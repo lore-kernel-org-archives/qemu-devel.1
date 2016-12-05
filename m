@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45026)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45755)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cDwHa-0003Sp-LJ
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 11:38:27 -0500
+	(envelope-from <krister@redhat.com>) id 1cDwK1-0004ZO-NO
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 11:40:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cDwHV-0004Sh-PP
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 11:38:26 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47370)
+	(envelope-from <krister@redhat.com>) id 1cDwJw-0005P9-RO
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 11:40:57 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54678)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cDwHV-0004SS-KF
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 11:38:21 -0500
-Date: Mon, 5 Dec 2016 14:38:18 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20161205163818.GE13060@thinpad.lan.raisama.net>
-References: <1479777133-23567-1-git-send-email-ehabkost@redhat.com>
-	<1479777133-23567-12-git-send-email-ehabkost@redhat.com>
-	<2f5f20a1-920f-6381-8402-81df697d61d3@redhat.com>
-	<20161205170327.42c21c03.cornelia.huck@de.ibm.com>
+	(Exim 4.71) (envelope-from <krister@redhat.com>) id 1cDwJw-0005Ok-L8
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 11:40:52 -0500
+Reply-To: krister@redhat.com
+References: <20161201192652.9509-1-stefanha@redhat.com>
+	<20161205102549.GA23432@lemon>
+	<20161205145626.GF30434@stefanha-x1.localdomain>
+From: Karl Rister <krister@redhat.com>
+Message-ID: <8a60274e-2bb8-fd1a-282d-f1b5e106d684@redhat.com>
+Date: Mon, 5 Dec 2016 10:40:49 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20161205170327.42c21c03.cornelia.huck@de.ibm.com>
-Subject: Re: [Qemu-devel] [RFC 11/15] s390x: Initialize default bus lists
+In-Reply-To: <20161205145626.GF30434@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 00/13] aio: experimental virtio-blk
+ polling mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,50 +30,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cornelia.huck@de.ibm.com>
-Cc: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, Paolo Bonzini <pbonzini@redhat.com>
 
-On Mon, Dec 05, 2016 at 05:03:27PM +0100, Cornelia Huck wrote:
-> On Mon, 5 Dec 2016 16:24:00 +0100
-> David Hildenbrand <david@redhat.com> wrote:
-> 
-> > Am 22.11.2016 um 02:12 schrieb Eduardo Habkost:
-> > > Populate the default_bus_types list for the s390x machines. This
-> > > will allow qmp-machine-info.py to run in strict mode for s390x.
-> > >
-> > > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> > > ---
-> > >  hw/s390x/s390-virtio-ccw.c | 6 ++++++
-> > >  tests/qmp-machine-info.py  | 2 +-
-> > >  2 files changed, 7 insertions(+), 1 deletion(-)
-> > >
-> > > diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> > > index e340eab..2532fcb 100644
-> > > --- a/hw/s390x/s390-virtio-ccw.c
-> > > +++ b/hw/s390x/s390-virtio-ccw.c
-> > > @@ -206,6 +206,12 @@ static void ccw_machine_class_init(ObjectClass *oc, void *data)
-> > >      mc->use_sclp = 1;
-> > >      mc->max_cpus = 248;
-> > >      mc->get_hotplug_handler = s390_get_hotplug_handler;
-> > > +    machine_class_add_default_bus(mc, TYPE_VIRTUAL_CSS_BUS);
-> > > +    machine_class_add_default_bus(mc, TYPE_PCI_BUS);
-> > > +    machine_class_add_default_bus(mc, TYPE_S390_PCI_BUS);
-> > > +    machine_class_add_default_bus(mc, "s390-sclp-events-bus");
-> > > +    machine_class_add_default_bus(mc, TYPE_VIRTIO_BUS);
-> > > +
-> > 
-> > Maybe move and use
-> > #define TYPE_SCLP_EVENTS_BUS "s390-sclp-events-bus"
-> > 
-> > (maybe this should then become TYPE_S390_SCLP_EVENTS_BUS ...)
-> > 
-> > ?
-> > 
-> 
-> I'd ack/take such a patch.
+On 12/05/2016 08:56 AM, Stefan Hajnoczi wrote:
+<snip>
 
-Agreed. I will address that in final version. This version was
-supposed to include a "//FIXME: use macro here" comment.
+> Karl: do you have time to run a bigger suite of benchmarks to identify a
+> reasonable default poll-max-ns value?  Both aio=native and aio=threads
+> are important.
+> 
+> If there is a sweet spot that improves performance without pathological
+> cases then we could even enable polling by default in QEMU.
+> 
+> Otherwise we'd just document the recommended best polling duration as a
+> starting point for users.
+> 
+
+I have collected a baseline on the latest patches and am currently
+collecting poll-max-ns=16384.  I can certainly throw in a few more
+scenarios.  Do we want to stick with powers of 2 or some other strategy?
 
 -- 
-Eduardo
+Karl Rister <krister@redhat.com>
