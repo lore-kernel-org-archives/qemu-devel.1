@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49469)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50654)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cDwXv-0007Bb-7N
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 11:55:20 -0500
+	(envelope-from <berrange@redhat.com>) id 1cDwbg-0001y1-7g
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 11:59:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cDwXs-0002TS-5H
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 11:55:19 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59196)
+	(envelope-from <berrange@redhat.com>) id 1cDwbe-0003Sm-R0
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 11:59:12 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50198)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cDwXr-0002TE-Up
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 11:55:16 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <1479922617-4400-1-git-send-email-eblake@redhat.com>
-Date: Mon, 05 Dec 2016 17:55:12 +0100
-In-Reply-To: <1479922617-4400-1-git-send-email-eblake@redhat.com> (Eric
-	Blake's message of "Wed, 23 Nov 2016 11:36:53 -0600")
-Message-ID: <877f7euxhr.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cDwbe-0003Sa-J0
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 11:59:10 -0500
+Date: Mon, 5 Dec 2016 16:59:05 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20161205165905.GR2498@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <1480928380-161760-1-git-send-email-longpeng2@huawei.com>
+	<1480928380-161760-2-git-send-email-longpeng2@huawei.com>
+	<20161205091842.GA2498@redhat.com>
+	<33183CC9F5247A488A2544077AF19020DA152B60@DGGEMA505-MBX.china.huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 for-2.8 0/4] Fix MacOS runtime failure
- of qobject_from_jsonf()
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <33183CC9F5247A488A2544077AF19020DA152B60@DGGEMA505-MBX.china.huawei.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.9 1/3] crypto: add standard des
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,29 +31,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, programmingkidx@gmail.com, pbonzini@redhat.com
+To: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Cc: longpeng <longpeng2@huawei.com>, "eblake@redhat.com" <eblake@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Wubin (H)" <wu.wubin@huawei.com>, "Zhoujian (jay, Euler)" <jianjay.zhou@huawei.com>
 
-Eric Blake <eblake@redhat.com> writes:
+On Mon, Dec 05, 2016 at 09:29:59AM +0000, Gonglei (Arei) wrote:
+> >
+> > >      switch (alg) {
+> > > +    case QCRYPTO_CIPHER_ALG_DES:
+> > >      case QCRYPTO_CIPHER_ALG_DES_RFB:
+> > >      case QCRYPTO_CIPHER_ALG_AES_128:
+> > >      case QCRYPTO_CIPHER_ALG_AES_192:
+> > > @@ -256,11 +257,17 @@ QCryptoCipher
+> > *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
+> > >      ctx = g_new0(QCryptoCipherNettle, 1);
+> > >
+> > >      switch (alg) {
+> > > +    case QCRYPTO_CIPHER_ALG_DES:
+> > >      case QCRYPTO_CIPHER_ALG_DES_RFB:
+> > >          ctx->ctx = g_new0(struct des_ctx, 1);
+> > > -        rfbkey = qcrypto_cipher_munge_des_rfb_key(key, nkey);
+> > > -        des_set_key(ctx->ctx, rfbkey);
+> > > -        g_free(rfbkey);
+> > > +
+> > > +        if (alg == QCRYPTO_CIPHER_ALG_DES_RFB) {
+> > > +            rfbkey = qcrypto_cipher_munge_des_rfb_key(key, nkey);
+> > > +            des_set_key(ctx->ctx, rfbkey);
+> > > +            g_free(rfbkey);
+> > > +        } else {
+> > > +            des_set_key(ctx->ctx, key);
+> > > +        }
+> > >
+> > >          ctx->alg_encrypt_native = des_encrypt_native;
+> > >          ctx->alg_decrypt_native = des_decrypt_native;
+> > > diff --git a/crypto/cipher.c b/crypto/cipher.c
+> > > index a9bca41..00d9682 100644
+> > > --- a/crypto/cipher.c
+> > > +++ b/crypto/cipher.c
+> > > @@ -27,6 +27,7 @@ static size_t
+> > alg_key_len[QCRYPTO_CIPHER_ALG__MAX] = {
+> > >      [QCRYPTO_CIPHER_ALG_AES_128] = 16,
+> > >      [QCRYPTO_CIPHER_ALG_AES_192] = 24,
+> > >      [QCRYPTO_CIPHER_ALG_AES_256] = 32,
+> > > +    [QCRYPTO_CIPHER_ALG_DES] = 8,
+> > >      [QCRYPTO_CIPHER_ALG_DES_RFB] = 8,
+> > >      [QCRYPTO_CIPHER_ALG_CAST5_128] = 16,
+> > >      [QCRYPTO_CIPHER_ALG_SERPENT_128] = 16,
+> > > @@ -41,6 +42,7 @@ static size_t
+> > alg_block_len[QCRYPTO_CIPHER_ALG__MAX] = {
+> > >      [QCRYPTO_CIPHER_ALG_AES_128] = 16,
+> > >      [QCRYPTO_CIPHER_ALG_AES_192] = 16,
+> > >      [QCRYPTO_CIPHER_ALG_AES_256] = 16,
+> > > +    [QCRYPTO_CIPHER_ALG_DES] = 8,
+> > >      [QCRYPTO_CIPHER_ALG_DES_RFB] = 8,
+> > >      [QCRYPTO_CIPHER_ALG_CAST5_128] = 8,
+> > >      [QCRYPTO_CIPHER_ALG_SERPENT_128] = 16,
+> > > @@ -107,7 +109,8 @@
+> > qcrypto_cipher_validate_key_length(QCryptoCipherAlgorithm alg,
+> > >      }
+> > >
+> > >      if (mode == QCRYPTO_CIPHER_MODE_XTS) {
+> > > -        if (alg == QCRYPTO_CIPHER_ALG_DES_RFB) {
+> > > +        if (alg == QCRYPTO_CIPHER_ALG_DES_RFB
+> > > +            || alg == QCRYPTO_CIPHER_ALG_DES) {
+> > >              error_setg(errp, "XTS mode not compatible with DES-RFB");
+> > >              return false;
+> > >          }
+> > > diff --git a/qapi/crypto.json b/qapi/crypto.json
+> > > index 5c9d7d4..d403ab9 100644
+> > > --- a/qapi/crypto.json
+> > > +++ b/qapi/crypto.json
+> > > @@ -75,7 +75,7 @@
+> > >  { 'enum': 'QCryptoCipherAlgorithm',
+> > >    'prefix': 'QCRYPTO_CIPHER_ALG',
+> > >    'data': ['aes-128', 'aes-192', 'aes-256',
+> > > -           'des-rfb',
+> > > +           'des-rfb', 'des',
+> > 
+> > Can we call this '3des' to make it clear that this is Triple-DES and not
+> > the single-DES (which des-rfb is)
+> > 
+> Actually the current des is not triple-DES, just the single-DES, and des-rfb in QEMU is just a variant of
+> single DES, which change the standard key by calling qcrypto_cipher_munge_des_rfb_key().
+> 
+> I think we can add the 3des support as well in the next step.
+> 
+> The current single-DES in the patch set is ok to me. :)
 
-> programmingkidx@gmail.com[*] reported a runtime failure on a
-> 32-bit Mac OS compilation, where "%"PRId64 expands to "%qd".
-> Fortunately, we had very few spots that were relying on our
-> pseudo-printf JSON parsing of int64_t numbers, so it was
-> easier to just convert callers to stick to safer %lld.
->
-> The remaining uses of pseudo-printf handling are more complex;
-> there are only 3 users in the released codebased, but LOTS of
-> users in the testsuite (via wrapper functions like qmp()); I
-> will be posting a followup series that rips out the remaining
-> uses of dynamic JSON, but it will be 2.9 material, while
-> these (first three) patches qualify for 2.8.  The fourth patch
-> is RFC; not intended to be applied now, but shows how I tested
-> patch 3/4; it will probably reappear in the later 2.9 series.
->
-> [*] git log shows the name John, but the particular email that
-> sparked this only stated the non-descript name 'G 3', which
-> makes it a bit hard for me to know which form is preferred
-> when lending credit.
+Per my othre reply in this thread, I don't think we should be supporting
+single-DES at all in QEMU / cryptodev. So IMHO, the correct fix is to
+remove the single-DES support from cryptodev entirely
 
-PATCH 1-3 applied to qapi-next for 2.8 with minor touch-ups.  Thanks!
+Regards,
+Daniel
+-- 
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
