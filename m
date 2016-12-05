@@ -1,22 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45612)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45644)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cDxqm-0007BH-AP
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 13:18:53 -0500
+	(envelope-from <david@redhat.com>) id 1cDxqo-0007CA-GI
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 13:18:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cDxql-0000YT-Bs
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 13:18:52 -0500
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <1480937130-24561-1-git-send-email-nikunj@linux.vnet.ibm.com>
-	<1480937130-24561-13-git-send-email-nikunj@linux.vnet.ibm.com>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <720dddfe-5db4-e243-872f-7e0557eaa86c@twiddle.net>
-Date: Mon, 5 Dec 2016 10:18:47 -0800
+	(envelope-from <david@redhat.com>) id 1cDxql-0000YN-9f
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 13:18:54 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:11327)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1cDxql-0000Y5-39
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 13:18:51 -0500
+Received: from int-mx14.intmail.prod.int.phx2.redhat.com
+	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 19A5C8B137
+	for <qemu-devel@nongnu.org>; Mon,  5 Dec 2016 18:18:50 +0000 (UTC)
+References: <1480713496-11213-1-git-send-email-ehabkost@redhat.com>
+	<1480713496-11213-16-git-send-email-ehabkost@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <df0f3ade-bd09-58a0-ac83-3775d4ab7c6c@redhat.com>
+Date: Mon, 5 Dec 2016 19:18:47 +0100
 MIME-Version: 1.0
-In-Reply-To: <1480937130-24561-13-git-send-email-nikunj@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <1480713496-11213-16-git-send-email-ehabkost@redhat.com>
+Content-Type: text/plain; charset=iso-8859-15; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 12/13] target-ppc: implement xscpsgnqp
- instruction
+Subject: Re: [Qemu-devel] [PATCH for-2.9 15/17] target-i386: Define static
+ "base" CPU model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,19 +34,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
-Cc: qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com
+To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
 
-On 12/05/2016 03:25 AM, Nikunj A Dadhania wrote:
-> xscpsgnqp: VSX Scalar Copy Sign Quad-Precision
-> 
-> Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-> ---
->  target-ppc/translate/vsx-impl.inc.c | 12 +++++++++++-
->  target-ppc/translate/vsx-ops.inc.c  |  1 +
->  2 files changed, 12 insertions(+), 1 deletion(-)
+Am 02.12.2016 um 22:18 schrieb Eduardo Habkost:
+> The query-cpu-model-expand QMP command needs at least one static
+> model, to allow the "static" expansion mode to be implemented.
+> Instead of defining static versions of every CPU model, define a
+> "base" CPU model that has absolutely no feature flag enabled.
+>
 
-Reviewed-by: Richard Henderson <rth@twiddle.net>
+Introducing separate ones makes feature lists presented to the user much 
+shorter (and therefore easier to maintain). But I don't know how libvirt 
+wants to deal with models on x86 in the future.
+
+How long is the static expansion on a recent intel CPU?
 
 
-r~
+-- 
+
+David
