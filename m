@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35133)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35149)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1cE16i-0006dy-DA
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 16:47:33 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1cE16j-0006eL-Kv
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 16:47:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1cE16h-0002E1-5y
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 16:47:32 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1cE16i-0002Ea-LY
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 16:47:33 -0500
 From: Eric Auger <eric.auger@redhat.com>
-Date: Mon,  5 Dec 2016 22:46:37 +0100
-Message-Id: <1480974406-29345-7-git-send-email-eric.auger@redhat.com>
+Date: Mon,  5 Dec 2016 22:46:38 +0100
+Message-Id: <1480974406-29345-8-git-send-email-eric.auger@redhat.com>
 In-Reply-To: <1480974406-29345-1-git-send-email-eric.auger@redhat.com>
 References: <1480974406-29345-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [kvm-unit-tests RFC 06/15] arm/arm64: ITS: Set the LPI
- config and pending tables
+Subject: [Qemu-devel] [kvm-unit-tests RFC 07/15] arm/arm64: ITS: Init the
+ command queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,200 +23,126 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, qemu-arm@nongnu.org, drjones@redhat.com, marc.zyngier@arm.com, christoffer.dall@linaro.org
 Cc: andre.przywara@arm.com, peter.maydell@linaro.org, alex.bennee@linaro.org, pbonzini@redhat.com
 
-Allocate the LPI configuration and per re-distributor pending table.
-Set redistributor's PROPBASER and PENDBASER. The LPIs are enabled
-by default in the config table.
+Allocate the command queue and initialize related registers:
+CBASER, CREADR, CWRITER.
+
+The command queue is 64kB. This aims at not bothing with fullness.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 ---
- lib/arm/asm/gic-v3-its.h | 20 +++++++++++++
- lib/arm/asm/gic-v3.h     | 77 ++++++++++++++++++++++++++++++++++++++++++++++++
- lib/arm/gic-v3-its.c     | 50 +++++++++++++++++++++++++++++++
- 3 files changed, 147 insertions(+)
+ lib/arm/asm/gic-v3-its.h | 37 +++++++++++++++++++++++++++++++++++++
+ lib/arm/gic-v3-its.c     | 35 +++++++++++++++++++++++++++++++++++
+ 2 files changed, 72 insertions(+)
 
 diff --git a/lib/arm/asm/gic-v3-its.h b/lib/arm/asm/gic-v3-its.h
-index 2fdc042..6fd5d6d 100644
+index 6fd5d6d..21054cb 100644
 --- a/lib/arm/asm/gic-v3-its.h
 +++ b/lib/arm/asm/gic-v3-its.h
-@@ -13,6 +13,26 @@
- #include <asm/setup.h>
- #include <asm/io.h>
+@@ -33,8 +33,35 @@
+ #define GICR_PROPBASER_InnerShareable                                   \
+ 	GIC_BASER_SHAREABILITY(GICR_PROPBASER, InnerShareable)
  
-+#define GIC_BASER_CACHEABILITY(reg, inner_outer, type)                  \
-+	(GIC_BASER_CACHE_##type << reg##_##inner_outer##_CACHEABILITY_SHIFT)
-+
-+#define GIC_BASER_SHAREABILITY(reg, type)                               \
-+	(GIC_BASER_##type << reg##_SHAREABILITY_SHIFT)
-+
-+#define GICR_PROPBASER_SHAREABILITY_SHIFT               (10)
-+#define GICR_PROPBASER_INNER_CACHEABILITY_SHIFT         (7)
-+#define GICR_PROPBASER_OUTER_CACHEABILITY_SHIFT         (56)
-+#define GICR_PROPBASER_SHAREABILITY_MASK                                \
-+	GIC_BASER_SHAREABILITY(GICR_PROPBASER, SHAREABILITY_MASK)
-+#define GICR_PROPBASER_INNER_CACHEABILITY_MASK                          \
-+	GIC_BASER_CACHEABILITY(GICR_PROPBASER, INNER, MASK)
-+#define GICR_PROPBASER_OUTER_CACHEABILITY_MASK                          \
-+	GIC_BASER_CACHEABILITY(GICR_PROPBASER, OUTER, MASK)
-+#define GICR_PROPBASER_CACHEABILITY_MASK GICR_PROPBASER_INNER_CACHEABILITY_MASK
-+
-+#define GICR_PROPBASER_InnerShareable                                   \
-+	GIC_BASER_SHAREABILITY(GICR_PROPBASER, InnerShareable)
-+
++#define GITS_CBASER                     0x0080
++#define GITS_CWRITER                    0x0088
++#define GITS_CREADR                     0x0090
  #define GITS_BASER                      0x0100
  
++#define GITS_CBASER_VALID                       (1UL << 63)
++#define GITS_CBASER_SHAREABILITY_SHIFT          (10)
++#define GITS_CBASER_INNER_CACHEABILITY_SHIFT    (59)
++#define GITS_CBASER_OUTER_CACHEABILITY_SHIFT    (53)
++#define GITS_CBASER_SHAREABILITY_MASK                                   \
++	GIC_BASER_SHAREABILITY(GITS_CBASER, SHAREABILITY_MASK)
++#define GITS_CBASER_INNER_CACHEABILITY_MASK                             \
++	GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, MASK)
++#define GITS_CBASER_OUTER_CACHEABILITY_MASK                             \
++	GIC_BASER_CACHEABILITY(GITS_CBASER, OUTER, MASK)
++#define GITS_CBASER_CACHEABILITY_MASK GITS_CBASER_INNER_CACHEABILITY_MASK
++
++#define GITS_CBASER_InnerShareable                                      \
++	GIC_BASER_SHAREABILITY(GITS_CBASER, InnerShareable)
++
++#define GITS_CBASER_nCnB        GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, nCnB)
++#define GITS_CBASER_nC          GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, nC)
++#define GITS_CBASER_RaWt        GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, RaWt)
++#define GITS_CBASER_RaWb        GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, RaWt)
++#define GITS_CBASER_WaWt        GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, WaWt)
++#define GITS_CBASER_WaWb        GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, WaWb)
++#define GITS_CBASER_RaWaWt      GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, RaWaWt)
++#define GITS_CBASER_RaWaWb      GIC_BASER_CACHEABILITY(GITS_CBASER, INNER, RaWaWb)
++
  #define GITS_BASER_NR_REGS              8
-diff --git a/lib/arm/asm/gic-v3.h b/lib/arm/asm/gic-v3.h
-index 039b7c2..0bdb013 100644
---- a/lib/arm/asm/gic-v3.h
-+++ b/lib/arm/asm/gic-v3.h
-@@ -45,6 +45,81 @@
- #define MPIDR_TO_SGI_AFFINITY(cluster_id, level) \
- 	(MPIDR_AFFINITY_LEVEL(cluster_id, level) << ICC_SGI1R_AFFINITY_## level ## _SHIFT)
  
-+#define GIC_BASER_CACHE_nCnB            0ULL
-+#define GIC_BASER_CACHE_SameAsInner     0ULL
-+#define GIC_BASER_CACHE_nC              1ULL
-+#define GIC_BASER_CACHE_RaWt            2ULL
-+#define GIC_BASER_CACHE_RaWb            3ULL
-+#define GIC_BASER_CACHE_WaWt            4ULL
-+#define GIC_BASER_CACHE_WaWb            5ULL
-+#define GIC_BASER_CACHE_RaWaWt          6ULL
-+#define GIC_BASER_CACHE_RaWaWb          7ULL
-+#define GIC_BASER_CACHE_MASK            7ULL
-+#define GIC_BASER_NonShareable          0ULL
-+#define GIC_BASER_InnerShareable        1ULL
-+#define GIC_BASER_OuterShareable        2ULL
-+#define GIC_BASER_SHAREABILITY_MASK     3ULL
-+
-+#define GIC_BASER_CACHEABILITY(reg, inner_outer, type)                  \
-+	(GIC_BASER_CACHE_##type << reg##_##inner_outer##_CACHEABILITY_SHIFT)
-+
-+#define GIC_BASER_SHAREABILITY(reg, type)                               \
-+	(GIC_BASER_##type << reg##_SHAREABILITY_SHIFT)
-+
-+#define GICR_PROPBASER_SHAREABILITY_SHIFT               (10)
-+#define GICR_PROPBASER_INNER_CACHEABILITY_SHIFT         (7)
-+#define GICR_PROPBASER_OUTER_CACHEABILITY_SHIFT         (56)
-+#define GICR_PROPBASER_SHAREABILITY_MASK                                \
-+	GIC_BASER_SHAREABILITY(GICR_PROPBASER, SHAREABILITY_MASK)
-+#define GICR_PROPBASER_INNER_CACHEABILITY_MASK                          \
-+	GIC_BASER_CACHEABILITY(GICR_PROPBASER, INNER, MASK)
-+#define GICR_PROPBASER_OUTER_CACHEABILITY_MASK                          \
-+	GIC_BASER_CACHEABILITY(GICR_PROPBASER, OUTER, MASK)
-+#define GICR_PROPBASER_CACHEABILITY_MASK GICR_PROPBASER_INNER_CACHEABILITY_MASK
-+
-+#define GICR_PROPBASER_InnerShareable                                   \
-+	GIC_BASER_SHAREABILITY(GICR_PROPBASER, InnerShareable)
-+
-+#define GICR_PROPBASER_nCnB     GIC_BASER_CACHEABILITY(GICR_PROPBASER, INNER, nCnB)
-+#define GICR_PROPBASER_nC       GIC_BASER_CACHEABILITY(GICR_PROPBASER, INNER, nC)
-+#define GICR_PROPBASER_RaWt     GIC_BASER_CACHEABILITY(GICR_PROPBASER, INNER, RaWt)
-+#define GICR_PROPBASER_RaWb     GIC_BASER_CACHEABILITY(GICR_PROPBASER, INNER, RaWt)
-+#define GICR_PROPBASER_WaWt     GIC_BASER_CACHEABILITY(GICR_PROPBASER, INNER, WaWt)
-+#define GICR_PROPBASER_WaWb     GIC_BASER_CACHEABILITY(GICR_PROPBASER, INNER, WaWb)
-+#define GICR_PROPBASER_RaWaWt   GIC_BASER_CACHEABILITY(GICR_PROPBASER, INNER, RaWaWt)
-+#define GICR_PROPBASER_RaWaWb   GIC_BASER_CACHEABILITY(GICR_PROPBASER, INNER, RaWaWb)
-+
-+#define GICR_PROPBASER_IDBITS_MASK                      (0x1f)
-+
-+#define GICR_PENDBASER_SHAREABILITY_SHIFT               (10)
-+#define GICR_PENDBASER_INNER_CACHEABILITY_SHIFT         (7)
-+#define GICR_PENDBASER_OUTER_CACHEABILITY_SHIFT         (56)
-+#define GICR_PENDBASER_SHAREABILITY_MASK                                \
-+	GIC_BASER_SHAREABILITY(GICR_PENDBASER, SHAREABILITY_MASK)
-+#define GICR_PENDBASER_INNER_CACHEABILITY_MASK                          \
-+	GIC_BASER_CACHEABILITY(GICR_PENDBASER, INNER, MASK)
-+#define GICR_PENDBASER_OUTER_CACHEABILITY_MASK                          \
-+	GIC_BASER_CACHEABILITY(GICR_PENDBASER, OUTER, MASK)
-+#define GICR_PENDBASER_CACHEABILITY_MASK GICR_PENDBASER_INNER_CACHEABILITY_MASK
-+
-+#define GICR_PENDBASER_InnerShareable                                   \
-+	GIC_BASER_SHAREABILITY(GICR_PENDBASER, InnerShareable)
-+
-+#define GICR_PENDBASER_nCnB     GIC_BASER_CACHEABILITY(GICR_PENDBASER, INNER, nCnB)
-+#define GICR_PENDBASER_nC       GIC_BASER_CACHEABILITY(GICR_PENDBASER, INNER, nC)
-+#define GICR_PENDBASER_RaWt     GIC_BASER_CACHEABILITY(GICR_PENDBASER, INNER, RaWt)
-+#define GICR_PENDBASER_RaWb     GIC_BASER_CACHEABILITY(GICR_PENDBASER, INNER, RaWt)
-+#define GICR_PENDBASER_WaWt     GIC_BASER_CACHEABILITY(GICR_PENDBASER, INNER, WaWt)
-+#define GICR_PENDBASER_WaWb     GIC_BASER_CACHEABILITY(GICR_PENDBASER, INNER, WaWb)
-+#define GICR_PENDBASER_RaWaWt   GIC_BASER_CACHEABILITY(GICR_PENDBASER, INNER, RaWaWt)
-+#define GICR_PENDBASER_RaWaWb   GIC_BASER_CACHEABILITY(GICR_PENDBASER, INNER, RaWaWb)
-+
-+#define GICR_PENDBASER_PTZ                              BIT_ULL(62)
-+
-+#define LPI_PROP_GROUP1                 (1 << 1)
-+#define LPI_PROP_ENABLED                (1 << 0)
-+#define LPI_PROP_DEFAULT_PRIO   0xa0
-+
- #include <asm/arch_gicv3.h>
+ #define GITS_BASER_VALID                        (1UL << 63)
+@@ -84,6 +111,8 @@
+ #define GITS_BASER_TYPE_RESERVED6       6
+ #define GITS_BASER_TYPE_RESERVED7       7
  
- #ifndef __ASSEMBLY__
-@@ -57,6 +132,8 @@
- struct gicv3_data {
- 	void *dist_base;
- 	void *redist_base[NR_CPUS];
-+	void *lpi_prop;
-+	void *lpi_pend[NR_CPUS];
- 	unsigned int irq_nr;
- 	unsigned int cpu_count;
++#define ITS_FLAGS_CMDQ_NEEDS_FLUSHING           (1ULL << 0)
++
+ struct its_baser {
+ 	unsigned int index;
+ 	int type;
+@@ -97,9 +126,17 @@ struct its_baser {
+ 	int esz;
  };
+ 
++struct its_cmd_block {
++	u64     raw_cmd[4];
++};
++
+ struct its_data {
+ 	void *base;
++	struct its_cmd_block *cmd_base;
++	struct its_cmd_block *cmd_write;
++	struct its_cmd_block *cmd_readr;
+ 	struct its_baser baser[GITS_BASER_NR_REGS];
++	u64 flags;
+ };
+ 
+ extern struct its_data its_data;
 diff --git a/lib/arm/gic-v3-its.c b/lib/arm/gic-v3-its.c
-index 225a72e..5eb8e6a 100644
+index 5eb8e6a..f577d5f 100644
 --- a/lib/arm/gic-v3-its.c
 +++ b/lib/arm/gic-v3-its.c
-@@ -86,3 +86,53 @@ void its_setup_baser(int i, struct its_baser *baser)
- 	writeq(val, reg_addr);
+@@ -136,3 +136,38 @@ void alloc_lpi_tables(void)
+ 		writeq(pend_val, ptr + GICR_PENDBASER);
+ 	}
  }
- 
-+/*
-+ * alloc_lpi_tables: Allocate LPI config and pending tables
-+ * Enable LPIs in the config table.
-+ *
-+ * prerequisites: gic_data.cpu_count must be set
++
++/**
++ * init_cmd_queue: Allocate the command queue and initialize
++ * CBASER, CREADR, CWRITER
 + */
-+void alloc_lpi_tables(void)
++void init_cmd_queue(void)
 +{
-+	u64 prop_val;
-+	unsigned int cpu;
++	u64 cbaser, tmp;
 +
-+	if (!gicv3_data.cpu_count)
-+		report_abort("%s cpu_count not set\n", __func__);
++	its_data.cmd_base = (void *)phys_zalloc_aligned(SZ_64K, SZ_64K);
 +
-+	gicv3_data.lpi_prop =
-+		(void *)phys_zalloc_aligned(SZ_64K, SZ_64K);
++	cbaser = ((u64)its_data.cmd_base	|
++		 GITS_CBASER_WaWb               |
++		 GITS_CBASER_InnerShareable     |
++		 (SZ_64K / SZ_4K - 1) |
++		 GITS_CBASER_VALID);
 +
-+	/* ID bits = 13, ie. up to 14b LPI INTID */
-+	prop_val = ((u64)gicv3_data.lpi_prop |
-+			GICR_PROPBASER_InnerShareable |
-+			GICR_PROPBASER_WaWb |
-+			(13 & GICR_PROPBASER_IDBITS_MASK));
++	writeq(cbaser, its_data.base + GITS_CBASER);
++	tmp = readq(its_data.base + GITS_CBASER);
 +
-+	/* All LPIs enabled */
-+	memset(gicv3_data.lpi_prop,
-+	      LPI_PROP_DEFAULT_PRIO | LPI_PROP_GROUP1 | 1,
-+	      SZ_64K);
-+
-+	/*
-+	 * Allocate pending tables for each redistributor
-+	 * and set PROPBASER and PENDBASER
-+	 */
-+	for (cpu = 0; cpu < gicv3_data.cpu_count; cpu++) {
-+		u64 pend_val;
-+		void *ptr;
-+
-+		ptr = gicv3_data.redist_base[cpu];
-+
-+		writeq(prop_val, ptr + GICR_PROPBASER);
-+
-+		gicv3_data.lpi_pend[cpu] =
-+			(void *)phys_zalloc_aligned(SZ_64K, SZ_64K);
-+
-+		pend_val = ((u64)gicv3_data.lpi_pend[cpu] |
-+			GICR_PENDBASER_InnerShareable |
-+			GICR_PENDBASER_WaWb);
-+
-+		writeq(pend_val, ptr + GICR_PENDBASER);
++	if ((tmp ^ cbaser) & GITS_CBASER_SHAREABILITY_MASK) {
++		if (!(tmp & GITS_CBASER_SHAREABILITY_MASK)) {
++			cbaser &= ~(GITS_CBASER_SHAREABILITY_MASK |
++				GITS_CBASER_CACHEABILITY_MASK);
++			cbaser |= GITS_CBASER_nC;
++			writeq(cbaser, its_data.base + GITS_CBASER);
++		}
++		its_data.flags |= ITS_FLAGS_CMDQ_NEEDS_FLUSHING;
 +	}
++
++	its_data.cmd_write = its_data.cmd_base;
++	its_data.cmd_readr = its_data.cmd_base;
++	writeq(0, its_data.base + GITS_CWRITER);
++	writeq(0, its_data.base + GITS_CREADR);
 +}
 -- 
 2.5.5
