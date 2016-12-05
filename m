@@ -1,23 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49633)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41381)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <3v0n1d3@gmail.com>) id 1cDfdk-0002By-Uu
-	for qemu-devel@nongnu.org; Sun, 04 Dec 2016 17:52:14 -0500
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cDvPF-0001Pg-JS
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 10:42:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <3v0n1d3@gmail.com>) id 1cDfdj-00042r-U3
-	for qemu-devel@nongnu.org; Sun, 04 Dec 2016 17:52:13 -0500
-Received: from mail-yb0-x233.google.com ([2607:f8b0:4002:c09::233]:35925)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <3v0n1d3@gmail.com>) id 1cDfdj-00042i-Ol
-	for qemu-devel@nongnu.org; Sun, 04 Dec 2016 17:52:11 -0500
-Received: by mail-yb0-x233.google.com with SMTP id v78so53332353ybe.3
-	for <qemu-devel@nongnu.org>; Sun, 04 Dec 2016 14:52:11 -0800 (PST)
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cDvPA-0001k1-6e
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 10:42:17 -0500
+Received: from 001b2d01.pphosted.com ([148.163.156.1]:53873
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
+	id 1cDvP9-0001hi-Sv
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 10:42:12 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
+	uB5Fefvu072397
+	for <qemu-devel@nongnu.org>; Mon, 5 Dec 2016 10:42:09 -0500
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2758u5s7at-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 05 Dec 2016 10:42:09 -0500
+Received: from localhost
+	by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
+	Mon, 5 Dec 2016 15:42:06 -0000
+Date: Mon, 5 Dec 2016 16:42:00 +0100
+From: Cornelia Huck <cornelia.huck@de.ibm.com>
+In-Reply-To: <148095126363.31351.4484514300033863622.stgit@bahia>
+References: <148095126363.31351.4484514300033863622.stgit@bahia>
 MIME-Version: 1.0
-From: Ruslan Habalov <3v0n1d3@gmail.com>
-Date: Sun, 4 Dec 2016 23:52:10 +0100
-Message-ID: <CAP5jUk10i4P0x99n6+yXvDfR=ExN0jxyvF2_Ur_82N1_JTWgxg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: [Qemu-devel] Slow qemu guest performance after host is resumed from
- suspended state
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Message-Id: <20161205164200.49bec0f6.cornelia.huck@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.8] qdev: apply global properties in
+ reverse order
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,50 +42,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-stable@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Hi everyone,
+On Mon, 05 Dec 2016 16:21:22 +0100
+Greg Kurz <groug@kaod.org> wrote:
 
-I'm having the following qemu issue since about February on Xubuntu.
+> The current code recursively applies global properties from child up to
+> parent. So, if you have:
+> 
+> -global virtio-pci.disable-modern=on
+> -global virtio-blk-pci.disable-modern=off
+> 
+> Then the default value of disable-modern for a virtio-blk-pci device is on,
+> which looks wrong from an OOP perspective.
+> 
+> This patch reverses the logic, so that a child property always prevail.
 
-Steps to reproduce:
-1) Boot host and boot qemu guest - everything works perfect
-2) Shutdown qemu guest
-3) Suspend host and resume host
-4) Boot qemu guest again - the guest is now extremely slow
+This sounds reasonable...
 
-Current system setup:
-host: kernel 4.8.0-27-generic (also reproducible with older kernel versions)
-qemu guest: Linux or Windows affected (tested both)
+> 
+> This fixes a subtle bug that got introduced in 2.7 with commit "9a4c0e220d8a
+> hw/virtio-pci: fix virtio behaviour" for older (< 2.7) machine types: the
+> HW_COMPAT_2_6 macro contains global virtio-pci.disable-* properties which
+> would silently override global properties passed on the command line for
+> virtio subtypes.
+> 
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+> ---
+> 
+> AFAIK, libvirt's XML doesn't know about modern/legacy modes for virtio
+> devices. Early adopters of virtio 1.0 had to rely on the <qemu:commandline>
+> tag to pass global properties to QEMU. This patch ensures that XML files
+> used with older machine types remain valid with newer versions of QEMU.
+> 
+> FWIW I guess it could help to have this fix in 2.8, and also probably in
+> 2.7.1.
 
-I've tried to debug the issue on my own with the following results:
-------------------------------------------------------------------------------------------------------------------------------
-https://www.evonide.com/images/qemu_problem.png
-- This shows "perf top $QEMU_PID" from guest boot to shutdown for three
-different scenarios:
-  Left: normal guest behavior after fresh boot of host system
-  Middle: very slow guest after host was suspended and resumed
-  Right: test run with disabled HPET (since I initially assumed some
-problems with HPET)
+...but I'm a bit worried about doing that change this late in the
+cycle, as we may introduce subtle changes for other configurations. At
+the very least, we should look over the existing backwards compat
+properties (I'll look at those I'm familiar with).
 
-https://www.evonide.com/images/qemu_hpet_investigation.png
-- Results of "perf record -g" and "perf report"
-  According to stefanha (qemu IRC) this doesn't seem to indicate any error
-sources.
+> 
+> Please advise.
+> 
+>  hw/core/qdev-properties.c |   11 ++++++++++-
+>  1 file changed, 10 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+> index 2a8276806721..1345f489d6b1 100644
+> --- a/hw/core/qdev-properties.c
+> +++ b/hw/core/qdev-properties.c
+> @@ -1119,11 +1119,20 @@ static void qdev_prop_set_globals_for_type(DeviceState *dev,
+>  void qdev_prop_set_globals(DeviceState *dev)
+>  {
+>      ObjectClass *class = object_get_class(OBJECT(dev));
+> +    GSList *class_list = NULL;
+> 
+>      do {
+> -        qdev_prop_set_globals_for_type(dev, object_class_get_name(class));
+> +        class_list = g_slist_prepend(class_list, class);
+>          class = object_class_get_parent(class);
+>      } while (class);
+> +
+> +    do {
+> +        GSList *head = class_list;
+> +
+> +        qdev_prop_set_globals_for_type(dev, object_class_get_name(head->data));
+> +        class_list = g_slist_next(head);
+> +        g_slist_free_1(head);
+> +    } while (class_list);
+>  }
+> 
+>  /* --- 64bit unsigned int 'size' type --- */
+> 
 
-https://www.evonide.com/images/qemu_vm_exit_healthy_vs_unhealthy.png
-- Results of running: "perf record -a -e kvm:kvm_exit" and "perf
-report" from guest boot to shutdown
-  - Left: normal situation (after fresh host boot)
-  - Right: bad situation    (after suspend and resume on host and boot of
-qemu guest)
-  There were ~300 out of order events reported by perf for the "bad"
-scenario (vs. only 2 for the "good" scenario).
-------------------------------------------------------------------------------------------------------------------------------
-I was also recommended to check the host timers (e.g. /proc/timer_list).
-However, this file has more than 800 lines and I am unsure what to look for.
-
-Please let me know if you need further information on this issue.
-
-Best regards,
-Ruslan Habalov (Evonide)
+It is a bit unfortunate that we need a double loop here, but I don't
+see any good alternative.
