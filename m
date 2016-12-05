@@ -1,17 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58854)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34976)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1cE0rv-0007Zp-M3
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 16:32:19 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1cE16L-0006OE-AY
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 16:47:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1cE0rr-0005p8-0z
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 16:32:15 -0500
-From: Jeff Cody <jcody@redhat.com>
-Date: Mon,  5 Dec 2016 16:32:00 -0500
-Message-Id: <1480973521-28945-3-git-send-email-jcody@redhat.com>
-In-Reply-To: <1480973521-28945-1-git-send-email-jcody@redhat.com>
-References: <1480973521-28945-1-git-send-email-jcody@redhat.com>
-Subject: [Qemu-devel] [PULL for-2.8 2/3] block/nfs: fix QMP to match debug
- option
+	(envelope-from <eric.auger@redhat.com>) id 1cE16K-00027F-G7
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 16:47:09 -0500
+From: Eric Auger <eric.auger@redhat.com>
+Date: Mon,  5 Dec 2016 22:46:31 +0100
+Message-Id: <1480974406-29345-1-git-send-email-eric.auger@redhat.com>
+Subject: [Qemu-devel] [kvm-unit-tests RFC 00/15] arm/arm64: add ITS framework
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,77 +17,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: peter.maydell@linaro.org, jcody@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, qemu-arm@nongnu.org, drjones@redhat.com, marc.zyngier@arm.com, christoffer.dall@linaro.org
+Cc: andre.przywara@arm.com, peter.maydell@linaro.org, alex.bennee@linaro.org, pbonzini@redhat.com
 
-From: Prasanna Kumar Kalever <prasanna.kalever@redhat.com>
+This series proposes a framework to test the virtual ITS.
+This is based on Drew's v7 series [1]. The last patch tests
+several ITS commands (collection/device mapping, interrupt
+translation service entry creation and LPI trigger through INT
+command). At this point we don't use any external PCIe device
+to write into the GITS_TRANSLATER register.
 
-The QMP definition of BlockdevOptionsNfs:
-{ 'struct': 'BlockdevOptionsNfs',
-  'data': { 'server': 'NFSServer',
-            'path': 'str',
-            '*user': 'int',
-            '*group': 'int',
-            '*tcp-syn-count': 'int',
-            '*readahead-size': 'int',
-            '*page-cache-size': 'int',
-            '*debug-level': 'int' } }
+The bulk of the code derives from the ITS driver code so all
+the credit is due to Marc.
 
-To make this consistent with other block protocols like gluster, lets
-change s/debug-level/debug/
+Many other ITS commands could be tested. Also existing MMIO
+accesses could be enhanced into standalone tests. Current focus
+was to make it functional.
 
-Suggested-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Prasanna Kumar Kalever <prasanna.kalever@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Jeff Cody <jcody@redhat.com>
----
- block/nfs.c          | 4 ++--
- qapi/block-core.json | 4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
+The code deserves more cleanup with respect to cacheability
+attributes in general.
 
-diff --git a/block/nfs.c b/block/nfs.c
-index d082783..a490660 100644
---- a/block/nfs.c
-+++ b/block/nfs.c
-@@ -134,7 +134,7 @@ static int nfs_parse_uri(const char *filename, QDict *options, Error **errp)
-             qdict_put(options, "page-cache-size",
-                       qstring_from_str(qp->p[i].value));
-         } else if (!strcmp(qp->p[i].name, "debug")) {
--            qdict_put(options, "debug-level",
-+            qdict_put(options, "debug",
-                       qstring_from_str(qp->p[i].value));
-         } else {
-             error_setg(errp, "Unknown NFS parameter name: %s",
-@@ -165,7 +165,7 @@ static bool nfs_has_filename_options_conflict(QDict *options, Error **errp)
-             !strcmp(qe->key, "tcp-syn-count") ||
-             !strcmp(qe->key, "readahead-size") ||
-             !strcmp(qe->key, "page-cache-size") ||
--            !strcmp(qe->key, "debug-level") ||
-+            !strcmp(qe->key, "debug") ||
-             strstart(qe->key, "server.", NULL))
-         {
-             error_setg(errp, "Option %s cannot be used with a filename",
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 03b19f1..f22ed2a 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -2292,7 +2292,7 @@
- # @page-cache-size:         #optional set the pagecache size in bytes (defaults
- #                           to libnfs default)
- #
--# @debug-level:             #optional set the NFS debug level (max 2) (defaults
-+# @debug:                   #optional set the NFS debug level (max 2) (defaults
- #                           to libnfs default)
- #
- # Since 2.8
-@@ -2305,7 +2305,7 @@
-             '*tcp-syn-count': 'int',
-             '*readahead-size': 'int',
-             '*page-cache-size': 'int',
--            '*debug-level': 'int' } }
-+            '*debug': 'int' } }
- 
- ##
- # @BlockdevOptionsCurl
+Tested on Cavium ThunderX [2].
+
+Best Regards
+
+Eric
+
+[1] [kvm-unit-tests PATCH v7 00/11] arm/arm64: add gic framework
+
+[2] sample command line:
+
+$QEMU -machine virt,accel=kvm -cpu host \
+ -device virtio-serial-device \
+ -device virtconsole,chardev=ctd -chardev testdev,id=ctd \
+ -display none -serial stdio \
+ -kernel arm/gic.flat \
+ -smp 8 -machine gic-version=3 -append 'its'
+
+Eric Auger (15):
+  libcflat: Add other size defines
+  arm/arm64: gicv3: Add some re-distributor defines
+  arm/arm64: ITS skeleton
+  arm/arm64: ITS: BASER parsing and setup
+  arm/arm64: GICv3: add cpu count
+  arm/arm64: ITS: Set the LPI config and pending tables
+  arm/arm64: ITS: Init the command queue
+  arm/arm64: ITS: enable LPIs at re-distributor level
+  arm/arm64: ITS: Parse the typer register
+  arm/arm64: ITS: its_enable_defaults
+  arm/arm64: ITS: create device
+  arm/arm64: ITS: create collection
+  arm/arm64: ITS: commands
+  arm/arm64: gic: Generalize ipi_enable()
+  arm/arm64: ITS test
+
+ arm/Makefile.common        |   1 +
+ arm/gic.c                  | 101 +++++++++++-
+ lib/arm/asm/gic-v3-its.h   | 238 +++++++++++++++++++++++++++
+ lib/arm/asm/gic-v3.h       |  84 ++++++++++
+ lib/arm/asm/gic.h          |   1 +
+ lib/arm/gic-v3-its-cmd.c   | 399 +++++++++++++++++++++++++++++++++++++++++++++
+ lib/arm/gic-v3-its.c       | 305 ++++++++++++++++++++++++++++++++++
+ lib/arm/gic-v3.c           |   2 +
+ lib/arm/gic.c              |  30 +++-
+ lib/arm64/asm/gic-v3-its.h |   1 +
+ lib/libcflat.h             |   3 +
+ 11 files changed, 1154 insertions(+), 11 deletions(-)
+ create mode 100644 lib/arm/asm/gic-v3-its.h
+ create mode 100644 lib/arm/gic-v3-its-cmd.c
+ create mode 100644 lib/arm/gic-v3-its.c
+ create mode 100644 lib/arm64/asm/gic-v3-its.h
+
 -- 
-2.7.4
+2.5.5
