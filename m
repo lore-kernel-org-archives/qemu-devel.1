@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35048)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35095)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1cE16W-0006Uv-NX
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 16:47:22 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1cE16f-0006cJ-7e
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 16:47:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1cE16V-0002Br-Il
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 16:47:20 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1cE16a-0002Cu-7b
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 16:47:29 -0500
 From: Eric Auger <eric.auger@redhat.com>
-Date: Mon,  5 Dec 2016 22:46:34 +0100
-Message-Id: <1480974406-29345-4-git-send-email-eric.auger@redhat.com>
+Date: Mon,  5 Dec 2016 22:46:35 +0100
+Message-Id: <1480974406-29345-5-git-send-email-eric.auger@redhat.com>
 In-Reply-To: <1480974406-29345-1-git-send-email-eric.auger@redhat.com>
 References: <1480974406-29345-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [kvm-unit-tests RFC 03/15] arm/arm64: ITS skeleton
+Subject: [Qemu-devel] [kvm-unit-tests RFC 04/15] arm/arm64: ITS: BASER
+ parsing and setup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,164 +23,190 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, qemu-arm@nongnu.org, drjones@redhat.com, marc.zyngier@arm.com, christoffer.dall@linaro.org
 Cc: andre.przywara@arm.com, peter.maydell@linaro.org, alex.bennee@linaro.org, pbonzini@redhat.com
 
-At the moment we just detect the presence of ITS as part of the
-GICv3 init routine and initialize its base address.
+Add helper routines to parse BASER registers and set them up
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 ---
- arm/Makefile.common        |  1 +
- lib/arm/asm/gic-v3-its.h   | 22 ++++++++++++++++++++++
- lib/arm/asm/gic.h          |  1 +
- lib/arm/gic-v3-its.c       |  9 +++++++++
- lib/arm/gic.c              | 30 +++++++++++++++++++++++++-----
- lib/arm64/asm/gic-v3-its.h |  1 +
- 6 files changed, 59 insertions(+), 5 deletions(-)
- create mode 100644 lib/arm/asm/gic-v3-its.h
- create mode 100644 lib/arm/gic-v3-its.c
- create mode 100644 lib/arm64/asm/gic-v3-its.h
+ lib/arm/asm/gic-v3-its.h | 72 +++++++++++++++++++++++++++++++++++++++++++
+ lib/arm/gic-v3-its.c     | 79 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 151 insertions(+)
 
-diff --git a/arm/Makefile.common b/arm/Makefile.common
-index 6c0898f..070f349 100644
---- a/arm/Makefile.common
-+++ b/arm/Makefile.common
-@@ -47,6 +47,7 @@ cflatobjs += lib/arm/bitops.o
- cflatobjs += lib/arm/psci.o
- cflatobjs += lib/arm/smp.o
- cflatobjs += lib/arm/gic.o lib/arm/gic-v2.o lib/arm/gic-v3.o
-+cflatobjs += lib/arm/gic-v3-its.o
- 
- libeabi = lib/arm/libeabi.a
- eabiobjs = lib/arm/eabi_compat.o
 diff --git a/lib/arm/asm/gic-v3-its.h b/lib/arm/asm/gic-v3-its.h
-new file mode 100644
-index 0000000..2044565
---- /dev/null
+index 2044565..2fdc042 100644
+--- a/lib/arm/asm/gic-v3-its.h
 +++ b/lib/arm/asm/gic-v3-its.h
-@@ -0,0 +1,22 @@
-+/*
-+ * All ITS* defines are lifted from include/linux/irqchip/arm-gic-v3.h
-+ *
-+ * Copyright (C) 2016, Red Hat Inc, Andrew Jones <drjones@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU LGPL, version 2.
-+ */
-+#ifndef _ASMARM_GIC_V3_ITS_H_
-+#define _ASMARM_GIC_V3_ITS_H_
-+
-+#ifndef __ASSEMBLY__
-+
-+struct its_data {
-+	void *base;
-+};
-+
-+extern struct its_data its_data;
-+
-+#define gicv3_its_base()		(its_data.base)
-+
-+#endif /* !__ASSEMBLY__ */
-+#endif /* _ASMARM_GIC_V3_ITS_H_ */
-diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
-index ea5fde9..73d4502 100644
---- a/lib/arm/asm/gic.h
-+++ b/lib/arm/asm/gic.h
-@@ -30,6 +30,7 @@
- 
- #include <asm/gic-v2.h>
- #include <asm/gic-v3.h>
-+#include <asm/gic-v3-its.h>
+@@ -10,13 +10,85 @@
  
  #ifndef __ASSEMBLY__
- #include <asm/cpumask.h>
+ 
++#include <asm/setup.h>
++#include <asm/io.h>
++
++#define GITS_BASER                      0x0100
++
++#define GITS_BASER_NR_REGS              8
++
++#define GITS_BASER_VALID                        (1UL << 63)
++#define GITS_BASER_INDIRECT                     (1ULL << 62)
++
++#define GITS_BASER_INNER_CACHEABILITY_SHIFT     (59)
++#define GITS_BASER_OUTER_CACHEABILITY_SHIFT     (53)
++#define GITS_BASER_INNER_CACHEABILITY_MASK                              \
++	GIC_BASER_CACHEABILITY(GITS_BASER, INNER, MASK)
++#define GITS_BASER_CACHEABILITY_MASK            GITS_BASER_INNER_CACHEABILITY_MASK
++#define GITS_BASER_OUTER_CACHEABILITY_MASK                              \
++	GIC_BASER_CACHEABILITY(GITS_BASER, OUTER, MASK)
++#define GITS_BASER_SHAREABILITY_MASK                                    \
++	GIC_BASER_SHAREABILITY(GITS_BASER, SHAREABILITY_MASK)
++
++#define GITS_BASER_nCnB         GIC_BASER_CACHEABILITY(GITS_BASER, INNER, nCnB)
++#define GITS_BASER_nC           GIC_BASER_CACHEABILITY(GITS_BASER, INNER, nC)
++#define GITS_BASER_RaWt         GIC_BASER_CACHEABILITY(GITS_BASER, INNER, RaWt)
++#define GITS_BASER_RaWb         GIC_BASER_CACHEABILITY(GITS_BASER, INNER, RaWt)
++#define GITS_BASER_WaWt         GIC_BASER_CACHEABILITY(GITS_BASER, INNER, WaWt)
++#define GITS_BASER_WaWb         GIC_BASER_CACHEABILITY(GITS_BASER, INNER, WaWb)
++#define GITS_BASER_RaWaWt       GIC_BASER_CACHEABILITY(GITS_BASER, INNER, RaWaWt)
++#define GITS_BASER_RaWaWb       GIC_BASER_CACHEABILITY(GITS_BASER, INNER, RaWaWb)
++
++#define GITS_BASER_TYPE_SHIFT                   (56)
++#define GITS_BASER_TYPE(r)              (((r) >> GITS_BASER_TYPE_SHIFT) & 7)
++#define GITS_BASER_ENTRY_SIZE_SHIFT             (48)
++#define GITS_BASER_ENTRY_SIZE(r)        ((((r) >> GITS_BASER_ENTRY_SIZE_SHIFT) & 0x1f) + 1)
++#define GITS_BASER_SHAREABILITY_SHIFT   (10)
++#define GITS_BASER_InnerShareable                                       \
++	GIC_BASER_SHAREABILITY(GITS_BASER, InnerShareable)
++#define GITS_BASER_PAGE_SIZE_SHIFT      (8)
++#define GITS_BASER_PAGE_SIZE_4K         (0UL << GITS_BASER_PAGE_SIZE_SHIFT)
++#define GITS_BASER_PAGE_SIZE_16K        (1UL << GITS_BASER_PAGE_SIZE_SHIFT)
++#define GITS_BASER_PAGE_SIZE_64K        (2UL << GITS_BASER_PAGE_SIZE_SHIFT)
++#define GITS_BASER_PAGE_SIZE_MASK       (3UL << GITS_BASER_PAGE_SIZE_SHIFT)
++#define GITS_BASER_PAGES_MAX            256
++#define GITS_BASER_PAGES_SHIFT          (0)
++#define GITS_BASER_NR_PAGES(r)          (((r) & 0xff) + 1)
++
++#define GITS_BASER_TYPE_NONE            0
++#define GITS_BASER_TYPE_DEVICE          1
++#define GITS_BASER_TYPE_VCPU            2
++#define GITS_BASER_TYPE_CPU             3
++#define GITS_BASER_TYPE_COLLECTION      4
++#define GITS_BASER_TYPE_RESERVED5       5
++#define GITS_BASER_TYPE_RESERVED6       6
++#define GITS_BASER_TYPE_RESERVED7       7
++
++struct its_baser {
++	unsigned int index;
++	int type;
++	u64 cache;
++	int shr;
++	size_t psz;
++	int nr_pages;
++	bool indirect;
++	phys_addr_t table_addr;
++	bool valid;
++	int esz;
++};
++
+ struct its_data {
+ 	void *base;
++	struct its_baser baser[GITS_BASER_NR_REGS];
+ };
+ 
+ extern struct its_data its_data;
+ 
+ #define gicv3_its_base()		(its_data.base)
+ 
++extern int its_parse_baser(int i, struct its_baser *baser);
++extern void its_setup_baser(int i, struct its_baser *baser);
++
++
+ #endif /* !__ASSEMBLY__ */
+ #endif /* _ASMARM_GIC_V3_ITS_H_ */
 diff --git a/lib/arm/gic-v3-its.c b/lib/arm/gic-v3-its.c
-new file mode 100644
-index 0000000..e382b80
---- /dev/null
+index e382b80..225a72e 100644
+--- a/lib/arm/gic-v3-its.c
 +++ b/lib/arm/gic-v3-its.c
-@@ -0,0 +1,9 @@
-+/*
-+ * Copyright (C) 2016, Red Hat Inc, Eric Auger <eric.auger@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU LGPL, version 2.
-+ */
-+#include <asm/gic.h>
-+
-+struct its_data its_data;
-+
-diff --git a/lib/arm/gic.c b/lib/arm/gic.c
-index 957a146..e551abd 100644
---- a/lib/arm/gic.c
-+++ b/lib/arm/gic.c
-@@ -6,6 +6,7 @@
- #include <devicetree.h>
- #include <asm/gic.h>
- #include <asm/io.h>
-+#include <asm/gic-v3-its.h>
+@@ -7,3 +7,82 @@
  
- struct gic_common_ops *gic_common_ops;
+ struct its_data its_data;
  
-@@ -17,12 +18,14 @@ struct gicv3_data gicv3_data;
-  * Documentation/devicetree/bindings/interrupt-controller/arm,gic-v3.txt
-  */
- static bool
--gic_get_dt_bases(const char *compatible, void **base1, void **base2)
-+gic_get_dt_bases(const char *compatible, void **base1, void **base2,
-+		 void **base3)
- {
- 	struct dt_pbus_reg reg;
--	struct dt_device gic;
-+	struct dt_device gic, its;
- 	struct dt_bus bus;
--	int node, ret;
-+	int node, subnode, ret, len;
-+	const void *fdt = dt_fdt();
- 
- 	dt_bus_init_defaults(&bus);
- 	dt_device_init(&gic, &bus, NULL);
-@@ -43,19 +46,36 @@ gic_get_dt_bases(const char *compatible, void **base1, void **base2)
- 	assert(ret == 0);
- 	*base2 = ioremap(reg.addr, reg.size);
- 
-+	if (base3 && !strcmp(compatible, "arm,gic-v3")) {
-+		dt_for_each_subnode(node, subnode) {
-+			const struct fdt_property *prop;
++static const char * const its_base_type_string[] = {
++	[GITS_BASER_TYPE_DEVICE]        = "Devices",
++	[GITS_BASER_TYPE_VCPU]          = "Virtual CPUs",
++	[GITS_BASER_TYPE_CPU]           = "Physical CPUs",
++	[GITS_BASER_TYPE_COLLECTION]    = "Interrupt Collections",
++	[GITS_BASER_TYPE_RESERVED5]     = "Reserved (5)",
++	[GITS_BASER_TYPE_RESERVED6]     = "Reserved (6)",
++	[GITS_BASER_TYPE_RESERVED7]     = "Reserved (7)",
++};
 +
-+			prop = fdt_get_property(fdt, subnode,
-+						"compatible", &len);
-+			if (!strcmp((char *)prop->data, "arm,gic-v3-its")) {
-+				dt_device_bind_node(&its, subnode);
-+				ret = dt_pbus_translate(&its, 0, &reg);
-+				assert(ret == 0);
-+				*base3 = ioremap(reg.addr, reg.size);
-+				break;
-+			}
-+		}
++int its_parse_baser(int i, struct its_baser *baser)
++{
++	void *reg_addr = gicv3_its_base() + GITS_BASER + i * 8;
++	u64 val = readq(reg_addr);
++	int inner_cache;
 +
++	if (!val) {
++		memset(baser, 0, sizeof(*baser));
++		return -1;
 +	}
 +
- 	return true;
- }
- 
- int gicv2_init(void)
- {
- 	return gic_get_dt_bases("arm,cortex-a15-gic",
--			&gicv2_data.dist_base, &gicv2_data.cpu_base);
-+			&gicv2_data.dist_base, &gicv2_data.cpu_base, NULL);
- }
- 
- int gicv3_init(void)
- {
- 	return gic_get_dt_bases("arm,gic-v3", &gicv3_data.dist_base,
--			&gicv3_data.redist_base[0]);
-+			&gicv3_data.redist_base[0], &its_data.base);
- }
- 
- int gic_init(void)
-diff --git a/lib/arm64/asm/gic-v3-its.h b/lib/arm64/asm/gic-v3-its.h
-new file mode 100644
-index 0000000..083cba4
---- /dev/null
-+++ b/lib/arm64/asm/gic-v3-its.h
-@@ -0,0 +1 @@
-+#include "../../arm/asm/gic-v3-its.h"
++	baser->valid = val & GITS_BASER_VALID;
++	baser->indirect = val & GITS_BASER_INDIRECT;
++	baser->type = GITS_BASER_TYPE(val);
++	baser->esz = GITS_BASER_ENTRY_SIZE(val);
++	baser->nr_pages = GITS_BASER_NR_PAGES(val);
++	baser->table_addr = (val >> 12) & 36;
++	inner_cache = (val >> 59) & 0x7;
++	baser->cache = inner_cache;
++	switch (val & GITS_BASER_PAGE_SIZE_MASK) {
++	case GITS_BASER_PAGE_SIZE_4K:
++		baser->psz = SZ_4K;
++		break;
++	case GITS_BASER_PAGE_SIZE_16K:
++		baser->psz = SZ_16K;
++		break;
++	case GITS_BASER_PAGE_SIZE_64K:
++		baser->psz = SZ_64K;
++		break;
++	default:
++		baser->psz = SZ_64K;
++	}
++	baser->shr = (val >> 10) & 0x3;
++
++	return 0;
++}
++
++void its_setup_baser(int i, struct its_baser *baser)
++{
++	void *reg_addr = gicv3_its_base() + GITS_BASER + i * 8;
++	u64 val = readq(reg_addr);
++
++	baser->table_addr =
++		(u64)phys_zalloc(baser->psz * baser->nr_pages);
++
++	val = ((u64)baser->table_addr					|
++		((u64)baser->type << GITS_BASER_TYPE_SHIFT)		|
++		((u64)(baser->esz - 1) << GITS_BASER_ENTRY_SIZE_SHIFT)	|
++		((baser->nr_pages - 1) << GITS_BASER_PAGES_SHIFT)	|
++		baser->cache						|
++		baser->shr						|
++		GITS_BASER_VALID);
++
++	val |=  baser->indirect ? GITS_BASER_INDIRECT : 0x0;
++	switch (baser->psz) {
++	case SZ_4K:
++		val |= GITS_BASER_PAGE_SIZE_4K;
++		break;
++	case SZ_16K:
++		val |= GITS_BASER_PAGE_SIZE_16K;
++		break;
++	case SZ_64K:
++		val |= GITS_BASER_PAGE_SIZE_64K;
++		break;
++	}
++
++	writeq(val, reg_addr);
++}
++
 -- 
 2.5.5
