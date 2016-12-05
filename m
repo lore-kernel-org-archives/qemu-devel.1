@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52564)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54655)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cDwhC-0006ZH-21
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 12:05:00 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1cDwno-0003YW-8S
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 12:11:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cDwh6-0005jX-Rr
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 12:04:54 -0500
-Received: from mail-wj0-x229.google.com ([2a00:1450:400c:c01::229]:34996)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cDwh6-0005ip-9r
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 12:04:48 -0500
-Received: by mail-wj0-x229.google.com with SMTP id v7so296059795wjy.2
-	for <qemu-devel@nongnu.org>; Mon, 05 Dec 2016 09:04:48 -0800 (PST)
-References: <20161202173454.19179-1-alex.bennee@linaro.org>
-	<8737i21vl8.fsf@linaro.org>
-	<b6c3b949-ef2a-31f4-ce86-712ce7b64a3f@twiddle.net>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <b6c3b949-ef2a-31f4-ce86-712ce7b64a3f@twiddle.net>
-Date: Mon, 05 Dec 2016 17:04:45 +0000
-Message-ID: <87twaiz4r6.fsf@linaro.org>
+	(envelope-from <ehabkost@redhat.com>) id 1cDwnj-0000Q0-7Z
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 12:11:44 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41048)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cDwni-0000PJ-TG
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 12:11:39 -0500
+Date: Mon, 5 Dec 2016 15:11:35 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20161205171135.GG13060@thinpad.lan.raisama.net>
+References: <1480713496-11213-1-git-send-email-ehabkost@redhat.com>
+	<d611cf93-06e4-edc1-8012-1501f3b883ad@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for-2.8] target-arm/translate-a64: fix
- gen_load_exclusive
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d611cf93-06e4-edc1-8012-1501f3b883ad@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.9 00/17] target-i386: Implement
+ query-cpu-model-expansion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,63 +28,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: stefanha@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org, cota@braap.org, "open list:ARM" <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, libvir-list@redhat.com, Markus Armbruster <armbru@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, "Jason J. Herne" <jjherne@linux.vnet.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Igor Mammedov <imammedo@redhat.com>, Jiri Denemark <jdenemar@redhat.com>, Richard Henderson <rth@twiddle.net>
+
+On Mon, Dec 05, 2016 at 04:15:38PM +0100, David Hildenbrand wrote:
+> Am 02.12.2016 um 22:17 schrieb Eduardo Habkost:
+> > This series implements query-cpu-model-expansion on target-i386.
+> > 
+> > QAPI / interface changes
+> > ------------------------
+> > 
+> > When implementing this, I have noticed that the "host" CPU model
+> > in i386 includes some migration-unsafe features that can't be
+> > translated to any migration-safe representation: "pmu", and
+> > "host-cache-info".
+> > 
+> > To be able to handle the migration-unsafe features, I have
+> > extended the query-cpu-model-expansion definition to be clear
+> > about what happens to those features when the CPU model is
+> > expanded (in short: static expansion removes them, full expansion
+> > keeps them).
+> 
+> I think this makes sense. The important part is to really keep static
+> expansion static :)
+> 
+> > 
+> > I also added "static" and "migration-safe" fields to the return
+> > value of query-cpu-model-expansion, so callers can know if the
+> > the expanded representation is static and migration-safe.
+> 
+> Is static really needed? I can understand why migration-safe might be
+> of interest, but can't see how "static" could help (I mean we have
+> static expansion for this purpose). Do you have anything special in
+> mind regarding exposing "static"?
+
+I didn't have any specific use case in mind. My main worry is to
+avoid letting management software make any assumptions about the
+returned data. If we don't add an explicit "static" field, a
+client might make some wrong assumptions just because some
+conditions are known to be always true on existing
+implementations. e.g.: a client could incorrectly assume that
+"query-cpu-model-expansion type=full" of a migration-safe model
+would always be static.
 
 
-Richard Henderson <rth@twiddle.net> writes:
+> 
+> > 
+> > Test code
+> > ---------
+> > 
+> > I have added a Python test script for the feature, that will try
+> > multiple combinations of the expansion operation, and see if the
+> > returned data keeps matches some constratins.
+> > 
+> > The test script works with the s390x query-cpu-model-expansion
+> > command, except that: 1) I couldn't test it with KVM; 2) qtest.py
+> > error handling when QEMU refuses to run is unreliable (so the
+> > script needs runnability information to be availble in TCG mode,
+> > too, to skip not-runnable CPU models and avoid problems).
+> 
+> Everything except "host" should behave completely the same on s390x
+> with or without KVM being active. So with !KVM tests we can already
+> cover most of the interesting parts. Thanks for taking care of s390x.
+> 
+> > 
+> > Future versions of the test script could run a arch-specific
+> > CPUID-dump guest binary, and validate data seen by the guest
+> > directly. While we don't do that, the script validates all QOM
+> > properties on the CPU objects looking for unexpected changes. At
+> > least in the case of x86, the QOM properties will include lots of
+> > the CPUID data seen by the guest, giving us decent coverage.
+> 
+> Something like that would be cool. Unfortunately, e.g. on s390x some
+> CPUID-like data (e.g. STFL(E) and SCP info) is only available from
+> kernel space. So we can't simply run a user space script. However,
+> something like a kernel module would be possible (or even something like the
+> s390x pc-bios to simply read and dump the data).
 
-> On 12/05/2016 03:09 AM, Alex Bennée wrote:
->>
->> Alex Bennée <alex.bennee@linaro.org> writes:
->>
->>> While testing rth's latest TCG patches with risu I found ldaxp was
->>> broken. Investigating further I found it was broken by 1dd089d0 when
->>> the cmpxchg atomic work was merged.
->>
->> CC'ing Paolo/Richard
->>
->> Do you guys have any final TCG fixes planned for 2.8 that can take this
->> fix for the ldaxp regression?
->
-> I don't have any pending patchs for 2.8, no.
->
->>> As part of that change the code
->>> attempted to be clever by doing a single 64 bit load and then shuffle
->>> the data around to set the two 32 bit registers.
->
-> It's not trying to be "clever", it's trying to be correct, giving an atomic
-> 64-bit load.
+I meant a kernel binary, above. On x86, there are existing test
+cases on the autotest repository that run a very small kernel[1]
+that simply dumps CPUID data to the serial console. We could
+reuse it, or we could add a CPUID command to the qtest protocol.
+I'm not sure what's the best solution.
 
-Ahh right I see. What happens if the backend is 32bit, will it issue two
-loads anyway?
+We can try to use a similar approach on s390x to reuse code in
+the test script, but we can add arch-specific code to it if
+necessary.
 
->
-> The fact that we didn't attempt an atomic 128-bit load here for the 64-bit pair
-> is a bug.  We have support for that in helper_atomic_ldo_le_mmu; I'm not sure
-> why I didn't use that here.
->
->>> As I couldn't quite follow the endian magic I've simply partially
->>> reverted the change to the original code gen_load_exclusive code. This
->>> doesn't affect the cmpxchg functionality as that is all done on in
->>> gen_store_exclusive part which is untouched.
->
-> We'll have to fix it properly eventually.  But perhaps 2.9 is soon enough,
-> since that's when mttcg will go in.
+[1] https://github.com/autotest/tp-qemu/tree/master/qemu/deps/cpuid/src
 
-I guess the easiest way would be to punt these paired loads to a helper?
-
-However regardless of the atomicity the actual values loaded into
-the registers are wrong so that behaviour is a regression vs 2.7.
-
-I don't know how often these load-exclusive paired operations are used
-in real code but I think we should at least fix it so the values are
-loaded properly for 2.8 and do the proper atomic fix for 2.9.
-
->
->
-> r~
-
-
---
-Alex Bennée
+-- 
+Eduardo
