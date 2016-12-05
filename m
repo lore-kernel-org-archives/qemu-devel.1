@@ -1,28 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57445)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58248)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dave.hansen@intel.com>) id 1cDwyH-00010l-F3
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 12:22:38 -0500
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cDx1l-00038g-MD
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 12:26:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dave.hansen@intel.com>) id 1cDwyC-0004nV-L9
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 12:22:33 -0500
-Received: from mga05.intel.com ([192.55.52.43]:23716)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dave.hansen@intel.com>)
-	id 1cDwyC-0004kY-8T
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 12:22:28 -0500
-References: <1480495397-23225-1-git-send-email-liang.z.li@intel.com>
-	<1480495397-23225-6-git-send-email-liang.z.li@intel.com>
-	<438dd41a-fdf1-2a77-ef9c-8c103f492b2f@intel.com>
-	<F2CBF3009FA73547804AE4C663CAB28E3A12D814@shsmsx102.ccr.corp.intel.com>
-From: Dave Hansen <dave.hansen@intel.com>
-Message-ID: <70ece7a5-348b-2eb9-c40a-f21b08df042c@intel.com>
-Date: Mon, 5 Dec 2016 09:22:25 -0800
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cDx1j-00067V-IZ
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 12:26:09 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33825)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
+	id 1cDx1j-00067B-9O
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 12:26:07 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
+	uB5HOemW118442
+	for <qemu-devel@nongnu.org>; Mon, 5 Dec 2016 12:26:03 -0500
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 275ah6gm10-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 05 Dec 2016 12:26:03 -0500
+Received: from localhost
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
+	Mon, 5 Dec 2016 17:26:01 -0000
+Date: Mon, 5 Dec 2016 18:25:55 +0100
+From: Cornelia Huck <cornelia.huck@de.ibm.com>
+In-Reply-To: <20161205164829.GB14457@thinpad.lan.raisama.net>
+References: <148095126363.31351.4484514300033863622.stgit@bahia>
+	<20161205164200.49bec0f6.cornelia.huck@de.ibm.com>
+	<20161205164829.GB14457@thinpad.lan.raisama.net>
 MIME-Version: 1.0
-In-Reply-To: <F2CBF3009FA73547804AE4C663CAB28E3A12D814@shsmsx102.ccr.corp.intel.com>
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH kernel v5 5/5] virtio-balloon: tell host
- vm's unused page info
+Message-Id: <20161205182555.2e988ac6.cornelia.huck@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.8] qdev: apply global properties in
+ reverse order
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,107 +43,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Li, Liang Z" <liang.z.li@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Cc: "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "quintela@redhat.com" <quintela@redhat.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "mhocko@suse.com" <mhocko@suse.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, Mel Gorman <mgorman@techsingularity.net>, Cornelia Huck <cornelia.huck@de.ibm.com>, Amit Shah <amit.shah@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Greg Kurz <groug@kaod.org>, Peter Maydell <peter.maydell@linaro.org>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-stable@nongnu.org, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 12/04/2016 05:13 AM, Li, Liang Z wrote:
->> On 11/30/2016 12:43 AM, Liang Li wrote:
->>> +static void send_unused_pages_info(struct virtio_balloon *vb,
->>> +				unsigned long req_id)
->>> +{
->>> +	struct scatterlist sg_in;
->>> +	unsigned long pos = 0;
->>> +	struct virtqueue *vq = vb->req_vq;
->>> +	struct virtio_balloon_resp_hdr *hdr = vb->resp_hdr;
->>> +	int ret, order;
->>> +
->>> +	mutex_lock(&vb->balloon_lock);
->>> +
->>> +	for (order = MAX_ORDER - 1; order >= 0; order--) {
->>
->> I scratched my head for a bit on this one.  Why are you walking over orders,
->> *then* zones.  I *think* you're doing it because you can efficiently fill the
->> bitmaps at a given order for all zones, then move to a new bitmap.  But, it
->> would be interesting to document this.
+On Mon, 5 Dec 2016 14:48:29 -0200
+Eduardo Habkost <ehabkost@redhat.com> wrote:
+
+> On Mon, Dec 05, 2016 at 04:42:00PM +0100, Cornelia Huck wrote:
+> > On Mon, 05 Dec 2016 16:21:22 +0100
+> > Greg Kurz <groug@kaod.org> wrote:
+> > 
+> > > The current code recursively applies global properties from child up to
+> > > parent. So, if you have:
+> > > 
+> > > -global virtio-pci.disable-modern=on
+> > > -global virtio-blk-pci.disable-modern=off
+> > > 
+> > > Then the default value of disable-modern for a virtio-blk-pci device is on,
+> > > which looks wrong from an OOP perspective.
+> > > 
+> > > This patch reverses the logic, so that a child property always prevail.
+> > 
+> > This sounds reasonable...
+> > 
+> > > 
+> > > This fixes a subtle bug that got introduced in 2.7 with commit "9a4c0e220d8a
+> > > hw/virtio-pci: fix virtio behaviour" for older (< 2.7) machine types: the
+> > > HW_COMPAT_2_6 macro contains global virtio-pci.disable-* properties which
+> > > would silently override global properties passed on the command line for
+> > > virtio subtypes.
+> > > 
+> > > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > > ---
+> > > 
+> > > AFAIK, libvirt's XML doesn't know about modern/legacy modes for virtio
+> > > devices. Early adopters of virtio 1.0 had to rely on the <qemu:commandline>
+> > > tag to pass global properties to QEMU. This patch ensures that XML files
+> > > used with older machine types remain valid with newer versions of QEMU.
+> > > 
+> > > FWIW I guess it could help to have this fix in 2.8, and also probably in
+> > > 2.7.1.
+> > 
+> > ...but I'm a bit worried about doing that change this late in the
+> > cycle, as we may introduce subtle changes for other configurations. At
+> > the very least, we should look over the existing backwards compat
+> > properties (I'll look at those I'm familiar with).
 > 
-> Yes, use the order is somewhat strange, but it's helpful to keep the API simple. 
-> Do you think it's acceptable?
-
-Yeah, it's fine.  Just comment it, please.
-
->>> +		if (ret == -ENOSPC) {
->>> +			void *new_resp_data;
->>> +
->>> +			new_resp_data = kmalloc(2 * vb->resp_buf_size,
->>> +						GFP_KERNEL);
->>> +			if (new_resp_data) {
->>> +				kfree(vb->resp_data);
->>> +				vb->resp_data = new_resp_data;
->>> +				vb->resp_buf_size *= 2;
->>
->> What happens to the data in ->resp_data at this point?  Doesn't this just
->> throw it away?
+> This patch would change the behavior for:
+>  -global virtio-blk-pci.disable-modern=on
+>  -global virtio-pci.disable-modern=off
 > 
-> Yes, so we should make sure the data in resp_data is not inuse.
+> And I am not sure the new behavior would be correct. Shouldn't we
+> apply the properties in the order specified in the command-line?
 
-But doesn't it have valid data that we just collected and haven't told
-the hypervisor about yet?  Aren't we throwing away good data that cost
-us something to collect?
+Probably; but how should this interact with compat props?
 
->> ...
->>> +struct page_info_item {
->>> +	__le64 start_pfn : 52; /* start pfn for the bitmap */
->>> +	__le64 page_shift : 6; /* page shift width, in bytes */
-
-What does a page_shift "in bytes" mean? :)
-
->>> +	__le64 bmap_len : 6;  /* bitmap length, in bytes */ };
->>
->> Is 'bmap_len' too short?  a 64-byte buffer is a bit tiny.  Right?
 > 
-> Currently, we just use the 8 bytes and 0 bytes bitmap, should we support more than 64 bytes?
+> On either case, changing the semantics of the command-line can
+> break existing configurations. Let's do it more carefully in the
+> 2.9 cycle, and fix the existing bug by changing the HW_COMPAT_*
+> macros?
 
-It just means that with this format, you end up wasting at least ~1/8th
-of the space with metadata.  That's a bit unfortunate, but I guess it's
-not fatal.
-
-I'd definitely call it out in the patch description and make sure other
-folks take a look at it.
-
-There's a somewhat easy fix, but that would make the qemu implementation
-more complicated: You could just have bmap_len==0x3f imply that there's
-another field that contains an extended bitmap length for when you need
-long bitmaps.
-
-But, as you note, there's no need for it, so it's a matter of trading
-the extra complexity versus the desire to not habing to change the ABI
-again for longer (hopefully).
-
->>> +static int  mark_unused_pages(struct zone *zone,
->>> +		unsigned long *unused_pages, unsigned long size,
->>> +		int order, unsigned long *pos)
->>> +{
->>> +	unsigned long pfn, flags;
->>> +	unsigned int t;
->>> +	struct list_head *curr;
->>> +	struct page_info_item *info;
->>> +
->>> +	if (zone_is_empty(zone))
->>> +		return 0;
->>> +
->>> +	spin_lock_irqsave(&zone->lock, flags);
->>> +
->>> +	if (*pos + zone->free_area[order].nr_free > size)
->>> +		return -ENOSPC;
->>
->> Urg, so this won't partially fill?  So, what the nr_free pages limit where we no
->> longer fit in the kmalloc()'d buffer where this simply won't work?
-> 
-> Yes.  My initial implementation is partially fill, it's better for the worst case.
-> I thought the above code is more efficient for most case ...
-> Do you think partially fill the bitmap is better?
-
-Could you please answer the question I asked?
-
-Because if you don't get this right, it could mean that there are system
-that simply *fail* here.
+Changing the compat props is probably the best option at this point in
+time. Let's take this slowly so we can come up with a reasonable
+solution for 2.9.
