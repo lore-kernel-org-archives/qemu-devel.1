@@ -1,16 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35521)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50529)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1cE17L-000797-5P
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 16:48:12 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1cE29V-00054j-2t
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 17:54:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1cE17K-0002SP-9M
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 16:48:11 -0500
-From: Eric Auger <eric.auger@redhat.com>
-Date: Mon,  5 Dec 2016 22:46:46 +0100
-Message-Id: <1480974406-29345-16-git-send-email-eric.auger@redhat.com>
-In-Reply-To: <1480974406-29345-1-git-send-email-eric.auger@redhat.com>
-References: <1480974406-29345-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [kvm-unit-tests RFC 15/15] arm/arm64: ITS test
+	(envelope-from <alex.williamson@redhat.com>) id 1cE29Q-0002VI-Tx
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 17:54:29 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40376)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1cE29Q-0002Ue-L5
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 17:54:24 -0500
+Date: Mon, 5 Dec 2016 15:54:21 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20161205155421.075bbec5@t450s.home>
+In-Reply-To: <1480972081-773-1-git-send-email-kwankhede@nvidia.com>
+References: <1480972081-773-1-git-send-email-kwankhede@nvidia.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/1] vfio iommu type1: set size to
+ PAGE_SIZE while looking for iova in dma list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,166 +28,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, qemu-arm@nongnu.org, drjones@redhat.com, marc.zyngier@arm.com, christoffer.dall@linaro.org
-Cc: andre.przywara@arm.com, peter.maydell@linaro.org, alex.bennee@linaro.org, pbonzini@redhat.com
+To: Kirti Wankhede <kwankhede@nvidia.com>
+Cc: pbonzini@redhat.com, kraxel@redhat.com, cjia@nvidia.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 
-This patch implements an example ITS test which
-- allocates a device
-- allocates a collection
-- maps the device to an ITT
-- maps the collection to a redistributor
-- creates an ITT entry for the device
-- requests an LPI for this entry
+On Tue, 6 Dec 2016 02:38:01 +0530
+Kirti Wankhede <kwankhede@nvidia.com> wrote:
 
-the test checks the LPI hits the right CPU and triggers
-the right lpi id.
+> In the functions of pin_pages/unpin_pages from mdev vendor driver,
+> vfio_find_dma() should be called with size as PAGE_SIZE instead of 0.
+> vfio_find_dma() searches for the range in dma_list.
+> 
+> In vfio_dma_do_unmap(), vfio_find_dma() when used to look for start
+> address of unmap->iova, size should be 1, not 0. Otherwise vfio_find_dma()
+> returns NULL.
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
----
- arm/gic.c                | 87 ++++++++++++++++++++++++++++++++++++++++++++++++
- lib/arm/asm/gic-v3-its.h | 10 ++++++
- 2 files changed, 97 insertions(+)
+Hi Kirti,
 
-diff --git a/arm/gic.c b/arm/gic.c
-index cbaab3f..89f34b6 100644
---- a/arm/gic.c
-+++ b/arm/gic.c
-@@ -31,6 +31,7 @@ static int acked[NR_CPUS], spurious[NR_CPUS];
- static int bad_sender[NR_CPUS], bad_irq[NR_CPUS];
- static int cmdl_sender = 1, cmdl_irq = 1;
- static cpumask_t ready;
-+static struct its_stats lpi_stats;
- 
- static void nr_cpu_check(int nr)
- {
-@@ -154,6 +155,42 @@ static void ipi_handler(struct pt_regs *regs __unused)
- 	}
- }
- 
-+static void lpi_handler(struct pt_regs *regs __unused)
-+{
-+	u32 irqstat = gic_read_iar();
-+	int irqnr = gic_iar_irqnr(irqstat);
-+
-+	gic_write_eoir(irqstat);
-+	smp_rmb(); /* pairs with wmb in lpi_stats_reset */
-+	lpi_stats.observed.cpu_id = smp_processor_id();
-+	lpi_stats.observed.lpi_id = irqnr;
-+	smp_wmb(); /* pairs with rmb in check_lpi_stats */
-+}
-+
-+static void lpi_stats_reset(int exp_cpu_id, int exp_lpi_id)
-+{
-+	lpi_stats.expected.cpu_id = exp_cpu_id;
-+	lpi_stats.expected.lpi_id = exp_lpi_id;
-+	lpi_stats.observed.cpu_id = -1;
-+	lpi_stats.observed.lpi_id = -1;
-+	smp_wmb(); /* pairs with rmb in handler */
-+}
-+
-+static void check_lpi_stats(void)
-+{
-+	mdelay(100);
-+	smp_rmb(); /* pairs with wmb in lpi_handler */
-+	if ((lpi_stats.observed.cpu_id != lpi_stats.expected.cpu_id) ||
-+	    (lpi_stats.observed.lpi_id != lpi_stats.expected.lpi_id))
-+		report("Unexpected LPI (cpuid=%d, lpidid=%d)\n", false,
-+			lpi_stats.observed.cpu_id,
-+			lpi_stats.observed.lpi_id);
-+	else
-+		report("LPI %d on CPU %d\n", true,
-+			lpi_stats.observed.lpi_id,
-+			lpi_stats.observed.cpu_id);
-+}
-+
- static void gicv2_ipi_send_self(void)
- {
- 	writel(2 << 24 | cmdl_irq, gicv2_dist_base() + GICD_SGIR);
-@@ -288,6 +325,51 @@ static void cmdl_ipi_get_inputs(int argc, char **argv)
- 	}
- }
- 
-+static void secondary_lpi_test(void)
-+{
-+	setup_irq(lpi_handler);
-+	cpumask_set_cpu(smp_processor_id(), &ready);
-+	while (1)
-+		wfi();
-+}
-+
-+static int gic_test_its(void)
-+{
-+	struct its_device *dev0;
-+	struct its_collection *col0;
-+	int cpu;
-+
-+	stats_reset();
-+
-+	setup_irq(lpi_handler);
-+	for_each_present_cpu(cpu) {
-+		if (cpu == 0)
-+			continue;
-+		smp_boot_secondary(cpu, secondary_lpi_test);
-+	}
-+	wait_on_ready();
-+
-+	its_enable_defaults();
-+
-+	report_prefix_push("Test 1");
-+
-+	dev0 = its_create_device(2 /* dev id */, 8 /* nvecs */);
-+	col0 = its_create_collection(3 /* col id */, 3/* target PE */);
-+
-+	lpi_stats_reset(3, 8195);
-+
-+	its_send_mapd(dev0, true);
-+	its_send_mapc(col0, true);
-+	its_send_mapti(dev0, 8195 /* lpi id */,
-+		       8200 /* event id */, col0);
-+	its_send_int(dev0, 8200);
-+
-+	check_lpi_stats();
-+
-+	return 0;
-+
-+}
-+
- static struct gic gicv2 = {
- 	.ipi = {
- 		.send_self = gicv2_ipi_send_self,
-@@ -342,7 +424,12 @@ int main(int argc, char **argv)
- 			smp_boot_secondary(cpu, ipi_test);
- 		}
- 		ipi_test();
-+	} else if (!strcmp(argv[1], "its")) {
-+		report_prefix_push(argv[1]);
- 
-+		gic_test_its();
-+
-+		report_prefix_pop();
- 	} else {
- 		report_abort("Unknown subtest '%s'", argv[1]);
- 	}
-diff --git a/lib/arm/asm/gic-v3-its.h b/lib/arm/asm/gic-v3-its.h
-index 6130605..10c6a09 100644
---- a/lib/arm/asm/gic-v3-its.h
-+++ b/lib/arm/asm/gic-v3-its.h
-@@ -198,6 +198,16 @@ struct its_data {
- 	u64 flags;
- };
- 
-+struct its_event {
-+	int cpu_id;
-+	int lpi_id;
-+};
-+
-+struct its_stats {
-+	struct its_event expected;
-+	struct its_event observed;
-+};
-+
- extern struct its_data its_data;
- 
- #define gicv3_its_base()		(its_data.base)
--- 
-2.5.5
+I'd prefer to fix the preexisting case of this issue as a separate
+patch, we might want to backport it for stable trees separately from the
+new cases introduced with mdev.  It would also be great if we could go
+into some detail about why size=0 doesn't work in these cases, ie.
+vfio_find_dma() accounting for the end address of the range makes it
+fall through at the wrong branch point.  For the case of the
+preexisting issue, it would also be useful to mention that the other
+case of passing size=0 works correctly due to the -1 in the start
+address calculation.  Finally, I think I agree with your choice to use
+PAGE_SIZE in one case and 1 in the preexisting case, but perhaps we
+could spell that out as one is related to a page size interface and the
+other is trying to test boundary conditions.  Thanks,
+
+Alex
+
+> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> Signed-off-by: Neo Jia <cjia@nvidia.com>
+> Change-Id: Iee6fd45441c342b5e8626087046b2e0075d19a08
+> ---
+>  drivers/vfio/vfio_iommu_type1.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> index a28fbddb505c..023fba7b8d5a 100644
+> --- a/drivers/vfio/vfio_iommu_type1.c
+> +++ b/drivers/vfio/vfio_iommu_type1.c
+> @@ -581,7 +581,7 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
+>  		struct vfio_pfn *vpfn;
+>  
+>  		iova = user_pfn[i] << PAGE_SHIFT;
+> -		dma = vfio_find_dma(iommu, iova, 0);
+> +		dma = vfio_find_dma(iommu, iova, PAGE_SIZE);
+>  		if (!dma) {
+>  			ret = -EINVAL;
+>  			goto pin_unwind;
+> @@ -622,7 +622,7 @@ pin_unwind:
+>  		dma_addr_t iova;
+>  
+>  		iova = user_pfn[j] << PAGE_SHIFT;
+> -		dma = vfio_find_dma(iommu, iova, 0);
+> +		dma = vfio_find_dma(iommu, iova, PAGE_SIZE);
+>  		vfio_unpin_page_external(dma, iova, do_accounting);
+>  		phys_pfn[j] = 0;
+>  	}
+> @@ -659,7 +659,7 @@ static int vfio_iommu_type1_unpin_pages(void *iommu_data,
+>  		dma_addr_t iova;
+>  
+>  		iova = user_pfn[i] << PAGE_SHIFT;
+> -		dma = vfio_find_dma(iommu, iova, 0);
+> +		dma = vfio_find_dma(iommu, iova, PAGE_SIZE);
+>  		if (!dma)
+>  			goto unpin_exit;
+>  		vfio_unpin_page_external(dma, iova, do_accounting);
+> @@ -826,7 +826,7 @@ again:
+>  	 * mappings within the range.
+>  	 */
+>  	if (iommu->v2) {
+> -		dma = vfio_find_dma(iommu, unmap->iova, 0);
+> +		dma = vfio_find_dma(iommu, unmap->iova, 1);
+>  		if (dma && dma->iova != unmap->iova) {
+>  			ret = -EINVAL;
+>  			goto unlock;
