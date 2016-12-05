@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57272)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57275)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cE2ka-0002qh-VO
+	(envelope-from <imammedo@redhat.com>) id 1cE2kb-0002qk-0A
 	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 18:32:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cE2kY-00061v-79
+	(envelope-from <imammedo@redhat.com>) id 1cE2kZ-00062H-G3
 	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 18:32:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37854)
+Received: from mx1.redhat.com ([209.132.183.28]:48556)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cE2kX-00061l-V1
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 18:32:46 -0500
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cE2kZ-00061z-7g
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 18:32:47 -0500
 Received: from int-mx10.intmail.prod.int.phx2.redhat.com
 	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 216B064D8B
-	for <qemu-devel@nongnu.org>; Mon,  5 Dec 2016 23:32:45 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 66A98C0AC361
+	for <qemu-devel@nongnu.org>; Mon,  5 Dec 2016 23:32:46 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Tue,  6 Dec 2016 00:32:28 +0100
-Message-Id: <1480980749-182204-10-git-send-email-imammedo@redhat.com>
+Date: Tue,  6 Dec 2016 00:32:29 +0100
+Message-Id: <1480980749-182204-11-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1480980749-182204-1-git-send-email-imammedo@redhat.com>
 References: <1480980749-182204-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.9 09/10] memhp: don't generate memory
- hotplug AML if it's not enabled/supported
+Subject: [Qemu-devel] [PATCH for-2.9 10/10] memhp: move DIMM devices into
+ dedicated scope with related common methods
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,204 +33,322 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: "Michael S. Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
 
-That reduces DSDT by 910 bytes when memory hotplug
-isn't enabled.
+Move DIMM devices from global _SB scope to a new \_SB.MHPC
+container along with common methods used by DIMMs:
+  MCRS, MRST, MPXM, MOST, MEJ00, MSCN, MTFY
 
-While doing so drop intermediate variables/arguments
-passing around ACPI_MEMORY_HOTPLUG_IO_LEN and making
-it local to memory_hotplug.c, hardcoding it there as
-it can't change.
-
-Also don't pass around ACPI_MEMORY_HOTPLUG_BASE through
-intermediate variables/arguments where it's not needed.
-Instead initialize in module static variable when MMIO
-region is mapped and use that within memory_hotplug.c
-whenever it's required.
-That way MMIO base specified only at one place and AML
-with MMIO would always use the same value.
+this reduces AML size on 12 * #slots bytes,
+i.e. up to 3072 bytes for 265 slots.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
- include/hw/acpi/memory_hotplug.h |  3 +--
- include/hw/acpi/pc-hotplug.h     |  1 -
- hw/acpi/ich9.c                   |  3 ++-
- hw/acpi/memory_hotplug.c         | 24 +++++++++++++++++-------
- hw/acpi/piix4.c                  |  3 ++-
- hw/i386/acpi-build.c             |  9 +--------
- 6 files changed, 23 insertions(+), 20 deletions(-)
+ hw/acpi/memory_hotplug.c | 190 ++++++++++++++++++++++++-----------------------
+ 1 file changed, 97 insertions(+), 93 deletions(-)
 
-diff --git a/include/hw/acpi/memory_hotplug.h b/include/hw/acpi/memory_hotplug.h
-index 91d4045..db8ebc9 100644
---- a/include/hw/acpi/memory_hotplug.h
-+++ b/include/hw/acpi/memory_hotplug.h
-@@ -30,7 +30,7 @@ typedef struct MemHotplugState {
- } MemHotplugState;
- 
- void acpi_memory_hotplug_init(MemoryRegion *as, Object *owner,
--                              MemHotplugState *state);
-+                              MemHotplugState *state, uint16_t io_base);
- 
- void acpi_memory_plug_cb(HotplugHandler *hotplug_dev, MemHotplugState *mem_st,
-                          DeviceState *dev, Error **errp);
-@@ -48,7 +48,6 @@ extern const VMStateDescription vmstate_memory_hotplug;
- void acpi_memory_ospm_status(MemHotplugState *mem_st, ACPIOSTInfoList ***list);
- 
- void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
--                              uint16_t io_base, uint16_t io_len,
-                               const char *res_root,
-                               const char *event_handler_method);
- #endif
-diff --git a/include/hw/acpi/pc-hotplug.h b/include/hw/acpi/pc-hotplug.h
-index a4f513d..31bc919 100644
---- a/include/hw/acpi/pc-hotplug.h
-+++ b/include/hw/acpi/pc-hotplug.h
-@@ -29,7 +29,6 @@
- #define PIIX4_CPU_HOTPLUG_IO_BASE 0xaf00
- #define CPU_HOTPLUG_RESOURCE_DEVICE PRES
- 
--#define ACPI_MEMORY_HOTPLUG_IO_LEN 24
- #define ACPI_MEMORY_HOTPLUG_BASE 0x0a00
- 
- #endif
-diff --git a/hw/acpi/ich9.c b/hw/acpi/ich9.c
-index 830c475..5c279bb 100644
---- a/hw/acpi/ich9.c
-+++ b/hw/acpi/ich9.c
-@@ -306,7 +306,8 @@ void ich9_pm_init(PCIDevice *lpc_pci, ICH9LPCPMRegs *pm,
- 
-     if (pm->acpi_memory_hotplug.is_enabled) {
-         acpi_memory_hotplug_init(pci_address_space_io(lpc_pci), OBJECT(lpc_pci),
--                                 &pm->acpi_memory_hotplug);
-+                                 &pm->acpi_memory_hotplug,
-+                                 ACPI_MEMORY_HOTPLUG_BASE);
-     }
- }
- 
 diff --git a/hw/acpi/memory_hotplug.c b/hw/acpi/memory_hotplug.c
-index da29332..fb04d24 100644
+index fb04d24..210073d 100644
 --- a/hw/acpi/memory_hotplug.c
 +++ b/hw/acpi/memory_hotplug.c
-@@ -30,6 +30,9 @@
- #define MEMORY_SLOT_NOTIFY_METHOD    "MTFY"
+@@ -31,6 +31,7 @@
  #define MEMORY_SLOT_SCAN_METHOD      "MSCN"
  #define MEMORY_HOTPLUG_DEVICE        "MHPD"
-+#define MEMORY_HOTPLUG_IO_LEN         24
-+
-+static uint16_t memhp_io_base;
+ #define MEMORY_HOTPLUG_IO_LEN         24
++#define MEMORY_DEVICES_CONTAINER     "\\_SB.MHPC"
  
- static ACPIOSTInfo *acpi_memory_device_status(int slot, MemStatus *mdev)
- {
-@@ -202,7 +205,7 @@ static const MemoryRegionOps acpi_memory_hotplug_ops = {
- };
+ static uint16_t memhp_io_base;
  
- void acpi_memory_hotplug_init(MemoryRegion *as, Object *owner,
--                              MemHotplugState *state)
-+                              MemHotplugState *state, uint16_t io_base)
- {
-     MachineState *machine = MACHINE(qdev_get_machine());
- 
-@@ -211,10 +214,12 @@ void acpi_memory_hotplug_init(MemoryRegion *as, Object *owner,
-         return;
-     }
- 
-+    assert(!memhp_io_base);
-+    memhp_io_base = io_base;
-     state->devs = g_malloc0(sizeof(*state->devs) * state->dev_count);
-     memory_region_init_io(&state->io, owner, &acpi_memory_hotplug_ops, state,
--                          "acpi-mem-hotplug", ACPI_MEMORY_HOTPLUG_IO_LEN);
--    memory_region_add_subregion(as, ACPI_MEMORY_HOTPLUG_BASE, &state->io);
-+                          "acpi-mem-hotplug", MEMORY_HOTPLUG_IO_LEN);
-+    memory_region_add_subregion(as, memhp_io_base, &state->io);
- }
- 
- /**
-@@ -332,7 +337,6 @@ const VMStateDescription vmstate_memory_hotplug = {
- };
- 
- void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
--                              uint16_t io_base, uint16_t io_len,
-                               const char *res_root,
-                               const char *event_handler_method)
- {
-@@ -342,8 +346,13 @@ void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
-     Aml *sb_scope;
+@@ -343,9 +344,8 @@ void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
+     int i;
+     Aml *ifctx;
+     Aml *method;
+-    Aml *sb_scope;
++    Aml *dev_container;
      Aml *mem_ctrl_dev;
-     char *scan_path;
--    char *mhp_res_path = g_strdup_printf("%s." MEMORY_HOTPLUG_DEVICE, res_root);
-+    char *mhp_res_path;
-+
-+    if (!memhp_io_base) {
-+        return;
-+    }
+-    char *scan_path;
+     char *mhp_res_path;
  
-+    mhp_res_path = g_strdup_printf("%s." MEMORY_HOTPLUG_DEVICE, res_root);
+     if (!memhp_io_base) {
+@@ -356,24 +356,11 @@ void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
      mem_ctrl_dev = aml_device("%s", mhp_res_path);
      {
          Aml *crs;
-@@ -367,13 +376,14 @@ void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
+-        Aml *field;
+-        Aml *one = aml_int(1);
+-        Aml *zero = aml_int(0);
+-        Aml *ret_val = aml_local(0);
+-        Aml *slot_arg0 = aml_arg(0);
+-        Aml *slots_nr = aml_name(MEMORY_SLOTS_NUMBER);
+-        Aml *ctrl_lock = aml_name(MEMORY_SLOT_LOCK);
+-        Aml *slot_selector = aml_name(MEMORY_SLOT_SLECTOR);
  
+         aml_append(mem_ctrl_dev, aml_name_decl("_HID", aml_string("PNP0A06")));
+         aml_append(mem_ctrl_dev,
+             aml_name_decl("_UID", aml_string("Memory hotplug resources")));
+ 
+-        assert(nr_mem <= ACPI_MAX_RAM_SLOTS);
+-        aml_append(mem_ctrl_dev,
+-            aml_name_decl(MEMORY_SLOTS_NUMBER, aml_int(nr_mem))
+-        );
+-
          crs = aml_resource_template();
          aml_append(crs,
--            aml_io(AML_DECODE16, io_base, io_base, 0, io_len)
-+            aml_io(AML_DECODE16, memhp_io_base, memhp_io_base, 0,
-+                   MEMORY_HOTPLUG_IO_LEN)
-         );
-         aml_append(mem_ctrl_dev, aml_name_decl("_CRS", crs));
- 
-         aml_append(mem_ctrl_dev, aml_operation_region(
-             MEMORY_HOTPLUG_IO_REGION, AML_SYSTEM_IO,
--            aml_int(io_base), io_len)
-+            aml_int(memhp_io_base), MEMORY_HOTPLUG_IO_LEN)
+             aml_io(AML_DECODE16, memhp_io_base, memhp_io_base, 0,
+@@ -386,7 +373,32 @@ void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
+             aml_int(memhp_io_base), MEMORY_HOTPLUG_IO_LEN)
          );
  
-         field = aml_field(MEMORY_HOTPLUG_IO_REGION, AML_DWORD_ACC,
-diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
-index 17d36bd..6d99fe4 100644
---- a/hw/acpi/piix4.c
-+++ b/hw/acpi/piix4.c
-@@ -644,7 +644,8 @@ static void piix4_acpi_system_hot_add_init(MemoryRegion *parent,
-                                  PIIX4_CPU_HOTPLUG_IO_BASE);
+-        field = aml_field(MEMORY_HOTPLUG_IO_REGION, AML_DWORD_ACC,
++    }
++    aml_append(table, mem_ctrl_dev);
++
++    dev_container = aml_device(MEMORY_DEVICES_CONTAINER);
++    {
++        Aml *field;
++        Aml *one = aml_int(1);
++        Aml *zero = aml_int(0);
++        Aml *ret_val = aml_local(0);
++        Aml *slot_arg0 = aml_arg(0);
++        Aml *slots_nr = aml_name(MEMORY_SLOTS_NUMBER);
++        Aml *ctrl_lock = aml_name(MEMORY_SLOT_LOCK);
++        Aml *slot_selector = aml_name(MEMORY_SLOT_SLECTOR);
++        char *mmio_path = g_strdup_printf("%s." MEMORY_HOTPLUG_IO_REGION,
++                                          mhp_res_path);
++
++        aml_append(dev_container, aml_name_decl("_HID", aml_string("PNP0A06")));
++        aml_append(dev_container,
++            aml_name_decl("_UID", aml_string("DIMM devices")));
++
++        assert(nr_mem <= ACPI_MAX_RAM_SLOTS);
++        aml_append(dev_container,
++            aml_name_decl(MEMORY_SLOTS_NUMBER, aml_int(nr_mem))
++        );
++
++        field = aml_field(mmio_path, AML_DWORD_ACC,
+                           AML_NOLOCK, AML_PRESERVE);
+         aml_append(field, /* read only */
+             aml_named_field(MEMORY_SLOT_ADDR_LOW, 32));
+@@ -398,9 +410,9 @@ void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
+             aml_named_field(MEMORY_SLOT_SIZE_HIGH, 32));
+         aml_append(field, /* read only */
+             aml_named_field(MEMORY_SLOT_PROXIMITY, 32));
+-        aml_append(mem_ctrl_dev, field);
++        aml_append(dev_container, field);
  
-     if (s->acpi_memory_hotplug.is_enabled) {
--        acpi_memory_hotplug_init(parent, OBJECT(s), &s->acpi_memory_hotplug);
-+        acpi_memory_hotplug_init(parent, OBJECT(s), &s->acpi_memory_hotplug,
-+                                 ACPI_MEMORY_HOTPLUG_BASE);
-     }
- }
+-        field = aml_field(MEMORY_HOTPLUG_IO_REGION, AML_BYTE_ACC,
++        field = aml_field(mmio_path, AML_BYTE_ACC,
+                           AML_NOLOCK, AML_WRITE_AS_ZEROS);
+         aml_append(field, aml_reserved_field(160 /* bits, Offset(20) */));
+         aml_append(field, /* 1 if enabled, read only */
+@@ -414,9 +426,9 @@ void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
+         aml_append(field,
+             /* initiates device eject, write only */
+             aml_named_field(MEMORY_SLOT_EJECT, 1));
+-        aml_append(mem_ctrl_dev, field);
++        aml_append(dev_container, field);
  
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index b7f4682..f207d4f 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -101,8 +101,6 @@ typedef struct AcpiPmInfo {
-     uint32_t gpe0_blk_len;
-     uint32_t io_base;
-     uint16_t cpu_hp_io_base;
--    uint16_t mem_hp_io_base;
--    uint16_t mem_hp_io_len;
-     uint16_t pcihp_io_base;
-     uint16_t pcihp_io_len;
- } AcpiPmInfo;
-@@ -148,9 +146,6 @@ static void acpi_get_pm_info(AcpiPmInfo *pm)
-     }
-     assert(obj);
+-        field = aml_field(MEMORY_HOTPLUG_IO_REGION, AML_DWORD_ACC,
++        field = aml_field(mmio_path, AML_DWORD_ACC,
+                           AML_NOLOCK, AML_PRESERVE);
+         aml_append(field, /* DIMM selector, write only */
+             aml_named_field(MEMORY_SLOT_SLECTOR, 32));
+@@ -424,7 +436,8 @@ void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
+             aml_named_field(MEMORY_SLOT_OST_EVENT, 32));
+         aml_append(field, /* _OST status code, write only */
+             aml_named_field(MEMORY_SLOT_OST_STATUS, 32));
+-        aml_append(mem_ctrl_dev, field);
++        aml_append(dev_container, field);
++        g_free(mmio_path);
  
--    pm->mem_hp_io_base = ACPI_MEMORY_HOTPLUG_BASE;
--    pm->mem_hp_io_len = ACPI_MEMORY_HOTPLUG_IO_LEN;
+         method = aml_method("_STA", 0, AML_NOTSERIALIZED);
+         ifctx = aml_if(aml_equal(slots_nr, zero));
+@@ -434,9 +447,9 @@ void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
+         aml_append(method, ifctx);
+         /* present, functioning, decoding, not shown in UI */
+         aml_append(method, aml_return(aml_int(0xB)));
+-        aml_append(mem_ctrl_dev, method);
++        aml_append(dev_container, method);
+ 
+-        aml_append(mem_ctrl_dev, aml_mutex(MEMORY_SLOT_LOCK, 0));
++        aml_append(dev_container, aml_mutex(MEMORY_SLOT_LOCK, 0));
+ 
+         method = aml_method(MEMORY_SLOT_SCAN_METHOD, 0, AML_NOTSERIALIZED);
+         {
+@@ -492,7 +505,7 @@ void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
+             aml_append(method, aml_release(ctrl_lock));
+             aml_append(method, aml_return(one));
+         }
+-        aml_append(mem_ctrl_dev, method);
++        aml_append(dev_container, method);
+ 
+         method = aml_method(MEMORY_SLOT_STATUS_METHOD, 1, AML_NOTSERIALIZED);
+         {
+@@ -512,7 +525,7 @@ void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
+             aml_append(method, aml_release(ctrl_lock));
+             aml_append(method, aml_return(ret_val));
+         }
+-        aml_append(mem_ctrl_dev, method);
++        aml_append(dev_container, method);
+ 
+         method = aml_method(MEMORY_SLOT_CRS_METHOD, 1, AML_SERIALIZED);
+         {
+@@ -603,7 +616,7 @@ void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
+             aml_append(method, aml_release(ctrl_lock));
+             aml_append(method, aml_return(mr64));
+         }
+-        aml_append(mem_ctrl_dev, method);
++        aml_append(dev_container, method);
+ 
+         method = aml_method(MEMORY_SLOT_PROXIMITY_METHOD, 1,
+                             AML_NOTSERIALIZED);
+@@ -617,7 +630,7 @@ void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
+             aml_append(method, aml_release(ctrl_lock));
+             aml_append(method, aml_return(ret_val));
+         }
+-        aml_append(mem_ctrl_dev, method);
++        aml_append(dev_container, method);
+ 
+         method = aml_method(MEMORY_SLOT_OST_METHOD, 4, AML_NOTSERIALIZED);
+         {
+@@ -631,7 +644,7 @@ void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
+             aml_append(method, aml_store(aml_arg(2), ost_status));
+             aml_append(method, aml_release(ctrl_lock));
+         }
+-        aml_append(mem_ctrl_dev, method);
++        aml_append(dev_container, method);
+ 
+         method = aml_method(MEMORY_SLOT_EJECT_METHOD, 2, AML_NOTSERIALIZED);
+         {
+@@ -643,75 +656,66 @@ void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
+             aml_append(method, aml_store(one, eject));
+             aml_append(method, aml_release(ctrl_lock));
+         }
+-        aml_append(mem_ctrl_dev, method);
+-    }
+-    aml_append(table, mem_ctrl_dev);
 -
-     /* Fill in optional s3/s4 related properties */
-     o = object_property_get_qobject(obj, ACPI_PM_PROP_S3_DISABLED, NULL);
-     if (o) {
-@@ -1925,9 +1920,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-         build_cpus_aml(dsdt, machine, opts, pm->cpu_hp_io_base,
-                        "\\_SB.PCI0", "\\_GPE._E02");
-     }
--    build_memory_hotplug_aml(dsdt, nr_mem, pm->mem_hp_io_base,
--                             pm->mem_hp_io_len,
--                             "\\_SB.PCI0", "\\_GPE._E03");
-+    build_memory_hotplug_aml(dsdt, nr_mem, "\\_SB.PCI0", "\\_GPE._E03");
+-    sb_scope = aml_scope("_SB");
+-    /* build memory devices */
+-    for (i = 0; i < nr_mem; i++) {
+-        Aml *dev;
+-        char *s;
+-
+-        dev = aml_device("MP%02X", i);
+-        aml_append(dev, aml_name_decl("_UID", aml_string("0x%02X", i)));
+-        aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0C80")));
+-
+-        method = aml_method("_CRS", 0, AML_NOTSERIALIZED);
+-        s = g_strdup_printf("%s.%s", mhp_res_path, MEMORY_SLOT_CRS_METHOD);
+-        aml_append(method, aml_return(aml_call1(s, aml_name("_UID"))));
+-        g_free(s);
+-        aml_append(dev, method);
+-
+-        method = aml_method("_STA", 0, AML_NOTSERIALIZED);
+-        s = g_strdup_printf("%s.%s", mhp_res_path, MEMORY_SLOT_STATUS_METHOD);
+-        aml_append(method, aml_return(aml_call1(s, aml_name("_UID"))));
+-        g_free(s);
+-        aml_append(dev, method);
+-
+-        method = aml_method("_PXM", 0, AML_NOTSERIALIZED);
+-        s = g_strdup_printf("%s.%s", mhp_res_path,
+-                            MEMORY_SLOT_PROXIMITY_METHOD);
+-        aml_append(method, aml_return(aml_call1(s, aml_name("_UID"))));
+-        g_free(s);
+-        aml_append(dev, method);
+-
+-        method = aml_method("_OST", 3, AML_NOTSERIALIZED);
+-        s = g_strdup_printf("%s.%s", mhp_res_path, MEMORY_SLOT_OST_METHOD);
+-        aml_append(method, aml_return(aml_call4(
+-            s, aml_name("_UID"), aml_arg(0), aml_arg(1), aml_arg(2)
+-        )));
+-        g_free(s);
+-        aml_append(dev, method);
+-
+-        method = aml_method("_EJ0", 1, AML_NOTSERIALIZED);
+-        s = g_strdup_printf("%s.%s", mhp_res_path, MEMORY_SLOT_EJECT_METHOD);
+-        aml_append(method, aml_return(aml_call2(
+-                   s, aml_name("_UID"), aml_arg(0))));
+-        g_free(s);
+-        aml_append(dev, method);
+-
+-        aml_append(sb_scope, dev);
+-    }
++        aml_append(dev_container, method);
++
++        /* build memory devices */
++        for (i = 0; i < nr_mem; i++) {
++            Aml *dev;
++            const char *s;
++
++            dev = aml_device("MP%02X", i);
++            aml_append(dev, aml_name_decl("_UID", aml_string("0x%02X", i)));
++            aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0C80")));
++
++            method = aml_method("_CRS", 0, AML_NOTSERIALIZED);
++            s = MEMORY_SLOT_CRS_METHOD;
++            aml_append(method, aml_return(aml_call1(s, aml_name("_UID"))));
++            aml_append(dev, method);
++
++            method = aml_method("_STA", 0, AML_NOTSERIALIZED);
++            s = MEMORY_SLOT_STATUS_METHOD;
++            aml_append(method, aml_return(aml_call1(s, aml_name("_UID"))));
++            aml_append(dev, method);
++
++            method = aml_method("_PXM", 0, AML_NOTSERIALIZED);
++            s = MEMORY_SLOT_PROXIMITY_METHOD;
++            aml_append(method, aml_return(aml_call1(s, aml_name("_UID"))));
++            aml_append(dev, method);
++
++            method = aml_method("_OST", 3, AML_NOTSERIALIZED);
++            s = MEMORY_SLOT_OST_METHOD;
++            aml_append(method, aml_return(aml_call4(
++                s, aml_name("_UID"), aml_arg(0), aml_arg(1), aml_arg(2)
++            )));
++            aml_append(dev, method);
++
++            method = aml_method("_EJ0", 1, AML_NOTSERIALIZED);
++            s = MEMORY_SLOT_EJECT_METHOD;
++            aml_append(method, aml_return(aml_call2(
++                       s, aml_name("_UID"), aml_arg(0))));
++            aml_append(dev, method);
++
++            aml_append(dev_container, dev);
++        }
  
-     scope =  aml_scope("_GPE");
-     {
+-    /* build Method(MEMORY_SLOT_NOTIFY_METHOD, 2) {
+-     *     If (LEqual(Arg0, 0x00)) {Notify(MP00, Arg1)} ... }
+-     */
+-    method = aml_method(MEMORY_SLOT_NOTIFY_METHOD, 2, AML_NOTSERIALIZED);
+-    for (i = 0; i < nr_mem; i++) {
+-        ifctx = aml_if(aml_equal(aml_arg(0), aml_int(i)));
+-        aml_append(ifctx,
+-            aml_notify(aml_name("MP%.02X", i), aml_arg(1))
+-        );
+-        aml_append(method, ifctx);
++        /* build Method(MEMORY_SLOT_NOTIFY_METHOD, 2) {
++         *     If (LEqual(Arg0, 0x00)) {Notify(MP00, Arg1)} ... }
++         */
++        method = aml_method(MEMORY_SLOT_NOTIFY_METHOD, 2, AML_NOTSERIALIZED);
++        for (i = 0; i < nr_mem; i++) {
++            ifctx = aml_if(aml_equal(aml_arg(0), aml_int(i)));
++            aml_append(ifctx,
++                aml_notify(aml_name("MP%.02X", i), aml_arg(1))
++            );
++            aml_append(method, ifctx);
++        }
++        aml_append(dev_container, method);
+     }
+-    aml_append(sb_scope, method);
+-    aml_append(table, sb_scope);
++    aml_append(table, dev_container);
+ 
+     method = aml_method(event_handler_method, 0, AML_NOTSERIALIZED);
+-    scan_path = g_strdup_printf("%s.%s", mhp_res_path, MEMORY_SLOT_SCAN_METHOD);
+-    aml_append(method, aml_call0(scan_path));
+-    g_free(scan_path);
++    aml_append(method,
++        aml_call0(MEMORY_DEVICES_CONTAINER "." MEMORY_SLOT_SCAN_METHOD));
+     aml_append(table, method);
+ 
+     g_free(mhp_res_path);
 -- 
 2.7.4
