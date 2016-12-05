@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39817)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39843)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cDxYN-0005M2-7D
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 12:59:52 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cDxYT-0005Pc-Mc
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 12:59:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cDxYJ-0001Zw-Cy
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 12:59:51 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:47631)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1cDxYJ-0001Wp-6E
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 12:59:47 -0500
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon,  5 Dec 2016 17:59:34 +0000
-Message-Id: <1480960775-5002-1-git-send-email-peter.maydell@linaro.org>
+	(envelope-from <rth7680@gmail.com>) id 1cDxYT-0001eE-2L
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 12:59:57 -0500
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <1480937130-24561-1-git-send-email-nikunj@linux.vnet.ibm.com>
+	<1480937130-24561-5-git-send-email-nikunj@linux.vnet.ibm.com>
+	<3452cd65-6045-b93d-47cc-879174660849@twiddle.net>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <d90a56b2-0b62-377b-3337-50ad2ec10b79@twiddle.net>
+Date: Mon, 5 Dec 2016 09:59:53 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 0/1] target-arm queue
+In-Reply-To: <3452cd65-6045-b93d-47cc-879174660849@twiddle.net>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 04/13] target-ppc: implement lxvll
+ instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,34 +26,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@redhat.com>
+To: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+Cc: qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com
 
-One patch for 2.8-rc3, which is Alex's partial revert
-of 1dd089d0 to fix A64 ldaxp.
+On 12/05/2016 09:52 AM, Richard Henderson wrote:
+> On 12/05/2016 03:25 AM, Nikunj A Dadhania wrote:
+>> +void helper_lxvll(CPUPPCState *env, target_ulong addr,
+>> +                  target_ulong xt_num, target_ulong rb)
+>> +{
+>> +    ppc_vsr_t xt;
+>> +
+>> +    getVSR(xt_num, &xt, env);
+>> +    if (unlikely((rb & 0xFF) == 0)) {
+>> +        xt.s128 = int128_make128(0, 0);
+> 
+> Nit: int128_zero.
+> 
+>> +    } else {
+>> +        target_ulong end = ((rb & 0xFF) * 8) - 1;
+>> +        if (msr_le) {
+>> +            xt.u64[LO_IDX] = cpu_ldq_data_ra(env, addr, GETPC());
+>> +            addr = addr_add(env, addr, 8);
+>> +            xt.u64[HI_IDX] = cpu_ldq_data_ra(env, addr, GETPC());
+>> +            xt.s128 = int128_and(xt.s128, mask_u128(127 - end, 127));
+> 
+> The ISA document says that this is a sequence of byte operations.  Which means
+> that END < 127 will not access bytes outside of the length.  Which means that
+> your code will trigger SIGSEGV near page boundaries when real hardware won't.
+> 
+> I also don't see how this does the right thing for little-endian.
 
-thanks
--- PMM
+Oh, and one more thing:
 
-The following changes since commit bc66cedb4141fb7588f2462c74310d8fb5dd4cf1:
+Do you need to perform the permission check on all NB bytes before writing any
+of them?  I suspect that real hardware does, otherwise the instruction might
+not be restartable.
 
-  Merge remote-tracking branch 'yongbok/tags/mips-20161204' into staging (2016-12-05 10:56:45 +0000)
+Are there any atomicity guarantees made by real hardware?  If so, you may need
+to implement this differently.  If not, a comment to that effect would be helpful.
 
-are available in the git repository at:
 
-  git://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20161205
-
-for you to fetch changes up to 5460da501a57cd72eda6fec736d76539122e2f99:
-
-  target-arm/translate-a64: fix gen_load_exclusive (2016-12-05 17:52:01 +0000)
-
-----------------------------------------------------------------
-target-arm queue:
- * fix gen_load_exclusive handling of ldaxp
-
-----------------------------------------------------------------
-Alex Bennée (1):
-      target-arm/translate-a64: fix gen_load_exclusive
-
- target-arm/translate-a64.c | 42 +++++++++++++++++++-----------------------
- 1 file changed, 19 insertions(+), 23 deletions(-)
+r~
