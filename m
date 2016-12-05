@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57201)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57222)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cE2kU-0002jq-5O
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 18:32:43 -0500
+	(envelope-from <imammedo@redhat.com>) id 1cE2kV-0002kr-Cl
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 18:32:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cE2kS-000608-Vj
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 18:32:42 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52630)
+	(envelope-from <imammedo@redhat.com>) id 1cE2kU-00060f-Bk
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 18:32:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37842)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cE2kS-0005zt-NR
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 18:32:40 -0500
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cE2kU-00060S-3m
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 18:32:42 -0500
 Received: from int-mx10.intmail.prod.int.phx2.redhat.com
 	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E547D3D97E
-	for <qemu-devel@nongnu.org>; Mon,  5 Dec 2016 23:32:39 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 51DB264D8B
+	for <qemu-devel@nongnu.org>; Mon,  5 Dec 2016 23:32:41 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Tue,  6 Dec 2016 00:32:24 +0100
-Message-Id: <1480980749-182204-6-git-send-email-imammedo@redhat.com>
+Date: Tue,  6 Dec 2016 00:32:25 +0100
+Message-Id: <1480980749-182204-7-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1480980749-182204-1-git-send-email-imammedo@redhat.com>
 References: <1480980749-182204-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.9 05/10] memhp: consolidate scattered
- MHPD device declaration
+Subject: [Qemu-devel] [PATCH for-2.9 06/10] memhp: merge
+ build_memory_devices() into build_memory_hotplug_aml()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,199 +33,147 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: "Michael S. Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
 
-since static and dynamic parts of memory MHPD device are now
-in the same table (DSDT), there is no point keeping
-them scattered across the table, so consolidate it
-in one place.
-
-There aren't any functional change, only AML text movement
-from externally refferenced MHPD scope directly into
-MHPD device declaration.
+It consolidates memory hotplug AML in one place within DSDT
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
- include/hw/acpi/memory_hotplug.h |   2 +-
- hw/acpi/memory_hotplug.c         | 123 +++++++++++++++++++--------------------
- 2 files changed, 61 insertions(+), 64 deletions(-)
+ include/hw/acpi/memory_hotplug.h |  2 --
+ hw/acpi/memory_hotplug.c         | 14 ++++-----
+ hw/i386/acpi-build.c             | 61 ++++++++++++++++++----------------------
+ 3 files changed, 33 insertions(+), 44 deletions(-)
 
 diff --git a/include/hw/acpi/memory_hotplug.h b/include/hw/acpi/memory_hotplug.h
-index 964c244..c70481e 100644
+index c70481e..6dc48d2 100644
 --- a/include/hw/acpi/memory_hotplug.h
 +++ b/include/hw/acpi/memory_hotplug.h
-@@ -52,7 +52,7 @@ void acpi_memory_ospm_status(MemHotplugState *mem_st, ACPIOSTInfoList ***list);
- #define MEMORY_HOTPLUG_HANDLER_PATH "\\_SB.PCI0." \
-      MEMORY_HOTPLUG_DEVICE "." MEMORY_SLOT_SCAN_METHOD
+@@ -54,6 +54,4 @@ void acpi_memory_ospm_status(MemHotplugState *mem_st, ACPIOSTInfoList ***list);
  
--void build_memory_hotplug_aml(Aml *ctx, uint32_t nr_mem,
-+void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
+ void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
                                uint16_t io_base, uint16_t io_len);
- void build_memory_devices(Aml *sb_scope, int nr_mem,
-                           uint16_t io_base, uint16_t io_len);
+-void build_memory_devices(Aml *sb_scope, int nr_mem,
+-                          uint16_t io_base, uint16_t io_len);
+ #endif
 diff --git a/hw/acpi/memory_hotplug.c b/hw/acpi/memory_hotplug.c
-index 67dd3f8..fb40a5e 100644
+index fb40a5e..18b95f2 100644
 --- a/hw/acpi/memory_hotplug.c
 +++ b/hw/acpi/memory_hotplug.c
-@@ -307,7 +307,7 @@ const VMStateDescription vmstate_memory_hotplug = {
-     }
- };
- 
--void build_memory_hotplug_aml(Aml *ctx, uint32_t nr_mem,
-+void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
+@@ -310,9 +310,11 @@ const VMStateDescription vmstate_memory_hotplug = {
+ void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
                                uint16_t io_base, uint16_t io_len)
  {
++    int i;
      Aml *ifctx;
-@@ -319,6 +319,8 @@ void build_memory_hotplug_aml(Aml *ctx, uint32_t nr_mem,
-     pci_scope = aml_scope("_SB.PCI0");
-     mem_ctrl_dev = aml_device(MEMORY_HOTPLUG_DEVICE);
-     {
-+        Aml *crs;
-+        Aml *field;
-         Aml *one = aml_int(1);
-         Aml *zero = aml_int(0);
-         Aml *ret_val = aml_local(0);
-@@ -331,6 +333,62 @@ void build_memory_hotplug_aml(Aml *ctx, uint32_t nr_mem,
-         aml_append(mem_ctrl_dev,
-             aml_name_decl("_UID", aml_string("Memory hotplug resources")));
+     Aml *method;
+     Aml *pci_scope;
++    Aml *sb_scope;
+     Aml *mem_ctrl_dev;
  
-+        assert(nr_mem <= ACPI_MAX_RAM_SLOTS);
-+        aml_append(mem_ctrl_dev,
-+            aml_name_decl(MEMORY_SLOTS_NUMBER, aml_int(nr_mem))
-+        );
-+
-+        crs = aml_resource_template();
-+        aml_append(crs,
-+            aml_io(AML_DECODE16, io_base, io_base, 0, io_len)
-+        );
-+        aml_append(mem_ctrl_dev, aml_name_decl("_CRS", crs));
-+
-+        aml_append(mem_ctrl_dev, aml_operation_region(
-+            MEMORY_HOTPLUG_IO_REGION, AML_SYSTEM_IO,
-+            aml_int(io_base), io_len)
-+        );
-+
-+        field = aml_field(MEMORY_HOTPLUG_IO_REGION, AML_DWORD_ACC,
-+                          AML_NOLOCK, AML_PRESERVE);
-+        aml_append(field, /* read only */
-+            aml_named_field(MEMORY_SLOT_ADDR_LOW, 32));
-+        aml_append(field, /* read only */
-+            aml_named_field(MEMORY_SLOT_ADDR_HIGH, 32));
-+        aml_append(field, /* read only */
-+            aml_named_field(MEMORY_SLOT_SIZE_LOW, 32));
-+        aml_append(field, /* read only */
-+            aml_named_field(MEMORY_SLOT_SIZE_HIGH, 32));
-+        aml_append(field, /* read only */
-+            aml_named_field(MEMORY_SLOT_PROXIMITY, 32));
-+        aml_append(mem_ctrl_dev, field);
-+
-+        field = aml_field(MEMORY_HOTPLUG_IO_REGION, AML_BYTE_ACC,
-+                          AML_NOLOCK, AML_WRITE_AS_ZEROS);
-+        aml_append(field, aml_reserved_field(160 /* bits, Offset(20) */));
-+        aml_append(field, /* 1 if enabled, read only */
-+            aml_named_field(MEMORY_SLOT_ENABLED, 1));
-+        aml_append(field,
-+            /*(read) 1 if has a insert event. (write) 1 to clear event */
-+            aml_named_field(MEMORY_SLOT_INSERT_EVENT, 1));
-+        aml_append(field,
-+            /* (read) 1 if has a remove event. (write) 1 to clear event */
-+            aml_named_field(MEMORY_SLOT_REMOVE_EVENT, 1));
-+        aml_append(field,
-+            /* initiates device eject, write only */
-+            aml_named_field(MEMORY_SLOT_EJECT, 1));
-+        aml_append(mem_ctrl_dev, field);
-+
-+        field = aml_field(MEMORY_HOTPLUG_IO_REGION, AML_DWORD_ACC,
-+                          AML_NOLOCK, AML_PRESERVE);
-+        aml_append(field, /* DIMM selector, write only */
-+            aml_named_field(MEMORY_SLOT_SLECTOR, 32));
-+        aml_append(field, /* _OST event code, write only */
-+            aml_named_field(MEMORY_SLOT_OST_EVENT, 32));
-+        aml_append(field, /* _OST status code, write only */
-+            aml_named_field(MEMORY_SLOT_OST_STATUS, 32));
-+        aml_append(mem_ctrl_dev, field);
-+
-         method = aml_method("_STA", 0, AML_NOTSERIALIZED);
-         ifctx = aml_if(aml_equal(slots_nr, zero));
-         {
-@@ -551,79 +609,18 @@ void build_memory_hotplug_aml(Aml *ctx, uint32_t nr_mem,
-         aml_append(mem_ctrl_dev, method);
+     /* scope for memory hotplug controller device node */
+@@ -610,19 +612,12 @@ void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
      }
      aml_append(pci_scope, mem_ctrl_dev);
--    aml_append(ctx, pci_scope);
-+    aml_append(table, pci_scope);
- }
+     aml_append(table, pci_scope);
+-}
+-
+-void build_memory_devices(Aml *sb_scope, int nr_mem,
+-                          uint16_t io_base, uint16_t io_len)
+-{
+-    int i;
+-    Aml *dev;
+-    Aml *method;
+-    Aml *ifctx;
  
- void build_memory_devices(Aml *sb_scope, int nr_mem,
-                           uint16_t io_base, uint16_t io_len)
- {
-     int i;
--    Aml *scope;
--    Aml *crs;
--    Aml *field;
-     Aml *dev;
-     Aml *method;
-     Aml *ifctx;
- 
++    sb_scope = aml_scope("_SB");
      /* build memory devices */
--    assert(nr_mem <= ACPI_MAX_RAM_SLOTS);
--    scope = aml_scope("\\_SB.PCI0." MEMORY_HOTPLUG_DEVICE);
--    aml_append(scope,
--        aml_name_decl(MEMORY_SLOTS_NUMBER, aml_int(nr_mem))
--    );
--
--    crs = aml_resource_template();
--    aml_append(crs,
--        aml_io(AML_DECODE16, io_base, io_base, 0, io_len)
--    );
--    aml_append(scope, aml_name_decl("_CRS", crs));
--
--    aml_append(scope, aml_operation_region(
--        MEMORY_HOTPLUG_IO_REGION, AML_SYSTEM_IO,
--        aml_int(io_base), io_len)
--    );
--
--    field = aml_field(MEMORY_HOTPLUG_IO_REGION, AML_DWORD_ACC,
--                      AML_NOLOCK, AML_PRESERVE);
--    aml_append(field, /* read only */
--        aml_named_field(MEMORY_SLOT_ADDR_LOW, 32));
--    aml_append(field, /* read only */
--        aml_named_field(MEMORY_SLOT_ADDR_HIGH, 32));
--    aml_append(field, /* read only */
--        aml_named_field(MEMORY_SLOT_SIZE_LOW, 32));
--    aml_append(field, /* read only */
--        aml_named_field(MEMORY_SLOT_SIZE_HIGH, 32));
--    aml_append(field, /* read only */
--        aml_named_field(MEMORY_SLOT_PROXIMITY, 32));
--    aml_append(scope, field);
--
--    field = aml_field(MEMORY_HOTPLUG_IO_REGION, AML_BYTE_ACC,
--                      AML_NOLOCK, AML_WRITE_AS_ZEROS);
--    aml_append(field, aml_reserved_field(160 /* bits, Offset(20) */));
--    aml_append(field, /* 1 if enabled, read only */
--        aml_named_field(MEMORY_SLOT_ENABLED, 1));
--    aml_append(field,
--        /*(read) 1 if has a insert event. (write) 1 to clear event */
--        aml_named_field(MEMORY_SLOT_INSERT_EVENT, 1));
--    aml_append(field,
--        /* (read) 1 if has a remove event. (write) 1 to clear event */
--        aml_named_field(MEMORY_SLOT_REMOVE_EVENT, 1));
--    aml_append(field,
--        /* initiates device eject, write only */
--        aml_named_field(MEMORY_SLOT_EJECT, 1));
--    aml_append(scope, field);
--
--    field = aml_field(MEMORY_HOTPLUG_IO_REGION, AML_DWORD_ACC,
--                      AML_NOLOCK, AML_PRESERVE);
--    aml_append(field, /* DIMM selector, write only */
--        aml_named_field(MEMORY_SLOT_SLECTOR, 32));
--    aml_append(field, /* _OST event code, write only */
--        aml_named_field(MEMORY_SLOT_OST_EVENT, 32));
--    aml_append(field, /* _OST status code, write only */
--        aml_named_field(MEMORY_SLOT_OST_STATUS, 32));
--    aml_append(scope, field);
--    aml_append(sb_scope, scope);
--
      for (i = 0; i < nr_mem; i++) {
          #define BASEPATH "\\_SB.PCI0." MEMORY_HOTPLUG_DEVICE "."
++        Aml *dev;
          const char *s;
+ 
+         dev = aml_device("MP%02X", i);
+@@ -673,4 +668,5 @@ void build_memory_devices(Aml *sb_scope, int nr_mem,
+         aml_append(method, ifctx);
+     }
+     aml_append(sb_scope, method);
++    aml_append(table, sb_scope);
+ }
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 38dcac7..690e9a0 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -2197,45 +2197,40 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+ 
+     sb_scope = aml_scope("\\_SB");
+     {
+-        build_memory_devices(sb_scope, nr_mem, pm->mem_hp_io_base,
+-                             pm->mem_hp_io_len);
++        Object *pci_host;
++        PCIBus *bus = NULL;
+ 
+-        {
+-            Object *pci_host;
+-            PCIBus *bus = NULL;
++        pci_host = acpi_get_i386_pci_host();
++        if (pci_host) {
++            bus = PCI_HOST_BRIDGE(pci_host)->bus;
++        }
+ 
+-            pci_host = acpi_get_i386_pci_host();
+-            if (pci_host) {
+-                bus = PCI_HOST_BRIDGE(pci_host)->bus;
++        if (bus) {
++            Aml *scope = aml_scope("PCI0");
++            /* Scan all PCI buses. Generate tables to support hotplug. */
++            build_append_pci_bus_devices(scope, bus, pm->pcihp_bridge_en);
++
++            if (misc->tpm_version != TPM_VERSION_UNSPEC) {
++                dev = aml_device("ISA.TPM");
++                aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0C31")));
++                aml_append(dev, aml_name_decl("_STA", aml_int(0xF)));
++                crs = aml_resource_template();
++                aml_append(crs, aml_memory32_fixed(TPM_TIS_ADDR_BASE,
++                           TPM_TIS_ADDR_SIZE, AML_READ_WRITE));
++                /*
++                    FIXME: TPM_TIS_IRQ=5 conflicts with PNP0C0F irqs,
++                    Rewrite to take IRQ from TPM device model and
++                    fix default IRQ value there to use some unused IRQ
++                 */
++                /* aml_append(crs, aml_irq_no_flags(TPM_TIS_IRQ)); */
++                aml_append(dev, aml_name_decl("_CRS", crs));
++                aml_append(scope, dev);
+             }
+ 
+-            if (bus) {
+-                Aml *scope = aml_scope("PCI0");
+-                /* Scan all PCI buses. Generate tables to support hotplug. */
+-                build_append_pci_bus_devices(scope, bus, pm->pcihp_bridge_en);
+-
+-                if (misc->tpm_version != TPM_VERSION_UNSPEC) {
+-                    dev = aml_device("ISA.TPM");
+-                    aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0C31")));
+-                    aml_append(dev, aml_name_decl("_STA", aml_int(0xF)));
+-                    crs = aml_resource_template();
+-                    aml_append(crs, aml_memory32_fixed(TPM_TIS_ADDR_BASE,
+-                               TPM_TIS_ADDR_SIZE, AML_READ_WRITE));
+-                    /*
+-                        FIXME: TPM_TIS_IRQ=5 conflicts with PNP0C0F irqs,
+-                        Rewrite to take IRQ from TPM device model and
+-                        fix default IRQ value there to use some unused IRQ
+-                     */
+-                    /* aml_append(crs, aml_irq_no_flags(TPM_TIS_IRQ)); */
+-                    aml_append(dev, aml_name_decl("_CRS", crs));
+-                    aml_append(scope, dev);
+-                }
+-
+-                aml_append(sb_scope, scope);
+-            }
++            aml_append(sb_scope, scope);
+         }
+-        aml_append(dsdt, sb_scope);
+     }
++    aml_append(dsdt, sb_scope);
+ 
+     /* copy AML table into ACPI tables blob and patch header there */
+     g_array_append_vals(table_data, dsdt->buf->data, dsdt->buf->len);
 -- 
 2.7.4
