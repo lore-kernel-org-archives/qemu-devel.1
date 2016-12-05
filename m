@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57158)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57159)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cE2kR-0002jG-Jj
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 18:32:40 -0500
+	(envelope-from <imammedo@redhat.com>) id 1cE2kR-0002jH-Jk
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 18:32:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cE2kN-0005ya-PE
+	(envelope-from <imammedo@redhat.com>) id 1cE2kN-0005yU-Ij
 	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 18:32:39 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48512)
+Received: from mx1.redhat.com ([209.132.183.28]:39824)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cE2kN-0005yN-K1
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cE2kN-0005y9-AZ
 	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 18:32:35 -0500
 Received: from int-mx10.intmail.prod.int.phx2.redhat.com
 	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AD8CBC01095C
-	for <qemu-devel@nongnu.org>; Mon,  5 Dec 2016 23:32:34 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6A67C619FB
+	for <qemu-devel@nongnu.org>; Mon,  5 Dec 2016 23:32:33 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Tue,  6 Dec 2016 00:32:20 +0100
-Message-Id: <1480980749-182204-2-git-send-email-imammedo@redhat.com>
-In-Reply-To: <1480980749-182204-1-git-send-email-imammedo@redhat.com>
-References: <1480980749-182204-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.9 01/10] tests: pc: add memory hotplug
- acpi tables tests
+Date: Tue,  6 Dec 2016 00:32:19 +0100
+Message-Id: <1480980749-182204-1-git-send-email-imammedo@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.9 00/10] pc: acpi: memory hotplug
+ cleanup/consolidation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,52 +31,74 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: "Michael S. Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
----
- tests/bios-tables-test.c | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
 
-diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-index 812f830..5404805 100644
---- a/tests/bios-tables-test.c
-+++ b/tests/bios-tables-test.c
-@@ -867,6 +867,28 @@ static void test_acpi_piix4_tcg_ipmi(void)
-     free_test_data(&data);
- }
- 
-+static void test_acpi_q35_tcg_memhp(void)
-+{
-+    test_data data;
-+
-+    memset(&data, 0, sizeof(data));
-+    data.machine = MACHINE_Q35;
-+    data.variant = ".memhp";
-+    test_acpi_one(" -m 128,slots=3,maxmem=1G -numa node", &data);
-+    free_test_data(&data);
-+}
-+
-+static void test_acpi_piix4_tcg_memhp(void)
-+{
-+    test_data data;
-+
-+    memset(&data, 0, sizeof(data));
-+    data.machine = MACHINE_PC;
-+    data.variant = ".memhp";
-+    test_acpi_one(" -m 128,slots=3,maxmem=1G -numa node", &data);
-+    free_test_data(&data);
-+}
-+
- int main(int argc, char *argv[])
- {
-     const char *arch = qtest_get_arch();
-@@ -887,6 +909,8 @@ int main(int argc, char *argv[])
-         qtest_add_func("acpi/q35/ipmi", test_acpi_q35_tcg_ipmi);
-         qtest_add_func("acpi/piix4/cpuhp", test_acpi_piix4_tcg_cphp);
-         qtest_add_func("acpi/q35/cpuhp", test_acpi_q35_tcg_cphp);
-+        qtest_add_func("acpi/piix4/memhp", test_acpi_piix4_tcg_memhp);
-+        qtest_add_func("acpi/q35/memhp", test_acpi_q35_tcg_memhp);
-     }
-     ret = g_test_run();
-     boot_sector_cleanup(disk);
+Series cleanups and consolidates scattered memory hotplug
+code so it could be easily reused by ARM target later.
+
+As result:
+ * added memory hotplug variant to bios tables test
+ * all ACPI related parts of memory hotplug are consolidated
+   within memory_hotplug.c
+ * DSDT table size is reduced ~900 bytes when memory hotplug
+   is not enabled (by not generating not used AML)
+ * DSDT table size is reduced on 12 bytes per slot
+   (i.e. up to ~3000 bytes savings for 256 DIMMs) with memory hotplug
+   enabled due AML reorganization that makes calls to common functions
+   smaller as devices and common functions are now within the same scope.
+
+Tested with following guests:
+  - RHEL7.3, WS2008DC, WS2008R2DC, WS2012R2DC, WS2016TP5 - no regressions found
+  - XP3 and WS2003 - boots fine even if memhotplug is enabled (but otherwise
+    it never worked as memhp is not supported there)
+
+Git tree for testing:
+  https://github.com/imammedo/qemu.git memhp_consolidate_v1
+viewing:
+  https://github.com/imammedo/qemu/commits/memhp_consolidate_v1
+
+Note to maintaner:
+  * blobs patch 2/10 should be merged to patch 1/10
+  * ACPI tables should be regenarated and applied after series is merged
+    as DSDT will cange for all tests cases due removal of inactive
+    memory hotplug code.
+
+CC: "Michael S. Tsirkin" <mst@redhat.com>
+CC: Eduardo Habkost <ehabkost@redhat.com>
+CC: Marcel Apfelbaum <marcel@redhat.com>
+
+
+Igor Mammedov (10):
+  tests: pc: add memory hotplug acpi tables tests
+  tests: pc: acpi: add SRAT and DSDT blobs for memory hotplug variant
+  memhp: move build_memory_hotplug_aml() into memory_hotplug.c
+  memhp: move build_memory_devices() into memory_hotplug.c
+  memhp: consolidate scattered MHPD device declaration
+  memhp: merge build_memory_devices() into build_memory_hotplug_aml()
+  memhp: move GPE handler_E03 into build_memory_hotplug_aml()
+  memhp: move memory hotplug only defines to memory_hotplug.c
+  memhp: don't generate memory hotplug AML if it's not enabled/supported
+  memhp: move DIMM devices into dedicated scope with related common
+    methods
+
+ include/hw/acpi/memory_hotplug.h    |  12 +-
+ include/hw/acpi/pc-hotplug.h        |  23 --
+ hw/acpi/Makefile.objs               |   2 +-
+ hw/acpi/ich9.c                      |   3 +-
+ hw/acpi/memory_hotplug.c            | 420 +++++++++++++++++++++++++++++++++++-
+ hw/acpi/memory_hotplug_acpi_table.c | 262 ----------------------
+ hw/acpi/piix4.c                     |   3 +-
+ hw/i386/acpi-build.c                | 197 +++--------------
+ tests/acpi-test-data/pc/DSDT.memhp  | Bin 0 -> 6613 bytes
+ tests/acpi-test-data/pc/SRAT.memhp  | Bin 0 -> 224 bytes
+ tests/acpi-test-data/q35/DSDT.memhp | Bin 0 -> 9375 bytes
+ tests/acpi-test-data/q35/SRAT.memhp | Bin 0 -> 224 bytes
+ tests/bios-tables-test.c            |  24 +++
+ 13 files changed, 479 insertions(+), 467 deletions(-)
+ delete mode 100644 hw/acpi/memory_hotplug_acpi_table.c
+ create mode 100644 tests/acpi-test-data/pc/DSDT.memhp
+ create mode 100644 tests/acpi-test-data/pc/SRAT.memhp
+ create mode 100644 tests/acpi-test-data/q35/DSDT.memhp
+ create mode 100644 tests/acpi-test-data/q35/SRAT.memhp
+
 -- 
 2.7.4
