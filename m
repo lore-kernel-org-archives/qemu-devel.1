@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35425)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35977)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cDxJO-0005NT-1o
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 12:44:23 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cDxLb-0006bH-9Y
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 12:46:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cDxJJ-0004Hg-At
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 12:44:22 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58602)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cDxJJ-0004H5-55
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 12:44:17 -0500
-Message-ID: <1480959854.28320.21.camel@redhat.com>
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon, 05 Dec 2016 18:44:14 +0100
-In-Reply-To: <580DB32F.8040806@intel.com>
-References: <1476739332-4911-1-git-send-email-kwankhede@nvidia.com>
-	<580DB32F.8040806@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v9 00/12] Add Mediated device support
+	(envelope-from <rth7680@gmail.com>) id 1cDxLa-0005FM-BV
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 12:46:39 -0500
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <1480937130-24561-1-git-send-email-nikunj@linux.vnet.ibm.com>
+	<1480937130-24561-4-git-send-email-nikunj@linux.vnet.ibm.com>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <37c840a9-b9c1-4308-fbff-2e22c8f57d09@twiddle.net>
+Date: Mon, 5 Dec 2016 09:46:34 -0800
+MIME-Version: 1.0
+In-Reply-To: <1480937130-24561-4-git-send-email-nikunj@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 03/13] target-ppc: implement lxvl
+ instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,53 +25,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jike Song <jike.song@intel.com>
-Cc: Kirti Wankhede <kwankhede@nvidia.com>, alex.williamson@redhat.com, cjia@nvidia.com, pbonzini@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, kevin.tian@intel.com, bjsdjshi@linux.vnet.ibm.com, linux-kernel@vger.kernel.org
+To: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+Cc: qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com
 
-  Hi,
+On 12/05/2016 03:25 AM, Nikunj A Dadhania wrote:
+> lxvl: Load VSX Vector with Length
+> 
+> Little/Big-endian Storage:
+> +---+---+---+---+---+---+---+---+---+---+---+---+---+---+--+--+
+> |“T”|“h”|“i”|“s”|“ ”|“i”|“s”|“ ”|“a”|“ ”|“T”|“E”|“S”|“T”|FF|FF|
+> +---+---+---+---+---+---+---+---+---+---+---+---+---+---+--+--+
+> 
+> Loading 14 bytes results in:
+> 
+> Vector (8-bit elements) in BE:
+> +---+---+---+---+---+---+---+---+---+---+---+---+---+---+--+--+
+> |“T”|“h”|“i”|“s”|“ ”|“i”|“s”|“ ”|“a”|“ ”|“T”|“E”|“S”|“T”|00|00|
+> +---+---+---+---+---+---+---+---+---+---+---+---+---+---+--+--+
+> 
+> Vector (8-bit elements) in LE:
+> +--+--+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+> |00|00|“T”|“S”|“E”|“T”|“ ”|“a”|“ ”|“s”|“i”|“ ”|“s”|“i”|"h"|"T"|
+> +--+--+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+> 
+> Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+> ---
+>  target-ppc/helper.h                 |  1 +
+>  target-ppc/mem_helper.c             | 25 +++++++++++++++++++++++++
+>  target-ppc/translate/vsx-impl.inc.c | 27 +++++++++++++++++++++++++++
+>  target-ppc/translate/vsx-ops.inc.c  |  1 +
+>  4 files changed, 54 insertions(+)
+> 
+> diff --git a/target-ppc/helper.h b/target-ppc/helper.h
+> index bc39efb..d9ccafd 100644
+> --- a/target-ppc/helper.h
+> +++ b/target-ppc/helper.h
+> @@ -317,6 +317,7 @@ DEF_HELPER_3(lvewx, void, env, avr, tl)
+>  DEF_HELPER_3(stvebx, void, env, avr, tl)
+>  DEF_HELPER_3(stvehx, void, env, avr, tl)
+>  DEF_HELPER_3(stvewx, void, env, avr, tl)
+> +DEF_HELPER_4(lxvl, void, env, tl, tl, tl)
+>  DEF_HELPER_4(vsumsws, void, env, avr, avr, avr)
+>  DEF_HELPER_4(vsum2sws, void, env, avr, avr, avr)
+>  DEF_HELPER_4(vsum4sbs, void, env, avr, avr, avr)
+> diff --git a/target-ppc/mem_helper.c b/target-ppc/mem_helper.c
+> index 1ab8a6e..0a8ff54 100644
+> --- a/target-ppc/mem_helper.c
+> +++ b/target-ppc/mem_helper.c
+> @@ -24,6 +24,7 @@
+>  
+>  #include "helper_regs.h"
+>  #include "exec/cpu_ldst.h"
+> +#include "internal.h"
+>  
+>  //#define DEBUG_OP
+>  
+> @@ -284,6 +285,30 @@ STVE(stvewx, cpu_stl_data_ra, bswap32, u32)
+>  #undef I
+>  #undef LVE
+>  
+> +void helper_lxvl(CPUPPCState *env, target_ulong addr,
+> +                 target_ulong xt_num, target_ulong rb)
+> +{
+> +    ppc_vsr_t xt;
+> +
+> +    getVSR(xt_num, &xt, env);
+> +    if (unlikely((rb & 0xFF) == 0)) {
+> +        xt.s128 = int128_make128(0, 0);
+> +    } else {
+> +        target_ulong end = ((rb & 0xFF) * 8) - 1;
+> +        if (msr_le) {
+> +            xt.u64[HI_IDX] = bswap64(cpu_ldq_data_ra(env, addr, GETPC()));
+> +            addr = addr_add(env, addr, 8);
+> +            xt.u64[LO_IDX] = bswap64(cpu_ldq_data_ra(env, addr, GETPC()));
 
-> Just want to share that we have published a KVMGT implementation
-> based on this v9 patchset, to:
->=20
-> 	https://github.com/01org/gvt-linux/tree/gvt-next-kvmgt
->=20
-> It doesn't utilize common routines introduced by 05+ patches yet.
-> The complete intel vGPU device-model is contained.
+hi/lo assignment reversed for le.
 
-Tried to use this implementation.  Used the
-topic/gvt-next-kvmgt-mdev-2016-11-18 branch which looked like the most
-recent one.  Setup:
+> +        } else {
+> +            xt.u64[HI_IDX] = cpu_ldq_data_ra(env, addr, GETPC());
+> +            addr = addr_add(env, addr, 8);
+> +            xt.u64[LO_IDX] = cpu_ldq_data_ra(env, addr, GETPC());
+> +        }
+> +        xt.s128 = int128_and(xt.s128, mask_u128(0, end));
 
-  * Everything compiled as modules.
-  * iommu turned off for the igd (intel_iommu=3Don,igfx_off).
-  * Blacklisted i915 so dracut initrd doesn't load it
-    (rd.driver.blacklist=3Di915)
-  * tweaked module config so kvmgt is loaded before i915,
-    also enable gvt:
+I don't think mask_u128 does the right thing for end > 127.
+I think you need a check here.
 
-      # cat /etc/modprobe.d/kraxel-gvt.conf=20
-      options i915 enable_gvt=3D1
-      softdep i915 pre: kvmgt
 
-Everything seems to load fine.  Sysfs files are there, and I can create
-vgpus.
-
-Trying to assign a vgpu this way:
-
-  -device vfio-pci,sysfsdev=3D/sys/class/mdev_bus/0000:00:02.0/<uuid>
-
-fails though and gives this message in the kernel log:
-
-  [  402.560350] [drm:intel_vgpu_open [kvmgt]] *ERROR* gvt: KVM is
-required to use Intel vGPU
-
-Trying the same with a mtty sample device works and I can see the pci
-serial device in the guest.
-
-Any clues what is going wrong?
-
-Has this version any support for exporting the guest display as dma-buf,
-so qemu can show it?  Or is this a headless vgpu?
-
-thanks,
-  Gerd
+r~
