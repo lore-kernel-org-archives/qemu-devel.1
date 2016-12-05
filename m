@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57855)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58403)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cDygO-0007YO-BD
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 14:12:13 -0500
+	(envelope-from <eblake@redhat.com>) id 1cDyk3-0000Gd-7n
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 14:16:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cDygK-0005VP-9E
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 14:12:12 -0500
-Received: from 18.mo4.mail-out.ovh.net ([188.165.54.143]:44263)
+	(envelope-from <eblake@redhat.com>) id 1cDyjz-0006eC-94
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 14:15:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39754)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cDygK-0005Uz-2k
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 14:12:08 -0500
-Received: from player762.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id B83AF1F049
-	for <qemu-devel@nongnu.org>; Mon,  5 Dec 2016 20:12:05 +0100 (CET)
-Date: Mon, 5 Dec 2016 20:11:56 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20161205201156.46b0116b@bahia>
-In-Reply-To: <20161205164200.49bec0f6.cornelia.huck@de.ibm.com>
-References: <148095126363.31351.4484514300033863622.stgit@bahia>
-	<20161205164200.49bec0f6.cornelia.huck@de.ibm.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cDyjz-0006dp-0l
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 14:15:55 -0500
+References: <1480928380-161760-1-git-send-email-longpeng2@huawei.com>
+	<1480928380-161760-2-git-send-email-longpeng2@huawei.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <50e11e16-6378-8ce0-241a-252272f5b99a@redhat.com>
+Date: Mon, 5 Dec 2016 13:15:48 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.8] qdev: apply global properties in
- reverse order
+In-Reply-To: <1480928380-161760-2-git-send-email-longpeng2@huawei.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="jM1Hnh2nObqUO2p6Ut9EuWMRuifduWEu5"
+Subject: Re: [Qemu-devel] [PATCH for-2.9 1/3] crypto: add standard des
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,92 +29,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cornelia.huck@de.ibm.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-stable@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: "Longpeng(Mike)" <longpeng2@huawei.com>, berrange@redhat.com, armbru@redhat.com, arei.gonglei@huawei.com
+Cc: qemu-devel@nongnu.org, wu.wubin@huawei.com, jianjay.zhou@huawei.com
 
-On Mon, 5 Dec 2016 16:42:00 +0100
-Cornelia Huck <cornelia.huck@de.ibm.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--jM1Hnh2nObqUO2p6Ut9EuWMRuifduWEu5
+From: Eric Blake <eblake@redhat.com>
+To: "Longpeng(Mike)" <longpeng2@huawei.com>, berrange@redhat.com,
+ armbru@redhat.com, arei.gonglei@huawei.com
+Cc: qemu-devel@nongnu.org, wu.wubin@huawei.com, jianjay.zhou@huawei.com
+Message-ID: <50e11e16-6378-8ce0-241a-252272f5b99a@redhat.com>
+Subject: Re: [PATCH for-2.9 1/3] crypto: add standard des support
+References: <1480928380-161760-1-git-send-email-longpeng2@huawei.com>
+ <1480928380-161760-2-git-send-email-longpeng2@huawei.com>
+In-Reply-To: <1480928380-161760-2-git-send-email-longpeng2@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> On Mon, 05 Dec 2016 16:21:22 +0100
-> Greg Kurz <groug@kaod.org> wrote:
-> 
-> > The current code recursively applies global properties from child up to
-> > parent. So, if you have:
-> > 
-> > -global virtio-pci.disable-modern=on
-> > -global virtio-blk-pci.disable-modern=off
-> > 
-> > Then the default value of disable-modern for a virtio-blk-pci device is on,
-> > which looks wrong from an OOP perspective.
-> > 
-> > This patch reverses the logic, so that a child property always prevail.  
-> 
-> This sounds reasonable...
-> 
-> > 
-> > This fixes a subtle bug that got introduced in 2.7 with commit "9a4c0e220d8a
-> > hw/virtio-pci: fix virtio behaviour" for older (< 2.7) machine types: the
-> > HW_COMPAT_2_6 macro contains global virtio-pci.disable-* properties which
-> > would silently override global properties passed on the command line for
-> > virtio subtypes.
-> > 
-> > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > ---
-> > 
-> > AFAIK, libvirt's XML doesn't know about modern/legacy modes for virtio
-> > devices. Early adopters of virtio 1.0 had to rely on the <qemu:commandline>
-> > tag to pass global properties to QEMU. This patch ensures that XML files
-> > used with older machine types remain valid with newer versions of QEMU.
-> > 
-> > FWIW I guess it could help to have this fix in 2.8, and also probably in
-> > 2.7.1.  
-> 
-> ...but I'm a bit worried about doing that change this late in the
-> cycle, as we may introduce subtle changes for other configurations. At
-> the very least, we should look over the existing backwards compat
-> properties (I'll look at those I'm familiar with).
-> 
+On 12/05/2016 02:59 AM, Longpeng(Mike) wrote:
+> This patch add standart DES support.
 
-Yeah, it's unfortunate I encountered the issue this late... I usually
-pass properties to -device directly. :-\ Maybe we should set global
-options per virtio-pci subtype as you suggested on IRC ?
+s/standart/standard/
 
-Note: sorry for the late answer but I've just received all the mails...
+>=20
+> Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
+> ---
 
-> > 
-> > Please advise.
-> > 
-> >  hw/core/qdev-properties.c |   11 ++++++++++-
-> >  1 file changed, 10 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-> > index 2a8276806721..1345f489d6b1 100644
-> > --- a/hw/core/qdev-properties.c
-> > +++ b/hw/core/qdev-properties.c
-> > @@ -1119,11 +1119,20 @@ static void qdev_prop_set_globals_for_type(DeviceState *dev,
-> >  void qdev_prop_set_globals(DeviceState *dev)
-> >  {
-> >      ObjectClass *class = object_get_class(OBJECT(dev));
-> > +    GSList *class_list = NULL;
-> > 
-> >      do {
-> > -        qdev_prop_set_globals_for_type(dev, object_class_get_name(class));
-> > +        class_list = g_slist_prepend(class_list, class);
-> >          class = object_class_get_parent(class);
-> >      } while (class);
-> > +
-> > +    do {
-> > +        GSList *head = class_list;
-> > +
-> > +        qdev_prop_set_globals_for_type(dev, object_class_get_name(head->data));
-> > +        class_list = g_slist_next(head);
-> > +        g_slist_free_1(head);
-> > +    } while (class_list);
-> >  }
-> > 
-> >  /* --- 64bit unsigned int 'size' type --- */
-> >   
-> 
-> It is a bit unfortunate that we need a double loop here, but I don't
-> see any good alternative.
-> 
+> +++ b/qapi/crypto.json
+> @@ -75,7 +75,7 @@
+>  { 'enum': 'QCryptoCipherAlgorithm',
+>    'prefix': 'QCRYPTO_CIPHER_ALG',
+>    'data': ['aes-128', 'aes-192', 'aes-256',
+> -           'des-rfb',
+> +           'des-rfb', 'des',
+
+Missing documentation that includes a (since 2.9) blurb
+
+>             'cast5-128',
+>             'serpent-128', 'serpent-192', 'serpent-256',
+>             'twofish-128', 'twofish-192', 'twofish-256']}
+>=20
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--jM1Hnh2nObqUO2p6Ut9EuWMRuifduWEu5
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYRbzkAAoJEKeha0olJ0Nq8ecH/1uVxt9ymZds7AqR8S8gZYSP
+ZaKVNxEJtdfEXJewzt6wszKJn9LS9RRFvyZggPtWEeoER0gh/gXAjLxA0LMDCQ6c
+PTEHkxkpXs5M+1LP33iKzQiRleMyZ2Vzv2sRwyVVqU9ZFFouJsFZQPkDAsF55PYG
+n0eFXn6Grmt+zPJdYPu1UoNcobKHPwnr5ualyXiTIKj+6t5nw3NFoP8Uob1QQI/t
+O2+nlu2Ys4Wq3188vFY/2o+RZfpAOomI0YqMPUylqWkbKSefBuZ8Ow7ur6dRomkY
+c3DYciknQJUWKicGzI/jtBsvFAFJS+RXkZxV946Z5mpETa20Y79I7tqh2vkLH4w=
+=NR8Q
+-----END PGP SIGNATURE-----
+
+--jM1Hnh2nObqUO2p6Ut9EuWMRuifduWEu5--
