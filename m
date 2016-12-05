@@ -1,31 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45644)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50803)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1cDxqo-0007CA-GI
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 13:18:55 -0500
+	(envelope-from <alistai@xilinx.com>) id 1cDy8c-0006EL-T8
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 13:37:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1cDxql-0000YN-9f
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 13:18:54 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:11327)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1cDxql-0000Y5-39
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 13:18:51 -0500
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 19A5C8B137
-	for <qemu-devel@nongnu.org>; Mon,  5 Dec 2016 18:18:50 +0000 (UTC)
-References: <1480713496-11213-1-git-send-email-ehabkost@redhat.com>
-	<1480713496-11213-16-git-send-email-ehabkost@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <df0f3ade-bd09-58a0-ac83-3775d4ab7c6c@redhat.com>
-Date: Mon, 5 Dec 2016 19:18:47 +0100
+	(envelope-from <alistai@xilinx.com>) id 1cDy8a-0007kV-BH
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 13:37:18 -0500
+Received: from mail-by2nam01on0083.outbound.protection.outlook.com
+	([104.47.34.83]:20512
+	helo=NAM01-BY2-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1cDy8Z-0007k7-Ty
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 13:37:16 -0500
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Mon, 5 Dec 2016 10:35:26 -0800
+Message-ID: <cb06a932a7c6b29bc6eb0d35f31766bfb0bba47f.1480962799.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
-In-Reply-To: <1480713496-11213-16-git-send-email-ehabkost@redhat.com>
-Content-Type: text/plain; charset=iso-8859-15; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.9 15/17] target-i386: Define static
- "base" CPU model
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH for 2.8 v3 1/1] cadence_uart: Check baud rate
+ generator and divider values on migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,22 +26,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, peter.maydell@linaro.org
+Cc: alistair.francis@xilinx.com, alistair23@gmail.com, pjp@fedoraproject.org, psirt@huawei.com
 
-Am 02.12.2016 um 22:18 schrieb Eduardo Habkost:
-> The query-cpu-model-expand QMP command needs at least one static
-> model, to allow the "static" expansion mode to be implemented.
-> Instead of defining static versions of every CPU model, define a
-> "base" CPU model that has absolutely no feature flag enabled.
->
+The Cadence UART device emulator calculates speed by dividing the
+baud rate by a 'baud rate generator' & 'baud rate divider' value.
+The device specification defines these register values to be
+non-zero and within certain limits. Checks were recently added when
+writing to these registers but not when restoring from migration.
 
-Introducing separate ones makes feature lists presented to the user much 
-shorter (and therefore easier to maintain). But I don't know how libvirt 
-wants to deal with models on x86 in the future.
+This patch adds checks when restoring from migration to avoid divide by
+zero errors.
 
-How long is the static expansion on a recent intel CPU?
+Reported-by: Huawei PSIRT <psirt@huawei.com>
+Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+---
+It would be nice to squeeze this into 2.8 if possible.
 
+V3:
+ - Fix broken migration logic
+ - Manually double checked and it passes migration.
+V2:
+ - Abort the migration if the data is invalid
 
+ hw/char/cadence_uart.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/hw/char/cadence_uart.c b/hw/char/cadence_uart.c
+index 0215d65..ce9063b 100644
+--- a/hw/char/cadence_uart.c
++++ b/hw/char/cadence_uart.c
+@@ -502,6 +502,13 @@ static int cadence_uart_post_load(void *opaque, int version_id)
+ {
+     CadenceUARTState *s = opaque;
+ 
++    /* Ensure these two aren't invalid numbers */
++    if (s->r[R_BRGR] <= 1 || s->r[R_BRGR] & ~0xFFFF ||
++        s->r[R_BDIV] <= 3 || s->r[R_BDIV] & ~0xFF) {
++        /* Value is invalid, abort */
++        return 1;
++    }
++
+     uart_parameters_setup(s);
+     uart_update_status(s);
+     return 0;
 -- 
-
-David
+2.7.4
