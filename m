@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42731)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44435)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cDvPt-0001vW-PN
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 10:42:58 -0500
+	(envelope-from <eblake@redhat.com>) id 1cDvQr-0002eb-TZ
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 10:44:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cDvPs-0002Xu-SW
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 10:42:57 -0500
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20161202173454.19179-1-alex.bennee@linaro.org>
-	<8737i21vl8.fsf@linaro.org>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <b6c3b949-ef2a-31f4-ce86-712ce7b64a3f@twiddle.net>
-Date: Mon, 5 Dec 2016 07:42:50 -0800
+	(envelope-from <eblake@redhat.com>) id 1cDvQq-0003Ls-VF
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 10:43:57 -0500
+References: <20161203173402.12537-1-eblake@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <08ed9fee-e8fe-5c9e-f0f6-d203c870b105@redhat.com>
+Date: Mon, 5 Dec 2016 09:43:44 -0600
 MIME-Version: 1.0
-In-Reply-To: <8737i21vl8.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for-2.8] target-arm/translate-a64: fix
- gen_load_exclusive
+In-Reply-To: <20161203173402.12537-1-eblake@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="0eTcETSqOcl69mCJallfu5fGi7GA3B9IR"
+Subject: Re: [Qemu-devel] [PATCH for-2.8] qcow2: Don't strand clusters near
+ 2G intervals during commit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,42 +24,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, stefanha@redhat.com, peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, cota@braap.org, "open list:ARM" <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, jsnow@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On 12/05/2016 03:09 AM, Alex Bennée wrote:
-> 
-> Alex Bennée <alex.bennee@linaro.org> writes:
-> 
->> While testing rth's latest TCG patches with risu I found ldaxp was
->> broken. Investigating further I found it was broken by 1dd089d0 when
->> the cmpxchg atomic work was merged.
-> 
-> CC'ing Paolo/Richard
-> 
-> Do you guys have any final TCG fixes planned for 2.8 that can take this
-> fix for the ldaxp regression?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--0eTcETSqOcl69mCJallfu5fGi7GA3B9IR
+From: Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, jsnow@redhat.com, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
+Message-ID: <08ed9fee-e8fe-5c9e-f0f6-d203c870b105@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.8] qcow2: Don't strand clusters near 2G
+ intervals during commit
+References: <20161203173402.12537-1-eblake@redhat.com>
+In-Reply-To: <20161203173402.12537-1-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-I don't have any pending patchs for 2.8, no.
+On 12/03/2016 11:34 AM, Eric Blake wrote:
+> The qcow2_make_empty() function is reached during 'qemu-img commit',
+> in order to clear out ALL clusters of an image.  However, if the
+> image cannot use the fast code path (true if the image is format
+> 0.10, or if the image contains a snapshot), the cluster size is
+> larger than 512, and the image is larger than 2G in size, then our
+> choice of sector_step causes problems.  Since it is not cluster
+> aligned, but qcow2_discard_clusters() silently ignores an unaligned
+> head or tail, we are leaving clusters allocated.
+>=20
+> Enhance the testsuite to expose the flaw, and patch the problem by
+> ensuring our step size is aligned.
+>=20
+> [qcow2_discard_clusters() is a GROSS interface: it takes a mix of
+> byte offset and sector count to perform cluster operations. But
+> fixing it to use a saner byte/byte rather than byte/sector interface,
+> and/or asserting that the counts are now aligned thanks to both
+> this patch and commit 3482b9b, is material for another day.]
+>=20
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>  block/qcow2.c              |   3 +-
+>  tests/qemu-iotests/097     |  41 +++++---
+>  tests/qemu-iotests/097.out | 249 +++++++++++++++++++++++++++++++++----=
+--------
+>  3 files changed, 210 insertions(+), 83 deletions(-)
 
->> As part of that change the code
->> attempted to be clever by doing a single 64 bit load and then shuffle
->> the data around to set the two 32 bit registers.
+> +++ b/block/qcow2.c
+> @@ -2808,7 +2808,8 @@ static int qcow2_make_empty(BlockDriverState *bs)=
 
-It's not trying to be "clever", it's trying to be correct, giving an atomic
-64-bit load.
+>  {
+>      BDRVQcow2State *s =3D bs->opaque;
+>      uint64_t start_sector;
+> -    int sector_step =3D INT_MAX / BDRV_SECTOR_SIZE;
+> +    int sector_step =3D QEMU_ALIGN_DOWN(INT_MAX / BDRV_SECTOR_SIZE,
+> +                                      s->cluster_size);
 
-The fact that we didn't attempt an atomic 128-bit load here for the 64-bit pair
-is a bug.  We have support for that in helper_atomic_ldo_le_mmu; I'm not sure
-why I didn't use that here.
+Oh shoot. I got the units wrong, and made the slow path do more loop
+iterations than necessary (rounding sectors to cluster size in bytes is
+inappropriate - either the rounding has to occur before division, or the
+rounding needs to be by secotrs instead of bytes).  I'll send a v2 that
+gets the math right.
 
->> As I couldn't quite follow the endian magic I've simply partially
->> reverted the change to the original code gen_load_exclusive code. This
->> doesn't affect the cmpxchg functionality as that is all done on in
->> gen_store_exclusive part which is untouched.
-
-We'll have to fix it properly eventually.  But perhaps 2.9 is soon enough,
-since that's when mttcg will go in.
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
 
-r~
+--0eTcETSqOcl69mCJallfu5fGi7GA3B9IR
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYRYswAAoJEKeha0olJ0NqqugH/1jz7u4rt9B9SBrEf5gavLlm
+hK2y65qhccwnxw20g1h6bwdKyVOb95cSgFgwvhAULjQjMqgLdVAx7OwqMLMkM90P
+16gSbP9FE1Dax9Fg2zDtoa5Kani8lDv5GyVM/qf+GtRtwGPbjEeBoyKtR0zXxDJY
+67MJ3f5Di/d0Ea7SJpIRNVqY1QI/+k6oGaKFzna1g7bru9aKZnbDTostCrXaNgaK
+ql+lPqmdjSPDn/ouqIjrueyWYjlXpVM5RdrrF3VLABbSMOSRNn31s0dkbMj/jhen
+4JYsmQ06mNfsvq6n6GSdQQWYhAYlXP2MTZTUk0TgKXRo3qFd3yUw4ZSNYwIh+ag=
+=wuTe
+-----END PGP SIGNATURE-----
+
+--0eTcETSqOcl69mCJallfu5fGi7GA3B9IR--
