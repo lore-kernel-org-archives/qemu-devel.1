@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44899)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47791)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1cDuCz-0000Ta-M6
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 09:25:34 -0500
+	(envelope-from <stefanha@redhat.com>) id 1cDuMH-0002NX-Ok
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 09:35:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1cDuCw-0007Oi-EW
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 09:25:33 -0500
-Received: from mail-io0-x233.google.com ([2607:f8b0:4001:c06::233]:33401)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1cDuCw-0007Oa-94
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 09:25:30 -0500
-Received: by mail-io0-x233.google.com with SMTP id j65so598185366iof.0
-	for <qemu-devel@nongnu.org>; Mon, 05 Dec 2016 06:25:30 -0800 (PST)
-In-Reply-To: <450b3a36-225b-25ee-1cd7-7e5ad3254fc6@redhat.com>
-References: <6AEB7A4C-14B5-41D2-8905-35296B337347@gmail.com>
-	<0ac3720a-6e4b-81b9-10a7-5103546f1a40@redhat.com>
-	<3A17D27E-08ED-43E1-BB66-E0C89A5DE878@gmail.com>
-	<450b3a36-225b-25ee-1cd7-7e5ad3254fc6@redhat.com>
-Mime-Version: 1.0 (Apple Message framework v753.1)
-Content-Type: text/plain; charset=US-ASCII; delsp=yes; format=flowed
-Message-Id: <97699278-36D1-4CB1-8511-69F856579163@gmail.com>
-Content-Transfer-Encoding: 7bit
-From: G 3 <programmingkidx@gmail.com>
-Date: Mon, 5 Dec 2016 09:25:26 -0500
-Subject: Re: [Qemu-devel] New wiki page: http://wiki.qemu.org/Hosts
+	(envelope-from <stefanha@redhat.com>) id 1cDuMC-0002bU-WF
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 09:35:09 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37700)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cDuMC-0002ab-Pq
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 09:35:04 -0500
+Date: Mon, 5 Dec 2016 14:35:00 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20161205143500.GD30434@stefanha-x1.localdomain>
+References: <1480931523-5769-1-git-send-email-jasowang@redhat.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="n/aVsWSeQ4JHkrmm"
+Content-Disposition: inline
+In-Reply-To: <1480931523-5769-1-git-send-email-jasowang@redhat.com>
+Subject: Re: [Qemu-devel] [PULL 0/3] Net patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,26 +27,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+To: Jason Wang <jasowang@redhat.com>
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
 
 
-On Dec 5, 2016, at 9:15 AM, Paolo Bonzini wrote:
+--n/aVsWSeQ4JHkrmm
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
->
->
-> On 05/12/2016 14:47, G 3 wrote:
->>
->> So now I have to figure out which commands to use. This script would
->> have to work on all operating systems that QEMU is built on. This  
->> page
->> has some pretty good information on how to do this:
->> http://stackoverflow.com/questions/12422289/bash-command-to-covert- 
->> html-page-to-a-text-file
->
-> No, I just want to do that once and get rid of the Hosts/ pages.
->
-> Paolo
+On Mon, Dec 05, 2016 at 05:52:00PM +0800, Jason Wang wrote:
+> The following changes since commit bd8ef5060dd2124a54578241da9a572faf7658=
+dd:
+>=20
+>   Merge remote-tracking branch 'dgibson/tags/ppc-for-2.8-20161201' into s=
+taging (2016-12-01 13:39:29 +0000)
+>=20
+> are available in the git repository at:
+>=20
+>   https://github.com/jasowang/qemu.git tags/net-pull-request
+>=20
+> for you to fetch changes up to 18766d28848f2a4c309e78c6706b872f2cb32786:
+>=20
+>   fsl_etsec: Fix various small problems in hexdump code (2016-12-05 17:45=
+:14 +0800)
+>=20
+> ----------------------------------------------------------------
 
-Really? Why? I thought they were very useful. Where would people who  
-are doing a web search go for building information? 
+Please resend with the coding style violation fixed.  See the patchew
+email for details.
+
+--n/aVsWSeQ4JHkrmm
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJYRXsUAAoJEJykq7OBq3PIehMH/i3ndHZfk9gmFG3F2TrhE0YO
+Zr+9/JeZNfWwNYWTIlBqQ6ra9y1Gr9/qm+ZUBnL5bZfuJMxdDZ1pLKDIDqiwD3tS
+NGtfPiz+Pkip/LqKq27HJt5YxQGv4o9/1lxciHIw5aPw35fKkSRx58cmk8xxLvjz
+H2B9pnaJvLGYWReWvN26dhZ3E19KyMqB/RYc9qugnbGDM/Z2esJZWvEzIPo1AUMX
+lPv3Iyj09RHXq5MZJwdQ+yox18fOpT1SnPOf+C/1pJMavzhbw7chxTHb7kFVwdWM
+++i7BxeNRRuDbH7DVhw/VqxoreaVPFLe+cjTGBaqSpMMm09FcgJZbFPLOB4YkXA=
+=CX+D
+-----END PGP SIGNATURE-----
+
+--n/aVsWSeQ4JHkrmm--
