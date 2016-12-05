@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57271)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57272)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cE2ka-0002qg-VA
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 18:32:49 -0500
+	(envelope-from <imammedo@redhat.com>) id 1cE2ka-0002qh-VO
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 18:32:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cE2kW-00061e-Uv
+	(envelope-from <imammedo@redhat.com>) id 1cE2kY-00061v-79
 	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 18:32:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51290)
+Received: from mx1.redhat.com ([209.132.183.28]:37854)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cE2kW-00061Q-MX
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 18:32:44 -0500
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cE2kX-00061l-V1
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 18:32:46 -0500
 Received: from int-mx10.intmail.prod.int.phx2.redhat.com
 	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D72EA61B96
-	for <qemu-devel@nongnu.org>; Mon,  5 Dec 2016 23:32:43 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 216B064D8B
+	for <qemu-devel@nongnu.org>; Mon,  5 Dec 2016 23:32:45 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Tue,  6 Dec 2016 00:32:27 +0100
-Message-Id: <1480980749-182204-9-git-send-email-imammedo@redhat.com>
+Date: Tue,  6 Dec 2016 00:32:28 +0100
+Message-Id: <1480980749-182204-10-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1480980749-182204-1-git-send-email-imammedo@redhat.com>
 References: <1480980749-182204-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.9 08/10] memhp: move memory hotplug only
- defines to memory_hotplug.c
+Subject: [Qemu-devel] [PATCH for-2.9 09/10] memhp: don't generate memory
+ hotplug AML if it's not enabled/supported
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,95 +33,204 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: "Michael S. Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
 
-Move defines used locally only by memory_hotplug.c into it
-from header files.
+That reduces DSDT by 910 bytes when memory hotplug
+isn't enabled.
+
+While doing so drop intermediate variables/arguments
+passing around ACPI_MEMORY_HOTPLUG_IO_LEN and making
+it local to memory_hotplug.c, hardcoding it there as
+it can't change.
+
+Also don't pass around ACPI_MEMORY_HOTPLUG_BASE through
+intermediate variables/arguments where it's not needed.
+Instead initialize in module static variable when MMIO
+region is mapped and use that within memory_hotplug.c
+whenever it's required.
+That way MMIO base specified only at one place and AML
+with MMIO would always use the same value.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
- include/hw/acpi/memory_hotplug.h |  3 ---
- include/hw/acpi/pc-hotplug.h     | 22 ----------------------
- hw/acpi/memory_hotplug.c         | 24 ++++++++++++++++++++++++
- 3 files changed, 24 insertions(+), 25 deletions(-)
+ include/hw/acpi/memory_hotplug.h |  3 +--
+ include/hw/acpi/pc-hotplug.h     |  1 -
+ hw/acpi/ich9.c                   |  3 ++-
+ hw/acpi/memory_hotplug.c         | 24 +++++++++++++++++-------
+ hw/acpi/piix4.c                  |  3 ++-
+ hw/i386/acpi-build.c             |  9 +--------
+ 6 files changed, 23 insertions(+), 20 deletions(-)
 
 diff --git a/include/hw/acpi/memory_hotplug.h b/include/hw/acpi/memory_hotplug.h
-index 37e2706..91d4045 100644
+index 91d4045..db8ebc9 100644
 --- a/include/hw/acpi/memory_hotplug.h
 +++ b/include/hw/acpi/memory_hotplug.h
-@@ -47,9 +47,6 @@ extern const VMStateDescription vmstate_memory_hotplug;
+@@ -30,7 +30,7 @@ typedef struct MemHotplugState {
+ } MemHotplugState;
  
+ void acpi_memory_hotplug_init(MemoryRegion *as, Object *owner,
+-                              MemHotplugState *state);
++                              MemHotplugState *state, uint16_t io_base);
+ 
+ void acpi_memory_plug_cb(HotplugHandler *hotplug_dev, MemHotplugState *mem_st,
+                          DeviceState *dev, Error **errp);
+@@ -48,7 +48,6 @@ extern const VMStateDescription vmstate_memory_hotplug;
  void acpi_memory_ospm_status(MemHotplugState *mem_st, ACPIOSTInfoList ***list);
  
--#define MEMORY_HOTPLUG_DEVICE        "MHPD"
--#define MEMORY_SLOT_SCAN_METHOD      "MSCN"
--
  void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
-                               uint16_t io_base, uint16_t io_len,
+-                              uint16_t io_base, uint16_t io_len,
                                const char *res_root,
+                               const char *event_handler_method);
+ #endif
 diff --git a/include/hw/acpi/pc-hotplug.h b/include/hw/acpi/pc-hotplug.h
-index 6a8d268..a4f513d 100644
+index a4f513d..31bc919 100644
 --- a/include/hw/acpi/pc-hotplug.h
 +++ b/include/hw/acpi/pc-hotplug.h
-@@ -32,26 +32,4 @@
- #define ACPI_MEMORY_HOTPLUG_IO_LEN 24
+@@ -29,7 +29,6 @@
+ #define PIIX4_CPU_HOTPLUG_IO_BASE 0xaf00
+ #define CPU_HOTPLUG_RESOURCE_DEVICE PRES
+ 
+-#define ACPI_MEMORY_HOTPLUG_IO_LEN 24
  #define ACPI_MEMORY_HOTPLUG_BASE 0x0a00
  
--#define MEMORY_SLOTS_NUMBER          "MDNR"
--#define MEMORY_HOTPLUG_IO_REGION     "HPMR"
--#define MEMORY_SLOT_ADDR_LOW         "MRBL"
--#define MEMORY_SLOT_ADDR_HIGH        "MRBH"
--#define MEMORY_SLOT_SIZE_LOW         "MRLL"
--#define MEMORY_SLOT_SIZE_HIGH        "MRLH"
--#define MEMORY_SLOT_PROXIMITY        "MPX"
--#define MEMORY_SLOT_ENABLED          "MES"
--#define MEMORY_SLOT_INSERT_EVENT     "MINS"
--#define MEMORY_SLOT_REMOVE_EVENT     "MRMV"
--#define MEMORY_SLOT_EJECT            "MEJ"
--#define MEMORY_SLOT_SLECTOR          "MSEL"
--#define MEMORY_SLOT_OST_EVENT        "MOEV"
--#define MEMORY_SLOT_OST_STATUS       "MOSC"
--#define MEMORY_SLOT_LOCK             "MLCK"
--#define MEMORY_SLOT_STATUS_METHOD    "MRST"
--#define MEMORY_SLOT_CRS_METHOD       "MCRS"
--#define MEMORY_SLOT_OST_METHOD       "MOST"
--#define MEMORY_SLOT_PROXIMITY_METHOD "MPXM"
--#define MEMORY_SLOT_EJECT_METHOD     "MEJ0"
--#define MEMORY_SLOT_NOTIFY_METHOD    "MTFY"
--
  #endif
+diff --git a/hw/acpi/ich9.c b/hw/acpi/ich9.c
+index 830c475..5c279bb 100644
+--- a/hw/acpi/ich9.c
++++ b/hw/acpi/ich9.c
+@@ -306,7 +306,8 @@ void ich9_pm_init(PCIDevice *lpc_pci, ICH9LPCPMRegs *pm,
+ 
+     if (pm->acpi_memory_hotplug.is_enabled) {
+         acpi_memory_hotplug_init(pci_address_space_io(lpc_pci), OBJECT(lpc_pci),
+-                                 &pm->acpi_memory_hotplug);
++                                 &pm->acpi_memory_hotplug,
++                                 ACPI_MEMORY_HOTPLUG_BASE);
+     }
+ }
+ 
 diff --git a/hw/acpi/memory_hotplug.c b/hw/acpi/memory_hotplug.c
-index 49e856f..da29332 100644
+index da29332..fb04d24 100644
 --- a/hw/acpi/memory_hotplug.c
 +++ b/hw/acpi/memory_hotplug.c
-@@ -7,6 +7,30 @@
- #include "trace.h"
- #include "qapi-event.h"
- 
-+#define MEMORY_SLOTS_NUMBER          "MDNR"
-+#define MEMORY_HOTPLUG_IO_REGION     "HPMR"
-+#define MEMORY_SLOT_ADDR_LOW         "MRBL"
-+#define MEMORY_SLOT_ADDR_HIGH        "MRBH"
-+#define MEMORY_SLOT_SIZE_LOW         "MRLL"
-+#define MEMORY_SLOT_SIZE_HIGH        "MRLH"
-+#define MEMORY_SLOT_PROXIMITY        "MPX"
-+#define MEMORY_SLOT_ENABLED          "MES"
-+#define MEMORY_SLOT_INSERT_EVENT     "MINS"
-+#define MEMORY_SLOT_REMOVE_EVENT     "MRMV"
-+#define MEMORY_SLOT_EJECT            "MEJ"
-+#define MEMORY_SLOT_SLECTOR          "MSEL"
-+#define MEMORY_SLOT_OST_EVENT        "MOEV"
-+#define MEMORY_SLOT_OST_STATUS       "MOSC"
-+#define MEMORY_SLOT_LOCK             "MLCK"
-+#define MEMORY_SLOT_STATUS_METHOD    "MRST"
-+#define MEMORY_SLOT_CRS_METHOD       "MCRS"
-+#define MEMORY_SLOT_OST_METHOD       "MOST"
-+#define MEMORY_SLOT_PROXIMITY_METHOD "MPXM"
-+#define MEMORY_SLOT_EJECT_METHOD     "MEJ0"
-+#define MEMORY_SLOT_NOTIFY_METHOD    "MTFY"
-+#define MEMORY_SLOT_SCAN_METHOD      "MSCN"
-+#define MEMORY_HOTPLUG_DEVICE        "MHPD"
+@@ -30,6 +30,9 @@
+ #define MEMORY_SLOT_NOTIFY_METHOD    "MTFY"
+ #define MEMORY_SLOT_SCAN_METHOD      "MSCN"
+ #define MEMORY_HOTPLUG_DEVICE        "MHPD"
++#define MEMORY_HOTPLUG_IO_LEN         24
 +
++static uint16_t memhp_io_base;
+ 
  static ACPIOSTInfo *acpi_memory_device_status(int slot, MemStatus *mdev)
  {
-     ACPIOSTInfo *info = g_new0(ACPIOSTInfo, 1);
+@@ -202,7 +205,7 @@ static const MemoryRegionOps acpi_memory_hotplug_ops = {
+ };
+ 
+ void acpi_memory_hotplug_init(MemoryRegion *as, Object *owner,
+-                              MemHotplugState *state)
++                              MemHotplugState *state, uint16_t io_base)
+ {
+     MachineState *machine = MACHINE(qdev_get_machine());
+ 
+@@ -211,10 +214,12 @@ void acpi_memory_hotplug_init(MemoryRegion *as, Object *owner,
+         return;
+     }
+ 
++    assert(!memhp_io_base);
++    memhp_io_base = io_base;
+     state->devs = g_malloc0(sizeof(*state->devs) * state->dev_count);
+     memory_region_init_io(&state->io, owner, &acpi_memory_hotplug_ops, state,
+-                          "acpi-mem-hotplug", ACPI_MEMORY_HOTPLUG_IO_LEN);
+-    memory_region_add_subregion(as, ACPI_MEMORY_HOTPLUG_BASE, &state->io);
++                          "acpi-mem-hotplug", MEMORY_HOTPLUG_IO_LEN);
++    memory_region_add_subregion(as, memhp_io_base, &state->io);
+ }
+ 
+ /**
+@@ -332,7 +337,6 @@ const VMStateDescription vmstate_memory_hotplug = {
+ };
+ 
+ void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
+-                              uint16_t io_base, uint16_t io_len,
+                               const char *res_root,
+                               const char *event_handler_method)
+ {
+@@ -342,8 +346,13 @@ void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
+     Aml *sb_scope;
+     Aml *mem_ctrl_dev;
+     char *scan_path;
+-    char *mhp_res_path = g_strdup_printf("%s." MEMORY_HOTPLUG_DEVICE, res_root);
++    char *mhp_res_path;
++
++    if (!memhp_io_base) {
++        return;
++    }
+ 
++    mhp_res_path = g_strdup_printf("%s." MEMORY_HOTPLUG_DEVICE, res_root);
+     mem_ctrl_dev = aml_device("%s", mhp_res_path);
+     {
+         Aml *crs;
+@@ -367,13 +376,14 @@ void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
+ 
+         crs = aml_resource_template();
+         aml_append(crs,
+-            aml_io(AML_DECODE16, io_base, io_base, 0, io_len)
++            aml_io(AML_DECODE16, memhp_io_base, memhp_io_base, 0,
++                   MEMORY_HOTPLUG_IO_LEN)
+         );
+         aml_append(mem_ctrl_dev, aml_name_decl("_CRS", crs));
+ 
+         aml_append(mem_ctrl_dev, aml_operation_region(
+             MEMORY_HOTPLUG_IO_REGION, AML_SYSTEM_IO,
+-            aml_int(io_base), io_len)
++            aml_int(memhp_io_base), MEMORY_HOTPLUG_IO_LEN)
+         );
+ 
+         field = aml_field(MEMORY_HOTPLUG_IO_REGION, AML_DWORD_ACC,
+diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
+index 17d36bd..6d99fe4 100644
+--- a/hw/acpi/piix4.c
++++ b/hw/acpi/piix4.c
+@@ -644,7 +644,8 @@ static void piix4_acpi_system_hot_add_init(MemoryRegion *parent,
+                                  PIIX4_CPU_HOTPLUG_IO_BASE);
+ 
+     if (s->acpi_memory_hotplug.is_enabled) {
+-        acpi_memory_hotplug_init(parent, OBJECT(s), &s->acpi_memory_hotplug);
++        acpi_memory_hotplug_init(parent, OBJECT(s), &s->acpi_memory_hotplug,
++                                 ACPI_MEMORY_HOTPLUG_BASE);
+     }
+ }
+ 
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index b7f4682..f207d4f 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -101,8 +101,6 @@ typedef struct AcpiPmInfo {
+     uint32_t gpe0_blk_len;
+     uint32_t io_base;
+     uint16_t cpu_hp_io_base;
+-    uint16_t mem_hp_io_base;
+-    uint16_t mem_hp_io_len;
+     uint16_t pcihp_io_base;
+     uint16_t pcihp_io_len;
+ } AcpiPmInfo;
+@@ -148,9 +146,6 @@ static void acpi_get_pm_info(AcpiPmInfo *pm)
+     }
+     assert(obj);
+ 
+-    pm->mem_hp_io_base = ACPI_MEMORY_HOTPLUG_BASE;
+-    pm->mem_hp_io_len = ACPI_MEMORY_HOTPLUG_IO_LEN;
+-
+     /* Fill in optional s3/s4 related properties */
+     o = object_property_get_qobject(obj, ACPI_PM_PROP_S3_DISABLED, NULL);
+     if (o) {
+@@ -1925,9 +1920,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+         build_cpus_aml(dsdt, machine, opts, pm->cpu_hp_io_base,
+                        "\\_SB.PCI0", "\\_GPE._E02");
+     }
+-    build_memory_hotplug_aml(dsdt, nr_mem, pm->mem_hp_io_base,
+-                             pm->mem_hp_io_len,
+-                             "\\_SB.PCI0", "\\_GPE._E03");
++    build_memory_hotplug_aml(dsdt, nr_mem, "\\_SB.PCI0", "\\_GPE._E03");
+ 
+     scope =  aml_scope("_GPE");
+     {
 -- 
 2.7.4
