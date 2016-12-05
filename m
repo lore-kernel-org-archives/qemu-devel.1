@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35905)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37800)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cDv5x-0002ux-AN
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 10:22:22 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cDv7U-00044c-Ob
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 10:23:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cDv5u-0000ZC-8A
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 10:22:21 -0500
-Received: from mx4-phx2.redhat.com ([209.132.183.25]:47532)
+	(envelope-from <pbonzini@redhat.com>) id 1cDv7P-0001td-BK
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 10:23:56 -0500
+Received: from mx6-phx2.redhat.com ([209.132.183.39]:39988)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cDv5t-0000Yc-VJ
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 10:22:18 -0500
-Date: Mon, 5 Dec 2016 10:22:12 -0500 (EST)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cDv7P-0001rv-2L
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 10:23:51 -0500
+Date: Mon, 5 Dec 2016 10:23:48 -0500 (EST)
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <1637153950.1453448.1480951332566.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20161205144615.GE30434@stefanha-x1.localdomain>
-References: <20161201192652.9509-1-stefanha@redhat.com>
-	<20161201192652.9509-5-stefanha@redhat.com>
-	<20161205005459.GA21702@lemon>
-	<20161205101452.GB22443@stefanha-x1.localdomain>
-	<1548288582.1411113.1480935595505.JavaMail.zimbra@redhat.com>
-	<20161205144615.GE30434@stefanha-x1.localdomain>
+Message-ID: <211691004.1455466.1480951428933.JavaMail.zimbra@redhat.com>
+In-Reply-To: <97699278-36D1-4CB1-8511-69F856579163@gmail.com>
+References: <6AEB7A4C-14B5-41D2-8905-35296B337347@gmail.com>
+	<0ac3720a-6e4b-81b9-10a7-5103546f1a40@redhat.com>
+	<3A17D27E-08ED-43E1-BB66-E0C89A5DE878@gmail.com>
+	<450b3a36-225b-25ee-1cd7-7e5ad3254fc6@redhat.com>
+	<97699278-36D1-4CB1-8511-69F856579163@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 04/13] virtio: poll virtqueues for new
- buffers
+Subject: Re: [Qemu-devel] New wiki page: http://wiki.qemu.org/Hosts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,14 +30,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Fam Zheng <famz@redhat.com>, borntraeger@de.ibm.com, Karl Rister <krister@redhat.com>, qemu-devel@nongnu.org, v maffione <v.maffione@gmail.com>
+To: G 3 <programmingkidx@gmail.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
-> Anyway, I'm glad the polling series on its own is already showing good
-> performance results.  I'd like to merge it at the beginning of QEMU 2.9
-> so we can work on further improvements that build on top of it.
+> On Dec 5, 2016, at 9:15 AM, Paolo Bonzini wrote:
+> > On 05/12/2016 14:47, G 3 wrote:
+> > > So now I have to figure out which commands to use. This script would
+> > > have to work on all operating systems that QEMU is built on. This
+> > > page
+> > > has some pretty good information on how to do this:
+> > > http://stackoverflow.com/questions/12422289/bash-command-to-covert-
+> > > html-page-to-a-text-file
+> >
+> > No, I just want to do that once and get rid of the Hosts/ pages.
+> >
+> > Paolo
+> 
+> Really? Why? I thought they were very useful. Where would people who
+> are doing a web search go for building information?
 
-Yes, it would be great if you can stage the infrastructure bits, so that
-I can rebase my lockcnt patches on top.
+To http://www.quasiquark.com/download/#source in the new website, which
+would have a link to the BUILDING file.
 
 Paolo
