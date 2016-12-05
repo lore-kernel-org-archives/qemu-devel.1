@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50654)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52564)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cDwbg-0001y1-7g
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 11:59:13 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cDwhC-0006ZH-21
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 12:05:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cDwbe-0003Sm-R0
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 11:59:12 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50198)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cDwbe-0003Sa-J0
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 11:59:10 -0500
-Date: Mon, 5 Dec 2016 16:59:05 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20161205165905.GR2498@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1480928380-161760-1-git-send-email-longpeng2@huawei.com>
-	<1480928380-161760-2-git-send-email-longpeng2@huawei.com>
-	<20161205091842.GA2498@redhat.com>
-	<33183CC9F5247A488A2544077AF19020DA152B60@DGGEMA505-MBX.china.huawei.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1cDwh6-0005jX-Rr
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 12:04:54 -0500
+Received: from mail-wj0-x229.google.com ([2a00:1450:400c:c01::229]:34996)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cDwh6-0005ip-9r
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 12:04:48 -0500
+Received: by mail-wj0-x229.google.com with SMTP id v7so296059795wjy.2
+	for <qemu-devel@nongnu.org>; Mon, 05 Dec 2016 09:04:48 -0800 (PST)
+References: <20161202173454.19179-1-alex.bennee@linaro.org>
+	<8737i21vl8.fsf@linaro.org>
+	<b6c3b949-ef2a-31f4-ce86-712ce7b64a3f@twiddle.net>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <b6c3b949-ef2a-31f4-ce86-712ce7b64a3f@twiddle.net>
+Date: Mon, 05 Dec 2016 17:04:45 +0000
+Message-ID: <87twaiz4r6.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <33183CC9F5247A488A2544077AF19020DA152B60@DGGEMA505-MBX.china.huawei.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.9 1/3] crypto: add standard des
- support
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH for-2.8] target-arm/translate-a64: fix
+ gen_load_exclusive
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,99 +32,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Cc: longpeng <longpeng2@huawei.com>, "eblake@redhat.com" <eblake@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Wubin (H)" <wu.wubin@huawei.com>, "Zhoujian (jay, Euler)" <jianjay.zhou@huawei.com>
+To: Richard Henderson <rth@twiddle.net>
+Cc: stefanha@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org, cota@braap.org, "open list:ARM" <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Mon, Dec 05, 2016 at 09:29:59AM +0000, Gonglei (Arei) wrote:
-> >
-> > >      switch (alg) {
-> > > +    case QCRYPTO_CIPHER_ALG_DES:
-> > >      case QCRYPTO_CIPHER_ALG_DES_RFB:
-> > >      case QCRYPTO_CIPHER_ALG_AES_128:
-> > >      case QCRYPTO_CIPHER_ALG_AES_192:
-> > > @@ -256,11 +257,17 @@ QCryptoCipher
-> > *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
-> > >      ctx = g_new0(QCryptoCipherNettle, 1);
-> > >
-> > >      switch (alg) {
-> > > +    case QCRYPTO_CIPHER_ALG_DES:
-> > >      case QCRYPTO_CIPHER_ALG_DES_RFB:
-> > >          ctx->ctx = g_new0(struct des_ctx, 1);
-> > > -        rfbkey = qcrypto_cipher_munge_des_rfb_key(key, nkey);
-> > > -        des_set_key(ctx->ctx, rfbkey);
-> > > -        g_free(rfbkey);
-> > > +
-> > > +        if (alg == QCRYPTO_CIPHER_ALG_DES_RFB) {
-> > > +            rfbkey = qcrypto_cipher_munge_des_rfb_key(key, nkey);
-> > > +            des_set_key(ctx->ctx, rfbkey);
-> > > +            g_free(rfbkey);
-> > > +        } else {
-> > > +            des_set_key(ctx->ctx, key);
-> > > +        }
-> > >
-> > >          ctx->alg_encrypt_native = des_encrypt_native;
-> > >          ctx->alg_decrypt_native = des_decrypt_native;
-> > > diff --git a/crypto/cipher.c b/crypto/cipher.c
-> > > index a9bca41..00d9682 100644
-> > > --- a/crypto/cipher.c
-> > > +++ b/crypto/cipher.c
-> > > @@ -27,6 +27,7 @@ static size_t
-> > alg_key_len[QCRYPTO_CIPHER_ALG__MAX] = {
-> > >      [QCRYPTO_CIPHER_ALG_AES_128] = 16,
-> > >      [QCRYPTO_CIPHER_ALG_AES_192] = 24,
-> > >      [QCRYPTO_CIPHER_ALG_AES_256] = 32,
-> > > +    [QCRYPTO_CIPHER_ALG_DES] = 8,
-> > >      [QCRYPTO_CIPHER_ALG_DES_RFB] = 8,
-> > >      [QCRYPTO_CIPHER_ALG_CAST5_128] = 16,
-> > >      [QCRYPTO_CIPHER_ALG_SERPENT_128] = 16,
-> > > @@ -41,6 +42,7 @@ static size_t
-> > alg_block_len[QCRYPTO_CIPHER_ALG__MAX] = {
-> > >      [QCRYPTO_CIPHER_ALG_AES_128] = 16,
-> > >      [QCRYPTO_CIPHER_ALG_AES_192] = 16,
-> > >      [QCRYPTO_CIPHER_ALG_AES_256] = 16,
-> > > +    [QCRYPTO_CIPHER_ALG_DES] = 8,
-> > >      [QCRYPTO_CIPHER_ALG_DES_RFB] = 8,
-> > >      [QCRYPTO_CIPHER_ALG_CAST5_128] = 8,
-> > >      [QCRYPTO_CIPHER_ALG_SERPENT_128] = 16,
-> > > @@ -107,7 +109,8 @@
-> > qcrypto_cipher_validate_key_length(QCryptoCipherAlgorithm alg,
-> > >      }
-> > >
-> > >      if (mode == QCRYPTO_CIPHER_MODE_XTS) {
-> > > -        if (alg == QCRYPTO_CIPHER_ALG_DES_RFB) {
-> > > +        if (alg == QCRYPTO_CIPHER_ALG_DES_RFB
-> > > +            || alg == QCRYPTO_CIPHER_ALG_DES) {
-> > >              error_setg(errp, "XTS mode not compatible with DES-RFB");
-> > >              return false;
-> > >          }
-> > > diff --git a/qapi/crypto.json b/qapi/crypto.json
-> > > index 5c9d7d4..d403ab9 100644
-> > > --- a/qapi/crypto.json
-> > > +++ b/qapi/crypto.json
-> > > @@ -75,7 +75,7 @@
-> > >  { 'enum': 'QCryptoCipherAlgorithm',
-> > >    'prefix': 'QCRYPTO_CIPHER_ALG',
-> > >    'data': ['aes-128', 'aes-192', 'aes-256',
-> > > -           'des-rfb',
-> > > +           'des-rfb', 'des',
-> > 
-> > Can we call this '3des' to make it clear that this is Triple-DES and not
-> > the single-DES (which des-rfb is)
-> > 
-> Actually the current des is not triple-DES, just the single-DES, and des-rfb in QEMU is just a variant of
-> single DES, which change the standard key by calling qcrypto_cipher_munge_des_rfb_key().
-> 
-> I think we can add the 3des support as well in the next step.
-> 
-> The current single-DES in the patch set is ok to me. :)
 
-Per my othre reply in this thread, I don't think we should be supporting
-single-DES at all in QEMU / cryptodev. So IMHO, the correct fix is to
-remove the single-DES support from cryptodev entirely
+Richard Henderson <rth@twiddle.net> writes:
 
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+> On 12/05/2016 03:09 AM, Alex Bennée wrote:
+>>
+>> Alex Bennée <alex.bennee@linaro.org> writes:
+>>
+>>> While testing rth's latest TCG patches with risu I found ldaxp was
+>>> broken. Investigating further I found it was broken by 1dd089d0 when
+>>> the cmpxchg atomic work was merged.
+>>
+>> CC'ing Paolo/Richard
+>>
+>> Do you guys have any final TCG fixes planned for 2.8 that can take this
+>> fix for the ldaxp regression?
+>
+> I don't have any pending patchs for 2.8, no.
+>
+>>> As part of that change the code
+>>> attempted to be clever by doing a single 64 bit load and then shuffle
+>>> the data around to set the two 32 bit registers.
+>
+> It's not trying to be "clever", it's trying to be correct, giving an atomic
+> 64-bit load.
+
+Ahh right I see. What happens if the backend is 32bit, will it issue two
+loads anyway?
+
+>
+> The fact that we didn't attempt an atomic 128-bit load here for the 64-bit pair
+> is a bug.  We have support for that in helper_atomic_ldo_le_mmu; I'm not sure
+> why I didn't use that here.
+>
+>>> As I couldn't quite follow the endian magic I've simply partially
+>>> reverted the change to the original code gen_load_exclusive code. This
+>>> doesn't affect the cmpxchg functionality as that is all done on in
+>>> gen_store_exclusive part which is untouched.
+>
+> We'll have to fix it properly eventually.  But perhaps 2.9 is soon enough,
+> since that's when mttcg will go in.
+
+I guess the easiest way would be to punt these paired loads to a helper?
+
+However regardless of the atomicity the actual values loaded into
+the registers are wrong so that behaviour is a regression vs 2.7.
+
+I don't know how often these load-exclusive paired operations are used
+in real code but I think we should at least fix it so the values are
+loaded properly for 2.8 and do the proper atomic fix for 2.9.
+
+>
+>
+> r~
+
+
+--
+Alex Bennée
