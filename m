@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58808)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58867)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1cE0rq-0007VT-WE
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 16:32:12 -0500
+	(envelope-from <jcody@redhat.com>) id 1cE0rx-0007aT-3V
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 16:32:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1cE0rp-0005oi-Qz
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 16:32:11 -0500
+	(envelope-from <jcody@redhat.com>) id 1cE0rt-0005pj-UU
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 16:32:17 -0500
 From: Jeff Cody <jcody@redhat.com>
-Date: Mon,  5 Dec 2016 16:31:59 -0500
-Message-Id: <1480973521-28945-2-git-send-email-jcody@redhat.com>
+Date: Mon,  5 Dec 2016 16:32:01 -0500
+Message-Id: <1480973521-28945-4-git-send-email-jcody@redhat.com>
 In-Reply-To: <1480973521-28945-1-git-send-email-jcody@redhat.com>
 References: <1480973521-28945-1-git-send-email-jcody@redhat.com>
-Subject: [Qemu-devel] [PULL for-2.8 1/3] block/gluster: fix QMP to match
- debug option
+Subject: [Qemu-devel] [PULL for-2.8 3/3] qemu-doc: update gluster protocol
+ usage guide
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,131 +25,151 @@ Cc: peter.maydell@linaro.org, jcody@redhat.com, qemu-devel@nongnu.org, stefanha@
 
 From: Prasanna Kumar Kalever <prasanna.kalever@redhat.com>
 
-The QMP definition of BlockdevOptionsGluster:
-{ 'struct': 'BlockdevOptionsGluster',
-  'data': { 'volume': 'str',
-            'path': 'str',
-            'server': ['GlusterServer'],
-            '*debug-level': 'int',
-            '*logfile': 'str' } }
+Document:
+1. The new debug and logfile options with their usages
+2. New json format and its usage and
+3. update "GlusterFS, Device URL Syntax" section in "Invocation"
 
-But instead of 'debug-level we have exported 'debug' as the option for choosing
-debug level of gluster protocol driver.
-
-This patch fix QMP definition BlockdevOptionsGluster
-s/debug-level/debug/
-
-Suggested-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Prasanna Kumar Kalever <prasanna.kalever@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Jeff Cody <jcody@redhat.com>
 ---
- block/gluster.c      | 38 +++++++++++++++++++-------------------
- qapi/block-core.json |  4 ++--
- 2 files changed, 21 insertions(+), 21 deletions(-)
+ qemu-doc.texi   | 59 +++++++++++++++++++++++++++++++++++++++++++--------------
+ qemu-options.hx | 25 ++++++++++++++++++++++--
+ 2 files changed, 68 insertions(+), 16 deletions(-)
 
-diff --git a/block/gluster.c b/block/gluster.c
-index 891c13b..a0a74e4 100644
---- a/block/gluster.c
-+++ b/block/gluster.c
-@@ -48,7 +48,7 @@ typedef struct BDRVGlusterState {
-     struct glfs_fd *fd;
-     char *logfile;
-     bool supports_seek_data;
--    int debug_level;
-+    int debug;
- } BDRVGlusterState;
+diff --git a/qemu-doc.texi b/qemu-doc.texi
+index 023c140..02cb39d 100644
+--- a/qemu-doc.texi
++++ b/qemu-doc.texi
+@@ -1041,35 +1041,55 @@ GlusterFS is an user space distributed file system.
  
- typedef struct BDRVGlusterReopenState {
-@@ -434,7 +434,7 @@ static struct glfs *qemu_gluster_glfs_init(BlockdevOptionsGluster *gconf,
-         }
-     }
+ You can boot from the GlusterFS disk image with the command:
+ @example
+-qemu-system-x86_64 -drive file=gluster[+@var{transport}]://[@var{server}[:@var{port}]]/@var{volname}/@var{image}[?socket=...]
++URI:
++qemu-system-x86_64 -drive file=gluster[+@var{type}]://[@var{host}[:@var{port}]]/@var{volume}/@var{path}
++                               [?socket=...][,file.debug=9][,file.logfile=...]
++
++JSON:
++qemu-system-x86_64 'json:@{"driver":"qcow2",
++                           "file":@{"driver":"gluster",
++                                    "volume":"testvol","path":"a.img","debug":9,"logfile":"...",
++                                    "server":[@{"type":"tcp","host":"...","port":"..."@},
++                                              @{"type":"unix","socket":"..."@}]@}@}'
+ @end example
  
--    ret = glfs_set_logging(glfs, gconf->logfile, gconf->debug_level);
-+    ret = glfs_set_logging(glfs, gconf->logfile, gconf->debug);
-     if (ret < 0) {
-         goto out;
-     }
-@@ -788,17 +788,17 @@ static int qemu_gluster_open(BlockDriverState *bs,  QDict *options,
+ @var{gluster} is the protocol.
  
-     filename = qemu_opt_get(opts, GLUSTER_OPT_FILENAME);
+-@var{transport} specifies the transport type used to connect to gluster
++@var{type} specifies the transport type used to connect to gluster
+ management daemon (glusterd). Valid transport types are
+-tcp, unix and rdma. If a transport type isn't specified, then tcp
+-type is assumed.
++tcp and unix. In the URI form, if a transport type isn't specified,
++then tcp type is assumed.
  
--    s->debug_level = qemu_opt_get_number(opts, GLUSTER_OPT_DEBUG,
--                                         GLUSTER_DEBUG_DEFAULT);
--    if (s->debug_level < 0) {
--        s->debug_level = 0;
--    } else if (s->debug_level > GLUSTER_DEBUG_MAX) {
--        s->debug_level = GLUSTER_DEBUG_MAX;
-+    s->debug = qemu_opt_get_number(opts, GLUSTER_OPT_DEBUG,
-+                                   GLUSTER_DEBUG_DEFAULT);
-+    if (s->debug < 0) {
-+        s->debug = 0;
-+    } else if (s->debug > GLUSTER_DEBUG_MAX) {
-+        s->debug = GLUSTER_DEBUG_MAX;
-     }
+-@var{server} specifies the server where the volume file specification for
+-the given volume resides. This can be either hostname, ipv4 address
+-or ipv6 address. ipv6 address needs to be within square brackets [ ].
+-If transport type is unix, then @var{server} field should not be specified.
++@var{host} specifies the server where the volume file specification for
++the given volume resides. This can be either a hostname or an ipv4 address.
++If transport type is unix, then @var{host} field should not be specified.
+ Instead @var{socket} field needs to be populated with the path to unix domain
+ socket.
  
-     gconf = g_new0(BlockdevOptionsGluster, 1);
--    gconf->debug_level = s->debug_level;
--    gconf->has_debug_level = true;
-+    gconf->debug = s->debug;
-+    gconf->has_debug = true;
+ @var{port} is the port number on which glusterd is listening. This is optional
+-and if not specified, QEMU will send 0 which will make gluster to use the
+-default port. If the transport type is unix, then @var{port} should not be
+-specified.
++and if not specified, it defaults to port 24007. If the transport type is unix,
++then @var{port} should not be specified.
++
++@var{volume} is the name of the gluster volume which contains the disk image.
++
++@var{path} is the path to the actual disk image that resides on gluster volume.
++
++@var{debug} is the logging level of the gluster protocol driver. Debug levels
++are 0-9, with 9 being the most verbose, and 0 representing no debugging output.
++The default level is 4. The current logging levels defined in the gluster source
++are 0 - None, 1 - Emergency, 2 - Alert, 3 - Critical, 4 - Error, 5 - Warning,
++6 - Notice, 7 - Info, 8 - Debug, 9 - Trace
++
++@var{logfile} is a commandline option to mention log file path which helps in
++logging to the specified file and also help in persisting the gfapi logs. The
++default is stderr.
++
  
-     logfile = qemu_opt_get(opts, GLUSTER_OPT_LOGFILE);
-     s->logfile = g_strdup(logfile ? logfile : GLUSTER_LOGFILE_DEFAULT);
-@@ -874,8 +874,8 @@ static int qemu_gluster_reopen_prepare(BDRVReopenState *state,
-     qemu_gluster_parse_flags(state->flags, &open_flags);
+-@var{volname} is the name of the gluster volume which contains the disk image.
  
-     gconf = g_new0(BlockdevOptionsGluster, 1);
--    gconf->debug_level = s->debug_level;
--    gconf->has_debug_level = true;
-+    gconf->debug = s->debug;
-+    gconf->has_debug = true;
-     gconf->logfile = g_strdup(s->logfile);
-     gconf->has_logfile = true;
-     reop_s->glfs = qemu_gluster_init(gconf, state->bs->filename, NULL, errp);
-@@ -1011,14 +1011,14 @@ static int qemu_gluster_create(const char *filename,
-     char *tmp = NULL;
+-@var{image} is the path to the actual disk image that resides on gluster volume.
  
-     gconf = g_new0(BlockdevOptionsGluster, 1);
--    gconf->debug_level = qemu_opt_get_number_del(opts, GLUSTER_OPT_DEBUG,
--                                                 GLUSTER_DEBUG_DEFAULT);
--    if (gconf->debug_level < 0) {
--        gconf->debug_level = 0;
--    } else if (gconf->debug_level > GLUSTER_DEBUG_MAX) {
--        gconf->debug_level = GLUSTER_DEBUG_MAX;
-+    gconf->debug = qemu_opt_get_number_del(opts, GLUSTER_OPT_DEBUG,
-+                                           GLUSTER_DEBUG_DEFAULT);
-+    if (gconf->debug < 0) {
-+        gconf->debug = 0;
-+    } else if (gconf->debug > GLUSTER_DEBUG_MAX) {
-+        gconf->debug = GLUSTER_DEBUG_MAX;
-     }
--    gconf->has_debug_level = true;
-+    gconf->has_debug = true;
+ You can create a GlusterFS disk image with the command:
+ @example
+-qemu-img create gluster://@var{server}/@var{volname}/@var{image} @var{size}
++qemu-img create gluster://@var{host}/@var{volume}/@var{path} @var{size}
+ @end example
  
-     gconf->logfile = qemu_opt_get_del(opts, GLUSTER_OPT_LOGFILE);
-     if (!gconf->logfile) {
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index c29bef7..03b19f1 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -2195,7 +2195,7 @@
- #
- # @server:      gluster servers description
- #
--# @debug-level: #optional libgfapi log level (default '4' which is Error)
-+# @debug:       #optional libgfapi log level (default '4' which is Error)
- #
- # @logfile:     #optional libgfapi log file (default /dev/stderr) (Since 2.8)
- #
-@@ -2205,7 +2205,7 @@
-   'data': { 'volume': 'str',
-             'path': 'str',
-             'server': ['GlusterServer'],
--            '*debug-level': 'int',
-+            '*debug': 'int',
-             '*logfile': 'str' } }
+ Examples
+@@ -1082,6 +1102,17 @@ qemu-system-x86_64 -drive file=gluster+tcp://[1:2:3:4:5:6:7:8]:24007/testvol/dir
+ qemu-system-x86_64 -drive file=gluster+tcp://server.domain.com:24007/testvol/dir/a.img
+ qemu-system-x86_64 -drive file=gluster+unix:///testvol/dir/a.img?socket=/tmp/glusterd.socket
+ qemu-system-x86_64 -drive file=gluster+rdma://1.2.3.4:24007/testvol/a.img
++qemu-system-x86_64 -drive file=gluster://1.2.3.4/testvol/a.img,file.debug=9,file.logfile=/var/log/qemu-gluster.log
++qemu-system-x86_64 'json:@{"driver":"qcow2",
++                           "file":@{"driver":"gluster",
++                                    "volume":"testvol","path":"a.img",
++                                    "debug":9,"logfile":"/var/log/qemu-gluster.log",
++                                    "server":[@{"type":"tcp","host":"1.2.3.4","port":24007@},
++                                              @{"type":"unix","socket":"/var/run/glusterd.socket"@}]@}@}'
++qemu-system-x86_64 -drive driver=qcow2,file.driver=gluster,file.volume=testvol,file.path=/path/a.img,
++                                       file.debug=9,file.logfile=/var/log/qemu-gluster.log,
++                                       file.server.0.type=tcp,file.server.0.host=1.2.3.4,file.server.0.port=24007,
++                                       file.server.1.type=unix,file.server.1.socket=/var/run/glusterd.socket
+ @end example
  
- ##
+ @node disk_images_ssh
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 4a5b29f..c534a2f 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -2595,13 +2595,34 @@ TCP, Unix Domain Sockets and RDMA transport protocols.
+ 
+ Syntax for specifying a VM disk image on GlusterFS volume is
+ @example
+-gluster[+transport]://[server[:port]]/volname/image[?socket=...]
++
++URI:
++gluster[+type]://[host[:port]]/volume/path[?socket=...][,debug=N][,logfile=...]
++
++JSON:
++'json:@{"driver":"qcow2","file":@{"driver":"gluster","volume":"testvol","path":"a.img","debug":N,"logfile":"...",
++@                                 "server":[@{"type":"tcp","host":"...","port":"..."@},
++@                                           @{"type":"unix","socket":"..."@}]@}@}'
+ @end example
+ 
+ 
+ Example
+ @example
+-qemu-system-x86_64 --drive file=gluster://192.0.2.1/testvol/a.img
++URI:
++qemu-system-x86_64 --drive file=gluster://192.0.2.1/testvol/a.img,
++@                               file.debug=9,file.logfile=/var/log/qemu-gluster.log
++
++JSON:
++qemu-system-x86_64 'json:@{"driver":"qcow2",
++@                          "file":@{"driver":"gluster",
++@                                   "volume":"testvol","path":"a.img",
++@                                   "debug":9,"logfile":"/var/log/qemu-gluster.log",
++@                                   "server":[@{"type":"tcp","host":"1.2.3.4","port":24007@},
++@                                             @{"type":"unix","socket":"/var/run/glusterd.socket"@}]@}@}'
++qemu-system-x86_64 -drive driver=qcow2,file.driver=gluster,file.volume=testvol,file.path=/path/a.img,
++@                                      file.debug=9,file.logfile=/var/log/qemu-gluster.log,
++@                                      file.server.0.type=tcp,file.server.0.host=1.2.3.4,file.server.0.port=24007,
++@                                      file.server.1.type=unix,file.server.1.socket=/var/run/glusterd.socket
+ @end example
+ 
+ See also @url{http://www.gluster.org}.
 -- 
 2.7.4
