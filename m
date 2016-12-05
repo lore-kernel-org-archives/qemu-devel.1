@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60630)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60737)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cDvbl-00026S-6K
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 10:55:14 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cDvcI-0002MA-4b
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 10:55:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cDvbg-00048E-D2
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 10:55:13 -0500
-Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:36578)
+	(envelope-from <peter.maydell@linaro.org>) id 1cDvcH-0004Qa-D3
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 10:55:46 -0500
+Received: from mail-vk0-x232.google.com ([2607:f8b0:400c:c05::232]:34163)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cDvbg-00047k-9D
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 10:55:08 -0500
-Received: by mail-qk0-x243.google.com with SMTP id h201so39909765qke.3
-	for <qemu-devel@nongnu.org>; Mon, 05 Dec 2016 07:55:08 -0800 (PST)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <1480600329-16272-1-git-send-email-jinguojie@loongson.cn>
-	<7b7aaab8-f27e-4d0f-8864-302ac0ab4722@twiddle.net>
-	<tencent_5403D2430F3FB2F62D8E902C@qq.com>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <0ba48409-fdff-9df2-422a-662650da7c99@twiddle.net>
-Date: Mon, 5 Dec 2016 07:55:04 -0800
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cDvcG-0004PA-Tm
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 10:55:45 -0500
+Received: by mail-vk0-x232.google.com with SMTP id x186so180799687vkd.1
+	for <qemu-devel@nongnu.org>; Mon, 05 Dec 2016 07:55:44 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <tencent_5403D2430F3FB2F62D8E902C@qq.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 00/10] tcg mips64 and mips r6
- improvements
+In-Reply-To: <b6c3b949-ef2a-31f4-ce86-712ce7b64a3f@twiddle.net>
+References: <20161202173454.19179-1-alex.bennee@linaro.org>
+	<8737i21vl8.fsf@linaro.org>
+	<b6c3b949-ef2a-31f4-ce86-712ce7b64a3f@twiddle.net>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 5 Dec 2016 15:55:23 +0000
+Message-ID: <CAFEAcA9k6u41vMcemdoFZ-imH6e6YAsoSMNMgr3km+G544s=uA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH for-2.8] target-arm/translate-a64: fix
+ gen_load_exclusive
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,61 +31,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jin Guojie <jinguojie@loongson.cn>, qemu-devel <qemu-devel@nongnu.org>
-Cc: Aurelien Jarno <aurelien@aurel32.net>, James Hogan <james.hogan@imgtec.com>, YunQiang Su <wzssyqa@gmail.com>
+To: Richard Henderson <rth@twiddle.net>
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, "Emilio G. Cota" <cota@braap.org>, "open list:ARM" <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 12/05/2016 01:41 AM, Jin Guojie wrote:
-> ------------------ Original ------------------
-> From:  "Richard Henderson";<rth@twiddle.net>;
-> Send time: Thursday, Dec 1, 2016 11:52 PM
-> To: "Jin Guojie"<jinguojie@loongson.cn>; "qemu-devel"<qemu-devel@nongnu.org>;
-> Cc: "Aurelien Jarno"<aurelien@aurel32.net>; "James Hogan"<james.hogan@imgtec.com>;
-> Subject:  Re: [PATCH v5 00/10] tcg mips64 and mips r6 improvements
-> 
-> Thanks a lot for Richard's careful review.
-> I have some different opinions for discussion:
-> 
->>  @@ -1233,7 +1235,8 @@ static void tcg_out_tlb_load(TCGContext *s, TCGReg base,
->>  -    mask = (target_ulong)TARGET_PAGE_MASK | ((1 << a_bits) - 1);
->>  +    mask = TARGET_PAGE_MASK | ((1 << a_bits) - 1);
->> You need the target_ulong cast here for mips64.
->> See patch ebb90a005da67147245cd38fb04a965a87a961b7.
-> 
-> Since mask is defined as a C type "target_ulong" at the beginning of the function, 
-> I guess an implicit type cast should be already done by the compiler.
-> So your change is functionally the same with v5 patch. 
-> To test my idea, I wrote a small case and compiled it on an x86_64 host:
-> 
-> main()
-> {
->   int a_bits = 2;
->   int page_mask = 0xfffff000;    /* X86 4KB page*/
->   unsigned int mask = page_mask | ((1 << a_bits) - 1);
->   unsigned long m = mask;
->   printf("mask=%lx\n", m);
-> }
-> 
-> $ gcc a.c
-> $ file a.out 
-> a.out: Mach-O 64-bit executable x86_64
-> $ ./a.out
-> mask=fffff003
+On 5 December 2016 at 15:42, Richard Henderson <rth@twiddle.net> wrote:
+> We'll have to fix it properly eventually.  But perhaps 2.9 is soon enough,
+> since that's when mttcg will go in.
 
-You misunderstand.  For a 64-bit guest, the result we're looking for is
-0xfffffffffffff003.
+Could you provide a reviewed-by (or an explicit nak) for Alex's
+patch, please? I didn't look at this area of the code when it
+went in so I'm not really in position to review it even if it
+goes via my tree.
 
-(1) the type of a_bits is unsigned int, not int,
-(2) which means the expression "page_mask | ((1 << a_bits) - 1)"
-    becomes unsigned int,
-(3) which means that the assignment to mask gets truncated.
-
-> The output is exactly an unsigned 32-bit quantity.
-> I didn't see a wrong result generated. 
-> Could you teach me where is my mistake?
-
-For a 64-bit guest we need a 64-bit quantity.  For a 32-bit guest... we need to
-match the load that we issue from cmp_off.  If use use LWU, then we need an
-unsigned 32-bit quantity; if we use LW, then we need a signed 32-bit quantity.
-
-
-r~
+thanks
+-- PMM
