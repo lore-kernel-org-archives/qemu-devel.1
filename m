@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33045)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34814)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cDxC1-0000aV-DR
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 12:36:46 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1cDxGj-0003wo-LP
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 12:41:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cDxC0-00019Z-Ka
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 12:36:45 -0500
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <1480937130-24561-1-git-send-email-nikunj@linux.vnet.ibm.com>
-	<1480937130-24561-3-git-send-email-nikunj@linux.vnet.ibm.com>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <20e22e8b-c4ea-8e4c-b8d2-09f4af1f6ab2@twiddle.net>
-Date: Mon, 5 Dec 2016 09:36:40 -0800
+	(envelope-from <ehabkost@redhat.com>) id 1cDxGg-0003gr-G5
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 12:41:37 -0500
+Date: Mon, 5 Dec 2016 15:41:30 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20161205174130.GH13060@thinpad.lan.raisama.net>
+References: <148095126363.31351.4484514300033863622.stgit@bahia>
+	<20161205164200.49bec0f6.cornelia.huck@de.ibm.com>
+	<20161205164829.GB14457@thinpad.lan.raisama.net>
+	<20161205182555.2e988ac6.cornelia.huck@de.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <1480937130-24561-3-git-send-email-nikunj@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 02/13] target-ppc: add mask_u128 routine
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20161205182555.2e988ac6.cornelia.huck@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.8] qdev: apply global properties in
+ reverse order
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,51 +26,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
-Cc: qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com
+To: Cornelia Huck <cornelia.huck@de.ibm.com>
+Cc: Greg Kurz <groug@kaod.org>, Peter Maydell <peter.maydell@linaro.org>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-stable@nongnu.org, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 12/05/2016 03:25 AM, Nikunj A Dadhania wrote:
-> +#if defined(CONFIG_INT128)
-> +FUNC_MASK(mask_u128, Int128, 128, Int128, ~((__uint128_t)0));
-> +#else
-> +static inline Int128 mask_u128(int start, int end)
-> +{
-> +    Int128 r = {0};
-> +    if (start > 63) {
-> +        r.hi = 0;
-> +        r.lo = mask_u64(start - 64, end - 64);
-> +    } else if (end < 64) {
-> +        r.hi = mask_u64(start, end);
-> +        r.lo = 0;
-> +    } else {
-> +        r.hi = mask_u64(start, 63);
-> +        r.lo = mask_u64(0, end - 64);
-> +    }
-> +    return r;
-> +}
->  #endif
+On Mon, Dec 05, 2016 at 06:25:55PM +0100, Cornelia Huck wrote:
+> On Mon, 5 Dec 2016 14:48:29 -0200
+> Eduardo Habkost <ehabkost@redhat.com> wrote:
+> 
+> > On Mon, Dec 05, 2016 at 04:42:00PM +0100, Cornelia Huck wrote:
+> > > On Mon, 05 Dec 2016 16:21:22 +0100
+> > > Greg Kurz <groug@kaod.org> wrote:
+> > > 
+> > > > The current code recursively applies global properties from child up to
+> > > > parent. So, if you have:
+> > > > 
+> > > > -global virtio-pci.disable-modern=on
+> > > > -global virtio-blk-pci.disable-modern=off
+> > > > 
+> > > > Then the default value of disable-modern for a virtio-blk-pci device is on,
+> > > > which looks wrong from an OOP perspective.
+> > > > 
+> > > > This patch reverses the logic, so that a child property always prevail.
+> > > 
+> > > This sounds reasonable...
+> > > 
+> > > > 
+> > > > This fixes a subtle bug that got introduced in 2.7 with commit "9a4c0e220d8a
+> > > > hw/virtio-pci: fix virtio behaviour" for older (< 2.7) machine types: the
+> > > > HW_COMPAT_2_6 macro contains global virtio-pci.disable-* properties which
+> > > > would silently override global properties passed on the command line for
+> > > > virtio subtypes.
+> > > > 
+> > > > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > > > ---
+> > > > 
+> > > > AFAIK, libvirt's XML doesn't know about modern/legacy modes for virtio
+> > > > devices. Early adopters of virtio 1.0 had to rely on the <qemu:commandline>
+> > > > tag to pass global properties to QEMU. This patch ensures that XML files
+> > > > used with older machine types remain valid with newer versions of QEMU.
+> > > > 
+> > > > FWIW I guess it could help to have this fix in 2.8, and also probably in
+> > > > 2.7.1.
+> > > 
+> > > ...but I'm a bit worried about doing that change this late in the
+> > > cycle, as we may introduce subtle changes for other configurations. At
+> > > the very least, we should look over the existing backwards compat
+> > > properties (I'll look at those I'm familiar with).
+> > 
+> > This patch would change the behavior for:
+> >  -global virtio-blk-pci.disable-modern=on
+> >  -global virtio-pci.disable-modern=off
+> > 
+> > And I am not sure the new behavior would be correct. Shouldn't we
+> > apply the properties in the order specified in the command-line?
+> 
+> Probably; but how should this interact with compat props?
 
-First, I would really really like you to stop adding *any* ifdefs on
-CONFIG_INT128.  All that's going to do is make sure that there's code that is
-almost never tested, since x86_64 (and other 64-bit hosts) does support int128.
+compat props should be always applied in the order they appear.
+-global should always be applied after compat props.
 
-Second, you're not using the Int128 interface correctly.  Better would be
+So, it looks like we have two additional reasons to just follow
+the order the global properties were registered.
 
-static inline Int128 mask_u128(int start, int end)
-{
-    uint64_t hi, lo;
-    if (start > 63) {
-        hi = 0;
-        lo = mask_u64(start - 64, end - 64);
-    } else if (end < 64) {
-        hi = mask_u64(start, end);
-        lo = 0;
-    } else {
-        hi = mask_u64(start, 63);
-        lo = mask_u64(0, end - 64);
-    }
-    return make_int128(lo, hi);
-}
+> 
+> > 
+> > On either case, changing the semantics of the command-line can
+> > break existing configurations. Let's do it more carefully in the
+> > 2.9 cycle, and fix the existing bug by changing the HW_COMPAT_*
+> > macros?
+> 
+> Changing the compat props is probably the best option at this point in
+> time. Let's take this slowly so we can come up with a reasonable
+> solution for 2.9.
 
+Agreed.
 
-r~
+-- 
+Eduardo
