@@ -1,36 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41507)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42204)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <joserz@linux.vnet.ibm.com>) id 1cELbq-0000eS-8y
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 14:41:06 -0500
+	(envelope-from <mst@redhat.com>) id 1cELey-0003jI-SE
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 14:44:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <joserz@linux.vnet.ibm.com>) id 1cELbk-0004YM-Ri
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 14:41:00 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44692
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <joserz@linux.vnet.ibm.com>)
-	id 1cELbk-0004Y6-Lq
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 14:40:56 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	uB6Je0un104679
-	for <qemu-devel@nongnu.org>; Tue, 6 Dec 2016 14:40:56 -0500
-Received: from e24smtp04.br.ibm.com (e24smtp04.br.ibm.com [32.104.18.25])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2761xrevug-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 06 Dec 2016 14:40:55 -0500
-Received: from localhost
-	by e24smtp04.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <joserz@linux.vnet.ibm.com>;
-	Tue, 6 Dec 2016 17:40:53 -0200
-From: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
-Date: Tue,  6 Dec 2016 17:40:10 -0200
-In-Reply-To: <1481053210-26821-1-git-send-email-joserz@linux.vnet.ibm.com>
-References: <1481053210-26821-1-git-send-email-joserz@linux.vnet.ibm.com>
-Message-Id: <1481053210-26821-8-git-send-email-joserz@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v2 7/7] target-ppc: Implement bcdtrunc.
- instruction
+	(envelope-from <mst@redhat.com>) id 1cELev-00058w-HM
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 14:44:16 -0500
+Date: Tue, 6 Dec 2016 21:44:11 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20161206214217-mutt-send-email-mst@kernel.org>
+References: <148104617887.7699.984921868108236415.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+	<20161206213023-mutt-send-email-mst@kernel.org>
+	<20161206193349.GF4027@thinpad.lan.raisama.net>
+	<20161206213545-mutt-send-email-mst@kernel.org>
+	<20161206194029.GG4027@thinpad.lan.raisama.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20161206194029.GG4027@thinpad.lan.raisama.net>
+Subject: Re: [Qemu-devel] [PATCH] virtio: fix HW_COMPAT_2_6 macro for
+ virtio-*-pci drivers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,117 +27,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-ppc@nongnu.org
-Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au, nikunj@linux.vnet.ibm.com, bharata@linux.vnet.ibm.com
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org, Halil Pasic <pasic@linux.vnet.ibm.com>, qemu-stable@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-bcdutrunc. Decimal unsigned truncate. Works like bcdtrunc. with
-unsigned BCD numbers.
+On Tue, Dec 06, 2016 at 05:40:29PM -0200, Eduardo Habkost wrote:
+> On Tue, Dec 06, 2016 at 09:36:07PM +0200, Michael S. Tsirkin wrote:
+> > On Tue, Dec 06, 2016 at 05:33:49PM -0200, Eduardo Habkost wrote:
+> > > On Tue, Dec 06, 2016 at 09:31:43PM +0200, Michael S. Tsirkin wrote:
+> > > > On Tue, Dec 06, 2016 at 06:50:47PM +0100, Greg Kurz wrote:
+> > > > > Since commit "9a4c0e220d8a hw/virtio-pci: fix virtio behaviour", passing
+> > > > > -device virtio-blk-pci.disable-modern=off has no effect on 2.6 machine
+> > > > > types because the internal virtio-pci.disable-modern=on compat property
+> > > > > always prevail.
+> > > > > 
+> > > > > This should ideally be fixed in the qdev properties core code, but it is
+> > > > > too late in the QEMU 2.8 schedule. So this patch fixes the issue by setting
+> > > > > the compat properties for every virtio-*-pci subtypes instead of the base
+> > > > > virtio-pci type.
+> > > > > 
+> > > > > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > > > 
+> > > > What's the rush? Either the issue is or isn't 2.8 material. If it is,
+> > > > let's fix it in qdev core now. If it isn't no need for quick fixes,
+> > > > just wait a bit and merge qdev core fix after 2.8 is out.
+> > > 
+> > > Because it is a regression,
+> > 
+> > Regression in 2.7 though, isn't it?
+> 
+> Yes. Does that mean we don't mind leaving a regression unfixed in
+> 2.8 because it was introduced in 2.7?
 
-Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
----
- target-ppc/helper.h                 |  1 +
- target-ppc/int_helper.c             | 39 +++++++++++++++++++++++++++++++++++++
- target-ppc/translate/vmx-impl.inc.c |  4 ++++
- target-ppc/translate/vmx-ops.inc.c  |  2 +-
- 4 files changed, 45 insertions(+), 1 deletion(-)
+Not necessarily, it's a judgement call.  But there will always be
+another release.  I would say don't rush it.
 
-diff --git a/target-ppc/helper.h b/target-ppc/helper.h
-index 49965b0..52a2707 100644
---- a/target-ppc/helper.h
-+++ b/target-ppc/helper.h
-@@ -396,6 +396,7 @@ DEF_HELPER_4(bcds, i32, avr, avr, avr, i32)
- DEF_HELPER_4(bcdus, i32, avr, avr, avr, i32)
- DEF_HELPER_4(bcdsr, i32, avr, avr, avr, i32)
- DEF_HELPER_4(bcdtrunc, i32, avr, avr, avr, i32)
-+DEF_HELPER_4(bcdutrunc, i32, avr, avr, avr, i32)
- 
- DEF_HELPER_2(xsadddp, void, env, i32)
- DEF_HELPER_2(xssubdp, void, env, i32)
-diff --git a/target-ppc/int_helper.c b/target-ppc/int_helper.c
-index faf34c1..6167f52 100644
---- a/target-ppc/int_helper.c
-+++ b/target-ppc/int_helper.c
-@@ -3212,6 +3212,45 @@ uint32_t helper_bcdtrunc(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b, uint32_t ps)
-     return cr;
- }
- 
-+uint32_t helper_bcdutrunc(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b, uint32_t ps)
-+{
-+    int i;
-+    uint8_t digit;
-+    uint8_t trunc;
-+    int ox_flag = 0;
-+    int invalid = 0;
-+    ppc_avr_t ret = *b;
-+
-+#if defined(HOST_WORDS_BIGENDIAN)
-+    int upper = ARRAY_SIZE(a->u16) - 1;
-+#else
-+    int upper = 0;
-+#endif
-+
-+    trunc = 32 - (a->u16[upper] % 33);
-+    for (i = 0; i < 32; i++) {
-+        digit = bcd_get_digit(b, i, &invalid);
-+
-+        if (unlikely(invalid)) {
-+            return CRF_SO;
-+        }
-+
-+        if (i >= trunc) {
-+            if (unlikely(!ox_flag && digit > 0x0)) {
-+                ox_flag = 1;
-+            }
-+            bcd_put_digit(&ret, 0, i);
-+        }
-+    }
-+
-+    *r = ret;
-+    if (r->u64[HI_IDX] == 0 && r->u64[LO_IDX] == 0) {
-+        return (ox_flag) ? CRF_SO | CRF_EQ : CRF_EQ;
-+    } else {
-+        return (ox_flag) ? CRF_SO | CRF_GT : CRF_GT;
-+    }
-+}
-+
- void helper_vsbox(ppc_avr_t *r, ppc_avr_t *a)
- {
-     int i;
-diff --git a/target-ppc/translate/vmx-impl.inc.c b/target-ppc/translate/vmx-impl.inc.c
-index 1683f42..3cb6fc2 100644
---- a/target-ppc/translate/vmx-impl.inc.c
-+++ b/target-ppc/translate/vmx-impl.inc.c
-@@ -1020,6 +1020,7 @@ GEN_BCD(bcds);
- GEN_BCD(bcdus);
- GEN_BCD(bcdsr);
- GEN_BCD(bcdtrunc);
-+GEN_BCD(bcdutrunc);
- 
- static void gen_xpnd04_1(DisasContext *ctx)
- {
-@@ -1102,6 +1103,9 @@ GEN_VXFORM_DUAL(vsubsbs, PPC_ALTIVEC, PPC_NONE, \
-                 bcdtrunc, PPC_NONE, PPC2_ISA300)
- GEN_VXFORM_DUAL(vsubuqm, PPC2_ALTIVEC_207, PPC_NONE, \
-                 bcdtrunc, PPC_NONE, PPC2_ISA300)
-+GEN_VXFORM_DUAL(vsubcuq, PPC2_ALTIVEC_207, PPC_NONE, \
-+                bcdutrunc, PPC_NONE, PPC2_ISA300)
-+
- 
- static void gen_vsbox(DisasContext *ctx)
- {
-diff --git a/target-ppc/translate/vmx-ops.inc.c b/target-ppc/translate/vmx-ops.inc.c
-index e6167a4..139f80c 100644
---- a/target-ppc/translate/vmx-ops.inc.c
-+++ b/target-ppc/translate/vmx-ops.inc.c
-@@ -149,8 +149,8 @@ GEN_VXFORM_DUAL(vsubsws, xpnd04_2, 0, 30, PPC_ALTIVEC, PPC_NONE),
- GEN_VXFORM_207(vadduqm, 0, 4),
- GEN_VXFORM_207(vaddcuq, 0, 5),
- GEN_VXFORM_DUAL(vaddeuqm, vaddecuq, 30, 0xFF, PPC_NONE, PPC2_ALTIVEC_207),
--GEN_VXFORM_207(vsubcuq, 0, 21),
- GEN_VXFORM_DUAL(vsubuqm, bcdtrunc, 0, 20, PPC2_ALTIVEC_207, PPC2_ISA300),
-+GEN_VXFORM_DUAL(vsubcuq, bcdutrunc, 0, 21, PPC2_ALTIVEC_207, PPC2_ISA300),
- GEN_VXFORM_DUAL(vsubeuqm, vsubecuq, 31, 0xFF, PPC_NONE, PPC2_ALTIVEC_207),
- GEN_VXFORM(vrlb, 2, 0),
- GEN_VXFORM(vrlh, 2, 1),
--- 
-2.7.4
+
+> -- 
+> Eduardo
