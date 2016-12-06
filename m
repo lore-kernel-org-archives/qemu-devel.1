@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50451)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56585)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cEGwx-00073x-B9
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 09:42:35 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cEH6a-0008Eg-Jm
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 09:52:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cEGww-0006SL-66
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 09:42:31 -0500
-References: <20161205154934.24999-1-eblake@redhat.com>
-	<7f28bb55-ceed-2551-1556-98945a10fcbc@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <b575c977-9414-68cb-d5f1-897d38105d6e@redhat.com>
-Date: Tue, 6 Dec 2016 08:42:18 -0600
+	(envelope-from <alex.bennee@linaro.org>) id 1cEH6W-0002Vd-M3
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 09:52:28 -0500
+Received: from mail-wm0-f44.google.com ([74.125.82.44]:38906)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cEH6W-0002V3-Eq
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 09:52:24 -0500
+Received: by mail-wm0-f44.google.com with SMTP id f82so128753268wmf.1
+	for <qemu-devel@nongnu.org>; Tue, 06 Dec 2016 06:52:24 -0800 (PST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Tue,  6 Dec 2016 14:51:04 +0000
+Message-Id: <20161206145104.16048-1-alex.bennee@linaro.org>
+In-Reply-To: <20161206113915.26308.72810.malonedeb@wampee.canonical.com>
+References: <20161206113915.26308.72810.malonedeb@wampee.canonical.com>
 MIME-Version: 1.0
-In-Reply-To: <7f28bb55-ceed-2551-1556-98945a10fcbc@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="flmjUsKctbxJIltJ8mb9AjfKEe7NFeVhC"
-Subject: Re: [Qemu-devel] [PATCH for-2.8 v2] qcow2: Don't strand clusters
- near 2G intervals during commit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] exec.c: simplify the breakpoint invalidation
+ logic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,117 +30,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, stefanha@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: 1647683@bugs.launchpad.net
+Cc: peter.maydell@linaro.org, pbonzini@redhat.com, rth@twiddle.net, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "open list:Overall" <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---flmjUsKctbxJIltJ8mb9AjfKEe7NFeVhC
-From: Eric Blake <eblake@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, stefanha@redhat.com, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
-Message-ID: <b575c977-9414-68cb-d5f1-897d38105d6e@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.8 v2] qcow2: Don't strand clusters near
- 2G intervals during commit
-References: <20161205154934.24999-1-eblake@redhat.com>
- <7f28bb55-ceed-2551-1556-98945a10fcbc@redhat.com>
-In-Reply-To: <7f28bb55-ceed-2551-1556-98945a10fcbc@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+A bug (1647683) was reported showing a crash when removing
+breakpoints. The reproducer was bisected to 3359baad when tb_flush was
+finally made thread safe. While in MTTCG the locking in
+breakpoint_invalidate should have prevented any problems currently
+tb_lock() is a NOP for system emulation.
 
-On 12/05/2016 01:52 PM, John Snow wrote:
->=20
->=20
-> On 12/05/2016 10:49 AM, Eric Blake wrote:
->> The qcow2_make_empty() function is reached during 'qemu-img commit',
->> in order to clear out ALL clusters of an image.  However, if the
->> image cannot use the fast code path (true if the image is format
->> 0.10, or if the image contains a snapshot), the cluster size is
->> larger than 512, and the image is larger than 2G in size, then our
->> choice of sector_step causes problems.  Since it is not cluster
->> aligned, but qcow2_discard_clusters() silently ignores an unaligned
->> head or tail, we are leaving clusters allocated.
->>
->> Enhance the testsuite to expose the flaw, and patch the problem by
->> ensuring our step size is aligned.
+On top of it all the invalidation code was special-cased between user
+and system emulation which was ugly. As we now have a safe tb_flush()
+we might as well use that when breakpoints and added and removed. This
+is the same thing we do for single-stepping and as this is during
+debugging it isn't a major performance concern.
 
->> +++ b/tests/qemu-iotests/097
->> @@ -46,7 +46,7 @@ _supported_proto file
->>  _supported_os Linux
->>
->>
->> -# Four passes:
->> +# Four main passes:
->>  #  0: Two-layer backing chain, commit to upper backing file (implicit=
-ly)
->>  #     (in this case, the top image will be emptied)
->>  #  1: Two-layer backing chain, commit to upper backing file (explicit=
-ly)
->> @@ -56,22 +56,30 @@ _supported_os Linux
->>  #  3: Two-layer backing chain, commit to lower backing file
->>  #     (in this case, the top image will implicitly stay unchanged)
->>  #
->> +# Each pass is run twice, since qcow2 has different code paths for cl=
-eaning
->> +# an image depending on whether it has a snapshot.
->> +#
->>  # 020 already tests committing, so this only tests whether image chai=
-ns are
->>  # working properly and that all images above the base are emptied; th=
-erefore,
->> -# no complicated patterns are necessary
->> +# no complicated patterns are necessary.  Check near the 2G mark, as =
-qcow2
->> +# has been buggy at that boundary in the past.
->>  for i in 0 1 2 3; do
->> +for j in 0 1; do
->>
->>  echo
->> -echo "=3D=3D=3D Test pass $i =3D=3D=3D"
->> +echo "=3D=3D=3D Test pass $i.$j =3D=3D=3D"
+Reported-by: Julian Brown
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ exec.c | 31 ++++---------------------------
+ 1 file changed, 4 insertions(+), 27 deletions(-)
 
->=20
-> I skimmed the test changes, but it looks good.
-
-By the way, it was test 0.0 that fails without the change to qcow2.c
-(the changes added the x.0 passes; the pre-existing x.1 passes all
-succeed because they use the fast path, and passes 1-3.y succeed because
-they aren't clearing all clusters).
-
-Maybe I could have mentioned that in the commit message, and/or split
-this into two patches to make the test changes have an easier diff (one
-to shift the portion of the test image being written from 0-0x30000 out
-to 0x7ffd0000-0x80000000, the other to double the number of passes). But
-at this point, it's probably not worth a respin if we're going to get it
-in 2.8; but I'm okay if the maintainer wants to add the above paragraph
-into the commit message.
-
->=20
-> Reviewed-by: John Snow <jsnow@redhat.com>
->=20
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---flmjUsKctbxJIltJ8mb9AjfKEe7NFeVhC
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYRs5KAAoJEKeha0olJ0NqtWUH/jGQEihe/No2XjEsLVWTrkOm
-J3aJAMy//ERBiedeDf0Sh/UiTePPEx6u/pSV05JVhIB/7/6F9QZBmLcB8dvKgYDq
-MMbnbzkgJGVa6bSLNDX82X1zHgHV/mF7CmJ+2faQ1wWoYoZNd5/EjduxuKhR7U5y
-gmypGrHeL1+IvaeTDupKHeIEZZ3Zt4C4aohc2TKrwx6s8m8gdT1U4vFBiE0TqqxK
-buYZ65t430qckJvYUBKxdFSdAh8t35DRnSyGVoUH7DUVGUhkU7Eqw5JzjNVFu9K/
-/AZr2fgoyWXt/fXWOVWwNp48QMhCEn9heFf56Eo9QhMnTXwO2UUJ2HxQENuukLI=
-=pA/Z
------END PGP SIGNATURE-----
-
---flmjUsKctbxJIltJ8mb9AjfKEe7NFeVhC--
+diff --git a/exec.c b/exec.c
+index 3d867f1..e991221 100644
+--- a/exec.c
++++ b/exec.c
+@@ -685,29 +685,6 @@ void cpu_exec_realizefn(CPUState *cpu, Error **errp)
+ }
+ 
+ #if defined(CONFIG_USER_ONLY)
+-static void breakpoint_invalidate(CPUState *cpu, target_ulong pc)
+-{
+-    mmap_lock();
+-    tb_lock();
+-    tb_invalidate_phys_page_range(pc, pc + 1, 0);
+-    tb_unlock();
+-    mmap_unlock();
+-}
+-#else
+-static void breakpoint_invalidate(CPUState *cpu, target_ulong pc)
+-{
+-    MemTxAttrs attrs;
+-    hwaddr phys = cpu_get_phys_page_attrs_debug(cpu, pc, &attrs);
+-    int asidx = cpu_asidx_from_attrs(cpu, attrs);
+-    if (phys != -1) {
+-        /* Locks grabbed by tb_invalidate_phys_addr */
+-        tb_invalidate_phys_addr(cpu->cpu_ases[asidx].as,
+-                                phys | (pc & ~TARGET_PAGE_MASK));
+-    }
+-}
+-#endif
+-
+-#if defined(CONFIG_USER_ONLY)
+ void cpu_watchpoint_remove_all(CPUState *cpu, int mask)
+ 
+ {
+@@ -839,7 +816,7 @@ int cpu_breakpoint_insert(CPUState *cpu, vaddr pc, int flags,
+         QTAILQ_INSERT_TAIL(&cpu->breakpoints, bp, entry);
+     }
+ 
+-    breakpoint_invalidate(cpu, pc);
++    tb_flush(cpu);
+ 
+     if (breakpoint) {
+         *breakpoint = bp;
+@@ -855,6 +832,7 @@ int cpu_breakpoint_remove(CPUState *cpu, vaddr pc, int flags)
+     QTAILQ_FOREACH(bp, &cpu->breakpoints, entry) {
+         if (bp->pc == pc && bp->flags == flags) {
+             cpu_breakpoint_remove_by_ref(cpu, bp);
++            tb_flush(cpu);
+             return 0;
+         }
+     }
+@@ -865,9 +843,6 @@ int cpu_breakpoint_remove(CPUState *cpu, vaddr pc, int flags)
+ void cpu_breakpoint_remove_by_ref(CPUState *cpu, CPUBreakpoint *breakpoint)
+ {
+     QTAILQ_REMOVE(&cpu->breakpoints, breakpoint, entry);
+-
+-    breakpoint_invalidate(cpu, breakpoint->pc);
+-
+     g_free(breakpoint);
+ }
+ 
+@@ -881,6 +856,8 @@ void cpu_breakpoint_remove_all(CPUState *cpu, int mask)
+             cpu_breakpoint_remove_by_ref(cpu, bp);
+         }
+     }
++
++    tb_flush(cpu);
+ }
+ 
+ /* enable or disable single step mode. EXCP_DEBUG is returned by the
+-- 
+2.10.2
