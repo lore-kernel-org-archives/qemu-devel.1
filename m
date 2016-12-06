@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49336)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50721)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cE9bh-0004NZ-Bg
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 01:52:06 -0500
+	(envelope-from <kraxel@redhat.com>) id 1cE9iz-0005vS-Na
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 01:59:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cE9be-0002oZ-CW
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 01:52:05 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57478)
+	(envelope-from <kraxel@redhat.com>) id 1cE9iw-0005S3-NM
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 01:59:37 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39502)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cE9be-0002oR-6l
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 01:52:02 -0500
-Date: Tue, 6 Dec 2016 14:51:55 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20161206065155.GB4344@pxdev.xzpeter.org>
-References: <1480348315-13332-1-git-send-email-bd.aviv@gmail.com>
-	<8188dd5e-2c71-dbd0-9a1a-9c8af6f74b96@intel.com>
-	<20161202065214.GF21601@pxdev.xzpeter.org>
-	<088c2afd-575e-99af-1686-023c116352ab@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <088c2afd-575e-99af-1686-023c116352ab@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v7 0/5] IOMMU: intel_iommu support map and
- unmap notifications
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cE9iw-0005Rq-HQ
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 01:59:34 -0500
+Message-ID: <1481007570.20373.3.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Tue, 06 Dec 2016 07:59:30 +0100
+In-Reply-To: <62f28da2-a81b-e0f8-32b7-6e75f197750b@redhat.com>
+References: <20161202174015.GE15373@work-vm>
+	<1480926783.28320.9.camel@redhat.com> <20161205094646.GA2508@work-vm>
+	<62f28da2-a81b-e0f8-32b7-6e75f197750b@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Subject: Re: [Qemu-devel] [Spice-devel] Postcopy+spice crash
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,28 +28,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Lan Tianyu <tianyu.lan@intel.com>
-Cc: "Aviv B.D" <bd.aviv@gmail.com>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>, Alex Williamson <alex.williamson@redhat.com>, Jason Wang <jasowang@redhat.com>, "Liu, Yi L" <yi.l.liu@intel.com>, "Wu, Fengguang" <fengguang.wu@intel.com>
+To: uril@redhat.com
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, spice-devel <spice-devel@freedesktop.org>
 
-On Tue, Dec 06, 2016 at 02:30:24PM +0800, Lan Tianyu wrote:
+  Hi,
 
-[...]
+> >> On a quick glance I'd blame the guest for sending corrupted commands.
+> >> Strange though that it happens on migration only, so there could be
+> >> a host issue too.  Or a timing issue triggered by migration.
+> >>
+> >> Which migration phase?
+> >
+> > This is the point at which it switches over in postcopy.
+>=20
+> It looks like it's the vmstate (post) load phase of the qxl device on
+> destination host.
 
-> >> 2. How to restore GPA->HPA mapping when IOVA is disabled by guest.
-> >> When guest enables IOVA for device, vIOMMU will invalidate all previous
-> >> GPA->HPA mapping and update IOVA->HPA mapping to pIOMMU via iommu
-> >> notifier. But if IOVA is disabled, I think we should restore GPA->HPA
-> >> mapping for the device otherwise the device won't work again in the VM.
-> > 
-> > If we can have a workable replay mechanism, this problem will be
-> > solved IMHO.
-> 
-> Basic idea is to replay related memory regions to restore GPA->HPA
-> mapping when guest disables IOVA.
+Dave, can you try "thread apply all bt" so we see the other threads too?
+That should show whenever it happens in post_load
 
-Btw, could you help elaborate in what case we will trigger such a
-condition? Or, can we dynamically enable/disable an IOMMU?
+> Maybe if you trace qxl device save/load related functions
+> on both src and dst hosts you'll see a difference.
 
-Thanks,
+qxl keeps references to certain commands (create surface for example) in
+qxl device memory, so it can replay them in post_load.  That possibly
+doesn't work correctly with postcopy.
 
--- peterx
+cheers,
+  Gerd
