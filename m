@@ -1,41 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49656)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50897)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1cECk7-0007O0-HR
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 05:13:00 -0500
+	(envelope-from <stefanha@gmail.com>) id 1cECqq-0000fj-B0
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 05:19:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1cECk2-0001sw-JN
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 05:12:59 -0500
-Received: from 001b2d01.pphosted.com ([148.163.156.1]:53665
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1cECk2-0001sm-9G
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 05:12:54 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	uB6AALUg115584
-	for <qemu-devel@nongnu.org>; Tue, 6 Dec 2016 05:12:53 -0500
-Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 275qv2ca3c-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 06 Dec 2016 05:12:52 -0500
-Received: from localhost
-	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Tue, 6 Dec 2016 03:12:52 -0700
-References: <20161201192652.9509-1-stefanha@redhat.com>
-	<20161201192652.9509-13-stefanha@redhat.com>
-	<14acce63-5f93-ca54-477a-3a998769bbe9@de.ibm.com>
-	<20161206092029.GA12630@stefanha-x1.localdomain>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Tue, 6 Dec 2016 11:12:45 +0100
+	(envelope-from <stefanha@gmail.com>) id 1cECqk-0003Si-Hy
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 05:19:56 -0500
+Date: Tue, 6 Dec 2016 10:18:25 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20161206101825.GA20860@stefanha-x1.localdomain>
+References: <20161205234235.5728-1-eblake@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20161206092029.GA12630@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 8bit
-Message-Id: <826ff365-4ef1-6118-f677-ccfd86ea337b@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v4 12/13] aio: self-tune polling time
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="sdtB3X0nJg68CQEu"
+Content-Disposition: inline
+In-Reply-To: <20161205234235.5728-1-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] doc: Propose NBD_FLAG_INIT_ZEROES extension
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,49 +23,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Karl Rister <krister@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: nbd-general@lists.sourceforge.net, qemu-devel@nongnu.org, xieyingtai@huawei.com, subo7@huawei.com, eric.fangyi@huawei.com, pbonzini@redhat.com, qemu-block@nongnu.org
 
-On 12/06/2016 10:20 AM, Stefan Hajnoczi wrote:
-> On Mon, Dec 05, 2016 at 09:06:17PM +0100, Christian Borntraeger wrote:
->> On 12/01/2016 08:26 PM, Stefan Hajnoczi wrote:
->>> This patch is based on the algorithm for the kvm.ko halt_poll_ns
->>> parameter in Linux.  The initial polling time is zero.
->>>
->>> If the event loop is woken up within the maximum polling time it means
->>> polling could be effective, so grow polling time.
->>>
->>> If the event loop is woken up beyond the maximum polling time it means
->>> polling is not effective, so shrink polling time.
->>>
->>> If the event loop makes progress within the current polling time then
->>> the sweet spot has been reached.
->>>
->>> This algorithm adjusts the polling time so it can adapt to variations in
->>> workloads.  The goal is to reach the sweet spot while also recognizing
->>> when polling would hurt more than help.
->>>
->>> Two new trace events, poll_grow and poll_shrink, are added for observing
->>> polling time adjustment.
->>>
->>> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
->>
->> Not sure way, but I have 4 host ramdisks with the same iothread as guest
->> virtio-blk. running fio in the guest on one of these disks will poll, as
->> soon as I have 2 disks  in fio I almost always see shrinks (so polling 
->> stays at 0) and almost no grows.
-> 
-> Shrinking occurs when polling + ppoll(2) time exceeds poll-max-ns.
-> 
-> What is the value of poll-max-ns
 
-I used 50000ns as poll value. When using 500000ns it is polling again.
+--sdtB3X0nJg68CQEu
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> and how long is run_poll_handlers_end - run_poll_handlers_begin?
+On Mon, Dec 05, 2016 at 05:42:35PM -0600, Eric Blake wrote:
+> While not directly related to NBD_CMD_WRITE_ZEROES, the qemu
+> team discovered that it is useful if a server can advertise
+> whether an export is in a known-all-zeroes state at the time
+> the client connects.
+>=20
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>  doc/proto.md | 5 +++++
+>  1 file changed, 5 insertions(+)
+>=20
+> This replaces the following qemu patch attempt:
+> https://lists.gnu.org/archive/html/qemu-devel/2016-12/msg00357.html
+> which tried to add NBD_CMD_HAS_ZERO_INIT with poor semantics. The
+> semantics in this proposal should be much better.
+>=20
+> Patch is to the merge of the master branch and the
+> extension-write-zeroes branch.  By the way, qemu 2.8 is due
+> to be released "real soon now", and implements NBD_CMD_WRITE_ZEROES,
+> so maybe it is time to consider promoting the extension-write-zeroes
+> branch into master.
 
-Too long. I looked again and I realized that I used cache=none without
-io=native. After adding io=native things are better. Even with 4 disks
-polling still happens. So it seems that the mileage will vary depending
-on the settings
+Useful, thanks!
 
-Christian
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--sdtB3X0nJg68CQEu
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJYRpBxAAoJEJykq7OBq3PIdegH/2PLLVJ93RR72pDQIMoJ+7+M
+xBQNwC36ko3RQnfU4Hkfm6XbDv0ifVopBvxKtwmNdc/TduK3sBkwc8UxhJiP+Qk/
+AdrGfj0LjSmmTAEV5LNT8oIXJhmeivBm9c/kifyprZl7fqZDmSvlSeAuSE/brj3j
+IGsJtwzPaNOvRj10ExQ4kLFpqu9/gTLOld/jeapB+6zqjV7bzpLOcPmNjI7v4DTC
+7xLJQZ60LTjHowAVjrKBZyeZXZTCEsgOWm2AOocRPisDJ370pGzYIJWhcOJn7doJ
+A17LY73X+gxbOg00Ru1CFgel3IxXBoIO8DTmlONF1RB4d9je4EjhfyFTPLu8JeQ=
+=zebu
+-----END PGP SIGNATURE-----
+
+--sdtB3X0nJg68CQEu--
