@@ -1,44 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34366)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37370)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1cEF14-0003hK-Jh
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 07:38:39 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1cEF60-0002Bs-53
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 07:43:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1cEF11-00047c-GP
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 07:38:38 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60150)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1cEF11-00047Q-74
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 07:38:35 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	uB6CY8FL063146
-	for <qemu-devel@nongnu.org>; Tue, 6 Dec 2016 07:38:31 -0500
-Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 275qv2jnud-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 06 Dec 2016 07:38:31 -0500
-Received: from localhost
-	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Tue, 6 Dec 2016 12:38:29 -0000
-References: <148095126363.31351.4484514300033863622.stgit@bahia>
-	<20161205164200.49bec0f6.cornelia.huck@de.ibm.com>
-	<20161205164829.GB14457@thinpad.lan.raisama.net>
-	<20161205182555.2e988ac6.cornelia.huck@de.ibm.com>
-	<20161205174130.GH13060@thinpad.lan.raisama.net>
-	<7663fe2f-ae4e-dccd-6422-bd2fba5c9e7d@linux.vnet.ibm.com>
-	<20161206101110.164b8a93@bahia>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Tue, 6 Dec 2016 13:38:24 +0100
+	(envelope-from <ehabkost@redhat.com>) id 1cEF5v-0005uj-RT
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 07:43:44 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40878)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cEF5v-0005uT-JZ
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 07:43:39 -0500
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com
+	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8628E6DDED
+	for <qemu-devel@nongnu.org>; Tue,  6 Dec 2016 12:43:38 +0000 (UTC)
+Date: Tue, 6 Dec 2016 10:43:36 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20161206124336.GL13060@thinpad.lan.raisama.net>
+References: <1480713496-11213-1-git-send-email-ehabkost@redhat.com>
+	<1480713496-11213-16-git-send-email-ehabkost@redhat.com>
+	<df0f3ade-bd09-58a0-ac83-3775d4ab7c6c@redhat.com>
+	<20161205235745.GJ13060@thinpad.lan.raisama.net>
+	<862e80d2-d0f9-668f-d6ed-b25712a220c1@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20161206101110.164b8a93@bahia>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 8bit
-Message-Id: <80731f31-83c1-0f36-e949-e6f20790921a@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.8] qdev: apply global properties in
- reverse order
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <862e80d2-d0f9-668f-d6ed-b25712a220c1@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.9 15/17] target-i386: Define static
+ "base" CPU model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -47,65 +38,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, qemu-stable@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, libvir-list@redhat.com, Jiri Denemark <jdenemar@redhat.com>
 
+On Tue, Dec 06, 2016 at 10:32:48AM +0100, David Hildenbrand wrote:
+[...]
+> >=20
+> > I would like to hear from libvirt developers what they think. I
+> > still don't know what they plan to use the type=3Dstatic expansion
+> > results for.
+> >=20
+> > >=20
+> > > How long is the static expansion on a recent intel CPU?
+> >=20
+> > CPU model "Broadwell" returns 165 entries on return.model.props:
+> >=20
+> > (QEMU) query-cpu-model-expansion type=3Dstatic model=3D{"name":"Broadwe=
+ll"}
+>=20
+> > {"return": {"migration-safe": true, "model": {"name": "base", "props": =
+{"pfthreshold": false, "pku": false, "rtm": true, "tsc-deadline": true, "xs=
+tore-en": false, "tsc-scale": false, "abm": true, "ia64": false, "kvm-mmu":=
+ false, "xsaveopt": true, "tce": false, "smep": true, "fpu": true, "xcrypt"=
+: false, "clflush": true, "flushbyasid": false, "kvm-steal-time": false, "l=
+m": true, "tsc": true, "adx": true, "fxsr": true, "tm": false, "xgetbv1": f=
+alse, "xstore": false, "vme": false, "vendor": "GenuineIntel", "arat": true=
+, "de": true, "aes": true, "pse": true, "ds-cpl": false, "tbm": false, "sse=
+": true, "phe-en": false, "f16c": true, "ds": false, "mpx": false, "tsc-adj=
+ust": false, "avx512f": false, "avx2": true, "pbe": false, "cx16": true, "a=
+vx512pf": false, "movbe": true, "perfctr-nb": false, "ospke": false, "avx51=
+2ifma": false, "stepping": 2, "sep": true, "sse4a": false, "avx512dq": fals=
+e, "avx512-4vnniw": false, "xsave": true, "pmm": false, "hle": true, "est":=
+ false, "xop": false, "smx": false, "monitor": false, "avx512er": false, "a=
+pic": true, "sse4.1": true, "sse4.2": true, "pause-filter": false, "lahf-lm=
+": true, "kvm-nopiodelay": false, "acpi": false, "mmx": true, "osxsave": fa=
+lse, "pcommit": false, "mtrr": true, "clwb": false, "dca": false, "pdcm": f=
+alse, "xcrypt-en": false, "3dnow": false, "invtsc": false, "tm2": false, "h=
+ypervisor": true, "kvmclock-stable-bit": false, "fxsr-opt": false, "pcid": =
+true, "lbrv": false, "avx512-4fmaps": false, "svm-lock": false, "popcnt": t=
+rue, "nrip-save": false, "avx512vl": false, "x2apic": true, "kvmclock": fal=
+se, "smap": true, "family": 6, "min-level": 13, "dtes64": false, "ace2": fa=
+lse, "fma4": false, "xtpr": false, "avx512bw": false, "nx": true, "lwp": fa=
+lse, "msr": true, "ace2-en": false, "decodeassists": false, "perfctr-core":=
+ false, "pge": true, "pn": false, "fma": true, "nodeid-msr": false, "cx8": =
+true, "mce": true, "avx512cd": false, "cr8legacy": false, "mca": true, "pni=
+": true, "rdseed": true, "osvw": false, "fsgsbase": true, "model-id": "Inte=
+l Core Processor (Broadwell)", "cmp-legacy": false, "kvm-pv-unhalt": false,=
+ "rdtscp": true, "mmxext": false, "cid": false, "vmx": false, "ssse3": true=
+, "extapic": false, "pse36": true, "min-xlevel": 2147483656, "ibs": false, =
+"avx": true, "syscall": true, "umip": false, "invpcid": true, "bmi1": true,=
+ "bmi2": true, "vmcb-clean": false, "erms": true, "cmov": true, "misalignss=
+e": false, "clflushopt": false, "pat": true, "3dnowprefetch": true, "rdpid"=
+: false, "pae": true, "wdt": false, "skinit": false, "pmm-en": false, "phe"=
+: false, "3dnowext": false, "lmce": false, "ht": false, "pdpe1gb": false, "=
+kvm-pv-eoi": false, "npt": false, "xsavec": false, "pclmulqdq": true, "svm"=
+: false, "sse2": true, "ss": false, "topoext": false, "rdrand": true, "avx5=
+12vbmi": false, "kvm-asyncpf": false, "xsaves": false, "model": 61}}, "stat=
+ic": true}}
+> >=20
+> >=20
+>=20
+> Wow, yes that was the reason for me to introduce abstractions on s390x. B=
+ut
+> here the plan was to use the epansion directly when indication the
+> "host" model to the user. Having something like "Broadwell-base"+/- a
+> handful of features is just easier to handle than "base" with 165 feature
+> flags. But as we don't know what libvirt plans are (they could use that
+> interface on x86 to do feature detection only and convert to models
+> themselves), I also have no idea what would be best in the context of x86
+> cpu models.
 
+In the case of x86, libvirt already has their own database of
+"static" CPU models in /usr/share/libvirt/cpu_map.xml. Maybe
+providing our own set of static CPU models would be helpful if
+they want to get rid of their database. But I'm not sure if:
+1) they want to do that in the near future; 2) how easily they
+could keep compatibility with their existing model names while
+doing that.
 
-On 12/06/2016 10:11 AM, Greg Kurz wrote:
->> Given the current doc:
->> > """
->> > -global driver.prop=value
->> > -global driver=driver,property=property,value=value
->> >     Set default value of driver's property prop to value, e.g.:
->> > 
->> >          qemu-system-i386 -global ide-drive.physical_block_size=4096 -drive
->> > file=file,if=ide,index=0,media=disk
->> > 
->> >     In particular, you can use this to set driver properties for devices which
->> >     are created automatically by the machine model. To create a device which is
->> >     not created automatically and set properties on it, use -device.
->> > 
->> >     -global driver.prop=value is shorthand for -global driver=driver,property=prop,
->> > value=value. The longhand syntax works even when
->> >     driver contains a dot. 
->> > """
->> > I think this OOP argument, which I do not completely understand,
-> With the current code, properties from the parent classes implicitly
-> prevail and this has nothing to do with command line order, or order
-> of appearance in HW_COMPAT_*.
->
-
-Yeah and IMHO this is exactly the problem :).
- 
-> From an OOP perspective, we usually expect child classes to override
-> parent classes behavior, not the contrary.
-> 
-
-
-I know, but the question is if it is the right analogy. The point is (as
-you yourself already stated in a follow up email) the semantic of global
-properties can be very well defined as for each instance of the class X
-set property P to value V (that is imperatively). Now if it is possible
-that same data exposed by properties is set more than once (e.g. via
-parent and via child) and we want to remain deterministic we need to say
-which write is going to win by being the last one.
-
-Another option would be to say define this in a functional manner and
-say the value of a property is going to be V unless ... ( here we need
-to state that child takes precedence over parent and bring in command
-line in in some way too -- where I do not know if parent command line
-should take precedence over compat property on the child or the other
-way around).
-
-Because IMHO the first option is not consistent with the doc I'm in
-favor of that, but then it has not much to do with overriding behavior.
-
-Thanks for the explanation. Given your other email I think we are in
-agreement now. I still think a bit more documentation (not necessarily
-user documentation) would not hurt, as IMHO the OOP intuition you stated
-is a valid one too (not my favored one though) and thus it would not
-hurt to have the design decision captured in natural language too.
-
-Cheers,
-Halil
+--=20
+Eduardo
