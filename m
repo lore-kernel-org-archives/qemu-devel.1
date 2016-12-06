@@ -1,23 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41280)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41347)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cELbQ-0000Fa-6w
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 14:40:37 -0500
+	(envelope-from <joserz@linux.vnet.ibm.com>) id 1cELbW-0000L0-MS
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 14:40:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cELbM-0004O9-Ua
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 14:40:36 -0500
-Date: Tue, 6 Dec 2016 17:40:29 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20161206194029.GG4027@thinpad.lan.raisama.net>
-References: <148104617887.7699.984921868108236415.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-	<20161206213023-mutt-send-email-mst@kernel.org>
-	<20161206193349.GF4027@thinpad.lan.raisama.net>
-	<20161206213545-mutt-send-email-mst@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20161206213545-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH] virtio: fix HW_COMPAT_2_6 macro for
- virtio-*-pci drivers
+	(envelope-from <joserz@linux.vnet.ibm.com>) id 1cELbT-0004Qf-Dq
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 14:40:42 -0500
+Received: from 001b2d01.pphosted.com ([148.163.156.1]:40239
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <joserz@linux.vnet.ibm.com>)
+	id 1cELbT-0004Q6-13
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 14:40:39 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
+	uB6Je6HT055362
+	for <qemu-devel@nongnu.org>; Tue, 6 Dec 2016 14:40:37 -0500
+Received: from e24smtp03.br.ibm.com (e24smtp03.br.ibm.com [32.104.18.24])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2762h4cxpe-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 06 Dec 2016 14:40:37 -0500
+Received: from localhost
+	by e24smtp03.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <joserz@linux.vnet.ibm.com>;
+	Tue, 6 Dec 2016 17:40:34 -0200
+From: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
+Date: Tue,  6 Dec 2016 17:40:04 -0200
+In-Reply-To: <1481053210-26821-1-git-send-email-joserz@linux.vnet.ibm.com>
+References: <1481053210-26821-1-git-send-email-joserz@linux.vnet.ibm.com>
+Message-Id: <1481053210-26821-2-git-send-email-joserz@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v2 1/7] target-ppc: Implement bcd_is_valid
+ function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,35 +39,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org, Halil Pasic <pasic@linux.vnet.ibm.com>, qemu-stable@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-ppc@nongnu.org
+Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au, nikunj@linux.vnet.ibm.com, bharata@linux.vnet.ibm.com
 
-On Tue, Dec 06, 2016 at 09:36:07PM +0200, Michael S. Tsirkin wrote:
-> On Tue, Dec 06, 2016 at 05:33:49PM -0200, Eduardo Habkost wrote:
-> > On Tue, Dec 06, 2016 at 09:31:43PM +0200, Michael S. Tsirkin wrote:
-> > > On Tue, Dec 06, 2016 at 06:50:47PM +0100, Greg Kurz wrote:
-> > > > Since commit "9a4c0e220d8a hw/virtio-pci: fix virtio behaviour", passing
-> > > > -device virtio-blk-pci.disable-modern=off has no effect on 2.6 machine
-> > > > types because the internal virtio-pci.disable-modern=on compat property
-> > > > always prevail.
-> > > > 
-> > > > This should ideally be fixed in the qdev properties core code, but it is
-> > > > too late in the QEMU 2.8 schedule. So this patch fixes the issue by setting
-> > > > the compat properties for every virtio-*-pci subtypes instead of the base
-> > > > virtio-pci type.
-> > > > 
-> > > > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > > 
-> > > What's the rush? Either the issue is or isn't 2.8 material. If it is,
-> > > let's fix it in qdev core now. If it isn't no need for quick fixes,
-> > > just wait a bit and merge qdev core fix after 2.8 is out.
-> > 
-> > Because it is a regression,
-> 
-> Regression in 2.7 though, isn't it?
+A function to check if all digits of a given BCD number is valid is
+here presented because more instructions will need to reuse the
+same code.
 
-Yes. Does that mean we don't mind leaving a regression unfixed in
-2.8 because it was introduced in 2.7?
+Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
+---
+ target-ppc/int_helper.c | 27 ++++++++++++++++++++-------
+ 1 file changed, 20 insertions(+), 7 deletions(-)
 
+diff --git a/target-ppc/int_helper.c b/target-ppc/int_helper.c
+index 7030f61..7989b1f 100644
+--- a/target-ppc/int_helper.c
++++ b/target-ppc/int_helper.c
+@@ -2596,6 +2596,24 @@ static void bcd_put_digit(ppc_avr_t *bcd, uint8_t digit, int n)
+     }
+ }
+ 
++static bool bcd_is_valid(ppc_avr_t *bcd)
++{
++    int i;
++    int invalid = 0;
++
++    if (bcd_get_sgn(bcd) == 0) {
++        return false;
++    }
++
++    for (i = 1; i < 32; i++) {
++        bcd_get_digit(bcd, i, &invalid);
++        if (unlikely(invalid)) {
++            return false;
++        }
++    }
++    return true;
++}
++
+ static int bcd_cmp_zero(ppc_avr_t *bcd)
+ {
+     if (bcd->u64[HI_IDX] == 0 && (bcd->u64[LO_IDX] >> 4) == 0) {
+@@ -3013,18 +3031,13 @@ uint32_t helper_bcdcpsgn(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b, uint32_t ps)
+ 
+ uint32_t helper_bcdsetsgn(ppc_avr_t *r, ppc_avr_t *b, uint32_t ps)
+ {
+-    int i;
+-    int invalid = 0;
+     int sgnb = bcd_get_sgn(b);
+ 
+     *r = *b;
+     bcd_put_digit(r, bcd_preferred_sgn(sgnb, ps), 0);
+ 
+-    for (i = 1; i < 32; i++) {
+-        bcd_get_digit(b, i, &invalid);
+-        if (unlikely(invalid)) {
+-            return CRF_SO;
+-        }
++    if (bcd_is_valid(b) == false) {
++        return CRF_SO;
+     }
+ 
+     return bcd_cmp_zero(r);
 -- 
-Eduardo
+2.7.4
