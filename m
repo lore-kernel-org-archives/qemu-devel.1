@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56423)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56422)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cEEgu-0005mr-KQ
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 07:17:49 -0500
+	(envelope-from <bounces@canonical.com>) id 1cEEgu-0005mq-K5
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 07:17:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cEEgs-00053V-1A
+	(envelope-from <bounces@canonical.com>) id 1cEEgr-00053K-Fl
 	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 07:17:48 -0500
-Received: from indium.canonical.com ([91.189.90.7]:37693)
+Received: from indium.canonical.com ([91.189.90.7]:37684)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cEEgr-00053F-S7
+	id 1cEEgr-00053C-9n
 	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 07:17:45 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cEEgn-00025b-Ug
-	for <qemu-devel@nongnu.org>; Tue, 06 Dec 2016 12:17:42 +0000
+	id 1cEEgn-0002oM-D7
+	for <qemu-devel@nongnu.org>; Tue, 06 Dec 2016 12:17:41 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 53E382E8199
-	for <qemu-devel@nongnu.org>; Tue,  6 Dec 2016 11:55:40 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id C06332E818F
+	for <qemu-devel@nongnu.org>; Tue,  6 Dec 2016 11:55:39 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 06 Dec 2016 11:36:57 -0000
-From: Thomas Huth <1221966@bugs.launchpad.net>
-Reply-To: Bug 1221966 <1221966@bugs.launchpad.net>
+Date: Tue, 06 Dec 2016 11:43:20 -0000
+From: Thomas Huth <1233225@bugs.launchpad.net>
+Reply-To: Bug 1233225 <1233225@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20130906230043.20668.15929.malonedeb@soybean.canonical.com>
-Message-Id: <20161206113657.5307.77727.malone@chaenomeles.canonical.com>
+References: <20130930150918.29090.41471.malonedeb@gac.canonical.com>
+Message-Id: <20161206114320.28154.97605.malone@soybean.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1221966] Re: SIGSEGV in static_code_gen_buffer
+Subject: [Qemu-devel] [Bug 1233225] Re: mips/mipsel linux user float
+ division problem
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,64 +39,58 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Triaging old bug tickets ... is this still an issue with the latest
-version of QEMU or could we close this ticket nowadays?
+Looks like Petar's patch from comment #6 has been included here:
+http://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D4d66261f71f2efa31e1052e
+=3D=3D> Fix released
 
 ** Changed in: qemu
-       Status: New =3D> Incomplete
+       Status: Confirmed =3D> Fix Released
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1221966
+https://bugs.launchpad.net/bugs/1233225
 
 Title:
-  SIGSEGV in static_code_gen_buffer
+  mips/mipsel linux user float division problem
 
 Status in QEMU:
-  Incomplete
+  Fix Released
 
 Bug description:
-  Trying to run 'ls' (or, anything else as far as I can tell) from a
-  SunOS 5.8 box under RHEL 6.4 linux, I get a segfault.  I've tried
-  qemu-1.5.3, qemu-1.6.0, and I fetched git://git.qemu-
-  project.org/qemu.git.  I've also tried a statically linked sh from
-  /sbin/ and it also segfaulted.
+  Hi,
 
-  wcolburn@anotheruvula</home/anotheruvula/qemu>$ gdb bin/qemu-sparc
-  GNU gdb (GDB) Red Hat Enterprise Linux (7.2-60.el6_4.1)
-  Copyright (C) 2010 Free Software Foundation, Inc.
-  License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.h=
-tml>
-  This is free software: you are free to change and redistribute it.
-  There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
-  and "show warranty" for details.
-  This GDB was configured as "x86_64-redhat-linux-gnu".
-  For bug reporting instructions, please see:
-  <http://www.gnu.org/software/gdb/bugs/>...
-  Reading symbols from /home/anotheruvula/qemu/bin/qemu-sparc...done.
-  (gdb) run ../sparc/ls
-  Starting program: /home/anotheruvula/qemu/bin/qemu-sparc ../sparc/ls
-  [Thread debugging using libthread_db enabled]
+  I tested the following with the qemu git HEAD as of 2013-09-30 on
+  Debian stable and testing. My host runs amd64 but I also tried this
+  out inside a i386 chroot with the same result. The problem occurs for
+  mips and mipsel. Given the following program:
 
-  Program received signal SIGSEGV, Segmentation fault.
-  0x00007ffff8259116 in static_code_gen_buffer ()
-  Missing separate debuginfos, use: debuginfo-install glib2-2.22.5-7.el6.x8=
-6_64 glibc-2.12-1.107.el6_4.4.x86_64
-  (gdb) where
-  #0  0x00007ffff8259116 in static_code_gen_buffer ()
-  #1  0x00007ffff7f570cd in cpu_tb_exec (cpu=3D0x7ffffa2b1210, tb_ptr=3D
-      0x7ffff82590d0 "A\213n=C2=A0\205=C3=AD\017\205=C3=8D")
-      at /home/anotheruvula/qemu-devel/cpu-exec.c:56
-  #2  0x00007ffff7f57b2d in cpu_sparc_exec (env=3D0x7ffffa2b1348)
-      at /home/anotheruvula/qemu-devel/cpu-exec.c:631
-  #3  0x00007ffff7f77f36 in cpu_loop (env=3D0x7ffffa2b1348)
-      at /home/anotheruvula/qemu-devel/linux-user/main.c:1089
-  #4  0x00007ffff7f798ff in main (argc=3D2, argv=3D0x7fffffffdfc8, envp=3D
-      0x7fffffffdfe0) at /home/anotheruvula/qemu-devel/linux-user/main.c:40=
-83
-  (gdb)
+  #include <stdio.h>
+  int main(int argc, char **argv)
+  {
+      int a =3D 1;
+      double d =3D a/2.0;
+      printf("%f\n", d);
+      return 0;
+  }
+
+  Instead of printing 0.5, it will print 2.0 if executed in qemu user
+  mode.
+
+  $ mipsel-linux-gnu-gcc mipstest.c
+  $ ~/qemu/mipsel-linux-user/qemu-mipsel ./a.out
+  2.0
+
+  Expecting this to be a problem with my cross compiler (gcc-4.4 from
+  emdebian) I ran a fully emulated debian squeeze environment inside
+  qemu. There, I compiled the same program natively with gcc and as
+  expected got 0.5 as the output. I also copied the cross compiled
+  binary inside the emulated environment and also got 0.5 when I ran it.
+  So the same mips/mipsel binary produces different output depending on
+  whether it is run in a fully emulated environment or qemu user mode.
+
+  Can anybody else reproduce this problem?
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1221966/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1233225/+subscriptions
