@@ -1,34 +1,44 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51070)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51235)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cEEWp-0002w9-Iq
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 07:07:29 -0500
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1cEEXb-0004Kw-OY
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 07:08:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cEEWm-0000Om-Dk
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 07:07:23 -0500
-Received: from indium.canonical.com ([91.189.90.7]:50029)
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1cEEXY-0000XN-IO
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 07:08:11 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58215
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cEEWm-0000OS-8I
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 07:07:20 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cEEWi-00033I-Cm
-	for <qemu-devel@nongnu.org>; Tue, 06 Dec 2016 12:07:16 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 9743D2EE4BD
-	for <qemu-devel@nongnu.org>; Tue,  6 Dec 2016 11:42:31 +0000 (UTC)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1cEEXY-0000XG-Bf
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 07:08:08 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
+	uB6C5HG6144730
+	for <qemu-devel@nongnu.org>; Tue, 6 Dec 2016 07:08:07 -0500
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 275rky5x0q-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 06 Dec 2016 07:08:07 -0500
+Received: from localhost
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Tue, 6 Dec 2016 12:08:05 -0000
+References: <148095126363.31351.4484514300033863622.stgit@bahia>
+	<20161205164200.49bec0f6.cornelia.huck@de.ibm.com>
+	<20161205164829.GB14457@thinpad.lan.raisama.net>
+	<20161205182555.2e988ac6.cornelia.huck@de.ibm.com>
+	<20161205174130.GH13060@thinpad.lan.raisama.net>
+	<20161206103008.5ea4ddd6@bahia>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Tue, 6 Dec 2016 13:08:02 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 06 Dec 2016 11:30:45 -0000
-From: Thomas Huth <1646610@bugs.launchpad.net>
-Reply-To: Bug 1646610 <1646610@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20161201202504.25700.658.malonedeb@wampee.canonical.com>
-Message-Id: <20161206113045.28755.67568.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1646610] Re: "Assertion `!r->req.sg' failed."
- during live migration with VirtIO
+In-Reply-To: <20161206103008.5ea4ddd6@bahia>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 8bit
+Message-Id: <faeed1b7-93e0-b723-4aba-675a9341ef27@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.8] qdev: apply global properties in
+ reverse order
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,109 +47,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Greg Kurz <groug@kaod.org>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, qemu-stable@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Which version of QEMU are you using?
 
--- =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1646610
+On 12/06/2016 10:30 AM, Greg Kurz wrote:
+> On Mon, 5 Dec 2016 15:41:30 -0200
+> Eduardo Habkost <ehabkost@redhat.com> wrote:
+> 
+>> > On Mon, Dec 05, 2016 at 06:25:55PM +0100, Cornelia Huck wrote:
+>>> > > On Mon, 5 Dec 2016 14:48:29 -0200
+>>> > > Eduardo Habkost <ehabkost@redhat.com> wrote:
+>>> > >   
+>>>> > > > On Mon, Dec 05, 2016 at 04:42:00PM +0100, Cornelia Huck wrote:  
+>>>>> > > > > On Mon, 05 Dec 2016 16:21:22 +0100
+>>>>> > > > > Greg Kurz <groug@kaod.org> wrote:
+>>>>> > > > >   
+>>>>>> > > > > > The current code recursively applies global properties from child up to
+>>>>>> > > > > > parent. So, if you have:
+>>>>>> > > > > > 
+>>>>>> > > > > > -global virtio-pci.disable-modern=on
+>>>>>> > > > > > -global virtio-blk-pci.disable-modern=off
+>>>>>> > > > > > 
+>>>>>> > > > > > Then the default value of disable-modern for a virtio-blk-pci device is on,
+>>>>>> > > > > > which looks wrong from an OOP perspective.
+>>>>>> > > > > > 
+>>>>>> > > > > > This patch reverses the logic, so that a child property always prevail.  
+[...]
+>> > compat props should be always applied in the order they appear.
+>> > -global should always be applied after compat props.
+>> > 
+> This is actually the way they're being registered to the global_props
+> static list: compat props as they appear in HW_COMPAT_* and then -global
+> as they appear on the command line.
+> 
+>> > So, it looks like we have two additional reasons to just follow
+>> > the order the global properties were registered.
+>> > 
+> Thinking again, maybe we just need to reverse the logic in another
+> way: go through global_props and apply the property if the device
+> can be casted to the corresponding class (i.e. object_class_dynamic_cast()
+> != NULL). I'll try that.
+> 
 
-Title:
-  "Assertion `!r->req.sg' failed." during live migration with VirtIO
+IMHO this is the right thing to do (and would result in the
+exactly behavior outlined by Eduardo -- compat props as they
+applied appear and then command line props as they appear, what
+means inverse ordering in terms of overriding regarding the
+result).
 
-Status in QEMU:
-  New
-
-Bug description:
-  We've hit this issue twice so far, but don't have an obvious repro
-  yet. It's pretty rare for us to hit it but I'm still trying so I can
-  get a core and backtrace. The guest was Windows running a constant
-  workload. We were using VirtIO SCSI drivers in both cases.
-
-  In both cases we hit the assert here:
-
-  hw/scsi/scsi-generic.c:
-
-  static void scsi_generic_save_request(QEMUFile *f, SCSIRequest *req)
-  {
-      SCSIGenericReq *r =3D DO_UPCAST(SCSIGenericReq, req, req);
-
-      qemu_put_sbe32s(f, &r->buflen);
-      if (r->buflen && r->req.cmd.mode =3D=3D SCSI_XFER_TO_DEV) {
-  ***     assert(!r->req.sg);
-          qemu_put_buffer(f, r->buf, r->req.cmd.xfer);
-      }
-  }
-
-  From code inspection, it seems that this will always happen if
-  scsi_req_enqueue_internal in hw/scsi/scsi-bus.c is ever invoked.
-
-  static void scsi_req_enqueue_internal(SCSIRequest *req)
-  {
-      assert(!req->enqueued);
-      scsi_req_ref(req);
-      if (req->bus->info->get_sg_list) {
-          req->sg =3D req->bus->info->get_sg_list(req);
-      } else {
-          req->sg =3D NULL;
-      }
-      req->enqueued =3D true;
-      QTAILQ_INSERT_TAIL(&req->dev->requests, req, next);
-  }
-
-  req->bus->info->get_sg_list will return &req->qsgl for a virtio-scsi
-  bus since it's a method stored on the SCSIBusInfo struct. I didn't see
-  anything that would clear the req->sg if scsi_req_enqueue_internal is
-  called at least once.
-
-  I think this can only happen if scsi_dma_restart_bh in hw/scsi/scsi-
-  bus.c is called. The only other location I see
-  scsi_req_enqueue_internal is on the load side for the destination of a
-  migration.
-
-  static void scsi_dma_restart_bh(void *opaque)
-  {
-      SCSIDevice *s =3D opaque;
-      SCSIRequest *req, *next;
-
-      qemu_bh_delete(s->bh);
-      s->bh =3D NULL;
-
-      QTAILQ_FOREACH_SAFE(req, &s->requests, next, next) {
-          scsi_req_ref(req);
-          if (req->retry) {
-              req->retry =3D false;
-              switch (req->cmd.mode) {
-              case SCSI_XFER_FROM_DEV:
-              case SCSI_XFER_TO_DEV:
-                  scsi_req_continue(req);
-                  break;
-              case SCSI_XFER_NONE:
-                  scsi_req_dequeue(req);
-                  scsi_req_enqueue(req); // *** this calls scsi_req_enqueue=
-_internal
-                  break;
-              }
-          }
-          scsi_req_unref(req);
-      }
-  }
-
-  Finally when put_scsi_requests is called for migration, it seems like
-  it will call both virtio_scsi_save_request (from
-  bus->info->save_request) and scsi_generic_save_request (from
-  req->ops->save_request) and trigger the assert.
-
-  I searched for a bit, but didn't find anyone else reporting this. Has
-  anyone else seen this? It seems to me like that assert should check
-  that the sg list is empty instead of checking that it exists. Is this
-  an appropriate assessment? Assuming I find a repro, I'll try to test
-  this solution.
-
-  Thanks!
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1646610/+subscriptions
+Halil
