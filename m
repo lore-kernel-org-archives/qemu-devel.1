@@ -1,34 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38696)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39936)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cENUQ-0003GQ-Aq
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 16:41:31 -0500
+	(envelope-from <eblake@redhat.com>) id 1cENbp-0006Zt-CW
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 16:49:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cENUM-00023C-Dk
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 16:41:30 -0500
-Received: from indium.canonical.com ([91.189.90.7]:59546)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cENUM-00022R-8Q
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 16:41:26 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cENUJ-0003qD-2v
-	for <qemu-devel@nongnu.org>; Tue, 06 Dec 2016 21:41:23 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 8ED2B2E80D9
-	for <qemu-devel@nongnu.org>; Tue,  6 Dec 2016 21:41:14 +0000 (UTC)
+	(envelope-from <eblake@redhat.com>) id 1cENbo-0004Q8-ID
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 16:49:09 -0500
+References: <20161203181914.7467-1-eblake@redhat.com>
+	<0c1ad753-561b-62c9-cdd6-2dfebb020b2b@redhat.com>
+	<d6e0a4ba-d64b-7b9d-a7a1-53170ddbb543@redhat.com>
+	<18e3382e-ec17-f25c-06e5-e49004a80f94@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <b72676d4-f708-1c5e-4522-f721cedeb43a@redhat.com>
+Date: Tue, 6 Dec 2016 15:48:56 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 06 Dec 2016 21:33:18 -0000
-From: Peter <1646610@bugs.launchpad.net>
-Reply-To: Bug 1646610 <1646610@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20161201202504.25700.658.malonedeb@wampee.canonical.com>
-Message-Id: <20161206213318.25217.3156.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1646610] Re: "Assertion `!r->req.sg' failed."
- during live migration with VirtIO
+In-Reply-To: <18e3382e-ec17-f25c-06e5-e49004a80f94@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="GlNlOG8bu8neJhP9J2HMV7RJAm0OOpwe8"
+Subject: Re: [Qemu-devel] [PATCH] qcow2: Discard/zero clusters by byte count
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,109 +26,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, "open list:qcow2" <qemu-block@nongnu.org>
 
-Thanks Thomas. Will do.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--GlNlOG8bu8neJhP9J2HMV7RJAm0OOpwe8
+From: Eric Blake <eblake@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, "open list:qcow2" <qemu-block@nongnu.org>
+Message-ID: <b72676d4-f708-1c5e-4522-f721cedeb43a@redhat.com>
+Subject: Re: [PATCH] qcow2: Discard/zero clusters by byte count
+References: <20161203181914.7467-1-eblake@redhat.com>
+ <0c1ad753-561b-62c9-cdd6-2dfebb020b2b@redhat.com>
+ <d6e0a4ba-d64b-7b9d-a7a1-53170ddbb543@redhat.com>
+ <18e3382e-ec17-f25c-06e5-e49004a80f94@redhat.com>
+In-Reply-To: <18e3382e-ec17-f25c-06e5-e49004a80f94@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
--- =
+On 12/06/2016 03:31 PM, Max Reitz wrote:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1646610
+>>>
+>>> The only alternative I can come up with would be "qcow2_write_zeroes"=
+;
+>>> that at least solves the first issue I have with this, but not the
+>>> second one...
+>>
+>> Maybe qcow2_cluster_zeroize() and qcow2_cluster_discard()?
+>=20
+> I think qcow2_discard() is fine (it works with any alignment (even
+> though it will only discard whole clusters)
 
-Title:
-  "Assertion `!r->req.sg' failed." during live migration with VirtIO
+Except that I think with my recent fix to qcow2_make_empty(), we can now
+assert that all callers actually pass cluster-aligned values.  Hence my
+other comment that maybe we want to (as a prereq patch) actually assert
+that callers are aligned, at which point keeping cluster in the name is
+once again worthwhile.
 
-Status in QEMU:
-  Incomplete
+> and "discard" is mainly used
+> as a verb, so at least I'm not confused there). I like
+> qcow2_cluster_zeroize() if nothing else then for the "zeroize" alone. :=
+-)
 
-Bug description:
-  We've hit this issue twice so far, but don't have an obvious repro
-  yet. It's pretty rare for us to hit it but I'm still trying so I can
-  get a core and backtrace. The guest was Windows running a constant
-  workload. We were using VirtIO SCSI drivers in both cases.
+Okay, then I have a good idea of what name to use.
 
-  In both cases we hit the assert here:
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
-  hw/scsi/scsi-generic.c:
 
-  static void scsi_generic_save_request(QEMUFile *f, SCSIRequest *req)
-  {
-      SCSIGenericReq *r =3D DO_UPCAST(SCSIGenericReq, req, req);
+--GlNlOG8bu8neJhP9J2HMV7RJAm0OOpwe8
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-      qemu_put_sbe32s(f, &r->buflen);
-      if (r->buflen && r->req.cmd.mode =3D=3D SCSI_XFER_TO_DEV) {
-  ***     assert(!r->req.sg);
-          qemu_put_buffer(f, r->buf, r->req.cmd.xfer);
-      }
-  }
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-  From code inspection, it seems that this will always happen if
-  scsi_req_enqueue_internal in hw/scsi/scsi-bus.c is ever invoked.
+iQEcBAEBCAAGBQJYRzJJAAoJEKeha0olJ0Nq2vsH/37kkbmuWYrB6o1e2cdFymzg
+fEHWCPhW7uKJ1lpXvMkspo7SEQ9Bnpkftl+cxIQvfESUwybrbUn7EvHB5PjSOcGU
+o/6jTsTqBvbakWjcqH+eQBdzNCtkRBBVFuOEMK0kLBBvgePGKR0Y7d+BRRIuwRU2
+SmesK+MWXgP/Fnio2/iTaCq2l62+t+4CDAvcunYEhDwZbW3x9+nmDn5ph6wNbuEM
+O8SeFGIuErNFVGsHSkSyONGMypGvRHRsUeNBGtempprbtVimrXjbND1asciR9N6E
+uKSZDFziqo9A4/NxFLglPXJMndDY+D+49SMdhrCtQnFz/mc3uUqbDQCeymyU8VE=
+=mFuc
+-----END PGP SIGNATURE-----
 
-  static void scsi_req_enqueue_internal(SCSIRequest *req)
-  {
-      assert(!req->enqueued);
-      scsi_req_ref(req);
-      if (req->bus->info->get_sg_list) {
-          req->sg =3D req->bus->info->get_sg_list(req);
-      } else {
-          req->sg =3D NULL;
-      }
-      req->enqueued =3D true;
-      QTAILQ_INSERT_TAIL(&req->dev->requests, req, next);
-  }
-
-  req->bus->info->get_sg_list will return &req->qsgl for a virtio-scsi
-  bus since it's a method stored on the SCSIBusInfo struct. I didn't see
-  anything that would clear the req->sg if scsi_req_enqueue_internal is
-  called at least once.
-
-  I think this can only happen if scsi_dma_restart_bh in hw/scsi/scsi-
-  bus.c is called. The only other location I see
-  scsi_req_enqueue_internal is on the load side for the destination of a
-  migration.
-
-  static void scsi_dma_restart_bh(void *opaque)
-  {
-      SCSIDevice *s =3D opaque;
-      SCSIRequest *req, *next;
-
-      qemu_bh_delete(s->bh);
-      s->bh =3D NULL;
-
-      QTAILQ_FOREACH_SAFE(req, &s->requests, next, next) {
-          scsi_req_ref(req);
-          if (req->retry) {
-              req->retry =3D false;
-              switch (req->cmd.mode) {
-              case SCSI_XFER_FROM_DEV:
-              case SCSI_XFER_TO_DEV:
-                  scsi_req_continue(req);
-                  break;
-              case SCSI_XFER_NONE:
-                  scsi_req_dequeue(req);
-                  scsi_req_enqueue(req); // *** this calls scsi_req_enqueue=
-_internal
-                  break;
-              }
-          }
-          scsi_req_unref(req);
-      }
-  }
-
-  Finally when put_scsi_requests is called for migration, it seems like
-  it will call both virtio_scsi_save_request (from
-  bus->info->save_request) and scsi_generic_save_request (from
-  req->ops->save_request) and trigger the assert.
-
-  I searched for a bit, but didn't find anyone else reporting this. Has
-  anyone else seen this? It seems to me like that assert should check
-  that the sg list is empty instead of checking that it exists. Is this
-  an appropriate assessment? Assuming I find a repro, I'll try to test
-  this solution.
-
-  Thanks!
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1646610/+subscriptions
+--GlNlOG8bu8neJhP9J2HMV7RJAm0OOpwe8--
