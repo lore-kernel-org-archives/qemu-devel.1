@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56422)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58183)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cEEgu-0005mq-K5
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 07:17:53 -0500
+	(envelope-from <bounces@canonical.com>) id 1cEEm1-0003RJ-RE
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 07:23:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cEEgr-00053K-Fl
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 07:17:48 -0500
-Received: from indium.canonical.com ([91.189.90.7]:37684)
+	(envelope-from <bounces@canonical.com>) id 1cEElx-0006mh-JT
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 07:23:05 -0500
+Received: from indium.canonical.com ([91.189.90.7]:45925)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cEEgr-00053C-9n
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 07:17:45 -0500
+	id 1cEElx-0006mZ-Dn
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 07:23:01 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cEEgn-0002oM-D7
-	for <qemu-devel@nongnu.org>; Tue, 06 Dec 2016 12:17:41 +0000
+	id 1cEElt-0003YE-3m
+	for <qemu-devel@nongnu.org>; Tue, 06 Dec 2016 12:22:57 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C06332E818F
-	for <qemu-devel@nongnu.org>; Tue,  6 Dec 2016 11:55:39 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id C1B4E2E9C38
+	for <qemu-devel@nongnu.org>; Tue,  6 Dec 2016 12:01:18 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 06 Dec 2016 11:43:20 -0000
-From: Thomas Huth <1233225@bugs.launchpad.net>
-Reply-To: Bug 1233225 <1233225@bugs.launchpad.net>
+Date: Tue, 06 Dec 2016 11:46:37 -0000
+From: Julian Brown <1647683@bugs.launchpad.net>
+Reply-To: Bug 1647683 <1647683@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20130930150918.29090.41471.malonedeb@gac.canonical.com>
-Message-Id: <20161206114320.28154.97605.malone@soybean.canonical.com>
+References: <20161206113915.26308.72810.malonedeb@wampee.canonical.com>
+Message-Id: <20161206114637.26046.68333.malone@wampee.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1233225] Re: mips/mipsel linux user float
- division problem
+Subject: [Qemu-devel] [Bug 1647683] Re: Bad interaction between tb flushing
+ & gdb stub
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,58 +39,72 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Looks like Petar's patch from comment #6 has been included here:
-http://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D4d66261f71f2efa31e1052e
-=3D=3D> Fix released
-
-** Changed in: qemu
-       Status: Confirmed =3D> Fix Released
+(FAOD, the crashes happen without Valgrind too, and the above backtrace
+may be a red herring.)
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1233225
+https://bugs.launchpad.net/bugs/1647683
 
 Title:
-  mips/mipsel linux user float division problem
+  Bad interaction between tb flushing & gdb stub
 
 Status in QEMU:
-  Fix Released
+  New
 
 Bug description:
-  Hi,
+  I have been working on a series of patches for ARM big-endian system
+  mode support, using QEMU as a bare-metal simulator for the GDB test
+  suite. At some point I realised that these tests were not running
+  reliably on the QEMU master branch, even without my patches applied.
+  (I.e., in little-endian mode.)
 
-  I tested the following with the qemu git HEAD as of 2013-09-30 on
-  Debian stable and testing. My host runs amd64 but I also tried this
-  out inside a i386 chroot with the same result. The problem occurs for
-  mips and mipsel. Given the following program:
+  Running QEMU under GDB in the test harness via Valgrind, using
+  something akin to:
 
-  #include <stdio.h>
-  int main(int argc, char **argv)
-  {
-      int a =3D 1;
-      double d =3D a/2.0;
-      printf("%f\n", d);
-      return 0;
-  }
+  (gdb) target remote | valgrind --tool=3Dmemcheck qemu-arm-system [...]
 
-  Instead of printing 0.5, it will print 2.0 if executed in qemu user
-  mode.
+  leads to intermittent (and quite hard-to-reproduce) segfaults in QEMU
+  of the form:
 
-  $ mipsel-linux-gnu-gcc mipstest.c
-  $ ~/qemu/mipsel-linux-user/qemu-mipsel ./a.out
-  2.0
+  =3D=3D52333=3D=3D Process terminating with default action of signal 11 (S=
+IGSEGV)
+  =3D=3D52333=3D=3D  Access not within mapped region at address 0x24
+  =3D=3D52333=3D=3D    at 0x1D55F2: tb_page_remove (translate-all.c:1026)
+  =3D=3D52333=3D=3D    by 0x1D58B4: tb_phys_invalidate (translate-all.c:111=
+9)
+  =3D=3D52333=3D=3D    by 0x1D63AA: tb_invalidate_phys_page_range (translat=
+e-all.c:1519)
+  =3D=3D52333=3D=3D    by 0x1D66D7: tb_invalidate_phys_addr (translate-all.=
+c:1714)
+  =3D=3D52333=3D=3D    by 0x1CBA7F: breakpoint_invalidate (exec.c:704)
+  =3D=3D52333=3D=3D    by 0x1CC01F: cpu_breakpoint_remove_by_ref (exec.c:86=
+9)
+  =3D=3D52333=3D=3D    by 0x1CBF97: cpu_breakpoint_remove (exec.c:857)
+  =3D=3D52333=3D=3D    by 0x218FAA: gdb_breakpoint_remove (gdbstub.c:717)
+  =3D=3D52333=3D=3D    by 0x219E35: gdb_handle_packet (gdbstub.c:1035)
+  =3D=3D52333=3D=3D    by 0x21AF62: gdb_read_byte (gdbstub.c:1459)
+  =3D=3D52333=3D=3D    by 0x21B096: gdb_chr_receive (gdbstub.c:1672)
+  =3D=3D52333=3D=3D    by 0x3AF2BC: qemu_chr_be_write_impl (qemu-char.c:419)
 
-  Expecting this to be a problem with my cross compiler (gcc-4.4 from
-  emdebian) I ran a fully emulated debian squeeze environment inside
-  qemu. There, I compiled the same program natively with gcc and as
-  expected got 0.5 as the output. I also copied the cross compiled
-  binary inside the emulated environment and also got 0.5 when I ran it.
-  So the same mips/mipsel binary produces different output depending on
-  whether it is run in a fully emulated environment or qemu user mode.
+  These crashes didn't happen on a 2.6-era QEMU, so I bisected and
+  discovered the commit 3359baad36889b83df40b637ed993a4b816c4906 ("tcg:
+  Make tb_flush() thread safe") appears to be the thing that triggers
+  this intermittent failure. Reverting the patch on the branch tip makes
+  the crashes go away.
 
-  Can anybody else reproduce this problem?
+  Unfortunately I don't currently have a way to trigger the segfaults
+  outside of Mentor Graphics's test infrastructure, which I can't share.
+
+  Does anyone know a reason that this might be happening, or suggestions
+  of how I might further debug this? Maybe a missed tb flush in the gdb
+  stub code, somewhere?
+
+  Thanks!
+
+  Julian
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1233225/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1647683/+subscriptions
