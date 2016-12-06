@@ -1,33 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35345)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37403)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1cEC7L-00012H-66
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 04:32:56 -0500
+	(envelope-from <dovgaluk@ispras.ru>) id 1cECCO-000555-Ek
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 04:38:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1cEC7J-000095-Tu
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 04:32:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56430)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1cEC7J-00008s-Lk
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 04:32:53 -0500
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AC80B66C8D
-	for <qemu-devel@nongnu.org>; Tue,  6 Dec 2016 09:32:52 +0000 (UTC)
-References: <1480713496-11213-1-git-send-email-ehabkost@redhat.com>
-	<1480713496-11213-16-git-send-email-ehabkost@redhat.com>
-	<df0f3ade-bd09-58a0-ac83-3775d4ab7c6c@redhat.com>
-	<20161205235745.GJ13060@thinpad.lan.raisama.net>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <862e80d2-d0f9-668f-d6ed-b25712a220c1@redhat.com>
-Date: Tue, 6 Dec 2016 10:32:48 +0100
+	(envelope-from <dovgaluk@ispras.ru>) id 1cECCN-0002LY-7U
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 04:38:08 -0500
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <001501d2196b$496b4e90$dc41ebb0$@ru>
+	<20160928094313.GI5236@noname.redhat.com>
+	<000001d21986$b68cd280$23a67780$@ru>
+	<001d01d23fee$b962ec40$2c28c4c0$@ru>
+	<20161116122001.GA5407@noname.str.redhat.com>
+	<001b01d243f1$e2313260$a6939720$@ru>
+	<20161121155458.GD5876@noname.redhat.com>
+	<001201d24ecb$36f94880$a4ebd980$@ru>
+	<20161205103416.GA4870@noname.redhat.com>
+	<002201d24eed$acc39440$064abcc0$@ru>
+	<20161205124457.GB4870@noname.redhat.com>
+In-Reply-To: <20161205124457.GB4870@noname.redhat.com>
+Date: Tue, 6 Dec 2016 12:37:53 +0300
+Message-ID: <000e01d24fa4$6b1a4400$414ecc00$@ru>
 MIME-Version: 1.0
-In-Reply-To: <20161205235745.GJ13060@thinpad.lan.raisama.net>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel] [PATCH for-2.9 15/17] target-i386: Define static
- "base" CPU model
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Content-Language: ru
+Subject: Re: [Qemu-devel] [PATCH v5 7/9] block: don't make snapshots for
+ filters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,101 +35,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, libvir-list@redhat.com, Jiri Denemark <jdenemar@redhat.com>
+To: 'Kevin Wolf' <kwolf@redhat.com>
+Cc: pbonzini@redhat.com, 'Pavel Dovgalyuk' <pavel.dovgaluk@ispras.ru>, qemu-devel@nongnu.org, peter.maydell@linaro.org, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, armbru@redhat.com
 
-QW0gMDYuMTIuMjAxNiB1bSAwMDo1NyBzY2hyaWViIEVkdWFyZG8gSGFia29zdDoNCj4gT24g
-TW9uLCBEZWMgMDUsIDIwMTYgYXQgMDc6MTg6NDdQTSArMDEwMCwgRGF2aWQgSGlsZGVuYnJh
-bmQgd3JvdGU6DQo+PiBBbSAwMi4xMi4yMDE2IHVtIDIyOjE4IHNjaHJpZWIgRWR1YXJkbyBI
-YWJrb3N0Og0KPj4+IFRoZSBxdWVyeS1jcHUtbW9kZWwtZXhwYW5kIFFNUCBjb21tYW5kIG5l
-ZWRzIGF0IGxlYXN0IG9uZSBzdGF0aWMNCj4+PiBtb2RlbCwgdG8gYWxsb3cgdGhlICJzdGF0
-aWMiIGV4cGFuc2lvbiBtb2RlIHRvIGJlIGltcGxlbWVudGVkLg0KPj4+IEluc3RlYWQgb2Yg
-ZGVmaW5pbmcgc3RhdGljIHZlcnNpb25zIG9mIGV2ZXJ5IENQVSBtb2RlbCwgZGVmaW5lIGEN
-Cj4+PiAiYmFzZSIgQ1BVIG1vZGVsIHRoYXQgaGFzIGFic29sdXRlbHkgbm8gZmVhdHVyZSBm
-bGFnIGVuYWJsZWQuDQo+Pj4NCj4+DQo+PiBJbnRyb2R1Y2luZyBzZXBhcmF0ZSBvbmVzIG1h
-a2VzIGZlYXR1cmUgbGlzdHMgcHJlc2VudGVkIHRvIHRoZSB1c2VyIG11Y2gNCj4+IHNob3J0
-ZXIgKGFuZCB0aGVyZWZvcmUgZWFzaWVyIHRvIG1haW50YWluKS4gQnV0IEkgZG9uJ3Qga25v
-dyBob3cgbGlidmlydA0KPj4gd2FudHMgdG8gZGVhbCB3aXRoIG1vZGVscyBvbiB4ODYgaW4g
-dGhlIGZ1dHVyZS4NCj4NCj4gSSB1bmRlcnN0YW5kIHRoYXQgaGF2aW5nIGEgbGFyZ2VyIHNl
-dCBvZiBzdGF0aWMgbW9kZWxzIHdvdWxkIG1ha2UNCj4gZXhwYW5zaW9ucyBzaG9ydGVyLiBC
-dXQgSSB3b3JyeSB0aGF0IGJ5IGRlZmluaW5nIGEgY29tcGxldGUgc2V0DQo+IG9mIHN0YXRp
-YyBtb2RlbHMgb24geDg2IHdvdWxkIHJlcXVpcmUgZXh0cmEgbWFpbnRlbmFuY2Ugd29yayBv
-bg0KPiB0aGUgUUVNVSBzaWRlIHdpdGggbm8gdmlzaWJsZSBiZW5lZml0IGZvciBsaWJ2aXJ0
-Lg0KDQpBcyBzdGF0aWMgbW9kZWxzIHdpbGwgbmV2ZXIgY2hhbmdlICh0aGVvcnkpIHRoZSBt
-YWludGVuYW5jZSB3b3JrIHNob3VsZCANCmJlIHByZXR0eSBtdWNoIGRvd24gdG8gemVyby4g
-QnV0IHRoZSBpbml0aWFsIGltcGxlbWVudGF0aW9uIGFuZCBjb21taW5nIA0KdXAgd2l0aCB0
-aGUgbW9kZWxzIHJlcXVpcmVzIHdvcmsgKG15IGV4cGVyaWVuY2UgOykgKS4NCg0KSSBhbSBu
-b3QgYWdhaW5zdCB0aGUgImJhc2UiIG1vZGVsIChhY3R1YWxseSBpdCBpcyByZWFsbHkgcHJl
-dHR5IG5pY2UgdG8gDQpoYXZlKS4gVXNpbmcgb25seSB0aGF0IHNvbWVob3cgc21lbGxzIGxp
-a2UgdGhlICJ1c2VyIiBjcHUgbW9kZWwgDQpkaXNjdXNzaW9uLiBXaGljaCBtaWdodCBiZSBv
-ayBmb3IgeDg2Lg0KDQo+DQo+IEkgd291bGQgbGlrZSB0byBoZWFyIGZyb20gbGlidmlydCBk
-ZXZlbG9wZXJzIHdoYXQgdGhleSB0aGluay4gSQ0KPiBzdGlsbCBkb24ndCBrbm93IHdoYXQg
-dGhleSBwbGFuIHRvIHVzZSB0aGUgdHlwZT1zdGF0aWMgZXhwYW5zaW9uDQo+IHJlc3VsdHMg
-Zm9yLg0KPg0KPj4NCj4+IEhvdyBsb25nIGlzIHRoZSBzdGF0aWMgZXhwYW5zaW9uIG9uIGEg
-cmVjZW50IGludGVsIENQVT8NCj4NCj4gQ1BVIG1vZGVsICJCcm9hZHdlbGwiIHJldHVybnMg
-MTY1IGVudHJpZXMgb24gcmV0dXJuLm1vZGVsLnByb3BzOg0KPg0KPiAoUUVNVSkgcXVlcnkt
-Y3B1LW1vZGVsLWV4cGFuc2lvbiB0eXBlPXN0YXRpYyBtb2RlbD17Im5hbWUiOiJCcm9hZHdl
-bGwifQ0KDQo+IHsicmV0dXJuIjogeyJtaWdyYXRpb24tc2FmZSI6IHRydWUsICJtb2RlbCI6
-IHsibmFtZSI6ICJiYXNlIiwgInByb3BzIjogeyJwZnRocmVzaG9sZCI6IGZhbHNlLCAicGt1
-IjogZmFsc2UsICJydG0iOiB0cnVlLCAidHNjLWRlYWRsaW5lIjogdHJ1ZSwgInhzdG9yZS1l
-biI6IGZhbHNlLCAidHNjLXNjYWxlIjogZmFsc2UsICJhYm0iOiB0cnVlLCAiaWE2NCI6IGZh
-bHNlLCAia3ZtLW1tdSI6IGZhbHNlLCAieHNhdmVvcHQiOiB0cnVlLCAidGNlIjogZmFsc2Us
-ICJzbWVwIjogdHJ1ZSwgImZwdSI6IHRydWUsICJ4Y3J5cHQiOiBmYWxzZSwgImNsZmx1c2gi
-OiB0cnVlLCAiZmx1c2hieWFzaWQiOiBmYWxzZSwgImt2bS1zdGVhbC10aW1lIjogZmFsc2Us
-ICJsbSI6IHRydWUsICJ0c2MiOiB0cnVlLCAiYWR4IjogdHJ1ZSwgImZ4c3IiOiB0cnVlLCAi
-dG0iOiBmYWxzZSwgInhnZXRidjEiOiBmYWxzZSwgInhzdG9yZSI6IGZhbHNlLCAidm1lIjog
-ZmFsc2UsICJ2ZW5kb3IiOiAiR2VudWluZUludGVsIiwgImFyYXQiOiB0cnVlLCAiZGUiOiB0
-cnVlLCAiYWVzIjogdHJ1ZSwgInBzZSI6IHRydWUsICJkcy1jcGwiOiBmYWxzZSwgInRibSI6
-IGZhbHNlLCAic3NlIjogdHJ1ZSwgInBoZS1lbiI6IGZhbHNlLCAiZjE2YyI6IHRydWUsICJk
-cyI6IGZhbHNlLCAibXB4IjogZmFsc2UsICJ0c2MtYWRqdXN0IjogZmFsc2UsICJhdng1MTJm
-IjogZmFsc2UsICJhdngyIjogdHJ1ZSwgInBiZSI6IGZhbHNlLCAiY3gxNiI6IHRydWUsICJh
-dng1MTJwZiI6IGZhbHNlLCAibW92YmUiOiB0cnVlLCAicGVyZmN0ci1uYiI6IGZhbHNlLCAi
-b3Nwa2UiOiBmYWxzZSwgImF2eDUxMmlmbWEiOiBmYWxzZSwgInN0ZXBwaW5nIjogMiwgInNl
-cCI6IHRydWUsICJzc2U0YSI6IGZhbHNlLCAiYXZ4NTEyZHEiOiBmYWxzZSwgImF2eDUxMi00
-dm5uaXciOiBmYWxzZSwgInhzYXZlIjogdHJ1ZSwgInBtbSI6IGZhbHNlLCAiaGxlIjogdHJ1
-ZSwgImVzdCI6IGZhbHNlLCAieG9wIjogZmFsc2UsICJzbXgiOiBmYWxzZSwgIm1vbml0b3Ii
-OiBmYWxzZSwgImF2eDUxMmVyIjogZmFsc2UsICJhcGljIjogdHJ1ZSwgInNzZTQuMSI6IHRy
-dWUsICJzc2U0LjIiOiB0cnVlLCAicGF1c2UtZmlsdGVyIjogZmFsc2UsICJsYWhmLWxtIjog
-dHJ1ZSwgImt2bS1ub3Bpb2RlbGF5IjogZmFsc2UsICJhY3BpIjogZmFsc2UsICJtbXgiOiB0
-cnVlLCAib3N4c2F2ZSI6IGZhbHNlLCAicGNvbW1pdCI6IGZhbHNlLCAibXRyciI6IHRydWUs
-ICJjbHdiIjogZmFsc2UsICJkY2EiOiBmYWxzZSwgInBkY20iOiBmYWxzZSwgInhjcnlwdC1l
-biI6IGZhbHNlLCAiM2Rub3ciOiBmYWxzZSwgImludnRzYyI6IGZhbHNlLCAidG0yIjogZmFs
-c2UsICJoeXBlcnZpc29yIjogdHJ1ZSwgImt2bWNsb2NrLXN0YWJsZS1iaXQiOiBmYWxzZSwg
-ImZ4c3Itb3B0IjogZmFsc2UsICJwY2lkIjogdHJ1ZSwgImxicnYiOiBmYWxzZSwgImF2eDUx
-Mi00Zm1hcHMiOiBmYWxzZSwgInN2bS1sb2NrIjogZmFsc2UsICJwb3BjbnQiOiB0cnVlLCAi
-bnJpcC1zYXZlIjogZmFsc2UsICJhdng1MTJ2bCI6IGZhbHNlLCAieDJhcGljIjogdHJ1ZSwg
-Imt2bWNsb2NrIjogZmFsc2UsICJzbWFwIjogdHJ1ZSwgImZhbWlseSI6IDYsICJtaW4tbGV2
-ZWwiOiAxMywgImR0ZXM2NCI6IGZhbHNlLCAiYWNlMiI6IGZhbHNlLCAiZm1hNCI6IGZhbHNl
-LCAieHRwciI6IGZhbHNlLCAiYXZ4NTEyYnciOiBmYWxzZSwgIm54IjogdHJ1ZSwgImx3cCI6
-IGZhbHNlLCAibXNyIjogdHJ1ZSwgImFjZTItZW4iOiBmYWxzZSwgImRlY29kZWFzc2lzdHMi
-OiBmYWxzZSwgInBlcmZjdHItY29yZSI6IGZhbHNlLCAicGdlIjogdHJ1ZSwgInBuIjogZmFs
-c2UsICJmbWEiOiB0cnVlLCAibm9kZWlkLW1zciI6IGZhbHNlLCAiY3g4IjogdHJ1ZSwgIm1j
-ZSI6IHRydWUsICJhdng1MTJjZCI6IGZhbHNlLCAiY3I4bGVnYWN5IjogZmFsc2UsICJtY2Ei
-OiB0cnVlLCAicG5pIjogdHJ1ZSwgInJkc2VlZCI6IHRydWUsICJvc3Z3IjogZmFsc2UsICJm
-c2dzYmFzZSI6IHRydWUsICJtb2RlbC1pZCI6ICJJbnRlbCBDb3JlIFByb2Nlc3NvciAoQnJv
-YWR3ZWxsKSIsICJjbXAtbGVnYWN5IjogZmFsc2UsICJrdm0tcHYtdW5oYWx0IjogZmFsc2Us
-ICJyZHRzY3AiOiB0cnVlLCAibW14ZXh0IjogZmFsc2UsICJjaWQiOiBmYWxzZSwgInZteCI6
-IGZhbHNlLCAic3NzZTMiOiB0cnVlLCAiZXh0YXBpYyI6IGZhbHNlLCAicHNlMzYiOiB0cnVl
-LCAibWluLXhsZXZlbCI6IDIxNDc0ODM2NTYsICJpYnMiOiBmYWxzZSwgImF2eCI6IHRydWUs
-ICJzeXNjYWxsIjogdHJ1ZSwgInVtaXAiOiBmYWxzZSwgImludnBjaWQiOiB0cnVlLCAiYm1p
-MSI6IHRydWUsICJibWkyIjogdHJ1ZSwgInZtY2ItY2xlYW4iOiBmYWxzZSwgImVybXMiOiB0
-cnVlLCAiY21vdiI6IHRydWUsICJtaXNhbGlnbnNzZSI6IGZhbHNlLCAiY2xmbHVzaG9wdCI6
-IGZhbHNlLCAicGF0IjogdHJ1ZSwgIjNkbm93cHJlZmV0Y2giOiB0cnVlLCAicmRwaWQiOiBm
-YWxzZSwgInBhZSI6IHRydWUsICJ3ZHQiOiBmYWxzZSwgInNraW5pdCI6IGZhbHNlLCAicG1t
-LWVuIjogZmFsc2UsICJwaGUiOiBmYWxzZSwgIjNkbm93ZXh0IjogZmFsc2UsICJsbWNlIjog
-ZmFsc2UsICJodCI6IGZhbHNlLCAicGRwZTFnYiI6IGZhbHNlLCAia3ZtLXB2LWVvaSI6IGZh
-bHNlLCAibnB0IjogZmFsc2UsICJ4c2F2ZWMiOiBmYWxzZSwgInBjbG11bHFkcSI6IHRydWUs
-ICJzdm0iOiBmYWxzZSwgInNzZTIiOiB0cnVlLCAic3MiOiBmYWxzZSwgInRvcG9leHQiOiBm
-YWxzZSwgInJkcmFuZCI6IHRydWUsICJhdng1MTJ2Ym1pIjogZmFsc2UsICJrdm0tYXN5bmNw
-ZiI6IGZhbHNlLCAieHNhdmVzIjogZmFsc2UsICJtb2RlbCI6IDYxfX0sICJzdGF0aWMiOiB0
-cnVlfX0NCj4NCj4NCg0KV293LCB5ZXMgdGhhdCB3YXMgdGhlIHJlYXNvbiBmb3IgbWUgdG8g
-aW50cm9kdWNlIGFic3RyYWN0aW9ucyBvbiBzMzkweC4gDQpCdXQgaGVyZSB0aGUgcGxhbiB3
-YXMgdG8gdXNlIHRoZSBlcGFuc2lvbiBkaXJlY3RseSB3aGVuIGluZGljYXRpb24gdGhlDQoi
-aG9zdCIgbW9kZWwgdG8gdGhlIHVzZXIuIEhhdmluZyBzb21ldGhpbmcgbGlrZSAiQnJvYWR3
-ZWxsLWJhc2UiKy8tIGEgDQpoYW5kZnVsIG9mIGZlYXR1cmVzIGlzIGp1c3QgZWFzaWVyIHRv
-IGhhbmRsZSB0aGFuICJiYXNlIiB3aXRoIDE2NSANCmZlYXR1cmUgZmxhZ3MuIEJ1dCBhcyB3
-ZSBkb24ndCBrbm93IHdoYXQgbGlidmlydCBwbGFucyBhcmUgKHRoZXkgY291bGQgDQp1c2Ug
-dGhhdCBpbnRlcmZhY2Ugb24geDg2IHRvIGRvIGZlYXR1cmUgZGV0ZWN0aW9uIG9ubHkgYW5k
-IGNvbnZlcnQgdG8gDQptb2RlbHMgdGhlbXNlbHZlcyksIEkgYWxzbyBoYXZlIG5vIGlkZWEg
-d2hhdCB3b3VsZCBiZSBiZXN0IGluIHRoZSANCmNvbnRleHQgb2YgeDg2IGNwdSBtb2RlbHMu
-DQoNCi0tIA0KDQpEYXZpZA0K
+> From: Kevin Wolf [mailto:kwolf@redhat.com]
+> Am 05.12.2016 um 12:49 hat Pavel Dovgalyuk geschrieben:
+> > > From: Kevin Wolf [mailto:kwolf@redhat.com]
+> > > Am 05.12.2016 um 08:43 hat Pavel Dovgalyuk geschrieben:
+> 
+> > Record/replay without this option uses '-snapshot' to preserve
+> > the state of the disk images.
+> >
+> > > Anyway, it seems that doing things manually is the safe way as long as
+> > > we don't know the final solution, so I think I agree.
+> > >
+> > > For a slightly more convenient way, one of the problems to solve seems
+> > > to be that snapshot=on always affects the top level node and you can't
+> > > create a temporary snapshot in the middle of the chain. Perhaps we
+> > > should introduce a 'temporary-overlay' driver or something like that, so
+> > > that you could specify things like this:
+> > >
+> > >     -drive if=none,driver=file,filename=test.img,id=orig
+> > >     -drive if=none,driver=temporary-overlay,file=orig,id=snap
+> > >     -drive if=none,driver=blkreplay,image=snap
+> >
+> > This seems reasonable for manual way.
+> 
+> Maybe another, easier to implement option could be something like this:
+> 
+>     -drive if=none,driver=file,filename=test.img,snapshot=on,overlay.node-name=snap
+>     -drive if=none,driver=blkreplay,image=snap
+> 
+> It would require that we implement support for overlay.* options like we
+> already support backing.* options. Allowing to specify options for the
+> overlay node is probably nice to have anyway.
+> 
+> However, there could be a few tricky parts there. For example, what
+> happens if someone uses overlay.backing=something-else? Perhaps
+> completely disallowing backing and backing.* for overlays would already
+> solve this.
+> 
+> > > Which makes me wonder... Is blkreplay usable without the temporary
+> > > snapshot or is this pretty much a requirement?
+> >
+> > It's not a requirement. But to make replay deterministic we have to
+> > start with the same image every time. As I know, this may be achieved by:
+> > 1. Restoring original disk image manually
+> > 2. Using vm snapshot to start execution from
+> > 3. Using -snapshot option
+> > 4. Not using disks at all
+> >
+> > > Because if it has to be
+> > > there, the next step could be that blkreplay creates temporary-overlay
+> > > internally in its .bdrv_open().
+> >
+> > Here is your answer about such an approach :)
+> > https://lists.gnu.org/archive/html/qemu-devel/2016-09/msg04687.html
+> 
+> Right, and unfortunately these are still good points.
+> 
+> Especially the part where you allowed to give the overlay filename
+> really needs to work the way it does now with the 'image' option. We
+> might not need to be that strict with temporary overlays, restricting to
+> qcow2 with default options could be acceptable there - but whatever I
+> think of to support both cases results in something that isn't really
+> easier than the manual way that we figured out above.
+
+Can we stop on the following?
+1. Don't create any overlays automatically when user wants to save/restore VM state
+2. In the opposite case create snapshots, but do not use -snapshot option.
+   Snapshots will be created by the blkreplay as in the link specified.
+
+Pavel Dovgalyuk
