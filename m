@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54683)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54741)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cED78-0007EV-P3
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 05:36:51 -0500
+	(envelope-from <peterx@redhat.com>) id 1cED7I-0007Mm-4h
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 05:36:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cED77-0001wG-D7
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 05:36:46 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48106)
+	(envelope-from <peterx@redhat.com>) id 1cED7G-0001xr-CG
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 05:36:56 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46790)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cED77-0001w0-4c
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 05:36:45 -0500
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cED7G-0001xe-2t
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 05:36:54 -0500
 From: Peter Xu <peterx@redhat.com>
-Date: Tue,  6 Dec 2016 18:36:18 +0800
-Message-Id: <1481020588-4245-4-git-send-email-peterx@redhat.com>
+Date: Tue,  6 Dec 2016 18:36:20 +0800
+Message-Id: <1481020588-4245-6-git-send-email-peterx@redhat.com>
 In-Reply-To: <1481020588-4245-1-git-send-email-peterx@redhat.com>
 References: <1481020588-4245-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [RFC PATCH 03/13] intel_iommu: renaming gpa to iova
- where proper
+Subject: [Qemu-devel] [RFC PATCH 05/13] intel_iommu: fix trace for addr
+ translation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,140 +27,241 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, bd.aviv@gmail.com, peterx@redhat.com, alex.williamson@redhat.com, jasowang@redhat.com
 
-There are lots of places in current intel_iommu.c codes that named
-"iova" as "gpa". It is really confusing to use a name "gpa" in these
-places (which is very easily to be understood as "Guest Physical
-Address", while it's not). To make the codes (much) easier to be read, I
-decided to do this once and for all.
-
-No functional change is made. Only literal ones.
+Another patch to convert the DPRINTF() stuffs. This patch focuses on the
+address translation path and caching.
 
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- hw/i386/intel_iommu.c | 46 +++++++++++++++++++++++-----------------------
- 1 file changed, 23 insertions(+), 23 deletions(-)
+ hw/i386/intel_iommu.c | 87 ++++++++++++++++++++++++---------------------------
+ hw/i386/trace-events  |  7 +++++
+ 2 files changed, 48 insertions(+), 46 deletions(-)
 
 diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index f19a8b3..3d98797 100644
+index 35fbfbe..0f8387e 100644
 --- a/hw/i386/intel_iommu.c
 +++ b/hw/i386/intel_iommu.c
-@@ -279,7 +279,7 @@ static void vtd_update_iotlb(IntelIOMMUState *s, uint16_t source_id,
+@@ -280,11 +280,9 @@ static void vtd_update_iotlb(IntelIOMMUState *s, uint16_t source_id,
      uint64_t *key = g_malloc(sizeof(*key));
      uint64_t gfn = vtd_get_iotlb_gfn(addr, level);
  
--    VTD_DPRINTF(CACHE, "update iotlb sid 0x%"PRIx16 " gpa 0x%"PRIx64
-+    VTD_DPRINTF(CACHE, "update iotlb sid 0x%"PRIx16 " iova 0x%"PRIx64
-                 " slpte 0x%"PRIx64 " did 0x%"PRIx16, source_id, addr, slpte,
-                 domain_id);
+-    VTD_DPRINTF(CACHE, "update iotlb sid 0x%"PRIx16 " iova 0x%"PRIx64
+-                " slpte 0x%"PRIx64 " did 0x%"PRIx16, source_id, addr, slpte,
+-                domain_id);
++    trace_vtd_iotlb_page_update(source_id, addr, slpte, domain_id);
      if (g_hash_table_size(s->iotlb) >= VTD_IOTLB_MAX_SIZE) {
-@@ -595,12 +595,12 @@ static uint64_t vtd_get_slpte(dma_addr_t base_addr, uint32_t index)
-     return slpte;
- }
- 
--/* Given a gpa and the level of paging structure, return the offset of current
-- * level.
-+/* Given a iova and the level of paging structure, return the offset
-+ * of current level.
-  */
--static inline uint32_t vtd_gpa_level_offset(uint64_t gpa, uint32_t level)
-+static inline uint32_t vtd_iova_level_offset(uint64_t iova, uint32_t level)
- {
--    return (gpa >> vtd_slpt_level_shift(level)) &
-+    return (iova >> vtd_slpt_level_shift(level)) &
-             ((1ULL << VTD_SL_LEVEL_BITS) - 1);
- }
- 
-@@ -648,13 +648,13 @@ static bool vtd_slpte_nonzero_rsvd(uint64_t slpte, uint32_t level)
+-        VTD_DPRINTF(CACHE, "iotlb exceeds size limit, forced to reset");
++        trace_vtd_iotlb_reset("iotlb exceeds size limit");
+         vtd_reset_iotlb(s);
      }
- }
  
--/* Given the @gpa, get relevant @slptep. @slpte_level will be the last level
-+/* Given the @iova, get relevant @slptep. @slpte_level will be the last level
-  * of the translation, can be used for deciding the size of large page.
-  */
--static int vtd_gpa_to_slpte(VTDContextEntry *ce, uint64_t gpa,
--                            IOMMUAccessFlags flags,
--                            uint64_t *slptep, uint32_t *slpte_level,
--                            bool *reads, bool *writes)
-+static int vtd_iova_to_slpte(VTDContextEntry *ce, uint64_t iova,
-+                             IOMMUAccessFlags flags,
-+                             uint64_t *slptep, uint32_t *slpte_level,
-+                             bool *reads, bool *writes)
- {
-     dma_addr_t addr = vtd_get_slpt_base_from_context(ce);
-     uint32_t level = vtd_get_level_from_context_entry(ce);
-@@ -663,11 +663,11 @@ static int vtd_gpa_to_slpte(VTDContextEntry *ce, uint64_t gpa,
-     uint32_t ce_agaw = vtd_get_agaw_from_context_entry(ce);
-     uint64_t access_right_check = 0;
+@@ -525,8 +523,8 @@ static int vtd_get_root_entry(IntelIOMMUState *s, uint8_t index,
  
--    /* Check if @gpa is above 2^X-1, where X is the minimum of MGAW in CAP_REG
--     * and AW in context-entry.
-+    /* Check if @iova is above 2^X-1, where X is the minimum of MGAW
-+     * in CAP_REG and AW in context-entry.
+     addr = s->root + index * sizeof(*re);
+     if (dma_memory_read(&address_space_memory, addr, re, sizeof(*re))) {
+-        VTD_DPRINTF(GENERAL, "error: fail to access root-entry at 0x%"PRIx64
+-                    " + %"PRIu8, s->root, index);
++        error_report("Fail to access root-entry at 0x%"PRIx64
++                     " index %"PRIu8, s->root, index);
+         re->val = 0;
+         return -VTD_FR_ROOT_TABLE_INV;
+     }
+@@ -545,13 +543,12 @@ static int vtd_get_context_entry_from_root(VTDRootEntry *root, uint8_t index,
+     dma_addr_t addr;
+ 
+     if (!vtd_root_entry_present(root)) {
+-        VTD_DPRINTF(GENERAL, "error: root-entry is not present");
++        error_report("Root-entry is not present");
+         return -VTD_FR_ROOT_ENTRY_P;
+     }
+     addr = (root->val & VTD_ROOT_ENTRY_CTP) + index * sizeof(*ce);
+     if (dma_memory_read(&address_space_memory, addr, ce, sizeof(*ce))) {
+-        VTD_DPRINTF(GENERAL, "error: fail to access context-entry at 0x%"PRIx64
+-                    " + %"PRIu8,
++        error_report("Fail to access context-entry at 0x%"PRIx64" ind %"PRIu8,
+                     (uint64_t)(root->val & VTD_ROOT_ENTRY_CTP), index);
+         return -VTD_FR_CONTEXT_TABLE_INV;
+     }
+@@ -665,7 +662,7 @@ static int vtd_iova_to_slpte(VTDContextEntry *ce, uint64_t iova,
+      * in CAP_REG and AW in context-entry.
       */
--    if (gpa & ~((1ULL << MIN(ce_agaw, VTD_MGAW)) - 1)) {
--        VTD_DPRINTF(GENERAL, "error: gpa 0x%"PRIx64 " exceeds limits", gpa);
-+    if (iova & ~((1ULL << MIN(ce_agaw, VTD_MGAW)) - 1)) {
-+        VTD_DPRINTF(GENERAL, "error: iova 0x%"PRIx64 " exceeds limits", iova);
+     if (iova & ~((1ULL << MIN(ce_agaw, VTD_MGAW)) - 1)) {
+-        VTD_DPRINTF(GENERAL, "error: iova 0x%"PRIx64 " exceeds limits", iova);
++        error_report("IOVA 0x%"PRIx64 " exceeds limits", iova);
          return -VTD_FR_ADDR_BEYOND_MGAW;
      }
  
-@@ -683,13 +683,13 @@ static int vtd_gpa_to_slpte(VTDContextEntry *ce, uint64_t gpa,
-     }
- 
-     while (true) {
--        offset = vtd_gpa_level_offset(gpa, level);
-+        offset = vtd_iova_level_offset(iova, level);
+@@ -685,7 +682,7 @@ static int vtd_iova_to_slpte(VTDContextEntry *ce, uint64_t iova,
          slpte = vtd_get_slpte(addr, offset);
  
          if (slpte == (uint64_t)-1) {
-             VTD_DPRINTF(GENERAL, "error: fail to access second-level paging "
--                        "entry at level %"PRIu32 " for gpa 0x%"PRIx64,
--                        level, gpa);
-+                        "entry at level %"PRIu32 " for iova 0x%"PRIx64,
-+                        level, iova);
+-            VTD_DPRINTF(GENERAL, "error: fail to access second-level paging "
++            error_report("Fail to access second-level paging "
+                         "entry at level %"PRIu32 " for iova 0x%"PRIx64,
+                         level, iova);
              if (level == vtd_get_level_from_context_entry(ce)) {
-                 /* Invalid programming of context-entry */
-                 return -VTD_FR_CONTEXT_ENTRY_INV;
-@@ -701,8 +701,8 @@ static int vtd_gpa_to_slpte(VTDContextEntry *ce, uint64_t gpa,
+@@ -698,13 +695,13 @@ static int vtd_iova_to_slpte(VTDContextEntry *ce, uint64_t iova,
+         *reads = (*reads) && (slpte & VTD_SL_R);
          *writes = (*writes) && (slpte & VTD_SL_W);
          if (!(slpte & access_right_check) && !(flags & IOMMU_NO_FAIL)) {
-             VTD_DPRINTF(GENERAL, "error: lack of %s permission for "
--                        "gpa 0x%"PRIx64 " slpte 0x%"PRIx64,
--                        (flags & IOMMU_WO ? "write" : "read"), gpa, slpte);
-+                        "iova 0x%"PRIx64 " slpte 0x%"PRIx64,
-+                        (flags & IOMMU_WO ? "write" : "read"), iova, slpte);
+-            VTD_DPRINTF(GENERAL, "error: lack of %s permission for "
+-                        "iova 0x%"PRIx64 " slpte 0x%"PRIx64,
+-                        (flags & IOMMU_WO ? "write" : "read"), iova, slpte);
++            error_report("Lack of %s permission for iova 0x%"PRIx64
++                         " slpte 0x%"PRIx64,
++                         (flags & IOMMU_WO ? "write" : "read"), iova, slpte);
              return (flags & IOMMU_WO) ? -VTD_FR_WRITE : -VTD_FR_READ;
          }
          if (vtd_slpte_nonzero_rsvd(slpte, level)) {
-@@ -851,7 +851,7 @@ static void vtd_do_iommu_translate(VTDAddressSpace *vtd_as, PCIBus *bus,
+-            VTD_DPRINTF(GENERAL, "error: non-zero reserved field in second "
++            error_report("Non-zero reserved field in second "
+                         "level paging entry level %"PRIu32 " slpte 0x%"PRIx64,
+                         level, slpte);
+             return -VTD_FR_PAGING_ENTRY_RSVD;
+@@ -733,12 +730,13 @@ static int vtd_dev_to_context_entry(IntelIOMMUState *s, uint8_t bus_num,
+     }
+ 
+     if (!vtd_root_entry_present(&re)) {
+-        VTD_DPRINTF(GENERAL, "error: root-entry #%"PRIu8 " is not present",
+-                    bus_num);
++        /* Not error - it's okay we don't have root entry. */
++        trace_vtd_re_not_present(bus_num);
+         return -VTD_FR_ROOT_ENTRY_P;
+     } else if (re.rsvd || (re.val & VTD_ROOT_ENTRY_RSVD)) {
+-        VTD_DPRINTF(GENERAL, "error: non-zero reserved field in root-entry "
+-                    "hi 0x%"PRIx64 " lo 0x%"PRIx64, re.rsvd, re.val);
++        error_report("Non-zero reserved field in root-entry bus_num %d "
++                     "hi 0x%"PRIx64 " lo 0x%"PRIx64,
++                     bus_num, re.rsvd, re.val);
+         return -VTD_FR_ROOT_ENTRY_RSVD;
+     }
+ 
+@@ -748,27 +746,25 @@ static int vtd_dev_to_context_entry(IntelIOMMUState *s, uint8_t bus_num,
+     }
+ 
+     if (!vtd_context_entry_present(ce)) {
+-        VTD_DPRINTF(GENERAL,
+-                    "error: context-entry #%"PRIu8 "(bus #%"PRIu8 ") "
+-                    "is not present", devfn, bus_num);
++        /* Not error - it's okay we don't have context entry. */
++        trace_vtd_ce_not_present(bus_num, devfn);
+         return -VTD_FR_CONTEXT_ENTRY_P;
+     } else if ((ce->hi & VTD_CONTEXT_ENTRY_RSVD_HI) ||
+                (ce->lo & VTD_CONTEXT_ENTRY_RSVD_LO)) {
+-        VTD_DPRINTF(GENERAL,
+-                    "error: non-zero reserved field in context-entry "
++        error_report("Non-zero reserved field in context-entry"
+                     "hi 0x%"PRIx64 " lo 0x%"PRIx64, ce->hi, ce->lo);
+         return -VTD_FR_CONTEXT_ENTRY_RSVD;
+     }
+     /* Check if the programming of context-entry is valid */
+     if (!vtd_is_level_supported(s, vtd_get_level_from_context_entry(ce))) {
+-        VTD_DPRINTF(GENERAL, "error: unsupported Address Width value in "
+-                    "context-entry hi 0x%"PRIx64 " lo 0x%"PRIx64,
+-                    ce->hi, ce->lo);
++        error_report("Unsupported Address Width value in "
++                     "context-entry hi 0x%"PRIx64 " lo 0x%"PRIx64,
++                     ce->hi, ce->lo);
+         return -VTD_FR_CONTEXT_ENTRY_INV;
+     } else if (ce->lo & VTD_CONTEXT_ENTRY_TT) {
+-        VTD_DPRINTF(GENERAL, "error: unsupported Translation Type in "
+-                    "context-entry hi 0x%"PRIx64 " lo 0x%"PRIx64,
+-                    ce->hi, ce->lo);
++        error_report("Unsupported Translation Type in "
++                     "context-entry hi 0x%"PRIx64 " lo 0x%"PRIx64,
++                     ce->hi, ce->lo);
+         return -VTD_FR_CONTEXT_ENTRY_INV;
+     }
+     return 0;
+@@ -849,9 +845,8 @@ static void vtd_do_iommu_translate(VTDAddressSpace *vtd_as, PCIBus *bus,
      /* Try to fetch slpte form IOTLB */
      iotlb_entry = vtd_lookup_iotlb(s, source_id, addr);
      if (iotlb_entry) {
--        VTD_DPRINTF(CACHE, "hit iotlb sid 0x%"PRIx16 " gpa 0x%"PRIx64
-+        VTD_DPRINTF(CACHE, "hit iotlb sid 0x%"PRIx16 " iova 0x%"PRIx64
-                     " slpte 0x%"PRIx64 " did 0x%"PRIx16, source_id, addr,
-                     iotlb_entry->slpte, iotlb_entry->domain_id);
+-        VTD_DPRINTF(CACHE, "hit iotlb sid 0x%"PRIx16 " iova 0x%"PRIx64
+-                    " slpte 0x%"PRIx64 " did 0x%"PRIx16, source_id, addr,
+-                    iotlb_entry->slpte, iotlb_entry->domain_id);
++        trace_vtd_iotlb_page_hit(source_id, addr, iotlb_entry->slpte,
++                                 iotlb_entry->domain_id);
          slpte = iotlb_entry->slpte;
-@@ -894,8 +894,8 @@ static void vtd_do_iommu_translate(VTDAddressSpace *vtd_as, PCIBus *bus,
+         reads = iotlb_entry->read_flags;
+         writes = iotlb_entry->write_flags;
+@@ -860,10 +855,9 @@ static void vtd_do_iommu_translate(VTDAddressSpace *vtd_as, PCIBus *bus,
+     }
+     /* Try to fetch context-entry from cache first */
+     if (cc_entry->context_cache_gen == s->context_cache_gen) {
+-        VTD_DPRINTF(CACHE, "hit context-cache bus %d devfn %d "
+-                    "(hi %"PRIx64 " lo %"PRIx64 " gen %"PRIu32 ")",
+-                    bus_num, devfn, cc_entry->context_entry.hi,
+-                    cc_entry->context_entry.lo, cc_entry->context_cache_gen);
++        trace_vtd_iotlb_cc_hit(bus_num, devfn, cc_entry->context_entry.hi,
++                               cc_entry->context_entry.lo,
++                               cc_entry->context_cache_gen);
+         ce = cc_entry->context_entry;
+         is_fpd_set = ce.lo & VTD_CONTEXT_ENTRY_FPD;
+     } else {
+@@ -873,9 +867,9 @@ static void vtd_do_iommu_translate(VTDAddressSpace *vtd_as, PCIBus *bus,
+             ret_fr = -ret_fr;
+             if (!(flags & IOMMU_NO_FAIL)) {
+                 if (is_fpd_set && vtd_is_qualified_fault(ret_fr)) {
+-                    VTD_DPRINTF(FLOG, "fault processing is disabled for DMA "
+-                            "requests through this context-entry "
+-                            "(with FPD Set)");
++                    error_report("Fault processing is disabled for DMA "
++                                 "requests through this context-entry "
++                                 "(with FPD Set)");
+                 } else {
+                     vtd_report_dmar_fault(s, source_id, addr, ret_fr,
+                             flags & IOMMU_WO);
+@@ -884,10 +878,9 @@ static void vtd_do_iommu_translate(VTDAddressSpace *vtd_as, PCIBus *bus,
+             return;
+         }
+         /* Update context-cache */
+-        VTD_DPRINTF(CACHE, "update context-cache bus %d devfn %d "
+-                    "(hi %"PRIx64 " lo %"PRIx64 " gen %"PRIu32 "->%"PRIu32 ")",
+-                    bus_num, devfn, ce.hi, ce.lo,
+-                    cc_entry->context_cache_gen, s->context_cache_gen);
++        trace_vtd_iotlb_cc_update(bus_num, devfn, ce.hi, ce.lo,
++                                  cc_entry->context_cache_gen,
++                                  s->context_cache_gen);
+         cc_entry->context_entry = ce;
          cc_entry->context_cache_gen = s->context_cache_gen;
      }
- 
--    ret_fr = vtd_gpa_to_slpte(&ce, addr, flags, &slpte, &level,
--                              &reads, &writes);
-+    ret_fr = vtd_iova_to_slpte(&ce, addr, flags, &slpte, &level,
-+                               &reads, &writes);
-     if (ret_fr) {
+@@ -898,8 +891,9 @@ static void vtd_do_iommu_translate(VTDAddressSpace *vtd_as, PCIBus *bus,
          ret_fr = -ret_fr;
          if (!(flags & IOMMU_NO_FAIL)) {
-@@ -2032,7 +2032,7 @@ static IOMMUTLBEntry vtd_iommu_translate(MemoryRegion *iommu, hwaddr addr,
-                            flags, &ret);
-     VTD_DPRINTF(MMU,
-                 "bus %"PRIu8 " slot %"PRIu8 " func %"PRIu8 " devfn %"PRIu8
--                " gpa 0x%"PRIx64 " hpa 0x%"PRIx64, pci_bus_num(vtd_as->bus),
-+                " iova 0x%"PRIx64 " hpa 0x%"PRIx64, pci_bus_num(vtd_as->bus),
-                 VTD_PCI_SLOT(vtd_as->devfn), VTD_PCI_FUNC(vtd_as->devfn),
-                 vtd_as->devfn, addr, ret.translated_addr);
-     return ret;
+             if (is_fpd_set && vtd_is_qualified_fault(ret_fr)) {
+-                VTD_DPRINTF(FLOG, "fault processing is disabled for DMA "
+-                        "requests through this context-entry (with FPD Set)");
++                error_report("Fault processing is disabled for DMA "
++                             "requests through this context-entry "
++                             "(with FPD Set)");
+             } else {
+                 vtd_report_dmar_fault(s, source_id, addr, ret_fr, flags);
+             }
+@@ -1060,6 +1054,7 @@ static uint64_t vtd_context_cache_invalidate(IntelIOMMUState *s, uint64_t val)
+ 
+ static void vtd_iotlb_global_invalidate(IntelIOMMUState *s)
+ {
++    trace_vtd_iotlb_reset("global invalidation recved");
+     vtd_reset_iotlb(s);
+ }
+ 
+diff --git a/hw/i386/trace-events b/hw/i386/trace-events
+index c83ebae..e64a4e2 100644
+--- a/hw/i386/trace-events
++++ b/hw/i386/trace-events
+@@ -21,6 +21,13 @@ vtd_inv_desc_iotlb_domain(uint16_t domain) "iotlb invalidate whole domain 0x%"PR
+ vtd_inv_desc_iotlb_pages(uint16_t domain, uint64_t addr, uint8_t mask) "iotlb invalidate domain 0x%"PRIx16" addr 0x%"PRIx64" mask 0x%"PRIx8
+ vtd_inv_desc_wait_sw(uint64_t addr, uint32_t data) "wait invalidate status write addr 0x%"PRIx64" data 0x%"PRIx32
+ vtd_inv_desc_wait_irq(const char *msg) "%s"
++vtd_re_not_present(uint8_t bus) "Root entry bus %"PRIu8" not present"
++vtd_ce_not_present(uint8_t bus, uint8_t devfn) "Context entry bus %"PRIu8" devfn %"PRIu8" not present"
++vtd_iotlb_page_hit(uint16_t sid, uint64_t addr, uint64_t slpte, uint16_t domain) "IOTLB page hit sid 0x%"PRIx16" iova 0x%"PRIx64" slpte 0x%"PRIx64" domain 0x%"PRIx16
++vtd_iotlb_page_update(uint16_t sid, uint64_t addr, uint64_t slpte, uint16_t domain) "IOTLB page update sid 0x%"PRIx16" iova 0x%"PRIx64" slpte 0x%"PRIx64" domain 0x%"PRIx16
++vtd_iotlb_cc_hit(uint8_t bus, uint8_t devfn, uint64_t high, uint64_t low, uint32_t gen) "IOTLB context hit bus 0x%"PRIx8" devfn 0x%"PRIx8" high 0x%"PRIx64" low 0x%"PRIx64" gen %"PRIu32
++vtd_iotlb_cc_update(uint8_t bus, uint8_t devfn, uint64_t high, uint64_t low, uint32_t gen1, uint32_t gen2) "IOTLB context update bus 0x%"PRIx8" devfn 0x%"PRIx8" high 0x%"PRIx64" low 0x%"PRIx64" gen %"PRIu32" -> gen %"PRIu32
++vtd_iotlb_reset(const char *reason) "IOTLB reset (reason: %s)"
+ 
+ # hw/i386/amd_iommu.c
+ amdvi_evntlog_fail(uint64_t addr, uint32_t head) "error: fail to write at addr 0x%"PRIx64" +  offset 0x%"PRIx32
 -- 
 2.7.4
