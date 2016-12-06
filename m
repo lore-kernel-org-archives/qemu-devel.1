@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53317)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59620)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1cE4UF-0007nC-C5
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 20:24:04 -0500
+	(envelope-from <PSIRT@huawei.com>) id 1cE4zz-0004dk-9E
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 20:56:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1cE4UA-0007ZE-Ca
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 20:24:03 -0500
-Received: from [45.249.212.188] (port=2428 helo=dggrg02-dlp.huawei.com)
+	(envelope-from <PSIRT@huawei.com>) id 1cE4zw-0002kv-8A
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 20:56:51 -0500
+Received: from szxga02-in.huawei.com ([119.145.14.65]:1242)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1cE4U9-0007Ye-DO
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 20:23:58 -0500
-From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Date: Tue, 6 Dec 2016 01:23:31 +0000
-Message-ID: <33183CC9F5247A488A2544077AF19020DA153D9F@DGGEMA505-MBX.china.huawei.com>
-References: <1480928380-161760-1-git-send-email-longpeng2@huawei.com>
-	<1480928380-161760-2-git-send-email-longpeng2@huawei.com>
-	<20161205091842.GA2498@redhat.com>
-	<33183CC9F5247A488A2544077AF19020DA152B60@DGGEMA505-MBX.china.huawei.com>
-	<20161205165905.GR2498@redhat.com>
-In-Reply-To: <20161205165905.GR2498@redhat.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <PSIRT@huawei.com>) id 1cE4zv-0002jc-L2
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 20:56:48 -0500
+From: Huawei PSIRT <psirt@huawei.com>
+References: <cb06a932a7c6b29bc6eb0d35f31766bfb0bba47f.1480962799.git.alistair.francis@xilinx.com>
+In-Reply-To: <cb06a932a7c6b29bc6eb0d35f31766bfb0bba47f.1480962799.git.alistair.francis@xilinx.com>
+Date: Tue, 6 Dec 2016 09:56:14 +0800
+Message-ID: <002301d24f63$ee1a8e00$ca4faa00$@com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH for-2.9 1/3] crypto: add standard des
- support
+Content-Type: text/plain; charset="gb2312"
+Content-Transfer-Encoding: quoted-printable
+Content-Language: zh-cn
+Subject: Re: [Qemu-devel] [PATCH for 2.8 v3 1/1] cadence_uart: Check baud
+ rate generator and divider values on migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,89 +28,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: longpeng <longpeng2@huawei.com>, "eblake@redhat.com" <eblake@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Wubin (H)" <wu.wubin@huawei.com>, "Zhoujian (jay,
-	Euler)" <jianjay.zhou@huawei.com>
+To: alistair.francis@xilinx.com, qemu-devel@nongnu.org, peter.maydell@linaro.org
+Cc: alistair23@gmail.com, pjp@fedoraproject.org, "Jiangxin (hunter, SCC)" <jiangxin1@huawei.com>, Huawei PSIRT <PSIRT@huawei.com>, "Wanglijun (PSIRT)" <wanglijun.wanglijun@huawei.com>
 
-Pg0KPiBGcm9tOiBEYW5pZWwgUC4gQmVycmFuZ2UgW21haWx0bzpiZXJyYW5nZUByZWRoYXQuY29t
-XQ0KPiBTZW50OiBUdWVzZGF5LCBEZWNlbWJlciAwNiwgMjAxNiAxMjo1OSBBTQ0KPiBUbzogR29u
-Z2xlaSAoQXJlaSkNCj4gQ2M6IGxvbmdwZW5nOyBlYmxha2VAcmVkaGF0LmNvbTsgYXJtYnJ1QHJl
-ZGhhdC5jb207DQo+IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZzsgV3ViaW4gKEgpOyBaaG91amlhbiAo
-amF5LCBFdWxlcikNCj4gU3ViamVjdDogUmU6IFtQQVRDSCBmb3ItMi45IDEvM10gY3J5cHRvOiBh
-ZGQgc3RhbmRhcmQgZGVzIHN1cHBvcnQNCj4gDQo+IE9uIE1vbiwgRGVjIDA1LCAyMDE2IGF0IDA5
-OjI5OjU5QU0gKzAwMDAsIEdvbmdsZWkgKEFyZWkpIHdyb3RlOg0KPiA+ID4NCj4gPiA+ID4gICAg
-ICBzd2l0Y2ggKGFsZykgew0KPiA+ID4gPiArICAgIGNhc2UgUUNSWVBUT19DSVBIRVJfQUxHX0RF
-UzoNCj4gPiA+ID4gICAgICBjYXNlIFFDUllQVE9fQ0lQSEVSX0FMR19ERVNfUkZCOg0KPiA+ID4g
-PiAgICAgIGNhc2UgUUNSWVBUT19DSVBIRVJfQUxHX0FFU18xMjg6DQo+ID4gPiA+ICAgICAgY2Fz
-ZSBRQ1JZUFRPX0NJUEhFUl9BTEdfQUVTXzE5MjoNCj4gPiA+ID4gQEAgLTI1NiwxMSArMjU3LDE3
-IEBAIFFDcnlwdG9DaXBoZXINCj4gPiA+ICpxY3J5cHRvX2NpcGhlcl9uZXcoUUNyeXB0b0NpcGhl
-ckFsZ29yaXRobSBhbGcsDQo+ID4gPiA+ICAgICAgY3R4ID0gZ19uZXcwKFFDcnlwdG9DaXBoZXJO
-ZXR0bGUsIDEpOw0KPiA+ID4gPg0KPiA+ID4gPiAgICAgIHN3aXRjaCAoYWxnKSB7DQo+ID4gPiA+
-ICsgICAgY2FzZSBRQ1JZUFRPX0NJUEhFUl9BTEdfREVTOg0KPiA+ID4gPiAgICAgIGNhc2UgUUNS
-WVBUT19DSVBIRVJfQUxHX0RFU19SRkI6DQo+ID4gPiA+ICAgICAgICAgIGN0eC0+Y3R4ID0gZ19u
-ZXcwKHN0cnVjdCBkZXNfY3R4LCAxKTsNCj4gPiA+ID4gLSAgICAgICAgcmZia2V5ID0gcWNyeXB0
-b19jaXBoZXJfbXVuZ2VfZGVzX3JmYl9rZXkoa2V5LCBua2V5KTsNCj4gPiA+ID4gLSAgICAgICAg
-ZGVzX3NldF9rZXkoY3R4LT5jdHgsIHJmYmtleSk7DQo+ID4gPiA+IC0gICAgICAgIGdfZnJlZShy
-ZmJrZXkpOw0KPiA+ID4gPiArDQo+ID4gPiA+ICsgICAgICAgIGlmIChhbGcgPT0gUUNSWVBUT19D
-SVBIRVJfQUxHX0RFU19SRkIpIHsNCj4gPiA+ID4gKyAgICAgICAgICAgIHJmYmtleSA9IHFjcnlw
-dG9fY2lwaGVyX211bmdlX2Rlc19yZmJfa2V5KGtleSwgbmtleSk7DQo+ID4gPiA+ICsgICAgICAg
-ICAgICBkZXNfc2V0X2tleShjdHgtPmN0eCwgcmZia2V5KTsNCj4gPiA+ID4gKyAgICAgICAgICAg
-IGdfZnJlZShyZmJrZXkpOw0KPiA+ID4gPiArICAgICAgICB9IGVsc2Ugew0KPiA+ID4gPiArICAg
-ICAgICAgICAgZGVzX3NldF9rZXkoY3R4LT5jdHgsIGtleSk7DQo+ID4gPiA+ICsgICAgICAgIH0N
-Cj4gPiA+ID4NCj4gPiA+ID4gICAgICAgICAgY3R4LT5hbGdfZW5jcnlwdF9uYXRpdmUgPSBkZXNf
-ZW5jcnlwdF9uYXRpdmU7DQo+ID4gPiA+ICAgICAgICAgIGN0eC0+YWxnX2RlY3J5cHRfbmF0aXZl
-ID0gZGVzX2RlY3J5cHRfbmF0aXZlOw0KPiA+ID4gPiBkaWZmIC0tZ2l0IGEvY3J5cHRvL2NpcGhl
-ci5jIGIvY3J5cHRvL2NpcGhlci5jDQo+ID4gPiA+IGluZGV4IGE5YmNhNDEuLjAwZDk2ODIgMTAw
-NjQ0DQo+ID4gPiA+IC0tLSBhL2NyeXB0by9jaXBoZXIuYw0KPiA+ID4gPiArKysgYi9jcnlwdG8v
-Y2lwaGVyLmMNCj4gPiA+ID4gQEAgLTI3LDYgKzI3LDcgQEAgc3RhdGljIHNpemVfdA0KPiA+ID4g
-YWxnX2tleV9sZW5bUUNSWVBUT19DSVBIRVJfQUxHX19NQVhdID0gew0KPiA+ID4gPiAgICAgIFtR
-Q1JZUFRPX0NJUEhFUl9BTEdfQUVTXzEyOF0gPSAxNiwNCj4gPiA+ID4gICAgICBbUUNSWVBUT19D
-SVBIRVJfQUxHX0FFU18xOTJdID0gMjQsDQo+ID4gPiA+ICAgICAgW1FDUllQVE9fQ0lQSEVSX0FM
-R19BRVNfMjU2XSA9IDMyLA0KPiA+ID4gPiArICAgIFtRQ1JZUFRPX0NJUEhFUl9BTEdfREVTXSA9
-IDgsDQo+ID4gPiA+ICAgICAgW1FDUllQVE9fQ0lQSEVSX0FMR19ERVNfUkZCXSA9IDgsDQo+ID4g
-PiA+ICAgICAgW1FDUllQVE9fQ0lQSEVSX0FMR19DQVNUNV8xMjhdID0gMTYsDQo+ID4gPiA+ICAg
-ICAgW1FDUllQVE9fQ0lQSEVSX0FMR19TRVJQRU5UXzEyOF0gPSAxNiwNCj4gPiA+ID4gQEAgLTQx
-LDYgKzQyLDcgQEAgc3RhdGljIHNpemVfdA0KPiA+ID4gYWxnX2Jsb2NrX2xlbltRQ1JZUFRPX0NJ
-UEhFUl9BTEdfX01BWF0gPSB7DQo+ID4gPiA+ICAgICAgW1FDUllQVE9fQ0lQSEVSX0FMR19BRVNf
-MTI4XSA9IDE2LA0KPiA+ID4gPiAgICAgIFtRQ1JZUFRPX0NJUEhFUl9BTEdfQUVTXzE5Ml0gPSAx
-NiwNCj4gPiA+ID4gICAgICBbUUNSWVBUT19DSVBIRVJfQUxHX0FFU18yNTZdID0gMTYsDQo+ID4g
-PiA+ICsgICAgW1FDUllQVE9fQ0lQSEVSX0FMR19ERVNdID0gOCwNCj4gPiA+ID4gICAgICBbUUNS
-WVBUT19DSVBIRVJfQUxHX0RFU19SRkJdID0gOCwNCj4gPiA+ID4gICAgICBbUUNSWVBUT19DSVBI
-RVJfQUxHX0NBU1Q1XzEyOF0gPSA4LA0KPiA+ID4gPiAgICAgIFtRQ1JZUFRPX0NJUEhFUl9BTEdf
-U0VSUEVOVF8xMjhdID0gMTYsDQo+ID4gPiA+IEBAIC0xMDcsNyArMTA5LDggQEANCj4gPiA+IHFj
-cnlwdG9fY2lwaGVyX3ZhbGlkYXRlX2tleV9sZW5ndGgoUUNyeXB0b0NpcGhlckFsZ29yaXRobSBh
-bGcsDQo+ID4gPiA+ICAgICAgfQ0KPiA+ID4gPg0KPiA+ID4gPiAgICAgIGlmIChtb2RlID09IFFD
-UllQVE9fQ0lQSEVSX01PREVfWFRTKSB7DQo+ID4gPiA+IC0gICAgICAgIGlmIChhbGcgPT0gUUNS
-WVBUT19DSVBIRVJfQUxHX0RFU19SRkIpIHsNCj4gPiA+ID4gKyAgICAgICAgaWYgKGFsZyA9PSBR
-Q1JZUFRPX0NJUEhFUl9BTEdfREVTX1JGQg0KPiA+ID4gPiArICAgICAgICAgICAgfHwgYWxnID09
-IFFDUllQVE9fQ0lQSEVSX0FMR19ERVMpIHsNCj4gPiA+ID4gICAgICAgICAgICAgIGVycm9yX3Nl
-dGcoZXJycCwgIlhUUyBtb2RlIG5vdCBjb21wYXRpYmxlIHdpdGgNCj4gREVTLVJGQiIpOw0KPiA+
-ID4gPiAgICAgICAgICAgICAgcmV0dXJuIGZhbHNlOw0KPiA+ID4gPiAgICAgICAgICB9DQo+ID4g
-PiA+IGRpZmYgLS1naXQgYS9xYXBpL2NyeXB0by5qc29uIGIvcWFwaS9jcnlwdG8uanNvbg0KPiA+
-ID4gPiBpbmRleCA1YzlkN2Q0Li5kNDAzYWI5IDEwMDY0NA0KPiA+ID4gPiAtLS0gYS9xYXBpL2Ny
-eXB0by5qc29uDQo+ID4gPiA+ICsrKyBiL3FhcGkvY3J5cHRvLmpzb24NCj4gPiA+ID4gQEAgLTc1
-LDcgKzc1LDcgQEANCj4gPiA+ID4gIHsgJ2VudW0nOiAnUUNyeXB0b0NpcGhlckFsZ29yaXRobScs
-DQo+ID4gPiA+ICAgICdwcmVmaXgnOiAnUUNSWVBUT19DSVBIRVJfQUxHJywNCj4gPiA+ID4gICAg
-J2RhdGEnOiBbJ2Flcy0xMjgnLCAnYWVzLTE5MicsICdhZXMtMjU2JywNCj4gPiA+ID4gLSAgICAg
-ICAgICAgJ2Rlcy1yZmInLA0KPiA+ID4gPiArICAgICAgICAgICAnZGVzLXJmYicsICdkZXMnLA0K
-PiA+ID4NCj4gPiA+IENhbiB3ZSBjYWxsIHRoaXMgJzNkZXMnIHRvIG1ha2UgaXQgY2xlYXIgdGhh
-dCB0aGlzIGlzIFRyaXBsZS1ERVMgYW5kIG5vdA0KPiA+ID4gdGhlIHNpbmdsZS1ERVMgKHdoaWNo
-IGRlcy1yZmIgaXMpDQo+ID4gPg0KPiA+IEFjdHVhbGx5IHRoZSBjdXJyZW50IGRlcyBpcyBub3Qg
-dHJpcGxlLURFUywganVzdCB0aGUgc2luZ2xlLURFUywgYW5kIGRlcy1yZmIgaW4NCj4gUUVNVSBp
-cyBqdXN0IGEgdmFyaWFudCBvZg0KPiA+IHNpbmdsZSBERVMsIHdoaWNoIGNoYW5nZSB0aGUgc3Rh
-bmRhcmQga2V5IGJ5IGNhbGxpbmcNCj4gcWNyeXB0b19jaXBoZXJfbXVuZ2VfZGVzX3JmYl9rZXko
-KS4NCj4gPg0KPiA+IEkgdGhpbmsgd2UgY2FuIGFkZCB0aGUgM2RlcyBzdXBwb3J0IGFzIHdlbGwg
-aW4gdGhlIG5leHQgc3RlcC4NCj4gPg0KPiA+IFRoZSBjdXJyZW50IHNpbmdsZS1ERVMgaW4gdGhl
-IHBhdGNoIHNldCBpcyBvayB0byBtZS4gOikNCj4gDQo+IFBlciBteSBvdGhyZSByZXBseSBpbiB0
-aGlzIHRocmVhZCwNCg0KSSBzYXcgdGhhdCwgdGhhbmtzIGZvciB5b3VyIGluZm9ybWF0aW9uLCBE
-YW5pZWwuDQoNCj4gSSBkb24ndCB0aGluayB3ZSBzaG91bGQgYmUgc3VwcG9ydGluZw0KPiBzaW5n
-bGUtREVTIGF0IGFsbCBpbiBRRU1VIC8gY3J5cHRvZGV2LiBTbyBJTUhPLCB0aGUgY29ycmVjdCBm
-aXggaXMgdG8NCj4gcmVtb3ZlIHRoZSBzaW5nbGUtREVTIHN1cHBvcnQgZnJvbSBjcnlwdG9kZXYg
-ZW50aXJlbHkNCj4gDQpUaGUgY3J5cHRvZGV2LWJ1aWx0aW4gaXMgb25lIGtpbmQgb2YgY3J5cHRv
-ZGV2IGJhY2tlbmRzLiBJdCBwcm92aWRlcyB0aGUNCnJlYWwgY3J5cHRvIGNhcGFiaWxpdHkgZm9y
-IHZpcnRpbyBjcnlwdG8gZGV2aWNlLg0KIA0KSSBkb24ndCB0aGluayB3ZSBzaG91bGQgYXJ0aWZp
-Y2lhbGx5IHJlbW92ZSBvbmUgYWxnb3JpdGhtIHN1cHBvcnQgaWYNCnRoZSBmcm9udGVuZCBkcml2
-ZXIgKHVzZXJzKSB3YW50cyB0byB1c2UgaXQsIHRob3VnaCB0aGUgYWxnb3JpdGhtIGlzDQp1bnNh
-ZmUuDQoNCk9mIGNvdXJzZSwgaWYgdGhlIFFFTVUgY3J5cHRvIEFQSSBkb2Vzbid0IHByb3ZpZGUg
-c2luZ2xlLURFUyBzdXBwb3J0LA0Kd2Ugc2hvdWxkIHJlbW92ZSBpdCBmcm9tIHRoZSBjcnlwdG9k
-ZXYtYnVpbHRpbiBiYWNrZW5kIGFzIHdlbGwuIDspDQoNClJlZ2FyZHMsDQotR29uZ2xlaQ0K
+Dear Alistair francis,
+
+As the issue is found by Jiangxin from Huawei test team, could you =
+please
+change the "Reported-by" to Jiangxin <jiangxin1@huawei.com>, thank you.
+And keep Jiangxin <jiangxin1@huawei.com> in the email loop, thank you.
+
+Best regards,
+Huawei PSIRT
+
+-----=D3=CA=BC=FE=D4=AD=BC=FE-----
+=B7=A2=BC=FE=C8=CB: Alistair Francis =
+[mailto:alistair.francis@xilinx.com]=20
+=B7=A2=CB=CD=CA=B1=BC=E4: 2016=C4=EA12=D4=C26=C8=D5 2:35
+=CA=D5=BC=FE=C8=CB: qemu-devel@nongnu.org; peter.maydell@linaro.org
+=B3=AD=CB=CD: alistair.francis@xilinx.com; alistair23@gmail.com;
+pjp@fedoraproject.org; psirt@huawei.com
+=D6=F7=CC=E2: [PATCH for 2.8 v3 1/1] cadence_uart: Check baud rate =
+generator and
+divider values on migration
+
+The Cadence UART device emulator calculates speed by dividing the baud =
+rate
+by a 'baud rate generator' & 'baud rate divider' value.
+The device specification defines these register values to be non-zero =
+and
+within certain limits. Checks were recently added when writing to these
+registers but not when restoring from migration.
+
+This patch adds checks when restoring from migration to avoid divide by =
+zero
+errors.
+
+Reported-by: Huawei PSIRT <psirt@huawei.com>
+Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+---
+It would be nice to squeeze this into 2.8 if possible.
+
+V3:
+ - Fix broken migration logic
+ - Manually double checked and it passes migration.
+V2:
+ - Abort the migration if the data is invalid
+
+ hw/char/cadence_uart.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/hw/char/cadence_uart.c b/hw/char/cadence_uart.c index =
+0215d65..
+ce9063b 100644
+--- a/hw/char/cadence_uart.c
++++ b/hw/char/cadence_uart.c
+@@ -502,6 +502,13 @@ static int cadence_uart_post_load(void *opaque, int
+version_id)  {
+     CadenceUARTState *s =3D opaque;
+=20
++    /* Ensure these two aren't invalid numbers */
++    if (s->r[R_BRGR] <=3D 1 || s->r[R_BRGR] & ~0xFFFF ||
++        s->r[R_BDIV] <=3D 3 || s->r[R_BDIV] & ~0xFF) {
++        /* Value is invalid, abort */
++        return 1;
++    }
++
+     uart_parameters_setup(s);
+     uart_update_status(s);
+     return 0;
+--
+2.7.4
