@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44986)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47064)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cECSe-0006bD-Nr
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 04:54:57 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cECX6-0001Nt-MP
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 04:59:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cECSb-00022f-Lo
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 04:54:56 -0500
-Received: from 3.mo4.mail-out.ovh.net ([46.105.57.129]:38615)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cECSb-000224-ER
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 04:54:53 -0500
-Received: from player762.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id D3DFF21B5B
-	for <qemu-devel@nongnu.org>; Tue,  6 Dec 2016 10:54:51 +0100 (CET)
-Date: Tue, 6 Dec 2016 10:54:41 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20161206105441.6f51a1f4@bahia>
-In-Reply-To: <20161206094708.GE12630@stefanha-x1.localdomain>
-References: <148095126363.31351.4484514300033863622.stgit@bahia>
-	<20161206094708.GE12630@stefanha-x1.localdomain>
+	(envelope-from <kwolf@redhat.com>) id 1cECX5-0004Wo-Hh
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 04:59:32 -0500
+Date: Tue, 6 Dec 2016 10:59:21 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20161206095921.GB4990@noname.str.redhat.com>
+References: <1480589964-29411-1-git-send-email-w.bumiller@proxmox.com>
+	<f67785d9-7f7e-703d-b026-3e9adbb04c5a@redhat.com>
+	<20161205082639.GA17546@olga.wb>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/u0tdgSK5xisDXP_Mdt3Wrbz";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH for-2.8] qdev: apply global properties in
- reverse order
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20161205082639.GA17546@olga.wb>
+Subject: Re: [Qemu-devel] [RFC PATCH] glusterfs: allow partial reads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,79 +24,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-stable@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Wolfgang Bumiller <w.bumiller@proxmox.com>
+Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, Jeff Cody <jcody@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
---Sig_/u0tdgSK5xisDXP_Mdt3Wrbz
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Am 05.12.2016 um 09:26 hat Wolfgang Bumiller geschrieben:
+> On Fri, Dec 02, 2016 at 01:13:28PM -0600, Eric Blake wrote:
+> > On 12/01/2016 04:59 AM, Wolfgang Bumiller wrote:
+> > > Fixes #1644754.
+> > > 
+> > > Signed-off-by: Wolfgang Bumiller <w.bumiller@proxmox.com>
+> > > ---
+> > > I'm not sure what the original rationale was to treat both partial
+> > > reads as well as well as writes as I/O error. (Seems to have happened
+> > > from original glusterfs v1 to v2 series with a note but no reasoning
+> > > for the read side as far as I could see.)
+> > > The general direction lately seems to be to move away from sector
+> > > based block APIs. Also eg. the NFS code allows partial reads. (It
+> > > does, however, have an old patch (c2eb918e3) dedicated to aligning
+> > > sizes to 512 byte boundaries for file creation for compatibility to
+> > > other parts of qemu like qcow2. This already happens in glusterfs,
+> > > though, but if you move a file from a different storage over to
+> > > glusterfs you may end up with a qcow2 file with eg. the L1 table in
+> > > the last 80 bytes of the file aligned to _begin_ at a 512 boundary,
+> > > but not _end_ at one.)
 
-On Tue, 6 Dec 2016 09:47:08 +0000
-Stefan Hajnoczi <stefanha@gmail.com> wrote:
+Hm, does this really happen? I always thought that the file size of
+qcow2 images is aligned to the cluster size. If it isn't, maybe we
+should fix that.
 
-> On Mon, Dec 05, 2016 at 04:21:22PM +0100, Greg Kurz wrote:
-> > The current code recursively applies global properties from child up to
-> > parent. So, if you have:
-> >=20
-> > -global virtio-pci.disable-modern=3Don
-> > -global virtio-blk-pci.disable-modern=3Doff
-> >=20
-> > Then the default value of disable-modern for a virtio-blk-pci device is=
- on,
-> > which looks wrong from an OOP perspective.
-> >=20
-> > This patch reverses the logic, so that a child property always prevail.
-> >=20
-> > This fixes a subtle bug that got introduced in 2.7 with commit "9a4c0e2=
-20d8a
-> > hw/virtio-pci: fix virtio behaviour" for older (< 2.7) machine types: t=
-he
-> > HW_COMPAT_2_6 macro contains global virtio-pci.disable-* properties whi=
-ch
-> > would silently override global properties passed on the command line for
-> > virtio subtypes.
-> >=20
-> > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > ---
-> >=20
-> > AFAIK, libvirt's XML doesn't know about modern/legacy modes for virtio
-> > devices. Early adopters of virtio 1.0 had to rely on the <qemu:commandl=
-ine>
-> > tag to pass global properties to QEMU. This patch ensures that XML files
-> > used with older machine types remain valid with newer versions of QEMU.
-> >=20
-> > FWIW I guess it could help to have this fix in 2.8, and also probably in
-> > 2.7.1. =20
->=20
-> Hi Greg,
-> I won't merge this for QEMU 2.8 because this 2.7 issue is not a 2.8
-> release blocker and it's too risky (good points have been raised in this
-> thread).
->=20
-> Please target -stable when consensus has been reached.
->=20
+> > >  block/gluster.c | 10 +++++++++-
+> > >  1 file changed, 9 insertions(+), 1 deletion(-)
+> > > 
+> > > diff --git a/block/gluster.c b/block/gluster.c
+> > > index 891c13b..3db0bf8 100644
+> > > --- a/block/gluster.c
+> > > +++ b/block/gluster.c
+> > > @@ -41,6 +41,7 @@ typedef struct GlusterAIOCB {
+> > >      int ret;
+> > >      Coroutine *coroutine;
+> > >      AioContext *aio_context;
+> > > +    bool is_write;
+> > >  } GlusterAIOCB;
+> > >  
+> > >  typedef struct BDRVGlusterState {
+> > > @@ -716,8 +717,10 @@ static void gluster_finish_aiocb(struct glfs_fd *fd, ssize_t ret, void *arg)
+> > >          acb->ret = 0; /* Success */
+> > >      } else if (ret < 0) {
+> > >          acb->ret = -errno; /* Read/Write failed */
+> > > +    } else if (acb->is_write) {
+> > > +        acb->ret = -EIO; /* Partial write - fail it */
+> > >      } else {
+> > > -        acb->ret = -EIO; /* Partial read/write - fail it */
+> > > +        acb->ret = 0; /* Success */
+> > 
+> > Does this properly guarantee that the portion beyond EOF reads as zero?
+> 
+> I'd argue this wasn't necessarily the case before either, considering
+> the first check starts with `!ret`:
+> 
+>     if (!ret || ret == acb->size) {
+>         acb->ret = 0; /* Success */
+> 
+> A read right at EOF would return 0 and be treated as success there, no?
 
-Sure I'll just do that.
+Yes, this is a bug.
 
-Cheers.
+I guess this was the lazy way that "usually" works both for
+reads/writes, which return a positive number of bytes, and for things
+like flush which return 0 on success. But the callback really needs to
+distinguish these cases and apply different checks.
 
---
-Greg
+> Iow. it wouldn't zero out the destination buffer as far as I can see.
+> Come to think of it, I'm not too fond of this part of the check for the
+> write case either.
 
-> Thanks,
-> Stefan
+raw-posix treats short reads as success, too, but it zeroes out the
+missing part. Note that it also loops after a short read and only if it
+reads 0 bytes then, it returns success. If an error is returned after
+the short read, the whole function returns an error. Is this necessary
+for gluster, too?
 
+> > Would it be better to switch to byte-based interfaces rather than
+> > continue to force gluster interaction in 512-byte sector chunks,
+> > since gluster can obviously store files that are not 512-aligned?
 
---Sig_/u0tdgSK5xisDXP_Mdt3Wrbz
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+The gluster I/O functions are byte-based anyway, and the driver already
+implements .bdrv_co_readv, so going to .bdrv_co_preadv should be
+trivial. Probably the best solution here indeed.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEYEARECAAYFAlhGiuIACgkQAvw66wEB28Im6ACfb9Fwk/sbUQsy8nWdM6GB70GQ
-u/0AnjK0YyMpzWmve+9/v592s4mp6WzA
-=yqyz
------END PGP SIGNATURE-----
-
---Sig_/u0tdgSK5xisDXP_Mdt3Wrbz--
+Kevin
