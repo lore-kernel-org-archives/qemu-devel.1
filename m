@@ -1,35 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51203)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51955)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cEM91-0005ZZ-7R
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 15:15:20 -0500
+	(envelope-from <stefanha@gmail.com>) id 1cEMCu-0000Hy-CC
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 15:19:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cEM8x-00010j-Ud
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 15:15:19 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42405)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1cEM8x-0000zx-Hw
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 15:15:15 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	uB6KEkg0144112
-	for <qemu-devel@nongnu.org>; Tue, 6 Dec 2016 15:15:14 -0500
-Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2762h4ee6w-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 06 Dec 2016 15:15:14 -0500
-Received: from localhost
-	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Tue, 6 Dec 2016 13:15:13 -0700
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Tue,  6 Dec 2016 14:15:00 -0600
-In-Reply-To: <1481055300-14239-1-git-send-email-mdroth@linux.vnet.ibm.com>
-References: <1481055300-14239-1-git-send-email-mdroth@linux.vnet.ibm.com>
-Message-Id: <1481055300-14239-3-git-send-email-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH for-2.8 2/2] tests: check-qom-proplist: add
- checks for cmdline-created objects
+	(envelope-from <stefanha@gmail.com>) id 1cEMCp-0002BC-Dx
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 15:19:20 -0500
+Received: from mail-wj0-f194.google.com ([209.85.210.194]:34551)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cEMCp-0002Ax-7Y
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 15:19:15 -0500
+Received: by mail-wj0-f194.google.com with SMTP id xy5so45954420wjc.1
+	for <qemu-devel@nongnu.org>; Tue, 06 Dec 2016 12:19:15 -0800 (PST)
+Date: Tue, 6 Dec 2016 20:18:11 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20161206201811.GC2521@stefanha-x1.localdomain>
+References: <1481016553-69252-1-git-send-email-arei.gonglei@huawei.com>
+	<20161206153945-mutt-send-email-mst@kernel.org>
+	<20161206173337.GB30363@stefanha-x1.localdomain>
+	<20161206211034-mutt-send-email-mst@kernel.org>
+	<66ab8815-b9bb-7068-1809-0a31367534ff@redhat.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="+xNpyl7Qekk2NvDX"
+Content-Disposition: inline
+In-Reply-To: <66ab8815-b9bb-7068-1809-0a31367534ff@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.8] virtio-crypto: zeroize the key
+ material before free
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,137 +34,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: david@gibson.dropbear.id.au, bharata.rao@gmail.com, dgilbert@redhat.com, armbru@redhat.com, Eric Blake <eblake@redhat.com>, Daniel Berrange <berrange@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Gonglei <arei.gonglei@huawei.com>, qemu-devel@nongnu.org, "Daniel P. Berrange" <berrange@redhat.com>
 
-check-qom-proplist originally added tests for verifying that
-object-creation helpers object_new_with_{props,propv} behaved in
-similar fashion to the "traditional" method involving setting each
-individual property separately after object creation rather than
-in via a single call.
 
-Another similar "helper" for creating Objects exists in the form of
-objects specified via -object command-line parameters. By that
-rationale, we extend check-qom-proplist to include similar checks
-for command-line-created objects by employing the same
-qemu_opts_parse()-based parsing the vl.c employs.
+--+xNpyl7Qekk2NvDX
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-This parser has a side-effect of parsing the object's options into
-a QemuOpt structure and registering this in the global QemuOptsList
-using the Object's ID. This can conflict with future Object instances
-that attempt to use the same ID if we don't ensure this is cleaned
-up as part of Object finalization, so we add specific checks for this
-scenario in addition to the normal sanity checks.
+On Tue, Dec 06, 2016 at 01:30:12PM -0600, Eric Blake wrote:
+> On 12/06/2016 01:22 PM, Michael S. Tsirkin wrote:
+> > On Tue, Dec 06, 2016 at 05:33:37PM +0000, Stefan Hajnoczi wrote:
+> >> On Tue, Dec 06, 2016 at 03:40:49PM +0200, Michael S. Tsirkin wrote:
+> >>> On Tue, Dec 06, 2016 at 05:29:13PM +0800, Gonglei wrote:
+> >>>> Zeroize the memory of CryptoDevBackendSymOpInfo structure pointed
+> >>>> for key material security.
+> >>>>
+>=20
+> >>>> +            /* Zeroize and free request data structure */
+> >>>> +            memset(op_info, 0, sizeof(*op_info) + max_len);
+> >>>> +            g_free(op_info);
+> >>>
+> >>> Write into memory, then free it?  This looks rather strange. Why are =
+we
+> >>> doing this?
+> >>
+> >> Common practice with sensitive information (key material, passwords,
+> >> etc).
+> >=20
+> > Some kind of explanation about what makes this one
+> > more sensitive than others would be nice.
+>=20
+> Even mentioning existing practice would go a long way; see commit 8813800=
+b.
+>=20
+> >=20
+> > Also, what makes it 2.8 material? Considering the pointer math
+> > involved, it's not risk-free.
+> >=20
+> >> coredumps, memory disclosure bugs when heap memory is reused, etc.
+> >>
+> >> Sensitive information is sometimes also held in mlocked pages to preve=
+nt
+> >> it being swapped to disk but that's not being done here.
+>=20
+> And existing practice is that we aren't going to be that paranoid at
+> this time (and yes, I asked Dan that same question on his commit
+> mentioned above).
 
-Suggested-by: Daniel Berrange <berrange@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>
-Cc: Daniel Berrange <berrange@redhat.com>
-Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
----
- tests/check-qom-proplist.c | 54 +++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 53 insertions(+), 1 deletion(-)
+Okay.  I am not merging this for QEMU 2.8.0-rc3, it should go through
+Michael Tsirkin's tree.
 
-diff --git a/tests/check-qom-proplist.c b/tests/check-qom-proplist.c
-index a16cefc..087ce21 100644
---- a/tests/check-qom-proplist.c
-+++ b/tests/check-qom-proplist.c
-@@ -23,6 +23,9 @@
- #include "qapi/error.h"
- #include "qom/object.h"
- #include "qemu/module.h"
-+#include "qemu/option.h"
-+#include "qemu/config-file.h"
-+#include "qom/object_interfaces.h"
- 
- 
- #define TYPE_DUMMY "qemu-dummy"
-@@ -162,6 +165,10 @@ static const TypeInfo dummy_info = {
-     .instance_finalize = dummy_finalize,
-     .class_size = sizeof(DummyObjectClass),
-     .class_init = dummy_class_init,
-+    .interfaces = (InterfaceInfo[]) {
-+        { TYPE_USER_CREATABLE },
-+        { }
-+    }
- };
- 
- 
-@@ -291,7 +298,6 @@ static void dummy_backend_init(Object *obj)
- {
- }
- 
--
- static const TypeInfo dummy_dev_info = {
-     .name          = TYPE_DUMMY_DEV,
-     .parent        = TYPE_OBJECT,
-@@ -320,6 +326,14 @@ static const TypeInfo dummy_backend_info = {
-     .class_size = sizeof(DummyBackendClass),
- };
- 
-+static QemuOptsList qemu_object_opts = {
-+    .name = "object",
-+    .implied_opt_name = "qom-type",
-+    .head = QTAILQ_HEAD_INITIALIZER(qemu_object_opts.head),
-+    .desc = {
-+        { }
-+    },
-+};
- 
- 
- static void test_dummy_createv(void)
-@@ -388,6 +402,43 @@ static void test_dummy_createlist(void)
-     object_unparent(OBJECT(dobj));
- }
- 
-+static void test_dummy_createcmdl(void)
-+{
-+    QemuOpts *opts;
-+    DummyObject *dobj;
-+    Error *err = NULL;
-+    const char *params = TYPE_DUMMY \
-+                         ",id=dev0," \
-+                         "bv=yes,sv=Hiss hiss hiss,av=platypus";
-+
-+    qemu_add_opts(&qemu_object_opts);
-+    opts = qemu_opts_parse(&qemu_object_opts, params, true, &err);
-+    g_assert(err == NULL);
-+    g_assert(opts);
-+
-+    dobj = DUMMY_OBJECT(user_creatable_add_opts(opts, &err));
-+    g_assert(err == NULL);
-+    g_assert(dobj);
-+    g_assert_cmpstr(dobj->sv, ==, "Hiss hiss hiss");
-+    g_assert(dobj->bv == true);
-+    g_assert(dobj->av == DUMMY_PLATYPUS);
-+
-+    user_creatable_del("dev0", &err);
-+    g_assert(err == NULL);
-+    error_free(err);
-+
-+    /* cmdline-parsing via qemu_opts_parse() results in a QemuOpts entry
-+     * corresponding to the Object's ID to be added to the QemuOptsList
-+     * for objects. To avoid having this entry conflict with future
-+     * Objects using the same ID (which can happen in cases where
-+     * qemu_opts_parse() is used to parse the object params, such as
-+     * with hmp_object_add() at the time of this comment), we check
-+     * for this in user_creatable_del() and remove the QemuOpts if it
-+     * is present. The below check ensures this works as expected.
-+     */
-+    g_assert(qemu_opts_find(&qemu_object_opts, "dev0") == NULL);
-+}
-+
- static void test_dummy_badenum(void)
- {
-     Error *err = NULL;
-@@ -525,6 +576,7 @@ int main(int argc, char **argv)
- 
-     g_test_add_func("/qom/proplist/createlist", test_dummy_createlist);
-     g_test_add_func("/qom/proplist/createv", test_dummy_createv);
-+    g_test_add_func("/qom/proplist/createcmdline", test_dummy_createcmdl);
-     g_test_add_func("/qom/proplist/badenum", test_dummy_badenum);
-     g_test_add_func("/qom/proplist/getenum", test_dummy_getenum);
-     g_test_add_func("/qom/proplist/iterator", test_dummy_iterator);
--- 
-1.9.1
+Stefan
+
+--+xNpyl7Qekk2NvDX
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJYRx0DAAoJEJykq7OBq3PIGEgH/jtsmn2vCpu3Zn8jmlus6Xqa
+atM9+BEqaE9+7cROpl7MnGT2NaVDKvbeZR8+dwOEUVRPpkt0W7Ni/2Y4lGrXWJB9
+yTaeMt+OwuBIAkgoWsxq/npkPvehMbB72K3TISLBV4TZ7tBl+oJJOBZNPq8Ec0dV
+y91iALFEmhUzvO32yGR07zUIVJXliC6lrxETiqxHGWJoPDgjFNl2TuuD1CPQxZEW
+pFD8yYwHS9cL7gTLV6EXPsTyH7mCM9LpwaP3WvKGAwSd9UX6zEl7z3LL4ngKkc6Z
+DVOkxY2asjT+3zVmuq35GLTIZmSmHk4m0zrbh5XmxlVHpKQlS9X+XIoVwQNRlCM=
+=+ojI
+-----END PGP SIGNATURE-----
+
+--+xNpyl7Qekk2NvDX--
