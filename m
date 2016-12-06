@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49731)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dje@google.com>) id 1cEONx-0001aV-3B
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 17:38:54 -0500
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56071)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from
+	<3dkRHWAMKCuMIOJLTTLQJ.HTRVJRZ-IJaJQSTSLSZ.TWL@flex--dje.bounces.google.com>)
+	id 1cEOq6-0003AV-D3
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 18:07:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dje@google.com>) id 1cEONt-0001Sq-SU
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 17:38:53 -0500
-Received: from mail-io0-f174.google.com ([209.85.223.174]:35329)
+	(envelope-from
+	<3dkRHWAMKCuMIOJLTTLQJ.HTRVJRZ-IJaJQSTSLSZ.TWL@flex--dje.bounces.google.com>)
+	id 1cEOq1-0001OH-F9
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 18:07:58 -0500
+Received: from mail-pf0-f202.google.com ([209.85.192.202]:33842)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <dje@google.com>) id 1cEONt-0001PU-Mu
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 17:38:49 -0500
-Received: by mail-io0-f174.google.com with SMTP id a124so680489932ioe.2
-	for <qemu-devel@nongnu.org>; Tue, 06 Dec 2016 14:38:28 -0800 (PST)
+	(Exim 4.71) (envelope-from
+	<3dkRHWAMKCuMIOJLTTLQJ.HTRVJRZ-IJaJQSTSLSZ.TWL@flex--dje.bounces.google.com>)
+	id 1cEOq1-0001Cp-7z
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 18:07:53 -0500
+Received: by mail-pf0-f202.google.com with SMTP id a8so13736912pfg.1
+	for <qemu-devel@nongnu.org>; Tue, 06 Dec 2016 15:07:31 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <b7104b2b-eb57-1fcd-7dbd-f0b5138915be@twiddle.net>
-References: <001a113ec6308021110543008630@google.com>
-	<b7104b2b-eb57-1fcd-7dbd-f0b5138915be@twiddle.net>
+Message-ID: <94eb2c0bfa1c6a9fec0543057483@google.com>
+Date: Tue, 06 Dec 2016 23:06:30 +0000
 From: Doug Evans <dje@google.com>
-Date: Tue, 6 Dec 2016 14:36:46 -0800
-Message-ID: <CADPb22RE55fQGf97RWpJ19bAhet7RUYi4BNEk_Y=ZC7SpJ2L0w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH] x86: Fix eflags tracking for syscall insn
+Content-Type: text/plain; charset=UTF-8; format=flowed; delsp=yes
+Subject: [Qemu-devel] [PATCH] target-i386: Fix eflags.TF/#DB handling of
+ syscall/sysret insns
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,50 +31,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net
 
-On Tue, Dec 6, 2016 at 11:43 AM, Richard Henderson <rth@twiddle.net> wrote:
-> On 12/06/2016 09:13 AM, Doug Evans wrote:
->> @@ -7104,6 +7104,10 @@ static target_ulong disas_insn(CPUX86State *env,
->> DisasContext *s,
->>          gen_update_cc_op(s);
->>          gen_jmp_im(pc_start - s->cs_base);
->>          gen_helper_syscall(cpu_env, tcg_const_i32(s->pc - pc_start));
->> +        /* condition codes are modified only in long mode */
->> +        if (s->lma) {
->> +            set_cc_op(s, CC_OP_EFLAGS);
->> +        }
->
-> Since we will definitely end the TranslationBlock here, I'm a bit confused as
-> to how we get things wrong here.  Is this simply a visual inspection of the
-> code, or do you have a test case?
+Hi.
 
-Visual inspection and looking at what other code does.
-[eflags handling is very clever, but a bit obscure - I'm sure just a
-bit more documentation
-would help but I dunno if it's "just me" ...]
+While qemu's behaviour matches what one would expect from reading
+the docs, it does not match what I'm seeing on h/w.
+Can anyone else confirm what the correct behaviour is here?
 
-> In gen_update_cc_op, we store the current version of CC_OP back to ENV.  This
-> lets helper_syscall (via cpu_compute_eflags) compute the proper value.  We then
-> store the updated version back via cpu_load_eflags, which sets ENV->CC_OP to
-> CC_OP_EFLAGS.
->
-> So far so good.
->
-> The only way I could see things going wrong is if we were to use DC->CC_OP
-> after the call to the helper.  But since we've (1) synced the value first and
-> (2) end the TB via gen_eob, I don't see how we would.
->
-> If any change is required, I think better would be
->
-> +  /* The syscall helper may read and modify EFLAGS.  */
->    gen_update_cc_op(s);
-> +  set_cc_op(s, CC_OP_DYNAMIC);
->    gen_jmp_im(pc_start - s->cs_base);
->    gen_helper_syscall(cpu_env, tcg_const_i32(s->pc - pc_start));
->
-> This will tell subsequent code within the translator that it must re-read
-> ENV->CC_OP in order to compute the flags.
+---
 
-Ah.
+The syscall and sysret instructions behave a bit differently:
+TF is checked after the instruction completes.
+This allows the o/s to disable #DB at a syscall by adding TF to FMASK.
+And then when the sysret is executed the #DB is taken "as if" the
+syscall insn just completed.
+
+Signed-off-by: Doug Evans <dje@google.com>
+---
+  target-i386/bpt_helper.c | 12 ++++++++++++
+  target-i386/helper.h     |  1 +
+  target-i386/translate.c  | 29 ++++++++++++++++++++++++-----
+  3 files changed, 37 insertions(+), 5 deletions(-)
+
+diff --git a/target-i386/bpt_helper.c b/target-i386/bpt_helper.c
+index 6fd7fe0..d771461 100644
+--- a/target-i386/bpt_helper.c
++++ b/target-i386/bpt_helper.c
+@@ -244,6 +244,18 @@ void helper_single_step(CPUX86State *env)
+      raise_exception(env, EXCP01_DB);
+  }
+
++void helper_rechecking_single_step(CPUX86State *env)
++{
++    if ((env->eflags & TF_MASK) != 0)
++    {
++#ifndef CONFIG_USER_ONLY
++        check_hw_breakpoints(env, true);
++        env->dr[6] |= DR6_BS;
++#endif
++        raise_exception(env, EXCP01_DB);
++    }
++}
++
+  void helper_set_dr(CPUX86State *env, int reg, target_ulong t0)
+  {
+  #ifndef CONFIG_USER_ONLY
+diff --git a/target-i386/helper.h b/target-i386/helper.h
+index 4e859eb..bd9b2cf 100644
+--- a/target-i386/helper.h
++++ b/target-i386/helper.h
+@@ -79,6 +79,7 @@ DEF_HELPER_2(cmpxchg16b_unlocked, void, env, tl)
+  DEF_HELPER_2(cmpxchg16b, void, env, tl)
+  #endif
+  DEF_HELPER_1(single_step, void, env)
++DEF_HELPER_1(rechecking_single_step, void, env)
+  DEF_HELPER_1(cpuid, void, env)
+  DEF_HELPER_1(rdtsc, void, env)
+  DEF_HELPER_1(rdtscp, void, env)
+diff --git a/target-i386/translate.c b/target-i386/translate.c
+index 9fd1a04..42d036e 100644
+--- a/target-i386/translate.c
++++ b/target-i386/translate.c
+@@ -2500,8 +2500,10 @@ static void gen_bnd_jmp(DisasContext *s)
+  }
+
+  /* Generate an end of block. Trace exception is also generated if needed.
+-   If IIM, set HF_INHIBIT_IRQ_MASK if it isn't already set.  */
+-static void gen_eob_inhibit_irq(DisasContext *s, bool inhibit)
++   If INHIBIT, set HF_INHIBIT_IRQ_MASK if it isn't already set.
++   If RECHECK_TF, emit a rechecking helper for #DB, ignoring the state of
++   S->TF.  This is used by the syscall/sysret insns.  */
++static void gen_eob_worker(DisasContext *s, bool inhibit, bool recheck_tf)
+  {
+      gen_update_cc_op(s);
+
+@@ -2517,6 +2519,9 @@ static void gen_eob_inhibit_irq(DisasContext *s, bool  
+inhibit)
+      }
+      if (s->singlestep_enabled) {
+          gen_helper_debug(cpu_env);
++    } else if (recheck_tf) {
++        gen_helper_rechecking_single_step(cpu_env);
++        tcg_gen_exit_tb(0);
+      } else if (s->tf) {
+          gen_helper_single_step(cpu_env);
+      } else {
+@@ -2525,10 +2530,17 @@ static void gen_eob_inhibit_irq(DisasContext *s,  
+bool inhibit)
+      s->is_jmp = DISAS_TB_JUMP;
+  }
+
++/* End of block.
++   If INHIBIT, set HF_INHIBIT_IRQ_MASK if it isn't already set.  */
++static void gen_eob_inhibit_irq(DisasContext *s, bool inhibit)
++{
++    gen_eob_worker(s, inhibit, false);
++}
++
+  /* End of block, resetting the inhibit irq flag.  */
+  static void gen_eob(DisasContext *s)
+  {
+-    gen_eob_inhibit_irq(s, false);
++    gen_eob_worker(s, false, false);
+  }
+
+  /* generate a jump to eip. No segment change must happen before as a
+@@ -7108,7 +7120,10 @@ static target_ulong disas_insn(CPUX86State *env,  
+DisasContext *s,
+          if (s->lma) {
+              set_cc_op(s, CC_OP_EFLAGS);
+          }
+-        gen_eob(s);
++        /* TF handling for the syscall insn is different. The TF bit is  
+checked
++           after the syscall insn completes. This allows #DB to not be
++           generated after one has entered CPL0 if TF is set in FMASK.  */
++        gen_eob_worker(s, false, true);
+          break;
+      case 0x107: /* sysret */
+          if (!s->pe) {
+@@ -7119,7 +7134,11 @@ static target_ulong disas_insn(CPUX86State *env,  
+DisasContext *s,
+              if (s->lma) {
+                  set_cc_op(s, CC_OP_EFLAGS);
+              }
+-            gen_eob(s);
++            /* TF handling for the sysret insn is different. The TF bit is
++               checked after the sysret insn completes. This allows #DB to  
+be
++               generated "as if" the syscall insn in userspace has just
++               completed.  */
++            gen_eob_worker(s, false, true);
+          }
+          break;
+  #endif
+-- 
+2.8.0.rc3.226.g39d4020
