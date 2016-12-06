@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57110)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57528)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cEIrG-0006zc-Bd
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 11:44:51 -0500
+	(envelope-from <lersek@redhat.com>) id 1cEItR-0008LW-7u
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 11:47:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cEIrB-0000ih-FR
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 11:44:46 -0500
-Received: from mail-wj0-f170.google.com ([209.85.210.170]:32889)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cEIrA-0000iJ-T3
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 11:44:41 -0500
-Received: by mail-wj0-f170.google.com with SMTP id xy5so328595289wjc.0
-	for <qemu-devel@nongnu.org>; Tue, 06 Dec 2016 08:44:40 -0800 (PST)
-References: <1479906121-12211-1-git-send-email-rth@twiddle.net>
-	<1479906121-12211-23-git-send-email-rth@twiddle.net>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <1479906121-12211-23-git-send-email-rth@twiddle.net>
-Date: Tue, 06 Dec 2016 16:43:37 +0000
-Message-ID: <87d1h5ypmu.fsf@linaro.org>
+	(envelope-from <lersek@redhat.com>) id 1cEItL-0001VV-EG
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 11:47:01 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53136)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cEItL-0001V5-4a
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 11:46:55 -0500
+References: <20161201170624.26496-1-lersek@redhat.com>
+	<20161201170624.26496-4-lersek@redhat.com>
+	<20161206124906.76a41896@nial.brq.redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <3da2baa9-9fa6-7802-fe56-afa02a892a07@redhat.com>
+Date: Tue, 6 Dec 2016 17:46:51 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v4 22/64] tcg: Pass the opcode width to
- target_parse_constraint
+In-Reply-To: <20161206124906.76a41896@nial.brq.redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 3/7] fw-cfg: expose "file_slots"
+ parameter in fw_cfg_init_io_dma()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,388 +29,193 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: qemu-devel@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu devel list <qemu-devel@nongnu.org>, "Gabriel L. Somlo" <somlo@cmu.edu>, "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
+On 12/06/16 12:49, Igor Mammedov wrote:
+> On Thu,  1 Dec 2016 18:06:20 +0100
+> Laszlo Ersek <lersek@redhat.com> wrote:
+> 
+>> Accordingly, generalize the "file_slots" minimum calculation in
+>> fw_cfg_init_io_dma(), and move the constant FW_CFG_FILE_SLOTS_TRAD
+>> argument to the callers of fw_cfg_init_io_dma().
+> If I get idea correctly you're extending fw_cfg_init_io_dma() and
+> setting
+>  qdev_prop_set_uint32(dev, "file_slots", file_slots);
+> manually to keep old fw_cfg_init_io() the same without touching
+> xen/sun4u machines.
 
-Richard Henderson <rth@twiddle.net> writes:
+First, to my knowledge, Xen does not use fw_cfg. The following call
+chains depend on (!xen_enabled()):
 
-> This will let us choose how to interpret a given constraint
-> depending on whether the opcode is 32- or 64-bit.  Which will
-> let us share more constraint combinations between opcodes.
->
-> At the same time, change the interface to return the advanced
-> pointer instead of passing it in/out by reference.
->
-> Signed-off-by: Richard Henderson <rth@twiddle.net>
+pc_init1() | pc_q35_init()
+  if (!xen_enabled()):
+    pc_memory_init()
+      bochs_bios_init()
+        fw_cfg_init_io_dma()
 
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Second, I wanted to keep the fw_cfg_init_io() call sites un-touched. In
+this patch, the fw_cfg_init_io() function passes an additional /
+internal-only parameter to fw_cfg_init_io_dma(), and the unconditional
+qdev_prop_set_uint32() call in fw_cfg_init_io_dma() is replaced with a
+conditional one (so that the property can only be lowered, not raised,
+by board code).
 
-> ---
->  tcg/aarch64/tcg-target.inc.c | 15 +++++----------
->  tcg/arm/tcg-target.inc.c     | 15 +++++----------
->  tcg/i386/tcg-target.inc.c    | 14 +++++---------
->  tcg/ia64/tcg-target.inc.c    | 14 +++++---------
->  tcg/mips/tcg-target.inc.c    | 14 +++++---------
->  tcg/ppc/tcg-target.inc.c     | 14 +++++---------
->  tcg/s390/tcg-target.inc.c    | 14 +++++---------
->  tcg/sparc/tcg-target.inc.c   | 14 +++++---------
->  tcg/tcg.c                    | 12 ++++++++----
->  tcg/tci/tcg-target.inc.c     | 12 +++++-------
->  10 files changed, 53 insertions(+), 85 deletions(-)
->
-> diff --git a/tcg/aarch64/tcg-target.inc.c b/tcg/aarch64/tcg-target.inc.c
-> index 416db45..17c0b20 100644
-> --- a/tcg/aarch64/tcg-target.inc.c
-> +++ b/tcg/aarch64/tcg-target.inc.c
-> @@ -115,12 +115,10 @@ static inline void patch_reloc(tcg_insn_unit *code_ptr, int type,
->  #define TCG_CT_CONST_MONE 0x800
->
->  /* parse target specific constraints */
-> -static int target_parse_constraint(TCGArgConstraint *ct,
-> -                                   const char **pct_str)
-> +static const char *target_parse_constraint(TCGArgConstraint *ct,
-> +                                           const char *ct_str, TCGType type)
->  {
-> -    const char *ct_str = *pct_str;
-> -
-> -    switch (ct_str[0]) {
-> +    switch (*ct_str++) {
->      case 'r':
->          ct->ct |= TCG_CT_REG;
->          tcg_regset_set32(ct->u.regs, 0, (1ULL << TCG_TARGET_NB_REGS) - 1);
-> @@ -150,12 +148,9 @@ static int target_parse_constraint(TCGArgConstraint *ct,
->          ct->ct |= TCG_CT_CONST_ZERO;
->          break;
->      default:
-> -        return -1;
-> +        return NULL;
->      }
-> -
-> -    ct_str++;
-> -    *pct_str = ct_str;
-> -    return 0;
-> +    return ct_str;
->  }
->
->  static inline bool is_aimm(uint64_t val)
-> diff --git a/tcg/arm/tcg-target.inc.c b/tcg/arm/tcg-target.inc.c
-> index 4500ca7..473c170 100644
-> --- a/tcg/arm/tcg-target.inc.c
-> +++ b/tcg/arm/tcg-target.inc.c
-> @@ -114,12 +114,10 @@ static void patch_reloc(tcg_insn_unit *code_ptr, int type,
->  #define TCG_CT_CONST_ZERO 0x800
->
->  /* parse target specific constraints */
-> -static int target_parse_constraint(TCGArgConstraint *ct, const char **pct_str)
-> +static const char *target_parse_constraint(TCGArgConstraint *ct,
-> +                                           const char *ct_str, TCGType type)
->  {
-> -    const char *ct_str;
-> -
-> -    ct_str = *pct_str;
-> -    switch (ct_str[0]) {
-> +    switch (*ct_str++) {
->      case 'I':
->          ct->ct |= TCG_CT_CONST_ARM;
->          break;
-> @@ -172,12 +170,9 @@ static int target_parse_constraint(TCGArgConstraint *ct, const char **pct_str)
->          break;
->
->      default:
-> -        return -1;
-> +        return NULL;
->      }
-> -    ct_str++;
-> -    *pct_str = ct_str;
-> -
-> -    return 0;
-> +    return ct_str;
->  }
->
->  static inline uint32_t rotl(uint32_t val, int n)
-> diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
-> index 595c399..aa5a248 100644
-> --- a/tcg/i386/tcg-target.inc.c
-> +++ b/tcg/i386/tcg-target.inc.c
-> @@ -166,12 +166,10 @@ static void patch_reloc(tcg_insn_unit *code_ptr, int type,
->  }
->
->  /* parse target specific constraints */
-> -static int target_parse_constraint(TCGArgConstraint *ct, const char **pct_str)
-> +static const char *target_parse_constraint(TCGArgConstraint *ct,
-> +                                           const char *ct_str, TCGType type)
->  {
-> -    const char *ct_str;
-> -
-> -    ct_str = *pct_str;
-> -    switch(ct_str[0]) {
-> +    switch(*ct_str++) {
->      case 'a':
->          ct->ct |= TCG_CT_REG;
->          tcg_regset_set_reg(ct->u.regs, TCG_REG_EAX);
-> @@ -249,11 +247,9 @@ static int target_parse_constraint(TCGArgConstraint *ct, const char **pct_str)
->          break;
->
->      default:
-> -        return -1;
-> +        return NULL;
->      }
-> -    ct_str++;
-> -    *pct_str = ct_str;
-> -    return 0;
-> +    return ct_str;
->  }
->
->  /* test if a constant matches the constraint */
-> diff --git a/tcg/ia64/tcg-target.inc.c b/tcg/ia64/tcg-target.inc.c
-> index e4d419d..bf9a97d 100644
-> --- a/tcg/ia64/tcg-target.inc.c
-> +++ b/tcg/ia64/tcg-target.inc.c
-> @@ -721,12 +721,10 @@ static void patch_reloc(tcg_insn_unit *code_ptr, int type,
->   */
->
->  /* parse target specific constraints */
-> -static int target_parse_constraint(TCGArgConstraint *ct, const char **pct_str)
-> +static const char *target_parse_constraint(TCGArgConstraint *ct,
-> +                                           const char *ct_str, TCGType type)
->  {
-> -    const char *ct_str;
-> -
-> -    ct_str = *pct_str;
-> -    switch(ct_str[0]) {
-> +    switch(*ct_str++) {
->      case 'r':
->          ct->ct |= TCG_CT_REG;
->          tcg_regset_set(ct->u.regs, 0xffffffffffffffffull);
-> @@ -750,11 +748,9 @@ static int target_parse_constraint(TCGArgConstraint *ct, const char **pct_str)
->          ct->ct |= TCG_CT_CONST_ZERO;
->          break;
->      default:
-> -        return -1;
-> +        return NULL;
->      }
-> -    ct_str++;
-> -    *pct_str = ct_str;
-> -    return 0;
-> +    return ct_str;
->  }
->
->  /* test if a constant matches the constraint */
-> diff --git a/tcg/mips/tcg-target.inc.c b/tcg/mips/tcg-target.inc.c
-> index 7758b6d..4341ea2 100644
-> --- a/tcg/mips/tcg-target.inc.c
-> +++ b/tcg/mips/tcg-target.inc.c
-> @@ -167,12 +167,10 @@ static inline bool is_p2m1(tcg_target_long val)
->  }
->
->  /* parse target specific constraints */
-> -static int target_parse_constraint(TCGArgConstraint *ct, const char **pct_str)
-> +static const char *target_parse_constraint(TCGArgConstraint *ct,
-> +                                           const char *ct_str, TCGType type)
->  {
-> -    const char *ct_str;
-> -
-> -    ct_str = *pct_str;
-> -    switch(ct_str[0]) {
-> +    switch(*ct_str++) {
->      case 'r':
->          ct->ct |= TCG_CT_REG;
->          tcg_regset_set(ct->u.regs, 0xffffffff);
-> @@ -224,11 +222,9 @@ static int target_parse_constraint(TCGArgConstraint *ct, const char **pct_str)
->          ct->ct |= TCG_CT_CONST_ZERO;
->          break;
->      default:
-> -        return -1;
-> +        return NULL;
->      }
-> -    ct_str++;
-> -    *pct_str = ct_str;
-> -    return 0;
-> +    return ct_str;
->  }
->
->  /* test if a constant matches the constraint */
-> diff --git a/tcg/ppc/tcg-target.inc.c b/tcg/ppc/tcg-target.inc.c
-> index a1b7412..bf17161 100644
-> --- a/tcg/ppc/tcg-target.inc.c
-> +++ b/tcg/ppc/tcg-target.inc.c
-> @@ -259,12 +259,10 @@ static void patch_reloc(tcg_insn_unit *code_ptr, int type,
->  }
->
->  /* parse target specific constraints */
-> -static int target_parse_constraint(TCGArgConstraint *ct, const char **pct_str)
-> +static const char *target_parse_constraint(TCGArgConstraint *ct,
-> +                                           const char *ct_str, TCGType type)
->  {
-> -    const char *ct_str;
-> -
-> -    ct_str = *pct_str;
-> -    switch (ct_str[0]) {
-> +    switch (*ct_str++) {
->      case 'A': case 'B': case 'C': case 'D':
->          ct->ct |= TCG_CT_REG;
->          tcg_regset_set_reg(ct->u.regs, 3 + ct_str[0] - 'A');
-> @@ -311,11 +309,9 @@ static int target_parse_constraint(TCGArgConstraint *ct, const char **pct_str)
->          ct->ct |= TCG_CT_CONST_ZERO;
->          break;
->      default:
-> -        return -1;
-> +        return NULL;
->      }
-> -    ct_str++;
-> -    *pct_str = ct_str;
-> -    return 0;
-> +    return ct_str;
->  }
->
->  /* test if a constant matches the constraint */
-> diff --git a/tcg/s390/tcg-target.inc.c b/tcg/s390/tcg-target.inc.c
-> index 3cb34eb..5275297 100644
-> --- a/tcg/s390/tcg-target.inc.c
-> +++ b/tcg/s390/tcg-target.inc.c
-> @@ -359,11 +359,10 @@ static void patch_reloc(tcg_insn_unit *code_ptr, int type,
->  }
->
->  /* parse target specific constraints */
-> -static int target_parse_constraint(TCGArgConstraint *ct, const char **pct_str)
-> +static const char *target_parse_constraint(TCGArgConstraint *ct,
-> +                                           const char *ct_str, TCGType type)
->  {
-> -    const char *ct_str = *pct_str;
-> -
-> -    switch (ct_str[0]) {
-> +    switch (*ct_str++) {
->      case 'r':                  /* all registers */
->          ct->ct |= TCG_CT_REG;
->          tcg_regset_set32(ct->u.regs, 0, 0xffff);
-> @@ -409,12 +408,9 @@ static int target_parse_constraint(TCGArgConstraint *ct, const char **pct_str)
->          ct->ct |= TCG_CT_CONST_ZERO;
->          break;
->      default:
-> -        return -1;
-> +        return NULL;
->      }
-> -    ct_str++;
-> -    *pct_str = ct_str;
-> -
-> -    return 0;
-> +    return ct_str;
->  }
->
->  /* Immediates to be used with logical OR.  This is an optimization only,
-> diff --git a/tcg/sparc/tcg-target.inc.c b/tcg/sparc/tcg-target.inc.c
-> index f2cbf50..d1f4c0d 100644
-> --- a/tcg/sparc/tcg-target.inc.c
-> +++ b/tcg/sparc/tcg-target.inc.c
-> @@ -319,12 +319,10 @@ static void patch_reloc(tcg_insn_unit *code_ptr, int type,
->  }
->
->  /* parse target specific constraints */
-> -static int target_parse_constraint(TCGArgConstraint *ct, const char **pct_str)
-> +static const char *target_parse_constraint(TCGArgConstraint *ct,
-> +                                           const char *ct_str, TCGType type)
->  {
-> -    const char *ct_str;
-> -
-> -    ct_str = *pct_str;
-> -    switch (ct_str[0]) {
-> +    switch (*ct_str++) {
->      case 'r':
->          ct->ct |= TCG_CT_REG;
->          tcg_regset_set32(ct->u.regs, 0, 0xffffffff);
-> @@ -360,11 +358,9 @@ static int target_parse_constraint(TCGArgConstraint *ct, const char **pct_str)
->          ct->ct |= TCG_CT_CONST_ZERO;
->          break;
->      default:
-> -        return -1;
-> +        return NULL;
->      }
-> -    ct_str++;
-> -    *pct_str = ct_str;
-> -    return 0;
-> +    return ct_str;
->  }
->
->  /* test if a constant matches the constraint */
-> diff --git a/tcg/tcg.c b/tcg/tcg.c
-> index 5792c1e..8b4dce7 100644
-> --- a/tcg/tcg.c
-> +++ b/tcg/tcg.c
-> @@ -96,7 +96,8 @@ static void tcg_register_jit_int(void *buf, size_t size,
->      __attribute__((unused));
->
->  /* Forward declarations for functions declared and used in tcg-target.inc.c. */
-> -static int target_parse_constraint(TCGArgConstraint *ct, const char **pct_str);
-> +static const char *target_parse_constraint(TCGArgConstraint *ct,
-> +                                           const char *ct_str, TCGType type);
->  static void tcg_out_ld(TCGContext *s, TCGType type, TCGReg ret, TCGReg arg1,
->                         intptr_t arg2);
->  static void tcg_out_mov(TCGContext *s, TCGType type, TCGReg ret, TCGReg arg);
-> @@ -1231,7 +1232,8 @@ static void process_op_defs(TCGContext *s)
->      for (op = 0; op < NB_OPS; op++) {
->          TCGOpDef *def = &tcg_op_defs[op];
->          const TCGTargetOpDef *tdefs;
-> -        int i, nb_args, ok;
-> +        TCGType type;
-> +        int i, nb_args;
->
->          if (def->flags & TCG_OPF_NOT_PRESENT) {
->              continue;
-> @@ -1246,6 +1248,7 @@ static void process_op_defs(TCGContext *s)
->          /* Missing TCGTargetOpDef entry. */
->          tcg_debug_assert(tdefs != NULL);
->
-> +        type = (def->flags & TCG_OPF_64BIT ? TCG_TYPE_I64 : TCG_TYPE_I32);
->          for (i = 0; i < nb_args; i++) {
->              const char *ct_str = tdefs->args_ct_str[i];
->              /* Incomplete TCGTargetOpDef entry. */
-> @@ -1279,9 +1282,10 @@ static void process_op_defs(TCGContext *s)
->                          ct_str++;
->                          break;
->                      default:
-> -                        ok = target_parse_constraint(&def->args_ct[i], &ct_str);
-> +                        ct_str = target_parse_constraint(&def->args_ct[i],
-> +                                                         ct_str, type);
->                          /* Typo in TCGTargetOpDef constraint. */
-> -                        tcg_debug_assert(ok == 0);
-> +                        tcg_debug_assert(ct_str != NULL);
->                      }
->                  }
->              }
-> diff --git a/tcg/tci/tcg-target.inc.c b/tcg/tci/tcg-target.inc.c
-> index 42d4bd6..26ee9b1 100644
-> --- a/tcg/tci/tcg-target.inc.c
-> +++ b/tcg/tci/tcg-target.inc.c
-> @@ -384,10 +384,10 @@ static void patch_reloc(tcg_insn_unit *code_ptr, int type,
->  }
->
->  /* Parse target specific constraints. */
-> -static int target_parse_constraint(TCGArgConstraint *ct, const char **pct_str)
-> +static const char *target_parse_constraint(TCGArgConstraint *ct,
-> +                                           const char *ct_str, TCGType type)
->  {
-> -    const char *ct_str = *pct_str;
-> -    switch (ct_str[0]) {
-> +    switch (*ct_str++) {
->      case 'r':
->      case 'L':                   /* qemu_ld constraint */
->      case 'S':                   /* qemu_st constraint */
-> @@ -395,11 +395,9 @@ static int target_parse_constraint(TCGArgConstraint *ct, const char **pct_str)
->          tcg_regset_set32(ct->u.regs, 0, BIT(TCG_TARGET_NB_REGS) - 1);
->          break;
->      default:
-> -        return -1;
-> +        return NULL;
->      }
-> -    ct_str++;
-> -    *pct_str = ct_str;
-> -    return 0;
-> +    return ct_str;
->  }
->
->  #if defined(CONFIG_DEBUG_TCG_INTERPRETER)
+> That way we would have 2 different ways to set defaults
+> per machine type/version rather then the single COMPAT property way.
+> 
+> How about dropping this patch and adding
+>  SET_MACHINE_COMPAT
+> to xen/sun4u machines instead and dropping fw_cfg_init_io() in
+> favor of fw_cfg_init_io_dma() along the way.
 
+For the conditional qdev_prop_set_uint32() call, added in this patch, I
+used commit e6915b5f3a87 ("fw_cfg: unbreak migration compatibility for
+2.4 and earlier machines") as model. According to that model, I couldn't
+drop this patch completely, because the new feature -- i.e., DMA in that
+patch, and higher fw_cfg file slots in this patch -- depends on both
+machine versions and board opt-in.
 
---
-Alex Bennée
+However, if we agree (according to your feedback on patch v4 2/7) that
+we will silently bump the fw_cfg file count for all new machine
+versions, without requiring (or permitting) board opt-in / opt-out, then
+I agree your above suggestion is consistent with that.
+
+I think I don't have to drop fw_cfg_init_io() actually. But, with the
+board opt-in going away, I can drop both the additional "file_slots"
+parameter in fw_cfg_init_io_dma(), and the qdev_prop_set_uint32() call
+in it (even the unconditional one).
+
+In fact I like this simplicity more, I just wanted to be extra cautious
+in the first version of the series that turned file_slots into a property.
+
+... Actually, are sun4u machines versioned? Hm... "hw/sparc64/sun4u.c"
+doesn't seem to define versioned machine types. Doesn't that imply that
+migration is *completely* unsupported for sun4u? Because, if that's the
+case, then I wouldn't even have to add SET_MACHINE_COMPAT().
+
+Thanks!
+Laszlo
+
+> 
+>>
+>> Cc: "Gabriel L. Somlo" <somlo@cmu.edu>
+>> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+>> Cc: Gerd Hoffmann <kraxel@redhat.com>
+>> Cc: Igor Mammedov <imammedo@redhat.com>
+>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+>> ---
+>>  docs/specs/fw_cfg.txt     |  4 ++--
+>>  include/hw/nvram/fw_cfg.h |  2 +-
+>>  hw/i386/pc.c              |  3 ++-
+>>  hw/nvram/fw_cfg.c         | 13 ++++++-------
+>>  4 files changed, 11 insertions(+), 11 deletions(-)
+>>
+>> diff --git a/docs/specs/fw_cfg.txt b/docs/specs/fw_cfg.txt
+>> index 84e2978706f5..4a6888b511f4 100644
+>> --- a/docs/specs/fw_cfg.txt
+>> +++ b/docs/specs/fw_cfg.txt
+>> @@ -153,12 +153,12 @@ Selector Reg.    Range Usage
+>>  0x4000 - 0x7fff  Generic (0x0000 - 0x3fff, RW, ignored in QEMU v2.4+)
+>>  0x8000 - 0xbfff  Arch. Specific (0x0000 - 0x3fff, generally RO, possibly RW
+>>                                   through the DMA interface in QEMU v2.9+)
+>>  0xc000 - 0xffff  Arch. Specific (0x0000 - 0x3fff, RW, ignored in v2.4+)
+>>  
+>> -In practice, the number of allowed firmware configuration items is given
+>> -by the value (FW_CFG_FILE_FIRST + FW_CFG_FILE_SLOTS_TRAD) (see fw_cfg.h).
+>> +In practice, the number of allowed firmware configuration items depends on the
+>> +machine type.
+> machine type/version
+> 
+>>  
+>>  = Guest-side DMA Interface =
+>>  
+>>  If bit 1 of the feature bitmap is set, the DMA interface is present. This does
+>>  not replace the existing fw_cfg interface, it is an add-on. This interface
+>> diff --git a/include/hw/nvram/fw_cfg.h b/include/hw/nvram/fw_cfg.h
+>> index b980cbaebf43..e9a6b6aa968c 100644
+>> --- a/include/hw/nvram/fw_cfg.h
+>> +++ b/include/hw/nvram/fw_cfg.h
+>> @@ -173,11 +173,11 @@ void fw_cfg_add_file_callback(FWCfgState *s, const char *filename,
+>>   */
+>>  void *fw_cfg_modify_file(FWCfgState *s, const char *filename, void *data,
+>>                           size_t len);
+>>  
+>>  FWCfgState *fw_cfg_init_io_dma(uint32_t iobase, uint32_t dma_iobase,
+>> -                                AddressSpace *dma_as);
+>> +                                AddressSpace *dma_as, uint32_t file_slots);
+>>  FWCfgState *fw_cfg_init_io(uint32_t iobase);
+>>  FWCfgState *fw_cfg_init_mem(hwaddr ctl_addr, hwaddr data_addr);
+>>  FWCfgState *fw_cfg_init_mem_wide(hwaddr ctl_addr,
+>>                                   hwaddr data_addr, uint32_t data_width,
+>>                                   hwaddr dma_addr, AddressSpace *dma_as);
+>> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+>> index a9e64a88e5e7..5d929d8fc887 100644
+>> --- a/hw/i386/pc.c
+>> +++ b/hw/i386/pc.c
+>> @@ -741,11 +741,12 @@ static FWCfgState *bochs_bios_init(AddressSpace *as, PCMachineState *pcms)
+>>  {
+>>      FWCfgState *fw_cfg;
+>>      uint64_t *numa_fw_cfg;
+>>      int i, j;
+>>  
+>> -    fw_cfg = fw_cfg_init_io_dma(FW_CFG_IO_BASE, FW_CFG_IO_BASE + 4, as);
+>> +    fw_cfg = fw_cfg_init_io_dma(FW_CFG_IO_BASE, FW_CFG_IO_BASE + 4, as,
+>> +                                FW_CFG_FILE_SLOTS_TRAD);
+>>      fw_cfg_add_i16(fw_cfg, FW_CFG_NB_CPUS, pcms->boot_cpus);
+>>  
+>>      /* FW_CFG_MAX_CPUS is a bit confusing/problematic on x86:
+>>       *
+>>       * For machine types prior to 1.8, SeaBIOS needs FW_CFG_MAX_CPUS for
+>> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+>> index 2e1441c09750..c33c76ab93b1 100644
+>> --- a/hw/nvram/fw_cfg.c
+>> +++ b/hw/nvram/fw_cfg.c
+>> @@ -926,11 +926,11 @@ static void fw_cfg_init1(DeviceState *dev)
+>>      s->machine_ready.notify = fw_cfg_machine_ready;
+>>      qemu_add_machine_init_done_notifier(&s->machine_ready);
+>>  }
+>>  
+>>  FWCfgState *fw_cfg_init_io_dma(uint32_t iobase, uint32_t dma_iobase,
+>> -                                AddressSpace *dma_as)
+>> +                                AddressSpace *dma_as, uint32_t file_slots)
+>>  {
+>>      DeviceState *dev;
+>>      FWCfgState *s;
+>>      uint32_t version = FW_CFG_VERSION;
+>>      bool dma_requested = dma_iobase && dma_as;
+>> @@ -940,15 +940,14 @@ FWCfgState *fw_cfg_init_io_dma(uint32_t iobase, uint32_t dma_iobase,
+>>      qdev_prop_set_uint32(dev, "dma_iobase", dma_iobase);
+>>      if (!dma_requested) {
+>>          qdev_prop_set_bit(dev, "dma_enabled", false);
+>>      }
+>>  
+>> -    /* Once we expose the "file_slots" property to callers of
+>> -     * fw_cfg_init_io_dma(), the following setting should become conditional on
+>> -     * the input parameter being lower than the current value of the property.
+>> -     */
+>> -    qdev_prop_set_uint32(dev, "file_slots", FW_CFG_FILE_SLOTS_TRAD);
+>> +    if (file_slots < object_property_get_int(OBJECT(dev), "file_slots",
+>> +                                             &error_abort)) {
+>> +        qdev_prop_set_uint32(dev, "file_slots", file_slots);
+>> +    }
+>>  
+>>      fw_cfg_init1(dev);
+>>      s = FW_CFG(dev);
+>>  
+>>      if (s->dma_enabled) {
+>> @@ -964,11 +963,11 @@ FWCfgState *fw_cfg_init_io_dma(uint32_t iobase, uint32_t dma_iobase,
+>>      return s;
+>>  }
+>>  
+>>  FWCfgState *fw_cfg_init_io(uint32_t iobase)
+>>  {
+>> -    return fw_cfg_init_io_dma(iobase, 0, NULL);
+>> +    return fw_cfg_init_io_dma(iobase, 0, NULL, FW_CFG_FILE_SLOTS_TRAD);
+>>  }
+>>  
+>>  FWCfgState *fw_cfg_init_mem_wide(hwaddr ctl_addr,
+>>                                   hwaddr data_addr, uint32_t data_width,
+>>                                   hwaddr dma_addr, AddressSpace *dma_as)
+> 
