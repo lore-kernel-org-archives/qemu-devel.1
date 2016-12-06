@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45247)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48669)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cEEGF-0004mv-Gw
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 06:50:21 -0500
+	(envelope-from <imammedo@redhat.com>) id 1cEESZ-0006jx-88
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 07:03:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cEEG9-0002Fu-J1
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 06:50:15 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51552)
+	(envelope-from <imammedo@redhat.com>) id 1cEESW-0006VM-1o
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 07:02:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50738)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cEEG9-0002FD-5T
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 06:50:09 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <20161117155504.21843-1-marcandre.lureau@redhat.com>
-	<20161117155504.21843-14-marcandre.lureau@redhat.com>
-	<87twapdkb5.fsf@dusky.pond.sub.org>
-	<CAJ+F1CLjozGuqXARb-W8CjmJY64JFAgWogAL_HnnyhUgJwf5VQ@mail.gmail.com>
-Date: Tue, 06 Dec 2016 12:50:04 +0100
-In-Reply-To: <CAJ+F1CLjozGuqXARb-W8CjmJY64JFAgWogAL_HnnyhUgJwf5VQ@mail.gmail.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Mon, 05 Dec 2016
-	17:35:34 +0000")
-Message-ID: <87vauxmg43.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cEESV-0006VA-Oc
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 07:02:55 -0500
+Date: Tue, 6 Dec 2016 13:02:49 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20161206130249.6225908a@nial.brq.redhat.com>
+In-Reply-To: <7723a0d7-0764-ab5d-51ce-25054f910c36@redhat.com>
+References: <20161201170624.26496-1-lersek@redhat.com>
+	<20161201170624.26496-3-lersek@redhat.com>
+	<20161206115038.4495a217@nial.brq.redhat.com>
+	<7723a0d7-0764-ab5d-51ce-25054f910c36@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 13/17] qapi: add qapi2texi script
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 2/7] fw-cfg: turn FW_CFG_FILE_SLOTS into
+ a device property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,1799 +30,424 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
-Cc: qemu-devel@nongnu.org
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: qemu devel list <qemu-devel@nongnu.org>, "Gabriel L. Somlo" <somlo@cmu.edu>, "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-I had to resort to diff to find your replies, and massage the text
-manually to produce a readable reply myself.  Please quote the usual
-way.
+On Tue, 6 Dec 2016 12:43:06 +0100
+Laszlo Ersek <lersek@redhat.com> wrote:
 
-> Markus Armbruster <armbru@redhat.com> writes:
->=20
-> > Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
-> >
-> >> As the name suggests, the qapi2texi script converts JSON QAPI
-> >> description into a texi file suitable for different target
-> >> formats (info/man/txt/pdf/html...).
+> On 12/06/16 11:50, Igor Mammedov wrote:
+> > On Thu,  1 Dec 2016 18:06:19 +0100
+> > Laszlo Ersek <lersek@redhat.com> wrote:
+> >   
+> >> We'd like to raise the value of FW_CFG_FILE_SLOTS. Doing it naively could
+> >> lead to problems with backward migration: a more recent QEMU (running an
+> >> older machine type) would allow the guest, in fw_cfg_select(), to select a
+> >> high key value that is unavailable in the same machine type implemented by
+> >> the older (target) QEMU. On the target host, fw_cfg_data_read() for
+> >> example could dereference nonexistent entries.
 > >>
-> >> It parses the following kind of blocks:
+> >> As first step, size the FWCfgState.entries[*] and FWCfgState.entry_order
+> >> arrays dynamically. All three array sizes will be influenced by the new
+> >> field (and device property) FWCfgState.file_slots.
 > >>
-> >> Free-form:
+> >> Make the following changes:
 > >>
-> >>   ##
-> >>   # =3D Section
-> >>   # =3D=3D Subsection
-> >>   #
-> >>   # Some text foo with *emphasis*
-> >>   # 1. with a list
-> >>   # 2. like that
-> >>   #
-> >>   # And some code:
-> >>   # | $ echo foo
-> >>   # | -> do this
-> >>   # | <- get that
-> >>   #
-> >>   ##
+> >> - Replace the FW_CFG_FILE_SLOTS macro with FW_CFG_FILE_SLOTS_TRAD
+> >>   (traditional count of fw_cfg file slots) in the header file. The value
+> >>   remains 0x10.
 > >>
-> >> Symbol:
+> >> - Replace all uses of FW_CFG_FILE_SLOTS with a helper function called
+> >>   fw_cfg_file_slots(), returning the new property.
 > >>
-> >>   ##
-> >>   # @symbol:
-> >>   #
-> >>   # Symbol body ditto ergo sum. Foo bar
-> >>   # baz ding.
-> >>   #
-> >>   # @arg: foo
-> >>   # @arg: #optional foo
-> >
-> > Let's not use @arg twice.
-> >
-> > Terminology: I prefer to use "parameter" for formal parameters, and
-> > "argument" for actual arguments.  This matches how The Python Language
-> > Reference uses the terms.
-> >
-> > What about
-> >
-> >     # @param1: the frob to frobnicate
-> >     # @param2: #optional how hard to frobnicate
->=20
-> ok
->=20
-> >>   #
-> >>   # Returns: returns bla bla
-> >>   #          Or bla blah
-> >
-> > Repeating "returns" is awkward, and we don't do that in our schemas.
-> >
-> > We need a period before "Or", or spell it "or".
-> >
-> > What about
-> >
-> >     # Returns: the frobnicated frob.
-> >     #          If frob isn't frobnicatable, GenericError.
->=20
-> ok
->=20
-> >>   #
-> >>   # Since: version
-> >>   # Notes: notes, comments can have
-> >>   #        - itemized list
-> >>   #        - like this
-> >>   #
-> >>   # Example:
-> >>   #
-> >>   # -> { "execute": "quit" }
-> >>   # <- { "return": {} }
-> >>   #
-> >>   ##
+> >> - Eliminate the macro FW_CFG_MAX_ENTRY, and replace all its uses with a
+> >>   helper function called fw_cfg_max_entry().
 > >>
-> >> That's roughly following the following EBNF grammar:
+> >> - In the MMIO- and IO-mapped realize functions both, allocate all three
+> >>   arrays dynamically, based on the new property.
 > >>
-> >> api_comment =3D "##\n" comment "##\n"
-> >> comment =3D freeform_comment | symbol_comment
-> >> freeform_comment =3D { "# " text "\n" | "#\n" }
-> >> symbol_comment =3D "# @" name ":\n" { member | meta | freeform_comment=
- }
-> >
-> > Rejects non-empty comments where "#" is not followed by space.  Such
-> > usage is accepted outside doc comments.  Hmm.
-> >
-> >> member =3D "# @" name ':' [ text ] freeform_comment
-> >
-> > Are you missing a "\n" before freeform_comment?
->=20
-> yes
->=20
-> >> meta =3D "# " ( "Returns:", "Since:", "Note:", "Notes:", "Example:", "=
-Examples:" ) [ text ] freeform_comment
-> >
-> > Likewise.
->=20
-> ok
->=20
-> >> text =3D free-text markdown-like, "#optional" for members
-> >
-> > The grammar is ambiguous: a line "# @foo:\n" can be parsed both as
-> > freeform_comment and as symbol_comment.  Since your intent is obvious
-> > enough, it can still serve as documentation.  It's not a suitable
-> > foundation for parsing, though.  Okay for a commit message.
-> >
-> >> Thanks to the following json expressions, the documentation is enhanced
-> >> with extra information about the type of arguments and return value
-> >> expected.
-> >
-> > I guess you want to say that we enrich the documentation we extract from
-> > comments with information from the actual schema.  Correct?
->=20
-> yes
->=20
-> > Missing: a brief discussion of deficiencies.  These include:
-> >
-> > * The generated QMP documentation includes internal types
-> >
-> >   We use qapi-schema.json both for defining the external QMP interface
-> >   and for defining internal types.  qmp-introspect.py carefully
-> >   separates the two, to not expose internal types.  qapi2texi.py happily
-> >   exposes everything.
-> >
-> >   Currently, about a fifth of the types in the generated docs are
-> >   internal:
-> >
-> >       AcpiTableOptions
-> >       BiosAtaTranslation
-> >       BlockDeviceMapEntry
-> >       COLOMessage
-> >       COLOMode
-> >       DummyForceArrays
-> >       FailoverStatus
-> >       FloppyDriveType
-> >       ImageCheck
-> >       LostTickPolicy
-> >       MapEntry
-> >       MigrationParameter
-> >       NetClientDriver
-> >       NetFilterDirection
-> >       NetLegacy
-> >       NetLegacyNicOptions
-> >       NetLegacyOptions
-> >       NetLegacyOptionsKind
-> >       Netdev
-> >       NetdevBridgeOptions
-> >       NetdevDumpOptions
-> >       NetdevHubPortOptions
-> >       NetdevL2TPv3Options
-> >       NetdevNetmapOptions
-> >       NetdevNoneOptions
-> >       NetdevSocketOptions
-> >       NetdevTapOptions
-> >       NetdevUserOptions
-> >       NetdevVdeOptions
-> >       NetdevVhostUserOptions
-> >       NumaNodeOptions
-> >       NumaOptions
-> >       NumaOptionsKind
-> >       OnOffAuto
-> >       OnOffSplit
-> >       PreallocMode
-> >       QCryptoBlockCreateOptions
-> >       QCryptoBlockCreateOptionsLUKS
-> >       QCryptoBlockFormat
-> >       QCryptoBlockInfo
-> >       QCryptoBlockInfoBase
-> >       QCryptoBlockInfoQCow
-> >       QCryptoBlockOpenOptions
-> >       QCryptoBlockOptionsBase
-> >       QCryptoBlockOptionsLUKS
-> >       QCryptoBlockOptionsQCow
-> >       QCryptoSecretFormat
-> >       QCryptoTLSCredsEndpoint
-> >       QapiErrorClass
-> >       ReplayMode
-> >       X86CPUFeatureWordInfo
-> >       X86CPURegister32
-> >
-> >   Generating documentation for internal types might be useful, but
-> >   letting them pollute QMP interface documentation isn't.  Needs fixing
-> >   before we release.  Until then, needs a FIXME comment in qapi2texi.py.
-> >
-> > * Union support is lacking
-> >
-> >   The doc string language is adequate for documenting commands, events,
-> >   and non-union types.  It doesn't really handle union variants.  Hardly
-> >   surprising, as you fitted the language do existing practice, and
-> >   existing (mal-)practice is neglecting to document union variant
-> >   members.
-> >
-> > * Documentation is lacking
-> >
-> >   See review of qapi-code-gen.txt below.
-> >
-> > * Doc comment error message positions are imprecise
-> >
-> >   They always point to the beginning of the comment.
-> >
-> > * Probably more
-> >
-> >   We should update this with noteworthy findings during review.  I
-> >   tried, but I suspect I missed some.
->=20
-> ok
->=20
-> >> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > [Lengthy diffstat snipped...]
+> >> - The new property defaults to 0x20; however at the moment we forcibly set
+> >>   it to FW_CFG_FILE_SLOTS_TRAD on all code paths available to board code
+> >>   (namely in the fw_cfg_init_io_dma() and fw_cfg_init_mem_wide() helper
+> >>   functions). This is going to be customized in the following patches.
 > >>
-> >> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> >> index e98d3b6..f16764c 100644
-> >> --- a/tests/Makefile.include
-> >> +++ b/tests/Makefile.include
-> >> @@ -350,6 +350,21 @@ qapi-schema +=3D base-cycle-direct.json
-> >>  qapi-schema +=3D base-cycle-indirect.json
-> >>  qapi-schema +=3D command-int.json
-> >>  qapi-schema +=3D comments.json
-> >> +qapi-schema +=3D doc-bad-args.json
-> >> +qapi-schema +=3D doc-bad-symbol.json
-> >> +qapi-schema +=3D doc-duplicated-arg.json
-> >> +qapi-schema +=3D doc-duplicated-return.json
-> >> +qapi-schema +=3D doc-duplicated-since.json
-> >> +qapi-schema +=3D doc-empty-arg.json
-> >> +qapi-schema +=3D doc-empty-section.json
-> >> +qapi-schema +=3D doc-empty-symbol.json
-> >> +qapi-schema +=3D doc-invalid-end.json
-> >> +qapi-schema +=3D doc-invalid-end2.json
-> >> +qapi-schema +=3D doc-invalid-return.json
-> >> +qapi-schema +=3D doc-invalid-section.json
-> >> +qapi-schema +=3D doc-invalid-start.json
-> >> +qapi-schema +=3D doc-missing-expr.json
-> >> +qapi-schema +=3D doc-missing-space.json
-> >>  qapi-schema +=3D double-data.json
-> >>  qapi-schema +=3D double-type.json
-> >>  qapi-schema +=3D duplicate-key.json
-> >> @@ -443,6 +458,8 @@ qapi-schema +=3D union-optional-branch.json
-> >>  qapi-schema +=3D union-unknown.json
-> >>  qapi-schema +=3D unknown-escape.json
-> >>  qapi-schema +=3D unknown-expr-key.json
+> >> Cc: "Gabriel L. Somlo" <somlo@cmu.edu>
+> >> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> >> Cc: Gerd Hoffmann <kraxel@redhat.com>
+> >> Cc: Igor Mammedov <imammedo@redhat.com>
+> >> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> >> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+> >> ---
+> >>
+> >> Notes:
+> >>     I know that upstream doesn't care about backward migration, but some
+> >>     downstreams might.
+> >>
+> >>  docs/specs/fw_cfg.txt          |  2 +-
+> >>  include/hw/nvram/fw_cfg_keys.h |  3 +-
+> >>  hw/nvram/fw_cfg.c              | 85 ++++++++++++++++++++++++++++++++++++++----
+> >>  3 files changed, 79 insertions(+), 11 deletions(-)
+> >>
+> >> diff --git a/docs/specs/fw_cfg.txt b/docs/specs/fw_cfg.txt
+> >> index a19e2adbe1c6..84e2978706f5 100644
+> >> --- a/docs/specs/fw_cfg.txt
+> >> +++ b/docs/specs/fw_cfg.txt
+> >> @@ -154,11 +154,11 @@ Selector Reg.    Range Usage
+> >>  0x8000 - 0xbfff  Arch. Specific (0x0000 - 0x3fff, generally RO, possibly RW
+> >>                                   through the DMA interface in QEMU v2.9+)
+> >>  0xc000 - 0xffff  Arch. Specific (0x0000 - 0x3fff, RW, ignored in v2.4+)
+> >>  
+> >>  In practice, the number of allowed firmware configuration items is given
+> >> -by the value of FW_CFG_MAX_ENTRY (see fw_cfg.h).
+> >> +by the value (FW_CFG_FILE_FIRST + FW_CFG_FILE_SLOTS_TRAD) (see fw_cfg.h).
+> >>  
+> >>  = Guest-side DMA Interface =
+> >>  
+> >>  If bit 1 of the feature bitmap is set, the DMA interface is present. This does
+> >>  not replace the existing fw_cfg interface, it is an add-on. This interface
+> >> diff --git a/include/hw/nvram/fw_cfg_keys.h b/include/hw/nvram/fw_cfg_keys.h
+> >> index 0f3e871884c0..627589793671 100644
+> >> --- a/include/hw/nvram/fw_cfg_keys.h
+> >> +++ b/include/hw/nvram/fw_cfg_keys.h
+> >> @@ -27,12 +27,11 @@
+> >>  #define FW_CFG_SETUP_SIZE       0x17
+> >>  #define FW_CFG_SETUP_DATA       0x18
+> >>  #define FW_CFG_FILE_DIR         0x19
+> >>  
+> >>  #define FW_CFG_FILE_FIRST       0x20
+> >> -#define FW_CFG_FILE_SLOTS       0x10
+> >> -#define FW_CFG_MAX_ENTRY        (FW_CFG_FILE_FIRST + FW_CFG_FILE_SLOTS)
+> >> +#define FW_CFG_FILE_SLOTS_TRAD  0x10
+> >>  
+> >>  #define FW_CFG_WRITE_CHANNEL    0x4000
+> >>  #define FW_CFG_ARCH_LOCAL       0x8000
+> >>  #define FW_CFG_ENTRY_MASK       (~(FW_CFG_WRITE_CHANNEL | FW_CFG_ARCH_LOCAL))
+> >>  
+> >> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+> >> index e0145c11a19b..2e1441c09750 100644
+> >> --- a/hw/nvram/fw_cfg.c
+> >> +++ b/hw/nvram/fw_cfg.c
+> >> @@ -31,10 +31,13 @@
+> >>  #include "hw/sysbus.h"
+> >>  #include "trace.h"
+> >>  #include "qemu/error-report.h"
+> >>  #include "qemu/config-file.h"
+> >>  #include "qemu/cutils.h"
+> >> +#include "qapi/error.h"
 > >> +
-> >> +
-> >>  check-qapi-schema-y :=3D $(addprefix tests/qapi-schema/, $(qapi-schem=
-a))
-> >>=20=20
-> >>  GENERATED_HEADERS +=3D tests/test-qapi-types.h tests/test-qapi-visit.=
-h \
-> >> diff --git a/scripts/qapi.py b/scripts/qapi.py
-> >> index 4d1b0e4..1b456b4 100644
-> >> --- a/scripts/qapi.py
-> >> +++ b/scripts/qapi.py
-> >> @@ -122,6 +122,109 @@ class QAPILineError(Exception):
-> >>              "%s:%d: %s" % (self.info['file'], self.info['line'], self=
-.msg)
-> >>=20=20
-> >>=20=20
-> >> +class QAPIDoc(object):
-> >> +    class Section(object):
-> >> +        def __init__(self, name=3D""):
-> >
-> > name=3DNone feels more natural than "" for an absent optional name.
->=20
-> ok
->=20
-> >> +            # optional section name (argument/member or section name)
-> >> +            self.name =3D name
-> >> +            # the list of strings for this section
-> >
-> > Would "list of lines" be more accurate, or less?
->=20
-> more accurate, ok
->=20
-> >> +            self.content =3D []
-> >> +
-> >> +        def append(self, line):
-> >> +            self.content.append(line)
-> >> +
-> >> +        def __repr__(self):
-> >> +            return "\n".join(self.content).strip()
-> >> +
-> >> +    class ArgSection(Section):
-> >> +        pass
-> >
-> > Begs the question what makes ArgSection differ from Section.  I think
-> > it's the semantics of self.name: an ArgSection's name is the parameter
-> > name, a non-ArgSection can either be a "meta" section (name is one of
-> > "Returns"", "Since", "Note", "Notes", "Example", "Examples") or an
-> > anonymous section (name is "").
->=20
-> yes, and the section type is checked in  _append_freeform()
->=20
-> >> +
-> >> +    def __init__(self, parser):
-> >> +        self.parser =3D parser
-> >> +        self.symbol =3D None
-> >> +        self.body =3D QAPIDoc.Section()
-> >> +        # a dict {'arg': ArgSection, ...}
-> >
-> > Works.  Alternatevely:
-> >
-> >            # dict mapping parameter name to ArgSection
->=20
-> ok
->=20
-> >> +        self.args =3D OrderedDict()
-> >> +        # a list of Section
-> >> +        self.meta =3D []
-> >> +        # the current section
-> >> +        self.section =3D self.body
-> >> +        # associated expression and info (set by expression parser)
-> >
-> > "will be set by expression parser", or "to be set by expression parser"?
->=20
-> ok
->=20
-> >> +        self.expr =3D None
-> >> +        self.info =3D None
-> >
-> > Clearer now.  The one remark I still have is on the use of "meta" isn't
-> > obvious here.  I think a comment further up explaining the different
-> > kinds of sections would help.
-> >
-> > To be honest, I don't get what's "meta" about the "meta" sections :)
->=20
-> Let's drop that distinction, it isn't necessary anymore
->=20
-> >> +
-> >> +    def has_meta(self, name):
-> >> +        """Returns True if the doc has a meta section 'name'"""
-> >
-> > PEP257[1] demands imperative mood, and punctuation:
-> >
-> >            """Return True if the doc has a meta section 'name'."""
-> >
-> > Unfortunately, there seems to be no established convention for marking
-> > parameter names.  You put this one in single quotes, which works here,
-> > but could be confusing in other cases.  I'd sidestep it:
-> >
-> >            """Return True if we have a meta section with this name."""
-> >
-> > or
-> >
-> >            """Does a meta section with this name exist?"""
->=20
-> ok
->=20
-> >> +        for i in self.meta:
-> >> +            if i.name =3D=3D name:
-> >> +                return True
-> >> +        return False
-> >> +
-> >> +    def append(self, line):
-> >> +        """Adds a # comment line, to be parsed and added to current s=
-ection"""
-> >
-> > Imperative mood:
-> >
-> >     """Add a comment line, to be parsed and added to the current sectio=
-n."""
-> >
-> > However, we're not always adding to the current section, we can also
-> > start a new one.  The following avoids suggesting anything about the
-> > current section:
-> >
-> >     """Parse a comment line and add it to the documentation."""
-> >
-> > When the function name is a verb, and its doc string starts with a
-> > different verb, the name might be suboptimal.  Use your judgement.
-> >
-> > If this one-liner is too terse, we can try a multi-line doc string:
-> >=20=20=20=20=20
-> >     """Parse a comment line and add it to the documentation.
-> >
-> >     TODO should we tell more about how we parse?
-> >
-> >     Args:
-> >         line: the comment starting with '#', with the newline stripped.
-> >
-> >     Raises:
-> >         QAPISchemaError: TODO explain error conditions
-> >     """
-> >
-> > Format stolen from the Google Python Style Guide[2], because PEP257 is
-> > of not much help there.
-> >
-> > Once you start with such elaborate doc strings, pressure will likely
-> > mount to do the same elsewhere.  Could be a distraction right now.  Use
-> > your judgement.
->=20
-> ok, thanks
->=20
-> >> +        line =3D line[1:]
-> >> +        if not line:
-> >> +            self._append_freeform(line)
-> >> +            return
-> >> +
-> >> +        if line[0] !=3D ' ':
-> >> +            raise QAPISchemaError(self.parser, "missing space after #=
-")
-> >> +        line =3D line[1:]
-> >
-> > QAPISchemaError takes the error position from its QAPISchemaParser
-> > argument.  In other words, the error position depends on the state of
-> > the parser when it calls this function.  Turns out the position is the
-> > beginning of the comment.  Servicable here.  Action at a distance,
-> > though.
-> >
-> > Less strict:
-> >
-> >            # strip leading # and space
-> >            line =3D line[1:]
-> >            if line[0] =3D=3D ' ':
-> >                line =3D line[1:]
-> >
-> > Also avoids special-casing empty comments.
->=20
-> That would raise "IndexError: string index out of range" on empty comment
-> lines ("#")
+> >> +#define FW_CFG_FILE_SLOTS_DFLT 0x20
+> >>  
+> >>  #define FW_CFG_NAME "fw_cfg"
+> >>  #define FW_CFG_PATH "/machine/" FW_CFG_NAME
+> >>  
+> >>  #define TYPE_FW_CFG     "fw_cfg"
+> >> @@ -69,12 +72,13 @@ typedef struct FWCfgEntry {
+> >>  struct FWCfgState {
+> >>      /*< private >*/
+> >>      SysBusDevice parent_obj;
+> >>      /*< public >*/
+> >>  
+> >> -    FWCfgEntry entries[2][FW_CFG_MAX_ENTRY];
+> >> -    int entry_order[FW_CFG_MAX_ENTRY];
+> >> +    uint32_t file_slots;  
+> > should it be uint16_t?
+> > As below you use "uint16_t file_slots_max;" and do some UINT16
+> > to calculate max limit.  
+> 
+> I think I had a reason for making this uint32_t. I think the argument
+> was that fw_cfg_max_entry() could theoretically return a value that
+> doesn't fit in a uint16_t. Looking again at the patch however, I think I
+> can try to make this a uint16_t for the next version.
+> 
+> >   
+> >> +    FWCfgEntry *entries[2];
+> >> +    int *entry_order;
+> >>      FWCfgFiles *files;
+> >>      uint16_t cur_entry;
+> >>      uint32_t cur_offset;
+> >>      Notifier machine_ready;
+> >>  
+> >> @@ -255,17 +259,27 @@ static void fw_cfg_reboot(FWCfgState *s)
+> >>  static void fw_cfg_write(FWCfgState *s, uint8_t value)
+> >>  {
+> >>      /* nothing, write support removed in QEMU v2.4+ */
+> >>  }
+> >>  
+> >> +static inline uint32_t fw_cfg_file_slots(const FWCfgState *s)
+> >> +{
+> >> +    return s->file_slots;
+> >> +}  
+> > so far it doesn't look like this wrapper function is necessary,
+> > I'd prefer accessing field directly as it's used only internally.
+> > Or do you have plans to extend wrapper later?
+> > (then it would be better introduce wrapper at that time)  
+> 
+> Originally I used "s->file_slots" in this patch, like you say, without
+> this small wrapper function,, but the resultant patch was harder to
+> review. With this wrapper, you have two kinds of changes in the patch:
+> 
+> *     FW_CFG_MAX_ENTRY
+>   --> fw_cfg_max_entry(s)  
+> 
+> *     FW_CFG_FILE_SLOTS
+>   --> fw_cfg_file_slots(s)  
+> 
+> Without the wrapper, the second bullet looks
+> 
+> *     FW_CFG_FILE_SLOTS
+>   --> s->file_slots  
+> 
+> and to me that made the patch harder to verify.
+to me this variant look clearer as I don't have to recall that 
+fw_cfg_file_slots(s) is s->file_slots  and does nothing more.
+But if you prefer wrapper I'm also fine with it.
 
-Fixable:
-               if line.startswith(' '):
+> 
+> >   
+> >> +
+> >> +static inline uint32_t fw_cfg_max_entry(const FWCfgState *s)
+> >> +{
+> >> +    return FW_CFG_FILE_FIRST + fw_cfg_file_slots(s);
+> >> +}
+> >> +
+> >>  static int fw_cfg_select(FWCfgState *s, uint16_t key)
+> >>  {
+> >>      int arch, ret;
+> >>      FWCfgEntry *e;
+> >>  
+> >>      s->cur_offset = 0;
+> >> -    if ((key & FW_CFG_ENTRY_MASK) >= FW_CFG_MAX_ENTRY) {
+> >> +    if ((key & FW_CFG_ENTRY_MASK) >= fw_cfg_max_entry(s)) {
+> >>          s->cur_entry = FW_CFG_INVALID;
+> >>          ret = 0;
+> >>      } else {
+> >>          s->cur_entry = key;
+> >>          ret = 1;
+> >> @@ -608,11 +622,11 @@ static void fw_cfg_add_bytes_read_callback(FWCfgState *s, uint16_t key,
+> >>  {
+> >>      int arch = !!(key & FW_CFG_ARCH_LOCAL);
+> >>  
+> >>      key &= FW_CFG_ENTRY_MASK;
+> >>  
+> >> -    assert(key < FW_CFG_MAX_ENTRY && len < UINT32_MAX);
+> >> +    assert(key < fw_cfg_max_entry(s) && len < UINT32_MAX);
+> >>      assert(s->entries[arch][key].data == NULL); /* avoid key conflict */
+> >>  
+> >>      s->entries[arch][key].data = data;
+> >>      s->entries[arch][key].len = (uint32_t)len;
+> >>      s->entries[arch][key].read_callback = callback;
+> >> @@ -626,11 +640,11 @@ static void *fw_cfg_modify_bytes_read(FWCfgState *s, uint16_t key,
+> >>      void *ptr;
+> >>      int arch = !!(key & FW_CFG_ARCH_LOCAL);
+> >>  
+> >>      key &= FW_CFG_ENTRY_MASK;
+> >>  
+> >> -    assert(key < FW_CFG_MAX_ENTRY && len < UINT32_MAX);
+> >> +    assert(key < fw_cfg_max_entry(s) && len < UINT32_MAX);
+> >>  
+> >>      /* return the old data to the function caller, avoid memory leak */
+> >>      ptr = s->entries[arch][key].data;
+> >>      s->entries[arch][key].data = data;
+> >>      s->entries[arch][key].len = len;
+> >> @@ -775,17 +789,17 @@ void fw_cfg_add_file_callback(FWCfgState *s,  const char *filename,
+> >>      size_t dsize;
+> >>      MachineClass *mc = MACHINE_GET_CLASS(qdev_get_machine());
+> >>      int order = 0;
+> >>  
+> >>      if (!s->files) {
+> >> -        dsize = sizeof(uint32_t) + sizeof(FWCfgFile) * FW_CFG_FILE_SLOTS;
+> >> +        dsize = sizeof(uint32_t) + sizeof(FWCfgFile) * fw_cfg_file_slots(s);
+> >>          s->files = g_malloc0(dsize);
+> >>          fw_cfg_add_bytes(s, FW_CFG_FILE_DIR, s->files, dsize);
+> >>      }
+> >>  
+> >>      count = be32_to_cpu(s->files->count);
+> >> -    assert(count < FW_CFG_FILE_SLOTS);
+> >> +    assert(count < fw_cfg_file_slots(s));
+> >>  
+> >>      /* Find the insertion point. */
+> >>      if (mc->legacy_fw_cfg_order) {
+> >>          /*
+> >>           * Sort by order. For files with the same order, we keep them
+> >> @@ -855,11 +869,11 @@ void *fw_cfg_modify_file(FWCfgState *s, const char *filename,
+> >>      void *ptr = NULL;
+> >>  
+> >>      assert(s->files);
+> >>  
+> >>      index = be32_to_cpu(s->files->count);
+> >> -    assert(index < FW_CFG_FILE_SLOTS);
+> >> +    assert(index < fw_cfg_file_slots(s));
+> >>  
+> >>      for (i = 0; i < index; i++) {
+> >>          if (strcmp(filename, s->files->f[i].name) == 0) {
+> >>              ptr = fw_cfg_modify_bytes_read(s, FW_CFG_FILE_FIRST + i,
+> >>                                             data, len);
+> >> @@ -926,10 +940,16 @@ FWCfgState *fw_cfg_init_io_dma(uint32_t iobase, uint32_t dma_iobase,
+> >>      qdev_prop_set_uint32(dev, "dma_iobase", dma_iobase);
+> >>      if (!dma_requested) {
+> >>          qdev_prop_set_bit(dev, "dma_enabled", false);
+> >>      }
+> >>  
+> >> +    /* Once we expose the "file_slots" property to callers of
+> >> +     * fw_cfg_init_io_dma(), the following setting should become conditional on
+> >> +     * the input parameter being lower than the current value of the property.
+> >> +     */
+> >> +    qdev_prop_set_uint32(dev, "file_slots", FW_CFG_FILE_SLOTS_TRAD);
+> >> +
+> >>      fw_cfg_init1(dev);
+> >>      s = FW_CFG(dev);
+> >>  
+> >>      if (s->dma_enabled) {
+> >>          /* 64 bits for the address field */
+> >> @@ -963,10 +983,17 @@ FWCfgState *fw_cfg_init_mem_wide(hwaddr ctl_addr,
+> >>      qdev_prop_set_uint32(dev, "data_width", data_width);
+> >>      if (!dma_requested) {
+> >>          qdev_prop_set_bit(dev, "dma_enabled", false);
+> >>      }
+> >>  
+> >> +    /* Once we expose the "file_slots" property to callers of
+> >> +     * fw_cfg_init_mem_wide(), the following setting should become conditional
+> >> +     * on the input parameter being lower than the current value of the
+> >> +     * property. Refer to fw_cfg_init_io_dma().
+> >> +     */
+> >> +    qdev_prop_set_uint32(dev, "file_slots", FW_CFG_FILE_SLOTS_TRAD);  
+> > both above cases of qdev_prop_set_uint32() could be replaced by
+> > compat property for fwcfg device which would clamp "file_slots"
+> > to old value for old machine types in a cleaner way.  
+> 
+> The unconditional qdev_prop_set_uint32() call is already replaced, in
+> fw_cfg_init_io_dma(), in the next patch, and the compat properties are
+> added in the patch after it.
+> 
+> The current approach is:
+> - patch #2 adds the property with the raised default, but clamps it
+>   down in code that calls fw_cfg_init1() directly
+> - patch #3 propagates the clamping-down a little bit outwards, towards
+>   board code, but only in the IO-port mapped case,
+> - patch #4 adds the 2.8 compat props and raises the limit in 2.9 pc
+>   board code (i.e., 2.9 pc opts in)
+> 
+> The point is that
+> (a) no old machine type should see any change
+> (b) even for new machine types, the higher file slot count is opt-in for
+>     board code (i.e., it shouldn't affect callers of
+>     fw_cfg_init_mem_wide() and fw_cfg_init_io())
+I'm not sure that we need (b) (i.e. optin for new machine versions)
+Maybe all new machine types should use new default and we should
+clamp it down for all old machine types the same way (compat prop).
+It would be uniform and less confusing possibly making series simpler.
 
-> Also I'd like to keep the error in case a space is missing (it caught some
-> already).
-
-On the one hand, I share your distaste for lack of space between # and
-comment text.  On the other hand, I dislike enforcing spacing
-inconsistently: enforce in doc comments, but not in other comments.
-
-> > Perhaps we should treat all leading whitespace the same (I'm not sure):
-> >
-> >            # strip leading # and whitespace
-> >            line =3D line[1:]
-> >            line =3D line.lstrip()
->=20
-> That would break indentation in Example sections
-
-True; scratch the idea.
-
-> >> +
-> >> +        if self.symbol:
-> >> +            self._append_symbol_line(line)
-> >> +        elif (not self.body.content and
-> >> +              line.startswith("@") and line.endswith(":")):
-> >> +            self.symbol =3D line[1:-1]
-> >> +            if not self.symbol:
-> >> +                raise QAPISchemaError(self.parser, "Invalid symbol")
-> >
-> > Doesn't recognize the symbol when there's anything other than a single
-> > space between # and @.  Pathological case: '#\t@foo:' starting in column
-> > 6 looks exactly like '# @foo:', but doesn't work.  Fortunately, your
-> > code rejects the tab there.  Assigning meaning to (leading) whitespace
-> > may make sense, but it must be documented clearly.
->=20
-> I think it's simpler to only accept a simple space (# + space + @ + symbol
-> + :), it will also lead to more uniform doc.
-
-Simpler is always an argument worth considering, but simpler isn't
-always better.  Experience with other languages has taught me to be
-carefule when making the kind or amount of whitespace significant.
-
-Kind of whitespace is not a usability issue with your proposal, because
-your patch rejects anything but space.
-
-Amount of whitespace is, because getting it wrong turns a symbol comment
-block into a free-form comment block, or a parameter section into
-free-form lines belonging to whatever section precedes it.
-
-As long as we reject definitions without a symbol comment, errors of the
-former kind will still be caught, although the error message could be
-confusing.
-
-As is, we don't reject definitions whose symbol comment fails to
-document all parameters.  Errors of the latter kind will therefore go
-undetected.  Trap for the unwary.  See also "@param2 is True" below.
-
-If we can't find a solution without such usability issues now, then I'm
-willing to settle for documentation warning unwary users, or even for a
-FIXME comment.
-
-> > Doesn't recognize the symbol when there's crap after ":".  Confusing
-> > when it's invisible crap, i.e. trailing whitespace.  In general, it's
-> > best to parse left to right, like this:
-> >
-> >            elif not self.body.content and line.startswith('@'):
-> >                match =3D valid_name.match(line[1:]);
-> >                if not match:
-> >                    raise QAPISchemaError(self.parser, 'Invalid name')
-> >                if line.startswith(':', match.end(0)):
-> >                    raise QAPISchemaError(self.parser, 'Expected ":")
->=20
-> Easier is simply to check :
-> if not line.endswith(":"):
->                 raise QAPIParseError(self.parser, "Line should end with :=
-")
->=20
-> test added
-
-There's a reason we have a mountain of theory on parsing, built in
-decades of practice.  What starts "easier" than that generally ends up
-rewritten from scratch.  Anyway, let's continue.
-
-> > Here, the error position is clearly suboptimal: it's the beginning of
-> > the comment instead of where the actual error is, namely the beginning /
-> > the end of the name.  More of the same below.  The root cause is
-> > stacking parsers.  I'm not asking you to do anything about it at this
-> > time.
-> >
-> > Note my use of "name" rather than "symbol" in the error message.
-> > qapi-code-gen.txt talks about names, not symbols.  Consistent use of
-> > terminology matters.
->=20
-> Agree, isn't "symbol" more appropriate for documentation though?
-
-Possibly.  But if it's an improvement for generated documentation, it
-surely is an improvement for hand-written documentation such as
-qapi-code-gen.txt and the comments in qapi*.py, too.  And the Python
-identifiers.  I have to admit that cools my enthusiasm for making the
-improvement right now :)
-
-> >> +        else:
-> >> +            self._append_freeform(line)
-> >> +
-> >> +    def _append_symbol_line(self, line):
-> >> +        name =3D line.split(' ', 1)[0]
-> >> +
-> >> +        if name.startswith("@") and name.endswith(":"):
-> >> +            line =3D line[len(name)+1:]
-> >> +            self._start_args_section(name[1:-1])
-> >
-> > Similar issue.  Left to right:
-> >
-> >            if re.match(r'\s*@', line):
-> >                match =3D valid_name.match(line[1:]);
-> >                if not match:
-> >                    raise QAPISchemaError(self.parser, 'Invalid paramete=
-r name')
-> >                line =3D line[match.end(0):]
-> >                if line.startswith(':'):
-> >                    raise QAPISchemaError(self.parser, 'Expected ":")
-> >                line =3D line[1:]
-> >                self._start_args_section(match.group(0))
-> >
-> > Even better would be factoring out the common code to parse '@foo:'.
->=20
-> It's a valid case to have a section freeform comment starting with @foo, =
-ex:
->=20
-> @param: do this and than if
->                @param2 is True
-
-Good point, but it's a language issue, not a parsing issue.
-
-The language issue is that we need to recognize a line "# @param: ..."
-as the start of a parameter section, while still permitting free-form
-lines like "# @param2 is True".
-
-This is a pretty convincing argument for requiring the ':'.  It can also
-be used as an argument for requiring exactly one space between # and @.
-
-How the language is parsed is completely orthogonal.
-
->  I don't think it's worth to factor out the code to parse @foo vs @foo:, =
-yet
->=20
-> >> +        elif name in ("Returns:", "Since:",
-> >> +                      # those are often singular or plural
-> >> +                      "Note:", "Notes:",
-> >> +                      "Example:", "Examples:"):
-> >> +            line =3D line[len(name)+1:]
-> >> +            self._start_meta_section(name[:-1])
-> >
-> > Since we're re.match()ing already, here's how do to it that way:
->=20
-> I don't follow your suggestion for the reason above,so I still have the
-> first word 'name'
->=20
-> >            else
-> >                match =3D re.match(r'\s*(Returns|Since|Notes?|Examples?)=
-:', line)
-> >                if match:
-> >                    line =3D line[match.end(0):]
-> >                    self._start_meta_section(match.group(1))
->=20
-> not really much nicer to me (especially because no match yet), I'll keep
-> the current code for now
->=20
-> >> +
-> >> +        self._append_freeform(line)
-> >> +
-> >> +    def _start_args_section(self, name):
-> >> +        if not name:
-> >> +            raise QAPISchemaError(self.parser, "Invalid argument name=
-")
-> >
-> > parameter name
->=20
-> ok
->=20
-> >> +        if name in self.args:
-> >> +            raise QAPISchemaError(self.parser, "'%s' arg duplicated" =
-% name)
-> >
-> > Duplicate parameter name
->=20
-> ok
->=20
-> >> +        self.section =3D QAPIDoc.ArgSection(name)
-> >> +        self.args[name] =3D self.section
-> >> +
-> >> +    def _start_meta_section(self, name):
-> >> +        if name in ("Returns", "Since") and self.has_meta(name):
-> >> +            raise QAPISchemaError(self.parser,
-> >> +                                  "Duplicated '%s' section" % name)
-> >> +        self.section =3D QAPIDoc.Section(name)
-> >> +        self.meta.append(self.section)
-> >> +
-> >> +    def _append_freeform(self, line):
-> >> +        in_arg =3D isinstance(self.section, QAPIDoc.ArgSection)
-> >> +        if in_arg and self.section.content and not self.section.conte=
-nt[-1] \
-> >> +           and line and not line[0].isspace():
-> >
-> > PEP8[3] prefers parenthesises over backslash:
-> >
-> >            if (in_arg and self.section.content and not self.section.con=
-tent[-1]
-> >                and line and not line[0].isspace()):
->=20
-> yes, thanks
->=20
-> >> +            # an empty line followed by a non-indented
-> >> +            # comment ends the argument section
-> >> +            self.section =3D self.body
-> >> +            self._append_freeform(line)
-> >> +            return
-> >
-> > Switching back to the self.body section like this reorders the
-> > documentation text.  I still think this is a terrible idea.  A dumb
-> > script is exceedingly unlikely to improve human-written doc comment text
-> > by reordering.  In the rare case it does, the doc comment source should
-> > be reordered.
-> >
-> > Here's an example where the doc generator happily creates unintelligible
-> > garbage if I format CpuDefinitionInfo's doc comment in a slightly off
-> > way:
-> >
-> >     ##
-> >     # @CpuDefinitionInfo:
-> >     #
-> >     # Virtual CPU definition.
-> >     #
-> >     # @name: the name of the CPU definition
-> >     #=20
-> >     # @migration-safe: #optional whether a CPU definition can be safely
-> >     # used for migration in combination with a QEMU compatibility
-> >     # machine when migrating between different QMU versions and between
-> >     # hosts with different sets of (hardware or software)
-> >     # capabilities.
-> >     #=20
-> >     # If not provided, information is not available and callers should
-> >     # not assume the CPU definition to be migration-safe. (since 2.8)
-> >     #
-> >     # @static: whether a CPU definition is static and will not change
-> >     # depending on QEMU version, machine type, machine options and
-> >     # accelerator options.  A static model is always
-> >     # migration-safe. (since 2.8)
-> >     #
-> >     # @unavailable-features: #optional List of properties that prevent
-> >     # the CPU model from running in the current host. (since 2.8)
-> >     #
-> >     # @unavailable-features is a list of QOM property names that
-> >     # represent CPU model attributes that prevent the CPU from running.
-> >     # If the QOM property is read-only, that means there's no known
-> >     # way to make the CPU model run in the current host. Implementations
-> >     # that choose not to provide specific information return the
-> >     # property name "type".
-> >     #
-> >     # If the property is read-write, it means that it MAY be possible
-> >     # to run the CPU model in the current host if that property is
-> >     # changed. Management software can use it as hints to suggest or
-> >     # choose an alternative for the user, or just to generate meaningful
-> >     # error messages explaining why the CPU model can't be used.
-> >     # If @unavailable-features is an empty list, the CPU model is
-> >     # runnable using the current host and machine-type.
-> >     # If @unavailable-features is not present, runnability
-> >     # information for the CPU is not available.
-> >     #
-> >     # Since: 1.2.0
-> >     ##
-> >     { 'struct': 'CpuDefinitionInfo',
-> >       'data': { 'name': 'str', '*migration-safe': 'bool', 'static': 'bo=
-ol',
-> >                 '*unavailable-features': [ 'str' ] } }
-> >
-> > To detect the problem, you have to read the generated docs attentively.
-> > You know my opinion on our chances for that to happen during
-> > development.
-> >
-> > My point is not that we should support this doc comment format.  My
-> > point is that people could conceivably write something like it, and not
-> > get caught in patch review.
-> >
-> > I can see three ways out of this swamp:
-> >
-> > 1. Let sections continue until another one begins.
->=20
-> but we have interleaved  sections, and no explicit "body" section tag, ex:
->=20
-> ##
-> # @input-send-event:
-> #
-> # Send input event(s) to guest.
-> #
-> # @device: #optional display device to send event(s) to.
-> # @head: #optional head to send event(s) to, in case the
-> #        display device supports multiple scanouts.
-> # @events: List of InputEvent union.
-> #
-> # Returns: Nothing on success.
-> #
-> # The @device and @head parameters can be used to send the input event
-> # to specific input devices in case (a) multiple input devices of the
-> # same kind are added to the virtual machine and (b) you have
-> # configured input routing (see docs/multiseat.txt) for those input
-> # ....
->=20
-> > 2. Make text between sections an error.
-> >
-> > 3. When a section ends, start a new anonymous section.
->=20
-> It's not clear how to recognize when a section ends and append to comment
-> body.
->=20
-> 2. Make text between sections an error.
->=20
-> Sound like the best option to me. I'll fix the doc and add a check & test
-> for this common pattern though:
->=20
-> ##
-> # @TestStruct:
-> #
-> # body with @var
-> #
-> # @integer: foo
-> #           blah
-> #
-> #           bao
-> #
-> # Let's catch this bad comment.
-> ##
-
-Go ahead.
-
-> > Can't say offhand which one will work best.
-> >
-> >> +        if in_arg or not self.section.name.startswith("Example"):
-> >> +            line =3D line.strip()
-> >
-> > Stripping whitespace is not "Markdown-like", because intendation carries
-> > meaning in Markdown.  Example:
-> >
-> > * First item in itemized list
-> > * Second item
-> >     * Sub-item of second item
-> >     * Another sub-item
-> > * Third item
-> >
-> > Stripping whitespace destroys the list structure.  If that's what you
-> > want, you get to document where your "Markdown-like" markup is unlike
-> > Markdown :)
->=20
-> let's use "comment annotations" instead
-
-Okay.
-
-> > Is there a technical reason for stripping whitespace?
-> >
-> > See also discussion of space after # above.
-> >
-> >> +        self.section.append(line)
-> >> +
-> >> +
-> >>  class QAPISchemaParser(object):
-> >>=20=20
-> >>      def __init__(self, fp, previously_included=3D[], incl_info=3DNone=
-):
-> >> @@ -137,11 +240,18 @@ class QAPISchemaParser(object):
-> >>          self.line =3D 1
-> >>          self.line_pos =3D 0
-> >>          self.exprs =3D []
-> >> +        self.docs =3D []
-> >>          self.accept()
-> >>=20=20
-> >>          while self.tok is not None:
-> >>              info =3D {'file': fname, 'line': self.line,
-> >>                      'parent': self.incl_info}
-> >> +            if self.tok =3D=3D '#' and self.val.startswith('##'):
-> >
-> > How can self.val *not* start with '##' here?
->=20
-> you are right, unnecessary condition since we break get_expr() only in
-> this case now
->=20
-> >> +                doc =3D self.get_doc()
-> >> +                doc.info =3D info
-> >
-> > Let's pass info as argument to get_doc(), so we don't have to dot into
-> > doc here.  get_doc() can avoid dotting into doc by passing info to the
-> > constructor.
->=20
-> ok
->=20
-> >> +                self.docs.append(doc)
-> >> +                continue
-> >> +
-> >>              expr =3D self.get_expr(False)
-> >>              if isinstance(expr, dict) and "include" in expr:
-> >>                  if len(expr) !=3D 1:
-> >> @@ -160,6 +270,7 @@ class QAPISchemaParser(object):
-> >>                          raise QAPILineError(info, "Inclusion loop for=
- %s"
-> >>                                              % include)
-> >>                      inf =3D inf['parent']
-> >> +
-> >>                  # skip multiple include of the same file
-> >>                  if incl_abs_fname in previously_included:
-> >>                      continue
-> >> @@ -171,12 +282,38 @@ class QAPISchemaParser(object):
-> >>                  exprs_include =3D QAPISchemaParser(fobj, previously_i=
-ncluded,
-> >>                                                   info)
-> >>                  self.exprs.extend(exprs_include.exprs)
-> >> +                self.docs.extend(exprs_include.docs)
-> >>              else:
-> >>                  expr_elem =3D {'expr': expr,
-> >>                               'info': info}
-> >> +                if self.docs and not self.docs[-1].expr:
-> >> +                    self.docs[-1].expr =3D expr
-> >> +                    expr_elem['doc'] =3D self.docs[-1]
-> >> +
-> >
-> > Attaches the expression to the last doc comment that doesn't already
-> > have one.  A bit sloppy, because there could be non-doc comments in
-> > between, or the doc comment could be in another file.  It'll do, at
-> > least for now.
->=20
-> I extended the condition to check it attaches the doc from the same file
->=20
-> >>                  self.exprs.append(expr_elem)
-> >>=20=20
-> >> -    def accept(self):
-> >> +    def get_doc(self):
-> >> +        if self.val !=3D '##':
-> >> +            raise QAPISchemaError(self, "Junk after '##' at start of "
-> >> +                                  "documentation comment")
-> >> +
-> >> +        doc =3D QAPIDoc(self)
-> >> +        self.accept(False)
-> >> +        while self.tok =3D=3D '#':
-> >> +            if self.val.startswith('##'):
-> >> +                # End of doc comment
-> >> +                if self.val !=3D '##':
-> >> +                    raise QAPISchemaError(self, "Junk after '##' at e=
-nd of "
-> >> +                                          "documentation comment")
-> >> +                self.accept()
-> >> +                return doc
-> >> +            else:
-> >> +                doc.append(self.val)
-> >> +            self.accept(False)
-> >> +
-> >> +        raise QAPISchemaError(self, "Documentation comment must end w=
-ith '##'")
-> >
-> > Let's put this after accept, next to the other get_FOO().
->=20
-> ok
->=20
-> >> +
-> >> +    def accept(self, skip_comment=3DTrue):
-> >>          while True:
-> >>              self.tok =3D self.src[self.cursor]
-> >>              self.pos =3D self.cursor
-> >> @@ -184,7 +321,13 @@ class QAPISchemaParser(object):
-> >>              self.val =3D None
-> >>=20=20
-> >>              if self.tok =3D=3D '#':
-> >> +                if self.src[self.cursor] =3D=3D '#':
-> >> +                    # Start of doc comment
-> >> +                    skip_comment =3D False
-> >>                  self.cursor =3D self.src.find('\n', self.cursor)
-> >> +                if not skip_comment:
-> >> +                    self.val =3D self.src[self.pos:self.cursor]
-> >> +                    return
-> >>              elif self.tok in "{}:,[]":
-> >>                  return
-> >>              elif self.tok =3D=3D "'":
-> >
-> > Copied from review of v3, so I don't forget:
-> >
-> > Comment tokens are thrown away as before, except when the parser asks
-> > for them by passing skip_comment=3DFalse, or when the comment token sta=
-rts
-> > with ##.  The parser asks while parsing a doc comment, in get_doc().
-> >
-> > This is a backchannel from the parser to the lexer.  I'd rather avoid
-> > such lexer hacks, but I guess we can address that on top.
->=20
-> I don't have a good solution to that
-
-I have an idea which may or may not work.  I can explore it on top.
-
-> > A comment starting with ## inside an expression is now a syntax error.
-> > For instance, input
-> >
-> >     {
-> >     ##
-> >
-> > yields
-> >
-> >     /dev/stdin:2:1: Expected string or "}"
-> >
-> > Rather unfriendly error message, but we can fix that on top.
-> >
-> >> @@ -713,7 +856,7 @@ def check_keys(expr_elem, meta, required, optional=
-=3D[]):
-> >>                                  % (key, meta, name))
-> >>=20=20
-> >>=20=20
-> >> -def check_exprs(exprs):
-> >> +def check_exprs(exprs, strict_doc):
-> >
-> > Note: strict_doc=3DFalse unless this is qapi2texi.py.
->=20
-> For tests reasons: we may want to fix the test instead, or have a flag
-> QAPI_CHECK/NOSTRICT_DOC=3D1 or an option.
->=20
-> >>      global all_names
-> >>=20=20
-> >>      # Learn the types and check for valid expression keys
-> >> @@ -722,6 +865,11 @@ def check_exprs(exprs):
-> >>      for expr_elem in exprs:
-> >>          expr =3D expr_elem['expr']
-> >>          info =3D expr_elem['info']
-> >> +
-> >> +        if strict_doc and 'doc' not in expr_elem:
-> >> +            raise QAPILineError(info,
-> >> +                                "Expression missing documentation com=
-ment")
-> >> +
-> >
-> > Why should we supress this error in programs other than qapi2texi.py?
->=20
-> because the tests don't have comments
-
-Good point :)
-
-Can we come up with a brief comment explaining this?
-
-> > Can't see a test for this one.
->=20
-> because tests aren't strict :)
->=20
-> I guess you'll tell me to fix the tests instead, so I did that in the next
-> series.
->=20
-> >>          if 'enum' in expr:
-> >>              check_keys(expr_elem, 'enum', ['data'], ['prefix'])
-> >>              add_enum(expr['enum'], info, expr['data'])
-> >> @@ -780,6 +928,63 @@ def check_exprs(exprs):
-> >>      return exprs
-> >>=20=20
-> >>=20=20
-> >> +def check_simple_doc(doc):
-> >
-> > You call this "free-form" elsewhere.  Pick one name and stick to it.
-> > I think free-form is more descriptive than simple.
->=20
-> ok
->=20
-> >> +    if doc.symbol:
-> >> +        raise QAPILineError(doc.info,
-> >> +                            "'%s' documention is not followed by the =
-definition"
-> >> +                            % doc.symbol)
-> >
-> > "Documentation for %s is not ..."
->=20
-> ok
->=20
-> >> +
-> >> +    body =3D str(doc.body)
-> >> +    if re.search(r'@\S+:', body, re.MULTILINE):
-> >> +        raise QAPILineError(doc.info,
-> >> +                            "Document body cannot contain @NAME: sect=
-ions")
-> >> +
-> >> +
-> >> +def check_expr_doc(doc, expr, info):
-> >
-> > You call this "symbol" elsewhere.  I think "definition" would be better
-> > than either.
->=20
-> ok
->=20
-> >> +    for i in ('enum', 'union', 'alternate', 'struct', 'command', 'eve=
-nt'):
-> >> +        if i in expr:
-> >> +            meta =3D i
-> >> +            break
-> >> +
-> >> +    name =3D expr[meta]
-> >> +    if doc.symbol !=3D name:
-> >> +        raise QAPILineError(info, "Definition of '%s' follows documen=
-tation"
-> >> +                            " for '%s'" % (name, doc.symbol))
-> >> +    if doc.has_meta('Returns') and 'command' not in expr:
-> >> +        raise QAPILineError(info, "Invalid return documentation")
-> >
-> > Suggest something like "'Returns:' is only valid for commands".
-> >
-> > We accept 'Returns:' even when the command doesn't return anything,
-> > because we currently use it to document errors, too.  Can't say I like
-> > that, but it's out of scope here.
->=20
-> ok
->=20
-> >> +
-> >> +    doc_args =3D set(doc.args.keys())
-> >> +    if meta =3D=3D 'union':
-> >> +        data =3D expr.get('base', [])
-> >> +    else:
-> >> +        data =3D expr.get('data', [])
-> >> +    if isinstance(data, dict):
-> >> +        data =3D data.keys()
-> >> +    args =3D set([name.strip('*') for name in data])
-> >
-> > Not fixed since v3:
-> >
-> > * Flat union where 'base' is a string, e.g. union UserDefFlatUnion in
-> >   qapi-schema-test.json has base 'UserDefUnionBase', args is set(['a',
-> >   'B', 'e', 'D', 'f', 'i', 'o', 'n', 's', 'r', 'U'])
-> >
-> > * Command where 'data' is a string, e.g. user_def_cmd0 in
-> >   qapi-schema-test.json has data 'Empty2', args is set(['E', 'm', 'p',
-> >   '2', 't', 'y'])
-> >
-> > * Event where 'data' is a string, no test case handy (hole in test
-> >   coverage)
->=20
-> ok, I changed it that way, that fixes it:
-> +    if isinstance(data, list):
-> +        args =3D set([name.strip('*') for name in data])
-> +    else:
-> +        args =3D set()
-
-Uh, sure this does the right thing when data is a dict?
-
-> >> +    if meta =3D=3D 'alternate' or \
-> >> +       (meta =3D=3D 'union' and not expr.get('discriminator')):
-> >> +        args.add('type')
-> >
-> > As explained in review of v3, this is only a subset of the real set of
-> > members.  Computing the exact set is impractical when working with the
-> > abstract syntax tree.  I believe we'll eventually have to rewrite this
-> > code to work with the QAPISchemaEntity instead.
->=20
-> I don't think we want to list all the members as this would lead to
-> duplicated documentation. Instead it should document only the members of
-> the expr being defined.
-
-You're sticking to established practice, which makes lots of sense.
-However, established practice is a lot more clear for simple cases than
-for things like members inherited from base types, variant members and
-such.  At some point, we'll have to figure out how we want not so simple
-cases documented.  Until then, we can't really decide how to check
-documentation completeness.
-
->                         In which case, it looks like this check is good
-> enough, no?
-
-For now, yes.  Later on, maybe.
-
-Let's document the limitation in a comment and the commit message, and
-move on.
-
-> >> +    if not doc_args.issubset(args):
-> >> +        raise QAPILineError(info, "Members documentation is not a sub=
-set of"
-> >> +                            " API %r > %r" % (list(doc_args), list(ar=
-gs)))
-> >> +
-> >> +
-> >> +def check_docs(docs):
-> >> +    for doc in docs:
-> >> +        for section in doc.args.values() + doc.meta:
-> >> +            content =3D str(section)
-> >> +            if not content or content.isspace():
-> >> +                raise QAPILineError(doc.info,
-> >> +                                    "Empty doc section '%s'" % sectio=
-n.name)
-> >> +
-> >> +        if not doc.expr:
-> >> +            check_simple_doc(doc)
-> >> +        else:
-> >> +            check_expr_doc(doc, doc.expr, doc.info)
-> >> +
-> >> +    return docs
-> >> +
-> >> +
-> >>  #
-> >>  # Schema compiler frontend
-> >>  #
-> >> @@ -1249,9 +1454,11 @@ class QAPISchemaEvent(QAPISchemaEntity):
-> >>=20=20
-> >>=20=20
-> >>  class QAPISchema(object):
-> >> -    def __init__(self, fname):
-> >> +    def __init__(self, fname, strict_doc=3DFalse):
-> >>          try:
-> >> -            self.exprs =3D check_exprs(QAPISchemaParser(open(fname, "=
-r")).exprs)
-> >> +            parser =3D QAPISchemaParser(open(fname, "r"))
-> >> +            self.exprs =3D check_exprs(parser.exprs, strict_doc)
-> >> +            self.docs =3D check_docs(parser.docs)
-> >>              self._entity_dict =3D {}
-> >>              self._predefining =3D True
-> >>              self._def_predefineds()
-> >> diff --git a/scripts/qapi2texi.py b/scripts/qapi2texi.py
-> >> new file mode 100755
-> >> index 0000000..0cec43a
-> >> --- /dev/null
-> >> +++ b/scripts/qapi2texi.py
-> >
-> > Still only skimming this one.
-> >
-> >> @@ -0,0 +1,331 @@
-> >> +#!/usr/bin/env python
-> >> +# QAPI texi generator
-> >> +#
-> >> +# This work is licensed under the terms of the GNU LGPL, version 2+.
-> >> +# See the COPYING file in the top-level directory.
-> >> +"""This script produces the documentation of a qapi schema in texinfo=
- format"""
-> >> +import re
-> >> +import sys
-> >> +
-> >> +import qapi
-> >> +
-> >> +COMMAND_FMT =3D """
-> >> +@deftypefn {type} {{{ret}}} {name} @
-> >> +{{{args}}}
-> >> +
-> >> +{body}
-> >> +
-> >> +@end deftypefn
-> >> +
-> >> +""".format
-> >> +
-> >> +ENUM_FMT =3D """
-> >> +@deftp Enum {name}
-> >> +
-> >> +{body}
-> >> +
-> >> +@end deftp
-> >> +
-> >> +""".format
-> >> +
-> >> +STRUCT_FMT =3D """
-> >> +@deftp {{{type}}} {name} @
-> >> +{{{attrs}}}
-> >> +
-> >> +{body}
-> >> +
-> >> +@end deftp
-> >> +
-> >> +""".format
-> >> +
-> >> +EXAMPLE_FMT =3D """@example
-> >> +{code}
-> >> +@end example
-> >> +""".format
-> >> +
-> >> +
-> >> +def subst_strong(doc):
-> >> +    """Replaces *foo* by @strong{foo}"""
-> >> +    return re.sub(r'\*([^_\n]+)\*', r'@emph{\1}', doc)
-> >> +
-> >> +
-> >> +def subst_emph(doc):
-> >> +    """Replaces _foo_ by @emph{foo}"""
-> >> +    return re.sub(r'\s_([^_\n]+)_\s', r' @emph{\1} ', doc)
-> >> +
-> >> +
-> >> +def subst_vars(doc):
-> >> +    """Replaces @var by @code{var}"""
-> >> +    return re.sub(r'@([\w-]+)', r'@code{\1}', doc)
-> >> +
-> >> +
-> >> +def subst_braces(doc):
-> >> +    """Replaces {} with @{ @}"""
-> >> +    return doc.replace("{", "@{").replace("}", "@}")
-> >> +
-> >> +
-> >> +def texi_example(doc):
-> >> +    """Format @example"""
-> >> +    doc =3D subst_braces(doc).strip('\n')
-> >> +    return EXAMPLE_FMT(code=3Ddoc)
-> >> +
-> >> +
-> >> +def texi_comment(doc):
-> >> +    """
-> >> +    Format a comment
-> >> +
-> >> +    Lines starting with:
-> >> +    - |: generates an @example
-> >> +    - =3D: generates @section
-> >> +    - =3D=3D: generates @subsection
-> >> +    - 1. or 1): generates an @enumerate @item
-> >> +    - o/*/-: generates an @itemize list
-> >> +    """
-> >> +    lines =3D []
-> >> +    doc =3D subst_braces(doc)
-> >> +    doc =3D subst_vars(doc)
-> >> +    doc =3D subst_emph(doc)
-> >> +    doc =3D subst_strong(doc)
-> >> +    inlist =3D ""
-> >> +    lastempty =3D False
-> >> +    for line in doc.split('\n'):
-> >> +        empty =3D line =3D=3D ""
-> >> +
-> >> +        if line.startswith("| "):
-> >> +            line =3D EXAMPLE_FMT(code=3Dline[2:])
-> >> +        elif line.startswith("=3D "):
-> >> +            line =3D "@section " + line[2:]
-> >> +        elif line.startswith("=3D=3D "):
-> >> +            line =3D "@subsection " + line[3:]
-> >> +        elif re.match("^([0-9]*[.)]) ", line):
-> >> +            if not inlist:
-> >> +                lines.append("@enumerate")
-> >> +                inlist =3D "enumerate"
-> >> +            line =3D line[line.find(" ")+1:]
-> >> +            lines.append("@item")
-> >> +        elif re.match("^[o*-] ", line):
-> >> +            if not inlist:
-> >> +                lines.append("@itemize %s" % {'o': "@bullet",
-> >> +                                              '*': "@minus",
-> >> +                                              '-': ""}[line[0]])
-> >> +                inlist =3D "itemize"
-> >> +            lines.append("@item")
-> >> +            line =3D line[2:]
-> >> +        elif lastempty and inlist:
-> >> +            lines.append("@end %s\n" % inlist)
-> >> +            inlist =3D ""
-> >> +
-> >> +        lastempty =3D empty
-> >> +        lines.append(line)
-> >> +
-> >> +    if inlist:
-> >> +        lines.append("@end %s\n" % inlist)
-> >> +    return "\n".join(lines)
-> >> +
-> >> +
-> >> +def texi_args(expr, key=3D"data"):
-> >> +    """
-> >> +    Format the functions/structure/events.. arguments/members
-> >> +    """
-> >> +    if key not in expr:
-> >> +        return ""
-> >> +
-> >> +    args =3D expr[key]
-> >> +    arg_list =3D []
-> >> +    if isinstance(args, str):
-> >> +        arg_list.append(args)
-> >> +    else:
-> >> +        for name, typ in args.iteritems():
-> >> +            # optional arg
-> >> +            if name.startswith("*"):
-> >> +                name =3D name[1:]
-> >> +                arg_list.append("['%s': @var{%s}]" % (name, typ))
-> >> +            # regular arg
-> >> +            else:
-> >> +                arg_list.append("'%s': @var{%s}" % (name, typ))
-> >
-> > Inappropriate use of @var.  @var is for metasyntactic variables,
-> > i.e. something that stands for another piece of text.  typ isn't, it's
-> > the name of a specific QAPI type.  I think you should use @code.
->=20
-> yes
->=20
-> > This is the reason why the type names in qemu-qmp-ref.txt are often
-> > mangled, e.g.
-> >
-> >  -- Struct: VersionInfo { 'qemu': VERSIONTRIPLE, 'package': STR }
->=20
-> Right, we have format issue here. If we change it for @code, we get
-> additional quotes in the text format. The simpler is to use no format or
-> @t{}
-
-Pick something you like.
-
-> >> +
-> >> +    return ", ".join(arg_list)
-> >> +
-> >> +
-> >> +def texi_body(doc):
-> >> +    """
-> >> +    Format the body of a symbol documentation:
-> >> +    - a table of arguments
-> >> +    - followed by "Returns/Notes/Since/Example" sections
-> >> +    """
-> >> +    def _section_order(section):
-> >> +        return {"Returns": 0,
-> >> +                "Note": 1,
-> >> +                "Notes": 1,
-> >> +                "Since": 2,
-> >> +                "Example": 3,
-> >> +                "Examples": 3}[section]
-> >> +
-> >> +    body =3D "@table @asis\n"
-> >> +    for arg, section in doc.args.iteritems():
-> >> +        desc =3D str(section)
-> >> +        opt =3D ''
-> >> +        if desc.startswith("#optional"):
-> >> +            desc =3D desc[10:]
-> >> +            opt =3D ' *'
-> >> +        elif desc.endswith("#optional"):
-> >> +            desc =3D desc[:-10]
-> >> +            opt =3D ' *'
-> >> +        body +=3D "@item @code{'%s'}%s\n%s\n" % (arg, opt, texi_comme=
-nt(desc))
-> >> +    body +=3D "@end table\n"
-> >> +    body +=3D texi_comment(str(doc.body))
-> >> +
-> >> +    meta =3D sorted(doc.meta, key=3Dlambda i: _section_order(i.name))
-> >> +    for section in meta:
-> >> +        name, doc =3D (section.name, str(section))
-> >> +        func =3D texi_comment
-> >> +        if name.startswith("Example"):
-> >> +            func =3D texi_example
-> >> +
-> >> +        body +=3D "\n@quotation %s\n%s\n@end quotation" % \
-> >> +                (name, func(doc))
-> >> +    return body
-> >> +
-> >> +
-> >> +def texi_alternate(expr, doc):
-> >> +    """
-> >> +    Format an alternate to texi
-> >> +    """
-> >> +    args =3D texi_args(expr)
-> >> +    body =3D texi_body(doc)
-> >> +    return STRUCT_FMT(type=3D"Alternate",
-> >> +                      name=3Ddoc.symbol,
-> >> +                      attrs=3D"[ " + args + " ]",
-> >> +                      body=3Dbody)
-> >> +
-> >> +
-> >> +def texi_union(expr, doc):
-> >> +    """
-> >> +    Format an union to texi
-> >
-> > I think it's "a union".
->=20
-> ok
->=20
-> >> +    """
-> >> +    attrs =3D "@{ " + texi_args(expr, "base") + " @}"
-> >> +    discriminator =3D expr.get("discriminator")
-> >> +    if not discriminator:
-> >> +        union =3D "Flat Union"
-> >> +        discriminator =3D "type"
-> >> +    else:
-> >> +        union =3D "Union"
-> >
-> > Condition is backwards.
->=20
-> fixed
->=20
-> >> +    attrs +=3D " + '%s' =3D [ " % discriminator
-> >> +    attrs +=3D texi_args(expr, "data") + " ]"
-> >> +    body =3D texi_body(doc)
-> >> +
-> >> +    return STRUCT_FMT(type=3Dunion,
-> >> +                      name=3Ddoc.symbol,
-> >> +                      attrs=3Dattrs,
-> >> +                      body=3Dbody)
-> >
-> > You're inventing syntax here.  Example output:
-> >
-> >  -- Union: QCryptoBlockOpenOptions { QCryptoBlockOptionsBase } +
-> >           'format' =3D [ 'qcow': QCRYPTOBLOCKOPTIONSQCOW, 'luks':
-> >           QCRYPTOBLOCKOPTIONSLUKS ]
-> >
-> >      The options that are available for all encryption formats when
-> >      opening an existing volume
-> >           Since: 2.6
-> >
-> >  -- Flat Union: ImageInfoSpecific { } + 'type' =3D [ 'qcow2':
-> >           IMAGEINFOSPECIFICQCOW2, 'vmdk': IMAGEINFOSPECIFICVMDK, 'luks':
-> >           QCRYPTOBLOCKINFOLUKS ]
-> >
-> >      A discriminated record of image format specific information
-> >      structures.
-> >           Since: 1.7
-> >
-> > Note that QCryptoBlockOpenOptions is actually a flat union, and
-> > ImageInfoSpecific a simple union.  As I said, the condition is
-> > backwards.
-> >
-> > The meaning of the attrs part is unobvious.  Familiarity with schema
-> > syntax doesn't really help.
-> >
-> > Could we simply use schema syntax here?
->=20
-> Union: QCryptoBlockOpenOptions {
-> 'base': QCryptoBlockOptionsBase,
-> 'discriminator': 'format',
-> 'data':  { 'qcow': QCryptoBlockOptionsQCow, 'luks':
-> QCryptoBlockCreateOptionsLUKS }
->=20
-> }
->=20
-> Doesn't look obvious either and pollute the documentation with
-> schema-specific parameters.
-
-The schema syntax for flat unions is pretty horrid :)  I hope to improve
-it, but there's more urgent fish to fry.
-
-> > If not: whatever format you use, you first need to explain it.
->=20
-> I am not sure my solution is the best and will remain, but ok let's try to
-> document it for now.
-
-Before you pour time into documenting what you have, we should probably
-discuss what we need.
-
-> >> +
-> >> +
-> >> +def texi_enum(expr, doc):
-> >> +    """
-> >> +    Format an enum to texi
-> >> +    """
-> >> +    for i in expr['data']:
-> >> +        if i not in doc.args:
-> >> +            doc.args[i] =3D ''
-> >> +    body =3D texi_body(doc)
-> >> +    return ENUM_FMT(name=3Ddoc.symbol,
-> >> +                    body=3Dbody)
-> >> +
-> >> +
-> >> +def texi_struct(expr, doc):
-> >> +    """
-> >> +    Format a struct to texi
-> >> +    """
-> >> +    args =3D texi_args(expr)
-> >> +    body =3D texi_body(doc)
-> >> +    attrs =3D "@{ " + args + " @}"
-> >> +    base =3D expr.get("base")
-> >> +    if base:
-> >> +        attrs +=3D " + %s" % base
-> >> +    return STRUCT_FMT(type=3D"Struct",
-> >> +                      name=3Ddoc.symbol,
-> >> +                      attrs=3Dattrs,
-> >> +                      body=3Dbody)
-> >
-> > More syntax invention.  Example output:
-> >
-> >  -- Struct: BlockdevOptionsReplication { 'mode': REPLICATIONMODE,
-> >           ['top-id': STR] } + BlockdevOptionsGenericFormat
-> >
-> >      ''mode''
-> >           the replication mode
-> >      ''top-id'' *
-> >           In secondary mode, node name or device ID of the root node who
-> >           owns the replication node chain.  Must not be given in primary
-> >           mode.
-> >      Driver specific block device options for replication
-> >           Since: 2.8
-> >
-> > Meaning of the attrs part is perhaps more guessable here, but it's still
-> > guesswork.
-> >
-> > The meaning of * after ''top-id'' is also unobvious.
-> >
-> > Note the redundancy between the attrs part and the body: both state
-> > member names and optionalness.  The body doesn't state member types and
-> > base type.  If we fixed that, we could drop the attrs part and save us
-> > the trouble of defining and explaining a syntax for it.
-> >
-> > Let me take a step back.  This document is about the QMP wire format.
-> > There are no such things as simple and flat unions on the wire, only
-> > JSON objects.  QMP introspection duly describes a type's JSON objects,
-> > not how it's defined in QAPI.  I think QMP documentation should ideally
-> > do the same.
-> >
-> > QMP introspection uses a common structure for struct, simple and flat
-> > union: common members, variants, and if variants, then the common member
-> > that serves as tag.  See introspect.json for details.
-> >
-> > Base types are flattened away.  Appropriate for introspection, but
-> > documentation shouldn't do that.
-> >
-> > I wrote "ideally" because it's probably too big a step.  I'm willing to
-> > settle for something less than ideal.
->=20
-> I don't have clear idea what to do here, so if we can leave that for late=
-r,
-> that would be nice for me (I am already spending more time than I imagined
-> I would on doc stuff)
-
-Me too, if that's any consolation...
-
-Perhaps I can find a bit of time to think so I can propose what we could
-do.
-
-> >> +
-> >> +
-> >> +def texi_command(expr, doc):
-> >> +    """
-> >> +    Format a command to texi
-> >> +    """
-> >> +    args =3D texi_args(expr)
-> >> +    ret =3D expr["returns"] if "returns" in expr else ""
-> >> +    body =3D texi_body(doc)
-> >> +    return COMMAND_FMT(type=3D"Command",
-> >> +                       name=3Ddoc.symbol,
-> >> +                       ret=3Dret,
-> >> +                       args=3D"(" + args + ")",
-> >> +                       body=3Dbody)
-> >> +
-> >> +
-> >> +def texi_event(expr, doc):
-> >> +    """
-> >> +    Format an event to texi
-> >> +    """
-> >> +    args =3D texi_args(expr)
-> >> +    body =3D texi_body(doc)
-> >> +    return COMMAND_FMT(type=3D"Event",
-> >> +                       name=3Ddoc.symbol,
-> >> +                       ret=3D"",
-> >> +                       args=3D"(" + args + ")",
-> >> +                       body=3Dbody)
-> >> +
-> >> +
-> >> +def texi_expr(expr, doc):
-> >> +    """
-> >> +    Format an expr to texi
-> >> +    """
-> >> +    (kind, _) =3D expr.items()[0]
-> >> +
-> >> +    fmt =3D {"command": texi_command,
-> >> +           "struct": texi_struct,
-> >> +           "enum": texi_enum,
-> >> +           "union": texi_union,
-> >> +           "alternate": texi_alternate,
-> >> +           "event": texi_event}
-> >> +    try:
-> >> +        fmt =3D fmt[kind]
-> >> +    except KeyError:
-> >> +        raise ValueError("Unknown expression kind '%s'" % kind)
-> >
-> > The try / except converts one kind of error into another.  What does
-> > that buy us?  As far as I can tell, this shouldn't ever happen.
->=20
-> dropped
->=20
-> >> +
-> >> +    return fmt(expr, doc)
-> >> +
-> >> +
-> >> +def texi(docs):
-> >> +    """
-> >> +    Convert QAPI schema expressions to texi documentation
-> >> +    """
-> >> +    res =3D []
-> >> +    for doc in docs:
-> >> +        expr =3D doc.expr
-> >> +        if not expr:
-> >> +            res.append(texi_body(doc))
-> >> +            continue
-> >> +        try:
-> >> +            doc =3D texi_expr(expr, doc)
-> >> +            res.append(doc)
-> >> +        except:
-> >> +            print >>sys.stderr, "error at @%s" % doc.info
-> >> +            raise
-> >> +
-> >> +    return '\n'.join(res)
-> >> +
-> >> +
-> >> +def main(argv):
-> >> +    """
-> >> +    Takes schema argument, prints result to stdout
-> >> +    """
-> >> +    if len(argv) !=3D 2:
-> >> +        print >>sys.stderr, "%s: need exactly 1 argument: SCHEMA" % a=
-rgv[0]
-> >> +        sys.exit(1)
-> >> +
-> >> +    schema =3D qapi.QAPISchema(argv[1], strict_doc=3DTrue)
-> >> +    print texi(schema.docs)
-> >> +
-> >> +
-> >> +if __name__ =3D=3D "__main__":
-> >> +    main(sys.argv)
-> >> diff --git a/docs/qapi-code-gen.txt b/docs/qapi-code-gen.txt
-> >> index 2841c51..8bc963e 100644
-> >> --- a/docs/qapi-code-gen.txt
-> >> +++ b/docs/qapi-code-gen.txt
-> >> @@ -45,16 +45,13 @@ QAPI parser does not).  At present, there is no pl=
-ace where a QAPI
-> >>  schema requires the use of JSON numbers or null.
-> >>=20=20
-> >>  Comments are allowed; anything between an unquoted # and the following
-> >> -newline is ignored.  Although there is not yet a documentation
-> >> -generator, a form of stylized comments has developed for consistently
-> >> -documenting details about an expression and when it was added to the
-> >> -schema.  The documentation is delimited between two lines of ##, then
-> >> -the first line names the expression, an optional overview is provided,
-> >> -then individual documentation about each member of 'data' is provided,
-> >> -and finally, a 'Since: x.y.z' tag lists the release that introduced
-> >> -the expression.  Optional members are tagged with the phrase
-> >> -'#optional', often with their default value; and extensions added
-> >> -after the expression was first released are also given a '(since
-> >> +newline is ignored.  The documentation is delimited between two lines
-> >> +of ##, then the first line names the expression, an optional overview
-> >> +is provided, then individual documentation about each member of 'data'
-> >> +is provided, and finally, a 'Since: x.y.z' tag lists the release that
-> >> +introduced the expression.  Optional members are tagged with the
-> >> +phrase '#optional', often with their default value; and extensions
-> >> +added after the expression was first released are also given a '(since
-> >>  x.y.z)' comment.  For example:
-> >>=20=20
-> >>      ##
-> >> @@ -73,12 +70,49 @@ x.y.z)' comment.  For example:
-> >>      #           (Since 2.0)
-> >>      #
-> >>      # Since: 0.14.0
-> >> +    #
-> >> +    # Notes: You can also make a list:
-> >> +    #        - with items
-> >> +    #        - like this
-> >> +    #
-> >> +    # Example:
-> >> +    #
-> >> +    # -> { "execute": ... }
-> >> +    # <- { "return": ... }
-> >> +    #
-> >>      ##
-> >>      { 'struct': 'BlockStats',
-> >>        'data': {'*device': 'str', 'stats': 'BlockDeviceStats',
-> >>                 '*parent': 'BlockStats',
-> >>                 '*backing': 'BlockStats'} }
-> >
-> > This example gives an idea of how to document struct types.  But the
-> > reader is left guessing how to document other kinds of definitions.  In
-> > particular, there's no mention of "Returns", "Note" and "Examples"
-> > sections anywhere in this file.  As is, this could do for a tutorial,
-> > but this file is a *reference*, not a tutorial.
-> >
-> > For a reference, we need to be more thorough.  A doc comments section on
-> > its own seems advisable.
-> >
-> > I guess doc comment examples are best added to the schema code examples
-> > in sections =3D=3D=3D Struct types =3D=3D=3D, ..., =3D=3D=3D Events =3D=
-=3D=3D.
-> >
-> > Careful review for completeness is advised.
->=20
-> So far we did quite fine with the generic example. I am not convinced we
-> need to have doc comments for all kinds of types, it looks redundant to m=
-e.
-
-Well, so far we didn't require people to write well-formed doc comments.
-
-Without such comments in qapi-code-gen.txt's examples, they become
-incomplete.  Pity, because I like to feed them to the QAPI generators;
-extracted like this:
-
-    $ sed '1,/\$ cat example-schema.json/d;/^[^ ]/,$d;s/^    //' ../docs/qa=
-pi-code-gen.txt >example-schema.json
-
-> >> +It's also possible to create documentation sections, such as:
-> >> +
-> >> +    ##
-> >> +    # =3D Section
-> >> +    # =3D=3D Subsection
-> >> +    #
-> >> +    # Some text foo with *strong* and _emphasis_
-> >> +    # 1. with a list
-> >> +    # 2. like that
-> >> +    #
-> >> +    # And some code:
-> >> +    # | $ echo foo
-> >> +    # | -> do this
-> >> +    # | <- get that
-> >> +    #
-> >> +    ##
-> >> +
-> >> +Text *foo* and _foo_ are for "strong" and "emphasis" styles (they do
-> >> +not work over multiple lines). @foo is used to reference a symbol.
-> >> +
-> >> +Lines starting with the following characters and a space:
-> >> +- | are examples
-> >> +- =3D are top section
-> >> +- =3D=3D are subsection
-> >> +- X. or X) are enumerations (X is any number)
-> >> +- o/*/- are itemized list
-> >> +
-> >
-> > Is this doc markup documentation complete?
->=20
-> I think so
->=20
-> > Is it related to any existing text markup language?  Hmm, the commit
-> > message calls it "Markdown-like".  Should we mention that here?
->=20
-> I'll use "annotations" instead in the doc
->=20
-> > Is all markup valid in all contexts?  For instance, is =3D Section valid
-> > in symbol blocks?  What does | (or any markup for that matter) do within
-> > an Example section?
->=20
-> Example is verbatim
->=20
-> I improved a bit the doc based on your feedback. I'd suggest we iterate
-> with additional patches later, I could use help.
-
-Let's mark places that need improvement with FIXME or TODO comments,
-noted in commit messages.
-
-> >>  The schema sets up a series of types, as well as commands and events
-> >>  that will use those types.  Forward references are allowed: the parser
-> >>  scans in two passes, where the first pass learns all type names, and
-> >> diff --git a/tests/qapi-schema/doc-bad-args.err b/tests/qapi-schema/do=
-c-bad-args.err
-> >> new file mode 100644
-> >> index 0000000..a55e003
-> >> --- /dev/null
-> >> +++ b/tests/qapi-schema/doc-bad-args.err
-> >> @@ -0,0 +1 @@
-> >> +tests/qapi-schema/doc-bad-args.json:1: Members documentation is not a=
- subset of API ['a', 'b'] > ['a']
-> >> diff --git a/tests/qapi-schema/doc-bad-args.exit b/tests/qapi-schema/d=
-oc-bad-args.exit
-> >> new file mode 100644
-> >> index 0000000..d00491f
-> >> --- /dev/null
-> >> +++ b/tests/qapi-schema/doc-bad-args.exit
-> >> @@ -0,0 +1 @@
-> >> +1
-> >> diff --git a/tests/qapi-schema/doc-bad-args.json b/tests/qapi-schema/d=
-oc-bad-args.json
-> >> new file mode 100644
-> >> index 0000000..26992ea
-> >> --- /dev/null
-> >> +++ b/tests/qapi-schema/doc-bad-args.json
-> >> @@ -0,0 +1,6 @@
-> >> +##
-> >> +# @foo:
-> >> +# @a: a
-> >> +# @b: b
-> >> +##
-> >> +{ 'command': 'foo', 'data': {'a': 'int'} }
-> >
-> > The existing tests/qapi-schema/*.json explain what is being tested in a
-> > comment.  Perhaps like this:
-> >
-> >     # Arguments listed in the doc comment must exist in the actual sche=
-ma
-> >
-> >     ##
-> >     # @foo:
-> >     ...
-> >
-> > Likewise for other tests.
->=20
-> ok
->=20
-[...]
-> > [1] https://www.python.org/dev/peps/pep-0257/
-> > [2] https://google.github.io/styleguide/pyguide.html
-> > [3] https://www.python.org/dev/peps/pep-0008/
+> 
+> The qdev_prop_set_uint32() call that unconditionally remains in
+> fw_cfg_init_mem_wide() at the end of this series is for ensuring (b).
+> 
+> The "hw/arm/virt.c" board calls fw_cfg_init_mem_wide(), and that board
+> should not receive the increased fw_cfg file count even in 2.9+ (to
+> which the compat props would not apply).
+> 
+> In order to remove the unconditional property setting from
+> fw_cfg_init_mem_wide() too, I'd either have to modify the
+> fw_cfg_init_mem_wide() prototype and also the call site in
+> "hw/arm/virt.c", or we'd have to carry forward the compat property to
+> 2.9 and later, indefinitely.
+> 
+> I'm open to reworking this code, but both goals (a) and (b) should be
+> considered in any alternative implementation.
+> 
+> Thanks!
+> Laszlo
+> 
+> >   
+> >> +
+> >>      fw_cfg_init1(dev);
+> >>  
+> >>      sbd = SYS_BUS_DEVICE(dev);
+> >>      sysbus_mmio_map(sbd, 0, ctl_addr);
+> >>      sysbus_mmio_map(sbd, 1, data_addr);
+> >> @@ -1012,23 +1039,56 @@ static const TypeInfo fw_cfg_info = {
+> >>      .abstract      = true,
+> >>      .instance_size = sizeof(FWCfgState),
+> >>      .class_init    = fw_cfg_class_init,
+> >>  };
+> >>  
+> >> +static void fw_cfg_file_slots_allocate(FWCfgState *s, Error **errp)
+> >> +{
+> >> +    uint16_t file_slots_max;
+> >> +
+> >> +    if (fw_cfg_file_slots(s) < FW_CFG_FILE_SLOTS_TRAD) {
+> >> +        error_setg(errp, "\"file_slots\" must be at least 0x%x",
+> >> +                   FW_CFG_FILE_SLOTS_TRAD);
+> >> +        return;
+> >> +    }
+> >> +
+> >> +    /* (UINT16_MAX & FW_CFG_ENTRY_MASK) is the highest inclusive selector value
+> >> +     * that we permit. The actual (exclusive) value coming from the
+> >> +     * configuration is (FW_CFG_FILE_FIRST + fw_cfg_file_slots(s)). */
+> >> +    file_slots_max = (UINT16_MAX & FW_CFG_ENTRY_MASK) - FW_CFG_FILE_FIRST + 1;
+> >> +    if (fw_cfg_file_slots(s) > file_slots_max) {
+> >> +        error_setg(errp, "\"file_slots\" must not exceed 0x%" PRIx16,
+> >> +                   file_slots_max);
+> >> +        return;
+> >> +    }
+> >> +
+> >> +    s->entries[0] = g_new0(FWCfgEntry, fw_cfg_max_entry(s));
+> >> +    s->entries[1] = g_new0(FWCfgEntry, fw_cfg_max_entry(s));
+> >> +    s->entry_order = g_new0(int, fw_cfg_max_entry(s));
+> >> +}
+> >>  
+> >>  static Property fw_cfg_io_properties[] = {
+> >>      DEFINE_PROP_UINT32("iobase", FWCfgIoState, iobase, -1),
+> >>      DEFINE_PROP_UINT32("dma_iobase", FWCfgIoState, dma_iobase, -1),
+> >>      DEFINE_PROP_BOOL("dma_enabled", FWCfgIoState, parent_obj.dma_enabled,
+> >>                       true),
+> >> +    DEFINE_PROP_UINT32("file_slots", FWCfgIoState, parent_obj.file_slots,
+> >> +                       FW_CFG_FILE_SLOTS_DFLT),
+> >>      DEFINE_PROP_END_OF_LIST(),
+> >>  };
+> >>  
+> >>  static void fw_cfg_io_realize(DeviceState *dev, Error **errp)
+> >>  {
+> >>      FWCfgIoState *s = FW_CFG_IO(dev);
+> >>      SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
+> >> +    Error *local_err = NULL;
+> >> +
+> >> +    fw_cfg_file_slots_allocate(FW_CFG(s), &local_err);
+> >> +    if (local_err) {
+> >> +        error_propagate(errp, local_err);
+> >> +        return;
+> >> +    }
+> >>  
+> >>      /* when using port i/o, the 8-bit data register ALWAYS overlaps
+> >>       * with half of the 16-bit control register. Hence, the total size
+> >>       * of the i/o region used is FW_CFG_CTL_SIZE */
+> >>      memory_region_init_io(&s->comb_iomem, OBJECT(s), &fw_cfg_comb_mem_ops,
+> >> @@ -1061,18 +1121,27 @@ static const TypeInfo fw_cfg_io_info = {
+> >>  
+> >>  static Property fw_cfg_mem_properties[] = {
+> >>      DEFINE_PROP_UINT32("data_width", FWCfgMemState, data_width, -1),
+> >>      DEFINE_PROP_BOOL("dma_enabled", FWCfgMemState, parent_obj.dma_enabled,
+> >>                       true),
+> >> +    DEFINE_PROP_UINT32("file_slots", FWCfgMemState, parent_obj.file_slots,
+> >> +                       FW_CFG_FILE_SLOTS_DFLT),
+> >>      DEFINE_PROP_END_OF_LIST(),
+> >>  };
+> >>  
+> >>  static void fw_cfg_mem_realize(DeviceState *dev, Error **errp)
+> >>  {
+> >>      FWCfgMemState *s = FW_CFG_MEM(dev);
+> >>      SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
+> >>      const MemoryRegionOps *data_ops = &fw_cfg_data_mem_ops;
+> >> +    Error *local_err = NULL;
+> >> +
+> >> +    fw_cfg_file_slots_allocate(FW_CFG(s), &local_err);
+> >> +    if (local_err) {
+> >> +        error_propagate(errp, local_err);
+> >> +        return;
+> >> +    }
+> >>  
+> >>      memory_region_init_io(&s->ctl_iomem, OBJECT(s), &fw_cfg_ctl_mem_ops,
+> >>                            FW_CFG(s), "fwcfg.ctl", FW_CFG_CTL_SIZE);
+> >>      sysbus_init_mmio(sbd, &s->ctl_iomem);
+> >>    
+> >   
+> 
