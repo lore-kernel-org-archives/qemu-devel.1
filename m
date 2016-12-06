@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60394)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35986)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1cEJ4u-0000Ph-Ac
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 11:58:53 -0500
+	(envelope-from <kwankhede@nvidia.com>) id 1cEJHl-0003z7-3N
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 12:12:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1cEJ4r-0004ta-1s
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 11:58:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54410)
+	(envelope-from <kwankhede@nvidia.com>) id 1cEJHh-0001Qf-UV
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 12:12:09 -0500
+Received: from hqemgate15.nvidia.com ([216.228.121.64]:19624)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1cEJ4q-0004tO-SI
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 11:58:48 -0500
-Date: Tue, 6 Dec 2016 09:58:46 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20161206095846.36d994f3@t450s.home>
-In-Reply-To: <20161206105914.GB3469@pxdev.xzpeter.org>
-References: <1480348315-13332-1-git-send-email-bd.aviv@gmail.com>
-	<8188dd5e-2c71-dbd0-9a1a-9c8af6f74b96@intel.com>
-	<20161202065214.GF21601@pxdev.xzpeter.org>
-	<088c2afd-575e-99af-1686-023c116352ab@intel.com>
-	<20161206065155.GB4344@pxdev.xzpeter.org>
-	<6d37d046-8e5a-7662-baa6-445d3985fde7@intel.com>
-	<20161206072228.GC4344@pxdev.xzpeter.org>
-	<f9f9daab-519d-381b-c9e8-c6dcc139f1d3@intel.com>
-	<20161206105914.GB3469@pxdev.xzpeter.org>
+	(Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
+	id 1cEJHh-0001QJ-P0
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 12:12:05 -0500
+From: Kirti Wankhede <kwankhede@nvidia.com>
+Date: Tue, 6 Dec 2016 22:43:30 +0530
+Message-ID: <1481044410-23862-1-git-send-email-kwankhede@nvidia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v7 0/5] IOMMU: intel_iommu support map and
- unmap notifications
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v2 1/2] vfio iommu type1: Fix size argument to
+ vfio_find_dma() during DMA UNMAP.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,42 +25,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: Lan Tianyu <tianyu.lan@intel.com>, "Aviv B.D" <bd.aviv@gmail.com>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>, Jason Wang <jasowang@redhat.com>, "Liu, Yi L" <yi.l.liu@intel.com>, "Wu, Fengguang" <fengguang.wu@intel.com>
+To: alex.williamson@redhat.com, pbonzini@redhat.com, kraxel@redhat.com, cjia@nvidia.com
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>
 
-On Tue, 6 Dec 2016 18:59:14 +0800
-Peter Xu <peterx@redhat.com> wrote:
+vfio_dma keeps track of address range from (dma->iova + 0) to
+(dma->iova + dma->size - 1), while vfio_find_dma() search logic looks for
+range from (dma->iova + 1) to (dma->iova + dma->size).
+In vfio_find_dma(), when the start address is equal to dma->iova and size
+is 0, check for the end of search range makes it to take wrong side of
+RB-tree. That fails the search even though the address is present in
+mapped dma ranges. Due to this, in vfio_dma_do_unmap(), while checking
+boundary conditions, size should be set to 1 for verifying start address
+of unmap range.
+vfio_find_dma() is also used to verify last address in unmap range with
+size = 0, but in that case address to be searched is calculated with
+size - 1 and so it works correctly.
 
-> On Tue, Dec 06, 2016 at 04:27:39PM +0800, Lan Tianyu wrote:
-> 
-> [...]
-> 
-> > >   
-> > >> User space driver(E.G DPDK) also can enable/disable
-> > >> IOVA for device dynamically.  
-> > > 
-> > > Could you provide more detailed (or any pointer) on how to do that? I
-> > > did try to find it myself, I see an VFIO_IOMMU_ENABLE ioctl, but looks
-> > > like it is for ppc only.  
-> > 
-> > No, I just give an example that user space may do that but no more
-> > research. But since Qemu already can enable device's IOVA, other user
-> > application also should can do that with the same VFIO interface, right?  
-> 
-> AFAIU we can't do that at least on x86. We can use vfio interface to
-> bind group into container, but we should not be able to dynamically
-> disable IOMMU protection. IIUC That needs to taint the kernel.
-> 
-> The only way I know is that we probe vfio-pci with no-iommu mode, in
-> that case, we disabled IOMMU, but we can never dynamically enable it
-> as well.
-> 
-> Please correct me if I am wrong.
+Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+Signed-off-by: Neo Jia <cjia@nvidia.com>
+---
+ drivers/vfio/vfio_iommu_type1.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-A vfio user such as QEMU enabling or disabling translation in the
-vIOMMU is "simply" assigning the vfio container to the system
-AddressSpace (as we do w/o vIOMMU) or the device specific, IOMMU domain,
-AddressSpace.  The device must be protected by the pIOMMU domain
-(container) at all times.  Thanks,
-
-Alex
+diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+index a28fbddb505c..8e9e94ccb2ff 100644
+--- a/drivers/vfio/vfio_iommu_type1.c
++++ b/drivers/vfio/vfio_iommu_type1.c
+@@ -826,7 +826,7 @@ again:
+ 	 * mappings within the range.
+ 	 */
+ 	if (iommu->v2) {
+-		dma = vfio_find_dma(iommu, unmap->iova, 0);
++		dma = vfio_find_dma(iommu, unmap->iova, 1);
+ 		if (dma && dma->iova != unmap->iova) {
+ 			ret = -EINVAL;
+ 			goto unlock;
+-- 
+2.7.0
