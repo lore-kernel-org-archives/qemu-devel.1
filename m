@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60740)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36697)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fabian@lesniak-it.de>) id 1cEKyU-0005oc-Sh
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 14:00:28 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1cELHU-0004S1-1G
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 14:20:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fabian@lesniak-it.de>) id 1cEKyQ-0007lB-6G
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 14:00:22 -0500
-Received: from mout.kundenserver.de ([217.72.192.75]:57319)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <fabian@lesniak-it.de>)
-	id 1cEKyP-0007k7-S6
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 14:00:18 -0500
-From: Fabian Lesniak <fabian@lesniak-it.de>
-Date: Tue,  6 Dec 2016 20:00:06 +0100
-Message-Id: <20161206190007.7539-3-fabian@lesniak-it.de>
-In-Reply-To: <20161206190007.7539-1-fabian@lesniak-it.de>
-References: <20161206190007.7539-1-fabian@lesniak-it.de>
-Subject: [Qemu-devel] [PATCH v3 2/3] ps2: add support for mice with
- extra/side buttons
+	(envelope-from <ehabkost@redhat.com>) id 1cELHP-0006BE-Rp
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 14:20:00 -0500
+Date: Tue, 6 Dec 2016 17:19:52 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20161206191952.GD4027@thinpad.lan.raisama.net>
+References: <148104617887.7699.984921868108236415.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <148104617887.7699.984921868108236415.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH] virtio: fix HW_COMPAT_2_6 macro for
+ virtio-*-pci drivers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,54 +23,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Fabian Lesniak <fabian@lesniak-it.de>
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, Halil Pasic <pasic@linux.vnet.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-stable@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-This enables the ps2 controller to process mouse events for buttons 4 and 5.
-Additionally, distinct definitions for the ps2 mouse button state are
-introduced. The legacy definitions from console.h are not used anymore.
+On Tue, Dec 06, 2016 at 06:50:47PM +0100, Greg Kurz wrote:
+> Since commit "9a4c0e220d8a hw/virtio-pci: fix virtio behaviour", passing
+> -device virtio-blk-pci.disable-modern=off has no effect on 2.6 machine
+> types because the internal virtio-pci.disable-modern=on compat property
+> always prevail.
+> 
+> This should ideally be fixed in the qdev properties core code, but it is
+> too late in the QEMU 2.8 schedule. So this patch fixes the issue by setting
+> the compat properties for every virtio-*-pci subtypes instead of the base
+> virtio-pci type.
+> 
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-Signed-off-by: Fabian Lesniak <fabian@lesniak-it.de>
----
- hw/input/ps2.c         | 8 +++++---
- include/hw/input/ps2.h | 6 ++++++
- 2 files changed, 11 insertions(+), 3 deletions(-)
+So, it looks like the bug is present in many other cases...
 
-diff --git a/hw/input/ps2.c b/hw/input/ps2.c
-index 0d14de0..598cc86 100644
---- a/hw/input/ps2.c
-+++ b/hw/input/ps2.c
-@@ -871,9 +871,11 @@ static void ps2_mouse_event(DeviceState *dev, QemuConsole *src,
-                             InputEvent *evt)
- {
-     static const int bmap[INPUT_BUTTON__MAX] = {
--        [INPUT_BUTTON_LEFT]   = MOUSE_EVENT_LBUTTON,
--        [INPUT_BUTTON_MIDDLE] = MOUSE_EVENT_MBUTTON,
--        [INPUT_BUTTON_RIGHT]  = MOUSE_EVENT_RBUTTON,
-+        [INPUT_BUTTON_LEFT]   = PS2_MOUSE_BUTTON_LEFT,
-+        [INPUT_BUTTON_MIDDLE] = PS2_MOUSE_BUTTON_MIDDLE,
-+        [INPUT_BUTTON_RIGHT]  = PS2_MOUSE_BUTTON_RIGHT,
-+        [INPUT_BUTTON_SIDE]   = PS2_MOUSE_BUTTON_SIDE,
-+        [INPUT_BUTTON_EXTRA]  = PS2_MOUSE_BUTTON_EXTRA,
-     };
-     PS2MouseState *s = (PS2MouseState *)dev;
-     InputMoveEvent *move;
-diff --git a/include/hw/input/ps2.h b/include/hw/input/ps2.h
-index b9ceee4..0fec91c 100644
---- a/include/hw/input/ps2.h
-+++ b/include/hw/input/ps2.h
-@@ -25,6 +25,12 @@
- #ifndef HW_PS2_H
- #define HW_PS2_H
- 
-+#define PS2_MOUSE_BUTTON_LEFT   0x01
-+#define PS2_MOUSE_BUTTON_MIDDLE 0x02
-+#define PS2_MOUSE_BUTTON_RIGHT  0x04
-+#define PS2_MOUSE_BUTTON_SIDE   0x08
-+#define PS2_MOUSE_BUTTON_EXTRA  0x10
-+
- /* ps2.c */
- void *ps2_kbd_init(void (*update_irq)(void *, int), void *update_arg);
- void *ps2_mouse_init(void (*update_irq)(void *, int), void *update_arg);
+I have hacked QEMU to print a warning in case the driver name in
+compat_props refer to an abstract class or a class that have any
+subclasses. The results are below:
+
+ apic-common.legacy-instance-id set for abstract class
+ apic-common.vapic set for abstract class
+ i386-cpu.arat set for abstract class
+ i386-cpu.check set for abstract class
+ i386-cpu.cpuid-0xb set for abstract class
+ i386-cpu.fill-mtrr-mask set for abstract class
+ i386-cpu.full-cpuid-auto-level set for abstract class
+ i386-cpu.l3-cache set for abstract class
+ i386-cpu.pmu set for abstract class
+ pci-device.command_serr_enable set for abstract class
+ pci-device.rombar set for abstract class
+ pci-device.x-pcie-lnksta-dllla set for abstract class
+ powerpc64-cpu.pre-2.8-migration set for abstract class
+ s390-skeys.migration-enabled set for abstract class
+ spapr-pci-host-bridge.ddw set for superclass
+ spapr-pci-host-bridge.dynamic-reconfiguration set for superclass
+ spapr-pci-host-bridge.mem64_win_size set for superclass
+ spapr-pci-host-bridge.mem_win_size set for superclass
+ spapr-pci-host-bridge.pre-2.8-migration set for superclass
+ usb-device.full-path set for abstract class
+ usb-device.msos-desc set for abstract class
+ virtio-pci.disable-legacy set for abstract class
+ virtio-pci.disable-modern set for abstract class
+ virtio-pci.migrate-extra set for abstract class
+ virtio-pci.page-per-vq set for abstract class
+ virtio-pci.virtio-pci-bus-master-bug-migration set for abstract class
+ virtio-pci.x-disable-pcie set for abstract class
+ x86_64-cpu.arat set for abstract class
+ x86_64-cpu.check set for abstract class
+ x86_64-cpu.cpuid-0xb set for abstract class
+ x86_64-cpu.fill-mtrr-mask set for abstract class
+ x86_64-cpu.full-cpuid-auto-level set for abstract class
+ x86_64-cpu.l3-cache set for abstract class
+ x86_64-cpu.pmu set for abstract class
+
+I believe the cases where we are likely to cause real-world bugs
+are virtio-pci and the *-cpu classes (because -cpu is translated
+to -global).
+
+I'm not sure what should be the right fix in 2.8. I am
+considering a temporary hack to translate abstract class names in
+compat_props to global properties for all subclasses, in case
+they refer to an abstract class. This way we fix the bug where
+-global doesn't override compat_props properly, but keep the
+rules for -global untouched.
+
 -- 
-2.10.2
+Eduardo
