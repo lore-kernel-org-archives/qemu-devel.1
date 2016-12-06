@@ -1,39 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46448)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47455)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cEK4e-0004yT-4b
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 13:02:41 -0500
+	(envelope-from <wei@redhat.com>) id 1cEK7V-0006kM-H0
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 13:05:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cEK4a-0004iW-Uv
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 13:02:40 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:39470
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1cEK4a-0004iJ-P5
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 13:02:36 -0500
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	uB6HwYXS112281
-	for <qemu-devel@nongnu.org>; Tue, 6 Dec 2016 13:02:35 -0500
-Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 275xs6p9nu-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 06 Dec 2016 13:02:35 -0500
-Received: from localhost
-	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Tue, 6 Dec 2016 18:02:34 -0000
-Date: Tue, 6 Dec 2016 19:02:30 +0100
-From: Cornelia Huck <cornelia.huck@de.ibm.com>
-In-Reply-To: <148104617887.7699.984921868108236415.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-References: <148104617887.7699.984921868108236415.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Message-Id: <20161206190230.2c9b46b8.cornelia.huck@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] virtio: fix HW_COMPAT_2_6 macro for
- virtio-*-pci drivers
+	(envelope-from <wei@redhat.com>) id 1cEK7R-0005VA-VN
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 13:05:37 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38170)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei@redhat.com>) id 1cEK7R-0005Uj-IZ
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 13:05:33 -0500
+From: Wei Huang <wei@redhat.com>
+Date: Tue,  6 Dec 2016 12:05:23 -0600
+Message-Id: <1481047528-16180-1-git-send-email-wei@redhat.com>
+Subject: [Qemu-devel] [kvm-unit-tests PATCH v14 0/5] ARM PMU tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,42 +21,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, Halil Pasic <pasic@linux.vnet.ibm.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-stable@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: cov@codeaurora.org
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, shannon.zhao@linaro.org, alistair.francis@xilinx.com, croberts@codeaurora.org, alindsay@codeaurora.org, drjones@redhat.com, andre.przywara@arm.com
 
-On Tue, 06 Dec 2016 18:50:47 +0100
-Greg Kurz <groug@kaod.org> wrote:
+Changes from v13:
+* Rename cp15.h to sysreg.h for ARMv7 and add a new file sysreg.h for ARMv8
+* Add macros for read_sysreg() and write_sysreg(). CP15 registers can be
+  defined with __ACCESS_CP15() or __ACCESS_CP15_64(). sysreg.h (ARMv8) was
+  from Drew's GIC testing code, which can be leveraged when his GIC testing
+  code is imported.
+* Rewrite PMU testing code based on new macros. All get_xxx() and set_xxx()
+  functions are defined in pmu.c based on read_sysreg() and write_sysreg().
+  So the code parsing tool, like cscope, can parse them easily.
+* Minor fixes inside pmu.c, printf formatting, pmu_probe() func, based on
+  Andre's comments.
 
-> Since commit "9a4c0e220d8a hw/virtio-pci: fix virtio behaviour", passing
-> -device virtio-blk-pci.disable-modern=off has no effect on 2.6 machine
-> types because the internal virtio-pci.disable-modern=on compat property
-> always prevail.
+Note:
+Current KVM code has bugs in handling PMCCFILTR write. A fix (see below) is
+required for this unit testing code to work correctly under KVM mode.
+Link: https://lists.cs.columbia.edu/pipermail/kvmarm/2016-November/022134.html.
 
-s/prevail/prevails/
+Thanks,
+-Wei
 
-> 
-> This should ideally be fixed in the qdev properties core code, but it is
-> too late in the QEMU 2.8 schedule. So this patch fixes the issue by setting
-> the compat properties for every virtio-*-pci subtypes instead of the base
+Christopher Covington (3):
+  arm: Add PMU test
+  arm: pmu: Check cycle count increases
+  arm: pmu: Add CPI checking
 
-s/subtypes/subtype/
+Wei Huang (2):
+  arm: rename cp15.h to sysreg.h
+  arm: Add support for read_sysreg() and write_sysreg()
 
-> virtio-pci type.
-> 
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> ---
-> 
-> This fix is for both QEMU 2.8 and 2.7.1.
-> 
-> Generated with:
-> 
-> for i in $(git grep 'define TYPE_VIRTIO_.*_PCI' hw/virtio/virtio-pci.h | \
->            awk '{print $3 }'); do 
->     printf '{\\'"\n        .driver   = %s,"'\\'"\n        .property = \"disable-modern\","'\\'"\n        .value    = \"on\","'\\'"\n    },{"'\\'"\n        .driver   = %s,"'\\'"\n        .property = \"disable-legacy\","'\\'"\n        .value    = \"off\","'\\'"\n    }," $i $i
-> done
+ arm/Makefile.common              |   3 +-
+ arm/cstart.S                     |   2 +-
+ arm/pmu.c                        | 290 +++++++++++++++++++++++++++++++++++++++
+ arm/unittests.cfg                |  19 +++
+ lib/arm/asm/processor.h          |   6 +-
+ lib/arm/asm/{cp15.h => sysreg.h} |  25 +++-
+ lib/arm64/asm/processor.h        |  11 +-
+ lib/arm64/asm/sysreg.h           |  26 ++++
+ lib/libcflat.h                   |   4 +-
+ 9 files changed, 369 insertions(+), 17 deletions(-)
+ create mode 100644 arm/pmu.c
+ rename lib/arm/asm/{cp15.h => sysreg.h} (68%)
+ create mode 100644 lib/arm64/asm/sysreg.h
 
-Don't we want vhost-scsi-pci as well?
-
-> 
->  include/hw/compat.h |  116 ++++++++++++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 114 insertions(+), 2 deletions(-)
+-- 
+1.8.3.1
