@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38620)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39844)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cECFJ-0006on-P5
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 04:41:11 -0500
+	(envelope-from <stefanha@gmail.com>) id 1cECMB-0001nU-2c
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 04:48:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cECFE-0003gY-Sn
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 04:41:09 -0500
-Received: from mail-wj0-f196.google.com ([209.85.210.196]:34094)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cECFE-0003gN-KX
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 04:41:04 -0500
-Received: by mail-wj0-f196.google.com with SMTP id xy5so42773267wjc.1
-	for <qemu-devel@nongnu.org>; Tue, 06 Dec 2016 01:41:04 -0800 (PST)
-Date: Tue, 6 Dec 2016 09:40:01 +0000
+	(envelope-from <stefanha@gmail.com>) id 1cECM7-0006O8-Tc
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 04:48:15 -0500
+Date: Tue, 6 Dec 2016 09:47:08 +0000
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20161206094001.GD12630@stefanha-x1.localdomain>
-References: <1480935840-3961-1-git-send-email-kraxel@redhat.com>
+Message-ID: <20161206094708.GE12630@stefanha-x1.localdomain>
+References: <148095126363.31351.4484514300033863622.stgit@bahia>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="fOHHtNG4YXGJ0yqR"
+	protocol="application/pgp-signature"; boundary="u5E4XgoOPWr4PD9E"
 Content-Disposition: inline
-In-Reply-To: <1480935840-3961-1-git-send-email-kraxel@redhat.com>
-Subject: Re: [Qemu-devel] [PULL for-2.8 0/4] vga fixes
+In-Reply-To: <148095126363.31351.4484514300033863622.stgit@bahia>
+Subject: Re: [Qemu-devel] [PATCH for-2.8] qdev: apply global properties in
+ reverse order
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,86 +24,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-stable@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
 
 
---fOHHtNG4YXGJ0yqR
+--u5E4XgoOPWr4PD9E
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Dec 05, 2016 at 12:03:56PM +0100, Gerd Hoffmann wrote:
->   Hi,
+On Mon, Dec 05, 2016 at 04:21:22PM +0100, Greg Kurz wrote:
+> The current code recursively applies global properties from child up to
+> parent. So, if you have:
 >=20
-> Here is a last-minute poll for 2.8-rc3, bringing some vga fixes.
+> -global virtio-pci.disable-modern=3Don
+> -global virtio-blk-pci.disable-modern=3Doff
 >=20
-> Most important one is the qxl fix which is quite user-visible.
-> Sorry for submitting that late, it lingers in my queue for a while
-> already and I through I had that in the last vga pull already, but
-> obviously that isn't the case.  If you feel it is too late now it'll
-> be -stable instead.
+> Then the default value of disable-modern for a virtio-blk-pci device is o=
+n,
+> which looks wrong from an OOP perspective.
 >=20
-> cheers,
->   Gerd
+> This patch reverses the logic, so that a child property always prevail.
 >=20
-> The following changes since commit bd8ef5060dd2124a54578241da9a572faf7658=
-dd:
+> This fixes a subtle bug that got introduced in 2.7 with commit "9a4c0e220=
+d8a
+> hw/virtio-pci: fix virtio behaviour" for older (< 2.7) machine types: the
+> HW_COMPAT_2_6 macro contains global virtio-pci.disable-* properties which
+> would silently override global properties passed on the command line for
+> virtio subtypes.
 >=20
->   Merge remote-tracking branch 'dgibson/tags/ppc-for-2.8-20161201' into s=
-taging (2016-12-01 13:39:29 +0000)
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+> ---
 >=20
-> are available in the git repository at:
+> AFAIK, libvirt's XML doesn't know about modern/legacy modes for virtio
+> devices. Early adopters of virtio 1.0 had to rely on the <qemu:commandlin=
+e>
+> tag to pass global properties to QEMU. This patch ensures that XML files
+> used with older machine types remain valid with newer versions of QEMU.
 >=20
->=20
->   git://git.kraxel.org/qemu tags/pull-vga-20161205-1
->=20
-> for you to fetch changes up to 4299b90e9ba9ce5ca9024572804ba751aa1a7e70:
->=20
->   display: cirrus: check vga bits per pixel(bpp) value (2016-12-05 11:01:=
-55 +0100)
->=20
-> ----------------------------------------------------------------
-> qxl: fix flickering.
-> cirrus: avoid devision by zero.
-> virtio-gpu: fix two leaks.
->=20
-> ----------------------------------------------------------------
-> Christophe Fergeau (1):
->       qxl: Only emit QXL_INTERRUPT_CLIENT_MONITORS_CONFIG on config chang=
-es
->=20
-> Li Qiang (2):
->       virtio-gpu: fix information leak in getting capset info dispatch
->       virtio-gpu: fix memory leak in update_cursor_data_virgl
->=20
-> Prasad J Pandit (1):
->       display: cirrus: check vga bits per pixel(bpp) value
->=20
->  hw/display/cirrus_vga.c    | 14 ++++++++++----
->  hw/display/qxl.c           | 37 ++++++++++++++++++++++++++++++++++++-
->  hw/display/virtio-gpu-3d.c |  1 +
->  hw/display/virtio-gpu.c    |  1 +
->  4 files changed, 48 insertions(+), 5 deletions(-)
->=20
+> FWIW I guess it could help to have this fix in 2.8, and also probably in
+> 2.7.1.
 
-Thanks, applied to my staging tree:
-https://github.com/stefanha/qemu/commits/staging
+Hi Greg,
+I won't merge this for QEMU 2.8 because this 2.7 issue is not a 2.8
+release blocker and it's too risky (good points have been raised in this
+thread).
 
+Please target -stable when consensus has been reached.
+
+Thanks,
 Stefan
 
---fOHHtNG4YXGJ0yqR
+--u5E4XgoOPWr4PD9E
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJYRodxAAoJEJykq7OBq3PIO1gIAIWFPPQR60Y/1goHU2vnSTUN
-4e6bbiMN6MFwqnmQ4Y5sI5nXkA20OO/Id91w5+/AX/j+BmsYGAF4pk9sl2Zks9cn
-2nFt5JPiEh0812HtL8Histdw6fOgak6+HEQod59VCsKcJcKmCBFNBB7/wgBgO/xl
-OYBX3oTLAqiha+bz9BIU0PJzDZX7T0fQDouPZ2+ZPsxcdbTCQmYWqk86E2xxvOFp
-tgT8XORcBVvzm60/NdQtxdX8AHDFOD3XzGTSiqBEpRlxRd/YQS5rhVQaBaPa9d4S
-zhVWJkfahuhFn44ndHzUQ3ANZ9sBDOOBI/udDM/3XauXoLmJhjJcyvnE5pRyPJA=
-=A3KO
+iQEcBAEBAgAGBQJYRokcAAoJEJykq7OBq3PINrkIAJpuhul03M8N3kV/4JcXZNyG
+vHDJ44E83u8yRNr2U2BbfvGrZ5wXAgJ3uDJ67DmcCNwmbA+jnKzV9d9gjKlR1LQY
+RPQykTADuVEXoG4pKnksF4EvTppj7Jrf7IPt88CMvjOOd2uS/z8iAZMj/QW0OCso
+TyI799Wl7T5fZYEDe0jnsY0s1sQ7tdtCdoHj0fZdEraJxt3pkbxRKZfBRqmvzxpb
+ZZ25eVEwYgUHiUQ67qj63fkQFuU/opsL0j7cbcdVBhmLg+yWhW7VYaXOuKNbG2OB
+s2t2UOyWQFgSrqXadpZrxJtOU5anNz+4hypGy/oiXVGBtaiVfd7XQUPnVaf7DbQ=
+=NcCl
 -----END PGP SIGNATURE-----
 
---fOHHtNG4YXGJ0yqR--
+--u5E4XgoOPWr4PD9E--
