@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37282)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38799)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cELKE-0005h0-4X
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 14:22:51 -0500
+	(envelope-from <sstabellini@kernel.org>) id 1cELRF-0000ZR-Ry
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 14:30:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cELKA-00076i-1U
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 14:22:50 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42300)
+	(envelope-from <sstabellini@kernel.org>) id 1cELRB-0000rh-Pa
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 14:30:05 -0500
+Received: from mail.kernel.org ([198.145.29.136]:47278)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cELK9-00076b-Rj
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 14:22:45 -0500
-Date: Tue, 6 Dec 2016 21:22:43 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20161206211034-mutt-send-email-mst@kernel.org>
-References: <1481016553-69252-1-git-send-email-arei.gonglei@huawei.com>
-	<20161206153945-mutt-send-email-mst@kernel.org>
-	<20161206173337.GB30363@stefanha-x1.localdomain>
+	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
+	id 1cELRB-0000rA-Jq
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 14:30:01 -0500
+Date: Tue, 6 Dec 2016 11:29:55 -0800 (PST)
+From: Stefano Stabellini <sstabellini@kernel.org>
+In-Reply-To: <20161206190956.6a096808@Igors-MacBook-Pro.local>
+Message-ID: <alpine.DEB.2.10.1612061115140.6598@sstabellini-ThinkPad-X260>
+References: <20161201170624.26496-1-lersek@redhat.com>
+	<20161201170624.26496-4-lersek@redhat.com>
+	<20161206124906.76a41896@nial.brq.redhat.com>
+	<3da2baa9-9fa6-7802-fe56-afa02a892a07@redhat.com>
+	<20161206190956.6a096808@Igors-MacBook-Pro.local>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20161206173337.GB30363@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [PATCH for-2.8] virtio-crypto: zeroize the key
- material before free
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH v4 3/7] fw-cfg: expose "file_slots"
+ parameter in fw_cfg_init_io_dma()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,64 +31,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Gonglei <arei.gonglei@huawei.com>, qemu-devel@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Laszlo Ersek <lersek@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Gabriel L. Somlo" <somlo@cmu.edu>, Gerd Hoffmann <kraxel@redhat.com>, qemu devel list <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, sstabellini@kernel.org, anthony.perard@citrix.com, xen-devel@lists.xensource.com
 
-On Tue, Dec 06, 2016 at 05:33:37PM +0000, Stefan Hajnoczi wrote:
-> On Tue, Dec 06, 2016 at 03:40:49PM +0200, Michael S. Tsirkin wrote:
-> > On Tue, Dec 06, 2016 at 05:29:13PM +0800, Gonglei wrote:
-> > > Zeroize the memory of CryptoDevBackendSymOpInfo structure pointed
-> > > for key material security.
-> > > 
-> > > Signed-off-by: Gonglei <arei.gonglei@huawei.com>
-> > > ---
-> > >  hw/virtio/virtio-crypto.c | 13 ++++++++++++-
-> > >  1 file changed, 12 insertions(+), 1 deletion(-)
-> > > 
-> > > diff --git a/hw/virtio/virtio-crypto.c b/hw/virtio/virtio-crypto.c
-> > > index 2f2467e..ecb19b6 100644
-> > > --- a/hw/virtio/virtio-crypto.c
-> > > +++ b/hw/virtio/virtio-crypto.c
-> > > @@ -337,7 +337,18 @@ static void virtio_crypto_free_request(VirtIOCryptoReq *req)
-> > >  {
-> > >      if (req) {
-> > >          if (req->flags == CRYPTODEV_BACKEND_ALG_SYM) {
-> > > -            g_free(req->u.sym_op_info);
-> > > +            size_t max_len;
-> > > +            CryptoDevBackendSymOpInfo *op_info = req->u.sym_op_info;
-> > > +
-> > > +            max_len = op_info->iv_len +
-> > > +                      op_info->aad_len +
-> > > +                      op_info->src_len +
-> > > +                      op_info->dst_len +
-> > > +                      op_info->digest_result_len;
-> > > +
-> > > +            /* Zeroize and free request data structure */
-> > > +            memset(op_info, 0, sizeof(*op_info) + max_len);
-> > > +            g_free(op_info);
+On Tue, 6 Dec 2016, Igor Mammedov wrote:
+> > First, to my knowledge, Xen does not use fw_cfg. The following call
+> > chains depend on (!xen_enabled()):
+> maybe not, it's just grep gave me:
+>   xen_load_linux() -> fw_cfg_init_io()
+> maybe it's dead code now
+
+[...]
+
 > > 
-> > Write into memory, then free it?  This looks rather strange. Why are we
-> > doing this?
-> 
-> Common practice with sensitive information (key material, passwords,
-> etc).
+> > pc_init1() | pc_q35_init()
+> >   if (!xen_enabled()):
+> >     pc_memory_init()
+> >       bochs_bios_init()
+> >         fw_cfg_init_io_dma()
 
-Some kind of explanation about what makes this one
-more sensitive than others would be nice.
 
-Also, what makes it 2.8 material? Considering the pointer math
-involved, it's not risk-free.
+We have a couple of idiosyncrasies with Xen support in QEMU; this is one
+of them.
 
-> coredumps, memory disclosure bugs when heap memory is reused, etc.
->
-> Sensitive information is sometimes also held in mlocked pages to prevent
-> it being swapped to disk but that's not being done here.
-> 
-> Perhaps the comment should be more explicit but this patch seems
-> reasonable.
+Xen doesn't use fw_cfg, because hvmloader [1][2] runs in guest context
+before SeaBios setting things up, including ACPI tables. So usually we
+don't need it. However direct kernel boot is done via xen_load_linux
+which is based on fw_cfg. So when kernel= and ramdisk= are specified in
+a Xen HVM config file (which is not common), they are passed to QEMU as
+-kernel and -initrd, then QEMU ends up using fw_cfg to load the kernel
+in the guest. That's the only use case we have for it at the moment.
 
-Right.  One can see memset and free at a glance.
-The comment and the commit log should explain the why,
-not the what.
+Direct kernel boot with Xen HVM guests is not tested by OSSTest (Xen
+Project CI loop), as a consequence it broke in the past without anybody
+noticing.
 
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+[1]: http://xenbits.xenproject.org/gitweb/?p=xen.git;a=tree;f=tools/firmware/hvmloader;h=069e29fa3820364c69c95798d56ef097148fddd2;hb=HEAD
+[2]: https://wiki.xenproject.org/wiki/Hvmloader
