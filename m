@@ -1,39 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36001)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36610)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cE8AN-0000Hs-Sc
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 00:19:48 -0500
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cE8Fg-0001dr-O2
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 00:25:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cE8AK-0003Oo-Mm
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 00:19:47 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:39598
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cE8Fe-00067a-83
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 00:25:16 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43262
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
-	id 1cE8AK-0003Ob-FT
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 00:19:44 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	uB65J5oW011363
-	for <qemu-devel@nongnu.org>; Tue, 6 Dec 2016 00:19:43 -0500
-Received: from e23smtp08.au.ibm.com (e23smtp08.au.ibm.com [202.81.31.141])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 275ntgcyd2-1
+	id 1cE8Fe-00067N-21
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 00:25:14 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
+	uB65MGtu101286
+	for <qemu-devel@nongnu.org>; Tue, 6 Dec 2016 00:25:13 -0500
+Received: from e28smtp01.in.ibm.com (e28smtp01.in.ibm.com [125.16.236.1])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 275jgq0x28-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 06 Dec 2016 00:19:42 -0500
+	for <qemu-devel@nongnu.org>; Tue, 06 Dec 2016 00:25:13 -0500
 Received: from localhost
-	by e23smtp08.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e28smtp01.in.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
-	Tue, 6 Dec 2016 15:19:39 +1000
+	Tue, 6 Dec 2016 10:55:09 +0530
 From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-In-Reply-To: <20e22e8b-c4ea-8e4c-b8d2-09f4af1f6ab2@twiddle.net>
+In-Reply-To: <37c840a9-b9c1-4308-fbff-2e22c8f57d09@twiddle.net>
 References: <1480937130-24561-1-git-send-email-nikunj@linux.vnet.ibm.com>
-	<1480937130-24561-3-git-send-email-nikunj@linux.vnet.ibm.com>
-	<20e22e8b-c4ea-8e4c-b8d2-09f4af1f6ab2@twiddle.net>
-Date: Tue, 06 Dec 2016 10:49:26 +0530
+	<1480937130-24561-4-git-send-email-nikunj@linux.vnet.ibm.com>
+	<37c840a9-b9c1-4308-fbff-2e22c8f57d09@twiddle.net>
+Date: Tue, 06 Dec 2016 10:55:03 +0530
 MIME-Version: 1.0
-Content-Type: text/plain
-Message-Id: <87fum1iqht.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-Subject: Re: [Qemu-devel] [PATCH 02/13] target-ppc: add mask_u128 routine
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <87d1h5iq8g.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+Subject: Re: [Qemu-devel] [PATCH 03/13] target-ppc: implement lxvl
+ instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,53 +50,111 @@ Cc: qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com
 Richard Henderson <rth@twiddle.net> writes:
 
 > On 12/05/2016 03:25 AM, Nikunj A Dadhania wrote:
->> +#if defined(CONFIG_INT128)
->> +FUNC_MASK(mask_u128, Int128, 128, Int128, ~((__uint128_t)0));
->> +#else
->> +static inline Int128 mask_u128(int start, int end)
+>> lxvl: Load VSX Vector with Length
+>>=20
+>> Little/Big-endian Storage:
+>> +---+---+---+---+---+---+---+---+---+---+---+---+---+---+--+--+
+>> |=E2=80=9CT=E2=80=9D|=E2=80=9Ch=E2=80=9D|=E2=80=9Ci=E2=80=9D|=E2=80=9Cs=
+=E2=80=9D|=E2=80=9C =E2=80=9D|=E2=80=9Ci=E2=80=9D|=E2=80=9Cs=E2=80=9D|=E2=
+=80=9C =E2=80=9D|=E2=80=9Ca=E2=80=9D|=E2=80=9C =E2=80=9D|=E2=80=9CT=E2=80=
+=9D|=E2=80=9CE=E2=80=9D|=E2=80=9CS=E2=80=9D|=E2=80=9CT=E2=80=9D|FF|FF|
+>> +---+---+---+---+---+---+---+---+---+---+---+---+---+---+--+--+
+>>=20
+>> Loading 14 bytes results in:
+>>=20
+>> Vector (8-bit elements) in BE:
+>> +---+---+---+---+---+---+---+---+---+---+---+---+---+---+--+--+
+>> |=E2=80=9CT=E2=80=9D|=E2=80=9Ch=E2=80=9D|=E2=80=9Ci=E2=80=9D|=E2=80=9Cs=
+=E2=80=9D|=E2=80=9C =E2=80=9D|=E2=80=9Ci=E2=80=9D|=E2=80=9Cs=E2=80=9D|=E2=
+=80=9C =E2=80=9D|=E2=80=9Ca=E2=80=9D|=E2=80=9C =E2=80=9D|=E2=80=9CT=E2=80=
+=9D|=E2=80=9CE=E2=80=9D|=E2=80=9CS=E2=80=9D|=E2=80=9CT=E2=80=9D|00|00|
+>> +---+---+---+---+---+---+---+---+---+---+---+---+---+---+--+--+
+>>=20
+>> Vector (8-bit elements) in LE:
+>> +--+--+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+>> |00|00|=E2=80=9CT=E2=80=9D|=E2=80=9CS=E2=80=9D|=E2=80=9CE=E2=80=9D|=E2=
+=80=9CT=E2=80=9D|=E2=80=9C =E2=80=9D|=E2=80=9Ca=E2=80=9D|=E2=80=9C =E2=80=
+=9D|=E2=80=9Cs=E2=80=9D|=E2=80=9Ci=E2=80=9D|=E2=80=9C =E2=80=9D|=E2=80=9Cs=
+=E2=80=9D|=E2=80=9Ci=E2=80=9D|"h"|"T"|
+>> +--+--+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+>>=20
+>> Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+>> ---
+>>  target-ppc/helper.h                 |  1 +
+>>  target-ppc/mem_helper.c             | 25 +++++++++++++++++++++++++
+>>  target-ppc/translate/vsx-impl.inc.c | 27 +++++++++++++++++++++++++++
+>>  target-ppc/translate/vsx-ops.inc.c  |  1 +
+>>  4 files changed, 54 insertions(+)
+>>=20
+>> diff --git a/target-ppc/helper.h b/target-ppc/helper.h
+>> index bc39efb..d9ccafd 100644
+>> --- a/target-ppc/helper.h
+>> +++ b/target-ppc/helper.h
+>> @@ -317,6 +317,7 @@ DEF_HELPER_3(lvewx, void, env, avr, tl)
+>>  DEF_HELPER_3(stvebx, void, env, avr, tl)
+>>  DEF_HELPER_3(stvehx, void, env, avr, tl)
+>>  DEF_HELPER_3(stvewx, void, env, avr, tl)
+>> +DEF_HELPER_4(lxvl, void, env, tl, tl, tl)
+>>  DEF_HELPER_4(vsumsws, void, env, avr, avr, avr)
+>>  DEF_HELPER_4(vsum2sws, void, env, avr, avr, avr)
+>>  DEF_HELPER_4(vsum4sbs, void, env, avr, avr, avr)
+>> diff --git a/target-ppc/mem_helper.c b/target-ppc/mem_helper.c
+>> index 1ab8a6e..0a8ff54 100644
+>> --- a/target-ppc/mem_helper.c
+>> +++ b/target-ppc/mem_helper.c
+>> @@ -24,6 +24,7 @@
+>>=20=20
+>>  #include "helper_regs.h"
+>>  #include "exec/cpu_ldst.h"
+>> +#include "internal.h"
+>>=20=20
+>>  //#define DEBUG_OP
+>>=20=20
+>> @@ -284,6 +285,30 @@ STVE(stvewx, cpu_stl_data_ra, bswap32, u32)
+>>  #undef I
+>>  #undef LVE
+>>=20=20
+>> +void helper_lxvl(CPUPPCState *env, target_ulong addr,
+>> +                 target_ulong xt_num, target_ulong rb)
 >> +{
->> +    Int128 r = {0};
->> +    if (start > 63) {
->> +        r.hi = 0;
->> +        r.lo = mask_u64(start - 64, end - 64);
->> +    } else if (end < 64) {
->> +        r.hi = mask_u64(start, end);
->> +        r.lo = 0;
+>> +    ppc_vsr_t xt;
+>> +
+>> +    getVSR(xt_num, &xt, env);
+>> +    if (unlikely((rb & 0xFF) =3D=3D 0)) {
+>> +        xt.s128 =3D int128_make128(0, 0);
 >> +    } else {
->> +        r.hi = mask_u64(start, 63);
->> +        r.lo = mask_u64(0, end - 64);
->> +    }
->> +    return r;
->> +}
->>  #endif
+>> +        target_ulong end =3D ((rb & 0xFF) * 8) - 1;
+>> +        if (msr_le) {
+>> +            xt.u64[HI_IDX] =3D bswap64(cpu_ldq_data_ra(env, addr, GETPC=
+()));
+>> +            addr =3D addr_add(env, addr, 8);
+>> +            xt.u64[LO_IDX] =3D bswap64(cpu_ldq_data_ra(env, addr, GETPC=
+()));
 >
-> First, I would really really like you to stop adding *any* ifdefs on
-> CONFIG_INT128.  All that's going to do is make sure that there's code that is
-> almost never tested, since x86_64 (and other 64-bit hosts) does support int128.
+> hi/lo assignment reversed for le.
 
-I did test both the cases above by flipping the switch of CONFIG_INT128.
-Initially was planning to do this in int128.h, but the bit numbering is
-different and wont be usable for other architecture.
+Already taken care here:
 
-> Second, you're not using the Int128 interface correctly.  Better would be
+#if defined(HOST_WORDS_BIGENDIAN)
+#define HI_IDX 0
+#define LO_IDX 1
+#else
+#define HI_IDX 1
+#define LO_IDX 0
+#endif
+
 >
-> static inline Int128 mask_u128(int start, int end)
-> {
->     uint64_t hi, lo;
->     if (start > 63) {
->         hi = 0;
->         lo = mask_u64(start - 64, end - 64);
->     } else if (end < 64) {
->         hi = mask_u64(start, end);
->         lo = 0;
->     } else {
->         hi = mask_u64(start, 63);
->         lo = mask_u64(0, end - 64);
->     }
->     return make_int128(lo, hi);
-> }
+>> +        } else {
+>> +            xt.u64[HI_IDX] =3D cpu_ldq_data_ra(env, addr, GETPC());
+>> +            addr =3D addr_add(env, addr, 8);
+>> +            xt.u64[LO_IDX] =3D cpu_ldq_data_ra(env, addr, GETPC());
+>> +        }
+>> +        xt.s128 =3D int128_and(xt.s128, mask_u128(0, end));
+>
+> I don't think mask_u128 does the right thing for end > 127.
+> I think you need a check here.
 
-Sure will use this.
+Sure. Will do that.
 
 Regards
 Nikunj
