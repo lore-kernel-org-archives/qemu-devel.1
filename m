@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36363)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwankhede@nvidia.com>) id 1cEJJv-000720-S0
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 12:14:24 -0500
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36617)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from
+	<3w_FGWAMKCoorxsu22uzs.q204s08-rs9sz121u18.25u@flex--dje.bounces.google.com>)
+	id 1cEJKb-0007Qr-3g
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 12:15:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwankhede@nvidia.com>) id 1cEJJs-0001wo-Mb
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 12:14:23 -0500
-Received: from hqemgate16.nvidia.com ([216.228.121.65]:4504)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
-	id 1cEJJs-0001vT-GC
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 12:14:20 -0500
-From: Kirti Wankhede <kwankhede@nvidia.com>
-Date: Tue, 6 Dec 2016 22:43:45 +0530
-Message-ID: <1481044425-23920-1-git-send-email-kwankhede@nvidia.com>
+	(envelope-from
+	<3w_FGWAMKCoorxsu22uzs.q204s08-rs9sz121u18.25u@flex--dje.bounces.google.com>)
+	id 1cEJKX-00029h-VU
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 12:15:05 -0500
+Received: from mail-pg0-f74.google.com ([74.125.83.74]:33097)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from
+	<3w_FGWAMKCoorxsu22uzs.q204s08-rs9sz121u18.25u@flex--dje.bounces.google.com>)
+	id 1cEJKX-000243-Pl
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 12:15:01 -0500
+Received: by mail-pg0-f74.google.com with SMTP id p66so32876393pga.0
+	for <qemu-devel@nongnu.org>; Tue, 06 Dec 2016 09:14:40 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 2/2] vfio iommu: Fix size argument to
- vfio_find_dma() in pin_pages/unpin_pages
+Message-ID: <001a113ec6308021110543008630@google.com>
+Date: Tue, 06 Dec 2016 17:13:39 +0000
+From: Doug Evans <dje@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed; delsp=yes
+Subject: [Qemu-devel] [PATCH] x86: Fix eflags tracking for syscall insn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,56 +30,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: alex.williamson@redhat.com, pbonzini@redhat.com, kraxel@redhat.com, cjia@nvidia.com
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>
+To: qemu-devel@nongnu.org, pbonzini@redhat.com
 
-vfio_dma keeps track of address range from (dma->iova + 0) to
-(dma->iova + dma->size - 1), while vfio_find_dma() search logic looks for
-range from (dma->iova + 1) to (dma->iova + dma->size).
-In vfio_find_dma(), when the start address is equal to dma->iova and size
-is 0, check for the end of search range makes it to take wrong side of
-RB-tree. That fails the search even though the address is present in
-mapped dma ranges.
-In functions pin_pages and unpin_pages, the iova which is being searched
-is base address of page to be pinned or unpinned. So here size should be
-set to PAGE_SIZE, as argument to vfio_find_dma.
+Hi.
 
-Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-Signed-off-by: Neo Jia <cjia@nvidia.com>
----
- drivers/vfio/vfio_iommu_type1.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+While researching an issue related to the syscall insn it seemed
+like eflags status tracking was missing this step.
 
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 8e9e94ccb2ff..023fba7b8d5a 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -581,7 +581,7 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
- 		struct vfio_pfn *vpfn;
- 
- 		iova = user_pfn[i] << PAGE_SHIFT;
--		dma = vfio_find_dma(iommu, iova, 0);
-+		dma = vfio_find_dma(iommu, iova, PAGE_SIZE);
- 		if (!dma) {
- 			ret = -EINVAL;
- 			goto pin_unwind;
-@@ -622,7 +622,7 @@ pin_unwind:
- 		dma_addr_t iova;
- 
- 		iova = user_pfn[j] << PAGE_SHIFT;
--		dma = vfio_find_dma(iommu, iova, 0);
-+		dma = vfio_find_dma(iommu, iova, PAGE_SIZE);
- 		vfio_unpin_page_external(dma, iova, do_accounting);
- 		phys_pfn[j] = 0;
- 	}
-@@ -659,7 +659,7 @@ static int vfio_iommu_type1_unpin_pages(void *iommu_data,
- 		dma_addr_t iova;
- 
- 		iova = user_pfn[i] << PAGE_SHIFT;
--		dma = vfio_find_dma(iommu, iova, 0);
-+		dma = vfio_find_dma(iommu, iova, PAGE_SIZE);
- 		if (!dma)
- 			goto unpin_exit;
- 		vfio_unpin_page_external(dma, iova, do_accounting);
--- 
-2.7.0
+I think(!) this is correct, it follows what similar code does elsewhere,
+and what the doc says. If it's not correct IWBN to clarify the situation.
+
+commit 393243eda30d4429a07a0f7c29b0f6297616a355
+Author: Doug Evans <dje@google.com>
+Date:   Tue Dec 6 09:00:42 2016 -0800
+
+     syscall insn: update eflags to CC_OP_EFLAGS
+
+     Signed-off-by: Doug Evans <dje@google.com>
+
+diff --git a/target-i386/translate.c b/target-i386/translate.c
+index 324103c..9fd1a04 100644
+--- a/target-i386/translate.c
++++ b/target-i386/translate.c
+@@ -7104,6 +7104,10 @@ static target_ulong disas_insn(CPUX86State *env,  
+DisasContext *s,
+          gen_update_cc_op(s);
+          gen_jmp_im(pc_start - s->cs_base);
+          gen_helper_syscall(cpu_env, tcg_const_i32(s->pc - pc_start));
++        /* condition codes are modified only in long mode */
++        if (s->lma) {
++            set_cc_op(s, CC_OP_EFLAGS);
++        }
+          gen_eob(s);
+          break;
+      case 0x107: /* sysret */
