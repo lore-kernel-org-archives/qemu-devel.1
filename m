@@ -1,40 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44294)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44542)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cEBO4-0007jm-Ax
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 03:46:09 -0500
+	(envelope-from <alex@alex.org.uk>) id 1cEBOt-0008EO-KQ
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 03:47:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cEBO1-0006YM-AJ
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 03:46:08 -0500
-Received: from 001b2d01.pphosted.com ([148.163.156.1]:44237
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
-	id 1cEBO1-0006Xq-01
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 03:46:05 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	uB68hjNo063658
-	for <qemu-devel@nongnu.org>; Tue, 6 Dec 2016 03:46:03 -0500
-Received: from e23smtp01.au.ibm.com (e23smtp01.au.ibm.com [202.81.31.143])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 275ns2guxt-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 06 Dec 2016 03:46:03 -0500
-Received: from localhost
-	by e23smtp01.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
-	Tue, 6 Dec 2016 18:46:01 +1000
-From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-In-Reply-To: <8e4a0e60-c44a-5591-9b91-b77bd1e1b2c1@twiddle.net>
-References: <1480937130-24561-1-git-send-email-nikunj@linux.vnet.ibm.com>
-	<1480937130-24561-12-git-send-email-nikunj@linux.vnet.ibm.com>
-	<8e4a0e60-c44a-5591-9b91-b77bd1e1b2c1@twiddle.net>
-Date: Tue, 06 Dec 2016 14:15:54 +0530
-MIME-Version: 1.0
-Content-Type: text/plain
-Message-Id: <871sxligxp.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-Subject: Re: [Qemu-devel] [PATCH 11/13] target-ppc: implement xsnegqp
- instruction
+	(envelope-from <alex@alex.org.uk>) id 1cEBOs-0006rG-MW
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 03:46:59 -0500
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+From: Alex Bligh <alex@alex.org.uk>
+In-Reply-To: <20161205234235.5728-1-eblake@redhat.com>
+Date: Tue, 6 Dec 2016 08:46:43 +0000
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <35E2FCDC-462E-4EC2-940E-B37247C69E24@alex.org.uk>
+References: <20161205234235.5728-1-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [Nbd] [PATCH] doc: Propose NBD_FLAG_INIT_ZEROES
+ extension
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,20 +23,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
-Cc: qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com
+To: Eric Blake <eblake@redhat.com>
+Cc: Alex Bligh <alex@alex.org.uk>, "nbd-general@lists.sourceforge.net" <nbd-general@lists.sourceforge.net>, xieyingtai@huawei.com, subo7@huawei.com, qemu block <qemu-block@nongnu.org>, Stefan Hajnoczi <stefanha@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-Richard Henderson <rth@twiddle.net> writes:
 
-> On 12/05/2016 03:25 AM, Nikunj A Dadhania wrote:
->> +    case OP_NEG:                                                  \
->> +        tcg_gen_xor_i64(xbh, xbh, sgm);                           \
->> +        tcg_gen_xori_i64(xbl, xbl, 0);                            \
->> +        break;                                                    \
->
-> No point in the xori.
+> On 5 Dec 2016, at 23:42, Eric Blake <eblake@redhat.com> wrote:
+>=20
+> While not directly related to NBD_CMD_WRITE_ZEROES, the qemu
+> team discovered that it is useful if a server can advertise
+> whether an export is in a known-all-zeroes state at the time
+> the client connects.
 
-Yeah, right.
+I think this is good to go, and ...
 
-Regards
-Nikunj
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+> doc/proto.md | 5 +++++
+> 1 file changed, 5 insertions(+)
+>=20
+> This replaces the following qemu patch attempt:
+> https://lists.gnu.org/archive/html/qemu-devel/2016-12/msg00357.html
+> which tried to add NBD_CMD_HAS_ZERO_INIT with poor semantics. The
+> semantics in this proposal should be much better.
+>=20
+> Patch is to the merge of the master branch and the
+> extension-write-zeroes branch.  By the way, qemu 2.8 is due
+> to be released "real soon now", and implements NBD_CMD_WRITE_ZEROES,
+> so maybe it is time to consider promoting the extension-write-zeroes
+> branch into master.
+
+I would support this.
+
+In fact the patch is sufficiently simple I think I'd merge this
+into extension-write-zeroes then merge that into master.
+
+Wouter?
+
+Alex
+
+> diff --git a/doc/proto.md b/doc/proto.md
+> index afe71fc..7e4ec7f 100644
+> --- a/doc/proto.md
+> +++ b/doc/proto.md
+> @@ -697,6 +697,11 @@ The field has the following format:
+>   the export.
+> - bit 9, `NBD_FLAG_SEND_BLOCK_STATUS`: defined by the experimental
+>   `BLOCK_STATUS` =
+[extension](https://github.com/NetworkBlockDevice/nbd/blob/extension-block=
+status/doc/proto.md).
+> +- bit 10, `NBD_FLAG_INIT_ZEROES`: Indicates that the server =
+guarantees
+> +  that at the time transmission phase begins, all offsets within the
+> +  export read as zero bytes.  Clients MAY use this information to
+> +  avoid writing to sections of the export that should still read as
+> +  zero after the client is done writing.
+>=20
+> Clients SHOULD ignore unknown flags.
+>=20
+> --=20
+> 2.9.3
+>=20
+>=20
+> =
+--------------------------------------------------------------------------=
+----
+> Developer Access Program for Intel Xeon Phi Processors
+> Access to Intel Xeon Phi processor-based developer platforms.
+> With one year of Intel Parallel Studio XE.
+> Training and support from Colfax.
+> Order your platform today.http://sdm.link/xeonphi
+> _______________________________________________
+> Nbd-general mailing list
+> Nbd-general@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/nbd-general
+>=20
+
+--=20
+Alex Bligh
