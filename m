@@ -1,21 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55980)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60506)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cE77X-0007ql-Vh
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 23:12:48 -0500
+	(envelope-from <liang.z.li@intel.com>) id 1cE7fJ-0004fo-4C
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 23:47:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cE77X-0004N4-1D
-	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 23:12:47 -0500
-Date: Tue, 6 Dec 2016 15:12:08 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20161206041208.GQ32366@umbus.fritz.box>
-References: <1480937130-24561-1-git-send-email-nikunj@linux.vnet.ibm.com>
+	(envelope-from <liang.z.li@intel.com>) id 1cE7fG-0007jD-2B
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 23:47:41 -0500
+Received: from mga03.intel.com ([134.134.136.65]:39567)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <liang.z.li@intel.com>)
+	id 1cE7fF-0007iy-Mu
+	for qemu-devel@nongnu.org; Mon, 05 Dec 2016 23:47:38 -0500
+From: "Li, Liang Z" <liang.z.li@intel.com>
+Date: Tue, 6 Dec 2016 04:47:27 +0000
+Message-ID: <F2CBF3009FA73547804AE4C663CAB28E3A12F831@shsmsx102.ccr.corp.intel.com>
+References: <1480495397-23225-1-git-send-email-liang.z.li@intel.com>
+	<1480495397-23225-6-git-send-email-liang.z.li@intel.com>
+	<438dd41a-fdf1-2a77-ef9c-8c103f492b2f@intel.com>
+	<F2CBF3009FA73547804AE4C663CAB28E3A12D814@shsmsx102.ccr.corp.intel.com>
+	<70ece7a5-348b-2eb9-c40a-f21b08df042c@intel.com>
+In-Reply-To: <70ece7a5-348b-2eb9-c40a-f21b08df042c@intel.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="XQ/JOjNzrAcf1KaA"
-Content-Disposition: inline
-In-Reply-To: <1480937130-24561-1-git-send-email-nikunj@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH ppc-for-2.9 00/13] POWER9 TCG enablements -
- part9
+Subject: Re: [Qemu-devel] [PATCH kernel v5 5/5] virtio-balloon: tell host
+ vm's unused page info
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,51 +33,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-Cc: qemu-ppc@nongnu.org, rth@twiddle.net, qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com
+To: "Hansen, Dave" <dave.hansen@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Cc: "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "quintela@redhat.com" <quintela@redhat.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "mhocko@suse.com" <mhocko@suse.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, Mel Gorman <mgorman@techsingularity.net>, Cornelia Huck <cornelia.huck@de.ibm.com>, Amit Shah <amit.shah@redhat.com>
 
+> >>> +	mutex_lock(&vb->balloon_lock);
+> >>> +
+> >>> +	for (order =3D MAX_ORDER - 1; order >=3D 0; order--) {
+> >>
+> >> I scratched my head for a bit on this one.  Why are you walking over
+> >> orders,
+> >> *then* zones.  I *think* you're doing it because you can efficiently
+> >> fill the bitmaps at a given order for all zones, then move to a new
+> >> bitmap.  But, it would be interesting to document this.
+> >
+> > Yes, use the order is somewhat strange, but it's helpful to keep the AP=
+I simple.
+> > Do you think it's acceptable?
+>=20
+> Yeah, it's fine.  Just comment it, please.
+>=20
+Good!
 
---XQ/JOjNzrAcf1KaA
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> >>> +		if (ret =3D=3D -ENOSPC) {
+> >>> +			void *new_resp_data;
+> >>> +
+> >>> +			new_resp_data =3D kmalloc(2 * vb->resp_buf_size,
+> >>> +						GFP_KERNEL);
+> >>> +			if (new_resp_data) {
+> >>> +				kfree(vb->resp_data);
+> >>> +				vb->resp_data =3D new_resp_data;
+> >>> +				vb->resp_buf_size *=3D 2;
+> >>
+> >> What happens to the data in ->resp_data at this point?  Doesn't this
+> >> just throw it away?
+> >
+> > Yes, so we should make sure the data in resp_data is not inuse.
+>=20
+> But doesn't it have valid data that we just collected and haven't told th=
+e
+> hypervisor about yet?  Aren't we throwing away good data that cost us
+> something to collect?
 
-On Mon, Dec 05, 2016 at 04:55:17PM +0530, Nikunj A Dadhania wrote:
-> This series contains 12 new instructions for POWER9 ISA3.0
->      Couple of consolidation patches
->      VSX Vector Insert/Extract Word
->      VSX Vector Permute
->      VSX Load/Store with length
->      VSX Scalar Quad-Precision Move Instructions
+Indeed.  Some filled data may exist for the previous zone. Should we
+change the API to=20
+'int get_unused_pages(unsigned long *unused_pages, unsigned long size,
+		int order, unsigned long *pos, struct zone *zone)' ?
 
-I've merged 1, 9 & 10 to ppc-for-2.9.  The rest I've left for now
-since they have comments from either me or rth.
+then we can use the 'zone' to record the zone to retry and not discard the
+filled data.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+> >> ...
+> >>> +struct page_info_item {
+> >>> +	__le64 start_pfn : 52; /* start pfn for the bitmap */
+> >>> +	__le64 page_shift : 6; /* page shift width, in bytes */
+>=20
+> What does a page_shift "in bytes" mean? :)
 
---XQ/JOjNzrAcf1KaA
-Content-Type: application/pgp-signature; name="signature.asc"
+Obviously, you know. :o
+I will try to make it clear.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
+>=20
+> >>> +	__le64 bmap_len : 6;  /* bitmap length, in bytes */ };
+> >>
+> >> Is 'bmap_len' too short?  a 64-byte buffer is a bit tiny.  Right?
+> >
+> > Currently, we just use the 8 bytes and 0 bytes bitmap, should we suppor=
+t
+> more than 64 bytes?
+>=20
+> It just means that with this format, you end up wasting at least ~1/8th o=
+f the
+> space with metadata.  That's a bit unfortunate, but I guess it's not fata=
+l.
+>=20
+> I'd definitely call it out in the patch description and make sure other f=
+olks take
+> a look at it.
 
-iQIcBAEBCAAGBQJYRjqYAAoJEGw4ysog2bOSgbgQAKQUKdwwWlnVzVVhwhDjtoZv
-RaNENmp02JYvobudjAXX+9nL1+gsSWxnghehEVtmw2kPIVZAb5aR+a+q+/V2NcHC
-BPk9AarRqNMIrEbOX7Rsnc7F42DMci/1BLF1EI4Jlk/wZfbkARK9dh3WtYI0Hrfm
-Pbb0ur+3nYNUN75S2AkmevA+7jUAcKseS4STdzy0atFPGD0eHe3PpjX9/fqeuX3X
-88XqF9BbIdW2HdW5haRzS7jJvYdSUtdT3taepbw6OeMFARD1Q940hmsK7/7rZFbS
-uKPLOa9n1nVfkA7mZU5NPVUzcWn2g/BiAhd3VHaXoFcualunOSChyeB86U6oNvoB
-gKA6aMTYwLjDe/2baE3ySyKlwJC+sKucp9d6zGTD7YPf13CJnsfpboydHJTL+iMB
-u4pXYgc39AQe4XoZNDjq5BWKZJT9ZX9Oux6l/v1OftvJNehean5l8b0g7saI5q1u
-XuwdorPT4ESfcA3ntlOqhCB/MuLOX+N6KIL1rfSSVidIBvzxJFHOzZ6HB7tnvoVl
-1L9ZyasPa1TZlWA4L7LpQ9zyXBUa7P9qGQ8mqU6VfKPzIkwOrzk3ixYhiVexUCo8
-mcXgcook0RE4G1OptQEwWJhgLueCa8gEXqrU+1aL3JxEVc8Jt/SoiO4ThDrEyIP4
-pucPzgINf1PxKZgqFT2j
-=+kB2
------END PGP SIGNATURE-----
+OK.
 
---XQ/JOjNzrAcf1KaA--
+>=20
+> There's a somewhat easy fix, but that would make the qemu implementation
+> more complicated: You could just have bmap_len=3D=3D0x3f imply that there=
+'s
+> another field that contains an extended bitmap length for when you need l=
+ong
+> bitmaps.
+>=20
+> But, as you note, there's no need for it, so it's a matter of trading the=
+ extra
+> complexity versus the desire to not habing to change the ABI again for lo=
+nger
+> (hopefully).
+>=20
+
+Your suggestion still works without changing the current code, just reserve
+ ' bmap_len=3D=3D0x3f' for future extension, and it's not used by the curre=
+nt code.
+
+> >>> +static int  mark_unused_pages(struct zone *zone,
+> >>> +		unsigned long *unused_pages, unsigned long size,
+> >>> +		int order, unsigned long *pos)
+> >>> +{
+> >>> +	unsigned long pfn, flags;
+> >>> +	unsigned int t;
+> >>> +	struct list_head *curr;
+> >>> +	struct page_info_item *info;
+> >>> +
+> >>> +	if (zone_is_empty(zone))
+> >>> +		return 0;
+> >>> +
+> >>> +	spin_lock_irqsave(&zone->lock, flags);
+> >>> +
+> >>> +	if (*pos + zone->free_area[order].nr_free > size)
+> >>> +		return -ENOSPC;
+> >>
+> >> Urg, so this won't partially fill?  So, what the nr_free pages limit
+> >> where we no longer fit in the kmalloc()'d buffer where this simply won=
+'t
+> work?
+> >
+> > Yes.  My initial implementation is partially fill, it's better for the =
+worst case.
+> > I thought the above code is more efficient for most case ...
+> > Do you think partially fill the bitmap is better?
+>=20
+> Could you please answer the question I asked?
+>=20
+
+For your question:
+---------------------------------------------------------------------------=
+----------------------------
+>So, what the nr_free pages limit where we no longer fit in the kmalloc()'d=
+ buffer
+> where this simply won't work?
+---------------------------------------------------------------------------=
+---------------------------
+No, if the buffer is not big enough to save 'nr_free'  pages, get_unused_pa=
+ges() will return
+'-ENOSPC', and the following code will try to allocate a 2x times size buff=
+er for retrying,
+until the proper size buffer is allocated. The current order will not be sk=
+ipped unless the
+buffer allocation failed.
+
+> Because if you don't get this right, it could mean that there are system =
+that
+> simply *fail* here.
