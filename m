@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57528)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57694)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cEItR-0008LW-7u
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 11:47:05 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cEItp-0000AX-F5
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 11:47:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cEItL-0001VV-EG
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 11:47:01 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53136)
+	(envelope-from <dgilbert@redhat.com>) id 1cEItm-0001bd-CE
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 11:47:25 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42192)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cEItL-0001V5-4a
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 11:46:55 -0500
-References: <20161201170624.26496-1-lersek@redhat.com>
-	<20161201170624.26496-4-lersek@redhat.com>
-	<20161206124906.76a41896@nial.brq.redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <3da2baa9-9fa6-7802-fe56-afa02a892a07@redhat.com>
-Date: Tue, 6 Dec 2016 17:46:51 +0100
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cEItm-0001bZ-3s
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 11:47:22 -0500
+Date: Tue, 6 Dec 2016 16:47:17 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20161206164716.GG2125@work-vm>
+References: <20161202174015.GE15373@work-vm>
+	<1480926783.28320.9.camel@redhat.com>
+	<20161205094646.GA2508@work-vm>
+	<62f28da2-a81b-e0f8-32b7-6e75f197750b@redhat.com>
+	<1481007570.20373.3.camel@redhat.com>
+	<20161206105344.GD2125@work-vm>
+	<1481027841.20373.23.camel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20161206124906.76a41896@nial.brq.redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 3/7] fw-cfg: expose "file_slots"
- parameter in fw_cfg_init_io_dma()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1481027841.20373.23.camel@redhat.com>
+Subject: Re: [Qemu-devel] [Spice-devel] Postcopy+spice crash
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,193 +32,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu devel list <qemu-devel@nongnu.org>, "Gabriel L. Somlo" <somlo@cmu.edu>, "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: uril@redhat.com, qemu-devel@nongnu.org, spice-devel <spice-devel@freedesktop.org>
 
-On 12/06/16 12:49, Igor Mammedov wrote:
-> On Thu,  1 Dec 2016 18:06:20 +0100
-> Laszlo Ersek <lersek@redhat.com> wrote:
+* Gerd Hoffmann (kraxel@redhat.com) wrote:
+>   Hi,
 > 
->> Accordingly, generalize the "file_slots" minimum calculation in
->> fw_cfg_init_io_dma(), and move the constant FW_CFG_FILE_SLOTS_TRAD
->> argument to the callers of fw_cfg_init_io_dma().
-> If I get idea correctly you're extending fw_cfg_init_io_dma() and
-> setting
->  qdev_prop_set_uint32(dev, "file_slots", file_slots);
-> manually to keep old fw_cfg_init_io() the same without touching
-> xen/sun4u machines.
-
-First, to my knowledge, Xen does not use fw_cfg. The following call
-chains depend on (!xen_enabled()):
-
-pc_init1() | pc_q35_init()
-  if (!xen_enabled()):
-    pc_memory_init()
-      bochs_bios_init()
-        fw_cfg_init_io_dma()
-
-Second, I wanted to keep the fw_cfg_init_io() call sites un-touched. In
-this patch, the fw_cfg_init_io() function passes an additional /
-internal-only parameter to fw_cfg_init_io_dma(), and the unconditional
-qdev_prop_set_uint32() call in fw_cfg_init_io_dma() is replaced with a
-conditional one (so that the property can only be lowered, not raised,
-by board code).
-
-> That way we would have 2 different ways to set defaults
-> per machine type/version rather then the single COMPAT property way.
+> Yep, spice worker thread ...
 > 
-> How about dropping this patch and adding
->  SET_MACHINE_COMPAT
-> to xen/sun4u machines instead and dropping fw_cfg_init_io() in
-> favor of fw_cfg_init_io_dma() along the way.
-
-For the conditional qdev_prop_set_uint32() call, added in this patch, I
-used commit e6915b5f3a87 ("fw_cfg: unbreak migration compatibility for
-2.4 and earlier machines") as model. According to that model, I couldn't
-drop this patch completely, because the new feature -- i.e., DMA in that
-patch, and higher fw_cfg file slots in this patch -- depends on both
-machine versions and board opt-in.
-
-However, if we agree (according to your feedback on patch v4 2/7) that
-we will silently bump the fw_cfg file count for all new machine
-versions, without requiring (or permitting) board opt-in / opt-out, then
-I agree your above suggestion is consistent with that.
-
-I think I don't have to drop fw_cfg_init_io() actually. But, with the
-board opt-in going away, I can drop both the additional "file_slots"
-parameter in fw_cfg_init_io_dma(), and the qdev_prop_set_uint32() call
-in it (even the unconditional one).
-
-In fact I like this simplicity more, I just wanted to be extra cautious
-in the first version of the series that turned file_slots into a property.
-
-... Actually, are sun4u machines versioned? Hm... "hw/sparc64/sun4u.c"
-doesn't seem to define versioned machine types. Doesn't that imply that
-migration is *completely* unsupported for sun4u? Because, if that's the
-case, then I wouldn't even have to add SET_MACHINE_COMPAT().
-
-Thanks!
-Laszlo
-
+> > Thread 7 (Thread 0x7fbe7f9ff700 (LWP 22383)):
+> > #0  0x00007fc0aa42f49d in read () from /lib64/libpthread.so.0
+> > #1  0x00007fc0a8c36c01 in spice_backtrace_gstack () from /lib64/libspice-server.so.1
+> > #2  0x00007fc0a8c3e4f7 in spice_logv () from /lib64/libspice-server.so.1
+> > #3  0x00007fc0a8c3e655 in spice_log () from /lib64/libspice-server.so.1
+> > #4  0x00007fc0a8bfc6de in get_virt () from /lib64/libspice-server.so.1
+> > #5  0x00007fc0a8bfcb73 in red_get_data_chunks_ptr () from /lib64/libspice-server.so.1
+> > #6  0x00007fc0a8bff3fa in red_get_cursor_cmd () from /lib64/libspice-server.so.1
+> > #7  0x00007fc0a8c0fd79 in handle_dev_loadvm_commands () from /lib64/libspice-server.so.1
+> > #8  0x00007fc0a8bf9523 in dispatcher_handle_recv_read () from /lib64/libspice-server.so.1
+> > #9  0x00007fc0a8c1d5a5 in red_worker_main () from /lib64/libspice-server.so.1
+> > #10 0x00007fc0aa428dc5 in start_thread () from /lib64/libpthread.so.0
+> > #11 0x00007fc0a61786ed in clone () from /lib64/libc.so.6
 > 
->>
->> Cc: "Gabriel L. Somlo" <somlo@cmu.edu>
->> Cc: "Michael S. Tsirkin" <mst@redhat.com>
->> Cc: Gerd Hoffmann <kraxel@redhat.com>
->> Cc: Igor Mammedov <imammedo@redhat.com>
->> Cc: Paolo Bonzini <pbonzini@redhat.com>
->> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
->> ---
->>  docs/specs/fw_cfg.txt     |  4 ++--
->>  include/hw/nvram/fw_cfg.h |  2 +-
->>  hw/i386/pc.c              |  3 ++-
->>  hw/nvram/fw_cfg.c         | 13 ++++++-------
->>  4 files changed, 11 insertions(+), 11 deletions(-)
->>
->> diff --git a/docs/specs/fw_cfg.txt b/docs/specs/fw_cfg.txt
->> index 84e2978706f5..4a6888b511f4 100644
->> --- a/docs/specs/fw_cfg.txt
->> +++ b/docs/specs/fw_cfg.txt
->> @@ -153,12 +153,12 @@ Selector Reg.    Range Usage
->>  0x4000 - 0x7fff  Generic (0x0000 - 0x3fff, RW, ignored in QEMU v2.4+)
->>  0x8000 - 0xbfff  Arch. Specific (0x0000 - 0x3fff, generally RO, possibly RW
->>                                   through the DMA interface in QEMU v2.9+)
->>  0xc000 - 0xffff  Arch. Specific (0x0000 - 0x3fff, RW, ignored in v2.4+)
->>  
->> -In practice, the number of allowed firmware configuration items is given
->> -by the value (FW_CFG_FILE_FIRST + FW_CFG_FILE_SLOTS_TRAD) (see fw_cfg.h).
->> +In practice, the number of allowed firmware configuration items depends on the
->> +machine type.
-> machine type/version
+> ... busy processing post_load request from main thread ...
 > 
->>  
->>  = Guest-side DMA Interface =
->>  
->>  If bit 1 of the feature bitmap is set, the DMA interface is present. This does
->>  not replace the existing fw_cfg interface, it is an add-on. This interface
->> diff --git a/include/hw/nvram/fw_cfg.h b/include/hw/nvram/fw_cfg.h
->> index b980cbaebf43..e9a6b6aa968c 100644
->> --- a/include/hw/nvram/fw_cfg.h
->> +++ b/include/hw/nvram/fw_cfg.h
->> @@ -173,11 +173,11 @@ void fw_cfg_add_file_callback(FWCfgState *s, const char *filename,
->>   */
->>  void *fw_cfg_modify_file(FWCfgState *s, const char *filename, void *data,
->>                           size_t len);
->>  
->>  FWCfgState *fw_cfg_init_io_dma(uint32_t iobase, uint32_t dma_iobase,
->> -                                AddressSpace *dma_as);
->> +                                AddressSpace *dma_as, uint32_t file_slots);
->>  FWCfgState *fw_cfg_init_io(uint32_t iobase);
->>  FWCfgState *fw_cfg_init_mem(hwaddr ctl_addr, hwaddr data_addr);
->>  FWCfgState *fw_cfg_init_mem_wide(hwaddr ctl_addr,
->>                                   hwaddr data_addr, uint32_t data_width,
->>                                   hwaddr dma_addr, AddressSpace *dma_as);
->> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
->> index a9e64a88e5e7..5d929d8fc887 100644
->> --- a/hw/i386/pc.c
->> +++ b/hw/i386/pc.c
->> @@ -741,11 +741,12 @@ static FWCfgState *bochs_bios_init(AddressSpace *as, PCMachineState *pcms)
->>  {
->>      FWCfgState *fw_cfg;
->>      uint64_t *numa_fw_cfg;
->>      int i, j;
->>  
->> -    fw_cfg = fw_cfg_init_io_dma(FW_CFG_IO_BASE, FW_CFG_IO_BASE + 4, as);
->> +    fw_cfg = fw_cfg_init_io_dma(FW_CFG_IO_BASE, FW_CFG_IO_BASE + 4, as,
->> +                                FW_CFG_FILE_SLOTS_TRAD);
->>      fw_cfg_add_i16(fw_cfg, FW_CFG_NB_CPUS, pcms->boot_cpus);
->>  
->>      /* FW_CFG_MAX_CPUS is a bit confusing/problematic on x86:
->>       *
->>       * For machine types prior to 1.8, SeaBIOS needs FW_CFG_MAX_CPUS for
->> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
->> index 2e1441c09750..c33c76ab93b1 100644
->> --- a/hw/nvram/fw_cfg.c
->> +++ b/hw/nvram/fw_cfg.c
->> @@ -926,11 +926,11 @@ static void fw_cfg_init1(DeviceState *dev)
->>      s->machine_ready.notify = fw_cfg_machine_ready;
->>      qemu_add_machine_init_done_notifier(&s->machine_ready);
->>  }
->>  
->>  FWCfgState *fw_cfg_init_io_dma(uint32_t iobase, uint32_t dma_iobase,
->> -                                AddressSpace *dma_as)
->> +                                AddressSpace *dma_as, uint32_t file_slots)
->>  {
->>      DeviceState *dev;
->>      FWCfgState *s;
->>      uint32_t version = FW_CFG_VERSION;
->>      bool dma_requested = dma_iobase && dma_as;
->> @@ -940,15 +940,14 @@ FWCfgState *fw_cfg_init_io_dma(uint32_t iobase, uint32_t dma_iobase,
->>      qdev_prop_set_uint32(dev, "dma_iobase", dma_iobase);
->>      if (!dma_requested) {
->>          qdev_prop_set_bit(dev, "dma_enabled", false);
->>      }
->>  
->> -    /* Once we expose the "file_slots" property to callers of
->> -     * fw_cfg_init_io_dma(), the following setting should become conditional on
->> -     * the input parameter being lower than the current value of the property.
->> -     */
->> -    qdev_prop_set_uint32(dev, "file_slots", FW_CFG_FILE_SLOTS_TRAD);
->> +    if (file_slots < object_property_get_int(OBJECT(dev), "file_slots",
->> +                                             &error_abort)) {
->> +        qdev_prop_set_uint32(dev, "file_slots", file_slots);
->> +    }
->>  
->>      fw_cfg_init1(dev);
->>      s = FW_CFG(dev);
->>  
->>      if (s->dma_enabled) {
->> @@ -964,11 +963,11 @@ FWCfgState *fw_cfg_init_io_dma(uint32_t iobase, uint32_t dma_iobase,
->>      return s;
->>  }
->>  
->>  FWCfgState *fw_cfg_init_io(uint32_t iobase)
->>  {
->> -    return fw_cfg_init_io_dma(iobase, 0, NULL);
->> +    return fw_cfg_init_io_dma(iobase, 0, NULL, FW_CFG_FILE_SLOTS_TRAD);
->>  }
->>  
->>  FWCfgState *fw_cfg_init_mem_wide(hwaddr ctl_addr,
->>                                   hwaddr data_addr, uint32_t data_width,
->>                                   hwaddr dma_addr, AddressSpace *dma_as)
+> > Thread 1 (Thread 0x7fc0aead5c40 (LWP 22376)):
+> > #0  0x00007fc0aa42f49d in read () from /lib64/libpthread.so.0
+> > #1  0x00007fc0a8bf9264 in read_safe () from /lib64/libspice-server.so.1
+> > #2  0x00007fc0a8bf9717 in dispatcher_send_message () from /lib64/libspice-server.so.1
+> > #3  0x00007fc0a8bfa0c2 in red_dispatcher_loadvm_commands () from /lib64/libspice-server.so.1
+> > #4  0x000055646556c03d in qxl_spice_loadvm_commands (qxl=qxl@entry=0x55646755b8c0, ext=ext@entry=0x556467a895a0, count=2) at /root/git/qemu/hw/display/qxl.c:219
+> > #5  0x000055646556d15f in qxl_post_load (opaque=0x55646755b8c0, version=<optimized out>) at /root/git/qemu/hw/display/qxl.c:2212
+> > #6  0x000055646562f1b8 in vmstate_load_state (f=f@entry=0x5564666347d0, vmsd=<optimized out>, opaque=0x55646755b8c0, version_id=version_id@entry=21) at /root/git/qemu/migration/vmstate.c:151
+> > #7  0x000055646540f4a1 in vmstate_load (f=0x5564666347d0, se=0x5564676f90a0, version_id=21) at /root/git/qemu/migration/savevm.c:690
+> > #8  0x000055646540f6db in qemu_loadvm_section_start_full (f=f@entry=0x5564666347d0, mis=mis@entry=0x556466c93f10) at /root/git/qemu/migration/savevm.c:1843
+> > #9  0x000055646540f9ac in qemu_loadvm_state_main (f=f@entry=0x5564666347d0, mis=mis@entry=0x556466c93f10) at /root/git/qemu/migration/savevm.c:1900
+> > #10 0x000055646540fd8f in loadvm_handle_cmd_packaged (mis=0x556466c93f10) at /root/git/qemu/migration/savevm.c:1660
+> > #11 loadvm_process_command (f=0x556467e45740) at /root/git/qemu/migration/savevm.c:1723
+> > #12 qemu_loadvm_state_main (f=f@entry=0x556467e45740, mis=mis@entry=0x556466c93f10) at /root/git/qemu/migration/savevm.c:1913
+> > #13 0x0000556465412546 in qemu_loadvm_state (f=f@entry=0x556467e45740) at /root/git/qemu/migration/savevm.c:1973
+> > #14 0x000055646562b4e8 in process_incoming_migration_co (opaque=0x556467e45740) at /root/git/qemu/migration/migration.c:394
+> > #15 0x0000556465746ada in coroutine_trampoline (i0=<optimized out>, i1=<optimized out>) at /root/git/qemu/util/coroutine-ucontext.c:79
+> > #16 0x00007fc0a60c7cf0 in ?? () from /lib64/libc.so.6
+> > #17 0x00007ffe14885180 in ?? ()
+> > #18 0x0000000000000000 in ?? ()
 > 
+> > It should; the device memory is just a RAMBlock that's migrated, so if it's
+> > not arrived yet from the source the qxl code will block until postcopy
+> > drags it across; assuming that is that the qxl code on the source isn't
+> > still trying to write to it's copy at the same time, which at this
+> > point it shouldn't.
+> 
+> Seems it happens while restoring the cursor,
+> does this patch make a difference?
+
+Hmm, my test case doesn't want to fail today, so unfortunately I can't tell.
+(I've done at least 10 postcopies)
+
+Dave
+
+> --- a/hw/display/qxl.c
+> +++ b/hw/display/qxl.c
+> @@ -2238,12 +2238,14 @@ static int qxl_post_load(void *opaque, int
+> version)
+>              cmds[out].group_id = MEMSLOT_GROUP_GUEST;
+>              out++;
+>          }
+> +#if 0
+>          if (d->guest_cursor) {
+>              cmds[out].cmd.data = d->guest_cursor;
+>              cmds[out].cmd.type = QXL_CMD_CURSOR;
+>              cmds[out].group_id = MEMSLOT_GROUP_GUEST;
+>              out++;
+>          }
+> +#endif
+>          qxl_spice_loadvm_commands(d, cmds, out);
+>          g_free(cmds);
+>          if (d->guest_monitors_config) {
+> 
+> cheers,
+>   Gerd
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
