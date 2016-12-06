@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55005)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59810)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cEA5I-00021R-Th
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 02:22:41 -0500
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1cEAWR-0006OB-Kr
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 02:50:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cEA5D-0008BL-VT
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 02:22:40 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:32828)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cEA5D-0008B7-PL
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 02:22:35 -0500
-Date: Tue, 6 Dec 2016 15:22:28 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20161206072228.GC4344@pxdev.xzpeter.org>
-References: <1480348315-13332-1-git-send-email-bd.aviv@gmail.com>
-	<8188dd5e-2c71-dbd0-9a1a-9c8af6f74b96@intel.com>
-	<20161202065214.GF21601@pxdev.xzpeter.org>
-	<088c2afd-575e-99af-1686-023c116352ab@intel.com>
-	<20161206065155.GB4344@pxdev.xzpeter.org>
-	<6d37d046-8e5a-7662-baa6-445d3985fde7@intel.com>
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1cEAWO-0007zq-Gf
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 02:50:43 -0500
+Received: from [59.151.112.132] (port=21205 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1cEAWN-0007yz-O1
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 02:50:40 -0500
+References: <a503e0f2-79ad-b8c5-9418-ac0502514581@cn.fujitsu.com>
+	<20161205115339.GG22443@stefanha-x1.localdomain>
+From: Dou Liyang <douly.fnst@cn.fujitsu.com>
+Message-ID: <e4e0f3ee-7668-7bf3-8bf1-270a14a00c6a@cn.fujitsu.com>
+Date: Tue, 6 Dec 2016 15:50:29 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <6d37d046-8e5a-7662-baa6-445d3985fde7@intel.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v7 0/5] IOMMU: intel_iommu support map and
- unmap notifications
+In-Reply-To: <20161205115339.GG22443@stefanha-x1.localdomain>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] a suggestion to extend the query block stats
+ commands for multi-disk case
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,47 +28,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Lan Tianyu <tianyu.lan@intel.com>
-Cc: "Aviv B.D" <bd.aviv@gmail.com>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>, Alex Williamson <alex.williamson@redhat.com>, Jason Wang <jasowang@redhat.com>, "Liu, Yi L" <yi.l.liu@intel.com>, "Wu, Fengguang" <fengguang.wu@intel.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Fam Zheng <famz@redhat.com>, armbru@redhat.com, stefanha@redhat.com, danpb@redhat.com
 
-On Tue, Dec 06, 2016 at 03:06:20PM +0800, Lan Tianyu wrote:
-> On 2016=E5=B9=B412=E6=9C=8806=E6=97=A5 14:51, Peter Xu wrote:
-> > On Tue, Dec 06, 2016 at 02:30:24PM +0800, Lan Tianyu wrote:
-> >=20
-> > [...]
-> >=20
-> >>>> 2. How to restore GPA->HPA mapping when IOVA is disabled by guest.
-> >>>> When guest enables IOVA for device, vIOMMU will invalidate all pre=
-vious
-> >>>> GPA->HPA mapping and update IOVA->HPA mapping to pIOMMU via iommu
-> >>>> notifier. But if IOVA is disabled, I think we should restore GPA->=
-HPA
-> >>>> mapping for the device otherwise the device won't work again in th=
-e VM.
-> >>>
-> >>> If we can have a workable replay mechanism, this problem will be
-> >>> solved IMHO.
-> >>
-> >> Basic idea is to replay related memory regions to restore GPA->HPA
-> >> mapping when guest disables IOVA.
-> >=20
-> > Btw, could you help elaborate in what case we will trigger such a
-> > condition? Or, can we dynamically enable/disable an IOMMU?
->=20
-> First case I think of is nest virtualization and we assign physical
-> device to l2 guest.
+Hi stefan,
 
-If we assign physical device to l2 guest, then it will belongs to an
-IOMMU domain in either l1 guest and host, right? (assuming we are
-using vfio-pci to do device assignment)
+At 12/05/2016 07:53 PM, Stefan Hajnoczi wrote:
+> On Mon, Dec 05, 2016 at 04:56:38PM +0800, Dou Liyang wrote:
+>> Hi all,
+>>
+>> Currently, in Qemu, we query the block states by using “info blockstats”.
+>> For each disk, the command calls “bdrv_query_stats” function to get the
+>> info of block states in “qmp_query_blockstats” .
+>> Since commit 13344f3a, Stefan added mutex to ensures that the dataplane
+>> IOThread and the main loop's monitor code do not race.
+>> These are very useful to us.
+>>
+>> Recently, we fount that when the guest in qemu had a lot of disks, the
+>> I/O performance might be degraded if we used the command above.
+>>
+>> So, we consider whether the following optimization can be carried out:
+>>
+>> 1. Add an optional parameter to identify a block, If this parameter is
+>> not empty, only the states of the identified block is acquired.
+>>
+>>  BlockStatsList *qmp_query_blockstats(bool has_query_nodes,
+>>                                       bool query_nodes,
+>> +                                     BlockBackend *query_blk,
+>>                                       Error **errp)
+>>  {
+>>      BlockStatsList *head = NULL, **p_next = &head;
+>>
+>> 2. Just use the mutex when we set the 'x-data-plane=on' feature.
+>>
+>>
+>> The following is the reason:
+>>
+>> 1. background:
+>>
+>> we have some guests which have more than 450 disks. And we use
+>> “qmp_query_blockstats” to monitor their disks states in real time( 2
+>> times/s).
+>>
+>> we found that, in the monitor situation, the I/O performance of the
+>> guests might be degraded. We tested(used “dd”):
+>>
+>>  disk number |  degraded    |
+>>      10      |  1.4%   |
+>>      100     |  3.4%   |
+>>      200     |  5.5%   |
+>>      500     |  13.6%  |
+>>
+>>
+>> 2. In the description above, a comparison was made on the number of 500
+>> disks:
+>>
+>>   2.1. Adds the specified parameter： degraded 2.1%
+>>
+>>   2.2. Turn off the lock protection(for test)： degraded 1.6%
+>>
+>> 3. Guess
+>>
+>> We stamped the time-stamps before and after the method named
+>> “qmp_query_blockstats”, found that in our host:
+>>
+>> 3.1 the time to acquire a disk states is about 4637ns (without
+>> considering the time of searching the linked list).
+>> 3.2  the time to get 500 disks states is about 901583ns.
+>> 3.3  if we don't consider the mutex,  the time to acquire a disk states
+>> is about 2302ns.
+>>
+>> The operation consumes the running resources of I/O . As the number of
+>> disks increases, it becomes apparent.
+>>
+>> We think that the performance degradation is inevitable, but if we can
+>> configure the parameters, allowing users to balance between the number
+>> of disks states and the performance of I/O, that may be also a good
+>> thing.
+>>
+>> And, we searched in the mail-list archive, did not find the relevant
+>> discussion. We are not sure if anyone has ever experienced this
+>> problem, or if anyone ever mentioned it before.
+>>
+>> So, we boldly put forward, and hope to get everyone's advices.
+>
+> Adding the BlockBackend *query_blk parameter is a reasonable short-term
+> workaround.  I wonder if the polling stats APIs need to be rethought in
+> the longer term.
+>
 
-> User space driver(E.G DPDK) also can enable/disable
-> IOVA for device dynamically.
+Thank you very much. Now I can confirm my idea.
 
-Could you provide more detailed (or any pointer) on how to do that? I
-did try to find it myself, I see an VFIO_IOMMU_ENABLE ioctl, but looks
-like it is for ppc only.
+For the APIs, I'm sorry, I have no idea yet.
+I will try the short-term and simple way first, maybe I could find 
+something.
+
 
 Thanks,
 
--- peterx
+   Liyang.
