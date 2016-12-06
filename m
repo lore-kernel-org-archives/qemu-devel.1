@@ -1,26 +1,44 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33978)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34366)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cEEzx-0001le-DA
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 07:37:30 -0500
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1cEF14-0003hK-Jh
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 07:38:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cEEzu-0003Z8-6G
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 07:37:29 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44778)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cEEzt-0003Yi-UF
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 07:37:26 -0500
-Message-ID: <1481027841.20373.23.camel@redhat.com>
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue, 06 Dec 2016 13:37:21 +0100
-In-Reply-To: <20161206105344.GD2125@work-vm>
-References: <20161202174015.GE15373@work-vm>
-	<1480926783.28320.9.camel@redhat.com> <20161205094646.GA2508@work-vm>
-	<62f28da2-a81b-e0f8-32b7-6e75f197750b@redhat.com>
-	<1481007570.20373.3.camel@redhat.com> <20161206105344.GD2125@work-vm>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0
-Subject: Re: [Qemu-devel] [Spice-devel] Postcopy+spice crash
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1cEF11-00047c-GP
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 07:38:38 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60150)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1cEF11-00047Q-74
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 07:38:35 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
+	uB6CY8FL063146
+	for <qemu-devel@nongnu.org>; Tue, 6 Dec 2016 07:38:31 -0500
+Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 275qv2jnud-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 06 Dec 2016 07:38:31 -0500
+Received: from localhost
+	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Tue, 6 Dec 2016 12:38:29 -0000
+References: <148095126363.31351.4484514300033863622.stgit@bahia>
+	<20161205164200.49bec0f6.cornelia.huck@de.ibm.com>
+	<20161205164829.GB14457@thinpad.lan.raisama.net>
+	<20161205182555.2e988ac6.cornelia.huck@de.ibm.com>
+	<20161205174130.GH13060@thinpad.lan.raisama.net>
+	<7663fe2f-ae4e-dccd-6422-bd2fba5c9e7d@linux.vnet.ibm.com>
+	<20161206101110.164b8a93@bahia>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Tue, 6 Dec 2016 13:38:24 +0100
+MIME-Version: 1.0
+In-Reply-To: <20161206101110.164b8a93@bahia>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 8bit
+Message-Id: <80731f31-83c1-0f36-e949-e6f20790921a@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.8] qdev: apply global properties in
+ reverse order
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,102 +47,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: uril@redhat.com, qemu-devel@nongnu.org, spice-devel <spice-devel@freedesktop.org>
+To: Greg Kurz <groug@kaod.org>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, qemu-stable@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-  Hi,
 
-Yep, spice worker thread ...
 
-> Thread 7 (Thread 0x7fbe7f9ff700 (LWP 22383)):
-> #0  0x00007fc0aa42f49d in read () from /lib64/libpthread.so.0
-> #1  0x00007fc0a8c36c01 in spice_backtrace_gstack () from /lib64/libspice-=
-server.so.1
-> #2  0x00007fc0a8c3e4f7 in spice_logv () from /lib64/libspice-server.so.1
-> #3  0x00007fc0a8c3e655 in spice_log () from /lib64/libspice-server.so.1
-> #4  0x00007fc0a8bfc6de in get_virt () from /lib64/libspice-server.so.1
-> #5  0x00007fc0a8bfcb73 in red_get_data_chunks_ptr () from /lib64/libspice=
--server.so.1
-> #6  0x00007fc0a8bff3fa in red_get_cursor_cmd () from /lib64/libspice-serv=
-er.so.1
-> #7  0x00007fc0a8c0fd79 in handle_dev_loadvm_commands () from /lib64/libsp=
-ice-server.so.1
-> #8  0x00007fc0a8bf9523 in dispatcher_handle_recv_read () from /lib64/libs=
-pice-server.so.1
-> #9  0x00007fc0a8c1d5a5 in red_worker_main () from /lib64/libspice-server.=
-so.1
-> #10 0x00007fc0aa428dc5 in start_thread () from /lib64/libpthread.so.0
-> #11 0x00007fc0a61786ed in clone () from /lib64/libc.so.6
+On 12/06/2016 10:11 AM, Greg Kurz wrote:
+>> Given the current doc:
+>> > """
+>> > -global driver.prop=value
+>> > -global driver=driver,property=property,value=value
+>> >     Set default value of driver's property prop to value, e.g.:
+>> > 
+>> >          qemu-system-i386 -global ide-drive.physical_block_size=4096 -drive
+>> > file=file,if=ide,index=0,media=disk
+>> > 
+>> >     In particular, you can use this to set driver properties for devices which
+>> >     are created automatically by the machine model. To create a device which is
+>> >     not created automatically and set properties on it, use -device.
+>> > 
+>> >     -global driver.prop=value is shorthand for -global driver=driver,property=prop,
+>> > value=value. The longhand syntax works even when
+>> >     driver contains a dot. 
+>> > """
+>> > I think this OOP argument, which I do not completely understand,
+> With the current code, properties from the parent classes implicitly
+> prevail and this has nothing to do with command line order, or order
+> of appearance in HW_COMPAT_*.
+>
 
-... busy processing post_load request from main thread ...
+Yeah and IMHO this is exactly the problem :).
+ 
+> From an OOP perspective, we usually expect child classes to override
+> parent classes behavior, not the contrary.
+> 
 
-> Thread 1 (Thread 0x7fc0aead5c40 (LWP 22376)):
-> #0  0x00007fc0aa42f49d in read () from /lib64/libpthread.so.0
-> #1  0x00007fc0a8bf9264 in read_safe () from /lib64/libspice-server.so.1
-> #2  0x00007fc0a8bf9717 in dispatcher_send_message () from /lib64/libspice=
--server.so.1
-> #3  0x00007fc0a8bfa0c2 in red_dispatcher_loadvm_commands () from /lib64/l=
-ibspice-server.so.1
-> #4  0x000055646556c03d in qxl_spice_loadvm_commands (qxl=3Dqxl@entry=3D0x=
-55646755b8c0, ext=3Dext@entry=3D0x556467a895a0, count=3D2) at /root/git/qem=
-u/hw/display/qxl.c:219
-> #5  0x000055646556d15f in qxl_post_load (opaque=3D0x55646755b8c0, version=
-=3D<optimized out>) at /root/git/qemu/hw/display/qxl.c:2212
-> #6  0x000055646562f1b8 in vmstate_load_state (f=3Df@entry=3D0x5564666347d=
-0, vmsd=3D<optimized out>, opaque=3D0x55646755b8c0, version_id=3Dversion_id=
-@entry=3D21) at /root/git/qemu/migration/vmstate.c:151
-> #7  0x000055646540f4a1 in vmstate_load (f=3D0x5564666347d0, se=3D0x556467=
-6f90a0, version_id=3D21) at /root/git/qemu/migration/savevm.c:690
-> #8  0x000055646540f6db in qemu_loadvm_section_start_full (f=3Df@entry=3D0=
-x5564666347d0, mis=3Dmis@entry=3D0x556466c93f10) at /root/git/qemu/migratio=
-n/savevm.c:1843
-> #9  0x000055646540f9ac in qemu_loadvm_state_main (f=3Df@entry=3D0x5564666=
-347d0, mis=3Dmis@entry=3D0x556466c93f10) at /root/git/qemu/migration/savevm=
-.c:1900
-> #10 0x000055646540fd8f in loadvm_handle_cmd_packaged (mis=3D0x556466c93f1=
-0) at /root/git/qemu/migration/savevm.c:1660
-> #11 loadvm_process_command (f=3D0x556467e45740) at /root/git/qemu/migrati=
-on/savevm.c:1723
-> #12 qemu_loadvm_state_main (f=3Df@entry=3D0x556467e45740, mis=3Dmis@entry=
-=3D0x556466c93f10) at /root/git/qemu/migration/savevm.c:1913
-> #13 0x0000556465412546 in qemu_loadvm_state (f=3Df@entry=3D0x556467e45740=
-) at /root/git/qemu/migration/savevm.c:1973
-> #14 0x000055646562b4e8 in process_incoming_migration_co (opaque=3D0x55646=
-7e45740) at /root/git/qemu/migration/migration.c:394
-> #15 0x0000556465746ada in coroutine_trampoline (i0=3D<optimized out>, i1=
-=3D<optimized out>) at /root/git/qemu/util/coroutine-ucontext.c:79
-> #16 0x00007fc0a60c7cf0 in ?? () from /lib64/libc.so.6
-> #17 0x00007ffe14885180 in ?? ()
-> #18 0x0000000000000000 in ?? ()
 
-> It should; the device memory is just a RAMBlock that's migrated, so if it=
-'s
-> not arrived yet from the source the qxl code will block until postcopy
-> drags it across; assuming that is that the qxl code on the source isn't
-> still trying to write to it's copy at the same time, which at this
-> point it shouldn't.
+I know, but the question is if it is the right analogy. The point is (as
+you yourself already stated in a follow up email) the semantic of global
+properties can be very well defined as for each instance of the class X
+set property P to value V (that is imperatively). Now if it is possible
+that same data exposed by properties is set more than once (e.g. via
+parent and via child) and we want to remain deterministic we need to say
+which write is going to win by being the last one.
 
-Seems it happens while restoring the cursor,
-does this patch make a difference?
+Another option would be to say define this in a functional manner and
+say the value of a property is going to be V unless ... ( here we need
+to state that child takes precedence over parent and bring in command
+line in in some way too -- where I do not know if parent command line
+should take precedence over compat property on the child or the other
+way around).
 
---- a/hw/display/qxl.c
-+++ b/hw/display/qxl.c
-@@ -2238,12 +2238,14 @@ static int qxl_post_load(void *opaque, int
-version)
-             cmds[out].group_id =3D MEMSLOT_GROUP_GUEST;
-             out++;
-         }
-+#if 0
-         if (d->guest_cursor) {
-             cmds[out].cmd.data =3D d->guest_cursor;
-             cmds[out].cmd.type =3D QXL_CMD_CURSOR;
-             cmds[out].group_id =3D MEMSLOT_GROUP_GUEST;
-             out++;
-         }
-+#endif
-         qxl_spice_loadvm_commands(d, cmds, out);
-         g_free(cmds);
-         if (d->guest_monitors_config) {
+Because IMHO the first option is not consistent with the doc I'm in
+favor of that, but then it has not much to do with overriding behavior.
 
-cheers,
-  Gerd
+Thanks for the explanation. Given your other email I think we are in
+agreement now. I still think a bit more documentation (not necessarily
+user documentation) would not hurt, as IMHO the OOP intuition you stated
+is a valid one too (not my favored one though) and thus it would not
+hurt to have the design decision captured in natural language too.
+
+Cheers,
+Halil
