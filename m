@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33250)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34387)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cEDSy-0001f4-Ri
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 05:59:21 -0500
+	(envelope-from <stefanha@gmail.com>) id 1cEDXd-0004as-2p
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 06:04:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cEDSy-0001ny-3y
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 05:59:20 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51050)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cEDSx-0001mX-UK
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 05:59:20 -0500
-Date: Tue, 6 Dec 2016 18:59:14 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20161206105914.GB3469@pxdev.xzpeter.org>
-References: <1480348315-13332-1-git-send-email-bd.aviv@gmail.com>
-	<8188dd5e-2c71-dbd0-9a1a-9c8af6f74b96@intel.com>
-	<20161202065214.GF21601@pxdev.xzpeter.org>
-	<088c2afd-575e-99af-1686-023c116352ab@intel.com>
-	<20161206065155.GB4344@pxdev.xzpeter.org>
-	<6d37d046-8e5a-7662-baa6-445d3985fde7@intel.com>
-	<20161206072228.GC4344@pxdev.xzpeter.org>
-	<f9f9daab-519d-381b-c9e8-c6dcc139f1d3@intel.com>
+	(envelope-from <stefanha@gmail.com>) id 1cEDXX-0003LU-Aj
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 06:04:09 -0500
+Date: Tue, 6 Dec 2016 11:03:00 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20161206110300.GC20860@stefanha-x1.localdomain>
+References: <87oa0q1t21.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="69pVuxX8awAiJ7fD"
 Content-Disposition: inline
-In-Reply-To: <f9f9daab-519d-381b-c9e8-c6dcc139f1d3@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v7 0/5] IOMMU: intel_iommu support map and
- unmap notifications
+In-Reply-To: <87oa0q1t21.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [Qemu-block] Meeting notes on -blockdev,
+ dynamic backend reconfiguration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,35 +24,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Lan Tianyu <tianyu.lan@intel.com>
-Cc: "Aviv B.D" <bd.aviv@gmail.com>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>, Alex Williamson <alex.williamson@redhat.com>, Jason Wang <jasowang@redhat.com>, "Liu, Yi L" <yi.l.liu@intel.com>, "Wu, Fengguang" <fengguang.wu@intel.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On Tue, Dec 06, 2016 at 04:27:39PM +0800, Lan Tianyu wrote:
 
-[...]
+--69pVuxX8awAiJ7fD
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-> > 
-> >> User space driver(E.G DPDK) also can enable/disable
-> >> IOVA for device dynamically.
-> > 
-> > Could you provide more detailed (or any pointer) on how to do that? I
-> > did try to find it myself, I see an VFIO_IOMMU_ENABLE ioctl, but looks
-> > like it is for ppc only.
-> 
-> No, I just give an example that user space may do that but no more
-> research. But since Qemu already can enable device's IOVA, other user
-> application also should can do that with the same VFIO interface, right?
+On Mon, Dec 05, 2016 at 01:03:50PM +0100, Markus Armbruster wrote:
+> I recently met Kevin, and we discussed two block layer topics in some
+> depth.
 
-AFAIU we can't do that at least on x86. We can use vfio interface to
-bind group into container, but we should not be able to dynamically
-disable IOMMU protection. IIUC That needs to taint the kernel.
+Thanks for sharing this.  Both topics were a good read and the direction
+you are heading in looks good.
 
-The only way I know is that we probe vfio-pci with no-iommu mode, in
-that case, we disabled IOMMU, but we can never dynamically enable it
-as well.
+Stefan
 
-Please correct me if I am wrong.
+--69pVuxX8awAiJ7fD
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Thanks,
+-----BEGIN PGP SIGNATURE-----
 
--- peterx
+iQEcBAEBAgAGBQJYRprjAAoJEJykq7OBq3PIRr8H/RJqK9XUvItaI7JaadD8VSQC
+25eymU5ICGUi0q1TZjdcY9PoA6arZu3+ttUs6W5Lbl2mQL6/66/3aY93aNLrEAtJ
+nbKrvc6tvTgEVpS1pTo03d1nvM0S2PYHd51XsTuELNnDuIdEVkhBxGsgm0bhr+jb
+0r6bm84kJDgHANCcPr+TUM3G7fVlPjtiPHa9hwjfxRRgf998IjdDloxknjKVGaWL
+DzRgqBkTCnJEfH+2j9e23yrE/FG1E2zobvhahArPQqFQLzV/MPCC+ygEm7NZFL6/
+FjLLPyrK6sC1dsucBvCRsMRmvWp6zRUF6IWzlgeAzqqD7iOWL6REYzZ70wGLDjw=
+=R77Y
+-----END PGP SIGNATURE-----
+
+--69pVuxX8awAiJ7fD--
