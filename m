@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58720)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59905)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1cEBy0-0002IG-37
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 04:23:17 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cEC0G-0003mm-VW
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 04:25:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1cEBxy-0003mn-Uf
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 04:23:16 -0500
-Date: Tue, 6 Dec 2016 10:23:03 +0100
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20161206092303.tq6gisapxierpwlx@kamzik.brq.redhat.com>
-References: <1480974406-29345-1-git-send-email-eric.auger@redhat.com>
-	<1480974406-29345-4-git-send-email-eric.auger@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1cEC0B-00053B-CB
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 04:25:36 -0500
+Date: Tue, 6 Dec 2016 10:25:23 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20161206092523.GA4990@noname.str.redhat.com>
+References: <20161205234235.5728-1-eblake@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1480974406-29345-4-git-send-email-eric.auger@redhat.com>
-Subject: Re: [Qemu-devel] [kvm-unit-tests RFC 03/15] arm/arm64: ITS skeleton
+In-Reply-To: <20161205234235.5728-1-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] doc: Propose
+ NBD_FLAG_INIT_ZEROES extension
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,179 +23,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Auger <eric.auger@redhat.com>
-Cc: eric.auger.pro@gmail.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, qemu-arm@nongnu.org, marc.zyngier@arm.com, christoffer.dall@linaro.org, andre.przywara@arm.com, pbonzini@redhat.com, alex.bennee@linaro.org, peter.maydell@linaro.org
+To: Eric Blake <eblake@redhat.com>
+Cc: nbd-general@lists.sourceforge.net, xieyingtai@huawei.com, subo7@huawei.com, qemu-block@nongnu.org, eric.fangyi@huawei.com, qemu-devel@nongnu.org, pbonzini@redhat.com
 
-On Mon, Dec 05, 2016 at 10:46:34PM +0100, Eric Auger wrote:
-> At the moment we just detect the presence of ITS as part of the
-> GICv3 init routine and initialize its base address.
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> ---
->  arm/Makefile.common        |  1 +
->  lib/arm/asm/gic-v3-its.h   | 22 ++++++++++++++++++++++
->  lib/arm/asm/gic.h          |  1 +
->  lib/arm/gic-v3-its.c       |  9 +++++++++
->  lib/arm/gic.c              | 30 +++++++++++++++++++++++++-----
->  lib/arm64/asm/gic-v3-its.h |  1 +
->  6 files changed, 59 insertions(+), 5 deletions(-)
->  create mode 100644 lib/arm/asm/gic-v3-its.h
->  create mode 100644 lib/arm/gic-v3-its.c
->  create mode 100644 lib/arm64/asm/gic-v3-its.h
-> 
-> diff --git a/arm/Makefile.common b/arm/Makefile.common
-> index 6c0898f..070f349 100644
-> --- a/arm/Makefile.common
-> +++ b/arm/Makefile.common
-> @@ -47,6 +47,7 @@ cflatobjs += lib/arm/bitops.o
->  cflatobjs += lib/arm/psci.o
->  cflatobjs += lib/arm/smp.o
->  cflatobjs += lib/arm/gic.o lib/arm/gic-v2.o lib/arm/gic-v3.o
-> +cflatobjs += lib/arm/gic-v3-its.o
->  
->  libeabi = lib/arm/libeabi.a
->  eabiobjs = lib/arm/eabi_compat.o
-> diff --git a/lib/arm/asm/gic-v3-its.h b/lib/arm/asm/gic-v3-its.h
-> new file mode 100644
-> index 0000000..2044565
-> --- /dev/null
-> +++ b/lib/arm/asm/gic-v3-its.h
-> @@ -0,0 +1,22 @@
-> +/*
-> + * All ITS* defines are lifted from include/linux/irqchip/arm-gic-v3.h
-> + *
-> + * Copyright (C) 2016, Red Hat Inc, Andrew Jones <drjones@redhat.com>
+Am 06.12.2016 um 00:42 hat Eric Blake geschrieben:
+> While not directly related to NBD_CMD_WRITE_ZEROES, the qemu
+> team discovered that it is useful if a server can advertise
+> whether an export is in a known-all-zeroes state at the time
+> the client connects.
 
-s/Andrew/Eric/
+Does a server usually have the information to set this flag, other than
+querying the block status of all blocks at startup? If so, the client
+could just query this by itself.
 
-> + *
-> + * This work is licensed under the terms of the GNU LGPL, version 2.
-> + */
-> +#ifndef _ASMARM_GIC_V3_ITS_H_
-> +#define _ASMARM_GIC_V3_ITS_H_
-> +
-> +#ifndef __ASSEMBLY__
-> +
-> +struct its_data {
-> +	void *base;
-> +};
-> +
-> +extern struct its_data its_data;
-> +
-> +#define gicv3_its_base()		(its_data.base)
+The patch that was originally sent to qemu-devel just forwarded qemu's
+.bdrv_has_zero_init() call to the server. However, what this function
+returns is not a known-all-zeroes state on open, but just a
+known-all-zeroes state immediately after bdrv_create(), i.e. creating a
+new image. Then it becomes information that is easy to get and doesn't
+involve querying all blocks (e.g. true for COW image formats, true for
+raw on regular files, false for raw on block devices).
 
-Can't we just add the ITS base address to the current gicv3_data struct?
+This is useful for 'qemu-img convert', which creates an image and then
+writes the whole contents, but I'm not sure if this property is
+applicable for NBD, which I think doesn't even have a create operation.
 
-> +
-> +#endif /* !__ASSEMBLY__ */
-> +#endif /* _ASMARM_GIC_V3_ITS_H_ */
-> diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
-> index ea5fde9..73d4502 100644
-> --- a/lib/arm/asm/gic.h
-> +++ b/lib/arm/asm/gic.h
-> @@ -30,6 +30,7 @@
->  
->  #include <asm/gic-v2.h>
->  #include <asm/gic-v3.h>
-> +#include <asm/gic-v3-its.h>
->  
->  #ifndef __ASSEMBLY__
->  #include <asm/cpumask.h>
-> diff --git a/lib/arm/gic-v3-its.c b/lib/arm/gic-v3-its.c
-> new file mode 100644
-> index 0000000..e382b80
-> --- /dev/null
-> +++ b/lib/arm/gic-v3-its.c
-> @@ -0,0 +1,9 @@
-> +/*
-> + * Copyright (C) 2016, Red Hat Inc, Eric Auger <eric.auger@redhat.com>
-> + *
-> + * This work is licensed under the terms of the GNU LGPL, version 2.
-> + */
-> +#include <asm/gic.h>
-> +
-> +struct its_data its_data;
-> +
-> diff --git a/lib/arm/gic.c b/lib/arm/gic.c
-> index 957a146..e551abd 100644
-> --- a/lib/arm/gic.c
-> +++ b/lib/arm/gic.c
-> @@ -6,6 +6,7 @@
->  #include <devicetree.h>
->  #include <asm/gic.h>
->  #include <asm/io.h>
-> +#include <asm/gic-v3-its.h>
->  
->  struct gic_common_ops *gic_common_ops;
->  
-> @@ -17,12 +18,14 @@ struct gicv3_data gicv3_data;
->   * Documentation/devicetree/bindings/interrupt-controller/arm,gic-v3.txt
->   */
->  static bool
-> -gic_get_dt_bases(const char *compatible, void **base1, void **base2)
-> +gic_get_dt_bases(const char *compatible, void **base1, void **base2,
-> +		 void **base3)
->  {
->  	struct dt_pbus_reg reg;
-> -	struct dt_device gic;
-> +	struct dt_device gic, its;
->  	struct dt_bus bus;
-> -	int node, ret;
-> +	int node, subnode, ret, len;
-> +	const void *fdt = dt_fdt();
->  
->  	dt_bus_init_defaults(&bus);
->  	dt_device_init(&gic, &bus, NULL);
-> @@ -43,19 +46,36 @@ gic_get_dt_bases(const char *compatible, void **base1, void **base2)
->  	assert(ret == 0);
->  	*base2 = ioremap(reg.addr, reg.size);
->  
-> +	if (base3 && !strcmp(compatible, "arm,gic-v3")) {
-> +		dt_for_each_subnode(node, subnode) {
-> +			const struct fdt_property *prop;
-> +
-> +			prop = fdt_get_property(fdt, subnode,
-> +						"compatible", &len);
-> +			if (!strcmp((char *)prop->data, "arm,gic-v3-its")) {
-> +				dt_device_bind_node(&its, subnode);
-> +				ret = dt_pbus_translate(&its, 0, &reg);
-> +				assert(ret == 0);
-> +				*base3 = ioremap(reg.addr, reg.size);
-> +				break;
-> +			}
-> +		}
-> +
-> +	}
-> +
->  	return true;
->  }
->  
->  int gicv2_init(void)
->  {
->  	return gic_get_dt_bases("arm,cortex-a15-gic",
-> -			&gicv2_data.dist_base, &gicv2_data.cpu_base);
-> +			&gicv2_data.dist_base, &gicv2_data.cpu_base, NULL);
->  }
->  
->  int gicv3_init(void)
->  {
->  	return gic_get_dt_bases("arm,gic-v3", &gicv3_data.dist_base,
-> -			&gicv3_data.redist_base[0]);
-> +			&gicv3_data.redist_base[0], &its_data.base);
->  }
->  
->  int gic_init(void)
-> diff --git a/lib/arm64/asm/gic-v3-its.h b/lib/arm64/asm/gic-v3-its.h
-> new file mode 100644
-> index 0000000..083cba4
-> --- /dev/null
-> +++ b/lib/arm64/asm/gic-v3-its.h
-> @@ -0,0 +1 @@
-> +#include "../../arm/asm/gic-v3-its.h"
-> -- 
-> 2.5.5
-> 
->
-
-Thanks,
-drew 
+Kevin
