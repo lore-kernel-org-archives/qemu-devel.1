@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50897)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52054)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cECqq-0000fj-B0
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 05:19:57 -0500
+	(envelope-from <stefanha@gmail.com>) id 1cECwM-0002Rt-Ty
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 05:25:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cECqk-0003Si-Hy
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 05:19:56 -0500
-Date: Tue, 6 Dec 2016 10:18:25 +0000
+	(envelope-from <stefanha@gmail.com>) id 1cECwI-0006BY-V4
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 05:25:38 -0500
+Received: from mail-wj0-f195.google.com ([209.85.210.195]:33171)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cECwI-0006BJ-KG
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 05:25:34 -0500
+Received: by mail-wj0-f195.google.com with SMTP id kp2so43013080wjc.0
+	for <qemu-devel@nongnu.org>; Tue, 06 Dec 2016 02:25:34 -0800 (PST)
+Date: Tue, 6 Dec 2016 10:24:31 +0000
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20161206101825.GA20860@stefanha-x1.localdomain>
-References: <20161205234235.5728-1-eblake@redhat.com>
+Message-ID: <20161206102431.GB20860@stefanha-x1.localdomain>
+References: <1480991552-14360-1-git-send-email-jasowang@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="sdtB3X0nJg68CQEu"
+	protocol="application/pgp-signature"; boundary="i9LlY+UWpKt15+FH"
 Content-Disposition: inline
-In-Reply-To: <20161205234235.5728-1-eblake@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] doc: Propose NBD_FLAG_INIT_ZEROES extension
+In-Reply-To: <1480991552-14360-1-git-send-email-jasowang@redhat.com>
+Subject: Re: [Qemu-devel] [PULL V2 0/3] Net patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,53 +29,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: nbd-general@lists.sourceforge.net, qemu-devel@nongnu.org, xieyingtai@huawei.com, subo7@huawei.com, eric.fangyi@huawei.com, pbonzini@redhat.com, qemu-block@nongnu.org
+To: Jason Wang <jasowang@redhat.com>
+Cc: peter.maydell@linaro.org, stefanha@redhat.com, qemu-devel@nongnu.org
 
 
---sdtB3X0nJg68CQEu
+--i9LlY+UWpKt15+FH
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Dec 05, 2016 at 05:42:35PM -0600, Eric Blake wrote:
-> While not directly related to NBD_CMD_WRITE_ZEROES, the qemu
-> team discovered that it is useful if a server can advertise
-> whether an export is in a known-all-zeroes state at the time
-> the client connects.
+On Tue, Dec 06, 2016 at 10:32:29AM +0800, Jason Wang wrote:
+> The following changes since commit bd8ef5060dd2124a54578241da9a572faf7658=
+dd:
 >=20
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
->  doc/proto.md | 5 +++++
->  1 file changed, 5 insertions(+)
+>   Merge remote-tracking branch 'dgibson/tags/ppc-for-2.8-20161201' into s=
+taging (2016-12-01 13:39:29 +0000)
 >=20
-> This replaces the following qemu patch attempt:
-> https://lists.gnu.org/archive/html/qemu-devel/2016-12/msg00357.html
-> which tried to add NBD_CMD_HAS_ZERO_INIT with poor semantics. The
-> semantics in this proposal should be much better.
+> are available in the git repository at:
 >=20
-> Patch is to the merge of the master branch and the
-> extension-write-zeroes branch.  By the way, qemu 2.8 is due
-> to be released "real soon now", and implements NBD_CMD_WRITE_ZEROES,
-> so maybe it is time to consider promoting the extension-write-zeroes
-> branch into master.
+>   https://github.com/jasowang/qemu.git tags/net-pull-request
+>=20
+> for you to fetch changes up to 9f5832d34b0c155e9538a745c80e441aed257670:
+>=20
+>   fsl_etsec: Fix various small problems in hexdump code (2016-12-06 10:23=
+:50 +0800)
+>=20
+> ----------------------------------------------------------------
+>=20
+> Changes from V1:
+> - fix coding style
+>=20
+> ----------------------------------------------------------------
+> Andrey Smirnov (2):
+>       fsl_etsec: Pad short payloads with zeros
+>       fsl_etsec: Fix various small problems in hexdump code
+>=20
+> Prasad J Pandit (1):
+>       net: mcf: check receive buffer size register value
+>=20
+>  hw/net/fsl_etsec/etsec.c | 4 ++--
+>  hw/net/fsl_etsec/rings.c | 8 ++++++++
+>  hw/net/mcf_fec.c         | 2 +-
+>  3 files changed, 11 insertions(+), 3 deletions(-)
+>=20
+>=20
 
-Useful, thanks!
+Thanks, applied to my staging tree:
+https://github.com/stefanha/qemu/commits/staging
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Stefan
 
---sdtB3X0nJg68CQEu
+--i9LlY+UWpKt15+FH
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJYRpBxAAoJEJykq7OBq3PIdegH/2PLLVJ93RR72pDQIMoJ+7+M
-xBQNwC36ko3RQnfU4Hkfm6XbDv0ifVopBvxKtwmNdc/TduK3sBkwc8UxhJiP+Qk/
-AdrGfj0LjSmmTAEV5LNT8oIXJhmeivBm9c/kifyprZl7fqZDmSvlSeAuSE/brj3j
-IGsJtwzPaNOvRj10ExQ4kLFpqu9/gTLOld/jeapB+6zqjV7bzpLOcPmNjI7v4DTC
-7xLJQZ60LTjHowAVjrKBZyeZXZTCEsgOWm2AOocRPisDJ370pGzYIJWhcOJn7doJ
-A17LY73X+gxbOg00Ru1CFgel3IxXBoIO8DTmlONF1RB4d9je4EjhfyFTPLu8JeQ=
-=zebu
+iQEcBAEBAgAGBQJYRpHfAAoJEJykq7OBq3PINEMH/0xbayqkfM9/bsdr1+kjPECh
+BObdiZ9a5YpeZehXgsy4gXGHurxqaWvt/CGvsIF3MgDvC92k1i8M4zpp3p6wCVdO
+x0p9qLtf6wqooYXGEKuCzVTKv7HuhlBGlsW8W4lnfialYO5HIqT3IWS/Co2PwtBm
+/lYlt43hy3O0ssyqSZCz3/jMxqZ5MLziaziVHPrwcgPFnVYRsArMaFUBd9PPCbP0
+V/ZXEYNfL7/to4e0c2f7wlKqlAEHfz19S0edl9KNSzevuEoUm3HWa45E/Qp760kA
+sBYcqVCfaznWJEDLg5PedOuCOckQ1WJJX8cqAPb5IC3nTv70gRBZqQt0YvAlbxo=
+=wps1
 -----END PGP SIGNATURE-----
 
---sdtB3X0nJg68CQEu--
+--i9LlY+UWpKt15+FH--
