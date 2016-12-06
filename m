@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42204)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42483)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cELey-0003jI-SE
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 14:44:18 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cELfW-0004A5-63
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 14:44:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cELev-00058w-HM
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 14:44:16 -0500
-Date: Tue, 6 Dec 2016 21:44:11 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20161206214217-mutt-send-email-mst@kernel.org>
-References: <148104617887.7699.984921868108236415.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-	<20161206213023-mutt-send-email-mst@kernel.org>
-	<20161206193349.GF4027@thinpad.lan.raisama.net>
-	<20161206213545-mutt-send-email-mst@kernel.org>
-	<20161206194029.GG4027@thinpad.lan.raisama.net>
+	(envelope-from <rth7680@gmail.com>) id 1cELfS-0005RB-Nt
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 14:44:50 -0500
+Received: from mail-qt0-f194.google.com ([209.85.216.194]:33147)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cELfS-0005Qx-JM
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 14:44:46 -0500
+Received: by mail-qt0-f194.google.com with SMTP id n6so41668457qtd.0
+	for <qemu-devel@nongnu.org>; Tue, 06 Dec 2016 11:44:46 -0800 (PST)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <001a113ec6308021110543008630@google.com>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <b7104b2b-eb57-1fcd-7dbd-f0b5138915be@twiddle.net>
+Date: Tue, 6 Dec 2016 11:43:41 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20161206194029.GG4027@thinpad.lan.raisama.net>
-Subject: Re: [Qemu-devel] [PATCH] virtio: fix HW_COMPAT_2_6 macro for
- virtio-*-pci drivers
+In-Reply-To: <001a113ec6308021110543008630@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] x86: Fix eflags tracking for syscall insn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,40 +29,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org, Halil Pasic <pasic@linux.vnet.ibm.com>, qemu-stable@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Doug Evans <dje@google.com>, qemu-devel@nongnu.org, pbonzini@redhat.com
 
-On Tue, Dec 06, 2016 at 05:40:29PM -0200, Eduardo Habkost wrote:
-> On Tue, Dec 06, 2016 at 09:36:07PM +0200, Michael S. Tsirkin wrote:
-> > On Tue, Dec 06, 2016 at 05:33:49PM -0200, Eduardo Habkost wrote:
-> > > On Tue, Dec 06, 2016 at 09:31:43PM +0200, Michael S. Tsirkin wrote:
-> > > > On Tue, Dec 06, 2016 at 06:50:47PM +0100, Greg Kurz wrote:
-> > > > > Since commit "9a4c0e220d8a hw/virtio-pci: fix virtio behaviour", passing
-> > > > > -device virtio-blk-pci.disable-modern=off has no effect on 2.6 machine
-> > > > > types because the internal virtio-pci.disable-modern=on compat property
-> > > > > always prevail.
-> > > > > 
-> > > > > This should ideally be fixed in the qdev properties core code, but it is
-> > > > > too late in the QEMU 2.8 schedule. So this patch fixes the issue by setting
-> > > > > the compat properties for every virtio-*-pci subtypes instead of the base
-> > > > > virtio-pci type.
-> > > > > 
-> > > > > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > > > 
-> > > > What's the rush? Either the issue is or isn't 2.8 material. If it is,
-> > > > let's fix it in qdev core now. If it isn't no need for quick fixes,
-> > > > just wait a bit and merge qdev core fix after 2.8 is out.
-> > > 
-> > > Because it is a regression,
-> > 
-> > Regression in 2.7 though, isn't it?
-> 
-> Yes. Does that mean we don't mind leaving a regression unfixed in
-> 2.8 because it was introduced in 2.7?
+On 12/06/2016 09:13 AM, Doug Evans wrote:
+> @@ -7104,6 +7104,10 @@ static target_ulong disas_insn(CPUX86State *env,
+> DisasContext *s,
+>          gen_update_cc_op(s);
+>          gen_jmp_im(pc_start - s->cs_base);
+>          gen_helper_syscall(cpu_env, tcg_const_i32(s->pc - pc_start));
+> +        /* condition codes are modified only in long mode */
+> +        if (s->lma) {
+> +            set_cc_op(s, CC_OP_EFLAGS);
+> +        }
 
-Not necessarily, it's a judgement call.  But there will always be
-another release.  I would say don't rush it.
+Since we will definitely end the TranslationBlock here, I'm a bit confused as
+to how we get things wrong here.  Is this simply a visual inspection of the
+code, or do you have a test case?
+
+In gen_update_cc_op, we store the current version of CC_OP back to ENV.  This
+lets helper_syscall (via cpu_compute_eflags) compute the proper value.  We then
+store the updated version back via cpu_load_eflags, which sets ENV->CC_OP to
+CC_OP_EFLAGS.
+
+So far so good.
+
+The only way I could see things going wrong is if we were to use DC->CC_OP
+after the call to the helper.  But since we've (1) synced the value first and
+(2) end the TB via gen_eob, I don't see how we would.
+
+If any change is required, I think better would be
+
++  /* The syscall helper may read and modify EFLAGS.  */
+   gen_update_cc_op(s);
++  set_cc_op(s, CC_OP_DYNAMIC);
+   gen_jmp_im(pc_start - s->cs_base);
+   gen_helper_syscall(cpu_env, tcg_const_i32(s->pc - pc_start));
+
+This will tell subsequent code within the translator that it must re-read
+ENV->CC_OP in order to compute the flags.
 
 
-> -- 
-> Eduardo
+r~
