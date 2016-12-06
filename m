@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37427)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37661)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cEDnC-0005IE-8d
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 06:20:15 -0500
+	(envelope-from <drjones@redhat.com>) id 1cEDoW-0006Fj-OZ
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 06:21:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cEDnB-0008SO-By
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 06:20:14 -0500
-Date: Tue, 6 Dec 2016 12:20:04 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20161206112004.GC4990@noname.str.redhat.com>
-References: <20161206110836.21687-1-pbonzini@redhat.com>
+	(envelope-from <drjones@redhat.com>) id 1cEDoV-0000bv-Jp
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 06:21:36 -0500
+Date: Tue, 6 Dec 2016 12:21:21 +0100
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20161206112121.577yyjtzeh2f7fkp@kamzik.brq.redhat.com>
+References: <1480974406-29345-1-git-send-email-eric.auger@redhat.com>
+	<20161206094841.2wi34yfapalf6fth@kamzik.brq.redhat.com>
+	<e7850784-09d3-c4eb-17c6-02765fecddf2@arm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20161206110836.21687-1-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] qemu-img: fix in-flight count for qemu-img
- bench
+In-Reply-To: <e7850784-09d3-c4eb-17c6-02765fecddf2@arm.com>
+Subject: Re: [Qemu-devel] [kvm-unit-tests RFC 00/15] arm/arm64: add ITS
+ framework
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,40 +25,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, famz@redhat.com, qemu-block@nongnu.org
+To: Andre Przywara <andre.przywara@arm.com>
+Cc: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, qemu-arm@nongnu.org, marc.zyngier@arm.com, christoffer.dall@linaro.org, pbonzini@redhat.com, alex.bennee@linaro.org, peter.maydell@linaro.org
 
-Am 06.12.2016 um 12:08 hat Paolo Bonzini geschrieben:
-> With aio=native (qemu-img bench -n) one or more requests can be completed
-> when a new request is submitted.  This in turn can cause bench_cb to
-> recurse before b->in_flight is updated.  The blk_aio_pwritev coroutines
-> are never freed, and qemu-img aborts.
+On Tue, Dec 06, 2016 at 11:14:41AM +0000, Andre Przywara wrote:
+> Hi,
 > 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  qemu-img.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+> On 06/12/16 09:48, Andrew Jones wrote:
+> > On Mon, Dec 05, 2016 at 10:46:31PM +0100, Eric Auger wrote:
+> >> This series proposes a framework to test the virtual ITS.
+> >> This is based on Drew's v7 series [1]. The last patch tests
+> >> several ITS commands (collection/device mapping, interrupt
+> >> translation service entry creation and LPI trigger through INT
+> >> command). At this point we don't use any external PCIe device
+> >> to write into the GITS_TRANSLATER register.
+> >>
+> >> The bulk of the code derives from the ITS driver code so all
+> >> the credit is due to Marc.
+> >>
+> >> Many other ITS commands could be tested. Also existing MMIO
+> >> accesses could be enhanced into standalone tests. Current focus
+> >> was to make it functional.
+> >>
+> >> The code deserves more cleanup with respect to cacheability
+> >> attributes in general.
+> >>
+> >> Tested on Cavium ThunderX [2].
+> >>
+> >> Best Regards
+> >>
+> >> Eric
+> >>
+> >> [1] [kvm-unit-tests PATCH v7 00/11] arm/arm64: add gic framework
+> >>
+> >> [2] sample command line:
+> >>
+> >> $QEMU -machine virt,accel=kvm -cpu host \
+> >>  -device virtio-serial-device \
+> >>  -device virtconsole,chardev=ctd -chardev testdev,id=ctd \
+> >>  -display none -serial stdio \
+> >>  -kernel arm/gic.flat \
+> >>  -smp 8 -machine gic-version=3 -append 'its'
+> >>
+> >> Eric Auger (15):
+> >>   libcflat: Add other size defines
+> >>   arm/arm64: gicv3: Add some re-distributor defines
+> >>   arm/arm64: ITS skeleton
+> >>   arm/arm64: ITS: BASER parsing and setup
+> >>   arm/arm64: GICv3: add cpu count
+> >>   arm/arm64: ITS: Set the LPI config and pending tables
+> >>   arm/arm64: ITS: Init the command queue
+> >>   arm/arm64: ITS: enable LPIs at re-distributor level
+> >>   arm/arm64: ITS: Parse the typer register
+> >>   arm/arm64: ITS: its_enable_defaults
+> >>   arm/arm64: ITS: create device
+> >>   arm/arm64: ITS: create collection
+> >>   arm/arm64: ITS: commands
+> >>   arm/arm64: gic: Generalize ipi_enable()
+> >>   arm/arm64: ITS test
+> >>
+> >>  arm/Makefile.common        |   1 +
+> >>  arm/gic.c                  | 101 +++++++++++-
+> >>  lib/arm/asm/gic-v3-its.h   | 238 +++++++++++++++++++++++++++
+> >>  lib/arm/asm/gic-v3.h       |  84 ++++++++++
+> >>  lib/arm/asm/gic.h          |   1 +
+> >>  lib/arm/gic-v3-its-cmd.c   | 399 +++++++++++++++++++++++++++++++++++++++++++++
+> >>  lib/arm/gic-v3-its.c       | 305 ++++++++++++++++++++++++++++++++++
+> >>  lib/arm/gic-v3.c           |   2 +
+> >>  lib/arm/gic.c              |  30 +++-
+> >>  lib/arm64/asm/gic-v3-its.h |   1 +
+> >>  lib/libcflat.h             |   3 +
+> >>  11 files changed, 1154 insertions(+), 11 deletions(-)
+> >>  create mode 100644 lib/arm/asm/gic-v3-its.h
+> >>  create mode 100644 lib/arm/gic-v3-its-cmd.c
+> >>  create mode 100644 lib/arm/gic-v3-its.c
+> >>  create mode 100644 lib/arm64/asm/gic-v3-its.h
+> >>
+> >> -- 
+> >> 2.5.5
+> >>
+> >>
+> > 
+> > Thanks for this Eric! I'm glad to see we're getting more GIC test
+> > coverage written, even before v8 of the gic series is posted :-)
+> > v8 will be rebased on some sysreg stuff Wei is doing for the PMU
+> > series,
 > 
-> diff --git a/qemu-img.c b/qemu-img.c
-> index 6949b73..607dbe5 100644
-> --- a/qemu-img.c
-> +++ b/qemu-img.c
-> @@ -3559,6 +3559,9 @@ static void bench_cb(void *opaque, int ret)
->      }
->  
->      while (b->n > b->in_flight && b->in_flight < b->nrreq) {
-> +        b->in_flight++;
-> +        b->offset += b->step;
-> +        b->offset %= b->image_size;
->          if (b->write) {
->              acb = blk_aio_pwritev(b->blk, b->offset, b->qiov, 0,
->                                    bench_cb, b);
+> Are you planning on a v8 post any time soon?
 
-This implicitly adds b->step to the initial offset because the write
-request now uses the already updated offset. We should probably save the
-old value and use that for the request.
+I think Wei is going to post PMU today. Hopefully everyone will be happy
+with the sysreg bits. If so, then I'll post v8 no later than tomorrow
+sometime.
 
-Also, maybe add a short comment to the code (rather than just to the
-commit message) that explains why the update has to be first?
+> 
+> > that's why it's held up. I'll need to set plenty of time
+> > aside to learn enough in order to review all the 'ITS:' patches
+> > in this series.
+> 
+> Are you sure you want to really taint yourself with this stuff? You
+> wouldn't be the first who risks his mental health by understanding the
+> ITS ;-)
+> 
+> That being said, I will take a look, I am in ITS land anyway for Xen ...
 
-Kevin
+Excellent! Thanks!
+
+drew
+
+> 
+> Cheers,
+> Andre.
+> 
+> 
+> > Apologies if I can't get to it right away.
+> > 
+> > Thanks again,
+> > drew
+> > 
