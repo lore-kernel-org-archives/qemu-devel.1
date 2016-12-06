@@ -1,44 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51235)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56336)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1cEEXb-0004Kw-OY
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 07:08:12 -0500
+	(envelope-from <bounces@canonical.com>) id 1cEEgP-00055t-JL
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 07:17:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1cEEXY-0000XN-IO
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 07:08:11 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58215
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <bounces@canonical.com>) id 1cEEgM-0004zL-DU
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 07:17:17 -0500
+Received: from indium.canonical.com ([91.189.90.7]:36853)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1cEEXY-0000XG-Bf
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 07:08:08 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	uB6C5HG6144730
-	for <qemu-devel@nongnu.org>; Tue, 6 Dec 2016 07:08:07 -0500
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 275rky5x0q-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 06 Dec 2016 07:08:07 -0500
-Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Tue, 6 Dec 2016 12:08:05 -0000
-References: <148095126363.31351.4484514300033863622.stgit@bahia>
-	<20161205164200.49bec0f6.cornelia.huck@de.ibm.com>
-	<20161205164829.GB14457@thinpad.lan.raisama.net>
-	<20161205182555.2e988ac6.cornelia.huck@de.ibm.com>
-	<20161205174130.GH13060@thinpad.lan.raisama.net>
-	<20161206103008.5ea4ddd6@bahia>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Tue, 6 Dec 2016 13:08:02 +0100
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cEEgM-0004zA-8I
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 07:17:14 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cEEgI-0001uU-V4
+	for <qemu-devel@nongnu.org>; Tue, 06 Dec 2016 12:17:11 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 467B632696B
+	for <qemu-devel@nongnu.org>; Tue,  6 Dec 2016 11:51:02 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20161206103008.5ea4ddd6@bahia>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 8bit
-Message-Id: <faeed1b7-93e0-b723-4aba-675a9341ef27@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.8] qdev: apply global properties in
- reverse order
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 06 Dec 2016 11:39:15 -0000
+From: Julian Brown <1647683@bugs.launchpad.net>
+Reply-To: Bug 1647683 <1647683@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <20161206113915.26308.72810.malonedeb@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1647683] [NEW] Bad interaction between tb
+ flushing & gdb stub
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -47,54 +36,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, Eduardo Habkost <ehabkost@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, qemu-stable@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
 
+Public bug reported:
 
+I have been working on a series of patches for ARM big-endian system
+mode support, using QEMU as a bare-metal simulator for the GDB test
+suite. At some point I realised that these tests were not running
+reliably on the QEMU master branch, even without my patches applied.
+(I.e., in little-endian mode.)
 
-On 12/06/2016 10:30 AM, Greg Kurz wrote:
-> On Mon, 5 Dec 2016 15:41:30 -0200
-> Eduardo Habkost <ehabkost@redhat.com> wrote:
-> 
->> > On Mon, Dec 05, 2016 at 06:25:55PM +0100, Cornelia Huck wrote:
->>> > > On Mon, 5 Dec 2016 14:48:29 -0200
->>> > > Eduardo Habkost <ehabkost@redhat.com> wrote:
->>> > >   
->>>> > > > On Mon, Dec 05, 2016 at 04:42:00PM +0100, Cornelia Huck wrote:  
->>>>> > > > > On Mon, 05 Dec 2016 16:21:22 +0100
->>>>> > > > > Greg Kurz <groug@kaod.org> wrote:
->>>>> > > > >   
->>>>>> > > > > > The current code recursively applies global properties from child up to
->>>>>> > > > > > parent. So, if you have:
->>>>>> > > > > > 
->>>>>> > > > > > -global virtio-pci.disable-modern=on
->>>>>> > > > > > -global virtio-blk-pci.disable-modern=off
->>>>>> > > > > > 
->>>>>> > > > > > Then the default value of disable-modern for a virtio-blk-pci device is on,
->>>>>> > > > > > which looks wrong from an OOP perspective.
->>>>>> > > > > > 
->>>>>> > > > > > This patch reverses the logic, so that a child property always prevail.  
-[...]
->> > compat props should be always applied in the order they appear.
->> > -global should always be applied after compat props.
->> > 
-> This is actually the way they're being registered to the global_props
-> static list: compat props as they appear in HW_COMPAT_* and then -global
-> as they appear on the command line.
-> 
->> > So, it looks like we have two additional reasons to just follow
->> > the order the global properties were registered.
->> > 
-> Thinking again, maybe we just need to reverse the logic in another
-> way: go through global_props and apply the property if the device
-> can be casted to the corresponding class (i.e. object_class_dynamic_cast()
-> != NULL). I'll try that.
-> 
+Running QEMU under GDB in the test harness via Valgrind, using something
+akin to:
 
-IMHO this is the right thing to do (and would result in the
-exactly behavior outlined by Eduardo -- compat props as they
-applied appear and then command line props as they appear, what
-means inverse ordering in terms of overriding regarding the
-result).
+(gdb) target remote | valgrind --tool=3Dmemcheck qemu-arm-system [...]
 
-Halil
+leads to intermittent (and quite hard-to-reproduce) segfaults in QEMU of
+the form:
+
+=3D=3D52333=3D=3D Process terminating with default action of signal 11 (SIG=
+SEGV)
+=3D=3D52333=3D=3D  Access not within mapped region at address 0x24
+=3D=3D52333=3D=3D    at 0x1D55F2: tb_page_remove (translate-all.c:1026)
+=3D=3D52333=3D=3D    by 0x1D58B4: tb_phys_invalidate (translate-all.c:1119)
+=3D=3D52333=3D=3D    by 0x1D63AA: tb_invalidate_phys_page_range (translate-=
+all.c:1519)
+=3D=3D52333=3D=3D    by 0x1D66D7: tb_invalidate_phys_addr (translate-all.c:=
+1714)
+=3D=3D52333=3D=3D    by 0x1CBA7F: breakpoint_invalidate (exec.c:704)
+=3D=3D52333=3D=3D    by 0x1CC01F: cpu_breakpoint_remove_by_ref (exec.c:869)
+=3D=3D52333=3D=3D    by 0x1CBF97: cpu_breakpoint_remove (exec.c:857)
+=3D=3D52333=3D=3D    by 0x218FAA: gdb_breakpoint_remove (gdbstub.c:717)
+=3D=3D52333=3D=3D    by 0x219E35: gdb_handle_packet (gdbstub.c:1035)
+=3D=3D52333=3D=3D    by 0x21AF62: gdb_read_byte (gdbstub.c:1459)
+=3D=3D52333=3D=3D    by 0x21B096: gdb_chr_receive (gdbstub.c:1672)
+=3D=3D52333=3D=3D    by 0x3AF2BC: qemu_chr_be_write_impl (qemu-char.c:419)
+
+These crashes didn't happen on a 2.6-era QEMU, so I bisected and
+discovered the commit 3359baad36889b83df40b637ed993a4b816c4906 ("tcg:
+Make tb_flush() thread safe") appears to be the thing that triggers this
+intermittent failure. Reverting the patch on the branch tip makes the
+crashes go away.
+
+Unfortunately I don't currently have a way to trigger the segfaults
+outside of Mentor Graphics's test infrastructure, which I can't share.
+
+Does anyone know a reason that this might be happening, or suggestions
+of how I might further debug this? Maybe a missed tb flush in the gdb
+stub code, somewhere?
+
+Thanks!
+
+Julian
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1647683
+
+Title:
+  Bad interaction between tb flushing & gdb stub
+
+Status in QEMU:
+  New
+
+Bug description:
+  I have been working on a series of patches for ARM big-endian system
+  mode support, using QEMU as a bare-metal simulator for the GDB test
+  suite. At some point I realised that these tests were not running
+  reliably on the QEMU master branch, even without my patches applied.
+  (I.e., in little-endian mode.)
+
+  Running QEMU under GDB in the test harness via Valgrind, using
+  something akin to:
+
+  (gdb) target remote | valgrind --tool=3Dmemcheck qemu-arm-system [...]
+
+  leads to intermittent (and quite hard-to-reproduce) segfaults in QEMU
+  of the form:
+
+  =3D=3D52333=3D=3D Process terminating with default action of signal 11 (S=
+IGSEGV)
+  =3D=3D52333=3D=3D  Access not within mapped region at address 0x24
+  =3D=3D52333=3D=3D    at 0x1D55F2: tb_page_remove (translate-all.c:1026)
+  =3D=3D52333=3D=3D    by 0x1D58B4: tb_phys_invalidate (translate-all.c:111=
+9)
+  =3D=3D52333=3D=3D    by 0x1D63AA: tb_invalidate_phys_page_range (translat=
+e-all.c:1519)
+  =3D=3D52333=3D=3D    by 0x1D66D7: tb_invalidate_phys_addr (translate-all.=
+c:1714)
+  =3D=3D52333=3D=3D    by 0x1CBA7F: breakpoint_invalidate (exec.c:704)
+  =3D=3D52333=3D=3D    by 0x1CC01F: cpu_breakpoint_remove_by_ref (exec.c:86=
+9)
+  =3D=3D52333=3D=3D    by 0x1CBF97: cpu_breakpoint_remove (exec.c:857)
+  =3D=3D52333=3D=3D    by 0x218FAA: gdb_breakpoint_remove (gdbstub.c:717)
+  =3D=3D52333=3D=3D    by 0x219E35: gdb_handle_packet (gdbstub.c:1035)
+  =3D=3D52333=3D=3D    by 0x21AF62: gdb_read_byte (gdbstub.c:1459)
+  =3D=3D52333=3D=3D    by 0x21B096: gdb_chr_receive (gdbstub.c:1672)
+  =3D=3D52333=3D=3D    by 0x3AF2BC: qemu_chr_be_write_impl (qemu-char.c:419)
+
+  These crashes didn't happen on a 2.6-era QEMU, so I bisected and
+  discovered the commit 3359baad36889b83df40b637ed993a4b816c4906 ("tcg:
+  Make tb_flush() thread safe") appears to be the thing that triggers
+  this intermittent failure. Reverting the patch on the branch tip makes
+  the crashes go away.
+
+  Unfortunately I don't currently have a way to trigger the segfaults
+  outside of Mentor Graphics's test infrastructure, which I can't share.
+
+  Does anyone know a reason that this might be happening, or suggestions
+  of how I might further debug this? Maybe a missed tb flush in the gdb
+  stub code, somewhere?
+
+  Thanks!
+
+  Julian
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1647683/+subscriptions
