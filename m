@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35834)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36465)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cEHZ5-0001EU-H2
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 10:21:56 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cEHbZ-0004EO-UZ
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 10:24:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cEHZ4-0003QB-8w
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 10:21:55 -0500
-References: <20161205234235.5728-1-eblake@redhat.com>
-	<20161206092523.GA4990@noname.str.redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <871488c7-b870-da8f-1a71-c2462214e650@redhat.com>
-Date: Tue, 6 Dec 2016 09:21:42 -0600
+	(envelope-from <dgilbert@redhat.com>) id 1cEHbY-0004Jx-KS
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 10:24:29 -0500
+Date: Tue, 6 Dec 2016 15:24:15 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20161206152415.GF2125@work-vm>
+References: <1479555831-30960-1-git-send-email-zhang.zhanghailiang@huawei.com>
+	<20161206134211.GD4990@noname.str.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20161206092523.GA4990@noname.str.redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="i6oRtubBbos6M5sNo1uMH7T6ilnd8bJIc"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] doc: Propose
- NBD_FLAG_INIT_ZEROES extension
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20161206134211.GD4990@noname.str.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] migration: re-active images when migration
+ fails to complete
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,112 +25,135 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Kevin Wolf <kwolf@redhat.com>
-Cc: nbd-general@lists.sourceforge.net, xieyingtai@huawei.com, subo7@huawei.com, qemu-block@nongnu.org, eric.fangyi@huawei.com, qemu-devel@nongnu.org, pbonzini@redhat.com
+Cc: zhanghailiang <zhang.zhanghailiang@huawei.com>, amit.shah@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, quintela@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---i6oRtubBbos6M5sNo1uMH7T6ilnd8bJIc
-From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: nbd-general@lists.sourceforge.net, xieyingtai@huawei.com,
- subo7@huawei.com, qemu-block@nongnu.org, eric.fangyi@huawei.com,
- qemu-devel@nongnu.org, pbonzini@redhat.com
-Message-ID: <871488c7-b870-da8f-1a71-c2462214e650@redhat.com>
-Subject: Re: [Qemu-block] [PATCH] doc: Propose NBD_FLAG_INIT_ZEROES extension
-References: <20161205234235.5728-1-eblake@redhat.com>
- <20161206092523.GA4990@noname.str.redhat.com>
-In-Reply-To: <20161206092523.GA4990@noname.str.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+* Kevin Wolf (kwolf@redhat.com) wrote:
+> Am 19.11.2016 um 12:43 hat zhanghailiang geschrieben:
+> > commit fe904ea8242cbae2d7e69c052c754b8f5f1ba1d6 fixed a case
+> > which migration aborted QEMU because it didn't regain the control
+> > of images while some errors happened.
+> > 
+> > Actually, we have another case in that error path to abort QEMU
+> > because of the same reason:
+> >     migration_thread()
+> >         migration_completion()
+> >            bdrv_inactivate_all() ----------------> inactivate images
+> >            qemu_savevm_state_complete_precopy()
+> >                socket_writev_buffer() --------> error because destination fails
+> >              qemu_fflush() -------------------> set error on migration stream
+> >            qemu_mutex_unlock_iothread() ------> unlock
+> >     qmp_migrate_cancel() ---------------------> user cancelled migration
+> >         migrate_set_state() ------------------> set migrate CANCELLING
+> 
+> Important to note here: qmp_migrate_cancel() is executed by a concurrent
+> thread, it doesn't depend on any code paths in migration_completion().
+> 
+> >     migration_completion() -----------------> go on to fail_invalidate
+> >         if (s->state == MIGRATION_STATUS_ACTIVE) -> Jump this branch
+> >     migration_thread() -----------------------> break migration loop
+> >       vm_start() -----------------------------> restart guest with inactive
+> >                                                 images
+> > We failed to regain the control of images because we only regain it
+> > while the migration state is "active", but here users cancelled the migration
+> > when they found some errors happened (for example, libvirtd daemon is shutdown
+> > in destination unexpectedly).
+> > 
+> > Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+> > ---
+> >  migration/migration.c | 3 ++-
+> >  1 file changed, 2 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/migration/migration.c b/migration/migration.c
+> > index f498ab8..0c1ee6d 100644
+> > --- a/migration/migration.c
+> > +++ b/migration/migration.c
+> > @@ -1752,7 +1752,8 @@ fail_invalidate:
+> >      /* If not doing postcopy, vm_start() will be called: let's regain
+> >       * control on images.
+> >       */
+> > -    if (s->state == MIGRATION_STATUS_ACTIVE) {
+> 
+> This if condition tries to check whether we ran the code path that
+> called bdrv_inactivate_all(), so that we only try to reactivate images
+> it if we really inactivated them first.
+> 
+> The problem with it is that it ignores a possible concurrent
+> modification of s->state.
+> 
+> > +    if (s->state == MIGRATION_STATUS_ACTIVE ||
+> > +        s->state == MIGRATION_STATUS_CANCELLING) {
+> 
+> This adds another state that we could end up with with a concurrent
+> modification, so that even in this case we undo the inactivation.
+> 
+> However, it is no longer limited to the cases where we inactivated the
+> image. It also applies to other code paths (like the postcopy one) where
+> we didn't inactivate images.
+> 
+> What saves the patch is that bdrv_invalidate_cache() is a no-op for
+> block devices that aren't inactivated, so calling it more often than
+> necessary is okay.
+> 
+> But then, if we're going to rely on this, it would be much better to
+> just remove the if altogether. I can't say whether there are any other
+> possible values of s->state that we should consider, and by removing the
+> if we would be guaranteed to catch all of them.
+> 
+> If we don't want to rely on it, just keep a local bool that remembers
+> whether we inactivated images and check that here.
+> 
+> >          Error *local_err = NULL;
+> >  
+> >          bdrv_invalidate_cache_all(&local_err);
+> 
+> So in summary, this is a horrible patch because it checks the wrong
+> thing, and for I can't really say if it covers everything it needs to
+> cover, but arguably it happens to correctly fix the outcome of a
+> previously failing case.
+> 
+> Normally I would reject such a patch and require a clean solution, but
+> then we're on the day of -rc3, so if you can't send v2 right away, we
+> might not have the time for it.
+> 
+> Tough call...
 
-On 12/06/2016 03:25 AM, Kevin Wolf wrote:
-> Am 06.12.2016 um 00:42 hat Eric Blake geschrieben:
->> While not directly related to NBD_CMD_WRITE_ZEROES, the qemu
->> team discovered that it is useful if a server can advertise
->> whether an export is in a known-all-zeroes state at the time
->> the client connects.
->=20
-> Does a server usually have the information to set this flag, other than=
+Hmm, this case is messy; I created this function having split it out
+of the main loop a couple of years back but it did get more messy
+with more s->state checks; as far as I can tell it's always
+done the transition to COMPLETED at the end well after the locked
+section, so there's always been that chance that cancellation sneaks
+in just before or just after the locked section.
 
-> querying the block status of all blocks at startup? If so, the client
-> could just query this by itself.
+Some of the bad cases that can happen:
+   a) A cancel sneaks in after the ACTIVE check but before or after
+     the locked section;  should we reactivate the disks? Well that
+     depends on whether the destination actually got the full migration
+     stream - we don't know!
+        If the destination actually starts running we must not reactivate
+        the disk on the source even if the CPU is stopped.
 
-Well, only if the client can query information at all (we don't have the
-documentation finished for extent queries, let alone a reference
-implementation).
+   b) If the bdrv_inactive_all fails for one device, but the others 
+      are fine, we go down the fail: label and don't reactivate, so
+      the source dies even though it might have been mostly OK.
 
->=20
-> The patch that was originally sent to qemu-devel just forwarded qemu's
-> .bdrv_has_zero_init() call to the server. However, what this function
-> returns is not a known-all-zeroes state on open, but just a
-> known-all-zeroes state immediately after bdrv_create(), i.e. creating a=
+We can move the _lock to before the check of s->state at the top,
+which would stop the cancel sneaking in early.
+In the case where postcopy was never enabled (!migrate_postcopy_ram())
+we can move the COMPLETED transition into the lock as well; so I think
+then we kind of become safe.
+In the case where postcopy was enabled I think we can do the COMPLETED
+transition before waiting for the return path to close - I think but
+I need to think more about that.
+And there seem to be some dodgy cases where we call the invalidate
+there after a late postcopy failure; that's bad, we shouldn't reactivate
+the source disks after going into postcopy.
 
-> new image. Then it becomes information that is easy to get and doesn't
-> involve querying all blocks (e.g. true for COW image formats, true for
-> raw on regular files, false for raw on block devices).
+So, in summary; this function is a mess - it needs a much bigger
+fix than this patch.
 
-Just because the NBD spec describes the bit does NOT require that
-servers HAVE to set the bit on all images that are all zeroes.  It is
-perfectly compliant if the server never advertises the bit.  That said,
-I think there are cases where qemu can easily advertise the bit.
+Dave
 
-I _do_ agree that it is NOT as trivial as the qemu server just
-forwarding the value of .bdrv_has_zero_init() - the server HAS to prove
-that no data has been written to the image.  But for a qcow2 image just
-created with qemu-img, it is a fairly easy proof: If the L1 table has
-all-zero entries, then the image has not been written to yet.  Reading
-the L1 table for all-zeroes is only a single cluster read, which is MUCH
-faster than crawling the entire image for extent status.  And for
-regular files, a single lseek(SEEK_DATA) is sufficient to see if the
-entire image is currently sparse.
-
-Note that I only proposed the NBD implementation - it still remains to
-be coded into the qemu code for the client to make use of the bit
-(fairly easy: if the bit is set, the client can make its own
-=2Ebdrv_has_zero_init() return true), as well as for the server to set th=
-e
-bit (harder: the server has to check .bdrv_has_zero_init() of the
-wrapped image, but also has to prove the image is still unwritten).
-Maybe this means that qemu's block layer wants to add a new
-=2Ebdrv_has_been_written() [or whatever name] to better abstract the proo=
-f
-across drivers.  But those patches would be qemu 2.9 material, and do
-not need to further cc the NBD list.
-
->=20
-> This is useful for 'qemu-img convert', which creates an image and then
-> writes the whole contents, but I'm not sure if this property is
-> applicable for NBD, which I think doesn't even have a create operation.=
-
-
-Another option on the NBD server side is to create a server option -
-when firing up a server to serve a particular file as an export, the
-user can explicitly tell the server to advertise the bit because the
-user has side knowledge that the file was just created (and then the
-burden of misbehavior is on the user if they mistakenly request the
-advertisement when it is not true).
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---i6oRtubBbos6M5sNo1uMH7T6ilnd8bJIc
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYRteGAAoJEKeha0olJ0NqG5UH/12iEPL6jTLJm4H/haWrQFs6
-XEUq6anU75J156j2+4P1mYxHCvE5Qw4K5IUGx4DCJt7FHEQYyMYvmsyWZoswvpr/
-JGhU9bWaLWtdsjOmsCMk1cbmJXt+U141BPB9LkEJU4sAKyjDxwTLc8Q61RplJPBR
-tPBbaWBT12XiqRfsGTULnjlaLaVG+MGDF4IbXNXsFXSvfVoK+Xl9FjF1m2IHP8hk
-NH1xdNb8Lhc3+R+F/hFB5mEROn87owjpk3+LRPuSwgyXRrFd/p+rESqlEFwxF2Od
-eOHjR+Y9iUq84ozC+x+bka9AGo68Fpv+rm4davnm3yMaTCFOj7ssK3+x1jpKWVs=
-=1zsd
------END PGP SIGNATURE-----
-
---i6oRtubBbos6M5sNo1uMH7T6ilnd8bJIc--
+> Kevin
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
