@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40184)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41278)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cELXB-0005BK-Ve
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 14:36:15 -0500
+	(envelope-from <joserz@linux.vnet.ibm.com>) id 1cELbQ-0000FT-2H
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 14:40:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cELX8-0003Mo-N4
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 14:36:14 -0500
-Date: Tue, 6 Dec 2016 21:36:07 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20161206213545-mutt-send-email-mst@kernel.org>
-References: <148104617887.7699.984921868108236415.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-	<20161206213023-mutt-send-email-mst@kernel.org>
-	<20161206193349.GF4027@thinpad.lan.raisama.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20161206193349.GF4027@thinpad.lan.raisama.net>
-Subject: Re: [Qemu-devel] [PATCH] virtio: fix HW_COMPAT_2_6 macro for
- virtio-*-pci drivers
+	(envelope-from <joserz@linux.vnet.ibm.com>) id 1cELbN-0004OR-Fy
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 14:40:36 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44020
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <joserz@linux.vnet.ibm.com>)
+	id 1cELbN-0004NR-82
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 14:40:33 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
+	uB6Je2Kx104877
+	for <qemu-devel@nongnu.org>; Tue, 6 Dec 2016 14:40:31 -0500
+Received: from e24smtp05.br.ibm.com (e24smtp05.br.ibm.com [32.104.18.26])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2761xrev1c-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 06 Dec 2016 14:40:31 -0500
+Received: from localhost
+	by e24smtp05.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <joserz@linux.vnet.ibm.com>;
+	Tue, 6 Dec 2016 17:40:29 -0200
+From: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
+Date: Tue,  6 Dec 2016 17:40:03 -0200
+Message-Id: <1481053210-26821-1-git-send-email-joserz@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v2 0/7] POWER9 TCG enablements - BCD functions
+ - final part
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,34 +37,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org, Halil Pasic <pasic@linux.vnet.ibm.com>, qemu-stable@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-ppc@nongnu.org
+Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au, nikunj@linux.vnet.ibm.com, bharata@linux.vnet.ibm.com
 
-On Tue, Dec 06, 2016 at 05:33:49PM -0200, Eduardo Habkost wrote:
-> On Tue, Dec 06, 2016 at 09:31:43PM +0200, Michael S. Tsirkin wrote:
-> > On Tue, Dec 06, 2016 at 06:50:47PM +0100, Greg Kurz wrote:
-> > > Since commit "9a4c0e220d8a hw/virtio-pci: fix virtio behaviour", passing
-> > > -device virtio-blk-pci.disable-modern=off has no effect on 2.6 machine
-> > > types because the internal virtio-pci.disable-modern=on compat property
-> > > always prevail.
-> > > 
-> > > This should ideally be fixed in the qdev properties core code, but it is
-> > > too late in the QEMU 2.8 schedule. So this patch fixes the issue by setting
-> > > the compat properties for every virtio-*-pci subtypes instead of the base
-> > > virtio-pci type.
-> > > 
-> > > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > 
-> > What's the rush? Either the issue is or isn't 2.8 material. If it is,
-> > let's fix it in qdev core now. If it isn't no need for quick fixes,
-> > just wait a bit and merge qdev core fix after 2.8 is out.
-> 
-> Because it is a regression,
+v2:
+ - bcd[s,sr,us] uses 1 byte for shifting instead of 4 bytes
+ - left/right functions in host-utils are out of CONFIG_INT128
+ - fixes overflowing issue in left shift and added a testcase
 
-Regression in 2.7 though, isn't it?
+This serie contains 5 new instructions for POWER9 ISA3.0, left/right shifts for 
+unsigned quadwords and a small improvement to check whether a bcd value is 
+valid or not.
 
-> and changing HW_COMPAT_* is less
-> risky than changing qdev core rules about -global ordering.
-> 
-> -- 
-> Eduardo
+bcds.: Decimal signed shift
+bcdus.: Decimal unsigned shift
+bcdsr.: Decimal shift and round
+bcdtrunc.: Decimal signed trucate
+bcdtrunc.: Decimal unsigned truncate
+
+Jose Ricardo Ziviani (7):
+  target-ppc: Implement bcd_is_valid function
+  target-ppc: Implement unsigned quadword left/right shift and unit
+    tests
+  target-ppc: Implement bcds. instruction
+  target-ppc: Implement bcdus. instruction
+  target-ppc: Implement bcdsr. instruction
+  target-ppc: Implement bcdtrunc. instruction
+  target-ppc: Implement bcdtrunc. instruction
+
+ include/qemu/host-utils.h           |  43 +++++++
+ target-ppc/helper.h                 |   5 +
+ target-ppc/int_helper.c             | 229 +++++++++++++++++++++++++++++++++++-
+ target-ppc/translate/vmx-impl.inc.c |  16 +++
+ target-ppc/translate/vmx-ops.inc.c  |  13 +-
+ tests/Makefile.include              |   5 +-
+ tests/test-shift128.c               |  98 +++++++++++++++
+ 7 files changed, 399 insertions(+), 10 deletions(-)
+ create mode 100644 tests/test-shift128.c
+
+-- 
+2.7.4
