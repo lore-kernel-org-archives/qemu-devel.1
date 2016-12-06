@@ -1,30 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58295)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58720)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cEBwq-0001T3-6h
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 04:22:05 -0500
+	(envelope-from <drjones@redhat.com>) id 1cEBy0-0002IG-37
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 04:23:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cEBwn-0003Mf-0G
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 04:22:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45870)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cEBwm-0003Lx-O2
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 04:22:00 -0500
-Date: Tue, 6 Dec 2016 09:21:52 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20161206092152.GD2381@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1480928380-161760-1-git-send-email-longpeng2@huawei.com>
-	<1480928380-161760-2-git-send-email-longpeng2@huawei.com>
-	<20161205091842.GA2498@redhat.com>
-	<33183CC9F5247A488A2544077AF19020DA152B60@DGGEMA505-MBX.china.huawei.com>
-	<20161205165905.GR2498@redhat.com>
-	<33183CC9F5247A488A2544077AF19020DA153D9F@DGGEMA505-MBX.china.huawei.com>
+	(envelope-from <drjones@redhat.com>) id 1cEBxy-0003mn-Uf
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 04:23:16 -0500
+Date: Tue, 6 Dec 2016 10:23:03 +0100
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20161206092303.tq6gisapxierpwlx@kamzik.brq.redhat.com>
+References: <1480974406-29345-1-git-send-email-eric.auger@redhat.com>
+	<1480974406-29345-4-git-send-email-eric.auger@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <33183CC9F5247A488A2544077AF19020DA153D9F@DGGEMA505-MBX.china.huawei.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.9 1/3] crypto: add standard des
- support
+In-Reply-To: <1480974406-29345-4-git-send-email-eric.auger@redhat.com>
+Subject: Re: [Qemu-devel] [kvm-unit-tests RFC 03/15] arm/arm64: ITS skeleton
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,131 +23,179 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Cc: longpeng <longpeng2@huawei.com>, "eblake@redhat.com" <eblake@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Wubin (H)" <wu.wubin@huawei.com>, "Zhoujian (jay, Euler)" <jianjay.zhou@huawei.com>
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, qemu-arm@nongnu.org, marc.zyngier@arm.com, christoffer.dall@linaro.org, andre.przywara@arm.com, pbonzini@redhat.com, alex.bennee@linaro.org, peter.maydell@linaro.org
 
-On Tue, Dec 06, 2016 at 01:23:31AM +0000, Gonglei (Arei) wrote:
-> >
-> > From: Daniel P. Berrange [mailto:berrange@redhat.com]
-> > Sent: Tuesday, December 06, 2016 12:59 AM
-> > To: Gonglei (Arei)
-> > Cc: longpeng; eblake@redhat.com; armbru@redhat.com;
-> > qemu-devel@nongnu.org; Wubin (H); Zhoujian (jay, Euler)
-> > Subject: Re: [PATCH for-2.9 1/3] crypto: add standard des support
-> > 
-> > On Mon, Dec 05, 2016 at 09:29:59AM +0000, Gonglei (Arei) wrote:
-> > > >
-> > > > >      switch (alg) {
-> > > > > +    case QCRYPTO_CIPHER_ALG_DES:
-> > > > >      case QCRYPTO_CIPHER_ALG_DES_RFB:
-> > > > >      case QCRYPTO_CIPHER_ALG_AES_128:
-> > > > >      case QCRYPTO_CIPHER_ALG_AES_192:
-> > > > > @@ -256,11 +257,17 @@ QCryptoCipher
-> > > > *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
-> > > > >      ctx = g_new0(QCryptoCipherNettle, 1);
-> > > > >
-> > > > >      switch (alg) {
-> > > > > +    case QCRYPTO_CIPHER_ALG_DES:
-> > > > >      case QCRYPTO_CIPHER_ALG_DES_RFB:
-> > > > >          ctx->ctx = g_new0(struct des_ctx, 1);
-> > > > > -        rfbkey = qcrypto_cipher_munge_des_rfb_key(key, nkey);
-> > > > > -        des_set_key(ctx->ctx, rfbkey);
-> > > > > -        g_free(rfbkey);
-> > > > > +
-> > > > > +        if (alg == QCRYPTO_CIPHER_ALG_DES_RFB) {
-> > > > > +            rfbkey = qcrypto_cipher_munge_des_rfb_key(key, nkey);
-> > > > > +            des_set_key(ctx->ctx, rfbkey);
-> > > > > +            g_free(rfbkey);
-> > > > > +        } else {
-> > > > > +            des_set_key(ctx->ctx, key);
-> > > > > +        }
-> > > > >
-> > > > >          ctx->alg_encrypt_native = des_encrypt_native;
-> > > > >          ctx->alg_decrypt_native = des_decrypt_native;
-> > > > > diff --git a/crypto/cipher.c b/crypto/cipher.c
-> > > > > index a9bca41..00d9682 100644
-> > > > > --- a/crypto/cipher.c
-> > > > > +++ b/crypto/cipher.c
-> > > > > @@ -27,6 +27,7 @@ static size_t
-> > > > alg_key_len[QCRYPTO_CIPHER_ALG__MAX] = {
-> > > > >      [QCRYPTO_CIPHER_ALG_AES_128] = 16,
-> > > > >      [QCRYPTO_CIPHER_ALG_AES_192] = 24,
-> > > > >      [QCRYPTO_CIPHER_ALG_AES_256] = 32,
-> > > > > +    [QCRYPTO_CIPHER_ALG_DES] = 8,
-> > > > >      [QCRYPTO_CIPHER_ALG_DES_RFB] = 8,
-> > > > >      [QCRYPTO_CIPHER_ALG_CAST5_128] = 16,
-> > > > >      [QCRYPTO_CIPHER_ALG_SERPENT_128] = 16,
-> > > > > @@ -41,6 +42,7 @@ static size_t
-> > > > alg_block_len[QCRYPTO_CIPHER_ALG__MAX] = {
-> > > > >      [QCRYPTO_CIPHER_ALG_AES_128] = 16,
-> > > > >      [QCRYPTO_CIPHER_ALG_AES_192] = 16,
-> > > > >      [QCRYPTO_CIPHER_ALG_AES_256] = 16,
-> > > > > +    [QCRYPTO_CIPHER_ALG_DES] = 8,
-> > > > >      [QCRYPTO_CIPHER_ALG_DES_RFB] = 8,
-> > > > >      [QCRYPTO_CIPHER_ALG_CAST5_128] = 8,
-> > > > >      [QCRYPTO_CIPHER_ALG_SERPENT_128] = 16,
-> > > > > @@ -107,7 +109,8 @@
-> > > > qcrypto_cipher_validate_key_length(QCryptoCipherAlgorithm alg,
-> > > > >      }
-> > > > >
-> > > > >      if (mode == QCRYPTO_CIPHER_MODE_XTS) {
-> > > > > -        if (alg == QCRYPTO_CIPHER_ALG_DES_RFB) {
-> > > > > +        if (alg == QCRYPTO_CIPHER_ALG_DES_RFB
-> > > > > +            || alg == QCRYPTO_CIPHER_ALG_DES) {
-> > > > >              error_setg(errp, "XTS mode not compatible with
-> > DES-RFB");
-> > > > >              return false;
-> > > > >          }
-> > > > > diff --git a/qapi/crypto.json b/qapi/crypto.json
-> > > > > index 5c9d7d4..d403ab9 100644
-> > > > > --- a/qapi/crypto.json
-> > > > > +++ b/qapi/crypto.json
-> > > > > @@ -75,7 +75,7 @@
-> > > > >  { 'enum': 'QCryptoCipherAlgorithm',
-> > > > >    'prefix': 'QCRYPTO_CIPHER_ALG',
-> > > > >    'data': ['aes-128', 'aes-192', 'aes-256',
-> > > > > -           'des-rfb',
-> > > > > +           'des-rfb', 'des',
-> > > >
-> > > > Can we call this '3des' to make it clear that this is Triple-DES and not
-> > > > the single-DES (which des-rfb is)
-> > > >
-> > > Actually the current des is not triple-DES, just the single-DES, and des-rfb in
-> > QEMU is just a variant of
-> > > single DES, which change the standard key by calling
-> > qcrypto_cipher_munge_des_rfb_key().
-> > >
-> > > I think we can add the 3des support as well in the next step.
-> > >
-> > > The current single-DES in the patch set is ok to me. :)
-> > 
-> > Per my othre reply in this thread,
+On Mon, Dec 05, 2016 at 10:46:34PM +0100, Eric Auger wrote:
+> At the moment we just detect the presence of ITS as part of the
+> GICv3 init routine and initialize its base address.
 > 
-> I saw that, thanks for your information, Daniel.
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> ---
+>  arm/Makefile.common        |  1 +
+>  lib/arm/asm/gic-v3-its.h   | 22 ++++++++++++++++++++++
+>  lib/arm/asm/gic.h          |  1 +
+>  lib/arm/gic-v3-its.c       |  9 +++++++++
+>  lib/arm/gic.c              | 30 +++++++++++++++++++++++++-----
+>  lib/arm64/asm/gic-v3-its.h |  1 +
+>  6 files changed, 59 insertions(+), 5 deletions(-)
+>  create mode 100644 lib/arm/asm/gic-v3-its.h
+>  create mode 100644 lib/arm/gic-v3-its.c
+>  create mode 100644 lib/arm64/asm/gic-v3-its.h
 > 
-> > I don't think we should be supporting
-> > single-DES at all in QEMU / cryptodev. So IMHO, the correct fix is to
-> > remove the single-DES support from cryptodev entirely
-> > 
-> The cryptodev-builtin is one kind of cryptodev backends. It provides the
-> real crypto capability for virtio crypto device.
+> diff --git a/arm/Makefile.common b/arm/Makefile.common
+> index 6c0898f..070f349 100644
+> --- a/arm/Makefile.common
+> +++ b/arm/Makefile.common
+> @@ -47,6 +47,7 @@ cflatobjs += lib/arm/bitops.o
+>  cflatobjs += lib/arm/psci.o
+>  cflatobjs += lib/arm/smp.o
+>  cflatobjs += lib/arm/gic.o lib/arm/gic-v2.o lib/arm/gic-v3.o
+> +cflatobjs += lib/arm/gic-v3-its.o
 >  
-> I don't think we should artificially remove one algorithm support if
-> the frontend driver (users) wants to use it, though the algorithm is
-> unsafe.
+>  libeabi = lib/arm/libeabi.a
+>  eabiobjs = lib/arm/eabi_compat.o
+> diff --git a/lib/arm/asm/gic-v3-its.h b/lib/arm/asm/gic-v3-its.h
+> new file mode 100644
+> index 0000000..2044565
+> --- /dev/null
+> +++ b/lib/arm/asm/gic-v3-its.h
+> @@ -0,0 +1,22 @@
+> +/*
+> + * All ITS* defines are lifted from include/linux/irqchip/arm-gic-v3.h
+> + *
+> + * Copyright (C) 2016, Red Hat Inc, Andrew Jones <drjones@redhat.com>
 
-IIUC the cryptodev hardware is ultimately about allowing the guest
-to offload crypto operations to the host, potentialy using hardware
-acceleration. If the cryptodev backend doesn't support a particular
-algorithm, the guest is still capable of using its own built-in
-support for that algorithm. I see no compelling reason to provide
-host offload / acceleration for single-DES. Just kill this obsolete
-algorithm from cryptodev and in the unlikely event that a guest
-really does want single-DES it can use its built-in impl instead.
+s/Andrew/Eric/
 
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+> + *
+> + * This work is licensed under the terms of the GNU LGPL, version 2.
+> + */
+> +#ifndef _ASMARM_GIC_V3_ITS_H_
+> +#define _ASMARM_GIC_V3_ITS_H_
+> +
+> +#ifndef __ASSEMBLY__
+> +
+> +struct its_data {
+> +	void *base;
+> +};
+> +
+> +extern struct its_data its_data;
+> +
+> +#define gicv3_its_base()		(its_data.base)
+
+Can't we just add the ITS base address to the current gicv3_data struct?
+
+> +
+> +#endif /* !__ASSEMBLY__ */
+> +#endif /* _ASMARM_GIC_V3_ITS_H_ */
+> diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
+> index ea5fde9..73d4502 100644
+> --- a/lib/arm/asm/gic.h
+> +++ b/lib/arm/asm/gic.h
+> @@ -30,6 +30,7 @@
+>  
+>  #include <asm/gic-v2.h>
+>  #include <asm/gic-v3.h>
+> +#include <asm/gic-v3-its.h>
+>  
+>  #ifndef __ASSEMBLY__
+>  #include <asm/cpumask.h>
+> diff --git a/lib/arm/gic-v3-its.c b/lib/arm/gic-v3-its.c
+> new file mode 100644
+> index 0000000..e382b80
+> --- /dev/null
+> +++ b/lib/arm/gic-v3-its.c
+> @@ -0,0 +1,9 @@
+> +/*
+> + * Copyright (C) 2016, Red Hat Inc, Eric Auger <eric.auger@redhat.com>
+> + *
+> + * This work is licensed under the terms of the GNU LGPL, version 2.
+> + */
+> +#include <asm/gic.h>
+> +
+> +struct its_data its_data;
+> +
+> diff --git a/lib/arm/gic.c b/lib/arm/gic.c
+> index 957a146..e551abd 100644
+> --- a/lib/arm/gic.c
+> +++ b/lib/arm/gic.c
+> @@ -6,6 +6,7 @@
+>  #include <devicetree.h>
+>  #include <asm/gic.h>
+>  #include <asm/io.h>
+> +#include <asm/gic-v3-its.h>
+>  
+>  struct gic_common_ops *gic_common_ops;
+>  
+> @@ -17,12 +18,14 @@ struct gicv3_data gicv3_data;
+>   * Documentation/devicetree/bindings/interrupt-controller/arm,gic-v3.txt
+>   */
+>  static bool
+> -gic_get_dt_bases(const char *compatible, void **base1, void **base2)
+> +gic_get_dt_bases(const char *compatible, void **base1, void **base2,
+> +		 void **base3)
+>  {
+>  	struct dt_pbus_reg reg;
+> -	struct dt_device gic;
+> +	struct dt_device gic, its;
+>  	struct dt_bus bus;
+> -	int node, ret;
+> +	int node, subnode, ret, len;
+> +	const void *fdt = dt_fdt();
+>  
+>  	dt_bus_init_defaults(&bus);
+>  	dt_device_init(&gic, &bus, NULL);
+> @@ -43,19 +46,36 @@ gic_get_dt_bases(const char *compatible, void **base1, void **base2)
+>  	assert(ret == 0);
+>  	*base2 = ioremap(reg.addr, reg.size);
+>  
+> +	if (base3 && !strcmp(compatible, "arm,gic-v3")) {
+> +		dt_for_each_subnode(node, subnode) {
+> +			const struct fdt_property *prop;
+> +
+> +			prop = fdt_get_property(fdt, subnode,
+> +						"compatible", &len);
+> +			if (!strcmp((char *)prop->data, "arm,gic-v3-its")) {
+> +				dt_device_bind_node(&its, subnode);
+> +				ret = dt_pbus_translate(&its, 0, &reg);
+> +				assert(ret == 0);
+> +				*base3 = ioremap(reg.addr, reg.size);
+> +				break;
+> +			}
+> +		}
+> +
+> +	}
+> +
+>  	return true;
+>  }
+>  
+>  int gicv2_init(void)
+>  {
+>  	return gic_get_dt_bases("arm,cortex-a15-gic",
+> -			&gicv2_data.dist_base, &gicv2_data.cpu_base);
+> +			&gicv2_data.dist_base, &gicv2_data.cpu_base, NULL);
+>  }
+>  
+>  int gicv3_init(void)
+>  {
+>  	return gic_get_dt_bases("arm,gic-v3", &gicv3_data.dist_base,
+> -			&gicv3_data.redist_base[0]);
+> +			&gicv3_data.redist_base[0], &its_data.base);
+>  }
+>  
+>  int gic_init(void)
+> diff --git a/lib/arm64/asm/gic-v3-its.h b/lib/arm64/asm/gic-v3-its.h
+> new file mode 100644
+> index 0000000..083cba4
+> --- /dev/null
+> +++ b/lib/arm64/asm/gic-v3-its.h
+> @@ -0,0 +1 @@
+> +#include "../../arm/asm/gic-v3-its.h"
+> -- 
+> 2.5.5
+> 
+>
+
+Thanks,
+drew 
