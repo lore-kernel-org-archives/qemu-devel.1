@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43614)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44986)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cECQx-0005IJ-U0
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 04:53:12 -0500
+	(envelope-from <groug@kaod.org>) id 1cECSe-0006bD-Nr
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 04:54:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cECQs-00013q-Of
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 04:53:11 -0500
-Received: from mail-wj0-f196.google.com ([209.85.210.196]:36029)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cECQs-00013b-IU
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 04:53:06 -0500
-Received: by mail-wj0-f196.google.com with SMTP id j10so15468166wjb.3
-	for <qemu-devel@nongnu.org>; Tue, 06 Dec 2016 01:53:06 -0800 (PST)
-Date: Tue, 6 Dec 2016 09:52:03 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20161206095203.GH12630@stefanha-x1.localdomain>
-References: <1480960775-5002-1-git-send-email-peter.maydell@linaro.org>
+	(envelope-from <groug@kaod.org>) id 1cECSb-00022f-Lo
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 04:54:56 -0500
+Received: from 3.mo4.mail-out.ovh.net ([46.105.57.129]:38615)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cECSb-000224-ER
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 04:54:53 -0500
+Received: from player762.ha.ovh.net (b7.ovh.net [213.186.33.57])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id D3DFF21B5B
+	for <qemu-devel@nongnu.org>; Tue,  6 Dec 2016 10:54:51 +0100 (CET)
+Date: Tue, 6 Dec 2016 10:54:41 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20161206105441.6f51a1f4@bahia>
+In-Reply-To: <20161206094708.GE12630@stefanha-x1.localdomain>
+References: <148095126363.31351.4484514300033863622.stgit@bahia>
+	<20161206094708.GE12630@stefanha-x1.localdomain>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="U3BNvdZEnlJXqmh+"
-Content-Disposition: inline
-In-Reply-To: <1480960775-5002-1-git-send-email-peter.maydell@linaro.org>
-Subject: Re: [Qemu-devel] [PULL 0/1] target-arm queue
+	boundary="Sig_/u0tdgSK5xisDXP_Mdt3Wrbz";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH for-2.8] qdev: apply global properties in
+ reverse order
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,68 +32,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-stable@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-
---U3BNvdZEnlJXqmh+
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+--Sig_/u0tdgSK5xisDXP_Mdt3Wrbz
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Dec 05, 2016 at 05:59:34PM +0000, Peter Maydell wrote:
-> One patch for 2.8-rc3, which is Alex's partial revert
-> of 1dd089d0 to fix A64 ldaxp.
+On Tue, 6 Dec 2016 09:47:08 +0000
+Stefan Hajnoczi <stefanha@gmail.com> wrote:
+
+> On Mon, Dec 05, 2016 at 04:21:22PM +0100, Greg Kurz wrote:
+> > The current code recursively applies global properties from child up to
+> > parent. So, if you have:
+> >=20
+> > -global virtio-pci.disable-modern=3Don
+> > -global virtio-blk-pci.disable-modern=3Doff
+> >=20
+> > Then the default value of disable-modern for a virtio-blk-pci device is=
+ on,
+> > which looks wrong from an OOP perspective.
+> >=20
+> > This patch reverses the logic, so that a child property always prevail.
+> >=20
+> > This fixes a subtle bug that got introduced in 2.7 with commit "9a4c0e2=
+20d8a
+> > hw/virtio-pci: fix virtio behaviour" for older (< 2.7) machine types: t=
+he
+> > HW_COMPAT_2_6 macro contains global virtio-pci.disable-* properties whi=
+ch
+> > would silently override global properties passed on the command line for
+> > virtio subtypes.
+> >=20
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > ---
+> >=20
+> > AFAIK, libvirt's XML doesn't know about modern/legacy modes for virtio
+> > devices. Early adopters of virtio 1.0 had to rely on the <qemu:commandl=
+ine>
+> > tag to pass global properties to QEMU. This patch ensures that XML files
+> > used with older machine types remain valid with newer versions of QEMU.
+> >=20
+> > FWIW I guess it could help to have this fix in 2.8, and also probably in
+> > 2.7.1. =20
 >=20
-> thanks
-> -- PMM
+> Hi Greg,
+> I won't merge this for QEMU 2.8 because this 2.7 issue is not a 2.8
+> release blocker and it's too risky (good points have been raised in this
+> thread).
 >=20
-> The following changes since commit bc66cedb4141fb7588f2462c74310d8fb5dd4c=
-f1:
+> Please target -stable when consensus has been reached.
 >=20
->   Merge remote-tracking branch 'yongbok/tags/mips-20161204' into staging =
-(2016-12-05 10:56:45 +0000)
->=20
-> are available in the git repository at:
->=20
->   git://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-=
-20161205
->=20
-> for you to fetch changes up to 5460da501a57cd72eda6fec736d76539122e2f99:
->=20
->   target-arm/translate-a64: fix gen_load_exclusive (2016-12-05 17:52:01 +=
-0000)
->=20
-> ----------------------------------------------------------------
-> target-arm queue:
->  * fix gen_load_exclusive handling of ldaxp
->=20
-> ----------------------------------------------------------------
-> Alex Benn=E9e (1):
->       target-arm/translate-a64: fix gen_load_exclusive
->=20
->  target-arm/translate-a64.c | 42 +++++++++++++++++++---------------------=
+
+Sure I'll just do that.
+
+Cheers.
+
 --
->  1 file changed, 19 insertions(+), 23 deletions(-)
->=20
+Greg
 
-Thanks, applied to my staging tree:
-https://github.com/stefanha/qemu/commits/staging
+> Thanks,
+> Stefan
 
-Stefan
 
---U3BNvdZEnlJXqmh+
-Content-Type: application/pgp-signature; name="signature.asc"
+--Sig_/u0tdgSK5xisDXP_Mdt3Wrbz
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
 -----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
-iQEcBAEBAgAGBQJYRopDAAoJEJykq7OBq3PIvjoH/2abu5UqlH/5YNCzvapwLnaW
-xxeyOcCk1SQGBtJNIWYt4MCgTC61vnhrUEB1ss831eZSi/UVbg3vgwm9bR6wNxAz
-bnCNFt41DbSBJagose+FkemYZBu9G/AL7wdvMGuuBTo3h/kp0HVks7xXfnfSFQq9
-vmq7y80SrzUV/hQu99zU4q23pPH3LHlNptT3kWbGialXtKKfvTKA4s7XjclXhPpu
-VWnekZ2P+cPxwRDQu3DHP0RIhdUz0Dr1rqiZR5irYOZrBJtU9j6cBhc9E7mAV8FL
-kOEvBStcg7Fp2OKdhPgHSeOe8fhkL6Un2HyDpdrAxfNIG9wHATTBHNVx+C7DnNE=
-=z8WU
+iEYEARECAAYFAlhGiuIACgkQAvw66wEB28Im6ACfb9Fwk/sbUQsy8nWdM6GB70GQ
+u/0AnjK0YyMpzWmve+9/v592s4mp6WzA
+=yqyz
 -----END PGP SIGNATURE-----
 
---U3BNvdZEnlJXqmh+--
+--Sig_/u0tdgSK5xisDXP_Mdt3Wrbz--
