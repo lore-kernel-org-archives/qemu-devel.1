@@ -1,29 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39206)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40066)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cEB6d-00030w-CA
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 03:28:08 -0500
+	(envelope-from <tianyu.lan@intel.com>) id 1cEB9U-0004KF-3M
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 03:31:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cEB6Z-0006va-F3
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 03:28:07 -0500
-Received: from 7.mo4.mail-out.ovh.net ([178.33.253.54]:47182)
+	(envelope-from <tianyu.lan@intel.com>) id 1cEB9R-0008V2-09
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 03:31:04 -0500
+Received: from mga04.intel.com ([192.55.52.120]:45577)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cEB6Z-0006rt-7y
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 03:28:03 -0500
-Received: from player762.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 4E34E217F5
-	for <qemu-devel@nongnu.org>; Tue,  6 Dec 2016 09:28:00 +0100 (CET)
-Date: Tue, 6 Dec 2016 09:27:49 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20161206092749.01a55bca@bahia>
-In-Reply-To: <20161205170128.533850e5.cornelia.huck@de.ibm.com>
-References: <148095126363.31351.4484514300033863622.stgit@bahia>
-	<20161205164200.49bec0f6.cornelia.huck@de.ibm.com>
-	<20161205170128.533850e5.cornelia.huck@de.ibm.com>
+	(Exim 4.71) (envelope-from <tianyu.lan@intel.com>)
+	id 1cEB9Q-0008Uk-Ly
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 03:31:00 -0500
+References: <1480348315-13332-1-git-send-email-bd.aviv@gmail.com>
+	<8188dd5e-2c71-dbd0-9a1a-9c8af6f74b96@intel.com>
+	<20161202065214.GF21601@pxdev.xzpeter.org>
+	<088c2afd-575e-99af-1686-023c116352ab@intel.com>
+	<20161206065155.GB4344@pxdev.xzpeter.org>
+	<6d37d046-8e5a-7662-baa6-445d3985fde7@intel.com>
+	<20161206072228.GC4344@pxdev.xzpeter.org>
+From: Lan Tianyu <tianyu.lan@intel.com>
+Message-ID: <f9f9daab-519d-381b-c9e8-c6dcc139f1d3@intel.com>
+Date: Tue, 6 Dec 2016 16:27:39 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.8] qdev: apply global properties in
- reverse order
+In-Reply-To: <20161206072228.GC4344@pxdev.xzpeter.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v7 0/5] IOMMU: intel_iommu support map and
+ unmap notifications
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,46 +34,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cornelia.huck@de.ibm.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-stable@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: "Aviv B.D" <bd.aviv@gmail.com>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>, Alex Williamson <alex.williamson@redhat.com>, Jason Wang <jasowang@redhat.com>, "Liu, Yi L" <yi.l.liu@intel.com>, "Wu, Fengguang" <fengguang.wu@intel.com>
 
-On Mon, 5 Dec 2016 17:01:28 +0100
-Cornelia Huck <cornelia.huck@de.ibm.com> wrote:
+On 2016年12月06日 15:22, Peter Xu wrote:
+> On Tue, Dec 06, 2016 at 03:06:20PM +0800, Lan Tianyu wrote:
+>> On 2016年12月06日 14:51, Peter Xu wrote:
+>>> On Tue, Dec 06, 2016 at 02:30:24PM +0800, Lan Tianyu wrote:
+>>>
+>>> [...]
+>>>
+>>>>>> 2. How to restore GPA->HPA mapping when IOVA is disabled by guest.
+>>>>>> When guest enables IOVA for device, vIOMMU will invalidate all previous
+>>>>>> GPA->HPA mapping and update IOVA->HPA mapping to pIOMMU via iommu
+>>>>>> notifier. But if IOVA is disabled, I think we should restore GPA->HPA
+>>>>>> mapping for the device otherwise the device won't work again in the VM.
+>>>>>
+>>>>> If we can have a workable replay mechanism, this problem will be
+>>>>> solved IMHO.
+>>>>
+>>>> Basic idea is to replay related memory regions to restore GPA->HPA
+>>>> mapping when guest disables IOVA.
+>>>
+>>> Btw, could you help elaborate in what case we will trigger such a
+>>> condition? Or, can we dynamically enable/disable an IOMMU?
+>>
+>> First case I think of is nest virtualization and we assign physical
+>> device to l2 guest.
+> 
+> If we assign physical device to l2 guest, then it will belongs to an
+> IOMMU domain in either l1 guest and host, right? (assuming we are
+> using vfio-pci to do device assignment)
 
-> On Mon, 5 Dec 2016 16:42:00 +0100
-> Cornelia Huck <cornelia.huck@de.ibm.com> wrote:
-> 
-> > On Mon, 05 Dec 2016 16:21:22 +0100
-> > Greg Kurz <groug@kaod.org> wrote:  
-> 
-> > > AFAIK, libvirt's XML doesn't know about modern/legacy modes for virtio
-> > > devices. Early adopters of virtio 1.0 had to rely on the <qemu:commandline>
-> > > tag to pass global properties to QEMU. This patch ensures that XML files
-> > > used with older machine types remain valid with newer versions of QEMU.  
-> 
-> I recall some libvirt patches floating around for this legacy/modern
-> stuff, but I don't know their status.
-> 
+Yes.
 
-libvirt does some probing of disable-legacy but I could find nothing that
-allows a user to explicitly choose between legacy or modern.
+> 
+>> User space driver(E.G DPDK) also can enable/disable
+>> IOVA for device dynamically.
+> 
+> Could you provide more detailed (or any pointer) on how to do that? I
+> did try to find it myself, I see an VFIO_IOMMU_ENABLE ioctl, but looks
+> like it is for ppc only.
 
-> > > 
-> > > FWIW I guess it could help to have this fix in 2.8, and also probably in
-> > > 2.7.1.  
-> > 
-> > ...but I'm a bit worried about doing that change this late in the
-> > cycle, as we may introduce subtle changes for other configurations. At
-> > the very least, we should look over the existing backwards compat
-> > properties (I'll look at those I'm familiar with).  
-> 
-> The s390x properties seem safe.
-> 
-> For virtio-pci, the ability to override extra state might become
-> problematic for modern devices. Although manually setting this property
-> is probably a patholotical case...
-> 
+No, I just give an example that user space may do that but no more
+research. But since Qemu already can enable device's IOVA, other user
+application also should can do that with the same VFIO interface, right?
 
-I agree that migrating a 2.6 machine type with disable-modern=off being
-set through -global for a given subtype, from QEMU 2.6 to QEMU 2.8 (or 2.7)
-is probably a corner case :)
+-- 
+Best regards
+Tianyu Lan
