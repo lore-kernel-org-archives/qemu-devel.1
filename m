@@ -1,29 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34538)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35007)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cEHSg-00034W-Pt
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 10:15:23 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cEHUR-0004d9-IN
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 10:17:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cEHSa-0001Qh-TH
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 10:15:18 -0500
-Received: from mail-wj0-f176.google.com ([209.85.210.176]:33438)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cEHSa-0001Pu-Hi
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 10:15:12 -0500
-Received: by mail-wj0-f176.google.com with SMTP id xy5so325022073wjc.0
-	for <qemu-devel@nongnu.org>; Tue, 06 Dec 2016 07:15:12 -0800 (PST)
-References: <20161206113915.26308.72810.malonedeb@wampee.canonical.com>
-	<20161206145104.16048-1-alex.bennee@linaro.org>
-	<CAFEAcA8tnP5_annrApB2O_ZUXvc7HXM7+K1XOsPUVqrU6hHLeA@mail.gmail.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <CAFEAcA8tnP5_annrApB2O_ZUXvc7HXM7+K1XOsPUVqrU6hHLeA@mail.gmail.com>
-Date: Tue, 06 Dec 2016 15:14:10 +0000
-Message-ID: <87k2bdytrx.fsf@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] exec.c: simplify the breakpoint
- invalidation logic
+	(envelope-from <kwolf@redhat.com>) id 1cEHUQ-0002IC-Pc
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 10:17:07 -0500
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Tue,  6 Dec 2016 16:16:57 +0100
+Message-Id: <1481037418-10239-1-git-send-email-kwolf@redhat.com>
+Subject: [Qemu-devel] [PULL] Block layer patches for 2.8.0-rc3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,117 +17,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Bug 1647683 <1647683@bugs.launchpad.net>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "open list:Overall" <qemu-devel@nongnu.org>
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org
+
+The following changes since commit bc66cedb4141fb7588f2462c74310d8fb5dd4cf1:
+
+  Merge remote-tracking branch 'yongbok/tags/mips-20161204' into staging (2016-12-05 10:56:45 +0000)
+
+are available in the git repository at:
 
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+  git://repo.or.cz/qemu/kevin.git tags/for-upstream
 
-> On 6 December 2016 at 14:51, Alex Bennée <alex.bennee@linaro.org> wrote:
->> A bug (1647683) was reported showing a crash when removing
->> breakpoints. The reproducer was bisected to 3359baad when tb_flush was
->> finally made thread safe. While in MTTCG the locking in
->> breakpoint_invalidate should have prevented any problems currently
->> tb_lock() is a NOP for system emulation.
->>
->> On top of it all the invalidation code was special-cased between user
->> and system emulation which was ugly. As we now have a safe tb_flush()
->> we might as well use that when breakpoints and added and removed. This
->> is the same thing we do for single-stepping and as this is during
->> debugging it isn't a major performance concern.
->>
->> Reported-by: Julian Brown
->> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
->> ---
->>  exec.c | 31 ++++---------------------------
->>  1 file changed, 4 insertions(+), 27 deletions(-)
->>
->> diff --git a/exec.c b/exec.c
->> index 3d867f1..e991221 100644
->> --- a/exec.c
->> +++ b/exec.c
->> @@ -685,29 +685,6 @@ void cpu_exec_realizefn(CPUState *cpu, Error **errp)
->>  }
->>
->>  #if defined(CONFIG_USER_ONLY)
->> -static void breakpoint_invalidate(CPUState *cpu, target_ulong pc)
->> -{
->> -    mmap_lock();
->> -    tb_lock();
->> -    tb_invalidate_phys_page_range(pc, pc + 1, 0);
->> -    tb_unlock();
->> -    mmap_unlock();
->> -}
->> -#else
->> -static void breakpoint_invalidate(CPUState *cpu, target_ulong pc)
->> -{
->> -    MemTxAttrs attrs;
->> -    hwaddr phys = cpu_get_phys_page_attrs_debug(cpu, pc, &attrs);
->> -    int asidx = cpu_asidx_from_attrs(cpu, attrs);
->> -    if (phys != -1) {
->> -        /* Locks grabbed by tb_invalidate_phys_addr */
->> -        tb_invalidate_phys_addr(cpu->cpu_ases[asidx].as,
->> -                                phys | (pc & ~TARGET_PAGE_MASK));
->> -    }
->> -}
->> -#endif
->> -
->> -#if defined(CONFIG_USER_ONLY)
->>  void cpu_watchpoint_remove_all(CPUState *cpu, int mask)
->>
->>  {
->> @@ -839,7 +816,7 @@ int cpu_breakpoint_insert(CPUState *cpu, vaddr pc, int flags,
->>          QTAILQ_INSERT_TAIL(&cpu->breakpoints, bp, entry);
->>      }
->>
->> -    breakpoint_invalidate(cpu, pc);
->> +    tb_flush(cpu);
->>
->>      if (breakpoint) {
->>          *breakpoint = bp;
->> @@ -855,6 +832,7 @@ int cpu_breakpoint_remove(CPUState *cpu, vaddr pc, int flags)
->>      QTAILQ_FOREACH(bp, &cpu->breakpoints, entry) {
->>          if (bp->pc == pc && bp->flags == flags) {
->>              cpu_breakpoint_remove_by_ref(cpu, bp);
->> +            tb_flush(cpu);
->>              return 0;
->>          }
->>      }
->> @@ -865,9 +843,6 @@ int cpu_breakpoint_remove(CPUState *cpu, vaddr pc, int flags)
->>  void cpu_breakpoint_remove_by_ref(CPUState *cpu, CPUBreakpoint *breakpoint)
->>  {
->>      QTAILQ_REMOVE(&cpu->breakpoints, breakpoint, entry);
->> -
->> -    breakpoint_invalidate(cpu, breakpoint->pc);
->> -
->>      g_free(breakpoint);
->>  }
->>
->> @@ -881,6 +856,8 @@ void cpu_breakpoint_remove_all(CPUState *cpu, int mask)
->>              cpu_breakpoint_remove_by_ref(cpu, bp);
->>          }
->>      }
->> +
->> +    tb_flush(cpu);
->>  }
->>
->>  /* enable or disable single step mode. EXCP_DEBUG is returned by the
->
-> I think this is the wrong direction. We only need to invalidate
-> the TBs for the specific location the breakpoint is at.
-> Even if we for the moment want to apply a big hammer of doing
-> a full tb flush on breakpoint to fix this issue for this release,
-> we shouldn't drop the indirection through breakpoint_invalidate(),
-> because then we can't go back to invalidating just the parts we need
-> easily later.
+for you to fetch changes up to a3e1505daec31ef56f0489f8c8fff1b8e4ca92bd:
 
-Why would we? It's not like fresh code generation is particularly slow,
-especially in a debugging situation when you've just stopped the
-machine.
+  qcow2: Don't strand clusters near 2G intervals during commit (2016-12-06 15:37:02 +0100)
 
-The self-modifying-code paths make more sense to be partial in their
-invalidations although I've never really measured quite how pathalogical
-running a JIT inside QEMU is.
+----------------------------------------------------------------
+Block layer patches for 2.8.0-rc3
 
---
-Alex Bennée
+----------------------------------------------------------------
+Eric Blake (1):
+      qcow2: Don't strand clusters near 2G intervals during commit
+
+ block/qcow2.c              |   3 +-
+ tests/qemu-iotests/097     |  41 +++++---
+ tests/qemu-iotests/097.out | 249 +++++++++++++++++++++++++++++++++------------
+ 3 files changed, 210 insertions(+), 83 deletions(-)
