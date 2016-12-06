@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38920)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42562)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cEDvc-00063N-6B
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 06:28:57 -0500
+	(envelope-from <lersek@redhat.com>) id 1cEE9U-0002Hz-Dt
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 06:43:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cEDvY-0003EN-UG
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 06:28:56 -0500
-Received: from mail-vk0-f46.google.com ([209.85.213.46]:33166)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cEDvY-0003Ai-DH
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 06:28:52 -0500
-Received: by mail-vk0-f46.google.com with SMTP id 137so194296707vkl.0
-	for <qemu-devel@nongnu.org>; Tue, 06 Dec 2016 03:28:31 -0800 (PST)
+	(envelope-from <lersek@redhat.com>) id 1cEE9R-0007lN-NS
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 06:43:16 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43692)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cEE9R-0007kl-Db
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 06:43:13 -0500
+References: <20161201170624.26496-1-lersek@redhat.com>
+	<20161201170624.26496-3-lersek@redhat.com>
+	<20161206115038.4495a217@nial.brq.redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <7723a0d7-0764-ab5d-51ce-25054f910c36@redhat.com>
+Date: Tue, 6 Dec 2016 12:43:06 +0100
 MIME-Version: 1.0
-In-Reply-To: <87pol5z57w.fsf@linaro.org>
-References: <87pol5z57w.fsf@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 6 Dec 2016 11:27:08 +0000
-Message-ID: <CAFEAcA8qUBSSRS5a+0qv=450z5RXdbbS51RJ1Fj9OjO3K63xLw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] RISU TCG failures (AArch64 on AArch64)
+In-Reply-To: <20161206115038.4495a217@nial.brq.redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 2/7] fw-cfg: turn FW_CFG_FILE_SLOTS into
+ a device property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,123 +29,411 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: Claudio Fontana <claudio.fontana@huawei.com>, Claudio Fontana <claudio.fontana@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "open list:ARM" <qemu-arm@nongnu.org>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu devel list <qemu-devel@nongnu.org>, "Gabriel L. Somlo" <somlo@cmu.edu>, "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 6 December 2016 at 11:06, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrot=
-e:
+On 12/06/16 11:50, Igor Mammedov wrote:
+> On Thu,  1 Dec 2016 18:06:19 +0100
+> Laszlo Ersek <lersek@redhat.com> wrote:
+> 
+>> We'd like to raise the value of FW_CFG_FILE_SLOTS. Doing it naively could
+>> lead to problems with backward migration: a more recent QEMU (running an
+>> older machine type) would allow the guest, in fw_cfg_select(), to select a
+>> high key value that is unavailable in the same machine type implemented by
+>> the older (target) QEMU. On the target host, fw_cfg_data_read() for
+>> example could dereference nonexistent entries.
+>>
+>> As first step, size the FWCfgState.entries[*] and FWCfgState.entry_order
+>> arrays dynamically. All three array sizes will be influenced by the new
+>> field (and device property) FWCfgState.file_slots.
+>>
+>> Make the following changes:
+>>
+>> - Replace the FW_CFG_FILE_SLOTS macro with FW_CFG_FILE_SLOTS_TRAD
+>>   (traditional count of fw_cfg file slots) in the header file. The value
+>>   remains 0x10.
+>>
+>> - Replace all uses of FW_CFG_FILE_SLOTS with a helper function called
+>>   fw_cfg_file_slots(), returning the new property.
+>>
+>> - Eliminate the macro FW_CFG_MAX_ENTRY, and replace all its uses with a
+>>   helper function called fw_cfg_max_entry().
+>>
+>> - In the MMIO- and IO-mapped realize functions both, allocate all three
+>>   arrays dynamically, based on the new property.
+>>
+>> - The new property defaults to 0x20; however at the moment we forcibly set
+>>   it to FW_CFG_FILE_SLOTS_TRAD on all code paths available to board code
+>>   (namely in the fw_cfg_init_io_dma() and fw_cfg_init_mem_wide() helper
+>>   functions). This is going to be customized in the following patches.
+>>
+>> Cc: "Gabriel L. Somlo" <somlo@cmu.edu>
+>> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+>> Cc: Gerd Hoffmann <kraxel@redhat.com>
+>> Cc: Igor Mammedov <imammedo@redhat.com>
+>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+>> ---
+>>
+>> Notes:
+>>     I know that upstream doesn't care about backward migration, but some
+>>     downstreams might.
+>>
+>>  docs/specs/fw_cfg.txt          |  2 +-
+>>  include/hw/nvram/fw_cfg_keys.h |  3 +-
+>>  hw/nvram/fw_cfg.c              | 85 ++++++++++++++++++++++++++++++++++++++----
+>>  3 files changed, 79 insertions(+), 11 deletions(-)
+>>
+>> diff --git a/docs/specs/fw_cfg.txt b/docs/specs/fw_cfg.txt
+>> index a19e2adbe1c6..84e2978706f5 100644
+>> --- a/docs/specs/fw_cfg.txt
+>> +++ b/docs/specs/fw_cfg.txt
+>> @@ -154,11 +154,11 @@ Selector Reg.    Range Usage
+>>  0x8000 - 0xbfff  Arch. Specific (0x0000 - 0x3fff, generally RO, possibly RW
+>>                                   through the DMA interface in QEMU v2.9+)
+>>  0xc000 - 0xffff  Arch. Specific (0x0000 - 0x3fff, RW, ignored in v2.4+)
+>>  
+>>  In practice, the number of allowed firmware configuration items is given
+>> -by the value of FW_CFG_MAX_ENTRY (see fw_cfg.h).
+>> +by the value (FW_CFG_FILE_FIRST + FW_CFG_FILE_SLOTS_TRAD) (see fw_cfg.h).
+>>  
+>>  = Guest-side DMA Interface =
+>>  
+>>  If bit 1 of the feature bitmap is set, the DMA interface is present. This does
+>>  not replace the existing fw_cfg interface, it is an add-on. This interface
+>> diff --git a/include/hw/nvram/fw_cfg_keys.h b/include/hw/nvram/fw_cfg_keys.h
+>> index 0f3e871884c0..627589793671 100644
+>> --- a/include/hw/nvram/fw_cfg_keys.h
+>> +++ b/include/hw/nvram/fw_cfg_keys.h
+>> @@ -27,12 +27,11 @@
+>>  #define FW_CFG_SETUP_SIZE       0x17
+>>  #define FW_CFG_SETUP_DATA       0x18
+>>  #define FW_CFG_FILE_DIR         0x19
+>>  
+>>  #define FW_CFG_FILE_FIRST       0x20
+>> -#define FW_CFG_FILE_SLOTS       0x10
+>> -#define FW_CFG_MAX_ENTRY        (FW_CFG_FILE_FIRST + FW_CFG_FILE_SLOTS)
+>> +#define FW_CFG_FILE_SLOTS_TRAD  0x10
+>>  
+>>  #define FW_CFG_WRITE_CHANNEL    0x4000
+>>  #define FW_CFG_ARCH_LOCAL       0x8000
+>>  #define FW_CFG_ENTRY_MASK       (~(FW_CFG_WRITE_CHANNEL | FW_CFG_ARCH_LOCAL))
+>>  
+>> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+>> index e0145c11a19b..2e1441c09750 100644
+>> --- a/hw/nvram/fw_cfg.c
+>> +++ b/hw/nvram/fw_cfg.c
+>> @@ -31,10 +31,13 @@
+>>  #include "hw/sysbus.h"
+>>  #include "trace.h"
+>>  #include "qemu/error-report.h"
+>>  #include "qemu/config-file.h"
+>>  #include "qemu/cutils.h"
+>> +#include "qapi/error.h"
+>> +
+>> +#define FW_CFG_FILE_SLOTS_DFLT 0x20
+>>  
+>>  #define FW_CFG_NAME "fw_cfg"
+>>  #define FW_CFG_PATH "/machine/" FW_CFG_NAME
+>>  
+>>  #define TYPE_FW_CFG     "fw_cfg"
+>> @@ -69,12 +72,13 @@ typedef struct FWCfgEntry {
+>>  struct FWCfgState {
+>>      /*< private >*/
+>>      SysBusDevice parent_obj;
+>>      /*< public >*/
+>>  
+>> -    FWCfgEntry entries[2][FW_CFG_MAX_ENTRY];
+>> -    int entry_order[FW_CFG_MAX_ENTRY];
+>> +    uint32_t file_slots;
+> should it be uint16_t?
+> As below you use "uint16_t file_slots_max;" and do some UINT16
+> to calculate max limit.
 
-A quick eyeball of the logs:
+I think I had a reason for making this uint32_t. I think the argument
+was that fw_cfg_max_entry() could theoretically return a value that
+doesn't fit in a uint16_t. Looking again at the patch however, I think I
+can try to make this a uint16_t for the next version.
 
-> loading test image testcases.aarch64/insn_ADDPv_ADD_RES1_ADD_RES2_ADDS__I=
-NC.risu.bin...
-> starting apprentice image at 0x4000801000
-> Executed 100 test instructions (pc=3D0x4000801574).Executed 200 test inst=
-ructions (pc=3D0x4000801aec).Executed 300 test instructions (pc=3D0x4000801=
-d08).Executed 400 test instructions (pc=3D0x4000802264).Executed 500 test i=
-nstructions (pc=3D0x40008027b8).Executed 600 test instructions (pc=3D0x4000=
-8029e8).Executed 700 test instructions (pc=3D0x4000802f3c).Executed 800 tes=
-t instructions (pc=3D0x40008034a8).Executed 900 test instructions (pc=3D0x4=
-0008036cc).Executed 1000 test instructions (pc=3D0x4000803c2c).------------=
-----
-> IN:
-> 0x0000004000803cac:  ab1feff6      adds x22, xzr, xzr, lsl #59
+> 
+>> +    FWCfgEntry *entries[2];
+>> +    int *entry_order;
+>>      FWCfgFiles *files;
+>>      uint16_t cur_entry;
+>>      uint32_t cur_offset;
+>>      Notifier machine_ready;
+>>  
+>> @@ -255,17 +259,27 @@ static void fw_cfg_reboot(FWCfgState *s)
+>>  static void fw_cfg_write(FWCfgState *s, uint8_t value)
+>>  {
+>>      /* nothing, write support removed in QEMU v2.4+ */
+>>  }
+>>  
+>> +static inline uint32_t fw_cfg_file_slots(const FWCfgState *s)
+>> +{
+>> +    return s->file_slots;
+>> +}
+> so far it doesn't look like this wrapper function is necessary,
+> I'd prefer accessing field directly as it's used only internally.
+> Or do you have plans to extend wrapper later?
+> (then it would be better introduce wrapper at that time)
 
->  ---- 0000004000803cac 0000000000000000 0000000000000000
->  movi_i64 tmp2,$0x0
->  movi_i64 tmp3,$0x0
->  movi_i64 tmp7,$0x0
->  add2_i64 tmp5,tmp6,tmp2,tmp7,tmp3,tmp7           dead: 2 3 4 5
->  mov_i32 CF,tmp6                                  sync: 0  dead: 0 1
->  mov_i32 ZF,tmp5
->  movi_i64 tmp9,$0x20
->  shr_i64 tmp8,tmp5,tmp9                           dead: 2
-[...]
+Originally I used "s->file_slots" in this patch, like you say, without
+this small wrapper function,, but the resultant patch was harder to
+review. With this wrapper, you have two kinds of changes in the patch:
 
-> OUT: [size=3D108]
-> 0x556a9c11a0:  b85f8274      ldur w20, [x19, #-8]
-> 0x556a9c11a4:  350002d4      cbnz w20, #+0x58 (addr 0x556a9c11fc)
-> 0x556a9c11a8:  b10003f4      adds x20, sp, #0x0 (0)
-> 0x556a9c11ac:  9a1f03f5      adc x21, xzr, xzr
+*     FW_CFG_MAX_ENTRY
+  --> fw_cfg_max_entry(s)
 
-Looks like the add2_i64 has emitted a bogus adds, because
-it thinks adds (immediate) allows use of xzr when it doesn't
-(for this insn Rn=3D=3D31 means SP, not XZR).
+*     FW_CFG_FILE_SLOTS
+  --> fw_cfg_file_slots(s)
 
+Without the wrapper, the second bullet looks
 
-> loading test image testcases.aarch64/insn_BSL_CCMN_CCMNi_CCMP__INC.risu.b=
-in...
-> starting apprentice image at 0x4000801000
-> ----------------
-> IN:
-> 0x000000400080157c:  3a5cabed      ccmn wzr, #28, #NZcV, ge
-> 0x0000004000801580:  00005af0      unallocated (Unallocated)
+*     FW_CFG_FILE_SLOTS
+  --> s->file_slots
 
-> OP after optimization and liveness analysis:
->  ld_i32 tmp0,env,$0xfffffffffffffff8              dead: 1
->  movi_i32 tmp1,$0x0
->  brcond_i32 tmp0,tmp1,ne,$L0                      dead: 0 1
->
->  ---- 000000400080157c 0000000000000000 0000000000000000
->  xor_i32 tmp1,VF,NF                               dead: 1 2
->  movi_i32 tmp2,$0x0
->  setcond_i32 tmp0,tmp1,tmp2,lt                    dead: 1 2
->  movi_i64 tmp3,$0x1c
->  movi_i64 tmp4,$0x0
->  movi_i32 tmp6,$0x0
->  mov_i32 tmp1,tmp4                                dead: 1
->  mov_i32 tmp2,tmp3                                dead: 1
->  add2_i32 NF,CF,tmp1,tmp6,tmp2,tmp6               dead: 3 5
+and to me that made the patch harder to verify.
 
-> 0x55956bfc4c:  310073f5      adds w21, wsp, #0x1c (28)
-> 0x55956bfc50:  1a1f03f6      adc w22, wzr, wzr
+> 
+>> +
+>> +static inline uint32_t fw_cfg_max_entry(const FWCfgState *s)
+>> +{
+>> +    return FW_CFG_FILE_FIRST + fw_cfg_file_slots(s);
+>> +}
+>> +
+>>  static int fw_cfg_select(FWCfgState *s, uint16_t key)
+>>  {
+>>      int arch, ret;
+>>      FWCfgEntry *e;
+>>  
+>>      s->cur_offset = 0;
+>> -    if ((key & FW_CFG_ENTRY_MASK) >= FW_CFG_MAX_ENTRY) {
+>> +    if ((key & FW_CFG_ENTRY_MASK) >= fw_cfg_max_entry(s)) {
+>>          s->cur_entry = FW_CFG_INVALID;
+>>          ret = 0;
+>>      } else {
+>>          s->cur_entry = key;
+>>          ret = 1;
+>> @@ -608,11 +622,11 @@ static void fw_cfg_add_bytes_read_callback(FWCfgState *s, uint16_t key,
+>>  {
+>>      int arch = !!(key & FW_CFG_ARCH_LOCAL);
+>>  
+>>      key &= FW_CFG_ENTRY_MASK;
+>>  
+>> -    assert(key < FW_CFG_MAX_ENTRY && len < UINT32_MAX);
+>> +    assert(key < fw_cfg_max_entry(s) && len < UINT32_MAX);
+>>      assert(s->entries[arch][key].data == NULL); /* avoid key conflict */
+>>  
+>>      s->entries[arch][key].data = data;
+>>      s->entries[arch][key].len = (uint32_t)len;
+>>      s->entries[arch][key].read_callback = callback;
+>> @@ -626,11 +640,11 @@ static void *fw_cfg_modify_bytes_read(FWCfgState *s, uint16_t key,
+>>      void *ptr;
+>>      int arch = !!(key & FW_CFG_ARCH_LOCAL);
+>>  
+>>      key &= FW_CFG_ENTRY_MASK;
+>>  
+>> -    assert(key < FW_CFG_MAX_ENTRY && len < UINT32_MAX);
+>> +    assert(key < fw_cfg_max_entry(s) && len < UINT32_MAX);
+>>  
+>>      /* return the old data to the function caller, avoid memory leak */
+>>      ptr = s->entries[arch][key].data;
+>>      s->entries[arch][key].data = data;
+>>      s->entries[arch][key].len = len;
+>> @@ -775,17 +789,17 @@ void fw_cfg_add_file_callback(FWCfgState *s,  const char *filename,
+>>      size_t dsize;
+>>      MachineClass *mc = MACHINE_GET_CLASS(qdev_get_machine());
+>>      int order = 0;
+>>  
+>>      if (!s->files) {
+>> -        dsize = sizeof(uint32_t) + sizeof(FWCfgFile) * FW_CFG_FILE_SLOTS;
+>> +        dsize = sizeof(uint32_t) + sizeof(FWCfgFile) * fw_cfg_file_slots(s);
+>>          s->files = g_malloc0(dsize);
+>>          fw_cfg_add_bytes(s, FW_CFG_FILE_DIR, s->files, dsize);
+>>      }
+>>  
+>>      count = be32_to_cpu(s->files->count);
+>> -    assert(count < FW_CFG_FILE_SLOTS);
+>> +    assert(count < fw_cfg_file_slots(s));
+>>  
+>>      /* Find the insertion point. */
+>>      if (mc->legacy_fw_cfg_order) {
+>>          /*
+>>           * Sort by order. For files with the same order, we keep them
+>> @@ -855,11 +869,11 @@ void *fw_cfg_modify_file(FWCfgState *s, const char *filename,
+>>      void *ptr = NULL;
+>>  
+>>      assert(s->files);
+>>  
+>>      index = be32_to_cpu(s->files->count);
+>> -    assert(index < FW_CFG_FILE_SLOTS);
+>> +    assert(index < fw_cfg_file_slots(s));
+>>  
+>>      for (i = 0; i < index; i++) {
+>>          if (strcmp(filename, s->files->f[i].name) == 0) {
+>>              ptr = fw_cfg_modify_bytes_read(s, FW_CFG_FILE_FIRST + i,
+>>                                             data, len);
+>> @@ -926,10 +940,16 @@ FWCfgState *fw_cfg_init_io_dma(uint32_t iobase, uint32_t dma_iobase,
+>>      qdev_prop_set_uint32(dev, "dma_iobase", dma_iobase);
+>>      if (!dma_requested) {
+>>          qdev_prop_set_bit(dev, "dma_enabled", false);
+>>      }
+>>  
+>> +    /* Once we expose the "file_slots" property to callers of
+>> +     * fw_cfg_init_io_dma(), the following setting should become conditional on
+>> +     * the input parameter being lower than the current value of the property.
+>> +     */
+>> +    qdev_prop_set_uint32(dev, "file_slots", FW_CFG_FILE_SLOTS_TRAD);
+>> +
+>>      fw_cfg_init1(dev);
+>>      s = FW_CFG(dev);
+>>  
+>>      if (s->dma_enabled) {
+>>          /* 64 bits for the address field */
+>> @@ -963,10 +983,17 @@ FWCfgState *fw_cfg_init_mem_wide(hwaddr ctl_addr,
+>>      qdev_prop_set_uint32(dev, "data_width", data_width);
+>>      if (!dma_requested) {
+>>          qdev_prop_set_bit(dev, "dma_enabled", false);
+>>      }
+>>  
+>> +    /* Once we expose the "file_slots" property to callers of
+>> +     * fw_cfg_init_mem_wide(), the following setting should become conditional
+>> +     * on the input parameter being lower than the current value of the
+>> +     * property. Refer to fw_cfg_init_io_dma().
+>> +     */
+>> +    qdev_prop_set_uint32(dev, "file_slots", FW_CFG_FILE_SLOTS_TRAD);
+> both above cases of qdev_prop_set_uint32() could be replaced by
+> compat property for fwcfg device which would clamp "file_slots"
+> to old value for old machine types in a cleaner way.
 
-Same again but with add2_i32.
+The unconditional qdev_prop_set_uint32() call is already replaced, in
+fw_cfg_init_io_dma(), in the next patch, and the compat properties are
+added in the patch after it.
 
-> loading test image testcases.aarch64/insn_MOVI_MOVK_MOVN_MOVZ__INC.risu.b=
-in...
+The current approach is:
+- patch #2 adds the property with the raised default, but clamps it
+  down in code that calls fw_cfg_init1() directly
+- patch #3 propagates the clamping-down a little bit outwards, towards
+  board code, but only in the IO-port mapped case,
+- patch #4 adds the 2.8 compat props and raises the limit in 2.9 pc
+  board code (i.e., 2.9 pc opts in)
 
+The point is that
+(a) no old machine type should see any change
+(b) even for new machine types, the higher file slot count is opt-in for
+    board code (i.e., it shouldn't affect callers of
+    fw_cfg_init_mem_wide() and fw_cfg_init_io())
 
-> 0x000000400080be2c:  6f01e7a0      movi v0.2d, #0xffffffff00ff
-> 0x000000400080be30:  00005af0      unallocated (Unallocated)
+The qdev_prop_set_uint32() call that unconditionally remains in
+fw_cfg_init_mem_wide() at the end of this series is for ensuring (b).
 
->  ---- 000000400080be2c 0000000000000000 0000000000000000
->  movi_i64 tmp2,$0xffffffff00ff
->  mov_i64 tmp3,tmp2                                dead: 1
->  st_i64 tmp3,env,$0x838
->  st_i64 tmp3,env,$0x840                           dead: 0
+The "hw/arm/virt.c" board calls fw_cfg_init_mem_wide(), and that board
+should not receive the increased fw_cfg file count even in 2.9+ (to
+which the compat props would not apply).
 
-> OUT: [size=3D72]
-> 0x5561a8beb0:  b85f8274      ldur w20, [x19, #-8]
-> 0x5561a8beb4:  350001b4      cbnz w20, #+0x34 (addr 0x5561a8bee8)
-> 0x5561a8beb8:  929fe014      mov x20, #0xffffffffffff00ff
+In order to remove the unconditional property setting from
+fw_cfg_init_mem_wide() too, I'd either have to modify the
+fw_cfg_init_mem_wide() prototype and also the call site in
+"hw/arm/virt.c", or we'd have to carry forward the compat property to
+2.9 and later, indefinitely.
 
-Generated move with wrong constant value...
+I'm open to reworking this code, but both goals (a) and (b) should be
+considered in any alternative implementation.
 
-> loading test image testcases.aarch64/insn_UCVTFv_UCVTFvf_UCVTFvis_UCVTFv_=
-RES1__INC.risu.bin...
-> starting apprentice image at 0x4000801000
-> Executed 100 test instructions (pc=3D0x400080158c).Executed 200 test inst=
-ructions (pc=3D0x4000801b10).Executed 300 test instructions (pc=3D0x4000802=
-08c).Executed 400 test instructions (pc=3D0x40008022c8).Executed 500 test i=
-nstructions (pc=3D0x4000802880).Executed 600 test instructions (pc=3D0x4000=
-802e10).Executed 700 test instructions (pc=3D0x4000803034).Executed 800 tes=
-t instructions (pc=3D0x40008035a8).----------------
-> IN:
-> 0x0000004000803a74:  6f01e6fc      movi v28.2d, #0xffff00ffffff
-> 0x0000004000803a78:  00005af0      unallocated (Unallocated)
+Thanks!
+Laszlo
 
->  movi_i64 tmp2,$0xffff00ffffff
-
-> OUT: [size=3D72]
-> 0x555c897290:  b85f8274      ldur w20, [x19, #-8]
-> 0x555c897294:  350001b4      cbnz w20, #+0x34 (addr 0x555c8972c8)
-> 0x555c897298:  92bfe014      mov x20, #0xffffffff00ffffff
-
-Same thing again.
-
-So there's two bugs here, one in handling of add2 in the
-backend, and one in constant loading.
-
-thanks
--- PMM
+> 
+>> +
+>>      fw_cfg_init1(dev);
+>>  
+>>      sbd = SYS_BUS_DEVICE(dev);
+>>      sysbus_mmio_map(sbd, 0, ctl_addr);
+>>      sysbus_mmio_map(sbd, 1, data_addr);
+>> @@ -1012,23 +1039,56 @@ static const TypeInfo fw_cfg_info = {
+>>      .abstract      = true,
+>>      .instance_size = sizeof(FWCfgState),
+>>      .class_init    = fw_cfg_class_init,
+>>  };
+>>  
+>> +static void fw_cfg_file_slots_allocate(FWCfgState *s, Error **errp)
+>> +{
+>> +    uint16_t file_slots_max;
+>> +
+>> +    if (fw_cfg_file_slots(s) < FW_CFG_FILE_SLOTS_TRAD) {
+>> +        error_setg(errp, "\"file_slots\" must be at least 0x%x",
+>> +                   FW_CFG_FILE_SLOTS_TRAD);
+>> +        return;
+>> +    }
+>> +
+>> +    /* (UINT16_MAX & FW_CFG_ENTRY_MASK) is the highest inclusive selector value
+>> +     * that we permit. The actual (exclusive) value coming from the
+>> +     * configuration is (FW_CFG_FILE_FIRST + fw_cfg_file_slots(s)). */
+>> +    file_slots_max = (UINT16_MAX & FW_CFG_ENTRY_MASK) - FW_CFG_FILE_FIRST + 1;
+>> +    if (fw_cfg_file_slots(s) > file_slots_max) {
+>> +        error_setg(errp, "\"file_slots\" must not exceed 0x%" PRIx16,
+>> +                   file_slots_max);
+>> +        return;
+>> +    }
+>> +
+>> +    s->entries[0] = g_new0(FWCfgEntry, fw_cfg_max_entry(s));
+>> +    s->entries[1] = g_new0(FWCfgEntry, fw_cfg_max_entry(s));
+>> +    s->entry_order = g_new0(int, fw_cfg_max_entry(s));
+>> +}
+>>  
+>>  static Property fw_cfg_io_properties[] = {
+>>      DEFINE_PROP_UINT32("iobase", FWCfgIoState, iobase, -1),
+>>      DEFINE_PROP_UINT32("dma_iobase", FWCfgIoState, dma_iobase, -1),
+>>      DEFINE_PROP_BOOL("dma_enabled", FWCfgIoState, parent_obj.dma_enabled,
+>>                       true),
+>> +    DEFINE_PROP_UINT32("file_slots", FWCfgIoState, parent_obj.file_slots,
+>> +                       FW_CFG_FILE_SLOTS_DFLT),
+>>      DEFINE_PROP_END_OF_LIST(),
+>>  };
+>>  
+>>  static void fw_cfg_io_realize(DeviceState *dev, Error **errp)
+>>  {
+>>      FWCfgIoState *s = FW_CFG_IO(dev);
+>>      SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
+>> +    Error *local_err = NULL;
+>> +
+>> +    fw_cfg_file_slots_allocate(FW_CFG(s), &local_err);
+>> +    if (local_err) {
+>> +        error_propagate(errp, local_err);
+>> +        return;
+>> +    }
+>>  
+>>      /* when using port i/o, the 8-bit data register ALWAYS overlaps
+>>       * with half of the 16-bit control register. Hence, the total size
+>>       * of the i/o region used is FW_CFG_CTL_SIZE */
+>>      memory_region_init_io(&s->comb_iomem, OBJECT(s), &fw_cfg_comb_mem_ops,
+>> @@ -1061,18 +1121,27 @@ static const TypeInfo fw_cfg_io_info = {
+>>  
+>>  static Property fw_cfg_mem_properties[] = {
+>>      DEFINE_PROP_UINT32("data_width", FWCfgMemState, data_width, -1),
+>>      DEFINE_PROP_BOOL("dma_enabled", FWCfgMemState, parent_obj.dma_enabled,
+>>                       true),
+>> +    DEFINE_PROP_UINT32("file_slots", FWCfgMemState, parent_obj.file_slots,
+>> +                       FW_CFG_FILE_SLOTS_DFLT),
+>>      DEFINE_PROP_END_OF_LIST(),
+>>  };
+>>  
+>>  static void fw_cfg_mem_realize(DeviceState *dev, Error **errp)
+>>  {
+>>      FWCfgMemState *s = FW_CFG_MEM(dev);
+>>      SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
+>>      const MemoryRegionOps *data_ops = &fw_cfg_data_mem_ops;
+>> +    Error *local_err = NULL;
+>> +
+>> +    fw_cfg_file_slots_allocate(FW_CFG(s), &local_err);
+>> +    if (local_err) {
+>> +        error_propagate(errp, local_err);
+>> +        return;
+>> +    }
+>>  
+>>      memory_region_init_io(&s->ctl_iomem, OBJECT(s), &fw_cfg_ctl_mem_ops,
+>>                            FW_CFG(s), "fwcfg.ctl", FW_CFG_CTL_SIZE);
+>>      sysbus_init_mmio(sbd, &s->ctl_iomem);
+>>  
+> 
