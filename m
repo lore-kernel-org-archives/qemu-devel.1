@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58183)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59253)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cEEm1-0003RJ-RE
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 07:23:06 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cEEoZ-0006Mi-SD
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 07:25:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cEElx-0006mh-JT
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 07:23:05 -0500
-Received: from indium.canonical.com ([91.189.90.7]:45925)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cEElx-0006mZ-Dn
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 07:23:01 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cEElt-0003YE-3m
-	for <qemu-devel@nongnu.org>; Tue, 06 Dec 2016 12:22:57 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C1B4E2E9C38
-	for <qemu-devel@nongnu.org>; Tue,  6 Dec 2016 12:01:18 +0000 (UTC)
+	(envelope-from <alex.bennee@linaro.org>) id 1cEEoW-0007qm-9s
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 07:25:43 -0500
+Received: from mail-wm0-f42.google.com ([74.125.82.42]:35187)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cEEoV-0007jZ-P3
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 07:25:40 -0500
+Received: by mail-wm0-f42.google.com with SMTP id a197so126463279wmd.0
+	for <qemu-devel@nongnu.org>; Tue, 06 Dec 2016 04:25:18 -0800 (PST)
+References: <1479906121-12211-1-git-send-email-rth@twiddle.net>
+	<1479906121-12211-5-git-send-email-rth@twiddle.net>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <1479906121-12211-5-git-send-email-rth@twiddle.net>
+Date: Tue, 06 Dec 2016 12:24:15 +0000
+Message-ID: <87oa0pz1n4.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 06 Dec 2016 11:46:37 -0000
-From: Julian Brown <1647683@bugs.launchpad.net>
-Reply-To: Bug 1647683 <1647683@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20161206113915.26308.72810.malonedeb@wampee.canonical.com>
-Message-Id: <20161206114637.26046.68333.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1647683] Re: Bad interaction between tb flushing
- & gdb stub
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v4 04/64] tcg/aarch64: Implement field
+ extraction opcodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,74 +31,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org, Claudio Fontana <claudio.fontana@huawei.com>
 
-(FAOD, the crashes happen without Valgrind too, and the above backtrace
-may be a red herring.)
 
--- =
+Richard Henderson <rth@twiddle.net> writes:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1647683
+> Signed-off-by: Richard Henderson <rth@twiddle.net>
+> ---
+>  tcg/aarch64/tcg-target.h     |  8 ++++----
+>  tcg/aarch64/tcg-target.inc.c | 14 ++++++++++++++
+>  2 files changed, 18 insertions(+), 4 deletions(-)
+>
+> diff --git a/tcg/aarch64/tcg-target.h b/tcg/aarch64/tcg-target.h
+> index 410c31b..4a74bd8 100644
+> --- a/tcg/aarch64/tcg-target.h
+> +++ b/tcg/aarch64/tcg-target.h
+> @@ -63,8 +63,8 @@ typedef enum {
+>  #define TCG_TARGET_HAS_nand_i32         0
+>  #define TCG_TARGET_HAS_nor_i32          0
+>  #define TCG_TARGET_HAS_deposit_i32      1
+> -#define TCG_TARGET_HAS_extract_i32      0
+> -#define TCG_TARGET_HAS_sextract_i32     0
+> +#define TCG_TARGET_HAS_extract_i32      1
+> +#define TCG_TARGET_HAS_sextract_i32     1
+>  #define TCG_TARGET_HAS_movcond_i32      1
+>  #define TCG_TARGET_HAS_add2_i32         1
+>  #define TCG_TARGET_HAS_sub2_i32         1
+> @@ -95,8 +95,8 @@ typedef enum {
+>  #define TCG_TARGET_HAS_nand_i64         0
+>  #define TCG_TARGET_HAS_nor_i64          0
+>  #define TCG_TARGET_HAS_deposit_i64      1
+> -#define TCG_TARGET_HAS_extract_i64      0
+> -#define TCG_TARGET_HAS_sextract_i64     0
+> +#define TCG_TARGET_HAS_extract_i64      1
+> +#define TCG_TARGET_HAS_sextract_i64     1
+>  #define TCG_TARGET_HAS_movcond_i64      1
+>  #define TCG_TARGET_HAS_add2_i64         1
+>  #define TCG_TARGET_HAS_sub2_i64         1
+> diff --git a/tcg/aarch64/tcg-target.inc.c b/tcg/aarch64/tcg-target.inc.c
+> index 1939d35..c0e9890 100644
+> --- a/tcg/aarch64/tcg-target.inc.c
+> +++ b/tcg/aarch64/tcg-target.inc.c
+> @@ -1640,6 +1640,16 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc,
+>          tcg_out_dep(s, ext, a0, REG0(2), args[3], args[4]);
+>          break;
+>
+> +    case INDEX_op_extract_i64:
+> +    case INDEX_op_extract_i32:
+> +        tcg_out_ubfm(s, ext, a0, a1, a2, a2 + args[3] - 1);
+> +        break;
+> +
+> +    case INDEX_op_sextract_i64:
+> +    case INDEX_op_sextract_i32:
+> +        tcg_out_sbfm(s, ext, a0, a1, a2, a2 + args[3] - 1);
+> +        break;
+> +
 
-Title:
-  Bad interaction between tb flushing & gdb stub
+This isn't right is it? As I'm reading it extract takes from a
+offset+len from the source register to low bits of the destination
+register. The Bitfield Move instructions are the other way around,
+moving from the low order bits in the source register to an offset+len
+in the destination.
 
-Status in QEMU:
-  New
+>      case INDEX_op_add2_i32:
+>          tcg_out_addsub2(s, TCG_TYPE_I32, a0, a1, REG0(2), REG0(3),
+>                          (int32_t)args[4], args[5], const_args[4],
+> @@ -1785,6 +1795,10 @@ static const TCGTargetOpDef aarch64_op_defs[] = {
+>
+>      { INDEX_op_deposit_i32, { "r", "0", "rZ" } },
+>      { INDEX_op_deposit_i64, { "r", "0", "rZ" } },
+> +    { INDEX_op_extract_i32, { "r", "r" } },
+> +    { INDEX_op_extract_i64, { "r", "r" } },
+> +    { INDEX_op_sextract_i32, { "r", "r" } },
+> +    { INDEX_op_sextract_i64, { "r", "r" } },
+>
+>      { INDEX_op_add2_i32, { "r", "r", "rZ", "rZ", "rA", "rMZ" } },
+>      { INDEX_op_add2_i64, { "r", "r", "rZ", "rZ", "rA", "rMZ" } },
 
-Bug description:
-  I have been working on a series of patches for ARM big-endian system
-  mode support, using QEMU as a bare-metal simulator for the GDB test
-  suite. At some point I realised that these tests were not running
-  reliably on the QEMU master branch, even without my patches applied.
-  (I.e., in little-endian mode.)
 
-  Running QEMU under GDB in the test harness via Valgrind, using
-  something akin to:
-
-  (gdb) target remote | valgrind --tool=3Dmemcheck qemu-arm-system [...]
-
-  leads to intermittent (and quite hard-to-reproduce) segfaults in QEMU
-  of the form:
-
-  =3D=3D52333=3D=3D Process terminating with default action of signal 11 (S=
-IGSEGV)
-  =3D=3D52333=3D=3D  Access not within mapped region at address 0x24
-  =3D=3D52333=3D=3D    at 0x1D55F2: tb_page_remove (translate-all.c:1026)
-  =3D=3D52333=3D=3D    by 0x1D58B4: tb_phys_invalidate (translate-all.c:111=
-9)
-  =3D=3D52333=3D=3D    by 0x1D63AA: tb_invalidate_phys_page_range (translat=
-e-all.c:1519)
-  =3D=3D52333=3D=3D    by 0x1D66D7: tb_invalidate_phys_addr (translate-all.=
-c:1714)
-  =3D=3D52333=3D=3D    by 0x1CBA7F: breakpoint_invalidate (exec.c:704)
-  =3D=3D52333=3D=3D    by 0x1CC01F: cpu_breakpoint_remove_by_ref (exec.c:86=
-9)
-  =3D=3D52333=3D=3D    by 0x1CBF97: cpu_breakpoint_remove (exec.c:857)
-  =3D=3D52333=3D=3D    by 0x218FAA: gdb_breakpoint_remove (gdbstub.c:717)
-  =3D=3D52333=3D=3D    by 0x219E35: gdb_handle_packet (gdbstub.c:1035)
-  =3D=3D52333=3D=3D    by 0x21AF62: gdb_read_byte (gdbstub.c:1459)
-  =3D=3D52333=3D=3D    by 0x21B096: gdb_chr_receive (gdbstub.c:1672)
-  =3D=3D52333=3D=3D    by 0x3AF2BC: qemu_chr_be_write_impl (qemu-char.c:419)
-
-  These crashes didn't happen on a 2.6-era QEMU, so I bisected and
-  discovered the commit 3359baad36889b83df40b637ed993a4b816c4906 ("tcg:
-  Make tb_flush() thread safe") appears to be the thing that triggers
-  this intermittent failure. Reverting the patch on the branch tip makes
-  the crashes go away.
-
-  Unfortunately I don't currently have a way to trigger the segfaults
-  outside of Mentor Graphics's test infrastructure, which I can't share.
-
-  Does anyone know a reason that this might be happening, or suggestions
-  of how I might further debug this? Maybe a missed tb flush in the gdb
-  stub code, somewhere?
-
-  Thanks!
-
-  Julian
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1647683/+subscriptions
+--
+Alex Bennée
