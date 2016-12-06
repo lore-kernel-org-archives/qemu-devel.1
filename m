@@ -1,21 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36465)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42141)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cEHbZ-0004EO-UZ
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 10:24:36 -0500
+	(envelope-from <groug@kaod.org>) id 1cEHs0-00087u-3L
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 10:41:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cEHbY-0004Jx-KS
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 10:24:29 -0500
-Date: Tue, 6 Dec 2016 15:24:15 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20161206152415.GF2125@work-vm>
-References: <1479555831-30960-1-git-send-email-zhang.zhanghailiang@huawei.com>
-	<20161206134211.GD4990@noname.str.redhat.com>
+	(envelope-from <groug@kaod.org>) id 1cEHru-00037u-DC
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 10:41:28 -0500
+Received: from 001b2d01.pphosted.com ([148.163.156.1]:34005
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cEHru-00037e-4B
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 10:41:22 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
+	uB6Faefc031729
+	for <qemu-devel@nongnu.org>; Tue, 6 Dec 2016 10:41:18 -0500
+Received: from e37.co.us.ibm.com (e37.co.us.ibm.com [32.97.110.158])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 275x2agudf-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 06 Dec 2016 10:41:17 -0500
+Received: from localhost
+	by e37.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
+	Tue, 6 Dec 2016 08:41:17 -0700
+From: Greg Kurz <groug@kaod.org>
+Date: Tue, 06 Dec 2016 16:41:12 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20161206134211.GD4990@noname.str.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] migration: re-active images when migration
- fails to complete
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <148103887228.22326.478406873609299999.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+Subject: [Qemu-devel] [PATCH] qdev: fix the order compat and global
+ properties are applied
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,136 +39,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: zhanghailiang <zhang.zhanghailiang@huawei.com>, amit.shah@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, quintela@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Cornelia Huck <cornelia.huck@de.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-* Kevin Wolf (kwolf@redhat.com) wrote:
-> Am 19.11.2016 um 12:43 hat zhanghailiang geschrieben:
-> > commit fe904ea8242cbae2d7e69c052c754b8f5f1ba1d6 fixed a case
-> > which migration aborted QEMU because it didn't regain the control
-> > of images while some errors happened.
-> > 
-> > Actually, we have another case in that error path to abort QEMU
-> > because of the same reason:
-> >     migration_thread()
-> >         migration_completion()
-> >            bdrv_inactivate_all() ----------------> inactivate images
-> >            qemu_savevm_state_complete_precopy()
-> >                socket_writev_buffer() --------> error because destination fails
-> >              qemu_fflush() -------------------> set error on migration stream
-> >            qemu_mutex_unlock_iothread() ------> unlock
-> >     qmp_migrate_cancel() ---------------------> user cancelled migration
-> >         migrate_set_state() ------------------> set migrate CANCELLING
-> 
-> Important to note here: qmp_migrate_cancel() is executed by a concurrent
-> thread, it doesn't depend on any code paths in migration_completion().
-> 
-> >     migration_completion() -----------------> go on to fail_invalidate
-> >         if (s->state == MIGRATION_STATUS_ACTIVE) -> Jump this branch
-> >     migration_thread() -----------------------> break migration loop
-> >       vm_start() -----------------------------> restart guest with inactive
-> >                                                 images
-> > We failed to regain the control of images because we only regain it
-> > while the migration state is "active", but here users cancelled the migration
-> > when they found some errors happened (for example, libvirtd daemon is shutdown
-> > in destination unexpectedly).
-> > 
-> > Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
-> > ---
-> >  migration/migration.c | 3 ++-
-> >  1 file changed, 2 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/migration/migration.c b/migration/migration.c
-> > index f498ab8..0c1ee6d 100644
-> > --- a/migration/migration.c
-> > +++ b/migration/migration.c
-> > @@ -1752,7 +1752,8 @@ fail_invalidate:
-> >      /* If not doing postcopy, vm_start() will be called: let's regain
-> >       * control on images.
-> >       */
-> > -    if (s->state == MIGRATION_STATUS_ACTIVE) {
-> 
-> This if condition tries to check whether we ran the code path that
-> called bdrv_inactivate_all(), so that we only try to reactivate images
-> it if we really inactivated them first.
-> 
-> The problem with it is that it ignores a possible concurrent
-> modification of s->state.
-> 
-> > +    if (s->state == MIGRATION_STATUS_ACTIVE ||
-> > +        s->state == MIGRATION_STATUS_CANCELLING) {
-> 
-> This adds another state that we could end up with with a concurrent
-> modification, so that even in this case we undo the inactivation.
-> 
-> However, it is no longer limited to the cases where we inactivated the
-> image. It also applies to other code paths (like the postcopy one) where
-> we didn't inactivate images.
-> 
-> What saves the patch is that bdrv_invalidate_cache() is a no-op for
-> block devices that aren't inactivated, so calling it more often than
-> necessary is okay.
-> 
-> But then, if we're going to rely on this, it would be much better to
-> just remove the if altogether. I can't say whether there are any other
-> possible values of s->state that we should consider, and by removing the
-> if we would be guaranteed to catch all of them.
-> 
-> If we don't want to rely on it, just keep a local bool that remembers
-> whether we inactivated images and check that here.
-> 
-> >          Error *local_err = NULL;
-> >  
-> >          bdrv_invalidate_cache_all(&local_err);
-> 
-> So in summary, this is a horrible patch because it checks the wrong
-> thing, and for I can't really say if it covers everything it needs to
-> cover, but arguably it happens to correctly fix the outcome of a
-> previously failing case.
-> 
-> Normally I would reject such a patch and require a clean solution, but
-> then we're on the day of -rc3, so if you can't send v2 right away, we
-> might not have the time for it.
-> 
-> Tough call...
+The current code recursively applies global properties from child up to
+parent types. This can cause properties passed with the -global option to
+be silently overridden by internal compat properties.
 
-Hmm, this case is messy; I created this function having split it out
-of the main loop a couple of years back but it did get more messy
-with more s->state checks; as far as I can tell it's always
-done the transition to COMPLETED at the end well after the locked
-section, so there's always been that chance that cancellation sneaks
-in just before or just after the locked section.
+This is exactly what happens with virtio-*-pci drivers since commit:
 
-Some of the bad cases that can happen:
-   a) A cancel sneaks in after the ACTIVE check but before or after
-     the locked section;  should we reactivate the disks? Well that
-     depends on whether the destination actually got the full migration
-     stream - we don't know!
-        If the destination actually starts running we must not reactivate
-        the disk on the source even if the CPU is stopped.
+"9a4c0e220d8a hw/virtio-pci: fix virtio behaviour"
 
-   b) If the bdrv_inactive_all fails for one device, but the others 
-      are fine, we go down the fail: label and don't reactivate, so
-      the source dies even though it might have been mostly OK.
+Passing -device virtio-blk-pci.disable-modern=off has no effect on 2.6
+machine types because the internal virtio-pci.disable-modern=on compat
+property always prevail.
 
-We can move the _lock to before the check of s->state at the top,
-which would stop the cancel sneaking in early.
-In the case where postcopy was never enabled (!migrate_postcopy_ram())
-we can move the COMPLETED transition into the lock as well; so I think
-then we kind of become safe.
-In the case where postcopy was enabled I think we can do the COMPLETED
-transition before waiting for the return path to close - I think but
-I need to think more about that.
-And there seem to be some dodgy cases where we call the invalidate
-there after a late postcopy failure; that's bad, we shouldn't reactivate
-the source disks after going into postcopy.
+This patch fixes the issue by reversing the logic: we now go through the
+global property list and, for each property, we check if it is applicable
+to the device.
 
-So, in summary; this function is a mess - it needs a much bigger
-fix than this patch.
+This result in compat properties being applied first, in the order they
+appear in the HW_COMPAT_* macros, followed by global properties, in they
+order appear on the command line.
 
-Dave
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+ hw/core/qdev-properties.c |   15 ++-------------
+ 1 file changed, 2 insertions(+), 13 deletions(-)
 
-> Kevin
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+index 5972108b2699..93a4dfeb0836 100644
+--- a/hw/core/qdev-properties.c
++++ b/hw/core/qdev-properties.c
+@@ -1089,8 +1089,7 @@ int qdev_prop_check_globals(void)
+     return ret;
+ }
+ 
+-static void qdev_prop_set_globals_for_type(DeviceState *dev,
+-                                           const char *typename)
++void qdev_prop_set_globals(DeviceState *dev)
+ {
+     GList *l;
+ 
+@@ -1098,7 +1097,7 @@ static void qdev_prop_set_globals_for_type(DeviceState *dev,
+         GlobalProperty *prop = l->data;
+         Error *err = NULL;
+ 
+-        if (strcmp(typename, prop->driver) != 0) {
++        if (object_dynamic_cast(OBJECT(dev), prop->driver) == NULL) {
+             continue;
+         }
+         prop->used = true;
+@@ -1120,16 +1119,6 @@ static void qdev_prop_set_globals_for_type(DeviceState *dev,
+     }
+ }
+ 
+-void qdev_prop_set_globals(DeviceState *dev)
+-{
+-    ObjectClass *class = object_get_class(OBJECT(dev));
+-
+-    do {
+-        qdev_prop_set_globals_for_type(dev, object_class_get_name(class));
+-        class = object_class_get_parent(class);
+-    } while (class);
+-}
+-
+ /* --- 64bit unsigned int 'size' type --- */
+ 
+ static void get_size(Object *obj, Visitor *v, const char *name, void *opaque,
