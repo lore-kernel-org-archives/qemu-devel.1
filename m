@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49305)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49731)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cEOM8-0000If-5w
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 17:37:01 -0500
+	(envelope-from <dje@google.com>) id 1cEONx-0001aV-3B
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 17:38:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cEOM7-0001BU-5C
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 17:37:00 -0500
-References: <20161202192223.15153-1-eblake@redhat.com>
-	<20161202192223.15153-3-eblake@redhat.com>
-	<42b3c9e3-7c0d-4ec2-4257-1331f16d2c04@redhat.com>
-	<50585dad-8418-f52c-8e19-418d8a064131@redhat.com>
-	<110c4d8c-c87c-a8b5-04e0-985672e24337@redhat.com>
-	<227dbbb5-0486-281b-6668-1dc88cfb6d91@redhat.com>
-	<1d974cec-fefe-e4c9-f2b0-1d8231b229cd@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <7e0db4e1-92b9-d14d-9785-f98379cf36f9@redhat.com>
-Date: Tue, 6 Dec 2016 16:36:48 -0600
+	(envelope-from <dje@google.com>) id 1cEONt-0001Sq-SU
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 17:38:53 -0500
+Received: from mail-io0-f174.google.com ([209.85.223.174]:35329)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <dje@google.com>) id 1cEONt-0001PU-Mu
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 17:38:49 -0500
+Received: by mail-io0-f174.google.com with SMTP id a124so680489932ioe.2
+	for <qemu-devel@nongnu.org>; Tue, 06 Dec 2016 14:38:28 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1d974cec-fefe-e4c9-f2b0-1d8231b229cd@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="wwAS008smMo2XeOSVpbxMLmRimTMafhX2"
-Subject: Re: [Qemu-devel] [PATCH v3 2/5] blkdebug: Add pass-through
- write_zero and discard support
+In-Reply-To: <b7104b2b-eb57-1fcd-7dbd-f0b5138915be@twiddle.net>
+References: <001a113ec6308021110543008630@google.com>
+	<b7104b2b-eb57-1fcd-7dbd-f0b5138915be@twiddle.net>
+From: Doug Evans <dje@google.com>
+Date: Tue, 6 Dec 2016 14:36:46 -0800
+Message-ID: <CADPb22RE55fQGf97RWpJ19bAhet7RUYi4BNEk_Y=ZC7SpJ2L0w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH] x86: Fix eflags tracking for syscall insn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,90 +28,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org
+To: Richard Henderson <rth@twiddle.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---wwAS008smMo2XeOSVpbxMLmRimTMafhX2
-From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org
-Message-ID: <7e0db4e1-92b9-d14d-9785-f98379cf36f9@redhat.com>
-Subject: Re: [PATCH v3 2/5] blkdebug: Add pass-through write_zero and discard
- support
-References: <20161202192223.15153-1-eblake@redhat.com>
- <20161202192223.15153-3-eblake@redhat.com>
- <42b3c9e3-7c0d-4ec2-4257-1331f16d2c04@redhat.com>
- <50585dad-8418-f52c-8e19-418d8a064131@redhat.com>
- <110c4d8c-c87c-a8b5-04e0-985672e24337@redhat.com>
- <227dbbb5-0486-281b-6668-1dc88cfb6d91@redhat.com>
- <1d974cec-fefe-e4c9-f2b0-1d8231b229cd@redhat.com>
-In-Reply-To: <1d974cec-fefe-e4c9-f2b0-1d8231b229cd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Tue, Dec 6, 2016 at 11:43 AM, Richard Henderson <rth@twiddle.net> wrote:
+> On 12/06/2016 09:13 AM, Doug Evans wrote:
+>> @@ -7104,6 +7104,10 @@ static target_ulong disas_insn(CPUX86State *env,
+>> DisasContext *s,
+>>          gen_update_cc_op(s);
+>>          gen_jmp_im(pc_start - s->cs_base);
+>>          gen_helper_syscall(cpu_env, tcg_const_i32(s->pc - pc_start));
+>> +        /* condition codes are modified only in long mode */
+>> +        if (s->lma) {
+>> +            set_cc_op(s, CC_OP_EFLAGS);
+>> +        }
+>
+> Since we will definitely end the TranslationBlock here, I'm a bit confused as
+> to how we get things wrong here.  Is this simply a visual inspection of the
+> code, or do you have a test case?
 
-On 12/06/2016 04:23 PM, Max Reitz wrote:
-> On 06.12.2016 23:18, Eric Blake wrote:
->> On 12/06/2016 04:14 PM, Max Reitz wrote:
->>> On 06.12.2016 23:12, Eric Blake wrote:
->>>> On 12/06/2016 04:00 PM, Max Reitz wrote:
->>>>
->>>>>> Tested by setting up an NBD server with export 'foo', then invokin=
-g:
->>>>>> $ ./qemu-io
->>>>>> qemu-io> open -o driver=3Dblkdebug blkdebug::nbd://localhost:10809=
-/foo
->>>>
->>>> By the way, I'd LOVE to know if there is a way to write a qemu-io
->>>> command line that would do this connection automatically (so that I =
-can
->>>> batch commands up front and benefit from the shell's history) rather=
+Visual inspection and looking at what other code does.
+[eflags handling is very clever, but a bit obscure - I'm sure just a
+bit more documentation
+would help but I dunno if it's "just me" ...]
 
->>>> than having to issue an 'open' after the fact.  I tried various
->>>> incantations with --object and --image-opts, but got stumped.
->>>
->>> Can't you just do qemu-io -c 'open'?
->>
->> I suppose that would get command-line history.  But I still want
->> interactive mode.  The moment you use -c, ALL commands get run
->> back-to-back without stopping, so I'd have to add additional -c
->> 'read'/'write' commands up front. I like interactive mode (open
->> pre-connected, now let me explore the image at will).
->=20
-> Well, the usual --image-opts version would be:
->=20
-> ./qemu-io --image-opts driver=3Dblkdebug,image.driver=3Dnbd,\
-> image.host=3Dlocalhost,image.export=3Dfoo
+> In gen_update_cc_op, we store the current version of CC_OP back to ENV.  This
+> lets helper_syscall (via cpu_compute_eflags) compute the proper value.  We then
+> store the updated version back via cpu_load_eflags, which sets ENV->CC_OP to
+> CC_OP_EFLAGS.
+>
+> So far so good.
+>
+> The only way I could see things going wrong is if we were to use DC->CC_OP
+> after the call to the helper.  But since we've (1) synced the value first and
+> (2) end the TB via gen_eob, I don't see how we would.
+>
+> If any change is required, I think better would be
+>
+> +  /* The syscall helper may read and modify EFLAGS.  */
+>    gen_update_cc_op(s);
+> +  set_cc_op(s, CC_OP_DYNAMIC);
+>    gen_jmp_im(pc_start - s->cs_base);
+>    gen_helper_syscall(cpu_env, tcg_const_i32(s->pc - pc_start));
+>
+> This will tell subsequent code within the translator that it must re-read
+> ENV->CC_OP in order to compute the flags.
 
-Thanks, that appears to do the trick! I think I was getting confused by
-trying 'file.driver' instead of 'image.driver', or maybe it was because
-I was trying 'image.align' to set the blkdebug alignment where just
-plain 'align' works once you are in --image-opts mode, or some such
-problem on my end.  [Maybe I shouldn't be testing patches late at night,
-either...]
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---wwAS008smMo2XeOSVpbxMLmRimTMafhX2
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYRz2AAAoJEKeha0olJ0NqLssH/Aju/FGm3FR4kSshxket+faj
-xdJ/z6UeVHtta1U6SWIVunMLv/36eVDRe74zK5xhgClIYv4tYHO4ZHr8KgGtSz+A
-zLLBIt4cegik/J+YN9GdwY6LWyO3MlNXwPMIYgd2Dza51dgCDkaOxR35Fck0bvHa
-pNHJMxr1ezbUHhjdKtCevdohjq+XDZCEJK/oFZkf4KbffaRp/3by0VshdoFkU+Jf
-WQg2U7ODL3xdeT+dANJAqB1dKKr7RIyRGWA50fJGOMkULpnTjXqX6RsbHDP5gxKa
-LTYENxbtcwSHqrouctR2kmhjSPXrcXC0xQel5MFEK0SDKJBfoJf9YLfcQ0p2iJU=
-=45qW
------END PGP SIGNATURE-----
-
---wwAS008smMo2XeOSVpbxMLmRimTMafhX2--
+Ah.
