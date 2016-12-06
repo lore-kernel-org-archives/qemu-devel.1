@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44684)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44693)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cEGWI-0004Vl-4g
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cEGWI-0004WR-Vz
 	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 09:14:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cEGWC-0006H3-EP
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cEGWF-0006Hp-RJ
 	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 09:14:58 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55252)
+Received: from mx1.redhat.com ([209.132.183.28]:51464)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1cEGWC-0006Gs-93
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 09:14:52 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+	id 1cEGWF-0006HY-L7
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 09:14:55 -0500
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com
+	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6B0FB31B315
-	for <qemu-devel@nongnu.org>; Tue,  6 Dec 2016 14:14:51 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id DBAE280F9B
+	for <qemu-devel@nongnu.org>; Tue,  6 Dec 2016 14:14:54 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue,  6 Dec 2016 17:13:41 +0300
-Message-Id: <20161206141343.28044-16-marcandre.lureau@redhat.com>
+Date: Tue,  6 Dec 2016 17:13:42 +0300
+Message-Id: <20161206141343.28044-17-marcandre.lureau@redhat.com>
 In-Reply-To: <20161206141343.28044-1-marcandre.lureau@redhat.com>
 References: <20161206141343.28044-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v6 15/17] build-sys: use a generic TEXI2MAN rule
+Subject: [Qemu-devel] [PATCH v6 16/17] build-sys: add txt documentation rules
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,79 +36,85 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: eblake@redhat.com, armbru@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
+Build txt documentation, and install it.
+
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- Makefile  | 24 ------------------------
- rules.mak | 10 ++++++++++
- 2 files changed, 10 insertions(+), 24 deletions(-)
+ Makefile   | 12 +++++++++---
+ .gitignore |  1 +
+ 2 files changed, 10 insertions(+), 3 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index f2b9ef0784..d18bac1c31 100644
+index d18bac1c31..37d45ee21b 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -554,35 +554,11 @@ qemu-img-cmds.texi: $(SRC_PATH)/qemu-img-cmds.hx $(=
-SRC_PATH)/scripts/hxtool
- 	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -t < $< > $@,"GEN","=
-$@")
+@@ -81,7 +81,7 @@ Makefile: ;
+ configure: ;
 =20
- qemu.1: qemu-doc.texi qemu-options.texi qemu-monitor.texi qemu-monitor-i=
-nfo.texi
--	$(call quiet-command, \
--	  perl -Ww -- $(SRC_PATH)/scripts/texi2pod.pl $< qemu.pod && \
--	  $(POD2MAN) --section=3D1 --center=3D" " --release=3D" " qemu.pod > $@=
-, \
--	  "GEN","$@")
- qemu.1: qemu-option-trace.texi
--
- qemu-img.1: qemu-img.texi qemu-option-trace.texi qemu-img-cmds.texi
--	$(call quiet-command, \
--	  perl -Ww -- $(SRC_PATH)/scripts/texi2pod.pl $< qemu-img.pod && \
--	  $(POD2MAN) --section=3D1 --center=3D" " --release=3D" " qemu-img.pod =
-> $@, \
--	  "GEN","$@")
--
- fsdev/virtfs-proxy-helper.1: fsdev/virtfs-proxy-helper.texi
--	$(call quiet-command, \
--	  perl -Ww -- $(SRC_PATH)/scripts/texi2pod.pl $< fsdev/virtfs-proxy-hel=
-per.pod && \
--	  $(POD2MAN) --section=3D1 --center=3D" " --release=3D" " fsdev/virtfs-=
-proxy-helper.pod > $@, \
--	  "GEN","$@")
--
- qemu-nbd.8: qemu-nbd.texi qemu-option-trace.texi
--	$(call quiet-command, \
--	  perl -Ww -- $(SRC_PATH)/scripts/texi2pod.pl $< qemu-nbd.pod && \
--	  $(POD2MAN) --section=3D8 --center=3D" " --release=3D" " qemu-nbd.pod =
-> $@, \
--	  "GEN","$@")
--
- qemu-ga.8: qemu-ga.texi
--	$(call quiet-command, \
--	  perl -Ww -- $(SRC_PATH)/scripts/texi2pod.pl $< qemu-ga.pod && \
--	  $(POD2MAN) --section=3D8 --center=3D" " --release=3D" " qemu-ga.pod >=
- $@, \
--	  "GEN","$@")
+ .PHONY: all clean cscope distclean html info install install-doc \
+-	pdf recurse-all speed test dist msi FORCE
++	pdf txt recurse-all speed test dist msi FORCE
 =20
+ $(call set-vpath, $(SRC_PATH))
+=20
+@@ -90,7 +90,7 @@ LIBS+=3D-lz $(LIBS_TOOLS)
+ HELPERS-$(CONFIG_LINUX) =3D qemu-bridge-helper$(EXESUF)
+=20
+ ifdef BUILD_DOCS
+-DOCS=3Dqemu-doc.html qemu.1 qemu-img.1 qemu-nbd.8 qemu-ga.8
++DOCS=3Dqemu-doc.html qemu-doc.txt qemu.1 qemu-img.1 qemu-nbd.8 qemu-ga.8
+ ifdef CONFIG_VIRTFS
+ DOCS+=3Dfsdev/virtfs-proxy-helper.1
+ endif
+@@ -431,6 +431,7 @@ endif
+ install-doc: $(DOCS)
+ 	$(INSTALL_DIR) "$(DESTDIR)$(qemu_docdir)"
+ 	$(INSTALL_DATA) qemu-doc.html "$(DESTDIR)$(qemu_docdir)"
++	$(INSTALL_DATA) qemu-doc.txt "$(DESTDIR)$(qemu_docdir)"
+ ifdef CONFIG_POSIX
+ 	$(INSTALL_DIR) "$(DESTDIR)$(mandir)/man1"
+ 	$(INSTALL_DATA) qemu.1 "$(DESTDIR)$(mandir)/man1"
+@@ -538,6 +539,10 @@ TEXIFLAG=3D$(if $(V),,--quiet)
+ %.info: %.texi
+ 	$(call quiet-command,$(MAKEINFO) $(MAKEINFOFLAGS) $< -o $@,"GEN","$@")
+=20
++%.txt: %.texi
++	$(call quiet-command,LC_ALL=3DC $(MAKEINFO) $(MAKEINFOFLAGS) --no-heade=
+rs \
++	--plaintext $< -o $@,"GEN   $@")
++
+ %.pdf: %.texi
+ 	$(call quiet-command,texi2pdf $(TEXIFLAG) -I . $<,"GEN","$@")
+=20
+@@ -563,6 +568,7 @@ qemu-ga.8: qemu-ga.texi
  html: qemu-doc.html
  info: qemu-doc.info
-diff --git a/rules.mak b/rules.mak
-index f4839d2c38..c9739961a7 100644
---- a/rules.mak
-+++ b/rules.mak
-@@ -361,3 +361,13 @@ define unnest-vars
-         $(eval -include $(patsubst %.o,%.d,$(patsubst %.mo,%.d,$($v))))
-         $(eval $v :=3D $(filter-out %/,$($v))))
- endef
-+
-+TEXI2MAN =3D $(call quiet-command, \
-+	perl -Ww -- $(SRC_PATH)/scripts/texi2pod.pl $< $@.pod && \
-+	$(POD2MAN) --section=3D$(subst .,,$(suffix $@)) --center=3D" " --releas=
-e=3D" " $@.pod > $@, \
-+	"GEN","$@")
-+
-+%.1:
-+	$(call TEXI2MAN)
-+%.8:
-+	$(call TEXI2MAN)
+ pdf: qemu-doc.pdf
++txt: qemu-doc.txt
+=20
+ qemu-doc.html qemu-doc.info qemu-doc.pdf: \
+ 	qemu-img.texi qemu-nbd.texi qemu-options.texi qemu-option-trace.texi \
+@@ -661,7 +667,7 @@ help:
+ 	@echo  '  docker          - Help about targets running tests inside Doc=
+ker containers'
+ 	@echo  ''
+ 	@echo  'Documentation targets:'
+-	@echo  '  html info pdf'
++	@echo  '  html info pdf txt'
+ 	@echo  '                  - Build documentation in specified format'
+ 	@echo  ''
+ ifdef CONFIG_WIN32
+diff --git a/.gitignore b/.gitignore
+index 6f175b391e..e16bddc070 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -40,6 +40,7 @@
+ /qmp-marshal.c
+ /qemu-doc.html
+ /qemu-doc.info
++/qemu-doc.txt
+ /qemu-img
+ /qemu-nbd
+ /qemu-options.def
 --=20
 2.11.0
