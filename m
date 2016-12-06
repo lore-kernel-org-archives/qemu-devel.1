@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35156)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35345)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cEC6u-0000hD-AH
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 04:32:29 -0500
+	(envelope-from <david@redhat.com>) id 1cEC7L-00012H-66
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 04:32:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cEC6q-0008Rm-9y
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 04:32:28 -0500
-Received: from mail-ua0-f171.google.com ([209.85.217.171]:36828)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cEC6p-0008RZ-SX
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 04:32:24 -0500
-Received: by mail-ua0-f171.google.com with SMTP id b35so375220011uaa.3
-	for <qemu-devel@nongnu.org>; Tue, 06 Dec 2016 01:32:23 -0800 (PST)
+	(envelope-from <david@redhat.com>) id 1cEC7J-000095-Tu
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 04:32:55 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56430)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1cEC7J-00008s-Lk
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 04:32:53 -0500
+Received: from int-mx14.intmail.prod.int.phx2.redhat.com
+	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id AC80B66C8D
+	for <qemu-devel@nongnu.org>; Tue,  6 Dec 2016 09:32:52 +0000 (UTC)
+References: <1480713496-11213-1-git-send-email-ehabkost@redhat.com>
+	<1480713496-11213-16-git-send-email-ehabkost@redhat.com>
+	<df0f3ade-bd09-58a0-ac83-3775d4ab7c6c@redhat.com>
+	<20161205235745.GJ13060@thinpad.lan.raisama.net>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <862e80d2-d0f9-668f-d6ed-b25712a220c1@redhat.com>
+Date: Tue, 6 Dec 2016 10:32:48 +0100
 MIME-Version: 1.0
-In-Reply-To: <cb06a932a7c6b29bc6eb0d35f31766bfb0bba47f.1480962799.git.alistair.francis@xilinx.com>
-References: <cb06a932a7c6b29bc6eb0d35f31766bfb0bba47f.1480962799.git.alistair.francis@xilinx.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 6 Dec 2016 09:31:02 +0000
-Message-ID: <CAFEAcA8k++Q9ByEj_yynGW+N6sry4wNCB-=ASXtWuLHEBUxSHw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH for 2.8 v3 1/1] cadence_uart: Check baud
- rate generator and divider values on migration
+In-Reply-To: <20161205235745.GJ13060@thinpad.lan.raisama.net>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: base64
+Subject: Re: [Qemu-devel] [PATCH for-2.9 15/17] target-i386: Define static
+ "base" CPU model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,48 +36,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair23@gmail.com>, Prasad J Pandit <pjp@fedoraproject.org>, Huawei PSIRT <psirt@huawei.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, libvir-list@redhat.com, Jiri Denemark <jdenemar@redhat.com>
 
-On 5 December 2016 at 18:35, Alistair Francis
-<alistair.francis@xilinx.com> wrote:
-> The Cadence UART device emulator calculates speed by dividing the
-> baud rate by a 'baud rate generator' & 'baud rate divider' value.
-> The device specification defines these register values to be
-> non-zero and within certain limits. Checks were recently added when
-> writing to these registers but not when restoring from migration.
->
-> This patch adds checks when restoring from migration to avoid divide by
-> zero errors.
->
-> Reported-by: Huawei PSIRT <psirt@huawei.com>
-> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-> ---
-> It would be nice to squeeze this into 2.8 if possible.
->
-> V3:
->  - Fix broken migration logic
->  - Manually double checked and it passes migration.
-> V2:
->  - Abort the migration if the data is invalid
->
->  hw/char/cadence_uart.c | 7 +++++++
->  1 file changed, 7 insertions(+)
->
-> diff --git a/hw/char/cadence_uart.c b/hw/char/cadence_uart.c
-> index 0215d65..ce9063b 100644
-> --- a/hw/char/cadence_uart.c
-> +++ b/hw/char/cadence_uart.c
-> @@ -502,6 +502,13 @@ static int cadence_uart_post_load(void *opaque, int version_id)
->  {
->      CadenceUARTState *s = opaque;
->
-> +    /* Ensure these two aren't invalid numbers */
-> +    if (s->r[R_BRGR] <= 1 || s->r[R_BRGR] & ~0xFFFF ||
-> +        s->r[R_BDIV] <= 3 || s->r[R_BDIV] & ~0xFF) {
-
-The uart_write() code says BRGR == 1 is valid, but
-this code says it isn't. Which is correct?
-
-thanks
--- PMM
+QW0gMDYuMTIuMjAxNiB1bSAwMDo1NyBzY2hyaWViIEVkdWFyZG8gSGFia29zdDoNCj4gT24g
+TW9uLCBEZWMgMDUsIDIwMTYgYXQgMDc6MTg6NDdQTSArMDEwMCwgRGF2aWQgSGlsZGVuYnJh
+bmQgd3JvdGU6DQo+PiBBbSAwMi4xMi4yMDE2IHVtIDIyOjE4IHNjaHJpZWIgRWR1YXJkbyBI
+YWJrb3N0Og0KPj4+IFRoZSBxdWVyeS1jcHUtbW9kZWwtZXhwYW5kIFFNUCBjb21tYW5kIG5l
+ZWRzIGF0IGxlYXN0IG9uZSBzdGF0aWMNCj4+PiBtb2RlbCwgdG8gYWxsb3cgdGhlICJzdGF0
+aWMiIGV4cGFuc2lvbiBtb2RlIHRvIGJlIGltcGxlbWVudGVkLg0KPj4+IEluc3RlYWQgb2Yg
+ZGVmaW5pbmcgc3RhdGljIHZlcnNpb25zIG9mIGV2ZXJ5IENQVSBtb2RlbCwgZGVmaW5lIGEN
+Cj4+PiAiYmFzZSIgQ1BVIG1vZGVsIHRoYXQgaGFzIGFic29sdXRlbHkgbm8gZmVhdHVyZSBm
+bGFnIGVuYWJsZWQuDQo+Pj4NCj4+DQo+PiBJbnRyb2R1Y2luZyBzZXBhcmF0ZSBvbmVzIG1h
+a2VzIGZlYXR1cmUgbGlzdHMgcHJlc2VudGVkIHRvIHRoZSB1c2VyIG11Y2gNCj4+IHNob3J0
+ZXIgKGFuZCB0aGVyZWZvcmUgZWFzaWVyIHRvIG1haW50YWluKS4gQnV0IEkgZG9uJ3Qga25v
+dyBob3cgbGlidmlydA0KPj4gd2FudHMgdG8gZGVhbCB3aXRoIG1vZGVscyBvbiB4ODYgaW4g
+dGhlIGZ1dHVyZS4NCj4NCj4gSSB1bmRlcnN0YW5kIHRoYXQgaGF2aW5nIGEgbGFyZ2VyIHNl
+dCBvZiBzdGF0aWMgbW9kZWxzIHdvdWxkIG1ha2UNCj4gZXhwYW5zaW9ucyBzaG9ydGVyLiBC
+dXQgSSB3b3JyeSB0aGF0IGJ5IGRlZmluaW5nIGEgY29tcGxldGUgc2V0DQo+IG9mIHN0YXRp
+YyBtb2RlbHMgb24geDg2IHdvdWxkIHJlcXVpcmUgZXh0cmEgbWFpbnRlbmFuY2Ugd29yayBv
+bg0KPiB0aGUgUUVNVSBzaWRlIHdpdGggbm8gdmlzaWJsZSBiZW5lZml0IGZvciBsaWJ2aXJ0
+Lg0KDQpBcyBzdGF0aWMgbW9kZWxzIHdpbGwgbmV2ZXIgY2hhbmdlICh0aGVvcnkpIHRoZSBt
+YWludGVuYW5jZSB3b3JrIHNob3VsZCANCmJlIHByZXR0eSBtdWNoIGRvd24gdG8gemVyby4g
+QnV0IHRoZSBpbml0aWFsIGltcGxlbWVudGF0aW9uIGFuZCBjb21taW5nIA0KdXAgd2l0aCB0
+aGUgbW9kZWxzIHJlcXVpcmVzIHdvcmsgKG15IGV4cGVyaWVuY2UgOykgKS4NCg0KSSBhbSBu
+b3QgYWdhaW5zdCB0aGUgImJhc2UiIG1vZGVsIChhY3R1YWxseSBpdCBpcyByZWFsbHkgcHJl
+dHR5IG5pY2UgdG8gDQpoYXZlKS4gVXNpbmcgb25seSB0aGF0IHNvbWVob3cgc21lbGxzIGxp
+a2UgdGhlICJ1c2VyIiBjcHUgbW9kZWwgDQpkaXNjdXNzaW9uLiBXaGljaCBtaWdodCBiZSBv
+ayBmb3IgeDg2Lg0KDQo+DQo+IEkgd291bGQgbGlrZSB0byBoZWFyIGZyb20gbGlidmlydCBk
+ZXZlbG9wZXJzIHdoYXQgdGhleSB0aGluay4gSQ0KPiBzdGlsbCBkb24ndCBrbm93IHdoYXQg
+dGhleSBwbGFuIHRvIHVzZSB0aGUgdHlwZT1zdGF0aWMgZXhwYW5zaW9uDQo+IHJlc3VsdHMg
+Zm9yLg0KPg0KPj4NCj4+IEhvdyBsb25nIGlzIHRoZSBzdGF0aWMgZXhwYW5zaW9uIG9uIGEg
+cmVjZW50IGludGVsIENQVT8NCj4NCj4gQ1BVIG1vZGVsICJCcm9hZHdlbGwiIHJldHVybnMg
+MTY1IGVudHJpZXMgb24gcmV0dXJuLm1vZGVsLnByb3BzOg0KPg0KPiAoUUVNVSkgcXVlcnkt
+Y3B1LW1vZGVsLWV4cGFuc2lvbiB0eXBlPXN0YXRpYyBtb2RlbD17Im5hbWUiOiJCcm9hZHdl
+bGwifQ0KDQo+IHsicmV0dXJuIjogeyJtaWdyYXRpb24tc2FmZSI6IHRydWUsICJtb2RlbCI6
+IHsibmFtZSI6ICJiYXNlIiwgInByb3BzIjogeyJwZnRocmVzaG9sZCI6IGZhbHNlLCAicGt1
+IjogZmFsc2UsICJydG0iOiB0cnVlLCAidHNjLWRlYWRsaW5lIjogdHJ1ZSwgInhzdG9yZS1l
+biI6IGZhbHNlLCAidHNjLXNjYWxlIjogZmFsc2UsICJhYm0iOiB0cnVlLCAiaWE2NCI6IGZh
+bHNlLCAia3ZtLW1tdSI6IGZhbHNlLCAieHNhdmVvcHQiOiB0cnVlLCAidGNlIjogZmFsc2Us
+ICJzbWVwIjogdHJ1ZSwgImZwdSI6IHRydWUsICJ4Y3J5cHQiOiBmYWxzZSwgImNsZmx1c2gi
+OiB0cnVlLCAiZmx1c2hieWFzaWQiOiBmYWxzZSwgImt2bS1zdGVhbC10aW1lIjogZmFsc2Us
+ICJsbSI6IHRydWUsICJ0c2MiOiB0cnVlLCAiYWR4IjogdHJ1ZSwgImZ4c3IiOiB0cnVlLCAi
+dG0iOiBmYWxzZSwgInhnZXRidjEiOiBmYWxzZSwgInhzdG9yZSI6IGZhbHNlLCAidm1lIjog
+ZmFsc2UsICJ2ZW5kb3IiOiAiR2VudWluZUludGVsIiwgImFyYXQiOiB0cnVlLCAiZGUiOiB0
+cnVlLCAiYWVzIjogdHJ1ZSwgInBzZSI6IHRydWUsICJkcy1jcGwiOiBmYWxzZSwgInRibSI6
+IGZhbHNlLCAic3NlIjogdHJ1ZSwgInBoZS1lbiI6IGZhbHNlLCAiZjE2YyI6IHRydWUsICJk
+cyI6IGZhbHNlLCAibXB4IjogZmFsc2UsICJ0c2MtYWRqdXN0IjogZmFsc2UsICJhdng1MTJm
+IjogZmFsc2UsICJhdngyIjogdHJ1ZSwgInBiZSI6IGZhbHNlLCAiY3gxNiI6IHRydWUsICJh
+dng1MTJwZiI6IGZhbHNlLCAibW92YmUiOiB0cnVlLCAicGVyZmN0ci1uYiI6IGZhbHNlLCAi
+b3Nwa2UiOiBmYWxzZSwgImF2eDUxMmlmbWEiOiBmYWxzZSwgInN0ZXBwaW5nIjogMiwgInNl
+cCI6IHRydWUsICJzc2U0YSI6IGZhbHNlLCAiYXZ4NTEyZHEiOiBmYWxzZSwgImF2eDUxMi00
+dm5uaXciOiBmYWxzZSwgInhzYXZlIjogdHJ1ZSwgInBtbSI6IGZhbHNlLCAiaGxlIjogdHJ1
+ZSwgImVzdCI6IGZhbHNlLCAieG9wIjogZmFsc2UsICJzbXgiOiBmYWxzZSwgIm1vbml0b3Ii
+OiBmYWxzZSwgImF2eDUxMmVyIjogZmFsc2UsICJhcGljIjogdHJ1ZSwgInNzZTQuMSI6IHRy
+dWUsICJzc2U0LjIiOiB0cnVlLCAicGF1c2UtZmlsdGVyIjogZmFsc2UsICJsYWhmLWxtIjog
+dHJ1ZSwgImt2bS1ub3Bpb2RlbGF5IjogZmFsc2UsICJhY3BpIjogZmFsc2UsICJtbXgiOiB0
+cnVlLCAib3N4c2F2ZSI6IGZhbHNlLCAicGNvbW1pdCI6IGZhbHNlLCAibXRyciI6IHRydWUs
+ICJjbHdiIjogZmFsc2UsICJkY2EiOiBmYWxzZSwgInBkY20iOiBmYWxzZSwgInhjcnlwdC1l
+biI6IGZhbHNlLCAiM2Rub3ciOiBmYWxzZSwgImludnRzYyI6IGZhbHNlLCAidG0yIjogZmFs
+c2UsICJoeXBlcnZpc29yIjogdHJ1ZSwgImt2bWNsb2NrLXN0YWJsZS1iaXQiOiBmYWxzZSwg
+ImZ4c3Itb3B0IjogZmFsc2UsICJwY2lkIjogdHJ1ZSwgImxicnYiOiBmYWxzZSwgImF2eDUx
+Mi00Zm1hcHMiOiBmYWxzZSwgInN2bS1sb2NrIjogZmFsc2UsICJwb3BjbnQiOiB0cnVlLCAi
+bnJpcC1zYXZlIjogZmFsc2UsICJhdng1MTJ2bCI6IGZhbHNlLCAieDJhcGljIjogdHJ1ZSwg
+Imt2bWNsb2NrIjogZmFsc2UsICJzbWFwIjogdHJ1ZSwgImZhbWlseSI6IDYsICJtaW4tbGV2
+ZWwiOiAxMywgImR0ZXM2NCI6IGZhbHNlLCAiYWNlMiI6IGZhbHNlLCAiZm1hNCI6IGZhbHNl
+LCAieHRwciI6IGZhbHNlLCAiYXZ4NTEyYnciOiBmYWxzZSwgIm54IjogdHJ1ZSwgImx3cCI6
+IGZhbHNlLCAibXNyIjogdHJ1ZSwgImFjZTItZW4iOiBmYWxzZSwgImRlY29kZWFzc2lzdHMi
+OiBmYWxzZSwgInBlcmZjdHItY29yZSI6IGZhbHNlLCAicGdlIjogdHJ1ZSwgInBuIjogZmFs
+c2UsICJmbWEiOiB0cnVlLCAibm9kZWlkLW1zciI6IGZhbHNlLCAiY3g4IjogdHJ1ZSwgIm1j
+ZSI6IHRydWUsICJhdng1MTJjZCI6IGZhbHNlLCAiY3I4bGVnYWN5IjogZmFsc2UsICJtY2Ei
+OiB0cnVlLCAicG5pIjogdHJ1ZSwgInJkc2VlZCI6IHRydWUsICJvc3Z3IjogZmFsc2UsICJm
+c2dzYmFzZSI6IHRydWUsICJtb2RlbC1pZCI6ICJJbnRlbCBDb3JlIFByb2Nlc3NvciAoQnJv
+YWR3ZWxsKSIsICJjbXAtbGVnYWN5IjogZmFsc2UsICJrdm0tcHYtdW5oYWx0IjogZmFsc2Us
+ICJyZHRzY3AiOiB0cnVlLCAibW14ZXh0IjogZmFsc2UsICJjaWQiOiBmYWxzZSwgInZteCI6
+IGZhbHNlLCAic3NzZTMiOiB0cnVlLCAiZXh0YXBpYyI6IGZhbHNlLCAicHNlMzYiOiB0cnVl
+LCAibWluLXhsZXZlbCI6IDIxNDc0ODM2NTYsICJpYnMiOiBmYWxzZSwgImF2eCI6IHRydWUs
+ICJzeXNjYWxsIjogdHJ1ZSwgInVtaXAiOiBmYWxzZSwgImludnBjaWQiOiB0cnVlLCAiYm1p
+MSI6IHRydWUsICJibWkyIjogdHJ1ZSwgInZtY2ItY2xlYW4iOiBmYWxzZSwgImVybXMiOiB0
+cnVlLCAiY21vdiI6IHRydWUsICJtaXNhbGlnbnNzZSI6IGZhbHNlLCAiY2xmbHVzaG9wdCI6
+IGZhbHNlLCAicGF0IjogdHJ1ZSwgIjNkbm93cHJlZmV0Y2giOiB0cnVlLCAicmRwaWQiOiBm
+YWxzZSwgInBhZSI6IHRydWUsICJ3ZHQiOiBmYWxzZSwgInNraW5pdCI6IGZhbHNlLCAicG1t
+LWVuIjogZmFsc2UsICJwaGUiOiBmYWxzZSwgIjNkbm93ZXh0IjogZmFsc2UsICJsbWNlIjog
+ZmFsc2UsICJodCI6IGZhbHNlLCAicGRwZTFnYiI6IGZhbHNlLCAia3ZtLXB2LWVvaSI6IGZh
+bHNlLCAibnB0IjogZmFsc2UsICJ4c2F2ZWMiOiBmYWxzZSwgInBjbG11bHFkcSI6IHRydWUs
+ICJzdm0iOiBmYWxzZSwgInNzZTIiOiB0cnVlLCAic3MiOiBmYWxzZSwgInRvcG9leHQiOiBm
+YWxzZSwgInJkcmFuZCI6IHRydWUsICJhdng1MTJ2Ym1pIjogZmFsc2UsICJrdm0tYXN5bmNw
+ZiI6IGZhbHNlLCAieHNhdmVzIjogZmFsc2UsICJtb2RlbCI6IDYxfX0sICJzdGF0aWMiOiB0
+cnVlfX0NCj4NCj4NCg0KV293LCB5ZXMgdGhhdCB3YXMgdGhlIHJlYXNvbiBmb3IgbWUgdG8g
+aW50cm9kdWNlIGFic3RyYWN0aW9ucyBvbiBzMzkweC4gDQpCdXQgaGVyZSB0aGUgcGxhbiB3
+YXMgdG8gdXNlIHRoZSBlcGFuc2lvbiBkaXJlY3RseSB3aGVuIGluZGljYXRpb24gdGhlDQoi
+aG9zdCIgbW9kZWwgdG8gdGhlIHVzZXIuIEhhdmluZyBzb21ldGhpbmcgbGlrZSAiQnJvYWR3
+ZWxsLWJhc2UiKy8tIGEgDQpoYW5kZnVsIG9mIGZlYXR1cmVzIGlzIGp1c3QgZWFzaWVyIHRv
+IGhhbmRsZSB0aGFuICJiYXNlIiB3aXRoIDE2NSANCmZlYXR1cmUgZmxhZ3MuIEJ1dCBhcyB3
+ZSBkb24ndCBrbm93IHdoYXQgbGlidmlydCBwbGFucyBhcmUgKHRoZXkgY291bGQgDQp1c2Ug
+dGhhdCBpbnRlcmZhY2Ugb24geDg2IHRvIGRvIGZlYXR1cmUgZGV0ZWN0aW9uIG9ubHkgYW5k
+IGNvbnZlcnQgdG8gDQptb2RlbHMgdGhlbXNlbHZlcyksIEkgYWxzbyBoYXZlIG5vIGlkZWEg
+d2hhdCB3b3VsZCBiZSBiZXN0IGluIHRoZSANCmNvbnRleHQgb2YgeDg2IGNwdSBtb2RlbHMu
+DQoNCi0tIA0KDQpEYXZpZA0K
