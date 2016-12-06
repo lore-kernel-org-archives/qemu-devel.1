@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36697)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37282)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cELHU-0004S1-1G
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 14:20:01 -0500
+	(envelope-from <mst@redhat.com>) id 1cELKE-0005h0-4X
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 14:22:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cELHP-0006BE-Rp
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 14:20:00 -0500
-Date: Tue, 6 Dec 2016 17:19:52 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20161206191952.GD4027@thinpad.lan.raisama.net>
-References: <148104617887.7699.984921868108236415.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+	(envelope-from <mst@redhat.com>) id 1cELKA-00076i-1U
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 14:22:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42300)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cELK9-00076b-Rj
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 14:22:45 -0500
+Date: Tue, 6 Dec 2016 21:22:43 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20161206211034-mutt-send-email-mst@kernel.org>
+References: <1481016553-69252-1-git-send-email-arei.gonglei@huawei.com>
+	<20161206153945-mutt-send-email-mst@kernel.org>
+	<20161206173337.GB30363@stefanha-x1.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <148104617887.7699.984921868108236415.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] virtio: fix HW_COMPAT_2_6 macro for
- virtio-*-pci drivers
+In-Reply-To: <20161206173337.GB30363@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [PATCH for-2.8] virtio-crypto: zeroize the key
+ material before free
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,73 +29,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, Halil Pasic <pasic@linux.vnet.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-stable@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Gonglei <arei.gonglei@huawei.com>, qemu-devel@nongnu.org
 
-On Tue, Dec 06, 2016 at 06:50:47PM +0100, Greg Kurz wrote:
-> Since commit "9a4c0e220d8a hw/virtio-pci: fix virtio behaviour", passing
-> -device virtio-blk-pci.disable-modern=off has no effect on 2.6 machine
-> types because the internal virtio-pci.disable-modern=on compat property
-> always prevail.
+On Tue, Dec 06, 2016 at 05:33:37PM +0000, Stefan Hajnoczi wrote:
+> On Tue, Dec 06, 2016 at 03:40:49PM +0200, Michael S. Tsirkin wrote:
+> > On Tue, Dec 06, 2016 at 05:29:13PM +0800, Gonglei wrote:
+> > > Zeroize the memory of CryptoDevBackendSymOpInfo structure pointed
+> > > for key material security.
+> > > 
+> > > Signed-off-by: Gonglei <arei.gonglei@huawei.com>
+> > > ---
+> > >  hw/virtio/virtio-crypto.c | 13 ++++++++++++-
+> > >  1 file changed, 12 insertions(+), 1 deletion(-)
+> > > 
+> > > diff --git a/hw/virtio/virtio-crypto.c b/hw/virtio/virtio-crypto.c
+> > > index 2f2467e..ecb19b6 100644
+> > > --- a/hw/virtio/virtio-crypto.c
+> > > +++ b/hw/virtio/virtio-crypto.c
+> > > @@ -337,7 +337,18 @@ static void virtio_crypto_free_request(VirtIOCryptoReq *req)
+> > >  {
+> > >      if (req) {
+> > >          if (req->flags == CRYPTODEV_BACKEND_ALG_SYM) {
+> > > -            g_free(req->u.sym_op_info);
+> > > +            size_t max_len;
+> > > +            CryptoDevBackendSymOpInfo *op_info = req->u.sym_op_info;
+> > > +
+> > > +            max_len = op_info->iv_len +
+> > > +                      op_info->aad_len +
+> > > +                      op_info->src_len +
+> > > +                      op_info->dst_len +
+> > > +                      op_info->digest_result_len;
+> > > +
+> > > +            /* Zeroize and free request data structure */
+> > > +            memset(op_info, 0, sizeof(*op_info) + max_len);
+> > > +            g_free(op_info);
+> > 
+> > Write into memory, then free it?  This looks rather strange. Why are we
+> > doing this?
 > 
-> This should ideally be fixed in the qdev properties core code, but it is
-> too late in the QEMU 2.8 schedule. So this patch fixes the issue by setting
-> the compat properties for every virtio-*-pci subtypes instead of the base
-> virtio-pci type.
+> Common practice with sensitive information (key material, passwords,
+> etc).
+
+Some kind of explanation about what makes this one
+more sensitive than others would be nice.
+
+Also, what makes it 2.8 material? Considering the pointer math
+involved, it's not risk-free.
+
+> coredumps, memory disclosure bugs when heap memory is reused, etc.
+>
+> Sensitive information is sometimes also held in mlocked pages to prevent
+> it being swapped to disk but that's not being done here.
 > 
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+> Perhaps the comment should be more explicit but this patch seems
+> reasonable.
 
-So, it looks like the bug is present in many other cases...
+Right.  One can see memset and free at a glance.
+The comment and the commit log should explain the why,
+not the what.
 
-I have hacked QEMU to print a warning in case the driver name in
-compat_props refer to an abstract class or a class that have any
-subclasses. The results are below:
-
- apic-common.legacy-instance-id set for abstract class
- apic-common.vapic set for abstract class
- i386-cpu.arat set for abstract class
- i386-cpu.check set for abstract class
- i386-cpu.cpuid-0xb set for abstract class
- i386-cpu.fill-mtrr-mask set for abstract class
- i386-cpu.full-cpuid-auto-level set for abstract class
- i386-cpu.l3-cache set for abstract class
- i386-cpu.pmu set for abstract class
- pci-device.command_serr_enable set for abstract class
- pci-device.rombar set for abstract class
- pci-device.x-pcie-lnksta-dllla set for abstract class
- powerpc64-cpu.pre-2.8-migration set for abstract class
- s390-skeys.migration-enabled set for abstract class
- spapr-pci-host-bridge.ddw set for superclass
- spapr-pci-host-bridge.dynamic-reconfiguration set for superclass
- spapr-pci-host-bridge.mem64_win_size set for superclass
- spapr-pci-host-bridge.mem_win_size set for superclass
- spapr-pci-host-bridge.pre-2.8-migration set for superclass
- usb-device.full-path set for abstract class
- usb-device.msos-desc set for abstract class
- virtio-pci.disable-legacy set for abstract class
- virtio-pci.disable-modern set for abstract class
- virtio-pci.migrate-extra set for abstract class
- virtio-pci.page-per-vq set for abstract class
- virtio-pci.virtio-pci-bus-master-bug-migration set for abstract class
- virtio-pci.x-disable-pcie set for abstract class
- x86_64-cpu.arat set for abstract class
- x86_64-cpu.check set for abstract class
- x86_64-cpu.cpuid-0xb set for abstract class
- x86_64-cpu.fill-mtrr-mask set for abstract class
- x86_64-cpu.full-cpuid-auto-level set for abstract class
- x86_64-cpu.l3-cache set for abstract class
- x86_64-cpu.pmu set for abstract class
-
-I believe the cases where we are likely to cause real-world bugs
-are virtio-pci and the *-cpu classes (because -cpu is translated
-to -global).
-
-I'm not sure what should be the right fix in 2.8. I am
-considering a temporary hack to translate abstract class names in
-compat_props to global properties for all subclasses, in case
-they refer to an abstract class. This way we fix the bug where
--global doesn't override compat_props properly, but keep the
-rules for -global untouched.
-
--- 
-Eduardo
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
