@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59373)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60238)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1cEfSI-0002Lc-SJ
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 11:52:32 -0500
+	(envelope-from <dave.hansen@intel.com>) id 1cEfWl-0003VA-Jg
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 11:57:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1cEfSF-00030s-PN
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 11:52:30 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37928)
+	(envelope-from <dave.hansen@intel.com>) id 1cEfWi-0004EM-FC
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 11:57:07 -0500
+Received: from mga02.intel.com ([134.134.136.20]:46131)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <drjones@redhat.com>) id 1cEfSF-00030U-Ga
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 11:52:27 -0500
-Date: Wed, 7 Dec 2016 17:52:20 +0100
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20161207165220.6k2zpatqxtzfxcvp@kamzik.brq.redhat.com>
-References: <1481047528-16180-1-git-send-email-wei@redhat.com>
-	<1481047528-16180-3-git-send-email-wei@redhat.com>
+	(Exim 4.71) (envelope-from <dave.hansen@intel.com>)
+	id 1cEfWi-0004E9-5k
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 11:57:04 -0500
+From: Dave Hansen <dave.hansen@intel.com>
+References: <1480495397-23225-1-git-send-email-liang.z.li@intel.com>
+	<f67ca79c-ad34-59dd-835f-e7bc9dcaef58@redhat.com>
+	<F2CBF3009FA73547804AE4C663CAB28E3A130C01@shsmsx102.ccr.corp.intel.com>
+	<0b18c636-ee67-cbb4-1ba3-81a06150db76@redhat.com>
+	<0b83db29-ebad-2a70-8d61-756d33e33a48@intel.com>
+	<2171e091-46ee-decd-7348-772555d3a5e3@redhat.com>
+Message-ID: <d3ff453c-56fa-19de-317c-1c82456f2831@intel.com>
+Date: Wed, 7 Dec 2016 08:57:01 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1481047528-16180-3-git-send-email-wei@redhat.com>
-Subject: Re: [Qemu-devel] [kvm-unit-tests PATCH v14 2/5] arm: Add support
- for read_sysreg() and write_sysreg()
+In-Reply-To: <2171e091-46ee-decd-7348-772555d3a5e3@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH kernel v5 0/5] Extend virtio-balloon for
+ fast (de)inflating & fast live migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,170 +33,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Huang <wei@redhat.com>
-Cc: cov@codeaurora.org, alindsay@codeaurora.org, kvm@vger.kernel.org, andre.przywara@arm.com, croberts@codeaurora.org, qemu-devel@nongnu.org, alistair.francis@xilinx.com, shannon.zhao@linaro.org, kvmarm@lists.cs.columbia.edu
+To: David Hildenbrand <david@redhat.com>, "Li, Liang Z" <liang.z.li@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Cc: "mhocko@suse.com" <mhocko@suse.com>, "mst@redhat.com" <mst@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "dgilbert@redhat.com" <dgilbert@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
 
-On Tue, Dec 06, 2016 at 12:05:25PM -0600, Wei Huang wrote:
-> This patch adds two new macros to support read/write operations of ARMv7
-> and ARMv8 system registers. As part of the change, xstr() is revised to
-> support variable arguments. With it, ARMv7 system register can be defined
-> with __ACCESS_CP15() or __ACCESS_CP15_64() depending if it is 32-bit or
-> 64-bit. get_mpidr() is re-written with new macros.
+Removing silly virtio-dev@ list because it's bouncing mail...
+
+On 12/07/2016 08:21 AM, David Hildenbrand wrote:
+>> Li's current patches do that.  Well, maybe not pfn/length, but they do
+>> take a pfn and page-order, which fits perfectly with the kernel's
+>> concept of high-order pages.
 > 
-> Suggested-by: Andrew Jones <drjones@redhat.com>
-> Signed-off-by: Wei Huang <wei@redhat.com>
-> ---
->  lib/arm/asm/processor.h   |  6 +++---
->  lib/arm/asm/sysreg.h      | 19 +++++++++++++++++++
->  lib/arm64/asm/processor.h | 11 ++++-------
->  lib/arm64/asm/sysreg.h    | 26 ++++++++++++++++++++++++++
->  lib/libcflat.h            |  4 ++--
->  5 files changed, 54 insertions(+), 12 deletions(-)
->  create mode 100644 lib/arm64/asm/sysreg.h
-> 
-> diff --git a/lib/arm/asm/processor.h b/lib/arm/asm/processor.h
-> index f25e7ee..c831749 100644
-> --- a/lib/arm/asm/processor.h
-> +++ b/lib/arm/asm/processor.h
-> @@ -6,6 +6,7 @@
->   * This work is licensed under the terms of the GNU LGPL, version 2.
->   */
->  #include <asm/ptrace.h>
-> +#include <asm/sysreg.h>
->  
->  enum vector {
->  	EXCPTN_RST,
-> @@ -33,11 +34,10 @@ static inline unsigned long current_cpsr(void)
->  
->  #define current_mode() (current_cpsr() & MODE_MASK)
->  
-> +#define MPIDR __ACCESS_CP15(c0, 0, c0, 5)
->  static inline unsigned int get_mpidr(void)
+> So we can send length in powers of two. Still, I don't see any benefit
+> over a simple pfn/len schema. But I'll have a more detailed look at the
+> implementation first, maybe that will enlighten me :)
 
-I'll change the get_mpidr functions to u64 after the gic series
-is merged, as we've discussed previously.
+It is more space-efficient.  We're fitting the order into 6 bits, which
+would allows the full 2^64 address space to be represented in one entry,
+and leaves room for the bitmap size to be encoded as well, if we decide
+we need a bitmap in the future.
 
->  {
-> -	unsigned int mpidr;
-> -	asm volatile("mrc p15, 0, %0, c0, c0, 5" : "=r" (mpidr));
-> -	return mpidr;
-> +	return read_sysreg(MPIDR);
->  }
->  
->  /* Only support Aff0 for now, up to 4 cpus */
-> diff --git a/lib/arm/asm/sysreg.h b/lib/arm/asm/sysreg.h
-> index 3e1ad3a..02dbe3d 100644
-> --- a/lib/arm/asm/sysreg.h
-> +++ b/lib/arm/asm/sysreg.h
-> @@ -34,4 +34,23 @@
->  #define CR_AFE	(1 << 29)	/* Access flag enable			*/
->  #define CR_TE	(1 << 30)	/* Thumb exception enable		*/
->  
-> +#ifndef __ASSEMBLY__
-> +#include <libcflat.h>
-> +
-> +#define __ACCESS_CP15(CRn, Op1, CRm, Op2)			\
-> +	"mrc", "mcr", xstr(p15, Op1, %0, CRn, CRm, Op2), u32
-> +#define __ACCESS_CP15_64(Op1, CRm)					\
-> +	"mrrc", "mcrr", xstr(p15, Op1, %Q0, %R0, CRm), u64
-> +
-> +#define __read_sysreg(r, w, c, t) ({				\
-> +			t __val;				\
-> +			asm volatile(r " " c : "=r" (__val));	\
-> +			__val;					\
-> +		})
-> +#define read_sysreg(...)                 __read_sysreg(__VA_ARGS__)
-> +
-> +#define __write_sysreg(v, r, w, c, t)   asm volatile(w " " c : : "r" ((t)(v)))
-> +#define write_sysreg(v, ...)            __write_sysreg(v, __VA_ARGS__)
-> +#endif /* !__ASSEMBLY__ */
-> +
->  #endif /* _ASMARM_SYSREG_H_ */
-> diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
-> index 84d5c7c..ed59ad2 100644
-> --- a/lib/arm64/asm/processor.h
-> +++ b/lib/arm64/asm/processor.h
-> @@ -19,6 +19,7 @@
->  #ifndef __ASSEMBLY__
->  #include <asm/ptrace.h>
->  #include <asm/esr.h>
-> +#include <asm/sysreg.h>
->  
->  enum vector {
->  	EL1T_SYNC,
-> @@ -66,14 +67,10 @@ static inline unsigned long current_level(void)
->  	return el & 0xc;
->  }
->  
-> -#define DEFINE_GET_SYSREG32(reg)				\
-> -static inline unsigned int get_##reg(void)			\
-> -{								\
-> -	unsigned int reg;					\
-> -	asm volatile("mrs %0, " #reg "_el1" : "=r" (reg));	\
-> -	return reg;						\
-> +static inline unsigned int get_mpidr(void)
-> +{
-> +	return read_sysreg(mpidr_el1);
->  }
-> -DEFINE_GET_SYSREG32(mpidr)
->  
->  /* Only support Aff0 for now, gicv2 only */
->  #define mpidr_to_cpu(mpidr) ((int)((mpidr) & 0xff))
-> diff --git a/lib/arm64/asm/sysreg.h b/lib/arm64/asm/sysreg.h
-> new file mode 100644
-> index 0000000..05b9fcb
-> --- /dev/null
-> +++ b/lib/arm64/asm/sysreg.h
-> @@ -0,0 +1,26 @@
-> +/*
-> + * Ripped off from arch/arm64/include/asm/sysreg.h
-> + *
-> + * Copyright (C) 2016, Red Hat Inc, Andrew Jones <drjones@redhat.com>
-> + *
-> + * This work is licensed under the terms of the GNU LGPL, version 2.
-> + */
-> +#ifndef _ASMARM64_SYSREG_H_
-> +#define _ASMARM64_SYSREG_H_
-> +
-> +#ifndef __ASSEMBLY__
-> +#include <libcflat.h>
-> +
-> +#define read_sysreg(r) ({					\
-> +	u64 __val;						\
-> +	asm volatile("mrs %0, " xstr(r) : "=r" (__val));	\
-> +	__val;							\
-> +})
-> +
-> +#define write_sysreg(v, r) do {					\
-> +	u64 __val = (u64)v;					\
-> +	asm volatile("msr " xstr(r) ", %x0" : : "rZ" (__val));	\
-> +} while (0)
-
-I'd prefer using the ({}) syntax here to the do-while, but it doesn't
-matter.
-
-> +
-> +#endif /* !__ASSEMBLY__ */
-> +#endif /* _ASMARM64_SYSREG_H_ */
-> diff --git a/lib/libcflat.h b/lib/libcflat.h
-> index c622198..c3fa4f2 100644
-> --- a/lib/libcflat.h
-> +++ b/lib/libcflat.h
-> @@ -27,8 +27,8 @@
->  
->  #define __unused __attribute__((__unused__))
->  
-> -#define xstr(s) xxstr(s)
-> -#define xxstr(s) #s
-> +#define xstr(s...) xxstr(s)
-> +#define xxstr(s...) #s
->  
->  #define __ALIGN_MASK(x, mask)	(((x) + (mask)) & ~(mask))
->  #define __ALIGN(x, a)		__ALIGN_MASK(x, (typeof(x))(a) - 1)
-> -- 
-> 1.8.3.1
-> 
-> 
-
-Thanks,
-drew
+If that was purely a length, we'd be limited to 64*4k pages per entry,
+which isn't even a full large page.
