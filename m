@@ -1,23 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48746)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50376)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cEckt-0005vY-8d
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 08:59:34 -0500
+	(envelope-from <tianyu.lan@intel.com>) id 1cEcqw-00081o-FN
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 09:05:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cEckk-0003Nl-7O
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 08:59:26 -0500
-Date: Wed, 7 Dec 2016 11:59:17 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20161207135917.GI4027@thinpad.lan.raisama.net>
-References: <148104617887.7699.984921868108236415.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-	<20161206191952.GD4027@thinpad.lan.raisama.net>
-	<20161206193159.GE4027@thinpad.lan.raisama.net>
-	<20161207143925.7b3a54f2@bahia>
+	(envelope-from <tianyu.lan@intel.com>) id 1cEcqr-0005IJ-F8
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 09:05:46 -0500
+Received: from mga14.intel.com ([192.55.52.115]:15740)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <tianyu.lan@intel.com>)
+	id 1cEcqq-0005I6-Rv
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 09:05:41 -0500
+From: Lan Tianyu <tianyu.lan@intel.com>
+References: <1480348315-13332-1-git-send-email-bd.aviv@gmail.com>
+	<8188dd5e-2c71-dbd0-9a1a-9c8af6f74b96@intel.com>
+	<20161202065214.GF21601@pxdev.xzpeter.org>
+	<088c2afd-575e-99af-1686-023c116352ab@intel.com>
+	<20161206065155.GB4344@pxdev.xzpeter.org>
+	<6d37d046-8e5a-7662-baa6-445d3985fde7@intel.com>
+	<20161206072228.GC4344@pxdev.xzpeter.org>
+	<f9f9daab-519d-381b-c9e8-c6dcc139f1d3@intel.com>
+	<20161206105914.GB3469@pxdev.xzpeter.org>
+	<1b348745-3135-e28c-88f3-f45ed1855de3@intel.com>
+	<20161207064322.GA28693@pxdev.xzpeter.org>
+Message-ID: <c1f4b99f-1bfd-9742-b8ca-360fa6fa609c@intel.com>
+Date: Wed, 7 Dec 2016 22:04:57 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20161207143925.7b3a54f2@bahia>
-Subject: Re: [Qemu-devel] [RFC for-2.8] machine: Convert abstract typename
- on compat_props to subclass names
+In-Reply-To: <20161207064322.GA28693@pxdev.xzpeter.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v7 0/5] IOMMU: intel_iommu support map and
+ unmap notifications
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,100 +38,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, Halil Pasic <pasic@linux.vnet.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-stable@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: "Aviv B.D" <bd.aviv@gmail.com>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>, Alex Williamson <alex.williamson@redhat.com>, Jason Wang <jasowang@redhat.com>, "Liu, Yi L" <yi.l.liu@intel.com>, "Wu, Fengguang" <fengguang.wu@intel.com>
 
-On Wed, Dec 07, 2016 at 02:39:25PM +0100, Greg Kurz wrote:
-> On Tue, 6 Dec 2016 17:31:59 -0200
-> Eduardo Habkost <ehabkost@redhat.com> wrote:
-> 
-> > On Tue, Dec 06, 2016 at 05:19:52PM -0200, Eduardo Habkost wrote:
-> > > On Tue, Dec 06, 2016 at 06:50:47PM +0100, Greg Kurz wrote:  
-> > > > Since commit "9a4c0e220d8a hw/virtio-pci: fix virtio behaviour", passing
-> > > > -device virtio-blk-pci.disable-modern=off has no effect on 2.6 machine
-> > > > types because the internal virtio-pci.disable-modern=on compat property
-> > > > always prevail.
-> > > > 
-> > > > This should ideally be fixed in the qdev properties core code, but it is
-> > > > too late in the QEMU 2.8 schedule. So this patch fixes the issue by setting
-> > > > the compat properties for every virtio-*-pci subtypes instead of the base
-> > > > virtio-pci type.
-> > > > 
-> > > > Signed-off-by: Greg Kurz <groug@kaod.org>  
-> > > 
-> > > So, it looks like the bug is present in many other cases...
-> > > 
-> > > I have hacked QEMU to print a warning in case the driver name in
-> > > compat_props refer to an abstract class or a class that have any
-> > > subclasses. The results are below:
-> > > 
-> > >  apic-common.legacy-instance-id set for abstract class
-> > >  apic-common.vapic set for abstract class
-> > >  i386-cpu.arat set for abstract class
-> > >  i386-cpu.check set for abstract class
-> > >  i386-cpu.cpuid-0xb set for abstract class
-> > >  i386-cpu.fill-mtrr-mask set for abstract class
-> > >  i386-cpu.full-cpuid-auto-level set for abstract class
-> > >  i386-cpu.l3-cache set for abstract class
-> > >  i386-cpu.pmu set for abstract class
-> > >  pci-device.command_serr_enable set for abstract class
-> > >  pci-device.rombar set for abstract class
-> > >  pci-device.x-pcie-lnksta-dllla set for abstract class
-> > >  powerpc64-cpu.pre-2.8-migration set for abstract class
-> > >  s390-skeys.migration-enabled set for abstract class
-> > >  spapr-pci-host-bridge.ddw set for superclass
-> > >  spapr-pci-host-bridge.dynamic-reconfiguration set for superclass
-> > >  spapr-pci-host-bridge.mem64_win_size set for superclass
-> > >  spapr-pci-host-bridge.mem_win_size set for superclass
-> > >  spapr-pci-host-bridge.pre-2.8-migration set for superclass
-> > >  usb-device.full-path set for abstract class
-> > >  usb-device.msos-desc set for abstract class
-> > >  virtio-pci.disable-legacy set for abstract class
-> > >  virtio-pci.disable-modern set for abstract class
-> > >  virtio-pci.migrate-extra set for abstract class
-> > >  virtio-pci.page-per-vq set for abstract class
-> > >  virtio-pci.virtio-pci-bus-master-bug-migration set for abstract class
-> > >  virtio-pci.x-disable-pcie set for abstract class
-> > >  x86_64-cpu.arat set for abstract class
-> > >  x86_64-cpu.check set for abstract class
-> > >  x86_64-cpu.cpuid-0xb set for abstract class
-> > >  x86_64-cpu.fill-mtrr-mask set for abstract class
-> > >  x86_64-cpu.full-cpuid-auto-level set for abstract class
-> > >  x86_64-cpu.l3-cache set for abstract class
-> > >  x86_64-cpu.pmu set for abstract class
-> > > 
-> > > I believe the cases where we are likely to cause real-world bugs
-> > > are virtio-pci and the *-cpu classes (because -cpu is translated
-> > > to -global).
-> > > 
-> > > I'm not sure what should be the right fix in 2.8. I am
-> > > considering a temporary hack to translate abstract class names in
-> > > compat_props to global properties for all subclasses, in case
-> > > they refer to an abstract class. This way we fix the bug where
-> > > -global doesn't override compat_props properly, but keep the
-> > > rules for -global untouched.  
-> > 
-> > What about this?
-> > 
-> 
-> Indeed that would have been a clever workaround but it is too late anyway. :)
-> 
-> BTW, that makes me think about Halil's comment in another mail, even if it
-> is not strictly related to the comapt issue (but rather because I mentioned
-> it in the changelog of my first patch):
-> 
-> "So I can't even tell if -global virtio-pci.disable-modern=off is even legit
-> on the command line."
-> 
-> And indeed, -device doesn't accept abstract classes... shouldn't -global
-> prohibit setting properties for them ?
+On 2016年12月07日 14:43, Peter Xu wrote:
+> On Wed, Dec 07, 2016 at 02:09:16PM +0800, Lan Tianyu wrote:
+>> On 2016年12月06日 18:59, Peter Xu wrote:
+>>> On Tue, Dec 06, 2016 at 04:27:39PM +0800, Lan Tianyu wrote:
+>>>
+>>> [...]
+>>>
+>>>>>
+>>>>>> User space driver(E.G DPDK) also can enable/disable
+>>>>>> IOVA for device dynamically.
+>>>>>
+>>>>> Could you provide more detailed (or any pointer) on how to do that? I
+>>>>> did try to find it myself, I see an VFIO_IOMMU_ENABLE ioctl, but looks
+>>>>> like it is for ppc only.
+>>>>
+>>>> No, I just give an example that user space may do that but no more
+>>>> research. But since Qemu already can enable device's IOVA, other user
+>>>> application also should can do that with the same VFIO interface, right?
+>>>
+>>> AFAIU we can't do that at least on x86. We can use vfio interface to
+>>> bind group into container, but we should not be able to dynamically
+>>> disable IOMMU protection. IIUC That needs to taint the kernel.
+>>>
+>>> The only way I know is that we probe vfio-pci with no-iommu mode, in
+>>> that case, we disabled IOMMU, but we can never dynamically enable it
+>>> as well.
+>>>
+>>> Please correct me if I am wrong.
+>>
+>>
+>> Actually, disabling device's IOVA doesn't require to disable kernel
+>> global DMA protect and just clear device's VTD context entry in the
+>> context table. Go though IOMMU and VFIO code, find this will happen when
+>> call VFIO_GROUP_UNSET_CONTAINER ioctl and it will be called when destroy
+>> VM or unplug assigned device in Qemu. Please help to double check.
+>>
+>> Call trace:
+>> __vfio_group_unset_container()
+>> vfio_iommu_type1_detach_group()
+>> iommu_detach_group()
+>> dmar_remove_one_dev_info()
+>> __dmar_remove_one_dev_info()
+>> domain_context_clear()
+>>
+>>
+>> The legacy KVM device assign code also will call iommu_detach_device()
+>> when deassign a device.
+>>
+>> From device emulation view, we need to make sure correct register
+>> emulation regardless of guest behavior.
+>
+> Even if the context entry is cleared and invalidated, IMHO it does not
+> mean that we should be using GPA address space, nor do we need to put
+> it into guest physical address space. Instead, it simply means this
+> device cannot do any IO at that time. If IO comes, IOMMU should do
+> fault reporting to guest OS, which should be treated as error.
 
-I'm not sure. Setting disable-modern for all virtio-pci devices
-with a single -global option sounds very useful, for example.
+Yes, that looks right and there will be fault event reported by pIOMMU
+if context entry is no present for DMA untranslated request. This goes 
+back to the first gap to report pIOMMU fault event to vIOMMU.
 
-Also, if we start rejecting it we risk breaking existing
-configurations. We would need to deprecate it first (making it
-print a warning) and reject it a few releases later.
+For disabling via clearing DMA translation via gcmd.TE bit, assigned
+device should work after clearing operation and it's still necessary to
+restore GPA->HPA mapping since we can't assume guest won't clear the bit
+after enabling DMA translation.
+
+This maybe low priority gap since Linux IOMMU driver don't disable DMA
+translation frequently or dynamically. But we also should consider the
+situation.
+
+>
+> So I think we are emulating the correct guest behavior here - we don't
+> need to do anything if a device is detached from an existing IOMMU
+> domain in guest. If we do (e.g., we replay the GPA address space on
+> that device when it is detached, so the shadow page table for that
+> device maps the whole guest memory), that is dangerous, because with
+> that the device can DMA to anywhere it wants to guest memory.
+
+If guest want to disabling DMA translation, this is expected behavior
+and device model should follow guest configuration. This just likes most
+distributions don't enable VTD DMA translation by default and it's OS
+choice.
 
 -- 
-Eduardo
+Best regards
+Tianyu Lan
