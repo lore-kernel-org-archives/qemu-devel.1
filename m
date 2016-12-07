@@ -1,41 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48682)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48930)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <duanj@linux.vnet.ibm.com>) id 1cEjLX-00071R-5O
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 16:01:48 -0500
+	(envelope-from <edgar.iglesias@gmail.com>) id 1cEjMX-0007ds-Pl
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 16:02:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <duanj@linux.vnet.ibm.com>) id 1cEjLS-00015o-9D
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 16:01:47 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57761
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <duanj@linux.vnet.ibm.com>)
-	id 1cEjLS-00015i-4S
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 16:01:42 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	uB7L0BGh121885
-	for <qemu-devel@nongnu.org>; Wed, 7 Dec 2016 16:01:41 -0500
-Received: from e38.co.us.ibm.com (e38.co.us.ibm.com [32.97.110.159])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 276m0bk6br-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 07 Dec 2016 16:01:40 -0500
-Received: from localhost
-	by e38.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <duanj@linux.vnet.ibm.com>;
-	Wed, 7 Dec 2016 14:01:40 -0700
-References: <1479923640-8423-1-git-send-email-duanj@linux.vnet.ibm.com>
-	<1479923640-8423-4-git-send-email-duanj@linux.vnet.ibm.com>
-	<20161207194922.GC2073@work-vm>
-From: Jianjun Duan <duanj@linux.vnet.ibm.com>
-Date: Wed, 7 Dec 2016 13:01:28 -0800
+	(envelope-from <edgar.iglesias@gmail.com>) id 1cEjMW-0001KX-Ff
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 16:02:49 -0500
+Date: Wed, 7 Dec 2016 22:01:18 +0100
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Message-ID: <20161207210118.GE9606@toto>
+References: <1481046379-32632-1-git-send-email-peter.maydell@linaro.org>
+	<1481046379-32632-2-git-send-email-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20161207194922.GC2073@work-vm>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Message-Id: <d4db7b13-9729-5faa-bb0f-93e148346ee4@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [QEMU PATCH v14 3/4] tests/migration: Add test for
- QTAILQ migration
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1481046379-32632-2-git-send-email-peter.maydell@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH 1/3] target-arm: Log AArch64 exception
+ returns
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,220 +24,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, dmitry@daynix.com, peter.maydell@linaro.org, kraxel@redhat.com, mst@redhat.com, david@gibson.dropbear.id.au, pbonzini@redhat.com, veroniabahaa@gmail.com, quintela@redhat.com, amit.shah@redhat.com, mreitz@redhat.com, kwolf@redhat.com, rth@twiddle.net, aurelien@aurel32.net, leon.alrae@imgtec.com, blauwirbel@gmail.com, mark.cave-ayland@ilande.co.uk, mdroth@linux.vnet.ibm.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 
-
-
-On 12/07/2016 11:49 AM, Dr. David Alan Gilbert wrote:
-> * Jianjun Duan (duanj@linux.vnet.ibm.com) wrote:
->> Add a test for QTAILQ migration to tests/test-vmstate.c.
+On Tue, Dec 06, 2016 at 05:46:17PM +0000, Peter Maydell wrote:
+> We already log exception entry; add logging of the AArch64 exception
+> return path as well.
 > 
-> Yes, but see comment below if you have to respin:
-> 
->> Signed-off-by: Jianjun Duan <duanj@linux.vnet.ibm.com>
->> ---
->>  tests/test-vmstate.c | 160 +++++++++++++++++++++++++++++++++++++++++++++++++++
->>  1 file changed, 160 insertions(+)
->>
->> diff --git a/tests/test-vmstate.c b/tests/test-vmstate.c
->> index d2f529b..88aab8c 100644
->> --- a/tests/test-vmstate.c
->> +++ b/tests/test-vmstate.c
->> @@ -544,6 +544,163 @@ static void test_arr_ptr_str_no0_load(void)
->>      }
->>  }
->>  
->> +/* test QTAILQ migration */
->> +typedef struct TestQtailqElement TestQtailqElement;
->> +
->> +struct TestQtailqElement {
->> +    bool     b;
->> +    uint8_t  u8;
->> +    QTAILQ_ENTRY(TestQtailqElement) next;
->> +};
->> +
->> +typedef struct TestQtailq {
->> +    int16_t  i16;
->> +    QTAILQ_HEAD(TestQtailqHead, TestQtailqElement) q;
->> +    int32_t  i32;
->> +} TestQtailq;
->> +
->> +static const VMStateDescription vmstate_q_element = {
->> +    .name = "test/queue-element",
->> +    .version_id = 1,
->> +    .minimum_version_id = 1,
->> +    .fields = (VMStateField[]) {
->> +        VMSTATE_BOOL(b, TestQtailqElement),
->> +        VMSTATE_UINT8(u8, TestQtailqElement),
->> +        VMSTATE_END_OF_LIST()
->> +    },
->> +};
->> +
->> +static const VMStateDescription vmstate_q = {
->> +    .name = "test/queue",
->> +    .version_id = 1,
->> +    .minimum_version_id = 1,
->> +    .fields = (VMStateField[]) {
->> +        VMSTATE_INT16(i16, TestQtailq),
->> +        VMSTATE_QTAILQ_V(q, TestQtailq, 1, vmstate_q_element, TestQtailqElement,
->> +                         next),
->> +        VMSTATE_INT32(i32, TestQtailq),
->> +        VMSTATE_END_OF_LIST()
->> +    }
->> +};
->> +
->> +static void test_save_q(void)
->> +{
->> +    TestQtailq obj_q = {
->> +        .i16 = -512,
->> +        .i32 = 70000,
->> +    };
->> +
->> +    TestQtailqElement obj_qe1 = {
->> +        .b = true,
->> +        .u8 = 130,
->> +    };
->> +
->> +    TestQtailqElement obj_qe2 = {
->> +        .b = false,
->> +        .u8 = 65,
->> +    };
->> +
->> +    uint8_t wire_q[] = {
->> +        /* i16 */                     0xfe, 0x0,
->> +        /* start of element 0 of q */ 0x01,
->> +        /* .b  */                     0x01,
->> +        /* .u8 */                     0x82,
->> +        /* start of element 1 of q */ 0x01,
->> +        /* b */                       0x00,
->> +        /* u8 */                      0x41,
->> +        /* end of q */                0x00,
->> +        /* i32 */                     0x00, 0x01, 0x11, 0x70,
->> +        QEMU_VM_EOF, /* just to ensure we won't get EOF reported prematurely */
->> +    };
-> 
-> If possible it would be great to share these structures with the ones in test_load_q.
-> 
-The issue is that obj_q need be initialized and elements need be
-inserted in both testing cases. It is not straightforward or a good idea
-to construct the q in a static way. Sharing the structures would make
-one test depending on another, since the q needs be torn down and
-restored to the uninitialized states after one test, which has to be
-manually done. Or we need to add a test to just init the q before these
-two tests. That will still create dependence issue.
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-So I would leave it as it is.
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 
-Thanks,
-Jianjun
 
-> Dave
+
+> ---
+>  target-arm/op_helper.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
 > 
->> +    QTAILQ_INIT(&obj_q.q);
->> +    QTAILQ_INSERT_TAIL(&obj_q.q, &obj_qe1, next);
->> +    QTAILQ_INSERT_TAIL(&obj_q.q, &obj_qe2, next);
->> +
->> +    save_vmstate(&vmstate_q, &obj_q);
->> +    compare_vmstate(wire_q, sizeof(wire_q));
->> +}
->> +
->> +static void test_load_q(void)
->> +{
->> +    TestQtailq obj_q = {
->> +        .i16 = -512,
->> +        .i32 = 70000,
->> +    };
->> +
->> +    TestQtailqElement obj_qe1 = {
->> +        .b = true,
->> +        .u8 = 130,
->> +    };
->> +
->> +    TestQtailqElement obj_qe2 = {
->> +        .b = false,
->> +        .u8 = 65,
->> +    };
->> +
->> +    uint8_t wire_q[] = {
->> +        /* i16 */                     0xfe, 0x0,
->> +        /* start of element 0 of q */ 0x01,
->> +        /* .b  */                     0x01,
->> +        /* .u8 */                     0x82,
->> +        /* start of element 1 of q */ 0x01,
->> +        /* b */                       0x00,
->> +        /* u8 */                      0x41,
->> +        /* end of q */                0x00,
->> +        /* i32 */                     0x00, 0x01, 0x11, 0x70,
->> +    };
->> +
->> +    QTAILQ_INIT(&obj_q.q);
->> +    QTAILQ_INSERT_TAIL(&obj_q.q, &obj_qe1, next);
->> +    QTAILQ_INSERT_TAIL(&obj_q.q, &obj_qe2, next);
->> +
->> +    QEMUFile *fsave = open_test_file(true);
->> +
->> +    qemu_put_buffer(fsave, wire_q, sizeof(wire_q));
->> +    qemu_put_byte(fsave, QEMU_VM_EOF);
->> +    g_assert(!qemu_file_get_error(fsave));
->> +    qemu_fclose(fsave);
->> +
->> +    QEMUFile *fload = open_test_file(false);
->> +    TestQtailq tgt;
->> +
->> +    QTAILQ_INIT(&tgt.q);
->> +    vmstate_load_state(fload, &vmstate_q, &tgt, 1);
->> +    char eof = qemu_get_byte(fload);
->> +    g_assert(!qemu_file_get_error(fload));
->> +    g_assert_cmpint(tgt.i16, ==, obj_q.i16);
->> +    g_assert_cmpint(tgt.i32, ==, obj_q.i32);
->> +    g_assert_cmpint(eof, ==, QEMU_VM_EOF);
->> +
->> +    TestQtailqElement *qele_from = QTAILQ_FIRST(&obj_q.q);
->> +    TestQtailqElement *qlast_from = QTAILQ_LAST(&obj_q.q, TestQtailqHead);
->> +    TestQtailqElement *qele_to = QTAILQ_FIRST(&tgt.q);
->> +    TestQtailqElement *qlast_to = QTAILQ_LAST(&tgt.q, TestQtailqHead);
->> +
->> +    while (1) {
->> +        g_assert_cmpint(qele_to->b, ==, qele_from->b);
->> +        g_assert_cmpint(qele_to->u8, ==, qele_from->u8);
->> +        if ((qele_from == qlast_from) || (qele_to == qlast_to)) {
->> +            break;
->> +        }
->> +        qele_from = QTAILQ_NEXT(qele_from, next);
->> +        qele_to = QTAILQ_NEXT(qele_to, next);
->> +    }
->> +
->> +    g_assert_cmpint((uint64_t) qele_from, ==, (uint64_t) qlast_from);
->> +    g_assert_cmpint((uint64_t) qele_to, ==, (uint64_t) qlast_to);
->> +
->> +    /* clean up */
->> +    TestQtailqElement *qele;
->> +    while (!QTAILQ_EMPTY(&tgt.q)) {
->> +        qele = QTAILQ_LAST(&tgt.q, TestQtailqHead);
->> +        QTAILQ_REMOVE(&tgt.q, qele, next);
->> +        free(qele);
->> +        qele = NULL;
->> +    }
->> +    qemu_fclose(fload);
->> +}
->> +
->>  int main(int argc, char **argv)
->>  {
->>      temp_fd = mkstemp(temp_file);
->> @@ -562,6 +719,9 @@ int main(int argc, char **argv)
->>                      test_arr_ptr_str_no0_save);
->>      g_test_add_func("/vmstate/array/ptr/str/no0/load",
->>                      test_arr_ptr_str_no0_load);
->> +    g_test_add_func("/vmstate/qtailq/save/saveq", test_save_q);
->> +    g_test_add_func("/vmstate/qtailq/load/loadq", test_load_q);
->> +
->>      g_test_run();
->>  
->>      close(temp_fd);
->> -- 
->> 1.9.1
->>
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> diff --git a/target-arm/op_helper.c b/target-arm/op_helper.c
+> index cd94216..ba796d8 100644
+> --- a/target-arm/op_helper.c
+> +++ b/target-arm/op_helper.c
+> @@ -17,6 +17,7 @@
+>   * License along with this library; if not, see <http://www.gnu.org/licenses/>.
+>   */
+>  #include "qemu/osdep.h"
+> +#include "qemu/log.h"
+>  #include "cpu.h"
+>  #include "exec/helper-proto.h"
+>  #include "internals.h"
+> @@ -972,6 +973,9 @@ void HELPER(exception_return)(CPUARMState *env)
+>          } else {
+>              env->regs[15] = env->elr_el[cur_el] & ~0x3;
+>          }
+> +        qemu_log_mask(CPU_LOG_INT, "Exception return from AArch64 EL%d to "
+> +                      "AArch32 EL%d PC 0x%" PRIx32 "\n",
+> +                      cur_el, new_el, env->regs[15]);
+>      } else {
+>          env->aarch64 = 1;
+>          pstate_write(env, spsr);
+> @@ -980,6 +984,9 @@ void HELPER(exception_return)(CPUARMState *env)
+>          }
+>          aarch64_restore_sp(env, new_el);
+>          env->pc = env->elr_el[cur_el];
+> +        qemu_log_mask(CPU_LOG_INT, "Exception return from AArch64 EL%d to "
+> +                      "AArch64 EL%d PC 0x%" PRIx64 "\n",
+> +                      cur_el, new_el, env->pc);
+>      }
+>  
+>      arm_call_el_change_hook(arm_env_get_cpu(env));
+> @@ -1002,6 +1009,8 @@ illegal_return:
+>      if (!arm_singlestep_active(env)) {
+>          env->pstate &= ~PSTATE_SS;
+>      }
+> +    qemu_log_mask(LOG_GUEST_ERROR, "Illegal exception return at EL%d: "
+> +                  "resuming execution at 0x%" PRIx64 "\n", cur_el, env->pc);
+>  }
+>  
+>  /* Return true if the linked breakpoint entry lbn passes its checks */
+> -- 
+> 2.7.4
 > 
