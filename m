@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50340)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50367)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cEglG-00086Z-Lb
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 13:16:11 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cEgla-0008NB-VA
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 13:16:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cEglD-0007ab-H5
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 13:16:10 -0500
-Received: from mail-qk0-f193.google.com ([209.85.220.193]:35702)
+	(envelope-from <rth7680@gmail.com>) id 1cEglW-0007dz-Gn
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 13:16:30 -0500
+Received: from mail-qt0-f194.google.com ([209.85.216.194]:34663)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cEglD-0007aL-B5
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 13:16:07 -0500
-Received: by mail-qk0-f193.google.com with SMTP id n204so49358482qke.2
-	for <qemu-devel@nongnu.org>; Wed, 07 Dec 2016 10:16:07 -0800 (PST)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cEglW-0007ds-Ct
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 13:16:26 -0500
+Received: by mail-qt0-f194.google.com with SMTP id l20so45652654qta.1
+	for <qemu-devel@nongnu.org>; Wed, 07 Dec 2016 10:16:26 -0800 (PST)
+Received: from anchor.twiddle.net.com ([2602:47:d954:1500:221:9bff:feff:8add])
+	by smtp.gmail.com with ESMTPSA id
+	p35sm15344911qta.43.2016.12.07.10.15.24 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Wed, 07 Dec 2016 10:15:25 -0800 (PST)
 Sender: Richard Henderson <rth7680@gmail.com>
-References: <20161207180727.6286-1-rth@twiddle.net>
-	<20161207180727.6286-2-rth@twiddle.net>
-	<CAFEAcA_7kvm41Q-hzWW04ujk+y4jAekhoG9A4yYFSdaoDOgpHw@mail.gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Message-ID: <691e8220-de86-2319-7b9c-5cfe6198e26d@twiddle.net>
-Date: Wed, 7 Dec 2016 10:15:02 -0800
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_7kvm41Q-hzWW04ujk+y4jAekhoG9A4yYFSdaoDOgpHw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] tcg/aarch64: Fix addsub2 for 0+C
+Date: Wed,  7 Dec 2016 10:15:21 -0800
+Message-Id: <20161207181521.6591-1-rth@twiddle.net>
+Subject: [Qemu-devel] [PATCH] tcg/s390: Fix setcond expansion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,26 +29,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
 
-On 12/07/2016 10:10 AM, Peter Maydell wrote:
-> On 7 December 2016 at 18:07, Richard Henderson <rth@twiddle.net> wrote:
->> When al == xzr, we cannot use addi/subi because that encodes xsp.
->> Force a zero into the temp register for that (rare) case.
-> 
-> Incidentally I was slightly surprised that the optimisation
-> pass didn't turn "add2 rlo, rhi, 0, 0, 0, 0" into moves of 0
-> into rlo and rhi. Constant shifts of xzr in the guest don't
-> seem worth spending much effort on optimising though :-)
+We can't use LOAD AND TEST for unsigned data and then expect to
+extract the result with ADD LOGICAL WITH CARRY.  Fall through to
+using COMPARE LOGICAL IMMEDIATE instead.
 
-Until this last release cycle, we couldn't insert opcodes into the instruction
-stream during optimization.  Thus we were very restricted in what we could do
-when wanting to assign simpler values to two different outputs.
+Signed-off-by: Richard Henderson <rth@twiddle.net>
+---
+ tcg/s390/tcg-target.inc.c | 50 ++++++++++++++++++++++++++++-------------------
+ 1 file changed, 30 insertions(+), 20 deletions(-)
 
-I'll bet addition of 0 + non-constant come up semi-regularly for 32-bit hosts
-and 64-bit guests.  I'll see about better simplification of double-word
-arithmetic for the next cycle.
-
-
-r~
+diff --git a/tcg/s390/tcg-target.inc.c b/tcg/s390/tcg-target.inc.c
+index 253d4a0..23115b5 100644
+--- a/tcg/s390/tcg-target.inc.c
++++ b/tcg/s390/tcg-target.inc.c
+@@ -1093,33 +1093,43 @@ static void tgen64_xori(TCGContext *s, TCGReg dest, tcg_target_ulong val)
+ }
+ 
+ static int tgen_cmp(TCGContext *s, TCGType type, TCGCond c, TCGReg r1,
+-                    TCGArg c2, int c2const)
++                    TCGArg c2, bool c2const, bool need_carry)
+ {
+     bool is_unsigned = is_unsigned_cond(c);
+     if (c2const) {
+         if (c2 == 0) {
++            if (!(is_unsigned && need_carry)) {
++                if (type == TCG_TYPE_I32) {
++                    tcg_out_insn(s, RR, LTR, r1, r1);
++                } else {
++                    tcg_out_insn(s, RRE, LTGR, r1, r1);
++                }
++                return tcg_cond_to_ltr_cond[c];
++            }
++            /* If we only got here because of load-and-test,
++               and we couldn't use that, then we need to load
++               the constant into a register.  */
++            if (!(facilities & FACILITY_EXT_IMM)) {
++                c2 = TCG_TMP0;
++                tcg_out_movi(s, type, c2, 0);
++                goto do_reg;
++            }
++        }
++        if (is_unsigned) {
+             if (type == TCG_TYPE_I32) {
+-                tcg_out_insn(s, RR, LTR, r1, r1);
++                tcg_out_insn(s, RIL, CLFI, r1, c2);
+             } else {
+-                tcg_out_insn(s, RRE, LTGR, r1, r1);
++                tcg_out_insn(s, RIL, CLGFI, r1, c2);
+             }
+-            return tcg_cond_to_ltr_cond[c];
+         } else {
+-            if (is_unsigned) {
+-                if (type == TCG_TYPE_I32) {
+-                    tcg_out_insn(s, RIL, CLFI, r1, c2);
+-                } else {
+-                    tcg_out_insn(s, RIL, CLGFI, r1, c2);
+-                }
++            if (type == TCG_TYPE_I32) {
++                tcg_out_insn(s, RIL, CFI, r1, c2);
+             } else {
+-                if (type == TCG_TYPE_I32) {
+-                    tcg_out_insn(s, RIL, CFI, r1, c2);
+-                } else {
+-                    tcg_out_insn(s, RIL, CGFI, r1, c2);
+-                }
++                tcg_out_insn(s, RIL, CGFI, r1, c2);
+             }
+         }
+     } else {
++    do_reg:
+         if (is_unsigned) {
+             if (type == TCG_TYPE_I32) {
+                 tcg_out_insn(s, RR, CLR, r1, c2);
+@@ -1148,7 +1158,7 @@ static void tgen_setcond(TCGContext *s, TCGType type, TCGCond cond,
+     do_greater:
+         /* The result of a compare has CC=2 for GT and CC=3 unused.
+            ADD LOGICAL WITH CARRY considers (CC & 2) the carry bit.  */
+-        tgen_cmp(s, type, cond, c1, c2, c2const);
++        tgen_cmp(s, type, cond, c1, c2, c2const, true);
+         tcg_out_movi(s, type, dest, 0);
+         tcg_out_insn(s, RRE, ALCGR, dest, dest);
+         return;
+@@ -1219,7 +1229,7 @@ static void tgen_setcond(TCGContext *s, TCGType type, TCGCond cond,
+         break;
+     }
+ 
+-    cc = tgen_cmp(s, type, cond, c1, c2, c2const);
++    cc = tgen_cmp(s, type, cond, c1, c2, c2const, false);
+     if (facilities & FACILITY_LOAD_ON_COND) {
+         /* Emit: d = 0, t = 1, d = (cc ? t : d).  */
+         tcg_out_movi(s, TCG_TYPE_I64, dest, 0);
+@@ -1238,11 +1248,11 @@ static void tgen_movcond(TCGContext *s, TCGType type, TCGCond c, TCGReg dest,
+ {
+     int cc;
+     if (facilities & FACILITY_LOAD_ON_COND) {
+-        cc = tgen_cmp(s, type, c, c1, c2, c2const);
++        cc = tgen_cmp(s, type, c, c1, c2, c2const, false);
+         tcg_out_insn(s, RRF, LOCGR, dest, r3, cc);
+     } else {
+         c = tcg_invert_cond(c);
+-        cc = tgen_cmp(s, type, c, c1, c2, c2const);
++        cc = tgen_cmp(s, type, c, c1, c2, c2const, false);
+ 
+         /* Emit: if (cc) goto over; dest = r3; over:  */
+         tcg_out_insn(s, RI, BRC, cc, (4 + 4) >> 1);
+@@ -1374,7 +1384,7 @@ static void tgen_brcond(TCGContext *s, TCGType type, TCGCond c,
+         }
+     }
+ 
+-    cc = tgen_cmp(s, type, c, r1, c2, c2const);
++    cc = tgen_cmp(s, type, c, r1, c2, c2const, false);
+     tgen_branch(s, cc, l);
+ }
+ 
+-- 
+2.9.3
