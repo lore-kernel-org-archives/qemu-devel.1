@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58585)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34207)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cEidg-00063F-95
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 15:16:32 -0500
+	(envelope-from <bounces@canonical.com>) id 1cEim7-0000So-Qf
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 15:25:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cEidc-0005Hy-9N
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 15:16:28 -0500
-Received: from indium.canonical.com ([91.189.90.7]:42501)
+	(envelope-from <bounces@canonical.com>) id 1cEim4-00007a-KJ
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 15:25:11 -0500
+Received: from indium.canonical.com ([91.189.90.7]:46842)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cEidc-0005HP-44
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 15:16:24 -0500
+	id 1cEim4-00005w-Dh
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 15:25:08 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cEidZ-0000xm-NQ
-	for <qemu-devel@nongnu.org>; Wed, 07 Dec 2016 20:16:22 +0000
+	id 1cEim2-0002kB-6h
+	for <qemu-devel@nongnu.org>; Wed, 07 Dec 2016 20:25:06 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 0025B2E80EA
-	for <qemu-devel@nongnu.org>; Wed,  7 Dec 2016 20:16:18 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 0139F2E80DA
+	for <qemu-devel@nongnu.org>; Wed,  7 Dec 2016 20:25:00 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 07 Dec 2016 20:01:41 -0000
-From: Thomas Huth <584146@bugs.launchpad.net>
-Reply-To: Bug 584146 <584146@bugs.launchpad.net>
+Date: Wed, 07 Dec 2016 20:05:53 -0000
+From: Thomas Huth <498417@bugs.launchpad.net>
+Reply-To: Bug 498417 <498417@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20100522092545.29377.46473.malonedeb@soybean.canonical.com>
-Message-Id: <20161207200141.16926.48817.malone@soybean.canonical.com>
+References: <20091219045751.13510.70467.malonedeb@gangotri.canonical.com>
+Message-Id: <20161207200553.25246.35218.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 584146] Re: Virtual fat breaks with -snapshot
+Subject: [Qemu-devel] [Bug 498417] Re: cache=writeback on disk image doesn't
+ do write-back
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,37 +39,47 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Can you still reproduce this issue with the latest version of QEMU? If
-so, could you please provide a proper command line that triggers this
-problem?
+QEMU 0.11 / 0.12 is pretty much outdated nowadays ... can you still
+reproduce this issue with the latest version of QEMU?
 
 ** Changed in: qemu
-       Status: Confirmed =3D> Incomplete
+       Status: New =3D> Incomplete
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/584146
+https://bugs.launchpad.net/bugs/498417
 
 Title:
-  Virtual fat breaks with -snapshot
+  cache=3Dwriteback on disk image doesn't do write-back
 
 Status in QEMU:
   Incomplete
-Status in qemu-kvm package in Debian:
-  Confirmed
 
 Bug description:
-  When using fat emulation together with snapshot, qemu fails to find
-  the directory for the fat "filesystem".
+  I noticed that qemu seems to have poor disk performance.  Here's a
+  test that has miserable performance but which should be really fast:
 
-  See Debian bug#504049, http://bugs.debian.org/cgi-
-  bin/bugreport.cgi?bug=3D504049 and discussion on qemu-devel with Kevin
-  Wolf, http://marc.info/?t=3D126850802800001 for details.
+  - Configure qemu to use the disk image with cache=3Dwriteback
+  - Configure a 2GiB Linux VM on an 8GiB Linux host
+  - In the VM, write a 4GiB file (dd if=3D/dev/zero of=3D/tmp/x bs=3D4K cou=
+nt=3D1M)
+  - In the VM, read it back (dd if=3D/tmp/x of=3D/dev/null bs=3D4K count=3D=
+1M)
 
-  There's a workaround for this bug: when using full path for
-  fat:/dir/name it works.
+  With writeback, the whole file should end up in the host pagecache.
+  So when I read it back, there should be no I/O to the real disk, and
+  it should be really fast.  Instead, I see disk activity through the
+  duration of the test, and the performance is roughly the native hard
+  disk throughput (somewhat slower).
+
+  I'm using version 0.11.1, and this is my command line:
+
+  qemu-system-x86_64 -drive
+  cache=3Dwriteback,index=3D0,media=3Ddisk,file=3Dubuntu.img -k en-us -m 20=
+48
+  -smp 2 -vnc :3100 -usbdevice tablet -enable-kvm &
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/584146/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/498417/+subscriptions
