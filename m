@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59506)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40798)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1cEWzB-0007IG-Cp
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 02:49:54 -0500
+	(envelope-from <longpeng2@huawei.com>) id 1cEXgI-0005S6-Dx
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 03:34:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1cEWz8-00064Y-C4
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 02:49:53 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48482)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
-	id 1cEWz8-00062o-6V
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 02:49:50 -0500
-References: <20161130101017.13382-1-maxime.coquelin@redhat.com>
-	<20161130101017.13382-3-maxime.coquelin@redhat.com>
-	<f7t37i0x61w.fsf@redhat.com>
-From: Maxime Coquelin <maxime.coquelin@redhat.com>
-Message-ID: <506e3923-6354-03fa-b622-01d23233f42a@redhat.com>
-Date: Wed, 7 Dec 2016 08:49:42 +0100
+	(envelope-from <longpeng2@huawei.com>) id 1cEXgF-0001hd-8s
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 03:34:26 -0500
+Received: from szxga03-in.huawei.com ([119.145.14.66]:8120)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <longpeng2@huawei.com>) id 1cEXgE-0001fj-U5
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 03:34:23 -0500
+From: "Longpeng(Mike)" <longpeng2@huawei.com>
+Date: Wed, 7 Dec 2016 16:33:42 +0800
+Message-ID: <1481099622-188132-3-git-send-email-longpeng2@huawei.com>
+In-Reply-To: <1481099622-188132-1-git-send-email-longpeng2@huawei.com>
+References: <1481099622-188132-1-git-send-email-longpeng2@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <f7t37i0x61w.fsf@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v3 2/3] vhost-net: Notify the backend about
- the host MTU
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH for-2.9 2/2] cryptodev: add 3des-ede support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,82 +25,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aaron Conole <aconole@redhat.com>
-Cc: mst@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, fbl@redhat.com, berrange@redhat.com, mlureau@redhat.com, ktraynor@redhat.com, jasowang@redhat.com, yuanhan.liu@linux.intel.com
+To: berrange@redhat.com, eblake@redhat.com, armbru@redhat.com, arei.gonglei@huawei.com
+Cc: qemu-devel@nongnu.org, wu.wubin@huawei.com, jianjay.zhou@huawei.com, "Longpeng(Mike)" <longpeng2@huawei.com>
 
+This patch add 3des-ede support for cryptodev. However this is effective
+only when backend using libgcrypt/nettle, because cipher-builtin doesn't
+support 3des-ede yet.
 
+Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
+---
+ backends/cryptodev-builtin.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-On 12/06/2016 07:31 PM, Aaron Conole wrote:
-> Maxime Coquelin <maxime.coquelin@redhat.com> writes:
->
->> This patch provides a way for virtio-net to notify the
->> backend about the host MTU set by the user.
->>
->> Cc: Michael S. Tsirkin <mst@redhat.com>
->> Cc: Aaron Conole <aconole@redhat.com>
->> Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
->> ---
->>  hw/net/vhost_net.c      | 22 ++++++++++++++++++++++
->>  include/net/vhost_net.h |  2 ++
->>  2 files changed, 24 insertions(+)
->>
->> diff --git a/hw/net/vhost_net.c b/hw/net/vhost_net.c
->> index f2d49ad..d7c13d4 100644
->> --- a/hw/net/vhost_net.c
->> +++ b/hw/net/vhost_net.c
->> @@ -51,6 +51,7 @@ static const int kernel_feature_bits[] = {
->>      VIRTIO_RING_F_EVENT_IDX,
->>      VIRTIO_NET_F_MRG_RXBUF,
->>      VIRTIO_F_VERSION_1,
->> +    VIRTIO_NET_F_MTU,
->>      VHOST_INVALID_FEATURE_BIT
->>  };
->>
->> @@ -74,6 +75,7 @@ static const int user_feature_bits[] = {
->>      VIRTIO_NET_F_HOST_ECN,
->>      VIRTIO_NET_F_HOST_UFO,
->>      VIRTIO_NET_F_MRG_RXBUF,
->> +    VIRTIO_NET_F_MTU,
->>
->>      /* This bit implies RARP isn't sent by QEMU out of band */
->>      VIRTIO_NET_F_GUEST_ANNOUNCE,
->> @@ -435,6 +437,22 @@ int vhost_set_vring_enable(NetClientState *nc, int enable)
->>      return 0;
->>  }
->>
->> +int vhost_net_set_mtu(struct vhost_net *net, uint16_t mtu)
->> +{
->> +    const VhostOps *vhost_ops = net->dev.vhost_ops;
->> +    int ret;
->> +
->> +    if (!vhost_ops->vhost_net_set_mtu) {
->> +        return -ENOSYS;
->> +    }
->> +
->> +    ret = vhost_ops->vhost_net_set_mtu(&net->dev, mtu);
->> +    if (ret < 0) {
->> +        return -errno;
->> +    }
->> +    return 0;
->> +}
->> +
->>  #else
->>  uint64_t vhost_net_get_max_queues(VHostNetState *net)
->>  {
->> @@ -501,4 +519,8 @@ int vhost_set_vring_enable(NetClientState *nc, int enable)
->>  {
->>      return 0;
->>  }
->> +
->> +int vhost_net_set_mtu(struct vhost_net *net, uint16_t mtu)
->> +{
->> +}
->>  #endif
->
-> I think this should return something - I don't know what value will come
-> through if it doesn't :).
-
-Good catch, of course something should be returned...
-
-Thanks!
-Maxime
+diff --git a/backends/cryptodev-builtin.c b/backends/cryptodev-builtin.c
+index 5fb2836..0231f51 100644
+--- a/backends/cryptodev-builtin.c
++++ b/backends/cryptodev-builtin.c
+@@ -205,6 +205,18 @@ static int cryptodev_builtin_create_cipher_session(
+             return -1;
+         }
+         break;
++    case VIRTIO_CRYPTO_CIPHER_3DES_ECB:
++        mode = QCRYPTO_CIPHER_MODE_ECB;
++        algo = QCRYPTO_CIPHER_ALG_3DES_EDE;
++        break;
++    case VIRTIO_CRYPTO_CIPHER_3DES_CBC:
++        mode = QCRYPTO_CIPHER_MODE_CBC;
++        algo = QCRYPTO_CIPHER_ALG_3DES_EDE;
++        break;
++    case VIRTIO_CRYPTO_CIPHER_3DES_CTR:
++        mode = QCRYPTO_CIPHER_MODE_CTR;
++        algo = QCRYPTO_CIPHER_ALG_3DES_EDE;
++        break;
+     default:
+         error_setg(errp, "Unsupported cipher alg :%u",
+                    sess_info->cipher_alg);
+-- 
+1.8.3.1
