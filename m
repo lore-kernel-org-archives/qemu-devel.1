@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50367)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52207)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cEgla-0008NB-VA
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 13:16:32 -0500
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cEguC-0004h9-Lp
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 13:25:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cEglW-0007dz-Gn
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 13:16:30 -0500
-Received: from mail-qt0-f194.google.com ([209.85.216.194]:34663)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cEglW-0007ds-Ct
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 13:16:26 -0500
-Received: by mail-qt0-f194.google.com with SMTP id l20so45652654qta.1
-	for <qemu-devel@nongnu.org>; Wed, 07 Dec 2016 10:16:26 -0800 (PST)
-Received: from anchor.twiddle.net.com ([2602:47:d954:1500:221:9bff:feff:8add])
-	by smtp.gmail.com with ESMTPSA id
-	p35sm15344911qta.43.2016.12.07.10.15.24 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Wed, 07 Dec 2016 10:15:25 -0800 (PST)
-Sender: Richard Henderson <rth7680@gmail.com>
-From: Richard Henderson <rth@twiddle.net>
-Date: Wed,  7 Dec 2016 10:15:21 -0800
-Message-Id: <20161207181521.6591-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH] tcg/s390: Fix setcond expansion
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cEgu7-0001lm-OS
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 13:25:24 -0500
+Received: from 001b2d01.pphosted.com ([148.163.156.1]:36067
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
+	id 1cEgu7-0001lY-FJ
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 13:25:19 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
+	uB7IJuc2057245
+	for <qemu-devel@nongnu.org>; Wed, 7 Dec 2016 13:25:17 -0500
+Received: from e28smtp09.in.ibm.com (e28smtp09.in.ibm.com [125.16.236.9])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 276m5xku3y-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 07 Dec 2016 13:25:16 -0500
+Received: from localhost
+	by e28smtp09.in.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
+	Wed, 7 Dec 2016 23:55:13 +0530
+From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+Date: Wed,  7 Dec 2016 23:54:53 +0530
+Message-Id: <1481135102-20011-1-git-send-email-nikunj@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v1 ppc-for-2.9 0/9] POWER9 TCG enablements -
+ part9
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,120 +37,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net
+Cc: qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com, nikunj@linux.vnet.ibm.com
 
-We can't use LOAD AND TEST for unsigned data and then expect to
-extract the result with ADD LOGICAL WITH CARRY.  Fall through to
-using COMPARE LOGICAL IMMEDIATE instead.
+This series contains 12 new instructions for POWER9 ISA3.0
+     Couple of consolidation patches
+     VSX Vector Insert/Extract Word
+     VSX Vector Permute
+     VSX Load/Store with length
+     VSX Scalar Quad-Precision Move Instructions
 
-Signed-off-by: Richard Henderson <rth@twiddle.net>
----
- tcg/s390/tcg-target.inc.c | 50 ++++++++++++++++++++++++++++-------------------
- 1 file changed, 30 insertions(+), 20 deletions(-)
+Changelog:
+v0:
+* Fixed lxvl/lxvll and stxvl/stxvll as suggested by Richard
+* Dropped mask_u128, which is not needed anymore
+* Prevent UIMM > 12 in xxextractuw
+* Drop xori from xsnegqp
+* Rewrite xxperm/xxpermr without double copy
 
-diff --git a/tcg/s390/tcg-target.inc.c b/tcg/s390/tcg-target.inc.c
-index 253d4a0..23115b5 100644
---- a/tcg/s390/tcg-target.inc.c
-+++ b/tcg/s390/tcg-target.inc.c
-@@ -1093,33 +1093,43 @@ static void tgen64_xori(TCGContext *s, TCGReg dest, tcg_target_ulong val)
- }
- 
- static int tgen_cmp(TCGContext *s, TCGType type, TCGCond c, TCGReg r1,
--                    TCGArg c2, int c2const)
-+                    TCGArg c2, bool c2const, bool need_carry)
- {
-     bool is_unsigned = is_unsigned_cond(c);
-     if (c2const) {
-         if (c2 == 0) {
-+            if (!(is_unsigned && need_carry)) {
-+                if (type == TCG_TYPE_I32) {
-+                    tcg_out_insn(s, RR, LTR, r1, r1);
-+                } else {
-+                    tcg_out_insn(s, RRE, LTGR, r1, r1);
-+                }
-+                return tcg_cond_to_ltr_cond[c];
-+            }
-+            /* If we only got here because of load-and-test,
-+               and we couldn't use that, then we need to load
-+               the constant into a register.  */
-+            if (!(facilities & FACILITY_EXT_IMM)) {
-+                c2 = TCG_TMP0;
-+                tcg_out_movi(s, type, c2, 0);
-+                goto do_reg;
-+            }
-+        }
-+        if (is_unsigned) {
-             if (type == TCG_TYPE_I32) {
--                tcg_out_insn(s, RR, LTR, r1, r1);
-+                tcg_out_insn(s, RIL, CLFI, r1, c2);
-             } else {
--                tcg_out_insn(s, RRE, LTGR, r1, r1);
-+                tcg_out_insn(s, RIL, CLGFI, r1, c2);
-             }
--            return tcg_cond_to_ltr_cond[c];
-         } else {
--            if (is_unsigned) {
--                if (type == TCG_TYPE_I32) {
--                    tcg_out_insn(s, RIL, CLFI, r1, c2);
--                } else {
--                    tcg_out_insn(s, RIL, CLGFI, r1, c2);
--                }
-+            if (type == TCG_TYPE_I32) {
-+                tcg_out_insn(s, RIL, CFI, r1, c2);
-             } else {
--                if (type == TCG_TYPE_I32) {
--                    tcg_out_insn(s, RIL, CFI, r1, c2);
--                } else {
--                    tcg_out_insn(s, RIL, CGFI, r1, c2);
--                }
-+                tcg_out_insn(s, RIL, CGFI, r1, c2);
-             }
-         }
-     } else {
-+    do_reg:
-         if (is_unsigned) {
-             if (type == TCG_TYPE_I32) {
-                 tcg_out_insn(s, RR, CLR, r1, c2);
-@@ -1148,7 +1158,7 @@ static void tgen_setcond(TCGContext *s, TCGType type, TCGCond cond,
-     do_greater:
-         /* The result of a compare has CC=2 for GT and CC=3 unused.
-            ADD LOGICAL WITH CARRY considers (CC & 2) the carry bit.  */
--        tgen_cmp(s, type, cond, c1, c2, c2const);
-+        tgen_cmp(s, type, cond, c1, c2, c2const, true);
-         tcg_out_movi(s, type, dest, 0);
-         tcg_out_insn(s, RRE, ALCGR, dest, dest);
-         return;
-@@ -1219,7 +1229,7 @@ static void tgen_setcond(TCGContext *s, TCGType type, TCGCond cond,
-         break;
-     }
- 
--    cc = tgen_cmp(s, type, cond, c1, c2, c2const);
-+    cc = tgen_cmp(s, type, cond, c1, c2, c2const, false);
-     if (facilities & FACILITY_LOAD_ON_COND) {
-         /* Emit: d = 0, t = 1, d = (cc ? t : d).  */
-         tcg_out_movi(s, TCG_TYPE_I64, dest, 0);
-@@ -1238,11 +1248,11 @@ static void tgen_movcond(TCGContext *s, TCGType type, TCGCond c, TCGReg dest,
- {
-     int cc;
-     if (facilities & FACILITY_LOAD_ON_COND) {
--        cc = tgen_cmp(s, type, c, c1, c2, c2const);
-+        cc = tgen_cmp(s, type, c, c1, c2, c2const, false);
-         tcg_out_insn(s, RRF, LOCGR, dest, r3, cc);
-     } else {
-         c = tcg_invert_cond(c);
--        cc = tgen_cmp(s, type, c, c1, c2, c2const);
-+        cc = tgen_cmp(s, type, c, c1, c2, c2const, false);
- 
-         /* Emit: if (cc) goto over; dest = r3; over:  */
-         tcg_out_insn(s, RI, BRC, cc, (4 + 4) >> 1);
-@@ -1374,7 +1384,7 @@ static void tgen_brcond(TCGContext *s, TCGType type, TCGCond c,
-         }
-     }
- 
--    cc = tgen_cmp(s, type, c, r1, c2, c2const);
-+    cc = tgen_cmp(s, type, c, r1, c2, c2const, false);
-     tgen_branch(s, cc, l);
- }
- 
+Bharata B Rao (1):
+  target-ppc: Add xxperm and xxpermr instructions
+
+Nikunj A Dadhania (8):
+  target-ppc: implement lxvl instruction
+  target-ppc: implement lxvll instruction
+  target-ppc: implement stxvl instruction
+  target-ppc: implement stxvll instructions
+  target-ppc: implement xxextractuw instruction
+  target-ppc: implement xxinsertw instruction
+  target-ppc: implement xsnegqp instruction
+  target-ppc: implement xscpsgnqp instruction
+
+ target-ppc/fpu_helper.c             | 23 +++++++++
+ target-ppc/helper.h                 |  8 ++++
+ target-ppc/int_helper.c             | 61 ++++++++++++++++++++++++
+ target-ppc/mem_helper.c             | 94 +++++++++++++++++++++++++++++++++++++
+ target-ppc/translate/vsx-impl.inc.c | 76 +++++++++++++++++++++++++++++-
+ target-ppc/translate/vsx-ops.inc.c  | 14 ++++++
+ 6 files changed, 275 insertions(+), 1 deletion(-)
+
 -- 
-2.9.3
+2.7.4
