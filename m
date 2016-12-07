@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45081)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45711)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1cEl02-000740-K8
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 17:47:43 -0500
+	(envelope-from <jsnow@redhat.com>) id 1cEl3z-0008Cg-3z
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 17:51:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1cEl01-0000FC-Nj
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 17:47:42 -0500
-Date: Wed, 7 Dec 2016 23:46:34 +0100
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Message-ID: <20161207224634.GG9606@toto>
-References: <1481046379-32632-1-git-send-email-peter.maydell@linaro.org>
-	<1481046379-32632-4-git-send-email-peter.maydell@linaro.org>
+	(envelope-from <jsnow@redhat.com>) id 1cEl3y-0001VR-5X
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 17:51:47 -0500
+References: <1479835586-74394-1-git-send-email-vsementsov@virtuozzo.com>
+	<1479835586-74394-9-git-send-email-vsementsov@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <080c81f9-6360-8b0f-2f77-14f10f7ac244@redhat.com>
+Date: Wed, 7 Dec 2016 17:51:38 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1481046379-32632-4-git-send-email-peter.maydell@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH 3/3] hw/intc/arm_gicv3: Don't signal
- Pending+Active interrupts to CPU
+In-Reply-To: <1479835586-74394-9-git-send-email-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 08/21] block: introduce auto-loading bitmaps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,69 +23,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, armbru@redhat.com, mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, den@openvz.org
 
-On Tue, Dec 06, 2016 at 05:46:19PM +0000, Peter Maydell wrote:
-> The GICv3 requires that we only signal Pending interrupts to
-> the CPU. This category does not include Pending+Active interrupts,
-> which means we need to check whether the interrupt is Active in
-> the gicr_int_pending() and gicd_int_pending() functions.
+
+
+On 11/22/2016 12:26 PM, Vladimir Sementsov-Ogievskiy wrote:
+> Auto loading bitmaps are bitmaps store in the disk image, which should
+> be loaded when the image is opened and become BdrvDirtyBitmaps for the
+> corresponding drive.
 > 
-> Interrupts are rarely in the Active+Pending state, but KVM
-> uses this as part of its handling of the virtual timer, so
-> this bug was causing KVM to go into an infinite loop of
-> taking the vtimer interrupt when the guest first triggered it.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-
-
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-
-
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  hw/intc/arm_gicv3.c | 5 +++++
->  1 file changed, 5 insertions(+)
+>  block.c                   | 14 ++++++++++++++
+>  include/block/block.h     |  2 ++
+>  include/block/block_int.h |  3 +++
+>  3 files changed, 19 insertions(+)
 > 
-> diff --git a/hw/intc/arm_gicv3.c b/hw/intc/arm_gicv3.c
-> index 8a6c647..f0c967b 100644
-> --- a/hw/intc/arm_gicv3.c
-> +++ b/hw/intc/arm_gicv3.c
-> @@ -54,6 +54,7 @@ static uint32_t gicd_int_pending(GICv3State *s, int irq)
->       *  + the PENDING latch is set OR it is level triggered and the input is 1
->       *  + its ENABLE bit is set
->       *  + the GICD enable bit for its group is set
-> +     *  + its ACTIVE bit is not set (otherwise it would be Active+Pending)
->       * Conveniently we can bulk-calculate this with bitwise operations.
->       */
->      uint32_t pend, grpmask;
-> @@ -63,9 +64,11 @@ static uint32_t gicd_int_pending(GICv3State *s, int irq)
->      uint32_t group = *gic_bmp_ptr32(s->group, irq);
->      uint32_t grpmod = *gic_bmp_ptr32(s->grpmod, irq);
->      uint32_t enable = *gic_bmp_ptr32(s->enabled, irq);
-> +    uint32_t active = *gic_bmp_ptr32(s->active, irq);
+> diff --git a/block.c b/block.c
+> index 39ddea3..450379c 100644
+> --- a/block.c
+> +++ b/block.c
+> @@ -1137,6 +1137,13 @@ static int bdrv_open_common(BlockDriverState *bs, BdrvChild *file,
+>          goto free_and_fail;
+>      }
 >  
->      pend = pending | (~edge_trigger & level);
->      pend &= enable;
-> +    pend &= ~active;
+> +    bdrv_load_autoloading_dirty_bitmaps(bs, &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        ret = -EINVAL;
+> +        goto free_and_fail;
+> +    }
+> +
+>      assert(bdrv_opt_mem_align(bs) != 0);
+>      assert(bdrv_min_mem_align(bs) != 0);
+>      assert(is_power_of_2(bs->bl.request_alignment));
+> @@ -4093,3 +4100,10 @@ void bdrv_del_child(BlockDriverState *parent_bs, BdrvChild *child, Error **errp)
 >  
->      if (s->gicd_ctlr & GICD_CTLR_DS) {
->          grpmod = 0;
-> @@ -96,12 +99,14 @@ static uint32_t gicr_int_pending(GICv3CPUState *cs)
->       *  + the PENDING latch is set OR it is level triggered and the input is 1
->       *  + its ENABLE bit is set
->       *  + the GICD enable bit for its group is set
-> +     *  + its ACTIVE bit is not set (otherwise it would be Active+Pending)
->       * Conveniently we can bulk-calculate this with bitwise operations.
->       */
->      uint32_t pend, grpmask, grpmod;
+>      parent_bs->drv->bdrv_del_child(parent_bs, child, errp);
+>  }
+> +
+> +void bdrv_load_autoloading_dirty_bitmaps(BlockDriverState *bs, Error **errp)
+> +{
+> +    if (bs->drv && bs->drv->bdrv_load_autoloading_dirty_bitmaps) {
+> +        bs->drv->bdrv_load_autoloading_dirty_bitmaps(bs, errp);
+> +    }
+> +}
+> diff --git a/include/block/block.h b/include/block/block.h
+> index 49bb0b2..f701da2 100644
+> --- a/include/block/block.h
+> +++ b/include/block/block.h
+> @@ -552,4 +552,6 @@ void bdrv_add_child(BlockDriverState *parent, BlockDriverState *child,
+>                      Error **errp);
+>  void bdrv_del_child(BlockDriverState *parent, BdrvChild *child, Error **errp);
 >  
->      pend = cs->gicr_ipendr0 | (~cs->edge_trigger & cs->level);
->      pend &= cs->gicr_ienabler0;
-> +    pend &= ~cs->gicr_iactiver0;
+> +void bdrv_load_autoloading_dirty_bitmaps(BlockDriverState *bs, Error **errp);
+> +
+>  #endif
+> diff --git a/include/block/block_int.h b/include/block/block_int.h
+> index 83a423c..ca955f0 100644
+> --- a/include/block/block_int.h
+> +++ b/include/block/block_int.h
+> @@ -320,6 +320,9 @@ struct BlockDriver {
+>      void (*bdrv_del_child)(BlockDriverState *parent, BdrvChild *child,
+>                             Error **errp);
 >  
->      if (cs->gic->gicd_ctlr & GICD_CTLR_DS) {
->          grpmod = 0;
-> -- 
-> 2.7.4
+> +    void (*bdrv_load_autoloading_dirty_bitmaps)(BlockDriverState *bs,
+> +                                                Error **errp);
+> +
+>      QLIST_ENTRY(BlockDriver) list;
+>  };
+>  
 > 
+
+If you address Max's comments:
+
+Reviewed-by: John Snow <jsnow@redhat.com>
