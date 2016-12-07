@@ -1,34 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34207)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35582)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cEim7-0000So-Qf
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 15:25:13 -0500
+	(envelope-from <aarcange@redhat.com>) id 1cEipK-0002Gl-OT
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 15:28:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cEim4-00007a-KJ
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 15:25:11 -0500
-Received: from indium.canonical.com ([91.189.90.7]:46842)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cEim4-00005w-Dh
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 15:25:08 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cEim2-0002kB-6h
-	for <qemu-devel@nongnu.org>; Wed, 07 Dec 2016 20:25:06 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 0139F2E80DA
-	for <qemu-devel@nongnu.org>; Wed,  7 Dec 2016 20:25:00 +0000 (UTC)
+	(envelope-from <aarcange@redhat.com>) id 1cEipH-0001nB-IQ
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 15:28:30 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36404)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aarcange@redhat.com>) id 1cEipH-0001mm-Aw
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 15:28:27 -0500
+Date: Wed, 7 Dec 2016 21:28:24 +0100
+From: Andrea Arcangeli <aarcange@redhat.com>
+Message-ID: <20161207202824.GH28786@redhat.com>
+References: <1480495397-23225-1-git-send-email-liang.z.li@intel.com>
+	<f67ca79c-ad34-59dd-835f-e7bc9dcaef58@redhat.com>
+	<F2CBF3009FA73547804AE4C663CAB28E3A130C01@shsmsx102.ccr.corp.intel.com>
+	<0b18c636-ee67-cbb4-1ba3-81a06150db76@redhat.com>
+	<0b83db29-ebad-2a70-8d61-756d33e33a48@intel.com>
+	<2171e091-46ee-decd-7348-772555d3a5e3@redhat.com>
+	<d3ff453c-56fa-19de-317c-1c82456f2831@intel.com>
+	<20161207183817.GE28786@redhat.com>
+	<b58fd9f6-d9dd-dd56-d476-dd342174dac5@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 07 Dec 2016 20:05:53 -0000
-From: Thomas Huth <498417@bugs.launchpad.net>
-Reply-To: Bug 498417 <498417@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20091219045751.13510.70467.malonedeb@gangotri.canonical.com>
-Message-Id: <20161207200553.25246.35218.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 498417] Re: cache=writeback on disk image doesn't
- do write-back
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b58fd9f6-d9dd-dd56-d476-dd342174dac5@intel.com>
+Subject: Re: [Qemu-devel] [PATCH kernel v5 0/5] Extend virtio-balloon for
+ fast (de)inflating & fast live migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,49 +35,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Dave Hansen <dave.hansen@intel.com>
+Cc: David Hildenbrand <david@redhat.com>, "Li, Liang Z" <liang.z.li@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mhocko@suse.com" <mhocko@suse.com>, "mst@redhat.com" <mst@redhat.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>
 
-QEMU 0.11 / 0.12 is pretty much outdated nowadays ... can you still
-reproduce this issue with the latest version of QEMU?
+On Wed, Dec 07, 2016 at 11:54:34AM -0800, Dave Hansen wrote:
+> We're talking about a bunch of different stuff which is all being
+> conflated.  There are 3 issues here that I can see.  I'll attempt to
+> summarize what I think is going on:
+> 
+> 1. Current patches do a hypercall for each order in the allocator.
+>    This is inefficient, but independent from the underlying data
+>    structure in the ABI, unless bitmaps are in play, which they aren't.
+> 2. Should we have bitmaps in the ABI, even if they are not in use by the
+>    guest implementation today?  Andrea says they have zero benefits
+>    over a pfn/len scheme.  Dave doesn't think they have zero benefits
+>    but isn't that attached to them.  QEMU's handling gets more
+>    complicated when using a bitmap.
+> 3. Should the ABI contain records each with a pfn/len pair or a
+>    pfn/order pair?
+>    3a. 'len' is more flexible, but will always be a power-of-two anyway
+> 	for high-order pages (the common case)
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+Len wouldn't be a power of two practically only if we detect adjacent
+pages of smaller order that may merge into larger orders we already
+allocated (or the other way around).
 
--- =
+[addr=2M, len=2M] allocated at order 9 pass
+[addr=4M, len=1M] allocated at order 8 pass -> merge as [addr=2M, len=3M]
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/498417
+Not sure if it would be worth it, but that unless we do this, page-order or
+len won't make much difference.
 
-Title:
-  cache=3Dwriteback on disk image doesn't do write-back
+>    3b. if we decide not to have a bitmap, then we basically have plenty
+> 	of space for 'len' and should just do it
+>    3c. It's easiest for the hypervisor to turn pfn/len into the
+>        madvise() calls that it needs.
+> 
+> Did I miss anything?
 
-Status in QEMU:
-  Incomplete
+I think you summarized fine all my arguments in your summary.
 
-Bug description:
-  I noticed that qemu seems to have poor disk performance.  Here's a
-  test that has miserable performance but which should be really fast:
+> FWIW, I don't feel that strongly about the bitmap.  Li had one
+> originally, but I think the code thus far has demonstrated a huge
+> benefit without even having a bitmap.
+> 
+> I've got no objections to ripping the bitmap out of the ABI.
 
-  - Configure qemu to use the disk image with cache=3Dwriteback
-  - Configure a 2GiB Linux VM on an 8GiB Linux host
-  - In the VM, write a 4GiB file (dd if=3D/dev/zero of=3D/tmp/x bs=3D4K cou=
-nt=3D1M)
-  - In the VM, read it back (dd if=3D/tmp/x of=3D/dev/null bs=3D4K count=3D=
-1M)
+I think we need to see a statistic showing the number of bits set in
+each bitmap in average, after some uptime and lru churn, like running
+stresstest app for a while with I/O and then inflate the balloon and
+count:
 
-  With writeback, the whole file should end up in the host pagecache.
-  So when I read it back, there should be no I/O to the real disk, and
-  it should be really fast.  Instead, I see disk activity through the
-  duration of the test, and the performance is roughly the native hard
-  disk throughput (somewhat slower).
+1) how many bits were set vs total number of bits used in bitmaps
 
-  I'm using version 0.11.1, and this is my command line:
+2) how many times bitmaps were used vs bitmap_len = 0 case of single
+   page
 
-  qemu-system-x86_64 -drive
-  cache=3Dwriteback,index=3D0,media=3Ddisk,file=3Dubuntu.img -k en-us -m 20=
-48
-  -smp 2 -vnc :3100 -usbdevice tablet -enable-kvm &
+My guess would be like very low percentage for both points.
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/498417/+subscriptions
+> Surely we can think of a few ways...
+> 
+> A bitmap is 64x more dense if the lists are unordered.  It means being
+> able to store ~32k*2M=64G worth of 2M pages in one data page vs. ~1G.
+> That's 64x fewer cachelines to touch, 64x fewer pages to move to the
+> hypervisor and lets us allocate 1/64th the memory.  Given a maximum
+> allocation that we're allowed, it lets us do 64x more per-pass.
+> 
+> Now, are those benefits worth it?  Maybe not, but let's not pretend they
+> don't exist. ;)
+
+In the best case there are benefits obviously, the question is how
+common the best case is.
+
+The best case if I understand correctly is all high order not
+available, but plenty of order 0 pages available at phys address X,
+X+8k, X+16k, X+(8k*nr_bits_in_bitmap). How common is that 0 pages
+exist but they're not at an address < X or > X+(8k*nr_bits_in_bitmap)?
+
+> Yes, the current code sends one batch of pages up to the hypervisor per
+> order.  But, this has nothing to do with the underlying data structure,
+> or the choice to have an order vs. len in the ABI.
+> 
+> What you describe here is obviously more efficient.
+
+And it isn't possible with the current ABI.
+
+So there is a connection with the MAX_ORDER..0 allocation loop and the
+ABI change, but I agree any of the ABI proposed would still allow for
+it this logic to be used. Bitmap or not bitmap, the loop would still
+work.
