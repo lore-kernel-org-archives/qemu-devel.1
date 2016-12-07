@@ -1,31 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34643)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36650)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cEdgX-0005NG-Ed
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 09:59:06 -0500
+	(envelope-from <eblake@redhat.com>) id 1cEdqP-0007nc-EZ
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 10:09:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cEdgS-0004UP-L7
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 09:59:05 -0500
-Received: from 4.mo68.mail-out.ovh.net ([46.105.59.63]:53731)
+	(envelope-from <eblake@redhat.com>) id 1cEdqL-0007C9-6e
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 10:09:17 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33626)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cEdgS-0004Tx-C0
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 09:59:00 -0500
-Received: from player763.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo68.mail-out.ovh.net (Postfix) with ESMTP id BFDF516E72
-	for <qemu-devel@nongnu.org>; Wed,  7 Dec 2016 15:58:58 +0100 (CET)
-Date: Wed, 7 Dec 2016 15:58:48 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20161207155848.76429902@bahia>
-In-Reply-To: <20161207135917.GI4027@thinpad.lan.raisama.net>
-References: <148104617887.7699.984921868108236415.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-	<20161206191952.GD4027@thinpad.lan.raisama.net>
-	<20161206193159.GE4027@thinpad.lan.raisama.net>
-	<20161207143925.7b3a54f2@bahia>
-	<20161207135917.GI4027@thinpad.lan.raisama.net>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cEdqL-0007Bq-0R
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 10:09:13 -0500
+References: <20161207125130.5184-1-fziglio@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <1116d039-b29e-980a-e2ba-8893dc27f5fc@redhat.com>
+Date: Wed, 7 Dec 2016 09:08:59 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC for-2.8] machine: Convert abstract typename
- on compat_props to subclass names
+In-Reply-To: <20161207125130.5184-1-fziglio@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="eTMR2dQgBCeW6gXXtr3aH2wK4xBEUdIwn"
+Subject: Re: [Qemu-devel] [PATCH] egl-helpers: Change file licensing to LGPL2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,115 +27,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Halil Pasic <pasic@linux.vnet.ibm.com>, "Michael
-	S. Tsirkin" <mst@redhat.com>, qemu-stable@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Frediano Ziglio <fziglio@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Cole Robinson <crobinso@redhat.com>, Gonglei <arei.gonglei@huawei.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On Wed, 7 Dec 2016 11:59:17 -0200
-Eduardo Habkost <ehabkost@redhat.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--eTMR2dQgBCeW6gXXtr3aH2wK4xBEUdIwn
+From: Eric Blake <eblake@redhat.com>
+To: Frediano Ziglio <fziglio@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Cole Robinson
+ <crobinso@redhat.com>, Gonglei <arei.gonglei@huawei.com>,
+ Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org
+Message-ID: <1116d039-b29e-980a-e2ba-8893dc27f5fc@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] egl-helpers: Change file licensing to LGPL2
+References: <20161207125130.5184-1-fziglio@redhat.com>
+In-Reply-To: <20161207125130.5184-1-fziglio@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> On Wed, Dec 07, 2016 at 02:39:25PM +0100, Greg Kurz wrote:
-> > On Tue, 6 Dec 2016 17:31:59 -0200
-> > Eduardo Habkost <ehabkost@redhat.com> wrote:
-> >   
-> > > On Tue, Dec 06, 2016 at 05:19:52PM -0200, Eduardo Habkost wrote:  
-> > > > On Tue, Dec 06, 2016 at 06:50:47PM +0100, Greg Kurz wrote:    
-> > > > > Since commit "9a4c0e220d8a hw/virtio-pci: fix virtio behaviour", passing
-> > > > > -device virtio-blk-pci.disable-modern=off has no effect on 2.6 machine
-> > > > > types because the internal virtio-pci.disable-modern=on compat property
-> > > > > always prevail.
-> > > > > 
-> > > > > This should ideally be fixed in the qdev properties core code, but it is
-> > > > > too late in the QEMU 2.8 schedule. So this patch fixes the issue by setting
-> > > > > the compat properties for every virtio-*-pci subtypes instead of the base
-> > > > > virtio-pci type.
-> > > > > 
-> > > > > Signed-off-by: Greg Kurz <groug@kaod.org>    
-> > > > 
-> > > > So, it looks like the bug is present in many other cases...
-> > > > 
-> > > > I have hacked QEMU to print a warning in case the driver name in
-> > > > compat_props refer to an abstract class or a class that have any
-> > > > subclasses. The results are below:
-> > > > 
-> > > >  apic-common.legacy-instance-id set for abstract class
-> > > >  apic-common.vapic set for abstract class
-> > > >  i386-cpu.arat set for abstract class
-> > > >  i386-cpu.check set for abstract class
-> > > >  i386-cpu.cpuid-0xb set for abstract class
-> > > >  i386-cpu.fill-mtrr-mask set for abstract class
-> > > >  i386-cpu.full-cpuid-auto-level set for abstract class
-> > > >  i386-cpu.l3-cache set for abstract class
-> > > >  i386-cpu.pmu set for abstract class
-> > > >  pci-device.command_serr_enable set for abstract class
-> > > >  pci-device.rombar set for abstract class
-> > > >  pci-device.x-pcie-lnksta-dllla set for abstract class
-> > > >  powerpc64-cpu.pre-2.8-migration set for abstract class
-> > > >  s390-skeys.migration-enabled set for abstract class
-> > > >  spapr-pci-host-bridge.ddw set for superclass
-> > > >  spapr-pci-host-bridge.dynamic-reconfiguration set for superclass
-> > > >  spapr-pci-host-bridge.mem64_win_size set for superclass
-> > > >  spapr-pci-host-bridge.mem_win_size set for superclass
-> > > >  spapr-pci-host-bridge.pre-2.8-migration set for superclass
-> > > >  usb-device.full-path set for abstract class
-> > > >  usb-device.msos-desc set for abstract class
-> > > >  virtio-pci.disable-legacy set for abstract class
-> > > >  virtio-pci.disable-modern set for abstract class
-> > > >  virtio-pci.migrate-extra set for abstract class
-> > > >  virtio-pci.page-per-vq set for abstract class
-> > > >  virtio-pci.virtio-pci-bus-master-bug-migration set for abstract class
-> > > >  virtio-pci.x-disable-pcie set for abstract class
-> > > >  x86_64-cpu.arat set for abstract class
-> > > >  x86_64-cpu.check set for abstract class
-> > > >  x86_64-cpu.cpuid-0xb set for abstract class
-> > > >  x86_64-cpu.fill-mtrr-mask set for abstract class
-> > > >  x86_64-cpu.full-cpuid-auto-level set for abstract class
-> > > >  x86_64-cpu.l3-cache set for abstract class
-> > > >  x86_64-cpu.pmu set for abstract class
-> > > > 
-> > > > I believe the cases where we are likely to cause real-world bugs
-> > > > are virtio-pci and the *-cpu classes (because -cpu is translated
-> > > > to -global).
-> > > > 
-> > > > I'm not sure what should be the right fix in 2.8. I am
-> > > > considering a temporary hack to translate abstract class names in
-> > > > compat_props to global properties for all subclasses, in case
-> > > > they refer to an abstract class. This way we fix the bug where
-> > > > -global doesn't override compat_props properly, but keep the
-> > > > rules for -global untouched.    
-> > > 
-> > > What about this?
-> > >   
-> > 
-> > Indeed that would have been a clever workaround but it is too late anyway. :)
-> > 
-> > BTW, that makes me think about Halil's comment in another mail, even if it
-> > is not strictly related to the comapt issue (but rather because I mentioned
-> > it in the changelog of my first patch):
-> > 
-> > "So I can't even tell if -global virtio-pci.disable-modern=off is even legit
-> > on the command line."
-> > 
-> > And indeed, -device doesn't accept abstract classes... shouldn't -global
-> > prohibit setting properties for them ?  
-> 
-> I'm not sure. Setting disable-modern for all virtio-pci devices
-> with a single -global option sounds very useful, for example.
-> 
+On 12/07/2016 06:51 AM, Frediano Ziglio wrote:
+> Signed-off-by: Frediano Ziglio <fziglio@redhat.com>
 
-Indeed but, unless I've missed something *again*, you cannot know about
-it without reading the code... maybe this calls for a '-global help' option
-to list them all ?
+Very sparse on the commit message.  I would highly recommend being
+verbose with something like "all people listed below have agreed to the
+relicense" (prior to listing the signatures that have been collected in
+the various threads so far), as well as stating that the relicense
+permits sharing the code with LGPL Spice.  See commits 74523b8 or
+2b3bc6c for examples of commit text justifying a relicense.
 
-> Also, if we start rejecting it we risk breaking existing
-> configurations. We would need to deprecate it first (making it
-> print a warning) and reject it a few releases later.
-> 
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
-This would be an undocumented configuration but I get your point, so
-it's probably better to keep it... especially if it's useful :)
 
-Cheers.
+--eTMR2dQgBCeW6gXXtr3aH2wK4xBEUdIwn
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
---
-Greg
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYSCYLAAoJEKeha0olJ0Nq6j4IAJNWgNrxkoMkf91KYpZYwsx+
+dHRXKnBoNoXPI5MAevTVSP8S+oBo10NC6TZ+9Boz0ih337y8nTjiZXo7TbnOqMQC
+3xTIeDACmhq/GxDOlhY0x/POr6QlsHK5NXoEv7zyBX6bywmKIPJFgfL6ETHmHXcM
+uLRQ3+WhTZQG+yxynnu47Nn0BIfdkzeOwv8A6xZJ+FJ5W37PFaWgJi8aLdbzqi6h
+UDhvZjwDrtNH67fcV+4PMzq3wG65wJyEUgPPCQzl7HeaNFA/xfJhlm6aksos7Wic
+WUo5yAUS3UG7EbRtBgdaAE00kCOaINNm+eOZ17WZVpRN+IWMpVjmr2KLWvEsdvQ=
+=xB3j
+-----END PGP SIGNATURE-----
+
+--eTMR2dQgBCeW6gXXtr3aH2wK4xBEUdIwn--
