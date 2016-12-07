@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51594)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52575)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cEeue-0008H0-A7
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 11:17:45 -0500
+	(envelope-from <david@redhat.com>) id 1cEeyp-0002XD-N9
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 11:22:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cEeud-0001br-HM
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 11:17:44 -0500
-Date: Wed, 7 Dec 2016 17:17:36 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20161207161736.GI4773@noname.str.redhat.com>
-References: <20161202192223.15153-1-eblake@redhat.com>
-	<20161202192223.15153-4-eblake@redhat.com>
+	(envelope-from <david@redhat.com>) id 1cEeyl-0002bq-RM
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 11:22:03 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36112)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1cEeyl-0002bi-L9
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 11:21:59 -0500
+References: <1480495397-23225-1-git-send-email-liang.z.li@intel.com>
+	<f67ca79c-ad34-59dd-835f-e7bc9dcaef58@redhat.com>
+	<F2CBF3009FA73547804AE4C663CAB28E3A130C01@shsmsx102.ccr.corp.intel.com>
+	<0b18c636-ee67-cbb4-1ba3-81a06150db76@redhat.com>
+	<0b83db29-ebad-2a70-8d61-756d33e33a48@intel.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <2171e091-46ee-decd-7348-772555d3a5e3@redhat.com>
+Date: Wed, 7 Dec 2016 17:21:53 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20161202192223.15153-4-eblake@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 3/5] blkdebug: Simplify override logic
+In-Reply-To: <0b83db29-ebad-2a70-8d61-756d33e33a48@intel.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH kernel v5 0/5] Extend virtio-balloon for
+ fast (de)inflating & fast live migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,16 +31,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, mreitz@redhat.com, qemu-block@nongnu.org
+To: Dave Hansen <dave.hansen@intel.com>, "Li, Liang Z" <liang.z.li@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Cc: "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "mhocko@suse.com" <mhocko@suse.com>, "mst@redhat.com" <mst@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "dgilbert@redhat.com" <dgilbert@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
 
-Am 02.12.2016 um 20:22 hat Eric Blake geschrieben:
-> Rather than store into a local variable, the copy to the struct
-> if the value is valid, then reporting errors otherwise, it is
-> simpler to just store into the struct and report errors if the
-> value is invalid.  This however requires that the struct store
-> a 64-bit number, rather than a narrower type.
-> 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
+>>>
+>>> I did something similar. Filled the balloon with 15GB for a 16GB idle
+>>> guest, by
+>>> using bitmap, the madvise count was reduced to 605. when using the
+>>> PFNs, the madvise count
+>>> was 3932160. It means there are quite a lot consecutive bits in the
+>>> bitmap.
+>>> I didn't test for a guest with heavy memory workload.
+>>
+>> Would it then even make sense to go one step further and report {pfn,
+>> length} combinations?
+>>
+>> So simply send over an array of {pfn, length}?
+>
+> Li's current patches do that.  Well, maybe not pfn/length, but they do
+> take a pfn and page-order, which fits perfectly with the kernel's
+> concept of high-order pages.
 
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+So we can send length in powers of two. Still, I don't see any benefit
+over a simple pfn/len schema. But I'll have a more detailed look at the
+implementation first, maybe that will enlighten me :)
+
+>
+>> And it makes sense if you think about:
+>>
+>> a) hugetlb backing: The host may only be able to free huge pages (we
+>> might want to communicate that to the guest later, that's another
+>> story). Still we would have to send bitmaps full of 4k frames (512 bits
+>> for 2mb frames). Of course, we could add a way to communicate that we
+>> are using a different bitmap-granularity.
+>
+> Yeah, please read the patches.  If they're not clear, then the
+> descriptions need work, but this is done already.
+>
+
+I missed the page_shift, thanks for the hint.
+
+-- 
+
+David
