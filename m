@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44203)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47627)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cEcRg-0001Nv-TQ
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 08:39:42 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cEcgy-0004qX-4I
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 08:55:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cEcRe-00060c-3Q
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 08:39:40 -0500
-Received: from 5.mo179.mail-out.ovh.net ([46.105.43.140]:52606)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cEcRd-00060L-Pa
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 08:39:38 -0500
-Received: from player732.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 9068F7D5D
-	for <qemu-devel@nongnu.org>; Wed,  7 Dec 2016 14:39:35 +0100 (CET)
-Date: Wed, 7 Dec 2016 14:39:25 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20161207143925.7b3a54f2@bahia>
-In-Reply-To: <20161206193159.GE4027@thinpad.lan.raisama.net>
-References: <148104617887.7699.984921868108236415.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-	<20161206191952.GD4027@thinpad.lan.raisama.net>
-	<20161206193159.GE4027@thinpad.lan.raisama.net>
+	(envelope-from <kwolf@redhat.com>) id 1cEcgt-00025n-D1
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 08:55:28 -0500
+Date: Wed, 7 Dec 2016 14:55:10 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20161207135510.GE4773@noname.str.redhat.com>
+References: <20161202192223.15153-1-eblake@redhat.com>
+	<20161202192223.15153-3-eblake@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC for-2.8] machine: Convert abstract typename
- on compat_props to subclass names
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20161202192223.15153-3-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 2/5] blkdebug: Add pass-through
+ write_zero and discard support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,152 +24,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Halil Pasic <pasic@linux.vnet.ibm.com>, "Michael
-	S. Tsirkin" <mst@redhat.com>, qemu-stable@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, mreitz@redhat.com, qemu-block@nongnu.org
 
-On Tue, 6 Dec 2016 17:31:59 -0200
-Eduardo Habkost <ehabkost@redhat.com> wrote:
-
-> On Tue, Dec 06, 2016 at 05:19:52PM -0200, Eduardo Habkost wrote:
-> > On Tue, Dec 06, 2016 at 06:50:47PM +0100, Greg Kurz wrote:  
-> > > Since commit "9a4c0e220d8a hw/virtio-pci: fix virtio behaviour", passing
-> > > -device virtio-blk-pci.disable-modern=off has no effect on 2.6 machine
-> > > types because the internal virtio-pci.disable-modern=on compat property
-> > > always prevail.
-> > > 
-> > > This should ideally be fixed in the qdev properties core code, but it is
-> > > too late in the QEMU 2.8 schedule. So this patch fixes the issue by setting
-> > > the compat properties for every virtio-*-pci subtypes instead of the base
-> > > virtio-pci type.
-> > > 
-> > > Signed-off-by: Greg Kurz <groug@kaod.org>  
-> > 
-> > So, it looks like the bug is present in many other cases...
-> > 
-> > I have hacked QEMU to print a warning in case the driver name in
-> > compat_props refer to an abstract class or a class that have any
-> > subclasses. The results are below:
-> > 
-> >  apic-common.legacy-instance-id set for abstract class
-> >  apic-common.vapic set for abstract class
-> >  i386-cpu.arat set for abstract class
-> >  i386-cpu.check set for abstract class
-> >  i386-cpu.cpuid-0xb set for abstract class
-> >  i386-cpu.fill-mtrr-mask set for abstract class
-> >  i386-cpu.full-cpuid-auto-level set for abstract class
-> >  i386-cpu.l3-cache set for abstract class
-> >  i386-cpu.pmu set for abstract class
-> >  pci-device.command_serr_enable set for abstract class
-> >  pci-device.rombar set for abstract class
-> >  pci-device.x-pcie-lnksta-dllla set for abstract class
-> >  powerpc64-cpu.pre-2.8-migration set for abstract class
-> >  s390-skeys.migration-enabled set for abstract class
-> >  spapr-pci-host-bridge.ddw set for superclass
-> >  spapr-pci-host-bridge.dynamic-reconfiguration set for superclass
-> >  spapr-pci-host-bridge.mem64_win_size set for superclass
-> >  spapr-pci-host-bridge.mem_win_size set for superclass
-> >  spapr-pci-host-bridge.pre-2.8-migration set for superclass
-> >  usb-device.full-path set for abstract class
-> >  usb-device.msos-desc set for abstract class
-> >  virtio-pci.disable-legacy set for abstract class
-> >  virtio-pci.disable-modern set for abstract class
-> >  virtio-pci.migrate-extra set for abstract class
-> >  virtio-pci.page-per-vq set for abstract class
-> >  virtio-pci.virtio-pci-bus-master-bug-migration set for abstract class
-> >  virtio-pci.x-disable-pcie set for abstract class
-> >  x86_64-cpu.arat set for abstract class
-> >  x86_64-cpu.check set for abstract class
-> >  x86_64-cpu.cpuid-0xb set for abstract class
-> >  x86_64-cpu.fill-mtrr-mask set for abstract class
-> >  x86_64-cpu.full-cpuid-auto-level set for abstract class
-> >  x86_64-cpu.l3-cache set for abstract class
-> >  x86_64-cpu.pmu set for abstract class
-> > 
-> > I believe the cases where we are likely to cause real-world bugs
-> > are virtio-pci and the *-cpu classes (because -cpu is translated
-> > to -global).
-> > 
-> > I'm not sure what should be the right fix in 2.8. I am
-> > considering a temporary hack to translate abstract class names in
-> > compat_props to global properties for all subclasses, in case
-> > they refer to an abstract class. This way we fix the bug where
-> > -global doesn't override compat_props properly, but keep the
-> > rules for -global untouched.  
+Am 02.12.2016 um 20:22 hat Eric Blake geschrieben:
+> In order to test the effects of artificial geometry constraints
+> on operations like write zero or discard, we first need blkdebug
+> to manage these actions.  It also allows us to inject errors on
+> those operations, just like we can for read/write/flush.
 > 
-> What about this?
+> We can also test the contract promised by the block layer; namely,
+> if a device has specified limits on alignment or maximum size,
+> then those limits must be obeyed (for now, the blkdebug driver
+> merely inherits limits from whatever it is wrapping, but the next
+> patch will further enhance it to allow specific limit overrides).
 > 
-
-Indeed that would have been a clever workaround but it is too late anyway. :)
-
-BTW, that makes me think about Halil's comment in another mail, even if it
-is not strictly related to the comapt issue (but rather because I mentioned
-it in the changelog of my first patch):
-
-"So I can't even tell if -global virtio-pci.disable-modern=off is even legit
-on the command line."
-
-And indeed, -device doesn't accept abstract classes... shouldn't -global
-prohibit setting properties for them ?
-
-> (untested)
+> This patch intentionally refuses to service requests smaller than
+> the requested alignments; this is because an upcoming patch adds
+> a qemu-iotest to prove that the block layer is correctly handling
+> fragmentation, but the test only works if there is a way to tell
+> the difference at artificial alignment boundaries when blkdebug is
+> using a larger-than-default alignment.  If we let the blkdebug
+> layer always defer to the underlying layer, which potentially has
+> a smaller granularity, the iotest will be thwarted.
 > 
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> Tested by setting up an NBD server with export 'foo', then invoking:
+> $ ./qemu-io
+> qemu-io> open -o driver=blkdebug blkdebug::nbd://localhost:10809/foo
+> qemu-io> d 0 15M
+> qemu-io> w -z 0 15M
+> 
+> Pre-patch, the server never sees the discard (it was silently
+> eaten by the block layer); post-patch it is passed across the
+> wire.  Likewise, pre-patch the write is always passed with
+> NBD_WRITE (with 15M of zeroes on the wire), while post-patch
+> it can utilize NBD_WRITE_ZEROES (for less traffic).
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> 
 > ---
->  hw/core/machine.c | 35 ++++++++++++++++++++++++++++++++---
->  1 file changed, 32 insertions(+), 3 deletions(-)
+> v3: rebase to byte-based read/write, improve docs on why no
+> partial write zero passthrough
+> v2: new patch
+> ---
+>  block/blkdebug.c | 81 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 81 insertions(+)
 > 
-> diff --git a/hw/core/machine.c b/hw/core/machine.c
-> index b0fd91f..49f9007 100644
-> --- a/hw/core/machine.c
-> +++ b/hw/core/machine.c
-> @@ -554,6 +554,25 @@ static void machine_class_finalize(ObjectClass *klass, void *data)
->      g_free(mc->name);
->  }
->  
-> +static void register_compat_prop(const char *driver,
-> +                                 const char *property,
-> +                                 const char *value)
-> +{
-> +    GlobalProperty *p = g_new0(GlobalProperty, 1);
-> +    /* Machine compat_props must never cause errors: */
-> +    p->errp = &error_abort;
-> +    p->driver = driver;
-> +    p->property = property;
-> +    p->value = value;
-> +    qdev_prop_register_global(p);
-> +}
-> +
-> +static void machine_register_compat_for_subclass(ObjectClass *oc, void *opaque)
-> +{
-> +    GlobalProperty *p = opaque;
-> +    register_compat_prop(object_class_get_name(oc), p->property, p->value);
-> +}
-> +
->  void machine_register_compat_props(MachineState *machine)
->  {
->      MachineClass *mc = MACHINE_GET_CLASS(machine);
-> @@ -565,10 +584,20 @@ void machine_register_compat_props(MachineState *machine)
+> diff --git a/block/blkdebug.c b/block/blkdebug.c
+> index 37094a2..aac8184 100644
+> --- a/block/blkdebug.c
+> +++ b/block/blkdebug.c
+> @@ -1,6 +1,7 @@
+>  /*
+>   * Block protocol for I/O error injection
+>   *
+> + * Copyright (C) 2016 Red Hat, Inc.
+>   * Copyright (c) 2010 Kevin Wolf <kwolf@redhat.com>
+>   *
+>   * Permission is hereby granted, free of charge, to any person obtaining a copy
+> @@ -382,6 +383,11 @@ static int blkdebug_open(BlockDriverState *bs, QDict *options, int flags,
+>          goto out;
 >      }
->  
->      for (i = 0; i < mc->compat_props->len; i++) {
-> +        ObjectClass *oc;
->          p = g_array_index(mc->compat_props, GlobalProperty *, i);
-> -        /* Machine compat_props must never cause errors: */
-> -        p->errp = &error_abort;
-> -        qdev_prop_register_global(p);
-> +        oc = object_class_by_name(p->driver);
-> +        if (oc && object_class_is_abstract(oc)) {
-> +            /* temporary hack to make sure we will never override
-> +             * globals set explicitly on -global: if an abstract class
-> +             * is on compat_props, register globals for each of their
-> +             * subclasses instead.
-> +             */
-> +            object_class_foreach(machine_register_compat_for_subclass,
-> +                                 p->driver, false, p);
-> +        } else {
-> +            register_compat_prop(p->driver, p->property, p->value);
+> 
+> +    bs->supported_write_flags = BDRV_REQ_FUA &
+> +        bs->file->bs->supported_write_flags;
+> +    bs->supported_zero_flags = (BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP) &
+> +        bs->file->bs->supported_zero_flags;
+> +
+>      /* Set request alignment */
+>      align = qemu_opt_get_size(opts, "align", 0);
+>      if (align < INT_MAX && is_power_of_2(align)) {
+> @@ -512,6 +518,79 @@ static int blkdebug_co_flush(BlockDriverState *bs)
+>  }
+> 
+> 
+> +static int coroutine_fn blkdebug_co_pwrite_zeroes(BlockDriverState *bs,
+> +                                                  int64_t offset, int count,
+> +                                                  BdrvRequestFlags flags)
+> +{
+> +    BDRVBlkdebugState *s = bs->opaque;
+> +    BlkdebugRule *rule = NULL;
+> +    uint32_t align = MAX(bs->bl.request_alignment,
+> +                         bs->bl.pwrite_zeroes_alignment);
+> +
+> +    /* Only pass through requests that are larger than requested
+> +     * preferred alignment (so that we test the fallback to writes on
+> +     * unaligned portions), and check that the block layer never hands
+> +     * us anything crossing an alignment boundary.  */
+> +    if (count < align) {
+> +        return -ENOTSUP;
+> +    }
+> +    assert(QEMU_IS_ALIGNED(offset, align));
+> +    assert(QEMU_IS_ALIGNED(count, align));
+> +    if (bs->bl.max_pwrite_zeroes) {
+> +        assert(count <= bs->bl.max_pwrite_zeroes);
+> +    }
+> +
+> +    QSIMPLEQ_FOREACH(rule, &s->active_rules, active_next) {
+> +        if (rule->options.inject.offset == -1) {
+
+We do have offset and bytes parameters in this function, so I guess we
+should check overlaps like in the read/write functions instead of only
+executing the rule if it doesn't specify an offset.
+
+> +            break;
 > +        }
->      }
->  }
->  
+> +    }
+> +
+> +    if (rule && rule->options.inject.error) {
+> +        return inject_error(bs, rule);
+> +    }
+> +
+> +    return bdrv_co_pwrite_zeroes(bs->file, offset, count, flags);
+> +}
+> +
+> +
+
+Why two newlines?
+
+> +static int coroutine_fn blkdebug_co_pdiscard(BlockDriverState *bs,
+> +                                             int64_t offset, int count)
+> +{
+> +    BDRVBlkdebugState *s = bs->opaque;
+> +    BlkdebugRule *rule = NULL;
+> +    uint32_t align = bs->bl.pdiscard_alignment;
+> +
+> +    /* Only pass through requests that are larger than requested
+> +     * minimum alignment, and ensure that unaligned requests do not
+> +     * cross optimum discard boundaries. */
+> +    if (count < bs->bl.request_alignment) {
+> +        return -ENOTSUP;
+> +    }
+> +    assert(QEMU_IS_ALIGNED(offset, bs->bl.request_alignment));
+> +    assert(QEMU_IS_ALIGNED(count, bs->bl.request_alignment));
+> +    if (align && count >= align) {
+> +        assert(QEMU_IS_ALIGNED(offset, align));
+> +        assert(QEMU_IS_ALIGNED(count, align));
+> +    }
+> +    if (bs->bl.max_pdiscard) {
+> +        assert(count <= bs->bl.max_pdiscard);
+> +    }
+> +
+> +    QSIMPLEQ_FOREACH(rule, &s->active_rules, active_next) {
+> +        if (rule->options.inject.offset == -1) {
+
+Same thing as above.
+
+> +            break;
+> +        }
+> +    }
+> +
+> +    if (rule && rule->options.inject.error) {
+> +        return inject_error(bs, rule);
+> +    }
+> +
+> +    return bdrv_co_pdiscard(bs->file->bs, offset, count);
+> +}
+
+Kevin
