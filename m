@@ -1,34 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54168)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59452)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cEjj2-0000zS-QZ
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 16:26:05 -0500
+	(envelope-from <duanj@linux.vnet.ibm.com>) id 1cEkCB-0006vG-NW
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 16:56:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cEjiz-0000hQ-Je
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 16:26:04 -0500
-Received: from indium.canonical.com ([91.189.90.7]:50489)
+	(envelope-from <duanj@linux.vnet.ibm.com>) id 1cEkC6-0000wp-PD
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 16:56:11 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42765)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cEjiz-0000gm-DZ
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 16:26:01 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cEjiw-0006WL-DA
-	for <qemu-devel@nongnu.org>; Wed, 07 Dec 2016 21:25:58 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 627442E80E0
-	for <qemu-devel@nongnu.org>; Wed,  7 Dec 2016 21:25:52 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 07 Dec 2016 21:08:05 -0000
-From: Stefan Weil <538808@bugs.launchpad.net>
-Reply-To: Bug 538808 <538808@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20100314203151.2911.69634.malonedeb@wampee.canonical.com>
-Message-Id: <20161207210805.11926.5003.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 538808] Re: qemu-system-x86_64 0.12.2 crashes
- with -m 967 under Windows
+	(Exim 4.71) (envelope-from <duanj@linux.vnet.ibm.com>)
+	id 1cEkC6-0000wk-Gb
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 16:56:06 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
+	uB7Lt8JJ130468
+	for <qemu-devel@nongnu.org>; Wed, 7 Dec 2016 16:56:05 -0500
+Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 276m5xv6g4-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 07 Dec 2016 16:56:04 -0500
+Received: from localhost
+	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <duanj@linux.vnet.ibm.com>;
+	Wed, 7 Dec 2016 14:56:04 -0700
+From: Jianjun Duan <duanj@linux.vnet.ibm.com>
+Date: Wed,  7 Dec 2016 13:55:50 -0800
+Message-Id: <1481147754-8976-1-git-send-email-duanj@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [QEMU PATCH v15 0/4] migration: migrate QTAILQ
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,52 +36,111 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, duanj@linux.vnet.ibm.com, dmitry@daynix.com, peter.maydell@linaro.org, kraxel@redhat.com, mst@redhat.com, david@gibson.dropbear.id.au, pbonzini@redhat.com, veroniabahaa@gmail.com, quintela@redhat.com, amit.shah@redhat.com, mreitz@redhat.com, kwolf@redhat.com, rth@twiddle.net, aurelien@aurel32.net, leon.alrae@imgtec.com, blauwirbel@gmail.com, mark.cave-ayland@ilande.co.uk, mdroth@linux.vnet.ibm.com, dgilbert@redhat.com
 
-I think that QEMU did not crash, but simply was not able to allocate the
-block of memory which was requested. This is an inherent problem of the
-fragmented memory of 32 bit applications on Windows.
+    I addressed some review comments. Comments are welcome.     
 
-QEMU reports problems with memory allocation, but QEMU for Windows tries
-to send those messages to stderr which is redirected to a file when QEMU
-was built with SDL2.
+v15: - Improved error messages.
 
-So no crash and silently by design.
+Previous versions are:
 
-64 bit versions don't have that problem, nor do my pre-built 32 bit
-binaries which include a patch to use upper memory. And in my latest
-binaries I dropped SDL support.
+v14: - Fixed a return statement.
+(link: http://lists.nongnu.org/archive/html/qemu-devel/2016-11/msg04467.html)
 
-I close this issue - please re-open if you think this was wrong.
+v13: - Changed some QTAILQ related macro names to match existing ones. 
+(link: http://lists.nongnu.org/archive/html/qemu-ppc/2016-11/msg00226.html)
 
-** Changed in: qemu
-       Status: Incomplete =3D> Invalid
+v12: - Fixed type for put_qtailq which caused build break.
+(link: http://lists.gnu.org/archive/html/qemu-devel/2016-11/msg01328.html
 
--- =
+v11: - Split error_report statements into a separate patch.
+     - Changed the signature of put. It now returns int type.
+     - Minor changes to QTAILQ macros. 
+         
+v10: - Fixed a typo.
+(link: http://lists.nongnu.org/archive/html/qemu-ppc/2016-10/msg01206.html)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/538808
+v9: - No more hard encoding of QTAILQ layout information
+(link: http://lists.nongnu.org/archive/html/qemu-ppc/2016-10/msg01042.html)
 
-Title:
-  qemu-system-x86_64 0.12.2 crashes with -m 967 under Windows
+v8: - Fixed a style issue. 
+(link: http://lists.nongnu.org/archive/html/qemu-ppc/2016-10/msg00874.html)
 
-Status in QEMU:
-  Invalid
+v7: - Fixed merge errors.
+    - Simplified macro definitions related to pointer arithmetic based QTAILQ access.
+    - Added test case for QTAILQ migration in tests/test-vmstate.c.
+(link: http://lists.nongnu.org/archive/html/qemu-ppc/2016-10/msg00711.html)
 
-Bug description:
-  qemu 0.12.2 and 0.12.3 exit silently under Windows XP when using an -m va=
-lue higher than 967.  Any value below 967 works fine.  Affects both qemu.ex=
-e and qemu-system-x86_64.exe (the only binaries currently available).
-  qemu 0.12.3 under Linux (Ubuntu 8.10) works fine.
-  Version 0.9.0 for Windows does not have this problem.  I do not have any =
-other binaries to test.
 
-  Command used:
-  qemu-system-x86_64 -L . -m 967 -hda linux.img -localtime -M pc
+v6: - Split from Power specific patches. 
+    - Dropped VMS_LINKED flag.
+    - Rebased to master.
+    - Added comments to clarify about put/get in VMStateInfo.  
+(link: http://lists.nongnu.org/archive/html/qemu-ppc/2016-10/msg00336.html)
 
-  There is plenty of available RAM on the host PC (see attached systeminfo).
-  Not sure what debugging options to use, but will attach whatever is neces=
-sary.
+v5: - Rebased to David's ppc-for-2.8. 
+(link: https://lists.nongnu.org/archive/html/qemu-devel/2016-10/msg00270.html)
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/538808/+subscriptions
+v4: - Introduce a way to set customized instance_id in SaveStateEntry. Use it
+      to set instance_id for DRC using its unique index to address David 
+      Gibson's concern.
+    - Rename VMS_CSTM to VMS_LINKED based on Paolo Bonzini's suggestions.
+    - Clean up qjson stuff in put_qtailq. 
+    - Add trace for put_qtailq and get_qtailq based on David Gilbert's 
+      suggestion.
+    - Based on David's ppc-for-2.7. 
+(link: https://lists.nongnu.org/archive/html/qemu-devel/2016-06/msg07720.html)
+
+v3: - Simplify overall design followng discussion with Paolo. No longer need
+      metadata to migrate QTAILQ.
+    - Extend VMStateInfo instead of adding similar fields to VMStateField.
+    - Clean up macros in qemu/queue.h.
+(link: https://lists.nongnu.org/archive/html/qemu-devel/2016-05/msg05695.html)
+
+v2: - Introduce a general approach to migrate QTAILQ in qemu/queue.h.
+    - Migrate signalled field in the DRC state.
+    - Put the newly added migrating fields in subsections so that backward 
+      migration is not broken.  
+    - Set detach_cb field right after migration so that a migrated hot-unplug
+      event could finish its course.
+(link: https://lists.nongnu.org/archive/html/qemu-devel/2016-05/msg04188.html)
+
+v1: - Inital version.
+(link: https://lists.nongnu.org/archive/html/qemu-devel/2016-04/msg02601.html)
+
+
+Jianjun Duan (4):
+  migration: extend VMStateInfo
+  migration: migrate QTAILQ
+  tests/migration: Add test for QTAILQ migration
+  migration: add error_report
+
+ hw/display/virtio-gpu.c     |   8 +-
+ hw/intc/s390_flic_kvm.c     |   8 +-
+ hw/net/vmxnet3.c            |  24 ++++--
+ hw/nvram/eeprom93xx.c       |   8 +-
+ hw/nvram/fw_cfg.c           |   8 +-
+ hw/pci/msix.c               |   8 +-
+ hw/pci/pci.c                |  16 +++-
+ hw/pci/shpc.c               |   7 +-
+ hw/scsi/scsi-bus.c          |   8 +-
+ hw/timer/twl92230.c         |   8 +-
+ hw/usb/redirect.c           |  26 ++++--
+ hw/virtio/virtio-pci.c      |   8 +-
+ hw/virtio/virtio.c          |  15 +++-
+ include/migration/vmstate.h |  39 +++++++--
+ include/qemu/queue.h        |  60 ++++++++++++++
+ migration/savevm.c          |   7 +-
+ migration/trace-events      |   4 +
+ migration/vmstate.c         | 188 +++++++++++++++++++++++++++++++++++---------
+ target-alpha/machine.c      |   6 +-
+ target-arm/machine.c        |  14 +++-
+ target-i386/machine.c       |  26 ++++--
+ target-mips/machine.c       |  14 +++-
+ target-ppc/machine.c        |  12 ++-
+ target-sparc/machine.c      |   6 +-
+ tests/test-vmstate.c        | 160 +++++++++++++++++++++++++++++++++++++
+ 25 files changed, 582 insertions(+), 106 deletions(-)
+
+-- 
+1.9.1
