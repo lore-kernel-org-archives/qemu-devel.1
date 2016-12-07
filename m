@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58388)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59403)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cEdOt-0002yG-IM
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 09:40:52 -0500
+	(envelope-from <crobinso@redhat.com>) id 1cEdRo-0004Li-Ey
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 09:43:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cEdOq-0007z5-HD
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 09:40:51 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40946)
+	(envelope-from <crobinso@redhat.com>) id 1cEdRj-0000QL-QB
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 09:43:52 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42996)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cEdOq-0007yf-Bk
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 09:40:48 -0500
-Message-ID: <1481121643.11413.14.camel@redhat.com>
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Wed, 07 Dec 2016 15:40:43 +0100
-In-Reply-To: <58462160.7020107@intel.com>
-References: <1476739332-4911-1-git-send-email-kwankhede@nvidia.com>
-	<580DB32F.8040806@intel.com> <1480959854.28320.21.camel@redhat.com>
-	<58462160.7020107@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v9 00/12] Add Mediated device support
+	(Exim 4.71) (envelope-from <crobinso@redhat.com>) id 1cEdRj-0000QA-Ks
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 09:43:47 -0500
+References: <20161207125130.5184-1-fziglio@redhat.com>
+From: Cole Robinson <crobinso@redhat.com>
+Message-ID: <aaa44380-14f1-1b4f-2b88-68f85566b2db@redhat.com>
+Date: Wed, 7 Dec 2016 09:43:44 -0500
+MIME-Version: 1.0
+In-Reply-To: <20161207125130.5184-1-fziglio@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] egl-helpers: Change file licensing to LGPL2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,30 +26,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jike Song <jike.song@intel.com>
-Cc: Kirti Wankhede <kwankhede@nvidia.com>, alex.williamson@redhat.com, cjia@nvidia.com, pbonzini@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, kevin.tian@intel.com, bjsdjshi@linux.vnet.ibm.com, linux-kernel@vger.kernel.org
+To: Frediano Ziglio <fziglio@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Gonglei <arei.gonglei@huawei.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-  Hi,
+On 12/07/2016 07:51 AM, Frediano Ziglio wrote:
+> Signed-off-by: Frediano Ziglio <fziglio@redhat.com>
+> ---
+>  ui/egl-helpers.c | 16 ++++++++++++++++
+>  1 file changed, 16 insertions(+)
+> 
+> diff --git a/ui/egl-helpers.c b/ui/egl-helpers.c
+> index 79cee05..cd24568 100644
+> --- a/ui/egl-helpers.c
+> +++ b/ui/egl-helpers.c
+> @@ -1,3 +1,19 @@
+> +/*
+> + * Copyright (C) 2015-2016 Gerd Hoffmann <kraxel@redhat.com>
+> + *
+> + * This library is free software; you can redistribute it and/or
+> + * modify it under the terms of the GNU Lesser General Public
+> + * License as published by the Free Software Foundation; either
+> + * version 2.1 of the License, or (at your option) any later version.
+> + *
+> + * This library is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> + * Lesser General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU Lesser General Public
+> + * License along with this library; if not, see <http://www.gnu.org/licenses/>.
+> + */
+>  #include "qemu/osdep.h"
+>  #include <glob.h>
+>  #include <dirent.h>
+> 
 
-> Will update a topic/gvt-next-kvmgt-2016-12-06 today, sorry for the
-> inconvenience :)
+ACK, I'm fine with relicensing my changes
 
-Thanks, that brings us one step forward.
-
-Linux guest can see the device (in lspci).  Trying to load i915.ko leads
-to kernel oopses on both guest and host though.  So I guess the guest
-driver can't handle the device.
-
-I've tried RHEL-7.3, kernel 3.10.0-514.el7.x86_64.  The drivers/gpu/drm/
-subsystem is roughly at upstream kernel v4.6 level.  Is that too old?
-IIRC some vgpu guest patches have been merged in v4.2 timeframe, so I
-kind-of expected this to work ...
-
-I'll go try the kvmgt branch in the guest next.
-
-What is the upstream merge status btw?  As far I know the bulk of the
-gvt code is scheduled for 4.10.  What about the gvt/mdev plumbing?  Will
-that land in 4.10 too or is that planned for 4.11?
-
-thanks,
-  Gerd
+- Cole
