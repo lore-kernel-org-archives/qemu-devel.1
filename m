@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45439)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47654)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cEbO9-00037T-LP
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 07:32:01 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cEbVf-00050Q-5W
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 07:39:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cEbO5-00063U-HP
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 07:31:57 -0500
-Received: from mail-ua0-f177.google.com ([209.85.217.177]:35373)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cEbO5-00062y-Cw
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 07:31:53 -0500
-Received: by mail-ua0-f177.google.com with SMTP id 12so413534562uas.2
-	for <qemu-devel@nongnu.org>; Wed, 07 Dec 2016 04:31:53 -0800 (PST)
+	(envelope-from <dgilbert@redhat.com>) id 1cEbVb-0000LT-QP
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 07:39:43 -0500
+Date: Wed, 7 Dec 2016 12:39:31 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20161207123930.GB2073@work-vm>
+References: <1479923640-8423-1-git-send-email-duanj@linux.vnet.ibm.com>
+	<1479923640-8423-3-git-send-email-duanj@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20161207120419.GA1476@redhat.com>
-References: <CAFEAcA9kODkdK96a=rdZS7+xSW0drj4vLMev-AVio-uewm6Cbw@mail.gmail.com>
-	<20161207120419.GA1476@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 7 Dec 2016 12:30:31 +0000
-Message-ID: <CAFEAcA8UofRa9Yo93vsFYDqJaW5YuKKF68X+2ae=GKdp8w9HWg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] qemu -netdev tun/tap support can't handle macvtap
- type devices
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1479923640-8423-3-git-send-email-duanj@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [QEMU PATCH v14 2/4] migration: migrate QTAILQ
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,28 +23,246 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
+To: Jianjun Duan <duanj@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, dmitry@daynix.com, peter.maydell@linaro.org, kraxel@redhat.com, mst@redhat.com, david@gibson.dropbear.id.au, pbonzini@redhat.com, veroniabahaa@gmail.com, quintela@redhat.com, amit.shah@redhat.com, mreitz@redhat.com, kwolf@redhat.com, rth@twiddle.net, aurelien@aurel32.net, leon.alrae@imgtec.com, blauwirbel@gmail.com, mark.cave-ayland@ilande.co.uk, mdroth@linux.vnet.ibm.com
 
-On 7 December 2016 at 12:04, Daniel P. Berrange <berrange@redhat.com> wrote:
-> On Wed, Dec 07, 2016 at 12:01:14PM +0000, Peter Maydell wrote:
->> The usual suggested workaround is to use the -netdev fd option, like
->>   fd=3 3<>/dev/tap$(< /sys/class/net/tap0/ifindex)
->> (which gets the shell to open the right /dev/tap device).
->> Unfortunately this isn't compatible with multi-queue support
->> because netdev complains
->> "ifname=, script=, downscript=, vnet_hdr=, helper=, queues=, fds=,
->> and vhostfds= are invalid with fd="
->> so you can't pass options like "queues=4"...
->
-> FWIW you should be able to instead do
->
->    fds=3 3<>/dev/tap$(< /sys/class/net/tap0/ifindex)
->
-> note 'fds' plural, instead of 'fd'
+* Jianjun Duan (duanj@linux.vnet.ibm.com) wrote:
+> Currently we cannot directly transfer a QTAILQ instance because of the
+> limitation in the migration code. Here we introduce an approach to
+> transfer such structures. We created VMStateInfo vmstate_info_qtailq
+> for QTAILQ. Similar VMStateInfo can be created for other data structures
+> such as list.
+> 
+> When a QTAILQ is migrated from source to target, it is appended to the
+> corresponding QTAILQ structure, which is assumed to have been properly
+> initialized.
+> 
+> This approach will be used to transfer pending_events and ccs_list in spapr
+> state.
+> 
+> We also create some macros in qemu/queue.h to access a QTAILQ using pointer
+> arithmetic. This ensures that we do not depend on the implementation
+> details about QTAILQ in the migration code.
+> 
+> Signed-off-by: Jianjun Duan <duanj@linux.vnet.ibm.com>
 
-What's the difference between that and the "usual suggested workaround"
-I described above that doesn't work with queues=... ?
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-thanks
--- PMM
+> ---
+>  include/migration/vmstate.h | 20 +++++++++++++
+>  include/qemu/queue.h        | 60 +++++++++++++++++++++++++++++++++++++++
+>  migration/trace-events      |  4 +++
+>  migration/vmstate.c         | 69 +++++++++++++++++++++++++++++++++++++++++++++
+>  4 files changed, 153 insertions(+)
+> 
+> diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
+> index eafc8f2..e47ad6e 100644
+> --- a/include/migration/vmstate.h
+> +++ b/include/migration/vmstate.h
+> @@ -253,6 +253,7 @@ extern const VMStateInfo vmstate_info_timer;
+>  extern const VMStateInfo vmstate_info_buffer;
+>  extern const VMStateInfo vmstate_info_unused_buffer;
+>  extern const VMStateInfo vmstate_info_bitmap;
+> +extern const VMStateInfo vmstate_info_qtailq;
+>  
+>  #define type_check_2darray(t1,t2,n,m) ((t1(*)[n][m])0 - (t2*)0)
+>  #define type_check_array(t1,t2,n) ((t1(*)[n])0 - (t2*)0)
+> @@ -664,6 +665,25 @@ extern const VMStateInfo vmstate_info_bitmap;
+>      .offset       = offsetof(_state, _field),                        \
+>  }
+>  
+> +/* For migrating a QTAILQ.
+> + * Target QTAILQ needs be properly initialized.
+> + * _type: type of QTAILQ element
+> + * _next: name of QTAILQ entry field in QTAILQ element
+> + * _vmsd: VMSD for QTAILQ element
+> + * size: size of QTAILQ element
+> + * start: offset of QTAILQ entry in QTAILQ element
+> + */
+> +#define VMSTATE_QTAILQ_V(_field, _state, _version, _vmsd, _type, _next)  \
+> +{                                                                        \
+> +    .name         = (stringify(_field)),                                 \
+> +    .version_id   = (_version),                                          \
+> +    .vmsd         = &(_vmsd),                                            \
+> +    .size         = sizeof(_type),                                       \
+> +    .info         = &vmstate_info_qtailq,                                \
+> +    .offset       = offsetof(_state, _field),                            \
+> +    .start        = offsetof(_type, _next),                              \
+> +}
+> +
+>  /* _f : field name
+>     _f_n : num of elements field_name
+>     _n : num of elements
+> diff --git a/include/qemu/queue.h b/include/qemu/queue.h
+> index 342073f..35292c3 100644
+> --- a/include/qemu/queue.h
+> +++ b/include/qemu/queue.h
+> @@ -438,4 +438,64 @@ struct {                                                                \
+>  #define QTAILQ_PREV(elm, headname, field) \
+>          (*(((struct headname *)((elm)->field.tqe_prev))->tqh_last))
+>  
+> +#define field_at_offset(base, offset, type)                                    \
+> +        ((type) (((char *) (base)) + (offset)))
+> +
+> +typedef struct DUMMY_Q_ENTRY DUMMY_Q_ENTRY;
+> +typedef struct DUMMY_Q DUMMY_Q;
+> +
+> +struct DUMMY_Q_ENTRY {
+> +        QTAILQ_ENTRY(DUMMY_Q_ENTRY) next;
+> +};
+> +
+> +struct DUMMY_Q {
+> +        QTAILQ_HEAD(DUMMY_Q_HEAD, DUMMY_Q_ENTRY) head;
+> +};
+> +
+> +#define dummy_q ((DUMMY_Q *) 0)
+> +#define dummy_qe ((DUMMY_Q_ENTRY *) 0)
+> +
+> +/*
+> + * Offsets of layout of a tail queue head.
+> + */
+> +#define QTAILQ_FIRST_OFFSET (offsetof(typeof(dummy_q->head), tqh_first))
+> +#define QTAILQ_LAST_OFFSET  (offsetof(typeof(dummy_q->head), tqh_last))
+> +/*
+> + * Raw access of elements of a tail queue
+> + */
+> +#define QTAILQ_RAW_FIRST(head)                                                 \
+> +        (*field_at_offset(head, QTAILQ_FIRST_OFFSET, void **))
+> +#define QTAILQ_RAW_TQH_LAST(head)                                              \
+> +        (*field_at_offset(head, QTAILQ_LAST_OFFSET, void ***))
+> +
+> +/*
+> + * Offsets of layout of a tail queue element.
+> + */
+> +#define QTAILQ_NEXT_OFFSET (offsetof(typeof(dummy_qe->next), tqe_next))
+> +#define QTAILQ_PREV_OFFSET (offsetof(typeof(dummy_qe->next), tqe_prev))
+> +
+> +/*
+> + * Raw access of elements of a tail entry
+> + */
+> +#define QTAILQ_RAW_NEXT(elm, entry)                                            \
+> +        (*field_at_offset(elm, entry + QTAILQ_NEXT_OFFSET, void **))
+> +#define QTAILQ_RAW_TQE_PREV(elm, entry)                                        \
+> +        (*field_at_offset(elm, entry + QTAILQ_PREV_OFFSET, void ***))
+> +/*
+> + * Tail queue tranversal using pointer arithmetic.
+> + */
+> +#define QTAILQ_RAW_FOREACH(elm, head, entry)                                   \
+> +        for ((elm) = QTAILQ_RAW_FIRST(head);                                   \
+> +             (elm);                                                            \
+> +             (elm) = QTAILQ_RAW_NEXT(elm, entry))
+> +/*
+> + * Tail queue insertion using pointer arithmetic.
+> + */
+> +#define QTAILQ_RAW_INSERT_TAIL(head, elm, entry) do {                          \
+> +        QTAILQ_RAW_NEXT(elm, entry) = NULL;                                    \
+> +        QTAILQ_RAW_TQE_PREV(elm, entry) = QTAILQ_RAW_TQH_LAST(head);           \
+> +        *QTAILQ_RAW_TQH_LAST(head) = (elm);                                    \
+> +        QTAILQ_RAW_TQH_LAST(head) = &QTAILQ_RAW_NEXT(elm, entry);              \
+> +} while (/*CONSTCOND*/0)
+> +
+>  #endif /* QEMU_SYS_QUEUE_H */
+> diff --git a/migration/trace-events b/migration/trace-events
+> index 94134f7..c46f9e9 100644
+> --- a/migration/trace-events
+> +++ b/migration/trace-events
+> @@ -52,6 +52,10 @@ vmstate_n_elems(const char *name, int n_elems) "%s: %d"
+>  vmstate_subsection_load(const char *parent) "%s"
+>  vmstate_subsection_load_bad(const char *parent,  const char *sub, const char *sub2) "%s: %s/%s"
+>  vmstate_subsection_load_good(const char *parent) "%s"
+> +get_qtailq(const char *name, int version_id) "%s v%d"
+> +get_qtailq_end(const char *name, const char *reason, int val) "%s %s/%d"
+> +put_qtailq(const char *name, int version_id) "%s v%d"
+> +put_qtailq_end(const char *name, const char *reason) "%s %s"
+>  
+>  # migration/qemu-file.c
+>  qemu_file_fclose(void) ""
+> diff --git a/migration/vmstate.c b/migration/vmstate.c
+> index 7b4bd6e..2f9d4ba 100644
+> --- a/migration/vmstate.c
+> +++ b/migration/vmstate.c
+> @@ -5,6 +5,7 @@
+>  #include "migration/vmstate.h"
+>  #include "qemu/bitops.h"
+>  #include "qemu/error-report.h"
+> +#include "qemu/queue.h"
+>  #include "trace.h"
+>  #include "migration/qjson.h"
+>  
+> @@ -965,3 +966,71 @@ const VMStateInfo vmstate_info_bitmap = {
+>      .get = get_bitmap,
+>      .put = put_bitmap,
+>  };
+> +
+> +/* get for QTAILQ
+> + * meta data about the QTAILQ is encoded in a VMStateField structure
+> + */
+> +static int get_qtailq(QEMUFile *f, void *pv, size_t unused_size,
+> +                      VMStateField *field)
+> +{
+> +    int ret = 0;
+> +    const VMStateDescription *vmsd = field->vmsd;
+> +    /* size of a QTAILQ element */
+> +    size_t size = field->size;
+> +    /* offset of the QTAILQ entry in a QTAILQ element */
+> +    size_t entry_offset = field->start;
+> +    int version_id = field->version_id;
+> +    void *elm;
+> +
+> +    trace_get_qtailq(vmsd->name, version_id);
+> +    if (version_id > vmsd->version_id) {
+> +        error_report("%s %s",  vmsd->name, "too new");
+> +        trace_get_qtailq_end(vmsd->name, "too new", -EINVAL);
+> +
+> +        return -EINVAL;
+> +    }
+> +    if (version_id < vmsd->minimum_version_id) {
+> +        error_report("%s %s",  vmsd->name, "too old");
+> +        trace_get_qtailq_end(vmsd->name, "too old", -EINVAL);
+> +        return -EINVAL;
+> +    }
+> +
+> +    while (qemu_get_byte(f)) {
+> +        elm = g_malloc(size);
+> +        ret = vmstate_load_state(f, vmsd, elm, version_id);
+> +        if (ret) {
+> +            return ret;
+> +        }
+> +        QTAILQ_RAW_INSERT_TAIL(pv, elm, entry_offset);
+> +    }
+> +
+> +    trace_get_qtailq_end(vmsd->name, "end", ret);
+> +    return ret;
+> +}
+> +
+> +/* put for QTAILQ */
+> +static int put_qtailq(QEMUFile *f, void *pv, size_t unused_size,
+> +                      VMStateField *field, QJSON *vmdesc)
+> +{
+> +    const VMStateDescription *vmsd = field->vmsd;
+> +    /* offset of the QTAILQ entry in a QTAILQ element*/
+> +    size_t entry_offset = field->start;
+> +    void *elm;
+> +
+> +    trace_put_qtailq(vmsd->name, vmsd->version_id);
+> +
+> +    QTAILQ_RAW_FOREACH(elm, pv, entry_offset) {
+> +        qemu_put_byte(f, true);
+> +        vmstate_save_state(f, vmsd, elm, vmdesc);
+> +    }
+> +    qemu_put_byte(f, false);
+> +
+> +    trace_put_qtailq_end(vmsd->name, "end");
+> +
+> +    return 0;
+> +}
+> +const VMStateInfo vmstate_info_qtailq = {
+> +    .name = "qtailq",
+> +    .get  = get_qtailq,
+> +    .put  = put_qtailq,
+> +};
+> -- 
+> 1.9.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
