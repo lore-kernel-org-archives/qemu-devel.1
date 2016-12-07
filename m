@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60728)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34643)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Julian_Brown@mentor.com>) id 1cEdXW-0007De-4S
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 09:49:48 -0500
+	(envelope-from <groug@kaod.org>) id 1cEdgX-0005NG-Ed
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 09:59:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Julian_Brown@mentor.com>) id 1cEdXV-0001XK-6i
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 09:49:46 -0500
-Received: from relay1.mentorg.com ([192.94.38.131]:37478)
+	(envelope-from <groug@kaod.org>) id 1cEdgS-0004UP-L7
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 09:59:05 -0500
+Received: from 4.mo68.mail-out.ovh.net ([46.105.59.63]:53731)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Julian_Brown@mentor.com>)
-	id 1cEdXV-0001X6-1Q
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 09:49:45 -0500
-Received: from nat-ies.mentorg.com ([192.94.31.2]
-	helo=SVR-IES-MBX-04.mgc.mentorg.com)
-	by relay1.mentorg.com with esmtp
-	id 1cEdXT-0002Zo-UM from Julian_Brown@mentor.com
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 06:49:44 -0800
-From: Julian Brown <julian@codesourcery.com>
-Date: Wed, 7 Dec 2016 06:49:25 -0800
-Message-ID: <314be7d149b8d7b1d9ae86f2a1beb070ec161f0c.1481121503.git.julian@codesourcery.com>
-In-Reply-To: <cover.1481121503.git.julian@codesourcery.com>
-References: <cover.1481121503.git.julian@codesourcery.com>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cEdgS-0004Tx-C0
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 09:59:00 -0500
+Received: from player763.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo68.mail-out.ovh.net (Postfix) with ESMTP id BFDF516E72
+	for <qemu-devel@nongnu.org>; Wed,  7 Dec 2016 15:58:58 +0100 (CET)
+Date: Wed, 7 Dec 2016 15:58:48 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20161207155848.76429902@bahia>
+In-Reply-To: <20161207135917.GI4027@thinpad.lan.raisama.net>
+References: <148104617887.7699.984921868108236415.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+	<20161206191952.GD4027@thinpad.lan.raisama.net>
+	<20161206193159.GE4027@thinpad.lan.raisama.net>
+	<20161207143925.7b3a54f2@bahia>
+	<20161207135917.GI4027@thinpad.lan.raisama.net>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 6/6] ARM BE32 watchpoint fix.
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC for-2.8] machine: Convert abstract typename
+ on compat_props to subclass names
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,134 +34,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, Halil Pasic <pasic@linux.vnet.ibm.com>, "Michael
+	S. Tsirkin" <mst@redhat.com>, qemu-stable@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-In BE32 mode, sub-word size watchpoints can fail to trigger because the
-address of the access is adjusted in the opcode helpers before being
-compared with the watchpoint registers.  This patch reverses the address
-adjustment before performing the comparison with the help of a new CPUClass
-hook.
+On Wed, 7 Dec 2016 11:59:17 -0200
+Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-Signed-off-by: Julian Brown <julian@codesourcery.com>
----
- exec.c                 |  1 +
- include/qom/cpu.h      |  1 +
- qom/cpu.c              |  6 ++++++
- target-arm/cpu.c       |  3 +++
- target-arm/internals.h |  5 +++++
- target-arm/op_helper.c | 22 ++++++++++++++++++++++
- 6 files changed, 38 insertions(+)
+> On Wed, Dec 07, 2016 at 02:39:25PM +0100, Greg Kurz wrote:
+> > On Tue, 6 Dec 2016 17:31:59 -0200
+> > Eduardo Habkost <ehabkost@redhat.com> wrote:
+> >   
+> > > On Tue, Dec 06, 2016 at 05:19:52PM -0200, Eduardo Habkost wrote:  
+> > > > On Tue, Dec 06, 2016 at 06:50:47PM +0100, Greg Kurz wrote:    
+> > > > > Since commit "9a4c0e220d8a hw/virtio-pci: fix virtio behaviour", passing
+> > > > > -device virtio-blk-pci.disable-modern=off has no effect on 2.6 machine
+> > > > > types because the internal virtio-pci.disable-modern=on compat property
+> > > > > always prevail.
+> > > > > 
+> > > > > This should ideally be fixed in the qdev properties core code, but it is
+> > > > > too late in the QEMU 2.8 schedule. So this patch fixes the issue by setting
+> > > > > the compat properties for every virtio-*-pci subtypes instead of the base
+> > > > > virtio-pci type.
+> > > > > 
+> > > > > Signed-off-by: Greg Kurz <groug@kaod.org>    
+> > > > 
+> > > > So, it looks like the bug is present in many other cases...
+> > > > 
+> > > > I have hacked QEMU to print a warning in case the driver name in
+> > > > compat_props refer to an abstract class or a class that have any
+> > > > subclasses. The results are below:
+> > > > 
+> > > >  apic-common.legacy-instance-id set for abstract class
+> > > >  apic-common.vapic set for abstract class
+> > > >  i386-cpu.arat set for abstract class
+> > > >  i386-cpu.check set for abstract class
+> > > >  i386-cpu.cpuid-0xb set for abstract class
+> > > >  i386-cpu.fill-mtrr-mask set for abstract class
+> > > >  i386-cpu.full-cpuid-auto-level set for abstract class
+> > > >  i386-cpu.l3-cache set for abstract class
+> > > >  i386-cpu.pmu set for abstract class
+> > > >  pci-device.command_serr_enable set for abstract class
+> > > >  pci-device.rombar set for abstract class
+> > > >  pci-device.x-pcie-lnksta-dllla set for abstract class
+> > > >  powerpc64-cpu.pre-2.8-migration set for abstract class
+> > > >  s390-skeys.migration-enabled set for abstract class
+> > > >  spapr-pci-host-bridge.ddw set for superclass
+> > > >  spapr-pci-host-bridge.dynamic-reconfiguration set for superclass
+> > > >  spapr-pci-host-bridge.mem64_win_size set for superclass
+> > > >  spapr-pci-host-bridge.mem_win_size set for superclass
+> > > >  spapr-pci-host-bridge.pre-2.8-migration set for superclass
+> > > >  usb-device.full-path set for abstract class
+> > > >  usb-device.msos-desc set for abstract class
+> > > >  virtio-pci.disable-legacy set for abstract class
+> > > >  virtio-pci.disable-modern set for abstract class
+> > > >  virtio-pci.migrate-extra set for abstract class
+> > > >  virtio-pci.page-per-vq set for abstract class
+> > > >  virtio-pci.virtio-pci-bus-master-bug-migration set for abstract class
+> > > >  virtio-pci.x-disable-pcie set for abstract class
+> > > >  x86_64-cpu.arat set for abstract class
+> > > >  x86_64-cpu.check set for abstract class
+> > > >  x86_64-cpu.cpuid-0xb set for abstract class
+> > > >  x86_64-cpu.fill-mtrr-mask set for abstract class
+> > > >  x86_64-cpu.full-cpuid-auto-level set for abstract class
+> > > >  x86_64-cpu.l3-cache set for abstract class
+> > > >  x86_64-cpu.pmu set for abstract class
+> > > > 
+> > > > I believe the cases where we are likely to cause real-world bugs
+> > > > are virtio-pci and the *-cpu classes (because -cpu is translated
+> > > > to -global).
+> > > > 
+> > > > I'm not sure what should be the right fix in 2.8. I am
+> > > > considering a temporary hack to translate abstract class names in
+> > > > compat_props to global properties for all subclasses, in case
+> > > > they refer to an abstract class. This way we fix the bug where
+> > > > -global doesn't override compat_props properly, but keep the
+> > > > rules for -global untouched.    
+> > > 
+> > > What about this?
+> > >   
+> > 
+> > Indeed that would have been a clever workaround but it is too late anyway. :)
+> > 
+> > BTW, that makes me think about Halil's comment in another mail, even if it
+> > is not strictly related to the comapt issue (but rather because I mentioned
+> > it in the changelog of my first patch):
+> > 
+> > "So I can't even tell if -global virtio-pci.disable-modern=off is even legit
+> > on the command line."
+> > 
+> > And indeed, -device doesn't accept abstract classes... shouldn't -global
+> > prohibit setting properties for them ?  
+> 
+> I'm not sure. Setting disable-modern for all virtio-pci devices
+> with a single -global option sounds very useful, for example.
+> 
 
-diff --git a/exec.c b/exec.c
-index cbe14cd..0f1fe1c 100644
---- a/exec.c
-+++ b/exec.c
-@@ -2067,6 +2067,7 @@ static void check_watchpoint(int offset, int len, MemTxAttrs attrs, int flags)
-         return;
-     }
-     vaddr = (cpu->mem_io_vaddr & TARGET_PAGE_MASK) + offset;
-+    vaddr = cc->adjust_watchpoint_address(cpu, vaddr, len);
-     QTAILQ_FOREACH(wp, &cpu->watchpoints, entry) {
-         if (cpu_watchpoint_address_matches(wp, vaddr, len)
-             && (wp->flags & flags)) {
-diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-index 3f79a8e..5c0c893 100644
---- a/include/qom/cpu.h
-+++ b/include/qom/cpu.h
-@@ -195,6 +195,7 @@ typedef struct CPUClass {
-     bool (*cpu_exec_interrupt)(CPUState *cpu, int interrupt_request);
- 
-     void (*disas_set_info)(CPUState *cpu, disassemble_info *info);
-+    vaddr (*adjust_watchpoint_address)(CPUState *cpu, vaddr addr, int len);
- } CPUClass;
- 
- #ifdef HOST_WORDS_BIGENDIAN
-diff --git a/qom/cpu.c b/qom/cpu.c
-index 03d9190..9ad07c8 100644
---- a/qom/cpu.c
-+++ b/qom/cpu.c
-@@ -383,6 +383,11 @@ static int64_t cpu_common_get_arch_id(CPUState *cpu)
-     return cpu->cpu_index;
- }
- 
-+static vaddr cpu_adjust_watchpoint_address(CPUState *cpu, vaddr addr, int len)
-+{
-+    return addr;
-+}
-+
- static void cpu_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(klass);
-@@ -407,6 +412,7 @@ static void cpu_class_init(ObjectClass *klass, void *data)
-     k->cpu_exec_enter = cpu_common_noop;
-     k->cpu_exec_exit = cpu_common_noop;
-     k->cpu_exec_interrupt = cpu_common_exec_interrupt;
-+    k->adjust_watchpoint_address = cpu_adjust_watchpoint_address;
-     dc->realize = cpu_common_realizefn;
-     dc->unrealize = cpu_common_unrealizefn;
-     /*
-diff --git a/target-arm/cpu.c b/target-arm/cpu.c
-index 6099d50..a609211 100644
---- a/target-arm/cpu.c
-+++ b/target-arm/cpu.c
-@@ -1650,6 +1650,9 @@ static void arm_cpu_class_init(ObjectClass *oc, void *data)
-     cc->gdb_stop_before_watchpoint = true;
-     cc->debug_excp_handler = arm_debug_excp_handler;
-     cc->debug_check_watchpoint = arm_debug_check_watchpoint;
-+#if !defined(CONFIG_USER_ONLY)
-+    cc->adjust_watchpoint_address = arm_adjust_watchpoint_address;
-+#endif
- 
-     cc->disas_set_info = arm_disas_set_info;
- }
-diff --git a/target-arm/internals.h b/target-arm/internals.h
-index 3edccd2..132f8d0 100644
---- a/target-arm/internals.h
-+++ b/target-arm/internals.h
-@@ -437,6 +437,11 @@ void hw_breakpoint_update_all(ARMCPU *cpu);
- /* Callback function for checking if a watchpoint should trigger. */
- bool arm_debug_check_watchpoint(CPUState *cs, CPUWatchpoint *wp);
- 
-+/* Adjust addresses (in BE32 mode) before testing against watchpoint
-+ * addresses.
-+ */
-+vaddr arm_adjust_watchpoint_address(CPUState *cs, vaddr addr, int len);
-+
- /* Callback function for when a watchpoint or breakpoint triggers. */
- void arm_debug_excp_handler(CPUState *cs);
- 
-diff --git a/target-arm/op_helper.c b/target-arm/op_helper.c
-index cd94216..dc92e49 100644
---- a/target-arm/op_helper.c
-+++ b/target-arm/op_helper.c
-@@ -1216,6 +1216,28 @@ bool arm_debug_check_watchpoint(CPUState *cs, CPUWatchpoint *wp)
-     return check_watchpoints(cpu);
- }
- 
-+vaddr arm_adjust_watchpoint_address(CPUState *cs, vaddr addr, int len)
-+{
-+    ARMCPU *cpu = ARM_CPU(cs);
-+    CPUARMState *env = &cpu->env;
-+
-+    /* In BE32 system mode, target memory is stored byteswapped (FIXME:
-+     * relative to a little-endian host system), and by the time we reach here
-+     * (via an opcode helper) the addresses of subword accesses have been
-+     * adjusted to account for that, which means that watchpoints will not
-+     * match.  Undo the adjustment here.
-+     */
-+    if (arm_sctlr_b(env)) {
-+        if (len == 1) {
-+            addr ^= 3;
-+        } else if (len == 2) {
-+            addr ^= 2;
-+        }
-+    }
-+
-+    return addr;
-+}
-+
- void arm_debug_excp_handler(CPUState *cs)
- {
-     /* Called by core code when a watchpoint or breakpoint fires;
--- 
-2.8.1
+Indeed but, unless I've missed something *again*, you cannot know about
+it without reading the code... maybe this calls for a '-global help' option
+to list them all ?
+
+> Also, if we start rejecting it we risk breaking existing
+> configurations. We would need to deprecate it first (making it
+> print a warning) and reject it a few releases later.
+> 
+
+This would be an undocumented configuration but I get your point, so
+it's probably better to keep it... especially if it's useful :)
+
+Cheers.
+
+--
+Greg
