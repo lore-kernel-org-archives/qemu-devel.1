@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37088)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39230)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Julian_Brown@mentor.com>) id 1cEfnj-0006if-8I
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 12:14:40 -0500
+	(envelope-from <alistair23@gmail.com>) id 1cEfy5-00036i-Em
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 12:25:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Julian_Brown@mentor.com>) id 1cEfne-0002l5-At
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 12:14:39 -0500
-Received: from relay1.mentorg.com ([192.94.38.131]:35817)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Julian_Brown@mentor.com>)
-	id 1cEfne-0002h6-4P
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 12:14:34 -0500
-Received: from nat-ies.mentorg.com ([192.94.31.2]
-	helo=SVR-IES-MBX-04.mgc.mentorg.com)
-	by relay1.mentorg.com with esmtp
-	id 1cEfnY-0002KI-J6 from Julian_Brown@mentor.com
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 09:14:28 -0800
-From: Julian Brown <julian@codesourcery.com>
-Date: Wed, 7 Dec 2016 09:14:18 -0800
-Message-ID: <1481130858-31767-1-git-send-email-julian@codesourcery.com>
+	(envelope-from <alistair23@gmail.com>) id 1cEfy1-0006fp-Hr
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 12:25:21 -0500
+Received: from mail-oi0-f66.google.com ([209.85.218.66]:35781)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1cEfy1-0006Yb-CH
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 12:25:17 -0500
+Received: by mail-oi0-f66.google.com with SMTP id v84so46518678oie.2
+	for <qemu-devel@nongnu.org>; Wed, 07 Dec 2016 09:24:54 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH] Correct value of ARM Cortex-A8 MVFR1 register.
+Sender: alistair23@gmail.com
+In-Reply-To: <CAFEAcA8k++Q9ByEj_yynGW+N6sry4wNCB-=ASXtWuLHEBUxSHw@mail.gmail.com>
+References: <cb06a932a7c6b29bc6eb0d35f31766bfb0bba47f.1480962799.git.alistair.francis@xilinx.com>
+	<CAFEAcA8k++Q9ByEj_yynGW+N6sry4wNCB-=ASXtWuLHEBUxSHw@mail.gmail.com>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Wed, 7 Dec 2016 09:23:21 -0800
+Message-ID: <CAKmqyKP-Vt+1pkgAXosZdXrWYCGWOon4Excu=4NdE-6XB7hU+Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH for 2.8 v3 1/1] cadence_uart: Check baud
+ rate generator and divider values on migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,42 +31,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, QEMU Developers <qemu-devel@nongnu.org>, Prasad J Pandit <pjp@fedoraproject.org>, Huawei PSIRT <psirt@huawei.com>
 
-The value of the MVFR1 (Media and VFP Feature Register 1) register for
-the Cortex-A8 appears to be incorrect (according to the TRM, DDI0344K),
-with the "full denormal arithmetic" and "propagation of NaN" fields
-holding both 0 instead of both 1.
+On Tue, Dec 6, 2016 at 1:31 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 5 December 2016 at 18:35, Alistair Francis
+> <alistair.francis@xilinx.com> wrote:
+>> The Cadence UART device emulator calculates speed by dividing the
+>> baud rate by a 'baud rate generator' & 'baud rate divider' value.
+>> The device specification defines these register values to be
+>> non-zero and within certain limits. Checks were recently added when
+>> writing to these registers but not when restoring from migration.
+>>
+>> This patch adds checks when restoring from migration to avoid divide by
+>> zero errors.
+>>
+>> Reported-by: Huawei PSIRT <psirt@huawei.com>
+>> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+>> ---
+>> It would be nice to squeeze this into 2.8 if possible.
+>>
+>> V3:
+>>  - Fix broken migration logic
+>>  - Manually double checked and it passes migration.
+>> V2:
+>>  - Abort the migration if the data is invalid
+>>
+>>  hw/char/cadence_uart.c | 7 +++++++
+>>  1 file changed, 7 insertions(+)
+>>
+>> diff --git a/hw/char/cadence_uart.c b/hw/char/cadence_uart.c
+>> index 0215d65..ce9063b 100644
+>> --- a/hw/char/cadence_uart.c
+>> +++ b/hw/char/cadence_uart.c
+>> @@ -502,6 +502,13 @@ static int cadence_uart_post_load(void *opaque, int version_id)
+>>  {
+>>      CadenceUARTState *s = opaque;
+>>
+>> +    /* Ensure these two aren't invalid numbers */
+>> +    if (s->r[R_BRGR] <= 1 || s->r[R_BRGR] & ~0xFFFF ||
+>> +        s->r[R_BDIV] <= 3 || s->r[R_BDIV] & ~0xFF) {
+>
+> The uart_write() code says BRGR == 1 is valid, but
+> this code says it isn't. Which is correct?
 
-I had a go tracing the history of the use of this value, and it seems
-it's always just been wrong in QEMU: maybe it was derived from early
-documentation, or guessed based on the use of a "VFP Lite" implementation
-in the Cortex-A8.
+1 is valid, it is bypass mode, fixing.
 
-Depending on the startup/early-boot code in use, this can manifest as
-failure to perform denormal arithmetic properly: in our case, selecting
-a Cortex-A8 CPU when using QEMU as an instruction-set simulator for
-bare-metal GCC testing caused tests using denormal arithmetic to
-fail. Problems might be masked (or not occur) when using a full OS kernel
-with suitable trap handlers (I'm not sure).
+Thanks,
 
-Signed-off-by: Julian Brown <julian@codesourcery.com>
----
- target-arm/cpu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Alistair
 
-diff --git a/target-arm/cpu.c b/target-arm/cpu.c
-index 7946877..a609211 100644
---- a/target-arm/cpu.c
-+++ b/target-arm/cpu.c
-@@ -1109,7 +1109,7 @@ static void cortex_a8_initfn(Object *obj)
-     cpu->midr = 0x410fc080;
-     cpu->reset_fpsid = 0x410330c0;
-     cpu->mvfr0 = 0x11110222;
--    cpu->mvfr1 = 0x00011100;
-+    cpu->mvfr1 = 0x00011111;
-     cpu->ctr = 0x82048004;
-     cpu->reset_sctlr = 0x00c50078;
-     cpu->id_pfr0 = 0x1031;
--- 
-1.9.1
+>
+> thanks
+> -- PMM
