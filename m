@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36061)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45439)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cEaxX-00078i-Uz
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 07:04:31 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cEbO9-00037T-LP
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 07:32:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cEaxV-0006HD-1O
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 07:04:27 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50776)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cEaxU-0006Gm-SC
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 07:04:24 -0500
-Date: Wed, 7 Dec 2016 12:04:19 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20161207120419.GA1476@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <CAFEAcA9kODkdK96a=rdZS7+xSW0drj4vLMev-AVio-uewm6Cbw@mail.gmail.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1cEbO5-00063U-HP
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 07:31:57 -0500
+Received: from mail-ua0-f177.google.com ([209.85.217.177]:35373)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cEbO5-00062y-Cw
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 07:31:53 -0500
+Received: by mail-ua0-f177.google.com with SMTP id 12so413534562uas.2
+	for <qemu-devel@nongnu.org>; Wed, 07 Dec 2016 04:31:53 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA9kODkdK96a=rdZS7+xSW0drj4vLMev-AVio-uewm6Cbw@mail.gmail.com>
+In-Reply-To: <20161207120419.GA1476@redhat.com>
+References: <CAFEAcA9kODkdK96a=rdZS7+xSW0drj4vLMev-AVio-uewm6Cbw@mail.gmail.com>
+	<20161207120419.GA1476@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 7 Dec 2016 12:30:31 +0000
+Message-ID: <CAFEAcA8UofRa9Yo93vsFYDqJaW5YuKKF68X+2ae=GKdp8w9HWg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Subject: Re: [Qemu-devel] qemu -netdev tun/tap support can't handle macvtap
  type devices
 List-Id: <qemu-devel.nongnu.org>
@@ -28,47 +30,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>
 Cc: QEMU Developers <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
 
-On Wed, Dec 07, 2016 at 12:01:14PM +0000, Peter Maydell wrote:
-> Hi; this is a bug report I'm forwarding for somebody else.
-> 
-> The problem is that QEMU's tun/tap support in net/tap-linux.c only
-> supports the legacy /dev/net/tun interface (the filename is hardcoded).
-> If you created the tap device via macvtap, then this is the wrong
-> filename, but there's no code in QEMU to get the correct /dev/tapN
-> filename from the user-provided ifname=whatever option.
-> 
-> Talking on IRC, the answer suggested was that we ought to
-> do a SIOCGIFINDEX ioctl passing in the user-specified ifname
-> string, which then gives you the index N to construct the
-> /dev/tapN filename. There is probably complexity in working out
-> whether we should do that or use the legacy interface (or try both
-> always?) This is probably overall not a very large amount of code,
-> though.
-> 
-> The usual suggested workaround is to use the -netdev fd option, like
->   fd=3 3<>/dev/tap$(< /sys/class/net/tap0/ifindex)
-> (which gets the shell to open the right /dev/tap device).
-> Unfortunately this isn't compatible with multi-queue support
-> because netdev complains
-> "ifname=, script=, downscript=, vnet_hdr=, helper=, queues=, fds=,
-> and vhostfds= are invalid with fd="
-> so you can't pass options like "queues=4"...
+On 7 December 2016 at 12:04, Daniel P. Berrange <berrange@redhat.com> wrote:
+> On Wed, Dec 07, 2016 at 12:01:14PM +0000, Peter Maydell wrote:
+>> The usual suggested workaround is to use the -netdev fd option, like
+>>   fd=3 3<>/dev/tap$(< /sys/class/net/tap0/ifindex)
+>> (which gets the shell to open the right /dev/tap device).
+>> Unfortunately this isn't compatible with multi-queue support
+>> because netdev complains
+>> "ifname=, script=, downscript=, vnet_hdr=, helper=, queues=, fds=,
+>> and vhostfds= are invalid with fd="
+>> so you can't pass options like "queues=4"...
+>
+> FWIW you should be able to instead do
+>
+>    fds=3 3<>/dev/tap$(< /sys/class/net/tap0/ifindex)
+>
+> note 'fds' plural, instead of 'fd'
 
-FWIW you should be able to instead do
+What's the difference between that and the "usual suggested workaround"
+I described above that doesn't work with queues=... ?
 
-   fds=3 3<>/dev/tap$(< /sys/class/net/tap0/ifindex)
-
-note 'fds' plural, instead of 'fd'
-
-It would be nicer to make it "just work" though when giving a device
-name for macvtap
-
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+thanks
+-- PMM
