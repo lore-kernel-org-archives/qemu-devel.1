@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45893)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46451)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1cEQZ5-0005QM-AO
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 19:58:32 -0500
+	(envelope-from <sstabellini@kernel.org>) id 1cEQct-0007Rc-F1
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 20:02:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1cEQZ2-0003cO-9y
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 19:58:31 -0500
-Received: from szxga02-in.huawei.com ([119.145.14.65]:20329)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1cEQZ1-0003Uw-Ll
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 19:58:28 -0500
-Message-ID: <58475E9E.9030704@huawei.com>
-Date: Wed, 7 Dec 2016 08:58:06 +0800
-From: "Longpeng (Mike)" <longpeng2@huawei.com>
+	(envelope-from <sstabellini@kernel.org>) id 1cEQcq-0004so-Ci
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 20:02:27 -0500
+Received: from mail.kernel.org ([198.145.29.136]:52098)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
+	id 1cEQcq-0004sY-6N
+	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 20:02:24 -0500
+Date: Tue, 6 Dec 2016 17:02:18 -0800 (PST)
+From: Stefano Stabellini <sstabellini@kernel.org>
+In-Reply-To: <1480572399-10455-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+Message-ID: <alpine.DEB.2.10.1612061700330.6598@sstabellini-ThinkPad-X260>
+References: <1480572399-10455-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-References: <1480928380-161760-1-git-send-email-longpeng2@huawei.com>
-	<1480928380-161760-2-git-send-email-longpeng2@huawei.com>
-	<50e11e16-6378-8ce0-241a-252272f5b99a@redhat.com>
-In-Reply-To: <50e11e16-6378-8ce0-241a-252272f5b99a@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.9 1/3] crypto: add standard des
- support
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: [Qemu-devel] [PATCH 0/3] Add new qmp commands to suppurt Xen
+ COLO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,43 +27,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: berrange@redhat.com, armbru@redhat.com, arei.gonglei@huawei.com, qemu-devel@nongnu.org, wu.wubin@huawei.com, jianjay.zhou@huawei.com
+To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+Cc: qemu devel <qemu-devel@nongnu.org>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Changlong Xie <xiecl.fnst@cn.fujitsu.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Jason Wang <jasowang@redhat.com>, "eddie . dong" <eddie.dong@intel.com>, Bian Naimeng <biannm@cn.fujitsu.com>, xen-devel@lists.xenproject.org
 
-Hi Eric,
+Hello Zhang,
 
-On 2016/12/6 3:15, Eric Blake wrote:
+Are the corresponding libxl patches already in xen.git? If so, could you
+please mention the commits; if not, could you please add a link to the
+corresponding patches?
 
-> On 12/05/2016 02:59 AM, Longpeng(Mike) wrote:
->> This patch add standart DES support.
+Thanks!
+
+- Stefano
+
+On Thu, 1 Dec 2016, Zhang Chen wrote:
+> Xen COLO depend on qemu COLO replication function.
+> So, We need new qmp commands for Xen to use qemu replication.
 > 
-> s/standart/standard/
+> Zhang Chen (3):
+>   Migration: Don't load vmdesc when xen is enabled
+>   Add a new qmp command to start/stop replication
+>   Add a new qmp command to do checkpoint, get replication error
 > 
->>
->> Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
->> ---
+>  docs/qmp-commands.txt | 41 +++++++++++++++++++++++++++++++++++++++++
+>  migration/colo.c      | 32 ++++++++++++++++++++++++++++++++
+>  migration/savevm.c    |  4 ++++
+>  qapi-schema.json      | 40 ++++++++++++++++++++++++++++++++++++++++
+>  4 files changed, 117 insertions(+)
 > 
->> +++ b/qapi/crypto.json
->> @@ -75,7 +75,7 @@
->>  { 'enum': 'QCryptoCipherAlgorithm',
->>    'prefix': 'QCRYPTO_CIPHER_ALG',
->>    'data': ['aes-128', 'aes-192', 'aes-256',
->> -           'des-rfb',
->> +           'des-rfb', 'des',
+> -- 
+> 2.7.4
 > 
-> Missing documentation that includes a (since 2.9) blurb
 > 
-
-Thanks, but I decide to disable standard single-DES in cryptodev, as suggested
-by Daniel.
-
->>             'cast5-128',
->>             'serpent-128', 'serpent-192', 'serpent-256',
->>             'twofish-128', 'twofish-192', 'twofish-256']}
->>
 > 
-
-
--- 
-Regards,
-Longpeng(Mike)
+> 
