@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57099)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57561)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1cEYoD-00013U-UR
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 04:46:43 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cEYqA-000239-Td
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 04:48:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1cEYoA-0005up-Tz
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 04:46:42 -0500
-Received: from szxga02-in.huawei.com ([119.145.14.65]:48062)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1cEYoA-0005rP-GL
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 04:46:38 -0500
-Message-ID: <5847DA6D.20404@huawei.com>
-Date: Wed, 7 Dec 2016 17:46:21 +0800
-From: "Longpeng (Mike)" <longpeng2@huawei.com>
+	(envelope-from <kwolf@redhat.com>) id 1cEYqA-0006E0-6l
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 04:48:42 -0500
+Date: Wed, 7 Dec 2016 10:48:32 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20161207094832.GA4773@noname.str.redhat.com>
+References: <87oa0q1t21.fsf@dusky.pond.sub.org> <20161207025457.GB30227@lemon>
 MIME-Version: 1.0
-References: <1481099622-188132-1-git-send-email-longpeng2@huawei.com>
-	<1481099622-188132-2-git-send-email-longpeng2@huawei.com>
-	<20161207093702.GD21167@redhat.com>
-In-Reply-To: <20161207093702.GD21167@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.9 1/2] crypto: add 3des-ede support
- when using libgcrypt/nettle
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20161207025457.GB30227@lemon>
+Subject: Re: [Qemu-devel] [Qemu-block]  Meeting notes on -blockdev,
+ dynamic backend reconfiguration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,37 +23,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: eblake@redhat.com, armbru@redhat.com, arei.gonglei@huawei.com, qemu-devel@nongnu.org, wu.wubin@huawei.com, jianjay.zhou@huawei.com
+To: Fam Zheng <famz@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-Hi Daniel,
-
-On 2016/12/7 17:37, Daniel P. Berrange wrote:
-
-> On Wed, Dec 07, 2016 at 04:33:41PM +0800, Longpeng(Mike) wrote:
-......
->> diff --git a/qapi/crypto.json b/qapi/crypto.json
->> index 5c9d7d4..848b6cd 100644
->> --- a/qapi/crypto.json
->> +++ b/qapi/crypto.json
->> @@ -63,6 +63,7 @@
->>  # @aes-192: AES with 192 bit / 24 byte keys
->>  # @aes-256: AES with 256 bit / 32 byte keys
->>  # @des-rfb: RFB specific variant of single DES. Do not use except in VNC.
->> +# @3des-ede: 3DES-EDE with 192 bit / 24 byte keys
+Am 07.12.2016 um 03:55 hat Fam Zheng geschrieben:
+> On Mon, 12/05 13:03, Markus Armbruster wrote:
+> > == Basic dynamic reconfiguration operation ==
+> > 
+> > The basic operation is "replace child".
+> > 
+> > Beware of race conditions.  Consider:
+> > 
+> >           BB
+> >           |
+> >     mirror-filter
+> >           |
+> >          BDS
+> > 
+> > Add a throttle filter under BB while the mirror job is running.  First
+> > step, create the filter:
+> > 
+> >           BB    throttle-filter
+> >           |     /
+> >     mirror-filter
+> >           |
+> >          BDS
+> > 
+> > Second step, replace child of BB by the new filter:
+> > 
+> >           BB
+> >           |
+> >    throttle-filter
+> >           |
+> >     mirror-filter
+> >           |
+> >          BDS
+> > 
+> > But: if mirror-filter goes away between the two steps, the replace
+> > brings it right back!
+> > 
+> > To guard against such races, we need to specify both ends of the edge
+> > being replaced, i.e. parent, child name, actual child.  Then the replace
+> > step fails if the mirror-filter has gone away.  We can either fail the
+> > whole operation, or start over.
+> > 
+> > Alternatively, transactions, but that feels much more complex.
+> > 
 > 
-> Lets just call this '3des' as 'ede' is can be assumed, eg
-> 
->     # @3des: 3DES (EDE) with 192 bit / 24 byte keys
-> 
+> Isn't it easy to make creating throttle-filter and replacing child
+> happen in the same critical section of BQL, without any coroutine
+> yield?
 
-Okay, I will fix it in V2, thanks. :)
+Letting it happen in the same critical section of BQL would mean a
+QMP transaction of blockdev-add (for the new throttle node) and
+blockdev-replace-child or whatever it would be called. We weren't quite
+confident that trying to make blockdev-add transactionable would be
+possible or a good idea.
 
-> 
-> Regards,
-> Daniel
+> If so I think there is no race to worry about, mirror-filter should go
+> away only after a QMP command.
 
+Currently, a mirror job goes away whenever it is done. This is not
+directly tied to a QMP command.
 
--- 
-Regards,
-Longpeng(Mike)
+Of course, in the new job API we want an explicit job-delete, so in
+that case it wouldn't happen, but we need to keep the old case for
+compatibility.
+
+Kevin
