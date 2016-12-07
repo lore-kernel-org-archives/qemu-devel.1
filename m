@@ -1,23 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60903)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35155)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1cEfZg-0004kG-BS
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 12:00:10 -0500
+	(envelope-from <vijay.kilari@gmail.com>) id 1cEfh2-0002Ao-CZ
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 12:07:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1cEfZb-0004zz-2W
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 12:00:08 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49138)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <drjones@redhat.com>) id 1cEfZa-0004yn-Tt
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 12:00:03 -0500
-Date: Wed, 7 Dec 2016 17:59:56 +0100
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20161207165956.ehw4buztnzqiie2v@kamzik.brq.redhat.com>
-References: <1481047528-16180-1-git-send-email-wei@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1481047528-16180-1-git-send-email-wei@redhat.com>
-Subject: Re: [Qemu-devel] [kvm-unit-tests PATCH v14 0/5] ARM PMU tests
+	(envelope-from <vijay.kilari@gmail.com>) id 1cEfh1-0000QD-FJ
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 12:07:44 -0500
+From: vijay.kilari@gmail.com
+Date: Wed,  7 Dec 2016 22:36:10 +0530
+Message-Id: <1481130374-5147-1-git-send-email-vijay.kilari@gmail.com>
+Subject: [Qemu-devel] [PATCH v5 0/3] Live migration optimization for
+ Thunderx platform
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,64 +18,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Huang <wei@redhat.com>
-Cc: cov@codeaurora.org, alindsay@codeaurora.org, kvm@vger.kernel.org, andre.przywara@arm.com, croberts@codeaurora.org, qemu-devel@nongnu.org, alistair.francis@xilinx.com, shannon.zhao@linaro.org, kvmarm@lists.cs.columbia.edu
+To: qemu-arm@nongnu.org, peter.maydell@linaro.org, pbonzini@redhat.com, rth@twiddle.net
+Cc: qemu-devel@nongnu.org, vijay.kilari@gmail.com, Vijaya Kumar K <Vijaya.Kumar@cavium.com>
 
-On Tue, Dec 06, 2016 at 12:05:23PM -0600, Wei Huang wrote:
-> Changes from v13:
-> * Rename cp15.h to sysreg.h for ARMv7 and add a new file sysreg.h for ARMv8
-> * Add macros for read_sysreg() and write_sysreg(). CP15 registers can be
->   defined with __ACCESS_CP15() or __ACCESS_CP15_64(). sysreg.h (ARMv8) was
->   from Drew's GIC testing code, which can be leveraged when his GIC testing
->   code is imported.
-> * Rewrite PMU testing code based on new macros. All get_xxx() and set_xxx()
->   functions are defined in pmu.c based on read_sysreg() and write_sysreg().
->   So the code parsing tool, like cscope, can parse them easily.
-> * Minor fixes inside pmu.c, printf formatting, pmu_probe() func, based on
->   Andre's comments.
+From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
 
-Thanks for this Wei. I like the sysreg framework. It should address
-Andre's concerns with asm-maintainability, plus maintain code analysis
-tool (cscope) support.
+The CPU MIDR_EL1 register is exposed to userspace for arm64
+with the below patch.
+https://lkml.org/lkml/2016/7/8/467
 
-The series looks good to me, so I'll apply it to arm/next and rebase the
-gic series on it, using the new sysreg framework everywhere needed.
+Thunderx platform requires explicit prefetch instruction to
+provide prefetch hint. Using MIDR_EL1 information, provided
+by above kernel patch, prefetch is executed if the platform
+is Thunderx.
 
-drew
+The results of live migration time improvement is provided
+in commit message of patch 3.
 
-> 
-> Note:
-> Current KVM code has bugs in handling PMCCFILTR write. A fix (see below) is
-> required for this unit testing code to work correctly under KVM mode.
-> Link: https://lists.cs.columbia.edu/pipermail/kvmarm/2016-November/022134.html.
-> 
-> Thanks,
-> -Wei
-> 
-> Christopher Covington (3):
->   arm: Add PMU test
->   arm: pmu: Check cycle count increases
->   arm: pmu: Add CPI checking
-> 
-> Wei Huang (2):
->   arm: rename cp15.h to sysreg.h
->   arm: Add support for read_sysreg() and write_sysreg()
-> 
->  arm/Makefile.common              |   3 +-
->  arm/cstart.S                     |   2 +-
->  arm/pmu.c                        | 290 +++++++++++++++++++++++++++++++++++++++
->  arm/unittests.cfg                |  19 +++
->  lib/arm/asm/processor.h          |   6 +-
->  lib/arm/asm/{cp15.h => sysreg.h} |  25 +++-
->  lib/arm64/asm/processor.h        |  11 +-
->  lib/arm64/asm/sysreg.h           |  26 ++++
->  lib/libcflat.h                   |   4 +-
->  9 files changed, 369 insertions(+), 17 deletions(-)
->  create mode 100644 arm/pmu.c
->  rename lib/arm/asm/{cp15.h => sysreg.h} (68%)
->  create mode 100644 lib/arm64/asm/sysreg.h
-> 
-> -- 
-> 1.8.3.1
-> 
-> 
+Note: Check for size of while prefetching beyond page is
+not added. Making this check is counter productive on
+performance of live migration.
+
+v4 => v5:
+   - Compile util/aarch64-cpuid.c when CONFIG_LINUX enabled
+   - Added stubs include/qemu/aarch64-cpuid.h if __aarch64__ and
+     CONFIG_LINUX are not enabled.
+v3 => v4:
+   - Dropped allocation of memory for buf in
+     qemu_read_aarch64_midr_el1()
+   - Moved MIDR reg definitions to header file
+   - Dropped arm64 and thunder specific code from generic
+     function.
+
+v2 => v3:
+   - Rebased on top of richard's patches.
+   - Consider cache line size and line number to prefetch
+   - Passed optional parameters to __builtin_prefetch
+v1 => v2:
+   - Rename util/cpuinfo.c as util/aarch64-cpuid.c
+   - Introduced header file include/qemu/aarch64-cpuid.h
+   - Place all arch specific code under define __aarch64__ and
+     CONFIG_LINUX.
+   - Used builtin_prefetch() to add prefetch instruction.
+   - Moved arch specific changes out of generic code
+   - Dropped prefetching 5th cache line.
+
+Vijaya Kumar K (3):
+  cutils: Set __builtin_prefetch optional parameters
+  utils: Add helper to read arm MIDR_EL1 register
+  utils: Add prefetch for Thunderx platform
+
+ include/qemu/aarch64-cpuid.h | 38 ++++++++++++++++++++++++++++++++
+ util/Makefile.objs           |  1 +
+ util/aarch64-cpuid.c         | 52 ++++++++++++++++++++++++++++++++++++++++++++
+ util/bufferiszero.c          | 43 +++++++++++++++++++++++++++++++-----
+ 4 files changed, 129 insertions(+), 5 deletions(-)
+ create mode 100644 include/qemu/aarch64-cpuid.h
+ create mode 100644 util/aarch64-cpuid.c
+
+-- 
+1.9.1
