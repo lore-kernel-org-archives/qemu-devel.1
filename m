@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46715)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47849)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cEY7F-0004LF-Na
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 04:02:18 -0500
+	(envelope-from <berrange@redhat.com>) id 1cEYC0-0005pr-1n
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 04:07:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cEY7E-00017T-VB
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 04:02:17 -0500
-References: <1480575357-25056-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<a1593129-ddb9-8e74-5865-b1e8400c991d@redhat.com>
-	<8b90a1da-a129-f2cb-4545-355348387925@cn.fujitsu.com>
-	<063dfa33-2015-e566-c623-d59578c20fcd@redhat.com>
-	<13aed710-c5d1-b1de-5922-52e3e53029f9@cn.fujitsu.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <956d6c43-0904-e094-1adb-bb7c584967d0@vivier.eu>
-Date: Wed, 7 Dec 2016 10:01:49 +0100
+	(envelope-from <berrange@redhat.com>) id 1cEYBw-0002P5-Bf
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 04:07:12 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41082)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cEYBw-0002P1-5X
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 04:07:08 -0500
+Date: Wed, 7 Dec 2016 09:07:02 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20161207090702.GA21167@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <1481074285-178976-1-git-send-email-longpeng2@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <13aed710-c5d1-b1de-5922-52e3e53029f9@cn.fujitsu.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH for-2.8] docs: Fix
- description of the sentence
+Content-Disposition: inline
+In-Reply-To: <1481074285-178976-1-git-send-email-longpeng2@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.9] cryptodev: remove single-DES
+ support in cryptodev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,37 +28,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, Laurent Vivier <lvivier@redhat.com>, Eric Blake <eblake@redhat.com>, qemu devel <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Michael Tokarev <mjt@tls.msk.ru>
-Cc: Stefan Weil <sw@weilnetz.de>, Stefan Hajnoczi <stefanha@gmail.com>
+To: "Longpeng(Mike)" <longpeng2@huawei.com>
+Cc: arei.gonglei@huawei.com, eblake@redhat.com, wu.wubin@huawei.com, jianjay.zhou@huawei.com, qemu-devel@nongnu.org
 
-Le 07/12/2016 à 09:58, Zhang Chen a écrit :
+On Wed, Dec 07, 2016 at 09:31:25AM +0800, Longpeng(Mike) wrote:
+> Single-DES is obsolete and it's broken/useless for decades, we should
+> remove it in cryptodev, as suggested by Daniel.
+> Guest who wants to use this obsolete cipher alg will use its built-in
+> implementation instead.
 > 
+> Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
+> ---
+>  backends/cryptodev-builtin.c | 4 ----
+>  1 file changed, 4 deletions(-)
 > 
-> On 12/02/2016 03:57 PM, Laurent Vivier wrote:
->>
->> On 02/12/2016 03:59, Zhang Chen wrote:
->>>
->>> On 12/01/2016 10:57 PM, Eric Blake wrote:
->>>> On 12/01/2016 12:55 AM, Zhang Chen wrote:
->>>>> Say it in another way to make it easier to understand.
->>>>>
->>>>> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
->>>>> Signed-off-by: Eric Blake <eblake@redhat.com>
->>>> I guess that's because I suggested the replacement text to use, even
->>>> though I didn't write the patch.
->>> Yes, In that case, should I change the signed-off-by to acked-by or
->>> remove it?
->> You can use "Suggested-by:"
->>
->> https://www.kernel.org/doc/Documentation/SubmittingPatches
->>
->> Laurent
->>
-> 
-> Should I fix it? or can you pick up this directly for 2.8?
+> diff --git a/backends/cryptodev-builtin.c b/backends/cryptodev-builtin.c
+> index a4224f4..5fb2836 100644
+> --- a/backends/cryptodev-builtin.c
+> +++ b/backends/cryptodev-builtin.c
+> @@ -205,10 +205,6 @@ static int cryptodev_builtin_create_cipher_session(
+>              return -1;
+>          }
+>          break;
+> -    case VIRTIO_CRYPTO_CIPHER_DES_ECB:
+> -        mode = QCRYPTO_CIPHER_MODE_ECB;
+> -        algo = QCRYPTO_CIPHER_ALG_DES_RFB;
+> -        break;
+>      default:
+>          error_setg(errp, "Unsupported cipher alg :%u",
+>                     sess_info->cipher_alg);
 
-I don't think it is needed.
-Perhaps Stefan H can take it directly in his staging tree?
+Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
 
-Thanks,
-Laurent
+Regards,
+Daniel
+-- 
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
