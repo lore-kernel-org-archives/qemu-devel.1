@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46682)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52700)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shaohe.feng@intel.com>) id 1cEOCG-00041P-Ng
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 17:26:49 -0500
+	(envelope-from <fziglio@redhat.com>) id 1cEbhF-0004SZ-4n
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 07:51:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shaohe.feng@intel.com>) id 1cEOCF-0006Wg-LF
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 17:26:48 -0500
-From: "Feng, Shaohe" <shaohe.feng@intel.com>
-Date: Tue, 6 Dec 2016 22:26:30 +0000
-Message-ID: <B069EE0E-37FF-49BF-BC17-5275AF762968@intel.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <2E68B9E3DB95E04FBFC479E81D1B4651@intel.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-Subject: [Qemu-devel] how to get the features  of a cpu model
+	(envelope-from <fziglio@redhat.com>) id 1cEbhC-0004xB-Ce
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 07:51:41 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39788)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <fziglio@redhat.com>) id 1cEbhC-0004wN-77
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 07:51:38 -0500
+From: Frediano Ziglio <fziglio@redhat.com>
+Date: Wed,  7 Dec 2016 12:51:30 +0000
+Message-Id: <20161207125130.5184-1-fziglio@redhat.com>
+Subject: [Qemu-devel] [PATCH] egl-helpers: Change file licensing to LGPL2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,70 +21,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-discuss@nongnu.org" <qemu-discuss@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "Du, Dolpher" <dolpher.du@intel.com>
+To: Peter Maydell <peter.maydell@linaro.org>, Cole Robinson <crobinso@redhat.com>, Gonglei <arei.gonglei@huawei.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org, Frediano Ziglio <fziglio@redhat.com>
 
-SGkgYWxsLCANCg0KSSB3cml0ZSBhIHNjcmlwdCB0byBnZXQgdGhlIGZlYXR1cmVzIG9mIGEgY3B1
-IG1vZGVsDQoNCmh0dHBzOi8vZ2l0aHViLmNvbS9zaGFvaGVmL2NwdV9tb2RlbF9mZWF0dXJlcy9i
-bG9iL21hc3Rlci9pbnRlcnNlY3Rpb25fZmVhdHVyZXMucHkNCg0KSSB1c2Ug4oCccWVtdSAtY3B1
-IG1vZGVsLCtmZWF0dXJlcyxjaGVja+KAnCB0byB0cnkgd2hldGhlciAgYSBjcHUgbW9kZWwgY2Fu
-IHN1cHBvcnQgYSAgZmVhdHVyZS4NCg0KSSBmaW5kIGRpZmZlcmVudCBjcHUgbW9kZWxzIGNhbiBz
-dXBwb3J0IHNhbWUgZmVhdHVyZXMgb24gc2FtZSBob3N0Lg0Kc3VjaCBhcyBhIHJlc3VsdCBvbiBv
-bmUgb2YgbXkgaG9zdCB3aXRoIGl2eWJyaWRnZSBDUFUuDQoNCm1vZGVsOiBuMjcwDQogICAgc3Vw
-cG9ydCA1NSBmZWF0dXJzOiBbJ2t2bWNsb2NrJywgJ3BnZScsICdhdngnLCAnY2xmbHVzaCcsICdz
-ZXAnLCAnc3lzY2FsbCcsICd0c2MtZGVhZGxpbmUnLCAna3ZtX3B2X2VvaScsICdmc2dzYmFzZScs
-ICd4c2F2ZScsICdtc3InLCAndm14JywgJ2t2bV9wdl91bmhhbHQnLCAnZXJtcycsICdjbW92Jywg
-J2YxNmMnLCAnc21lcCcsICdzc3NlMycsICd0c2MnLCAnZnhzcicsICdwYWUnLCAnbWNlJywgJ3Zt
-ZScsICdtbXgnLCAnY3g4JywgJ3JkdHNjcCcsICdtY2EnLCAncHNlJywgJ3BvcGNudCcsICdhcGlj
-JywgJ3NzZScsICdwYXQnLCAna3ZtX3N0ZWFsX3RpbWUnLCAna3ZtX2FzeW5jcGYnLCAnbGFoZl9s
-bScsICdhZXMnLCAnc3NlMicsICdzcycsICdoeXBlcnZpc29yJywgJ3BjaWQnLCAnZGUnLCAnZnB1
-JywgJ2N4MTYnLCAncHNlMzYnLCAnbXRycicsICdyZHJhbmQnLCAna3ZtX25vcGlvZGVsYXknLCAn
-eDJhcGljJywgJ3NzZTQuMnxzc2U0XzInLCAnc3NlNC4xfHNzZTRfMScsICdwY2xtdWxxZHF8cGNs
-bXVsZHEnLCAncG5pfHNzZTMnLCAnbG18aTY0JywgJ2Z4c3Jfb3B0fGZmeHNyJywgJ254fHhkJ10N
-Cg0KPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT0NCm1vZGVsOiBDb25yb2UNCiAgICBzdXBwb3J0IDU1
-IGZlYXR1cnM6IFsna3ZtY2xvY2snLCAncGdlJywgJ2F2eCcsICdjbGZsdXNoJywgJ3NlcCcsICdz
-eXNjYWxsJywgJ3RzYy1kZWFkbGluZScsICdrdm1fcHZfZW9pJywgJ2ZzZ3NiYXNlJywgJ3hzYXZl
-JywgJ21zcicsICd2bXgnLCAna3ZtX3B2X3VuaGFsdCcsICdlcm1zJywgJ2Ntb3YnLCAnZjE2Yycs
-ICdzbWVwJywgJ3Nzc2UzJywgJ3RzYycsICdmeHNyJywgJ3BhZScsICdtY2UnLCAndm1lJywgJ21t
-eCcsICdjeDgnLCAncmR0c2NwJywgJ21jYScsICdwc2UnLCAncG9wY250JywgJ2FwaWMnLCAnc3Nl
-JywgJ3BhdCcsICdrdm1fc3RlYWxfdGltZScsICdrdm1fYXN5bmNwZicsICdsYWhmX2xtJywgJ2Fl
-cycsICdzc2UyJywgJ3NzJywgJ2h5cGVydmlzb3InLCAncGNpZCcsICdkZScsICdmcHUnLCAnY3gx
-NicsICdwc2UzNicsICdtdHJyJywgJ3JkcmFuZCcsICdrdm1fbm9waW9kZWxheScsICd4MmFwaWMn
-LCAnc3NlNC4yfHNzZTRfMicsICdzc2U0LjF8c3NlNF8xJywgJ3BjbG11bHFkcXxwY2xtdWxkcScs
-ICdwbml8c3NlMycsICdsbXxpNjQnLCAnZnhzcl9vcHR8ZmZ4c3InLCAnbnh8eGQnXQ0KDQo9PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PQ0KbW9kZWw6IFNhbmR5QnJpZGdlDQogICAgc3VwcG9ydCA1NSBm
-ZWF0dXJzOiBbJ2t2bWNsb2NrJywgJ3BnZScsICdhdngnLCAnY2xmbHVzaCcsICdzZXAnLCAnc3lz
-Y2FsbCcsICd0c2MtZGVhZGxpbmUnLCAna3ZtX3B2X2VvaScsICdmc2dzYmFzZScsICd4c2F2ZScs
-ICdtc3InLCAndm14JywgJ2t2bV9wdl91bmhhbHQnLCAnZXJtcycsICdjbW92JywgJ2YxNmMnLCAn
-c21lcCcsICdzc3NlMycsICd0c2MnLCAnZnhzcicsICdwYWUnLCAnbWNlJywgJ3ZtZScsICdtbXgn
-LCAnY3g4JywgJ3JkdHNjcCcsICdtY2EnLCAncHNlJywgJ3BvcGNudCcsICdhcGljJywgJ3NzZScs
-ICdwYXQnLCAna3ZtX3N0ZWFsX3RpbWUnLCAna3ZtX2FzeW5jcGYnLCAnbGFoZl9sbScsICdhZXMn
-LCAnc3NlMicsICdzcycsICdoeXBlcnZpc29yJywgJ3BjaWQnLCAnZGUnLCAnZnB1JywgJ2N4MTYn
-LCAncHNlMzYnLCAnbXRycicsICdyZHJhbmQnLCAna3ZtX25vcGlvZGVsYXknLCAneDJhcGljJywg
-J3NzZTQuMnxzc2U0XzInLCAnc3NlNC4xfHNzZTRfMScsICdwY2xtdWxxZHF8cGNsbXVsZHEnLCAn
-cG5pfHNzZTMnLCAnbG18aTY0JywgJ2Z4c3Jfb3B0fGZmeHNyJywgJ254fHhk4oCZXQ0KDQp5b3Ug
-Y2FuIHNlZSB0aGVyZSBpcyAgbm8gZGlmZmVyZW5jZSBmb3IgdGhlIHN1cHBvcnRlZCBmZWF0dXJl
-cyBiZXR3ZWVuIG4yNzAsIFNhbmR5QnJpZGdlLg0KDQoNCkFsc28gSSBoYXZlIGdldCBhIHJlc3Vs
-dCBvbiBhbm90aGVyIGhvc3Qgd2l0aCBoYXN3ZWxsIENQVS4NCg0KPT09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT0NCm1vZGVsOiBTYW5keUJyaWRnZQ0KICAgIHN1cHBvcnQgNjUgZmVhdHVyczogWydrdm1j
-bG9jaycsICdwZ2UnLCAnYXZ4JywgJ2NsZmx1c2gnLCAnc2VwJywgJ3J0bScsICd0c2MtZGVhZGxp
-bmUnLCAnYWJtJywgJ2ZzZ3NiYXNlJywgJ3hzYXZlJywgJ21zcicsICd2bXgnLCAna3ZtX3B2X3Vu
-aGFsdCcsICdlcm1zJywgJ2hsZScsICdjbW92JywgJ2YxNmMnLCAnc21lcCcsICdzc3NlMycsICd0
-c2MnLCAnZnhzcicsICdzeXNjYWxsJywgJ3BhZScsICdtY2UnLCAnZm1hJywgJ3ZtZScsICdtbXgn
-LCAnY3g4JywgJ3JkdHNjcCcsICdtY2EnLCAncHNlJywgJ3BvcGNudCcsICdpbnZwY2lkJywgJ3Bk
-cGUxZ2InLCAnYXBpYycsICdzc2UnLCAncGF0JywgJ2t2bV9zdGVhbF90aW1lJywgJ2t2bV9wdl9l
-b2knLCAna3ZtX2FzeW5jcGYnLCAnbGFoZl9sbScsICdhZXMnLCAnYXZ4MicsICdzc2UyJywgJ3Nz
-JywgJ2h5cGVydmlzb3InLCAnYm1pMScsICdibWkyJywgJ3BjaWQnLCAnZGUnLCAnZnB1JywgJ2N4
-MTYnLCAncHNlMzYnLCAnbXRycicsICdtb3ZiZScsICdyZHJhbmQnLCAna3ZtX25vcGlvZGVsYXkn
-LCAneDJhcGljJywgJ3NzZTQuMnxzc2U0XzInLCAnc3NlNC4xfHNzZTRfMScsICdwY2xtdWxxZHF8
-cGNsbXVsZHEnLCAncG5pfHNzZTMnLCAnbG18aTY0JywgJ2Z4c3Jfb3B0fGZmeHNyJywgJ254fHhk
-4oCZXQ0KDQoNCllvdSBjYW4gc2VlIHRoZSBzYW1lIENQVSBtb2RlbCBTYW5keUJyaWRnZSBjYW4g
-c3VwcG9ydCBtb3JlIGZlYXR1cmVzIG9uIHRoZSBob3N0IHdpdGggaGFzd2VsbCBDUFUgdGhhbiB0
-aGUgaG9zdCB3aXRoIGl2eWJyaWRnZSBDUFUuDQoNCg0KDQpNeSBxdWVzdGlvbnMgYXJlOg0KMS4g
-Y2FuIEkgbGl2ZS1taWdyYXRpb24gdGhlIHZtIHdpdGggc2FtZSAgQ1BVIG1vZGVsKGZvciBleGFt
-cGxlIFNhbmR5QnJpZGdlKSAgYmV0d2VlbiAgaGFzd2VsbCBob3N0IGFuZCBpdnlicmlkZ2UgaG9z
-dCANCjIuIGRvZXMgcWVtdSBzdXBwb3J0IGEgQVBJIHRvIGdldCBpdOKAmXMgZW11bGF0ZWQgQ1BV
-SUQ/IA0KDQo=
+Signed-off-by: Frediano Ziglio <fziglio@redhat.com>
+---
+ ui/egl-helpers.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/ui/egl-helpers.c b/ui/egl-helpers.c
+index 79cee05..cd24568 100644
+--- a/ui/egl-helpers.c
++++ b/ui/egl-helpers.c
+@@ -1,3 +1,19 @@
++/*
++ * Copyright (C) 2015-2016 Gerd Hoffmann <kraxel@redhat.com>
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
++ */
+ #include "qemu/osdep.h"
+ #include <glob.h>
+ #include <dirent.h>
+-- 
+2.9.3
