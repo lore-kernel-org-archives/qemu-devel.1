@@ -1,32 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50366)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50426)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dave.hansen@intel.com>) id 1cEiIb-00073M-HM
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 14:54:42 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cEiJ1-0007LJ-H4
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 14:55:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dave.hansen@intel.com>) id 1cEiIW-0005F5-LG
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 14:54:41 -0500
-Received: from mga01.intel.com ([192.55.52.88]:24714)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dave.hansen@intel.com>)
-	id 1cEiIW-0005Ea-9u
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 14:54:36 -0500
-References: <1480495397-23225-1-git-send-email-liang.z.li@intel.com>
-	<f67ca79c-ad34-59dd-835f-e7bc9dcaef58@redhat.com>
-	<F2CBF3009FA73547804AE4C663CAB28E3A130C01@shsmsx102.ccr.corp.intel.com>
-	<0b18c636-ee67-cbb4-1ba3-81a06150db76@redhat.com>
-	<0b83db29-ebad-2a70-8d61-756d33e33a48@intel.com>
-	<2171e091-46ee-decd-7348-772555d3a5e3@redhat.com>
-	<d3ff453c-56fa-19de-317c-1c82456f2831@intel.com>
-	<20161207183817.GE28786@redhat.com>
-From: Dave Hansen <dave.hansen@intel.com>
-Message-ID: <b58fd9f6-d9dd-dd56-d476-dd342174dac5@intel.com>
-Date: Wed, 7 Dec 2016 11:54:34 -0800
+	(envelope-from <dgilbert@redhat.com>) id 1cEiIx-0005L7-5x
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 14:55:07 -0500
+Date: Wed, 7 Dec 2016 19:54:51 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20161207195451.GF2073@work-vm>
+References: <1479923640-8423-1-git-send-email-duanj@linux.vnet.ibm.com>
+	<b2ad27cc-70c7-707a-631c-102fa153059b@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20161207183817.GE28786@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH kernel v5 0/5] Extend virtio-balloon for
- fast (de)inflating & fast live migration
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b2ad27cc-70c7-707a-631c-102fa153059b@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [QEMU PATCH v14 0/4] migration: migrate QTAILQ
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,106 +23,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrea Arcangeli <aarcange@redhat.com>
-Cc: David Hildenbrand <david@redhat.com>, "Li, Liang Z" <liang.z.li@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mhocko@suse.com" <mhocko@suse.com>, "mst@redhat.com" <mst@redhat.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>
+To: Jianjun Duan <duanj@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, dmitry@daynix.com, peter.maydell@linaro.org, kraxel@redhat.com, mst@redhat.com, david@gibson.dropbear.id.au, pbonzini@redhat.com, veroniabahaa@gmail.com, quintela@redhat.com, amit.shah@redhat.com, mreitz@redhat.com, kwolf@redhat.com, rth@twiddle.net, aurelien@aurel32.net, leon.alrae@imgtec.com, blauwirbel@gmail.com, mark.cave-ayland@ilande.co.uk, mdroth@linux.vnet.ibm.com
 
-We're talking about a bunch of different stuff which is all being
-conflated.  There are 3 issues here that I can see.  I'll attempt to
-summarize what I think is going on:
+* Jianjun Duan (duanj@linux.vnet.ibm.com) wrote:
+> ping
 
-1. Current patches do a hypercall for each order in the allocator.
-   This is inefficient, but independent from the underlying data
-   structure in the ABI, unless bitmaps are in play, which they aren't.
-2. Should we have bitmaps in the ABI, even if they are not in use by the
-   guest implementation today?  Andrea says they have zero benefits
-   over a pfn/len scheme.  Dave doesn't think they have zero benefits
-   but isn't that attached to them.  QEMU's handling gets more
-   complicated when using a bitmap.
-3. Should the ABI contain records each with a pfn/len pair or a
-   pfn/order pair?
-   3a. 'len' is more flexible, but will always be a power-of-two anyway
-	for high-order pages (the common case)
-   3b. if we decide not to have a bitmap, then we basically have plenty
-	of space for 'len' and should just do it
-   3c. It's easiest for the hypervisor to turn pfn/len into the
-       madvise() calls that it needs.
+Yes, hopefully this can go in right near the start of 2.9
 
-Did I miss anything?
+Dave
 
-On 12/07/2016 10:38 AM, Andrea Arcangeli wrote:
-> On Wed, Dec 07, 2016 at 08:57:01AM -0800, Dave Hansen wrote:
->> It is more space-efficient.  We're fitting the order into 6 bits, which
->> would allows the full 2^64 address space to be represented in one entry,
 > 
-> Very large order is the same as very large len, 6 bits of order or 8
-> bytes of len won't really move the needle here, simpler code is
-> preferable.
-
-Agreed.  But without seeing them side-by-side I'm not sure we can say
-which is simpler.
-
-> The main benefit of "len" is that it can be more granular, plus it's
-> simpler than the bitmap too. Eventually all this stuff has to end up
-> into a madvisev (not yet upstream but somebody posted it for jemalloc
-> and should get merged eventually).
+> On 11/23/2016 09:53 AM, Jianjun Duan wrote:
+> > Hi all,
+> > 
+> >     I addressed some review comments. Comments are welcome.     
+> > 
+> > v14: - Fixed a return statement.
+> > 
+> > Previous versions are:
+> > 
+> > v13: - Changed some QTAILQ related macro names to match existing ones. 
+> > (link: http://lists.nongnu.org/archive/html/qemu-ppc/2016-11/msg00226.html)
+> > 
+> > v12: - Fixed type for put_qtailq which caused build break.
+> > (link: http://lists.gnu.org/archive/html/qemu-devel/2016-11/msg01328.html
+> > 
+> > v11: - Split error_report statements into a separate patch.
+> >      - Changed the signature of put. It now returns int type.
+> >      - Minor changes to QTAILQ macros. 
+> >          
+> > v10: - Fixed a typo.
+> > (link: http://lists.nongnu.org/archive/html/qemu-ppc/2016-10/msg01206.html)
+> > 
+> > v9: - No more hard encoding of QTAILQ layout information
+> > (link: http://lists.nongnu.org/archive/html/qemu-ppc/2016-10/msg01042.html)
+> > 
+> > v8: - Fixed a style issue. 
+> > (link: http://lists.nongnu.org/archive/html/qemu-ppc/2016-10/msg00874.html)
+> > 
+> > v7: - Fixed merge errors.
+> >     - Simplified macro definitions related to pointer arithmetic based QTAILQ access.
+> >     - Added test case for QTAILQ migration in tests/test-vmstate.c.
+> > (link: http://lists.nongnu.org/archive/html/qemu-ppc/2016-10/msg00711.html)
+> > 
+> > 
+> > v6: - Split from Power specific patches. 
+> >     - Dropped VMS_LINKED flag.
+> >     - Rebased to master.
+> >     - Added comments to clarify about put/get in VMStateInfo.  
+> > (link: http://lists.nongnu.org/archive/html/qemu-ppc/2016-10/msg00336.html)
+> > 
+> > v5: - Rebased to David's ppc-for-2.8. 
+> > (link: https://lists.nongnu.org/archive/html/qemu-devel/2016-10/msg00270.html)
+> > 
+> > v4: - Introduce a way to set customized instance_id in SaveStateEntry. Use it
+> >       to set instance_id for DRC using its unique index to address David 
+> >       Gibson's concern.
+> >     - Rename VMS_CSTM to VMS_LINKED based on Paolo Bonzini's suggestions.
+> >     - Clean up qjson stuff in put_qtailq. 
+> >     - Add trace for put_qtailq and get_qtailq based on David Gilbert's 
+> >       suggestion.
+> >     - Based on David's ppc-for-2.7. 
+> > (link: https://lists.nongnu.org/archive/html/qemu-devel/2016-06/msg07720.html)
+> > 
+> > v3: - Simplify overall design followng discussion with Paolo. No longer need
+> >       metadata to migrate QTAILQ.
+> >     - Extend VMStateInfo instead of adding similar fields to VMStateField.
+> >     - Clean up macros in qemu/queue.h.
+> > (link: https://lists.nongnu.org/archive/html/qemu-devel/2016-05/msg05695.html)
+> > 
+> > v2: - Introduce a general approach to migrate QTAILQ in qemu/queue.h.
+> >     - Migrate signalled field in the DRC state.
+> >     - Put the newly added migrating fields in subsections so that backward 
+> >       migration is not broken.  
+> >     - Set detach_cb field right after migration so that a migrated hot-unplug
+> >       event could finish its course.
+> > (link: https://lists.nongnu.org/archive/html/qemu-devel/2016-05/msg04188.html)
+> > 
+> > v1: - Inital version.
+> > (link: https://lists.nongnu.org/archive/html/qemu-devel/2016-04/msg02601.html)
+> > 
+> > 
+> > Jianjun Duan (4):
+> >   migration: extend VMStateInfo
+> >   migration: migrate QTAILQ
+> >   tests/migration: Add test for QTAILQ migration
+> >   migration: add error_report
+> > 
+> >  hw/display/virtio-gpu.c     |   8 +-
+> >  hw/intc/s390_flic_kvm.c     |   8 +-
+> >  hw/net/vmxnet3.c            |  24 ++++--
+> >  hw/nvram/eeprom93xx.c       |   8 +-
+> >  hw/nvram/fw_cfg.c           |   8 +-
+> >  hw/pci/msix.c               |   8 +-
+> >  hw/pci/pci.c                |  16 +++-
+> >  hw/pci/shpc.c               |   7 +-
+> >  hw/scsi/scsi-bus.c          |   8 +-
+> >  hw/timer/twl92230.c         |   8 +-
+> >  hw/usb/redirect.c           |  26 +++++--
+> >  hw/virtio/virtio-pci.c      |   8 +-
+> >  hw/virtio/virtio.c          |  15 +++-
+> >  include/migration/vmstate.h |  39 ++++++++--
+> >  include/qemu/queue.h        |  60 +++++++++++++++
+> >  migration/savevm.c          |   7 +-
+> >  migration/trace-events      |   4 +
+> >  migration/vmstate.c         | 184 +++++++++++++++++++++++++++++++++++---------
+> >  target-alpha/machine.c      |   6 +-
+> >  target-arm/machine.c        |  14 +++-
+> >  target-i386/machine.c       |  26 +++++--
+> >  target-mips/machine.c       |  14 +++-
+> >  target-ppc/machine.c        |  12 ++-
+> >  target-sparc/machine.c      |   6 +-
+> >  tests/test-vmstate.c        | 160 ++++++++++++++++++++++++++++++++++++++
+> >  25 files changed, 578 insertions(+), 106 deletions(-)
+> > 
 > 
-> So the bitmap shall be demuxed to a addr,len array anyway, the bitmap
-> won't ever be sent to the madvise syscall, which makes the
-> intermediate representation with the bitmap a complication with
-> basically no benefits compared to a (N, [addr1,len1], .., [addrN,
-> lenN]) representation.
-
-FWIW, I don't feel that strongly about the bitmap.  Li had one
-originally, but I think the code thus far has demonstrated a huge
-benefit without even having a bitmap.
-
-I've got no objections to ripping the bitmap out of the ABI.
-
->> and leaves room for the bitmap size to be encoded as well, if we decide
->> we need a bitmap in the future.
-> 
-> How would a bitmap ever be useful with very large page-order?
-
-Surely we can think of a few ways...
-
-A bitmap is 64x more dense if the lists are unordered.  It means being
-able to store ~32k*2M=64G worth of 2M pages in one data page vs. ~1G.
-That's 64x fewer cachelines to touch, 64x fewer pages to move to the
-hypervisor and lets us allocate 1/64th the memory.  Given a maximum
-allocation that we're allowed, it lets us do 64x more per-pass.
-
-Now, are those benefits worth it?  Maybe not, but let's not pretend they
-don't exist. ;)
-
->> If that was purely a length, we'd be limited to 64*4k pages per entry,
->> which isn't even a full large page.
-> 
-> I don't follow here.
-> 
-> What we suggest is to send the data down represented as (N,
-> [addr1,len1], ..., [addrN, lenN]) which allows infinite ranges each
-> one of maximum length 2^64, so 2^64 multiplied infinite times if you
-> wish. Simplifying the code and not having any bitmap at all and no :6
-> :6 bits either.
-> 
-> The high order to low order loop of allocations is the interesting part
-> here, not the bitmap, and the fact of doing a single vmexit to send
-> the large ranges.
-
-Yes, the current code sends one batch of pages up to the hypervisor per
-order.  But, this has nothing to do with the underlying data structure,
-or the choice to have an order vs. len in the ABI.
-
-What you describe here is obviously more efficient.
-
-> Considering the loop that allocates starting from MAX_ORDER..1, the
-> chance the bitmap is actually getting filled with more than one bit at
-> page_shift of PAGE_SHIFT should be very low after some uptime.
-
-Yes, if bitmaps were in use, this is true.  I think a guest populating
-bitmaps would probably not use the same algorithm.
-
-> By the very nature of this loop, if we already exacerbates all high
-> order buddies, the page-order 0 pages obtained are going to be fairly
-> fragmented reducing the usefulness of the bitmap and potentially only
-> wasting CPU/memory.
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
