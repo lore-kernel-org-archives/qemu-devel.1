@@ -1,21 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54504)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55340)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cEh3D-00040m-L3
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 13:34:44 -0500
+	(envelope-from <aarcange@redhat.com>) id 1cEh6o-0006wq-1F
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 13:38:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cEh3C-0004cZ-M5
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 13:34:43 -0500
-References: <1479835586-74394-1-git-send-email-vsementsov@virtuozzo.com>
-	<1479835586-74394-9-git-send-email-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <bf580075-64f6-3e87-1787-8b2aae884424@redhat.com>
-Date: Wed, 7 Dec 2016 19:34:31 +0100
+	(envelope-from <aarcange@redhat.com>) id 1cEh6k-0005cd-3q
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 13:38:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41986)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aarcange@redhat.com>) id 1cEh6j-0005cT-Rq
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 13:38:22 -0500
+Date: Wed, 7 Dec 2016 19:38:17 +0100
+From: Andrea Arcangeli <aarcange@redhat.com>
+Message-ID: <20161207183817.GE28786@redhat.com>
+References: <1480495397-23225-1-git-send-email-liang.z.li@intel.com>
+	<f67ca79c-ad34-59dd-835f-e7bc9dcaef58@redhat.com>
+	<F2CBF3009FA73547804AE4C663CAB28E3A130C01@shsmsx102.ccr.corp.intel.com>
+	<0b18c636-ee67-cbb4-1ba3-81a06150db76@redhat.com>
+	<0b83db29-ebad-2a70-8d61-756d33e33a48@intel.com>
+	<2171e091-46ee-decd-7348-772555d3a5e3@redhat.com>
+	<d3ff453c-56fa-19de-317c-1c82456f2831@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <1479835586-74394-9-git-send-email-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="0agecLpfEecxg2O9CEdOfLaw8cKqpcdPQ"
-Subject: Re: [Qemu-devel] [PATCH 08/21] block: introduce auto-loading bitmaps
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d3ff453c-56fa-19de-317c-1c82456f2831@intel.com>
+Subject: Re: [Qemu-devel] [PATCH kernel v5 0/5] Extend virtio-balloon for
+ fast (de)inflating & fast live migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,128 +33,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
+To: Dave Hansen <dave.hansen@intel.com>
+Cc: David Hildenbrand <david@redhat.com>, "Li, Liang Z" <liang.z.li@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mhocko@suse.com" <mhocko@suse.com>, "mst@redhat.com" <mst@redhat.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---0agecLpfEecxg2O9CEdOfLaw8cKqpcdPQ
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com,
- famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
-Message-ID: <bf580075-64f6-3e87-1787-8b2aae884424@redhat.com>
-Subject: Re: [PATCH 08/21] block: introduce auto-loading bitmaps
-References: <1479835586-74394-1-git-send-email-vsementsov@virtuozzo.com>
- <1479835586-74394-9-git-send-email-vsementsov@virtuozzo.com>
-In-Reply-To: <1479835586-74394-9-git-send-email-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=iso-8859-15
-Content-Transfer-Encoding: quoted-printable
+Hello,
 
-On 22.11.2016 18:26, Vladimir Sementsov-Ogievskiy wrote:
-> Auto loading bitmaps are bitmaps store in the disk image, which should
+On Wed, Dec 07, 2016 at 08:57:01AM -0800, Dave Hansen wrote:
+> It is more space-efficient.  We're fitting the order into 6 bits, which
+> would allows the full 2^64 address space to be represented in one entry,
 
-s/store/stored/
+Very large order is the same as very large len, 6 bits of order or 8
+bytes of len won't really move the needle here, simpler code is
+preferable.
 
-> be loaded when the image is opened and become BdrvDirtyBitmaps for the
-> corresponding drive.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  block.c                   | 14 ++++++++++++++
->  include/block/block.h     |  2 ++
->  include/block/block_int.h |  3 +++
->  3 files changed, 19 insertions(+)
->=20
-> diff --git a/block.c b/block.c
-> index 39ddea3..450379c 100644
-> --- a/block.c
-> +++ b/block.c
-> @@ -1137,6 +1137,13 @@ static int bdrv_open_common(BlockDriverState *bs=
-, BdrvChild *file,
->          goto free_and_fail;
->      }
-> =20
-> +    bdrv_load_autoloading_dirty_bitmaps(bs, &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        ret =3D -EINVAL;
-> +        goto free_and_fail;
-> +    }
-> +
->      assert(bdrv_opt_mem_align(bs) !=3D 0);
->      assert(bdrv_min_mem_align(bs) !=3D 0);
->      assert(is_power_of_2(bs->bl.request_alignment));
+The main benefit of "len" is that it can be more granular, plus it's
+simpler than the bitmap too. Eventually all this stuff has to end up
+into a madvisev (not yet upstream but somebody posted it for jemalloc
+and should get merged eventually).
 
-These asserts should stay directly after the bdrv_refresh_limits() block
-(i.e. the bdrv_load_autoloading_dirty_bitmaps() call should be moved
-here, after them).
+So the bitmap shall be demuxed to a addr,len array anyway, the bitmap
+won't ever be sent to the madvise syscall, which makes the
+intermediate representation with the bitmap a complication with
+basically no benefits compared to a (N, [addr1,len1], .., [addrN,
+lenN]) representation.
 
-The rest looks good.
+If you prefer 1 byte of order (not just 6 bits) instead 8bytes of len
+that's possible too, I wouldn't be against that, the conversion before
+calling madvise would be pretty efficient too.
 
-Max
+> and leaves room for the bitmap size to be encoded as well, if we decide
+> we need a bitmap in the future.
 
-> @@ -4093,3 +4100,10 @@ void bdrv_del_child(BlockDriverState *parent_bs,=
- BdrvChild *child, Error **errp)
-> =20
->      parent_bs->drv->bdrv_del_child(parent_bs, child, errp);
->  }
-> +
-> +void bdrv_load_autoloading_dirty_bitmaps(BlockDriverState *bs, Error *=
-*errp)
-> +{
-> +    if (bs->drv && bs->drv->bdrv_load_autoloading_dirty_bitmaps) {
-> +        bs->drv->bdrv_load_autoloading_dirty_bitmaps(bs, errp);
-> +    }
-> +}
-> diff --git a/include/block/block.h b/include/block/block.h
-> index 49bb0b2..f701da2 100644
-> --- a/include/block/block.h
-> +++ b/include/block/block.h
-> @@ -552,4 +552,6 @@ void bdrv_add_child(BlockDriverState *parent, Block=
-DriverState *child,
->                      Error **errp);
->  void bdrv_del_child(BlockDriverState *parent, BdrvChild *child, Error =
-**errp);
-> =20
-> +void bdrv_load_autoloading_dirty_bitmaps(BlockDriverState *bs, Error *=
-*errp);
-> +
->  #endif
-> diff --git a/include/block/block_int.h b/include/block/block_int.h
-> index 83a423c..ca955f0 100644
-> --- a/include/block/block_int.h
-> +++ b/include/block/block_int.h
-> @@ -320,6 +320,9 @@ struct BlockDriver {
->      void (*bdrv_del_child)(BlockDriverState *parent, BdrvChild *child,=
+How would a bitmap ever be useful with very large page-order?
 
->                             Error **errp);
-> =20
-> +    void (*bdrv_load_autoloading_dirty_bitmaps)(BlockDriverState *bs,
-> +                                                Error **errp);
-> +
->      QLIST_ENTRY(BlockDriver) list;
->  };
-> =20
->=20
+> If that was purely a length, we'd be limited to 64*4k pages per entry,
+> which isn't even a full large page.
 
+I don't follow here.
 
+What we suggest is to send the data down represented as (N,
+[addr1,len1], ..., [addrN, lenN]) which allows infinite ranges each
+one of maximum length 2^64, so 2^64 multiplied infinite times if you
+wish. Simplifying the code and not having any bitmap at all and no :6
+:6 bits either.
 
---0agecLpfEecxg2O9CEdOfLaw8cKqpcdPQ
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+The high order to low order loop of allocations is the interesting part
+here, not the bitmap, and the fact of doing a single vmexit to send
+the large ranges.
 
------BEGIN PGP SIGNATURE-----
+Once we pull out the largest order regions, we just add them to the
+array as [addr,1UL<<order], when the array reaches a maximum N number
+of entries or we fail a order 0 allocation, we flush all those entries
+down to qemu. Qemu then builds the iov for madvisev and it's pretty
+much a 1:1 conversion, not a decoding operation converting the bitmap
+in the (N, [addr1,len1], ..., [addrN, lenN]) for madvisev (or a flood
+of madvise MADV_DONTNEED with current kernels).
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlhIVjgSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9A+pgH/3eufdAA20y/T1Dh2Bu/eEnNMcysDNAE
-n4CBsqCn2vdjTbSwDZPn+rhRbqm+uimu1YZcVyqKQjaqgaS8k3bddz5Iyn6R2HzV
-JQokihQqsFYZKPphcMKnEz9RVcDy/AO/BW3ESrJmyRxm6bdoZU0CUs6aCSXl4jq2
-bBpCUgAZvQl1EJEV5safMLoJKh97SIeB1E9xyuLXN4VM9De9wvPRkOhPFQ5/YyUm
-pdhv7zlAEQ5iqYGN5Dr52n3were+L+Vnf9fGkllfDxW4Uwk4ujrJ7HX6GNkMBNiy
-5PccQaX8dhgk1xu3qbiek518nK0HfVGOpJXBBvy3gDLDlxh6cdrTwr0=
-=Y3/A
------END PGP SIGNATURE-----
+Considering the loop that allocates starting from MAX_ORDER..1, the
+chance the bitmap is actually getting filled with more than one bit at
+page_shift of PAGE_SHIFT should be very low after some uptime.
 
---0agecLpfEecxg2O9CEdOfLaw8cKqpcdPQ--
+By the very nature of this loop, if we already exacerbates all high
+order buddies, the page-order 0 pages obtained are going to be fairly
+fragmented reducing the usefulness of the bitmap and potentially only
+wasting CPU/memory.
