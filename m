@@ -1,19 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37713)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42787)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cEc5N-0003EV-GT
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 08:16:44 -0500
+	(envelope-from <stefanha@gmail.com>) id 1cEcKX-00075Y-He
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 08:32:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cEc5J-00074Z-60
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 08:16:37 -0500
-Date: Wed, 7 Dec 2016 14:16:19 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20161207131619.GD4773@noname.str.redhat.com>
-References: <CANYihzr60=ctstmpVA-g-ttWFd+8kf7-vLws3Zjx-hudYP0LjQ@mail.gmail.com>
+	(envelope-from <stefanha@gmail.com>) id 1cEcKT-0004Vg-Tp
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 08:32:17 -0500
+Date: Wed, 7 Dec 2016 13:30:49 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20161207133049.GA32099@stefanha-x1.localdomain>
+References: <1480575357-25056-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<a1593129-ddb9-8e74-5865-b1e8400c991d@redhat.com>
+	<8b90a1da-a129-f2cb-4545-355348387925@cn.fujitsu.com>
+	<063dfa33-2015-e566-c623-d59578c20fcd@redhat.com>
+	<13aed710-c5d1-b1de-5922-52e3e53029f9@cn.fujitsu.com>
+	<956d6c43-0904-e094-1adb-bb7c584967d0@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="nFreZHaLTZJo0R7j"
 Content-Disposition: inline
-In-Reply-To: <CANYihzr60=ctstmpVA-g-ttWFd+8kf7-vLws3Zjx-hudYP0LjQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] vpc max table entries calculation error
+In-Reply-To: <956d6c43-0904-e094-1adb-bb7c584967d0@vivier.eu>
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH for-2.8] docs: Fix
+ description of the sentence
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,51 +29,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nick Owens <mischief@coreos.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, Laurent Vivier <lvivier@redhat.com>, Eric Blake <eblake@redhat.com>, qemu devel <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Michael Tokarev <mjt@tls.msk.ru>, Stefan Weil <sw@weilnetz.de>
 
-Am 29.11.2016 um 22:07 hat Nick Owens geschrieben:
-> i'm writing to discuss an issue in qemu's vpc creation.
-> 
-> when creating a dynamic-type vpc image with qemu-img like so:
-> 
-> $ qemu-img create -f vpc vhd.vhd 100M
-> Formatting 'vhd.vhd', fmt=vpc size=104857600
-> 
-> and then inspecting the file (with a tool i wrote; it's also easy to see in
-> a hex dump):
-> 
-> $ vhd-inspect ./vhd.vhd
->                                   MaxTableEntries: 51
-> BlockSize: 2097152
-> PhysicalSize: 104865792
-> VirtualSize: 104865792
-> PhysicalSize/BlockSize = 50
-> 
-> we see that the MaxTableEntries differs from the PhysicalSize/BlockSize.
 
-You did an integer division, which you can't really do because with only
-50 blocks it couldn't describe the part of the image after the last
-complete block. The real value is PhysicalSize/BlockSize = 50.00390625,
-and rounding up is the only sane thing to do to give you an image with
-this specific size.
+--nFreZHaLTZJo0R7j
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> so, i am not sure what the right fix is here, as it seems vpc is very
-> messy, but i do think that this is a bug because the incorrect
-> MaxTableEntries causes other tools to miscompute the real disk size. when
-> these dynamic-type vpcs with incorrect MaxTableEntries are converted to
-> fixed-type and uploaded to Microsoft Azure, it results in the hypervisor
-> rejecting the image.
-> 
-> does someone have an idea about the correct way to fix this?
+On Wed, Dec 07, 2016 at 10:01:49AM +0100, Laurent Vivier wrote:
+> Le 07/12/2016 =E0 09:58, Zhang Chen a =E9crit :
+> >=20
+> >=20
+> > On 12/02/2016 03:57 PM, Laurent Vivier wrote:
+> >>
+> >> On 02/12/2016 03:59, Zhang Chen wrote:
+> >>>
+> >>> On 12/01/2016 10:57 PM, Eric Blake wrote:
+> >>>> On 12/01/2016 12:55 AM, Zhang Chen wrote:
+> >>>>> Say it in another way to make it easier to understand.
+> >>>>>
+> >>>>> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+> >>>>> Signed-off-by: Eric Blake <eblake@redhat.com>
+> >>>> I guess that's because I suggested the replacement text to use, even
+> >>>> though I didn't write the patch.
+> >>> Yes, In that case, should I change the signed-off-by to acked-by or
+> >>> remove it?
+> >> You can use "Suggested-by:"
+> >>
+> >> https://www.kernel.org/doc/Documentation/SubmittingPatches
+> >>
+> >> Laurent
+> >>
+> >=20
+> > Should I fix it? or can you pick up this directly for 2.8?
+>=20
+> I don't think it is needed.
+> Perhaps Stefan H can take it directly in his staging tree?
 
-You must use a multiple of the block size for the image size if you want
-an exact result without any rounding. You'll have to use force_size=on
-because adjusting the size to CHS will most likely fail to keep the size
-at a multiple of the block size.
+Too late for that now.  This should be merged through Jason Wang (net
+maintainer) like any other colo-proxy patch.
 
-Yes, calling VHD "very messy" seems to be quite accurate. Creating an
-image that works the same way both on Azure and the original Virtual PC
-is almost impossible.
+Stefan
 
-Kevin
+--nFreZHaLTZJo0R7j
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJYSA8JAAoJEJykq7OBq3PIy5sH/3wXENzI0kcJ0ZiUZeNVtMB3
+IExdr5PLpiW1sygrAoUVrYKBPaDHm6iP6WQuMZUCBB3dP+A5PYHpi6+ZMuoHkKbU
+D8+vaEXi2OV3pvpgVXHq5n0TCQkkm2oUb/O1AmabB2QadvfdPUM5sMj+71VUXsie
+6vWoy8m/gwayMlNhtjY1e3RGowe8PsMrZrjJ1eaGotkdJdpnp0CcEPi1WrUR7lXk
+6sKru9BAzP3zAI9nXl4kDsNMdS9UF1ZtouY6ZLoSWAmpmguai3a2ECUaZPwStZYw
+VIduslTg0r0maSytYuMzGeWmaQzfdoN3ATAJW/pzYLuSSSx1SR2kLdDJ7Zl88gc=
+=Q5qe
+-----END PGP SIGNATURE-----
+
+--nFreZHaLTZJo0R7j--
