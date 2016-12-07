@@ -1,36 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50950)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52291)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cEcsx-0000he-Ci
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 09:07:52 -0500
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cEcyq-0002xD-Q8
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 09:13:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cEcss-0006ov-CR
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 09:07:51 -0500
-Received: from 001b2d01.pphosted.com ([148.163.156.1]:59982
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cEcyl-0008CF-Qz
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 09:13:56 -0500
+Received: from 001b2d01.pphosted.com ([148.163.156.1]:49026
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1cEcss-0006oi-2T
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 09:07:46 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	id 1cEcyl-0008C0-HC
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 09:13:51 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	uB7E6pdn108920
-	for <qemu-devel@nongnu.org>; Wed, 7 Dec 2016 09:07:44 -0500
-Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 276gjg43dd-1
+	uB7E8Ydb091068
+	for <qemu-devel@nongnu.org>; Wed, 7 Dec 2016 09:13:50 -0500
+Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 276jhh5k4a-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 07 Dec 2016 09:07:43 -0500
+	for <qemu-devel@nongnu.org>; Wed, 07 Dec 2016 09:13:50 -0500
 Received: from localhost
-	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Wed, 7 Dec 2016 07:07:43 -0700
+	Wed, 7 Dec 2016 07:13:48 -0700
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Wed, 07 Dec 2016 08:07:33 -0600
-Message-Id: <20161207140733.3613.57602@loki>
-Subject: [Qemu-devel] [ANNOUNCE] QEMU 2.8.0-rc3 is now available
+In-Reply-To: <20161207140733.3613.57602@loki>
+References: <20161207140733.3613.57602@loki>
+Date: Wed, 07 Dec 2016 08:13:27 -0600
+Message-Id: <20161207141327.3613.89015@loki>
+Subject: Re: [Qemu-devel] [ANNOUNCE] QEMU 2.8.0-rc3 is now available
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,96 +44,95 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: stefanha@redhat.com
 
-Hello,
+Quoting Michael Roth (2016-12-07 08:07:33)
+> Hello,
+> =
 
-On behalf of the QEMU Team, I'd like to announce the availability of the
-fourth release candidate for the QEMU 2.8 release.  This release is meant
-for testing purposes and should not be used in a production environment.
+> On behalf of the QEMU Team, I'd like to announce the availability of the
+> fourth release candidate for the QEMU 2.8 release.  This release is meant
+> for testing purposes and should not be used in a production environment.
+> =
 
-http://wiki.qemu.org/download/qemu-2.8.0-rc3.tar.bz2
+> http://wiki.qemu.org/download/qemu-2.8.0-rc3.tar.bz2
+> =
 
-Barring the discovery of any major issues, this is the last planned RC
-before the release of QEMU 2.8, so your testing is greatly appreciated.
+> Barring the discovery of any major issues, this is the last planned RC
+> before the release of QEMU 2.8, so your testing is greatly appreciated.
+> =
 
-You can help improve the quality of the QEMU 2.8 release by testing this
-release and reporting bugs on Launchpad or directly to the mailing list:
+> You can help improve the quality of the QEMU 2.8 release by testing this
+> release and reporting bugs on Launchpad or directly to the mailing list:
+> =
 
-https://bugs.launchpad.net/qemu/
+> https://bugs.launchpad.net/qemu/
+> =
 
-The release plan, as well a documented known issues for release
-candidates, are available at:
+> The release plan, as well a documented known issues for release
+> candidates, are available at:
+> =
 
-http://wiki.qemu.org/Planning/2.8
+> http://wiki.qemu.org/Planning/2.8
+> =
 
-Please add entries to the ChangeLog for the 2.8 release below:
+> Please add entries to the ChangeLog for the 2.8 release below:
+> =
 
-http://wiki.qemu.org/ChangeLog/2.8
+> http://wiki.qemu.org/ChangeLog/2.8
+> =
 
-Changes since rc1:
+> Changes since rc1:
 
-1cd56fd: Update version for v2.8.0-rc2 release (Stefan Hajnoczi)
-7ecf44a: rules.mak: Also try -r to build modules (Paolo Bonzini)
-6725f88: hbitmap: Fix shifts of constants by granularity (Max Reitz)
-c79ed23: configure: fix LTTng UST tracing backend detection (Francis Deslau=
-riers)
-e514379: xen: ignore direction in bufioreq handling (Jan Beulich)
-f37f29d: xen: slightly simplify bufioreq handling (Jan Beulich)
-ff3b8b8: xen: fix quad word bufioreq handling (Jan Beulich)
-c96f0ee: rules.mak: Use -r instead of -Wl, -r to fix building when PIE is d=
-efault (Adrian Bunk)
-f9f885b: migration/pcspk: Turn migration of pcspk off for 2.7 and older (Dr=
-. David Alan Gilbert)
-04e27c6: migration/pcspk: Add a property to state if pcspk is migrated (Dr.=
- David Alan Gilbert)
-64e184e: pci-assign: sync MSI/MSI-X cap and table with PCIDevice (Peter Xu)
-9e55d58: megasas: clean up and fix request completion/cancellation (Paolo B=
-onzini)
-75f19f8: megasas: do not call pci_dma_unmap after having freed the frame on=
-ce (Paolo Bonzini)
-b77257d: arm: Create /chosen and /memory devicetree nodes if necessary (Gue=
-nter Roeck)
-6aa3a61: generic-loader: file: Only set a PC if a CPU is specified (Alistai=
-r Francis)
-685479b: target-i386: Remove unused local_err variable (Eduardo Habkost)
-8f57758: docs: Specify that cache-clean-interval is only supported in Linux=
- (Alberto Garcia)
-a8b99dd: qcow2: Remove stale comment (Alberto Garcia)
-91203f0: qcow2: Allow 'cache-clean-interval' in Linux only (Alberto Garcia)
-2f2c8d6: qcow2: Make qcow2_cache_table_release() work only in Linux (Albert=
-o Garcia)
-06c3375: Update OpenBIOS images to ef8a14e built from submodule. (Mark Cave=
--Ayland)
-4a18cd4: target-m68k: fix muluw/mulsw (Laurent Vivier)
-5436c29: target-m68k: Fix cmpa operand size (Laurent Vivier)
-c090c97: target-m68k: fix EXG instruction (Laurent Vivier)
-7875efb: xen_disk: split discard input to match internal representation (Ol=
-af Hering)
-898ae90: 9pfs: add cleanup operation for proxy backend driver (Li Qiang)
-971f406: 9pfs: add cleanup operation for handle backend driver (Li Qiang)
-702dbcc: 9pfs: add cleanup operation in FileOperations (Li Qiang)
-4774718: 9pfs: adjust the order of resource cleanup in device unrealize (Li=
- Qiang)
-5c4537b: spapr: Fix 2.7<->2.8 migration of PCI host bridge (David Gibson)
-5a78b82: Revert "spapr: Fix migration of PCI host bridges from qemu-2.7" (D=
-avid Gibson)
-146c11f: target-ppc: Allow eventual removal of old migration mistakes (Davi=
-d Gibson)
-3fed86e: migration: Add VMSTATE_UINTTL_TEST() (David Gibson)
-16a2497: target-ppc: Fix CPU migration from qemu-2.6 <-> later versions (Da=
-vid Gibson)
-39d97e1: ppc: Make uninorth interrupt swizzling identical to Grackle (Benja=
-min Herrenschmidt)
-a813fe7: target-ppc: fix index array of national digits (Jose Ricardo Zivia=
-ni)
-8a273cb: hw/char/spapr_vty: Return amount of free buffer entries in vty_can=
-_receive() (Thomas Huth)
-0d28aa1: ppc: BOOK3E: nothing should be done when MSR:PR is set (Vladimir S=
-voboda)
-62ef376: spapr: migration support for CAS-negotiated option vectors (Michae=
-l Roth)
-171da9d: tests/postcopy: Use KVM on ppc64 only if it is KVM-HV (Thomas Huth)
-1d895fe: scsi/esp: do not raise an interrupt when reading the FIFO register=
- (Herv=C3=A9 Poussineau)
-169407e: nbd: Allow unmap and fua during write zeroes (Eric Blake)
-c2a8531: cpu_ldst.h: use correct guest address parameter (Bobby Bingham)
-424ad83: target-alpha: Fix interrupt mask for cpu1 (Richard Henderson)
+Sorry, I neglected to include the changes since rc2. Please see them
+below:
+
+Changes since rc2:
+
+a92f7fe: Update version for v2.8.0-rc3 release (Stefan Hajnoczi)
+4230e5d: qapi: Document introduction of gluster's 'debug' option (Eric Blak=
+e)
+a9353fe: exec.c: Fix breakpoint invalidation race (Peter Maydell)
+d750c3a: qapi: Document DEVICE_TRAY_MOVED addition (Eric Blake)
+b5b7b5d: tests/.gitignore: Ignore test-char (Changlong Xie)
+a3e1505: qcow2: Don't strand clusters near 2G intervals during commit (Eric=
+ Blake)
+9f5832d: fsl_etsec: Fix various small problems in hexdump code (Andrey Smir=
+nov)
+76b5550: qemu-doc: update gluster protocol usage guide (Prasanna Kumar Kale=
+ver)
+7103d91: block/nfs: fix QMP to match debug option (Prasanna Kumar Kalever)
+1a417e4: block/gluster: fix QMP to match debug option (Prasanna Kumar Kalev=
+er)
+5460da5: target-arm/translate-a64: fix gen_load_exclusive (Alex Benn=C3=A9e)
+5072f7b: qapi: add missing colon-ending for section name (Marc-Andr=C3=A9 L=
+ureau)
+9f2a70e: qapi: use one symbol per line (Marc-Andr=C3=A9 Lureau)
+4d5c8bc: qapi: fix various symbols mismatch in documentation (Marc-Andr=C3=
+=A9 Lureau)
+c5927e7: qapi: fix missing symbol @prefix (Marc-Andr=C3=A9 Lureau)
+49687ac: qapi: fix schema symbol sections (Marc-Andr=C3=A9 Lureau)
+95cd8fd: qga/schema: fix double-return in doc (Marc-Andr=C3=A9 Lureau)
+29a6731: tests: Avoid qobject_from_jsonf("%"PRId64) (Eric Blake)
+1792d7d: test-qga: Avoid qobject_from_jsonv("%"PRId64) (Eric Blake)
+043b5a4: qmp-event: Avoid qobject_from_jsonf("%"PRId64) (Eric Blake)
+4299b90: display: cirrus: check vga bits per pixel(bpp) value (Prasad J Pan=
+dit)
+64f441d: fsl_etsec: Pad short payloads with zeros (Andrey Smirnov)
+77d5498: net: mcf: check receive buffer size register value (Prasad J Pandi=
+t)
+2d1cd6c: virtio-gpu: fix memory leak in update_cursor_data_virgl (Li Qiang)
+42a8dad: virtio-gpu: fix information leak in getting capset info dispatch (=
+Li Qiang)
+6c75650: qxl: Only emit QXL_INTERRUPT_CLIENT_MONITORS_CONFIG on config chan=
+ges (Christophe Fergeau)
+e6e2784: target-mips: fix bad shifts in {dextp|dextpdp} (Yongbok Kim)
+b5a587b: target-mips: Fix Loongson multimedia instructions. (Heiher)
+bb7cab5: target-mips: Fix Loongson multimedia 'or' instruction. (Heiher)
+9099a36: target-mips: Fix Loongson pandn instruction. (Heiher)
+5c0139a: spapr: fix default DRC state for coldplugged LMBs (Michael Roth)
+9730280: virtio-crypto: fix uninitialized variables (Gonglei)
+1b57bd4: loader: fix undefined behavior in rom_order_compare() (Laszlo Erse=
+k)
+aa6c6ae: loader: fix handling of custom address spaces when adding ROM blob=
+s (Laszlo Ersek)
+6cb99ac: intel_iommu: fix incorrect device invalidate (Peter Xu)
+5449c23: spec/vhost-user: fix the VHOST_USER prefix (Wei Wang)
