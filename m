@@ -1,13 +1,13 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48916)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49169)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cEiDg-0003ky-VT
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 14:49:38 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cEiEd-0004HZ-Q9
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 14:50:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cEiDc-0003Ov-1G
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 14:49:37 -0500
-Date: Wed, 7 Dec 2016 19:49:22 +0000
+	(envelope-from <dgilbert@redhat.com>) id 1cEiEY-0003qh-UD
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 14:50:35 -0500
+Date: Wed, 7 Dec 2016 19:50:23 +0000
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20161207194922.GC2073@work-vm>
+Message-ID: <20161207195023.GD2073@work-vm>
 References: <1479923640-8423-1-git-send-email-duanj@linux.vnet.ibm.com>
 	<1479923640-8423-4-git-send-email-duanj@linux.vnet.ibm.com>
 MIME-Version: 1.0
@@ -29,10 +29,13 @@ Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, dmitry@daynix.com, peter.maydell
 
 * Jianjun Duan (duanj@linux.vnet.ibm.com) wrote:
 > Add a test for QTAILQ migration to tests/test-vmstate.c.
-
-Yes, but see comment below if you have to respin:
-
+> 
 > Signed-off-by: Jianjun Duan <duanj@linux.vnet.ibm.com>
+
+oops, follow up to my previous mail, I meant to add:
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
 > ---
 >  tests/test-vmstate.c | 160 +++++++++++++++++++++++++++++++++++++++++++++++++++
 >  1 file changed, 160 insertions(+)
@@ -113,11 +116,7 @@ Yes, but see comment below if you have to respin:
 > +        /* i32 */                     0x00, 0x01, 0x11, 0x70,
 > +        QEMU_VM_EOF, /* just to ensure we won't get EOF reported prematurely */
 > +    };
-
-If possible it would be great to share these structures with the ones in test_load_q.
-
-Dave
-
+> +
 > +    QTAILQ_INIT(&obj_q.q);
 > +    QTAILQ_INSERT_TAIL(&obj_q.q, &obj_qe1, next);
 > +    QTAILQ_INSERT_TAIL(&obj_q.q, &obj_qe2, next);
