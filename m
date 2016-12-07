@@ -1,32 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34652)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48916)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aarcange@redhat.com>) id 1cEhQd-0001ly-Eh
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 13:58:56 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cEiDg-0003ky-VT
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 14:49:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aarcange@redhat.com>) id 1cEhQc-0004E6-HZ
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 13:58:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38732)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aarcange@redhat.com>) id 1cEhQc-0004Dj-Cn
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 13:58:54 -0500
-Date: Wed, 7 Dec 2016 19:58:50 +0100
-From: Andrea Arcangeli <aarcange@redhat.com>
-Message-ID: <20161207185850.GF28786@redhat.com>
-References: <1480495397-23225-1-git-send-email-liang.z.li@intel.com>
-	<f67ca79c-ad34-59dd-835f-e7bc9dcaef58@redhat.com>
-	<F2CBF3009FA73547804AE4C663CAB28E3A130C01@shsmsx102.ccr.corp.intel.com>
-	<0b18c636-ee67-cbb4-1ba3-81a06150db76@redhat.com>
-	<0b83db29-ebad-2a70-8d61-756d33e33a48@intel.com>
-	<2171e091-46ee-decd-7348-772555d3a5e3@redhat.com>
-	<d3ff453c-56fa-19de-317c-1c82456f2831@intel.com>
-	<20161207183817.GE28786@redhat.com>
-	<3954fe69-15ac-43eb-e14b-e2bfe976be33@intel.com>
+	(envelope-from <dgilbert@redhat.com>) id 1cEiDc-0003Ov-1G
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 14:49:37 -0500
+Date: Wed, 7 Dec 2016 19:49:22 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20161207194922.GC2073@work-vm>
+References: <1479923640-8423-1-git-send-email-duanj@linux.vnet.ibm.com>
+	<1479923640-8423-4-git-send-email-duanj@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <3954fe69-15ac-43eb-e14b-e2bfe976be33@intel.com>
-Subject: Re: [Qemu-devel] [PATCH kernel v5 0/5] Extend virtio-balloon for
- fast (de)inflating & fast live migration
+In-Reply-To: <1479923640-8423-4-git-send-email-duanj@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [QEMU PATCH v14 3/4] tests/migration: Add test for
+ QTAILQ migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,38 +24,203 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dave Hansen <dave.hansen@intel.com>
-Cc: David Hildenbrand <david@redhat.com>, "Li, Liang Z" <liang.z.li@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mhocko@suse.com" <mhocko@suse.com>, "mst@redhat.com" <mst@redhat.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>
+To: Jianjun Duan <duanj@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, dmitry@daynix.com, peter.maydell@linaro.org, kraxel@redhat.com, mst@redhat.com, david@gibson.dropbear.id.au, pbonzini@redhat.com, veroniabahaa@gmail.com, quintela@redhat.com, amit.shah@redhat.com, mreitz@redhat.com, kwolf@redhat.com, rth@twiddle.net, aurelien@aurel32.net, leon.alrae@imgtec.com, blauwirbel@gmail.com, mark.cave-ayland@ilande.co.uk, mdroth@linux.vnet.ibm.com
 
-On Wed, Dec 07, 2016 at 10:44:31AM -0800, Dave Hansen wrote:
-> On 12/07/2016 10:38 AM, Andrea Arcangeli wrote:
-> >> > and leaves room for the bitmap size to be encoded as well, if we decide
-> >> > we need a bitmap in the future.
-> > How would a bitmap ever be useful with very large page-order?
+* Jianjun Duan (duanj@linux.vnet.ibm.com) wrote:
+> Add a test for QTAILQ migration to tests/test-vmstate.c.
+
+Yes, but see comment below if you have to respin:
+
+> Signed-off-by: Jianjun Duan <duanj@linux.vnet.ibm.com>
+> ---
+>  tests/test-vmstate.c | 160 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 160 insertions(+)
 > 
-> Please, guys.  Read the patches.  *Please*.
+> diff --git a/tests/test-vmstate.c b/tests/test-vmstate.c
+> index d2f529b..88aab8c 100644
+> --- a/tests/test-vmstate.c
+> +++ b/tests/test-vmstate.c
+> @@ -544,6 +544,163 @@ static void test_arr_ptr_str_no0_load(void)
+>      }
+>  }
+>  
+> +/* test QTAILQ migration */
+> +typedef struct TestQtailqElement TestQtailqElement;
+> +
+> +struct TestQtailqElement {
+> +    bool     b;
+> +    uint8_t  u8;
+> +    QTAILQ_ENTRY(TestQtailqElement) next;
+> +};
+> +
+> +typedef struct TestQtailq {
+> +    int16_t  i16;
+> +    QTAILQ_HEAD(TestQtailqHead, TestQtailqElement) q;
+> +    int32_t  i32;
+> +} TestQtailq;
+> +
+> +static const VMStateDescription vmstate_q_element = {
+> +    .name = "test/queue-element",
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_BOOL(b, TestQtailqElement),
+> +        VMSTATE_UINT8(u8, TestQtailqElement),
+> +        VMSTATE_END_OF_LIST()
+> +    },
+> +};
+> +
+> +static const VMStateDescription vmstate_q = {
+> +    .name = "test/queue",
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_INT16(i16, TestQtailq),
+> +        VMSTATE_QTAILQ_V(q, TestQtailq, 1, vmstate_q_element, TestQtailqElement,
+> +                         next),
+> +        VMSTATE_INT32(i32, TestQtailq),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+> +static void test_save_q(void)
+> +{
+> +    TestQtailq obj_q = {
+> +        .i16 = -512,
+> +        .i32 = 70000,
+> +    };
+> +
+> +    TestQtailqElement obj_qe1 = {
+> +        .b = true,
+> +        .u8 = 130,
+> +    };
+> +
+> +    TestQtailqElement obj_qe2 = {
+> +        .b = false,
+> +        .u8 = 65,
+> +    };
+> +
+> +    uint8_t wire_q[] = {
+> +        /* i16 */                     0xfe, 0x0,
+> +        /* start of element 0 of q */ 0x01,
+> +        /* .b  */                     0x01,
+> +        /* .u8 */                     0x82,
+> +        /* start of element 1 of q */ 0x01,
+> +        /* b */                       0x00,
+> +        /* u8 */                      0x41,
+> +        /* end of q */                0x00,
+> +        /* i32 */                     0x00, 0x01, 0x11, 0x70,
+> +        QEMU_VM_EOF, /* just to ensure we won't get EOF reported prematurely */
+> +    };
 
-I did read the code but you didn't answer my question.
+If possible it would be great to share these structures with the ones in test_load_q.
 
-Why should a feature exist in the code that will never be useful. Why
-do you think we could ever decide we'll need the bitmap in the future
-for high order pages?
+Dave
 
-> The current code doesn't even _use_ a bitmap.
-
-It's not using it right now, my question is exactly when it will ever
-use it?
-
-Leaving the bitmap only for order 0 allocations when you already wiped
-all high pages orders from the buddy, doesn't seem very good idea
-overall as the chance you got order 0 pages with close physical
-address doesn't seem very high. It would be high if the loop that eat
-into every possible higher order didn't run first, but such loop just
-run and already wiped everything.
-
-Also note, we need to call compaction very aggressive before falling
-back from order 9 down to order 8. Ideally we should never use the
-page_shift = PAGE_SHIFT case at all! Which leaves the bitmap as best
-as an optimization for something that is suboptimal case already. If
-the bitmap starts to payoff it means the admin did a mistake and
-shrunk the guest too much.
+> +    QTAILQ_INIT(&obj_q.q);
+> +    QTAILQ_INSERT_TAIL(&obj_q.q, &obj_qe1, next);
+> +    QTAILQ_INSERT_TAIL(&obj_q.q, &obj_qe2, next);
+> +
+> +    save_vmstate(&vmstate_q, &obj_q);
+> +    compare_vmstate(wire_q, sizeof(wire_q));
+> +}
+> +
+> +static void test_load_q(void)
+> +{
+> +    TestQtailq obj_q = {
+> +        .i16 = -512,
+> +        .i32 = 70000,
+> +    };
+> +
+> +    TestQtailqElement obj_qe1 = {
+> +        .b = true,
+> +        .u8 = 130,
+> +    };
+> +
+> +    TestQtailqElement obj_qe2 = {
+> +        .b = false,
+> +        .u8 = 65,
+> +    };
+> +
+> +    uint8_t wire_q[] = {
+> +        /* i16 */                     0xfe, 0x0,
+> +        /* start of element 0 of q */ 0x01,
+> +        /* .b  */                     0x01,
+> +        /* .u8 */                     0x82,
+> +        /* start of element 1 of q */ 0x01,
+> +        /* b */                       0x00,
+> +        /* u8 */                      0x41,
+> +        /* end of q */                0x00,
+> +        /* i32 */                     0x00, 0x01, 0x11, 0x70,
+> +    };
+> +
+> +    QTAILQ_INIT(&obj_q.q);
+> +    QTAILQ_INSERT_TAIL(&obj_q.q, &obj_qe1, next);
+> +    QTAILQ_INSERT_TAIL(&obj_q.q, &obj_qe2, next);
+> +
+> +    QEMUFile *fsave = open_test_file(true);
+> +
+> +    qemu_put_buffer(fsave, wire_q, sizeof(wire_q));
+> +    qemu_put_byte(fsave, QEMU_VM_EOF);
+> +    g_assert(!qemu_file_get_error(fsave));
+> +    qemu_fclose(fsave);
+> +
+> +    QEMUFile *fload = open_test_file(false);
+> +    TestQtailq tgt;
+> +
+> +    QTAILQ_INIT(&tgt.q);
+> +    vmstate_load_state(fload, &vmstate_q, &tgt, 1);
+> +    char eof = qemu_get_byte(fload);
+> +    g_assert(!qemu_file_get_error(fload));
+> +    g_assert_cmpint(tgt.i16, ==, obj_q.i16);
+> +    g_assert_cmpint(tgt.i32, ==, obj_q.i32);
+> +    g_assert_cmpint(eof, ==, QEMU_VM_EOF);
+> +
+> +    TestQtailqElement *qele_from = QTAILQ_FIRST(&obj_q.q);
+> +    TestQtailqElement *qlast_from = QTAILQ_LAST(&obj_q.q, TestQtailqHead);
+> +    TestQtailqElement *qele_to = QTAILQ_FIRST(&tgt.q);
+> +    TestQtailqElement *qlast_to = QTAILQ_LAST(&tgt.q, TestQtailqHead);
+> +
+> +    while (1) {
+> +        g_assert_cmpint(qele_to->b, ==, qele_from->b);
+> +        g_assert_cmpint(qele_to->u8, ==, qele_from->u8);
+> +        if ((qele_from == qlast_from) || (qele_to == qlast_to)) {
+> +            break;
+> +        }
+> +        qele_from = QTAILQ_NEXT(qele_from, next);
+> +        qele_to = QTAILQ_NEXT(qele_to, next);
+> +    }
+> +
+> +    g_assert_cmpint((uint64_t) qele_from, ==, (uint64_t) qlast_from);
+> +    g_assert_cmpint((uint64_t) qele_to, ==, (uint64_t) qlast_to);
+> +
+> +    /* clean up */
+> +    TestQtailqElement *qele;
+> +    while (!QTAILQ_EMPTY(&tgt.q)) {
+> +        qele = QTAILQ_LAST(&tgt.q, TestQtailqHead);
+> +        QTAILQ_REMOVE(&tgt.q, qele, next);
+> +        free(qele);
+> +        qele = NULL;
+> +    }
+> +    qemu_fclose(fload);
+> +}
+> +
+>  int main(int argc, char **argv)
+>  {
+>      temp_fd = mkstemp(temp_file);
+> @@ -562,6 +719,9 @@ int main(int argc, char **argv)
+>                      test_arr_ptr_str_no0_save);
+>      g_test_add_func("/vmstate/array/ptr/str/no0/load",
+>                      test_arr_ptr_str_no0_load);
+> +    g_test_add_func("/vmstate/qtailq/save/saveq", test_save_q);
+> +    g_test_add_func("/vmstate/qtailq/load/loadq", test_load_q);
+> +
+>      g_test_run();
+>  
+>      close(temp_fd);
+> -- 
+> 1.9.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
