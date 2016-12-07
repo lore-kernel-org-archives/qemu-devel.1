@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35288)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35365)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vijay.kilari@gmail.com>) id 1cEfhC-0002JV-Gq
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 12:07:55 -0500
+	(envelope-from <vijay.kilari@gmail.com>) id 1cEfhN-0002SR-NU
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 12:08:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vijay.kilari@gmail.com>) id 1cEfhB-0000UP-I2
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 12:07:54 -0500
+	(envelope-from <vijay.kilari@gmail.com>) id 1cEfhI-0000Wi-Ot
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 12:08:05 -0500
 From: vijay.kilari@gmail.com
-Date: Wed,  7 Dec 2016 22:36:12 +0530
-Message-Id: <1481130374-5147-3-git-send-email-vijay.kilari@gmail.com>
+Date: Wed,  7 Dec 2016 22:36:13 +0530
+Message-Id: <1481130374-5147-4-git-send-email-vijay.kilari@gmail.com>
 In-Reply-To: <1481130374-5147-1-git-send-email-vijay.kilari@gmail.com>
 References: <1481130374-5147-1-git-send-email-vijay.kilari@gmail.com>
-Subject: [Qemu-devel] [PATCH v5 2/3] utils: Add helper to read arm MIDR_EL1
- register
+Subject: [Qemu-devel] [PATCH v5 3/3] utils: Add prefetch for Thunderx
+ platform
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,129 +25,157 @@ Cc: qemu-devel@nongnu.org, vijay.kilari@gmail.com, Vijaya Kumar K <Vijaya.Kumar@
 
 From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
 
-Add helper API to read MIDR_EL1 registers to fetch
-cpu identification information. This helps in
-adding errata's and architecture specific features.
+Thunderx pass2 chip requires explicit prefetch
+instruction to give prefetch hint.
 
-This is implemented only for arm architecture.
+To speed up live migration on Thunderx platform,
+prefetch instruction is added in zero buffer check
+function.The below results show live migration time improvement
+with prefetch instruction. VM with 4 VCPUs, 8GB RAM is migrated.
+
+Code for decoding cache size is taken from Richard's patch.
+
+With 1K page size and without prefetch
+======================================
+Migration status: completed
+total time: 13556 milliseconds
+downtime: 380 milliseconds
+setup: 15 milliseconds
+transferred ram: 265557 kbytes
+throughput: 160.51 mbps
+remaining ram: 0 kbytes
+total ram: 8519872 kbytes
+duplicate: 8344672 pages
+skipped: 0 pages
+normal: 190724 pages
+normal bytes: 190724 kbytes
+dirty sync count: 3
+
+With 1K page size and with prefetch
+===================================
+Migration status: completed
+total time: 8218 milliseconds
+downtime: 395 milliseconds
+setup: 15 milliseconds
+transferred ram: 274484 kbytes
+throughput: 273.67 mbps
+remaining ram: 0 kbytes
+total ram: 8519872 kbytes
+duplicate: 8341921 pages
+skipped: 0 pages
+normal: 199606 pages
+normal bytes: 199606 kbytes
+dirty sync count: 3
+(qemu)
+
+With 4K page size and without prefetch
+======================================
+Migration status: completed
+total time: 11121 milliseconds
+downtime: 372 milliseconds
+setup: 5 milliseconds
+transferred ram: 231777 kbytes
+throughput: 170.77 mbps
+remaining ram: 0 kbytes
+total ram: 8519872 kbytes
+duplicate: 2082158 pages
+skipped: 0 pages
+normal: 53265 pages
+normal bytes: 213060 kbytes
+dirty sync count: 3
+
+With 4K page size and with prefetch
+===================================
+Migration status: completed
+total time: 5893 milliseconds
+downtime: 359 milliseconds
+setup: 5 milliseconds
+transferred ram: 225795 kbytes
+throughput: 313.96 mbps
+remaining ram: 0 kbytes
+total ram: 8519872 kbytes
+duplicate: 2081903 pages
+skipped: 0 pages
+normal: 51773 pages
+normal bytes: 207092 kbytes
+dirty sync count: 3
 
 Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
 ---
- include/qemu/aarch64-cpuid.h | 38 ++++++++++++++++++++++++++++++++
- util/Makefile.objs           |  1 +
- util/aarch64-cpuid.c         | 52 ++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 91 insertions(+)
+ util/bufferiszero.c | 37 +++++++++++++++++++++++++++++++++++--
+ 1 file changed, 35 insertions(+), 2 deletions(-)
 
-diff --git a/include/qemu/aarch64-cpuid.h b/include/qemu/aarch64-cpuid.h
-new file mode 100644
-index 0000000..fb88ed8
---- /dev/null
-+++ b/include/qemu/aarch64-cpuid.h
-@@ -0,0 +1,38 @@
-+#ifndef QEMU_AARCH64_CPUID_H
-+#define QEMU_AARCH64_CPUID_H
-+
-+#if defined(__aarch64__) && defined(CONFIG_LINUX)
-+#define MIDR_IMPLEMENTER_SHIFT  24
-+#define MIDR_IMPLEMENTER_MASK   (0xffULL << MIDR_IMPLEMENTER_SHIFT)
-+#define MIDR_ARCHITECTURE_SHIFT 16
-+#define MIDR_ARCHITECTURE_MASK  (0xf << MIDR_ARCHITECTURE_SHIFT)
-+#define MIDR_PARTNUM_SHIFT      4
-+#define MIDR_PARTNUM_MASK       (0xfff << MIDR_PARTNUM_SHIFT)
-+
-+#define MIDR_CPU_PART(imp, partnum) \
-+        (((imp)                 << MIDR_IMPLEMENTER_SHIFT)  | \
-+        (0xf                    << MIDR_ARCHITECTURE_SHIFT) | \
-+        ((partnum)              << MIDR_PARTNUM_SHIFT))
-+
-+#define ARM_CPU_IMP_CAVIUM        0x43
-+#define CAVIUM_CPU_PART_THUNDERX  0x0A1
-+
-+#define MIDR_THUNDERX_PASS2  \
-+               MIDR_CPU_PART(ARM_CPU_IMP_CAVIUM, CAVIUM_CPU_PART_THUNDERX)
-+#define CPU_MODEL_MASK  (MIDR_IMPLEMENTER_MASK | MIDR_ARCHITECTURE_MASK | \
-+                         MIDR_PARTNUM_MASK)
-+
-+uint64_t get_aarch64_cpu_id(void);
-+bool is_thunderx_pass2_cpu(void);
-+#else
-+static inline uint64_t get_aarch64_cpu_id(void)
-+{
-+    return 0;
-+}
-+
-+static inline bool is_thunderx_pass2_cpu(void)
-+{
-+    return false;
-+}
-+#endif
-+#endif
-diff --git a/util/Makefile.objs b/util/Makefile.objs
-index ad0f9c7..a9585c9 100644
---- a/util/Makefile.objs
-+++ b/util/Makefile.objs
-@@ -36,3 +36,4 @@ util-obj-y += log.o
- util-obj-y += qdist.o
- util-obj-y += qht.o
- util-obj-y += range.o
-+util-obj-$(CONFIG_LINUX) += aarch64-cpuid.o
-diff --git a/util/aarch64-cpuid.c b/util/aarch64-cpuid.c
-new file mode 100644
-index 0000000..575f52e
---- /dev/null
-+++ b/util/aarch64-cpuid.c
-@@ -0,0 +1,52 @@
-+/*
-+ * Dealing with arm cpu identification information.
-+ *
-+ * Copyright (C) 2016 Cavium, Inc.
-+ *
-+ * Authors:
-+ *  Vijaya Kumar K <Vijaya.Kumar@cavium.com>
-+ *
-+ * This work is licensed under the terms of the GNU LGPL, version 2.1
-+ * or later.  See the COPYING.LIB file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/cutils.h"
+diff --git a/util/bufferiszero.c b/util/bufferiszero.c
+index 421d945..ed3b31d 100644
+--- a/util/bufferiszero.c
++++ b/util/bufferiszero.c
+@@ -25,6 +25,11 @@
+ #include "qemu-common.h"
+ #include "qemu/cutils.h"
+ #include "qemu/bswap.h"
 +#include "qemu/aarch64-cpuid.h"
 +
++static uint32_t cache_line_size = 64;
++static uint32_t prefetch_line_dist = 1;
++static uint32_t prefetch_distance = 8;
+ 
+ static bool
+ buffer_zero_int(const void *buf, size_t len)
+@@ -49,7 +54,7 @@ buffer_zero_int(const void *buf, size_t len)
+         const uint64_t *e = (uint64_t *)(((uintptr_t)buf + len) & -8);
+ 
+         for (; p + 8 <= e; p += 8) {
+-            __builtin_prefetch(p + 8, 0, 0);
++            __builtin_prefetch(p + prefetch_distance, 0, 0);
+             if (t) {
+                 return false;
+             }
+@@ -293,17 +298,45 @@ bool test_buffer_is_zero_next_accel(void)
+ }
+ #endif
+ 
++static void __attribute__((constructor)) init_cache_size(void)
++{
 +#if defined(__aarch64__)
-+static uint64_t qemu_read_aarch64_midr_el1(void)
-+{
-+    const char *file = "/sys/devices/system/cpu/cpu0/regs/identification/midr_el1";
-+    char *buf;
-+    uint64_t midr = 0;
++    uint64_t t;
 +
-+    if (!g_file_get_contents(file, &buf, 0, NULL)) {
-+        goto out;
++    /* Use the DZP block size as a proxy for the cacheline size,
++       since the later is not available to userspace.  This seems
++       to work in practice for existing implementations.  */
++    asm("mrs %0, dczid_el0" : "=r"(t));
++    if ((1 << ((t & 0xf) + 2)) >= 128) {
++        cache_line_size = 128;
 +    }
-+
-+    if (qemu_strtoull(buf, NULL, 0, &midr) < 0) {
-+        midr = 0;
-+        goto out;
-+    }
-+
-+out:
-+    g_free(buf);
-+
-+    return midr;
-+}
-+
-+static uint64_t aarch64_midr_val;
-+uint64_t get_aarch64_cpu_id(void)
-+{
-+    aarch64_midr_val = qemu_read_aarch64_midr_el1();
-+    aarch64_midr_val &= CPU_MODEL_MASK;
-+
-+    return aarch64_midr_val;
-+}
-+
-+bool is_thunderx_pass2_cpu(void)
-+{
-+    return aarch64_midr_val == MIDR_THUNDERX_PASS2;
-+}
 +#endif
++
++    get_aarch64_cpu_id();
++    if (is_thunderx_pass2_cpu()) {
++        prefetch_line_dist = 3;
++        prefetch_distance = (prefetch_line_dist * cache_line_size) /
++                             sizeof(uint64_t);
++    }
++}
++
+ /*
+  * Checks if a buffer is all zeroes
+  */
+ bool buffer_is_zero(const void *buf, size_t len)
+ {
++    int i;
++    uint32_t prefetch_distance_bytes;
++
+     if (unlikely(len == 0)) {
+         return true;
+     }
+ 
+     /* Fetch the beginning of the buffer while we select the accelerator.  */
+-    __builtin_prefetch(buf, 0, 0);
++    prefetch_distance_bytes = prefetch_line_dist * cache_line_size;
++    for (i = 0; i < prefetch_distance_bytes && i < len; i += cache_line_size) {
++        __builtin_prefetch(buf + i, 0, 0);
++    }
+ 
+     /* Use an optimized zero check if possible.  Note that this also
+        includes a check for an unrolled loop over 64-bit integers.  */
 -- 
 1.9.1
