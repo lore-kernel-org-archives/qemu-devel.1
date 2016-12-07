@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35212)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35288)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vijay.kilari@gmail.com>) id 1cEfh5-0002D2-7n
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 12:07:48 -0500
+	(envelope-from <vijay.kilari@gmail.com>) id 1cEfhC-0002JV-Gq
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 12:07:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vijay.kilari@gmail.com>) id 1cEfh4-0000RX-88
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 12:07:47 -0500
+	(envelope-from <vijay.kilari@gmail.com>) id 1cEfhB-0000UP-I2
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 12:07:54 -0500
 From: vijay.kilari@gmail.com
-Date: Wed,  7 Dec 2016 22:36:11 +0530
-Message-Id: <1481130374-5147-2-git-send-email-vijay.kilari@gmail.com>
+Date: Wed,  7 Dec 2016 22:36:12 +0530
+Message-Id: <1481130374-5147-3-git-send-email-vijay.kilari@gmail.com>
 In-Reply-To: <1481130374-5147-1-git-send-email-vijay.kilari@gmail.com>
 References: <1481130374-5147-1-git-send-email-vijay.kilari@gmail.com>
-Subject: [Qemu-devel] [PATCH v5 1/3] cutils: Set __builtin_prefetch optional
- parameters
+Subject: [Qemu-devel] [PATCH v5 2/3] utils: Add helper to read arm MIDR_EL1
+ register
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,68 +25,129 @@ Cc: qemu-devel@nongnu.org, vijay.kilari@gmail.com, Vijaya Kumar K <Vijaya.Kumar@
 
 From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
 
-Optional parameters of __builtin_prefetch() which specifies
-rw and locality to 0's. For checking buffer is zero, set rw as read
-and temporal locality to 0.
+Add helper API to read MIDR_EL1 registers to fetch
+cpu identification information. This helps in
+adding errata's and architecture specific features.
 
-On arm64, __builtin_prefetch(addr) generates 'prfm    pldl1keep'
-where __builtin_prefetch(addr, 0, 0) generates 'prfm pldl1strm'
-instruction which is optimal for this use case
+This is implemented only for arm architecture.
 
 Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
-Reviewed-by: Richard Henderson <rth@twiddle.net>
 ---
- util/bufferiszero.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ include/qemu/aarch64-cpuid.h | 38 ++++++++++++++++++++++++++++++++
+ util/Makefile.objs           |  1 +
+ util/aarch64-cpuid.c         | 52 ++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 91 insertions(+)
 
-diff --git a/util/bufferiszero.c b/util/bufferiszero.c
-index eb974b7..421d945 100644
---- a/util/bufferiszero.c
-+++ b/util/bufferiszero.c
-@@ -49,7 +49,7 @@ buffer_zero_int(const void *buf, size_t len)
-         const uint64_t *e = (uint64_t *)(((uintptr_t)buf + len) & -8);
- 
-         for (; p + 8 <= e; p += 8) {
--            __builtin_prefetch(p + 8);
-+            __builtin_prefetch(p + 8, 0, 0);
-             if (t) {
-                 return false;
-             }
-@@ -86,7 +86,7 @@ buffer_zero_sse2(const void *buf, size_t len)
- 
-     /* Loop over 16-byte aligned blocks of 64.  */
-     while (likely(p <= e)) {
--        __builtin_prefetch(p);
-+        __builtin_prefetch(p, 0, 0);
-         t = _mm_cmpeq_epi8(t, zero);
-         if (unlikely(_mm_movemask_epi8(t) != 0xFFFF)) {
-             return false;
-@@ -127,7 +127,7 @@ buffer_zero_sse4(const void *buf, size_t len)
- 
-     /* Loop over 16-byte aligned blocks of 64.  */
-     while (likely(p <= e)) {
--        __builtin_prefetch(p);
-+        __builtin_prefetch(p, 0, 0);
-         if (unlikely(!_mm_testz_si128(t, t))) {
-             return false;
-         }
-@@ -162,7 +162,7 @@ buffer_zero_avx2(const void *buf, size_t len)
-     if (likely(p <= e)) {
-         /* Loop over 32-byte aligned blocks of 128.  */
-         do {
--            __builtin_prefetch(p);
-+            __builtin_prefetch(p, 0, 0);
-             if (unlikely(!_mm256_testz_si256(t, t))) {
-                 return false;
-             }
-@@ -303,7 +303,7 @@ bool buffer_is_zero(const void *buf, size_t len)
-     }
- 
-     /* Fetch the beginning of the buffer while we select the accelerator.  */
--    __builtin_prefetch(buf);
-+    __builtin_prefetch(buf, 0, 0);
- 
-     /* Use an optimized zero check if possible.  Note that this also
-        includes a check for an unrolled loop over 64-bit integers.  */
+diff --git a/include/qemu/aarch64-cpuid.h b/include/qemu/aarch64-cpuid.h
+new file mode 100644
+index 0000000..fb88ed8
+--- /dev/null
++++ b/include/qemu/aarch64-cpuid.h
+@@ -0,0 +1,38 @@
++#ifndef QEMU_AARCH64_CPUID_H
++#define QEMU_AARCH64_CPUID_H
++
++#if defined(__aarch64__) && defined(CONFIG_LINUX)
++#define MIDR_IMPLEMENTER_SHIFT  24
++#define MIDR_IMPLEMENTER_MASK   (0xffULL << MIDR_IMPLEMENTER_SHIFT)
++#define MIDR_ARCHITECTURE_SHIFT 16
++#define MIDR_ARCHITECTURE_MASK  (0xf << MIDR_ARCHITECTURE_SHIFT)
++#define MIDR_PARTNUM_SHIFT      4
++#define MIDR_PARTNUM_MASK       (0xfff << MIDR_PARTNUM_SHIFT)
++
++#define MIDR_CPU_PART(imp, partnum) \
++        (((imp)                 << MIDR_IMPLEMENTER_SHIFT)  | \
++        (0xf                    << MIDR_ARCHITECTURE_SHIFT) | \
++        ((partnum)              << MIDR_PARTNUM_SHIFT))
++
++#define ARM_CPU_IMP_CAVIUM        0x43
++#define CAVIUM_CPU_PART_THUNDERX  0x0A1
++
++#define MIDR_THUNDERX_PASS2  \
++               MIDR_CPU_PART(ARM_CPU_IMP_CAVIUM, CAVIUM_CPU_PART_THUNDERX)
++#define CPU_MODEL_MASK  (MIDR_IMPLEMENTER_MASK | MIDR_ARCHITECTURE_MASK | \
++                         MIDR_PARTNUM_MASK)
++
++uint64_t get_aarch64_cpu_id(void);
++bool is_thunderx_pass2_cpu(void);
++#else
++static inline uint64_t get_aarch64_cpu_id(void)
++{
++    return 0;
++}
++
++static inline bool is_thunderx_pass2_cpu(void)
++{
++    return false;
++}
++#endif
++#endif
+diff --git a/util/Makefile.objs b/util/Makefile.objs
+index ad0f9c7..a9585c9 100644
+--- a/util/Makefile.objs
++++ b/util/Makefile.objs
+@@ -36,3 +36,4 @@ util-obj-y += log.o
+ util-obj-y += qdist.o
+ util-obj-y += qht.o
+ util-obj-y += range.o
++util-obj-$(CONFIG_LINUX) += aarch64-cpuid.o
+diff --git a/util/aarch64-cpuid.c b/util/aarch64-cpuid.c
+new file mode 100644
+index 0000000..575f52e
+--- /dev/null
++++ b/util/aarch64-cpuid.c
+@@ -0,0 +1,52 @@
++/*
++ * Dealing with arm cpu identification information.
++ *
++ * Copyright (C) 2016 Cavium, Inc.
++ *
++ * Authors:
++ *  Vijaya Kumar K <Vijaya.Kumar@cavium.com>
++ *
++ * This work is licensed under the terms of the GNU LGPL, version 2.1
++ * or later.  See the COPYING.LIB file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/cutils.h"
++#include "qemu/aarch64-cpuid.h"
++
++#if defined(__aarch64__)
++static uint64_t qemu_read_aarch64_midr_el1(void)
++{
++    const char *file = "/sys/devices/system/cpu/cpu0/regs/identification/midr_el1";
++    char *buf;
++    uint64_t midr = 0;
++
++    if (!g_file_get_contents(file, &buf, 0, NULL)) {
++        goto out;
++    }
++
++    if (qemu_strtoull(buf, NULL, 0, &midr) < 0) {
++        midr = 0;
++        goto out;
++    }
++
++out:
++    g_free(buf);
++
++    return midr;
++}
++
++static uint64_t aarch64_midr_val;
++uint64_t get_aarch64_cpu_id(void)
++{
++    aarch64_midr_val = qemu_read_aarch64_midr_el1();
++    aarch64_midr_val &= CPU_MODEL_MASK;
++
++    return aarch64_midr_val;
++}
++
++bool is_thunderx_pass2_cpu(void)
++{
++    return aarch64_midr_val == MIDR_THUNDERX_PASS2;
++}
++#endif
 -- 
 1.9.1
