@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48044)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59506)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cEVzf-0006yj-L8
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 01:46:20 -0500
+	(envelope-from <maxime.coquelin@redhat.com>) id 1cEWzB-0007IG-Cp
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 02:49:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cEVza-0006ZL-Gm
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 01:46:19 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:12690)
+	(envelope-from <maxime.coquelin@redhat.com>) id 1cEWz8-00064Y-C4
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 02:49:53 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48482)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cEVza-0006Z5-8P
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 01:46:14 -0500
-Date: Wed, 7 Dec 2016 14:43:22 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20161207064322.GA28693@pxdev.xzpeter.org>
-References: <1480348315-13332-1-git-send-email-bd.aviv@gmail.com>
-	<8188dd5e-2c71-dbd0-9a1a-9c8af6f74b96@intel.com>
-	<20161202065214.GF21601@pxdev.xzpeter.org>
-	<088c2afd-575e-99af-1686-023c116352ab@intel.com>
-	<20161206065155.GB4344@pxdev.xzpeter.org>
-	<6d37d046-8e5a-7662-baa6-445d3985fde7@intel.com>
-	<20161206072228.GC4344@pxdev.xzpeter.org>
-	<f9f9daab-519d-381b-c9e8-c6dcc139f1d3@intel.com>
-	<20161206105914.GB3469@pxdev.xzpeter.org>
-	<1b348745-3135-e28c-88f3-f45ed1855de3@intel.com>
+	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
+	id 1cEWz8-00062o-6V
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 02:49:50 -0500
+References: <20161130101017.13382-1-maxime.coquelin@redhat.com>
+	<20161130101017.13382-3-maxime.coquelin@redhat.com>
+	<f7t37i0x61w.fsf@redhat.com>
+From: Maxime Coquelin <maxime.coquelin@redhat.com>
+Message-ID: <506e3923-6354-03fa-b622-01d23233f42a@redhat.com>
+Date: Wed, 7 Dec 2016 08:49:42 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1b348745-3135-e28c-88f3-f45ed1855de3@intel.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v7 0/5] IOMMU: intel_iommu support map and
- unmap notifications
+In-Reply-To: <f7t37i0x61w.fsf@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC v3 2/3] vhost-net: Notify the backend about
+ the host MTU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,78 +30,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Lan Tianyu <tianyu.lan@intel.com>
-Cc: "Aviv B.D" <bd.aviv@gmail.com>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>, Alex Williamson <alex.williamson@redhat.com>, Jason Wang <jasowang@redhat.com>, "Liu, Yi L" <yi.l.liu@intel.com>, "Wu, Fengguang" <fengguang.wu@intel.com>
+To: Aaron Conole <aconole@redhat.com>
+Cc: mst@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, fbl@redhat.com, berrange@redhat.com, mlureau@redhat.com, ktraynor@redhat.com, jasowang@redhat.com, yuanhan.liu@linux.intel.com
 
-On Wed, Dec 07, 2016 at 02:09:16PM +0800, Lan Tianyu wrote:
-> On 2016=E5=B9=B412=E6=9C=8806=E6=97=A5 18:59, Peter Xu wrote:
-> > On Tue, Dec 06, 2016 at 04:27:39PM +0800, Lan Tianyu wrote:
-> >=20
-> > [...]
-> >=20
-> >>>
-> >>>> User space driver(E.G DPDK) also can enable/disable
-> >>>> IOVA for device dynamically.
-> >>>
-> >>> Could you provide more detailed (or any pointer) on how to do that?=
- I
-> >>> did try to find it myself, I see an VFIO_IOMMU_ENABLE ioctl, but lo=
-oks
-> >>> like it is for ppc only.
-> >>
-> >> No, I just give an example that user space may do that but no more
-> >> research. But since Qemu already can enable device's IOVA, other use=
-r
-> >> application also should can do that with the same VFIO interface, ri=
-ght?
-> >=20
-> > AFAIU we can't do that at least on x86. We can use vfio interface to
-> > bind group into container, but we should not be able to dynamically
-> > disable IOMMU protection. IIUC That needs to taint the kernel.
-> >=20
-> > The only way I know is that we probe vfio-pci with no-iommu mode, in
-> > that case, we disabled IOMMU, but we can never dynamically enable it
-> > as well.
-> >=20
-> > Please correct me if I am wrong.
->=20
->=20
-> Actually, disabling device's IOVA doesn't require to disable kernel
-> global DMA protect and just clear device's VTD context entry in the
-> context table. Go though IOMMU and VFIO code, find this will happen whe=
-n
-> call VFIO_GROUP_UNSET_CONTAINER ioctl and it will be called when destro=
-y
-> VM or unplug assigned device in Qemu. Please help to double check.
->=20
-> Call trace:
-> __vfio_group_unset_container()
-> vfio_iommu_type1_detach_group()
-> iommu_detach_group()
-> dmar_remove_one_dev_info()
-> __dmar_remove_one_dev_info()
-> domain_context_clear()
->=20
->=20
-> The legacy KVM device assign code also will call iommu_detach_device()
-> when deassign a device.
->=20
-> From device emulation view, we need to make sure correct register
-> emulation regardless of guest behavior.
 
-Even if the context entry is cleared and invalidated, IMHO it does not
-mean that we should be using GPA address space, nor do we need to put
-it into guest physical address space. Instead, it simply means this
-device cannot do any IO at that time. If IO comes, IOMMU should do
-fault reporting to guest OS, which should be treated as error.
 
-So I think we are emulating the correct guest behavior here - we don't
-need to do anything if a device is detached from an existing IOMMU
-domain in guest. If we do (e.g., we replay the GPA address space on
-that device when it is detached, so the shadow page table for that
-device maps the whole guest memory), that is dangerous, because with
-that the device can DMA to anywhere it wants to guest memory.
+On 12/06/2016 07:31 PM, Aaron Conole wrote:
+> Maxime Coquelin <maxime.coquelin@redhat.com> writes:
+>
+>> This patch provides a way for virtio-net to notify the
+>> backend about the host MTU set by the user.
+>>
+>> Cc: Michael S. Tsirkin <mst@redhat.com>
+>> Cc: Aaron Conole <aconole@redhat.com>
+>> Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
+>> ---
+>>  hw/net/vhost_net.c      | 22 ++++++++++++++++++++++
+>>  include/net/vhost_net.h |  2 ++
+>>  2 files changed, 24 insertions(+)
+>>
+>> diff --git a/hw/net/vhost_net.c b/hw/net/vhost_net.c
+>> index f2d49ad..d7c13d4 100644
+>> --- a/hw/net/vhost_net.c
+>> +++ b/hw/net/vhost_net.c
+>> @@ -51,6 +51,7 @@ static const int kernel_feature_bits[] = {
+>>      VIRTIO_RING_F_EVENT_IDX,
+>>      VIRTIO_NET_F_MRG_RXBUF,
+>>      VIRTIO_F_VERSION_1,
+>> +    VIRTIO_NET_F_MTU,
+>>      VHOST_INVALID_FEATURE_BIT
+>>  };
+>>
+>> @@ -74,6 +75,7 @@ static const int user_feature_bits[] = {
+>>      VIRTIO_NET_F_HOST_ECN,
+>>      VIRTIO_NET_F_HOST_UFO,
+>>      VIRTIO_NET_F_MRG_RXBUF,
+>> +    VIRTIO_NET_F_MTU,
+>>
+>>      /* This bit implies RARP isn't sent by QEMU out of band */
+>>      VIRTIO_NET_F_GUEST_ANNOUNCE,
+>> @@ -435,6 +437,22 @@ int vhost_set_vring_enable(NetClientState *nc, int enable)
+>>      return 0;
+>>  }
+>>
+>> +int vhost_net_set_mtu(struct vhost_net *net, uint16_t mtu)
+>> +{
+>> +    const VhostOps *vhost_ops = net->dev.vhost_ops;
+>> +    int ret;
+>> +
+>> +    if (!vhost_ops->vhost_net_set_mtu) {
+>> +        return -ENOSYS;
+>> +    }
+>> +
+>> +    ret = vhost_ops->vhost_net_set_mtu(&net->dev, mtu);
+>> +    if (ret < 0) {
+>> +        return -errno;
+>> +    }
+>> +    return 0;
+>> +}
+>> +
+>>  #else
+>>  uint64_t vhost_net_get_max_queues(VHostNetState *net)
+>>  {
+>> @@ -501,4 +519,8 @@ int vhost_set_vring_enable(NetClientState *nc, int enable)
+>>  {
+>>      return 0;
+>>  }
+>> +
+>> +int vhost_net_set_mtu(struct vhost_net *net, uint16_t mtu)
+>> +{
+>> +}
+>>  #endif
+>
+> I think this should return something - I don't know what value will come
+> through if it doesn't :).
 
-Thanks,
+Good catch, of course something should be returned...
 
--- peterx
+Thanks!
+Maxime
