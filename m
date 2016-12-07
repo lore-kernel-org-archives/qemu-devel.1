@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60360)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60399)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cEZ4o-0007VN-W0
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 05:03:55 -0500
+	(envelope-from <kraxel@redhat.com>) id 1cEZ5H-0007jL-6F
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 05:04:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cEZ4o-0001Zo-1t
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 05:03:50 -0500
-Date: Wed, 7 Dec 2016 18:03:39 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20161207100339.GB2286@lemon>
-References: <87oa0q1t21.fsf@dusky.pond.sub.org> <20161207025457.GB30227@lemon>
-	<20161207094832.GA4773@noname.str.redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20161207094832.GA4773@noname.str.redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block]  Meeting notes on -blockdev,
- dynamic backend reconfiguration
+	(envelope-from <kraxel@redhat.com>) id 1cEZ5C-0001cK-8f
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 05:04:19 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41378)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cEZ5C-0001c9-2e
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 05:04:14 -0500
+Message-ID: <1481105051.11413.2.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Wed, 07 Dec 2016 11:04:11 +0100
+In-Reply-To: <e8c1ed6f-fc4b-2093-60d8-5a2fb4f22e5e@redhat.com>
+References: <2011630530.2430235.1481039230635.JavaMail.zimbra@redhat.com>
+	<e8c1ed6f-fc4b-2093-60d8-5a2fb4f22e5e@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Subject: Re: [Qemu-devel] ui/egl-helpers.c license and reuse
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,26 +27,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: John Snow <jsnow@redhat.com>
+Cc: Frediano Ziglio <fziglio@redhat.com>, Qemu-devel <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Gonglei <arei.gonglei@huawei.com>, Cole Robinson <crobinso@redhat.com>
 
-On Wed, 12/07 10:48, Kevin Wolf wrote:
-> > If so I think there is no race to worry about, mirror-filter should go
-> > away only after a QMP command.
-> 
-> Currently, a mirror job goes away whenever it is done. This is not
-> directly tied to a QMP command.
+  Hi,
 
-Ah right, block-job-complete is only "start to complete" and the job goes away
-at some later point. I thought this is "the" QMP command but it is not.
+> "IANAL,"
+>=20
+> Looks like the file was authored by four people with no explicit
+> license, so it defaulted to GPL2.
+>=20
+> Cole Robinson, Gerd Hoffman, Gonglei, and Peter Maydell.
+>=20
+> Maybe you can get explicit permission from these four.
 
-> 
-> Of course, in the new job API we want an explicit job-delete, so in
-> that case it wouldn't happen, but we need to keep the old case for
-> compatibility.
+I'm fine with relicensing the file.
 
-Another possibility is to add a placeholder node in the right location first
-then fill in the actual throttling node once created. QMP owns the placeholder
-node so it won't suddenly vanish when mirror job goes away.
+I'd suggest you send a patch explicitly licensing the file to LGPLv2,
+Cc'ing anyone who touched the file.  I'll go collect the ACKS and merge
+the patch once we got them all.
 
-Fam
+cheers,
+  Gerd
