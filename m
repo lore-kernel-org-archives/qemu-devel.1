@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39379)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40701)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cEe2P-0005m5-Ak
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 10:21:42 -0500
+	(envelope-from <no-reply@patchew.org>) id 1cEe8s-0007LF-Rn
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 10:28:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cEe2M-0002gR-5u
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 10:21:41 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48372)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cEe2L-0002gC-TU
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 10:21:38 -0500
-References: <1481077751-106192-1-git-send-email-arei.gonglei@huawei.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <6c9a32a1-9984-6ae6-bbdc-6843938ee2fd@redhat.com>
-Date: Wed, 7 Dec 2016 09:21:31 -0600
+	(envelope-from <no-reply@patchew.org>) id 1cEe8p-0004ZO-OV
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 10:28:22 -0500
+Resent-Message-Id: <E1cEe8p-0004ZO-OV@eggs.gnu.org>
+Received: from sender163-mail.zoho.com ([74.201.84.163]:21494)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1cEe8p-0004Yv-FF
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 10:28:19 -0500
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <148112449106.154.16454651802669413265@5b492b8a941d>
+In-Reply-To: <cover.1481121503.git.julian@codesourcery.com>
 MIME-Version: 1.0
-In-Reply-To: <1481077751-106192-1-git-send-email-arei.gonglei@huawei.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="tDTrHdISLMKex0wTHfg6KdtqmadETLqSg"
-Subject: Re: [Qemu-devel] [PATCH for-2.9 v2] virtio-crypto: zeroize the key
- material before free
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 7 Dec 2016 07:28:12 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v2 0/6] ARM BE8/BE32 big-endian system-mode
+ fixes (semihosting, gdbstub)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,84 +29,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gonglei <arei.gonglei@huawei.com>, qemu-devel@nongnu.org
-Cc: mst@redhat.com, stefanha@redhat.com
+To: julian@codesourcery.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---tDTrHdISLMKex0wTHfg6KdtqmadETLqSg
-From: Eric Blake <eblake@redhat.com>
-To: Gonglei <arei.gonglei@huawei.com>, qemu-devel@nongnu.org
-Cc: mst@redhat.com, stefanha@redhat.com
-Message-ID: <6c9a32a1-9984-6ae6-bbdc-6843938ee2fd@redhat.com>
-Subject: Re: [PATCH for-2.9 v2] virtio-crypto: zeroize the key material before
- free
-References: <1481077751-106192-1-git-send-email-arei.gonglei@huawei.com>
-In-Reply-To: <1481077751-106192-1-git-send-email-arei.gonglei@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 12/06/2016 08:29 PM, Gonglei wrote:
-> Common practice with sensitive information (key material, passwords,
-> etc). Prevents sensitive information from being exposed by accident lat=
-er in
-> coredumps, memory disclosure bugs when heap memory is reused, etc.
->=20
-> Sensitive information is sometimes also held in mlocked pages to preven=
-t
-> it being swapped to disk but that's not being done here.
-
-I also think that pointing to earlier commit ids with similar behavior
-is a good idea; in other words, call out commit 8813800b.  So maybe
-rework this second paragraph to:
-
-Sensitive information is sometimes also held in mlocked pages to prevent
-it being swapped to disk, but qemu in general is not currently taking
-that level of precaution (see also commit 8813800b).
-
->=20
-> Let's zeroize the memory of CryptoDevBackendSymOpInfo structure pointed=
-
-> for key material security.
->=20
-> [v2: Stefan perfects the commit message, thanks]
-
-The v2 blurb should appear after the --- line, as it is nice for
-reviewers but a year from now when reading 'git log' we won't care how
-many versions were on the list, only about the one version in git.
-
-> Signed-off-by: Gonglei <arei.gonglei@huawei.com>
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->  hw/virtio/virtio-crypto.c | 13 ++++++++++++-
->  1 file changed, 12 insertions(+), 1 deletion(-)
->=20
-
-The commit message may still need improvement, but the maintainer might
-be willing to do that without needing a v3.  At any rate,
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---tDTrHdISLMKex0wTHfg6KdtqmadETLqSg
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYSCj7AAoJEKeha0olJ0NqdgcH/2GjY0gYx+Qk2h/4GBxebljL
-+IRv92gvSDLyjxYvSHpap26A58P4mt5CtOI4Ve16daVKHI3Y6mINBTk+8z2aOGos
-lnxIs0ULSxcQGfXF0+e3aJDxkbIx26bNq5BFyFLhImr8iqGMxjs2Zqo7tiTFQafx
-MihWtRP2zGZGE/ugOvpGxExSHUZeLxwyYi5SucJvYUxx+MqvBv65wKTFyh+XqNNi
-NqCSZWcO168kDCNBBJE2SO2g2BcDU5ukJs4N3JyZFu3Qu8npQ1b+aib6gYnKUzbM
-DuSLGV2nYgU94/IcXgWOdBkOOIoIRCZTxP/kg56StSpDhsZ57HALVeVlWgv3Mzo=
-=rRBT
------END PGP SIGNATURE-----
-
---tDTrHdISLMKex0wTHfg6KdtqmadETLqSg--
+SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
+ZGV2ZWxdIFtQQVRDSCB2MiAwLzZdIEFSTSBCRTgvQkUzMiBiaWctZW5kaWFuIHN5c3RlbS1tb2Rl
+IGZpeGVzIChzZW1paG9zdGluZywgZ2Ric3R1YikKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IGNv
+dmVyLjE0ODExMjE1MDMuZ2l0Lmp1bGlhbkBjb2Rlc291cmNlcnkuY29tCgo9PT0gVEVTVCBTQ1JJ
+UFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAt
+LW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKIyBVc2VmdWwgZ2l0IG9wdGlvbnMK
+Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwg
+ZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVy
+c2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFU
+Q0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAh
+IGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1t
+YWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAg
+bj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVw
+ZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRw
+czovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKIC0gW3RhZyB1cGRhdGVdICAgICAg
+cGF0Y2hldy8xNDgxMDc3NzUxLTEwNjE5Mi0xLWdpdC1zZW5kLWVtYWlsLWFyZWkuZ29uZ2xlaUBo
+dWF3ZWkuY29tIC0+IHBhdGNoZXcvMTQ4MTA3Nzc1MS0xMDYxOTItMS1naXQtc2VuZC1lbWFpbC1h
+cmVpLmdvbmdsZWlAaHVhd2VpLmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjdj
+OTQ5MmUgQVJNIEJFMzIgd2F0Y2hwb2ludCBmaXguCjBlYTQ1MmEgRml4IFRodW1iLTEgQkUzMiBl
+eGVjdXRpb24gYW5kIGRpc2Fzc2VtYmx5LgpjMGE2ZjEzIEFSTSBiaWctZW5kaWFuIHN5c3RlbS1t
+b2RlIGdkYnN0dWIgc3VwcG9ydC4KZTRhZWQ2YiBBUk0gYmlnLWVuZGlhbiBzeXN0ZW0tbW9kZSBz
+ZW1paG9zdGluZyBzdXBwb3J0LgpiYWNkZDBhIEluZmVyIGVuZGlhbm5lc3MgZnJvbSBTQ1RMUiBy
+ZXNldCB2YWx1ZS4KYTA1NGJkOCBBZGQgY2ZnZW5kIHBhcmFtZXRlciBmb3IgQVJNIENQVSBzZWxl
+Y3Rpb24uCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzY6IEFkZCBjZmdl
+bmQgcGFyYW1ldGVyIGZvciBBUk0gQ1BVIHNlbGVjdGlvbi4uLi4KQ2hlY2tpbmcgUEFUQ0ggMi82
+OiBJbmZlciBlbmRpYW5uZXNzIGZyb20gU0NUTFIgcmVzZXQgdmFsdWUuLi4uCkNoZWNraW5nIFBB
+VENIIDMvNjogQVJNIGJpZy1lbmRpYW4gc3lzdGVtLW1vZGUgc2VtaWhvc3Rpbmcgc3VwcG9ydC4u
+Li4KQ2hlY2tpbmcgUEFUQ0ggNC82OiBBUk0gYmlnLWVuZGlhbiBzeXN0ZW0tbW9kZSBnZGJzdHVi
+IHN1cHBvcnQuLi4uCkNoZWNraW5nIFBBVENIIDUvNjogRml4IFRodW1iLTEgQkUzMiBleGVjdXRp
+b24gYW5kIGRpc2Fzc2VtYmx5Li4uLgpDaGVja2luZyBQQVRDSCA2LzY6IEFSTSBCRTMyIHdhdGNo
+cG9pbnQgZml4Li4uLgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBiZXR3ZWVuIGZ1bmN0aW9uIG5h
+bWUgYW5kIG9wZW4gcGFyZW50aGVzaXMgJygnCiMzNTogRklMRTogaW5jbHVkZS9xb20vY3B1Lmg6
+MTk4OgorICAgIHZhZGRyICgqYWRqdXN0X3dhdGNocG9pbnRfYWRkcmVzcykoQ1BVU3RhdGUgKmNw
+dSwgdmFkZHIgYWRkciwgaW50IGxlbik7Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDgw
+IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2
+aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0
+aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09
+PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0K
+RW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcu
+b3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlz
+dHMub3Jn
