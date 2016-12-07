@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42247)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43748)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cEjC5-0001RX-Uz
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 15:52:03 -0500
+	(envelope-from <3v0n1d3@gmail.com>) id 1cEjEg-0003FF-SR
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 15:54:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cEjC3-0003tN-SG
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 15:52:02 -0500
-References: <1479835586-74394-1-git-send-email-vsementsov@virtuozzo.com>
-	<1479835586-74394-10-git-send-email-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <2e03e805-9226-fdc7-7069-814c1346edd2@redhat.com>
-Date: Wed, 7 Dec 2016 21:51:41 +0100
+	(envelope-from <3v0n1d3@gmail.com>) id 1cEjEb-0005D3-W9
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 15:54:42 -0500
+Received: from mail-qk0-f196.google.com ([209.85.220.196]:34094)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <3v0n1d3@gmail.com>) id 1cEjEb-0004o5-RQ
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 15:54:37 -0500
+Received: by mail-qk0-f196.google.com with SMTP id y205so50255079qkb.1
+	for <qemu-devel@nongnu.org>; Wed, 07 Dec 2016 12:54:16 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1479835586-74394-10-git-send-email-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="dLLa5CWPGhQgamIwC631bbmBdmxbI2wD0"
-Subject: Re: [Qemu-devel] [PATCH 09/21] qcow2: add
- .bdrv_load_autoloading_dirty_bitmaps
+In-Reply-To: <CAJSP0QWj_PB_=ChXOO=PGTdsSRXvRG4CmA1-yvkPrBVomS5Q0w@mail.gmail.com>
+References: <CAP5jUk10i4P0x99n6+yXvDfR=ExN0jxyvF2_Ur_82N1_JTWgxg@mail.gmail.com>
+	<CAJSP0QWj_PB_=ChXOO=PGTdsSRXvRG4CmA1-yvkPrBVomS5Q0w@mail.gmail.com>
+From: Ruslan Habalov <3v0n1d3@gmail.com>
+Date: Wed, 7 Dec 2016 21:53:15 +0100
+Message-ID: <CAP5jUk1b31i_UH-kx57DijHkm==hH=9XwDNWCH1a8y7DqYoMjA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] Slow qemu guest performance after host is resumed
+ from suspended state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,222 +29,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---dLLa5CWPGhQgamIwC631bbmBdmxbI2wD0
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com,
- famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
-Message-ID: <2e03e805-9226-fdc7-7069-814c1346edd2@redhat.com>
-Subject: Re: [PATCH 09/21] qcow2: add .bdrv_load_autoloading_dirty_bitmaps
-References: <1479835586-74394-1-git-send-email-vsementsov@virtuozzo.com>
- <1479835586-74394-10-git-send-email-vsementsov@virtuozzo.com>
-In-Reply-To: <1479835586-74394-10-git-send-email-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=iso-8859-15
-Content-Transfer-Encoding: quoted-printable
+Following Stefan's suggestion I've investigated the possibility of
+potential problems with interrupts.
+Unfortunately, I can see no differences between both scenarios regarding
+the interrupt counter growth (c.f.
+https://evonide.com/images/qemu_proc_interrupts.png).
+After a short conversation with him I think we can exclude this as a
+problem source.
 
-On 22.11.2016 18:26, Vladimir Sementsov-Ogievskiy wrote:
-> Auto loading bitmaps are bitmaps in Qcow2, with the AUTO flag set. They=
+Please let me know if you have any further advice how I should proceed
+further in order to triage this bug.
 
-> are loaded when the image is opened and become BdrvDirtyBitmaps for the=
+On Wed, Dec 7, 2016 at 7:49 PM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
 
-> corresponding drive.
->=20
-> Extra data in bitmaps is not supported for now.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  block/Makefile.objs  |   2 +-
->  block/qcow2-bitmap.c | 663 +++++++++++++++++++++++++++++++++++++++++++=
-++++++++
->  block/qcow2.c        |   2 +
->  block/qcow2.h        |   3 +
->  4 files changed, 669 insertions(+), 1 deletion(-)
->  create mode 100644 block/qcow2-bitmap.c
->=20
-
-[...]
-
-> diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-> new file mode 100644
-> index 0000000..0f797e6
-> --- /dev/null
-> +++ b/block/qcow2-bitmap.c
-> @@ -0,0 +1,663 @@
-
-[...]
-
-> +/* Check table entry specification constraints. If cluster_size is 0, =
-offset
-> + * alignment is not checked. */
-> +static int check_table_entry(uint64_t entry, int cluster_size)
-> +{
-> +    uint64_t offset;
-> +
-> +    if (entry & BME_TABLE_ENTRY_RESERVED_MASK) {
-> +        return -EINVAL;
-> +    }
-> +
-> +    offset =3D entry & BME_TABLE_ENTRY_OFFSET_MASK;
-> +    if (offset !=3D 0) {
-> +        /* if offset specified, bit 0 must is reserved */
-
--must
-
-> +        if (entry & 1) {
-> +            return -EINVAL;
-> +        }
-> +
-> +        if ((cluster_size !=3D 0) && (entry % cluster_size !=3D 0)) {
-
-Why would cluster_size be 0? Also, shouldn't it be offset instead of entr=
-y?
-
-> +            return -EINVAL;
-> +        }
-> +    }
-> +
-> +    return 0;
-> +}
-
-[...]
-
-> +/* bitmap table entries must satisfy specification constraints */
-> +static int load_bitmap_data(BlockDriverState *bs,
-> +                            const uint64_t *bitmap_table,
-> +                            uint32_t bitmap_table_size,
-> +                            BdrvDirtyBitmap *bitmap)
-> +{
-> +    int ret =3D 0;
-> +    BDRVQcow2State *s =3D bs->opaque;
-> +    uint64_t sector, dsc;
-> +    uint64_t bm_size =3D bdrv_dirty_bitmap_size(bitmap);
-> +    uint8_t *buf =3D NULL;
-> +    uint64_t i, tab_size =3D
-> +            size_to_clusters(s,
-> +                bdrv_dirty_bitmap_serialization_size(bitmap, 0, bm_siz=
-e));
-> +
-> +    if (tab_size !=3D bitmap_table_size ||
-> +            tab_size > BME_MAX_TABLE_SIZE) {
-
-This line should be aligned to the opening parenthesis.
-
-[...]
-
-> +static int check_dir_entry(BlockDriverState *bs, Qcow2BitmapDirEntry *=
-entry)
-> +{
-> +    BDRVQcow2State *s =3D bs->opaque;
-> +    uint64_t phys_bitmap_bytes =3D
-> +            (uint64_t)entry->bitmap_table_size * s->cluster_size;
-> +    uint64_t max_virtual_bits =3D
-> +            (phys_bitmap_bytes * 8) << entry->granularity_bits;
-
-I think this shift can overflow, even if bitmap_table_size, cluster_size
-and granularity_bits are all within their respective limits.
-
-> +    int64_t nb_sectors =3D bdrv_nb_sectors(bs);
-
-Just using bdrv_getlength() would probably be simpler.
-
-> +
-> +    if (nb_sectors < 0) {
-> +        return nb_sectors;
-> +    }
-> +
-> +    int fail =3D
-
-I'd prefer a boolean.
-
-> +            (entry->bitmap_table_size =3D=3D 0) ||
-> +            (entry->bitmap_table_offset =3D=3D 0) ||
-> +            (entry->bitmap_table_offset % s->cluster_size) ||
-> +            (entry->bitmap_table_size > BME_MAX_TABLE_SIZE) ||
-> +            (phys_bitmap_bytes > BME_MAX_PHYS_SIZE) ||
-> +            (entry->bitmap_table_offset !=3D 0 &&
-> +                (nb_sectors << BDRV_SECTOR_BITS) > max_virtual_bits) |=
-|
-> +            (entry->granularity_bits > BME_MAX_GRANULARITY_BITS) ||
-> +            (entry->granularity_bits < BME_MIN_GRANULARITY_BITS) ||
-> +            (entry->flags & BME_RESERVED_FLAGS) ||
-> +            (entry->name_size > BME_MAX_NAME_SIZE) ||
-> +            (entry->type !=3D BT_DIRTY_TRACKING_BITMAP);
-> +
-> +    return fail ? -EINVAL : 0;
-> +}
-
-[...]
-
-> +/* bitmap_list_load
-> + * Get bitmap list from qcow2 image. Actually reads bitmap directory,
-> + * checks it and convert to bitmap list.
-> + */
-> +static Qcow2BitmapList *bitmap_list_load(BlockDriverState *bs, uint64_=
-t offset,
-> +                                         uint64_t size, Error **errp)
-> +{
-
-[...]
-
-> +    bm_list =3D bitmap_list_new();
-> +    for (e =3D (Qcow2BitmapDirEntry *)dir;
-> +             e < (Qcow2BitmapDirEntry *)dir_end; e =3D next_dir_entry(=
-e)) {
-
-This line should be aligned to the opening parenthesis.
-
-[...]
-
-> +
-> +/* bitmap_list_store
-> + * Store bitmap list to qcow2 image as a bitmap directory.
-> + * Everything is checked.
-> + */
-> +static int bitmap_list_store(BlockDriverState *bs, Qcow2BitmapList *bm=
-_list,
-> +                             uint64_t *offset, uint64_t *size, bool in=
-_place)
-> +{
-
-[...]
-
-> +fail:
-> +    g_free(dir);
-> +
-> +    if (dir_offset > 0) {
-> +        qcow2_free_clusters(bs, dir_offset, dir_size, QCOW2_DISCARD_OT=
-HER);
-
-I think this should only be freed if in_place is false.
-
-Max
-
-> +    }
-> +
-> +    return ret;
-> +}
-
-
---dLLa5CWPGhQgamIwC631bbmBdmxbI2wD0
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlhIdl0SHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9ARnEIAIQSrNtWaBcJdWpRlAQJQkVZmANWODCd
-u1Hg9fHu4QRkdRgXOOpNoybpIhdO82Ug8ERetfay84Nr19UPA2XtXP59VwiJRz4k
-+iiBaQUP78AeMbi3RiT3xr0V+C98CNkVstBH10a6ejDV7R+dqqdTMMc+Fx2/G+Us
-zSqOAcGcsHfkofYH25woRy2FpNhi2RQ7JF4USRMMkJJvkXjrCokDcDRwxiBcea2z
-vUm6lX38y49qFc/uhNacpaLo/lzNgefchZbv/FqWUFc3Gi9dJ6Nz0HExG66ost4a
-70oWj6zdQeIWFs9GvtseKPG4Nng7wZDPRIao5SscBg+tMJLvh3aokXw=
-=OECE
------END PGP SIGNATURE-----
-
---dLLa5CWPGhQgamIwC631bbmBdmxbI2wD0--
+> On Sun, Dec 4, 2016 at 10:52 PM, Ruslan Habalov <3v0n1d3@gmail.com> wrote:
+> > Hi everyone,
+> >
+> > I'm having the following qemu issue since about February on Xubuntu.
+> >
+> > Steps to reproduce:
+> > 1) Boot host and boot qemu guest - everything works perfect
+> > 2) Shutdown qemu guest
+> > 3) Suspend host and resume host
+> > 4) Boot qemu guest again - the guest is now extremely slow
+> >
+> > Current system setup:
+> > host: kernel 4.8.0-27-generic (also reproducible with older kernel
+> versions)
+> > qemu guest: Linux or Windows affected (tested both)
+> >
+> > I've tried to debug the issue on my own with the following results:
+> > ------------------------------------------------------------
+> ------------------------------------------------------------------
+> > https://www.evonide.com/images/qemu_problem.png
+> > - This shows "perf top $QEMU_PID" from guest boot to shutdown for three
+> > different scenarios:
+> >   Left: normal guest behavior after fresh boot of host system
+> >   Middle: very slow guest after host was suspended and resumed
+> >   Right: test run with disabled HPET (since I initially assumed some
+> > problems with HPET)
+> >
+> > https://www.evonide.com/images/qemu_hpet_investigation.png
+> > - Results of "perf record -g" and "perf report"
+> >   According to stefanha (qemu IRC) this doesn't seem to indicate any
+> error
+> > sources.
+> >
+> > https://www.evonide.com/images/qemu_vm_exit_healthy_vs_unhealthy.png
+> > - Results of running: "perf record -a -e kvm:kvm_exit" and "perf
+> > report" from guest boot to shutdown
+> >   - Left: normal situation (after fresh host boot)
+> >   - Right: bad situation    (after suspend and resume on host and boot of
+> > qemu guest)
+> >   There were ~300 out of order events reported by perf for the "bad"
+> > scenario (vs. only 2 for the "good" scenario).
+> > ------------------------------------------------------------
+> ------------------------------------------------------------------
+> > I was also recommended to check the host timers (e.g. /proc/timer_list).
+> > However, this file has more than 800 lines and I am unsure what to look
+> for.
+> >
+> > Please let me know if you need further information on this issue.
+>
+> Unfortunately I don't see an obvious pattern in the kvm_exit reasons.
+> Maybe someone on kvm@vger.kernel.org can help, I have CCed the list.
+>
+> One idea that might explain the read_hpet trace you collected is an
+> interrupt storm.  That means an interrupt is firing all the time
+> without doing useful work.  This could explain why the vcpu keeps
+> halting (leading to many ktime_get() calls on the host).
+>
+> You can check the interrupt storm theory by collecting
+> /proc/interrupts on the host and inside the guest.  If you compare the
+> healthy system against the slowed system there might be an obvious
+> difference in the interrupt counters.  That would allow you to track
+> down which device keeps firing an interrupt.
+>
+> Stefan
+>
