@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49079)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59694)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1cEjND-000853-3a
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 16:03:35 -0500
+	(envelope-from <sam@ravnborg.org>) id 1cEii0-0007kL-Ce
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 15:20:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1cEjNC-0001TO-0g
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 16:03:31 -0500
-Date: Wed, 7 Dec 2016 22:02:21 +0100
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Message-ID: <20161207210221.GF9606@toto>
-References: <1481046379-32632-1-git-send-email-peter.maydell@linaro.org>
-	<1481046379-32632-3-git-send-email-peter.maydell@linaro.org>
+	(envelope-from <sam@ravnborg.org>) id 1cEihw-0006fN-Mc
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 15:20:56 -0500
+Received: from asavdk4.altibox.net ([109.247.116.15]:41575)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sam@ravnborg.org>) id 1cEihw-0006eV-Fp
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 15:20:52 -0500
+Date: Wed, 7 Dec 2016 21:20:39 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
+Message-ID: <20161207202039.GA27878@ravnborg.org>
+References: <1480595945-63656-2-git-send-email-arei.gonglei@huawei.com>
+	<201612041032.loAEWLIy%fengguang.wu@intel.com>
+	<33183CC9F5247A488A2544077AF19020DA1528DE@DGGEMA505-MBX.china.huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1481046379-32632-3-git-send-email-peter.maydell@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH 2/3] hw/intc/arm_gicv3: Remove incorrect
- usage of fieldoffset
+In-Reply-To: <33183CC9F5247A488A2544077AF19020DA1528DE@DGGEMA505-MBX.china.huawei.com>
+Subject: Re: [Qemu-devel] [PATCH v5 1/1] crypto: add virtio-crypto driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,91 +28,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+To: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Cc: kbuild test robot <lkp@intel.com>, "davem@davemloft.net" <davem@davemloft.net>, "kbuild-all@01.org" <kbuild-all@01.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>, Luonengjun <luonengjun@huawei.com>, "mst@redhat.com" <mst@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "Wubin (H)" <wu.wubin@huawei.com>, "xin.zeng@intel.com" <xin.zeng@intel.com>, Claudio Fontana <Claudio.Fontana@huawei.com>, "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>, "pasic@linux.vnet.ibm.com" <pasic@linux.vnet.ibm.com>, "Zhoujian (jay, Euler)" <jianjay.zhou@huawei.com>, "Hanweidong (Randy)" <hanweidong@huawei.com>, "arei.gonglei@hotmail.com" <arei.gonglei@hotmail.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "Xuquan (Quan Xu)" <xuquan8@huawei.com>, longpeng <longpeng2@huawei.com>, "Wanzongshun (Vincent)" <wanzongshun@huawei.com>
 
-On Tue, Dec 06, 2016 at 05:46:18PM +0000, Peter Maydell wrote:
-> In the ARMCPRegInfo definitions for the GICv3 CPU interface
-> registers, we were trying to use .fieldoffset to specify
-> the locations of data fields within the GICv3CPUState struct.
-> This is completely broken, because .fieldoffset is for offsets
-> into the CPUARMState struct. We didn't notice because we
-> were only using this for reads to BPR0, AP0R<n>, IGRPEN0
-> and CTLR_EL3, and Linux doesn't use these registers.
+On Mon, Dec 05, 2016 at 03:12:52AM +0000, Gonglei (Arei) wrote:
+> I don't think the root cause of those warnings are introduced by virtio-crypto driver.
 > 
-> Replace the .fieldoffset uses with explicit read functions.
+> What's your opinion? Sam and David?
 
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Root cause here is that arch/sparc/include/asm/topology_64.h
+references cpu_data without including arch/sparc/include/asm/cpudata.h
 
+I think other architectures pull in the dependency from
+either smp.h or they have it topology.h.
 
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  hw/intc/arm_gicv3_cpuif.c | 13 ++++++-------
->  1 file changed, 6 insertions(+), 7 deletions(-)
-> 
-> diff --git a/hw/intc/arm_gicv3_cpuif.c b/hw/intc/arm_gicv3_cpuif.c
-> index bca30c4..35e8eb3 100644
-> --- a/hw/intc/arm_gicv3_cpuif.c
-> +++ b/hw/intc/arm_gicv3_cpuif.c
-> @@ -1118,35 +1118,35 @@ static const ARMCPRegInfo gicv3_cpuif_reginfo[] = {
->        .opc0 = 3, .opc1 = 0, .crn = 12, .crm = 8, .opc2 = 3,
->        .type = ARM_CP_IO | ARM_CP_NO_RAW,
->        .access = PL1_RW, .accessfn = gicv3_fiq_access,
-> -      .fieldoffset = offsetof(GICv3CPUState, icc_bpr[GICV3_G0]),
-> +      .readfn = icc_bpr_read,
->        .writefn = icc_bpr_write,
->      },
->      { .name = "ICC_AP0R0_EL1", .state = ARM_CP_STATE_BOTH,
->        .opc0 = 3, .opc1 = 0, .crn = 12, .crm = 8, .opc2 = 4,
->        .type = ARM_CP_IO | ARM_CP_NO_RAW,
->        .access = PL1_RW, .accessfn = gicv3_fiq_access,
-> -      .fieldoffset = offsetof(GICv3CPUState, icc_apr[GICV3_G0][0]),
-> +      .readfn = icc_ap_read,
->        .writefn = icc_ap_write,
->      },
->      { .name = "ICC_AP0R1_EL1", .state = ARM_CP_STATE_BOTH,
->        .opc0 = 3, .opc1 = 0, .crn = 12, .crm = 8, .opc2 = 5,
->        .type = ARM_CP_IO | ARM_CP_NO_RAW,
->        .access = PL1_RW, .accessfn = gicv3_fiq_access,
-> -      .fieldoffset = offsetof(GICv3CPUState, icc_apr[GICV3_G0][1]),
-> +      .readfn = icc_ap_read,
->        .writefn = icc_ap_write,
->      },
->      { .name = "ICC_AP0R2_EL1", .state = ARM_CP_STATE_BOTH,
->        .opc0 = 3, .opc1 = 0, .crn = 12, .crm = 8, .opc2 = 6,
->        .type = ARM_CP_IO | ARM_CP_NO_RAW,
->        .access = PL1_RW, .accessfn = gicv3_fiq_access,
-> -      .fieldoffset = offsetof(GICv3CPUState, icc_apr[GICV3_G0][2]),
-> +      .readfn = icc_ap_read,
->        .writefn = icc_ap_write,
->      },
->      { .name = "ICC_AP0R3_EL1", .state = ARM_CP_STATE_BOTH,
->        .opc0 = 3, .opc1 = 0, .crn = 12, .crm = 8, .opc2 = 7,
->        .type = ARM_CP_IO | ARM_CP_NO_RAW,
->        .access = PL1_RW, .accessfn = gicv3_fiq_access,
-> -      .fieldoffset = offsetof(GICv3CPUState, icc_apr[GICV3_G0][3]),
-> +      .readfn = icc_ap_read,
->        .writefn = icc_ap_write,
->      },
->      /* All the ICC_AP1R*_EL1 registers are banked */
-> @@ -1275,7 +1275,7 @@ static const ARMCPRegInfo gicv3_cpuif_reginfo[] = {
->        .opc0 = 3, .opc1 = 0, .crn = 12, .crm = 12, .opc2 = 6,
->        .type = ARM_CP_IO | ARM_CP_NO_RAW,
->        .access = PL1_RW, .accessfn = gicv3_fiq_access,
-> -      .fieldoffset = offsetof(GICv3CPUState, icc_igrpen[GICV3_G0]),
-> +      .readfn = icc_igrpen_read,
->        .writefn = icc_igrpen_write,
->      },
->      /* This register is banked */
-> @@ -1299,7 +1299,6 @@ static const ARMCPRegInfo gicv3_cpuif_reginfo[] = {
->        .opc0 = 3, .opc1 = 6, .crn = 12, .crm = 12, .opc2 = 4,
->        .type = ARM_CP_IO | ARM_CP_NO_RAW,
->        .access = PL3_RW,
-> -      .fieldoffset = offsetof(GICv3CPUState, icc_ctlr_el3),
->        .readfn = icc_ctlr_el3_read,
->        .writefn = icc_ctlr_el3_write,
->      },
-> -- 
-> 2.7.4
-> 
+The easy fix would be to include cpudata.h in arch/sparc/include/asm/topology_64.h.
+And that should also be a correct fix.
+
+Could you include this in your patch-set and build test it?
+
+	Sam
