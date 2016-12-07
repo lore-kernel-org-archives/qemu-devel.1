@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56743)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57169)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cEdI7-0008Sg-M5
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 09:33:52 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cEdJm-00013b-Ph
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 09:35:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cEdI1-0005To-QW
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 09:33:51 -0500
-Received: from mail-ua0-f181.google.com ([209.85.217.181]:34869)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cEdI1-0005TU-ER
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 09:33:45 -0500
-Received: by mail-ua0-f181.google.com with SMTP id 12so416880454uas.2
-	for <qemu-devel@nongnu.org>; Wed, 07 Dec 2016 06:33:45 -0800 (PST)
+	(envelope-from <kwolf@redhat.com>) id 1cEdJg-0006Gq-UZ
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 09:35:34 -0500
+Date: Wed, 7 Dec 2016 15:35:21 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20161207143521.GF4773@noname.str.redhat.com>
+References: <20161202192223.15153-1-eblake@redhat.com>
+	<20161202192223.15153-5-eblake@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20161207142449.GC1476@redhat.com>
-References: <CAFEAcA9kODkdK96a=rdZS7+xSW0drj4vLMev-AVio-uewm6Cbw@mail.gmail.com>
-	<20161207120419.GA1476@redhat.com>
-	<CAFEAcA8UofRa9Yo93vsFYDqJaW5YuKKF68X+2ae=GKdp8w9HWg@mail.gmail.com>
-	<20161207140715.GB1476@redhat.com>
-	<CAFEAcA-8P3cv=ce_jjQRAa5Oh-1EDUByuJq-tX2sX29vVm-5mQ@mail.gmail.com>
-	<20161207142449.GC1476@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 7 Dec 2016 14:32:24 +0000
-Message-ID: <CAFEAcA-riLzPyfT+CSbEgLzRoJiGVRByk7Ft7EdDqhVcOH4vHg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] qemu -netdev tun/tap support can't handle macvtap
- type devices
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20161202192223.15153-5-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 4/5] blkdebug: Add ability to override
+ unmap geometries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,36 +24,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, mreitz@redhat.com, qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>
 
-On 7 December 2016 at 14:24, Daniel P. Berrange <berrange@redhat.com> wrote:
-> On Wed, Dec 07, 2016 at 02:21:24PM +0000, Peter Maydell wrote:
->> On 7 December 2016 at 14:07, Daniel P. Berrange <berrange@redhat.com> wrote:
->> > On Wed, Dec 07, 2016 at 12:30:31PM +0000, Peter Maydell wrote:
->> >> On 7 December 2016 at 12:04, Daniel P. Berrange <berrange@redhat.com> wrote:
->> >> > note 'fds' plural, instead of 'fd'
->> >>
->> >> What's the difference between that and the "usual suggested workaround"
->> >> I described above that doesn't work with queues=... ?
->> >
->> > It just seems the 'queues' param always wants you to use 'fds' instead
->> > of 'fd' - 'fds' takes a comma-separated list of FDs - one per queue
->> > and 'fd' only takes a single FD.
->>
->> Oh, I see. That seems a bit obscure :-)
->
-> And pointless, because QemuOpts would have allowed use of 'fd' multiple
-> times instead of inventing a new arg.  fd=1,fd=3,fd=6 could have worked
-> fine with multi-queue :-(
+Am 02.12.2016 um 20:22 hat Eric Blake geschrieben:
+> Make it easier to simulate various unusual hardware setups (for
+> example, recent commits 3482b9b and b8d0a98 affect the Dell
+> Equallogic iSCSI with its 15M preferred and maximum unmap and
+> write zero sizing, or b2f95fe deals with the Linux loopback
+> block device having a max_transfer of 64k), by allowing blkdebug
+> to wrap any other device with further restrictions on various
+> alignments.
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> 
+> ---
+> v3: improve legibility of bounds checking, improve docs
+> v2: new patch
+> ---
+>  qapi/block-core.json | 27 ++++++++++++++-
+>  block/blkdebug.c     | 96 ++++++++++++++++++++++++++++++++++++++++++++++++++--
+>  2 files changed, 120 insertions(+), 3 deletions(-)
+> 
+> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> index c29bef7..26f3e9f 100644
+> --- a/qapi/block-core.json
+> +++ b/qapi/block-core.json
+> @@ -2068,6 +2068,29 @@
+>  # @align:           #optional required alignment for requests in bytes,
+>  #                   must be power of 2, or 0 for default
+>  #
+> +# @max-transfer:    #optional maximum size for I/O transfers in bytes,
+> +#                   must be multiple of the larger of @align and and 512
 
-I guess the best we could do now would be to make fd= and fds= synonyms
-with both supporting either comma-separated or being specified
-multiple times ?
+s/and and/and/
 
-It's particularly confusing in this case that fd= doesn't work with
-queues=, because the user isn't trying to pass multiple fds, just
-the one is fine.
+> +#                   (but need not be a power of 2), or 0 for default
+> +#                   (since 2.9)
 
-thanks
--- PMM
+What is the reason for the 512 bytes restriction? Not really a problem,
+though, allowing more values later is easier than restricting them.
+
+The rest looks good.
+
+Kevin
