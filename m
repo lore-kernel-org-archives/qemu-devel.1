@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40701)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41972)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cEe8s-0007LF-Rn
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 10:28:24 -0500
+	(envelope-from <dave.hansen@intel.com>) id 1cEeEp-0000A3-MN
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 10:34:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cEe8p-0004ZO-OV
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 10:28:22 -0500
-Resent-Message-Id: <E1cEe8p-0004ZO-OV@eggs.gnu.org>
-Received: from sender163-mail.zoho.com ([74.201.84.163]:21494)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1cEe8p-0004Yv-FF
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 10:28:19 -0500
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <148112449106.154.16454651802669413265@5b492b8a941d>
-In-Reply-To: <cover.1481121503.git.julian@codesourcery.com>
+	(envelope-from <dave.hansen@intel.com>) id 1cEeEm-0006BP-Iw
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 10:34:31 -0500
+Received: from mga03.intel.com ([134.134.136.65]:59256)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dave.hansen@intel.com>)
+	id 1cEeEm-00069w-7I
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 10:34:28 -0500
+References: <1480495397-23225-1-git-send-email-liang.z.li@intel.com>
+	<f67ca79c-ad34-59dd-835f-e7bc9dcaef58@redhat.com>
+	<F2CBF3009FA73547804AE4C663CAB28E3A130C01@shsmsx102.ccr.corp.intel.com>
+From: Dave Hansen <dave.hansen@intel.com>
+Message-ID: <f7b47cc4-ee94-bacb-5a17-d049b402263e@intel.com>
+Date: Wed, 7 Dec 2016 07:34:23 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 7 Dec 2016 07:28:12 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v2 0/6] ARM BE8/BE32 big-endian system-mode
- fixes (semihosting, gdbstub)
+In-Reply-To: <F2CBF3009FA73547804AE4C663CAB28E3A130C01@shsmsx102.ccr.corp.intel.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH kernel v5 0/5] Extend virtio-balloon for
+ fast (de)inflating & fast live migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,48 +30,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: julian@codesourcery.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org
+To: "Li, Liang Z" <liang.z.li@intel.com>, David Hildenbrand <david@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Cc: "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "mhocko@suse.com" <mhocko@suse.com>, "mst@redhat.com" <mst@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "dgilbert@redhat.com" <dgilbert@redhat.com>
 
-SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQQVRDSCB2MiAwLzZdIEFSTSBCRTgvQkUzMiBiaWctZW5kaWFuIHN5c3RlbS1tb2Rl
-IGZpeGVzIChzZW1paG9zdGluZywgZ2Ric3R1YikKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IGNv
-dmVyLjE0ODExMjE1MDMuZ2l0Lmp1bGlhbkBjb2Rlc291cmNlcnkuY29tCgo9PT0gVEVTVCBTQ1JJ
-UFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAt
-LW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKIyBVc2VmdWwgZ2l0IG9wdGlvbnMK
-Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwg
-ZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVy
-c2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFU
-Q0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAh
-IGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1t
-YWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAg
-bj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVw
-ZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRw
-czovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKIC0gW3RhZyB1cGRhdGVdICAgICAg
-cGF0Y2hldy8xNDgxMDc3NzUxLTEwNjE5Mi0xLWdpdC1zZW5kLWVtYWlsLWFyZWkuZ29uZ2xlaUBo
-dWF3ZWkuY29tIC0+IHBhdGNoZXcvMTQ4MTA3Nzc1MS0xMDYxOTItMS1naXQtc2VuZC1lbWFpbC1h
-cmVpLmdvbmdsZWlAaHVhd2VpLmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjdj
-OTQ5MmUgQVJNIEJFMzIgd2F0Y2hwb2ludCBmaXguCjBlYTQ1MmEgRml4IFRodW1iLTEgQkUzMiBl
-eGVjdXRpb24gYW5kIGRpc2Fzc2VtYmx5LgpjMGE2ZjEzIEFSTSBiaWctZW5kaWFuIHN5c3RlbS1t
-b2RlIGdkYnN0dWIgc3VwcG9ydC4KZTRhZWQ2YiBBUk0gYmlnLWVuZGlhbiBzeXN0ZW0tbW9kZSBz
-ZW1paG9zdGluZyBzdXBwb3J0LgpiYWNkZDBhIEluZmVyIGVuZGlhbm5lc3MgZnJvbSBTQ1RMUiBy
-ZXNldCB2YWx1ZS4KYTA1NGJkOCBBZGQgY2ZnZW5kIHBhcmFtZXRlciBmb3IgQVJNIENQVSBzZWxl
-Y3Rpb24uCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzY6IEFkZCBjZmdl
-bmQgcGFyYW1ldGVyIGZvciBBUk0gQ1BVIHNlbGVjdGlvbi4uLi4KQ2hlY2tpbmcgUEFUQ0ggMi82
-OiBJbmZlciBlbmRpYW5uZXNzIGZyb20gU0NUTFIgcmVzZXQgdmFsdWUuLi4uCkNoZWNraW5nIFBB
-VENIIDMvNjogQVJNIGJpZy1lbmRpYW4gc3lzdGVtLW1vZGUgc2VtaWhvc3Rpbmcgc3VwcG9ydC4u
-Li4KQ2hlY2tpbmcgUEFUQ0ggNC82OiBBUk0gYmlnLWVuZGlhbiBzeXN0ZW0tbW9kZSBnZGJzdHVi
-IHN1cHBvcnQuLi4uCkNoZWNraW5nIFBBVENIIDUvNjogRml4IFRodW1iLTEgQkUzMiBleGVjdXRp
-b24gYW5kIGRpc2Fzc2VtYmx5Li4uLgpDaGVja2luZyBQQVRDSCA2LzY6IEFSTSBCRTMyIHdhdGNo
-cG9pbnQgZml4Li4uLgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBiZXR3ZWVuIGZ1bmN0aW9uIG5h
-bWUgYW5kIG9wZW4gcGFyZW50aGVzaXMgJygnCiMzNTogRklMRTogaW5jbHVkZS9xb20vY3B1Lmg6
-MTk4OgorICAgIHZhZGRyICgqYWRqdXN0X3dhdGNocG9pbnRfYWRkcmVzcykoQ1BVU3RhdGUgKmNw
-dSwgdmFkZHIgYWRkciwgaW50IGxlbik7Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDgw
-IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2
-aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0
-aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09
-PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0K
-RW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcu
-b3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlz
-dHMub3Jn
+On 12/07/2016 05:35 AM, Li, Liang Z wrote:
+>> Am 30.11.2016 um 09:43 schrieb Liang Li:
+>> IOW in real examples, do we have really large consecutive areas or are all
+>> pages just completely distributed over our memory?
+> 
+> The buddy system of Linux kernel memory management shows there should
+> be quite a lot of consecutive pages as long as there are a portion of
+> free memory in the guest.
+...
+> If all pages just completely distributed over our memory, it means
+> the memory fragmentation is very serious, the kernel has the
+> mechanism to avoid this happened.
+
+While it is correct that the kernel has anti-fragmentation mechanisms, I
+don't think it invalidates the question as to whether a bitmap would be
+too sparse to be effective.
+
+> In the other hand, the inflating should not happen at this time because the guest is almost
+> 'out of memory'.
+
+I don't think this is correct.  Most systems try to run with relatively
+little free memory all the time, using the bulk of it as page cache.  We
+have no reason to expect that ballooning will only occur when there is
+lots of actual free memory and that it will not occur when that same
+memory is in use as page cache.
+
+In these patches, you're effectively still sending pfns.  You're just
+sending one pfn per high-order page which is giving a really nice
+speedup.  IMNHO, you're avoiding doing a real bitmap because creating a
+bitmap means either have a really big bitmap, or you would have to do
+some sorting (or multiple passes) of the free lists before populating a
+smaller bitmap.
+
+Like David, I would still like to see some data on whether the choice
+between bitmaps and pfn lists is ever clearly in favor of bitmaps.  You
+haven't convinced me, at least, that the data isn't even worth collecting.
