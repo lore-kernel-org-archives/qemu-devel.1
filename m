@@ -1,18 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58355)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40665)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cETtE-0005NC-Kc
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 23:31:33 -0500
+	(envelope-from <peterx@redhat.com>) id 1cEVA3-0005yx-2B
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 00:52:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cETt9-0006bA-Oj
-	for qemu-devel@nongnu.org; Tue, 06 Dec 2016 23:31:32 -0500
-Sender: Richard Henderson <rth7680@gmail.com>
-From: Richard Henderson <rth@twiddle.net>
-Date: Tue,  6 Dec 2016 20:30:20 -0800
-Message-Id: <1481085020-2614-3-git-send-email-rth@twiddle.net>
-In-Reply-To: <1481085020-2614-1-git-send-email-rth@twiddle.net>
-References: <1481085020-2614-1-git-send-email-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH 2/2] target-arm: Fix aarch64
- disas_ldst_single_struct
+	(envelope-from <peterx@redhat.com>) id 1cEV9y-0000Wu-7p
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 00:52:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41698)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cEV9y-0000WG-1f
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 00:52:54 -0500
+Received: from int-mx13.intmail.prod.int.phx2.redhat.com
+	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D0CC64E357
+	for <qemu-devel@nongnu.org>; Wed,  7 Dec 2016 05:52:51 +0000 (UTC)
+From: Peter Xu <peterx@redhat.com>
+Date: Wed,  7 Dec 2016 13:52:43 +0800
+Message-Id: <1481089965-3888-1-git-send-email-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.9 0/2] VT-d extend GAW to 48 bits
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,32 +28,24 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org
+Cc: jasowang@redhat.com, famz@redhat.com, peterx@redhat.com, mst@redhat.com
 
-We add s->be_data within do_vec_ld/st.  Adding it here means that
-we have the wrong bits set in SIZE for a big-endian host, leading
-to g_assert_not_reached in write_vec_element and read_vec_element.
+The first patch did some check to make sure the CE GAW bits are always
+valid (it can overflow in old codes, I see it dangerous).
 
-Signed-off-by: Richard Henderson <rth@twiddle.net>
----
- target-arm/translate-a64.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+The second patch extended VT-d GAW (Guest Address Width) from 39 bits
+to 48 bits.
 
-diff --git a/target-arm/translate-a64.c b/target-arm/translate-a64.c
-index ef7601b..f673d93 100644
---- a/target-arm/translate-a64.c
-+++ b/target-arm/translate-a64.c
-@@ -2830,9 +2830,9 @@ static void disas_ldst_single_struct(DisasContext *s, uint32_t insn)
-         } else {
-             /* Load/store one element per register */
-             if (is_load) {
--                do_vec_ld(s, rt, index, tcg_addr, s->be_data + scale);
-+                do_vec_ld(s, rt, index, tcg_addr, scale);
-             } else {
--                do_vec_st(s, rt, index, tcg_addr, s->be_data + scale);
-+                do_vec_st(s, rt, index, tcg_addr, scale);
-             }
-         }
-         tcg_gen_addi_i64(tcg_addr, tcg_addr, ebytes);
+Please review. Thanks,
+
+Peter Xu (2):
+  intel_iommu: check validity for GAW bits in CE
+  intel_iommu: extend supported guest aw to 48 bits
+
+ hw/i386/intel_iommu.c          | 12 +++++++++++-
+ hw/i386/intel_iommu_internal.h |  7 +++++--
+ include/hw/i386/intel_iommu.h  |  2 +-
+ 3 files changed, 17 insertions(+), 4 deletions(-)
+
 -- 
 2.7.4
