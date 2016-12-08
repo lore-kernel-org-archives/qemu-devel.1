@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56226)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58403)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cEzUe-0001f8-IF
-	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 09:16:20 -0500
+	(envelope-from <martin@lichtvoll.de>) id 1cEzaj-0000yA-EX
+	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 09:22:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cEzUd-0005xT-OE
-	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 09:16:16 -0500
-Date: Thu, 8 Dec 2016 14:16:00 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20161208141600.GM26641@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1481203391-9523-1-git-send-email-kwolf@redhat.com>
-	<1481203391-9523-4-git-send-email-kwolf@redhat.com>
+	(envelope-from <martin@lichtvoll.de>) id 1cEzag-00082l-By
+	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 09:22:33 -0500
+Received: from mondschein.lichtvoll.de ([194.150.191.11]:33925
+	helo=mail.lichtvoll.de) by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <martin@lichtvoll.de>) id 1cEzag-00082B-5d
+	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 09:22:30 -0500
+From: Martin Steigerwald <martin@lichtvoll.de>
+Date: Thu, 08 Dec 2016 15:22:27 +0100
+Message-ID: <1514222.8V9WS3jFTv@merkaba>
+In-Reply-To: <9130d11d-f31f-3c16-529f-1d470b4336c3@tuxfamily.org>
+References: <4210685.WpqiJ5gano@merkaba>
+	<9130d11d-f31f-3c16-529f-1d470b4336c3@tuxfamily.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1481203391-9523-4-git-send-email-kwolf@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 3/6] iscsi: Add initiator-name option
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] QEMU Advent Calendar
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,25 +27,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, jcody@redhat.com, pl@kamp.de, ptoscano@redhat.com, ronniesahlberg@gmail.com, pbonzini@redhat.com, qemu-devel@nongnu.org
+To: Thomas Huth <huth@tuxfamily.org>
+Cc: qemu-devel@nongnu.org, Kashyap Chamarthy <kashyapc@fedoraproject.org>
 
-On Thu, Dec 08, 2016 at 02:23:08PM +0100, Kevin Wolf wrote:
-> This was previously only available with -iscsi. Again, after this patch,
-> the -iscsi option only takes effect if an URL is given. New users are
-> supposed to use the new driver-specific option.
-> 
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  block/iscsi.c | 32 +++++++++++++++-----------------
->  1 file changed, 15 insertions(+), 17 deletions(-)
+Am Donnerstag, 8. Dezember 2016, 09:14:06 CET schrieb Thomas Huth:
+> On 07.12.2016 23:15, Martin Steigerwald wrote:
+[=E2=80=A6]
+> > Considered
+> >=20
+> > http://aros.sourceforge.net/
+> >=20
+> > or some of its distributions?
+>=20
+> Yes, just yesterday, somebody else suggested that to me. So far, I only
+> thought this OS would run on some Amiga hardware and clones, I wasn't
+> aware of the icaros distribution which also runs on x86. I'll have a
+> closer look when time permits...
 
-Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
+Also AROS itself is available for x86. Thats actually where it started. m68=
+k=20
+ports nowadays also used in a free replacement Kickstart ROM for WinUAE, ot=
+her=20
+emulators and I think also physical classic Amiga=C2=B4s came at a later ti=
+me.
 
+The Icaros distribution my be just fine as a show case for QEMU.
 
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+Thanks,
+=2D-=20
+Martin
