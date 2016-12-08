@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38170)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48877)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cEnaf-0004F9-Pz
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 20:34:15 -0500
+	(envelope-from <jasowang@redhat.com>) id 1cEnsh-0006rO-JM
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 20:52:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cEnaH-0003YL-TI
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 20:33:41 -0500
-References: <1480575357-25056-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<a1593129-ddb9-8e74-5865-b1e8400c991d@redhat.com>
-	<8b90a1da-a129-f2cb-4545-355348387925@cn.fujitsu.com>
-	<063dfa33-2015-e566-c623-d59578c20fcd@redhat.com>
-	<13aed710-c5d1-b1de-5922-52e3e53029f9@cn.fujitsu.com>
-	<956d6c43-0904-e094-1adb-bb7c584967d0@vivier.eu>
-	<20161207133049.GA32099@stefanha-x1.localdomain>
-From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Message-ID: <fc30a10e-10d5-6b53-d098-f00780cdbe16@cn.fujitsu.com>
-Date: Thu, 8 Dec 2016 09:32:56 +0800
+	(envelope-from <jasowang@redhat.com>) id 1cEnsc-0006nK-PR
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 20:52:19 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59978)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cEnsc-0006md-J4
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 20:52:14 -0500
+References: <CAFEAcA9kODkdK96a=rdZS7+xSW0drj4vLMev-AVio-uewm6Cbw@mail.gmail.com>
+	<20161207120419.GA1476@redhat.com>
+	<CAFEAcA8UofRa9Yo93vsFYDqJaW5YuKKF68X+2ae=GKdp8w9HWg@mail.gmail.com>
+	<20161207140715.GB1476@redhat.com>
+	<CAFEAcA-8P3cv=ce_jjQRAa5Oh-1EDUByuJq-tX2sX29vVm-5mQ@mail.gmail.com>
+	<20161207142449.GC1476@redhat.com>
+	<CAFEAcA-riLzPyfT+CSbEgLzRoJiGVRByk7Ft7EdDqhVcOH4vHg@mail.gmail.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <c1475981-5d6f-a623-525c-fa72b101a96b@redhat.com>
+Date: Thu, 8 Dec 2016 09:52:07 +0800
 MIME-Version: 1.0
-In-Reply-To: <20161207133049.GA32099@stefanha-x1.localdomain>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH for-2.9] docs: Fix
- description of the sentence
+In-Reply-To: <CAFEAcA-riLzPyfT+CSbEgLzRoJiGVRByk7Ft7EdDqhVcOH4vHg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] qemu -netdev tun/tap support can't handle macvtap
+ type devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,46 +33,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>, Laurent Vivier <laurent@vivier.eu>
-Cc: Laurent Vivier <lvivier@redhat.com>, Eric Blake <eblake@redhat.com>, qemu devel <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Jason Wang <jasowang@redhat.com>, Stefan Weil <sw@weilnetz.de>
+To: Peter Maydell <peter.maydell@linaro.org>, "Daniel P. Berrange" <berrange@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
 
 
-On 12/07/2016 09:30 PM, Stefan Hajnoczi wrote:
-> On Wed, Dec 07, 2016 at 10:01:49AM +0100, Laurent Vivier wrote:
->> Le 07/12/2016 à 09:58, Zhang Chen a écrit :
->>>
->>> On 12/02/2016 03:57 PM, Laurent Vivier wrote:
->>>> On 02/12/2016 03:59, Zhang Chen wrote:
->>>>> On 12/01/2016 10:57 PM, Eric Blake wrote:
->>>>>> On 12/01/2016 12:55 AM, Zhang Chen wrote:
->>>>>>> Say it in another way to make it easier to understand.
->>>>>>>
->>>>>>> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
->>>>>>> Signed-off-by: Eric Blake <eblake@redhat.com>
->>>>>> I guess that's because I suggested the replacement text to use, even
->>>>>> though I didn't write the patch.
->>>>> Yes, In that case, should I change the signed-off-by to acked-by or
->>>>> remove it?
->>>> You can use "Suggested-by:"
->>>>
->>>> https://www.kernel.org/doc/Documentation/SubmittingPatches
->>>>
->>>> Laurent
->>>>
->>> Should I fix it? or can you pick up this directly for 2.8?
->> I don't think it is needed.
->> Perhaps Stefan H can take it directly in his staging tree?
-> Too late for that now.  This should be merged through Jason Wang (net
-> maintainer) like any other colo-proxy patch.
+On 2016=E5=B9=B412=E6=9C=8807=E6=97=A5 22:32, Peter Maydell wrote:
+> On 7 December 2016 at 14:24, Daniel P. Berrange <berrange@redhat.com> w=
+rote:
+>> On Wed, Dec 07, 2016 at 02:21:24PM +0000, Peter Maydell wrote:
+>>> On 7 December 2016 at 14:07, Daniel P. Berrange <berrange@redhat.com>=
+ wrote:
+>>>> On Wed, Dec 07, 2016 at 12:30:31PM +0000, Peter Maydell wrote:
+>>>>> On 7 December 2016 at 12:04, Daniel P. Berrange <berrange@redhat.co=
+m> wrote:
+>>>>>> note 'fds' plural, instead of 'fd'
+>>>>> What's the difference between that and the "usual suggested workaro=
+und"
+>>>>> I described above that doesn't work with queues=3D... ?
+>>>> It just seems the 'queues' param always wants you to use 'fds' inste=
+ad
+>>>> of 'fd' - 'fds' takes a comma-separated list of FDs - one per queue
+>>>> and 'fd' only takes a single FD.
+>>> Oh, I see. That seems a bit obscure :-)
+>> And pointless, because QemuOpts would have allowed use of 'fd' multipl=
+e
+>> times instead of inventing a new arg.  fd=3D1,fd=3D3,fd=3D6 could have=
+ worked
+>> fine with multi-queue :-(
+> I guess the best we could do now would be to make fd=3D and fds=3D syno=
+nyms
+> with both supporting either comma-separated or being specified
+> multiple times ?
+
+When multiqueue were introduced, qemu does not support such kind of=20
+parameters. This maybe useful (or use fd[0],fd[1]), but I'm not sure=20
+this is really needed consider libvirt is in charge of doing such things=20
+now.
+
 >
+> It's particularly confusing in this case that fd=3D doesn't work with
+> queues=3D, because the user isn't trying to pass multiple fds, just
+> the one is fine.
 
-OK~ I change the subject to "for-2.9" and cc Jason.
+Since fd can only accept on file descriptor, so it implies 1 queue. For=20
+"fds", specifying queues seems redundant, since qemu can count the #fds=20
+by itself.
 
 Thanks
-Zhang Chen
 
-
--- 
-Thanks
-zhangchen
+>
+> thanks
+> -- PMM
+>
