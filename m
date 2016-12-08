@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53059)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59271)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1cEopG-0007MT-Pa
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 21:52:52 -0500
+	(envelope-from <tianyu.lan@intel.com>) id 1cEp1M-0001w1-AA
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 22:05:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1cEopC-0007Yu-3Y
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 21:52:50 -0500
-Received: from szxga02-in.huawei.com ([119.145.14.65]:21222)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1cEopB-0007Tv-Nf
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 21:52:46 -0500
-From: "Longpeng(Mike)" <longpeng2@huawei.com>
-Date: Thu, 8 Dec 2016 10:52:26 +0800
-Message-ID: <1481165546-203200-1-git-send-email-longpeng2@huawei.com>
+	(envelope-from <tianyu.lan@intel.com>) id 1cEp1H-00065y-Ci
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 22:05:20 -0500
+Received: from mga02.intel.com ([134.134.136.20]:65463)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <tianyu.lan@intel.com>)
+	id 1cEp1H-00065H-5L
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 22:05:15 -0500
+References: <1481020588-4245-1-git-send-email-peterx@redhat.com>
+	<1481020588-4245-12-git-send-email-peterx@redhat.com>
+From: Lan Tianyu <tianyu.lan@intel.com>
+Message-ID: <f8541994-4a68-add3-6378-36dc9e37219f@intel.com>
+Date: Thu, 8 Dec 2016 11:01:53 +0800
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH for-2.9] cryptodev: add 3des-ede support
+In-Reply-To: <1481020588-4245-12-git-send-email-peterx@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RFC PATCH 11/13] intel_iommu: provide its own
+ replay() callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,44 +29,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: arei.gonglei@huawei.com
-Cc: wu.wubin@huawei.com, jianjay.zhou@huawei.com, qemu-devel@nongnu.org, "Longpeng(Mike)" <longpeng2@huawei.com>
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+Cc: kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, bd.aviv@gmail.com, alex.williamson@redhat.com, jasowang@redhat.com
 
-This patch add 3des-ede support for cryptodev. However this is effective
-only when backend using libgcrypt/nettle, because cipher-builtin doesn't
-support 3des-ede yet.
+On 2016年12月06日 18:36, Peter Xu wrote:
+> +/**
+> + * vtd_page_walk - walk specific IOVA range, and call the hook
+> + *
+> + * @ce: context entry to walk upon
+> + * @start: IOVA address to start the walk
+> + * @end: size of the IOVA range to walk over
 
-Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
----
-Changes since v1:
-    - split the original pathset. [Gonglei]
 
----
- backends/cryptodev-builtin.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+*·@end:·IOVA·range·end·address·(start·<=·addr·<·end)
+This comment for vtd_page_walk_level() maybe more accurate here?
 
-diff --git a/backends/cryptodev-builtin.c b/backends/cryptodev-builtin.c
-index 5fb2836..486b4a6 100644
---- a/backends/cryptodev-builtin.c
-+++ b/backends/cryptodev-builtin.c
-@@ -205,6 +205,18 @@ static int cryptodev_builtin_create_cipher_session(
-             return -1;
-         }
-         break;
-+    case VIRTIO_CRYPTO_CIPHER_3DES_ECB:
-+        mode = QCRYPTO_CIPHER_MODE_ECB;
-+        algo = QCRYPTO_CIPHER_ALG_3DES;
-+        break;
-+    case VIRTIO_CRYPTO_CIPHER_3DES_CBC:
-+        mode = QCRYPTO_CIPHER_MODE_CBC;
-+        algo = QCRYPTO_CIPHER_ALG_3DES;
-+        break;
-+    case VIRTIO_CRYPTO_CIPHER_3DES_CTR:
-+        mode = QCRYPTO_CIPHER_MODE_CTR;
-+        algo = QCRYPTO_CIPHER_ALG_3DES;
-+        break;
-     default:
-         error_setg(errp, "Unsupported cipher alg :%u",
-                    sess_info->cipher_alg);
+
 -- 
-1.8.3.1
+Best regards
+Tianyu Lan
