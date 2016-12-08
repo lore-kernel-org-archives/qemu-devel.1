@@ -1,18 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59672)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59751)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1cF2qC-0002pa-1O
-	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 12:50:45 -0500
+	(envelope-from <drjones@redhat.com>) id 1cF2qH-00033Y-1B
+	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 12:50:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1cF2qA-00046u-HE
-	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 12:50:44 -0500
+	(envelope-from <drjones@redhat.com>) id 1cF2qE-000492-2x
+	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 12:50:49 -0500
 From: Andrew Jones <drjones@redhat.com>
-Date: Thu,  8 Dec 2016 18:50:20 +0100
-Message-Id: <20161208175030.12269-1-drjones@redhat.com>
+Date: Thu,  8 Dec 2016 18:50:22 +0100
+Message-Id: <20161208175030.12269-3-drjones@redhat.com>
+In-Reply-To: <20161208175030.12269-1-drjones@redhat.com>
+References: <20161208175030.12269-1-drjones@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH kvm-unit-tests v8 00/10] arm/arm64: add gic
- framework
+Subject: [Qemu-devel] [PATCH kvm-unit-tests v8 02/10] arm/arm64: smp:
+ support more than 8 cpus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,172 +26,182 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, qemu-arm@nongnu.org
 Cc: peter.maydell@linaro.org, marc.zyngier@arm.com, andre.przywara@arm.com, eric.auger@redhat.com, pbonzini@redhat.com, alex.bennee@linaro.org, christoffer.dall@linaro.org
 
+By adding support for launching with gicv3 we can break the 8 vcpu
+limit. This patch adds support to smp code and also selects the
+vgic model corresponding to the host. The vgic model may also be
+manually selected by adding e.g. -machine gic-version=3D3 to
+extra_params.
 
-v8:
- - Main change is rebasing to Wei's sysreg framework, which is part
-   of his PMU series, which I've applied to arm/next. That rebase
-   leads to dropping the first two patches of the v7 series, expecting
-   get_mpidr() to return u64 (with future patches), a rework of the
-   delay routines (now based on sysreg framework), and changes to all
-   sysreg asms
- - The delay routines also got their own files: delay.[ch]
- - Another bigger change was to now keep gic_common_ops local to
-   lib/arm/gic.c, export the functions from the gic-v[23] instead
- - Yet another bigger change was dropping the sender and irq cmdline
-   inputs, hard coding to '1' is sufficient and much less code
- - Other minor changes listed in individual patches  =20
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Signed-off-by: Andrew Jones <drjones@redhat.com>
 
+---
+v8: in anticipation of get_mpidr() returning a u64 (patches will
+    be in a future series), make sure we use that type everywhere
+    get_mpidr is used
+v5: left cpus a u32 for now. Changing to u64 requires a change to
+    devicetree. Will do it later. [Andre]
+v4: improved commit message
+---
+ arm/run                   | 19 ++++++++++++-------
+ lib/arm/asm/processor.h   |  9 +++++++--
+ lib/arm/asm/setup.h       |  4 ++--
+ lib/arm64/asm/processor.h |  9 +++++++--
+ arm/selftest.c            |  7 ++++++-
+ lib/arm/setup.c           | 10 ++++++++++
+ 6 files changed, 44 insertions(+), 14 deletions(-)
 
-v7:
- - biggest change is splitting lib/arm/gic.c into lib/arm/gic.c,
-   lib/arm/gic-v2.c, lib/arm/gic-v3.c
- - second biggest change, which probably affects Alex, is that
-   gic_ipi_send(cpu, irq) changed to gic_ipi_send_single(irq, cpu),
-   note the swapping of cpu and irq!
- - other changes thanks to Eric are noted in individual patches
- - also rebased to latest master
-
-v6:
- - rebased to latest master
- - several other changes thanks to Andre and Alex, changes in
-   individual patch change logs
- - some code cleanups
-
-v5:
- - fix arm32/gicv3 compile [drew]
- - use modern register names [Andre]
- - one Andre r-b
-
-v4:
- - Eric's r-b's
- - Andre's suggestion to only take defines we need
- - several other changes listed in individual patches
-
-v3:
- - Rebased on latest master
- - Added Alex's r-b's
-
-v2:
- Rebased on latest master + my "populate argv[0]" series (will
- send a REPOST for that shortly. Additionally a few patches got
- fixes/features;
- 07/10 got same fix as kernel 7c9b973061 "irqchip/gic-v3: Configure
-       all interrupts as non-secure Group-1" in order to continue
-       working over TCG, as the gicv3 code for TCG removed a hack
-       it had there to make Linux happy.
- 08/10 added more output for when things fail (if they fail)
- 09/10 switched gicv3 broadcast implementation to using IRM. This
-       found a bug in a recent (but not tip) kernel, which I was
-       about to fix, but then I saw MarcZ beat me to it.
- 10/10 actually check that the input irq is the received irq
-
-
-Import defines, and steal enough helper functions, from Linux to
-enable programming of the gic (v2 and v3). Then use the framework
-to add an initial test (an ipi test; self, target-list, broadcast).
-
-It's my hope that this framework will be a suitable base on which
-more tests may be easily added, particularly because we have
-vgic-new and tcg gicv3 emulation getting close to merge. (v3 UPDATE:
-vgic-new and tcg gicv3 are merged now)
-
-To run it, along with other tests, just do
-
- ./configure [ --arch=3D[arm|arm64] --cross-prefix=3D$PREFIX ]
- make
- export QEMU=3D$PATH_TO_QEMU
- ./run_tests.sh
-
-To run it separately do, e.g.
-
-$QEMU -machine virt,accel=3Dtcg -cpu cortex-a57 \
- -device virtio-serial-device \
- -device virtconsole,chardev=3Dctd -chardev testdev,id=3Dctd \
- -display none -serial stdio \
- -kernel arm/gic.flat \
- -smp 123 -machine gic-version=3D3 -append ipi
-      ^^ note, we can go nuts with nr-cpus on TCG :-)
-
-Or, a KVM example using a different "sender" cpu and irq (other than zero=
-)
-
-$QEMU -machine virt,accel=3Dkvm -cpu host \
- -device virtio-serial-device \
- -device virtconsole,chardev=3Dctd -chardev testdev,id=3Dctd \
- -display none -serial stdio \
- -kernel arm/gic.flat \
- -smp 48 -machine gic-version=3D3 -append 'ipi sender=3D42 irq=3D1'
-
-
-Patches:
-01-04: fixes and functionality needed by the later gic patches
-05-06: enable gicv2 and gicv2 IPI test
-07-09: enable gicv3 and gicv3 IPI test
-   10: extend the IPI tests to use cpu1 and irq1 instead of zero
-
-Available here: https://github.com/rhdrjones/kvm-unit-tests/commits/arm/g=
-ic-v8
-and based on https://github.com/rhdrjones/kvm-unit-tests/commits/arm/next
-
-
-Andrew Jones (9):
-  arm/arm64: yield on cpu_relax
-  arm/arm64: smp: support more than 8 cpus
-  arm/arm64: add some delay routines
-  arm/arm64: irq enable/disable
-  arm/arm64: add initial gicv2 support
-  arm/arm64: gicv2: add an IPI test
-  arm/arm64: add initial gicv3 support
-  arm/arm64: gicv3: add an IPI test
-  arm/arm64: gic: don't just use zero
-
-Peter Xu (1):
-  libcflat: add IS_ALIGNED() macro, and page sizes
-
- arm/Makefile.common        |  12 +-
- arm/run                    |  19 +--
- arm/unittests.cfg          |  14 +++
- lib/arm/asm/arch_gicv3.h   |  65 ++++++++++
- lib/arm/asm/barrier.h      |   5 +-
- lib/arm/asm/delay.h        |  14 +++
- lib/arm/asm/gic-v2.h       |  42 +++++++
- lib/arm/asm/gic-v3.h       | 117 ++++++++++++++++++
- lib/arm/asm/gic.h          |  65 ++++++++++
- lib/arm/asm/processor.h    |  34 +++++-
- lib/arm/asm/setup.h        |   4 +-
- lib/arm64/asm/arch_gicv3.h |  64 ++++++++++
- lib/arm64/asm/barrier.h    |   3 +-
- lib/arm64/asm/delay.h      |   1 +
- lib/arm64/asm/gic-v2.h     |   1 +
- lib/arm64/asm/gic-v3.h     |   1 +
- lib/arm64/asm/gic.h        |   1 +
- lib/arm64/asm/processor.h  |  31 ++++-
- lib/arm64/asm/sysreg.h     |  34 +++++-
- lib/libcflat.h             |   6 +
- arm/gic.c                  | 298 +++++++++++++++++++++++++++++++++++++++=
-++++++
- arm/selftest.c             |   7 +-
- lib/arm/delay.c            |  29 +++++
- lib/arm/gic-v2.c           |  57 +++++++++
- lib/arm/gic-v3.c           | 145 ++++++++++++++++++++++
- lib/arm/gic.c              | 147 ++++++++++++++++++++++
- lib/arm/setup.c            |  10 ++
- 27 files changed, 1202 insertions(+), 24 deletions(-)
- create mode 100644 lib/arm/asm/arch_gicv3.h
- create mode 100644 lib/arm/asm/delay.h
- create mode 100644 lib/arm/asm/gic-v2.h
- create mode 100644 lib/arm/asm/gic-v3.h
- create mode 100644 lib/arm/asm/gic.h
- create mode 100644 lib/arm64/asm/arch_gicv3.h
- create mode 100644 lib/arm64/asm/delay.h
- create mode 100644 lib/arm64/asm/gic-v2.h
- create mode 100644 lib/arm64/asm/gic-v3.h
- create mode 100644 lib/arm64/asm/gic.h
- create mode 100644 arm/gic.c
- create mode 100644 lib/arm/delay.c
- create mode 100644 lib/arm/gic-v2.c
- create mode 100644 lib/arm/gic-v3.c
- create mode 100644 lib/arm/gic.c
-
+diff --git a/arm/run b/arm/run
+index f1b04af614dc..1c40ab02eb57 100755
+--- a/arm/run
++++ b/arm/run
+@@ -31,13 +31,6 @@ if [ -z "$ACCEL" ]; then
+ 	fi
+ fi
+=20
+-if [ "$HOST" =3D "aarch64" ] && [ "$ACCEL" =3D "kvm" ]; then
+-	processor=3D"host"
+-	if [ "$ARCH" =3D "arm" ]; then
+-		processor+=3D",aarch64=3Doff"
+-	fi
+-fi
+-
+ qemu=3D"${QEMU:-qemu-system-$ARCH_NAME}"
+ qpath=3D$(which $qemu 2>/dev/null)
+=20
+@@ -53,6 +46,18 @@ fi
+=20
+ M=3D'-machine virt'
+=20
++if [ "$ACCEL" =3D "kvm" ]; then
++	if $qemu $M,\? 2>&1 | grep gic-version > /dev/null; then
++		M+=3D',gic-version=3Dhost'
++	fi
++	if [ "$HOST" =3D "aarch64" ]; then
++		processor=3D"host"
++		if [ "$ARCH" =3D "arm" ]; then
++			processor+=3D",aarch64=3Doff"
++		fi
++	fi
++fi
++
+ if ! $qemu $M -device '?' 2>&1 | grep virtconsole > /dev/null; then
+ 	echo "$qpath doesn't support virtio-console for chr-testdev. Exiting."
+ 	exit 2
+diff --git a/lib/arm/asm/processor.h b/lib/arm/asm/processor.h
+index c831749e04de..6b0d36b87817 100644
+--- a/lib/arm/asm/processor.h
++++ b/lib/arm/asm/processor.h
+@@ -40,8 +40,13 @@ static inline unsigned int get_mpidr(void)
+ 	return read_sysreg(MPIDR);
+ }
+=20
+-/* Only support Aff0 for now, up to 4 cpus */
+-#define mpidr_to_cpu(mpidr) ((int)((mpidr) & 0xff))
++#define MPIDR_HWID_BITMASK 0xffffff
++extern int mpidr_to_cpu(uint64_t mpidr);
++
++#define MPIDR_LEVEL_SHIFT(level) \
++	(((1 << level) >> 1) << 3)
++#define MPIDR_AFFINITY_LEVEL(mpidr, level) \
++	((mpidr >> MPIDR_LEVEL_SHIFT(level)) & 0xff)
+=20
+ extern void start_usr(void (*func)(void *arg), void *arg, unsigned long =
+sp_usr);
+ extern bool is_user(void);
+diff --git a/lib/arm/asm/setup.h b/lib/arm/asm/setup.h
+index cb8fdbd38dd5..1de99dd184d1 100644
+--- a/lib/arm/asm/setup.h
++++ b/lib/arm/asm/setup.h
+@@ -10,8 +10,8 @@
+ #include <asm/page.h>
+ #include <asm/pgtable-hwdef.h>
+=20
+-#define NR_CPUS			8
+-extern u32 cpus[NR_CPUS];
++#define NR_CPUS			255
++extern u32 cpus[NR_CPUS];	/* per-cpu IDs (MPIDRs) */
+ extern int nr_cpus;
+=20
+ #define NR_MEM_REGIONS		8
+diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
+index ed59ad25007b..48abf2c9e358 100644
+--- a/lib/arm64/asm/processor.h
++++ b/lib/arm64/asm/processor.h
+@@ -72,8 +72,13 @@ static inline unsigned int get_mpidr(void)
+ 	return read_sysreg(mpidr_el1);
+ }
+=20
+-/* Only support Aff0 for now, gicv2 only */
+-#define mpidr_to_cpu(mpidr) ((int)((mpidr) & 0xff))
++#define MPIDR_HWID_BITMASK 0xff00ffffff
++extern int mpidr_to_cpu(uint64_t mpidr);
++
++#define MPIDR_LEVEL_SHIFT(level) \
++	(((1 << level) >> 1) << 3)
++#define MPIDR_AFFINITY_LEVEL(mpidr, level) \
++	((mpidr >> MPIDR_LEVEL_SHIFT(level)) & 0xff)
+=20
+ extern void start_usr(void (*func)(void *arg), void *arg, unsigned long =
+sp_usr);
+ extern bool is_user(void);
+diff --git a/arm/selftest.c b/arm/selftest.c
+index 196164f5313d..750e90893141 100644
+--- a/arm/selftest.c
++++ b/arm/selftest.c
+@@ -312,9 +312,11 @@ static bool psci_check(void)
+ static cpumask_t smp_reported;
+ static void cpu_report(void)
+ {
++	uint64_t mpidr =3D get_mpidr();
+ 	int cpu =3D smp_processor_id();
+=20
+-	report("CPU%d online", true, cpu);
++	report("CPU(%3d) mpidr=3D%010" PRIx64,
++		mpidr_to_cpu(mpidr) =3D=3D cpu, cpu, mpidr);
+ 	cpumask_set_cpu(cpu, &smp_reported);
+ 	halt();
+ }
+@@ -343,6 +345,7 @@ int main(int argc, char **argv)
+=20
+ 	} else if (strcmp(argv[1], "smp") =3D=3D 0) {
+=20
++		uint64_t mpidr =3D get_mpidr();
+ 		int cpu;
+=20
+ 		report("PSCI version", psci_check());
+@@ -353,6 +356,8 @@ int main(int argc, char **argv)
+ 			smp_boot_secondary(cpu, cpu_report);
+ 		}
+=20
++		report("CPU(%3d) mpidr=3D%010" PRIx64,
++			mpidr_to_cpu(mpidr) =3D=3D 0, 0, mpidr);
+ 		cpumask_set_cpu(0, &smp_reported);
+ 		while (!cpumask_full(&smp_reported))
+ 			cpu_relax();
+diff --git a/lib/arm/setup.c b/lib/arm/setup.c
+index 7e7b39f11dde..e52a25abd722 100644
+--- a/lib/arm/setup.c
++++ b/lib/arm/setup.c
+@@ -30,6 +30,16 @@ int nr_cpus;
+ struct mem_region mem_regions[NR_MEM_REGIONS];
+ phys_addr_t __phys_offset, __phys_end;
+=20
++int mpidr_to_cpu(uint64_t mpidr)
++{
++	int i;
++
++	for (i =3D 0; i < nr_cpus; ++i)
++		if (cpus[i] =3D=3D (mpidr & MPIDR_HWID_BITMASK))
++			return i;
++	return -1;
++}
++
+ static void cpu_set(int fdtnode __unused, u32 regval, void *info __unuse=
+d)
+ {
+ 	int cpu =3D nr_cpus++;
 --=20
 2.9.3
