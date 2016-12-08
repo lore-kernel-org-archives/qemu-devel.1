@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49437)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51134)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrew.gacek@gmail.com>) id 1cEwmR-0003cJ-8U
-	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 06:22:28 -0500
+	(envelope-from <bounces@canonical.com>) id 1cEwpq-0005JE-K0
+	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 06:26:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrew.gacek@gmail.com>) id 1cEwmN-0008FL-6Q
-	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 06:22:27 -0500
+	(envelope-from <bounces@canonical.com>) id 1cEwpm-0001Ux-Hg
+	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 06:25:58 -0500
+Received: from indium.canonical.com ([91.189.90.7]:37984)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cEwpm-0001UV-91
+	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 06:25:54 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cEwpj-0000a6-KU
+	for <qemu-devel@nongnu.org>; Thu, 08 Dec 2016 11:25:52 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id E7A4C2E81AD
+	for <qemu-devel@nongnu.org>; Thu,  8 Dec 2016 11:25:46 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20161208104252.GH9606@toto>
-References: <CAHgzvFi2wjPtJzU9hXzdaZsbYr085VCbjfsiUeVc5XnUR8arHw@mail.gmail.com>
-	<293c3354-b11b-a31f-39dc-b7264ad0bb24@redhat.com>
-	<20161208104252.GH9606@toto>
-From: Andrew Gacek <andrew.gacek@gmail.com>
-Date: Thu, 8 Dec 2016 05:21:01 -0600
-Message-ID: <CAHgzvFjyvHOSYdGyi8_ug+tO1rE_0TZXVQwc9g=NnZJxQ2Dtdg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] cadence_uart: Check if
- receiver timeout counter is disabled
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 08 Dec 2016 11:14:37 -0000
+From: Rafael David Tinoco <rafael.tinoco@canonical.com>
+Reply-To: Bug 1626972 <1626972@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20160923110300.23502.55001.malonedeb@soybean.canonical.com>
+Message-Id: <20161208111437.16767.15504.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1626972] Re: QEMU memfd_create fallback mechanism
+ change for security drivers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,86 +37,174 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Cc: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Alistair Francis <alistair.francis@xilinx.com>, qemu-arm@nongnu.org
+To: qemu-devel@nongnu.org
 
-When register Rcvr_timeout_reg0 (R_RTOR in cadence_uart.c) is set to
-0, the receiver timeout counter should be disabled. See page 1801 of
-"Zynq-7000 AP SoC Technical Reference Manual". This commit adds a
-such a check before setting the receive timeout interrupt.
+Hello Antonio (@arcimboldo)
 
-Signed-off-by: Andrew Gacek <andrew.gacek@gmail.com>
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
----
- hw/char/cadence_uart.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+The fix only makes sense for newer QEMUs (>=3D Xenial, like the one from
+Mitaka Ubuntu Cloud Archive).
 
-diff --git a/hw/char/cadence_uart.c b/hw/char/cadence_uart.c
-index 0215d65..378630d 100644
---- a/hw/char/cadence_uart.c
-+++ b/hw/char/cadence_uart.c
-@@ -138,9 +138,11 @@ static void fifo_trigger_update(void *opaque)
- {
-     CadenceUARTState *s = opaque;
+OBS:
 
--    s->r[R_CISR] |= UART_INTR_TIMEOUT;
-+    if (s->r[R_RTOR]) {
-+        s->r[R_CISR] |= UART_INTR_TIMEOUT;
+The "migration check" is done in VHOST initialization functions when the
+devices are virtually attached to the virtual machine. If you are using
+kernel 3.13 and have apparmor enabled, then all the running instances
+have the "migration blocker" ON - because of this buggy migration check
+- and won't be able to live migration.
 
--    uart_update_status(s);
-+        uart_update_status(s);
-+    }
- }
+Unfortunately there is a "in-memory" linked list telling qemu that is
+has a blocker (with the reason). This blocker was added during instance
+startup and will be checked/used only when instance is live-migrated.
 
- static void uart_rx_reset(CadenceUARTState *s)
--- 
-2.7.4
+Check this: http://pastebin.ubuntu.com/23517175/
 
-On Thu, Dec 8, 2016 at 4:42 AM, Edgar E. Iglesias
-<edgar.iglesias@gmail.com> wrote:
-> On Thu, Dec 08, 2016 at 08:50:40AM +0100, Laurent Vivier wrote:
->> I CC: Xilinx Zynq Maintainers.
->>
->> Laurent
->
-> Thanks
->
->>
->> On 07/12/2016 22:12, Andrew Gacek wrote:
->> > When register Rcvr_timeout_reg0 (R_RTOR in cadence_uart.c) is set to
->> > 0, the receiver timeout counter should be disabled. See page 1801 of
->> > "Zynq-7000 AP SoC Technical Reference Manual". This commit adds a
->> > such a check before setting the receive timeout interrupt.
->
-> We could also try to disable the timer when rtor is zero but I think
-> that exposes a bunch of corner cases that would complicate the model a bit.
-> So IMO, this patch is good.
->
->
->> > Signed-off-by: Andrew Gacek <andrew.gacek@gmail.com>
->> > ---
->> >  hw/char/cadence_uart.c | 4 +++-
->> >  1 file changed, 3 insertions(+), 1 deletion(-)
->> >
->> > diff --git a/hw/char/cadence_uart.c b/hw/char/cadence_uart.c
->> > index 0215d65..54194b1 100644
->> > --- a/hw/char/cadence_uart.c
->> > +++ b/hw/char/cadence_uart.c
->> > @@ -138,7 +138,9 @@ static void fifo_trigger_update(void *opaque)
->> >  {
->> >      CadenceUARTState *s = opaque;
->> >
->> > -    s->r[R_CISR] |= UART_INTR_TIMEOUT;
->> > +    if (s->r[R_RTOR]) {
->> > +        s->r[R_CISR] |= UART_INTR_TIMEOUT;
->> > +    }
->> >
->> >      uart_update_status(s);
->
-> Since you are not modifying the IRQ state when the timeout is disabled, you can avoid calling uart_update_status too (because it will only end up recomputing the same state).
->
-> With that fix:
-> Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
->
-> Best regards,
-> Edgar
+If you started the instance in a host not running apparmor (or not
+having libvirt profile loaded, for example) it won't block the creation
+of /tmp/memfd-XXX files during instance initialization. That won't
+trigger the "blocker flag" inside the running program and, if/when
+needed, the live migration will be able to occur.
+
+This means that, after installing the new package, if you're using
+apparmor, yes, you would have to RESTART running instances that were
+affected by this bug in order to live migrating them. Sorry for the bad
+news!  Even if you remove the apparmor rules, the migration blocker is
+already set.
+
+Hacking your process virtual memory would jeopardize the contents of the
+virtual memory (could be catastrophic specially for a virtual machine).
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1626972
+
+Title:
+  QEMU memfd_create fallback mechanism change for security drivers
+
+Status in Ubuntu Cloud Archive:
+  Invalid
+Status in Ubuntu Cloud Archive mitaka series:
+  Fix Committed
+Status in QEMU:
+  Fix Committed
+Status in qemu package in Ubuntu:
+  Fix Released
+Status in qemu source package in Xenial:
+  Fix Committed
+Status in qemu source package in Yakkety:
+  Fix Committed
+Status in qemu source package in Zesty:
+  Fix Released
+
+Bug description:
+  [Impact]
+
+   * Updated QEMU (from UCA) live migration doesn't work with 3.13 kernels.
+   * QEMU code checks if it can create /tmp/memfd-XXX files wrongly.
+   * Apparmor will block access to /tmp/ and QEMU will fail migrating.
+
+  [Test Case]
+
+   * Install 2 Ubuntu Trusty (3.13) + UCA Mitaka + apparmor rules.
+   * Try to live-migration from one to another. =
+
+   * Apparmor will block creation of /tmp/memfd-XXX files.
+
+  [Regression Potential]
+
+   Pros:
+   * Exhaustively tested this.
+   * Worked with upstream on this fix. =
+
+   * I'm implementing new vhost log mechanism for upstream.
+   * One line change to a blocker that is already broken.
+
+   Cons:
+   * To break live migration in other circumstances. =
+
+
+  [Other Info]
+
+   * Christian Ehrhardt has been following this.
+
+  ORIGINAL DESCRIPTION:
+
+  When libvirt starts using apparmor, and creating apparmor profiles for
+  every virtual machine created in the compute nodes, mitaka qemu (2.5 -
+  and upstream also) uses a fallback mechanism for creating shared
+  memory for live-migrations. This fall back mechanism, on kernels 3.13
+  - that don't have memfd_create() system-call, try to create files on
+  /tmp/ directory and fails.. causing live-migration not to work.
+
+  Trusty with kernel 3.13 + Mitaka with qemu 2.5 + apparmor capability =3D
+  can't live migrate.
+
+  From qemu 2.5, logic is on :
+
+  void *qemu_memfd_alloc(const char *name, size_t size, unsigned int seals,=
+ int *fd)
+  {
+  =C2=A0=C2=A0=C2=A0=C2=A0if (memfd_create)... ### only works with HWE kern=
+els
+
+  =C2=A0=C2=A0=C2=A0=C2=A0else ### 3.13 kernels, gets blocked by apparmor
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0tmpdir =3D g_get_tmp_dir
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0...
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0mfd =3D mkstemp(fname)
+  }
+
+  And you can see the errors:
+
+  From the host trying to send the virtual machine:
+
+  2016-08-15 16:36:26.160 1974 ERROR nova.virt.libvirt.driver [req-0cac612b=
+-8d53-4610-b773-d07ad6bacb91 691a581cfa7046278380ce82b1c38ddd 133ebc3585c04=
+1aebaead8c062cd6511 - - -] [instance: 2afa1131-bc8c-43d2-9c4a-962c1bf7723e]=
+ Migration operation has aborted
+  2016-08-15 16:36:26.248 1974 ERROR nova.virt.libvirt.driver [req-0cac612b=
+-8d53-4610-b773-d07ad6bacb91 691a581cfa7046278380ce82b1c38ddd 133ebc3585c04=
+1aebaead8c062cd6511 - - -] [instance: 2afa1131-bc8c-43d2-9c4a-962c1bf7723e]=
+ Live Migration failure: internal error: unable to execute QEMU command 'mi=
+grate': Migration disabled: failed to allocate shared memory
+
+  From the host trying to receive the virtual machine:
+
+  Aug 15 16:36:19 tkcompute01 kernel: [ 1194.356794] type=3D1400 audit(1471=
+289779.791:72): apparmor=3D"STATUS" operation=3D"profile_load" profile=3D"u=
+nconfined" name=3D"libvirt-2afa1131-bc8c-43d2-9c4a-962c1bf7723e" pid=3D1256=
+5 comm=3D"apparmor_parser"
+  Aug 15 16:36:19 tkcompute01 kernel: [ 1194.357048] type=3D1400 audit(1471=
+289779.791:73): apparmor=3D"STATUS" operation=3D"profile_load" profile=3D"u=
+nconfined" name=3D"qemu_bridge_helper" pid=3D12565 comm=3D"apparmor_parser"
+  Aug 15 16:36:20 tkcompute01 kernel: [ 1194.877027] type=3D1400 audit(1471=
+289780.311:74): apparmor=3D"STATUS" operation=3D"profile_replace" profile=
+=3D"unconfined" name=3D"libvirt-2afa1131-bc8c-43d2-9c4a-962c1bf7723e" pid=
+=3D12613 comm=3D"apparmor_parser"
+  Aug 15 16:36:20 tkcompute01 kernel: [ 1194.904407] type=3D1400 audit(1471=
+289780.343:75): apparmor=3D"STATUS" operation=3D"profile_replace" profile=
+=3D"unconfined" name=3D"qemu_bridge_helper" pid=3D12613 comm=3D"apparmor_pa=
+rser"
+  Aug 15 16:36:20 tkcompute01 kernel: [ 1194.973064] type=3D1400 audit(1471=
+289780.407:76): apparmor=3D"DENIED" operation=3D"mknod" profile=3D"libvirt-=
+2afa1131-bc8c-43d2-9c4a-962c1bf7723e" name=3D"/tmp/memfd-tNpKSj" pid=3D1262=
+5 comm=3D"qemu-system-x86" requested_mask=3D"c" denied_mask=3D"c" fsuid=3D1=
+07 ouid=3D107
+  Aug 15 16:36:20 tkcompute01 kernel: [ 1194.979871] type=3D1400 audit(1471=
+289780.411:77): apparmor=3D"DENIED" operation=3D"open" profile=3D"libvirt-2=
+afa1131-bc8c-43d2-9c4a-962c1bf7723e" name=3D"/tmp/" pid=3D12625 comm=3D"qem=
+u-system-x86" requested_mask=3D"r" denied_mask=3D"r" fsuid=3D107 ouid=3D0
+  Aug 15 16:36:20 tkcompute01 kernel: [ 1194.979881] type=3D1400 audit(1471=
+289780.411:78): apparmor=3D"DENIED" operation=3D"open" profile=3D"libvirt-2=
+afa1131-bc8c-43d2-9c4a-962c1bf7723e" name=3D"/var/tmp/" pid=3D12625 comm=3D=
+"qemu-system-x86" requested_mask=3D"r" denied_mask=3D"r" fsuid=3D107 ouid=
+=3D0
+
+  When leaving libvirt without apparmor capabilities (thus not confining
+  virtual machines on compute nodes, the live migration works as
+  expected, so, clearly, apparmor is stepping into the live migration).
+  I'm sure that virtual machines have to be confined and that this isn't
+  the desired behaviour...
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/cloud-archive/+bug/1626972/+subscriptions
