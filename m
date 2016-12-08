@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49528)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53059)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1cEogl-0005mZ-4e
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 21:44:03 -0500
+	(envelope-from <longpeng2@huawei.com>) id 1cEopG-0007MT-Pa
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 21:52:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1cEogi-0003oH-0u
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 21:44:03 -0500
-Received: from [45.249.212.187] (port=2494 helo=dggrg01-dlp.huawei.com)
+	(envelope-from <longpeng2@huawei.com>) id 1cEopC-0007Yu-3Y
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 21:52:50 -0500
+Received: from szxga02-in.huawei.com ([119.145.14.65]:21222)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1cEogg-0003lH-MK
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 21:43:59 -0500
-From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Date: Thu, 8 Dec 2016 02:43:15 +0000
-Message-ID: <33183CC9F5247A488A2544077AF19020DA156ACB@DGGEMA505-MBX.china.huawei.com>
-References: <1481164408-194252-1-git-send-email-longpeng2@huawei.com>
-In-Reply-To: <1481164408-194252-1-git-send-email-longpeng2@huawei.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <longpeng2@huawei.com>) id 1cEopB-0007Tv-Nf
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 21:52:46 -0500
+From: "Longpeng(Mike)" <longpeng2@huawei.com>
+Date: Thu, 8 Dec 2016 10:52:26 +0800
+Message-ID: <1481165546-203200-1-git-send-email-longpeng2@huawei.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH for-2.9 v2] crypto: add 3des-ede support
- when using libgcrypt/nettle
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH for-2.9] cryptodev: add 3des-ede support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,37 +23,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: longpeng <longpeng2@huawei.com>, "berrange@redhat.com" <berrange@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>
-Cc: "Wubin (H)" <wu.wubin@huawei.com>, "Zhoujian (jay, Euler)" <jianjay.zhou@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: arei.gonglei@huawei.com
+Cc: wu.wubin@huawei.com, jianjay.zhou@huawei.com, qemu-devel@nongnu.org, "Longpeng(Mike)" <longpeng2@huawei.com>
 
-> From: longpeng
-> Sent: Thursday, December 08, 2016 10:33 AM
-> To: berrange@redhat.com; eblake@redhat.com; armbru@redhat.com
-> Cc: Wubin (H); Zhoujian (jay, Euler); Gonglei (Arei); qemu-devel@nongnu.o=
-rg;
-> longpeng
-> Subject: [PATCH for-2.9 v2] crypto: add 3des-ede support when using
-> libgcrypt/nettle
->=20
-> Libgcrypt and nettle support 3des-ede, so this patch add 3des-ede
-> support when using libgcrypt or nettle.
->=20
-> Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
-> ---
-> Changes since v1:
->     - rename 3des-ede to 3des. [Daniel]
->     - add (since 2.9) in comment. [Gonglei]
->     - add ctr(3des) testcase. [Gonglei]
->     - split original patchset. [Gonglei]
->=20
-> ---
->  crypto/cipher-gcrypt.c     |   6 +++
->  crypto/cipher-nettle.c     |  37 ++++++++++++++
->  crypto/cipher.c            |   7 ++-
->  qapi/crypto.json           |   3 +-
->  tests/test-crypto-cipher.c | 119
-> +++++++++++++++++++++++++++++++++++++++++++++
->  5 files changed, 169 insertions(+), 3 deletions(-)
->=20
+This patch add 3des-ede support for cryptodev. However this is effective
+only when backend using libgcrypt/nettle, because cipher-builtin doesn't
+support 3des-ede yet.
 
-Reviewed-by: Gonglei <arei.gonglei@huawei.com>
+Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
+---
+Changes since v1:
+    - split the original pathset. [Gonglei]
+
+---
+ backends/cryptodev-builtin.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/backends/cryptodev-builtin.c b/backends/cryptodev-builtin.c
+index 5fb2836..486b4a6 100644
+--- a/backends/cryptodev-builtin.c
++++ b/backends/cryptodev-builtin.c
+@@ -205,6 +205,18 @@ static int cryptodev_builtin_create_cipher_session(
+             return -1;
+         }
+         break;
++    case VIRTIO_CRYPTO_CIPHER_3DES_ECB:
++        mode = QCRYPTO_CIPHER_MODE_ECB;
++        algo = QCRYPTO_CIPHER_ALG_3DES;
++        break;
++    case VIRTIO_CRYPTO_CIPHER_3DES_CBC:
++        mode = QCRYPTO_CIPHER_MODE_CBC;
++        algo = QCRYPTO_CIPHER_ALG_3DES;
++        break;
++    case VIRTIO_CRYPTO_CIPHER_3DES_CTR:
++        mode = QCRYPTO_CIPHER_MODE_CTR;
++        algo = QCRYPTO_CIPHER_ALG_3DES;
++        break;
+     default:
+         error_setg(errp, "Unsupported cipher alg :%u",
+                    sess_info->cipher_alg);
+-- 
+1.8.3.1
