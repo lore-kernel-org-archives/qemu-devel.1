@@ -1,36 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56572)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56595)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <joserz@linux.vnet.ibm.com>) id 1cEo7j-00045F-8E
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 21:07:52 -0500
+	(envelope-from <joserz@linux.vnet.ibm.com>) id 1cEo7j-00045p-VJ
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 21:07:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <joserz@linux.vnet.ibm.com>) id 1cEo7f-0006Xo-Ha
+	(envelope-from <joserz@linux.vnet.ibm.com>) id 1cEo7i-0006bR-RZ
 	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 21:07:51 -0500
-Received: from 001b2d01.pphosted.com ([148.163.156.1]:36384
+Received: from 001b2d01.pphosted.com ([148.163.156.1]:45906
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <joserz@linux.vnet.ibm.com>)
-	id 1cEo7f-0006Vv-2Y
-	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 21:07:47 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	id 1cEo7i-0006af-JE
+	for qemu-devel@nongnu.org; Wed, 07 Dec 2016 21:07:50 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	uB823gRg013777
-	for <qemu-devel@nongnu.org>; Wed, 7 Dec 2016 21:07:46 -0500
-Received: from e24smtp05.br.ibm.com (e24smtp05.br.ibm.com [32.104.18.26])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 276qscac53-1
+	uB823cU5077052
+	for <qemu-devel@nongnu.org>; Wed, 7 Dec 2016 21:07:49 -0500
+Received: from e24smtp03.br.ibm.com (e24smtp03.br.ibm.com [32.104.18.24])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 276u96s75e-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 07 Dec 2016 21:07:45 -0500
+	for <qemu-devel@nongnu.org>; Wed, 07 Dec 2016 21:07:49 -0500
 Received: from localhost
-	by e24smtp05.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e24smtp03.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <joserz@linux.vnet.ibm.com>;
-	Thu, 8 Dec 2016 00:07:43 -0200
+	Thu, 8 Dec 2016 00:07:46 -0200
 From: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
-Date: Thu,  8 Dec 2016 00:07:03 -0200
+Date: Thu,  8 Dec 2016 00:07:04 -0200
 In-Reply-To: <1481162828-2295-1-git-send-email-joserz@linux.vnet.ibm.com>
 References: <1481162828-2295-1-git-send-email-joserz@linux.vnet.ibm.com>
-Message-Id: <1481162828-2295-2-git-send-email-joserz@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v3 1/6] target-ppc: Implement unsigned quadword
- left/right shift and unit tests
+Message-Id: <1481162828-2295-3-git-send-email-joserz@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v3 2/6] target-ppc: Implement bcds. instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,241 +41,112 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-ppc@nongnu.org
 Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au, nikunj@linux.vnet.ibm.com, bharata@linux.vnet.ibm.com
 
-This commit implements functions to right and left shifts and the
-unittest for them. Such functions is needed due to instructions
-that requires them.
-
-Today, there is already a right shift implementation in int128.h
-but it's designed for signed numbers.
+bcds.: Decimal shift. Given two registers vra and vrb, this instruction
+shift the vrb value by vra bits into the result register.
 
 Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
 ---
- include/qemu/host-utils.h |  3 ++
- tests/Makefile.include    |  5 ++-
- tests/test-shift128.c     | 98 +++++++++++++++++++++++++++++++++++++++++++++++
- util/Makefile.objs        |  2 +-
- util/host-utils.c         | 44 +++++++++++++++++++++
- 5 files changed, 150 insertions(+), 2 deletions(-)
- create mode 100644 tests/test-shift128.c
+ target-ppc/helper.h                 |  1 +
+ target-ppc/int_helper.c             | 38 +++++++++++++++++++++++++++++++++++++
+ target-ppc/translate/vmx-impl.inc.c |  3 +++
+ target-ppc/translate/vmx-ops.inc.c  |  3 ++-
+ 4 files changed, 44 insertions(+), 1 deletion(-)
 
-diff --git a/include/qemu/host-utils.h b/include/qemu/host-utils.h
-index 46187bb..e87de19 100644
---- a/include/qemu/host-utils.h
-+++ b/include/qemu/host-utils.h
-@@ -516,4 +516,7 @@ static inline uint64_t pow2ceil(uint64_t value)
-     return 1ULL << (64 - nlz);
+diff --git a/target-ppc/helper.h b/target-ppc/helper.h
+index bc39efb..471a1da 100644
+--- a/target-ppc/helper.h
++++ b/target-ppc/helper.h
+@@ -392,6 +392,7 @@ DEF_HELPER_3(bcdcfsq, i32, avr, avr, i32)
+ DEF_HELPER_3(bcdctsq, i32, avr, avr, i32)
+ DEF_HELPER_4(bcdcpsgn, i32, avr, avr, avr, i32)
+ DEF_HELPER_3(bcdsetsgn, i32, avr, avr, i32)
++DEF_HELPER_4(bcds, i32, avr, avr, avr, i32)
+ 
+ DEF_HELPER_2(xsadddp, void, env, i32)
+ DEF_HELPER_2(xssubdp, void, env, i32)
+diff --git a/target-ppc/int_helper.c b/target-ppc/int_helper.c
+index 7989b1f..854cf3a 100644
+--- a/target-ppc/int_helper.c
++++ b/target-ppc/int_helper.c
+@@ -3043,6 +3043,44 @@ uint32_t helper_bcdsetsgn(ppc_avr_t *r, ppc_avr_t *b, uint32_t ps)
+     return bcd_cmp_zero(r);
  }
  
-+void urshift(uint64_t *plow, uint64_t *phigh, uint32_t shift);
-+void ulshift(uint64_t *plow, uint64_t *phigh, uint32_t shift, bool *overflow);
-+
- #endif
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index e98d3b6..89e5e85 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -65,6 +65,8 @@ check-unit-$(CONFIG_POSIX) += tests/test-vmstate$(EXESUF)
- endif
- check-unit-y += tests/test-cutils$(EXESUF)
- gcov-files-test-cutils-y += util/cutils.c
-+check-unit-y += tests/test-shift128$(EXESUF)
-+gcov-files-test-shift128-y = util/host-utils.c
- check-unit-y += tests/test-mul64$(EXESUF)
- gcov-files-test-mul64-y = util/host-utils.c
- check-unit-y += tests/test-int128$(EXESUF)
-@@ -460,7 +462,7 @@ test-obj-y = tests/check-qint.o tests/check-qstring.o tests/check-qdict.o \
- 	tests/test-x86-cpuid.o tests/test-mul64.o tests/test-int128.o \
- 	tests/test-opts-visitor.o tests/test-qmp-event.o \
- 	tests/rcutorture.o tests/test-rcu-list.o \
--	tests/test-qdist.o \
-+	tests/test-qdist.o tests/test-shift128.o \
- 	tests/test-qht.o tests/qht-bench.o tests/test-qht-par.o \
- 	tests/atomic_add-bench.o
- 
-@@ -568,6 +570,7 @@ tests/test-qmp-commands$(EXESUF): tests/test-qmp-commands.o tests/test-qmp-marsh
- tests/test-visitor-serialization$(EXESUF): tests/test-visitor-serialization.o $(test-qapi-obj-y)
- tests/test-opts-visitor$(EXESUF): tests/test-opts-visitor.o $(test-qapi-obj-y)
- 
-+tests/test-shift128$(EXESUF): tests/test-shift128.o $(test-util-obj-y)
- tests/test-mul64$(EXESUF): tests/test-mul64.o $(test-util-obj-y)
- tests/test-bitops$(EXESUF): tests/test-bitops.o $(test-util-obj-y)
- tests/test-crypto-hash$(EXESUF): tests/test-crypto-hash.o $(test-crypto-obj-y)
-diff --git a/tests/test-shift128.c b/tests/test-shift128.c
-new file mode 100644
-index 0000000..52be6a2
---- /dev/null
-+++ b/tests/test-shift128.c
-@@ -0,0 +1,98 @@
-+/*
-+ * Test unsigned left and right shift
-+ *
-+ * This work is licensed under the terms of the GNU LGPL, version 2 or later.
-+ * See the COPYING.LIB file in the top-level directory.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/host-utils.h"
-+
-+typedef struct {
-+    uint64_t low;
-+    uint64_t high;
-+    uint64_t rlow;
-+    uint64_t rhigh;
-+    int32_t shift;
-+    bool overflow;
-+} test_data;
-+
-+static const test_data test_ltable[] = {
-+    { 1223ULL, 0, 1223ULL,   0, 0, false },
-+    { 1ULL,    0, 2ULL,   0, 1, false },
-+    { 1ULL,    0, 4ULL,   0, 2, false },
-+    { 1ULL,    0, 16ULL,  0, 4, false },
-+    { 1ULL,    0, 256ULL, 0, 8, false },
-+    { 1ULL,    0, 65536ULL, 0, 16, false },
-+    { 1ULL,    0, 2147483648ULL, 0, 31, false },
-+    { 1ULL,    0, 35184372088832ULL, 0, 45, false },
-+    { 1ULL,    0, 1152921504606846976ULL, 0, 60, false },
-+    { 1ULL,    0, 0, 1ULL, 64, false },
-+    { 1ULL,    0, 0, 65536ULL, 80, false },
-+    { 1ULL,    0, 0, 9223372036854775808ULL, 127, false },
-+    { 0ULL,    1, 0, 0, 64, true },
-+    { 0x8888888888888888ULL, 0x9999999999999999ULL,
-+        0x8000000000000000ULL, 0x9888888888888888ULL, 60, true },
-+    { 0x8888888888888888ULL, 0x9999999999999999ULL,
-+        0, 0x8888888888888888ULL, 64, true },
-+    { 0x8ULL, 0, 0, 0x8ULL, 64, false },
-+    { 0x8ULL, 0, 0, 0x8000000000000000ULL, 124, false },
-+    { 0x1ULL, 0, 0, 0x4000000000000000ULL, 126, false },
-+    { 0x1ULL, 0, 0, 0x8000000000000000ULL, 127, false },
-+    { 0x1ULL, 0, 0x1ULL, 0, 128, true },
-+    { 0, 0, 0ULL, 0, 200, false },
-+};
-+
-+static const test_data test_rtable[] = {
-+    { 1223ULL, 0, 1223ULL,   0, 0, false },
-+    { 9223372036854775808ULL, 9223372036854775808ULL,
-+        2147483648L, 2147483648ULL, 32, false },
-+    { 9223372036854775808ULL, 9223372036854775808ULL,
-+        9223372036854775808ULL, 0, 64, false },
-+    { 9223372036854775808ULL, 9223372036854775808ULL,
-+        36028797018963968ULL, 0, 72, false },
-+    { 9223372036854775808ULL, 9223372036854775808ULL,
-+        1ULL, 0, 127, false },
-+    { 9223372036854775808ULL, 0, 4611686018427387904ULL, 0, 1, false },
-+    { 9223372036854775808ULL, 0, 2305843009213693952ULL, 0, 2, false },
-+    { 9223372036854775808ULL, 0, 36028797018963968ULL, 0, 8, false },
-+    { 9223372036854775808ULL, 0, 140737488355328ULL, 0, 16, false },
-+    { 9223372036854775808ULL, 0, 2147483648ULL, 0, 32, false },
-+    { 9223372036854775808ULL, 0, 1ULL, 0, 63, false },
-+    { 9223372036854775808ULL, 0, 0ULL, 0, 64, false },
-+};
-+
-+static void test_lshift(void)
++uint32_t helper_bcds(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b, uint32_t ps)
 +{
-+    int i;
++    int cr;
++    int i = 0;
++    bool ox_flag = false;
++    int sgnb = bcd_get_sgn(b);
++    ppc_avr_t ret = *b;
++    ret.u64[LO_IDX] &= ~0xf;
 +
-+    for (i = 0; i < ARRAY_SIZE(test_ltable); ++i) {
-+        bool overflow = false;
-+        test_data tmp = test_ltable[i];
-+        ulshift(&tmp.low, &tmp.high, tmp.shift, &overflow);
-+        g_assert_cmpuint(tmp.low, ==, tmp.rlow);
-+        g_assert_cmpuint(tmp.high, ==, tmp.rhigh);
-+        g_assert_cmpuint(tmp.overflow, ==, overflow);
-+    }
-+}
-+
-+static void test_rshift(void)
-+{
-+    int i;
-+
-+    for (i = 0; i < ARRAY_SIZE(test_rtable); ++i) {
-+        test_data tmp = test_rtable[i];
-+        urshift(&tmp.low, &tmp.high, tmp.shift);
-+        g_assert_cmpuint(tmp.low, ==, tmp.rlow);
-+        g_assert_cmpuint(tmp.high, ==, tmp.rhigh);
-+    }
-+}
-+
-+int main(int argc, char **argv)
-+{
-+    g_test_init(&argc, &argv, NULL);
-+    g_test_add_func("/host-utils/test_lshift", test_lshift);
-+    g_test_add_func("/host-utils/test_rshift", test_rshift);
-+    return g_test_run();
-+}
-diff --git a/util/Makefile.objs b/util/Makefile.objs
-index ad0f9c7..39ae26e 100644
---- a/util/Makefile.objs
-+++ b/util/Makefile.objs
-@@ -11,7 +11,7 @@ util-obj-$(CONFIG_POSIX) += memfd.o
- util-obj-$(CONFIG_WIN32) += oslib-win32.o
- util-obj-$(CONFIG_WIN32) += qemu-thread-win32.o
- util-obj-y += envlist.o path.o module.o
--util-obj-$(call lnot,$(CONFIG_INT128)) += host-utils.o
-+util-obj-y += host-utils.o
- util-obj-y += bitmap.o bitops.o hbitmap.o
- util-obj-y += fifo8.o
- util-obj-y += acl.o
-diff --git a/util/host-utils.c b/util/host-utils.c
-index b166e57..1ee2433 100644
---- a/util/host-utils.c
-+++ b/util/host-utils.c
-@@ -26,6 +26,7 @@
- #include "qemu/osdep.h"
- #include "qemu/host-utils.h"
- 
-+#ifndef CONFIG_INT128
- /* Long integer helpers */
- static inline void mul64(uint64_t *plow, uint64_t *phigh,
-                          uint64_t a, uint64_t b)
-@@ -158,4 +159,47 @@ int divs128(int64_t *plow, int64_t *phigh, int64_t divisor)
- 
-     return overflow;
- }
++#if defined(HOST_WORDS_BIGENDIAN)
++    int upper = ARRAY_SIZE(a->s8) - 1;
++#else
++    int upper = 0;
 +#endif
++
++    if (bcd_is_valid(b) == false) {
++        return CRF_SO;
++    }
++
++    if (a->s8[upper] > 0) {
++        i = (a->s8[upper] > 31) ? 31 : a->s8[upper];
++        ulshift(&ret.u64[LO_IDX], &ret.u64[HI_IDX], i * 4, &ox_flag);
++    } else {
++        i = (a->s8[upper] < -31) ? 31 : -a->s8[upper];
++        urshift(&ret.u64[LO_IDX], &ret.u64[HI_IDX], i * 4);
++    }
++    bcd_put_digit(&ret, bcd_preferred_sgn(sgnb, ps), 0);
++
++    *r = ret;
++
++    cr = bcd_cmp_zero(r);
++    if (unlikely(ox_flag)) {
++        cr |= CRF_SO;
++    }
++
++    return cr;
++}
++
+ void helper_vsbox(ppc_avr_t *r, ppc_avr_t *a)
+ {
+     int i;
+diff --git a/target-ppc/translate/vmx-impl.inc.c b/target-ppc/translate/vmx-impl.inc.c
+index e8e527f..84ebb7e 100644
+--- a/target-ppc/translate/vmx-impl.inc.c
++++ b/target-ppc/translate/vmx-impl.inc.c
+@@ -1016,6 +1016,7 @@ GEN_BCD2(bcdcfsq)
+ GEN_BCD2(bcdctsq)
+ GEN_BCD2(bcdsetsgn)
+ GEN_BCD(bcdcpsgn);
++GEN_BCD(bcds);
  
-+void urshift(uint64_t *plow, uint64_t *phigh, uint32_t shift)
-+{
-+    shift &= 127;
-+    uint64_t h = *phigh >> (shift & 63);
-+    if (shift == 0) {
-+        return;
-+    } else if (shift >= 64) {
-+        *plow = h;
-+        *phigh = 0;
-+    } else {
-+        *plow = (*plow >> (shift & 63)) | (*phigh << (64 - (shift & 63)));
-+        *phigh = h;
-+    }
-+}
-+
-+void ulshift(uint64_t *plow, uint64_t *phigh, uint32_t shift, bool *overflow)
-+{
-+    uint64_t low = *plow;
-+    uint64_t high = *phigh;
-+
-+    if (shift > 127 && (low | high)) {
-+        *overflow = true;
-+    }
-+    shift &= 127;
-+
-+    if (shift == 0) {
-+        return;
-+    }
-+
-+    urshift(&low, &high, 128 - shift);
-+    if (low > 0 || high > 0) {
-+        *overflow = true;
-+    }
-+
-+    if (shift >= 64) {
-+        *phigh = *plow << (shift & 63);
-+        *plow = 0;
-+    } else {
-+        *phigh = (*plow >> (64 - (shift & 63))) | (*phigh << (shift & 63));
-+        *plow = *plow << shift;
-+    }
-+}
+ static void gen_xpnd04_1(DisasContext *ctx)
+ {
+@@ -1090,6 +1091,8 @@ GEN_VXFORM_DUAL(vsubuhs, PPC_ALTIVEC, PPC_NONE, \
+                 bcdsub, PPC_NONE, PPC2_ALTIVEC_207)
+ GEN_VXFORM_DUAL(vaddshs, PPC_ALTIVEC, PPC_NONE, \
+                 bcdcpsgn, PPC_NONE, PPC2_ISA300)
++GEN_VXFORM_DUAL(vsubudm, PPC2_ALTIVEC_207, PPC_NONE, \
++                bcds, PPC_NONE, PPC2_ISA300)
+ 
+ static void gen_vsbox(DisasContext *ctx)
+ {
+diff --git a/target-ppc/translate/vmx-ops.inc.c b/target-ppc/translate/vmx-ops.inc.c
+index 57dce6e..7b4b009 100644
+--- a/target-ppc/translate/vmx-ops.inc.c
++++ b/target-ppc/translate/vmx-ops.inc.c
+@@ -62,7 +62,8 @@ GEN_VXFORM_207(vaddudm, 0, 3),
+ GEN_VXFORM_DUAL(vsububm, bcdadd, 0, 16, PPC_ALTIVEC, PPC_NONE),
+ GEN_VXFORM_DUAL(vsubuhm, bcdsub, 0, 17, PPC_ALTIVEC, PPC_NONE),
+ GEN_VXFORM(vsubuwm, 0, 18),
+-GEN_VXFORM_207(vsubudm, 0, 19),
++GEN_VXFORM_DUAL(vsubudm, bcds, 0, 19, PPC2_ALTIVEC_207, PPC2_ISA300),
++GEN_VXFORM_300(bcds, 0, 27),
+ GEN_VXFORM(vmaxub, 1, 0),
+ GEN_VXFORM(vmaxuh, 1, 1),
+ GEN_VXFORM(vmaxuw, 1, 2),
 -- 
 2.7.4
