@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60727)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60724)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cF7Xo-0005He-L3
+	(envelope-from <dgibson@ozlabs.org>) id 1cF7Xo-0005HZ-JU
 	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 17:52:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cF7Xn-0002U8-Bl
+	(envelope-from <dgibson@ozlabs.org>) id 1cF7Xn-0002U0-9o
 	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 17:52:04 -0500
-Date: Fri, 9 Dec 2016 09:51:13 +1100
+Date: Fri, 9 Dec 2016 09:51:03 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20161208225113.GI13139@umbus.fritz.box>
+Message-ID: <20161208225103.GH13139@umbus.fritz.box>
 References: <1481135102-20011-1-git-send-email-nikunj@linux.vnet.ibm.com>
-	<1481135102-20011-10-git-send-email-nikunj@linux.vnet.ibm.com>
+	<1481135102-20011-9-git-send-email-nikunj@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="k1BdFSKqAqVdu8k/"
+	protocol="application/pgp-signature"; boundary="pe+tqlI1iYzVj1X/"
 Content-Disposition: inline
-In-Reply-To: <1481135102-20011-10-git-send-email-nikunj@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v1 9/9] target-ppc: Add xxperm and xxpermr
- instructions
+In-Reply-To: <1481135102-20011-9-git-send-email-nikunj@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v1 8/9] target-ppc: implement xscpsgnqp
+ instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,103 +29,79 @@ To: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 Cc: qemu-ppc@nongnu.org, rth@twiddle.net, qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com
 
 
---k1BdFSKqAqVdu8k/
+--pe+tqlI1iYzVj1X/
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Dec 07, 2016 at 11:55:02PM +0530, Nikunj A Dadhania wrote:
-> From: Bharata B Rao <bharata@linux.vnet.ibm.com>
+On Wed, Dec 07, 2016 at 11:55:01PM +0530, Nikunj A Dadhania wrote:
+> xscpsgnqp: VSX Scalar Copy Sign Quad-Precision
 >=20
-> xxperm:  VSX Vector Permute
-> xxpermr: VSX Vector Permute Right-indexed
->=20
-> Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
 > Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+> Reviewed-by: Richard Henderson <rth@twiddle.net>
 
-Merged to ppc-for-2.9.
+Merged to ppc-for-2.9
 
 > ---
->  target-ppc/fpu_helper.c             | 23 +++++++++++++++++++++++
->  target-ppc/helper.h                 |  2 ++
->  target-ppc/translate/vsx-impl.inc.c |  2 ++
->  target-ppc/translate/vsx-ops.inc.c  |  2 ++
->  4 files changed, 29 insertions(+)
+>  target-ppc/translate/vsx-impl.inc.c | 12 +++++++++++-
+>  target-ppc/translate/vsx-ops.inc.c  |  1 +
+>  2 files changed, 12 insertions(+), 1 deletion(-)
 >=20
-> diff --git a/target-ppc/fpu_helper.c b/target-ppc/fpu_helper.c
-> index 3b867cf..1ccd5e6 100644
-> --- a/target-ppc/fpu_helper.c
-> +++ b/target-ppc/fpu_helper.c
-> @@ -2869,3 +2869,26 @@ uint64_t helper_xsrsp(CPUPPCState *env, uint64_t x=
-b)
->      float_check_status(env);
->      return xt;
->  }
-> +
-> +#define VSX_XXPERM(op, indexed)                                       \
-> +void helper_##op(CPUPPCState *env, uint32_t opcode)                   \
-> +{                                                                     \
-> +    ppc_vsr_t xt, xa, pcv, xto;                                       \
-> +    int i, idx;                                                       \
-> +                                                                      \
-> +    getVSR(xA(opcode), &xa, env);                                     \
-> +    getVSR(xT(opcode), &xt, env);                                     \
-> +    getVSR(xB(opcode), &pcv, env);                                    \
-> +                                                                      \
-> +    for (i =3D 0; i < 16; i++) {                                        \
-> +        idx =3D pcv.VsrB(i) & 0x1F;                                     \
-> +        if (indexed) {                                                \
-> +            idx =3D 31 - idx;                                           \
-> +        }                                                             \
-> +        xto.VsrB(i) =3D (idx <=3D 15) ? xa.VsrB(idx) : xt.VsrB(idx - 16)=
-; \
-> +    }                                                                 \
-> +    putVSR(xT(opcode), &xto, env);                                    \
-> +}
-> +
-> +VSX_XXPERM(xxperm, 0)
-> +VSX_XXPERM(xxpermr, 1)
-> diff --git a/target-ppc/helper.h b/target-ppc/helper.h
-> index 9f812c8..399cf99 100644
-> --- a/target-ppc/helper.h
-> +++ b/target-ppc/helper.h
-> @@ -538,6 +538,8 @@ DEF_HELPER_2(xvrspip, void, env, i32)
->  DEF_HELPER_2(xvrspiz, void, env, i32)
->  DEF_HELPER_4(xxextractuw, void, env, tl, tl, i32)
->  DEF_HELPER_4(xxinsertw, void, env, tl, tl, i32)
-> +DEF_HELPER_2(xxperm, void, env, i32)
-> +DEF_HELPER_2(xxpermr, void, env, i32)
-> =20
->  DEF_HELPER_2(efscfsi, i32, env, i32)
->  DEF_HELPER_2(efscfui, i32, env, i32)
 > diff --git a/target-ppc/translate/vsx-impl.inc.c b/target-ppc/translate/v=
 sx-impl.inc.c
-> index 8321134..1d88cee 100644
+> index 01b95df..8321134 100644
 > --- a/target-ppc/translate/vsx-impl.inc.c
 > +++ b/target-ppc/translate/vsx-impl.inc.c
-> @@ -913,6 +913,8 @@ GEN_VSX_HELPER_2(xvrspic, 0x16, 0x0A, 0, PPC2_VSX)
->  GEN_VSX_HELPER_2(xvrspim, 0x12, 0x0B, 0, PPC2_VSX)
->  GEN_VSX_HELPER_2(xvrspip, 0x12, 0x0A, 0, PPC2_VSX)
->  GEN_VSX_HELPER_2(xvrspiz, 0x12, 0x09, 0, PPC2_VSX)
-> +GEN_VSX_HELPER_2(xxperm, 0x08, 0x03, 0, PPC2_ISA300)
-> +GEN_VSX_HELPER_2(xxpermr, 0x08, 0x07, 0, PPC2_ISA300)
+> @@ -642,9 +642,10 @@ VSX_SCALAR_MOVE(xscpsgndp, OP_CPSGN, SGN_MASK_DP)
+>  #define VSX_SCALAR_MOVE_QP(name, op, sgn_mask)                    \
+>  static void glue(gen_, name)(DisasContext *ctx)                   \
+>  {                                                                 \
+> +    int xa;                                                       \
+>      int xt =3D rD(ctx->opcode) + 32;                                \
+>      int xb =3D rB(ctx->opcode) + 32;                                \
+> -    TCGv_i64 xbh, xbl, sgm;                                       \
+> +    TCGv_i64 xah, xbh, xbl, sgm;                                  \
+>                                                                    \
+>      if (unlikely(!ctx->vsx_enabled)) {                            \
+>          gen_exception(ctx, POWERPC_EXCP_VSXU);                    \
+> @@ -666,6 +667,14 @@ static void glue(gen_, name)(DisasContext *ctx)     =
+              \
+>      case OP_NEG:                                                  \
+>          tcg_gen_xor_i64(xbh, xbh, sgm);                           \
+>          break;                                                    \
+> +    case OP_CPSGN:                                                \
+> +        xah =3D tcg_temp_new_i64();                                 \
+> +        xa =3D rA(ctx->opcode) + 32;                                \
+> +        tcg_gen_and_i64(xah, cpu_vsrh(xa), sgm);                  \
+> +        tcg_gen_andc_i64(xbh, xbh, sgm);                          \
+> +        tcg_gen_or_i64(xbh, xbh, xah);                            \
+> +        tcg_temp_free_i64(xah);                                   \
+> +        break;                                                    \
+>      }                                                             \
+>      tcg_gen_mov_i64(cpu_vsrh(xt), xbh);                           \
+>      tcg_gen_mov_i64(cpu_vsrl(xt), xbl);                           \
+> @@ -677,6 +686,7 @@ static void glue(gen_, name)(DisasContext *ctx)      =
+             \
+>  VSX_SCALAR_MOVE_QP(xsabsqp, OP_ABS, SGN_MASK_DP)
+>  VSX_SCALAR_MOVE_QP(xsnabsqp, OP_NABS, SGN_MASK_DP)
+>  VSX_SCALAR_MOVE_QP(xsnegqp, OP_NEG, SGN_MASK_DP)
+> +VSX_SCALAR_MOVE_QP(xscpsgnqp, OP_CPSGN, SGN_MASK_DP)
 > =20
->  static void gen_xxbrd(DisasContext *ctx)
->  {
+>  #define VSX_VECTOR_MOVE(name, op, sgn_mask)                      \
+>  static void glue(gen_, name)(DisasContext * ctx)                 \
 > diff --git a/target-ppc/translate/vsx-ops.inc.c b/target-ppc/translate/vs=
 x-ops.inc.c
-> index 42e83d2..93fb9b8 100644
+> index d798edb..42e83d2 100644
 > --- a/target-ppc/translate/vsx-ops.inc.c
 > +++ b/target-ppc/translate/vsx-ops.inc.c
-> @@ -275,6 +275,8 @@ VSX_LOGICAL(xxlnand, 0x8, 0x16, PPC2_VSX207),
->  VSX_LOGICAL(xxlorc, 0x8, 0x15, PPC2_VSX207),
->  GEN_XX3FORM(xxmrghw, 0x08, 0x02, PPC2_VSX),
->  GEN_XX3FORM(xxmrglw, 0x08, 0x06, PPC2_VSX),
-> +GEN_XX3FORM(xxperm, 0x08, 0x03, PPC2_ISA300),
-> +GEN_XX3FORM(xxpermr, 0x08, 0x07, PPC2_ISA300),
->  GEN_XX2FORM(xxspltw, 0x08, 0x0A, PPC2_VSX),
->  GEN_XX1FORM(xxspltib, 0x08, 0x0B, PPC2_ISA300),
->  GEN_XX3FORM_DM(xxsldwi, 0x08, 0x00),
+> @@ -107,6 +107,7 @@ GEN_XX3FORM(xscpsgndp, 0x00, 0x16, PPC2_VSX),
+>  GEN_VSX_XFORM_300_EO(xsabsqp, 0x04, 0x19, 0x00, 0x00000001),
+>  GEN_VSX_XFORM_300_EO(xsnabsqp, 0x04, 0x19, 0x08, 0x00000001),
+>  GEN_VSX_XFORM_300_EO(xsnegqp, 0x04, 0x19, 0x10, 0x00000001),
+> +GEN_VSX_XFORM_300(xscpsgnqp, 0x04, 0x03, 0x00000001),
+> =20
+>  GEN_XX2FORM(xvabsdp, 0x12, 0x1D, PPC2_VSX),
+>  GEN_XX2FORM(xvnabsdp, 0x12, 0x1E, PPC2_VSX),
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -133,25 +109,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---k1BdFSKqAqVdu8k/
+--pe+tqlI1iYzVj1X/
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJYSePhAAoJEGw4ysog2bOSKwQP/RMgwQwFH6OvHPHKgf8TTkCw
-cr94V888G79ImkeMDdMPKc/2Q0UUlQl5Qnh0UIRB/jByMVG5smf003INvTX71+uu
-k0L3tdEpFj0c6ggKG1og8AgJVrax3m02Uq0iT8AQDnfnyxmWrHa45zRi/DvDfEru
-fisnpiYTO9eyL6UHn6lVifsPf5sKh48SiNWNzOOjKWNrG8t7XDZ3AUQYhD0qTVPp
-kAaqNqSPshBQqTjRwDdqdythmk6OroCCRhCGO56ffJu1xXz4j28h4iYJEd5IrFlf
-NlV4cG+Syb62EbKI0wQKxEy3AyeJ2jSNf3bVYjFraPTffcqA8TJaHLH29yCPc1Ih
-f8IasSfK1BZS92sPZC7yr44RN0VHjVoTJ4T5ZrsOpoxTqUgOMNhrDbpDHQyk/Q1A
-9LmuwvLoNRQvqKdKa532bLZJVWZp+I2IzHsE9caCtxSyt+NqbEiO1v7hopM5WHQK
-T65S0HB2baE7H6Ji2+BACcJiFGKvzLnVfkTHP8bGeaQf5qARiGvXi4QFGtUeAsMS
-tvVFxbqnlRObRYpzSUShakCuUlO8lJlahuFUSWLw1T/uqexifMK6pvxkKgeL15XS
-D2NrO6fPggof8rz9cFit6hOx24zCP8uORPgligOtKKy2JmQbQgfKKAY064DUqGJL
-ttl0OBHCqssVW32oVDX8
-=f67t
+iQIcBAEBCAAGBQJYSePXAAoJEGw4ysog2bOSVocP/jBpXtdlha/9pGNwwBR/nbR3
+2mai1EezkQFY14xHV2izLMfqU+MbZlNySJlg9mRo6AblAlpfSC8fxLZC7XKB4w8n
+DMtBUaSAbUMePAW0NR2l+Mqwf8Pun/y2DECC7FBseq4t/vzk2ZrS9wgpkeP9H8qo
+DplcOpzPholtJyRGef9PGbQEoXFLGGZ4vJUF5nSfNcQuWlCbsJcK9SsXusw6L6ZL
+DmdUG52ypFdSw/7+K3AJQZm2eEb9qRLlxY7n3D+6uG/2wjKolGm+RPwl7CL3Yiwc
+87zcoO+c08/bHGUDcaEOs63+6Exq7AjJ46tgOl121R/tCeRcJMCk0Bzt3gnQHoxF
+jZqLPg7LUDFFyGsLgpRPRxqJJJnaoZAkdZnBYDtJLTTObTRUhw9TncCeykDqm1dn
+HLbq+Ck51RGpKm0zC/snt1mEwOqlt6th3EcoNQ1eNjgrmFikn1/kUjEx67AGVFqF
+luDIGb6t5i0jAQGG6Hr0NW7LU/PcYNJrrjR+dDbuMRrBli72WJTt9XovKzb+/P37
+yi33EzkJS0658atpqyg3p3Wc8Lx1DpIJNyHBPUqX5b9Q288eW75YXhaHLCBKCbTQ
+pfEjXgEUGhO5eDCCYlfqU51h/2xHfHYoOMnO84HLctI/6uRvnlgudXX79yxqDXnd
+8mJGzAROHu1fckIFQvtc
+=USyV
 -----END PGP SIGNATURE-----
 
---k1BdFSKqAqVdu8k/--
+--pe+tqlI1iYzVj1X/--
