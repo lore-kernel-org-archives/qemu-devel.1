@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59660)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35018)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cEv4y-0005NM-4S
-	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 04:33:29 -0500
+	(envelope-from <bounces@canonical.com>) id 1cEvDI-0007BK-LX
+	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 04:42:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cEv4u-00023l-H5
-	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 04:33:28 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44346)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cEv4u-00023E-CA
-	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 04:33:24 -0500
-Date: Thu, 8 Dec 2016 09:33:16 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20161208093316.GA26641@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1481164408-194252-1-git-send-email-longpeng2@huawei.com>
+	(envelope-from <bounces@canonical.com>) id 1cEvDF-0008Cz-D1
+	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 04:42:04 -0500
+Received: from indium.canonical.com ([91.189.90.7]:60785)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cEvDF-0008BS-4e
+	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 04:42:01 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cEvDC-0000F3-U6
+	for <qemu-devel@nongnu.org>; Thu, 08 Dec 2016 09:41:59 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 046D32E830C
+	for <qemu-devel@nongnu.org>; Thu,  8 Dec 2016 09:41:42 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1481164408-194252-1-git-send-email-longpeng2@huawei.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.9 v2] crypto: add 3des-ede support
- when using libgcrypt/nettle
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 08 Dec 2016 09:29:22 -0000
+From: James Page <james.page@ubuntu.com>
+Reply-To: Bug 1626972 <1626972@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20160923110300.23502.55001.malonedeb@soybean.canonical.com>
+Message-Id: <20161208092922.23191.59227.launchpad@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1626972] Re: QEMU memfd_create fallback mechanism
+ change for security drivers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,37 +37,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Longpeng(Mike)" <longpeng2@huawei.com>
-Cc: eblake@redhat.com, armbru@redhat.com, wu.wubin@huawei.com, jianjay.zhou@huawei.com, arei.gonglei@huawei.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-On Thu, Dec 08, 2016 at 10:33:28AM +0800, Longpeng(Mike) wrote:
-> Libgcrypt and nettle support 3des-ede, so this patch add 3des-ede
-> support when using libgcrypt or nettle.
-> 
-> Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
-> ---
-> Changes since v1:
->     - rename 3des-ede to 3des. [Daniel]
->     - add (since 2.9) in comment. [Gonglei]
->     - add ctr(3des) testcase. [Gonglei]
->     - split original patchset. [Gonglei]
-> 
-> ---
->  crypto/cipher-gcrypt.c     |   6 +++
->  crypto/cipher-nettle.c     |  37 ++++++++++++++
->  crypto/cipher.c            |   7 ++-
->  qapi/crypto.json           |   3 +-
->  tests/test-crypto-cipher.c | 119 +++++++++++++++++++++++++++++++++++++++++++++
->  5 files changed, 169 insertions(+), 3 deletions(-)
+** Also affects: cloud-archive/mitaka
+   Importance: Undecided
+       Status: New
 
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+** Changed in: cloud-archive/mitaka
+       Status: New =3D> Fix Committed
 
-Added to my crypto-next queue
+** Changed in: cloud-archive
+       Status: Fix Released =3D> Invalid
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1626972
+
+Title:
+  QEMU memfd_create fallback mechanism change for security drivers
+
+Status in Ubuntu Cloud Archive:
+  Invalid
+Status in Ubuntu Cloud Archive mitaka series:
+  Fix Committed
+Status in QEMU:
+  Fix Committed
+Status in qemu package in Ubuntu:
+  Fix Released
+Status in qemu source package in Xenial:
+  Fix Committed
+Status in qemu source package in Yakkety:
+  Fix Committed
+Status in qemu source package in Zesty:
+  Fix Released
+
+Bug description:
+  [Impact]
+
+   * Updated QEMU (from UCA) live migration doesn't work with 3.13 kernels.
+   * QEMU code checks if it can create /tmp/memfd-XXX files wrongly.
+   * Apparmor will block access to /tmp/ and QEMU will fail migrating.
+
+  [Test Case]
+
+   * Install 2 Ubuntu Trusty (3.13) + UCA Mitaka + apparmor rules.
+   * Try to live-migration from one to another. =
+
+   * Apparmor will block creation of /tmp/memfd-XXX files.
+
+  [Regression Potential]
+
+   Pros:
+   * Exhaustively tested this.
+   * Worked with upstream on this fix. =
+
+   * I'm implementing new vhost log mechanism for upstream.
+   * One line change to a blocker that is already broken.
+
+   Cons:
+   * To break live migration in other circumstances. =
 
 
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+  [Other Info]
+
+   * Christian Ehrhardt has been following this.
+
+  ORIGINAL DESCRIPTION:
+
+  When libvirt starts using apparmor, and creating apparmor profiles for
+  every virtual machine created in the compute nodes, mitaka qemu (2.5 -
+  and upstream also) uses a fallback mechanism for creating shared
+  memory for live-migrations. This fall back mechanism, on kernels 3.13
+  - that don't have memfd_create() system-call, try to create files on
+  /tmp/ directory and fails.. causing live-migration not to work.
+
+  Trusty with kernel 3.13 + Mitaka with qemu 2.5 + apparmor capability =3D
+  can't live migrate.
+
+  From qemu 2.5, logic is on :
+
+  void *qemu_memfd_alloc(const char *name, size_t size, unsigned int seals,=
+ int *fd)
+  {
+  =C2=A0=C2=A0=C2=A0=C2=A0if (memfd_create)... ### only works with HWE kern=
+els
+
+  =C2=A0=C2=A0=C2=A0=C2=A0else ### 3.13 kernels, gets blocked by apparmor
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0tmpdir =3D g_get_tmp_dir
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0...
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0mfd =3D mkstemp(fname)
+  }
+
+  And you can see the errors:
+
+  From the host trying to send the virtual machine:
+
+  2016-08-15 16:36:26.160 1974 ERROR nova.virt.libvirt.driver [req-0cac612b=
+-8d53-4610-b773-d07ad6bacb91 691a581cfa7046278380ce82b1c38ddd 133ebc3585c04=
+1aebaead8c062cd6511 - - -] [instance: 2afa1131-bc8c-43d2-9c4a-962c1bf7723e]=
+ Migration operation has aborted
+  2016-08-15 16:36:26.248 1974 ERROR nova.virt.libvirt.driver [req-0cac612b=
+-8d53-4610-b773-d07ad6bacb91 691a581cfa7046278380ce82b1c38ddd 133ebc3585c04=
+1aebaead8c062cd6511 - - -] [instance: 2afa1131-bc8c-43d2-9c4a-962c1bf7723e]=
+ Live Migration failure: internal error: unable to execute QEMU command 'mi=
+grate': Migration disabled: failed to allocate shared memory
+
+  From the host trying to receive the virtual machine:
+
+  Aug 15 16:36:19 tkcompute01 kernel: [ 1194.356794] type=3D1400 audit(1471=
+289779.791:72): apparmor=3D"STATUS" operation=3D"profile_load" profile=3D"u=
+nconfined" name=3D"libvirt-2afa1131-bc8c-43d2-9c4a-962c1bf7723e" pid=3D1256=
+5 comm=3D"apparmor_parser"
+  Aug 15 16:36:19 tkcompute01 kernel: [ 1194.357048] type=3D1400 audit(1471=
+289779.791:73): apparmor=3D"STATUS" operation=3D"profile_load" profile=3D"u=
+nconfined" name=3D"qemu_bridge_helper" pid=3D12565 comm=3D"apparmor_parser"
+  Aug 15 16:36:20 tkcompute01 kernel: [ 1194.877027] type=3D1400 audit(1471=
+289780.311:74): apparmor=3D"STATUS" operation=3D"profile_replace" profile=
+=3D"unconfined" name=3D"libvirt-2afa1131-bc8c-43d2-9c4a-962c1bf7723e" pid=
+=3D12613 comm=3D"apparmor_parser"
+  Aug 15 16:36:20 tkcompute01 kernel: [ 1194.904407] type=3D1400 audit(1471=
+289780.343:75): apparmor=3D"STATUS" operation=3D"profile_replace" profile=
+=3D"unconfined" name=3D"qemu_bridge_helper" pid=3D12613 comm=3D"apparmor_pa=
+rser"
+  Aug 15 16:36:20 tkcompute01 kernel: [ 1194.973064] type=3D1400 audit(1471=
+289780.407:76): apparmor=3D"DENIED" operation=3D"mknod" profile=3D"libvirt-=
+2afa1131-bc8c-43d2-9c4a-962c1bf7723e" name=3D"/tmp/memfd-tNpKSj" pid=3D1262=
+5 comm=3D"qemu-system-x86" requested_mask=3D"c" denied_mask=3D"c" fsuid=3D1=
+07 ouid=3D107
+  Aug 15 16:36:20 tkcompute01 kernel: [ 1194.979871] type=3D1400 audit(1471=
+289780.411:77): apparmor=3D"DENIED" operation=3D"open" profile=3D"libvirt-2=
+afa1131-bc8c-43d2-9c4a-962c1bf7723e" name=3D"/tmp/" pid=3D12625 comm=3D"qem=
+u-system-x86" requested_mask=3D"r" denied_mask=3D"r" fsuid=3D107 ouid=3D0
+  Aug 15 16:36:20 tkcompute01 kernel: [ 1194.979881] type=3D1400 audit(1471=
+289780.411:78): apparmor=3D"DENIED" operation=3D"open" profile=3D"libvirt-2=
+afa1131-bc8c-43d2-9c4a-962c1bf7723e" name=3D"/var/tmp/" pid=3D12625 comm=3D=
+"qemu-system-x86" requested_mask=3D"r" denied_mask=3D"r" fsuid=3D107 ouid=
+=3D0
+
+  When leaving libvirt without apparmor capabilities (thus not confining
+  virtual machines on compute nodes, the live migration works as
+  expected, so, clearly, apparmor is stepping into the live migration).
+  I'm sure that virtual machines have to be confined and that this isn't
+  the desired behaviour...
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/cloud-archive/+bug/1626972/+subscriptions
