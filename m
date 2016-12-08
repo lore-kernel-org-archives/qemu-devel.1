@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51154)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51358)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cEwpr-0005JH-HI
-	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 06:26:00 -0500
+	(envelope-from <andrew.gacek@gmail.com>) id 1cEwqh-0005sn-N3
+	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 06:26:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cEwpq-0001Wt-57
-	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 06:25:59 -0500
-Received: from indium.canonical.com ([91.189.90.7]:38090)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cEwpp-0001WQ-TZ
-	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 06:25:58 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cEwpn-0000aB-Kk
-	for <qemu-devel@nongnu.org>; Thu, 08 Dec 2016 11:25:56 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 3B7F12E8211
-	for <qemu-devel@nongnu.org>; Thu,  8 Dec 2016 11:25:50 +0000 (UTC)
+	(envelope-from <andrew.gacek@gmail.com>) id 1cEwqd-0001jY-K3
+	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 06:26:51 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 08 Dec 2016 11:16:19 -0000
-From: Rafael David Tinoco <rafael.tinoco@canonical.com>
-Reply-To: Bug 1626972 <1626972@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20160923110300.23502.55001.malonedeb@soybean.canonical.com>
-Message-Id: <20161208111619.16838.19980.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1626972] Re: QEMU memfd_create fallback mechanism
- change for security drivers
+In-Reply-To: <CAHgzvFjyvHOSYdGyi8_ug+tO1rE_0TZXVQwc9g=NnZJxQ2Dtdg@mail.gmail.com>
+References: <CAHgzvFi2wjPtJzU9hXzdaZsbYr085VCbjfsiUeVc5XnUR8arHw@mail.gmail.com>
+	<293c3354-b11b-a31f-39dc-b7264ad0bb24@redhat.com>
+	<20161208104252.GH9606@toto>
+	<CAHgzvFjyvHOSYdGyi8_ug+tO1rE_0TZXVQwc9g=NnZJxQ2Dtdg@mail.gmail.com>
+From: Andrew Gacek <andrew.gacek@gmail.com>
+Date: Thu, 8 Dec 2016 05:25:26 -0600
+Message-ID: <CAHgzvFi2ft+Oqo7MvmJQWa_Wv5AYKxZveaLi2FZ3OiY8BZrA=Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] cadence_uart: Check if
+ receiver timeout counter is disabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,148 +25,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Alistair Francis <alistair.francis@xilinx.com>, qemu-arm@nongnu.org
 
-@jamespage, @cpaelzer,
+Laurent, thanks for CC'ing Xilinx Zynq maintainers. I read that part
+of the submission guidelines, then completely forgot to do it.
 
-I'll verify this fix in couple of days so it can be released.
+Edgar, thanks for the comments. I wasn't sure if I needed to call that
+function or not. Also, one other discrepancy with the technical
+reference manual is that writing to R_RTOR should mask off all but the
+lower 8 bits. I'm not sure how important that actually is (since the
+timer isn't really implemented in qemu), but I thought I'd mention it.
+For my use case, the current patch fixes the issue we were having.
 
-Thank you!
+-Andrew
 
-Rafael
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1626972
-
-Title:
-  QEMU memfd_create fallback mechanism change for security drivers
-
-Status in Ubuntu Cloud Archive:
-  Invalid
-Status in Ubuntu Cloud Archive mitaka series:
-  Fix Committed
-Status in QEMU:
-  Fix Committed
-Status in qemu package in Ubuntu:
-  Fix Released
-Status in qemu source package in Xenial:
-  Fix Committed
-Status in qemu source package in Yakkety:
-  Fix Committed
-Status in qemu source package in Zesty:
-  Fix Released
-
-Bug description:
-  [Impact]
-
-   * Updated QEMU (from UCA) live migration doesn't work with 3.13 kernels.
-   * QEMU code checks if it can create /tmp/memfd-XXX files wrongly.
-   * Apparmor will block access to /tmp/ and QEMU will fail migrating.
-
-  [Test Case]
-
-   * Install 2 Ubuntu Trusty (3.13) + UCA Mitaka + apparmor rules.
-   * Try to live-migration from one to another. =
-
-   * Apparmor will block creation of /tmp/memfd-XXX files.
-
-  [Regression Potential]
-
-   Pros:
-   * Exhaustively tested this.
-   * Worked with upstream on this fix. =
-
-   * I'm implementing new vhost log mechanism for upstream.
-   * One line change to a blocker that is already broken.
-
-   Cons:
-   * To break live migration in other circumstances. =
-
-
-  [Other Info]
-
-   * Christian Ehrhardt has been following this.
-
-  ORIGINAL DESCRIPTION:
-
-  When libvirt starts using apparmor, and creating apparmor profiles for
-  every virtual machine created in the compute nodes, mitaka qemu (2.5 -
-  and upstream also) uses a fallback mechanism for creating shared
-  memory for live-migrations. This fall back mechanism, on kernels 3.13
-  - that don't have memfd_create() system-call, try to create files on
-  /tmp/ directory and fails.. causing live-migration not to work.
-
-  Trusty with kernel 3.13 + Mitaka with qemu 2.5 + apparmor capability =3D
-  can't live migrate.
-
-  From qemu 2.5, logic is on :
-
-  void *qemu_memfd_alloc(const char *name, size_t size, unsigned int seals,=
- int *fd)
-  {
-  =C2=A0=C2=A0=C2=A0=C2=A0if (memfd_create)... ### only works with HWE kern=
-els
-
-  =C2=A0=C2=A0=C2=A0=C2=A0else ### 3.13 kernels, gets blocked by apparmor
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0tmpdir =3D g_get_tmp_dir
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0...
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0mfd =3D mkstemp(fname)
-  }
-
-  And you can see the errors:
-
-  From the host trying to send the virtual machine:
-
-  2016-08-15 16:36:26.160 1974 ERROR nova.virt.libvirt.driver [req-0cac612b=
--8d53-4610-b773-d07ad6bacb91 691a581cfa7046278380ce82b1c38ddd 133ebc3585c04=
-1aebaead8c062cd6511 - - -] [instance: 2afa1131-bc8c-43d2-9c4a-962c1bf7723e]=
- Migration operation has aborted
-  2016-08-15 16:36:26.248 1974 ERROR nova.virt.libvirt.driver [req-0cac612b=
--8d53-4610-b773-d07ad6bacb91 691a581cfa7046278380ce82b1c38ddd 133ebc3585c04=
-1aebaead8c062cd6511 - - -] [instance: 2afa1131-bc8c-43d2-9c4a-962c1bf7723e]=
- Live Migration failure: internal error: unable to execute QEMU command 'mi=
-grate': Migration disabled: failed to allocate shared memory
-
-  From the host trying to receive the virtual machine:
-
-  Aug 15 16:36:19 tkcompute01 kernel: [ 1194.356794] type=3D1400 audit(1471=
-289779.791:72): apparmor=3D"STATUS" operation=3D"profile_load" profile=3D"u=
-nconfined" name=3D"libvirt-2afa1131-bc8c-43d2-9c4a-962c1bf7723e" pid=3D1256=
-5 comm=3D"apparmor_parser"
-  Aug 15 16:36:19 tkcompute01 kernel: [ 1194.357048] type=3D1400 audit(1471=
-289779.791:73): apparmor=3D"STATUS" operation=3D"profile_load" profile=3D"u=
-nconfined" name=3D"qemu_bridge_helper" pid=3D12565 comm=3D"apparmor_parser"
-  Aug 15 16:36:20 tkcompute01 kernel: [ 1194.877027] type=3D1400 audit(1471=
-289780.311:74): apparmor=3D"STATUS" operation=3D"profile_replace" profile=
-=3D"unconfined" name=3D"libvirt-2afa1131-bc8c-43d2-9c4a-962c1bf7723e" pid=
-=3D12613 comm=3D"apparmor_parser"
-  Aug 15 16:36:20 tkcompute01 kernel: [ 1194.904407] type=3D1400 audit(1471=
-289780.343:75): apparmor=3D"STATUS" operation=3D"profile_replace" profile=
-=3D"unconfined" name=3D"qemu_bridge_helper" pid=3D12613 comm=3D"apparmor_pa=
-rser"
-  Aug 15 16:36:20 tkcompute01 kernel: [ 1194.973064] type=3D1400 audit(1471=
-289780.407:76): apparmor=3D"DENIED" operation=3D"mknod" profile=3D"libvirt-=
-2afa1131-bc8c-43d2-9c4a-962c1bf7723e" name=3D"/tmp/memfd-tNpKSj" pid=3D1262=
-5 comm=3D"qemu-system-x86" requested_mask=3D"c" denied_mask=3D"c" fsuid=3D1=
-07 ouid=3D107
-  Aug 15 16:36:20 tkcompute01 kernel: [ 1194.979871] type=3D1400 audit(1471=
-289780.411:77): apparmor=3D"DENIED" operation=3D"open" profile=3D"libvirt-2=
-afa1131-bc8c-43d2-9c4a-962c1bf7723e" name=3D"/tmp/" pid=3D12625 comm=3D"qem=
-u-system-x86" requested_mask=3D"r" denied_mask=3D"r" fsuid=3D107 ouid=3D0
-  Aug 15 16:36:20 tkcompute01 kernel: [ 1194.979881] type=3D1400 audit(1471=
-289780.411:78): apparmor=3D"DENIED" operation=3D"open" profile=3D"libvirt-2=
-afa1131-bc8c-43d2-9c4a-962c1bf7723e" name=3D"/var/tmp/" pid=3D12625 comm=3D=
-"qemu-system-x86" requested_mask=3D"r" denied_mask=3D"r" fsuid=3D107 ouid=
-=3D0
-
-  When leaving libvirt without apparmor capabilities (thus not confining
-  virtual machines on compute nodes, the live migration works as
-  expected, so, clearly, apparmor is stepping into the live migration).
-  I'm sure that virtual machines have to be confined and that this isn't
-  the desired behaviour...
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/cloud-archive/+bug/1626972/+subscriptions
+On Thu, Dec 8, 2016 at 5:21 AM, Andrew Gacek <andrew.gacek@gmail.com> wrote:
+> When register Rcvr_timeout_reg0 (R_RTOR in cadence_uart.c) is set to
+> 0, the receiver timeout counter should be disabled. See page 1801 of
+> "Zynq-7000 AP SoC Technical Reference Manual". This commit adds a
+> such a check before setting the receive timeout interrupt.
+>
+> Signed-off-by: Andrew Gacek <andrew.gacek@gmail.com>
+> Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+> ---
+>  hw/char/cadence_uart.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+>
+> diff --git a/hw/char/cadence_uart.c b/hw/char/cadence_uart.c
+> index 0215d65..378630d 100644
+> --- a/hw/char/cadence_uart.c
+> +++ b/hw/char/cadence_uart.c
+> @@ -138,9 +138,11 @@ static void fifo_trigger_update(void *opaque)
+>  {
+>      CadenceUARTState *s = opaque;
+>
+> -    s->r[R_CISR] |= UART_INTR_TIMEOUT;
+> +    if (s->r[R_RTOR]) {
+> +        s->r[R_CISR] |= UART_INTR_TIMEOUT;
+>
+> -    uart_update_status(s);
+> +        uart_update_status(s);
+> +    }
+>  }
+>
+>  static void uart_rx_reset(CadenceUARTState *s)
+> --
+> 2.7.4
+>
+> On Thu, Dec 8, 2016 at 4:42 AM, Edgar E. Iglesias
+> <edgar.iglesias@gmail.com> wrote:
+>> On Thu, Dec 08, 2016 at 08:50:40AM +0100, Laurent Vivier wrote:
+>>> I CC: Xilinx Zynq Maintainers.
+>>>
+>>> Laurent
+>>
+>> Thanks
+>>
+>>>
+>>> On 07/12/2016 22:12, Andrew Gacek wrote:
+>>> > When register Rcvr_timeout_reg0 (R_RTOR in cadence_uart.c) is set to
+>>> > 0, the receiver timeout counter should be disabled. See page 1801 of
+>>> > "Zynq-7000 AP SoC Technical Reference Manual". This commit adds a
+>>> > such a check before setting the receive timeout interrupt.
+>>
+>> We could also try to disable the timer when rtor is zero but I think
+>> that exposes a bunch of corner cases that would complicate the model a bit.
+>> So IMO, this patch is good.
+>>
+>>
+>>> > Signed-off-by: Andrew Gacek <andrew.gacek@gmail.com>
+>>> > ---
+>>> >  hw/char/cadence_uart.c | 4 +++-
+>>> >  1 file changed, 3 insertions(+), 1 deletion(-)
+>>> >
+>>> > diff --git a/hw/char/cadence_uart.c b/hw/char/cadence_uart.c
+>>> > index 0215d65..54194b1 100644
+>>> > --- a/hw/char/cadence_uart.c
+>>> > +++ b/hw/char/cadence_uart.c
+>>> > @@ -138,7 +138,9 @@ static void fifo_trigger_update(void *opaque)
+>>> >  {
+>>> >      CadenceUARTState *s = opaque;
+>>> >
+>>> > -    s->r[R_CISR] |= UART_INTR_TIMEOUT;
+>>> > +    if (s->r[R_RTOR]) {
+>>> > +        s->r[R_CISR] |= UART_INTR_TIMEOUT;
+>>> > +    }
+>>> >
+>>> >      uart_update_status(s);
+>>
+>> Since you are not modifying the IRQ state when the timeout is disabled, you can avoid calling uart_update_status too (because it will only end up recomputing the same state).
+>>
+>> With that fix:
+>> Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+>>
+>> Best regards,
+>> Edgar
