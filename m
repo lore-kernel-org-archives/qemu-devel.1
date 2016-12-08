@@ -1,16 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59894)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55778)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cEyfl-0005jp-Is
-	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 08:23:44 -0500
+	(envelope-from <berrange@redhat.com>) id 1cEyYV-0002Ve-P7
+	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 08:16:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cEyff-00035L-T3
-	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 08:23:41 -0500
-From: Kevin Wolf <kwolf@redhat.com>
-Date: Thu,  8 Dec 2016 14:23:10 +0100
-Message-Id: <1481203391-9523-6-git-send-email-kwolf@redhat.com>
-In-Reply-To: <1481203391-9523-1-git-send-email-kwolf@redhat.com>
-References: <1481203391-9523-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [RFC PATCH 5/6] iscsi: Add timeout option
+	(envelope-from <berrange@redhat.com>) id 1cEyYR-0007U0-H7
+	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 08:16:11 -0500
+Date: Thu, 8 Dec 2016 13:15:51 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20161208131551.GF26641@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20161208124103.9813-1-berrange@redhat.com>
+	<20161208131204.GB3891@noname.str.redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20161208131204.GB3891@noname.str.redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 0/2] Remove need for -iscsi
+ argument
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,103 +25,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, jcody@redhat.com, berrange@redhat.com, pl@kamp.de, ptoscano@redhat.com, ronniesahlberg@gmail.com, pbonzini@redhat.com, qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Peter Lieven <pl@kamp.de>, Pino Toscano <ptoscano@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, jtc@redhat.com
 
-This was previously only available with -iscsi. Again, after this patch,
-the -iscsi option only takes effect if an URL is given. New users are
-supposed to use the new driver-specific option.
+On Thu, Dec 08, 2016 at 02:12:04PM +0100, Kevin Wolf wrote:
+> Am 08.12.2016 um 13:41 hat Daniel P. Berrange geschrieben:
+> > This small series removes the need for using the -iscsi argument
+> > by directly supporting all the -iscsi options against the block
+> > device config eg instead of
+> > 
+> > $QEMU \
+> >   -object secret,id=sec0,data=123456 \
+> >   -drive driver=iscsi,file=iscsi://catbus/iqn.fedora:kvm/2 \
+> >   -iscsi initiator-name=fish,user=test,password-secret=sec0,timeout=234 
+> > 
+> > you can now do it all against -drive
+> > 
+> > $QEMU \
+> >   -object secret,id=sec0,data=123456 \
+> >   -drive driver=iscsi,file=iscsi://catbus/iqn.fedora:kvm/2,\
+> >          initiator-name=fish,user=test,password-secret=sec0,timeout=234 
+> > 
+> > This fixes the problem that you cannot associate -drive instances
+> > with -iscsi args reliably due to IQNs containing chracters that
+> > QEMU forbids in QemuOpts ID strings.
+> > 
+> > Pino had previously sent a patch to do this for initiator-name
+> > back in the 2.6 dev cycle
+> > 
+> >   https://lists.nongnu.org/archive/html/qemu-block/2016-04/msg00246.html
+> > 
+> > This series supports all the -iscsi option names, except for
+> > 'password' which is intentionally left out as it is insecure
+> > and replaced by 'password-secret'.
+> 
+> I actually do the same as part of my iscsi for blockdev-add series,
+> which I guess I better should have sent as an RFC even if it's yet
+> untested to save you the work...
+> 
+> As I do more on top of just converting -iscsi, I would prefer using my
+> patches even if you posted yours first.
 
-All -iscsi options have a corresponding driver-specific option for the
-iscsi block driver now.
+I don't mind, as long as this gets done for 2.9 and doesn't slip for
+yet another release.
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- block/iscsi.c | 37 +++++++++++--------------------------
- 1 file changed, 11 insertions(+), 26 deletions(-)
-
-diff --git a/block/iscsi.c b/block/iscsi.c
-index f993b19..29191f2 100644
---- a/block/iscsi.c
-+++ b/block/iscsi.c
-@@ -1317,29 +1317,6 @@ static char *get_initiator_name(QemuOpts *opts)
-     return iscsi_name;
- }
- 
--static int parse_timeout(const char *target)
--{
--    QemuOptsList *list;
--    QemuOpts *opts;
--    const char *timeout;
--
--    list = qemu_find_opts("iscsi");
--    if (list) {
--        opts = qemu_opts_find(list, target);
--        if (!opts) {
--            opts = QTAILQ_FIRST(&list->head);
--        }
--        if (opts) {
--            timeout = qemu_opt_get(opts, "timeout");
--            if (timeout) {
--                return atoi(timeout);
--            }
--        }
--    }
--
--    return 0;
--}
--
- static void iscsi_nop_timed_event(void *opaque)
- {
-     IscsiLun *iscsilun = opaque;
-@@ -1547,7 +1524,7 @@ static void iscsi_parse_iscsi_option(const char *target, QDict *options)
- {
-     QemuOptsList *list;
-     QemuOpts *opts;
--    const char *user, *initiator_name, *header_digest;
-+    const char *user, *initiator_name, *header_digest, *timeout;
- 
-     list = qemu_find_opts("iscsi");
-     if (!list) {
-@@ -1580,6 +1557,11 @@ static void iscsi_parse_iscsi_option(const char *target, QDict *options)
-     if (header_digest) {
-         qdict_set_default_str(options, "header-digest", header_digest);
-     }
-+
-+    timeout = qemu_opt_get(opts, "timeout");
-+    if (timeout) {
-+        qdict_set_default_str(options, "timeout", timeout);
-+    }
- }
- 
- /*
-@@ -1631,7 +1613,6 @@ static void iscsi_parse_filename(const char *filename, QDict *options,
-     iscsi_destroy_url(iscsi_url);
- }
- 
--/* TODO Add -iscsi options */
- static QemuOptsList runtime_opts = {
-     .name = "iscsi",
-     .head = QTAILQ_HEAD_INITIALIZER(runtime_opts.head),
-@@ -1672,6 +1653,10 @@ static QemuOptsList runtime_opts = {
-             .name = "header-digest",
-             .type = QEMU_OPT_STRING,
-         },
-+        {
-+            .name = "timeout",
-+            .type = QEMU_OPT_NUMBER,
-+        },
-         { /* end of list */ }
-     },
- };
-@@ -1772,7 +1757,7 @@ static int iscsi_open(BlockDriverState *bs, QDict *options, int flags,
-     }
- 
-     /* timeout handling is broken in libiscsi before 1.15.0 */
--    timeout = parse_timeout(target);
-+    timeout = qemu_opt_get_number(opts, "timeout", 0);
- #if LIBISCSI_API_VERSION >= 20150621
-     iscsi_set_timeout(iscsi, timeout);
- #else
+Regards,
+Daniel
 -- 
-1.8.3.1
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
