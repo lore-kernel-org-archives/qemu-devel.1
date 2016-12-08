@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55734)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55846)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cEzSc-0006qX-R5
-	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 09:14:11 -0500
+	(envelope-from <berrange@redhat.com>) id 1cEzT1-0007SK-VT
+	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 09:14:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cEzSb-0005W0-Qu
-	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 09:14:10 -0500
-Date: Thu, 8 Dec 2016 14:13:58 +0000
+	(envelope-from <berrange@redhat.com>) id 1cEzT1-0005bE-1f
+	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 09:14:35 -0500
+Date: Thu, 8 Dec 2016 14:14:23 +0000
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20161208141358.GJ26641@redhat.com>
+Message-ID: <20161208141423.GK26641@redhat.com>
 Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
 References: <1481203391-9523-1-git-send-email-kwolf@redhat.com>
-	<1481203391-9523-5-git-send-email-kwolf@redhat.com>
+	<1481203391-9523-6-git-send-email-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1481203391-9523-5-git-send-email-kwolf@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 4/6] iscsi: Add header-digest option
+In-Reply-To: <1481203391-9523-6-git-send-email-kwolf@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 5/6] iscsi: Add timeout option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,17 +27,21 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Kevin Wolf <kwolf@redhat.com>
 Cc: qemu-block@nongnu.org, jcody@redhat.com, pl@kamp.de, ptoscano@redhat.com, ronniesahlberg@gmail.com, pbonzini@redhat.com, qemu-devel@nongnu.org
 
-On Thu, Dec 08, 2016 at 02:23:09PM +0100, Kevin Wolf wrote:
+On Thu, Dec 08, 2016 at 02:23:10PM +0100, Kevin Wolf wrote:
 > This was previously only available with -iscsi. Again, after this patch,
 > the -iscsi option only takes effect if an URL is given. New users are
 > supposed to use the new driver-specific option.
 > 
+> All -iscsi options have a corresponding driver-specific option for the
+> iscsi block driver now.
+> 
 > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->  block/iscsi.c | 38 ++++++++++++++------------------------
->  1 file changed, 14 insertions(+), 24 deletions(-)
+>  block/iscsi.c | 37 +++++++++++--------------------------
+>  1 file changed, 11 insertions(+), 26 deletions(-)
 
-Reviewed-by: Daniel P. berrange <berrange@redhat.com>
+Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
+
 
 Regards,
 Daniel
