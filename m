@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40573)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42415)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cEsaL-0005n8-MV
-	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 01:53:42 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cEsfE-00076Z-FK
+	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 01:58:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cEsaK-0008KM-Rm
-	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 01:53:41 -0500
-Date: Thu, 8 Dec 2016 14:53:32 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20161208065332.GA2045@lemon>
-References: <1477928314-11184-1-git-send-email-famz@redhat.com>
-	<1477928314-11184-2-git-send-email-famz@redhat.com>
-	<29e8c31e-a05f-79b0-df81-ec84317496b9@redhat.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cEsfB-0007O1-D9
+	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 01:58:44 -0500
+Received: from mailhub.sw.ru ([195.214.232.25]:9007 helo=relay.sw.ru)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1cEsfB-0007I8-1F
+	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 01:58:41 -0500
+References: <1480073296-6931-1-git-send-email-vsementsov@virtuozzo.com>
+	<F075D231-9CBE-437C-B9F0-0DE2AB98007B@alex.org.uk>
+	<ed5f8fc7-c7c8-c678-668f-17047dbe0b23@redhat.com>
+	<4329D951-F1D0-4B0B-99AB-9F1B7D3DA99B@alex.org.uk>
+	<C9D4A99C-1E81-4144-976B-289FF959430B@alex.org.uk>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <ee7fc746-eb1d-3f89-df3c-308a2dd4a026@virtuozzo.com>
+Date: Thu, 8 Dec 2016 09:58:23 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <29e8c31e-a05f-79b0-df81-ec84317496b9@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 01/14] osdep: Add qemu_lock_fd and
- qemu_unlock_fd
+In-Reply-To: <C9D4A99C-1E81-4144-976B-289FF959430B@alex.org.uk>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3] doc: Add NBD_CMD_BLOCK_STATUS extension
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,83 +31,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-devel@nongnu.org, "Daniel P. Berrange" <berrange@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, rjones@redhat.com
+To: Alex Bligh <alex@alex.org.uk>, John Snow <jsnow@redhat.com>
+Cc: "nbd-general@lists.sourceforge.net" <nbd-general@lists.sourceforge.net>, Kevin Wolf <kwolf@redhat.com>, "Stefan stefanha@redhat. com" <stefanha@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Markus Pargmann <mpa@pengutronix.de>, Pavel Borzenkov <pborzenkov@virtuozzo.com>, "Denis V. Lunev" <den@openvz.org>, Wouter Verhelst <w@uter.be>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Fri, 12/02 01:30, Max Reitz wrote:
-> On 31.10.2016 16:38, Fam Zheng wrote:
-> > They are wrappers of POSIX fcntl "file private locking".
-> > 
-> > Signed-off-by: Fam Zheng <famz@redhat.com>
-> > ---
-> >  include/qemu/osdep.h |  2 ++
-> >  util/osdep.c         | 29 +++++++++++++++++++++++++++++
-> >  2 files changed, 31 insertions(+)
-> > 
-> > diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-> > index 0e3c330..f15e122 100644
-> > --- a/include/qemu/osdep.h
-> > +++ b/include/qemu/osdep.h
-> > @@ -294,6 +294,8 @@ int qemu_close(int fd);
-> >  #ifndef _WIN32
-> >  int qemu_dup(int fd);
-> >  #endif
-> > +int qemu_lock_fd(int fd, int64_t start, int64_t len, bool exclusive);
-> > +int qemu_unlock_fd(int fd, int64_t start, int64_t len);
-> >  
-> >  #if defined(__HAIKU__) && defined(__i386__)
-> >  #define FMT_pid "%ld"
-> > diff --git a/util/osdep.c b/util/osdep.c
-> > index 06fb1cf..b85a490 100644
-> > --- a/util/osdep.c
-> > +++ b/util/osdep.c
-> > @@ -140,6 +140,35 @@ static int qemu_parse_fdset(const char *param)
-> >  {
-> >      return qemu_parse_fd(param);
-> >  }
-> > +
-> > +static int qemu_lock_fcntl(int fd, int64_t start, int64_t len, int fl_type)
-> > +{
-> > +#ifdef F_OFD_SETLK
-> > +    int ret;
-> > +    struct flock fl = {
-> > +        .l_whence = SEEK_SET,
-> > +        .l_start  = start,
-> > +        .l_len    = len,
-> > +        .l_type   = fl_type,
-> > +    };
-> > +    do {
-> > +        ret = fcntl(fd, F_OFD_SETLK, &fl);
-> > +    } while (ret == -1 && errno == EINTR);
-> 
-> As I've asked in the last version: Can EINTR happen at all? My man page
-> tells me it's possible only with F(_OFD)_SETLKW.
+08.12.2016 06:39, Alex Bligh wrote:
 
-I think you are right, let's drop the condition.
+[...]
 
-Fam
+>> are vendor dependent extensions. The 'BASE' namespace represents
+>> metadata contexts defined within this document. Other namespaces
+>> may be registered by reference within this document.
+>>
+>> +The "BASE:allocation"
+>>
+>> Backticks: `BASE:allocation`
 
-> 
-> Max
-> 
-> > +    return ret == -1 ? -errno : 0;
-> > +#else
-> > +    return -ENOTSUP;
-> > +#endif
-> > +}
-> > +
-> > +int qemu_lock_fd(int fd, int64_t start, int64_t len, bool exclusive)
-> > +{
-> > +    return qemu_lock_fcntl(fd, start, len, exclusive ? F_WRLCK : F_RDLCK);
-> > +}
-> > +
-> > +int qemu_unlock_fd(int fd, int64_t start, int64_t len)
-> > +{
-> > +    return qemu_lock_fcntl(fd, start, len, F_UNLCK);
-> > +}
-> >  #endif
-> >  
-> >  /*
-> > 
-> 
-> 
+An idea: let's not use uppercase. Why to shout the namespace? 'base' and 
+'x-' would be better I think. BASE and X- will provoke all user-defined 
+namespaces be in uppercase too and a lot of uppercase will come to the 
+code =(
+
+
+-- 
+Best regards,
+Vladimir
