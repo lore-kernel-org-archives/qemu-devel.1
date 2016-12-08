@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54913)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55734)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex@alex.org.uk>) id 1cEzRk-0005k5-Dl
-	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 09:13:20 -0500
+	(envelope-from <berrange@redhat.com>) id 1cEzSc-0006qX-R5
+	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 09:14:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex@alex.org.uk>) id 1cEzRh-0004ve-6c
-	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 09:13:16 -0500
-Received: from mail.avalus.com ([89.16.176.221]:53467)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex@alex.org.uk>) id 1cEzRh-0004vV-0s
-	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 09:13:13 -0500
-Content-Type: text/plain; charset=windows-1252
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-From: Alex Bligh <alex@alex.org.uk>
-In-Reply-To: <ee7fc746-eb1d-3f89-df3c-308a2dd4a026@virtuozzo.com>
-Date: Thu, 8 Dec 2016 14:13:06 +0000
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <9547F239-73C4-4018-8C0B-3D0294BBF611@alex.org.uk>
-References: <1480073296-6931-1-git-send-email-vsementsov@virtuozzo.com>
-	<F075D231-9CBE-437C-B9F0-0DE2AB98007B@alex.org.uk>
-	<ed5f8fc7-c7c8-c678-668f-17047dbe0b23@redhat.com>
-	<4329D951-F1D0-4B0B-99AB-9F1B7D3DA99B@alex.org.uk>
-	<C9D4A99C-1E81-4144-976B-289FF959430B@alex.org.uk>
-	<ee7fc746-eb1d-3f89-df3c-308a2dd4a026@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH v3] doc: Add NBD_CMD_BLOCK_STATUS extension
+	(envelope-from <berrange@redhat.com>) id 1cEzSb-0005W0-Qu
+	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 09:14:10 -0500
+Date: Thu, 8 Dec 2016 14:13:58 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20161208141358.GJ26641@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <1481203391-9523-1-git-send-email-kwolf@redhat.com>
+	<1481203391-9523-5-git-send-email-kwolf@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1481203391-9523-5-git-send-email-kwolf@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 4/6] iscsi: Add header-digest option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,19 +24,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: Alex Bligh <alex@alex.org.uk>, John Snow <jsnow@redhat.com>, "nbd-general@lists.sourceforge.net" <nbd-general@lists.sourceforge.net>, Kevin Wolf <kwolf@redhat.com>, "Stefan stefanha@redhat. com" <stefanha@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Markus Pargmann <mpa@pengutronix.de>, Pavel Borzenkov <pborzenkov@virtuozzo.com>, "Denis V. Lunev" <den@openvz.org>, Wouter Verhelst <w@uter.be>, Paolo Bonzini <pbonzini@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, jcody@redhat.com, pl@kamp.de, ptoscano@redhat.com, ronniesahlberg@gmail.com, pbonzini@redhat.com, qemu-devel@nongnu.org
 
+On Thu, Dec 08, 2016 at 02:23:09PM +0100, Kevin Wolf wrote:
+> This was previously only available with -iscsi. Again, after this patch,
+> the -iscsi option only takes effect if an URL is given. New users are
+> supposed to use the new driver-specific option.
+> 
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  block/iscsi.c | 38 ++++++++++++++------------------------
+>  1 file changed, 14 insertions(+), 24 deletions(-)
 
-> On 8 Dec 2016, at 06:58, Vladimir Sementsov-Ogievskiy =
-<vsementsov@virtuozzo.com> wrote:
->=20
-> An idea: let's not use uppercase. Why to shout the namespace? 'base' =
-and 'x-' would be better I think. BASE and X- will provoke all =
-user-defined namespaces be in uppercase too and a lot of uppercase will =
-come to the code =3D(
+Reviewed-by: Daniel P. berrange <berrange@redhat.com>
 
-I agree
-
---=20
-Alex Bligh
+Regards,
+Daniel
+-- 
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
