@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46504)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41600)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cF0Uf-0002DF-1x
-	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 10:20:22 -0500
+	(envelope-from <bounces@canonical.com>) id 1cEuUv-0007HV-0c
+	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 03:56:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cF0Ua-0004VT-Ps
-	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 10:20:21 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58428)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cF0Ua-0004Uw-Gq
-	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 10:20:16 -0500
-References: <1481077751-106192-1-git-send-email-arei.gonglei@huawei.com>
-	<6c9a32a1-9984-6ae6-bbdc-6843938ee2fd@redhat.com>
-	<33183CC9F5247A488A2544077AF19020DA156AAE@DGGEMA505-MBX.china.huawei.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <54e4918c-f686-d7d1-2c70-31ed344cd8a9@redhat.com>
-Date: Thu, 8 Dec 2016 09:20:07 -0600
+	(envelope-from <bounces@canonical.com>) id 1cEuUr-00057m-L2
+	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 03:56:13 -0500
+Received: from indium.canonical.com ([91.189.90.7]:36242)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cEuUr-00056X-D9
+	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 03:56:09 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cEuUo-0000L4-BL
+	for <qemu-devel@nongnu.org>; Thu, 08 Dec 2016 08:56:07 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id C6A7A2E8233
+	for <qemu-devel@nongnu.org>; Thu,  8 Dec 2016 08:55:56 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <33183CC9F5247A488A2544077AF19020DA156AAE@DGGEMA505-MBX.china.huawei.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="2q8u1FddtgbmWCHAroWgk39TAePDe4sIa"
-Subject: Re: [Qemu-devel] [PATCH for-2.9 v2] virtio-crypto: zeroize the key
- material before free
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 08 Dec 2016 08:49:27 -0000
+From: Antonio Messina <antonio.s.messina@gmail.com>
+Reply-To: Bug 1626972 <1626972@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20160923110300.23502.55001.malonedeb@soybean.canonical.com>
+Message-Id: <20161208084927.25898.64355.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1626972] Re: QEMU memfd_create fallback mechanism
+ change for security drivers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,91 +37,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Gonglei (Arei)" <arei.gonglei@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "mst@redhat.com" <mst@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---2q8u1FddtgbmWCHAroWgk39TAePDe4sIa
-From: Eric Blake <eblake@redhat.com>
-To: "Gonglei (Arei)" <arei.gonglei@huawei.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "mst@redhat.com" <mst@redhat.com>,
- "stefanha@redhat.com" <stefanha@redhat.com>
-Message-ID: <54e4918c-f686-d7d1-2c70-31ed344cd8a9@redhat.com>
-Subject: Re: [PATCH for-2.9 v2] virtio-crypto: zeroize the key material before
- free
-References: <1481077751-106192-1-git-send-email-arei.gonglei@huawei.com>
- <6c9a32a1-9984-6ae6-bbdc-6843938ee2fd@redhat.com>
- <33183CC9F5247A488A2544077AF19020DA156AAE@DGGEMA505-MBX.china.huawei.com>
-In-Reply-To: <33183CC9F5247A488A2544077AF19020DA156AAE@DGGEMA505-MBX.china.huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hi all,
 
-On 12/07/2016 08:33 PM, Gonglei (Arei) wrote:
+I am facing this issue too, and although I can confirm the patch can be
+easily backported to Trusty (we run Mitaka on Trusty), some of our
+customers have VMs started with the old qemu and I cannot live migrate
+anymore or update qemu without stopping and starting the VM.
 
->> Sensitive information is sometimes also held in mlocked pages to preve=
-nt
->> it being swapped to disk, but qemu in general is not currently taking
->> that level of precaution (see also commit 8813800b).
->>
->>>
->>> Let's zeroize the memory of CryptoDevBackendSymOpInfo structure point=
-ed
->>> for key material security.
->>>
->>> [v2: Stefan perfects the commit message, thanks]
->>
->> The v2 blurb should appear after the --- line, as it is nice for
->> reviewers but a year from now when reading 'git log' we won't care how=
+Do you have any suggestion on how to allow the live migration of VMs
+currently running with qemu pre-patch and kernel 3.13?
 
->> many versions were on the list, only about the one version in git.
->>
-> Yes, you are right. I just wanted to keep the Stefan's work because
-> the most of commit message comes from him. :)
+Thank you in advance
 
-Then I might have written:
+-- =
 
-[Thanks to Stefan for help with crafting the commit message]
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1626972
 
->=20
->>> Signed-off-by: Gonglei <arei.gonglei@huawei.com>
->>> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
->>> ---
->>>  hw/virtio/virtio-crypto.c | 13 ++++++++++++-
->>>  1 file changed, 12 insertions(+), 1 deletion(-)
->>>
->>
->> The commit message may still need improvement, but the maintainer migh=
-t
->> be willing to do that without needing a v3.  At any rate,
->> Reviewed-by: Eric Blake <eblake@redhat.com>
->>
-> Thanks.
+Title:
+  QEMU memfd_create fallback mechanism change for security drivers
 
-We'll see what the maintainer thinks :)
+Status in Ubuntu Cloud Archive:
+  Fix Released
+Status in QEMU:
+  Fix Committed
+Status in qemu package in Ubuntu:
+  Fix Released
+Status in qemu source package in Xenial:
+  Fix Committed
+Status in qemu source package in Yakkety:
+  Fix Committed
+Status in qemu source package in Zesty:
+  Fix Released
 
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+Bug description:
+  [Impact]
+
+   * Updated QEMU (from UCA) live migration doesn't work with 3.13 kernels.
+   * QEMU code checks if it can create /tmp/memfd-XXX files wrongly.
+   * Apparmor will block access to /tmp/ and QEMU will fail migrating.
+
+  [Test Case]
+
+   * Install 2 Ubuntu Trusty (3.13) + UCA Mitaka + apparmor rules.
+   * Try to live-migration from one to another. =
+
+   * Apparmor will block creation of /tmp/memfd-XXX files.
+
+  [Regression Potential]
+
+   Pros:
+   * Exhaustively tested this.
+   * Worked with upstream on this fix. =
+
+   * I'm implementing new vhost log mechanism for upstream.
+   * One line change to a blocker that is already broken.
+
+   Cons:
+   * To break live migration in other circumstances. =
 
 
---2q8u1FddtgbmWCHAroWgk39TAePDe4sIa
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+  [Other Info]
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+   * Christian Ehrhardt has been following this.
 
-iQEcBAEBCAAGBQJYSXonAAoJEKeha0olJ0Nqu9MH/0BBQhHWB+mtA9pTQqxL6khe
-p4qP5aL5JcE4T+zi3XUCB8ATnRiO4+bcBOYGoDm3ln0xaWV82NBfiFbeHhq1cRtR
-XkfvA8/dpCNtQU/OzrzwMMLONepEwLC/UjMfTVCqE0xbFOe8FKjw4nazNOjoHmLd
-ivArp8trd/+WIte7M81tBFCGZGGGlDXD9erv07HtrzrxfSfouwByN9GCUvgoma4V
-zVpCUgadmrTeLfITF8h7ZncR9Ec3MMt5iSHG2SXIbfo75T76vHJrsmWGz7Dvv60J
-8X44dApcs9/l3doAGr2qwRT8EOga2W83gQAUX9CvQNkiE6nryQ1MZM5o+WkA5iU=
-=XnMn
------END PGP SIGNATURE-----
+  ORIGINAL DESCRIPTION:
 
---2q8u1FddtgbmWCHAroWgk39TAePDe4sIa--
+  When libvirt starts using apparmor, and creating apparmor profiles for
+  every virtual machine created in the compute nodes, mitaka qemu (2.5 -
+  and upstream also) uses a fallback mechanism for creating shared
+  memory for live-migrations. This fall back mechanism, on kernels 3.13
+  - that don't have memfd_create() system-call, try to create files on
+  /tmp/ directory and fails.. causing live-migration not to work.
+
+  Trusty with kernel 3.13 + Mitaka with qemu 2.5 + apparmor capability =3D
+  can't live migrate.
+
+  From qemu 2.5, logic is on :
+
+  void *qemu_memfd_alloc(const char *name, size_t size, unsigned int seals,=
+ int *fd)
+  {
+  =C2=A0=C2=A0=C2=A0=C2=A0if (memfd_create)... ### only works with HWE kern=
+els
+
+  =C2=A0=C2=A0=C2=A0=C2=A0else ### 3.13 kernels, gets blocked by apparmor
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0tmpdir =3D g_get_tmp_dir
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0...
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0mfd =3D mkstemp(fname)
+  }
+
+  And you can see the errors:
+
+  From the host trying to send the virtual machine:
+
+  2016-08-15 16:36:26.160 1974 ERROR nova.virt.libvirt.driver [req-0cac612b=
+-8d53-4610-b773-d07ad6bacb91 691a581cfa7046278380ce82b1c38ddd 133ebc3585c04=
+1aebaead8c062cd6511 - - -] [instance: 2afa1131-bc8c-43d2-9c4a-962c1bf7723e]=
+ Migration operation has aborted
+  2016-08-15 16:36:26.248 1974 ERROR nova.virt.libvirt.driver [req-0cac612b=
+-8d53-4610-b773-d07ad6bacb91 691a581cfa7046278380ce82b1c38ddd 133ebc3585c04=
+1aebaead8c062cd6511 - - -] [instance: 2afa1131-bc8c-43d2-9c4a-962c1bf7723e]=
+ Live Migration failure: internal error: unable to execute QEMU command 'mi=
+grate': Migration disabled: failed to allocate shared memory
+
+  From the host trying to receive the virtual machine:
+
+  Aug 15 16:36:19 tkcompute01 kernel: [ 1194.356794] type=3D1400 audit(1471=
+289779.791:72): apparmor=3D"STATUS" operation=3D"profile_load" profile=3D"u=
+nconfined" name=3D"libvirt-2afa1131-bc8c-43d2-9c4a-962c1bf7723e" pid=3D1256=
+5 comm=3D"apparmor_parser"
+  Aug 15 16:36:19 tkcompute01 kernel: [ 1194.357048] type=3D1400 audit(1471=
+289779.791:73): apparmor=3D"STATUS" operation=3D"profile_load" profile=3D"u=
+nconfined" name=3D"qemu_bridge_helper" pid=3D12565 comm=3D"apparmor_parser"
+  Aug 15 16:36:20 tkcompute01 kernel: [ 1194.877027] type=3D1400 audit(1471=
+289780.311:74): apparmor=3D"STATUS" operation=3D"profile_replace" profile=
+=3D"unconfined" name=3D"libvirt-2afa1131-bc8c-43d2-9c4a-962c1bf7723e" pid=
+=3D12613 comm=3D"apparmor_parser"
+  Aug 15 16:36:20 tkcompute01 kernel: [ 1194.904407] type=3D1400 audit(1471=
+289780.343:75): apparmor=3D"STATUS" operation=3D"profile_replace" profile=
+=3D"unconfined" name=3D"qemu_bridge_helper" pid=3D12613 comm=3D"apparmor_pa=
+rser"
+  Aug 15 16:36:20 tkcompute01 kernel: [ 1194.973064] type=3D1400 audit(1471=
+289780.407:76): apparmor=3D"DENIED" operation=3D"mknod" profile=3D"libvirt-=
+2afa1131-bc8c-43d2-9c4a-962c1bf7723e" name=3D"/tmp/memfd-tNpKSj" pid=3D1262=
+5 comm=3D"qemu-system-x86" requested_mask=3D"c" denied_mask=3D"c" fsuid=3D1=
+07 ouid=3D107
+  Aug 15 16:36:20 tkcompute01 kernel: [ 1194.979871] type=3D1400 audit(1471=
+289780.411:77): apparmor=3D"DENIED" operation=3D"open" profile=3D"libvirt-2=
+afa1131-bc8c-43d2-9c4a-962c1bf7723e" name=3D"/tmp/" pid=3D12625 comm=3D"qem=
+u-system-x86" requested_mask=3D"r" denied_mask=3D"r" fsuid=3D107 ouid=3D0
+  Aug 15 16:36:20 tkcompute01 kernel: [ 1194.979881] type=3D1400 audit(1471=
+289780.411:78): apparmor=3D"DENIED" operation=3D"open" profile=3D"libvirt-2=
+afa1131-bc8c-43d2-9c4a-962c1bf7723e" name=3D"/var/tmp/" pid=3D12625 comm=3D=
+"qemu-system-x86" requested_mask=3D"r" denied_mask=3D"r" fsuid=3D107 ouid=
+=3D0
+
+  When leaving libvirt without apparmor capabilities (thus not confining
+  virtual machines on compute nodes, the live migration works as
+  expected, so, clearly, apparmor is stepping into the live migration).
+  I'm sure that virtual machines have to be confined and that this isn't
+  the desired behaviour...
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/cloud-archive/+bug/1626972/+subscriptions
