@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33563)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39586)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ashijeetacharya@gmail.com>) id 1cF2zz-00035G-5u
-	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 13:00:52 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cF3E9-0003bd-9C
+	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 13:15:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ashijeetacharya@gmail.com>) id 1cF2zw-00079d-6t
-	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 13:00:51 -0500
-Received: from mail-oi0-f45.google.com ([209.85.218.45]:33838)
+	(envelope-from <rth7680@gmail.com>) id 1cF3E4-0004gi-BU
+	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 13:15:29 -0500
+Received: from mail-qt0-f195.google.com ([209.85.216.195]:34401)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ashijeetacharya@gmail.com>)
-	id 1cF2zw-00073r-2K
-	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 13:00:48 -0500
-Received: by mail-oi0-f45.google.com with SMTP id y198so461117596oia.1
-	for <qemu-devel@nongnu.org>; Thu, 08 Dec 2016 10:00:26 -0800 (PST)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cF3E4-0004MF-7j
+	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 13:15:24 -0500
+Received: by mail-qt0-f195.google.com with SMTP id l20so49733750qta.1
+	for <qemu-devel@nongnu.org>; Thu, 08 Dec 2016 10:15:03 -0800 (PST)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <1479906121-12211-1-git-send-email-rth@twiddle.net>
+	<1479906121-12211-43-git-send-email-rth@twiddle.net>
+	<871sxiz4mh.fsf@linaro.org>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <ebe1ea7b-f67c-6c70-988c-7ae0c7831faa@twiddle.net>
+Date: Thu, 8 Dec 2016 10:13:58 -0800
 MIME-Version: 1.0
-From: Ashijeet Acharya <ashijeetacharya@gmail.com>
-Date: Thu, 8 Dec 2016 23:29:24 +0530
-Message-ID: <CAC2QTZa8paD4kaY+fWqwWiAu9NKsCTZr9-=Ldn78HPHAUE1ZSA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: [Qemu-devel] migration: Introduce a new "--only-migratable" option
+In-Reply-To: <871sxiz4mh.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v4 42/64] tcg/arm: Handle ctz and clz
+ opcodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,24 +32,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "dgilbert@redhat.com" <dgilbert@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org
 
-Hi Dave,
+On 12/08/2016 09:56 AM, Alex Bennée wrote:
+>> +        if (c && a2 == 32) {
+>> +            tcg_out_dat_reg(s, COND_AL, INSN_CLZ, a0, 0, a1, 0);
+>> +            break;
+>> +        }
+>
+> Why the early break instead of else leg?
+>
+>> +        tcg_out_dat_imm(s, COND_AL, ARITH_CMP, 0, a1, 0);
+>> +        tcg_out_dat_reg(s, COND_NE, INSN_CLZ, a0, 0, a1, 0);
+>> +        if (c || a0 != a2) {
+>> +            tcg_out_dat_rIK(s, COND_EQ, ARITH_MOV, ARITH_MVN, a0, 0, a2, c);
 
-I have added the compatibility of this option for both command line
-and hotplug via qmp and hmp. Although, please confirm that making use
-of "device_add" is the only way of hotplugging devices into a QEMU
-instance.
+It keeps this line under 80 columns, is all.
 
-With this sorted out, there is one special case left where the device
-dynamically declares itself 'unmigratable' via migrate_add_blocker. I
-have a query regarding that which is, what is the preferred action in
-this scenario? Should I unmount the device or restrict the device from
-becoming unmigratable in the first place.
-For example, restrict 9pfs from mounting the filesystem (which you
-explained previously).
 
-Or is there a completely different solution in your mind?
-
-Thanks
-Ashijeet
+r~
