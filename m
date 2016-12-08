@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51134)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51154)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cEwpq-0005JE-K0
+	(envelope-from <bounces@canonical.com>) id 1cEwpr-0005JH-HI
 	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 06:26:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cEwpm-0001Ux-Hg
-	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 06:25:58 -0500
-Received: from indium.canonical.com ([91.189.90.7]:37984)
+	(envelope-from <bounces@canonical.com>) id 1cEwpq-0001Wt-57
+	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 06:25:59 -0500
+Received: from indium.canonical.com ([91.189.90.7]:38090)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cEwpm-0001UV-91
-	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 06:25:54 -0500
+	id 1cEwpp-0001WQ-TZ
+	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 06:25:58 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cEwpj-0000a6-KU
-	for <qemu-devel@nongnu.org>; Thu, 08 Dec 2016 11:25:52 +0000
+	id 1cEwpn-0000aB-Kk
+	for <qemu-devel@nongnu.org>; Thu, 08 Dec 2016 11:25:56 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id E7A4C2E81AD
-	for <qemu-devel@nongnu.org>; Thu,  8 Dec 2016 11:25:46 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 3B7F12E8211
+	for <qemu-devel@nongnu.org>; Thu,  8 Dec 2016 11:25:50 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 08 Dec 2016 11:14:37 -0000
+Date: Thu, 08 Dec 2016 11:16:19 -0000
 From: Rafael David Tinoco <rafael.tinoco@canonical.com>
 Reply-To: Bug 1626972 <1626972@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20160923110300.23502.55001.malonedeb@soybean.canonical.com>
-Message-Id: <20161208111437.16767.15504.malone@soybean.canonical.com>
+Message-Id: <20161208111619.16838.19980.malone@soybean.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1626972] Re: QEMU memfd_create fallback mechanism
  change for security drivers
@@ -39,39 +39,13 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Hello Antonio (@arcimboldo)
+@jamespage, @cpaelzer,
 
-The fix only makes sense for newer QEMUs (>=3D Xenial, like the one from
-Mitaka Ubuntu Cloud Archive).
+I'll verify this fix in couple of days so it can be released.
 
-OBS:
+Thank you!
 
-The "migration check" is done in VHOST initialization functions when the
-devices are virtually attached to the virtual machine. If you are using
-kernel 3.13 and have apparmor enabled, then all the running instances
-have the "migration blocker" ON - because of this buggy migration check
-- and won't be able to live migration.
-
-Unfortunately there is a "in-memory" linked list telling qemu that is
-has a blocker (with the reason). This blocker was added during instance
-startup and will be checked/used only when instance is live-migrated.
-
-Check this: http://pastebin.ubuntu.com/23517175/
-
-If you started the instance in a host not running apparmor (or not
-having libvirt profile loaded, for example) it won't block the creation
-of /tmp/memfd-XXX files during instance initialization. That won't
-trigger the "blocker flag" inside the running program and, if/when
-needed, the live migration will be able to occur.
-
-This means that, after installing the new package, if you're using
-apparmor, yes, you would have to RESTART running instances that were
-affected by this bug in order to live migrating them. Sorry for the bad
-news!  Even if you remove the apparmor rules, the migration blocker is
-already set.
-
-Hacking your process virtual memory would jeopardize the contents of the
-virtual memory (could be catastrophic specially for a virtual machine).
+Rafael
 
 -- =
 
