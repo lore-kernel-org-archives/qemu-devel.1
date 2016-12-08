@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41600)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59970)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cEuUv-0007HV-0c
-	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 03:56:14 -0500
+	(envelope-from <yu.ning@linux.intel.com>) id 1cEv5t-0005ls-7x
+	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 04:34:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cEuUr-00057m-L2
-	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 03:56:13 -0500
-Received: from indium.canonical.com ([91.189.90.7]:36242)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cEuUr-00056X-D9
-	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 03:56:09 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cEuUo-0000L4-BL
-	for <qemu-devel@nongnu.org>; Thu, 08 Dec 2016 08:56:07 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C6A7A2E8233
-	for <qemu-devel@nongnu.org>; Thu,  8 Dec 2016 08:55:56 +0000 (UTC)
+	(envelope-from <yu.ning@linux.intel.com>) id 1cEv5p-0002YG-7D
+	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 04:34:25 -0500
+Received: from mga03.intel.com ([134.134.136.65]:54029)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yu.ning@linux.intel.com>)
+	id 1cEv5o-0002Wz-TB
+	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 04:34:21 -0500
+References: <cover.1479381090.git.vpalatin@chromium.org>
+From: Yu Ning <yu.ning@linux.intel.com>
+Message-ID: <f228cb95-de64-5dc3-f761-390f20675541@linux.intel.com>
+Date: Thu, 8 Dec 2016 17:34:32 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 08 Dec 2016 08:49:27 -0000
-From: Antonio Messina <antonio.s.messina@gmail.com>
-Reply-To: Bug 1626972 <1626972@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20160923110300.23502.55001.malonedeb@soybean.canonical.com>
-Message-Id: <20161208084927.25898.64355.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1626972] Re: QEMU memfd_create fallback mechanism
- change for security drivers
+In-Reply-To: <cover.1479381090.git.vpalatin@chromium.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 0/3] Add HAX support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,150 +27,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Vincent Palatin <vpalatin@chromium.org>, qemu-devel <qemu-devel@nongnu.org>
 
-Hi all,
+As a HAXM developer at Intel, I just want to come out and show our 
+support for Vincent's upstreaming effort. We'd love to see HAXM support 
+code land in upstream QEMU, and will do what is necessary to make that 
+happen.
 
-I am facing this issue too, and although I can confirm the patch can be
-easily backported to Trusty (we run Mitaka on Trusty), some of our
-customers have VMs started with the old qemu and I cannot live migrate
-anymore or update qemu without stopping and starting the VM.
+We've been working on the issues that Vincent raised and have made some 
+progress - see below.
 
-Do you have any suggestion on how to allow the live migration of VMs
-currently running with qemu pre-patch and kernel 3.13?
+Regards,
+Yu
 
-Thank you in advance
+On 11/17/2016 7:13 PM, Vincent Palatin wrote:
+> I took a stab at trying to rebase/upstream the support for Intel HAXM.
+> (Hardware Accelerated Execution Manager).
+> Intel HAX is kernel-based hardware acceleration module for Windows and MacOSX.
+>
+> I have based my work on the last version of the source code I found:
+> the emu-2.2-release branch in the external/qemu-android repository as used by
+> the Android emulator.
+> In patch 2/3, I have forward-ported the core HAX code from there.
+> It has been modified to build and run along with the current code base.
+> It has been simplifying by removing non-UG hardware support / Darwin support /
+> Android-specific leftovers.
+>
+> CAVEAT: this patchset is still RFC because in addition of potentially containing
+> a few outdated constructs and a questionable mess in qemu_cpu_kick_thread(),
+> there are 2 unsolved issues:
+> - in rare cases, the HAX kernel module asks us to emulate a MMIO access rather
+>    than just using the 'fast MMIO' path. This path is still not implemented (as
+>    it was in the original patch). It's unclear why/when this is happening
+>    (eg you can run a full linux image without hitting it but the default iPXE
+>    option ROM is hitting it in the Intel network driver).
 
--- =
+This is now resolved, thanks to Vincent's help with debugging. The next 
+HAXM driver release will include the fix.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1626972
+> - the MemoryListener implementation cannot remove a memory mapping (e.g. for
+>    digging the VGA 'hole' in the lowmem). This shortcoming breaks the std vga
+>    implementation but in the current HAX module API, I don't see any (documented)
+>    way of implementing this.
 
-Title:
-  QEMU memfd_create fallback mechanism change for security drivers
+The current HAXM driver does not support removing a memory mapping. We 
+just got that implemented this week, but testing has revealed another 
+MMIO bug, which we are trying to fix.
 
-Status in Ubuntu Cloud Archive:
-  Fix Released
-Status in QEMU:
-  Fix Committed
-Status in qemu package in Ubuntu:
-  Fix Released
-Status in qemu source package in Xenial:
-  Fix Committed
-Status in qemu source package in Yakkety:
-  Fix Committed
-Status in qemu source package in Zesty:
-  Fix Released
-
-Bug description:
-  [Impact]
-
-   * Updated QEMU (from UCA) live migration doesn't work with 3.13 kernels.
-   * QEMU code checks if it can create /tmp/memfd-XXX files wrongly.
-   * Apparmor will block access to /tmp/ and QEMU will fail migrating.
-
-  [Test Case]
-
-   * Install 2 Ubuntu Trusty (3.13) + UCA Mitaka + apparmor rules.
-   * Try to live-migration from one to another. =
-
-   * Apparmor will block creation of /tmp/memfd-XXX files.
-
-  [Regression Potential]
-
-   Pros:
-   * Exhaustively tested this.
-   * Worked with upstream on this fix. =
-
-   * I'm implementing new vhost log mechanism for upstream.
-   * One line change to a blocker that is already broken.
-
-   Cons:
-   * To break live migration in other circumstances. =
-
-
-  [Other Info]
-
-   * Christian Ehrhardt has been following this.
-
-  ORIGINAL DESCRIPTION:
-
-  When libvirt starts using apparmor, and creating apparmor profiles for
-  every virtual machine created in the compute nodes, mitaka qemu (2.5 -
-  and upstream also) uses a fallback mechanism for creating shared
-  memory for live-migrations. This fall back mechanism, on kernels 3.13
-  - that don't have memfd_create() system-call, try to create files on
-  /tmp/ directory and fails.. causing live-migration not to work.
-
-  Trusty with kernel 3.13 + Mitaka with qemu 2.5 + apparmor capability =3D
-  can't live migrate.
-
-  From qemu 2.5, logic is on :
-
-  void *qemu_memfd_alloc(const char *name, size_t size, unsigned int seals,=
- int *fd)
-  {
-  =C2=A0=C2=A0=C2=A0=C2=A0if (memfd_create)... ### only works with HWE kern=
-els
-
-  =C2=A0=C2=A0=C2=A0=C2=A0else ### 3.13 kernels, gets blocked by apparmor
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0tmpdir =3D g_get_tmp_dir
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0...
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0mfd =3D mkstemp(fname)
-  }
-
-  And you can see the errors:
-
-  From the host trying to send the virtual machine:
-
-  2016-08-15 16:36:26.160 1974 ERROR nova.virt.libvirt.driver [req-0cac612b=
--8d53-4610-b773-d07ad6bacb91 691a581cfa7046278380ce82b1c38ddd 133ebc3585c04=
-1aebaead8c062cd6511 - - -] [instance: 2afa1131-bc8c-43d2-9c4a-962c1bf7723e]=
- Migration operation has aborted
-  2016-08-15 16:36:26.248 1974 ERROR nova.virt.libvirt.driver [req-0cac612b=
--8d53-4610-b773-d07ad6bacb91 691a581cfa7046278380ce82b1c38ddd 133ebc3585c04=
-1aebaead8c062cd6511 - - -] [instance: 2afa1131-bc8c-43d2-9c4a-962c1bf7723e]=
- Live Migration failure: internal error: unable to execute QEMU command 'mi=
-grate': Migration disabled: failed to allocate shared memory
-
-  From the host trying to receive the virtual machine:
-
-  Aug 15 16:36:19 tkcompute01 kernel: [ 1194.356794] type=3D1400 audit(1471=
-289779.791:72): apparmor=3D"STATUS" operation=3D"profile_load" profile=3D"u=
-nconfined" name=3D"libvirt-2afa1131-bc8c-43d2-9c4a-962c1bf7723e" pid=3D1256=
-5 comm=3D"apparmor_parser"
-  Aug 15 16:36:19 tkcompute01 kernel: [ 1194.357048] type=3D1400 audit(1471=
-289779.791:73): apparmor=3D"STATUS" operation=3D"profile_load" profile=3D"u=
-nconfined" name=3D"qemu_bridge_helper" pid=3D12565 comm=3D"apparmor_parser"
-  Aug 15 16:36:20 tkcompute01 kernel: [ 1194.877027] type=3D1400 audit(1471=
-289780.311:74): apparmor=3D"STATUS" operation=3D"profile_replace" profile=
-=3D"unconfined" name=3D"libvirt-2afa1131-bc8c-43d2-9c4a-962c1bf7723e" pid=
-=3D12613 comm=3D"apparmor_parser"
-  Aug 15 16:36:20 tkcompute01 kernel: [ 1194.904407] type=3D1400 audit(1471=
-289780.343:75): apparmor=3D"STATUS" operation=3D"profile_replace" profile=
-=3D"unconfined" name=3D"qemu_bridge_helper" pid=3D12613 comm=3D"apparmor_pa=
-rser"
-  Aug 15 16:36:20 tkcompute01 kernel: [ 1194.973064] type=3D1400 audit(1471=
-289780.407:76): apparmor=3D"DENIED" operation=3D"mknod" profile=3D"libvirt-=
-2afa1131-bc8c-43d2-9c4a-962c1bf7723e" name=3D"/tmp/memfd-tNpKSj" pid=3D1262=
-5 comm=3D"qemu-system-x86" requested_mask=3D"c" denied_mask=3D"c" fsuid=3D1=
-07 ouid=3D107
-  Aug 15 16:36:20 tkcompute01 kernel: [ 1194.979871] type=3D1400 audit(1471=
-289780.411:77): apparmor=3D"DENIED" operation=3D"open" profile=3D"libvirt-2=
-afa1131-bc8c-43d2-9c4a-962c1bf7723e" name=3D"/tmp/" pid=3D12625 comm=3D"qem=
-u-system-x86" requested_mask=3D"r" denied_mask=3D"r" fsuid=3D107 ouid=3D0
-  Aug 15 16:36:20 tkcompute01 kernel: [ 1194.979881] type=3D1400 audit(1471=
-289780.411:78): apparmor=3D"DENIED" operation=3D"open" profile=3D"libvirt-2=
-afa1131-bc8c-43d2-9c4a-962c1bf7723e" name=3D"/var/tmp/" pid=3D12625 comm=3D=
-"qemu-system-x86" requested_mask=3D"r" denied_mask=3D"r" fsuid=3D107 ouid=
-=3D0
-
-  When leaving libvirt without apparmor capabilities (thus not confining
-  virtual machines on compute nodes, the live migration works as
-  expected, so, clearly, apparmor is stepping into the live migration).
-  I'm sure that virtual machines have to be confined and that this isn't
-  the desired behaviour...
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/cloud-archive/+bug/1626972/+subscriptions
+>
+> In patch 3/3, I have put the plumbing into the QEMU code base, I did some clean
+> up there and it is reasonably intrusive: i.e.
+>   Makefile.target           |  1 +
+>   configure                 | 18 ++++++++++
+>   cpus.c                    | 87 ++++++++++++++++++++++++++++++++++++++++++++++-
+>   exec.c                    | 16 +++++++++
+>   hw/intc/apic_common.c     |  3 +-
+>   include/qom/cpu.h         |  5 +++
+>   include/sysemu/hw_accel.h |  9 +++++
+>   qemu-options.hx           | 11 ++++++
+>   target-i386/Makefile.objs |  4 +++
+>   vl.c                      | 15 ++++++--
+>   10 files changed, 164 insertions(+), 5 deletions(-)
+>
+> The patch 1/3 just extracts from KVM specific header the cpu_synchronize_
+> functions that HAX is also using.
+>
+> I have tested the end result on a Windows 10 Pro machine (with UG support)
+> with the Intel HAXM module 6.0.4 and a large ChromiumOS x86_64 image to
+> exercise various code paths. It looks stable.
+> I also did a quick regression testing of the integration by running a Linux
+> build with KVM enabled.
+> Just running 'qemu-system-x86_64 -enable-hax' is broken due to the caveats
+> described above.
+>
+> Changes from v2 to v3:
+> - fix saving/restoring FPU registers as suggested by Paolo.
+> - fix Windows build on all targets as contributed by Stefan Weil.
+> - clean-up IO / MMIO emulation.
+> - more clean-up of emulation leftovers.
+>
+> Changes from v1 to v2:
+> - fix all style issues in the original code to get it through checkpatch.pl.
+> - remove Darwin support, it was barely tested and not fully functional.
+> - remove the support for CPU without UG mode.
+> - fix most review comments
+>
+> Vincent Palatin (3):
+>    kvm: move cpu synchronization code
+>    target-i386: Add Intel HAX files
+>    Plumb the HAXM-based hardware acceleration support
+>
+>   Makefile.target             |    1 +
+>   configure                   |   18 +
+>   cpus.c                      |   88 ++-
+>   exec.c                      |   16 +
+>   gdbstub.c                   |    1 +
+>   hax-stub.c                  |   39 ++
+>   hw/i386/kvm/apic.c          |    1 +
+>   hw/i386/kvmvapic.c          |    1 +
+>   hw/intc/apic_common.c       |    3 +-
+>   hw/misc/vmport.c            |    2 +-
+>   hw/ppc/pnv_xscom.c          |    2 +-
+>   hw/ppc/ppce500_spin.c       |    4 +-
+>   hw/ppc/spapr.c              |    2 +-
+>   hw/ppc/spapr_hcall.c        |    2 +-
+>   hw/s390x/s390-pci-inst.c    |    1 +
+>   include/qom/cpu.h           |    5 +
+>   include/sysemu/hax.h        |   56 ++
+>   include/sysemu/hw_accel.h   |   48 ++
+>   include/sysemu/kvm.h        |   23 -
+>   monitor.c                   |    2 +-
+>   qemu-options.hx             |   11 +
+>   qom/cpu.c                   |    2 +-
+>   target-arm/cpu.c            |    2 +-
+>   target-i386/Makefile.objs   |    4 +
+>   target-i386/hax-all.c       | 1250 +++++++++++++++++++++++++++++++++++++++++++
+>   target-i386/hax-i386.h      |   85 +++
+>   target-i386/hax-interface.h |  357 ++++++++++++
+>   target-i386/hax-slot.c      |  333 ++++++++++++
+>   target-i386/hax-slot.h      |   58 ++
+>   target-i386/hax-windows.c   |  489 +++++++++++++++++
+>   target-i386/hax-windows.h   |   89 +++
+>   target-i386/helper.c        |    1 +
+>   target-i386/kvm.c           |    1 +
+>   target-ppc/mmu-hash64.c     |    2 +-
+>   target-ppc/translate_init.c |    2 +-
+>   target-s390x/gdbstub.c      |    1 +
+>   vl.c                        |   15 +-
+>   37 files changed, 2978 insertions(+), 39 deletions(-)
+>   create mode 100644 hax-stub.c
+>   create mode 100644 include/sysemu/hax.h
+>   create mode 100644 include/sysemu/hw_accel.h
+>   create mode 100644 target-i386/hax-all.c
+>   create mode 100644 target-i386/hax-i386.h
+>   create mode 100644 target-i386/hax-interface.h
+>   create mode 100644 target-i386/hax-slot.c
+>   create mode 100644 target-i386/hax-slot.h
+>   create mode 100644 target-i386/hax-windows.c
+>   create mode 100644 target-i386/hax-windows.h
+>
