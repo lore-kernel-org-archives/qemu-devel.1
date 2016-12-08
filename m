@@ -1,21 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33153)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33908)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1cEwBD-000380-6p
-	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 05:44:00 -0500
+	(envelope-from <fziglio@redhat.com>) id 1cEwCz-0004Cy-V4
+	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 05:45:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1cEwB9-0004iu-9u
-	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 05:43:59 -0500
-Date: Thu, 8 Dec 2016 11:42:52 +0100
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Message-ID: <20161208104252.GH9606@toto>
-References: <CAHgzvFi2wjPtJzU9hXzdaZsbYr085VCbjfsiUeVc5XnUR8arHw@mail.gmail.com>
-	<293c3354-b11b-a31f-39dc-b7264ad0bb24@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <293c3354-b11b-a31f-39dc-b7264ad0bb24@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] cadence_uart: Check if
- receiver timeout counter is disabled
+	(envelope-from <fziglio@redhat.com>) id 1cEwCw-00065E-22
+	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 05:45:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53492)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <fziglio@redhat.com>) id 1cEwCv-00064l-R0
+	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 05:45:45 -0500
+From: Frediano Ziglio <fziglio@redhat.com>
+Date: Thu,  8 Dec 2016 10:45:39 +0000
+Message-Id: <20161208104539.3045-1-fziglio@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] egl-helpers: Change file licensing to LGPLv2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,52 +21,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>
-Cc: Andrew Gacek <andrew.gacek@gmail.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Alistair Francis <alistair.francis@xilinx.com>, qemu-arm@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, Cole Robinson <crobinso@redhat.com>, Gonglei <arei.gonglei@huawei.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org, Frediano Ziglio <fziglio@redhat.com>
 
-On Thu, Dec 08, 2016 at 08:50:40AM +0100, Laurent Vivier wrote:
-> I CC: Xilinx Zynq Maintainers.
-> 
-> Laurent
+The relicense permits sharing the code with Spice which
+is LGPL.
 
-Thanks
+All people listed below have agreed to the
+relicense:
+- Arei Gonglei;
+- Cole Robinson;
+- Gerd Hoffmann;
+- Peter Maydell.
 
-> 
-> On 07/12/2016 22:12, Andrew Gacek wrote:
-> > When register Rcvr_timeout_reg0 (R_RTOR in cadence_uart.c) is set to
-> > 0, the receiver timeout counter should be disabled. See page 1801 of
-> > "Zynq-7000 AP SoC Technical Reference Manual". This commit adds a
-> > such a check before setting the receive timeout interrupt.
+Signed-off-by: Frediano Ziglio <fziglio@redhat.com>
+Acked-by: Cole Robinson <crobinso@redhat.com>
+---
+ ui/egl-helpers.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-We could also try to disable the timer when rtor is zero but I think
-that exposes a bunch of corner cases that would complicate the model a bit.
-So IMO, this patch is good.
+Changes since v1:
+- extended commit message.
 
-
-> > Signed-off-by: Andrew Gacek <andrew.gacek@gmail.com>
-> > ---
-> >  hw/char/cadence_uart.c | 4 +++-
-> >  1 file changed, 3 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/hw/char/cadence_uart.c b/hw/char/cadence_uart.c
-> > index 0215d65..54194b1 100644
-> > --- a/hw/char/cadence_uart.c
-> > +++ b/hw/char/cadence_uart.c
-> > @@ -138,7 +138,9 @@ static void fifo_trigger_update(void *opaque)
-> >  {
-> >      CadenceUARTState *s = opaque;
-> > 
-> > -    s->r[R_CISR] |= UART_INTR_TIMEOUT;
-> > +    if (s->r[R_RTOR]) {
-> > +        s->r[R_CISR] |= UART_INTR_TIMEOUT;
-> > +    }
-> > 
-> >      uart_update_status(s);
-
-Since you are not modifying the IRQ state when the timeout is disabled, you can avoid calling uart_update_status too (because it will only end up recomputing the same state).
-
-With that fix:
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-
-Best regards,
-Edgar
+diff --git a/ui/egl-helpers.c b/ui/egl-helpers.c
+index 79cee05..cd24568 100644
+--- a/ui/egl-helpers.c
++++ b/ui/egl-helpers.c
+@@ -1,3 +1,19 @@
++/*
++ * Copyright (C) 2015-2016 Gerd Hoffmann <kraxel@redhat.com>
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
++ */
+ #include "qemu/osdep.h"
+ #include <glob.h>
+ #include <dirent.h>
+-- 
+2.9.3
