@@ -1,34 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35938)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45419)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cEuKO-0004bE-21
-	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 03:45:21 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cEucD-00086b-BC
+	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 04:03:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cEuKK-00065s-41
-	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 03:45:20 -0500
-Received: from indium.canonical.com ([91.189.90.7]:55039)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cEuKJ-00064F-V1
-	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 03:45:16 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cEuKH-00057r-3Z
-	for <qemu-devel@nongnu.org>; Thu, 08 Dec 2016 08:45:13 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 0274E2E80C0
-	for <qemu-devel@nongnu.org>; Thu,  8 Dec 2016 08:45:10 +0000 (UTC)
+	(envelope-from <dgilbert@redhat.com>) id 1cEucA-0005rK-4G
+	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 04:03:45 -0500
+Date: Thu, 8 Dec 2016 09:03:31 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20161208090330.GA2054@work-vm>
+References: <1479923640-8423-1-git-send-email-duanj@linux.vnet.ibm.com>
+	<1479923640-8423-4-git-send-email-duanj@linux.vnet.ibm.com>
+	<20161207194922.GC2073@work-vm>
+	<d4db7b13-9729-5faa-bb0f-93e148346ee4@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 08 Dec 2016 08:26:05 -0000
-From: Thomas Huth <920772@bugs.launchpad.net>
-Reply-To: Bug 920772 <920772@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20120124014831.2874.7900.malonedeb@wampee.canonical.com>
-Message-Id: <20161208082605.22923.41490.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 920772] Re: Win98SE glitches RHEL6.2/CentOS6.2
- QEMU
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d4db7b13-9729-5faa-bb0f-93e148346ee4@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [QEMU PATCH v14 3/4] tests/migration: Add test for
+ QTAILQ migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,62 +26,228 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Jianjun Duan <duanj@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, dmitry@daynix.com, peter.maydell@linaro.org, kraxel@redhat.com, mst@redhat.com, david@gibson.dropbear.id.au, pbonzini@redhat.com, veroniabahaa@gmail.com, quintela@redhat.com, amit.shah@redhat.com, mreitz@redhat.com, kwolf@redhat.com, rth@twiddle.net, aurelien@aurel32.net, leon.alrae@imgtec.com, blauwirbel@gmail.com, mark.cave-ayland@ilande.co.uk, mdroth@linux.vnet.ibm.com
 
-QEMU 0.12 is pretty much outdated nowadays - can you still reproduce
-these issues with the latest version of QEMU?
+* Jianjun Duan (duanj@linux.vnet.ibm.com) wrote:
+> 
+> 
+> On 12/07/2016 11:49 AM, Dr. David Alan Gilbert wrote:
+> > * Jianjun Duan (duanj@linux.vnet.ibm.com) wrote:
+> >> Add a test for QTAILQ migration to tests/test-vmstate.c.
+> > 
+> > Yes, but see comment below if you have to respin:
+> > 
+> >> Signed-off-by: Jianjun Duan <duanj@linux.vnet.ibm.com>
+> >> ---
+> >>  tests/test-vmstate.c | 160 +++++++++++++++++++++++++++++++++++++++++++++++++++
+> >>  1 file changed, 160 insertions(+)
+> >>
+> >> diff --git a/tests/test-vmstate.c b/tests/test-vmstate.c
+> >> index d2f529b..88aab8c 100644
+> >> --- a/tests/test-vmstate.c
+> >> +++ b/tests/test-vmstate.c
+> >> @@ -544,6 +544,163 @@ static void test_arr_ptr_str_no0_load(void)
+> >>      }
+> >>  }
+> >>  
+> >> +/* test QTAILQ migration */
+> >> +typedef struct TestQtailqElement TestQtailqElement;
+> >> +
+> >> +struct TestQtailqElement {
+> >> +    bool     b;
+> >> +    uint8_t  u8;
+> >> +    QTAILQ_ENTRY(TestQtailqElement) next;
+> >> +};
+> >> +
+> >> +typedef struct TestQtailq {
+> >> +    int16_t  i16;
+> >> +    QTAILQ_HEAD(TestQtailqHead, TestQtailqElement) q;
+> >> +    int32_t  i32;
+> >> +} TestQtailq;
+> >> +
+> >> +static const VMStateDescription vmstate_q_element = {
+> >> +    .name = "test/queue-element",
+> >> +    .version_id = 1,
+> >> +    .minimum_version_id = 1,
+> >> +    .fields = (VMStateField[]) {
+> >> +        VMSTATE_BOOL(b, TestQtailqElement),
+> >> +        VMSTATE_UINT8(u8, TestQtailqElement),
+> >> +        VMSTATE_END_OF_LIST()
+> >> +    },
+> >> +};
+> >> +
+> >> +static const VMStateDescription vmstate_q = {
+> >> +    .name = "test/queue",
+> >> +    .version_id = 1,
+> >> +    .minimum_version_id = 1,
+> >> +    .fields = (VMStateField[]) {
+> >> +        VMSTATE_INT16(i16, TestQtailq),
+> >> +        VMSTATE_QTAILQ_V(q, TestQtailq, 1, vmstate_q_element, TestQtailqElement,
+> >> +                         next),
+> >> +        VMSTATE_INT32(i32, TestQtailq),
+> >> +        VMSTATE_END_OF_LIST()
+> >> +    }
+> >> +};
+> >> +
+> >> +static void test_save_q(void)
+> >> +{
+> >> +    TestQtailq obj_q = {
+> >> +        .i16 = -512,
+> >> +        .i32 = 70000,
+> >> +    };
+> >> +
+> >> +    TestQtailqElement obj_qe1 = {
+> >> +        .b = true,
+> >> +        .u8 = 130,
+> >> +    };
+> >> +
+> >> +    TestQtailqElement obj_qe2 = {
+> >> +        .b = false,
+> >> +        .u8 = 65,
+> >> +    };
+> >> +
+> >> +    uint8_t wire_q[] = {
+> >> +        /* i16 */                     0xfe, 0x0,
+> >> +        /* start of element 0 of q */ 0x01,
+> >> +        /* .b  */                     0x01,
+> >> +        /* .u8 */                     0x82,
+> >> +        /* start of element 1 of q */ 0x01,
+> >> +        /* b */                       0x00,
+> >> +        /* u8 */                      0x41,
+> >> +        /* end of q */                0x00,
+> >> +        /* i32 */                     0x00, 0x01, 0x11, 0x70,
+> >> +        QEMU_VM_EOF, /* just to ensure we won't get EOF reported prematurely */
+> >> +    };
+> > 
+> > If possible it would be great to share these structures with the ones in test_load_q.
+> > 
+> The issue is that obj_q need be initialized and elements need be
+> inserted in both testing cases. It is not straightforward or a good idea
+> to construct the q in a static way. Sharing the structures would make
+> one test depending on another, since the q needs be torn down and
+> restored to the uninitialized states after one test, which has to be
+> manually done. Or we need to add a test to just init the q before these
+> two tests. That will still create dependence issue.
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+OK, what about sharing wire_q ?
 
--- =
+Dave
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/920772
-
-Title:
-  Win98SE glitches RHEL6.2/CentOS6.2 QEMU
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  I'm not sure if this is something anyone will be interested in,
-  but I ran into some glitches setting up a Windows 98 SE
-  QEMU VM with a relatively recent version.  Needed this
-  to restore an ancient backup and got it working well
-  enough to get the job done.
-
-  Versions
-  =3D=3D=3D=3D=3D=3D=3D=3D
-
-  Distro: CentOS 6.2
-
-  Kernel: upstream 3.1.8
-
-  QEMU:
-  gpxe-roms-qemu-0.9.7-6.9.el6.noarch
-  qemu-img-0.12.1.2-2.209.el6_2.1.x86_64
-  qemu-kvm-0.12.1.2-2.209.el6_2.1.x86_64
-
-  Glitches:
-
-  1) Doesn't work in KVM mode, screen goes black
-  just after installer is finishing up and switching to
-  Win98.  Saw this issue has been around for awhile.
-
-  2) Got it working in QEMU mode, but BIOS plug-n-play
-  driver fails.  This prevents other devices from working.
-
-  a) CDROM not recognized
-
-  b) Realtek 8139C driver (installed separately after
-  Win98) not recognized.
-
-  I don't need these issues fixed, just reporting the
-  in case it's of interest and/or helpful.  Can provide
-  more detail on request.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/920772/+subscriptions
+> So I would leave it as it is.
+> 
+> Thanks,
+> Jianjun
+> 
+> > Dave
+> > 
+> >> +    QTAILQ_INIT(&obj_q.q);
+> >> +    QTAILQ_INSERT_TAIL(&obj_q.q, &obj_qe1, next);
+> >> +    QTAILQ_INSERT_TAIL(&obj_q.q, &obj_qe2, next);
+> >> +
+> >> +    save_vmstate(&vmstate_q, &obj_q);
+> >> +    compare_vmstate(wire_q, sizeof(wire_q));
+> >> +}
+> >> +
+> >> +static void test_load_q(void)
+> >> +{
+> >> +    TestQtailq obj_q = {
+> >> +        .i16 = -512,
+> >> +        .i32 = 70000,
+> >> +    };
+> >> +
+> >> +    TestQtailqElement obj_qe1 = {
+> >> +        .b = true,
+> >> +        .u8 = 130,
+> >> +    };
+> >> +
+> >> +    TestQtailqElement obj_qe2 = {
+> >> +        .b = false,
+> >> +        .u8 = 65,
+> >> +    };
+> >> +
+> >> +    uint8_t wire_q[] = {
+> >> +        /* i16 */                     0xfe, 0x0,
+> >> +        /* start of element 0 of q */ 0x01,
+> >> +        /* .b  */                     0x01,
+> >> +        /* .u8 */                     0x82,
+> >> +        /* start of element 1 of q */ 0x01,
+> >> +        /* b */                       0x00,
+> >> +        /* u8 */                      0x41,
+> >> +        /* end of q */                0x00,
+> >> +        /* i32 */                     0x00, 0x01, 0x11, 0x70,
+> >> +    };
+> >> +
+> >> +    QTAILQ_INIT(&obj_q.q);
+> >> +    QTAILQ_INSERT_TAIL(&obj_q.q, &obj_qe1, next);
+> >> +    QTAILQ_INSERT_TAIL(&obj_q.q, &obj_qe2, next);
+> >> +
+> >> +    QEMUFile *fsave = open_test_file(true);
+> >> +
+> >> +    qemu_put_buffer(fsave, wire_q, sizeof(wire_q));
+> >> +    qemu_put_byte(fsave, QEMU_VM_EOF);
+> >> +    g_assert(!qemu_file_get_error(fsave));
+> >> +    qemu_fclose(fsave);
+> >> +
+> >> +    QEMUFile *fload = open_test_file(false);
+> >> +    TestQtailq tgt;
+> >> +
+> >> +    QTAILQ_INIT(&tgt.q);
+> >> +    vmstate_load_state(fload, &vmstate_q, &tgt, 1);
+> >> +    char eof = qemu_get_byte(fload);
+> >> +    g_assert(!qemu_file_get_error(fload));
+> >> +    g_assert_cmpint(tgt.i16, ==, obj_q.i16);
+> >> +    g_assert_cmpint(tgt.i32, ==, obj_q.i32);
+> >> +    g_assert_cmpint(eof, ==, QEMU_VM_EOF);
+> >> +
+> >> +    TestQtailqElement *qele_from = QTAILQ_FIRST(&obj_q.q);
+> >> +    TestQtailqElement *qlast_from = QTAILQ_LAST(&obj_q.q, TestQtailqHead);
+> >> +    TestQtailqElement *qele_to = QTAILQ_FIRST(&tgt.q);
+> >> +    TestQtailqElement *qlast_to = QTAILQ_LAST(&tgt.q, TestQtailqHead);
+> >> +
+> >> +    while (1) {
+> >> +        g_assert_cmpint(qele_to->b, ==, qele_from->b);
+> >> +        g_assert_cmpint(qele_to->u8, ==, qele_from->u8);
+> >> +        if ((qele_from == qlast_from) || (qele_to == qlast_to)) {
+> >> +            break;
+> >> +        }
+> >> +        qele_from = QTAILQ_NEXT(qele_from, next);
+> >> +        qele_to = QTAILQ_NEXT(qele_to, next);
+> >> +    }
+> >> +
+> >> +    g_assert_cmpint((uint64_t) qele_from, ==, (uint64_t) qlast_from);
+> >> +    g_assert_cmpint((uint64_t) qele_to, ==, (uint64_t) qlast_to);
+> >> +
+> >> +    /* clean up */
+> >> +    TestQtailqElement *qele;
+> >> +    while (!QTAILQ_EMPTY(&tgt.q)) {
+> >> +        qele = QTAILQ_LAST(&tgt.q, TestQtailqHead);
+> >> +        QTAILQ_REMOVE(&tgt.q, qele, next);
+> >> +        free(qele);
+> >> +        qele = NULL;
+> >> +    }
+> >> +    qemu_fclose(fload);
+> >> +}
+> >> +
+> >>  int main(int argc, char **argv)
+> >>  {
+> >>      temp_fd = mkstemp(temp_file);
+> >> @@ -562,6 +719,9 @@ int main(int argc, char **argv)
+> >>                      test_arr_ptr_str_no0_save);
+> >>      g_test_add_func("/vmstate/array/ptr/str/no0/load",
+> >>                      test_arr_ptr_str_no0_load);
+> >> +    g_test_add_func("/vmstate/qtailq/save/saveq", test_save_q);
+> >> +    g_test_add_func("/vmstate/qtailq/load/loadq", test_load_q);
+> >> +
+> >>      g_test_run();
+> >>  
+> >>      close(temp_fd);
+> >> -- 
+> >> 1.9.1
+> >>
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> > 
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
