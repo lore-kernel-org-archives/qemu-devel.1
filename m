@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48044)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48060)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cFK8r-0001R0-0M
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 07:19:14 -0500
+	(envelope-from <thuth@redhat.com>) id 1cFK8t-0001ZQ-EF
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 07:19:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cFK8m-0003RT-BX
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 07:19:08 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43160)
+	(envelope-from <thuth@redhat.com>) id 1cFK8s-0003Tn-8D
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 07:19:11 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41942)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1cFK8m-0003R3-2n
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 07:19:04 -0500
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1cFK8r-0003TO-Vw
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 07:19:10 -0500
 From: Thomas Huth <thuth@redhat.com>
-Date: Fri,  9 Dec 2016 13:17:41 +0100
-Message-Id: <1481285870-3396-12-git-send-email-thuth@redhat.com>
+Date: Fri,  9 Dec 2016 13:17:42 +0100
+Message-Id: <1481285870-3396-13-git-send-email-thuth@redhat.com>
 In-Reply-To: <1481285870-3396-1-git-send-email-thuth@redhat.com>
 References: <1481285870-3396-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH 11/20] sparc: Move CPU files to target/ folder
+Subject: [Qemu-devel] [PATCH 12/20] cris: Move CPU files to target/ folder
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,191 +29,132 @@ Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Michael Walle <michael@walle
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
  MAINTAINERS                                   | 2 +-
- Makefile.objs                                 | 2 +-
- {target-sparc => target/sparc}/Makefile.objs  | 0
- {target-sparc => target/sparc}/TODO           | 0
- {target-sparc => target/sparc}/asi.h          | 0
- {target-sparc => target/sparc}/cc_helper.c    | 0
- {target-sparc => target/sparc}/cpu-qom.h      | 0
- {target-sparc => target/sparc}/cpu.c          | 0
- {target-sparc => target/sparc}/cpu.h          | 0
- {target-sparc => target/sparc}/fop_helper.c   | 0
- {target-sparc => target/sparc}/gdbstub.c      | 0
- {target-sparc => target/sparc}/helper.c       | 0
- {target-sparc => target/sparc}/helper.h       | 0
- {target-sparc => target/sparc}/int32_helper.c | 0
- {target-sparc => target/sparc}/int64_helper.c | 0
- {target-sparc => target/sparc}/ldst_helper.c  | 0
- {target-sparc => target/sparc}/machine.c      | 0
- {target-sparc => target/sparc}/mmu_helper.c   | 0
- {target-sparc => target/sparc}/monitor.c      | 0
- {target-sparc => target/sparc}/trace-events   | 8 ++++----
- {target-sparc => target/sparc}/translate.c    | 0
- {target-sparc => target/sparc}/vis_helper.c   | 0
- {target-sparc => target/sparc}/win_helper.c   | 0
- 23 files changed, 6 insertions(+), 6 deletions(-)
- rename {target-sparc => target/sparc}/Makefile.objs (100%)
- rename {target-sparc => target/sparc}/TODO (100%)
- rename {target-sparc => target/sparc}/asi.h (100%)
- rename {target-sparc => target/sparc}/cc_helper.c (100%)
- rename {target-sparc => target/sparc}/cpu-qom.h (100%)
- rename {target-sparc => target/sparc}/cpu.c (100%)
- rename {target-sparc => target/sparc}/cpu.h (100%)
- rename {target-sparc => target/sparc}/fop_helper.c (100%)
- rename {target-sparc => target/sparc}/gdbstub.c (100%)
- rename {target-sparc => target/sparc}/helper.c (100%)
- rename {target-sparc => target/sparc}/helper.h (100%)
- rename {target-sparc => target/sparc}/int32_helper.c (100%)
- rename {target-sparc => target/sparc}/int64_helper.c (100%)
- rename {target-sparc => target/sparc}/ldst_helper.c (100%)
- rename {target-sparc => target/sparc}/machine.c (100%)
- rename {target-sparc => target/sparc}/mmu_helper.c (100%)
- rename {target-sparc => target/sparc}/monitor.c (100%)
- rename {target-sparc => target/sparc}/trace-events (94%)
- rename {target-sparc => target/sparc}/translate.c (100%)
- rename {target-sparc => target/sparc}/vis_helper.c (100%)
- rename {target-sparc => target/sparc}/win_helper.c (100%)
+ disas/cris.c                                  | 4 +---
+ {target-cris => target/cris}/Makefile.objs    | 0
+ {target-cris => target/cris}/cpu-qom.h        | 0
+ {target-cris => target/cris}/cpu.c            | 0
+ {target-cris => target/cris}/cpu.h            | 0
+ {target-cris => target/cris}/crisv10-decode.h | 0
+ {target-cris => target/cris}/crisv32-decode.h | 0
+ {target-cris => target/cris}/gdbstub.c        | 0
+ {target-cris => target/cris}/helper.c         | 0
+ {target-cris => target/cris}/helper.h         | 0
+ {target-cris => target/cris}/machine.c        | 0
+ {target-cris => target/cris}/mmu.c            | 0
+ {target-cris => target/cris}/mmu.h            | 0
+ {target-cris => target/cris}/op_helper.c      | 0
+ {target-cris => target/cris}/opcode-cris.h    | 0
+ {target-cris => target/cris}/translate.c      | 0
+ {target-cris => target/cris}/translate_v10.c  | 0
+ 18 files changed, 2 insertions(+), 4 deletions(-)
+ rename {target-cris => target/cris}/Makefile.objs (100%)
+ rename {target-cris => target/cris}/cpu-qom.h (100%)
+ rename {target-cris => target/cris}/cpu.c (100%)
+ rename {target-cris => target/cris}/cpu.h (100%)
+ rename {target-cris => target/cris}/crisv10-decode.h (100%)
+ rename {target-cris => target/cris}/crisv32-decode.h (100%)
+ rename {target-cris => target/cris}/gdbstub.c (100%)
+ rename {target-cris => target/cris}/helper.c (100%)
+ rename {target-cris => target/cris}/helper.h (100%)
+ rename {target-cris => target/cris}/machine.c (100%)
+ rename {target-cris => target/cris}/mmu.c (100%)
+ rename {target-cris => target/cris}/mmu.h (100%)
+ rename {target-cris => target/cris}/op_helper.c (100%)
+ rename {target-cris => target/cris}/opcode-cris.h (100%)
+ rename {target-cris => target/cris}/translate.c (100%)
+ rename {target-cris => target/cris}/translate_v10.c (100%)
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 48b0a7b..f8959d8 100644
+index f8959d8..ccb841f 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -218,7 +218,7 @@ SPARC
- M: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
- M: Artyom Tarasenko <atar4qemu@gmail.com>
+@@ -126,7 +126,7 @@ F: disas/libvixl/
+ CRIS
+ M: Edgar E. Iglesias <edgar.iglesias@gmail.com>
  S: Maintained
--F: target-sparc/
-+F: target/sparc/
- F: hw/sparc/
- F: hw/sparc64/
- F: disas/sparc.c
-diff --git a/Makefile.objs b/Makefile.objs
-index c5ebb80..e59b979 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -157,7 +157,7 @@ trace-events-y += audio/trace-events
- trace-events-y += net/trace-events
- trace-events-y += target/arm/trace-events
- trace-events-y += target/i386/trace-events
--trace-events-y += target-sparc/trace-events
-+trace-events-y += target/sparc/trace-events
- trace-events-y += target/s390x/trace-events
- trace-events-y += target/ppc/trace-events
- trace-events-y += qom/trace-events
-diff --git a/target-sparc/Makefile.objs b/target/sparc/Makefile.objs
-similarity index 100%
-rename from target-sparc/Makefile.objs
-rename to target/sparc/Makefile.objs
-diff --git a/target-sparc/TODO b/target/sparc/TODO
-similarity index 100%
-rename from target-sparc/TODO
-rename to target/sparc/TODO
-diff --git a/target-sparc/asi.h b/target/sparc/asi.h
-similarity index 100%
-rename from target-sparc/asi.h
-rename to target/sparc/asi.h
-diff --git a/target-sparc/cc_helper.c b/target/sparc/cc_helper.c
-similarity index 100%
-rename from target-sparc/cc_helper.c
-rename to target/sparc/cc_helper.c
-diff --git a/target-sparc/cpu-qom.h b/target/sparc/cpu-qom.h
-similarity index 100%
-rename from target-sparc/cpu-qom.h
-rename to target/sparc/cpu-qom.h
-diff --git a/target-sparc/cpu.c b/target/sparc/cpu.c
-similarity index 100%
-rename from target-sparc/cpu.c
-rename to target/sparc/cpu.c
-diff --git a/target-sparc/cpu.h b/target/sparc/cpu.h
-similarity index 100%
-rename from target-sparc/cpu.h
-rename to target/sparc/cpu.h
-diff --git a/target-sparc/fop_helper.c b/target/sparc/fop_helper.c
-similarity index 100%
-rename from target-sparc/fop_helper.c
-rename to target/sparc/fop_helper.c
-diff --git a/target-sparc/gdbstub.c b/target/sparc/gdbstub.c
-similarity index 100%
-rename from target-sparc/gdbstub.c
-rename to target/sparc/gdbstub.c
-diff --git a/target-sparc/helper.c b/target/sparc/helper.c
-similarity index 100%
-rename from target-sparc/helper.c
-rename to target/sparc/helper.c
-diff --git a/target-sparc/helper.h b/target/sparc/helper.h
-similarity index 100%
-rename from target-sparc/helper.h
-rename to target/sparc/helper.h
-diff --git a/target-sparc/int32_helper.c b/target/sparc/int32_helper.c
-similarity index 100%
-rename from target-sparc/int32_helper.c
-rename to target/sparc/int32_helper.c
-diff --git a/target-sparc/int64_helper.c b/target/sparc/int64_helper.c
-similarity index 100%
-rename from target-sparc/int64_helper.c
-rename to target/sparc/int64_helper.c
-diff --git a/target-sparc/ldst_helper.c b/target/sparc/ldst_helper.c
-similarity index 100%
-rename from target-sparc/ldst_helper.c
-rename to target/sparc/ldst_helper.c
-diff --git a/target-sparc/machine.c b/target/sparc/machine.c
-similarity index 100%
-rename from target-sparc/machine.c
-rename to target/sparc/machine.c
-diff --git a/target-sparc/mmu_helper.c b/target/sparc/mmu_helper.c
-similarity index 100%
-rename from target-sparc/mmu_helper.c
-rename to target/sparc/mmu_helper.c
-diff --git a/target-sparc/monitor.c b/target/sparc/monitor.c
-similarity index 100%
-rename from target-sparc/monitor.c
-rename to target/sparc/monitor.c
-diff --git a/target-sparc/trace-events b/target/sparc/trace-events
-similarity index 94%
-rename from target-sparc/trace-events
-rename to target/sparc/trace-events
-index bf52d97..8df178a 100644
---- a/target-sparc/trace-events
-+++ b/target/sparc/trace-events
-@@ -1,6 +1,6 @@
- # See docs/tracing.txt for syntax documentation.
+-F: target-cris/
++F: target/cris/
+ F: hw/cris/
+ F: include/hw/cris/
+ F: tests/tcg/cris/
+diff --git a/disas/cris.c b/disas/cris.c
+index 7f35bc0..08161d1 100644
+--- a/disas/cris.c
++++ b/disas/cris.c
+@@ -21,9 +21,7 @@
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
+ #include "disas/bfd.h"
+-//#include "sysdep.h"
+-#include "target-cris/opcode-cris.h"
+-//#include "libiberty.h"
++#include "target/cris/opcode-cris.h"
  
--# target-sparc/mmu_helper.c
-+# target/sparc/mmu_helper.c
- mmu_helper_dfault(uint64_t address, uint64_t context, int mmu_idx, uint32_t tl) "DFAULT at %"PRIx64" context %"PRIx64" mmu_idx=%d tl=%d"
- mmu_helper_dprot(uint64_t address, uint64_t context, int mmu_idx, uint32_t tl) "DPROT at %"PRIx64" context %"PRIx64" mmu_idx=%d tl=%d"
- mmu_helper_dmiss(uint64_t address, uint64_t context) "DMISS at %"PRIx64" context %"PRIx64
-@@ -10,16 +10,16 @@ mmu_helper_get_phys_addr_code(uint32_t tl, int mmu_idx, uint64_t prim_context, u
- mmu_helper_get_phys_addr_data(uint32_t tl, int mmu_idx, uint64_t prim_context, uint64_t sec_context, uint64_t address) "tl=%d mmu_idx=%d primary context=%"PRIx64" secondary context=%"PRIx64" address=%"PRIx64
- mmu_helper_mmu_fault(uint64_t address, uint64_t paddr, int mmu_idx, uint32_t tl, uint64_t prim_context, uint64_t sec_context) "Translate at %"PRIx64" -> %"PRIx64", mmu_idx=%d tl=%d primary context=%"PRIx64" secondary context=%"PRIx64
+ #define CONST_STRNEQ(STR1,STR2) (strncmp ((STR1), (STR2), sizeof (STR2) - 1) == 0)
  
--# target-sparc/int64_helper.c
-+# target/sparc/int64_helper.c
- int_helper_set_softint(uint32_t softint) "new %08x"
- int_helper_clear_softint(uint32_t softint) "new %08x"
- int_helper_write_softint(uint32_t softint) "new %08x"
- 
--# target-sparc/int32_helper.c
-+# target/sparc/int32_helper.c
- int_helper_icache_freeze(void) "Instruction cache: freeze"
- int_helper_dcache_freeze(void) "Data cache: freeze"
- 
--# target-sparc/win_helper.c
-+# target/sparc/win_helper.c
- win_helper_gregset_error(uint32_t pstate) "ERROR in get_gregset: active pstate bits=%x"
- win_helper_switch_pstate(uint32_t pstate_regs, uint32_t new_pstate_regs) "change_pstate: switching regs old=%x new=%x"
- win_helper_no_switch_pstate(uint32_t new_pstate_regs) "change_pstate: regs new=%x (unchanged)"
-diff --git a/target-sparc/translate.c b/target/sparc/translate.c
+diff --git a/target-cris/Makefile.objs b/target/cris/Makefile.objs
 similarity index 100%
-rename from target-sparc/translate.c
-rename to target/sparc/translate.c
-diff --git a/target-sparc/vis_helper.c b/target/sparc/vis_helper.c
+rename from target-cris/Makefile.objs
+rename to target/cris/Makefile.objs
+diff --git a/target-cris/cpu-qom.h b/target/cris/cpu-qom.h
 similarity index 100%
-rename from target-sparc/vis_helper.c
-rename to target/sparc/vis_helper.c
-diff --git a/target-sparc/win_helper.c b/target/sparc/win_helper.c
+rename from target-cris/cpu-qom.h
+rename to target/cris/cpu-qom.h
+diff --git a/target-cris/cpu.c b/target/cris/cpu.c
 similarity index 100%
-rename from target-sparc/win_helper.c
-rename to target/sparc/win_helper.c
+rename from target-cris/cpu.c
+rename to target/cris/cpu.c
+diff --git a/target-cris/cpu.h b/target/cris/cpu.h
+similarity index 100%
+rename from target-cris/cpu.h
+rename to target/cris/cpu.h
+diff --git a/target-cris/crisv10-decode.h b/target/cris/crisv10-decode.h
+similarity index 100%
+rename from target-cris/crisv10-decode.h
+rename to target/cris/crisv10-decode.h
+diff --git a/target-cris/crisv32-decode.h b/target/cris/crisv32-decode.h
+similarity index 100%
+rename from target-cris/crisv32-decode.h
+rename to target/cris/crisv32-decode.h
+diff --git a/target-cris/gdbstub.c b/target/cris/gdbstub.c
+similarity index 100%
+rename from target-cris/gdbstub.c
+rename to target/cris/gdbstub.c
+diff --git a/target-cris/helper.c b/target/cris/helper.c
+similarity index 100%
+rename from target-cris/helper.c
+rename to target/cris/helper.c
+diff --git a/target-cris/helper.h b/target/cris/helper.h
+similarity index 100%
+rename from target-cris/helper.h
+rename to target/cris/helper.h
+diff --git a/target-cris/machine.c b/target/cris/machine.c
+similarity index 100%
+rename from target-cris/machine.c
+rename to target/cris/machine.c
+diff --git a/target-cris/mmu.c b/target/cris/mmu.c
+similarity index 100%
+rename from target-cris/mmu.c
+rename to target/cris/mmu.c
+diff --git a/target-cris/mmu.h b/target/cris/mmu.h
+similarity index 100%
+rename from target-cris/mmu.h
+rename to target/cris/mmu.h
+diff --git a/target-cris/op_helper.c b/target/cris/op_helper.c
+similarity index 100%
+rename from target-cris/op_helper.c
+rename to target/cris/op_helper.c
+diff --git a/target-cris/opcode-cris.h b/target/cris/opcode-cris.h
+similarity index 100%
+rename from target-cris/opcode-cris.h
+rename to target/cris/opcode-cris.h
+diff --git a/target-cris/translate.c b/target/cris/translate.c
+similarity index 100%
+rename from target-cris/translate.c
+rename to target/cris/translate.c
+diff --git a/target-cris/translate_v10.c b/target/cris/translate_v10.c
+similarity index 100%
+rename from target-cris/translate_v10.c
+rename to target/cris/translate_v10.c
 -- 
 1.8.3.1
