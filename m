@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54808)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55102)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cFOMv-0002SX-0G
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 11:49:58 -0500
+	(envelope-from <thuth@redhat.com>) id 1cFOOM-0006RD-7f
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 11:51:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cFOMq-0005GU-RP
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 11:49:57 -0500
-Received: from mail-qt0-f195.google.com ([209.85.216.195]:35341)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cFOMq-0005GJ-Mk
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 11:49:52 -0500
-Received: by mail-qt0-f195.google.com with SMTP id m48so2688430qta.2
-	for <qemu-devel@nongnu.org>; Fri, 09 Dec 2016 08:49:52 -0800 (PST)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <1479906121-12211-1-git-send-email-rth@twiddle.net>
-	<1479906121-12211-63-git-send-email-rth@twiddle.net>
-	<87r35hxf04.fsf@linaro.org>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <e1c33280-7442-d03a-446f-8150d4b86353@twiddle.net>
-Date: Fri, 9 Dec 2016 08:48:49 -0800
+	(envelope-from <thuth@redhat.com>) id 1cFOOG-0005mI-Li
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 11:51:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35258)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1cFOOG-0005m5-Fz
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 11:51:20 -0500
+References: <1481285870-3396-1-git-send-email-thuth@redhat.com>
+	<1481285870-3396-2-git-send-email-thuth@redhat.com>
+	<ca0a18a3-c007-9b72-3709-fcddb0d3b3d5@vivier.eu>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <d73b3f30-8445-4734-4d78-2efdf193791e@redhat.com>
+Date: Fri, 9 Dec 2016 17:51:11 +0100
 MIME-Version: 1.0
-In-Reply-To: <87r35hxf04.fsf@linaro.org>
+In-Reply-To: <ca0a18a3-c007-9b72-3709-fcddb0d3b3d5@vivier.eu>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v4 62/64] tcg: Use ctpop to generate ctz if
- needed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 01/20] Makefile: Allow CPU targets to
+ reside in target/ folder, too
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,91 +29,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>
+Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Michael Walle <michael@walle.cc>, Yongbok Kim <yongbok.kim@imgtec.com>, Anthony Green <green@moxielogic.com>, Jia Liu <proljc@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Eduardo Habkost <ehabkost@redhat.com>, Max Filippov <jcmvbkbc@gmail.com>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, James Hogan <james.hogan@imgtec.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Marcelo Tosatti <mtosatti@redhat.com>
 
-On 12/09/2016 08:07 AM, Alex Bennée wrote:
-> 
-> Richard Henderson <rth@twiddle.net> writes:
-> 
->> Particularly when andc is also available, this is two insns
->> shorter than using clz to compute ctz.
+On 09.12.2016 13:24, Laurent Vivier wrote:
+> Le 09/12/2016 =C3=A0 13:17, Thomas Huth a =C3=A9crit :
+>> To be able to compile the CPU targets from within a subfolder
+>> of the target/ folder, we've got to adapt the Makefile.target
+>> a little bit first. After this change, target CPUs can either
+>> reside in a target/xxx folder or continue to use the target-xxx
+>> scheme. The latter will be disabled once all targets have been
+>> moved.
 >>
->> Signed-off-by: Richard Henderson <rth@twiddle.net>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
 >> ---
->>  tcg/tcg-op.c | 107 ++++++++++++++++++++++++++++++++++++-----------------------
->>  1 file changed, 65 insertions(+), 42 deletions(-)
+>>  Makefile.target | 10 ++++++++--
+>>  1 file changed, 8 insertions(+), 2 deletions(-)
 >>
->> diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
->> index 6f4b1b6..d1debde 100644
->> --- a/tcg/tcg-op.c
->> +++ b/tcg/tcg-op.c
->> @@ -497,43 +497,46 @@ void tcg_gen_ctz_i32(TCGv_i32 ret, TCGv_i32 arg1, TCGv_i32 arg2)
-> <snip>
->>      } else {
->> -        gen_helper_ctz_i32(ret, arg1, arg2);
->> +        TCGv_i32 z, t;
->> +        if (TCG_TARGET_HAS_ctpop_i32 && TCG_TARGET_HAS_andc_i32) {
->> +            t = tcg_temp_new_i32();
->> +            tcg_gen_subi_i32(t, arg1, 1);
->> +            tcg_gen_andc_i32(t, t, arg1);
->> +            tcg_gen_ctpop_i32(t, t);
->> +        do_movc:
-> 
-> Hmmm and...
-> 
-> <snip>
->>  void tcg_gen_clrsb_i32(TCGv_i32 ret, TCGv_i32 arg)
->> @@ -1842,18 +1845,29 @@ void tcg_gen_ctz_i64(TCGv_i64 ret, TCGv_i64 arg1, TCGv_i64 arg2)
->>  {
->>      if (TCG_TARGET_HAS_ctz_i64) {
->>          tcg_gen_op3_i64(INDEX_op_ctz_i64, ret, arg1, arg2);
-> <snip>
->>      } else {
->> -        gen_helper_ctz_i64(ret, arg1, arg2);
->> +        TCGv_i64 z, t;
->> +        if (TCG_TARGET_HAS_ctpop_i64 && TCG_TARGET_HAS_andc_i64) {
->> +            t = tcg_temp_new_i64();
->> +            tcg_gen_subi_i64(t, arg1, 1);
->> +            tcg_gen_andc_i64(t, t, arg1);
->> +            tcg_gen_ctpop_i64(t, t);
->> +        do_movc:
-> 
-> Hmmm.
-> 
-> So I'm not a goto hater as it makes sense for a bunch of things. But
-> this seems just a little too liberal usage to my eyes. What's wrong with
-> a little extra nesting (seeing the compiler sorts it all out in the
-> end):
-> 
->         if ((TCG_TARGET_HAS_ctpop_i32 && TCG_TARGET_HAS_andc_i32)
->             || TCG_TARGET_HAS_clz_i32 || TCG_TARGET_HAS_clz_i64) {
-> 
->             TCGv_i32 z, t;
-> 
->             if (TCG_TARGET_HAS_ctpop_i32 && TCG_TARGET_HAS_andc_i32) {
->                 t = tcg_temp_new_i32();
->                 tcg_gen_subi_i32(t, arg1, 1);
->                 tcg_gen_andc_i32(t, t, arg1);
->                 tcg_gen_ctpop_i32(t, t);
->             } else if (TCG_TARGET_HAS_clz_i32 || TCG_TARGET_HAS_clz_i64) {
->                 /* Since all non-x86 hosts have clz(0) == 32, don't fight it.  */
->                 t = tcg_temp_new_i32();
->                 tcg_gen_neg_i32(t, arg1);
->                 tcg_gen_and_i32(t, t, arg1);
->                 tcg_gen_clzi_i32(t, t, 32);
->                 tcg_gen_xori_i32(t, t, 31);
->             }
->             /* final movc */
->             z = tcg_const_i32(0);
->             tcg_gen_movcond_i32(TCG_COND_EQ, ret, arg1, z, arg2, t);
->             tcg_temp_free_i32(t);
->             tcg_temp_free_i32(z);
->         } else {
->             gen_helper_ctz_i32(ret, arg1, arg2);
->         }
+>> diff --git a/Makefile.target b/Makefile.target
+>> index 7a5080e..90b25ae 100644
+>> --- a/Makefile.target
+>> +++ b/Makefile.target
+>> @@ -7,11 +7,17 @@ include config-target.mak
+>>  include config-devices.mak
+>>  include $(SRC_PATH)/rules.mak
+>> =20
+>> +ifneq ($(wildcard $(SRC_PATH)/target/$(TARGET_BASE_ARCH)),)
+>> +TARGET_FOLDER=3Dtarget/$(TARGET_BASE_ARCH)
+>> +else
+>> +TARGET_FOLDER=3Dtarget-$(TARGET_BASE_ARCH)
+>> +endif
+>=20
+> Perhaps you should consider to use ':=3D' instead of '=3D'.
 
-That does look better.  Thanks,
+Most of the other variables in that file seem to be set with '=3D' instea=
+d
+of ':=3D', so using '=3D' sounds more consistent to me ... is there a rea=
+l
+benefit of using ':=3D' here?
 
-
-r~
+ Thomas
