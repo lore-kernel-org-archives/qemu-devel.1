@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41348)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49969)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cFRRa-0007Ad-Jt
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 15:06:59 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1cFRxb-0007Tg-Q6
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 15:40:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cFRRX-0007u3-Fh
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 15:06:58 -0500
-Date: Fri, 9 Dec 2016 18:06:50 -0200
+	(envelope-from <ehabkost@redhat.com>) id 1cFRxW-0002b0-VX
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 15:40:03 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52312)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cFRxW-0002ao-Pn
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 15:39:58 -0500
+Date: Fri, 9 Dec 2016 18:39:54 -0200
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20161209200650.GB29563@thinpad.lan.raisama.net>
-References: <148104617887.7699.984921868108236415.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-	<20161206191952.GD4027@thinpad.lan.raisama.net>
-	<20161206193159.GE4027@thinpad.lan.raisama.net>
-	<20161207143925.7b3a54f2@bahia>
+Message-ID: <20161209203954.GW4027@thinpad.lan.raisama.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20161207143925.7b3a54f2@bahia>
-Subject: Re: [Qemu-devel] [RFC for-2.8] machine: Convert abstract typename
- on compat_props to subclass names
+Subject: [Qemu-devel] Reproducible crash on PCIe hotplug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,59 +24,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: Halil Pasic <pasic@linux.vnet.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-stable@nongnu.org, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Marcel Apfelbaum <marcel@redhat.com>, Cao jin <caoj.fnst@cn.fujitsu.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-On Wed, Dec 07, 2016 at 02:39:25PM +0100, Greg Kurz wrote:
-> On Tue, 6 Dec 2016 17:31:59 -0200
-> Eduardo Habkost <ehabkost@redhat.com> wrote:
-> > On Tue, Dec 06, 2016 at 05:19:52PM -0200, Eduardo Habkost wrote:
-> > > On Tue, Dec 06, 2016 at 06:50:47PM +0100, Greg Kurz wrote:  
-> > > > Since commit "9a4c0e220d8a hw/virtio-pci: fix virtio behaviour", passing
-> > > > -device virtio-blk-pci.disable-modern=off has no effect on 2.6 machine
-> > > > types because the internal virtio-pci.disable-modern=on compat property
-> > > > always prevail.
-> > > > 
-> > > > This should ideally be fixed in the qdev properties core code, but it is
-> > > > too late in the QEMU 2.8 schedule. So this patch fixes the issue by setting
-> > > > the compat properties for every virtio-*-pci subtypes instead of the base
-> > > > virtio-pci type.
-> > > > 
-> > > > Signed-off-by: Greg Kurz <groug@kaod.org>  
-> > > 
-> > > So, it looks like the bug is present in many other cases...
-> > > 
-> > > I have hacked QEMU to print a warning in case the driver name in
-> > > compat_props refer to an abstract class or a class that have any
-> > > subclasses. The results are below:
-> > > 
-[...]
-> > > 
-> > > I believe the cases where we are likely to cause real-world bugs
-> > > are virtio-pci and the *-cpu classes (because -cpu is translated
-> > > to -global).
-> > > 
-> > > I'm not sure what should be the right fix in 2.8. I am
-> > > considering a temporary hack to translate abstract class names in
-> > > compat_props to global properties for all subclasses, in case
-> > > they refer to an abstract class. This way we fix the bug where
-> > > -global doesn't override compat_props properly, but keep the
-> > > rules for -global untouched.  
-> > 
-> > What about this?
-> > 
-> 
-> Indeed that would have been a clever workaround but it is too late anyway. :)
+Using latest qemu.git master:
 
-Now my question is: what should we do in 2.8.1?
+  $ qemu-system-x86_64 -machine q35 -readconfig docs/q35-chipset.cfg -monitor stdio
+  QEMU 2.7.93 monitor - type 'help' for more information
+  (qemu) device_add e1000e,bus=ich9-pcie-port-4,addr=00
+  (qemu) device_add e1000e,bus=ich9-pcie-port-4,addr=08
+  Segmentation fault (core dumped)
 
-1) Change the rules and apply "[PATCH] qdev: fix the order compat
-   and global properties are applied"
-2) Fix only virtio-pci (apply a new version of "[PATCH] virtio:
-   fix HW_COMPAT_2_6 macro for virtio-*-pci drivers")
-3) Apply this hack so we fix all compat_props cases without
-   changing ordering rules. (And then change the ordering rules
-   in 2.9)
+It crashes at:
+
+  #7  0x000055555598d7dc in do_pci_register_device (errp=0x7fffffffbfd0, devfn=64, name=0x5555565df340 "e1000e", bus=0x555558487380, pci_dev=0x5555589cd000)
+      at /home/ehabkost/rh/proj/virt/qemu/hw/pci/pci.c:983
+  983             error_setg(errp, "PCI: slot %d function 0 already ocuppied by %s,"
+  (gdb) l
+  978                        PCI_SLOT(devfn), PCI_FUNC(devfn), name,
+  979                        bus->devices[devfn]->name);
+  980             return NULL;
+  981         } else if (dev->hotplugged &&
+  982                    pci_get_function_0(pci_dev)) {
+  983             error_setg(errp, "PCI: slot %d function 0 already ocuppied by %s,"
+  984                        " new func %s cannot be exposed to guest.",
+  985                        PCI_SLOT(devfn),
+  986                        bus->devices[PCI_DEVFN(PCI_SLOT(devfn), 0)]->name,
+  987                        name);
 
 -- 
 Eduardo
