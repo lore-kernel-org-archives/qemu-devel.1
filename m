@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54578)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56795)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1cFGE5-0006NA-FT
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 03:08:23 -0500
+	(envelope-from <thuth@redhat.com>) id 1cFGOS-0001MZ-Lw
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 03:19:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pagupta@redhat.com>) id 1cFGDz-0006og-Lu
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 03:08:17 -0500
-Received: from mx4-phx2.redhat.com ([209.132.183.25]:57405)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1cFGDz-0006o7-DT
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 03:08:11 -0500
-Date: Fri, 9 Dec 2016 03:07:55 -0500 (EST)
-From: Pankaj Gupta <pagupta@redhat.com>
-Message-ID: <1560317871.2551833.1481270875346.JavaMail.zimbra@redhat.com>
-In-Reply-To: <CA+scX6ktntUQ3+0WF7xaEGBgCBzYdKB1KhWNXBJJUCJgcje4Bw@mail.gmail.com>
-References: <CA+scX6ktntUQ3+0WF7xaEGBgCBzYdKB1KhWNXBJJUCJgcje4Bw@mail.gmail.com>
+	(envelope-from <thuth@redhat.com>) id 1cFGOP-0001l0-DS
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 03:19:00 -0500
+References: <20161209022314.14399-1-david@gibson.dropbear.id.au>
+	<20161209022314.14399-3-david@gibson.dropbear.id.au>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <e8178564-d4a6-17a8-895d-a88147560cc0@redhat.com>
+Date: Fri, 9 Dec 2016 09:18:51 +0100
 MIME-Version: 1.0
+In-Reply-To: <20161209022314.14399-3-david@gibson.dropbear.id.au>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Timeslice of vCPU thread in QEMU/KVM is not stable
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [for-2.9 2/5] pseries: Stubs for HPT resizing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,67 +23,238 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Weiwei Jia <harrynjit@gmail.com>
-Cc: qemu-devel@nongnu.org, mingo@redhat.com, efault@gmx.de, dmitry adamushko <dmitry.adamushko@gmail.com>, vatsa@linux.vnet.ibm.com, tglx@linutronix.de, pzijlstr@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+To: David Gibson <david@gibson.dropbear.id.au>, paulus@samba.org, sjitindarsingh@gmail.com
+Cc: agraf@suse.de, mdroth@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.com
 
-Hello,
+On 09.12.2016 03:23, David Gibson wrote:
+> This introduces stub implementations of the H_RESIZE_HPT_PREPARE and
+> H_RESIZE_HPT_COMMIT hypercalls which we hope to add in a PAPR
+> extension to allow run time resizing of a guest's hash page table.  It
+> also adds a new machine property for controlling whether this new
+> facility is available, and logic to check that against availability
+> with KVM (only supported with KVM PR for now).
+>=20
+> Finally, it adds a new string to the hypertas property in the device
+> tree, advertising to the guest the availability of the HPT resizing
+> hypercalls.  This is a tentative suggested value, and would need to be
+> standardized by PAPR before being merged.
+>=20
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
+>  hw/ppc/spapr.c         | 66 ++++++++++++++++++++++++++++++++++++++++++=
+++++++++
+>  hw/ppc/spapr_hcall.c   | 36 +++++++++++++++++++++++++++
+>  hw/ppc/trace-events    |  2 ++
+>  include/hw/ppc/spapr.h | 11 +++++++++
+>  target-ppc/kvm.c       | 26 ++++++++++++++++++++
+>  target-ppc/kvm_ppc.h   |  5 ++++
+>  6 files changed, 146 insertions(+)
+>=20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 0f25e83..ecb0822 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -760,6 +760,11 @@ static void spapr_dt_rtas(sPAPRMachineState *spapr=
+, void *fdt)
+>      if (!kvm_enabled() || kvmppc_spapr_use_multitce()) {
+>          add_str(hypertas, "hcall-multi-tce");
+>      }
+> +
+> +    if (spapr->resize_hpt !=3D SPAPR_RESIZE_HPT_DISABLED) {
+> +        add_str(hypertas, "hcall-hpt-resize");
+> +    }
+> +
+>      _FDT(fdt_setprop(fdt, rtas, "ibm,hypertas-functions",
+>                       hypertas->str, hypertas->len));
+>      g_string_free(hypertas, TRUE);
+> @@ -1839,11 +1844,31 @@ static void ppc_spapr_init(MachineState *machin=
+e)
+>      long load_limit, fw_size;
+>      char *filename;
+>      int smt =3D kvmppc_smt_threads();
+> +    Error *resize_hpt_err =3D NULL;
+> =20
+>      msi_nonbroken =3D true;
+> =20
+>      QLIST_INIT(&spapr->phbs);
+> =20
+> +    /* Check HPT resizing availability */
+> +    kvmppc_check_papr_resize_hpt(&resize_hpt_err);
+> +    if (spapr->resize_hpt =3D=3D SPAPR_RESIZE_HPT_DEFAULT) {
+> +        if (resize_hpt_err) {
+> +            spapr->resize_hpt =3D SPAPR_RESIZE_HPT_DISABLED;
+> +            error_free(resize_hpt_err);
+> +            resize_hpt_err =3D NULL;
+> +        } else {
+> +            spapr->resize_hpt =3D smc->resize_hpt_default;
+> +        }
+> +    }
+> +
+> +    assert(spapr->resize_hpt !=3D SPAPR_RESIZE_HPT_DEFAULT);
+> +
+> +    if ((spapr->resize_hpt !=3D SPAPR_RESIZE_HPT_DISABLED) && resize_h=
+pt_err) {
+> +        error_report_err(resize_hpt_err);
+> +        exit(1);
+> +    }
 
-> 
-> Hi everyone,
-> 
-> I am testing the timeslice of vCPU thread in QEMU/KVM. In principle,
-> the timeslice should be stable under following workload but it is
-> unstable after I do experiments with following workload. I appreciate
-> it if you can give me some suggestions. Thanks in advance.
-> 
-> Workload settings:
-> In VMM, there are 6 pCPUs which are pCPU0, pCPU1, pCPU2, pCPU3, pCPU4,
-> pCPU5. There are two Kernel Virtual Machines (VM1 and VM2) upon VMM.
-> In each VM, there are 5 vritual CPUs (vCPU0, vCPU1, vCPU2, vCPU3,
-> vCPU4). vCPU0 in VM1 and vCPU0 in VM2 are pinned to pCPU0 and pCPU5
-> separately to handle interrupts dedicatedly. vCPU1 in VM1 and vCPU1 in
-> VM2 are pinned to pCPU1; vCPU2 in VM1 and vCPU2 in VM2 are pinned to
-> pCPU2; vCPU3 in VM1 and vCPU3 in VM2 are pinned to pCPU3; vCPU4 in VM1
-> and vCPU4 in VM2 are pinned to pCPU4. There is one CPU intensive
-> thread (while(1){i++}) upon each vCPU in VM1 and VM2 to avoid the vCPU
-> to be idle. In VM1, I start one I/O thread on vCPU2, which the I/O
-> thread reads 4KB from disk each time (reads 8GB in total). The I/O
-> scheduler in VM1 and VM2 is Noop. The I/O scheduler in VMM is CFQ.
-> "/proc/sys/kernel/sched_min_granularity_ns" is set to be 100
-> microseconds in VM1 and VM2. "/proc/sys/kernel/sched_latency_ns" is
-> set to be 100 microseconds in VM1 and VM2.
-> "/proc/sys/kernel/sched_wakeup_granularity_ns" is set to be 0
-> microseconds in VM1 and VM2.
-> "/proc/sys/kernel/sched_min_granularity_ns" is set to be 2.25
-> milliseconds in VMM. "/proc/sys/kernel/sched_latency_ns" is set to be
-> 18 milliseconds in VMM. "/proc/sys/kernel/sched_wakeup_granularity_ns"
-> is set to be 0 microseconds in VMM. I also pinned the I/O worker
-> threads started by QEMU to pCPU5. The process scheduling class I use
-> is CFS.
-> 
-> Linux Kernel version for VMM is: 3.16.39
-> Linux Kernel version for VM1 and VM2 is: 4.7.4
-> QEMU emulator version is: 2.0.0
-> 
-> I test the timeslice of vCPU2 thread of VM1 in VMM according to above
-> workload settings and the experiment shows that the timeslice is not
-> stable. I also find that after the I/O thread on vCPU2 in VM1 is
-> finished, the timeslice of vCPU2 thread of VM1 will be stable. From
-> the experiment, it seems that the unstable timeslice of vCPU2 thread
-> of VM1 is caused by the I/O thread on it in VM1. However, I think the
-> I/O thread on vCPU2 in VM1 should not affect its timeslice since each
-> vCPU in VM1 and VM2 has one CPU intensive thread (while(1){i++}).
-> Please give me some suggestions if you have. Thank you.
+The logic here is IMHO a little bit hard to understand. Why do you need
+the SPAPR_RESIZE_HPT_DEFAULT state here at all? Wouldn't it be
+sufficient to start with SPAPR_RESIZE_HPT_DISABLED by default and to
+only enable it when the extension is available? ... at least some
+explaining comments in the code about SPAPR_RESIZE_HPT_DEFAULT could
+help here.
 
-I think you need to check what else is scheduling on pCPU2(physical cpu).
-If you want to avoid any other task to be scheduled at pCPU2, you need
-to isolate the pCPU2 core to avoid scheduler to run any other task on it.
+> @@ -2236,6 +2261,40 @@ static void spapr_set_modern_hotplug_events(Obje=
+ct *obj, bool value,
+>      spapr->use_hotplug_event_source =3D value;
+>  }
+> =20
+> +static char *spapr_get_resize_hpt(Object *obj, Error **errp)
+> +{
+> +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
+> +
+> +    switch (spapr->resize_hpt) {
+> +    case SPAPR_RESIZE_HPT_DEFAULT:
+> +        return g_strdup("default");
+> +    case SPAPR_RESIZE_HPT_DISABLED:
+> +        return g_strdup("disabled");
+> +    case SPAPR_RESIZE_HPT_ENABLED:
+> +        return g_strdup("enabled");
+> +    case SPAPR_RESIZE_HPT_REQUIRED:
+> +        return g_strdup("required");
+> +    }
+> +    assert(0);
+> +}
+> +
+> +static void spapr_set_resize_hpt(Object *obj, const char *value, Error=
+ **errp)
+> +{
+> +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
+> +
+> +    if (strcmp(value, "default") =3D=3D 0) {
+> +        spapr->resize_hpt =3D SPAPR_RESIZE_HPT_DEFAULT;
+> +    } else if (strcmp(value, "disabled") =3D=3D 0) {
+> +        spapr->resize_hpt =3D SPAPR_RESIZE_HPT_DISABLED;
+> +    } else if (strcmp(value, "enabled") =3D=3D 0) {
+> +        spapr->resize_hpt =3D SPAPR_RESIZE_HPT_ENABLED;
+> +    } else if (strcmp(value, "required") =3D=3D 0) {
+> +        spapr->resize_hpt =3D SPAPR_RESIZE_HPT_REQUIRED;
+> +    } else {
+> +        error_setg(errp, "Bad value for \"resize-hpt\" property");
+> +    }
+> +}
+> +
+>  static void spapr_machine_initfn(Object *obj)
+>  {
+>      sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
+> @@ -2256,6 +2315,12 @@ static void spapr_machine_initfn(Object *obj)
+>                                      " place of standard EPOW events wh=
+en possible"
+>                                      " (required for memory hot-unplug =
+support)",
+>                                      NULL);
+> +
+> +    object_property_add_str(obj, "resize-hpt",
+> +                            spapr_get_resize_hpt, spapr_set_resize_hpt=
+, NULL);
+> +    object_property_set_description(obj, "resize-hpt",
+> +                                    "Resizing of the Hash Page Table (=
+enabled, disabled, required)",
+> +                                    NULL);
 
-> 
-> Best,
-> Harry
-> --
-> To unsubscribe from this list: send the line "unsubscribe kvm" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> 
+... and "default" ?
+
+>  }
+> =20
+>  static void spapr_machine_finalizefn(Object *obj)
+> @@ -2707,6 +2772,7 @@ static void spapr_machine_class_init(ObjectClass =
+*oc, void *data)
+> =20
+>      smc->dr_lmb_enabled =3D true;
+>      smc->tcg_default_cpu =3D "POWER8";
+> +    smc->resize_hpt_default =3D SPAPR_RESIZE_HPT_DISABLED;
+>      mc->query_hotpluggable_cpus =3D spapr_query_hotpluggable_cpus;
+>      fwc->get_dev_path =3D spapr_get_fw_dev_path;
+>      nc->nmi_monitor_handler =3D spapr_nmi;
+...
+> diff --git a/target-ppc/kvm.c b/target-ppc/kvm.c
+> index 15e12f3..dcd8cef 100644
+> --- a/target-ppc/kvm.c
+> +++ b/target-ppc/kvm.c
+> @@ -22,6 +22,7 @@
+>  #include <linux/kvm.h>
+> =20
+>  #include "qemu-common.h"
+> +#include "qapi/error.h"
+>  #include "qemu/error-report.h"
+>  #include "cpu.h"
+>  #include "qemu/timer.h"
+> @@ -2269,6 +2270,7 @@ int kvmppc_reset_htab(int shift_hint)
+>          /* Full emulation, tell caller to allocate htab itself */
+>          return 0;
+>      }
+> +
+
+Unnecessary white space change.
+
+>      if (kvm_check_extension(kvm_state, KVM_CAP_PPC_ALLOC_HTAB)) {
+>          int ret;
+>          ret =3D kvm_vm_ioctl(kvm_state, KVM_PPC_ALLOCATE_HTAB, &shift)=
+;
+> @@ -2672,3 +2674,27 @@ int kvmppc_enable_hwrng(void)
+> =20
+>      return kvmppc_enable_hcall(kvm_state, H_RANDOM);
+>  }
+> +
+> +void kvmppc_check_papr_resize_hpt(Error **errp)
+> +{
+> +    if (!kvm_enabled()) {
+> +        return;
+> +    }
+> +
+> +    /* TODO: Check specific capabilities for HPT resize aware host ker=
+nels */
+> +
+> +    /*
+> +     * It's tempting to try to check directly if the HPT is under our
+> +     * control or KVM's, which is what's really relevant here.
+> +     * Unfortunately, in order to correctly size the HPT, we need to
+> +     * know if we can do resizing, _before_ we attempt to allocate it
+> +     * with KVM.  Before that point, we don't officially know whether
+> +     * we'll control the HPT or not.  So we have to use a fallback
+> +     * test for PR vs HV KVM to predict that.
+> +     */
+> +    if (kvmppc_is_pr(kvm_state)) {
+> +        return;
+> +    }
+
+Couldn't we get HPT resizing on KVM-PR one day, too?
+
+> +    error_setg(errp, "Hash page table resizing not available with this=
+ KVM version");
+> +}
+> diff --git a/target-ppc/kvm_ppc.h b/target-ppc/kvm_ppc.h
+> index 841a29b..3e852ba 100644
+> --- a/target-ppc/kvm_ppc.h
+> +++ b/target-ppc/kvm_ppc.h
+> @@ -59,6 +59,7 @@ bool kvmppc_has_cap_htm(void);
+>  int kvmppc_enable_hwrng(void);
+>  int kvmppc_put_books_sregs(PowerPCCPU *cpu);
+>  PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void);
+> +void kvmppc_check_papr_resize_hpt(Error **errp);
+> =20
+>  #else
+> =20
+> @@ -270,6 +271,10 @@ static inline PowerPCCPUClass *kvm_ppc_get_host_cp=
+u_class(void)
+>      return NULL;
+>  }
+> =20
+> +static inline void kvmppc_check_papr_resize_hpt(Error **errp)
+> +{
+> +    return;
+> +}
+>  #endif
+
+ Thomas
