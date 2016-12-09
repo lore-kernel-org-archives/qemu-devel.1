@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51368)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51420)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cFMNm-0004Nz-Et
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 09:42:46 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cFMNv-0004ka-DP
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 09:42:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cFMNg-0005OG-46
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 09:42:42 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50678)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cFMNf-0005NV-RW
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 09:42:36 -0500
-Date: Fri, 9 Dec 2016 14:42:29 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20161209144229.GC24165@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20161011173526-mutt-send-email-mst@kernel.org>
-	<20161117082902.GM5048@yliu-dev.sh.intel.com>
-	<b9e55320-f53d-d7d3-978f-ec696f3c1d93@redhat.com>
-	<20161117094936.GN5048@yliu-dev.sh.intel.com>
-	<20161117192445-mutt-send-email-mst@kernel.org>
-	<20161122130223.GW5048@yliu-dev.sh.intel.com>
-	<20161122164143-mutt-send-email-mst@kernel.org>
-	<20161124063129.GE5048@yliu-dev.sh.intel.com>
-	<9b73a012-fb7a-4b7c-0dfe-6ef4b8cb48d2@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1cFMNp-0005TA-9A
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 09:42:51 -0500
+Received: from mail-wm0-f53.google.com ([74.125.82.53]:37787)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cFMNo-0005SD-OA
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 09:42:45 -0500
+Received: by mail-wm0-f53.google.com with SMTP id t79so29291331wmt.0
+	for <qemu-devel@nongnu.org>; Fri, 09 Dec 2016 06:42:44 -0800 (PST)
+References: <1479906121-12211-1-git-send-email-rth@twiddle.net>
+	<1479906121-12211-62-git-send-email-rth@twiddle.net>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <1479906121-12211-62-git-send-email-rth@twiddle.net>
+Date: Fri, 09 Dec 2016 14:41:41 +0000
+Message-ID: <87twadxize.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <9b73a012-fb7a-4b7c-0dfe-6ef4b8cb48d2@redhat.com>
-Subject: Re: [Qemu-devel] dpdk/vpp and cross-version migration for vhost
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v4 61/64] qemu/host-utils.h: Reduce the
+ operation count in the fallback ctpop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,89 +31,216 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Maxime Coquelin <maxime.coquelin@redhat.com>
-Cc: Yuanhan Liu <yuanhan.liu@linux.intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, dev@dpdk.org, Stephen Hemminger <stephen@networkplumber.org>, qemu-devel@nongnu.org, libvir-list@redhat.com, vpp-dev@lists.fd.io, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+To: Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org
 
-On Fri, Dec 09, 2016 at 02:35:58PM +0100, Maxime Coquelin wrote:
-> ++Daniel for libvirt
-> 
-> On 11/24/2016 07:31 AM, Yuanhan Liu wrote:
-> > > > > > > > > As version here is an opaque string for libvirt and qemu,
-> > > > > > > > > > > > > > >>anything can be used - but I suggest either a list
-> > > > > > > > > > > > > > >>of values defining the interface, e.g.
-> > > > > > > > > > > > > > >>any_layout=on,max_ring=256
-> > > > > > > > > > > > > > >>or a version including the name and vendor of the backend,
-> > > > > > > > > > > > > > >>e.g. "org.dpdk.v4.5.6".
-> > > > > >
-> > > > > > The version scheme may not be ideal here. Assume a QEMU is supposed
-> > > > > > to work with a specific DPDK version, however, user may disable some
-> > > > > > newer features through qemu command line, that it also could work with
-> > > > > > an elder DPDK version. Using the version scheme will not allow us doing
-> > > > > > such migration to an elder DPDK version. The MTU is a lively example
-> > > > > > here? (when MTU feature is provided by QEMU but is actually disabled
-> > > > > > by user, that it could also work with an elder DPDK without MTU support).
-> > > > > >
-> > > > > > 	--yliu
-> > > >
-> > > > OK, so does a list of values look better to you then?
-> > Yes, if there are no better way.
-> > 
-> > And I think it may be better to not list all those features, literally.
-> > But instead, using the number should be better, say, features=0xdeadbeef.
-> > 
-> > Listing the feature names means we have to come to an agreement in all
-> > components involved here (QEMU, libvirt, DPDK, VPP, and maybe more
-> > backends), that we have to use the exact same feature names. Though it
-> > may not be a big deal, it lacks some flexibility.
-> > 
-> > A feature bits will not have this issue.
-> 
-> I initially thought having key/value pairs would be more flexible, and
-> could allow migrating to another application if compatible (i.e. from
-> OVS to VPP, and vice versa...) without needing synchronization between
-> the applications.
-> 
-> But Daniel pointed me out that it would add a lot of complexity on
-> management tool side, as it would need to know how to interpret these
-> key/value pairs. I think his argument is very valid.
-> 
-> So maybe the best way would be the version string, letting the
-> application (OVS-DPDK/VPP/...) specify which version it is
-> compatible with.
-> For the downsides, as soon as a new feature is supported in vhost-user
-> application, the new version will not be advertised as compatible with
-> the previous one, even if the user disables the feature in Qemu (as
-> pointed out by Yuanhan).
 
-We need two distinct capabilities in order to make this work properly.
+Richard Henderson <rth@twiddle.net> writes:
 
-First, libvirt needs to be able to query the list of (one or more)
-supported versions strings for a given host.
+> Signed-off-by: Richard Henderson <rth@twiddle.net>
 
-Second, when launching QEMU we need to be able to specify the desired
-version against the NIC backend.
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 
-So, consider host A, initially supporting "ovsdpdk-v1". When libvirt
-launches the VM it will specify 'ovsdpgk-v1' as the desired version
-string to use.
+As it looked like we were messing about with the Hackers Delight
+algorithms I thought it might be worth defending any changes with some
+unit tests. Feel free to include the unit test bellow:
 
-Now some time later you add features X, Y & Z to a new release of
-DPDK and install this on host B.  Host B is able to support two
-versions 'ovsdppk-v1' and 'ovsdpdk-v2'.  When libvirt launches
-a VM on host B, it'll pick 'ovsdpgk-v2' by default, since that's
-the newest.   When libvirt migrates a VM from host A, however,
-it will request the old version 'ovsdpdk-v1' in order to ensure
-compatibility.  Similarly when launching a new VM on host B,
-libvirt could choose to use 'ovsdpdk-v1' as the version, in
-order to enable migration to the olver host A, if desired.
+--8<---------------cut here---------------start------------->8---
+>From 66857f0be793c86ce9aaa6e02ffccc6552f6e894 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Fri, 9 Dec 2016 14:36:00 +0000
+Subject: [PATCH] new: tests/test-bitcnt
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-This is exactly the way QEMU machine types work, hiding the
-existance of 100's low level settings / default values, that
-a mgmt app would otherwise have to worry about.
+Add some unit tests for bit count functions (currently only ctpop). As
+the routines are based on the Hackers Delight optimisations I based
+the test patterns on their tests.
 
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ tests/.gitignore       |   1 +
+ tests/Makefile.include |   2 +
+ tests/test-bitcnt.c    | 135 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 138 insertions(+)
+ create mode 100644 tests/test-bitcnt.c
+
+diff --git a/tests/.gitignore b/tests/.gitignore
+index c0d7857538..96986efc1a 100644
+--- a/tests/.gitignore
++++ b/tests/.gitignore
+@@ -13,6 +13,7 @@ rcutorture
+ test-aio
+ test-base64
+ test-bitops
++test-bitcnt
+ test-blockjob
+ test-blockjob-txn
+ test-bufferiszero
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index e98d3b6bb3..8b85c5399a 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -81,6 +81,7 @@ gcov-files-test-qht-y = util/qht.c
+ check-unit-y += tests/test-qht-par$(EXESUF)
+ gcov-files-test-qht-par-y = util/qht.c
+ check-unit-y += tests/test-bitops$(EXESUF)
++check-unit-y += tests/test-bitcnt$(EXESUF)
+ check-unit-$(CONFIG_HAS_GLIB_SUBPROCESS_TESTS) += tests/test-qdev-global-props$(EXESUF)
+ check-unit-y += tests/check-qom-interface$(EXESUF)
+ gcov-files-check-qom-interface-y = qom/object.c
+@@ -570,6 +571,7 @@ tests/test-opts-visitor$(EXESUF): tests/test-opts-visitor.o $(test-qapi-obj-y)
+
+ tests/test-mul64$(EXESUF): tests/test-mul64.o $(test-util-obj-y)
+ tests/test-bitops$(EXESUF): tests/test-bitops.o $(test-util-obj-y)
++tests/test-bitcnt$(EXESUF): tests/test-bitcnt.o $(test-util-obj-y)
+ tests/test-crypto-hash$(EXESUF): tests/test-crypto-hash.o $(test-crypto-obj-y)
+ tests/test-crypto-cipher$(EXESUF): tests/test-crypto-cipher.o $(test-crypto-obj-y)
+ tests/test-crypto-secret$(EXESUF): tests/test-crypto-secret.o $(test-crypto-obj-y)
+diff --git a/tests/test-bitcnt.c b/tests/test-bitcnt.c
+new file mode 100644
+index 0000000000..3969b32803
+--- /dev/null
++++ b/tests/test-bitcnt.c
+@@ -0,0 +1,135 @@
++/*
++ * Test bit count routines
++ *
++ * This work is licensed under the terms of the GNU LGPL, version 2 or later.
++ * See the COPYING.LIB file in the top-level directory.
++ *
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/host-utils.h"
++
++struct bitcnt_test_data {
++    /* value to count */
++    union {
++        uint8_t  w8;
++        uint16_t w16;
++        uint32_t w32;
++        uint64_t w64;
++    } value;
++    /* expected result */
++    int popct;
++};
++
++struct bitcnt_test_data eight_bit_data[] = {
++    { { .w8 = 0x01 }, .popct=1 },
++    { { .w8 = 0x03 }, .popct=2 },
++    { { .w8 = 0x04 }, .popct=1 },
++    { { .w8 = 0x0f }, .popct=4 },
++    { { .w8 = 0x3f }, .popct=6 },
++    { { .w8 = 0x40 }, .popct=1 },
++    { { .w8 = 0xf0 }, .popct=4 },
++    { { .w8 = 0x7f }, .popct=7 },
++    { { .w8 = 0x80 }, .popct=1 },
++    { { .w8 = 0xf1 }, .popct=5 },
++    { { .w8 = 0xfe }, .popct=7 },
++    { { .w8 = 0xff }, .popct=8 },
++};
++
++static void test_ctpop8(void)
++{
++    int i;
++
++    for (i = 0; i < ARRAY_SIZE(eight_bit_data); i++) {
++        struct bitcnt_test_data *d = &eight_bit_data[i];
++        g_assert(ctpop8(d->value.w8)==d->popct);
++    }
++}
++
++struct bitcnt_test_data sixteen_bit_data[] = {
++    { { .w16 = 0x0001 }, .popct=1 },
++    { { .w16 = 0x0003 }, .popct=2 },
++    { { .w16 = 0x000f }, .popct=4 },
++    { { .w16 = 0x003f }, .popct=6 },
++    { { .w16 = 0x00f0 }, .popct=4 },
++    { { .w16 = 0x0f0f }, .popct=8 },
++    { { .w16 = 0x1f1f }, .popct=10 },
++    { { .w16 = 0x4000 }, .popct=1 },
++    { { .w16 = 0x4001 }, .popct=2 },
++    { { .w16 = 0x7000 }, .popct=3 },
++    { { .w16 = 0x7fff }, .popct=15 },
++};
++
++static void test_ctpop16(void)
++{
++    int i;
++
++    for (i = 0; i < ARRAY_SIZE(sixteen_bit_data); i++) {
++        struct bitcnt_test_data *d = &sixteen_bit_data[i];
++        g_assert(ctpop16(d->value.w16)==d->popct);
++    }
++}
++
++struct bitcnt_test_data thirtytwo_bit_data[] = {
++    { { .w32 = 0x00000001 }, .popct=1 },
++    { { .w32 = 0x0000000f }, .popct=4 },
++    { { .w32 = 0x00000f0f }, .popct=8 },
++    { { .w32 = 0x00001f1f }, .popct=10 },
++    { { .w32 = 0x00004001 }, .popct=2 },
++    { { .w32 = 0x00007000 }, .popct=3 },
++    { { .w32 = 0x00007fff }, .popct=15 },
++    { { .w32 = 0x55555555 }, .popct=16 },
++    { { .w32 = 0xaaaaaaaa }, .popct=16 },
++    { { .w32 = 0xff000000 }, .popct=8 },
++    { { .w32 = 0xc0c0c0c0 }, .popct=8 },
++    { { .w32 = 0x0ffffff0 }, .popct=24 },
++    { { .w32 = 0x80000000 }, .popct=1 },
++    { { .w32 = 0xffffffff }, .popct=32 },
++};
++
++static void test_ctpop32(void)
++{
++    int i;
++
++    for (i = 0; i < ARRAY_SIZE(thirtytwo_bit_data); i++) {
++        struct bitcnt_test_data *d = &thirtytwo_bit_data[i];
++        g_assert(ctpop32(d->value.w32)==d->popct);
++    }
++}
++
++struct bitcnt_test_data sixtyfour_bit_data[] = {
++    { { .w64 = 0x0000000000000001 }, .popct=1 },
++    { { .w64 = 0x000000000000000f }, .popct=4 },
++    { { .w64 = 0x0000000000000f0f }, .popct=8 },
++    { { .w64 = 0x0000000000001f1f }, .popct=10 },
++    { { .w64 = 0x0000000000004001 }, .popct=2 },
++    { { .w64 = 0x0000000000007000 }, .popct=3 },
++    { { .w64 = 0x0000000000007fff }, .popct=15 },
++    { { .w64 = 0x0000005500555555 }, .popct=16 },
++    { { .w64 = 0x00aa0000aaaa00aa }, .popct=16 },
++    { { .w64 = 0x000f000000f00000 }, .popct=8 },
++    { { .w64 = 0x0c0c0000c0c0c0c0 }, .popct=12 },
++    { { .w64 = 0xf00f00f0f0f0f000 }, .popct=24 },
++    { { .w64 = 0x8000000000000000 }, .popct=1 },
++    { { .w64 = 0xf0f0f0f0f0f0f0f0 }, .popct=32 },
++};
++
++static void test_ctpop64(void)
++{
++    int i;
++
++    for (i = 0; i < ARRAY_SIZE(sixtyfour_bit_data); i++) {
++        struct bitcnt_test_data *d = &sixtyfour_bit_data[i];
++        g_assert(ctpop64(d->value.w64)==d->popct);
++    }
++}
++
++int main(int argc, char **argv)
++{
++    g_test_init(&argc, &argv, NULL);
++    g_test_add_func("/bitcnt/ctpop8", test_ctpop8);
++    g_test_add_func("/bitcnt/ctpop16", test_ctpop16);
++    g_test_add_func("/bitcnt/ctpop32", test_ctpop32);
++    g_test_add_func("/bitcnt/ctpop64", test_ctpop64);
++    return g_test_run();
++}
+--
+2.11.0
+
+
+--8<---------------cut here---------------end--------------->8---
