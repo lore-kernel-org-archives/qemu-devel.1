@@ -1,33 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46139)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46163)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cFPY1-00082E-PK
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 13:05:33 -0500
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cFPYE-0000Eq-HM
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 13:05:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cFPXy-0005oF-1d
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 13:05:29 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60542
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cFPYA-0005pn-K2
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 13:05:42 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46361
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1cFPXx-0005ni-Qb
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 13:05:25 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	id 1cFPYA-0005pi-EN
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 13:05:38 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
 	by mx0b-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	uB9I3OvM080916
-	for <qemu-devel@nongnu.org>; Fri, 9 Dec 2016 13:05:24 -0500
+	uB9I3OJ4029061
+	for <qemu-devel@nongnu.org>; Fri, 9 Dec 2016 13:05:37 -0500
 Received: from e19.ny.us.ibm.com (e19.ny.us.ibm.com [129.33.205.209])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 277ymhp9dy-1
+	by mx0b-001b2d01.pphosted.com with ESMTP id 27806kv9n6-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 09 Dec 2016 13:05:24 -0500
+	for <qemu-devel@nongnu.org>; Fri, 09 Dec 2016 13:05:36 -0500
 Received: from localhost
 	by e19.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Fri, 9 Dec 2016 13:05:24 -0500
+	Fri, 9 Dec 2016 13:05:36 -0500
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Fri,  9 Dec 2016 12:04:39 -0600
-Message-Id: <1481306681-5760-1-git-send-email-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v3 0/2] Fixes/tests for hmp_object_del()
+Date: Fri,  9 Dec 2016 12:04:40 -0600
+In-Reply-To: <1481306681-5760-1-git-send-email-mdroth@linux.vnet.ibm.com>
+References: <1481306681-5760-1-git-send-email-mdroth@linux.vnet.ibm.com>
+Message-Id: <1481306681-5760-2-git-send-email-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v3 1/2] tests: check-qom-proplist: add checks
+ for cmdline-created objects
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,27 +40,130 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: armbru@redhat.com, bharata.rao@gmail.com, dgilbert@redhat.com, david@gibson.dropbear.id.au
+Cc: armbru@redhat.com, bharata.rao@gmail.com, dgilbert@redhat.com, david@gibson.dropbear.id.au, Eric Blake <eblake@redhat.com>, Daniel Berrange <berrange@redhat.com>
 
-hmp_object_del() followed by a subsequent hmp_object_add() can trigger a
-duplicate ID error if the previous object shared the same ID and was added
-via the command-line. Please see patch 2/2 for more details.
+check-qom-proplist originally added tests for verifying that
+object-creation helpers object_new_with_{props,propv} behaved in
+similar fashion to the "traditional" method involving setting each
+individual property separately after object creation rather than
+via a single call.
 
-This patchset fixes the issue in question and adds some general unit tests
-for object created via -object, which we later extend to verify the fix in
-question.
+Another similar "helper" for creating Objects exists in the form of
+objects specified via -object command-line parameters. By that
+rationale, we extend check-qom-proplist to include similar checks
+for command-line-created objects by employing the same
+qemu_opts_parse()-based parsing the vl.c employs.
 
-Changes since v3:
-  - Moved the generic unit tests ahead of the fix patch, with a FIXME
-    in place of the actual check for the failure addressed in patch
-    2/2 (Daniel/Markus)
-  - Dropped check for existence of objects' QemuOptsList (Markus)
-  - Dropped unintended whitespace removal in PATCH 1/2
-  - Slight rewording of commit messages to reflect the changes and fix
-    minor grammar errors.
+This parser has a side-effect of parsing the object's options into
+a QemuOpt structure and registering this in the global QemuOptsList
+using the Object's ID. This can conflict with future Object instances
+that attempt to use the same ID if we don't ensure this is cleaned
+up as part of Object finalization, so we include a FIXME stub to test
+for this case, which will then be resolved in a subsequent patch.
 
-Changes since v2:
+Suggested-by: Daniel Berrange <berrange@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>
+Cc: Daniel Berrange <berrange@redhat.com>
+Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+---
+ tests/check-qom-proplist.c | 55 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 55 insertions(+)
 
-  - Moved QemuOpt cleanup out of {qmp,hmp}_object_del() and into common
-    user_creatable_del() path (Daniel, David)
-  - Added corresponding test case in check-qom-proplist
+diff --git a/tests/check-qom-proplist.c b/tests/check-qom-proplist.c
+index a16cefc..e3f56ca 100644
+--- a/tests/check-qom-proplist.c
++++ b/tests/check-qom-proplist.c
+@@ -23,6 +23,9 @@
+ #include "qapi/error.h"
+ #include "qom/object.h"
+ #include "qemu/module.h"
++#include "qemu/option.h"
++#include "qemu/config-file.h"
++#include "qom/object_interfaces.h"
+ 
+ 
+ #define TYPE_DUMMY "qemu-dummy"
+@@ -162,6 +165,10 @@ static const TypeInfo dummy_info = {
+     .instance_finalize = dummy_finalize,
+     .class_size = sizeof(DummyObjectClass),
+     .class_init = dummy_class_init,
++    .interfaces = (InterfaceInfo[]) {
++        { TYPE_USER_CREATABLE },
++        { }
++    }
+ };
+ 
+ 
+@@ -320,6 +327,14 @@ static const TypeInfo dummy_backend_info = {
+     .class_size = sizeof(DummyBackendClass),
+ };
+ 
++static QemuOptsList qemu_object_opts = {
++    .name = "object",
++    .implied_opt_name = "qom-type",
++    .head = QTAILQ_HEAD_INITIALIZER(qemu_object_opts.head),
++    .desc = {
++        { }
++    },
++};
+ 
+ 
+ static void test_dummy_createv(void)
+@@ -388,6 +403,45 @@ static void test_dummy_createlist(void)
+     object_unparent(OBJECT(dobj));
+ }
+ 
++static void test_dummy_createcmdl(void)
++{
++    QemuOpts *opts;
++    DummyObject *dobj;
++    Error *err = NULL;
++    const char *params = TYPE_DUMMY \
++                         ",id=dev0," \
++                         "bv=yes,sv=Hiss hiss hiss,av=platypus";
++
++    qemu_add_opts(&qemu_object_opts);
++    opts = qemu_opts_parse(&qemu_object_opts, params, true, &err);
++    g_assert(err == NULL);
++    g_assert(opts);
++
++    dobj = DUMMY_OBJECT(user_creatable_add_opts(opts, &err));
++    g_assert(err == NULL);
++    g_assert(dobj);
++    g_assert_cmpstr(dobj->sv, ==, "Hiss hiss hiss");
++    g_assert(dobj->bv == true);
++    g_assert(dobj->av == DUMMY_PLATYPUS);
++
++    user_creatable_del("dev0", &err);
++    g_assert(err == NULL);
++    error_free(err);
++
++    /* cmdline-parsing via qemu_opts_parse() results in a QemuOpts entry
++     * corresponding to the Object's ID to be added to the QemuOptsList
++     * for objects. To avoid having this entry conflict with future
++     * Objects using the same ID (which can happen in cases where
++     * qemu_opts_parse() is used to parse the object params, such as
++     * with hmp_object_add() at the time of this comment), we need to
++     * check for this in user_creatable_del() and remove the QemuOpts if
++     * it is present.
++     *
++     * FIXME: add an assert to verify that the QemuOpts is cleaned up
++     * once the corresponding cleanup code is added.
++     */
++}
++
+ static void test_dummy_badenum(void)
+ {
+     Error *err = NULL;
+@@ -525,6 +579,7 @@ int main(int argc, char **argv)
+ 
+     g_test_add_func("/qom/proplist/createlist", test_dummy_createlist);
+     g_test_add_func("/qom/proplist/createv", test_dummy_createv);
++    g_test_add_func("/qom/proplist/createcmdline", test_dummy_createcmdl);
+     g_test_add_func("/qom/proplist/badenum", test_dummy_badenum);
+     g_test_add_func("/qom/proplist/getenum", test_dummy_getenum);
+     g_test_add_func("/qom/proplist/iterator", test_dummy_iterator);
+-- 
+1.9.1
