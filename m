@@ -1,33 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57466)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60662)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cFGQX-0007Mg-I8
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 03:21:14 -0500
+	(envelope-from <thuth@redhat.com>) id 1cFGfN-0006mF-GA
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 03:36:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cFGQU-0002ax-AC
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 03:21:09 -0500
-Received: from indium.canonical.com ([91.189.90.7]:47373)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cFGQU-0002ar-1I
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 03:21:06 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cFGQP-0005JM-O3
-	for <qemu-devel@nongnu.org>; Fri, 09 Dec 2016 08:21:02 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 605D52E8219
-	for <qemu-devel@nongnu.org>; Fri,  9 Dec 2016 08:20:51 +0000 (UTC)
+	(envelope-from <thuth@redhat.com>) id 1cFGfI-0007qq-D1
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 03:36:29 -0500
+References: <20161209022314.14399-1-david@gibson.dropbear.id.au>
+	<20161209022314.14399-4-david@gibson.dropbear.id.au>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <457e8c69-3221-2606-3f54-03b34e928a50@redhat.com>
+Date: Fri, 9 Dec 2016 09:36:17 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20161209022314.14399-4-david@gibson.dropbear.id.au>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 09 Dec 2016 08:09:58 -0000
-From: Jack Coulter <1648726@bugs.launchpad.net>
-Reply-To: Bug 1648726 <1648726@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <20161209080958.23373.14363.malonedeb@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1648726] [NEW] Passthrough of UAS devices fails
- with Windows (10) guests
+Subject: Re: [Qemu-devel] [for-2.9 3/5] pseries: Implement HPT resizing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,274 +23,500 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>, paulus@samba.org, sjitindarsingh@gmail.com
+Cc: agraf@suse.de, mdroth@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, lvivier@redhat.com
 
-Public bug reported:
+On 09.12.2016 03:23, David Gibson wrote:
+> This patch implements hypercalls allowing a PAPR guest to resize its ow=
+n
+> hash page table.  This will eventually allow for more flexible memory
+> hotplug.
+>=20
+> The implementation is partially asynchronous, handled in a special thre=
+ad
+> running the hpt_prepare_thread() function.  The state of a pending resi=
+ze
+> is stored in SPAPR_MACHINE->pending_hpt.
+>=20
+> The H_RESIZE_HPT_PREPARE hypercall will kick off creation of a new HPT,=
+ or,
+> if one is already in progress, monitor it for completion.  If there is =
+an
+> existing HPT resize in progress that doesn't match the size specified i=
+n
+> the call, it will cancel it, replacing it with a new one matching the
+> given size.
+>=20
+> The H_RESIZE_HPT_COMMIT completes transition to a resized HPT, and can =
+only
+> be called successfully once H_RESIZE_HPT_PREPARE has successfully
+> completed initialization of a new HPT.  The guest must ensure that ther=
+e
+> are no concurrent accesses to the existing HPT while this is called (th=
+is
+> effectively means stop_machine() for Linux guests).
+>=20
+> For now H_RESIZE_HPT_COMMIT goes through the whole old HPT, rehashing e=
+ach
+> HPTE into the new HPT.  This can have quite high latency, but it seems =
+to
+> be of the order of typical migration downtime latencies for HPTs of siz=
+e
+> up to ~2GiB (which would be used in a 256GiB guest).
+>=20
+> In future we probably want to move more of the rehashing to the "prepar=
+e"
+> phase, by having H_ENTER and other hcalls update both current and
+> pending HPTs.  That's a project for another day, but should be possible
+> without any changes to the guest interface.
+>=20
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
+>  hw/ppc/spapr.c          |   4 +-
+>  hw/ppc/spapr_hcall.c    | 346 ++++++++++++++++++++++++++++++++++++++++=
++++++++-
 
-Split off from https://bugs.launchpad.net/qemu/+bug/1579306 as this is a
-distinct issue.
+I wonder whether it makes sense to put all the hpt related code into a
+separate new file?
 
-Physical USB storage devices that support the UAS protocol do not work
-correctly when passed through to Windows guests (I've only tested this
-with Windows 10 x64, build 1607).
+>  include/hw/ppc/spapr.h  |   6 +
+>  target-ppc/mmu-hash64.h |   4 +
+>  4 files changed, 354 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index ecb0822..f3b74dc 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -93,8 +93,6 @@
+> =20
+>  #define PHANDLE_XICP            0x00001111
+> =20
+> -#define HTAB_SIZE(spapr)        (1ULL << ((spapr)->htab_shift))
+> -
+>  static XICSState *try_create_xics(const char *type, int nr_servers,
+>                                    int nr_irqs, Error **errp)
+>  {
+> @@ -1055,7 +1053,7 @@ static void close_htab_fd(sPAPRMachineState *spap=
+r)
+>      spapr->htab_fd =3D -1;
+>  }
+> =20
+> -static int spapr_hpt_shift_for_ramsize(uint64_t ramsize)
+> +int spapr_hpt_shift_for_ramsize(uint64_t ramsize)
+>  {
+>      int shift;
+> =20
+> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> index 72a9c4d..9f421c1 100644
+> --- a/hw/ppc/spapr_hcall.c
+> +++ b/hw/ppc/spapr_hcall.c
+> @@ -2,6 +2,7 @@
+>  #include "qapi/error.h"
+>  #include "sysemu/sysemu.h"
+>  #include "qemu/log.h"
+> +#include "qemu/error-report.h"
+>  #include "cpu.h"
+>  #include "exec/exec-all.h"
+>  #include "helper_regs.h"
+> @@ -355,20 +356,320 @@ static target_ulong h_read(PowerPCCPU *cpu, sPAP=
+RMachineState *spapr,
+>      return H_SUCCESS;
+>  }
+> =20
+> +struct sPAPRPendingHPT {
+> +    /* These fields are read-only after initialization */
+> +    int shift;
+> +    QemuThread thread;
+> +
+> +    /* These fields are protected by the BQL */
+> +    bool complete;
+> +
+> +    /* These fields are private to the preparation thread if
+> +     * !complete, otherwise protected by the BQL */
+> +    int ret;
+> +    void *hpt;
+> +};
+> +
+> +static void free_pending_hpt(sPAPRPendingHPT *pending)
+> +{
+> +    if (pending->hpt) {
+> +        qemu_vfree(pending->hpt);
+> +    }
+> +
+> +    g_free(pending);
+> +}
+> +
+> +static void *hpt_prepare_thread(void *opaque)
+> +{
+> +    sPAPRPendingHPT *pending =3D opaque;
+> +    size_t size =3D 1ULL << pending->shift;
+> +
+> +    pending->hpt =3D qemu_memalign(size, size);
+> +    if (pending->hpt) {
+> +        memset(pending->hpt, 0, size);
+> +        pending->ret =3D H_SUCCESS;
+> +    } else {
+> +        pending->ret =3D H_NO_MEM;
+> +    }
+> +
+> +    qemu_mutex_lock_iothread();
+> +
+> +    if (SPAPR_MACHINE(qdev_get_machine())->pending_hpt !=3D pending) {
+> +        /* We've been cancelled, clean ourselves up */
+> +        free_pending_hpt(pending);
+> +        goto out;
+> +    }
+> +
+> +    pending->complete =3D true;
+> +
+> +out:
 
-Passing through such a device results in the older BOT/MSC protocol
-being used:
+You could easily avoid the goto here:
 
-<See attachment win10-uas-fail.png>
+    if (SPAPR_MACHINE(qdev_get_machine())->pending_hpt !=3D pending) {
+        /* We've been cancelled, clean ourselves up */
+        free_pending_hpt(pending);
+    } else {
+        pending->complete =3D true;
+    }
 
-Using the same domain configuration with a Linux guest (tested with
-SystemRescueCD 4.8.0) works correctly:
+?
 
-/: Bus 02.Port 1: Dev 1, Class=3Droot_hub, Driver=3Dxhci_hcd/4p, 5000M
-=C2=A0=C2=A0=C2=A0=C2=A0|__ Port 1: Dev 2, If 0, Class=3DMass Storage, Driv=
-er=3Duas, 5000M
-/: Bus 01.Port 1: Dev 1, Class=3Droot_hub, Driver=3Dxhci_hcd/4p, 480M
+> +    qemu_mutex_unlock_iothread();
+> +    return NULL;
+> +}
+> +
+> +/* Must be called with BQL held */
+> +static void cancel_hpt_prepare(sPAPRMachineState *spapr)
+> +{
+> +    sPAPRPendingHPT *pending =3D spapr->pending_hpt;
+> +
+> +    /* Let the thread know it's cancelled */
+> +    spapr->pending_hpt =3D NULL;
+> +
+> +    if (!pending) {
+> +        /* Nothing to do */
+> +        return;
+> +    }
+> +
+> +    if (!pending->complete) {
+> +        /* thread will clean itself up */
+> +        return;
+> +    }
+> +
+> +    free_pending_hpt(pending);
+> +}
+> +
+> +static int build_dimm_list(Object *obj, void *opaque)
+> +{
+> +    GSList **list =3D opaque;
+> +
+> +    if (object_dynamic_cast(obj, TYPE_PC_DIMM)) {
+> +        DeviceState *dev =3D DEVICE(obj);
+> +        if (dev->realized) { /* only realized DIMMs matter */
+> +            *list =3D g_slist_prepend(*list, dev);
+> +        }
+> +    }
+> +
+> +    object_child_foreach(obj, build_dimm_list, opaque);
+> +    return 0;
+> +}
+> +
+> +static ram_addr_t get_current_ram_size(void)
+> +{
+> +    GSList *list =3D NULL, *item;
+> +    ram_addr_t size =3D ram_size;
+> +
+> +    build_dimm_list(qdev_get_machine(), &list);
+> +    for (item =3D list; item; item =3D g_slist_next(item)) {
+> +        Object *obj =3D OBJECT(item->data);
+> +        if (!strcmp(object_get_typename(obj), TYPE_PC_DIMM)) {
+> +            size +=3D object_property_get_int(obj, PC_DIMM_SIZE_PROP,
+> +                                            &error_abort);
+> +        }
+> +    }
+> +    g_slist_free(list);
+> +
+> +    return size;
+> +}
+> +
+>  static target_ulong h_resize_hpt_prepare(PowerPCCPU *cpu,
+>                                           sPAPRMachineState *spapr,
+>                                           target_ulong opcode,
+>                                           target_ulong *args)
+>  {
+>      target_ulong flags =3D args[0];
+> -    target_ulong shift =3D args[1];
+> +    int shift =3D args[1];
+> +    sPAPRPendingHPT *pending =3D spapr->pending_hpt;
+> =20
+>      if (spapr->resize_hpt =3D=3D SPAPR_RESIZE_HPT_DISABLED) {
+>          return H_AUTHORITY;
+>      }
+> =20
+>      trace_spapr_h_resize_hpt_prepare(flags, shift);
+> -    return H_HARDWARE;
+> +
+> +    if (flags !=3D 0) {
+> +        return H_PARAMETER;
+> +    }
+> +
+> +    if (shift && ((shift < 18) || (shift > 46))) {
+> +        return H_PARAMETER;
+> +    }
+> +
+> +    if (pending) {
+> +        /* something already in progress */
+> +        if (pending->shift =3D=3D shift) {
+> +            /* and it's suitable */
+> +            if (pending->complete) {
+> +                return pending->ret;
+> +            } else {
+> +                return H_LONG_BUSY_ORDER_100_MSEC;
+> +            }
+> +        }
+> +
+> +        /* not suitable, cancel and replace */
+> +        cancel_hpt_prepare(spapr);
+> +    }
+> +
+> +    if (!shift) {
+> +        /* nothing to do */
+> +        return H_SUCCESS;
+> +    }
+> +
+> +    /* start new prepare */
+> +
+> +    /* We only allow the guest to allocate an HPT one order above what
+> +     * we'd normally give them (to stop a small guest claiming a huge
+> +     * chunk of resources in the HPT */
+> +    if (shift > (spapr_hpt_shift_for_ramsize(get_current_ram_size()) +=
+ 1)) {
+> +        return H_RESOURCE;
+> +    }
+> +
+> +    pending =3D g_malloc0(sizeof(*pending));
 
-In both cases, the VM was launched via libvirt, which generated the
-following command line:
+Maybe use g_new0() instead?
 
-/usr/bin/qemu-system-x86_64 -name guest=3DWin10-Edge-IE11,debug-threads=3Don
--S -object
-secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/domain-13-=
-Win10
--Edge-IE11/master-key.aes -machine
-pc-q35-2.7,accel=3Dkvm,usb=3Doff,vmport=3Doff,dump-guest-core=3Doff -cpu
-host,hv_time,hv_relaxed,hv_vapic,hv_spinlocks=3D0x1fff -m 4096 -realtime
-mlock=3Doff -smp 8,sockets=3D1,cores=3D4,threads=3D2 -uuid 47c39707-088c-4e=
-dc-
-8b6a-a7856e09f43d -no-user-config -nodefaults -chardev
-socket,id=3Dcharmonitor,path=3D/var/lib/libvirt/qemu/domain-13-Win10-Edge-
-IE11/monitor.sock,server,nowait -mon
-chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc
-base=3Dlocaltime,driftfix=3Dslew -global kvm-pit.lost_tick_policy=3Ddiscard
--no-hpet -no-shutdown -global ICH9-LPC.disable_s3=3D1 -global
-ICH9-LPC.disable_s4=3D1 -boot strict=3Don -device
-i82801b11-bridge,id=3Dpci.1,bus=3Dpcie.0,addr=3D0x1e -device pci-
-bridge,chassis_nr=3D2,id=3Dpci.2,bus=3Dpci.1,addr=3D0x0 -device nec-usb-
-xhci,id=3Dusb,bus=3Dpci.2,addr=3D0x6 -device virtio-scsi-
-pci,id=3Dscsi0,bus=3Dpci.2,addr=3D0x3 -device virtio-serial-pci,id=3Dvirtio-
-serial0,bus=3Dpci.2,addr=3D0x4 -drive file=3D/home/jack/IMG/Win10-Edge-
-IE11.qcow2,format=3Dqcow2,if=3Dnone,id=3Ddrive-scsi0-0-0-0,discard=3Dunmap
--device scsi-hd,bus=3Dscsi0.0,channel=3D0,scsi-id=3D0,lun=3D0,drive=3Ddrive-
-scsi0-0-0-0,id=3Dscsi0-0-0-0,bootindex=3D1 -drive if=3Dnone,id=3Ddrive-
-scsi0-0-0-1,readonly=3Don -device scsi-cd,bus=3Dscsi0.0,channel=3D0,scsi-
-id=3D0,lun=3D1,drive=3Ddrive-scsi0-0-0-1,id=3Dscsi0-0-0-1 -netdev
-tap,fd=3D22,id=3Dhostnet0,vhost=3Don,vhostfd=3D24 -device virtio-net-
-pci,netdev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:27:94:5d,bus=3Dpci.2,addr=3D=
-0x1
--chardev pty,id=3Dcharserial0 -device isa-
-serial,chardev=3Dcharserial0,id=3Dserial0 -chardev
-spicevmc,id=3Dcharchannel0,name=3Dvdagent -device virtserialport,bus=3Dvirt=
-io-
-serial0.0,nr=3D1,chardev=3Dcharchannel0,id=3Dchannel0,name=3Dcom.redhat.spi=
-ce.0
--device usb-tablet,id=3Dinput0,bus=3Dusb.0,port=3D2 -spice
-port=3D5900,addr=3D127.0.0.1,disable-ticketing,image-compression=3Doff
-,seamless-migration=3Don -device qxl-
-vga,id=3Dvideo0,ram_size=3D67108864,vram_size=3D67108864,vram64_size_mb=3D0=
-,vgamem_mb=3D16,max_outputs=3D1,bus=3Dpcie.0,addr=3D0x1
--device intel-hda,id=3Dsound0,bus=3Dpci.2,addr=3D0x2 -device hda-
-duplex,id=3Dsound0-codec0,bus=3Dsound0.0,cad=3D0 -chardev
-spicevmc,id=3Dcharredir0,name=3Dusbredir -device usb-
-redir,chardev=3Dcharredir0,id=3Dredir0,bus=3Dusb.0,port=3D3 -chardev
-spicevmc,id=3Dcharredir1,name=3Dusbredir -device usb-
-redir,chardev=3Dcharredir1,id=3Dredir1,bus=3Dusb.0,port=3D4 -device usb-
-host,hostbus=3D4,hostaddr=3D4,id=3Dhostdev0,bus=3Dusb.0,port=3D1 -device vi=
-rtio-
-balloon-pci,id=3Dballoon0,bus=3Dpci.2,addr=3D0x5 -msg timestamp=3Don
+> +    pending->shift =3D shift;
+> +    pending->ret =3D H_HARDWARE;
+> +
+> +    qemu_thread_create(&pending->thread, "sPAPR HPT prepare",
+> +                       hpt_prepare_thread, pending, QEMU_THREAD_DETACH=
+ED);
+> +
+> +    spapr->pending_hpt =3D pending;
+> +
+> +    /* In theory we could estimate the time more accurately based on
+> +     * the new size, but there's not much point */
+> +    return H_LONG_BUSY_ORDER_100_MSEC;
+> +}
+> +
+> +static uint64_t new_hpte_load0(void *htab, uint64_t pteg, int slot)
+> +{
+> +    uint8_t *addr =3D htab;
+> +
+> +    addr +=3D pteg * HASH_PTEG_SIZE_64;
+> +    addr +=3D slot * HASH_PTE_SIZE_64;
+> +    return  ldq_p(addr);
+> +}
+> +
+> +static void new_hpte_store(void *htab, uint64_t pteg, int slot,
+> +                           uint64_t pte0, uint64_t pte1)
+> +{
+> +    uint8_t *addr =3D htab;
+> +
+> +    addr +=3D pteg * HASH_PTEG_SIZE_64;
+> +    addr +=3D slot * HASH_PTE_SIZE_64;
+> +
+> +    stq_p(addr, pte0);
+> +    stq_p(addr + HASH_PTE_SIZE_64/2, pte1);
+> +}
+> +
+> +static int rehash_hpte(PowerPCCPU *cpu, uint64_t token,
+> +                       void *old, uint64_t oldsize,
+> +                       void *new, uint64_t newsize,
+> +                       uint64_t pteg, int slot)
+> +{
+> +    uint64_t old_hash_mask =3D (oldsize >> 7) - 1;
+> +    uint64_t new_hash_mask =3D (newsize >> 7) - 1;
+> +    target_ulong pte0 =3D ppc_hash64_load_hpte0(cpu, token, slot);
+> +    target_ulong pte1;
+> +    uint64_t avpn;
+> +    unsigned shift;
+> +    uint64_t hash, new_pteg, replace_pte0;
+> +
+> +    if (!(pte0 & HPTE64_V_VALID) || !(pte0 & HPTE64_V_BOLTED)) {
+> +        return H_SUCCESS;
+> +    }
+> +
+> +    pte1 =3D ppc_hash64_load_hpte1(cpu, token, slot);
+> +
+> +    shift =3D ppc_hash64_hpte_page_shift_noslb(cpu, pte0, pte1);
+> +    assert(shift); /* H_ENTER should never have allowed a bad encoding=
+ */
+> +    avpn =3D HPTE64_V_AVPN_VAL(pte0) & ~(((1ULL << shift) - 1) >> 23);
+> +
+> +    if (pte0 & HPTE64_V_SECONDARY) {
+> +        pteg =3D ~pteg;
+> +    }
+> +
+> +    if ((pte0 & HPTE64_V_SSIZE) =3D=3D HPTE64_V_SSIZE_256M) {
+> +        uint64_t offset, vsid;
+> +
+> +        /* We only have 28 - 23 bits of offset in avpn */
+> +        offset =3D (avpn & 0x1f) << 23;
+> +        vsid =3D avpn >> 5;
+> +        /* We can find more bits from the pteg value */
+> +        if (shift < 23) {
+> +            offset |=3D ((vsid ^ pteg) & old_hash_mask) << shift;
+> +        }
+> +
+> +        hash =3D vsid ^ (offset >> shift);
+> +    } else if ((pte0 & HPTE64_V_SSIZE) =3D=3D HPTE64_V_SSIZE_1T) {
+> +        uint64_t offset, vsid;
+> +
+> +        /* We only have 40 - 23 bits of seg_off in avpn */
+> +        offset =3D (avpn & 0x1ffff) << 23;
+> +        vsid =3D avpn >> 17;
+> +        if (shift < 23) {
+> +            offset |=3D ((vsid ^ (vsid << 25) ^ pteg) & old_hash_mask)=
+ << shift;
+> +        }
+> +
+> +        hash =3D vsid ^ (vsid << 25) ^ (offset >> shift);
+> +    } else {
+> +        error_report("rehash_pte: Bad segment size in HPTE");
+> +        return H_HARDWARE;
+> +    }
+> +
+> +    new_pteg =3D hash & new_hash_mask;
+> +    if (pte0 & HPTE64_V_SECONDARY) {
+> +        assert(~pteg =3D=3D (hash & old_hash_mask));
+> +        new_pteg =3D ~new_pteg;
+> +    } else {
+> +        assert(pteg =3D=3D (hash & old_hash_mask));
+> +    }
+> +    assert((oldsize !=3D newsize) || (pteg =3D=3D new_pteg));
+> +    replace_pte0 =3D new_hpte_load0(new, new_pteg, slot);
+> +    if (replace_pte0 & HPTE64_V_VALID) {
+> +        assert(newsize < oldsize);
+> +        if (replace_pte0 & HPTE64_V_BOLTED) {
+> +            if (pte0 & HPTE64_V_BOLTED) {
+> +                /* Bolted collision, nothing we can do */
+> +                return H_PTEG_FULL;
+> +            } else {
+> +                /* Discard this hpte */
+> +                return H_SUCCESS;
+> +            }
+> +        }
+> +    }
+> +
+> +    new_hpte_store(new, new_pteg, slot, pte0, pte1);
+> +    return H_SUCCESS;
+> +}
+> +
+> +static int rehash_hpt(PowerPCCPU *cpu,
+> +                      void *old, uint64_t oldsize,
+> +                      void *new, uint64_t newsize)
+> +{
+> +    CPUPPCState *env =3D &cpu->env;
+> +    uint64_t n_ptegs =3D oldsize >> 7;
+> +    uint64_t pteg;
+> +    int slot;
+> +    int rc;
+> +
+> +    assert(env->external_htab =3D=3D old);
+> +
+> +    for (pteg =3D 0; pteg < n_ptegs; pteg++) {
+> +        uint64_t token =3D ppc_hash64_start_access(cpu, pteg * HPTES_P=
+ER_GROUP);
+> +
+> +        if (!token) {
+> +            return H_HARDWARE;
+> +        }
+> +
+> +        for (slot =3D 0; slot < HPTES_PER_GROUP; slot++) {
+> +            rc =3D rehash_hpte(cpu, token, old, oldsize, new, newsize,
+> +                             pteg, slot);
+> +            if (rc !=3D H_SUCCESS) {
+> +                ppc_hash64_stop_access(cpu, token);
+> +                return rc;
+> +            }
+> +        }
+> +        ppc_hash64_stop_access(cpu, token);
+> +    }
+> +
+> +    return H_SUCCESS;
+> +}
+> +
+> +static void pivot_hpt(CPUState *cs, run_on_cpu_data arg)
+> +{
+> +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(arg.host_ptr);
+> +    PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+> +
+> +    cpu_synchronize_state(cs);
+> +    ppc_hash64_set_external_hpt(cpu, spapr->htab, spapr->htab_shift,
+> +                                &error_fatal);
+>  }
+> =20
+>  static target_ulong h_resize_hpt_commit(PowerPCCPU *cpu,
+> @@ -378,13 +679,52 @@ static target_ulong h_resize_hpt_commit(PowerPCCP=
+U *cpu,
+>  {
+>      target_ulong flags =3D args[0];
+>      target_ulong shift =3D args[1];
+> +    sPAPRPendingHPT *pending =3D spapr->pending_hpt;
+> +    int rc;
+> +    size_t newsize;
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+Why size_t here? size_t could be 32-bit on some systems, and don't you
+rather want to always have 64-bit (or at least target_ulong) here?
 
+>      if (spapr->resize_hpt =3D=3D SPAPR_RESIZE_HPT_DISABLED) {
+>          return H_AUTHORITY;
+>      }
+> =20
+>      trace_spapr_h_resize_hpt_commit(flags, shift);
+> -    return H_HARDWARE;
+> +
+> +    if (flags !=3D 0) {
+> +        return H_PARAMETER;
+> +    }
+> +
+> +    if (!pending || (pending->shift !=3D shift)) {
+> +        /* no matching prepare */
+> +        return H_CLOSED;
+> +    }
+> +
+> +    if (!pending->complete) {
+> +        /* prepare has not completed */
+> +        return H_BUSY;
+> +    }
+> +
+> +    newsize =3D 1ULL << pending->shift;
+> +    rc =3D rehash_hpt(cpu, spapr->htab, HTAB_SIZE(spapr),
+> +                    pending->hpt, newsize);
+> +    if (rc =3D=3D H_SUCCESS) {
+> +        CPUState *cs;
+> +
+> +        qemu_vfree(spapr->htab);
+> +        spapr->htab =3D pending->hpt;
+> +        spapr->htab_shift =3D pending->shift;
+> +
+> +        CPU_FOREACH(cs) {
+> +            run_on_cpu(cs, pivot_hpt, RUN_ON_CPU_HOST_PTR(spapr));
+> +        }
+> +
+> +        pending->hpt =3D NULL; /* so it's not free()d */
+> +    }
+> +
+> +    /* Clean up */
+> +    spapr->pending_hpt =3D NULL;
+> +    free_pending_hpt(pending);
+> +
+> +    return rc;
+>  }
 
-** Tags: uas uasp usb usb-host xhci
-
-** Attachment added: "win10-uas-fail.png"
-   https://bugs.launchpad.net/bugs/1648726/+attachment/4789413/+files/2016-=
-12-09-165117_504x687_scrot.png
-
-** Description changed:
-
-- Split off from #1579306 as this is a distinct issue.
-+ Split off from https://bugs.launchpad.net/qemu/+bug/1579306 as this is a
-+ distinct issue.
-  =
-
-  Physical USB storage devices that support the UAS protocol do not work
-  correctly when passed through to Windows guests (I've only tested this
-  with Windows 10 x64, build 1607).
-  =
-
-  Passing through such a device results in the older BOT/MSC protocol
-  being used:
-  =
-
-  <See attachment win10-uas-fail.png>
-  =
-
-  Using the same domain configuration with a Linux guest (tested with
-  SystemRescueCD 4.8.0) works correctly:
-  =
-
-  /: Bus 02.Port 1: Dev 1, Class=3Droot_hub, Driver=3Dxhci_hcd/4p, 5000M
--     |__ Port 1: Dev 2, If 0, Class=3DMass Storage, Driver=3Duas, 5000M
-+ =C2=A0=C2=A0=C2=A0=C2=A0|__ Port 1: Dev 2, If 0, Class=3DMass Storage, Dr=
-iver=3Duas, 5000M
-  /: Bus 01.Port 1: Dev 1, Class=3Droot_hub, Driver=3Dxhci_hcd/4p, 480M
-  =
-
-- =
-
-- In both cases, the VM was launched via libvirt, which generated the follo=
-wing command line:
-+ In both cases, the VM was launched via libvirt, which generated the
-+ following command line:
-  =
-
-  /usr/bin/qemu-system-x86_64 -name guest=3DWin10-Edge-IE11,debug-threads=
-=3Don
-  -S -object
-  secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/domain-1=
-3-Win10
-  -Edge-IE11/master-key.aes -machine
-  pc-q35-2.7,accel=3Dkvm,usb=3Doff,vmport=3Doff,dump-guest-core=3Doff -cpu
-  host,hv_time,hv_relaxed,hv_vapic,hv_spinlocks=3D0x1fff -m 4096 -realtime
-  mlock=3Doff -smp 8,sockets=3D1,cores=3D4,threads=3D2 -uuid 47c39707-088c-=
-4edc-
-  8b6a-a7856e09f43d -no-user-config -nodefaults -chardev
-  socket,id=3Dcharmonitor,path=3D/var/lib/libvirt/qemu/domain-13-Win10-Edge-
-  IE11/monitor.sock,server,nowait -mon
-  chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc
-  base=3Dlocaltime,driftfix=3Dslew -global kvm-pit.lost_tick_policy=3Ddisca=
-rd
-  -no-hpet -no-shutdown -global ICH9-LPC.disable_s3=3D1 -global
-  ICH9-LPC.disable_s4=3D1 -boot strict=3Don -device
-  i82801b11-bridge,id=3Dpci.1,bus=3Dpcie.0,addr=3D0x1e -device pci-
-  bridge,chassis_nr=3D2,id=3Dpci.2,bus=3Dpci.1,addr=3D0x0 -device nec-usb-
-  xhci,id=3Dusb,bus=3Dpci.2,addr=3D0x6 -device virtio-scsi-
-  pci,id=3Dscsi0,bus=3Dpci.2,addr=3D0x3 -device virtio-serial-pci,id=3Dvirt=
-io-
-  serial0,bus=3Dpci.2,addr=3D0x4 -drive file=3D/home/jack/IMG/Win10-Edge-
-  IE11.qcow2,format=3Dqcow2,if=3Dnone,id=3Ddrive-scsi0-0-0-0,discard=3Dunmap
-  -device scsi-hd,bus=3Dscsi0.0,channel=3D0,scsi-id=3D0,lun=3D0,drive=3Ddri=
-ve-
-  scsi0-0-0-0,id=3Dscsi0-0-0-0,bootindex=3D1 -drive if=3Dnone,id=3Ddrive-
-  scsi0-0-0-1,readonly=3Don -device scsi-cd,bus=3Dscsi0.0,channel=3D0,scsi-
-  id=3D0,lun=3D1,drive=3Ddrive-scsi0-0-0-1,id=3Dscsi0-0-0-1 -netdev
-  tap,fd=3D22,id=3Dhostnet0,vhost=3Don,vhostfd=3D24 -device virtio-net-
-  pci,netdev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:27:94:5d,bus=3Dpci.2,addr=
-=3D0x1
-  -chardev pty,id=3Dcharserial0 -device isa-
-  serial,chardev=3Dcharserial0,id=3Dserial0 -chardev
-  spicevmc,id=3Dcharchannel0,name=3Dvdagent -device virtserialport,bus=3Dvi=
-rtio-
-  serial0.0,nr=3D1,chardev=3Dcharchannel0,id=3Dchannel0,name=3Dcom.redhat.s=
-pice.0
-  -device usb-tablet,id=3Dinput0,bus=3Dusb.0,port=3D2 -spice
-  port=3D5900,addr=3D127.0.0.1,disable-ticketing,image-compression=3Doff
-  ,seamless-migration=3Don -device qxl-
-  vga,id=3Dvideo0,ram_size=3D67108864,vram_size=3D67108864,vram64_size_mb=
-=3D0,vgamem_mb=3D16,max_outputs=3D1,bus=3Dpcie.0,addr=3D0x1
-  -device intel-hda,id=3Dsound0,bus=3Dpci.2,addr=3D0x2 -device hda-
-  duplex,id=3Dsound0-codec0,bus=3Dsound0.0,cad=3D0 -chardev
-  spicevmc,id=3Dcharredir0,name=3Dusbredir -device usb-
-  redir,chardev=3Dcharredir0,id=3Dredir0,bus=3Dusb.0,port=3D3 -chardev
-  spicevmc,id=3Dcharredir1,name=3Dusbredir -device usb-
-  redir,chardev=3Dcharredir1,id=3Dredir1,bus=3Dusb.0,port=3D4 -device usb-
-  host,hostbus=3D4,hostaddr=3D4,id=3Dhostdev0,bus=3Dusb.0,port=3D1 -device =
-virtio-
-  balloon-pci,id=3Dballoon0,bus=3Dpci.2,addr=3D0x5 -msg timestamp=3Don
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1648726
-
-Title:
-  Passthrough of UAS devices fails with Windows (10) guests
-
-Status in QEMU:
-  New
-
-Bug description:
-  Split off from https://bugs.launchpad.net/qemu/+bug/1579306 as this is
-  a distinct issue.
-
-  Physical USB storage devices that support the UAS protocol do not work
-  correctly when passed through to Windows guests (I've only tested this
-  with Windows 10 x64, build 1607).
-
-  Passing through such a device results in the older BOT/MSC protocol
-  being used:
-
-  <See attachment win10-uas-fail.png>
-
-  Using the same domain configuration with a Linux guest (tested with
-  SystemRescueCD 4.8.0) works correctly:
-
-  /: Bus 02.Port 1: Dev 1, Class=3Droot_hub, Driver=3Dxhci_hcd/4p, 5000M
-  =C2=A0=C2=A0=C2=A0=C2=A0|__ Port 1: Dev 2, If 0, Class=3DMass Storage, Dr=
-iver=3Duas, 5000M
-  /: Bus 01.Port 1: Dev 1, Class=3Droot_hub, Driver=3Dxhci_hcd/4p, 480M
-
-  In both cases, the VM was launched via libvirt, which generated the
-  following command line:
-
-  /usr/bin/qemu-system-x86_64 -name guest=3DWin10-Edge-IE11,debug-
-  threads=3Don -S -object
-  secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/domain-1=
-3-Win10
-  -Edge-IE11/master-key.aes -machine
-  pc-q35-2.7,accel=3Dkvm,usb=3Doff,vmport=3Doff,dump-guest-core=3Doff -cpu
-  host,hv_time,hv_relaxed,hv_vapic,hv_spinlocks=3D0x1fff -m 4096 -realtime
-  mlock=3Doff -smp 8,sockets=3D1,cores=3D4,threads=3D2 -uuid 47c39707-088c-=
-4edc-
-  8b6a-a7856e09f43d -no-user-config -nodefaults -chardev
-  socket,id=3Dcharmonitor,path=3D/var/lib/libvirt/qemu/domain-13-Win10-Edge-
-  IE11/monitor.sock,server,nowait -mon
-  chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc
-  base=3Dlocaltime,driftfix=3Dslew -global kvm-pit.lost_tick_policy=3Ddisca=
-rd
-  -no-hpet -no-shutdown -global ICH9-LPC.disable_s3=3D1 -global
-  ICH9-LPC.disable_s4=3D1 -boot strict=3Don -device
-  i82801b11-bridge,id=3Dpci.1,bus=3Dpcie.0,addr=3D0x1e -device pci-
-  bridge,chassis_nr=3D2,id=3Dpci.2,bus=3Dpci.1,addr=3D0x0 -device nec-usb-
-  xhci,id=3Dusb,bus=3Dpci.2,addr=3D0x6 -device virtio-scsi-
-  pci,id=3Dscsi0,bus=3Dpci.2,addr=3D0x3 -device virtio-serial-pci,id=3Dvirt=
-io-
-  serial0,bus=3Dpci.2,addr=3D0x4 -drive file=3D/home/jack/IMG/Win10-Edge-
-  IE11.qcow2,format=3Dqcow2,if=3Dnone,id=3Ddrive-scsi0-0-0-0,discard=3Dunmap
-  -device scsi-hd,bus=3Dscsi0.0,channel=3D0,scsi-id=3D0,lun=3D0,drive=3Ddri=
-ve-
-  scsi0-0-0-0,id=3Dscsi0-0-0-0,bootindex=3D1 -drive if=3Dnone,id=3Ddrive-
-  scsi0-0-0-1,readonly=3Don -device scsi-cd,bus=3Dscsi0.0,channel=3D0,scsi-
-  id=3D0,lun=3D1,drive=3Ddrive-scsi0-0-0-1,id=3Dscsi0-0-0-1 -netdev
-  tap,fd=3D22,id=3Dhostnet0,vhost=3Don,vhostfd=3D24 -device virtio-net-
-  pci,netdev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:27:94:5d,bus=3Dpci.2,addr=
-=3D0x1
-  -chardev pty,id=3Dcharserial0 -device isa-
-  serial,chardev=3Dcharserial0,id=3Dserial0 -chardev
-  spicevmc,id=3Dcharchannel0,name=3Dvdagent -device virtserialport,bus
-  =3Dvirtio-
-  serial0.0,nr=3D1,chardev=3Dcharchannel0,id=3Dchannel0,name=3Dcom.redhat.s=
-pice.0
-  -device usb-tablet,id=3Dinput0,bus=3Dusb.0,port=3D2 -spice
-  port=3D5900,addr=3D127.0.0.1,disable-ticketing,image-compression=3Doff
-  ,seamless-migration=3Don -device qxl-
-  vga,id=3Dvideo0,ram_size=3D67108864,vram_size=3D67108864,vram64_size_mb=
-=3D0,vgamem_mb=3D16,max_outputs=3D1,bus=3Dpcie.0,addr=3D0x1
-  -device intel-hda,id=3Dsound0,bus=3Dpci.2,addr=3D0x2 -device hda-
-  duplex,id=3Dsound0-codec0,bus=3Dsound0.0,cad=3D0 -chardev
-  spicevmc,id=3Dcharredir0,name=3Dusbredir -device usb-
-  redir,chardev=3Dcharredir0,id=3Dredir0,bus=3Dusb.0,port=3D3 -chardev
-  spicevmc,id=3Dcharredir1,name=3Dusbredir -device usb-
-  redir,chardev=3Dcharredir1,id=3Dredir1,bus=3Dusb.0,port=3D4 -device usb-
-  host,hostbus=3D4,hostaddr=3D4,id=3Dhostdev0,bus=3Dusb.0,port=3D1 -device =
-virtio-
-  balloon-pci,id=3Dballoon0,bus=3Dpci.2,addr=3D0x5 -msg timestamp=3Don
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1648726/+subscriptions
+ Thomas
