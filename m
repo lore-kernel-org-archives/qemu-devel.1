@@ -1,20 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47778)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47759)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cFK89-0007TN-Fy
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 07:18:26 -0500
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cFK88-0007OD-3h
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 07:18:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cFK88-0003Bs-1L
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 07:18:25 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44904)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1cFK87-0003BN-P2
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 07:18:23 -0500
-From: Thomas Huth <thuth@redhat.com>
-Date: Fri,  9 Dec 2016 13:17:34 +0100
-Message-Id: <1481285870-3396-5-git-send-email-thuth@redhat.com>
-In-Reply-To: <1481285870-3396-1-git-send-email-thuth@redhat.com>
-References: <1481285870-3396-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH 04/20] alpha: Move CPU files to target/ folder
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cFK82-000397-9h
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 07:18:24 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60881)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
+	id 1cFK82-00038b-13
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 07:18:18 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
+	uB9CEE7c086025
+	for <qemu-devel@nongnu.org>; Fri, 9 Dec 2016 07:18:17 -0500
+Received: from e28smtp08.in.ibm.com (e28smtp08.in.ibm.com [125.16.236.8])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 277rtmbcb4-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 09 Dec 2016 07:18:16 -0500
+Received: from localhost
+	by e28smtp08.in.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
+	Fri, 9 Dec 2016 17:48:13 +0530
+From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+Date: Fri,  9 Dec 2016 17:47:25 +0530
+In-Reply-To: <1481285845-16415-1-git-send-email-nikunj@linux.vnet.ibm.com>
+References: <1481285845-16415-1-git-send-email-nikunj@linux.vnet.ibm.com>
+Message-Id: <1481285845-16415-7-git-send-email-nikunj@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v2 6/6] target-ppc: implement xxinsertw
+ instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,130 +38,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>
-Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Michael Walle <michael@walle.cc>, Laurent Vivier <laurent@vivier.eu>, Yongbok Kim <yongbok.kim@imgtec.com>, Anthony Green <green@moxielogic.com>, Jia Liu <proljc@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Eduardo Habkost <ehabkost@redhat.com>, Max Filippov <jcmvbkbc@gmail.com>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, James Hogan <james.hogan@imgtec.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Marcelo Tosatti <mtosatti@redhat.com>
+To: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net
+Cc: qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com, nikunj@linux.vnet.ibm.com
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
+xxinsertw: VSX Vector Insert Word
+
+Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 ---
- MAINTAINERS                                  | 2 +-
- hw/alpha/alpha_sys.h                         | 2 +-
- {target-alpha => target/alpha}/Makefile.objs | 0
- {target-alpha => target/alpha}/STATUS        | 0
- {target-alpha => target/alpha}/cpu-qom.h     | 0
- {target-alpha => target/alpha}/cpu.c         | 0
- {target-alpha => target/alpha}/cpu.h         | 0
- {target-alpha => target/alpha}/fpu_helper.c  | 0
- {target-alpha => target/alpha}/gdbstub.c     | 0
- {target-alpha => target/alpha}/helper.c      | 0
- {target-alpha => target/alpha}/helper.h      | 0
- {target-alpha => target/alpha}/int_helper.c  | 0
- {target-alpha => target/alpha}/machine.c     | 0
- {target-alpha => target/alpha}/mem_helper.c  | 0
- {target-alpha => target/alpha}/sys_helper.c  | 0
- {target-alpha => target/alpha}/translate.c   | 0
- {target-alpha => target/alpha}/vax_helper.c  | 0
- 17 files changed, 2 insertions(+), 2 deletions(-)
- rename {target-alpha => target/alpha}/Makefile.objs (100%)
- rename {target-alpha => target/alpha}/STATUS (100%)
- rename {target-alpha => target/alpha}/cpu-qom.h (100%)
- rename {target-alpha => target/alpha}/cpu.c (100%)
- rename {target-alpha => target/alpha}/cpu.h (100%)
- rename {target-alpha => target/alpha}/fpu_helper.c (100%)
- rename {target-alpha => target/alpha}/gdbstub.c (100%)
- rename {target-alpha => target/alpha}/helper.c (100%)
- rename {target-alpha => target/alpha}/helper.h (100%)
- rename {target-alpha => target/alpha}/int_helper.c (100%)
- rename {target-alpha => target/alpha}/machine.c (100%)
- rename {target-alpha => target/alpha}/mem_helper.c (100%)
- rename {target-alpha => target/alpha}/sys_helper.c (100%)
- rename {target-alpha => target/alpha}/translate.c (100%)
- rename {target-alpha => target/alpha}/vax_helper.c (100%)
+ target-ppc/helper.h                 |  1 +
+ target-ppc/int_helper.c             | 21 +++++++++++++++++++++
+ target-ppc/translate/vsx-impl.inc.c |  5 +++--
+ target-ppc/translate/vsx-ops.inc.c  |  1 +
+ 4 files changed, 26 insertions(+), 2 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index ce1ee35..37deb43 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -106,7 +106,7 @@ F: include/fpu/
- Alpha
- M: Richard Henderson <rth@twiddle.net>
- S: Maintained
--F: target-alpha/
-+F: target/alpha/
- F: hw/alpha/
- F: tests/tcg/alpha/
- F: disas/alpha.c
-diff --git a/hw/alpha/alpha_sys.h b/hw/alpha/alpha_sys.h
-index ed911f2..bdabf41 100644
---- a/hw/alpha/alpha_sys.h
-+++ b/hw/alpha/alpha_sys.h
-@@ -3,7 +3,7 @@
- #ifndef HW_ALPHA_SYS_H
- #define HW_ALPHA_SYS_H
+diff --git a/target-ppc/helper.h b/target-ppc/helper.h
+index 8b30420..6c5b194 100644
+--- a/target-ppc/helper.h
++++ b/target-ppc/helper.h
+@@ -541,6 +541,7 @@ DEF_HELPER_2(xvrspiz, void, env, i32)
+ DEF_HELPER_2(xxperm, void, env, i32)
+ DEF_HELPER_2(xxpermr, void, env, i32)
+ DEF_HELPER_4(xxextractuw, void, env, tl, tl, i32)
++DEF_HELPER_4(xxinsertw, void, env, tl, tl, i32)
  
--#include "target-alpha/cpu-qom.h"
-+#include "cpu-qom.h"
- #include "hw/pci/pci.h"
- #include "hw/pci/pci_host.h"
- #include "hw/ide.h"
-diff --git a/target-alpha/Makefile.objs b/target/alpha/Makefile.objs
-similarity index 100%
-rename from target-alpha/Makefile.objs
-rename to target/alpha/Makefile.objs
-diff --git a/target-alpha/STATUS b/target/alpha/STATUS
-similarity index 100%
-rename from target-alpha/STATUS
-rename to target/alpha/STATUS
-diff --git a/target-alpha/cpu-qom.h b/target/alpha/cpu-qom.h
-similarity index 100%
-rename from target-alpha/cpu-qom.h
-rename to target/alpha/cpu-qom.h
-diff --git a/target-alpha/cpu.c b/target/alpha/cpu.c
-similarity index 100%
-rename from target-alpha/cpu.c
-rename to target/alpha/cpu.c
-diff --git a/target-alpha/cpu.h b/target/alpha/cpu.h
-similarity index 100%
-rename from target-alpha/cpu.h
-rename to target/alpha/cpu.h
-diff --git a/target-alpha/fpu_helper.c b/target/alpha/fpu_helper.c
-similarity index 100%
-rename from target-alpha/fpu_helper.c
-rename to target/alpha/fpu_helper.c
-diff --git a/target-alpha/gdbstub.c b/target/alpha/gdbstub.c
-similarity index 100%
-rename from target-alpha/gdbstub.c
-rename to target/alpha/gdbstub.c
-diff --git a/target-alpha/helper.c b/target/alpha/helper.c
-similarity index 100%
-rename from target-alpha/helper.c
-rename to target/alpha/helper.c
-diff --git a/target-alpha/helper.h b/target/alpha/helper.h
-similarity index 100%
-rename from target-alpha/helper.h
-rename to target/alpha/helper.h
-diff --git a/target-alpha/int_helper.c b/target/alpha/int_helper.c
-similarity index 100%
-rename from target-alpha/int_helper.c
-rename to target/alpha/int_helper.c
-diff --git a/target-alpha/machine.c b/target/alpha/machine.c
-similarity index 100%
-rename from target-alpha/machine.c
-rename to target/alpha/machine.c
-diff --git a/target-alpha/mem_helper.c b/target/alpha/mem_helper.c
-similarity index 100%
-rename from target-alpha/mem_helper.c
-rename to target/alpha/mem_helper.c
-diff --git a/target-alpha/sys_helper.c b/target/alpha/sys_helper.c
-similarity index 100%
-rename from target-alpha/sys_helper.c
-rename to target/alpha/sys_helper.c
-diff --git a/target-alpha/translate.c b/target/alpha/translate.c
-similarity index 100%
-rename from target-alpha/translate.c
-rename to target/alpha/translate.c
-diff --git a/target-alpha/vax_helper.c b/target/alpha/vax_helper.c
-similarity index 100%
-rename from target-alpha/vax_helper.c
-rename to target/alpha/vax_helper.c
+ DEF_HELPER_2(efscfsi, i32, env, i32)
+ DEF_HELPER_2(efscfui, i32, env, i32)
+diff --git a/target-ppc/int_helper.c b/target-ppc/int_helper.c
+index e3f66ac..4d7eab6 100644
+--- a/target-ppc/int_helper.c
++++ b/target-ppc/int_helper.c
+@@ -2054,6 +2054,27 @@ void helper_xxextractuw(CPUPPCState *env, target_ulong xtn,
+     putVSR(xtn, &xt, env);
+ }
+ 
++void helper_xxinsertw(CPUPPCState *env, target_ulong xtn,
++                      target_ulong xbn, uint32_t index)
++{
++    ppc_vsr_t xt, xb;
++    size_t es = sizeof(uint32_t);
++    uint32_t ins_index;
++
++    getVSR(xbn, &xb, env);
++    getVSR(xtn, &xt, env);
++
++#if defined(HOST_WORDS_BIGENDIAN)
++    ins_index = index;
++    memcpy(&xt.u8[ins_index], &xb.u8[8 - es], es);
++#else
++    ins_index = (16 - index) - es;
++    memcpy(&xt.u8[ins_index], &xb.u8[8], es);
++#endif
++
++    putVSR(xtn, &xt, env);
++}
++
+ #define VEXT_SIGNED(name, element, mask, cast, recast)              \
+ void helper_##name(ppc_avr_t *r, ppc_avr_t *b)                      \
+ {                                                                   \
+diff --git a/target-ppc/translate/vsx-impl.inc.c b/target-ppc/translate/vsx-impl.inc.c
+index 1c40a35..9124e99 100644
+--- a/target-ppc/translate/vsx-impl.inc.c
++++ b/target-ppc/translate/vsx-impl.inc.c
+@@ -1180,7 +1180,7 @@ static void gen_xxsldwi(DisasContext *ctx)
+     tcg_temp_free_i64(xtl);
+ }
+ 
+-#define VSX_EXTRACT(name)                                       \
++#define VSX_EXTRACT_INSERT(name)                                \
+ static void gen_##name(DisasContext *ctx)                       \
+ {                                                               \
+     TCGv xt, xb;                                                \
+@@ -1205,7 +1205,8 @@ static void gen_##name(DisasContext *ctx)                       \
+     tcg_temp_free_i32(t0);                                      \
+ }
+ 
+-VSX_EXTRACT(xxextractuw)
++VSX_EXTRACT_INSERT(xxextractuw)
++VSX_EXTRACT_INSERT(xxinsertw)
+ 
+ #undef GEN_XX2FORM
+ #undef GEN_XX3FORM
+diff --git a/target-ppc/translate/vsx-ops.inc.c b/target-ppc/translate/vsx-ops.inc.c
+index 473d925..096d358 100644
+--- a/target-ppc/translate/vsx-ops.inc.c
++++ b/target-ppc/translate/vsx-ops.inc.c
+@@ -285,6 +285,7 @@ GEN_XX2FORM(xxspltw, 0x08, 0x0A, PPC2_VSX),
+ GEN_XX1FORM(xxspltib, 0x08, 0x0B, PPC2_ISA300),
+ GEN_XX3FORM_DM(xxsldwi, 0x08, 0x00),
+ GEN_XX2FORM_EXT(xxextractuw, 0x0A, 0x0A, PPC2_ISA300),
++GEN_XX2FORM_EXT(xxinsertw, 0x0A, 0x0B, PPC2_ISA300),
+ 
+ #define GEN_XXSEL_ROW(opc3) \
+ GEN_HANDLER2_E(xxsel, "xxsel", 0x3C, 0x18, opc3, 0, PPC_NONE, PPC2_VSX), \
 -- 
-1.8.3.1
+2.7.4
