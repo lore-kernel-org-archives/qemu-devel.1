@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55317)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37106)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1cFMet-0001iy-E9
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 10:00:27 -0500
+	(envelope-from <stefanha@gmail.com>) id 1cFNDB-0002zz-3U
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 10:35:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1cFMep-0001wc-HY
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 10:00:23 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20161209141823.GC3992@noname.redhat.com>
-References: <cover.1481290956.git.berto@igalia.com>
-	<20161209141823.GC3992@noname.redhat.com>
-Date: Fri, 09 Dec 2016 16:00:14 +0100
-Message-ID: <w51fulxw3k1.fsf@maestria.local.igalia.com>
+	(envelope-from <stefanha@gmail.com>) id 1cFND7-0006dL-W9
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 10:35:49 -0500
+Received: from mail-io0-f173.google.com ([209.85.223.173]:35246)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cFND7-0006W0-Rd
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 10:35:45 -0500
+Received: by mail-io0-f173.google.com with SMTP id h30so62284773iod.2
+	for <qemu-devel@nongnu.org>; Fri, 09 Dec 2016 07:35:24 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH RFC 0/1] Allow storing the qcow2 L2 cache
- in disk
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Fri, 9 Dec 2016 15:34:22 +0000
+Message-ID: <CAJSP0QUn4OE3_9foGgktt5O_KzrEzV8uhB1mpoS1q5x4DsPTPQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: [Qemu-devel] Any QEMU 2.8 release blockers?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,45 +25,14 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: qemu-devel <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>
 
-On Fri 09 Dec 2016 03:18:23 PM CET, Kevin Wolf wrote:
->> I have been making some tests with exactly that scenario and the
->> results look good: storing the cache in disk gives roughly the same
->> performance as storing it in memory.
->> 
->> |---------------------+------------+------+------------+--------|
->> |                     | Random 4k reads   | Sequential 4k reads |
->> |                     | Throughput | IOPS | Throughput |  IOPS  |
->> |---------------------+------------+------+------------+--------|
->> | Cache in memory/SSD | 406 KB/s   |   99 | 84 MB/s    |  21000 |
->> | Default cache (1MB) | 200 KB/s   |   60 | 83 MB/s    |  21000 |
->> | No cache            | 200 KB/s   |   49 | 56 MB/s    |  14000 |
->> |---------------------+------------+------+------------+--------|
->> 
->> I'm including the patch that I used to get these results. This is the
->> simplest approach that I could think of.
->> 
->> Opinions, questions?
->
-> I suppose you used the fact that the cache is now on disk to increase
-> the cache size so that it covers the whole image?
+Hi folks,
+How is QEMU 2.8.0-rc3 holding up?
 
-Right, the wording on the table is not clear, but that's what I did. I
-also don't think this makes much sense if the cache is not big enough to
-cover the whole image.
+I'm not aware of release blockers.  QEMU 2.8.0 will be released on
+Tuesday, December 13th if nothing comes up.  It will be the -rc3
+source tree.
 
-> If so, are you sure that you aren't just testing that accessing memory
-> in the kernel page cache is just as fast as accessing memory in qemu's
-> own cache? It seems this would just bypass the cache size limit given
-> to qemu by instead leaving things cached in the kernel where the limit
-> doesn't apply.
-
-Fair question: what I checked is that the PSS/RSS values match the
-expected values (i.e, they don't grow as you read from the disk
-image). If the kernel is caching those pages so accessing them after
-MADV_DONTNEED does not require going to disk again is a possibility that
-I haven't ruled out.
-
-Berto
+Stefan
