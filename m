@@ -1,38 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42996)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43030)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cFHTY-0000qF-2Q
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 04:28:24 -0500
+	(envelope-from <groug@kaod.org>) id 1cFHTe-0001BO-CU
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 04:28:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cFHTT-0000AU-I1
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 04:28:20 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37454
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <groug@kaod.org>) id 1cFHTa-0000D9-Bc
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 04:28:26 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35731)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cFHTT-0000AG-BS
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 04:28:15 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	uB99QX5I079614
-	for <qemu-devel@nongnu.org>; Fri, 9 Dec 2016 04:28:14 -0500
-Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 277rtpaymh-1
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cFHTa-0000Cf-38
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 04:28:22 -0500
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
+	uB99Ow9j046607
+	for <qemu-devel@nongnu.org>; Fri, 9 Dec 2016 04:28:21 -0500
+Received: from e38.co.us.ibm.com (e38.co.us.ibm.com [32.97.110.159])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 277ru1aybk-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 09 Dec 2016 04:28:14 -0500
+	for <qemu-devel@nongnu.org>; Fri, 09 Dec 2016 04:28:20 -0500
 Received: from localhost
-	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e38.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
-	Fri, 9 Dec 2016 02:28:13 -0700
+	Fri, 9 Dec 2016 02:28:20 -0700
 From: Greg Kurz <groug@kaod.org>
-Date: Fri, 09 Dec 2016 10:28:07 +0100
+Date: Fri, 09 Dec 2016 10:28:15 +0100
 In-Reply-To: <148127558476.2633.13433882390740185948.stgit@bahia>
 References: <148127558476.2633.13433882390740185948.stgit@bahia>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <148127568771.2633.11664955007798533845.stgit@bahia>
-Subject: [Qemu-devel] [PATCH 4/8] tests: virtio-9p: add version operation
- test
+Message-Id: <148127569509.2633.12364612819225579911.stgit@bahia>
+Subject: [Qemu-devel] [PATCH 5/8] tests: virtio-9p: add attach operation test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,291 +42,90 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Greg Kurz <groug@kaod.org>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>
 
-This patch lays the foundations to be able to test 9P operations and
-provides a test for the version operation as a first example.
+The attach operation is used to establish a connection between the
+client and the server. After this, the client is able to access the
+underlying filesystem and do I/O.
 
-A 9P request is composed of a T-message sent by the client (guest) to the
-server (QEMU), and a R-message sent by the server back to the client.
+This test simply ensures the operation succeeds without error.
 
-The following general calls are available to implement requests for any
-9P operations:
+Reference:
 
-v9fs_req_init(): allocates the request structure and the guest memory for
-                 the T-message
-
-v9fs_req_send(): allocates the guest memory for the R-message and sends the
-                 T-message to QEMU
-
-v9fs_req_recv(): waits for QEMU to answer and does some sanity checks on the
-                 returned R-message header
-
-v9fs_req_free(): releases the guest memory and the request structure
-
-Helpers are provided, to be used by each specific 9P operation to copy data
-to/from the guest memory.
-
-The version operation is used to negotiate the 9P protocol version to be
-used and the maximum buffer size for exchanged data. It is necessarily
-the first message of a 9P session. For simplicity, the maximum buffer size
-is hardcoded to 4k, which should be enough for functional tests.
-
-The test simply advertises the "9P2000.L" version to QEMU and expects QEMU
-to answer it is supported.
-
-References:
-
-http://man.cat-v.org/plan_9/5/intro
-http://man.cat-v.org/plan_9/5/version
+http://man.cat-v.org/plan_9/5/attach
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
- tests/virtio-9p-test.c |  222 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 222 insertions(+)
+ tests/virtio-9p-test.c |   40 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 40 insertions(+)
 
 diff --git a/tests/virtio-9p-test.c b/tests/virtio-9p-test.c
-index 727316086337..b3ee956cbcb2 100644
+index b3ee956cbcb2..37a256ef4a59 100644
 --- a/tests/virtio-9p-test.c
 +++ b/tests/virtio-9p-test.c
-@@ -16,6 +16,7 @@
- #include "libqos/virtio-pci.h"
- #include "standard-headers/linux/virtio_ids.h"
- #include "standard-headers/linux/virtio_pci.h"
-+#include "hw/9pfs/9p.h"
+@@ -25,6 +25,7 @@ typedef struct {
+     QOSState *qs;
+     QVirtQueue *vq;
+     char *test_share;
++    uint16_t p9_req_tag;
+ } QVirtIO9P;
  
- static const char mount_tag[] = "qtest";
- 
-@@ -98,6 +99,226 @@ static void pci_config(QVirtIO9P *v9p)
-     g_free(tag);
+ static QVirtIO9P *qvirtio_9p_start(const char *driver)
+@@ -304,6 +305,35 @@ static void v9fs_rversion(P9Req *req, uint16_t *len, char **version)
+     v9fs_req_free(req);
  }
  
-+#define P9_MAX_SIZE 4096 /* Max size of a T-message or R-message */
-+
-+typedef struct {
-+    QVirtIO9P *v9p;
-+    uint16_t tag;
-+    uint64_t t_msg;
-+    uint32_t t_size;
-+    uint64_t r_msg;
-+    /* No r_size, it is hardcoded to P9_MAX_SIZE */
-+    size_t t_off;
-+    size_t r_off;
-+} P9Req;
-+
-+static void v9fs_memwrite(P9Req *req, const void *addr, size_t len)
++/* size[4] Tattach tag[2] fid[4] afid[4] uname[s] aname[s] n_uname[4] */
++static P9Req *v9fs_tattach(QVirtIO9P *v9p, uint32_t fid, uint32_t n_uname)
 +{
-+    memwrite(req->t_msg + req->t_off, addr, len);
-+    req->t_off += len;
-+}
++    const char *uname = ""; /* ignored by QEMU */
++    const char *aname = ""; /* ignored by QEMU */
++    P9Req *req = v9fs_req_init(v9p, 4 + 4 + 2 + 2 + 4, P9_TATTACH,
++                               ++(v9p->p9_req_tag));
 +
-+static void v9fs_memskip(P9Req *req, size_t len)
-+{
-+    req->r_off += len;
-+}
-+
-+static void v9fs_memrewind(P9Req *req, size_t len)
-+{
-+    req->r_off -= len;
-+}
-+
-+static void v9fs_memread(P9Req *req, void *addr, size_t len)
-+{
-+    memread(req->r_msg + req->r_off, addr, len);
-+    req->r_off += len;
-+}
-+
-+static void v9fs_uint16_write(P9Req *req, uint16_t val)
-+{
-+    uint16_t le_val = cpu_to_le16(val);
-+
-+    v9fs_memwrite(req, &le_val, 2);
-+}
-+
-+static void v9fs_uint16_read(P9Req *req, uint16_t *val)
-+{
-+    v9fs_memread(req, val, 2);
-+    le16_to_cpus(val);
-+}
-+
-+static void v9fs_uint32_write(P9Req *req, uint32_t val)
-+{
-+    uint32_t le_val = cpu_to_le32(val);
-+
-+    v9fs_memwrite(req, &le_val, 4);
-+}
-+
-+static void v9fs_uint32_read(P9Req *req, uint32_t *val)
-+{
-+    v9fs_memread(req, val, 4);
-+    le32_to_cpus(val);
-+}
-+
-+/* len[2] string[len] */
-+static uint16_t v9fs_string_size(const char *string)
-+{
-+    size_t len = strlen(string);
-+
-+    g_assert_cmpint(len, <=, UINT16_MAX);
-+
-+    return 2 + len;
-+}
-+
-+static void v9fs_string_write(P9Req *req, const char *string)
-+{
-+    int len = strlen(string);
-+
-+    g_assert_cmpint(len, <=, UINT16_MAX);
-+
-+    v9fs_uint16_write(req, (uint16_t) len);
-+    v9fs_memwrite(req, string, len);
-+}
-+
-+static void v9fs_string_read(P9Req *req, uint16_t *len, char **string)
-+{
-+    uint16_t local_len;
-+
-+    v9fs_uint16_read(req, &local_len);
-+    if (len) {
-+        *len = local_len;
-+    }
-+    if (string) {
-+        *string = g_malloc(local_len);
-+        v9fs_memread(req, *string, local_len);
-+    } else {
-+        v9fs_memskip(req, local_len);
-+    }
-+}
-+
-+ typedef struct {
-+    uint32_t size;
-+    uint8_t id;
-+    uint16_t tag;
-+} QEMU_PACKED P9Hdr;
-+
-+static P9Req *v9fs_req_init(QVirtIO9P *v9p, uint32_t size, uint8_t id,
-+                            uint16_t tag)
-+{
-+    P9Req *req = g_new0(P9Req, 1);
-+    uint32_t t_size = 7 + size; /* 9P header has well-known size of 7 bytes */
-+    P9Hdr hdr = {
-+        .size = cpu_to_le32(t_size),
-+        .id = id,
-+        .tag = cpu_to_le16(tag)
-+    };
-+
-+    g_assert_cmpint(t_size, <=, P9_MAX_SIZE);
-+
-+    req->v9p = v9p;
-+    req->t_size = t_size;
-+    req->t_msg = guest_alloc(v9p->qs->alloc, req->t_size);
-+    v9fs_memwrite(req, &hdr, 7);
-+    req->tag = tag;
-+    return req;
-+}
-+
-+static void v9fs_req_send(P9Req *req)
-+{
-+    QVirtIO9P *v9p = req->v9p;
-+    uint32_t free_head;
-+
-+    req->r_msg = guest_alloc(v9p->qs->alloc, P9_MAX_SIZE);
-+    free_head = qvirtqueue_add(v9p->vq, req->t_msg, req->t_size, false, true);
-+    qvirtqueue_add(v9p->vq, req->r_msg, P9_MAX_SIZE, true, false);
-+    qvirtqueue_kick(v9p->dev, v9p->vq, free_head);
-+    req->t_off = 0;
-+}
-+
-+static void v9fs_req_recv(P9Req *req, uint8_t id)
-+{
-+    QVirtIO9P *v9p = req->v9p;
-+    P9Hdr hdr;
-+    int i;
-+
-+    for (i = 0; i < 10; i++) {
-+        qvirtio_wait_queue_isr(v9p->dev, v9p->vq, 1000 * 1000);
-+
-+        v9fs_memread(req, &hdr, 7);
-+        le32_to_cpus(&hdr.size);
-+        le16_to_cpus(&hdr.tag);
-+        if (hdr.size >= 7) {
-+            break;
-+        }
-+        v9fs_memrewind(req, 7);
-+    }
-+
-+    g_assert_cmpint(hdr.size, >=, 7);
-+    g_assert_cmpint(hdr.size, <=, P9_MAX_SIZE);
-+    g_assert_cmpint(hdr.tag, ==, req->tag);
-+
-+    if (hdr.id != id && hdr.id == P9_RLERROR) {
-+        uint32_t err;
-+        v9fs_uint32_read(req, &err);
-+        g_printerr("Received Rlerror (%d) instead of Response %d\n", err, id);
-+        g_assert_not_reached();
-+    }
-+    g_assert_cmpint(hdr.id, ==, id);
-+}
-+
-+static void v9fs_req_free(P9Req *req)
-+{
-+    QVirtIO9P *v9p = req->v9p;
-+
-+    guest_free(v9p->qs->alloc, req->t_msg);
-+    guest_free(v9p->qs->alloc, req->r_msg);
-+    g_free(req);
-+}
-+
-+/* size[4] Tversion tag[2] msize[4] version[s] */
-+static P9Req *v9fs_tversion(QVirtIO9P *v9p, uint32_t msize, const char *version)
-+{
-+    P9Req *req = v9fs_req_init(v9p, 4 + v9fs_string_size(version), P9_TVERSION,
-+                               P9_NOTAG);
-+
-+    v9fs_uint32_write(req, msize);
-+    v9fs_string_write(req, version);
++    v9fs_uint32_write(req, fid);
++    v9fs_uint32_write(req, P9_NOFID);
++    v9fs_string_write(req, uname);
++    v9fs_string_write(req, aname);
++    v9fs_uint32_write(req, n_uname);
 +    v9fs_req_send(req);
 +    return req;
 +}
 +
-+/* size[4] Rversion tag[2] msize[4] version[s] */
-+static void v9fs_rversion(P9Req *req, uint16_t *len, char **version)
++typedef char v9fs_qid[13];
++
++/* size[4] Rattach tag[2] qid[13] */
++static void v9fs_rattach(P9Req *req, v9fs_qid *qid)
 +{
-+    uint32_t msize;
-+
-+    v9fs_req_recv(req, P9_RVERSION);
-+    v9fs_uint32_read(req, &msize);
-+
-+    g_assert_cmpint(msize, ==, P9_MAX_SIZE);
-+
-+    if (len || version) {
-+        v9fs_string_read(req, len, version);
++    v9fs_req_recv(req, P9_RATTACH);
++    if (qid) {
++        v9fs_memread(req, qid, 13);
 +    }
-+
 +    v9fs_req_free(req);
 +}
 +
-+static void fs_version(QVirtIO9P *v9p)
+ static void fs_version(QVirtIO9P *v9p)
+ {
+     const char *version = "9P2000.L";
+@@ -319,6 +349,15 @@ static void fs_version(QVirtIO9P *v9p)
+     g_free(server_version);
+ }
+ 
++static void fs_attach(QVirtIO9P *v9p)
 +{
-+    const char *version = "9P2000.L";
-+    uint16_t server_len;
-+    char *server_version;
 +    P9Req *req;
 +
-+    req = v9fs_tversion(v9p, P9_MAX_SIZE, version);
-+    v9fs_rversion(req, &server_len, &server_version);
-+
-+    g_assert_cmpmem(server_version, server_len, version, strlen(version));
-+
-+    g_free(server_version);
++    fs_version(v9p);
++    req = v9fs_tattach(v9p, 0, getuid());
++    v9fs_rattach(req, NULL);
 +}
 +
  typedef void (*v9fs_test_fn)(QVirtIO9P *v9p);
  
  static void v9fs_run_pci_test(gconstpointer data)
-@@ -121,6 +342,7 @@ int main(int argc, char **argv)
-     g_test_init(&argc, &argv, NULL);
+@@ -343,6 +382,7 @@ int main(int argc, char **argv)
      v9fs_qtest_pci_add("/virtio/9p/pci/nop", NULL);
      v9fs_qtest_pci_add("/virtio/9p/pci/config", pci_config);
-+    v9fs_qtest_pci_add("/virtio/9p/pci/fs/version/basic", fs_version);
+     v9fs_qtest_pci_add("/virtio/9p/pci/fs/version/basic", fs_version);
++    v9fs_qtest_pci_add("/virtio/9p/pci/fs/attach/basic", fs_attach);
  
      return g_test_run();
  }
