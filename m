@@ -1,34 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34711)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34758)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cFEJa-0002UF-5e
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 01:05:51 -0500
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cFEJo-000375-2s
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 01:06:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cFEJV-0002nx-UJ
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 01:05:50 -0500
-Received: from indium.canonical.com ([91.189.90.7]:38848)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cFEJV-0002nq-Gl
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 01:05:45 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cFEJT-0001QO-Dh
-	for <qemu-devel@nongnu.org>; Fri, 09 Dec 2016 06:05:43 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 4900F2E80C3
-	for <qemu-devel@nongnu.org>; Fri,  9 Dec 2016 06:05:43 +0000 (UTC)
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cFEJm-0002qb-1c
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 01:06:04 -0500
+Received: from [59.151.112.132] (port=18988 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cFEJk-0002pq-SW
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 01:06:01 -0500
+From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+Date: Fri, 9 Dec 2016 14:04:55 +0800
+Message-ID: <1481263496-8004-3-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+In-Reply-To: <1481263496-8004-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+References: <1481263496-8004-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 09 Dec 2016 05:51:48 -0000
-From: Jack Coulter <1579306@bugs.launchpad.net>
-Reply-To: Bug 1579306 <1579306@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20160507052845.589.63580.malonedeb@chaenomeles.canonical.com>
-Message-Id: <20161209055148.23095.1695.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1579306] Re: usb-uas does not work in Windows
- (10) guest
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH for-2.9 V3 2/3] Add a new qmp command to
+ start/stop replication
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,112 +26,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>, Eric Blake <eblake@redhat.com>
+Cc: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, "eddie . dong" <eddie.dong@intel.com>, Bian Naimeng <biannm@cn.fujitsu.com>, Changlong Xie <xiecl.fnst@cn.fujitsu.com>
 
-Just echoing Tom Yan's comment; I've tried passing through what appears
-to be the very same device (if not, at least the same UAS-SATA bridge)
-to a VM in its entirety.
+We can call this qmp command to start/stop replication outside of qemu.
+Like Xen colo need this function.
 
-I can confirm the same result - with an otherwise identical domain
-configuration, Linux guests correctly use the UAS driver:
+Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+---
+ docs/qmp-commands.txt | 18 ++++++++++++++++++
+ migration/colo.c      | 23 +++++++++++++++++++++++
+ qapi-schema.json      | 19 +++++++++++++++++++
+ 3 files changed, 60 insertions(+)
 
-/:  Bus 02.Port 1: Dev 1, Class=3Droot_hub, Driver=3Dxhci_hcd/4p, 5000M
-    |__ Port 1: Dev 2, If 0, Class=3DMass Storage, Driver=3Duas, 5000M
-/:  Bus 01.Port 1: Dev 1, Class=3Droot_hub, Driver=3Dxhci_hcd/4p, 480M
-
-
-Whereas Windows guests fall back to BOT/MSC:
-
-<see attached image>
-
-
-In both cases, QEMU is being run via libvirt, which is generating the follo=
-wing command line:
-
-/usr/bin/qemu-system-x86_64 -name guest=3DWin10-Edge-IE11,debug-threads=3Don
--S -object
-secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/domain-13-=
-Win10
--Edge-IE11/master-key.aes -machine
-pc-q35-2.7,accel=3Dkvm,usb=3Doff,vmport=3Doff,dump-guest-core=3Doff -cpu
-host,hv_time,hv_relaxed,hv_vapic,hv_spinlocks=3D0x1fff -m 4096 -realtime
-mlock=3Doff -smp 8,sockets=3D1,cores=3D4,threads=3D2 -uuid 47c39707-088c-4e=
-dc-
-8b6a-a7856e09f43d -no-user-config -nodefaults -chardev
-socket,id=3Dcharmonitor,path=3D/var/lib/libvirt/qemu/domain-13-Win10-Edge-
-IE11/monitor.sock,server,nowait -mon
-chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc
-base=3Dlocaltime,driftfix=3Dslew -global kvm-pit.lost_tick_policy=3Ddiscard
--no-hpet -no-shutdown -global ICH9-LPC.disable_s3=3D1 -global
-ICH9-LPC.disable_s4=3D1 -boot strict=3Don -device
-i82801b11-bridge,id=3Dpci.1,bus=3Dpcie.0,addr=3D0x1e -device pci-
-bridge,chassis_nr=3D2,id=3Dpci.2,bus=3Dpci.1,addr=3D0x0 -device nec-usb-
-xhci,id=3Dusb,bus=3Dpci.2,addr=3D0x6 -device virtio-scsi-
-pci,id=3Dscsi0,bus=3Dpci.2,addr=3D0x3 -device virtio-serial-pci,id=3Dvirtio-
-serial0,bus=3Dpci.2,addr=3D0x4 -drive file=3D/home/jack/IMG/Win10-Edge-
-IE11.qcow2,format=3Dqcow2,if=3Dnone,id=3Ddrive-scsi0-0-0-0,discard=3Dunmap
--device scsi-hd,bus=3Dscsi0.0,channel=3D0,scsi-id=3D0,lun=3D0,drive=3Ddrive-
-scsi0-0-0-0,id=3Dscsi0-0-0-0,bootindex=3D1 -drive if=3Dnone,id=3Ddrive-
-scsi0-0-0-1,readonly=3Don -device scsi-cd,bus=3Dscsi0.0,channel=3D0,scsi-
-id=3D0,lun=3D1,drive=3Ddrive-scsi0-0-0-1,id=3Dscsi0-0-0-1 -netdev
-tap,fd=3D22,id=3Dhostnet0,vhost=3Don,vhostfd=3D24 -device virtio-net-
-pci,netdev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:27:94:5d,bus=3Dpci.2,addr=3D=
-0x1
--chardev pty,id=3Dcharserial0 -device isa-
-serial,chardev=3Dcharserial0,id=3Dserial0 -chardev
-spicevmc,id=3Dcharchannel0,name=3Dvdagent -device virtserialport,bus=3Dvirt=
-io-
-serial0.0,nr=3D1,chardev=3Dcharchannel0,id=3Dchannel0,name=3Dcom.redhat.spi=
-ce.0
--device usb-tablet,id=3Dinput0,bus=3Dusb.0,port=3D2 -spice
-port=3D5900,addr=3D127.0.0.1,disable-ticketing,image-compression=3Doff
-,seamless-migration=3Don -device qxl-
-vga,id=3Dvideo0,ram_size=3D67108864,vram_size=3D67108864,vram64_size_mb=3D0=
-,vgamem_mb=3D16,max_outputs=3D1,bus=3Dpcie.0,addr=3D0x1
--device intel-hda,id=3Dsound0,bus=3Dpci.2,addr=3D0x2 -device hda-
-duplex,id=3Dsound0-codec0,bus=3Dsound0.0,cad=3D0 -chardev
-spicevmc,id=3Dcharredir0,name=3Dusbredir -device usb-
-redir,chardev=3Dcharredir0,id=3Dredir0,bus=3Dusb.0,port=3D3 -chardev
-spicevmc,id=3Dcharredir1,name=3Dusbredir -device usb-
-redir,chardev=3Dcharredir1,id=3Dredir1,bus=3Dusb.0,port=3D4 -device usb-
-host,hostbus=3D4,hostaddr=3D4,id=3Dhostdev0,bus=3Dusb.0,port=3D1 -device vi=
-rtio-
-balloon-pci,id=3Dballoon0,bus=3Dpci.2,addr=3D0x5 -msg timestamp=3Don
-
-** Attachment added: "windows-guest-uas-fail.png"
-   https://bugs.launchpad.net/qemu/+bug/1579306/+attachment/4789396/+files/=
-2016-12-09-165117_504x687_scrot.png
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1579306
-
-Title:
-  usb-uas does not work in Windows (10) guest
-
-Status in QEMU:
-  New
-
-Bug description:
-  When I attach a "-device usb-uas" to a VM with Windows 10 10586, the
-  device fail to start with the following error in the guest:
-
-  "The device cannot start. (Code 10)
-
-  {Operation Failed}
-  The requested operation was unsuccessful"
-
-  If the host controller is nec-usb-xhci, there will be two of the
-  following error on the terminal of the host as well:
-
-  "qemu-system-x86_64: usb_uas_handle_control: unhandled control
-  request"
-
-  If it's usb-ehci, ich9-usb-ehci1 or ich9-usb-echi2, this will not show
-  up on the host side, but the device stil fails with the same error on
-  the guest side.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1579306/+subscriptions
+diff --git a/docs/qmp-commands.txt b/docs/qmp-commands.txt
+index abf210a..a8e9eb6 100644
+--- a/docs/qmp-commands.txt
++++ b/docs/qmp-commands.txt
+@@ -432,6 +432,24 @@ Example:
+      "arguments": { "enable": true } }
+ <- { "return": {} }
+ 
++xen-set-replication
++-------------------
++
++Enable or disable replication.
++
++Arguments:
++
++- "enable": Enable it or disable it.
++- "primary": True for primary or false for secondary.
++- "failover": Enable failover when stopping replication, but cannot be
++              specified if 'enable' is true (optional, default false).
++
++Example:
++
++-> { "execute": "xen-set-replicate",
++     "arguments": {"enable": true, "primary": false} }
++<- { "return": {} }
++
+ migrate
+ -------
+ 
+diff --git a/migration/colo.c b/migration/colo.c
+index 93c85c5..6fc2ade 100644
+--- a/migration/colo.c
++++ b/migration/colo.c
+@@ -19,6 +19,8 @@
+ #include "qemu/error-report.h"
+ #include "qapi/error.h"
+ #include "migration/failover.h"
++#include "replication.h"
++#include "qmp-commands.h"
+ 
+ #define COLO_BUFFER_BASE_SIZE (4 * 1024 * 1024)
+ 
+@@ -104,6 +106,27 @@ void colo_do_failover(MigrationState *s)
+     }
+ }
+ 
++void qmp_xen_set_replication(bool enable, bool primary,
++                             bool has_failover, bool failover,
++                             Error **errp)
++{
++    ReplicationMode mode = primary ?
++                           REPLICATION_MODE_PRIMARY :
++                           REPLICATION_MODE_SECONDARY;
++
++    if (has_failover && enable) {
++        error_setg(errp, "Parameter 'failover' is only for"
++                   " stopping replication");
++        return;
++    }
++
++    if (enable) {
++        replication_start_all(mode, errp);
++    } else {
++        replication_stop_all(failover, failover ? NULL : errp);
++    }
++}
++
+ static void colo_send_message(QEMUFile *f, COLOMessage msg,
+                               Error **errp)
+ {
+diff --git a/qapi-schema.json b/qapi-schema.json
+index f3e9bfc..78802f4 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -4676,6 +4676,25 @@
+ { 'command': 'xen-load-devices-state', 'data': {'filename': 'str'} }
+ 
+ ##
++# @xen-set-replication
++#
++# Enable or disable replication.
++#
++# @enable: true to enable, false to disable.
++#
++# @primary: true for primary or false for secondary.
++#
++# @failover: #optional true to do failover, false to stop. but cannot be
++#            specified if 'enable' is true. default value is false.
++#
++# Returns: nothing.
++#
++# Since: 2.9
++##
++{ 'command': 'xen-set-replication',
++  'data': { 'enable': 'bool', 'primary': 'bool', '*failover' : 'bool' } }
++
++##
+ # @GICCapability:
+ #
+ # The struct describes capability for a specific GIC (Generic
+-- 
+2.7.4
