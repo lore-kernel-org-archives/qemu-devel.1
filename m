@@ -1,18 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53515)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54451)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liang.z.li@intel.com>) id 1cFD47-0007Nm-Ec
-	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 23:45:48 -0500
+	(envelope-from <dave.hansen@intel.com>) id 1cFDBC-0002Ex-S8
+	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 23:53:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liang.z.li@intel.com>) id 1cFD44-0006Tp-Aw
-	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 23:45:47 -0500
-Received: from mga03.intel.com ([134.134.136.65]:15433)
+	(envelope-from <dave.hansen@intel.com>) id 1cFDB9-0000EH-Qs
+	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 23:53:06 -0500
+Received: from mga11.intel.com ([192.55.52.93]:3553)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <liang.z.li@intel.com>)
-	id 1cFD43-0006Sh-Vl
-	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 23:45:44 -0500
-From: "Li, Liang Z" <liang.z.li@intel.com>
-Date: Fri, 9 Dec 2016 04:45:36 +0000
-Message-ID: <F2CBF3009FA73547804AE4C663CAB28E3A14E2AD@SHSMSX104.ccr.corp.intel.com>
+	(Exim 4.71) (envelope-from <dave.hansen@intel.com>)
+	id 1cFDB9-0000Cy-Gr
+	for qemu-devel@nongnu.org; Thu, 08 Dec 2016 23:53:03 -0500
 References: <1480495397-23225-1-git-send-email-liang.z.li@intel.com>
 	<f67ca79c-ad34-59dd-835f-e7bc9dcaef58@redhat.com>
 	<F2CBF3009FA73547804AE4C663CAB28E3A130C01@shsmsx102.ccr.corp.intel.com>
@@ -23,11 +20,14 @@ References: <1480495397-23225-1-git-send-email-liang.z.li@intel.com>
 	<20161207183817.GE28786@redhat.com>
 	<b58fd9f6-d9dd-dd56-d476-dd342174dac5@intel.com>
 	<20161207202824.GH28786@redhat.com>
-In-Reply-To: <20161207202824.GH28786@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	<F2CBF3009FA73547804AE4C663CAB28E3A14E2AD@SHSMSX104.ccr.corp.intel.com>
+From: Dave Hansen <dave.hansen@intel.com>
+Message-ID: <060287c7-d1af-45d5-70ea-ad35d4bbeb84@intel.com>
+Date: Thu, 8 Dec 2016 20:53:00 -0800
 MIME-Version: 1.0
+In-Reply-To: <F2CBF3009FA73547804AE4C663CAB28E3A14E2AD@SHSMSX104.ccr.corp.intel.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PATCH kernel v5 0/5] Extend virtio-balloon for
  fast (de)inflating & fast live migration
 List-Id: <qemu-devel.nongnu.org>
@@ -38,77 +38,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrea Arcangeli <aarcange@redhat.com>, "Hansen, Dave" <dave.hansen@intel.com>
+To: "Li, Liang Z" <liang.z.li@intel.com>, Andrea Arcangeli <aarcange@redhat.com>
 Cc: David Hildenbrand <david@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mhocko@suse.com" <mhocko@suse.com>, "mst@redhat.com" <mst@redhat.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>
 
-> > 1. Current patches do a hypercall for each order in the allocator.
-> >    This is inefficient, but independent from the underlying data
-> >    structure in the ABI, unless bitmaps are in play, which they aren't.
-> > 2. Should we have bitmaps in the ABI, even if they are not in use by th=
-e
-> >    guest implementation today?  Andrea says they have zero benefits
-> >    over a pfn/len scheme.  Dave doesn't think they have zero benefits
-> >    but isn't that attached to them.  QEMU's handling gets more
-> >    complicated when using a bitmap.
-> > 3. Should the ABI contain records each with a pfn/len pair or a
-> >    pfn/order pair?
-> >    3a. 'len' is more flexible, but will always be a power-of-two anyway
-> > 	for high-order pages (the common case)
->=20
-> Len wouldn't be a power of two practically only if we detect adjacent pag=
-es
-> of smaller order that may merge into larger orders we already allocated (=
-or
-> the other way around).
->=20
-> [addr=3D2M, len=3D2M] allocated at order 9 pass [addr=3D4M, len=3D1M] all=
-ocated at
-> order 8 pass -> merge as [addr=3D2M, len=3D3M]
->=20
-> Not sure if it would be worth it, but that unless we do this, page-order =
-or len
-> won't make much difference.
->=20
-> >    3b. if we decide not to have a bitmap, then we basically have plenty
-> > 	of space for 'len' and should just do it
-> >    3c. It's easiest for the hypervisor to turn pfn/len into the
-> >        madvise() calls that it needs.
-> >
-> > Did I miss anything?
->=20
-> I think you summarized fine all my arguments in your summary.
->=20
-> > FWIW, I don't feel that strongly about the bitmap.  Li had one
-> > originally, but I think the code thus far has demonstrated a huge
-> > benefit without even having a bitmap.
-> >
-> > I've got no objections to ripping the bitmap out of the ABI.
->=20
-> I think we need to see a statistic showing the number of bits set in each
-> bitmap in average, after some uptime and lru churn, like running stresste=
-st
-> app for a while with I/O and then inflate the balloon and
-> count:
->=20
-> 1) how many bits were set vs total number of bits used in bitmaps
->=20
-> 2) how many times bitmaps were used vs bitmap_len =3D 0 case of single
->    page
->=20
-> My guess would be like very low percentage for both points.
->=20
+On 12/08/2016 08:45 PM, Li, Liang Z wrote:
+> What's the conclusion of your discussion? It seems you want some
+> statistic before deciding whether to  ripping the bitmap from the
+> ABI, am I right?
 
-> So there is a connection with the MAX_ORDER..0 allocation loop and the AB=
-I
-> change, but I agree any of the ABI proposed would still allow for it this=
- logic to
-> be used. Bitmap or not bitmap, the loop would still work.
+I think Andrea and David feel pretty strongly that we should remove the
+bitmap, unless we have some data to support keeping it.  I don't feel as
+strongly about it, but I think their critique of it is pretty valid.  I
+think the consensus is that the bitmap needs to go.
 
-Hi guys,
-
-What's the conclusion of your discussion?=20
-It seems you want some statistic before deciding whether to  ripping the bi=
-tmap from the ABI, am I right?
-
-Thanks!
-Liang=20
+The only real question IMNHO is whether we should do a power-of-2 or a
+length.  But, if we have 12 bits, then the argument for doing length is
+pretty strong.  We don't need anywhere near 12 bits if doing power-of-2.
