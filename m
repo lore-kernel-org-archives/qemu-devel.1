@@ -1,36 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42933)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42967)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cFHTI-0008U0-VK
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 04:28:06 -0500
+	(envelope-from <groug@kaod.org>) id 1cFHTP-0000P2-LH
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 04:28:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cFHTE-0008VD-Tc
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 04:28:04 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33059)
+	(envelope-from <groug@kaod.org>) id 1cFHTL-00006X-Lu
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 04:28:11 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35217)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cFHTE-0008UW-Jw
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 04:28:00 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cFHTL-000060-BT
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 04:28:07 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	uB99PGqu142158
-	for <qemu-devel@nongnu.org>; Fri, 9 Dec 2016 04:27:59 -0500
-Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 277rtktx8c-1
+	uB99PJXl091220
+	for <qemu-devel@nongnu.org>; Fri, 9 Dec 2016 04:28:06 -0500
+Received: from e37.co.us.ibm.com (e37.co.us.ibm.com [32.97.110.158])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 277rtm32eg-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 09 Dec 2016 04:27:59 -0500
+	for <qemu-devel@nongnu.org>; Fri, 09 Dec 2016 04:28:06 -0500
 Received: from localhost
-	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e37.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
-	Fri, 9 Dec 2016 02:27:58 -0700
+	Fri, 9 Dec 2016 02:28:05 -0700
 From: Greg Kurz <groug@kaod.org>
-Date: Fri, 09 Dec 2016 10:27:52 +0100
+Date: Fri, 09 Dec 2016 10:28:00 +0100
 In-Reply-To: <148127558476.2633.13433882390740185948.stgit@bahia>
 References: <148127558476.2633.13433882390740185948.stgit@bahia>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <148127567295.2633.2746159367283631184.stgit@bahia>
-Subject: [Qemu-devel] [PATCH 2/8] tests: virtio-9p: code refactoring
+Message-Id: <148127568042.2633.5084932697061472826.stgit@bahia>
+Subject: [Qemu-devel] [PATCH 3/8] 9pfs: fix P9_NOTAG and P9_NOFID macros
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,172 +42,29 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Greg Kurz <groug@kaod.org>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>
 
-This moves the test_share static and the QOSState into the QVirtIO9P
-structure, and put PCI related code in functions with a _pci_ name.
+The u16 and u32 types don't exist in QEMU common headers. It never broke
+build because these two macros aren't use by the current code, but this
+is about to change with the future addition of functional tests for 9P.
 
-This will avoid code duplication in future tests, and allow to add
-support for non-PCI platforms.
+This patch convert the types to uintXX_t.
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
- tests/virtio-9p-test.c |  101 ++++++++++++++++++++++++------------------------
- 1 file changed, 50 insertions(+), 51 deletions(-)
+ hw/9pfs/9p.h |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/tests/virtio-9p-test.c b/tests/virtio-9p-test.c
-index f458297f9ae1..727316086337 100644
---- a/tests/virtio-9p-test.c
-+++ b/tests/virtio-9p-test.c
-@@ -18,59 +18,49 @@
- #include "standard-headers/linux/virtio_pci.h"
+diff --git a/hw/9pfs/9p.h b/hw/9pfs/9p.h
+index 3976b7fe3dcd..89c904bdb7e7 100644
+--- a/hw/9pfs/9p.h
++++ b/hw/9pfs/9p.h
+@@ -99,8 +99,8 @@ enum p9_proto_version {
+     V9FS_PROTO_2000L = 0x02,
+ };
  
- static const char mount_tag[] = "qtest";
--static char *test_share;
+-#define P9_NOTAG    (u16)(~0)
+-#define P9_NOFID    (u32)(~0)
++#define P9_NOTAG    (uint16_t)(~0)
++#define P9_NOFID    (uint32_t)(~0)
+ #define P9_MAXWELEM 16
  
-+typedef struct {
-+    QVirtioDevice *dev;
-+    QOSState *qs;
-+    QVirtQueue *vq;
-+    char *test_share;
-+} QVirtIO9P;
- 
--static QOSState *qvirtio_9p_start(void)
-+static QVirtIO9P *qvirtio_9p_start(const char *driver)
- {
-     const char *arch = qtest_get_arch();
-     const char *cmd = "-fsdev local,id=fsdev0,security_model=none,path=%s "
--                      "-device virtio-9p-pci,fsdev=fsdev0,mount_tag=%s";
-+                      "-device %s,fsdev=fsdev0,mount_tag=%s";
-+    QVirtIO9P *v9p = g_new0(QVirtIO9P, 1);
- 
--    test_share = g_strdup("/tmp/qtest.XXXXXX");
--    g_assert_nonnull(mkdtemp(test_share));
-+    v9p->test_share = g_strdup("/tmp/qtest.XXXXXX");
-+    g_assert_nonnull(mkdtemp(v9p->test_share));
- 
-     if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
--        return qtest_pc_boot(cmd, test_share, mount_tag);
--    }
--    if (strcmp(arch, "ppc64") == 0) {
--        return qtest_spapr_boot(cmd, test_share, mount_tag);
-+        v9p->qs = qtest_pc_boot(cmd, v9p->test_share, driver, mount_tag);
-+    } else if (strcmp(arch, "ppc64") == 0) {
-+        v9p->qs = qtest_spapr_boot(cmd, v9p->test_share, driver, mount_tag);
-+    } else {
-+        g_printerr("virtio-9p tests are only available on x86 or ppc64\n");
-+        exit(EXIT_FAILURE);
-     }
- 
--    g_printerr("virtio-9p tests are only available on x86 or ppc64\n");
--    exit(EXIT_FAILURE);
--}
--
--static void qvirtio_9p_stop(QOSState *qs)
--{
--    qtest_shutdown(qs);
--    rmdir(test_share);
--    g_free(test_share);
-+    return v9p;
- }
- 
--static void pci_nop(void)
-+static void qvirtio_9p_stop(QVirtIO9P *v9p)
- {
--    QOSState *qs;
--
--    qs = qvirtio_9p_start();
--    qvirtio_9p_stop(qs);
-+    qtest_shutdown(v9p->qs);
-+    rmdir(v9p->test_share);
-+    g_free(v9p->test_share);
-+    g_free(v9p);
- }
- 
--typedef struct {
--    QVirtioDevice *dev;
--    QOSState *qs;
--    QVirtQueue *vq;
--} QVirtIO9P;
--
--static QVirtIO9P *qvirtio_9p_pci_init(QOSState *qs)
-+static QVirtIO9P *qvirtio_9p_pci_start(void)
- {
--    QVirtIO9P *v9p;
--    QVirtioPCIDevice *dev;
--
--    v9p = g_new0(QVirtIO9P, 1);
--
--    v9p->qs = qs;
--    dev = qvirtio_pci_device_find(v9p->qs->pcibus, VIRTIO_ID_9P);
-+    QVirtIO9P *v9p = qvirtio_9p_start("virtio-9p-pci");
-+    QVirtioPCIDevice *dev = qvirtio_pci_device_find(v9p->qs->pcibus,
-+                                                    VIRTIO_ID_9P);
-     g_assert_nonnull(dev);
-     g_assert_cmphex(dev->vdev.device_type, ==, VIRTIO_ID_9P);
-     v9p->dev = (QVirtioDevice *) dev;
-@@ -84,26 +74,20 @@ static QVirtIO9P *qvirtio_9p_pci_init(QOSState *qs)
-     return v9p;
- }
- 
--static void qvirtio_9p_pci_free(QVirtIO9P *v9p)
-+static void qvirtio_9p_pci_stop(QVirtIO9P *v9p)
- {
-     qvirtqueue_cleanup(v9p->dev->bus, v9p->vq, v9p->qs->alloc);
-     qvirtio_pci_device_disable(container_of(v9p->dev, QVirtioPCIDevice, vdev));
-     g_free(v9p->dev);
--    g_free(v9p);
-+    qvirtio_9p_stop(v9p);
- }
- 
--static void pci_config(void)
-+static void pci_config(QVirtIO9P *v9p)
- {
--    QVirtIO9P *v9p;
--    size_t tag_len;
-+    size_t tag_len = qvirtio_config_readw(v9p->dev, 0);
-     char *tag;
-     int i;
--    QOSState *qs;
--
--    qs = qvirtio_9p_start();
--    v9p = qvirtio_9p_pci_init(qs);
- 
--    tag_len = qvirtio_config_readw(v9p->dev, 0);
-     g_assert_cmpint(tag_len, ==, strlen(mount_tag));
- 
-     tag = g_malloc(tag_len);
-@@ -112,16 +96,31 @@ static void pci_config(void)
-     }
-     g_assert_cmpmem(tag, tag_len, mount_tag, tag_len);
-     g_free(tag);
-+}
-+
-+typedef void (*v9fs_test_fn)(QVirtIO9P *v9p);
-+
-+static void v9fs_run_pci_test(gconstpointer data)
-+{
-+    v9fs_test_fn fn = data;
-+    QVirtIO9P *v9p = qvirtio_9p_pci_start();
- 
--    qvirtio_9p_pci_free(v9p);
--    qvirtio_9p_stop(qs);
-+    if (fn) {
-+        fn(v9p);
-+    }
-+    qvirtio_9p_pci_stop(v9p);
-+}
-+
-+static void v9fs_qtest_pci_add(const char *path, v9fs_test_fn fn)
-+{
-+    qtest_add_data_func(path, fn, v9fs_run_pci_test);
- }
- 
- int main(int argc, char **argv)
- {
-     g_test_init(&argc, &argv, NULL);
--    qtest_add_func("/virtio/9p/pci/nop", pci_nop);
--    qtest_add_func("/virtio/9p/pci/config", pci_config);
-+    v9fs_qtest_pci_add("/virtio/9p/pci/nop", NULL);
-+    v9fs_qtest_pci_add("/virtio/9p/pci/config", pci_config);
- 
-     return g_test_run();
- }
+ #define FID_REFERENCED          0x1
