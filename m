@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55738)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55897)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edward.shishkin@gmail.com>) id 1cFQ8o-0003j4-PX
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 13:43:35 -0500
+	(envelope-from <edward.shishkin@gmail.com>) id 1cFQ9q-0006vZ-2D
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 13:44:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edward.shishkin@gmail.com>) id 1cFQ8k-0000rv-R7
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 13:43:30 -0500
-Received: from mail-wm0-f66.google.com ([74.125.82.66]:34119)
+	(envelope-from <edward.shishkin@gmail.com>) id 1cFQ9m-00010i-2D
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 13:44:34 -0500
+Received: from mail-wm0-f66.google.com ([74.125.82.66]:36123)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <edward.shishkin@gmail.com>)
-	id 1cFQ8k-0000qN-H3
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 13:43:26 -0500
-Received: by mail-wm0-f66.google.com with SMTP id g23so5366273wme.1
-	for <qemu-devel@nongnu.org>; Fri, 09 Dec 2016 10:43:05 -0800 (PST)
+	id 1cFQ9l-00010U-Nt
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 13:44:29 -0500
+Received: by mail-wm0-f66.google.com with SMTP id m203so5333887wma.3
+	for <qemu-devel@nongnu.org>; Fri, 09 Dec 2016 10:44:29 -0800 (PST)
 References: <7a0376a6-e9c1-92c0-a75f-6b44495ba2b2@gmail.com>
 	<1476120280-30873-1-git-send-email-edward.shishkin@gmail.com>
-	<1476120280-30873-2-git-send-email-edward.shishkin@gmail.com>
-	<580F689A.5070305@suse.de>
+	<580F65A5.5010802@suse.de>
 From: Edward Shishkin <edward.shishkin@gmail.com>
-Message-ID: <4e24c3bf-2efb-147d-7cae-51e3797ba04d@gmail.com>
-Date: Fri, 9 Dec 2016 19:42:02 +0100
+Message-ID: <6338209f-9ee0-458b-3693-ce476175c60d@gmail.com>
+Date: Fri, 9 Dec 2016 19:43:27 +0100
 MIME-Version: 1.0
-In-Reply-To: <580F689A.5070305@suse.de>
+In-Reply-To: <580F65A5.5010802@suse.de>
 Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] 9p: v9fs new readpages.
+Subject: Re: [Qemu-devel] [PATCH 1/2] 9p: v9fs add writepages.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,280 +34,334 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Alexander Graf <agraf@suse.de>, Eric Van Hensbergen <ericvh@gmail.com>, V9FS Developers Mailing List <v9fs-developer@lists.sourceforge.net>, Linux Filesystem Development List <linux-fsdevel@vger.kernel.org>
 Cc: Edward Shishkin <Eduard.Shishkin@huawei.com>, Claudio Fontana <Claudio.Fontana@huawei.com>, QEMU Developers Mailing List <qemu-devel@nongnu.org>, ZhangWei <zhangwei555@huawei.com>
 
-Hello Alexander,
-
-Thank you for the comments.
-Please, find my answers below.
-
-
-On 10/25/2016 04:13 PM, Alexander Graf wrote:
+On 10/25/2016 04:01 PM, Alexander Graf wrote:
 > On 10/10/2016 07:24 PM, Edward Shishkin wrote:
->> Modify v9fs private ->readpages() method of address_space
+>> Add a v9fs private ->writepages() method of address_space
 >> operations for merging pages into long 9p messages.
 >>
 >> Signed-off-by: Edward Shishkin <edward.shishkin@gmail.com>
 >> ---
->>   fs/9p/vfs_addr.c | 156 
->> ++++++++++++++++++++++++++++++++++++++++++++++++++++++-
->>   1 file changed, 155 insertions(+), 1 deletion(-)
+>>   fs/9p/v9fs.c      |  46 +++++++
+>>   fs/9p/v9fs.h      |  22 +++-
+>>   fs/9p/vfs_addr.c  | 357 
+>> ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>>   fs/9p/vfs_super.c |   8 +-
+>>   4 files changed, 431 insertions(+), 2 deletions(-)
 >>
->> diff --git a/fs/9p/vfs_addr.c b/fs/9p/vfs_addr.c
->> index e871886..4ad248e 100644
->> --- a/fs/9p/vfs_addr.c
->> +++ b/fs/9p/vfs_addr.c
->> @@ -34,6 +34,7 @@
+>> diff --git a/fs/9p/v9fs.c b/fs/9p/v9fs.c
+>> index 072e759..3b49daf 100644
+>> --- a/fs/9p/v9fs.c
+>> +++ b/fs/9p/v9fs.c
+>> @@ -32,6 +32,7 @@
+>>   #include <linux/parser.h>
 >>   #include <linux/idr.h>
->>   #include <linux/sched.h>
->>   #include <linux/uio.h>
->> +#include <linux/slab.h>
+>>   #include <linux/slab.h>
+>> +#include <linux/pagemap.h>
 >>   #include <net/9p/9p.h>
 >>   #include <net/9p/client.h>
->>   #include <trace/events/writeback.h>
->> @@ -99,6 +100,148 @@ static int v9fs_vfs_readpage(struct file *filp, 
->> struct page *page)
->>       return v9fs_fid_readpage(filp->private_data, page);
+>>   #include <net/9p/transport.h>
+>> @@ -309,6 +310,49 @@ static int v9fs_parse_options(struct 
+>> v9fs_session_info *v9ses, char *opts)
+>>       return ret;
 >>   }
->>   +/*
->> + * Context for "fast readpages"
->> + */
->> +struct v9fs_readpages_ctx {
->> +    struct file *filp;
->> +    struct address_space *mapping;
->> +    pgoff_t start_index; /* index of the first page with actual data */
->> +    char *buf; /* buffer with actual data */
->> +    int len; /* length of the actual data */
->> +    int num_pages; /* maximal data chunk (in pages) that can be
->> +              passed per transmission */
->> +};
->> +
->> +static int init_readpages_ctx(struct v9fs_readpages_ctx *ctx,
->> +                  struct file *filp,
->> +                  struct address_space *mapping,
->> +                  int num_pages)
+>>   +void put_flush_set(struct v9fs_flush_set *fset)
 >> +{
->> +    memset(ctx, 0, sizeof(*ctx));
->> +    ctx->buf = kmalloc(num_pages << PAGE_SHIFT, GFP_USER);
->
-> Doesn't this a) have potential information leak to user space
-
-
-Yes, allocation with such flag is a mistake. Will be fixed in v2.
-
-
-> and b) allow user space to allocate big amounts of kernel memory?
-
-
-Yes, I definitely missed a sanity check for the num_pages. Will be fixed 
-in v2.
-
-
-> A limited page pool would probably be better here.
->
-> I also don't quite grasp yet what pattern you're actually optimizing.
-
-
-reading/writing a large file in sequential/random manner.
-
-
-> Basically you're doing implicit read-ahead on behalf of the reader, right?
-
-
-Yes. As you can see, we always read (ctx->num_pages) number of pages.
-
-
-> So why would that be faster in a random 4k read scenario?
-
-
-You mean 41 MB/s vs 64 MB/s?
-With such read-ahead it's more likely that an up-to-date page will be 
-present in
-the cache. So, why not? After all, our speedup of random 4K reads is not 
-dramatic.
-
-
-> Also, have you compared tmpfs hosted files to only benchmark the 
-> transmission path?
-
-
-No, I haven't. Only I/O speedup was a concern.
-I can obtain such numbers, if interesting.
-
-
->
->> +    if (!ctx->buf)
->> +        return -ENOMEM;
->> +    ctx->filp = filp;
->> +    ctx->mapping = mapping;
->> +    ctx->num_pages = num_pages;
->> +    return 0;
->> +}
->> +
->> +static void done_readpages_ctx(struct v9fs_readpages_ctx *ctx)
->> +{
->> +    kfree(ctx->buf);
->> +}
->> +
->> +static int receive_buffer(struct file *filp,
->> +              char *buf,
->> +              off_t offset, /* offset in the file */
->> +              int len,
->> +              int *err)
->> +{
->> +    struct kvec kvec;
->> +    struct iov_iter iter;
->> +
->> +    kvec.iov_base = buf;
->> +    kvec.iov_len = len;
->> +    iov_iter_kvec(&iter, READ | ITER_KVEC, &kvec, 1, len);
->> +
->> +    return p9_client_read(filp->private_data, offset, &iter, err);
->> +}
->> +
->> +static int fast_filler(struct v9fs_readpages_ctx *ctx, struct page 
->> *page)
->> +{
->> +    int err;
->> +    int ret = 0;
->> +    char *kdata;
->> +    int to_page;
->> +    off_t off_in_buf;
->> +    struct inode *inode = page->mapping->host;
->> +
->> +    BUG_ON(!PageLocked(page));
->> +    /*
->> +     * first, validate the buffer
->> +     */
->> +    if (page->index < ctx->start_index ||
->> +        ctx->start_index + ctx->num_pages < page->index) {
->> +        /*
->> +         * No actual data in the buffer,
->> +         * so actualize it
->> +         */
->> +        ret = receive_buffer(ctx->filp,
->> +                     ctx->buf,
->> +                     page_offset(page),
->> +                     ctx->num_pages << PAGE_SHIFT,
->
-> Doesn't this potentially read beyond the end of the file?
-
-
-POSIX doesn't prohibit to read beyond the end of a file. The only 
-requirement is that
-the supplement should be filled with zeros.
-Full pages of such supplement are filled with zeros from the buffer: 
-here we rely on
-the local file system on the host. Partial pages are filled with zeros 
-by us at the place
-I have marked with (*) below.
-
-Thanks,
-Edward.
-
->
-> Alex
->
->> +                     &err);
->> +        if (err) {
->> +            printk("failed to receive buffer off=%llu (%d)\n",
->> +                   (unsigned long long)page_offset(page),
->> +                   err);
->> +            ret = err;
->> +            goto done;
->> +        }
->> +        ctx->start_index = page->index;
->> +        ctx->len = ret;
->> +        ret = 0;
->> +    }
->> +    /*
->> +     * fill the page with buffer's data
->> +     */
->> +    off_in_buf = (page->index - ctx->start_index) << PAGE_SHIFT;
->> +    if (off_in_buf >= ctx->len) {
->> +        /*
->> +         * No actual data to fill the page with
->> +         */
->> +        ret = -1;
->> +        goto done;
->> +    }
->> +    to_page = ctx->len - off_in_buf;
->> +    if (to_page >= PAGE_SIZE)
->> +        to_page = PAGE_SIZE;
->> +
->> +    kdata = kmap_atomic(page);
->> +    memcpy(kdata, ctx->buf + off_in_buf, to_page);
->> +    memset(kdata + to_page, 0, PAGE_SIZE - to_page);
-
-(*)
-
->> +    kunmap_atomic(kdata);
->> +
->> +    flush_dcache_page(page);
->> +    SetPageUptodate(page);
->> +    v9fs_readpage_to_fscache(inode, page);
->> + done:
->> +    unlock_page(page);
->> +    return ret;
+>> +    if (!fset)
+>> +        return;
+>> +    if (fset->pages)
+>> +        kfree(fset->pages);
+>> +    if (fset->buf)
+>> +        kfree(fset->buf);
+>> +    kfree(fset);
 >> +}
 >> +
 >> +/**
->> + * Try to read pages by groups. For every such group we issue only one
->> + * read request to the server.
->> + * @num_pages: maximal chunk of data (in pages) that can be passed per
->> + * such request
+>> + * Allocate and initalize flush set
+>> + * Pre-conditions: valid msize is set
 >> + */
->> +static int v9fs_readpages_tryfast(struct file *filp,
->> +                  struct address_space *mapping,
->> +                  struct list_head *pages,
->> +                  int num_pages)
+>> +int alloc_init_flush_set(struct v9fs_session_info *v9ses)
 >> +{
->> +    int ret;
->> +    struct v9fs_readpages_ctx ctx;
+>> +    int ret = -ENOMEM;
+>> +    int num_pages;
+>> +    struct v9fs_flush_set *fset = NULL;
 >> +
->> +    ret = init_readpages_ctx(&ctx, filp, mapping, num_pages);
->> +    if (ret)
->> +        /*
->> +         * Can not allocate resources for the fast path,
->> +         * so do it by slow way
->> +         */
->> +        return read_cache_pages(mapping, pages,
->> +                    (void *)v9fs_vfs_readpage, filp);
->> +
->> +    else
->> +        ret = read_cache_pages(mapping, pages,
->> +                       (void *)fast_filler, &ctx);
->> +    done_readpages_ctx(&ctx);
+>> +    num_pages = v9ses->clnt->msize >> PAGE_SHIFT;
+>> +    if (num_pages < 2)
+>> +        /* speedup impossible */
+>> +        return 0;
+>> +    fset = kzalloc(sizeof(*fset), GFP_KERNEL);
+>> +    if (!fset)
+>> +        goto error;
+>> +    fset->num_pages = num_pages;
+>> +    fset->pages = kzalloc(num_pages * sizeof(*fset->pages), 
+>> GFP_KERNEL);
+>> +    if (!fset->pages)
+>> +        goto error;
+>> +    fset->buf = kzalloc(num_pages << PAGE_SHIFT, GFP_USER);
+>> +    if (!fset->buf)
+>> +        goto error;
+>> +    spin_lock_init(&(fset->lock));
+>> +    v9ses->flush = fset;
+>> +    return 0;
+>> + error:
+>> +    put_flush_set(fset);
 >> +    return ret;
 >> +}
 >> +
 >>   /**
->>    * v9fs_vfs_readpages - read a set of pages from 9P
->>    *
->> @@ -114,6 +257,7 @@ static int v9fs_vfs_readpages(struct file *filp, 
->> struct address_space *mapping,
->>   {
->>       int ret = 0;
->>       struct inode *inode;
->> +    struct v9fs_flush_set *fset;
->>         inode = mapping->host;
->>       p9_debug(P9_DEBUG_VFS, "inode: %p file: %p\n", inode, filp);
->> @@ -122,7 +266,17 @@ static int v9fs_vfs_readpages(struct file *filp, 
->> struct address_space *mapping,
->>       if (ret == 0)
->>           return ret;
->>   -    ret = read_cache_pages(mapping, pages, (void 
->> *)v9fs_vfs_readpage, filp);
->> +    fset = v9fs_inode2v9ses(mapping->host)->flush;
->> +    if (!fset)
->> +        /*
->> +         * Do it by slow way
->> +         */
->> +        ret = read_cache_pages(mapping, pages,
->> +                       (void *)v9fs_vfs_readpage, filp);
->> +    else
->> +        ret = v9fs_readpages_tryfast(filp, mapping,
->> +                         pages, fset->num_pages);
+>>    * v9fs_session_init - initialize session
+>>    * @v9ses: session information structure
+>> @@ -444,6 +488,8 @@ void v9fs_session_close(struct v9fs_session_info 
+>> *v9ses)
+>>       kfree(v9ses->uname);
+>>       kfree(v9ses->aname);
+>>   +    put_flush_set(v9ses->flush);
 >> +
->>       p9_debug(P9_DEBUG_VFS, "  = %d\n", ret);
->>       return ret;
+>>       bdi_destroy(&v9ses->bdi);
+>>         spin_lock(&v9fs_sessionlist_lock);
+>> diff --git a/fs/9p/v9fs.h b/fs/9p/v9fs.h
+>> index 6877050..d1092e4 100644
+>> --- a/fs/9p/v9fs.h
+>> +++ b/fs/9p/v9fs.h
+>> @@ -23,6 +23,7 @@
+>>   #ifndef FS_9P_V9FS_H
+>>   #define FS_9P_V9FS_H
+>>   +#include <linux/kconfig.h>
+>>   #include <linux/backing-dev.h>
+>>     /**
+>> @@ -69,6 +70,13 @@ enum p9_cache_modes {
+>>       CACHE_FSCACHE,
+>>   };
+>>   +struct v9fs_flush_set {
+>> +        struct page **pages;
+>> +    int num_pages;
+>> +        char *buf;
+>> +    spinlock_t lock;
+>> +};
+>> +
+>>   /**
+>>    * struct v9fs_session_info - per-instance session information
+>>    * @flags: session options of type &p9_session_flags
+>> @@ -105,7 +113,7 @@ struct v9fs_session_info {
+>>       char *cachetag;
+>>       struct fscache_cookie *fscache;
+>>   #endif
+>> -
+>> +    struct v9fs_flush_set *flush; /* flush set for writepages */
+>>       char *uname;        /* user name to mount as */
+>>       char *aname;        /* name of remote hierarchy being mounted */
+>>       unsigned int maxdata;    /* max data for client interface */
+>> @@ -158,6 +166,8 @@ extern const struct inode_operations 
+>> v9fs_symlink_inode_operations_dotl;
+>>   extern struct inode *v9fs_inode_from_fid_dotl(struct 
+>> v9fs_session_info *v9ses,
+>>                             struct p9_fid *fid,
+>>                             struct super_block *sb, int new);
+>> +extern int alloc_init_flush_set(struct v9fs_session_info *v9ses);
+>> +extern void put_flush_set(struct v9fs_flush_set *fset);
+>>     /* other default globals */
+>>   #define V9FS_PORT    564
+>> @@ -222,4 +232,14 @@ v9fs_get_new_inode_from_fid(struct 
+>> v9fs_session_info *v9ses, struct p9_fid *fid,
+>>           return v9fs_inode_from_fid(v9ses, fid, sb, 1);
 >>   }
+>>   +static inline int spin_trylock_flush_set(struct v9fs_flush_set *fset)
+>> +{
+>> +    return spin_trylock(&(fset->lock));
+>> +}
+>> +
+>> +static inline void spin_unlock_flush_set(struct v9fs_flush_set *fset)
+>> +{
+>> +    spin_unlock(&(fset->lock));
+>> +}
+>> +
+>>   #endif
+>> diff --git a/fs/9p/vfs_addr.c b/fs/9p/vfs_addr.c
+>> index 6181ad7..e871886 100644
+>> --- a/fs/9p/vfs_addr.c
+>> +++ b/fs/9p/vfs_addr.c
+>> @@ -36,6 +36,7 @@
+>>   #include <linux/uio.h>
+>>   #include <net/9p/9p.h>
+>>   #include <net/9p/client.h>
+>> +#include <trace/events/writeback.h>
+>>     #include "v9fs.h"
+>>   #include "v9fs_vfs.h"
+>> @@ -209,6 +210,361 @@ static int v9fs_vfs_writepage(struct page 
+>> *page, struct writeback_control *wbc)
+>>       return retval;
+>>   }
+>>   +static void redirty_pages_for_writeback(struct page **pages, int nr,
+>> +                    struct writeback_control *wbc)
+>> +{
+>> +    int i;
+>> +    for (i = 0; i < nr; i++) {
+>> +        lock_page(pages[i]);
+>> +        redirty_page_for_writepage(wbc, pages[i]);
+>> +        unlock_page(pages[i]);
+>> +    }
+>> +}
+>> +
+>> +static void set_pages_error(struct page **pages, int nr, int error)
+>> +{
+>> +    int i;
+>> +    for (i = 0; i < nr; i++) {
+>> +        lock_page(pages[i]);
+>> +        SetPageError(pages[i]);
+>> +        mapping_set_error(pages[i]->mapping, error);
+>> +        unlock_page(pages[i]);
+>> +    }
+>> +}
+>> +
+>> +#define V9FS_WRITEPAGES_DEBUG   (0)
+>> +
+>> +struct flush_context {
+>> +    struct writeback_control *wbc;
+>> +    struct address_space *mapping;
+>> +    struct v9fs_flush_set *fset;
+>> +    pgoff_t done_index;
+>> +    pgoff_t writeback_index;
+>> +    pgoff_t index;
+>> +    pgoff_t end; /* Inclusive */
+>> +    const char *msg;
+>> +    int cycled;
+>> +    int range_whole;
+>> +    int done;
+>> +};
+>> +
+>> +/**
+>> + * Copy a page with file's data to buffer.
+>> + * Handle races with truncate, etc.
+>> + * Return number of copied bytes
+>> + *
+>> + * @page: page to copy data from;
+>> + * @page_nr: serial number of the page
+>> + */
+>> +static int flush_page(struct page *page, int page_nr, struct 
+>> flush_context *ctx)
+>> +{
+>> +    char *kdata;
+>> +    loff_t isize;
+>> +    int copied = 0;
+>> +    struct writeback_control *wbc = ctx->wbc;
+>> +    /*
+>> +     * At this point, the page may be truncated or
+>> +     * invalidated (changing page->mapping to NULL), or
+>> +     * even swizzled back from swapper_space to tmpfs file
+>> +     * mapping. However, page->index will not change
+>> +     * because we have a reference on the page.
+>> +     */
+>> +    if (page->index > ctx->end) {
+>> +        /*
+>> +         * can't be range_cyclic (1st pass) because
+>> +         * end == -1 in that case.
+>> +         */
+>> +        ctx->done = 1;
+>> +        ctx->msg = "page out of range";
+>> +        goto exit;
+>> +    }
+>> +    ctx->done_index = page->index;
+>> +    lock_page(page);
+>> +    /*
+>> +     * Page truncated or invalidated. We can freely skip it
+>> +     * then, even for data integrity operations: the page
+>> +     * has disappeared concurrently, so there could be no
+>> +     * real expectation of this data interity operation
+>> +     * even if there is now a new, dirty page at the same
+>> +     * pagecache address.
+>> +     */
+>> +    if (unlikely(page->mapping != ctx->mapping)) {
+>> +        unlock_page(page);
+>> +        ctx->msg = "page truncated or invalidated";
+>> +        goto exit;
+>> +    }
+>> +    if (!PageDirty(page)) {
+>> +        /*
+>> +         * someone wrote it for us
+>> +         */
+>> +        unlock_page(page);
+>> +        ctx->msg = "page not dirty";
+>> +        goto exit;
+>> +    }
+>> +    if (PageWriteback(page)) {
+>> +        if (wbc->sync_mode != WB_SYNC_NONE)
+>> +            wait_on_page_writeback(page);
+>> +        else {
+>> +            unlock_page(page);
+>> +            ctx->msg = "page is writeback";
+>> +            goto exit;
+>> +        }
+>> +    }
+>> +    BUG_ON(PageWriteback(page));
+>> +    if (!clear_page_dirty_for_io(page)) {
+>> +        unlock_page(page);
+>> +        ctx->msg = "failed to clear page dirty";
+>> +        goto exit;
+>> +    }
+>> +    trace_wbc_writepage(wbc, inode_to_bdi(ctx->mapping->host));
+>> +
+>> +    set_page_writeback(page);
+>> +    isize = i_size_read(ctx->mapping->host);
+>> +    if (page->index == isize >> PAGE_SHIFT)
+>> +        copied = isize & ~PAGE_MASK;
+>> +    else
+>> +        copied = PAGE_SIZE;
+>> +    kdata = kmap_atomic(page);
+>> +    memcpy(ctx->fset->buf + (page_nr << PAGE_SHIFT), kdata, copied);
+>> +    kunmap_atomic(kdata);
+>> +    end_page_writeback(page);
+>> +
+>> +    unlock_page(page);
+>> +    /*
+>> +     * We stop writing back only if we are not doing
+>> +     * integrity sync. In case of integrity sync we have to
+>> +     * keep going until we have written all the pages
+>> +     * we tagged for writeback prior to entering this loop.
+>> +     */
+>> +    if (--wbc->nr_to_write <= 0 && wbc->sync_mode == WB_SYNC_NONE)
+>> +        ctx->done = 1;
+>> + exit:
+>> +    return copied;
+>> +}
+>> +
+>> +static int send_buffer(off_t offset, int len, struct flush_context 
+>> *ctx)
+>> +{
+>> +    int ret = 0;
+>> +    struct kvec kvec;
+>> +    struct iov_iter iter;
+>> +    struct v9fs_inode *v9inode = V9FS_I(ctx->mapping->host);
+>> +
+>> +    kvec.iov_base = ctx->fset->buf;
+>> +    kvec.iov_len = len;
+>> +    iov_iter_kvec(&iter, WRITE | ITER_KVEC, &kvec, 1, len);
+>> +    BUG_ON(!v9inode->writeback_fid);
+>> +
+>> +    p9_client_write(v9inode->writeback_fid, offset, &iter, &ret);
+>> +    return ret;
+>> +}
+>> +
+>> +/**
+>> + * Helper function for managing 9pFS write requests.
+>> + * The main purpose of this function is to provide support for
+>> + * the coalescing of several pages into a single 9p message.
+>> + * This is similarly to NFS's pagelist.
+>> + *
+>> + * Copy pages with adjusent indices to a buffer and send it to
+>> + * the server.
 >
+> Why do you need to copy the pages? The transport below 9p - virtio in 
+> your case - has native scatter-gather support, so you don't need to 
+> copy anything, no?
+>
+
+
+Perhaps we can avoid copying pages. However it would mean modification
+of the 9P file transfer protocol, which is not aware of pages. I suspect 
+that
+such activity requires substantial sponsorship, and I am not sure that 
+it will
+be interesting for Huawei.
+
+Thanks,
+Edward.
