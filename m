@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48060)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48116)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cFK8t-0001ZQ-EF
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 07:19:15 -0500
+	(envelope-from <thuth@redhat.com>) id 1cFK92-00027x-QA
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 07:19:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cFK8s-0003Tn-8D
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 07:19:11 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41942)
+	(envelope-from <thuth@redhat.com>) id 1cFK8x-0003WI-U0
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 07:19:20 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45350)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1cFK8r-0003TO-Vw
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 07:19:10 -0500
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1cFK8x-0003Vs-Ls
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 07:19:15 -0500
 From: Thomas Huth <thuth@redhat.com>
-Date: Fri,  9 Dec 2016 13:17:42 +0100
-Message-Id: <1481285870-3396-13-git-send-email-thuth@redhat.com>
+Date: Fri,  9 Dec 2016 13:17:43 +0100
+Message-Id: <1481285870-3396-14-git-send-email-thuth@redhat.com>
 In-Reply-To: <1481285870-3396-1-git-send-email-thuth@redhat.com>
 References: <1481285870-3396-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH 12/20] cris: Move CPU files to target/ folder
+Subject: [Qemu-devel] [PATCH 13/20] lm32: Move CPU files to target/ folder
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,133 +28,99 @@ Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Michael Walle <michael@walle
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- MAINTAINERS                                   | 2 +-
- disas/cris.c                                  | 4 +---
- {target-cris => target/cris}/Makefile.objs    | 0
- {target-cris => target/cris}/cpu-qom.h        | 0
- {target-cris => target/cris}/cpu.c            | 0
- {target-cris => target/cris}/cpu.h            | 0
- {target-cris => target/cris}/crisv10-decode.h | 0
- {target-cris => target/cris}/crisv32-decode.h | 0
- {target-cris => target/cris}/gdbstub.c        | 0
- {target-cris => target/cris}/helper.c         | 0
- {target-cris => target/cris}/helper.h         | 0
- {target-cris => target/cris}/machine.c        | 0
- {target-cris => target/cris}/mmu.c            | 0
- {target-cris => target/cris}/mmu.h            | 0
- {target-cris => target/cris}/op_helper.c      | 0
- {target-cris => target/cris}/opcode-cris.h    | 0
- {target-cris => target/cris}/translate.c      | 0
- {target-cris => target/cris}/translate_v10.c  | 0
- 18 files changed, 2 insertions(+), 4 deletions(-)
- rename {target-cris => target/cris}/Makefile.objs (100%)
- rename {target-cris => target/cris}/cpu-qom.h (100%)
- rename {target-cris => target/cris}/cpu.c (100%)
- rename {target-cris => target/cris}/cpu.h (100%)
- rename {target-cris => target/cris}/crisv10-decode.h (100%)
- rename {target-cris => target/cris}/crisv32-decode.h (100%)
- rename {target-cris => target/cris}/gdbstub.c (100%)
- rename {target-cris => target/cris}/helper.c (100%)
- rename {target-cris => target/cris}/helper.h (100%)
- rename {target-cris => target/cris}/machine.c (100%)
- rename {target-cris => target/cris}/mmu.c (100%)
- rename {target-cris => target/cris}/mmu.h (100%)
- rename {target-cris => target/cris}/op_helper.c (100%)
- rename {target-cris => target/cris}/opcode-cris.h (100%)
- rename {target-cris => target/cris}/translate.c (100%)
- rename {target-cris => target/cris}/translate_v10.c (100%)
+ MAINTAINERS                                | 2 +-
+ {target-lm32 => target/lm32}/Makefile.objs | 0
+ {target-lm32 => target/lm32}/README        | 0
+ {target-lm32 => target/lm32}/TODO          | 0
+ {target-lm32 => target/lm32}/cpu-qom.h     | 0
+ {target-lm32 => target/lm32}/cpu.c         | 0
+ {target-lm32 => target/lm32}/cpu.h         | 0
+ {target-lm32 => target/lm32}/gdbstub.c     | 0
+ {target-lm32 => target/lm32}/helper.c      | 0
+ {target-lm32 => target/lm32}/helper.h      | 0
+ {target-lm32 => target/lm32}/lm32-semi.c   | 0
+ {target-lm32 => target/lm32}/machine.c     | 0
+ {target-lm32 => target/lm32}/op_helper.c   | 0
+ {target-lm32 => target/lm32}/translate.c   | 0
+ 14 files changed, 1 insertion(+), 1 deletion(-)
+ rename {target-lm32 => target/lm32}/Makefile.objs (100%)
+ rename {target-lm32 => target/lm32}/README (100%)
+ rename {target-lm32 => target/lm32}/TODO (100%)
+ rename {target-lm32 => target/lm32}/cpu-qom.h (100%)
+ rename {target-lm32 => target/lm32}/cpu.c (100%)
+ rename {target-lm32 => target/lm32}/cpu.h (100%)
+ rename {target-lm32 => target/lm32}/gdbstub.c (100%)
+ rename {target-lm32 => target/lm32}/helper.c (100%)
+ rename {target-lm32 => target/lm32}/helper.h (100%)
+ rename {target-lm32 => target/lm32}/lm32-semi.c (100%)
+ rename {target-lm32 => target/lm32}/machine.c (100%)
+ rename {target-lm32 => target/lm32}/op_helper.c (100%)
+ rename {target-lm32 => target/lm32}/translate.c (100%)
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index f8959d8..ccb841f 100644
+index ccb841f..0d6b5fe 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -126,7 +126,7 @@ F: disas/libvixl/
- CRIS
- M: Edgar E. Iglesias <edgar.iglesias@gmail.com>
+@@ -135,7 +135,7 @@ F: disas/cris.c
+ LM32
+ M: Michael Walle <michael@walle.cc>
  S: Maintained
--F: target-cris/
-+F: target/cris/
- F: hw/cris/
- F: include/hw/cris/
- F: tests/tcg/cris/
-diff --git a/disas/cris.c b/disas/cris.c
-index 7f35bc0..08161d1 100644
---- a/disas/cris.c
-+++ b/disas/cris.c
-@@ -21,9 +21,7 @@
- #include "qemu/osdep.h"
- #include "qemu-common.h"
- #include "disas/bfd.h"
--//#include "sysdep.h"
--#include "target-cris/opcode-cris.h"
--//#include "libiberty.h"
-+#include "target/cris/opcode-cris.h"
- 
- #define CONST_STRNEQ(STR1,STR2) (strncmp ((STR1), (STR2), sizeof (STR2) - 1) == 0)
- 
-diff --git a/target-cris/Makefile.objs b/target/cris/Makefile.objs
+-F: target-lm32/
++F: target/lm32/
+ F: disas/lm32.c
+ F: hw/lm32/
+ F: hw/*/lm32_*
+diff --git a/target-lm32/Makefile.objs b/target/lm32/Makefile.objs
 similarity index 100%
-rename from target-cris/Makefile.objs
-rename to target/cris/Makefile.objs
-diff --git a/target-cris/cpu-qom.h b/target/cris/cpu-qom.h
+rename from target-lm32/Makefile.objs
+rename to target/lm32/Makefile.objs
+diff --git a/target-lm32/README b/target/lm32/README
 similarity index 100%
-rename from target-cris/cpu-qom.h
-rename to target/cris/cpu-qom.h
-diff --git a/target-cris/cpu.c b/target/cris/cpu.c
+rename from target-lm32/README
+rename to target/lm32/README
+diff --git a/target-lm32/TODO b/target/lm32/TODO
 similarity index 100%
-rename from target-cris/cpu.c
-rename to target/cris/cpu.c
-diff --git a/target-cris/cpu.h b/target/cris/cpu.h
+rename from target-lm32/TODO
+rename to target/lm32/TODO
+diff --git a/target-lm32/cpu-qom.h b/target/lm32/cpu-qom.h
 similarity index 100%
-rename from target-cris/cpu.h
-rename to target/cris/cpu.h
-diff --git a/target-cris/crisv10-decode.h b/target/cris/crisv10-decode.h
+rename from target-lm32/cpu-qom.h
+rename to target/lm32/cpu-qom.h
+diff --git a/target-lm32/cpu.c b/target/lm32/cpu.c
 similarity index 100%
-rename from target-cris/crisv10-decode.h
-rename to target/cris/crisv10-decode.h
-diff --git a/target-cris/crisv32-decode.h b/target/cris/crisv32-decode.h
+rename from target-lm32/cpu.c
+rename to target/lm32/cpu.c
+diff --git a/target-lm32/cpu.h b/target/lm32/cpu.h
 similarity index 100%
-rename from target-cris/crisv32-decode.h
-rename to target/cris/crisv32-decode.h
-diff --git a/target-cris/gdbstub.c b/target/cris/gdbstub.c
+rename from target-lm32/cpu.h
+rename to target/lm32/cpu.h
+diff --git a/target-lm32/gdbstub.c b/target/lm32/gdbstub.c
 similarity index 100%
-rename from target-cris/gdbstub.c
-rename to target/cris/gdbstub.c
-diff --git a/target-cris/helper.c b/target/cris/helper.c
+rename from target-lm32/gdbstub.c
+rename to target/lm32/gdbstub.c
+diff --git a/target-lm32/helper.c b/target/lm32/helper.c
 similarity index 100%
-rename from target-cris/helper.c
-rename to target/cris/helper.c
-diff --git a/target-cris/helper.h b/target/cris/helper.h
+rename from target-lm32/helper.c
+rename to target/lm32/helper.c
+diff --git a/target-lm32/helper.h b/target/lm32/helper.h
 similarity index 100%
-rename from target-cris/helper.h
-rename to target/cris/helper.h
-diff --git a/target-cris/machine.c b/target/cris/machine.c
+rename from target-lm32/helper.h
+rename to target/lm32/helper.h
+diff --git a/target-lm32/lm32-semi.c b/target/lm32/lm32-semi.c
 similarity index 100%
-rename from target-cris/machine.c
-rename to target/cris/machine.c
-diff --git a/target-cris/mmu.c b/target/cris/mmu.c
+rename from target-lm32/lm32-semi.c
+rename to target/lm32/lm32-semi.c
+diff --git a/target-lm32/machine.c b/target/lm32/machine.c
 similarity index 100%
-rename from target-cris/mmu.c
-rename to target/cris/mmu.c
-diff --git a/target-cris/mmu.h b/target/cris/mmu.h
+rename from target-lm32/machine.c
+rename to target/lm32/machine.c
+diff --git a/target-lm32/op_helper.c b/target/lm32/op_helper.c
 similarity index 100%
-rename from target-cris/mmu.h
-rename to target/cris/mmu.h
-diff --git a/target-cris/op_helper.c b/target/cris/op_helper.c
+rename from target-lm32/op_helper.c
+rename to target/lm32/op_helper.c
+diff --git a/target-lm32/translate.c b/target/lm32/translate.c
 similarity index 100%
-rename from target-cris/op_helper.c
-rename to target/cris/op_helper.c
-diff --git a/target-cris/opcode-cris.h b/target/cris/opcode-cris.h
-similarity index 100%
-rename from target-cris/opcode-cris.h
-rename to target/cris/opcode-cris.h
-diff --git a/target-cris/translate.c b/target/cris/translate.c
-similarity index 100%
-rename from target-cris/translate.c
-rename to target/cris/translate.c
-diff --git a/target-cris/translate_v10.c b/target/cris/translate_v10.c
-similarity index 100%
-rename from target-cris/translate_v10.c
-rename to target/cris/translate_v10.c
+rename from target-lm32/translate.c
+rename to target/lm32/translate.c
 -- 
 1.8.3.1
