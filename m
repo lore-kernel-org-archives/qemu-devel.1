@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48012)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48044)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cFK8l-0001A4-IO
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 07:19:08 -0500
+	(envelope-from <thuth@redhat.com>) id 1cFK8r-0001R0-0M
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 07:19:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cFK8g-0003NY-Jt
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 07:19:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47614)
+	(envelope-from <thuth@redhat.com>) id 1cFK8m-0003RT-BX
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 07:19:08 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43160)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1cFK8g-0003NA-BH
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 07:18:58 -0500
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1cFK8m-0003R3-2n
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 07:19:04 -0500
 From: Thomas Huth <thuth@redhat.com>
-Date: Fri,  9 Dec 2016 13:17:40 +0100
-Message-Id: <1481285870-3396-11-git-send-email-thuth@redhat.com>
+Date: Fri,  9 Dec 2016 13:17:41 +0100
+Message-Id: <1481285870-3396-12-git-send-email-thuth@redhat.com>
 In-Reply-To: <1481285870-3396-1-git-send-email-thuth@redhat.com>
 References: <1481285870-3396-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH 10/20] s390x: Move CPU files to target/ folder
+Subject: [Qemu-devel] [PATCH 11/20] sparc: Move CPU files to target/ folder
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,258 +28,192 @@ Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Michael Walle <michael@walle
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- MAINTAINERS                                       | 8 ++++----
- Makefile.objs                                     | 2 +-
- {target-s390x => target/s390x}/Makefile.objs      | 2 +-
- {target-s390x => target/s390x}/arch_dump.c        | 0
- {target-s390x => target/s390x}/cc_helper.c        | 0
- {target-s390x => target/s390x}/cpu-qom.h          | 0
- {target-s390x => target/s390x}/cpu.c              | 0
- {target-s390x => target/s390x}/cpu.h              | 0
- {target-s390x => target/s390x}/cpu_features.c     | 0
- {target-s390x => target/s390x}/cpu_features.h     | 0
- {target-s390x => target/s390x}/cpu_features_def.h | 0
- {target-s390x => target/s390x}/cpu_models.c       | 0
- {target-s390x => target/s390x}/cpu_models.h       | 0
- {target-s390x => target/s390x}/fpu_helper.c       | 0
- {target-s390x => target/s390x}/gdbstub.c          | 0
- {target-s390x => target/s390x}/gen-features.c     | 0
- {target-s390x => target/s390x}/helper.c           | 0
- {target-s390x => target/s390x}/helper.h           | 0
- {target-s390x => target/s390x}/insn-data.def      | 0
- {target-s390x => target/s390x}/insn-format.def    | 0
- {target-s390x => target/s390x}/int_helper.c       | 0
- {target-s390x => target/s390x}/interrupt.c        | 0
- {target-s390x => target/s390x}/ioinst.c           | 0
- {target-s390x => target/s390x}/kvm.c              | 0
- {target-s390x => target/s390x}/machine.c          | 0
- {target-s390x => target/s390x}/mem_helper.c       | 0
- {target-s390x => target/s390x}/misc_helper.c      | 0
- {target-s390x => target/s390x}/mmu_helper.c       | 0
- {target-s390x => target/s390x}/trace-events       | 8 ++++----
- {target-s390x => target/s390x}/translate.c        | 0
- 30 files changed, 10 insertions(+), 10 deletions(-)
- rename {target-s390x => target/s390x}/Makefile.objs (94%)
- rename {target-s390x => target/s390x}/arch_dump.c (100%)
- rename {target-s390x => target/s390x}/cc_helper.c (100%)
- rename {target-s390x => target/s390x}/cpu-qom.h (100%)
- rename {target-s390x => target/s390x}/cpu.c (100%)
- rename {target-s390x => target/s390x}/cpu.h (100%)
- rename {target-s390x => target/s390x}/cpu_features.c (100%)
- rename {target-s390x => target/s390x}/cpu_features.h (100%)
- rename {target-s390x => target/s390x}/cpu_features_def.h (100%)
- rename {target-s390x => target/s390x}/cpu_models.c (100%)
- rename {target-s390x => target/s390x}/cpu_models.h (100%)
- rename {target-s390x => target/s390x}/fpu_helper.c (100%)
- rename {target-s390x => target/s390x}/gdbstub.c (100%)
- rename {target-s390x => target/s390x}/gen-features.c (100%)
- rename {target-s390x => target/s390x}/helper.c (100%)
- rename {target-s390x => target/s390x}/helper.h (100%)
- rename {target-s390x => target/s390x}/insn-data.def (100%)
- rename {target-s390x => target/s390x}/insn-format.def (100%)
- rename {target-s390x => target/s390x}/int_helper.c (100%)
- rename {target-s390x => target/s390x}/interrupt.c (100%)
- rename {target-s390x => target/s390x}/ioinst.c (100%)
- rename {target-s390x => target/s390x}/kvm.c (100%)
- rename {target-s390x => target/s390x}/machine.c (100%)
- rename {target-s390x => target/s390x}/mem_helper.c (100%)
- rename {target-s390x => target/s390x}/misc_helper.c (100%)
- rename {target-s390x => target/s390x}/mmu_helper.c (100%)
- rename {target-s390x => target/s390x}/trace-events (91%)
- rename {target-s390x => target/s390x}/translate.c (100%)
+ MAINTAINERS                                   | 2 +-
+ Makefile.objs                                 | 2 +-
+ {target-sparc => target/sparc}/Makefile.objs  | 0
+ {target-sparc => target/sparc}/TODO           | 0
+ {target-sparc => target/sparc}/asi.h          | 0
+ {target-sparc => target/sparc}/cc_helper.c    | 0
+ {target-sparc => target/sparc}/cpu-qom.h      | 0
+ {target-sparc => target/sparc}/cpu.c          | 0
+ {target-sparc => target/sparc}/cpu.h          | 0
+ {target-sparc => target/sparc}/fop_helper.c   | 0
+ {target-sparc => target/sparc}/gdbstub.c      | 0
+ {target-sparc => target/sparc}/helper.c       | 0
+ {target-sparc => target/sparc}/helper.h       | 0
+ {target-sparc => target/sparc}/int32_helper.c | 0
+ {target-sparc => target/sparc}/int64_helper.c | 0
+ {target-sparc => target/sparc}/ldst_helper.c  | 0
+ {target-sparc => target/sparc}/machine.c      | 0
+ {target-sparc => target/sparc}/mmu_helper.c   | 0
+ {target-sparc => target/sparc}/monitor.c      | 0
+ {target-sparc => target/sparc}/trace-events   | 8 ++++----
+ {target-sparc => target/sparc}/translate.c    | 0
+ {target-sparc => target/sparc}/vis_helper.c   | 0
+ {target-sparc => target/sparc}/win_helper.c   | 0
+ 23 files changed, 6 insertions(+), 6 deletions(-)
+ rename {target-sparc => target/sparc}/Makefile.objs (100%)
+ rename {target-sparc => target/sparc}/TODO (100%)
+ rename {target-sparc => target/sparc}/asi.h (100%)
+ rename {target-sparc => target/sparc}/cc_helper.c (100%)
+ rename {target-sparc => target/sparc}/cpu-qom.h (100%)
+ rename {target-sparc => target/sparc}/cpu.c (100%)
+ rename {target-sparc => target/sparc}/cpu.h (100%)
+ rename {target-sparc => target/sparc}/fop_helper.c (100%)
+ rename {target-sparc => target/sparc}/gdbstub.c (100%)
+ rename {target-sparc => target/sparc}/helper.c (100%)
+ rename {target-sparc => target/sparc}/helper.h (100%)
+ rename {target-sparc => target/sparc}/int32_helper.c (100%)
+ rename {target-sparc => target/sparc}/int64_helper.c (100%)
+ rename {target-sparc => target/sparc}/ldst_helper.c (100%)
+ rename {target-sparc => target/sparc}/machine.c (100%)
+ rename {target-sparc => target/sparc}/mmu_helper.c (100%)
+ rename {target-sparc => target/sparc}/monitor.c (100%)
+ rename {target-sparc => target/sparc}/trace-events (94%)
+ rename {target-sparc => target/sparc}/translate.c (100%)
+ rename {target-sparc => target/sparc}/vis_helper.c (100%)
+ rename {target-sparc => target/sparc}/win_helper.c (100%)
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index fb6c3a6..48b0a7b 100644
+index 48b0a7b..f8959d8 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -202,7 +202,7 @@ S390
- M: Richard Henderson <rth@twiddle.net>
- M: Alexander Graf <agraf@suse.de>
+@@ -218,7 +218,7 @@ SPARC
+ M: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+ M: Artyom Tarasenko <atar4qemu@gmail.com>
  S: Maintained
--F: target-s390x/
-+F: target/s390x/
- F: hw/s390x/
- F: disas/s390.c
- 
-@@ -286,9 +286,9 @@ M: Christian Borntraeger <borntraeger@de.ibm.com>
- M: Cornelia Huck <cornelia.huck@de.ibm.com>
- M: Alexander Graf <agraf@suse.de>
- S: Maintained
--F: target-s390x/kvm.c
--F: target-s390x/ioinst.[ch]
--F: target-s390x/machine.c
-+F: target/s390x/kvm.c
-+F: target/s390x/ioinst.[ch]
-+F: target/s390x/machine.c
- F: hw/intc/s390_flic.c
- F: hw/intc/s390_flic_kvm.c
- F: include/hw/s390x/s390_flic.h
+-F: target-sparc/
++F: target/sparc/
+ F: hw/sparc/
+ F: hw/sparc64/
+ F: disas/sparc.c
 diff --git a/Makefile.objs b/Makefile.objs
-index 91a24c5..c5ebb80 100644
+index c5ebb80..e59b979 100644
 --- a/Makefile.objs
 +++ b/Makefile.objs
-@@ -158,7 +158,7 @@ trace-events-y += net/trace-events
+@@ -157,7 +157,7 @@ trace-events-y += audio/trace-events
+ trace-events-y += net/trace-events
  trace-events-y += target/arm/trace-events
  trace-events-y += target/i386/trace-events
- trace-events-y += target-sparc/trace-events
--trace-events-y += target-s390x/trace-events
-+trace-events-y += target/s390x/trace-events
+-trace-events-y += target-sparc/trace-events
++trace-events-y += target/sparc/trace-events
+ trace-events-y += target/s390x/trace-events
  trace-events-y += target/ppc/trace-events
  trace-events-y += qom/trace-events
- trace-events-y += linux-user/trace-events
-diff --git a/target-s390x/Makefile.objs b/target/s390x/Makefile.objs
+diff --git a/target-sparc/Makefile.objs b/target/sparc/Makefile.objs
+similarity index 100%
+rename from target-sparc/Makefile.objs
+rename to target/sparc/Makefile.objs
+diff --git a/target-sparc/TODO b/target/sparc/TODO
+similarity index 100%
+rename from target-sparc/TODO
+rename to target/sparc/TODO
+diff --git a/target-sparc/asi.h b/target/sparc/asi.h
+similarity index 100%
+rename from target-sparc/asi.h
+rename to target/sparc/asi.h
+diff --git a/target-sparc/cc_helper.c b/target/sparc/cc_helper.c
+similarity index 100%
+rename from target-sparc/cc_helper.c
+rename to target/sparc/cc_helper.c
+diff --git a/target-sparc/cpu-qom.h b/target/sparc/cpu-qom.h
+similarity index 100%
+rename from target-sparc/cpu-qom.h
+rename to target/sparc/cpu-qom.h
+diff --git a/target-sparc/cpu.c b/target/sparc/cpu.c
+similarity index 100%
+rename from target-sparc/cpu.c
+rename to target/sparc/cpu.c
+diff --git a/target-sparc/cpu.h b/target/sparc/cpu.h
+similarity index 100%
+rename from target-sparc/cpu.h
+rename to target/sparc/cpu.h
+diff --git a/target-sparc/fop_helper.c b/target/sparc/fop_helper.c
+similarity index 100%
+rename from target-sparc/fop_helper.c
+rename to target/sparc/fop_helper.c
+diff --git a/target-sparc/gdbstub.c b/target/sparc/gdbstub.c
+similarity index 100%
+rename from target-sparc/gdbstub.c
+rename to target/sparc/gdbstub.c
+diff --git a/target-sparc/helper.c b/target/sparc/helper.c
+similarity index 100%
+rename from target-sparc/helper.c
+rename to target/sparc/helper.c
+diff --git a/target-sparc/helper.h b/target/sparc/helper.h
+similarity index 100%
+rename from target-sparc/helper.h
+rename to target/sparc/helper.h
+diff --git a/target-sparc/int32_helper.c b/target/sparc/int32_helper.c
+similarity index 100%
+rename from target-sparc/int32_helper.c
+rename to target/sparc/int32_helper.c
+diff --git a/target-sparc/int64_helper.c b/target/sparc/int64_helper.c
+similarity index 100%
+rename from target-sparc/int64_helper.c
+rename to target/sparc/int64_helper.c
+diff --git a/target-sparc/ldst_helper.c b/target/sparc/ldst_helper.c
+similarity index 100%
+rename from target-sparc/ldst_helper.c
+rename to target/sparc/ldst_helper.c
+diff --git a/target-sparc/machine.c b/target/sparc/machine.c
+similarity index 100%
+rename from target-sparc/machine.c
+rename to target/sparc/machine.c
+diff --git a/target-sparc/mmu_helper.c b/target/sparc/mmu_helper.c
+similarity index 100%
+rename from target-sparc/mmu_helper.c
+rename to target/sparc/mmu_helper.c
+diff --git a/target-sparc/monitor.c b/target/sparc/monitor.c
+similarity index 100%
+rename from target-sparc/monitor.c
+rename to target/sparc/monitor.c
+diff --git a/target-sparc/trace-events b/target/sparc/trace-events
 similarity index 94%
-rename from target-s390x/Makefile.objs
-rename to target/s390x/Makefile.objs
-index 6b02b17..c573633 100644
---- a/target-s390x/Makefile.objs
-+++ b/target/s390x/Makefile.objs
-@@ -5,7 +5,7 @@ obj-$(CONFIG_SOFTMMU) += machine.o ioinst.o arch_dump.o mmu_helper.o
- obj-$(CONFIG_KVM) += kvm.o
- 
- # build and run feature list generator
--feat-src = $(SRC_PATH)/target-$(TARGET_BASE_ARCH)/
-+feat-src = $(SRC_PATH)/target/$(TARGET_BASE_ARCH)/
- feat-dst = $(BUILD_DIR)/$(TARGET_DIR)
- ifneq ($(MAKECMDGOALS),clean)
- GENERATED_HEADERS += $(feat-dst)gen-features.h
-diff --git a/target-s390x/arch_dump.c b/target/s390x/arch_dump.c
-similarity index 100%
-rename from target-s390x/arch_dump.c
-rename to target/s390x/arch_dump.c
-diff --git a/target-s390x/cc_helper.c b/target/s390x/cc_helper.c
-similarity index 100%
-rename from target-s390x/cc_helper.c
-rename to target/s390x/cc_helper.c
-diff --git a/target-s390x/cpu-qom.h b/target/s390x/cpu-qom.h
-similarity index 100%
-rename from target-s390x/cpu-qom.h
-rename to target/s390x/cpu-qom.h
-diff --git a/target-s390x/cpu.c b/target/s390x/cpu.c
-similarity index 100%
-rename from target-s390x/cpu.c
-rename to target/s390x/cpu.c
-diff --git a/target-s390x/cpu.h b/target/s390x/cpu.h
-similarity index 100%
-rename from target-s390x/cpu.h
-rename to target/s390x/cpu.h
-diff --git a/target-s390x/cpu_features.c b/target/s390x/cpu_features.c
-similarity index 100%
-rename from target-s390x/cpu_features.c
-rename to target/s390x/cpu_features.c
-diff --git a/target-s390x/cpu_features.h b/target/s390x/cpu_features.h
-similarity index 100%
-rename from target-s390x/cpu_features.h
-rename to target/s390x/cpu_features.h
-diff --git a/target-s390x/cpu_features_def.h b/target/s390x/cpu_features_def.h
-similarity index 100%
-rename from target-s390x/cpu_features_def.h
-rename to target/s390x/cpu_features_def.h
-diff --git a/target-s390x/cpu_models.c b/target/s390x/cpu_models.c
-similarity index 100%
-rename from target-s390x/cpu_models.c
-rename to target/s390x/cpu_models.c
-diff --git a/target-s390x/cpu_models.h b/target/s390x/cpu_models.h
-similarity index 100%
-rename from target-s390x/cpu_models.h
-rename to target/s390x/cpu_models.h
-diff --git a/target-s390x/fpu_helper.c b/target/s390x/fpu_helper.c
-similarity index 100%
-rename from target-s390x/fpu_helper.c
-rename to target/s390x/fpu_helper.c
-diff --git a/target-s390x/gdbstub.c b/target/s390x/gdbstub.c
-similarity index 100%
-rename from target-s390x/gdbstub.c
-rename to target/s390x/gdbstub.c
-diff --git a/target-s390x/gen-features.c b/target/s390x/gen-features.c
-similarity index 100%
-rename from target-s390x/gen-features.c
-rename to target/s390x/gen-features.c
-diff --git a/target-s390x/helper.c b/target/s390x/helper.c
-similarity index 100%
-rename from target-s390x/helper.c
-rename to target/s390x/helper.c
-diff --git a/target-s390x/helper.h b/target/s390x/helper.h
-similarity index 100%
-rename from target-s390x/helper.h
-rename to target/s390x/helper.h
-diff --git a/target-s390x/insn-data.def b/target/s390x/insn-data.def
-similarity index 100%
-rename from target-s390x/insn-data.def
-rename to target/s390x/insn-data.def
-diff --git a/target-s390x/insn-format.def b/target/s390x/insn-format.def
-similarity index 100%
-rename from target-s390x/insn-format.def
-rename to target/s390x/insn-format.def
-diff --git a/target-s390x/int_helper.c b/target/s390x/int_helper.c
-similarity index 100%
-rename from target-s390x/int_helper.c
-rename to target/s390x/int_helper.c
-diff --git a/target-s390x/interrupt.c b/target/s390x/interrupt.c
-similarity index 100%
-rename from target-s390x/interrupt.c
-rename to target/s390x/interrupt.c
-diff --git a/target-s390x/ioinst.c b/target/s390x/ioinst.c
-similarity index 100%
-rename from target-s390x/ioinst.c
-rename to target/s390x/ioinst.c
-diff --git a/target-s390x/kvm.c b/target/s390x/kvm.c
-similarity index 100%
-rename from target-s390x/kvm.c
-rename to target/s390x/kvm.c
-diff --git a/target-s390x/machine.c b/target/s390x/machine.c
-similarity index 100%
-rename from target-s390x/machine.c
-rename to target/s390x/machine.c
-diff --git a/target-s390x/mem_helper.c b/target/s390x/mem_helper.c
-similarity index 100%
-rename from target-s390x/mem_helper.c
-rename to target/s390x/mem_helper.c
-diff --git a/target-s390x/misc_helper.c b/target/s390x/misc_helper.c
-similarity index 100%
-rename from target-s390x/misc_helper.c
-rename to target/s390x/misc_helper.c
-diff --git a/target-s390x/mmu_helper.c b/target/s390x/mmu_helper.c
-similarity index 100%
-rename from target-s390x/mmu_helper.c
-rename to target/s390x/mmu_helper.c
-diff --git a/target-s390x/trace-events b/target/s390x/trace-events
-similarity index 91%
-rename from target-s390x/trace-events
-rename to target/s390x/trace-events
-index df59f5f..1574033 100644
---- a/target-s390x/trace-events
-+++ b/target/s390x/trace-events
-@@ -1,22 +1,22 @@
+rename from target-sparc/trace-events
+rename to target/sparc/trace-events
+index bf52d97..8df178a 100644
+--- a/target-sparc/trace-events
++++ b/target/sparc/trace-events
+@@ -1,6 +1,6 @@
  # See docs/tracing.txt for syntax documentation.
  
--# target-s390x/mmu_helper.c
-+# target/s390x/mmu_helper.c
- get_skeys_nonzero(int rc) "SKEY: Call to get_skeys unexpectedly returned %d"
- set_skeys_nonzero(int rc) "SKEY: Call to set_skeys unexpectedly returned %d"
+-# target-sparc/mmu_helper.c
++# target/sparc/mmu_helper.c
+ mmu_helper_dfault(uint64_t address, uint64_t context, int mmu_idx, uint32_t tl) "DFAULT at %"PRIx64" context %"PRIx64" mmu_idx=%d tl=%d"
+ mmu_helper_dprot(uint64_t address, uint64_t context, int mmu_idx, uint32_t tl) "DPROT at %"PRIx64" context %"PRIx64" mmu_idx=%d tl=%d"
+ mmu_helper_dmiss(uint64_t address, uint64_t context) "DMISS at %"PRIx64" context %"PRIx64
+@@ -10,16 +10,16 @@ mmu_helper_get_phys_addr_code(uint32_t tl, int mmu_idx, uint64_t prim_context, u
+ mmu_helper_get_phys_addr_data(uint32_t tl, int mmu_idx, uint64_t prim_context, uint64_t sec_context, uint64_t address) "tl=%d mmu_idx=%d primary context=%"PRIx64" secondary context=%"PRIx64" address=%"PRIx64
+ mmu_helper_mmu_fault(uint64_t address, uint64_t paddr, int mmu_idx, uint32_t tl, uint64_t prim_context, uint64_t sec_context) "Translate at %"PRIx64" -> %"PRIx64", mmu_idx=%d tl=%d primary context=%"PRIx64" secondary context=%"PRIx64
  
--# target-s390x/ioinst.c
-+# target/s390x/ioinst.c
- ioinst(const char *insn) "IOINST: %s"
- ioinst_sch_id(const char *insn, int cssid, int ssid, int schid) "IOINST: %s (%x.%x.%04x)"
- ioinst_chp_id(const char *insn, int cssid, int chpid) "IOINST: %s (%x.%02x)"
- ioinst_chsc_cmd(uint16_t cmd, uint16_t len) "IOINST: chsc command %04x, len %04x"
+-# target-sparc/int64_helper.c
++# target/sparc/int64_helper.c
+ int_helper_set_softint(uint32_t softint) "new %08x"
+ int_helper_clear_softint(uint32_t softint) "new %08x"
+ int_helper_write_softint(uint32_t softint) "new %08x"
  
--# target-s390x/kvm.c
-+# target/s390x/kvm.c
- kvm_enable_cmma(int rc) "CMMA: enabling with result code %d"
- kvm_clear_cmma(int rc) "CMMA: clearing with result code %d"
- kvm_failed_cpu_state_set(int cpu_index, uint8_t state, const char *msg) "Warning: Unable to set cpu %d state %" PRIu8 " to KVM: %s"
- kvm_sigp_finished(uint8_t order, int cpu_index, int dst_index, int cc) "SIGP: Finished order %u on cpu %d -> cpu %d with cc=%d"
+-# target-sparc/int32_helper.c
++# target/sparc/int32_helper.c
+ int_helper_icache_freeze(void) "Instruction cache: freeze"
+ int_helper_dcache_freeze(void) "Data cache: freeze"
  
--# target-s390x/cpu.c
-+# target/s390x/cpu.c
- cpu_set_state(int cpu_index, uint8_t state) "setting cpu %d state to %" PRIu8
- cpu_halt(int cpu_index) "halting cpu %d"
- cpu_unhalt(int cpu_index) "unhalting cpu %d"
-diff --git a/target-s390x/translate.c b/target/s390x/translate.c
+-# target-sparc/win_helper.c
++# target/sparc/win_helper.c
+ win_helper_gregset_error(uint32_t pstate) "ERROR in get_gregset: active pstate bits=%x"
+ win_helper_switch_pstate(uint32_t pstate_regs, uint32_t new_pstate_regs) "change_pstate: switching regs old=%x new=%x"
+ win_helper_no_switch_pstate(uint32_t new_pstate_regs) "change_pstate: regs new=%x (unchanged)"
+diff --git a/target-sparc/translate.c b/target/sparc/translate.c
 similarity index 100%
-rename from target-s390x/translate.c
-rename to target/s390x/translate.c
+rename from target-sparc/translate.c
+rename to target/sparc/translate.c
+diff --git a/target-sparc/vis_helper.c b/target/sparc/vis_helper.c
+similarity index 100%
+rename from target-sparc/vis_helper.c
+rename to target/sparc/vis_helper.c
+diff --git a/target-sparc/win_helper.c b/target/sparc/win_helper.c
+similarity index 100%
+rename from target-sparc/win_helper.c
+rename to target/sparc/win_helper.c
 -- 
 1.8.3.1
