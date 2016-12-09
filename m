@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37377)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37612)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1cFOyP-0000RN-Fa
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 12:28:42 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cFOyn-0001pg-KV
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 12:29:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1cFOyO-00027k-I9
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 12:28:41 -0500
-Date: Fri, 9 Dec 2016 18:28:27 +0100
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20161209172827.xmzcxxc7xxvlheia@hawk.localdomain>
-References: <20161208175030.12269-1-drjones@redhat.com>
-	<20161208175030.12269-10-drjones@redhat.com>
-	<2fc872dd-ee19-f2fb-7444-cf701871fbeb@arm.com>
+	(envelope-from <mreitz@redhat.com>) id 1cFOym-0002LG-F8
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 12:29:05 -0500
+References: <1479835586-74394-1-git-send-email-vsementsov@virtuozzo.com>
+	<1479835586-74394-16-git-send-email-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <f3b2be4f-3ea6-0af9-00f6-e28d5b502974@redhat.com>
+Date: Fri, 9 Dec 2016 18:28:53 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2fc872dd-ee19-f2fb-7444-cf701871fbeb@arm.com>
-Subject: Re: [Qemu-devel] [PATCH kvm-unit-tests v8 09/10] arm/arm64: gicv3:
- add an IPI test
+In-Reply-To: <1479835586-74394-16-git-send-email-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="eSDAtaFBfhtFsFI7Alt3gWRo0RwTdtnof"
+Subject: Re: [Qemu-devel] [PATCH 15/21] qcow2: add
+ .bdrv_can_store_dirty_bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,104 +25,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andre Przywara <andre.przywara@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, marc.zyngier@arm.com, eric.auger@redhat.com, pbonzini@redhat.com, alex.bennee@linaro.org, christoffer.dall@linaro.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
 
-On Fri, Dec 09, 2016 at 04:08:00PM +0000, Andre Przywara wrote:
-> On 08/12/16 17:50, Andrew Jones wrote:
-> > +u32 gicv3_iar_irqnr(u32 iar)
-> > +{
-> > +	return iar;
-> 
-> I am probably a bit paranoid here, but the spec says that the interrupt
-> ID is in bits[23:0] only (at most).
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--eSDAtaFBfhtFsFI7Alt3gWRo0RwTdtnof
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com,
+ famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
+Message-ID: <f3b2be4f-3ea6-0af9-00f6-e28d5b502974@redhat.com>
+Subject: Re: [PATCH 15/21] qcow2: add .bdrv_can_store_dirty_bitmap
+References: <1479835586-74394-1-git-send-email-vsementsov@virtuozzo.com>
+ <1479835586-74394-16-git-send-email-vsementsov@virtuozzo.com>
+In-Reply-To: <1479835586-74394-16-git-send-email-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Transfer-Encoding: quoted-printable
 
-Indeed, I'll add '& ((1 << 24) - 1' here.
+On 22.11.2016 18:26, Vladimir Sementsov-Ogievskiy wrote:
+> Realize .bdrv_can_store_dirty_bitmap interface.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block/qcow2-bitmap.c | 40 ++++++++++++++++++++++++++++++++++++++++
+>  block/qcow2.c        |  1 +
+>  block/qcow2.h        |  4 ++++
+>  3 files changed, 45 insertions(+)
+>=20
+> diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
+> index a975388..55b1112 100644
+> --- a/block/qcow2-bitmap.c
+> +++ b/block/qcow2-bitmap.c
+> @@ -1115,3 +1115,43 @@ fail:
+> =20
+>      bitmap_list_free(bm_list);
+>  }
+> +
+> +bool qcow2_can_store_dirty_bitmap(BlockDriverState *bs,
+> +                                  const char *name,
+> +                                  uint32_t granularity,
+> +                                  Error **errp)
+> +{
+> +    BDRVQcow2State *s =3D bs->opaque;
+> +    const char *reason =3D NULL;
+> +    bool found;
+> +    Qcow2BitmapList *bm_list;
+> +
+> +    if (check_constraints_on_bitmap(bs, name, granularity) !=3D 0) {
+> +        reason =3D "it doesn't satisfy the constraints";
+> +        goto common_errp;
+> +    }
+> +
+> +    if (s->nb_bitmaps =3D=3D 0) {
+> +        return true;
+> +    }
+> +
+> +    bm_list =3D bitmap_list_load(bs, s->bitmap_directory_offset,
+> +                               s->bitmap_directory_size, errp);
 
-> 
-> > +}
-> > +
-> > +void gicv3_ipi_send_mask(int irq, const cpumask_t *dest)
-> > +{
-> > +	u16 tlist;
-> > +	int cpu;
-> > +
-> > +	assert(irq < 16);
-> > +
-> > +	/*
-> > +	 * For each cpu in the mask collect its peers, which are also in
-> > +	 * the mask, in order to form target lists.
-> > +	 */
-> > +	for_each_cpu(cpu, dest) {
-> > +		u64 mpidr = cpus[cpu], sgi1r;
-> > +		u64 cluster_id;
-> > +
-> > +		/*
-> > +		 * GICv3 can send IPIs to up 16 peer cpus with a single
-> > +		 * write to ICC_SGI1R_EL1 (using the target list). Peers
-> > +		 * are cpus that have nearly identical MPIDRs, the only
-> > +		 * difference being Aff0. The matching upper affinity
-> > +		 * levels form the cluster ID.
-> > +		 */
-> > +		cluster_id = mpidr & ~0xffUL;
-> > +		tlist = 0;
-> > +
-> > +		/*
-> > +		 * Sort of open code for_each_cpu in order to have a
-> > +		 * nested for_each_cpu loop.
-> > +		 */
-> > +		while (cpu < nr_cpus) {
-> > +			if ((mpidr & 0xff) >= 16) {
-> > +				printf("cpu%d MPIDR:aff0 is %d (>= 16)!\n",
-> > +					cpu, (int)(mpidr & 0xff));
-> > +				break;
-> > +			}
-> > +
-> > +			tlist |= 1 << (mpidr & 0xf);
-> > +
-> > +			cpu = cpumask_next(cpu, dest);
-> > +			if (cpu >= nr_cpus)
-> > +				break;
-> > +
-> > +			mpidr = cpus[cpu];
-> > +
-> > +			if (cluster_id != (mpidr & ~0xffUL)) {
-> > +				/*
-> > +				 * The next cpu isn't in our cluster. Roll
-> > +				 * back the cpu index allowing the outer
-> > +				 * for_each_cpu to find it again with
-> > +				 * cpumask_next
-> > +				 */
-> > +				--cpu;
-> > +				break;
-> > +			}
-> > +		}
-> > +
-> > +		/* Send the IPIs for the target list of this cluster */
-> > +		sgi1r = (MPIDR_TO_SGI_AFFINITY(cluster_id, 3)	|
-> > +			 MPIDR_TO_SGI_AFFINITY(cluster_id, 2)	|
-> > +			 irq << 24				|
-> > +			 MPIDR_TO_SGI_AFFINITY(cluster_id, 1)	|
-> > +			 tlist);
-> > +
-> > +		gicv3_write_sgi1r(sgi1r);
-> > +	}
-> > +
-> > +	/* Force the above writes to ICC_SGI1R_EL1 to be executed */
-> > +	isb();
-> > +}
-> 
-> Wow, this is really heavy stuff, especially for a Friday afternoon ;-)
-> But I convinced myself that it's correct. The only issue is that it's
-> sub-optimal if the MPIDRs of the VCPUs are not in order, say: 0x000,
-> 0x100, 0x001.
-> In this case we do three register writes instead of the minimal two.
-> But it's still correct, so it's actually a minor nit just to prove that
-> I checked the algorithm ;-)
-> 
-> So apart from the minor comment above:
-> 
-> Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+Maybe it would make sense to keep the bitmap list in memory...
 
-Thanks!
-drew
+> +    if (bm_list =3D=3D NULL) {
+> +        return false;
+> +    }
+> +
+> +    found =3D !!find_bitmap_by_name(bm_list, name);
+
+You can omit the !!, storing it in a bool will do that for you.
+
+> +    bitmap_list_free(bm_list);
+> +    if (found) {
+> +        reason =3D "bitmap with the same name is already stored";
+> +        goto common_errp;
+> +    }
+> +
+> +    return true;
+> +
+> +common_errp:
+> +    error_setg(errp, "Can't make bitmap '%s' persistent in '%s', as %s=
+=2E",
+> +               name, bdrv_get_device_or_node_name(bs), reason);
+
+Hm, so this function isn't for checking whether a bitmap can be stored,
+but whether it can be made persistent. That's a difference; you can
+store a bitmap of the same name in the file if you want to overwrite it
+(i.e. it's an auto-load bitmap), but you cannot create a new bitmap with
+the same name.
+
+Maybe rename it from bdrv_can_store_dirty_bitmap to
+bdrv_can_store_new_dirty_bitmap?
+
+Max
+
+> +    return false;
+> +}
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index 66c7f74..cb9c2a2 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+> @@ -3516,6 +3516,7 @@ BlockDriver bdrv_qcow2 =3D {
+> =20
+>      .bdrv_load_autoloading_dirty_bitmaps =3D qcow2_load_autoloading_di=
+rty_bitmaps,
+>      .bdrv_store_persistent_dirty_bitmaps =3D qcow2_store_persistent_di=
+rty_bitmaps,
+> +    .bdrv_can_store_dirty_bitmap =3D qcow2_can_store_dirty_bitmap,
+>  };
+> =20
+>  static void bdrv_qcow2_init(void)
+> diff --git a/block/qcow2.h b/block/qcow2.h
+> index d9a7643..e7a44a1 100644
+> --- a/block/qcow2.h
+> +++ b/block/qcow2.h
+> @@ -616,5 +616,9 @@ void qcow2_cache_put(BlockDriverState *bs, Qcow2Cac=
+he *c, void **table);
+>  /* qcow2-bitmap.c functions */
+>  void qcow2_load_autoloading_dirty_bitmaps(BlockDriverState *bs, Error =
+**errp);
+>  void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error =
+**errp);
+> +bool qcow2_can_store_dirty_bitmap(BlockDriverState *bs,
+> +                                  const char *name,
+> +                                  uint32_t granularity,
+> +                                  Error **errp);
+> =20
+>  #endif
+>=20
+
+
+
+--eSDAtaFBfhtFsFI7Alt3gWRo0RwTdtnof
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlhK6dUSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9A90QH/1hAUG+GrYX11Kic8dm6jG+QeUqnQwaS
+l8jxnUsvUoksa7fFcqriREXiZeKOA93MKhvuNg81/sYByO9n7ztu+9ljeqi3LqMi
+qv5pL2mcc43AUVMUwRUhJxk8gUJWIeMINQEzXP8uTMMTTNCO1xlONaFfuKJC/aLC
+j4pvWDvorVWNeUgsjAYTexLceQk6LGuY+Vj6leHJgbKks06zpzVro3JG5IZFSHar
+Prz66xMVUiqtGNNWITQvuaEUoq7BdFVi0TX1n9vXOsaqNojdYm2c71f/HqlQNQy0
+bGRVzN8l+ZC37rEZ7puQJWzfKbG/R7rPaDFVh0g3POrcCuq0RJ+QO7s=
+=0U5W
+-----END PGP SIGNATURE-----
+
+--eSDAtaFBfhtFsFI7Alt3gWRo0RwTdtnof--
