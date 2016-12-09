@@ -1,41 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33464)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34711)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cFE9W-0000V4-Dp
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 00:55:31 -0500
+	(envelope-from <bounces@canonical.com>) id 1cFEJa-0002UF-5e
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 01:05:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cFE9Q-0000Gp-5n
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 00:55:26 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:48577
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <bounces@canonical.com>) id 1cFEJV-0002nx-UJ
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 01:05:50 -0500
+Received: from indium.canonical.com ([91.189.90.7]:38848)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
-	id 1cFE9Q-0000GS-1B
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 00:55:20 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	uB95tHvS103576
-	for <qemu-devel@nongnu.org>; Fri, 9 Dec 2016 00:55:19 -0500
-Received: from e23smtp01.au.ibm.com (e23smtp01.au.ibm.com [202.81.31.143])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 277gu4nvp3-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 09 Dec 2016 00:55:18 -0500
-Received: from localhost
-	by e23smtp01.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
-	Fri, 9 Dec 2016 15:54:32 +1000
-From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-In-Reply-To: <20161208222546.GC13139@umbus.fritz.box>
-References: <1481135102-20011-1-git-send-email-nikunj@linux.vnet.ibm.com>
-	<1481135102-20011-2-git-send-email-nikunj@linux.vnet.ibm.com>
-	<20161208222546.GC13139@umbus.fritz.box>
-Date: Fri, 09 Dec 2016 11:24:20 +0530
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cFEJV-0002nq-Gl
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 01:05:45 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cFEJT-0001QO-Dh
+	for <qemu-devel@nongnu.org>; Fri, 09 Dec 2016 06:05:43 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 4900F2E80C3
+	for <qemu-devel@nongnu.org>; Fri,  9 Dec 2016 06:05:43 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <8737hx3awj.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-Subject: Re: [Qemu-devel] [PATCH v1 1/9] target-ppc: implement lxvl
- instruction
+Date: Fri, 09 Dec 2016 05:51:48 -0000
+From: Jack Coulter <1579306@bugs.launchpad.net>
+Reply-To: Bug 1579306 <1579306@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20160507052845.589.63580.malonedeb@chaenomeles.canonical.com>
+Message-Id: <20161209055148.23095.1695.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1579306] Re: usb-uas does not work in Windows
+ (10) guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,134 +37,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, rth@twiddle.net, qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com
+To: qemu-devel@nongnu.org
 
-David Gibson <david@gibson.dropbear.id.au> writes:
+Just echoing Tom Yan's comment; I've tried passing through what appears
+to be the very same device (if not, at least the same UAS-SATA bridge)
+to a VM in its entirety.
 
-> [ Unknown signature status ]
-> On Wed, Dec 07, 2016 at 11:54:54PM +0530, Nikunj A Dadhania wrote:
->> lxvl: Load VSX Vector with Length
->>=20
->> Little/Big-endian Storage:
->> +---+---+---+---+---+---+---+---+---+---+---+---+---+---+--+--+
->> |=E2=80=9CT=E2=80=9D|=E2=80=9Ch=E2=80=9D|=E2=80=9Ci=E2=80=9D|=E2=80=9Cs=
-=E2=80=9D|=E2=80=9C =E2=80=9D|=E2=80=9Ci=E2=80=9D|=E2=80=9Cs=E2=80=9D|=E2=
-=80=9C =E2=80=9D|=E2=80=9Ca=E2=80=9D|=E2=80=9C =E2=80=9D|=E2=80=9CT=E2=80=
-=9D|=E2=80=9CE=E2=80=9D|=E2=80=9CS=E2=80=9D|=E2=80=9CT=E2=80=9D|FF|FF|
->> +---+---+---+---+---+---+---+---+---+---+---+---+---+---+--+--+
->>=20
->> Loading 14 bytes results in:
->>=20
->> Vector (8-bit elements) in BE:
->> +---+---+---+---+---+---+---+---+---+---+---+---+---+---+--+--+
->> |=E2=80=9CT=E2=80=9D|=E2=80=9Ch=E2=80=9D|=E2=80=9Ci=E2=80=9D|=E2=80=9Cs=
-=E2=80=9D|=E2=80=9C =E2=80=9D|=E2=80=9Ci=E2=80=9D|=E2=80=9Cs=E2=80=9D|=E2=
-=80=9C =E2=80=9D|=E2=80=9Ca=E2=80=9D|=E2=80=9C =E2=80=9D|=E2=80=9CT=E2=80=
-=9D|=E2=80=9CE=E2=80=9D|=E2=80=9CS=E2=80=9D|=E2=80=9CT=E2=80=9D|00|00|
->> +---+---+---+---+---+---+---+---+---+---+---+---+---+---+--+--+
->>=20
->> Vector (8-bit elements) in LE:
->> +--+--+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
->> |00|00|=E2=80=9CT=E2=80=9D|=E2=80=9CS=E2=80=9D|=E2=80=9CE=E2=80=9D|=E2=
-=80=9CT=E2=80=9D|=E2=80=9C =E2=80=9D|=E2=80=9Ca=E2=80=9D|=E2=80=9C =E2=80=
-=9D|=E2=80=9Cs=E2=80=9D|=E2=80=9Ci=E2=80=9D|=E2=80=9C =E2=80=9D|=E2=80=9Cs=
-=E2=80=9D|=E2=80=9Ci=E2=80=9D|"h"|"T"|
->> +--+--+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
->
-> Took a while to wrap my head around the semantics, but I believe this
-> is correct.  However, there are a couple of nits:
->
->>=20
->> Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
->> ---
->>  target-ppc/helper.h                 |  1 +
->>  target-ppc/mem_helper.c             | 33 ++++++++++++++++++++++++++++++=
-+++
->>  target-ppc/translate/vsx-impl.inc.c | 27 +++++++++++++++++++++++++++
->>  target-ppc/translate/vsx-ops.inc.c  |  1 +
->>  4 files changed, 62 insertions(+)
->>=20
->> diff --git a/target-ppc/helper.h b/target-ppc/helper.h
->> index bc39efb..d9ccafd 100644
->> --- a/target-ppc/helper.h
->> +++ b/target-ppc/helper.h
->> @@ -317,6 +317,7 @@ DEF_HELPER_3(lvewx, void, env, avr, tl)
->>  DEF_HELPER_3(stvebx, void, env, avr, tl)
->>  DEF_HELPER_3(stvehx, void, env, avr, tl)
->>  DEF_HELPER_3(stvewx, void, env, avr, tl)
->> +DEF_HELPER_4(lxvl, void, env, tl, tl, tl)
->>  DEF_HELPER_4(vsumsws, void, env, avr, avr, avr)
->>  DEF_HELPER_4(vsum2sws, void, env, avr, avr, avr)
->>  DEF_HELPER_4(vsum4sbs, void, env, avr, avr, avr)
->> diff --git a/target-ppc/mem_helper.c b/target-ppc/mem_helper.c
->> index 1ab8a6e..54447a7 100644
->> --- a/target-ppc/mem_helper.c
->> +++ b/target-ppc/mem_helper.c
->> @@ -24,6 +24,7 @@
->>=20=20
->>  #include "helper_regs.h"
->>  #include "exec/cpu_ldst.h"
->> +#include "internal.h"
->>=20=20
->>  //#define DEBUG_OP
->>=20=20
->> @@ -284,8 +285,40 @@ STVE(stvewx, cpu_stl_data_ra, bswap32, u32)
->>  #undef I
->>  #undef LVE
->>=20=20
->> +#ifdef TARGET_PPC64
->> +#define GET_NB(rb) ((rb >> 56) & 0xFF)
->> +#else
->> +#define GET_NB(rb) ((rb >> 24) & 0xFF)
->> +#endif
->
-> A 32-bit VSX implementation seems... improbable.  Simpler to just
-> bracket the whole thing with ifdef TARGET_PPC64.
+I can confirm the same result - with an otherwise identical domain
+configuration, Linux guests correctly use the UAS driver:
 
-Sure, can be done, just that the instruction specifically got bit 0:7, i
-thought that I shouldn't limit my implementation to just PPC64.
+/:  Bus 02.Port 1: Dev 1, Class=3Droot_hub, Driver=3Dxhci_hcd/4p, 5000M
+    |__ Port 1: Dev 2, If 0, Class=3DMass Storage, Driver=3Duas, 5000M
+/:  Bus 01.Port 1: Dev 1, Class=3Droot_hub, Driver=3Dxhci_hcd/4p, 480M
 
 
->> +
->> +void helper_lxvl(CPUPPCState *env, target_ulong addr,
->> +                 target_ulong xt_num, target_ulong rb)
->
-> I think it would be nicer to either have two different helpers for the
-> LE and BE cases, or take an endian parameter.  That should allow you
-> to share the helper with the lxvll implementation.
+Whereas Windows guests fall back to BOT/MSC:
 
-Something like the below should work:
+<see attached image>
 
-#define VSX_LXVL(name, lj)                                              \
-void helper_##name(CPUPPCState *env, target_ulong addr,                 \
-                   target_ulong xt_num, target_ulong rb)                \
-{                                                                       \
-    int i;                                                              \
-    ppc_vsr_t xt;                                                       \
-    uint64_t nb =3D GET_NB(rb);                                           \
-                                                                        \
-    xt.s128 =3D int128_zero();                                            \
-    if (nb) {                                                           \
-        nb =3D (nb >=3D 16) ? 16 : nb;                                     =
- \
-        if (msr_le && !lj) {                                            \
-            for (i =3D 16; i > 16 - nb; i--) {                            \
-                xt.VsrB(i - 1) =3D cpu_ldub_data_ra(env, addr, GETPC());  \
-                addr =3D addr_add(env, addr, 1);                          \
-            }                                                           \
-        } else {                                                        \
-            for (i =3D 0; i < nb; i++) {                                  \
-                xt.VsrB(i) =3D cpu_ldub_data_ra(env, addr, GETPC());      \
-                addr =3D addr_add(env, addr, 1);                          \
-            }                                                           \
-        }                                                               \
-    }                                                                   \
-    putVSR(xt_num, &xt, env);                                           \
-}
 
-VSX_LXVL(lxvl, 0)
-VSX_LXVL(lxvll, 1)
+In both cases, QEMU is being run via libvirt, which is generating the follo=
+wing command line:
 
-Regards
-Nikunj
+/usr/bin/qemu-system-x86_64 -name guest=3DWin10-Edge-IE11,debug-threads=3Don
+-S -object
+secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/domain-13-=
+Win10
+-Edge-IE11/master-key.aes -machine
+pc-q35-2.7,accel=3Dkvm,usb=3Doff,vmport=3Doff,dump-guest-core=3Doff -cpu
+host,hv_time,hv_relaxed,hv_vapic,hv_spinlocks=3D0x1fff -m 4096 -realtime
+mlock=3Doff -smp 8,sockets=3D1,cores=3D4,threads=3D2 -uuid 47c39707-088c-4e=
+dc-
+8b6a-a7856e09f43d -no-user-config -nodefaults -chardev
+socket,id=3Dcharmonitor,path=3D/var/lib/libvirt/qemu/domain-13-Win10-Edge-
+IE11/monitor.sock,server,nowait -mon
+chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc
+base=3Dlocaltime,driftfix=3Dslew -global kvm-pit.lost_tick_policy=3Ddiscard
+-no-hpet -no-shutdown -global ICH9-LPC.disable_s3=3D1 -global
+ICH9-LPC.disable_s4=3D1 -boot strict=3Don -device
+i82801b11-bridge,id=3Dpci.1,bus=3Dpcie.0,addr=3D0x1e -device pci-
+bridge,chassis_nr=3D2,id=3Dpci.2,bus=3Dpci.1,addr=3D0x0 -device nec-usb-
+xhci,id=3Dusb,bus=3Dpci.2,addr=3D0x6 -device virtio-scsi-
+pci,id=3Dscsi0,bus=3Dpci.2,addr=3D0x3 -device virtio-serial-pci,id=3Dvirtio-
+serial0,bus=3Dpci.2,addr=3D0x4 -drive file=3D/home/jack/IMG/Win10-Edge-
+IE11.qcow2,format=3Dqcow2,if=3Dnone,id=3Ddrive-scsi0-0-0-0,discard=3Dunmap
+-device scsi-hd,bus=3Dscsi0.0,channel=3D0,scsi-id=3D0,lun=3D0,drive=3Ddrive-
+scsi0-0-0-0,id=3Dscsi0-0-0-0,bootindex=3D1 -drive if=3Dnone,id=3Ddrive-
+scsi0-0-0-1,readonly=3Don -device scsi-cd,bus=3Dscsi0.0,channel=3D0,scsi-
+id=3D0,lun=3D1,drive=3Ddrive-scsi0-0-0-1,id=3Dscsi0-0-0-1 -netdev
+tap,fd=3D22,id=3Dhostnet0,vhost=3Don,vhostfd=3D24 -device virtio-net-
+pci,netdev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:27:94:5d,bus=3Dpci.2,addr=3D=
+0x1
+-chardev pty,id=3Dcharserial0 -device isa-
+serial,chardev=3Dcharserial0,id=3Dserial0 -chardev
+spicevmc,id=3Dcharchannel0,name=3Dvdagent -device virtserialport,bus=3Dvirt=
+io-
+serial0.0,nr=3D1,chardev=3Dcharchannel0,id=3Dchannel0,name=3Dcom.redhat.spi=
+ce.0
+-device usb-tablet,id=3Dinput0,bus=3Dusb.0,port=3D2 -spice
+port=3D5900,addr=3D127.0.0.1,disable-ticketing,image-compression=3Doff
+,seamless-migration=3Don -device qxl-
+vga,id=3Dvideo0,ram_size=3D67108864,vram_size=3D67108864,vram64_size_mb=3D0=
+,vgamem_mb=3D16,max_outputs=3D1,bus=3Dpcie.0,addr=3D0x1
+-device intel-hda,id=3Dsound0,bus=3Dpci.2,addr=3D0x2 -device hda-
+duplex,id=3Dsound0-codec0,bus=3Dsound0.0,cad=3D0 -chardev
+spicevmc,id=3Dcharredir0,name=3Dusbredir -device usb-
+redir,chardev=3Dcharredir0,id=3Dredir0,bus=3Dusb.0,port=3D3 -chardev
+spicevmc,id=3Dcharredir1,name=3Dusbredir -device usb-
+redir,chardev=3Dcharredir1,id=3Dredir1,bus=3Dusb.0,port=3D4 -device usb-
+host,hostbus=3D4,hostaddr=3D4,id=3Dhostdev0,bus=3Dusb.0,port=3D1 -device vi=
+rtio-
+balloon-pci,id=3Dballoon0,bus=3Dpci.2,addr=3D0x5 -msg timestamp=3Don
+
+** Attachment added: "windows-guest-uas-fail.png"
+   https://bugs.launchpad.net/qemu/+bug/1579306/+attachment/4789396/+files/=
+2016-12-09-165117_504x687_scrot.png
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1579306
+
+Title:
+  usb-uas does not work in Windows (10) guest
+
+Status in QEMU:
+  New
+
+Bug description:
+  When I attach a "-device usb-uas" to a VM with Windows 10 10586, the
+  device fail to start with the following error in the guest:
+
+  "The device cannot start. (Code 10)
+
+  {Operation Failed}
+  The requested operation was unsuccessful"
+
+  If the host controller is nec-usb-xhci, there will be two of the
+  following error on the terminal of the host as well:
+
+  "qemu-system-x86_64: usb_uas_handle_control: unhandled control
+  request"
+
+  If it's usb-ehci, ich9-usb-ehci1 or ich9-usb-echi2, this will not show
+  up on the host side, but the device stil fails with the same error on
+  the guest side.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1579306/+subscriptions
