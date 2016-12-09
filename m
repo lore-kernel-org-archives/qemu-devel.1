@@ -1,19 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39405)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40478)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1cFLX9-0000c8-ET
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 08:48:25 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cFLdE-0003QR-1W
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 08:54:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1cFLX4-0005Z6-B5
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 08:48:16 -0500
-From: Alberto Garcia <berto@igalia.com>
-Date: Fri,  9 Dec 2016 15:47:04 +0200
-Message-Id: <e0e7bc0b085d6694f549eb10fecba6563edc0449.1481290956.git.berto@igalia.com>
-In-Reply-To: <cover.1481290956.git.berto@igalia.com>
-References: <cover.1481290956.git.berto@igalia.com>
-In-Reply-To: <cover.1481290956.git.berto@igalia.com>
-References: <cover.1481290956.git.berto@igalia.com>
-Subject: [Qemu-devel] [PATCH RFC 1/1] qcow2: Allow storing the qcow2 L2
- cache in disk
+	(envelope-from <mreitz@redhat.com>) id 1cFLdB-00070B-FC
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 08:54:36 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34952)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1cFLdB-0006ze-6P
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 08:54:33 -0500
+References: <1481077751-106192-1-git-send-email-arei.gonglei@huawei.com>
+	<09ca3210-e066-3937-1351-46b857a1dda7@redhat.com>
+	<33183CC9F5247A488A2544077AF19020DA156A93@DGGEMA505-MBX.china.huawei.com>
+	<20d0895e-9d22-8718-a1d8-618d5b7d75d0@redhat.com>
+	<9100954e-d7e6-8670-e614-0fa611d6f248@redhat.com>
+	<33183CC9F5247A488A2544077AF19020DA158099@DGGEMA505-MBX.china.huawei.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <5a0a4eab-5de3-493b-ff92-e17796a17058@redhat.com>
+Date: Fri, 9 Dec 2016 14:54:28 +0100
+MIME-Version: 1.0
+In-Reply-To: <33183CC9F5247A488A2544077AF19020DA158099@DGGEMA505-MBX.china.huawei.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="JkqaA8n5L1aIEHBTH8LhLoQqSLILUecQb"
+Subject: Re: [Qemu-devel] [PATCH for-2.9 v2] virtio-crypto: zeroize the key
+ material before free
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,193 +33,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>
+To: "Gonglei (Arei)" <arei.gonglei@huawei.com>, Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "stefanha@redhat.com" <stefanha@redhat.com>, "mst@redhat.com" <mst@redhat.com>
 
-In scenarios where we have a large qcow2 file stored in a slow storage
-backend, we can save memory by storing its L2 cache in a faster drive
-rather than keeping it in RAM.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--JkqaA8n5L1aIEHBTH8LhLoQqSLILUecQb
+From: Max Reitz <mreitz@redhat.com>
+To: "Gonglei (Arei)" <arei.gonglei@huawei.com>, Eric Blake
+ <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "stefanha@redhat.com" <stefanha@redhat.com>,
+ "mst@redhat.com" <mst@redhat.com>
+Message-ID: <5a0a4eab-5de3-493b-ff92-e17796a17058@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.9 v2] virtio-crypto: zeroize the key
+ material before free
+References: <1481077751-106192-1-git-send-email-arei.gonglei@huawei.com>
+ <09ca3210-e066-3937-1351-46b857a1dda7@redhat.com>
+ <33183CC9F5247A488A2544077AF19020DA156A93@DGGEMA505-MBX.china.huawei.com>
+ <20d0895e-9d22-8718-a1d8-618d5b7d75d0@redhat.com>
+ <9100954e-d7e6-8670-e614-0fa611d6f248@redhat.com>
+ <33183CC9F5247A488A2544077AF19020DA158099@DGGEMA505-MBX.china.huawei.com>
+In-Reply-To: <33183CC9F5247A488A2544077AF19020DA158099@DGGEMA505-MBX.china.huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Alberto Garcia <berto@igalia.com>
----
- block/qcow2-cache.c | 56 +++++++++++++++++++++++++++++++++++++++++++++--------
- block/qcow2.c       | 11 +++++++++--
- block/qcow2.h       |  3 ++-
- 3 files changed, 59 insertions(+), 11 deletions(-)
+On 09.12.2016 02:42, Gonglei (Arei) wrote:
+> Hi,
+>=20
+>>
+>> Subject: Re: [Qemu-devel] [PATCH for-2.9 v2] virtio-crypto: zeroize th=
+e key
+>> material before free
+>>
+>> On 08.12.2016 16:23, Eric Blake wrote:
+>>> On 12/07/2016 08:28 PM, Gonglei (Arei) wrote:
+>>>
+>>>>> As far as I'm aware, other projects usually have a special memset
+>>>>> variation for doing this. That is because compilers may choose to
+>>>>> "optimize" memset(p, ...) + free(p) to just the free(p). Having a
+>>>>
+>>>> Actually, I googled this, but I didn't find a definite answer. And
+>>>>
+>>>> The Linux kernel uses kzfree instead of memset + kfree
+>> (mm/slab_common.c).
+>>
+>> Well, I personally don't mind whether we use a custom zfree() or a
+>> custom memset_s() + free(). I only mind that this patch actually alway=
+s
+>> does what it is intended to do.
+>>
+> Yes, but why linux kernel to think about the compiler optimization for
+> memset for sensitive data?
 
-diff --git a/block/qcow2-cache.c b/block/qcow2-cache.c
-index 1d25147..8ba8ed9 100644
---- a/block/qcow2-cache.c
-+++ b/block/qcow2-cache.c
-@@ -23,6 +23,7 @@
-  */
- 
- #include "qemu/osdep.h"
-+#include "qemu/mmap-alloc.h"
- #include "block/block_int.h"
- #include "qemu-common.h"
- #include "qcow2.h"
-@@ -36,6 +37,7 @@ typedef struct Qcow2CachedTable {
- } Qcow2CachedTable;
- 
- struct Qcow2Cache {
-+    int                     fd;
-     Qcow2CachedTable       *entries;
-     struct Qcow2Cache      *depends;
-     int                     size;
-@@ -63,7 +65,7 @@ static inline int qcow2_cache_get_table_idx(BlockDriverState *bs,
- }
- 
- static void qcow2_cache_table_release(BlockDriverState *bs, Qcow2Cache *c,
--                                      int i, int num_tables)
-+                                      int i, int num_tables, bool flush)
- {
- /* Using MADV_DONTNEED to discard memory is a Linux-specific feature */
- #ifdef CONFIG_LINUX
-@@ -74,6 +76,10 @@ static void qcow2_cache_table_release(BlockDriverState *bs, Qcow2Cache *c,
-     size_t offset = QEMU_ALIGN_UP((uintptr_t) t, align) - (uintptr_t) t;
-     size_t length = QEMU_ALIGN_DOWN(mem_size - offset, align);
-     if (length > 0) {
-+        if (flush) {
-+            assert(c->fd > 0);
-+            msync((uint8_t *) t + offset, length, MS_SYNC);
-+        }
-         madvise((uint8_t *) t + offset, length, MADV_DONTNEED);
-     }
- #endif
-@@ -106,26 +112,50 @@ void qcow2_cache_clean_unused(BlockDriverState *bs, Qcow2Cache *c)
-         }
- 
-         if (to_clean > 0) {
--            qcow2_cache_table_release(bs, c, i - to_clean, to_clean);
-+            qcow2_cache_table_release(bs, c, i - to_clean, to_clean, false);
-         }
-     }
- 
-     c->cache_clean_lru_counter = c->lru_counter;
- }
- 
--Qcow2Cache *qcow2_cache_create(BlockDriverState *bs, int num_tables)
-+Qcow2Cache *qcow2_cache_create(BlockDriverState *bs, int num_tables,
-+                               const char *cache_file_path)
- {
-     BDRVQcow2State *s = bs->opaque;
-     Qcow2Cache *c;
-+    size_t total_size = (size_t) num_tables * s->cluster_size;
- 
-     c = g_new0(Qcow2Cache, 1);
-     c->size = num_tables;
-     c->entries = g_try_new0(Qcow2CachedTable, num_tables);
--    c->table_array = qemu_try_blockalign(bs->file->bs,
--                                         (size_t) num_tables * s->cluster_size);
-+    if (cache_file_path) {
-+        size_t align = MAX(bdrv_opt_mem_align(bs->file->bs), getpagesize());
-+        char *filename = g_strdup_printf("%s/qemu-qcow2-cache.XXXXXX",
-+                                         cache_file_path);
-+        c->fd = mkstemp(filename);
-+        if (c->fd > 0) {
-+            unlink(filename);
-+        }
-+        g_free(filename);
-+        if (c->fd == -1 || ftruncate(c->fd, total_size)) {
-+            goto out;
-+        }
-+        c->table_array = qemu_ram_mmap(c->fd, total_size, align, true);
-+    } else {
-+        c->table_array = qemu_try_blockalign(bs->file->bs, total_size);
-+    }
- 
-+out:
-     if (!c->entries || !c->table_array) {
--        qemu_vfree(c->table_array);
-+        if (cache_file_path) {
-+            qemu_ram_munmap(c->table_array, total_size);
-+            if (c->fd > 0) {
-+                close(c->fd);
-+            }
-+        } else {
-+            qemu_vfree(c->table_array);
-+        }
-         g_free(c->entries);
-         g_free(c);
-         c = NULL;
-@@ -142,7 +172,14 @@ int qcow2_cache_destroy(BlockDriverState *bs, Qcow2Cache *c)
-         assert(c->entries[i].ref == 0);
-     }
- 
--    qemu_vfree(c->table_array);
-+    if (c->fd) {
-+        BDRVQcow2State *s = bs->opaque;
-+        size_t total_size = (size_t) c->size * s->cluster_size;
-+        qemu_ram_munmap(c->table_array, total_size);
-+        close(c->fd);
-+    } else {
-+        qemu_vfree(c->table_array);
-+    }
-     g_free(c->entries);
-     g_free(c);
- 
-@@ -297,7 +334,7 @@ int qcow2_cache_empty(BlockDriverState *bs, Qcow2Cache *c)
-         c->entries[i].lru_counter = 0;
-     }
- 
--    qcow2_cache_table_release(bs, c, 0, c->size);
-+    qcow2_cache_table_release(bs, c, 0, c->size, false);
- 
-     c->lru_counter = 0;
- 
-@@ -399,6 +436,9 @@ void qcow2_cache_put(BlockDriverState *bs, Qcow2Cache *c, void **table)
- 
-     if (c->entries[i].ref == 0) {
-         c->entries[i].lru_counter = ++c->lru_counter;
-+        if (c->fd) {
-+            qcow2_cache_table_release(bs, c, i, 1, true);
-+        }
-     }
- 
-     assert(c->entries[i].ref >= 0);
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 96fb8a8..4d5d092 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -461,6 +461,11 @@ static QemuOptsList qcow2_runtime_opts = {
-             .type = QEMU_OPT_NUMBER,
-             .help = "Clean unused cache entries after this time (in seconds)",
-         },
-+        {
-+            .name = "l2-cache-path",
-+            .type = QEMU_OPT_STRING,
-+            .help = "Directory where to store the L2 cache",
-+        },
-         { /* end of list */ }
-     },
- };
-@@ -656,8 +661,10 @@ static int qcow2_update_options_prepare(BlockDriverState *bs,
-         }
-     }
- 
--    r->l2_table_cache = qcow2_cache_create(bs, l2_cache_size);
--    r->refcount_block_cache = qcow2_cache_create(bs, refcount_cache_size);
-+    const char *path = qemu_opt_get(opts, "l2-cache-path");
-+
-+    r->l2_table_cache = qcow2_cache_create(bs, l2_cache_size, path);
-+    r->refcount_block_cache = qcow2_cache_create(bs, refcount_cache_size, NULL);
-     if (r->l2_table_cache == NULL || r->refcount_block_cache == NULL) {
-         error_setg(errp, "Could not allocate metadata caches");
-         ret = -ENOMEM;
-diff --git a/block/qcow2.h b/block/qcow2.h
-index 1823414..494f1ed 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -569,7 +569,8 @@ void qcow2_free_snapshots(BlockDriverState *bs);
- int qcow2_read_snapshots(BlockDriverState *bs);
- 
- /* qcow2-cache.c functions */
--Qcow2Cache *qcow2_cache_create(BlockDriverState *bs, int num_tables);
-+Qcow2Cache *qcow2_cache_create(BlockDriverState *bs, int num_tables,
-+                               const char *cache_file_path);
- int qcow2_cache_destroy(BlockDriverState* bs, Qcow2Cache *c);
- 
- void qcow2_cache_entry_mark_dirty(BlockDriverState *bs, Qcow2Cache *c,
--- 
-2.10.2
+I'm afraid I don't quite (syntactically) understand this question. Do
+you mean to ask why the Linux kernel would have to think about this
+optimization? My answer to that would be because the optimization of
+memset() + free() is known, and they probably want to protect against
+the compiler optimizing it even with -ffreestanding and differently
+called functions -- you never know.
+
+Related example: gcc detects code that basically does a memset() and
+replaces it with a call to memset(). There were a couple of versions
+where it did that even with -ffreestanding or -fno-builtin, which is bad
+if you want to actually write a memset(). They fixed it by now (so that
+-ffreestanding and -fno-builtin will imply
+-fno-tree-loop-distribute-patterns, which will disable that optimization.=
+
+
+Now imagine the same case here: Maybe at some point gcc is able to
+detect that kfree() is basically free() and will then optimize the
+memset() before kfree() away. A couple of versions later, somebody will
+notice that -- but at that point, the damage has been done already and
+there are compiled versions out which leak sensitive data somewhere.
+
+I think this is why the Linux kernel decides to be proactive and use
+kzfree() from the start, and this is also why I'm proposing to not delay
+this issue in qemu until some compiler actually makes it a real issue.
+
+>>> If we're worried about cleaning things without allowing the compiler =
+a
+>>> chance to optimize, then writing our own qemu_zfree() wrapper may ind=
+eed
+>>> make sense.  But that won't cover the case in Daniel's earlier patch
+>>> (referenced elsewhere in this thread), as that was zeroizing stack
+>>> memory (before it went out of scope) rather than heap memory (before
+>>> free).  So you'd still need some sort of 'write this memory no matter=
+
+>>> what' primitive that would be directly usable on stack memory and
+>>> indirectly used as part of the qemu_zfree() wrapper.
+>>>
+> If we wrap a secure_memset(), then both stack memory and heap
+> memory can use it.
+>=20
+> Pls see:
+>=20
+> http://www.open-std.org/jtc1/sc22/wg14/www/docs/n1381.pdf
+>=20
+> But the secure_memset() is not as efficient as possible due to the natu=
+re of the volatile
+> type qualifier preventing the compiler from optimizing the code at all.=
+
+>=20
+> It will cause huge performance regression at hot path of data plane...
+
+I would suggest we implement an own secure_memset() or secure_bzero()
+which falls back on what we have:
+- memset_s(), if that is available;
+- explizit_bzero() if we have libbsd;
+- SecureZeroMemory() on Windows
+
+Or we have to write it ourselves:
+https://sourceware.org/ml/libc-alpha/2014-12/msg00506.html suggests that
+putting a full memory barrier after the memset() should be enough.
+
+>>> But I wouldn't worry about it for now, unless someone proves we actua=
+lly
+>>> have a compiler optimizing away the cleanups.
+>>
+>> It's true that we don't have to worry about it *now*, but the approach=
+
+>> of waiting until the compiler breaks it does not seem right to me.
+>>
+>> If at some point some compiler recognizes g_free() as being the same
+>> function as free() and thus optimizes memset() + g_free(), we simply
+>> won't notice because nobody will keep track of the generated assembly
+>> output all the time.
+>>
+>> There is a reason C11 introduced memset_s(), and it is this.
+>>
+> ...does it make sense if we introduce secure_memset() now ?=20
+>=20
+> Waiting for your feedback. Thanks!
+
+I would propose so; or better something like secure_bzero() or
+secure_memzero(), because we can then fall back on existing
+implementations like explizit_bzero() or SecureZeroMemory().
+
+We don't have to implement this immediately, but we should do it before
+the 2.9 release.
+
+Max
+
+
+--JkqaA8n5L1aIEHBTH8LhLoQqSLILUecQb
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlhKt5QSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9A8+IH/3zYLEyKIx20l0fHzwZnCHNDV70DRTdB
+vzA9C1pmcTxiiutcfzxJ4zT3HWHCGz5eRDsRDhOwoE2VC7MwQ7CfHgU9VLSbXfbs
+x3cDoP6T+aDr/HzuhonqxXZBg/llWwmsUjVKWszDZB3HG7pYFRs8qNpxDBcAhRyC
+xLLjMGsp+KPNoxOAJqQVASOfoHuh5qo4BHRVZsYSBtzqLxKVPjSsDhMqKcR4QQ9k
+rezKo29dbPg09j2aCaKGbIjfaepnXb8LnF+33DL6XGc5NzAxK33/7+69jnihHPUq
+RUdVmqb2tRGpA9fsvjCXou4j+Fei9stGuyoEFdB/0s30OKOGRX/b16Y=
+=m/lF
+-----END PGP SIGNATURE-----
+
+--JkqaA8n5L1aIEHBTH8LhLoQqSLILUecQb--
