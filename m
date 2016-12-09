@@ -1,18 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46422)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48680)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cFPZR-0003z2-Vy
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 13:07:02 -0500
+	(envelope-from <jcmvbkbc@gmail.com>) id 1cFPg6-0000ig-Sx
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 13:13:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cFPZN-00064z-B3
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 13:06:57 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44926)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cFPZN-00064s-3h
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 13:06:53 -0500
-From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Fri,  9 Dec 2016 16:06:17 -0200
-Message-Id: <1481306777-5441-1-git-send-email-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.9] qom: Make all interface types abstract
+	(envelope-from <jcmvbkbc@gmail.com>) id 1cFPg3-00004s-O8
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 13:13:50 -0500
+Received: from mail-io0-f194.google.com ([209.85.223.194]:35019)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1cFPg3-0008S3-J5
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 13:13:47 -0500
+Received: by mail-io0-f194.google.com with SMTP id f73so8449840ioe.2
+	for <qemu-devel@nongnu.org>; Fri, 09 Dec 2016 10:13:26 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <1481285870-3396-20-git-send-email-thuth@redhat.com>
+References: <1481285870-3396-1-git-send-email-thuth@redhat.com>
+	<1481285870-3396-20-git-send-email-thuth@redhat.com>
+From: Max Filippov <jcmvbkbc@gmail.com>
+Date: Fri, 9 Dec 2016 10:12:24 -0800
+Message-ID: <CAMo8BfKjZwq+orMS3dcq7uKgZSuJFr1vnTMMH7dSeFgnnxX-LQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH 19/20] xtensa: Move CPU files to target/
+ folder
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,137 +29,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>
-Cc: Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Lin Ma <lma@suse.com>, qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Michael Walle <michael@walle.cc>, Laurent Vivier <laurent@vivier.eu>, Yongbok Kim <yongbok.kim@imgtec.com>, Anthony Green <green@moxielogic.com>, Jia Liu <proljc@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Eduardo Habkost <ehabkost@redhat.com>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, James Hogan <james.hogan@imgtec.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Marcelo Tosatti <mtosatti@redhat.com>
 
-"qom-list-types abstract=false" currently returns all interface
-types, as if they were not abstract. Fix this by making sure all
-interface types are abstract.
+On Fri, Dec 9, 2016 at 4:17 AM, Thomas Huth <thuth@redhat.com> wrote:
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  MAINTAINERS                                               | 2 +-
+>  {target-xtensa => target/xtensa}/Makefile.objs            | 0
+>  {target-xtensa => target/xtensa}/core-dc232b.c            | 0
+>  {target-xtensa => target/xtensa}/core-dc232b/core-isa.h   | 0
+>  {target-xtensa => target/xtensa}/core-dc232b/gdb-config.c | 0
+>  {target-xtensa => target/xtensa}/core-dc233c.c            | 0
+>  {target-xtensa => target/xtensa}/core-dc233c/core-isa.h   | 0
+>  {target-xtensa => target/xtensa}/core-dc233c/gdb-config.c | 0
+>  {target-xtensa => target/xtensa}/core-fsf.c               | 0
+>  {target-xtensa => target/xtensa}/core-fsf/core-isa.h      | 0
+>  {target-xtensa => target/xtensa}/cpu-qom.h                | 0
+>  {target-xtensa => target/xtensa}/cpu.c                    | 0
+>  {target-xtensa => target/xtensa}/cpu.h                    | 0
+>  {target-xtensa => target/xtensa}/gdbstub.c                | 0
+>  {target-xtensa => target/xtensa}/helper.c                 | 0
+>  {target-xtensa => target/xtensa}/helper.h                 | 0
+>  {target-xtensa => target/xtensa}/import_core.sh           | 0
+>  {target-xtensa => target/xtensa}/monitor.c                | 0
+>  {target-xtensa => target/xtensa}/op_helper.c              | 0
+>  {target-xtensa => target/xtensa}/overlay_tool.h           | 0
+>  {target-xtensa => target/xtensa}/translate.c              | 0
+>  {target-xtensa => target/xtensa}/xtensa-semi.c            | 0
+>  tests/tcg/xtensa/Makefile                                 | 2 +-
+>  23 files changed, 2 insertions(+), 2 deletions(-)
 
-All interface types have instance_size == 0, so we can use
-it to set abstract=true on
+Acked-by: Max Filippov <jcmvbkbc@gmail.com>
 
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
- qom/object.c                   |  4 +++
- tests/device-introspect-test.c | 61 +++++++++++++++++++++++++++++++++++++++---
- 2 files changed, 62 insertions(+), 3 deletions(-)
-
-diff --git a/qom/object.c b/qom/object.c
-index 7a05e35..3870c1b 100644
---- a/qom/object.c
-+++ b/qom/object.c
-@@ -272,6 +272,10 @@ static void type_initialize(TypeImpl *ti)
- 
-     ti->class_size = type_class_get_size(ti);
-     ti->instance_size = type_object_get_size(ti);
-+    /* Any type with zero instance_size is implicitly abstract.
-+     * This means interface types are all abstract.
-+     */
-+    ti->abstract |= ti->instance_size == 0;
- 
-     ti->class = g_malloc0(ti->class_size);
- 
-diff --git a/tests/device-introspect-test.c b/tests/device-introspect-test.c
-index 37debc1..d1b0ea6 100644
---- a/tests/device-introspect-test.c
-+++ b/tests/device-introspect-test.c
-@@ -20,18 +20,24 @@
- #include "qemu/osdep.h"
- #include "qemu-common.h"
- #include "qapi/qmp/qstring.h"
-+#include "qapi/qmp/qbool.h"
-+#include "qapi/qmp/qdict.h"
- #include "libqtest.h"
- 
- const char common_args[] = "-nodefaults -machine none";
- 
--static QList *device_type_list(bool abstract)
-+static QList *qom_list_types(const char *implements, bool abstract)
- {
-     QDict *resp;
-     QList *ret;
-+    QDict *args = qdict_new();
- 
-+    qdict_put(args, "abstract", qbool_from_bool(abstract));
-+    if (implements) {
-+        qdict_put(args, "implements", qstring_from_str(implements));
-+    }
-     resp = qmp("{'execute': 'qom-list-types',"
--               " 'arguments': {'implements': 'device', 'abstract': %i}}",
--               abstract);
-+               " 'arguments': %p }", args);
-     g_assert(qdict_haskey(resp, "return"));
-     ret = qdict_get_qlist(resp, "return");
-     QINCREF(ret);
-@@ -39,6 +45,11 @@ static QList *device_type_list(bool abstract)
-     return ret;
- }
- 
-+static QList *device_type_list(bool abstract)
-+{
-+    return qom_list_types("device", abstract);
-+}
-+
- static void test_one_device(const char *type)
- {
-     QDict *resp;
-@@ -110,6 +121,48 @@ static void test_device_intro_concrete(void)
-     qtest_end();
- }
- 
-+static void test_abstract_interfaces(void)
-+{
-+    QList *all_types;
-+    QList *obj_types;
-+    QListEntry *ae;
-+
-+    qtest_start(common_args);
-+    /* qom-list-types implements=interface would return any type
-+     * that implements _any_ interface (not just interface types),
-+     * so use a trick to find the interface type names:
-+     * - list all object types
-+     * - list all types, and look for items that are not
-+     *   on the first list
-+     */
-+    all_types = qom_list_types(NULL, false);
-+    obj_types = qom_list_types("object", false);
-+
-+    QLIST_FOREACH_ENTRY(all_types, ae) {
-+        QDict *at = qobject_to_qdict(qlist_entry_obj(ae));
-+        const char *aname = qdict_get_str(at, "name");
-+        QListEntry *oe;
-+        const char *found = NULL;
-+
-+        QLIST_FOREACH_ENTRY(obj_types, oe) {
-+            QDict *ot = qobject_to_qdict(qlist_entry_obj(oe));
-+            const char *oname = qdict_get_str(ot, "name");
-+            if (!strcmp(aname, oname)) {
-+                found = oname;
-+                break;
-+            }
-+        }
-+
-+        /* Using g_assert_cmpstr() will give more useful failure
-+         * messages than g_assert(found) */
-+        g_assert_cmpstr(aname, ==, found);
-+    }
-+
-+    QDECREF(all_types);
-+    QDECREF(obj_types);
-+    qtest_end();
-+}
-+
- int main(int argc, char **argv)
- {
-     g_test_init(&argc, &argv, NULL);
-@@ -119,5 +172,7 @@ int main(int argc, char **argv)
-     qtest_add_func("device/introspect/abstract", test_device_intro_abstract);
-     qtest_add_func("device/introspect/concrete", test_device_intro_concrete);
- 
-+    qtest_add_func("qom/introspect/abstract-interfaces", test_abstract_interfaces);
-+
-     return g_test_run();
- }
 -- 
-2.7.4
+Thanks.
+-- Max
