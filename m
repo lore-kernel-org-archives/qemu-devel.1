@@ -1,20 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47744)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47712)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cFK85-0007GE-UU
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 07:18:23 -0500
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cFK82-00073D-GM
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 07:18:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cFK82-00039P-Kt
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 07:18:21 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49014)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1cFK82-00038m-DE
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cFK7x-00036o-Sd
 	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 07:18:18 -0500
-From: Thomas Huth <thuth@redhat.com>
-Date: Fri,  9 Dec 2016 13:17:33 +0100
-Message-Id: <1481285870-3396-4-git-send-email-thuth@redhat.com>
-In-Reply-To: <1481285870-3396-1-git-send-email-thuth@redhat.com>
-References: <1481285870-3396-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH 03/20] m68k: Move CPU files to target/ folder
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60765)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
+	id 1cFK7x-000362-K0
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 07:18:13 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
+	uB9CEFM2086125
+	for <qemu-devel@nongnu.org>; Fri, 9 Dec 2016 07:18:12 -0500
+Received: from e28smtp09.in.ibm.com (e28smtp09.in.ibm.com [125.16.236.9])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 277rtmbc6j-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 09 Dec 2016 07:18:12 -0500
+Received: from localhost
+	by e28smtp09.in.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
+	Fri, 9 Dec 2016 17:48:09 +0530
+From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+Date: Fri,  9 Dec 2016 17:47:24 +0530
+In-Reply-To: <1481285845-16415-1-git-send-email-nikunj@linux.vnet.ibm.com>
+References: <1481285845-16415-1-git-send-email-nikunj@linux.vnet.ibm.com>
+Message-Id: <1481285845-16415-6-git-send-email-nikunj@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v2 5/6] target-ppc: implement xxextractuw
+ instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,106 +38,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>
-Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Michael Walle <michael@walle.cc>, Laurent Vivier <laurent@vivier.eu>, Yongbok Kim <yongbok.kim@imgtec.com>, Anthony Green <green@moxielogic.com>, Jia Liu <proljc@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Eduardo Habkost <ehabkost@redhat.com>, Max Filippov <jcmvbkbc@gmail.com>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, James Hogan <james.hogan@imgtec.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Marcelo Tosatti <mtosatti@redhat.com>
+To: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net
+Cc: qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com, nikunj@linux.vnet.ibm.com
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
+xxextractuw: VSX Vector Extract Unsigned Word
+
+Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 ---
- MAINTAINERS                                | 2 +-
- include/hw/m68k/mcf.h                      | 2 +-
- {target-m68k => target/m68k}/Makefile.objs | 0
- {target-m68k => target/m68k}/cpu-qom.h     | 0
- {target-m68k => target/m68k}/cpu.c         | 0
- {target-m68k => target/m68k}/cpu.h         | 0
- {target-m68k => target/m68k}/gdbstub.c     | 0
- {target-m68k => target/m68k}/helper.c      | 0
- {target-m68k => target/m68k}/helper.h      | 0
- {target-m68k => target/m68k}/m68k-semi.c   | 0
- {target-m68k => target/m68k}/op_helper.c   | 0
- {target-m68k => target/m68k}/qregs.def     | 0
- {target-m68k => target/m68k}/translate.c   | 0
- 13 files changed, 2 insertions(+), 2 deletions(-)
- rename {target-m68k => target/m68k}/Makefile.objs (100%)
- rename {target-m68k => target/m68k}/cpu-qom.h (100%)
- rename {target-m68k => target/m68k}/cpu.c (100%)
- rename {target-m68k => target/m68k}/cpu.h (100%)
- rename {target-m68k => target/m68k}/gdbstub.c (100%)
- rename {target-m68k => target/m68k}/helper.c (100%)
- rename {target-m68k => target/m68k}/helper.h (100%)
- rename {target-m68k => target/m68k}/m68k-semi.c (100%)
- rename {target-m68k => target/m68k}/op_helper.c (100%)
- rename {target-m68k => target/m68k}/qregs.def (100%)
- rename {target-m68k => target/m68k}/translate.c (100%)
+ target-ppc/helper.h                 |  1 +
+ target-ppc/int_helper.c             | 21 +++++++++++++++++++++
+ target-ppc/translate/vsx-impl.inc.c | 27 +++++++++++++++++++++++++++
+ target-ppc/translate/vsx-ops.inc.c  |  5 +++++
+ 4 files changed, 54 insertions(+)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 4a60579..ce1ee35 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -147,7 +147,7 @@ F: tests/tcg/lm32/
- M68K
- M: Laurent Vivier <laurent@vivier.eu>
- S: Maintained
--F: target-m68k/
-+F: target/m68k/
- F: disas/m68k.c
+diff --git a/target-ppc/helper.h b/target-ppc/helper.h
+index 4707db4..8b30420 100644
+--- a/target-ppc/helper.h
++++ b/target-ppc/helper.h
+@@ -540,6 +540,7 @@ DEF_HELPER_2(xvrspip, void, env, i32)
+ DEF_HELPER_2(xvrspiz, void, env, i32)
+ DEF_HELPER_2(xxperm, void, env, i32)
+ DEF_HELPER_2(xxpermr, void, env, i32)
++DEF_HELPER_4(xxextractuw, void, env, tl, tl, i32)
  
- MicroBlaze
-diff --git a/include/hw/m68k/mcf.h b/include/hw/m68k/mcf.h
-index 0f0d228..ef8963d 100644
---- a/include/hw/m68k/mcf.h
-+++ b/include/hw/m68k/mcf.h
-@@ -2,7 +2,7 @@
- #define HW_MCF_H
- /* Motorola ColdFire device prototypes.  */
+ DEF_HELPER_2(efscfsi, i32, env, i32)
+ DEF_HELPER_2(efscfui, i32, env, i32)
+diff --git a/target-ppc/int_helper.c b/target-ppc/int_helper.c
+index 7989b1f..e3f66ac 100644
+--- a/target-ppc/int_helper.c
++++ b/target-ppc/int_helper.c
+@@ -2033,6 +2033,27 @@ VEXTRACT(uw, u32)
+ VEXTRACT(d, u64)
+ #undef VEXTRACT
  
--#include "target-m68k/cpu-qom.h"
-+#include "cpu-qom.h"
++void helper_xxextractuw(CPUPPCState *env, target_ulong xtn,
++                        target_ulong xbn, uint32_t index)
++{
++    ppc_vsr_t xt, xb;
++    size_t es = sizeof(uint32_t);
++    uint32_t ext_index;
++
++    getVSR(xbn, &xb, env);
++    memset(&xt, 0, sizeof(xt));
++
++#if defined(HOST_WORDS_BIGENDIAN)
++    ext_index = index;
++    memcpy(&xt.u8[8 - es], &xb.u8[ext_index], es);
++#else
++    ext_index = (16 - index) - es;
++    memcpy(&xt.u8[8], &xb.u8[ext_index], es);
++#endif
++
++    putVSR(xtn, &xt, env);
++}
++
+ #define VEXT_SIGNED(name, element, mask, cast, recast)              \
+ void helper_##name(ppc_avr_t *r, ppc_avr_t *b)                      \
+ {                                                                   \
+diff --git a/target-ppc/translate/vsx-impl.inc.c b/target-ppc/translate/vsx-impl.inc.c
+index 2a17c35..1c40a35 100644
+--- a/target-ppc/translate/vsx-impl.inc.c
++++ b/target-ppc/translate/vsx-impl.inc.c
+@@ -1180,6 +1180,33 @@ static void gen_xxsldwi(DisasContext *ctx)
+     tcg_temp_free_i64(xtl);
+ }
  
- struct MemoryRegion;
++#define VSX_EXTRACT(name)                                       \
++static void gen_##name(DisasContext *ctx)                       \
++{                                                               \
++    TCGv xt, xb;                                                \
++    TCGv_i32 t0 = tcg_temp_new_i32();                           \
++    uint8_t uimm = UIMM4(ctx->opcode);                          \
++                                                                \
++    if (unlikely(!ctx->vsx_enabled)) {                          \
++        gen_exception(ctx, POWERPC_EXCP_VSXU);                  \
++        return;                                                 \
++    }                                                           \
++    if (uimm > 12) {                                            \
++        tcg_gen_movi_i64(cpu_vsrh(xT(ctx->opcode)), 0);         \
++        tcg_gen_movi_i64(cpu_vsrl(xT(ctx->opcode)), 0);         \
++        return;                                                 \
++    }                                                           \
++    xt = tcg_const_tl(xT(ctx->opcode));                         \
++    xb = tcg_const_tl(xB(ctx->opcode));                         \
++    tcg_gen_movi_i32(t0, uimm);                                 \
++    gen_helper_##name(cpu_env, xt, xb, t0);                     \
++    tcg_temp_free(xb);                                          \
++    tcg_temp_free(xt);                                          \
++    tcg_temp_free_i32(t0);                                      \
++}
++
++VSX_EXTRACT(xxextractuw)
++
+ #undef GEN_XX2FORM
+ #undef GEN_XX3FORM
+ #undef GEN_XX2IFORM
+diff --git a/target-ppc/translate/vsx-ops.inc.c b/target-ppc/translate/vsx-ops.inc.c
+index 46b95e3..473d925 100644
+--- a/target-ppc/translate/vsx-ops.inc.c
++++ b/target-ppc/translate/vsx-ops.inc.c
+@@ -49,6 +49,10 @@ GEN_HANDLER2_E(name, #name, 0x3C, opc2 | 1, opc3, 0, PPC_NONE, fl2)
+ GEN_HANDLER2_E(name, #name, 0x3C, opc2 | 0, opc3, 0, PPC_NONE, fl2), \
+ GEN_HANDLER2_E(name, #name, 0x3C, opc2 | 1, opc3, 0, PPC_NONE, fl2)
  
-diff --git a/target-m68k/Makefile.objs b/target/m68k/Makefile.objs
-similarity index 100%
-rename from target-m68k/Makefile.objs
-rename to target/m68k/Makefile.objs
-diff --git a/target-m68k/cpu-qom.h b/target/m68k/cpu-qom.h
-similarity index 100%
-rename from target-m68k/cpu-qom.h
-rename to target/m68k/cpu-qom.h
-diff --git a/target-m68k/cpu.c b/target/m68k/cpu.c
-similarity index 100%
-rename from target-m68k/cpu.c
-rename to target/m68k/cpu.c
-diff --git a/target-m68k/cpu.h b/target/m68k/cpu.h
-similarity index 100%
-rename from target-m68k/cpu.h
-rename to target/m68k/cpu.h
-diff --git a/target-m68k/gdbstub.c b/target/m68k/gdbstub.c
-similarity index 100%
-rename from target-m68k/gdbstub.c
-rename to target/m68k/gdbstub.c
-diff --git a/target-m68k/helper.c b/target/m68k/helper.c
-similarity index 100%
-rename from target-m68k/helper.c
-rename to target/m68k/helper.c
-diff --git a/target-m68k/helper.h b/target/m68k/helper.h
-similarity index 100%
-rename from target-m68k/helper.h
-rename to target/m68k/helper.h
-diff --git a/target-m68k/m68k-semi.c b/target/m68k/m68k-semi.c
-similarity index 100%
-rename from target-m68k/m68k-semi.c
-rename to target/m68k/m68k-semi.c
-diff --git a/target-m68k/op_helper.c b/target/m68k/op_helper.c
-similarity index 100%
-rename from target-m68k/op_helper.c
-rename to target/m68k/op_helper.c
-diff --git a/target-m68k/qregs.def b/target/m68k/qregs.def
-similarity index 100%
-rename from target-m68k/qregs.def
-rename to target/m68k/qregs.def
-diff --git a/target-m68k/translate.c b/target/m68k/translate.c
-similarity index 100%
-rename from target-m68k/translate.c
-rename to target/m68k/translate.c
++#define GEN_XX2FORM_EXT(name, opc2, opc3, fl2)                          \
++GEN_HANDLER2_E(name, #name, 0x3C, opc2 | 0, opc3, 0x00100000, PPC_NONE, fl2), \
++GEN_HANDLER2_E(name, #name, 0x3C, opc2 | 1, opc3, 0x00100000, PPC_NONE, fl2)
++
+ #define GEN_XX2FORM_EO(name, opc2, opc3, opc4, fl2)                          \
+ GEN_HANDLER2_E_2(name, #name, 0x3C, opc2 | 0, opc3, opc4, 0, PPC_NONE, fl2), \
+ GEN_HANDLER2_E_2(name, #name, 0x3C, opc2 | 1, opc3, opc4, 0, PPC_NONE, fl2)
+@@ -280,6 +284,7 @@ GEN_XX3FORM(xxpermr, 0x08, 0x07, PPC2_ISA300),
+ GEN_XX2FORM(xxspltw, 0x08, 0x0A, PPC2_VSX),
+ GEN_XX1FORM(xxspltib, 0x08, 0x0B, PPC2_ISA300),
+ GEN_XX3FORM_DM(xxsldwi, 0x08, 0x00),
++GEN_XX2FORM_EXT(xxextractuw, 0x0A, 0x0A, PPC2_ISA300),
+ 
+ #define GEN_XXSEL_ROW(opc3) \
+ GEN_HANDLER2_E(xxsel, "xxsel", 0x3C, 0x18, opc3, 0, PPC_NONE, PPC2_VSX), \
 -- 
-1.8.3.1
+2.7.4
