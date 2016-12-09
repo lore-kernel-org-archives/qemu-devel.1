@@ -1,35 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46200)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46422)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cFPYT-00011Q-7h
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 13:06:01 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1cFPZR-0003z2-Vy
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 13:07:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cFPYP-0005sn-Jl
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 13:05:57 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34675)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1cFPYP-0005sA-BT
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 13:05:53 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	uB9I4dwd020337
-	for <qemu-devel@nongnu.org>; Fri, 9 Dec 2016 13:05:52 -0500
-Received: from e19.ny.us.ibm.com (e19.ny.us.ibm.com [129.33.205.209])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 277ymj6bkk-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 09 Dec 2016 13:05:51 -0500
-Received: from localhost
-	by e19.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Fri, 9 Dec 2016 13:05:50 -0500
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Fri,  9 Dec 2016 12:04:41 -0600
-In-Reply-To: <1481306681-5760-1-git-send-email-mdroth@linux.vnet.ibm.com>
-References: <1481306681-5760-1-git-send-email-mdroth@linux.vnet.ibm.com>
-Message-Id: <1481306681-5760-3-git-send-email-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v3 2/2] monitor: fix object_del for
- command-line-created objects
+	(envelope-from <ehabkost@redhat.com>) id 1cFPZN-00064z-B3
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 13:06:57 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44926)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cFPZN-00064s-3h
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 13:06:53 -0500
+From: Eduardo Habkost <ehabkost@redhat.com>
+Date: Fri,  9 Dec 2016 16:06:17 -0200
+Message-Id: <1481306777-5441-1-git-send-email-ehabkost@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.9] qom: Make all interface types abstract
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,93 +21,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: armbru@redhat.com, bharata.rao@gmail.com, dgilbert@redhat.com, david@gibson.dropbear.id.au, Eric Blake <eblake@redhat.com>, Daniel Berrange <berrange@redhat.com>, qemu-stable@nongnu.org
+To: =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>
+Cc: Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Lin Ma <lma@suse.com>, qemu-devel@nongnu.org
 
-Currently objects specified on the command-line are only partially
-cleaned up when 'object_del' is issued in either HMP or QMP: the
-object itself is fully finalized, but the QemuOpts are not removed.
-This results in the following behavior:
+"qom-list-types abstract=false" currently returns all interface
+types, as if they were not abstract. Fix this by making sure all
+interface types are abstract.
 
-  x86_64-softmmu/qemu-system-x86_64 -monitor stdio \
-    -object memory-backend-ram,id=ram1,size=256M
+All interface types have instance_size == 0, so we can use
+it to set abstract=true on
 
-  QEMU 2.7.91 monitor - type 'help' for more information
-  (qemu) object_del ram1
-  (qemu) object_del ram1
-  object 'ram1' not found
-  (qemu) object_add memory-backend-ram,id=ram1,size=256M
-  Duplicate ID 'ram1' for object
-  Try "help object_add" for more information
-
-which can be an issue for use-cases like memory hotplug.
-
-This happens on the HMP side because hmp_object_add() attempts to
-create a temporary QemuOpts entry with ID 'ram1', which ends up
-conflicting with the command-line-created entry, since it was never
-cleaned up during the previous hmp_object_del() call.
-
-We address this by adding a check in user_creatable_del(), which
-is called by both qmp_object_del() and hmp_object_del() to handle
-the actual object cleanup, to determine whether an option group entry
-matching the object's ID is present and removing it if it is.
-
-Note that qmp_object_add() never attempts to create a temporary
-QemuOpts entry, so it does not encounter the duplicate ID error,
-which is why this isn't generally visible in libvirt.
-
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>
-Cc: Daniel Berrange <berrange@redhat.com>
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- qom/object_interfaces.c    | 7 +++++++
- tests/check-qom-proplist.c | 4 ++--
- 2 files changed, 9 insertions(+), 2 deletions(-)
+ qom/object.c                   |  4 +++
+ tests/device-introspect-test.c | 61 +++++++++++++++++++++++++++++++++++++++---
+ 2 files changed, 62 insertions(+), 3 deletions(-)
 
-diff --git a/qom/object_interfaces.c b/qom/object_interfaces.c
-index ded4d84..b462a74 100644
---- a/qom/object_interfaces.c
-+++ b/qom/object_interfaces.c
-@@ -5,6 +5,7 @@
- #include "qapi-visit.h"
- #include "qapi/qobject-output-visitor.h"
- #include "qapi/opts-visitor.h"
-+#include "qemu/config-file.h"
+diff --git a/qom/object.c b/qom/object.c
+index 7a05e35..3870c1b 100644
+--- a/qom/object.c
++++ b/qom/object.c
+@@ -272,6 +272,10 @@ static void type_initialize(TypeImpl *ti)
  
- void user_creatable_complete(Object *obj, Error **errp)
- {
-@@ -209,6 +210,12 @@ void user_creatable_del(const char *id, Error **errp)
-         error_setg(errp, "object '%s' is in use, can not be deleted", id);
-         return;
-     }
-+
-+    /* if object was defined on the command-line, remove its corresponding
-+     * option group entry
+     ti->class_size = type_class_get_size(ti);
+     ti->instance_size = type_object_get_size(ti);
++    /* Any type with zero instance_size is implicitly abstract.
++     * This means interface types are all abstract.
 +     */
-+    qemu_opts_del(qemu_opts_find(qemu_find_opts_err("object", NULL), id));
++    ti->abstract |= ti->instance_size == 0;
+ 
+     ti->class = g_malloc0(ti->class_size);
+ 
+diff --git a/tests/device-introspect-test.c b/tests/device-introspect-test.c
+index 37debc1..d1b0ea6 100644
+--- a/tests/device-introspect-test.c
++++ b/tests/device-introspect-test.c
+@@ -20,18 +20,24 @@
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
+ #include "qapi/qmp/qstring.h"
++#include "qapi/qmp/qbool.h"
++#include "qapi/qmp/qdict.h"
+ #include "libqtest.h"
+ 
+ const char common_args[] = "-nodefaults -machine none";
+ 
+-static QList *device_type_list(bool abstract)
++static QList *qom_list_types(const char *implements, bool abstract)
+ {
+     QDict *resp;
+     QList *ret;
++    QDict *args = qdict_new();
+ 
++    qdict_put(args, "abstract", qbool_from_bool(abstract));
++    if (implements) {
++        qdict_put(args, "implements", qstring_from_str(implements));
++    }
+     resp = qmp("{'execute': 'qom-list-types',"
+-               " 'arguments': {'implements': 'device', 'abstract': %i}}",
+-               abstract);
++               " 'arguments': %p }", args);
+     g_assert(qdict_haskey(resp, "return"));
+     ret = qdict_get_qlist(resp, "return");
+     QINCREF(ret);
+@@ -39,6 +45,11 @@ static QList *device_type_list(bool abstract)
+     return ret;
+ }
+ 
++static QList *device_type_list(bool abstract)
++{
++    return qom_list_types("device", abstract);
++}
 +
-     object_unparent(obj);
+ static void test_one_device(const char *type)
+ {
+     QDict *resp;
+@@ -110,6 +121,48 @@ static void test_device_intro_concrete(void)
+     qtest_end();
  }
  
-diff --git a/tests/check-qom-proplist.c b/tests/check-qom-proplist.c
-index e3f56ca..c5d4b60 100644
---- a/tests/check-qom-proplist.c
-+++ b/tests/check-qom-proplist.c
-@@ -437,9 +437,9 @@ static void test_dummy_createcmdl(void)
-      * check for this in user_creatable_del() and remove the QemuOpts if
-      * it is present.
-      *
--     * FIXME: add an assert to verify that the QemuOpts is cleaned up
--     * once the corresponding cleanup code is added.
-+     * The below check ensures this works as expected.
-      */
-+    g_assert(qemu_opts_find(&qemu_object_opts, "dev0") == NULL);
- }
++static void test_abstract_interfaces(void)
++{
++    QList *all_types;
++    QList *obj_types;
++    QListEntry *ae;
++
++    qtest_start(common_args);
++    /* qom-list-types implements=interface would return any type
++     * that implements _any_ interface (not just interface types),
++     * so use a trick to find the interface type names:
++     * - list all object types
++     * - list all types, and look for items that are not
++     *   on the first list
++     */
++    all_types = qom_list_types(NULL, false);
++    obj_types = qom_list_types("object", false);
++
++    QLIST_FOREACH_ENTRY(all_types, ae) {
++        QDict *at = qobject_to_qdict(qlist_entry_obj(ae));
++        const char *aname = qdict_get_str(at, "name");
++        QListEntry *oe;
++        const char *found = NULL;
++
++        QLIST_FOREACH_ENTRY(obj_types, oe) {
++            QDict *ot = qobject_to_qdict(qlist_entry_obj(oe));
++            const char *oname = qdict_get_str(ot, "name");
++            if (!strcmp(aname, oname)) {
++                found = oname;
++                break;
++            }
++        }
++
++        /* Using g_assert_cmpstr() will give more useful failure
++         * messages than g_assert(found) */
++        g_assert_cmpstr(aname, ==, found);
++    }
++
++    QDECREF(all_types);
++    QDECREF(obj_types);
++    qtest_end();
++}
++
+ int main(int argc, char **argv)
+ {
+     g_test_init(&argc, &argv, NULL);
+@@ -119,5 +172,7 @@ int main(int argc, char **argv)
+     qtest_add_func("device/introspect/abstract", test_device_intro_abstract);
+     qtest_add_func("device/introspect/concrete", test_device_intro_concrete);
  
- static void test_dummy_badenum(void)
++    qtest_add_func("qom/introspect/abstract-interfaces", test_abstract_interfaces);
++
+     return g_test_run();
+ }
 -- 
-1.9.1
+2.7.4
