@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49848)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49845)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mtosatti@redhat.com>) id 1cFlP2-0000zS-Cr
+	(envelope-from <mtosatti@redhat.com>) id 1cFlP2-0000zQ-CJ
 	for qemu-devel@nongnu.org; Sat, 10 Dec 2016 12:25:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mtosatti@redhat.com>) id 1cFlOz-00038o-H2
+	(envelope-from <mtosatti@redhat.com>) id 1cFlOz-00038t-HG
 	for qemu-devel@nongnu.org; Sat, 10 Dec 2016 12:25:40 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46032)
+Received: from mx1.redhat.com ([209.132.183.28]:37388)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mtosatti@redhat.com>) id 1cFlOz-00038N-9a
+	(Exim 4.71) (envelope-from <mtosatti@redhat.com>) id 1cFlOz-00038W-9W
 	for qemu-devel@nongnu.org; Sat, 10 Dec 2016 12:25:37 -0500
-Message-Id: <20161210172324.402794293@redhat.com>
-Date: Sat, 10 Dec 2016 15:21:49 -0200
+Message-Id: <20161210172324.482367805@redhat.com>
+Date: Sat, 10 Dec 2016 15:21:50 -0200
 From: Marcelo Tosatti <mtosatti@redhat.com>
 References: <20161210172148.361793326@redhat.com>
-Content-Disposition: inline; filename=sync-linux-headers.patch
-Subject: [Qemu-devel] [qemu patch V4 1/2] kvm: sync linux headers
+Content-Disposition: inline; filename=kvmclock-advance-clock.patch
+Subject: [Qemu-devel] [qemu patch V4 2/2] kvmclock: reduce kvmclock
+ difference on migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,146 +27,266 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: kvm@vger.kernel.org
 Cc: qemu-devel@nongnu.org, Dr David Alan Gilbert <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, Radim Krcmar <rkrcmar@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>
 
-Import KVM_CLOCK_TSC_STABLE.
+Check for KVM_CAP_ADJUST_CLOCK capability KVM_CLOCK_TSC_STABLE, which
+indicates that KVM_GET_CLOCK returns a value as seen by the guest at
+that moment.
+
+For new machine types, use this value rather than reading
+from guest memory.
+
+This reduces kvmclock difference on migration from 5s to 0.1s
+(when max_downtime == 5s).
+
+Note: pre_save contradicts the following comment
+        /*
+         * If the VM is stopped, declare the clock state valid to
+         * avoid re-reading it on next vmsave (which would return
+         * a different value). Will be reset when the VM is continued.
+         */
+But the comment is bogus: vm_state_change is never called twice in a row
+with running=0 or running=1.
 
 Signed-off-by: Marcelo Tosatti <mtosatti@redhat.com>
 
-diff --git a/include/standard-headers/linux/input.h b/include/standard-headers/linux/input.h
-index 7361a16..b472b85 100644
---- a/include/standard-headers/linux/input.h
-+++ b/include/standard-headers/linux/input.h
-@@ -245,6 +245,7 @@ struct input_mask {
- #define BUS_SPI			0x1C
- #define BUS_RMI			0x1D
- #define BUS_CEC			0x1E
-+#define BUS_INTEL_ISHTP		0x1F
+---
+ hw/i386/kvm/clock.c    |  107 ++++++++++++++++++++++++++++++++++++++++++-------
+ include/hw/i386/pc.h   |    5 ++
+ target-i386/kvm.c      |    7 +++
+ target-i386/kvm_i386.h |    1 
+ 4 files changed, 106 insertions(+), 14 deletions(-)
+
+v2: 
+- improve variable names (Juan)
+- consolidate code on kvm_get_clock function (Paolo)
+- return mach_use_reliable_get_clock from needed function (Paolo)
+v3: 
+- simplify check for src_use_reliable_get_clock (Eduardo)
+- move src_use_reliable_get_clock initialization to realize (Eduardo)
+
+v4: 
+- have kvm_get_clock and clock_is_reliable assignments synchronized (Eduardo)
+- add comment to the reasoning of kvmclock_pre_save (Eduardo)
+
+
+Index: qemu-mig-advance-clock/hw/i386/kvm/clock.c
+===================================================================
+--- qemu-mig-advance-clock.orig/hw/i386/kvm/clock.c	2016-11-17 15:07:11.220632761 -0200
++++ qemu-mig-advance-clock/hw/i386/kvm/clock.c	2016-12-10 13:57:58.115983966 -0200
+@@ -36,6 +36,13 @@
  
- /*
-  * MT_TOOL types
-diff --git a/include/standard-headers/linux/pci_regs.h b/include/standard-headers/linux/pci_regs.h
-index 4040951..e5a2e68 100644
---- a/include/standard-headers/linux/pci_regs.h
-+++ b/include/standard-headers/linux/pci_regs.h
-@@ -612,6 +612,8 @@
-  */
- #define PCI_EXP_DEVCAP2		36	/* Device Capabilities 2 */
- #define  PCI_EXP_DEVCAP2_ARI		0x00000020 /* Alternative Routing-ID */
-+#define  PCI_EXP_DEVCAP2_ATOMIC_ROUTE	0x00000040 /* Atomic Op routing */
-+#define PCI_EXP_DEVCAP2_ATOMIC_COMP64	0x00000100 /* Atomic 64-bit compare */
- #define  PCI_EXP_DEVCAP2_LTR		0x00000800 /* Latency tolerance reporting */
- #define  PCI_EXP_DEVCAP2_OBFF_MASK	0x000c0000 /* OBFF support mechanism */
- #define  PCI_EXP_DEVCAP2_OBFF_MSG	0x00040000 /* New message signaling */
-@@ -619,6 +621,7 @@
- #define PCI_EXP_DEVCTL2		40	/* Device Control 2 */
- #define  PCI_EXP_DEVCTL2_COMP_TIMEOUT	0x000f	/* Completion Timeout Value */
- #define  PCI_EXP_DEVCTL2_ARI		0x0020	/* Alternative Routing-ID */
-+#define PCI_EXP_DEVCTL2_ATOMIC_REQ	0x0040	/* Set Atomic requests */
- #define  PCI_EXP_DEVCTL2_IDO_REQ_EN	0x0100	/* Allow IDO for requests */
- #define  PCI_EXP_DEVCTL2_IDO_CMP_EN	0x0200	/* Allow IDO for completions */
- #define  PCI_EXP_DEVCTL2_LTR_EN		0x0400	/* Enable LTR mechanism */
-@@ -671,7 +674,8 @@
- #define PCI_EXT_CAP_ID_PMUX	0x1A	/* Protocol Multiplexing */
- #define PCI_EXT_CAP_ID_PASID	0x1B	/* Process Address Space ID */
- #define PCI_EXT_CAP_ID_DPC	0x1D	/* Downstream Port Containment */
--#define PCI_EXT_CAP_ID_MAX	PCI_EXT_CAP_ID_DPC
-+#define PCI_EXT_CAP_ID_PTM	0x1F	/* Precision Time Measurement */
-+#define PCI_EXT_CAP_ID_MAX	PCI_EXT_CAP_ID_PTM
- 
- #define PCI_EXT_CAP_DSN_SIZEOF	12
- #define PCI_EXT_CAP_MCAST_ENDPOINT_SIZEOF 40
-@@ -964,4 +968,13 @@
- 
- #define PCI_EXP_DPC_SOURCE_ID		10	/* DPC Source Identifier */
- 
-+/* Precision Time Measurement */
-+#define PCI_PTM_CAP			0x04	    /* PTM Capability */
-+#define  PCI_PTM_CAP_REQ		0x00000001  /* Requester capable */
-+#define  PCI_PTM_CAP_ROOT		0x00000004  /* Root capable */
-+#define  PCI_PTM_GRANULARITY_MASK	0x0000FF00  /* Clock granularity */
-+#define PCI_PTM_CTRL			0x08	    /* PTM Control */
-+#define  PCI_PTM_CTRL_ENABLE		0x00000001  /* PTM enable */
-+#define  PCI_PTM_CTRL_ROOT		0x00000002  /* Root select */
+     uint64_t clock;
+     bool clock_valid;
 +
- #endif /* LINUX_PCI_REGS_H */
-diff --git a/linux-headers/asm-arm/kvm.h b/linux-headers/asm-arm/kvm.h
-index 541268c..2fb7859 100644
---- a/linux-headers/asm-arm/kvm.h
-+++ b/linux-headers/asm-arm/kvm.h
-@@ -84,6 +84,13 @@ struct kvm_regs {
- #define KVM_VGIC_V2_DIST_SIZE		0x1000
- #define KVM_VGIC_V2_CPU_SIZE		0x2000
- 
-+/* Supported VGICv3 address types  */
-+#define KVM_VGIC_V3_ADDR_TYPE_DIST	2
-+#define KVM_VGIC_V3_ADDR_TYPE_REDIST	3
++    /* whether machine type supports reliable get clock */
++    bool mach_use_reliable_get_clock;
 +
-+#define KVM_VGIC_V3_DIST_SIZE		SZ_64K
-+#define KVM_VGIC_V3_REDIST_SIZE		(2 * SZ_64K)
++    /* whether the 'clock' value was obtained in a host with
++     * reliable KVM_GET_CLOCK */
++    bool clock_is_reliable;
+ } KVMClockState;
+ 
+ struct pvclock_vcpu_time_info {
+@@ -81,6 +88,19 @@
+     return nsec + time.system_time;
+ }
+ 
++static uint64_t kvm_get_clock(void)
++{
++    struct kvm_clock_data data;
++    int ret;
 +
- #define KVM_ARM_VCPU_POWER_OFF		0 /* CPU is started in OFF state */
- #define KVM_ARM_VCPU_PSCI_0_2		1 /* CPU uses PSCI v0.2 */
++    ret = kvm_vm_ioctl(kvm_state, KVM_GET_CLOCK, &data);
++    if (ret < 0) {
++        fprintf(stderr, "KVM_GET_CLOCK failed: %s\n", strerror(ret));
++                abort();
++    }
++    return data.clock;
++}
++
+ static void kvmclock_vm_state_change(void *opaque, int running,
+                                      RunState state)
+ {
+@@ -91,15 +111,23 @@
  
-diff --git a/linux-headers/asm-x86/unistd_32.h b/linux-headers/asm-x86/unistd_32.h
-index abeaf40..d45ea28 100644
---- a/linux-headers/asm-x86/unistd_32.h
-+++ b/linux-headers/asm-x86/unistd_32.h
-@@ -377,5 +377,8 @@
- #define __NR_copy_file_range 377
- #define __NR_preadv2 378
- #define __NR_pwritev2 379
-+#define __NR_pkey_mprotect 380
-+#define __NR_pkey_alloc 381
-+#define __NR_pkey_free 382
+     if (running) {
+         struct kvm_clock_data data = {};
+-        uint64_t time_at_migration = kvmclock_current_nsec(s);
++        uint64_t pvclock_via_mem = 0;
  
- #endif /* _ASM_X86_UNISTD_32_H */
-diff --git a/linux-headers/asm-x86/unistd_64.h b/linux-headers/asm-x86/unistd_64.h
-index 73c3d1f..e22db91 100644
---- a/linux-headers/asm-x86/unistd_64.h
-+++ b/linux-headers/asm-x86/unistd_64.h
-@@ -330,5 +330,8 @@
- #define __NR_copy_file_range 326
- #define __NR_preadv2 327
- #define __NR_pwritev2 328
-+#define __NR_pkey_mprotect 329
-+#define __NR_pkey_alloc 330
-+#define __NR_pkey_free 331
+-        s->clock_valid = false;
++        /*
++         * If the host where s->clock was read did not support reliable
++         * KVM_GET_CLOCK, read kvmclock value from memory.
++         */
++        if (!s->clock_is_reliable) {
++            pvclock_via_mem = kvmclock_current_nsec(s);
++        }
  
- #endif /* _ASM_X86_UNISTD_64_H */
-diff --git a/linux-headers/asm-x86/unistd_x32.h b/linux-headers/asm-x86/unistd_x32.h
-index e5aea76..84e58b2 100644
---- a/linux-headers/asm-x86/unistd_x32.h
-+++ b/linux-headers/asm-x86/unistd_x32.h
-@@ -283,6 +283,9 @@
- #define __NR_membarrier (__X32_SYSCALL_BIT + 324)
- #define __NR_mlock2 (__X32_SYSCALL_BIT + 325)
- #define __NR_copy_file_range (__X32_SYSCALL_BIT + 326)
-+#define __NR_pkey_mprotect (__X32_SYSCALL_BIT + 329)
-+#define __NR_pkey_alloc (__X32_SYSCALL_BIT + 330)
-+#define __NR_pkey_free (__X32_SYSCALL_BIT + 331)
- #define __NR_rt_sigaction (__X32_SYSCALL_BIT + 512)
- #define __NR_rt_sigreturn (__X32_SYSCALL_BIT + 513)
- #define __NR_ioctl (__X32_SYSCALL_BIT + 514)
-diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
-index 4806e06..bb0ed71 100644
---- a/linux-headers/linux/kvm.h
-+++ b/linux-headers/linux/kvm.h
-@@ -972,12 +972,19 @@ struct kvm_irqfd {
- 	__u8  pad[16];
+-        /* We can't rely on the migrated clock value, just discard it */
+-        if (time_at_migration) {
+-            s->clock = time_at_migration;
++        /* We can't rely on the saved clock value, just discard it */
++        if (pvclock_via_mem) {
++            s->clock = pvclock_via_mem;
+         }
+ 
++        s->clock_valid = false;
++
+         data.clock = s->clock;
+         ret = kvm_vm_ioctl(kvm_state, KVM_SET_CLOCK, &data);
+         if (ret < 0) {
+@@ -120,8 +148,6 @@
+             }
+         }
+     } else {
+-        struct kvm_clock_data data;
+-        int ret;
+ 
+         if (s->clock_valid) {
+             return;
+@@ -129,13 +155,11 @@
+ 
+         kvm_synchronize_all_tsc();
+ 
+-        ret = kvm_vm_ioctl(kvm_state, KVM_GET_CLOCK, &data);
+-        if (ret < 0) {
+-            fprintf(stderr, "KVM_GET_CLOCK failed: %s\n", strerror(ret));
+-            abort();
+-        }
+-        s->clock = data.clock;
+-
++        s->clock = kvm_get_clock();
++        /* any code that sets s->clock needs to ensure clock_is_reliable
++         * is correctly set.
++         */
++        s->clock_is_reliable = kvm_has_adjust_clock_stable();
+         /*
+          * If the VM is stopped, declare the clock state valid to
+          * avoid re-reading it on next vmsave (which would return
+@@ -149,25 +173,80 @@
+ {
+     KVMClockState *s = KVM_CLOCK(dev);
+ 
++    if (kvm_has_adjust_clock_stable()) {
++        s->clock_is_reliable = true;
++    }
++
+     qemu_add_vm_change_state_handler(kvmclock_vm_state_change, s);
+ }
+ 
++static bool kvmclock_clock_is_reliable_needed(void *opaque)
++{
++    KVMClockState *s = opaque;
++
++    return s->mach_use_reliable_get_clock;
++}
++
++static const VMStateDescription kvmclock_reliable_get_clock = {
++    .name = "kvmclock/clock_is_reliable",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .needed = kvmclock_clock_is_reliable_needed,
++    .fields = (VMStateField[]) {
++        VMSTATE_BOOL(clock_is_reliable, KVMClockState),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++/*
++ * When migrating, read the clock just before migration,
++ * so that the guest clock counts during the events
++ * between:
++ *
++ *  * vm_stop()
++ *  *
++ *  * pre_save()
++ *
++ *  This reduces kvmclock difference on migration from 5s
++ *  to 0.1s (when max_downtime == 5s), because sending the
++ *  final pages of memory (which happens between vm_stop()
++ *  and pre_save()) takes max_downtime.
++ */
++static void kvmclock_pre_save(void *opaque)
++{
++    KVMClockState *s = opaque;
++
++    s->clock = kvm_get_clock();
++}
++
+ static const VMStateDescription kvmclock_vmsd = {
+     .name = "kvmclock",
+     .version_id = 1,
+     .minimum_version_id = 1,
++    .pre_save = kvmclock_pre_save,
+     .fields = (VMStateField[]) {
+         VMSTATE_UINT64(clock, KVMClockState),
+         VMSTATE_END_OF_LIST()
++    },
++    .subsections = (const VMStateDescription * []) {
++        &kvmclock_reliable_get_clock,
++        NULL
+     }
  };
  
-+/* For KVM_CAP_ADJUST_CLOCK */
++static Property kvmclock_properties[] = {
++    DEFINE_PROP_BOOL("x-mach-use-reliable-get-clock", KVMClockState,
++                      mach_use_reliable_get_clock, true),
++    DEFINE_PROP_END_OF_LIST(),
++};
 +
-+/* Do not use 1, KVM_CHECK_EXTENSION returned it before we had flags.  */
-+#define KVM_CLOCK_TSC_STABLE		2
-+
- struct kvm_clock_data {
- 	__u64 clock;
- 	__u32 flags;
- 	__u32 pad[9];
- };
+ static void kvmclock_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
  
-+/* For KVM_CAP_SW_TLB */
-+
- #define KVM_MMU_FSL_BOOKE_NOHV		0
- #define KVM_MMU_FSL_BOOKE_HV		1
+     dc->realize = kvmclock_realize;
+     dc->vmsd = &kvmclock_vmsd;
++    dc->props = kvmclock_properties;
+ }
  
+ static const TypeInfo kvmclock_info = {
+Index: qemu-mig-advance-clock/include/hw/i386/pc.h
+===================================================================
+--- qemu-mig-advance-clock.orig/include/hw/i386/pc.h	2016-11-17 15:07:11.220632761 -0200
++++ qemu-mig-advance-clock/include/hw/i386/pc.h	2016-11-17 15:08:58.096791416 -0200
+@@ -370,6 +370,11 @@
+ #define PC_COMPAT_2_7 \
+     HW_COMPAT_2_7 \
+     {\
++        .driver   = "kvmclock",\
++        .property = "x-mach-use-reliable-get-clock",\
++        .value    = "off",\
++    },\
++    {\
+         .driver   = TYPE_X86_CPU,\
+         .property = "l3-cache",\
+         .value    = "off",\
+Index: qemu-mig-advance-clock/target-i386/kvm.c
+===================================================================
+--- qemu-mig-advance-clock.orig/target-i386/kvm.c	2016-11-17 15:07:11.221632762 -0200
++++ qemu-mig-advance-clock/target-i386/kvm.c	2016-11-17 15:07:15.867639659 -0200
+@@ -117,6 +117,13 @@
+     return kvm_check_extension(kvm_state, KVM_CAP_X86_SMM);
+ }
+ 
++bool kvm_has_adjust_clock_stable(void)
++{
++    int ret = kvm_check_extension(kvm_state, KVM_CAP_ADJUST_CLOCK);
++
++    return (ret == KVM_CLOCK_TSC_STABLE);
++}
++
+ bool kvm_allows_irq0_override(void)
+ {
+     return !kvm_irqchip_in_kernel() || kvm_has_gsi_routing();
+Index: qemu-mig-advance-clock/target-i386/kvm_i386.h
+===================================================================
+--- qemu-mig-advance-clock.orig/target-i386/kvm_i386.h	2016-11-17 15:07:11.222632764 -0200
++++ qemu-mig-advance-clock/target-i386/kvm_i386.h	2016-11-17 15:07:15.867639659 -0200
+@@ -17,6 +17,7 @@
+ 
+ bool kvm_allows_irq0_override(void);
+ bool kvm_has_smm(void);
++bool kvm_has_adjust_clock_stable(void);
+ void kvm_synchronize_all_tsc(void);
+ void kvm_arch_reset_vcpu(X86CPU *cs);
+ void kvm_arch_do_init_vcpu(X86CPU *cs);
