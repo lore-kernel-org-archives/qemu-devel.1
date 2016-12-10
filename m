@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39090)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54550)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sam@ravnborg.org>) id 1cFTC8-0007Rw-0G
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 16:59:09 -0500
+	(envelope-from <arei.gonglei@huawei.com>) id 1cFXs0-00007S-0b
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 21:58:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sam@ravnborg.org>) id 1cFTC3-0000Pu-Co
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 16:59:08 -0500
-Received: from asavdk3.altibox.net ([109.247.116.14]:46342)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sam@ravnborg.org>) id 1cFTC3-0000OF-6o
-	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 16:59:03 -0500
-Date: Fri, 9 Dec 2016 22:58:51 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
-Message-ID: <20161209215851.GA7717@ravnborg.org>
-References: <1481171829-116496-1-git-send-email-arei.gonglei@huawei.com>
-	<1481171829-116496-2-git-send-email-arei.gonglei@huawei.com>
+	(envelope-from <arei.gonglei@huawei.com>) id 1cFXrw-0005dK-TH
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 21:58:40 -0500
+Received: from [45.249.212.187] (port=2495 helo=dggrg01-dlp.huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <arei.gonglei@huawei.com>) id 1cFXrv-0005bm-TW
+	for qemu-devel@nongnu.org; Fri, 09 Dec 2016 21:58:36 -0500
+From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Date: Sat, 10 Dec 2016 02:58:01 +0000
+Message-ID: <33183CC9F5247A488A2544077AF19020DA159216@DGGEMA505-MBX.china.huawei.com>
+References: <1481077751-106192-1-git-send-email-arei.gonglei@huawei.com>
+	<09ca3210-e066-3937-1351-46b857a1dda7@redhat.com>
+	<33183CC9F5247A488A2544077AF19020DA156A93@DGGEMA505-MBX.china.huawei.com>
+	<20d0895e-9d22-8718-a1d8-618d5b7d75d0@redhat.com>
+	<9100954e-d7e6-8670-e614-0fa611d6f248@redhat.com>
+	<33183CC9F5247A488A2544077AF19020DA158099@DGGEMA505-MBX.china.huawei.com>
+	<5a0a4eab-5de3-493b-ff92-e17796a17058@redhat.com>
+In-Reply-To: <5a0a4eab-5de3-493b-ff92-e17796a17058@redhat.com>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1481171829-116496-2-git-send-email-arei.gonglei@huawei.com>
-Subject: Re: [Qemu-devel] [PATCH v6 1/2] sparc: fix a building error
- reported by kbuild
+Subject: Re: [Qemu-devel] [PATCH for-2.9 v2] virtio-crypto: zeroize the key
+ material before free
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,50 +34,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gonglei <arei.gonglei@huawei.com>
-Cc: linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, virtualization@lists.linux-foundation.org, linux-crypto@vger.kernel.org, luonengjun@huawei.com, mst@redhat.com, stefanha@redhat.com, weidong.huang@huawei.com, wu.wubin@huawei.com, xin.zeng@intel.com, claudio.fontana@huawei.com, herbert@gondor.apana.org.au, pasic@linux.vnet.ibm.com, davem@davemloft.net, jianjay.zhou@huawei.com, hanweidong@huawei.com, arei.gonglei@hotmail.com, cornelia.huck@de.ibm.com, xuquan8@huawei.com, longpeng2@huawei.com, wanzongshun@huawei.com, sparclinux@vger.kernel.org
+To: Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "stefanha@redhat.com" <stefanha@redhat.com>, "mst@redhat.com" <mst@redhat.com>
 
-Hi Gonglei.
-
-On Thu, Dec 08, 2016 at 12:37:08PM +0800, Gonglei wrote:
-> >> arch/sparc/include/asm/topology_64.h:44:44:
-> error: implicit declaration of function 'cpu_data'
-> [-Werror=implicit-function-declaration]
-> 
->  #define topology_physical_package_id(cpu) (cpu_data(cpu).proc_id)
->                                                ^
-> Let's include cpudata.h in topology_64.h.
-> 
-> Cc: Sam Ravnborg <sam@ravnborg.org>
-> Cc: David S. Miller <davem@davemloft.net>
-> Cc: sparclinux@vger.kernel.org
-> Suggested-by: Sam Ravnborg <sam@ravnborg.org>
-> Signed-off-by: Gonglei <arei.gonglei@huawei.com>
-Acked-by: Sam Ravnborg <sam@ravnborg.org>
-
-> ---
->  arch/sparc/include/asm/topology_64.h | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/arch/sparc/include/asm/topology_64.h b/arch/sparc/include/asm/topology_64.h
-> index 7b4898a..2255430 100644
-> --- a/arch/sparc/include/asm/topology_64.h
-> +++ b/arch/sparc/include/asm/topology_64.h
-> @@ -4,6 +4,7 @@
->  #ifdef CONFIG_NUMA
->  
->  #include <asm/mmzone.h>
-> +#include <asm/cpudata.h>
-
-Nitpick - if you are going to resend this patch, then please
-order the two includes in alphabetic order.
-
-For two includes this looks like bikeshedding, but when we add
-more having them in a defined arder prevents merge conflicts.
-And makes it readable too.
-
-We also sometimes order the includes with the longest lines topmost,
-and lines with the ame length are ordered alphabetically.
-But this is not seen so often.
-
-	Sam
+Pg0KPiANCj4gT24gMDkuMTIuMjAxNiAwMjo0MiwgR29uZ2xlaSAoQXJlaSkgd3JvdGU6DQo+ID4g
+SGksDQo+ID4NCj4gPj4NCj4gPj4gU3ViamVjdDogUmU6IFtRZW11LWRldmVsXSBbUEFUQ0ggZm9y
+LTIuOSB2Ml0gdmlydGlvLWNyeXB0bzogemVyb2l6ZSB0aGUga2V5DQo+ID4+IG1hdGVyaWFsIGJl
+Zm9yZSBmcmVlDQo+ID4+DQo+ID4+IE9uIDA4LjEyLjIwMTYgMTY6MjMsIEVyaWMgQmxha2Ugd3Jv
+dGU6DQo+ID4+PiBPbiAxMi8wNy8yMDE2IDA4OjI4IFBNLCBHb25nbGVpIChBcmVpKSB3cm90ZToN
+Cj4gPj4+DQo+ID4+Pj4+IEFzIGZhciBhcyBJJ20gYXdhcmUsIG90aGVyIHByb2plY3RzIHVzdWFs
+bHkgaGF2ZSBhIHNwZWNpYWwgbWVtc2V0DQo+ID4+Pj4+IHZhcmlhdGlvbiBmb3IgZG9pbmcgdGhp
+cy4gVGhhdCBpcyBiZWNhdXNlIGNvbXBpbGVycyBtYXkgY2hvb3NlIHRvDQo+ID4+Pj4+ICJvcHRp
+bWl6ZSIgbWVtc2V0KHAsIC4uLikgKyBmcmVlKHApIHRvIGp1c3QgdGhlIGZyZWUocCkuIEhhdmlu
+ZyBhDQo+ID4+Pj4NCj4gPj4+PiBBY3R1YWxseSwgSSBnb29nbGVkIHRoaXMsIGJ1dCBJIGRpZG4n
+dCBmaW5kIGEgZGVmaW5pdGUgYW5zd2VyLiBBbmQNCj4gPj4+Pg0KPiA+Pj4+IFRoZSBMaW51eCBr
+ZXJuZWwgdXNlcyBremZyZWUgaW5zdGVhZCBvZiBtZW1zZXQgKyBrZnJlZQ0KPiA+PiAobW0vc2xh
+Yl9jb21tb24uYykuDQo+ID4+DQo+ID4+IFdlbGwsIEkgcGVyc29uYWxseSBkb24ndCBtaW5kIHdo
+ZXRoZXIgd2UgdXNlIGEgY3VzdG9tIHpmcmVlKCkgb3IgYQ0KPiA+PiBjdXN0b20gbWVtc2V0X3Mo
+KSArIGZyZWUoKS4gSSBvbmx5IG1pbmQgdGhhdCB0aGlzIHBhdGNoIGFjdHVhbGx5IGFsd2F5cw0K
+PiA+PiBkb2VzIHdoYXQgaXQgaXMgaW50ZW5kZWQgdG8gZG8uDQo+ID4+DQo+ID4gWWVzLCBidXQg
+d2h5IGxpbnV4IGtlcm5lbCB0byB0aGluayBhYm91dCB0aGUgY29tcGlsZXIgb3B0aW1pemF0aW9u
+IGZvcg0KPiA+IG1lbXNldCBmb3Igc2Vuc2l0aXZlIGRhdGE/DQo+IA0KPiBJJ20gYWZyYWlkIEkg
+ZG9uJ3QgcXVpdGUgKHN5bnRhY3RpY2FsbHkpIHVuZGVyc3RhbmQgdGhpcyBxdWVzdGlvbi4gRG8N
+Cj4geW91IG1lYW4gdG8gYXNrIHdoeSB0aGUgTGludXgga2VybmVsIHdvdWxkIGhhdmUgdG8gdGhp
+bmsgYWJvdXQgdGhpcw0KPiBvcHRpbWl6YXRpb24/IE15IGFuc3dlciB0byB0aGF0IHdvdWxkIGJl
+IGJlY2F1c2UgdGhlIG9wdGltaXphdGlvbiBvZg0KPiBtZW1zZXQoKSArIGZyZWUoKSBpcyBrbm93
+biwgYW5kIHRoZXkgcHJvYmFibHkgd2FudCB0byBwcm90ZWN0IGFnYWluc3QNCj4gdGhlIGNvbXBp
+bGVyIG9wdGltaXppbmcgaXQgZXZlbiB3aXRoIC1mZnJlZXN0YW5kaW5nIGFuZCBkaWZmZXJlbnRs
+eQ0KPiBjYWxsZWQgZnVuY3Rpb25zIC0tIHlvdSBuZXZlciBrbm93Lg0KPiANClNvcnJ5LCB0aGF0
+J3MgbXkgdHlwby4gOykgDQoNCk15IHF1ZXN0aW9uIGlzIHdoeSBub3QgbGludXgga2VybmVsIHRv
+IHRoaW5rIGFib3V0IHRoZSBjb21waWxlciBvcHRpbWl6YXRpb24NCm9uIHRoZSBjb2RlIGxheWVy
+LiBCZWNhdXNlIHRoZSByZWFsaXphdGlvbiBvZiBremZyZWUgaXMganVzdCBtZW1zZXQgKyBrZnJl
+ZSwgDQppdCBkaWRuJ3QgYWRkIGFueSBtZW1vcnkgYmFycmllciB0byBwcmV2ZW50IG1lbXNldCBp
+cyBvcHRpbWl6ZWQsIG9yIHVzZQ0Kc2VjdXJlX21lbXNldCwgb3Igd2hhdGV2ZXIuDQoNClNvIHlv
+dSBhbnN3ZXIgbWVhbnMgdGhleSBtYXliZSB1c2Ugc29tZSBjb21waWxlciBvcHRpb25zIHRvIGF2
+b2lkDQp0aGUgY29tcGlsZXIgb3B0aW1pemluZz8NCg0KPiBSZWxhdGVkIGV4YW1wbGU6IGdjYyBk
+ZXRlY3RzIGNvZGUgdGhhdCBiYXNpY2FsbHkgZG9lcyBhIG1lbXNldCgpIGFuZA0KPiByZXBsYWNl
+cyBpdCB3aXRoIGEgY2FsbCB0byBtZW1zZXQoKS4gVGhlcmUgd2VyZSBhIGNvdXBsZSBvZiB2ZXJz
+aW9ucw0KPiB3aGVyZSBpdCBkaWQgdGhhdCBldmVuIHdpdGggLWZmcmVlc3RhbmRpbmcgb3IgLWZu
+by1idWlsdGluLCB3aGljaCBpcyBiYWQNCj4gaWYgeW91IHdhbnQgdG8gYWN0dWFsbHkgd3JpdGUg
+YSBtZW1zZXQoKS4gVGhleSBmaXhlZCBpdCBieSBub3cgKHNvIHRoYXQNCj4gLWZmcmVlc3RhbmRp
+bmcgYW5kIC1mbm8tYnVpbHRpbiB3aWxsIGltcGx5DQo+IC1mbm8tdHJlZS1sb29wLWRpc3RyaWJ1
+dGUtcGF0dGVybnMsIHdoaWNoIHdpbGwgZGlzYWJsZSB0aGF0IG9wdGltaXphdGlvbi4NCj4gDQo+
+IE5vdyBpbWFnaW5lIHRoZSBzYW1lIGNhc2UgaGVyZTogTWF5YmUgYXQgc29tZSBwb2ludCBnY2Mg
+aXMgYWJsZSB0bw0KPiBkZXRlY3QgdGhhdCBrZnJlZSgpIGlzIGJhc2ljYWxseSBmcmVlKCkgYW5k
+IHdpbGwgdGhlbiBvcHRpbWl6ZSB0aGUNCj4gbWVtc2V0KCkgYmVmb3JlIGtmcmVlKCkgYXdheS4g
+QSBjb3VwbGUgb2YgdmVyc2lvbnMgbGF0ZXIsIHNvbWVib2R5IHdpbGwNCj4gbm90aWNlIHRoYXQg
+LS0gYnV0IGF0IHRoYXQgcG9pbnQsIHRoZSBkYW1hZ2UgaGFzIGJlZW4gZG9uZSBhbHJlYWR5IGFu
+ZA0KPiB0aGVyZSBhcmUgY29tcGlsZWQgdmVyc2lvbnMgb3V0IHdoaWNoIGxlYWsgc2Vuc2l0aXZl
+IGRhdGEgc29tZXdoZXJlLg0KPiANCj4gSSB0aGluayB0aGlzIGlzIHdoeSB0aGUgTGludXgga2Vy
+bmVsIGRlY2lkZXMgdG8gYmUgcHJvYWN0aXZlIGFuZCB1c2UNCj4ga3pmcmVlKCkgZnJvbSB0aGUg
+c3RhcnQsIGFuZCB0aGlzIGlzIGFsc28gd2h5IEknbSBwcm9wb3NpbmcgdG8gbm90IGRlbGF5DQo+
+IHRoaXMgaXNzdWUgaW4gcWVtdSB1bnRpbCBzb21lIGNvbXBpbGVyIGFjdHVhbGx5IG1ha2VzIGl0
+IGEgcmVhbCBpc3N1ZS4NCj4gDQo+ID4+PiBJZiB3ZSdyZSB3b3JyaWVkIGFib3V0IGNsZWFuaW5n
+IHRoaW5ncyB3aXRob3V0IGFsbG93aW5nIHRoZSBjb21waWxlciBhDQo+ID4+PiBjaGFuY2UgdG8g
+b3B0aW1pemUsIHRoZW4gd3JpdGluZyBvdXIgb3duIHFlbXVfemZyZWUoKSB3cmFwcGVyIG1heQ0K
+PiBpbmRlZWQNCj4gPj4+IG1ha2Ugc2Vuc2UuICBCdXQgdGhhdCB3b24ndCBjb3ZlciB0aGUgY2Fz
+ZSBpbiBEYW5pZWwncyBlYXJsaWVyIHBhdGNoDQo+ID4+PiAocmVmZXJlbmNlZCBlbHNld2hlcmUg
+aW4gdGhpcyB0aHJlYWQpLCBhcyB0aGF0IHdhcyB6ZXJvaXppbmcgc3RhY2sNCj4gPj4+IG1lbW9y
+eSAoYmVmb3JlIGl0IHdlbnQgb3V0IG9mIHNjb3BlKSByYXRoZXIgdGhhbiBoZWFwIG1lbW9yeSAo
+YmVmb3JlDQo+ID4+PiBmcmVlKS4gIFNvIHlvdSdkIHN0aWxsIG5lZWQgc29tZSBzb3J0IG9mICd3
+cml0ZSB0aGlzIG1lbW9yeSBubyBtYXR0ZXINCj4gPj4+IHdoYXQnIHByaW1pdGl2ZSB0aGF0IHdv
+dWxkIGJlIGRpcmVjdGx5IHVzYWJsZSBvbiBzdGFjayBtZW1vcnkgYW5kDQo+ID4+PiBpbmRpcmVj
+dGx5IHVzZWQgYXMgcGFydCBvZiB0aGUgcWVtdV96ZnJlZSgpIHdyYXBwZXIuDQo+ID4+Pg0KPiA+
+IElmIHdlIHdyYXAgYSBzZWN1cmVfbWVtc2V0KCksIHRoZW4gYm90aCBzdGFjayBtZW1vcnkgYW5k
+IGhlYXANCj4gPiBtZW1vcnkgY2FuIHVzZSBpdC4NCj4gPg0KPiA+IFBscyBzZWU6DQo+ID4NCj4g
+PiBodHRwOi8vd3d3Lm9wZW4tc3RkLm9yZy9qdGMxL3NjMjIvd2cxNC93d3cvZG9jcy9uMTM4MS5w
+ZGYNCj4gPg0KPiA+IEJ1dCB0aGUgc2VjdXJlX21lbXNldCgpIGlzIG5vdCBhcyBlZmZpY2llbnQg
+YXMgcG9zc2libGUgZHVlIHRvIHRoZSBuYXR1cmUgb2YNCj4gdGhlIHZvbGF0aWxlDQo+ID4gdHlw
+ZSBxdWFsaWZpZXIgcHJldmVudGluZyB0aGUgY29tcGlsZXIgZnJvbSBvcHRpbWl6aW5nIHRoZSBj
+b2RlIGF0IGFsbC4NCj4gPg0KPiA+IEl0IHdpbGwgY2F1c2UgaHVnZSBwZXJmb3JtYW5jZSByZWdy
+ZXNzaW9uIGF0IGhvdCBwYXRoIG9mIGRhdGEgcGxhbmUuLi4NCj4gDQo+IEkgd291bGQgc3VnZ2Vz
+dCB3ZSBpbXBsZW1lbnQgYW4gb3duIHNlY3VyZV9tZW1zZXQoKSBvciBzZWN1cmVfYnplcm8oKQ0K
+PiB3aGljaCBmYWxscyBiYWNrIG9uIHdoYXQgd2UgaGF2ZToNCj4gLSBtZW1zZXRfcygpLCBpZiB0
+aGF0IGlzIGF2YWlsYWJsZTsNCj4gLSBleHBsaXppdF9iemVybygpIGlmIHdlIGhhdmUgbGliYnNk
+Ow0KPiAtIFNlY3VyZVplcm9NZW1vcnkoKSBvbiBXaW5kb3dzDQo+IA0KPiBPciB3ZSBoYXZlIHRv
+IHdyaXRlIGl0IG91cnNlbHZlczoNCj4gaHR0cHM6Ly9zb3VyY2V3YXJlLm9yZy9tbC9saWJjLWFs
+cGhhLzIwMTQtMTIvbXNnMDA1MDYuaHRtbCBzdWdnZXN0cyB0aGF0DQo+IHB1dHRpbmcgYSBmdWxs
+IG1lbW9yeSBiYXJyaWVyIGFmdGVyIHRoZSBtZW1zZXQoKSBzaG91bGQgYmUgZW5vdWdoLg0KPiAN
+CkkgbGlrZSB0aGlzIGFwcHJvYWNoLg0KDQo+ID4+PiBCdXQgSSB3b3VsZG4ndCB3b3JyeSBhYm91
+dCBpdCBmb3Igbm93LCB1bmxlc3Mgc29tZW9uZSBwcm92ZXMgd2UgYWN0dWFsbHkNCj4gPj4+IGhh
+dmUgYSBjb21waWxlciBvcHRpbWl6aW5nIGF3YXkgdGhlIGNsZWFudXBzLg0KPiA+Pg0KPiA+PiBJ
+dCdzIHRydWUgdGhhdCB3ZSBkb24ndCBoYXZlIHRvIHdvcnJ5IGFib3V0IGl0ICpub3cqLCBidXQg
+dGhlIGFwcHJvYWNoDQo+ID4+IG9mIHdhaXRpbmcgdW50aWwgdGhlIGNvbXBpbGVyIGJyZWFrcyBp
+dCBkb2VzIG5vdCBzZWVtIHJpZ2h0IHRvIG1lLg0KPiA+Pg0KPiA+PiBJZiBhdCBzb21lIHBvaW50
+IHNvbWUgY29tcGlsZXIgcmVjb2duaXplcyBnX2ZyZWUoKSBhcyBiZWluZyB0aGUgc2FtZQ0KPiA+
+PiBmdW5jdGlvbiBhcyBmcmVlKCkgYW5kIHRodXMgb3B0aW1pemVzIG1lbXNldCgpICsgZ19mcmVl
+KCksIHdlIHNpbXBseQ0KPiA+PiB3b24ndCBub3RpY2UgYmVjYXVzZSBub2JvZHkgd2lsbCBrZWVw
+IHRyYWNrIG9mIHRoZSBnZW5lcmF0ZWQgYXNzZW1ibHkNCj4gPj4gb3V0cHV0IGFsbCB0aGUgdGlt
+ZS4NCj4gPj4NCj4gPj4gVGhlcmUgaXMgYSByZWFzb24gQzExIGludHJvZHVjZWQgbWVtc2V0X3Mo
+KSwgYW5kIGl0IGlzIHRoaXMuDQo+ID4+DQo+ID4gLi4uZG9lcyBpdCBtYWtlIHNlbnNlIGlmIHdl
+IGludHJvZHVjZSBzZWN1cmVfbWVtc2V0KCkgbm93ID8NCj4gPg0KPiA+IFdhaXRpbmcgZm9yIHlv
+dXIgZmVlZGJhY2suIFRoYW5rcyENCj4gDQo+IEkgd291bGQgcHJvcG9zZSBzbzsgb3IgYmV0dGVy
+IHNvbWV0aGluZyBsaWtlIHNlY3VyZV9iemVybygpIG9yDQo+IHNlY3VyZV9tZW16ZXJvKCksIGJl
+Y2F1c2Ugd2UgY2FuIHRoZW4gZmFsbCBiYWNrIG9uIGV4aXN0aW5nDQo+IGltcGxlbWVudGF0aW9u
+cyBsaWtlIGV4cGxpeml0X2J6ZXJvKCkgb3IgU2VjdXJlWmVyb01lbW9yeSgpLg0KPiANCkJvdGgg
+T0suDQoNCj4gV2UgZG9uJ3QgaGF2ZSB0byBpbXBsZW1lbnQgdGhpcyBpbW1lZGlhdGVseSwgYnV0
+IHdlIHNob3VsZCBkbyBpdCBiZWZvcmUNCj4gdGhlIDIuOSByZWxlYXNlLg0KPiANCkFncmVlLg0K
+DQpSZWdhcmRzLA0KLUdvbmdsZWkNCg0K
