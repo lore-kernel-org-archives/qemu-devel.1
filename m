@@ -1,19 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35005)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35016)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1cFjc2-0000QR-8U
-	for qemu-devel@nongnu.org; Sat, 10 Dec 2016 10:30:59 -0500
+	(envelope-from <maxime.coquelin@redhat.com>) id 1cFjc3-0000RN-SM
+	for qemu-devel@nongnu.org; Sat, 10 Dec 2016 10:31:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1cFjbz-0007OG-3l
-	for qemu-devel@nongnu.org; Sat, 10 Dec 2016 10:30:58 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53308)
+	(envelope-from <maxime.coquelin@redhat.com>) id 1cFjc2-0007Oq-P2
+	for qemu-devel@nongnu.org; Sat, 10 Dec 2016 10:30:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45454)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
-	id 1cFjby-0007O4-UZ
-	for qemu-devel@nongnu.org; Sat, 10 Dec 2016 10:30:55 -0500
+	id 1cFjc2-0007Oc-GV
+	for qemu-devel@nongnu.org; Sat, 10 Dec 2016 10:30:58 -0500
 From: Maxime Coquelin <maxime.coquelin@redhat.com>
-Date: Sat, 10 Dec 2016 16:30:35 +0100
-Message-Id: <20161210153038.9184-1-maxime.coquelin@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 0/3] virtio-net: Add support to MTU feature
+Date: Sat, 10 Dec 2016 16:30:36 +0100
+Message-Id: <20161210153038.9184-2-maxime.coquelin@redhat.com>
+In-Reply-To: <20161210153038.9184-1-maxime.coquelin@redhat.com>
+References: <20161210153038.9184-1-maxime.coquelin@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 1/3] vhost-user: Add MTU protocol feature
+ and op
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,55 +28,150 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: mst@redhat.com, aconole@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, jasowang@redhat.com, yuanhan.liu@linux.intel.com
 Cc: fbl@redhat.com, berrange@redhat.com, mlureau@redhat.com, ktraynor@redhat.com, Maxime Coquelin <maxime.coquelin@redhat.com>
 
-Thanks for the reviews,
+This patch implements VHOST_USER_PROTOCOL_F_NET_MTU
+protocol feature and VHOST_USER_NET_SET_MTU request so
+that the backend gets notified of the user defined host
+MTU.
 
-This series implements Virtio spec update from Aaron Conole which
-defines a way for the host to expose its max MTU to the guest.
+If backend supports VHOST_USER_PROTOCOL_F_REPLY_ACK,
+QEMU assumes MTU is valid if success is returned.
 
-"host_mtu" parameter is added to provide QEMU with the MTU value,
-and the backend, if supported, gets notified of the MTU value when the
-MTU feature neogotiation succeeds.
+Vhost-net driver sends this request through a new
+vhost_net_set_mtu vhost_ops entry.
 
-Only user backend currently supports MTU notification. A new protocol
-feature has been implemented for sending MTU value to the backend.
-
-For kernel backend, it is expected the management tool also configures
-the tap/macvtap interface with same MTU value.
-Daniel, I would be interrested about your feedback on this implementation
-from management tool point of view.
-
-Changes since RFC v3:
----------------------
- - No more RFC as consensus seems found on design
- - No more report an error if backend not implemented
- - Instead, check reply from the backend if REPLY_ACK supported
- - Add NET previx to new protocol feature & request names
- - Add return value to vhost_net_set_mtu() when !CONFIG_VHOST_NET
-
-Changes since RFC v2:
----------------------
- - host_mtu propoerty is now used to specify the MTU value
- - update vhost-user spec with MTU additions
-
-Changes since RFC v1:
----------------------
- - Rebased on top of v2.8.0-rc0 (2.7.90)
- - Write MTU unconditionnaly in netcfg to avoid memory leak (Paolo)
- - Add host_mtu property to be able to disable the feature from QEMU
-
-Maxime Coquelin (3):
-  vhost-user: Add MTU protocol feature and op
-  vhost-net: Notify the backend about the host MTU
-  virtio-net: Add MTU feature support
-
+Cc: Michael S. Tsirkin <mst@redhat.com>
+Cc: Aaron Conole <aconole@redhat.com>
+Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
+---
  docs/specs/vhost-user.txt         | 16 ++++++++++++++++
- hw/net/vhost_net.c                | 18 ++++++++++++++++++
- hw/net/virtio-net.c               | 19 +++++++++++++++++++
  hw/virtio/vhost-user.c            | 34 ++++++++++++++++++++++++++++++++++
  include/hw/virtio/vhost-backend.h |  2 ++
- include/hw/virtio/virtio-net.h    |  1 +
- include/net/vhost_net.h           |  2 ++
- 7 files changed, 92 insertions(+)
+ 3 files changed, 52 insertions(+)
 
+diff --git a/docs/specs/vhost-user.txt b/docs/specs/vhost-user.txt
+index 7890d71..6f19276 100644
+--- a/docs/specs/vhost-user.txt
++++ b/docs/specs/vhost-user.txt
+@@ -259,6 +259,7 @@ Protocol features
+ #define VHOST_USER_PROTOCOL_F_LOG_SHMFD      1
+ #define VHOST_USER_PROTOCOL_F_RARP           2
+ #define VHOST_USER_PROTOCOL_F_REPLY_ACK      3
++#define VHOST_USER_PROTOCOL_F_MTU            4
+ 
+ Message types
+ -------------
+@@ -470,6 +471,21 @@ Message types
+       The first 6 bytes of the payload contain the mac address of the guest to
+       allow the vhost user backend to construct and broadcast the fake RARP.
+ 
++ * VHOST_USER_NET_SET_MTU
++
++      Id: 20
++      Equivalent ioctl: N/A
++      Master payload: u64
++
++      Set host MTU value exposed to the guest.
++      This request should be sent only when VIRTIO_NET_F_MTU feature has been
++      successfully negotiated, VHOST_USER_F_PROTOCOL_FEATURES is present in
++      VHOST_USER_GET_FEATURES and protocol feature bit
++      VHOST_USER_PROTOCOL_F_NET_MTU is present in
++      VHOST_USER_GET_PROTOCOL_FEATURES.
++      If VHOST_USER_PROTOCOL_F_REPLY_ACK is negotiated, slave must respond
++      with zero in case the specified MTU is valid, or non-zero otherwise.
++
+ VHOST_USER_PROTOCOL_F_REPLY_ACK:
+ -------------------------------
+ The original vhost-user specification only demands replies for certain
+diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+index 7ee92b3..9334a8a 100644
+--- a/hw/virtio/vhost-user.c
++++ b/hw/virtio/vhost-user.c
+@@ -32,6 +32,7 @@ enum VhostUserProtocolFeature {
+     VHOST_USER_PROTOCOL_F_LOG_SHMFD = 1,
+     VHOST_USER_PROTOCOL_F_RARP = 2,
+     VHOST_USER_PROTOCOL_F_REPLY_ACK = 3,
++    VHOST_USER_PROTOCOL_F_NET_MTU = 4,
+ 
+     VHOST_USER_PROTOCOL_F_MAX
+ };
+@@ -59,6 +60,7 @@ typedef enum VhostUserRequest {
+     VHOST_USER_GET_QUEUE_NUM = 17,
+     VHOST_USER_SET_VRING_ENABLE = 18,
+     VHOST_USER_SEND_RARP = 19,
++    VHOST_USER_NET_SET_MTU = 20,
+     VHOST_USER_MAX
+ } VhostUserRequest;
+ 
+@@ -186,6 +188,7 @@ static bool vhost_user_one_time_request(VhostUserRequest request)
+     case VHOST_USER_RESET_OWNER:
+     case VHOST_USER_SET_MEM_TABLE:
+     case VHOST_USER_GET_QUEUE_NUM:
++    case VHOST_USER_NET_SET_MTU:
+         return true;
+     default:
+         return false;
+@@ -685,6 +688,36 @@ static bool vhost_user_can_merge(struct vhost_dev *dev,
+     return mfd == rfd;
+ }
+ 
++static int vhost_user_net_set_mtu(struct vhost_dev *dev, uint16_t mtu)
++{
++    VhostUserMsg msg;
++    bool reply_supported = virtio_has_feature(dev->protocol_features,
++                                              VHOST_USER_PROTOCOL_F_REPLY_ACK);
++
++    if (!(dev->protocol_features & (1ULL << VHOST_USER_PROTOCOL_F_NET_MTU))) {
++        return 0;
++    }
++
++    msg.request = VHOST_USER_NET_SET_MTU;
++    msg.payload.u64 = mtu;
++    msg.size = sizeof(msg.payload.u64);
++    msg.flags = VHOST_USER_VERSION;
++    if (reply_supported) {
++        msg.flags |= VHOST_USER_NEED_REPLY_MASK;
++    }
++
++    if (vhost_user_write(dev, &msg, NULL, 0) < 0) {
++        return -1;
++    }
++
++    /* If reply_ack supported, slave has to ack specified MTU is valid */
++    if (reply_supported) {
++        return process_message_reply(dev, msg.request);
++    }
++
++    return 0;
++}
++
+ const VhostOps user_ops = {
+         .backend_type = VHOST_BACKEND_TYPE_USER,
+         .vhost_backend_init = vhost_user_init,
+@@ -708,4 +741,5 @@ const VhostOps user_ops = {
+         .vhost_requires_shm_log = vhost_user_requires_shm_log,
+         .vhost_migration_done = vhost_user_migration_done,
+         .vhost_backend_can_merge = vhost_user_can_merge,
++        .vhost_net_set_mtu = vhost_user_net_set_mtu,
+ };
+diff --git a/include/hw/virtio/vhost-backend.h b/include/hw/virtio/vhost-backend.h
+index 6e90703..30abc11 100644
+--- a/include/hw/virtio/vhost-backend.h
++++ b/include/hw/virtio/vhost-backend.h
+@@ -32,6 +32,7 @@ typedef int (*vhost_backend_memslots_limit)(struct vhost_dev *dev);
+ 
+ typedef int (*vhost_net_set_backend_op)(struct vhost_dev *dev,
+                                 struct vhost_vring_file *file);
++typedef int (*vhost_net_set_mtu_op)(struct vhost_dev *dev, uint16_t mtu);
+ typedef int (*vhost_scsi_set_endpoint_op)(struct vhost_dev *dev,
+                                   struct vhost_scsi_target *target);
+ typedef int (*vhost_scsi_clear_endpoint_op)(struct vhost_dev *dev,
+@@ -83,6 +84,7 @@ typedef struct VhostOps {
+     vhost_backend_cleanup vhost_backend_cleanup;
+     vhost_backend_memslots_limit vhost_backend_memslots_limit;
+     vhost_net_set_backend_op vhost_net_set_backend;
++    vhost_net_set_mtu_op vhost_net_set_mtu;
+     vhost_scsi_set_endpoint_op vhost_scsi_set_endpoint;
+     vhost_scsi_clear_endpoint_op vhost_scsi_clear_endpoint;
+     vhost_scsi_get_abi_version_op vhost_scsi_get_abi_version;
 -- 
 2.9.3
