@@ -1,34 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50931)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59917)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cFyZx-00048g-8t
-	for qemu-devel@nongnu.org; Sun, 11 Dec 2016 02:29:50 -0500
+	(envelope-from <bounces@canonical.com>) id 1cFulj-0005Qu-Os
+	for qemu-devel@nongnu.org; Sat, 10 Dec 2016 22:25:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cFyZu-0002Dx-2J
-	for qemu-devel@nongnu.org; Sun, 11 Dec 2016 02:29:49 -0500
-Received: from indium.canonical.com ([91.189.90.7]:42418)
+	(envelope-from <bounces@canonical.com>) id 1cFulg-0005sB-JA
+	for qemu-devel@nongnu.org; Sat, 10 Dec 2016 22:25:43 -0500
+Received: from indium.canonical.com ([91.189.90.7]:55183)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cFyZt-0002DC-TC
-	for qemu-devel@nongnu.org; Sun, 11 Dec 2016 02:29:46 -0500
+	id 1cFulg-0005qQ-Aj
+	for qemu-devel@nongnu.org; Sat, 10 Dec 2016 22:25:40 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cFyZr-0004hD-9k
-	for <qemu-devel@nongnu.org>; Sun, 11 Dec 2016 07:29:43 +0000
+	id 1cFule-0000er-EB
+	for <qemu-devel@nongnu.org>; Sun, 11 Dec 2016 03:25:38 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 391C22E80DA
-	for <qemu-devel@nongnu.org>; Sun, 11 Dec 2016 07:29:42 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 4E8B72E80C6
+	for <qemu-devel@nongnu.org>; Sun, 11 Dec 2016 03:25:38 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 11 Dec 2016 07:19:53 -0000
-From: Stefan Weil <932487@bugs.launchpad.net>
-Reply-To: Bug 932487 <932487@bugs.launchpad.net>
+Date: Sun, 11 Dec 2016 03:15:31 -0000
+From: LPNow <77777@tutanota.de>
+Reply-To: Bug 1649040 <1649040@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20120215015959.27405.46578.malonedeb@soybean.canonical.com>
-Message-Id: <20161211071953.12193.26932.malone@wampee.canonical.com>
+Message-Id: <20161211031531.25603.88090.malonedeb@gac.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 932487] Re: win32: git rev 59f971d crashes when
- accessing disk (coroutine issue)
+Subject: [Qemu-devel] [Bug 1649040] [NEW] Ubuntu 16.04.1 Grub Splash Doesn't
+ Appear
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,96 +38,244 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Fixed in newer versions which no longer have problems with thread local
-storage on Windows.
+Public bug reported:
 
-** Changed in: qemu
-       Status: Confirmed =3D> Fix Released
+My Specs:
+
+Slackware 14.2 x86_64 > Host
+QEMU 2.7.0
+
+Ubuntu 16.04.1 x86_64 > Guest
+
+Start options for Ubuntu:
+
+qemu-system-x86_64 -drive format=3Draw,file=3Dubuntu.img \
+-cpu host \
+--enable-kvm \
+-smp 2 \
+-m 4096 \
+-vga vmware \
+-soundhw ac97 \
+-usbdevice tablet \
+-rtc base=3Dlocaltime \
+-usbdevice host:0781:5575
+
+I've started Ubuntu around 6-8 times, and I have only see the Grub Boot
+Splash appear twice, so pretty much without fail it typically boots past
+the grub splash and automatically boots...
+
+These are the /etc/default/grub settings; (I only changed these options
+GRUB_TIMEOUT=3D15 and GRUB_GFXMODE=3D1440x900)
+
+# If you change this file, run 'update-grub' afterwards to update
+# /boot/grub/grub.cfg.
+# For full documentation of the options in this file, see:
+#   info -f grub -n 'Simple configuration'
+
+GRUB_DEFAULT=3D0
+GRUB_HIDDEN_TIMEOUT=3D0
+GRUB_HIDDEN_TIMEOUT_QUIET=3Dtrue
+GRUB_TIMEOUT=3D15
+GRUB_DISTRIBUTOR=3D`lsb_release -i -s 2> /dev/null || echo Debian`
+GRUB_CMDLINE_LINUX_DEFAULT=3D"quiet splash"
+GRUB_CMDLINE_LINUX=3D""
+
+# Uncomment to enable BadRAM filtering, modify to suit your needs
+# This works with Linux (no patch required) and with any kernel that obtains
+# the memory map information from GRUB (GNU Mach, kernel of FreeBSD ...)
+#GRUB_BADRAM=3D"0x01234567,0xfefefefe,0x89abcdef,0xefefefef"
+
+# Uncomment to disable graphical terminal (grub-pc only)
+#GRUB_TERMINAL=3Dconsole
+
+# The resolution used on graphical terminal
+# note that you can use only modes which your graphic card supports via VBE
+# you can see them in real GRUB with the command `vbeinfo'
+GRUB_GFXMODE=3D1440x900
+
+# Uncomment if you don't want GRUB to pass "root=3DUUID=3Dxxx" parameter to=
+ Linux
+#GRUB_DISABLE_LINUX_UUID=3Dtrue
+
+# Uncomment to disable generation of recovery mode menu entries
+#GRUB_DISABLE_RECOVERY=3D"true"
+
+# Uncomment to get a beep at grub start
+#GRUB_INIT_TUNE=3D"480 440 1"
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+** Description changed:
+
+  My Specs:
+  =
+
+  Slackware 14.2 x86_64 > Host
+- QEMU 2.7.0 =
+
++ QEMU 2.7.0
+  =
+
+- Ubuntu 16.04.1 > Guest
++ Ubuntu 16.04.1 x86_64 > Guest
+  =
+
+  Start options for Ubuntu:
+  =
+
+  qemu-system-x86_64 -drive format=3Draw,file=3Dubuntu.img \
+  -cpu host \
+  --enable-kvm \
+  -smp 2 \
+  -m 4096 \
+  -vga vmware \
+  -soundhw ac97 \
+  -usbdevice tablet \
+  -rtc base=3Dlocaltime \
+  -usbdevice host:0781:5575
+  =
+
+- =
+
+  I've started Ubuntu around 6-8 times, and I have only see the Grub Boot
+  Splash appear twice, so pretty much without fail it typically boots past
+  the grub splash and automatically boots...
+  =
+
+- =
+
+- These are the /etc/default/grub settings; (I only changed these options G=
+RUB_TIMEOUT=3D15 and GRUB_GFXMODE=3D1440x900)
+- =
+
++ These are the /etc/default/grub settings; (I only changed these options
++ GRUB_TIMEOUT=3D15 and GRUB_GFXMODE=3D1440x900)
+  =
+
+  # If you change this file, run 'update-grub' afterwards to update
+  # /boot/grub/grub.cfg.
+  # For full documentation of the options in this file, see:
+  #   info -f grub -n 'Simple configuration'
+  =
+
+  GRUB_DEFAULT=3D0
+  GRUB_HIDDEN_TIMEOUT=3D0
+  GRUB_HIDDEN_TIMEOUT_QUIET=3Dtrue
+  GRUB_TIMEOUT=3D15
+  GRUB_DISTRIBUTOR=3D`lsb_release -i -s 2> /dev/null || echo Debian`
+  GRUB_CMDLINE_LINUX_DEFAULT=3D"quiet splash"
+  GRUB_CMDLINE_LINUX=3D""
+  =
+
+  # Uncomment to enable BadRAM filtering, modify to suit your needs
+  # This works with Linux (no patch required) and with any kernel that obta=
+ins
+  # the memory map information from GRUB (GNU Mach, kernel of FreeBSD ...)
+  #GRUB_BADRAM=3D"0x01234567,0xfefefefe,0x89abcdef,0xefefefef"
+  =
+
+  # Uncomment to disable graphical terminal (grub-pc only)
+  #GRUB_TERMINAL=3Dconsole
+  =
+
+  # The resolution used on graphical terminal
+  # note that you can use only modes which your graphic card supports via V=
+BE
+  # you can see them in real GRUB with the command `vbeinfo'
+  GRUB_GFXMODE=3D1440x900
+  =
+
+  # Uncomment if you don't want GRUB to pass "root=3DUUID=3Dxxx" parameter =
+to Linux
+  #GRUB_DISABLE_LINUX_UUID=3Dtrue
+  =
+
+  # Uncomment to disable generation of recovery mode menu entries
+  #GRUB_DISABLE_RECOVERY=3D"true"
+  =
+
+  # Uncomment to get a beep at grub start
+  #GRUB_INIT_TUNE=3D"480 440 1"
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/932487
+https://bugs.launchpad.net/bugs/1649040
 
 Title:
-  win32: git rev 59f971d crashes when accessing disk (coroutine issue)
+  Ubuntu 16.04.1 Grub Splash Doesn't Appear
 
 Status in QEMU:
-  Fix Released
+  New
 
 Bug description:
-  Host: XP SP3 / Vista SP2
+  My Specs:
 
-  configure commandline: ./configure --target-list=3D"i386-softmmu"
-  --audio-drv-list=3Dsdl --audio-card-list=3Dac97,sb16,adlib --disable-
-  linux-aio --disable-vnc-thread --disable-vnc-jpeg --extra-cflags=3D"-O0
-  -pipe"
+  Slackware 14.2 x86_64 > Host
+  QEMU 2.7.0
 
-  gcc -v:
-  Using built-in specs.
-  Target: mingw32
-  Configured with: ../gcc-4.3.3/configure --prefix=3D/mingw --build=3Dmingw=
-32 --enable-languages=3Dc,ada,c++,fortran,objc,obj-c++ --with-bugurl=3Dhttp=
-://www.tdragon.net/recentgcc/bugs.php --disable-nls --disable-win32-registr=
-y --enable-libgomp --disable-werror --enable-threads --disable-symvers --en=
-able-cxx-flags=3D'-fno-function-sections -fno-data-sections' --enable-fully=
--dynamic-string --enable-version-specific-runtime-libs --enable-sjlj-except=
-ions --with-pkgversion=3D'4.3.3-tdm-1 mingw32'
-  Thread model: win32
-  gcc version 4.3.3 (4.3.3-tdm-1 mingw32)
+  Ubuntu 16.04.1 x86_64 > Guest
 
-  gdb output:
-  C:\msys\home\User\qemu\i386-softmmu>gdb --args qemu-system-i386.exe -L ..=
-\pc-bios -hda xp.vmdk
-  GNU gdb (GDB) 7.3
-  Copyright (C) 2011 Free Software Foundation, Inc.
-  License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.h=
-tml>
-  This is free software: you are free to change and redistribute it.
-  There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
-  and "show warranty" for details.
-  This GDB was configured as "mingw32".
-  For bug reporting instructions, please see:
-  <http://www.gnu.org/software/gdb/bugs/>...
-  Reading symbols from C:\msys\home\User\qemu\i386-softmmu/qemu-system-i386=
-.exe...
-  done.
-  (gdb) r
-  Starting program: C:\msys\home\User\qemu\i386-softmmu/qemu-system-i386.ex=
-e -L ..\\pc-bios -hda xp.vmdk
-  [New Thread 2472.0x8e0]
-  [New Thread 2472.0xdc4]
-  [New Thread 2472.0x8f0]
+  Start options for Ubuntu:
 
-  Program received signal SIGSEGV, Segmentation fault.
-  [Switching to Thread 2472.0x8f0]
-  0x7c81071e in SwitchToFiber () from C:\WINDOWS\system32\kernel32.dll
-  (gdb) bt
-  #0  0x7c81071e in SwitchToFiber () from C:\WINDOWS\system32\kernel32.dll
-  #1  0x0044774c in qemu_coroutine_switch (from_=3D0x19593fc, to_=3D0xdcee9=
-a8,
-      action=3DCOROUTINE_YIELD) at coroutine-win32.c:48
-  #2  0x004db18d in coroutine_swap (from=3D0x1e00, to=3D0xdcee9a8)
-      at qemu-coroutine.c:31
-  #3  0x00411618 in bdrv_rw_co (bs=3D<optimized out>, sector_num=3D<optimiz=
-ed out>,
-      buf=3D0x2140000 "@", nb_sectors=3D1, is_write=3Dfalse) at block.c:1335
-  #4  0x00486e39 in ide_sector_read (s=3D0x1bbdaa0)
-      at C:/msys/home/User/qemu/hw/ide/core.c:480
-  #5  0x0054e71f in memory_region_iorange_write (iorange=3D0x1bbcf60, offse=
-t=3D7,
-      width=3D1, data=3D32) at C:/msys/home/User/qemu/memory.c:431
-  #6  0x005494e0 in ioport_writeb_thunk (opaque=3D0x1bbcf60, addr=3D7680, d=
-ata=3D32)
-      at C:/msys/home/User/qemu/ioport.c:211
-  #7  0x005496cf in ioport_write (data=3D<optimized out>,
-      address=3D<optimized out>, index=3D<optimized out>)
-      at C:/msys/home/User/qemu/ioport.c:82
-  #8  cpu_outb (addr=3D2147340288, val=3D0 '\000')
-      at C:/msys/home/User/qemu/ioport.c:274
-  #9  0x022c0397 in ?? ()
-  Backtrace stopped: previous frame inner to this frame (corrupt stack?)
+  qemu-system-x86_64 -drive format=3Draw,file=3Dubuntu.img \
+  -cpu host \
+  --enable-kvm \
+  -smp 2 \
+  -m 4096 \
+  -vga vmware \
+  -soundhw ac97 \
+  -usbdevice tablet \
+  -rtc base=3Dlocaltime \
+  -usbdevice host:0781:5575
+
+  I've started Ubuntu around 6-8 times, and I have only see the Grub
+  Boot Splash appear twice, so pretty much without fail it typically
+  boots past the grub splash and automatically boots...
+
+  These are the /etc/default/grub settings; (I only changed these
+  options GRUB_TIMEOUT=3D15 and GRUB_GFXMODE=3D1440x900)
+
+  # If you change this file, run 'update-grub' afterwards to update
+  # /boot/grub/grub.cfg.
+  # For full documentation of the options in this file, see:
+  #   info -f grub -n 'Simple configuration'
+
+  GRUB_DEFAULT=3D0
+  GRUB_HIDDEN_TIMEOUT=3D0
+  GRUB_HIDDEN_TIMEOUT_QUIET=3Dtrue
+  GRUB_TIMEOUT=3D15
+  GRUB_DISTRIBUTOR=3D`lsb_release -i -s 2> /dev/null || echo Debian`
+  GRUB_CMDLINE_LINUX_DEFAULT=3D"quiet splash"
+  GRUB_CMDLINE_LINUX=3D""
+
+  # Uncomment to enable BadRAM filtering, modify to suit your needs
+  # This works with Linux (no patch required) and with any kernel that obta=
+ins
+  # the memory map information from GRUB (GNU Mach, kernel of FreeBSD ...)
+  #GRUB_BADRAM=3D"0x01234567,0xfefefefe,0x89abcdef,0xefefefef"
+
+  # Uncomment to disable graphical terminal (grub-pc only)
+  #GRUB_TERMINAL=3Dconsole
+
+  # The resolution used on graphical terminal
+  # note that you can use only modes which your graphic card supports via V=
+BE
+  # you can see them in real GRUB with the command `vbeinfo'
+  GRUB_GFXMODE=3D1440x900
+
+  # Uncomment if you don't want GRUB to pass "root=3DUUID=3Dxxx" parameter =
+to Linux
+  #GRUB_DISABLE_LINUX_UUID=3Dtrue
+
+  # Uncomment to disable generation of recovery mode menu entries
+  #GRUB_DISABLE_RECOVERY=3D"true"
+
+  # Uncomment to get a beep at grub start
+  #GRUB_INIT_TUNE=3D"480 440 1"
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/932487/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1649040/+subscriptions
