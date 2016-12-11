@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42887)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42902)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jinguojie@loongson.cn>) id 1cG4Kb-0001ty-2y
-	for qemu-devel@nongnu.org; Sun, 11 Dec 2016 08:38:22 -0500
+	(envelope-from <jinguojie@loongson.cn>) id 1cG4Kb-0001ue-Ra
+	for qemu-devel@nongnu.org; Sun, 11 Dec 2016 08:38:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jinguojie@loongson.cn>) id 1cG4Ka-0001Kx-4I
+	(envelope-from <jinguojie@loongson.cn>) id 1cG4Ka-0001LV-Qa
 	for qemu-devel@nongnu.org; Sun, 11 Dec 2016 08:38:21 -0500
-Received: from [114.242.206.163] (port=49181 helo=loongson.cn)
+Received: from [114.242.206.163] (port=49182 helo=loongson.cn)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jinguojie@loongson.cn>) id 1cG4KZ-0001IS-4m
+	(envelope-from <jinguojie@loongson.cn>) id 1cG4KZ-0001Ja-Sp
 	for qemu-devel@nongnu.org; Sun, 11 Dec 2016 08:38:20 -0500
 From: Jin Guojie <jinguojie@loongson.cn>
-Date: Sun, 11 Dec 2016 21:36:21 +0800
-Message-Id: <1481463385-15898-7-git-send-email-jinguojie@loongson.cn>
+Date: Sun, 11 Dec 2016 21:36:20 +0800
+Message-Id: <1481463385-15898-6-git-send-email-jinguojie@loongson.cn>
 In-Reply-To: <1481463385-15898-1-git-send-email-jinguojie@loongson.cn>
 References: <1481463385-15898-1-git-send-email-jinguojie@loongson.cn>
-Subject: [Qemu-devel] [PATCH v6 06/10] tcg-mips: Adjust load/store functions
- for mips64
+Subject: [Qemu-devel] [PATCH v6 05/10] tcg-mips: Adjust move functions for
+ mips64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,9 +27,8 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Aurelien Jarno <aurelien@aurel32.net>, James Hogan <james.hogan@imgtec.com>, YunQiang Su <wzssyqa@gmail.com>, Richard Henderson <rth@twiddle.net>, Jin Guojie <jinguojie@loongson.cn>
 
-tcg_out_ldst: using a generic ALIAS_PADD to avoid ifdefs
-tcg_out_ld: generates LD or LW
-tcg_out_st: generates SD or SW
+tcg_out_mov: using OPC_OR as most mips assemblers do;
+tcg_out_movi: extended to 64-bit immediate.
 
 Tested-by: Aurelien Jarno <aurelien@aurel32.net>
 Tested-by: James Hogan <james.hogan@imgtec.com>
@@ -37,45 +36,61 @@ Tested-by: YunQiang Su <wzssyqa@gmail.com>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 Signed-off-by: Jin Guojie <jinguojie@loongson.cn>
 ---
- tcg/mips/tcg-target.inc.c | 14 +++++++++++---
- 1 file changed, 11 insertions(+), 3 deletions(-)
+ tcg/mips/tcg-target.inc.c | 34 +++++++++++++++++++++++++---------
+ 1 file changed, 25 insertions(+), 9 deletions(-)
 
 diff --git a/tcg/mips/tcg-target.inc.c b/tcg/mips/tcg-target.inc.c
-index 18368f0..5cc8df3 100644
+index ec139cd..18368f0 100644
 --- a/tcg/mips/tcg-target.inc.c
 +++ b/tcg/mips/tcg-target.inc.c
-@@ -697,7 +697,7 @@ static void tcg_out_ldst(TCGContext *s, MIPSInsn opc, TCGReg data,
-     if (ofs != lo) {
-         tcg_out_movi(s, TCG_TYPE_PTR, TCG_TMP0, ofs - lo);
-         if (addr != TCG_REG_ZERO) {
--            tcg_out_opc_reg(s, OPC_ADDU, TCG_TMP0, TCG_TMP0, addr);
-+            tcg_out_opc_reg(s, ALIAS_PADD, TCG_TMP0, TCG_TMP0, addr);
-         }
-         addr = TCG_TMP0;
+@@ -544,23 +544,39 @@ static inline void tcg_out_mov(TCGContext *s, TCGType type,
+ {
+     /* Simple reg-reg move, optimising out the 'do nothing' case */
+     if (ret != arg) {
+-        tcg_out_opc_reg(s, OPC_ADDU, ret, arg, TCG_REG_ZERO);
++        tcg_out_opc_reg(s, OPC_OR, ret, arg, TCG_REG_ZERO);
      }
-@@ -707,13 +707,21 @@ static void tcg_out_ldst(TCGContext *s, MIPSInsn opc, TCGReg data,
- static inline void tcg_out_ld(TCGContext *s, TCGType type, TCGReg arg,
-                               TCGReg arg1, intptr_t arg2)
- {
--    tcg_out_ldst(s, OPC_LW, arg, arg1, arg2);
-+    MIPSInsn opc = OPC_LD;
-+    if (TCG_TARGET_REG_BITS == 32 || type == TCG_TYPE_I32) {
-+        opc = OPC_LW;
-+    }
-+    tcg_out_ldst(s, opc, arg, arg1, arg2);
  }
  
- static inline void tcg_out_st(TCGContext *s, TCGType type, TCGReg arg,
-                               TCGReg arg1, intptr_t arg2)
+-static inline void tcg_out_movi(TCGContext *s, TCGType type,
+-                                TCGReg reg, tcg_target_long arg)
++static void tcg_out_movi(TCGContext *s, TCGType type,
++                         TCGReg ret, tcg_target_long arg)
  {
--    tcg_out_ldst(s, OPC_SW, arg, arg1, arg2);
-+    MIPSInsn opc = OPC_SD;
-+    if (TCG_TARGET_REG_BITS == 32 || type == TCG_TYPE_I32) {
-+        opc = OPC_SW;
++    if (TCG_TARGET_REG_BITS == 64 && type == TCG_TYPE_I32) {
++        arg = (int32_t)arg;
 +    }
-+    tcg_out_ldst(s, opc, arg, arg1, arg2);
+     if (arg == (int16_t)arg) {
+-        tcg_out_opc_imm(s, OPC_ADDIU, reg, TCG_REG_ZERO, arg);
+-    } else if (arg == (uint16_t)arg) {
+-        tcg_out_opc_imm(s, OPC_ORI, reg, TCG_REG_ZERO, arg);
++        tcg_out_opc_imm(s, OPC_ADDIU, ret, TCG_REG_ZERO, arg);
++        return;
++    }
++    if (arg == (uint16_t)arg) {
++        tcg_out_opc_imm(s, OPC_ORI, ret, TCG_REG_ZERO, arg);
++        return;
++    }
++    if (TCG_TARGET_REG_BITS == 32 || arg == (int32_t)arg) {
++        tcg_out_opc_imm(s, OPC_LUI, ret, TCG_REG_ZERO, arg >> 16);
+     } else {
+-        tcg_out_opc_imm(s, OPC_LUI, reg, TCG_REG_ZERO, arg >> 16);
+-        if (arg & 0xffff) {
+-            tcg_out_opc_imm(s, OPC_ORI, reg, reg, arg & 0xffff);
++        tcg_out_movi(s, TCG_TYPE_I32, ret, arg >> 31 >> 1);
++        if (arg & 0xffff0000ull) {
++            tcg_out_dsll(s, ret, ret, 16);
++            tcg_out_opc_imm(s, OPC_ORI, ret, ret, arg >> 16);
++            tcg_out_dsll(s, ret, ret, 16);
++        } else {
++            tcg_out_dsll(s, ret, ret, 32);
+         }
+     }
++    if (arg & 0xffff) {
++        tcg_out_opc_imm(s, OPC_ORI, ret, ret, arg & 0xffff);
++    }
  }
  
- static inline bool tcg_out_sti(TCGContext *s, TCGType type, TCGArg val,
+ static inline void tcg_out_bswap16(TCGContext *s, TCGReg ret, TCGReg arg)
 -- 
 2.1.0
