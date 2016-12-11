@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42818)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42836)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jinguojie@loongson.cn>) id 1cG4KF-0001gr-4M
-	for qemu-devel@nongnu.org; Sun, 11 Dec 2016 08:38:00 -0500
+	(envelope-from <jinguojie@loongson.cn>) id 1cG4KO-0001kr-7h
+	for qemu-devel@nongnu.org; Sun, 11 Dec 2016 08:38:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jinguojie@loongson.cn>) id 1cG4KC-00011A-J3
-	for qemu-devel@nongnu.org; Sun, 11 Dec 2016 08:37:59 -0500
-Received: from [114.242.206.163] (port=49155 helo=loongson.cn)
+	(envelope-from <jinguojie@loongson.cn>) id 1cG4KK-00017x-U9
+	for qemu-devel@nongnu.org; Sun, 11 Dec 2016 08:38:08 -0500
+Received: from [114.242.206.163] (port=49152 helo=loongson.cn)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jinguojie@loongson.cn>) id 1cG4KB-0000xv-KD
-	for qemu-devel@nongnu.org; Sun, 11 Dec 2016 08:37:56 -0500
+	(envelope-from <jinguojie@loongson.cn>) id 1cG4KJ-0000ww-8r
+	for qemu-devel@nongnu.org; Sun, 11 Dec 2016 08:38:04 -0500
 From: Jin Guojie <jinguojie@loongson.cn>
-Date: Sun, 11 Dec 2016 21:36:17 +0800
-Message-Id: <1481463385-15898-3-git-send-email-jinguojie@loongson.cn>
+Date: Sun, 11 Dec 2016 21:36:16 +0800
+Message-Id: <1481463385-15898-2-git-send-email-jinguojie@loongson.cn>
 In-Reply-To: <1481463385-15898-1-git-send-email-jinguojie@loongson.cn>
 References: <1481463385-15898-1-git-send-email-jinguojie@loongson.cn>
-Subject: [Qemu-devel] [PATCH v6 02/10] tcg-mips: Add mips64 opcodes
+Subject: [Qemu-devel] [PATCH v6 01/10] tcg-mips: Move bswap code to a
+ subroutine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,9 +27,12 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Aurelien Jarno <aurelien@aurel32.net>, James Hogan <james.hogan@imgtec.com>, YunQiang Su <wzssyqa@gmail.com>, Richard Henderson <rth@twiddle.net>, Jin Guojie <jinguojie@loongson.cn>
 
-Since the mips manual tables are in octal, reorg all of the opcodes
-into that format for clarity.  Note that the 64-bit opcodes are as
-yet unused.
+Without the mips32r2 instructions to perform swapping, bswap is quite large,
+dominating the size of each reverse-endian qemu_ld/qemu_st operation.
+
+Create a subroutine in the prologue block.  The subroutine requires extra
+reserved registers (TCG_TMP[2, 3]).  Using these within qemu_ld means that
+we need not place additional restrictions on the qemu_ld outputs.
 
 Tested-by: Aurelien Jarno <aurelien@aurel32.net>
 Tested-by: James Hogan <james.hogan@imgtec.com>
@@ -36,219 +40,408 @@ Tested-by: YunQiang Su <wzssyqa@gmail.com>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 Signed-off-by: Jin Guojie <jinguojie@loongson.cn>
 ---
- tcg/mips/tcg-target.inc.c | 193 ++++++++++++++++++++++++++++------------------
- 1 file changed, 118 insertions(+), 75 deletions(-)
+ tcg/mips/tcg-target.h     |   2 +-
+ tcg/mips/tcg-target.inc.c | 207 ++++++++++++++++++++++++++++++----------------
+ 2 files changed, 139 insertions(+), 70 deletions(-)
 
+diff --git a/tcg/mips/tcg-target.h b/tcg/mips/tcg-target.h
+index 3aeac87..a6871fb 100644
+--- a/tcg/mips/tcg-target.h
++++ b/tcg/mips/tcg-target.h
+@@ -117,11 +117,11 @@ extern bool use_mips32r2_instructions;
+ #define TCG_TARGET_HAS_muls2_i32        (!use_mips32r6_instructions)
+ #define TCG_TARGET_HAS_muluh_i32        1
+ #define TCG_TARGET_HAS_mulsh_i32        1
++#define TCG_TARGET_HAS_bswap32_i32      1
+ 
+ /* optional instructions detected at runtime */
+ #define TCG_TARGET_HAS_movcond_i32      use_movnz_instructions
+ #define TCG_TARGET_HAS_bswap16_i32      use_mips32r2_instructions
+-#define TCG_TARGET_HAS_bswap32_i32      use_mips32r2_instructions
+ #define TCG_TARGET_HAS_deposit_i32      use_mips32r2_instructions
+ #define TCG_TARGET_HAS_ext8s_i32        use_mips32r2_instructions
+ #define TCG_TARGET_HAS_ext16s_i32       use_mips32r2_instructions
 diff --git a/tcg/mips/tcg-target.inc.c b/tcg/mips/tcg-target.inc.c
-index 2b116ea..fb84ea5 100644
+index abce602..2b116ea 100644
 --- a/tcg/mips/tcg-target.inc.c
 +++ b/tcg/mips/tcg-target.inc.c
-@@ -254,81 +254,118 @@ static inline int tcg_target_const_match(tcg_target_long val, TCGType type,
+@@ -74,6 +74,8 @@ static const char * const tcg_target_reg_names[TCG_TARGET_NB_REGS] = {
  
- /* instruction opcodes */
- typedef enum {
--    OPC_J        = 0x02 << 26,
--    OPC_JAL      = 0x03 << 26,
--    OPC_BEQ      = 0x04 << 26,
--    OPC_BNE      = 0x05 << 26,
--    OPC_BLEZ     = 0x06 << 26,
--    OPC_BGTZ     = 0x07 << 26,
--    OPC_ADDIU    = 0x09 << 26,
--    OPC_SLTI     = 0x0A << 26,
--    OPC_SLTIU    = 0x0B << 26,
--    OPC_ANDI     = 0x0C << 26,
--    OPC_ORI      = 0x0D << 26,
--    OPC_XORI     = 0x0E << 26,
--    OPC_LUI      = 0x0F << 26,
--    OPC_LB       = 0x20 << 26,
--    OPC_LH       = 0x21 << 26,
--    OPC_LW       = 0x23 << 26,
--    OPC_LBU      = 0x24 << 26,
--    OPC_LHU      = 0x25 << 26,
--    OPC_LWU      = 0x27 << 26,
--    OPC_SB       = 0x28 << 26,
--    OPC_SH       = 0x29 << 26,
--    OPC_SW       = 0x2B << 26,
--
--    OPC_SPECIAL  = 0x00 << 26,
--    OPC_SLL      = OPC_SPECIAL | 0x00,
--    OPC_SRL      = OPC_SPECIAL | 0x02,
--    OPC_ROTR     = OPC_SPECIAL | (0x01 << 21) | 0x02,
--    OPC_SRA      = OPC_SPECIAL | 0x03,
--    OPC_SLLV     = OPC_SPECIAL | 0x04,
--    OPC_SRLV     = OPC_SPECIAL | 0x06,
--    OPC_ROTRV    = OPC_SPECIAL | (0x01 <<  6) | 0x06,
--    OPC_SRAV     = OPC_SPECIAL | 0x07,
--    OPC_JR_R5    = OPC_SPECIAL | 0x08,
--    OPC_JALR     = OPC_SPECIAL | 0x09,
--    OPC_MOVZ     = OPC_SPECIAL | 0x0A,
--    OPC_MOVN     = OPC_SPECIAL | 0x0B,
--    OPC_SYNC     = OPC_SPECIAL | 0x0F,
--    OPC_MFHI     = OPC_SPECIAL | 0x10,
--    OPC_MFLO     = OPC_SPECIAL | 0x12,
--    OPC_MULT     = OPC_SPECIAL | 0x18,
--    OPC_MUL_R6   = OPC_SPECIAL | (0x02 <<  6) | 0x18,
--    OPC_MUH      = OPC_SPECIAL | (0x03 <<  6) | 0x18,
--    OPC_MULTU    = OPC_SPECIAL | 0x19,
--    OPC_MULU     = OPC_SPECIAL | (0x02 <<  6) | 0x19,
--    OPC_MUHU     = OPC_SPECIAL | (0x03 <<  6) | 0x19,
--    OPC_DIV      = OPC_SPECIAL | 0x1A,
--    OPC_DIV_R6   = OPC_SPECIAL | (0x02 <<  6) | 0x1A,
--    OPC_MOD      = OPC_SPECIAL | (0x03 <<  6) | 0x1A,
--    OPC_DIVU     = OPC_SPECIAL | 0x1B,
--    OPC_DIVU_R6  = OPC_SPECIAL | (0x02 <<  6) | 0x1B,
--    OPC_MODU     = OPC_SPECIAL | (0x03 <<  6) | 0x1B,
--    OPC_ADDU     = OPC_SPECIAL | 0x21,
--    OPC_SUBU     = OPC_SPECIAL | 0x23,
--    OPC_AND      = OPC_SPECIAL | 0x24,
--    OPC_OR       = OPC_SPECIAL | 0x25,
--    OPC_XOR      = OPC_SPECIAL | 0x26,
--    OPC_NOR      = OPC_SPECIAL | 0x27,
--    OPC_SLT      = OPC_SPECIAL | 0x2A,
--    OPC_SLTU     = OPC_SPECIAL | 0x2B,
--    OPC_SELEQZ   = OPC_SPECIAL | 0x35,
--    OPC_SELNEZ   = OPC_SPECIAL | 0x37,
--
--    OPC_REGIMM   = 0x01 << 26,
--    OPC_BLTZ     = OPC_REGIMM | (0x00 << 16),
--    OPC_BGEZ     = OPC_REGIMM | (0x01 << 16),
--
--    OPC_SPECIAL2 = 0x1c << 26,
--    OPC_MUL_R5   = OPC_SPECIAL2 | 0x002,
--
--    OPC_SPECIAL3 = 0x1f << 26,
--    OPC_EXT      = OPC_SPECIAL3 | 0x000,
--    OPC_INS      = OPC_SPECIAL3 | 0x004,
--    OPC_WSBH     = OPC_SPECIAL3 | 0x0a0,
--    OPC_SEB      = OPC_SPECIAL3 | 0x420,
--    OPC_SEH      = OPC_SPECIAL3 | 0x620,
-+    OPC_J        = 002 << 26,
-+    OPC_JAL      = 003 << 26,
-+    OPC_BEQ      = 004 << 26,
-+    OPC_BNE      = 005 << 26,
-+    OPC_BLEZ     = 006 << 26,
-+    OPC_BGTZ     = 007 << 26,
-+    OPC_ADDIU    = 011 << 26,
-+    OPC_SLTI     = 012 << 26,
-+    OPC_SLTIU    = 013 << 26,
-+    OPC_ANDI     = 014 << 26,
-+    OPC_ORI      = 015 << 26,
-+    OPC_XORI     = 016 << 26,
-+    OPC_LUI      = 017 << 26,
-+    OPC_DADDIU   = 031 << 26,
-+    OPC_LB       = 040 << 26,
-+    OPC_LH       = 041 << 26,
-+    OPC_LW       = 043 << 26,
-+    OPC_LBU      = 044 << 26,
-+    OPC_LHU      = 045 << 26,
-+    OPC_LWU      = 047 << 26,
-+    OPC_SB       = 050 << 26,
-+    OPC_SH       = 051 << 26,
-+    OPC_SW       = 053 << 26,
-+    OPC_LD       = 067 << 26,
-+    OPC_SD       = 077 << 26,
-+
-+    OPC_SPECIAL  = 000 << 26,
-+    OPC_SLL      = OPC_SPECIAL | 000,
-+    OPC_SRL      = OPC_SPECIAL | 002,
-+    OPC_ROTR     = OPC_SPECIAL | 002 | (1 << 21),
-+    OPC_SRA      = OPC_SPECIAL | 003,
-+    OPC_SLLV     = OPC_SPECIAL | 004,
-+    OPC_SRLV     = OPC_SPECIAL | 006,
-+    OPC_ROTRV    = OPC_SPECIAL | 006 | 0100,
-+    OPC_SRAV     = OPC_SPECIAL | 007,
-+    OPC_JR_R5    = OPC_SPECIAL | 010,
-+    OPC_JALR     = OPC_SPECIAL | 011,
-+    OPC_MOVZ     = OPC_SPECIAL | 012,
-+    OPC_MOVN     = OPC_SPECIAL | 013,
-+    OPC_SYNC     = OPC_SPECIAL | 017,
-+    OPC_MFHI     = OPC_SPECIAL | 020,
-+    OPC_MFLO     = OPC_SPECIAL | 022,
-+    OPC_DSLLV    = OPC_SPECIAL | 024,
-+    OPC_DSRLV    = OPC_SPECIAL | 026,
-+    OPC_DROTRV   = OPC_SPECIAL | 026 | 0100,
-+    OPC_DSRAV    = OPC_SPECIAL | 027,
-+    OPC_MULT     = OPC_SPECIAL | 030,
-+    OPC_MUL_R6   = OPC_SPECIAL | 030 | 0200,
-+    OPC_MUH      = OPC_SPECIAL | 030 | 0300,
-+    OPC_MULTU    = OPC_SPECIAL | 031,
-+    OPC_MULU     = OPC_SPECIAL | 031 | 0200,
-+    OPC_MUHU     = OPC_SPECIAL | 031 | 0300,
-+    OPC_DIV      = OPC_SPECIAL | 032,
-+    OPC_DIV_R6   = OPC_SPECIAL | 032 | 0200,
-+    OPC_MOD      = OPC_SPECIAL | 032 | 0300,
-+    OPC_DIVU     = OPC_SPECIAL | 033,
-+    OPC_DIVU_R6  = OPC_SPECIAL | 033 | 0200,
-+    OPC_MODU     = OPC_SPECIAL | 033 | 0300,
-+    OPC_DMULT    = OPC_SPECIAL | 034,
-+    OPC_DMUL     = OPC_SPECIAL | 034 | 0200,
-+    OPC_DMUH     = OPC_SPECIAL | 034 | 0300,
-+    OPC_DMULTU   = OPC_SPECIAL | 035,
-+    OPC_DMULU    = OPC_SPECIAL | 035 | 0200,
-+    OPC_DMUHU    = OPC_SPECIAL | 035 | 0300,
-+    OPC_DDIV     = OPC_SPECIAL | 036,
-+    OPC_DDIV_R6  = OPC_SPECIAL | 036 | 0200,
-+    OPC_DMOD     = OPC_SPECIAL | 036 | 0300,
-+    OPC_DDIVU    = OPC_SPECIAL | 037,
-+    OPC_DDIVU_R6 = OPC_SPECIAL | 037 | 0200,
-+    OPC_DMODU    = OPC_SPECIAL | 037 | 0300,
-+    OPC_ADDU     = OPC_SPECIAL | 041,
-+    OPC_SUBU     = OPC_SPECIAL | 043,
-+    OPC_AND      = OPC_SPECIAL | 044,
-+    OPC_OR       = OPC_SPECIAL | 045,
-+    OPC_XOR      = OPC_SPECIAL | 046,
-+    OPC_NOR      = OPC_SPECIAL | 047,
-+    OPC_SLT      = OPC_SPECIAL | 052,
-+    OPC_SLTU     = OPC_SPECIAL | 053,
-+    OPC_DADDU    = OPC_SPECIAL | 055,
-+    OPC_DSUBU    = OPC_SPECIAL | 057,
-+    OPC_SELEQZ   = OPC_SPECIAL | 065,
-+    OPC_SELNEZ   = OPC_SPECIAL | 067,
-+    OPC_DSLL     = OPC_SPECIAL | 070,
-+    OPC_DSRL     = OPC_SPECIAL | 072,
-+    OPC_DROTR    = OPC_SPECIAL | 072 | (1 << 21),
-+    OPC_DSRA     = OPC_SPECIAL | 073,
-+    OPC_DSLL32   = OPC_SPECIAL | 074,
-+    OPC_DSRL32   = OPC_SPECIAL | 076,
-+    OPC_DROTR32  = OPC_SPECIAL | 076 | (1 << 21),
-+    OPC_DSRA32   = OPC_SPECIAL | 077,
-+
-+    OPC_REGIMM   = 001 << 26,
-+    OPC_BLTZ     = OPC_REGIMM | (000 << 16),
-+    OPC_BGEZ     = OPC_REGIMM | (001 << 16),
-+
-+    OPC_SPECIAL2 = 034 << 26,
-+    OPC_MUL_R5   = OPC_SPECIAL2 | 002,
-+
-+    OPC_SPECIAL3 = 037 << 26,
-+    OPC_EXT      = OPC_SPECIAL3 | 000,
-+    OPC_DEXTM    = OPC_SPECIAL3 | 001,
-+    OPC_DEXTU    = OPC_SPECIAL3 | 002,
-+    OPC_DEXT     = OPC_SPECIAL3 | 003,
-+    OPC_INS      = OPC_SPECIAL3 | 004,
-+    OPC_DINSM    = OPC_SPECIAL3 | 005,
-+    OPC_DINSU    = OPC_SPECIAL3 | 006,
-+    OPC_DINS     = OPC_SPECIAL3 | 007,
-+    OPC_WSBH     = OPC_SPECIAL3 | 00240,
-+    OPC_DSBH     = OPC_SPECIAL3 | 00244,
-+    OPC_DSHD     = OPC_SPECIAL3 | 00544,
-+    OPC_SEB      = OPC_SPECIAL3 | 02040,
-+    OPC_SEH      = OPC_SPECIAL3 | 03040,
+ #define TCG_TMP0  TCG_REG_AT
+ #define TCG_TMP1  TCG_REG_T9
++#define TCG_TMP2  TCG_REG_T8
++#define TCG_TMP3  TCG_REG_T7
  
-     /* MIPS r6 doesn't have JR, JALR should be used instead */
-     OPC_JR       = use_mips32r6_instructions ? OPC_JALR : OPC_JR_R5,
-@@ -346,6 +383,12 @@ typedef enum {
-     OPC_SYNC_ACQUIRE = OPC_SYNC | 0x11 << 5,
-     OPC_SYNC_RELEASE = OPC_SYNC | 0x12 << 5,
-     OPC_SYNC_RMB     = OPC_SYNC | 0x13 << 5,
-+
-+    /* Aliases for convenience.  */
-+    ALIAS_PADD     = sizeof(void *) == 4 ? OPC_ADDU : OPC_DADDU,
-+    ALIAS_PADDI    = sizeof(void *) == 4 ? OPC_ADDIU : OPC_DADDIU,
-+    ALIAS_TSRL     = TARGET_LONG_BITS == 32 || TCG_TARGET_REG_BITS == 32
-+                     ? OPC_SRL : OPC_DSRL,
- } MIPSInsn;
+ /* check if we really need so many registers :P */
+ static const int tcg_target_reg_alloc_order[] = {
+@@ -122,6 +124,7 @@ static const TCGReg tcg_target_call_oarg_regs[2] = {
+ };
  
- /*
+ static tcg_insn_unit *tb_ret_addr;
++static tcg_insn_unit *bswap32_addr;
+ 
+ static inline uint32_t reloc_pc16_val(tcg_insn_unit *pc, tcg_insn_unit *target)
+ {
+@@ -177,12 +180,7 @@ static int target_parse_constraint(TCGArgConstraint *ct, const char **pct_str)
+         ct->ct |= TCG_CT_REG;
+         tcg_regset_set(ct->u.regs, 0xffffffff);
+         break;
+-    case 'L': /* qemu_ld output arg constraint */
+-        ct->ct |= TCG_CT_REG;
+-        tcg_regset_set(ct->u.regs, 0xffffffff);
+-        tcg_regset_reset_reg(ct->u.regs, TCG_REG_V0);
+-        break;
+-    case 'l': /* qemu_ld input arg constraint */
++    case 'L': /* qemu_ld input arg constraint */
+         ct->ct |= TCG_CT_REG;
+         tcg_regset_set(ct->u.regs, 0xffffffff);
+         tcg_regset_reset_reg(ct->u.regs, TCG_REG_A0);
+@@ -513,29 +511,22 @@ static inline void tcg_out_bswap16s(TCGContext *s, TCGReg ret, TCGReg arg)
+     }
+ }
+ 
+-static inline void tcg_out_bswap32(TCGContext *s, TCGReg ret, TCGReg arg)
++static void tcg_out_bswap_subr(TCGContext *s, tcg_insn_unit *sub)
++{
++    bool ok = tcg_out_opc_jmp(s, OPC_JAL, sub);
++    tcg_debug_assert(ok);
++}
++
++static void tcg_out_bswap32(TCGContext *s, TCGReg ret, TCGReg arg)
+ {
+     if (use_mips32r2_instructions) {
+         tcg_out_opc_reg(s, OPC_WSBH, ret, 0, arg);
+         tcg_out_opc_sa(s, OPC_ROTR, ret, ret, 16);
+     } else {
+-        /* ret and arg must be different and can't be register at */
+-        if (ret == arg || ret == TCG_TMP0 || arg == TCG_TMP0) {
+-            tcg_abort();
+-        }
+-
+-        tcg_out_opc_sa(s, OPC_SLL, ret, arg, 24);
+-
+-        tcg_out_opc_sa(s, OPC_SRL, TCG_TMP0, arg, 24);
+-        tcg_out_opc_reg(s, OPC_OR, ret, ret, TCG_TMP0);
+-
+-        tcg_out_opc_imm(s, OPC_ANDI, TCG_TMP0, arg, 0xff00);
+-        tcg_out_opc_sa(s, OPC_SLL, TCG_TMP0, TCG_TMP0, 8);
+-        tcg_out_opc_reg(s, OPC_OR, ret, ret, TCG_TMP0);
+-
+-        tcg_out_opc_sa(s, OPC_SRL, TCG_TMP0, arg, 8);
+-        tcg_out_opc_imm(s, OPC_ANDI, TCG_TMP0, TCG_TMP0, 0xff00);
+-        tcg_out_opc_reg(s, OPC_OR, ret, ret, TCG_TMP0);
++        tcg_out_bswap_subr(s, bswap32_addr);
++        /* delay slot -- never omit the insn, like tcg_out_mov might.  */
++        tcg_out_opc_reg(s, OPC_OR, TCG_TMP0, arg, TCG_REG_ZERO);
++        tcg_out_mov(s, TCG_TYPE_I32, ret, TCG_TMP3);
+     }
+ }
+ 
+@@ -1044,7 +1035,7 @@ static int tcg_out_call_iarg_reg2(TCGContext *s, int i, TCGReg al, TCGReg ah)
+ }
+ 
+ /* Perform the tlb comparison operation.  The complete host address is
+-   placed in BASE.  Clobbers AT, T0, A0.  */
++   placed in BASE.  Clobbers TMP0, TMP1, A0.  */
+ static void tcg_out_tlb_load(TCGContext *s, TCGReg base, TCGReg addrl,
+                              TCGReg addrh, TCGMemOpIdx oi,
+                              tcg_insn_unit *label_ptr[2], bool is_load)
+@@ -1227,46 +1218,72 @@ static void tcg_out_qemu_st_slow_path(TCGContext *s, TCGLabelQemuLdst *l)
+ }
+ #endif
+ 
+-static void tcg_out_qemu_ld_direct(TCGContext *s, TCGReg datalo, TCGReg datahi,
++static void tcg_out_qemu_ld_direct(TCGContext *s, TCGReg lo, TCGReg hi,
+                                    TCGReg base, TCGMemOp opc)
+ {
+     switch (opc & (MO_SSIZE | MO_BSWAP)) {
+     case MO_UB:
+-        tcg_out_opc_imm(s, OPC_LBU, datalo, base, 0);
++        tcg_out_opc_imm(s, OPC_LBU, lo, base, 0);
+         break;
+     case MO_SB:
+-        tcg_out_opc_imm(s, OPC_LB, datalo, base, 0);
++        tcg_out_opc_imm(s, OPC_LB, lo, base, 0);
+         break;
+     case MO_UW | MO_BSWAP:
+         tcg_out_opc_imm(s, OPC_LHU, TCG_TMP1, base, 0);
+-        tcg_out_bswap16(s, datalo, TCG_TMP1);
++        tcg_out_bswap16(s, lo, TCG_TMP1);
+         break;
+     case MO_UW:
+-        tcg_out_opc_imm(s, OPC_LHU, datalo, base, 0);
++        tcg_out_opc_imm(s, OPC_LHU, lo, base, 0);
+         break;
+     case MO_SW | MO_BSWAP:
+         tcg_out_opc_imm(s, OPC_LHU, TCG_TMP1, base, 0);
+-        tcg_out_bswap16s(s, datalo, TCG_TMP1);
++        tcg_out_bswap16s(s, lo, TCG_TMP1);
+         break;
+     case MO_SW:
+-        tcg_out_opc_imm(s, OPC_LH, datalo, base, 0);
++        tcg_out_opc_imm(s, OPC_LH, lo, base, 0);
+         break;
+     case MO_UL | MO_BSWAP:
+-        tcg_out_opc_imm(s, OPC_LW, TCG_TMP1, base, 0);
+-        tcg_out_bswap32(s, datalo, TCG_TMP1);
++        if (use_mips32r2_instructions) {
++            tcg_out_opc_imm(s, OPC_LW, lo, base, 0);
++            tcg_out_bswap32(s, lo, lo);
++        } else {
++            tcg_out_bswap_subr(s, bswap32_addr);
++            /* delay slot */
++            tcg_out_opc_imm(s, OPC_LW, TCG_TMP0, base, 0);
++            tcg_out_mov(s, TCG_TYPE_I32, lo, TCG_TMP3);
++        }
+         break;
+     case MO_UL:
+-        tcg_out_opc_imm(s, OPC_LW, datalo, base, 0);
++        tcg_out_opc_imm(s, OPC_LW, lo, base, 0);
+         break;
+     case MO_Q | MO_BSWAP:
+-        tcg_out_opc_imm(s, OPC_LW, TCG_TMP1, base, HI_OFF);
+-        tcg_out_bswap32(s, datalo, TCG_TMP1);
+-        tcg_out_opc_imm(s, OPC_LW, TCG_TMP1, base, LO_OFF);
+-        tcg_out_bswap32(s, datahi, TCG_TMP1);
++        if (use_mips32r2_instructions) {
++            tcg_out_opc_imm(s, OPC_LW, TCG_TMP0, base, 0);
++            tcg_out_opc_imm(s, OPC_LW, TCG_TMP1, base, 4);
++            tcg_out_opc_reg(s, OPC_WSBH, TCG_TMP0, 0, TCG_TMP0);
++            tcg_out_opc_reg(s, OPC_WSBH, TCG_TMP1, 0, TCG_TMP1);
++            tcg_out_opc_sa(s, OPC_ROTR, MIPS_BE ? lo : hi, TCG_TMP0, 16);
++            tcg_out_opc_sa(s, OPC_ROTR, MIPS_BE ? hi : lo, TCG_TMP1, 16);
++        } else {
++            tcg_out_bswap_subr(s, bswap32_addr);
++            /* delay slot */
++            tcg_out_opc_imm(s, OPC_LW, TCG_TMP0, base, 0);
++            tcg_out_opc_imm(s, OPC_LW, TCG_TMP0, base, 4);
++            tcg_out_bswap_subr(s, bswap32_addr);
++            /* delay slot */
++            tcg_out_mov(s, TCG_TYPE_I32, MIPS_BE ? lo : hi, TCG_TMP3);
++            tcg_out_mov(s, TCG_TYPE_I32, MIPS_BE ? hi : lo, TCG_TMP3);
++        }
+         break;
+     case MO_Q:
+-        tcg_out_opc_imm(s, OPC_LW, datalo, base, LO_OFF);
+-        tcg_out_opc_imm(s, OPC_LW, datahi, base, HI_OFF);
++        /* Prefer to load from offset 0 first, but allow for overlap.  */
++        if (MIPS_BE ? hi != base : lo == base) {
++            tcg_out_opc_imm(s, OPC_LW, hi, base, HI_OFF);
++            tcg_out_opc_imm(s, OPC_LW, lo, base, LO_OFF);
++        } else {
++            tcg_out_opc_imm(s, OPC_LW, lo, base, LO_OFF);
++            tcg_out_opc_imm(s, OPC_LW, hi, base, HI_OFF);
++        }
+         break;
+     default:
+         tcg_abort();
+@@ -1282,9 +1299,7 @@ static void tcg_out_qemu_ld(TCGContext *s, const TCGArg *args, bool is_64)
+ #if defined(CONFIG_SOFTMMU)
+     tcg_insn_unit *label_ptr[2];
+ #endif
+-    /* Note that we've eliminated V0 from the output registers,
+-       so we won't overwrite the base register during loading.  */
+-    TCGReg base = TCG_REG_V0;
++    TCGReg base = TCG_REG_A0;
+ 
+     data_regl = *args++;
+     data_regh = (is_64 ? *args++ : 0);
+@@ -1311,40 +1326,54 @@ static void tcg_out_qemu_ld(TCGContext *s, const TCGArg *args, bool is_64)
+ #endif
+ }
+ 
+-static void tcg_out_qemu_st_direct(TCGContext *s, TCGReg datalo, TCGReg datahi,
++static void tcg_out_qemu_st_direct(TCGContext *s, TCGReg lo, TCGReg hi,
+                                    TCGReg base, TCGMemOp opc)
+ {
++    /* Don't clutter the code below with checks to avoid bswapping ZERO.  */
++    if ((lo | hi) == 0) {
++        opc &= ~MO_BSWAP;
++    }
++
+     switch (opc & (MO_SIZE | MO_BSWAP)) {
+     case MO_8:
+-        tcg_out_opc_imm(s, OPC_SB, datalo, base, 0);
++        tcg_out_opc_imm(s, OPC_SB, lo, base, 0);
+         break;
+ 
+     case MO_16 | MO_BSWAP:
+-        tcg_out_opc_imm(s, OPC_ANDI, TCG_TMP1, datalo, 0xffff);
++        tcg_out_opc_imm(s, OPC_ANDI, TCG_TMP1, lo, 0xffff);
+         tcg_out_bswap16(s, TCG_TMP1, TCG_TMP1);
+-        datalo = TCG_TMP1;
++        lo = TCG_TMP1;
+         /* FALLTHRU */
+     case MO_16:
+-        tcg_out_opc_imm(s, OPC_SH, datalo, base, 0);
++        tcg_out_opc_imm(s, OPC_SH, lo, base, 0);
+         break;
+ 
+     case MO_32 | MO_BSWAP:
+-        tcg_out_bswap32(s, TCG_TMP1, datalo);
+-        datalo = TCG_TMP1;
++        tcg_out_bswap32(s, TCG_TMP3, lo);
++        lo = TCG_TMP3;
+         /* FALLTHRU */
+     case MO_32:
+-        tcg_out_opc_imm(s, OPC_SW, datalo, base, 0);
++        tcg_out_opc_imm(s, OPC_SW, lo, base, 0);
+         break;
+ 
+     case MO_64 | MO_BSWAP:
+-        tcg_out_bswap32(s, TCG_TMP1, datalo);
+-        tcg_out_opc_imm(s, OPC_SW, TCG_TMP1, base, HI_OFF);
+-        tcg_out_bswap32(s, TCG_TMP1, datahi);
+-        tcg_out_opc_imm(s, OPC_SW, TCG_TMP1, base, LO_OFF);
++        if (use_mips32r2_instructions) {
++            tcg_out_opc_reg(s, OPC_WSBH, TCG_TMP0, 0, MIPS_BE ? lo : hi);
++            tcg_out_opc_reg(s, OPC_WSBH, TCG_TMP1, 0, MIPS_BE ? hi : lo);
++            tcg_out_opc_sa(s, OPC_ROTR, TCG_TMP0, TCG_TMP0, 16);
++            tcg_out_opc_sa(s, OPC_ROTR, TCG_TMP1, TCG_TMP1, 16);
++            tcg_out_opc_imm(s, OPC_SW, TCG_TMP0, base, 0);
++            tcg_out_opc_imm(s, OPC_SW, TCG_TMP1, base, 4);
++        } else {
++            tcg_out_bswap32(s, TCG_TMP3, MIPS_BE ? lo : hi);
++            tcg_out_opc_imm(s, OPC_SW, TCG_TMP3, base, 0);
++            tcg_out_bswap32(s, TCG_TMP3, MIPS_BE ? hi : lo);
++            tcg_out_opc_imm(s, OPC_SW, TCG_TMP3, base, 4);
++        }
+         break;
+     case MO_64:
+-        tcg_out_opc_imm(s, OPC_SW, datalo, base, LO_OFF);
+-        tcg_out_opc_imm(s, OPC_SW, datahi, base, HI_OFF);
++        tcg_out_opc_imm(s, OPC_SW, MIPS_BE ? hi : lo, base, 0);
++        tcg_out_opc_imm(s, OPC_SW, MIPS_BE ? lo : hi, base, 4);
+         break;
+ 
+     default:
+@@ -1355,12 +1384,13 @@ static void tcg_out_qemu_st_direct(TCGContext *s, TCGReg datalo, TCGReg datahi,
+ static void tcg_out_qemu_st(TCGContext *s, const TCGArg *args, bool is_64)
+ {
+     TCGReg addr_regl, addr_regh __attribute__((unused));
+-    TCGReg data_regl, data_regh, base;
++    TCGReg data_regl, data_regh;
+     TCGMemOpIdx oi;
+     TCGMemOp opc;
+ #if defined(CONFIG_SOFTMMU)
+     tcg_insn_unit *label_ptr[2];
+ #endif
++    TCGReg base = TCG_REG_A0;
+ 
+     data_regl = *args++;
+     data_regh = (is_64 ? *args++ : 0);
+@@ -1370,9 +1400,6 @@ static void tcg_out_qemu_st(TCGContext *s, const TCGArg *args, bool is_64)
+     opc = get_memop(oi);
+ 
+ #if defined(CONFIG_SOFTMMU)
+-    /* Note that we eliminated the helper's address argument,
+-       so we can reuse that for the base.  */
+-    base = (TARGET_LONG_BITS == 32 ? TCG_REG_A1 : TCG_REG_A2);
+     tcg_out_tlb_load(s, base, addr_regl, addr_regh, oi, label_ptr, 0);
+     tcg_out_qemu_st_direct(s, data_regl, data_regh, base, opc);
+     add_qemu_ldst_label(s, 0, oi, data_regl, data_regh, addr_regl, addr_regh,
+@@ -1381,7 +1408,6 @@ static void tcg_out_qemu_st(TCGContext *s, const TCGArg *args, bool is_64)
+     if (guest_base == 0) {
+         base = addr_regl;
+     } else {
+-        base = TCG_REG_A0;
+         if (guest_base == (int16_t)guest_base) {
+             tcg_out_opc_imm(s, OPC_ADDIU, base, addr_regl, guest_base);
+         } else {
+@@ -1630,8 +1656,7 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
+         break;
+ 
+     case INDEX_op_bswap32_i32:
+-        tcg_out_opc_reg(s, OPC_WSBH, a0, 0, a1);
+-        tcg_out_opc_sa(s, OPC_ROTR, a0, a0, 16);
++        tcg_out_bswap32(s, a0, a1);
+         break;
+ 
+     case INDEX_op_deposit_i32:
+@@ -1751,14 +1776,14 @@ static const TCGTargetOpDef mips_op_defs[] = {
+     { INDEX_op_brcond2_i32, { "rZ", "rZ", "rZ", "rZ" } },
+ 
+ #if TARGET_LONG_BITS == 32
+-    { INDEX_op_qemu_ld_i32, { "L", "lZ" } },
++    { INDEX_op_qemu_ld_i32, { "r", "LZ" } },
+     { INDEX_op_qemu_st_i32, { "SZ", "SZ" } },
+-    { INDEX_op_qemu_ld_i64, { "L", "L", "lZ" } },
++    { INDEX_op_qemu_ld_i64, { "r", "r", "LZ" } },
+     { INDEX_op_qemu_st_i64, { "SZ", "SZ", "SZ" } },
+ #else
+-    { INDEX_op_qemu_ld_i32, { "L", "lZ", "lZ" } },
++    { INDEX_op_qemu_ld_i32, { "r", "LZ", "LZ" } },
+     { INDEX_op_qemu_st_i32, { "SZ", "SZ", "SZ" } },
+-    { INDEX_op_qemu_ld_i64, { "L", "L", "lZ", "lZ" } },
++    { INDEX_op_qemu_ld_i64, { "r", "r", "LZ", "LZ" } },
+     { INDEX_op_qemu_st_i64, { "SZ", "SZ", "SZ", "SZ" } },
+ #endif
+ 
+@@ -1858,6 +1883,16 @@ static void tcg_target_detect_isa(void)
+     sigaction(SIGILL, &sa_old, NULL);
+ }
+ 
++static tcg_insn_unit *align_code_ptr(TCGContext *s)
++{
++    uintptr_t p = (uintptr_t)s->code_ptr;
++    if (p & 15) {
++        p = (p + 15) & -16;
++        s->code_ptr = (void *)p;
++    }
++    return s->code_ptr;
++}
++
+ /* Generate global QEMU prologue and epilogue code */
+ static void tcg_target_qemu_prologue(TCGContext *s)
+ {
+@@ -1892,7 +1927,39 @@ static void tcg_target_qemu_prologue(TCGContext *s)
+     }
+ 
+     tcg_out_opc_reg(s, OPC_JR, 0, TCG_REG_RA, 0);
++    /* delay slot */
+     tcg_out_addi(s, TCG_REG_SP, frame_size);
++
++    if (use_mips32r2_instructions) {
++        return;
++    }
++
++    /* Bswap subroutine: Input in TCG_TMP0, output in TCG_TMP3;
++       clobbers TCG_TMP1, TCG_TMP2.  */
++
++    /*
++     * bswap32 -- 32-bit swap (signed result for mips64).  a0 = abcd.
++     */
++    bswap32_addr = align_code_ptr(s);
++    /* t3 = (ssss)d000 */
++    tcg_out_opc_sa(s, OPC_SLL, TCG_TMP3, TCG_TMP0, 24);
++    /* t1 = 000a */
++    tcg_out_opc_sa(s, OPC_SRL, TCG_TMP1, TCG_TMP0, 24);
++    /* t2 = 00c0 */
++    tcg_out_opc_imm(s, OPC_ANDI, TCG_TMP2, TCG_TMP0, 0xff00);
++    /* t3 = d00a */
++    tcg_out_opc_reg(s, OPC_OR, TCG_TMP3, TCG_TMP3, TCG_TMP1);
++    /* t1 = 0abc */
++    tcg_out_opc_sa(s, OPC_SRL, TCG_TMP1, TCG_TMP0, 8);
++    /* t2 = 0c00 */
++    tcg_out_opc_sa(s, OPC_SLL, TCG_TMP2, TCG_TMP2, 8);
++    /* t1 = 00b0 */
++    tcg_out_opc_imm(s, OPC_ANDI, TCG_TMP1, TCG_TMP1, 0xff00);
++    /* t3 = dc0a */
++    tcg_out_opc_reg(s, OPC_OR, TCG_TMP3, TCG_TMP3, TCG_TMP2);
++    tcg_out_opc_reg(s, OPC_JR, 0, TCG_REG_RA, 0);
++    /* t3 = dcba -- delay slot */
++    tcg_out_opc_reg(s, OPC_OR, TCG_TMP3, TCG_TMP3, TCG_TMP1);
+ }
+ 
+ static void tcg_target_init(TCGContext *s)
+@@ -1923,6 +1990,8 @@ static void tcg_target_init(TCGContext *s)
+     tcg_regset_set_reg(s->reserved_regs, TCG_REG_K1);   /* kernel use only */
+     tcg_regset_set_reg(s->reserved_regs, TCG_TMP0);     /* internal use */
+     tcg_regset_set_reg(s->reserved_regs, TCG_TMP1);     /* internal use */
++    tcg_regset_set_reg(s->reserved_regs, TCG_TMP2);     /* internal use */
++    tcg_regset_set_reg(s->reserved_regs, TCG_TMP3);     /* internal use */
+     tcg_regset_set_reg(s->reserved_regs, TCG_REG_RA);   /* return address */
+     tcg_regset_set_reg(s->reserved_regs, TCG_REG_SP);   /* stack pointer */
+     tcg_regset_set_reg(s->reserved_regs, TCG_REG_GP);   /* global pointer */
 -- 
 2.1.0
