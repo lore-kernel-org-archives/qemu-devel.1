@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42425)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55658)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gxt@mprc.pku.edu.cn>) id 1cFs56-0003h7-Ny
-	for qemu-devel@nongnu.org; Sat, 10 Dec 2016 19:33:33 -0500
+	(envelope-from <mst@redhat.com>) id 1cFuEb-00083l-Fx
+	for qemu-devel@nongnu.org; Sat, 10 Dec 2016 21:51:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gxt@mprc.pku.edu.cn>) id 1cFs53-0006Gt-Ie
-	for qemu-devel@nongnu.org; Sat, 10 Dec 2016 19:33:32 -0500
-Received: from mprc.pku.edu.cn ([162.105.203.9]:52152)
+	(envelope-from <mst@redhat.com>) id 1cFuEY-0005vY-Dv
+	for qemu-devel@nongnu.org; Sat, 10 Dec 2016 21:51:29 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44918)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <gxt@mprc.pku.edu.cn>) id 1cFs53-0006G2-00
-	for qemu-devel@nongnu.org; Sat, 10 Dec 2016 19:33:29 -0500
-Message-ID: <56180.222.29.22.167.1481415688.squirrel@mprc.pku.edu.cn>
-In-Reply-To: <56076.222.29.22.167.1481415386.squirrel@mprc.pku.edu.cn>
-References: <1481285870-3396-1-git-send-email-thuth@redhat.com>
-	<1481285870-3396-19-git-send-email-thuth@redhat.com>
-	<56076.222.29.22.167.1481415386.squirrel@mprc.pku.edu.cn>
-Date: Sun, 11 Dec 2016 08:21:28 +0800 (CST)
-From: "Xuetao Guan" <gxt@mprc.pku.edu.cn>
-Reply-To: gxt@mprc.pku.edu.cn
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cFuEY-0005vP-7s
+	for qemu-devel@nongnu.org; Sat, 10 Dec 2016 21:51:26 -0500
+Date: Sun, 11 Dec 2016 04:51:19 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20161211045034-mutt-send-email-mst@kernel.org>
+References: <1481077751-106192-1-git-send-email-arei.gonglei@huawei.com>
+	<6c9a32a1-9984-6ae6-bbdc-6843938ee2fd@redhat.com>
+	<33183CC9F5247A488A2544077AF19020DA156AAE@DGGEMA505-MBX.china.huawei.com>
+	<54e4918c-f686-d7d1-2c70-31ed344cd8a9@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain;charset=gb2312
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 18/20] unicore32: Move CPU files to target/
- folder
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <54e4918c-f686-d7d1-2c70-31ed344cd8a9@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.9 v2] virtio-crypto: zeroize the key
+ material before free
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,96 +30,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: gxt@mprc.pku.edu.cn
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Michael Walle <michael@walle.cc>, Laurent Vivier <laurent@vivier.eu>, Yongbok Kim <yongbok.kim@imgtec.com>, Anthony Green <green@moxielogic.com>, Jia Liu <proljc@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Max Filippov <jcmvbkbc@gmail.com>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, James Hogan <james.hogan@imgtec.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Marcelo Tosatti <mtosatti@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: "Gonglei (Arei)" <arei.gonglei@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "stefanha@redhat.com" <stefanha@redhat.com>
 
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->
-> Asked-by: Guan Xuetao <gxt@mprc.pku.edu.cn>
-Sorry, should be
-Acked-by: Guan Xuetao <gxt@mprc.pku.edu.cn>
+On Thu, Dec 08, 2016 at 09:20:07AM -0600, Eric Blake wrote:
+> On 12/07/2016 08:33 PM, Gonglei (Arei) wrote:
+> 
+> >> Sensitive information is sometimes also held in mlocked pages to prevent
+> >> it being swapped to disk, but qemu in general is not currently taking
+> >> that level of precaution (see also commit 8813800b).
+> >>
+> >>>
+> >>> Let's zeroize the memory of CryptoDevBackendSymOpInfo structure pointed
+> >>> for key material security.
+> >>>
+> >>> [v2: Stefan perfects the commit message, thanks]
+> >>
+> >> The v2 blurb should appear after the --- line, as it is nice for
+> >> reviewers but a year from now when reading 'git log' we won't care how
+> >> many versions were on the list, only about the one version in git.
+> >>
+> > Yes, you are right. I just wanted to keep the Stefan's work because
+> > the most of commit message comes from him. :)
+> 
+> Then I might have written:
+> 
+> [Thanks to Stefan for help with crafting the commit message]
+> 
+> > 
+> >>> Signed-off-by: Gonglei <arei.gonglei@huawei.com>
+> >>> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> >>> ---
+> >>>  hw/virtio/virtio-crypto.c | 13 ++++++++++++-
+> >>>  1 file changed, 12 insertions(+), 1 deletion(-)
+> >>>
+> >>
+> >> The commit message may still need improvement, but the maintainer might
+> >> be willing to do that without needing a v3.  At any rate,
+> >> Reviewed-by: Eric Blake <eblake@redhat.com>
+> >>
+> > Thanks.
+> 
+> We'll see what the maintainer thinks :)
+> 
+> -- 
+> Eric Blake   eblake redhat com    +1-919-301-3266
+> Libvirt virtualization library http://libvirt.org
+> 
 
->
->> ---
->>  MAINTAINERS                                           | 2 +-
->>  {target-unicore32 => target/unicore32}/Makefile.objs  | 0
->>  {target-unicore32 => target/unicore32}/cpu-qom.h      | 0
->>  {target-unicore32 => target/unicore32}/cpu.c          | 0
->>  {target-unicore32 => target/unicore32}/cpu.h          | 0
->>  {target-unicore32 => target/unicore32}/helper.c       | 0
->>  {target-unicore32 => target/unicore32}/helper.h       | 0
->>  {target-unicore32 => target/unicore32}/op_helper.c    | 0
->>  {target-unicore32 => target/unicore32}/softmmu.c      | 0
->>  {target-unicore32 => target/unicore32}/translate.c    | 0
->>  {target-unicore32 => target/unicore32}/ucf64_helper.c | 0
->>  11 files changed, 1 insertion(+), 1 deletion(-)
->>  rename {target-unicore32 => target/unicore32}/Makefile.objs (100%)
->>  rename {target-unicore32 => target/unicore32}/cpu-qom.h (100%)
->>  rename {target-unicore32 => target/unicore32}/cpu.c (100%)
->>  rename {target-unicore32 => target/unicore32}/cpu.h (100%)
->>  rename {target-unicore32 => target/unicore32}/helper.c (100%)
->>  rename {target-unicore32 => target/unicore32}/helper.h (100%)
->>  rename {target-unicore32 => target/unicore32}/op_helper.c (100%)
->>  rename {target-unicore32 => target/unicore32}/softmmu.c (100%)
->>  rename {target-unicore32 => target/unicore32}/translate.c (100%)
->>  rename {target-unicore32 => target/unicore32}/ucf64_helper.c (100%)
->>
->> diff --git a/MAINTAINERS b/MAINTAINERS
->> index 7733ccc..9e9607c 100644
->> --- a/MAINTAINERS
->> +++ b/MAINTAINERS
->> @@ -226,7 +226,7 @@ F: disas/sparc.c
->>  UniCore32
->>  M: Guan Xuetao <gxt@mprc.pku.edu.cn>
->>  S: Maintained
->> -F: target-unicore32/
->> +F: target/unicore32/
->>  F: hw/unicore32/
->>  F: include/hw/unicore32/
->>
->> diff --git a/target-unicore32/Makefile.objs
->> b/target/unicore32/Makefile.objs
->> similarity index 100%
->> rename from target-unicore32/Makefile.objs
->> rename to target/unicore32/Makefile.objs
->> diff --git a/target-unicore32/cpu-qom.h b/target/unicore32/cpu-qom.h
->> similarity index 100%
->> rename from target-unicore32/cpu-qom.h
->> rename to target/unicore32/cpu-qom.h
->> diff --git a/target-unicore32/cpu.c b/target/unicore32/cpu.c
->> similarity index 100%
->> rename from target-unicore32/cpu.c
->> rename to target/unicore32/cpu.c
->> diff --git a/target-unicore32/cpu.h b/target/unicore32/cpu.h
->> similarity index 100%
->> rename from target-unicore32/cpu.h
->> rename to target/unicore32/cpu.h
->> diff --git a/target-unicore32/helper.c b/target/unicore32/helper.c
->> similarity index 100%
->> rename from target-unicore32/helper.c
->> rename to target/unicore32/helper.c
->> diff --git a/target-unicore32/helper.h b/target/unicore32/helper.h
->> similarity index 100%
->> rename from target-unicore32/helper.h
->> rename to target/unicore32/helper.h
->> diff --git a/target-unicore32/op_helper.c b/target/unicore32/op_helper.c
->> similarity index 100%
->> rename from target-unicore32/op_helper.c
->> rename to target/unicore32/op_helper.c
->> diff --git a/target-unicore32/softmmu.c b/target/unicore32/softmmu.c
->> similarity index 100%
->> rename from target-unicore32/softmmu.c
->> rename to target/unicore32/softmmu.c
->> diff --git a/target-unicore32/translate.c b/target/unicore32/translate.c
->> similarity index 100%
->> rename from target-unicore32/translate.c
->> rename to target/unicore32/translate.c
->> diff --git a/target-unicore32/ucf64_helper.c
->> b/target/unicore32/ucf64_helper.c
->> similarity index 100%
->> rename from target-unicore32/ucf64_helper.c
->> rename to target/unicore32/ucf64_helper.c
->> --
->> 1.8.3.1
->>
->
+I'd suggest post v3 after 2.8 is out.
+
+-- 
+MST
