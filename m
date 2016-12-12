@@ -1,35 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60740)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36076)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ilg@livius.net>) id 1cGSDQ-0006Om-1b
-	for Qemu-devel@nongnu.org; Mon, 12 Dec 2016 10:08:37 -0500
+	(envelope-from <stefanha@redhat.com>) id 1cGRQ9-0000uu-RM
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 09:17:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ilg@livius.net>) id 1cGSDM-0005Vi-0V
-	for Qemu-devel@nongnu.org; Mon, 12 Dec 2016 10:08:32 -0500
-Received: from mail-wm0-f67.google.com ([74.125.82.67]:33065)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ilg@livius.net>) id 1cGSDL-0005VM-MZ
-	for Qemu-devel@nongnu.org; Mon, 12 Dec 2016 10:08:27 -0500
-Received: by mail-wm0-f67.google.com with SMTP id u144so11834514wmu.0
-	for <Qemu-devel@nongnu.org>; Mon, 12 Dec 2016 07:08:27 -0800 (PST)
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.1 \(3251\))
-From: Liviu Ionescu <ilg@livius.net>
-In-Reply-To: <20161212145117.GB21817@lemon>
-Date: Mon, 12 Dec 2016 17:07:24 +0200
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <F71562E4-2D12-4F28-AC3F-70463E91E6A5@livius.net>
-References: <20161212033512.GA3725@lemon>
-	<908F0328-771A-4269-8301-9A7D08BD585F@livius.net>
-	<20161212073915.GC3725@lemon>
-	<96DEA2D0-3822-4A8C-9950-973B84AF4182@livius.net>
-	<20161212093907.GA7918@lemon>
-	<151F368B-80DA-4DF6-837C-E2E0737E4AE6@livius.net>
-	<20161212103616.GB7918@lemon>
-	<220EB996-A454-4FB1-9BAD-B0F4A300345E@livius.net>
-	<20161212122803.GC7918@lemon>
-	<EA7E7748-CB11-49AB-ADBA-555A0A510611@livius.net>
-	<20161212145117.GB21817@lemon>
-Subject: Re: [Qemu-devel] experience with SDL2, event loop & main thread
+	(envelope-from <stefanha@redhat.com>) id 1cGRQ4-0001aW-A3
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 09:17:37 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47302)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cGRQ4-0001aP-3c
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 09:17:32 -0500
+Date: Mon, 12 Dec 2016 14:17:28 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20161212141728.GI4074@stefanha-x1.localdomain>
+References: <20161212111857.23399-1-pbonzini@redhat.com>
+	<20161212111857.23399-9-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="nEsDIrWrg+hrB7l1"
+Content-Disposition: inline
+In-Reply-To: <20161212111857.23399-9-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 08/11] virtio: use MemoryRegionCache to
+ access descriptors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,57 +29,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: QEMU Developer <Qemu-devel@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, famz@redhat.com, mst@redhat.com, borntraeger@de.ibm.com
 
 
-> On 12 Dec 2016, at 16:51, Fam Zheng <famz@redhat.com> wrote:
->=20
-> On Mon, 12/12 15:22, Liviu Ionescu wrote:
->> so, back to square one; any suggestion on how to avoid the periodic =
-timer
->> required to poll SDL system events?
->=20
-> Good question, I've missed that!
->=20
-> Sadly I don't find it possible. The main thread of QEMU has to run the =
-glib
-> event loop so it cannot block on SDL_WaitEvent().
+--nEsDIrWrg+hrB7l1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-why should the glib event loop run as the main thread? according to my =
-tests, on linux and macos the glib event loop can run very well on a =
-regular thread.
+On Mon, Dec 12, 2016 at 12:18:54PM +0100, Paolo Bonzini wrote:
+> @@ -430,41 +431,42 @@ void virtqueue_get_avail_bytes(VirtQueue *vq, unsig=
+ned int *in_bytes,
+>                                 unsigned int *out_bytes,
+>                                 unsigned max_in_bytes, unsigned max_out_b=
+ytes)
+>  {
+> -    unsigned int idx;
+> +    VirtIODevice *vdev =3D vq->vdev;
+> +    unsigned int max, idx;
+>      unsigned int total_bufs, in_total, out_total;
+> -    void *desc_ptr =3D NULL;
+> -    hwaddr len =3D 0;
+> +    MemoryRegionCache *desc_cache =3D NULL;
+> +    MemoryRegionCache vring_desc_cache;
+> +    MemoryRegionCache indirect_desc_cache;
+> +    int64_t len =3D 0;
+>      int rc;
+> =20
+> +    rcu_read_lock();
 
-the problem that I encountered with this approach was on windows, where =
-there is no `poll()`, and the existing implementation of it in qemu does =
-not work if moved on a different thread. I do not know if the qemu =
-implementation is not correct, or the win32 api does not allow this.
+Please document the purpose of the rcu_read_lock() in virtio code.
 
-> ... it cannot block on SDL_WaitEvent().
+Also, do the goto err cases call rcu_read_unlock()?
 
-initially I considered that rearranging threads to free the main thread =
-for a dedicated SDL loop that blocks on SDL_WaitEvent() is a good =
-solution, but then I took a look at how SDL_WaitEvent() is implemented: =
-a loop that sleeps 10 ms and checks if there are events in the queue. =
-:-(
+--nEsDIrWrg+hrB7l1
+Content-Type: application/pgp-signature; name="signature.asc"
 
-so the best solution would be to make SDL asynchronous and run it on the =
-glib event loop.
+-----BEGIN PGP SIGNATURE-----
 
-> Ideally SDL should provide an API to get a pollable fd (or a set of) =
-to allow
-> such types of integration, not much can be done from QEMU side in its =
-current
-> form.
+iQEcBAEBAgAGBQJYTrF4AAoJEJykq7OBq3PIJWQH/2E+wJcm/aJb+Td+sH8mWlzq
+i05O3aEE3Xm0lGbtdd+jMYTECcAL8NxmBA177SCzY1Q+yD7VR6bpayhUa7BOuYhQ
+9KYg8jvOKFqRuGGfZQIuNjgpHCAnGkgdPkDFHsKjHG/KQMLA7JjHXT2O4fwwyxRq
+OAmbkUalUV/j/OIe7mEDyJCbWTnydIs1aGL5dYHg7J4ZjGZlo0+mpa8e8SHnBpOM
+qd+EXcsGj87MnJ2Ou7xYgYLQktwr6TZkRSxLxgIwm7q7Q7DMQUrVYZjgL23yiaR5
+PxtGz8tvLBpMaiUs6mDS3yx9OdGo5ihwHKKgwK0a/YhSp+R7pP+xkUtvyBHNMCQ=
+=QGwd
+-----END PGP SIGNATURE-----
 
-I'm glad you reached more or less the same conclusion as I mentioned in =
-one of the previous messages:
-
-> I guess making SDL run asynchronously will need some major changes to =
-the SDL
-> source code, not simple patches that can be added to the QEMU build.
-
-
-regards,
-
-Liviu
+--nEsDIrWrg+hrB7l1--
