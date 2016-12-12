@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39259)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39469)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cGOdS-0004cz-8z
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 06:19:19 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cGOdb-0004hg-4T
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 06:19:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cGOdM-0000No-To
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 06:19:10 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34084)
+	(envelope-from <pbonzini@redhat.com>) id 1cGOdW-0000UR-Rw
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 06:19:19 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34138)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cGOdM-0000Mi-7b
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 06:19:04 -0500
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cGOdW-0000U0-JW
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 06:19:14 -0500
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 12 Dec 2016 12:18:48 +0100
-Message-Id: <20161212111857.23399-3-pbonzini@redhat.com>
+Date: Mon, 12 Dec 2016 12:18:55 +0100
+Message-Id: <20161212111857.23399-10-pbonzini@redhat.com>
 In-Reply-To: <20161212111857.23399-1-pbonzini@redhat.com>
 References: <20161212111857.23399-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 02/11] exec: introduce memory_ldst.inc.c
+Subject: [Qemu-devel] [PATCH 09/11] virtio: add MemoryListener to cache ring
+ translations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,1477 +27,188 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: stefanha@redhat.com, famz@redhat.com, mst@redhat.com, borntraeger@de.ibm.com
 
-Templatize the address_space_* and *_phys functions, so that we can add
-similar functions in the next patch that work with a lightweight version
-of address_space_map/unmap.
-
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- exec.c                    | 681 +-------------------------------------------
- include/exec/cpu-common.h |  15 -
- include/exec/memory.h     |  15 +
- memory_ldst.inc.c         | 709 ++++++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 734 insertions(+), 686 deletions(-)
- create mode 100644 memory_ldst.inc.c
+ hw/virtio/virtio.c         | 91 ++++++++++++++++++++++++++++++++++++++++++++--
+ include/hw/virtio/virtio.h |  1 +
+ 2 files changed, 89 insertions(+), 3 deletions(-)
 
-diff --git a/exec.c b/exec.c
-index 4db0ce5..8568a6f 100644
---- a/exec.c
-+++ b/exec.c
-@@ -3058,677 +3058,16 @@ void cpu_physical_memory_unmap(void *buffer, hwaddr len,
-     return address_space_unmap(&address_space_memory, buffer, len, is_write, access_len);
+diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+index 562e2b7..4f355b4 100644
+--- a/hw/virtio/virtio.c
++++ b/hw/virtio/virtio.c
+@@ -59,6 +59,13 @@ typedef struct VRingUsed
+     VRingUsedElem ring[0];
+ } VRingUsed;
+ 
++typedef struct VRingMemoryRegionCaches {
++    struct rcu_head rcu;
++    MemoryRegionCache desc;
++    MemoryRegionCache avail;
++    MemoryRegionCache used;
++} VRingMemoryRegionCaches;
++
+ typedef struct VRing
+ {
+     unsigned int num;
+@@ -67,6 +74,7 @@ typedef struct VRing
+     hwaddr desc;
+     hwaddr avail;
+     hwaddr used;
++    VRingMemoryRegionCaches *caches;
+ } VRing;
+ 
+ struct VirtQueue
+@@ -103,6 +111,46 @@ struct VirtQueue
+     QLIST_ENTRY(VirtQueue) node;
+ };
+ 
++static void virtio_free_region_cache(VRingMemoryRegionCaches *caches)
++{
++    address_space_cache_destroy(&caches->desc);
++    address_space_cache_destroy(&caches->avail);
++    address_space_cache_destroy(&caches->used);
++    g_free(caches);
++}
++
++static void virtio_init_region_cache(VirtIODevice *vdev, int i)
++{
++    VirtQueue *vq = &vdev->vq[i];
++    VRingMemoryRegionCaches *old = vq->vring.caches;
++    VRingMemoryRegionCaches *new = g_new0(VRingMemoryRegionCaches, 1);
++    hwaddr addr, size;
++    int event_size;
++
++    event_size = virtio_vdev_has_feature(vq->vdev, VIRTIO_RING_F_EVENT_IDX) ? 2 : 0;
++
++    addr = vq->vring.desc;
++    if (!addr) {
++        return;
++    }
++    size = virtio_queue_get_desc_size(vdev, i);
++    address_space_cache_init(&new->desc, &address_space_memory,
++                             addr, size, false);
++
++    size = virtio_queue_get_used_size(vdev, i) + event_size;
++    address_space_cache_init(&new->used, &address_space_memory,
++                             vq->vring.used, size, true);
++
++    size = virtio_queue_get_avail_size(vdev, i) + event_size;
++    address_space_cache_init(&new->avail, &address_space_memory,
++                             vq->vring.avail, size, false);
++
++    atomic_rcu_set(&vq->vring.caches, new);
++    if (old) {
++        call_rcu(old, virtio_free_region_cache, rcu);
++    }
++}
++
+ /* virt queue functions */
+ void virtio_queue_update_rings(VirtIODevice *vdev, int n)
+ {
+@@ -116,6 +164,7 @@ void virtio_queue_update_rings(VirtIODevice *vdev, int n)
+     vring->used = vring_align(vring->avail +
+                               offsetof(VRingAvail, ring[vring->num]),
+                               vring->align);
++    virtio_init_region_cache(vdev, n);
  }
  
--/* warning: addr must be aligned */
--static inline uint32_t address_space_ldl_internal(AddressSpace *as, hwaddr addr,
--                                                  MemTxAttrs attrs,
--                                                  MemTxResult *result,
--                                                  enum device_endian endian)
--{
--    uint8_t *ptr;
--    uint64_t val;
--    MemoryRegion *mr;
--    hwaddr l = 4;
--    hwaddr addr1;
--    MemTxResult r;
--    bool release_lock = false;
--
--    rcu_read_lock();
--    mr = address_space_translate(as, addr, &addr1, &l, false);
--    if (l < 4 || !memory_access_is_direct(mr, false)) {
--        release_lock |= prepare_mmio_access(mr);
--
--        /* I/O case */
--        r = memory_region_dispatch_read(mr, addr1, &val, 4, attrs);
--#if defined(TARGET_WORDS_BIGENDIAN)
--        if (endian == DEVICE_LITTLE_ENDIAN) {
--            val = bswap32(val);
--        }
--#else
--        if (endian == DEVICE_BIG_ENDIAN) {
--            val = bswap32(val);
--        }
--#endif
--    } else {
--        /* RAM case */
--        ptr = qemu_map_ram_ptr(mr->ram_block, addr1);
--        switch (endian) {
--        case DEVICE_LITTLE_ENDIAN:
--            val = ldl_le_p(ptr);
--            break;
--        case DEVICE_BIG_ENDIAN:
--            val = ldl_be_p(ptr);
--            break;
--        default:
--            val = ldl_p(ptr);
--            break;
--        }
--        r = MEMTX_OK;
--    }
--    if (result) {
--        *result = r;
--    }
--    if (release_lock) {
--        qemu_mutex_unlock_iothread();
--    }
--    rcu_read_unlock();
--    return val;
--}
--
--uint32_t address_space_ldl(AddressSpace *as, hwaddr addr,
--                           MemTxAttrs attrs, MemTxResult *result)
--{
--    return address_space_ldl_internal(as, addr, attrs, result,
--                                      DEVICE_NATIVE_ENDIAN);
--}
--
--uint32_t address_space_ldl_le(AddressSpace *as, hwaddr addr,
--                              MemTxAttrs attrs, MemTxResult *result)
--{
--    return address_space_ldl_internal(as, addr, attrs, result,
--                                      DEVICE_LITTLE_ENDIAN);
--}
--
--uint32_t address_space_ldl_be(AddressSpace *as, hwaddr addr,
--                              MemTxAttrs attrs, MemTxResult *result)
--{
--    return address_space_ldl_internal(as, addr, attrs, result,
--                                      DEVICE_BIG_ENDIAN);
--}
--
--uint32_t ldl_phys(AddressSpace *as, hwaddr addr)
--{
--    return address_space_ldl(as, addr, MEMTXATTRS_UNSPECIFIED, NULL);
--}
--
--uint32_t ldl_le_phys(AddressSpace *as, hwaddr addr)
--{
--    return address_space_ldl_le(as, addr, MEMTXATTRS_UNSPECIFIED, NULL);
--}
--
--uint32_t ldl_be_phys(AddressSpace *as, hwaddr addr)
--{
--    return address_space_ldl_be(as, addr, MEMTXATTRS_UNSPECIFIED, NULL);
--}
--
--/* warning: addr must be aligned */
--static inline uint64_t address_space_ldq_internal(AddressSpace *as, hwaddr addr,
--                                                  MemTxAttrs attrs,
--                                                  MemTxResult *result,
--                                                  enum device_endian endian)
--{
--    uint8_t *ptr;
--    uint64_t val;
--    MemoryRegion *mr;
--    hwaddr l = 8;
--    hwaddr addr1;
--    MemTxResult r;
--    bool release_lock = false;
--
--    rcu_read_lock();
--    mr = address_space_translate(as, addr, &addr1, &l,
--                                 false);
--    if (l < 8 || !memory_access_is_direct(mr, false)) {
--        release_lock |= prepare_mmio_access(mr);
--
--        /* I/O case */
--        r = memory_region_dispatch_read(mr, addr1, &val, 8, attrs);
--#if defined(TARGET_WORDS_BIGENDIAN)
--        if (endian == DEVICE_LITTLE_ENDIAN) {
--            val = bswap64(val);
--        }
--#else
--        if (endian == DEVICE_BIG_ENDIAN) {
--            val = bswap64(val);
--        }
--#endif
--    } else {
--        /* RAM case */
--        ptr = qemu_map_ram_ptr(mr->ram_block, addr1);
--        switch (endian) {
--        case DEVICE_LITTLE_ENDIAN:
--            val = ldq_le_p(ptr);
--            break;
--        case DEVICE_BIG_ENDIAN:
--            val = ldq_be_p(ptr);
--            break;
--        default:
--            val = ldq_p(ptr);
--            break;
--        }
--        r = MEMTX_OK;
--    }
--    if (result) {
--        *result = r;
--    }
--    if (release_lock) {
--        qemu_mutex_unlock_iothread();
--    }
--    rcu_read_unlock();
--    return val;
--}
--
--uint64_t address_space_ldq(AddressSpace *as, hwaddr addr,
--                           MemTxAttrs attrs, MemTxResult *result)
--{
--    return address_space_ldq_internal(as, addr, attrs, result,
--                                      DEVICE_NATIVE_ENDIAN);
--}
--
--uint64_t address_space_ldq_le(AddressSpace *as, hwaddr addr,
--                           MemTxAttrs attrs, MemTxResult *result)
--{
--    return address_space_ldq_internal(as, addr, attrs, result,
--                                      DEVICE_LITTLE_ENDIAN);
--}
--
--uint64_t address_space_ldq_be(AddressSpace *as, hwaddr addr,
--                           MemTxAttrs attrs, MemTxResult *result)
--{
--    return address_space_ldq_internal(as, addr, attrs, result,
--                                      DEVICE_BIG_ENDIAN);
--}
--
--uint64_t ldq_phys(AddressSpace *as, hwaddr addr)
--{
--    return address_space_ldq(as, addr, MEMTXATTRS_UNSPECIFIED, NULL);
--}
--
--uint64_t ldq_le_phys(AddressSpace *as, hwaddr addr)
--{
--    return address_space_ldq_le(as, addr, MEMTXATTRS_UNSPECIFIED, NULL);
--}
--
--uint64_t ldq_be_phys(AddressSpace *as, hwaddr addr)
--{
--    return address_space_ldq_be(as, addr, MEMTXATTRS_UNSPECIFIED, NULL);
--}
--
--uint32_t address_space_ldub(AddressSpace *as, hwaddr addr,
--                            MemTxAttrs attrs, MemTxResult *result)
--{
--    uint8_t *ptr;
--    uint64_t val;
--    MemoryRegion *mr;
--    hwaddr l = 1;
--    hwaddr addr1;
--    MemTxResult r;
--    bool release_lock = false;
--
--    rcu_read_lock();
--    mr = address_space_translate(as, addr, &addr1, &l, false);
--    if (!memory_access_is_direct(mr, false)) {
--        release_lock |= prepare_mmio_access(mr);
--
--        /* I/O case */
--        r = memory_region_dispatch_read(mr, addr1, &val, 1, attrs);
--    } else {
--        /* RAM case */
--        ptr = qemu_map_ram_ptr(mr->ram_block, addr1);
--        val = ldub_p(ptr);
--        r = MEMTX_OK;
--    }
--    if (result) {
--        *result = r;
--    }
--    if (release_lock) {
--        qemu_mutex_unlock_iothread();
--    }
--    rcu_read_unlock();
--    return val;
--}
--
--uint32_t ldub_phys(AddressSpace *as, hwaddr addr)
--{
--    return address_space_ldub(as, addr, MEMTXATTRS_UNSPECIFIED, NULL);
--}
--
--/* warning: addr must be aligned */
--static inline uint32_t address_space_lduw_internal(AddressSpace *as,
--                                                   hwaddr addr,
--                                                   MemTxAttrs attrs,
--                                                   MemTxResult *result,
--                                                   enum device_endian endian)
--{
--    uint8_t *ptr;
--    uint64_t val;
--    MemoryRegion *mr;
--    hwaddr l = 2;
--    hwaddr addr1;
--    MemTxResult r;
--    bool release_lock = false;
--
--    rcu_read_lock();
--    mr = address_space_translate(as, addr, &addr1, &l,
--                                 false);
--    if (l < 2 || !memory_access_is_direct(mr, false)) {
--        release_lock |= prepare_mmio_access(mr);
--
--        /* I/O case */
--        r = memory_region_dispatch_read(mr, addr1, &val, 2, attrs);
--#if defined(TARGET_WORDS_BIGENDIAN)
--        if (endian == DEVICE_LITTLE_ENDIAN) {
--            val = bswap16(val);
--        }
--#else
--        if (endian == DEVICE_BIG_ENDIAN) {
--            val = bswap16(val);
--        }
--#endif
--    } else {
--        /* RAM case */
--        ptr = qemu_map_ram_ptr(mr->ram_block, addr1);
--        switch (endian) {
--        case DEVICE_LITTLE_ENDIAN:
--            val = lduw_le_p(ptr);
--            break;
--        case DEVICE_BIG_ENDIAN:
--            val = lduw_be_p(ptr);
--            break;
--        default:
--            val = lduw_p(ptr);
--            break;
--        }
--        r = MEMTX_OK;
--    }
--    if (result) {
--        *result = r;
--    }
--    if (release_lock) {
--        qemu_mutex_unlock_iothread();
--    }
--    rcu_read_unlock();
--    return val;
--}
--
--uint32_t address_space_lduw(AddressSpace *as, hwaddr addr,
--                           MemTxAttrs attrs, MemTxResult *result)
--{
--    return address_space_lduw_internal(as, addr, attrs, result,
--                                       DEVICE_NATIVE_ENDIAN);
--}
--
--uint32_t address_space_lduw_le(AddressSpace *as, hwaddr addr,
--                           MemTxAttrs attrs, MemTxResult *result)
--{
--    return address_space_lduw_internal(as, addr, attrs, result,
--                                       DEVICE_LITTLE_ENDIAN);
--}
--
--uint32_t address_space_lduw_be(AddressSpace *as, hwaddr addr,
--                           MemTxAttrs attrs, MemTxResult *result)
--{
--    return address_space_lduw_internal(as, addr, attrs, result,
--                                       DEVICE_BIG_ENDIAN);
--}
--
--uint32_t lduw_phys(AddressSpace *as, hwaddr addr)
--{
--    return address_space_lduw(as, addr, MEMTXATTRS_UNSPECIFIED, NULL);
--}
--
--uint32_t lduw_le_phys(AddressSpace *as, hwaddr addr)
--{
--    return address_space_lduw_le(as, addr, MEMTXATTRS_UNSPECIFIED, NULL);
--}
--
--uint32_t lduw_be_phys(AddressSpace *as, hwaddr addr)
--{
--    return address_space_lduw_be(as, addr, MEMTXATTRS_UNSPECIFIED, NULL);
--}
--
--/* warning: addr must be aligned. The ram page is not masked as dirty
--   and the code inside is not invalidated. It is useful if the dirty
--   bits are used to track modified PTEs */
--void address_space_stl_notdirty(AddressSpace *as, hwaddr addr, uint32_t val,
--                                MemTxAttrs attrs, MemTxResult *result)
--{
--    uint8_t *ptr;
--    MemoryRegion *mr;
--    hwaddr l = 4;
--    hwaddr addr1;
--    MemTxResult r;
--    uint8_t dirty_log_mask;
--    bool release_lock = false;
--
--    rcu_read_lock();
--    mr = address_space_translate(as, addr, &addr1, &l,
--                                 true);
--    if (l < 4 || !memory_access_is_direct(mr, true)) {
--        release_lock |= prepare_mmio_access(mr);
--
--        r = memory_region_dispatch_write(mr, addr1, val, 4, attrs);
--    } else {
--        ptr = qemu_map_ram_ptr(mr->ram_block, addr1);
--        stl_p(ptr, val);
--
--        dirty_log_mask = memory_region_get_dirty_log_mask(mr);
--        dirty_log_mask &= ~(1 << DIRTY_MEMORY_CODE);
--        cpu_physical_memory_set_dirty_range(memory_region_get_ram_addr(mr) + addr,
--                                            4, dirty_log_mask);
--        r = MEMTX_OK;
--    }
--    if (result) {
--        *result = r;
--    }
--    if (release_lock) {
--        qemu_mutex_unlock_iothread();
--    }
--    rcu_read_unlock();
--}
--
--void stl_phys_notdirty(AddressSpace *as, hwaddr addr, uint32_t val)
--{
--    address_space_stl_notdirty(as, addr, val, MEMTXATTRS_UNSPECIFIED, NULL);
--}
--
--/* warning: addr must be aligned */
--static inline void address_space_stl_internal(AddressSpace *as,
--                                              hwaddr addr, uint32_t val,
--                                              MemTxAttrs attrs,
--                                              MemTxResult *result,
--                                              enum device_endian endian)
--{
--    uint8_t *ptr;
--    MemoryRegion *mr;
--    hwaddr l = 4;
--    hwaddr addr1;
--    MemTxResult r;
--    bool release_lock = false;
--
--    rcu_read_lock();
--    mr = address_space_translate(as, addr, &addr1, &l,
--                                 true);
--    if (l < 4 || !memory_access_is_direct(mr, true)) {
--        release_lock |= prepare_mmio_access(mr);
--
--#if defined(TARGET_WORDS_BIGENDIAN)
--        if (endian == DEVICE_LITTLE_ENDIAN) {
--            val = bswap32(val);
--        }
--#else
--        if (endian == DEVICE_BIG_ENDIAN) {
--            val = bswap32(val);
--        }
--#endif
--        r = memory_region_dispatch_write(mr, addr1, val, 4, attrs);
--    } else {
--        /* RAM case */
--        ptr = qemu_map_ram_ptr(mr->ram_block, addr1);
--        switch (endian) {
--        case DEVICE_LITTLE_ENDIAN:
--            stl_le_p(ptr, val);
--            break;
--        case DEVICE_BIG_ENDIAN:
--            stl_be_p(ptr, val);
--            break;
--        default:
--            stl_p(ptr, val);
--            break;
--        }
--        invalidate_and_set_dirty(mr, addr1, 4);
--        r = MEMTX_OK;
--    }
--    if (result) {
--        *result = r;
--    }
--    if (release_lock) {
--        qemu_mutex_unlock_iothread();
--    }
--    rcu_read_unlock();
--}
--
--void address_space_stl(AddressSpace *as, hwaddr addr, uint32_t val,
--                       MemTxAttrs attrs, MemTxResult *result)
--{
--    address_space_stl_internal(as, addr, val, attrs, result,
--                               DEVICE_NATIVE_ENDIAN);
--}
--
--void address_space_stl_le(AddressSpace *as, hwaddr addr, uint32_t val,
--                       MemTxAttrs attrs, MemTxResult *result)
--{
--    address_space_stl_internal(as, addr, val, attrs, result,
--                               DEVICE_LITTLE_ENDIAN);
--}
--
--void address_space_stl_be(AddressSpace *as, hwaddr addr, uint32_t val,
--                       MemTxAttrs attrs, MemTxResult *result)
--{
--    address_space_stl_internal(as, addr, val, attrs, result,
--                               DEVICE_BIG_ENDIAN);
--}
--
--void stl_phys(AddressSpace *as, hwaddr addr, uint32_t val)
--{
--    address_space_stl(as, addr, val, MEMTXATTRS_UNSPECIFIED, NULL);
--}
--
--void stl_le_phys(AddressSpace *as, hwaddr addr, uint32_t val)
--{
--    address_space_stl_le(as, addr, val, MEMTXATTRS_UNSPECIFIED, NULL);
--}
--
--void stl_be_phys(AddressSpace *as, hwaddr addr, uint32_t val)
--{
--    address_space_stl_be(as, addr, val, MEMTXATTRS_UNSPECIFIED, NULL);
--}
--
--void address_space_stb(AddressSpace *as, hwaddr addr, uint32_t val,
--                       MemTxAttrs attrs, MemTxResult *result)
--{
--    uint8_t *ptr;
--    MemoryRegion *mr;
--    hwaddr l = 1;
--    hwaddr addr1;
--    MemTxResult r;
--    bool release_lock = false;
--
--    rcu_read_lock();
--    mr = address_space_translate(as, addr, &addr1, &l, true);
--    if (!memory_access_is_direct(mr, true)) {
--        release_lock |= prepare_mmio_access(mr);
--        r = memory_region_dispatch_write(mr, addr1, val, 1, attrs);
--    } else {
--        /* RAM case */
--        ptr = qemu_map_ram_ptr(mr->ram_block, addr1);
--        stb_p(ptr, val);
--        invalidate_and_set_dirty(mr, addr1, 1);
--        r = MEMTX_OK;
--    }
--    if (result) {
--        *result = r;
--    }
--    if (release_lock) {
--        qemu_mutex_unlock_iothread();
--    }
--    rcu_read_unlock();
--}
--
--void stb_phys(AddressSpace *as, hwaddr addr, uint32_t val)
--{
--    address_space_stb(as, addr, val, MEMTXATTRS_UNSPECIFIED, NULL);
--}
--
--/* warning: addr must be aligned */
--static inline void address_space_stw_internal(AddressSpace *as,
--                                              hwaddr addr, uint32_t val,
--                                              MemTxAttrs attrs,
--                                              MemTxResult *result,
--                                              enum device_endian endian)
--{
--    uint8_t *ptr;
--    MemoryRegion *mr;
--    hwaddr l = 2;
--    hwaddr addr1;
--    MemTxResult r;
--    bool release_lock = false;
--
--    rcu_read_lock();
--    mr = address_space_translate(as, addr, &addr1, &l, true);
--    if (l < 2 || !memory_access_is_direct(mr, true)) {
--        release_lock |= prepare_mmio_access(mr);
--
--#if defined(TARGET_WORDS_BIGENDIAN)
--        if (endian == DEVICE_LITTLE_ENDIAN) {
--            val = bswap16(val);
--        }
--#else
--        if (endian == DEVICE_BIG_ENDIAN) {
--            val = bswap16(val);
--        }
--#endif
--        r = memory_region_dispatch_write(mr, addr1, val, 2, attrs);
--    } else {
--        /* RAM case */
--        ptr = qemu_map_ram_ptr(mr->ram_block, addr1);
--        switch (endian) {
--        case DEVICE_LITTLE_ENDIAN:
--            stw_le_p(ptr, val);
--            break;
--        case DEVICE_BIG_ENDIAN:
--            stw_be_p(ptr, val);
--            break;
--        default:
--            stw_p(ptr, val);
--            break;
--        }
--        invalidate_and_set_dirty(mr, addr1, 2);
--        r = MEMTX_OK;
--    }
--    if (result) {
--        *result = r;
--    }
--    if (release_lock) {
--        qemu_mutex_unlock_iothread();
--    }
--    rcu_read_unlock();
--}
--
--void address_space_stw(AddressSpace *as, hwaddr addr, uint32_t val,
--                       MemTxAttrs attrs, MemTxResult *result)
--{
--    address_space_stw_internal(as, addr, val, attrs, result,
--                               DEVICE_NATIVE_ENDIAN);
--}
--
--void address_space_stw_le(AddressSpace *as, hwaddr addr, uint32_t val,
--                       MemTxAttrs attrs, MemTxResult *result)
--{
--    address_space_stw_internal(as, addr, val, attrs, result,
--                               DEVICE_LITTLE_ENDIAN);
--}
--
--void address_space_stw_be(AddressSpace *as, hwaddr addr, uint32_t val,
--                       MemTxAttrs attrs, MemTxResult *result)
--{
--    address_space_stw_internal(as, addr, val, attrs, result,
--                               DEVICE_BIG_ENDIAN);
--}
--
--void stw_phys(AddressSpace *as, hwaddr addr, uint32_t val)
--{
--    address_space_stw(as, addr, val, MEMTXATTRS_UNSPECIFIED, NULL);
--}
--
--void stw_le_phys(AddressSpace *as, hwaddr addr, uint32_t val)
--{
--    address_space_stw_le(as, addr, val, MEMTXATTRS_UNSPECIFIED, NULL);
--}
--
--void stw_be_phys(AddressSpace *as, hwaddr addr, uint32_t val)
--{
--    address_space_stw_be(as, addr, val, MEMTXATTRS_UNSPECIFIED, NULL);
--}
--
--static inline void address_space_stq_internal(AddressSpace *as,
--                                              hwaddr addr, uint64_t val,
--                                              MemTxAttrs attrs,
--                                              MemTxResult *result,
--                                              enum device_endian endian)
--{
--    uint8_t *ptr;
--    MemoryRegion *mr;
--    hwaddr l = 8;
--    hwaddr addr1;
--    MemTxResult r;
--    bool release_lock = false;
--
--    rcu_read_lock();
--    mr = address_space_translate(as, addr, &addr1, &l, true);
--    if (l < 8 || !memory_access_is_direct(mr, true)) {
--        release_lock |= prepare_mmio_access(mr);
--
--#if defined(TARGET_WORDS_BIGENDIAN)
--        if (endian == DEVICE_LITTLE_ENDIAN) {
--            val = bswap64(val);
--        }
--#else
--        if (endian == DEVICE_BIG_ENDIAN) {
--            val = bswap64(val);
--        }
--#endif
--        r = memory_region_dispatch_write(mr, addr1, val, 4, attrs);
--    } else {
--        /* RAM case */
--        ptr = qemu_map_ram_ptr(mr->ram_block, addr1);
--        switch (endian) {
--        case DEVICE_LITTLE_ENDIAN:
--            stq_le_p(ptr, val);
--            break;
--        case DEVICE_BIG_ENDIAN:
--            stq_be_p(ptr, val);
--            break;
--        default:
--            stq_p(ptr, val);
--            break;
--        }
--        invalidate_and_set_dirty(mr, addr1, 8);
--        r = MEMTX_OK;
--    }
--    if (result) {
--        *result = r;
--    }
--    if (release_lock) {
--        qemu_mutex_unlock_iothread();
--    }
--    rcu_read_unlock();
--}
--
--void address_space_stq(AddressSpace *as, hwaddr addr, uint64_t val,
--                       MemTxAttrs attrs, MemTxResult *result)
--{
--    address_space_stq_internal(as, addr, val, attrs, result,
--                               DEVICE_NATIVE_ENDIAN);
--}
--
--void address_space_stq_le(AddressSpace *as, hwaddr addr, uint64_t val,
--                       MemTxAttrs attrs, MemTxResult *result)
--{
--    address_space_stq_internal(as, addr, val, attrs, result,
--                               DEVICE_LITTLE_ENDIAN);
--}
--
--void address_space_stq_be(AddressSpace *as, hwaddr addr, uint64_t val,
--                       MemTxAttrs attrs, MemTxResult *result)
--{
--    address_space_stq_internal(as, addr, val, attrs, result,
--                               DEVICE_BIG_ENDIAN);
--}
--
--void stq_phys(AddressSpace *as, hwaddr addr, uint64_t val)
--{
--    address_space_stq(as, addr, val, MEMTXATTRS_UNSPECIFIED, NULL);
--}
--
--void stq_le_phys(AddressSpace *as, hwaddr addr, uint64_t val)
--{
--    address_space_stq_le(as, addr, val, MEMTXATTRS_UNSPECIFIED, NULL);
--}
--
--void stq_be_phys(AddressSpace *as, hwaddr addr, uint64_t val)
--{
--    address_space_stq_be(as, addr, val, MEMTXATTRS_UNSPECIFIED, NULL);
--}
-+#define ARG1_DECL                AddressSpace *as
-+#define ARG1                     as
-+#define SUFFIX
-+#define TRANSLATE(...)           address_space_translate(as, __VA_ARGS__)
-+#define IS_DIRECT(mr, is_write)  memory_access_is_direct(mr, is_write)
-+#define MAP_RAM(mr, ofs)         qemu_map_ram_ptr((mr)->ram_block, ofs)
-+#define INVALIDATE(mr, ofs, len) invalidate_and_set_dirty(mr, ofs, len)
-+#define RCU_READ_LOCK(...)       rcu_read_lock()
-+#define RCU_READ_UNLOCK(...)     rcu_read_unlock()
-+#include "memory_ldst.inc.c"
+ static void vring_desc_read(VirtIODevice *vdev, VRingDesc *desc,
+@@ -1223,6 +1272,7 @@ void virtio_queue_set_rings(VirtIODevice *vdev, int n, hwaddr desc,
+     vdev->vq[n].vring.desc = desc;
+     vdev->vq[n].vring.avail = avail;
+     vdev->vq[n].vring.used = used;
++    virtio_init_region_cache(vdev, n);
+ }
  
- /* virtual memory access for debug (includes writing to ROM) */
- int cpu_memory_rw_debug(CPUState *cpu, target_ulong addr,
-diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
-index cffdc13..bd15853 100644
---- a/include/exec/cpu-common.h
-+++ b/include/exec/cpu-common.h
-@@ -94,21 +94,6 @@ bool cpu_physical_memory_is_io(hwaddr phys_addr);
-  */
- void qemu_flush_coalesced_mmio_buffer(void);
+ void virtio_queue_set_num(VirtIODevice *vdev, int n, int num)
+@@ -1927,9 +1977,6 @@ int virtio_load(VirtIODevice *vdev, QEMUFile *f, int version_id)
+ void virtio_cleanup(VirtIODevice *vdev)
+ {
+     qemu_del_vm_change_state_handler(vdev->vmstate);
+-    g_free(vdev->config);
+-    g_free(vdev->vq);
+-    g_free(vdev->vector_queues);
+ }
  
--uint32_t ldub_phys(AddressSpace *as, hwaddr addr);
--uint32_t lduw_le_phys(AddressSpace *as, hwaddr addr);
--uint32_t lduw_be_phys(AddressSpace *as, hwaddr addr);
--uint32_t ldl_le_phys(AddressSpace *as, hwaddr addr);
--uint32_t ldl_be_phys(AddressSpace *as, hwaddr addr);
--uint64_t ldq_le_phys(AddressSpace *as, hwaddr addr);
--uint64_t ldq_be_phys(AddressSpace *as, hwaddr addr);
--void stb_phys(AddressSpace *as, hwaddr addr, uint32_t val);
--void stw_le_phys(AddressSpace *as, hwaddr addr, uint32_t val);
--void stw_be_phys(AddressSpace *as, hwaddr addr, uint32_t val);
--void stl_le_phys(AddressSpace *as, hwaddr addr, uint32_t val);
--void stl_be_phys(AddressSpace *as, hwaddr addr, uint32_t val);
--void stq_le_phys(AddressSpace *as, hwaddr addr, uint64_t val);
--void stq_be_phys(AddressSpace *as, hwaddr addr, uint64_t val);
--
- void cpu_physical_memory_write_rom(AddressSpace *as, hwaddr addr,
-                                    const uint8_t *buf, int len);
- void cpu_flush_icache_range(hwaddr start, int len);
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index 9728a2f..f35b612 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -1404,6 +1404,21 @@ void address_space_stq_le(AddressSpace *as, hwaddr addr, uint64_t val,
- void address_space_stq_be(AddressSpace *as, hwaddr addr, uint64_t val,
-                             MemTxAttrs attrs, MemTxResult *result);
+ static void virtio_vmstate_change(void *opaque, int running, RunState state)
+@@ -2150,6 +2197,19 @@ void GCC_FMT_ATTR(2, 3) virtio_error(VirtIODevice *vdev, const char *fmt, ...)
+     }
+ }
  
-+uint32_t ldub_phys(AddressSpace *as, hwaddr addr);
-+uint32_t lduw_le_phys(AddressSpace *as, hwaddr addr);
-+uint32_t lduw_be_phys(AddressSpace *as, hwaddr addr);
-+uint32_t ldl_le_phys(AddressSpace *as, hwaddr addr);
-+uint32_t ldl_be_phys(AddressSpace *as, hwaddr addr);
-+uint64_t ldq_le_phys(AddressSpace *as, hwaddr addr);
-+uint64_t ldq_be_phys(AddressSpace *as, hwaddr addr);
-+void stb_phys(AddressSpace *as, hwaddr addr, uint32_t val);
-+void stw_le_phys(AddressSpace *as, hwaddr addr, uint32_t val);
-+void stw_be_phys(AddressSpace *as, hwaddr addr, uint32_t val);
-+void stl_le_phys(AddressSpace *as, hwaddr addr, uint32_t val);
-+void stl_be_phys(AddressSpace *as, hwaddr addr, uint32_t val);
-+void stq_le_phys(AddressSpace *as, hwaddr addr, uint64_t val);
-+void stq_be_phys(AddressSpace *as, hwaddr addr, uint64_t val);
-+
- /* address_space_translate: translate an address range into an address space
-  * into a MemoryRegion and an address range into that section.  Should be
-  * called from an RCU critical section, to avoid that the last reference
-diff --git a/memory_ldst.inc.c b/memory_ldst.inc.c
-new file mode 100644
-index 0000000..e1abe5f
---- /dev/null
-+++ b/memory_ldst.inc.c
-@@ -0,0 +1,709 @@
-+/*
-+ *  Physical memory access templates
-+ *
-+ *  Copyright (c) 2003 Fabrice Bellard
-+ *  Copyright (c) 2015 Linaro, Inc.
-+ *  Copyright (c) 2016 Red Hat, Inc.
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+/* warning: addr must be aligned */
-+static inline uint32_t glue(address_space_ldl_internal, SUFFIX)(ARG1_DECL,
-+    hwaddr addr, MemTxAttrs attrs, MemTxResult *result,
-+    enum device_endian endian)
++static void virtio_memory_listener_commit(MemoryListener *listener)
 +{
-+    uint8_t *ptr;
-+    uint64_t val;
-+    MemoryRegion *mr;
-+    hwaddr l = 4;
-+    hwaddr addr1;
-+    MemTxResult r;
-+    bool release_lock = false;
++    VirtIODevice *vdev = container_of(listener, VirtIODevice, listener);
++    int i;
 +
-+    RCU_READ_LOCK();
-+    mr = TRANSLATE(addr, &addr1, &l, false);
-+    if (l < 4 || !IS_DIRECT(mr, false)) {
-+        release_lock |= prepare_mmio_access(mr);
-+
-+        /* I/O case */
-+        r = memory_region_dispatch_read(mr, addr1, &val, 4, attrs);
-+#if defined(TARGET_WORDS_BIGENDIAN)
-+        if (endian == DEVICE_LITTLE_ENDIAN) {
-+            val = bswap32(val);
-+        }
-+#else
-+        if (endian == DEVICE_BIG_ENDIAN) {
-+            val = bswap32(val);
-+        }
-+#endif
-+    } else {
-+        /* RAM case */
-+        ptr = MAP_RAM(mr, addr1);
-+        switch (endian) {
-+        case DEVICE_LITTLE_ENDIAN:
-+            val = ldl_le_p(ptr);
-+            break;
-+        case DEVICE_BIG_ENDIAN:
-+            val = ldl_be_p(ptr);
-+            break;
-+        default:
-+            val = ldl_p(ptr);
++    for (i = 0; i < VIRTIO_QUEUE_MAX; i++) {
++        if (vdev->vq[i].vring.num == 0) {
 +            break;
 +        }
-+        r = MEMTX_OK;
++        virtio_init_region_cache(vdev, i);
 +    }
-+    if (result) {
-+        *result = r;
-+    }
-+    if (release_lock) {
-+        qemu_mutex_unlock_iothread();
-+    }
-+    RCU_READ_UNLOCK();
-+    return val;
 +}
 +
-+uint32_t glue(address_space_ldl, SUFFIX)(ARG1_DECL,
-+    hwaddr addr, MemTxAttrs attrs, MemTxResult *result)
+ static void virtio_device_realize(DeviceState *dev, Error **errp)
+ {
+     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
+@@ -2172,6 +2232,9 @@ static void virtio_device_realize(DeviceState *dev, Error **errp)
+         error_propagate(errp, err);
+         return;
+     }
++
++    vdev->listener.commit = virtio_memory_listener_commit;
++    memory_listener_register(&vdev->listener, &address_space_memory);
+ }
+ 
+ static void virtio_device_unrealize(DeviceState *dev, Error **errp)
+@@ -2194,6 +2257,27 @@ static void virtio_device_unrealize(DeviceState *dev, Error **errp)
+     vdev->bus_name = NULL;
+ }
+ 
++static void virtio_device_instance_finalize(Object *obj)
 +{
-+    return glue(address_space_ldl_internal, SUFFIX)(ARG1, addr, attrs, result,
-+                                                    DEVICE_NATIVE_ENDIAN);
-+}
++    VirtIODevice *vdev = VIRTIO_DEVICE(obj);
++    int i;
 +
-+uint32_t glue(address_space_ldl_le, SUFFIX)(ARG1_DECL,
-+    hwaddr addr, MemTxAttrs attrs, MemTxResult *result)
-+{
-+    return glue(address_space_ldl_internal, SUFFIX)(ARG1, addr, attrs, result,
-+                                                    DEVICE_LITTLE_ENDIAN);
-+}
-+
-+uint32_t glue(address_space_ldl_be, SUFFIX)(ARG1_DECL,
-+    hwaddr addr, MemTxAttrs attrs, MemTxResult *result)
-+{
-+    return glue(address_space_ldl_internal, SUFFIX)(ARG1, addr, attrs, result,
-+                                                    DEVICE_BIG_ENDIAN);
-+}
-+
-+uint32_t glue(ldl_phys, SUFFIX)(ARG1_DECL, hwaddr addr)
-+{
-+    return glue(address_space_ldl, SUFFIX)(ARG1, addr,
-+                                           MEMTXATTRS_UNSPECIFIED, NULL);
-+}
-+
-+uint32_t glue(ldl_le_phys, SUFFIX)(ARG1_DECL, hwaddr addr)
-+{
-+    return glue(address_space_ldl_le, SUFFIX)(ARG1, addr,
-+                                              MEMTXATTRS_UNSPECIFIED, NULL);
-+}
-+
-+uint32_t glue(ldl_be_phys, SUFFIX)(ARG1_DECL, hwaddr addr)
-+{
-+    return glue(address_space_ldl_be, SUFFIX)(ARG1, addr,
-+                                              MEMTXATTRS_UNSPECIFIED, NULL);
-+}
-+
-+/* warning: addr must be aligned */
-+static inline uint64_t glue(address_space_ldq_internal, SUFFIX)(ARG1_DECL,
-+    hwaddr addr, MemTxAttrs attrs, MemTxResult *result,
-+    enum device_endian endian)
-+{
-+    uint8_t *ptr;
-+    uint64_t val;
-+    MemoryRegion *mr;
-+    hwaddr l = 8;
-+    hwaddr addr1;
-+    MemTxResult r;
-+    bool release_lock = false;
-+
-+    RCU_READ_LOCK();
-+    mr = TRANSLATE(addr, &addr1, &l, false);
-+    if (l < 8 || !IS_DIRECT(mr, false)) {
-+        release_lock |= prepare_mmio_access(mr);
-+
-+        /* I/O case */
-+        r = memory_region_dispatch_read(mr, addr1, &val, 8, attrs);
-+#if defined(TARGET_WORDS_BIGENDIAN)
-+        if (endian == DEVICE_LITTLE_ENDIAN) {
-+            val = bswap64(val);
-+        }
-+#else
-+        if (endian == DEVICE_BIG_ENDIAN) {
-+            val = bswap64(val);
-+        }
-+#endif
-+    } else {
-+        /* RAM case */
-+        ptr = MAP_RAM(mr, addr1);
-+        switch (endian) {
-+        case DEVICE_LITTLE_ENDIAN:
-+            val = ldq_le_p(ptr);
-+            break;
-+        case DEVICE_BIG_ENDIAN:
-+            val = ldq_be_p(ptr);
-+            break;
-+        default:
-+            val = ldq_p(ptr);
++    memory_listener_unregister(&vdev->listener);
++    for (i = 0; i < VIRTIO_QUEUE_MAX; i++) {
++        VRingMemoryRegionCaches *caches;
++        if (vdev->vq[i].vring.num == 0) {
 +            break;
 +        }
-+        r = MEMTX_OK;
++        caches = atomic_read(&vdev->vq[i].vring.caches);
++        atomic_set(&vdev->vq[i].vring.caches, NULL);
++        virtio_free_region_cache(caches);
 +    }
-+    if (result) {
-+        *result = r;
-+    }
-+    if (release_lock) {
-+        qemu_mutex_unlock_iothread();
-+    }
-+    RCU_READ_UNLOCK();
-+    return val;
++
++    g_free(vdev->config);
++    g_free(vdev->vq);
++    g_free(vdev->vector_queues);
 +}
 +
-+uint64_t glue(address_space_ldq, SUFFIX)(ARG1_DECL,
-+    hwaddr addr, MemTxAttrs attrs, MemTxResult *result)
-+{
-+    return glue(address_space_ldq_internal, SUFFIX)(ARG1, addr, attrs, result,
-+                                                    DEVICE_NATIVE_ENDIAN);
-+}
-+
-+uint64_t glue(address_space_ldq_le, SUFFIX)(ARG1_DECL,
-+    hwaddr addr, MemTxAttrs attrs, MemTxResult *result)
-+{
-+    return glue(address_space_ldq_internal, SUFFIX)(ARG1, addr, attrs, result,
-+                                                    DEVICE_LITTLE_ENDIAN);
-+}
-+
-+uint64_t glue(address_space_ldq_be, SUFFIX)(ARG1_DECL,
-+    hwaddr addr, MemTxAttrs attrs, MemTxResult *result)
-+{
-+    return glue(address_space_ldq_internal, SUFFIX)(ARG1, addr, attrs, result,
-+                                                    DEVICE_BIG_ENDIAN);
-+}
-+
-+uint64_t glue(ldq_phys, SUFFIX)(ARG1_DECL, hwaddr addr)
-+{
-+    return glue(address_space_ldq, SUFFIX)(ARG1, addr,
-+                                           MEMTXATTRS_UNSPECIFIED, NULL);
-+}
-+
-+uint64_t glue(ldq_le_phys, SUFFIX)(ARG1_DECL, hwaddr addr)
-+{
-+    return glue(address_space_ldq_le, SUFFIX)(ARG1, addr,
-+                                              MEMTXATTRS_UNSPECIFIED, NULL);
-+}
-+
-+uint64_t glue(ldq_be_phys, SUFFIX)(ARG1_DECL, hwaddr addr)
-+{
-+    return glue(address_space_ldq_be, SUFFIX)(ARG1, addr,
-+                                              MEMTXATTRS_UNSPECIFIED, NULL);
-+}
-+
-+uint32_t glue(address_space_ldub, SUFFIX)(ARG1_DECL,
-+    hwaddr addr, MemTxAttrs attrs, MemTxResult *result)
-+{
-+    uint8_t *ptr;
-+    uint64_t val;
-+    MemoryRegion *mr;
-+    hwaddr l = 1;
-+    hwaddr addr1;
-+    MemTxResult r;
-+    bool release_lock = false;
-+
-+    RCU_READ_LOCK();
-+    mr = TRANSLATE(addr, &addr1, &l, false);
-+    if (!IS_DIRECT(mr, false)) {
-+        release_lock |= prepare_mmio_access(mr);
-+
-+        /* I/O case */
-+        r = memory_region_dispatch_read(mr, addr1, &val, 1, attrs);
-+    } else {
-+        /* RAM case */
-+        ptr = MAP_RAM(mr, addr1);
-+        val = ldub_p(ptr);
-+        r = MEMTX_OK;
-+    }
-+    if (result) {
-+        *result = r;
-+    }
-+    if (release_lock) {
-+        qemu_mutex_unlock_iothread();
-+    }
-+    RCU_READ_UNLOCK();
-+    return val;
-+}
-+
-+uint32_t glue(ldub_phys, SUFFIX)(ARG1_DECL, hwaddr addr)
-+{
-+    return glue(address_space_ldub, SUFFIX)(ARG1, addr,
-+                                            MEMTXATTRS_UNSPECIFIED, NULL);
-+}
-+
-+/* warning: addr must be aligned */
-+static inline uint32_t glue(address_space_lduw_internal, SUFFIX)(ARG1_DECL,
-+    hwaddr addr, MemTxAttrs attrs, MemTxResult *result,
-+    enum device_endian endian)
-+{
-+    uint8_t *ptr;
-+    uint64_t val;
-+    MemoryRegion *mr;
-+    hwaddr l = 2;
-+    hwaddr addr1;
-+    MemTxResult r;
-+    bool release_lock = false;
-+
-+    RCU_READ_LOCK();
-+    mr = TRANSLATE(addr, &addr1, &l, false);
-+    if (l < 2 || !IS_DIRECT(mr, false)) {
-+        release_lock |= prepare_mmio_access(mr);
-+
-+        /* I/O case */
-+        r = memory_region_dispatch_read(mr, addr1, &val, 2, attrs);
-+#if defined(TARGET_WORDS_BIGENDIAN)
-+        if (endian == DEVICE_LITTLE_ENDIAN) {
-+            val = bswap16(val);
-+        }
-+#else
-+        if (endian == DEVICE_BIG_ENDIAN) {
-+            val = bswap16(val);
-+        }
-+#endif
-+    } else {
-+        /* RAM case */
-+        ptr = MAP_RAM(mr, addr1);
-+        switch (endian) {
-+        case DEVICE_LITTLE_ENDIAN:
-+            val = lduw_le_p(ptr);
-+            break;
-+        case DEVICE_BIG_ENDIAN:
-+            val = lduw_be_p(ptr);
-+            break;
-+        default:
-+            val = lduw_p(ptr);
-+            break;
-+        }
-+        r = MEMTX_OK;
-+    }
-+    if (result) {
-+        *result = r;
-+    }
-+    if (release_lock) {
-+        qemu_mutex_unlock_iothread();
-+    }
-+    RCU_READ_UNLOCK();
-+    return val;
-+}
-+
-+uint32_t glue(address_space_lduw, SUFFIX)(ARG1_DECL,
-+    hwaddr addr, MemTxAttrs attrs, MemTxResult *result)
-+{
-+    return glue(address_space_lduw_internal, SUFFIX)(ARG1, addr, attrs, result,
-+                                                     DEVICE_NATIVE_ENDIAN);
-+}
-+
-+uint32_t glue(address_space_lduw_le, SUFFIX)(ARG1_DECL,
-+    hwaddr addr, MemTxAttrs attrs, MemTxResult *result)
-+{
-+    return glue(address_space_lduw_internal, SUFFIX)(ARG1, addr, attrs, result,
-+                                                     DEVICE_LITTLE_ENDIAN);
-+}
-+
-+uint32_t glue(address_space_lduw_be, SUFFIX)(ARG1_DECL,
-+    hwaddr addr, MemTxAttrs attrs, MemTxResult *result)
-+{
-+    return glue(address_space_lduw_internal, SUFFIX)(ARG1, addr, attrs, result,
-+                                       DEVICE_BIG_ENDIAN);
-+}
-+
-+uint32_t glue(lduw_phys, SUFFIX)(ARG1_DECL, hwaddr addr)
-+{
-+    return glue(address_space_lduw, SUFFIX)(ARG1, addr,
-+                                            MEMTXATTRS_UNSPECIFIED, NULL);
-+}
-+
-+uint32_t glue(lduw_le_phys, SUFFIX)(ARG1_DECL, hwaddr addr)
-+{
-+    return glue(address_space_lduw_le, SUFFIX)(ARG1, addr,
-+                                               MEMTXATTRS_UNSPECIFIED, NULL);
-+}
-+
-+uint32_t glue(lduw_be_phys, SUFFIX)(ARG1_DECL, hwaddr addr)
-+{
-+    return glue(address_space_lduw_be, SUFFIX)(ARG1, addr,
-+                                               MEMTXATTRS_UNSPECIFIED, NULL);
-+}
-+
-+/* warning: addr must be aligned. The ram page is not masked as dirty
-+   and the code inside is not invalidated. It is useful if the dirty
-+   bits are used to track modified PTEs */
-+void glue(address_space_stl_notdirty, SUFFIX)(ARG1_DECL,
-+    hwaddr addr, uint32_t val, MemTxAttrs attrs, MemTxResult *result)
-+{
-+    uint8_t *ptr;
-+    MemoryRegion *mr;
-+    hwaddr l = 4;
-+    hwaddr addr1;
-+    MemTxResult r;
-+    uint8_t dirty_log_mask;
-+    bool release_lock = false;
-+
-+    RCU_READ_LOCK();
-+    mr = TRANSLATE(addr, &addr1, &l, true);
-+    if (l < 4 || !IS_DIRECT(mr, true)) {
-+        release_lock |= prepare_mmio_access(mr);
-+
-+        r = memory_region_dispatch_write(mr, addr1, val, 4, attrs);
-+    } else {
-+        ptr = MAP_RAM(mr, addr1);
-+        stl_p(ptr, val);
-+
-+        dirty_log_mask = memory_region_get_dirty_log_mask(mr);
-+        dirty_log_mask &= ~(1 << DIRTY_MEMORY_CODE);
-+        cpu_physical_memory_set_dirty_range(memory_region_get_ram_addr(mr) + addr,
-+                                            4, dirty_log_mask);
-+        r = MEMTX_OK;
-+    }
-+    if (result) {
-+        *result = r;
-+    }
-+    if (release_lock) {
-+        qemu_mutex_unlock_iothread();
-+    }
-+    RCU_READ_UNLOCK();
-+}
-+
-+void glue(stl_phys_notdirty, SUFFIX)(ARG1_DECL, hwaddr addr, uint32_t val)
-+{
-+    glue(address_space_stl_notdirty, SUFFIX)(ARG1, addr, val,
-+                                             MEMTXATTRS_UNSPECIFIED, NULL);
-+}
-+
-+/* warning: addr must be aligned */
-+static inline void glue(address_space_stl_internal, SUFFIX)(ARG1_DECL,
-+    hwaddr addr, uint32_t val, MemTxAttrs attrs,
-+    MemTxResult *result, enum device_endian endian)
-+{
-+    uint8_t *ptr;
-+    MemoryRegion *mr;
-+    hwaddr l = 4;
-+    hwaddr addr1;
-+    MemTxResult r;
-+    bool release_lock = false;
-+
-+    RCU_READ_LOCK();
-+    mr = TRANSLATE(addr, &addr1, &l, true);
-+    if (l < 4 || !IS_DIRECT(mr, true)) {
-+        release_lock |= prepare_mmio_access(mr);
-+
-+#if defined(TARGET_WORDS_BIGENDIAN)
-+        if (endian == DEVICE_LITTLE_ENDIAN) {
-+            val = bswap32(val);
-+        }
-+#else
-+        if (endian == DEVICE_BIG_ENDIAN) {
-+            val = bswap32(val);
-+        }
-+#endif
-+        r = memory_region_dispatch_write(mr, addr1, val, 4, attrs);
-+    } else {
-+        /* RAM case */
-+        ptr = MAP_RAM(mr, addr1);
-+        switch (endian) {
-+        case DEVICE_LITTLE_ENDIAN:
-+            stl_le_p(ptr, val);
-+            break;
-+        case DEVICE_BIG_ENDIAN:
-+            stl_be_p(ptr, val);
-+            break;
-+        default:
-+            stl_p(ptr, val);
-+            break;
-+        }
-+        INVALIDATE(mr, addr1, 4);
-+        r = MEMTX_OK;
-+    }
-+    if (result) {
-+        *result = r;
-+    }
-+    if (release_lock) {
-+        qemu_mutex_unlock_iothread();
-+    }
-+    RCU_READ_UNLOCK();
-+}
-+
-+void glue(address_space_stl, SUFFIX)(ARG1_DECL,
-+    hwaddr addr, uint32_t val, MemTxAttrs attrs, MemTxResult *result)
-+{
-+    glue(address_space_stl_internal, SUFFIX)(ARG1, addr, val, attrs,
-+                                             result, DEVICE_NATIVE_ENDIAN);
-+}
-+
-+void glue(address_space_stl_le, SUFFIX)(ARG1_DECL,
-+    hwaddr addr, uint32_t val, MemTxAttrs attrs, MemTxResult *result)
-+{
-+    glue(address_space_stl_internal, SUFFIX)(ARG1, addr, val, attrs,
-+                                             result, DEVICE_LITTLE_ENDIAN);
-+}
-+
-+void glue(address_space_stl_be, SUFFIX)(ARG1_DECL,
-+    hwaddr addr, uint32_t val, MemTxAttrs attrs, MemTxResult *result)
-+{
-+    glue(address_space_stl_internal, SUFFIX)(ARG1, addr, val, attrs,
-+                                             result, DEVICE_BIG_ENDIAN);
-+}
-+
-+void glue(stl_phys, SUFFIX)(ARG1_DECL, hwaddr addr, uint32_t val)
-+{
-+    glue(address_space_stl, SUFFIX)(ARG1, addr, val,
-+                                    MEMTXATTRS_UNSPECIFIED, NULL);
-+}
-+
-+void glue(stl_le_phys, SUFFIX)(ARG1_DECL, hwaddr addr, uint32_t val)
-+{
-+    glue(address_space_stl_le, SUFFIX)(ARG1, addr, val,
-+                                       MEMTXATTRS_UNSPECIFIED, NULL);
-+}
-+
-+void glue(stl_be_phys, SUFFIX)(ARG1_DECL, hwaddr addr, uint32_t val)
-+{
-+    glue(address_space_stl_be, SUFFIX)(ARG1, addr, val,
-+                                       MEMTXATTRS_UNSPECIFIED, NULL);
-+}
-+
-+void glue(address_space_stb, SUFFIX)(ARG1_DECL,
-+    hwaddr addr, uint32_t val, MemTxAttrs attrs, MemTxResult *result)
-+{
-+    uint8_t *ptr;
-+    MemoryRegion *mr;
-+    hwaddr l = 1;
-+    hwaddr addr1;
-+    MemTxResult r;
-+    bool release_lock = false;
-+
-+    RCU_READ_LOCK();
-+    mr = TRANSLATE(addr, &addr1, &l, true);
-+    if (!IS_DIRECT(mr, true)) {
-+        release_lock |= prepare_mmio_access(mr);
-+        r = memory_region_dispatch_write(mr, addr1, val, 1, attrs);
-+    } else {
-+        /* RAM case */
-+        ptr = MAP_RAM(mr, addr1);
-+        stb_p(ptr, val);
-+        INVALIDATE(mr, addr1, 1);
-+        r = MEMTX_OK;
-+    }
-+    if (result) {
-+        *result = r;
-+    }
-+    if (release_lock) {
-+        qemu_mutex_unlock_iothread();
-+    }
-+    RCU_READ_UNLOCK();
-+}
-+
-+void glue(stb_phys, SUFFIX)(ARG1_DECL, hwaddr addr, uint32_t val)
-+{
-+    glue(address_space_stb, SUFFIX)(ARG1, addr, val,
-+                                    MEMTXATTRS_UNSPECIFIED, NULL);
-+}
-+
-+/* warning: addr must be aligned */
-+static inline void glue(address_space_stw_internal, SUFFIX)(ARG1_DECL,
-+    hwaddr addr, uint32_t val, MemTxAttrs attrs,
-+    MemTxResult *result, enum device_endian endian)
-+{
-+    uint8_t *ptr;
-+    MemoryRegion *mr;
-+    hwaddr l = 2;
-+    hwaddr addr1;
-+    MemTxResult r;
-+    bool release_lock = false;
-+
-+    RCU_READ_LOCK();
-+    mr = TRANSLATE(addr, &addr1, &l, true);
-+    if (l < 2 || !IS_DIRECT(mr, true)) {
-+        release_lock |= prepare_mmio_access(mr);
-+
-+#if defined(TARGET_WORDS_BIGENDIAN)
-+        if (endian == DEVICE_LITTLE_ENDIAN) {
-+            val = bswap16(val);
-+        }
-+#else
-+        if (endian == DEVICE_BIG_ENDIAN) {
-+            val = bswap16(val);
-+        }
-+#endif
-+        r = memory_region_dispatch_write(mr, addr1, val, 2, attrs);
-+    } else {
-+        /* RAM case */
-+        ptr = MAP_RAM(mr, addr1);
-+        switch (endian) {
-+        case DEVICE_LITTLE_ENDIAN:
-+            stw_le_p(ptr, val);
-+            break;
-+        case DEVICE_BIG_ENDIAN:
-+            stw_be_p(ptr, val);
-+            break;
-+        default:
-+            stw_p(ptr, val);
-+            break;
-+        }
-+        INVALIDATE(mr, addr1, 2);
-+        r = MEMTX_OK;
-+    }
-+    if (result) {
-+        *result = r;
-+    }
-+    if (release_lock) {
-+        qemu_mutex_unlock_iothread();
-+    }
-+    RCU_READ_UNLOCK();
-+}
-+
-+void glue(address_space_stw, SUFFIX)(ARG1_DECL,
-+    hwaddr addr, uint32_t val, MemTxAttrs attrs, MemTxResult *result)
-+{
-+    glue(address_space_stw_internal, SUFFIX)(ARG1, addr, val, attrs, result,
-+                                             DEVICE_NATIVE_ENDIAN);
-+}
-+
-+void glue(address_space_stw_le, SUFFIX)(ARG1_DECL,
-+    hwaddr addr, uint32_t val, MemTxAttrs attrs, MemTxResult *result)
-+{
-+    glue(address_space_stw_internal, SUFFIX)(ARG1, addr, val, attrs, result,
-+                                             DEVICE_LITTLE_ENDIAN);
-+}
-+
-+void glue(address_space_stw_be, SUFFIX)(ARG1_DECL,
-+    hwaddr addr, uint32_t val, MemTxAttrs attrs, MemTxResult *result)
-+{
-+    glue(address_space_stw_internal, SUFFIX)(ARG1, addr, val, attrs, result,
-+                               DEVICE_BIG_ENDIAN);
-+}
-+
-+void glue(stw_phys, SUFFIX)(ARG1_DECL, hwaddr addr, uint32_t val)
-+{
-+    glue(address_space_stw, SUFFIX)(ARG1, addr, val,
-+                                    MEMTXATTRS_UNSPECIFIED, NULL);
-+}
-+
-+void glue(stw_le_phys, SUFFIX)(ARG1_DECL, hwaddr addr, uint32_t val)
-+{
-+    glue(address_space_stw_le, SUFFIX)(ARG1, addr, val,
-+                                       MEMTXATTRS_UNSPECIFIED, NULL);
-+}
-+
-+void glue(stw_be_phys, SUFFIX)(ARG1_DECL, hwaddr addr, uint32_t val)
-+{
-+    glue(address_space_stw_be, SUFFIX)(ARG1, addr, val,
-+                                       MEMTXATTRS_UNSPECIFIED, NULL);
-+}
-+
-+static void glue(address_space_stq_internal, SUFFIX)(ARG1_DECL,
-+    hwaddr addr, uint64_t val, MemTxAttrs attrs,
-+    MemTxResult *result, enum device_endian endian)
-+{
-+    uint8_t *ptr;
-+    MemoryRegion *mr;
-+    hwaddr l = 8;
-+    hwaddr addr1;
-+    MemTxResult r;
-+    bool release_lock = false;
-+
-+    RCU_READ_LOCK();
-+    mr = TRANSLATE(addr, &addr1, &l, true);
-+    if (l < 8 || !IS_DIRECT(mr, true)) {
-+        release_lock |= prepare_mmio_access(mr);
-+
-+#if defined(TARGET_WORDS_BIGENDIAN)
-+        if (endian == DEVICE_LITTLE_ENDIAN) {
-+            val = bswap64(val);
-+        }
-+#else
-+        if (endian == DEVICE_BIG_ENDIAN) {
-+            val = bswap64(val);
-+        }
-+#endif
-+        r = memory_region_dispatch_write(mr, addr1, val, 4, attrs);
-+    } else {
-+        /* RAM case */
-+        ptr = MAP_RAM(mr, addr1);
-+        switch (endian) {
-+        case DEVICE_LITTLE_ENDIAN:
-+            stq_le_p(ptr, val);
-+            break;
-+        case DEVICE_BIG_ENDIAN:
-+            stq_be_p(ptr, val);
-+            break;
-+        default:
-+            stq_p(ptr, val);
-+            break;
-+        }
-+        INVALIDATE(mr, addr1, 8);
-+        r = MEMTX_OK;
-+    }
-+    if (result) {
-+        *result = r;
-+    }
-+    if (release_lock) {
-+        qemu_mutex_unlock_iothread();
-+    }
-+    RCU_READ_UNLOCK();
-+}
-+
-+void glue(address_space_stq, SUFFIX)(ARG1_DECL,
-+    hwaddr addr, uint64_t val, MemTxAttrs attrs, MemTxResult *result)
-+{
-+    glue(address_space_stq_internal, SUFFIX)(ARG1, addr, val, attrs, result,
-+                                             DEVICE_NATIVE_ENDIAN);
-+}
-+
-+void glue(address_space_stq_le, SUFFIX)(ARG1_DECL,
-+    hwaddr addr, uint64_t val, MemTxAttrs attrs, MemTxResult *result)
-+{
-+    glue(address_space_stq_internal, SUFFIX)(ARG1, addr, val, attrs, result,
-+                                             DEVICE_LITTLE_ENDIAN);
-+}
-+
-+void glue(address_space_stq_be, SUFFIX)(ARG1_DECL,
-+    hwaddr addr, uint64_t val, MemTxAttrs attrs, MemTxResult *result)
-+{
-+    glue(address_space_stq_internal, SUFFIX)(ARG1, addr, val, attrs, result,
-+                                             DEVICE_BIG_ENDIAN);
-+}
-+
-+void glue(stq_phys, SUFFIX)(ARG1_DECL, hwaddr addr, uint64_t val)
-+{
-+    glue(address_space_stq, SUFFIX)(ARG1, addr, val,
-+                                    MEMTXATTRS_UNSPECIFIED, NULL);
-+}
-+
-+void glue(stq_le_phys, SUFFIX)(ARG1_DECL, hwaddr addr, uint64_t val)
-+{
-+    glue(address_space_stq_le, SUFFIX)(ARG1, addr, val,
-+                                       MEMTXATTRS_UNSPECIFIED, NULL);
-+}
-+
-+void glue(stq_be_phys, SUFFIX)(ARG1_DECL, hwaddr addr, uint64_t val)
-+{
-+    glue(address_space_stq_be, SUFFIX)(ARG1, addr, val,
-+                                       MEMTXATTRS_UNSPECIFIED, NULL);
-+}
-+
-+#undef ARG1_DECL
-+#undef ARG1
-+#undef SUFFIX
-+#undef TRANSLATE
-+#undef IS_DIRECT
-+#undef MAP_RAM
-+#undef INVALIDATE
-+#undef RCU_READ_LOCK
-+#undef RCU_READ_UNLOCK
+ static Property virtio_properties[] = {
+     DEFINE_VIRTIO_COMMON_FEATURES(VirtIODevice, host_features),
+     DEFINE_PROP_END_OF_LIST(),
+@@ -2320,6 +2404,7 @@ static const TypeInfo virtio_device_info = {
+     .parent = TYPE_DEVICE,
+     .instance_size = sizeof(VirtIODevice),
+     .class_init = virtio_device_class_init,
++    .instance_finalize = virtio_device_instance_finalize,
+     .abstract = true,
+     .class_size = sizeof(VirtioDeviceClass),
+ };
+diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
+index 9b21795..5bcc9a8 100644
+--- a/include/hw/virtio/virtio.h
++++ b/include/hw/virtio/virtio.h
+@@ -85,6 +85,7 @@ struct VirtIODevice
+     uint32_t generation;
+     int nvectors;
+     VirtQueue *vq;
++    MemoryListener listener;
+     uint16_t device_id;
+     bool vm_running;
+     bool broken; /* device in invalid state, needs reset */
 -- 
 1.8.3.1
