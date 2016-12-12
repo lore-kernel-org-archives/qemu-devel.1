@@ -1,15 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49265)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49354)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cGXXC-0000gH-Hq
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 15:49:20 -0500
+	(envelope-from <wouter@grep.be>) id 1cGXXP-0000ln-7A
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 15:49:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cGXX7-00046u-Ee
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 15:49:18 -0500
-From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Mon, 12 Dec 2016 18:49:05 -0200
-Message-Id: <1481575745-26120-1-git-send-email-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.8.1 v2] machine: Convert abstract
- typename on compat_props to subclass names
+	(envelope-from <wouter@grep.be>) id 1cGXXK-0004CT-3k
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 15:49:31 -0500
+Received: from [2a01:4f8:140:52e5::2] (port=35793 helo=latin.grep.be)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <wouter@grep.be>) id 1cGXXJ-0004B1-Ti
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 15:49:26 -0500
+Date: Mon, 12 Dec 2016 21:49:13 +0100
+From: Wouter Verhelst <w@uter.be>
+Message-ID: <20161212204913.oaatvexhnndyhhwa@grep.be>
+References: <20161212182119.dceppkzqb7gftsl5@grep.be>
+	<bbdb71c7-540e-f5d9-c779-adddf4a0c79c@redhat.com>
+	<20161212202615.llsqhojp2xztfao3@grep.be>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20161212202615.llsqhojp2xztfao3@grep.be>
+Subject: Re: [Qemu-devel] [Nbd] [PATCH v4] doc: Add NBD_CMD_BLOCK_STATUS
+ extension
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,113 +29,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-stable@nongnu.org, Halil Pasic <pasic@linux.vnet.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Stefan Hajnoczi <stefanha@redhat.com>, Greg Kurz <groug@kaod.org>
+To: Eric Blake <eblake@redhat.com>
+Cc: "nbd-general@lists.sourceforge.net" <nbd-general@lists.sourceforge.net>, Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "Stefan stefanha@redhat. com" <stefanha@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Pavel Borzenkov <pborzenkov@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, Markus Pargmann <mpa@pengutronix.de>, "Denis V. Lunev" <den@openvz.org>, John Snow <jsnow@redhat.com>
 
-Original problem description by Greg Kurz:
+On Mon, Dec 12, 2016 at 09:26:15PM +0100, Wouter Verhelst wrote:
+> > Do we still want to require servers to always send 16 extents (when not
+> > limited to exactly 1), or is it better to just state that as long as the
+> > server sends at least one extent (so that the client can make progress),
+> > then the server can shorten the reply if it is resource-intensive to
+> > provide details over the entire client request?
+> 
+> Hrm, I wanted to drop that (I did drop another reference to that thing,
+> I though), but apparently I forgot.
 
-> Since commit "9a4c0e220d8a hw/virtio-pci: fix virtio
-> behaviour", passing -device virtio-blk-pci.disable-modern=off
-> has no effect on 2.6 machine types because the internal
-> virtio-pci.disable-modern=on compat property always prevail.
+...and I still did. I don't think it's worth sending another full diff
+from extension-structured-reply for that, but here's the diff from v5:
 
-The same bug also affects other abstract type names mentioned on
-compat_props by machine-types: apic-common, i386-cpu, pci-device,
-powerpc64-cpu, s390-skeys, spapr-pci-host-bridge, usb-device,
-virtio-pci, x86_64-cpu.
+diff --git a/doc/proto.md b/doc/proto.md
+index 526f71a..1d6db4b 100644
+--- a/doc/proto.md
++++ b/doc/proto.md
+@@ -1242,9 +1242,11 @@ interpret the "length" bytes of payload.
+     Even if the client did not use the `NBD_CMD_FLAG_REQ_ONE` flag in
+     its request, the server MAY return less descriptors in the reply
+     than would be required to fully specify the whole range of requested
+-    information to the client, if the number of descriptors would be
+-    over 16 otherwise and looking up the information would be too
+-    resource-intensive for the server.
++    information to the client, if looking up the information would be
++    too resource-intensive for the server, so long as at least one
++    extent is returned. Servers should however be aware that most
++    clients implementations will then simply ask for the next extent
++    instead.
 
-The right fix for this problem is to make sure compat_props and
--global options are always applied in the order they are
-registered, instead of reordering them based on the type
-hierarchy. But changing the ordering rules of -global is risky
-and might break existing configurations, so we shouldn't do that
-on a stable branch.
+Regards,
 
-This is a temporary hack that will work around the bug when
-registering compat_props properties: if we find an abstract class
-on compat_props, register properties for all its non-abstract
-subtypes instead. This will make sure -global won't be overridden
-by compat_props, while keeping the existing ordering rules on
--global options.
-
-Note that there's one case that won't be fixed by this hack:
-"-global spapr-pci-vfio-host-bridge.<option>=<value>" won't be
-able to override compat_props, because spapr-pci-host-bridge is
-not an abstract class.
-
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
-Changes v1 (RFC) -> v2:
-* New commit message
-* Clarified comments
-  Suggested-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-* Moved variable declaration outside of loop
-  Suggested-by: Cornelia Huck <cornelia.huck@de.ibm.com>
----
- hw/core/machine.c | 39 ++++++++++++++++++++++++++++++++++++---
- 1 file changed, 36 insertions(+), 3 deletions(-)
-
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index b0fd91f..213e8e0 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -554,11 +554,31 @@ static void machine_class_finalize(ObjectClass *klass, void *data)
-     g_free(mc->name);
- }
- 
-+static void register_compat_prop(const char *driver,
-+                                 const char *property,
-+                                 const char *value)
-+{
-+    GlobalProperty *p = g_new0(GlobalProperty, 1);
-+    /* Machine compat_props must never cause errors: */
-+    p->errp = &error_abort;
-+    p->driver = driver;
-+    p->property = property;
-+    p->value = value;
-+    qdev_prop_register_global(p);
-+}
-+
-+static void machine_register_compat_for_subclass(ObjectClass *oc, void *opaque)
-+{
-+    GlobalProperty *p = opaque;
-+    register_compat_prop(object_class_get_name(oc), p->property, p->value);
-+}
-+
- void machine_register_compat_props(MachineState *machine)
- {
-     MachineClass *mc = MACHINE_GET_CLASS(machine);
-     int i;
-     GlobalProperty *p;
-+    ObjectClass *oc;
- 
-     if (!mc->compat_props) {
-         return;
-@@ -566,9 +586,22 @@ void machine_register_compat_props(MachineState *machine)
- 
-     for (i = 0; i < mc->compat_props->len; i++) {
-         p = g_array_index(mc->compat_props, GlobalProperty *, i);
--        /* Machine compat_props must never cause errors: */
--        p->errp = &error_abort;
--        qdev_prop_register_global(p);
-+        oc = object_class_by_name(p->driver);
-+        if (oc && object_class_is_abstract(oc)) {
-+            /* temporary hack to make sure we do not override
-+             * globals set explicitly on -global: if an abstract class
-+             * is on compat_props, register globals for all its
-+             * non-abstract subtypes instead.
-+             *
-+             * This doesn't solve the problem for cases where
-+             * a non-abstract typename mentioned on compat_props
-+             * has subclasses, like spapr-pci-host-bridge.
-+             */
-+            object_class_foreach(machine_register_compat_for_subclass,
-+                                 p->driver, false, p);
-+        } else {
-+            register_compat_prop(p->driver, p->property, p->value);
-+        }
-     }
- }
- 
 -- 
-2.7.4
+< ron> I mean, the main *practical* problem with C++, is there's like a dozen
+       people in the world who think they really understand all of its rules,
+       and pretty much all of them are just lying to themselves too.
+ -- #debian-devel, OFTC, 2016-02-12
