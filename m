@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43986)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47579)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cGVNd-0003Qg-AN
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 13:31:19 -0500
+	(envelope-from <mst@redhat.com>) id 1cGVXn-0003lg-SO
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 13:41:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cGVNY-00074W-IU
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 13:31:17 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60588)
+	(envelope-from <mst@redhat.com>) id 1cGVXk-0002wF-TP
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 13:41:48 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58008)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cGVNY-00073g-9u
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 13:31:12 -0500
-From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Mon, 12 Dec 2016 16:31:01 -0200
-Message-Id: <1481567461-2341-1-git-send-email-ehabkost@redhat.com>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cGVXk-0002w3-Ky
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 13:41:44 -0500
+Date: Mon, 12 Dec 2016 20:41:41 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20161212202617-mutt-send-email-mst@kernel.org>
+References: <20161209203954.GW4027@thinpad.lan.raisama.net>
+	<584E36CD.50405@cn.fujitsu.com>
+	<20161212172915.GP4074@stefanha-x1.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH for-2.9 v2] qom: Make all interface types
- abstract
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20161212172915.GP4074@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] Reproducible crash on PCIe hotplug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,151 +28,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>
-Cc: Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Lin Ma <lma@suse.com>, qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Cao jin <caoj.fnst@cn.fujitsu.com>
 
-"qom-list-types abstract=3Dfalse" currently returns all interface
-types, as if they were not abstract. Fix this by making sure all
-interface types are abstract.
+On Mon, Dec 12, 2016 at 05:29:15PM +0000, Stefan Hajnoczi wrote:
+> On Mon, Dec 12, 2016 at 01:34:05PM +0800, Cao jin wrote:
+> > 
+> > 
+> > On 12/10/2016 04:39 AM, Eduardo Habkost wrote:
+> > > Using latest qemu.git master:
+> > > 
+> > >   $ qemu-system-x86_64 -machine q35 -readconfig docs/q35-chipset.cfg -monitor stdio
+> > >   QEMU 2.7.93 monitor - type 'help' for more information
+> > >   (qemu) device_add e1000e,bus=ich9-pcie-port-4,addr=00
+> > >   (qemu) device_add e1000e,bus=ich9-pcie-port-4,addr=08
+> > >   Segmentation fault (core dumped)
+> > > 
+> > > It crashes at:
+> > > 
+> > >   #7  0x000055555598d7dc in do_pci_register_device (errp=0x7fffffffbfd0, devfn=64, name=0x5555565df340 "e1000e", bus=0x555558487380, pci_dev=0x5555589cd000)
+> > >       at /home/ehabkost/rh/proj/virt/qemu/hw/pci/pci.c:983
+> > >   983             error_setg(errp, "PCI: slot %d function 0 already ocuppied by %s,"
+> > >   (gdb) l
+> > >   978                        PCI_SLOT(devfn), PCI_FUNC(devfn), name,
+> > >   979                        bus->devices[devfn]->name);
+> > >   980             return NULL;
+> > >   981         } else if (dev->hotplugged &&
+> > >   982                    pci_get_function_0(pci_dev)) {
+> > >   983             error_setg(errp, "PCI: slot %d function 0 already ocuppied by %s,"
+> > >   984                        " new func %s cannot be exposed to guest.",
+> > >   985                        PCI_SLOT(devfn),
+> > >   986                        bus->devices[PCI_DEVFN(PCI_SLOT(devfn), 0)]->name,
+> > >   987                        name);
+> > > 
+> > 
+> > Thanks for informing me. I am kind of busy for now, so I suppose I will
+> > investigate it after 2.8 release.
+> 
+> Please let me know if this should be considered a release blocker.
+> 
+> The proposed QEMU 2.8 release date is tomorrow (December 13th)!
+> 
+> Stefan
 
-All interface types have instance_size =3D=3D 0, so we can use
-it to set abstract=3Dtrue on type_initialize().
+I don't see how it's a blocker, it's an illegal configuration.
+Here's the fix. It's a rather obvious one.
+I'll target the fix for 2.9.
+Eduardo, I'd appreciate a tested-by tag.
 
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+-->
+
+pci: fix error message for express slots
+
+PCI Express downstream slot has a single PCI slot
+behind it, using PCI_DEVFN(PCI_SLOT(devfn), 0)
+does not give you function 0 in cases such as ARI
+as well as some error cases.
+
+This is exactly what we are hitting:
+   $ qemu-system-x86_64 -machine q35 -readconfig docs/q35-chipset.cfg -monitor stdio
+   (qemu) device_add e1000e,bus=ich9-pcie-port-4,addr=00
+   (qemu) device_add e1000e,bus=ich9-pcie-port-4,addr=08
+   Segmentation fault (core dumped)
+
+The fix is to use the pci_get_function_0 API.
+
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Reported-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
-Changes v1 -> v2:
-* Use old-fashioned if statement instead of "|=3D" on bool field
-  Suggested-by: Andreas F=C3=A4rber <afaerber@suse.de>
-* Keep "device/introspect" path prefix on unit test
-  * Suggested-by: Andreas F=C3=A4rber <afaerber@suse.de>
----
- qom/object.c                   |  6 +++++
- tests/device-introspect-test.c | 60 ++++++++++++++++++++++++++++++++++++=
-+++---
- 2 files changed, 63 insertions(+), 3 deletions(-)
 
-diff --git a/qom/object.c b/qom/object.c
-index 7a05e35..760fafb 100644
---- a/qom/object.c
-+++ b/qom/object.c
-@@ -272,6 +272,12 @@ static void type_initialize(TypeImpl *ti)
-=20
-     ti->class_size =3D type_class_get_size(ti);
-     ti->instance_size =3D type_object_get_size(ti);
-+    /* Any type with zero instance_size is implicitly abstract.
-+     * This means interface types are all abstract.
-+     */
-+    if (ti->instance_size =3D=3D 0) {
-+        ti->abstract =3D true;
-+    }
-=20
-     ti->class =3D g_malloc0(ti->class_size);
-=20
-diff --git a/tests/device-introspect-test.c b/tests/device-introspect-tes=
-t.c
-index 37debc1..c5637cc 100644
---- a/tests/device-introspect-test.c
-+++ b/tests/device-introspect-test.c
-@@ -20,18 +20,24 @@
- #include "qemu/osdep.h"
- #include "qemu-common.h"
- #include "qapi/qmp/qstring.h"
-+#include "qapi/qmp/qbool.h"
-+#include "qapi/qmp/qdict.h"
- #include "libqtest.h"
-=20
- const char common_args[] =3D "-nodefaults -machine none";
-=20
--static QList *device_type_list(bool abstract)
-+static QList *qom_list_types(const char *implements, bool abstract)
- {
-     QDict *resp;
-     QList *ret;
-+    QDict *args =3D qdict_new();
-=20
-+    qdict_put(args, "abstract", qbool_from_bool(abstract));
-+    if (implements) {
-+        qdict_put(args, "implements", qstring_from_str(implements));
-+    }
-     resp =3D qmp("{'execute': 'qom-list-types',"
--               " 'arguments': {'implements': 'device', 'abstract': %i}}"=
-,
--               abstract);
-+               " 'arguments': %p }", args);
-     g_assert(qdict_haskey(resp, "return"));
-     ret =3D qdict_get_qlist(resp, "return");
-     QINCREF(ret);
-@@ -39,6 +45,11 @@ static QList *device_type_list(bool abstract)
-     return ret;
- }
-=20
-+static QList *device_type_list(bool abstract)
-+{
-+    return qom_list_types("device", abstract);
-+}
-+
- static void test_one_device(const char *type)
- {
-     QDict *resp;
-@@ -110,6 +121,48 @@ static void test_device_intro_concrete(void)
-     qtest_end();
- }
-=20
-+static void test_abstract_interfaces(void)
-+{
-+    QList *all_types;
-+    QList *obj_types;
-+    QListEntry *ae;
-+
-+    qtest_start(common_args);
-+    /* qom-list-types implements=3Dinterface would return any type
-+     * that implements _any_ interface (not just interface types),
-+     * so use a trick to find the interface type names:
-+     * - list all object types
-+     * - list all types, and look for items that are not
-+     *   on the first list
-+     */
-+    all_types =3D qom_list_types(NULL, false);
-+    obj_types =3D qom_list_types("object", false);
-+
-+    QLIST_FOREACH_ENTRY(all_types, ae) {
-+        QDict *at =3D qobject_to_qdict(qlist_entry_obj(ae));
-+        const char *aname =3D qdict_get_str(at, "name");
-+        QListEntry *oe;
-+        const char *found =3D NULL;
-+
-+        QLIST_FOREACH_ENTRY(obj_types, oe) {
-+            QDict *ot =3D qobject_to_qdict(qlist_entry_obj(oe));
-+            const char *oname =3D qdict_get_str(ot, "name");
-+            if (!strcmp(aname, oname)) {
-+                found =3D oname;
-+                break;
-+            }
-+        }
-+
-+        /* Using g_assert_cmpstr() will give more useful failure
-+         * messages than g_assert(found) */
-+        g_assert_cmpstr(aname, =3D=3D, found);
-+    }
-+
-+    QDECREF(all_types);
-+    QDECREF(obj_types);
-+    qtest_end();
-+}
-+
- int main(int argc, char **argv)
- {
-     g_test_init(&argc, &argv, NULL);
-@@ -118,6 +171,7 @@ int main(int argc, char **argv)
-     qtest_add_func("device/introspect/none", test_device_intro_none);
-     qtest_add_func("device/introspect/abstract", test_device_intro_abstr=
-act);
-     qtest_add_func("device/introspect/concrete", test_device_intro_concr=
-ete);
-+    qtest_add_func("device/introspect/abstract-interfaces", test_abstrac=
-t_interfaces);
-=20
-     return g_test_run();
- }
---=20
-2.7.4
+diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+index 24fae16..339c531 100644
+--- a/hw/pci/pci.c
++++ b/hw/pci/pci.c
+@@ -983,7 +983,7 @@ static PCIDevice *do_pci_register_device(PCIDevice *pci_dev, PCIBus *bus,
+         error_setg(errp, "PCI: slot %d function 0 already ocuppied by %s,"
+                    " new func %s cannot be exposed to guest.",
+                    PCI_SLOT(devfn),
+-                   bus->devices[PCI_DEVFN(PCI_SLOT(devfn), 0)]->name,
++                   pci_get_function_0(pci_dev)->name,
+                    name);
+ 
+        return NULL;
+
+-- 
+MST
