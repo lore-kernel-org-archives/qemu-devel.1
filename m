@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50283)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50320)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1cGNbZ-0007Ds-2c
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 05:13:09 -0500
+	(envelope-from <drjones@redhat.com>) id 1cGNba-0007FC-VV
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 05:13:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1cGNbU-0002Oa-5p
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 05:13:09 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56040)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
-	id 1cGNbU-0002O1-0J
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 05:13:04 -0500
-References: <20161210153038.9184-1-maxime.coquelin@redhat.com>
-	<20161212100236.GA15611@redhat.com>
-From: Maxime Coquelin <maxime.coquelin@redhat.com>
-Message-ID: <cc475d20-6e77-17ab-b41e-56a6d4bf81b2@redhat.com>
-Date: Mon, 12 Dec 2016 11:12:56 +0100
+	(envelope-from <drjones@redhat.com>) id 1cGNbZ-0002Qp-Vh
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 05:13:10 -0500
+Date: Mon, 12 Dec 2016 11:13:01 +0100
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20161212101301.pls7yf6fnymo444k@kamzik.brq.redhat.com>
+References: <1481301020-21777-1-git-send-email-peter.maydell@linaro.org>
+	<1481301020-21777-2-git-send-email-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20161212100236.GA15611@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 0/3] virtio-net: Add support to MTU
- feature
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1481301020-21777-2-git-send-email-peter.maydell@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH 1/4] hw/arm/virt: add 2.9 machine type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,45 +23,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: mst@redhat.com, aconole@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, jasowang@redhat.com, yuanhan.liu@linux.intel.com, fbl@redhat.com, mlureau@redhat.com, ktraynor@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Christoffer Dall <christoffer.dall@linaro.org>
 
-Hi Daniel,
+On Fri, Dec 09, 2016 at 04:30:17PM +0000, Peter Maydell wrote:
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  include/hw/compat.h |  3 +++
+>  hw/arm/virt.c       | 19 +++++++++++++++++--
+>  2 files changed, 20 insertions(+), 2 deletions(-)
 
-On 12/12/2016 11:02 AM, Daniel P. Berrange wrote:
-> On Sat, Dec 10, 2016 at 04:30:35PM +0100, Maxime Coquelin wrote:
->> Thanks for the reviews,
->>
->> This series implements Virtio spec update from Aaron Conole which
->> defines a way for the host to expose its max MTU to the guest.
->>
->> "host_mtu" parameter is added to provide QEMU with the MTU value,
->> and the backend, if supported, gets notified of the MTU value when the
->> MTU feature neogotiation succeeds.
->>
->> Only user backend currently supports MTU notification. A new protocol
->> feature has been implemented for sending MTU value to the backend.
->>
->> For kernel backend, it is expected the management tool also configures
->> the tap/macvtap interface with same MTU value.
->> Daniel, I would be interrested about your feedback on this implementation
->> from management tool point of view.
->
-> I can't give real feedback yet, as I'm not seeing clear information on
-> what problem this series is designed to solve....
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 
-Right, I agree it is missing a bit of context here, I'll add more about
-the background in next revision.
-
-The goal of this series is to address two things:
-1. Providing a way for the guests to use the same MTU as the host,
-    in order to have a consistent MTU value across the infrastructure.
-
-2. Improve Rx performance for small packets, as if all parties agrees
-    on a MTU value for which packets fit into a single descriptor, then
-    Rx mergeable buffers feature can be disabled (saving one
-    cache-miss on guest side by not accessing the virtio header, when
-    offloading has not been negotiated).
-
-Thanks,
-Maxime
+> 
+> diff --git a/include/hw/compat.h b/include/hw/compat.h
+> index 0f06e11..f8b8354 100644
+> --- a/include/hw/compat.h
+> +++ b/include/hw/compat.h
+> @@ -1,6 +1,9 @@
+>  #ifndef HW_COMPAT_H
+>  #define HW_COMPAT_H
+>  
+> +#define HW_COMPAT_2_8 \
+> +    /* empty */
+> +
+>  #define HW_COMPAT_2_7 \
+>      {\
+>          .driver   = "virtio-pci",\
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index d04e4ac..11c53a5 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -1525,7 +1525,7 @@ static void machvirt_machine_init(void)
+>  }
+>  type_init(machvirt_machine_init);
+>  
+> -static void virt_2_8_instance_init(Object *obj)
+> +static void virt_2_9_instance_init(Object *obj)
+>  {
+>      VirtMachineState *vms = VIRT_MACHINE(obj);
+>  
+> @@ -1558,10 +1558,25 @@ static void virt_2_8_instance_init(Object *obj)
+>                                      "Valid values are 2, 3 and host", NULL);
+>  }
+>  
+> +static void virt_machine_2_9_options(MachineClass *mc)
+> +{
+> +}
+> +DEFINE_VIRT_MACHINE_AS_LATEST(2, 9)
+> +
+> +#define VIRT_COMPAT_2_8 \
+> +    HW_COMPAT_2_8
+> +
+> +static void virt_2_8_instance_init(Object *obj)
+> +{
+> +    virt_2_9_instance_init(obj);
+> +}
+> +
+>  static void virt_machine_2_8_options(MachineClass *mc)
+>  {
+> +    virt_machine_2_9_options(mc);
+> +    SET_MACHINE_COMPAT(mc, VIRT_COMPAT_2_8);
+>  }
+> -DEFINE_VIRT_MACHINE_AS_LATEST(2, 8)
+> +DEFINE_VIRT_MACHINE(2, 8)
+>  
+>  #define VIRT_COMPAT_2_7 \
+>      HW_COMPAT_2_7
+> -- 
+> 2.7.4
+> 
