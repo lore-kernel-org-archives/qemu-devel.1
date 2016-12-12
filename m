@@ -1,34 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39486)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40135)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cGO2s-0001tw-2c
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 05:41:26 -0500
+	(envelope-from <berrange@redhat.com>) id 1cGO43-0002lH-OY
+	for Qemu-devel@nongnu.org; Mon, 12 Dec 2016 05:42:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cGO2o-0005mD-QZ
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 05:41:22 -0500
-Received: from indium.canonical.com ([91.189.90.7]:57695)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cGO2o-0005lU-Kp
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 05:41:18 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cGO2m-0003FK-NG
-	for <qemu-devel@nongnu.org>; Mon, 12 Dec 2016 10:41:17 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 877042E80CC
-	for <qemu-devel@nongnu.org>; Mon, 12 Dec 2016 10:41:14 +0000 (UTC)
+	(envelope-from <berrange@redhat.com>) id 1cGO40-0006AY-JF
+	for Qemu-devel@nongnu.org; Mon, 12 Dec 2016 05:42:35 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36804)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cGO40-0006AJ-E9
+	for Qemu-devel@nongnu.org; Mon, 12 Dec 2016 05:42:32 -0500
+Date: Mon, 12 Dec 2016 10:42:28 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20161212104228.GA3597@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <6BBB3038-0389-4221-9A41-63800F3FF514@livius.net>
+	<20161212033512.GA3725@lemon>
+	<908F0328-771A-4269-8301-9A7D08BD585F@livius.net>
+	<20161212073915.GC3725@lemon>
+	<96DEA2D0-3822-4A8C-9950-973B84AF4182@livius.net>
+	<20161212093907.GA7918@lemon>
+	<151F368B-80DA-4DF6-837C-E2E0737E4AE6@livius.net>
+	<20161212103616.GB7918@lemon>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 12 Dec 2016 10:28:28 -0000
-From: Tom Yan <tom.ty89@gmail.com>
-Reply-To: Bug 1649233 <1649233@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20161212101630.16736.48530.malonedeb@soybean.canonical.com>
-Message-Id: <20161212102829.25771.81731.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1649233] Re: scrolling does not work once mouse
- is grabbed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20161212103616.GB7918@lemon>
+Subject: Re: [Qemu-devel] experience with SDL2, event loop & main thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,38 +34,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Fam Zheng <famz@redhat.com>
+Cc: Liviu Ionescu <ilg@livius.net>, QEMU Developer <Qemu-devel@nongnu.org>
 
-Not sure if it is relevant, but there's a HID button device cannot get
-started in Windows 10 RS1.
+On Mon, Dec 12, 2016 at 06:36:16PM +0800, Fam Zheng wrote:
+> On Mon, 12/12 12:20, Liviu Ionescu wrote:
+> > 
+> > > On 12 Dec 2016, at 11:39, Fam Zheng <famz@redhat.com> wrote:
+> > > 
+> > > ... I myself know next to nothing about SDL project.
+> > 
+> > ok, neither do I.
+> > 
+> > 
+> > do you have any comments on the current situation of the SDL integration in
+> > QEMU? any comments on the conclusions I reached after integrating SDL2 into
+> > GNU ARM Eclipse QEMU?
+> > 
+> > personally I do not like at all polling the SDL loop every 10 ms on a timer,
+> > but I currently have no other solution. I tried to move the I/O loop on a
+> > separate thread, but the Windows implementation of `poll` works only on the
+> > main thread.
+> 
+> Like I said ealier, instead of "polling" SDL events in a timer, how about
+> registering an EventNotifier in the main thread which is notified by the vCPU
+> thread upon a new graphics operation? That will fix the latency issue.
 
-** Attachment added: "Capture.PNG"
-   https://bugs.launchpad.net/qemu/+bug/1649233/+attachment/4790624/+files/=
-Capture.PNG
+Also, note that SDL is not the only backend that requires all graphics
+operations to take place in a single thread. GTK2/3 both require that
+everything is done in the same thread. So if there's any parts of QEMU
+that are triggering graphics operations in non-main threads, we really
+need to make sure any fix applies to all QEMU graphics backends, not
+just SDL2.
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1649233
-
-Title:
-  scrolling does not work once mouse is grabbed
-
-Status in QEMU:
-  New
-
-Bug description:
-  The title pretty much told it all. It occurs in Windows 10 RS1 on qemu
-  2.7.0. Interestingly, I can scroll in the guest if the mouse is not
-  grabbed. So using usb-tablet sort of works around it, but if I
-  explicitly grab the mouse with Ctrl+Alt+G, scrolling will also stop
-  working.
-
-  The host is Arch Linux so the qemu build uses gtk(3) for GUI by
-  default. I wanted to test with sdl but it seems sdl support in qemu is
-  sort of broken that I can't even start the virtual machine properly
-  with that.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1649233/+subscriptions
+Regards,
+Daniel
+-- 
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
