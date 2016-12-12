@@ -1,32 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50261)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35055)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cGRwr-00080F-54
-	for Qemu-devel@nongnu.org; Mon, 12 Dec 2016 09:51:25 -0500
+	(envelope-from <berto@igalia.com>) id 1cGRMw-0008Uo-Kx
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 09:14:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cGRwn-0005JG-AB
-	for Qemu-devel@nongnu.org; Mon, 12 Dec 2016 09:51:25 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39434)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1cGRwn-0005Im-5E
-	for Qemu-devel@nongnu.org; Mon, 12 Dec 2016 09:51:21 -0500
-Date: Mon, 12 Dec 2016 22:51:17 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20161212145117.GB21817@lemon>
-References: <20161212033512.GA3725@lemon>
-	<908F0328-771A-4269-8301-9A7D08BD585F@livius.net>
-	<20161212073915.GC3725@lemon>
-	<96DEA2D0-3822-4A8C-9950-973B84AF4182@livius.net>
-	<20161212093907.GA7918@lemon>
-	<151F368B-80DA-4DF6-837C-E2E0737E4AE6@livius.net>
-	<20161212103616.GB7918@lemon>
-	<220EB996-A454-4FB1-9BAD-B0F4A300345E@livius.net>
-	<20161212122803.GC7918@lemon>
-	<EA7E7748-CB11-49AB-ADBA-555A0A510611@livius.net>
+	(envelope-from <berto@igalia.com>) id 1cGRMs-0000UF-Ao
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 09:14:18 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <468dbeb8-5b1b-669f-f7e5-0d24a4308da8@redhat.com>
+References: <cover.1481290956.git.berto@igalia.com>
+	<468dbeb8-5b1b-669f-f7e5-0d24a4308da8@redhat.com>
+Date: Mon, 12 Dec 2016 15:13:35 +0100
+Message-ID: <w51bmwhck1c.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <EA7E7748-CB11-49AB-ADBA-555A0A510611@livius.net>
-Subject: Re: [Qemu-devel] experience with SDL2, event loop & main thread
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH RFC 0/1] Allow storing the qcow2 L2 cache
+ in disk
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,20 +23,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Liviu Ionescu <ilg@livius.net>
-Cc: QEMU Developer <Qemu-devel@nongnu.org>
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
-On Mon, 12/12 15:22, Liviu Ionescu wrote:
-> so, back to square one; any suggestion on how to avoid the periodic timer
-> required to poll SDL system events?
+On Fri 09 Dec 2016 03:21:08 PM CET, Max Reitz wrote:
 
-Good question, I've missed that!
+>> In some scenarios, however, there's a different alternative: if the
+>> qcow2 image is stored in a slow backend (eg. HDD), we could save
+>> memory by putting the L2 cache in a faster one (SSD) instead of in
+>> RAM.
 
-Sadly I don't find it possible. The main thread of QEMU has to run the glib
-event loop so it cannot block on SDL_WaitEvent().
+> Well, from a full design standpoint, it doesn't make a lot of sense to
+> me:
+>
+> We have a two-level on-disk structure for cluster mapping so as to not
+> waste memory for unused areas and so that we don't need to keep one
+> large continuous chunk of metadata. Accessing the disk is slow, so we
+> also have an in-memory cache which is just a single level fully
+> associative cache replicating the same data (but just a part of it).
+>
+> Now you want to replicate all of it and store it on disk. My mind
+> tells me that is duplicate data: We already have all of the metadata
+> elsewhere on disk, namely in the qcow2 file, and even better, it is
+> not stored in a fully associative structure there but directly mapped,
+> making finding the correct entry much quicker.
 
-Ideally SDL should provide an API to get a pollable fd (or a set of) to allow
-such types of integration, not much can be done from QEMU side in its current
-form.
+Yes but the use case is that the qcow2 image is stored in a slow disk,
+so things will be faster if we avoid having to read it too often.
 
-Fam
+But the data is there and it needs to be read, so we have three options:
+
+  1) Read it everytime we need it. It slows things down.
+  2) Keep (part of) it in memory. It can use a lot of memory.
+  3) Keep it in a faster disk.
+
+We're talking about 3) here, and this it not about creating new
+structures, but about changing the storage backend of the existing L2
+cache (disk rather than RAM).
+
+> However, the thing is that the existing structures also only exist in
+> the original qcow2 file and cannot be just placed anywhere else, as
+> opposed to our cache. In order to solve this, we would need to
+> (incompatibly) modify the qcow2 format to allow storing data
+> independently from metadata. I think this would be certainly doable,
+> but the question is whether it is worth the effort.
+
+You mean split the qcow2 file in two: data and metadata? I don't think
+it's worth the effort.
+
+> Maybe we can at least make the cache directly mapped if it is supposed
+> to cover the whole image? That is, we would basically just load all of
+> the L2 tables into memory and bypass the existing cache.
+
+I don't see how this addresses the original use case that I described.
+
+But leaving that aside, would that improve anything? I don't think the
+cache itself adds any significant overhead here, IIRC even in your
+presentation at KVM Forum 2015 qcow2 was comparable to raw as long as
+all L2 tables were cached in memory.
+
+Berto
