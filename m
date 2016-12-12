@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43297)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43309)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cGZLM-0004SR-LM
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 17:45:15 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cGZLP-0004TN-PG
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 17:45:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cGZLL-0003xj-MD
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 17:45:12 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36184)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cGZLO-0003yu-Pv
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 17:45:15 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38026)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1cGZLL-0003xN-Gp
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 17:45:11 -0500
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
+	id 1cGZLO-0003yb-Je
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 17:45:14 -0500
+Received: from int-mx09.intmail.prod.int.phx2.redhat.com
+	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 952C64E339
-	for <qemu-devel@nongnu.org>; Mon, 12 Dec 2016 22:45:10 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id A00D676A10
+	for <qemu-devel@nongnu.org>; Mon, 12 Dec 2016 22:45:13 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue, 13 Dec 2016 01:42:56 +0300
-Message-Id: <20161212224325.20790-26-marcandre.lureau@redhat.com>
+Date: Tue, 13 Dec 2016 01:42:57 +0300
+Message-Id: <20161212224325.20790-27-marcandre.lureau@redhat.com>
 In-Reply-To: <20161212224325.20790-1-marcandre.lureau@redhat.com>
 References: <20161212224325.20790-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 25/54] char-stdio: convert to finalize
+Subject: [Qemu-devel] [PATCH 26/54] char-win-stdio: convert to finalize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,39 +42,39 @@ Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
  1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/qemu-char.c b/qemu-char.c
-index 403b8a3dc7..8a5953954c 100644
+index 8a5953954c..3dfb249d81 100644
 --- a/qemu-char.c
 +++ b/qemu-char.c
-@@ -1417,10 +1417,10 @@ static void qemu_chr_set_echo_stdio(Chardev *chr,=
- bool echo)
-     tcsetattr (0, TCSANOW, &tty);
+@@ -2589,9 +2589,9 @@ static void qemu_chr_set_echo_win_stdio(Chardev *ch=
+r, bool echo)
+     }
  }
 =20
--static void qemu_chr_free_stdio(struct Chardev *chr)
-+static void char_stdio_finalize(Object *obj)
+-static void win_stdio_free(Chardev *chr)
++static void char_win_stdio_finalize(Object *obj)
  {
-     term_exit();
--    fd_chr_free(chr);
-+    fd_chr_free(CHARDEV(chr));
- }
+-    WinStdioChardev *stdio =3D WIN_STDIO_CHARDEV(chr);
++    WinStdioChardev *stdio =3D WIN_STDIO_CHARDEV(obj);
 =20
- static void qemu_chr_open_stdio(Chardev *chr,
-@@ -3852,7 +3852,6 @@ static void char_stdio_class_init(ObjectClass *oc, =
+     if (stdio->hInputReadyEvent !=3D INVALID_HANDLE_VALUE) {
+         CloseHandle(stdio->hInputReadyEvent);
+@@ -2608,6 +2608,7 @@ static const TypeInfo char_win_stdio_type_info =3D =
+{
+     .name =3D TYPE_CHARDEV_WIN_STDIO,
+     .parent =3D TYPE_CHARDEV,
+     .instance_size =3D sizeof(WinStdioChardev),
++    .instance_finalize =3D char_win_stdio_finalize,
+     .abstract =3D true,
+ };
+=20
+@@ -3849,7 +3850,6 @@ static void char_stdio_class_init(ObjectClass *oc, =
 void *data)
-     cc->chr_free =3D win_stdio_free;
+ #ifdef _WIN32
+     cc->chr_write =3D win_stdio_write;
+     cc->chr_set_echo =3D qemu_chr_set_echo_win_stdio;
+-    cc->chr_free =3D win_stdio_free;
  #else
      cc->chr_set_echo =3D qemu_chr_set_echo_stdio;
--    cc->chr_free =3D qemu_chr_free_stdio;
  #endif
- }
-=20
-@@ -3862,6 +3861,7 @@ static const TypeInfo char_stdio_type_info =3D {
-     .parent =3D TYPE_CHARDEV_WIN_STDIO,
- #else
-     .parent =3D TYPE_CHARDEV_FD,
-+    .instance_finalize =3D char_stdio_finalize,
- #endif
-     .class_init =3D char_stdio_class_init,
- };
 --=20
 2.11.0
