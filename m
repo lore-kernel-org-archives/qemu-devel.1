@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34664)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35828)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cGNwP-0005OK-IU
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 05:34:42 -0500
+	(envelope-from <famz@redhat.com>) id 1cGNy0-0006l0-TZ
+	for Qemu-devel@nongnu.org; Mon, 12 Dec 2016 05:36:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cGNwM-0002cC-EU
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 05:34:41 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45726)
+	(envelope-from <famz@redhat.com>) id 1cGNy0-0003Xk-0L
+	for Qemu-devel@nongnu.org; Mon, 12 Dec 2016 05:36:20 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46208)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cGNwM-0002bz-8t
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 05:34:38 -0500
-Date: Mon, 12 Dec 2016 10:34:32 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20161212103432.GH15611@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20161210153038.9184-1-maxime.coquelin@redhat.com>
-	<20161212100236.GA15611@redhat.com>
-	<cc475d20-6e77-17ab-b41e-56a6d4bf81b2@redhat.com>
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1cGNxz-0003X0-RA
+	for Qemu-devel@nongnu.org; Mon, 12 Dec 2016 05:36:19 -0500
+Date: Mon, 12 Dec 2016 18:36:16 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20161212103616.GB7918@lemon>
+References: <6BBB3038-0389-4221-9A41-63800F3FF514@livius.net>
+	<20161212033512.GA3725@lemon>
+	<908F0328-771A-4269-8301-9A7D08BD585F@livius.net>
+	<20161212073915.GC3725@lemon>
+	<96DEA2D0-3822-4A8C-9950-973B84AF4182@livius.net>
+	<20161212093907.GA7918@lemon>
+	<151F368B-80DA-4DF6-837C-E2E0737E4AE6@livius.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <cc475d20-6e77-17ab-b41e-56a6d4bf81b2@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 0/3] virtio-net: Add support to MTU
- feature
+In-Reply-To: <151F368B-80DA-4DF6-837C-E2E0737E4AE6@livius.net>
+Subject: Re: [Qemu-devel] experience with SDL2, event loop & main thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,49 +32,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Maxime Coquelin <maxime.coquelin@redhat.com>
-Cc: mst@redhat.com, aconole@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, jasowang@redhat.com, yuanhan.liu@linux.intel.com, fbl@redhat.com, mlureau@redhat.com, ktraynor@redhat.com
+To: Liviu Ionescu <ilg@livius.net>
+Cc: QEMU Developer <Qemu-devel@nongnu.org>
 
-On Mon, Dec 12, 2016 at 11:12:56AM +0100, Maxime Coquelin wrote:
-> Hi Daniel,
+On Mon, 12/12 12:20, Liviu Ionescu wrote:
 > 
-> On 12/12/2016 11:02 AM, Daniel P. Berrange wrote:
-> > On Sat, Dec 10, 2016 at 04:30:35PM +0100, Maxime Coquelin wrote:
-> > > Thanks for the reviews,
-> > > 
-> > > This series implements Virtio spec update from Aaron Conole which
-> > > defines a way for the host to expose its max MTU to the guest.
-> > > 
-> > > "host_mtu" parameter is added to provide QEMU with the MTU value,
-> > > and the backend, if supported, gets notified of the MTU value when the
-> > > MTU feature neogotiation succeeds.
-> > > 
-> > > Only user backend currently supports MTU notification. A new protocol
-> > > feature has been implemented for sending MTU value to the backend.
-> > > 
-> > > For kernel backend, it is expected the management tool also configures
-> > > the tap/macvtap interface with same MTU value.
-> > > Daniel, I would be interrested about your feedback on this implementation
-> > > from management tool point of view.
+> > On 12 Dec 2016, at 11:39, Fam Zheng <famz@redhat.com> wrote:
 > > 
-> > I can't give real feedback yet, as I'm not seeing clear information on
-> > what problem this series is designed to solve....
+> > ... I myself know next to nothing about SDL project.
 > 
-> Right, I agree it is missing a bit of context here, I'll add more about
-> the background in next revision.
+> ok, neither do I.
 > 
-> The goal of this series is to address two things:
-> 1. Providing a way for the guests to use the same MTU as the host,
->    in order to have a consistent MTU value across the infrastructure.
+> 
+> do you have any comments on the current situation of the SDL integration in
+> QEMU? any comments on the conclusions I reached after integrating SDL2 into
+> GNU ARM Eclipse QEMU?
+> 
+> personally I do not like at all polling the SDL loop every 10 ms on a timer,
+> but I currently have no other solution. I tried to move the I/O loop on a
+> separate thread, but the Windows implementation of `poll` works only on the
+> main thread.
 
-Ok, currently libvirt sets the MTU of the tap device based on the MTU
-of the device it will be attached to. This change means we need to pass
-that MTU value into QEMU via the -netdev command line so it can inform
-the guest what the MTU is.
+Like I said ealier, instead of "polling" SDL events in a timer, how about
+registering an EventNotifier in the main thread which is notified by the vCPU
+thread upon a new graphics operation? That will fix the latency issue.
 
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+Fam
