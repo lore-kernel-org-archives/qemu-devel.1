@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59389)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57995)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ilg@livius.net>) id 1cGQaB-0001zB-9f
-	for Qemu-devel@nongnu.org; Mon, 12 Dec 2016 08:23:58 -0500
+	(envelope-from <drjones@redhat.com>) id 1cGQYd-0000ze-MV
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 08:22:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ilg@livius.net>) id 1cGQa7-0004rg-Pm
-	for Qemu-devel@nongnu.org; Mon, 12 Dec 2016 08:23:55 -0500
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:33696)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ilg@livius.net>) id 1cGQa7-0004pN-Ez
-	for Qemu-devel@nongnu.org; Mon, 12 Dec 2016 08:23:51 -0500
-Received: by mail-wm0-f65.google.com with SMTP id u144so11251660wmu.0
-	for <Qemu-devel@nongnu.org>; Mon, 12 Dec 2016 05:23:51 -0800 (PST)
+	(envelope-from <drjones@redhat.com>) id 1cGQYX-0003vP-Qh
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 08:22:19 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53232)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <drjones@redhat.com>) id 1cGQYX-0003vE-In
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 08:22:13 -0500
+Date: Mon, 12 Dec 2016 14:22:09 +0100
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20161212132209.ryh4uojsz7uev2a6@kamzik.brq.redhat.com>
+References: <CAFEAcA9_E=uPX5GqryrF4kyrXNYbH-8Oiv1mgbJM6VshnQe-kw@mail.gmail.com>
+	<20161102135933.h6clwz4ahsgchwgv@hawk.localdomain>
+	<CAFEAcA9hb1M25AYnBDY0OYTMGvGe5VVR0SLg=T5MR_k1U_S=fw@mail.gmail.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.1 \(3251\))
-From: Liviu Ionescu <ilg@livius.net>
-In-Reply-To: <20161212122803.GC7918@lemon>
-Date: Mon, 12 Dec 2016 15:22:48 +0200
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <EA7E7748-CB11-49AB-ADBA-555A0A510611@livius.net>
-References: <6BBB3038-0389-4221-9A41-63800F3FF514@livius.net>
-	<20161212033512.GA3725@lemon>
-	<908F0328-771A-4269-8301-9A7D08BD585F@livius.net>
-	<20161212073915.GC3725@lemon>
-	<96DEA2D0-3822-4A8C-9950-973B84AF4182@livius.net>
-	<20161212093907.GA7918@lemon>
-	<151F368B-80DA-4DF6-837C-E2E0737E4AE6@livius.net>
-	<20161212103616.GB7918@lemon>
-	<220EB996-A454-4FB1-9BAD-B0F4A300345E@livius.net>
-	<20161212122803.GC7918@lemon>
-Subject: Re: [Qemu-devel] experience with SDL2, event loop & main thread
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA9hb1M25AYnBDY0OYTMGvGe5VVR0SLg=T5MR_k1U_S=fw@mail.gmail.com>
+Subject: Re: [Qemu-devel] when we add EL2 to QEMU TCG ARM emulation and the
+ virt board, should it default on or off?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,36 +29,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: QEMU Developer <Qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 
+On Mon, Dec 12, 2016 at 12:48:14PM +0000, Peter Maydell wrote:
+> On 2 November 2016 at 13:59, Andrew Jones <drjones@redhat.com> wrote:
+> > On Tue, Nov 01, 2016 at 05:16:59PM +0000, Peter Maydell wrote:
+> >>  (2) directly user-set cpu property, or board property ?
+> >
+> > So this is why I was rambling above about the two precedents.
+> > IMO, we should choose a cpu property when it's a purely cpu
+> > feature, like the PMU, and board (without a user-settable cpu
+> > property) otherwise. Does this feature require board changes?
+> > I'm aware of switching the psci method from hvc to smc, but
+> > I'd shrug that one off. Is there anything else? If not, then
+> > I vote cpu property only.
+> 
+> So the things that the board needs to support EL2:
+>  * PSCI method change
+>  * need to wire up some interrupt lines (GICv3 maintenance
+>    interrupt, and VIRQ and VFIQ)
+>  * for GICv2 you would need also to set a property on
+>    the GIC to tell it to implement the virt extensions
+>    (for GICv3 this isn't necessary as the virt extensions
+>    only affect the CPU interface, which is strictly part
+>    of the CPU and which in my patches is configured via
+>    a back-door connection between the CPU proper and the
+>    GIC cpuif code)
+> 
+> You can do all the interrupt wiring unconditionally,
+> because if the CPU doesn't have EL2 then the extra
+> irq lines are just unused.
 
-> On 12 Dec 2016, at 14:28, Fam Zheng <famz@redhat.com> wrote:
->=20
-> ... Take a look at event_notifier_set_handler() and =
-event_notifier_set().
-> ... qemu_bh_new() and qemu_bh_schedule().
->=20
-> Both can register a callback that will be called in main loop once =
-fired.
+Sounds good.
 
-ok, thank you, I'll consider them.
+> And of course you can drive
+> the board changes off a CPU property value if you want...
 
-if I understand it right, this is a more portable alternative of using =
-the SDL user events, to forward actions from the device thread to the =
-main thread.
+Fair point. What do we typically do? I think it'd be nice to be
+consistent here. Do cpu properties typically [silently] drive
+board changes? Or do board properties, depending on cpu properties,
+simply fail when those cpu properties aren't selected by the user,
+or do they silently enable them?
 
-but this is only part of the problem, in addition to user events, =
-graphical libraries also generate system events (like mouse, =
-termination, etc) usually consumed by a kind of event loop. probably it =
-is possible to set a notifier handler to run the SDL PollEvent, but, at =
-least for SDL, I did not find any function in the public API to add a =
-hook to trigger events associated with system events.
+> 
+> The other reason I made EL3 have both a CPU property and a
+> board property is that it allowed us to have the board
+> property default to false (for back-compat) but the
+> CPU property default to true (so that any future boards
+> would get EL3 support by default, like the h/w -- you
+> can't get a real Cortex-A57 without EL2 and EL3).
 
-so, back to square one; any suggestion on how to avoid the periodic =
-timer required to poll SDL system events?
+This makes sense to me. A good goal is to keep the processor model
+as close as possible to real hardware. I guess that pretty much
+just leaves one option: creating a board property that enables the
+there-by-default (but still special) cpu feature use.
 
+So, EL2 cpu property on by default, but EL2 board property off
+by default. And with EL2 board property off, El2 cpu property
+automatically turned off?
 
-regards,
+Thanks,
+drew
 
-Liviu
+> 
+> thanks
+> -- PMM
