@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53028)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55446)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1cGiIe-0005Ja-QU
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 03:19:02 -0500
+	(envelope-from <yi.l.liu@linux.intel.com>) id 1cGiUj-0000cA-JI
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 03:31:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1cGiIb-0005MF-Jx
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 03:19:00 -0500
-References: <1481585316-31612-1-git-send-email-lvivier@redhat.com>
-	<1481585316-31612-5-git-send-email-lvivier@redhat.com>
-	<877f74w9dm.fsf@dusky.pond.sub.org>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <c38f9acb-1c74-f698-954c-f8c7a98a8c90@redhat.com>
-Date: Tue, 13 Dec 2016 09:18:53 +0100
+	(envelope-from <yi.l.liu@linux.intel.com>) id 1cGiUe-0008OV-OY
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 03:31:29 -0500
+Received: from mga04.intel.com ([192.55.52.120]:33775)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yi.l.liu@linux.intel.com>)
+	id 1cGiUe-0008N4-Fo
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 03:31:24 -0500
+Date: Mon, 12 Dec 2016 16:16:50 +0800
+From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
+Message-ID: <20161212081650.GA13155@gmail.com>
+References: <1481020588-4245-1-git-send-email-peterx@redhat.com>
+	<1481020588-4245-2-git-send-email-peterx@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <877f74w9dm.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 4/4] qtest: add ivshmem-test for ppc64
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1481020588-4245-2-git-send-email-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 01/13] intel_iommu: allocate new key
+ when creating new address space
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,220 +29,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, bd.aviv@gmail.com, alex.williamson@redhat.com, jasowang@redhat.com, yi.liu@intel.com
 
+On Tue, Dec 06, 2016 at 06:36:16PM +0800, Peter Xu wrote:
+> From: Jason Wang <jasowang@redhat.com>
+> 
+> We use the pointer to stack for key for new address space, this will
+> break hash table searching, fixing by g_malloc() a new key instead.
+> 
+> Cc: Michael S. Tsirkin <mst@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Richard Henderson <rth@twiddle.net>
+> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> Acked-by: Peter Xu <peterx@redhat.com>
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  hw/i386/intel_iommu.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> index 708770e..92e4064 100644
+> --- a/hw/i386/intel_iommu.c
+> +++ b/hw/i386/intel_iommu.c
+> @@ -2426,12 +2426,13 @@ VTDAddressSpace *vtd_find_add_as(IntelIOMMUState *s, PCIBus *bus, int devfn)
+>      VTDAddressSpace *vtd_dev_as;
+>  
+>      if (!vtd_bus) {
+> +        uintptr_t *new_key = g_malloc(sizeof(*new_key));
+> +        *new_key = (uintptr_t)bus;
+>          /* No corresponding free() */
+>          vtd_bus = g_malloc0(sizeof(VTDBus) + sizeof(VTDAddressSpace *) * \
+>                              X86_IOMMU_PCI_DEVFN_MAX);
+>          vtd_bus->bus = bus;
+> -        key = (uintptr_t)bus;
+> -        g_hash_table_insert(s->vtd_as_by_busptr, &key, vtd_bus);
+> +        g_hash_table_insert(s->vtd_as_by_busptr, new_key, vtd_bus);
+Hi Peter,
+Your fix seems to answer an issue I encountered back in Oct. The symptom is: use the same bus value to
+searcha previous inserted entry in s->vtd_as_by_busptr, the result is not found.
 
+really grt fix. could explain it a bit on why this change would fix the issue?
 
-On 13/12/2016 08:55, Markus Armbruster wrote:
-> Laurent Vivier <lvivier@redhat.com> writes:
+Regards,
+Yi L
+>      }
+>  
+>      vtd_dev_as = vtd_bus->dev_as[devfn];
+> -- 
+> 2.7.4
 > 
->> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
->> ---
->>  tests/Makefile.include |  3 ++-
->>  tests/ivshmem-test.c   | 46 +++++++++++++++++++++++++++++-----------------
->>  2 files changed, 31 insertions(+), 18 deletions(-)
->>
->> diff --git a/tests/Makefile.include b/tests/Makefile.include
->> index b574964..09fe5b6 100644
->> --- a/tests/Makefile.include
->> +++ b/tests/Makefile.include
->> @@ -287,6 +287,7 @@ check-qtest-ppc64-y += tests/test-netfilter$(EXESUF)
->>  check-qtest-ppc64-y += tests/test-filter-mirror$(EXESUF)
->>  check-qtest-ppc64-y += tests/test-filter-redirector$(EXESUF)
->>  check-qtest-ppc64-y += tests/display-vga-test$(EXESUF)
->> +check-qtest-ppc64-y += tests/ivshmem-test$(EXESUF)
->>  
->>  check-qtest-sh4-y = tests/endianness-test$(EXESUF)
->>  
->> @@ -690,7 +691,7 @@ tests/test-netfilter$(EXESUF): tests/test-netfilter.o $(qtest-obj-y)
->>  tests/test-filter-mirror$(EXESUF): tests/test-filter-mirror.o $(qtest-obj-y)
->>  tests/test-filter-redirector$(EXESUF): tests/test-filter-redirector.o $(qtest-obj-y)
->>  tests/test-x86-cpuid-compat$(EXESUF): tests/test-x86-cpuid-compat.o $(qtest-obj-y)
->> -tests/ivshmem-test$(EXESUF): tests/ivshmem-test.o contrib/ivshmem-server/ivshmem-server.o $(libqos-pc-obj-y)
->> +tests/ivshmem-test$(EXESUF): tests/ivshmem-test.o contrib/ivshmem-server/ivshmem-server.o $(libqos-pc-obj-y) $(libqos-spapr-obj-y)
->>  tests/vhost-user-bridge$(EXESUF): tests/vhost-user-bridge.o
->>  tests/test-uuid$(EXESUF): tests/test-uuid.o $(test-util-obj-y)
->>  tests/test-arm-mptimer$(EXESUF): tests/test-arm-mptimer.o
->> diff --git a/tests/ivshmem-test.c b/tests/ivshmem-test.c
->> index 04a5c5d..5c6dc38 100644
->> --- a/tests/ivshmem-test.c
->> +++ b/tests/ivshmem-test.c
->> @@ -11,8 +11,9 @@
->>  #include "qemu/osdep.h"
->>  #include <glib/gstdio.h>
->>  #include "contrib/ivshmem-server/ivshmem-server.h"
->> -#include "libqos/pci-pc.h"
->>  #include "libqtest.h"
->> +#include "libqos/libqos-pc.h"
->> +#include "libqos/libqos-spapr.h"
->>  #include "qemu-common.h"
->>  
->>  #define TMPSHMSIZE (1 << 20)
->> @@ -40,9 +41,8 @@ static QPCIDevice *get_device(QPCIBus *pcibus)
->>  }
->>  
->>  typedef struct _IVState {
->> -    QTestState *qtest;
->> +    QOSState *qs;
->>      QPCIBar reg_bar, mem_bar;
->> -    QPCIBus *pcibus;
->>      QPCIDevice *dev;
->>  } IVState;
->>  
->> @@ -74,7 +74,7 @@ static inline unsigned in_reg(IVState *s, enum Reg reg)
->>      QTestState *qtest = global_qtest;
->>      unsigned res;
->>  
->> -    global_qtest = s->qtest;
->> +    global_qtest = s->qs->qts;
->>      res = qpci_io_readl(s->dev, s->reg_bar, reg);
->>      g_test_message("*%s -> %x\n", name, res);
->>      global_qtest = qtest;
->> @@ -87,7 +87,7 @@ static inline void out_reg(IVState *s, enum Reg reg, unsigned v)
->>      const char *name = reg2str(reg);
->>      QTestState *qtest = global_qtest;
->>  
->> -    global_qtest = s->qtest;
->> +    global_qtest = s->qs->qts;
->>      g_test_message("%x -> *%s\n", v, name);
->>      qpci_io_writel(s->dev, s->reg_bar, reg, v);
->>      global_qtest = qtest;
->> @@ -97,7 +97,7 @@ static inline void read_mem(IVState *s, uint64_t off, void *buf, size_t len)
->>  {
->>      QTestState *qtest = global_qtest;
->>  
->> -    global_qtest = s->qtest;
->> +    global_qtest = s->qs->qts;
->>      qpci_memread(s->dev, s->mem_bar, off, buf, len);
->>      global_qtest = qtest;
->>  }
->> @@ -107,7 +107,7 @@ static inline void write_mem(IVState *s, uint64_t off,
->>  {
->>      QTestState *qtest = global_qtest;
->>  
->> -    global_qtest = s->qtest;
->> +    global_qtest = s->qs->qts;
->>      qpci_memwrite(s->dev, s->mem_bar, off, buf, len);
->>      global_qtest = qtest;
->>  }
->> @@ -115,17 +115,23 @@ static inline void write_mem(IVState *s, uint64_t off,
->>  static void cleanup_vm(IVState *s)
->>  {
->>      g_free(s->dev);
->> -    qpci_free_pc(s->pcibus);
->> -    qtest_quit(s->qtest);
->> +    qtest_shutdown(s->qs);
->>  }
->>  
->>  static void setup_vm_cmd(IVState *s, const char *cmd, bool msix)
->>  {
->>      uint64_t barsize;
->> +    const char *arch = qtest_get_arch();
->>  
->> -    s->qtest = qtest_start(cmd);
->> -    s->pcibus = qpci_init_pc(NULL);
->> -    s->dev = get_device(s->pcibus);
->> +    if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
->> +        s->qs = qtest_pc_boot(cmd);
->> +    } else if (strcmp(arch, "ppc64") == 0) {
->> +        s->qs = qtest_spapr_boot(cmd);
->> +    } else {
->> +        g_printerr("vshmem-test tests are only available on x86 or ppc64\n");
 > 
-> Typo: s/vshmem/ivshmem
-> 
-> To get here, you need to build and run this manually, as make check only
-> builds and runs this for targets that work.  But the check doesn't hurt,
-> and documents expectations.
-> 
->> +        exit(EXIT_FAILURE);
->> +    }
->> +    s->dev = get_device(s->qs->pcibus);
->>  
->>      s->reg_bar = qpci_iomap(s->dev, 0, &barsize);
->>      g_assert_cmpuint(barsize, ==, 256);
->> @@ -347,7 +353,7 @@ static void test_ivshmem_server(bool msi)
->>      g_assert_cmpint(vm1, !=, vm2);
->>  
->>      /* check number of MSI-X vectors */
->> -    global_qtest = s1->qtest;
->> +    global_qtest = s1->qs->qts;
->>      if (msi) {
->>          ret = qpci_msix_table_size(s1->dev);
->>          g_assert_cmpuint(ret, ==, nvectors);
->> @@ -370,7 +376,7 @@ static void test_ivshmem_server(bool msi)
->>      g_assert_cmpuint(ret, !=, 0);
->>  
->>      /* ping vm1 -> vm2 on vector 1 */
->> -    global_qtest = s2->qtest;
->> +    global_qtest = s2->qs->qts;
->>      if (msi) {
->>          ret = qpci_msix_pending(s2->dev, 1);
->>          g_assert_cmpuint(ret, ==, 0);
->> @@ -412,6 +418,7 @@ static void test_ivshmem_server_irq(void)
->>  
->>  static void test_ivshmem_hotplug(void)
->>  {
->> +    const char *arch = qtest_get_arch();
->>      gchar *opts;
->>  
->>      qtest_start("");
-> 
-> Unlike the other tests, this one doesn't refuse to run on unexpected
-> targets.  Intentional?
-
-Yes, because there is no dependencies on libqos PCI implementation, so
-it should always work.
-
->> @@ -419,7 +426,9 @@ static void test_ivshmem_hotplug(void)
->>      opts = g_strdup_printf("'shm': '%s', 'size': '1M'", tmpshm);
->>  
->>      qpci_plug_device_test("ivshmem", "iv1", PCI_SLOT_HP, opts);
->> -    qpci_unplug_acpi_device_test("iv1", PCI_SLOT_HP);
->> +    if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
->> +        qpci_unplug_acpi_device_test("iv1", PCI_SLOT_HP);
->> +    }
-> 
-> Disables unplug test for ppc64.
-> 
->>  
->>      qtest_end();
->>      g_free(opts);
->> @@ -491,6 +500,7 @@ static gchar *mktempshm(int size, int *fd)
->>  int main(int argc, char **argv)
->>  {
->>      int ret, fd;
->> +    const char *arch = qtest_get_arch();
->>      gchar dir[] = "/tmp/ivshmem-test.XXXXXX";
->>  
->>  #if !GLIB_CHECK_VERSION(2, 31, 0)
->> @@ -521,8 +531,10 @@ int main(int argc, char **argv)
->>      qtest_add_func("/ivshmem/memdev", test_ivshmem_memdev);
->>      if (g_test_slow()) {
->>          qtest_add_func("/ivshmem/pair", test_ivshmem_pair);
->> -        qtest_add_func("/ivshmem/server-msi", test_ivshmem_server_msi);
->> -        qtest_add_func("/ivshmem/server-irq", test_ivshmem_server_irq);
->> +        if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
->> +            qtest_add_func("/ivshmem/server-msi", test_ivshmem_server_msi);
->> +            qtest_add_func("/ivshmem/server-irq", test_ivshmem_server_irq);
->> +        }
->>      }
->>  
->>      ret = g_test_run();
-> 
-> The commit message should explain things in a bit more detail: the test
-> works only for x86, and is only compiled and executed for x86.  The
-> patch converts it to libqos, adds ppc64, and makes the test fail for
-> targets that don't work.  It also disables the unplug part of test
-> /ivshmem/hotplug for ppc64; please explain why.
-> 
-> Please make the conversion to libqos a separate patch, for easier
-> review.
-> 
-
-Thank you for the review.
-
-I'm going to change this patch according to your comments.
-
-Laurent
