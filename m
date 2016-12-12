@@ -1,27 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43847)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45043)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1cGFZW-0004pi-QU
-	for qemu-devel@nongnu.org; Sun, 11 Dec 2016 20:38:31 -0500
+	(envelope-from <peterx@redhat.com>) id 1cGFip-0006T2-D4
+	for qemu-devel@nongnu.org; Sun, 11 Dec 2016 20:48:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1cGFZT-0003sX-Ky
-	for qemu-devel@nongnu.org; Sun, 11 Dec 2016 20:38:30 -0500
-Received: from mail-oi0-f51.google.com ([209.85.218.51]:33228)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
-	id 1cGFZT-0003s3-Es
-	for qemu-devel@nongnu.org; Sun, 11 Dec 2016 20:38:27 -0500
-Received: by mail-oi0-f51.google.com with SMTP id w63so74101979oiw.0
-	for <qemu-devel@nongnu.org>; Sun, 11 Dec 2016 17:38:27 -0800 (PST)
+	(envelope-from <peterx@redhat.com>) id 1cGFim-0007Mc-9B
+	for qemu-devel@nongnu.org; Sun, 11 Dec 2016 20:48:07 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38318)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cGFim-0007LR-40
+	for qemu-devel@nongnu.org; Sun, 11 Dec 2016 20:48:04 -0500
+Received: from int-mx09.intmail.prod.int.phx2.redhat.com
+	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5A2ABC05680F
+	for <qemu-devel@nongnu.org>; Mon, 12 Dec 2016 01:48:02 +0000 (UTC)
+Date: Mon, 12 Dec 2016 09:47:58 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20161212014758.GI28693@pxdev.xzpeter.org>
+References: <1481089965-3888-1-git-send-email-peterx@redhat.com>
+	<1481089965-3888-2-git-send-email-peterx@redhat.com>
+	<819b97f5-c1c6-c599-f681-9612a0d1a9e4@redhat.com>
+	<20161208021623.GD28693@pxdev.xzpeter.org>
+	<2ecc2092-ef56-7289-0a6f-8ceaa5d0218e@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9qiEK+Z3TBFxebTjqdm-4TeeZLQm2uewMHQUsmtCvL=g@mail.gmail.com>
-References: <87lgvm1dvz.fsf@gmail.com>
-	<CAFEAcA9qiEK+Z3TBFxebTjqdm-4TeeZLQm2uewMHQUsmtCvL=g@mail.gmail.com>
-From: Pranith Kumar <bobby.prani@gmail.com>
-Date: Sun, 11 Dec 2016 20:36:55 -0500
-Message-ID: <CAJhHMCAvd0+PNFF-PfMVP2aSpN2V9B7XbV59qh-FaXtLGemQmg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <2ecc2092-ef56-7289-0a6f-8ceaa5d0218e@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] aarch64-linux-user compilation error
+Subject: Re: [Qemu-devel] [PATCH for-2.9 1/2] intel_iommu: check validity
+ for GAW bits in CE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,39 +38,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+To: Jason Wang <jasowang@redhat.com>
+Cc: qemu-devel@nongnu.org, famz@redhat.com, mst@redhat.com
 
-On Sun, Dec 11, 2016 at 5:59 PM, Peter Maydell <peter.maydell@linaro.org> w=
-rote:
->
->> Error:
->> /home/pranith/devops/code/qemu/linux-user/ioctls.h:224:9: error: =E2=80=
-=98SNDCTL_DSP_MAPINBUF=E2=80=99 undeclared here (not in a function)
->>    IOCTL(SNDCTL_DSP_MAPINBUF, IOC_R, MK_PTR(MK_STRUCT(STRUCT_buffmem_des=
-c)))
->>          ^
->
-> SNDCTL_DSP_MAPINBUF is supposed to be defined by your system
-> headers (/usr/include/linux/soundcard.h or equivalent).
-> Similarly for SNDCTL_DSP_MAPOUTBUF and SOUND_MIXER_ACCESS.
->
-> Looking at QEMU's git history we've used these symbols
-> for years. I would check whether your system headers
-> are actually providing these symbols (and that the
-> compiler is really putting the right headers on the
-> include path).
+On Thu, Dec 08, 2016 at 10:21:35AM +0800, Jason Wang wrote:
+>=20
+>=20
+> On 2016=E5=B9=B412=E6=9C=8808=E6=97=A5 10:16, Peter Xu wrote:
+> >On Thu, Dec 08, 2016 at 10:02:15AM +0800, Jason Wang wrote:
+> >>
+> >>On 2016=E5=B9=B412=E6=9C=8807=E6=97=A5 13:52, Peter Xu wrote:
+> >>>Currently vt-d Context Entry (CE) only allows 39/48 bits address wid=
+th.
+> >>>If guest software configured more than that, we complain and force
+> >>>shrink to the maximum supported, which is 48bits.
+> >>>
+> >>>Signed-off-by: Peter Xu <peterx@redhat.com>
+> >>>---
+> >>>  hw/i386/intel_iommu.c          | 12 +++++++++++-
+> >>>  hw/i386/intel_iommu_internal.h |  2 ++
+> >>>  2 files changed, 13 insertions(+), 1 deletion(-)
+> >>>
+> >>>diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> >>>index 5f3e351..98d45ef 100644
+> >>>--- a/hw/i386/intel_iommu.c
+> >>>+++ b/hw/i386/intel_iommu.c
+> >>>@@ -601,7 +601,17 @@ static inline uint32_t vtd_get_level_from_conte=
+xt_entry(VTDContextEntry *ce)
+> >>>  static inline uint32_t vtd_get_agaw_from_context_entry(VTDContextE=
+ntry *ce)
+> >>>  {
+> >>>-    return 30 + (ce->hi & VTD_CONTEXT_ENTRY_AW) * 9;
+> >>>+    uint8_t aw =3D (ce->hi & VTD_CONTEXT_ENTRY_AW);
+> >>>+    /*
+> >>>+     * According to vt-d spec 10.4.2 bits 12:8, SAGAW only allows
+> >>>+     * 39/48 bits.
+> >>>+     */
+> >>>+    if (aw > VTD_CE_AW_48BIT) {
+> >>>+        error_report("Context entry address width not supported (aw=
+=3D%d), "
+> >>>+                     "Shrinking to maximum.", aw);
+> >>>+        aw =3D VTD_CE_AW_48BIT;
+> >>>+    }
+> >>Is this behavior specified by spec?
+> >That's how I understand spec 10.4.2 bits 12:8 (as mentioned in above
+> >comment). Only 39/48 bits AGAW are allowed, and others are reserved.
+> >
+> >When writting up this patch, I thought illegal value for this aw bits
+> >(from guest software) might cause trouble, but I was wrong, since we
+> >have a "MIN(ce_agaw, VTD_MGAW)" check later on. So that won't be a
+> >problem, and this patch is not that necessary now.
+> >
+> >Thanks,
+> >
+> >-- peterx
+>=20
+> Yes, and it can even report DMAR fault to guest which is better.
 
-So soundcard.h header is provided by two packages:
+Yes. Will respin, thanks. :-)
 
-$ apt-file search /usr/include/linux/soundcard.h
-linux-libc-dev: /usr/include/linux/soundcard.h
-oss4-dev: /usr/include/linux/soundcard.h
-
-I had oss4-dev installed. After removing that and reinstalling
-linux-libc-dev, it compiles fine. Not sure why this file differs. May
-be a packaging issue.
-
-Thanks for the help!
---=20
-Pranith
+-- peterx
