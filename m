@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36469)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33401)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cGQiJ-0005A2-Fd
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 08:32:21 -0500
+	(envelope-from <stefanha@redhat.com>) id 1cGQdH-0003Aa-2h
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 08:27:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cGQiG-0000mc-RO
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 08:32:19 -0500
-Received: from mail-vk0-f41.google.com ([209.85.213.41]:34648)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cGQiG-0000mV-NO
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 08:32:16 -0500
-Received: by mail-vk0-f41.google.com with SMTP id x186so40075259vkd.1
-	for <qemu-devel@nongnu.org>; Mon, 12 Dec 2016 05:32:16 -0800 (PST)
+	(envelope-from <stefanha@redhat.com>) id 1cGQdE-00071u-Ep
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 08:27:07 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35390)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cGQdE-00070P-8V
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 08:27:04 -0500
+Date: Mon, 12 Dec 2016 13:27:01 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20161212132701.GB4074@stefanha-x1.localdomain>
+References: <20161212111857.23399-1-pbonzini@redhat.com>
+	<20161212111857.23399-2-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20161212132209.ryh4uojsz7uev2a6@kamzik.brq.redhat.com>
-References: <CAFEAcA9_E=uPX5GqryrF4kyrXNYbH-8Oiv1mgbJM6VshnQe-kw@mail.gmail.com>
-	<20161102135933.h6clwz4ahsgchwgv@hawk.localdomain>
-	<CAFEAcA9hb1M25AYnBDY0OYTMGvGe5VVR0SLg=T5MR_k1U_S=fw@mail.gmail.com>
-	<20161212132209.ryh4uojsz7uev2a6@kamzik.brq.redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 12 Dec 2016 13:30:55 +0000
-Message-ID: <CAFEAcA9v2Wpdsg6iGqBX74_vGp-fB4bOM=DF5z7E32s-0rieoA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] when we add EL2 to QEMU TCG ARM emulation and the
- virt board, should it default on or off?
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="RASg3xLB4tUQ4RcS"
+Content-Disposition: inline
+In-Reply-To: <20161212111857.23399-2-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 01/11] exec: optimize remaining
+ address_space_* cases
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,55 +29,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jones <drjones@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, famz@redhat.com, mst@redhat.com, borntraeger@de.ibm.com
 
-On 12 December 2016 at 13:22, Andrew Jones <drjones@redhat.com> wrote:
-> On Mon, Dec 12, 2016 at 12:48:14PM +0000, Peter Maydell wrote:
->> And of course you can drive
->> the board changes off a CPU property value if you want...
->
-> Fair point. What do we typically do? I think it'd be nice to be
-> consistent here.
 
-We're not terribly consistent for ARM. We do this for 'pmu' but
-not for EL3. (Part of my motivation for this thread was to
-find out which of these two precedents we should follow for
-EL2.)
+--RASg3xLB4tUQ4RcS
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> Do cpu properties typically [silently] drive
-> board changes? Or do board properties, depending on cpu properties,
-> simply fail when those cpu properties aren't selected by the user,
-> or do they silently enable them?
+On Mon, Dec 12, 2016 at 12:18:47PM +0100, Paolo Bonzini wrote:
+> Do them right before the next patch generalizes them into a multi-included
+> file.
+>=20
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  exec.c | 126 +++++++++++++++++++++++++++++++++++++++++++++++++++++------=
+------
+>  1 file changed, 103 insertions(+), 23 deletions(-)
 
-For ARM so far the answer has mostly been "CPU properties are
-there for the board to set, either unconditionally or sometimes
-based on a board property; the user isn't intended to set them,
-and if the user does mess with them results are unsupported".
-The PMU property is an exception to this rule (perhaps our only
-exception so far, though the "define the SCTLR.EE reset value"
-property patches currently on the list would be another where
-the user is allowed to set them in some cases).
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-I'm not sure how other CPU architectures handle this.
+--RASg3xLB4tUQ4RcS
+Content-Type: application/pgp-signature; name="signature.asc"
 
->> The other reason I made EL3 have both a CPU property and a
->> board property is that it allowed us to have the board
->> property default to false (for back-compat) but the
->> CPU property default to true (so that any future boards
->> would get EL3 support by default, like the h/w -- you
->> can't get a real Cortex-A57 without EL2 and EL3).
->
-> This makes sense to me. A good goal is to keep the processor model
-> as close as possible to real hardware. I guess that pretty much
-> just leaves one option: creating a board property that enables the
-> there-by-default (but still special) cpu feature use.
->
-> So, EL2 cpu property on by default, but EL2 board property off
-> by default. And with EL2 board property off, El2 cpu property
-> automatically turned off?
+-----BEGIN PGP SIGNATURE-----
 
-Yes; this matches how we handle EL3, anyway.
+iQEcBAEBAgAGBQJYTqWlAAoJEJykq7OBq3PIQrIH/i0jJoN7Mi08oeX2uwnfNAj3
+cjYjMSNiVHpUumr+n03V5UnBGrGb46TMX5T9xr7MpLnsRM5/+1iwyDFbi3wsiPC+
+0iGIpf6Cm8GwnWSI1V/CNBvBQMC5+mdLukFtI15c2EekTbIzqslItnI63aVdGYto
+R8E+jP2Os1yHUg1nUtz/hg4afdFHqF81lAv/y71U28Vlc4dCQ3fTaiDbdWNTZE2c
+NJ0C5bped1RoBdu2T9rWM8jJ4aQQFErhkTH9xjNQZwrCuaBmWagcB/XA17o45nAz
+RdF7ReOoipud+Fvl1kH3H/GZOl+APPppimyu4gbJwdQJtu7syFLDehS7SFgdXm8=
+=HXPa
+-----END PGP SIGNATURE-----
 
-thanks
--- PMM
+--RASg3xLB4tUQ4RcS--
