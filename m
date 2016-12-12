@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56860)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33869)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1cGYFo-0002IR-K6
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 16:35:25 -0500
+	(envelope-from <mst@redhat.com>) id 1cGYiv-0000Qb-Mp
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 17:05:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1cGYFl-0008AV-JS
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 16:35:24 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55044)
+	(envelope-from <mst@redhat.com>) id 1cGYis-0007nP-Hf
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 17:05:29 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36350)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1cGYFl-0008AC-Cl
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 16:35:21 -0500
-Received: from int-mx11.intmail.prod.int.phx2.redhat.com
-	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E79C661B86
-	for <qemu-devel@nongnu.org>; Mon, 12 Dec 2016 21:35:19 +0000 (UTC)
-From: Alex Williamson <alex.williamson@redhat.com>
-Date: Mon, 12 Dec 2016 14:35:19 -0700
-Message-ID: <20161212213430.20071.7346.stgit@gimli.home>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cGYis-0007nB-BN
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 17:05:26 -0500
+Date: Tue, 13 Dec 2016 00:05:19 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20161212234941-mutt-send-email-mst@kernel.org>
+References: <1481171829-116496-1-git-send-email-arei.gonglei@huawei.com>
+	<1481171829-116496-3-git-send-email-arei.gonglei@huawei.com>
+	<33183CC9F5247A488A2544077AF19020DA15A07C@DGGEMA505-MBX.china.huawei.com>
+	<20161212105407.GA3033@gondor.apana.org.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH for-2.9] vfio-pci: Fix GTT wrap-around for
- Skylake+ IGD
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20161212105407.GA3033@gondor.apana.org.au>
+Subject: Re: [Qemu-devel] [PATCH v6 2/2] crypto: add virtio-crypto driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,55 +29,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: alex.williamson@redhat.com
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "Gonglei (Arei)" <arei.gonglei@huawei.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>, Luonengjun <luonengjun@huawei.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "Wubin (H)" <wu.wubin@huawei.com>, "xin.zeng@intel.com" <xin.zeng@intel.com>, Claudio Fontana <Claudio.Fontana@huawei.com>, "pasic@linux.vnet.ibm.com" <pasic@linux.vnet.ibm.com>, "davem@davemloft.net" <davem@davemloft.net>, "Zhoujian (jay, Euler)" <jianjay.zhou@huawei.com>, "Hanweidong (Randy)" <hanweidong@huawei.com>, "arei.gonglei@hotmail.com" <arei.gonglei@hotmail.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "Xuquan (Quan Xu)" <xuquan8@huawei.com>, longpeng <longpeng2@huawei.com>, "Wanzongshun (Vincent)" <wanzongshun@huawei.com>
 
-Previous IGD, up through Broadwell, only seem to write GTT values into
-the first 1MB of space allocated for the BDSM, but clearly the GTT
-can be multiple MB in size.  Our test in vfio_igd_quirk_data_write()
-correctly filters out indexes beyond 1MB, but given the 1MB mask we're
-using, we re-apply writes only to the first 1MB of the guest allocated
-BDSM.
+On Mon, Dec 12, 2016 at 06:54:07PM +0800, Herbert Xu wrote:
+> On Mon, Dec 12, 2016 at 06:25:12AM +0000, Gonglei (Arei) wrote:
+> > Hi, Michael & Herbert
+> > 
+> > Because the virtio-crypto device emulation had been in QEMU 2.8,
+> > would you please merge the virtio-crypto driver for 4.10 if no other
+> > comments? If so, Miachel pls ack and/or review the patch, then
+> > Herbert will take it (I asked him last week). Thank you!
+> > 
+> > Ps: Note on 4.10 merge window timing from Linus
+> >  https://lkml.org/lkml/2016/12/7/506
+> > 
+> > Dec 23rd is the deadline for 4.10 merge window.
+> 
+> Sorry but it's too late for 4.10.  It needed to have been in my
+> tree before the merge window opened to make it for this cycle.
+> 
+> Cheers,
 
-We can't assume either the host or guest BDSM is naturally aligned, so
-we can't simply apply a different mask.  Instead, save the host BDSM
-and do the arithmetic to subtract the host value to get the BDSM
-offset and add it to the guest allocated BDSM.
 
-Reported-by: Alexander Indenbaum <alexander.indenbaum@gmail.com>
-Tested-by: Alexander Indenbaum <alexander.indenbaum@gmail.com>
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
----
- hw/vfio/pci-quirks.c |    5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+Objections to me merging this? I'm preparing my tree right now.
 
-diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
-index 811eecd..6fdb3d4 100644
---- a/hw/vfio/pci-quirks.c
-+++ b/hw/vfio/pci-quirks.c
-@@ -1041,6 +1041,7 @@ static int igd_gen(VFIOPCIDevice *vdev)
- typedef struct VFIOIGDQuirk {
-     struct VFIOPCIDevice *vdev;
-     uint32_t index;
-+    uint32_t bdsm;
- } VFIOIGDQuirk;
- 
- #define IGD_GMCH 0x50 /* Graphics Control Register */
-@@ -1304,7 +1305,7 @@ static void vfio_igd_quirk_data_write(void *opaque, hwaddr addr,
-                          "BIOS reserved stolen memory.  Unsupported BIOS?");
-             }
- 
--            val = base | (data & ((1 << 20) - 1));
-+            val = data - igd->bdsm + base;
-         } else {
-             val = 0; /* upper 32bits of pte, we only enable below 4G PTEs */
-         }
-@@ -1503,6 +1504,8 @@ static void vfio_probe_igd_bar4_quirk(VFIOPCIDevice *vdev, int nr)
-     igd = quirk->data = g_malloc0(sizeof(*igd));
-     igd->vdev = vdev;
-     igd->index = ~0;
-+    igd->bdsm = vfio_pci_read_config(&vdev->pdev, IGD_BDSM, 4);
-+    igd->bdsm &= ~((1 << 20) - 1); /* 1MB aligned */
- 
-     memory_region_init_io(&quirk->mem[0], OBJECT(vdev), &vfio_igd_index_quirk,
-                           igd, "vfio-igd-index-quirk", 4);
+> -- 
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
