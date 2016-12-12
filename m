@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43909)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43933)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cGZMT-0005Nl-1K
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 17:46:23 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cGZMY-0005Ss-DK
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 17:46:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cGZMR-0004bC-0C
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 17:46:21 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36566)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cGZMV-0004cm-6s
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 17:46:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54678)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1cGZMQ-0004ar-NL
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 17:46:18 -0500
-Received: from int-mx13.intmail.prod.int.phx2.redhat.com
-	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
+	id 1cGZMU-0004cN-Tq
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 17:46:23 -0500
+Received: from int-mx09.intmail.prod.int.phx2.redhat.com
+	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D47894DD7C
-	for <qemu-devel@nongnu.org>; Mon, 12 Dec 2016 22:46:17 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0E6C87DD06
+	for <qemu-devel@nongnu.org>; Mon, 12 Dec 2016 22:46:22 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue, 13 Dec 2016 01:43:14 +0300
-Message-Id: <20161212224325.20790-44-marcandre.lureau@redhat.com>
+Date: Tue, 13 Dec 2016 01:43:15 +0300
+Message-Id: <20161212224325.20790-45-marcandre.lureau@redhat.com>
 In-Reply-To: <20161212224325.20790-1-marcandre.lureau@redhat.com>
 References: <20161212224325.20790-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 43/54] char: move win chardev base class in its
- own file
+Subject: [Qemu-devel] [PATCH 44/54] char: move win-stdio into its own file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,618 +38,571 @@ Cc: pbonzini@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- chardev/char-win.c    | 245 ++++++++++++++++++++++++++++++++++++++++++++=
-+++
- chardev/char.c        | 256 +-------------------------------------------=
-------
- chardev/Makefile.objs |   1 +
- chardev/char-win.h    |  30 ++++++
- 4 files changed, 279 insertions(+), 253 deletions(-)
- create mode 100644 chardev/char-win.c
- create mode 100644 chardev/char-win.h
+ chardev/char-win-stdio.c | 243 +++++++++++++++++++++++++++++++++++++++++=
+++++++
+ chardev/char.c           | 231 +----------------------------------------=
+---
+ chardev/Makefile.objs    |   1 +
+ chardev/char-win-stdio.h |   6 ++
+ 4 files changed, 252 insertions(+), 229 deletions(-)
+ create mode 100644 chardev/char-win-stdio.c
+ create mode 100644 chardev/char-win-stdio.h
 
-diff --git a/chardev/char-win.c b/chardev/char-win.c
+diff --git a/chardev/char-win-stdio.c b/chardev/char-win-stdio.c
 new file mode 100644
-index 0000000000..ad69c384fe
+index 0000000000..78d1f7cf29
 --- /dev/null
-+++ b/chardev/char-win.c
-@@ -0,0 +1,245 @@
++++ b/chardev/char-win-stdio.c
+@@ -0,0 +1,243 @@
 +#include "qemu/osdep.h"
-+#include "qemu-common.h"
 +#include "qapi/error.h"
 +#include "char-win.h"
++#include "char-win-stdio.h"
 +
-+static void win_chr_readfile(Chardev *chr)
++typedef struct {
++    Chardev parent;
++    HANDLE  hStdIn;
++    HANDLE  hInputReadyEvent;
++    HANDLE  hInputDoneEvent;
++    HANDLE  hInputThread;
++    uint8_t win_stdio_buf;
++} WinStdioChardev;
++
++#define WIN_STDIO_CHARDEV(obj)                                          =
+\
++    OBJECT_CHECK(WinStdioChardev, (obj), TYPE_CHARDEV_WIN_STDIO)
++
++static void win_stdio_wait_func(void *opaque)
 +{
-+    WinChardev *s =3D WIN_CHARDEV(chr);
++    Chardev *chr =3D CHARDEV(opaque);
++    WinStdioChardev *stdio =3D WIN_STDIO_CHARDEV(opaque);
++    INPUT_RECORD       buf[4];
++    int                ret;
++    DWORD              dwSize;
++    int                i;
 +
-+    int ret, err;
-+    uint8_t buf[CHR_READ_BUF_LEN];
-+    DWORD size;
++    ret =3D ReadConsoleInput(stdio->hStdIn, buf, ARRAY_SIZE(buf), &dwSiz=
+e);
 +
-+    ZeroMemory(&s->orecv, sizeof(s->orecv));
-+    s->orecv.hEvent =3D s->hrecv;
-+    ret =3D ReadFile(s->hcom, buf, s->len, &size, &s->orecv);
 +    if (!ret) {
-+        err =3D GetLastError();
-+        if (err =3D=3D ERROR_IO_PENDING) {
-+            ret =3D GetOverlappedResult(s->hcom, &s->orecv, &size, TRUE)=
-;
-+        }
-+    }
-+
-+    if (size > 0) {
-+        qemu_chr_be_write(chr, buf, size);
-+    }
-+}
-+
-+static void win_chr_read(Chardev *chr)
-+{
-+    WinChardev *s =3D WIN_CHARDEV(chr);
-+
-+    if (s->len > s->max_size) {
-+        s->len =3D s->max_size;
-+    }
-+    if (s->len =3D=3D 0) {
++        /* Avoid error storm */
++        qemu_del_wait_object(stdio->hStdIn, NULL, NULL);
 +        return;
 +    }
 +
-+    win_chr_readfile(chr);
-+}
++    for (i =3D 0; i < dwSize; i++) {
++        KEY_EVENT_RECORD *kev =3D &buf[i].Event.KeyEvent;
 +
-+static int win_chr_read_poll(Chardev *chr)
-+{
-+    WinChardev *s =3D WIN_CHARDEV(chr);
-+
-+    s->max_size =3D qemu_chr_be_can_write(chr);
-+    return s->max_size;
-+}
-+
-+static int win_chr_poll(void *opaque)
-+{
-+    Chardev *chr =3D CHARDEV(opaque);
-+    WinChardev *s =3D WIN_CHARDEV(opaque);
-+    COMSTAT status;
-+    DWORD comerr;
-+
-+    ClearCommError(s->hcom, &comerr, &status);
-+    if (status.cbInQue > 0) {
-+        s->len =3D status.cbInQue;
-+        win_chr_read_poll(chr);
-+        win_chr_read(chr);
-+        return 1;
-+    }
-+    return 0;
-+}
-+
-+int win_chr_init(Chardev *chr, const char *filename, Error **errp)
-+{
-+    WinChardev *s =3D WIN_CHARDEV(chr);
-+    COMMCONFIG comcfg;
-+    COMMTIMEOUTS cto =3D { 0, 0, 0, 0, 0};
-+    COMSTAT comstat;
-+    DWORD size;
-+    DWORD err;
-+
-+    s->hsend =3D CreateEvent(NULL, TRUE, FALSE, NULL);
-+    if (!s->hsend) {
-+        error_setg(errp, "Failed CreateEvent");
-+        goto fail;
-+    }
-+    s->hrecv =3D CreateEvent(NULL, TRUE, FALSE, NULL);
-+    if (!s->hrecv) {
-+        error_setg(errp, "Failed CreateEvent");
-+        goto fail;
-+    }
-+
-+    s->hcom =3D CreateFile(filename, GENERIC_READ | GENERIC_WRITE, 0, NU=
-LL,
-+                      OPEN_EXISTING, FILE_FLAG_OVERLAPPED, 0);
-+    if (s->hcom =3D=3D INVALID_HANDLE_VALUE) {
-+        error_setg(errp, "Failed CreateFile (%lu)", GetLastError());
-+        s->hcom =3D NULL;
-+        goto fail;
-+    }
-+
-+    if (!SetupComm(s->hcom, NRECVBUF, NSENDBUF)) {
-+        error_setg(errp, "Failed SetupComm");
-+        goto fail;
-+    }
-+
-+    ZeroMemory(&comcfg, sizeof(COMMCONFIG));
-+    size =3D sizeof(COMMCONFIG);
-+    GetDefaultCommConfig(filename, &comcfg, &size);
-+    comcfg.dcb.DCBlength =3D sizeof(DCB);
-+    CommConfigDialog(filename, NULL, &comcfg);
-+
-+    if (!SetCommState(s->hcom, &comcfg.dcb)) {
-+        error_setg(errp, "Failed SetCommState");
-+        goto fail;
-+    }
-+
-+    if (!SetCommMask(s->hcom, EV_ERR)) {
-+        error_setg(errp, "Failed SetCommMask");
-+        goto fail;
-+    }
-+
-+    cto.ReadIntervalTimeout =3D MAXDWORD;
-+    if (!SetCommTimeouts(s->hcom, &cto)) {
-+        error_setg(errp, "Failed SetCommTimeouts");
-+        goto fail;
-+    }
-+
-+    if (!ClearCommError(s->hcom, &err, &comstat)) {
-+        error_setg(errp, "Failed ClearCommError");
-+        goto fail;
-+    }
-+    qemu_add_polling_cb(win_chr_poll, chr);
-+    return 0;
-+
-+ fail:
-+    return -1;
-+}
-+
-+int win_chr_pipe_poll(void *opaque)
-+{
-+    Chardev *chr =3D CHARDEV(opaque);
-+    WinChardev *s =3D WIN_CHARDEV(opaque);
-+    DWORD size;
-+
-+    PeekNamedPipe(s->hcom, NULL, 0, NULL, &size, NULL);
-+    if (size > 0) {
-+        s->len =3D size;
-+        win_chr_read_poll(chr);
-+        win_chr_read(chr);
-+        return 1;
-+    }
-+    return 0;
-+}
-+
-+/* Called with chr_write_lock held.  */
-+static int win_chr_write(Chardev *chr, const uint8_t *buf, int len1)
-+{
-+    WinChardev *s =3D WIN_CHARDEV(chr);
-+    DWORD len, ret, size, err;
-+
-+    len =3D len1;
-+    ZeroMemory(&s->osend, sizeof(s->osend));
-+    s->osend.hEvent =3D s->hsend;
-+    while (len > 0) {
-+        if (s->hsend) {
-+            ret =3D WriteFile(s->hcom, buf, len, &size, &s->osend);
-+        } else {
-+            ret =3D WriteFile(s->hcom, buf, len, &size, NULL);
-+        }
-+        if (!ret) {
-+            err =3D GetLastError();
-+            if (err =3D=3D ERROR_IO_PENDING) {
-+                ret =3D GetOverlappedResult(s->hcom, &s->osend, &size, T=
-RUE);
-+                if (ret) {
-+                    buf +=3D size;
-+                    len -=3D size;
-+                } else {
-+                    break;
++        if (buf[i].EventType =3D=3D KEY_EVENT && kev->bKeyDown) {
++            int j;
++            if (kev->uChar.AsciiChar !=3D 0) {
++                for (j =3D 0; j < kev->wRepeatCount; j++) {
++                    if (qemu_chr_be_can_write(chr)) {
++                        uint8_t c =3D kev->uChar.AsciiChar;
++                        qemu_chr_be_write(chr, &c, 1);
++                    }
 +                }
-+            } else {
-+                break;
 +            }
-+        } else {
-+            buf +=3D size;
-+            len -=3D size;
 +        }
 +    }
-+    return len1 - len;
 +}
 +
-+static void char_win_finalize(Object *obj)
++static DWORD WINAPI win_stdio_thread(LPVOID param)
 +{
-+    Chardev *chr =3D CHARDEV(obj);
-+    WinChardev *s =3D WIN_CHARDEV(chr);
++    WinStdioChardev *stdio =3D WIN_STDIO_CHARDEV(param);
++    int                ret;
++    DWORD              dwSize;
 +
-+    if (s->skip_free) {
++    while (1) {
++
++        /* Wait for one byte */
++        ret =3D ReadFile(stdio->hStdIn, &stdio->win_stdio_buf, 1, &dwSiz=
+e, NULL);
++
++        /* Exit in case of error, continue if nothing read */
++        if (!ret) {
++            break;
++        }
++        if (!dwSize) {
++            continue;
++        }
++
++        /* Some terminal emulator returns \r\n for Enter, just pass \n *=
+/
++        if (stdio->win_stdio_buf =3D=3D '\r') {
++            continue;
++        }
++
++        /* Signal the main thread and wait until the byte was eaten */
++        if (!SetEvent(stdio->hInputReadyEvent)) {
++            break;
++        }
++        if (WaitForSingleObject(stdio->hInputDoneEvent, INFINITE)
++            !=3D WAIT_OBJECT_0) {
++            break;
++        }
++    }
++
++    qemu_del_wait_object(stdio->hInputReadyEvent, NULL, NULL);
++    return 0;
++}
++
++static void win_stdio_thread_wait_func(void *opaque)
++{
++    Chardev *chr =3D CHARDEV(opaque);
++    WinStdioChardev *stdio =3D WIN_STDIO_CHARDEV(opaque);
++
++    if (qemu_chr_be_can_write(chr)) {
++        qemu_chr_be_write(chr, &stdio->win_stdio_buf, 1);
++    }
++
++    SetEvent(stdio->hInputDoneEvent);
++}
++
++static void qemu_chr_set_echo_win_stdio(Chardev *chr, bool echo)
++{
++    WinStdioChardev *stdio =3D WIN_STDIO_CHARDEV(chr);
++    DWORD              dwMode =3D 0;
++
++    GetConsoleMode(stdio->hStdIn, &dwMode);
++
++    if (echo) {
++        SetConsoleMode(stdio->hStdIn, dwMode | ENABLE_ECHO_INPUT);
++    } else {
++        SetConsoleMode(stdio->hStdIn, dwMode & ~ENABLE_ECHO_INPUT);
++    }
++}
++
++static void qemu_chr_open_stdio(Chardev *chr,
++                                ChardevBackend *backend,
++                                bool *be_opened,
++                                Error **errp)
++{
++    WinStdioChardev *stdio =3D WIN_STDIO_CHARDEV(chr);
++    DWORD              dwMode;
++    int                is_console =3D 0;
++
++    stdio->hStdIn =3D GetStdHandle(STD_INPUT_HANDLE);
++    if (stdio->hStdIn =3D=3D INVALID_HANDLE_VALUE) {
++        error_setg(errp, "cannot open stdio: invalid handle");
 +        return;
 +    }
 +
-+    if (s->hsend) {
-+        CloseHandle(s->hsend);
-+        s->hsend =3D NULL;
-+    }
-+    if (s->hrecv) {
-+        CloseHandle(s->hrecv);
-+        s->hrecv =3D NULL;
-+    }
-+    if (s->hcom) {
-+        CloseHandle(s->hcom);
-+        s->hcom =3D NULL;
-+    }
-+    if (s->fpipe) {
-+        qemu_del_polling_cb(win_chr_pipe_poll, chr);
++    is_console =3D GetConsoleMode(stdio->hStdIn, &dwMode) !=3D 0;
++
++    if (is_console) {
++        if (qemu_add_wait_object(stdio->hStdIn,
++                                 win_stdio_wait_func, chr)) {
++            error_setg(errp, "qemu_add_wait_object: failed");
++            goto err1;
++        }
 +    } else {
-+        qemu_del_polling_cb(win_chr_poll, chr);
++        DWORD   dwId;
++
++        stdio->hInputReadyEvent =3D CreateEvent(NULL, FALSE, FALSE, NULL=
+);
++        stdio->hInputDoneEvent  =3D CreateEvent(NULL, FALSE, FALSE, NULL=
+);
++        if (stdio->hInputReadyEvent =3D=3D INVALID_HANDLE_VALUE
++            || stdio->hInputDoneEvent =3D=3D INVALID_HANDLE_VALUE) {
++            error_setg(errp, "cannot create event");
++            goto err2;
++        }
++        if (qemu_add_wait_object(stdio->hInputReadyEvent,
++                                 win_stdio_thread_wait_func, chr)) {
++            error_setg(errp, "qemu_add_wait_object: failed");
++            goto err2;
++        }
++        stdio->hInputThread     =3D CreateThread(NULL, 0, win_stdio_thre=
+ad,
++                                               chr, 0, &dwId);
++
++        if (stdio->hInputThread =3D=3D INVALID_HANDLE_VALUE) {
++            error_setg(errp, "cannot create stdio thread");
++            goto err3;
++        }
 +    }
 +
-+    qemu_chr_be_event(chr, CHR_EVENT_CLOSED);
++    dwMode |=3D ENABLE_LINE_INPUT;
++
++    if (is_console) {
++        /* set the terminal in raw mode */
++        /* ENABLE_QUICK_EDIT_MODE | ENABLE_EXTENDED_FLAGS */
++        dwMode |=3D ENABLE_PROCESSED_INPUT;
++    }
++
++    SetConsoleMode(stdio->hStdIn, dwMode);
++
++    qemu_chr_set_echo_win_stdio(chr, false);
++
++    return;
++
++err3:
++    qemu_del_wait_object(stdio->hInputReadyEvent, NULL, NULL);
++err2:
++    CloseHandle(stdio->hInputReadyEvent);
++    CloseHandle(stdio->hInputDoneEvent);
++err1:
++    qemu_del_wait_object(stdio->hStdIn, NULL, NULL);
 +}
 +
-+void qemu_chr_open_win_file(Chardev *chr, HANDLE fd_out)
++static void char_win_stdio_finalize(Object *obj)
 +{
-+    WinChardev *s =3D WIN_CHARDEV(chr);
++    WinStdioChardev *stdio =3D WIN_STDIO_CHARDEV(obj);
 +
-+    s->skip_free =3D true;
-+    s->hcom =3D fd_out;
++    if (stdio->hInputReadyEvent !=3D INVALID_HANDLE_VALUE) {
++        CloseHandle(stdio->hInputReadyEvent);
++    }
++    if (stdio->hInputDoneEvent !=3D INVALID_HANDLE_VALUE) {
++        CloseHandle(stdio->hInputDoneEvent);
++    }
++    if (stdio->hInputThread !=3D INVALID_HANDLE_VALUE) {
++        TerminateThread(stdio->hInputThread, 0);
++    }
 +}
 +
-+static void char_win_class_init(ObjectClass *oc, void *data)
++static int win_stdio_write(Chardev *chr, const uint8_t *buf, int len)
++{
++    HANDLE  hStdOut =3D GetStdHandle(STD_OUTPUT_HANDLE);
++    DWORD   dwSize;
++    int     len1;
++
++    len1 =3D len;
++
++    while (len1 > 0) {
++        if (!WriteFile(hStdOut, buf, len1, &dwSize, NULL)) {
++            break;
++        }
++        buf  +=3D dwSize;
++        len1 -=3D dwSize;
++    }
++
++    return len - len1;
++}
++
++static void char_win_stdio_class_init(ObjectClass *oc, void *data)
 +{
 +    ChardevClass *cc =3D CHARDEV_CLASS(oc);
 +
-+    cc->chr_write =3D win_chr_write;
++    cc->open =3D qemu_chr_open_stdio;
++    cc->chr_write =3D win_stdio_write;
++    cc->chr_set_echo =3D qemu_chr_set_echo_win_stdio;
 +}
 +
-+static const TypeInfo char_win_type_info =3D {
-+    .name =3D TYPE_CHARDEV_WIN,
++static const TypeInfo char_win_stdio_type_info =3D {
++    .name =3D TYPE_CHARDEV_WIN_STDIO,
 +    .parent =3D TYPE_CHARDEV,
-+    .instance_size =3D sizeof(WinChardev),
-+    .instance_finalize =3D char_win_finalize,
-+    .class_init =3D char_win_class_init,
++    .instance_size =3D sizeof(WinStdioChardev),
++    .instance_finalize =3D char_win_stdio_finalize,
++    .class_init =3D char_win_stdio_class_init,
 +    .abstract =3D true,
 +};
 +
 +static void register_types(void)
 +{
-+    type_register_static(&char_win_type_info);
++    type_register_static(&char_win_stdio_type_info);
 +}
 +
 +type_init(register_types);
 diff --git a/chardev/char.c b/chardev/char.c
-index 17d47395a7..3b7140482c 100644
+index 3b7140482c..470549afa4 100644
 --- a/chardev/char.c
 +++ b/chardev/char.c
-@@ -88,6 +88,9 @@
- #include "char-mux.h"
- #include "char-fd.h"
+@@ -90,6 +90,7 @@
  #include "char-io.h"
-+#ifdef _WIN32
-+#include "char-win.h"
-+#endif
+ #ifdef _WIN32
+ #include "char-win.h"
++#include "char-win-stdio.h"
+ #endif
 =20
  #define TCP_MAX_FDS 16
-=20
-@@ -1469,23 +1472,6 @@ static void qemu_chr_open_pp_fd(Chardev *chr,
+@@ -1472,19 +1473,6 @@ static void qemu_chr_open_pp_fd(Chardev *chr,
 =20
  #define HAVE_CHARDEV_SERIAL 1
 =20
 -typedef struct {
 -    Chardev parent;
--    int max_size;
--    HANDLE hcom, hrecv, hsend;
--    OVERLAPPED orecv;
--    BOOL fpipe;
--    DWORD len;
+-    HANDLE  hStdIn;
+-    HANDLE  hInputReadyEvent;
+-    HANDLE  hInputDoneEvent;
+-    HANDLE  hInputThread;
+-    uint8_t win_stdio_buf;
+-} WinStdioChardev;
 -
--    /* Protected by the Chardev chr_write_lock.  */
--    OVERLAPPED osend;
--    /* FIXME: file/console do not finalize */
--    BOOL skip_free;
--} WinChardev;
+-#define TYPE_CHARDEV_WIN_STDIO "chardev-win-stdio"
+-#define WIN_STDIO_CHARDEV(obj)                                  \
+-    OBJECT_CHECK(WinStdioChardev, (obj), TYPE_CHARDEV_WIN_STDIO)
 -
--#define TYPE_CHARDEV_WIN "chardev-win"
--#define WIN_CHARDEV(obj) OBJECT_CHECK(WinChardev, (obj), TYPE_CHARDEV_WI=
-N)
--
- typedef struct {
-     Chardev parent;
-     HANDLE  hStdIn;
-@@ -1499,220 +1485,9 @@ typedef struct {
- #define WIN_STDIO_CHARDEV(obj)                                  \
-     OBJECT_CHECK(WinStdioChardev, (obj), TYPE_CHARDEV_WIN_STDIO)
-=20
--#define NSENDBUF 2048
--#define NRECVBUF 2048
  #define MAXCONNECT 1
  #define NTIMEOUT 5000
 =20
--static int win_chr_poll(void *opaque);
--static int win_chr_pipe_poll(void *opaque);
--
--static void char_win_finalize(Object *obj)
--{
--    Chardev *chr =3D CHARDEV(obj);
--    WinChardev *s =3D WIN_CHARDEV(chr);
--
--    if (s->skip_free) {
--        return;
--    }
--
--    if (s->hsend) {
--        CloseHandle(s->hsend);
--        s->hsend =3D NULL;
--    }
--    if (s->hrecv) {
--        CloseHandle(s->hrecv);
--        s->hrecv =3D NULL;
--    }
--    if (s->hcom) {
--        CloseHandle(s->hcom);
--        s->hcom =3D NULL;
--    }
--    if (s->fpipe)
--        qemu_del_polling_cb(win_chr_pipe_poll, chr);
--    else
--        qemu_del_polling_cb(win_chr_poll, chr);
--
--    qemu_chr_be_event(chr, CHR_EVENT_CLOSED);
--}
--
--static int win_chr_init(Chardev *chr, const char *filename, Error **errp=
-)
--{
--    WinChardev *s =3D WIN_CHARDEV(chr);
--    COMMCONFIG comcfg;
--    COMMTIMEOUTS cto =3D { 0, 0, 0, 0, 0};
--    COMSTAT comstat;
--    DWORD size;
--    DWORD err;
--
--    s->hsend =3D CreateEvent(NULL, TRUE, FALSE, NULL);
--    if (!s->hsend) {
--        error_setg(errp, "Failed CreateEvent");
--        goto fail;
--    }
--    s->hrecv =3D CreateEvent(NULL, TRUE, FALSE, NULL);
--    if (!s->hrecv) {
--        error_setg(errp, "Failed CreateEvent");
--        goto fail;
--    }
--
--    s->hcom =3D CreateFile(filename, GENERIC_READ|GENERIC_WRITE, 0, NULL=
-,
--                      OPEN_EXISTING, FILE_FLAG_OVERLAPPED, 0);
--    if (s->hcom =3D=3D INVALID_HANDLE_VALUE) {
--        error_setg(errp, "Failed CreateFile (%lu)", GetLastError());
--        s->hcom =3D NULL;
--        goto fail;
--    }
--
--    if (!SetupComm(s->hcom, NRECVBUF, NSENDBUF)) {
--        error_setg(errp, "Failed SetupComm");
--        goto fail;
--    }
--
--    ZeroMemory(&comcfg, sizeof(COMMCONFIG));
--    size =3D sizeof(COMMCONFIG);
--    GetDefaultCommConfig(filename, &comcfg, &size);
--    comcfg.dcb.DCBlength =3D sizeof(DCB);
--    CommConfigDialog(filename, NULL, &comcfg);
--
--    if (!SetCommState(s->hcom, &comcfg.dcb)) {
--        error_setg(errp, "Failed SetCommState");
--        goto fail;
--    }
--
--    if (!SetCommMask(s->hcom, EV_ERR)) {
--        error_setg(errp, "Failed SetCommMask");
--        goto fail;
--    }
--
--    cto.ReadIntervalTimeout =3D MAXDWORD;
--    if (!SetCommTimeouts(s->hcom, &cto)) {
--        error_setg(errp, "Failed SetCommTimeouts");
--        goto fail;
--    }
--
--    if (!ClearCommError(s->hcom, &err, &comstat)) {
--        error_setg(errp, "Failed ClearCommError");
--        goto fail;
--    }
--    qemu_add_polling_cb(win_chr_poll, chr);
--    return 0;
--
-- fail:
--    return -1;
--}
--
--/* Called with chr_write_lock held.  */
--static int win_chr_write(Chardev *chr, const uint8_t *buf, int len1)
--{
--    WinChardev *s =3D WIN_CHARDEV(chr);
--    DWORD len, ret, size, err;
--
--    len =3D len1;
--    ZeroMemory(&s->osend, sizeof(s->osend));
--    s->osend.hEvent =3D s->hsend;
--    while (len > 0) {
--        if (s->hsend)
--            ret =3D WriteFile(s->hcom, buf, len, &size, &s->osend);
--        else
--            ret =3D WriteFile(s->hcom, buf, len, &size, NULL);
--        if (!ret) {
--            err =3D GetLastError();
--            if (err =3D=3D ERROR_IO_PENDING) {
--                ret =3D GetOverlappedResult(s->hcom, &s->osend, &size, T=
-RUE);
--                if (ret) {
--                    buf +=3D size;
--                    len -=3D size;
--                } else {
--                    break;
--                }
--            } else {
--                break;
--            }
--        } else {
--            buf +=3D size;
--            len -=3D size;
--        }
--    }
--    return len1 - len;
--}
--
--static int win_chr_read_poll(Chardev *chr)
--{
--    WinChardev *s =3D WIN_CHARDEV(chr);
--
--    s->max_size =3D qemu_chr_be_can_write(chr);
--    return s->max_size;
--}
--
--static void win_chr_readfile(Chardev *chr)
--{
--    WinChardev *s =3D WIN_CHARDEV(chr);
--
--    int ret, err;
--    uint8_t buf[CHR_READ_BUF_LEN];
--    DWORD size;
--
--    ZeroMemory(&s->orecv, sizeof(s->orecv));
--    s->orecv.hEvent =3D s->hrecv;
--    ret =3D ReadFile(s->hcom, buf, s->len, &size, &s->orecv);
--    if (!ret) {
--        err =3D GetLastError();
--        if (err =3D=3D ERROR_IO_PENDING) {
--            ret =3D GetOverlappedResult(s->hcom, &s->orecv, &size, TRUE)=
-;
--        }
--    }
--
--    if (size > 0) {
--        qemu_chr_be_write(chr, buf, size);
--    }
--}
--
--static void win_chr_read(Chardev *chr)
--{
--    WinChardev *s =3D WIN_CHARDEV(chr);
--
--    if (s->len > s->max_size)
--        s->len =3D s->max_size;
--    if (s->len =3D=3D 0)
--        return;
--
--    win_chr_readfile(chr);
--}
--
--static int win_chr_poll(void *opaque)
--{
--    Chardev *chr =3D CHARDEV(opaque);
--    WinChardev *s =3D WIN_CHARDEV(opaque);
--    COMSTAT status;
--    DWORD comerr;
--
--    ClearCommError(s->hcom, &comerr, &status);
--    if (status.cbInQue > 0) {
--        s->len =3D status.cbInQue;
--        win_chr_read_poll(chr);
--        win_chr_read(chr);
--        return 1;
--    }
--    return 0;
--}
--
--static int win_chr_pipe_poll(void *opaque)
--{
--    Chardev *chr =3D CHARDEV(opaque);
--    WinChardev *s =3D WIN_CHARDEV(opaque);
--    DWORD size;
--
--    PeekNamedPipe(s->hcom, NULL, 0, NULL, &size, NULL);
--    if (size > 0) {
--        s->len =3D size;
--        win_chr_read_poll(chr);
--        win_chr_read(chr);
--        return 1;
--    }
--    return 0;
--}
--
- static int win_chr_pipe_init(Chardev *chr, const char *filename,
-                              Error **errp)
- {
-@@ -1790,30 +1565,6 @@ static void qemu_chr_open_pipe(Chardev *chr,
-     }
- }
+@@ -1586,215 +1574,6 @@ static const TypeInfo char_console_type_info =3D =
+{
+     .class_init =3D char_console_class_init,
+ };
 =20
--static void qemu_chr_open_win_file(Chardev *chr, HANDLE fd_out)
+-static int win_stdio_write(Chardev *chr, const uint8_t *buf, int len)
 -{
--    WinChardev *s =3D WIN_CHARDEV(chr);
+-    HANDLE  hStdOut =3D GetStdHandle(STD_OUTPUT_HANDLE);
+-    DWORD   dwSize;
+-    int     len1;
 -
--    s->skip_free =3D true;
--    s->hcom =3D fd_out;
+-    len1 =3D len;
+-
+-    while (len1 > 0) {
+-        if (!WriteFile(hStdOut, buf, len1, &dwSize, NULL)) {
+-            break;
+-        }
+-        buf  +=3D dwSize;
+-        len1 -=3D dwSize;
+-    }
+-
+-    return len - len1;
 -}
 -
--static void char_win_class_init(ObjectClass *oc, void *data)
+-static void win_stdio_wait_func(void *opaque)
 -{
--    ChardevClass *cc =3D CHARDEV_CLASS(oc);
+-    Chardev *chr =3D CHARDEV(opaque);
+-    WinStdioChardev *stdio =3D WIN_STDIO_CHARDEV(opaque);
+-    INPUT_RECORD       buf[4];
+-    int                ret;
+-    DWORD              dwSize;
+-    int                i;
 -
--    cc->chr_write =3D win_chr_write;
+-    ret =3D ReadConsoleInput(stdio->hStdIn, buf, ARRAY_SIZE(buf), &dwSiz=
+e);
+-
+-    if (!ret) {
+-        /* Avoid error storm */
+-        qemu_del_wait_object(stdio->hStdIn, NULL, NULL);
+-        return;
+-    }
+-
+-    for (i =3D 0; i < dwSize; i++) {
+-        KEY_EVENT_RECORD *kev =3D &buf[i].Event.KeyEvent;
+-
+-        if (buf[i].EventType =3D=3D KEY_EVENT && kev->bKeyDown) {
+-            int j;
+-            if (kev->uChar.AsciiChar !=3D 0) {
+-                for (j =3D 0; j < kev->wRepeatCount; j++) {
+-                    if (qemu_chr_be_can_write(chr)) {
+-                        uint8_t c =3D kev->uChar.AsciiChar;
+-                        qemu_chr_be_write(chr, &c, 1);
+-                    }
+-                }
+-            }
+-        }
+-    }
 -}
 -
--static const TypeInfo char_win_type_info =3D {
--    .name =3D TYPE_CHARDEV_WIN,
+-static DWORD WINAPI win_stdio_thread(LPVOID param)
+-{
+-    WinStdioChardev *stdio =3D WIN_STDIO_CHARDEV(param);
+-    int                ret;
+-    DWORD              dwSize;
+-
+-    while (1) {
+-
+-        /* Wait for one byte */
+-        ret =3D ReadFile(stdio->hStdIn, &stdio->win_stdio_buf, 1, &dwSiz=
+e, NULL);
+-
+-        /* Exit in case of error, continue if nothing read */
+-        if (!ret) {
+-            break;
+-        }
+-        if (!dwSize) {
+-            continue;
+-        }
+-
+-        /* Some terminal emulator returns \r\n for Enter, just pass \n *=
+/
+-        if (stdio->win_stdio_buf =3D=3D '\r') {
+-            continue;
+-        }
+-
+-        /* Signal the main thread and wait until the byte was eaten */
+-        if (!SetEvent(stdio->hInputReadyEvent)) {
+-            break;
+-        }
+-        if (WaitForSingleObject(stdio->hInputDoneEvent, INFINITE)
+-            !=3D WAIT_OBJECT_0) {
+-            break;
+-        }
+-    }
+-
+-    qemu_del_wait_object(stdio->hInputReadyEvent, NULL, NULL);
+-    return 0;
+-}
+-
+-static void win_stdio_thread_wait_func(void *opaque)
+-{
+-    Chardev *chr =3D CHARDEV(opaque);
+-    WinStdioChardev *stdio =3D WIN_STDIO_CHARDEV(opaque);
+-
+-    if (qemu_chr_be_can_write(chr)) {
+-        qemu_chr_be_write(chr, &stdio->win_stdio_buf, 1);
+-    }
+-
+-    SetEvent(stdio->hInputDoneEvent);
+-}
+-
+-static void qemu_chr_set_echo_win_stdio(Chardev *chr, bool echo)
+-{
+-    WinStdioChardev *stdio =3D WIN_STDIO_CHARDEV(chr);
+-    DWORD              dwMode =3D 0;
+-
+-    GetConsoleMode(stdio->hStdIn, &dwMode);
+-
+-    if (echo) {
+-        SetConsoleMode(stdio->hStdIn, dwMode | ENABLE_ECHO_INPUT);
+-    } else {
+-        SetConsoleMode(stdio->hStdIn, dwMode & ~ENABLE_ECHO_INPUT);
+-    }
+-}
+-
+-static void char_win_stdio_finalize(Object *obj)
+-{
+-    WinStdioChardev *stdio =3D WIN_STDIO_CHARDEV(obj);
+-
+-    if (stdio->hInputReadyEvent !=3D INVALID_HANDLE_VALUE) {
+-        CloseHandle(stdio->hInputReadyEvent);
+-    }
+-    if (stdio->hInputDoneEvent !=3D INVALID_HANDLE_VALUE) {
+-        CloseHandle(stdio->hInputDoneEvent);
+-    }
+-    if (stdio->hInputThread !=3D INVALID_HANDLE_VALUE) {
+-        TerminateThread(stdio->hInputThread, 0);
+-    }
+-}
+-
+-static const TypeInfo char_win_stdio_type_info =3D {
+-    .name =3D TYPE_CHARDEV_WIN_STDIO,
 -    .parent =3D TYPE_CHARDEV,
--    .instance_size =3D sizeof(WinChardev),
--    .instance_finalize =3D char_win_finalize,
--    .class_init =3D char_win_class_init,
+-    .instance_size =3D sizeof(WinStdioChardev),
+-    .instance_finalize =3D char_win_stdio_finalize,
 -    .abstract =3D true,
 -};
 -
- static void qemu_chr_open_win_con(Chardev *chr,
-                                   ChardevBackend *backend,
-                                   bool *be_opened,
-@@ -4181,7 +3932,6 @@ static void register_types(void)
+-static void qemu_chr_open_stdio(Chardev *chr,
+-                                ChardevBackend *backend,
+-                                bool *be_opened,
+-                                Error **errp)
+-{
+-    WinStdioChardev *stdio =3D WIN_STDIO_CHARDEV(chr);
+-    DWORD              dwMode;
+-    int                is_console =3D 0;
+-
+-    stdio->hStdIn =3D GetStdHandle(STD_INPUT_HANDLE);
+-    if (stdio->hStdIn =3D=3D INVALID_HANDLE_VALUE) {
+-        error_setg(errp, "cannot open stdio: invalid handle");
+-        return;
+-    }
+-
+-    is_console =3D GetConsoleMode(stdio->hStdIn, &dwMode) !=3D 0;
+-
+-    if (is_console) {
+-        if (qemu_add_wait_object(stdio->hStdIn,
+-                                 win_stdio_wait_func, chr)) {
+-            error_setg(errp, "qemu_add_wait_object: failed");
+-            goto err1;
+-        }
+-    } else {
+-        DWORD   dwId;
+-           =20
+-        stdio->hInputReadyEvent =3D CreateEvent(NULL, FALSE, FALSE, NULL=
+);
+-        stdio->hInputDoneEvent  =3D CreateEvent(NULL, FALSE, FALSE, NULL=
+);
+-        if (stdio->hInputReadyEvent =3D=3D INVALID_HANDLE_VALUE
+-            || stdio->hInputDoneEvent =3D=3D INVALID_HANDLE_VALUE) {
+-            error_setg(errp, "cannot create event");
+-            goto err2;
+-        }
+-        if (qemu_add_wait_object(stdio->hInputReadyEvent,
+-                                 win_stdio_thread_wait_func, chr)) {
+-            error_setg(errp, "qemu_add_wait_object: failed");
+-            goto err2;
+-        }
+-        stdio->hInputThread     =3D CreateThread(NULL, 0, win_stdio_thre=
+ad,
+-                                               chr, 0, &dwId);
+-
+-        if (stdio->hInputThread =3D=3D INVALID_HANDLE_VALUE) {
+-            error_setg(errp, "cannot create stdio thread");
+-            goto err3;
+-        }
+-    }
+-
+-    dwMode |=3D ENABLE_LINE_INPUT;
+-
+-    if (is_console) {
+-        /* set the terminal in raw mode */
+-        /* ENABLE_QUICK_EDIT_MODE | ENABLE_EXTENDED_FLAGS */
+-        dwMode |=3D ENABLE_PROCESSED_INPUT;
+-    }
+-
+-    SetConsoleMode(stdio->hStdIn, dwMode);
+-
+-    qemu_chr_set_echo_win_stdio(chr, false);
+-
+-    return;
+-
+-err3:
+-    qemu_del_wait_object(stdio->hInputReadyEvent, NULL, NULL);
+-err2:
+-    CloseHandle(stdio->hInputReadyEvent);
+-    CloseHandle(stdio->hInputDoneEvent);
+-err1:
+-    qemu_del_wait_object(stdio->hStdIn, NULL, NULL);
+-}
+ #endif /* !_WIN32 */
+=20
+ /***********************************************************/
+@@ -2780,11 +2559,8 @@ static void char_stdio_class_init(ObjectClass *oc,=
+ void *data)
+     ChardevClass *cc =3D CHARDEV_CLASS(oc);
+=20
+     cc->parse =3D qemu_chr_parse_stdio;
++#ifndef _WIN32
+     cc->open =3D qemu_chr_open_stdio;
+-#ifdef _WIN32
+-    cc->chr_write =3D win_stdio_write;
+-    cc->chr_set_echo =3D qemu_chr_set_echo_win_stdio;
+-#else
+     cc->chr_set_echo =3D qemu_chr_set_echo_stdio;
+ #endif
+ }
+@@ -3931,9 +3707,6 @@ void qemu_chr_cleanup(void)
+ static void register_types(void)
  {
      type_register_static(&char_type_info);
- #ifdef _WIN32
--    type_register_static(&char_win_type_info);
-     type_register_static(&char_win_stdio_type_info);
- #endif
+-#ifdef _WIN32
+-    type_register_static(&char_win_stdio_type_info);
+-#endif
      type_register_static(&char_socket_type_info);
+     type_register_static(&char_udp_type_info);
+     type_register_static(&char_file_type_info);
 diff --git a/chardev/Makefile.objs b/chardev/Makefile.objs
-index d2f03dc5df..bdf5a112a7 100644
+index bdf5a112a7..3c4a328de8 100644
 --- a/chardev/Makefile.objs
 +++ b/chardev/Makefile.objs
-@@ -4,3 +4,4 @@ chardev-obj-y +=3D char-io.o
- chardev-obj-y +=3D char-mux.o
+@@ -5,3 +5,4 @@ chardev-obj-y +=3D char-mux.o
  chardev-obj-y +=3D char-null.o
  chardev-obj-y +=3D char-ringbuf.o
-+chardev-obj-$(CONFIG_WIN32) +=3D char-win.o
-diff --git a/chardev/char-win.h b/chardev/char-win.h
+ chardev-obj-$(CONFIG_WIN32) +=3D char-win.o
++chardev-obj-$(CONFIG_WIN32) +=3D char-win-stdio.o
+diff --git a/chardev/char-win-stdio.h b/chardev/char-win-stdio.h
 new file mode 100644
-index 0000000000..e91b5004ab
+index 0000000000..50ad99300a
 --- /dev/null
-+++ b/chardev/char-win.h
-@@ -0,0 +1,30 @@
-+#ifndef CHAR_WIN_H
-+#define CHAR_WIN_H
++++ b/chardev/char-win-stdio.h
+@@ -0,0 +1,6 @@
++#ifndef CHAR_WIN_STDIO_H
++#define CHAR_WIN_STDIO_H
 +
-+#include "sysemu/char.h"
++#define TYPE_CHARDEV_WIN_STDIO "chardev-win-stdio"
 +
-+typedef struct {
-+    Chardev parent;
-+    int max_size;
-+    HANDLE hcom, hrecv, hsend;
-+    OVERLAPPED orecv;
-+    BOOL fpipe;
-+    DWORD len;
-+
-+    /* Protected by the Chardev chr_write_lock.  */
-+    OVERLAPPED osend;
-+    /* FIXME: file/console do not finalize */
-+    BOOL skip_free;
-+} WinChardev;
-+
-+#define NSENDBUF 2048
-+#define NRECVBUF 2048
-+
-+#define TYPE_CHARDEV_WIN "chardev-win"
-+#define WIN_CHARDEV(obj) OBJECT_CHECK(WinChardev, (obj), TYPE_CHARDEV_WI=
-N)
-+
-+void qemu_chr_open_win_file(Chardev *chr, HANDLE fd_out);
-+int win_chr_init(Chardev *chr, const char *filename, Error **errp);
-+int win_chr_pipe_poll(void *opaque);
-+
-+#endif /* CHAR_WIN_H */
++#endif /* CHAR_WIN_STDIO_H */
 --=20
 2.11.0
