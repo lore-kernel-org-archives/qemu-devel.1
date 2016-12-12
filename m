@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42140)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42416)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cGVFc-000511-Oz
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 13:23:05 -0500
+	(envelope-from <armbru@redhat.com>) id 1cGVG3-0005Pl-9y
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 13:23:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cGVFb-0004oX-PU
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 13:23:00 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37916)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cGVFb-0004oQ-Il
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 13:22:59 -0500
-Date: Mon, 12 Dec 2016 16:22:56 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20161212182256.GA29949@thinpad.lan.raisama.net>
-References: <1481306777-5441-1-git-send-email-ehabkost@redhat.com>
-	<6b1269fd-762f-9971-7114-868cd425de3d@suse.de>
+	(envelope-from <armbru@redhat.com>) id 1cGVG2-0004zo-BL
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 13:23:27 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <87oa0q1t21.fsf@dusky.pond.sub.org> <20161207025457.GB30227@lemon>
+	<20161207094832.GA4773@noname.str.redhat.com>
+	<20161207100339.GB2286@lemon> <87shpybnbc.fsf@dusky.pond.sub.org>
+	<20161208134759.GA32226@lemon> <87wpf52qru.fsf@dusky.pond.sub.org>
+	<20161212144307.GA21817@lemon>
+Date: Mon, 12 Dec 2016 19:23:13 +0100
+In-Reply-To: <20161212144307.GA21817@lemon> (Fam Zheng's message of "Mon, 12
+	Dec 2016 22:43:07 +0800")
+Message-ID: <87zik1xazy.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <6b1269fd-762f-9971-7114-868cd425de3d@suse.de>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-2.9] qom: Make all interface types
- abstract
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [Qemu-block]  Meeting notes on -blockdev,
+ dynamic backend reconfiguration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,77 +27,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, Lin Ma <lma@suse.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On Mon, Dec 12, 2016 at 03:04:25PM +0100, Andreas F=E4rber wrote:
-> Am 09.12.2016 um 19:06 schrieb Eduardo Habkost:
-> > "qom-list-types abstract=3Dfalse" currently returns all interface
-> > types, as if they were not abstract. Fix this by making sure all
-> > interface types are abstract.
-> >=20
-> > All interface types have instance_size =3D=3D 0, so we can use
-> > it to set abstract=3Dtrue on
-> >=20
-> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> > ---
-> >  qom/object.c                   |  4 +++
-> >  tests/device-introspect-test.c | 61 ++++++++++++++++++++++++++++++++=
-+++++++---
-> >  2 files changed, 62 insertions(+), 3 deletions(-)
-> >=20
-> > diff --git a/qom/object.c b/qom/object.c
-> > index 7a05e35..3870c1b 100644
-> > --- a/qom/object.c
-> > +++ b/qom/object.c
-> > @@ -272,6 +272,10 @@ static void type_initialize(TypeImpl *ti)
-> > =20
-> >      ti->class_size =3D type_class_get_size(ti);
-> >      ti->instance_size =3D type_object_get_size(ti);
-> > +    /* Any type with zero instance_size is implicitly abstract.
-> > +     * This means interface types are all abstract.
-> > +     */
-> > +    ti->abstract |=3D ti->instance_size =3D=3D 0;
->=20
-> IIRC this is a bool field, so I would prefer to avoid |=3D by using an
-> old-fashioned if statement.
+Fam Zheng <famz@redhat.com> writes:
 
-I was going to use an if statement, but then I tried to make it
-simpler using "|=3D". I will add it back in v2.
+> On Mon, 12/12 14:58, Markus Armbruster wrote:
+>> Fam Zheng <famz@redhat.com> writes:
+>> 
+>> > On Thu, 12/08 13:46, Markus Armbruster wrote:
+>> >> Fam Zheng <famz@redhat.com> writes:
+>> >> 
+>> >> > On Wed, 12/07 10:48, Kevin Wolf wrote:
+>> >> >> > If so I think there is no race to worry about, mirror-filter should go
+>> >> >> > away only after a QMP command.
+>> >> >> 
+>> >> >> Currently, a mirror job goes away whenever it is done. This is not
+>> >> >> directly tied to a QMP command.
+>> >> >
+>> >> > Ah right, block-job-complete is only "start to complete" and the job goes away
+>> >> > at some later point. I thought this is "the" QMP command but it is not.
+>> >> >
+>> >> >> 
+>> >> >> Of course, in the new job API we want an explicit job-delete, so in
+>> >> >> that case it wouldn't happen, but we need to keep the old case for
+>> >> >> compatibility.
+>> >> >
+>> >> > Another possibility is to add a placeholder node in the right location first
+>> >> > then fill in the actual throttling node once created. QMP owns the placeholder
+>> >> > node so it won't suddenly vanish when mirror job goes away.
+>> >> 
+>> >> I'm not sure I understand this idea.  Could you explain it in a bit more
+>> >> detail, perhaps even with a bit of ASCII art?
+>> >
+>> > OK, I'll base on your version:
+>> >
+>> > == Basic dynamic reconfiguration operation ==
+>> >
+>> > The two primitives are "insert placeholder" and bdrv_replace_child;
+>> >
+>> > A placeholder BDS is a dummy "pass through everything" filter. Inserting
+>> > placeholder is something like:
+>> >
+>> >     void bdrv_insert_placeholder(BdrvChild *child) {
+>> >         BlockDriverState *ph = bdrv_new_placeholder();
+>> >         ph->file->bs = child->bs;
+>> >         child->bs = ph;
+>> >     }
+>> >
+>> > Consider:
+>> >
+>> >           BB
+>> >           |
+>> >     mirror-filter
+>> >           |
+>> >          BDS
+>> >
+>> > Add a throttle filter under BB while the mirror job is running.  First step,
+>> > create the dummy _placeholder_ node and throttle-filter node (the existence of
+>> > placeholder node can be an implementation detail hidden from user):
+>> >
+>> >     placeholder = bdrv_insert_placeholder(BB->root);
+>> >     throttle_filter = bdrv_create_throttle_filter(placeholder);
+>> >
+>> > we get:
+>> >
+>> >           BB     throttle-filter
+>> >           |     /
+>> >      placeholder
+>> >           |
+>> >     mirror-filter
+>> >           |
+>> >          BDS
+>> >
+>> > Second step, move throttle filter in:
+>> >
+>> >     bdrv_replace_child(BB->root, throttle_filter);
+>> >     bdrv_replace_child(throttle_filter->file, throttle_filter->file->bs->file->bs);
+>> >     bdrv_unref(placeholder);
+>> >
+>> > we get:
+>> >
+>> >           BB
+>> >           |
+>> >    throttle-filter
+>> >           |
+>> >     mirror-filter
+>> >           |
+>> >          BDS
+>> >
+>> > Does this make us safe from racing with mirror-filter disappearing?
+>> 
+>> Thanks!  I figure your placeholder node does immunize the splicing in of
+>> the throttle-filter against the removal of mirror-filter.
+>> 
+>> Given a specific dynamic reconfiguration, where do we have to put
+>> placeholder nodes to immunize it against arbitrary other dynamic
+>> changes?
+>
+> Generally, a placeholder node is essentially an insertion to the middle of an
+> existing edge, namely to change:
+>
+>          NodeA
+>        /   |   \
+>       /    |    \
+>  [...]   NodeB   [...]
+>
+> into:
+>
+>          NodeA
+>        /   |   \
+>       /    |    \
+>  [...]  p-holdr  [...]
+>            |
+>            |
+>          NodeB
+>
+> and the operation is safe because of BQL. Our later bdrv_replace_child()
+> operations on it will always work because a dynamic reconfiguration won't delete
+> the placeholder node in any case.
+>
+> On the other hand, concurrent dynamic changes could yield usual outcomes from
+> user PoV (like the involved node is no longer in the same place or disappears),
+> but I think it is still in some degree under user's control. E.g. a
+> mirror-filter won't go away automatically until user does
+> block-job-complete/cancel.
 
->=20
-> The ->abstract =3D false for interfaces itself makes sense to me, but I=
-'d
-> appreciate confirmation from Paolo or some other interface expert.
-
-Thanks!
-
-[...]
-> >  int main(int argc, char **argv)
-> >  {
-> >      g_test_init(&argc, &argv, NULL);
-> > @@ -119,5 +172,7 @@ int main(int argc, char **argv)
-> >      qtest_add_func("device/introspect/abstract", test_device_intro_a=
-bstract);
-> >      qtest_add_func("device/introspect/concrete", test_device_intro_c=
-oncrete);
-> > =20
-> > +    qtest_add_func("qom/introspect/abstract-interfaces", test_abstra=
-ct_interfaces);
->=20
-> I see why you combine the two for reuse, but this path looks odd, it's
-> supposed to indicate which testsuite the test comes from.
-> "device/introspect/abstract-qom-interfaces" maybe?
-
-I was unsure if I should keep the existing path prefix, or change
-to a new one to indicate we are not testing anything specific
-about devices. If you prefer to keep using "device/introspect", I
-will change it in v2.
-
->=20
-> > +
-> >      return g_test_run();
-> >  }
-
---=20
-Eduardo
+I think I understand how we can safely insert a placeholder.  My
+question is: *where* do we have to insert placeholders before a certain
+dynamic reconfiguration to make that reconfiguration safe?
