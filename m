@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52963)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52985)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1cGL1g-0007Gn-1T
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 02:27:56 -0500
+	(envelope-from <longpeng2@huawei.com>) id 1cGL1g-0007Gt-OM
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 02:27:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1cGL1c-0006AU-3b
+	(envelope-from <longpeng2@huawei.com>) id 1cGL1f-0006CJ-Md
 	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 02:27:56 -0500
-Received: from szxga01-in.huawei.com ([58.251.152.64]:7361)
+Received: from szxga03-in.huawei.com ([119.145.14.66]:30185)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1cGL1b-00062U-Il
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 02:27:52 -0500
+	(envelope-from <longpeng2@huawei.com>) id 1cGL1f-00069M-2d
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 02:27:55 -0500
 From: "Longpeng(Mike)" <longpeng2@huawei.com>
-Date: Mon, 12 Dec 2016 15:27:13 +0800
-Message-ID: <1481527639-17520-2-git-send-email-longpeng2@huawei.com>
+Date: Mon, 12 Dec 2016 15:27:18 +0800
+Message-ID: <1481527639-17520-7-git-send-email-longpeng2@huawei.com>
 In-Reply-To: <1481527639-17520-1-git-send-email-longpeng2@huawei.com>
 References: <1481527639-17520-1-git-send-email-longpeng2@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH for-2.9 v1 1/7] qapi: crypto: add defination
- about HMAC algorithms
+Subject: [Qemu-devel] [PATCH for-2.9 v1 6/7] crypto: support HMAC algorithms
+ based on nettle
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,41 +29,160 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: eblake@redhat.com, armbru@redhat.com, berrange@redhat.com, stefanha@redhat.com
 Cc: wu.wubin@huawei.com, jianjay.zhou@huawei.com, arei.gonglei@huawei.com, qemu-devel@nongnu.org, "Longpeng(Mike)" <longpeng2@huawei.com>
 
-This patch introduce HMAC algorithms relevant defination, they will
-be used by the following patch.
+This patch add nettle-backed HMAC algorithms support
 
 Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
 ---
- qapi/crypto.json | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ crypto/hmac-nettle.c | 118 +++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 115 insertions(+), 3 deletions(-)
 
-diff --git a/qapi/crypto.json b/qapi/crypto.json
-index f4fd93b..e63862a 100644
---- a/qapi/crypto.json
-+++ b/qapi/crypto.json
-@@ -55,6 +55,23 @@
- 
- 
- ##
-+# @QCryptoHmacAlgorithm:
-+#
-+# The supported algorithms for hash-based message authentication code
-+#
-+# @md5: HMAC-MD5
-+# @sha1: HMAC-SHA1
-+# @sha256: HMAC-SHA256
-+# @sha512: HMAC-SHA512
-+#
-+# Since 2.9
-+##
-+{ 'enum': 'QCryptoHmacAlgorithm',
-+  'prefix': 'QCRYPTO_HMAC_ALG',
-+  'data': ['md5', 'sha1', 'sha256', 'sha512']}
+diff --git a/crypto/hmac-nettle.c b/crypto/hmac-nettle.c
+index 7a9cd2e..a082bc0 100644
+--- a/crypto/hmac-nettle.c
++++ b/crypto/hmac-nettle.c
+@@ -15,9 +15,66 @@
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+ #include "crypto/hmac.h"
++#include <nettle/hmac.h>
 +
++typedef void (*qcrypto_nettle_hmac_setkey)(void *ctx,
++        size_t key_length, const uint8_t *key);
 +
-+##
- # @QCryptoCipherAlgorithm:
- #
- # The supported algorithms for content encryption ciphers
++typedef void (*qcrypto_nettle_hmac_update)(void *ctx,
++        size_t length, const uint8_t *data);
++
++typedef void (*qcrypto_nettle_hmac_digest)(void *ctx,
++        size_t length, uint8_t *digest);
++
++typedef struct QCryptoHmacNettle QCryptoHmacNettle;
++struct QCryptoHmacNettle {
++    union qcrypto_nettle_hmac_ctx {
++        struct hmac_md5_ctx md5_ctx;
++        struct hmac_sha1_ctx sha1_ctx;
++        struct hmac_sha256_ctx sha256_ctx;
++        struct hmac_sha512_ctx sha512_ctx;
++    } u;
++};
++
++struct qcrypto_nettle_hmac_alg {
++    qcrypto_nettle_hmac_setkey setkey;
++    qcrypto_nettle_hmac_update update;
++    qcrypto_nettle_hmac_digest digest;
++    size_t len;
++} qcrypto_hmac_alg_map[QCRYPTO_HMAC_ALG__MAX] = {
++    [QCRYPTO_HMAC_ALG_MD5] = {
++        .setkey = (qcrypto_nettle_hmac_setkey)hmac_md5_set_key,
++        .update = (qcrypto_nettle_hmac_update)hmac_md5_update,
++        .digest = (qcrypto_nettle_hmac_digest)hmac_md5_digest,
++        .len = MD5_DIGEST_SIZE,
++    },
++    [QCRYPTO_HMAC_ALG_SHA1] = {
++        .setkey = (qcrypto_nettle_hmac_setkey)hmac_sha1_set_key,
++        .update = (qcrypto_nettle_hmac_update)hmac_sha1_update,
++        .digest = (qcrypto_nettle_hmac_digest)hmac_sha1_digest,
++        .len = SHA1_DIGEST_SIZE,
++    },
++    [QCRYPTO_HMAC_ALG_SHA256] = {
++        .setkey = (qcrypto_nettle_hmac_setkey)hmac_sha256_set_key,
++        .update = (qcrypto_nettle_hmac_update)hmac_sha256_update,
++        .digest = (qcrypto_nettle_hmac_digest)hmac_sha256_digest,
++        .len = SHA256_DIGEST_SIZE,
++    },
++    [QCRYPTO_HMAC_ALG_SHA512] = {
++        .setkey = (qcrypto_nettle_hmac_setkey)hmac_sha512_set_key,
++        .update = (qcrypto_nettle_hmac_update)hmac_sha512_update,
++        .digest = (qcrypto_nettle_hmac_digest)hmac_sha512_digest,
++        .len = SHA512_DIGEST_SIZE,
++    },
++};
+ 
+ bool qcrypto_hmac_supports(QCryptoHmacAlgorithm alg)
+ {
++    if (alg < G_N_ELEMENTS(qcrypto_hmac_alg_map) &&
++        qcrypto_hmac_alg_map[alg].setkey != NULL) {
++        return true;
++    }
++
+     return false;
+ }
+ 
+@@ -25,12 +82,39 @@ QCryptoHmac *qcrypto_hmac_new(QCryptoHmacAlgorithm alg,
+                                   const uint8_t *key, size_t nkey,
+                                   Error **errp)
+ {
+-    return NULL;
++    QCryptoHmac *hmac;
++    QCryptoHmacNettle *ctx;
++
++    if (!qcrypto_hmac_supports(alg)) {
++        error_setg(errp, "Unsupported hmac algorithm %s",
++                    QCryptoHmacAlgorithm_lookup[alg]);
++        return NULL;
++    }
++
++    hmac = g_new0(QCryptoHmac, 1);
++    hmac->alg = alg;
++
++    ctx = g_new0(QCryptoHmacNettle, 1);
++
++    qcrypto_hmac_alg_map[alg].setkey(&ctx->u, nkey, key);
++
++    hmac->opaque = ctx;
++
++    return hmac;
+ }
+ 
+ void qcrypto_hmac_free(QCryptoHmac *hmac)
+ {
+-    return;
++    QCryptoHmacNettle *ctx;
++
++    if (!hmac) {
++        return;
++    }
++
++    ctx = hmac->opaque;
++
++    g_free(ctx);
++    g_free(hmac);
+ }
+ 
+ int qcrypto_hmac_bytesv(QCryptoHmac *hmac,
+@@ -40,5 +124,33 @@ int qcrypto_hmac_bytesv(QCryptoHmac *hmac,
+                         size_t *resultlen,
+                         Error **errp)
+ {
+-    return -1;
++    QCryptoHmacNettle *ctx;
++    int i;
++
++    ctx = (QCryptoHmacNettle *)hmac->opaque;
++
++    for (i = 0; i < niov; ++i) {
++        size_t len = iov[i].iov_len;
++        uint8_t *base = iov[i].iov_base;
++        while (len) {
++            size_t shortlen = MIN(len, UINT_MAX);
++            qcrypto_hmac_alg_map[hmac->alg].update(&ctx->u, len, base);
++            len -= shortlen;
++            base += len;
++        }
++    }
++
++    if (*resultlen == 0) {
++        *resultlen = qcrypto_hmac_alg_map[hmac->alg].len;
++        *result = g_new0(uint8_t, *resultlen);
++    } else if (*resultlen != qcrypto_hmac_alg_map[hmac->alg].len) {
++        error_setg(errp,
++                   "Result buffer size %zu is smaller than hash %zu",
++                   *resultlen, qcrypto_hmac_alg_map[hmac->alg].len);
++        return -1;
++    }
++
++    qcrypto_hmac_alg_map[hmac->alg].digest(&ctx->u, *resultlen, *result);
++
++    return 0;
+ }
 -- 
 1.8.3.1
