@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41651)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44358)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cGQ32-0007U7-3I
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 07:49:41 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cGQBq-0000Wv-Pe
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 07:58:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cGQ2y-0007ce-1D
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 07:49:40 -0500
-Received: from mail-vk0-f46.google.com ([209.85.213.46]:33335)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cGQ2x-0007cV-Sq
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 07:49:35 -0500
-Received: by mail-vk0-f46.google.com with SMTP id 137so39598104vkl.0
-	for <qemu-devel@nongnu.org>; Mon, 12 Dec 2016 04:49:35 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <20161102135933.h6clwz4ahsgchwgv@hawk.localdomain>
-References: <CAFEAcA9_E=uPX5GqryrF4kyrXNYbH-8Oiv1mgbJM6VshnQe-kw@mail.gmail.com>
-	<20161102135933.h6clwz4ahsgchwgv@hawk.localdomain>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 12 Dec 2016 12:48:14 +0000
-Message-ID: <CAFEAcA9hb1M25AYnBDY0OYTMGvGe5VVR0SLg=T5MR_k1U_S=fw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] when we add EL2 to QEMU TCG ARM emulation and the
- virt board, should it default on or off?
+	(envelope-from <dgilbert@redhat.com>) id 1cGQBm-0001yn-OR
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 07:58:46 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55722)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cGQBm-0001yO-Gf
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 07:58:42 -0500
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com
+	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E8B2B7EBB5
+	for <qemu-devel@nongnu.org>; Mon, 12 Dec 2016 12:58:39 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Date: Mon, 12 Dec 2016 12:58:38 +0000
+Message-Id: <20161212125838.14425-1-dgilbert@redhat.com>
+Subject: [Qemu-devel] [for 2.9] migration/tracing: Add tracing on save
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,44 +27,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jones <drjones@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+To: qemu-devel@nongnu.org, quintela@redhat.com, amit.shah@redhat.com
 
-On 2 November 2016 at 13:59, Andrew Jones <drjones@redhat.com> wrote:
-> On Tue, Nov 01, 2016 at 05:16:59PM +0000, Peter Maydell wrote:
->>  (2) directly user-set cpu property, or board property ?
->
-> So this is why I was rambling above about the two precedents.
-> IMO, we should choose a cpu property when it's a purely cpu
-> feature, like the PMU, and board (without a user-settable cpu
-> property) otherwise. Does this feature require board changes?
-> I'm aware of switching the psci method from hvc to smc, but
-> I'd shrug that one off. Is there anything else? If not, then
-> I vote cpu property only.
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-So the things that the board needs to support EL2:
- * PSCI method change
- * need to wire up some interrupt lines (GICv3 maintenance
-   interrupt, and VIRQ and VFIQ)
- * for GICv2 you would need also to set a property on
-   the GIC to tell it to implement the virt extensions
-   (for GICv3 this isn't necessary as the virt extensions
-   only affect the CPU interface, which is strictly part
-   of the CPU and which in my patches is configured via
-   a back-door connection between the CPU proper and the
-   GIC cpuif code)
+Add some tracing to vmstate_subsection_save and vmstate_save_state
+to help in debugging when you're not sure if a conditional piece
+of data is being saved.
 
-You can do all the interrupt wiring unconditionally,
-because if the CPU doesn't have EL2 then the extra
-irq lines are just unused. And of course you can drive
-the board changes off a CPU property value if you want...
+In vmstate_subsection_save I renamed the inner vmsd to avoid the aliasing
+and be able to print both names.
 
-The other reason I made EL3 have both a CPU property and a
-board property is that it allowed us to have the board
-property default to false (for back-compat) but the
-CPU property default to true (so that any future boards
-would get EL3 support by default, like the h/w -- you
-can't get a real Cortex-A57 without EL2 and EL3).
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ migration/trace-events |  4 ++++
+ migration/vmstate.c    | 15 ++++++++++-----
+ 2 files changed, 14 insertions(+), 5 deletions(-)
 
-thanks
--- PMM
+diff --git a/migration/trace-events b/migration/trace-events
+index 6dded4f..83ef913 100644
+--- a/migration/trace-events
++++ b/migration/trace-events
+@@ -40,6 +40,10 @@ savevm_state_iterate(void) ""
+ savevm_state_cleanup(void) ""
+ savevm_state_complete_precopy(void) ""
+ vmstate_save(const char *idstr, const char *vmsd_name) "%s, %s"
++vmstate_save_state_loop(const char *name, const char *field, int n_elems) "%s/%s[%d]"
++vmstate_save_state_top(const char *idstr) "%s"
++vmstate_subsection_save_loop(const char *name, const char *sub) "%s/%s"
++vmstate_subsection_save_top(const char *idstr) "%s"
+ vmstate_load(const char *idstr, const char *vmsd_name) "%s, %s"
+ qemu_announce_self_iter(const char *mac) "%s"
+ 
+diff --git a/migration/vmstate.c b/migration/vmstate.c
+index 0bc9f35..42b9069 100644
+--- a/migration/vmstate.c
++++ b/migration/vmstate.c
+@@ -299,6 +299,8 @@ void vmstate_save_state(QEMUFile *f, const VMStateDescription *vmsd,
+ {
+     VMStateField *field = vmsd->fields;
+ 
++    trace_vmstate_save_state_top(vmsd->name);
++
+     if (vmsd->pre_save) {
+         vmsd->pre_save(opaque);
+     }
+@@ -318,6 +320,7 @@ void vmstate_save_state(QEMUFile *f, const VMStateDescription *vmsd,
+             int64_t old_offset, written_bytes;
+             QJSON *vmdesc_loop = vmdesc;
+ 
++            trace_vmstate_save_state_loop(vmsd->name, field->name, n_elems);
+             for (i = 0; i < n_elems; i++) {
+                 void *addr = base_addr + size * i;
+ 
+@@ -427,11 +430,13 @@ static void vmstate_subsection_save(QEMUFile *f, const VMStateDescription *vmsd,
+     const VMStateDescription **sub = vmsd->subsections;
+     bool subsection_found = false;
+ 
++    trace_vmstate_subsection_save_top(vmsd->name);
+     while (sub && *sub && (*sub)->needed) {
+         if ((*sub)->needed(opaque)) {
+-            const VMStateDescription *vmsd = *sub;
++            const VMStateDescription *vmsdsub = *sub;
+             uint8_t len;
+ 
++            trace_vmstate_subsection_save_loop(vmsd->name, vmsdsub->name);
+             if (vmdesc) {
+                 /* Only create subsection array when we have any */
+                 if (!subsection_found) {
+@@ -443,11 +448,11 @@ static void vmstate_subsection_save(QEMUFile *f, const VMStateDescription *vmsd,
+             }
+ 
+             qemu_put_byte(f, QEMU_VM_SUBSECTION);
+-            len = strlen(vmsd->name);
++            len = strlen(vmsdsub->name);
+             qemu_put_byte(f, len);
+-            qemu_put_buffer(f, (uint8_t *)vmsd->name, len);
+-            qemu_put_be32(f, vmsd->version_id);
+-            vmstate_save_state(f, vmsd, opaque, vmdesc);
++            qemu_put_buffer(f, (uint8_t *)vmsdsub->name, len);
++            qemu_put_be32(f, vmsdsub->version_id);
++            vmstate_save_state(f, vmsdsub, opaque, vmdesc);
+ 
+             if (vmdesc) {
+                 json_end_object(vmdesc);
+-- 
+2.9.3
