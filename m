@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51601)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51620)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1cGa1V-0008P8-Gx
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 18:28:46 -0500
+	(envelope-from <lvivier@redhat.com>) id 1cGa1X-0008R1-5T
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 18:28:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1cGa1U-00072u-Qq
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 18:28:45 -0500
+	(envelope-from <lvivier@redhat.com>) id 1cGa1T-00072S-89
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 18:28:47 -0500
 From: Laurent Vivier <lvivier@redhat.com>
-Date: Tue, 13 Dec 2016 00:28:35 +0100
-Message-Id: <1481585316-31612-4-git-send-email-lvivier@redhat.com>
+Date: Tue, 13 Dec 2016 00:28:34 +0100
+Message-Id: <1481585316-31612-3-git-send-email-lvivier@redhat.com>
 In-Reply-To: <1481585316-31612-1-git-send-email-lvivier@redhat.com>
 References: <1481585316-31612-1-git-send-email-lvivier@redhat.com>
-Subject: [Qemu-devel] [PATCH 3/4] libqos: fix spapr qpci_map()
+Subject: [Qemu-devel] [PATCH 2/4] qtest: add display-vga-test to ppc64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,25 +22,47 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, Laurent Vivier <lvivier@redhat.com>
 
+Only enable for ppc64 in the Makefile, but added
+code in the file to check cirrus card only on architectures
+supporting it (alpha, mips, i386, x86_64).
+
 Signed-off-by: Laurent Vivier <lvivier@redhat.com>
 ---
- tests/libqos/pci-spapr.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ tests/Makefile.include   | 1 +
+ tests/display-vga-test.c | 7 ++++++-
+ 2 files changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/tests/libqos/pci-spapr.c b/tests/libqos/pci-spapr.c
-index 1e5d015..2043f1e 100644
---- a/tests/libqos/pci-spapr.c
-+++ b/tests/libqos/pci-spapr.c
-@@ -193,8 +193,8 @@ QPCIBus *qpci_init_spapr(QGuestAllocator *alloc)
-     ret->pio.size = SPAPR_PCI_IO_WIN_SIZE;
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index be6209d..b574964 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -286,6 +286,7 @@ check-qtest-ppc64-y += $(check-qtest-virtio-y)
+ check-qtest-ppc64-y += tests/test-netfilter$(EXESUF)
+ check-qtest-ppc64-y += tests/test-filter-mirror$(EXESUF)
+ check-qtest-ppc64-y += tests/test-filter-redirector$(EXESUF)
++check-qtest-ppc64-y += tests/display-vga-test$(EXESUF)
  
-     /* 32-bit portion of the MMIO window is at PCI address 2..4 GiB */
--    ret->mmio32_cpu_base = SPAPR_PCI_BASE + SPAPR_PCI_MMIO32_WIN_SIZE;
--    ret->mmio32.pci_base = 0x80000000; /* 2 GiB */
-+    ret->mmio32_cpu_base = SPAPR_PCI_BASE;
-+    ret->mmio32.pci_base = SPAPR_PCI_MMIO32_WIN_SIZE;
-     ret->mmio32.size = SPAPR_PCI_MMIO32_WIN_SIZE;
+ check-qtest-sh4-y = tests/endianness-test$(EXESUF)
  
-     ret->bus.pio_alloc_ptr = 0xc000;
+diff --git a/tests/display-vga-test.c b/tests/display-vga-test.c
+index 9146021..2d7d24e 100644
+--- a/tests/display-vga-test.c
++++ b/tests/display-vga-test.c
+@@ -50,9 +50,14 @@ static void pci_virtio_vga(void)
+ 
+ int main(int argc, char **argv)
+ {
++    const char *arch = qtest_get_arch();
++
+     g_test_init(&argc, &argv, NULL);
+ 
+-    qtest_add_func("/display/pci/cirrus", pci_cirrus);
++    if (strcmp(arch, "alpha") == 0 || strcmp(arch, "i386") == 0 ||
++        strcmp(arch, "mips") == 0 || strcmp(arch, "x86_64") == 0) {
++        qtest_add_func("/display/pci/cirrus", pci_cirrus);
++    }
+     qtest_add_func("/display/pci/stdvga", pci_stdvga);
+     qtest_add_func("/display/pci/secondary", pci_secondary);
+     qtest_add_func("/display/pci/multihead", pci_multihead);
 -- 
 2.7.4
