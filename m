@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53137)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42400)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cGVnF-0005R0-LW
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 13:57:47 -0500
+	(envelope-from <nikunj.dadhania@gmail.com>) id 1cGHp1-00033s-LU
+	for qemu-devel@nongnu.org; Sun, 11 Dec 2016 23:02:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cGVn4-0007t7-9G
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 13:57:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58004)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cGVn3-0007se-VV
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 13:57:34 -0500
-Date: Mon, 12 Dec 2016 16:57:30 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20161212185730.GG3808@thinpad.lan.raisama.net>
-References: <20161209203954.GW4027@thinpad.lan.raisama.net>
-	<584E36CD.50405@cn.fujitsu.com>
-	<20161212172915.GP4074@stefanha-x1.localdomain>
-	<20161212202617-mutt-send-email-mst@kernel.org>
+	(envelope-from <nikunj.dadhania@gmail.com>) id 1cGHp0-00032l-JT
+	for qemu-devel@nongnu.org; Sun, 11 Dec 2016 23:02:39 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20161212202617-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] Reproducible crash on PCIe hotplug
+In-Reply-To: <20161212003055.GC12127@umbus.fritz.box>
+References: <1481285845-16415-1-git-send-email-nikunj@linux.vnet.ibm.com>
+	<1481285845-16415-6-git-send-email-nikunj@linux.vnet.ibm.com>
+	<20161212003055.GC12127@umbus.fritz.box>
+From: Nikunj Dadhania <nikunj.dadhania@gmail.com>
+Date: Mon, 12 Dec 2016 09:31:11 +0530
+Message-ID: <CALAZu38RiyxcnV5uXucUcyyV9aeWqXXpEznUF9z2gNrn0Fy4tQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2 5/6] target-ppc: implement
+ xxextractuw instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,106 +24,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Cao jin <caoj.fnst@cn.fujitsu.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, Bharata B Rao <bharata@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
 
-On Mon, Dec 12, 2016 at 08:41:41PM +0200, Michael S. Tsirkin wrote:
-> On Mon, Dec 12, 2016 at 05:29:15PM +0000, Stefan Hajnoczi wrote:
-> > On Mon, Dec 12, 2016 at 01:34:05PM +0800, Cao jin wrote:
-> > > 
-> > > 
-> > > On 12/10/2016 04:39 AM, Eduardo Habkost wrote:
-> > > > Using latest qemu.git master:
-> > > > 
-> > > >   $ qemu-system-x86_64 -machine q35 -readconfig docs/q35-chipset.cfg -monitor stdio
-> > > >   QEMU 2.7.93 monitor - type 'help' for more information
-> > > >   (qemu) device_add e1000e,bus=ich9-pcie-port-4,addr=00
-> > > >   (qemu) device_add e1000e,bus=ich9-pcie-port-4,addr=08
-> > > >   Segmentation fault (core dumped)
-> > > > 
-> > > > It crashes at:
-> > > > 
-> > > >   #7  0x000055555598d7dc in do_pci_register_device (errp=0x7fffffffbfd0, devfn=64, name=0x5555565df340 "e1000e", bus=0x555558487380, pci_dev=0x5555589cd000)
-> > > >       at /home/ehabkost/rh/proj/virt/qemu/hw/pci/pci.c:983
-> > > >   983             error_setg(errp, "PCI: slot %d function 0 already ocuppied by %s,"
-> > > >   (gdb) l
-> > > >   978                        PCI_SLOT(devfn), PCI_FUNC(devfn), name,
-> > > >   979                        bus->devices[devfn]->name);
-> > > >   980             return NULL;
-> > > >   981         } else if (dev->hotplugged &&
-> > > >   982                    pci_get_function_0(pci_dev)) {
-> > > >   983             error_setg(errp, "PCI: slot %d function 0 already ocuppied by %s,"
-> > > >   984                        " new func %s cannot be exposed to guest.",
-> > > >   985                        PCI_SLOT(devfn),
-> > > >   986                        bus->devices[PCI_DEVFN(PCI_SLOT(devfn), 0)]->name,
-> > > >   987                        name);
-> > > > 
-> > > 
-> > > Thanks for informing me. I am kind of busy for now, so I suppose I will
-> > > investigate it after 2.8 release.
-> > 
-> > Please let me know if this should be considered a release blocker.
-> > 
-> > The proposed QEMU 2.8 release date is tomorrow (December 13th)!
-> > 
-> > Stefan
-> 
-> I don't see how it's a blocker, it's an illegal configuration.
-> Here's the fix. It's a rather obvious one.
-> I'll target the fix for 2.9.
-> Eduardo, I'd appreciate a tested-by tag.
+On 12 December 2016 at 06:00, David Gibson <david@gibson.dropbear.id.au> wrote:
+> On Fri, Dec 09, 2016 at 05:47:24PM +0530, Nikunj A Dadhania wrote:
+>> xxextractuw: VSX Vector Extract Unsigned Word
+>>
+>> Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+>> ---
+>>  target-ppc/helper.h                 |  1 +
+>>  target-ppc/int_helper.c             | 21 +++++++++++++++++++++
+>>  target-ppc/translate/vsx-impl.inc.c | 27 +++++++++++++++++++++++++++
+>>  target-ppc/translate/vsx-ops.inc.c  |  5 +++++
+>>  4 files changed, 54 insertions(+)
+>>
+>> diff --git a/target-ppc/helper.h b/target-ppc/helper.h
+>> index 4707db4..8b30420 100644
+>> --- a/target-ppc/helper.h
+>> +++ b/target-ppc/helper.h
+>> @@ -540,6 +540,7 @@ DEF_HELPER_2(xvrspip, void, env, i32)
+>>  DEF_HELPER_2(xvrspiz, void, env, i32)
+>>  DEF_HELPER_2(xxperm, void, env, i32)
+>>  DEF_HELPER_2(xxpermr, void, env, i32)
+>> +DEF_HELPER_4(xxextractuw, void, env, tl, tl, i32)
+>>
+>>  DEF_HELPER_2(efscfsi, i32, env, i32)
+>>  DEF_HELPER_2(efscfui, i32, env, i32)
+>> diff --git a/target-ppc/int_helper.c b/target-ppc/int_helper.c
+>> index 7989b1f..e3f66ac 100644
+>> --- a/target-ppc/int_helper.c
+>> +++ b/target-ppc/int_helper.c
+>> @@ -2033,6 +2033,27 @@ VEXTRACT(uw, u32)
+>>  VEXTRACT(d, u64)
+>>  #undef VEXTRACT
+>>
+>> +void helper_xxextractuw(CPUPPCState *env, target_ulong xtn,
+>> +                        target_ulong xbn, uint32_t index)
+>> +{
+>> +    ppc_vsr_t xt, xb;
+>> +    size_t es = sizeof(uint32_t);
+>> +    uint32_t ext_index;
+>> +
+>> +    getVSR(xbn, &xb, env);
+>> +    memset(&xt, 0, sizeof(xt));
+>> +
+>> +#if defined(HOST_WORDS_BIGENDIAN)
+>> +    ext_index = index;
+>> +    memcpy(&xt.u8[8 - es], &xb.u8[ext_index], es);
+>> +#else
+>> +    ext_index = (16 - index) - es;
+>> +    memcpy(&xt.u8[8], &xb.u8[ext_index], es);
+>
+> Hm.  So, IIUC, ext_index is the byte element - in IBM numbering - to
+> start copying from.  But I thought that when we have an LE host, the
+> IBM byte element ordering is reversed from the actual order in host
+> memory, so we'd need &xb.u8[16 - ext_index - es]
 
-I confirm the patch fixes the crash, but the error message seems
-incorrect: the existing e1000e device is on slot 0 function 0,
-not slot 8.
+I am not getting you, I am getting index from user. So in case of BE host:
 
-  $ ./x86-kvm-build/x86_64-softmmu/qemu-system-x86_64 -machine q35 -readconfig docs/q35-chipset.cfg -monitor stdio
-  QEMU 2.7.93 monitor - type 'help' for more information
-  (qemu) device_add e1000e,bus=ich9-pcie-port-4,addr=00
-  (qemu) device_add e1000e,bus=ich9-pcie-port-4,addr=08
-  PCI: slot 8 function 0 already ocuppied by e1000e, new func e1000e cannot be exposed to guest.
-           ^^^
+ext_index = index;
 
+LE Host:
 
-> 
-> -->
-> 
-> pci: fix error message for express slots
-> 
-> PCI Express downstream slot has a single PCI slot
-> behind it, using PCI_DEVFN(PCI_SLOT(devfn), 0)
-> does not give you function 0 in cases such as ARI
-> as well as some error cases.
-> 
-> This is exactly what we are hitting:
->    $ qemu-system-x86_64 -machine q35 -readconfig docs/q35-chipset.cfg -monitor stdio
->    (qemu) device_add e1000e,bus=ich9-pcie-port-4,addr=00
->    (qemu) device_add e1000e,bus=ich9-pcie-port-4,addr=08
->    Segmentation fault (core dumped)
-> 
-> The fix is to use the pci_get_function_0 API.
-> 
-> Cc: qemu-stable@nongnu.org
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> Reported-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
-> 
-> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-> index 24fae16..339c531 100644
-> --- a/hw/pci/pci.c
-> +++ b/hw/pci/pci.c
-> @@ -983,7 +983,7 @@ static PCIDevice *do_pci_register_device(PCIDevice *pci_dev, PCIBus *bus,
->          error_setg(errp, "PCI: slot %d function 0 already ocuppied by %s,"
->                     " new func %s cannot be exposed to guest.",
->                     PCI_SLOT(devfn),
-> -                   bus->devices[PCI_DEVFN(PCI_SLOT(devfn), 0)]->name,
-> +                   pci_get_function_0(pci_dev)->name,
->                     name);
->  
->         return NULL;
-> 
-> -- 
-> MST
+ext_index = (16 - index) - es;
 
--- 
-Eduardo
+I am already doing that. Am I missing something.
+
+>
+>> +#endif
+>> +
+>> +    putVSR(xtn, &xt, env);
+>> +}
+>> +
+>>  #define VEXT_SIGNED(name, element, mask, cast, recast)              \
+>>  void helper_##name(ppc_avr_t *r, ppc_avr_t *b)                      \
+>>  {                                                                   \
+>> diff --git a/target-ppc/translate/vsx-impl.inc.c b/target-ppc/translate/vsx-impl.inc.c
+>> index 2a17c35..1c40a35 100644
+>> --- a/target-ppc/translate/vsx-impl.inc.c
+>> +++ b/target-ppc/translate/vsx-impl.inc.c
+>> @@ -1180,6 +1180,33 @@ static void gen_xxsldwi(DisasContext *ctx)
+>>      tcg_temp_free_i64(xtl);
+>>  }
+>>
+>> +#define VSX_EXTRACT(name)                                       \
+>> +static void gen_##name(DisasContext *ctx)                       \
+>> +{                                                               \
+>> +    TCGv xt, xb;                                                \
+>> +    TCGv_i32 t0 = tcg_temp_new_i32();                           \
+>> +    uint8_t uimm = UIMM4(ctx->opcode);                          \
+>> +                                                                \
+>> +    if (unlikely(!ctx->vsx_enabled)) {                          \
+>> +        gen_exception(ctx, POWERPC_EXCP_VSXU);                  \
+>> +        return;                                                 \
+>> +    }                                                           \
+>> +    if (uimm > 12) {                                            \
+>
+> Throughout the helper you use es == sizeof(uint32_t), but here you
+> hardcode the assumption of 4 bytes, seems a bit inconsistent.
+>
+>> +        tcg_gen_movi_i64(cpu_vsrh(xT(ctx->opcode)), 0);         \
+>> +        tcg_gen_movi_i64(cpu_vsrl(xT(ctx->opcode)), 0);         \
+>> +        return;                                                 \
+>
+> So, I know the architecture says it is undefined.  But since you're
+> testing for the bogus case anyway, why not turn this into an
+> exception. That seems like it would be more helpful for debugging the
+> guest than just setting the result to zero.  Or is this done to match
+> actual hardware behaviour?
+
+I havent had a change to run on the real hardware, but on the system
+simulator, it happily
+returns extracted content even if UIMM > 12.
+
+Regards
+Nikunj
