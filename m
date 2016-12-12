@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50493)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36556)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cGUh1-00044F-OS
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 12:47:16 -0500
+	(envelope-from <wouter@grep.be>) id 1cGV5z-0005hU-4Z
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 13:13:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cGUgw-0007HE-OI
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 12:47:15 -0500
-Date: Mon, 12 Dec 2016 15:47:07 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20161212174707.GE3808@thinpad.lan.raisama.net>
-References: <148104617887.7699.984921868108236415.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-	<20161206191952.GD4027@thinpad.lan.raisama.net>
-	<20161206193159.GE4027@thinpad.lan.raisama.net>
-	<20161212132509.6a031fb6.cornelia.huck@de.ibm.com>
-	<f1f93b66-c414-9dce-ecc4-2239ceaa1774@linux.vnet.ibm.com>
+	(envelope-from <wouter@grep.be>) id 1cGV5w-0000MD-2e
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 13:13:03 -0500
+Received: from [2a01:4f8:140:52e5::2] (port=35592 helo=latin.grep.be)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <wouter@grep.be>) id 1cGV5v-0000DM-SV
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 13:13:00 -0500
+Date: Mon, 12 Dec 2016 19:12:37 +0100
+From: Wouter Verhelst <w@uter.be>
+Message-ID: <20161212181237.3aymdmenxeu2kwjj@grep.be>
+References: <20161205234235.5728-1-eblake@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <f1f93b66-c414-9dce-ecc4-2239ceaa1774@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [RFC for-2.8] machine: Convert abstract typename
- on compat_props to subclass names
+In-Reply-To: <20161205234235.5728-1-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [Nbd] [PATCH] doc: Propose NBD_FLAG_INIT_ZEROES
+ extension
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,81 +27,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Cornelia Huck <cornelia.huck@de.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>, qemu-stable@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: nbd-general@lists.sourceforge.net, xieyingtai@huawei.com, subo7@huawei.com, qemu-block@nongnu.org, stefanha@gmail.com, qemu-devel@nongnu.org, pbonzini@redhat.com
 
-On Mon, Dec 12, 2016 at 06:13:50PM +0100, Halil Pasic wrote:
+Hi Eric,
+
+I'm not opposed to this proposal, per se, but there seems to be some
+disagreement (by Kevin, for instance) on whether this extension is at
+all useful.
+
+If you can clarify that, I'll be happy to merge it.
+
+On Mon, Dec 05, 2016 at 05:42:35PM -0600, Eric Blake wrote:
+> While not directly related to NBD_CMD_WRITE_ZEROES, the qemu
+> team discovered that it is useful if a server can advertise
+> whether an export is in a known-all-zeroes state at the time
+> the client connects.
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>  doc/proto.md | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> This replaces the following qemu patch attempt:
+> https://lists.gnu.org/archive/html/qemu-devel/2016-12/msg00357.html
+> which tried to add NBD_CMD_HAS_ZERO_INIT with poor semantics. The
+> semantics in this proposal should be much better.
+> 
+> Patch is to the merge of the master branch and the
+> extension-write-zeroes branch.  By the way, qemu 2.8 is due
+> to be released "real soon now", and implements NBD_CMD_WRITE_ZEROES,
+> so maybe it is time to consider promoting the extension-write-zeroes
+> branch into master.
+> 
+> diff --git a/doc/proto.md b/doc/proto.md
+> index afe71fc..7e4ec7f 100644
+> --- a/doc/proto.md
+> +++ b/doc/proto.md
+> @@ -697,6 +697,11 @@ The field has the following format:
+>    the export.
+>  - bit 9, `NBD_FLAG_SEND_BLOCK_STATUS`: defined by the experimental
+>    `BLOCK_STATUS` [extension](https://github.com/NetworkBlockDevice/nbd/blob/extension-blockstatus/doc/proto.md).
+> +- bit 10, `NBD_FLAG_INIT_ZEROES`: Indicates that the server guarantees
+> +  that at the time transmission phase begins, all offsets within the
+> +  export read as zero bytes.  Clients MAY use this information to
+> +  avoid writing to sections of the export that should still read as
+> +  zero after the client is done writing.
+> 
+>  Clients SHOULD ignore unknown flags.
+> 
+> -- 
+> 2.9.3
 > 
 > 
-> On 12/12/2016 01:25 PM, Cornelia Huck wrote:
-> >> +        if (oc && object_class_is_abstract(oc)) {
-> >> +            /* temporary hack to make sure we will never override
->                                                ~~~~~~~~~~~~~~~~~~~~~~
+> ------------------------------------------------------------------------------
+> Developer Access Program for Intel Xeon Phi Processors
+> Access to Intel Xeon Phi processor-based developer platforms.
+> With one year of Intel Parallel Studio XE.
+> Training and support from Colfax.
+> Order your platform today.http://sdm.link/xeonphi
+> _______________________________________________
+> Nbd-general mailing list
+> Nbd-general@lists.sourceforge.net
+> https://lists.sourceforge.net/lists/listinfo/nbd-general
 > 
-> I would say this is not enough to provide that guarantee. Inheriting
-> from non-abstract, or something like I described below, would still
-> get us in trouble. Or am I wrong? 
-
-Yes, inheriting from non-abstract would still be broken, so this
-hack is not enough for some cases. In the current tree, it won't
-fix the problem for the spapr-pci-host-bridge properties.
-
-> 
-> How about s/we will never/we do not/?
-
-I will change it.
-
-> 
-> >> +             * globals set explicitly on -global: if an abstract class
-> >> +             * is on compat_props, register globals for each of their
-> >> +             * subclasses instead.
-> 
-> I'm not sure if this is clear enough regarding multilevel inheritance.
-> I would prefer "subtype" or "class derived from it".
-
-I can rewrite it as "for all of their subtypes".
-
-> 
-> >> +             */
-> > I think this should not just be a 'temporary hack'... rather document
-> > this behaviour for abstract classes?
-> > 
-> 
-> Connie, I have to disagree with you on this. I'm fine with this as a
-> temporary hack provided it remedies the acute problem, but I would this
-> becoming state of art.
-> 
-> The reason for this how abstract class is usually understood in OOP:
-> it's like a normal class except you can not instantiate it.  Adding an
-> extra property rule, and especially such a convoluted one, could result
-> in a conflict between intuition and reality.  And it's not like we have
-> no plan how to do this cleanly.
-> 
-> Why do I say convoluted:
-> * Inheriting form abstract and from non-abstract behaves differently.
-> * Theoretically we have something like non-abstract (C_3) inherits for
-> abstract (AC_2) inherits from non-abstract (C_1)  inherits from abstract
-> (AC_0), and we set the property P both via AC_0 and AC_2 for an instance
-> of C1 we would/could end up having the same problem as we have now (via
-> AC_0 taking precedence over AC_2) -- at least I think so. 
-
-Well, we could change the code to:
-1) Not check object_class_is_abstract(), and simply register the
-   globals for all subtypes;
-2) Call qdev_prop_set_globals_for_type() only for
-   object_class_get_name(), instead of doing it for all
-   parent classes in qdev_prop_set_globals().
-
-But this sounds like a more complicated way of implementing
-exactly the same behavior implemented by Greg Kurz in "qdev: fix
-the order compat and global properties are applied".
-
-> 
-> I did not test it either, but it looks sane to me. Regardless of the
-> comments on the comment (if you are going to consider them or not) you
-> can take my r-b.
-
-Thanks!
 
 -- 
-Eduardo
+< ron> I mean, the main *practical* problem with C++, is there's like a dozen
+       people in the world who think they really understand all of its rules,
+       and pretty much all of them are just lying to themselves too.
+ -- #debian-devel, OFTC, 2016-02-12
