@@ -1,20 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35055)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60740)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1cGRMw-0008Uo-Kx
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 09:14:22 -0500
+	(envelope-from <ilg@livius.net>) id 1cGSDQ-0006Om-1b
+	for Qemu-devel@nongnu.org; Mon, 12 Dec 2016 10:08:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1cGRMs-0000UF-Ao
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 09:14:18 -0500
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <468dbeb8-5b1b-669f-f7e5-0d24a4308da8@redhat.com>
-References: <cover.1481290956.git.berto@igalia.com>
-	<468dbeb8-5b1b-669f-f7e5-0d24a4308da8@redhat.com>
-Date: Mon, 12 Dec 2016 15:13:35 +0100
-Message-ID: <w51bmwhck1c.fsf@maestria.local.igalia.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH RFC 0/1] Allow storing the qcow2 L2 cache
- in disk
+	(envelope-from <ilg@livius.net>) id 1cGSDM-0005Vi-0V
+	for Qemu-devel@nongnu.org; Mon, 12 Dec 2016 10:08:32 -0500
+Received: from mail-wm0-f67.google.com ([74.125.82.67]:33065)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ilg@livius.net>) id 1cGSDL-0005VM-MZ
+	for Qemu-devel@nongnu.org; Mon, 12 Dec 2016 10:08:27 -0500
+Received: by mail-wm0-f67.google.com with SMTP id u144so11834514wmu.0
+	for <Qemu-devel@nongnu.org>; Mon, 12 Dec 2016 07:08:27 -0800 (PST)
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.1 \(3251\))
+From: Liviu Ionescu <ilg@livius.net>
+In-Reply-To: <20161212145117.GB21817@lemon>
+Date: Mon, 12 Dec 2016 17:07:24 +0200
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <F71562E4-2D12-4F28-AC3F-70463E91E6A5@livius.net>
+References: <20161212033512.GA3725@lemon>
+	<908F0328-771A-4269-8301-9A7D08BD585F@livius.net>
+	<20161212073915.GC3725@lemon>
+	<96DEA2D0-3822-4A8C-9950-973B84AF4182@livius.net>
+	<20161212093907.GA7918@lemon>
+	<151F368B-80DA-4DF6-837C-E2E0737E4AE6@livius.net>
+	<20161212103616.GB7918@lemon>
+	<220EB996-A454-4FB1-9BAD-B0F4A300345E@livius.net>
+	<20161212122803.GC7918@lemon>
+	<EA7E7748-CB11-49AB-ADBA-555A0A510611@livius.net>
+	<20161212145117.GB21817@lemon>
+Subject: Re: [Qemu-devel] experience with SDL2, event loop & main thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,63 +38,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: QEMU Developer <Qemu-devel@nongnu.org>
 
-On Fri 09 Dec 2016 03:21:08 PM CET, Max Reitz wrote:
 
->> In some scenarios, however, there's a different alternative: if the
->> qcow2 image is stored in a slow backend (eg. HDD), we could save
->> memory by putting the L2 cache in a faster one (SSD) instead of in
->> RAM.
+> On 12 Dec 2016, at 16:51, Fam Zheng <famz@redhat.com> wrote:
+>=20
+> On Mon, 12/12 15:22, Liviu Ionescu wrote:
+>> so, back to square one; any suggestion on how to avoid the periodic =
+timer
+>> required to poll SDL system events?
+>=20
+> Good question, I've missed that!
+>=20
+> Sadly I don't find it possible. The main thread of QEMU has to run the =
+glib
+> event loop so it cannot block on SDL_WaitEvent().
 
-> Well, from a full design standpoint, it doesn't make a lot of sense to
-> me:
->
-> We have a two-level on-disk structure for cluster mapping so as to not
-> waste memory for unused areas and so that we don't need to keep one
-> large continuous chunk of metadata. Accessing the disk is slow, so we
-> also have an in-memory cache which is just a single level fully
-> associative cache replicating the same data (but just a part of it).
->
-> Now you want to replicate all of it and store it on disk. My mind
-> tells me that is duplicate data: We already have all of the metadata
-> elsewhere on disk, namely in the qcow2 file, and even better, it is
-> not stored in a fully associative structure there but directly mapped,
-> making finding the correct entry much quicker.
+why should the glib event loop run as the main thread? according to my =
+tests, on linux and macos the glib event loop can run very well on a =
+regular thread.
 
-Yes but the use case is that the qcow2 image is stored in a slow disk,
-so things will be faster if we avoid having to read it too often.
+the problem that I encountered with this approach was on windows, where =
+there is no `poll()`, and the existing implementation of it in qemu does =
+not work if moved on a different thread. I do not know if the qemu =
+implementation is not correct, or the win32 api does not allow this.
 
-But the data is there and it needs to be read, so we have three options:
+> ... it cannot block on SDL_WaitEvent().
 
-  1) Read it everytime we need it. It slows things down.
-  2) Keep (part of) it in memory. It can use a lot of memory.
-  3) Keep it in a faster disk.
+initially I considered that rearranging threads to free the main thread =
+for a dedicated SDL loop that blocks on SDL_WaitEvent() is a good =
+solution, but then I took a look at how SDL_WaitEvent() is implemented: =
+a loop that sleeps 10 ms and checks if there are events in the queue. =
+:-(
 
-We're talking about 3) here, and this it not about creating new
-structures, but about changing the storage backend of the existing L2
-cache (disk rather than RAM).
+so the best solution would be to make SDL asynchronous and run it on the =
+glib event loop.
 
-> However, the thing is that the existing structures also only exist in
-> the original qcow2 file and cannot be just placed anywhere else, as
-> opposed to our cache. In order to solve this, we would need to
-> (incompatibly) modify the qcow2 format to allow storing data
-> independently from metadata. I think this would be certainly doable,
-> but the question is whether it is worth the effort.
+> Ideally SDL should provide an API to get a pollable fd (or a set of) =
+to allow
+> such types of integration, not much can be done from QEMU side in its =
+current
+> form.
 
-You mean split the qcow2 file in two: data and metadata? I don't think
-it's worth the effort.
+I'm glad you reached more or less the same conclusion as I mentioned in =
+one of the previous messages:
 
-> Maybe we can at least make the cache directly mapped if it is supposed
-> to cover the whole image? That is, we would basically just load all of
-> the L2 tables into memory and bypass the existing cache.
+> I guess making SDL run asynchronously will need some major changes to =
+the SDL
+> source code, not simple patches that can be added to the QEMU build.
 
-I don't see how this addresses the original use case that I described.
 
-But leaving that aside, would that improve anything? I don't think the
-cache itself adds any significant overhead here, IIRC even in your
-presentation at KVM Forum 2015 qcow2 was comparable to raw as long as
-all L2 tables were cached in memory.
+regards,
 
-Berto
+Liviu
