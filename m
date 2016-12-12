@@ -1,22 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43169)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47467)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cGPQw-0008LF-Gt
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 07:10:19 -0500
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cGPfV-00047W-Nz
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 07:25:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cGPQv-0006EJ-C1
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 07:10:18 -0500
-Date: Mon, 12 Dec 2016 13:10:04 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20161212121004.GA8868@noname.redhat.com>
-References: <cover.1481290956.git.berto@igalia.com>
-	<20161209141823.GC3992@noname.redhat.com>
-	<w51fulxw3k1.fsf@maestria.local.igalia.com>
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cGPfS-0002ym-58
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 07:25:21 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52430
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
+	id 1cGPfR-0002y6-Vt
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 07:25:18 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
+	uBCCOwuc079851
+	for <qemu-devel@nongnu.org>; Mon, 12 Dec 2016 07:25:17 -0500
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 279psmx28w-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 12 Dec 2016 07:25:16 -0500
+Received: from localhost
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
+	Mon, 12 Dec 2016 12:25:15 -0000
+Date: Mon, 12 Dec 2016 13:25:09 +0100
+From: Cornelia Huck <cornelia.huck@de.ibm.com>
+In-Reply-To: <20161206193159.GE4027@thinpad.lan.raisama.net>
+References: <148104617887.7699.984921868108236415.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+	<20161206191952.GD4027@thinpad.lan.raisama.net>
+	<20161206193159.GE4027@thinpad.lan.raisama.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <w51fulxw3k1.fsf@maestria.local.igalia.com>
-Subject: Re: [Qemu-devel] [PATCH RFC 0/1] Allow storing the qcow2 L2 cache
- in disk
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Message-Id: <20161212132509.6a031fb6.cornelia.huck@de.ibm.com>
+Subject: Re: [Qemu-devel] [RFC for-2.8] machine: Convert abstract typename
+ on compat_props to subclass names
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,66 +44,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org, Halil Pasic <pasic@linux.vnet.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-stable@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Am 09.12.2016 um 16:00 hat Alberto Garcia geschrieben:
-> On Fri 09 Dec 2016 03:18:23 PM CET, Kevin Wolf wrote:
-> >> I have been making some tests with exactly that scenario and the
-> >> results look good: storing the cache in disk gives roughly the same
-> >> performance as storing it in memory.
-> >> 
-> >> |---------------------+------------+------+------------+--------|
-> >> |                     | Random 4k reads   | Sequential 4k reads |
-> >> |                     | Throughput | IOPS | Throughput |  IOPS  |
-> >> |---------------------+------------+------+------------+--------|
-> >> | Cache in memory/SSD | 406 KB/s   |   99 | 84 MB/s    |  21000 |
-> >> | Default cache (1MB) | 200 KB/s   |   60 | 83 MB/s    |  21000 |
-> >> | No cache            | 200 KB/s   |   49 | 56 MB/s    |  14000 |
-> >> |---------------------+------------+------+------------+--------|
-> >> 
-> >> I'm including the patch that I used to get these results. This is the
-> >> simplest approach that I could think of.
-> >> 
-> >> Opinions, questions?
-> >
-> > I suppose you used the fact that the cache is now on disk to increase
-> > the cache size so that it covers the whole image?
+On Tue, 6 Dec 2016 17:31:59 -0200
+Eduardo Habkost <ehabkost@redhat.com> wrote:
+
+> What about this?
 > 
-> Right, the wording on the table is not clear, but that's what I did. I
-> also don't think this makes much sense if the cache is not big enough to
-> cover the whole image.
+> (untested)
+
+Have not tested it either, but I think it looks good. Some nits below.
+
 > 
-> > If so, are you sure that you aren't just testing that accessing memory
-> > in the kernel page cache is just as fast as accessing memory in qemu's
-> > own cache? It seems this would just bypass the cache size limit given
-> > to qemu by instead leaving things cached in the kernel where the limit
-> > doesn't apply.
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> ---
+>  hw/core/machine.c | 35 ++++++++++++++++++++++++++++++++---
+>  1 file changed, 32 insertions(+), 3 deletions(-)
 > 
-> Fair question: what I checked is that the PSS/RSS values match the
-> expected values (i.e, they don't grow as you read from the disk
-> image). If the kernel is caching those pages so accessing them after
-> MADV_DONTNEED does not require going to disk again is a possibility that
-> I haven't ruled out.
 
-This is what the man page says:
+> @@ -565,10 +584,20 @@ void machine_register_compat_props(MachineState *machine)
+>      }
+> 
+>      for (i = 0; i < mc->compat_props->len; i++) {
+> +        ObjectClass *oc;
 
-    Note that, when applied to shared mappings, MADV_DONTNEED might not
-    lead to immediate freeing of the pages in the range.  The kernel is
-    free to delay freeing the pages until an appropriate moment.  The
-    resident set size (RSS) of the calling process will be immediately
-    reduced however.
+Move the declaration out of the loop?
 
-I think it makes sense that this is what is happening in your case. Your
-patch uses MADV_DONTNEED after every single access, so even if you're
-using an SSD, accessing it should be slower than accessing memory. This
-means that at least for sequential I/O where cached tables are reused
-all the time, your patch would have to be considerably slower than the
-default cache.
+>          p = g_array_index(mc->compat_props, GlobalProperty *, i);
+> -        /* Machine compat_props must never cause errors: */
+> -        p->errp = &error_abort;
+> -        qdev_prop_register_global(p);
+> +        oc = object_class_by_name(p->driver);
+> +        if (oc && object_class_is_abstract(oc)) {
+> +            /* temporary hack to make sure we will never override
+> +             * globals set explicitly on -global: if an abstract class
+> +             * is on compat_props, register globals for each of their
+> +             * subclasses instead.
+> +             */
 
-Maybe try putting the image on some storage where you definitely notice
-whether the kernel accesses it or not. Using a floppy should be fun, but
-an NBD device connected to qemu-nbd with enabled throttling or tracing
-could do the job as well.
+I think this should not just be a 'temporary hack'... rather document
+this behaviour for abstract classes?
 
-Kevin
+> +            object_class_foreach(machine_register_compat_for_subclass,
+> +                                 p->driver, false, p);
+> +        } else {
+> +            register_compat_prop(p->driver, p->property, p->value);
+> +        }
+>      }
+>  }
+> 
