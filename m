@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54066)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39547)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cGR7a-00011b-8p
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 08:58:27 -0500
+	(envelope-from <pagupta@redhat.com>) id 1cGRWd-0002jB-TT
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 09:24:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cGR7Z-00062u-GU
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 08:58:26 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <87oa0q1t21.fsf@dusky.pond.sub.org> <20161207025457.GB30227@lemon>
-	<20161207094832.GA4773@noname.str.redhat.com>
-	<20161207100339.GB2286@lemon> <87shpybnbc.fsf@dusky.pond.sub.org>
-	<20161208134759.GA32226@lemon>
-Date: Mon, 12 Dec 2016 14:58:13 +0100
-In-Reply-To: <20161208134759.GA32226@lemon> (Fam Zheng's message of "Thu, 8
-	Dec 2016 21:47:59 +0800")
-Message-ID: <87wpf52qru.fsf@dusky.pond.sub.org>
+	(envelope-from <pagupta@redhat.com>) id 1cGRWX-00042Y-9J
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 09:24:19 -0500
+Received: from mx6-phx2.redhat.com ([209.132.183.39]:44722)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1cGRWX-00042J-01
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 09:24:13 -0500
+Date: Mon, 12 Dec 2016 09:24:10 -0500 (EST)
+From: Pankaj Gupta <pagupta@redhat.com>
+Message-ID: <1756197781.4269368.1481552650802.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20161212112255.GA21270@amt.cnet>
+References: <20161210172148.361793326@redhat.com>
+	<20161210172324.482367805@redhat.com>
+	<836450782.4168420.1481528215255.JavaMail.zimbra@redhat.com>
+	<20161212112255.GA21270@amt.cnet>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [Qemu-block]  Meeting notes on -blockdev,
- dynamic backend reconfiguration
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu patch V4 2/2] kvmclock: reduce kvmclock
+ difference on migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,97 +30,306 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Marcelo Tosatti <mtosatti@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org, Radim Krcmar <rkrcmar@redhat.com>, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, Dr David Alan Gilbert <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Fam Zheng <famz@redhat.com> writes:
 
-> On Thu, 12/08 13:46, Markus Armbruster wrote:
->> Fam Zheng <famz@redhat.com> writes:
->> 
->> > On Wed, 12/07 10:48, Kevin Wolf wrote:
->> >> > If so I think there is no race to worry about, mirror-filter should go
->> >> > away only after a QMP command.
->> >> 
->> >> Currently, a mirror job goes away whenever it is done. This is not
->> >> directly tied to a QMP command.
->> >
->> > Ah right, block-job-complete is only "start to complete" and the job goes away
->> > at some later point. I thought this is "the" QMP command but it is not.
->> >
->> >> 
->> >> Of course, in the new job API we want an explicit job-delete, so in
->> >> that case it wouldn't happen, but we need to keep the old case for
->> >> compatibility.
->> >
->> > Another possibility is to add a placeholder node in the right location first
->> > then fill in the actual throttling node once created. QMP owns the placeholder
->> > node so it won't suddenly vanish when mirror job goes away.
->> 
->> I'm not sure I understand this idea.  Could you explain it in a bit more
->> detail, perhaps even with a bit of ASCII art?
->
-> OK, I'll base on your version:
->
-> == Basic dynamic reconfiguration operation ==
->
-> The two primitives are "insert placeholder" and bdrv_replace_child;
->
-> A placeholder BDS is a dummy "pass through everything" filter. Inserting
-> placeholder is something like:
->
->     void bdrv_insert_placeholder(BdrvChild *child) {
->         BlockDriverState *ph = bdrv_new_placeholder();
->         ph->file->bs = child->bs;
->         child->bs = ph;
->     }
->
-> Consider:
->
->           BB
->           |
->     mirror-filter
->           |
->          BDS
->
-> Add a throttle filter under BB while the mirror job is running.  First step,
-> create the dummy _placeholder_ node and throttle-filter node (the existence of
-> placeholder node can be an implementation detail hidden from user):
->
->     placeholder = bdrv_insert_placeholder(BB->root);
->     throttle_filter = bdrv_create_throttle_filter(placeholder);
->
-> we get:
->
->           BB     throttle-filter
->           |     /
->      placeholder
->           |
->     mirror-filter
->           |
->          BDS
->
-> Second step, move throttle filter in:
->
->     bdrv_replace_child(BB->root, throttle_filter);
->     bdrv_replace_child(throttle_filter->file, throttle_filter->file->bs->file->bs);
->     bdrv_unref(placeholder);
->
-> we get:
->
->           BB
->           |
->    throttle-filter
->           |
->     mirror-filter
->           |
->          BDS
->
-> Does this make us safe from racing with mirror-filter disappearing?
+> 
+> On Mon, Dec 12, 2016 at 02:36:55AM -0500, Pankaj Gupta wrote:
+> > 
+> > Hello Marcelo,
+> 
+> Hi Pankaj,
+> 
+> > > Check for KVM_CAP_ADJUST_CLOCK capability KVM_CLOCK_TSC_STABLE, which
+> > > indicates that KVM_GET_CLOCK returns a value as seen by the guest at
+> > > that moment.
+> > > 
+> > > For new machine types, use this value rather than reading
+> > > from guest memory.
+> > > 
+> > > This reduces kvmclock difference on migration from 5s to 0.1s
+> > > (when max_downtime == 5s).
+> > > 
+> > > Note: pre_save contradicts the following comment
+> > >         /*
+> > >          * If the VM is stopped, declare the clock state valid to
+> > >          * avoid re-reading it on next vmsave (which would return
+> > >          * a different value). Will be reset when the VM is continued.
+> > >          */
+> > > But the comment is bogus: vm_state_change is never called twice in a row
+> > > with running=0 or running=1.
+> > > 
+> > > Signed-off-by: Marcelo Tosatti <mtosatti@redhat.com>
+> > > 
+> > > ---
+> > >  hw/i386/kvm/clock.c    |  107
+> > >  ++++++++++++++++++++++++++++++++++++++++++-------
+> > >  include/hw/i386/pc.h   |    5 ++
+> > >  target-i386/kvm.c      |    7 +++
+> > >  target-i386/kvm_i386.h |    1
+> > >  4 files changed, 106 insertions(+), 14 deletions(-)
+> > > 
+> > > v2:
+> > > - improve variable names (Juan)
+> > > - consolidate code on kvm_get_clock function (Paolo)
+> > > - return mach_use_reliable_get_clock from needed function (Paolo)
+> > > v3:
+> > > - simplify check for src_use_reliable_get_clock (Eduardo)
+> > > - move src_use_reliable_get_clock initialization to realize (Eduardo)
+> > > 
+> > > v4:
+> > > - have kvm_get_clock and clock_is_reliable assignments synchronized
+> > > (Eduardo)
+> > > - add comment to the reasoning of kvmclock_pre_save (Eduardo)
+> > > 
+> > > 
+> > > Index: qemu-mig-advance-clock/hw/i386/kvm/clock.c
+> > > ===================================================================
+> > > --- qemu-mig-advance-clock.orig/hw/i386/kvm/clock.c	2016-11-17
+> > > 15:07:11.220632761 -0200
+> > > +++ qemu-mig-advance-clock/hw/i386/kvm/clock.c	2016-12-10
+> > > 13:57:58.115983966
+> > > -0200
+> > > @@ -36,6 +36,13 @@
+> > >  
+> > >      uint64_t clock;
+> > >      bool clock_valid;
+> > > +
+> > > +    /* whether machine type supports reliable get clock */
+> > > +    bool mach_use_reliable_get_clock;
+> > > +
+> > > +    /* whether the 'clock' value was obtained in a host with
+> > > +     * reliable KVM_GET_CLOCK */
+> > > +    bool clock_is_reliable;
+> > >  } KVMClockState;
+> > >  
+> > >  struct pvclock_vcpu_time_info {
+> > > @@ -81,6 +88,19 @@
+> > >      return nsec + time.system_time;
+> > >  }
+> > >  
+> > > +static uint64_t kvm_get_clock(void)
+> > > +{
+> > > +    struct kvm_clock_data data;
+> > > +    int ret;
+> > > +
+> > > +    ret = kvm_vm_ioctl(kvm_state, KVM_GET_CLOCK, &data);
+> > > +    if (ret < 0) {
+> > > +        fprintf(stderr, "KVM_GET_CLOCK failed: %s\n", strerror(ret));
+> > > +                abort();
+> > > +    }
+> > > +    return data.clock;
+> > > +}
+> > > +
+> > >  static void kvmclock_vm_state_change(void *opaque, int running,
+> > >                                       RunState state)
+> > >  {
+> > > @@ -91,15 +111,23 @@
+> > >  
+> > >      if (running) {
+> > >          struct kvm_clock_data data = {};
+> > > -        uint64_t time_at_migration = kvmclock_current_nsec(s);
+> > > +        uint64_t pvclock_via_mem = 0;
+> > >  
+> > > -        s->clock_valid = false;
+> > > +        /*
+> > > +         * If the host where s->clock was read did not support reliable
+> > > +         * KVM_GET_CLOCK, read kvmclock value from memory.
+> > > +         */
+> > > +        if (!s->clock_is_reliable) {
+> > > +            pvclock_via_mem = kvmclock_current_nsec(s);
+> > > +        }
+> > >  
+> > > -        /* We can't rely on the migrated clock value, just discard it */
+> > > -        if (time_at_migration) {
+> > > -            s->clock = time_at_migration;
+> > > +        /* We can't rely on the saved clock value, just discard it */
+> > > +        if (pvclock_via_mem) {
+> > > +            s->clock = pvclock_via_mem;
+> > >          }
+> > >  
+> > > +        s->clock_valid = false;
+> > > +
+> > >          data.clock = s->clock;
+> > >          ret = kvm_vm_ioctl(kvm_state, KVM_SET_CLOCK, &data);
+> > >          if (ret < 0) {
+> > > @@ -120,8 +148,6 @@
+> > >              }
+> > >          }
+> > >      } else {
+> > > -        struct kvm_clock_data data;
+> > > -        int ret;
+> > >  
+> > >          if (s->clock_valid) {
+> > >              return;
+> > > @@ -129,13 +155,11 @@
+> > >  
+> > >          kvm_synchronize_all_tsc();
+> > >  
+> > > -        ret = kvm_vm_ioctl(kvm_state, KVM_GET_CLOCK, &data);
+> > > -        if (ret < 0) {
+> > > -            fprintf(stderr, "KVM_GET_CLOCK failed: %s\n",
+> > > strerror(ret));
+> > > -            abort();
+> > > -        }
+> > > -        s->clock = data.clock;
+> > > -
+> > > +        s->clock = kvm_get_clock();
+> > > +        /* any code that sets s->clock needs to ensure clock_is_reliable
+> > > +         * is correctly set.
+> > > +         */
+> > > +        s->clock_is_reliable = kvm_has_adjust_clock_stable();
+> >           
+> > Is it required to call  'kvm_has_adjust_clock_stable' here. Is there any
+> > chance
+> > of getting different value then in 'realize'?
+> 
+> Yes it can happen: migration overwrites s->clock_is_reliable value (but
+> you can't see that from grepping).
 
-Thanks!  I figure your placeholder node does immunize the splicing in of
-the throttle-filter against the removal of mirror-filter.
-
-Given a specific dynamic reconfiguration, where do we have to put
-placeholder nodes to immunize it against arbitrary other dynamic
-changes?
+o.k. 
+> 
+> > >           * If the VM is stopped, declare the clock state valid to
+> > >           * avoid re-reading it on next vmsave (which would return
+> > > @@ -149,25 +173,80 @@
+> > >  {
+> > >      KVMClockState *s = KVM_CLOCK(dev);
+> > >  
+> > > +    if (kvm_has_adjust_clock_stable()) {
+> > > +        s->clock_is_reliable = true;
+> > > +    }
+> > > +
+> > >      qemu_add_vm_change_state_handler(kvmclock_vm_state_change, s);
+> > >  }
+> > >  
+> > > +static bool kvmclock_clock_is_reliable_needed(void *opaque)
+> > > +{
+> > > +    KVMClockState *s = opaque;
+> > > +
+> > > +    return s->mach_use_reliable_get_clock;
+> > > +}
+> > > +
+> > > +static const VMStateDescription kvmclock_reliable_get_clock = {
+> > > +    .name = "kvmclock/clock_is_reliable",
+> > > +    .version_id = 1,
+> > > +    .minimum_version_id = 1,
+> > > +    .needed = kvmclock_clock_is_reliable_needed,
+> > > +    .fields = (VMStateField[]) {
+> > > +        VMSTATE_BOOL(clock_is_reliable, KVMClockState),
+> > > +        VMSTATE_END_OF_LIST()
+> > > +    }
+> > > +};
+> > > +
+> > > +/*
+> > > + * When migrating, read the clock just before migration,
+> > > + * so that the guest clock counts during the events
+> > > + * between:
+> > > + *
+> > > + *  * vm_stop()
+> > > + *  *
+> > > + *  * pre_save()
+> > > + *
+> > > + *  This reduces kvmclock difference on migration from 5s
+> > > + *  to 0.1s (when max_downtime == 5s), because sending the
+> > > + *  final pages of memory (which happens between vm_stop()
+> > > + *  and pre_save()) takes max_downtime.
+> > > + */
+> > > +static void kvmclock_pre_save(void *opaque)
+> > > +{
+> > > +    KVMClockState *s = opaque;
+> > > +
+> > > +    s->clock = kvm_get_clock();
+> > > +}
+> > > +
+> > >  static const VMStateDescription kvmclock_vmsd = {
+> > >      .name = "kvmclock",
+> > >      .version_id = 1,
+> > >      .minimum_version_id = 1,
+> > > +    .pre_save = kvmclock_pre_save,
+> > >      .fields = (VMStateField[]) {
+> > >          VMSTATE_UINT64(clock, KVMClockState),
+> > >          VMSTATE_END_OF_LIST()
+> > > +    },
+> > > +    .subsections = (const VMStateDescription * []) {
+> > > +        &kvmclock_reliable_get_clock,
+> > > +        NULL
+> > >      }
+> > >  };
+> > >  
+> > > +static Property kvmclock_properties[] = {
+> > > +    DEFINE_PROP_BOOL("x-mach-use-reliable-get-clock", KVMClockState,
+> > > +                      mach_use_reliable_get_clock, true),
+> > > +    DEFINE_PROP_END_OF_LIST(),
+> > > +};
+> > > +
+> > >  static void kvmclock_class_init(ObjectClass *klass, void *data)
+> > >  {
+> > >      DeviceClass *dc = DEVICE_CLASS(klass);
+> > >  
+> > >      dc->realize = kvmclock_realize;
+> > >      dc->vmsd = &kvmclock_vmsd;
+> > > +    dc->props = kvmclock_properties;
+> > >  }
+> > >  
+> > >  static const TypeInfo kvmclock_info = {
+> > > Index: qemu-mig-advance-clock/include/hw/i386/pc.h
+> > > ===================================================================
+> > > --- qemu-mig-advance-clock.orig/include/hw/i386/pc.h	2016-11-17
+> > > 15:07:11.220632761 -0200
+> > > +++ qemu-mig-advance-clock/include/hw/i386/pc.h	2016-11-17
+> > > 15:08:58.096791416
+> > > -0200
+> > > @@ -370,6 +370,11 @@
+> > >  #define PC_COMPAT_2_7 \
+> > >      HW_COMPAT_2_7 \
+> > >      {\
+> > > +        .driver   = "kvmclock",\
+> > > +        .property = "x-mach-use-reliable-get-clock",\
+> > > +        .value    = "off",\
+> > > +    },\
+> > > +    {\
+> > >          .driver   = TYPE_X86_CPU,\
+> > >          .property = "l3-cache",\
+> > >          .value    = "off",\
+> > > Index: qemu-mig-advance-clock/target-i386/kvm.c
+> > > ===================================================================
+> > > --- qemu-mig-advance-clock.orig/target-i386/kvm.c	2016-11-17
+> > > 15:07:11.221632762 -0200
+> > > +++ qemu-mig-advance-clock/target-i386/kvm.c	2016-11-17
+> > > 15:07:15.867639659
+> > > -0200
+> > > @@ -117,6 +117,13 @@
+> > >      return kvm_check_extension(kvm_state, KVM_CAP_X86_SMM);
+> > >  }
+> > >  
+> > > +bool kvm_has_adjust_clock_stable(void)
+> > > +{
+> > > +    int ret = kvm_check_extension(kvm_state, KVM_CAP_ADJUST_CLOCK);
+> > > +
+> > > +    return (ret == KVM_CLOCK_TSC_STABLE);
+> > > +}
+> > > +
+> > >  bool kvm_allows_irq0_override(void)
+> > >  {
+> > >      return !kvm_irqchip_in_kernel() || kvm_has_gsi_routing();
+> > > Index: qemu-mig-advance-clock/target-i386/kvm_i386.h
+> > > ===================================================================
+> > > --- qemu-mig-advance-clock.orig/target-i386/kvm_i386.h	2016-11-17
+> > > 15:07:11.222632764 -0200
+> > > +++ qemu-mig-advance-clock/target-i386/kvm_i386.h	2016-11-17
+> > > 15:07:15.867639659 -0200
+> > > @@ -17,6 +17,7 @@
+> > >  
+> > >  bool kvm_allows_irq0_override(void);
+> > >  bool kvm_has_smm(void);
+> > > +bool kvm_has_adjust_clock_stable(void);
+> > >  void kvm_synchronize_all_tsc(void);
+> > >  void kvm_arch_reset_vcpu(X86CPU *cs);
+> > >  void kvm_arch_do_init_vcpu(X86CPU *cs);
+> > > 
+> > > 
+> > > 
+> > > 
+> 
+> 
