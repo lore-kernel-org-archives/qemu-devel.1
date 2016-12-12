@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33258)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54346)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ossman@cendio.se>) id 1cGMdd-0000QT-SJ
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 04:11:14 -0500
+	(envelope-from <famz@redhat.com>) id 1cGN4k-0006Br-Oh
+	for Qemu-devel@nongnu.org; Mon, 12 Dec 2016 04:39:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ossman@cendio.se>) id 1cGMdc-0004cN-Ce
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 04:11:13 -0500
-Received: from lists.cendio.se ([2a00:801:107:f000::b]:57368
-	helo=mail.cendio.se)
+	(envelope-from <famz@redhat.com>) id 1cGN4h-0001st-MS
+	for Qemu-devel@nongnu.org; Mon, 12 Dec 2016 04:39:14 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55506)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ossman@cendio.se>) id 1cGMdc-0004bm-6e
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 04:11:12 -0500
-Received: from ossman.lkpg.cendio.se (unknown
-	[IPv6:2a00:801:107:4700:92b1:1cff:fe97:f932])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by mail.cendio.se (Postfix) with ESMTPSA id 3904EC0A4AEC
-	for <qemu-devel@nongnu.org>; Mon, 12 Dec 2016 10:11:07 +0100 (CET)
-References: <f460049b-211e-194b-d4c3-a3cc34e4d289@cendio.se>
-From: Pierre Ossman <ossman@cendio.se>
-Message-ID: <27705b01-d582-d155-4490-15522258c3ef@cendio.se>
-Date: Mon, 12 Dec 2016 10:11:07 +0100
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1cGN4h-0001sd-GS
+	for Qemu-devel@nongnu.org; Mon, 12 Dec 2016 04:39:11 -0500
+Date: Mon, 12 Dec 2016 17:39:07 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20161212093907.GA7918@lemon>
+References: <6BBB3038-0389-4221-9A41-63800F3FF514@livius.net>
+	<20161212033512.GA3725@lemon>
+	<908F0328-771A-4269-8301-9A7D08BD585F@livius.net>
+	<20161212073915.GC3725@lemon>
+	<96DEA2D0-3822-4A8C-9950-973B84AF4182@livius.net>
 MIME-Version: 1.0
-In-Reply-To: <f460049b-211e-194b-d4c3-a3cc34e4d289@cendio.se>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] VNC LED state buggy, interop issue
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <96DEA2D0-3822-4A8C-9950-973B84AF4182@livius.net>
+Subject: Re: [Qemu-devel] experience with SDL2, event loop & main thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,35 +30,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Liviu Ionescu <ilg@livius.net>
+Cc: QEMU Developer <Qemu-devel@nongnu.org>
 
-On 10/12/16 16:30, Pierre Ossman wrote:
->
-> There are two ways to fix this:
->
->  a) Send an update to the client when the assumption doesn't hold. This
-> will most likely be difficult in your case since there is no definite
-> point where you can assume a LED change event should have occurred.
->
->  b) Remove the assumption from the code and the protocol.
->
-> My vote is for b). Assumptions and side effects are rarely a good idea.
-> The downside though is that it will break compatibility with older
-> versions of QEMU.
->
+On Mon, 12/12 09:43, Liviu Ionescu wrote:
+> 
+> > On 12 Dec 2016, at 09:39, Fam Zheng <famz@redhat.com> wrote:
+> > 
+> >> any idea how difficult would be to push any changes to SDL?
+> > 
+> > Not sure I understand this question, could you be more specific?
+> 
+> I guess making SDL run asynchronously will need some major changes to the SDL
+> source code, not simple patches that can be added to the QEMU build.
+> 
+> do you know someone who can not only implement the patches, but also push them
+> to the mainstream SDL repository, to have them available to everyone?
 
-Follow-up: Reading the initial proposal, it does indeed seem that b) was=20
-the intended behaviour:
+Sorry I have no idea how to answer that.. Anyone can contribute since it is an
+open source project, but I myself know next to nothing about SDL project.
 
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg165162.html
-
-Regards
---=20
-Pierre Ossman           Software Development
-Cendio AB               https://cendio.com
-Teknikringen 8          https://twitter.com/ThinLinc
-583 30 Link=C3=B6ping        https://facebook.com/ThinLinc
-Phone: +46-13-214600    https://plus.google.com/+CendioThinLinc
-
-A: Because it messes up the order in which people normally read text.
-Q: Why is top-posting such a bad thing?
+Fam
