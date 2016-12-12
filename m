@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33869)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35149)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cGYiv-0000Qb-Mp
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 17:05:30 -0500
+	(envelope-from <mst@redhat.com>) id 1cGYmw-00029B-Dr
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 17:09:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cGYis-0007nP-Hf
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 17:05:29 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36350)
+	(envelope-from <mst@redhat.com>) id 1cGYmt-0000VO-6q
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 17:09:38 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52438)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cGYis-0007nB-BN
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 17:05:26 -0500
-Date: Tue, 13 Dec 2016 00:05:19 +0200
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cGYms-0000Ui-VD
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 17:09:35 -0500
+Date: Tue, 13 Dec 2016 00:09:33 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20161212234941-mutt-send-email-mst@kernel.org>
-References: <1481171829-116496-1-git-send-email-arei.gonglei@huawei.com>
-	<1481171829-116496-3-git-send-email-arei.gonglei@huawei.com>
-	<33183CC9F5247A488A2544077AF19020DA15A07C@DGGEMA505-MBX.china.huawei.com>
-	<20161212105407.GA3033@gondor.apana.org.au>
+Message-ID: <20161213000816-mutt-send-email-mst@kernel.org>
+References: <20161209203954.GW4027@thinpad.lan.raisama.net>
+	<584E36CD.50405@cn.fujitsu.com>
+	<20161212172915.GP4074@stefanha-x1.localdomain>
+	<20161212202617-mutt-send-email-mst@kernel.org>
+	<20161212185730.GG3808@thinpad.lan.raisama.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20161212105407.GA3033@gondor.apana.org.au>
-Subject: Re: [Qemu-devel] [PATCH v6 2/2] crypto: add virtio-crypto driver
+In-Reply-To: <20161212185730.GG3808@thinpad.lan.raisama.net>
+Subject: Re: [Qemu-devel] Reproducible crash on PCIe hotplug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,32 +30,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "Gonglei (Arei)" <arei.gonglei@huawei.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>, Luonengjun <luonengjun@huawei.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "Wubin (H)" <wu.wubin@huawei.com>, "xin.zeng@intel.com" <xin.zeng@intel.com>, Claudio Fontana <Claudio.Fontana@huawei.com>, "pasic@linux.vnet.ibm.com" <pasic@linux.vnet.ibm.com>, "davem@davemloft.net" <davem@davemloft.net>, "Zhoujian (jay, Euler)" <jianjay.zhou@huawei.com>, "Hanweidong (Randy)" <hanweidong@huawei.com>, "arei.gonglei@hotmail.com" <arei.gonglei@hotmail.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "Xuquan (Quan Xu)" <xuquan8@huawei.com>, longpeng <longpeng2@huawei.com>, "Wanzongshun (Vincent)" <wanzongshun@huawei.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Cao jin <caoj.fnst@cn.fujitsu.com>
 
-On Mon, Dec 12, 2016 at 06:54:07PM +0800, Herbert Xu wrote:
-> On Mon, Dec 12, 2016 at 06:25:12AM +0000, Gonglei (Arei) wrote:
-> > Hi, Michael & Herbert
+On Mon, Dec 12, 2016 at 04:57:30PM -0200, Eduardo Habkost wrote:
+> On Mon, Dec 12, 2016 at 08:41:41PM +0200, Michael S. Tsirkin wrote:
+> > On Mon, Dec 12, 2016 at 05:29:15PM +0000, Stefan Hajnoczi wrote:
+> > > On Mon, Dec 12, 2016 at 01:34:05PM +0800, Cao jin wrote:
+> > > > 
+> > > > 
+> > > > On 12/10/2016 04:39 AM, Eduardo Habkost wrote:
+> > > > > Using latest qemu.git master:
+> > > > > 
+> > > > >   $ qemu-system-x86_64 -machine q35 -readconfig docs/q35-chipset.cfg -monitor stdio
+> > > > >   QEMU 2.7.93 monitor - type 'help' for more information
+> > > > >   (qemu) device_add e1000e,bus=ich9-pcie-port-4,addr=00
+> > > > >   (qemu) device_add e1000e,bus=ich9-pcie-port-4,addr=08
+> > > > >   Segmentation fault (core dumped)
+> > > > > 
+> > > > > It crashes at:
+> > > > > 
+> > > > >   #7  0x000055555598d7dc in do_pci_register_device (errp=0x7fffffffbfd0, devfn=64, name=0x5555565df340 "e1000e", bus=0x555558487380, pci_dev=0x5555589cd000)
+> > > > >       at /home/ehabkost/rh/proj/virt/qemu/hw/pci/pci.c:983
+> > > > >   983             error_setg(errp, "PCI: slot %d function 0 already ocuppied by %s,"
+> > > > >   (gdb) l
+> > > > >   978                        PCI_SLOT(devfn), PCI_FUNC(devfn), name,
+> > > > >   979                        bus->devices[devfn]->name);
+> > > > >   980             return NULL;
+> > > > >   981         } else if (dev->hotplugged &&
+> > > > >   982                    pci_get_function_0(pci_dev)) {
+> > > > >   983             error_setg(errp, "PCI: slot %d function 0 already ocuppied by %s,"
+> > > > >   984                        " new func %s cannot be exposed to guest.",
+> > > > >   985                        PCI_SLOT(devfn),
+> > > > >   986                        bus->devices[PCI_DEVFN(PCI_SLOT(devfn), 0)]->name,
+> > > > >   987                        name);
+> > > > > 
+> > > > 
+> > > > Thanks for informing me. I am kind of busy for now, so I suppose I will
+> > > > investigate it after 2.8 release.
+> > > 
+> > > Please let me know if this should be considered a release blocker.
+> > > 
+> > > The proposed QEMU 2.8 release date is tomorrow (December 13th)!
+> > > 
+> > > Stefan
 > > 
-> > Because the virtio-crypto device emulation had been in QEMU 2.8,
-> > would you please merge the virtio-crypto driver for 4.10 if no other
-> > comments? If so, Miachel pls ack and/or review the patch, then
-> > Herbert will take it (I asked him last week). Thank you!
-> > 
-> > Ps: Note on 4.10 merge window timing from Linus
-> >  https://lkml.org/lkml/2016/12/7/506
-> > 
-> > Dec 23rd is the deadline for 4.10 merge window.
+> > I don't see how it's a blocker, it's an illegal configuration.
+> > Here's the fix. It's a rather obvious one.
+> > I'll target the fix for 2.9.
+> > Eduardo, I'd appreciate a tested-by tag.
 > 
-> Sorry but it's too late for 4.10.  It needed to have been in my
-> tree before the merge window opened to make it for this cycle.
+> I confirm the patch fixes the crash, but the error message seems
+> incorrect: the existing e1000e device is on slot 0 function 0,
+> not slot 8.
 > 
-> Cheers,
-
-
-Objections to me merging this? I'm preparing my tree right now.
-
+>   $ ./x86-kvm-build/x86_64-softmmu/qemu-system-x86_64 -machine q35 -readconfig docs/q35-chipset.cfg -monitor stdio
+>   QEMU 2.7.93 monitor - type 'help' for more information
+>   (qemu) device_add e1000e,bus=ich9-pcie-port-4,addr=00
+>   (qemu) device_add e1000e,bus=ich9-pcie-port-4,addr=08
+>   PCI: slot 8 function 0 already ocuppied by e1000e, new func e1000e cannot be exposed to guest.
+>            ^^^
+> 
+> 
+> > 
+> > -->
+> > 
+> > pci: fix error message for express slots
+> > 
+> > PCI Express downstream slot has a single PCI slot
+> > behind it, using PCI_DEVFN(PCI_SLOT(devfn), 0)
+> > does not give you function 0 in cases such as ARI
+> > as well as some error cases.
+> > 
+> > This is exactly what we are hitting:
+> >    $ qemu-system-x86_64 -machine q35 -readconfig docs/q35-chipset.cfg -monitor stdio
+> >    (qemu) device_add e1000e,bus=ich9-pcie-port-4,addr=00
+> >    (qemu) device_add e1000e,bus=ich9-pcie-port-4,addr=08
+> >    Segmentation fault (core dumped)
+> > 
+> > The fix is to use the pci_get_function_0 API.
+> > 
+> > Cc: qemu-stable@nongnu.org
+> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > Reported-by: Eduardo Habkost <ehabkost@redhat.com>
+> > ---
+> > 
+> > diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+> > index 24fae16..339c531 100644
+> > --- a/hw/pci/pci.c
+> > +++ b/hw/pci/pci.c
+> > @@ -983,7 +983,7 @@ static PCIDevice *do_pci_register_device(PCIDevice *pci_dev, PCIBus *bus,
+> >          error_setg(errp, "PCI: slot %d function 0 already ocuppied by %s,"
+> >                     " new func %s cannot be exposed to guest.",
+> >                     PCI_SLOT(devfn),
+> > -                   bus->devices[PCI_DEVFN(PCI_SLOT(devfn), 0)]->name,
+> > +                   pci_get_function_0(pci_dev)->name,
+> >                     name);
+> >  
+> >         return NULL;
+> > 
+> > -- 
+> > MST
+> 
 > -- 
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+
+
+
+this then?
+
+
+diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+index 339c531..637d545 100644
+--- a/hw/pci/pci.c
++++ b/hw/pci/pci.c
+@@ -982,7 +982,7 @@ static PCIDevice *do_pci_register_device(PCIDevice *pci_dev, PCIBus *bus,
+                pci_get_function_0(pci_dev)) {
+         error_setg(errp, "PCI: slot %d function 0 already ocuppied by %s,"
+                    " new func %s cannot be exposed to guest.",
+-                   PCI_SLOT(devfn),
++                   PCI_SLOT(pci_get_function_0(pci_dev)->devfn),
+                    pci_get_function_0(pci_dev)->name,
+                    name);
+ 
