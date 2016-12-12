@@ -1,21 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48085)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33258)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1cGLfx-0006lI-Bn
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 03:09:34 -0500
+	(envelope-from <ossman@cendio.se>) id 1cGMdd-0000QT-SJ
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 04:11:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1cGLft-0007C8-B5
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 03:09:33 -0500
-Received: from szxga01-in.huawei.com ([58.251.152.64]:35976)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1cGLfs-00071e-JM
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 03:09:29 -0500
-From: "Longpeng(Mike)" <longpeng2@huawei.com>
-Date: Mon, 12 Dec 2016 16:08:05 +0800
-Message-ID: <1481530092-20240-1-git-send-email-longpeng2@huawei.com>
+	(envelope-from <ossman@cendio.se>) id 1cGMdc-0004cN-Ce
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 04:11:13 -0500
+Received: from lists.cendio.se ([2a00:801:107:f000::b]:57368
+	helo=mail.cendio.se)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ossman@cendio.se>) id 1cGMdc-0004bm-6e
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 04:11:12 -0500
+Received: from ossman.lkpg.cendio.se (unknown
+	[IPv6:2a00:801:107:4700:92b1:1cff:fe97:f932])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by mail.cendio.se (Postfix) with ESMTPSA id 3904EC0A4AEC
+	for <qemu-devel@nongnu.org>; Mon, 12 Dec 2016 10:11:07 +0100 (CET)
+References: <f460049b-211e-194b-d4c3-a3cc34e4d289@cendio.se>
+From: Pierre Ossman <ossman@cendio.se>
+Message-ID: <27705b01-d582-d155-4490-15522258c3ef@cendio.se>
+Date: Mon, 12 Dec 2016 10:11:07 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH for-2.9 v2 0/7] crypto: add HMAC algorithms
- support
+In-Reply-To: <f460049b-211e-194b-d4c3-a3cc34e4d289@cendio.se>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] VNC LED state buggy, interop issue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,45 +33,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: eblake@redhat.com, armbru@redhat.com, berrange@redhat.com, stefanha@redhat.com
-Cc: wu.wubin@huawei.com, jianjay.zhou@huawei.com, arei.gonglei@huawei.com, qemu-devel@nongnu.org, "Longpeng(Mike)" <longpeng2@huawei.com>
+To: qemu-devel@nongnu.org
 
-Since QEMU has been supported cryptodev, so it is necessary to support
-more crypto algorithms(i.e. hmac,aead) in QEMU backend.
+On 10/12/16 16:30, Pierre Ossman wrote:
+>
+> There are two ways to fix this:
+>
+>  a) Send an update to the client when the assumption doesn't hold. This
+> will most likely be difficult in your case since there is no definite
+> point where you can assume a LED change event should have occurred.
+>
+>  b) Remove the assumption from the code and the protocol.
+>
+> My vote is for b). Assumptions and side effects are rarely a good idea.
+> The downside though is that it will break compatibility with older
+> versions of QEMU.
+>
 
-This patchset add HMAC algorithms support.
+Follow-up: Reading the initial proposal, it does indeed seem that b) was=20
+the intended behaviour:
 
----
-Changes since v1:
-    - check whether algorithm is supported in testcase [build test]
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg165162.html
 
----
-Longpeng(Mike) (7):
-  qapi: crypto: add defination about HMAC algorithms
-  crypto: add HMAC algorithms framework
-  configure: add CONFIG_GCRYPT_SUPPORT_HMAC item
-  crypto: support HMAC algorithms based on libgcrypt
-  crypto: support HMAC algorithms based on glibc
-  crypto: support HMAC algorithms based on nettle
-  crypto: add HMAC algorithms testcases
+Regards
+--=20
+Pierre Ossman           Software Development
+Cendio AB               https://cendio.com
+Teknikringen 8          https://twitter.com/ThinLinc
+583 30 Link=C3=B6ping        https://facebook.com/ThinLinc
+Phone: +46-13-214600    https://plus.google.com/+CendioThinLinc
 
- configure                |  18 +++++
- crypto/Makefile.objs     |   4 ++
- crypto/hmac-gcrypt.c     | 182 +++++++++++++++++++++++++++++++++++++++++++++++
- crypto/hmac-glib.c       | 163 ++++++++++++++++++++++++++++++++++++++++++
- crypto/hmac-nettle.c     | 156 ++++++++++++++++++++++++++++++++++++++++
- crypto/hmac.c            |  72 +++++++++++++++++++
- crypto/hmac.h            | 166 ++++++++++++++++++++++++++++++++++++++++++
- qapi/crypto.json         |  17 +++++
- tests/Makefile.include   |   2 +
- tests/test-crypto-hmac.c | 166 ++++++++++++++++++++++++++++++++++++++++++
- 10 files changed, 946 insertions(+)
- create mode 100644 crypto/hmac-gcrypt.c
- create mode 100644 crypto/hmac-glib.c
- create mode 100644 crypto/hmac-nettle.c
- create mode 100644 crypto/hmac.c
- create mode 100644 crypto/hmac.h
- create mode 100644 tests/test-crypto-hmac.c
-
--- 
-1.8.3.1
+A: Because it messes up the order in which people normally read text.
+Q: Why is top-posting such a bad thing?
