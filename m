@@ -1,21 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44320)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36280)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cGUWv-0007Iq-Gl
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 12:36:50 -0500
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1cGUAs-0006mx-0d
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 12:14:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cGUWq-0002Wo-Ev
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 12:36:49 -0500
-Date: Mon, 12 Dec 2016 15:36:41 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20161212173641.GD3808@thinpad.lan.raisama.net>
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1cGUAn-0003Da-W1
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 12:14:01 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59265
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1cGUAn-0003DM-Pk
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 12:13:57 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
+	uBCHABgR036156
+	for <qemu-devel@nongnu.org>; Mon, 12 Dec 2016 12:13:56 -0500
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 27a0200an9-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 12 Dec 2016 12:13:56 -0500
+Received: from localhost
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Mon, 12 Dec 2016 17:13:54 -0000
 References: <148104617887.7699.984921868108236415.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
 	<20161206191952.GD4027@thinpad.lan.raisama.net>
 	<20161206193159.GE4027@thinpad.lan.raisama.net>
 	<20161212132509.6a031fb6.cornelia.huck@de.ibm.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Mon, 12 Dec 2016 18:13:50 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
 In-Reply-To: <20161212132509.6a031fb6.cornelia.huck@de.ibm.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 8bit
+Message-Id: <f1f93b66-c414-9dce-ecc4-2239ceaa1774@linux.vnet.ibm.com>
 Subject: Re: [Qemu-devel] [RFC for-2.8] machine: Convert abstract typename
  on compat_props to subclass names
 List-Id: <qemu-devel.nongnu.org>
@@ -26,75 +45,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cornelia.huck@de.ibm.com>
-Cc: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org, Halil Pasic <pasic@linux.vnet.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-stable@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Cornelia Huck <cornelia.huck@de.ibm.com>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>, qemu-stable@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Mon, Dec 12, 2016 at 01:25:09PM +0100, Cornelia Huck wrote:
-> On Tue, 6 Dec 2016 17:31:59 -0200
-> Eduardo Habkost <ehabkost@redhat.com> wrote:
-> 
-> > What about this?
-> > 
-> > (untested)
-> 
-> Have not tested it either, but I think it looks good. Some nits below.
 
-Thanks!
 
-> 
-> > 
-> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> > ---
-> >  hw/core/machine.c | 35 ++++++++++++++++++++++++++++++++---
-> >  1 file changed, 32 insertions(+), 3 deletions(-)
-> > 
-> 
-> > @@ -565,10 +584,20 @@ void machine_register_compat_props(MachineState *machine)
-> >      }
-> > 
-> >      for (i = 0; i < mc->compat_props->len; i++) {
-> > +        ObjectClass *oc;
-> 
-> Move the declaration out of the loop?
+On 12/12/2016 01:25 PM, Cornelia Huck wrote:
+>> +        if (oc && object_class_is_abstract(oc)) {
+>> +            /* temporary hack to make sure we will never override
+                                               ~~~~~~~~~~~~~~~~~~~~~~
 
-I will do it on v2.
+I would say this is not enough to provide that guarantee. Inheriting
+from non-abstract, or something like I described below, would still
+get us in trouble. Or am I wrong? 
 
-> 
-> >          p = g_array_index(mc->compat_props, GlobalProperty *, i);
-> > -        /* Machine compat_props must never cause errors: */
-> > -        p->errp = &error_abort;
-> > -        qdev_prop_register_global(p);
-> > +        oc = object_class_by_name(p->driver);
-> > +        if (oc && object_class_is_abstract(oc)) {
-> > +            /* temporary hack to make sure we will never override
-> > +             * globals set explicitly on -global: if an abstract class
-> > +             * is on compat_props, register globals for each of their
-> > +             * subclasses instead.
-> > +             */
-> 
+How about s/we will never/we do not/?
+
+>> +             * globals set explicitly on -global: if an abstract class
+>> +             * is on compat_props, register globals for each of their
+>> +             * subclasses instead.
+
+I'm not sure if this is clear enough regarding multilevel inheritance.
+I would prefer "subtype" or "class derived from it".
+
+>> +             */
 > I think this should not just be a 'temporary hack'... rather document
 > this behaviour for abstract classes?
-
-I'm not sure. I believe the translation from abstract superclass
-to subclasses just emulates the behavior implemented by Greg Kurz
-at "qdev: fix the order compat and global properties are applied"
-in a more complicated way (and only for compat_props, not for
--global).
-
-This hack specifically would not be enough because it affects
-only compat_props, and still behaves in a weird way when
-non-abstract classes have subclasses.
-
-> 
-> > +            object_class_foreach(machine_register_compat_for_subclass,
-> > +                                 p->driver, false, p);
-> > +        } else {
-> > +            register_compat_prop(p->driver, p->property, p->value);
-> > +        }
-> >      }
-> >  }
-> > 
 > 
 
--- 
-Eduardo
+Connie, I have to disagree with you on this. I'm fine with this as a
+temporary hack provided it remedies the acute problem, but I would this
+becoming state of art.
+
+The reason for this how abstract class is usually understood in OOP:
+it's like a normal class except you can not instantiate it.  Adding an
+extra property rule, and especially such a convoluted one, could result
+in a conflict between intuition and reality.  And it's not like we have
+no plan how to do this cleanly.
+
+Why do I say convoluted:
+* Inheriting form abstract and from non-abstract behaves differently.
+* Theoretically we have something like non-abstract (C_3) inherits for
+abstract (AC_2) inherits from non-abstract (C_1)  inherits from abstract
+(AC_0), and we set the property P both via AC_0 and AC_2 for an instance
+of C1 we would/could end up having the same problem as we have now (via
+AC_0 taking precedence over AC_2) -- at least I think so. 
+
+I did not test it either, but it looks sane to me. Regardless of the
+comments on the comment (if you are going to consider them or not) you
+can take my r-b.
+
+Cheers,
+Halil
