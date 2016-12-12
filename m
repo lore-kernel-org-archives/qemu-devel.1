@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52171)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43169)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cGOys-0003eA-EK
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 06:41:19 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cGPQw-0008LF-Gt
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 07:10:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cGOyo-00026X-LT
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 06:41:18 -0500
-Received: from mail-wm0-f52.google.com ([74.125.82.52]:37108)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cGOyo-0001r8-5j
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 06:41:14 -0500
-Received: by mail-wm0-f52.google.com with SMTP id t79so63297316wmt.0
-	for <qemu-devel@nongnu.org>; Mon, 12 Dec 2016 03:40:51 -0800 (PST)
-References: <87lgvm1dvz.fsf@gmail.com>
-	<CAFEAcA9qiEK+Z3TBFxebTjqdm-4TeeZLQm2uewMHQUsmtCvL=g@mail.gmail.com>
-	<CAJhHMCAvd0+PNFF-PfMVP2aSpN2V9B7XbV59qh-FaXtLGemQmg@mail.gmail.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <CAJhHMCAvd0+PNFF-PfMVP2aSpN2V9B7XbV59qh-FaXtLGemQmg@mail.gmail.com>
-Date: Mon, 12 Dec 2016 11:39:49 +0000
-Message-ID: <87k2b5tlyy.fsf@linaro.org>
+	(envelope-from <kwolf@redhat.com>) id 1cGPQv-0006EJ-C1
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 07:10:18 -0500
+Date: Mon, 12 Dec 2016 13:10:04 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20161212121004.GA8868@noname.redhat.com>
+References: <cover.1481290956.git.berto@igalia.com>
+	<20161209141823.GC3992@noname.redhat.com>
+	<w51fulxw3k1.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] aarch64-linux-user compilation error
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <w51fulxw3k1.fsf@maestria.local.igalia.com>
+Subject: Re: [Qemu-devel] [PATCH RFC 0/1] Allow storing the qcow2 L2 cache
+ in disk
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,41 +25,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pranith Kumar <bobby.prani@gmail.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Alberto Garcia <berto@igalia.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
+Am 09.12.2016 um 16:00 hat Alberto Garcia geschrieben:
+> On Fri 09 Dec 2016 03:18:23 PM CET, Kevin Wolf wrote:
+> >> I have been making some tests with exactly that scenario and the
+> >> results look good: storing the cache in disk gives roughly the same
+> >> performance as storing it in memory.
+> >> 
+> >> |---------------------+------------+------+------------+--------|
+> >> |                     | Random 4k reads   | Sequential 4k reads |
+> >> |                     | Throughput | IOPS | Throughput |  IOPS  |
+> >> |---------------------+------------+------+------------+--------|
+> >> | Cache in memory/SSD | 406 KB/s   |   99 | 84 MB/s    |  21000 |
+> >> | Default cache (1MB) | 200 KB/s   |   60 | 83 MB/s    |  21000 |
+> >> | No cache            | 200 KB/s   |   49 | 56 MB/s    |  14000 |
+> >> |---------------------+------------+------+------------+--------|
+> >> 
+> >> I'm including the patch that I used to get these results. This is the
+> >> simplest approach that I could think of.
+> >> 
+> >> Opinions, questions?
+> >
+> > I suppose you used the fact that the cache is now on disk to increase
+> > the cache size so that it covers the whole image?
+> 
+> Right, the wording on the table is not clear, but that's what I did. I
+> also don't think this makes much sense if the cache is not big enough to
+> cover the whole image.
+> 
+> > If so, are you sure that you aren't just testing that accessing memory
+> > in the kernel page cache is just as fast as accessing memory in qemu's
+> > own cache? It seems this would just bypass the cache size limit given
+> > to qemu by instead leaving things cached in the kernel where the limit
+> > doesn't apply.
+> 
+> Fair question: what I checked is that the PSS/RSS values match the
+> expected values (i.e, they don't grow as you read from the disk
+> image). If the kernel is caching those pages so accessing them after
+> MADV_DONTNEED does not require going to disk again is a possibility that
+> I haven't ruled out.
 
-Pranith Kumar <bobby.prani@gmail.com> writes:
+This is what the man page says:
 
-> On Sun, Dec 11, 2016 at 5:59 PM, Peter Maydell <peter.maydell@linaro.org> wrote:
->>
->>> Error:
->>> /home/pranith/devops/code/qemu/linux-user/ioctls.h:224:9: error: ‘SNDCTL_DSP_MAPINBUF’ undeclared here (not in a function)
->>>    IOCTL(SNDCTL_DSP_MAPINBUF, IOC_R, MK_PTR(MK_STRUCT(STRUCT_buffmem_desc)))
->>>          ^
->>
->> SNDCTL_DSP_MAPINBUF is supposed to be defined by your system
->> headers (/usr/include/linux/soundcard.h or equivalent).
->> Similarly for SNDCTL_DSP_MAPOUTBUF and SOUND_MIXER_ACCESS.
->>
->> Looking at QEMU's git history we've used these symbols
->> for years. I would check whether your system headers
->> are actually providing these symbols (and that the
->> compiler is really putting the right headers on the
->> include path).
->
-> So soundcard.h header is provided by two packages:
->
-> $ apt-file search /usr/include/linux/soundcard.h
-> linux-libc-dev: /usr/include/linux/soundcard.h
-> oss4-dev: /usr/include/linux/soundcard.h
->
-> I had oss4-dev installed. After removing that and reinstalling
-> linux-libc-dev, it compiles fine. Not sure why this file differs. May
-> be a packaging issue.
+    Note that, when applied to shared mappings, MADV_DONTNEED might not
+    lead to immediate freeing of the pages in the range.  The kernel is
+    free to delay freeing the pages until an appropriate moment.  The
+    resident set size (RSS) of the calling process will be immediately
+    reduced however.
 
-Sounds like it. How did you ensure you had your QEMU build dependencies
-installed on your system?
+I think it makes sense that this is what is happening in your case. Your
+patch uses MADV_DONTNEED after every single access, so even if you're
+using an SSD, accessing it should be slower than accessing memory. This
+means that at least for sequential I/O where cached tables are reused
+all the time, your patch would have to be considerably slower than the
+default cache.
 
---
-Alex Bennée
+Maybe try putting the image on some storage where you definitely notice
+whether the kernel accesses it or not. Using a floppy should be fun, but
+an NBD device connected to qemu-nbd with enabled throttling or tracing
+could do the job as well.
+
+Kevin
