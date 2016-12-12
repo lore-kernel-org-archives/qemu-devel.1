@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47485)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52963)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ilg@livius.net>) id 1cGKtr-0002LV-UP
-	for Qemu-devel@nongnu.org; Mon, 12 Dec 2016 02:19:52 -0500
+	(envelope-from <longpeng2@huawei.com>) id 1cGL1g-0007Gn-1T
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 02:27:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ilg@livius.net>) id 1cGKtn-00014Z-Us
-	for Qemu-devel@nongnu.org; Mon, 12 Dec 2016 02:19:51 -0500
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:35817)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ilg@livius.net>) id 1cGKtn-0000vn-PG
-	for Qemu-devel@nongnu.org; Mon, 12 Dec 2016 02:19:47 -0500
-Received: by mail-wm0-f65.google.com with SMTP id a20so9252219wme.2
-	for <Qemu-devel@nongnu.org>; Sun, 11 Dec 2016 23:19:26 -0800 (PST)
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.1 \(3251\))
-From: Liviu Ionescu <ilg@livius.net>
-In-Reply-To: <20161212033512.GA3725@lemon>
-Date: Mon, 12 Dec 2016 09:18:23 +0200
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <908F0328-771A-4269-8301-9A7D08BD585F@livius.net>
-References: <6BBB3038-0389-4221-9A41-63800F3FF514@livius.net>
-	<20161212033512.GA3725@lemon>
-Subject: Re: [Qemu-devel] experience with SDL2, event loop & main thread
+	(envelope-from <longpeng2@huawei.com>) id 1cGL1c-0006AU-3b
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 02:27:56 -0500
+Received: from szxga01-in.huawei.com ([58.251.152.64]:7361)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <longpeng2@huawei.com>) id 1cGL1b-00062U-Il
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 02:27:52 -0500
+From: "Longpeng(Mike)" <longpeng2@huawei.com>
+Date: Mon, 12 Dec 2016 15:27:13 +0800
+Message-ID: <1481527639-17520-2-git-send-email-longpeng2@huawei.com>
+In-Reply-To: <1481527639-17520-1-git-send-email-longpeng2@huawei.com>
+References: <1481527639-17520-1-git-send-email-longpeng2@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH for-2.9 v1 1/7] qapi: crypto: add defination
+ about HMAC algorithms
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,23 +26,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: QEMU Developer <Qemu-devel@nongnu.org>
+To: eblake@redhat.com, armbru@redhat.com, berrange@redhat.com, stefanha@redhat.com
+Cc: wu.wubin@huawei.com, jianjay.zhou@huawei.com, arei.gonglei@huawei.com, qemu-devel@nongnu.org, "Longpeng(Mike)" <longpeng2@huawei.com>
 
+This patch introduce HMAC algorithms relevant defination, they will
+be used by the following patch.
 
-> On 12 Dec 2016, at 05:35, Fam Zheng <famz@redhat.com> wrote:
->=20
-> Isn't it possible to notify the main thread with an EventNotifier and =
-process
-> the deferred events in its handler?
+Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
+---
+ qapi/crypto.json | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
-ideally, the SDL main loop might be re-implemented asynchronously, for =
-example using a pipe to pass the events, and in this case the SDL would =
-be just a regular client of the main I/O loop.
-
-any idea how difficult would be to push any changes to SDL?
-
-
-regards,
-
-Liviu
+diff --git a/qapi/crypto.json b/qapi/crypto.json
+index f4fd93b..e63862a 100644
+--- a/qapi/crypto.json
++++ b/qapi/crypto.json
+@@ -55,6 +55,23 @@
+ 
+ 
+ ##
++# @QCryptoHmacAlgorithm:
++#
++# The supported algorithms for hash-based message authentication code
++#
++# @md5: HMAC-MD5
++# @sha1: HMAC-SHA1
++# @sha256: HMAC-SHA256
++# @sha512: HMAC-SHA512
++#
++# Since 2.9
++##
++{ 'enum': 'QCryptoHmacAlgorithm',
++  'prefix': 'QCRYPTO_HMAC_ALG',
++  'data': ['md5', 'sha1', 'sha256', 'sha512']}
++
++
++##
+ # @QCryptoCipherAlgorithm:
+ #
+ # The supported algorithms for content encryption ciphers
+-- 
+1.8.3.1
