@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56885)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59757)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cGOOK-0005u8-Ao
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 06:03:35 -0500
+	(envelope-from <drjones@redhat.com>) id 1cGOSf-0007tF-JN
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 06:08:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cGOOH-0000jc-DE
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 06:03:32 -0500
-Date: Mon, 12 Dec 2016 11:02:54 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20161212110253.GD2206@work-vm>
-References: <20161209172547.31550-1-jsnow@redhat.com>
-	<20161209172547.31550-2-jsnow@redhat.com>
-	<20161212115250.5985e6d4@bahia.lan>
+	(envelope-from <drjones@redhat.com>) id 1cGOSd-00037F-QC
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 06:08:01 -0500
+Date: Mon, 12 Dec 2016 12:07:47 +0100
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20161212110747.ajfejuaikakmkznk@kamzik.brq.redhat.com>
+References: <1481301020-21777-1-git-send-email-peter.maydell@linaro.org>
+	<1481301020-21777-3-git-send-email-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20161212115250.5985e6d4@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH v3 1/1] migration: disallow
- migrate_add_blocker during migration
+In-Reply-To: <1481301020-21777-3-git-send-email-peter.maydell@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH 2/4] hw/arm/virt: Merge VirtBoardInfo and
+ VirtMachineState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,546 +24,356 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, mst@redhat.com, jcody@redhat.com, quintela@redhat.com, armbru@redhat.com, aneesh.kumar@linux.vnet.ibm.com, ashijeetacharya@gmail.com, pbonzini@redhat.com, amit.shah@redhat.com, marcandre.lureau@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Christoffer Dall <christoffer.dall@linaro.org>
 
-* Greg Kurz (groug@kaod.org) wrote:
-> On Fri,  9 Dec 2016 12:25:47 -0500
-> John Snow <jsnow@redhat.com> wrote:
+On Fri, Dec 09, 2016 at 04:30:18PM +0000, Peter Maydell wrote:
+> One of the purposes of VirtBoardInfo was to hold various
+> bits of state about the board. Now we have MachineState
+> and the subclass VirtMachineState to do this. Fold the
+> VirtBoardInfo into VirtMachineState rather than having
+> some flags in one struct and some in another with no
+> useful way to get between them.
 > 
-> > If a migration is already in progress and somebody attempts
-> > to add a migration blocker, this should rightly fail.
-> > 
-> > Add an errp parameter and a retcode return value to migrate_add_blocker.
-> > 
-> > Signed-off-by: John Snow <jsnow@redhat.com>
-> > ---
-> >  block/qcow.c                  |  6 +++++-
-> >  block/vdi.c                   |  6 +++++-
-> >  block/vhdx.c                  | 24 ++++++++++++++----------
-> >  block/vmdk.c                  |  7 ++++++-
-> >  block/vpc.c                   | 10 +++++++---
-> >  block/vvfat.c                 | 20 ++++++++++++--------
-> >  hw/9pfs/9p.c                  | 16 ++++++++++++----
-> >  hw/display/virtio-gpu.c       | 29 ++++++++++++++++-------------
-> >  hw/misc/ivshmem.c             | 11 +++++++----
-> >  hw/scsi/vhost-scsi.c          | 25 +++++++++++++++++++------
-> >  hw/virtio/vhost.c             |  8 +++++++-
-> >  include/migration/migration.h |  6 +++++-
-> >  migration/migration.c         | 35 +++++++++++++++++++++++++++++++++--
-> >  stubs/migr-blocker.c          |  3 ++-
-> >  target-i386/kvm.c             | 16 +++++++++++++---
-> >  15 files changed, 163 insertions(+), 59 deletions(-)
-> > 
-> > diff --git a/block/qcow.c b/block/qcow.c
-> > index 7540f43..11526a1 100644
-> > --- a/block/qcow.c
-> > +++ b/block/qcow.c
-> > @@ -252,7 +252,11 @@ static int qcow_open(BlockDriverState *bs, QDict *options, int flags,
-> >      error_setg(&s->migration_blocker, "The qcow format used by node '%s' "
-> >                 "does not support live migration",
-> >                 bdrv_get_device_or_node_name(bs));
-> > -    migrate_add_blocker(s->migration_blocker);
-> > +    ret = migrate_add_blocker(s->migration_blocker, errp);
-> > +    if (ret < 0) {
-> > +        error_free(s->migration_blocker);
-> > +        goto fail;
-> > +    }
-> >  
-> >      qemu_co_mutex_init(&s->lock);
-> >      return 0;
-> > diff --git a/block/vdi.c b/block/vdi.c
-> > index 96b78d5..2b56f52 100644
-> > --- a/block/vdi.c
-> > +++ b/block/vdi.c
-> > @@ -471,7 +471,11 @@ static int vdi_open(BlockDriverState *bs, QDict *options, int flags,
-> >      error_setg(&s->migration_blocker, "The vdi format used by node '%s' "
-> >                 "does not support live migration",
-> >                 bdrv_get_device_or_node_name(bs));
-> > -    migrate_add_blocker(s->migration_blocker);
-> > +    ret = migrate_add_blocker(s->migration_blocker, errp);
-> > +    if (ret < 0) {
-> > +        error_free(s->migration_blocker);
-> > +        goto fail_free_bmap;
-> > +    }
-> >  
-> >      qemu_co_mutex_init(&s->write_lock);
-> >  
-> > diff --git a/block/vhdx.c b/block/vhdx.c
-> > index 0ba2f0a..d81941b 100644
-> > --- a/block/vhdx.c
-> > +++ b/block/vhdx.c
-> > @@ -991,20 +991,24 @@ static int vhdx_open(BlockDriverState *bs, QDict *options, int flags,
-> >          }
-> >      }
-> >  
-> > -    if (flags & BDRV_O_RDWR) {
-> > -        ret = vhdx_update_headers(bs, s, false, NULL);
-> > -        if (ret < 0) {
-> > -            goto fail;
-> > -        }
-> > -    }
-> > -
-> > -    /* TODO: differencing files */
-> > -
-> >      /* Disable migration when VHDX images are used */
-> >      error_setg(&s->migration_blocker, "The vhdx format used by node '%s' "
-> >                 "does not support live migration",
-> >                 bdrv_get_device_or_node_name(bs));
-> > -    migrate_add_blocker(s->migration_blocker);
-> > +    ret = migrate_add_blocker(s->migration_blocker, errp);
-> > +    if (ret < 0) {
-> > +        error_free(s->migration_blocker);
-> > +        goto fail;
-> > +    }
-> > +
-> > +    if (flags & BDRV_O_RDWR) {
-> > +        ret = vhdx_update_headers(bs, s, false, NULL);
-> > +        if (ret < 0) {
-> > +            goto fail;
-> > +        }
-> > +    }
-> > +
-> > +    /* TODO: differencing files */
-> >  
-> >      return 0;
-> >  fail:
-> > diff --git a/block/vmdk.c b/block/vmdk.c
-> > index a11c27a..4a45a83 100644
-> > --- a/block/vmdk.c
-> > +++ b/block/vmdk.c
-> > @@ -976,7 +976,12 @@ static int vmdk_open(BlockDriverState *bs, QDict *options, int flags,
-> >      error_setg(&s->migration_blocker, "The vmdk format used by node '%s' "
-> >                 "does not support live migration",
-> >                 bdrv_get_device_or_node_name(bs));
-> > -    migrate_add_blocker(s->migration_blocker);
-> > +    ret = migrate_add_blocker(s->migration_blocker, errp);
-> > +    if (ret < 0) {
-> > +        error_free(s->migration_blocker);
-> > +        goto fail;
-> > +    }
-> > +
-> >      g_free(buf);
-> >      return 0;
-> >  
-> > diff --git a/block/vpc.c b/block/vpc.c
-> > index 8d5886f..299a8c8 100644
-> > --- a/block/vpc.c
-> > +++ b/block/vpc.c
-> > @@ -422,13 +422,17 @@ static int vpc_open(BlockDriverState *bs, QDict *options, int flags,
-> >  #endif
-> >      }
-> >  
-> > -    qemu_co_mutex_init(&s->lock);
-> > -
-> >      /* Disable migration when VHD images are used */
-> >      error_setg(&s->migration_blocker, "The vpc format used by node '%s' "
-> >                 "does not support live migration",
-> >                 bdrv_get_device_or_node_name(bs));
-> > -    migrate_add_blocker(s->migration_blocker);
-> > +    ret = migrate_add_blocker(s->migration_blocker, errp);
-> > +    if (ret < 0) {
-> > +        error_free(s->migration_blocker);
-> > +        goto fail;
-> > +    }
-> > +
-> > +    qemu_co_mutex_init(&s->lock);
-> >  
-> >      return 0;
-> >  
-> > diff --git a/block/vvfat.c b/block/vvfat.c
-> > index ded2109..3de3320 100644
-> > --- a/block/vvfat.c
-> > +++ b/block/vvfat.c
-> > @@ -1185,22 +1185,26 @@ static int vvfat_open(BlockDriverState *bs, QDict *options, int flags,
-> >  
-> >      s->sector_count = s->faked_sectors + s->sectors_per_cluster*s->cluster_count;
-> >  
-> > -    if (s->first_sectors_number == 0x40) {
-> > -        init_mbr(s, cyls, heads, secs);
-> > -    }
-> > -
-> > -    //    assert(is_consistent(s));
-> > -    qemu_co_mutex_init(&s->lock);
-> > -
-> >      /* Disable migration when vvfat is used rw */
-> >      if (s->qcow) {
-> >          error_setg(&s->migration_blocker,
-> >                     "The vvfat (rw) format used by node '%s' "
-> >                     "does not support live migration",
-> >                     bdrv_get_device_or_node_name(bs));
-> > -        migrate_add_blocker(s->migration_blocker);
-> > +        ret = migrate_add_blocker(s->migration_blocker, errp);
-> > +        if (ret < 0) {
-> > +            error_free(s->migration_blocker);
-> > +            goto fail;
-> > +        }
-> >      }
-> >  
-> > +    if (s->first_sectors_number == 0x40) {
-> > +        init_mbr(s, cyls, heads, secs);
-> > +    }
-> > +
-> > +    //    assert(is_consistent(s));
-> > +    qemu_co_mutex_init(&s->lock);
-> > +
-> >      ret = 0;
-> >  fail:
-> >      qemu_opts_del(opts);
-> > diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-> > index faebd91..e72ef43 100644
-> > --- a/hw/9pfs/9p.c
-> > +++ b/hw/9pfs/9p.c
-> > @@ -1013,20 +1013,28 @@ static void coroutine_fn v9fs_attach(void *opaque)
-> >          goto out;
-> >      }
-> >      err += offset;
-> > -    memcpy(&s->root_qid, &qid, sizeof(qid));
-> > -    trace_v9fs_attach_return(pdu->tag, pdu->id,
-> > -                             qid.type, qid.version, qid.path);
-> > +
-> >      /*
-> >       * disable migration if we haven't done already.
-> >       * attach could get called multiple times for the same export.
-> >       */
-> >      if (!s->migration_blocker) {
-> > +        int ret;
-> >          s->root_fid = fid;
-> >          error_setg(&s->migration_blocker,
-> >                     "Migration is disabled when VirtFS export path '%s' is mounted in the guest using mount_tag '%s'",
-> >                     s->ctx.fs_root ? s->ctx.fs_root : "NULL", s->tag);
-> > -        migrate_add_blocker(s->migration_blocker);
-> > +        ret = migrate_add_blocker(s->migration_blocker, NULL);
-> > +        if (ret < 0) {
-> > +            err = ret;
-> > +            clunk_fid(s, fid);
-> > +            goto out;
+> In the process we drop the code for looking up the
+> memory map and irq map from the CPU model, because
+> in practice we always use the same maps in all cases.
 > 
-> So this would cause mount(2) in the guest to fail with EBUSY if
-> migration is in progress, right ? I guess well configured guests
-> should be able to cope with temporary failures when mounting
-> a network filesystem and retry later.
+> For easier code review, this change removes the
+> VirtBoardInfo type but leaves all the variables which
+> used to be VirtBoardInfo* and are now VirtMachineState*
+> with their now-confusing 'vbi' names.
 > 
-> I don't object but I'd like to have some more background... if
-> you could point me to the on-list discussion you're mentioning
-> in the cover letter, that'd be great. :)
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  hw/arm/virt.c | 118 +++++++++++++++++++++++++---------------------------------
+>  1 file changed, 51 insertions(+), 67 deletions(-)
 
-See the discussion on:
-https://lists.nongnu.org/archive/html/qemu-devel/2016-12/msg01185.html
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 
-note, it might be best to special case 9pfs here; it's unusual
-in that it's unusable in that it always does the migration blocker
-when in use; everywhere else has the flag in the VMStateDescription
-or only blocks in specific cases.
-
-Dave
-
-> Thanks.
 > 
-> --
-> Greg
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index 11c53a5..fd4eed9 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -66,23 +66,8 @@
+>  
+>  static ARMPlatformBusSystemParams platform_bus_params;
+>  
+> -typedef struct VirtBoardInfo {
+> -    struct arm_boot_info bootinfo;
+> -    const char *cpu_model;
+> -    const MemMapEntry *memmap;
+> -    const int *irqmap;
+> -    int smp_cpus;
+> -    void *fdt;
+> -    int fdt_size;
+> -    uint32_t clock_phandle;
+> -    uint32_t gic_phandle;
+> -    uint32_t msi_phandle;
+> -    bool using_psci;
+> -} VirtBoardInfo;
+> -
+>  typedef struct {
+>      MachineClass parent;
+> -    VirtBoardInfo *daughterboard;
+>      bool disallow_affinity_adjustment;
+>      bool no_its;
+>      bool no_pmu;
+> @@ -93,6 +78,16 @@ typedef struct {
+>      bool secure;
+>      bool highmem;
+>      int32_t gic_version;
+> +    struct arm_boot_info bootinfo;
+> +    const MemMapEntry *memmap;
+> +    const int *irqmap;
+> +    int smp_cpus;
+> +    void *fdt;
+> +    int fdt_size;
+> +    uint32_t clock_phandle;
+> +    uint32_t gic_phandle;
+> +    uint32_t msi_phandle;
+> +    bool using_psci;
+>  } VirtMachineState;
+>  
+>  #define TYPE_VIRT_MACHINE   MACHINE_TYPE_NAME("virt")
+> @@ -202,42 +197,27 @@ static const int a15irqmap[] = {
+>      [VIRT_PLATFORM_BUS] = 112, /* ...to 112 + PLATFORM_BUS_NUM_IRQS -1 */
+>  };
+>  
+> -static VirtBoardInfo machines[] = {
+> -    {
+> -        .cpu_model = "cortex-a15",
+> -        .memmap = a15memmap,
+> -        .irqmap = a15irqmap,
+> -    },
+> -    {
+> -        .cpu_model = "cortex-a53",
+> -        .memmap = a15memmap,
+> -        .irqmap = a15irqmap,
+> -    },
+> -    {
+> -        .cpu_model = "cortex-a57",
+> -        .memmap = a15memmap,
+> -        .irqmap = a15irqmap,
+> -    },
+> -    {
+> -        .cpu_model = "host",
+> -        .memmap = a15memmap,
+> -        .irqmap = a15irqmap,
+> -    },
+> +static const char *valid_cpus[] = {
+> +    "cortex-a15",
+> +    "cortex-a53",
+> +    "cortex-a57",
+> +    "host",
+> +    NULL
+>  };
+>  
+> -static VirtBoardInfo *find_machine_info(const char *cpu)
+> +static bool cpuname_valid(const char *cpu)
+>  {
+>      int i;
+>  
+> -    for (i = 0; i < ARRAY_SIZE(machines); i++) {
+> -        if (strcmp(cpu, machines[i].cpu_model) == 0) {
+> -            return &machines[i];
+> +    for (i = 0; i < ARRAY_SIZE(valid_cpus); i++) {
+> +        if (strcmp(cpu, valid_cpus[i]) == 0) {
+> +            return true;
+>          }
+>      }
+> -    return NULL;
+> +    return false;
+>  }
+>  
+> -static void create_fdt(VirtBoardInfo *vbi)
+> +static void create_fdt(VirtMachineState *vbi)
+>  {
+>      void *fdt = create_device_tree(&vbi->fdt_size);
+>  
+> @@ -277,7 +257,7 @@ static void create_fdt(VirtBoardInfo *vbi)
+>  
+>  }
+>  
+> -static void fdt_add_psci_node(const VirtBoardInfo *vbi)
+> +static void fdt_add_psci_node(const VirtMachineState *vbi)
+>  {
+>      uint32_t cpu_suspend_fn;
+>      uint32_t cpu_off_fn;
+> @@ -327,7 +307,7 @@ static void fdt_add_psci_node(const VirtBoardInfo *vbi)
+>      qemu_fdt_setprop_cell(fdt, "/psci", "migrate", migrate_fn);
+>  }
+>  
+> -static void fdt_add_timer_nodes(const VirtBoardInfo *vbi, int gictype)
+> +static void fdt_add_timer_nodes(const VirtMachineState *vbi, int gictype)
+>  {
+>      /* Note that on A15 h/w these interrupts are level-triggered,
+>       * but for the GIC implementation provided by both QEMU and KVM
+> @@ -361,7 +341,7 @@ static void fdt_add_timer_nodes(const VirtBoardInfo *vbi, int gictype)
+>                         GIC_FDT_IRQ_TYPE_PPI, ARCH_TIMER_NS_EL2_IRQ, irqflags);
+>  }
+>  
+> -static void fdt_add_cpu_nodes(const VirtBoardInfo *vbi)
+> +static void fdt_add_cpu_nodes(const VirtMachineState *vbi)
+>  {
+>      int cpu;
+>      int addr_cells = 1;
+> @@ -424,7 +404,7 @@ static void fdt_add_cpu_nodes(const VirtBoardInfo *vbi)
+>      }
+>  }
+>  
+> -static void fdt_add_its_gic_node(VirtBoardInfo *vbi)
+> +static void fdt_add_its_gic_node(VirtMachineState *vbi)
+>  {
+>      vbi->msi_phandle = qemu_fdt_alloc_phandle(vbi->fdt);
+>      qemu_fdt_add_subnode(vbi->fdt, "/intc/its");
+> @@ -437,7 +417,7 @@ static void fdt_add_its_gic_node(VirtBoardInfo *vbi)
+>      qemu_fdt_setprop_cell(vbi->fdt, "/intc/its", "phandle", vbi->msi_phandle);
+>  }
+>  
+> -static void fdt_add_v2m_gic_node(VirtBoardInfo *vbi)
+> +static void fdt_add_v2m_gic_node(VirtMachineState *vbi)
+>  {
+>      vbi->msi_phandle = qemu_fdt_alloc_phandle(vbi->fdt);
+>      qemu_fdt_add_subnode(vbi->fdt, "/intc/v2m");
+> @@ -450,7 +430,7 @@ static void fdt_add_v2m_gic_node(VirtBoardInfo *vbi)
+>      qemu_fdt_setprop_cell(vbi->fdt, "/intc/v2m", "phandle", vbi->msi_phandle);
+>  }
+>  
+> -static void fdt_add_gic_node(VirtBoardInfo *vbi, int type)
+> +static void fdt_add_gic_node(VirtMachineState *vbi, int type)
+>  {
+>      vbi->gic_phandle = qemu_fdt_alloc_phandle(vbi->fdt);
+>      qemu_fdt_setprop_cell(vbi->fdt, "/", "interrupt-parent", vbi->gic_phandle);
+> @@ -483,7 +463,7 @@ static void fdt_add_gic_node(VirtBoardInfo *vbi, int type)
+>      qemu_fdt_setprop_cell(vbi->fdt, "/intc", "phandle", vbi->gic_phandle);
+>  }
+>  
+> -static void fdt_add_pmu_nodes(const VirtBoardInfo *vbi, int gictype)
+> +static void fdt_add_pmu_nodes(const VirtMachineState *vbi, int gictype)
+>  {
+>      CPUState *cpu;
+>      ARMCPU *armcpu;
+> @@ -514,7 +494,7 @@ static void fdt_add_pmu_nodes(const VirtBoardInfo *vbi, int gictype)
+>      }
+>  }
+>  
+> -static void create_its(VirtBoardInfo *vbi, DeviceState *gicdev)
+> +static void create_its(VirtMachineState *vbi, DeviceState *gicdev)
+>  {
+>      const char *itsclass = its_class_name();
+>      DeviceState *dev;
+> @@ -534,7 +514,7 @@ static void create_its(VirtBoardInfo *vbi, DeviceState *gicdev)
+>      fdt_add_its_gic_node(vbi);
+>  }
+>  
+> -static void create_v2m(VirtBoardInfo *vbi, qemu_irq *pic)
+> +static void create_v2m(VirtMachineState *vbi, qemu_irq *pic)
+>  {
+>      int i;
+>      int irq = vbi->irqmap[VIRT_GIC_V2M];
+> @@ -553,7 +533,7 @@ static void create_v2m(VirtBoardInfo *vbi, qemu_irq *pic)
+>      fdt_add_v2m_gic_node(vbi);
+>  }
+>  
+> -static void create_gic(VirtBoardInfo *vbi, qemu_irq *pic, int type,
+> +static void create_gic(VirtMachineState *vbi, qemu_irq *pic, int type,
+>                         bool secure, bool no_its)
+>  {
+>      /* We create a standalone GIC */
+> @@ -625,7 +605,7 @@ static void create_gic(VirtBoardInfo *vbi, qemu_irq *pic, int type,
+>      }
+>  }
+>  
+> -static void create_uart(const VirtBoardInfo *vbi, qemu_irq *pic, int uart,
+> +static void create_uart(const VirtMachineState *vbi, qemu_irq *pic, int uart,
+>                          MemoryRegion *mem, CharDriverState *chr)
+>  {
+>      char *nodename;
+> @@ -669,7 +649,7 @@ static void create_uart(const VirtBoardInfo *vbi, qemu_irq *pic, int uart,
+>      g_free(nodename);
+>  }
+>  
+> -static void create_rtc(const VirtBoardInfo *vbi, qemu_irq *pic)
+> +static void create_rtc(const VirtMachineState *vbi, qemu_irq *pic)
+>  {
+>      char *nodename;
+>      hwaddr base = vbi->memmap[VIRT_RTC].base;
+> @@ -703,7 +683,7 @@ static Notifier virt_system_powerdown_notifier = {
+>      .notify = virt_powerdown_req
+>  };
+>  
+> -static void create_gpio(const VirtBoardInfo *vbi, qemu_irq *pic)
+> +static void create_gpio(const VirtMachineState *vbi, qemu_irq *pic)
+>  {
+>      char *nodename;
+>      DeviceState *pl061_dev;
+> @@ -750,7 +730,7 @@ static void create_gpio(const VirtBoardInfo *vbi, qemu_irq *pic)
+>      g_free(nodename);
+>  }
+>  
+> -static void create_virtio_devices(const VirtBoardInfo *vbi, qemu_irq *pic)
+> +static void create_virtio_devices(const VirtMachineState *vbi, qemu_irq *pic)
+>  {
+>      int i;
+>      hwaddr size = vbi->memmap[VIRT_MMIO].size;
+> @@ -870,7 +850,7 @@ static void create_one_flash(const char *name, hwaddr flashbase,
+>      }
+>  }
+>  
+> -static void create_flash(const VirtBoardInfo *vbi,
+> +static void create_flash(const VirtMachineState *vbi,
+>                           MemoryRegion *sysmem,
+>                           MemoryRegion *secure_sysmem)
+>  {
+> @@ -925,7 +905,7 @@ static void create_flash(const VirtBoardInfo *vbi,
+>      }
+>  }
+>  
+> -static void create_fw_cfg(const VirtBoardInfo *vbi, AddressSpace *as)
+> +static void create_fw_cfg(const VirtMachineState *vbi, AddressSpace *as)
+>  {
+>      hwaddr base = vbi->memmap[VIRT_FW_CFG].base;
+>      hwaddr size = vbi->memmap[VIRT_FW_CFG].size;
+> @@ -944,7 +924,8 @@ static void create_fw_cfg(const VirtBoardInfo *vbi, AddressSpace *as)
+>      g_free(nodename);
+>  }
+>  
+> -static void create_pcie_irq_map(const VirtBoardInfo *vbi, uint32_t gic_phandle,
+> +static void create_pcie_irq_map(const VirtMachineState *vbi,
+> +                                uint32_t gic_phandle,
+>                                  int first_irq, const char *nodename)
+>  {
+>      int devfn, pin;
+> @@ -979,7 +960,7 @@ static void create_pcie_irq_map(const VirtBoardInfo *vbi, uint32_t gic_phandle,
+>                             0x7           /* PCI irq */);
+>  }
+>  
+> -static void create_pcie(const VirtBoardInfo *vbi, qemu_irq *pic,
+> +static void create_pcie(const VirtMachineState *vbi, qemu_irq *pic,
+>                          bool use_highmem)
+>  {
+>      hwaddr base_mmio = vbi->memmap[VIRT_PCIE_MMIO].base;
+> @@ -1095,7 +1076,7 @@ static void create_pcie(const VirtBoardInfo *vbi, qemu_irq *pic,
+>      g_free(nodename);
+>  }
+>  
+> -static void create_platform_bus(VirtBoardInfo *vbi, qemu_irq *pic)
+> +static void create_platform_bus(VirtMachineState *vbi, qemu_irq *pic)
+>  {
+>      DeviceState *dev;
+>      SysBusDevice *s;
+> @@ -1136,7 +1117,8 @@ static void create_platform_bus(VirtBoardInfo *vbi, qemu_irq *pic)
+>                                  sysbus_mmio_get_region(s, 0));
+>  }
+>  
+> -static void create_secure_ram(VirtBoardInfo *vbi, MemoryRegion *secure_sysmem)
+> +static void create_secure_ram(VirtMachineState *vbi,
+> +                              MemoryRegion *secure_sysmem)
+>  {
+>      MemoryRegion *secram = g_new(MemoryRegion, 1);
+>      char *nodename;
+> @@ -1159,7 +1141,8 @@ static void create_secure_ram(VirtBoardInfo *vbi, MemoryRegion *secure_sysmem)
+>  
+>  static void *machvirt_dtb(const struct arm_boot_info *binfo, int *fdt_size)
+>  {
+> -    const VirtBoardInfo *board = (const VirtBoardInfo *)binfo;
+> +    const VirtMachineState *board = container_of(binfo, VirtMachineState,
+> +                                                 bootinfo);
+>  
+>      *fdt_size = board->fdt_size;
+>      return board->fdt;
+> @@ -1214,7 +1197,7 @@ static void machvirt_init(MachineState *machine)
+>      int n, virt_max_cpus;
+>      MemoryRegion *ram = g_new(MemoryRegion, 1);
+>      const char *cpu_model = machine->cpu_model;
+> -    VirtBoardInfo *vbi;
+> +    VirtMachineState *vbi = vms;
+>      VirtGuestInfoState *guest_info_state = g_malloc0(sizeof *guest_info_state);
+>      VirtGuestInfo *guest_info = &guest_info_state->info;
+>      char **cpustr;
+> @@ -1248,9 +1231,7 @@ static void machvirt_init(MachineState *machine)
+>      /* Separate the actual CPU model name from any appended features */
+>      cpustr = g_strsplit(cpu_model, ",", 2);
+>  
+> -    vbi = find_machine_info(cpustr[0]);
+> -
+> -    if (!vbi) {
+> +    if (!cpuname_valid(cpustr[0])) {
+>          error_report("mach-virt: CPU %s not supported", cpustr[0]);
+>          exit(1);
+>      }
+> @@ -1556,6 +1537,9 @@ static void virt_2_9_instance_init(Object *obj)
+>      object_property_set_description(obj, "gic-version",
+>                                      "Set GIC version. "
+>                                      "Valid values are 2, 3 and host", NULL);
+> +
+> +    vms->memmap = a15memmap;
+> +    vms->irqmap = a15irqmap;
+>  }
+>  
+>  static void virt_machine_2_9_options(MachineClass *mc)
+> -- 
+> 2.7.4
 > 
-> > +        }
-> >      }
-> > +
-> > +    memcpy(&s->root_qid, &qid, sizeof(qid));
-> > +    trace_v9fs_attach_return(pdu->tag, pdu->id,
-> > +                             qid.type, qid.version, qid.path);
-> >  out:
-> >      put_fid(pdu, fidp);
-> >  out_nofid:
-> > diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
-> > index 5f32e1a..6e60b8c 100644
-> > --- a/hw/display/virtio-gpu.c
-> > +++ b/hw/display/virtio-gpu.c
-> > @@ -1108,14 +1108,6 @@ static void virtio_gpu_device_realize(DeviceState *qdev, Error **errp)
-> >          return;
-> >      }
-> >  
-> > -    g->config_size = sizeof(struct virtio_gpu_config);
-> > -    g->virtio_config.num_scanouts = g->conf.max_outputs;
-> > -    virtio_init(VIRTIO_DEVICE(g), "virtio-gpu", VIRTIO_ID_GPU,
-> > -                g->config_size);
-> > -
-> > -    g->req_state[0].width = 1024;
-> > -    g->req_state[0].height = 768;
-> > -
-> >      g->use_virgl_renderer = false;
-> >  #if !defined(CONFIG_VIRGL) || defined(HOST_WORDS_BIGENDIAN)
-> >      have_virgl = false;
-> > @@ -1127,6 +1119,22 @@ static void virtio_gpu_device_realize(DeviceState *qdev, Error **errp)
-> >      }
-> >  
-> >      if (virtio_gpu_virgl_enabled(g->conf)) {
-> > +        error_setg(&g->migration_blocker, "virgl is not yet migratable");
-> > +        if (migrate_add_blocker(g->migration_blocker, errp) < 0) {
-> > +            error_free(g->migration_blocker);
-> > +            return;
-> > +        }
-> > +    }
-> > +
-> > +    g->config_size = sizeof(struct virtio_gpu_config);
-> > +    g->virtio_config.num_scanouts = g->conf.max_outputs;
-> > +    virtio_init(VIRTIO_DEVICE(g), "virtio-gpu", VIRTIO_ID_GPU,
-> > +                g->config_size);
-> > +
-> > +    g->req_state[0].width = 1024;
-> > +    g->req_state[0].height = 768;
-> > +
-> > +    if (virtio_gpu_virgl_enabled(g->conf)) {
-> >          /* use larger control queue in 3d mode */
-> >          g->ctrl_vq   = virtio_add_queue(vdev, 256, virtio_gpu_handle_ctrl_cb);
-> >          g->cursor_vq = virtio_add_queue(vdev, 16, virtio_gpu_handle_cursor_cb);
-> > @@ -1152,11 +1160,6 @@ static void virtio_gpu_device_realize(DeviceState *qdev, Error **errp)
-> >              dpy_gfx_replace_surface(g->scanout[i].con, NULL);
-> >          }
-> >      }
-> > -
-> > -    if (virtio_gpu_virgl_enabled(g->conf)) {
-> > -        error_setg(&g->migration_blocker, "virgl is not yet migratable");
-> > -        migrate_add_blocker(g->migration_blocker);
-> > -    }
-> >  }
-> >  
-> >  static void virtio_gpu_device_unrealize(DeviceState *qdev, Error **errp)
-> > diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
-> > index abeaf3d..585cc5b 100644
-> > --- a/hw/misc/ivshmem.c
-> > +++ b/hw/misc/ivshmem.c
-> > @@ -903,9 +903,6 @@ static void ivshmem_common_realize(PCIDevice *dev, Error **errp)
-> >          }
-> >      }
-> >  
-> > -    vmstate_register_ram(s->ivshmem_bar2, DEVICE(s));
-> > -    pci_register_bar(PCI_DEVICE(s), 2, attr, s->ivshmem_bar2);
-> > -
-> >      if (s->master == ON_OFF_AUTO_AUTO) {
-> >          s->master = s->vm_id == 0 ? ON_OFF_AUTO_ON : ON_OFF_AUTO_OFF;
-> >      }
-> > @@ -913,8 +910,14 @@ static void ivshmem_common_realize(PCIDevice *dev, Error **errp)
-> >      if (!ivshmem_is_master(s)) {
-> >          error_setg(&s->migration_blocker,
-> >                     "Migration is disabled when using feature 'peer mode' in device 'ivshmem'");
-> > -        migrate_add_blocker(s->migration_blocker);
-> > +        if (migrate_add_blocker(s->migration_blocker, errp) < 0) {
-> > +            error_free(s->migration_blocker);
-> > +            return;
-> > +        }
-> >      }
-> > +
-> > +    vmstate_register_ram(s->ivshmem_bar2, DEVICE(s));
-> > +    pci_register_bar(PCI_DEVICE(s), 2, attr, s->ivshmem_bar2);
-> >  }
-> >  
-> >  static void ivshmem_exit(PCIDevice *dev)
-> > diff --git a/hw/scsi/vhost-scsi.c b/hw/scsi/vhost-scsi.c
-> > index 5b26946..ff503d0 100644
-> > --- a/hw/scsi/vhost-scsi.c
-> > +++ b/hw/scsi/vhost-scsi.c
-> > @@ -238,8 +238,14 @@ static void vhost_scsi_realize(DeviceState *dev, Error **errp)
-> >                                 vhost_dummy_handle_output);
-> >      if (err != NULL) {
-> >          error_propagate(errp, err);
-> > -        close(vhostfd);
-> > -        return;
-> > +        goto close_fd;
-> > +    }
-> > +
-> > +    error_setg(&s->migration_blocker,
-> > +               "vhost-scsi does not support migration");
-> > +    ret = migrate_add_blocker(s->migration_blocker, errp);
-> > +    if (ret < 0) {
-> > +        goto free_blocker;
-> >      }
-> >  
-> >      s->dev.nvqs = VHOST_SCSI_VQ_NUM_FIXED + vs->conf.num_queues;
-> > @@ -252,7 +258,7 @@ static void vhost_scsi_realize(DeviceState *dev, Error **errp)
-> >      if (ret < 0) {
-> >          error_setg(errp, "vhost-scsi: vhost initialization failed: %s",
-> >                     strerror(-ret));
-> > -        return;
-> > +        goto free_vqs;
-> >      }
-> >  
-> >      /* At present, channel and lun both are 0 for bootable vhost-scsi disk */
-> > @@ -261,9 +267,16 @@ static void vhost_scsi_realize(DeviceState *dev, Error **errp)
-> >      /* Note: we can also get the minimum tpgt from kernel */
-> >      s->target = vs->conf.boot_tpgt;
-> >  
-> > -    error_setg(&s->migration_blocker,
-> > -            "vhost-scsi does not support migration");
-> > -    migrate_add_blocker(s->migration_blocker);
-> > +    return;
-> > +
-> > + free_vqs:
-> > +    migrate_del_blocker(s->migration_blocker);
-> > +    g_free(s->dev.vqs);
-> > + free_blocker:
-> > +    error_free(s->migration_blocker);
-> > + close_fd:
-> > +    close(vhostfd);
-> > +    return;
-> >  }
-> >  
-> >  static void vhost_scsi_unrealize(DeviceState *dev, Error **errp)
-> > diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-> > index f7f7023..416fada 100644
-> > --- a/hw/virtio/vhost.c
-> > +++ b/hw/virtio/vhost.c
-> > @@ -1157,7 +1157,13 @@ int vhost_dev_init(struct vhost_dev *hdev, void *opaque,
-> >      }
-> >  
-> >      if (hdev->migration_blocker != NULL) {
-> > -        migrate_add_blocker(hdev->migration_blocker);
-> > +        Error *local_err;
-> > +        r = migrate_add_blocker(hdev->migration_blocker, &local_err);
-> > +        if (r < 0) {
-> > +            error_report_err(local_err);
-> > +            error_free(hdev->migration_blocker);
-> > +            goto fail_busyloop;
-> > +        }
-> >      }
-> >  
-> >      hdev->mem = g_malloc0(offsetof(struct vhost_memory, regions));
-> > diff --git a/include/migration/migration.h b/include/migration/migration.h
-> > index c309d23..8a91215 100644
-> > --- a/include/migration/migration.h
-> > +++ b/include/migration/migration.h
-> > @@ -240,6 +240,7 @@ void remove_migration_state_change_notifier(Notifier *notify);
-> >  MigrationState *migrate_init(const MigrationParams *params);
-> >  bool migration_is_blocked(Error **errp);
-> >  bool migration_in_setup(MigrationState *);
-> > +bool migration_is_idle(MigrationState *s);
-> >  bool migration_has_finished(MigrationState *);
-> >  bool migration_has_failed(MigrationState *);
-> >  /* True if outgoing migration has entered postcopy phase */
-> > @@ -284,8 +285,11 @@ int ram_postcopy_incoming_init(MigrationIncomingState *mis);
-> >   * @migrate_add_blocker - prevent migration from proceeding
-> >   *
-> >   * @reason - an error to be returned whenever migration is attempted
-> > + * @errp - [out] The reason (if any) we cannot block migration right now.
-> > + *
-> > + * @returns - 0 on success, -EBUSY on failure, with errp set.
-> >   */
-> > -void migrate_add_blocker(Error *reason);
-> > +int migrate_add_blocker(Error *reason, Error **errp);
-> >  
-> >  /**
-> >   * @migrate_del_blocker - remove a blocking error from migration
-> > diff --git a/migration/migration.c b/migration/migration.c
-> > index f498ab8..713e012 100644
-> > --- a/migration/migration.c
-> > +++ b/migration/migration.c
-> > @@ -1044,6 +1044,31 @@ bool migration_in_postcopy_after_devices(MigrationState *s)
-> >      return migration_in_postcopy(s) && s->postcopy_after_devices;
-> >  }
-> >  
-> > +bool migration_is_idle(MigrationState *s)
-> > +{
-> > +    if (!s) {
-> > +        s = migrate_get_current();
-> > +    }
-> > +
-> > +    switch (s->state) {
-> > +    case MIGRATION_STATUS_NONE:
-> > +    case MIGRATION_STATUS_CANCELLED:
-> > +    case MIGRATION_STATUS_COMPLETED:
-> > +    case MIGRATION_STATUS_FAILED:
-> > +        return true;
-> > +    case MIGRATION_STATUS_SETUP:
-> > +    case MIGRATION_STATUS_CANCELLING:
-> > +    case MIGRATION_STATUS_ACTIVE:
-> > +    case MIGRATION_STATUS_POSTCOPY_ACTIVE:
-> > +    case MIGRATION_STATUS_COLO:
-> > +        return false;
-> > +    case MIGRATION_STATUS__MAX:
-> > +        g_assert_not_reached();
-> > +    }
-> > +
-> > +    return false;
-> > +}
-> > +
-> >  MigrationState *migrate_init(const MigrationParams *params)
-> >  {
-> >      MigrationState *s = migrate_get_current();
-> > @@ -1086,9 +1111,15 @@ MigrationState *migrate_init(const MigrationParams *params)
-> >  
-> >  static GSList *migration_blockers;
-> >  
-> > -void migrate_add_blocker(Error *reason)
-> > +int migrate_add_blocker(Error *reason, Error **errp)
-> >  {
-> > -    migration_blockers = g_slist_prepend(migration_blockers, reason);
-> > +    if (migration_is_idle(NULL)) {
-> > +        migration_blockers = g_slist_prepend(migration_blockers, reason);
-> > +        return 0;
-> > +    }
-> > +
-> > +    error_setg(errp, "Cannot block a migration already in-progress");
-> > +    return -EBUSY;
-> >  }
-> >  
-> >  void migrate_del_blocker(Error *reason)
-> > diff --git a/stubs/migr-blocker.c b/stubs/migr-blocker.c
-> > index 8ab3604..a5ba18f 100644
-> > --- a/stubs/migr-blocker.c
-> > +++ b/stubs/migr-blocker.c
-> > @@ -2,8 +2,9 @@
-> >  #include "qemu-common.h"
-> >  #include "migration/migration.h"
-> >  
-> > -void migrate_add_blocker(Error *reason)
-> > +int migrate_add_blocker(Error *reason, Error **errp)
-> >  {
-> > +    return 0;
-> >  }
-> >  
-> >  void migrate_del_blocker(Error *reason)
-> > diff --git a/target-i386/kvm.c b/target-i386/kvm.c
-> > index f62264a..8abb54d 100644
-> > --- a/target-i386/kvm.c
-> > +++ b/target-i386/kvm.c
-> > @@ -961,7 +961,11 @@ int kvm_arch_init_vcpu(CPUState *cs)
-> >          error_setg(&invtsc_mig_blocker,
-> >                     "State blocked by non-migratable CPU device"
-> >                     " (invtsc flag)");
-> > -        migrate_add_blocker(invtsc_mig_blocker);
-> > +        r = migrate_add_blocker(invtsc_mig_blocker, NULL);
-> > +        if (r < 0) {
-> > +            fprintf(stderr, "migrate_add_blocker failed\n");
-> > +            goto efail;
-> > +        }
-> >          /* for savevm */
-> >          vmstate_x86_cpu.unmigratable = 1;
-> >      }
-> > @@ -969,12 +973,12 @@ int kvm_arch_init_vcpu(CPUState *cs)
-> >      cpuid_data.cpuid.padding = 0;
-> >      r = kvm_vcpu_ioctl(cs, KVM_SET_CPUID2, &cpuid_data);
-> >      if (r) {
-> > -        return r;
-> > +        goto fail;
-> >      }
-> >  
-> >      r = kvm_arch_set_tsc_khz(cs);
-> >      if (r < 0) {
-> > -        return r;
-> > +        goto fail;
-> >      }
-> >  
-> >      /* vcpu's TSC frequency is either specified by user, or following
-> > @@ -1001,6 +1005,12 @@ int kvm_arch_init_vcpu(CPUState *cs)
-> >      }
-> >  
-> >      return 0;
-> > +
-> > + fail:
-> > +    migrate_del_blocker(invtsc_mig_blocker);
-> > + efail:
-> > +    error_free(invtsc_mig_blocker);
-> > +    return r;
-> >  }
-> >  
-> >  void kvm_arch_reset_vcpu(X86CPU *cpu)
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
