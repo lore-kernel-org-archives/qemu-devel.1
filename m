@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59757)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59441)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1cGOSf-0007tF-JN
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 06:08:08 -0500
+	(envelope-from <drjones@redhat.com>) id 1cGOS3-0007iy-Ub
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 06:07:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1cGOSd-00037F-QC
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 06:08:01 -0500
-Date: Mon, 12 Dec 2016 12:07:47 +0100
+	(envelope-from <drjones@redhat.com>) id 1cGORy-0002v0-6J
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 06:07:23 -0500
+Date: Mon, 12 Dec 2016 12:07:06 +0100
 From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20161212110747.ajfejuaikakmkznk@kamzik.brq.redhat.com>
+Message-ID: <20161212110706.aec6ivktofuhxim7@kamzik.brq.redhat.com>
 References: <1481301020-21777-1-git-send-email-peter.maydell@linaro.org>
-	<1481301020-21777-3-git-send-email-peter.maydell@linaro.org>
+	<1481301020-21777-5-git-send-email-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1481301020-21777-3-git-send-email-peter.maydell@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH 2/4] hw/arm/virt: Merge VirtBoardInfo and
- VirtMachineState
+In-Reply-To: <1481301020-21777-5-git-send-email-peter.maydell@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH 4/4] hw/arm/virt: Don't incorrectly claim
+ architectural timer to be edge-triggered
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,353 +27,101 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>
 Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Christoffer Dall <christoffer.dall@linaro.org>
 
-On Fri, Dec 09, 2016 at 04:30:18PM +0000, Peter Maydell wrote:
-> One of the purposes of VirtBoardInfo was to hold various
-> bits of state about the board. Now we have MachineState
-> and the subclass VirtMachineState to do this. Fold the
-> VirtBoardInfo into VirtMachineState rather than having
-> some flags in one struct and some in another with no
-> useful way to get between them.
+On Fri, Dec 09, 2016 at 04:30:20PM +0000, Peter Maydell wrote:
+> The architectural timers in ARM CPUs all have level triggered interrupts
+> (unless you're using KVM on a host kernel before 4.4, which misimplemented
+> them as edge-triggered).
 > 
-> In the process we drop the code for looking up the
-> memory map and irq map from the CPU model, because
-> in practice we always use the same maps in all cases.
+> We were incorrectly describing them in the device tree as edge triggered.
+> This can cause problems for guest kernels in 4.8 before rc6:
+>  * pre-4.8 kernels ignore the values in the DT
+>  * 4.8 before rc6 write the DT values to the GIC config registers
+>  * newer than rc6 ignore the DT and insist that the timer interrupts
+>    are level triggered regardless
 > 
-> For easier code review, this change removes the
-> VirtBoardInfo type but leaves all the variables which
-> used to be VirtBoardInfo* and are now VirtMachineState*
-> with their now-confusing 'vbi' names.
+> Fix the DT so we're describing reality. For backwards-compatibility
+> purposes, only do this for the virt-2.9 machine onward.
 > 
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->  hw/arm/virt.c | 118 +++++++++++++++++++++++++---------------------------------
->  1 file changed, 51 insertions(+), 67 deletions(-)
+>  hw/arm/virt.c | 34 ++++++++++++++++++++++++++++++----
+>  1 file changed, 30 insertions(+), 4 deletions(-)
 
 Reviewed-by: Andrew Jones <drjones@redhat.com>
 
+I'll submit the ACPI counterpart, which would require we add
+claim_edge_triggered_timers to VirtGuestInfo, but I have plans
+for VirtGuestInfo - killing it, just like x86 killed PcGuestInfo.
+So the need for this timer patch just bumped the kill VirtGuestInfo
+patch up in the priority queue. I'll start working on it today.
+
+Thanks,
+drew
+
 > 
 > diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index 11c53a5..fd4eed9 100644
+> index 54498ea..2ca9527 100644
 > --- a/hw/arm/virt.c
 > +++ b/hw/arm/virt.c
-> @@ -66,23 +66,8 @@
->  
->  static ARMPlatformBusSystemParams platform_bus_params;
->  
-> -typedef struct VirtBoardInfo {
-> -    struct arm_boot_info bootinfo;
-> -    const char *cpu_model;
-> -    const MemMapEntry *memmap;
-> -    const int *irqmap;
-> -    int smp_cpus;
-> -    void *fdt;
-> -    int fdt_size;
-> -    uint32_t clock_phandle;
-> -    uint32_t gic_phandle;
-> -    uint32_t msi_phandle;
-> -    bool using_psci;
-> -} VirtBoardInfo;
-> -
->  typedef struct {
->      MachineClass parent;
-> -    VirtBoardInfo *daughterboard;
+> @@ -71,6 +71,7 @@ typedef struct {
 >      bool disallow_affinity_adjustment;
 >      bool no_its;
 >      bool no_pmu;
-> @@ -93,6 +78,16 @@ typedef struct {
->      bool secure;
->      bool highmem;
->      int32_t gic_version;
-> +    struct arm_boot_info bootinfo;
-> +    const MemMapEntry *memmap;
-> +    const int *irqmap;
-> +    int smp_cpus;
-> +    void *fdt;
-> +    int fdt_size;
-> +    uint32_t clock_phandle;
-> +    uint32_t gic_phandle;
-> +    uint32_t msi_phandle;
-> +    bool using_psci;
->  } VirtMachineState;
+> +    bool claim_edge_triggered_timers;
+>  } VirtMachineClass;
 >  
->  #define TYPE_VIRT_MACHINE   MACHINE_TYPE_NAME("virt")
-> @@ -202,42 +197,27 @@ static const int a15irqmap[] = {
->      [VIRT_PLATFORM_BUS] = 112, /* ...to 112 + PLATFORM_BUS_NUM_IRQS -1 */
->  };
+>  typedef struct {
+> @@ -309,12 +310,31 @@ static void fdt_add_psci_node(const VirtMachineState *vms)
 >  
-> -static VirtBoardInfo machines[] = {
-> -    {
-> -        .cpu_model = "cortex-a15",
-> -        .memmap = a15memmap,
-> -        .irqmap = a15irqmap,
-> -    },
-> -    {
-> -        .cpu_model = "cortex-a53",
-> -        .memmap = a15memmap,
-> -        .irqmap = a15irqmap,
-> -    },
-> -    {
-> -        .cpu_model = "cortex-a57",
-> -        .memmap = a15memmap,
-> -        .irqmap = a15irqmap,
-> -    },
-> -    {
-> -        .cpu_model = "host",
-> -        .memmap = a15memmap,
-> -        .irqmap = a15irqmap,
-> -    },
-> +static const char *valid_cpus[] = {
-> +    "cortex-a15",
-> +    "cortex-a53",
-> +    "cortex-a57",
-> +    "host",
-> +    NULL
->  };
->  
-> -static VirtBoardInfo *find_machine_info(const char *cpu)
-> +static bool cpuname_valid(const char *cpu)
+>  static void fdt_add_timer_nodes(const VirtMachineState *vms, int gictype)
 >  {
->      int i;
->  
-> -    for (i = 0; i < ARRAY_SIZE(machines); i++) {
-> -        if (strcmp(cpu, machines[i].cpu_model) == 0) {
-> -            return &machines[i];
-> +    for (i = 0; i < ARRAY_SIZE(valid_cpus); i++) {
-> +        if (strcmp(cpu, valid_cpus[i]) == 0) {
-> +            return true;
->          }
->      }
-> -    return NULL;
-> +    return false;
->  }
->  
-> -static void create_fdt(VirtBoardInfo *vbi)
-> +static void create_fdt(VirtMachineState *vbi)
->  {
->      void *fdt = create_device_tree(&vbi->fdt_size);
->  
-> @@ -277,7 +257,7 @@ static void create_fdt(VirtBoardInfo *vbi)
->  
->  }
->  
-> -static void fdt_add_psci_node(const VirtBoardInfo *vbi)
-> +static void fdt_add_psci_node(const VirtMachineState *vbi)
->  {
->      uint32_t cpu_suspend_fn;
->      uint32_t cpu_off_fn;
-> @@ -327,7 +307,7 @@ static void fdt_add_psci_node(const VirtBoardInfo *vbi)
->      qemu_fdt_setprop_cell(fdt, "/psci", "migrate", migrate_fn);
->  }
->  
-> -static void fdt_add_timer_nodes(const VirtBoardInfo *vbi, int gictype)
-> +static void fdt_add_timer_nodes(const VirtMachineState *vbi, int gictype)
->  {
->      /* Note that on A15 h/w these interrupts are level-triggered,
->       * but for the GIC implementation provided by both QEMU and KVM
-> @@ -361,7 +341,7 @@ static void fdt_add_timer_nodes(const VirtBoardInfo *vbi, int gictype)
->                         GIC_FDT_IRQ_TYPE_PPI, ARCH_TIMER_NS_EL2_IRQ, irqflags);
->  }
->  
-> -static void fdt_add_cpu_nodes(const VirtBoardInfo *vbi)
-> +static void fdt_add_cpu_nodes(const VirtMachineState *vbi)
->  {
->      int cpu;
->      int addr_cells = 1;
-> @@ -424,7 +404,7 @@ static void fdt_add_cpu_nodes(const VirtBoardInfo *vbi)
->      }
->  }
->  
-> -static void fdt_add_its_gic_node(VirtBoardInfo *vbi)
-> +static void fdt_add_its_gic_node(VirtMachineState *vbi)
->  {
->      vbi->msi_phandle = qemu_fdt_alloc_phandle(vbi->fdt);
->      qemu_fdt_add_subnode(vbi->fdt, "/intc/its");
-> @@ -437,7 +417,7 @@ static void fdt_add_its_gic_node(VirtBoardInfo *vbi)
->      qemu_fdt_setprop_cell(vbi->fdt, "/intc/its", "phandle", vbi->msi_phandle);
->  }
->  
-> -static void fdt_add_v2m_gic_node(VirtBoardInfo *vbi)
-> +static void fdt_add_v2m_gic_node(VirtMachineState *vbi)
->  {
->      vbi->msi_phandle = qemu_fdt_alloc_phandle(vbi->fdt);
->      qemu_fdt_add_subnode(vbi->fdt, "/intc/v2m");
-> @@ -450,7 +430,7 @@ static void fdt_add_v2m_gic_node(VirtBoardInfo *vbi)
->      qemu_fdt_setprop_cell(vbi->fdt, "/intc/v2m", "phandle", vbi->msi_phandle);
->  }
->  
-> -static void fdt_add_gic_node(VirtBoardInfo *vbi, int type)
-> +static void fdt_add_gic_node(VirtMachineState *vbi, int type)
->  {
->      vbi->gic_phandle = qemu_fdt_alloc_phandle(vbi->fdt);
->      qemu_fdt_setprop_cell(vbi->fdt, "/", "interrupt-parent", vbi->gic_phandle);
-> @@ -483,7 +463,7 @@ static void fdt_add_gic_node(VirtBoardInfo *vbi, int type)
->      qemu_fdt_setprop_cell(vbi->fdt, "/intc", "phandle", vbi->gic_phandle);
->  }
->  
-> -static void fdt_add_pmu_nodes(const VirtBoardInfo *vbi, int gictype)
-> +static void fdt_add_pmu_nodes(const VirtMachineState *vbi, int gictype)
->  {
->      CPUState *cpu;
+> -    /* Note that on A15 h/w these interrupts are level-triggered,
+> -     * but for the GIC implementation provided by both QEMU and KVM
+> -     * they are edge-triggered.
+> +    /* On real hardware these interrupts are level-triggered.
+> +     * On KVM they were edge-triggered before host kernel version 4.4,
+> +     * and level-triggered afterwards.
+> +     * On emulated QEMU they are level-triggered.
+> +     *
+> +     * Getting the DTB info about them wrong is awkward for some
+> +     * guest kernels:
+> +     *  pre-4.8 ignore the DT and leave the interrupt configured
+> +     *   with whatever the GIC reset value (or the bootloader) left it at
+> +     *  4.8 before rc6 honour the incorrect data by programming it back
+> +     *   into the GIC, causing problems
+> +     *  4.8rc6 and later ignore the DT and always write "level triggered"
+> +     *   into the GIC
+> +     *
+> +     * For backwards-compatibility, virt-2.8 and earlier will continue
+> +     * to say these are edge-triggered, but later machines will report
+> +     * the correct information.
+>       */
 >      ARMCPU *armcpu;
-> @@ -514,7 +494,7 @@ static void fdt_add_pmu_nodes(const VirtBoardInfo *vbi, int gictype)
->      }
->  }
->  
-> -static void create_its(VirtBoardInfo *vbi, DeviceState *gicdev)
-> +static void create_its(VirtMachineState *vbi, DeviceState *gicdev)
->  {
->      const char *itsclass = its_class_name();
->      DeviceState *dev;
-> @@ -534,7 +514,7 @@ static void create_its(VirtBoardInfo *vbi, DeviceState *gicdev)
->      fdt_add_its_gic_node(vbi);
->  }
->  
-> -static void create_v2m(VirtBoardInfo *vbi, qemu_irq *pic)
-> +static void create_v2m(VirtMachineState *vbi, qemu_irq *pic)
->  {
->      int i;
->      int irq = vbi->irqmap[VIRT_GIC_V2M];
-> @@ -553,7 +533,7 @@ static void create_v2m(VirtBoardInfo *vbi, qemu_irq *pic)
->      fdt_add_v2m_gic_node(vbi);
->  }
->  
-> -static void create_gic(VirtBoardInfo *vbi, qemu_irq *pic, int type,
-> +static void create_gic(VirtMachineState *vbi, qemu_irq *pic, int type,
->                         bool secure, bool no_its)
->  {
->      /* We create a standalone GIC */
-> @@ -625,7 +605,7 @@ static void create_gic(VirtBoardInfo *vbi, qemu_irq *pic, int type,
->      }
->  }
->  
-> -static void create_uart(const VirtBoardInfo *vbi, qemu_irq *pic, int uart,
-> +static void create_uart(const VirtMachineState *vbi, qemu_irq *pic, int uart,
->                          MemoryRegion *mem, CharDriverState *chr)
->  {
->      char *nodename;
-> @@ -669,7 +649,7 @@ static void create_uart(const VirtBoardInfo *vbi, qemu_irq *pic, int uart,
->      g_free(nodename);
->  }
->  
-> -static void create_rtc(const VirtBoardInfo *vbi, qemu_irq *pic)
-> +static void create_rtc(const VirtMachineState *vbi, qemu_irq *pic)
->  {
->      char *nodename;
->      hwaddr base = vbi->memmap[VIRT_RTC].base;
-> @@ -703,7 +683,7 @@ static Notifier virt_system_powerdown_notifier = {
->      .notify = virt_powerdown_req
->  };
->  
-> -static void create_gpio(const VirtBoardInfo *vbi, qemu_irq *pic)
-> +static void create_gpio(const VirtMachineState *vbi, qemu_irq *pic)
->  {
->      char *nodename;
->      DeviceState *pl061_dev;
-> @@ -750,7 +730,7 @@ static void create_gpio(const VirtBoardInfo *vbi, qemu_irq *pic)
->      g_free(nodename);
->  }
->  
-> -static void create_virtio_devices(const VirtBoardInfo *vbi, qemu_irq *pic)
-> +static void create_virtio_devices(const VirtMachineState *vbi, qemu_irq *pic)
->  {
->      int i;
->      hwaddr size = vbi->memmap[VIRT_MMIO].size;
-> @@ -870,7 +850,7 @@ static void create_one_flash(const char *name, hwaddr flashbase,
->      }
->  }
->  
-> -static void create_flash(const VirtBoardInfo *vbi,
-> +static void create_flash(const VirtMachineState *vbi,
->                           MemoryRegion *sysmem,
->                           MemoryRegion *secure_sysmem)
->  {
-> @@ -925,7 +905,7 @@ static void create_flash(const VirtBoardInfo *vbi,
->      }
->  }
->  
-> -static void create_fw_cfg(const VirtBoardInfo *vbi, AddressSpace *as)
-> +static void create_fw_cfg(const VirtMachineState *vbi, AddressSpace *as)
->  {
->      hwaddr base = vbi->memmap[VIRT_FW_CFG].base;
->      hwaddr size = vbi->memmap[VIRT_FW_CFG].size;
-> @@ -944,7 +924,8 @@ static void create_fw_cfg(const VirtBoardInfo *vbi, AddressSpace *as)
->      g_free(nodename);
->  }
->  
-> -static void create_pcie_irq_map(const VirtBoardInfo *vbi, uint32_t gic_phandle,
-> +static void create_pcie_irq_map(const VirtMachineState *vbi,
-> +                                uint32_t gic_phandle,
->                                  int first_irq, const char *nodename)
->  {
->      int devfn, pin;
-> @@ -979,7 +960,7 @@ static void create_pcie_irq_map(const VirtBoardInfo *vbi, uint32_t gic_phandle,
->                             0x7           /* PCI irq */);
->  }
->  
-> -static void create_pcie(const VirtBoardInfo *vbi, qemu_irq *pic,
-> +static void create_pcie(const VirtMachineState *vbi, qemu_irq *pic,
->                          bool use_highmem)
->  {
->      hwaddr base_mmio = vbi->memmap[VIRT_PCIE_MMIO].base;
-> @@ -1095,7 +1076,7 @@ static void create_pcie(const VirtBoardInfo *vbi, qemu_irq *pic,
->      g_free(nodename);
->  }
->  
-> -static void create_platform_bus(VirtBoardInfo *vbi, qemu_irq *pic)
-> +static void create_platform_bus(VirtMachineState *vbi, qemu_irq *pic)
->  {
->      DeviceState *dev;
->      SysBusDevice *s;
-> @@ -1136,7 +1117,8 @@ static void create_platform_bus(VirtBoardInfo *vbi, qemu_irq *pic)
->                                  sysbus_mmio_get_region(s, 0));
->  }
->  
-> -static void create_secure_ram(VirtBoardInfo *vbi, MemoryRegion *secure_sysmem)
-> +static void create_secure_ram(VirtMachineState *vbi,
-> +                              MemoryRegion *secure_sysmem)
->  {
->      MemoryRegion *secram = g_new(MemoryRegion, 1);
->      char *nodename;
-> @@ -1159,7 +1141,8 @@ static void create_secure_ram(VirtBoardInfo *vbi, MemoryRegion *secure_sysmem)
->  
->  static void *machvirt_dtb(const struct arm_boot_info *binfo, int *fdt_size)
->  {
-> -    const VirtBoardInfo *board = (const VirtBoardInfo *)binfo;
-> +    const VirtMachineState *board = container_of(binfo, VirtMachineState,
-> +                                                 bootinfo);
->  
->      *fdt_size = board->fdt_size;
->      return board->fdt;
-> @@ -1214,7 +1197,7 @@ static void machvirt_init(MachineState *machine)
->      int n, virt_max_cpus;
->      MemoryRegion *ram = g_new(MemoryRegion, 1);
->      const char *cpu_model = machine->cpu_model;
-> -    VirtBoardInfo *vbi;
-> +    VirtMachineState *vbi = vms;
->      VirtGuestInfoState *guest_info_state = g_malloc0(sizeof *guest_info_state);
->      VirtGuestInfo *guest_info = &guest_info_state->info;
->      char **cpustr;
-> @@ -1248,9 +1231,7 @@ static void machvirt_init(MachineState *machine)
->      /* Separate the actual CPU model name from any appended features */
->      cpustr = g_strsplit(cpu_model, ",", 2);
->  
-> -    vbi = find_machine_info(cpustr[0]);
-> -
-> -    if (!vbi) {
-> +    if (!cpuname_valid(cpustr[0])) {
->          error_report("mach-virt: CPU %s not supported", cpustr[0]);
->          exit(1);
->      }
-> @@ -1556,6 +1537,9 @@ static void virt_2_9_instance_init(Object *obj)
->      object_property_set_description(obj, "gic-version",
->                                      "Set GIC version. "
->                                      "Valid values are 2, 3 and host", NULL);
+> -    uint32_t irqflags = GIC_FDT_IRQ_FLAGS_EDGE_LO_HI;
+> +    VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
+> +    uint32_t irqflags = GIC_FDT_IRQ_FLAGS_LEVEL_HI;
 > +
-> +    vms->memmap = a15memmap;
-> +    vms->irqmap = a15irqmap;
->  }
+> +    if (vmc->claim_edge_triggered_timers) {
+> +        irqflags = GIC_FDT_IRQ_FLAGS_EDGE_LO_HI;
+> +    }
 >  
->  static void virt_machine_2_9_options(MachineClass *mc)
+>      if (gictype == 2) {
+>          irqflags = deposit32(irqflags, GIC_FDT_IRQ_PPI_CPU_START,
+> @@ -1556,8 +1576,14 @@ static void virt_2_8_instance_init(Object *obj)
+>  
+>  static void virt_machine_2_8_options(MachineClass *mc)
+>  {
+> +    VirtMachineClass *vmc = VIRT_MACHINE_CLASS(OBJECT_CLASS(mc));
+> +
+>      virt_machine_2_9_options(mc);
+>      SET_MACHINE_COMPAT(mc, VIRT_COMPAT_2_8);
+> +    /* For 2.8 and earlier we falsely claimed in the DT that
+> +     * our timers were edge-triggered, not level-triggered.
+> +     */
+> +    vmc->claim_edge_triggered_timers = true;
+>  }
+>  DEFINE_VIRT_MACHINE(2, 8)
+>  
 > -- 
 > 2.7.4
 > 
