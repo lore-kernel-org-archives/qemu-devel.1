@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42395)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47511)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cGNRZ-0000fd-4b
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 05:02:56 -0500
+	(envelope-from <drjones@redhat.com>) id 1cGNYu-0005J9-P1
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 05:10:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cGNRT-00052H-Qr
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 05:02:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48714)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cGNRT-00050l-L0
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 05:02:43 -0500
-Date: Mon, 12 Dec 2016 10:02:36 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20161212100236.GA15611@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20161210153038.9184-1-maxime.coquelin@redhat.com>
+	(envelope-from <drjones@redhat.com>) id 1cGNYt-0000v5-Sy
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 05:10:24 -0500
+Date: Mon, 12 Dec 2016 11:10:10 +0100
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20161212101010.eb74etmg6gjcx5ew@kamzik.brq.redhat.com>
+References: <1481301020-21777-1-git-send-email-peter.maydell@linaro.org>
+	<1481301020-21777-5-git-send-email-peter.maydell@linaro.org>
+	<20161211163502.GB6352@cbox>
+	<CAFEAcA_zvNvJ7K5GgPyeJ5EWRxO1XL2=rc6dv_nT6_h3qF=m6A@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20161210153038.9184-1-maxime.coquelin@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 0/3] virtio-net: Add support to MTU
- feature
+In-Reply-To: <CAFEAcA_zvNvJ7K5GgPyeJ5EWRxO1XL2=rc6dv_nT6_h3qF=m6A@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 4/4] hw/arm/virt: Don't incorrectly claim
+ architectural timer to be edge-triggered
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,33 +26,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Maxime Coquelin <maxime.coquelin@redhat.com>
-Cc: mst@redhat.com, aconole@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, jasowang@redhat.com, yuanhan.liu@linux.intel.com, fbl@redhat.com, mlureau@redhat.com, ktraynor@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Sat, Dec 10, 2016 at 04:30:35PM +0100, Maxime Coquelin wrote:
-> Thanks for the reviews,
+On Sun, Dec 11, 2016 at 10:52:25PM +0000, Peter Maydell wrote:
+> On 11 December 2016 at 16:35, Christoffer Dall
+> <christoffer.dall@linaro.org> wrote:
+> > On Fri, Dec 09, 2016 at 04:30:20PM +0000, Peter Maydell wrote:
+> >> +     * For backwards-compatibility, virt-2.8 and earlier will continue
+> >> +     * to say these are edge-triggered, but later machines will report
+> >> +     * the correct information.
+> >>       */
+> >
+> > Is this really necessary?
 > 
-> This series implements Virtio spec update from Aaron Conole which
-> defines a way for the host to expose its max MTU to the guest.
+> It's being conservative -- from the guest's point of view
+> (any guest, not necessarily just Linux) "virt-2.8" should behave
+> like the "virt" machine in the 2.8 QEMU release, including bugs,
+> not providing newer devices, and so on.
 > 
-> "host_mtu" parameter is added to provide QEMU with the MTU value,
-> and the backend, if supported, gets notified of the MTU value when the
-> MTU feature neogotiation succeeds.
-> 
-> Only user backend currently supports MTU notification. A new protocol
-> feature has been implemented for sending MTU value to the backend.
-> 
-> For kernel backend, it is expected the management tool also configures
-> the tap/macvtap interface with same MTU value.
-> Daniel, I would be interrested about your feedback on this implementation
-> from management tool point of view.
+> Andrew would be the expert on whether this is being unnecessarily
+> conservative in this specific case.
 
-I can't give real feedback yet, as I'm not seeing clear information on
-what problem this series is designed to solve....
+I agree that all DT and ACPI (we need the equivalent change to the GTDT)
+changes should require compatibility code. We should document a list of
+mach-virt change types that require machine version consideration
+somewhere. I can ask our migration experts to help me pull a list
+together.
 
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+Thanks,
+drew
