@@ -1,41 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47467)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49347)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cGPfV-00047W-Nz
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 07:25:22 -0500
+	(envelope-from <famz@redhat.com>) id 1cGPiE-0005wS-89
+	for Qemu-devel@nongnu.org; Mon, 12 Dec 2016 07:28:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cGPfS-0002ym-58
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 07:25:21 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52430
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1cGPfR-0002y6-Vt
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 07:25:18 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	uBCCOwuc079851
-	for <qemu-devel@nongnu.org>; Mon, 12 Dec 2016 07:25:17 -0500
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 279psmx28w-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 12 Dec 2016 07:25:16 -0500
-Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Mon, 12 Dec 2016 12:25:15 -0000
-Date: Mon, 12 Dec 2016 13:25:09 +0100
-From: Cornelia Huck <cornelia.huck@de.ibm.com>
-In-Reply-To: <20161206193159.GE4027@thinpad.lan.raisama.net>
-References: <148104617887.7699.984921868108236415.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-	<20161206191952.GD4027@thinpad.lan.raisama.net>
-	<20161206193159.GE4027@thinpad.lan.raisama.net>
+	(envelope-from <famz@redhat.com>) id 1cGPiA-0004L1-W2
+	for Qemu-devel@nongnu.org; Mon, 12 Dec 2016 07:28:10 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39668)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1cGPiA-0004Kh-QG
+	for Qemu-devel@nongnu.org; Mon, 12 Dec 2016 07:28:06 -0500
+Date: Mon, 12 Dec 2016 20:28:03 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20161212122803.GC7918@lemon>
+References: <6BBB3038-0389-4221-9A41-63800F3FF514@livius.net>
+	<20161212033512.GA3725@lemon>
+	<908F0328-771A-4269-8301-9A7D08BD585F@livius.net>
+	<20161212073915.GC3725@lemon>
+	<96DEA2D0-3822-4A8C-9950-973B84AF4182@livius.net>
+	<20161212093907.GA7918@lemon>
+	<151F368B-80DA-4DF6-837C-E2E0737E4AE6@livius.net>
+	<20161212103616.GB7918@lemon>
+	<220EB996-A454-4FB1-9BAD-B0F4A300345E@livius.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Message-Id: <20161212132509.6a031fb6.cornelia.huck@de.ibm.com>
-Subject: Re: [Qemu-devel] [RFC for-2.8] machine: Convert abstract typename
- on compat_props to subclass names
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <220EB996-A454-4FB1-9BAD-B0F4A300345E@livius.net>
+Subject: Re: [Qemu-devel] experience with SDL2, event loop & main thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,53 +34,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org, Halil Pasic <pasic@linux.vnet.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-stable@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Liviu Ionescu <ilg@livius.net>
+Cc: QEMU Developer <Qemu-devel@nongnu.org>
 
-On Tue, 6 Dec 2016 17:31:59 -0200
-Eduardo Habkost <ehabkost@redhat.com> wrote:
-
-> What about this?
+On Mon, 12/12 13:27, Liviu Ionescu wrote:
 > 
-> (untested)
-
-Have not tested it either, but I think it looks good. Some nits below.
-
+> > On 12 Dec 2016, at 12:36, Fam Zheng <famz@redhat.com> wrote:
+> > 
+> > an EventNotifier in the main thread which is notified by the vCPU
+> > thread upon a new graphics operation? 
 > 
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
->  hw/core/machine.c | 35 ++++++++++++++++++++++++++++++++---
->  1 file changed, 32 insertions(+), 3 deletions(-)
-> 
+> the idea of using notifications is ok, but I could not figure out what api to
+> use to implement it. can you provide more details?
 
-> @@ -565,10 +584,20 @@ void machine_register_compat_props(MachineState *machine)
->      }
-> 
->      for (i = 0; i < mc->compat_props->len; i++) {
-> +        ObjectClass *oc;
+Take a look at event_notifier_set_handler() and event_notifier_set().
 
-Move the declaration out of the loop?
+Or alternatively (whichever works better for you, I don't know): qemu_bh_new()
+and qemu_bh_schedule().
 
->          p = g_array_index(mc->compat_props, GlobalProperty *, i);
-> -        /* Machine compat_props must never cause errors: */
-> -        p->errp = &error_abort;
-> -        qdev_prop_register_global(p);
-> +        oc = object_class_by_name(p->driver);
-> +        if (oc && object_class_is_abstract(oc)) {
-> +            /* temporary hack to make sure we will never override
-> +             * globals set explicitly on -global: if an abstract class
-> +             * is on compat_props, register globals for each of their
-> +             * subclasses instead.
-> +             */
+Both can register a callback that will be called in main loop once fired.
 
-I think this should not just be a 'temporary hack'... rather document
-this behaviour for abstract classes?
-
-> +            object_class_foreach(machine_register_compat_for_subclass,
-> +                                 p->driver, false, p);
-> +        } else {
-> +            register_compat_prop(p->driver, p->property, p->value);
-> +        }
->      }
->  }
-> 
+Fam
