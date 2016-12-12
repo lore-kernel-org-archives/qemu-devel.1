@@ -1,24 +1,44 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42416)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57308)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cGVG3-0005Pl-9y
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 13:23:32 -0500
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1cGUu7-0000bT-Bh
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 13:00:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cGVG2-0004zo-BL
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 13:23:27 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <87oa0q1t21.fsf@dusky.pond.sub.org> <20161207025457.GB30227@lemon>
-	<20161207094832.GA4773@noname.str.redhat.com>
-	<20161207100339.GB2286@lemon> <87shpybnbc.fsf@dusky.pond.sub.org>
-	<20161208134759.GA32226@lemon> <87wpf52qru.fsf@dusky.pond.sub.org>
-	<20161212144307.GA21817@lemon>
-Date: Mon, 12 Dec 2016 19:23:13 +0100
-In-Reply-To: <20161212144307.GA21817@lemon> (Fam Zheng's message of "Mon, 12
-	Dec 2016 22:43:07 +0800")
-Message-ID: <87zik1xazy.fsf@dusky.pond.sub.org>
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1cGUu3-00047W-B7
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 13:00:47 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34829
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1cGUu2-00046w-SB
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 13:00:43 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
+	uBCHsSVY086202
+	for <qemu-devel@nongnu.org>; Mon, 12 Dec 2016 13:00:41 -0500
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 279yg165xu-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 12 Dec 2016 13:00:41 -0500
+Received: from localhost
+	by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Mon, 12 Dec 2016 18:00:39 -0000
+References: <148104617887.7699.984921868108236415.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+	<20161206191952.GD4027@thinpad.lan.raisama.net>
+	<20161206193159.GE4027@thinpad.lan.raisama.net>
+	<20161212132509.6a031fb6.cornelia.huck@de.ibm.com>
+	<f1f93b66-c414-9dce-ecc4-2239ceaa1774@linux.vnet.ibm.com>
+	<20161212174707.GE3808@thinpad.lan.raisama.net>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Mon, 12 Dec 2016 19:00:35 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [Qemu-block]  Meeting notes on -blockdev,
- dynamic backend reconfiguration
+In-Reply-To: <20161212174707.GE3808@thinpad.lan.raisama.net>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Message-Id: <a3724e25-cbc8-8392-93ac-7ff13dcf3f81@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [RFC for-2.8] machine: Convert abstract typename
+ on compat_props to subclass names
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,132 +47,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Cornelia Huck <cornelia.huck@de.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>, qemu-stable@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Fam Zheng <famz@redhat.com> writes:
 
-> On Mon, 12/12 14:58, Markus Armbruster wrote:
->> Fam Zheng <famz@redhat.com> writes:
->> 
->> > On Thu, 12/08 13:46, Markus Armbruster wrote:
->> >> Fam Zheng <famz@redhat.com> writes:
->> >> 
->> >> > On Wed, 12/07 10:48, Kevin Wolf wrote:
->> >> >> > If so I think there is no race to worry about, mirror-filter should go
->> >> >> > away only after a QMP command.
->> >> >> 
->> >> >> Currently, a mirror job goes away whenever it is done. This is not
->> >> >> directly tied to a QMP command.
->> >> >
->> >> > Ah right, block-job-complete is only "start to complete" and the job goes away
->> >> > at some later point. I thought this is "the" QMP command but it is not.
->> >> >
->> >> >> 
->> >> >> Of course, in the new job API we want an explicit job-delete, so in
->> >> >> that case it wouldn't happen, but we need to keep the old case for
->> >> >> compatibility.
->> >> >
->> >> > Another possibility is to add a placeholder node in the right location first
->> >> > then fill in the actual throttling node once created. QMP owns the placeholder
->> >> > node so it won't suddenly vanish when mirror job goes away.
->> >> 
->> >> I'm not sure I understand this idea.  Could you explain it in a bit more
->> >> detail, perhaps even with a bit of ASCII art?
->> >
->> > OK, I'll base on your version:
->> >
->> > == Basic dynamic reconfiguration operation ==
->> >
->> > The two primitives are "insert placeholder" and bdrv_replace_child;
->> >
->> > A placeholder BDS is a dummy "pass through everything" filter. Inserting
->> > placeholder is something like:
->> >
->> >     void bdrv_insert_placeholder(BdrvChild *child) {
->> >         BlockDriverState *ph = bdrv_new_placeholder();
->> >         ph->file->bs = child->bs;
->> >         child->bs = ph;
->> >     }
->> >
->> > Consider:
->> >
->> >           BB
->> >           |
->> >     mirror-filter
->> >           |
->> >          BDS
->> >
->> > Add a throttle filter under BB while the mirror job is running.  First step,
->> > create the dummy _placeholder_ node and throttle-filter node (the existence of
->> > placeholder node can be an implementation detail hidden from user):
->> >
->> >     placeholder = bdrv_insert_placeholder(BB->root);
->> >     throttle_filter = bdrv_create_throttle_filter(placeholder);
->> >
->> > we get:
->> >
->> >           BB     throttle-filter
->> >           |     /
->> >      placeholder
->> >           |
->> >     mirror-filter
->> >           |
->> >          BDS
->> >
->> > Second step, move throttle filter in:
->> >
->> >     bdrv_replace_child(BB->root, throttle_filter);
->> >     bdrv_replace_child(throttle_filter->file, throttle_filter->file->bs->file->bs);
->> >     bdrv_unref(placeholder);
->> >
->> > we get:
->> >
->> >           BB
->> >           |
->> >    throttle-filter
->> >           |
->> >     mirror-filter
->> >           |
->> >          BDS
->> >
->> > Does this make us safe from racing with mirror-filter disappearing?
->> 
->> Thanks!  I figure your placeholder node does immunize the splicing in of
->> the throttle-filter against the removal of mirror-filter.
->> 
->> Given a specific dynamic reconfiguration, where do we have to put
->> placeholder nodes to immunize it against arbitrary other dynamic
->> changes?
->
-> Generally, a placeholder node is essentially an insertion to the middle of an
-> existing edge, namely to change:
->
->          NodeA
->        /   |   \
->       /    |    \
->  [...]   NodeB   [...]
->
-> into:
->
->          NodeA
->        /   |   \
->       /    |    \
->  [...]  p-holdr  [...]
->            |
->            |
->          NodeB
->
-> and the operation is safe because of BQL. Our later bdrv_replace_child()
-> operations on it will always work because a dynamic reconfiguration won't delete
-> the placeholder node in any case.
->
-> On the other hand, concurrent dynamic changes could yield usual outcomes from
-> user PoV (like the involved node is no longer in the same place or disappears),
-> but I think it is still in some degree under user's control. E.g. a
-> mirror-filter won't go away automatically until user does
-> block-job-complete/cancel.
 
-I think I understand how we can safely insert a placeholder.  My
-question is: *where* do we have to insert placeholders before a certain
-dynamic reconfiguration to make that reconfiguration safe?
+On 12/12/2016 06:47 PM, Eduardo Habkost wrote:
+>>>> +             */
+>>> I think this should not just be a 'temporary hack'... rather document
+>>> this behaviour for abstract classes?
+>>>
+>> Connie, I have to disagree with you on this. I'm fine with this as a
+>> temporary hack provided it remedies the acute problem, but I would this
+>> becoming state of art.
+>>
+>> The reason for this how abstract class is usually understood in OOP:
+>> it's like a normal class except you can not instantiate it.  Adding an
+>> extra property rule, and especially such a convoluted one, could result
+>> in a conflict between intuition and reality.  And it's not like we have
+>> no plan how to do this cleanly.
+>>
+>> Why do I say convoluted:
+>> * Inheriting form abstract and from non-abstract behaves differently.
+>> * Theoretically we have something like non-abstract (C_3) inherits for
+>> abstract (AC_2) inherits from non-abstract (C_1)  inherits from abstract
+>> (AC_0), and we set the property P both via AC_0 and AC_2 for an instance
+>> of C1 we would/could end up having the same problem as we have now (via
+>> AC_0 taking precedence over AC_2) -- at least I think so. 
+> Well, we could change the code to:
+> 1) Not check object_class_is_abstract(), and simply register the
+>    globals for all subtypes;
+> 2) Call qdev_prop_set_globals_for_type() only for
+>    object_class_get_name(), instead of doing it for all
+>    parent classes in qdev_prop_set_globals().
+> 
+> But this sounds like a more complicated way of implementing
+> exactly the same behavior implemented by Greg Kurz in "qdev: fix
+> the order compat and global properties are applied".
+> 
+
+Yeah. This is what I meant with "And it's not like we have
+no plan how to do this cleanly.", was trying to convince Connie
+that this called a hack for a reason. I think we are on the same
+page. I think this is a really good way to solve the acute problem
+with a small LOC number.
+
+Halil
