@@ -1,14 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53689)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53706)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1cGutA-0002ML-Nr
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 16:45:33 -0500
+	(envelope-from <drjones@redhat.com>) id 1cGutB-0002NQ-Ls
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 16:45:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1cGut9-0007TG-6X
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 16:45:32 -0500
+	(envelope-from <drjones@redhat.com>) id 1cGutA-0007Tp-QA
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 16:45:33 -0500
 From: Andrew Jones <drjones@redhat.com>
-Date: Tue, 13 Dec 2016 22:45:11 +0100
-Message-Id: <20161213214522.25548-1-drjones@redhat.com>
-Subject: [Qemu-devel] [PATCH 00/11] Remove VirtGuestInfo
+Date: Tue, 13 Dec 2016 22:45:12 +0100
+Message-Id: <20161213214522.25548-2-drjones@redhat.com>
+In-Reply-To: <20161213214522.25548-1-drjones@redhat.com>
+References: <20161213214522.25548-1-drjones@redhat.com>
+Subject: [Qemu-devel] [PATCH 01/11] hw/arm/virt: parameter passing cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,43 +22,94 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-arm@nongnu.org
 Cc: peter.maydell@linaro.org, zhaoshenglong@huawei.com, mst@redhat.com, imammedo@redhat.com, ehabkost@redhat.com
 
-This series is based on Peter's qemu-arm gicv3-virt branch. It's
-main goal (patches 04-10), which was suggested by Eduardo, is to
-remove an unnecessary structure, VirtGuestInfo, which is a
-maintenance burden, as it requires duplicating Virt machine state.
-Additionally patches 01-03 do some mach-virt cleanups and patch 11
-adds the ACPI equivalent to one of the DT patches in Peter's
-gicv3-virt branch.
+Some simple cleanups made possible by "hw/arm/virt: Merge
+VirtBoardInfo and VirtMachineState"
 
-The last patch isn't really tested as the guest kernel versions I
-used seem to ignore the GTDT irqflags and either just choose edge,
-4.5-based kernel, or level, 4.9-based kernel.
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+---
+ hw/arm/virt.c | 19 +++++++++----------
+ 1 file changed, 9 insertions(+), 10 deletions(-)
 
-Patches available here
-https://github.com/rhdrjones/qemu/commits/virt/remove-guest-info
-
-
-Andrew Jones (11):
-  hw/arm/virt: parameter passing cleanups
-  hw/arm/virt: use VirtMachineState.gic_version
-  hw/arm/virt: use VirtMachineState.smp_cpus
-  hw/arm/virt: eliminate struct VirtGuestInfoState
-  hw/arm/virt: remove include/hw/arm/virt-acpi-build.h
-  hw/arm/virt: move VirtMachineState/Class to virt.h
-  hw/arm/virt: pass VirtMachineState instead of VirtGuestInfo
-  hw/arm/virt-acpi-build: remove redundant members from VirtGuestInfo
-  hw/arm/virt-acpi-build: don't save VirtGuestInfo on AcpiBuildState
-  hw/arm/virt: remove VirtGuestInfo
-  hw/arm/virt-acpi-build: Don't incorrectly claim architectural timer to
-    be edge-triggered
-
- MAINTAINERS                      |   2 -
- hw/arm/virt-acpi-build.c         | 103 +++++++++++++-------------
- hw/arm/virt.c                    | 152 ++++++++++++++-------------------------
- include/hw/arm/virt-acpi-build.h |  47 ------------
- include/hw/arm/virt.h            |  45 +++++++++++-
- 5 files changed, 151 insertions(+), 198 deletions(-)
- delete mode 100644 include/hw/arm/virt-acpi-build.h
-
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 7eec50a82494..d451bc4f6b9b 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -570,10 +570,10 @@ static void create_v2m(VirtMachineState *vms, qemu_irq *pic)
+     fdt_add_v2m_gic_node(vms);
+ }
+ 
+-static void create_gic(VirtMachineState *vms, qemu_irq *pic, int type,
+-                       bool secure, bool no_its)
++static void create_gic(VirtMachineState *vms, qemu_irq *pic, int type)
+ {
+     /* We create a standalone GIC */
++    VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
+     DeviceState *gicdev;
+     SysBusDevice *gicbusdev;
+     const char *gictype;
+@@ -589,7 +589,7 @@ static void create_gic(VirtMachineState *vms, qemu_irq *pic, int type,
+      */
+     qdev_prop_set_uint32(gicdev, "num-irq", NUM_IRQS + 32);
+     if (!kvm_irqchip_in_kernel()) {
+-        qdev_prop_set_bit(gicdev, "has-security-extensions", secure);
++        qdev_prop_set_bit(gicdev, "has-security-extensions", vms->secure);
+     }
+     qdev_init_nofail(gicdev);
+     gicbusdev = SYS_BUS_DEVICE(gicdev);
+@@ -643,7 +643,7 @@ static void create_gic(VirtMachineState *vms, qemu_irq *pic, int type,
+ 
+     fdt_add_gic_node(vms, type);
+ 
+-    if (type == 3 && !no_its) {
++    if (type == 3 && !vmc->no_its) {
+         create_its(vms, gicdev);
+     } else if (type == 2) {
+         create_v2m(vms, pic);
+@@ -1005,8 +1005,7 @@ static void create_pcie_irq_map(const VirtMachineState *vms,
+                            0x7           /* PCI irq */);
+ }
+ 
+-static void create_pcie(const VirtMachineState *vms, qemu_irq *pic,
+-                        bool use_highmem)
++static void create_pcie(const VirtMachineState *vms, qemu_irq *pic)
+ {
+     hwaddr base_mmio = vms->memmap[VIRT_PCIE_MMIO].base;
+     hwaddr size_mmio = vms->memmap[VIRT_PCIE_MMIO].size;
+@@ -1049,7 +1048,7 @@ static void create_pcie(const VirtMachineState *vms, qemu_irq *pic,
+                              mmio_reg, base_mmio, size_mmio);
+     memory_region_add_subregion(get_system_memory(), base_mmio, mmio_alias);
+ 
+-    if (use_highmem) {
++    if (vms->highmem) {
+         /* Map high MMIO space */
+         MemoryRegion *high_mmio_alias = g_new0(MemoryRegion, 1);
+ 
+@@ -1098,7 +1097,7 @@ static void create_pcie(const VirtMachineState *vms, qemu_irq *pic,
+     qemu_fdt_setprop_sized_cells(vms->fdt, nodename, "reg",
+                                  2, base_ecam, 2, size_ecam);
+ 
+-    if (use_highmem) {
++    if (vms->highmem) {
+         qemu_fdt_setprop_sized_cells(vms->fdt, nodename, "ranges",
+                                      1, FDT_PCI_RANGE_IOPORT, 2, 0,
+                                      2, base_pio, 2, size_pio,
+@@ -1428,7 +1427,7 @@ static void machvirt_init(MachineState *machine)
+ 
+     create_flash(vms, sysmem, secure_sysmem ? secure_sysmem : sysmem);
+ 
+-    create_gic(vms, pic, gic_version, vms->secure, vmc->no_its);
++    create_gic(vms, pic, gic_version);
+ 
+     fdt_add_pmu_nodes(vms, gic_version);
+ 
+@@ -1441,7 +1440,7 @@ static void machvirt_init(MachineState *machine)
+ 
+     create_rtc(vms, pic);
+ 
+-    create_pcie(vms, pic, vms->highmem);
++    create_pcie(vms, pic);
+ 
+     create_gpio(vms, pic);
+ 
 -- 
 2.9.3
