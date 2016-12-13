@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35272)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35744)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cGmlY-0007wm-GP
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 08:05:13 -0500
+	(envelope-from <berrange@redhat.com>) id 1cGmnf-0000ye-DO
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 08:07:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cGmlQ-00054w-N4
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 08:05:08 -0500
-Date: Tue, 13 Dec 2016 21:04:45 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20161213130445.GA22156@lemon>
-References: <cover.1481290956.git.berto@igalia.com>
-	<468dbeb8-5b1b-669f-f7e5-0d24a4308da8@redhat.com>
-	<w51bmwhck1c.fsf@maestria.local.igalia.com>
-	<756cfb05-61e1-7ee3-435b-93759438a52d@redhat.com>
-	<20161213101635.GC2165@lemon>
-	<20161213122900.GA3918@noname.redhat.com>
+	(envelope-from <berrange@redhat.com>) id 1cGmnb-0005gk-J3
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 08:07:19 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60228)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cGmnb-0005gX-BQ
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 08:07:15 -0500
+Date: Tue, 13 Dec 2016 13:07:07 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20161213130707.GH28416@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20161210153038.9184-1-maxime.coquelin@redhat.com>
+	<20161212100236.GA15611@redhat.com>
+	<cc475d20-6e77-17ab-b41e-56a6d4bf81b2@redhat.com>
+	<20161212103432.GH15611@redhat.com>
+	<9523b995-33a6-80a5-9e6e-e0dc1942578f@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20161213122900.GA3918@noname.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH RFC 0/1] Allow storing the qcow2 L2 cache
- in disk
+In-Reply-To: <9523b995-33a6-80a5-9e6e-e0dc1942578f@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 0/3] virtio-net: Add support to MTU
+ feature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,53 +32,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Maxime Coquelin <maxime.coquelin@redhat.com>
+Cc: mst@redhat.com, aconole@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, jasowang@redhat.com, yuanhan.liu@linux.intel.com, fbl@redhat.com, mlureau@redhat.com, ktraynor@redhat.com
 
-On Tue, 12/13 13:29, Kevin Wolf wrote:
-> Am 13.12.2016 um 11:16 hat Fam Zheng geschrieben:
-> > On Tue, 12/13 09:02, Max Reitz wrote:
-> > > > Yes but the use case is that the qcow2 image is stored in a slow disk,
-> > > > so things will be faster if we avoid having to read it too often.
-> > > > 
-> > > > But the data is there and it needs to be read, so we have three options:
-> > > > 
-> > > >   1) Read it everytime we need it. It slows things down.
-> > > >   2) Keep (part of) it in memory. It can use a lot of memory.
-> > > >   3) Keep it in a faster disk.
-> > > > 
-> > > > We're talking about 3) here, and this it not about creating new
-> > > > structures, but about changing the storage backend of the existing L2
-> > > > cache (disk rather than RAM).
-> > > 
-> > > I'm arguing that we already have an on-disk L2 structure and that is called
-> > > simply the L1-L2 structure in the qcow2 file. The cache only makes sense
-> > > because it is in RAM.
-> > 
-> > I am looking at this problem from a different angle:
-> > 
-> > Assume a qcow2 image created by a known version of QEMU with the option
-> > preallocation=falloc, it is theoretically possible to do a hacky optimization in
-> > qcow2 I/O path that, instead of looking up in L1/L2, we can calculate file
-> > offset for any given virtual address, by adding the file offset of LBA 0.
-> > 
-> > If we make this optimization a header extention and add it to the spec, it is no
-> > longer a hack, and it should offer nearly the same performance as raw in all
-> > cases - if we say raw is doing "identical mapping" from LBA to file offset, this
-> > new operation mode of qcow2 file is basically doing a "shift by constant" mapping.
+On Tue, Dec 13, 2016 at 02:04:52PM +0100, Maxime Coquelin wrote:
 > 
-> Is this a scenario that matters in practice, though? If you want
-> performance and you don't need COW functionality, just use raw images to
-> begin with.
+> 
+> On 12/12/2016 11:34 AM, Daniel P. Berrange wrote:
+> > On Mon, Dec 12, 2016 at 11:12:56AM +0100, Maxime Coquelin wrote:
+> > > Hi Daniel,
+> > > 
+> > > On 12/12/2016 11:02 AM, Daniel P. Berrange wrote:
+> > > > On Sat, Dec 10, 2016 at 04:30:35PM +0100, Maxime Coquelin wrote:
+> > > > > Thanks for the reviews,
+> > > > > 
+> > > > > This series implements Virtio spec update from Aaron Conole which
+> > > > > defines a way for the host to expose its max MTU to the guest.
+> > > > > 
+> > > > > "host_mtu" parameter is added to provide QEMU with the MTU value,
+> > > > > and the backend, if supported, gets notified of the MTU value when the
+> > > > > MTU feature neogotiation succeeds.
+> > > > > 
+> > > > > Only user backend currently supports MTU notification. A new protocol
+> > > > > feature has been implemented for sending MTU value to the backend.
+> > > > > 
+> > > > > For kernel backend, it is expected the management tool also configures
+> > > > > the tap/macvtap interface with same MTU value.
+> > > > > Daniel, I would be interrested about your feedback on this implementation
+> > > > > from management tool point of view.
+> > > > 
+> > > > I can't give real feedback yet, as I'm not seeing clear information on
+> > > > what problem this series is designed to solve....
+> > > 
+> > > Right, I agree it is missing a bit of context here, I'll add more about
+> > > the background in next revision.
+> > > 
+> > > The goal of this series is to address two things:
+> > > 1. Providing a way for the guests to use the same MTU as the host,
+> > >    in order to have a consistent MTU value across the infrastructure.
+> > 
+> > Ok, currently libvirt sets the MTU of the tap device based on the MTU
+> > of the device it will be attached to. This change means we need to pass
+> > that MTU value into QEMU via the -netdev command line so it can inform
+> > the guest what the MTU is.
+> Nice, do you have a pointer on where this is done in QEMU?
 
-The intention is actually to combine the advantages of both: external snapshot
-can be supported by an allocation status bitmap generated from scanning the
-whole L1/L2 table, or even from loading a new type of qcow2 bitmap specifically
-for making that efficient.
+Its in libvirt code via virNetDevSetMTUFromDevice()
 
-I share the same doubt as Stefan regarding the on disk format. Modern file
-systems support sparse file quite well, so I wonder what advantages are still
-there in using L1/L2 tables instead of a simple bitmap, if the user doesn't use
-internal snapshot in the first place?
 
-Fam
+Regards,
+Daniel
+-- 
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
