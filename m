@@ -1,25 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52385)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53689)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1cGunw-0004oB-1l
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 16:40:09 -0500
+	(envelope-from <drjones@redhat.com>) id 1cGutA-0002ML-Nr
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 16:45:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1cGuns-0006Dw-Ol
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 16:40:08 -0500
-Received: from [2a03:4000:1::4e2f:c7ac:d] (port=43907 helo=mail.weilnetz.de)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1cGuns-0006Dr-IU
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 16:40:04 -0500
-References: <CAJSP0QUn4OE3_9foGgktt5O_KzrEzV8uhB1mpoS1q5x4DsPTPQ@mail.gmail.com>
-	<CAJSP0QV1S4mohikvxx9OgnsRgMRNmH+a9WjHCeC7gGaeBMyktQ@mail.gmail.com>
-	<CAJSP0QUkFjfsQ21i3-qXQL5N3xJd6WnEmy1BewMV3z=VOpr7BQ@mail.gmail.com>
-From: Stefan Weil <sw@weilnetz.de>
-Message-ID: <c246423e-d62b-1572-341d-3a1933e496fa@weilnetz.de>
-Date: Tue, 13 Dec 2016 22:39:59 +0100
-MIME-Version: 1.0
-In-Reply-To: <CAJSP0QUkFjfsQ21i3-qXQL5N3xJd6WnEmy1BewMV3z=VOpr7BQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Any QEMU 2.8 release blockers?
+	(envelope-from <drjones@redhat.com>) id 1cGut9-0007TG-6X
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 16:45:32 -0500
+From: Andrew Jones <drjones@redhat.com>
+Date: Tue, 13 Dec 2016 22:45:11 +0100
+Message-Id: <20161213214522.25548-1-drjones@redhat.com>
+Subject: [Qemu-devel] [PATCH 00/11] Remove VirtGuestInfo
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,41 +17,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel <qemu-devel@nongnu.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org, qemu-arm@nongnu.org
+Cc: peter.maydell@linaro.org, zhaoshenglong@huawei.com, mst@redhat.com, imammedo@redhat.com, ehabkost@redhat.com
 
-On 12/13/16 22:04, Stefan Hajnoczi wrote:
-> On Tue, Dec 13, 2016 at 10:01 AM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
->> On Fri, Dec 9, 2016 at 3:34 PM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
->>> Hi folks,
->>> How is QEMU 2.8.0-rc3 holding up?
->>>
->>> I'm not aware of release blockers.  QEMU 2.8.0 will be released on
->>> Tuesday, December 13th if nothing comes up.  It will be the -rc3
->>> source tree.
->>
->> There have been no release blockers so I plan to tag QEMU 2.8.0 today
->> (December 13th at 19:00 UTC).
->>
->> If something critical turns up please notify me on IRC (stefanha on
->> #qemu irc.oftc.net).
->
-> Mike Roth discovered a migration compatibility bug introduced by
-> commit d1b4259f1ab18af24e6a297edb6a8f71691f3256 ("virtio-bus: Plug
-> devices after features are negotiated").  The release will be delayed
-> until this is resolved.
->
-> Please check the mailing list for discussion.  Mike is sending out a
-> mail summarizing the bug.
->
-> Stefan
->
+This series is based on Peter's qemu-arm gicv3-virt branch. It's
+main goal (patches 04-10), which was suggested by Eduardo, is to
+remove an unnecessary structure, VirtGuestInfo, which is a
+maintenance burden, as it requires duplicating Virt machine state.
+Additionally patches 01-03 do some mach-virt cleanups and patch 11
+adds the ACPI equivalent to one of the DT patches in Peter's
+gicv3-virt branch.
 
-Maybe you can update the po files before tagging the release.
-They currently no longer match the code (changed line numbers,
-new string "_Copy").
+The last patch isn't really tested as the guest kernel versions I
+used seem to ignore the GTDT irqflags and either just choose edge,
+4.5-based kernel, or level, 4.9-based kernel.
 
-Long way: make install
-Short way: make -C po build
+Patches available here
+https://github.com/rhdrjones/qemu/commits/virt/remove-guest-info
 
-Stefan
+
+Andrew Jones (11):
+  hw/arm/virt: parameter passing cleanups
+  hw/arm/virt: use VirtMachineState.gic_version
+  hw/arm/virt: use VirtMachineState.smp_cpus
+  hw/arm/virt: eliminate struct VirtGuestInfoState
+  hw/arm/virt: remove include/hw/arm/virt-acpi-build.h
+  hw/arm/virt: move VirtMachineState/Class to virt.h
+  hw/arm/virt: pass VirtMachineState instead of VirtGuestInfo
+  hw/arm/virt-acpi-build: remove redundant members from VirtGuestInfo
+  hw/arm/virt-acpi-build: don't save VirtGuestInfo on AcpiBuildState
+  hw/arm/virt: remove VirtGuestInfo
+  hw/arm/virt-acpi-build: Don't incorrectly claim architectural timer to
+    be edge-triggered
+
+ MAINTAINERS                      |   2 -
+ hw/arm/virt-acpi-build.c         | 103 +++++++++++++-------------
+ hw/arm/virt.c                    | 152 ++++++++++++++-------------------------
+ include/hw/arm/virt-acpi-build.h |  47 ------------
+ include/hw/arm/virt.h            |  45 +++++++++++-
+ 5 files changed, 151 insertions(+), 198 deletions(-)
+ delete mode 100644 include/hw/arm/virt-acpi-build.h
+
+-- 
+2.9.3
