@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42836)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43105)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cGnIu-0000gT-L3
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 08:39:38 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1cGnJs-0001W3-Db
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 08:40:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cGnIq-0005NC-Nl
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 08:39:36 -0500
-Received: from mail-wj0-f173.google.com ([209.85.210.173]:33358)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cGnIq-0005Mh-H1
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 08:39:32 -0500
-Received: by mail-wj0-f173.google.com with SMTP id xy5so100803306wjc.0
-	for <qemu-devel@nongnu.org>; Tue, 13 Dec 2016 05:39:32 -0800 (PST)
-References: <20161201051433.17168-1-bobby.prani@gmail.com>
-	<20161201051433.17168-18-bobby.prani@gmail.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20161201051433.17168-18-bobby.prani@gmail.com>
-Date: Tue, 13 Dec 2016 13:38:29 +0000
-Message-ID: <878trkt0dm.fsf@linaro.org>
+	(envelope-from <alex.williamson@redhat.com>) id 1cGnJm-0005mw-NI
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 08:40:36 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34084)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1cGnJm-0005mY-I1
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 08:40:30 -0500
+Date: Tue, 13 Dec 2016 06:40:28 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20161213064028.78938d07@t450s.home>
+In-Reply-To: <1481613903-17467-3-git-send-email-peterx@redhat.com>
+References: <1481613903-17467-1-git-send-email-peterx@redhat.com>
+	<1481613903-17467-3-git-send-email-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 17/19] tests/tcg: Move independent tests to
- misc dir
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.9 v2 2/2] intel_iommu: provide
+ "aw-bits" parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,139 +29,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pranith Kumar <bobby.prani@gmail.com>
-Cc: qemu-devel@nongnu.org, rth@twiddle.net
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, kevin.tian@intel.com, famz@redhat.com, mst@redhat.com, jasowang@redhat.com
 
+On Tue, 13 Dec 2016 15:25:03 +0800
+Peter Xu <peterx@redhat.com> wrote:
 
-Pranith Kumar <bobby.prani@gmail.com> writes:
+> Previously vt-d codes only supports 39 bits iova address width. This
+> patch provide a new parameter for Intel IOMMU to extend its address
+> width to 48 bits.
+> 
+> After enabling larger address width (48), we should be able to map
+> larger iova addresses in the guest. To check whether 48 bits aw is
+> enabled, we can grep in the guest dmesg with line: "dmar: Host address
+> width 48".
+> 
+> To keep compatibility with old QEMU and most hosts, default aw bits are
+> set to 39 bits.
 
-> Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
-> ---
->  tests/tcg/misc/Makefile           | 81 +++++++++++++++++++++++++++++++++++++++
->  tests/tcg/{ => misc}/linux-test.c |  0
->  tests/tcg/{ => misc}/sha1.c       |  0
->  tests/tcg/{ => misc}/test-mmap.c  |  0
->  tests/tcg/{ => misc}/test_path.c  |  0
->  tests/tcg/{ => misc}/testthread.c |  0
->  6 files changed, 81 insertions(+)
->  create mode 100644 tests/tcg/misc/Makefile
->  rename tests/tcg/{ => misc}/linux-test.c (100%)
->  rename tests/tcg/{ => misc}/sha1.c (100%)
->  rename tests/tcg/{ => misc}/test-mmap.c (100%)
->  rename tests/tcg/{ => misc}/test_path.c (100%)
->  rename tests/tcg/{ => misc}/testthread.c (100%)
->
-> diff --git a/tests/tcg/misc/Makefile b/tests/tcg/misc/Makefile
-> new file mode 100644
-> index 0000000..0aa6f2e
-> --- /dev/null
-> +++ b/tests/tcg/misc/Makefile
-> @@ -0,0 +1,81 @@
-> +# -*- Mode: makefile -*-
-> +#
-> +# Generic linux-user TCG tests
-> +#
-> +# These tests all use standard non-architecture specific APIs so can
-> +# be built for all TCG targets. The Make is expected to be called in
-> +# the ${BUILD_DIR}/$(TARGET_NAME_ARCH)-linux-user/tests directory
-> +#
-> +# To build for other architectures call make with CROSS_CC set
-> +#
-> +
-> +BUILD_DIR=../..
-> +include $(BUILD_DIR)/config-host.mak	# brings in SRC_PATH
-> +include ../config-target.mak		# TARGET_NAME
-> +include $(SRC_PATH)/rules.mak
-> +
-> +$(call set-vpath, $(SRC_PATH)/tests/tcg/misc)
-> +
-> +QEMU=$(BUILD_DIR)/$(TARGET_NAME)-linux-user/qemu-$(TARGET_NAME)
-> +
-> +# Compiler set-up, default to system compiler if not set
-> +CROSS_CC?=$(CC)
-> +
-> +CFLAGS=-Wall -O2 -g -fno-strict-aliasing -static
-> +LDFLAGS=
-> +
-> +TESTS=linux-test \
-> +      testthread \
-> +      sha1 \
-> +      test-mmap
-> +
-> +all: $(patsubst %,run-%,$(TESTS))
-> +test: all
-> +
-> +# rules to run tests
-> +
-> +run-%: %
-> +	-$(QEMU) ./$*
-> +
-> +run-linux-test: linux-test
-> +run-testthread: testthread
-> +run-sha1: sha1
-> +run-test_path: test_path
-> +
-> +run-test-mmap: test-mmap
-> +	-$(QEMU) ./test-mmap
-> +	-$(QEMU) -p 8192 ./test-mmap 8192
-> +	-$(QEMU) -p 16384 ./test-mmap 16384
-> +	-$(QEMU) -p 32768 ./test-mmap 32768
-> +
-> +run-test_path: test_path
-> +
-> +# rules to compile tests
-> +
-> +# These two need to be re-written as relying on glib (rather than just glibc)
-> +# test_path: test_path.o
-> +# 	$(CROSS_CC) $^ -o $@ -lglib-2.0
-> +
-> +# test_path.o: test_path.c
-> +# 	$(CROSS_CC) $^ -c -o $@ $(QEMU_INCLUDES) `pkg-config --cflags --libs glib-2.0`
-> +
-> +testthread: testthread.c
-> +	$(CROSS_CC) $(CFLAGS) $(LDFLAGS) -o $@ $< -lpthread
-> +
-> +# generic Linux and CPU test
-> +linux-test: linux-test.c
-> +	$(CROSS_CC) $(CFLAGS) $(LDFLAGS) -o $@ $< -lm
+I really fail to see the benefit of this option.  Clearly we always
+need to be able to support identity maps through the IOMMU, so the
+address width of the vIOMMU needs to support the maximum address of any
+memory or mmio range available to the VM.  However if that's the case,
+then the address width of the vIOMMU should be automatically configured
+for the VM configuration.  What's the benefit of creating yet another
+obscure device option rather than configuring this automatically.  If
+the argument is to be able to test 48bit vIOMMU support, then we could
+simply prefix this option with 'x-' to indicate an experimental,
+unsupported option.  Creating this option with the expectation that the
+user must specify this in order to potentially create a valid VT-d
+configuration for the VM doesn't make sense to me.  Thanks,
 
-This breaks the previous fix from 6/19
-
-> +
-> +test-mmap: test-mmap.c
-> +	$(CROSS_CC) $(CFLAGS) -Wall -O2 $(LDFLAGS) -o $@ $< -static
-> +
-> +# speed test
-> +sha1: sha1.c
-> +	$(CROSS_CC) $(CFLAGS) $(LDFLAGS) -o $@ $<
-> +
-> +speed: sha1
-> +	time ./sha1
-> +	time $(QEMU) ./sha1
-> +
-> +clean:
-> +	rm -f *~ *.o $(TESTS)
-> diff --git a/tests/tcg/linux-test.c b/tests/tcg/misc/linux-test.c
-> similarity index 100%
-> rename from tests/tcg/linux-test.c
-> rename to tests/tcg/misc/linux-test.c
-> diff --git a/tests/tcg/sha1.c b/tests/tcg/misc/sha1.c
-> similarity index 100%
-> rename from tests/tcg/sha1.c
-> rename to tests/tcg/misc/sha1.c
-> diff --git a/tests/tcg/test-mmap.c b/tests/tcg/misc/test-mmap.c
-> similarity index 100%
-> rename from tests/tcg/test-mmap.c
-> rename to tests/tcg/misc/test-mmap.c
-> diff --git a/tests/tcg/test_path.c b/tests/tcg/misc/test_path.c
-> similarity index 100%
-> rename from tests/tcg/test_path.c
-> rename to tests/tcg/misc/test_path.c
-> diff --git a/tests/tcg/testthread.c b/tests/tcg/misc/testthread.c
-> similarity index 100%
-> rename from tests/tcg/testthread.c
-> rename to tests/tcg/misc/testthread.c
-
-
---
-Alex Bennée
+Alex
