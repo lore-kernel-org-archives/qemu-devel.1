@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60801)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33878)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cGigy-0004J2-4S
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 03:44:27 -0500
+	(envelope-from <kraxel@redhat.com>) id 1cGihf-0004h9-1s
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 03:44:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cGigb-00046e-Q0
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 03:44:08 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48726)
+	(envelope-from <kraxel@redhat.com>) id 1cGihW-0004hW-Eq
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 03:44:51 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37176)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cGigb-00045G-EA
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 03:43:45 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <147954362297.28064.5118492606031513925.stgit@bahia>
-Date: Tue, 13 Dec 2016 09:43:41 +0100
-In-Reply-To: <147954362297.28064.5118492606031513925.stgit@bahia> (Greg Kurz's
-	message of "Sat, 19 Nov 2016 09:28:13 +0100")
-Message-ID: <87vauote0y.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] qapi: add explicit null to string input
- and output visitors
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cGihW-0004gk-7z
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 03:44:42 -0500
+Message-ID: <1481616362.27088.74.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Tue, 13 Dec 2016 09:06:02 +0100
+In-Reply-To: <f460049b-211e-194b-d4c3-a3cc34e4d289@cendio.se>
+References: <f460049b-211e-194b-d4c3-a3cc34e4d289@cendio.se>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Subject: Re: [Qemu-devel] VNC LED state buggy, interop issue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,88 +26,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
+To: Pierre Ossman <ossman@cendio.se>
+Cc: qemu-devel@nongnu.org
 
-Greg Kurz <groug@kaod.org> writes:
+  Hi,
 
-> This may be used for deprecated object properties that are kept for
-> backwards compatibility.
->
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> ---
->
-> This is enough to fix David's patch:
->
-> [RFCv2 10/12] pseries: Move CPU compatibility property to machine
->
-> Messag-Id: <1479248275-18889-11-git-send-email-david@gibson.dropbear.id.au>
->
->  qapi/string-input-visitor.c  |    5 +++++
->  qapi/string-output-visitor.c |   14 ++++++++++++++
->  2 files changed, 19 insertions(+)
->
-> diff --git a/qapi/string-input-visitor.c b/qapi/string-input-visitor.c
-> index 8dfa5612522b..4a378d7b67e6 100644
-> --- a/qapi/string-input-visitor.c
-> +++ b/qapi/string-input-visitor.c
-> @@ -314,6 +314,10 @@ static void parse_type_number(Visitor *v, const char *name, double *obj,
->      *obj = val;
->  }
->  
-> +static void parse_type_null(Visitor *v, const char *name, Error **errp)
-> +{
-> +}
-> +
+> The basic problem is that the code right now assumes that XK_Caps_Lock=
+=20
+> and XK_Num_Lock will toggle their respective states. It is however not=
+=20
+> assumed that XK_Scroll_Lock toggles any state.
 
-I figure this accepts an arbitrary string.  The output visitor ...
+The whole thing is more intended to make sure guest and host have the
+same idea about numlock and capslock state, so input works propery, not
+so much about making the leds blink properly.
 
+And, yes, it assumes you don't remap capslock + numlock keys to
+something else (in the guest).  vnc has an option (lock-key-sync) to
+turn off this logic in case it causes problems because the assumtion
+doesn't hold for a specific guest.
 
->  static void parse_optional(Visitor *v, const char *name, bool *present)
->  {
->      StringInputVisitor *siv = to_siv(v);
-> @@ -348,6 +352,7 @@ Visitor *string_input_visitor_new(const char *str)
->      v->visitor.type_bool = parse_type_bool;
->      v->visitor.type_str = parse_type_str;
->      v->visitor.type_number = parse_type_number;
-> +    v->visitor.type_null = parse_type_null;
->      v->visitor.start_list = start_list;
->      v->visitor.next_list = next_list;
->      v->visitor.end_list = end_list;
-> diff --git a/qapi/string-output-visitor.c b/qapi/string-output-visitor.c
-> index 94ac8211d144..5ec5352ca87c 100644
-> --- a/qapi/string-output-visitor.c
-> +++ b/qapi/string-output-visitor.c
-> @@ -266,6 +266,19 @@ static void print_type_number(Visitor *v, const char *name, double *obj,
->      string_output_set(sov, g_strdup_printf("%f", *obj));
->  }
->  
-> +static void print_type_null(Visitor *v, const char *name, Error **errp)
-> +{
-> +    StringOutputVisitor *sov = to_sov(v);
-> +    char *out;
-> +
-> +    if (sov->human) {
-> +        out = g_strdup("<null>");
-> +    } else {
-> +        out = g_strdup("");
+>   b) Remove the assumption from the code and the protocol.
 
-... produces an empty string.  Sure this makes sense?
+Patches are welcome.
 
-Shouldn't the input visitor reject anything but the empty string?
-
-> +    }
-> +    string_output_set(sov, out);
-> +}
-> +
->  static void
->  start_list(Visitor *v, const char *name, GenericList **list, size_t size,
->             Error **errp)
-> @@ -351,6 +364,7 @@ Visitor *string_output_visitor_new(bool human, char **result)
->      v->visitor.type_bool = print_type_bool;
->      v->visitor.type_str = print_type_str;
->      v->visitor.type_number = print_type_number;
-> +    v->visitor.type_null = print_type_null;
->      v->visitor.start_list = start_list;
->      v->visitor.next_list = next_list;
->      v->visitor.end_list = end_list;
+cheers,
+  Gerd
