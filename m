@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58973)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59466)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cGmZq-0006hg-5k
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 07:53:08 -0500
+	(envelope-from <berto@igalia.com>) id 1cGmc9-0008Nh-C2
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 07:55:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cGmZm-000162-6g
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 07:53:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53128)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cGmZm-00015w-15
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 07:52:58 -0500
-References: <20161212224325.20790-1-marcandre.lureau@redhat.com>
-	<20161212224325.20790-35-marcandre.lureau@redhat.com>
-	<d7d971e2-af70-0ea5-7c0e-8b70c547c2cd@redhat.com>
-	<CAJ+F1CL7V-ACHV66Jx5ZRn8Xk3KfmeOW8gE6zh7QsXgW4N=bMw@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d6860218-ce69-cfff-bbd6-5ae02b90af23@redhat.com>
-Date: Tue, 13 Dec 2016 13:52:54 +0100
+	(envelope-from <berto@igalia.com>) id 1cGmc5-0001pN-Dn
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 07:55:25 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <756cfb05-61e1-7ee3-435b-93759438a52d@redhat.com>
+References: <cover.1481290956.git.berto@igalia.com>
+	<468dbeb8-5b1b-669f-f7e5-0d24a4308da8@redhat.com>
+	<w51bmwhck1c.fsf@maestria.local.igalia.com>
+	<756cfb05-61e1-7ee3-435b-93759438a52d@redhat.com>
+Date: Tue, 13 Dec 2016 13:55:18 +0100
+Message-ID: <w51k2b4htu1.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <CAJ+F1CL7V-ACHV66Jx5ZRn8Xk3KfmeOW8gE6zh7QsXgW4N=bMw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 34/54] char: create chardev-obj-y
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH RFC 0/1] Allow storing the qcow2 L2 cache
+ in disk
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,36 +25,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, qemu-devel@nongnu.org
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
+On Tue 13 Dec 2016 09:02:34 AM CET, Max Reitz wrote:
 
+> I definitely like how simple your approach is, but from a design
+> standpoint it is not exactly optimal, because O(n) for a cluster
+> lookup is simply worse than O(1).
 
-On 13/12/2016 13:40, Marc-Andr=C3=A9 Lureau wrote:
->=20
->     On 12/12/2016 23:43, Marc-Andr=C3=A9 Lureau wrote:
->     > This will help to split char.c in several units without having to
->     > reference them all everywhere.
->     >
->     > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.co=
-m
->     <mailto:marcandre.lureau@redhat.com>>
->     > ---
->     >  Makefile               | 3 ++-
->     >  Makefile.objs          | 4 +++-
->     >  Makefile.target        | 3 +++
->     >  chardev/Makefile.objs  | 2 +-
->     >  tests/Makefile.include | 4 ++--
->     >  5 files changed, 11 insertions(+), 5 deletions(-)
->=20
->     Any reason to do this instead of keeping common-obj-y?
->=20
->=20
-> common-obj-y has a lot of other units, including vl.o, making it not
-> possible to link with tests/test-char for ex. However, if we changed it
-> to link with everything except vl.c (or other changes), we may be able
-> to link with and test spice-qemu-char. The resulting binaries will
-> likely explode though.
+It's actually not O(n) anymore since I rewrote that code last year.
 
-Ok, so it's for tests.  Fair enough!
+When I changed the algorithm to use LRU for cache eviction I also
+optimized the lookup:
 
-Paolo
+ 1) qcow2_cache_put() simply divides the table offset by the cluster
+    size and it immediately obtains the index.
+
+ 2) qcow2_cache_get() hashes the offset to do the lookup. In my tests
+    doing random I/O and a 2048 entry cache the average number of
+    comparisons was 2.5 (430 before the rewrite).
+
+The cache was ~13% faster after the rewrite, but the results in terms of
+actual disk I/O improvements were negligible, because that's not where
+the bottleneck is. We even discussed how the hash function that I was
+using was weak, but we decided not to touch it because it was not worth
+the effort.
+
+>> But leaving that aside, would that improve anything? I don't think
+>> the cache itself adds any significant overhead here, IIRC even in
+>> your presentation at KVM Forum 2015 qcow2 was comparable to raw as
+>> long as all L2 tables were cached in memory.
+>
+> I haven't compared CPU usage, though. That may have gone up quite a
+> bit, I don't know. For large enough images, it may even become a
+> bottleneck.
+
+I don't know, I don't have any data to suggest that there's a problem
+there, particularly after the rewrite from last year I think the cache
+is reasonably fast (as long as the cache is big enough; and if it's not
+big enough the problem is going to be in the extra I/O).
+
+Berto
