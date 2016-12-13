@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44314)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45715)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cGnNh-0004KZ-D4
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 08:44:34 -0500
+	(envelope-from <kraxel@redhat.com>) id 1cGnVv-0006j2-P9
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 08:53:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cGnNg-00089d-Dz
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 08:44:33 -0500
-References: <cover.1481290956.git.berto@igalia.com>
-	<468dbeb8-5b1b-669f-f7e5-0d24a4308da8@redhat.com>
-	<w51bmwhck1c.fsf@maestria.local.igalia.com>
-	<756cfb05-61e1-7ee3-435b-93759438a52d@redhat.com>
-	<w51k2b4htu1.fsf@maestria.local.igalia.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <7f400f89-3a21-bae1-cd16-d23bfa65d973@redhat.com>
-Date: Tue, 13 Dec 2016 14:44:26 +0100
-MIME-Version: 1.0
-In-Reply-To: <w51k2b4htu1.fsf@maestria.local.igalia.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC 0/1] Allow storing the qcow2 L2 cache
- in disk
+	(envelope-from <kraxel@redhat.com>) id 1cGnVs-0004RU-Oy
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 08:53:03 -0500
+Message-ID: <1481637176.27088.132.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Tue, 13 Dec 2016 14:52:56 +0100
+In-Reply-To: <1481633076-24521-1-git-send-email-thuth@redhat.com>
+References: <1481633076-24521-1-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH] hw/ppc/spapr: Fix boot path of usb-host
+ storage devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,62 +23,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org
 
-On 2016-12-13 at 13:55, Alberto Garcia wrote:
-> On Tue 13 Dec 2016 09:02:34 AM CET, Max Reitz wrote:
->
->> I definitely like how simple your approach is, but from a design
->> standpoint it is not exactly optimal, because O(n) for a cluster
->> lookup is simply worse than O(1).
->
-> It's actually not O(n) anymore since I rewrote that code last year.
->
-> When I changed the algorithm to use LRU for cache eviction I also
-> optimized the lookup:
->
->  1) qcow2_cache_put() simply divides the table offset by the cluster
->     size and it immediately obtains the index.
->
->  2) qcow2_cache_get() hashes the offset to do the lookup. In my tests
->     doing random I/O and a 2048 entry cache the average number of
->     comparisons was 2.5 (430 before the rewrite).
->
-> The cache was ~13% faster after the rewrite, but the results in terms of
-> actual disk I/O improvements were negligible, because that's not where
-> the bottleneck is. We even discussed how the hash function that I was
-> using was weak, but we decided not to touch it because it was not worth
-> the effort.
+On Di, 2016-12-13 at 13:44 +0100, Thomas Huth wrote:
+> When passing through a USB storage device to a pseries guest, it
+> is currently not possible to automatically boot from the device
+> if the "bootindex" property has been specified, too (e.g. when using
+> "-device nec-usb-xhci -device usb-host,hostbus=3D1,hostaddr=3D2,bootindex=
+=3D0"
+> at the command line). The problem is that QEMU builds a device tree path
+> like "/pci@800000020000000/usb@0/usb-host@1" and passes it to SLOF
+> in the /chosen/qemu,boot-list property. SLOF, however, probes the
+> USB device, recognizes that it is a storage device and thus changes
+> its name to "storage", and additionally adds a child node for the
+> SCSI LUN, so the correct boot path in SLOF is something like
+> "/pci@800000020000000/usb@0/storage@1/disk@101000000000000" instead.
+> So when we detect an USB mass storage device with SCSI interface,
+> we've got to adjust the firmware boot-device path properly, so that
+> SLOF can automatically boot from the device.
 
-13% is not really what O(1) vs. O(n) is about, but you are completely 
-right, For some reason I haven't seen that. OK, so the code is indeed 
-O(1) in the best case (and probably in the average case, too), so that's 
-good.
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 208ef7b..fe315b5 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -2185,6 +2185,15 @@ static char *spapr_get_fw_dev_path(FWPathProvider =
+*p, BusState *bus,
+>          }
+>      }
+> =20
+> +    if (strcmp("usb-host", qdev_fw_name(dev)) =3D=3D 0) {
+> +        USBDevice *usbdev =3D CAST(USBDevice, dev, TYPE_USB_DEVICE);
+> +
+> +        /* SLOF scans USB storage and adds a "disk" node for the SCSI LU=
+N */
+> +        if (usb_host_dev_is_scsi_storage(usbdev)) {
+> +            return g_strdup_printf("storage@%s/disk", usbdev->port->path=
+);
+> +        }
+> +    }
+> +
 
->>> But leaving that aside, would that improve anything? I don't think
->>> the cache itself adds any significant overhead here, IIRC even in
->>> your presentation at KVM Forum 2015 qcow2 was comparable to raw as
->>> long as all L2 tables were cached in memory.
->>
->> I haven't compared CPU usage, though. That may have gone up quite a
->> bit, I don't know. For large enough images, it may even become a
->> bottleneck.
->
-> I don't know, I don't have any data to suggest that there's a problem
-> there, particularly after the rewrite from last year I think the cache
-> is reasonably fast (as long as the cache is big enough; and if it's not
-> big enough the problem is going to be in the extra I/O).
+Any reason why this is hidden in ppc/spapr?
 
-So the remaining question is whether we want a cache for the cache. If 
-the cache is stored directly on an SSD, any access to it has to go there 
-and back, and that seems like we may still want to have the option of 
-having an in-RAM cache on top of it.
+usb-host could implement the ->fw_name callback instead to create a name
+depending on the device type ...
 
-If we don't want to split the qcow2 file into separate metadata and data 
-files, then we could still create a sparse temporary file at runtime 
-which contains all L2 tables. Reading an L2 table then wouldn't go 
-through the qcow2 file but through that temporary file and our existing 
-metadata cache would work on top of it.
-
-Max
+cheers,
+  Gerd
