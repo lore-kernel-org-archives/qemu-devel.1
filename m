@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51337)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51516)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cGk8Z-0006OI-LE
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 05:16:46 -0500
+	(envelope-from <groug@kaod.org>) id 1cGk9g-000766-VK
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 05:17:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cGk8Y-0000sP-LA
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 05:16:43 -0500
-Date: Tue, 13 Dec 2016 18:16:35 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20161213101635.GC2165@lemon>
-References: <cover.1481290956.git.berto@igalia.com>
-	<468dbeb8-5b1b-669f-f7e5-0d24a4308da8@redhat.com>
-	<w51bmwhck1c.fsf@maestria.local.igalia.com>
-	<756cfb05-61e1-7ee3-435b-93759438a52d@redhat.com>
+	(envelope-from <groug@kaod.org>) id 1cGk9d-000192-Pp
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 05:17:52 -0500
+Received: from 3.mo53.mail-out.ovh.net ([178.33.44.239]:60855)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cGk9d-00018r-JZ
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 05:17:49 -0500
+Received: from player158.ha.ovh.net (b7.ovh.net [213.186.33.57])
+	by mo53.mail-out.ovh.net (Postfix) with ESMTP id 40B0342769
+	for <qemu-devel@nongnu.org>; Tue, 13 Dec 2016 11:17:47 +0100 (CET)
+Date: Tue, 13 Dec 2016 11:17:39 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20161213111739.60458b3e@bahia.lan>
+In-Reply-To: <87vauote0y.fsf@dusky.pond.sub.org>
+References: <147954362297.28064.5118492606031513925.stgit@bahia>
+	<87vauote0y.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <756cfb05-61e1-7ee3-435b-93759438a52d@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH RFC 0/1] Allow storing the qcow2 L2 cache
- in disk
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] qapi: add explicit null to string input
+ and output visitors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,37 +31,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
 
-On Tue, 12/13 09:02, Max Reitz wrote:
-> > Yes but the use case is that the qcow2 image is stored in a slow disk,
-> > so things will be faster if we avoid having to read it too often.
-> > 
-> > But the data is there and it needs to be read, so we have three options:
-> > 
-> >   1) Read it everytime we need it. It slows things down.
-> >   2) Keep (part of) it in memory. It can use a lot of memory.
-> >   3) Keep it in a faster disk.
-> > 
-> > We're talking about 3) here, and this it not about creating new
-> > structures, but about changing the storage backend of the existing L2
-> > cache (disk rather than RAM).
+On Tue, 13 Dec 2016 09:43:41 +0100
+Markus Armbruster <armbru@redhat.com> wrote:
+
+> Greg Kurz <groug@kaod.org> writes:
 > 
-> I'm arguing that we already have an on-disk L2 structure and that is called
-> simply the L1-L2 structure in the qcow2 file. The cache only makes sense
-> because it is in RAM.
+> > This may be used for deprecated object properties that are kept for
+> > backwards compatibility.
+> >
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > ---
+> >
+> > This is enough to fix David's patch:
+> >
+> > [RFCv2 10/12] pseries: Move CPU compatibility property to machine
+> >
+> > Messag-Id: <1479248275-18889-11-git-send-email-david@gibson.dropbear.id.au>
+> >
+> >  qapi/string-input-visitor.c  |    5 +++++
+> >  qapi/string-output-visitor.c |   14 ++++++++++++++
+> >  2 files changed, 19 insertions(+)
+> >
+> > diff --git a/qapi/string-input-visitor.c b/qapi/string-input-visitor.c
+> > index 8dfa5612522b..4a378d7b67e6 100644
+> > --- a/qapi/string-input-visitor.c
+> > +++ b/qapi/string-input-visitor.c
+> > @@ -314,6 +314,10 @@ static void parse_type_number(Visitor *v, const char *name, double *obj,
+> >      *obj = val;
+> >  }
+> >  
+> > +static void parse_type_null(Visitor *v, const char *name, Error **errp)
+> > +{
+> > +}
+> > +  
+> 
+> I figure this accepts an arbitrary string.  The output visitor ...
+> 
 
-I am looking at this problem from a different angle:
+Yes, I assumed that null means "we don't care"... but maybe I'm wrong. :)
 
-Assume a qcow2 image created by a known version of QEMU with the option
-preallocation=falloc, it is theoretically possible to do a hacky optimization in
-qcow2 I/O path that, instead of looking up in L1/L2, we can calculate file
-offset for any given virtual address, by adding the file offset of LBA 0.
+> 
+> >  static void parse_optional(Visitor *v, const char *name, bool *present)
+> >  {
+> >      StringInputVisitor *siv = to_siv(v);
+> > @@ -348,6 +352,7 @@ Visitor *string_input_visitor_new(const char *str)
+> >      v->visitor.type_bool = parse_type_bool;
+> >      v->visitor.type_str = parse_type_str;
+> >      v->visitor.type_number = parse_type_number;
+> > +    v->visitor.type_null = parse_type_null;
+> >      v->visitor.start_list = start_list;
+> >      v->visitor.next_list = next_list;
+> >      v->visitor.end_list = end_list;
+> > diff --git a/qapi/string-output-visitor.c b/qapi/string-output-visitor.c
+> > index 94ac8211d144..5ec5352ca87c 100644
+> > --- a/qapi/string-output-visitor.c
+> > +++ b/qapi/string-output-visitor.c
+> > @@ -266,6 +266,19 @@ static void print_type_number(Visitor *v, const char *name, double *obj,
+> >      string_output_set(sov, g_strdup_printf("%f", *obj));
+> >  }
+> >  
+> > +static void print_type_null(Visitor *v, const char *name, Error **errp)
+> > +{
+> > +    StringOutputVisitor *sov = to_sov(v);
+> > +    char *out;
+> > +
+> > +    if (sov->human) {
+> > +        out = g_strdup("<null>");
+> > +    } else {
+> > +        out = g_strdup("");  
+> 
+> ... produces an empty string.  Sure this makes sense?
+> 
+> Shouldn't the input visitor reject anything but the empty string?
+> 
 
-If we make this optimization a header extention and add it to the spec, it is no
-longer a hack, and it should offer nearly the same performance as raw in all
-cases - if we say raw is doing "identical mapping" from LBA to file offset, this
-new operation mode of qcow2 file is basically doing a "shift by constant" mapping.
+Looking at how null is handled for qobject, I suppose you're right. I'll
+send a v2.
 
-Fam
+> > +    }
+> > +    string_output_set(sov, out);
+> > +}
+> > +
+> >  static void
+> >  start_list(Visitor *v, const char *name, GenericList **list, size_t size,
+> >             Error **errp)
+> > @@ -351,6 +364,7 @@ Visitor *string_output_visitor_new(bool human, char **result)
+> >      v->visitor.type_bool = print_type_bool;
+> >      v->visitor.type_str = print_type_str;
+> >      v->visitor.type_number = print_type_number;
+> > +    v->visitor.type_null = print_type_null;
+> >      v->visitor.start_list = start_list;
+> >      v->visitor.next_list = next_list;
+> >      v->visitor.end_list = end_list;  
