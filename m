@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56062)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56016)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cGkRw-0004pT-HJ
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 05:36:46 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cGkRu-0008Da-Jz
+	(envelope-from <pm215@archaic.org.uk>) id 1cGkRu-0004nW-Tm
 	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 05:36:44 -0500
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <pm215@archaic.org.uk>) id 1cGkRt-0008Ce-6I
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 05:36:42 -0500
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 13 Dec 2016 10:36:17 +0000
-Message-Id: <1481625384-15077-17-git-send-email-peter.maydell@linaro.org>
+Date: Tue, 13 Dec 2016 10:36:18 +0000
+Message-Id: <1481625384-15077-18-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1481625384-15077-1-git-send-email-peter.maydell@linaro.org>
 References: <1481625384-15077-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 16/23] hw/intc/arm_gicv3: Implement ICV_
- registers which are just accessors
+Subject: [Qemu-devel] [PATCH 17/23] hw/intc/arm_gicv3: Implement ICV_ HPPIR,
+ DIR and RPR registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,378 +23,322 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Christoffer Dall <christoffer.dall@linaro.org>, Andrew Jones <drjones@redhat.com>
 
-If the HCR_EL2.IMO or FMO bits are set, accesses to ICC_
-system registers are redirected to be accesses to ICV_
-registers (the guest-visible interface to the virtual
-interrupt controller). Implement this behaviour for the
-ICV_ registers which are simple accessors to the underlying
-register state.
+Implement the the ICV_ registers HPPIR, DIR and RPR.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/intc/arm_gicv3_cpuif.c | 239 ++++++++++++++++++++++++++++++++++++++++++++++
- hw/intc/trace-events      |  10 ++
- 2 files changed, 249 insertions(+)
+ hw/intc/arm_gicv3_cpuif.c | 235 +++++++++++++++++++++++++++++++++++++++++++++-
+ hw/intc/trace-events      |   3 +
+ 2 files changed, 235 insertions(+), 3 deletions(-)
 
 diff --git a/hw/intc/arm_gicv3_cpuif.c b/hw/intc/arm_gicv3_cpuif.c
-index 585c91c..40a52ce 100644
+index 40a52ce..e069082 100644
 --- a/hw/intc/arm_gicv3_cpuif.c
 +++ b/hw/intc/arm_gicv3_cpuif.c
-@@ -13,6 +13,7 @@
-  */
- 
- #include "qemu/osdep.h"
-+#include "qemu/bitops.h"
- #include "trace.h"
- #include "gicv3_internal.h"
- #include "cpu.h"
-@@ -48,6 +49,26 @@ static int ich_lr_state(uint64_t lr)
-     return extract64(lr, ICH_LR_EL2_STATE_SHIFT, ICH_LR_EL2_STATE_LENGTH);
+@@ -44,6 +44,21 @@ static inline int icv_min_vbpr(GICv3CPUState *cs)
  }
  
-+static bool icv_access(CPUARMState *env, int hcr_flags)
+ /* Simple accessor functions for LR fields */
++static uint32_t ich_lr_vintid(uint64_t lr)
 +{
-+    /* Return true if this ICC_ register access should really be
-+     * directed to an ICV_ access. hcr_flags is a mask of
-+     * HCR_EL2 bits to check: we treat this as an ICV_ access
-+     * if we are in NS EL1 and at least one of the specified
-+     * HCR_EL2 bits is set.
-+     *
-+     * ICV registers fall into four categories:
-+     *  * access if NS EL1 and HCR_EL2.FMO == 1:
-+     *    all ICV regs with '0' in their name
-+     *  * access if NS EL1 and HCR_EL2.IMO == 1:
-+     *    all ICV regs with '1' in their name
-+     *  * access if NS EL1 and either IMO or FMO == 1:
-+     *    CTLR, DIR, PMR, RPR
-+     */
-+    return (env->cp15.hcr_el2 & hcr_flags) && arm_current_el(env) == 1
-+        && !arm_is_secure_below_el3(env);
++    return extract64(lr, ICH_LR_EL2_VINTID_SHIFT, ICH_LR_EL2_VINTID_LENGTH);
 +}
 +
- static int read_vbpr(GICv3CPUState *cs, int grp)
++static uint32_t ich_lr_pintid(uint64_t lr)
++{
++    return extract64(lr, ICH_LR_EL2_PINTID_SHIFT, ICH_LR_EL2_PINTID_LENGTH);
++}
++
++static uint32_t ich_lr_prio(uint64_t lr)
++{
++    return extract64(lr, ICH_LR_EL2_PRIORITY_SHIFT, ICH_LR_EL2_PRIORITY_LENGTH);
++}
++
+ static int ich_lr_state(uint64_t lr)
  {
-     /* Read VBPR value out of the VMCR field (caller must handle
-@@ -84,6 +105,16 @@ static void write_vbpr(GICv3CPUState *cs, int grp, int value)
-     }
+     return extract64(lr, ICH_LR_EL2_STATE_SHIFT, ICH_LR_EL2_STATE_LENGTH);
+@@ -115,6 +130,79 @@ static uint32_t icv_fullprio_mask(GICv3CPUState *cs)
+     return ~0U << (8 - cs->vpribits);
  }
  
-+static uint32_t icv_fullprio_mask(GICv3CPUState *cs)
++static int ich_highest_active_virt_prio(GICv3CPUState *cs)
 +{
-+    /* Return a mask word which clears the unimplemented priority bits
-+     * from a priority value for a virtual interrupt. (Not to be confused
-+     * with the group priority, whose mask depends on the value of VBPR
-+     * for the interrupt group.)
++    /* Calculate the current running priority based on the set bits
++     * in the ICH Active Priority Registers.
 +     */
-+    return ~0U << (8 - cs->vpribits);
++    int i;
++    int aprmax = 1 << (cs->vprebits - 5);
++
++    assert(aprmax <= ARRAY_SIZE(cs->ich_apr[0]));
++
++    for (i = 0; i < aprmax; i++) {
++        uint32_t apr = cs->ich_apr[GICV3_G0][i] |
++            cs->ich_apr[GICV3_G1NS][i];
++
++        if (!apr) {
++            continue;
++        }
++        return (i * 32 + ctz32(apr)) << (icv_min_vbpr(cs) + 1);
++    }
++    /* No current active interrupts: return idle priority */
++    return 0xff;
++}
++
++static int hppvi_index(GICv3CPUState *cs)
++{
++    /* Return the list register index of the highest priority pending
++     * virtual interrupt, as per the HighestPriorityVirtualInterrupt
++     * pseudocode. If no pending virtual interrupts, return -1.
++     */
++    int idx = -1;
++    int i;
++    /* Note that a list register entry with a priority of 0xff will
++     * never be reported by this function; this is the architecturally
++     * correct behaviour.
++     */
++    int prio = 0xff;
++
++    if (!(cs->ich_vmcr_el2 & (ICH_VMCR_EL2_VENG0 | ICH_VMCR_EL2_VENG1))) {
++        /* Both groups disabled, definitely nothing to do */
++        return idx;
++    }
++
++    for (i = 0; i < cs->num_list_regs; i++) {
++        uint64_t lr = cs->ich_lr_el2[i];
++        int thisprio;
++
++        if (ich_lr_state(lr) != ICH_LR_EL2_STATE_PENDING) {
++            /* Not Pending */
++            continue;
++        }
++
++        /* Ignore interrupts if relevant group enable not set */
++        if (lr & ICH_LR_EL2_GROUP) {
++            if (!(cs->ich_vmcr_el2 & ICH_VMCR_EL2_VENG1)) {
++                continue;
++            }
++        } else {
++            if (!(cs->ich_vmcr_el2 & ICH_VMCR_EL2_VENG0)) {
++                continue;
++            }
++        }
++
++        thisprio = ich_lr_prio(lr);
++
++        if (thisprio < prio) {
++            prio = thisprio;
++            idx = i;
++        }
++    }
++
++    return idx;
 +}
 +
  static uint32_t eoi_maintenance_interrupt_state(GICv3CPUState *cs,
                                                  uint32_t *misr)
  {
-@@ -168,6 +199,170 @@ static void gicv3_cpuif_virt_update(GICv3CPUState *cs)
- {
+@@ -363,6 +451,35 @@ static void icv_ctlr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+     gicv3_cpuif_virt_update(cs);
  }
  
-+static uint64_t icv_ap_read(CPUARMState *env, const ARMCPRegInfo *ri)
++static uint64_t icv_rpr_read(CPUARMState *env, const ARMCPRegInfo *ri)
 +{
 +    GICv3CPUState *cs = icc_cs_from_env(env);
-+    int regno = ri->opc2 & 3;
-+    int grp = ri->crm & 1 ? GICV3_G0 : GICV3_G1NS;
-+    uint64_t value = cs->ich_apr[grp][regno];
++    int prio = ich_highest_active_virt_prio(cs);
 +
-+    trace_gicv3_icv_ap_read(ri->crm & 1, regno, gicv3_redist_affid(cs), value);
++    trace_gicv3_icv_rpr_read(gicv3_redist_affid(cs), prio);
++    return prio;
++}
++
++static uint64_t icv_hppir_read(CPUARMState *env, const ARMCPRegInfo *ri)
++{
++    GICv3CPUState *cs = icc_cs_from_env(env);
++    int grp = ri->crm == 8 ? GICV3_G0 : GICV3_G1NS;
++    int idx = hppvi_index(cs);
++    uint64_t value = INTID_SPURIOUS;
++
++    if (idx >= 0) {
++        uint64_t lr = cs->ich_lr_el2[idx];
++        int thisgrp = (lr & ICH_LR_EL2_GROUP) ? GICV3_G1NS : GICV3_G0;
++
++        if (grp == thisgrp) {
++            value = ich_lr_vintid(lr);
++        }
++    }
++
++    trace_gicv3_icv_hppir_read(grp, gicv3_redist_affid(cs), value);
 +    return value;
-+}
-+
-+static void icv_ap_write(CPUARMState *env, const ARMCPRegInfo *ri,
-+                         uint64_t value)
-+{
-+    GICv3CPUState *cs = icc_cs_from_env(env);
-+    int regno = ri->opc2 & 3;
-+    int grp = ri->crm & 1 ? GICV3_G0 : GICV3_G1NS;
-+
-+    trace_gicv3_icv_ap_write(ri->crm & 1, regno, gicv3_redist_affid(cs), value);
-+
-+    cs->ich_apr[grp][regno] = value & 0xFFFFFFFFU;
-+
-+    gicv3_cpuif_virt_update(cs);
-+    return;
-+}
-+
-+static uint64_t icv_bpr_read(CPUARMState *env, const ARMCPRegInfo *ri)
-+{
-+    GICv3CPUState *cs = icc_cs_from_env(env);
-+    int grp = (ri->crm == 8) ? GICV3_G0 : GICV3_G1NS;
-+    uint64_t bpr;
-+    bool satinc = false;
-+
-+    if (grp == GICV3_G1NS && (cs->ich_vmcr_el2 & ICH_VMCR_EL2_VCBPR)) {
-+        /* reads return bpr0 + 1 saturated to 7, writes ignored */
-+        grp = GICV3_G0;
-+        satinc = true;
-+    }
-+
-+    bpr = read_vbpr(cs, grp);
-+
-+    if (satinc) {
-+        bpr++;
-+        bpr = MIN(bpr, 7);
-+    }
-+
-+    trace_gicv3_icv_bpr_read(ri->crm == 8 ? 0 : 1, gicv3_redist_affid(cs), bpr);
-+
-+    return bpr;
-+}
-+
-+static void icv_bpr_write(CPUARMState *env, const ARMCPRegInfo *ri,
-+                          uint64_t value)
-+{
-+    GICv3CPUState *cs = icc_cs_from_env(env);
-+    int grp = (ri->crm == 8) ? GICV3_G0 : GICV3_G1NS;
-+
-+    trace_gicv3_icv_bpr_write(ri->crm == 8 ? 0 : 1,
-+                              gicv3_redist_affid(cs), value);
-+
-+    if (grp == GICV3_G1NS && (cs->ich_vmcr_el2 & ICH_VMCR_EL2_VCBPR)) {
-+        /* reads return bpr0 + 1 saturated to 7, writes ignored */
-+        return;
-+    }
-+
-+    write_vbpr(cs, grp, value);
-+
-+    gicv3_cpuif_virt_update(cs);
-+}
-+
-+static uint64_t icv_pmr_read(CPUARMState *env, const ARMCPRegInfo *ri)
-+{
-+    GICv3CPUState *cs = icc_cs_from_env(env);
-+    uint64_t value;
-+
-+    value = extract64(cs->ich_vmcr_el2, ICH_VMCR_EL2_VPMR_SHIFT,
-+                      ICH_VMCR_EL2_VPMR_LENGTH);
-+
-+    trace_gicv3_icv_pmr_read(gicv3_redist_affid(cs), value);
-+    return value;
-+}
-+
-+static void icv_pmr_write(CPUARMState *env, const ARMCPRegInfo *ri,
-+                          uint64_t value)
-+{
-+    GICv3CPUState *cs = icc_cs_from_env(env);
-+
-+    trace_gicv3_icv_pmr_write(gicv3_redist_affid(cs), value);
-+
-+    value &= icv_fullprio_mask(cs);
-+
-+    cs->ich_vmcr_el2 = deposit64(cs->ich_vmcr_el2, ICH_VMCR_EL2_VPMR_SHIFT,
-+                                 ICH_VMCR_EL2_VPMR_LENGTH, value);
-+
-+    gicv3_cpuif_virt_update(cs);
-+}
-+
-+static uint64_t icv_igrpen_read(CPUARMState *env, const ARMCPRegInfo *ri)
-+{
-+    GICv3CPUState *cs = icc_cs_from_env(env);
-+    int enbit;
-+    uint64_t value;
-+
-+    enbit = ri->opc2 & 1 ? ICH_VMCR_EL2_VENG1_SHIFT : ICH_VMCR_EL2_VENG0_SHIFT;
-+    value = extract64(cs->ich_vmcr_el2, enbit, 1);
-+
-+    trace_gicv3_icv_igrpen_read(ri->opc2 & 1 ? 1 : 0,
-+                                gicv3_redist_affid(cs), value);
-+    return value;
-+}
-+
-+static void icv_igrpen_write(CPUARMState *env, const ARMCPRegInfo *ri,
-+                             uint64_t value)
-+{
-+    GICv3CPUState *cs = icc_cs_from_env(env);
-+    int enbit;
-+
-+    trace_gicv3_icv_igrpen_write(ri->opc2 & 1 ? 1 : 0,
-+                                 gicv3_redist_affid(cs), value);
-+
-+    enbit = ri->opc2 & 1 ? ICH_VMCR_EL2_VENG1_SHIFT : ICH_VMCR_EL2_VENG0_SHIFT;
-+
-+    cs->ich_vmcr_el2 = deposit64(cs->ich_vmcr_el2, enbit, 1, value);
-+    gicv3_cpuif_virt_update(cs);
-+}
-+
-+static uint64_t icv_ctlr_read(CPUARMState *env, const ARMCPRegInfo *ri)
-+{
-+    GICv3CPUState *cs = icc_cs_from_env(env);
-+    uint64_t value;
-+
-+    /* Note that the fixed fields here (A3V, SEIS, IDbits, PRIbits)
-+     * should match the ones reported in ich_vtr_read().
-+     */
-+    value = ICC_CTLR_EL1_A3V | (1 << ICC_CTLR_EL1_IDBITS_SHIFT) |
-+        (7 << ICC_CTLR_EL1_PRIBITS_SHIFT);
-+
-+    if (cs->ich_vmcr_el2 & ICH_VMCR_EL2_VEOIM) {
-+        value |= ICC_CTLR_EL1_EOIMODE;
-+    }
-+
-+    if (cs->ich_vmcr_el2 & ICH_VMCR_EL2_VCBPR) {
-+        value |= ICC_CTLR_EL1_CBPR;
-+    }
-+
-+    trace_gicv3_icv_ctlr_read(gicv3_redist_affid(cs), value);
-+    return value;
-+}
-+
-+static void icv_ctlr_write(CPUARMState *env, const ARMCPRegInfo *ri,
-+                               uint64_t value)
-+{
-+    GICv3CPUState *cs = icc_cs_from_env(env);
-+
-+    trace_gicv3_icv_ctlr_write(gicv3_redist_affid(cs), value);
-+
-+    cs->ich_vmcr_el2 = deposit64(cs->ich_vmcr_el2, ICH_VMCR_EL2_VCBPR_SHIFT,
-+                                 1, value & ICC_CTLR_EL1_CBPR ? 1 : 0);
-+    cs->ich_vmcr_el2 = deposit64(cs->ich_vmcr_el2, ICH_VMCR_EL2_VEOIM_SHIFT,
-+                                 1, value & ICC_CTLR_EL1_EOIMODE ? 1 : 0);
-+
-+    gicv3_cpuif_virt_update(cs);
 +}
 +
  static int icc_highest_active_prio(GICv3CPUState *cs)
  {
      /* Calculate the current running priority based on the set bits
-@@ -309,6 +504,10 @@ static uint64_t icc_pmr_read(CPUARMState *env, const ARMCPRegInfo *ri)
-     GICv3CPUState *cs = icc_cs_from_env(env);
-     uint32_t value = cs->icc_pmr_el1;
+@@ -781,6 +898,97 @@ static void icc_deactivate_irq(GICv3CPUState *cs, int irq)
+     }
+ }
  
-+    if (icv_access(env, HCR_FMO | HCR_IMO)) {
-+        return icv_pmr_read(env, ri);
++static bool icv_eoi_split(CPUARMState *env, GICv3CPUState *cs)
++{
++    /* Return true if we should split priority drop and interrupt
++     * deactivation, ie whether the virtual EOIMode bit is set.
++     */
++    return cs->ich_vmcr_el2 & ICH_VMCR_EL2_VEOIM;
++}
++
++static int icv_find_active(GICv3CPUState *cs, int irq)
++{
++    /* Given an interrupt number for an active interrupt, return the index
++     * of the corresponding list register, or -1 if there is no match.
++     * Corresponds to FindActiveVirtualInterrupt pseudocode.
++     */
++    int i;
++
++    for (i = 0; i < cs->num_list_regs; i++) {
++        uint64_t lr = cs->ich_lr_el2[i];
++
++        if ((lr & ICH_LR_EL2_STATE_ACTIVE_BIT) && ich_lr_vintid(lr) == irq) {
++            return i;
++        }
 +    }
 +
-     if (arm_feature(env, ARM_FEATURE_EL3) && !arm_is_secure(env) &&
-         (env->cp15.scr_el3 & SCR_FIQ)) {
-         /* NS access and Group 0 is inaccessible to NS: return the
-@@ -332,6 +531,10 @@ static void icc_pmr_write(CPUARMState *env, const ARMCPRegInfo *ri,
++    return -1;
++}
++
++static void icv_deactivate_irq(GICv3CPUState *cs, int idx)
++{
++    /* Deactivate the interrupt in the specified list register index */
++    uint64_t lr = cs->ich_lr_el2[idx];
++
++    if (lr & ICH_LR_EL2_HW) {
++        /* Deactivate the associated physical interrupt */
++        int pirq = ich_lr_pintid(lr);
++
++        if (pirq < INTID_SECURE) {
++            icc_deactivate_irq(cs, pirq);
++        }
++    }
++
++    /* Clear the 'active' part of the state, so ActivePending->Pending
++     * and Active->Invalid.
++     */
++    lr &= ~ICH_LR_EL2_STATE_ACTIVE_BIT;
++    cs->ich_lr_el2[idx] = lr;
++}
++
++static void icv_increment_eoicount(GICv3CPUState *cs)
++{
++    /* Increment the EOICOUNT field in ICH_HCR_EL2 */
++    int eoicount = extract64(cs->ich_hcr_el2, ICH_HCR_EL2_EOICOUNT_SHIFT,
++                             ICH_HCR_EL2_EOICOUNT_LENGTH);
++
++    cs->ich_hcr_el2 = deposit64(cs->ich_hcr_el2, ICH_HCR_EL2_EOICOUNT_SHIFT,
++                                ICH_HCR_EL2_EOICOUNT_LENGTH, eoicount + 1);
++}
++
++static void icv_dir_write(CPUARMState *env, const ARMCPRegInfo *ri,
++                          uint64_t value)
++{
++    /* Deactivate interrupt */
++    GICv3CPUState *cs = icc_cs_from_env(env);
++    int idx;
++    int irq = value & 0xffffff;
++
++    trace_gicv3_icv_dir_write(gicv3_redist_affid(cs), value);
++
++    if (irq >= cs->gic->num_irq) {
++        /* Also catches special interrupt numbers and LPIs */
++        return;
++    }
++
++    if (!icv_eoi_split(env, cs)) {
++        return;
++    }
++
++    idx = icv_find_active(cs, irq);
++
++    if (idx < 0) {
++        /* No list register matching this, so increment the EOI count
++         * (might trigger a maintenance interrupt)
++         */
++        icv_increment_eoicount(cs);
++    } else {
++        icv_deactivate_irq(cs, idx);
++    }
++
++    gicv3_cpuif_virt_update(cs);
++}
++
+ static void icc_eoir_write(CPUARMState *env, const ARMCPRegInfo *ri,
+                            uint64_t value)
+ {
+@@ -831,8 +1039,13 @@ static void icc_eoir_write(CPUARMState *env, const ARMCPRegInfo *ri,
+ static uint64_t icc_hppir0_read(CPUARMState *env, const ARMCPRegInfo *ri)
  {
      GICv3CPUState *cs = icc_cs_from_env(env);
- 
-+    if (icv_access(env, HCR_FMO | HCR_IMO)) {
-+        return icv_pmr_write(env, ri, value);
-+    }
+-    uint64_t value = icc_hppir0_value(cs, env);
++    uint64_t value;
 +
-     trace_gicv3_icc_pmr_write(gicv3_redist_affid(cs), value);
- 
-     value &= 0xff;
-@@ -650,6 +853,10 @@ static uint64_t icc_bpr_read(CPUARMState *env, const ARMCPRegInfo *ri)
-     bool satinc = false;
-     uint64_t bpr;
- 
-+    if (icv_access(env, grp == GICV3_G0 ? HCR_FMO : HCR_IMO)) {
-+        return icv_bpr_read(env, ri);
++    if (icv_access(env, HCR_FMO)) {
++        return icv_hppir_read(env, ri);
 +    }
-+
-     if (grp == GICV3_G1 && gicv3_use_ns_bank(env)) {
-         grp = GICV3_G1NS;
-     }
-@@ -686,6 +893,11 @@ static void icc_bpr_write(CPUARMState *env, const ARMCPRegInfo *ri,
-     GICv3CPUState *cs = icc_cs_from_env(env);
-     int grp = (ri->crm == 8) ? GICV3_G0 : GICV3_G1;
  
-+    if (icv_access(env, grp == GICV3_G0 ? HCR_FMO : HCR_IMO)) {
-+        icv_bpr_write(env, ri, value);
-+        return;
-+    }
-+
-     trace_gicv3_icc_bpr_write(ri->crm == 8 ? 0 : 1,
-                               gicv3_redist_affid(cs), value);
- 
-@@ -719,6 +931,10 @@ static uint64_t icc_ap_read(CPUARMState *env, const ARMCPRegInfo *ri)
-     int regno = ri->opc2 & 3;
-     int grp = ri->crm & 1 ? GICV3_G0 : GICV3_G1;
- 
-+    if (icv_access(env, grp == GICV3_G0 ? HCR_FMO : HCR_IMO)) {
-+        return icv_ap_read(env, ri);
-+    }
-+
-     if (grp == GICV3_G1 && gicv3_use_ns_bank(env)) {
-         grp = GICV3_G1NS;
-     }
-@@ -737,6 +953,11 @@ static void icc_ap_write(CPUARMState *env, const ARMCPRegInfo *ri,
-     int regno = ri->opc2 & 3;
-     int grp = ri->crm & 1 ? GICV3_G0 : GICV3_G1;
- 
-+    if (icv_access(env, grp == GICV3_G0 ? HCR_FMO : HCR_IMO)) {
-+        icv_ap_write(env, ri, value);
-+        return;
-+    }
-+
-     trace_gicv3_icc_ap_write(ri->crm & 1, regno, gicv3_redist_affid(cs), value);
- 
-     if (grp == GICV3_G1 && gicv3_use_ns_bank(env)) {
-@@ -949,6 +1170,10 @@ static uint64_t icc_igrpen_read(CPUARMState *env, const ARMCPRegInfo *ri)
-     int grp = ri->opc2 & 1 ? GICV3_G1 : GICV3_G0;
-     uint64_t value;
- 
-+    if (icv_access(env, grp == GICV3_G0 ? HCR_FMO : HCR_IMO)) {
-+        return icv_igrpen_read(env, ri);
-+    }
-+
-     if (grp == GICV3_G1 && gicv3_use_ns_bank(env)) {
-         grp = GICV3_G1NS;
-     }
-@@ -965,6 +1190,11 @@ static void icc_igrpen_write(CPUARMState *env, const ARMCPRegInfo *ri,
-     GICv3CPUState *cs = icc_cs_from_env(env);
-     int grp = ri->opc2 & 1 ? GICV3_G1 : GICV3_G0;
- 
-+    if (icv_access(env, grp == GICV3_G0 ? HCR_FMO : HCR_IMO)) {
-+        icv_igrpen_write(env, ri, value);
-+        return;
-+    }
-+
-     trace_gicv3_icc_igrpen_write(ri->opc2 & 1 ? 1 : 0,
-                                  gicv3_redist_affid(cs), value);
- 
-@@ -1006,6 +1236,10 @@ static uint64_t icc_ctlr_el1_read(CPUARMState *env, const ARMCPRegInfo *ri)
-     int bank = gicv3_use_ns_bank(env) ? GICV3_NS : GICV3_S;
-     uint64_t value;
- 
-+    if (icv_access(env, HCR_FMO | HCR_IMO)) {
-+        return icv_ctlr_read(env, ri);
-+    }
-+
-     value = cs->icc_ctlr_el1[bank];
-     trace_gicv3_icc_ctlr_read(gicv3_redist_affid(cs), value);
++    value = icc_hppir0_value(cs, env);
+     trace_gicv3_icc_hppir0_read(gicv3_redist_affid(cs), value);
      return value;
-@@ -1018,6 +1252,11 @@ static void icc_ctlr_el1_write(CPUARMState *env, const ARMCPRegInfo *ri,
-     int bank = gicv3_use_ns_bank(env) ? GICV3_NS : GICV3_S;
-     uint64_t mask;
+ }
+@@ -840,8 +1053,13 @@ static uint64_t icc_hppir0_read(CPUARMState *env, const ARMCPRegInfo *ri)
+ static uint64_t icc_hppir1_read(CPUARMState *env, const ARMCPRegInfo *ri)
+ {
+     GICv3CPUState *cs = icc_cs_from_env(env);
+-    uint64_t value = icc_hppir1_value(cs, env);
++    uint64_t value;
++
++    if (icv_access(env, HCR_IMO)) {
++        return icv_hppir_read(env, ri);
++    }
+ 
++    value = icc_hppir1_value(cs, env);
+     trace_gicv3_icc_hppir1_read(gicv3_redist_affid(cs), value);
+     return value;
+ }
+@@ -986,6 +1204,11 @@ static void icc_dir_write(CPUARMState *env, const ARMCPRegInfo *ri,
+     bool irq_is_secure, single_sec_state, irq_is_grp0;
+     bool route_fiq_to_el3, route_irq_to_el3, route_fiq_to_el2, route_irq_to_el2;
  
 +    if (icv_access(env, HCR_FMO | HCR_IMO)) {
-+        icv_ctlr_write(env, ri, value);
++        icv_dir_write(env, ri, value);
 +        return;
 +    }
 +
-     trace_gicv3_icc_ctlr_write(gicv3_redist_affid(cs), value);
+     trace_gicv3_icc_dir_write(gicv3_redist_affid(cs), value);
  
-     /* Only CBPR and EOIMODE can be RW;
+     if (irq >= cs->gic->num_irq) {
+@@ -1057,7 +1280,13 @@ static void icc_dir_write(CPUARMState *env, const ARMCPRegInfo *ri,
+ static uint64_t icc_rpr_read(CPUARMState *env, const ARMCPRegInfo *ri)
+ {
+     GICv3CPUState *cs = icc_cs_from_env(env);
+-    int prio = icc_highest_active_prio(cs);
++    int prio;
++
++    if (icv_access(env, HCR_FMO | HCR_IMO)) {
++        return icv_rpr_read(env, ri);
++    }
++
++    prio = icc_highest_active_prio(cs);
+ 
+     if (arm_feature(env, ARM_FEATURE_EL3) &&
+         !arm_is_secure(env) && (env->cp15.scr_el3 & SCR_FIQ)) {
 diff --git a/hw/intc/trace-events b/hw/intc/trace-events
-index 4ac1ea2..19fe1d5 100644
+index 19fe1d5..fc9ec57 100644
 --- a/hw/intc/trace-events
 +++ b/hw/intc/trace-events
-@@ -123,6 +123,16 @@ gicv3_ich_vtr_read(uint32_t cpu, uint64_t val) "GICv3 ICH_VTR read cpu %x value
- gicv3_ich_misr_read(uint32_t cpu, uint64_t val) "GICv3 ICH_MISR read cpu %x value 0x%" PRIx64
- gicv3_ich_eisr_read(uint32_t cpu, uint64_t val) "GICv3 ICH_EISR read cpu %x value 0x%" PRIx64
- gicv3_ich_elrsr_read(uint32_t cpu, uint64_t val) "GICv3 ICH_ELRSR read cpu %x value 0x%" PRIx64
-+gicv3_icv_ap_read(int grp, int regno, uint32_t cpu, uint64_t val) "GICv3 ICV_AP%dR%d read cpu %x value 0x%" PRIx64
-+gicv3_icv_ap_write(int grp, int regno, uint32_t cpu, uint64_t val) "GICv3 ICV_AP%dR%d write cpu %x value 0x%" PRIx64
-+gicv3_icv_bpr_read(int grp, uint32_t cpu, uint64_t val) "GICv3 ICV_BPR%d read cpu %x value 0x%" PRIx64
-+gicv3_icv_bpr_write(int grp, uint32_t cpu, uint64_t val) "GICv3 ICV_BPR%d write cpu %x value 0x%" PRIx64
-+gicv3_icv_pmr_read(uint32_t cpu, uint64_t val) "GICv3 ICV_PMR read cpu %x value 0x%" PRIx64
-+gicv3_icv_pmr_write(uint32_t cpu, uint64_t val) "GICv3 ICV_PMR write cpu %x value 0x%" PRIx64
-+gicv3_icv_igrpen_read(int grp, uint32_t cpu, uint64_t val) "GICv3 ICV_IGRPEN%d read cpu %x value 0x%" PRIx64
-+gicv3_icv_igrpen_write(int grp, uint32_t cpu, uint64_t val) "GICv3 ICV_IGRPEN%d write cpu %x value 0x%" PRIx64
-+gicv3_icv_ctlr_read(uint32_t cpu, uint64_t val) "GICv3 ICV_CTLR read cpu %x value 0x%" PRIx64
-+gicv3_icv_ctlr_write(uint32_t cpu, uint64_t val) "GICv3 ICV_CTLR write cpu %x value 0x%" PRIx64
+@@ -133,6 +133,9 @@ gicv3_icv_igrpen_read(int grp, uint32_t cpu, uint64_t val) "GICv3 ICV_IGRPEN%d r
+ gicv3_icv_igrpen_write(int grp, uint32_t cpu, uint64_t val) "GICv3 ICV_IGRPEN%d write cpu %x value 0x%" PRIx64
+ gicv3_icv_ctlr_read(uint32_t cpu, uint64_t val) "GICv3 ICV_CTLR read cpu %x value 0x%" PRIx64
+ gicv3_icv_ctlr_write(uint32_t cpu, uint64_t val) "GICv3 ICV_CTLR write cpu %x value 0x%" PRIx64
++gicv3_icv_rpr_read(uint32_t cpu, uint64_t val) "GICv3 ICV_RPR read cpu %x value 0x%" PRIx64
++gicv3_icv_hppir_read(int grp, uint32_t cpu, uint64_t val) "GICv3 ICV_HPPIR%d read cpu %x value 0x%" PRIx64
++gicv3_icv_dir_write(uint32_t cpu, uint64_t val) "GICv3 ICV_DIR write cpu %x value 0x%" PRIx64
  
  # hw/intc/arm_gicv3_dist.c
  gicv3_dist_read(uint64_t offset, uint64_t data, unsigned size, bool secure) "GICv3 distributor read: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u secure %d"
