@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53929)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53965)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1cGutT-0002fG-AK
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 16:45:55 -0500
+	(envelope-from <drjones@redhat.com>) id 1cGutU-0002gr-Sq
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 16:45:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1cGutS-0007eR-8u
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 16:45:51 -0500
+	(envelope-from <drjones@redhat.com>) id 1cGutU-0007gB-66
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 16:45:52 -0500
 From: Andrew Jones <drjones@redhat.com>
-Date: Tue, 13 Dec 2016 22:45:21 +0100
-Message-Id: <20161213214522.25548-11-drjones@redhat.com>
+Date: Tue, 13 Dec 2016 22:45:20 +0100
+Message-Id: <20161213214522.25548-10-drjones@redhat.com>
 In-Reply-To: <20161213214522.25548-1-drjones@redhat.com>
 References: <20161213214522.25548-1-drjones@redhat.com>
-Subject: [Qemu-devel] [PATCH 10/11] hw/arm/virt: remove VirtGuestInfo
+Subject: [Qemu-devel] [PATCH 09/11] hw/arm/virt-acpi-build: don't save
+ VirtGuestInfo on AcpiBuildState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,137 +23,53 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-arm@nongnu.org
 Cc: peter.maydell@linaro.org, zhaoshenglong@huawei.com, mst@redhat.com, imammedo@redhat.com, ehabkost@redhat.com
 
-by moving VirtGuestInfo.fw_cfg to VirtMachineState. This is the
-mach-virt equivalent of "pc: Move PcGuestInfo.fw_cfg to
-PCMachineState" and "pc: Eliminate PcGuestInfo struct" combined.
+We can get to VirtMachineState without the need for saving a pointer
+on AcpiBuildState. This is the mach-virt equivalent to "acpi: Don't save
+PcGuestInfo on AcpiBuildState"
 
 Signed-off-by: Andrew Jones <drjones@redhat.com>
 ---
- hw/arm/virt-acpi-build.c |  7 +++----
- hw/arm/virt.c            | 18 +++++++-----------
- include/hw/arm/virt.h    |  6 +-----
- 3 files changed, 11 insertions(+), 20 deletions(-)
+ hw/arm/virt-acpi-build.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
 diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index 137781646bec..0e6caf5f1083 100644
+index 7a1efd0dc538..137781646bec 100644
 --- a/hw/arm/virt-acpi-build.c
 +++ b/hw/arm/virt-acpi-build.c
-@@ -826,11 +826,10 @@ static const VMStateDescription vmstate_virt_acpi_build = {
+@@ -706,7 +706,6 @@ struct AcpiBuildState {
+     MemoryRegion *linker_mr;
+     /* Is table patched? */
+     bool patched;
+-    VirtGuestInfo *guest_info;
+ } AcpiBuildState;
  
- void virt_acpi_setup(VirtMachineState *vms)
+ static
+@@ -779,6 +778,8 @@ static void acpi_ram_update(MemoryRegion *mr, GArray *data)
+ 
+ static void virt_acpi_build_update(void *build_opaque)
  {
--    VirtGuestInfo *guest_info = &vms->acpi_guest_info;
++    MachineState *machine = MACHINE(qdev_get_machine());
++    VirtMachineState *vms = VIRT_MACHINE(machine);
+     AcpiBuildState *build_state = build_opaque;
      AcpiBuildTables tables;
-     AcpiBuildState *build_state;
  
--    if (!guest_info->fw_cfg) {
-+    if (!vms->fw_cfg) {
-         trace_virt_acpi_setup();
-         return;
-     }
-@@ -855,8 +854,8 @@ void virt_acpi_setup(VirtMachineState *vms)
-         acpi_add_rom_blob(build_state, tables.linker->cmd_blob,
-                           "etc/table-loader", 0);
+@@ -790,8 +791,7 @@ static void virt_acpi_build_update(void *build_opaque)
  
--    fw_cfg_add_file(guest_info->fw_cfg, ACPI_BUILD_TPMLOG_FILE,
--                    tables.tcpalog->data, acpi_data_len(tables.tcpalog));
-+    fw_cfg_add_file(vms->fw_cfg, ACPI_BUILD_TPMLOG_FILE, tables.tcpalog->data,
-+                    acpi_data_len(tables.tcpalog));
+     acpi_build_tables_init(&tables);
  
-     build_state->rsdp_mr = acpi_add_rom_blob(build_state, tables.rsdp,
-                                               ACPI_BUILD_RSDP_FILE, 0);
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 2cb2e5b4f52a..348e23ff663c 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -914,15 +914,14 @@ static void create_flash(const VirtMachineState *vms,
-     }
- }
+-    virt_acpi_build(container_of(build_state->guest_info,
+-                                 VirtMachineState, acpi_guest_info), &tables);
++    virt_acpi_build(vms, &tables);
  
--static void create_fw_cfg(const VirtMachineState *vms, AddressSpace *as)
-+static void create_fw_cfg(VirtMachineState *vms, AddressSpace *as)
- {
-     hwaddr base = vms->memmap[VIRT_FW_CFG].base;
-     hwaddr size = vms->memmap[VIRT_FW_CFG].size;
--    FWCfgState *fw_cfg;
-     char *nodename;
- 
--    fw_cfg = fw_cfg_init_mem_wide(base + 8, base, 8, base + 16, as);
--    fw_cfg_add_i16(fw_cfg, FW_CFG_NB_CPUS, (uint16_t)vms->smp_cpus);
-+    vms->fw_cfg = fw_cfg_init_mem_wide(base + 8, base, 8, base + 16, as);
-+    fw_cfg_add_i16(vms->fw_cfg, FW_CFG_NB_CPUS, (uint16_t)vms->smp_cpus);
- 
-     nodename = g_strdup_printf("/fw-cfg@%" PRIx64, base);
-     qemu_fdt_add_subnode(vms->fdt, nodename);
-@@ -1158,12 +1157,11 @@ static void *machvirt_dtb(const struct arm_boot_info *binfo, int *fdt_size)
- 
- static void virt_build_smbios(VirtMachineState *vms)
- {
--    FWCfgState *fw_cfg = vms->acpi_guest_info.fw_cfg;
-     uint8_t *smbios_tables, *smbios_anchor;
-     size_t smbios_tables_len, smbios_anchor_len;
-     const char *product = "QEMU Virtual Machine";
- 
--    if (!fw_cfg) {
-+    if (!vms->fw_cfg) {
-         return;
+     acpi_ram_update(build_state->table_mr, tables.table_data);
+     acpi_ram_update(build_state->rsdp_mr, tables.rsdp);
+@@ -841,7 +841,6 @@ void virt_acpi_setup(VirtMachineState *vms)
      }
  
-@@ -1178,9 +1176,9 @@ static void virt_build_smbios(VirtMachineState *vms)
-                       &smbios_anchor, &smbios_anchor_len);
+     build_state = g_malloc0(sizeof *build_state);
+-    build_state->guest_info = guest_info;
  
-     if (smbios_anchor) {
--        fw_cfg_add_file(fw_cfg, "etc/smbios/smbios-tables",
-+        fw_cfg_add_file(vms->fw_cfg, "etc/smbios/smbios-tables",
-                         smbios_tables, smbios_tables_len);
--        fw_cfg_add_file(fw_cfg, "etc/smbios/smbios-anchor",
-+        fw_cfg_add_file(vms->fw_cfg, "etc/smbios/smbios-anchor",
-                         smbios_anchor, smbios_anchor_len);
-     }
- }
-@@ -1205,7 +1203,6 @@ static void machvirt_init(MachineState *machine)
-     int n, virt_max_cpus;
-     MemoryRegion *ram = g_new(MemoryRegion, 1);
-     const char *cpu_model = machine->cpu_model;
--    VirtGuestInfo *guest_info = &vms->acpi_guest_info;
-     char **cpustr;
-     ObjectClass *oc;
-     const char *typename;
-@@ -1414,9 +1411,8 @@ static void machvirt_init(MachineState *machine)
-     create_virtio_devices(vms, pic);
- 
-     create_fw_cfg(vms, &address_space_memory);
--    rom_set_fw(fw_cfg_find());
-+    rom_set_fw(vms->fw_cfg);
- 
--    guest_info->fw_cfg = fw_cfg_find();
-     vms->machine_done.notify = virt_machine_done;
-     qemu_add_machine_init_done_notifier(&vms->machine_done);
- 
-diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-index 52b35478223e..ece3260bfeb5 100644
---- a/include/hw/arm/virt.h
-+++ b/include/hw/arm/virt.h
-@@ -81,10 +81,6 @@ typedef struct MemMapEntry {
-     hwaddr size;
- } MemMapEntry;
- 
--typedef struct VirtGuestInfo {
--    FWCfgState *fw_cfg;
--} VirtGuestInfo;
--
- typedef struct {
-     MachineClass parent;
-     bool disallow_affinity_adjustment;
-@@ -95,8 +91,8 @@ typedef struct {
- 
- typedef struct {
-     MachineState parent;
--    VirtGuestInfo acpi_guest_info;
-     Notifier machine_done;
-+    FWCfgState *fw_cfg;
-     bool secure;
-     bool highmem;
-     bool virt;
+     acpi_build_tables_init(&tables);
+     virt_acpi_build(vms, &tables);
 -- 
 2.9.3
