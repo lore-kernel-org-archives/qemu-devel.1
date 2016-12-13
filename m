@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53965)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54026)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1cGutU-0002gr-Sq
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 16:45:56 -0500
+	(envelope-from <drjones@redhat.com>) id 1cGuta-0002lz-Rk
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 16:46:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1cGutU-0007gB-66
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 16:45:52 -0500
+	(envelope-from <drjones@redhat.com>) id 1cGutZ-0007ib-RQ
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 16:45:58 -0500
 From: Andrew Jones <drjones@redhat.com>
-Date: Tue, 13 Dec 2016 22:45:20 +0100
-Message-Id: <20161213214522.25548-10-drjones@redhat.com>
+Date: Tue, 13 Dec 2016 22:45:22 +0100
+Message-Id: <20161213214522.25548-12-drjones@redhat.com>
 In-Reply-To: <20161213214522.25548-1-drjones@redhat.com>
 References: <20161213214522.25548-1-drjones@redhat.com>
-Subject: [Qemu-devel] [PATCH 09/11] hw/arm/virt-acpi-build: don't save
- VirtGuestInfo on AcpiBuildState
+Subject: [Qemu-devel] [PATCH 11/11] hw/arm/virt-acpi-build: Don't
+ incorrectly claim architectural timer to be edge-triggered
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,53 +23,63 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-arm@nongnu.org
 Cc: peter.maydell@linaro.org, zhaoshenglong@huawei.com, mst@redhat.com, imammedo@redhat.com, ehabkost@redhat.com
 
-We can get to VirtMachineState without the need for saving a pointer
-on AcpiBuildState. This is the mach-virt equivalent to "acpi: Don't save
-PcGuestInfo on AcpiBuildState"
+This is the ACPI equivalent to "hw/arm/virt: Don't incorrectly claim
+architectural timer to be edge-triggered" which fixes the DT for
+machine types 2.9 and later.
 
 Signed-off-by: Andrew Jones <drjones@redhat.com>
 ---
- hw/arm/virt-acpi-build.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ hw/arm/virt-acpi-build.c | 18 ++++++++++++------
+ 1 file changed, 12 insertions(+), 6 deletions(-)
 
 diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index 7a1efd0dc538..137781646bec 100644
+index 0e6caf5f1083..62cf4e7f6615 100644
 --- a/hw/arm/virt-acpi-build.c
 +++ b/hw/arm/virt-acpi-build.c
-@@ -706,7 +706,6 @@ struct AcpiBuildState {
-     MemoryRegion *linker_mr;
-     /* Is table patched? */
-     bool patched;
--    VirtGuestInfo *guest_info;
- } AcpiBuildState;
+@@ -535,24 +535,30 @@ build_mcfg(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
  
- static
-@@ -779,6 +778,8 @@ static void acpi_ram_update(MemoryRegion *mr, GArray *data)
- 
- static void virt_acpi_build_update(void *build_opaque)
+ /* GTDT */
+ static void
+-build_gtdt(GArray *table_data, BIOSLinker *linker)
++build_gtdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
  {
-+    MachineState *machine = MACHINE(qdev_get_machine());
-+    VirtMachineState *vms = VIRT_MACHINE(machine);
-     AcpiBuildState *build_state = build_opaque;
-     AcpiBuildTables tables;
++    VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
+     int gtdt_start = table_data->len;
+     AcpiGenericTimerTable *gtdt;
++    uint8_t irqflags = ACPI_LEVEL_SENSITIVE;
++
++    if (vmc->claim_edge_triggered_timers) {
++        irqflags = ACPI_EDGE_SENSITIVE;
++    }
  
-@@ -790,8 +791,7 @@ static void virt_acpi_build_update(void *build_opaque)
+     gtdt = acpi_data_push(table_data, sizeof *gtdt);
+     /* The interrupt values are the same with the device tree when adding 16 */
+     gtdt->secure_el1_interrupt = ARCH_TIMER_S_EL1_IRQ + 16;
+-    gtdt->secure_el1_flags = ACPI_EDGE_SENSITIVE;
++    gtdt->secure_el1_flags = irqflags;
  
-     acpi_build_tables_init(&tables);
+     gtdt->non_secure_el1_interrupt = ARCH_TIMER_NS_EL1_IRQ + 16;
+-    gtdt->non_secure_el1_flags = ACPI_EDGE_SENSITIVE | ACPI_GTDT_ALWAYS_ON;
++    gtdt->non_secure_el1_flags = irqflags | ACPI_GTDT_ALWAYS_ON;
  
--    virt_acpi_build(container_of(build_state->guest_info,
--                                 VirtMachineState, acpi_guest_info), &tables);
-+    virt_acpi_build(vms, &tables);
+     gtdt->virtual_timer_interrupt = ARCH_TIMER_VIRT_IRQ + 16;
+-    gtdt->virtual_timer_flags = ACPI_EDGE_SENSITIVE;
++    gtdt->virtual_timer_flags = irqflags;
  
-     acpi_ram_update(build_state->table_mr, tables.table_data);
-     acpi_ram_update(build_state->rsdp_mr, tables.rsdp);
-@@ -841,7 +841,6 @@ void virt_acpi_setup(VirtMachineState *vms)
-     }
+     gtdt->non_secure_el2_interrupt = ARCH_TIMER_NS_EL2_IRQ + 16;
+-    gtdt->non_secure_el2_flags = ACPI_EDGE_SENSITIVE;
++    gtdt->non_secure_el2_flags = irqflags;
  
-     build_state = g_malloc0(sizeof *build_state);
--    build_state->guest_info = guest_info;
+     build_header(linker, table_data,
+                  (void *)(table_data->data + gtdt_start), "GTDT",
+@@ -735,7 +741,7 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
+     build_madt(tables_blob, tables->linker, vms);
  
-     acpi_build_tables_init(&tables);
-     virt_acpi_build(vms, &tables);
+     acpi_add_table(table_offsets, tables_blob);
+-    build_gtdt(tables_blob, tables->linker);
++    build_gtdt(tables_blob, tables->linker, vms);
+ 
+     acpi_add_table(table_offsets, tables_blob);
+     build_mcfg(tables_blob, tables->linker, vms);
 -- 
 2.9.3
