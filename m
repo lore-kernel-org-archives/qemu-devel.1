@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55169)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55831)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cGmHj-00046w-Js
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 07:34:23 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cGmK3-0005SV-Rp
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 07:36:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cGmHg-0004nc-F5
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 07:34:19 -0500
-Received: from mout.kundenserver.de ([212.227.126.187]:64779)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cGmHg-0004n8-5T
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 07:34:16 -0500
-References: <1480432054-12065-1-git-send-email-yuval.shaia@oracle.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <c809cb3d-6e44-679b-f3b4-3c37bb0252b1@vivier.eu>
-Date: Tue, 13 Dec 2016 13:33:04 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1cGmK0-0005NZ-LS
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 07:36:43 -0500
+Received: from mail-vk0-f51.google.com ([209.85.213.51]:34261)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cGmK0-0005NJ-H6
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 07:36:40 -0500
+Received: by mail-vk0-f51.google.com with SMTP id x186so58916567vkd.1
+	for <qemu-devel@nongnu.org>; Tue, 13 Dec 2016 04:36:40 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1480432054-12065-1-git-send-email-yuval.shaia@oracle.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2] slirp,
- disas: Replace min/max with MIN/MAX macros
+In-Reply-To: <1481130858-31767-1-git-send-email-julian@codesourcery.com>
+References: <1481130858-31767-1-git-send-email-julian@codesourcery.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 13 Dec 2016 12:35:19 +0000
+Message-ID: <CAFEAcA9DFG3NqTAtAXd3W7y70Mdn9jH5Y9yXFdtgbRKa7p_qow@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH] Correct value of ARM Cortex-A8 MVFR1
+ register.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,29 +29,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yuval Shaia <yuval.shaia@oracle.com>, samuel.thibault@ens-lyon.org, jan.kiszka@siemens.com
-Cc: qemu-devel@nongnu.org, Stefan Weil <sw@weilnetz.de>
+To: Julian Brown <julian@codesourcery.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Le 29/11/2016 à 16:07, Yuval Shaia a écrit :
-> diff --git a/slirp/slirp.h b/slirp/slirp.h
-> index a1f3139..3877f66 100644
-> --- a/slirp/slirp.h
-> +++ b/slirp/slirp.h
-> @@ -292,9 +292,4 @@ int tcp_emu(struct socket *, struct mbuf *);
->  int tcp_ctl(struct socket *);
->  struct tcpcb *tcp_drop(struct tcpcb *tp, int err);
->  
-> -#ifndef _WIN32
-> -#define min(x,y) ((x) < (y) ? (x) : (y))
-> -#define max(x,y) ((x) > (y) ? (x) : (y))
-> -#endif
-> -
+On 7 December 2016 at 17:14, Julian Brown <julian@codesourcery.com> wrote:
+> The value of the MVFR1 (Media and VFP Feature Register 1) register for
+> the Cortex-A8 appears to be incorrect (according to the TRM, DDI0344K),
+> with the "full denormal arithmetic" and "propagation of NaN" fields
+> holding both 0 instead of both 1.
+>
+> I had a go tracing the history of the use of this value, and it seems
+> it's always just been wrong in QEMU: maybe it was derived from early
+> documentation, or guessed based on the use of a "VFP Lite" implementation
+> in the Cortex-A8.
+>
+> Depending on the startup/early-boot code in use, this can manifest as
+> failure to perform denormal arithmetic properly: in our case, selecting
+> a Cortex-A8 CPU when using QEMU as an instruction-set simulator for
+> bare-metal GCC testing caused tests using denormal arithmetic to
+> fail. Problems might be masked (or not occur) when using a full OS kernel
+> with suitable trap handlers (I'm not sure).
+>
+> Signed-off-by: Julian Brown <julian@codesourcery.com>
 
-It seems the defines have been added because they are already defined
-for Win32.
+Applied to target-arm.next for 2.9, thanks.
 
-If we remove them, do we know if MIN()/MAX() are defined for Win32?
-[CC: host W32 maintainer]
-
-Thanks,
-Laurent
+-- PMM
