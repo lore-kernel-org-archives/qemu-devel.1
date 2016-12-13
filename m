@@ -1,38 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59637)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59814)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1cGmcv-0000e8-8s
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 07:56:14 -0500
+	(envelope-from <groug@kaod.org>) id 1cGmdd-0001DX-11
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 07:56:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1cGmcr-000233-9K
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 07:56:13 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44495)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1cGmcr-00022u-0u
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 07:56:09 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	uBDCsoTE054956
-	for <qemu-devel@nongnu.org>; Tue, 13 Dec 2016 07:56:07 -0500
-Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 27acdaqw0y-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 13 Dec 2016 07:56:06 -0500
-Received: from localhost
-	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Tue, 13 Dec 2016 05:56:06 -0700
-References: <20161212111857.23399-1-pbonzini@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Tue, 13 Dec 2016 13:56:00 +0100
+	(envelope-from <groug@kaod.org>) id 1cGmdZ-0002DP-1n
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 07:56:57 -0500
+Received: from 20.mo1.mail-out.ovh.net ([188.165.45.168]:57345)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cGmdY-0002DF-RY
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 07:56:52 -0500
+Received: from player795.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 432AB28535
+	for <qemu-devel@nongnu.org>; Tue, 13 Dec 2016 13:56:51 +0100 (CET)
+Date: Tue, 13 Dec 2016 13:56:41 +0100
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20161213135641.5ac9ad29@bahia.lan>
+In-Reply-To: <1481575745-26120-1-git-send-email-ehabkost@redhat.com>
+References: <1481575745-26120-1-git-send-email-ehabkost@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20161212111857.23399-1-pbonzini@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 8bit
-Message-Id: <13f7fc4b-3869-f150-f692-634cf9053998@de.ibm.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 00/11] speedup vring processing with
- MemoryRegionCaches
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.8.1 v2] machine: Convert abstract
+ typename on compat_props to subclass names
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,57 +30,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: famz@redhat.com, stefanha@redhat.com, mst@redhat.com
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-stable@nongnu.org, Halil Pasic <pasic@linux.vnet.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 12/12/2016 12:18 PM, Paolo Bonzini wrote:
-> It is known that virtio's usage of ld_*_phys and st_*_phys functions
-> wastes time in address_space_translate, visiting the
-> AddressSpaceDispatch's radix tree.
-> 
-> This series introduces a small cache that changes these functions
-> to a simple range check and memory access.  The effect is a bit
-> underwhelming, because the improvement is only 1-2Kiops/second.
-> Nevertheless I'm throwing out the patches so that for example they
-> can be tested on s390.
+On Mon, 12 Dec 2016 18:49:05 -0200
+Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-It does seem to save some cpu cycles and by that it gives some benefit
-if you are cpu bound (e.g. with just one host CPU I get ~4% benefit in 
-terms of throughput)
+> Original problem description by Greg Kurz:
+> 
+> > Since commit "9a4c0e220d8a hw/virtio-pci: fix virtio
+> > behaviour", passing -device virtio-blk-pci.disable-modern=off
+> > has no effect on 2.6 machine types because the internal
+> > virtio-pci.disable-modern=on compat property always prevail.  
+> 
+> The same bug also affects other abstract type names mentioned on
+> compat_props by machine-types: apic-common, i386-cpu, pci-device,
+> powerpc64-cpu, s390-skeys, spapr-pci-host-bridge, usb-device,
+> virtio-pci, x86_64-cpu.
+> 
+> The right fix for this problem is to make sure compat_props and
+> -global options are always applied in the order they are
+> registered, instead of reordering them based on the type
+> hierarchy. But changing the ordering rules of -global is risky
+> and might break existing configurations, so we shouldn't do that
+> on a stable branch.
+> 
+> This is a temporary hack that will work around the bug when
+> registering compat_props properties: if we find an abstract class
+> on compat_props, register properties for all its non-abstract
+> subtypes instead. This will make sure -global won't be overridden
+> by compat_props, while keeping the existing ordering rules on
+> -global options.
+> 
+> Note that there's one case that won't be fixed by this hack:
+> "-global spapr-pci-vfio-host-bridge.<option>=<value>" won't be
+> able to override compat_props, because spapr-pci-host-bridge is
+> not an abstract class.
+> 
 
+As mentioned by Connie, spapr-pci-vfio-host-bridge is deprecated:
+
+commit 72700d7e733948fa7fbb735ccdf2209931c88476
+Author: David Gibson <david@gibson.dropbear.id.au>
+Date:   Mon Feb 29 17:19:50 2016 +1100
+
+    spapr_pci: (Mostly) remove spapr-pci-vfio-host-bridge
+
+
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> ---
+
+Reviewed-by: Greg Kurz <groug@kaod.org>
+
+Tested-by: Greg Kurz <groug@kaod.org> # with virtio-blk-pci and pseries-2.6
+
+> Changes v1 (RFC) -> v2:
+> * New commit message
+> * Clarified comments
+>   Suggested-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+> * Moved variable declaration outside of loop
+>   Suggested-by: Cornelia Huck <cornelia.huck@de.ibm.com>
+> ---
+>  hw/core/machine.c | 39 ++++++++++++++++++++++++++++++++++++---
+>  1 file changed, 36 insertions(+), 3 deletions(-)
 > 
-> Things to fix: handle address_space_cache_init failures
-> in virtio_init_region_cache.  Also, once virtio breaks free of
-> address_space_memoory, we'll need to handle invalidation in IOMMU regions.
-> For the latter, maybe it's worth introducing a new abstraction that
-> is higher-level than MemoryListener and covers both regular and IOMMU
-> memory regions.
-> 
-> Paolo
-> 
-> Paolo Bonzini (11):
->   exec: optimize remaining address_space_* cases
->   exec: introduce memory_ldst.inc.c
->   exec: introduce address_space_extend_translation
->   exec: introduce MemoryRegionCache
->   virtio: make virtio_should_notify static
->   virtio: add virtio_*_phys_cached
->   virtio: use address_space_map/unmap to access descriptors
->   virtio: use MemoryRegionCache to access descriptors
->   virtio: add MemoryListener to cache ring translations
->   virtio: use VRingMemoryRegionCaches for descriptor ring
->   virtio: use VRingMemoryRegionCaches for avail and used rings
-> 
->  exec.c                            | 687 +++++-------------------------------
->  hw/net/virtio-net.c               |  14 +-
->  hw/virtio/virtio.c                | 322 +++++++++++++----
->  include/exec/cpu-all.h            |  23 ++
->  include/exec/cpu-common.h         |  15 -
->  include/exec/memory.h             | 166 +++++++++
->  include/hw/virtio/virtio-access.h |  52 +++
->  include/hw/virtio/virtio.h        |   2 +-
->  include/qemu/typedefs.h           |   1 +
->  memory_ldst.inc.c                 | 709 ++++++++++++++++++++++++++++++++++++++
->  10 files changed, 1316 insertions(+), 675 deletions(-)
->  create mode 100644 memory_ldst.inc.c
-> 
+> diff --git a/hw/core/machine.c b/hw/core/machine.c
+> index b0fd91f..213e8e0 100644
+> --- a/hw/core/machine.c
+> +++ b/hw/core/machine.c
+> @@ -554,11 +554,31 @@ static void machine_class_finalize(ObjectClass *klass, void *data)
+>      g_free(mc->name);
+>  }
+>  
+> +static void register_compat_prop(const char *driver,
+> +                                 const char *property,
+> +                                 const char *value)
+> +{
+> +    GlobalProperty *p = g_new0(GlobalProperty, 1);
+> +    /* Machine compat_props must never cause errors: */
+> +    p->errp = &error_abort;
+> +    p->driver = driver;
+> +    p->property = property;
+> +    p->value = value;
+> +    qdev_prop_register_global(p);
+> +}
+> +
+> +static void machine_register_compat_for_subclass(ObjectClass *oc, void *opaque)
+> +{
+> +    GlobalProperty *p = opaque;
+> +    register_compat_prop(object_class_get_name(oc), p->property, p->value);
+> +}
+> +
+>  void machine_register_compat_props(MachineState *machine)
+>  {
+>      MachineClass *mc = MACHINE_GET_CLASS(machine);
+>      int i;
+>      GlobalProperty *p;
+> +    ObjectClass *oc;
+>  
+>      if (!mc->compat_props) {
+>          return;
+> @@ -566,9 +586,22 @@ void machine_register_compat_props(MachineState *machine)
+>  
+>      for (i = 0; i < mc->compat_props->len; i++) {
+>          p = g_array_index(mc->compat_props, GlobalProperty *, i);
+> -        /* Machine compat_props must never cause errors: */
+> -        p->errp = &error_abort;
+> -        qdev_prop_register_global(p);
+> +        oc = object_class_by_name(p->driver);
+> +        if (oc && object_class_is_abstract(oc)) {
+> +            /* temporary hack to make sure we do not override
+> +             * globals set explicitly on -global: if an abstract class
+> +             * is on compat_props, register globals for all its
+> +             * non-abstract subtypes instead.
+> +             *
+> +             * This doesn't solve the problem for cases where
+> +             * a non-abstract typename mentioned on compat_props
+> +             * has subclasses, like spapr-pci-host-bridge.
+> +             */
+> +            object_class_foreach(machine_register_compat_for_subclass,
+> +                                 p->driver, false, p);
+> +        } else {
+> +            register_compat_prop(p->driver, p->property, p->value);
+> +        }
+>      }
+>  }
+>  
