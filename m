@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57304)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57818)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1cGphO-0004LZ-4s
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 11:13:08 -0500
+	(envelope-from <alex@alex.org.uk>) id 1cGpjr-0005ua-K7
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 11:15:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1cGphM-0007c4-VJ
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 11:13:02 -0500
-Date: Tue, 13 Dec 2016 17:11:52 +0100
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Message-ID: <20161213161152.GN9606@toto>
-References: <1481625384-15077-1-git-send-email-peter.maydell@linaro.org>
-	<1481625384-15077-23-git-send-email-peter.maydell@linaro.org>
-MIME-Version: 1.0
+	(envelope-from <alex@alex.org.uk>) id 1cGpjn-0008Cd-PY
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 11:15:35 -0500
+Received: from mail.avalus.com ([2001:41c8:10:1dd::10]:49784)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <alex@alex.org.uk>) id 1cGpjn-0008CP-Jb
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 11:15:31 -0500
 Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1481625384-15077-23-git-send-email-peter.maydell@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH 22/23] target-arm: Enable EL2 feature bit
- on A53 and A57
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+From: Alex Bligh <alex@alex.org.uk>
+In-Reply-To: <20161213160610.6xlwhvwq7xhee2wg@grep.be>
+Date: Tue, 13 Dec 2016 16:15:28 +0000
+Content-Transfer-Encoding: 7bit
+Message-Id: <1A0E3F59-A361-4F81-91E6-65C6AFC82C4F@alex.org.uk>
+References: <20161212204313.anhjire2gkwd6gzi@grep.be>
+	<2D482F67-8115-48CD-921D-5728BC1AD92B@alex.org.uk>
+	<20161213150343.3g3fxjixbteum7ju@grep.be>
+	<B6B52260-6814-40CB-AA00-E79099B8ED56@alex.org.uk>
+	<20161213160610.6xlwhvwq7xhee2wg@grep.be>
+Subject: Re: [Qemu-devel] [Nbd] [PATCH v5] doc: Add NBD_CMD_BLOCK_STATUS
+ extension
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,132 +31,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org, Christoffer Dall <christoffer.dall@linaro.org>, Andrew Jones <drjones@redhat.com>
-
-On Tue, Dec 13, 2016 at 10:36:23AM +0000, Peter Maydell wrote:
-> Enable the ARM_FEATURE_EL2 bit on Cortex-A52 and
-> Cortex-A57, since this is all now sufficiently implemented
-> to work with the GICv3. We provide the usual CPU property
-> to disable it for backwards compatibility with the older
-> virt boards.
-> 
-> In this commit, we disable the EL2 feature on the
-> virt and ZynpMP boards, so there is no overall effect.
-> Another commit will expose a board-level property to
-> allow the user to enable EL2.
-
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+To: Wouter Verhelst <w@uter.be>
+Cc: Alex Bligh <alex@alex.org.uk>, "nbd-general@lists.sourceforge.net" <nbd-general@lists.sourceforge.net>, Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Stefan stefanha@redhat. com" <stefanha@redhat.com>, "Denis V. Lunev" <den@openvz.org>, Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>
 
 
+> On 13 Dec 2016, at 16:06, Wouter Verhelst <w@uter.be> wrote:
 > 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  target-arm/cpu.h     |  2 ++
->  hw/arm/virt.c        |  4 ++++
->  hw/arm/xlnx-zynqmp.c |  2 ++
->  target-arm/cpu.c     | 12 ++++++++++++
->  target-arm/cpu64.c   |  2 ++
->  5 files changed, 22 insertions(+)
+>> 
+>> "If a server supports the `base:allocation` metadata context, then writing
+>> to an extent which has `NBD_STATE_HOLE` clear MUST NOT fail with ENOSPC
+>> unless for reasons specified in the definition of another context."
 > 
-> diff --git a/target-arm/cpu.h b/target-arm/cpu.h
-> index be42ffb..51165fa 100644
-> --- a/target-arm/cpu.h
-> +++ b/target-arm/cpu.h
-> @@ -574,6 +574,8 @@ struct ARMCPU {
->      bool start_powered_off;
->      /* CPU currently in PSCI powered-off state */
->      bool powered_off;
-> +    /* CPU has virtualization extension */
-> +    bool has_el2;
->      /* CPU has security extension */
->      bool has_el3;
->      /* CPU has PMU (Performance Monitor Unit) */
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index cce8d2e..5bde68c 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -1368,6 +1368,10 @@ static void machvirt_init(MachineState *machine)
->              object_property_set_bool(cpuobj, false, "has_el3", NULL);
->          }
->  
-> +        if (object_property_find(cpuobj, "has_el2", NULL)) {
-> +            object_property_set_bool(cpuobj, false, "has_el2", NULL);
-> +        }
-> +
->          if (vms->psci_conduit != QEMU_PSCI_CONDUIT_DISABLED) {
->              object_property_set_int(cpuobj, vms->psci_conduit,
->                                      "psci-conduit", NULL);
-> diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
-> index 0d86ba3..bc4e66b 100644
-> --- a/hw/arm/xlnx-zynqmp.c
-> +++ b/hw/arm/xlnx-zynqmp.c
-> @@ -258,6 +258,8 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
->  
->          object_property_set_bool(OBJECT(&s->apu_cpu[i]),
->                                   s->secure, "has_el3", NULL);
-> +        object_property_set_bool(OBJECT(&s->apu_cpu[i]),
-> +                                 false, "has_el2", NULL);
->          object_property_set_int(OBJECT(&s->apu_cpu[i]), GIC_BASE_ADDR,
->                                  "reset-cbar", &error_abort);
->          object_property_set_bool(OBJECT(&s->apu_cpu[i]), true, "realized",
-> diff --git a/target-arm/cpu.c b/target-arm/cpu.c
-> index 5e0d21d..d721cd4 100644
-> --- a/target-arm/cpu.c
-> +++ b/target-arm/cpu.c
-> @@ -497,6 +497,9 @@ static Property arm_cpu_reset_hivecs_property =
->  static Property arm_cpu_rvbar_property =
->              DEFINE_PROP_UINT64("rvbar", ARMCPU, rvbar, 0);
->  
-> +static Property arm_cpu_has_el2_property =
-> +            DEFINE_PROP_BOOL("has_el2", ARMCPU, has_el2, true);
-> +
->  static Property arm_cpu_has_el3_property =
->              DEFINE_PROP_BOOL("has_el3", ARMCPU, has_el3, true);
->  
-> @@ -547,6 +550,11 @@ static void arm_cpu_post_init(Object *obj)
->  #endif
->      }
->  
-> +    if (arm_feature(&cpu->env, ARM_FEATURE_EL2)) {
-> +        qdev_property_add_static(DEVICE(obj), &arm_cpu_has_el2_property,
-> +                                 &error_abort);
-> +    }
-> +
->      if (arm_feature(&cpu->env, ARM_FEATURE_PMU)) {
->          qdev_property_add_static(DEVICE(obj), &arm_cpu_has_pmu_property,
->                                   &error_abort);
-> @@ -690,6 +698,10 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
->          cpu->id_aa64pfr0 &= ~0xf000;
->      }
->  
-> +    if (!cpu->has_el2) {
-> +        unset_feature(env, ARM_FEATURE_EL2);
-> +    }
-> +
->      if (!cpu->has_pmu || !kvm_enabled()) {
->          cpu->has_pmu = false;
->          unset_feature(env, ARM_FEATURE_PMU);
-> diff --git a/target-arm/cpu64.c b/target-arm/cpu64.c
-> index 73c7f31..670c07a 100644
-> --- a/target-arm/cpu64.c
-> +++ b/target-arm/cpu64.c
-> @@ -110,6 +110,7 @@ static void aarch64_a57_initfn(Object *obj)
->      set_feature(&cpu->env, ARM_FEATURE_V8_SHA256);
->      set_feature(&cpu->env, ARM_FEATURE_V8_PMULL);
->      set_feature(&cpu->env, ARM_FEATURE_CRC);
-> +    set_feature(&cpu->env, ARM_FEATURE_EL2);
->      set_feature(&cpu->env, ARM_FEATURE_EL3);
->      set_feature(&cpu->env, ARM_FEATURE_PMU);
->      cpu->kvm_target = QEMU_KVM_ARM_TARGET_CORTEX_A57;
-> @@ -169,6 +170,7 @@ static void aarch64_a53_initfn(Object *obj)
->      set_feature(&cpu->env, ARM_FEATURE_V8_SHA256);
->      set_feature(&cpu->env, ARM_FEATURE_V8_PMULL);
->      set_feature(&cpu->env, ARM_FEATURE_CRC);
-> +    set_feature(&cpu->env, ARM_FEATURE_EL2);
->      set_feature(&cpu->env, ARM_FEATURE_EL3);
->      set_feature(&cpu->env, ARM_FEATURE_PMU);
->      cpu->kvm_target = QEMU_KVM_ARM_TARGET_CORTEX_A53;
-> -- 
-> 2.7.4
+> That is essentially what I mean, yes. The point though, is that I also
+> think a client should assume the worst.
 > 
+> (additionally, there may be reasons for ENOSPC that the server isn't
+> aware of; so even if NBD_STATE_HOLE is clear, it should still not be an
+> error for the server to return ENOSPC)
+
+All of this suggests 'SHOULD NOT' would be more appropriate than
+'MUST NOT'.
+
+-- 
+Alex Bligh
