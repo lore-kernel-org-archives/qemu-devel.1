@@ -1,16 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40917)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40906)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cGoqK-0008RQ-Tx
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 10:18:15 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cGoqK-0008Qs-2a
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 10:18:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cGoqG-0006Fa-RS
+	(envelope-from <pbonzini@redhat.com>) id 1cGoqE-0006EJ-PG
 	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 10:18:12 -0500
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 13 Dec 2016 16:17:53 +0100
-Message-Id: <20161213151753.17020-2-pbonzini@redhat.com>
-In-Reply-To: <20161213151753.17020-1-pbonzini@redhat.com>
-References: <20161213151753.17020-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH] add fio plugin
+Date: Tue, 13 Dec 2016 16:17:52 +0100
+Message-Id: <20161213151753.17020-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [throwaway PATCH] add fio plugin
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,26 +20,64 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org
 
+All of the infrastructure is a bit hackish, which is why I've marked
+this as throwaway, but perhaps someone else would like to use it (or
+even revive the libtool infrastructure so that it can be included
+in QEMU).  I tested it with fio 2.8 and the master branch.
+
+Support for driver options is minimal (only aio=native/threads :) so
+if you want to use the null driver remember that the size should be
+at most 1G (the default size of the null block device).
+
+The plugin requires Stefan's polling patches, but it's easy to remove
+the poll_max_ns option if desired.
+
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- configure                 |   3 +-
+ configure                 |  15 +-
  contrib/fio/Makefile      |  62 +++++++
  contrib/fio/README        |  13 ++
- contrib/fio/fio.c         | 404 ++++++++++++++++++++++++++++++++++++++++++++++
- contrib/fio/qemu.fio      |  26 +++
+ contrib/fio/fio.c         | 436 ++++++++++++++++++++++++++++++++++++++++++++++
+ contrib/fio/qemu.fio      |  27 +++
  contrib/fio/uninclude.awk |  78 +++++++++
- 6 files changed, 585 insertions(+), 1 deletion(-)
- create mode 100644 contrib/fio/Makefile
- create mode 100644 contrib/fio/README
- create mode 100644 contrib/fio/fio.c
- create mode 100644 contrib/fio/qemu.fio
- create mode 100644 contrib/fio/uninclude.awk
+ 6 files changed, 624 insertions(+), 7 deletions(-)
 
 diff --git a/configure b/configure
-index 7dec6cd..8687461 100755
+index 3770d7c..2c844bc 100755
 --- a/configure
 +++ b/configure
-@@ -6181,13 +6181,14 @@ fi
+@@ -1589,8 +1589,8 @@ static THREAD int tls_var;
+ int main(void) { return tls_var; }
+ 
+ EOF
+-  if compile_prog "-fPIE -DPIE" "-pie"; then
+-    QEMU_CFLAGS="-fPIE -DPIE $QEMU_CFLAGS"
++  if compile_prog "-fPIC -DPIC" "-pie"; then
++    QEMU_CFLAGS="-fPIC -DPIC $QEMU_CFLAGS"
+     LDFLAGS="-pie $LDFLAGS"
+     pie="yes"
+     if compile_prog "" "-Wl,-z,relro -Wl,-z,now" ; then
+@@ -1598,15 +1598,15 @@ EOF
+     fi
+   else
+     if test "$pie" = "yes"; then
+-      error_exit "PIE not available due to missing toolchain support"
++      error_exit "PIC not available due to missing toolchain support"
+     else
+-      echo "Disabling PIE due to missing toolchain support"
++      echo "Disabling PIC due to missing toolchain support"
+       pie="no"
+     fi
+   fi
+ 
+-  if compile_prog "-Werror -fno-pie" "-nopie"; then
+-    CFLAGS_NOPIE="-fno-pie"
++  if compile_prog "-Werror -fno-pic -fno-pie" "-nopie"; then
++    CFLAGS_NOPIE="-fno-pic -fno-pie"
+     LDFLAGS_NOPIE="-nopie"
+   fi
+ fi
+@@ -6183,13 +6183,14 @@ fi
  
  # build tree in object directory in case the source is not in the current directory
  DIRS="tests tests/tcg tests/tcg/cris tests/tcg/lm32 tests/libqos tests/qapi-schema tests/tcg/xtensa tests/qemu-iotests"
@@ -59,7 +95,7 @@ index 7dec6cd..8687461 100755
  FILES="$FILES pc-bios/s390-ccw/Makefile"
 diff --git a/contrib/fio/Makefile b/contrib/fio/Makefile
 new file mode 100644
-index 0000000..4a86b3f
+index 0000000..3d47d5c
 --- /dev/null
 +++ b/contrib/fio/Makefile
 @@ -0,0 +1,62 @@
@@ -78,7 +114,7 @@ index 0000000..4a86b3f
 +# Dummy command so that make thinks it has done something
 +	@true
 +
-+QEMU_CFLAGS += -I$(BUILD_DIR) -Wno-error -Wno-redundant-decls
++QEMU_CFLAGS += -Wno-redundant-decls
 +LIBS += $(LIBS_TOOLS)
 +
 +# We need two fio header files, but we don't want to include
@@ -143,13 +179,13 @@ index 0000000..4aef2a0
 +3) build the plugin with
 +
 +	make qemu-img
-+	make -C contrib/fio
++	make -C contrib/fio FIO_PATH=/path/to/fio/source
 diff --git a/contrib/fio/fio.c b/contrib/fio/fio.c
 new file mode 100644
-index 0000000..eedc3b9
+index 0000000..229b71c
 --- /dev/null
 +++ b/contrib/fio/fio.c
-@@ -0,0 +1,404 @@
+@@ -0,0 +1,436 @@
 +/*
 + * QEMU engine for fio
 + *
@@ -166,6 +202,11 @@ index 0000000..eedc3b9
 +#include "crypto/init.h"
 +#include "sysemu/block-backend.h"
 +
++#ifndef TD_ENG_FLAG_SHIFT
++#define io_ops_data io_ops->data
++#define io_ops_dlhandle io_ops->dlhandle
++#endif
++
 +struct qemu_data {
 +	AioContext *ctx;
 +	unsigned int completed;
@@ -178,6 +219,7 @@ index 0000000..eedc3b9
 +	const char *aio;
 +	const char *format;
 +	const char *driver;
++	unsigned int poll_max_ns;
 +};
 +
 +static QemuMutex iothread_lock;
@@ -217,6 +259,14 @@ index 0000000..eedc3b9
 +		.type   = FIO_OPT_STR_STORE,
 +		.off1   = offsetof(struct qemu_options, aio),
 +		.cb     = str_aio_cb,
++		.category = FIO_OPT_C_ENGINE,
++		.group  = FIO_OPT_G_INVALID,
++	},
++	{
++		.name   = "qemu_poll_max_ns",
++		.lname  = "QEMU polling period",
++		.type   = FIO_OPT_STR_SET,
++		.off1   = offsetof(struct qemu_options, poll_max_ns),
 +		.category = FIO_OPT_C_ENGINE,
 +		.group  = FIO_OPT_G_INVALID,
 +	},
@@ -325,6 +375,13 @@ index 0000000..eedc3b9
 +
 +	qd = td->io_ops_data;
 +	if (io_u->error == EINPROGRESS) {
++		/* Since we have a commit hook, we need to call io_u_queued()
++		 * ourselves, but we don't really know if the backend actually
++		 * does anything on blk_io_plug/unplug.  Calling it here is not
++		 * exactly right if it does do something, but it saves the
++		 * expense of walking the io_u's again in fio_qemu_commit.
++		 */
++		io_u_queued(td, io_u);
 +		io_u->error = 0;
 +		qd->to_submit++;
 +		return FIO_Q_QUEUED;
@@ -412,41 +469,41 @@ index 0000000..eedc3b9
 +	ImageInfo *info;
 +
 +	bs_opts = fio_qemu_opts(td, file);
++	qemu_mutex_lock(&iothread_lock);
 +	blk = blk_new_open(file->file_name, NULL, bs_opts, 0, &local_error);
 +	if (local_error) {
 +		struct qemu_options *o = td->eo;
-+		if (!td->o.create_on_open || !td->o.allow_create) {
-+			error_report_err(local_error);
-+			return -EINVAL;
-+		}
++		if (!td->o.create_on_open || !td->o.allow_create)
++			goto err;
 +
 +		error_free(local_error);
 +		local_error = NULL;
 +
 +		bdrv_img_create(file->file_name, o->format ? : "raw", NULL, NULL,
-+				NULL, td->o.size / td->o.nr_files, 0, &local_error, false);
-+		if (local_error) {
-+		    error_report_err(local_error);
-+		    return -EINVAL;
-+		}
++				NULL, get_rand_file_size(td), 0, &local_error, false);
++		if (local_error)
++			goto err;
 +
 +		bs_opts = fio_qemu_opts(td, file);
 +		blk = blk_new_open(file->file_name, NULL, bs_opts, 0, &local_error);
-+		if (local_error) {
-+		    error_report_err(local_error);
-+		    return -EINVAL;
-+		}
++		if (local_error)
++			goto err;
 +	}
 +
 +	/* QDECREF(bs_opts); ??? */
 +	bdrv_query_image_info(blk_bs(blk), &info, &local_error);
 +	blk_unref(blk);
++	qemu_mutex_unlock(&iothread_lock);
 +
 +	file->real_file_size = info->virtual_size;
 +	fio_file_set_size_known(file);
 +	qapi_free_ImageInfo(info);
 +
 +	return 0;
++err:
++	qemu_mutex_unlock(&iothread_lock);
++	error_report_err(local_error);
++	return -EINVAL;
 +}
 +
 +static void fio_qemu_setup_globals(void)
@@ -467,6 +524,10 @@ index 0000000..eedc3b9
 +	td->o.use_thread = 1;
 +	pthread_once(&fio_qemu_globals, fio_qemu_setup_globals);
 +
++        if (!td->o.file_size_low)
++		td->o.file_size_low = td->o.file_size_high =
++			td->o.size / td->o.nr_files;
++
 +	for_each_file(td, file, i) {
 +		int ret;
 +		dprint(FD_FILE, "get file size for %p/%d/%p\n", file, i,
@@ -486,9 +547,16 @@ index 0000000..eedc3b9
 +{
 +	size_t sz = sizeof(struct qemu_data) + td->o.iodepth * sizeof(struct io_u *);
 +	struct qemu_data *qd = malloc(sz);
++	struct qemu_options *o = td->eo;
++	Error *local_error = NULL;
 +
 +	memset(qd, 0, sz);
 +	qd->ctx = aio_context_new(&error_abort);
++	aio_context_set_poll_params(qd->ctx, o->poll_max_ns, 0, 0, &local_error);
++	if (local_error) {
++		error_report_err(local_error);
++		return 1;
++	}
 +
 +	/* dlclosing QEMU leaves a pthread_key behind.  We'd need RTLD_NODELETE,
 +	 * but fio does not use it.  Instead, just prevent fio from dlclosing.
@@ -556,15 +624,16 @@ index 0000000..eedc3b9
 +};
 diff --git a/contrib/fio/qemu.fio b/contrib/fio/qemu.fio
 new file mode 100644
-index 0000000..565c015
+index 0000000..09241c1
 --- /dev/null
 +++ b/contrib/fio/qemu.fio
-@@ -0,0 +1,26 @@
+@@ -0,0 +1,27 @@
 +; Read 4 files with aio at different depths
 +[global]
 +ioengine=./qemu.so
 +direct=1
 +qemu_aio=native
++create_on_open=1
 +rw=randread
 +bs=128k
 +filesize=128m
@@ -638,7 +707,7 @@ index 0000000..88afa59
 +
 +    if (command_line) {
 +        if ($1 == "#" && $4 == "1") {
-+            # This is a -included file, enter the delete state
++            # This is a -included file, go to the delete state
 +            delete_depth = 1
 +        }
 +        next
@@ -648,7 +717,7 @@ index 0000000..88afa59
 +        if ($2 ~ /^</) {
 +            print
 +            # We printed the #include directive.  Now skip until the # line
-+            # that enters the included file, and enter the delete state.
++            # that enters the included file, and go to the delete state.
 +            do {
 +                getline
 +            } while ($1 == "#" && $4 != "1")
@@ -670,5 +739,3 @@ index 0000000..88afa59
 +
 +    print
 +}
--- 
-2.9.3
