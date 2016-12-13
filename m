@@ -1,21 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56286)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57037)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cGpeA-0001vX-Iq
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 11:09:49 -0500
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1cGpgG-0003cU-OR
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 11:11:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cGpe9-0006XS-6e
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 11:09:42 -0500
-References: <1479835586-74394-1-git-send-email-vsementsov@virtuozzo.com>
-	<1479835586-74394-19-git-send-email-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <6e614a78-a137-c8b4-16bf-5a6ad47cc9b3@redhat.com>
-Date: Tue, 13 Dec 2016 17:09:26 +0100
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1cGpgD-0007NS-CV
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 11:11:52 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58561)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1cGpgD-0007NH-2u
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 11:11:49 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
+	uBDGA5hI064124
+	for <qemu-devel@nongnu.org>; Tue, 13 Dec 2016 11:11:47 -0500
+Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 27ahhq9ur4-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 13 Dec 2016 11:11:46 -0500
+Received: from localhost
+	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Tue, 13 Dec 2016 16:11:42 -0000
+References: <1481171829-116496-1-git-send-email-arei.gonglei@huawei.com>
+	<1481171829-116496-3-git-send-email-arei.gonglei@huawei.com>
+	<33183CC9F5247A488A2544077AF19020DA15A07C@DGGEMA505-MBX.china.huawei.com>
+	<20161212105407.GA3033@gondor.apana.org.au>
+	<20161212234941-mutt-send-email-mst@kernel.org>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Tue, 13 Dec 2016 17:11:34 +0100
 MIME-Version: 1.0
-In-Reply-To: <1479835586-74394-19-git-send-email-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+In-Reply-To: <20161212234941-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 18/21] qmp: add
- x-debug-block-dirty-bitmap-sha256
+Message-Id: <b55a4666-d71a-352c-8be3-286eef6c5bc0@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v6 2/2] crypto: add virtio-crypto driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,201 +44,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
+To: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Herbert Xu <herbert@gondor.apana.org.au>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>, Luonengjun <luonengjun@huawei.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "Wubin (H)" <wu.wubin@huawei.com>, "xin.zeng@intel.com" <xin.zeng@intel.com>, Claudio Fontana <Claudio.Fontana@huawei.com>, "davem@davemloft.net" <davem@davemloft.net>, "Zhoujian (jay, Euler)" <jianjay.zhou@huawei.com>, "Hanweidong (Randy)" <hanweidong@huawei.com>, "arei.gonglei@hotmail.com" <arei.gonglei@hotmail.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "Xuquan (Quan Xu)" <xuquan8@huawei.com>, longpeng <longpeng2@huawei.com>, "Wanzongshun (Vincent)" <wanzongshun@huawei.com>Cornelia Huck <cornelia.huck@de.ibm.com>
 
-On 2016-11-22 at 18:26, Vladimir Sementsov-Ogievskiy wrote:
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  block/dirty-bitmap.c         |  5 +++++
->  blockdev.c                   | 33 +++++++++++++++++++++++++++++++++
->  include/block/dirty-bitmap.h |  2 ++
->  include/qemu/hbitmap.h       |  8 ++++++++
->  qapi/block-core.json         | 26 ++++++++++++++++++++++++++
->  tests/Makefile.include       |  2 +-
->  util/hbitmap.c               | 11 +++++++++++
->  7 files changed, 86 insertions(+), 1 deletion(-)
->
-> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-> index fe34d48..775181c 100644
-> --- a/block/dirty-bitmap.c
-> +++ b/block/dirty-bitmap.c
-> @@ -589,3 +589,8 @@ BdrvDirtyBitmap *bdrv_dirty_bitmap_next(BlockDriverState *bs,
->      return bitmap == NULL ? QLIST_FIRST(&bs->dirty_bitmaps) :
->                              QLIST_NEXT(bitmap, list);
->  }
-> +
-> +char *bdrv_dirty_bitmap_sha256(const BdrvDirtyBitmap *bitmap, Error **errp)
-> +{
-> +    return hbitmap_sha256(bitmap->bitmap, errp);
-> +}
-> diff --git a/blockdev.c b/blockdev.c
-> index 3891d86..f129ccf 100644
-> --- a/blockdev.c
-> +++ b/blockdev.c
-> @@ -2819,6 +2819,39 @@ void qmp_block_dirty_bitmap_clear(const char *node, const char *name,
->      aio_context_release(aio_context);
->  }
->
-> +/**
-> + * Completely clear a bitmap, for the purposes of synchronizing a bitmap
-> + * immediately after a full backup operation.
 
-This comment doesn't seem quite right.
 
-> + */
-> +BlockDirtyBitmapSha256 *qmp_x_debug_block_dirty_bitmap_sha256(const char *node,
-> +                                                              const char *name,
-> +                                                              Error **errp)
-> +{
-> +    AioContext *aio_context;
-> +    BdrvDirtyBitmap *bitmap;
-> +    BlockDriverState *bs;
-> +    BlockDirtyBitmapSha256 *ret = NULL;
-> +    char *sha256;
-> +
-> +    bitmap = block_dirty_bitmap_lookup(node, name, &bs, &aio_context, errp);
-> +    if (!bitmap || !bs) {
-> +        return NULL;
-> +    }
-> +
-> +    sha256 = bdrv_dirty_bitmap_sha256(bitmap, errp);
-> +    if (sha256 == NULL) {
-> +        goto out;
-> +    }
-> +
-> +    ret = g_new(BlockDirtyBitmapSha256, 1);
-> +    ret->sha256 = sha256;
-> +
-> +out:
-> +    aio_context_release(aio_context);
-> +
-> +    return ret;
-> +}
-> +
->  void hmp_drive_del(Monitor *mon, const QDict *qdict)
->  {
->      const char *id = qdict_get_str(qdict, "id");
-> diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
-> index d71edc4..b022b34 100644
-> --- a/include/block/dirty-bitmap.h
-> +++ b/include/block/dirty-bitmap.h
-> @@ -86,4 +86,6 @@ BdrvDirtyBitmap *bdrv_dirty_bitmap_next(BlockDriverState *bs,
->
->  bool bdrv_has_persistent_bitmaps(BlockDriverState *bs);
->
-> +char *bdrv_dirty_bitmap_sha256(const BdrvDirtyBitmap *bitmap, Error **errp);
-> +
->  #endif
-> diff --git a/include/qemu/hbitmap.h b/include/qemu/hbitmap.h
-> index 063ec0e..750346c 100644
-> --- a/include/qemu/hbitmap.h
-> +++ b/include/qemu/hbitmap.h
-> @@ -240,6 +240,14 @@ void hbitmap_deserialize_ones(HBitmap *hb, uint64_t start, uint64_t count,
->  void hbitmap_deserialize_finish(HBitmap *hb);
->
->  /**
-> + * hbitmap_sha256:
-> + * @bitmap: HBitmap to operate on.
-> + *
-> + * Returns SHA256 hash of the last level.
-> + */
-> +char *hbitmap_sha256(const HBitmap *bitmap, Error **errp);
-> +
-> +/**
->   * hbitmap_free:
->   * @hb: HBitmap to operate on.
->   *
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index 648f94a..76f6c60 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -1289,6 +1289,32 @@
->    'data': 'BlockDirtyBitmap' }
->
->  ##
-> +# @BlockDirtyBitmapSha256:
-> +#
-> +# SHA256 hash of dirty bitmap data
-> +#
-> +# @sha256: bitmap SHA256 hash
-> +#
-> +# Since: 2.8
+On 12/12/2016 11:05 PM, Michael S. Tsirkin wrote:
+> On Mon, Dec 12, 2016 at 06:54:07PM +0800, Herbert Xu wrote:
+>> On Mon, Dec 12, 2016 at 06:25:12AM +0000, Gonglei (Arei) wrote:
+>>> Hi, Michael & Herbert
+>>>
+>>> Because the virtio-crypto device emulation had been in QEMU 2.8,
+>>> would you please merge the virtio-crypto driver for 4.10 if no other
+>>> comments? If so, Miachel pls ack and/or review the patch, then
+>>> Herbert will take it (I asked him last week). Thank you!
+>>>
+>>> Ps: Note on 4.10 merge window timing from Linus
+>>>  https://lkml.org/lkml/2016/12/7/506
+>>>
+>>> Dec 23rd is the deadline for 4.10 merge window.
+>>
+>> Sorry but it's too late for 4.10.  It needed to have been in my
+>> tree before the merge window opened to make it for this cycle.
+>>
+>> Cheers,
+> 
+> 
+> Objections to me merging this? I'm preparing my tree right now.
 
-*2.9
+Got this when testing the most recent version on s390x 
 
-> +##
-> +  { 'struct': 'BlockDirtyBitmapSha256',
-> +    'data': {'sha256': 'str'} }
-> +
-> +##
-> +# @x-debug-block-dirty-bitmap-sha256
+[   20.391074] test 0 (128 bit key, 16 byte blocks): [   20.391078] BUG: using smp_processor_id() in preemptible [00000000] code: insmod/97
+[   20.391082] caller is virtio_crypto_ablkcipher_setkey+0x44/0x198
+[   20.391085] CPU: 0 PID: 97 Comm: insmod Not tainted 4.9.0-02683-gb62a1ab #46
+[   20.391088] Hardware name: IBM              2964 NC9              704              (KVM)
+[   20.391405] Stack:
+[   20.391407]        000000000c0eb6d0 000000000c0eb760 0000000000000003 0000000000000000
+[   20.391414]        000000000c0eb800 000000000c0eb778 000000000c0eb778 0000000000000020
+[   20.391420]        0000000000000000 000000000000000a 0000000000000020 000003ff0000000a
+[   20.391426]        000003ff0000000c 000000000c0eb7c8 0000000000000000 0000000000000000
+[   20.391432]        0700000000c173c8 00000000001126ba 000000000c0eb760 000000000c0eb7b8
+[   20.391439] Call Trace:
+[   20.391442] ([<000000000011259e>] show_trace+0x8e/0xe0)
+[   20.391446]  [<0000000000112670>] show_stack+0x80/0xd8 
+[   20.391449]  [<0000000000753ab6>] dump_stack+0x96/0xd8 
+[   20.391453]  [<00000000007872e6>] check_preemption_disabled+0xfe/0x128 
+[   20.391456]  [<0000000000839cc4>] virtio_crypto_ablkcipher_setkey+0x44/0x198 
+[   20.391459]  [<0000000000705a40>] skcipher_setkey_ablkcipher+0x50/0x70 
+[   20.391476]  [<000003ff80002a48>] test_skcipher_speed+0x328/0xb98 [tcrypt] 
+[   20.391492]  [<000003ff800063dc>] do_test+0x1c24/0x28e0 [tcrypt] 
+[   20.391509]  [<000003ff8001006a>] tcrypt_mod_init+0x6a/0x1000 [tcrypt] 
+[   20.391512]  [<00000000001002cc>] do_one_initcall+0xb4/0x148 
+[   20.391515]  [<0000000000298632>] do_init_module+0x7a/0x228 
+[   20.391519]  [<00000000001fd380>] load_module+0x2428/0x2de0 
+[   20.391522]  [<00000000001fde8a>] SyS_init_module+0x152/0x160 
+[   20.391526]  [<00000000009f1306>] system_call+0xd6/0x270 
+[   20.391528] no locks held by insmod/97.
 
-Should end in a colon ("@x-debug-block-dirty-bitmap-sha256:").
+Gonglei, any idea? Did not look into it myself yet.
 
-> +#
-> +# Get bitmap SHA256
-> +#
-> +# Returns: BlockDirtyBitmapSha256 on success
-> +#          If @node is not a valid block device, DeviceNotFound
-> +#          If @name is not found, GenericError with an explanation
+Halil
 
-Theoretically, hashing can also fail, but, well...
-
-> +#
-> +# Since 2.8
-
-*2.9 and also "Since: 2.9" (with colon).
-
-Looks good apart from these minor things.
-
-Max
-
-> +##
-> +  { 'command': 'x-debug-block-dirty-bitmap-sha256',
-> +    'data': 'BlockDirtyBitmap', 'returns': 'BlockDirtyBitmapSha256' }
-> +
-> +##
->  # @blockdev-mirror
->  #
->  # Start mirroring a block device's writes to a new destination.
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index e98d3b6..b85ff78 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -496,7 +496,7 @@ tests/test-blockjob$(EXESUF): tests/test-blockjob.o $(test-block-obj-y) $(test-u
->  tests/test-blockjob-txn$(EXESUF): tests/test-blockjob-txn.o $(test-block-obj-y) $(test-util-obj-y)
->  tests/test-thread-pool$(EXESUF): tests/test-thread-pool.o $(test-block-obj-y)
->  tests/test-iov$(EXESUF): tests/test-iov.o $(test-util-obj-y)
-> -tests/test-hbitmap$(EXESUF): tests/test-hbitmap.o $(test-util-obj-y)
-> +tests/test-hbitmap$(EXESUF): tests/test-hbitmap.o $(test-util-obj-y) $(test-crypto-obj-y)
->  tests/test-x86-cpuid$(EXESUF): tests/test-x86-cpuid.o
->  tests/test-xbzrle$(EXESUF): tests/test-xbzrle.o migration/xbzrle.o page_cache.o $(test-util-obj-y)
->  tests/test-cutils$(EXESUF): tests/test-cutils.o util/cutils.o
-> diff --git a/util/hbitmap.c b/util/hbitmap.c
-> index 72623f4..96af071 100644
-> --- a/util/hbitmap.c
-> +++ b/util/hbitmap.c
-> @@ -13,6 +13,7 @@
->  #include "qemu/hbitmap.h"
->  #include "qemu/host-utils.h"
->  #include "trace.h"
-> +#include "crypto/hash.h"
->
->  /* HBitmaps provides an array of bits.  The bits are stored as usual in an
->   * array of unsigned longs, but HBitmap is also optimized to provide fast
-> @@ -707,3 +708,13 @@ void hbitmap_free_meta(HBitmap *hb)
->      hbitmap_free(hb->meta);
->      hb->meta = NULL;
->  }
-> +
-> +char *hbitmap_sha256(const HBitmap *bitmap, Error **errp)
-> +{
-> +    size_t size = bitmap->sizes[HBITMAP_LEVELS - 1] * sizeof(unsigned long);
-> +    char *data = (char *)bitmap->levels[HBITMAP_LEVELS - 1];
-> +    char *hash = NULL;
-> +    qcrypto_hash_digest(QCRYPTO_HASH_ALG_SHA256, data, size, &hash, errp);
-> +
-> +    return hash;
-> +}
->
+> 
+>> -- 
+>> Email: Herbert Xu <herbert@gondor.apana.org.au>
+>> Home Page: http://gondor.apana.org.au/~herbert/
+>> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> 
