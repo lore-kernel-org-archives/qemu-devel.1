@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45042)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48203)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex@alex.org.uk>) id 1cGowW-0003Rc-1g
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 10:24:37 -0500
+	(envelope-from <berto@igalia.com>) id 1cGpAf-00070U-Ud
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 10:39:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex@alex.org.uk>) id 1cGowP-0000o9-Ky
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 10:24:36 -0500
-Received: from mail.avalus.com ([2001:41c8:10:1dd::10]:48184)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex@alex.org.uk>) id 1cGowP-0000o5-BG
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 10:24:29 -0500
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-From: Alex Bligh <alex@alex.org.uk>
-In-Reply-To: <20161213150343.3g3fxjixbteum7ju@grep.be>
-Date: Tue, 13 Dec 2016 15:24:25 +0000
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <B6B52260-6814-40CB-AA00-E79099B8ED56@alex.org.uk>
-References: <20161212204313.anhjire2gkwd6gzi@grep.be>
-	<2D482F67-8115-48CD-921D-5728BC1AD92B@alex.org.uk>
-	<20161213150343.3g3fxjixbteum7ju@grep.be>
-Subject: Re: [Qemu-devel] [Nbd] [PATCH v5] doc: Add NBD_CMD_BLOCK_STATUS
- extension
+	(envelope-from <berto@igalia.com>) id 1cGpAd-0005qr-Bn
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 10:39:14 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <7f400f89-3a21-bae1-cd16-d23bfa65d973@redhat.com>
+References: <cover.1481290956.git.berto@igalia.com>
+	<468dbeb8-5b1b-669f-f7e5-0d24a4308da8@redhat.com>
+	<w51bmwhck1c.fsf@maestria.local.igalia.com>
+	<756cfb05-61e1-7ee3-435b-93759438a52d@redhat.com>
+	<w51k2b4htu1.fsf@maestria.local.igalia.com>
+	<7f400f89-3a21-bae1-cd16-d23bfa65d973@redhat.com>
+Date: Tue, 13 Dec 2016 16:38:02 +0100
+Message-ID: <w51h967j0v9.fsf@maestria.local.igalia.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH RFC 0/1] Allow storing the qcow2 L2 cache
+ in disk
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,208 +27,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wouter Verhelst <w@uter.be>
-Cc: Alex Bligh <alex@alex.org.uk>, "nbd-general@lists.sourceforge.net" <nbd-general@lists.sourceforge.net>, Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "Stefan stefanha@redhat. com" <stefanha@redhat.com>, John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Pavel Borzenkov <pborzenkov@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, Markus Pargmann <mpa@pengutronix.de>, "Denis V. Lunev" <den@openvz.org>
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
-Wouter,
+On Tue 13 Dec 2016 02:44:26 PM CET, Max Reitz wrote:
 
->> But actually, why do we need to be so mean? Why can't we assume
->> that if NBD_OPT_SET_META_CONTEXT is not sent, then all the metadata
->> contexts should be selected?
->=20
-> No. If no metadata contexts have been negotiated, then no metadata
-> context IDs were assigned to contexts, so there is no mapping to
-> external names. As such, the data being sent in response to
-> NBD_CMD_BLOCK_STATUS would have no meaning to the client.
+>>>> But leaving that aside, would that improve anything? I don't think
+>>>> the cache itself adds any significant overhead here, IIRC even in
+>>>> your presentation at KVM Forum 2015 qcow2 was comparable to raw as
+>>>> long as all L2 tables were cached in memory.
+>>>
+>>> I haven't compared CPU usage, though. That may have gone up quite a
+>>> bit, I don't know. For large enough images, it may even become a
+>>> bottleneck.
+>>
+>> I don't know, I don't have any data to suggest that there's a problem
+>> there, particularly after the rewrite from last year I think the
+>> cache is reasonably fast (as long as the cache is big enough; and if
+>> it's not big enough the problem is going to be in the extra I/O).
+>
+> So the remaining question is whether we want a cache for the cache. If
+> the cache is stored directly on an SSD, any access to it has to go
+> there and back, and that seems like we may still want to have the
+> option of having an in-RAM cache on top of it.
 
-Good point.
+That would be indeed possible... but I wouldn't have any without data
+showing that it's worth it.
 
->>> +    commands during the transmission phase.
->>=20
->> "otherwise, the client MUST NOT send NBD_CMD_BLOCK_STATUS
->> messages."
->>=20
->> But actually isn't the telling question whether =
-NBD_OPT_SET_META_CONTEXT
->> works?
->>=20
->> Actually, as this could be sent more than once, I think this whole
->> thing would be better phrased as:
->>=20
->> "A client MUST NOT send `NBD_CMD_BLOCK_STATUS` unless
->> within the negotiation phase it sent `NBD_OPT_SET_META_CONTEXT`
->> at least once, and the final time it was sent, the server
->> responded without an error."
->=20
-> ... and returned at least one metadata context (since we state =
-elsewhere
-> that sending a SET command which selects nothing is not an error).
->=20
->> obviously this would be better under _SET_ than _LIST_,
->> but the sentence can go entirely from here.
+> If we don't want to split the qcow2 file into separate metadata and
+> data files, then we could still create a sparse temporary file at
+> runtime which contains all L2 tables. Reading an L2 table then
+> wouldn't go through the qcow2 file but through that temporary file and
+> our existing metadata cache would work on top of it.
 
-Yes
+And if you modify a table you have to do it in both places.
 
->> Equally obviously, if we are making _SET_ optional (as
->> lack of _SET_ means that all the contexts are selected)
->> we just gate this on `NBD_FLAG_SEND_BLOCK_STATUS`
->=20
-> You can't, as per above.
+The basic idea is the same, anyway. I just started with the assumption
+that the L2 cache structures don't add significant overhead and went for
+the simplest solution (that's why it's an RFC after all).
 
-Indeed.
+But implementation details aside, the main question is whether the best
+way to go is to keep the existing metadata and store it in a faster disk
+or, as Stefan suggested, think about replacing the current structures
+with something else that scales better. I think that's at least worth
+exploring.
 
->> "If specified, the server MUST return the zero or more contexts
->> whose names (including the namespace) consist of or start with
->> the query string. For instance a query string of 'nbd-server:'
->> would return all contexts within the 'nbd-server' namespace,
->> and a string 'base:a' would return all context within the
->> 'base' namespace that began with 'a'"
->=20
-> NAK. This imposes a particular syntax for parsing query strings upon
-> namespaces, which I explicitly do not wish to do.
->=20
-> The spec should only specify how to select a particular namespace, and
-> then leave all parsing rules of query strings up to the namespace
-> specification.
-
-I'm not quite sure why you want that, but if that's the case, I'd
-suggest the easiest thing to do would be to pass (separately) a
-namespace string, and a name-query, because you are prohibiting
-queries that cover more than one namespace (though per our
-separate conversation, you can select context from more than
-one namespace with multiple queries). It does seem a bit odd
-thought that if context 'foo:bar' is returned from _LIST_,
-there is no guarantee that selecting it as 'foo:bar' will
-work (as the matching is namespace dependent).
-
->>> +    The server MUST reply with a list of `NBD_REP_META_CONTEXT` =
-replies,
->>> +    followed by `NBD_REP_ACK`. The metadata context ID in these =
-replies
->>> +    is reserved and SHOULD be set to zero; clients SHOULD disregard =
-it.
->>=20
->> Why is the context ID set to zero? Surely it would be really helpful
->> for this to be filled in with the ID?
->=20
-> The ID could change depending on which contexts are actually selected:
->=20
-> First, I could imagine a context namespace which allows the client to
-> dynamically create a context (e.g., "create a snapshot now and use
-> that"), but where that would only be actually done when the client
-> actually chooses the metadata context.
->=20
-> Second, a namespace could create symbolic context names (e.g., "the
-> latest snapshot, whatever that may be"), whose ID could change between
-> the LIST and SET options (presumably that's a very small race window,
-> but a race is a race).
->=20
-> Third, a valid (and simple) way to implement mapping could be to =
-assign
-> context IDs as array indices, where the array is dynamically created =
-at
-> SET time, and where the server side does a for loop over the array, =
-and
-> returns the metadata context ID as htonl() of its loop variable. This
-> would mean that there must be no gaps between the IDs at run time.
->=20
-> Perhaps another way to deal with that would be to specify that an
-> implementation is not required to assign the same context IDs to the
-> same metadata contexts from one call to SET (or LIST) to the next; but =
-I
-> thought it would be clearer if we were to explicitly make LIST return
-> "invalid" context IDs. Then again, maybe not.
-
-You're completely correct here and you should ignore my suggestion.
-
-Perhaps you should be even clearer and explicitly state that
-context IDs may change between sessions and even between successive
-use of the _SET_ command.
-
->> These two probably belong in a different patch
->=20
-> 3
->=20
-> (number of people telling me that. Yes, I know :-)
-
-Sorry, behind on mail :-)
-
->>> +##### Metadata contexts
->>> +
->>> +The `base:allocation` metadata context is the basic "allocated at =
-all"
->>> +metadata context. If an extent is marked with `NBD_STATE_HOLE` at =
-that
->>> +context, this means that the given extent is not allocated in the
->>> +backend storage, and that writing to the extent MAY result in the =
-ENOSPC
->>> +error. This supports sparse file semantics on the server side. If a
->>> +server has only one metadata context (the default), then writing to =
-an
->>> +extent which has `NBD_STATE_HOLE` clear MUST NOT fail with ENOSPC.
->>=20
->> Again I'm still confused by this. I *think* you mean "If a server
->> supports the `base:allocation` metadata context, then writing
->> to an extent which has `NBD_STATE_HOLE` clear MUST NOT fail with =
-ENOSPC.`
->>=20
->> I say that because as currently phrased:
->>=20
->> * If a server has one metadata context only, but it is not
->>  `base:allocation`, then you implying something about writing
->>  to an extent with a state that won't even exist.
->=20
-> Yes, that's wrong indeed. We should replace the "the default" bit by
-> "the base:allocation context".
->=20
->> * If a server has `base:allocation` AND another metadata context
->>  (for instance `qemu:dirty`) then the rule you set out will not
->>  apply.
->=20
-> Yes, and this is intentional, as I've explained before. The other
-> context's semantics should clarify whether that rule still applies or
-> not. Implementations that do not know of the other context should
-> however assume that it doesn't.
-
-I think I must be being very stupid or am at least at cross-purposes.
-
-Let's say the second context is (e.g.) =
-'colour:records_information_about_blue'
-(i.e. nothing at all to do with space or holes). Are you saying that the
-presence of that context might affect the interpretation of
-NBD_STATE_HOLE? Or just other contexts within the 'base:' space?
-Or that another context (e.g. perhaps compression) could be an =
-independent
-cause of ENOSPC? If so should it be the responsibility of the other =
-context
-to document that it does not affect that?
-
-How about:
-
-"If a server supports the `base:allocation` metadata context, then =
-writing
-to an extent which has `NBD_STATE_HOLE` clear MUST NOT fail with ENOSPC
-unless for reasons specified in the definition of another context."
-
->>> +For the `base:allocation` context, the remainder of the flags field =
-is
->>> +reserved. Servers SHOULD set it to all-zero;
->>=20
->> Surely if we want to reserve them for extension, we need "Servers
->> MUST set it to all-zero"
->=20
-> No, SHOULD, otherwise a future extension which adds meaning to those
-> bits will suddenly become incompatible with this spec. Think about it
-> ;-)
-
-I did! If there is a future extension, it will change the spec to
-incorporate those bits, so they won't be included within 'the
-remainder' any more.
-
-> (feel free to update the branch with those suggestions I've not NAK'd,
-> as I think they make sense...)
-
-OK. May take a look later.
-
---=20
-Alex Bligh
+Berto
