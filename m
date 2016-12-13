@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37515)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41292)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cGl5g-0004tr-N0
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 06:17:49 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cGlKn-00035S-Bi
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 06:33:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cGl5b-0005yf-Mg
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 06:17:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57594)
+	(envelope-from <pbonzini@redhat.com>) id 1cGlKj-0003LG-BX
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 06:33:25 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34770)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cGl5b-0005xn-HA
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 06:17:43 -0500
-Message-ID: <1481627861.27088.116.camel@redhat.com>
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue, 13 Dec 2016 12:17:41 +0100
-In-Reply-To: <20161213071439.32322-1-ppandit@redhat.com>
-References: <20161213071439.32322-1-ppandit@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] display: virtio-gpu-3d: check virgl
- capabilities max_size
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cGlKj-0003Kn-5k
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 06:33:21 -0500
+References: <94eb2c0bfa1c6a9fec0543057483@google.com>
+	<CADPb22R4bTg1en3rL3M=3_nLgC7Xj1P=j-mzwVtco0ar3h4EMQ@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <e83cf3c2-fba2-b093-5e63-a72fe8c0cdd1@redhat.com>
+Date: Tue, 13 Dec 2016 12:33:16 +0100
+MIME-Version: 1.0
+In-Reply-To: <CADPb22R4bTg1en3rL3M=3_nLgC7Xj1P=j-mzwVtco0ar3h4EMQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] target-i386: Fix eflags.TF/#DB handling of
+ syscall/sysret insns
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,45 +28,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: P J P <ppandit@redhat.com>
-Cc: Qemu Developers <qemu-devel@nongnu.org>, Zhenhao Hong <zhenhaohong@gmail.com>, Prasad J Pandit <pjp@fedoraproject.org>
+To: Doug Evans <dje@google.com>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
 
-On Di, 2016-12-13 at 12:44 +0530, P J P wrote:
-> From: Prasad J Pandit <pjp@fedoraproject.org>
->=20
-> Virtio GPU device while processing 'VIRTIO_GPU_CMD_GET_CAPSET'
-> command, retrieves the maximum capabilities size to fill in the
-> response object. It continues to fill in capabilities even if
-> retrieved 'max_size' is zero(0), thus resulting in OOB access.
-> Add check to avoid it.
 
-Hmm?  Did you see this happing in practice?
 
-> diff --git a/hw/display/virtio-gpu-3d.c b/hw/display/virtio-gpu-3d.c
-> index 758d33a..fbfb39f 100644
-> --- a/hw/display/virtio-gpu-3d.c
-> +++ b/hw/display/virtio-gpu-3d.c
-> @@ -371,11 +371,12 @@ static void virgl_cmd_get_capset(VirtIOGPU *g,
->      virgl_renderer_get_cap_set(gc.capset_id, &max_ver,
->                                 &max_size);
+On 12/12/2016 20:23, Doug Evans wrote:
+> On Tue, Dec 6, 2016 at 3:06 PM, Doug Evans <dje@google.com> wrote:
+>> Hi.
+>>
+>> While qemu's behaviour matches what one would expect from reading
+>> the docs, it does not match what I'm seeing on h/w.
+>> Can anyone else confirm what the correct behaviour is here?
+>>
+>> ---
+>>
+>> The syscall and sysret instructions behave a bit differently:
+>> TF is checked after the instruction completes.
+>> This allows the o/s to disable #DB at a syscall by adding TF to FMASK.
+>> And then when the sysret is executed the #DB is taken "as if" the
+>> syscall insn just completed.
+>>
+>> Signed-off-by: Doug Evans <dje@google.com>
+> 
+> Ping.
+> Especially, can anyone confirm the correct behaviour here?
 
-This is not the guest returning the size, it is the host renderer
-library saying how much space it needs ...
+Hi, I haven't look at the patch because QEMU was in freeze.  I'll get
+back to it later this week, hopefully.
 
->      resp =3D g_malloc(sizeof(*resp) + max_size);
-> -
-> -    resp->hdr.type =3D VIRTIO_GPU_RESP_OK_CAPSET;
-> -    virgl_renderer_fill_caps(gc.capset_id,
-> -                             gc.capset_version,
-> -                             (void *)resp->capset_data);
+The best way to provide a testcase would be a patch to kvm-unit-tests
+(git://git.kernel.org/pub/scm/virt/kvm/kvm-unit-tests.git); most of the
+tests can be used with both QEMU emulation mode and KVM.
 
-... and here the renderer fills the qemu-allocated space with the actual
-data.
+Paolo
 
-Can't see anything wrong here.  It's not that we process untrusted data
-without checking.  If a buffer overflow happens here this would clearly
-be a bug in the virglrenderer library, because the size advertised and
-the size actually needed mismatch.
-
-cheers,
-  Gerd
+> I can provide a testcase with Fuchsia if one likes.
+> https://fuchsia.googlesource.com/fuchsia/
+> It's not that hard to repro - we trip over it because we don't have a #DB IST
+> and since SYSCALL doesn't change SP we get a double fault on qemu
+> trying to establish the interrupt frame for the #DB (whereas the #DB shouldn't
+> happen in the first place - at least when run on the h/w I'm using).
+> The Intel/AMD docs are *really* unclear on this AFAICT.
+> 
+> patchwork reference: http://patchwork.ozlabs.org/patch/703373/
+> 
