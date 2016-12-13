@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36132)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36603)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ossman@cendio.se>) id 1cGmqQ-0002vH-0I
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 08:10:11 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cGmtQ-0004a7-AU
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 08:13:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ossman@cendio.se>) id 1cGmqO-0006TG-KD
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 08:10:10 -0500
-Received: from lists.cendio.se ([2a00:801:107:f000::b]:45340
-	helo=mail.cendio.se)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ossman@cendio.se>) id 1cGmqO-0006PX-EP
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 08:10:08 -0500
-References: <f460049b-211e-194b-d4c3-a3cc34e4d289@cendio.se>
-	<1481616362.27088.74.camel@redhat.com>
-From: Pierre Ossman <ossman@cendio.se>
-Message-ID: <7ba29954-e3ad-529c-9978-b10d2788f9e4@cendio.se>
-Date: Tue, 13 Dec 2016 14:10:04 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1cGmtN-00079h-5b
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 08:13:16 -0500
+Received: from mail-vk0-f51.google.com ([209.85.213.51]:36829)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cGmtM-00079T-VQ
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 08:13:13 -0500
+Received: by mail-vk0-f51.google.com with SMTP id p9so60211116vkd.3
+	for <qemu-devel@nongnu.org>; Tue, 13 Dec 2016 05:13:12 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1481616362.27088.74.camel@redhat.com>
-Content-Type: multipart/mixed; boundary="------------7EC3A6B0E202B4CFC700A638"
-Subject: Re: [Qemu-devel] VNC LED state buggy, interop issue
+In-Reply-To: <71bc12badf4f3125765146c21b4976b1d07dce46.1478566669.git.alistair.francis@xilinx.com>
+References: <cover.1478566669.git.alistair.francis@xilinx.com>
+	<71bc12badf4f3125765146c21b4976b1d07dce46.1478566669.git.alistair.francis@xilinx.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 13 Dec 2016 13:11:51 +0000
+Message-ID: <CAFEAcA9vrhPyHbpWqxjS167f_aG-NRf7EVms=dg6ULah_fwmgw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] arm_generic_timer: Add the ARM
+ Generic Timer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,201 +30,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Alistair Francis <alistair.francis@xilinx.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, =?UTF-8?B?S09OUkFEIEZyw6lkw6lyaWM=?= <fred.konrad@greensocs.com>, Alistair Francis <alistair23@gmail.com>
 
-This is a multi-part message in MIME format.
---------------7EC3A6B0E202B4CFC700A638
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-
-On 13/12/16 09:06, Gerd Hoffmann wrote:
->>   b) Remove the assumption from the code and the protocol.
+On 8 November 2016 at 00:58, Alistair Francis
+<alistair.francis@xilinx.com> wrote:
+> Add the ARM generic timer. This allows the guest to poll the timer for
+> values and also supports secure writes only.
 >
-> Patches are welcome.
+> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+> ---
+> V2:
+>  - Fix couter/counter typo
 >
+>  hw/timer/Makefile.objs               |   1 +
+>  hw/timer/arm_generic_timer.c         | 216 +++++++++++++++++++++++++++++++++++
+>  include/hw/timer/arm_generic_timer.h |  60 ++++++++++
+>  3 files changed, 277 insertions(+)
+>  create mode 100644 hw/timer/arm_generic_timer.c
+>  create mode 100644 include/hw/timer/arm_generic_timer.h
 
-I was just aiming for a consensus on the intended behaviour, rather than=20
-fix the bug right now. :)
-But all right, attached patch is an attempt.
+I can't quite seem to make this line up with the spec in the v8
+ARM ARM (chapter 11 "System Level Implementation of the Generic
+Timer"). The generic timer documented there looks quite like this,
+but has extra ID registers at 0xFD0..0xFFC which this code doesn't
+implement, and also has the "CNTReadBase" memory map (which
+exposes just the count value and ID registers) as well as the
+"CNTControlBase" map that looks like what you have here.
+(The register names here differ from the conventions in the
+ARM ARM too.)
 
-Btw, is there any client that implements this extension yet? I couldn't=20
-find anything.
+Is this code trying to implement that Generic Timer, or something
+else with a similar name?
 
-Regards
---=20
-Pierre Ossman           Software Development
-Cendio AB		http://cendio.com
-Teknikringen 8		http://twitter.com/ThinLinc
-583 30 Link=C3=B6ping	http://facebook.com/ThinLinc
-Phone: +46-13-214600	http://plus.google.com/+CendioThinLinc
+> diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
+> index 7ba8c23..f88c468 100644
+> --- a/hw/timer/Makefile.objs
+> +++ b/hw/timer/Makefile.objs
+> @@ -17,6 +17,7 @@ common-obj-$(CONFIG_IMX) += imx_epit.o
+>  common-obj-$(CONFIG_IMX) += imx_gpt.o
+>  common-obj-$(CONFIG_LM32) += lm32_timer.o
+>  common-obj-$(CONFIG_MILKYMIST) += milkymist-sysctl.o
+> +common-obj-$(CONFIG_XLNX_ZYNQMP) += arm_generic_timer.o
 
-A: Because it messes up the order in which people normally read text.
-Q: Why is top-posting such a bad thing?
+If this is really generic I think it ought to have its own
+CONFIG_foo rather than using the XLNX_ZYNQMP symbol.
 
---------------7EC3A6B0E202B4CFC700A638
-Content-Type: text/x-patch;
- name="0001-vnc-track-LED-state-separately.patch"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
- filename="0001-vnc-track-LED-state-separately.patch"
+>
+>  obj-$(CONFIG_EXYNOS4) += exynos4210_mct.o
+>  obj-$(CONFIG_EXYNOS4) += exynos4210_pwm.o
 
->From c27ac2026c84d7fd0da2c27a7ebe08f4359cc977 Mon Sep 17 00:00:00 2001
-From: Pierre Ossman <ossman@cendio.se>
-Date: Tue, 13 Dec 2016 14:03:18 +0100
-Subject: [PATCH] vnc: track LED state separately
+> +static uint64_t counter_low_value_postr(RegisterInfo *reg, uint64_t val64)
+> +{
+> +    ARMGenTimer *s = ARM_GEN_TIMER(reg->opaque);
+> +    uint64_t current_ticks, total_ticks;
+> +    uint32_t low_ticks;
+> +
+> +    if (s->enabled) {
+> +        current_ticks = muldiv64(qemu_clock_get_us(QEMU_CLOCK_VIRTUAL),
+> +                                 NANOSECONDS_PER_SECOND, 1000000);
+> +        total_ticks = current_ticks - s->tick_offset;
+> +        low_ticks = (uint32_t) total_ticks;
+> +    } else {
+> +        /* Timer is disabled, return the time when it was disabled */
+> +        low_ticks = (uint32_t) s->tick_offset;
+> +    }
+> +
+> +    return low_ticks;
+> +}
+> +
+> +static uint64_t counter_high_value_postr(RegisterInfo *reg, uint64_t val64)
+> +{
+> +    ARMGenTimer *s = ARM_GEN_TIMER(reg->opaque);
+> +    uint64_t current_ticks, total_ticks;
+> +    uint32_t high_ticks;
+> +
+> +    if (s->enabled) {
+> +        current_ticks = muldiv64(qemu_clock_get_us(QEMU_CLOCK_VIRTUAL),
+> +                                 NANOSECONDS_PER_SECOND, 1000000);
+> +        total_ticks = current_ticks - s->tick_offset;
+> +        high_ticks = (uint32_t) (total_ticks >> 32);
+> +    } else {
+> +        /* Timer is disabled, return the time when it was disabled */
+> +        high_ticks = (uint32_t) (s->tick_offset >> 32);
+> +    }
+> +
+> +    return high_ticks;
 
-Piggy-backing on the modifier state array made it difficult to send
-out updates at the proper times.
+These two functions are very similar and would benefit from
+being refactored to call a utility function that just returned
+the 64-bit count.
 
-Signed-off-by: Pierre Ossman <ossman@cendio.se>
----
- ui/vnc.c | 56 +++++++++++++-------------------------------------------
- ui/vnc.h |  3 ++-
- 2 files changed, 15 insertions(+), 44 deletions(-)
-
-diff --git a/ui/vnc.c b/ui/vnc.c
-index 2c28a59..c449a7d 100644
---- a/ui/vnc.c
-+++ b/ui/vnc.c
-@@ -1231,8 +1231,6 @@ void vnc_disconnect_finish(VncState *vs)
-         vnc_update_server_surface(vs->vd);
-     }
- 
--    if (vs->vd->lock_key_sync)
--        qemu_remove_led_event_handler(vs->led);
-     vnc_unlock_output(vs);
- 
-     qemu_mutex_destroy(&vs->output_mutex);
-@@ -1665,69 +1663,38 @@ static void press_key(VncState *vs, int keysym)
-     qemu_input_event_send_key_delay(vs->vd->key_delay_ms);
- }
- 
--static int current_led_state(VncState *vs)
--{
--    int ledstate = 0;
--
--    if (vs->modifiers_state[0x46]) {
--        ledstate |= QEMU_SCROLL_LOCK_LED;
--    }
--    if (vs->modifiers_state[0x45]) {
--        ledstate |= QEMU_NUM_LOCK_LED;
--    }
--    if (vs->modifiers_state[0x3a]) {
--        ledstate |= QEMU_CAPS_LOCK_LED;
--    }
--
--    return ledstate;
--}
--
- static void vnc_led_state_change(VncState *vs)
- {
--    int ledstate = 0;
--
-     if (!vnc_has_feature(vs, VNC_FEATURE_LED_STATE)) {
-         return;
-     }
- 
--    ledstate = current_led_state(vs);
-     vnc_lock_output(vs);
-     vnc_write_u8(vs, VNC_MSG_SERVER_FRAMEBUFFER_UPDATE);
-     vnc_write_u8(vs, 0);
-     vnc_write_u16(vs, 1);
-     vnc_framebuffer_update(vs, 0, 0, 1, 1, VNC_ENCODING_LED_STATE);
--    vnc_write_u8(vs, ledstate);
-+    vnc_write_u8(vs, vs->vd->ledstate);
-     vnc_unlock_output(vs);
-     vnc_flush(vs);
- }
- 
- static void kbd_leds(void *opaque, int ledstate)
- {
--    VncState *vs = opaque;
--    int caps, num, scr;
--    bool has_changed = (ledstate != current_led_state(vs));
-+    VncDisplay *vd = opaque;
-+    VncState *client;
- 
-     trace_vnc_key_guest_leds((ledstate & QEMU_CAPS_LOCK_LED),
-                              (ledstate & QEMU_NUM_LOCK_LED),
-                              (ledstate & QEMU_SCROLL_LOCK_LED));
- 
--    caps = ledstate & QEMU_CAPS_LOCK_LED ? 1 : 0;
--    num  = ledstate & QEMU_NUM_LOCK_LED  ? 1 : 0;
--    scr  = ledstate & QEMU_SCROLL_LOCK_LED ? 1 : 0;
-+    if (ledstate != vd->ledstate)
-+        return;
- 
--    if (vs->modifiers_state[0x3a] != caps) {
--        vs->modifiers_state[0x3a] = caps;
--    }
--    if (vs->modifiers_state[0x45] != num) {
--        vs->modifiers_state[0x45] = num;
--    }
--    if (vs->modifiers_state[0x46] != scr) {
--        vs->modifiers_state[0x46] = scr;
--    }
-+    vd->ledstate = ledstate;
- 
--    /* Sending the current led state message to the client */
--    if (has_changed) {
--        vnc_led_state_change(vs);
-+    QTAILQ_FOREACH(client, &vd->clients, next) {
-+        vnc_led_state_change(client);
-     }
- }
- 
-@@ -3083,8 +3050,6 @@ void vnc_start_protocol(VncState *vs)
-     vnc_write(vs, "RFB 003.008\n", 12);
-     vnc_flush(vs);
-     vnc_read_when(vs, protocol_version, 12);
--    if (vs->vd->lock_key_sync)
--        vs->led = qemu_add_led_event_handler(kbd_leds, vs);
- 
-     vs->mouse_mode_notifier.notify = check_pointer_type_change;
-     qemu_add_mouse_mode_change_notifier(&vs->mouse_mode_notifier);
-@@ -3191,6 +3156,8 @@ static void vnc_display_close(VncDisplay *vd)
-     }
-     g_free(vd->tlsaclname);
-     vd->tlsaclname = NULL;
-+    if (vd->lock_key_sync)
-+        qemu_remove_led_event_handler(vd->led);
- }
- 
- int vnc_display_password(const char *id, const char *password)
-@@ -3758,6 +3725,9 @@ void vnc_display_open(const char *id, Error **errp)
-     }
- #endif
-     vd->lock_key_sync = lock_key_sync;
-+    if (lock_key_sync)
-+        vd->led = qemu_add_led_event_handler(kbd_leds, vd);
-+    vd->ledstate = 0;
-     vd->key_delay_ms = key_delay_ms;
- 
-     device_id = qemu_opt_get(opts, "display");
-diff --git a/ui/vnc.h b/ui/vnc.h
-index d20b154..d8c9de5 100644
---- a/ui/vnc.h
-+++ b/ui/vnc.h
-@@ -154,6 +154,8 @@ struct VncDisplay
-     DisplayChangeListener dcl;
-     kbd_layout_t *kbd_layout;
-     int lock_key_sync;
-+    QEMUPutLEDEntry *led;
-+    int ledstate;
-     int key_delay_ms;
-     QemuMutex mutex;
- 
-@@ -304,7 +306,6 @@ struct VncState
-     size_t read_handler_expect;
-     /* input */
-     uint8_t modifiers_state[256];
--    QEMUPutLEDEntry *led;
- 
-     bool abort;
-     QemuMutex output_mutex;
--- 
-2.7.4
-
-
---------------7EC3A6B0E202B4CFC700A638--
+thanks
+-- PMM
