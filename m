@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55370)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34821)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cGv0s-0003Zu-BL
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 16:53:31 -0500
+	(envelope-from <eblake@redhat.com>) id 1cGvgI-0007iW-Vc
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 17:36:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cGv0p-0000yK-7n
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 16:53:30 -0500
-Received: from mail-io0-f193.google.com ([209.85.223.193]:34514)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cGv0p-0000yC-2H
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 16:53:27 -0500
-Received: by mail-io0-f193.google.com with SMTP id y124so913094iof.1
-	for <qemu-devel@nongnu.org>; Tue, 13 Dec 2016 13:53:26 -0800 (PST)
+	(envelope-from <eblake@redhat.com>) id 1cGvgI-0002Pg-5T
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 17:36:19 -0500
+References: <20161205234235.5728-1-eblake@redhat.com>
+	<20161212181237.3aymdmenxeu2kwjj@grep.be>
+	<20161213073812.GA4443@noname.str.redhat.com>
+	<20161213121856.b7fmjwjfkoeufz4g@grep.be>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <f354bb95-fcbe-c59d-d5b1-479d76764d9d@redhat.com>
+Date: Tue, 13 Dec 2016 16:36:08 -0600
 MIME-Version: 1.0
-In-Reply-To: <c246423e-d62b-1572-341d-3a1933e496fa@weilnetz.de>
-References: <CAJSP0QUn4OE3_9foGgktt5O_KzrEzV8uhB1mpoS1q5x4DsPTPQ@mail.gmail.com>
-	<CAJSP0QV1S4mohikvxx9OgnsRgMRNmH+a9WjHCeC7gGaeBMyktQ@mail.gmail.com>
-	<CAJSP0QUkFjfsQ21i3-qXQL5N3xJd6WnEmy1BewMV3z=VOpr7BQ@mail.gmail.com>
-	<c246423e-d62b-1572-341d-3a1933e496fa@weilnetz.de>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Tue, 13 Dec 2016 21:52:25 +0000
-Message-ID: <CAJSP0QW-Mv8N=aULWeXfMQa08DBEC9GPCOnsw6iPiSF_kb3s+g@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] Any QEMU 2.8 release blockers?
+In-Reply-To: <20161213121856.b7fmjwjfkoeufz4g@grep.be>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="SQRnnGnJl9F3uFuXPbP04SPBkHvMJrj4T"
+Subject: Re: [Qemu-devel] [Nbd] [Qemu-block] [PATCH] doc: Propose
+ NBD_FLAG_INIT_ZEROES extension
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,56 +27,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Weil <sw@weilnetz.de>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Wouter Verhelst <w@uter.be>, Kevin Wolf <kwolf@redhat.com>
+Cc: nbd-general@lists.sourceforge.net, xieyingtai@huawei.com, subo7@huawei.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, pbonzini@redhat.com
 
-On Tue, Dec 13, 2016 at 9:39 PM, Stefan Weil <sw@weilnetz.de> wrote:
-> On 12/13/16 22:04, Stefan Hajnoczi wrote:
->>
->> On Tue, Dec 13, 2016 at 10:01 AM, Stefan Hajnoczi <stefanha@gmail.com>
->> wrote:
->>>
->>> On Fri, Dec 9, 2016 at 3:34 PM, Stefan Hajnoczi <stefanha@gmail.com>
->>> wrote:
->>>>
->>>> Hi folks,
->>>> How is QEMU 2.8.0-rc3 holding up?
->>>>
->>>> I'm not aware of release blockers.  QEMU 2.8.0 will be released on
->>>> Tuesday, December 13th if nothing comes up.  It will be the -rc3
->>>> source tree.
->>>
->>>
->>> There have been no release blockers so I plan to tag QEMU 2.8.0 today
->>> (December 13th at 19:00 UTC).
->>>
->>> If something critical turns up please notify me on IRC (stefanha on
->>> #qemu irc.oftc.net).
->>
->>
->> Mike Roth discovered a migration compatibility bug introduced by
->> commit d1b4259f1ab18af24e6a297edb6a8f71691f3256 ("virtio-bus: Plug
->> devices after features are negotiated").  The release will be delayed
->> until this is resolved.
->>
->> Please check the mailing list for discussion.  Mike is sending out a
->> mail summarizing the bug.
->>
->> Stefan
->>
->
-> Maybe you can update the po files before tagging the release.
-> They currently no longer match the code (changed line numbers,
-> new string "_Copy").
->
-> Long way: make install
-> Short way: make -C po build
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--SQRnnGnJl9F3uFuXPbP04SPBkHvMJrj4T
+From: Eric Blake <eblake@redhat.com>
+To: Wouter Verhelst <w@uter.be>, Kevin Wolf <kwolf@redhat.com>
+Cc: nbd-general@lists.sourceforge.net, xieyingtai@huawei.com,
+ subo7@huawei.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ pbonzini@redhat.com
+Message-ID: <f354bb95-fcbe-c59d-d5b1-479d76764d9d@redhat.com>
+Subject: Re: [Qemu-devel] [Nbd] [Qemu-block] [PATCH] doc: Propose
+ NBD_FLAG_INIT_ZEROES extension
+References: <20161205234235.5728-1-eblake@redhat.com>
+ <20161212181237.3aymdmenxeu2kwjj@grep.be>
+ <20161213073812.GA4443@noname.str.redhat.com>
+ <20161213121856.b7fmjwjfkoeufz4g@grep.be>
+In-Reply-To: <20161213121856.b7fmjwjfkoeufz4g@grep.be>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-I've sent a patch to the list and CCed you.  I ran make -C po update.
+On 12/13/2016 06:18 AM, Wouter Verhelst wrote:
+> On Tue, Dec 13, 2016 at 08:38:12AM +0100, Kevin Wolf wrote:
+>> Am 12.12.2016 um 19:12 hat Wouter Verhelst geschrieben:
+>>> I'm not opposed to this proposal, per se, but there seems to be some
+>>> disagreement (by Kevin, for instance) on whether this extension is at=
 
-Weird that the line numbers are hardcoded in the .po file format.  An
-addr2line type tool would have been better to avoid the constant
-outdated line numbers.  That said, I don't know anything about how
-gettext is designed...
+>>> all useful.
+>>
+>> FWIW, I'm not opposed to adding the flag. I don't think it can hurt, b=
+ut
+>> I wanted to ask the question so that we don't end up adding a feature
+>> that noone actually uses. Ultimately it's your call as a maintainer
+>> anyway how conservative you want to be with spec additions.
+>=20
+> I'm not opposed either, but I do agree with you that we shouldn't add
+> such a feature if it doesn't end up getting used. Especially so if it
+> burns a flag in the (16-bit) "transmission flags" field, where space is=
 
-Stefan
+> at a premium.
+
+No, it is NOT a "transmission flag", as it is a per-export property
+(where we currently have 64 bits).
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--SQRnnGnJl9F3uFuXPbP04SPBkHvMJrj4T
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYUHfYAAoJEKeha0olJ0Nq4fgH/iEsxkrQXl5WeBFwLIVJue4S
+cJ8QkhNaBWP+ENLlN/C2VVitKv0uG4ZJ40cCdOEvlGcyjPBbGUyUonJ5kTqoe4yU
+U+OtWABMxEElf4ELcKKf5LRWNvZsFugE6bPxcfSrdZKrWnd7qchKSYVfvW/S2JAy
+h/hzbLkEGaG4lbuUKkIdoyxt52pIVm5s75d72si6ZBqMz7Jo9oosx08ccc66pURJ
+dMsDiJwxveb9GjbPd/ZNT1RSnXtYDuvyKKmVO2NrmXLx9/qHeRvNIaua142kmKDO
+Gvz6Pfd59YkNy6qmyLUtNvpucvhX6RPGOgJLDhD8rARfpZe1ezxQWcniATe1X6Q=
+=wFqT
+-----END PGP SIGNATURE-----
+
+--SQRnnGnJl9F3uFuXPbP04SPBkHvMJrj4T--
