@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60040)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36405)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cGpto-00023I-NW
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 11:25:56 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cGqAS-0005yu-1Q
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 11:43:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cGptm-0002hg-1H
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 11:25:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43864)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cGptl-0002hO-S1
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 11:25:49 -0500
-Date: Tue, 13 Dec 2016 18:25:48 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20161213181733-mutt-send-email-mst@kernel.org>
-References: <1480677386-16192-1-git-send-email-ppandit@redhat.com>
-	<alpine.LFD.2.20.1612131541330.4886@wniryva>
+	(envelope-from <alex.bennee@linaro.org>) id 1cGqAO-00006Y-9b
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 11:43:03 -0500
+Received: from mail-wj0-f170.google.com ([209.85.210.170]:36140)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cGqAO-000069-2d
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 11:43:00 -0500
+Received: by mail-wj0-f170.google.com with SMTP id tk12so105705253wjb.3
+	for <qemu-devel@nongnu.org>; Tue, 13 Dec 2016 08:42:59 -0800 (PST)
+References: <20161208175030.12269-1-drjones@redhat.com>
+	<20161208175030.12269-4-drjones@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20161208175030.12269-4-drjones@redhat.com>
+Date: Tue, 13 Dec 2016 16:41:57 +0000
+Message-ID: <8760mnu6ga.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <alpine.LFD.2.20.1612131541330.4886@wniryva>
-Subject: Re: [Qemu-devel] [PATCH] i386: amd_iommu: fix MMIO register count
- and access
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH kvm-unit-tests v8 03/10] arm/arm64: add
+ some delay routines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,61 +31,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: P J P <ppandit@redhat.com>
-Cc: Qemu Developers <qemu-devel@nongnu.org>, Azureyang <azureyang@tencent.com>
-
-On Tue, Dec 13, 2016 at 03:42:13PM +0530, P J P wrote:
-> +-- On Fri, 2 Dec 2016, P J P wrote --+
-> | IOMMU MMIO registers are divided in two groups by their offsets.
-> | Low offsets(<0x2000) registers are grouped into 'amdvi_mmio_low'
-> | table and higher offsets(>=0x2000) registers are grouped into
-> | 'amdvi_mmio_high' table. No of registers in each table is given
-> | by macro 'AMDVI_MMIO_REGS_LOW' and 'AMDVI_MMIO_REGS_HIGH' resp.
-> | Values of these two macros were swapped, resulting in an OOB
-> | access when reading 'amdvi_mmio_high' table. Correct these two
-> | macros. Also read from 'amdvi_mmio_low' table for lower address.
-> | 
-> | Reported-by: Azureyang <azureyang@tencent.com>
-> | Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
-> | ---
-> |  hw/i386/amd_iommu.c | 2 +-
-> |  hw/i386/amd_iommu.h | 4 ++--
-> |  2 files changed, 3 insertions(+), 3 deletions(-)
-> | 
-> | diff --git a/hw/i386/amd_iommu.c b/hw/i386/amd_iommu.c
-> | index 47b79d9..e0732cc 100644
-> | --- a/hw/i386/amd_iommu.c
-> | +++ b/hw/i386/amd_iommu.c
-> | @@ -562,7 +562,7 @@ static void amdvi_mmio_trace(hwaddr addr, unsigned size)
-> |          trace_amdvi_mmio_read(amdvi_mmio_high[index], addr, size, addr & ~0x07);
-> |      } else {
-> |          index = index >= AMDVI_MMIO_REGS_LOW ? AMDVI_MMIO_REGS_LOW : index;
-> | -        trace_amdvi_mmio_read(amdvi_mmio_high[index], addr, size, addr & ~0x07);
-> | +        trace_amdvi_mmio_read(amdvi_mmio_low[index], addr, size, addr & ~0x07);
-> |      }
-> |  }
-> |  
-> | diff --git a/hw/i386/amd_iommu.h b/hw/i386/amd_iommu.h
-> | index 884926e..0d3dc6a 100644
-> | --- a/hw/i386/amd_iommu.h
-> | +++ b/hw/i386/amd_iommu.h
-> | @@ -49,8 +49,8 @@
-> |  #define AMDVI_CAPAB_INIT_TYPE         (3 << 16)
-> |  
-> |  /* No. of used MMIO registers */
-> | -#define AMDVI_MMIO_REGS_HIGH  8
-> | -#define AMDVI_MMIO_REGS_LOW   7
-> | +#define AMDVI_MMIO_REGS_HIGH  7
-> | +#define AMDVI_MMIO_REGS_LOW   8
-> |  
-> |  /* MMIO registers */
-> |  #define AMDVI_MMIO_DEVICE_TABLE       0x0000
-> 
-> 
-> Ping..!
+To: Andrew Jones <drjones@redhat.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, marc.zyngier@arm.com, andre.przywara@arm.com, eric.auger@redhat.com, pbonzini@redhat.com, christoffer.dall@linaro.org
 
 
-Sorry missed 2.8. Wil be in 2.8.1
-> --
-> Prasad J Pandit / Red Hat Product Security Team
-> 47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
+Andrew Jones <drjones@redhat.com> writes:
+
+> Allow a thread to wait some specified amount of time. Can
+> specify in cycles, usecs, and msecs.
+>
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
+>
+> ---
+> v8: rewrote basing on new sysreg framework. Also decided delay
+>     functions warrant their own files (delay.[ch])
+> ---
+>  arm/Makefile.common       |  1 +
+>  lib/arm/asm/delay.h       | 14 ++++++++++++++
+>  lib/arm/asm/processor.h   | 15 +++++++++++++++
+>  lib/arm64/asm/delay.h     |  1 +
+>  lib/arm64/asm/processor.h | 12 ++++++++++++
+>  lib/arm/delay.c           | 29 +++++++++++++++++++++++++++++
+>  6 files changed, 72 insertions(+)
+>  create mode 100644 lib/arm/asm/delay.h
+>  create mode 100644 lib/arm64/asm/delay.h
+>  create mode 100644 lib/arm/delay.c
+>
+> diff --git a/arm/Makefile.common b/arm/Makefile.common
+> index b2c0fc8a2fdc..89fe3f69eb44 100644
+> --- a/arm/Makefile.common
+> +++ b/arm/Makefile.common
+> @@ -48,6 +48,7 @@ cflatobjs += lib/arm/mmu.o
+>  cflatobjs += lib/arm/bitops.o
+>  cflatobjs += lib/arm/psci.o
+>  cflatobjs += lib/arm/smp.o
+> +cflatobjs += lib/arm/delay.o
+>
+>  libeabi = lib/arm/libeabi.a
+>  eabiobjs = lib/arm/eabi_compat.o
+> diff --git a/lib/arm/asm/delay.h b/lib/arm/asm/delay.h
+> new file mode 100644
+> index 000000000000..2436b28c77ae
+> --- /dev/null
+> +++ b/lib/arm/asm/delay.h
+> @@ -0,0 +1,14 @@
+> +#ifndef _ASMARM_DELAY_H_
+> +#define _ASMARM_DELAY_H_
+> +/*
+> + * Copyright (C) 2016, Red Hat Inc, Andrew Jones <drjones@redhat.com>
+> + *
+> + * This work is licensed under the terms of the GNU LGPL, version 2.
+> + */
+> +#include <libcflat.h>
+> +
+> +extern void delay(u64 cycles);
+> +extern void udelay(unsigned long usecs);
+> +extern void mdelay(unsigned long msecs);
+> +
+> +#endif /* _ASMARM_DELAY_H_ */
+> diff --git a/lib/arm/asm/processor.h b/lib/arm/asm/processor.h
+> index 6b0d36b87817..857bdd96a3cc 100644
+> --- a/lib/arm/asm/processor.h
+> +++ b/lib/arm/asm/processor.h
+> @@ -7,6 +7,7 @@
+>   */
+>  #include <asm/ptrace.h>
+>  #include <asm/sysreg.h>
+> +#include <asm/barrier.h>
+
+Hmm this fails to apply cleanly to master and doesn't build as sysreg.h
+isn't in my tree. What happened to it?
+
+>
+>  enum vector {
+>  	EXCPTN_RST,
+> @@ -51,4 +52,18 @@ extern int mpidr_to_cpu(uint64_t mpidr);
+>  extern void start_usr(void (*func)(void *arg), void *arg, unsigned long sp_usr);
+>  extern bool is_user(void);
+>
+> +#define CNTVCT		__ACCESS_CP15_64(1, c14)
+> +#define CNTFRQ		__ACCESS_CP15(c14, 0, c0, 0)
+> +
+> +static inline u64 get_cntvct(void)
+> +{
+> +	isb();
+> +	return read_sysreg(CNTVCT);
+> +}
+> +
+> +static inline u32 get_cntfrq(void)
+> +{
+> +	return read_sysreg(CNTFRQ);
+> +}
+> +
+>  #endif /* _ASMARM_PROCESSOR_H_ */
+> diff --git a/lib/arm64/asm/delay.h b/lib/arm64/asm/delay.h
+> new file mode 100644
+> index 000000000000..288e4b3fe610
+> --- /dev/null
+> +++ b/lib/arm64/asm/delay.h
+> @@ -0,0 +1 @@
+> +#include "../../arm/asm/delay.h"
+> diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
+> index 48abf2c9e358..0898d89f9761 100644
+> --- a/lib/arm64/asm/processor.h
+> +++ b/lib/arm64/asm/processor.h
+> @@ -20,6 +20,7 @@
+>  #include <asm/ptrace.h>
+>  #include <asm/esr.h>
+>  #include <asm/sysreg.h>
+> +#include <asm/barrier.h>
+>
+>  enum vector {
+>  	EL1T_SYNC,
+> @@ -83,5 +84,16 @@ extern int mpidr_to_cpu(uint64_t mpidr);
+>  extern void start_usr(void (*func)(void *arg), void *arg, unsigned long sp_usr);
+>  extern bool is_user(void);
+>
+> +static inline u64 get_cntvct(void)
+> +{
+> +	isb();
+> +	return read_sysreg(cntvct_el0);
+> +}
+> +
+> +static inline u32 get_cntfrq(void)
+> +{
+> +	return read_sysreg(cntfrq_el0);
+> +}
+> +
+>  #endif /* !__ASSEMBLY__ */
+>  #endif /* _ASMARM64_PROCESSOR_H_ */
+> diff --git a/lib/arm/delay.c b/lib/arm/delay.c
+> new file mode 100644
+> index 000000000000..fa65e2dc9e35
+> --- /dev/null
+> +++ b/lib/arm/delay.c
+> @@ -0,0 +1,29 @@
+> +/*
+> + * Delay loops
+> + *
+> + * Copyright (C) 2016, Red Hat Inc, Andrew Jones <drjones@redhat.com>
+> + *
+> + * This work is licensed under the terms of the GNU LGPL, version 2.
+> + */
+> +#include <libcflat.h>
+> +#include <asm/processor.h>
+> +#include <asm/barrier.h>
+> +
+> +void delay(u64 cycles)
+> +{
+> +	u64 start = get_cntvct();
+> +
+> +	while ((get_cntvct() - start) < cycles)
+> +		cpu_relax();
+> +}
+> +
+> +void udelay(unsigned long usec)
+> +{
+> +	delay((u64)usec * get_cntfrq() / 1000000);
+> +}
+> +
+> +void mdelay(unsigned long msecs)
+> +{
+> +	while (msecs--)
+> +		udelay(1000);
+> +}
+
+
+--
+Alex Bennée
