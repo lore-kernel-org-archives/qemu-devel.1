@@ -1,17 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56113)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56225)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cGkRz-0004t6-RV
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 05:36:53 -0500
+	(envelope-from <stefanha@redhat.com>) id 1cGkSK-0005Af-A5
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 05:37:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cGkRx-0008FU-JM
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 05:36:47 -0500
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 13 Dec 2016 10:36:16 +0000
-Message-Id: <1481625384-15077-16-git-send-email-peter.maydell@linaro.org>
-In-Reply-To: <1481625384-15077-1-git-send-email-peter.maydell@linaro.org>
-References: <1481625384-15077-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 15/23] hw/intc/arm_gicv3: Add accessors for
- ICH_ system registers
+	(envelope-from <stefanha@redhat.com>) id 1cGkSF-0008Lg-I4
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 05:37:08 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38074)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cGkSF-0008LJ-9f
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 05:37:03 -0500
+Date: Tue, 13 Dec 2016 10:37:00 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20161213103700.GD3103@stefanha-x1.localdomain>
+References: <20161212204313.anhjire2gkwd6gzi@grep.be>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="wULyF7TL5taEdwHz"
+Content-Disposition: inline
+In-Reply-To: <20161212204313.anhjire2gkwd6gzi@grep.be>
+Subject: Re: [Qemu-devel] [Nbd] [PATCH v5] doc: Add NBD_CMD_BLOCK_STATUS
+ extension
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,553 +28,180 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Christoffer Dall <christoffer.dall@linaro.org>, Andrew Jones <drjones@redhat.com>
+To: Wouter Verhelst <w@uter.be>
+Cc: Eric Blake <eblake@redhat.com>, "nbd-general@lists.sourceforge.net" <nbd-general@lists.sourceforge.net>, Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Pavel Borzenkov <pborzenkov@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, Markus Pargmann <mpa@pengutronix.de>, "Denis V. Lunev" <den@openvz.org>, John Snow <jsnow@redhat.com>
 
-The GICv3 virtualization interface includes system registers
-accessible only to the hypervisor which form the control
-interface for interrupt virtualization. Implement these
-registers.
 
-The function gicv3_cpuif_virt_update() which determines
-whether it needs to signal vIRQ, vFIQ or a maintenance
-interrupt is introduced here as a stub function -- its
-implementation will be added in a subsequent commit.
+--wULyF7TL5taEdwHz
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- hw/intc/arm_gicv3_cpuif.c | 477 ++++++++++++++++++++++++++++++++++++++++++++++
- hw/intc/trace-events      |  16 ++
- 2 files changed, 493 insertions(+)
+On Mon, Dec 12, 2016 at 09:43:13PM +0100, Wouter Verhelst wrote:
+> +- `NBD_OPT_LIST_META_CONTEXT` (10)
+> +
+> +    Return a list of `NBD_REP_META_CONTEXT` replies, one per context,
+> +    followed by an `NBD_REP_ACK`. If a server replies to such a request
+> +    with no error message, clients MAY send NBD_CMD_BLOCK_STATUS
+> +    commands during the transmission phase.
+> +
+> +    If the query string is syntactically invalid, the server SHOULD send
+> +    `NBD_REP_ERR_INVALID`. If the query string is syntactically valid
+> +    but finds no metadata contexts, the server MUST send a single
+> +    reply of type `NBD_REP_ACK`.
+> +
+> +    This option MUST NOT be requested unless structured replies have
+> +    been negotiated first. If a client attempts to do so, a server
+> +    SHOULD send `NBD_REP_ERR_INVALID`.
+> +
+> +    Data:
+> +    - 32 bits, length of export name
+> +    - String, name of export for which we wish to list or select metadata
+> +      contexts.
+> +    - 32 bits, length of query
+> +    - String, query to select a subset of the available metadata
+> +      contexts. If this is not specified (i.e., the "length of query"
+> +      field is 0 and no query is sent), then the server MUST send all
+> +      the metadata contexts it knows about. If specified, this query
+> +      string MUST start with a name that uniquely identifies a server
+> +      implementation; e.g., the reference implementation that
+> +      accompanies this document would support query strings starting
+> +      with 'nbd-server:'
 
-diff --git a/hw/intc/arm_gicv3_cpuif.c b/hw/intc/arm_gicv3_cpuif.c
-index d2f859c..585c91c 100644
---- a/hw/intc/arm_gicv3_cpuif.c
-+++ b/hw/intc/arm_gicv3_cpuif.c
-@@ -42,6 +42,132 @@ static inline int icv_min_vbpr(GICv3CPUState *cs)
-     return 7 - cs->vprebits;
- }
- 
-+/* Simple accessor functions for LR fields */
-+static int ich_lr_state(uint64_t lr)
-+{
-+    return extract64(lr, ICH_LR_EL2_STATE_SHIFT, ICH_LR_EL2_STATE_LENGTH);
-+}
-+
-+static int read_vbpr(GICv3CPUState *cs, int grp)
-+{
-+    /* Read VBPR value out of the VMCR field (caller must handle
-+     * VCBPR effects if required)
-+     */
-+    if (grp == GICV3_G0) {
-+        return extract64(cs->ich_vmcr_el2, ICH_VMCR_EL2_VBPR0_SHIFT,
-+                     ICH_VMCR_EL2_VBPR0_LENGTH);
-+    } else {
-+        return extract64(cs->ich_vmcr_el2, ICH_VMCR_EL2_VBPR1_SHIFT,
-+                         ICH_VMCR_EL2_VBPR1_LENGTH);
-+    }
-+}
-+
-+static void write_vbpr(GICv3CPUState *cs, int grp, int value)
-+{
-+    /* Write new VBPR1 value, handling the "writing a value less than
-+     * the minimum sets it to the minimum" semantics.
-+     */
-+    int min = icv_min_vbpr(cs);
-+
-+    if (grp != GICV3_G0) {
-+        min++;
-+    }
-+
-+    value = MAX(value, min);
-+
-+    if (grp == GICV3_G0) {
-+        cs->ich_vmcr_el2 = deposit64(cs->ich_vmcr_el2, ICH_VMCR_EL2_VBPR0_SHIFT,
-+                                     ICH_VMCR_EL2_VBPR0_LENGTH, value);
-+    } else {
-+        cs->ich_vmcr_el2 = deposit64(cs->ich_vmcr_el2, ICH_VMCR_EL2_VBPR1_SHIFT,
-+                                     ICH_VMCR_EL2_VBPR1_LENGTH, value);
-+    }
-+}
-+
-+static uint32_t eoi_maintenance_interrupt_state(GICv3CPUState *cs,
-+                                                uint32_t *misr)
-+{
-+    /* Return a set of bits indicating the EOI maintenance interrupt status
-+     * for each list register. The EOI maintenance interrupt status is
-+     * 1 if LR.State == 0 && LR.HW == 0 && LR.EOI == 1
-+     * (see the GICv3 spec for the ICH_EISR_EL2 register).
-+     * If misr is not NULL then we should also collect the information
-+     * about the MISR.EOI, MISR.NP and MISR.U bits.
-+     */
-+    uint32_t value = 0;
-+    int validcount = 0;
-+    bool seenpending = false;
-+    int i;
-+
-+    for (i = 0; i < cs->num_list_regs; i++) {
-+        uint64_t lr = cs->ich_lr_el2[i];
-+
-+        if ((lr & (ICH_LR_EL2_STATE_MASK | ICH_LR_EL2_HW | ICH_LR_EL2_EOI))
-+            == ICH_LR_EL2_EOI) {
-+            value |= (1 << i);
-+        }
-+        if ((lr & ICH_LR_EL2_STATE_MASK)) {
-+            validcount++;
-+        }
-+        if (ich_lr_state(lr) == ICH_LR_EL2_STATE_PENDING) {
-+            seenpending = true;
-+        }
-+    }
-+
-+    if (misr) {
-+        if (validcount < 2 && (cs->ich_hcr_el2 & ICH_HCR_EL2_UIE)) {
-+            *misr |= ICH_MISR_EL2_U;
-+        }
-+        if (!seenpending && (cs->ich_hcr_el2 & ICH_HCR_EL2_NPIE)) {
-+            *misr |= ICH_MISR_EL2_NP;
-+        }
-+        if (value) {
-+            *misr |= ICH_MISR_EL2_EOI;
-+        }
-+    }
-+    return value;
-+}
-+
-+static uint32_t maintenance_interrupt_state(GICv3CPUState *cs)
-+{
-+    /* Return a set of bits indicating the maintenance interrupt status
-+     * (as seen in the ICH_MISR_EL2 register).
-+     */
-+    uint32_t value = 0;
-+
-+    /* Scan list registers and fill in the U, NP and EOI bits */
-+    eoi_maintenance_interrupt_state(cs, &value);
-+
-+    if (cs->ich_hcr_el2 & (ICH_HCR_EL2_LRENPIE | ICH_HCR_EL2_EOICOUNT_MASK)) {
-+        value |= ICH_MISR_EL2_LRENP;
-+    }
-+
-+    if ((cs->ich_hcr_el2 & ICH_HCR_EL2_VGRP0EIE) &&
-+        (cs->ich_vmcr_el2 & ICH_VMCR_EL2_VENG0)) {
-+        value |= ICH_MISR_EL2_VGRP0E;
-+    }
-+
-+    if ((cs->ich_hcr_el2 & ICH_HCR_EL2_VGRP0DIE) &&
-+        !(cs->ich_vmcr_el2 & ICH_VMCR_EL2_VENG1)) {
-+        value |= ICH_MISR_EL2_VGRP0D;
-+    }
-+    if ((cs->ich_hcr_el2 & ICH_HCR_EL2_VGRP1EIE) &&
-+        (cs->ich_vmcr_el2 & ICH_VMCR_EL2_VENG1)) {
-+        value |= ICH_MISR_EL2_VGRP1E;
-+    }
-+
-+    if ((cs->ich_hcr_el2 & ICH_HCR_EL2_VGRP1DIE) &&
-+        !(cs->ich_vmcr_el2 & ICH_VMCR_EL2_VENG1)) {
-+        value |= ICH_MISR_EL2_VGRP1D;
-+    }
-+
-+    return value;
-+}
-+
-+static void gicv3_cpuif_virt_update(GICv3CPUState *cs)
-+{
-+}
-+
- static int icc_highest_active_prio(GICv3CPUState *cs)
- {
-     /* Calculate the current running priority based on the set bits
-@@ -1334,6 +1460,306 @@ static const ARMCPRegInfo gicv3_cpuif_reginfo[] = {
-     REGINFO_SENTINEL
- };
- 
-+static uint64_t ich_ap_read(CPUARMState *env, const ARMCPRegInfo *ri)
-+{
-+    GICv3CPUState *cs = icc_cs_from_env(env);
-+    int regno = ri->opc2 & 3;
-+    int grp = ri->crm & 1 ? GICV3_G0 : GICV3_G1NS;
-+    uint64_t value;
-+
-+    value = cs->ich_apr[grp][regno];
-+    trace_gicv3_ich_ap_read(ri->crm & 1, regno, gicv3_redist_affid(cs), value);
-+    return value;
-+}
-+
-+static void ich_ap_write(CPUARMState *env, const ARMCPRegInfo *ri,
-+                         uint64_t value)
-+{
-+    GICv3CPUState *cs = icc_cs_from_env(env);
-+    int regno = ri->opc2 & 3;
-+    int grp = ri->crm & 1 ? GICV3_G0 : GICV3_G1NS;
-+
-+    trace_gicv3_ich_ap_write(ri->crm & 1, regno, gicv3_redist_affid(cs), value);
-+
-+    cs->ich_apr[grp][regno] = value & 0xFFFFFFFFU;
-+    gicv3_cpuif_virt_update(cs);
-+}
-+
-+static uint64_t ich_hcr_read(CPUARMState *env, const ARMCPRegInfo *ri)
-+{
-+    GICv3CPUState *cs = icc_cs_from_env(env);
-+    uint64_t value = cs->ich_hcr_el2;
-+
-+    trace_gicv3_ich_hcr_read(gicv3_redist_affid(cs), value);
-+    return value;
-+}
-+
-+static void ich_hcr_write(CPUARMState *env, const ARMCPRegInfo *ri,
-+                          uint64_t value)
-+{
-+    GICv3CPUState *cs = icc_cs_from_env(env);
-+
-+    trace_gicv3_ich_hcr_write(gicv3_redist_affid(cs), value);
-+
-+    value &= ICH_HCR_EL2_EN | ICH_HCR_EL2_UIE | ICH_HCR_EL2_LRENPIE |
-+        ICH_HCR_EL2_NPIE | ICH_HCR_EL2_VGRP0EIE | ICH_HCR_EL2_VGRP0DIE |
-+        ICH_HCR_EL2_VGRP1EIE | ICH_HCR_EL2_VGRP1DIE | ICH_HCR_EL2_TC |
-+        ICH_HCR_EL2_TALL0 | ICH_HCR_EL2_TALL1 | ICH_HCR_EL2_TSEI |
-+        ICH_HCR_EL2_TDIR | ICH_HCR_EL2_EOICOUNT_MASK;
-+
-+    cs->ich_hcr_el2 = value;
-+    gicv3_cpuif_virt_update(cs);
-+}
-+
-+static uint64_t ich_vmcr_read(CPUARMState *env, const ARMCPRegInfo *ri)
-+{
-+    GICv3CPUState *cs = icc_cs_from_env(env);
-+    uint64_t value = cs->ich_vmcr_el2;
-+
-+    trace_gicv3_ich_vmcr_read(gicv3_redist_affid(cs), value);
-+    return value;
-+}
-+
-+static void ich_vmcr_write(CPUARMState *env, const ARMCPRegInfo *ri,
-+                         uint64_t value)
-+{
-+    GICv3CPUState *cs = icc_cs_from_env(env);
-+
-+    trace_gicv3_ich_vmcr_write(gicv3_redist_affid(cs), value);
-+
-+    value &= ICH_VMCR_EL2_VENG0 | ICH_VMCR_EL2_VENG1 | ICH_VMCR_EL2_VCBPR |
-+        ICH_VMCR_EL2_VEOIM | ICH_VMCR_EL2_VBPR1_MASK |
-+        ICH_VMCR_EL2_VBPR0_MASK | ICH_VMCR_EL2_VPMR_MASK;
-+    value |= ICH_VMCR_EL2_VFIQEN;
-+
-+    cs->ich_vmcr_el2 = value;
-+    /* Enforce "writing BPRs to less than minimum sets them to the minimum"
-+     * by reading and writing back the fields.
-+     */
-+    write_vbpr(cs, GICV3_G1, read_vbpr(cs, GICV3_G0));
-+    write_vbpr(cs, GICV3_G1, read_vbpr(cs, GICV3_G1));
-+
-+    gicv3_cpuif_virt_update(cs);
-+}
-+
-+static uint64_t ich_lr_read(CPUARMState *env, const ARMCPRegInfo *ri)
-+{
-+    GICv3CPUState *cs = icc_cs_from_env(env);
-+    int regno = ri->opc2 | ((ri->crm & 1) << 3);
-+    uint64_t value;
-+
-+    /* This read function handles all of:
-+     * 64-bit reads of the whole LR
-+     * 32-bit reads of the low half of the LR
-+     * 32-bit reads of the high half of the LR
-+     */
-+    if (ri->state == ARM_CP_STATE_AA32) {
-+        if (ri->crm >= 14) {
-+            value = extract64(cs->ich_lr_el2[regno], 32, 32);
-+            trace_gicv3_ich_lrc_read(regno, gicv3_redist_affid(cs), value);
-+        } else {
-+            value = extract64(cs->ich_lr_el2[regno], 0, 32);
-+            trace_gicv3_ich_lr32_read(regno, gicv3_redist_affid(cs), value);
-+        }
-+    } else {
-+        value = cs->ich_lr_el2[regno];
-+        trace_gicv3_ich_lr_read(regno, gicv3_redist_affid(cs), value);
-+    }
-+
-+    return value;
-+}
-+
-+static void ich_lr_write(CPUARMState *env, const ARMCPRegInfo *ri,
-+                         uint64_t value)
-+{
-+    GICv3CPUState *cs = icc_cs_from_env(env);
-+    int regno = ri->opc2 | ((ri->crm & 1) << 3);
-+
-+    /* This write function handles all of:
-+     * 64-bit writes to the whole LR
-+     * 32-bit writes to the low half of the LR
-+     * 32-bit writes to the high half of the LR
-+     */
-+    if (ri->state == ARM_CP_STATE_AA32) {
-+        if (ri->crm >= 14) {
-+            trace_gicv3_ich_lrc_write(regno, gicv3_redist_affid(cs), value);
-+            value = deposit64(cs->ich_lr_el2[regno], 32, 32, value);
-+        } else {
-+            trace_gicv3_ich_lr32_write(regno, gicv3_redist_affid(cs), value);
-+            value = deposit64(cs->ich_lr_el2[regno], 0, 32, value);
-+        }
-+    } else {
-+        trace_gicv3_ich_lr_write(regno, gicv3_redist_affid(cs), value);
-+    }
-+
-+    /* Enforce RES0 bits in priority field */
-+    if (cs->vpribits < 8) {
-+        value = deposit64(value, ICH_LR_EL2_PRIORITY_SHIFT,
-+                          8 - cs->vpribits, 0);
-+    }
-+
-+    cs->ich_lr_el2[regno] = value;
-+    gicv3_cpuif_virt_update(cs);
-+}
-+
-+static uint64_t ich_vtr_read(CPUARMState *env, const ARMCPRegInfo *ri)
-+{
-+    GICv3CPUState *cs = icc_cs_from_env(env);
-+    uint64_t value;
-+
-+    value = ((cs->num_list_regs - 1) << ICH_VTR_EL2_LISTREGS_SHIFT)
-+        | ICH_VTR_EL2_TDS | ICH_VTR_EL2_NV4 | ICH_VTR_EL2_A3V
-+        | (1 << ICH_VTR_EL2_IDBITS_SHIFT)
-+        | ((cs->vprebits - 1) << ICH_VTR_EL2_PREBITS_SHIFT)
-+        | ((cs->vpribits - 1) << ICH_VTR_EL2_PRIBITS_SHIFT);
-+
-+    trace_gicv3_ich_vtr_read(gicv3_redist_affid(cs), value);
-+    return value;
-+}
-+
-+static uint64_t ich_misr_read(CPUARMState *env, const ARMCPRegInfo *ri)
-+{
-+    GICv3CPUState *cs = icc_cs_from_env(env);
-+    uint64_t value = maintenance_interrupt_state(cs);
-+
-+    trace_gicv3_ich_misr_read(gicv3_redist_affid(cs), value);
-+    return value;
-+}
-+
-+static uint64_t ich_eisr_read(CPUARMState *env, const ARMCPRegInfo *ri)
-+{
-+    GICv3CPUState *cs = icc_cs_from_env(env);
-+    uint64_t value = eoi_maintenance_interrupt_state(cs, NULL);
-+
-+    trace_gicv3_ich_eisr_read(gicv3_redist_affid(cs), value);
-+    return value;
-+}
-+
-+static uint64_t ich_elrsr_read(CPUARMState *env, const ARMCPRegInfo *ri)
-+{
-+    GICv3CPUState *cs = icc_cs_from_env(env);
-+    uint64_t value = 0;
-+    int i;
-+
-+    for (i = 0; i < cs->num_list_regs; i++) {
-+        uint64_t lr = cs->ich_lr_el2[i];
-+
-+        if ((lr & ICH_LR_EL2_STATE_MASK) == 0 &&
-+            ((lr & ICH_LR_EL2_HW) == 1 || (lr & ICH_LR_EL2_EOI) == 0)) {
-+            value |= (1 << i);
-+        }
-+    }
-+
-+    trace_gicv3_ich_elrsr_read(gicv3_redist_affid(cs), value);
-+    return value;
-+}
-+
-+static const ARMCPRegInfo gicv3_cpuif_hcr_reginfo[] = {
-+    { .name = "ICH_AP0R0_EL2", .state = ARM_CP_STATE_BOTH,
-+      .opc0 = 3, .opc1 = 4, .crn = 12, .crm = 8, .opc2 = 0,
-+      .type = ARM_CP_IO | ARM_CP_NO_RAW,
-+      .access = PL2_RW,
-+      .readfn = ich_ap_read,
-+      .writefn = ich_ap_write,
-+    },
-+    { .name = "ICH_AP1R0_EL2", .state = ARM_CP_STATE_BOTH,
-+      .opc0 = 3, .opc1 = 4, .crn = 12, .crm = 9, .opc2 = 0,
-+      .type = ARM_CP_IO | ARM_CP_NO_RAW,
-+      .access = PL2_RW,
-+      .readfn = ich_ap_read,
-+      .writefn = ich_ap_write,
-+    },
-+    { .name = "ICH_HCR_EL2", .state = ARM_CP_STATE_BOTH,
-+      .opc0 = 3, .opc1 = 4, .crn = 12, .crm = 11, .opc2 = 0,
-+      .type = ARM_CP_IO | ARM_CP_NO_RAW,
-+      .access = PL2_RW,
-+      .readfn = ich_hcr_read,
-+      .writefn = ich_hcr_write,
-+    },
-+    { .name = "ICH_VTR_EL2", .state = ARM_CP_STATE_BOTH,
-+      .opc0 = 3, .opc1 = 4, .crn = 12, .crm = 11, .opc2 = 1,
-+      .type = ARM_CP_IO | ARM_CP_NO_RAW,
-+      .access = PL2_R,
-+      .readfn = ich_vtr_read,
-+    },
-+    { .name = "ICH_MISR_EL2", .state = ARM_CP_STATE_BOTH,
-+      .opc0 = 3, .opc1 = 4, .crn = 12, .crm = 11, .opc2 = 2,
-+      .type = ARM_CP_IO | ARM_CP_NO_RAW,
-+      .access = PL2_R,
-+      .readfn = ich_misr_read,
-+    },
-+    { .name = "ICH_EISR_EL2", .state = ARM_CP_STATE_BOTH,
-+      .opc0 = 3, .opc1 = 4, .crn = 12, .crm = 11, .opc2 = 3,
-+      .type = ARM_CP_IO | ARM_CP_NO_RAW,
-+      .access = PL2_R,
-+      .readfn = ich_eisr_read,
-+    },
-+    { .name = "ICH_ELRSR_EL2", .state = ARM_CP_STATE_BOTH,
-+      .opc0 = 3, .opc1 = 4, .crn = 12, .crm = 11, .opc2 = 5,
-+      .type = ARM_CP_IO | ARM_CP_NO_RAW,
-+      .access = PL2_R,
-+      .readfn = ich_elrsr_read,
-+    },
-+    { .name = "ICH_VMCR_EL2", .state = ARM_CP_STATE_BOTH,
-+      .opc0 = 3, .opc1 = 4, .crn = 12, .crm = 11, .opc2 = 7,
-+      .type = ARM_CP_IO | ARM_CP_NO_RAW,
-+      .access = PL2_RW,
-+      .readfn = ich_vmcr_read,
-+      .writefn = ich_vmcr_write,
-+    },
-+    REGINFO_SENTINEL
-+};
-+
-+static const ARMCPRegInfo gicv3_cpuif_ich_apxr1_reginfo[] = {
-+    { .name = "ICH_AP0R1_EL2", .state = ARM_CP_STATE_BOTH,
-+      .opc0 = 3, .opc1 = 4, .crn = 12, .crm = 8, .opc2 = 1,
-+      .type = ARM_CP_IO | ARM_CP_NO_RAW,
-+      .access = PL2_RW,
-+      .readfn = ich_ap_read,
-+      .writefn = ich_ap_write,
-+    },
-+    { .name = "ICH_AP1R1_EL2", .state = ARM_CP_STATE_BOTH,
-+      .opc0 = 3, .opc1 = 4, .crn = 12, .crm = 9, .opc2 = 1,
-+      .type = ARM_CP_IO | ARM_CP_NO_RAW,
-+      .access = PL2_RW,
-+      .readfn = ich_ap_read,
-+      .writefn = ich_ap_write,
-+    },
-+    REGINFO_SENTINEL
-+};
-+
-+static const ARMCPRegInfo gicv3_cpuif_ich_apxr23_reginfo[] = {
-+    { .name = "ICH_AP0R2_EL2", .state = ARM_CP_STATE_BOTH,
-+      .opc0 = 3, .opc1 = 4, .crn = 12, .crm = 8, .opc2 = 2,
-+      .type = ARM_CP_IO | ARM_CP_NO_RAW,
-+      .access = PL2_RW,
-+      .readfn = ich_ap_read,
-+      .writefn = ich_ap_write,
-+    },
-+    { .name = "ICH_AP0R3_EL2", .state = ARM_CP_STATE_BOTH,
-+      .opc0 = 3, .opc1 = 4, .crn = 12, .crm = 8, .opc2 = 3,
-+      .type = ARM_CP_IO | ARM_CP_NO_RAW,
-+      .access = PL2_RW,
-+      .readfn = ich_ap_read,
-+      .writefn = ich_ap_write,
-+    },
-+    { .name = "ICH_AP1R2_EL2", .state = ARM_CP_STATE_BOTH,
-+      .opc0 = 3, .opc1 = 4, .crn = 12, .crm = 9, .opc2 = 2,
-+      .type = ARM_CP_IO | ARM_CP_NO_RAW,
-+      .access = PL2_RW,
-+      .readfn = ich_ap_read,
-+      .writefn = ich_ap_write,
-+    },
-+    { .name = "ICH_AP1R3_EL2", .state = ARM_CP_STATE_BOTH,
-+      .opc0 = 3, .opc1 = 4, .crn = 12, .crm = 9, .opc2 = 3,
-+      .type = ARM_CP_IO | ARM_CP_NO_RAW,
-+      .access = PL2_RW,
-+      .readfn = ich_ap_read,
-+      .writefn = ich_ap_write,
-+    },
-+    REGINFO_SENTINEL
-+};
-+
- static void gicv3_cpuif_el_change_hook(ARMCPU *cpu, void *opaque)
- {
-     GICv3CPUState *cs = opaque;
-@@ -1362,6 +1788,57 @@ void gicv3_init_cpuif(GICv3State *s)
-          * to need to register anyway.
-          */
-         define_arm_cp_regs(cpu, gicv3_cpuif_reginfo);
-+        if (arm_feature(&cpu->env, ARM_FEATURE_EL2)
-+            && cpu->gic_num_lrs) {
-+            int j;
-+
-+            cs->num_list_regs = cpu->gic_num_lrs;
-+            cs->vpribits = cpu->gic_vpribits;
-+            cs->vprebits = cpu->gic_vprebits;
-+
-+            /* Check against architectural constraints: getting these
-+             * wrong would be a bug in the CPU code defining these,
-+             * and the implementation relies on them holding.
-+             */
-+            g_assert(cs->vprebits <= cs->vpribits);
-+            g_assert(cs->vprebits >= 5 && cs->vprebits <= 7);
-+            g_assert(cs->vpribits >= 5 && cs->vpribits <= 8);
-+
-+            define_arm_cp_regs(cpu, gicv3_cpuif_hcr_reginfo);
-+
-+            for (j = 0; j < cs->num_list_regs; j++) {
-+                /* Note that the AArch64 LRs are 64-bit; the AArch32 LRs
-+                 * are split into two cp15 regs, LR (the low part, with the
-+                 * same encoding as the AArch64 LR) and LRC (the high part).
-+                 */
-+                ARMCPRegInfo lr_regset[] = {
-+                    { .name = "ICH_LRn_EL2", .state = ARM_CP_STATE_BOTH,
-+                      .opc0 = 3, .opc1 = 4, .crn = 12,
-+                      .crm = 12 + (j >> 3), .opc2 = j & 7,
-+                      .type = ARM_CP_IO | ARM_CP_NO_RAW,
-+                      .access = PL2_RW,
-+                      .readfn = ich_lr_read,
-+                      .writefn = ich_lr_write,
-+                    },
-+                    { .name = "ICH_LRCn_EL2", .state = ARM_CP_STATE_AA32,
-+                      .cp = 15, .opc1 = 4, .crn = 12,
-+                      .crm = 14 + (j >> 3), .opc2 = j & 7,
-+                      .type = ARM_CP_IO | ARM_CP_NO_RAW,
-+                      .access = PL2_RW,
-+                      .readfn = ich_lr_read,
-+                      .writefn = ich_lr_write,
-+                    },
-+                    REGINFO_SENTINEL
-+                };
-+                define_arm_cp_regs(cpu, lr_regset);
-+            }
-+            if (cs->vprebits >= 6) {
-+                define_arm_cp_regs(cpu, gicv3_cpuif_ich_apxr1_reginfo);
-+            }
-+            if (cs->vprebits == 7) {
-+                define_arm_cp_regs(cpu, gicv3_cpuif_ich_apxr23_reginfo);
-+            }
-+        }
-         arm_register_el_change_hook(cpu, gicv3_cpuif_el_change_hook, cs);
-     }
- }
-diff --git a/hw/intc/trace-events b/hw/intc/trace-events
-index 340f617..4ac1ea2 100644
---- a/hw/intc/trace-events
-+++ b/hw/intc/trace-events
-@@ -107,6 +107,22 @@ gicv3_icc_hppir0_read(uint32_t cpu, uint64_t val) "GICv3 ICC_HPPIR0 read cpu %x
- gicv3_icc_hppir1_read(uint32_t cpu, uint64_t val) "GICv3 ICC_HPPIR1 read cpu %x value 0x%" PRIx64
- gicv3_icc_dir_write(uint32_t cpu, uint64_t val) "GICv3 ICC_DIR write cpu %x value 0x%" PRIx64
- gicv3_icc_rpr_read(uint32_t cpu, uint64_t val) "GICv3 ICC_RPR read cpu %x value 0x%" PRIx64
-+gicv3_ich_ap_read(int grp, int regno, uint32_t cpu, uint64_t val) "GICv3 ICH_AP%dR%d read cpu %x value 0x%" PRIx64
-+gicv3_ich_ap_write(int grp, int regno, uint32_t cpu, uint64_t val) "GICv3 ICH_AP%dR%d write cpu %x value 0x%" PRIx64
-+gicv3_ich_hcr_read(uint32_t cpu, uint64_t val) "GICv3 ICH_HCR_EL2 read cpu %x value 0x%" PRIx64
-+gicv3_ich_hcr_write(uint32_t cpu, uint64_t val) "GICv3 ICH_HCR_EL2 write cpu %x value 0x%" PRIx64
-+gicv3_ich_vmcr_read(uint32_t cpu, uint64_t val) "GICv3 ICH_VMCR_EL2 read cpu %x value 0x%" PRIx64
-+gicv3_ich_vmcr_write(uint32_t cpu, uint64_t val) "GICv3 ICH_VMCR_EL2 write cpu %x value 0x%" PRIx64
-+gicv3_ich_lr_read(int regno, uint32_t cpu, uint64_t val) "GICv3 ICH_LR%d_EL2 read cpu %x value 0x%" PRIx64
-+gicv3_ich_lr32_read(int regno, uint32_t cpu, uint32_t val) "GICv3 ICH_LR%d read cpu %x value 0x%" PRIx32
-+gicv3_ich_lrc_read(int regno, uint32_t cpu, uint32_t val) "GICv3 ICH_LRC%d read cpu %x value 0x%" PRIx32
-+gicv3_ich_lr_write(int regno, uint32_t cpu, uint64_t val) "GICv3 ICH_LR%d_EL2 write cpu %x value 0x%" PRIx64
-+gicv3_ich_lr32_write(int regno, uint32_t cpu, uint32_t val) "GICv3 ICH_LR%d write cpu %x value 0x%" PRIx32
-+gicv3_ich_lrc_write(int regno, uint32_t cpu, uint32_t val) "GICv3 ICH_LRC%d write cpu %x value 0x%" PRIx32
-+gicv3_ich_vtr_read(uint32_t cpu, uint64_t val) "GICv3 ICH_VTR read cpu %x value 0x%" PRIx64
-+gicv3_ich_misr_read(uint32_t cpu, uint64_t val) "GICv3 ICH_MISR read cpu %x value 0x%" PRIx64
-+gicv3_ich_eisr_read(uint32_t cpu, uint64_t val) "GICv3 ICH_EISR read cpu %x value 0x%" PRIx64
-+gicv3_ich_elrsr_read(uint32_t cpu, uint64_t val) "GICv3 ICH_ELRSR read cpu %x value 0x%" PRIx64
- 
- # hw/intc/arm_gicv3_dist.c
- gicv3_dist_read(uint64_t offset, uint64_t data, unsigned size, bool secure) "GICv3 distributor read: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u secure %d"
--- 
-2.7.4
+What about querying "base:" if the NBD spec adds more standard metadata
+contexts in the future?  "base:" does not "uniquely identify a server
+implementation" but it should still be possible to query it so that
+additional contexts can be added to this spec in the future.
+
+Is the query matching algorithm defined anywhere?  I guess it is
+strncmp(query, context, strlen(query)) but I'm not sure from this text.
+
+Another common syntax would use an asterisk wildcard ('*') so that it's
+possible to differentiate between full matches and (wildcard) partial
+matches.
+
+> +
+> +    The server MUST reply with a list of `NBD_REP_META_CONTEXT` replies,
+> +    followed by `NBD_REP_ACK`. The metadata context ID in these replies
+> +    is reserved and SHOULD be set to zero; clients SHOULD disregard it.
+> +
+> +- `NBD_OPT_SET_META_CONTEXT` (11)
+> +
+> +    Change the set of active metadata contexts. Issuing this command
+> +    replaces all previously-set metadata contexts; clients must ensure
+> +    that all metadata contexts they're interested in are selected with
+> +    the final query that they sent.
+> +
+> +    Data:
+> +    - 32 bits, length of query
+> +    - String, query to select metadata contexts. The syntax of this
+> +      query is implementation-defined, except that it MUST start with a
+> +      namespace. This namespace may be one of the following:
+> +        - `base:`, for metadata contexts defined by this document;
+> +        - `nbd-server:`, for metadata contexts defined by the
+> +          implementation that accompanies this document (none
+> +          currently);
+> +        - `x-*:`, where `*` can be replaced by any random string not
+> +          containing colons, for local experiments. This SHOULD NOT be
+> +          used by metadata contexts that are expected to e widely used.
+
+s/ e / be /
+
+> +        - third-party implementations can register additional
+> +          namespaces by simple request to the mailinglist.
+
+Does this mean it is possible to activate multiple contexts but only if
+their namespace is identical?  That seems like an arbitrary limitation.
+
+In other words, the spec suggests you can activate nbd-server:a and
+nbd-server:b but you cannot activate base:a and nbd-server:a.
+
+I'd prefer a programming model where the contexts don't need to be set
+for the lifetime of the connection.  Instead the client passes a bitmap
+(64-bits?) of contexts along with each BLOCK_STATUS command.  That way
+the client can select contexts on a per-command basis.  It's unlikely
+that more than 64 contexts need to be available at once but I admit it's
+an arbitrary limitation...
+
+I guess you've considered this model and decided it's better to
+negotiate upfront, it's wasteful to enable multiple contexts and then
+discard the response data on the client side because only a subset is
+needed for this command invocation.
+
+> +
+> +    The server MUST reply with a number of `NBD_REP_META_CONTEXT`
+> +    replies, one for each selected metadata context, each with a unique
+> +    metadata context ID. It is not an error if a
+> +    `NBD_OPT_SET_META_CONTEXT` option does not select any metadata
+> +    context, provided the client then does not attempt to issue
+> +    `NBD_CMD_BLOCK_STATUS` commands.
+> +
+>  #### Option reply types
+> =20
+>  These values are used in the "reply type" field, sent by the server
+> @@ -882,7 +989,7 @@ during option haggling in the fixed newstyle negotiat=
+ion.
+>      information is available, or when sending data related to the option
+>      (in the case of `NBD_OPT_LIST`) has finished. No data.
+> =20
+> -* `NBD_REP_SERVER` (2)
+> +- `NBD_REP_SERVER` (2)
+> =20
+>      A description of an export. Data:
+> =20
+> @@ -897,10 +1004,18 @@ during option haggling in the fixed newstyle negot=
+iation.
+>        particular client request, this field is defined to be a string
+>        suitable for direct display to a human being.
+> =20
+> -* `NBD_REP_INFO` (3)
+> +- `NBD_REP_INFO` (3)
+> =20
+>      Defined by the experimental `INFO` [extension](https://github.com/Ne=
+tworkBlockDevice/nbd/blob/extension-info/doc/proto.md).
+> =20
+> +- `NBD_REP_META_CONTEXT` (4)
+> +
+> +    A description of a metadata context. Data:
+> +
+> +    - 32 bits, NBD metadata context ID.
+> +    - String, name of the metadata context. This is not required to be
+> +      a human-readable string, but it MUST be valid UTF-8 data.
+> +
+>  There are a number of error reply types, all of which are denoted by
+>  having bit 31 set. All error replies MAY have some data set, in which
+>  case that data is an error message string suitable for display to the us=
+er.
+> @@ -938,15 +1053,62 @@ case that data is an error message string suitable=
+ for display to the user.
+> =20
+>      Defined by the experimental `INFO` [extension](https://github.com/Ne=
+tworkBlockDevice/nbd/blob/extension-info/doc/proto.md).
+> =20
+> -* `NBD_REP_ERR_SHUTDOWN` (2^32 + 7)
+> +* `NBD_REP_ERR_SHUTDOWN` (2^31 + 7)
+> =20
+>      The server is unwilling to continue negotiation as it is in the
+>      process of being shut down.
+> =20
+> -* `NBD_REP_ERR_BLOCK_SIZE_REQD` (2^32 + 8)
+> +* `NBD_REP_ERR_BLOCK_SIZE_REQD` (2^31 + 8)
+
+Are these separate fixes that slipped into the patch?  Not directly
+relevant to BLOCK_STATUS.
+
+--wULyF7TL5taEdwHz
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJYT89MAAoJEJykq7OBq3PIOyUH/2+cjEFnMCOWUrtgSJFgW9Sr
+9olKbEAWi8mOQ7VNBHdjP+pQ6c0iigyBudRcWdrKxht1iBQrIomzUHu8oJsTn3um
+pfOem4mEgQeFLnfQ8O//4k2z8XNbiZxwJqDkS2l8WiAjAffI9rFunAa3O/Grun8I
+vmY8LBwAbSylXh4QPUEZt34XUPvXd4Ogv5iJvmKw/bR/8MgzGI99KWoHLkphQr1D
+IjxvttFEXcaFXmvcjHeJSd04aqPA5BjoMOI9lircc38LRQiDOk2cUqi9YqFZ8xmY
+S2EQR/G2uJbUysmKKl4Hi+gYWj5w/LOT9a3o4CN+XLDv2fP0UAjd8P14O62eu1I=
+=tSiE
+-----END PGP SIGNATURE-----
+
+--wULyF7TL5taEdwHz--
