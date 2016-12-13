@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50908)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50949)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cGm2z-0001jQ-BC
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 07:19:06 -0500
+	(envelope-from <wouter@grep.be>) id 1cGm3B-0001rd-6w
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 07:19:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cGm2t-0000sn-Oq
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 07:19:05 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47370)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cGm2t-0000sf-Iq
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 07:18:59 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <1481306777-5441-1-git-send-email-ehabkost@redhat.com>
-	<6b1269fd-762f-9971-7114-868cd425de3d@suse.de>
-	<20161212182256.GA29949@thinpad.lan.raisama.net>
+	(envelope-from <wouter@grep.be>) id 1cGm3A-0000vf-CM
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 07:19:17 -0500
 Date: Tue, 13 Dec 2016 13:18:56 +0100
-In-Reply-To: <20161212182256.GA29949@thinpad.lan.raisama.net> (Eduardo
-	Habkost's message of "Mon, 12 Dec 2016 16:22:56 -0200")
-Message-ID: <87y3zknhsf.fsf@dusky.pond.sub.org>
+From: Wouter Verhelst <w@uter.be>
+Message-ID: <20161213121856.b7fmjwjfkoeufz4g@grep.be>
+References: <20161205234235.5728-1-eblake@redhat.com>
+	<20161212181237.3aymdmenxeu2kwjj@grep.be>
+	<20161213073812.GA4443@noname.str.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-2.9] qom: Make all interface types
- abstract
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20161213073812.GA4443@noname.str.redhat.com>
+Subject: Re: [Qemu-devel] [Nbd] [Qemu-block] [PATCH] doc: Propose
+ NBD_FLAG_INIT_ZEROES extension
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,47 +25,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Andreas =?utf-8?Q?F=C3=A4rber?= <afaerber@suse.de>, Paolo Bonzini <pbonzini@redhat.com>, Lin Ma <lma@suse.com>, qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: nbd-general@lists.sourceforge.net, xieyingtai@huawei.com, subo7@huawei.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, pbonzini@redhat.com
 
-Eduardo Habkost <ehabkost@redhat.com> writes:
+On Tue, Dec 13, 2016 at 08:38:12AM +0100, Kevin Wolf wrote:
+> Am 12.12.2016 um 19:12 hat Wouter Verhelst geschrieben:
+> > I'm not opposed to this proposal, per se, but there seems to be some
+> > disagreement (by Kevin, for instance) on whether this extension is at
+> > all useful.
+> 
+> FWIW, I'm not opposed to adding the flag. I don't think it can hurt, but
+> I wanted to ask the question so that we don't end up adding a feature
+> that noone actually uses. Ultimately it's your call as a maintainer
+> anyway how conservative you want to be with spec additions.
 
-> On Mon, Dec 12, 2016 at 03:04:25PM +0100, Andreas F=C3=A4rber wrote:
->> Am 09.12.2016 um 19:06 schrieb Eduardo Habkost:
->> > "qom-list-types abstract=3Dfalse" currently returns all interface
->> > types, as if they were not abstract. Fix this by making sure all
->> > interface types are abstract.
->> >=20
->> > All interface types have instance_size =3D=3D 0, so we can use
->> > it to set abstract=3Dtrue on
->> >=20
->> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
->> > ---
->> >  qom/object.c                   |  4 +++
->> >  tests/device-introspect-test.c | 61 +++++++++++++++++++++++++++++++++=
-++++++---
->> >  2 files changed, 62 insertions(+), 3 deletions(-)
->> >=20
->> > diff --git a/qom/object.c b/qom/object.c
->> > index 7a05e35..3870c1b 100644
->> > --- a/qom/object.c
->> > +++ b/qom/object.c
->> > @@ -272,6 +272,10 @@ static void type_initialize(TypeImpl *ti)
->> >=20=20
->> >      ti->class_size =3D type_class_get_size(ti);
->> >      ti->instance_size =3D type_object_get_size(ti);
->> > +    /* Any type with zero instance_size is implicitly abstract.
->> > +     * This means interface types are all abstract.
->> > +     */
->> > +    ti->abstract |=3D ti->instance_size =3D=3D 0;
->>=20
->> IIRC this is a bool field, so I would prefer to avoid |=3D by using an
->> old-fashioned if statement.
->
-> I was going to use an if statement, but then I tried to make it
-> simpler using "|=3D". I will add it back in v2.
+I'm not opposed either, but I do agree with you that we shouldn't add
+such a feature if it doesn't end up getting used. Especially so if it
+burns a flag in the (16-bit) "transmission flags" field, where space is
+at a premium.
 
-Operator | is perfectly fine for boolean operands, and so is your |=3D
-line.  Doesn't mean a conditional would be worse.
-
-[...]
+-- 
+< ron> I mean, the main *practical* problem with C++, is there's like a dozen
+       people in the world who think they really understand all of its rules,
+       and pretty much all of them are just lying to themselves too.
+ -- #debian-devel, OFTC, 2016-02-12
