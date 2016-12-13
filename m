@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35744)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36132)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cGmnf-0000ye-DO
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 08:07:20 -0500
+	(envelope-from <ossman@cendio.se>) id 1cGmqQ-0002vH-0I
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 08:10:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cGmnb-0005gk-J3
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 08:07:19 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60228)
+	(envelope-from <ossman@cendio.se>) id 1cGmqO-0006TG-KD
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 08:10:10 -0500
+Received: from lists.cendio.se ([2a00:801:107:f000::b]:45340
+	helo=mail.cendio.se)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cGmnb-0005gX-BQ
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 08:07:15 -0500
-Date: Tue, 13 Dec 2016 13:07:07 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20161213130707.GH28416@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20161210153038.9184-1-maxime.coquelin@redhat.com>
-	<20161212100236.GA15611@redhat.com>
-	<cc475d20-6e77-17ab-b41e-56a6d4bf81b2@redhat.com>
-	<20161212103432.GH15611@redhat.com>
-	<9523b995-33a6-80a5-9e6e-e0dc1942578f@redhat.com>
+	(Exim 4.71) (envelope-from <ossman@cendio.se>) id 1cGmqO-0006PX-EP
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 08:10:08 -0500
+References: <f460049b-211e-194b-d4c3-a3cc34e4d289@cendio.se>
+	<1481616362.27088.74.camel@redhat.com>
+From: Pierre Ossman <ossman@cendio.se>
+Message-ID: <7ba29954-e3ad-529c-9978-b10d2788f9e4@cendio.se>
+Date: Tue, 13 Dec 2016 14:10:04 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <9523b995-33a6-80a5-9e6e-e0dc1942578f@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 0/3] virtio-net: Add support to MTU
- feature
+In-Reply-To: <1481616362.27088.74.camel@redhat.com>
+Content-Type: multipart/mixed; boundary="------------7EC3A6B0E202B4CFC700A638"
+Subject: Re: [Qemu-devel] VNC LED state buggy, interop issue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,57 +27,201 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Maxime Coquelin <maxime.coquelin@redhat.com>
-Cc: mst@redhat.com, aconole@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, jasowang@redhat.com, yuanhan.liu@linux.intel.com, fbl@redhat.com, mlureau@redhat.com, ktraynor@redhat.com
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On Tue, Dec 13, 2016 at 02:04:52PM +0100, Maxime Coquelin wrote:
-> 
-> 
-> On 12/12/2016 11:34 AM, Daniel P. Berrange wrote:
-> > On Mon, Dec 12, 2016 at 11:12:56AM +0100, Maxime Coquelin wrote:
-> > > Hi Daniel,
-> > > 
-> > > On 12/12/2016 11:02 AM, Daniel P. Berrange wrote:
-> > > > On Sat, Dec 10, 2016 at 04:30:35PM +0100, Maxime Coquelin wrote:
-> > > > > Thanks for the reviews,
-> > > > > 
-> > > > > This series implements Virtio spec update from Aaron Conole which
-> > > > > defines a way for the host to expose its max MTU to the guest.
-> > > > > 
-> > > > > "host_mtu" parameter is added to provide QEMU with the MTU value,
-> > > > > and the backend, if supported, gets notified of the MTU value when the
-> > > > > MTU feature neogotiation succeeds.
-> > > > > 
-> > > > > Only user backend currently supports MTU notification. A new protocol
-> > > > > feature has been implemented for sending MTU value to the backend.
-> > > > > 
-> > > > > For kernel backend, it is expected the management tool also configures
-> > > > > the tap/macvtap interface with same MTU value.
-> > > > > Daniel, I would be interrested about your feedback on this implementation
-> > > > > from management tool point of view.
-> > > > 
-> > > > I can't give real feedback yet, as I'm not seeing clear information on
-> > > > what problem this series is designed to solve....
-> > > 
-> > > Right, I agree it is missing a bit of context here, I'll add more about
-> > > the background in next revision.
-> > > 
-> > > The goal of this series is to address two things:
-> > > 1. Providing a way for the guests to use the same MTU as the host,
-> > >    in order to have a consistent MTU value across the infrastructure.
-> > 
-> > Ok, currently libvirt sets the MTU of the tap device based on the MTU
-> > of the device it will be attached to. This change means we need to pass
-> > that MTU value into QEMU via the -netdev command line so it can inform
-> > the guest what the MTU is.
-> Nice, do you have a pointer on where this is done in QEMU?
+This is a multi-part message in MIME format.
+--------------7EC3A6B0E202B4CFC700A638
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 
-Its in libvirt code via virNetDevSetMTUFromDevice()
+On 13/12/16 09:06, Gerd Hoffmann wrote:
+>>   b) Remove the assumption from the code and the protocol.
+>
+> Patches are welcome.
+>
 
+I was just aiming for a consensus on the intended behaviour, rather than=20
+fix the bug right now. :)
+But all right, attached patch is an attempt.
 
-Regards,
-Daniel
+Btw, is there any client that implements this extension yet? I couldn't=20
+find anything.
+
+Regards
+--=20
+Pierre Ossman           Software Development
+Cendio AB		http://cendio.com
+Teknikringen 8		http://twitter.com/ThinLinc
+583 30 Link=C3=B6ping	http://facebook.com/ThinLinc
+Phone: +46-13-214600	http://plus.google.com/+CendioThinLinc
+
+A: Because it messes up the order in which people normally read text.
+Q: Why is top-posting such a bad thing?
+
+--------------7EC3A6B0E202B4CFC700A638
+Content-Type: text/x-patch;
+ name="0001-vnc-track-LED-state-separately.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename="0001-vnc-track-LED-state-separately.patch"
+
+>From c27ac2026c84d7fd0da2c27a7ebe08f4359cc977 Mon Sep 17 00:00:00 2001
+From: Pierre Ossman <ossman@cendio.se>
+Date: Tue, 13 Dec 2016 14:03:18 +0100
+Subject: [PATCH] vnc: track LED state separately
+
+Piggy-backing on the modifier state array made it difficult to send
+out updates at the proper times.
+
+Signed-off-by: Pierre Ossman <ossman@cendio.se>
+---
+ ui/vnc.c | 56 +++++++++++++-------------------------------------------
+ ui/vnc.h |  3 ++-
+ 2 files changed, 15 insertions(+), 44 deletions(-)
+
+diff --git a/ui/vnc.c b/ui/vnc.c
+index 2c28a59..c449a7d 100644
+--- a/ui/vnc.c
++++ b/ui/vnc.c
+@@ -1231,8 +1231,6 @@ void vnc_disconnect_finish(VncState *vs)
+         vnc_update_server_surface(vs->vd);
+     }
+ 
+-    if (vs->vd->lock_key_sync)
+-        qemu_remove_led_event_handler(vs->led);
+     vnc_unlock_output(vs);
+ 
+     qemu_mutex_destroy(&vs->output_mutex);
+@@ -1665,69 +1663,38 @@ static void press_key(VncState *vs, int keysym)
+     qemu_input_event_send_key_delay(vs->vd->key_delay_ms);
+ }
+ 
+-static int current_led_state(VncState *vs)
+-{
+-    int ledstate = 0;
+-
+-    if (vs->modifiers_state[0x46]) {
+-        ledstate |= QEMU_SCROLL_LOCK_LED;
+-    }
+-    if (vs->modifiers_state[0x45]) {
+-        ledstate |= QEMU_NUM_LOCK_LED;
+-    }
+-    if (vs->modifiers_state[0x3a]) {
+-        ledstate |= QEMU_CAPS_LOCK_LED;
+-    }
+-
+-    return ledstate;
+-}
+-
+ static void vnc_led_state_change(VncState *vs)
+ {
+-    int ledstate = 0;
+-
+     if (!vnc_has_feature(vs, VNC_FEATURE_LED_STATE)) {
+         return;
+     }
+ 
+-    ledstate = current_led_state(vs);
+     vnc_lock_output(vs);
+     vnc_write_u8(vs, VNC_MSG_SERVER_FRAMEBUFFER_UPDATE);
+     vnc_write_u8(vs, 0);
+     vnc_write_u16(vs, 1);
+     vnc_framebuffer_update(vs, 0, 0, 1, 1, VNC_ENCODING_LED_STATE);
+-    vnc_write_u8(vs, ledstate);
++    vnc_write_u8(vs, vs->vd->ledstate);
+     vnc_unlock_output(vs);
+     vnc_flush(vs);
+ }
+ 
+ static void kbd_leds(void *opaque, int ledstate)
+ {
+-    VncState *vs = opaque;
+-    int caps, num, scr;
+-    bool has_changed = (ledstate != current_led_state(vs));
++    VncDisplay *vd = opaque;
++    VncState *client;
+ 
+     trace_vnc_key_guest_leds((ledstate & QEMU_CAPS_LOCK_LED),
+                              (ledstate & QEMU_NUM_LOCK_LED),
+                              (ledstate & QEMU_SCROLL_LOCK_LED));
+ 
+-    caps = ledstate & QEMU_CAPS_LOCK_LED ? 1 : 0;
+-    num  = ledstate & QEMU_NUM_LOCK_LED  ? 1 : 0;
+-    scr  = ledstate & QEMU_SCROLL_LOCK_LED ? 1 : 0;
++    if (ledstate != vd->ledstate)
++        return;
+ 
+-    if (vs->modifiers_state[0x3a] != caps) {
+-        vs->modifiers_state[0x3a] = caps;
+-    }
+-    if (vs->modifiers_state[0x45] != num) {
+-        vs->modifiers_state[0x45] = num;
+-    }
+-    if (vs->modifiers_state[0x46] != scr) {
+-        vs->modifiers_state[0x46] = scr;
+-    }
++    vd->ledstate = ledstate;
+ 
+-    /* Sending the current led state message to the client */
+-    if (has_changed) {
+-        vnc_led_state_change(vs);
++    QTAILQ_FOREACH(client, &vd->clients, next) {
++        vnc_led_state_change(client);
+     }
+ }
+ 
+@@ -3083,8 +3050,6 @@ void vnc_start_protocol(VncState *vs)
+     vnc_write(vs, "RFB 003.008\n", 12);
+     vnc_flush(vs);
+     vnc_read_when(vs, protocol_version, 12);
+-    if (vs->vd->lock_key_sync)
+-        vs->led = qemu_add_led_event_handler(kbd_leds, vs);
+ 
+     vs->mouse_mode_notifier.notify = check_pointer_type_change;
+     qemu_add_mouse_mode_change_notifier(&vs->mouse_mode_notifier);
+@@ -3191,6 +3156,8 @@ static void vnc_display_close(VncDisplay *vd)
+     }
+     g_free(vd->tlsaclname);
+     vd->tlsaclname = NULL;
++    if (vd->lock_key_sync)
++        qemu_remove_led_event_handler(vd->led);
+ }
+ 
+ int vnc_display_password(const char *id, const char *password)
+@@ -3758,6 +3725,9 @@ void vnc_display_open(const char *id, Error **errp)
+     }
+ #endif
+     vd->lock_key_sync = lock_key_sync;
++    if (lock_key_sync)
++        vd->led = qemu_add_led_event_handler(kbd_leds, vd);
++    vd->ledstate = 0;
+     vd->key_delay_ms = key_delay_ms;
+ 
+     device_id = qemu_opt_get(opts, "display");
+diff --git a/ui/vnc.h b/ui/vnc.h
+index d20b154..d8c9de5 100644
+--- a/ui/vnc.h
++++ b/ui/vnc.h
+@@ -154,6 +154,8 @@ struct VncDisplay
+     DisplayChangeListener dcl;
+     kbd_layout_t *kbd_layout;
+     int lock_key_sync;
++    QEMUPutLEDEntry *led;
++    int ledstate;
+     int key_delay_ms;
+     QemuMutex mutex;
+ 
+@@ -304,7 +306,6 @@ struct VncState
+     size_t read_handler_expect;
+     /* input */
+     uint8_t modifiers_state[256];
+-    QEMUPutLEDEntry *led;
+ 
+     bool abort;
+     QemuMutex output_mutex;
 -- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+2.7.4
+
+
+--------------7EC3A6B0E202B4CFC700A638--
