@@ -1,38 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56962)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34278)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cGgK5-0007jO-OP
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 01:12:23 -0500
+	(envelope-from <famz@redhat.com>) id 1cGgwL-0004Bg-CK
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 01:51:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cGgK2-0008DX-KP
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 01:12:21 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:9370)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cGgK2-0008D2-C5
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 01:12:18 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 60DEB8FD06
-	for <qemu-devel@nongnu.org>; Tue, 13 Dec 2016 06:12:16 +0000 (UTC)
-Date: Tue, 13 Dec 2016 14:12:12 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20161213061212.GC32222@pxdev.xzpeter.org>
-References: <1481089965-3888-1-git-send-email-peterx@redhat.com>
-	<1481089965-3888-3-git-send-email-peterx@redhat.com>
-	<20161211051011-mutt-send-email-mst@kernel.org>
-	<20161212015602.GJ28693@pxdev.xzpeter.org>
-	<20161212123544.2139b842@t450s.home>
-	<20161213033341.GA32222@pxdev.xzpeter.org>
-	<20161212205150.3e7f7d3b@t450s.home>
-	<20161213052429.GB32222@pxdev.xzpeter.org>
-	<20161212224828.5cc9f841@t450s.home>
+	(envelope-from <famz@redhat.com>) id 1cGgwK-00032f-Bg
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 01:51:53 -0500
+Date: Tue, 13 Dec 2016 14:51:41 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20161213065141.GA2165@lemon>
+References: <87oa0q1t21.fsf@dusky.pond.sub.org> <20161207025457.GB30227@lemon>
+	<20161207094832.GA4773@noname.str.redhat.com>
+	<20161207100339.GB2286@lemon> <87shpybnbc.fsf@dusky.pond.sub.org>
+	<20161208134759.GA32226@lemon> <87wpf52qru.fsf@dusky.pond.sub.org>
+	<20161212144307.GA21817@lemon> <87zik1xazy.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20161212224828.5cc9f841@t450s.home>
-Subject: Re: [Qemu-devel] [PATCH for-2.9 2/2] intel_iommu: extend supported
- guest aw to 48 bits
+In-Reply-To: <87zik1xazy.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [Qemu-block]  Meeting notes on -blockdev,
+ dynamic backend reconfiguration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,87 +27,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, jasowang@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On Mon, Dec 12, 2016 at 10:48:28PM -0700, Alex Williamson wrote:
-> On Tue, 13 Dec 2016 13:24:29 +0800
-> Peter Xu <peterx@redhat.com> wrote:
+On Mon, 12/12 19:23, Markus Armbruster wrote:
+> Fam Zheng <famz@redhat.com> writes:
 > 
-> > On Mon, Dec 12, 2016 at 08:51:50PM -0700, Alex Williamson wrote:
-> > 
-> > [...]
-> > 
-> > > > > I'm not sure how the vIOMMU supporting 39 bits or 48 bits is directly
-> > > > > relevant to vfio, we're not sharing page tables.  There is already a
-> > > > > case today, without vIOMMU that you can make a guest which has more
-> > > > > guest physical address space than the hardware IOMMU by overcommitting
-> > > > > system memory.  Generally this quickly resolves itself when we start
-> > > > > pinning pages since the physical address width of the IOMMU is
-> > > > > typically the same as the physical address width of the host system
-> > > > > (ie. we exhaust the host memory).    
-> > > > 
-> > > > Hi, Alex,
-> > > > 
-> > > > Here does "hardware IOMMU" means the IOMMU iova address space width?
-> > > > For example, if guest has 48 bits physical address width (without
-> > > > vIOMMU), but host hardware IOMMU only supports 39 bits for its iova
-> > > > address space, could device assigment work in this case?  
-> > > 
-> > > The current usage depends entirely on what the user (VM) tries to map.
-> > > You could expose a vIOMMU with a 64bit address width, but the moment
-> > > you try to perform a DMA mapping with IOVA beyond bit 39 (if that's the
-> > > host IOMMU address width), the ioctl will fail and the VM will abort.
-> > > IOW, you can claim whatever vIOMMU address width you want, but if you
-> > > layout guest memory or devices in such a way that actually require IOVA
-> > > mapping beyond the host capabilities, you're going to abort.  Likewise,
-> > > without a vIOMMU if the guest memory layout is sufficiently sparse to
-> > > require such IOVAs, you're going to abort.  Thanks,  
-> > 
-> > Thanks for the explanation. I got the point.
-> > 
-> > However, should we allow guest behaviors affect hypervisor? In this
-> > case, if guest maps IOVA range over 39 bits (assuming vIOMMU is
-> > declaring itself with 48 bits address width), the VM will crash. How
-> > about we shrink vIOMMU address width to 39 bits during boot if we
-> > detected that assigned devices are configured? IMHO no matter what we
-> > do in the guest, the hypervisor should keep the guest alive from
-> > hypervisor POV (emulation of the guest hardware should not be stopped
-> > by guest behavior). If any operation in guest can cause hypervisor
-> > down, isn't it a bug?
+> > On Mon, 12/12 14:58, Markus Armbruster wrote:
+> >> Fam Zheng <famz@redhat.com> writes:
+> >> 
+> >> > On Thu, 12/08 13:46, Markus Armbruster wrote:
+> >> >> Fam Zheng <famz@redhat.com> writes:
+> >> >> 
+> >> >> > On Wed, 12/07 10:48, Kevin Wolf wrote:
+> >> >> >> > If so I think there is no race to worry about, mirror-filter should go
+> >> >> >> > away only after a QMP command.
+> >> >> >> 
+> >> >> >> Currently, a mirror job goes away whenever it is done. This is not
+> >> >> >> directly tied to a QMP command.
+> >> >> >
+> >> >> > Ah right, block-job-complete is only "start to complete" and the job goes away
+> >> >> > at some later point. I thought this is "the" QMP command but it is not.
+> >> >> >
+> >> >> >> 
+> >> >> >> Of course, in the new job API we want an explicit job-delete, so in
+> >> >> >> that case it wouldn't happen, but we need to keep the old case for
+> >> >> >> compatibility.
+> >> >> >
+> >> >> > Another possibility is to add a placeholder node in the right location first
+> >> >> > then fill in the actual throttling node once created. QMP owns the placeholder
+> >> >> > node so it won't suddenly vanish when mirror job goes away.
+> >> >> 
+> >> >> I'm not sure I understand this idea.  Could you explain it in a bit more
+> >> >> detail, perhaps even with a bit of ASCII art?
+> >> >
+> >> > OK, I'll base on your version:
+> >> >
+> >> > == Basic dynamic reconfiguration operation ==
+> >> >
+> >> > The two primitives are "insert placeholder" and bdrv_replace_child;
+> >> >
+> >> > A placeholder BDS is a dummy "pass through everything" filter. Inserting
+> >> > placeholder is something like:
+> >> >
+> >> >     void bdrv_insert_placeholder(BdrvChild *child) {
+> >> >         BlockDriverState *ph = bdrv_new_placeholder();
+> >> >         ph->file->bs = child->bs;
+> >> >         child->bs = ph;
+> >> >     }
+> >> >
+> >> > Consider:
+> >> >
+> >> >           BB
+> >> >           |
+> >> >     mirror-filter
+> >> >           |
+> >> >          BDS
+> >> >
+> >> > Add a throttle filter under BB while the mirror job is running.  First step,
+> >> > create the dummy _placeholder_ node and throttle-filter node (the existence of
+> >> > placeholder node can be an implementation detail hidden from user):
+> >> >
+> >> >     placeholder = bdrv_insert_placeholder(BB->root);
+> >> >     throttle_filter = bdrv_create_throttle_filter(placeholder);
+> >> >
+> >> > we get:
+> >> >
+> >> >           BB     throttle-filter
+> >> >           |     /
+> >> >      placeholder
+> >> >           |
+> >> >     mirror-filter
+> >> >           |
+> >> >          BDS
+> >> >
+> >> > Second step, move throttle filter in:
+> >> >
+> >> >     bdrv_replace_child(BB->root, throttle_filter);
+> >> >     bdrv_replace_child(throttle_filter->file, throttle_filter->file->bs->file->bs);
+> >> >     bdrv_unref(placeholder);
+> >> >
+> >> > we get:
+> >> >
+> >> >           BB
+> >> >           |
+> >> >    throttle-filter
+> >> >           |
+> >> >     mirror-filter
+> >> >           |
+> >> >          BDS
+> >> >
+> >> > Does this make us safe from racing with mirror-filter disappearing?
+> >> 
+> >> Thanks!  I figure your placeholder node does immunize the splicing in of
+> >> the throttle-filter against the removal of mirror-filter.
+> >> 
+> >> Given a specific dynamic reconfiguration, where do we have to put
+> >> placeholder nodes to immunize it against arbitrary other dynamic
+> >> changes?
+> >
+> > Generally, a placeholder node is essentially an insertion to the middle of an
+> > existing edge, namely to change:
+> >
+> >          NodeA
+> >        /   |   \
+> >       /    |    \
+> >  [...]   NodeB   [...]
+> >
+> > into:
+> >
+> >          NodeA
+> >        /   |   \
+> >       /    |    \
+> >  [...]  p-holdr  [...]
+> >            |
+> >            |
+> >          NodeB
+> >
+> > and the operation is safe because of BQL. Our later bdrv_replace_child()
+> > operations on it will always work because a dynamic reconfiguration won't delete
+> > the placeholder node in any case.
+> >
+> > On the other hand, concurrent dynamic changes could yield usual outcomes from
+> > user PoV (like the involved node is no longer in the same place or disappears),
+> > but I think it is still in some degree under user's control. E.g. a
+> > mirror-filter won't go away automatically until user does
+> > block-job-complete/cancel.
 > 
-> Any case of the guest crashing the hypervisor (ie. the host) is a
-> serious bug, but a guest causing it's own VM to abort is an entirely
-> different class, and in some cases justified.  For instance, you only
-> need a guest misbehaving in the virtio protocol to generate a VM
-> abort.  The cases Kevin raises make me reconsider because they are
-> cases of a VM behaving properly, within the specifications of the
-> hardware exposed to it, generating a VM abort, and in the case of vfio
-> exposed through to a guest user, allow the VM to be susceptible to the
-> actions of that user.
-> 
-> Of course any time we tie VM hardware to a host constraint, we're
-> asking for trouble.  You're example of shrinking the vIOMMU address
-> width to 39bits on boot highlights that.  Clearly cold plug devices is
-> only one scenario, what about hotplug devices?  We cannot dynamically
-> change the vIOMMU address width.  What about migration, we could start
-> the VM w/o an assigned device on a 48bit capable host and migrate it to
-> a 39bit host and then attempt to hot add an assigned device.  For the
-> most compatibility, why would we ever configure the VM with a vIOMMU
-> address width beyond the minimum necessary to support the potential
-> populated guest physical memory?  Thanks,
+> I think I understand how we can safely insert a placeholder.  My
+> question is: *where* do we have to insert placeholders before a certain
+> dynamic reconfiguration to make that reconfiguration safe?
 
-For now, I feel a tunable for the address width more essential - let's
-just name it as "aw-bits", which should only be used by advanced
-users. By default, we can use an address width safe enough, like 39
-bits (I assume that most pIOMMUs should support at least 39 bits).
-User configurations can override (for now, we can limit the options to
-only 39/48 bits).
+The placeholder will mainly protect "insertions" and therefore the location
+woule be on edge where we insert a new filter.
 
-Then, we can temporarily live even without the interface to detect
-host parameters - when user specify a specific width, he/she will
-manage the rest (of course taking the risk of VM aborts).
+Removing a node doesn't need placeholder protection.
 
-Thanks,
+Updating a node (to a different type) probably doesn't need that either but I'm
+not 100% sure.
 
--- peterx
+Fam
