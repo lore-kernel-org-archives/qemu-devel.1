@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52138)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53028)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuri.benditovich@daynix.com>) id 1cGiDk-0001m5-HP
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 03:13:57 -0500
+	(envelope-from <lvivier@redhat.com>) id 1cGiIe-0005Ja-QU
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 03:19:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuri.benditovich@daynix.com>) id 1cGiDh-000404-B5
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 03:13:56 -0500
-Received: from mail-wj0-f194.google.com ([209.85.210.194]:36845)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <yuri.benditovich@daynix.com>)
-	id 1cGiDh-0003vD-50
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 03:13:53 -0500
-Received: by mail-wj0-f194.google.com with SMTP id j10so15104164wjb.3
-	for <qemu-devel@nongnu.org>; Tue, 13 Dec 2016 00:13:30 -0800 (PST)
-From: Yuri Benditovich <yuri.benditovich@daynix.com>
-Date: Tue, 13 Dec 2016 10:12:08 +0200
-Message-Id: <1481616728-148412-5-git-send-email-yuri.benditovich@daynix.com>
-In-Reply-To: <1481616728-148412-1-git-send-email-yuri.benditovich@daynix.com>
-References: <1481616728-148412-1-git-send-email-yuri.benditovich@daynix.com>
-Subject: [Qemu-devel] [PATCH v3 4/4] net: virtio-net discards TX data after
- link down
+	(envelope-from <lvivier@redhat.com>) id 1cGiIb-0005MF-Jx
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 03:19:00 -0500
+References: <1481585316-31612-1-git-send-email-lvivier@redhat.com>
+	<1481585316-31612-5-git-send-email-lvivier@redhat.com>
+	<877f74w9dm.fsf@dusky.pond.sub.org>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <c38f9acb-1c74-f698-954c-f8c7a98a8c90@redhat.com>
+Date: Tue, 13 Dec 2016 09:18:53 +0100
+MIME-Version: 1.0
+In-Reply-To: <877f74w9dm.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 4/4] qtest: add ivshmem-test for ppc64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,81 +24,220 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
 
-https://bugzilla.redhat.com/show_bug.cgi?id=1295637
-Upon set_link monitor command or upon netdev deletion
-virtio-net sends link down indication to the guest
-and stops vhost if one is used.
-Guest driver can still submit data for TX until it
-recognizes link loss. If these packets not returned by
-the host, the Windows guest will never be able to finish
-disable/removal/shutdown.
-Now each packet sent by guest after NIC indicated link
-down will be completed immediately.
 
-Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
----
- hw/net/virtio-net.c | 26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
 
-diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-index 5009533..6f98eab 100644
---- a/hw/net/virtio-net.c
-+++ b/hw/net/virtio-net.c
-@@ -218,6 +218,14 @@ static void virtio_net_vnet_endian_status(VirtIONet *n, uint8_t status)
-     }
- }
- 
-+static void virtio_net_drop_tx_queue_data(VirtIODevice *vdev, VirtQueue *vq)
-+{
-+    unsigned int dropped = virtqueue_drop_all(vq);
-+    if (dropped) {
-+        virtio_notify(vdev, vq);
-+    }
-+}
-+
- static void virtio_net_set_status(struct VirtIODevice *vdev, uint8_t status)
- {
-     VirtIONet *n = VIRTIO_NET(vdev);
-@@ -262,6 +270,14 @@ static void virtio_net_set_status(struct VirtIODevice *vdev, uint8_t status)
-             } else {
-                 qemu_bh_cancel(q->tx_bh);
-             }
-+            if ((n->status & VIRTIO_NET_S_LINK_UP) == 0 &&
-+                (queue_status & VIRTIO_CONFIG_S_DRIVER_OK)) {
-+                /* if tx is waiting we are likely have some packets in tx queue
-+                 * and disabled notification */
-+                q->tx_waiting = 0;
-+                virtio_queue_set_notification(q->tx_vq, 1);
-+                virtio_net_drop_tx_queue_data(vdev, q->tx_vq);
-+            }
-         }
-     }
- }
-@@ -1323,6 +1339,11 @@ static void virtio_net_handle_tx_timer(VirtIODevice *vdev, VirtQueue *vq)
-     VirtIONet *n = VIRTIO_NET(vdev);
-     VirtIONetQueue *q = &n->vqs[vq2q(virtio_get_queue_index(vq))];
- 
-+    if (unlikely((n->status & VIRTIO_NET_S_LINK_UP) == 0)) {
-+        virtio_net_drop_tx_queue_data(vdev, vq);
-+        return;
-+    }
-+
-     /* This happens when device was stopped but VCPU wasn't. */
-     if (!vdev->vm_running) {
-         q->tx_waiting = 1;
-@@ -1349,6 +1370,11 @@ static void virtio_net_handle_tx_bh(VirtIODevice *vdev, VirtQueue *vq)
-     VirtIONet *n = VIRTIO_NET(vdev);
-     VirtIONetQueue *q = &n->vqs[vq2q(virtio_get_queue_index(vq))];
- 
-+    if (unlikely((n->status & VIRTIO_NET_S_LINK_UP) == 0)) {
-+        virtio_net_drop_tx_queue_data(vdev, vq);
-+        return;
-+    }
-+
-     if (unlikely(q->tx_waiting)) {
-         return;
-     }
--- 
-1.9.1
+On 13/12/2016 08:55, Markus Armbruster wrote:
+> Laurent Vivier <lvivier@redhat.com> writes:
+> 
+>> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+>> ---
+>>  tests/Makefile.include |  3 ++-
+>>  tests/ivshmem-test.c   | 46 +++++++++++++++++++++++++++++-----------------
+>>  2 files changed, 31 insertions(+), 18 deletions(-)
+>>
+>> diff --git a/tests/Makefile.include b/tests/Makefile.include
+>> index b574964..09fe5b6 100644
+>> --- a/tests/Makefile.include
+>> +++ b/tests/Makefile.include
+>> @@ -287,6 +287,7 @@ check-qtest-ppc64-y += tests/test-netfilter$(EXESUF)
+>>  check-qtest-ppc64-y += tests/test-filter-mirror$(EXESUF)
+>>  check-qtest-ppc64-y += tests/test-filter-redirector$(EXESUF)
+>>  check-qtest-ppc64-y += tests/display-vga-test$(EXESUF)
+>> +check-qtest-ppc64-y += tests/ivshmem-test$(EXESUF)
+>>  
+>>  check-qtest-sh4-y = tests/endianness-test$(EXESUF)
+>>  
+>> @@ -690,7 +691,7 @@ tests/test-netfilter$(EXESUF): tests/test-netfilter.o $(qtest-obj-y)
+>>  tests/test-filter-mirror$(EXESUF): tests/test-filter-mirror.o $(qtest-obj-y)
+>>  tests/test-filter-redirector$(EXESUF): tests/test-filter-redirector.o $(qtest-obj-y)
+>>  tests/test-x86-cpuid-compat$(EXESUF): tests/test-x86-cpuid-compat.o $(qtest-obj-y)
+>> -tests/ivshmem-test$(EXESUF): tests/ivshmem-test.o contrib/ivshmem-server/ivshmem-server.o $(libqos-pc-obj-y)
+>> +tests/ivshmem-test$(EXESUF): tests/ivshmem-test.o contrib/ivshmem-server/ivshmem-server.o $(libqos-pc-obj-y) $(libqos-spapr-obj-y)
+>>  tests/vhost-user-bridge$(EXESUF): tests/vhost-user-bridge.o
+>>  tests/test-uuid$(EXESUF): tests/test-uuid.o $(test-util-obj-y)
+>>  tests/test-arm-mptimer$(EXESUF): tests/test-arm-mptimer.o
+>> diff --git a/tests/ivshmem-test.c b/tests/ivshmem-test.c
+>> index 04a5c5d..5c6dc38 100644
+>> --- a/tests/ivshmem-test.c
+>> +++ b/tests/ivshmem-test.c
+>> @@ -11,8 +11,9 @@
+>>  #include "qemu/osdep.h"
+>>  #include <glib/gstdio.h>
+>>  #include "contrib/ivshmem-server/ivshmem-server.h"
+>> -#include "libqos/pci-pc.h"
+>>  #include "libqtest.h"
+>> +#include "libqos/libqos-pc.h"
+>> +#include "libqos/libqos-spapr.h"
+>>  #include "qemu-common.h"
+>>  
+>>  #define TMPSHMSIZE (1 << 20)
+>> @@ -40,9 +41,8 @@ static QPCIDevice *get_device(QPCIBus *pcibus)
+>>  }
+>>  
+>>  typedef struct _IVState {
+>> -    QTestState *qtest;
+>> +    QOSState *qs;
+>>      QPCIBar reg_bar, mem_bar;
+>> -    QPCIBus *pcibus;
+>>      QPCIDevice *dev;
+>>  } IVState;
+>>  
+>> @@ -74,7 +74,7 @@ static inline unsigned in_reg(IVState *s, enum Reg reg)
+>>      QTestState *qtest = global_qtest;
+>>      unsigned res;
+>>  
+>> -    global_qtest = s->qtest;
+>> +    global_qtest = s->qs->qts;
+>>      res = qpci_io_readl(s->dev, s->reg_bar, reg);
+>>      g_test_message("*%s -> %x\n", name, res);
+>>      global_qtest = qtest;
+>> @@ -87,7 +87,7 @@ static inline void out_reg(IVState *s, enum Reg reg, unsigned v)
+>>      const char *name = reg2str(reg);
+>>      QTestState *qtest = global_qtest;
+>>  
+>> -    global_qtest = s->qtest;
+>> +    global_qtest = s->qs->qts;
+>>      g_test_message("%x -> *%s\n", v, name);
+>>      qpci_io_writel(s->dev, s->reg_bar, reg, v);
+>>      global_qtest = qtest;
+>> @@ -97,7 +97,7 @@ static inline void read_mem(IVState *s, uint64_t off, void *buf, size_t len)
+>>  {
+>>      QTestState *qtest = global_qtest;
+>>  
+>> -    global_qtest = s->qtest;
+>> +    global_qtest = s->qs->qts;
+>>      qpci_memread(s->dev, s->mem_bar, off, buf, len);
+>>      global_qtest = qtest;
+>>  }
+>> @@ -107,7 +107,7 @@ static inline void write_mem(IVState *s, uint64_t off,
+>>  {
+>>      QTestState *qtest = global_qtest;
+>>  
+>> -    global_qtest = s->qtest;
+>> +    global_qtest = s->qs->qts;
+>>      qpci_memwrite(s->dev, s->mem_bar, off, buf, len);
+>>      global_qtest = qtest;
+>>  }
+>> @@ -115,17 +115,23 @@ static inline void write_mem(IVState *s, uint64_t off,
+>>  static void cleanup_vm(IVState *s)
+>>  {
+>>      g_free(s->dev);
+>> -    qpci_free_pc(s->pcibus);
+>> -    qtest_quit(s->qtest);
+>> +    qtest_shutdown(s->qs);
+>>  }
+>>  
+>>  static void setup_vm_cmd(IVState *s, const char *cmd, bool msix)
+>>  {
+>>      uint64_t barsize;
+>> +    const char *arch = qtest_get_arch();
+>>  
+>> -    s->qtest = qtest_start(cmd);
+>> -    s->pcibus = qpci_init_pc(NULL);
+>> -    s->dev = get_device(s->pcibus);
+>> +    if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
+>> +        s->qs = qtest_pc_boot(cmd);
+>> +    } else if (strcmp(arch, "ppc64") == 0) {
+>> +        s->qs = qtest_spapr_boot(cmd);
+>> +    } else {
+>> +        g_printerr("vshmem-test tests are only available on x86 or ppc64\n");
+> 
+> Typo: s/vshmem/ivshmem
+> 
+> To get here, you need to build and run this manually, as make check only
+> builds and runs this for targets that work.  But the check doesn't hurt,
+> and documents expectations.
+> 
+>> +        exit(EXIT_FAILURE);
+>> +    }
+>> +    s->dev = get_device(s->qs->pcibus);
+>>  
+>>      s->reg_bar = qpci_iomap(s->dev, 0, &barsize);
+>>      g_assert_cmpuint(barsize, ==, 256);
+>> @@ -347,7 +353,7 @@ static void test_ivshmem_server(bool msi)
+>>      g_assert_cmpint(vm1, !=, vm2);
+>>  
+>>      /* check number of MSI-X vectors */
+>> -    global_qtest = s1->qtest;
+>> +    global_qtest = s1->qs->qts;
+>>      if (msi) {
+>>          ret = qpci_msix_table_size(s1->dev);
+>>          g_assert_cmpuint(ret, ==, nvectors);
+>> @@ -370,7 +376,7 @@ static void test_ivshmem_server(bool msi)
+>>      g_assert_cmpuint(ret, !=, 0);
+>>  
+>>      /* ping vm1 -> vm2 on vector 1 */
+>> -    global_qtest = s2->qtest;
+>> +    global_qtest = s2->qs->qts;
+>>      if (msi) {
+>>          ret = qpci_msix_pending(s2->dev, 1);
+>>          g_assert_cmpuint(ret, ==, 0);
+>> @@ -412,6 +418,7 @@ static void test_ivshmem_server_irq(void)
+>>  
+>>  static void test_ivshmem_hotplug(void)
+>>  {
+>> +    const char *arch = qtest_get_arch();
+>>      gchar *opts;
+>>  
+>>      qtest_start("");
+> 
+> Unlike the other tests, this one doesn't refuse to run on unexpected
+> targets.  Intentional?
+
+Yes, because there is no dependencies on libqos PCI implementation, so
+it should always work.
+
+>> @@ -419,7 +426,9 @@ static void test_ivshmem_hotplug(void)
+>>      opts = g_strdup_printf("'shm': '%s', 'size': '1M'", tmpshm);
+>>  
+>>      qpci_plug_device_test("ivshmem", "iv1", PCI_SLOT_HP, opts);
+>> -    qpci_unplug_acpi_device_test("iv1", PCI_SLOT_HP);
+>> +    if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
+>> +        qpci_unplug_acpi_device_test("iv1", PCI_SLOT_HP);
+>> +    }
+> 
+> Disables unplug test for ppc64.
+> 
+>>  
+>>      qtest_end();
+>>      g_free(opts);
+>> @@ -491,6 +500,7 @@ static gchar *mktempshm(int size, int *fd)
+>>  int main(int argc, char **argv)
+>>  {
+>>      int ret, fd;
+>> +    const char *arch = qtest_get_arch();
+>>      gchar dir[] = "/tmp/ivshmem-test.XXXXXX";
+>>  
+>>  #if !GLIB_CHECK_VERSION(2, 31, 0)
+>> @@ -521,8 +531,10 @@ int main(int argc, char **argv)
+>>      qtest_add_func("/ivshmem/memdev", test_ivshmem_memdev);
+>>      if (g_test_slow()) {
+>>          qtest_add_func("/ivshmem/pair", test_ivshmem_pair);
+>> -        qtest_add_func("/ivshmem/server-msi", test_ivshmem_server_msi);
+>> -        qtest_add_func("/ivshmem/server-irq", test_ivshmem_server_irq);
+>> +        if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
+>> +            qtest_add_func("/ivshmem/server-msi", test_ivshmem_server_msi);
+>> +            qtest_add_func("/ivshmem/server-irq", test_ivshmem_server_irq);
+>> +        }
+>>      }
+>>  
+>>      ret = g_test_run();
+> 
+> The commit message should explain things in a bit more detail: the test
+> works only for x86, and is only compiled and executed for x86.  The
+> patch converts it to libqos, adds ppc64, and makes the test fail for
+> targets that don't work.  It also disables the unplug part of test
+> /ivshmem/hotplug for ppc64; please explain why.
+> 
+> Please make the conversion to libqos a separate patch, for easier
+> review.
+> 
+
+Thank you for the review.
+
+I'm going to change this patch according to your comments.
+
+Laurent
