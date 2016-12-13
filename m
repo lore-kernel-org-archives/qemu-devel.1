@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40953)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53821)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cGrh1-0005Gl-VK
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 13:20:48 -0500
+	(envelope-from <armbru@redhat.com>) id 1cGsZ2-0001Bs-Tj
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 14:16:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cGrgy-0006Uw-SR
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 13:20:47 -0500
-Received: from mail-vk0-f50.google.com ([209.85.213.50]:36858)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cGrgy-0006UR-M6
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 13:20:44 -0500
-Received: by mail-vk0-f50.google.com with SMTP id p9so74204825vkd.3
-	for <qemu-devel@nongnu.org>; Tue, 13 Dec 2016 10:20:44 -0800 (PST)
+	(envelope-from <armbru@redhat.com>) id 1cGsYy-0004Om-0f
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 14:16:36 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44422)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cGsYx-0004NS-Rh
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 14:16:31 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <1480432054-12065-1-git-send-email-yuval.shaia@oracle.com>
+	<c809cb3d-6e44-679b-f3b4-3c37bb0252b1@vivier.eu>
+	<decdd3a8-518b-e618-f591-32b1db80c771@weilnetz.de>
+Date: Tue, 13 Dec 2016 20:16:27 +0100
+In-Reply-To: <decdd3a8-518b-e618-f591-32b1db80c771@weilnetz.de> (Stefan Weil's
+	message of "Tue, 13 Dec 2016 13:57:30 +0100")
+Message-ID: <87y3zjljw4.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <1481285870-3396-6-git-send-email-thuth@redhat.com>
-References: <1481285870-3396-1-git-send-email-thuth@redhat.com>
-	<1481285870-3396-6-git-send-email-thuth@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 13 Dec 2016 18:19:22 +0000
-Message-ID: <CAFEAcA-BbkYdTkTWQcqyK-jU+dncnrfDyGwQamMTZ4jr1VqL9A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH 05/20] arm: Move CPU files to target/ folder
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] slirp,
+ disas: Replace min/max with MIN/MAX macros
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,30 +30,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Aurelien Jarno <aurelien@aurel32.net>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Michael Walle <michael@walle.cc>, Laurent Vivier <laurent@vivier.eu>, Yongbok Kim <yongbok.kim@imgtec.com>, Anthony Green <green@moxielogic.com>, Jia Liu <proljc@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Eduardo Habkost <ehabkost@redhat.com>, Max Filippov <jcmvbkbc@gmail.com>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, James Hogan <james.hogan@imgtec.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Marcelo Tosatti <mtosatti@redhat.com>
+To: Stefan Weil <sw@weilnetz.de>
+Cc: Laurent Vivier <laurent@vivier.eu>, Yuval Shaia <yuval.shaia@oracle.com>, samuel.thibault@ens-lyon.org, jan.kiszka@siemens.com, qemu-devel@nongnu.org
 
-On 9 December 2016 at 12:17, Thomas Huth <thuth@redhat.com> wrote:
-> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> index d4160df..60770d4 100644
-> --- a/hw/arm/virt-acpi-build.c
-> +++ b/hw/arm/virt-acpi-build.c
-> @@ -33,7 +33,7 @@
->  #include "qemu/bitmap.h"
->  #include "trace.h"
->  #include "qom/cpu.h"
-> -#include "target-arm/cpu.h"
-> +#include "cpu.h"
->  #include "hw/acpi/acpi-defs.h"
->  #include "hw/acpi/acpi.h"
->  #include "hw/nvram/fw_cfg.h"
+Stefan Weil <sw@weilnetz.de> writes:
 
-Something looks wrong here. We definitely want the ARM
-version of cpu.h, not any random cpu.h. The #include
-filename should make it clear which file we're getting,
-both so it's easier for humans to understand and so that
-one day we might be able to build more than one target
-CPU into the same QEMU binary.
+> Am 13.12.2016 um 13:33 schrieb Laurent Vivier:
+>> Le 29/11/2016 =C3=A0 16:07, Yuval Shaia a =C3=A9crit :
+>>> diff --git a/slirp/slirp.h b/slirp/slirp.h
+>>> index a1f3139..3877f66 100644
+>>> --- a/slirp/slirp.h
+>>> +++ b/slirp/slirp.h
+>>> @@ -292,9 +292,4 @@ int tcp_emu(struct socket *, struct mbuf *);
+>>>  int tcp_ctl(struct socket *);
+>>>  struct tcpcb *tcp_drop(struct tcpcb *tp, int err);
+>>>=20=20
+>>> -#ifndef _WIN32
+>>> -#define min(x,y) ((x) < (y) ? (x) : (y))
+>>> -#define max(x,y) ((x) > (y) ? (x) : (y))
+>>> -#endif
+>>> -
+>> It seems the defines have been added because they are already defined
+>> for Win32.
+>>
+>> If we remove them, do we know if MIN()/MAX() are defined for Win32?
+>> [CC: host W32 maintainer]
+>>
+>> Thanks,
+>> Laurent
+>
+> Neither MIN nor MAX are defined in the header files provided with Mingw-w=
+64.
 
-thanks
--- PMM
+osdep.h provides them, and it's by convention included first by every
+.c.
