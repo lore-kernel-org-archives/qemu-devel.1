@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54636)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59293)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cGsd6-0002b6-4p
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 14:20:53 -0500
+	(envelope-from <hpoussin@reactos.org>) id 1cGt0g-0008As-Op
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 14:45:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cGsd1-0005dJ-1C
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 14:20:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55906)
+	(envelope-from <hpoussin@reactos.org>) id 1cGt0d-0003ZJ-Ha
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 14:45:10 -0500
+Received: from smtp2-g21.free.fr ([2a01:e0c:1:1599::11]:6834)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cGsd0-0005d5-IE
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 14:20:42 -0500
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C034380088
-	for <qemu-devel@nongnu.org>; Tue, 13 Dec 2016 19:20:41 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <1480713496-11213-1-git-send-email-ehabkost@redhat.com>
-	<1480713496-11213-18-git-send-email-ehabkost@redhat.com>
-	<87zik0qgm6.fsf@dusky.pond.sub.org>
-	<20161213125547.GQ3808@thinpad.lan.raisama.net>
-Date: Tue, 13 Dec 2016 20:20:39 +0100
-In-Reply-To: <20161213125547.GQ3808@thinpad.lan.raisama.net> (Eduardo
-	Habkost's message of "Tue, 13 Dec 2016 10:55:47 -0200")
-Message-ID: <87shprljp4.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <hpoussin@reactos.org>)
+	id 1cGt0d-0003Uy-Ai
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 14:45:07 -0500
+From: =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>
+Date: Tue, 13 Dec 2016 20:44:41 +0100
+Message-Id: <1481658281-24243-1-git-send-email-hpoussin@reactos.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH for-2.9 17/17] target-i386: Implement
- query-cpu-model-expansion QMP command
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] rtl8139: correctly handle PHY reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,365 +25,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: libvir-list@redhat.com, Jiri Denemark <jdenemar@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, Jason Wang <jasowang@redhat.com>
 
-Eduardo Habkost <ehabkost@redhat.com> writes:
+According to datasheet:
+"[Bit 15 of Basic Mode Control Register] sets the status and control regi=
+sters
+of the PHY (register 0062-0074) in a default state. This bit is self-clea=
+ring.
+1 =3D software reset; 0 =3D normal operation."
 
-> On Tue, Dec 13, 2016 at 11:16:01AM +0100, Markus Armbruster wrote:
->> Eduardo Habkost <ehabkost@redhat.com> writes:
->> 
->> > Implement query-cpu-model-expansion for target-i386.
->> >
->> > The code needs to be careful to handle non-migration-safe
->> > features ("pmu" and "host-cache-info") according to the expansion
->> > type.
->> >
->> > Cc: libvir-list@redhat.com
->> > Cc: Jiri Denemark <jdenemar@redhat.com>
->> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
->> > ---
->> >  tests/Makefile.include |   3 +
->> >  monitor.c              |   4 +-
->> >  target-i386/cpu.c      | 195 ++++++++++++++++++++++++++++++++++++++++++++++++-
->> >  3 files changed, 200 insertions(+), 2 deletions(-)
->> >
->> > diff --git a/tests/Makefile.include b/tests/Makefile.include
->> > index 63c4347..c7bbfca 100644
->> > --- a/tests/Makefile.include
->> > +++ b/tests/Makefile.include
->> > @@ -251,6 +251,9 @@ check-qtest-x86_64-y += $(check-qtest-i386-y)
->> >  gcov-files-i386-y += i386-softmmu/hw/timer/mc146818rtc.c
->> >  gcov-files-x86_64-y = $(subst i386-softmmu/,x86_64-softmmu/,$(gcov-files-i386-y))
->> >  
->> > +check-simpleqtest-x86_64-y += $(SRC_PATH)/tests/query-cpu-model-test.py
->> > +check-simpleqtest-i386-y += $(SRC_PATH)/tests/query-cpu-model-test.py
->> > +
->> >  check-qtest-alpha-y = tests/boot-serial-test$(EXESUF)
->> >  
->> >  check-qtest-mips-y = tests/endianness-test$(EXESUF)
->> > diff --git a/monitor.c b/monitor.c
->> > index 0841d43..90c12b3 100644
->> > --- a/monitor.c
->> > +++ b/monitor.c
->> > @@ -983,8 +983,10 @@ static void qmp_unregister_commands_hack(void)
->> >  #ifndef TARGET_ARM
->> >      qmp_unregister_command("query-gic-capabilities");
->> >  #endif
->> > -#if !defined(TARGET_S390X)
->> > +#if !defined(TARGET_S390X) && !defined(TARGET_I386)
->> >      qmp_unregister_command("query-cpu-model-expansion");
->> > +#endif
->> > +#if !defined(TARGET_S390X)
->> >      qmp_unregister_command("query-cpu-model-baseline");
->> >      qmp_unregister_command("query-cpu-model-comparison");
->> >  #endif
->> > diff --git a/target-i386/cpu.c b/target-i386/cpu.c
->> > index bf4ac09..198014a 100644
->> > --- a/target-i386/cpu.c
->> > +++ b/target-i386/cpu.c
->> > @@ -29,10 +29,14 @@
->> >  #include "qemu/option.h"
->> >  #include "qemu/config-file.h"
->> >  #include "qapi/qmp/qerror.h"
->> > +#include "qapi/qmp/qstring.h"
->> > +#include "qapi/qmp/qdict.h"
->> > +#include "qapi/qmp/qbool.h"
->> >  
->> >  #include "qapi-types.h"
->> >  #include "qapi-visit.h"
->> >  #include "qapi/visitor.h"
->> > +#include "qom/qom-qobject.h"
->> >  #include "sysemu/arch_init.h"
->> >  
->> >  #if defined(CONFIG_KVM)
->> > @@ -2259,7 +2263,7 @@ static void x86_cpu_apply_props(X86CPU *cpu, PropValue *props)
->> >      }
->> >  }
->> >  
->> > -/* Load data from X86CPUDefinition
->> > +/* Load data from X86CPUDefinition into a X86CPU object
->> >   */
->> >  static void x86_cpu_load_def(X86CPU *cpu, X86CPUDefinition *def, Error **errp)
->> >  {
->> > @@ -2268,6 +2272,11 @@ static void x86_cpu_load_def(X86CPU *cpu, X86CPUDefinition *def, Error **errp)
->> >      char host_vendor[CPUID_VENDOR_SZ + 1];
->> >      FeatureWord w;
->> >  
->> > +    /*NOTE: any property set by this function should be returned by
->> 
->> Space between /* and comment text, please.
->> 
->> Also, consider adding wings to both ends of multi-line comments.
->
-> Will do.
->
->> 
->> > +     * x86_cpu_to_dict(), so CPU model data returned by
->> > +     * query-cpu-model-expansion is always complete.
->> > +     */
->> > +
->> >      /* CPU models only set _minimum_ values for level/xlevel: */
->> >      object_property_set_int(OBJECT(cpu), def->level, "min-level", errp);
->> >      object_property_set_int(OBJECT(cpu), def->xlevel, "min-xlevel", errp);
->> > @@ -2312,6 +2321,190 @@ static void x86_cpu_load_def(X86CPU *cpu, X86CPUDefinition *def, Error **errp)
->> >  
->> >  }
->> >  
->> > +/* Convert CPU model data from X86CPU object to a property dictionary
->> > + * that can recreate exactly the same CPU model.
->> > + *
->> > + * This function does the opposite of x86_cpu_load_def(). Any
->> > + * property changed by x86_cpu_load_def() or instance_init
->> > + * methods should be returned by this function too.
->> > + */
->> > +static void x86_cpu_to_dict(X86CPU *cpu, QDict *props, Error **errp)
->> > +{
->> > +    Object *obj = OBJECT(cpu);
->> > +    FeatureWord w;
->> > +    PropValue *pv;
->> > +
->> > +    /* This code could simply iterate over all writeable properties in the
->> > +     * CPU object, and return all of them. But then the aliases properties
->> 
->> "alias properties"?
->
-> Will fix it.
->
->> 
->> > +     * would be returned as well. Returning only the known features
->> > +     * is more reliable.
->> > +     */
->> > +    qdict_put_obj(props, "min-level",
->> > +                  object_property_get_qobject(obj, "min-level", errp));
->> > +    qdict_put_obj(props, "min-xlevel",
->> > +                  object_property_get_qobject(obj, "min-xlevel", errp));
->> > +
->> > +    qdict_put_obj(props, "family",
->> > +                  object_property_get_qobject(obj, "family", errp));
->> > +    qdict_put_obj(props, "model",
->> > +                  object_property_get_qobject(obj, "model", errp));
->> > +    qdict_put_obj(props, "stepping",
->> > +                  object_property_get_qobject(obj, "stepping", errp));
->> > +    qdict_put_obj(props, "model-id",
->> > +                  object_property_get_qobject(obj, "model-id", errp));
->> 
->> Incorrect use of the error API: if more than one call fails, the second
->> failure will trip the assertion in error_setv().
->> 
->> If errors should not happen here, use &error_abort.
->> 
->> If errors need to be handled, see "Receive and accumulate multiple
->> errors" in error.h.
->> 
->
-> Oops. I will fix it.
->
->> Consider "more than four, use a for":
->> 
->>        static char *prop_name[] = {
->>            "min-level", "min-xlevel", "family", "model", "stepping",
->>            "model-id", NULL
->>        };
->> 
->>        for (pname = prop_name; *pname, pname++) {
->>            qdict_put_obj(props, *pname,
->>                          object_property_get_qobject(obj, *pname,
->>                                                      &error_abort));
->>        }
->
-> Good idea, I will do it.
->
->> 
->> > +
->> > +    for (w = 0; w < FEATURE_WORDS; w++) {
->> > +        FeatureWordInfo *fi = &feature_word_info[w];
->> > +        int bit;
->> > +        for (bit = 0; bit < 32; bit++) {
->> > +            if (!fi->feat_names[bit]) {
->> > +                continue;
->> > +            }
->> > +            qdict_put_obj(props, fi->feat_names[bit],
->> > +                          object_property_get_qobject(obj, fi->feat_names[bit],
->> > +                                                      errp));
->> > +        }
->> > +    }
->> > +
->> > +    for (pv = kvm_default_props; pv->prop; pv++) {
->> > +        qdict_put_obj(props, pv->prop,
->> > +                      object_property_get_qobject(obj, pv->prop, errp));
->> > +    }
->> > +    for (pv = tcg_default_props; pv->prop; pv++) {
->> > +        qdict_put_obj(props, pv->prop,
->> > +                      object_property_get_qobject(obj, pv->prop, errp));
->> > +    }
->> > +
->> > +    qdict_put_obj(props, "vendor",
->> > +                  object_property_get_qobject(obj, "vendor", errp));
->> > +
->> > +    /* Set by "host": */
->> > +    qdict_put_obj(props, "lmce",
->> > +                  object_property_get_qobject(obj, "lmce", errp));
->> > +    qdict_put_obj(props, "pmu",
->> > +                  object_property_get_qobject(obj, "pmu", errp));
->> > +
->> > +
->> > +    /* Other properties configurable by the user: */
->> > +    qdict_put_obj(props, "host-cache-info",
->> > +                  object_property_get_qobject(obj, "host-cache-info", errp));
->> > +}
->> > +
->> > +static void object_apply_props(Object *obj, QDict *props, Error **errp)
->> > +{
->> > +    const QDictEntry *prop;
->> > +    Error *err = NULL;
->> > +
->> > +    for (prop = qdict_first(props); prop; prop = qdict_next(props, prop)) {
->> > +        object_property_set_qobject(obj, qdict_entry_value(prop),
->> > +                                         qdict_entry_key(prop), &err);
->> > +        if (err) {
->> > +            break;
->> > +        }
->> > +    }
->> > +
->> > +    error_propagate(errp, err);
->> > +}
->> > +
->> > +static X86CPU *x86_cpu_from_model(CpuModelInfo *model, Error **errp)
->> > +{
->> > +    X86CPU *xc = NULL;
->> > +    X86CPUClass *xcc;
->> > +    Error *err = NULL;
->> > +
->> > +    xcc = X86_CPU_CLASS(cpu_class_by_name(TYPE_X86_CPU, model->name));
->> > +    if (xcc == NULL) {
->> > +        error_setg(&err, "CPU model '%s' not found", model->name);
->> > +        goto out;
->> > +    }
->> > +
->> > +    xc = X86_CPU(object_new(object_class_get_name(OBJECT_CLASS(xcc))));
->> > +    if (model->has_props) {
->> > +        QDict *d = qobject_to_qdict(model->props);
->> > +        if (!d) {
->> > +            error_setg(&err, "model.props must be a dictionary");
->> > +            goto out;
->> 
->> How can this happen?
->
-> 'props' is 'any' in the QAPI schema, because (it looks like) QAPI
-> doesn't have a 'dict' type.
+This fixes the netcard detection failure in Minoca OS.
 
-I see.
+Signed-off-by: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
+---
+ hw/net/rtl8139.c | 34 +++++++++++++++++++++-------------
+ 1 file changed, 21 insertions(+), 13 deletions(-)
 
->> > +        }
->> > +        object_apply_props(OBJECT(xc), d, &err);
->> > +        if (err) {
->> > +            goto out;
->> > +        }
->> > +    }
->> > +
->> > +    x86_cpu_expand_features(xc, &err);
->> > +    if (err) {
->> > +        goto out;
->> > +    }
->> > +
->> > +out:
->> > +    if (err) {
->> > +        error_propagate(errp, err);
->> > +        object_unref(OBJECT(xc));
->> > +        xc = NULL;
->> > +    }
->> > +    return xc;
->> > +}
->> > +
->> > +CpuModelExpansionInfo *arch_query_cpu_model_expansion(CpuModelExpansionType type,
->> > +                                                      CpuModelInfo *model,
->> > +                                                      Error **errp)
->> > +{
->> > +    X86CPU *xc = NULL;
->> > +    Error *err = NULL;
->> > +    CpuModelExpansionInfo *ret = g_new0(CpuModelExpansionInfo, 1);
->> > +    QDict *props;
->> > +
->> > +    xc = x86_cpu_from_model(model, &err);
->> > +    if (err) {
->> > +        goto out;
->> > +    }
->> > +
->> > +    /* We currently always do full expansion */
->> 
->> This comment made me go "wait, we do full expansion even when @type is
->> CPU_MODEL_EXPANSION_TYPE_STATIC?"  Looks like we first to full
->> expansion, then correct the result according to type.
->
-> The comment is a leftover from a previous version where we didn't
-> even check expansion type. I will remove it (or clarify it).
->
->> 
->> > +    ret->model = g_new0(CpuModelInfo, 1);
->> > +    ret->model->name = g_strdup("base"); /* the only static model */
->> > +    props = qdict_new();
->> > +    ret->model->props = QOBJECT(props);
->> > +    ret->model->has_props = true;
->> > +    x86_cpu_to_dict(xc, props, &err);
->> > +
->> > +    /* Some features (pmu, host-cache-info) are not migration-safe,
->> > +     * and are handled differently depending on expansion type:
->> > +     */
->> > +    if (type ==  CPU_MODEL_EXPANSION_TYPE_STATIC) {
->> 
->> Single space after ==, please.
->
-> Will fix.
->
->> 
->> > +        /* static expansion force migration-unsafe features off: */
->> > +        ret->q_static = ret->migration_safe = true;
->> > +        qdict_del(props, "pmu");
->> > +        qdict_del(props, "host-cache-info");
->> > +    } else if (type == CPU_MODEL_EXPANSION_TYPE_FULL) {
->> > +        QObject *o;
->> > +        /* full expansion clear the static/migration-safe flags
->> > +         * to indicate migration-unsafe features are on:
->> > +         */
->> > +        ret->q_static = true;
->> > +        ret->migration_safe = true;
->> > +
->> > +        o = qdict_get(props, "pmu");
->> > +        if (o && qbool_get_bool(qobject_to_qbool(o))) {
->> > +            ret->q_static = ret->migration_safe = false;
->> > +        }
->> > +        o = qdict_get(props, "host-cache-info");
->> > +        if (o && qbool_get_bool(qobject_to_qbool(o))) {
->> > +            ret->q_static = ret->migration_safe = false;
->> > +        }
->> > +    } else {
->> > +        error_setg(&err, "The requested expansion type is not supported.");
->> 
->> How can this happen?
->> 
->> If it can, it bombs when x86_cpu_to_dict() already set an error (see
->> "use of the error API" above).
->
-> This can happen if we change the QAPI schema to support another
-> expansion type in the future.
-
-I'd make this an assertion, because it's a programming error.
-
->
->> 
->> > +    }
->> > +
->> > +out:
->> > +    object_unref(OBJECT(xc));
->> > +    if (err) {
->> > +        error_propagate(errp, err);
->> > +        qapi_free_CpuModelExpansionInfo(ret);
->> > +        ret = NULL;
->> > +    }
->> > +    return ret;
->> > +}
->> > +
->> >  X86CPU *cpu_x86_init(const char *cpu_model)
->> >  {
->> >      return X86_CPU(cpu_generic_init(TYPE_X86_CPU, cpu_model));
+diff --git a/hw/net/rtl8139.c b/hw/net/rtl8139.c
+index f05e59c..671c7e4 100644
+--- a/hw/net/rtl8139.c
++++ b/hw/net/rtl8139.c
+@@ -1205,6 +1205,20 @@ static void rtl8139_reset_rxring(RTL8139State *s, =
+uint32_t bufferSize)
+     s->RxBufAddr =3D 0;
+ }
+=20
++static void rtl8139_reset_phy(RTL8139State *s)
++{
++    s->BasicModeStatus  =3D 0x7809;
++    s->BasicModeStatus |=3D 0x0020; /* autonegotiation completed */
++    /* preserve link state */
++    s->BasicModeStatus |=3D qemu_get_queue(s->nic)->link_down ? 0 : 0x04=
+;
++
++    s->NWayAdvert    =3D 0x05e1; /* all modes, full duplex */
++    s->NWayLPAR      =3D 0x05e1; /* all modes, full duplex */
++    s->NWayExpansion =3D 0x0001; /* autonegotiation supported */
++
++    s->CSCR =3D CSCR_F_LINK_100 | CSCR_HEART_BIT | CSCR_LD;
++}
++
+ static void rtl8139_reset(DeviceState *d)
+ {
+     RTL8139State *s =3D RTL8139(d);
+@@ -1256,25 +1270,14 @@ static void rtl8139_reset(DeviceState *d)
+     s->Config3 =3D 0x1; /* fast back-to-back compatible */
+     s->Config5 =3D 0x0;
+=20
+-    s->CSCR =3D CSCR_F_LINK_100 | CSCR_HEART_BIT | CSCR_LD;
+-
+     s->CpCmd   =3D 0x0; /* reset C+ mode */
+     s->cplus_enabled =3D 0;
+=20
+-
+ //    s->BasicModeCtrl =3D 0x3100; // 100Mbps, full duplex, autonegotiat=
+ion
+ //    s->BasicModeCtrl =3D 0x2100; // 100Mbps, full duplex
+     s->BasicModeCtrl =3D 0x1000; // autonegotiation
+=20
+-    s->BasicModeStatus  =3D 0x7809;
+-    //s->BasicModeStatus |=3D 0x0040; /* UTP medium */
+-    s->BasicModeStatus |=3D 0x0020; /* autonegotiation completed */
+-    /* preserve link state */
+-    s->BasicModeStatus |=3D qemu_get_queue(s->nic)->link_down ? 0 : 0x04=
+;
+-
+-    s->NWayAdvert    =3D 0x05e1; /* all modes, full duplex */
+-    s->NWayLPAR      =3D 0x05e1; /* all modes, full duplex */
+-    s->NWayExpansion =3D 0x0001; /* autonegotiation supported */
++    rtl8139_reset_phy(s);
+=20
+     /* also reset timer and disable timer interrupt */
+     s->TCTR =3D 0;
+@@ -1469,7 +1472,7 @@ static void rtl8139_BasicModeCtrl_write(RTL8139Stat=
+e *s, uint32_t val)
+     DPRINTF("BasicModeCtrl register write(w) val=3D0x%04x\n", val);
+=20
+     /* mask unwritable bits */
+-    uint32_t mask =3D 0x4cff;
++    uint32_t mask =3D 0xccff;
+=20
+     if (1 || !rtl8139_config_writable(s))
+     {
+@@ -1479,6 +1482,11 @@ static void rtl8139_BasicModeCtrl_write(RTL8139Sta=
+te *s, uint32_t val)
+         mask |=3D 0x0100;
+     }
+=20
++    if (val & 0x8000) {
++        /* Reset PHY */
++        rtl8139_reset_phy(s);
++    }
++
+     val =3D SET_MASKED(val, mask, s->BasicModeCtrl);
+=20
+     s->BasicModeCtrl =3D val;
+--=20
+2.1.4
