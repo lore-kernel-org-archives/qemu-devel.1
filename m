@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53798)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53800)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1cGutJ-0002UH-5g
+	(envelope-from <drjones@redhat.com>) id 1cGutJ-0002UI-6Y
 	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 16:45:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1cGutI-0007Ya-3H
+	(envelope-from <drjones@redhat.com>) id 1cGutI-0007Yf-4B
 	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 16:45:41 -0500
 From: Andrew Jones <drjones@redhat.com>
-Date: Tue, 13 Dec 2016 22:45:15 +0100
-Message-Id: <20161213214522.25548-5-drjones@redhat.com>
+Date: Tue, 13 Dec 2016 22:45:14 +0100
+Message-Id: <20161213214522.25548-4-drjones@redhat.com>
 In-Reply-To: <20161213214522.25548-1-drjones@redhat.com>
 References: <20161213214522.25548-1-drjones@redhat.com>
-Subject: [Qemu-devel] [PATCH 04/11] hw/arm/virt: eliminate struct
- VirtGuestInfoState
+Subject: [Qemu-devel] [PATCH 03/11] hw/arm/virt: use
+ VirtMachineState.smp_cpus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,87 +23,81 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-arm@nongnu.org
 Cc: peter.maydell@linaro.org, zhaoshenglong@huawei.com, mst@redhat.com, imammedo@redhat.com, ehabkost@redhat.com
 
-Instead of allocating a new struct just for VirtGuestInfo and the
-machine_done Notifier, place them inside VirtMachineState. This
-is the mach-virt equivalent of "pc: Eliminate struct
-PcGuestInfoState"
+Most places we need smp_cpus we use vms->smp_cpus already. This
+cleanup makes sure we do everywhere, preparing for the removal
+of the global smp_cpus someday.
 
-Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
 Signed-off-by: Andrew Jones <drjones@redhat.com>
 ---
- hw/arm/virt.c                    | 20 +++++++++++---------
- include/hw/arm/virt-acpi-build.h |  6 ------
- 2 files changed, 11 insertions(+), 15 deletions(-)
+ hw/arm/virt.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
 diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 18aa3672739d..0657f9ae8722 100644
+index 67c0abb30b5b..18aa3672739d 100644
 --- a/hw/arm/virt.c
 +++ b/hw/arm/virt.c
-@@ -76,6 +76,8 @@ typedef struct {
+@@ -583,7 +583,7 @@ static void create_gic(VirtMachineState *vms, qemu_irq *pic)
  
- typedef struct {
-     MachineState parent;
-+    VirtGuestInfo acpi_guest_info;
-+    Notifier machine_done;
-     bool secure;
-     bool highmem;
-     bool virt;
-@@ -1222,12 +1224,13 @@ static void virt_build_smbios(VirtGuestInfo *guest_info)
- }
+     gicdev = qdev_create(NULL, gictype);
+     qdev_prop_set_uint32(gicdev, "revision", type);
+-    qdev_prop_set_uint32(gicdev, "num-cpu", smp_cpus);
++    qdev_prop_set_uint32(gicdev, "num-cpu", vms->smp_cpus);
+     /* Note that the num-irq property counts both internal and external
+      * interrupts; there are always 32 of the former (mandated by GIC spec).
+      */
+@@ -604,7 +604,7 @@ static void create_gic(VirtMachineState *vms, qemu_irq *pic)
+      * maintenance interrupt signal to the appropriate GIC PPI inputs,
+      * and the GIC's IRQ/FIQ/VIRQ/VFIQ interrupt outputs to the CPU's inputs.
+      */
+-    for (i = 0; i < smp_cpus; i++) {
++    for (i = 0; i < vms->smp_cpus; i++) {
+         DeviceState *cpudev = DEVICE(qemu_get_cpu(i));
+         int ppibase = NUM_IRQS + i * GIC_INTERNAL + GIC_NR_SGIS;
+         int irq;
+@@ -629,7 +629,7 @@ static void create_gic(VirtMachineState *vms, qemu_irq *pic)
+                                                      + ARCH_GICV3_MAINT_IRQ));
  
- static
--void virt_guest_info_machine_done(Notifier *notifier, void *data)
-+void virt_machine_done(Notifier *notifier, void *data)
- {
--    VirtGuestInfoState *guest_info_state = container_of(notifier,
--                                              VirtGuestInfoState, machine_done);
--    virt_acpi_setup(&guest_info_state->info);
--    virt_build_smbios(&guest_info_state->info);
-+    VirtMachineState *vms = container_of(notifier, VirtMachineState,
-+                                         machine_done);
-+
-+    virt_acpi_setup(&vms->acpi_guest_info);
-+    virt_build_smbios(&vms->acpi_guest_info);
- }
+         sysbus_connect_irq(gicbusdev, i, qdev_get_gpio_in(cpudev, ARM_CPU_IRQ));
+-        sysbus_connect_irq(gicbusdev, i + smp_cpus,
++        sysbus_connect_irq(gicbusdev, i + vms->smp_cpus,
+                            qdev_get_gpio_in(cpudev, ARM_CPU_FIQ));
+         sysbus_connect_irq(gicbusdev, i + 2 * smp_cpus,
+                            qdev_get_gpio_in(cpudev, ARM_CPU_VIRQ));
+@@ -958,7 +958,7 @@ static void create_fw_cfg(const VirtMachineState *vms, AddressSpace *as)
+     char *nodename;
  
- static void machvirt_init(MachineState *machine)
-@@ -1240,8 +1243,7 @@ static void machvirt_init(MachineState *machine)
-     int n, virt_max_cpus;
-     MemoryRegion *ram = g_new(MemoryRegion, 1);
-     const char *cpu_model = machine->cpu_model;
--    VirtGuestInfoState *guest_info_state = g_malloc0(sizeof *guest_info_state);
--    VirtGuestInfo *guest_info = &guest_info_state->info;
-+    VirtGuestInfo *guest_info = &vms->acpi_guest_info;
-     char **cpustr;
-     ObjectClass *oc;
-     const char *typename;
-@@ -1459,8 +1461,8 @@ static void machvirt_init(MachineState *machine)
-     guest_info->use_highmem = vms->highmem;
-     guest_info->gic_version = vms->gic_version;
-     guest_info->no_its = vmc->no_its;
--    guest_info_state->machine_done.notify = virt_guest_info_machine_done;
--    qemu_add_machine_init_done_notifier(&guest_info_state->machine_done);
-+    vms->machine_done.notify = virt_machine_done;
-+    qemu_add_machine_init_done_notifier(&vms->machine_done);
+     fw_cfg = fw_cfg_init_mem_wide(base + 8, base, 8, base + 16, as);
+-    fw_cfg_add_i16(fw_cfg, FW_CFG_NB_CPUS, (uint16_t)smp_cpus);
++    fw_cfg_add_i16(fw_cfg, FW_CFG_NB_CPUS, (uint16_t)vms->smp_cpus);
  
-     vms->bootinfo.ram_size = machine->ram_size;
+     nodename = g_strdup_printf("/fw-cfg@%" PRIx64, base);
+     qemu_fdt_add_subnode(vms->fdt, nodename);
+@@ -1362,7 +1362,7 @@ static void machvirt_init(MachineState *machine)
+         exit(1);
+     }
+ 
+-    for (n = 0; n < smp_cpus; n++) {
++    for (n = 0; n < vms->smp_cpus; n++) {
+         Object *cpuobj = object_new(typename);
+         if (!vmc->disallow_affinity_adjustment) {
+             /* Adjust MPIDR like 64-bit KVM hosts, which incorporate the
+@@ -1452,7 +1452,7 @@ static void machvirt_init(MachineState *machine)
+     create_fw_cfg(vms, &address_space_memory);
+     rom_set_fw(fw_cfg_find());
+ 
+-    guest_info->smp_cpus = smp_cpus;
++    guest_info->smp_cpus = vms->smp_cpus;
+     guest_info->fw_cfg = fw_cfg_find();
+     guest_info->memmap = vms->memmap;
+     guest_info->irqmap = vms->irqmap;
+@@ -1466,7 +1466,7 @@ static void machvirt_init(MachineState *machine)
      vms->bootinfo.kernel_filename = machine->kernel_filename;
-diff --git a/include/hw/arm/virt-acpi-build.h b/include/hw/arm/virt-acpi-build.h
-index f5ec749b8fea..d74d7a1af650 100644
---- a/include/hw/arm/virt-acpi-build.h
-+++ b/include/hw/arm/virt-acpi-build.h
-@@ -36,12 +36,6 @@ typedef struct VirtGuestInfo {
-     bool no_its;
- } VirtGuestInfo;
- 
--
--typedef struct VirtGuestInfoState {
--    VirtGuestInfo info;
--    Notifier machine_done;
--} VirtGuestInfoState;
--
- void virt_acpi_setup(VirtGuestInfo *guest_info);
- 
- #endif
+     vms->bootinfo.kernel_cmdline = machine->kernel_cmdline;
+     vms->bootinfo.initrd_filename = machine->initrd_filename;
+-    vms->bootinfo.nb_cpus = smp_cpus;
++    vms->bootinfo.nb_cpus = vms->smp_cpus;
+     vms->bootinfo.board_id = -1;
+     vms->bootinfo.loader_start = vms->memmap[VIRT_MEM].base;
+     vms->bootinfo.get_dtb = machvirt_dtb;
 -- 
 2.9.3
