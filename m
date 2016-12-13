@@ -1,35 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40823)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41188)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ilg@livius.net>) id 1cGhQi-0002Ds-CM
-	for Qemu-devel@nongnu.org; Tue, 13 Dec 2016 02:23:17 -0500
+	(envelope-from <peterx@redhat.com>) id 1cGhSe-0003Dr-Le
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 02:25:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ilg@livius.net>) id 1cGhQe-0005LD-AC
-	for Qemu-devel@nongnu.org; Tue, 13 Dec 2016 02:23:16 -0500
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:35036)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ilg@livius.net>) id 1cGhQe-0005E4-0l
-	for Qemu-devel@nongnu.org; Tue, 13 Dec 2016 02:23:12 -0500
-Received: by mail-wm0-f65.google.com with SMTP id a20so16376617wme.2
-	for <Qemu-devel@nongnu.org>; Mon, 12 Dec 2016 23:22:49 -0800 (PST)
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.1 \(3251\))
-From: Liviu Ionescu <ilg@livius.net>
-In-Reply-To: <20161213070453.GB2165@lemon>
-Date: Tue, 13 Dec 2016 09:21:46 +0200
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <79F9B097-F930-430E-800D-83F98F17CBC3@livius.net>
-References: <20161212073915.GC3725@lemon>
-	<96DEA2D0-3822-4A8C-9950-973B84AF4182@livius.net>
-	<20161212093907.GA7918@lemon>
-	<151F368B-80DA-4DF6-837C-E2E0737E4AE6@livius.net>
-	<20161212103616.GB7918@lemon>
-	<220EB996-A454-4FB1-9BAD-B0F4A300345E@livius.net>
-	<20161212122803.GC7918@lemon>
-	<EA7E7748-CB11-49AB-ADBA-555A0A510611@livius.net>
-	<20161212145117.GB21817@lemon>
-	<F71562E4-2D12-4F28-AC3F-70463E91E6A5@livius.net>
-	<20161213070453.GB2165@lemon>
-Subject: Re: [Qemu-devel] experience with SDL2, event loop & main thread
+	(envelope-from <peterx@redhat.com>) id 1cGhSd-0005wG-Ir
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 02:25:16 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41588)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cGhSd-0005w9-DV
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 02:25:15 -0500
+From: Peter Xu <peterx@redhat.com>
+Date: Tue, 13 Dec 2016 15:25:02 +0800
+Message-Id: <1481613903-17467-2-git-send-email-peterx@redhat.com>
+In-Reply-To: <1481613903-17467-1-git-send-email-peterx@redhat.com>
+References: <1481613903-17467-1-git-send-email-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.9 v2 1/2] intel_iommu: check validity for
+ GAW bits in CE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,21 +24,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: QEMU Developer <Qemu-devel@nongnu.org>, "Daniel P. Berrange" <berrange@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: kevin.tian@intel.com, famz@redhat.com, mst@redhat.com, jasowang@redhat.com, alex.williamson@redhat.com, peterx@redhat.com
 
+Currently vt-d Context Entry (CE) only allows 39/48 bits address width.
+If guest software configured more than that, we complain and report.
 
-> On 13 Dec 2016, at 09:04, Fam Zheng <famz@redhat.com> wrote:
->=20
-> using qemu_bh_schedule_idle in the QEMU main loop and poll event there
-> periodically.
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+ hw/i386/intel_iommu.c          | 17 ++++++++++++++++-
+ hw/i386/intel_iommu_internal.h |  2 ++
+ 2 files changed, 18 insertions(+), 1 deletion(-)
 
-ok, so my TODO list includes two items: to move user events on an event =
-notifier and to run the SDL_PollEvent() on qemu_bh_schedule_idle. I'll =
-do this, but after I'll be ready with my new release (planned by the end =
-of this year).
-
-
-regards,
-
-Liviu
+diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+index 5f3e351..517a2a3 100644
+--- a/hw/i386/intel_iommu.c
++++ b/hw/i386/intel_iommu.c
+@@ -599,9 +599,19 @@ static inline uint32_t vtd_get_level_from_context_entry(VTDContextEntry *ce)
+     return 2 + (ce->hi & VTD_CONTEXT_ENTRY_AW);
+ }
+ 
++/* Return 0 if failed to fetch valid aw */
+ static inline uint32_t vtd_get_agaw_from_context_entry(VTDContextEntry *ce)
+ {
+-    return 30 + (ce->hi & VTD_CONTEXT_ENTRY_AW) * 9;
++    uint8_t aw = (ce->hi & VTD_CONTEXT_ENTRY_AW);
++    /*
++     * According to vt-d spec 10.4.2 bits 12:8, SAGAW only allows
++     * 39/48 bits.
++     */
++    if (aw > VTD_CE_AW_48BIT) {
++        error_report("Context entry address width not supported (aw=%d)" , aw);
++        return 0;
++    }
++    return 30 + aw * 9;
+ }
+ 
+ static const uint64_t vtd_paging_entry_rsvd_field[] = {
+@@ -642,6 +652,11 @@ static int vtd_gpa_to_slpte(VTDContextEntry *ce, uint64_t gpa, bool is_write,
+     uint32_t ce_agaw = vtd_get_agaw_from_context_entry(ce);
+     uint64_t access_right_check;
+ 
++    if (!ce_agaw) {
++        error_report("Illegal context entry AGAW");
++        return -VTD_FR_CONTEXT_ENTRY_INV;
++    }
++
+     /* Check if @gpa is above 2^X-1, where X is the minimum of MGAW in CAP_REG
+      * and AW in context-entry.
+      */
+diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
+index 11abfa2..e808c67 100644
+--- a/hw/i386/intel_iommu_internal.h
++++ b/hw/i386/intel_iommu_internal.h
+@@ -406,6 +406,8 @@ typedef struct VTDRootEntry VTDRootEntry;
+ #define VTD_CONTEXT_ENTRY_RSVD_LO   (0xff0ULL | ~VTD_HAW_MASK)
+ /* hi */
+ #define VTD_CONTEXT_ENTRY_AW        7ULL /* Adjusted guest-address-width */
++#define VTD_CE_AW_39BIT             1
++#define VTD_CE_AW_48BIT             2
+ #define VTD_CONTEXT_ENTRY_DID(val)  (((val) >> 8) & VTD_DOMAIN_ID_MASK)
+ #define VTD_CONTEXT_ENTRY_RSVD_HI   0xffffffffff000080ULL
+ 
+-- 
+2.7.4
