@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56770)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56786)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cGkTU-0006Eb-Ox
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 05:38:22 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cGkTX-0006Hu-B1
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 05:38:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cGkTT-0000Nq-K3
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 05:38:20 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cGkTW-0000Og-1m
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 05:38:23 -0500
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 13 Dec 2016 10:36:23 +0000
-Message-Id: <1481625384-15077-23-git-send-email-peter.maydell@linaro.org>
+Date: Tue, 13 Dec 2016 10:36:21 +0000
+Message-Id: <1481625384-15077-21-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1481625384-15077-1-git-send-email-peter.maydell@linaro.org>
 References: <1481625384-15077-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 22/23] target-arm: Enable EL2 feature bit on
- A53 and A57
+Subject: [Qemu-devel] [PATCH 20/23] hw/intc/arm_gicv3: Implement EL2 traps
+ for CPU i/f regs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,123 +23,175 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Christoffer Dall <christoffer.dall@linaro.org>, Andrew Jones <drjones@redhat.com>
 
-Enable the ARM_FEATURE_EL2 bit on Cortex-A52 and
-Cortex-A57, since this is all now sufficiently implemented
-to work with the GICv3. We provide the usual CPU property
-to disable it for backwards compatibility with the older
-virt boards.
+Implement the architecturally required traps from NS EL1
+to EL2 for the CPU interface registers. These fall into
+several different groups:
+ * group-0-only registers all trap if ICH_HRC_EL2.TALL0 is set
+   (exactly the registers covered by gicv3_fiq_access())
+ * group-1-only registers all trap if ICH_HRC_EL2.TALL1 is set
+   (exactly the registers covered by gicv3_irq_access())
+ * DIR traps if ICH_HCR_EL2.TC or ICH_HCR_EL2.TDIR are set
+ * PMR, RPR, CTLR trap if ICH_HCR_EL2.TC is set
+ * SGI0R, SGI1R, ASGI1R trap if ICH_HCR_EL2.TC is set or
+   if HCR_EL2.IMO or HCR_EL2.FMO are set
 
-In this commit, we disable the EL2 feature on the
-virt and ZynpMP boards, so there is no overall effect.
-Another commit will expose a board-level property to
-allow the user to enable EL2.
+We split DIR and the SGI registers out into their own access
+functions, leaving the existing gicv3_irqfiq_access() just
+handling PMR, RPR and CTLR.
+
+This commit doesn't implement support for trapping on
+HSTR_EL2.T12 for the 32-bit registers, as we don't implement
+any of those per-coprocessor trap bits currently and
+probably will want to do those in some more centralized way.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target-arm/cpu.h     |  2 ++
- hw/arm/virt.c        |  4 ++++
- hw/arm/xlnx-zynqmp.c |  2 ++
- target-arm/cpu.c     | 12 ++++++++++++
- target-arm/cpu64.c   |  2 ++
- 5 files changed, 22 insertions(+)
+ hw/intc/arm_gicv3_cpuif.c | 70 ++++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 60 insertions(+), 10 deletions(-)
 
-diff --git a/target-arm/cpu.h b/target-arm/cpu.h
-index be42ffb..51165fa 100644
---- a/target-arm/cpu.h
-+++ b/target-arm/cpu.h
-@@ -574,6 +574,8 @@ struct ARMCPU {
-     bool start_powered_off;
-     /* CPU currently in PSCI powered-off state */
-     bool powered_off;
-+    /* CPU has virtualization extension */
-+    bool has_el2;
-     /* CPU has security extension */
-     bool has_el3;
-     /* CPU has PMU (Performance Monitor Unit) */
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index cce8d2e..5bde68c 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -1368,6 +1368,10 @@ static void machvirt_init(MachineState *machine)
-             object_property_set_bool(cpuobj, false, "has_el3", NULL);
-         }
- 
-+        if (object_property_find(cpuobj, "has_el2", NULL)) {
-+            object_property_set_bool(cpuobj, false, "has_el2", NULL);
-+        }
+diff --git a/hw/intc/arm_gicv3_cpuif.c b/hw/intc/arm_gicv3_cpuif.c
+index e05f6b3..a9ee7fd 100644
+--- a/hw/intc/arm_gicv3_cpuif.c
++++ b/hw/intc/arm_gicv3_cpuif.c
+@@ -1833,9 +1833,17 @@ static CPAccessResult gicv3_irqfiq_access(CPUARMState *env,
+                                           const ARMCPRegInfo *ri, bool isread)
+ {
+     CPAccessResult r = CP_ACCESS_OK;
++    GICv3CPUState *cs = icc_cs_from_env(env);
++    int el = arm_current_el(env);
 +
-         if (vms->psci_conduit != QEMU_PSCI_CONDUIT_DISABLED) {
-             object_property_set_int(cpuobj, vms->psci_conduit,
-                                     "psci-conduit", NULL);
-diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
-index 0d86ba3..bc4e66b 100644
---- a/hw/arm/xlnx-zynqmp.c
-+++ b/hw/arm/xlnx-zynqmp.c
-@@ -258,6 +258,8 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
++    if ((cs->ich_hcr_el2 & ICH_HCR_EL2_TC) &&
++        el == 1 && !arm_is_secure_below_el3(env)) {
++        /* Takes priority over a possible EL3 trap */
++        return CP_ACCESS_TRAP_EL2;
++    }
  
-         object_property_set_bool(OBJECT(&s->apu_cpu[i]),
-                                  s->secure, "has_el3", NULL);
-+        object_property_set_bool(OBJECT(&s->apu_cpu[i]),
-+                                 false, "has_el2", NULL);
-         object_property_set_int(OBJECT(&s->apu_cpu[i]), GIC_BASE_ADDR,
-                                 "reset-cbar", &error_abort);
-         object_property_set_bool(OBJECT(&s->apu_cpu[i]), true, "realized",
-diff --git a/target-arm/cpu.c b/target-arm/cpu.c
-index 5e0d21d..d721cd4 100644
---- a/target-arm/cpu.c
-+++ b/target-arm/cpu.c
-@@ -497,6 +497,9 @@ static Property arm_cpu_reset_hivecs_property =
- static Property arm_cpu_rvbar_property =
-             DEFINE_PROP_UINT64("rvbar", ARMCPU, rvbar, 0);
+     if ((env->cp15.scr_el3 & (SCR_FIQ | SCR_IRQ)) == (SCR_FIQ | SCR_IRQ)) {
+-        switch (arm_current_el(env)) {
++        switch (el) {
+         case 1:
+             if (arm_is_secure_below_el3(env) ||
+                 ((env->cp15.hcr_el2 & (HCR_IMO | HCR_FMO)) == 0)) {
+@@ -1861,13 +1869,47 @@ static CPAccessResult gicv3_irqfiq_access(CPUARMState *env,
+     return r;
+ }
  
-+static Property arm_cpu_has_el2_property =
-+            DEFINE_PROP_BOOL("has_el2", ARMCPU, has_el2, true);
++static CPAccessResult gicv3_dir_access(CPUARMState *env,
++                                       const ARMCPRegInfo *ri, bool isread)
++{
++    GICv3CPUState *cs = icc_cs_from_env(env);
 +
- static Property arm_cpu_has_el3_property =
-             DEFINE_PROP_BOOL("has_el3", ARMCPU, has_el3, true);
- 
-@@ -547,6 +550,11 @@ static void arm_cpu_post_init(Object *obj)
- #endif
-     }
- 
-+    if (arm_feature(&cpu->env, ARM_FEATURE_EL2)) {
-+        qdev_property_add_static(DEVICE(obj), &arm_cpu_has_el2_property,
-+                                 &error_abort);
++    if ((cs->ich_hcr_el2 & ICH_HCR_EL2_TDIR) &&
++        arm_current_el(env) == 1 && !arm_is_secure_below_el3(env)) {
++        /* Takes priority over a possible EL3 trap */
++        return CP_ACCESS_TRAP_EL2;
 +    }
 +
-     if (arm_feature(&cpu->env, ARM_FEATURE_PMU)) {
-         qdev_property_add_static(DEVICE(obj), &arm_cpu_has_pmu_property,
-                                  &error_abort);
-@@ -690,6 +698,10 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
-         cpu->id_aa64pfr0 &= ~0xf000;
-     }
- 
-+    if (!cpu->has_el2) {
-+        unset_feature(env, ARM_FEATURE_EL2);
++    return gicv3_irqfiq_access(env, ri, isread);
++}
++
++static CPAccessResult gicv3_sgi_access(CPUARMState *env,
++                                       const ARMCPRegInfo *ri, bool isread)
++{
++    if ((env->cp15.hcr_el2 & (HCR_IMO | HCR_FMO)) &&
++        arm_current_el(env) == 1 && !arm_is_secure_below_el3(env)) {
++        /* Takes priority over a possible EL3 trap */
++        return CP_ACCESS_TRAP_EL2;
 +    }
 +
-     if (!cpu->has_pmu || !kvm_enabled()) {
-         cpu->has_pmu = false;
-         unset_feature(env, ARM_FEATURE_PMU);
-diff --git a/target-arm/cpu64.c b/target-arm/cpu64.c
-index 73c7f31..670c07a 100644
---- a/target-arm/cpu64.c
-+++ b/target-arm/cpu64.c
-@@ -110,6 +110,7 @@ static void aarch64_a57_initfn(Object *obj)
-     set_feature(&cpu->env, ARM_FEATURE_V8_SHA256);
-     set_feature(&cpu->env, ARM_FEATURE_V8_PMULL);
-     set_feature(&cpu->env, ARM_FEATURE_CRC);
-+    set_feature(&cpu->env, ARM_FEATURE_EL2);
-     set_feature(&cpu->env, ARM_FEATURE_EL3);
-     set_feature(&cpu->env, ARM_FEATURE_PMU);
-     cpu->kvm_target = QEMU_KVM_ARM_TARGET_CORTEX_A57;
-@@ -169,6 +170,7 @@ static void aarch64_a53_initfn(Object *obj)
-     set_feature(&cpu->env, ARM_FEATURE_V8_SHA256);
-     set_feature(&cpu->env, ARM_FEATURE_V8_PMULL);
-     set_feature(&cpu->env, ARM_FEATURE_CRC);
-+    set_feature(&cpu->env, ARM_FEATURE_EL2);
-     set_feature(&cpu->env, ARM_FEATURE_EL3);
-     set_feature(&cpu->env, ARM_FEATURE_PMU);
-     cpu->kvm_target = QEMU_KVM_ARM_TARGET_CORTEX_A53;
++    return gicv3_irqfiq_access(env, ri, isread);
++}
++
+ static CPAccessResult gicv3_fiq_access(CPUARMState *env,
+                                        const ARMCPRegInfo *ri, bool isread)
+ {
+     CPAccessResult r = CP_ACCESS_OK;
++    GICv3CPUState *cs = icc_cs_from_env(env);
++    int el = arm_current_el(env);
++
++    if ((cs->ich_hcr_el2 & ICH_HCR_EL2_TALL0) &&
++        el == 1 && !arm_is_secure_below_el3(env)) {
++        /* Takes priority over a possible EL3 trap */
++        return CP_ACCESS_TRAP_EL2;
++    }
+ 
+     if (env->cp15.scr_el3 & SCR_FIQ) {
+-        switch (arm_current_el(env)) {
++        switch (el) {
+         case 1:
+             if (arm_is_secure_below_el3(env) ||
+                 ((env->cp15.hcr_el2 & HCR_FMO) == 0)) {
+@@ -1897,9 +1939,17 @@ static CPAccessResult gicv3_irq_access(CPUARMState *env,
+                                        const ARMCPRegInfo *ri, bool isread)
+ {
+     CPAccessResult r = CP_ACCESS_OK;
++    GICv3CPUState *cs = icc_cs_from_env(env);
++    int el = arm_current_el(env);
++
++    if ((cs->ich_hcr_el2 & ICH_HCR_EL2_TALL1) &&
++        el == 1 && !arm_is_secure_below_el3(env)) {
++        /* Takes priority over a possible EL3 trap */
++        return CP_ACCESS_TRAP_EL2;
++    }
+ 
+     if (env->cp15.scr_el3 & SCR_IRQ) {
+-        switch (arm_current_el(env)) {
++        switch (el) {
+         case 1:
+             if (arm_is_secure_below_el3(env) ||
+                 ((env->cp15.hcr_el2 & HCR_IMO) == 0)) {
+@@ -2055,7 +2105,7 @@ static const ARMCPRegInfo gicv3_cpuif_reginfo[] = {
+     { .name = "ICC_DIR_EL1", .state = ARM_CP_STATE_BOTH,
+       .opc0 = 3, .opc1 = 0, .crn = 12, .crm = 11, .opc2 = 1,
+       .type = ARM_CP_IO | ARM_CP_NO_RAW,
+-      .access = PL1_W, .accessfn = gicv3_irqfiq_access,
++      .access = PL1_W, .accessfn = gicv3_dir_access,
+       .writefn = icc_dir_write,
+     },
+     { .name = "ICC_RPR_EL1", .state = ARM_CP_STATE_BOTH,
+@@ -2067,37 +2117,37 @@ static const ARMCPRegInfo gicv3_cpuif_reginfo[] = {
+     { .name = "ICC_SGI1R_EL1", .state = ARM_CP_STATE_AA64,
+       .opc0 = 3, .opc1 = 0, .crn = 12, .crm = 11, .opc2 = 5,
+       .type = ARM_CP_IO | ARM_CP_NO_RAW,
+-      .access = PL1_W, .accessfn = gicv3_irqfiq_access,
++      .access = PL1_W, .accessfn = gicv3_sgi_access,
+       .writefn = icc_sgi1r_write,
+     },
+     { .name = "ICC_SGI1R",
+       .cp = 15, .opc1 = 0, .crm = 12,
+       .type = ARM_CP_64BIT | ARM_CP_IO | ARM_CP_NO_RAW,
+-      .access = PL1_W, .accessfn = gicv3_irqfiq_access,
++      .access = PL1_W, .accessfn = gicv3_sgi_access,
+       .writefn = icc_sgi1r_write,
+     },
+     { .name = "ICC_ASGI1R_EL1", .state = ARM_CP_STATE_AA64,
+       .opc0 = 3, .opc1 = 0, .crn = 12, .crm = 11, .opc2 = 6,
+       .type = ARM_CP_IO | ARM_CP_NO_RAW,
+-      .access = PL1_W, .accessfn = gicv3_irqfiq_access,
++      .access = PL1_W, .accessfn = gicv3_sgi_access,
+       .writefn = icc_asgi1r_write,
+     },
+     { .name = "ICC_ASGI1R",
+       .cp = 15, .opc1 = 1, .crm = 12,
+       .type = ARM_CP_64BIT | ARM_CP_IO | ARM_CP_NO_RAW,
+-      .access = PL1_W, .accessfn = gicv3_irqfiq_access,
++      .access = PL1_W, .accessfn = gicv3_sgi_access,
+       .writefn = icc_asgi1r_write,
+     },
+     { .name = "ICC_SGI0R_EL1", .state = ARM_CP_STATE_AA64,
+       .opc0 = 3, .opc1 = 0, .crn = 12, .crm = 11, .opc2 = 7,
+       .type = ARM_CP_IO | ARM_CP_NO_RAW,
+-      .access = PL1_W, .accessfn = gicv3_irqfiq_access,
++      .access = PL1_W, .accessfn = gicv3_sgi_access,
+       .writefn = icc_sgi0r_write,
+     },
+     { .name = "ICC_SGI0R",
+       .cp = 15, .opc1 = 2, .crm = 12,
+       .type = ARM_CP_64BIT | ARM_CP_IO | ARM_CP_NO_RAW,
+-      .access = PL1_W, .accessfn = gicv3_irqfiq_access,
++      .access = PL1_W, .accessfn = gicv3_sgi_access,
+       .writefn = icc_sgi0r_write,
+     },
+     { .name = "ICC_IAR1_EL1", .state = ARM_CP_STATE_BOTH,
 -- 
 2.7.4
