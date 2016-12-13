@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52506)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53608)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cGo5o-0000pD-1t
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 09:30:13 -0500
+	(envelope-from <wouter@grep.be>) id 1cGo9c-0002js-LG
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 09:34:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cGo5k-0005Qq-4Y
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 09:30:08 -0500
-References: <1481633076-24521-1-git-send-email-thuth@redhat.com>
-	<1481637176.27088.132.camel@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <282345c0-fad3-eb66-63c5-3d1d24ab6d6d@redhat.com>
-Date: Tue, 13 Dec 2016 15:29:58 +0100
+	(envelope-from <wouter@grep.be>) id 1cGo9Y-0006iT-Nd
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 09:34:04 -0500
+Received: from [2a01:4f8:140:52e5::2] (port=37050 helo=latin.grep.be)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <wouter@grep.be>) id 1cGo9Y-0006i5-HT
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 09:34:00 -0500
+Date: Tue, 13 Dec 2016 15:33:44 +0100
+From: Wouter Verhelst <w@uter.be>
+Message-ID: <20161213143344.rgcasv4e3waeha5u@grep.be>
+References: <20161212204313.anhjire2gkwd6gzi@grep.be>
+	<4B4EF198-ABE9-4517-A19D-8058AB117342@alex.org.uk>
 MIME-Version: 1.0
-In-Reply-To: <1481637176.27088.132.camel@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw/ppc/spapr: Fix boot path of usb-host
- storage devices
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4B4EF198-ABE9-4517-A19D-8058AB117342@alex.org.uk>
+Subject: Re: [Qemu-devel] [Nbd] [PATCH v5] doc: Add NBD_CMD_BLOCK_STATUS
+ extension (part 2)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,51 +28,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org
+To: Alex Bligh <alex@alex.org.uk>
+Cc: "nbd-general@lists.sourceforge.net" <nbd-general@lists.sourceforge.net>, Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "Stefan stefanha@redhat. com" <stefanha@redhat.com>, John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Pavel Borzenkov <pborzenkov@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, Markus Pargmann <mpa@pengutronix.de>, "Denis V. Lunev" <den@openvz.org>
 
-On 13.12.2016 14:52, Gerd Hoffmann wrote:
-> On Di, 2016-12-13 at 13:44 +0100, Thomas Huth wrote:
->> When passing through a USB storage device to a pseries guest, it
->> is currently not possible to automatically boot from the device
->> if the "bootindex" property has been specified, too (e.g. when using
->> "-device nec-usb-xhci -device usb-host,hostbus=1,hostaddr=2,bootindex=0"
->> at the command line). The problem is that QEMU builds a device tree path
->> like "/pci@800000020000000/usb@0/usb-host@1" and passes it to SLOF
->> in the /chosen/qemu,boot-list property. SLOF, however, probes the
->> USB device, recognizes that it is a storage device and thus changes
->> its name to "storage", and additionally adds a child node for the
->> SCSI LUN, so the correct boot path in SLOF is something like
->> "/pci@800000020000000/usb@0/storage@1/disk@101000000000000" instead.
->> So when we detect an USB mass storage device with SCSI interface,
->> we've got to adjust the firmware boot-device path properly, so that
->> SLOF can automatically boot from the device.
+On Tue, Dec 13, 2016 at 02:12:48PM +0000, Alex Bligh wrote:
 > 
->> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
->> index 208ef7b..fe315b5 100644
->> --- a/hw/ppc/spapr.c
->> +++ b/hw/ppc/spapr.c
->> @@ -2185,6 +2185,15 @@ static char *spapr_get_fw_dev_path(FWPathProvider *p, BusState *bus,
->>          }
->>      }
->>  
->> +    if (strcmp("usb-host", qdev_fw_name(dev)) == 0) {
->> +        USBDevice *usbdev = CAST(USBDevice, dev, TYPE_USB_DEVICE);
->> +
->> +        /* SLOF scans USB storage and adds a "disk" node for the SCSI LUN */
->> +        if (usb_host_dev_is_scsi_storage(usbdev)) {
->> +            return g_strdup_printf("storage@%s/disk", usbdev->port->path);
->> +        }
->> +    }
->> +
+> > On 12 Dec 2016, at 20:43, Wouter Verhelst <w@uter.be> wrote:
+> > 
+> > +- `NBD_OPT_SET_META_CONTEXT` (11)
+> > +
+> > +    Change the set of active metadata contexts. Issuing this command
+> > +    replaces all previously-set metadata contexts; clients must ensure
+> > +    that all metadata contexts they're interested in are selected with
+> > +    the final query that they sent.
+> > +
+> > +    Data:
+> > +    - 32 bits, length of query
+> > +    - String, query to select metadata contexts. The syntax of this
+> > +      query is implementation-defined, except that it MUST start with a
+> > +      namespace. This namespace may be one of the following:
+> > +        - `base:`, for metadata contexts defined by this document;
+> > +        - `nbd-server:`, for metadata contexts defined by the
+> > +          implementation that accompanies this document (none
+> > +          currently);
+> > +        - `x-*:`, where `*` can be replaced by any random string not
+> > +          containing colons, for local experiments. This SHOULD NOT be
+> > +          used by metadata contexts that are expected to e widely used.
+> > +        - third-party implementations can register additional
+> > +          namespaces by simple request to the mailinglist.
 > 
-> Any reason why this is hidden in ppc/spapr?
-> 
-> usb-host could implement the ->fw_name callback instead to create a name
-> depending on the device type ...
+> Surely also we need to specify multiple queries?
 
-The naming is specific to SLOF ... not sure what happens with other
-firmware implementations, so spapr.c sounds like the better place to me
-right now.
+Yes. See my reply to Stefan's mail ;-)
 
- Thomas
+
+-- 
+< ron> I mean, the main *practical* problem with C++, is there's like a dozen
+       people in the world who think they really understand all of its rules,
+       and pretty much all of them are just lying to themselves too.
+ -- #debian-devel, OFTC, 2016-02-12
