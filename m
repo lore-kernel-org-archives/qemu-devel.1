@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53404)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54575)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cGmCr-0000k8-Cy
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 07:29:21 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cGmFf-0002sP-8n
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 07:32:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cGmCn-0003IK-Jj
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 07:29:17 -0500
-Date: Tue, 13 Dec 2016 13:29:00 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20161213122900.GA3918@noname.redhat.com>
-References: <cover.1481290956.git.berto@igalia.com>
-	<468dbeb8-5b1b-669f-f7e5-0d24a4308da8@redhat.com>
-	<w51bmwhck1c.fsf@maestria.local.igalia.com>
-	<756cfb05-61e1-7ee3-435b-93759438a52d@redhat.com>
-	<20161213101635.GC2165@lemon>
+	(envelope-from <peter.maydell@linaro.org>) id 1cGmFZ-0004Lg-NN
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 07:32:11 -0500
+Received: from mail-vk0-f46.google.com ([209.85.213.46]:36052)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cGmFZ-0004LS-JW
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 07:32:05 -0500
+Received: by mail-vk0-f46.google.com with SMTP id p9so58677178vkd.3
+	for <qemu-devel@nongnu.org>; Tue, 13 Dec 2016 04:32:05 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20161213101635.GC2165@lemon>
-Subject: Re: [Qemu-devel] [PATCH RFC 0/1] Allow storing the qcow2 L2 cache
- in disk
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 13 Dec 2016 12:30:44 +0000
+Message-ID: <CAFEAcA_D9wx=EZWE_ypAFPkQcYBhM+7NJaOt7rg=ed-0fExo8w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] cadence_uart: Check if
+ receiver timeout counter is disabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,42 +27,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Andrew Gacek <andrew.gacek@gmail.com>
+Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Laurent Vivier <lvivier@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>
 
-Am 13.12.2016 um 11:16 hat Fam Zheng geschrieben:
-> On Tue, 12/13 09:02, Max Reitz wrote:
-> > > Yes but the use case is that the qcow2 image is stored in a slow disk,
-> > > so things will be faster if we avoid having to read it too often.
-> > > 
-> > > But the data is there and it needs to be read, so we have three options:
-> > > 
-> > >   1) Read it everytime we need it. It slows things down.
-> > >   2) Keep (part of) it in memory. It can use a lot of memory.
-> > >   3) Keep it in a faster disk.
-> > > 
-> > > We're talking about 3) here, and this it not about creating new
-> > > structures, but about changing the storage backend of the existing L2
-> > > cache (disk rather than RAM).
-> > 
-> > I'm arguing that we already have an on-disk L2 structure and that is called
-> > simply the L1-L2 structure in the qcow2 file. The cache only makes sense
-> > because it is in RAM.
-> 
-> I am looking at this problem from a different angle:
-> 
-> Assume a qcow2 image created by a known version of QEMU with the option
-> preallocation=falloc, it is theoretically possible to do a hacky optimization in
-> qcow2 I/O path that, instead of looking up in L1/L2, we can calculate file
-> offset for any given virtual address, by adding the file offset of LBA 0.
-> 
-> If we make this optimization a header extention and add it to the spec, it is no
-> longer a hack, and it should offer nearly the same performance as raw in all
-> cases - if we say raw is doing "identical mapping" from LBA to file offset, this
-> new operation mode of qcow2 file is basically doing a "shift by constant" mapping.
+On 8 December 2016 at 11:21, Andrew Gacek <andrew.gacek@gmail.com> wrote:
+> When register Rcvr_timeout_reg0 (R_RTOR in cadence_uart.c) is set to
+> 0, the receiver timeout counter should be disabled. See page 1801 of
+> "Zynq-7000 AP SoC Technical Reference Manual". This commit adds a
+> such a check before setting the receive timeout interrupt.
+>
+> Signed-off-by: Andrew Gacek <andrew.gacek@gmail.com>
+> Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+> ---
+>  hw/char/cadence_uart.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
 
-Is this a scenario that matters in practice, though? If you want
-performance and you don't need COW functionality, just use raw images to
-begin with.
+Thanks; I've applied this to the target-arm.next queue for 2.9.
 
-Kevin
+For future patches, if you send a revised version of a patch it's
+best to send it as a standalone new thread (with a subject that
+says "[PATCH v2]"), not as a reply to the thread that started with
+the original patch. Otherwise our automated scripts and tooling
+for handling patch emails tend not to notice it.
+
+thanks
+-- PMM
