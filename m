@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47354)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49082)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cGhwL-0004qI-HT
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 02:55:58 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cGi2x-00077X-Jw
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 03:02:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cGhwI-0007m7-E5
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 02:55:57 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <1481585316-31612-1-git-send-email-lvivier@redhat.com>
-	<1481585316-31612-5-git-send-email-lvivier@redhat.com>
-Date: Tue, 13 Dec 2016 08:55:49 +0100
-In-Reply-To: <1481585316-31612-5-git-send-email-lvivier@redhat.com> (Laurent
-	Vivier's message of "Tue, 13 Dec 2016 00:28:36 +0100")
-Message-ID: <877f74w9dm.fsf@dusky.pond.sub.org>
+	(envelope-from <mreitz@redhat.com>) id 1cGi2w-00018w-Jo
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 03:02:47 -0500
+References: <cover.1481290956.git.berto@igalia.com>
+	<468dbeb8-5b1b-669f-f7e5-0d24a4308da8@redhat.com>
+	<w51bmwhck1c.fsf@maestria.local.igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <756cfb05-61e1-7ee3-435b-93759438a52d@redhat.com>
+Date: Tue, 13 Dec 2016 09:02:34 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 4/4] qtest: add ivshmem-test for ppc64
+In-Reply-To: <w51bmwhck1c.fsf@maestria.local.igalia.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RFC 0/1] Allow storing the qcow2 L2 cache
+ in disk
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,207 +25,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
-Laurent Vivier <lvivier@redhat.com> writes:
-
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-> ---
->  tests/Makefile.include |  3 ++-
->  tests/ivshmem-test.c   | 46 +++++++++++++++++++++++++++++-----------------
->  2 files changed, 31 insertions(+), 18 deletions(-)
+On 2016-12-12 at 15:13, Alberto Garcia wrote:
+> On Fri 09 Dec 2016 03:21:08 PM CET, Max Reitz wrote:
 >
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index b574964..09fe5b6 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -287,6 +287,7 @@ check-qtest-ppc64-y += tests/test-netfilter$(EXESUF)
->  check-qtest-ppc64-y += tests/test-filter-mirror$(EXESUF)
->  check-qtest-ppc64-y += tests/test-filter-redirector$(EXESUF)
->  check-qtest-ppc64-y += tests/display-vga-test$(EXESUF)
-> +check-qtest-ppc64-y += tests/ivshmem-test$(EXESUF)
->  
->  check-qtest-sh4-y = tests/endianness-test$(EXESUF)
->  
-> @@ -690,7 +691,7 @@ tests/test-netfilter$(EXESUF): tests/test-netfilter.o $(qtest-obj-y)
->  tests/test-filter-mirror$(EXESUF): tests/test-filter-mirror.o $(qtest-obj-y)
->  tests/test-filter-redirector$(EXESUF): tests/test-filter-redirector.o $(qtest-obj-y)
->  tests/test-x86-cpuid-compat$(EXESUF): tests/test-x86-cpuid-compat.o $(qtest-obj-y)
-> -tests/ivshmem-test$(EXESUF): tests/ivshmem-test.o contrib/ivshmem-server/ivshmem-server.o $(libqos-pc-obj-y)
-> +tests/ivshmem-test$(EXESUF): tests/ivshmem-test.o contrib/ivshmem-server/ivshmem-server.o $(libqos-pc-obj-y) $(libqos-spapr-obj-y)
->  tests/vhost-user-bridge$(EXESUF): tests/vhost-user-bridge.o
->  tests/test-uuid$(EXESUF): tests/test-uuid.o $(test-util-obj-y)
->  tests/test-arm-mptimer$(EXESUF): tests/test-arm-mptimer.o
-> diff --git a/tests/ivshmem-test.c b/tests/ivshmem-test.c
-> index 04a5c5d..5c6dc38 100644
-> --- a/tests/ivshmem-test.c
-> +++ b/tests/ivshmem-test.c
-> @@ -11,8 +11,9 @@
->  #include "qemu/osdep.h"
->  #include <glib/gstdio.h>
->  #include "contrib/ivshmem-server/ivshmem-server.h"
-> -#include "libqos/pci-pc.h"
->  #include "libqtest.h"
-> +#include "libqos/libqos-pc.h"
-> +#include "libqos/libqos-spapr.h"
->  #include "qemu-common.h"
->  
->  #define TMPSHMSIZE (1 << 20)
-> @@ -40,9 +41,8 @@ static QPCIDevice *get_device(QPCIBus *pcibus)
->  }
->  
->  typedef struct _IVState {
-> -    QTestState *qtest;
-> +    QOSState *qs;
->      QPCIBar reg_bar, mem_bar;
-> -    QPCIBus *pcibus;
->      QPCIDevice *dev;
->  } IVState;
->  
-> @@ -74,7 +74,7 @@ static inline unsigned in_reg(IVState *s, enum Reg reg)
->      QTestState *qtest = global_qtest;
->      unsigned res;
->  
-> -    global_qtest = s->qtest;
-> +    global_qtest = s->qs->qts;
->      res = qpci_io_readl(s->dev, s->reg_bar, reg);
->      g_test_message("*%s -> %x\n", name, res);
->      global_qtest = qtest;
-> @@ -87,7 +87,7 @@ static inline void out_reg(IVState *s, enum Reg reg, unsigned v)
->      const char *name = reg2str(reg);
->      QTestState *qtest = global_qtest;
->  
-> -    global_qtest = s->qtest;
-> +    global_qtest = s->qs->qts;
->      g_test_message("%x -> *%s\n", v, name);
->      qpci_io_writel(s->dev, s->reg_bar, reg, v);
->      global_qtest = qtest;
-> @@ -97,7 +97,7 @@ static inline void read_mem(IVState *s, uint64_t off, void *buf, size_t len)
->  {
->      QTestState *qtest = global_qtest;
->  
-> -    global_qtest = s->qtest;
-> +    global_qtest = s->qs->qts;
->      qpci_memread(s->dev, s->mem_bar, off, buf, len);
->      global_qtest = qtest;
->  }
-> @@ -107,7 +107,7 @@ static inline void write_mem(IVState *s, uint64_t off,
->  {
->      QTestState *qtest = global_qtest;
->  
-> -    global_qtest = s->qtest;
-> +    global_qtest = s->qs->qts;
->      qpci_memwrite(s->dev, s->mem_bar, off, buf, len);
->      global_qtest = qtest;
->  }
-> @@ -115,17 +115,23 @@ static inline void write_mem(IVState *s, uint64_t off,
->  static void cleanup_vm(IVState *s)
->  {
->      g_free(s->dev);
-> -    qpci_free_pc(s->pcibus);
-> -    qtest_quit(s->qtest);
-> +    qtest_shutdown(s->qs);
->  }
->  
->  static void setup_vm_cmd(IVState *s, const char *cmd, bool msix)
->  {
->      uint64_t barsize;
-> +    const char *arch = qtest_get_arch();
->  
-> -    s->qtest = qtest_start(cmd);
-> -    s->pcibus = qpci_init_pc(NULL);
-> -    s->dev = get_device(s->pcibus);
-> +    if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
-> +        s->qs = qtest_pc_boot(cmd);
-> +    } else if (strcmp(arch, "ppc64") == 0) {
-> +        s->qs = qtest_spapr_boot(cmd);
-> +    } else {
-> +        g_printerr("vshmem-test tests are only available on x86 or ppc64\n");
+>>> In some scenarios, however, there's a different alternative: if the
+>>> qcow2 image is stored in a slow backend (eg. HDD), we could save
+>>> memory by putting the L2 cache in a faster one (SSD) instead of in
+>>> RAM.
+>
+>> Well, from a full design standpoint, it doesn't make a lot of sense to
+>> me:
+>>
+>> We have a two-level on-disk structure for cluster mapping so as to not
+>> waste memory for unused areas and so that we don't need to keep one
+>> large continuous chunk of metadata. Accessing the disk is slow, so we
+>> also have an in-memory cache which is just a single level fully
+>> associative cache replicating the same data (but just a part of it).
+>>
+>> Now you want to replicate all of it and store it on disk. My mind
+>> tells me that is duplicate data: We already have all of the metadata
+>> elsewhere on disk, namely in the qcow2 file, and even better, it is
+>> not stored in a fully associative structure there but directly mapped,
+>> making finding the correct entry much quicker.
+>
+> Yes but the use case is that the qcow2 image is stored in a slow disk,
+> so things will be faster if we avoid having to read it too often.
+>
+> But the data is there and it needs to be read, so we have three options:
+>
+>   1) Read it everytime we need it. It slows things down.
+>   2) Keep (part of) it in memory. It can use a lot of memory.
+>   3) Keep it in a faster disk.
+>
+> We're talking about 3) here, and this it not about creating new
+> structures, but about changing the storage backend of the existing L2
+> cache (disk rather than RAM).
 
-Typo: s/vshmem/ivshmem
+I'm arguing that we already have an on-disk L2 structure and that is 
+called simply the L1-L2 structure in the qcow2 file. The cache only 
+makes sense because it is in RAM.
 
-To get here, you need to build and run this manually, as make check only
-builds and runs this for targets that work.  But the check doesn't hurt,
-and documents expectations.
+>> However, the thing is that the existing structures also only exist in
+>> the original qcow2 file and cannot be just placed anywhere else, as
+>> opposed to our cache. In order to solve this, we would need to
+>> (incompatibly) modify the qcow2 format to allow storing data
+>> independently from metadata. I think this would be certainly doable,
+>> but the question is whether it is worth the effort.
+>
+> You mean split the qcow2 file in two: data and metadata? I don't think
+> it's worth the effort.
 
-> +        exit(EXIT_FAILURE);
-> +    }
-> +    s->dev = get_device(s->qs->pcibus);
->  
->      s->reg_bar = qpci_iomap(s->dev, 0, &barsize);
->      g_assert_cmpuint(barsize, ==, 256);
-> @@ -347,7 +353,7 @@ static void test_ivshmem_server(bool msi)
->      g_assert_cmpint(vm1, !=, vm2);
->  
->      /* check number of MSI-X vectors */
-> -    global_qtest = s1->qtest;
-> +    global_qtest = s1->qs->qts;
->      if (msi) {
->          ret = qpci_msix_table_size(s1->dev);
->          g_assert_cmpuint(ret, ==, nvectors);
-> @@ -370,7 +376,7 @@ static void test_ivshmem_server(bool msi)
->      g_assert_cmpuint(ret, !=, 0);
->  
->      /* ping vm1 -> vm2 on vector 1 */
-> -    global_qtest = s2->qtest;
-> +    global_qtest = s2->qs->qts;
->      if (msi) {
->          ret = qpci_msix_pending(s2->dev, 1);
->          g_assert_cmpuint(ret, ==, 0);
-> @@ -412,6 +418,7 @@ static void test_ivshmem_server_irq(void)
->  
->  static void test_ivshmem_hotplug(void)
->  {
-> +    const char *arch = qtest_get_arch();
->      gchar *opts;
->  
->      qtest_start("");
+That's the thing. I don't know.
 
-Unlike the other tests, this one doesn't refuse to run on unexpected
-targets.  Intentional?
+I definitely like how simple your approach is, but from a design 
+standpoint it is not exactly optimal, because O(n) for a cluster lookup 
+is simply worse than O(1).
 
-> @@ -419,7 +426,9 @@ static void test_ivshmem_hotplug(void)
->      opts = g_strdup_printf("'shm': '%s', 'size': '1M'", tmpshm);
->  
->      qpci_plug_device_test("ivshmem", "iv1", PCI_SLOT_HP, opts);
-> -    qpci_unplug_acpi_device_test("iv1", PCI_SLOT_HP);
-> +    if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
-> +        qpci_unplug_acpi_device_test("iv1", PCI_SLOT_HP);
-> +    }
+>> Maybe we can at least make the cache directly mapped if it is supposed
+>> to cover the whole image? That is, we would basically just load all of
+>> the L2 tables into memory and bypass the existing cache.
+>
+> I don't see how this addresses the original use case that I described.
 
-Disables unplug test for ppc64.
+It just fixes the issue that the cache is fully associative and then the 
+only issue I would have with your approach is that we are keeping 
+duplicate data.
 
->  
->      qtest_end();
->      g_free(opts);
-> @@ -491,6 +500,7 @@ static gchar *mktempshm(int size, int *fd)
->  int main(int argc, char **argv)
->  {
->      int ret, fd;
-> +    const char *arch = qtest_get_arch();
->      gchar dir[] = "/tmp/ivshmem-test.XXXXXX";
->  
->  #if !GLIB_CHECK_VERSION(2, 31, 0)
-> @@ -521,8 +531,10 @@ int main(int argc, char **argv)
->      qtest_add_func("/ivshmem/memdev", test_ivshmem_memdev);
->      if (g_test_slow()) {
->          qtest_add_func("/ivshmem/pair", test_ivshmem_pair);
-> -        qtest_add_func("/ivshmem/server-msi", test_ivshmem_server_msi);
-> -        qtest_add_func("/ivshmem/server-irq", test_ivshmem_server_irq);
-> +        if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
-> +            qtest_add_func("/ivshmem/server-msi", test_ivshmem_server_msi);
-> +            qtest_add_func("/ivshmem/server-irq", test_ivshmem_server_irq);
-> +        }
->      }
->  
->      ret = g_test_run();
+> But leaving that aside, would that improve anything? I don't think the
+> cache itself adds any significant overhead here, IIRC even in your
+> presentation at KVM Forum 2015 qcow2 was comparable to raw as long as
+> all L2 tables were cached in memory.
 
-The commit message should explain things in a bit more detail: the test
-works only for x86, and is only compiled and executed for x86.  The
-patch converts it to libqos, adds ppc64, and makes the test fail for
-targets that don't work.  It also disables the unplug part of test
-/ivshmem/hotplug for ppc64; please explain why.
+I haven't compared CPU usage, though. That may have gone up quite a bit, 
+I don't know. For large enough images, it may even become a bottleneck.
 
-Please make the conversion to libqos a separate patch, for easier
-review.
+Max
