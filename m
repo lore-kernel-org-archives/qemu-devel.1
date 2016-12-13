@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38965)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39390)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cGn26-0001vw-Kk
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 08:22:19 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cGn3U-00035c-TW
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 08:23:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cGn23-00011T-Hq
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 08:22:14 -0500
-Received: from mail-vk0-f41.google.com ([209.85.213.41]:35964)
+	(envelope-from <alex.bennee@linaro.org>) id 1cGn3P-0001O2-Ux
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 08:23:40 -0500
+Received: from mail-wj0-f174.google.com ([209.85.210.174]:35884)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cGn23-000119-5d
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 08:22:11 -0500
-Received: by mail-vk0-f41.google.com with SMTP id p9so60564176vkd.3
-	for <qemu-devel@nongnu.org>; Tue, 13 Dec 2016 05:22:11 -0800 (PST)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cGn3P-0001Fi-Om
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 08:23:35 -0500
+Received: by mail-wj0-f174.google.com with SMTP id tk12so100416767wjb.3
+	for <qemu-devel@nongnu.org>; Tue, 13 Dec 2016 05:23:13 -0800 (PST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Tue, 13 Dec 2016 13:22:05 +0000
+Message-Id: <20161213132205.9114-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <1479133935-63848-3-git-send-email-agraf@suse.de>
-References: <1479133935-63848-1-git-send-email-agraf@suse.de>
-	<1479133935-63848-3-git-send-email-agraf@suse.de>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 13 Dec 2016 13:20:50 +0000
-Message-ID: <CAFEAcA9yW+pOcdE6d6-FUxtVZtEcEXZyEkjwACZa89CbnJ9Y8w@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH RFC v2 2/2] ARM: KVM: Enable in-kernel
- timers with user space gic
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [RFC PATCH] tests/docker: add basic user mapping
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,22 +28,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexander Graf <agraf@suse.de>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, kvm-devel <kvm@vger.kernel.org>, qemu-arm <qemu-arm@nongnu.org>
+To: famz@redhat.com
+Cc: bobby.prani@gmail.com, qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-On 14 November 2016 at 14:32, Alexander Graf <agraf@suse.de> wrote:
-> When running with KVM enabled, you can choose between emulating the
-> gic in kernel or user space. If the kernel supports in-kernel virtualization
-> of the interrupt controller, it will default to that. If not, if will
-> default to user space emulation.
->
-> Unfortunately when running in user mode gic emulation, we miss out on
-> timer events which are only available from kernel space. This patch leverages
-> the new kernel/user space pending line synchronization for those timer events.
->
-> Signed-off-by: Alexander Graf <agraf@suse.de>
+Currently all docker builds are done by exporting a tarball to the
+docker container and running the build as the containers root user.
+Other use cases are possible however and it is possible to map a part
+of users file-system to the container. This is useful for example for
+doing cross-builds of arbitrary source trees. For this to work
+smoothly the container needs to have a user created that maps cleanly
+to the host system.
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+This adds a -u option to the docker script so that:
 
-thanks
--- PMM
+  DEB_ARCH=armhf DEB_TYPE=stable ./tests/docker/docker.py build \
+    -u --include-executable=arm-linux-user/qemu-arm \
+    debian:armhf ./tests/docker/dockerfiles/debian-bootstrap.docker
+
+Will build a container that can then be run like:
+
+  docker run --rm -it -v /home/alex/lsrc/qemu/risu.git/:/src \
+    --user=alex:alex -w /src/ debian:armhf \
+    sh -c "make clean && ./configure -s && make"
+
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ tests/docker/docker.py                           | 19 +++++++++++++++++++
+ tests/docker/dockerfiles/debian-bootstrap.docker |  3 +++
+ 2 files changed, 22 insertions(+)
+
+diff --git a/tests/docker/docker.py b/tests/docker/docker.py
+index 37d83199e7..59baac6bae 100755
+--- a/tests/docker/docker.py
++++ b/tests/docker/docker.py
+@@ -12,6 +12,7 @@
+ # the top-level directory.
+ 
+ import os
++import stat
+ import sys
+ import subprocess
+ import json
+@@ -25,6 +26,7 @@ import signal
+ from tarfile import TarFile, TarInfo
+ from StringIO import StringIO
+ from shutil import copy, rmtree
++from pwd import getpwuid
+ 
+ 
+ DEVNULL = open(os.devnull, 'wb')
+@@ -225,6 +227,8 @@ class BuildCommand(SubCommand):
+                             help="""Specify a binary that will be copied to the
+                             container together with all its dependent
+                             libraries""")
++        parser.add_argument("--user", "-u", action="store_true",
++                            help="Add the current user to images passwd")
+         parser.add_argument("tag",
+                             help="Image Tag")
+         parser.add_argument("dockerfile",
+@@ -260,6 +264,21 @@ class BuildCommand(SubCommand):
+                 _copy_binary_with_libs(args.include_executable,
+                                        docker_dir)
+ 
++            if args.user:
++                uid = os.getuid()
++                uname = getpwuid(uid).pw_name
++                scriptlet = docker_dir+"/setup_user.sh"
++
++                # write scriptlet
++                setup = open(scriptlet, "w")
++                setup.write("#!/bin/sh\n")
++                setup.write("useradd -u %d -U %s" % (uid, uname))
++                setup.close()
++
++                st = os.stat(scriptlet)
++                os.chmod(scriptlet,
++                         st.st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
++
+             dkr.build_image(tag, docker_dir, dockerfile,
+                             quiet=args.quiet, argv=argv)
+ 
+diff --git a/tests/docker/dockerfiles/debian-bootstrap.docker b/tests/docker/dockerfiles/debian-bootstrap.docker
+index 3a9125e497..127782eedf 100644
+--- a/tests/docker/dockerfiles/debian-bootstrap.docker
++++ b/tests/docker/dockerfiles/debian-bootstrap.docker
+@@ -14,6 +14,9 @@ RUN sed -i 's/in_target mount/echo not for docker in_target mount/g' /debootstra
+ # Run stage 2
+ RUN /debootstrap/debootstrap --second-stage
+ 
++# Do we want to tweak the user?
++RUN if test -e /setup_user.sh; then /setup_user.sh; fi
++
+ # At this point we can install additional packages if we want
+ # Duplicate deb line as deb-src
+ RUN cat /etc/apt/sources.list | sed "s/deb/deb-src/" >> /etc/apt/sources.list
+-- 
+2.11.0
