@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56476)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56483)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cGkSs-0005cn-GL
+	(envelope-from <pm215@archaic.org.uk>) id 1cGkSs-0005dB-Rm
 	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 05:37:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cGkSr-0000Ay-EA
+	(envelope-from <pm215@archaic.org.uk>) id 1cGkSs-0000BQ-43
 	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 05:37:42 -0500
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 13 Dec 2016 10:36:12 +0000
-Message-Id: <1481625384-15077-12-git-send-email-peter.maydell@linaro.org>
+Date: Tue, 13 Dec 2016 10:36:11 +0000
+Message-Id: <1481625384-15077-11-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1481625384-15077-1-git-send-email-peter.maydell@linaro.org>
 References: <1481625384-15077-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 11/23] hw/arm/virt: Wire VIRQ, VFIQ,
- maintenance irq lines from GIC to CPU
+Subject: [Qemu-devel] [PATCH 10/23] target-arm: Expose output GPIO line for
+ VCPU maintenance interrupt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,62 +23,45 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Christoffer Dall <christoffer.dall@linaro.org>, Andrew Jones <drjones@redhat.com>
 
-Wire the new VIRQ, VFIQ and maintenance interrupt lines from the
-GIC to each CPU.
+The GICv3 support for virtualization includes an outbound
+maintenance interrupt signal which is asserted when the
+CPU interface wants to signal to the hypervisor that it
+needs attention. Expose this as an outbound GPIO line from
+the CPU object which can be wired up as a physical interrupt
+line by the board code (as we do already for the CPU timers).
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/hw/arm/virt.h |  2 ++
- hw/arm/virt.c         | 14 +++++++++++---
- 2 files changed, 13 insertions(+), 3 deletions(-)
+ target-arm/cpu.h | 2 ++
+ target-arm/cpu.c | 3 +++
+ 2 files changed, 5 insertions(+)
 
-diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-index 9650193..b805b76 100644
---- a/include/hw/arm/virt.h
-+++ b/include/hw/arm/virt.h
-@@ -36,6 +36,8 @@
- #define NUM_GICV2M_SPIS       64
- #define NUM_VIRTIO_TRANSPORTS 32
+diff --git a/target-arm/cpu.h b/target-arm/cpu.h
+index ca5c849..c38488a 100644
+--- a/target-arm/cpu.h
++++ b/target-arm/cpu.h
+@@ -555,6 +555,8 @@ struct ARMCPU {
+     QEMUTimer *gt_timer[NUM_GTIMERS];
+     /* GPIO outputs for generic timer */
+     qemu_irq gt_timer_outputs[NUM_GTIMERS];
++    /* GPIO output for GICv3 maintenance interrupt signal */
++    qemu_irq gicv3_maintenance_interrupt;
  
-+#define ARCH_GICV3_MAINT_IRQ  9
+     /* MemoryRegion to use for secure physical accesses */
+     MemoryRegion *secure_memory;
+diff --git a/target-arm/cpu.c b/target-arm/cpu.c
+index 99f0dbe..5e0d21d 100644
+--- a/target-arm/cpu.c
++++ b/target-arm/cpu.c
+@@ -466,6 +466,9 @@ static void arm_cpu_initfn(Object *obj)
+                                                 arm_gt_stimer_cb, cpu);
+     qdev_init_gpio_out(DEVICE(cpu), cpu->gt_timer_outputs,
+                        ARRAY_SIZE(cpu->gt_timer_outputs));
 +
- #define ARCH_TIMER_VIRT_IRQ   11
- #define ARCH_TIMER_S_EL1_IRQ  13
- #define ARCH_TIMER_NS_EL1_IRQ 14
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 2ca9527..7adb58b 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -583,9 +583,9 @@ static void create_gic(VirtMachineState *vms, qemu_irq *pic, int type,
-         sysbus_mmio_map(gicbusdev, 1, vms->memmap[VIRT_GIC_CPU].base);
-     }
++    qdev_init_gpio_out_named(DEVICE(cpu), &cpu->gicv3_maintenance_interrupt,
++                             "gicv3-maintenance-interrupt", 1);
+ #endif
  
--    /* Wire the outputs from each CPU's generic timer to the
--     * appropriate GIC PPI inputs, and the GIC's IRQ output to
--     * the CPU's IRQ input.
-+    /* Wire the outputs from each CPU's generic timer and the GICv3
-+     * maintenance interrupt signal to the appropriate GIC PPI inputs,
-+     * and the GIC's IRQ/FIQ/VIRQ/VFIQ interrupt outputs to the CPU's inputs.
-      */
-     for (i = 0; i < smp_cpus; i++) {
-         DeviceState *cpudev = DEVICE(qemu_get_cpu(i));
-@@ -607,9 +607,17 @@ static void create_gic(VirtMachineState *vms, qemu_irq *pic, int type,
-                                                    ppibase + timer_irq[irq]));
-         }
- 
-+        qdev_connect_gpio_out_named(cpudev, "gicv3-maintenance-interrupt", 0,
-+                                    qdev_get_gpio_in(gicdev, ppibase
-+                                                     + ARCH_GICV3_MAINT_IRQ));
-+
-         sysbus_connect_irq(gicbusdev, i, qdev_get_gpio_in(cpudev, ARM_CPU_IRQ));
-         sysbus_connect_irq(gicbusdev, i + smp_cpus,
-                            qdev_get_gpio_in(cpudev, ARM_CPU_FIQ));
-+        sysbus_connect_irq(gicbusdev, i + 2 * smp_cpus,
-+                           qdev_get_gpio_in(cpudev, ARM_CPU_VIRQ));
-+        sysbus_connect_irq(gicbusdev, i + 3 * smp_cpus,
-+                           qdev_get_gpio_in(cpudev, ARM_CPU_VFIQ));
-     }
- 
-     for (i = 0; i < NUM_IRQS; i++) {
+     /* DTB consumers generally don't in fact care what the 'compatible'
 -- 
 2.7.4
