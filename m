@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53840)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53850)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1cGutL-0002Wb-D2
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 16:45:44 -0500
+	(envelope-from <drjones@redhat.com>) id 1cGutM-0002XT-0A
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 16:45:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1cGutK-0007a2-5x
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 16:45:43 -0500
+	(envelope-from <drjones@redhat.com>) id 1cGutK-0007aE-PV
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 16:45:44 -0500
 From: Andrew Jones <drjones@redhat.com>
-Date: Tue, 13 Dec 2016 22:45:16 +0100
-Message-Id: <20161213214522.25548-6-drjones@redhat.com>
+Date: Tue, 13 Dec 2016 22:45:17 +0100
+Message-Id: <20161213214522.25548-7-drjones@redhat.com>
 In-Reply-To: <20161213214522.25548-1-drjones@redhat.com>
 References: <20161213214522.25548-1-drjones@redhat.com>
-Subject: [Qemu-devel] [PATCH 05/11] hw/arm/virt: remove
- include/hw/arm/virt-acpi-build.h
+Subject: [Qemu-devel] [PATCH 06/11] hw/arm/virt: move VirtMachineState/Class
+ to virt.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,159 +23,141 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-arm@nongnu.org
 Cc: peter.maydell@linaro.org, zhaoshenglong@huawei.com, mst@redhat.com, imammedo@redhat.com, ehabkost@redhat.com
 
-include/hw/arm/virt-acpi-build.h is only used for VirtGuestInfo,
-which doesn't even necessarily have to be ACPI specific. Move
-VirtGuestInfo to include/hw/arm/virt.h, allowing us to remove
-include/hw/arm/virt-acpi-build.h, and to prepare for even more
-code motion.
+In preparation to share more Virt machine state than just guest-info
+with other mach-virt source files, move the State and Class structures
+to virt.h
 
 Signed-off-by: Andrew Jones <drjones@redhat.com>
 ---
- MAINTAINERS                      |  2 --
- hw/arm/virt-acpi-build.c         |  2 +-
- hw/arm/virt.c                    |  1 -
- include/hw/arm/virt-acpi-build.h | 41 ----------------------------------------
- include/hw/arm/virt.h            | 16 +++++++++++++++-
- 5 files changed, 16 insertions(+), 46 deletions(-)
- delete mode 100644 include/hw/arm/virt-acpi-build.h
+ hw/arm/virt.c         | 51 +++++++--------------------------------------------
+ include/hw/arm/virt.h | 39 +++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 46 insertions(+), 44 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 4a605791fc98..465b9f0f8440 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -508,7 +508,6 @@ M: Shannon Zhao <shannon.zhao@linaro.org>
- L: qemu-arm@nongnu.org
- S: Maintained
- F: hw/arm/virt-acpi-build.c
--F: include/hw/arm/virt-acpi-build.h
- 
- STM32F205
- M: Alistair Francis <alistair@alistair23.me>
-@@ -885,7 +884,6 @@ F: hw/acpi/*
- F: hw/smbios/*
- F: hw/i386/acpi-build.[hc]
- F: hw/arm/virt-acpi-build.c
--F: include/hw/arm/virt-acpi-build.h
- 
- ppc4xx
- M: Alexander Graf <agraf@suse.de>
-diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index d4160dfa7d34..db44e2dd5f12 100644
---- a/hw/arm/virt-acpi-build.c
-+++ b/hw/arm/virt-acpi-build.c
-@@ -29,7 +29,6 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "qemu-common.h"
--#include "hw/arm/virt-acpi-build.h"
- #include "qemu/bitmap.h"
- #include "trace.h"
- #include "qom/cpu.h"
-@@ -43,6 +42,7 @@
- #include "hw/acpi/aml-build.h"
- #include "hw/pci/pcie_host.h"
- #include "hw/pci/pci.h"
-+#include "hw/arm/virt.h"
- #include "sysemu/numa.h"
- #include "kvm_arm.h"
- 
 diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 0657f9ae8722..b137d9bbb689 100644
+index b137d9bbb689..7860fade52f1 100644
 --- a/hw/arm/virt.c
 +++ b/hw/arm/virt.c
-@@ -48,7 +48,6 @@
- #include "qemu/bitops.h"
- #include "qemu/error-report.h"
- #include "hw/pci-host/gpex.h"
--#include "hw/arm/virt-acpi-build.h"
- #include "hw/arm/sysbus-fdt.h"
- #include "hw/platform-bus.h"
- #include "hw/arm/fdt.h"
-diff --git a/include/hw/arm/virt-acpi-build.h b/include/hw/arm/virt-acpi-build.h
-deleted file mode 100644
-index d74d7a1af650..000000000000
---- a/include/hw/arm/virt-acpi-build.h
-+++ /dev/null
-@@ -1,41 +0,0 @@
--/*
-- *
-- * Copyright (c) 2015 HUAWEI TECHNOLOGIES CO.,LTD.
-- *
-- * Author: Shannon Zhao <zhaoshenglong@huawei.com>
-- *
-- * This program is free software; you can redistribute it and/or modify it
-- * under the terms and conditions of the GNU General Public License,
-- * version 2 or later, as published by the Free Software Foundation.
-- *
-- * This program is distributed in the hope it will be useful, but WITHOUT
-- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-- * more details.
-- *
-- * You should have received a copy of the GNU General Public License along with
-- * this program.  If not, see <http://www.gnu.org/licenses/>.
-- */
+@@ -58,50 +58,6 @@
+ #include "qapi/visitor.h"
+ #include "standard-headers/linux/input.h"
+ 
+-/* Number of external interrupt lines to configure the GIC with */
+-#define NUM_IRQS 256
 -
--#ifndef QEMU_VIRT_ACPI_BUILD_H
--#define QEMU_VIRT_ACPI_BUILD_H
+-#define PLATFORM_BUS_NUM_IRQS 64
 -
--#include "qemu-common.h"
--#include "hw/arm/virt.h"
--#include "qemu/notify.h"
+-static ARMPlatformBusSystemParams platform_bus_params;
 -
--#define ACPI_GICC_ENABLED 1
+-typedef struct {
+-    MachineClass parent;
+-    bool disallow_affinity_adjustment;
+-    bool no_its;
+-    bool no_pmu;
+-    bool claim_edge_triggered_timers;
+-} VirtMachineClass;
 -
--typedef struct VirtGuestInfo {
--    int smp_cpus;
--    FWCfgState *fw_cfg;
+-typedef struct {
+-    MachineState parent;
+-    VirtGuestInfo acpi_guest_info;
+-    Notifier machine_done;
+-    bool secure;
+-    bool highmem;
+-    bool virt;
+-    int32_t gic_version;
+-    struct arm_boot_info bootinfo;
 -    const MemMapEntry *memmap;
 -    const int *irqmap;
--    bool use_highmem;
--    int gic_version;
--    bool no_its;
--} VirtGuestInfo;
+-    int smp_cpus;
+-    void *fdt;
+-    int fdt_size;
+-    uint32_t clock_phandle;
+-    uint32_t gic_phandle;
+-    uint32_t msi_phandle;
+-    int psci_conduit;
+-} VirtMachineState;
 -
--void virt_acpi_setup(VirtGuestInfo *guest_info);
+-#define TYPE_VIRT_MACHINE   MACHINE_TYPE_NAME("virt")
+-#define VIRT_MACHINE(obj) \
+-    OBJECT_CHECK(VirtMachineState, (obj), TYPE_VIRT_MACHINE)
+-#define VIRT_MACHINE_GET_CLASS(obj) \
+-    OBJECT_GET_CLASS(VirtMachineClass, obj, TYPE_VIRT_MACHINE)
+-#define VIRT_MACHINE_CLASS(klass) \
+-    OBJECT_CLASS_CHECK(VirtMachineClass, klass, TYPE_VIRT_MACHINE)
 -
--#endif
+-
+ #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
+     static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
+                                                     void *data) \
+@@ -131,6 +87,13 @@ typedef struct {
+     DEFINE_VIRT_MACHINE_LATEST(major, minor, false)
+ 
+ 
++/* Number of external interrupt lines to configure the GIC with */
++#define NUM_IRQS 256
++
++#define PLATFORM_BUS_NUM_IRQS 64
++
++static ARMPlatformBusSystemParams platform_bus_params;
++
+ /* RAM limit in GB. Since VIRT_MEM starts at the 1GB mark, this means
+  * RAM can go up to the 256GB mark, leaving 256GB of the physical
+  * address space unallocated and free for future use between 256G and 512G.
 diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-index b805b7622834..c2c1f6837442 100644
+index c2c1f6837442..77d25dbddb62 100644
 --- a/include/hw/arm/virt.h
 +++ b/include/hw/arm/virt.h
-@@ -32,6 +32,7 @@
- 
+@@ -33,6 +33,8 @@
  #include "qemu-common.h"
  #include "exec/hwaddr.h"
-+#include "qemu/notify.h"
+ #include "qemu/notify.h"
++#include "hw/boards.h"
++#include "hw/arm/arm.h"
  
  #define NUM_GICV2M_SPIS       64
  #define NUM_VIRTIO_TRANSPORTS 32
-@@ -47,6 +48,8 @@
+@@ -89,6 +91,43 @@ typedef struct VirtGuestInfo {
+     bool no_its;
+ } VirtGuestInfo;
  
- #define PPI(irq) ((irq) + 16)
- 
-+#define ACPI_GICC_ENABLED 1
++typedef struct {
++    MachineClass parent;
++    bool disallow_affinity_adjustment;
++    bool no_its;
++    bool no_pmu;
++    bool claim_edge_triggered_timers;
++} VirtMachineClass;
 +
- enum {
-     VIRT_FLASH,
-     VIRT_MEM,
-@@ -76,5 +79,16 @@ typedef struct MemMapEntry {
-     hwaddr size;
- } MemMapEntry;
- 
-+typedef struct VirtGuestInfo {
-+    int smp_cpus;
-+    FWCfgState *fw_cfg;
++typedef struct {
++    MachineState parent;
++    VirtGuestInfo acpi_guest_info;
++    Notifier machine_done;
++    bool secure;
++    bool highmem;
++    bool virt;
++    int32_t gic_version;
++    struct arm_boot_info bootinfo;
 +    const MemMapEntry *memmap;
 +    const int *irqmap;
-+    bool use_highmem;
-+    int gic_version;
-+    bool no_its;
-+} VirtGuestInfo;
++    int smp_cpus;
++    void *fdt;
++    int fdt_size;
++    uint32_t clock_phandle;
++    uint32_t gic_phandle;
++    uint32_t msi_phandle;
++    int psci_conduit;
++} VirtMachineState;
 +
-+void virt_acpi_setup(VirtGuestInfo *guest_info);
++#define TYPE_VIRT_MACHINE   MACHINE_TYPE_NAME("virt")
++#define VIRT_MACHINE(obj) \
++    OBJECT_CHECK(VirtMachineState, (obj), TYPE_VIRT_MACHINE)
++#define VIRT_MACHINE_GET_CLASS(obj) \
++    OBJECT_GET_CLASS(VirtMachineClass, obj, TYPE_VIRT_MACHINE)
++#define VIRT_MACHINE_CLASS(klass) \
++    OBJECT_CLASS_CHECK(VirtMachineClass, klass, TYPE_VIRT_MACHINE)
++
++
+ void virt_acpi_setup(VirtGuestInfo *guest_info);
  
--#endif
-+#endif /* QEMU_ARM_VIRT_H */
+ #endif /* QEMU_ARM_VIRT_H */
 -- 
 2.9.3
