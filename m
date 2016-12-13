@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47021)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47851)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1cGlnZ-00049T-LN
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 07:03:14 -0500
+	(envelope-from <kraxel@redhat.com>) id 1cGlsF-0006IY-00
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 07:07:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1cGlnV-000581-P2
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 07:03:09 -0500
-References: <1481585316-31612-1-git-send-email-lvivier@redhat.com>
-	<1481585316-31612-3-git-send-email-lvivier@redhat.com>
-	<2ca2de12-b712-3390-7a9d-3ef741302e64@redhat.com>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <9862fc5e-9500-fe88-6263-91e959c2f7f9@redhat.com>
-Date: Tue, 13 Dec 2016 13:03:02 +0100
-MIME-Version: 1.0
-In-Reply-To: <2ca2de12-b712-3390-7a9d-3ef741302e64@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 2/4] qtest: add display-vga-test
- to ppc64
+	(envelope-from <kraxel@redhat.com>) id 1cGlsB-00069W-0Z
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 07:07:58 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47464)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cGlsA-00069N-S6
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 07:07:54 -0500
+Message-ID: <1481630872.27088.128.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Tue, 13 Dec 2016 13:07:52 +0100
+In-Reply-To: <alpine.LFD.2.20.1612131703450.6298@wniryva>
+References: <20161213071439.32322-1-ppandit@redhat.com>
+	<1481627861.27088.116.camel@redhat.com>
+	<alpine.LFD.2.20.1612131703450.6298@wniryva>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH] display: virtio-gpu-3d: check virgl
+ capabilities max_size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,65 +29,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+To: P J P <ppandit@redhat.com>
+Cc: Qemu Developers <qemu-devel@nongnu.org>, Zhenhao Hong <zhenhaohong@gmail.com>
 
+> | This is not the guest returning the size, it is the host renderer
+> | library saying how much space it needs ...
+>=20
+>   The library funcion checks 'capset_id' supplied via the 'cmd' object, a=
+s=20
+> 'gc' is initialised from a given command 'cmd'. It sets 'max_size=3D0' if=
+=20
+> capset_id !=3D VREND_CAP_SET.
 
+Ah, ok, that makes sense.
 
-On 13/12/2016 09:40, Thomas Huth wrote:
-> On 13.12.2016 00:28, Laurent Vivier wrote:
->> Only enable for ppc64 in the Makefile, but added
->> code in the file to check cirrus card only on architectures
->> supporting it (alpha, mips, i386, x86_64).
->>
->> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
->> ---
->>  tests/Makefile.include   | 1 +
->>  tests/display-vga-test.c | 7 ++++++-
->>  2 files changed, 7 insertions(+), 1 deletion(-)
->>
->> diff --git a/tests/Makefile.include b/tests/Makefile.include
->> index be6209d..b574964 100644
->> --- a/tests/Makefile.include
->> +++ b/tests/Makefile.include
->> @@ -286,6 +286,7 @@ check-qtest-ppc64-y += $(check-qtest-virtio-y)
->>  check-qtest-ppc64-y += tests/test-netfilter$(EXESUF)
->>  check-qtest-ppc64-y += tests/test-filter-mirror$(EXESUF)
->>  check-qtest-ppc64-y += tests/test-filter-redirector$(EXESUF)
->> +check-qtest-ppc64-y += tests/display-vga-test$(EXESUF)
->>  
->>  check-qtest-sh4-y = tests/endianness-test$(EXESUF)
->>  
->> diff --git a/tests/display-vga-test.c b/tests/display-vga-test.c
->> index 9146021..2d7d24e 100644
->> --- a/tests/display-vga-test.c
->> +++ b/tests/display-vga-test.c
->> @@ -50,9 +50,14 @@ static void pci_virtio_vga(void)
->>  
->>  int main(int argc, char **argv)
->>  {
->> +    const char *arch = qtest_get_arch();
->> +
->>      g_test_init(&argc, &argv, NULL);
->>  
->> -    qtest_add_func("/display/pci/cirrus", pci_cirrus);
->> +    if (strcmp(arch, "alpha") == 0 || strcmp(arch, "i386") == 0 ||
->> +        strcmp(arch, "mips") == 0 || strcmp(arch, "x86_64") == 0) {
->> +        qtest_add_func("/display/pci/cirrus", pci_cirrus);
->> +    }
->>      qtest_add_func("/display/pci/stdvga", pci_stdvga);
->>      qtest_add_func("/display/pci/secondary", pci_secondary);
->>      qtest_add_func("/display/pci/multihead", pci_multihead);
-> 
-> Alternatively, I think you could also check the result of
->  qtest_hmp(global_qtest, "info qdm")
-> to see whether cirrus-vga is available ... but not sure, whether that's
-> really nicer, so:
+I guess we want throw an error (VIRTIO_GPU_RESP_ERR_INVALID_PARAMETER)
+in the error case then instead of leaving resp->hdr.type unset.
 
-I think it's too complicated for a so simple test (it only starts the
-machine with "-device XXX")
-
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-
-Thanks,
-Laurent
+cheers,
+  Gerd
