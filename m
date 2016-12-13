@@ -1,32 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53830)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54468)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cGpVW-0005HS-CB
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 11:00:47 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cGpXk-0006dJ-9A
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 11:03:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cGpVR-0003TG-PH
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 11:00:46 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54608)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cGpVR-0003T3-Bt
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 11:00:41 -0500
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7357C72AE7
-	for <qemu-devel@nongnu.org>; Tue, 13 Dec 2016 16:00:40 +0000 (UTC)
-Date: Tue, 13 Dec 2016 14:00:38 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20161213160038.GV3808@thinpad.lan.raisama.net>
-References: <20161208200737.GA29563@thinpad.lan.raisama.net>
-	<87a8c0qedq.fsf@dusky.pond.sub.org>
-	<20161213124239.GO3808@thinpad.lan.raisama.net>
-	<56cc6442-ba4f-6c5e-9c57-8787acccb6f9@redhat.com>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cGpXe-0004Uj-LF
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 11:03:04 -0500
+Received: from mail-lf0-f67.google.com ([209.85.215.67]:33825)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1cGpXe-0004UN-8z
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 11:02:58 -0500
+Received: by mail-lf0-f67.google.com with SMTP id 96so368425lfs.1
+	for <qemu-devel@nongnu.org>; Tue, 13 Dec 2016 08:02:58 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <56cc6442-ba4f-6c5e-9c57-8787acccb6f9@redhat.com>
-Subject: Re: [Qemu-devel] [RFC] qmp: query-device-slots command
+References: <20161213071439.32322-1-ppandit@redhat.com>
+	<1481627861.27088.116.camel@redhat.com>
+	<alpine.LFD.2.20.1612131703450.6298@wniryva>
+	<1481630872.27088.128.camel@redhat.com>
+	<alpine.LFD.2.20.1612131946260.6601@wniryva>
+In-Reply-To: <alpine.LFD.2.20.1612131946260.6601@wniryva>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 13 Dec 2016 16:01:45 +0000
+Message-ID: <CAJ+F1CLUhToO9jNsx3V88h6aVmswdJE3Z8KtM2j75OVdqy6gHg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] display: virtio-gpu-3d: check virgl
+ capabilities max_size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,86 +34,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, libvir-list@redhat.com, qemu-devel@nongnu.org, Laine Stump <laine@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: P J P <ppandit@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Zhenhao Hong <zhenhaohong@gmail.com>, Qemu Developers <qemu-devel@nongnu.org>
 
-On Tue, Dec 13, 2016 at 04:15:18PM +0200, Marcel Apfelbaum wrote:
-> On 12/13/2016 02:42 PM, Eduardo Habkost wrote:
-> > On Tue, Dec 13, 2016 at 12:04:17PM +0100, Markus Armbruster wrote:
-> > > Quick interface review only:
-> > > 
-> > > Eduardo Habkost <ehabkost@redhat.com> writes:
-> > > 
-> > > > This adds a new command to QMP: query-device-slots. It will allow
-> > > > management software to query possible slots where devices can be
-> > > > plugged.
-> > > > 
-> > > > This implementation of the command will return:
-> > > > 
-> > > > * Multiple PCI slots per bus, in the case of PCI buses;
-> > > > * One slot per bus in the case of the other buses;
-> > > 
-> > > Umm, that doesn't seem right.  For instance, a SCSI bus has multiple
-> > > slots.  The slot address is the SCSI ID.  An IDE bus may have one (SATA)
-> > > or two (PATA).  For more examples, see qdev-device-use.txt section
-> > > "Specifying Bus and Address on Bus".
-> > 
-> > Yes, I should have clarified that: this version changes only PCI
-> > to expose multiple slots, but other buses also need be changed to
-> > implement BusClass::enumerate_slots() properly, too.
-> > 
-> > > 
-> > > > * One slot for each entry from query-hotpluggable-cpus.
-> > > > In the example below, I am not sure if the PCIe ports are all
-> > > > supposed to report all slots, but I didn't find any existing
-> > > > field in PCIBus that would help me figure out the actual number
-> > > > of slots in a given PCI bus.
-> > > > 
-> > > > Git tree
-> > > > --------
-> > > > 
-> > > > This patch needs the previous query-machines series I am working
-> > > > on. The full tree can be found on the git tree at:
-> > > > 
-> > > >   git://github.com/ehabkost/qemu-hacks.git work/query-machines-bus-info
-> > > > 
-> > > > Example output
-> > > > --------------
-> > > > 
-> > > > The following output was returned by QEMU when running it as:
-> > > > 
-> > > >  $ qemu-system-x86_64 -machine q35 \
-> > > >    -readconfig docs/q35-chipset.cfg \
-> > > >    -smp 4,maxcpus=8,sockets=2,cores=2,threads=2
-> > > > 
-> > > >  {
-> > > >     "return": [
-> > > 
-> > > Are you sure >3000 lines of example output make sense here?
-> > 
-> > I'm not. :)
-> > 
-> > That's why I need feedback from the PCI experts. I believe most
-> > of the PCI ports on q35 accept only one device, but I see no code
-> > implementing that restriction, and no obvious PCIBus or
-> > PCIBusClass field indicating that.
-> 
-> Hi,
-> 
-> Sadly there is no such restriction today as far as I know.
-> We trust the user that he knows what he is doing :)
-> and we let libvirt implement the restriction.
-> 
-> I do agree we should fix that.
+Hi
 
-OK, this matches what I saw on the current code.
+On Tue, Dec 13, 2016 at 5:27 PM P J P <ppandit@redhat.com> wrote:
 
-But I would like to understand what exactly should be the rules
-if we fix that. Should we report only 1 slot if
-pci_bus_has_pcie_upstream_port(bus)?
+> +-- On Tue, 13 Dec 2016, Gerd Hoffmann wrote --+
+> | I guess we want throw an error (VIRTIO_GPU_RESP_ERR_INVALID_PARAMETER)
+> | in the error case then instead of leaving resp->hdr.type unset.
+>
+>   I see, okay. Does the patch below look okay?
+>
+> =3D=3D=3D
+> diff --git a/hw/display/virtio-gpu-3d.c b/hw/display/virtio-gpu-3d.c
+> index 758d33a..6ceeba3 100644
+> --- a/hw/display/virtio-gpu-3d.c
+> +++ b/hw/display/virtio-gpu-3d.c
+> @@ -370,8 +370,12 @@ static void virgl_cmd_get_capset(VirtIOGPU *g,
+>
+>      virgl_renderer_get_cap_set(gc.capset_id, &max_ver,
+>                                 &max_size);
+> -    resp =3D g_malloc(sizeof(*resp) + max_size);
+> +    if (!max_size) {
+> +        cmd->error =3D VIRTIO_GPU_RESP_ERR_INVALID_PARAMETER;
+> +        return;
+> +    }
+>
+> +    resp =3D g_malloc(sizeof(*resp) + max_size);
+>      resp->hdr.type =3D VIRTIO_GPU_RESP_OK_CAPSET;
+>      virgl_renderer_fill_caps(gc.capset_id,
+>                               gc.capset_version,
+> =3D=3D=3D
+>
+>
+That looks good to me, waiting for the proper patch.
 
-(Note that pci_bus_has_pcie_upstream_port() doesn't exist in the
-current code, it is added by my patch)
 
--- 
-Eduardo
+> Thank you.
+> --
+> Prasad J Pandit / Red Hat Product Security Team
+> 47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
+>
+> --
+Marc-Andr=C3=A9 Lureau
