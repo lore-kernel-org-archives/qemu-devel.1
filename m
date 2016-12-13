@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34825)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36764)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cGijk-0006MH-IK
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 03:47:02 -0500
+	(envelope-from <liq3ea@gmail.com>) id 1cGis6-0008TO-GI
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 03:55:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cGijg-0005a7-MU
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 03:47:00 -0500
-References: <1481585316-31612-1-git-send-email-lvivier@redhat.com>
-	<1481585316-31612-4-git-send-email-lvivier@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <27f08088-fbfa-848b-ff25-a373918a48e4@redhat.com>
-Date: Tue, 13 Dec 2016 09:46:51 +0100
+	(envelope-from <liq3ea@gmail.com>) id 1cGis3-0008G6-9b
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 03:55:38 -0500
+Received: from mail-io0-f195.google.com ([209.85.223.195]:33017)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1cGis3-00089o-0P
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 03:55:35 -0500
+Received: by mail-io0-f195.google.com with SMTP id p13so27213732ioi.0
+	for <qemu-devel@nongnu.org>; Tue, 13 Dec 2016 00:55:12 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1481585316-31612-4-git-send-email-lvivier@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 3/4] libqos: fix spapr qpci_map()
+In-Reply-To: <583d59a6.dcc6370a.3a361.b5d4@mx.google.com>
+References: <583d59a6.dcc6370a.3a361.b5d4@mx.google.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Tue, 13 Dec 2016 16:54:11 +0800
+Message-ID: <CAKXe6S+BB_72vZLWDhJk65Qm1Uh-2COKEEwM9YyaCF4aL1x1nA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH] audio: ac97: add exit function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,34 +27,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+To: kraxel@redhat.com, qemu-devel@nongnu.org
+Cc: Li Qiang <liqiang6-s@360.cn>
 
-A short patch description would be nice here.
+Ping!
 
-On 13.12.2016 00:28, Laurent Vivier wrote:
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+2016-11-29 18:33 GMT+08:00 Li Qiang <liq3ea@gmail.com>:
+
+> From: Li Qiang <liqiang6-s@360.cn>
+>
+> Currently the ac97 device emulation doesn't have a exit function,
+> hot unplug this device will leak some leak. Add a exit function to
+> avoid this.
+>
+> Signed-off-by: Li Qiang <liqiang6-s@360.cn>
 > ---
->  tests/libqos/pci-spapr.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tests/libqos/pci-spapr.c b/tests/libqos/pci-spapr.c
-> index 1e5d015..2043f1e 100644
-> --- a/tests/libqos/pci-spapr.c
-> +++ b/tests/libqos/pci-spapr.c
-> @@ -193,8 +193,8 @@ QPCIBus *qpci_init_spapr(QGuestAllocator *alloc)
->      ret->pio.size = SPAPR_PCI_IO_WIN_SIZE;
->  
->      /* 32-bit portion of the MMIO window is at PCI address 2..4 GiB */
-> -    ret->mmio32_cpu_base = SPAPR_PCI_BASE + SPAPR_PCI_MMIO32_WIN_SIZE;
-> -    ret->mmio32.pci_base = 0x80000000; /* 2 GiB */
-> +    ret->mmio32_cpu_base = SPAPR_PCI_BASE;
-> +    ret->mmio32.pci_base = SPAPR_PCI_MMIO32_WIN_SIZE;
->      ret->mmio32.size = SPAPR_PCI_MMIO32_WIN_SIZE;
-
-Not sure whether it is really right to use SPAPR_PCI_MMIO32_WIN_SIZE for
-the pci_base? I mean, the WIN_SIZE could also be 1G for example, but the
-base could still be at 2G ? IMHO it's better to keep the old value for
-pci_base here.
-
- Thomas
+>  hw/audio/ac97.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+>
+> diff --git a/hw/audio/ac97.c b/hw/audio/ac97.c
+> index cbd959e..2faed35 100644
+> --- a/hw/audio/ac97.c
+> +++ b/hw/audio/ac97.c
+> @@ -1387,6 +1387,13 @@ static void ac97_realize(PCIDevice *dev, Error
+> **errp)
+>      ac97_on_reset (&s->dev.qdev);
+>  }
+>
+> +static void ac97_exit(PCIDevice *dev)
+> +{
+> +    AC97LinkState *s = DO_UPCAST(AC97LinkState, dev, dev);
+> +
+> +    AUD_remove_card(&s->card);
+> +}
+> +
+>  static int ac97_init (PCIBus *bus)
+>  {
+>      pci_create_simple (bus, -1, "AC97");
+> @@ -1404,6 +1411,7 @@ static void ac97_class_init (ObjectClass *klass,
+> void *data)
+>      PCIDeviceClass *k = PCI_DEVICE_CLASS (klass);
+>
+>      k->realize = ac97_realize;
+> +    k->exit = ac97_exit;
+>      k->vendor_id = PCI_VENDOR_ID_INTEL;
+>      k->device_id = PCI_DEVICE_ID_INTEL_82801AA_5;
+>      k->revision = 0x01;
+> --
+> 1.8.3.1
+>
+>
