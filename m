@@ -1,28 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57818)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57914)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex@alex.org.uk>) id 1cGpjr-0005ua-K7
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 11:15:36 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cGpkO-0006H2-KJ
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 11:16:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex@alex.org.uk>) id 1cGpjn-0008Cd-PY
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 11:15:35 -0500
-Received: from mail.avalus.com ([2001:41c8:10:1dd::10]:49784)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex@alex.org.uk>) id 1cGpjn-0008CP-Jb
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 11:15:31 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cGpkK-0008Jt-O4
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 11:16:08 -0500
+Date: Tue, 13 Dec 2016 17:15:54 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20161213161554.GB3918@noname.redhat.com>
+References: <20161202194854.18737-1-eblake@redhat.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-From: Alex Bligh <alex@alex.org.uk>
-In-Reply-To: <20161213160610.6xlwhvwq7xhee2wg@grep.be>
-Date: Tue, 13 Dec 2016 16:15:28 +0000
-Content-Transfer-Encoding: 7bit
-Message-Id: <1A0E3F59-A361-4F81-91E6-65C6AFC82C4F@alex.org.uk>
-References: <20161212204313.anhjire2gkwd6gzi@grep.be>
-	<2D482F67-8115-48CD-921D-5728BC1AD92B@alex.org.uk>
-	<20161213150343.3g3fxjixbteum7ju@grep.be>
-	<B6B52260-6814-40CB-AA00-E79099B8ED56@alex.org.uk>
-	<20161213160610.6xlwhvwq7xhee2wg@grep.be>
-Subject: Re: [Qemu-devel] [Nbd] [PATCH v5] doc: Add NBD_CMD_BLOCK_STATUS
- extension
+Content-Disposition: inline
+In-Reply-To: <20161202194854.18737-1-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 0/2] less confusing block file names
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,26 +22,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wouter Verhelst <w@uter.be>
-Cc: Alex Bligh <alex@alex.org.uk>, "nbd-general@lists.sourceforge.net" <nbd-general@lists.sourceforge.net>, Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Stefan stefanha@redhat. com" <stefanha@redhat.com>, "Denis V. Lunev" <den@openvz.org>, Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-
-> On 13 Dec 2016, at 16:06, Wouter Verhelst <w@uter.be> wrote:
+Am 02.12.2016 um 20:48 hat Eric Blake geschrieben:
+> no real change from v2 other than trivial rebasing and R-by:
+> https://lists.gnu.org/archive/html/qemu-devel/2016-10/msg07220.html
 > 
->> 
->> "If a server supports the `base:allocation` metadata context, then writing
->> to an extent which has `NBD_STATE_HOLE` clear MUST NOT fail with ENOSPC
->> unless for reasons specified in the definition of another context."
+> but it's been more than a month since the last activity, and the
+> start of the release cycle is as good a time as any to avoid any
+> potential churn on conflicts due to renaming files
 > 
-> That is essentially what I mean, yes. The point though, is that I also
-> think a client should assume the worst.
-> 
-> (additionally, there may be reasons for ENOSPC that the server isn't
-> aware of; so even if NBD_STATE_HOLE is clear, it should still not be an
-> error for the server to return ENOSPC)
+> applies on Kevin's block-next branch for 2.9
 
-All of this suggests 'SHOULD NOT' would be more appropriate than
-'MUST NOT'.
+Thanks, applied to block-next.
 
--- 
-Alex Bligh
+Kevin
