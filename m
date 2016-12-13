@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52192)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52506)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1cGo4u-0000J0-VU
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 09:29:13 -0500
+	(envelope-from <thuth@redhat.com>) id 1cGo5o-0000pD-1t
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 09:30:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1cGo4r-00056E-1i
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 09:29:12 -0500
-References: <20161212040603.27295-1-david@gibson.dropbear.id.au>
-	<20161212040603.27295-3-david@gibson.dropbear.id.au>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <4431c63f-7ecc-d38b-df05-a428c0b98a63@redhat.com>
-Date: Tue, 13 Dec 2016 15:29:05 +0100
+	(envelope-from <thuth@redhat.com>) id 1cGo5k-0005Qq-4Y
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 09:30:08 -0500
+References: <1481633076-24521-1-git-send-email-thuth@redhat.com>
+	<1481637176.27088.132.camel@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <282345c0-fad3-eb66-63c5-3d1d24ab6d6d@redhat.com>
+Date: Tue, 13 Dec 2016 15:29:58 +0100
 MIME-Version: 1.0
-In-Reply-To: <20161212040603.27295-3-david@gibson.dropbear.id.au>
+In-Reply-To: <1481637176.27088.132.camel@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCHv3 2/5] pseries: Stubs for HPT resizing
+Subject: Re: [Qemu-devel] [PATCH] hw/ppc/spapr: Fix boot path of usb-host
+ storage devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,26 +24,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, paulus@samba.org, sjitindarsingh@gmail.com
-Cc: agraf@suse.de, mdroth@linux.vnet.ibm.com, thuth@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org
 
-
-
-On 12/12/2016 05:06, David Gibson wrote:
-> This introduces stub implementations of the H_RESIZE_HPT_PREPARE and
-> H_RESIZE_HPT_COMMIT hypercalls which we hope to add in a PAPR
-> extension to allow run time resizing of a guest's hash page table.  It
-> also adds a new machine property for controlling whether this new
-> facility is available, and logic to check that against availability
-> with KVM (only supported with KVM PR for now).
+On 13.12.2016 14:52, Gerd Hoffmann wrote:
+> On Di, 2016-12-13 at 13:44 +0100, Thomas Huth wrote:
+>> When passing through a USB storage device to a pseries guest, it
+>> is currently not possible to automatically boot from the device
+>> if the "bootindex" property has been specified, too (e.g. when using
+>> "-device nec-usb-xhci -device usb-host,hostbus=1,hostaddr=2,bootindex=0"
+>> at the command line). The problem is that QEMU builds a device tree path
+>> like "/pci@800000020000000/usb@0/usb-host@1" and passes it to SLOF
+>> in the /chosen/qemu,boot-list property. SLOF, however, probes the
+>> USB device, recognizes that it is a storage device and thus changes
+>> its name to "storage", and additionally adds a child node for the
+>> SCSI LUN, so the correct boot path in SLOF is something like
+>> "/pci@800000020000000/usb@0/storage@1/disk@101000000000000" instead.
+>> So when we detect an USB mass storage device with SCSI interface,
+>> we've got to adjust the firmware boot-device path properly, so that
+>> SLOF can automatically boot from the device.
 > 
-> Finally, it adds a new string to the hypertas property in the device
-> tree, advertising to the guest the availability of the HPT resizing
-> hypercalls.  This is a tentative suggested value, and would need to be
-> standardized by PAPR before being merged.
+>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+>> index 208ef7b..fe315b5 100644
+>> --- a/hw/ppc/spapr.c
+>> +++ b/hw/ppc/spapr.c
+>> @@ -2185,6 +2185,15 @@ static char *spapr_get_fw_dev_path(FWPathProvider *p, BusState *bus,
+>>          }
+>>      }
+>>  
+>> +    if (strcmp("usb-host", qdev_fw_name(dev)) == 0) {
+>> +        USBDevice *usbdev = CAST(USBDevice, dev, TYPE_USB_DEVICE);
+>> +
+>> +        /* SLOF scans USB storage and adds a "disk" node for the SCSI LUN */
+>> +        if (usb_host_dev_is_scsi_storage(usbdev)) {
+>> +            return g_strdup_printf("storage@%s/disk", usbdev->port->path);
+>> +        }
+>> +    }
+>> +
+> 
+> Any reason why this is hidden in ppc/spapr?
+> 
+> usb-host could implement the ->fw_name callback instead to create a name
+> depending on the device type ...
 
-Could you explain somewhere what is the aim of the "flags" parameter?
-It could help to understand why we have it as it is not used.
+The naming is specific to SLOF ... not sure what happens with other
+firmware implementations, so spapr.c sounds like the better place to me
+right now.
 
-Thanks,
-Laurent
+ Thomas
