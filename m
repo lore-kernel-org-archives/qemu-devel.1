@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58369)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59777)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1cGkaM-00042p-Eq
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 05:45:28 -0500
+	(envelope-from <pagupta@redhat.com>) id 1cGkgr-0000pP-0T
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 05:52:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1cGkaI-0002rh-HC
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 05:45:26 -0500
-Received: from szxga01-in.huawei.com ([58.251.152.64]:15983)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1cGkaG-0002pl-Kd
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 05:45:22 -0500
-From: "Longpeng(Mike)" <longpeng2@huawei.com>
-Date: Tue, 13 Dec 2016 18:43:00 +0800
-Message-ID: <1481625780-39164-7-git-send-email-longpeng2@huawei.com>
-In-Reply-To: <1481625780-39164-1-git-send-email-longpeng2@huawei.com>
-References: <1481625780-39164-1-git-send-email-longpeng2@huawei.com>
+	(envelope-from <pagupta@redhat.com>) id 1cGkgn-0005dk-5d
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 05:52:09 -0500
+Received: from mx6-phx2.redhat.com ([209.132.183.39]:37245)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1cGkgm-0005bx-TY
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 05:52:05 -0500
+Date: Tue, 13 Dec 2016 05:52:01 -0500 (EST)
+From: Pankaj Gupta <pagupta@redhat.com>
+Message-ID: <995759159.4566665.1481626321833.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20161213071439.32322-1-ppandit@redhat.com>
+References: <20161213071439.32322-1-ppandit@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH for-2.9 v4 6/6] crypto: add HMAC algorithms
- testcases
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] display: virtio-gpu-3d: check virgl
+ capabilities max_size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,309 +27,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: berrange@redhat.com
-Cc: wu.wubin@huawei.com, jianjay.zhou@huawei.com, arei.gonglei@huawei.com, qemu-devel@nongnu.org, "Longpeng(Mike)" <longpeng2@huawei.com>
+To: P J P <ppandit@redhat.com>
+Cc: Qemu Developers <qemu-devel@nongnu.org>, Zhenhao Hong <zhenhaohong@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, Prasad J Pandit <pjp@fedoraproject.org>
 
-This patch add HMAC algorithms testcases
 
-Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
----
- tests/Makefile.include   |   2 +
- tests/test-crypto-hmac.c | 266 +++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 268 insertions(+)
- create mode 100644 tests/test-crypto-hmac.c
+> 
+> From: Prasad J Pandit <pjp@fedoraproject.org>
+> 
+> Virtio GPU device while processing 'VIRTIO_GPU_CMD_GET_CAPSET'
+> command, retrieves the maximum capabilities size to fill in the
+> response object. It continues to fill in capabilities even if
+> retrieved 'max_size' is zero(0), thus resulting in OOB access.
+> Add check to avoid it.
+> 
+> Reported-by: Zhenhao Hong <zhenhaohong@gmail.com>
+> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+> ---
+>  hw/display/virtio-gpu-3d.c | 11 ++++++-----
+>  1 file changed, 6 insertions(+), 5 deletions(-)
+> 
+> diff --git a/hw/display/virtio-gpu-3d.c b/hw/display/virtio-gpu-3d.c
+> index 758d33a..fbfb39f 100644
+> --- a/hw/display/virtio-gpu-3d.c
+> +++ b/hw/display/virtio-gpu-3d.c
+> @@ -371,11 +371,12 @@ static void virgl_cmd_get_capset(VirtIOGPU *g,
+>      virgl_renderer_get_cap_set(gc.capset_id, &max_ver,
+>                                 &max_size);
+>      resp = g_malloc(sizeof(*resp) + max_size);
+> -
+> -    resp->hdr.type = VIRTIO_GPU_RESP_OK_CAPSET;
+> -    virgl_renderer_fill_caps(gc.capset_id,
+> -                             gc.capset_version,
+> -                             (void *)resp->capset_data);
+> +    if (max_size) {
+> +        resp->hdr.type = VIRTIO_GPU_RESP_OK_CAPSET;
+> +        virgl_renderer_fill_caps(gc.capset_id,
+> +                                 gc.capset_version,
+> +                                 (void *)resp->capset_data);
+> +    }
+>      virtio_gpu_ctrl_response(g, cmd, &resp->hdr, sizeof(*resp) + max_size);
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index e98d3b6..4841d58 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -91,6 +91,7 @@ gcov-files-test-qemu-opts-y = qom/test-qemu-opts.c
- check-unit-y += tests/test-write-threshold$(EXESUF)
- gcov-files-test-write-threshold-y = block/write-threshold.c
- check-unit-y += tests/test-crypto-hash$(EXESUF)
-+check-unit-y += tests/test-crypto-hmac$(EXESUF)
- check-unit-y += tests/test-crypto-cipher$(EXESUF)
- check-unit-y += tests/test-crypto-secret$(EXESUF)
- check-unit-$(CONFIG_GNUTLS) += tests/test-crypto-tlscredsx509$(EXESUF)
-@@ -571,6 +572,7 @@ tests/test-opts-visitor$(EXESUF): tests/test-opts-visitor.o $(test-qapi-obj-y)
- tests/test-mul64$(EXESUF): tests/test-mul64.o $(test-util-obj-y)
- tests/test-bitops$(EXESUF): tests/test-bitops.o $(test-util-obj-y)
- tests/test-crypto-hash$(EXESUF): tests/test-crypto-hash.o $(test-crypto-obj-y)
-+tests/test-crypto-hmac$(EXESUF): tests/test-crypto-hmac.o $(test-crypto-obj-y)
- tests/test-crypto-cipher$(EXESUF): tests/test-crypto-cipher.o $(test-crypto-obj-y)
- tests/test-crypto-secret$(EXESUF): tests/test-crypto-secret.o $(test-crypto-obj-y)
- tests/test-crypto-xts$(EXESUF): tests/test-crypto-xts.o $(test-crypto-obj-y)
-diff --git a/tests/test-crypto-hmac.c b/tests/test-crypto-hmac.c
-new file mode 100644
-index 0000000..ee55382
---- /dev/null
-+++ b/tests/test-crypto-hmac.c
-@@ -0,0 +1,266 @@
-+/*
-+ * QEMU Crypto hmac algorithms tests
-+ *
-+ * Copyright (c) 2016 HUAWEI TECHNOLOGIES CO., LTD.
-+ *
-+ * Authors:
-+ *    Longpeng(Mike) <longpeng2@huawei.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or
-+ * (at your option) any later version.  See the COPYING file in the
-+ * top-level directory.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "crypto/init.h"
-+#include "crypto/hmac.h"
-+
-+#define INPUT_TEXT1 "ABCDEFGHIJKLMNOPQRSTUVWXY"
-+#define INPUT_TEXT2 "Zabcdefghijklmnopqrstuvwx"
-+#define INPUT_TEXT3 "yz0123456789"
-+#define INPUT_TEXT INPUT_TEXT1 \
-+              INPUT_TEXT2 \
-+              INPUT_TEXT3
-+
-+#define KEY "monkey monkey monkey monkey"
-+
-+typedef struct QCryptoHmacTestData QCryptoHmacTestData;
-+struct QCryptoHmacTestData {
-+    QCryptoHashAlgorithm alg;
-+    const char *hex_digest;
-+};
-+
-+static QCryptoHmacTestData test_data[] = {
-+    {
-+        .alg = QCRYPTO_HASH_ALG_MD5,
-+        .hex_digest =
-+            "ede9cb83679ba82d88fbeae865b3f8fc",
-+    },
-+    {
-+        .alg = QCRYPTO_HASH_ALG_SHA1,
-+        .hex_digest =
-+            "c7b5a631e3aac975c4ededfcd346e469"
-+            "dbc5f2d1",
-+    },
-+    {
-+        .alg = QCRYPTO_HASH_ALG_SHA224,
-+        .hex_digest =
-+            "5f768179dbb29ca722875d0f461a2e2f"
-+            "597d0210340a84df1a8e9c63",
-+    },
-+    {
-+        .alg = QCRYPTO_HASH_ALG_SHA256,
-+        .hex_digest =
-+            "3798f363c57afa6edaffe39016ca7bad"
-+            "efd1e670afb0e3987194307dec3197db",
-+    },
-+    {
-+        .alg = QCRYPTO_HASH_ALG_SHA384,
-+        .hex_digest =
-+            "d218680a6032d33dccd9882d6a6a7164"
-+            "64f26623be257a9b2919b185294f4a49"
-+            "9e54b190bfd6bc5cedd2cd05c7e65e82",
-+    },
-+    {
-+        .alg = QCRYPTO_HASH_ALG_SHA512,
-+        .hex_digest =
-+            "835a4f5b3750b4c1fccfa88da2f746a4"
-+            "900160c9f18964309bb736c13b59491b"
-+            "8e32d37b724cc5aebb0f554c6338a3b5"
-+            "94c4ba26862b2dadb59b7ede1d08d53e",
-+    },
-+    {
-+        .alg = QCRYPTO_HASH_ALG_RIPEMD160,
-+        .hex_digest =
-+            "94964ed4c1155b62b668c241d67279e5"
-+            "8a711676",
-+    },
-+};
-+
-+static const char hex[] = "0123456789abcdef";
-+
-+static void test_hmac_alloc(void)
-+{
-+    size_t i;
-+
-+    for (i = 0; i < G_N_ELEMENTS(test_data); i++) {
-+        QCryptoHmacTestData *data = &test_data[i];
-+        QCryptoHmac *hmac = NULL;
-+        uint8_t *result = NULL;
-+        size_t resultlen = 0;
-+        Error *err = NULL;
-+        const char *exp_output = NULL;
-+        int ret;
-+        size_t j;
-+
-+        if (!qcrypto_hmac_supports(data->alg)) {
-+            return;
-+        }
-+
-+        exp_output = data->hex_digest;
-+
-+        hmac = qcrypto_hmac_new(data->alg, (const uint8_t *)KEY,
-+                                strlen(KEY), &err);
-+        g_assert(err == NULL);
-+        g_assert(hmac != NULL);
-+
-+        ret = qcrypto_hmac_bytes(hmac, (const char *)INPUT_TEXT,
-+                                 strlen(INPUT_TEXT), &result,
-+                                 &resultlen, &err);
-+        g_assert(err == NULL);
-+        g_assert(ret == 0);
-+
-+        for (j = 0; j < resultlen; j++) {
-+            g_assert(exp_output[j * 2] == hex[(result[j] >> 4) & 0xf]);
-+            g_assert(exp_output[j * 2 + 1] == hex[result[j] & 0xf]);
-+        }
-+
-+        qcrypto_hmac_free(hmac);
-+
-+        g_free(result);
-+    }
-+}
-+
-+static void test_hmac_prealloc(void)
-+{
-+    size_t i;
-+
-+    for (i = 0; i < G_N_ELEMENTS(test_data); i++) {
-+        QCryptoHmacTestData *data = &test_data[i];
-+        QCryptoHmac *hmac = NULL;
-+        uint8_t *result = NULL;
-+        size_t resultlen = 0;
-+        Error *err = NULL;
-+        const char *exp_output = NULL;
-+        int ret;
-+        size_t j;
-+
-+        if (!qcrypto_hmac_supports(data->alg)) {
-+            return;
-+        }
-+
-+        exp_output = data->hex_digest;
-+
-+        resultlen = strlen(exp_output) / 2;
-+        result = g_new0(uint8_t, resultlen);
-+
-+        hmac = qcrypto_hmac_new(data->alg, (const uint8_t *)KEY,
-+                                strlen(KEY), &err);
-+        g_assert(err == NULL);
-+        g_assert(hmac != NULL);
-+
-+        ret = qcrypto_hmac_bytes(hmac, (const char *)INPUT_TEXT,
-+                                 strlen(INPUT_TEXT), &result,
-+                                 &resultlen, &err);
-+        g_assert(err == NULL);
-+        g_assert(ret == 0);
-+
-+        exp_output = data->hex_digest;
-+        for (j = 0; j < resultlen; j++) {
-+            g_assert(exp_output[j * 2] == hex[(result[j] >> 4) & 0xf]);
-+            g_assert(exp_output[j * 2 + 1] == hex[result[j] & 0xf]);
-+        }
-+
-+        qcrypto_hmac_free(hmac);
-+
-+        g_free(result);
-+    }
-+}
-+
-+static void test_hmac_iov(void)
-+{
-+    size_t i;
-+
-+    for (i = 0; i < G_N_ELEMENTS(test_data); i++) {
-+        QCryptoHmacTestData *data = &test_data[i];
-+        QCryptoHmac *hmac = NULL;
-+        uint8_t *result = NULL;
-+        size_t resultlen = 0;
-+        Error *err = NULL;
-+        const char *exp_output = NULL;
-+        int ret;
-+        size_t j;
-+        struct iovec iov[3] = {
-+            { .iov_base = (char *)INPUT_TEXT1, .iov_len = strlen(INPUT_TEXT1) },
-+            { .iov_base = (char *)INPUT_TEXT2, .iov_len = strlen(INPUT_TEXT2) },
-+            { .iov_base = (char *)INPUT_TEXT3, .iov_len = strlen(INPUT_TEXT3) },
-+        };
-+
-+        if (!qcrypto_hmac_supports(data->alg)) {
-+            return;
-+        }
-+
-+        exp_output = data->hex_digest;
-+
-+        hmac = qcrypto_hmac_new(data->alg, (const uint8_t *)KEY,
-+                                strlen(KEY), &err);
-+        g_assert(err == NULL);
-+        g_assert(hmac != NULL);
-+
-+        ret = qcrypto_hmac_bytesv(hmac, iov, 3, &result,
-+                                  &resultlen, &err);
-+        g_assert(err == NULL);
-+        g_assert(ret == 0);
-+
-+        for (j = 0; j < resultlen; j++) {
-+            g_assert(exp_output[j * 2] == hex[(result[j] >> 4) & 0xf]);
-+            g_assert(exp_output[j * 2 + 1] == hex[result[j] & 0xf]);
-+        }
-+
-+        qcrypto_hmac_free(hmac);
-+
-+        g_free(result);
-+    }
-+}
-+
-+static void test_hmac_digest(void)
-+{
-+    size_t i;
-+
-+    for (i = 0; i < G_N_ELEMENTS(test_data); i++) {
-+        QCryptoHmacTestData *data = &test_data[i];
-+        QCryptoHmac *hmac = NULL;
-+        uint8_t *result = NULL;
-+        Error *err = NULL;
-+        const char *exp_output = NULL;
-+        int ret;
-+
-+        if (!qcrypto_hmac_supports(data->alg)) {
-+            return;
-+        }
-+
-+        exp_output = data->hex_digest;
-+
-+        hmac = qcrypto_hmac_new(data->alg, (const uint8_t *)KEY,
-+                                strlen(KEY), &err);
-+        g_assert(err == NULL);
-+        g_assert(hmac != NULL);
-+
-+        ret = qcrypto_hmac_digest(hmac, (const char *)INPUT_TEXT,
-+                                  strlen(INPUT_TEXT), (char **)&result,
-+                                  &err);
-+        g_assert(err == NULL);
-+        g_assert(ret == 0);
-+
-+        g_assert_cmpstr((const char *)result, ==, exp_output);
-+
-+        qcrypto_hmac_free(hmac);
-+
-+        g_free(result);
-+    }
-+}
-+
-+int main(int argc, char **argv)
-+{
-+    g_test_init(&argc, &argv, NULL);
-+
-+    g_assert(qcrypto_init(NULL) == 0);
-+
-+    g_test_add_func("/crypto/hmac/iov", test_hmac_iov);
-+    g_test_add_func("/crypto/hmac/alloc", test_hmac_alloc);
-+    g_test_add_func("/crypto/hmac/prealloc", test_hmac_prealloc);
-+    g_test_add_func("/crypto/hmac/digest", test_hmac_digest);
-+
-+    return g_test_run();
-+}
--- 
-1.8.3.1
+Just one point here for 'max_size=0', do we don't require to set resp->hdr.type?
+If yes,  other patch on list by 'Li Qiang' can also help to avoid sending garbage value.
+
+>      g_free(resp);
+>  }
+> --
+> 2.9.3
+> 
+> 
+> 
