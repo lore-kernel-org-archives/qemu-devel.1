@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56544)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37260)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cGcxp-0003u7-CE
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 21:37:10 -0500
+	(envelope-from <herbert@gondor.apana.org.au>) id 1cGdqe-0005tK-Ll
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 22:33:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cGcxm-0007Mx-6L
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 21:37:09 -0500
-Received: from [59.151.112.132] (port=19188 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cGcxl-0007MS-87
-	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 21:37:06 -0500
-References: <20161209203954.GW4027@thinpad.lan.raisama.net>
-	<584E36CD.50405@cn.fujitsu.com>
-	<20161212172915.GP4074@stefanha-x1.localdomain>
-	<20161212202617-mutt-send-email-mst@kernel.org>
-	<20161212185730.GG3808@thinpad.lan.raisama.net>
-	<20161213000816-mutt-send-email-mst@kernel.org>
-From: Cao jin <caoj.fnst@cn.fujitsu.com>
-Message-ID: <584F5FC6.1000106@cn.fujitsu.com>
-Date: Tue, 13 Dec 2016 10:41:10 +0800
+	(envelope-from <herbert@gondor.apana.org.au>) id 1cGdqb-0004R2-JV
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 22:33:48 -0500
+Received: from helcar.hengli.com.au ([209.40.204.226]:36871
+	helo=helcar.apana.org.au)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <herbert@gondor.apana.org.au>)
+	id 1cGdqb-0004QH-2I
+	for qemu-devel@nongnu.org; Mon, 12 Dec 2016 22:33:45 -0500
+Date: Tue, 13 Dec 2016 11:33:22 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Message-ID: <20161213033322.GA5601@gondor.apana.org.au>
+References: <1481171829-116496-1-git-send-email-arei.gonglei@huawei.com>
+	<1481171829-116496-3-git-send-email-arei.gonglei@huawei.com>
+	<33183CC9F5247A488A2544077AF19020DA15A07C@DGGEMA505-MBX.china.huawei.com>
+	<20161212105407.GA3033@gondor.apana.org.au>
+	<20161212234941-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20161213000816-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Reproducible crash on PCIe hotplug
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20161212234941-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH v6 2/2] crypto: add virtio-crypto driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,142 +32,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: "Gonglei (Arei)" <arei.gonglei@huawei.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>, Luonengjun <luonengjun@huawei.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "Wubin (H)" <wu.wubin@huawei.com>, "xin.zeng@intel.com" <xin.zeng@intel.com>, Claudio Fontana <Claudio.Fontana@huawei.com>, "pasic@linux.vnet.ibm.com" <pasic@linux.vnet.ibm.com>, "davem@davemloft.net" <davem@davemloft.net>, "Zhoujian (jay, Euler)" <jianjay.zhou@huawei.com>, "Hanweidong (Randy)" <hanweidong@huawei.com>, "arei.gonglei@hotmail.com" <arei.gonglei@hotmail.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "Xuquan (Quan Xu)" <xuquan8@huawei.com>, longpeng <longpeng2@huawei.com>, "Wanzongshun (Vincent)" <wanzongshun@huawei.com>
 
-
-
-On 12/13/2016 06:09 AM, Michael S. Tsirkin wrote:
-> On Mon, Dec 12, 2016 at 04:57:30PM -0200, Eduardo Habkost wrote:
->> On Mon, Dec 12, 2016 at 08:41:41PM +0200, Michael S. Tsirkin wrote:
->>> On Mon, Dec 12, 2016 at 05:29:15PM +0000, Stefan Hajnoczi wrote:
->>>> On Mon, Dec 12, 2016 at 01:34:05PM +0800, Cao jin wrote:
->>>>>
->>>>>
->>>>> On 12/10/2016 04:39 AM, Eduardo Habkost wrote:
->>>>>> Using latest qemu.git master:
->>>>>>
->>>>>>   $ qemu-system-x86_64 -machine q35 -readconfig docs/q35-chipset.cfg -monitor stdio
->>>>>>   QEMU 2.7.93 monitor - type 'help' for more information
->>>>>>   (qemu) device_add e1000e,bus=ich9-pcie-port-4,addr=00
->>>>>>   (qemu) device_add e1000e,bus=ich9-pcie-port-4,addr=08
->>>>>>   Segmentation fault (core dumped)
->>>>>>
->>>>>> It crashes at:
->>>>>>
->>>>>>   #7  0x000055555598d7dc in do_pci_register_device (errp=0x7fffffffbfd0, devfn=64, name=0x5555565df340 "e1000e", bus=0x555558487380, pci_dev=0x5555589cd000)
->>>>>>       at /home/ehabkost/rh/proj/virt/qemu/hw/pci/pci.c:983
->>>>>>   983             error_setg(errp, "PCI: slot %d function 0 already ocuppied by %s,"
->>>>>>   (gdb) l
->>>>>>   978                        PCI_SLOT(devfn), PCI_FUNC(devfn), name,
->>>>>>   979                        bus->devices[devfn]->name);
->>>>>>   980             return NULL;
->>>>>>   981         } else if (dev->hotplugged &&
->>>>>>   982                    pci_get_function_0(pci_dev)) {
->>>>>>   983             error_setg(errp, "PCI: slot %d function 0 already ocuppied by %s,"
->>>>>>   984                        " new func %s cannot be exposed to guest.",
->>>>>>   985                        PCI_SLOT(devfn),
->>>>>>   986                        bus->devices[PCI_DEVFN(PCI_SLOT(devfn), 0)]->name,
->>>>>>   987                        name);
->>>>>>
->>>>>
->>>>> Thanks for informing me. I am kind of busy for now, so I suppose I will
->>>>> investigate it after 2.8 release.
->>>>
->>>> Please let me know if this should be considered a release blocker.
->>>>
->>>> The proposed QEMU 2.8 release date is tomorrow (December 13th)!
->>>>
->>>> Stefan
->>>
->>> I don't see how it's a blocker, it's an illegal configuration.
->>> Here's the fix. It's a rather obvious one.
->>> I'll target the fix for 2.9.
->>> Eduardo, I'd appreciate a tested-by tag.
->>
->> I confirm the patch fixes the crash, but the error message seems
->> incorrect: the existing e1000e device is on slot 0 function 0,
->> not slot 8.
->>
->>   $ ./x86-kvm-build/x86_64-softmmu/qemu-system-x86_64 -machine q35 -readconfig docs/q35-chipset.cfg -monitor stdio
->>   QEMU 2.7.93 monitor - type 'help' for more information
->>   (qemu) device_add e1000e,bus=ich9-pcie-port-4,addr=00
->>   (qemu) device_add e1000e,bus=ich9-pcie-port-4,addr=08
->>   PCI: slot 8 function 0 already ocuppied by e1000e, new func e1000e cannot be exposed to guest.
->>            ^^^
->>
->>
->>>
->>> -->
->>>
->>> pci: fix error message for express slots
->>>
->>> PCI Express downstream slot has a single PCI slot
->>> behind it, using PCI_DEVFN(PCI_SLOT(devfn), 0)
->>> does not give you function 0 in cases such as ARI
->>> as well as some error cases.
->>>
->>> This is exactly what we are hitting:
->>>    $ qemu-system-x86_64 -machine q35 -readconfig docs/q35-chipset.cfg -monitor stdio
->>>    (qemu) device_add e1000e,bus=ich9-pcie-port-4,addr=00
->>>    (qemu) device_add e1000e,bus=ich9-pcie-port-4,addr=08
->>>    Segmentation fault (core dumped)
->>>
->>> The fix is to use the pci_get_function_0 API.
->>>
->>> Cc: qemu-stable@nongnu.org
->>> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->>> Reported-by: Eduardo Habkost <ehabkost@redhat.com>
->>> ---
->>>
->>> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
->>> index 24fae16..339c531 100644
->>> --- a/hw/pci/pci.c
->>> +++ b/hw/pci/pci.c
->>> @@ -983,7 +983,7 @@ static PCIDevice *do_pci_register_device(PCIDevice *pci_dev, PCIBus *bus,
->>>          error_setg(errp, "PCI: slot %d function 0 already ocuppied by %s,"
->>>                     " new func %s cannot be exposed to guest.",
->>>                     PCI_SLOT(devfn),
->>> -                   bus->devices[PCI_DEVFN(PCI_SLOT(devfn), 0)]->name,
->>> +                   pci_get_function_0(pci_dev)->name,
->>>                     name);
->>>  
->>>         return NULL;
->>>
->>> -- 
->>> MST
->>
->> -- 
+On Tue, Dec 13, 2016 at 12:05:19AM +0200, Michael S. Tsirkin wrote:
+>
+> > Sorry but it's too late for 4.10.  It needed to have been in my
+> > tree before the merge window opened to make it for this cycle.
 > 
-> 
-> 
-> this then?
-> 
-> 
-> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-> index 339c531..637d545 100644
-> --- a/hw/pci/pci.c
-> +++ b/hw/pci/pci.c
-> @@ -982,7 +982,7 @@ static PCIDevice *do_pci_register_device(PCIDevice *pci_dev, PCIBus *bus,
->                 pci_get_function_0(pci_dev)) {
->          error_setg(errp, "PCI: slot %d function 0 already ocuppied by %s,"
->                     " new func %s cannot be exposed to guest.",
-> -                   PCI_SLOT(devfn),
-> +                   PCI_SLOT(pci_get_function_0(pci_dev)->devfn),
->                     pci_get_function_0(pci_dev)->name,
->                     name);
->  
+> Objections to me merging this? I'm preparing my tree right now.
 
-Tested-by: Cao jin <caoj.fnst@cn.fujitsu.com>
+Sure feel free to merge it through your tree.
 
-./qemu-system-x86_64 -machine q35 -readconfig ../docs/q35-chipset.cfg
--monitor stdio
-QEMU 2.7.91 monitor - type 'help' for more information
-(qemu) device_add e1000e,bus=ich9-pcie-port-4,addr=00
-(qemu) device_add e1000e,bus=ich9-pcie-port-4,addr=08
-PCI: slot 0 function 0 already ocuppied by e1000e, new func e1000e
-cannot be exposed to guest.
-
+Cheers,
 -- 
-Sincerely,
-Cao jin
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
