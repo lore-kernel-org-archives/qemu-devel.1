@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53171)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53404)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cGmBo-0008LE-Sz
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 07:28:13 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cGmCr-0000k8-Cy
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 07:29:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cGmBl-000319-O2
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 07:28:12 -0500
-Received: from mail-vk0-f52.google.com ([209.85.213.52]:35921)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cGmBl-0002wD-IP
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 07:28:09 -0500
-Received: by mail-vk0-f52.google.com with SMTP id p9so58527110vkd.3
-	for <qemu-devel@nongnu.org>; Tue, 13 Dec 2016 04:27:47 -0800 (PST)
+	(envelope-from <kwolf@redhat.com>) id 1cGmCn-0003IK-Jj
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 07:29:17 -0500
+Date: Tue, 13 Dec 2016 13:29:00 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20161213122900.GA3918@noname.redhat.com>
+References: <cover.1481290956.git.berto@igalia.com>
+	<468dbeb8-5b1b-669f-f7e5-0d24a4308da8@redhat.com>
+	<w51bmwhck1c.fsf@maestria.local.igalia.com>
+	<756cfb05-61e1-7ee3-435b-93759438a52d@redhat.com>
+	<20161213101635.GC2165@lemon>
 MIME-Version: 1.0
-In-Reply-To: <04ae30ed8ee1758cd2d2af880da4d28f74c67738.1481132150.git.alistair.francis@xilinx.com>
-References: <04ae30ed8ee1758cd2d2af880da4d28f74c67738.1481132150.git.alistair.francis@xilinx.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 13 Dec 2016 12:26:25 +0000
-Message-ID: <CAFEAcA8mWr0tRHqLqPuSptUKFDOmXnmKfEffMK8EfJaFFSQ5kw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH for 2.8 v4 1/1] cadence_uart: Check baud
- rate generator and divider values on migration
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20161213101635.GC2165@lemon>
+Subject: Re: [Qemu-devel] [PATCH RFC 0/1] Allow storing the qcow2 L2 cache
+ in disk
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,25 +27,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair23@gmail.com>, Prasad J Pandit <pjp@fedoraproject.org>, Huawei PSIRT <psirt@huawei.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On 7 December 2016 at 17:53, Alistair Francis
-<alistair.francis@xilinx.com> wrote:
-> The Cadence UART device emulator calculates speed by dividing the
-> baud rate by a 'baud rate generator' & 'baud rate divider' value.
-> The device specification defines these register values to be
-> non-zero and within certain limits. Checks were recently added when
-> writing to these registers but not when restoring from migration.
->
-> This patch adds checks when restoring from migration to avoid divide by
-> zero errors.
->
-> Reported-by: Huawei PSIRT <psirt@huawei.com>
-> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+Am 13.12.2016 um 11:16 hat Fam Zheng geschrieben:
+> On Tue, 12/13 09:02, Max Reitz wrote:
+> > > Yes but the use case is that the qcow2 image is stored in a slow disk,
+> > > so things will be faster if we avoid having to read it too often.
+> > > 
+> > > But the data is there and it needs to be read, so we have three options:
+> > > 
+> > >   1) Read it everytime we need it. It slows things down.
+> > >   2) Keep (part of) it in memory. It can use a lot of memory.
+> > >   3) Keep it in a faster disk.
+> > > 
+> > > We're talking about 3) here, and this it not about creating new
+> > > structures, but about changing the storage backend of the existing L2
+> > > cache (disk rather than RAM).
+> > 
+> > I'm arguing that we already have an on-disk L2 structure and that is called
+> > simply the L1-L2 structure in the qcow2 file. The cache only makes sense
+> > because it is in RAM.
+> 
+> I am looking at this problem from a different angle:
+> 
+> Assume a qcow2 image created by a known version of QEMU with the option
+> preallocation=falloc, it is theoretically possible to do a hacky optimization in
+> qcow2 I/O path that, instead of looking up in L1/L2, we can calculate file
+> offset for any given virtual address, by adding the file offset of LBA 0.
+> 
+> If we make this optimization a header extention and add it to the spec, it is no
+> longer a hack, and it should offer nearly the same performance as raw in all
+> cases - if we say raw is doing "identical mapping" from LBA to file offset, this
+> new operation mode of qcow2 file is basically doing a "shift by constant" mapping.
 
+Is this a scenario that matters in practice, though? If you want
+performance and you don't need COW functionality, just use raw images to
+begin with.
 
-
-Applied to target-arm.next for 2.9, thanks.
-
--- PMM
+Kevin
