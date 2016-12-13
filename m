@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55365)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56286)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wouter@grep.be>) id 1cGpb9-0008UN-Fl
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 11:06:39 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cGpeA-0001vX-Iq
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 11:09:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wouter@grep.be>) id 1cGpb5-0005h6-6L
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 11:06:35 -0500
-Received: from [2a01:4f8:140:52e5::2] (port=37172 helo=latin.grep.be)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <wouter@grep.be>) id 1cGpb4-0005gr-Va
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 11:06:31 -0500
-Date: Tue, 13 Dec 2016 17:06:10 +0100
-From: Wouter Verhelst <w@uter.be>
-Message-ID: <20161213160610.6xlwhvwq7xhee2wg@grep.be>
-References: <20161212204313.anhjire2gkwd6gzi@grep.be>
-	<2D482F67-8115-48CD-921D-5728BC1AD92B@alex.org.uk>
-	<20161213150343.3g3fxjixbteum7ju@grep.be>
-	<B6B52260-6814-40CB-AA00-E79099B8ED56@alex.org.uk>
+	(envelope-from <mreitz@redhat.com>) id 1cGpe9-0006XS-6e
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 11:09:42 -0500
+References: <1479835586-74394-1-git-send-email-vsementsov@virtuozzo.com>
+	<1479835586-74394-19-git-send-email-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <6e614a78-a137-c8b4-16bf-5a6ad47cc9b3@redhat.com>
+Date: Tue, 13 Dec 2016 17:09:26 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <B6B52260-6814-40CB-AA00-E79099B8ED56@alex.org.uk>
-Subject: Re: [Qemu-devel] [Nbd] [PATCH v5] doc: Add NBD_CMD_BLOCK_STATUS
- extension
+In-Reply-To: <1479835586-74394-19-git-send-email-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 18/21] qmp: add
+ x-debug-block-dirty-bitmap-sha256
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,115 +24,201 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Bligh <alex@alex.org.uk>
-Cc: "nbd-general@lists.sourceforge.net" <nbd-general@lists.sourceforge.net>, Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Stefan stefanha@redhat. com" <stefanha@redhat.com>, "Denis V. Lunev" <den@openvz.org>, Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
 
-On Tue, Dec 13, 2016 at 03:24:25PM +0000, Alex Bligh wrote:
-> Wouter,
-> > The spec should only specify how to select a particular namespace, and
-> > then leave all parsing rules of query strings up to the namespace
-> > specification.
-> 
-> I'm not quite sure why you want that,
+On 2016-11-22 at 18:26, Vladimir Sementsov-Ogievskiy wrote:
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block/dirty-bitmap.c         |  5 +++++
+>  blockdev.c                   | 33 +++++++++++++++++++++++++++++++++
+>  include/block/dirty-bitmap.h |  2 ++
+>  include/qemu/hbitmap.h       |  8 ++++++++
+>  qapi/block-core.json         | 26 ++++++++++++++++++++++++++
+>  tests/Makefile.include       |  2 +-
+>  util/hbitmap.c               | 11 +++++++++++
+>  7 files changed, 86 insertions(+), 1 deletion(-)
+>
+> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+> index fe34d48..775181c 100644
+> --- a/block/dirty-bitmap.c
+> +++ b/block/dirty-bitmap.c
+> @@ -589,3 +589,8 @@ BdrvDirtyBitmap *bdrv_dirty_bitmap_next(BlockDriverState *bs,
+>      return bitmap == NULL ? QLIST_FIRST(&bs->dirty_bitmaps) :
+>                              QLIST_NEXT(bitmap, list);
+>  }
+> +
+> +char *bdrv_dirty_bitmap_sha256(const BdrvDirtyBitmap *bitmap, Error **errp)
+> +{
+> +    return hbitmap_sha256(bitmap->bitmap, errp);
+> +}
+> diff --git a/blockdev.c b/blockdev.c
+> index 3891d86..f129ccf 100644
+> --- a/blockdev.c
+> +++ b/blockdev.c
+> @@ -2819,6 +2819,39 @@ void qmp_block_dirty_bitmap_clear(const char *node, const char *name,
+>      aio_context_release(aio_context);
+>  }
+>
+> +/**
+> + * Completely clear a bitmap, for the purposes of synchronizing a bitmap
+> + * immediately after a full backup operation.
 
-Let's say you want to implement incremental backups (which is what we're
-talking about, really). Your backup program would presumably know when
-the last point in time is that we took a backup. In that context, you
-could want to have a syntax to say "list all contexts that contain data
-more recent than <previous backup point>" (or "select all contexts..."),
-so as to actually select the backup.
+This comment doesn't seem quite right.
 
-> but if that's the case, I'd
-> suggest the easiest thing to do would be to pass (separately) a
-> namespace string, and a name-query, because you are prohibiting
-> queries that cover more than one namespace
+> + */
+> +BlockDirtyBitmapSha256 *qmp_x_debug_block_dirty_bitmap_sha256(const char *node,
+> +                                                              const char *name,
+> +                                                              Error **errp)
+> +{
+> +    AioContext *aio_context;
+> +    BdrvDirtyBitmap *bitmap;
+> +    BlockDriverState *bs;
+> +    BlockDirtyBitmapSha256 *ret = NULL;
+> +    char *sha256;
+> +
+> +    bitmap = block_dirty_bitmap_lookup(node, name, &bs, &aio_context, errp);
+> +    if (!bitmap || !bs) {
+> +        return NULL;
+> +    }
+> +
+> +    sha256 = bdrv_dirty_bitmap_sha256(bitmap, errp);
+> +    if (sha256 == NULL) {
+> +        goto out;
+> +    }
+> +
+> +    ret = g_new(BlockDirtyBitmapSha256, 1);
+> +    ret->sha256 = sha256;
+> +
+> +out:
+> +    aio_context_release(aio_context);
+> +
+> +    return ret;
+> +}
+> +
+>  void hmp_drive_del(Monitor *mon, const QDict *qdict)
+>  {
+>      const char *id = qdict_get_str(qdict, "id");
+> diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
+> index d71edc4..b022b34 100644
+> --- a/include/block/dirty-bitmap.h
+> +++ b/include/block/dirty-bitmap.h
+> @@ -86,4 +86,6 @@ BdrvDirtyBitmap *bdrv_dirty_bitmap_next(BlockDriverState *bs,
+>
+>  bool bdrv_has_persistent_bitmaps(BlockDriverState *bs);
+>
+> +char *bdrv_dirty_bitmap_sha256(const BdrvDirtyBitmap *bitmap, Error **errp);
+> +
+>  #endif
+> diff --git a/include/qemu/hbitmap.h b/include/qemu/hbitmap.h
+> index 063ec0e..750346c 100644
+> --- a/include/qemu/hbitmap.h
+> +++ b/include/qemu/hbitmap.h
+> @@ -240,6 +240,14 @@ void hbitmap_deserialize_ones(HBitmap *hb, uint64_t start, uint64_t count,
+>  void hbitmap_deserialize_finish(HBitmap *hb);
+>
+>  /**
+> + * hbitmap_sha256:
+> + * @bitmap: HBitmap to operate on.
+> + *
+> + * Returns SHA256 hash of the last level.
+> + */
+> +char *hbitmap_sha256(const HBitmap *bitmap, Error **errp);
+> +
+> +/**
+>   * hbitmap_free:
+>   * @hb: HBitmap to operate on.
+>   *
+> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> index 648f94a..76f6c60 100644
+> --- a/qapi/block-core.json
+> +++ b/qapi/block-core.json
+> @@ -1289,6 +1289,32 @@
+>    'data': 'BlockDirtyBitmap' }
+>
+>  ##
+> +# @BlockDirtyBitmapSha256:
+> +#
+> +# SHA256 hash of dirty bitmap data
+> +#
+> +# @sha256: bitmap SHA256 hash
+> +#
+> +# Since: 2.8
 
-I think that would needlessly complicate matters, because there is
-also...
+*2.9
 
-> (though per our
-> separate conversation, you can select context from more than
-> one namespace with multiple queries)
+> +##
+> +  { 'struct': 'BlockDirtyBitmapSha256',
+> +    'data': {'sha256': 'str'} }
+> +
+> +##
+> +# @x-debug-block-dirty-bitmap-sha256
 
-... this.
+Should end in a colon ("@x-debug-block-dirty-bitmap-sha256:").
 
->. It does seem a bit odd thought that if context 'foo:bar' is returned
->from _LIST_, there is no guarantee that selecting it as 'foo:bar' will
->work (as the matching is namespace dependent).
+> +#
+> +# Get bitmap SHA256
+> +#
+> +# Returns: BlockDirtyBitmapSha256 on success
+> +#          If @node is not a valid block device, DeviceNotFound
+> +#          If @name is not found, GenericError with an explanation
 
-Yes. We should probably also make it clear that implementations SHOULD
-allow the selection of a (subset of) metadata context(s) which are
-returned by LIST by simply naming them individually.
+Theoretically, hashing can also fail, but, well...
 
-[...]
-> > Perhaps another way to deal with that would be to specify that an
-> > implementation is not required to assign the same context IDs to the
-> > same metadata contexts from one call to SET (or LIST) to the next; but I
-> > thought it would be clearer if we were to explicitly make LIST return
-> > "invalid" context IDs. Then again, maybe not.
-> 
-> You're completely correct here and you should ignore my suggestion.
-> 
-> Perhaps you should be even clearer and explicitly state that
-> context IDs may change between sessions and even between successive
-> use of the _SET_ command.
+> +#
+> +# Since 2.8
 
-Makes sense, yes.
+*2.9 and also "Since: 2.9" (with colon).
 
-[...]
-> >> * If a server has `base:allocation` AND another metadata context
-> >>  (for instance `qemu:dirty`) then the rule you set out will not
-> >>  apply.
-> > 
-> > Yes, and this is intentional, as I've explained before. The other
-> > context's semantics should clarify whether that rule still applies or
-> > not. Implementations that do not know of the other context should
-> > however assume that it doesn't.
-> 
-> I think I must be being very stupid or am at least at cross-purposes.
-> 
-> Let's say the second context is (e.g.) 'colour:records_information_about_blue'
-> (i.e. nothing at all to do with space or holes). Are you saying that the
-> presence of that context might affect the interpretation of
-> NBD_STATE_HOLE? Or just other contexts within the 'base:' space?
-> Or that another context (e.g. perhaps compression) could be an independent
-> cause of ENOSPC? If so should it be the responsibility of the other context
-> to document that it does not affect that?
-> 
-> How about:
-> 
-> "If a server supports the `base:allocation` metadata context, then writing
-> to an extent which has `NBD_STATE_HOLE` clear MUST NOT fail with ENOSPC
-> unless for reasons specified in the definition of another context."
+Looks good apart from these minor things.
 
-That is essentially what I mean, yes. The point though, is that I also
-think a client should assume the worst.
+Max
 
-(additionally, there may be reasons for ENOSPC that the server isn't
-aware of; so even if NBD_STATE_HOLE is clear, it should still not be an
-error for the server to return ENOSPC)
-
-> >>> +For the `base:allocation` context, the remainder of the flags field is
-> >>> +reserved. Servers SHOULD set it to all-zero;
-> >> 
-> >> Surely if we want to reserve them for extension, we need "Servers
-> >> MUST set it to all-zero"
-> > 
-> > No, SHOULD, otherwise a future extension which adds meaning to those
-> > bits will suddenly become incompatible with this spec. Think about it
-> > ;-)
-> 
-> I did! If there is a future extension, it will change the spec to
-> incorporate those bits, so they won't be included within 'the
-> remainder' any more.
-
-If we say MUST, a client would be within its rights to reject a future
-version of the "base:allocation" data with more flags set as invalid,
-and would therefore not be future-compliant. This is why it should be
-SHOULD, not MUST.
-
--- 
-< ron> I mean, the main *practical* problem with C++, is there's like a dozen
-       people in the world who think they really understand all of its rules,
-       and pretty much all of them are just lying to themselves too.
- -- #debian-devel, OFTC, 2016-02-12
+> +##
+> +  { 'command': 'x-debug-block-dirty-bitmap-sha256',
+> +    'data': 'BlockDirtyBitmap', 'returns': 'BlockDirtyBitmapSha256' }
+> +
+> +##
+>  # @blockdev-mirror
+>  #
+>  # Start mirroring a block device's writes to a new destination.
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index e98d3b6..b85ff78 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -496,7 +496,7 @@ tests/test-blockjob$(EXESUF): tests/test-blockjob.o $(test-block-obj-y) $(test-u
+>  tests/test-blockjob-txn$(EXESUF): tests/test-blockjob-txn.o $(test-block-obj-y) $(test-util-obj-y)
+>  tests/test-thread-pool$(EXESUF): tests/test-thread-pool.o $(test-block-obj-y)
+>  tests/test-iov$(EXESUF): tests/test-iov.o $(test-util-obj-y)
+> -tests/test-hbitmap$(EXESUF): tests/test-hbitmap.o $(test-util-obj-y)
+> +tests/test-hbitmap$(EXESUF): tests/test-hbitmap.o $(test-util-obj-y) $(test-crypto-obj-y)
+>  tests/test-x86-cpuid$(EXESUF): tests/test-x86-cpuid.o
+>  tests/test-xbzrle$(EXESUF): tests/test-xbzrle.o migration/xbzrle.o page_cache.o $(test-util-obj-y)
+>  tests/test-cutils$(EXESUF): tests/test-cutils.o util/cutils.o
+> diff --git a/util/hbitmap.c b/util/hbitmap.c
+> index 72623f4..96af071 100644
+> --- a/util/hbitmap.c
+> +++ b/util/hbitmap.c
+> @@ -13,6 +13,7 @@
+>  #include "qemu/hbitmap.h"
+>  #include "qemu/host-utils.h"
+>  #include "trace.h"
+> +#include "crypto/hash.h"
+>
+>  /* HBitmaps provides an array of bits.  The bits are stored as usual in an
+>   * array of unsigned longs, but HBitmap is also optimized to provide fast
+> @@ -707,3 +708,13 @@ void hbitmap_free_meta(HBitmap *hb)
+>      hbitmap_free(hb->meta);
+>      hb->meta = NULL;
+>  }
+> +
+> +char *hbitmap_sha256(const HBitmap *bitmap, Error **errp)
+> +{
+> +    size_t size = bitmap->sizes[HBITMAP_LEVELS - 1] * sizeof(unsigned long);
+> +    char *data = (char *)bitmap->levels[HBITMAP_LEVELS - 1];
+> +    char *hash = NULL;
+> +    qcrypto_hash_digest(QCRYPTO_HASH_ALG_SHA256, data, size, &hash, errp);
+> +
+> +    return hash;
+> +}
+>
