@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34278)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35772)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cGgwL-0004Bg-CK
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 01:51:54 -0500
+	(envelope-from <longpeng2@huawei.com>) id 1cGh6T-0006UF-E0
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 02:02:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cGgwK-00032f-Bg
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 01:51:53 -0500
-Date: Tue, 13 Dec 2016 14:51:41 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20161213065141.GA2165@lemon>
-References: <87oa0q1t21.fsf@dusky.pond.sub.org> <20161207025457.GB30227@lemon>
-	<20161207094832.GA4773@noname.str.redhat.com>
-	<20161207100339.GB2286@lemon> <87shpybnbc.fsf@dusky.pond.sub.org>
-	<20161208134759.GA32226@lemon> <87wpf52qru.fsf@dusky.pond.sub.org>
-	<20161212144307.GA21817@lemon> <87zik1xazy.fsf@dusky.pond.sub.org>
+	(envelope-from <longpeng2@huawei.com>) id 1cGh6R-00066o-9C
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 02:02:21 -0500
+Received: from szxga02-in.huawei.com ([119.145.14.65]:41192)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <longpeng2@huawei.com>) id 1cGh6Q-000634-6g
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 02:02:19 -0500
+From: "Longpeng(Mike)" <longpeng2@huawei.com>
+Date: Tue, 13 Dec 2016 15:01:49 +0800
+Message-ID: <1481612513-28556-3-git-send-email-longpeng2@huawei.com>
+In-Reply-To: <1481612513-28556-1-git-send-email-longpeng2@huawei.com>
+References: <1481612513-28556-1-git-send-email-longpeng2@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87zik1xazy.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [Qemu-block]  Meeting notes on -blockdev,
- dynamic backend reconfiguration
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH for-2.9 v3 2/6] crypto: add HMAC algorithms
+ framework
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,143 +26,442 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: berrange@redhat.com
+Cc: wu.wubin@huawei.com, jianjay.zhou@huawei.com, arei.gonglei@huawei.com, qemu-devel@nongnu.org, "Longpeng(Mike)" <longpeng2@huawei.com>
 
-On Mon, 12/12 19:23, Markus Armbruster wrote:
-> Fam Zheng <famz@redhat.com> writes:
-> 
-> > On Mon, 12/12 14:58, Markus Armbruster wrote:
-> >> Fam Zheng <famz@redhat.com> writes:
-> >> 
-> >> > On Thu, 12/08 13:46, Markus Armbruster wrote:
-> >> >> Fam Zheng <famz@redhat.com> writes:
-> >> >> 
-> >> >> > On Wed, 12/07 10:48, Kevin Wolf wrote:
-> >> >> >> > If so I think there is no race to worry about, mirror-filter should go
-> >> >> >> > away only after a QMP command.
-> >> >> >> 
-> >> >> >> Currently, a mirror job goes away whenever it is done. This is not
-> >> >> >> directly tied to a QMP command.
-> >> >> >
-> >> >> > Ah right, block-job-complete is only "start to complete" and the job goes away
-> >> >> > at some later point. I thought this is "the" QMP command but it is not.
-> >> >> >
-> >> >> >> 
-> >> >> >> Of course, in the new job API we want an explicit job-delete, so in
-> >> >> >> that case it wouldn't happen, but we need to keep the old case for
-> >> >> >> compatibility.
-> >> >> >
-> >> >> > Another possibility is to add a placeholder node in the right location first
-> >> >> > then fill in the actual throttling node once created. QMP owns the placeholder
-> >> >> > node so it won't suddenly vanish when mirror job goes away.
-> >> >> 
-> >> >> I'm not sure I understand this idea.  Could you explain it in a bit more
-> >> >> detail, perhaps even with a bit of ASCII art?
-> >> >
-> >> > OK, I'll base on your version:
-> >> >
-> >> > == Basic dynamic reconfiguration operation ==
-> >> >
-> >> > The two primitives are "insert placeholder" and bdrv_replace_child;
-> >> >
-> >> > A placeholder BDS is a dummy "pass through everything" filter. Inserting
-> >> > placeholder is something like:
-> >> >
-> >> >     void bdrv_insert_placeholder(BdrvChild *child) {
-> >> >         BlockDriverState *ph = bdrv_new_placeholder();
-> >> >         ph->file->bs = child->bs;
-> >> >         child->bs = ph;
-> >> >     }
-> >> >
-> >> > Consider:
-> >> >
-> >> >           BB
-> >> >           |
-> >> >     mirror-filter
-> >> >           |
-> >> >          BDS
-> >> >
-> >> > Add a throttle filter under BB while the mirror job is running.  First step,
-> >> > create the dummy _placeholder_ node and throttle-filter node (the existence of
-> >> > placeholder node can be an implementation detail hidden from user):
-> >> >
-> >> >     placeholder = bdrv_insert_placeholder(BB->root);
-> >> >     throttle_filter = bdrv_create_throttle_filter(placeholder);
-> >> >
-> >> > we get:
-> >> >
-> >> >           BB     throttle-filter
-> >> >           |     /
-> >> >      placeholder
-> >> >           |
-> >> >     mirror-filter
-> >> >           |
-> >> >          BDS
-> >> >
-> >> > Second step, move throttle filter in:
-> >> >
-> >> >     bdrv_replace_child(BB->root, throttle_filter);
-> >> >     bdrv_replace_child(throttle_filter->file, throttle_filter->file->bs->file->bs);
-> >> >     bdrv_unref(placeholder);
-> >> >
-> >> > we get:
-> >> >
-> >> >           BB
-> >> >           |
-> >> >    throttle-filter
-> >> >           |
-> >> >     mirror-filter
-> >> >           |
-> >> >          BDS
-> >> >
-> >> > Does this make us safe from racing with mirror-filter disappearing?
-> >> 
-> >> Thanks!  I figure your placeholder node does immunize the splicing in of
-> >> the throttle-filter against the removal of mirror-filter.
-> >> 
-> >> Given a specific dynamic reconfiguration, where do we have to put
-> >> placeholder nodes to immunize it against arbitrary other dynamic
-> >> changes?
-> >
-> > Generally, a placeholder node is essentially an insertion to the middle of an
-> > existing edge, namely to change:
-> >
-> >          NodeA
-> >        /   |   \
-> >       /    |    \
-> >  [...]   NodeB   [...]
-> >
-> > into:
-> >
-> >          NodeA
-> >        /   |   \
-> >       /    |    \
-> >  [...]  p-holdr  [...]
-> >            |
-> >            |
-> >          NodeB
-> >
-> > and the operation is safe because of BQL. Our later bdrv_replace_child()
-> > operations on it will always work because a dynamic reconfiguration won't delete
-> > the placeholder node in any case.
-> >
-> > On the other hand, concurrent dynamic changes could yield usual outcomes from
-> > user PoV (like the involved node is no longer in the same place or disappears),
-> > but I think it is still in some degree under user's control. E.g. a
-> > mirror-filter won't go away automatically until user does
-> > block-job-complete/cancel.
-> 
-> I think I understand how we can safely insert a placeholder.  My
-> question is: *where* do we have to insert placeholders before a certain
-> dynamic reconfiguration to make that reconfiguration safe?
+This patch introduce HMAC algorithms framework.
 
-The placeholder will mainly protect "insertions" and therefore the location
-woule be on edge where we insert a new filter.
+Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
+---
+ crypto/Makefile.objs |   4 ++
+ crypto/hmac-gcrypt.c |  45 ++++++++++++++
+ crypto/hmac-glib.c   |  44 ++++++++++++++
+ crypto/hmac-nettle.c |  45 ++++++++++++++
+ crypto/hmac.c        |  72 ++++++++++++++++++++++
+ crypto/hmac.h        | 166 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 6 files changed, 376 insertions(+)
+ create mode 100644 crypto/hmac-gcrypt.c
+ create mode 100644 crypto/hmac-glib.c
+ create mode 100644 crypto/hmac-nettle.c
+ create mode 100644 crypto/hmac.c
+ create mode 100644 crypto/hmac.h
 
-Removing a node doesn't need placeholder protection.
-
-Updating a node (to a different type) probably doesn't need that either but I'm
-not 100% sure.
-
-Fam
+diff --git a/crypto/Makefile.objs b/crypto/Makefile.objs
+index a36d2d9..1f749f2 100644
+--- a/crypto/Makefile.objs
++++ b/crypto/Makefile.objs
+@@ -3,6 +3,10 @@ crypto-obj-y += hash.o
+ crypto-obj-$(CONFIG_NETTLE) += hash-nettle.o
+ crypto-obj-$(if $(CONFIG_NETTLE),n,$(CONFIG_GCRYPT)) += hash-gcrypt.o
+ crypto-obj-$(if $(CONFIG_NETTLE),n,$(if $(CONFIG_GCRYPT),n,y)) += hash-glib.o
++crypto-obj-y += hmac.o
++crypto-obj-$(CONFIG_NETTLE) += hmac-nettle.o
++crypto-obj-$(CONFIG_GCRYPT_HMAC) += hmac-gcrypt.o
++crypto-obj-$(if $(CONFIG_NETTLE),n,$(if $(CONFIG_GCRYPT_HMAC),n,y)) += hmac-glib.o
+ crypto-obj-y += aes.o
+ crypto-obj-y += desrfb.o
+ crypto-obj-y += cipher.o
+diff --git a/crypto/hmac-gcrypt.c b/crypto/hmac-gcrypt.c
+new file mode 100644
+index 0000000..6e07415
+--- /dev/null
++++ b/crypto/hmac-gcrypt.c
+@@ -0,0 +1,45 @@
++/*
++ * QEMU Crypto hmac algorithms (based on libgcrypt)
++ *
++ * Copyright (c) 2016 HUAWEI TECHNOLOGIES CO., LTD.
++ *
++ * Authors:
++ *    Longpeng(Mike) <longpeng2@huawei.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or
++ * (at your option) any later version.  See the COPYING file in the
++ * top-level directory.
++ *
++ */
++
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "crypto/hmac.h"
++#include <gcrypt.h>
++
++bool qcrypto_hmac_supports(QCryptoHashAlgorithm alg)
++{
++    return false;
++}
++
++QCryptoHmac *qcrypto_hmac_new(QCryptoHashAlgorithm alg,
++                              const uint8_t *key, size_t nkey,
++                              Error **errp)
++{
++    return NULL;
++}
++
++void qcrypto_hmac_free(QCryptoHmac *hmac)
++{
++    return;
++}
++
++int qcrypto_hmac_bytesv(QCryptoHmac *hmac,
++                        const struct iovec *iov,
++                        size_t niov,
++                        uint8_t **result,
++                        size_t *resultlen,
++                        Error **errp)
++{
++    return -1;
++}
+diff --git a/crypto/hmac-glib.c b/crypto/hmac-glib.c
+new file mode 100644
+index 0000000..3e2a933
+--- /dev/null
++++ b/crypto/hmac-glib.c
+@@ -0,0 +1,44 @@
++/*
++ * QEMU Crypto hmac algorithms (based on glib)
++ *
++ * Copyright (c) 2016 HUAWEI TECHNOLOGIES CO., LTD.
++ *
++ * Authors:
++ *    Longpeng(Mike) <longpeng2@huawei.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or
++ * (at your option) any later version.  See the COPYING file in the
++ * top-level directory.
++ *
++ */
++
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "crypto/hmac.h"
++
++bool qcrypto_hmac_supports(QCryptoHashAlgorithm alg)
++{
++    return false;
++}
++
++QCryptoHmac *qcrypto_hmac_new(QCryptoHashAlgorithm alg,
++                              const uint8_t *key, size_t nkey,
++                              Error **errp)
++{
++    return NULL;
++}
++
++void qcrypto_hmac_free(QCryptoHmac *hmac)
++{
++    return;
++}
++
++int qcrypto_hmac_bytesv(QCryptoHmac *hmac,
++                        const struct iovec *iov,
++                        size_t niov,
++                        uint8_t **result,
++                        size_t *resultlen,
++                        Error **errp)
++{
++    return -1;
++}
+diff --git a/crypto/hmac-nettle.c b/crypto/hmac-nettle.c
+new file mode 100644
+index 0000000..95f3dcc
+--- /dev/null
++++ b/crypto/hmac-nettle.c
+@@ -0,0 +1,45 @@
++/*
++ * QEMU Crypto hmac algorithms (based on nettle)
++ *
++ * Copyright (c) 2016 HUAWEI TECHNOLOGIES CO., LTD.
++ *
++ * Authors:
++ *    Longpeng(Mike) <longpeng2@huawei.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or
++ * (at your option) any later version.  See the COPYING file in the
++ * top-level directory.
++ *
++ */
++
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "crypto/hmac.h"
++#include <nettle/hmac.h>
++
++bool qcrypto_hmac_supports(QCryptoHashAlgorithm alg)
++{
++    return false;
++}
++
++QCryptoHmac *qcrypto_hmac_new(QCryptoHashAlgorithm alg,
++                              const uint8_t *key, size_t nkey,
++                              Error **errp)
++{
++    return NULL;
++}
++
++void qcrypto_hmac_free(QCryptoHmac *hmac)
++{
++    return;
++}
++
++int qcrypto_hmac_bytesv(QCryptoHmac *hmac,
++                        const struct iovec *iov,
++                        size_t niov,
++                        uint8_t **result,
++                        size_t *resultlen,
++                        Error **errp)
++{
++    return -1;
++}
+diff --git a/crypto/hmac.c b/crypto/hmac.c
+new file mode 100644
+index 0000000..5750405
+--- /dev/null
++++ b/crypto/hmac.c
+@@ -0,0 +1,72 @@
++/*
++ * QEMU Crypto hmac algorithms
++ *
++ * Copyright (c) 2016 HUAWEI TECHNOLOGIES CO., LTD.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or
++ * (at your option) any later version.  See the COPYING file in the
++ * top-level directory.
++ *
++ */
++
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "crypto/hmac.h"
++
++static const char hex[] = "0123456789abcdef";
++
++int qcrypto_hmac_bytes(QCryptoHmac *hmac,
++                       const char *buf,
++                       size_t len,
++                       uint8_t **result,
++                       size_t *resultlen,
++                       Error **errp)
++{
++    struct iovec iov = {
++            .iov_base = (char *)buf,
++            .iov_len = len
++    };
++
++    return qcrypto_hmac_bytesv(hmac, &iov, 1, result, resultlen, errp);
++}
++
++int qcrypto_hmac_digestv(QCryptoHmac *hmac,
++                         const struct iovec *iov,
++                         size_t niov,
++                         char **digest,
++                         Error **errp)
++{
++    uint8_t *result = NULL;
++    size_t resultlen = 0;
++    size_t i;
++
++    if (qcrypto_hmac_bytesv(hmac, iov, niov, &result, &resultlen, errp) < 0) {
++        return -1;
++    }
++
++    *digest = g_new0(char, (resultlen * 2) + 1);
++
++    for (i = 0 ; i < resultlen ; i++) {
++        (*digest)[(i * 2)] = hex[(result[i] >> 4) & 0xf];
++        (*digest)[(i * 2) + 1] = hex[result[i] & 0xf];
++    }
++
++    (*digest)[resultlen * 2] = '\0';
++
++    g_free(result);
++    return 0;
++}
++
++int qcrypto_hmac_digest(QCryptoHmac *hmac,
++                        const char *buf,
++                        size_t len,
++                        char **digest,
++                        Error **errp)
++{
++    struct iovec iov = {
++            .iov_base = (char *)buf,
++            .iov_len = len
++    };
++
++    return qcrypto_hmac_digestv(hmac, &iov, 1, digest, errp);
++}
+diff --git a/crypto/hmac.h b/crypto/hmac.h
+new file mode 100644
+index 0000000..0d3acd7
+--- /dev/null
++++ b/crypto/hmac.h
+@@ -0,0 +1,166 @@
++/*
++ * QEMU Crypto hmac algorithms
++ *
++ * Copyright (c) 2016 HUAWEI TECHNOLOGIES CO., LTD.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or
++ * (at your option) any later version.  See the COPYING file in the
++ * top-level directory.
++ *
++ */
++
++#ifndef QCRYPTO_HMAC_H
++#define QCRYPTO_HMAC_H
++
++#include "qapi-types.h"
++
++typedef struct QCryptoHmac QCryptoHmac;
++struct QCryptoHmac {
++    QCryptoHashAlgorithm alg;
++    void *opaque;
++};
++
++/**
++ * qcrypto_hmac_supports:
++ * @alg: the hmac algorithm
++ *
++ * Determine if @alg hmac algorithm is supported by
++ * the current configured build
++ *
++ * Returns:
++ *  true if the algorithm is supported, false otherwise
++ */
++bool qcrypto_hmac_supports(QCryptoHashAlgorithm alg);
++
++/**
++ * qcrypto_hmac_new:
++ * @alg: the hmac algorithm
++ * @key: the key bytes
++ * @nkey: the length of @key
++ * @errp: pointer to a NULL-initialized error object
++ *
++ * Creates a new hmac object with the algorithm @alg
++ *
++ * The @key parameter provides the bytes representing
++ * the secret key to use. The @nkey parameter specifies
++ * the length of @key in bytes
++ *
++ * Note: must use qcrypto_hmac_free() to release the
++ * returned hmac object when no longer required
++ *
++ * Returns:
++ *  a new hmac object, or NULL on error
++ */
++QCryptoHmac *qcrypto_hmac_new(QCryptoHashAlgorithm alg,
++                              const uint8_t *key, size_t nkey,
++                              Error **errp);
++
++/**
++ * qcrypto_hmac_free:
++ * @hmac: the hmac object
++ *
++ * Release the memory associated with @hmac that was
++ * previously allocated by qcrypto_hmac_new()
++ */
++void qcrypto_hmac_free(QCryptoHmac *hmac);
++
++/**
++ * qcrypto_hmac_bytesv:
++ * @hmac: the hmac object
++ * @iov: the array of memory regions to hmac
++ * @niov: the length of @iov
++ * @result: pointer to hold output hmac
++ * @resultlen: pointer to hold length of @result
++ * @errp: pointer to a NULL-initialized error object
++ *
++ * Computes the hmac across all the memory regions
++ * present in @iov. The @result pointer will be
++ * filled with raw bytes representing the computed
++ * hmac, which will have length @resultlen. The
++ * memory pointer in @result must be released
++ * with a call to g_free() when no longer required.
++ *
++ * Returns:
++ *  0 on success, -1 on error
++ */
++int qcrypto_hmac_bytesv(QCryptoHmac *hmac,
++                        const struct iovec *iov,
++                        size_t niov,
++                        uint8_t **result,
++                        size_t *resultlen,
++                        Error **errp);
++
++/**
++ * qcrypto_hmac_bytes:
++ * @hmac: the hmac object
++ * @buf: the memory region to hmac
++ * @len: the length of @buf
++ * @result: pointer to hold output hmac
++ * @resultlen: pointer to hold length of @result
++ * @errp: pointer to a NULL-initialized error object
++ *
++ * Computes the hmac across all the memory region
++ * @buf of length @len. The @result pointer will be
++ * filled with raw bytes representing the computed
++ * hmac, which will have length @resultlen. The
++ * memory pointer in @result must be released
++ * with a call to g_free() when no longer required.
++ *
++ * Returns:
++ *  0 on success, -1 on error
++ */
++int qcrypto_hmac_bytes(QCryptoHmac *hmac,
++                       const char *buf,
++                       size_t len,
++                       uint8_t **result,
++                       size_t *resultlen,
++                       Error **errp);
++
++/**
++ * qcrypto_hmac_digestv:
++ * @hmac: the hmac object
++ * @iov: the array of memory regions to hmac
++ * @niov: the length of @iov
++ * @digest: pointer to hold output hmac
++ * @errp: pointer to a NULL-initialized error object
++ *
++ * Computes the hmac across all the memory regions
++ * present in @iov. The @digest pointer will be
++ * filled with the printable hex digest of the computed
++ * hmac, which will be terminated by '\0'. The
++ * memory pointer in @digest must be released
++ * with a call to g_free() when no longer required.
++ *
++ * Returns:
++ *  0 on success, -1 on error
++ */
++int qcrypto_hmac_digestv(QCryptoHmac *hmac,
++                         const struct iovec *iov,
++                         size_t niov,
++                         char **digest,
++                         Error **errp);
++
++/**
++ * qcrypto_hmac_digest:
++ * @hmac: the hmac object
++ * @buf: the memory region to hmac
++ * @len: the length of @buf
++ * @digest: pointer to hold output hmac
++ * @errp: pointer to a NULL-initialized error object
++ *
++ * Computes the hmac across all the memory region
++ * @buf of length @len. The @digest pointer will be
++ * filled with the printable hex digest of the computed
++ * hmac, which will be terminated by '\0'. The
++ * memory pointer in @digest must be released
++ * with a call to g_free() when no longer required.
++ *
++ * Returns: 0 on success, -1 on error
++ */
++int qcrypto_hmac_digest(QCryptoHmac *hmac,
++                        const char *buf,
++                        size_t len,
++                        char **digest,
++                        Error **errp);
++
++#endif
+-- 
+1.8.3.1
