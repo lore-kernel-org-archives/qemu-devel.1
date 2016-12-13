@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59814)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59957)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cGmdd-0001DX-11
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 07:56:58 -0500
+	(envelope-from <sw@weilnetz.de>) id 1cGmeJ-0001oH-3S
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 07:57:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cGmdZ-0002DP-1n
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 07:56:57 -0500
-Received: from 20.mo1.mail-out.ovh.net ([188.165.45.168]:57345)
+	(envelope-from <sw@weilnetz.de>) id 1cGmeF-0002Nd-5L
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 07:57:39 -0500
+Received: from smtp.mail.uni-mannheim.de ([134.155.96.80]:53836)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cGmdY-0002DF-RY
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 07:56:52 -0500
-Received: from player795.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 432AB28535
-	for <qemu-devel@nongnu.org>; Tue, 13 Dec 2016 13:56:51 +0100 (CET)
-Date: Tue, 13 Dec 2016 13:56:41 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20161213135641.5ac9ad29@bahia.lan>
-In-Reply-To: <1481575745-26120-1-git-send-email-ehabkost@redhat.com>
-References: <1481575745-26120-1-git-send-email-ehabkost@redhat.com>
+	(Exim 4.71) (envelope-from <sw@weilnetz.de>) id 1cGmeE-0002N2-VE
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 07:57:35 -0500
+References: <1480432054-12065-1-git-send-email-yuval.shaia@oracle.com>
+	<c809cb3d-6e44-679b-f3b4-3c37bb0252b1@vivier.eu>
+From: Stefan Weil <sw@weilnetz.de>
+Message-ID: <decdd3a8-518b-e618-f591-32b1db80c771@weilnetz.de>
+Date: Tue, 13 Dec 2016 13:57:30 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.8.1 v2] machine: Convert abstract
- typename on compat_props to subclass names
+In-Reply-To: <c809cb3d-6e44-679b-f3b4-3c37bb0252b1@vivier.eu>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] slirp,
+ disas: Replace min/max with MIN/MAX macros
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,129 +28,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-stable@nongnu.org, Halil Pasic <pasic@linux.vnet.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Laurent Vivier <laurent@vivier.eu>, Yuval Shaia <yuval.shaia@oracle.com>, samuel.thibault@ens-lyon.org, jan.kiszka@siemens.com
+Cc: qemu-devel@nongnu.org
 
-On Mon, 12 Dec 2016 18:49:05 -0200
-Eduardo Habkost <ehabkost@redhat.com> wrote:
+Am 13.12.2016 um 13:33 schrieb Laurent Vivier:
+> Le 29/11/2016 =C3=A0 16:07, Yuval Shaia a =C3=A9crit :
+>> diff --git a/slirp/slirp.h b/slirp/slirp.h
+>> index a1f3139..3877f66 100644
+>> --- a/slirp/slirp.h
+>> +++ b/slirp/slirp.h
+>> @@ -292,9 +292,4 @@ int tcp_emu(struct socket *, struct mbuf *);
+>>  int tcp_ctl(struct socket *);
+>>  struct tcpcb *tcp_drop(struct tcpcb *tp, int err);
+>> =20
+>> -#ifndef _WIN32
+>> -#define min(x,y) ((x) < (y) ? (x) : (y))
+>> -#define max(x,y) ((x) > (y) ? (x) : (y))
+>> -#endif
+>> -
+> It seems the defines have been added because they are already defined
+> for Win32.
+>
+> If we remove them, do we know if MIN()/MAX() are defined for Win32?
+> [CC: host W32 maintainer]
+>
+> Thanks,
+> Laurent
 
-> Original problem description by Greg Kurz:
-> 
-> > Since commit "9a4c0e220d8a hw/virtio-pci: fix virtio
-> > behaviour", passing -device virtio-blk-pci.disable-modern=off
-> > has no effect on 2.6 machine types because the internal
-> > virtio-pci.disable-modern=on compat property always prevail.  
-> 
-> The same bug also affects other abstract type names mentioned on
-> compat_props by machine-types: apic-common, i386-cpu, pci-device,
-> powerpc64-cpu, s390-skeys, spapr-pci-host-bridge, usb-device,
-> virtio-pci, x86_64-cpu.
-> 
-> The right fix for this problem is to make sure compat_props and
-> -global options are always applied in the order they are
-> registered, instead of reordering them based on the type
-> hierarchy. But changing the ordering rules of -global is risky
-> and might break existing configurations, so we shouldn't do that
-> on a stable branch.
-> 
-> This is a temporary hack that will work around the bug when
-> registering compat_props properties: if we find an abstract class
-> on compat_props, register properties for all its non-abstract
-> subtypes instead. This will make sure -global won't be overridden
-> by compat_props, while keeping the existing ordering rules on
-> -global options.
-> 
-> Note that there's one case that won't be fixed by this hack:
-> "-global spapr-pci-vfio-host-bridge.<option>=<value>" won't be
-> able to override compat_props, because spapr-pci-host-bridge is
-> not an abstract class.
-> 
+Neither MIN nor MAX are defined in the header files provided with Mingw-w=
+64.
 
-As mentioned by Connie, spapr-pci-vfio-host-bridge is deprecated:
-
-commit 72700d7e733948fa7fbb735ccdf2209931c88476
-Author: David Gibson <david@gibson.dropbear.id.au>
-Date:   Mon Feb 29 17:19:50 2016 +1100
-
-    spapr_pci: (Mostly) remove spapr-pci-vfio-host-bridge
-
-
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
-
-Reviewed-by: Greg Kurz <groug@kaod.org>
-
-Tested-by: Greg Kurz <groug@kaod.org> # with virtio-blk-pci and pseries-2.6
-
-> Changes v1 (RFC) -> v2:
-> * New commit message
-> * Clarified comments
->   Suggested-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-> * Moved variable declaration outside of loop
->   Suggested-by: Cornelia Huck <cornelia.huck@de.ibm.com>
-> ---
->  hw/core/machine.c | 39 ++++++++++++++++++++++++++++++++++++---
->  1 file changed, 36 insertions(+), 3 deletions(-)
-> 
-> diff --git a/hw/core/machine.c b/hw/core/machine.c
-> index b0fd91f..213e8e0 100644
-> --- a/hw/core/machine.c
-> +++ b/hw/core/machine.c
-> @@ -554,11 +554,31 @@ static void machine_class_finalize(ObjectClass *klass, void *data)
->      g_free(mc->name);
->  }
->  
-> +static void register_compat_prop(const char *driver,
-> +                                 const char *property,
-> +                                 const char *value)
-> +{
-> +    GlobalProperty *p = g_new0(GlobalProperty, 1);
-> +    /* Machine compat_props must never cause errors: */
-> +    p->errp = &error_abort;
-> +    p->driver = driver;
-> +    p->property = property;
-> +    p->value = value;
-> +    qdev_prop_register_global(p);
-> +}
-> +
-> +static void machine_register_compat_for_subclass(ObjectClass *oc, void *opaque)
-> +{
-> +    GlobalProperty *p = opaque;
-> +    register_compat_prop(object_class_get_name(oc), p->property, p->value);
-> +}
-> +
->  void machine_register_compat_props(MachineState *machine)
->  {
->      MachineClass *mc = MACHINE_GET_CLASS(machine);
->      int i;
->      GlobalProperty *p;
-> +    ObjectClass *oc;
->  
->      if (!mc->compat_props) {
->          return;
-> @@ -566,9 +586,22 @@ void machine_register_compat_props(MachineState *machine)
->  
->      for (i = 0; i < mc->compat_props->len; i++) {
->          p = g_array_index(mc->compat_props, GlobalProperty *, i);
-> -        /* Machine compat_props must never cause errors: */
-> -        p->errp = &error_abort;
-> -        qdev_prop_register_global(p);
-> +        oc = object_class_by_name(p->driver);
-> +        if (oc && object_class_is_abstract(oc)) {
-> +            /* temporary hack to make sure we do not override
-> +             * globals set explicitly on -global: if an abstract class
-> +             * is on compat_props, register globals for all its
-> +             * non-abstract subtypes instead.
-> +             *
-> +             * This doesn't solve the problem for cases where
-> +             * a non-abstract typename mentioned on compat_props
-> +             * has subclasses, like spapr-pci-host-bridge.
-> +             */
-> +            object_class_foreach(machine_register_compat_for_subclass,
-> +                                 p->driver, false, p);
-> +        } else {
-> +            register_compat_prop(p->driver, p->property, p->value);
-> +        }
->      }
->  }
->  
+Cheers,
+Stefan
