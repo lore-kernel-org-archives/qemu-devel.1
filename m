@@ -1,25 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53608)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55123)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wouter@grep.be>) id 1cGo9c-0002js-LG
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 09:34:05 -0500
+	(envelope-from <mst@redhat.com>) id 1cGoDj-0004Es-Tq
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 09:38:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wouter@grep.be>) id 1cGo9Y-0006iT-Nd
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 09:34:04 -0500
-Received: from [2a01:4f8:140:52e5::2] (port=37050 helo=latin.grep.be)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <wouter@grep.be>) id 1cGo9Y-0006i5-HT
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 09:34:00 -0500
-Date: Tue, 13 Dec 2016 15:33:44 +0100
-From: Wouter Verhelst <w@uter.be>
-Message-ID: <20161213143344.rgcasv4e3waeha5u@grep.be>
-References: <20161212204313.anhjire2gkwd6gzi@grep.be>
-	<4B4EF198-ABE9-4517-A19D-8058AB117342@alex.org.uk>
+	(envelope-from <mst@redhat.com>) id 1cGoDg-00088t-NC
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 09:38:19 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51124)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cGoDg-00088Y-F7
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 09:38:16 -0500
+Received: from int-mx10.intmail.prod.int.phx2.redhat.com
+	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5D2D9C05AA6F
+	for <qemu-devel@nongnu.org>; Tue, 13 Dec 2016 14:38:15 +0000 (UTC)
+Date: Tue, 13 Dec 2016 16:38:14 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20161213163524-mutt-send-email-mst@kernel.org>
+References: <1481089965-3888-3-git-send-email-peterx@redhat.com>
+	<20161211051011-mutt-send-email-mst@kernel.org>
+	<20161212015602.GJ28693@pxdev.xzpeter.org>
+	<20161212123544.2139b842@t450s.home>
+	<20161213033341.GA32222@pxdev.xzpeter.org>
+	<20161212205150.3e7f7d3b@t450s.home>
+	<20161213052429.GB32222@pxdev.xzpeter.org>
+	<20161212224828.5cc9f841@t450s.home>
+	<20161213061212.GC32222@pxdev.xzpeter.org>
+	<20161213061747.0c152b86@t450s.home>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <4B4EF198-ABE9-4517-A19D-8058AB117342@alex.org.uk>
-Subject: Re: [Qemu-devel] [Nbd] [PATCH v5] doc: Add NBD_CMD_BLOCK_STATUS
- extension (part 2)
+In-Reply-To: <20161213061747.0c152b86@t450s.home>
+Subject: Re: [Qemu-devel] [PATCH for-2.9 2/2] intel_iommu: extend supported
+ guest aw to 48 bits
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,42 +42,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Bligh <alex@alex.org.uk>
-Cc: "nbd-general@lists.sourceforge.net" <nbd-general@lists.sourceforge.net>, Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "Stefan stefanha@redhat. com" <stefanha@redhat.com>, John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Pavel Borzenkov <pborzenkov@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, Markus Pargmann <mpa@pengutronix.de>, "Denis V. Lunev" <den@openvz.org>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>, jasowang@redhat.com, famz@redhat.com, qemu-devel@nongnu.org
 
-On Tue, Dec 13, 2016 at 02:12:48PM +0000, Alex Bligh wrote:
+On Tue, Dec 13, 2016 at 06:17:47AM -0700, Alex Williamson wrote:
+> On Tue, 13 Dec 2016 14:12:12 +0800
+> Peter Xu <peterx@redhat.com> wrote:
 > 
-> > On 12 Dec 2016, at 20:43, Wouter Verhelst <w@uter.be> wrote:
+> > On Mon, Dec 12, 2016 at 10:48:28PM -0700, Alex Williamson wrote:
+> > > On Tue, 13 Dec 2016 13:24:29 +0800
+> > > Peter Xu <peterx@redhat.com> wrote:
+> > >   
+> > > > On Mon, Dec 12, 2016 at 08:51:50PM -0700, Alex Williamson wrote:
+> > > > 
+> > > > [...]
+> > > >   
+> > > > > > > I'm not sure how the vIOMMU supporting 39 bits or 48 bits is directly
+> > > > > > > relevant to vfio, we're not sharing page tables.  There is already a
+> > > > > > > case today, without vIOMMU that you can make a guest which has more
+> > > > > > > guest physical address space than the hardware IOMMU by overcommitting
+> > > > > > > system memory.  Generally this quickly resolves itself when we start
+> > > > > > > pinning pages since the physical address width of the IOMMU is
+> > > > > > > typically the same as the physical address width of the host system
+> > > > > > > (ie. we exhaust the host memory).      
+> > > > > > 
+> > > > > > Hi, Alex,
+> > > > > > 
+> > > > > > Here does "hardware IOMMU" means the IOMMU iova address space width?
+> > > > > > For example, if guest has 48 bits physical address width (without
+> > > > > > vIOMMU), but host hardware IOMMU only supports 39 bits for its iova
+> > > > > > address space, could device assigment work in this case?    
+> > > > > 
+> > > > > The current usage depends entirely on what the user (VM) tries to map.
+> > > > > You could expose a vIOMMU with a 64bit address width, but the moment
+> > > > > you try to perform a DMA mapping with IOVA beyond bit 39 (if that's the
+> > > > > host IOMMU address width), the ioctl will fail and the VM will abort.
+> > > > > IOW, you can claim whatever vIOMMU address width you want, but if you
+> > > > > layout guest memory or devices in such a way that actually require IOVA
+> > > > > mapping beyond the host capabilities, you're going to abort.  Likewise,
+> > > > > without a vIOMMU if the guest memory layout is sufficiently sparse to
+> > > > > require such IOVAs, you're going to abort.  Thanks,    
+> > > > 
+> > > > Thanks for the explanation. I got the point.
+> > > > 
+> > > > However, should we allow guest behaviors affect hypervisor? In this
+> > > > case, if guest maps IOVA range over 39 bits (assuming vIOMMU is
+> > > > declaring itself with 48 bits address width), the VM will crash. How
+> > > > about we shrink vIOMMU address width to 39 bits during boot if we
+> > > > detected that assigned devices are configured? IMHO no matter what we
+> > > > do in the guest, the hypervisor should keep the guest alive from
+> > > > hypervisor POV (emulation of the guest hardware should not be stopped
+> > > > by guest behavior). If any operation in guest can cause hypervisor
+> > > > down, isn't it a bug?  
+> > > 
+> > > Any case of the guest crashing the hypervisor (ie. the host) is a
+> > > serious bug, but a guest causing it's own VM to abort is an entirely
+> > > different class, and in some cases justified.  For instance, you only
+> > > need a guest misbehaving in the virtio protocol to generate a VM
+> > > abort.  The cases Kevin raises make me reconsider because they are
+> > > cases of a VM behaving properly, within the specifications of the
+> > > hardware exposed to it, generating a VM abort, and in the case of vfio
+> > > exposed through to a guest user, allow the VM to be susceptible to the
+> > > actions of that user.
+> > > 
+> > > Of course any time we tie VM hardware to a host constraint, we're
+> > > asking for trouble.  You're example of shrinking the vIOMMU address
+> > > width to 39bits on boot highlights that.  Clearly cold plug devices is
+> > > only one scenario, what about hotplug devices?  We cannot dynamically
+> > > change the vIOMMU address width.  What about migration, we could start
+> > > the VM w/o an assigned device on a 48bit capable host and migrate it to
+> > > a 39bit host and then attempt to hot add an assigned device.  For the
+> > > most compatibility, why would we ever configure the VM with a vIOMMU
+> > > address width beyond the minimum necessary to support the potential
+> > > populated guest physical memory?  Thanks,  
 > > 
-> > +- `NBD_OPT_SET_META_CONTEXT` (11)
-> > +
-> > +    Change the set of active metadata contexts. Issuing this command
-> > +    replaces all previously-set metadata contexts; clients must ensure
-> > +    that all metadata contexts they're interested in are selected with
-> > +    the final query that they sent.
-> > +
-> > +    Data:
-> > +    - 32 bits, length of query
-> > +    - String, query to select metadata contexts. The syntax of this
-> > +      query is implementation-defined, except that it MUST start with a
-> > +      namespace. This namespace may be one of the following:
-> > +        - `base:`, for metadata contexts defined by this document;
-> > +        - `nbd-server:`, for metadata contexts defined by the
-> > +          implementation that accompanies this document (none
-> > +          currently);
-> > +        - `x-*:`, where `*` can be replaced by any random string not
-> > +          containing colons, for local experiments. This SHOULD NOT be
-> > +          used by metadata contexts that are expected to e widely used.
-> > +        - third-party implementations can register additional
-> > +          namespaces by simple request to the mailinglist.
+> > For now, I feel a tunable for the address width more essential - let's
+> > just name it as "aw-bits", which should only be used by advanced
+> > users. By default, we can use an address width safe enough, like 39
+> > bits (I assume that most pIOMMUs should support at least 39 bits).
+> > User configurations can override (for now, we can limit the options to
+> > only 39/48 bits).
+> > 
+> > Then, we can temporarily live even without the interface to detect
+> > host parameters - when user specify a specific width, he/she will
+> > manage the rest (of course taking the risk of VM aborts).
 > 
-> Surely also we need to specify multiple queries?
+> I'm sorry, what is the actual benefit of a 48-bit address width?
+> Simply to be able to support larger memory VMs?  In that case the
+> address width should be automatically configured when necessary rather
+> than providing yet another obscure user configuration.
 
-Yes. See my reply to Stefan's mail ;-)
+I think we need to map out all the issues, and a tunable
+isn't a bad way to experiment in order do this.
 
+>  Minimally, if
+> we don't have the support worked out for an option we should denote it
+> as an experimental option by prefixing it with 'x-'.  Once we make a
+> non-experimental option, we're stuck with it, and if feels like this is
+> being rushed through without an concrete requirement for supporting
+> it.  Thanks,
+> 
+> Alex
+
+That's a good idea I think. We'll rename once we have
+a better understanding what this depends on.
 
 -- 
-< ron> I mean, the main *practical* problem with C++, is there's like a dozen
-       people in the world who think they really understand all of its rules,
-       and pretty much all of them are just lying to themselves too.
- -- #debian-devel, OFTC, 2016-02-12
+MST
