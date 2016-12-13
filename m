@@ -1,14 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40906)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45042)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cGoqK-0008Qs-2a
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 10:18:17 -0500
+	(envelope-from <alex@alex.org.uk>) id 1cGowW-0003Rc-1g
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 10:24:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cGoqE-0006EJ-PG
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 10:18:12 -0500
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 13 Dec 2016 16:17:52 +0100
-Message-Id: <20161213151753.17020-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [throwaway PATCH] add fio plugin
+	(envelope-from <alex@alex.org.uk>) id 1cGowP-0000o9-Ky
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 10:24:36 -0500
+Received: from mail.avalus.com ([2001:41c8:10:1dd::10]:48184)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <alex@alex.org.uk>) id 1cGowP-0000o5-BG
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 10:24:29 -0500
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+From: Alex Bligh <alex@alex.org.uk>
+In-Reply-To: <20161213150343.3g3fxjixbteum7ju@grep.be>
+Date: Tue, 13 Dec 2016 15:24:25 +0000
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <B6B52260-6814-40CB-AA00-E79099B8ED56@alex.org.uk>
+References: <20161212204313.anhjire2gkwd6gzi@grep.be>
+	<2D482F67-8115-48CD-921D-5728BC1AD92B@alex.org.uk>
+	<20161213150343.3g3fxjixbteum7ju@grep.be>
+Subject: Re: [Qemu-devel] [Nbd] [PATCH v5] doc: Add NBD_CMD_BLOCK_STATUS
+ extension
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,725 +29,208 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org
+To: Wouter Verhelst <w@uter.be>
+Cc: Alex Bligh <alex@alex.org.uk>, "nbd-general@lists.sourceforge.net" <nbd-general@lists.sourceforge.net>, Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "Stefan stefanha@redhat. com" <stefanha@redhat.com>, John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Pavel Borzenkov <pborzenkov@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, Markus Pargmann <mpa@pengutronix.de>, "Denis V. Lunev" <den@openvz.org>
 
-All of the infrastructure is a bit hackish, which is why I've marked
-this as throwaway, but perhaps someone else would like to use it (or
-even revive the libtool infrastructure so that it can be included
-in QEMU).  I tested it with fio 2.8 and the master branch.
+Wouter,
 
-Support for driver options is minimal (only aio=native/threads :) so
-if you want to use the null driver remember that the size should be
-at most 1G (the default size of the null block device).
+>> But actually, why do we need to be so mean? Why can't we assume
+>> that if NBD_OPT_SET_META_CONTEXT is not sent, then all the metadata
+>> contexts should be selected?
+>=20
+> No. If no metadata contexts have been negotiated, then no metadata
+> context IDs were assigned to contexts, so there is no mapping to
+> external names. As such, the data being sent in response to
+> NBD_CMD_BLOCK_STATUS would have no meaning to the client.
 
-The plugin requires Stefan's polling patches, but it's easy to remove
-the poll_max_ns option if desired.
+Good point.
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- configure                 |  15 +-
- contrib/fio/Makefile      |  62 +++++++
- contrib/fio/README        |  13 ++
- contrib/fio/fio.c         | 436 ++++++++++++++++++++++++++++++++++++++++++++++
- contrib/fio/qemu.fio      |  27 +++
- contrib/fio/uninclude.awk |  78 +++++++++
- 6 files changed, 624 insertions(+), 7 deletions(-)
+>>> +    commands during the transmission phase.
+>>=20
+>> "otherwise, the client MUST NOT send NBD_CMD_BLOCK_STATUS
+>> messages."
+>>=20
+>> But actually isn't the telling question whether =
+NBD_OPT_SET_META_CONTEXT
+>> works?
+>>=20
+>> Actually, as this could be sent more than once, I think this whole
+>> thing would be better phrased as:
+>>=20
+>> "A client MUST NOT send `NBD_CMD_BLOCK_STATUS` unless
+>> within the negotiation phase it sent `NBD_OPT_SET_META_CONTEXT`
+>> at least once, and the final time it was sent, the server
+>> responded without an error."
+>=20
+> ... and returned at least one metadata context (since we state =
+elsewhere
+> that sending a SET command which selects nothing is not an error).
+>=20
+>> obviously this would be better under _SET_ than _LIST_,
+>> but the sentence can go entirely from here.
 
-diff --git a/configure b/configure
-index 3770d7c..2c844bc 100755
---- a/configure
-+++ b/configure
-@@ -1589,8 +1589,8 @@ static THREAD int tls_var;
- int main(void) { return tls_var; }
- 
- EOF
--  if compile_prog "-fPIE -DPIE" "-pie"; then
--    QEMU_CFLAGS="-fPIE -DPIE $QEMU_CFLAGS"
-+  if compile_prog "-fPIC -DPIC" "-pie"; then
-+    QEMU_CFLAGS="-fPIC -DPIC $QEMU_CFLAGS"
-     LDFLAGS="-pie $LDFLAGS"
-     pie="yes"
-     if compile_prog "" "-Wl,-z,relro -Wl,-z,now" ; then
-@@ -1598,15 +1598,15 @@ EOF
-     fi
-   else
-     if test "$pie" = "yes"; then
--      error_exit "PIE not available due to missing toolchain support"
-+      error_exit "PIC not available due to missing toolchain support"
-     else
--      echo "Disabling PIE due to missing toolchain support"
-+      echo "Disabling PIC due to missing toolchain support"
-       pie="no"
-     fi
-   fi
- 
--  if compile_prog "-Werror -fno-pie" "-nopie"; then
--    CFLAGS_NOPIE="-fno-pie"
-+  if compile_prog "-Werror -fno-pic -fno-pie" "-nopie"; then
-+    CFLAGS_NOPIE="-fno-pic -fno-pie"
-     LDFLAGS_NOPIE="-nopie"
-   fi
- fi
-@@ -6183,13 +6183,14 @@ fi
- 
- # build tree in object directory in case the source is not in the current directory
- DIRS="tests tests/tcg tests/tcg/cris tests/tcg/lm32 tests/libqos tests/qapi-schema tests/tcg/xtensa tests/qemu-iotests"
--DIRS="$DIRS fsdev"
-+DIRS="$DIRS fsdev contrib/fio"
- DIRS="$DIRS pc-bios/optionrom pc-bios/spapr-rtas pc-bios/s390-ccw"
- DIRS="$DIRS roms/seabios roms/vgabios"
- DIRS="$DIRS qapi-generated"
- FILES="Makefile tests/tcg/Makefile qdict-test-data.txt"
- FILES="$FILES tests/tcg/cris/Makefile tests/tcg/cris/.gdbinit"
- FILES="$FILES tests/tcg/lm32/Makefile tests/tcg/xtensa/Makefile po/Makefile"
-+FILES="$FILES contrib/fio/Makefile"
- FILES="$FILES pc-bios/optionrom/Makefile pc-bios/keymaps"
- FILES="$FILES pc-bios/spapr-rtas/Makefile"
- FILES="$FILES pc-bios/s390-ccw/Makefile"
-diff --git a/contrib/fio/Makefile b/contrib/fio/Makefile
-new file mode 100644
-index 0000000..3d47d5c
---- /dev/null
-+++ b/contrib/fio/Makefile
-@@ -0,0 +1,62 @@
-+# -*- Mode: makefile -*-
-+
-+BUILD_DIR?=$(CURDIR)/../..
-+
-+include ../../config-host.mak
-+include $(SRC_PATH)/rules.mak
-+
-+$(call set-vpath, $(SRC_PATH):$(SRC_PATH)/contrib/fio:$(CURDIR))
-+
-+PROGS=qemu.so
-+
-+all: $(PROGS)
-+# Dummy command so that make thinks it has done something
-+	@true
-+
-+QEMU_CFLAGS += -Wno-redundant-decls
-+LIBS += $(LIBS_TOOLS)
-+
-+# We need two fio header files, but we don't want to include
-+# fio's config-host.h because its #defined symbols conflict
-+# with QEMU's own config-host.h.  In general we do not want to
-+# have -I$(FIO_PATH) while compiling fio.o because the possible
-+# conflicts are a mess.
-+#
-+# optgroup.h is tame and we can just copy it to the build directory,
-+# but fio.h includes a lot of other header files, from both fio
-+# itself and the system.  Therefore we preprocess it so that
-+# fio's headers are merged into a single file, fio-qemu.h, while
-+# system headers are left as #include directives.  Because the
-+# preprocessing step removes all preprocessor conditionals,
-+# there is no dependency left on fio's config-host.h file.
-+#
-+# While at it, we hack some symbols that conflict with QEMU's,
-+# by prefixing them with a "FIO_" or "fio_" namespace.
-+fio.o: fio-qemu.h fio-optgroup-qemu.h
-+
-+fio-optgroup-qemu.h:
-+	cp $(FIO_PATH)/optgroup.h $@
-+
-+FIO_HACK_SYMBOLS=sed -e 's/\<JSON_/FIO_&/' -e 's/\<cpu_to_/fio_&/'
-+fio-qemu.h:
-+	$(CC) -dD -dI -C -E -o - -I$(FIO_PATH) $(QEMU_CFLAGS) \
-+            -include $(FIO_PATH)/config-host.h $(FIO_PATH)/fio.h | \
-+            awk -f $(SRC_PATH)/contrib/fio/uninclude.awk | \
-+            $(FIO_HACK_SYMBOLS) > $@
-+
-+include $(SRC_PATH)/Makefile.objs
-+dummy := $(call unnest-vars,../.., \
-+               block-obj-y \
-+               block-obj-m \
-+               crypto-obj-y \
-+               qom-obj-y \
-+               io-obj-y)
-+obj-y := fio.o $(block-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y)
-+
-+dummy := $(shell mkdir -p $(dir $(obj-y)))
-+qemu.so: $(obj-y) ../../libqemuutil.a ../../libqemustub.a
-+	$(call LINK, $^)
-+
-+clean: clean-target
-+	rm -f *.a $(filter-out ../../%, $(obj-y))
-+	rm -f $(shell find . -name '*.[od]')
-diff --git a/contrib/fio/README b/contrib/fio/README
-new file mode 100644
-index 0000000..4aef2a0
---- /dev/null
-+++ b/contrib/fio/README
-@@ -0,0 +1,13 @@
-+This is a plugin to test the QEMU block layer with fio,
-+the flexible I/O tester.
-+
-+To build this plugin you have to:
-+
-+1) hack the configure file to use -fPIC instead of -fPIE
-+
-+2) configure qemu with --enable-pie
-+
-+3) build the plugin with
-+
-+	make qemu-img
-+	make -C contrib/fio FIO_PATH=/path/to/fio/source
-diff --git a/contrib/fio/fio.c b/contrib/fio/fio.c
-new file mode 100644
-index 0000000..229b71c
---- /dev/null
-+++ b/contrib/fio/fio.c
-@@ -0,0 +1,436 @@
-+/*
-+ * QEMU engine for fio
-+ *
-+ */
-+#include "fio-qemu.h"
-+#include "fio-optgroup-qemu.h"
-+#include "qemu/osdep.h"
-+#include "qemu/iov.h"
-+#include "qapi/error.h"
-+#include "qapi/qmp/qdict.h"
-+#include "qapi/qmp/qstring.h"
-+#include "block/aio.h"
-+#include "block/qapi.h"
-+#include "crypto/init.h"
-+#include "sysemu/block-backend.h"
-+
-+#ifndef TD_ENG_FLAG_SHIFT
-+#define io_ops_data io_ops->data
-+#define io_ops_dlhandle io_ops->dlhandle
-+#endif
-+
-+struct qemu_data {
-+	AioContext *ctx;
-+	unsigned int completed;
-+	unsigned int to_submit;
-+	struct io_u *aio_events[];
-+};
-+
-+struct qemu_options {
-+	void *pad;
-+	const char *aio;
-+	const char *format;
-+	const char *driver;
-+	unsigned int poll_max_ns;
-+};
-+
-+static QemuMutex iothread_lock;
-+
-+static int str_aio_cb(void *data, const char *str)
-+{
-+	struct qemu_options *o = data;
-+
-+	if (!strcmp(str, "native") || !strcmp(str, "threads"))
-+		o->aio = strdup(str);
-+	else
-+		return 1;
-+
-+	return 0;
-+}
-+
-+static struct fio_option options[] = {
-+	{
-+		.name   = "qemu_driver",
-+		.lname  = "QEMU block driver",
-+		.type   = FIO_OPT_STR_STORE,
-+		.off1   = offsetof(struct qemu_options, driver),
-+		.category = FIO_OPT_C_ENGINE,
-+		.group  = FIO_OPT_G_INVALID,
-+	},
-+	{
-+		.name   = "qemu_format",
-+		.lname  = "Image format",
-+		.type   = FIO_OPT_STR_STORE,
-+		.off1   = offsetof(struct qemu_options, format),
-+		.category = FIO_OPT_C_ENGINE,
-+		.group  = FIO_OPT_G_INVALID,
-+	},
-+	{
-+		.name   = "qemu_aio",
-+		.lname  = "Use native AIO",
-+		.type   = FIO_OPT_STR_STORE,
-+		.off1   = offsetof(struct qemu_options, aio),
-+		.cb     = str_aio_cb,
-+		.category = FIO_OPT_C_ENGINE,
-+		.group  = FIO_OPT_G_INVALID,
-+	},
-+	{
-+		.name   = "qemu_poll_max_ns",
-+		.lname  = "QEMU polling period",
-+		.type   = FIO_OPT_STR_SET,
-+		.off1   = offsetof(struct qemu_options, poll_max_ns),
-+		.category = FIO_OPT_C_ENGINE,
-+		.group  = FIO_OPT_G_INVALID,
-+	},
-+	{
-+		.name   = NULL,
-+	},
-+};
-+
-+static int fio_qemu_getevents(struct thread_data *td, unsigned int min,
-+			      unsigned int max, const struct timespec *t)
-+{
-+	struct qemu_data *qd = td->io_ops_data;
-+
-+	/* TODO: set timer */
-+	do
-+		aio_poll(qd->ctx, true);
-+	while (qd->completed < min);
-+
-+	return qd->completed;
-+}
-+
-+static struct io_u *fio_qemu_event(struct thread_data *td, int event)
-+{
-+	struct qemu_data *qd = td->io_ops_data;
-+
-+	qd->completed--;
-+	return qd->aio_events[event];
-+}
-+
-+static inline BlockBackend *fio_qemu_get_blk(struct fio_file *file)
-+{
-+	return (BlockBackend *)(uintptr_t)(file->engine_data & ~1);
-+}
-+
-+static inline bool fio_qemu_mark_plugged(struct fio_file *file)
-+{
-+	bool plugged = (file->engine_data & 1);
-+	file->engine_data |= 1;
-+	return plugged;
-+}
-+
-+static inline bool fio_qemu_test_and_clear_plugged(struct fio_file *file)
-+{
-+	bool plugged = (file->engine_data & 1);
-+	file->engine_data &= ~1;
-+	return plugged;
-+}
-+
-+static void fio_qemu_entry(void *opaque)
-+{
-+	struct io_u *io_u = opaque;
-+	struct fio_file *file = io_u->file;
-+	BlockBackend *blk = fio_qemu_get_blk(file);
-+	struct iovec iov = { io_u->xfer_buf, io_u->xfer_buflen };
-+
-+	struct thread_data *td;
-+	struct qemu_data *qd;
-+	unsigned r;
-+	int ret;
-+
-+	if (!fio_qemu_mark_plugged(io_u->file))
-+		blk_io_plug(blk);
-+
-+	if (io_u->ddir == DDIR_READ) {
-+		QEMUIOVector qiov;
-+		qemu_iovec_init_external(&qiov, &iov, 1);
-+		ret = blk_co_preadv(blk, io_u->offset, iov.iov_len, &qiov, 0);
-+	} else if (io_u->ddir == DDIR_WRITE) {
-+		QEMUIOVector qiov;
-+		qemu_iovec_init_external(&qiov, &iov, 1);
-+		ret = blk_co_pwritev(blk, io_u->offset, iov.iov_len, &qiov, 0);
-+	} else if (io_u->ddir == DDIR_TRIM) {
-+		ret = blk_co_pdiscard(blk, io_u->offset, iov.iov_len);
-+	} else {
-+		ret = blk_flush(blk);
-+	}
-+
-+	if (!ret) {
-+		io_u->resid = 0;
-+		io_u->error = 0;
-+	} else if (ret == -ECANCELED) {
-+		io_u->resid = io_u->xfer_buflen;
-+		io_u->error = 0;
-+	} else {
-+		io_u->error = -ret;
-+	}
-+
-+	td = io_u->engine_data;
-+	qd = td->io_ops_data;
-+	r = qd->completed++;
-+	qd->aio_events[r] = io_u;
-+}
-+
-+static int fio_qemu_queue(struct thread_data *td,
-+			      struct io_u *io_u)
-+{
-+	Coroutine *co;
-+	struct qemu_data *qd;
-+
-+	fio_ro_check(td, io_u);
-+
-+	co = qemu_coroutine_create(fio_qemu_entry, io_u);
-+	io_u->error = EINPROGRESS;
-+	io_u->engine_data = td;
-+	qemu_coroutine_enter(co);
-+
-+	qd = td->io_ops_data;
-+	if (io_u->error == EINPROGRESS) {
-+		/* Since we have a commit hook, we need to call io_u_queued()
-+		 * ourselves, but we don't really know if the backend actually
-+		 * does anything on blk_io_plug/unplug.  Calling it here is not
-+		 * exactly right if it does do something, but it saves the
-+		 * expense of walking the io_u's again in fio_qemu_commit.
-+		 */
-+		io_u_queued(td, io_u);
-+		io_u->error = 0;
-+		qd->to_submit++;
-+		return FIO_Q_QUEUED;
-+	}
-+
-+	/* This I/O operation has completed.  If all of them are, fio will not
-+	 * call fio_qemu_commit, so unplug immediately.
-+	 */
-+	qd->completed--;
-+	if (qd->to_submit == 0) {
-+		BlockBackend *blk = fio_qemu_get_blk(io_u->file);
-+		fio_qemu_test_and_clear_plugged(io_u->file);
-+		blk_io_unplug(blk);
-+	}
-+
-+	return FIO_Q_COMPLETED;
-+}
-+
-+static int fio_qemu_commit(struct thread_data *td)
-+{
-+	struct qemu_data *qd = td->io_ops_data;
-+	struct fio_file *file;
-+	int i;
-+
-+	for_each_file(td, file, i) {
-+		if (fio_qemu_test_and_clear_plugged(file)) {
-+			BlockBackend *blk = fio_qemu_get_blk(file);
-+			blk_io_unplug(blk);
-+		}
-+	}
-+	qd->to_submit = 0;
-+
-+	return 0;
-+}
-+
-+static int fio_qemu_invalidate(struct thread_data *td, struct fio_file *file)
-+{
-+	return 0;
-+}
-+static void fio_qemu_cleanup(struct thread_data *td)
-+{
-+	struct qemu_data *qd = td->io_ops_data;
-+
-+	if (qd) {
-+		aio_context_unref(qd->ctx);
-+		free(qd);
-+	}
-+}
-+
-+static QDict *fio_qemu_opts(struct thread_data *td, struct fio_file *file)
-+{
-+	QDict *bs_opts;
-+	struct qemu_options *o = td->eo;
-+
-+	bs_opts = qdict_new();
-+	if (td_read(td) && read_only)
-+		qdict_put(bs_opts, BDRV_OPT_READ_ONLY,
-+			  qstring_from_str("on"));
-+	qdict_put(bs_opts, BDRV_OPT_CACHE_DIRECT,
-+		  qstring_from_str(td->o.odirect ? "on" : "off"));
-+	if (o->format)
-+		qdict_put(bs_opts, "format", qstring_from_str(o->format));
-+
-+	/* If no format is provided, but a driver is, skip the raw format.  */
-+	if (o->driver)
-+		qdict_put(bs_opts, !o->format ? "driver" : "file.driver",
-+			  qstring_from_str(o->driver));
-+
-+
-+	/* This is mostly a convenience, because the aio option of the file
-+	 * driver is commonly specified.
-+	 */
-+	if (o->aio)
-+		qdict_put(bs_opts, !o->format && o->driver ? "aio" : "file.aio",
-+			  qstring_from_str(o->aio));
-+
-+	return bs_opts;
-+}
-+
-+static int fio_qemu_get_file_size(struct thread_data *td, struct fio_file *file)
-+{
-+	Error *local_error = NULL;
-+	BlockBackend *blk;
-+	QDict *bs_opts;
-+	ImageInfo *info;
-+
-+	bs_opts = fio_qemu_opts(td, file);
-+	qemu_mutex_lock(&iothread_lock);
-+	blk = blk_new_open(file->file_name, NULL, bs_opts, 0, &local_error);
-+	if (local_error) {
-+		struct qemu_options *o = td->eo;
-+		if (!td->o.create_on_open || !td->o.allow_create)
-+			goto err;
-+
-+		error_free(local_error);
-+		local_error = NULL;
-+
-+		bdrv_img_create(file->file_name, o->format ? : "raw", NULL, NULL,
-+				NULL, get_rand_file_size(td), 0, &local_error, false);
-+		if (local_error)
-+			goto err;
-+
-+		bs_opts = fio_qemu_opts(td, file);
-+		blk = blk_new_open(file->file_name, NULL, bs_opts, 0, &local_error);
-+		if (local_error)
-+			goto err;
-+	}
-+
-+	/* QDECREF(bs_opts); ??? */
-+	bdrv_query_image_info(blk_bs(blk), &info, &local_error);
-+	blk_unref(blk);
-+	qemu_mutex_unlock(&iothread_lock);
-+
-+	file->real_file_size = info->virtual_size;
-+	fio_file_set_size_known(file);
-+	qapi_free_ImageInfo(info);
-+
-+	return 0;
-+err:
-+	qemu_mutex_unlock(&iothread_lock);
-+	error_report_err(local_error);
-+	return -EINVAL;
-+}
-+
-+static void fio_qemu_setup_globals(void)
-+{
-+	qemu_init_main_loop(&error_abort);
-+	qcrypto_init(&error_fatal);
-+	module_call_init(MODULE_INIT_QOM);
-+	bdrv_init();
-+	qemu_mutex_init(&iothread_lock);
-+}
-+
-+static int fio_qemu_setup(struct thread_data *td)
-+{
-+	static pthread_once_t fio_qemu_globals = PTHREAD_ONCE_INIT;
-+	struct fio_file *file;
-+	int i;
-+
-+	td->o.use_thread = 1;
-+	pthread_once(&fio_qemu_globals, fio_qemu_setup_globals);
-+
-+        if (!td->o.file_size_low)
-+		td->o.file_size_low = td->o.file_size_high =
-+			td->o.size / td->o.nr_files;
-+
-+	for_each_file(td, file, i) {
-+		int ret;
-+		dprint(FD_FILE, "get file size for %p/%d/%p\n", file, i,
-+								file->file_name);
-+
-+		ret = fio_qemu_get_file_size(td, file);
-+		if (ret < 0) {
-+			log_err("%s\n", strerror(-ret));
-+			return 1;
-+		}
-+	}
-+
-+	return 0;
-+}
-+
-+static int fio_qemu_init(struct thread_data *td)
-+{
-+	size_t sz = sizeof(struct qemu_data) + td->o.iodepth * sizeof(struct io_u *);
-+	struct qemu_data *qd = malloc(sz);
-+	struct qemu_options *o = td->eo;
-+	Error *local_error = NULL;
-+
-+	memset(qd, 0, sz);
-+	qd->ctx = aio_context_new(&error_abort);
-+	aio_context_set_poll_params(qd->ctx, o->poll_max_ns, 0, 0, &local_error);
-+	if (local_error) {
-+		error_report_err(local_error);
-+		return 1;
-+	}
-+
-+	/* dlclosing QEMU leaves a pthread_key behind.  We'd need RTLD_NODELETE,
-+	 * but fio does not use it.  Instead, just prevent fio from dlclosing.
-+	 */
-+	td->io_ops_dlhandle = NULL;
-+
-+	td->io_ops_data = qd;
-+	td->o.use_thread = 1;
-+	return 0;
-+}
-+
-+static int fio_qemu_open_file(struct thread_data *td, struct fio_file *file)
-+{
-+	struct qemu_data *qd = td->io_ops_data;
-+	Error *local_error = NULL;
-+	QDict *bs_opts;
-+	BlockBackend *blk;
-+
-+	qemu_mutex_lock(&iothread_lock);
-+	bs_opts = fio_qemu_opts(td, file);
-+	blk = blk_new_open(file->file_name, NULL, bs_opts, 0, &local_error);
-+	/* QDECREF(bs_opts); ??? */
-+
-+	if (local_error) {
-+		error_report_err(local_error);
-+		return -EINVAL;
-+	}
-+
-+	blk_set_aio_context(blk, qd->ctx);
-+	blk_set_enable_write_cache(blk, !td->o.sync_io);
-+	qemu_mutex_unlock(&iothread_lock);
-+
-+	file->engine_data = (uintptr_t)blk;
-+	td->o.open_files ++;
-+	return 0;
-+}
-+
-+static int fio_qemu_close_file(struct thread_data *td, struct fio_file *file)
-+{
-+	BlockBackend *blk = fio_qemu_get_blk(file);
-+
-+	if (blk) {
-+		blk_unref(blk);
-+		file->engine_data = 0;
-+	}
-+
-+	return 0;
-+}
-+
-+struct ioengine_ops ioengine = {
-+	.name		= "qemu",
-+	.version	= FIO_IOOPS_VERSION,
-+	.init		= fio_qemu_init,
-+	.queue		= fio_qemu_queue,
-+	.commit		= fio_qemu_commit,
-+	.getevents	= fio_qemu_getevents,
-+	.event		= fio_qemu_event,
-+	.invalidate	= fio_qemu_invalidate,
-+	.cleanup	= fio_qemu_cleanup,
-+	.setup		= fio_qemu_setup,
-+	.open_file	= fio_qemu_open_file,
-+	.close_file	= fio_qemu_close_file,
-+	.options	= options,
-+	.option_struct_size = sizeof(struct qemu_options),
-+};
-diff --git a/contrib/fio/qemu.fio b/contrib/fio/qemu.fio
-new file mode 100644
-index 0000000..09241c1
---- /dev/null
-+++ b/contrib/fio/qemu.fio
-@@ -0,0 +1,27 @@
-+; Read 4 files with aio at different depths
-+[global]
-+ioengine=./qemu.so
-+direct=1
-+qemu_aio=native
-+create_on_open=1
-+rw=randread
-+bs=128k
-+filesize=128m
-+runtime=10s
-+time_based
-+
-+[file1]
-+filename=file1
-+iodepth=4
-+
-+[file2]
-+filename=file2
-+iodepth=32
-+
-+[file3]
-+filename=file3
-+iodepth=8
-+
-+[file4]
-+filename=file4
-+iodepth=16
-diff --git a/contrib/fio/uninclude.awk b/contrib/fio/uninclude.awk
-new file mode 100644
-index 0000000..88afa59
---- /dev/null
-+++ b/contrib/fio/uninclude.awk
-@@ -0,0 +1,78 @@
-+BEGIN {
-+    # gcc strips #ifdef blocks, which removes the multiple-inclusion guard too.
-+    # Repair with #pragma once.
-+    print "#pragma once"
-+}
-+
-+{
-+    # Documentation says builtins are not printed by -dD, but reality disagrees.
-+    if ($1 == "#" && $3 ~ "\"<built-in>\"") {
-+        delete_until_hash = 1
-+        next
-+    }
-+    if (delete_until_hash) {
-+        if ($1 == "#") {
-+            delete_until_hash = 0
-+        } else {
-+           next
-+       }
-+   }
-+
-+    # Handle the delete state: skip files included with <...> and -include,
-+    # plus their nested includes
-+    if (delete_depth) {
-+        if ($1 == "#") {
-+            if ($4 == "1") {
-+                delete_depth++
-+            } else if ($4 == "2") {
-+                delete_depth--
-+            }
-+        }
-+        if (delete_depth) {
-+            next
-+        } else {
-+            # Out of delete state.  We are on a # directive, if necessary
-+            # we can use it to set command_line again
-+            command_line = 0
-+        }
-+    }
-+
-+    # Handle the command-line state: skip -D definitions and -included files
-+    if ($1 == "#" && $3 == "\"<command-line>\"") {
-+        command_line = 1
-+    }
-+
-+    if (command_line) {
-+        if ($1 == "#" && $4 == "1") {
-+            # This is a -included file, go to the delete state
-+            delete_depth = 1
-+        }
-+        next
-+    }
-+
-+    if ($1 == "#include") {
-+        if ($2 ~ /^</) {
-+            print
-+            # We printed the #include directive.  Now skip until the # line
-+            # that enters the included file, and go to the delete state.
-+            do {
-+                getline
-+            } while ($1 == "#" && $4 != "1")
-+            if ($1 == "#" && $4 == "1") {
-+                delete_depth = 1
-+                next
-+            }
-+        } else {
-+            # For local includes we include their content, so the #include
-+            # directive must go.
-+            next
-+        }
-+    }
-+
-+    # Remove line directives emitted by the preprocessor
-+    if ($1 == "#") {
-+        next
-+    }
-+
-+    print
-+}
+Yes
+
+>> Equally obviously, if we are making _SET_ optional (as
+>> lack of _SET_ means that all the contexts are selected)
+>> we just gate this on `NBD_FLAG_SEND_BLOCK_STATUS`
+>=20
+> You can't, as per above.
+
+Indeed.
+
+>> "If specified, the server MUST return the zero or more contexts
+>> whose names (including the namespace) consist of or start with
+>> the query string. For instance a query string of 'nbd-server:'
+>> would return all contexts within the 'nbd-server' namespace,
+>> and a string 'base:a' would return all context within the
+>> 'base' namespace that began with 'a'"
+>=20
+> NAK. This imposes a particular syntax for parsing query strings upon
+> namespaces, which I explicitly do not wish to do.
+>=20
+> The spec should only specify how to select a particular namespace, and
+> then leave all parsing rules of query strings up to the namespace
+> specification.
+
+I'm not quite sure why you want that, but if that's the case, I'd
+suggest the easiest thing to do would be to pass (separately) a
+namespace string, and a name-query, because you are prohibiting
+queries that cover more than one namespace (though per our
+separate conversation, you can select context from more than
+one namespace with multiple queries). It does seem a bit odd
+thought that if context 'foo:bar' is returned from _LIST_,
+there is no guarantee that selecting it as 'foo:bar' will
+work (as the matching is namespace dependent).
+
+>>> +    The server MUST reply with a list of `NBD_REP_META_CONTEXT` =
+replies,
+>>> +    followed by `NBD_REP_ACK`. The metadata context ID in these =
+replies
+>>> +    is reserved and SHOULD be set to zero; clients SHOULD disregard =
+it.
+>>=20
+>> Why is the context ID set to zero? Surely it would be really helpful
+>> for this to be filled in with the ID?
+>=20
+> The ID could change depending on which contexts are actually selected:
+>=20
+> First, I could imagine a context namespace which allows the client to
+> dynamically create a context (e.g., "create a snapshot now and use
+> that"), but where that would only be actually done when the client
+> actually chooses the metadata context.
+>=20
+> Second, a namespace could create symbolic context names (e.g., "the
+> latest snapshot, whatever that may be"), whose ID could change between
+> the LIST and SET options (presumably that's a very small race window,
+> but a race is a race).
+>=20
+> Third, a valid (and simple) way to implement mapping could be to =
+assign
+> context IDs as array indices, where the array is dynamically created =
+at
+> SET time, and where the server side does a for loop over the array, =
+and
+> returns the metadata context ID as htonl() of its loop variable. This
+> would mean that there must be no gaps between the IDs at run time.
+>=20
+> Perhaps another way to deal with that would be to specify that an
+> implementation is not required to assign the same context IDs to the
+> same metadata contexts from one call to SET (or LIST) to the next; but =
+I
+> thought it would be clearer if we were to explicitly make LIST return
+> "invalid" context IDs. Then again, maybe not.
+
+You're completely correct here and you should ignore my suggestion.
+
+Perhaps you should be even clearer and explicitly state that
+context IDs may change between sessions and even between successive
+use of the _SET_ command.
+
+>> These two probably belong in a different patch
+>=20
+> 3
+>=20
+> (number of people telling me that. Yes, I know :-)
+
+Sorry, behind on mail :-)
+
+>>> +##### Metadata contexts
+>>> +
+>>> +The `base:allocation` metadata context is the basic "allocated at =
+all"
+>>> +metadata context. If an extent is marked with `NBD_STATE_HOLE` at =
+that
+>>> +context, this means that the given extent is not allocated in the
+>>> +backend storage, and that writing to the extent MAY result in the =
+ENOSPC
+>>> +error. This supports sparse file semantics on the server side. If a
+>>> +server has only one metadata context (the default), then writing to =
+an
+>>> +extent which has `NBD_STATE_HOLE` clear MUST NOT fail with ENOSPC.
+>>=20
+>> Again I'm still confused by this. I *think* you mean "If a server
+>> supports the `base:allocation` metadata context, then writing
+>> to an extent which has `NBD_STATE_HOLE` clear MUST NOT fail with =
+ENOSPC.`
+>>=20
+>> I say that because as currently phrased:
+>>=20
+>> * If a server has one metadata context only, but it is not
+>>  `base:allocation`, then you implying something about writing
+>>  to an extent with a state that won't even exist.
+>=20
+> Yes, that's wrong indeed. We should replace the "the default" bit by
+> "the base:allocation context".
+>=20
+>> * If a server has `base:allocation` AND another metadata context
+>>  (for instance `qemu:dirty`) then the rule you set out will not
+>>  apply.
+>=20
+> Yes, and this is intentional, as I've explained before. The other
+> context's semantics should clarify whether that rule still applies or
+> not. Implementations that do not know of the other context should
+> however assume that it doesn't.
+
+I think I must be being very stupid or am at least at cross-purposes.
+
+Let's say the second context is (e.g.) =
+'colour:records_information_about_blue'
+(i.e. nothing at all to do with space or holes). Are you saying that the
+presence of that context might affect the interpretation of
+NBD_STATE_HOLE? Or just other contexts within the 'base:' space?
+Or that another context (e.g. perhaps compression) could be an =
+independent
+cause of ENOSPC? If so should it be the responsibility of the other =
+context
+to document that it does not affect that?
+
+How about:
+
+"If a server supports the `base:allocation` metadata context, then =
+writing
+to an extent which has `NBD_STATE_HOLE` clear MUST NOT fail with ENOSPC
+unless for reasons specified in the definition of another context."
+
+>>> +For the `base:allocation` context, the remainder of the flags field =
+is
+>>> +reserved. Servers SHOULD set it to all-zero;
+>>=20
+>> Surely if we want to reserve them for extension, we need "Servers
+>> MUST set it to all-zero"
+>=20
+> No, SHOULD, otherwise a future extension which adds meaning to those
+> bits will suddenly become incompatible with this spec. Think about it
+> ;-)
+
+I did! If there is a future extension, it will change the spec to
+incorporate those bits, so they won't be included within 'the
+remainder' any more.
+
+> (feel free to update the branch with those suggestions I've not NAK'd,
+> as I think they make sense...)
+
+OK. May take a look later.
+
+--=20
+Alex Bligh
