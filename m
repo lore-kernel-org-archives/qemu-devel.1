@@ -1,17 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56786)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58054)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cGkTX-0006Hu-B1
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 05:38:24 -0500
+	(envelope-from <longpeng2@huawei.com>) id 1cGkYe-0002XU-Lh
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 05:43:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cGkTW-0000Og-1m
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 05:38:23 -0500
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 13 Dec 2016 10:36:21 +0000
-Message-Id: <1481625384-15077-21-git-send-email-peter.maydell@linaro.org>
-In-Reply-To: <1481625384-15077-1-git-send-email-peter.maydell@linaro.org>
-References: <1481625384-15077-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 20/23] hw/intc/arm_gicv3: Implement EL2 traps
- for CPU i/f regs
+	(envelope-from <longpeng2@huawei.com>) id 1cGkYa-0002Cx-Og
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 05:43:40 -0500
+Received: from szxga02-in.huawei.com ([119.145.14.65]:2776)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <longpeng2@huawei.com>) id 1cGkYa-0002BB-5I
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 05:43:36 -0500
+From: "Longpeng(Mike)" <longpeng2@huawei.com>
+Date: Tue, 13 Dec 2016 18:42:55 +0800
+Message-ID: <1481625780-39164-2-git-send-email-longpeng2@huawei.com>
+In-Reply-To: <1481625780-39164-1-git-send-email-longpeng2@huawei.com>
+References: <1481625780-39164-1-git-send-email-longpeng2@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH for-2.9 v4 1/6] configure: add
+ CONFIG_GCRYPT_HMAC item
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,178 +26,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Christoffer Dall <christoffer.dall@linaro.org>, Andrew Jones <drjones@redhat.com>
+To: berrange@redhat.com
+Cc: wu.wubin@huawei.com, jianjay.zhou@huawei.com, arei.gonglei@huawei.com, qemu-devel@nongnu.org, "Longpeng(Mike)" <longpeng2@huawei.com>
 
-Implement the architecturally required traps from NS EL1
-to EL2 for the CPU interface registers. These fall into
-several different groups:
- * group-0-only registers all trap if ICH_HRC_EL2.TALL0 is set
-   (exactly the registers covered by gicv3_fiq_access())
- * group-1-only registers all trap if ICH_HRC_EL2.TALL1 is set
-   (exactly the registers covered by gicv3_irq_access())
- * DIR traps if ICH_HCR_EL2.TC or ICH_HCR_EL2.TDIR are set
- * PMR, RPR, CTLR trap if ICH_HCR_EL2.TC is set
- * SGI0R, SGI1R, ASGI1R trap if ICH_HCR_EL2.TC is set or
-   if HCR_EL2.IMO or HCR_EL2.FMO are set
+This item will be used for support libcrypt-backed HMAC algorithms.
 
-We split DIR and the SGI registers out into their own access
-functions, leaving the existing gicv3_irqfiq_access() just
-handling PMR, RPR and CTLR.
+Support for hmac has been added in Libgcrypt 1.6.0, but we cannot
+use pkg-config to get libcrypt's version. However we can make a
+in configure to know whether current libcrypt support hmac.
 
-This commit doesn't implement support for trapping on
-HSTR_EL2.T12 for the 32-bit registers, as we don't implement
-any of those per-coprocessor trap bits currently and
-probably will want to do those in some more centralized way.
-
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
 ---
- hw/intc/arm_gicv3_cpuif.c | 70 ++++++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 60 insertions(+), 10 deletions(-)
+ configure | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
-diff --git a/hw/intc/arm_gicv3_cpuif.c b/hw/intc/arm_gicv3_cpuif.c
-index e05f6b3..a9ee7fd 100644
---- a/hw/intc/arm_gicv3_cpuif.c
-+++ b/hw/intc/arm_gicv3_cpuif.c
-@@ -1833,9 +1833,17 @@ static CPAccessResult gicv3_irqfiq_access(CPUARMState *env,
-                                           const ARMCPRegInfo *ri, bool isread)
- {
-     CPAccessResult r = CP_ACCESS_OK;
-+    GICv3CPUState *cs = icc_cs_from_env(env);
-+    int el = arm_current_el(env);
+diff --git a/configure b/configure
+index 3770d7c..f30aa1b 100755
+--- a/configure
++++ b/configure
+@@ -313,6 +313,7 @@ gnutls_rnd=""
+ nettle=""
+ nettle_kdf="no"
+ gcrypt=""
++gcrypt_hmac="no"
+ gcrypt_kdf="no"
+ vte=""
+ virglrenderer=""
+@@ -2417,6 +2418,19 @@ EOF
+         if compile_prog "$gcrypt_cflags" "$gcrypt_libs" ; then
+             gcrypt_kdf=yes
+         fi
 +
-+    if ((cs->ich_hcr_el2 & ICH_HCR_EL2_TC) &&
-+        el == 1 && !arm_is_secure_below_el3(env)) {
-+        /* Takes priority over a possible EL3 trap */
-+        return CP_ACCESS_TRAP_EL2;
-+    }
- 
-     if ((env->cp15.scr_el3 & (SCR_FIQ | SCR_IRQ)) == (SCR_FIQ | SCR_IRQ)) {
--        switch (arm_current_el(env)) {
-+        switch (el) {
-         case 1:
-             if (arm_is_secure_below_el3(env) ||
-                 ((env->cp15.hcr_el2 & (HCR_IMO | HCR_FMO)) == 0)) {
-@@ -1861,13 +1869,47 @@ static CPAccessResult gicv3_irqfiq_access(CPUARMState *env,
-     return r;
- }
- 
-+static CPAccessResult gicv3_dir_access(CPUARMState *env,
-+                                       const ARMCPRegInfo *ri, bool isread)
-+{
-+    GICv3CPUState *cs = icc_cs_from_env(env);
-+
-+    if ((cs->ich_hcr_el2 & ICH_HCR_EL2_TDIR) &&
-+        arm_current_el(env) == 1 && !arm_is_secure_below_el3(env)) {
-+        /* Takes priority over a possible EL3 trap */
-+        return CP_ACCESS_TRAP_EL2;
-+    }
-+
-+    return gicv3_irqfiq_access(env, ri, isread);
++        cat > $TMPC << EOF
++#include <gcrypt.h>
++int main(void) {
++  gcry_mac_hd_t handle;
++  gcry_mac_open(&handle, GCRY_MAC_HMAC_MD5,
++                GCRY_MAC_FLAG_SECURE, NULL);
++  return 0;
 +}
-+
-+static CPAccessResult gicv3_sgi_access(CPUARMState *env,
-+                                       const ARMCPRegInfo *ri, bool isread)
-+{
-+    if ((env->cp15.hcr_el2 & (HCR_IMO | HCR_FMO)) &&
-+        arm_current_el(env) == 1 && !arm_is_secure_below_el3(env)) {
-+        /* Takes priority over a possible EL3 trap */
-+        return CP_ACCESS_TRAP_EL2;
-+    }
-+
-+    return gicv3_irqfiq_access(env, ri, isread);
-+}
-+
- static CPAccessResult gicv3_fiq_access(CPUARMState *env,
-                                        const ARMCPRegInfo *ri, bool isread)
- {
-     CPAccessResult r = CP_ACCESS_OK;
-+    GICv3CPUState *cs = icc_cs_from_env(env);
-+    int el = arm_current_el(env);
-+
-+    if ((cs->ich_hcr_el2 & ICH_HCR_EL2_TALL0) &&
-+        el == 1 && !arm_is_secure_below_el3(env)) {
-+        /* Takes priority over a possible EL3 trap */
-+        return CP_ACCESS_TRAP_EL2;
-+    }
- 
-     if (env->cp15.scr_el3 & SCR_FIQ) {
--        switch (arm_current_el(env)) {
-+        switch (el) {
-         case 1:
-             if (arm_is_secure_below_el3(env) ||
-                 ((env->cp15.hcr_el2 & HCR_FMO) == 0)) {
-@@ -1897,9 +1939,17 @@ static CPAccessResult gicv3_irq_access(CPUARMState *env,
-                                        const ARMCPRegInfo *ri, bool isread)
- {
-     CPAccessResult r = CP_ACCESS_OK;
-+    GICv3CPUState *cs = icc_cs_from_env(env);
-+    int el = arm_current_el(env);
-+
-+    if ((cs->ich_hcr_el2 & ICH_HCR_EL2_TALL1) &&
-+        el == 1 && !arm_is_secure_below_el3(env)) {
-+        /* Takes priority over a possible EL3 trap */
-+        return CP_ACCESS_TRAP_EL2;
-+    }
- 
-     if (env->cp15.scr_el3 & SCR_IRQ) {
--        switch (arm_current_el(env)) {
-+        switch (el) {
-         case 1:
-             if (arm_is_secure_below_el3(env) ||
-                 ((env->cp15.hcr_el2 & HCR_IMO) == 0)) {
-@@ -2055,7 +2105,7 @@ static const ARMCPRegInfo gicv3_cpuif_reginfo[] = {
-     { .name = "ICC_DIR_EL1", .state = ARM_CP_STATE_BOTH,
-       .opc0 = 3, .opc1 = 0, .crn = 12, .crm = 11, .opc2 = 1,
-       .type = ARM_CP_IO | ARM_CP_NO_RAW,
--      .access = PL1_W, .accessfn = gicv3_irqfiq_access,
-+      .access = PL1_W, .accessfn = gicv3_dir_access,
-       .writefn = icc_dir_write,
-     },
-     { .name = "ICC_RPR_EL1", .state = ARM_CP_STATE_BOTH,
-@@ -2067,37 +2117,37 @@ static const ARMCPRegInfo gicv3_cpuif_reginfo[] = {
-     { .name = "ICC_SGI1R_EL1", .state = ARM_CP_STATE_AA64,
-       .opc0 = 3, .opc1 = 0, .crn = 12, .crm = 11, .opc2 = 5,
-       .type = ARM_CP_IO | ARM_CP_NO_RAW,
--      .access = PL1_W, .accessfn = gicv3_irqfiq_access,
-+      .access = PL1_W, .accessfn = gicv3_sgi_access,
-       .writefn = icc_sgi1r_write,
-     },
-     { .name = "ICC_SGI1R",
-       .cp = 15, .opc1 = 0, .crm = 12,
-       .type = ARM_CP_64BIT | ARM_CP_IO | ARM_CP_NO_RAW,
--      .access = PL1_W, .accessfn = gicv3_irqfiq_access,
-+      .access = PL1_W, .accessfn = gicv3_sgi_access,
-       .writefn = icc_sgi1r_write,
-     },
-     { .name = "ICC_ASGI1R_EL1", .state = ARM_CP_STATE_AA64,
-       .opc0 = 3, .opc1 = 0, .crn = 12, .crm = 11, .opc2 = 6,
-       .type = ARM_CP_IO | ARM_CP_NO_RAW,
--      .access = PL1_W, .accessfn = gicv3_irqfiq_access,
-+      .access = PL1_W, .accessfn = gicv3_sgi_access,
-       .writefn = icc_asgi1r_write,
-     },
-     { .name = "ICC_ASGI1R",
-       .cp = 15, .opc1 = 1, .crm = 12,
-       .type = ARM_CP_64BIT | ARM_CP_IO | ARM_CP_NO_RAW,
--      .access = PL1_W, .accessfn = gicv3_irqfiq_access,
-+      .access = PL1_W, .accessfn = gicv3_sgi_access,
-       .writefn = icc_asgi1r_write,
-     },
-     { .name = "ICC_SGI0R_EL1", .state = ARM_CP_STATE_AA64,
-       .opc0 = 3, .opc1 = 0, .crn = 12, .crm = 11, .opc2 = 7,
-       .type = ARM_CP_IO | ARM_CP_NO_RAW,
--      .access = PL1_W, .accessfn = gicv3_irqfiq_access,
-+      .access = PL1_W, .accessfn = gicv3_sgi_access,
-       .writefn = icc_sgi0r_write,
-     },
-     { .name = "ICC_SGI0R",
-       .cp = 15, .opc1 = 2, .crm = 12,
-       .type = ARM_CP_64BIT | ARM_CP_IO | ARM_CP_NO_RAW,
--      .access = PL1_W, .accessfn = gicv3_irqfiq_access,
-+      .access = PL1_W, .accessfn = gicv3_sgi_access,
-       .writefn = icc_sgi0r_write,
-     },
-     { .name = "ICC_IAR1_EL1", .state = ARM_CP_STATE_BOTH,
++EOF
++        if compile_prog "$gcrypt_cflags" "$gcrypt_libs" ; then
++            gcrypt_hmac=yes
++        fi
+     else
+         if test "$gcrypt" = "yes"; then
+             feature_not_found "gcrypt" "Install gcrypt devel"
+@@ -5387,6 +5401,9 @@ if test "$gnutls_rnd" = "yes" ; then
+ fi
+ if test "$gcrypt" = "yes" ; then
+   echo "CONFIG_GCRYPT=y" >> $config_host_mak
++  if test "$gcrypt_hmac" = "yes" ; then
++    echo "CONFIG_GCRYPT_HMAC=y" >> $config_host_mak
++  fi
+   if test "$gcrypt_kdf" = "yes" ; then
+     echo "CONFIG_GCRYPT_KDF=y" >> $config_host_mak
+   fi
 -- 
-2.7.4
+1.8.3.1
