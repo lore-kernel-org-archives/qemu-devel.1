@@ -1,27 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60850)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33554)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cHHFc-0007BV-5C
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 16:38:13 -0500
+	(envelope-from <thuth@redhat.com>) id 1cHHLe-0005St-PM
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 16:44:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cHHFZ-00077z-3B
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 16:38:12 -0500
-Received: from mx5-phx2.redhat.com ([209.132.183.37]:50852)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cHHFY-00077b-Pw
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 16:38:09 -0500
-Date: Wed, 14 Dec 2016 16:38:07 -0500 (EST)
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <1509132582.4065072.1481751487408.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20161214175144.GN3808@thinpad.lan.raisama.net>
-References: <1481732391-882-1-git-send-email-vlad.lungu@windriver.com>
-	<ef1f3b2a-d206-7082-3227-423e0d9d9619@redhat.com>
-	<20161214170058.GJ3808@thinpad.lan.raisama.net>
-	<abea10db-9da8-d6eb-c6eb-67817b1fadda@redhat.com>
-	<20161214175144.GN3808@thinpad.lan.raisama.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] multiboot: copy the cmdline verbatim
+	(envelope-from <thuth@redhat.com>) id 1cHHLZ-0000Ek-Tf
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 16:44:26 -0500
+From: Thomas Huth <thuth@redhat.com>
+Date: Wed, 14 Dec 2016 22:44:17 +0100
+Message-Id: <1481751857-464-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH for-2.9 v2] hw/ppc/spapr: Fix boot path of
+ usb-host storage devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,74 +18,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Vlad Lungu <vlad.lungu@windriver.com>, qemu-devel@nongnu.org, rth@twiddle.net
+To: David Gibson <david@gibson.dropbear.id.au>, Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+Cc: Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org
 
+When passing through an USB storage device to a pseries guest, it
+is currently not possible to automatically boot from the device
+if the "bootindex" property has been specified, too (e.g. when using
+"-device nec-usb-xhci -device usb-host,hostbus=1,hostaddr=2,bootindex=0"
+at the command line). The problem is that QEMU builds a device tree path
+like "/pci@800000020000000/usb@0/usb-host@1" and passes it to SLOF
+in the /chosen/qemu,boot-list property. SLOF, however, probes the
+USB device, recognizes that it is a storage device and thus changes
+its name to "storage", and additionally adds a child node for the
+SCSI LUN, so the correct boot path in SLOF is something like
+"/pci@800000020000000/usb@0/storage@1/disk@101000000000000" instead.
+So when we detect an USB mass storage device with SCSI interface,
+we've got to adjust the firmware boot-device path properly that
+SLOF can automatically boot from the device.
 
+Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1354177
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ v2: Improved the comment in spapr.c as requested by David
 
------ Original Message -----
-> From: "Eduardo Habkost" <ehabkost@redhat.com>
-> To: "Paolo Bonzini" <pbonzini@redhat.com>
-> Cc: "Vlad Lungu" <vlad.lungu@windriver.com>, qemu-devel@nongnu.org, rth@twiddle.net
-> Sent: Wednesday, December 14, 2016 6:51:44 PM
-> Subject: Re: [PATCH] multiboot: copy the cmdline verbatim
-> 
-> On Wed, Dec 14, 2016 at 06:20:46PM +0100, Paolo Bonzini wrote:
-> > On 14/12/2016 18:00, Eduardo Habkost wrote:
-> > > On Wed, Dec 14, 2016 at 05:55:07PM +0100, Paolo Bonzini wrote:
-> > >>
-> > >>
-> > >> On 14/12/2016 17:19, Vlad Lungu wrote:
-> > >>> get_opt_value() truncates the value at the first comma.
-> > >>> Use memcpy() instead.
-> > >>
-> > >> Looks good since get_opt_value is already used by the caller.  Have you
-> > >> tested this with multiple initrd modules too?
-> > > 
-> > > get_opt_value() is used by the caller, but with NULL buf
-> > > argument. This means the caller doesn't handle ",," escaping.
-> > > (See my reply to the previous submission of this patch)
-> > 
-> > Hmm, wait.  When NULL is passed, ",," escaping is handled correctly in
-> > that next_initrd points to the next lone comma.  The lone comma is
-> > replaced with a '\0' by the caller.
-> 
-> It is handled correctly when splitting the string, but not when opening the
-> file.
-> 
-> > 
-> > So you need to use get_opt_value again in mb_add_cmdline to do the
-> > unescaping, because mb_add_cmdline only receives double commas.
-> > 
-> > This was actually my first reaction to the patch, and it was correct.
-> > Then I overthought it. :)
-> > 
-> > So the patch is wrong.
-> 
-> Except that the caller is already broken when using ",," for a
-> different reason: it calls get_image_size(initrd_filename) and
-> load_image(initrd_filename, ...) directly. So comma-escaping
-> never worked anyway:
-> 
->   $ qemu-system-x86_64 -kernel ~/Downloads/gnumach -initrd
->   /tmp/one,,file,/tmp/another,,file
->   Failed to open file '/tmp/one,,file'
-> 
-> The right fix for comma-escaping would require calling
-> get_opt_value() with non-NULL buf outside mb_add_cmdline(),
-> because the mb_add_cmdline(&mbs, kcmdline) call do NOT need
-> get_opt_value() to be called.
+ hw/ppc/spapr.c       | 13 +++++++++++++
+ hw/usb/host-libusb.c | 29 +++++++++++++++++++++++++++++
+ hw/usb/host-stub.c   |  5 +++++
+ include/hw/usb.h     |  1 +
+ 4 files changed, 48 insertions(+)
 
-For filenames containing commas you're right, but...
-
-> In other words: this fixes the mb_add_cmdline(kcmdline) case, and
-> doesn't break comma escaping on the initrd case (because it was
-> already broken). I don't see a problem with this patch.
-
-... there is one case of comma escaping that wasn't broken:
-
-    $ qemu-system-x86_64 -kernel foo -initrd '/tmp/one arg,,with,,commas,/tmp/another arg,,with,,commas'
-
-And presumably this is what Vlad was trying to do.
-
-Paolo
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 208ef7b..cd83b2c 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -2185,6 +2185,19 @@ static char *spapr_get_fw_dev_path(FWPathProvider *p, BusState *bus,
+         }
+     }
+ 
++    /*
++     * SLOF probes the USB devices, and if it recognizes that the device is a
++     * storage device, it changes its name to "storage" instead of "usb-host",
++     * and additionally adds a child node for the SCSI LUN, so the correct
++     * boot path in SLOF is something like .../storage@1/disk@xxx" instead.
++     */
++    if (strcmp("usb-host", qdev_fw_name(dev)) == 0) {
++        USBDevice *usbdev = CAST(USBDevice, dev, TYPE_USB_DEVICE);
++        if (usb_host_dev_is_scsi_storage(usbdev)) {
++            return g_strdup_printf("storage@%s/disk", usbdev->port->path);
++        }
++    }
++
+     if (phb) {
+         /* Replace "pci" with "pci@800000020000000" */
+         return g_strdup_printf("pci@%"PRIX64, phb->buid);
+diff --git a/hw/usb/host-libusb.c b/hw/usb/host-libusb.c
+index bd81d71..7791c6d 100644
+--- a/hw/usb/host-libusb.c
++++ b/hw/usb/host-libusb.c
+@@ -1707,6 +1707,35 @@ static void usb_host_auto_check(void *unused)
+     timer_mod(usb_auto_timer, qemu_clock_get_ms(QEMU_CLOCK_REALTIME) + 2000);
+ }
+ 
++/**
++ * Check whether USB host device has a USB mass storage SCSI interface
++ */
++bool usb_host_dev_is_scsi_storage(USBDevice *ud)
++{
++    USBHostDevice *uhd = USB_HOST_DEVICE(ud);
++    struct libusb_config_descriptor *conf;
++    const struct libusb_interface_descriptor *intf;
++    bool is_scsi_storage = false;
++    int i;
++
++    if (!uhd || libusb_get_active_config_descriptor(uhd->dev, &conf) != 0) {
++        return false;
++    }
++
++    for (i = 0; i < conf->bNumInterfaces; i++) {
++        intf = &conf->interface[i].altsetting[ud->altsetting[i]];
++        if (intf->bInterfaceClass == LIBUSB_CLASS_MASS_STORAGE &&
++            intf->bInterfaceSubClass == 6) {                 /* 6 means SCSI */
++            is_scsi_storage = true;
++            break;
++        }
++    }
++
++    libusb_free_config_descriptor(conf);
++
++    return is_scsi_storage;
++}
++
+ void hmp_info_usbhost(Monitor *mon, const QDict *qdict)
+ {
+     libusb_device **devs = NULL;
+diff --git a/hw/usb/host-stub.c b/hw/usb/host-stub.c
+index 6ba65a1..d0268ba 100644
+--- a/hw/usb/host-stub.c
++++ b/hw/usb/host-stub.c
+@@ -46,3 +46,8 @@ USBDevice *usb_host_device_open(USBBus *bus, const char *devname)
+ {
+     return NULL;
+ }
++
++bool usb_host_dev_is_scsi_storage(USBDevice *ud)
++{
++    return false;
++}
+diff --git a/include/hw/usb.h b/include/hw/usb.h
+index 847c9de..43838c9 100644
+--- a/include/hw/usb.h
++++ b/include/hw/usb.h
+@@ -471,6 +471,7 @@ void usb_generic_async_ctrl_complete(USBDevice *s, USBPacket *p);
+ /* usb-linux.c */
+ USBDevice *usb_host_device_open(USBBus *bus, const char *devname);
+ void hmp_info_usbhost(Monitor *mon, const QDict *qdict);
++bool usb_host_dev_is_scsi_storage(USBDevice *usbdev);
+ 
+ /* usb ports of the VM */
+ 
+-- 
+1.8.3.1
