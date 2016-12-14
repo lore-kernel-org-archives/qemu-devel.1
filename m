@@ -1,32 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57454)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57816)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cHCu8-0004kG-EH
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 11:59:45 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1cHCvU-0008KD-KH
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:01:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cHCu3-0005Ie-GH
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 11:59:44 -0500
-Received: from mail-wj0-f196.google.com ([209.85.210.196]:33215)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1cHCu3-00058N-9z
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 11:59:39 -0500
-Received: by mail-wj0-f196.google.com with SMTP id kp2so5856117wjc.0
-	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 08:59:16 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <1478330391-74060-1-git-send-email-chao.p.peng@linux.intel.com>
-	<1478330391-74060-5-git-send-email-chao.p.peng@linux.intel.com>
-	<20161106090458-mutt-send-email-mst@kernel.org>
-	<9536bb8a-aec8-c03b-4b86-b40ce18f6d26@redhat.com>
-	<1479110762.2421.20.camel@linux.intel.com>
-	<20161114225108-mutt-send-email-mst@kernel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <fec880fc-89af-a934-858d-4e4e38173706@redhat.com>
-Date: Wed, 14 Dec 2016 17:58:13 +0100
+	(envelope-from <ehabkost@redhat.com>) id 1cHCvO-0005vU-W3
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:01:08 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42966)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cHCvO-0005vG-Qg
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:01:02 -0500
+Date: Wed, 14 Dec 2016 15:00:58 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20161214170058.GJ3808@thinpad.lan.raisama.net>
+References: <1481732391-882-1-git-send-email-vlad.lungu@windriver.com>
+	<ef1f3b2a-d206-7082-3227-423e0d9d9619@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20161114225108-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 4/4] q35: introduce q35-lite
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ef1f3b2a-d206-7082-3227-423e0d9d9619@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] multiboot: copy the cmdline verbatim
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,39 +27,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Chao Peng <chao.p.peng@linux.intel.com>
-Cc: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Vlad Lungu <vlad.lungu@windriver.com>, qemu-devel@nongnu.org, rth@twiddle.net
 
-
-
-On 14/11/2016 21:51, Michael S. Tsirkin wrote:
-> On Mon, Nov 14, 2016 at 04:06:02PM +0800, Chao Peng wrote:
->> On Mon, 2016-11-07 at 18:09 +0100, Paolo Bonzini wrote:
->>>
->>> On 06/11/2016 08:06, Michael S. Tsirkin wrote:
->>>>
->>>> On Sat, Nov 05, 2016 at 03:19:51AM -0400, Chao Peng wrote:
->>>>>
->>>>>>
->>>>>> This patch introduces a light weight machine type which shares
->>>>>> the
->>>>>> same codebase with existing q35 machine type but with some
->>>>>> features
->>>>>> disabled by default.
->>>>>>
->>>>>> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
->>>> I don't find this too useful, but if others do and send acks, I'll
->>>> merge
->>>> it, but only if it also has migration disabled.
->>>>
->>>
->>> Agreed, it's enough to have patches 1-3.
->>>
->>
->> I'm fine.
+On Wed, Dec 14, 2016 at 05:55:07PM +0100, Paolo Bonzini wrote:
 > 
-> Pls post just the correct patches after the release.
+> 
+> On 14/12/2016 17:19, Vlad Lungu wrote:
+> > get_opt_value() truncates the value at the first comma.
+> > Use memcpy() instead.
+> 
+> Looks good since get_opt_value is already used by the caller.  Have you
+> tested this with multiple initrd modules too?
 
-Since I was cleaning my inbox, I've already queued 1-3.
+get_opt_value() is used by the caller, but with NULL buf
+argument. This means the caller doesn't handle ",," escaping.
+(See my reply to the previous submission of this patch)
 
-Paolo
+However this only means the caller is buggy, not
+mb_add_cmdline(). So the change still looks good to me.
+
+> 
+> Paolo
+> 
+> > Signed-off-by: Vlad Lungu <vlad.lungu@windriver.com>
+> > ---
+> >  hw/i386/multiboot.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/hw/i386/multiboot.c b/hw/i386/multiboot.c
+> > index 387caa6..b4495ad 100644
+> > --- a/hw/i386/multiboot.c
+> > +++ b/hw/i386/multiboot.c
+> > @@ -109,7 +109,7 @@ static uint32_t mb_add_cmdline(MultibootState *s, const char *cmdline)
+> >      hwaddr p = s->offset_cmdlines;
+> >      char *b = (char *)s->mb_buf + p;
+> >  
+> > -    get_opt_value(b, strlen(cmdline) + 1, cmdline);
+> > +    memcpy(b, cmdline, strlen(cmdline) + 1);
+> >      s->offset_cmdlines += strlen(b) + 1;
+> >      return s->mb_buf_phys + p;
+> >  }
+> > 
+
+-- 
+Eduardo
