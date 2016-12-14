@@ -1,28 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36499)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36975)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cHBcZ-0005JW-Ho
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 10:37:32 -0500
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1cHBdt-0001Np-UZ
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 10:38:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cHBcV-0004Ac-Kl
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 10:37:31 -0500
-Received: from mail-wj0-f176.google.com ([209.85.210.176]:33471)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cHBcV-000470-EC
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 10:37:27 -0500
-Received: by mail-wj0-f176.google.com with SMTP id xy5so39627710wjc.0
-	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 07:37:04 -0800 (PST)
-References: <20161208175030.12269-1-drjones@redhat.com>
-	<20161214134644.4jm4sfv42jai732o@kamzik.brq.redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20161214134644.4jm4sfv42jai732o@kamzik.brq.redhat.com>
-Date: Wed, 14 Dec 2016 15:36:01 +0000
-Message-ID: <871sxattem.fsf@linaro.org>
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1cHBdq-0004RD-0n
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 10:38:53 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38263)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1cHBdp-0004Qv-No
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 10:38:49 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
+	uBEFZic5045114
+	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 10:38:47 -0500
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 27b8t28f6j-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 10:38:47 -0500
+Received: from localhost
+	by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Wed, 14 Dec 2016 15:38:42 -0000
+References: <1481716249-185392-1-git-send-email-arei.gonglei@huawei.com>
+	<1481716249-185392-2-git-send-email-arei.gonglei@huawei.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Wed, 14 Dec 2016 16:38:33 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1481716249-185392-2-git-send-email-arei.gonglei@huawei.com>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH kvm-unit-tests v8 00/10] arm/arm64: add gic
- framework
+Message-Id: <bcf62fa0-8fc9-daaf-ea7b-e09eb83b593a@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v7 1/1] crypto: add virtio-crypto driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,37 +41,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jones <drjones@redhat.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, marc.zyngier@arm.com, andre.przywara@arm.com, eric.auger@redhat.com, pbonzini@redhat.com, christoffer.dall@linaro.org
+To: Gonglei <arei.gonglei@huawei.com>, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, virtualization@lists.linux-foundation.org, linux-crypto@vger.kernel.org
+Cc: weidong.huang@huawei.com, claudio.fontana@huawei.com, mst@redhat.com, luonengjun@huawei.com, hanweidong@huawei.com, xin.zeng@intel.com, xuquan8@huawei.com, wanzongshun@huawei.com, stefanha@redhat.com, jianjay.zhou@huawei.com, cornelia.huck@de.ibm.com, longpeng2@huawei.com, arei.gonglei@hotmail.com, davem@davemloft.net, wu.wubin@huawei.com, herbert@gondor.apana.org.au
 
 
-Andrew Jones <drjones@redhat.com> writes:
 
-> On Thu, Dec 08, 2016 at 06:50:20PM +0100, Andrew Jones wrote:
->>
->> v8:
->>  - Main change is rebasing to Wei's sysreg framework, which is part
->>    of his PMU series, which I've applied to arm/next. That rebase
->>    leads to dropping the first two patches of the v7 series, expecting
->>    get_mpidr() to return u64 (with future patches), a rework of the
->>    delay routines (now based on sysreg framework), and changes to all
->>    sysreg asms
->>  - The delay routines also got their own files: delay.[ch]
->>  - Another bigger change was to now keep gic_common_ops local to
->>    lib/arm/gic.c, export the functions from the gic-v[23] instead
->>  - Yet another bigger change was dropping the sender and irq cmdline
->>    inputs, hard coding to '1' is sufficient and much less code
->>  - Other minor changes listed in individual patches
->>
->
-> OK, I'm going to go ahead and apply this to arm/next. Before making
-> the pull request I'll post another series that includes the 64-bit
-> MPIDR fix that Andre pointed out we need, and a couple other fixes,
-> though. Assuming nobody complains about that series, then I'll fold
-> those patches into arm/next too and make the pull request.
+On 12/14/2016 12:50 PM, Gonglei wrote:
+> diff --git a/drivers/crypto/virtio/virtio_crypto_core.c b/drivers/crypto/virtio/virtio_crypto_core.c
+> new file mode 100644
+> index 0000000..c0854a1
+> --- /dev/null
+> +++ b/drivers/crypto/virtio/virtio_crypto_core.c
+> @@ -0,0 +1,474 @@
+[..]
+> +
+> +static void virtcrypto_dataq_callback(struct virtqueue *vq)
+> +{
+> +	struct virtio_crypto *vcrypto = vq->vdev->priv;
+> +	struct virtio_crypto_request *vc_req;
+> +	unsigned long flags;
+> +	unsigned int len;
+> +	struct ablkcipher_request *ablk_req;
+> +	int error;
+> +
+> +	spin_lock_irqsave(&vcrypto->lock, flags);
 
-All looks good for me. I'll be re-basing my TCG tests once upstream has
-these changes merged.
+Would it make sense to use a per virtqueue lock
+like in virtio_blk for example instead of locking on the whole
+device? OK, it seems you use only one dataqueue, so it
+may not be that relevant.
 
---
-Alex Bennée
+> +	do {
+> +		virtqueue_disable_cb(vq);
+> +		while ((vc_req = virtqueue_get_buf(vq, &len)) != NULL) {
+> +			if (vc_req->type == VIRTIO_CRYPTO_SYM_OP_CIPHER) {
+> +				switch (vc_req->status) {
+> +				case VIRTIO_CRYPTO_OK:
+> +					error = 0;
+> +					break;
+> +				case VIRTIO_CRYPTO_INVSESS:
+> +				case VIRTIO_CRYPTO_ERR:
+> +					error = -EINVAL;
+> +					break;
+> +				case VIRTIO_CRYPTO_BADMSG:
+> +					error = -EBADMSG;
+> +					break;
+> +				default:
+> +					error = -EIO;
+> +					break;
+> +				}
+> +				ablk_req = vc_req->ablkcipher_req;
+> +				virtcrypto_clear_request(vc_req);
+> +
+> +				spin_unlock_irqrestore(&vcrypto->lock, flags);
+> +				/* Finish the encrypt or decrypt process */
+> +				ablk_req->base.complete(&ablk_req->base, error);
+> +				spin_lock_irqsave(&vcrypto->lock, flags);
+> +			}
+> +		}
+> +	} while (!virtqueue_enable_cb(vq));
+> +	spin_unlock_irqrestore(&vcrypto->lock, flags);
+> +}
