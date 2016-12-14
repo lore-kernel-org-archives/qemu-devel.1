@@ -1,34 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44693)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44748)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laine@redhat.com>) id 1cHFss-0001KQ-2e
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 15:10:39 -0500
+	(envelope-from <wouter@grep.be>) id 1cHFt6-0001yb-NH
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 15:10:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laine@redhat.com>) id 1cHFsn-0000rk-UT
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 15:10:37 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44354)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <laine@redhat.com>) id 1cHFsn-0000rG-LJ
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 15:10:33 -0500
-Received: from int-mx13.intmail.prod.int.phx2.redhat.com
-	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 40534C05AA5B
-	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 20:10:32 +0000 (UTC)
-References: <20161208200737.GA29563@thinpad.lan.raisama.net>
-	<87a8c0qedq.fsf@dusky.pond.sub.org>
-	<20161213124239.GO3808@thinpad.lan.raisama.net>
-	<56cc6442-ba4f-6c5e-9c57-8787acccb6f9@redhat.com>
-	<20161213160038.GV3808@thinpad.lan.raisama.net>
-	<cae49570-bde2-4075-78bb-bb348e7d634e@redhat.com>
-From: Laine Stump <laine@redhat.com>
-Message-ID: <cc92018a-e9c7-e3ab-7c17-556798f62920@redhat.com>
-Date: Wed, 14 Dec 2016 15:10:30 -0500
+	(envelope-from <wouter@grep.be>) id 1cHFt2-0000u6-NJ
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 15:10:52 -0500
+Received: from [2a01:4f8:140:52e5::2] (port=39252 helo=latin.grep.be)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <wouter@grep.be>) id 1cHFt2-0000tu-GD
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 15:10:48 -0500
+Date: Wed, 14 Dec 2016 21:10:31 +0100
+From: Wouter Verhelst <w@uter.be>
+Message-ID: <20161214201031.gcbem4n5gyl23tro@grep.be>
+References: <20161214150840.10899-1-alex@alex.org.uk>
+	<31576d46-c0ed-29b9-71a0-5aca1790799a@virtuozzo.com>
+	<6D1B30FC-FD7E-474C-A8E3-FD87E7AA1364@alex.org.uk>
+	<5e9150ed-2127-f2e8-f9db-a514e8f0ddf8@virtuozzo.com>
+	<5E697C22-5FBB-49A2-A018-A6B96E29FE84@alex.org.uk>
+	<94ef3ef2-b76f-fa5d-cbaf-8990ce2b1be8@virtuozzo.com>
+	<20161214181323.mehzfmlf6z4pyajp@grep.be>
+	<D71CECFD-E513-4372-BB54-BF8D8D521292@alex.org.uk>
+	<20161214184937.uv5gwkijaofhjfd7@grep.be>
+	<95CEC42B-486F-45F2-8879-ACF48C2380FD@alex.org.uk>
 MIME-Version: 1.0
-In-Reply-To: <cae49570-bde2-4075-78bb-bb348e7d634e@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC] qmp: query-device-slots command
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <95CEC42B-486F-45F2-8879-ACF48C2380FD@alex.org.uk>
+Subject: Re: [Qemu-devel] [Nbd] [PATCH] Further tidy-up on block status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,109 +35,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, libvir-list@redhat.com, Igor Mammedov <imammedo@redhat.com>
+To: Alex Bligh <alex@alex.org.uk>
+Cc: "nbd-general@lists.sourceforge.net" <nbd-general@lists.sourceforge.net>, Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Stefan stefanha@redhat. com" <stefanha@redhat.com>, "Denis V . Lunev" <den@openvz.org>, Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>
 
-On 12/14/2016 12:17 PM, Marcel Apfelbaum wrote:
-> On 12/13/2016 06:00 PM, Eduardo Habkost wrote:
->> On Tue, Dec 13, 2016 at 04:15:18PM +0200, Marcel Apfelbaum wrote:
->>> On 12/13/2016 02:42 PM, Eduardo Habkost wrote:
->>>> On Tue, Dec 13, 2016 at 12:04:17PM +0100, Markus Armbruster wrote:
->>>>> Quick interface review only:
->>>>>
->>>>> Eduardo Habkost <ehabkost@redhat.com> writes:
->>>>>
->>>>>> This adds a new command to QMP: query-device-slots. It will allow
->>>>>> management software to query possible slots where devices can be
->>>>>> plugged.
->>>>>>
->>>>>> This implementation of the command will return:
->>>>>>
->>>>>> * Multiple PCI slots per bus, in the case of PCI buses;
->>>>>> * One slot per bus in the case of the other buses;
->>>>>
->>>>> Umm, that doesn't seem right.  For instance, a SCSI bus has multiple
->>>>> slots.  The slot address is the SCSI ID.  An IDE bus may have one
->>>>> (SATA)
->>>>> or two (PATA).  For more examples, see qdev-device-use.txt section
->>>>> "Specifying Bus and Address on Bus".
->>>>
->>>> Yes, I should have clarified that: this version changes only PCI
->>>> to expose multiple slots, but other buses also need be changed to
->>>> implement BusClass::enumerate_slots() properly, too.
->>>>
->>>>>
->>>>>> * One slot for each entry from query-hotpluggable-cpus.
->>>>>> In the example below, I am not sure if the PCIe ports are all
->>>>>> supposed to report all slots, but I didn't find any existing
->>>>>> field in PCIBus that would help me figure out the actual number
->>>>>> of slots in a given PCI bus.
->>>>>>
->>>>>> Git tree
->>>>>> --------
->>>>>>
->>>>>> This patch needs the previous query-machines series I am working
->>>>>> on. The full tree can be found on the git tree at:
->>>>>>
->>>>>>   git://github.com/ehabkost/qemu-hacks.git
->>>>>> work/query-machines-bus-info
->>>>>>
->>>>>> Example output
->>>>>> --------------
->>>>>>
->>>>>> The following output was returned by QEMU when running it as:
->>>>>>
->>>>>>  $ qemu-system-x86_64 -machine q35 \
->>>>>>    -readconfig docs/q35-chipset.cfg \
->>>>>>    -smp 4,maxcpus=8,sockets=2,cores=2,threads=2
->>>>>>
->>>>>>  {
->>>>>>     "return": [
->>>>>
->>>>> Are you sure >3000 lines of example output make sense here?
->>>>
->>>> I'm not. :)
->>>>
->>>> That's why I need feedback from the PCI experts. I believe most
->>>> of the PCI ports on q35 accept only one device,
+On Wed, Dec 14, 2016 at 07:01:15PM +0000, Alex Bligh wrote:
+> Wouter,
+> 
+> (Our mails crossed and I've actually pushed something, but no matter)
+> 
+> > On 14 Dec 2016, at 18:49, Wouter Verhelst <w@uter.be> wrote:
+> > 
+> > What I was trying to say is that I think the result to _LIST_ with no
+> > queries should return all information the client needs to theoretically
+> > build the list of all possible contexts, even if that list may be
+> > so large as to be unfeasible for it to be built (e.g., in case of a
+> > cartesian product between all possible other contexts). I gave one
+> > example, but there may be more.
+> > 
+> > My point is that if the query includes a namespace, the result should
+> > not be defined by our spec. If the query does not include a namespace,
+> > the result should be "complete" by whatever definition, but not
+> > unreasonable (i.e., don't just write a cartesian product to a client).
+> > 
+> > This could allow an interactive client to present a user with a list of
+> > possible contexts before performing analysis on the block device, say.
+> 
+> OK, so first of all, one of the changes I made earlier was that now
+> each of the commands carries a list of queries, the way you list
+> everything is not 'having a query that doesn't contain a namespace'
+> but rather doing a _LIST_ with no queries at all. But that's semantics
+> and orthogonal to the main point.
+> 
+> What I've proposed (and pushed - but feel free to alter it) is that
+> 
+> 1. on _LIST_, the server can return fewer contexts than are available
+>    if returning all of them would consume undue levels of resources.
+> 
+> 2. on _LIST_ where the contexts are 'algorithmic', the server can
+>    return e.g. 'X-Backup:' rather than 'X-Backup:modified>' and
+>    every integer.
+> 
+> 3. On _SET_ if too many contexts are requested, the server may return
+>    an error (I think we need this anyway).
+> 
+> That nearly does what you ask for, but I'm not sure how you any query
+> could 'return all the information the client needs to build
+> the list of all possible contexts'. For instance, in my backup
+> example 'X-Backup:modified>[integer]' doesn't itself tell you
+> anything, as you don't know whether the integer is a unix
+> date time, in seconds after the epoch, milliseconds or whatever.
+> What, surely, as a client you want to know is 'does it support
+> the X-Backup: extension because I've read the spec for that and
+> know that it has X-Backup:modified if so'. So I've suggested it
+> return 'X-Backup:' only in that case, in which case from that
+> (*and the spec*) you know how to build any query.
 
-I don't think of it as "one device" but as "only slot 0 can be used" 
-(since, as Marcel pointed out, a different device can be placed on each 
-of the 8 functions of that slot).
+Actually, it does do what I ask for :-)
 
-> but I see no code
->>>> implementing that restriction, and no obvious PCIBus or
->>>> PCIBusClass field indicating that.
->>>
->>> Hi,
->>>
->>> Sadly there is no such restriction today as far as I know.
->>> We trust the user that he knows what he is doing :)
->>> and we let libvirt implement the restriction.
->>>
->>> I do agree we should fix that.
->>
->> OK, this matches what I saw on the current code.
->>
->> But I would like to understand what exactly should be the rules
->> if we fix that. Should we report only 1 slot if
->> pci_bus_has_pcie_upstream_port(bus)?
->>
->
-> We should report 1 slot for a bus exposed by a PCIe Root Port
-> or PCIe Downstream Port.
->
-> Be aware that 1 slot doesn't necessarily refer to only one device,
-> we can have a multi-function device.
+A client which knows about spec X, Y, or Z, should get all the
+information from a _LIST_ command that it needs in order to know whether
+or not it can request a particular context or not. E.g., in the case of
+a "modified more recent than X seconds ago", the _LIST_ command should
+expose (somehow, defined by the spec of that context) that it supports
+that particular syntax, without requiring a list of all possible
+integers between 0 and 2^64 (for obvious reasons).
 
-Is that a fixed thing? I mean, is it always possible to use all 8 
-functions of a slot (assuming no hotplug of course)?
+This does require that the client know about a particular spec before it
+can query it, but that's going to be the case anyway -- a client should
+have no business asking for a context of which it has no implementation,
+since that would mean it is asking the server to send it information
+that it is then going to throw away anyway, which makes no sense.
 
->
-> Thanks,
-> Marcel
->
->> (Note that pci_bus_has_pcie_upstream_port() doesn't exist in the
->> current code, it is added by my patch)
->>
->
+Additionally, this also allows a client which sees that no contexts were
+returned for one of the queries in its _SET_ command to differentiate
+beween "server does not support metadata context XYZ" and "server does
+support metadata context XYZ, but there is no relevant metadata context
+for the query I sent". Allowing a server to limit the information it
+sends at an arbitrary cut-off point of "20" or whatever would *not* do
+that, so I'm against it in the strongest of terms.
+
+Put otherwise: the information sent in return of a _LIST_ command with
+no query string (i.e., the command that asks for "everything") should be
+"complete" in the sense that it should allow a client to know whether a
+server has support for metadata context X, Y, or Z, even if that means
+it may have to issue further _LIST_ queries later on, or if it may have
+to combine some other information first.
+
+In the absense of dynamic namespaces, that is most easily implemented by
+just listing all metadata contexts in all namespaces that we know about,
+but it doesn't *have* to be that.
+
+-- 
+< ron> I mean, the main *practical* problem with C++, is there's like a dozen
+       people in the world who think they really understand all of its rules,
+       and pretty much all of them are just lying to themselves too.
+ -- #debian-devel, OFTC, 2016-02-12
