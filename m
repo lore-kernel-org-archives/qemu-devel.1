@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32984)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33852)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cHD26-0005L6-0d
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:07:59 -0500
+	(envelope-from <wouter@grep.be>) id 1cHD4R-0007E1-6G
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:10:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cHD20-00008i-To
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:07:57 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41092)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cHD20-00008S-NT
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:07:52 -0500
-References: <1481567461-2341-1-git-send-email-ehabkost@redhat.com>
-	<87zijyfyq5.fsf@dusky.pond.sub.org>
-	<20161214134841.GG3808@thinpad.lan.raisama.net>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <b5cf13d0-d03f-d477-20ce-211948b315ee@redhat.com>
-Date: Wed, 14 Dec 2016 18:07:48 +0100
+	(envelope-from <wouter@grep.be>) id 1cHD4M-0000wl-2L
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:10:23 -0500
+Received: from [2a01:4f8:140:52e5::2] (port=38997 helo=latin.grep.be)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <wouter@grep.be>) id 1cHD4L-0000wD-Rb
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:10:17 -0500
+Date: Wed, 14 Dec 2016 18:09:56 +0100
+From: Wouter Verhelst <w@uter.be>
+Message-ID: <20161214170956.32o6b27baf3bkmd4@grep.be>
+References: <20161214150840.10899-1-alex@alex.org.uk>
 MIME-Version: 1.0
-In-Reply-To: <20161214134841.GG3808@thinpad.lan.raisama.net>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.9 v2] qom: Make all interface types
- abstract
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20161214150840.10899-1-alex@alex.org.uk>
+Subject: Re: [Qemu-devel] [Nbd] [PATCH] Further tidy-up on block status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,27 +26,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>, qemu-devel@nongnu.org, Lin Ma <lma@suse.com>
+To: Alex Bligh <alex@alex.org.uk>
+Cc: nbd-general@lists.sourceforge.net, Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, Pavel Borzenkov <pborzenkov@virtuozzo.com>, stefanha@redhat.com, "Denis V . Lunev" <den@openvz.org>, Markus Pargmann <mpa@pengutronix.de>, Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>
 
+On Wed, Dec 14, 2016 at 03:08:40PM +0000, Alex Bligh wrote:
+> (NB: I've already applied this and pushed it)
 
+Thanks.
 
-On 14/12/2016 14:48, Eduardo Habkost wrote:
->> How do you find all abstract TypeInfo in the source?  The uninitiated
->> might grep for .abstract = true, and be misled.  The initiated will be
->> annoyed instead, because grepping for *absence* of .instance_size = is
->> bothersome.
->>
->> I suspect life could be easier going forward if we instead required
->> .abstract = true for interfaces, and enforced it with
->> assert(ti->instance_size || ti->abstract) here.
-> I was doing that before deciding to change type_initialize(). I
-> think I still have the commit in my git reflog, I will recover it
-> and submit it as v3.
+> * Change NBD_OPT_LIST_METADATA etc. to explicitly send a list of queries
+>   and add a count of queries so we can extend the command later (rather than
+>   rely on the length of option)
 
-I think it's worse.
+Sure, that works.
 
-Interfaces are abstract by definition.  Requiring ".abstract = true"
-makes things less intuitive.  v2 seems good.
+> * For NBD_OPT_LIST_METADATA make absence of any query (as opposed to zero
+>   length query) list all contexts, as absence of any query is now simple.
+> 
+> * Move definition of namespaces in the document to somewhere more appopriate.
+> 
+> * Various other minor changes as discussed on the mailing list
 
-Paolo
+Right. I think we're getting close to a good spec now, for this thing.
+
+One thing I've been thinking about that we might want to add:
+
+There may be cases where a server, in performing the required calls to
+be able to handle a BLOCK_STATUS request, will end up with more
+information than the client asked; e.g., if the client asked information
+in the base:allocation context on an extent at offset X of length Y,
+then the server might conceivably do an lseek(SEEK_DATA) and/or
+lseek(SEEK_HOLE). The result of that call might be that the file offset
+will now point to a location Z, where Z > (X+Y).
+
+Currently, our spec says "the sum of the *length* fields MUST not be
+greater than the overall *length* of request". This means that in
+essense, the server then has to throw away the information it has on the
+range Z - (X + Y). In case a client was interested in that information,
+that seems like a waste. I would therefore like to remove that
+requirement, by rephrasing that "sum of the *length* fields" thing into
+something along the following lines:
+
+  In case the server returns N extents, the sum of the *length* fields
+  of the first N-1 extents MUST NOT be greater than the overall *length*
+  of the request. The final extent MAY exceed the length of the request
+  if the server has that information anyway as a side effect of looking
+  up the required information and wishes to share it.
+
+This would then result in the fact that the "length" field in the
+BLOCK_STATUS command would be little more than a hint, since we're
+saying that a server can return more data than requested (if it's
+available anyway) and less data than requested (if it would be too
+resource-intensive to provide all the information). Not sure whether all
+that makes much sense anymore, but hey.
+
+In addition, the combination of a server providing more information than
+requested with a "REQ_ONE" flag and a length field of zero could be an
+interesting way to enumerate a whole export, too. Essentially, we could
+define that as a client saying "I'm interested in what the size of the
+extent at offset X is, and what its properties are".
+
+Thoughts?
+
+-- 
+< ron> I mean, the main *practical* problem with C++, is there's like a dozen
+       people in the world who think they really understand all of its rules,
+       and pretty much all of them are just lying to themselves too.
+ -- #debian-devel, OFTC, 2016-02-12
