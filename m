@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33424)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34314)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.l.liu@intel.com>) id 1cH0Au-0003vB-It
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 22:24:13 -0500
+	(envelope-from <bounces@canonical.com>) id 1cH0HP-0000ye-Bb
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 22:30:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.l.liu@intel.com>) id 1cH0Ar-0004OE-D0
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 22:24:12 -0500
-Received: from mga09.intel.com ([134.134.136.24]:44873)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1cH0Ar-0004O0-1V
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 22:24:09 -0500
-From: "Liu, Yi L" <yi.l.liu@intel.com>
-Date: Wed, 14 Dec 2016 03:24:01 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C257438FCB9E1@SHSMSX104.ccr.corp.intel.com>
-References: <1481020588-4245-1-git-send-email-peterx@redhat.com>
-	<1481020588-4245-2-git-send-email-peterx@redhat.com>
-	<20161212081650.GA13155@gmail.com>
-	<20161214030554.GH32222@pxdev.xzpeter.org>
-In-Reply-To: <20161214030554.GH32222@pxdev.xzpeter.org>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <bounces@canonical.com>) id 1cH0HK-0005tR-7e
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 22:30:55 -0500
+Received: from indium.canonical.com ([91.189.90.7]:60373)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cH0HJ-0005tL-Ui
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 22:30:50 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cH0HH-0000XA-LY
+	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 03:30:47 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id A0BD62E80C3
+	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 03:30:47 +0000 (UTC)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [RFC PATCH 01/13] intel_iommu: allocate new key
- when creating new address space
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 14 Dec 2016 03:21:34 -0000
+From: Ziyue Yang <1641637@bugs.launchpad.net>
+Reply-To: Bug 1641637 <1641637@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20161114154536.3631.7893.malonedeb@soybean.canonical.com>
+Message-Id: <20161214032134.27570.96790.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1641637] Re: incorrect illegal SSE3 instructions
+ reporting on x86_64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,63 +37,782 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, "Liu, Yi L" <yi.l.liu@linux.intel.com>, Jason Wang <jasowang@redhat.com>
-Cc: "Lan, Tianyu" <tianyu.lan@intel.com>, "Tian, Kevin" <kevin.tian@intel.com>, "mst@redhat.com" <mst@redhat.com>, "jan.kiszka@siemens.com" <jan.kiszka@siemens.com>, "bd.aviv@gmail.com" <bd.aviv@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "Wu, Feng" <feng.wu@intel.com>
+To: qemu-devel@nongnu.org
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBRZW11LWRldmVsIFttYWlsdG86
-cWVtdS1kZXZlbC1ib3VuY2VzK3lpLmwubGl1PWludGVsLmNvbUBub25nbnUub3JnXSBPbg0KPiBC
-ZWhhbGYgT2YgUGV0ZXIgWHUNCj4gU2VudDogV2VkbmVzZGF5LCBEZWNlbWJlciAxNCwgMjAxNiAx
-MTowNiBBTQ0KPiBUbzogTGl1LCBZaSBMIDx5aS5sLmxpdUBsaW51eC5pbnRlbC5jb20+OyBKYXNv
-biBXYW5nIDxqYXNvd2FuZ0ByZWRoYXQuY29tPg0KPiBDYzogTGFuLCBUaWFueXUgPHRpYW55dS5s
-YW5AaW50ZWwuY29tPjsgVGlhbiwgS2V2aW4gPGtldmluLnRpYW5AaW50ZWwuY29tPjsNCj4gbXN0
-QHJlZGhhdC5jb207IGphbi5raXN6a2FAc2llbWVucy5jb207IGJkLmF2aXZAZ21haWwuY29tOyBx
-ZW11LQ0KPiBkZXZlbEBub25nbnUub3JnOyBhbGV4LndpbGxpYW1zb25AcmVkaGF0LmNvbTsgTGl1
-LCBZaSA8eWkubGl1QGludGVsLmNvbT4NCj4gU3ViamVjdDogUmU6IFtRZW11LWRldmVsXSBbUkZD
-IFBBVENIIDAxLzEzXSBpbnRlbF9pb21tdTogYWxsb2NhdGUgbmV3IGtleSB3aGVuDQo+IGNyZWF0
-aW5nIG5ldyBhZGRyZXNzIHNwYWNlDQo+IA0KPiBPbiBNb24sIERlYyAxMiwgMjAxNiBhdCAwNDox
-Njo1MFBNICswODAwLCBMaXUsIFlpIEwgd3JvdGU6DQo+ID4gT24gVHVlLCBEZWMgMDYsIDIwMTYg
-YXQgMDY6MzY6MTZQTSArMDgwMCwgUGV0ZXIgWHUgd3JvdGU6DQo+ID4gPiBGcm9tOiBKYXNvbiBX
-YW5nIDxqYXNvd2FuZ0ByZWRoYXQuY29tPg0KPiA+ID4NCj4gPiA+IFdlIHVzZSB0aGUgcG9pbnRl
-ciB0byBzdGFjayBmb3Iga2V5IGZvciBuZXcgYWRkcmVzcyBzcGFjZSwgdGhpcyB3aWxsDQo+ID4g
-PiBicmVhayBoYXNoIHRhYmxlIHNlYXJjaGluZywgZml4aW5nIGJ5IGdfbWFsbG9jKCkgYSBuZXcg
-a2V5IGluc3RlYWQuDQo+ID4gPg0KPiA+ID4gQ2M6IE1pY2hhZWwgUy4gVHNpcmtpbiA8bXN0QHJl
-ZGhhdC5jb20+DQo+ID4gPiBDYzogUGFvbG8gQm9uemluaSA8cGJvbnppbmlAcmVkaGF0LmNvbT4N
-Cj4gPiA+IENjOiBSaWNoYXJkIEhlbmRlcnNvbiA8cnRoQHR3aWRkbGUubmV0Pg0KPiA+ID4gQ2M6
-IEVkdWFyZG8gSGFia29zdCA8ZWhhYmtvc3RAcmVkaGF0LmNvbT4NCj4gPiA+IEFja2VkLWJ5OiBQ
-ZXRlciBYdSA8cGV0ZXJ4QHJlZGhhdC5jb20+DQo+ID4gPiBTaWduZWQtb2ZmLWJ5OiBKYXNvbiBX
-YW5nIDxqYXNvd2FuZ0ByZWRoYXQuY29tPg0KPiA+ID4gU2lnbmVkLW9mZi1ieTogUGV0ZXIgWHUg
-PHBldGVyeEByZWRoYXQuY29tPg0KPiA+ID4gLS0tDQo+ID4gPiAgaHcvaTM4Ni9pbnRlbF9pb21t
-dS5jIHwgNSArKystLQ0KPiA+ID4gIDEgZmlsZSBjaGFuZ2VkLCAzIGluc2VydGlvbnMoKyksIDIg
-ZGVsZXRpb25zKC0pDQo+ID4gPg0KPiA+ID4gZGlmZiAtLWdpdCBhL2h3L2kzODYvaW50ZWxfaW9t
-bXUuYyBiL2h3L2kzODYvaW50ZWxfaW9tbXUuYw0KPiA+ID4gaW5kZXggNzA4NzcwZS4uOTJlNDA2
-NCAxMDA2NDQNCj4gPiA+IC0tLSBhL2h3L2kzODYvaW50ZWxfaW9tbXUuYw0KPiA+ID4gKysrIGIv
-aHcvaTM4Ni9pbnRlbF9pb21tdS5jDQo+ID4gPiBAQCAtMjQyNiwxMiArMjQyNiwxMyBAQCBWVERB
-ZGRyZXNzU3BhY2UNCj4gKnZ0ZF9maW5kX2FkZF9hcyhJbnRlbElPTU1VU3RhdGUgKnMsIFBDSUJ1
-cyAqYnVzLCBpbnQgZGV2Zm4pDQo+ID4gPiAgICAgIFZUREFkZHJlc3NTcGFjZSAqdnRkX2Rldl9h
-czsNCj4gPiA+DQo+ID4gPiAgICAgIGlmICghdnRkX2J1cykgew0KPiA+ID4gKyAgICAgICAgdWlu
-dHB0cl90ICpuZXdfa2V5ID0gZ19tYWxsb2Moc2l6ZW9mKCpuZXdfa2V5KSk7DQo+ID4gPiArICAg
-ICAgICAqbmV3X2tleSA9ICh1aW50cHRyX3QpYnVzOw0KPiA+ID4gICAgICAgICAgLyogTm8gY29y
-cmVzcG9uZGluZyBmcmVlKCkgKi8NCj4gPiA+ICAgICAgICAgIHZ0ZF9idXMgPSBnX21hbGxvYzAo
-c2l6ZW9mKFZUREJ1cykgKyBzaXplb2YoVlREQWRkcmVzc1NwYWNlICopICogXA0KPiA+ID4gICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICBYODZfSU9NTVVfUENJX0RFVkZOX01BWCk7DQo+ID4g
-PiAgICAgICAgICB2dGRfYnVzLT5idXMgPSBidXM7DQo+ID4gPiAtICAgICAgICBrZXkgPSAodWlu
-dHB0cl90KWJ1czsNCj4gPiA+IC0gICAgICAgIGdfaGFzaF90YWJsZV9pbnNlcnQocy0+dnRkX2Fz
-X2J5X2J1c3B0ciwgJmtleSwgdnRkX2J1cyk7DQo+ID4gPiArICAgICAgICBnX2hhc2hfdGFibGVf
-aW5zZXJ0KHMtPnZ0ZF9hc19ieV9idXNwdHIsIG5ld19rZXksIHZ0ZF9idXMpOw0KPiA+IEhpIFBl
-dGVyLA0KPiA+IFlvdXIgZml4IHNlZW1zIHRvIGFuc3dlciBhbiBpc3N1ZSBJIGVuY291bnRlcmVk
-IGJhY2sgaW4gT2N0LiBUaGUgc3ltcHRvbSBpczogdXNlDQo+IHRoZSBzYW1lIGJ1cyB2YWx1ZSB0
-bw0KPiA+IHNlYXJjaGEgcHJldmlvdXMgaW5zZXJ0ZWQgZW50cnkgaW4gcy0+dnRkX2FzX2J5X2J1
-c3B0ciwgdGhlIHJlc3VsdCBpcyBub3QgZm91bmQuDQo+ID4NCj4gPiByZWFsbHkgZ3J0IGZpeC4g
-Y291bGQgZXhwbGFpbiBpdCBhIGJpdCBvbiB3aHkgdGhpcyBjaGFuZ2Ugd291bGQgZml4IHRoZSBp
-c3N1ZT8NCj4gDQo+IFRoZSBvbGQgY29kZSBpcyBkb2luZyBnX2hhc2hfdGFibGVfaW5zZXJ0KCkg
-d2l0aCAiJmtleSIgYXMgdGhlIGhhc2gNCj4ga2V5LiBIb3dldmVyIHZhcmlhYmxlICJrZXkiIGlz
-IGFsbG9jYXRlZCBvbiBzdGFjaywgc28gaXQncyB2YWx1ZSBtaWdodA0KPiBjaGFuZ2UgYWZ0ZXIg
-d2UgcmV0dXJuIGZyb20gdnRkX2ZpbmRfYWRkX2FzKCkgKHN0YWNrIHZhcmlhYmxlcyBjYW4NCj4g
-b25seSBiZSB1c2VkIGluc2lkZSBpdHMgZnVuY3Rpb25hbCBzY29wZSkuIFRoZSBwYXRjaCBzd2l0
-Y2hlZCB0byB1c2UNCj4gZ19tYWxsb2MwKCksIHRoYXQnbGwgdXNlIGhlYXAgbWVtb3J5IHJhdGhl
-ciB0aGFuIHN0YWNrLCB3aGljaCBpcyBzYWZlLg0KPiANCj4gKEZvcndhcmRpbmcgdGhpcyB0aGFu
-a2Z1bG5lc3MgdG8gSmFzb24gd2hvIGlzIHRoZSByZWFsIGF1dGhvciBvZiB0aGlzDQo+ICBmaXgg
-Oi0pDQoNClRoYW5rcyBmb3IgdGhlIGV4cGxhbmF0aW9uLCBQZXRlci4gSSBzZWUuIFRoZW4gaXQg
-aXMgc3VyZSB0aGlzIHJlYWxseSBmaXggd2hhdA0KSSBlbmNvdW50ZXJlZCBpbiBPY3QuIFJlYWxs
-eSBhIHdvbmRlcmZ1bCBmaXggSmFzb25+IA0KDQo+IA0KPiBUaGFua3MsDQo+IA0KPiAtLSBwZXRl
-cngNCg0K
+Hi Jie,
+
+I can reproduce this by single-stepping through the bug1 testing code
+using gdb, and SIGILL was encountered when executing the pabsb SSE3
+instruction. Maybe it was due to QEMU's translator, I'll look further
+into it.
+
+** Changed in: qemu
+       Status: New =3D> Confirmed
+
+** Changed in: qemu
+     Assignee: (unassigned) =3D> Ziyue Yang (yzyubuntuzh)
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1641637
+
+Title:
+  incorrect illegal SSE3 instructions reporting on x86_64
+
+Status in QEMU:
+  Confirmed
+
+Bug description:
+  Hi all, we found 28 differently encoded illegal SSE3 instructions
+  reporting on the most recent x86_64 user mode linux qemu (version
+  2.7.0). We believe these reporting should be incorrect because the
+  same code can be executed on a real machine. The instructions are the
+  following:
+
+  pabsb %mm0, %mm1
+  pabsb %xmm0, %xmm1
+  pabsd %mm0, %mm1
+  pabsd %xmm0, %xmm1
+  pabsw %mm0, %mm1
+  pabsw %xmm0, %xmm1
+  phaddd %mm0, %mm1
+  phaddd %xmm0, %xmm1
+  phaddsw %mm0, %mm1
+  phaddsw %xmm0, %xmm1
+  phaddw %mm0, %mm1
+  phaddw %xmm0, %xmm1
+  phsubd %mm0, %mm1
+  phsubd %xmm0, %xmm1
+  phsubsw %mm0, %mm1
+  phsubsw %xmm0, %xmm1
+  phsubw %mm0, %mm1
+  phsubw %xmm0, %xmm1
+  pmaddubsw %mm0, %mm1
+  pmaddubsw %xmm0, %xmm1
+  pmulhrsw %mm0, %mm1
+  pmulhrsw %xmm0, %xmm1
+  psignb %mm0, %mm1
+  psignb %xmm0, %xmm1
+  psignd %mm0, %mm1
+  psignd %xmm0, %xmm1
+  psignw %mm0, %mm1
+  psignw %xmm0, %xmm1
+
+  The following is the proof of code
+
+  /********** Beginning of bug 1.c: pabsb %mm0, %mm1 **********/
+
+  int printf(const char *format, ...);
+  unsigned char i0[0x10];
+  unsigned char i1[0x10];
+  unsigned char o[0x10];
+  int main() {
+      int k =3D 0;
+      asm("mov %0, %%rdx\n"
+          "movq (%%rdx), %%mm0\n"::"r"((char *)(i0)));;
+      asm("mov %0, %%rdx\n"
+          "movq (%%rdx), %%mm1\n"::"r"((char *)(i1)));;
+      asm("pabsb %mm0, %mm1");
+      asm("mov %0, %%rdx\n"
+          "movq %%mm1, (%%rdx)\n"::"r"((char *)(o)));;
+      for (k =3D 0; k < 0x10; k++)
+          printf("%02x", o[0x10 - 1 - k]);
+      printf("\n");
+  }
+
+  /********** End of bug 1.c **********/
+
+  =
+
+  /********** Beginning of bug 2.c: pabsb %xmm0, %xmm1 **********/
+
+  int printf(const char *format, ...);
+  unsigned char i0[0x10];
+  unsigned char i1[0x10];
+  unsigned char o[0x10];
+  int main() {
+      int k =3D 0;
+      asm("mov %0, %%rdx\n"
+          "movdqu (%%rdx), %%xmm0\n"::"r"((char *)(i0)));;
+      asm("mov %0, %%rdx\n"
+          "movdqu (%%rdx), %%xmm1\n"::"r"((char *)(i1)));;
+      asm("pabsb %xmm0, %xmm1");
+      asm("mov %0, %%rdx\n"
+          "movdqu %%xmm1, (%%rdx)\n"::"r"((char *)(o)));;
+      for (k =3D 0; k < 0x10; k++)
+          printf("%02x", o[0x10 - 1 - k]);
+      printf("\n");
+  }
+
+  /********** End of bug 2.c **********/
+
+  =
+
+  /********** Beginning of bug 3.c: pabsd %mm0, %mm1 **********/
+
+  int printf(const char *format, ...);
+  unsigned char i0[0x10];
+  unsigned char i1[0x10];
+  unsigned char o[0x10];
+  int main() {
+      int k =3D 0;
+      asm("mov %0, %%rdx\n"
+          "movq (%%rdx), %%mm0\n"::"r"((char *)(i0)));;
+      asm("mov %0, %%rdx\n"
+          "movq (%%rdx), %%mm1\n"::"r"((char *)(i1)));;
+      asm("pabsd %mm0, %mm1");
+      asm("mov %0, %%rdx\n"
+          "movq %%mm1, (%%rdx)\n"::"r"((char *)(o)));;
+      for (k =3D 0; k < 0x10; k++)
+          printf("%02x", o[0x10 - 1 - k]);
+      printf("\n");
+  }
+
+  /********** End of bug 3.c **********/
+
+  =
+
+  /********** Beginning of bug 4.c: pabsd %xmm0, %xmm1 **********/
+
+  int printf(const char *format, ...);
+  unsigned char i0[0x10];
+  unsigned char i1[0x10];
+  unsigned char o[0x10];
+  int main() {
+      int k =3D 0;
+      asm("mov %0, %%rdx\n"
+          "movdqu (%%rdx), %%xmm0\n"::"r"((char *)(i0)));;
+      asm("mov %0, %%rdx\n"
+          "movdqu (%%rdx), %%xmm1\n"::"r"((char *)(i1)));;
+      asm("pabsd %xmm0, %xmm1");
+      asm("mov %0, %%rdx\n"
+          "movdqu %%xmm1, (%%rdx)\n"::"r"((char *)(o)));;
+      for (k =3D 0; k < 0x10; k++)
+          printf("%02x", o[0x10 - 1 - k]);
+      printf("\n");
+  }
+
+  /********** End of bug 4.c **********/
+
+  =
+
+  /********** Beginning of bug 5.c: pabsw %mm0, %mm1 **********/
+
+  int printf(const char *format, ...);
+  unsigned char i0[0x10];
+  unsigned char i1[0x10];
+  unsigned char o[0x10];
+  int main() {
+      int k =3D 0;
+      asm("mov %0, %%rdx\n"
+          "movq (%%rdx), %%mm0\n"::"r"((char *)(i0)));;
+      asm("mov %0, %%rdx\n"
+          "movq (%%rdx), %%mm1\n"::"r"((char *)(i1)));;
+      asm("pabsw %mm0, %mm1");
+      asm("mov %0, %%rdx\n"
+          "movq %%mm1, (%%rdx)\n"::"r"((char *)(o)));;
+      for (k =3D 0; k < 0x10; k++)
+          printf("%02x", o[0x10 - 1 - k]);
+      printf("\n");
+  }
+
+  /********** End of bug 5.c **********/
+
+  =
+
+  /********** Beginning of bug 6.c: pabsw %xmm0, %xmm1 **********/
+
+  int printf(const char *format, ...);
+  unsigned char i0[0x10];
+  unsigned char i1[0x10];
+  unsigned char o[0x10];
+  int main() {
+      int k =3D 0;
+      asm("mov %0, %%rdx\n"
+          "movdqu (%%rdx), %%xmm0\n"::"r"((char *)(i0)));;
+      asm("mov %0, %%rdx\n"
+          "movdqu (%%rdx), %%xmm1\n"::"r"((char *)(i1)));;
+      asm("pabsw %xmm0, %xmm1");
+      asm("mov %0, %%rdx\n"
+          "movdqu %%xmm1, (%%rdx)\n"::"r"((char *)(o)));;
+      for (k =3D 0; k < 0x10; k++)
+          printf("%02x", o[0x10 - 1 - k]);
+      printf("\n");
+  }
+
+  /********** End of bug 6.c **********/
+
+  =
+
+  /********** Beginning of bug 7.c: phaddd %mm0, %mm1 **********/
+
+  int printf(const char *format, ...);
+  unsigned char i0[0x10];
+  unsigned char i1[0x10];
+  unsigned char o[0x10];
+  int main() {
+      int k =3D 0;
+      asm("mov %0, %%rdx\n"
+          "movq (%%rdx), %%mm1\n"::"r"((char *)(i0)));;
+      asm("mov %0, %%rdx\n"
+          "movq (%%rdx), %%mm1\n"::"r"((char *)(i1)));;
+      asm("phaddd %mm0, %mm1");
+      asm("mov %0, %%rdx\n"
+          "movq %%mm1, (%%rdx)\n"::"r"((char *)(o)));;
+      for (k =3D 0; k < 0x10; k++)
+          printf("%02x", o[0x10 - 1 - k]);
+      printf("\n");
+  }
+
+  /********** End of bug 7.c **********/
+
+  =
+
+  /********** Beginning of bug 8.c: phaddd %xmm0, %xmm1 **********/
+
+  int printf(const char *format, ...);
+  unsigned char i0[0x10];
+  unsigned char i1[0x10];
+  unsigned char o[0x10];
+  int main() {
+      int k =3D 0;
+      asm("mov %0, %%rdx\n"
+          "movdqu (%%rdx), %%xmm1\n"::"r"((char *)(i0)));;
+      asm("mov %0, %%rdx\n"
+          "movdqu (%%rdx), %%xmm1\n"::"r"((char *)(i1)));;
+      asm("phaddd %xmm0, %xmm1");
+      asm("mov %0, %%rdx\n"
+          "movdqu %%xmm1, (%%rdx)\n"::"r"((char *)(o)));;
+      for (k =3D 0; k < 0x10; k++)
+          printf("%02x", o[0x10 - 1 - k]);
+      printf("\n");
+  }
+
+  /********** End of bug 8.c **********/
+
+  =
+
+  /********** Beginning of bug 9.c: phaddsw %mm0, %mm1 **********/
+
+  int printf(const char *format, ...);
+  unsigned char i0[0x10];
+  unsigned char i1[0x10];
+  unsigned char o[0x10];
+  int main() {
+      int k =3D 0;
+      asm("mov %0, %%rdx\n"
+          "movq (%%rdx), %%mm1\n"::"r"((char *)(i0)));;
+      asm("mov %0, %%rdx\n"
+          "movq (%%rdx), %%mm1\n"::"r"((char *)(i1)));;
+      asm("phaddsw %mm0, %mm1");
+      asm("mov %0, %%rdx\n"
+          "movq %%mm1, (%%rdx)\n"::"r"((char *)(o)));;
+      for (k =3D 0; k < 0x10; k++)
+          printf("%02x", o[0x10 - 1 - k]);
+      printf("\n");
+  }
+
+  /********** End of bug 9.c **********/
+
+  =
+
+  /********** Beginning of bug 10.c: phaddsw %xmm0, %xmm1 **********/
+
+  int printf(const char *format, ...);
+  unsigned char i0[0x10];
+  unsigned char i1[0x10];
+  unsigned char o[0x10];
+  int main() {
+      int k =3D 0;
+      asm("mov %0, %%rdx\n"
+          "movdqu (%%rdx), %%xmm1\n"::"r"((char *)(i0)));;
+      asm("mov %0, %%rdx\n"
+          "movdqu (%%rdx), %%xmm1\n"::"r"((char *)(i1)));;
+      asm("phaddsw %xmm0, %xmm1");
+      asm("mov %0, %%rdx\n"
+          "movdqu %%xmm1, (%%rdx)\n"::"r"((char *)(o)));;
+      for (k =3D 0; k < 0x10; k++)
+          printf("%02x", o[0x10 - 1 - k]);
+      printf("\n");
+  }
+
+  /********** End of bug 10.c **********/
+
+  =
+
+  /********** Beginning of bug 11.c: phaddw %mm0, %mm1 **********/
+
+  int printf(const char *format, ...);
+  unsigned char i0[0x10];
+  unsigned char i1[0x10];
+  unsigned char o[0x10];
+  int main() {
+      int k =3D 0;
+      asm("mov %0, %%rdx\n"
+          "movq (%%rdx), %%mm1\n"::"r"((char *)(i0)));;
+      asm("mov %0, %%rdx\n"
+          "movq (%%rdx), %%mm1\n"::"r"((char *)(i1)));;
+      asm("phaddw %mm0, %mm1");
+      asm("mov %0, %%rdx\n"
+          "movq %%mm1, (%%rdx)\n"::"r"((char *)(o)));;
+      for (k =3D 0; k < 0x10; k++)
+          printf("%02x", o[0x10 - 1 - k]);
+      printf("\n");
+  }
+
+  /********** End of bug 11.c **********/
+
+  =
+
+  /********** Beginning of bug 12.c: phaddw %xmm0, %xmm1 **********/
+
+  int printf(const char *format, ...);
+  unsigned char i0[0x10];
+  unsigned char i1[0x10];
+  unsigned char o[0x10];
+  int main() {
+      int k =3D 0;
+      asm("mov %0, %%rdx\n"
+          "movdqu (%%rdx), %%xmm1\n"::"r"((char *)(i0)));;
+      asm("mov %0, %%rdx\n"
+          "movdqu (%%rdx), %%xmm1\n"::"r"((char *)(i1)));;
+      asm("phaddw %xmm0, %xmm1");
+      asm("mov %0, %%rdx\n"
+          "movdqu %%xmm1, (%%rdx)\n"::"r"((char *)(o)));;
+      for (k =3D 0; k < 0x10; k++)
+          printf("%02x", o[0x10 - 1 - k]);
+      printf("\n");
+  }
+
+  /********** End of bug 12.c **********/
+
+  =
+
+  /********** Beginning of bug 13.c: phsubd %mm0, %mm1 **********/
+
+  int printf(const char *format, ...);
+  unsigned char i0[0x10];
+  unsigned char i1[0x10];
+  unsigned char o[0x10];
+  int main() {
+      int k =3D 0;
+      asm("mov %0, %%rdx\n"
+          "movq (%%rdx), %%mm1\n"::"r"((char *)(i0)));;
+      asm("mov %0, %%rdx\n"
+          "movq (%%rdx), %%mm1\n"::"r"((char *)(i1)));;
+      asm("phsubd %mm0, %mm1");
+      asm("mov %0, %%rdx\n"
+          "movq %%mm1, (%%rdx)\n"::"r"((char *)(o)));;
+      for (k =3D 0; k < 0x10; k++)
+          printf("%02x", o[0x10 - 1 - k]);
+      printf("\n");
+  }
+
+  /********** End of bug 13.c **********/
+
+  =
+
+  /********** Beginning of bug 14.c: phsubd %xmm0, %xmm1 **********/
+
+  int printf(const char *format, ...);
+  unsigned char i0[0x10];
+  unsigned char i1[0x10];
+  unsigned char o[0x10];
+  int main() {
+      int k =3D 0;
+      asm("mov %0, %%rdx\n"
+          "movdqu (%%rdx), %%xmm1\n"::"r"((char *)(i0)));;
+      asm("mov %0, %%rdx\n"
+          "movdqu (%%rdx), %%xmm1\n"::"r"((char *)(i1)));;
+      asm("phsubd %xmm0, %xmm1");
+      asm("mov %0, %%rdx\n"
+          "movdqu %%xmm1, (%%rdx)\n"::"r"((char *)(o)));;
+      for (k =3D 0; k < 0x10; k++)
+          printf("%02x", o[0x10 - 1 - k]);
+      printf("\n");
+  }
+
+  /********** End of bug 14.c **********/
+
+  =
+
+  /********** Beginning of bug 15.c: phsubsw %mm0, %mm1 **********/
+
+  int printf(const char *format, ...);
+  unsigned char i0[0x10];
+  unsigned char i1[0x10];
+  unsigned char o[0x10];
+  int main() {
+      int k =3D 0;
+      asm("mov %0, %%rdx\n"
+          "movq (%%rdx), %%mm1\n"::"r"((char *)(i0)));;
+      asm("mov %0, %%rdx\n"
+          "movq (%%rdx), %%mm1\n"::"r"((char *)(i1)));;
+      asm("phsubsw %mm0, %mm1");
+      asm("mov %0, %%rdx\n"
+          "movq %%mm1, (%%rdx)\n"::"r"((char *)(o)));;
+      for (k =3D 0; k < 0x10; k++)
+          printf("%02x", o[0x10 - 1 - k]);
+      printf("\n");
+  }
+
+  /********** End of bug 15.c **********/
+
+  =
+
+  /********** Beginning of bug 16.c: phsubsw %xmm0, %xmm1 **********/
+
+  int printf(const char *format, ...);
+  unsigned char i0[0x10];
+  unsigned char i1[0x10];
+  unsigned char o[0x10];
+  int main() {
+      int k =3D 0;
+      asm("mov %0, %%rdx\n"
+          "movdqu (%%rdx), %%xmm1\n"::"r"((char *)(i0)));;
+      asm("mov %0, %%rdx\n"
+          "movdqu (%%rdx), %%xmm1\n"::"r"((char *)(i1)));;
+      asm("phsubsw %xmm0, %xmm1");
+      asm("mov %0, %%rdx\n"
+          "movdqu %%xmm1, (%%rdx)\n"::"r"((char *)(o)));;
+      for (k =3D 0; k < 0x10; k++)
+          printf("%02x", o[0x10 - 1 - k]);
+      printf("\n");
+  }
+
+  /********** End of bug 16.c **********/
+
+  =
+
+  /********** Beginning of bug 17.c: phsubw %mm0, %mm1 **********/
+
+  int printf(const char *format, ...);
+  unsigned char i0[0x10];
+  unsigned char i1[0x10];
+  unsigned char o[0x10];
+  int main() {
+      int k =3D 0;
+      asm("mov %0, %%rdx\n"
+          "movq (%%rdx), %%mm1\n"::"r"((char *)(i0)));;
+      asm("mov %0, %%rdx\n"
+          "movq (%%rdx), %%mm1\n"::"r"((char *)(i1)));;
+      asm("phsubw %mm0, %mm1");
+      asm("mov %0, %%rdx\n"
+          "movq %%mm1, (%%rdx)\n"::"r"((char *)(o)));;
+      for (k =3D 0; k < 0x10; k++)
+          printf("%02x", o[0x10 - 1 - k]);
+      printf("\n");
+  }
+
+  /********** End of bug 17.c **********/
+
+  =
+
+  /********** Beginning of bug 18.c: phsubw %xmm0, %xmm1 **********/
+
+  int printf(const char *format, ...);
+  unsigned char i0[0x10];
+  unsigned char i1[0x10];
+  unsigned char o[0x10];
+  int main() {
+      int k =3D 0;
+      asm("mov %0, %%rdx\n"
+          "movdqu (%%rdx), %%xmm1\n"::"r"((char *)(i0)));;
+      asm("mov %0, %%rdx\n"
+          "movdqu (%%rdx), %%xmm1\n"::"r"((char *)(i1)));;
+      asm("phsubw %xmm0, %xmm1");
+      asm("mov %0, %%rdx\n"
+          "movdqu %%xmm1, (%%rdx)\n"::"r"((char *)(o)));;
+      for (k =3D 0; k < 0x10; k++)
+          printf("%02x", o[0x10 - 1 - k]);
+      printf("\n");
+  }
+
+  /********** End of bug 18.c **********/
+
+  =
+
+  /********** Beginning of bug 19.c: pmaddubsw %mm0, %mm1 **********/
+
+  int printf(const char *format, ...);
+  unsigned char i0[0x10];
+  unsigned char i1[0x10];
+  unsigned char i2[0x10];
+  unsigned char i3[0x10];
+  unsigned char o[0x10];
+  int main() {
+      int k =3D 0;
+      asm("mov %0, %%rdx\n"
+          "movq (%%rdx), %%mm0\n"::"r"((char *)(i0)));;
+      asm("mov %0, %%rdx\n"
+          "movq (%%rdx), %%mm1\n"::"r"((char *)(i1)));;
+      asm("mov %0, %%rdx\n"
+          "movq (%%rdx), %%mm0\n"::"r"((char *)(i2)));;
+      asm("mov %0, %%rdx\n"
+          "movq (%%rdx), %%mm1\n"::"r"((char *)(i3)));;
+      asm("pmaddubsw %mm0, %mm1");
+      asm("mov %0, %%rdx\n"
+          "movq %%mm1, (%%rdx)\n"::"r"((char *)(o)));;
+      for (k =3D 0; k < 0x10; k++)
+          printf("%02x", o[0x10 - 1 - k]);
+      printf("\n");
+  }
+
+  /********** End of bug 19.c **********/
+
+  =
+
+  /********** Beginning of bug 20.c: pmaddubsw %xmm0, %xmm1 **********/
+
+  int printf(const char *format, ...);
+  unsigned char i0[0x10];
+  unsigned char i1[0x10];
+  unsigned char i2[0x10];
+  unsigned char i3[0x10];
+  unsigned char o[0x10];
+  int main() {
+      int k =3D 0;
+      asm("mov %0, %%rdx\n"
+          "movdqu (%%rdx), %%xmm0\n"::"r"((char *)(i0)));;
+      asm("mov %0, %%rdx\n"
+          "movdqu (%%rdx), %%xmm1\n"::"r"((char *)(i1)));;
+      asm("mov %0, %%rdx\n"
+          "movdqu (%%rdx), %%xmm0\n"::"r"((char *)(i2)));;
+      asm("mov %0, %%rdx\n"
+          "movdqu (%%rdx), %%xmm1\n"::"r"((char *)(i3)));;
+      asm("pmaddubsw %xmm0, %xmm1");
+      asm("mov %0, %%rdx\n"
+          "movdqu %%xmm1, (%%rdx)\n"::"r"((char *)(o)));;
+      for (k =3D 0; k < 0x10; k++)
+          printf("%02x", o[0x10 - 1 - k]);
+      printf("\n");
+  }
+
+  /********** End of bug 20.c **********/
+
+  =
+
+  /********** Beginning of bug 21.c: pmulhrsw %mm0, %mm1 **********/
+
+  int printf(const char *format, ...);
+  unsigned char i0[0x10];
+  unsigned char i1[0x10];
+  unsigned char o[0x10];
+  int main() {
+      int k =3D 0;
+      asm("mov %0, %%rdx\n"
+          "movq (%%rdx), %%mm0\n"::"r"((char *)(i0)));;
+      asm("mov %0, %%rdx\n"
+          "movq (%%rdx), %%mm1\n"::"r"((char *)(i1)));;
+      asm("pmulhrsw %mm0, %mm1");
+      asm("mov %0, %%rdx\n"
+          "movq %%mm1, (%%rdx)\n"::"r"((char *)(o)));;
+      for (k =3D 0; k < 0x10; k++)
+          printf("%02x", o[0x10 - 1 - k]);
+      printf("\n");
+  }
+
+  /********** End of bug 21.c **********/
+
+  =
+
+  /********** Beginning of bug 22.c: pmulhrsw %xmm0, %xmm1 **********/
+
+  int printf(const char *format, ...);
+  unsigned char i0[0x10];
+  unsigned char i1[0x10];
+  unsigned char o[0x10];
+  int main() {
+      int k =3D 0;
+      asm("mov %0, %%rdx\n"
+          "movdqu (%%rdx), %%xmm0\n"::"r"((char *)(i0)));;
+      asm("mov %0, %%rdx\n"
+          "movdqu (%%rdx), %%xmm1\n"::"r"((char *)(i1)));;
+      asm("pmulhrsw %xmm0, %xmm1");
+      asm("mov %0, %%rdx\n"
+          "movdqu %%xmm1, (%%rdx)\n"::"r"((char *)(o)));;
+      for (k =3D 0; k < 0x10; k++)
+          printf("%02x", o[0x10 - 1 - k]);
+      printf("\n");
+  }
+
+  /********** End of bug 22.c **********/
+
+  =
+
+  /********** Beginning of bug 23.c: psignb %mm0, %mm1 **********/
+
+  int printf(const char *format, ...);
+  unsigned char i0[0x10];
+  unsigned char i1[0x10];
+  unsigned char o[0x10];
+  int main() {
+      int k =3D 0;
+      asm("mov %0, %%rdx\n"
+          "movq (%%rdx), %%mm0\n"::"r"((char *)(i0)));;
+      asm("mov %0, %%rdx\n"
+          "movq (%%rdx), %%mm1\n"::"r"((char *)(i1)));;
+      asm("psignb %mm0, %mm1");
+      asm("mov %0, %%rdx\n"
+          "movq %%mm1, (%%rdx)\n"::"r"((char *)(o)));;
+      for (k =3D 0; k < 0x10; k++)
+          printf("%02x", o[0x10 - 1 - k]);
+      printf("\n");
+  }
+
+  /********** End of bug 23.c **********/
+
+  =
+
+  /********** Beginning of bug 24.c: psignb %xmm0, %xmm1 **********/
+
+  int printf(const char *format, ...);
+  unsigned char i0[0x10];
+  unsigned char i1[0x10];
+  unsigned char o[0x10];
+  int main() {
+      int k =3D 0;
+      asm("mov %0, %%rdx\n"
+          "movdqu (%%rdx), %%xmm0\n"::"r"((char *)(i0)));;
+      asm("mov %0, %%rdx\n"
+          "movdqu (%%rdx), %%xmm1\n"::"r"((char *)(i1)));;
+      asm("psignb %xmm0, %xmm1");
+      asm("mov %0, %%rdx\n"
+          "movdqu %%xmm1, (%%rdx)\n"::"r"((char *)(o)));;
+      for (k =3D 0; k < 0x10; k++)
+          printf("%02x", o[0x10 - 1 - k]);
+      printf("\n");
+  }
+
+  /********** End of bug 24.c **********/
+
+  =
+
+  /********** Beginning of bug 25.c: psignd %mm0, %mm1 **********/
+
+  int printf(const char *format, ...);
+  unsigned char i0[0x10];
+  unsigned char i1[0x10];
+  unsigned char o[0x10];
+  int main() {
+      int k =3D 0;
+      asm("mov %0, %%rdx\n"
+          "movq (%%rdx), %%mm0\n"::"r"((char *)(i0)));;
+      asm("mov %0, %%rdx\n"
+          "movq (%%rdx), %%mm1\n"::"r"((char *)(i1)));;
+      asm("psignd %mm0, %mm1");
+      asm("mov %0, %%rdx\n"
+          "movq %%mm1, (%%rdx)\n"::"r"((char *)(o)));;
+      for (k =3D 0; k < 0x10; k++)
+          printf("%02x", o[0x10 - 1 - k]);
+      printf("\n");
+  }
+
+  /********** End of bug 25.c **********/
+
+  =
+
+  /********** Beginning of bug 26.c: psignd %xmm0, %xmm1 **********/
+
+  int printf(const char *format, ...);
+  unsigned char i0[0x10];
+  unsigned char i1[0x10];
+  unsigned char o[0x10];
+  int main() {
+      int k =3D 0;
+      asm("mov %0, %%rdx\n"
+          "movdqu (%%rdx), %%xmm0\n"::"r"((char *)(i0)));;
+      asm("mov %0, %%rdx\n"
+          "movdqu (%%rdx), %%xmm1\n"::"r"((char *)(i1)));;
+      asm("psignd %xmm0, %xmm1");
+      asm("mov %0, %%rdx\n"
+          "movdqu %%xmm1, (%%rdx)\n"::"r"((char *)(o)));;
+      for (k =3D 0; k < 0x10; k++)
+          printf("%02x", o[0x10 - 1 - k]);
+      printf("\n");
+  }
+
+  /********** End of bug 26.c **********/
+
+  =
+
+  /********** Beginning of bug 27.c: psignw %mm0, %mm1 **********/
+
+  int printf(const char *format, ...);
+  unsigned char i0[0x10];
+  unsigned char i1[0x10];
+  unsigned char o[0x10];
+  int main() {
+      int k =3D 0;
+      asm("mov %0, %%rdx\n"
+          "movq (%%rdx), %%mm0\n"::"r"((char *)(i0)));;
+      asm("mov %0, %%rdx\n"
+          "movq (%%rdx), %%mm1\n"::"r"((char *)(i1)));;
+      asm("psignw %mm0, %mm1");
+      asm("mov %0, %%rdx\n"
+          "movq %%mm1, (%%rdx)\n"::"r"((char *)(o)));;
+      for (k =3D 0; k < 0x10; k++)
+          printf("%02x", o[0x10 - 1 - k]);
+      printf("\n");
+  }
+
+  /********** End of bug 27.c **********/
+
+  =
+
+  /********** Beginning of bug 28.c: psignw %xmm0, %xmm1 **********/
+
+  int printf(const char *format, ...);
+  unsigned char i0[0x10];
+  unsigned char i1[0x10];
+  unsigned char o[0x10];
+  int main() {
+      int k =3D 0;
+      asm("mov %0, %%rdx\n"
+          "movdqu (%%rdx), %%xmm0\n"::"r"((char *)(i0)));;
+      asm("mov %0, %%rdx\n"
+          "movdqu (%%rdx), %%xmm1\n"::"r"((char *)(i1)));;
+      asm("psignw %xmm0, %xmm1");
+      asm("mov %0, %%rdx\n"
+          "movdqu %%xmm1, (%%rdx)\n"::"r"((char *)(o)));;
+      for (k =3D 0; k < 0x10; k++)
+          printf("%02x", o[0x10 - 1 - k]);
+      printf("\n");
+  }
+
+  /********** End of bug 28.c **********/
+
+  For any of the above code, when compiled into x86-64 binary code with
+  gcc, qemu reports the illegal instructions bug. However, these can be
+  correctly executed on a real machine. For example,
+
+  $ gcc 28.c -o 28
+  $ qemu-x86_64 ./28
+  qemu: uncaught target signal 4 (Illegal instruction) - core dumped
+  Illegal instruction
+  $ ./28
+  00000000000000000000000000000000
+
+  Some information about the system:
+
+  $ qemu-x86_64 --version
+  qemu-x86_64 version 2.7.0, Copyright (c) 2003-2016 Fabrice Bellard and th=
+e QEMU Project developers
+  $ uname -a
+  Linux cgos-System-Product-Name 3.13.0-32-generic #57-Ubuntu SMP Tue Jul 1=
+5 03:51:08 UTC 2014 x86_64 x86_64 x86_64 GNU/Linux
+  $ gcc --version
+  gcc (Ubuntu 4.8.4-2ubuntu1~14.04) 4.8.4
+  Copyright (C) 2013 Free Software Foundation, Inc.
+  This is free software; see the source for copying conditions.  There is NO
+  warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOS=
+E.
+
+  =
+
+  Thanks!
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1641637/+subscriptions
