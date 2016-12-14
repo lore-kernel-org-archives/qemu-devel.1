@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34155)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34579)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cHEre-0006Ca-Qv
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 14:05:19 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cHEue-0006JG-5K
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 14:08:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cHErb-00012R-Jv
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 14:05:18 -0500
-Received: from mail-wj0-f196.google.com ([209.85.210.196]:35572)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cHEua-0001bR-V0
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 14:08:24 -0500
+Received: from mail-wm0-f67.google.com ([74.125.82.67]:35315)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cHErb-000120-Dc
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 14:05:15 -0500
-Received: by mail-wj0-f196.google.com with SMTP id he10so6404136wjc.2
-	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 11:05:15 -0800 (PST)
-Date: Wed, 14 Dec 2016 19:04:12 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20161214190411.GA20648@stefanha-x1.localdomain>
-References: <20161212204313.anhjire2gkwd6gzi@grep.be>
-	<20161213103700.GD3103@stefanha-x1.localdomain>
-	<20161213121749.l572tsrnmnhnckvq@grep.be>
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1cHEua-0001Zq-LC
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 14:08:20 -0500
+Received: by mail-wm0-f67.google.com with SMTP id a20so1150262wme.2
+	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 11:07:57 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="ReaqsoxgOBHFXBhH"
-Content-Disposition: inline
-In-Reply-To: <20161213121749.l572tsrnmnhnckvq@grep.be>
-Subject: Re: [Qemu-devel] [Nbd] [PATCH v5] doc: Add NBD_CMD_BLOCK_STATUS
- extension
+References: <5850b689.68219d0a.9be2d.9b07@mx.google.com>
+In-Reply-To: <5850b689.68219d0a.9be2d.9b07@mx.google.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Wed, 14 Dec 2016 19:06:45 +0000
+Message-ID: <CAJ+F1CLibABvciw2Qo06KLbcYqA3ReYGKPxhgAH4ZG1dQy7ZAA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] audio: ac97: add exit function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,72 +29,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wouter Verhelst <w@uter.be>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, "nbd-general@lists.sourceforge.net" <nbd-general@lists.sourceforge.net>, Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Pavel Borzenkov <pborzenkov@virtuozzo.com>, "Denis V. Lunev" <den@openvz.org>, Markus Pargmann <mpa@pengutronix.de>, Paolo Bonzini <pbonzini@redhat.com>, Alex Bligh <alex@alex.org.uk>
+To: Li Qiang <liq3ea@gmail.com>, kraxel@redhat.com, qemu-devel@nongnu.org
+Cc: Li Qiang <liqiang6-s@360.cn>
+
+Hi
+
+On Wed, Dec 14, 2016 at 6:03 AM Li Qiang <liq3ea@gmail.com> wrote:
+
+From: Li Qiang <liqiang6-s@360.cn>
+
+Currently the ac97 device emulation doesn't have a exit function,
+hot unplug this device will leak some memory. Add a exit function to
+avoid this.
+
+Signed-off-by: Li Qiang <liqiang6-s@360.cn>
+---
+
+Changes since the v1:
+close the streams
+
+ hw/audio/ac97.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
+
+diff --git a/hw/audio/ac97.c b/hw/audio/ac97.c
+index cbd959e..efa20b5 100644
+--- a/hw/audio/ac97.c
++++ b/hw/audio/ac97.c
+@@ -1387,6 +1387,23 @@ static void ac97_realize(PCIDevice *dev, Error
+**errp)
+     ac97_on_reset (&s->dev.qdev);
+ }
+
++static void ac97_exit(PCIDevice *dev)
++{
++    AC97LinkState *s =3D DO_UPCAST(AC97LinkState, dev, dev);
++
++    if (s->voice_pi) {
++        AUD_close_in (&s->card, s->voice_pi);
++    }
++    if (s->voice_po) {
++        AUD_close_out (&s->card, s->voice_po);
++    }
++    if (s->voice_mc) {
++        AUD_close_in (&s->card, s->voice_mc);
++    }
++
 
 
---ReaqsoxgOBHFXBhH
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+You don't need to check if the pointer is non-null, same for es1370
 
-On Tue, Dec 13, 2016 at 01:17:49PM +0100, Wouter Verhelst wrote:
-> On Tue, Dec 13, 2016 at 10:37:00AM +0000, Stefan Hajnoczi wrote:
-> > On Mon, Dec 12, 2016 at 09:43:13PM +0100, Wouter Verhelst wrote:
-> > I'd prefer a programming model where the contexts don't need to be set
-> > for the lifetime of the connection.  Instead the client passes a bitmap
-> > (64-bits?) of contexts along with each BLOCK_STATUS command.  That way
-> > the client can select contexts on a per-command basis.  It's unlikely
-> > that more than 64 contexts need to be available at once but I admit it's
-> > an arbitrary limitation...
-> >=20
-> > I guess you've considered this model and decided it's better to
-> > negotiate upfront, it's wasteful to enable multiple contexts and then
-> > discard the response data on the client side because only a subset is
-> > needed for this command invocation.
->=20
-> I do agree that it might be nice to be able to enable or disable
-> particular metadata contexts for the lifetime of one BLOCK_STATUS
-> command. However, the problem then becomes one of "where do we do that".
-> The request header has a fixed size, and there is no space for such data
-> in the request header. This could be worked around in ways that do not
-> break compatibility with older implementations (not in the least because
-> we're defining a new command that needs to be negotiated first, and so
-> we could say that the server needs to understand a new request format),
-> but I haven't found a way to do so that doesn't strike me as "very
-> ugly".
->=20
-> In addition, most use cases that we've been presented with seem to
-> require only one or (at most) a handful of metadata contexts. In that
-> case, the ability to select which metadata contexts are to be used in
-> transmission doesn't strike me as a very useful possibility, which would
-> be used often. Given that, and given the problems described in the
-> previous paragraph, I'm not convinced it's worth complicating things
-> much over.
->=20
-> However, I could be convinced otherwise by strong arguments and by a
-> suggested spec for how to pass the required information in a clean way.
+Regarding style (space before parentheses), I think it's best to use qemu
+style (no space), even if the file uses its own style.
 
-Thanks for the responses, Woulter and Alex.
 
-I don't have a strong argument for why context selection should be
-per-command and you've explained that it would be awkward to add it to
-the protocol.
++    AUD_remove_card (&s->card);
++}
++
+ static int ac97_init (PCIBus *bus)
+ {
+     pci_create_simple (bus, -1, "AC97");
+@@ -1404,6 +1421,7 @@ static void ac97_class_init (ObjectClass *klass, void
+*data)
+     PCIDeviceClass *k =3D PCI_DEVICE_CLASS (klass);
 
-Stefan
+     k->realize =3D ac97_realize;
++    k->exit =3D ac97_exit;
+     k->vendor_id =3D PCI_VENDOR_ID_INTEL;
+     k->device_id =3D PCI_DEVICE_ID_INTEL_82801AA_5;
+     k->revision =3D 0x01;
+--
+1.8.3.1
 
---ReaqsoxgOBHFXBhH
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJYUZerAAoJEJykq7OBq3PIlW4H/1gQlGRPSoGEufLf2pd94U0K
-xI4h9v05eV96n2vAisyHlOGrQxvyE1GaWZmbORwFFMdTgAHxa07DjETZEPUi4il7
-I1NEIShsbnfLSpbE/hOxyITfyhx33zPI1Jd/0kjfN/RysdU2GUHt54ffpWiwwB1o
-rxkQGAvoPFKHu1RqcwTwoNYi5bFdWMkpquNSvBWy2rNNNVx9HqCW5psjvI/aAD9l
-PM7sEs76YXSrECxXPn4syKq8pI8nK2e/78s9HOE4VsfCw9PSx/I9RyG4BTWQ1Rh1
-BSHWO9PrTv94iLaXzI9s8Op/cClayZ9ey1v4NKgKYjfDOrQoMVRktKlalTMCj6E=
-=OeZy
------END PGP SIGNATURE-----
-
---ReaqsoxgOBHFXBhH--
+--=20
+Marc-Andr=C3=A9 Lureau
