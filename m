@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55084)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58539)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cHEK9-0007AR-Vd
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 13:30:43 -0500
+	(envelope-from <wouter@grep.be>) id 1cHEcn-0006H2-6D
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 13:49:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cHEK5-0007o5-IZ
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 13:30:41 -0500
-Received: from mail-vk0-f43.google.com ([209.85.213.43]:36214)
+	(envelope-from <wouter@grep.be>) id 1cHEcj-0004Ex-3C
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 13:49:57 -0500
+Received: from [2a01:4f8:140:52e5::2] (port=39137 helo=latin.grep.be)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cHEK5-0007nb-Bh
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 13:30:37 -0500
-Received: by mail-vk0-f43.google.com with SMTP id p9so40933500vkd.3
-	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 10:30:37 -0800 (PST)
+	(Exim 4.71) (envelope-from <wouter@grep.be>) id 1cHEci-0004Eg-Sp
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 13:49:53 -0500
+Date: Wed, 14 Dec 2016 19:49:37 +0100
+From: Wouter Verhelst <w@uter.be>
+Message-ID: <20161214184937.uv5gwkijaofhjfd7@grep.be>
+References: <20161214150840.10899-1-alex@alex.org.uk>
+	<31576d46-c0ed-29b9-71a0-5aca1790799a@virtuozzo.com>
+	<6D1B30FC-FD7E-474C-A8E3-FD87E7AA1364@alex.org.uk>
+	<5e9150ed-2127-f2e8-f9db-a514e8f0ddf8@virtuozzo.com>
+	<5E697C22-5FBB-49A2-A018-A6B96E29FE84@alex.org.uk>
+	<94ef3ef2-b76f-fa5d-cbaf-8990ce2b1be8@virtuozzo.com>
+	<20161214181323.mehzfmlf6z4pyajp@grep.be>
+	<D71CECFD-E513-4372-BB54-BF8D8D521292@alex.org.uk>
 MIME-Version: 1.0
-In-Reply-To: <20161202054617.6749-5-alastair@au1.ibm.com>
-References: <20161202054617.6749-1-alastair@au1.ibm.com>
-	<20161202054617.6749-5-alastair@au1.ibm.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 14 Dec 2016 18:29:11 +0000
-Message-ID: <CAFEAcA8__YWN9f2=GDeX5ddFnV_WWknpdrUeVud9-YLu9cE0Pw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v3 4/7] qtest: Support named interrupts
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <D71CECFD-E513-4372-BB54-BF8D8D521292@alex.org.uk>
+Subject: Re: [Qemu-devel] [Nbd] [PATCH] Further tidy-up on block status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,215 +33,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alastair D'Silva <alastair@au1.ibm.com>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, Andrew Jeffery <andrew@aj.id.au>, Joel Stanley <joel@jms.id.au>, Alastair D'Silva <alastair@d-silva.org>
+To: Alex Bligh <alex@alex.org.uk>
+Cc: "nbd-general@lists.sourceforge.net" <nbd-general@lists.sourceforge.net>, Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "Stefan stefanha@redhat. com" <stefanha@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, "Denis V . Lunev" <den@openvz.org>, John Snow <jsnow@redhat.com>
 
-On 2 December 2016 at 05:46, Alastair D'Silva <alastair@au1.ibm.com> wrote:
-> From: Alastair D'Silva <alastair@d-silva.org>
->
-> The QTest framework cannot work with named interrupts. This patch
-> adds support for them, as well as the ability to manipulate them
-> from within a test.
->
-> Read actions are via callbacks, which allows for pulsed interrupts
-> to be read (the polled method used for the unnamed interrupts
-> cannot read pulsed interrupts as the value is reverted before the
-> test sees the changes).
->
-> Signed-off-by: Alastair D'Silva <alastair@d-silva.org>
+On Wed, Dec 14, 2016 at 06:18:58PM +0000, Alex Bligh wrote:
+> 
+> > On 14 Dec 2016, at 18:13, Wouter Verhelst <w@uter.be> wrote:
+> > 
+> > Instead, I would suggest that the spec leave it up to the namespace spec
+> > to define what gets listed when. The namespace should still give some
+> > indication that a particular *type* of context is available, though;
+> > e.g., _LIST_ could return 'backup:snapshot-diff{*}' as well as a list of
+> > 'backup:snapshot{snapshot-X}' contexts, where the latter are all
+> > available snapshots, and the 'snapshot-diff' bit implies that the whole
+> > cartesian product of all possible diffs between snapshots is possible in
+> > a format of 'backup:snapshot-diff{snapshot-X:snapshot-Y}', or some such
+> > (you get the idea).
+> > 
+> > The spec currently says that a server SHOULD allow choosing exports by
+> > simply naming them, but doesn't make that a MUST; and it also says that
+> > the query format is defined by the namespace. If we simply clarify that
+> > the output of _LIST_ doesn't necessarily need to be a full list of all
+> > that's available (that it may be symbolic in the case of namespaces that
+> > allow things to be dynamically defined), we should be good.
+> 
+> Let me have a go at a change.
+> 
+> However, note that Vladimir was answering a slightly different question.
 
-> --- a/qtest.c
-> +++ b/qtest.c
-> @@ -40,7 +40,6 @@ static DeviceState *irq_intercept_dev;
->  static FILE *qtest_log_fp;
->  static CharBackend qtest_chr;
->  static GString *inbuf;
-> -static int irq_levels[MAX_IRQ];
->  static qemu_timeval start_time;
->  static bool qtest_opened;
->
-> @@ -160,10 +159,16 @@ static bool qtest_opened;
->   *
->   *  IRQ raise NUM
->   *  IRQ lower NUM
-> + *  IRQ_NAMED NAME NUM LEVEL
+Actually not :)
 
-I think we should be consistent about the protocol here:
-unnamed IRQs get 'raise' and 'lower' messages, so we should
-do the same for named IRQs.
+> I was asking about listing ALL contexts (previously an empty query
+> string, now a zero length list of queries), not a 'backup:*' type
+> thing.
 
->   *
->   * where NUM is an IRQ number.  For the PC, interrupts can be intercepted
->   * simply with "irq_intercept_in ioapic" (note that IRQ0 comes out with
->   * NUM=0 even though it is remapped to GSI 2).
-> + *
-> + *  > irq_set NAME NUM LEVEL
-> + *  < OK
-> + *
-> + *  Set the named input IRQ to the level (0/1)
+What I was trying to say is that I think the result to _LIST_ with no
+queries should return all information the client needs to theoretically
+build the list of all possible contexts, even if that list may be
+so large as to be unfeasible for it to be built (e.g., in case of a
+cartesian product between all possible other contexts). I gave one
+example, but there may be more.
 
-I think adding support for raising and lowering device IRQs
-should be a separate patch, as it's a different feature.
-(I'm also not sure we should need it -- devices will be
-wired into the system, and qtest is testing the whole
-system from the point of view of the CPU. The CPU can't
-arbitrarily reach in and assert a device's outgoing
-interrupt line, so I'm not sure the tests should be able
-to do it either.)
+My point is that if the query includes a namespace, the result should
+not be defined by our spec. If the query does not include a namespace,
+the result should be "complete" by whatever definition, but not
+unreasonable (i.e., don't just write a cartesian product to a client).
 
-(Everything else below here is trivial fixes.)
+This could allow an interactive client to present a user with a list of
+possible contexts before performing analysis on the block device, say.
 
->   */
->
->  static int hex2nib(char ch)
-> @@ -243,17 +248,31 @@ static void GCC_FMT_ATTR(2, 3) qtest_sendf(CharBackend *chr,
->      va_end(ap);
->  }
->
-> +typedef struct qtest_irq {
-> +    qemu_irq old_irq;
-> +    char *name;
-> +    bool last_level;
-> +} qtest_irq;
-> +
->  static void qtest_irq_handler(void *opaque, int n, int level)
->  {
-> -    qemu_irq old_irq = *(qemu_irq *)opaque;
-> -    qemu_set_irq(old_irq, level);
-> +    qtest_irq *data = (qtest_irq *)opaque;
-> +    level = !!level;
-> +
-> +    qemu_set_irq(data->old_irq, level);
->
-> -    if (irq_levels[n] != level) {
-> +    if (level != data->last_level) {
->          CharBackend *chr = &qtest_chr;
-> -        irq_levels[n] = level;
->          qtest_send_prefix(chr);
-> -        qtest_sendf(chr, "IRQ %s %d\n",
-> -                    level ? "raise" : "lower", n);
-> +
-> +        if (data->name) {
-> +            qtest_sendf(chr, "IRQ_NAMED %s %d %d\n",
-> +                    data->name, n, level);
-> +        } else {
-> +            qtest_sendf(chr, "IRQ %s %d\n", level ? "raise" : "lower", n);
-> +        }
-> +
-> +        data->last_level = level;
->      }
->  }
->
-> @@ -289,7 +308,7 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
->          if (!dev) {
->              qtest_send_prefix(chr);
->              qtest_send(chr, "FAIL Unknown device\n");
-> -           return;
-> +            return;
->          }
->
->          if (irq_intercept_dev) {
-> @@ -299,33 +318,73 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
->              } else {
->                  qtest_send(chr, "OK\n");
->              }
-> -           return;
-> +            return;
->          }
-
-Fixing whitespace issues is generally best done in a separate patch.
-
-
-> diff --git a/tests/libqtest.c b/tests/libqtest.c
-> index 6f69752..36b3960 100644
-> --- a/tests/libqtest.c
-> +++ b/tests/libqtest.c
-> @@ -21,12 +21,16 @@
->  #include <sys/wait.h>
->  #include <sys/un.h>
->
-> +#include <glib.h>
-> +
-
-osdep.h pulls in glib for you.
-
->  #include "qapi/qmp/json-parser.h"
->  #include "qapi/qmp/json-streamer.h"
->  #include "qapi/qmp/qjson.h"
->
-> +
-
-Stray whitespace change.
-
->  #define MAX_IRQ 256
->  #define SOCKET_TIMEOUT 50
-> +#define IRQ_KEY_LENGTH 64
->
->  QTestState *global_qtest;
-
-
-> @@ -346,6 +408,17 @@ redo:
->          g_strfreev(words);
->      }
->
-> +/* Defer processing of IRQ actions until all communications have been handled,
-> + * otherwise, interrupt handler that cause further communication can disrupt
-> + * the communication stream
-> + */
-
-Bad indent on this comment.
-
-> +    for (action_index = 0; action_index < action_count; action_index++) {
-> +        irq_action *action = actions[action_index];
-> +        action->cb(action->opaque, action->name, action->n,
-> +                action_raise[action_index]);
-> +        action->level = action_raise[action_index];
-> +    }
-> +
->      return words;
->  }
->
-
->  /**
-> + * irq_attach:
-> + * @name: the name of the gpio list containing the IRQ
-> + * @irq: The IRQ to attach to
-> + * @irq_cb: The callback to execute when the interrupt changes
-> + * @opaque: opaque info to pass to the callback
-> + *
-> + * Attach a callback to an intecepted interrupt
-> + */
-> +static inline void irq_attach(const char *name, int irq,
-> +        void (*irq_cb)(void *opaque, const char *name, int irq, bool level),
-> +        void *opaque)
-> +{
-> +    qtest_irq_attach(global_qtest, name, irq, irq_cb, opaque);
-> +}
-> +
-> +/**
-> + * qtest_irq_set
-
-Comment doesn't match function name (and missing ':').
-
-> + * Set an interrupt level
-> + * @id: the device to inject interrupts for
-> + * @gpiolist: the GPIO list containing the line to seh
-> + * @n: the line to set within the list
-> + * @level: the IRQ level
-> + */
-> +static inline void irq_set(const char *id, const char *gpiolist, int n,
-> +        bool level)
-> +{
-> +    qtest_irq_set(global_qtest, id, gpiolist, n, level);
-> +}
-> +
-> +
-> +/**
->   * outb:
->   * @addr: I/O port to write to.
->   * @value: Value being written.
-> --
-> 2.9.3
-
-thanks
--- PMM
+-- 
+< ron> I mean, the main *practical* problem with C++, is there's like a dozen
+       people in the world who think they really understand all of its rules,
+       and pretty much all of them are just lying to themselves too.
+ -- #debian-devel, OFTC, 2016-02-12
