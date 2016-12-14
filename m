@@ -1,32 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44628)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45326)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cHC3S-0007zs-9s
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 11:05:19 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cHC6b-0003Qc-E4
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 11:08:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cHC3O-0008Qs-85
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 11:05:18 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35158)
+	(envelope-from <kwolf@redhat.com>) id 1cHC6Y-0001Wy-91
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 11:08:33 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39282)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cHC3N-0008QY-Vq
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 11:05:14 -0500
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2C553104CE
-	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 16:05:13 +0000 (UTC)
-References: <20161212224325.20790-1-marcandre.lureau@redhat.com>
-	<20161212224325.20790-6-marcandre.lureau@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <f13d65f5-e9bc-e8e6-8a5f-954d0412f218@redhat.com>
-Date: Wed, 14 Dec 2016 10:05:11 -0600
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1cHC6Y-0001Wb-3V
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 11:08:30 -0500
+Date: Wed, 14 Dec 2016 17:08:27 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20161214160827.GA3872@noname.str.redhat.com>
+References: <20161214144713.11009-1-stefanha@redhat.com>
+	<22da7375-6a66-0340-4208-b4d04b5ce49f@vivier.eu>
+	<CAJSP0QW-zPDGrFoyE3XLd-SNKt261+AJPS5k1jxZyr8jNkvxXA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20161212224325.20790-6-marcandre.lureau@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="fN9bK17bUn5EdQpPn1SHCho7TBw9M2V3v"
-Subject: Re: [Qemu-devel] [PATCH 05/54] char: fold single-user functions in
- caller
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <CAJSP0QW-zPDGrFoyE3XLd-SNKt261+AJPS5k1jxZyr8jNkvxXA@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-2.8] po: add missing translations in de, fr, it,
+ zh
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,77 +30,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Laurent Vivier <laurent@vivier.eu>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Fam Zheng <famz@redhat.com>, Pino Toscano <ptoscano@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---fN9bK17bUn5EdQpPn1SHCho7TBw9M2V3v
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com
-Message-ID: <f13d65f5-e9bc-e8e6-8a5f-954d0412f218@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 05/54] char: fold single-user functions in
- caller
-References: <20161212224325.20790-1-marcandre.lureau@redhat.com>
- <20161212224325.20790-6-marcandre.lureau@redhat.com>
-In-Reply-To: <20161212224325.20790-6-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 12/12/2016 04:42 PM, Marc-Andr=C3=A9 Lureau wrote:
-> This shorten a bit the code.
-
-Grammar:
-This shortens the code a bit.
-
+Am 14.12.2016 um 16:58 hat Stefan Hajnoczi geschrieben:
+> On Wed, Dec 14, 2016 at 3:41 PM, Laurent Vivier <laurent@vivier.eu> wro=
+te:
+> > Le 14/12/2016 =E0 15:47, Stefan Hajnoczi a =E9crit :
+> >> There are missing translations for the new "Copy" menu item.
+> >>
+> >> The following people provided them to me on IRC just in time for the
+> >> QEMU 2.8 release:
+> >>
+> >>  * de_DE - Stefan Hajnoczi <stefanha@redhat.com>
+> >>  * fr_FR - Laurent Vivier <laurent@vivier.eu>
+> >>  * it    - Pino Toscano <ptoscano@redhat.com>
+> >>  * zh_CN - Fam Zheng <famz@redhat.com>
+> >>
+> >> Reported-by: Kevin Wolf <kwolf@redhat.com>
+> >> Cc: Fam Zheng <famz@redhat.com>
+> >> Cc: Pino Toscano <ptoscano@redhat.com>
+> >> Cc: Laurent Vivier <laurent@vivier.eu>
+> >> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> >
+> > "Copier" is OK now, but it seems we have some problems with the accen=
+ts.
+> > I don't know why.
 >=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  qemu-char.c | 97 ++++++++++++++++++++---------------------------------=
---------
->  1 file changed, 31 insertions(+), 66 deletions(-)
+> It could be an email encoding issue.  On disk I see the proper UTF-8 ch=
+aracters.
 >=20
+> You could try my git branch to avoid email issues:
+> https://github.com/stefanha/qemu/tree/missing-translations-2.8
 
->      name =3D g_strdup_printf("chardev-udp-%s", chr->label);
->      qio_channel_set_name(QIO_CHANNEL(sioc), name);
->      g_free(name);
-> =20
-> +    s =3D g_new0(NetCharDriver, 1);
-> +    s->ioc =3D QIO_CHANNEL(sioc);
-> +    s->bufcnt =3D 0;
-> +    s->bufptr =3D 0;
-> +    chr->opaque =3D s;
-> +    /* be isn't opened until we get a connection */
-> +    *be_opened =3D false;
+IIRC, it's actually a known problem with not consistently using a UTF-8
+locale, and we avoid changing some locale categories because that would
+break things like floating point representation in JSON (because printf
+might end up using comma as the decimal separator).
 
-The assignments to 0 and false are redundant with the g_new0(), if you
-want to drop them for even more code reduction.
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---fN9bK17bUn5EdQpPn1SHCho7TBw9M2V3v
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYUW23AAoJEKeha0olJ0NqztwIAJDvFh5ewQrGzLye1G/SQ9oD
-6Na/QBE7yH5usQjzZdTkgeAHXzI3+UKjEjkE1xLbNHzJahF9z0/5fxnf7GwJn2LH
-i4BN8m/GNTDDgClNY9x2O5zD3L+vNNq2zykFGTFD5Q+1wjKPex549q1bpnDJJgPq
-NAbN3JpFURzLrbhPhVzGYsdS8qSfp9yBk0YuzrU+lh1Rv37UlQ7dT1DhHy+l5SBJ
-4qOPwE4lwqtabxrRh2/j3DO8n1cqRa0rntpUj95d0cnj+jttfOufcOMBAHXUTjvt
-ZPO3ICdXwxfWariP3E8OnSnldNEqwdhGN51SlmtzKqJg4m/vzGIHFbt9GSj1NJk=
-=KCuY
------END PGP SIGNATURE-----
-
---fN9bK17bUn5EdQpPn1SHCho7TBw9M2V3v--
+Kevin
