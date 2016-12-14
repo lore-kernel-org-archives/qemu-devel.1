@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35280)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35468)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cH9Zh-0003T7-Pe
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 08:26:27 -0500
+	(envelope-from <stefanha@gmail.com>) id 1cH9ak-0000iW-V0
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 08:27:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cH9Zd-0002e8-TI
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 08:26:25 -0500
-Received: from indium.canonical.com ([91.189.90.7]:33475)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cH9Zd-0002e2-Nh
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 08:26:21 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cH9Zb-00081e-Tk
-	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 13:26:20 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 366732E81A5
-	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 13:26:13 +0000 (UTC)
+	(envelope-from <stefanha@gmail.com>) id 1cH9ag-0002wc-3U
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 08:27:31 -0500
+Received: from mail-io0-f177.google.com ([209.85.223.177]:34090)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cH9af-0002wT-Vo
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 08:27:26 -0500
+Received: by mail-io0-f177.google.com with SMTP id p42so39679595ioo.1
+	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 05:27:25 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 14 Dec 2016 13:07:59 -0000
-From: Ziyue Yang <1603734@bugs.launchpad.net>
-Reply-To: Bug 1603734 <1603734@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20160717083810.15994.59203.malonedeb@gac.canonical.com>
-Message-Id: <20161214130759.21082.78535.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1603734] Re: Hang in fsqrt
+In-Reply-To: <20161214125423.GB4135@noname.redhat.com>
+References: <20161213214917.6436-1-stefanha@redhat.com>
+	<20161214125423.GB4135@noname.redhat.com>
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Wed, 14 Dec 2016 13:26:24 +0000
+Message-ID: <CAJSP0QUJQfcCbDCjmOa-ZqYEBpiO2swjkwHk07hvAdUK5bTiiA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH] Update language files for QEMU 2.8.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,35 +28,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Stefan Weil <sw@weilnetz.de>, qemu-devel <qemu-devel@nongnu.org>
 
-Bug fixed showed by https://github.com/unicorn-engine/unicorn/pull/609
-and the test case shows no problem on the most recent release. =
+On Wed, Dec 14, 2016 at 12:54 PM, Kevin Wolf <kwolf@redhat.com> wrote:
+> Am 13.12.2016 um 22:49 hat Stefan Hajnoczi geschrieben:
+> And would that crash be considered a release blocker, too?
 
+If it's a regression in 2.8, then yes.  Otherwise no.
 
-** Changed in: qemu
-       Status: New =3D> Fix Released
+Since it's a user interface crash it's very visible to users and would
+be nice to fix for 2.8 even if it's not a release blocker.  But only
+if it can be fixed today, let's not hold up the release.
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1603734
-
-Title:
-  Hang in fsqrt
-
-Status in QEMU:
-  Fix Released
-
-Bug description:
-  At least qemu-i368 and qemu-x86_64 hang in floatx80_sqrt in versions
-  2.6.0 and git (2.6.50) for some input values, likely due to an
-  infinite loop at fpu/softfloat.c:6569.
-
-  Steps to reproduce:
-  1) Compile attached code: gcc -o test test.c -lm
-  2) `qemu-i368 test` and `qemu-x86_64 test` will hang at 100% cpu
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1603734/+subscriptions
+Stefan
