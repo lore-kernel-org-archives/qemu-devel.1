@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43850)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43849)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cHDcR-0006Az-7y
+	(envelope-from <ehabkost@redhat.com>) id 1cHDcR-0006Ax-7h
 	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:45:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cHDcP-00039X-Ad
+	(envelope-from <ehabkost@redhat.com>) id 1cHDcO-00039O-5Z
 	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:45:31 -0500
-Date: Wed, 14 Dec 2016 15:31:51 -0200
+Received: from mx1.redhat.com ([209.132.183.28]:37074)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cHDcO-00039G-01
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:45:28 -0500
+Date: Wed, 14 Dec 2016 15:45:23 -0200
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20161214173151.GL3808@thinpad.lan.raisama.net>
-References: <1481575745-26120-1-git-send-email-ehabkost@redhat.com>
-	<20161214164214.54254668@bahia.lan>
-	<20161214170427.GK3808@thinpad.lan.raisama.net>
-	<20161214182233.0fb3c1e5@bahia.lan>
+Message-ID: <20161214174523.GM3808@thinpad.lan.raisama.net>
+References: <1481567461-2341-1-git-send-email-ehabkost@redhat.com>
+	<87zijyfyq5.fsf@dusky.pond.sub.org>
+	<20161214134841.GG3808@thinpad.lan.raisama.net>
+	<b5cf13d0-d03f-d477-20ce-211948b315ee@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20161214182233.0fb3c1e5@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH for-2.8.1 v2] machine: Convert abstract
- typename on compat_props to subclass names
+In-Reply-To: <b5cf13d0-d03f-d477-20ce-211948b315ee@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.9 v2] qom: Make all interface types
+ abstract
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,72 +30,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-stable@nongnu.org, Halil Pasic <pasic@linux.vnet.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>, qemu-devel@nongnu.org, Lin Ma <lma@suse.com>
 
-On Wed, Dec 14, 2016 at 06:22:33PM +0100, Greg Kurz wrote:
-> On Wed, 14 Dec 2016 15:04:27 -0200
-> Eduardo Habkost <ehabkost@redhat.com> wrote:
+On Wed, Dec 14, 2016 at 06:07:48PM +0100, Paolo Bonzini wrote:
 > 
-> > On Wed, Dec 14, 2016 at 04:42:14PM +0100, Greg Kurz wrote:
-> > > On Mon, 12 Dec 2016 18:49:05 -0200
-> > > Eduardo Habkost <ehabkost@redhat.com> wrote:
-> > >   
-> > > > Original problem description by Greg Kurz:
-> > > >   
-> > > > > Since commit "9a4c0e220d8a hw/virtio-pci: fix virtio
-> > > > > behaviour", passing -device virtio-blk-pci.disable-modern=off
-> > > > > has no effect on 2.6 machine types because the internal
-> > > > > virtio-pci.disable-modern=on compat property always prevail.    
-> > > > 
-> > > > The same bug also affects other abstract type names mentioned on
-> > > > compat_props by machine-types: apic-common, i386-cpu, pci-device,
-> > > > powerpc64-cpu, s390-skeys, spapr-pci-host-bridge, usb-device,
-> > > > virtio-pci, x86_64-cpu.
-> > > > 
-> > > > The right fix for this problem is to make sure compat_props and
-> > > > -global options are always applied in the order they are
-> > > > registered, instead of reordering them based on the type
-> > > > hierarchy. But changing the ordering rules of -global is risky
-> > > > and might break existing configurations, so we shouldn't do that
-> > > > on a stable branch.
-> > > > 
-> > > > This is a temporary hack that will work around the bug when
-> > > > registering compat_props properties: if we find an abstract class
-> > > > on compat_props, register properties for all its non-abstract
-> > > > subtypes instead. This will make sure -global won't be overridden
-> > > > by compat_props, while keeping the existing ordering rules on
-> > > > -global options.
-> > > > 
-> > > > Note that there's one case that won't be fixed by this hack:
-> > > > "-global spapr-pci-vfio-host-bridge.<option>=<value>" won't be
-> > > > able to override compat_props, because spapr-pci-host-bridge is
-> > > > not an abstract class.
-> > > > 
-> > > > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> > > > ---  
-> > > 
-> > > This patch had 3 r-b. Is there any good reason to hold
-> > > it up to 2.8.1 ?  
-> > 
-> > Applying it today would mean delaying the 2.8.0 release, and the
-> > bug is not serious enough to justify that.
-> > 
 > 
-> IIUC there will be a v2.8.0-rc4 because we want this patch in 2.8:
+> On 14/12/2016 14:48, Eduardo Habkost wrote:
+> >> How do you find all abstract TypeInfo in the source?  The uninitiated
+> >> might grep for .abstract = true, and be misled.  The initiated will be
+> >> annoyed instead, because grepping for *absence* of .instance_size = is
+> >> bothersome.
+> >>
+> >> I suspect life could be easier going forward if we instead required
+> >> .abstract = true for interfaces, and enforced it with
+> >> assert(ti->instance_size || ti->abstract) here.
+> > I was doing that before deciding to change type_initialize(). I
+> > think I still have the commit in my git reflog, I will recover it
+> > and submit it as v3.
 > 
-> [PATCH v3] virtio-pci: Fix cross-version migration  with older machines
+> I think it's worse.
 > 
-> From IRC:
-> 
-> <stefanha> mcoquelin: Once Michael Tsirkin has reviewed your patch I'll merge it and tag v2.8.0-rc4 (today or tomorrow?).  The QEMU 2.8 release will be next Tuesday.
+> Interfaces are abstract by definition.  Requiring ".abstract = true"
+> makes things less intuitive.  v2 seems good.
 
-Oh, I didn't know that. Thanks for the pointer.
+I don't think that making the type declaration more explicit
+would cause any real problems, and it would help people grepping
+the code. Anybody forgetting to add .abstract=true to new
+interfaces would immediatly see an assertion error and would just
+be annoyed for 1 minute.
 
-But I'd still like to have more time to test this patch, as it
-affects multiple machine-types on multiple targets. I think the
-hack is a bit risky to be included in the last minute before the
-final release.
+I will submit v3 and let the maintainers decide.
 
 -- 
 Eduardo
