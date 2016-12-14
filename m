@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35148)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35247)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cHD7t-00060d-SA
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:14:03 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cHD8E-00075t-Ng
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:14:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cHD7p-0001yu-Pl
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:13:57 -0500
-Received: from mail-wj0-f173.google.com ([209.85.210.173]:33531)
+	(envelope-from <peter.maydell@linaro.org>) id 1cHD88-00023Q-Uv
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:14:18 -0500
+Received: from mail-vk0-f54.google.com ([209.85.213.54]:34135)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cHD7p-0001yk-Is
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:13:53 -0500
-Received: by mail-wj0-f173.google.com with SMTP id xy5so42545731wjc.0
-	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 09:13:53 -0800 (PST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Wed, 14 Dec 2016 17:12:42 +0000
-Message-Id: <20161214171244.26813-3-alex.bennee@linaro.org>
-In-Reply-To: <20161214171244.26813-1-alex.bennee@linaro.org>
-References: <20161214171244.26813-1-alex.bennee@linaro.org>
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cHD88-00023A-QL
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:14:12 -0500
+Received: by mail-vk0-f54.google.com with SMTP id x186so37687818vkd.1
+	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 09:14:12 -0800 (PST)
 MIME-Version: 1.0
+In-Reply-To: <1480434248-27138-1-git-send-email-clg@kaod.org>
+References: <1480434248-27138-1-git-send-email-clg@kaod.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 14 Dec 2016 17:12:51 +0000
+Message-ID: <CAFEAcA96OTfgO9agwKT10XHAPLA1cfme7syA0wTAu5t=zKgyHQ@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC/POC PATCH 2/4] new
- tests/docker/dockerfiles/debian-multiarch-cross.docker
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-2.9 00/30] Aspeed SoC fixes and model
+ improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,74 +30,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: bobby.prani@gmail.com, marcandre.lureau@redhat.com
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>
+To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Andrew Jeffery <andrew@aj.id.au>, Marcin Krzeminski <marcin.krzeminski@nokia.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-This provides a basic Debian install with access to the emdebian cross
-compilers for armhf, arm64 and ppc64el. On its own it provides the
-basic cross build essentials for building any of those architectures.
-More complex cross-compilations would need to install library
-dependencies on top of this image.
+On 29 November 2016 at 15:43, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+> Here is a collection of fixes and improvements on existing models for
+> the Aspeed SoCs
 
-An example use:
+I have taken into target-arm.next for 2.9 patches 2-13:
 
-  docker run --rm -it \
-    -v /home/alex/lsrc/qemu/qemu.git/:/home/alex/lsrc/qemu/qemu.git/ \
-    --user=alex:alex \
-    -w /home/alex/lsrc/qemu/qemu.git/arm-linux-user/tests \
-    -e CROSS_CC="arm-linux-gnueabihf-gcc" \
-    debian:cross make -f ../../tests/tcg/arm/Makefile
+>   m25p80: add support for the mx66l1g45g
+>   aspeed: QOMify the CPU object and attach it to the SoC
+>   aspeed: remove cannot_destroy_with_object_finalize_yet
+>   aspeed: attach the second SPI controller object to the SoC
+>   aspeed: extend the board configuration with flash models
+>   aspeed: add support for the romulus-bmc board
+>   aspeed: add a memory region for SRAM
+>   aspeed: add the definitions for the AST2400 A1 SoC
+>   aspeed: change SoC revision of the palmetto-bmc machine
+>   aspeed/scu: fix SCU region size
+>   aspeed/smc: improve segment register support
+>   aspeed/smc: set the number of flash modules for the FMC controller
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- .../dockerfiles/debian-multiarch-cross.docker      | 39 ++++++++++++++++++++++
- 1 file changed, 39 insertions(+)
- create mode 100644 tests/docker/dockerfiles/debian-multiarch-cross.docker
+which should at least reduce the size of this patchset for the
+next round.
 
-diff --git a/tests/docker/dockerfiles/debian-multiarch-cross.docker b/tests/docker/dockerfiles/debian-multiarch-cross.docker
-new file mode 100644
-index 0000000000..dba66374c0
---- /dev/null
-+++ b/tests/docker/dockerfiles/debian-multiarch-cross.docker
-@@ -0,0 +1,39 @@
-+#
-+# Docker multiarch cross-compiler target
-+#
-+# This docker target is builds on Debian and Emdebian's cross compiler targets
-+# to build distro with a selection of cross compilers for building test binaries.
-+#
-+# This does not include the build dependancies for QEMU as there are
-+# so many there are unresolvable clashes.
-+#
-+FROM debian:stable-slim
-+
-+# Do we want to tweak the user?
-+ADD . /
-+RUN if test -e /setup_user.sh; then /setup_user.sh; fi
-+
-+# Setup some basic tools we need
-+RUN apt update
-+RUN apt install -yy curl
-+
-+# Setup Emdebian
-+RUN echo "deb http://emdebian.org/tools/debian/ jessie main" >> /etc/apt/sources.list
-+RUN curl http://emdebian.org/tools/debian/emdebian-toolchain-archive.key | apt-key add -
-+
-+# Duplicate deb line as deb-src
-+RUN cat /etc/apt/sources.list | sed "s/deb/deb-src/" >> /etc/apt/sources.list
-+
-+# Add the foriegn architectures we want
-+RUN dpkg --add-architecture armhf
-+RUN dpkg --add-architecture arm64
-+RUN dpkg --add-architecture ppc64el
-+
-+# Final update
-+RUN apt update
-+
-+# Install the crossbuild essential packages
-+RUN apt install -yy crossbuild-essential-arm64 crossbuild-essential-armhf crossbuild-essential-ppc64el
-+
-+# To install greater dependencies you do a
-+# RUN apt-get build-dep -yy -a armhf qemu
--- 
-2.11.0
+thanks
+-- PMM
