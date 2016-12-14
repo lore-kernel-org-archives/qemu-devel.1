@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48614)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48815)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1cHCOx-0003kW-Ow
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 11:27:32 -0500
+	(envelope-from <stefanha@gmail.com>) id 1cHCPi-0004Kt-K5
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 11:28:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1cHCOs-0001lP-70
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 11:27:31 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49998)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
-	id 1cHCOs-0001lB-0a
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 11:27:26 -0500
-References: <20161214161958.2958-1-maxime.coquelin@redhat.com>
-	<20161214172448.7619816e.cornelia.huck@de.ibm.com>
-From: Maxime Coquelin <maxime.coquelin@redhat.com>
-Message-ID: <b683fbfa-041f-3df1-8733-a602c0e6782b@redhat.com>
-Date: Wed, 14 Dec 2016 17:27:21 +0100
+	(envelope-from <stefanha@gmail.com>) id 1cHCPe-00020q-N1
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 11:28:18 -0500
+Received: from mail-io0-f173.google.com ([209.85.223.173]:33383)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cHCPe-00020I-JL
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 11:28:14 -0500
+Received: by mail-io0-f173.google.com with SMTP id d9so44656648ioe.0
+	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 08:28:14 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20161214172448.7619816e.cornelia.huck@de.ibm.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] virtio-pci: Fix cross-version migration
- with older machines
+In-Reply-To: <1619747.imectsegtr@thyrus.usersys.redhat.com>
+References: <20161214144713.11009-1-stefanha@redhat.com>
+	<1619747.imectsegtr@thyrus.usersys.redhat.com>
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Wed, 14 Dec 2016 16:27:13 +0000
+Message-ID: <CAJSP0QUxXanfGD1H=j+cNs_P_1T4w6xmrmRrjBE8rx6aEaOmDQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH for-2.8] po: add missing translations in de, fr, it,
+ zh
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,33 +29,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cornelia.huck@de.ibm.com>
-Cc: mdroth@linux.vnet.ibm.com, stefanha@redhat.com, qemu-devel@nongnu.org, mst@redhat.com, marcel@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Pino Toscano <ptoscano@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>
 
-
-
-On 12/14/2016 05:24 PM, Cornelia Huck wrote:
-> On Wed, 14 Dec 2016 17:19:58 +0100
-> Maxime Coquelin <maxime.coquelin@redhat.com> wrote:
+On Wed, Dec 14, 2016 at 3:40 PM, Pino Toscano <ptoscano@redhat.com> wrote:
+> On Wednesday, 14 December 2016 14:47:13 CET Stefan Hajnoczi wrote:
+>> There are missing translations for the new "Copy" menu item.
+>>
+>> The following people provided them to me on IRC just in time for the
+>> QEMU 2.8 release:
+>>
+>>  * de_DE - Stefan Hajnoczi <stefanha@redhat.com>
+>>  * fr_FR - Laurent Vivier <laurent@vivier.eu>
+>>  * it    - Pino Toscano <ptoscano@redhat.com>
+>>  * zh_CN - Fam Zheng <famz@redhat.com>
+>>
+>> Reported-by: Kevin Wolf <kwolf@redhat.com>
+>> Cc: Fam Zheng <famz@redhat.com>
+>> Cc: Pino Toscano <ptoscano@redhat.com>
+>> Cc: Laurent Vivier <laurent@vivier.eu>
+>> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+>> ---
+>> [...]
+>> diff --git a/po/it.po b/po/it.po
+>> index 8eadf2f..bfae84e 100644
+>> --- a/po/it.po
+>> +++ b/po/it.po
+>> @@ -42,11 +42,11 @@ msgstr "_Esci"
+>>
+>>  #: ui/gtk.c:2029
+>>  msgid "_Fullscreen"
+>> -msgstr ""
+>> +msgstr "A t_utto schermo"
+>>
+>>  #: ui/gtk.c:2032
+>>  msgid "_Copy"
+>> -msgstr ""
+>> +msgstr "_Copia"
+>>
+>>  #: ui/gtk.c:2048
+>>  msgid "Zoom _In"
 >
->> > This patch fixes a cross-version migration regression introduced
->> > by commit d1b4259f ("virtio-bus: Plug devices after features are
->> > negotiated").
->> >
->> > The problem is encountered when host's vhost backend does not support
->> > VIRTIO_F_VERSION_1, and migration is initiated from a v2.7 or prior
->> > QEMU version with virtio-pci modern capabilities enabled to a v2.8
->> > QEMU version.
->> >
->> > In this case, modern capabilities get exposed to the guest by the source,
->> > whereas the target will detect version 1 is not supported so will only
->> > expose legacy capabilities.
->> >
->> > The problem is fixed by introducing a new "x-modern-broken" property,
-> wrong property name...
+> ACK.
 >
+> Should PO-Revision-Date be updated as well?
 
-Whoops... v3 on its way.
+No, I will ignore the po metadata as some of the previous commits have done.
 
-Thanks,
-Maxime
+I've looked through the commit history: sometimes we update them,
+sometimes we don't.  The creation date field keeps getting changed
+although the revision date doesn't (i.e. creation is newer than
+revision date!).  The QEMU version in the Project-Id is ridiculously
+out of date.  These fields may make sense in some translation
+workflows, especially without a version control system, but for the
+QEMU project they are useless.
+
+If allowed by the file format we should remove them completely since
+git already contains this information.
+
+Stefan
