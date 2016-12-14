@@ -1,24 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57232)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57454)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cHCtF-00035A-Oy
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 11:58:50 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cHCu8-0004kG-EH
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 11:59:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cHCtA-00051M-N3
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 11:58:49 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40510)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cHCtA-00050m-Ep
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 11:58:44 -0500
-References: <20161214150840.10899-1-alex@alex.org.uk>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <bf93346f-a875-8d09-0e20-431c7a379c3b@redhat.com>
-Date: Wed, 14 Dec 2016 10:58:41 -0600
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cHCu3-0005Ie-GH
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 11:59:44 -0500
+Received: from mail-wj0-f196.google.com ([209.85.210.196]:33215)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1cHCu3-00058N-9z
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 11:59:39 -0500
+Received: by mail-wj0-f196.google.com with SMTP id kp2so5856117wjc.0
+	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 08:59:16 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <1478330391-74060-1-git-send-email-chao.p.peng@linux.intel.com>
+	<1478330391-74060-5-git-send-email-chao.p.peng@linux.intel.com>
+	<20161106090458-mutt-send-email-mst@kernel.org>
+	<9536bb8a-aec8-c03b-4b86-b40ce18f6d26@redhat.com>
+	<1479110762.2421.20.camel@linux.intel.com>
+	<20161114225108-mutt-send-email-mst@kernel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <fec880fc-89af-a934-858d-4e4e38173706@redhat.com>
+Date: Wed, 14 Dec 2016 17:58:13 +0100
 MIME-Version: 1.0
-In-Reply-To: <20161214150840.10899-1-alex@alex.org.uk>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="mN5MM9MMFd8uG3isPDrNfIltOlv3McTKd"
-Subject: Re: [Qemu-devel] [PATCH] Further tidy-up on block status
+In-Reply-To: <20161114225108-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 4/4] q35: introduce q35-lite
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,79 +35,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Bligh <alex@alex.org.uk>, Wouter Verheist <w@uter.be>, nbd-general@lists.sourceforge.net
-Cc: Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, Pavel Borzenkov <pborzenkov@virtuozzo.com>, stefanha@redhat.com, "Denis V . Lunev" <den@openvz.org>, Markus Pargmann <mpa@pengutronix.de>, Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---mN5MM9MMFd8uG3isPDrNfIltOlv3McTKd
-From: Eric Blake <eblake@redhat.com>
-To: Alex Bligh <alex@alex.org.uk>, Wouter Verheist <w@uter.be>,
- nbd-general@lists.sourceforge.net
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, Pavel Borzenkov <pborzenkov@virtuozzo.com>,
- stefanha@redhat.com, "Denis V . Lunev" <den@openvz.org>,
- Markus Pargmann <mpa@pengutronix.de>, Paolo Bonzini <pbonzini@redhat.com>,
- John Snow <jsnow@redhat.com>
-Message-ID: <bf93346f-a875-8d09-0e20-431c7a379c3b@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] Further tidy-up on block status
-References: <20161214150840.10899-1-alex@alex.org.uk>
-In-Reply-To: <20161214150840.10899-1-alex@alex.org.uk>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 12/14/2016 09:08 AM, Alex Bligh wrote:
-> (NB: I've already applied this and pushed it)
->=20
-> * Change NBD_OPT_LIST_METADATA etc. to explicitly send a list of querie=
-s
->   and add a count of queries so we can extend the command later (rather=
- than
->   rely on the length of option)
->=20
-> * For NBD_OPT_LIST_METADATA make absence of any query (as opposed to ze=
-ro
->   length query) list all contexts, as absence of any query is now simpl=
-e.
->=20
-> * Move definition of namespaces in the document to somewhere more appop=
-riate.
->=20
-> * Various other minor changes as discussed on the mailing list
->=20
-
-> +Metadata contexts are identified by their names. The name MUST
-> +consist of a namespace, followed by a colon, followed by a leaf-name.
-> +The namespace and the leaf-name must each consist entirely of
-> +printable non-whitespace UTF-8 characters other than colons,
-> +and be non-empty. The entire name (namespace, colon and leaf-name)
-> +MUST NOT exceed 255 bytes (and therefore botht he namespace and
-
-s/botht he/both the/
+To: "Michael S. Tsirkin" <mst@redhat.com>, Chao Peng <chao.p.peng@linux.intel.com>
+Cc: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
 
 
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
 
+On 14/11/2016 21:51, Michael S. Tsirkin wrote:
+> On Mon, Nov 14, 2016 at 04:06:02PM +0800, Chao Peng wrote:
+>> On Mon, 2016-11-07 at 18:09 +0100, Paolo Bonzini wrote:
+>>>
+>>> On 06/11/2016 08:06, Michael S. Tsirkin wrote:
+>>>>
+>>>> On Sat, Nov 05, 2016 at 03:19:51AM -0400, Chao Peng wrote:
+>>>>>
+>>>>>>
+>>>>>> This patch introduces a light weight machine type which shares
+>>>>>> the
+>>>>>> same codebase with existing q35 machine type but with some
+>>>>>> features
+>>>>>> disabled by default.
+>>>>>>
+>>>>>> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+>>>> I don't find this too useful, but if others do and send acks, I'll
+>>>> merge
+>>>> it, but only if it also has migration disabled.
+>>>>
+>>>
+>>> Agreed, it's enough to have patches 1-3.
+>>>
+>>
+>> I'm fine.
+> 
+> Pls post just the correct patches after the release.
 
---mN5MM9MMFd8uG3isPDrNfIltOlv3McTKd
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Since I was cleaning my inbox, I've already queued 1-3.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYUXpBAAoJEKeha0olJ0Nq/o0IAKhbWAElJPVH0GWnZdwx/b+W
-w2OvKSwQZsMwMdhC1sdQ2hW4YYga3nBi87J7J9bYiNicBemvaSpmComxGjI3OjLc
-DvfhJBA1tXugHbSrp0wQ1cQ/EUiMGjiX4MzZF3ViPLeuU5KqEheer7awqzO1UZRw
-BmR9x/ADz8M/2V2+iunWq10VPGBzIQEFqEsEAK9QPNIziqZRuDPDPa1X5Os2ZxD4
-43Sz0AV+9Rmt6DbGR6KQrXR3f8djeS8LBQJ9/sNiJ3dFib0GW7DP05j7Li7WfvrR
-lDfFmRJqq6gw2TQOiQrsbHOoIjuqTPFw5rUA+HeEe0vjAwL6FNQEirnGuYREgJ0=
-=zzkB
------END PGP SIGNATURE-----
-
---mN5MM9MMFd8uG3isPDrNfIltOlv3McTKd--
+Paolo
