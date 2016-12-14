@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45410)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45523)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cHDiY-000749-U7
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:51:51 -0500
+	(envelope-from <clg@kaod.org>) id 1cHDip-0000Oy-Ps
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:52:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cHDiV-0004nq-S5
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:51:50 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47326)
+	(envelope-from <clg@kaod.org>) id 1cHDij-0004qZ-Tx
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:52:07 -0500
+Received: from 8.mo178.mail-out.ovh.net ([46.105.74.227]:49982)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cHDiV-0004nj-Jl
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:51:47 -0500
-Date: Wed, 14 Dec 2016 15:51:44 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20161214175144.GN3808@thinpad.lan.raisama.net>
-References: <1481732391-882-1-git-send-email-vlad.lungu@windriver.com>
-	<ef1f3b2a-d206-7082-3227-423e0d9d9619@redhat.com>
-	<20161214170058.GJ3808@thinpad.lan.raisama.net>
-	<abea10db-9da8-d6eb-c6eb-67817b1fadda@redhat.com>
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cHDij-0004qH-Ne
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:52:01 -0500
+Received: from player793.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 5409A9EFB
+	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 18:51:58 +0100 (CET)
+References: <1480434248-27138-1-git-send-email-clg@kaod.org>
+	<CAFEAcA96OTfgO9agwKT10XHAPLA1cfme7syA0wTAu5t=zKgyHQ@mail.gmail.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <2220d05d-a814-c5a0-2297-ea57e8cd8566@kaod.org>
+Date: Wed, 14 Dec 2016 18:51:51 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <abea10db-9da8-d6eb-c6eb-67817b1fadda@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] multiboot: copy the cmdline verbatim
+In-Reply-To: <CAFEAcA96OTfgO9agwKT10XHAPLA1cfme7syA0wTAu5t=zKgyHQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-2.9 00/30] Aspeed SoC fixes and model
+ improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,87 +31,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Vlad Lungu <vlad.lungu@windriver.com>, qemu-devel@nongnu.org, rth@twiddle.net
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Andrew Jeffery <andrew@aj.id.au>, Marcin Krzeminski <marcin.krzeminski@nokia.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
-On Wed, Dec 14, 2016 at 06:20:46PM +0100, Paolo Bonzini wrote:
-> On 14/12/2016 18:00, Eduardo Habkost wrote:
-> > On Wed, Dec 14, 2016 at 05:55:07PM +0100, Paolo Bonzini wrote:
-> >>
-> >>
-> >> On 14/12/2016 17:19, Vlad Lungu wrote:
-> >>> get_opt_value() truncates the value at the first comma.
-> >>> Use memcpy() instead.
-> >>
-> >> Looks good since get_opt_value is already used by the caller.  Have you
-> >> tested this with multiple initrd modules too?
-> > 
-> > get_opt_value() is used by the caller, but with NULL buf
-> > argument. This means the caller doesn't handle ",," escaping.
-> > (See my reply to the previous submission of this patch)
-> 
-> Hmm, wait.  When NULL is passed, ",," escaping is handled correctly in
-> that next_initrd points to the next lone comma.  The lone comma is
-> replaced with a '\0' by the caller.
+On 12/14/2016 06:12 PM, Peter Maydell wrote:
+> On 29 November 2016 at 15:43, C=C3=A9dric Le Goater <clg@kaod.org> wrot=
+e:
+>> Here is a collection of fixes and improvements on existing models for
+>> the Aspeed SoCs
+>=20
+> I have taken into target-arm.next for 2.9 patches 2-13:
+>=20
+>>   m25p80: add support for the mx66l1g45g
+>>   aspeed: QOMify the CPU object and attach it to the SoC
+>>   aspeed: remove cannot_destroy_with_object_finalize_yet
+>>   aspeed: attach the second SPI controller object to the SoC
+>>   aspeed: extend the board configuration with flash models
+>>   aspeed: add support for the romulus-bmc board
+>>   aspeed: add a memory region for SRAM
+>>   aspeed: add the definitions for the AST2400 A1 SoC
+>>   aspeed: change SoC revision of the palmetto-bmc machine
+>>   aspeed/scu: fix SCU region size
+>>   aspeed/smc: improve segment register support
+>>   aspeed/smc: set the number of flash modules for the FMC controller
+>=20
+> which should at least reduce the size of this patchset for the
+> next round.
 
-It is handled correctly when splitting the string, but not when opening the
-file.
+Thanks a lot, I was going to ask you that :)=20
 
-> 
-> So you need to use get_opt_value again in mb_add_cmdline to do the
-> unescaping, because mb_add_cmdline only receives double commas.
-> 
-> This was actually my first reaction to the patch, and it was correct.
-> Then I overthought it. :)
-> 
-> So the patch is wrong.
+I think I can simplify easily the vbar patch with the input
+you just gave. I lost my way with the EL3 I guess.
 
-Except that the caller is already broken when using ",," for a
-different reason: it calls get_image_size(initrd_filename) and
-load_image(initrd_filename, ...) directly. So comma-escaping
-never worked anyway:
+The model option to the drive should be just dropped. However,=20
+using -drive / -device to define the flash modules on the command=20
+line introduces more changes as we need to take them into=20
+account at reset time and not at init time anymore. I need to
+think about it.
 
-  $ qemu-system-x86_64 -kernel ~/Downloads/gnumach -initrd /tmp/one,,file,/tmp/another,,file
-  Failed to open file '/tmp/one,,file'
+Marcin had some concerns on the way the patchset handles the=20
+command mode modeling of the SMC controller. It can be improved=20
+surely but I won't do that right now. So that's a couple of=20
+patches for later.
 
-The right fix for comma-escaping would require calling
-get_opt_value() with non-NULL buf outside mb_add_cmdline(),
-because the mb_add_cmdline(&mbs, kcmdline) call do NOT need
-get_opt_value() to be called.
+I will take a look at the crash you spotted. Funny that I did
+not see that.
 
-In other words: this fixes the mb_add_cmdline(kcmdline) case, and
-doesn't break comma escaping on the initrd case (because it was
-already broken). I don't see a problem with this patch.
+The watchdog needs some review. It is nice to have as it gives
+Linux reboot.
 
-> 
-> Paolo
-> 
-> > However this only means the caller is buggy, not
-> > mb_add_cmdline(). So the change still looks good to me.
-> > 
-> >>
-> >> Paolo
-> >>
-> >>> Signed-off-by: Vlad Lungu <vlad.lungu@windriver.com>
-> >>> ---
-> >>>  hw/i386/multiboot.c | 2 +-
-> >>>  1 file changed, 1 insertion(+), 1 deletion(-)
-> >>>
-> >>> diff --git a/hw/i386/multiboot.c b/hw/i386/multiboot.c
-> >>> index 387caa6..b4495ad 100644
-> >>> --- a/hw/i386/multiboot.c
-> >>> +++ b/hw/i386/multiboot.c
-> >>> @@ -109,7 +109,7 @@ static uint32_t mb_add_cmdline(MultibootState *s, const char *cmdline)
-> >>>      hwaddr p = s->offset_cmdlines;
-> >>>      char *b = (char *)s->mb_buf + p;
-> >>>  
-> >>> -    get_opt_value(b, strlen(cmdline) + 1, cmdline);
-> >>> +    memcpy(b, cmdline, strlen(cmdline) + 1);
-> >>>      s->offset_cmdlines += strlen(b) + 1;
-> >>>      return s->mb_buf_phys + p;
-> >>>  }
-> >>>
-> > 
+Alastair has an interesting RTC device we could plug on the=20
+palmetto machine. I have a little TMP421 device on the waiting
+stack after.
 
--- 
-Eduardo
+Thanks,
+
+
+C.
