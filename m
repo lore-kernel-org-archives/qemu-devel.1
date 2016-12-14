@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60368)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60850)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cHHDG-0001uY-Ka
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 16:35:47 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cHHFc-0007BV-5C
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 16:38:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cHHDD-0006W0-I0
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 16:35:46 -0500
-Received: from mx4-phx2.redhat.com ([209.132.183.25]:48046)
+	(envelope-from <pbonzini@redhat.com>) id 1cHHFZ-00077z-3B
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 16:38:12 -0500
+Received: from mx5-phx2.redhat.com ([209.132.183.37]:50852)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cHHDD-0006UY-7W
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 16:35:43 -0500
-Date: Wed, 14 Dec 2016 16:34:55 -0500 (EST)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cHHFY-00077b-Pw
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 16:38:09 -0500
+Date: Wed, 14 Dec 2016 16:38:07 -0500 (EST)
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <1444801967.4064897.1481751295720.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20161214175546.GO3808@thinpad.lan.raisama.net>
-References: <1481706465-5636-1-git-send-email-thuth@redhat.com>
-	<87lgviiwn0.fsf@dusky.pond.sub.org>
-	<CAFEAcA9dOJPnwVy41ZMf4boPQ=VDz6R7P=jWa0ki6-anGedMdA@mail.gmail.com>
-	<50196ce3-9320-da14-07d2-867e09ffdcfc@redhat.com>
-	<87shpqcwyz.fsf@dusky.pond.sub.org>
-	<8ca18f15-e2f6-965e-6eaa-7b935c83d9c4@redhat.com>
-	<20161214175546.GO3808@thinpad.lan.raisama.net>
+Message-ID: <1509132582.4065072.1481751487408.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20161214175144.GN3808@thinpad.lan.raisama.net>
+References: <1481732391-882-1-git-send-email-vlad.lungu@windriver.com>
+	<ef1f3b2a-d206-7082-3227-423e0d9d9619@redhat.com>
+	<20161214170058.GJ3808@thinpad.lan.raisama.net>
+	<abea10db-9da8-d6eb-c6eb-67817b1fadda@redhat.com>
+	<20161214175144.GN3808@thinpad.lan.raisama.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.9 v2] Move target-* CPU file into a
- target/ folder
+Subject: Re: [Qemu-devel] [PATCH] multiboot: copy the cmdline verbatim
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,33 +31,73 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Anthony Green <green@moxielogic.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, QEMU Developers <qemu-devel@nongnu.org>, Max Filippov <jcmvbkbc@gmail.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Jia Liu <proljc@gmail.com>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, David Gibson <david@gibson.dropbear.id.au>, Artyom Tarasenko <atar4qemu@gmail.com>, James Hogan <james.hogan@imgtec.com>, Yongbok Kim <yongbok.kim@imgtec.com>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Marcelo Tosatti <mtosatti@redhat.com>, Laurent Vivier <laurent@vivier.eu>, Michael Walle <michael@walle.cc>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: Vlad Lungu <vlad.lungu@windriver.com>, qemu-devel@nongnu.org, rth@twiddle.net
 
 
-> I was considering moving xen-* and kvm-* to xen/ and kvm/
-> directories, but an accel/ directory would be even better. I plan
-> to send a patch to do this:
+
+----- Original Message -----
+> From: "Eduardo Habkost" <ehabkost@redhat.com>
+> To: "Paolo Bonzini" <pbonzini@redhat.com>
+> Cc: "Vlad Lungu" <vlad.lungu@windriver.com>, qemu-devel@nongnu.org, rth@twiddle.net
+> Sent: Wednesday, December 14, 2016 6:51:44 PM
+> Subject: Re: [PATCH] multiboot: copy the cmdline verbatim
 > 
-> tcg/    => accel/tcg/
-> kvm-*   => accel/kvm/*  (except for stubs)
-> xen-*   => accel/xen/*  (except for stubs)
-> qtest.c => accel/qtest/qtest.c
+> On Wed, Dec 14, 2016 at 06:20:46PM +0100, Paolo Bonzini wrote:
+> > On 14/12/2016 18:00, Eduardo Habkost wrote:
+> > > On Wed, Dec 14, 2016 at 05:55:07PM +0100, Paolo Bonzini wrote:
+> > >>
+> > >>
+> > >> On 14/12/2016 17:19, Vlad Lungu wrote:
+> > >>> get_opt_value() truncates the value at the first comma.
+> > >>> Use memcpy() instead.
+> > >>
+> > >> Looks good since get_opt_value is already used by the caller.  Have you
+> > >> tested this with multiple initrd modules too?
+> > > 
+> > > get_opt_value() is used by the caller, but with NULL buf
+> > > argument. This means the caller doesn't handle ",," escaping.
+> > > (See my reply to the previous submission of this patch)
+> > 
+> > Hmm, wait.  When NULL is passed, ",," escaping is handled correctly in
+> > that next_initrd points to the next lone comma.  The lone comma is
+> > replaced with a '\0' by the caller.
+> 
+> It is handled correctly when splitting the string, but not when opening the
+> file.
+> 
+> > 
+> > So you need to use get_opt_value again in mb_add_cmdline to do the
+> > unescaping, because mb_add_cmdline only receives double commas.
+> > 
+> > This was actually my first reaction to the patch, and it was correct.
+> > Then I overthought it. :)
+> > 
+> > So the patch is wrong.
+> 
+> Except that the caller is already broken when using ",," for a
+> different reason: it calls get_image_size(initrd_filename) and
+> load_image(initrd_filename, ...) directly. So comma-escaping
+> never worked anyway:
+> 
+>   $ qemu-system-x86_64 -kernel ~/Downloads/gnumach -initrd
+>   /tmp/one,,file,/tmp/another,,file
+>   Failed to open file '/tmp/one,,file'
+> 
+> The right fix for comma-escaping would require calling
+> get_opt_value() with non-NULL buf outside mb_add_cmdline(),
+> because the mb_add_cmdline(&mbs, kcmdline) call do NOT need
+> get_opt_value() to be called.
 
-I'm not sure if tcg/ should move to accel/tcg.  I was thinking of QEMU
-runtime files like cpu-exec*, translate*, user-exec.c and cputlb.c.
-IMO there's value in leaving the code generator separated from the
-QEMU-specific stuff.  I'm also not too enthusiastic about making
-accel/kvm and accel/xen for respectively one and three files. :)
-So maybe accel/ with accel/tcg/ inside would be enough.
+For filenames containing commas you're right, but...
 
-(Also, tcg-runtime.c and tci.c should move to tcg/).
+> In other words: this fixes the mb_add_cmdline(kcmdline) case, and
+> doesn't break comma escaping on the initrd case (because it was
+> already broken). I don't see a problem with this patch.
 
-BTW, you can certainly move stubs to subdirectories.  These are
-all per-target files, so you can just leave
+... there is one case of comma escaping that wasn't broken:
 
-    obj-y += accel/
+    $ qemu-system-x86_64 -kernel foo -initrd '/tmp/one arg,,with,,commas,/tmp/another arg,,with,,commas'
 
-in Makefile.target and move the obj-$(...) assignments to the
-accel/Makefile.objs file.
+And presumably this is what Vlad was trying to do.
 
 Paolo
