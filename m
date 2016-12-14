@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38796)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39858)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cHBjI-0004pr-Kf
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 10:44:30 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cHBls-0005ti-8L
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 10:47:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cHBjF-0006QV-Fe
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 10:44:28 -0500
-Received: from mail-vk0-f54.google.com ([209.85.213.54]:33365)
+	(envelope-from <alex.bennee@linaro.org>) id 1cHBlo-0007dN-Vg
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 10:47:08 -0500
+Received: from mail-wm0-f42.google.com ([74.125.82.42]:34927)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cHBjF-0006On-1r
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 10:44:25 -0500
-Received: by mail-vk0-f54.google.com with SMTP id 137so33567321vkl.0
-	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 07:44:24 -0800 (PST)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cHBlo-0007cs-L4
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 10:47:04 -0500
+Received: by mail-wm0-f42.google.com with SMTP id a197so119196372wmd.0
+	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 07:47:04 -0800 (PST)
+References: <20161201051433.17168-1-bobby.prani@gmail.com>
+	<20161201051433.17168-19-bobby.prani@gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20161201051433.17168-19-bobby.prani@gmail.com>
+Date: Wed, 14 Dec 2016 15:46:01 +0000
+Message-ID: <87zijysedi.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <1480434248-27138-2-git-send-email-clg@kaod.org>
-References: <1480434248-27138-1-git-send-email-clg@kaod.org>
-	<1480434248-27138-2-git-send-email-clg@kaod.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 14 Dec 2016 15:43:03 +0000
-Message-ID: <CAFEAcA-B3iMZ7rX3XEJvMJ-HdL3t9yAfLNR8P02NYybzUt_DEg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-2.9 01/30] target-arm: Add VBAR support
- to ARM1176 CPUs
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 18/19] tests/tcg: Add and update Makefiles
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,149 +30,486 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Andrew Jeffery <andrew@aj.id.au>, Marcin Krzeminski <marcin.krzeminski@nokia.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+To: Pranith Kumar <bobby.prani@gmail.com>
+Cc: qemu-devel@nongnu.org, rth@twiddle.net
 
-On 29 November 2016 at 15:43, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
-> ARM1176 CPUs support the Vector Base Address Register but currently,
-> qemu only supports VBAR on ARMv7 CPUs. Fix this by adding a new
-> feature ARM_FEATURE_VBAR which can used for ARMv7 and ARM1176 CPUs.
+
+Pranith Kumar <bobby.prani@gmail.com> writes:
+
+> This commit fixes the makefiles to bring them to the desired state.
 >
-> The VBAR feature is always set for ARMv7 because some legacy boards
-> require it even if this is not architecturally correct. However, to
-> support arm1176 CPUs without TrustZone, which doesn't exist in real
-> hardware but which is used in old qemu boards, we need to disable the
-> feature when 'has_el3' is not set.
->
-> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
 > ---
->  target-arm/cpu.c    |  6 ++++++
->  target-arm/cpu.h    |  1 +
->  target-arm/helper.c | 24 ++++++++++++++++++------
->  3 files changed, 25 insertions(+), 6 deletions(-)
+>  tests/tcg/alpha/Makefile             | 38 +++++++++++++++++++----------
+>  tests/tcg/arm/Makefile               | 32 +++++++++++++++----------
+>  tests/tcg/cris/Makefile              | 17 +++++++++++--
+>  tests/tcg/i386/Makefile              | 23 +++++++++---------
+>  tests/tcg/lm32/Makefile              | 17 +++++++++++--
+>  tests/tcg/mips/Makefile              | 46 ++++++++++++++++++++++++++++++++++++
+>  tests/tcg/mips/mips32-dsp/Makefile   | 17 +++++++++++--
+>  tests/tcg/mips/mips32-dspr2/Makefile | 17 +++++++++++--
+>  tests/tcg/mips/mips64-dsp/Makefile   | 18 ++++++++++++--
+>  tests/tcg/mips/mips64-dspr2/Makefile | 17 ++++++++++++-
+>  tests/tcg/openrisc/Makefile          | 19 ++++++++++++---
+>  tests/tcg/xtensa/Makefile            | 17 +++++++++++--
+>  12 files changed, 225 insertions(+), 53 deletions(-)
+>  create mode 100644 tests/tcg/mips/Makefile
+
+I think these changes should be split and merged with each move commit.
+I should be able to manually build each individual test target with each move.
+
 >
-> diff --git a/target-arm/cpu.c b/target-arm/cpu.c
-> index 99f0dbebb9f6..1007e504248a 100644
-> --- a/target-arm/cpu.c
-> +++ b/target-arm/cpu.c
-> @@ -685,6 +685,11 @@ static void arm_cpu_realizefn(DeviceState *dev, Erro=
-r **errp)
->           */
->          cpu->id_pfr1 &=3D ~0xf0;
->          cpu->id_aa64pfr0 &=3D ~0xf000;
+> diff --git a/tests/tcg/alpha/Makefile b/tests/tcg/alpha/Makefile
+> index 2b1f03d..e20315f 100644
+> --- a/tests/tcg/alpha/Makefile
+> +++ b/tests/tcg/alpha/Makefile
+> @@ -1,33 +1,47 @@
+> -CROSS=alpha-linux-gnu-
+> -CC=$(CROSS)gcc
+> -AS=$(CROSS)as
+> +# -*- Mode: makefile -*-
+> +#
+> +# Alpha linux-user TCG tests
+> +#
+> +# The Make is expected to be called in the
+> +# ${BUILD_DIR}/alpha-linux-user/tests directory
+> +#
+>
+> -SIM=../../alpha-linux-user/qemu-alpha
+> +BUILD_DIR?=$(CURDIR)
+> +include $(BUILD_DIR)/config-host.mak	# brings in SRC_PATH
+> +include ../config-target.mak		# TARGET_NAME
+> +include $(SRC_PATH)/rules.mak
+>
+> -CFLAGS=-O
+> -LINK=$(CC) -o $@ crt.o $< -nostdlib
+> +$(call set-vpath, $(SRC_PATH)/tests/tcg/alpha)
 > +
-> +        /* Also disable VBAR support for boards using a arm1176 CPU
-> +         * without EL3.
-> +         */
-> +        unset_feature(env, ARM_FEATURE_VBAR);
->      }
->
->      if (!cpu->has_pmu || !kvm_enabled()) {
-> @@ -911,6 +916,7 @@ static void arm1176_initfn(Object *obj)
->
->      cpu->dtb_compatible =3D "arm,arm1176";
->      set_feature(&cpu->env, ARM_FEATURE_V6K);
-> +    set_feature(&cpu->env, ARM_FEATURE_VBAR);
->      set_feature(&cpu->env, ARM_FEATURE_VFP);
->      set_feature(&cpu->env, ARM_FEATURE_VAPA);
->      set_feature(&cpu->env, ARM_FEATURE_DUMMY_C15_REGS);
-> diff --git a/target-arm/cpu.h b/target-arm/cpu.h
-> index ca5c849ed65e..ab119e62ab0f 100644
-> --- a/target-arm/cpu.h
-> +++ b/target-arm/cpu.h
-> @@ -1125,6 +1125,7 @@ enum arm_features {
->      ARM_FEATURE_V8_PMULL, /* implements PMULL part of v8 Crypto Extensio=
-ns */
->      ARM_FEATURE_THUMB_DSP, /* DSP insns supported in the Thumb encodings=
- */
->      ARM_FEATURE_PMU, /* has PMU support */
-> +    ARM_FEATURE_VBAR, /* has cp15 VBAR */
->  };
->
->  static inline int arm_feature(CPUARMState *env, int feature)
-> diff --git a/target-arm/helper.c b/target-arm/helper.c
-> index b5b65caadf8a..d417c8ba802f 100644
-> --- a/target-arm/helper.c
-> +++ b/target-arm/helper.c
-> @@ -1252,12 +1252,6 @@ static const ARMCPRegInfo v7_cp_reginfo[] =3D {
->        .access =3D PL1_RW, .accessfn =3D access_tpm, .type =3D ARM_CP_ALI=
-AS,
->        .fieldoffset =3D offsetof(CPUARMState, cp15.c9_pminten),
->        .writefn =3D pmintenclr_write },
-> -    { .name =3D "VBAR", .state =3D ARM_CP_STATE_BOTH,
-> -      .opc0 =3D 3, .crn =3D 12, .crm =3D 0, .opc1 =3D 0, .opc2 =3D 0,
-> -      .access =3D PL1_RW, .writefn =3D vbar_write,
-> -      .bank_fieldoffsets =3D { offsetof(CPUARMState, cp15.vbar_s),
-> -                             offsetof(CPUARMState, cp15.vbar_ns) },
-> -      .resetvalue =3D 0 },
->      { .name =3D "CCSIDR", .state =3D ARM_CP_STATE_BOTH,
->        .opc0 =3D 3, .crn =3D 0, .crm =3D 0, .opc1 =3D 1, .opc2 =3D 0,
->        .access =3D PL1_R, .readfn =3D ccsidr_read, .type =3D ARM_CP_NO_RA=
-W },
-> @@ -1412,6 +1406,16 @@ static const ARMCPRegInfo v6k_cp_reginfo[] =3D {
->      REGINFO_SENTINEL
->  };
->
-> +static const ARMCPRegInfo vbar_cp_reginfo[] =3D {
-> +    { .name =3D "VBAR", .state =3D ARM_CP_STATE_BOTH,
-> +      .opc0 =3D 3, .crn =3D 12, .crm =3D 0, .opc1 =3D 0, .opc2 =3D 0,
-> +      .access =3D PL1_RW, .writefn =3D vbar_write,
-> +      .bank_fieldoffsets =3D { offsetof(CPUARMState, cp15.vbar_s),
-> +                             offsetof(CPUARMState, cp15.vbar_ns) },
-> +      .resetvalue =3D 0 },
-> +    REGINFO_SENTINEL
-> +};
+> +QEMU=$(BUILD_DIR)/alpha-linux-user/qemu-alpha
 > +
->  #ifndef CONFIG_USER_ONLY
->
->  static CPAccessResult gt_cntfrq_access(CPUARMState *env, const ARMCPRegI=
-nfo *ri,
-> @@ -4506,6 +4510,9 @@ void register_cp_regs_for_features(ARMCPU *cpu)
->      if (arm_feature(env, ARM_FEATURE_V6K)) {
->          define_arm_cp_regs(cpu, v6k_cp_reginfo);
->      }
-> +    if (arm_feature(env, ARM_FEATURE_VBAR)) {
-> +        define_arm_cp_regs(cpu, vbar_cp_reginfo);
-> +    }
->      if (arm_feature(env, ARM_FEATURE_V7MP) &&
->          !arm_feature(env, ARM_FEATURE_MPU)) {
->          define_arm_cp_regs(cpu, v7mp_cp_reginfo);
-> @@ -4543,6 +4550,11 @@ void register_cp_regs_for_features(ARMCPU *cpu)
->          };
->          define_one_arm_cp_reg(cpu, &clidr);
->          define_arm_cp_regs(cpu, v7_cp_reginfo);
+> +# Compiler set-up, default to system compiler if not set
+> +CROSS_CC?=$(CC)
 > +
-> +        /* Always define VBAR even if it doesn't exist in non-EL3
-> +         * configs. This is needed by some legacy boards.
-> +         */
-> +        define_arm_cp_regs(cpu, vbar_cp_reginfo);
->          define_debug_regs(cpu);
->      } else {
->          define_arm_cp_regs(cpu, not_v7_cp_reginfo);
-> --
-> 2.7.4
+> +CFLAGS=-Wall -O2 -g -fno-strict-aliasing -static
+> +LDFLAGS=-nostdlib
+>
+>  TESTS=test-cond test-cmov
+>
+>  all: hello-alpha $(TESTS)
+>
+>  hello-alpha: hello-alpha.o crt.o
+> -	$(LINK)
+> +	$(CROSS_CC) -o $@ crt.o $< $(LDFLAGS)
+>
+>  test-cond: test-cond.o crt.o
+> -	$(LINK)
+> +	$(CROSS_CC) -o $@ crt.o $< $(LDFLAGS)
+>
+>  test-cmov.o: test-cond.c
+> -	$(CC) -c $(CFLAGS) -DTEST_CMOV -o $@ $<
+> +	$(CROSS_CC) -c $(CFLAGS) -DTEST_CMOV -o $@ $<
+>
+>  test-cmov: test-cmov.o crt.o
+> -	$(LINK)
+> +	$(CROSS_CC) -o $@ crt.o $< $(LDFLAGS)
+>
+>  test-ovf: test-ovf.o crt.o
+> -	$(LINK)
+> +	$(CROSS_CC) -o $@ crt.o $< $(LDFLAGS)
+>
+>  check: $(TESTS)
+> -	for f in $(TESTS); do $(SIM) $$f || exit 1; done
+> +	for f in $(TESTS); do $(QEMU) $$f || exit 1; done
+>
+>  clean:
+>  	$(RM) *.o *~ hello-alpha $(TESTS)
+> diff --git a/tests/tcg/arm/Makefile b/tests/tcg/arm/Makefile
+> index c2ae491..a7c8953 100644
+> --- a/tests/tcg/arm/Makefile
+> +++ b/tests/tcg/arm/Makefile
+> @@ -1,20 +1,26 @@
+> -BUILD_DIR?=$(CURDIR)
+> -SRC_PATH=../../../
+> -include $(BUILD_DIR)/config-host.mak
+> +# -*- Mode: makefile -*-
+> +#
+> +# Arm linux-user TCG tests
+> +#
+> +# The Make is expected to be called in the
+> +# ${BUILD_DIR}/arm-linux-user/tests directory
+> +#
+> +
+> +BUILD_DIR=../..
+> +include $(BUILD_DIR)/config-host.mak	# brings in SRC_PATH
+> +include ../config-target.mak		# TARGET_NAME
+>  include $(SRC_PATH)/rules.mak
+>
+>  $(call set-vpath, $(SRC_PATH)/tests/tcg/arm)
+>
+>  QEMU=$(BUILD_DIR)/arm-linux-user/qemu-arm
+>
+> -QEMU_INCLUDES += -I$(BUILD_DIR)
+> -CFLAGS=-Wall -O2 -g -fno-strict-aliasing
+> -LDFLAGS=
+> -
+> -# TODO: automatically detect ARM and MIPS compilers, and run those too
+> +# Compiler set-up, default to system compiler if not set
+> +CROSS_CC?=$(CC)
+>
+> -# runcom maps page 0, so it requires root privileges
+> -# also, pi_10.com runs indefinitely
+> +QEMU_INCLUDES += -I$(BUILD_DIR)
+> +CFLAGS=-Wall -O2 -g -fno-strict-aliasing -nostdlib
+> +LDFLAGS=-nostdlib
+>
+>  TESTS=hello-arm arm-iwmmxt
+>
+> @@ -33,13 +39,13 @@ run-arm-iwmmxt: arm-iwmmxt
+>
+>  # arm test
+>  hello-arm: hello-arm.o
+> -	arm-linux-gnueabi-ld -o $@ $<
+> +	$(CROSS_CC) $(LDFLAGS) -o $@ $<
+>
+>  hello-arm.o: hello-arm.c
+> -	arm-linux-gnueabi-gcc -Wall -g -O2 -c -o $@ $<
+> +	$(CROSS_CC) $(CFLAGS) -c -o $@ $<
+>
+>  arm-iwmmxt: test-arm-iwmmxt.s
+> -	cpp < $< | arm-linux-gnueabi-gcc -Wall -static -march=iwmmxt -mabi=aapcs -x assembler - -o $@
+> +	cpp < $< | $(CROSS_CC) -Wall -static -march=iwmmxt -mabi=aapcs -x assembler - -o $@
+>
+>  clean:
+>  	rm -f *~ *.o $(TESTS)
+> diff --git a/tests/tcg/cris/Makefile b/tests/tcg/cris/Makefile
+> index 6b3dba4..009c3f4 100644
+> --- a/tests/tcg/cris/Makefile
+> +++ b/tests/tcg/cris/Makefile
+> @@ -1,7 +1,20 @@
+> --include ../../../config-host.mak
+> +# -*- Mode: makefile -*-
+> +#
+> +# Cris linux-user TCG tests
+> +#
+> +# The Make is expected to be called in the
+> +# ${BUILD_DIR}/cris-linux-user/tests directory
+> +#
+> +
+> +BUILD_DIR=../..
+> +include $(BUILD_DIR)/config-host.mak	# brings in SRC_PATH
+> +include ../config-target.mak		# TARGET_NAME
+> +include $(SRC_PATH)/rules.mak
+> +
+> +$(call set-vpath, $(SRC_PATH)/tests/tcg/arm)
+>
+>  CROSS=crisv32-axis-linux-gnu-
+> -SIM=../../../cris-linux-user/qemu-cris -L ./
+> +SIM=$(BUILD_DIR)/cris-linux-user/qemu-cris -L ./
+>  SIMG=cris-axis-linux-gnu-run --sysroot=./
+>
+>  CC      = $(CROSS)gcc
+> diff --git a/tests/tcg/i386/Makefile b/tests/tcg/i386/Makefile
+> index 97c1a97..55a45ad 100644
+> --- a/tests/tcg/i386/Makefile
+> +++ b/tests/tcg/i386/Makefile
+> @@ -1,6 +1,14 @@
+> -BUILD_DIR=../../../build/
+> -SRC_PATH=../../../
+> -include $(BUILD_DIR)/config-host.mak
+> +# -*- Mode: makefile -*-
+> +#
+> +# i386 linux-user TCG tests
+> +#
+> +# The Make is expected to be called in the
+> +# ${BUILD_DIR}/i386-linux-user/tests directory
+> +#
+> +
+> +BUILD_DIR=../..
+> +include $(BUILD_DIR)/config-host.mak	# brings in SRC_PATH
+> +include ../config-target.mak		# TARGET_NAME
+>  include $(SRC_PATH)/rules.mak
+>
+>  $(call set-vpath, $(SRC_PATH)/tests/tcg/i386)
+> @@ -14,14 +22,8 @@ CFLAGS=-Wall -O2 -g -fno-strict-aliasing
+>  #CFLAGS+=-msse2
+>  LDFLAGS=
+>
+> -# TODO: automatically detect ARM and MIPS compilers, and run those too
+> -
+> -# runcom maps page 0, so it requires root privileges
+> -# also, pi_10.com runs indefinitely
+> -
+>  I386_TESTS=hello-i386 \
+>  	   test-i386-fprem
+> -	   # runcom
+>
+>  # native i386 compilers sometimes are not biarch.  assume cross-compilers are
+>  ifneq ($(ARCH),i386)
+> @@ -57,9 +59,6 @@ run-test-x86_64: test-x86_64
+>  	-$(QEMU_X86_64) test-x86_64 > test-x86_64.out
+>  	@if diff -u test-x86_64.ref test-x86_64.out ; then echo "Auto Test OK"; fi
+>
+> -run-runcom: runcom
+> -	-$(QEMU) ./runcom $(SRC_PATH)/tests/pi_10.com
+> -
+>  # rules to compile tests
+>
+>  hello-i386: hello-i386.c
+> diff --git a/tests/tcg/lm32/Makefile b/tests/tcg/lm32/Makefile
+> index 57e7363..ad5d9a7 100644
+> --- a/tests/tcg/lm32/Makefile
+> +++ b/tests/tcg/lm32/Makefile
+> @@ -1,8 +1,21 @@
+> --include ../../../config-host.mak
+> +# -*- Mode: makefile -*-
+> +#
+> +# lm32 linux-system TCG tests
+> +#
+> +# The Make is expected to be called in the
+> +# ${BUILD_DIR}/lm32-softmmu/tests directory
+> +#
+> +
+> +BUILD_DIR=../..
+> +include $(BUILD_DIR)/config-host.mak	# brings in SRC_PATH
+> +include ../config-target.mak		# TARGET_NAME
+> +include $(SRC_PATH)/rules.mak
+> +
+> +$(call set-vpath, $(SRC_PATH)/tests/tcg/lm32)
+>
+>  CROSS=lm32-elf-
+>
+> -SIM = qemu-system-lm32
+> +QEMU=$(BUILD_DIR)/lm32-softmmu/qemu-system-lm32
+>  SIMFLAGS = -M lm32-evr -nographic -semihosting -net none -kernel
+>
+>  CC      = $(CROSS)gcc
+> diff --git a/tests/tcg/mips/Makefile b/tests/tcg/mips/Makefile
+> new file mode 100644
+> index 0000000..a56d6c8
+> --- /dev/null
+> +++ b/tests/tcg/mips/Makefile
+> @@ -0,0 +1,46 @@
+> +# -*- Mode: makefile -*-
+> +#
+> +# mips linux-user TCG tests
+> +#
+> +# The Make is expected to be called in the
+> +# ${BUILD_DIR}/mips-linux-user/tests directory
+> +#
+> +
+> +BUILD_DIR=../..
+> +include $(BUILD_DIR)/config-host.mak	# brings in SRC_PATH
+> +include ../config-target.mak		# TARGET_NAME
+> +include $(SRC_PATH)/rules.mak
+> +
+> +$(call set-vpath, $(SRC_PATH)/tests/tcg/mips)
+> +
+> +QEMU=$(BUILD_DIR)/mips-linux-user/qemu-mips
+> +
+> +# Compiler set-up, default to system compiler if not set
+> +CROSS_CC?=$(CC)
+> +
+> +CFLAGS=-Wall -O2 -g -fno-strict-aliasing
+> +LDFLAGS=
+> +
+> +TESTS=hello-mips
+> +
+> +all: $(patsubst %,run-%,$(TESTS))
 
-This all seems overcomplicated to me. The aim is to define VBAR for:
- * CPUs with TrustZone/EL3
- * ARMv7 CPUs (even if no EL3, for legacy reasons)
-right?
+We need new run targets for the tests - certainly a default make
+shouldn't run the test.
 
-We do that by changing arm_cpu_realizefn():
- * add set_feature(arm, ARM_FEATURE_VBAR) to the things we enable
-   when the ARM_FEATURE_V7 bit is set (with a comment about why)
- * add
-    if (arm_feature(env, ARM_FEATURE_EL3)) {
-       set_feature(env, ARM_FEATURE_VBAR));
-    }
-   in the appropriate place
-and then register_cp_regs_for_features() just does
-   if (arm_feature(env, ARM_FEATURE_VBAR)) {
-       define_arm_cp_regs(cpu, vbar_cp_reginfo);
-   }
+> +test: all
+> +
+> +# rules to run tests
+> +
+> +run-%: %
+> +	$(QEMU) ./$*
+> +
+> +#.PHONY: $(patsubst %,run-%,$(TESTS))
+> +
+> +run-hello-mips: hello-mips
+> +
+> +# mips test
+> +hello-mips: hello-mips.o
+> +	$(CROSS_CC) -o $@ $<
+> +
+> +hello-mips.o: hello-mips.c
+> +	$(CROSS_CC) -Wall -g -O2 -c -o $@ $<
+> +
+> +clean:
+> +	rm -f *~ *.o $(TESTS)
+> diff --git a/tests/tcg/mips/mips32-dsp/Makefile b/tests/tcg/mips/mips32-dsp/Makefile
+> index c3a0a00..996b9a0 100644
+> --- a/tests/tcg/mips/mips32-dsp/Makefile
+> +++ b/tests/tcg/mips/mips32-dsp/Makefile
+> @@ -1,8 +1,21 @@
+> --include ../../config-host.mak
+> +# -*- Mode: makefile -*-
+> +#
+> +# mipsel linux-user TCG tests
+> +#
+> +# The Make is expected to be called in the
+> +# ${BUILD_DIR}/mipsel-linux-user/tests directory
+> +#
+> +
+> +BUILD_DIR=../..
+> +include $(BUILD_DIR)/config-host.mak	# brings in SRC_PATH
+> +include ../config-target.mak		# TARGET_NAME
+> +include $(SRC_PATH)/rules.mak
+> +
+> +$(call set-vpath, $(SRC_PATH)/tests/tcg/mips/mips32-dsp)
+>
+>  CROSS=mips64el-unknown-linux-gnu-
+>
+> -SIM=qemu-mipsel
+> +SIM=$(BUILD_DIR)/mipsel-linux-user/qemu-mipsel
+>  SIM_FLAGS=-cpu 74Kf
+>
+>  CC      = $(CROSS)gcc
+> diff --git a/tests/tcg/mips/mips32-dspr2/Makefile b/tests/tcg/mips/mips32-dspr2/Makefile
+> index ed19581..e99f2bc 100644
+> --- a/tests/tcg/mips/mips32-dspr2/Makefile
+> +++ b/tests/tcg/mips/mips32-dspr2/Makefile
+> @@ -1,8 +1,21 @@
+> --include ../../config-host.mak
+> +# -*- Mode: makefile -*-
+> +#
+> +# mipsel linux-user TCG tests
+> +#
+> +# The Make is expected to be called in the
+> +# ${BUILD_DIR}/mipsel-linux-user/tests directory
+> +#
+> +
+> +BUILD_DIR=../..
+> +include $(BUILD_DIR)/config-host.mak	# brings in SRC_PATH
+> +include ../config-target.mak		# TARGET_NAME
+> +include $(SRC_PATH)/rules.mak
+> +
+> +$(call set-vpath, $(SRC_PATH)/tests/tcg/mips/mips32-dsp)
+>
+>  CROSS=mips64el-unknown-linux-gnu-
+>
+> -SIM=qemu-mipsel
+> +SIM=$(BUILD_DIR)/mipsel-linux-user/qemu-mipsel
+>  SIM_FLAGS=-cpu 74Kf
+>
+>  CC      = $(CROSS)gcc
+> diff --git a/tests/tcg/mips/mips64-dsp/Makefile b/tests/tcg/mips/mips64-dsp/Makefile
+> index b2ac6b3..4ee3bbb 100644
+> --- a/tests/tcg/mips/mips64-dsp/Makefile
+> +++ b/tests/tcg/mips/mips64-dsp/Makefile
+> @@ -1,7 +1,21 @@
+> +# -*- Mode: makefile -*-
+> +#
+> +# mips64el linux-user TCG tests
+> +#
+> +# The Make is expected to be called in the
+> +# ${BUILD_DIR}/mips64el-linux-user/tests directory
+> +#
+>
+> -CROSS_COMPILE	?= mips64el-unknown-linux-gnu-
+> +BUILD_DIR=../..
+> +include $(BUILD_DIR)/config-host.mak	# brings in SRC_PATH
+> +include ../config-target.mak		# TARGET_NAME
+> +include $(SRC_PATH)/rules.mak
+>
+> -SIM = qemu-system-mips64el
+> +$(call set-vpath, $(SRC_PATH)/tests/tcg/mips/mips64-dsp)
+> +
+> +CROSS=mips64el-unknown-linux-gnu-
+> +
+> +SIM=$(BUILD_DIR)/mipsel-linux-user/qemu-mips64el
+>  SIMFLAGS = -nographic -cpu mips64dspr2 -kernel
+>
+>  AS      = $(CROSS_COMPILE)as
+> diff --git a/tests/tcg/mips/mips64-dspr2/Makefile b/tests/tcg/mips/mips64-dspr2/Makefile
+> index ba44bb9..8510d8c 100644
+> --- a/tests/tcg/mips/mips64-dspr2/Makefile
+> +++ b/tests/tcg/mips/mips64-dspr2/Makefile
+> @@ -1,6 +1,21 @@
+> +# -*- Mode: makefile -*-
+> +#
+> +# mips64el linux-user TCG tests
+> +#
+> +# The Make is expected to be called in the
+> +# ${BUILD_DIR}/mips64el-linux-user/tests directory
+> +#
+> +
+> +BUILD_DIR=../..
+> +include $(BUILD_DIR)/config-host.mak	# brings in SRC_PATH
+> +include ../config-target.mak		# TARGET_NAME
+> +include $(SRC_PATH)/rules.mak
+> +
+> +$(call set-vpath, $(SRC_PATH)/tests/tcg/mips/mips64-dsp)
+> +
+>  CROSS_COMPILE	?= mips64el-unknown-linux-gnu-
+>
+> -SIM = qemu-system-mips64el
+> +SIM=$(BUILD_DIR)/mipsel-linux-user/qemu-mips64el
+>  SIMFLAGS = -nographic -cpu mips64dspr2 -kernel
+>
+>  AS      = $(CROSS_COMPILE)as
+> diff --git a/tests/tcg/openrisc/Makefile b/tests/tcg/openrisc/Makefile
+> index 7e65888..071aaab 100644
+> --- a/tests/tcg/openrisc/Makefile
+> +++ b/tests/tcg/openrisc/Makefile
+> @@ -1,8 +1,21 @@
+> --include ../../config-host.mak
+> +# -*- Mode: makefile -*-
+> +#
+> +# openrisc linux-user TCG tests
+> +#
+> +# The Make is expected to be called in the
+> +# ${BUILD_DIR}/or32-linux-user/tests directory
+> +#
+>
+> -CROSS = or32-linux-
+> +BUILD_DIR=../..
+> +include $(BUILD_DIR)/config-host.mak	# brings in SRC_PATH
+> +include ../config-target.mak		# TARGET_NAME
+> +include $(SRC_PATH)/rules.mak
+> +
+> +$(call set-vpath, $(SRC_PATH)/tests/tcg/openrisc)
+>
+> -SIM = qemu-or32
+> +SIM=$(BUILD_DIR)/or32-linux-user/qemu-mips
+> +
+> +CROSS = or32-linux-
+>
+>  CC = $(CROSS)gcc
+>
+> diff --git a/tests/tcg/xtensa/Makefile b/tests/tcg/xtensa/Makefile
+> index 522a63e..e3269ed 100644
+> --- a/tests/tcg/xtensa/Makefile
+> +++ b/tests/tcg/xtensa/Makefile
+> @@ -1,10 +1,23 @@
+> --include ../../../config-host.mak
+> +# -*- Mode: makefile -*-
+> +#
+> +# xtensa linux TCG tests
+> +#
+> +# The Make is expected to be called in the
+> +# ${BUILD_DIR}/xtensa-softmmu/tests directory
+> +#
+> +
+> +BUILD_DIR=../..
+> +include $(BUILD_DIR)/config-host.mak	# brings in SRC_PATH
+> +include ../config-target.mak		# TARGET_NAME
+> +include $(SRC_PATH)/rules.mak
+> +
+> +$(call set-vpath, $(SRC_PATH)/tests/tcg/xtensa)
+>
+>  CORE=dc232b
+>  CROSS=xtensa-$(CORE)-elf-
+>
+>  ifndef XT
+> -SIM = ../../../xtensa-softmmu/qemu-system-xtensa
+> +SIM = $(BUILD_DIR)/xtensa-softmmu/qemu-system-xtensa
+>  SIMFLAGS = -M sim -cpu $(CORE) -nographic -semihosting $(EXTFLAGS) -kernel
+>  SIMDEBUG = -s -S
+>  else
 
-You don't need to explicitly set the VBAR feature in the 1176
-initfn, or unset set feature bits, or register vbar_cp_reginfo
-in two separate places.
 
-thanks
--- PMM
+--
+Alex Bennée
