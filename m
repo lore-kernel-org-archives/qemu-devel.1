@@ -1,36 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51946)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52092)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liang.z.li@intel.com>) id 1cH4nW-000625-LF
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 03:20:24 -0500
+	(envelope-from <maxime.coquelin@redhat.com>) id 1cH4oJ-0000S8-47
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 03:21:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liang.z.li@intel.com>) id 1cH4nR-0008A1-ML
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 03:20:22 -0500
-Received: from mga14.intel.com ([192.55.52.115]:3085)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <liang.z.li@intel.com>)
-	id 1cH4nR-000892-A4
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 03:20:17 -0500
-From: "Li, Liang Z" <liang.z.li@intel.com>
-Date: Wed, 14 Dec 2016 08:20:07 +0000
-Message-ID: <F2CBF3009FA73547804AE4C663CAB28E3C31D078@SHSMSX104.ccr.corp.intel.com>
-References: <0b18c636-ee67-cbb4-1ba3-81a06150db76@redhat.com>
-	<0b83db29-ebad-2a70-8d61-756d33e33a48@intel.com>
-	<2171e091-46ee-decd-7348-772555d3a5e3@redhat.com>
-	<d3ff453c-56fa-19de-317c-1c82456f2831@intel.com>
-	<20161207183817.GE28786@redhat.com>
-	<b58fd9f6-d9dd-dd56-d476-dd342174dac5@intel.com>
-	<20161207202824.GH28786@redhat.com>
-	<F2CBF3009FA73547804AE4C663CAB28E3A14E2AD@SHSMSX104.ccr.corp.intel.com>
-	<060287c7-d1af-45d5-70ea-ad35d4bbeb84@intel.com>
-	<F2CBF3009FA73547804AE4C663CAB28E3A14E339@SHSMSX104.ccr.corp.intel.com>
-	<20161209164222.GI28786@redhat.com>
-In-Reply-To: <20161209164222.GI28786@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <maxime.coquelin@redhat.com>) id 1cH4oE-0008Mg-04
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 03:21:10 -0500
+References: <1473773430-19616-1-git-send-email-maxime.coquelin@redhat.com>
+	<20161213212745.1976.91005@loki>
+From: Maxime Coquelin <maxime.coquelin@redhat.com>
+Message-ID: <a985d559-64aa-7690-1396-654e197989ff@redhat.com>
+Date: Wed, 14 Dec 2016 09:20:58 +0100
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH kernel v5 0/5] Extend virtio-balloon for
- fast (de)inflating & fast live migration
+In-Reply-To: <20161213212745.1976.91005@loki>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-stable] [PATCH v2] virtio-bus: Plug devices
+ after features are negotiated
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,112 +24,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrea Arcangeli <aarcange@redhat.com>
-Cc: "Hansen, Dave" <dave.hansen@intel.com>, David Hildenbrand <david@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mhocko@suse.com" <mhocko@suse.com>, "mst@redhat.com" <mst@redhat.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>
+To: Michael Roth <mdroth@linux.vnet.ibm.com>, mst@redhat.com, qemu-devel@nongnu.org
+Cc: cornelia.huck@de.ibm.com, marcel@redhat.com, eblake@redhat.com, qemu-stable@nongnu.org, stefanha@redhat.com, dgilbert@redhat.com
 
-> fast (de)inflating & fast live migration
->=20
-> Hello,
->=20
-> On Fri, Dec 09, 2016 at 05:35:45AM +0000, Li, Liang Z wrote:
-> > > On 12/08/2016 08:45 PM, Li, Liang Z wrote:
-> > > > What's the conclusion of your discussion? It seems you want some
-> > > > statistic before deciding whether to  ripping the bitmap from the
-> > > > ABI, am I right?
-> > >
-> > > I think Andrea and David feel pretty strongly that we should remove
-> > > the bitmap, unless we have some data to support keeping it.  I don't
-> > > feel as strongly about it, but I think their critique of it is
-> > > pretty valid.  I think the consensus is that the bitmap needs to go.
-> > >
-> >
-> > Thanks for you clarification.
-> >
-> > > The only real question IMNHO is whether we should do a power-of-2 or
-> > > a length.  But, if we have 12 bits, then the argument for doing
-> > > length is pretty strong.  We don't need anywhere near 12 bits if doin=
-g
-> power-of-2.
-> > >
-> > So each item can max represent 16MB Bytes, seems not big enough, but
-> > enough for most case.
-> > Things became much more simple without the bitmap, and I like simple
-> > solution too. :)
-> >
-> > I will prepare the v6 and remove all the bitmap related stuffs. Thank y=
-ou all!
->=20
-> Sounds great!
->=20
-> I suggested to check the statistics, because collecting those stats looke=
-d
-> simpler and quicker than removing all bitmap related stuff from the patch=
-set.
-> However if you prefer to prepare a v6 without the bitmap another perhaps
-> more interesting way to evaluate the usefulness of the bitmap is to just =
-run
-> the same benchmark and verify that there is no regression compared to the
-> bitmap enabled code.
->=20
-> The other issue with the bitmap is, the best case for the bitmap is ever =
-less
-> likely to materialize the more RAM is added to the guest. It won't regres=
-s
-> linearly because after all there can be some locality bias in the buddy s=
-plits,
-> but if sync compaction is used in the large order allocations tried befor=
-e
-> reaching order 0, the bitmap payoff will regress close to linearly with t=
-he
-> increase of RAM.
->=20
-> So it'd be good to check the stats or the benchmark on large guests, at l=
-east
-> one hundred gigabytes or so.
->=20
-> Changing topic but still about the ABI features needed, so it may be rele=
-vant
-> for this discussion:
->=20
-> 1) vNUMA locality: i.e. allowing host to specify which vNODEs to take
->    memory from, using alloc_pages_node in guest. So you can ask to
->    take X pages from vnode A, Y pages from vnode B, in one vmenter.
->=20
-> 2) allowing qemu to tell the guest to stop inflating the balloon and
->    report a fragmentation limit being hit, when sync compaction
->    powered allocations fails at certain power-of-two order granularity
->    passed by qemu to the guest. This order constraint will be passed
->    by default for hugetlbfs guests with 2MB hpage size, while it can
->    be used optionally on THP backed guests. This option with THP
->    guests would allow a highlevel management software to provide a
->    "don't reduce guest performance" while shrinking the memory size of
->    the guest from the GUI. If you deselect the option, you can shrink
->    down to the last freeable 4k guest page, but doing so may have to
->    split THP in the host (you don't know for sure if they were really
->    THP but they could have been), and it may regress
->    performance. Inflating the balloon while passing a minimum
->    granularity "order" of the pages being zapped, will guarantee
->    inflating the balloon cannot decrease guest performance
->    instead. Plus it's needed for hugetlbfs anyway as far as I can
->    tell. hugetlbfs would not be host enforceable even if the idea is
->    not to free memory but only reduce the available memory of the
->    guest (not without major changes that maps a hugetlb page with 4k
->    ptes at least). While for a more cooperative usage of hugetlbfs
->    guests, it's simply not useful to inflate the balloon at anything
->    less than the "HPAGE_SIZE" hugetlbfs granularity.
->=20
-> We also plan to use userfaultfd to make the balloon driver host enforced =
-(will
-> work fine on hugetlbfs 2M and tmpfs too) but that's going to be invisible=
- to
-> the ABI so it's not strictly relevant for this discussion.
->=20
-> On a side note, registering userfaultfd on the ballooned range, will keep
-> khugepaged at bay so it won't risk to re-inflating the MADV_DONTNEED
-> zapped sub-THP fragments no matter the sysfs tunings.
->=20
 
-Thanks for your elaboration!
 
-> Thanks!
-> Andrea
+On 12/13/2016 10:27 PM, Michael Roth wrote:
+> Quoting Maxime Coquelin (2016-09-13 08:30:30)
+>> > Currently, devices are plugged before features are negotiated.
+>> > If the backend doesn't support VIRTIO_F_VERSION_1, the transport
+>> > needs to rewind some settings.
+>> >
+>> > This is the case for CCW, for which a post_plugged callback had
+>> > been introduced, where max_rev field is just updated if
+>> > VIRTIO_F_VERSION_1 is not supported by the backend.
+>> > For PCI, implementing post_plugged would be much more
+>> > complicated, so it needs to know whether the backend supports
+>> > VIRTIO_F_VERSION_1 at plug time.
+>> >
+>> > Currently, nothing is done for PCI. Modern capabilities get
+>> > exposed to the guest even if VIRTIO_F_VERSION_1 is not supported
+>> > by the backend, which confuses the guest.
+>> >
+>> > This patch replaces existing post_plugged solution with an
+>> > approach that fits with both transports.
+>> > Features negotiation is performed before ->device_plugged() call.
+>> > A pre_plugged callback is introduced so that the transports can
+>> > set their supported features.
+>> >
+>> > Cc: Michael S. Tsirkin <mst@redhat.com>
+>> > Cc: qemu-stable@nongnu.org
+>> > Tested-by: Cornelia Huck <cornelia.huck@de.ibm.com> [ccw]
+>> > Reviewed-by: Cornelia Huck <cornelia.huck@de.ibm.com>
+>> > Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
+>> > Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
+>
+> It looks like this patch breaks migration under certain circumstances.
+> One such scenario is migrating 2.7 -> 2.8.0-rc3 as detailed below on a
+> host that doesn't have support for virtio-1 in vhost (which was
+> introduced via 41e3e42 in kernel 3.18. In my case, I'm using Ubuntu
+> 14.04, kernel 3.13):
+>
+>  source (2.7.0):
+>
+>    sudo build/v2.7.0/x86_64-softmmu/qemu-system-x86_64 -enable-kvm -L
+>    build/v2.7.0-bios -M pc-i440fx-2.7 -m 512M -drive
+>    file=/home/mdroth/vm/win7_home_sp1_virtio_testing.qcow2,if=virtio -vga
+>    cirrus -smp 4 -device virtio-net-pci,netdev=net0 -netdev
+>    tap,id=net0,vhost=on,script=/etc/qemu-ifup -monitor
+>    unix:/tmp/vm-hmp.sock,server,nowait -qmp
+>    unix:/tmp/vm-qmp.sock,server,nowait -vnc :200
+>
+>  target (2.8.0-rc3):
+>
+>    sudo build/v2.8.0-rc3/x86_64-softmmu/qemu-system-x86_64 -enable-kvm
+>    -L build/v2.8.0-rc3-bios -M pc-i440fx-2.7 -m 512M -drive
+>    file=/home/mdroth/vm/win7_home_sp1_virtio_testing.qcow2,if=virtio -vga
+>    cirrus -smp 4 -device virtio-net-pci,netdev=net0 -netdev
+>    tap,id=net0,vhost=on,script=/etc/qemu-ifup -monitor
+>    unix:/tmp/vm-hmp-incoming.sock,server,nowait -qmp
+>    unix:/tmp/vm-qmp-incoming.sock,server,nowait -vnc :201
+>    -incoming unix:/tmp/migrate.sock
+>
+>  error on target after migration:
+>
+>    qemu-system-x86_64: get_pci_config_device: Bad config data: i=0x34
+>    read: 98 device: 40 cmask: ff wmask: 0 w1cmask:0
+>    qemu-system-x86_64: Failed to load PCIDevice:config
+>    qemu-system-x86_64: Failed to load virtio-net:virtio
+>    qemu-system-x86_64: error while loading state for instance 0x0 of
+>    device '0000:00:03.0/virtio-net'
+>    qemu-system-x86_64: load of migration failed: Invalid argument
+>
+>
+> Based on discussion on IRC (excerpts below), I think the new handling needs
+> to be controllable via a machine option that can be disabled by default
+> for older machine types. This is being considered a release blocker for
+> 2.8 since there are still pre-3.18 LTS kernels in the wild.
+
+
+First, thanks for reporting this bad regression with a detailed
+analysis.
+
+>
+>
+> root-cause:
+>
+> 14:35 < stefanha> v3.13 will not work
+> 14:35 < stefanha>         VHOST_FEATURES = (1ULL << VIRTIO_F_NOTIFY_ON_EMPTY) |
+> 14:35 < stefanha>                          (1ULL << VIRTIO_RING_F_INDIRECT_DESC) |
+> 14:35 < stefanha>                          (1ULL << VIRTIO_RING_F_EVENT_IDX) |
+> 14:35 < stefanha>                          (1ULL << VHOST_F_LOG_ALL),
+> 14:35 < stefanha> The kernel side only knows about these guys
+> 14:35 < davidgiluk> our downstream 3.10.0-524 seems to work - but that's probably got all the vhost stuff backported
+> 14:35 < stefanha> plus these guys:
+> 14:35 < stefanha> F        VHOST_NET_FEATURES = VHOST_FEATURES |
+> 14:35 < stefanha>                          (1ULL << VHOST_NET_F_VIRTIO_NET_HDR) |
+> 14:35 < stefanha>                          (1ULL << VIRTIO_NET_F_MRG_RXBUF),
+> 14:36 < stefanha> mdroth: So QEMU is going to check a list of feature bits including VERSION_1
+> 14:36 < stefanha> and it will see that vhost doesn't support them.
+> 14:36 < stefanha> So we're kind of doing the right thing now.
+> 14:36 < stefanha> Before userspace was overriding the fact that vhost cannot handle VERSION_1.
+> 14:36 < stefanha> ...except we broke migration
+> 14:36 < davidgiluk> stefanha: But shouldn't it refuse to startup ?
+> 14:36 < stefanha> Everything is perfect*
+> 14:36 < stefanha> * except we broke migration
+> 14:36 < stefanha> :)
+>
+> suggestions on how to fix this:
+>
+> 14:40 < stefanha> My understanding is this bug is vhost-specific.  If you have an old kernel that doesn't support VERSION_1 vhost then migration will break.
+> 14:41 < stefanha> The actual bug is in QEMU though, not vhost
+> 14:42 < stefanha> vhost is reporting the truth.  It's QEMU that has changed behavior.
+> 14:44 < stefanha> mdroth: I think a lame fix would be to make virtio_pci_device_plugged() dependent on a flag that says: use old broken behavior instead of reporting the truth to the guest.
+> 14:44 < stefanha> The flag could be enabled for all old machine types
+> 14:44 < stefanha> and new machine types will report the truth.
+> 14:44 < stefanha> That way migration continues to work.
+Right.
+The problem doing this however is that it would re-introduce initial
+bug for old kernel on host and new kernel on guest.
+
+Indeed, in recent Kernels, virtio-pci device probe fails if modern 
+interface is exposed but VERSION_1 is not advertised.
+
+> 14:44 < stefanha> Not sure if anyone can think of a nicer solution.
+> 14:45 < stefanha> But we're going to have to keep lying to the guest if we want to preserve migration compatibility
+> 14:45 < stefanha> The key change in behavior with the patch you identified is:
+> 14:46 < stefanha> if (!virtio_has_feature(vdev->host_features, VIRTIO_F_VERSION_1)) {
+> 14:46 < stefanha> virtio_pci_disable_modern(proxy);
+> 14:46 < stefanha> Previously it didn't care about vdev->host_features.  It simply allowed VERSION_1 when proxy's disable_modern boolean was false.
+> 14:47 < mdroth> stefanha: ok, that explains why it seems to work with disable-modern=true
+> 14:48 < stefanha> mdroth: Your Ubuntu kernel old but 14.04 LTS is definitely still around so I don't think we can ship QEMU 2.8 like this.
+> 14:49 < stefanha> mdroth: Let's summarize it on the mailing list and see what Michael Tsirkin and Maxime Coquelin think.
+> 14:49 < mdroth> stefanha: i suppose a potential workaround would be to tell users to set disable-modern= to match their vhost capabilities, but it's hard for them to apply that retroactively if they're looking to migrate
+> 14:49 < stefanha> We can delay the release in the meantime.
+> 14:50 < stefanha> mdroth: I don't think a workaround is going to be smooth in this case
+> 14:50 < stefanha> People will only notice once migration fails,
+> 14:50 < stefanha> and that's when you lose your VM state!
+>
+>
+
+Thanks,
+Maxime
