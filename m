@@ -1,27 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48990)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51946)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cH4TQ-0008RP-U8
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 02:59:37 -0500
+	(envelope-from <liang.z.li@intel.com>) id 1cH4nW-000625-LF
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 03:20:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cH4TN-00026E-T8
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 02:59:37 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50720)
+	(envelope-from <liang.z.li@intel.com>) id 1cH4nR-0008A1-ML
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 03:20:22 -0500
+Received: from mga14.intel.com ([192.55.52.115]:3085)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1cH4TN-000266-LI
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 02:59:33 -0500
-References: <1481285870-3396-1-git-send-email-thuth@redhat.com>
-	<1481285870-3396-6-git-send-email-thuth@redhat.com>
-	<CAFEAcA-BbkYdTkTWQcqyK-jU+dncnrfDyGwQamMTZ4jr1VqL9A@mail.gmail.com>
-	<192aeaa3-042c-6e37-80b3-7a21453c542f@redhat.com>
-	<bd4c203a-ac68-2532-b248-41c25bd90065@vivier.eu>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <604aea80-b160-8cc8-c4e5-231669ca7443@redhat.com>
-Date: Wed, 14 Dec 2016 08:59:24 +0100
-MIME-Version: 1.0
-In-Reply-To: <bd4c203a-ac68-2532-b248-41c25bd90065@vivier.eu>
-Content-Type: text/plain; charset=utf-8
+	(Exim 4.71) (envelope-from <liang.z.li@intel.com>)
+	id 1cH4nR-000892-A4
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 03:20:17 -0500
+From: "Li, Liang Z" <liang.z.li@intel.com>
+Date: Wed, 14 Dec 2016 08:20:07 +0000
+Message-ID: <F2CBF3009FA73547804AE4C663CAB28E3C31D078@SHSMSX104.ccr.corp.intel.com>
+References: <0b18c636-ee67-cbb4-1ba3-81a06150db76@redhat.com>
+	<0b83db29-ebad-2a70-8d61-756d33e33a48@intel.com>
+	<2171e091-46ee-decd-7348-772555d3a5e3@redhat.com>
+	<d3ff453c-56fa-19de-317c-1c82456f2831@intel.com>
+	<20161207183817.GE28786@redhat.com>
+	<b58fd9f6-d9dd-dd56-d476-dd342174dac5@intel.com>
+	<20161207202824.GH28786@redhat.com>
+	<F2CBF3009FA73547804AE4C663CAB28E3A14E2AD@SHSMSX104.ccr.corp.intel.com>
+	<060287c7-d1af-45d5-70ea-ad35d4bbeb84@intel.com>
+	<F2CBF3009FA73547804AE4C663CAB28E3A14E339@SHSMSX104.ccr.corp.intel.com>
+	<20161209164222.GI28786@redhat.com>
+In-Reply-To: <20161209164222.GI28786@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 05/20] arm: Move CPU files to target/ folder
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH kernel v5 0/5] Extend virtio-balloon for
+ fast (de)inflating & fast live migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,45 +39,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>, Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Aurelien Jarno <aurelien@aurel32.net>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Michael Walle <michael@walle.cc>, Yongbok Kim <yongbok.kim@imgtec.com>, Anthony Green <green@moxielogic.com>, Jia Liu <proljc@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Eduardo Habkost <ehabkost@redhat.com>, Max Filippov <jcmvbkbc@gmail.com>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, James Hogan <james.hogan@imgtec.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Marcelo Tosatti <mtosatti@redhat.com>
+To: Andrea Arcangeli <aarcange@redhat.com>
+Cc: "Hansen, Dave" <dave.hansen@intel.com>, David Hildenbrand <david@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mhocko@suse.com" <mhocko@suse.com>, "mst@redhat.com" <mst@redhat.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>
 
-On 14.12.2016 08:56, Laurent Vivier wrote:
-> Le 14/12/2016 =C3=A0 08:43, Thomas Huth a =C3=A9crit :
->> On 13.12.2016 19:19, Peter Maydell wrote:
->>> On 9 December 2016 at 12:17, Thomas Huth <thuth@redhat.com> wrote:
->>>> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
->>>> index d4160df..60770d4 100644
->>>> --- a/hw/arm/virt-acpi-build.c
->>>> +++ b/hw/arm/virt-acpi-build.c
->>>> @@ -33,7 +33,7 @@
->>>>  #include "qemu/bitmap.h"
->>>>  #include "trace.h"
->>>>  #include "qom/cpu.h"
->>>> -#include "target-arm/cpu.h"
->>>> +#include "cpu.h"
->>>>  #include "hw/acpi/acpi-defs.h"
->>>>  #include "hw/acpi/acpi.h"
->>>>  #include "hw/nvram/fw_cfg.h"
->>>
->>> Something looks wrong here. We definitely want the ARM
->>> version of cpu.h, not any random cpu.h. The #include
->>> filename should make it clear which file we're getting,
->>> both so it's easier for humans to understand and so that
->>> one day we might be able to build more than one target
->>> CPU into the same QEMU binary.
->>
->> Right, good catch, thanks! Looks like I did it right in the other
->> patches and used target/ppc/cpu.h there for example ... I'll fix it fo=
-r
->> ARM in the next version of the patch...
+> fast (de)inflating & fast live migration
 >=20
-> There is the same problem in: m68k, alpha, mips and sh4.
+> Hello,
 >=20
-> Could you fix them too?
+> On Fri, Dec 09, 2016 at 05:35:45AM +0000, Li, Liang Z wrote:
+> > > On 12/08/2016 08:45 PM, Li, Liang Z wrote:
+> > > > What's the conclusion of your discussion? It seems you want some
+> > > > statistic before deciding whether to  ripping the bitmap from the
+> > > > ABI, am I right?
+> > >
+> > > I think Andrea and David feel pretty strongly that we should remove
+> > > the bitmap, unless we have some data to support keeping it.  I don't
+> > > feel as strongly about it, but I think their critique of it is
+> > > pretty valid.  I think the consensus is that the bitmap needs to go.
+> > >
+> >
+> > Thanks for you clarification.
+> >
+> > > The only real question IMNHO is whether we should do a power-of-2 or
+> > > a length.  But, if we have 12 bits, then the argument for doing
+> > > length is pretty strong.  We don't need anywhere near 12 bits if doin=
+g
+> power-of-2.
+> > >
+> > So each item can max represent 16MB Bytes, seems not big enough, but
+> > enough for most case.
+> > Things became much more simple without the bitmap, and I like simple
+> > solution too. :)
+> >
+> > I will prepare the v6 and remove all the bitmap related stuffs. Thank y=
+ou all!
+>=20
+> Sounds great!
+>=20
+> I suggested to check the statistics, because collecting those stats looke=
+d
+> simpler and quicker than removing all bitmap related stuff from the patch=
+set.
+> However if you prefer to prepare a v6 without the bitmap another perhaps
+> more interesting way to evaluate the usefulness of the bitmap is to just =
+run
+> the same benchmark and verify that there is no regression compared to the
+> bitmap enabled code.
+>=20
+> The other issue with the bitmap is, the best case for the bitmap is ever =
+less
+> likely to materialize the more RAM is added to the guest. It won't regres=
+s
+> linearly because after all there can be some locality bias in the buddy s=
+plits,
+> but if sync compaction is used in the large order allocations tried befor=
+e
+> reaching order 0, the bitmap payoff will regress close to linearly with t=
+he
+> increase of RAM.
+>=20
+> So it'd be good to check the stats or the benchmark on large guests, at l=
+east
+> one hundred gigabytes or so.
+>=20
+> Changing topic but still about the ABI features needed, so it may be rele=
+vant
+> for this discussion:
+>=20
+> 1) vNUMA locality: i.e. allowing host to specify which vNODEs to take
+>    memory from, using alloc_pages_node in guest. So you can ask to
+>    take X pages from vnode A, Y pages from vnode B, in one vmenter.
+>=20
+> 2) allowing qemu to tell the guest to stop inflating the balloon and
+>    report a fragmentation limit being hit, when sync compaction
+>    powered allocations fails at certain power-of-two order granularity
+>    passed by qemu to the guest. This order constraint will be passed
+>    by default for hugetlbfs guests with 2MB hpage size, while it can
+>    be used optionally on THP backed guests. This option with THP
+>    guests would allow a highlevel management software to provide a
+>    "don't reduce guest performance" while shrinking the memory size of
+>    the guest from the GUI. If you deselect the option, you can shrink
+>    down to the last freeable 4k guest page, but doing so may have to
+>    split THP in the host (you don't know for sure if they were really
+>    THP but they could have been), and it may regress
+>    performance. Inflating the balloon while passing a minimum
+>    granularity "order" of the pages being zapped, will guarantee
+>    inflating the balloon cannot decrease guest performance
+>    instead. Plus it's needed for hugetlbfs anyway as far as I can
+>    tell. hugetlbfs would not be host enforceable even if the idea is
+>    not to free memory but only reduce the available memory of the
+>    guest (not without major changes that maps a hugetlb page with 4k
+>    ptes at least). While for a more cooperative usage of hugetlbfs
+>    guests, it's simply not useful to inflate the balloon at anything
+>    less than the "HPAGE_SIZE" hugetlbfs granularity.
+>=20
+> We also plan to use userfaultfd to make the balloon driver host enforced =
+(will
+> work fine on hugetlbfs 2M and tmpfs too) but that's going to be invisible=
+ to
+> the ABI so it's not strictly relevant for this discussion.
+>=20
+> On a side note, registering userfaultfd on the ballooned range, will keep
+> khugepaged at bay so it won't risk to re-inflating the MADV_DONTNEED
+> zapped sub-THP fragments no matter the sysfs tunings.
+>=20
 
-You mean the #inlcude "cpu-qom.h" statements? I think they are less
-critical since there is no cpu-qom.h in the generic include folder ...
-but yes, better safe than sorry, I'll fix these statements, too.
+Thanks for your elaboration!
 
- Thomas
+> Thanks!
+> Andrea
