@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59076)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33424)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cGztM-0003Ph-NV
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 22:06:05 -0500
+	(envelope-from <yi.l.liu@intel.com>) id 1cH0Au-0003vB-It
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 22:24:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cGztI-0000Ak-Nu
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 22:06:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46828)
+	(envelope-from <yi.l.liu@intel.com>) id 1cH0Ar-0004OE-D0
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 22:24:12 -0500
+Received: from mga09.intel.com ([134.134.136.24]:44873)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cGztI-0000AZ-HM
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 22:06:00 -0500
-Date: Wed, 14 Dec 2016 11:05:54 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20161214030554.GH32222@pxdev.xzpeter.org>
+	(Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1cH0Ar-0004O0-1V
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 22:24:09 -0500
+From: "Liu, Yi L" <yi.l.liu@intel.com>
+Date: Wed, 14 Dec 2016 03:24:01 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C257438FCB9E1@SHSMSX104.ccr.corp.intel.com>
 References: <1481020588-4245-1-git-send-email-peterx@redhat.com>
 	<1481020588-4245-2-git-send-email-peterx@redhat.com>
 	<20161212081650.GA13155@gmail.com>
+	<20161214030554.GH32222@pxdev.xzpeter.org>
+In-Reply-To: <20161214030554.GH32222@pxdev.xzpeter.org>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20161212081650.GA13155@gmail.com>
 Subject: Re: [Qemu-devel] [RFC PATCH 01/13] intel_iommu: allocate new key
  when creating new address space
 List-Id: <qemu-devel.nongnu.org>
@@ -29,59 +31,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Liu, Yi L" <yi.l.liu@linux.intel.com>, Jason Wang <jasowang@redhat.com>
-Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, bd.aviv@gmail.com, alex.williamson@redhat.com, yi.liu@intel.com
+To: Peter Xu <peterx@redhat.com>, "Liu, Yi L" <yi.l.liu@linux.intel.com>, Jason Wang <jasowang@redhat.com>
+Cc: "Lan, Tianyu" <tianyu.lan@intel.com>, "Tian, Kevin" <kevin.tian@intel.com>, "mst@redhat.com" <mst@redhat.com>, "jan.kiszka@siemens.com" <jan.kiszka@siemens.com>, "bd.aviv@gmail.com" <bd.aviv@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "Wu, Feng" <feng.wu@intel.com>
 
-On Mon, Dec 12, 2016 at 04:16:50PM +0800, Liu, Yi L wrote:
-> On Tue, Dec 06, 2016 at 06:36:16PM +0800, Peter Xu wrote:
-> > From: Jason Wang <jasowang@redhat.com>
-> > 
-> > We use the pointer to stack for key for new address space, this will
-> > break hash table searching, fixing by g_malloc() a new key instead.
-> > 
-> > Cc: Michael S. Tsirkin <mst@redhat.com>
-> > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > Cc: Richard Henderson <rth@twiddle.net>
-> > Cc: Eduardo Habkost <ehabkost@redhat.com>
-> > Acked-by: Peter Xu <peterx@redhat.com>
-> > Signed-off-by: Jason Wang <jasowang@redhat.com>
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >  hw/i386/intel_iommu.c | 5 +++--
-> >  1 file changed, 3 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> > index 708770e..92e4064 100644
-> > --- a/hw/i386/intel_iommu.c
-> > +++ b/hw/i386/intel_iommu.c
-> > @@ -2426,12 +2426,13 @@ VTDAddressSpace *vtd_find_add_as(IntelIOMMUState *s, PCIBus *bus, int devfn)
-> >      VTDAddressSpace *vtd_dev_as;
-> >  
-> >      if (!vtd_bus) {
-> > +        uintptr_t *new_key = g_malloc(sizeof(*new_key));
-> > +        *new_key = (uintptr_t)bus;
-> >          /* No corresponding free() */
-> >          vtd_bus = g_malloc0(sizeof(VTDBus) + sizeof(VTDAddressSpace *) * \
-> >                              X86_IOMMU_PCI_DEVFN_MAX);
-> >          vtd_bus->bus = bus;
-> > -        key = (uintptr_t)bus;
-> > -        g_hash_table_insert(s->vtd_as_by_busptr, &key, vtd_bus);
-> > +        g_hash_table_insert(s->vtd_as_by_busptr, new_key, vtd_bus);
-> Hi Peter,
-> Your fix seems to answer an issue I encountered back in Oct. The symptom is: use the same bus value to
-> searcha previous inserted entry in s->vtd_as_by_busptr, the result is not found.
-> 
-> really grt fix. could explain it a bit on why this change would fix the issue?
-
-The old code is doing g_hash_table_insert() with "&key" as the hash
-key. However variable "key" is allocated on stack, so it's value might
-change after we return from vtd_find_add_as() (stack variables can
-only be used inside its functional scope). The patch switched to use
-g_malloc0(), that'll use heap memory rather than stack, which is safe.
-
-(Forwarding this thankfulness to Jason who is the real author of this
- fix :-)
-
-Thanks,
-
--- peterx
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBRZW11LWRldmVsIFttYWlsdG86
+cWVtdS1kZXZlbC1ib3VuY2VzK3lpLmwubGl1PWludGVsLmNvbUBub25nbnUub3JnXSBPbg0KPiBC
+ZWhhbGYgT2YgUGV0ZXIgWHUNCj4gU2VudDogV2VkbmVzZGF5LCBEZWNlbWJlciAxNCwgMjAxNiAx
+MTowNiBBTQ0KPiBUbzogTGl1LCBZaSBMIDx5aS5sLmxpdUBsaW51eC5pbnRlbC5jb20+OyBKYXNv
+biBXYW5nIDxqYXNvd2FuZ0ByZWRoYXQuY29tPg0KPiBDYzogTGFuLCBUaWFueXUgPHRpYW55dS5s
+YW5AaW50ZWwuY29tPjsgVGlhbiwgS2V2aW4gPGtldmluLnRpYW5AaW50ZWwuY29tPjsNCj4gbXN0
+QHJlZGhhdC5jb207IGphbi5raXN6a2FAc2llbWVucy5jb207IGJkLmF2aXZAZ21haWwuY29tOyBx
+ZW11LQ0KPiBkZXZlbEBub25nbnUub3JnOyBhbGV4LndpbGxpYW1zb25AcmVkaGF0LmNvbTsgTGl1
+LCBZaSA8eWkubGl1QGludGVsLmNvbT4NCj4gU3ViamVjdDogUmU6IFtRZW11LWRldmVsXSBbUkZD
+IFBBVENIIDAxLzEzXSBpbnRlbF9pb21tdTogYWxsb2NhdGUgbmV3IGtleSB3aGVuDQo+IGNyZWF0
+aW5nIG5ldyBhZGRyZXNzIHNwYWNlDQo+IA0KPiBPbiBNb24sIERlYyAxMiwgMjAxNiBhdCAwNDox
+Njo1MFBNICswODAwLCBMaXUsIFlpIEwgd3JvdGU6DQo+ID4gT24gVHVlLCBEZWMgMDYsIDIwMTYg
+YXQgMDY6MzY6MTZQTSArMDgwMCwgUGV0ZXIgWHUgd3JvdGU6DQo+ID4gPiBGcm9tOiBKYXNvbiBX
+YW5nIDxqYXNvd2FuZ0ByZWRoYXQuY29tPg0KPiA+ID4NCj4gPiA+IFdlIHVzZSB0aGUgcG9pbnRl
+ciB0byBzdGFjayBmb3Iga2V5IGZvciBuZXcgYWRkcmVzcyBzcGFjZSwgdGhpcyB3aWxsDQo+ID4g
+PiBicmVhayBoYXNoIHRhYmxlIHNlYXJjaGluZywgZml4aW5nIGJ5IGdfbWFsbG9jKCkgYSBuZXcg
+a2V5IGluc3RlYWQuDQo+ID4gPg0KPiA+ID4gQ2M6IE1pY2hhZWwgUy4gVHNpcmtpbiA8bXN0QHJl
+ZGhhdC5jb20+DQo+ID4gPiBDYzogUGFvbG8gQm9uemluaSA8cGJvbnppbmlAcmVkaGF0LmNvbT4N
+Cj4gPiA+IENjOiBSaWNoYXJkIEhlbmRlcnNvbiA8cnRoQHR3aWRkbGUubmV0Pg0KPiA+ID4gQ2M6
+IEVkdWFyZG8gSGFia29zdCA8ZWhhYmtvc3RAcmVkaGF0LmNvbT4NCj4gPiA+IEFja2VkLWJ5OiBQ
+ZXRlciBYdSA8cGV0ZXJ4QHJlZGhhdC5jb20+DQo+ID4gPiBTaWduZWQtb2ZmLWJ5OiBKYXNvbiBX
+YW5nIDxqYXNvd2FuZ0ByZWRoYXQuY29tPg0KPiA+ID4gU2lnbmVkLW9mZi1ieTogUGV0ZXIgWHUg
+PHBldGVyeEByZWRoYXQuY29tPg0KPiA+ID4gLS0tDQo+ID4gPiAgaHcvaTM4Ni9pbnRlbF9pb21t
+dS5jIHwgNSArKystLQ0KPiA+ID4gIDEgZmlsZSBjaGFuZ2VkLCAzIGluc2VydGlvbnMoKyksIDIg
+ZGVsZXRpb25zKC0pDQo+ID4gPg0KPiA+ID4gZGlmZiAtLWdpdCBhL2h3L2kzODYvaW50ZWxfaW9t
+bXUuYyBiL2h3L2kzODYvaW50ZWxfaW9tbXUuYw0KPiA+ID4gaW5kZXggNzA4NzcwZS4uOTJlNDA2
+NCAxMDA2NDQNCj4gPiA+IC0tLSBhL2h3L2kzODYvaW50ZWxfaW9tbXUuYw0KPiA+ID4gKysrIGIv
+aHcvaTM4Ni9pbnRlbF9pb21tdS5jDQo+ID4gPiBAQCAtMjQyNiwxMiArMjQyNiwxMyBAQCBWVERB
+ZGRyZXNzU3BhY2UNCj4gKnZ0ZF9maW5kX2FkZF9hcyhJbnRlbElPTU1VU3RhdGUgKnMsIFBDSUJ1
+cyAqYnVzLCBpbnQgZGV2Zm4pDQo+ID4gPiAgICAgIFZUREFkZHJlc3NTcGFjZSAqdnRkX2Rldl9h
+czsNCj4gPiA+DQo+ID4gPiAgICAgIGlmICghdnRkX2J1cykgew0KPiA+ID4gKyAgICAgICAgdWlu
+dHB0cl90ICpuZXdfa2V5ID0gZ19tYWxsb2Moc2l6ZW9mKCpuZXdfa2V5KSk7DQo+ID4gPiArICAg
+ICAgICAqbmV3X2tleSA9ICh1aW50cHRyX3QpYnVzOw0KPiA+ID4gICAgICAgICAgLyogTm8gY29y
+cmVzcG9uZGluZyBmcmVlKCkgKi8NCj4gPiA+ICAgICAgICAgIHZ0ZF9idXMgPSBnX21hbGxvYzAo
+c2l6ZW9mKFZUREJ1cykgKyBzaXplb2YoVlREQWRkcmVzc1NwYWNlICopICogXA0KPiA+ID4gICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICBYODZfSU9NTVVfUENJX0RFVkZOX01BWCk7DQo+ID4g
+PiAgICAgICAgICB2dGRfYnVzLT5idXMgPSBidXM7DQo+ID4gPiAtICAgICAgICBrZXkgPSAodWlu
+dHB0cl90KWJ1czsNCj4gPiA+IC0gICAgICAgIGdfaGFzaF90YWJsZV9pbnNlcnQocy0+dnRkX2Fz
+X2J5X2J1c3B0ciwgJmtleSwgdnRkX2J1cyk7DQo+ID4gPiArICAgICAgICBnX2hhc2hfdGFibGVf
+aW5zZXJ0KHMtPnZ0ZF9hc19ieV9idXNwdHIsIG5ld19rZXksIHZ0ZF9idXMpOw0KPiA+IEhpIFBl
+dGVyLA0KPiA+IFlvdXIgZml4IHNlZW1zIHRvIGFuc3dlciBhbiBpc3N1ZSBJIGVuY291bnRlcmVk
+IGJhY2sgaW4gT2N0LiBUaGUgc3ltcHRvbSBpczogdXNlDQo+IHRoZSBzYW1lIGJ1cyB2YWx1ZSB0
+bw0KPiA+IHNlYXJjaGEgcHJldmlvdXMgaW5zZXJ0ZWQgZW50cnkgaW4gcy0+dnRkX2FzX2J5X2J1
+c3B0ciwgdGhlIHJlc3VsdCBpcyBub3QgZm91bmQuDQo+ID4NCj4gPiByZWFsbHkgZ3J0IGZpeC4g
+Y291bGQgZXhwbGFpbiBpdCBhIGJpdCBvbiB3aHkgdGhpcyBjaGFuZ2Ugd291bGQgZml4IHRoZSBp
+c3N1ZT8NCj4gDQo+IFRoZSBvbGQgY29kZSBpcyBkb2luZyBnX2hhc2hfdGFibGVfaW5zZXJ0KCkg
+d2l0aCAiJmtleSIgYXMgdGhlIGhhc2gNCj4ga2V5LiBIb3dldmVyIHZhcmlhYmxlICJrZXkiIGlz
+IGFsbG9jYXRlZCBvbiBzdGFjaywgc28gaXQncyB2YWx1ZSBtaWdodA0KPiBjaGFuZ2UgYWZ0ZXIg
+d2UgcmV0dXJuIGZyb20gdnRkX2ZpbmRfYWRkX2FzKCkgKHN0YWNrIHZhcmlhYmxlcyBjYW4NCj4g
+b25seSBiZSB1c2VkIGluc2lkZSBpdHMgZnVuY3Rpb25hbCBzY29wZSkuIFRoZSBwYXRjaCBzd2l0
+Y2hlZCB0byB1c2UNCj4gZ19tYWxsb2MwKCksIHRoYXQnbGwgdXNlIGhlYXAgbWVtb3J5IHJhdGhl
+ciB0aGFuIHN0YWNrLCB3aGljaCBpcyBzYWZlLg0KPiANCj4gKEZvcndhcmRpbmcgdGhpcyB0aGFu
+a2Z1bG5lc3MgdG8gSmFzb24gd2hvIGlzIHRoZSByZWFsIGF1dGhvciBvZiB0aGlzDQo+ICBmaXgg
+Oi0pDQoNClRoYW5rcyBmb3IgdGhlIGV4cGxhbmF0aW9uLCBQZXRlci4gSSBzZWUuIFRoZW4gaXQg
+aXMgc3VyZSB0aGlzIHJlYWxseSBmaXggd2hhdA0KSSBlbmNvdW50ZXJlZCBpbiBPY3QuIFJlYWxs
+eSBhIHdvbmRlcmZ1bCBmaXggSmFzb25+IA0KDQo+IA0KPiBUaGFua3MsDQo+IA0KPiAtLSBwZXRl
+cngNCg0K
