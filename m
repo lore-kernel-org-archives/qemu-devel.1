@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43316)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43850)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cHDa2-00031G-VX
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:43:03 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1cHDcR-0006Az-7y
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:45:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cHDZz-0002c4-RU
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:43:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57876)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cHDZz-0002ba-JI
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:42:59 -0500
-References: <1481706465-5636-1-git-send-email-thuth@redhat.com>
-	<87lgviiwn0.fsf@dusky.pond.sub.org>
-	<CAFEAcA9dOJPnwVy41ZMf4boPQ=VDz6R7P=jWa0ki6-anGedMdA@mail.gmail.com>
-	<50196ce3-9320-da14-07d2-867e09ffdcfc@redhat.com>
-	<87shpqcwyz.fsf@dusky.pond.sub.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8ca18f15-e2f6-965e-6eaa-7b935c83d9c4@redhat.com>
-Date: Wed, 14 Dec 2016 18:42:49 +0100
+	(envelope-from <ehabkost@redhat.com>) id 1cHDcP-00039X-Ad
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:45:31 -0500
+Date: Wed, 14 Dec 2016 15:31:51 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20161214173151.GL3808@thinpad.lan.raisama.net>
+References: <1481575745-26120-1-git-send-email-ehabkost@redhat.com>
+	<20161214164214.54254668@bahia.lan>
+	<20161214170427.GK3808@thinpad.lan.raisama.net>
+	<20161214182233.0fb3c1e5@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <87shpqcwyz.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.9 v2] Move target-* CPU file into a
- target/ folder
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20161214182233.0fb3c1e5@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH for-2.8.1 v2] machine: Convert abstract
+ typename on compat_props to subclass names
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,63 +26,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Anthony Green <green@moxielogic.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, QEMU Developers <qemu-devel@nongnu.org>, Max Filippov <jcmvbkbc@gmail.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Jia Liu <proljc@gmail.com>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, David Gibson <david@gibson.dropbear.id.au>, Artyom Tarasenko <atar4qemu@gmail.com>, James Hogan <james.hogan@imgtec.com>, Eduardo Habkost <ehabkost@redhat.com>, Yongbok Kim <yongbok.kim@imgtec.com>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Marcelo Tosatti <mtosatti@redhat.com>, Laurent Vivier <laurent@vivier.eu>, Michael Walle <michael@walle.cc>, Aurelien Jarno <aurelien@aurel32.net>
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-stable@nongnu.org, Halil Pasic <pasic@linux.vnet.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-
-
-On 14/12/2016 17:11, Markus Armbruster wrote:
-> Thomas Huth <thuth@redhat.com> writes:
+On Wed, Dec 14, 2016 at 06:22:33PM +0100, Greg Kurz wrote:
+> On Wed, 14 Dec 2016 15:04:27 -0200
+> Eduardo Habkost <ehabkost@redhat.com> wrote:
 > 
->> On 14.12.2016 12:33, Peter Maydell wrote:
->>> On 14 December 2016 at 11:21, Markus Armbruster <armbru@redhat.com> wrote:
->>>> Thomas Huth <thuth@redhat.com> writes:
->>>>
->>>>> We've currently got 18 architectures in QEMU, and thus 18 target-xxx
->>>>> folders in the root folder of the QEMU source tree. More architectures
->>>>> (e.g. RISC-V, AVR) are likely to be included soon, too, so the main
->>>>> folder of the QEMU sources slowly gets quite overcrowded with the
->>>>> target-xxx folders.
->>>>> To disburden the main folder a little bit, let's move the target-xxx
->>>>> folders into a dedicated target/ folder, so that target-xxx/ simply
->>>>> becomes target/xxx/ instead.
->>>>
->>>> The root directory is crowded, but hardly because of its 18 target-*
->>>> entries:
->>>>
->>>>     $ git-ls-tree --name-only v2.8.0-rc3 | wc -l
->>>>     167
->>>>
->>>> Getting the 18 target-* out of the way would help a little, but I hate
->>>> making the directory tree deeper.
->>
->> We already got folders in folders in a lot of places, so this is not
->> increasing the maximum depths ;-)
+> > On Wed, Dec 14, 2016 at 04:42:14PM +0100, Greg Kurz wrote:
+> > > On Mon, 12 Dec 2016 18:49:05 -0200
+> > > Eduardo Habkost <ehabkost@redhat.com> wrote:
+> > >   
+> > > > Original problem description by Greg Kurz:
+> > > >   
+> > > > > Since commit "9a4c0e220d8a hw/virtio-pci: fix virtio
+> > > > > behaviour", passing -device virtio-blk-pci.disable-modern=off
+> > > > > has no effect on 2.6 machine types because the internal
+> > > > > virtio-pci.disable-modern=on compat property always prevail.    
+> > > > 
+> > > > The same bug also affects other abstract type names mentioned on
+> > > > compat_props by machine-types: apic-common, i386-cpu, pci-device,
+> > > > powerpc64-cpu, s390-skeys, spapr-pci-host-bridge, usb-device,
+> > > > virtio-pci, x86_64-cpu.
+> > > > 
+> > > > The right fix for this problem is to make sure compat_props and
+> > > > -global options are always applied in the order they are
+> > > > registered, instead of reordering them based on the type
+> > > > hierarchy. But changing the ordering rules of -global is risky
+> > > > and might break existing configurations, so we shouldn't do that
+> > > > on a stable branch.
+> > > > 
+> > > > This is a temporary hack that will work around the bug when
+> > > > registering compat_props properties: if we find an abstract class
+> > > > on compat_props, register properties for all its non-abstract
+> > > > subtypes instead. This will make sure -global won't be overridden
+> > > > by compat_props, while keeping the existing ordering rules on
+> > > > -global options.
+> > > > 
+> > > > Note that there's one case that won't be fixed by this hack:
+> > > > "-global spapr-pci-vfio-host-bridge.<option>=<value>" won't be
+> > > > able to override compat_props, because spapr-pci-host-bridge is
+> > > > not an abstract class.
+> > > > 
+> > > > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> > > > ---  
+> > > 
+> > > This patch had 3 r-b. Is there any good reason to hold
+> > > it up to 2.8.1 ?  
+> > 
+> > Applying it today would mean delaying the 2.8.0 release, and the
+> > bug is not serious enough to justify that.
+> > 
 > 
-> Let me rephrase: I hate making directory tree *branches* deeper.
+> IIUC there will be a v2.8.0-rc4 because we want this patch in 2.8:
 > 
->>>> We have 110 files in the root directory.  Moving some of them to
->>>> subdirectories looks more promising to me.
->>>
->>> True, but Thomas has done the work here already, so I don't think
->>> we lose anything by merging it rather than throwing it away.
->>
->> Yes, and please consider that there are more targets coming soon ...
->> RISC-V, AVR, ... and I am pretty sure that we won't stop there.
+> [PATCH v3] virtio-pci: Fix cross-version migration  with older machines
 > 
-> Even doubling the number of target-* won't make our root directory
-> appreciatively messier.
+> From IRC:
+> 
+> <stefanha> mcoquelin: Once Michael Tsirkin has reviewed your patch I'll merge it and tag v2.8.0-rc4 (today or tomorrow?).  The QEMU 2.8 release will be next Tuesday.
 
-Cutting down the number of toplevel directories by 1/3rd makes some
-sense though.
+Oh, I didn't know that. Thanks for the pointer.
 
->> With regards to the other *.c files in the main directory, I agree with
->> Markus, we should move some of them to suitable subdirectories, too. I
->> could have a look at that when I've got some spare minutes...
-> 
-> Thanks in advance!
+But I'd still like to have more time to test this patch, as it
+affects multiple machine-types on multiple targets. I think the
+hack is a bit risky to be included in the last minute before the
+final release.
 
-Yeah, there are some easy moves to migration/ and block/.  (One old idea
-was also to move block layer drivers to block/{formats,protocols}/ to
-make room for the core block layer in block/).  Also perhaps new
-directories monitor/, accel/ and tools/.
+-- 
+Eduardo
