@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55239)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55460)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1cH93D-0002G4-W6
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 07:52:56 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cH94o-00084u-T5
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 07:54:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1cH937-0007CN-Ou
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 07:52:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41480)
+	(envelope-from <kwolf@redhat.com>) id 1cH94l-0007fQ-Rq
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 07:54:30 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35220)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
-	id 1cH937-0007C5-FW
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 07:52:45 -0500
-From: Maxime Coquelin <maxime.coquelin@redhat.com>
-Date: Wed, 14 Dec 2016 13:52:37 +0100
-Message-Id: <20161214125237.20850-1-maxime.coquelin@redhat.com>
-Subject: [Qemu-devel] [PATCH] virtio-pci: Fix cross-version migration with
- older machines
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1cH94k-0007eH-Fk
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 07:54:27 -0500
+Date: Wed, 14 Dec 2016 13:54:23 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20161214125423.GB4135@noname.redhat.com>
+References: <20161213214917.6436-1-stefanha@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20161213214917.6436-1-stefanha@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] Update language files for QEMU 2.8.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,97 +26,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mdroth@linux.vnet.ibm.com, stefanha@redhat.com, qemu-devel@nongnu.org, mst@redhat.com, cornelia.huck@de.ibm.com, marcel@redhat.com
-Cc: Maxime Coquelin <maxime.coquelin@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, Stefan Weil <sw@weilnetz.de>
 
-This patch fixes a cross-version migration regression introduced
-by commit d1b4259f ("virtio-bus: Plug devices after features are
-negotiated").
+Am 13.12.2016 um 22:49 hat Stefan Hajnoczi geschrieben:
+> Update translation files (change created via 'make -C po update').
+> 
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-The problem is encountered when host's vhost backend does not support
-VIRTIO_F_VERSION_1, and migration is initiated from a v2.7 or prior
-machine with virtio-pci modern capabilities enabled to a v2.8 machine.
+Should we actually try to translate the additional string instead of
+just adding it as a placeholder? I can send a de_DE patch, if you like.
 
-In this case, modern capabilities get exposed to the guest by the source,
-whereas the target will detect version 1 is not supported so will only
-expose legacy capabilities.
+And actually, what is the "Copy" menu entry supposed to do apart from
+immediately crashing with a segfault, which it does for me in a qemu
+process without options?
 
-The problem is fixed by introducing a new "x-modern-broken" property,
-which is set in v2.7 and prior compatibility modes. Doing this, v2.7
-machine keeps its broken behaviour (enabling modern while version is
-not supported), and newer machines will behave correctly.
+And would that crash be considered a release blocker, too?
 
-Reported-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-Suggested-by: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Michael S. Tsirkin <mst@redhat.com>
-Cc: Cornelia Huck <cornelia.huck@de.ibm.com>
-Cc: Marcel Apfelbaum <marcel@redhat.com>
-Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
----
-
-I'm not sure about the property name, let me know if you have better ideas.
-I didn't tested migration yet, but I wanted to share the patch while I test it.
-I tested booting v2.8 and v2.7 machines with !VERSION_1 and get expected result:
- - v2.8: Virtio-pci probe succeed
- - v2.7: Virtio-pci probe fails
-
-Thanks,
-Maxime
-
- hw/virtio/virtio-pci.c | 4 +++-
- hw/virtio/virtio-pci.h | 1 +
- include/hw/compat.h    | 4 ++++
- 3 files changed, 8 insertions(+), 1 deletion(-)
-
-diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-index 521ba0b..93f6b54 100644
---- a/hw/virtio/virtio-pci.c
-+++ b/hw/virtio/virtio-pci.c
-@@ -1580,7 +1580,8 @@ static void virtio_pci_device_plugged(DeviceState *d, Error **errp)
-      * Virtio capabilities present without
-      * VIRTIO_F_VERSION_1 confuses guests
-      */
--    if (!virtio_has_feature(vdev->host_features, VIRTIO_F_VERSION_1)) {
-+    if (!proxy->modern_broken &&
-+            !virtio_has_feature(vdev->host_features, VIRTIO_F_VERSION_1)) {
-         virtio_pci_disable_modern(proxy);
- 
-         if (!legacy) {
-@@ -1852,6 +1853,7 @@ static Property virtio_pci_properties[] = {
-                     VIRTIO_PCI_FLAG_DISABLE_PCIE_BIT, false),
-     DEFINE_PROP_BIT("page-per-vq", VirtIOPCIProxy, flags,
-                     VIRTIO_PCI_FLAG_PAGE_PER_VQ_BIT, false),
-+    DEFINE_PROP_BOOL("x-modern-broken", VirtIOPCIProxy, modern_broken, false),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h
-index b2a996f..1dca223 100644
---- a/hw/virtio/virtio-pci.h
-+++ b/hw/virtio/virtio-pci.h
-@@ -153,6 +153,7 @@ struct VirtIOPCIProxy {
-     int config_cap;
-     uint32_t flags;
-     bool disable_modern;
-+    bool modern_broken;
-     OnOffAuto disable_legacy;
-     uint32_t class_code;
-     uint32_t nvectors;
-diff --git a/include/hw/compat.h b/include/hw/compat.h
-index 0f06e11..fe11723 100644
---- a/include/hw/compat.h
-+++ b/include/hw/compat.h
-@@ -18,6 +18,10 @@
-         .driver   = "intel-iommu",\
-         .property = "x-buggy-eim",\
-         .value    = "true",\
-+    },{\
-+        .driver   = "virtio-pci",\
-+        .property = "x-modern-broken",\
-+        .value    = "on",\
-     },
- 
- #define HW_COMPAT_2_6 \
--- 
-2.9.3
+Kevin
