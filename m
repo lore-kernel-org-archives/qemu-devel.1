@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52381)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54178)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ashmit602@gmail.com>) id 1cGx7R-00077x-MI
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 19:08:27 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cGxEk-0008WR-O8
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 19:16:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ashmit602@gmail.com>) id 1cGx7O-0000ze-GS
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 19:08:25 -0500
-Received: from mail-io0-f195.google.com ([209.85.223.195]:34499)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ashmit602@gmail.com>) id 1cGx7O-0000uN-BX
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 19:08:22 -0500
-Received: by mail-io0-f195.google.com with SMTP id y124so1500767iof.1
-	for <qemu-devel@nongnu.org>; Tue, 13 Dec 2016 16:07:59 -0800 (PST)
+	(envelope-from <dgibson@ozlabs.org>) id 1cGxEg-0002dC-Gm
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 19:15:58 -0500
+Date: Wed, 14 Dec 2016 11:14:51 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20161214001451.GB32647@umbus>
+References: <1481633076-24521-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-From: ashish mittal <ashmit602@gmail.com>
-Date: Tue, 13 Dec 2016 16:06:58 -0800
-Message-ID: <CAAo6VWMJAYeLdtEmyQ43vYeYjvNzCP80Wufe4=eNRUZum0rYdQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v7 RFC] block/vxhs: Initial commit to add
- Veritas HyperScale VxHS block device support
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="FkmkrVfFsRoUs1wW"
+Content-Disposition: inline
+In-Reply-To: <1481633076-24521-1-git-send-email-thuth@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] hw/ppc/spapr: Fix boot path of usb-host
+ storage devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,91 +24,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Ketan Nilangekar <Ketan.Nilangekar@veritas.com>, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Jeff Cody <jcody@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, Fam Zheng <famz@redhat.com>, Ashish Mittal <Ashish.Mittal@veritas.com>, Abhijit Dey <Abhijit.Dey@veritas.com>, Buddhi Madhav <Buddhi.Madhav@veritas.com>, "Venkatesha M.G." <Venkatesha.Mg@veritas.com>, Nitin Jerath <Nitin.Jerath@veritas.com>, Gaurav Bhandarkar <Gaurav.Bhandarkar@veritas.com>, Abhishek Kane <Abhishek.Kane@veritas.com>, Ketan Mahajan <Ketan.Mahajan@veritas.com>, Niranjan Pendharkar <Niranjan.Pendharkar@veritas.com>, Nirendra Awasthi <Nirendra.Awasthi@veritas.com>, Rakesh Ranjan <Rakesh.Ranjan@veritas.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org
 
-Hi,
 
-I am requesting feedback on the following design proposal for libqnio.
+--FkmkrVfFsRoUs1wW
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-This adds an access control mechanism between libqnio client and
-server. It is not a full client-server authentication model, and it is
-not intended to substitute an authentication mechanism.
+On Tue, Dec 13, 2016 at 01:44:36PM +0100, Thomas Huth wrote:
+> When passing through a USB storage device to a pseries guest, it
+> is currently not possible to automatically boot from the device
+> if the "bootindex" property has been specified, too (e.g. when using
+> "-device nec-usb-xhci -device usb-host,hostbus=3D1,hostaddr=3D2,bootindex=
+=3D0"
+> at the command line). The problem is that QEMU builds a device tree path
+> like "/pci@800000020000000/usb@0/usb-host@1" and passes it to SLOF
+> in the /chosen/qemu,boot-list property. SLOF, however, probes the
+> USB device, recognizes that it is a storage device and thus changes
+> its name to "storage", and additionally adds a child node for the
+> SCSI LUN, so the correct boot path in SLOF is something like
+> "/pci@800000020000000/usb@0/storage@1/disk@101000000000000" instead.
+> So when we detect an USB mass storage device with SCSI interface,
+> we've got to adjust the firmware boot-device path properly, so that
+> SLOF can automatically boot from the device.
+>=20
+> Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=3D1354177
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  hw/ppc/spapr.c       |  9 +++++++++
+>  hw/usb/host-libusb.c | 29 +++++++++++++++++++++++++++++
+>  hw/usb/host-stub.c   |  5 +++++
+>  include/hw/usb.h     |  1 +
+>  4 files changed, 44 insertions(+)
+>=20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 208ef7b..fe315b5 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -2185,6 +2185,15 @@ static char *spapr_get_fw_dev_path(FWPathProvider =
+*p, BusState *bus,
+>          }
+>      }
 
-We wanted to check if the following would be acceptable for the first
-version of VxHS patch while we design/implement a proper
-authentication mechanism (possibly on a libqnio side branch)?
+I think a chunk of your commit message needs to go into a comment
+here.  Anticipating the guest firmware behaviour is kind of a hack - I
+think it's worth it in this case, but we do need to make it clear to
+someone reading the code what the rationale is.
 
-1.       Client passes VM ID and vdisk ID to the server when it wants
-to open a vdisk.
-2.       Server verifies whether the client/VM has access to open the
-disk and passes/fails the open request.
-3.       Server returns unique token for every open vdisk.
-4.       Client passes this token with every request to server.
-5.       Server verifies this token for every request.
-6.       Server invalidates token when a client closes the corresponding vdisk.
+> +    if (strcmp("usb-host", qdev_fw_name(dev)) =3D=3D 0) {
+> +        USBDevice *usbdev =3D CAST(USBDevice, dev, TYPE_USB_DEVICE);
+> +
+> +        /* SLOF scans USB storage and adds a "disk" node for the SCSI LU=
+N */
+> +        if (usb_host_dev_is_scsi_storage(usbdev)) {
+> +            return g_strdup_printf("storage@%s/disk", usbdev->port->path=
+);
+> +        }
+> +    }
+> +
+>      if (phb) {
+>          /* Replace "pci" with "pci@800000020000000" */
+>          return g_strdup_printf("pci@%"PRIX64, phb->buid);
+> diff --git a/hw/usb/host-libusb.c b/hw/usb/host-libusb.c
+> index bd81d71..7791c6d 100644
+> --- a/hw/usb/host-libusb.c
+> +++ b/hw/usb/host-libusb.c
+> @@ -1707,6 +1707,35 @@ static void usb_host_auto_check(void *unused)
+>      timer_mod(usb_auto_timer, qemu_clock_get_ms(QEMU_CLOCK_REALTIME) + 2=
+000);
+>  }
+> =20
+> +/**
+> + * Check whether USB host device has a USB mass storage SCSI interface
+> + */
+> +bool usb_host_dev_is_scsi_storage(USBDevice *ud)
+> +{
+> +    USBHostDevice *uhd =3D USB_HOST_DEVICE(ud);
+> +    struct libusb_config_descriptor *conf;
+> +    const struct libusb_interface_descriptor *intf;
+> +    bool is_scsi_storage =3D false;
+> +    int i;
+> +
+> +    if (!uhd || libusb_get_active_config_descriptor(uhd->dev, &conf) !=
+=3D 0) {
+> +        return false;
+> +    }
+> +
+> +    for (i =3D 0; i < conf->bNumInterfaces; i++) {
+> +        intf =3D &conf->interface[i].altsetting[ud->altsetting[i]];
+> +        if (intf->bInterfaceClass =3D=3D LIBUSB_CLASS_MASS_STORAGE &&
+> +            intf->bInterfaceSubClass =3D=3D 6) {                 /* 6 me=
+ans SCSI */
+> +            is_scsi_storage =3D true;
+> +            break;
+> +        }
+> +    }
+> +
+> +    libusb_free_config_descriptor(conf);
+> +
+> +    return is_scsi_storage;
+> +}
+> +
+>  void hmp_info_usbhost(Monitor *mon, const QDict *qdict)
+>  {
+>      libusb_device **devs =3D NULL;
+> diff --git a/hw/usb/host-stub.c b/hw/usb/host-stub.c
+> index 6ba65a1..d0268ba 100644
+> --- a/hw/usb/host-stub.c
+> +++ b/hw/usb/host-stub.c
+> @@ -46,3 +46,8 @@ USBDevice *usb_host_device_open(USBBus *bus, const char=
+ *devname)
+>  {
+>      return NULL;
+>  }
+> +
+> +bool usb_host_dev_is_scsi_storage(USBDevice *ud)
+> +{
+> +    return false;
+> +}
+> diff --git a/include/hw/usb.h b/include/hw/usb.h
+> index 847c9de..43838c9 100644
+> --- a/include/hw/usb.h
+> +++ b/include/hw/usb.h
+> @@ -471,6 +471,7 @@ void usb_generic_async_ctrl_complete(USBDevice *s, US=
+BPacket *p);
+>  /* usb-linux.c */
+>  USBDevice *usb_host_device_open(USBBus *bus, const char *devname);
+>  void hmp_info_usbhost(Monitor *mon, const QDict *qdict);
+> +bool usb_host_dev_is_scsi_storage(USBDevice *usbdev);
+> =20
+>  /* usb ports of the VM */
+> =20
 
-Thanks,
-Ashish
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-On Wed, Nov 30, 2016 at 1:01 AM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
-> On Mon, Nov 28, 2016 at 02:17:56PM +0000, Stefan Hajnoczi wrote:
->> Please take a look at vhost-user-scsi, which folks from Nutanix are
->> currently working on.  See "[PATCH v2 0/3] Introduce vhost-user-scsi and
->> sample application" on qemu-devel.  It is a true zero-copy local I/O tap
->> because it shares guest RAM.  This is more efficient than cross memory
->> attach's single memory copy.  It does not require running the server as
->> root.  This is the #1 thing you should evaluate for your final
->> architecture.
->>
->> vhost-user-scsi works on the virtio-scsi emulation level.  That means
->> the server must implement the virtio-scsi vring and device emulation.
->> It is not a block driver.  By hooking in at this level you can achieve
->> the best performance but you lose all QEMU block layer functionality and
->> need to implement your own SCSI target.  You also need to consider live
->> migration.
->
-> To clarify why I think vhost-user-scsi is best suited to your
-> requirements for performance:
->
-> With vhost-user-scsi the qnio server would be notified by kvm.ko via
-> eventfd when the VM submits new I/O requests to the virtio-scsi HBA.
-> The QEMU process is completely bypassed for I/O request submission and
-> the qnio server processes the SCSI command instead.  This avoids the
-> context switch to QEMU and then to the qnio server.  With cross memory
-> attach QEMU first needs to process the I/O request and hand it to
-> libqnio before the qnio server can be scheduled.
->
-> The vhost-user-scsi qnio server has shared memory access to guest RAM
-> and is therefore able to do zero-copy I/O into guest buffers.  Cross
-> memory attach always incurs a memory copy.
->
-> Using this high-performance architecture requires significant changes
-> though.  vhost-user-scsi hooks into the stack at a different layer so a
-> QEMU block driver is not used at all.  QEMU also wouldn't use libqnio.
-> Instead everything will live in your qnio server process (not part of
-> QEMU).
->
-> You'd have to rethink the resiliency strategy because you currently rely
-> on the QEMU block driver connecting to a different qnio server if the
-> local qnio server fails.  In the vhost-user-scsi world it's more like
-> having a phyiscal SCSI adapter - redundancy and multipathing are used to
-> achieve resiliency.
->
-> For example, virtio-scsi HBA #1 would connect to the local qnio server
-> process.  virtio-scsi HBA #2 would connect to another local process
-> called the "proxy process" which forwards requests to a remote qnio
-> server (using libqnio?).  If HBA #1 fails then I/O is sent to HBA #2
-> instead.  The path can reset back to HBA #1 once that becomes
-> operational again.
->
-> If the qnio server is supposed to run in a VM instead of directly in the
-> host environment then it's worth looking at the vhost-pci work that Wei
-> Wang <wei.w.wang@intel.com> is working on.  The email thread is called
-> "[PATCH v2 0/4] *** vhost-user spec extension for vhost-pci ***".  The
-> idea here is to allow inter-VM virtio device emulation so that instead
-> of terminating the virtio-scsi device in the qnio server process on the
-> host, you can terminate it inside another VM with good performance
-> characteristics.
->
-> Stefan
+--FkmkrVfFsRoUs1wW
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJYUI73AAoJEGw4ysog2bOSWEwP/A8tV1VjQFE024hlcqm8q+ft
+J+XA3DaA7wf6adQdee1PD3P8APEGhtrkQdtrLLXjayvWR3062qqXGRCWlAulwim/
+gr8035uFXdGHSZP6fJqrHOeUwatzn8/1IJGZlQ6VYPO+FPXlm3cfbFC6r9atJKRG
+LX5OBZtI4foejDsjCgVqbLDKgTIyKHkNd5IBTnOLzN1WD8U0Y/UzNr+HsDJQL/eF
+jqsrXWgV5vXZ8ESXQdDDUL0tfaKCakAKcERPWTnlWcR1dzccYkTIWECTSS0XfCTe
+DTwuB2dkYTlKCd98vD48pFzl82b7mIWeUGm6Ct/sncpjrMYo3VXUdZIb15/hqqTp
+0ztaOYzNXqJEcUhwiCtJ9KenbSon+zZFU35WeLjhhOX+uBXlZUxu7BjTtwG/SxEF
+63bW01jaOFt5y+4JDaWa5PX7XDH11LLHFvJccYwNYkjvWcWRgV54M5ugKknh2ul1
+xnQvuIzY7voniQjLjWJguwbOgALIhXP0t/guw1WPLA5Ue5VyqJVCLKjpvuJIWbrv
+57Duzd9Yaw4HVXlrjvgDIr5lGLshVlyuMk0dbtN190DVdfG4t6MFHHpRmvz6ing+
++FGjJKAfNDiN7ySyhfni2XsmzDkQPr8D9hYkNkO7RT6lI34RnKIBdfLwyYUA8eQr
+zUMMkN0GH1vzj+A9p30i
+=IBs5
+-----END PGP SIGNATURE-----
+
+--FkmkrVfFsRoUs1wW--
