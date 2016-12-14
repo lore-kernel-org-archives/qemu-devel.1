@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39629)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43831)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cHHfW-0004WV-Dx
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 17:04:59 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1cHI00-0006Ou-U4
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 17:26:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cHHfS-0006ak-DA
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 17:04:58 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56244)
+	(envelope-from <ehabkost@redhat.com>) id 1cHHzx-0004gU-NR
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 17:26:08 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36670)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cHHfS-0006aP-4D
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 17:04:54 -0500
-Date: Thu, 15 Dec 2016 00:04:51 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20161215000438-mutt-send-email-mst@kernel.org>
-References: <20161214163035.3297-1-maxime.coquelin@redhat.com>
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cHHzx-0004g0-Eu
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 17:26:05 -0500
+Date: Wed, 14 Dec 2016 20:26:01 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20161214222601.GP3808@thinpad.lan.raisama.net>
+References: <1481732391-882-1-git-send-email-vlad.lungu@windriver.com>
+	<ef1f3b2a-d206-7082-3227-423e0d9d9619@redhat.com>
+	<20161214170058.GJ3808@thinpad.lan.raisama.net>
+	<abea10db-9da8-d6eb-c6eb-67817b1fadda@redhat.com>
+	<20161214175144.GN3808@thinpad.lan.raisama.net>
+	<1509132582.4065072.1481751487408.JavaMail.zimbra@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20161214163035.3297-1-maxime.coquelin@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3] virtio-pci: Fix cross-version migration
- with older machines
+In-Reply-To: <1509132582.4065072.1481751487408.JavaMail.zimbra@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] multiboot: copy the cmdline verbatim
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,99 +31,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Maxime Coquelin <maxime.coquelin@redhat.com>
-Cc: mdroth@linux.vnet.ibm.com, stefanha@redhat.com, qemu-devel@nongnu.org, cornelia.huck@de.ibm.com, marcel@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Vlad Lungu <vlad.lungu@windriver.com>, qemu-devel@nongnu.org, rth@twiddle.net
 
-On Wed, Dec 14, 2016 at 05:30:35PM +0100, Maxime Coquelin wrote:
-> This patch fixes a cross-version migration regression introduced
-> by commit d1b4259f ("virtio-bus: Plug devices after features are
-> negotiated").
+On Wed, Dec 14, 2016 at 04:38:07PM -0500, Paolo Bonzini wrote:
 > 
-> The problem is encountered when host's vhost backend does not support
-> VIRTIO_F_VERSION_1, and migration is initiated from a v2.7 or prior
-> machine with virtio-pci modern capabilities enabled to a v2.8 machine.
 > 
-> In this case, modern capabilities get exposed to the guest by the source,
-> whereas the target will detect version 1 is not supported so will only
-> expose legacy capabilities.
+> ----- Original Message -----
+> > From: "Eduardo Habkost" <ehabkost@redhat.com>
+> > To: "Paolo Bonzini" <pbonzini@redhat.com>
+> > Cc: "Vlad Lungu" <vlad.lungu@windriver.com>, qemu-devel@nongnu.org, rth@twiddle.net
+> > Sent: Wednesday, December 14, 2016 6:51:44 PM
+> > Subject: Re: [PATCH] multiboot: copy the cmdline verbatim
+> > 
+> > On Wed, Dec 14, 2016 at 06:20:46PM +0100, Paolo Bonzini wrote:
+> > > On 14/12/2016 18:00, Eduardo Habkost wrote:
+> > > > On Wed, Dec 14, 2016 at 05:55:07PM +0100, Paolo Bonzini wrote:
+> > > >>
+> > > >>
+> > > >> On 14/12/2016 17:19, Vlad Lungu wrote:
+> > > >>> get_opt_value() truncates the value at the first comma.
+> > > >>> Use memcpy() instead.
+> > > >>
+> > > >> Looks good since get_opt_value is already used by the caller.  Have you
+> > > >> tested this with multiple initrd modules too?
+> > > > 
+> > > > get_opt_value() is used by the caller, but with NULL buf
+> > > > argument. This means the caller doesn't handle ",," escaping.
+> > > > (See my reply to the previous submission of this patch)
+> > > 
+> > > Hmm, wait.  When NULL is passed, ",," escaping is handled correctly in
+> > > that next_initrd points to the next lone comma.  The lone comma is
+> > > replaced with a '\0' by the caller.
+> > 
+> > It is handled correctly when splitting the string, but not when opening the
+> > file.
+> > 
+> > > 
+> > > So you need to use get_opt_value again in mb_add_cmdline to do the
+> > > unescaping, because mb_add_cmdline only receives double commas.
+> > > 
+> > > This was actually my first reaction to the patch, and it was correct.
+> > > Then I overthought it. :)
+> > > 
+> > > So the patch is wrong.
+> > 
+> > Except that the caller is already broken when using ",," for a
+> > different reason: it calls get_image_size(initrd_filename) and
+> > load_image(initrd_filename, ...) directly. So comma-escaping
+> > never worked anyway:
+> > 
+> >   $ qemu-system-x86_64 -kernel ~/Downloads/gnumach -initrd
+> >   /tmp/one,,file,/tmp/another,,file
+> >   Failed to open file '/tmp/one,,file'
+> > 
+> > The right fix for comma-escaping would require calling
+> > get_opt_value() with non-NULL buf outside mb_add_cmdline(),
+> > because the mb_add_cmdline(&mbs, kcmdline) call do NOT need
+> > get_opt_value() to be called.
 > 
-> The problem is fixed by introducing a new "x-ignore-backend-features"
-> property, which is set in v2.7 and prior compatibility modes. Doing this,
-> v2.7 machine keeps its broken behaviour (enabling modern while version
-> is not supported), and newer machines will behave correctly.
+> For filenames containing commas you're right, but...
 > 
-> Reported-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-> Suggested-by: Stefan Hajnoczi <stefanha@redhat.com>
-> Cc: Michael S. Tsirkin <mst@redhat.com>
-> Cc: Cornelia Huck <cornelia.huck@de.ibm.com>
-> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> Tested-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-> Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
+> > In other words: this fixes the mb_add_cmdline(kcmdline) case, and
+> > doesn't break comma escaping on the initrd case (because it was
+> > already broken). I don't see a problem with this patch.
+> 
+> ... there is one case of comma escaping that wasn't broken:
+> 
+>     $ qemu-system-x86_64 -kernel foo -initrd '/tmp/one arg,,with,,commas,/tmp/another arg,,with,,commas'
+> 
 
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Oh, I didn't notice the whitespace-based split for initrd
+arguments.
 
-> ---
-> 
-> V3 fixes commit message with the new property name.
-> V2 changes the naming as proposed by Michael T.and Cornelia, and
-> fixes commit message.
-> 
->  hw/virtio/virtio-pci.c | 5 ++++-
->  hw/virtio/virtio-pci.h | 1 +
->  include/hw/compat.h    | 4 ++++
->  3 files changed, 9 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-> index 521ba0b..21c2b9d 100644
-> --- a/hw/virtio/virtio-pci.c
-> +++ b/hw/virtio/virtio-pci.c
-> @@ -1580,7 +1580,8 @@ static void virtio_pci_device_plugged(DeviceState *d, Error **errp)
->       * Virtio capabilities present without
->       * VIRTIO_F_VERSION_1 confuses guests
->       */
-> -    if (!virtio_has_feature(vdev->host_features, VIRTIO_F_VERSION_1)) {
-> +    if (!proxy->ignore_backend_features &&
-> +            !virtio_has_feature(vdev->host_features, VIRTIO_F_VERSION_1)) {
->          virtio_pci_disable_modern(proxy);
->  
->          if (!legacy) {
-> @@ -1852,6 +1853,8 @@ static Property virtio_pci_properties[] = {
->                      VIRTIO_PCI_FLAG_DISABLE_PCIE_BIT, false),
->      DEFINE_PROP_BIT("page-per-vq", VirtIOPCIProxy, flags,
->                      VIRTIO_PCI_FLAG_PAGE_PER_VQ_BIT, false),
-> +    DEFINE_PROP_BOOL("x-ignore-backend-features", VirtIOPCIProxy,
-> +                     ignore_backend_features, false),
->      DEFINE_PROP_END_OF_LIST(),
->  };
->  
-> diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h
-> index b2a996f..5e07886 100644
-> --- a/hw/virtio/virtio-pci.h
-> +++ b/hw/virtio/virtio-pci.h
-> @@ -153,6 +153,7 @@ struct VirtIOPCIProxy {
->      int config_cap;
->      uint32_t flags;
->      bool disable_modern;
-> +    bool ignore_backend_features;
->      OnOffAuto disable_legacy;
->      uint32_t class_code;
->      uint32_t nvectors;
-> diff --git a/include/hw/compat.h b/include/hw/compat.h
-> index 0f06e11..8dfc7a3 100644
-> --- a/include/hw/compat.h
-> +++ b/include/hw/compat.h
-> @@ -18,6 +18,10 @@
->          .driver   = "intel-iommu",\
->          .property = "x-buggy-eim",\
->          .value    = "true",\
-> +    },{\
-> +        .driver   = "virtio-pci",\
-> +        .property = "x-ignore-backend-features",\
-> +        .value    = "on",\
->      },
->  
->  #define HW_COMPAT_2_6 \
-> -- 
-> 2.9.3
+This is messier than I thought. Maybe the simplest solution is to
+inline mb_add_cmdline() at both callers, and change the kcmdline
+one to use memcpy().
+
+> And presumably this is what Vlad was trying to do.
+
+I believe he was trying to fix -append, not -initrd. The patch
+fixes -append, but breaks comma-escaping on -initrd.
+
+-- 
+Eduardo
