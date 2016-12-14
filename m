@@ -1,29 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56947)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56956)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1cHCrs-0007rk-5g
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 11:57:25 -0500
+	(envelope-from <stefanha@gmail.com>) id 1cHCrs-0007tp-Vb
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 11:57:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <maxime.coquelin@redhat.com>) id 1cHCrn-0004jB-7R
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 11:57:24 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40240)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
-	id 1cHCrm-0004j1-Uf
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 11:57:19 -0500
-References: <20161214125237.20850-1-maxime.coquelin@redhat.com>
-	<20161214150852.5009.51009@loki>
-	<20161214171501-mutt-send-email-mst@kernel.org>
-	<20161214160215.5009.32685@loki> <20161214165341.5009.38941@loki>
-	<20161214165604.5009.53902@loki>
-From: Maxime Coquelin <maxime.coquelin@redhat.com>
-Message-ID: <8df0a8ff-b82f-1d59-54ac-cffa384cc1b3@redhat.com>
-Date: Wed, 14 Dec 2016 17:57:14 +0100
+	(envelope-from <stefanha@gmail.com>) id 1cHCrp-0004jP-13
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 11:57:25 -0500
+Received: from mail-it0-f66.google.com ([209.85.214.66]:33083)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cHCro-0004jL-Sk
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 11:57:20 -0500
+Received: by mail-it0-f66.google.com with SMTP id c20so614147itb.0
+	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 08:57:20 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20161214165604.5009.53902@loki>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] virtio-pci: Fix cross-version migration
- with older machines
+In-Reply-To: <20161214163142.GB3872@noname.str.redhat.com>
+References: <20161214144713.11009-1-stefanha@redhat.com>
+	<22da7375-6a66-0340-4208-b4d04b5ce49f@vivier.eu>
+	<CAJSP0QW-zPDGrFoyE3XLd-SNKt261+AJPS5k1jxZyr8jNkvxXA@mail.gmail.com>
+	<20161214160827.GA3872@noname.str.redhat.com>
+	<3e1011ab-37bf-b244-11e5-9fd8df6678ce@vivier.eu>
+	<20161214163142.GB3872@noname.str.redhat.com>
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Wed, 14 Dec 2016 16:56:19 +0000
+Message-ID: <CAJSP0QUkS3z+pJbkg0tEHmGpWKrhcta6waqa8jeK1fNdiE1TsQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-2.8] po: add missing translations in de, fr, it,
+ zh
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,98 +34,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, marcel@redhat.com, stefanha@redhat.com, cornelia.huck@de.ibm.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Laurent Vivier <laurent@vivier.eu>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Fam Zheng <famz@redhat.com>, Pino Toscano <ptoscano@redhat.com>
 
-
-
-On 12/14/2016 05:56 PM, Michael Roth wrote:
-> Quoting Michael Roth (2016-12-14 10:53:41)
->> > Quoting Michael Roth (2016-12-14 10:02:15)
->>> > > Quoting Michael S. Tsirkin (2016-12-14 09:15:38)
->>>> > > > On Wed, Dec 14, 2016 at 09:08:52AM -0600, Michael Roth wrote:
->>>>> > > > > Quoting Maxime Coquelin (2016-12-14 06:52:37)
->>>>>> > > > > > This patch fixes a cross-version migration regression introduced
->>>>>> > > > > > by commit d1b4259f ("virtio-bus: Plug devices after features are
->>>>>> > > > > > negotiated").
->>>>>> > > > > >
->>>>>> > > > > > The problem is encountered when host's vhost backend does not support
->>>>>> > > > > > VIRTIO_F_VERSION_1, and migration is initiated from a v2.7 or prior
->>>>>> > > > > > machine with virtio-pci modern capabilities enabled to a v2.8 machine.
->>>>>> > > > > >
->>>>>> > > > > > In this case, modern capabilities get exposed to the guest by the source,
->>>>>> > > > > > whereas the target will detect version 1 is not supported so will only
->>>>>> > > > > > expose legacy capabilities.
->>>>>> > > > > >
->>>>>> > > > > > The problem is fixed by introducing a new "x-modern-broken" property,
->>>>>> > > > > > which is set in v2.7 and prior compatibility modes. Doing this, v2.7
->>>>>> > > > > > machine keeps its broken behaviour (enabling modern while version is
->>>>>> > > > > > not supported), and newer machines will behave correctly.
->>>>>> > > > > >
->>>>>> > > > > > Reported-by: Michael Roth <mdroth@linux.vnet.ibm.com>
->>>>>> > > > > > Suggested-by: Stefan Hajnoczi <stefanha@redhat.com>
->>>>>> > > > > > Cc: Michael S. Tsirkin <mst@redhat.com>
->>>>>> > > > > > Cc: Cornelia Huck <cornelia.huck@de.ibm.com>
->>>>>> > > > > > Cc: Marcel Apfelbaum <marcel@redhat.com>
->>>>>> > > > > > Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
->>>>>> > > > > > Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
->>>>> > > > >
->>>>> > > > > Tested-by: Michael Roth <mdroth@linux.vnet.ibm.com>
->>>>> > > > >
->>>>> > > > > I can confirm this fixes the original issue I reported. I also did a
->>>>> > > > > number of sanity runs with 2.7/2.8/pc-i440fx-2.{6,7,8} using various
->>>>> > > > > combinations of disable-modern=true/false on hosts with/without virtio-1,
->>>>> > > > > and some tests with pseries machines as well, and everything seems to
->>>>> > > > > work.
->>>>> > > > >
->>>>> > > > > Thanks for the quick fix!
->>>> > > >
->>>> > > > FYI what I think does not work is a recent kernel on 2.7
->>>> > > > machine type and host without virtio 1.
->>>> > > > But this is not new.
->>> > >
->>> > > To clarify I was only testing migration compatibility, I assume virtio
->>> > > on 2.7 machines is still broken for the configuration you mentioned.
->>> > >
->>> > > The migration tests I ran on the virtio-1 host do cover networking over
->>> > > a virtio-net device before/after migration with reboots before/after
->>> > > migration as well though, and the guest in those cases had a 4.8 kernel,
->>> > > so I think the sanity checks I mentioned also apply for confirming
->>> > > virtio-net probe is succeeding in the guest.
->>> > >
->>> > > The non-virtio-1 runs are being done on my local machine and the tests
->>> > > in that case are a bit more basic and don't involve actively testing
->>> > > networking. I'll try some manual tests to check this. I guess the main
->>> > > things to confirm on that front are that after the patch virtio probing:
->>> > >
->>> > >   pc-i440fx-2.6, defaults -> succeeds
->>> > >   pc-i440fx-2.6, disable-modern=true -> succeeds
->>> > >   pc-i440fx-2.6, disable-modern=false -> fails
->>> > >
->>> > >   pc-i440fx-2.7, defaults -> fails
->>> > >   pc-i440fx-2.7, disable-modern=true -> succeeds
->>> > >   pc-i440fx-2.7, disable-modern=false -> fails
->>> > >
->>> > >   pc-i440fx-2.8, defaults -> succeeds
->>> > >   pc-i440fx-2.8, disable-modern=true -> succeeds
->>> > >   pc-i440fx-2.8, disable-modern=false -> succeeds
+On Wed, Dec 14, 2016 at 4:31 PM, Kevin Wolf <kwolf@redhat.com> wrote:
+> Am 14.12.2016 um 17:17 hat Laurent Vivier geschrieben:
+>> Le 14/12/2016 =C3=A0 17:08, Kevin Wolf a =C3=A9crit :
+>> > Am 14.12.2016 um 16:58 hat Stefan Hajnoczi geschrieben:
+>> >> On Wed, Dec 14, 2016 at 3:41 PM, Laurent Vivier <laurent@vivier.eu> w=
+rote:
+>> >>> Le 14/12/2016 =C3=A0 15:47, Stefan Hajnoczi a =C3=A9crit :
+>> >>>> There are missing translations for the new "Copy" menu item.
+>> >>>>
+>> >>>> The following people provided them to me on IRC just in time for th=
+e
+>> >>>> QEMU 2.8 release:
+>> >>>>
+>> >>>>  * de_DE - Stefan Hajnoczi <stefanha@redhat.com>
+>> >>>>  * fr_FR - Laurent Vivier <laurent@vivier.eu>
+>> >>>>  * it    - Pino Toscano <ptoscano@redhat.com>
+>> >>>>  * zh_CN - Fam Zheng <famz@redhat.com>
+>> >>>>
+>> >>>> Reported-by: Kevin Wolf <kwolf@redhat.com>
+>> >>>> Cc: Fam Zheng <famz@redhat.com>
+>> >>>> Cc: Pino Toscano <ptoscano@redhat.com>
+>> >>>> Cc: Laurent Vivier <laurent@vivier.eu>
+>> >>>> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+>> >>>
+>> >>> "Copier" is OK now, but it seems we have some problems with the acce=
+nts.
+>> >>> I don't know why.
+>> >>
+>> >> It could be an email encoding issue.  On disk I see the proper UTF-8 =
+characters.
+>> >>
+>> >> You could try my git branch to avoid email issues:
+>> >> https://github.com/stefanha/qemu/tree/missing-translations-2.8
 >> >
->> > I wasn't able to test disable-modern with pc-i440fx-2.6 due to the issue
->> > being fixes by proposed patch "machine: Convert abstract typename on
->> > compat_props to subclass names", but I think the rest of the cases align
->> > with expectations:
->> >
->> > 2.6, defaults: succeeds
->> >
->> > 2.7, defaults: fails
->> > 2.7, disable-modern=true: succeeds
->> > 2.7, disable-modern=false: fails
->> >
->> > 2.8, defaults: succeeds
->> > 2.7, disable-modern=true: succeeds
->> > 2.7, disable-modern=false: succeeds
-> Typo on the latter 2, these were for pc-i440fx-2.8 as well.
+>> > IIRC, it's actually a known problem with not consistently using a UTF-=
+8
+>> > locale, and we avoid changing some locale categories because that woul=
+d
+>> > break things like floating point representation in JSON (because print=
+f
+>> > might end up using comma as the decimal separator).
+>>
+>> So the translation like the Chinese one is totally unusable?
+>
+> I just tried it:
+>
+> $ LANG=3Dzh_CN x86_64-softmmu/qemu-system-x86_64
+>
+> And yes, lots of question marks there...
 
-Thanks Michael, I confirm this is in line with expectations.
+Berto pointed at
+https://lists.gnu.org/archive/html/qemu-devel/2015-12/msg03368.html
 
-  - Maxime
+I've confirmed that removing gtk_disable_setlocale() fixes non-ASCII
+character rendering.  But we don't it breaks other things in QEMU so
+the solution isn't that simple...
+
+Stefan
