@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45419)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60965)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cH6mz-0002OG-Ej
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 05:27:58 -0500
+	(envelope-from <armbru@redhat.com>) id 1cH7d8-0002Hs-3v
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 06:21:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cH6my-0004Zg-7s
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 05:27:57 -0500
-References: <1479835586-74394-1-git-send-email-vsementsov@virtuozzo.com>
-	<1479835586-74394-22-git-send-email-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <07824e01-e163-c1eb-101b-5e7e27d701d9@redhat.com>
-Date: Wed, 14 Dec 2016 11:27:44 +0100
+	(envelope-from <armbru@redhat.com>) id 1cH7d3-0008Bl-82
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 06:21:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48640)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cH7d3-0008BQ-1e
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 06:21:45 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <1481706465-5636-1-git-send-email-thuth@redhat.com>
+Date: Wed, 14 Dec 2016 12:21:39 +0100
+In-Reply-To: <1481706465-5636-1-git-send-email-thuth@redhat.com> (Thomas
+	Huth's message of "Wed, 14 Dec 2016 10:07:45 +0100")
+Message-ID: <87lgviiwn0.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <1479835586-74394-22-git-send-email-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 21/21] qcow2-bitmap: refcounts
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH for-2.9 v2] Move target-* CPU file into a
+ target/ folder
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,74 +27,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cornelia.huck@de.ibm.com>, James Hogan <james.hogan@imgtec.com>, Jia Liu <proljc@gmail.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Anthony Green <green@moxielogic.com>, Marcelo Tosatti <mtosatti@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Laurent Vivier <laurent@vivier.eu>, Eduardo Habkost <ehabkost@redhat.com>, Alexander Graf <agraf@suse.de>, Max Filippov <jcmvbkbc@gmail.com>, Michael Walle <michael@walle.cc>, Yongbok Kim <yongbok.kim@imgtec.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Artyom Tarasenko <atar4qemu@gmail.com>, David Gibson <david@gibson.dropbear.id.au>
 
-On 2016-11-22 at 18:26, Vladimir Sementsov-Ogievskiy wrote:
-> Calculate refcounts for qcow2 bitmaps. It is needed for qcow2's qemu-img
-> check implementation.
->
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  block/qcow2-bitmap.c   | 73 ++++++++++++++++++++++++++++++++++++++++++++++++++
->  block/qcow2-refcount.c |  6 +++++
->  block/qcow2.h          |  3 +++
->  3 files changed, 82 insertions(+)
->
-> diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-> index 55b1112..0e0ddf3 100644
-> --- a/block/qcow2-bitmap.c
-> +++ b/block/qcow2-bitmap.c
-> @@ -1155,3 +1155,76 @@ common_errp:
->                 name, bdrv_get_device_or_node_name(bs), reason);
->      return false;
->  }
-> +
-> +int qcow2_check_bitmaps_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
-> +                                  void **refcount_table,
-> +                                  int64_t *refcount_table_size)
-> +{
+Thomas Huth <thuth@redhat.com> writes:
 
-[...]
+> We've currently got 18 architectures in QEMU, and thus 18 target-xxx
+> folders in the root folder of the QEMU source tree. More architectures
+> (e.g. RISC-V, AVR) are likely to be included soon, too, so the main
+> folder of the QEMU sources slowly gets quite overcrowded with the
+> target-xxx folders.
+> To disburden the main folder a little bit, let's move the target-xxx
+> folders into a dedicated target/ folder, so that target-xxx/ simply
+> becomes target/xxx/ instead.
 
-> +        for (i = 0; i < bm->table_size; ++i) {
-> +            uint64_t entry = bitmap_table[i];
-> +            uint64_t offset = entry & BME_TABLE_ENTRY_OFFSET_MASK;
-> +
-> +            if (check_table_entry(entry, s->cluster_size) < 0) {
-> +                res->corruptions++;
-> +                ret = -EINVAL;
-> +                continue;
+The root directory is crowded, but hardly because of its 18 target-*
+entries:
 
-First an optional suggestion: You could just assign 
-check_table_entry()'s return value directly to ret, then you wouldn't 
-have to set it manually.
+    $ git-ls-tree --name-only v2.8.0-rc3 | wc -l
+    167
 
-Second, why are you setting ret at all? If any of the next iterations is 
-successful, it will get overwritten and be set to 0 again.
+Getting the 18 target-* out of the way would help a little, but I hate
+making the directory tree deeper.
 
-Max
-
-> +            }
-> +
-> +            if (offset == 0) {
-> +                continue;
-> +            }
-> +
-> +            ret = qcow2_inc_refcounts_imrt(bs, res,
-> +                                           refcount_table, refcount_table_size,
-> +                                           offset, s->cluster_size);
-> +            if (ret < 0) {
-> +                g_free(bitmap_table);
-> +                goto out;
-> +            }
-> +        }
-> +
-> +        g_free(bitmap_table);
-> +    }
-> +
-> +out:
-> +    bitmap_list_free(bm_list);
-> +
-> +    return ret;
-> +}
+We have 110 files in the root directory.  Moving some of them to
+subdirectories looks more promising to me.
