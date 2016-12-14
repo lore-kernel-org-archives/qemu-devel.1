@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47756)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48850)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cGyw9-0005Vp-8y
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 21:04:54 -0500
+	(envelope-from <peterx@redhat.com>) id 1cGz0P-0002DD-1p
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 21:09:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cGyw5-00089g-A9
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 21:04:53 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54126)
+	(envelope-from <peterx@redhat.com>) id 1cGz0N-0001nd-IM
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 21:09:17 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33036)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cGyw5-00089L-51
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 21:04:49 -0500
-Date: Wed, 14 Dec 2016 10:04:43 +0800
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cGz0N-0001nR-CZ
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 21:09:15 -0500
 From: Peter Xu <peterx@redhat.com>
-Message-ID: <20161214020443.GF32222@pxdev.xzpeter.org>
-References: <1481613903-17467-1-git-send-email-peterx@redhat.com>
-	<1481613903-17467-3-git-send-email-peterx@redhat.com>
-	<20161213064028.78938d07@t450s.home>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20161213064028.78938d07@t450s.home>
-Subject: Re: [Qemu-devel] [PATCH for-2.9 v2 2/2] intel_iommu: provide
- "aw-bits" parameter
+Date: Wed, 14 Dec 2016 10:09:04 +0800
+Message-Id: <1481681345-32424-2-git-send-email-peterx@redhat.com>
+In-Reply-To: <1481681345-32424-1-git-send-email-peterx@redhat.com>
+References: <1481681345-32424-1-git-send-email-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 1/2] intel_iommu: check validity for GAW
+ bits in CE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,38 +24,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: qemu-devel@nongnu.org, kevin.tian@intel.com, famz@redhat.com, mst@redhat.com, jasowang@redhat.com
+To: qemu-devel@nongnu.org
+Cc: kevin.tian@intel.com, famz@redhat.com, mst@redhat.com, jasowang@redhat.com, alex.williamson@redhat.com, peterx@redhat.com
 
-On Tue, Dec 13, 2016 at 06:40:28AM -0700, Alex Williamson wrote:
-> On Tue, 13 Dec 2016 15:25:03 +0800
-> Peter Xu <peterx@redhat.com> wrote:
-> 
-> > Previously vt-d codes only supports 39 bits iova address width. This
-> > patch provide a new parameter for Intel IOMMU to extend its address
-> > width to 48 bits.
-> > 
-> > After enabling larger address width (48), we should be able to map
-> > larger iova addresses in the guest. To check whether 48 bits aw is
-> > enabled, we can grep in the guest dmesg with line: "dmar: Host address
-> > width 48".
-> > 
-> > To keep compatibility with old QEMU and most hosts, default aw bits are
-> > set to 39 bits.
-> 
-> I really fail to see the benefit of this option.  Clearly we always
-> need to be able to support identity maps through the IOMMU, so the
-> address width of the vIOMMU needs to support the maximum address of any
-> memory or mmio range available to the VM.  However if that's the case,
-> then the address width of the vIOMMU should be automatically configured
-> for the VM configuration.  What's the benefit of creating yet another
-> obscure device option rather than configuring this automatically.  If
-> the argument is to be able to test 48bit vIOMMU support, then we could
-> simply prefix this option with 'x-' to indicate an experimental,
-> unsupported option.  Creating this option with the expectation that the
-> user must specify this in order to potentially create a valid VT-d
-> configuration for the VM doesn't make sense to me.  Thanks,
+Currently vt-d Context Entry (CE) only allows 39/48 bits address width.
+If guest software configured more than that, we complain and report.
 
-I'll rename with "x-" prefix and repost. Thanks,
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+ hw/i386/intel_iommu.c          | 17 ++++++++++++++++-
+ hw/i386/intel_iommu_internal.h |  2 ++
+ 2 files changed, 18 insertions(+), 1 deletion(-)
 
--- peterx
+diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+index 5f3e351..517a2a3 100644
+--- a/hw/i386/intel_iommu.c
++++ b/hw/i386/intel_iommu.c
+@@ -599,9 +599,19 @@ static inline uint32_t vtd_get_level_from_context_entry(VTDContextEntry *ce)
+     return 2 + (ce->hi & VTD_CONTEXT_ENTRY_AW);
+ }
+ 
++/* Return 0 if failed to fetch valid aw */
+ static inline uint32_t vtd_get_agaw_from_context_entry(VTDContextEntry *ce)
+ {
+-    return 30 + (ce->hi & VTD_CONTEXT_ENTRY_AW) * 9;
++    uint8_t aw = (ce->hi & VTD_CONTEXT_ENTRY_AW);
++    /*
++     * According to vt-d spec 10.4.2 bits 12:8, SAGAW only allows
++     * 39/48 bits.
++     */
++    if (aw > VTD_CE_AW_48BIT) {
++        error_report("Context entry address width not supported (aw=%d)" , aw);
++        return 0;
++    }
++    return 30 + aw * 9;
+ }
+ 
+ static const uint64_t vtd_paging_entry_rsvd_field[] = {
+@@ -642,6 +652,11 @@ static int vtd_gpa_to_slpte(VTDContextEntry *ce, uint64_t gpa, bool is_write,
+     uint32_t ce_agaw = vtd_get_agaw_from_context_entry(ce);
+     uint64_t access_right_check;
+ 
++    if (!ce_agaw) {
++        error_report("Illegal context entry AGAW");
++        return -VTD_FR_CONTEXT_ENTRY_INV;
++    }
++
+     /* Check if @gpa is above 2^X-1, where X is the minimum of MGAW in CAP_REG
+      * and AW in context-entry.
+      */
+diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
+index 11abfa2..e808c67 100644
+--- a/hw/i386/intel_iommu_internal.h
++++ b/hw/i386/intel_iommu_internal.h
+@@ -406,6 +406,8 @@ typedef struct VTDRootEntry VTDRootEntry;
+ #define VTD_CONTEXT_ENTRY_RSVD_LO   (0xff0ULL | ~VTD_HAW_MASK)
+ /* hi */
+ #define VTD_CONTEXT_ENTRY_AW        7ULL /* Adjusted guest-address-width */
++#define VTD_CE_AW_39BIT             1
++#define VTD_CE_AW_48BIT             2
+ #define VTD_CONTEXT_ENTRY_DID(val)  (((val) >> 8) & VTD_DOMAIN_ID_MASK)
+ #define VTD_CONTEXT_ENTRY_RSVD_HI   0xffffffffff000080ULL
+ 
+-- 
+2.7.4
