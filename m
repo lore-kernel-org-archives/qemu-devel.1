@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47149)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47514)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cHCFy-0003QW-22
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 11:18:18 -0500
+	(envelope-from <maxime.coquelin@redhat.com>) id 1cHCHx-0002Qt-BB
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 11:20:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cHCFt-00067f-3f
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 11:18:14 -0500
-Received: from mout.kundenserver.de ([212.227.126.187]:54048)
+	(envelope-from <maxime.coquelin@redhat.com>) id 1cHCHr-0006wg-HY
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 11:20:17 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38710)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cHCFs-000678-PI
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 11:18:09 -0500
-References: <20161214144713.11009-1-stefanha@redhat.com>
-	<22da7375-6a66-0340-4208-b4d04b5ce49f@vivier.eu>
-	<CAJSP0QW-zPDGrFoyE3XLd-SNKt261+AJPS5k1jxZyr8jNkvxXA@mail.gmail.com>
-	<20161214160827.GA3872@noname.str.redhat.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <3e1011ab-37bf-b244-11e5-9fd8df6678ce@vivier.eu>
-Date: Wed, 14 Dec 2016 17:17:57 +0100
-MIME-Version: 1.0
-In-Reply-To: <20161214160827.GA3872@noname.str.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for-2.8] po: add missing translations in de, fr, it,
- zh
+	(Exim 4.71) (envelope-from <maxime.coquelin@redhat.com>)
+	id 1cHCHr-0006wK-8s
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 11:20:11 -0500
+From: Maxime Coquelin <maxime.coquelin@redhat.com>
+Date: Wed, 14 Dec 2016 17:19:58 +0100
+Message-Id: <20161214161958.2958-1-maxime.coquelin@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] virtio-pci: Fix cross-version migration
+ with older machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,42 +23,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Fam Zheng <famz@redhat.com>, Pino Toscano <ptoscano@redhat.com>
+To: mdroth@linux.vnet.ibm.com, stefanha@redhat.com, qemu-devel@nongnu.org, mst@redhat.com, cornelia.huck@de.ibm.com, marcel@redhat.com
+Cc: Maxime Coquelin <maxime.coquelin@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-Le 14/12/2016 à 17:08, Kevin Wolf a écrit :
-> Am 14.12.2016 um 16:58 hat Stefan Hajnoczi geschrieben:
->> On Wed, Dec 14, 2016 at 3:41 PM, Laurent Vivier <laurent@vivier.eu> wrote:
->>> Le 14/12/2016 à 15:47, Stefan Hajnoczi a écrit :
->>>> There are missing translations for the new "Copy" menu item.
->>>>
->>>> The following people provided them to me on IRC just in time for the
->>>> QEMU 2.8 release:
->>>>
->>>>  * de_DE - Stefan Hajnoczi <stefanha@redhat.com>
->>>>  * fr_FR - Laurent Vivier <laurent@vivier.eu>
->>>>  * it    - Pino Toscano <ptoscano@redhat.com>
->>>>  * zh_CN - Fam Zheng <famz@redhat.com>
->>>>
->>>> Reported-by: Kevin Wolf <kwolf@redhat.com>
->>>> Cc: Fam Zheng <famz@redhat.com>
->>>> Cc: Pino Toscano <ptoscano@redhat.com>
->>>> Cc: Laurent Vivier <laurent@vivier.eu>
->>>> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
->>>
->>> "Copier" is OK now, but it seems we have some problems with the accents.
->>> I don't know why.
->>
->> It could be an email encoding issue.  On disk I see the proper UTF-8 characters.
->>
->> You could try my git branch to avoid email issues:
->> https://github.com/stefanha/qemu/tree/missing-translations-2.8
-> 
-> IIRC, it's actually a known problem with not consistently using a UTF-8
-> locale, and we avoid changing some locale categories because that would
-> break things like floating point representation in JSON (because printf
-> might end up using comma as the decimal separator).
+This patch fixes a cross-version migration regression introduced
+by commit d1b4259f ("virtio-bus: Plug devices after features are
+negotiated").
 
-So the translation like the Chinese one is totally unusable?
+The problem is encountered when host's vhost backend does not support
+VIRTIO_F_VERSION_1, and migration is initiated from a v2.7 or prior
+QEMU version with virtio-pci modern capabilities enabled to a v2.8
+QEMU version.
 
-Laurent
+In this case, modern capabilities get exposed to the guest by the source,
+whereas the target will detect version 1 is not supported so will only
+expose legacy capabilities.
+
+The problem is fixed by introducing a new "x-modern-broken" property,
+which is set in v2.7 and prior compatibility modes. Doing this, v2.7
+machine keeps its broken behaviour (enabling modern while version is
+not supported), and newer machines will behave correctly.
+
+Reported-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+Suggested-by: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Michael S. Tsirkin <mst@redhat.com>
+Cc: Cornelia Huck <cornelia.huck@de.ibm.com>
+Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Tested-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
+---
+
+Thanks for the reviews and tests.
+This version changes the naming as proposed by Michael T.
+and Cornelia, and fixies commit message.
+
+ hw/virtio/virtio-pci.c | 5 ++++-
+ hw/virtio/virtio-pci.h | 1 +
+ include/hw/compat.h    | 4 ++++
+ 3 files changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+index 521ba0b..21c2b9d 100644
+--- a/hw/virtio/virtio-pci.c
++++ b/hw/virtio/virtio-pci.c
+@@ -1580,7 +1580,8 @@ static void virtio_pci_device_plugged(DeviceState *d, Error **errp)
+      * Virtio capabilities present without
+      * VIRTIO_F_VERSION_1 confuses guests
+      */
+-    if (!virtio_has_feature(vdev->host_features, VIRTIO_F_VERSION_1)) {
++    if (!proxy->ignore_backend_features &&
++            !virtio_has_feature(vdev->host_features, VIRTIO_F_VERSION_1)) {
+         virtio_pci_disable_modern(proxy);
+ 
+         if (!legacy) {
+@@ -1852,6 +1853,8 @@ static Property virtio_pci_properties[] = {
+                     VIRTIO_PCI_FLAG_DISABLE_PCIE_BIT, false),
+     DEFINE_PROP_BIT("page-per-vq", VirtIOPCIProxy, flags,
+                     VIRTIO_PCI_FLAG_PAGE_PER_VQ_BIT, false),
++    DEFINE_PROP_BOOL("x-ignore-backend-features", VirtIOPCIProxy,
++                     ignore_backend_features, false),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
+diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h
+index b2a996f..5e07886 100644
+--- a/hw/virtio/virtio-pci.h
++++ b/hw/virtio/virtio-pci.h
+@@ -153,6 +153,7 @@ struct VirtIOPCIProxy {
+     int config_cap;
+     uint32_t flags;
+     bool disable_modern;
++    bool ignore_backend_features;
+     OnOffAuto disable_legacy;
+     uint32_t class_code;
+     uint32_t nvectors;
+diff --git a/include/hw/compat.h b/include/hw/compat.h
+index 0f06e11..8dfc7a3 100644
+--- a/include/hw/compat.h
++++ b/include/hw/compat.h
+@@ -18,6 +18,10 @@
+         .driver   = "intel-iommu",\
+         .property = "x-buggy-eim",\
+         .value    = "true",\
++    },{\
++        .driver   = "virtio-pci",\
++        .property = "x-ignore-backend-features",\
++        .value    = "on",\
+     },
+ 
+ #define HW_COMPAT_2_6 \
+-- 
+2.9.3
