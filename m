@@ -1,34 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53949)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56151)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cHChE-00071A-88
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 11:46:26 -0500
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cHCoY-0000pa-Nx
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 11:54:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cHChB-0001dm-1g
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 11:46:24 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34354)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cHChA-0001dW-Of
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 11:46:20 -0500
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A1AF3C057FA7
-	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 16:46:19 +0000 (UTC)
-Date: Wed, 14 Dec 2016 14:46:17 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20161214164617.GI3808@thinpad.lan.raisama.net>
-References: <20161208200737.GA29563@thinpad.lan.raisama.net>
-	<87a8c0qedq.fsf@dusky.pond.sub.org>
-	<20161213124239.GO3808@thinpad.lan.raisama.net>
-	<87inqnli9l.fsf@dusky.pond.sub.org>
-	<20161213205911.GD3808@thinpad.lan.raisama.net>
-	<874m26frtf.fsf@dusky.pond.sub.org>
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cHCoV-0003lo-6x
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 11:53:58 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59436
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+	id 1cHCoU-0003kc-VR
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 11:53:55 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
+	uBEGmjJZ064596
+	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 11:53:52 -0500
+Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 27b9mh1nw0-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 11:53:52 -0500
+Received: from localhost
+	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+	Wed, 14 Dec 2016 09:53:51 -0700
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <874m26frtf.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [RFC] qmp: query-device-slots command
+Content-Transfer-Encoding: quoted-printable
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+In-Reply-To: <20161214160215.5009.32685@loki>
+References: <20161214125237.20850-1-maxime.coquelin@redhat.com>
+	<20161214150852.5009.51009@loki>
+	<20161214171501-mutt-send-email-mst@kernel.org>
+	<20161214160215.5009.32685@loki>
+Date: Wed, 14 Dec 2016 10:53:41 -0600
+Message-Id: <20161214165341.5009.38941@loki>
+Subject: Re: [Qemu-devel] [PATCH] virtio-pci: Fix cross-version migration
+ with older machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,584 +45,203 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, libvir-list@redhat.com, qemu-devel@nongnu.org, Laine Stump <laine@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, marcel@redhat.com, Maxime Coquelin <maxime.coquelin@redhat.com>, stefanha@redhat.com, cornelia.huck@de.ibm.com
 
-On Wed, Dec 14, 2016 at 04:34:04PM +0100, Markus Armbruster wrote:
-> Eduardo Habkost <ehabkost@redhat.com> writes:
-> 
-> > On Tue, Dec 13, 2016 at 08:51:34PM +0100, Markus Armbruster wrote:
-> >> Eduardo Habkost <ehabkost@redhat.com> writes:
-> >> 
-> >> > On Tue, Dec 13, 2016 at 12:04:17PM +0100, Markus Armbruster wrote:
-> >> >> Quick interface review only:
-> >> >> 
-> >> >> Eduardo Habkost <ehabkost@redhat.com> writes:
-> >> >> 
-> >> >> > This adds a new command to QMP: query-device-slots. It will allow
-> >> >> > management software to query possible slots where devices can be
-> >> >> > plugged.
-> >> >> >
-> >> >> > This implementation of the command will return:
-> >> >> >
-> >> >> > * Multiple PCI slots per bus, in the case of PCI buses;
-> >> >> > * One slot per bus in the case of the other buses;
-> >> >> 
-> >> >> Umm, that doesn't seem right.  For instance, a SCSI bus has multiple
-> >> >> slots.  The slot address is the SCSI ID.  An IDE bus may have one (SATA)
-> >> >> or two (PATA).  For more examples, see qdev-device-use.txt section
-> >> >> "Specifying Bus and Address on Bus".
-> >> >
-> >> > Yes, I should have clarified that: this version changes only PCI
-> >> > to expose multiple slots, but other buses also need be changed to
-> >> > implement BusClass::enumerate_slots() properly, too.
-> >> >
-> >> >> 
-> >> >> > * One slot for each entry from query-hotpluggable-cpus.
-> >> >> > In the example below, I am not sure if the PCIe ports are all
-> >> >> > supposed to report all slots, but I didn't find any existing
-> >> >> > field in PCIBus that would help me figure out the actual number
-> >> >> > of slots in a given PCI bus.
-> >> >> >
-> >> >> > Git tree
-> >> >> > --------
-> >> >> >
-> >> >> > This patch needs the previous query-machines series I am working
-> >> >> > on. The full tree can be found on the git tree at:
-> >> >> >
-> >> >> >   git://github.com/ehabkost/qemu-hacks.git work/query-machines-bus-info
-> >> >> >
-> >> >> > Example output
-> >> >> > --------------
-> >> >> >
-> >> >> > The following output was returned by QEMU when running it as:
-> >> >> >
-> >> >> >  $ qemu-system-x86_64 -machine q35 \
-> >> >> >    -readconfig docs/q35-chipset.cfg \
-> >> >> >    -smp 4,maxcpus=8,sockets=2,cores=2,threads=2
-> >> >> >
-> >> >> >  {
-> >> >> >     "return": [
-> >> >> 
-> >> >> Are you sure >3000 lines of example output make sense here?
-> >> >
-> >> > I'm not. :)
-> >> >
-> >> > That's why I need feedback from the PCI experts. I believe most
-> >> > of the PCI ports on q35 accept only one device, but I see no code
-> >> > implementing that restriction, and no obvious PCIBus or
-> >> > PCIBusClass field indicating that.
-> >> >
-> >> >> 
-> >> >> [...]
-> >> >> >     ]
-> >> >> >   }
-> >> >> >
-> >> >> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> >> >> > ---
-> >> >> >  qapi-schema.json       | 114 +++++++++++++++++++++++++++++++++++++++++++++++++
-> >> >> >  include/hw/qdev-core.h |   6 +++
-> >> >> >  hw/core/bus.c          |  49 +++++++++++++++++++++
-> >> >> >  hw/pci/pci.c           | 106 +++++++++++++++++++++++++++++++++------------
-> >> >> >  qdev-monitor.c         |  86 ++++++++++++++++++++++++++++++++++---
-> >> >> >  5 files changed, 328 insertions(+), 33 deletions(-)
-> >> >> >
-> >> >> > diff --git a/qapi-schema.json b/qapi-schema.json
-> >> >> > index d48ff3f..484d91e 100644
-> >> >> > --- a/qapi-schema.json
-> >> >> > +++ b/qapi-schema.json
-> >> >> > @@ -3166,6 +3166,120 @@
-> >> >> >  { 'command': 'closefd', 'data': {'fdname': 'str'} }
-> >> >> >  
-> >> >> >  ##
-> >> >> > +# @DeviceSlotType:
-> >> >> > +#
-> >> >> > +# Type of device slot
-> >> >> > +#
-> >> >> > +# @generic: Generic device slot, with no bus-specific information
-> >> >> > +# @pci: PCI device slot
-> >> >> > +# @cpu: CPU device slot
-> >> >> > +##
-> >> >> > +{ 'enum': 'DeviceSlotType',
-> >> >> > +  'data': ['generic', 'pci', 'cpu'] }
-> >> >> > +
-> >> >> > +##
-> >> >> > +# @DeviceSlotInfo:
-> >> >> > +#
-> >> >> > +# Information on a slot where devices can be plugged. Some buses
-> >> >> > +# are represented as a single slot that can support multiple devices,
-> >> >> > +# and some buses have multiple slots that are identified by arguments
-> >> >> > +# to @device_add.
-> >> >> 
-> >> >> Okay, let me try to wrap my poor, ignorant mind around this.
-> >> >> 
-> >> >> There are two kinds of buses: "single slot that can support multiple
-> >> >> devices", and "multiple slots that are identified by arguments".
-> >> >> 
-> >> >> How are the two kinds related to @type?
-> >> >
-> >> > They are related to @type indirectly because different bus types
-> >> > will return different data. But I don't want to make this part of
-> >> > the specification: clients should be prepared to handle both
-> >> > cases.
-> >> 
-> >> Well, color me confused :)
-> >> 
-> >> > e.g. a QEMU version might return a single generic catch-all
-> >> > sysbus-device slot that support any number of devices. Future
-> >> > versions may return more detailed information, and return slots
-> >> > only for the sysbus devices that really work with the machine.
-> >> 
-> >> Hmm.  See below.
-> >> 
-> >> >> 
-> >> >> Examples for "multiple slots that are identified by arguments":
-> >> >> 
-> >> >>     -device edu,addr=06.0,bus=...
-> >> >>     -device scsi-hd,scsi-hd=5,bus=...
-> >> >>     -device ide-hd,unit=1,bus=...
-> >> >>     -device virtserialport,nr=7,bus=...
-> >> >> 
-> >> >> Note that each of these buses has its own way to specify a slot address,
-> >> >> namely a bus-specific option.
-> >> >
-> >> > Yes.
-> >> >
-> >> >> 
-> >> >> Can you give examples for "single slot that can support multiple
-> >> >> devices"?
-> >> >
-> >> > I can't name any example except sysbus, right now.
-> >> 
-> >> Sysbus is a bad example, because it's a hack, not a bus.
-> >> 
-> >> Physical devices are wired up in some device-specific way.  An important
-> >> special wiring case is plugging into a standard socket provided by a
-> >> bus.  But not every device is connected only to a bus.  Devices can also
-> >> be wired to other devices in ad hoc ways.
-> >> 
-> >> In the initial qdev design, devices could only plug into buses.
-> >> Anything that didn't fit the mold was declared to plug into the "system
-> >> bus", which isn't a bus at all.
-> >> 
-> >> The hack used to be fairly harmless, because you couldn't do much with
-> >> system bus devices anyway.  Not true anymore: Alex created means to add
-> >> certain system bus devices to certain machines with -device.  Has been a
-> >> thorn in my side ever since.  I'm afraid we need to understand how
-> >> exactly it works before we can finalize the design for this command.
-> >
-> > I agree it is a hack, I just wanted to be able to cover it too
-> > (and possibly other cases where there's no obvious "address"
-> > parameter to devices).
-> >
-> > The other options I had were:
-> > a) Omitting the bus from the output;
-> > b) Waiting until we fix sysbus before implementing the interface.
-> >
-> > I avoided (a) because I would like to tell libvirt "always check
-> > query-device-slots before plugging anything. if it's not there,
-> > it means you can't plug it". To do that, I would need to ensure
-> > all buses are present in the list (even sysbus).
-> >
-> > (But as I say below: I don't love this solution and I am open to
-> > suggestions).
-> 
-> I'm okay with doing (c) including all buses, with full information for
-> only some.  As long as the case "no full information" is clearly
-> separate, and appropriately documented.  Then we can tell libvirt to
-> always check query-device-slots, and if it has full information, use
-> that.  Else, falling back to hardcoded strategies is okay, similar to
-> what's done when command query-device-slots doesn't exist.
+Quoting Michael Roth (2016-12-14 10:02:15)
+> Quoting Michael S. Tsirkin (2016-12-14 09:15:38)
+> > On Wed, Dec 14, 2016 at 09:08:52AM -0600, Michael Roth wrote:
+> > > Quoting Maxime Coquelin (2016-12-14 06:52:37)
+> > > > This patch fixes a cross-version migration regression introduced
+> > > > by commit d1b4259f ("virtio-bus: Plug devices after features are
+> > > > negotiated").
+> > > > =
 
-Understood.
+> > > > The problem is encountered when host's vhost backend does not suppo=
+rt
+> > > > VIRTIO_F_VERSION_1, and migration is initiated from a v2.7 or prior
+> > > > machine with virtio-pci modern capabilities enabled to a v2.8 machi=
+ne.
+> > > > =
 
-> 
-> >> > There are two cases that I tried to cover by reporting
-> >> > multiple-device no-argument slots:
-> >> >
-> >> > 1) Buses that were not converted (yet) to implement
-> >> >    enumerate_buses() (in the current version: everything except
-> >> >    PCI)
-> >> > 2) Buses that really do not require any extra slot address
-> >> >    argument (sysbus? others?)
-> >> >
-> >> > I'm proposing this interface because I don't want (1) or (2) to
-> >> > be missing from the returned data (otherwise management software
-> >> > can't differentiate "this bus is not available" from "this bus
-> >> > simply doesn't implement slot enumeration yet").
-> >> >
-> >> > We won't need the special multi-device-slot case if we eliminate
-> >> > all instances of (1) and (2). Can we do that in 2.9? I'm not
-> >> > sure.
-> >> 
-> >> If we can't do a complete job, and we don't want to hide slots affected
-> >> by that, the data we return for them should unequivocally state that
-> >> it's incomplete because computing complete data hasn't been implemented,
-> >> yet.
-> >
-> > OK, so we agree we need a way to tell the client the data is
-> > incomplete (or not as detailed as we would like).
-> 
-> Yes.
-> 
-> > I tried to solve that by providing a mechanism to tell the client
-> > "look, I can tell you that there's a bus called <bus name>, and
-> > it is valid to use it as the 'bus' argument for -device and
-> > device_add, but I don't know the rest of the rules (sorry!)". We
-> > can do that by simply including the bus on the list as if it was
-> > a multi-device slot.
-> 
-> What if we ever run into a kind of slot where the full information is
-> "use this 'bus' argument" and "you can plug in multiple devices"?
-> Wouldn't that be indistinguishable from "full information isn't
-> available"?
-> 
-> Let's make "full information isn't available" impossible to confuse with
-> any conceivable set of full information.
+> > > > In this case, modern capabilities get exposed to the guest by the s=
+ource,
+> > > > whereas the target will detect version 1 is not supported so will o=
+nly
+> > > > expose legacy capabilities.
+> > > > =
 
-I see. I tried to model it in a way that "incomplete information"
-was not considered an exception, just an instance where the data
-is less informative. But adding another bit of information that
-explicitly says "this in incomplete and will probably change in
-the future" is a good idea.
+> > > > The problem is fixed by introducing a new "x-modern-broken" propert=
+y,
+> > > > which is set in v2.7 and prior compatibility modes. Doing this, v2.7
+> > > > machine keeps its broken behaviour (enabling modern while version is
+> > > > not supported), and newer machines will behave correctly.
+> > > > =
 
-> 
-> > But I don't love this solution, so I am open to other suggestions
-> > on how to tell the client that slot information is incomplete for
-> > a bus.
-> >
-> > Maybe the following?
-> >
-> > 1) Add a new DeviceSlotType value meaning "this entry represents
-> >    a bus/device-type that can't enumerate its slots" (let's call
-> >    it "bus-with-no-slot-info" by now).
-> 
-> Let's call this one a non-slot, for brevity.
+> > > > Reported-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+> > > > Suggested-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > > > Cc: Michael S. Tsirkin <mst@redhat.com>
+> > > > Cc: Cornelia Huck <cornelia.huck@de.ibm.com>
+> > > > Cc: Marcel Apfelbaum <marcel@redhat.com>
+> > > > Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > > > Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
+> > > =
 
-I like that name. :)
+> > > Tested-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+> > > =
 
-> 
-> > 2) Remove DeviceSlotType "generic".
-> > 3) Remove max-devices field, and simply document the device-limit
-> >    semantics for each DeviceSlotType (cpu: 1 device, pci: 1
-> >    device, bus-with-no-slot-info: undefined limit).
-> 
-> Not sure there's much to document.  For me a slot takes exactly one plug
-> by definition (if it can take more, it's a set of slots, isn't it?), and
-> non-slots take an unknown number of plugs by definition (if we knew,
-> we'd return suitable slots instead).  But that's mincing words; I'm sure
-> we can come up with language that works for both of us.
+> > > I can confirm this fixes the original issue I reported. I also did a
+> > > number of sanity runs with 2.7/2.8/pc-i440fx-2.{6,7,8} using various
+> > > combinations of disable-modern=3Dtrue/false on hosts with/without vir=
+tio-1,
+> > > and some tests with pseries machines as well, and everything seems to
+> > > work.
+> > > =
 
-I am trying to not make any guarantees about all slot types,
-until we learn more about the more complex cases. All we can say
-right now is that CPU and PCI slots support only 1 device, and we
-don't claim anything about others.
+> > > Thanks for the quick fix!
+> > =
 
-I'm not even 100% sure about the 1-device rule for PCI, as each
-PCI function in a slot is a separate DeviceState*. I need to
-understand how multi-function PCI hotplug works, to find out what
-we should do.
+> > FYI what I think does not work is a recent kernel on 2.7
+> > machine type and host without virtio 1.
+> > But this is not new.
+> =
 
-I worry about having a general 1-slot = 1-device rule from the
-beginning, because I don't know if it can be a problem when the
-set of possible slots is too large. e.g.: should we return one
-slot for each of the 256 possible devfns in a PCI bus? What if a
-bus uses 32-bit identifiers for devices?
+> To clarify I was only testing migration compatibility, I assume virtio
+> on 2.7 machines is still broken for the configuration you mentioned.
+> =
 
-My suggestion is to avoid any general claims about device limits
-in slots in the documentation by now, until we have more
-knowledge about other bus types.
+> The migration tests I ran on the virtio-1 host do cover networking over
+> a virtio-net device before/after migration with reboots before/after
+> migration as well though, and the guest in those cases had a 4.8 kernel,
+> so I think the sanity checks I mentioned also apply for confirming
+> virtio-net probe is succeeding in the guest.
+> =
 
-> 
-> > This looks like a trade-off between moving data to specific union
-> > types (and representing type-specific limits/rules in the schema
-> > documentation), or moving data to the base union type (and
-> > representing type-specific limits as data in the base union
-> > type).
-> 
-> Works for me.
-> 
-> Additionally, let's replace 'devices': [ 'str' ] by '*device': 'str',
-> because a slot is either empty or has one device plugged in.
-> 
-> If we ever need to add a set-of-slots type, we'll have to extend the
-> schema, but then we'll be in a much better position to know what we
-> actually need.
-> 
+> The non-virtio-1 runs are being done on my local machine and the tests
+> in that case are a bit more basic and don't involve actively testing
+> networking. I'll try some manual tests to check this. I guess the main
+> things to confirm on that front are that after the patch virtio probing:
+> =
 
-I am working on a version that even removes 'devices', for
-simplicity. Then we would have more freedom when extending the
-schema later.
+>   pc-i440fx-2.6, defaults -> succeeds
+>   pc-i440fx-2.6, disable-modern=3Dtrue -> succeeds
+>   pc-i440fx-2.6, disable-modern=3Dfalse -> fails
+> =
 
+>   pc-i440fx-2.7, defaults -> fails
+>   pc-i440fx-2.7, disable-modern=3Dtrue -> succeeds
+>   pc-i440fx-2.7, disable-modern=3Dfalse -> fails
+> =
 
-> >> >> > +#
-> >> >> > +# @bus: ID of the bus object where the device can be plugged. Optional,
-> >> >> > +#       as some devices don't need a bus to be plugged (e.g. CPUs).
-> >> >> > +#       Can be copied to the "bus" argument to @device_add.
-> >> >> 
-> >> >> Suggest something like "Can be used as value for @device_add's bus
-> >> >> option".
-> >> >
-> >> > Will do.
-> >> >
-> >> >> 
-> >> >> Should we give similar information on the slot address?  The option name
-> >> >> is obvious.  What about acceptable values?
-> >> >
-> >> > Actually, this part of the documentation was a leftover from a
-> >> > previous version where @bus was inside DeviceSlotInfo. Now I
-> >> > moved @bus inside @props for all device types, and it should be
-> >> > documented the same way as the other fields inside @props.
-> >> >
-> >> >> 
-> >> >> > +#
-> >> >> > +# @type: type of device slot.
-> >> >> > +#
-> >> >> > +# @accepted-device-types: List of device types accepted by the slot.
-> >> >> > +#                         Any device plugged to the slot should implement
-> >> >> > +#                         one of the accepted device types.
-> >> >> > +#
-> >> >> > +# @max-devices: #optional maximum number of devices that can be plugged
-> >> >> > +#               to the slot.
-> >> >> 
-> >> >> What does it mean when @max-devices isn't given?
-> >> >
-> >> > It means there is no hard limit on the number of pluggable
-> >> > devices. sysbus is one of such cases.
-> >> 
-> >> Sysbus certainly has limits, but they're more complicated than just "at
-> >> most @max-devices devices".
-> >> 
-> >> >> > +#
-> >> >> > +# @devices: List of QOM paths for devices that are already plugged.
-> >> >> > +#
-> >> >> > +# @available: If false, the slot is not available for plugging any device.
-> >> >> > +#             This value can change at runtime if condition changes
-> >> >> > +#             (e.g. if the device becomes full, or if the machine
-> >> >> > +#             was already initialized and the slot doesn't support
-> >> >> > +#             hotplug).
-> >> >> > +#
-> >> >> > +# @hotpluggable: If true, the slot accepts hotplugged devices.
-> >> >> > +#
-> >> >> > +# DeviceSlotInfo structs always have a @props member, whose members
-> >> >> > +# can be directly copied to the arguments to @device_add.
-> >> >> 
-> >> >> Do you mean names of properties common to all @accepted-device-types?
-> >> >
-> >> > I mean that it should be safe to simply use the keys+values in
-> >> > @props as arguments to device_add or -device, for any slot @type.
-> >> > Some clients may want to extract some information from @props (if
-> >> > they already manage PCI addresses, for example), but some of them
-> >> > may simply choose any available slot and copy @props blindly.
-> >> >
-> >> > I didn't want to state anything about QOM properties, because I
-> >> > only want @props to represent device_add/-device arguments. Some
-> >> > of those arguments are consumed by the device_add code itself
-> >> > (e.g. "bus") and others are translated to QOM properties. I don't
-> >> > want the interface to impose any restrictions on how this is
-> >> > implemented.
-> >> 
-> >> Hmm, is this meant to work as follows?  To plug a device into this slot,
-> >> you use
-> >> 
-> >>     { "execute": "device_add",
-> >>       "arguments": { "driver": TYPE, ... PROPS ... }
-> >> 
-> >> where TYPE is a (concrete subtype of a) member of
-> >> @accepted-device-types, and PROPS is the value of @props spliced in.
-> >> Example: the data for slot 06.0 of PCI bus pci.0 would be something like
-> >> 
-> >>     {
-> >>       "bus": "pci.0",
-> >
-> > There's no "bus" field in DeviceSlotInfo. It was a documentation bug.
-> 
-> Should read code, not docs ;)
-> 
-> >>       "props": {
-> >>           "bus": "pci.0",
-> >>           "addr": "06.0"
-> >>       }
-> >>     }
-> >> 
-> >> Doesn't match your example output; I guess I'm still misunderstanding
-> >> something.
-> >
-> > This is a busy PCI slot, from my example:
-> >
-> >         {
-> >             "available": false,
-> >             "devices": [
-> >                 "/machine/q35/mch"
-> >             ],
-> >             "accepted-device-types": [
-> >                 "legacy-pci-device",
-> >                 "pci-express-device"
-> >             ],
-> >             "props": {
-> >                 "bus": "/machine/q35/pcie.0",
-> 
-> Does device_add device_add bus=/machine/q35/pcie.0 even work?  I know
-> qbus_find() interprets /-separated paths, but their semantics are FUBAR
-> (I can find details if you're curious).  We've long advised to use only
-> values without '/', like bus=pcie.0.
+>   pc-i440fx-2.8, defaults -> succeeds
+>   pc-i440fx-2.8, disable-modern=3Dtrue -> succeeds
+>   pc-i440fx-2.8, disable-modern=3Dfalse -> succeeds
 
-@device_add documentation says:
+I wasn't able to test disable-modern with pc-i440fx-2.6 due to the issue
+being fixes by proposed patch "machine: Convert abstract typename on
+compat_props to subclass names", but I think the rest of the cases align
+with expectations:
 
-# @bus: #optional the device's parent bus (device tree path)
+2.6, defaults: succeeds
 
-> 
-> Now, QOM gives us a framework for interpreting paths sanely.  Switching
-> the value of bus to QOM paths would be a compatibility break, though.
-> Matters only if the botched /-paths are actually used.
+2.7, defaults: fails
+2.7, disable-modern=3Dtrue: succeeds
+2.7, disable-modern=3Dfalse: fails
 
-I would be happy to use the bus name instead of the full path,
-but I don't see any code that ensures that bus names are really
-unique. Is there any existing mechanism to ensure that?
+2.8, defaults: succeeds
+2.7, disable-modern=3Dtrue: succeeds
+2.7, disable-modern=3Dfalse: succeeds
 
-> 
-> >                 "addr": 0
-> >             },
-> >             "hotpluggable": false,
-> >             "type": "pci",
-> >             "max-devices": 1
-> >         },
-> >
-> > This is an empty PCI slot from my example. It has available=false because
-> > hotplug is not supported on the root bus:
-> >
-> >         {
-> >             "available": false,
-> >             "devices": [],
-> >             "accepted-device-types": [
-> >                 "legacy-pci-device",
-> >                 "pci-express-device"  
-> >             ],
-> >             "props": {
-> >                 "bus": "/machine/q35/pcie.0",
-> >                 "addr": 32
-> >             },
-> >             "hotpluggable": false,
-> >             "type": "pci",
-> >             "max-devices": 1
-> >         },
-> >
-> > This is an empty PCI slot on pc_piix (not on my example):
-> >
-> >         {
-> >             "available": true,
-> >             "devices": [],
-> >             "accepted-device-types": [
-> >                 "legacy-pci-device"
-> >             ],
-> >             "props": {
-> >                 "bus": "/machine/i440fx/pci.0",
-> >                 "addr": 32
-> >             },
-> >             "hotpluggable": true,
-> >             "type": "pci",
-> >             "max-devices": 1
-> >         },
-> >
-> > This is a free PCIe slot, from my example:
-> >
-> >         {
-> >             "available": true,
-> >             "devices": [],
-> >             "accepted-device-types": [
-> >                 "pci-express-device"
-> >             ],
-> >             "props": {
-> >                 "bus": "/machine/peripheral/ich9-pcie-port-3/ich9-pcie-port-3",
-> >                 "addr": 0
-> >             },
-> >             "hotpluggable": true,
-> >             "type": "pci",
-> >             "max-devices": 1
-> >         },
-> >
-> > Note that it returns the uint32 value of "addr" (there's some magic on the
-> > devfn setter to make it accept both "<slot>[.<function>]" strings and <devfn>
-> > integers. On the next version, I plan to fix this insanity and replace "addr"
-> > with proper "slot" and "function" integer properties. (See FIXME below)
-> >
-> >> 
-> >> >
-> >> >> 
-> >> >> > +##
-> >> >> > +{ 'union': 'DeviceSlotInfo',
-> >> >> > +  'base': { 'type': 'DeviceSlotType',
-> >> >> > +            'accepted-device-types': [ 'str' ],
-> >> >> > +            '*max-devices': 'int', 'devices': [ 'str' ],
-> >> >> > +            'available': 'bool', 'hotpluggable': 'bool' },
-> >> >> > +  'discriminator': 'type',
-> >> >> > +  'data': { 'generic': 'GenericSlotInfo',
-> >> >> > +            'pci': 'PCISlotInfo',
-> >> >> > +            'cpu': 'CPUSlotInfo' } }
-> >> >> > +
-> >> >> > +##
-> >> >> > +# @GenericSlotProperties:
-> >> >> > +##
-> >> >> > +{ 'struct': 'GenericSlotProperties',
-> >> >> > +  'data': { 'bus': 'str' } }
-> >> >> > +
-> >> >> > +
-> >> >> > +##
-> >> >> > +# @GenericSlotInfo:
-> >> >> > +#
-> >> >> > +# Generic slot information, with no bus-specific information
-> >> >> > +##
-> >> >> > +{ 'struct': 'GenericSlotInfo',
-> >> >> > +  'data': { 'props': 'GenericSlotProperties' } }
-> >> >> > +
-> >> >> > +##
-> >> >> > +# @PCIDeviceSlotProperties:
-> >> >> > +#
-> >> >> > +# Properties that can be set when plugging a PCI device.
-> >> >> > +#
-> >> >> > +# @addr: "addr" argument to @device_add.
-> >> >> > +#
-> >> >> > +#FIXME: replace @addr with slot and function properties.
-> >> >> > +##
-> >> >> > +{ 'struct': 'PCIDeviceSlotProperties',
-> >> >> > +  'data': { 'bus': 'str', 'addr': 'int' } }
-> >> >> > +
-> >> >> > +##
-> >> >> > +# @PCISlotInfo:
-> >> >> > +#
-> >> >> > +# Information on a PCI device slot.
-> >> >> > +#
-> >> >> > +# @props: The @device_add arguments that can be used when plugging
-> >> >> > +# the device.
-> >> >> > +##
-> >> >> > +{ 'struct': 'PCISlotInfo',
-> >> >> > +  'data': { 'props': 'PCIDeviceSlotProperties' } }
-> >> >> > +
-> >> >> > +##
-> >> >> > +# @CPUSlotInfo:
-> >> >> > +#
-> >> >> > +# Information on a CPU device slot.
-> >> >> > +#
-> >> >> > +# @props: The @device_add arguments that can be used when plugging
-> >> >> > +# the device.
-> >> >> > +##
-> >> >> > +{ 'struct': 'CPUSlotInfo',
-> >> >> > +  'data': { 'props': 'CpuInstanceProperties' } }
-> >> >> > +
-> >> >> > +##
-> >> >> > +# @query-device-slots:
-> >> >> > +#
-> >> >> > +# Return the list of possible slots for plugging devices using
-> >> >> > +# @device_add.
-> >> >> > +##
-> >> >> > +{ 'command': 'query-device-slots',
-> >> >> > +  'returns': [ 'DeviceSlotInfo' ] }
-> >> >> > +
-> >> >> > +##
-> >> >> >  # @MachineBusInfo
-> >> >> >  #
-> >> >> >  # Information about a bus present on a machine.
-> >> >> [...]
+> =
 
--- 
-Eduardo
+> > =
+
+> > > > ---
+> > > > =
+
+> > > > I'm not sure about the property name, let me know if you have bette=
+r ideas.
+> > > > I didn't tested migration yet, but I wanted to share the patch whil=
+e I test it.
+> > > > I tested booting v2.8 and v2.7 machines with !VERSION_1 and get exp=
+ected result:
+> > > >  - v2.8: Virtio-pci probe succeed
+> > > >  - v2.7: Virtio-pci probe fails
+> > > > =
+
+> > > > Thanks,
+> > > > Maxime
+> > > > =
+
+> > > >  hw/virtio/virtio-pci.c | 4 +++-
+> > > >  hw/virtio/virtio-pci.h | 1 +
+> > > >  include/hw/compat.h    | 4 ++++
+> > > >  3 files changed, 8 insertions(+), 1 deletion(-)
+> > > > =
+
+> > > > diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+> > > > index 521ba0b..93f6b54 100644
+> > > > --- a/hw/virtio/virtio-pci.c
+> > > > +++ b/hw/virtio/virtio-pci.c
+> > > > @@ -1580,7 +1580,8 @@ static void virtio_pci_device_plugged(DeviceS=
+tate *d, Error **errp)
+> > > >       * Virtio capabilities present without
+> > > >       * VIRTIO_F_VERSION_1 confuses guests
+> > > >       */
+> > > > -    if (!virtio_has_feature(vdev->host_features, VIRTIO_F_VERSION_=
+1)) {
+> > > > +    if (!proxy->modern_broken &&
+> > > > +            !virtio_has_feature(vdev->host_features, VIRTIO_F_VERS=
+ION_1)) {
+> > > >          virtio_pci_disable_modern(proxy);
+> > > > =
+
+> > > >          if (!legacy) {
+> > > > @@ -1852,6 +1853,7 @@ static Property virtio_pci_properties[] =3D {
+> > > >                      VIRTIO_PCI_FLAG_DISABLE_PCIE_BIT, false),
+> > > >      DEFINE_PROP_BIT("page-per-vq", VirtIOPCIProxy, flags,
+> > > >                      VIRTIO_PCI_FLAG_PAGE_PER_VQ_BIT, false),
+> > > > +    DEFINE_PROP_BOOL("x-modern-broken", VirtIOPCIProxy, modern_bro=
+ken, false),
+> > > >      DEFINE_PROP_END_OF_LIST(),
+> > > >  };
+> > > > =
+
+> > > > diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h
+> > > > index b2a996f..1dca223 100644
+> > > > --- a/hw/virtio/virtio-pci.h
+> > > > +++ b/hw/virtio/virtio-pci.h
+> > > > @@ -153,6 +153,7 @@ struct VirtIOPCIProxy {
+> > > >      int config_cap;
+> > > >      uint32_t flags;
+> > > >      bool disable_modern;
+> > > > +    bool modern_broken;
+> > > >      OnOffAuto disable_legacy;
+> > > >      uint32_t class_code;
+> > > >      uint32_t nvectors;
+> > > > diff --git a/include/hw/compat.h b/include/hw/compat.h
+> > > > index 0f06e11..fe11723 100644
+> > > > --- a/include/hw/compat.h
+> > > > +++ b/include/hw/compat.h
+> > > > @@ -18,6 +18,10 @@
+> > > >          .driver   =3D "intel-iommu",\
+> > > >          .property =3D "x-buggy-eim",\
+> > > >          .value    =3D "true",\
+> > > > +    },{\
+> > > > +        .driver   =3D "virtio-pci",\
+> > > > +        .property =3D "x-modern-broken",\
+> > > > +        .value    =3D "on",\
+> > > >      },
+> > > > =
+
+> > > >  #define HW_COMPAT_2_6 \
+> > > > -- =
+
+> > > > 2.9.3
+> > > > =
+
+> > =
+
+> =
+
+>=20
