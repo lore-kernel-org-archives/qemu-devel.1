@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34314)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58250)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cH0HP-0000ye-Bb
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 22:30:58 -0500
+	(envelope-from <harrynjit@gmail.com>) id 1cH2bM-0000yK-2a
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 00:59:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cH0HK-0005tR-7e
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 22:30:55 -0500
-Received: from indium.canonical.com ([91.189.90.7]:60373)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cH0HJ-0005tL-Ui
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 22:30:50 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cH0HH-0000XA-LY
-	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 03:30:47 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id A0BD62E80C3
-	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 03:30:47 +0000 (UTC)
+	(envelope-from <harrynjit@gmail.com>) id 1cH2bH-0004aL-8G
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 00:59:40 -0500
+Received: from mail-qt0-f195.google.com ([209.85.216.195]:33859)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <harrynjit@gmail.com>) id 1cH2bH-0004P3-3K
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 00:59:35 -0500
+Received: by mail-qt0-f195.google.com with SMTP id l20so1027944qta.1
+	for <qemu-devel@nongnu.org>; Tue, 13 Dec 2016 21:59:12 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 14 Dec 2016 03:21:34 -0000
-From: Ziyue Yang <1641637@bugs.launchpad.net>
-Reply-To: Bug 1641637 <1641637@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20161114154536.3631.7893.malonedeb@soybean.canonical.com>
-Message-Id: <20161214032134.27570.96790.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1641637] Re: incorrect illegal SSE3 instructions
- reporting on x86_64
+From: Weiwei Jia <harrynjit@gmail.com>
+Date: Wed, 14 Dec 2016 00:58:11 -0500
+Message-ID: <CA+scX6=9y4wDBWzXyqpGh9U__usKUa6sxwdc63iA8YRmpWFPqA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: [Qemu-devel] Lock contention in QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,782 +25,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-
-Hi Jie,
-
-I can reproduce this by single-stepping through the bug1 testing code
-using gdb, and SIGILL was encountered when executing the pabsb SSE3
-instruction. Maybe it was due to QEMU's translator, I'll look further
-into it.
-
-** Changed in: qemu
-       Status: New =3D> Confirmed
-
-** Changed in: qemu
-     Assignee: (unassigned) =3D> Ziyue Yang (yzyubuntuzh)
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1641637
-
-Title:
-  incorrect illegal SSE3 instructions reporting on x86_64
-
-Status in QEMU:
-  Confirmed
-
-Bug description:
-  Hi all, we found 28 differently encoded illegal SSE3 instructions
-  reporting on the most recent x86_64 user mode linux qemu (version
-  2.7.0). We believe these reporting should be incorrect because the
-  same code can be executed on a real machine. The instructions are the
-  following:
-
-  pabsb %mm0, %mm1
-  pabsb %xmm0, %xmm1
-  pabsd %mm0, %mm1
-  pabsd %xmm0, %xmm1
-  pabsw %mm0, %mm1
-  pabsw %xmm0, %xmm1
-  phaddd %mm0, %mm1
-  phaddd %xmm0, %xmm1
-  phaddsw %mm0, %mm1
-  phaddsw %xmm0, %xmm1
-  phaddw %mm0, %mm1
-  phaddw %xmm0, %xmm1
-  phsubd %mm0, %mm1
-  phsubd %xmm0, %xmm1
-  phsubsw %mm0, %mm1
-  phsubsw %xmm0, %xmm1
-  phsubw %mm0, %mm1
-  phsubw %xmm0, %xmm1
-  pmaddubsw %mm0, %mm1
-  pmaddubsw %xmm0, %xmm1
-  pmulhrsw %mm0, %mm1
-  pmulhrsw %xmm0, %xmm1
-  psignb %mm0, %mm1
-  psignb %xmm0, %xmm1
-  psignd %mm0, %mm1
-  psignd %xmm0, %xmm1
-  psignw %mm0, %mm1
-  psignw %xmm0, %xmm1
-
-  The following is the proof of code
-
-  /********** Beginning of bug 1.c: pabsb %mm0, %mm1 **********/
-
-  int printf(const char *format, ...);
-  unsigned char i0[0x10];
-  unsigned char i1[0x10];
-  unsigned char o[0x10];
-  int main() {
-      int k =3D 0;
-      asm("mov %0, %%rdx\n"
-          "movq (%%rdx), %%mm0\n"::"r"((char *)(i0)));;
-      asm("mov %0, %%rdx\n"
-          "movq (%%rdx), %%mm1\n"::"r"((char *)(i1)));;
-      asm("pabsb %mm0, %mm1");
-      asm("mov %0, %%rdx\n"
-          "movq %%mm1, (%%rdx)\n"::"r"((char *)(o)));;
-      for (k =3D 0; k < 0x10; k++)
-          printf("%02x", o[0x10 - 1 - k]);
-      printf("\n");
-  }
-
-  /********** End of bug 1.c **********/
-
-  =
-
-  /********** Beginning of bug 2.c: pabsb %xmm0, %xmm1 **********/
-
-  int printf(const char *format, ...);
-  unsigned char i0[0x10];
-  unsigned char i1[0x10];
-  unsigned char o[0x10];
-  int main() {
-      int k =3D 0;
-      asm("mov %0, %%rdx\n"
-          "movdqu (%%rdx), %%xmm0\n"::"r"((char *)(i0)));;
-      asm("mov %0, %%rdx\n"
-          "movdqu (%%rdx), %%xmm1\n"::"r"((char *)(i1)));;
-      asm("pabsb %xmm0, %xmm1");
-      asm("mov %0, %%rdx\n"
-          "movdqu %%xmm1, (%%rdx)\n"::"r"((char *)(o)));;
-      for (k =3D 0; k < 0x10; k++)
-          printf("%02x", o[0x10 - 1 - k]);
-      printf("\n");
-  }
-
-  /********** End of bug 2.c **********/
-
-  =
-
-  /********** Beginning of bug 3.c: pabsd %mm0, %mm1 **********/
-
-  int printf(const char *format, ...);
-  unsigned char i0[0x10];
-  unsigned char i1[0x10];
-  unsigned char o[0x10];
-  int main() {
-      int k =3D 0;
-      asm("mov %0, %%rdx\n"
-          "movq (%%rdx), %%mm0\n"::"r"((char *)(i0)));;
-      asm("mov %0, %%rdx\n"
-          "movq (%%rdx), %%mm1\n"::"r"((char *)(i1)));;
-      asm("pabsd %mm0, %mm1");
-      asm("mov %0, %%rdx\n"
-          "movq %%mm1, (%%rdx)\n"::"r"((char *)(o)));;
-      for (k =3D 0; k < 0x10; k++)
-          printf("%02x", o[0x10 - 1 - k]);
-      printf("\n");
-  }
-
-  /********** End of bug 3.c **********/
-
-  =
-
-  /********** Beginning of bug 4.c: pabsd %xmm0, %xmm1 **********/
-
-  int printf(const char *format, ...);
-  unsigned char i0[0x10];
-  unsigned char i1[0x10];
-  unsigned char o[0x10];
-  int main() {
-      int k =3D 0;
-      asm("mov %0, %%rdx\n"
-          "movdqu (%%rdx), %%xmm0\n"::"r"((char *)(i0)));;
-      asm("mov %0, %%rdx\n"
-          "movdqu (%%rdx), %%xmm1\n"::"r"((char *)(i1)));;
-      asm("pabsd %xmm0, %xmm1");
-      asm("mov %0, %%rdx\n"
-          "movdqu %%xmm1, (%%rdx)\n"::"r"((char *)(o)));;
-      for (k =3D 0; k < 0x10; k++)
-          printf("%02x", o[0x10 - 1 - k]);
-      printf("\n");
-  }
-
-  /********** End of bug 4.c **********/
-
-  =
-
-  /********** Beginning of bug 5.c: pabsw %mm0, %mm1 **********/
-
-  int printf(const char *format, ...);
-  unsigned char i0[0x10];
-  unsigned char i1[0x10];
-  unsigned char o[0x10];
-  int main() {
-      int k =3D 0;
-      asm("mov %0, %%rdx\n"
-          "movq (%%rdx), %%mm0\n"::"r"((char *)(i0)));;
-      asm("mov %0, %%rdx\n"
-          "movq (%%rdx), %%mm1\n"::"r"((char *)(i1)));;
-      asm("pabsw %mm0, %mm1");
-      asm("mov %0, %%rdx\n"
-          "movq %%mm1, (%%rdx)\n"::"r"((char *)(o)));;
-      for (k =3D 0; k < 0x10; k++)
-          printf("%02x", o[0x10 - 1 - k]);
-      printf("\n");
-  }
-
-  /********** End of bug 5.c **********/
-
-  =
-
-  /********** Beginning of bug 6.c: pabsw %xmm0, %xmm1 **********/
-
-  int printf(const char *format, ...);
-  unsigned char i0[0x10];
-  unsigned char i1[0x10];
-  unsigned char o[0x10];
-  int main() {
-      int k =3D 0;
-      asm("mov %0, %%rdx\n"
-          "movdqu (%%rdx), %%xmm0\n"::"r"((char *)(i0)));;
-      asm("mov %0, %%rdx\n"
-          "movdqu (%%rdx), %%xmm1\n"::"r"((char *)(i1)));;
-      asm("pabsw %xmm0, %xmm1");
-      asm("mov %0, %%rdx\n"
-          "movdqu %%xmm1, (%%rdx)\n"::"r"((char *)(o)));;
-      for (k =3D 0; k < 0x10; k++)
-          printf("%02x", o[0x10 - 1 - k]);
-      printf("\n");
-  }
-
-  /********** End of bug 6.c **********/
-
-  =
-
-  /********** Beginning of bug 7.c: phaddd %mm0, %mm1 **********/
-
-  int printf(const char *format, ...);
-  unsigned char i0[0x10];
-  unsigned char i1[0x10];
-  unsigned char o[0x10];
-  int main() {
-      int k =3D 0;
-      asm("mov %0, %%rdx\n"
-          "movq (%%rdx), %%mm1\n"::"r"((char *)(i0)));;
-      asm("mov %0, %%rdx\n"
-          "movq (%%rdx), %%mm1\n"::"r"((char *)(i1)));;
-      asm("phaddd %mm0, %mm1");
-      asm("mov %0, %%rdx\n"
-          "movq %%mm1, (%%rdx)\n"::"r"((char *)(o)));;
-      for (k =3D 0; k < 0x10; k++)
-          printf("%02x", o[0x10 - 1 - k]);
-      printf("\n");
-  }
-
-  /********** End of bug 7.c **********/
-
-  =
-
-  /********** Beginning of bug 8.c: phaddd %xmm0, %xmm1 **********/
-
-  int printf(const char *format, ...);
-  unsigned char i0[0x10];
-  unsigned char i1[0x10];
-  unsigned char o[0x10];
-  int main() {
-      int k =3D 0;
-      asm("mov %0, %%rdx\n"
-          "movdqu (%%rdx), %%xmm1\n"::"r"((char *)(i0)));;
-      asm("mov %0, %%rdx\n"
-          "movdqu (%%rdx), %%xmm1\n"::"r"((char *)(i1)));;
-      asm("phaddd %xmm0, %xmm1");
-      asm("mov %0, %%rdx\n"
-          "movdqu %%xmm1, (%%rdx)\n"::"r"((char *)(o)));;
-      for (k =3D 0; k < 0x10; k++)
-          printf("%02x", o[0x10 - 1 - k]);
-      printf("\n");
-  }
-
-  /********** End of bug 8.c **********/
-
-  =
-
-  /********** Beginning of bug 9.c: phaddsw %mm0, %mm1 **********/
-
-  int printf(const char *format, ...);
-  unsigned char i0[0x10];
-  unsigned char i1[0x10];
-  unsigned char o[0x10];
-  int main() {
-      int k =3D 0;
-      asm("mov %0, %%rdx\n"
-          "movq (%%rdx), %%mm1\n"::"r"((char *)(i0)));;
-      asm("mov %0, %%rdx\n"
-          "movq (%%rdx), %%mm1\n"::"r"((char *)(i1)));;
-      asm("phaddsw %mm0, %mm1");
-      asm("mov %0, %%rdx\n"
-          "movq %%mm1, (%%rdx)\n"::"r"((char *)(o)));;
-      for (k =3D 0; k < 0x10; k++)
-          printf("%02x", o[0x10 - 1 - k]);
-      printf("\n");
-  }
-
-  /********** End of bug 9.c **********/
-
-  =
-
-  /********** Beginning of bug 10.c: phaddsw %xmm0, %xmm1 **********/
-
-  int printf(const char *format, ...);
-  unsigned char i0[0x10];
-  unsigned char i1[0x10];
-  unsigned char o[0x10];
-  int main() {
-      int k =3D 0;
-      asm("mov %0, %%rdx\n"
-          "movdqu (%%rdx), %%xmm1\n"::"r"((char *)(i0)));;
-      asm("mov %0, %%rdx\n"
-          "movdqu (%%rdx), %%xmm1\n"::"r"((char *)(i1)));;
-      asm("phaddsw %xmm0, %xmm1");
-      asm("mov %0, %%rdx\n"
-          "movdqu %%xmm1, (%%rdx)\n"::"r"((char *)(o)));;
-      for (k =3D 0; k < 0x10; k++)
-          printf("%02x", o[0x10 - 1 - k]);
-      printf("\n");
-  }
-
-  /********** End of bug 10.c **********/
-
-  =
-
-  /********** Beginning of bug 11.c: phaddw %mm0, %mm1 **********/
-
-  int printf(const char *format, ...);
-  unsigned char i0[0x10];
-  unsigned char i1[0x10];
-  unsigned char o[0x10];
-  int main() {
-      int k =3D 0;
-      asm("mov %0, %%rdx\n"
-          "movq (%%rdx), %%mm1\n"::"r"((char *)(i0)));;
-      asm("mov %0, %%rdx\n"
-          "movq (%%rdx), %%mm1\n"::"r"((char *)(i1)));;
-      asm("phaddw %mm0, %mm1");
-      asm("mov %0, %%rdx\n"
-          "movq %%mm1, (%%rdx)\n"::"r"((char *)(o)));;
-      for (k =3D 0; k < 0x10; k++)
-          printf("%02x", o[0x10 - 1 - k]);
-      printf("\n");
-  }
-
-  /********** End of bug 11.c **********/
-
-  =
-
-  /********** Beginning of bug 12.c: phaddw %xmm0, %xmm1 **********/
-
-  int printf(const char *format, ...);
-  unsigned char i0[0x10];
-  unsigned char i1[0x10];
-  unsigned char o[0x10];
-  int main() {
-      int k =3D 0;
-      asm("mov %0, %%rdx\n"
-          "movdqu (%%rdx), %%xmm1\n"::"r"((char *)(i0)));;
-      asm("mov %0, %%rdx\n"
-          "movdqu (%%rdx), %%xmm1\n"::"r"((char *)(i1)));;
-      asm("phaddw %xmm0, %xmm1");
-      asm("mov %0, %%rdx\n"
-          "movdqu %%xmm1, (%%rdx)\n"::"r"((char *)(o)));;
-      for (k =3D 0; k < 0x10; k++)
-          printf("%02x", o[0x10 - 1 - k]);
-      printf("\n");
-  }
-
-  /********** End of bug 12.c **********/
-
-  =
-
-  /********** Beginning of bug 13.c: phsubd %mm0, %mm1 **********/
-
-  int printf(const char *format, ...);
-  unsigned char i0[0x10];
-  unsigned char i1[0x10];
-  unsigned char o[0x10];
-  int main() {
-      int k =3D 0;
-      asm("mov %0, %%rdx\n"
-          "movq (%%rdx), %%mm1\n"::"r"((char *)(i0)));;
-      asm("mov %0, %%rdx\n"
-          "movq (%%rdx), %%mm1\n"::"r"((char *)(i1)));;
-      asm("phsubd %mm0, %mm1");
-      asm("mov %0, %%rdx\n"
-          "movq %%mm1, (%%rdx)\n"::"r"((char *)(o)));;
-      for (k =3D 0; k < 0x10; k++)
-          printf("%02x", o[0x10 - 1 - k]);
-      printf("\n");
-  }
-
-  /********** End of bug 13.c **********/
-
-  =
-
-  /********** Beginning of bug 14.c: phsubd %xmm0, %xmm1 **********/
-
-  int printf(const char *format, ...);
-  unsigned char i0[0x10];
-  unsigned char i1[0x10];
-  unsigned char o[0x10];
-  int main() {
-      int k =3D 0;
-      asm("mov %0, %%rdx\n"
-          "movdqu (%%rdx), %%xmm1\n"::"r"((char *)(i0)));;
-      asm("mov %0, %%rdx\n"
-          "movdqu (%%rdx), %%xmm1\n"::"r"((char *)(i1)));;
-      asm("phsubd %xmm0, %xmm1");
-      asm("mov %0, %%rdx\n"
-          "movdqu %%xmm1, (%%rdx)\n"::"r"((char *)(o)));;
-      for (k =3D 0; k < 0x10; k++)
-          printf("%02x", o[0x10 - 1 - k]);
-      printf("\n");
-  }
-
-  /********** End of bug 14.c **********/
-
-  =
-
-  /********** Beginning of bug 15.c: phsubsw %mm0, %mm1 **********/
-
-  int printf(const char *format, ...);
-  unsigned char i0[0x10];
-  unsigned char i1[0x10];
-  unsigned char o[0x10];
-  int main() {
-      int k =3D 0;
-      asm("mov %0, %%rdx\n"
-          "movq (%%rdx), %%mm1\n"::"r"((char *)(i0)));;
-      asm("mov %0, %%rdx\n"
-          "movq (%%rdx), %%mm1\n"::"r"((char *)(i1)));;
-      asm("phsubsw %mm0, %mm1");
-      asm("mov %0, %%rdx\n"
-          "movq %%mm1, (%%rdx)\n"::"r"((char *)(o)));;
-      for (k =3D 0; k < 0x10; k++)
-          printf("%02x", o[0x10 - 1 - k]);
-      printf("\n");
-  }
-
-  /********** End of bug 15.c **********/
-
-  =
-
-  /********** Beginning of bug 16.c: phsubsw %xmm0, %xmm1 **********/
-
-  int printf(const char *format, ...);
-  unsigned char i0[0x10];
-  unsigned char i1[0x10];
-  unsigned char o[0x10];
-  int main() {
-      int k =3D 0;
-      asm("mov %0, %%rdx\n"
-          "movdqu (%%rdx), %%xmm1\n"::"r"((char *)(i0)));;
-      asm("mov %0, %%rdx\n"
-          "movdqu (%%rdx), %%xmm1\n"::"r"((char *)(i1)));;
-      asm("phsubsw %xmm0, %xmm1");
-      asm("mov %0, %%rdx\n"
-          "movdqu %%xmm1, (%%rdx)\n"::"r"((char *)(o)));;
-      for (k =3D 0; k < 0x10; k++)
-          printf("%02x", o[0x10 - 1 - k]);
-      printf("\n");
-  }
-
-  /********** End of bug 16.c **********/
-
-  =
-
-  /********** Beginning of bug 17.c: phsubw %mm0, %mm1 **********/
-
-  int printf(const char *format, ...);
-  unsigned char i0[0x10];
-  unsigned char i1[0x10];
-  unsigned char o[0x10];
-  int main() {
-      int k =3D 0;
-      asm("mov %0, %%rdx\n"
-          "movq (%%rdx), %%mm1\n"::"r"((char *)(i0)));;
-      asm("mov %0, %%rdx\n"
-          "movq (%%rdx), %%mm1\n"::"r"((char *)(i1)));;
-      asm("phsubw %mm0, %mm1");
-      asm("mov %0, %%rdx\n"
-          "movq %%mm1, (%%rdx)\n"::"r"((char *)(o)));;
-      for (k =3D 0; k < 0x10; k++)
-          printf("%02x", o[0x10 - 1 - k]);
-      printf("\n");
-  }
-
-  /********** End of bug 17.c **********/
-
-  =
-
-  /********** Beginning of bug 18.c: phsubw %xmm0, %xmm1 **********/
-
-  int printf(const char *format, ...);
-  unsigned char i0[0x10];
-  unsigned char i1[0x10];
-  unsigned char o[0x10];
-  int main() {
-      int k =3D 0;
-      asm("mov %0, %%rdx\n"
-          "movdqu (%%rdx), %%xmm1\n"::"r"((char *)(i0)));;
-      asm("mov %0, %%rdx\n"
-          "movdqu (%%rdx), %%xmm1\n"::"r"((char *)(i1)));;
-      asm("phsubw %xmm0, %xmm1");
-      asm("mov %0, %%rdx\n"
-          "movdqu %%xmm1, (%%rdx)\n"::"r"((char *)(o)));;
-      for (k =3D 0; k < 0x10; k++)
-          printf("%02x", o[0x10 - 1 - k]);
-      printf("\n");
-  }
-
-  /********** End of bug 18.c **********/
-
-  =
-
-  /********** Beginning of bug 19.c: pmaddubsw %mm0, %mm1 **********/
-
-  int printf(const char *format, ...);
-  unsigned char i0[0x10];
-  unsigned char i1[0x10];
-  unsigned char i2[0x10];
-  unsigned char i3[0x10];
-  unsigned char o[0x10];
-  int main() {
-      int k =3D 0;
-      asm("mov %0, %%rdx\n"
-          "movq (%%rdx), %%mm0\n"::"r"((char *)(i0)));;
-      asm("mov %0, %%rdx\n"
-          "movq (%%rdx), %%mm1\n"::"r"((char *)(i1)));;
-      asm("mov %0, %%rdx\n"
-          "movq (%%rdx), %%mm0\n"::"r"((char *)(i2)));;
-      asm("mov %0, %%rdx\n"
-          "movq (%%rdx), %%mm1\n"::"r"((char *)(i3)));;
-      asm("pmaddubsw %mm0, %mm1");
-      asm("mov %0, %%rdx\n"
-          "movq %%mm1, (%%rdx)\n"::"r"((char *)(o)));;
-      for (k =3D 0; k < 0x10; k++)
-          printf("%02x", o[0x10 - 1 - k]);
-      printf("\n");
-  }
-
-  /********** End of bug 19.c **********/
-
-  =
-
-  /********** Beginning of bug 20.c: pmaddubsw %xmm0, %xmm1 **********/
-
-  int printf(const char *format, ...);
-  unsigned char i0[0x10];
-  unsigned char i1[0x10];
-  unsigned char i2[0x10];
-  unsigned char i3[0x10];
-  unsigned char o[0x10];
-  int main() {
-      int k =3D 0;
-      asm("mov %0, %%rdx\n"
-          "movdqu (%%rdx), %%xmm0\n"::"r"((char *)(i0)));;
-      asm("mov %0, %%rdx\n"
-          "movdqu (%%rdx), %%xmm1\n"::"r"((char *)(i1)));;
-      asm("mov %0, %%rdx\n"
-          "movdqu (%%rdx), %%xmm0\n"::"r"((char *)(i2)));;
-      asm("mov %0, %%rdx\n"
-          "movdqu (%%rdx), %%xmm1\n"::"r"((char *)(i3)));;
-      asm("pmaddubsw %xmm0, %xmm1");
-      asm("mov %0, %%rdx\n"
-          "movdqu %%xmm1, (%%rdx)\n"::"r"((char *)(o)));;
-      for (k =3D 0; k < 0x10; k++)
-          printf("%02x", o[0x10 - 1 - k]);
-      printf("\n");
-  }
-
-  /********** End of bug 20.c **********/
-
-  =
-
-  /********** Beginning of bug 21.c: pmulhrsw %mm0, %mm1 **********/
-
-  int printf(const char *format, ...);
-  unsigned char i0[0x10];
-  unsigned char i1[0x10];
-  unsigned char o[0x10];
-  int main() {
-      int k =3D 0;
-      asm("mov %0, %%rdx\n"
-          "movq (%%rdx), %%mm0\n"::"r"((char *)(i0)));;
-      asm("mov %0, %%rdx\n"
-          "movq (%%rdx), %%mm1\n"::"r"((char *)(i1)));;
-      asm("pmulhrsw %mm0, %mm1");
-      asm("mov %0, %%rdx\n"
-          "movq %%mm1, (%%rdx)\n"::"r"((char *)(o)));;
-      for (k =3D 0; k < 0x10; k++)
-          printf("%02x", o[0x10 - 1 - k]);
-      printf("\n");
-  }
-
-  /********** End of bug 21.c **********/
-
-  =
-
-  /********** Beginning of bug 22.c: pmulhrsw %xmm0, %xmm1 **********/
-
-  int printf(const char *format, ...);
-  unsigned char i0[0x10];
-  unsigned char i1[0x10];
-  unsigned char o[0x10];
-  int main() {
-      int k =3D 0;
-      asm("mov %0, %%rdx\n"
-          "movdqu (%%rdx), %%xmm0\n"::"r"((char *)(i0)));;
-      asm("mov %0, %%rdx\n"
-          "movdqu (%%rdx), %%xmm1\n"::"r"((char *)(i1)));;
-      asm("pmulhrsw %xmm0, %xmm1");
-      asm("mov %0, %%rdx\n"
-          "movdqu %%xmm1, (%%rdx)\n"::"r"((char *)(o)));;
-      for (k =3D 0; k < 0x10; k++)
-          printf("%02x", o[0x10 - 1 - k]);
-      printf("\n");
-  }
-
-  /********** End of bug 22.c **********/
-
-  =
-
-  /********** Beginning of bug 23.c: psignb %mm0, %mm1 **********/
-
-  int printf(const char *format, ...);
-  unsigned char i0[0x10];
-  unsigned char i1[0x10];
-  unsigned char o[0x10];
-  int main() {
-      int k =3D 0;
-      asm("mov %0, %%rdx\n"
-          "movq (%%rdx), %%mm0\n"::"r"((char *)(i0)));;
-      asm("mov %0, %%rdx\n"
-          "movq (%%rdx), %%mm1\n"::"r"((char *)(i1)));;
-      asm("psignb %mm0, %mm1");
-      asm("mov %0, %%rdx\n"
-          "movq %%mm1, (%%rdx)\n"::"r"((char *)(o)));;
-      for (k =3D 0; k < 0x10; k++)
-          printf("%02x", o[0x10 - 1 - k]);
-      printf("\n");
-  }
-
-  /********** End of bug 23.c **********/
-
-  =
-
-  /********** Beginning of bug 24.c: psignb %xmm0, %xmm1 **********/
-
-  int printf(const char *format, ...);
-  unsigned char i0[0x10];
-  unsigned char i1[0x10];
-  unsigned char o[0x10];
-  int main() {
-      int k =3D 0;
-      asm("mov %0, %%rdx\n"
-          "movdqu (%%rdx), %%xmm0\n"::"r"((char *)(i0)));;
-      asm("mov %0, %%rdx\n"
-          "movdqu (%%rdx), %%xmm1\n"::"r"((char *)(i1)));;
-      asm("psignb %xmm0, %xmm1");
-      asm("mov %0, %%rdx\n"
-          "movdqu %%xmm1, (%%rdx)\n"::"r"((char *)(o)));;
-      for (k =3D 0; k < 0x10; k++)
-          printf("%02x", o[0x10 - 1 - k]);
-      printf("\n");
-  }
-
-  /********** End of bug 24.c **********/
-
-  =
-
-  /********** Beginning of bug 25.c: psignd %mm0, %mm1 **********/
-
-  int printf(const char *format, ...);
-  unsigned char i0[0x10];
-  unsigned char i1[0x10];
-  unsigned char o[0x10];
-  int main() {
-      int k =3D 0;
-      asm("mov %0, %%rdx\n"
-          "movq (%%rdx), %%mm0\n"::"r"((char *)(i0)));;
-      asm("mov %0, %%rdx\n"
-          "movq (%%rdx), %%mm1\n"::"r"((char *)(i1)));;
-      asm("psignd %mm0, %mm1");
-      asm("mov %0, %%rdx\n"
-          "movq %%mm1, (%%rdx)\n"::"r"((char *)(o)));;
-      for (k =3D 0; k < 0x10; k++)
-          printf("%02x", o[0x10 - 1 - k]);
-      printf("\n");
-  }
-
-  /********** End of bug 25.c **********/
-
-  =
-
-  /********** Beginning of bug 26.c: psignd %xmm0, %xmm1 **********/
-
-  int printf(const char *format, ...);
-  unsigned char i0[0x10];
-  unsigned char i1[0x10];
-  unsigned char o[0x10];
-  int main() {
-      int k =3D 0;
-      asm("mov %0, %%rdx\n"
-          "movdqu (%%rdx), %%xmm0\n"::"r"((char *)(i0)));;
-      asm("mov %0, %%rdx\n"
-          "movdqu (%%rdx), %%xmm1\n"::"r"((char *)(i1)));;
-      asm("psignd %xmm0, %xmm1");
-      asm("mov %0, %%rdx\n"
-          "movdqu %%xmm1, (%%rdx)\n"::"r"((char *)(o)));;
-      for (k =3D 0; k < 0x10; k++)
-          printf("%02x", o[0x10 - 1 - k]);
-      printf("\n");
-  }
-
-  /********** End of bug 26.c **********/
-
-  =
-
-  /********** Beginning of bug 27.c: psignw %mm0, %mm1 **********/
-
-  int printf(const char *format, ...);
-  unsigned char i0[0x10];
-  unsigned char i1[0x10];
-  unsigned char o[0x10];
-  int main() {
-      int k =3D 0;
-      asm("mov %0, %%rdx\n"
-          "movq (%%rdx), %%mm0\n"::"r"((char *)(i0)));;
-      asm("mov %0, %%rdx\n"
-          "movq (%%rdx), %%mm1\n"::"r"((char *)(i1)));;
-      asm("psignw %mm0, %mm1");
-      asm("mov %0, %%rdx\n"
-          "movq %%mm1, (%%rdx)\n"::"r"((char *)(o)));;
-      for (k =3D 0; k < 0x10; k++)
-          printf("%02x", o[0x10 - 1 - k]);
-      printf("\n");
-  }
-
-  /********** End of bug 27.c **********/
-
-  =
-
-  /********** Beginning of bug 28.c: psignw %xmm0, %xmm1 **********/
-
-  int printf(const char *format, ...);
-  unsigned char i0[0x10];
-  unsigned char i1[0x10];
-  unsigned char o[0x10];
-  int main() {
-      int k =3D 0;
-      asm("mov %0, %%rdx\n"
-          "movdqu (%%rdx), %%xmm0\n"::"r"((char *)(i0)));;
-      asm("mov %0, %%rdx\n"
-          "movdqu (%%rdx), %%xmm1\n"::"r"((char *)(i1)));;
-      asm("psignw %xmm0, %xmm1");
-      asm("mov %0, %%rdx\n"
-          "movdqu %%xmm1, (%%rdx)\n"::"r"((char *)(o)));;
-      for (k =3D 0; k < 0x10; k++)
-          printf("%02x", o[0x10 - 1 - k]);
-      printf("\n");
-  }
-
-  /********** End of bug 28.c **********/
-
-  For any of the above code, when compiled into x86-64 binary code with
-  gcc, qemu reports the illegal instructions bug. However, these can be
-  correctly executed on a real machine. For example,
-
-  $ gcc 28.c -o 28
-  $ qemu-x86_64 ./28
-  qemu: uncaught target signal 4 (Illegal instruction) - core dumped
-  Illegal instruction
-  $ ./28
-  00000000000000000000000000000000
-
-  Some information about the system:
-
-  $ qemu-x86_64 --version
-  qemu-x86_64 version 2.7.0, Copyright (c) 2003-2016 Fabrice Bellard and th=
-e QEMU Project developers
-  $ uname -a
-  Linux cgos-System-Product-Name 3.13.0-32-generic #57-Ubuntu SMP Tue Jul 1=
-5 03:51:08 UTC 2014 x86_64 x86_64 x86_64 GNU/Linux
-  $ gcc --version
-  gcc (Ubuntu 4.8.4-2ubuntu1~14.04) 4.8.4
-  Copyright (C) 2013 Free Software Foundation, Inc.
-  This is free software; see the source for copying conditions.  There is NO
-  warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOS=
-E.
-
-  =
-
-  Thanks!
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1641637/+subscriptions
+To: stefanha@gmail.com
+Cc: qemu-devel@nongnu.org
+
+Hi Stefan,
+
+I find the timeslice of vCPU thread in QEMU/KVM is unstable when there
+are lots of read requests (for example, read 4KB each time (8GB in
+total) from one file) from Guest OS. I also find that this phenomenon
+may be caused by lock contention in QEMU layer. I find this problem
+under following workload.
+
+Workload settings:
+In VMM, there are 6 pCPUs which are pCPU0, pCPU1, pCPU2, pCPU3, pCPU4,
+pCPU5. There are two Kernel Virtual Machines (VM1 and VM2) upon VMM.
+In each VM, there are 5 vritual CPUs (vCPU0, vCPU1, vCPU2, vCPU3,
+vCPU4). vCPU0 in VM1 and vCPU0 in VM2 are pinned to pCPU0 and pCPU5
+separately to handle interrupts dedicatedly. vCPU1 in VM1 and vCPU1 in
+VM2 are pinned to pCPU1; vCPU2 in VM1 and vCPU2 in VM2 are pinned to
+pCPU2; vCPU3 in VM1 and vCPU3 in VM2 are pinned to pCPU3; vCPU4 in VM1
+and vCPU4 in VM2 are pinned to pCPU4. Besides vCPU0 in VM2 (pinned to
+pCPU5), other vCPUs all have one CPU intensive thread (while(1){i++})
+upon each of them in VM1 and VM2 to avoid the vCPU to be idle. In VM1,
+I start one I/O thread on vCPU2, which the I/O thread reads 4KB from
+one file each time (reads 8GB in total). The I/O scheduler in VM1 and
+VM2 is NOOP. The I/O scheduler in VMM is CFQ. I also pinned the I/O
+worker threads launched by QEMU to pCPU5 (note: there is no CPU
+intensive thread on pCPU5 so the I/O requests will be handled by QEMU
+I/O thread workers ASAP). The process scheduling class in VM and VMM
+is CFS.
+
+Linux Kernel version for VMM is: 3.16.39
+Linux Kernel version for VM1 and VM2 is: 4.7.4
+QEMU emulator version is: 2.0.0
+
+When I test above workload, I find the timeslice of vCPU2 thread
+jitters very much. I suspect this is triggered by lock contention in
+QEMU layer since my debug log in front of VMM Linux Kernel's
+schedule->__schedule->context_switch is like following. Once the
+timeslice jitters very much, following debug information will appear.
+
+7097537 Dec 13 11:22:33 mobius04 kernel: [39163.015789] Call Trace:
+7097538 Dec 13 11:22:33 mobius04 kernel: [39163.015791]
+[<ffffffff8176b2f0>] dump_stack+0x64/0x84
+7097539 Dec 13 11:22:33 mobius04 kernel: [39163.015793]
+[<ffffffff8176bf85>] __schedule+0x5b5/0x960
+7097540 Dec 13 11:22:33 mobius04 kernel: [39163.015794]
+[<ffffffff8176c409>] schedule+0x29/0x70
+7097541 Dec 13 11:22:33 mobius04 kernel: [39163.015796]
+[<ffffffff810ef4d8>] futex_wait_queue_me+0xd8/0x150
+7097542 Dec 13 11:22:33 mobius04 kernel: [39163.015798]
+[<ffffffff810ef6fb>] futex_wait+0x1ab/0x2b0
+7097543 Dec 13 11:22:33 mobius04 kernel: [39163.015800]
+[<ffffffff810eef00>] ? get_futex_key+0x2d0/0x2e0
+7097544 Dec 13 11:22:33 mobius04 kernel: [39163.015804]
+[<ffffffffc0290105>] ? __vmx_load_host_state+0x125/0x170 [kv
+m_intel]
+7097545 Dec 13 11:22:33 mobius04 kernel: [39163.015805]
+[<ffffffff810f1275>] do_futex+0xf5/0xd20
+7097546 Dec 13 11:22:33 mobius04 kernel: [39163.015813]
+[<ffffffffc0222690>] ? kvm_vcpu_ioctl+0x100/0x560 [kvm]
+7097547 Dec 13 11:22:33 mobius04 kernel: [39163.015816]
+[<ffffffff810b06f0>] ? __dequeue_entity+0x30/0x50
+7097548 Dec 13 11:22:33 mobius04 kernel: [39163.015818]
+[<ffffffff81013d06>] ? __switch_to+0x596/0x690
+7097549 Dec 13 11:22:33 mobius04 kernel: [39163.015820]
+[<ffffffff811f9f23>] ? do_vfs_ioctl+0x93/0x520
+7097550 Dec 13 11:22:33 mobius04 kernel: [39163.015822]
+[<ffffffff810f1f1d>] SyS_futex+0x7d/0x170
+7097551 Dec 13 11:22:33 mobius04 kernel: [39163.015824]
+[<ffffffff8116d1b2>] ? fire_user_return_notifiers+0x42/0x50
+7097552 Dec 13 11:22:33 mobius04 kernel: [39163.015826]
+[<ffffffff810154b5>] ? do_notify_resume+0xc5/0x100
+7097553 Dec 13 11:22:33 mobius04 kernel: [39163.015828]
+[<ffffffff81770a8d>] system_call_fastpath+0x1a/0x1f
+
+
+If true, I think this may be a scalability problem caused by QEMU I/O
+part. Do we have a feature in QEMU to avoid this? Would you please
+give me some suggestions about how to make the timeslice of vCPU2
+thread stable even though there are lots of I/O Read requests on it.
+Thank you.
+
+Best,
+Weiwei Jia
