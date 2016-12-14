@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38292)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41218)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cHDGV-0004sh-7o
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:22:52 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cHDRP-00066x-3w
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:34:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cHDGQ-0004xn-MU
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:22:50 -0500
-Received: from 7.mo179.mail-out.ovh.net ([46.105.61.94]:55048)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cHDRL-0008AI-SG
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:34:07 -0500
+Received: from mailhub.sw.ru ([195.214.232.25]:44644 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cHDGQ-0004xg-GB
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:22:46 -0500
-Received: from player732.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 4862E10A1E
-	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 18:22:44 +0100 (CET)
-Date: Wed, 14 Dec 2016 18:22:33 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20161214182233.0fb3c1e5@bahia.lan>
-In-Reply-To: <20161214170427.GK3808@thinpad.lan.raisama.net>
-References: <1481575745-26120-1-git-send-email-ehabkost@redhat.com>
-	<20161214164214.54254668@bahia.lan>
-	<20161214170427.GK3808@thinpad.lan.raisama.net>
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1cHDRL-00089t-GD
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:34:03 -0500
+References: <20161214150840.10899-1-alex@alex.org.uk>
+	<20161214170956.32o6b27baf3bkmd4@grep.be>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <c8e51c51-e395-5172-092c-f74ccb1791c4@virtuozzo.com>
+Date: Wed, 14 Dec 2016 20:33:48 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-2.8.1 v2] machine: Convert abstract
- typename on compat_props to subclass names
+In-Reply-To: <20161214170956.32o6b27baf3bkmd4@grep.be>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Nbd] [PATCH] Further tidy-up on block status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,63 +28,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-stable@nongnu.org, Halil Pasic <pasic@linux.vnet.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Wouter Verhelst <w@uter.be>, Alex Bligh <alex@alex.org.uk>
+Cc: nbd-general@lists.sourceforge.net, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Pavel Borzenkov <pborzenkov@virtuozzo.com>, stefanha@redhat.com, "Denis V . Lunev" <den@openvz.org>, Markus Pargmann <mpa@pengutronix.de>, Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>
 
-On Wed, 14 Dec 2016 15:04:27 -0200
-Eduardo Habkost <ehabkost@redhat.com> wrote:
+14.12.2016 20:09, Wouter Verhelst wrote:
+> On Wed, Dec 14, 2016 at 03:08:40PM +0000, Alex Bligh wrote:
+>> (NB: I've already applied this and pushed it)
+> Thanks.
+>
+>> * Change NBD_OPT_LIST_METADATA etc. to explicitly send a list of queries
+>>    and add a count of queries so we can extend the command later (rather than
+>>    rely on the length of option)
+> Sure, that works.
+>
+>> * For NBD_OPT_LIST_METADATA make absence of any query (as opposed to zero
+>>    length query) list all contexts, as absence of any query is now simple.
+>>
+>> * Move definition of namespaces in the document to somewhere more appopriate.
+>>
+>> * Various other minor changes as discussed on the mailing list
+> Right. I think we're getting close to a good spec now, for this thing.
+>
+> One thing I've been thinking about that we might want to add:
+>
+> There may be cases where a server, in performing the required calls to
+> be able to handle a BLOCK_STATUS request, will end up with more
+> information than the client asked; e.g., if the client asked information
+> in the base:allocation context on an extent at offset X of length Y,
+> then the server might conceivably do an lseek(SEEK_DATA) and/or
+> lseek(SEEK_HOLE). The result of that call might be that the file offset
+> will now point to a location Z, where Z > (X+Y).
+>
+> Currently, our spec says "the sum of the *length* fields MUST not be
+> greater than the overall *length* of request". This means that in
+> essense, the server then has to throw away the information it has on the
+> range Z - (X + Y). In case a client was interested in that information,
+> that seems like a waste. I would therefore like to remove that
+> requirement, by rephrasing that "sum of the *length* fields" thing into
+> something along the following lines:
+>
+>    In case the server returns N extents, the sum of the *length* fields
+>    of the first N-1 extents MUST NOT be greater than the overall *length*
+>    of the request. The final extent MAY exceed the length of the request
+>    if the server has that information anyway as a side effect of looking
+>    up the required information and wishes to share it.
+>
+> This would then result in the fact that the "length" field in the
+> BLOCK_STATUS command would be little more than a hint, since we're
+> saying that a server can return more data than requested (if it's
+> available anyway) and less data than requested (if it would be too
+> resource-intensive to provide all the information). Not sure whether all
+> that makes much sense anymore, but hey.
+>
+> In addition, the combination of a server providing more information than
+> requested with a "REQ_ONE" flag and a length field of zero could be an
+> interesting way to enumerate a whole export, too. Essentially, we could
+> define that as a client saying "I'm interested in what the size of the
+> extent at offset X is, and what its properties are".
+>
+> Thoughts?
+>
 
-> On Wed, Dec 14, 2016 at 04:42:14PM +0100, Greg Kurz wrote:
-> > On Mon, 12 Dec 2016 18:49:05 -0200
-> > Eduardo Habkost <ehabkost@redhat.com> wrote:
-> >  =20
-> > > Original problem description by Greg Kurz:
-> > >  =20
-> > > > Since commit "9a4c0e220d8a hw/virtio-pci: fix virtio
-> > > > behaviour", passing -device virtio-blk-pci.disable-modern=3Doff
-> > > > has no effect on 2.6 machine types because the internal
-> > > > virtio-pci.disable-modern=3Don compat property always prevail.   =20
-> > >=20
-> > > The same bug also affects other abstract type names mentioned on
-> > > compat_props by machine-types: apic-common, i386-cpu, pci-device,
-> > > powerpc64-cpu, s390-skeys, spapr-pci-host-bridge, usb-device,
-> > > virtio-pci, x86_64-cpu.
-> > >=20
-> > > The right fix for this problem is to make sure compat_props and
-> > > -global options are always applied in the order they are
-> > > registered, instead of reordering them based on the type
-> > > hierarchy. But changing the ordering rules of -global is risky
-> > > and might break existing configurations, so we shouldn't do that
-> > > on a stable branch.
-> > >=20
-> > > This is a temporary hack that will work around the bug when
-> > > registering compat_props properties: if we find an abstract class
-> > > on compat_props, register properties for all its non-abstract
-> > > subtypes instead. This will make sure -global won't be overridden
-> > > by compat_props, while keeping the existing ordering rules on
-> > > -global options.
-> > >=20
-> > > Note that there's one case that won't be fixed by this hack:
-> > > "-global spapr-pci-vfio-host-bridge.<option>=3D<value>" won't be
-> > > able to override compat_props, because spapr-pci-host-bridge is
-> > > not an abstract class.
-> > >=20
-> > > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> > > --- =20
-> >=20
-> > This patch had 3 r-b. Is there any good reason to hold
-> > it up to 2.8.1 ? =20
->=20
-> Applying it today would mean delaying the 2.8.0 release, and the
-> bug is not serious enough to justify that.
->=20
+Good, I'm for it. May be, in such wording there are too much information 
+about implementation (again, server can do it if it _wants_, is it a 
+side effect or not is implementation defined). In other words, "if the 
+server..." is better read as an example, not requirement. But it's not 
+important.
 
-IIUC there will be a v2.8.0-rc4 because we want this patch in 2.8:
-
-[PATCH v3] virtio-pci: Fix cross-version migration  with older machines
-
-=46rom IRC:
-
-<stefanha> mcoquelin: Once Michael Tsirkin has reviewed your patch I'll mer=
-ge it and tag v2.8.0-rc4 (today or tomorrow?).  The QEMU 2.8 release will b=
-e next Tuesday.
+-- 
+Best regards,
+Vladimir
