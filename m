@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54826)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52733)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1cH2Fb-0001Dg-QV
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 00:37:15 -0500
+	(envelope-from <sjitindarsingh@gmail.com>) id 1cH22o-0008Gf-AL
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 00:24:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1cH2FZ-0007sh-B7
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 00:37:11 -0500
-Message-ID: <1481693756.1555.30.camel@gmail.com>
+	(envelope-from <sjitindarsingh@gmail.com>) id 1cH22m-0003r4-Iu
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 00:23:58 -0500
+Message-ID: <1481692939.1555.19.camel@gmail.com>
 From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Date: Wed, 14 Dec 2016 16:35:56 +1100
-In-Reply-To: <20161212040603.27295-4-david@gibson.dropbear.id.au>
+Date: Wed, 14 Dec 2016 16:22:19 +1100
+In-Reply-To: <20161212040603.27295-3-david@gibson.dropbear.id.au>
 References: <20161212040603.27295-1-david@gibson.dropbear.id.au>
-	<20161212040603.27295-4-david@gibson.dropbear.id.au>
+	<20161212040603.27295-3-david@gibson.dropbear.id.au>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCHv3 3/5] pseries: Implement HPT resizing
+Subject: Re: [Qemu-devel] [PATCHv3 2/5] pseries: Stubs for HPT resizing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,543 +27,358 @@ To: David Gibson <david@gibson.dropbear.id.au>, paulus@samba.org
 Cc: agraf@suse.de, mdroth@linux.vnet.ibm.com, thuth@redhat.com, lvivier@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 On Mon, 2016-12-12 at 15:06 +1100, David Gibson wrote:
-> This patch implements hypercalls allowing a PAPR guest to resize its
-> own
-> hash page table.  This will eventually allow for more flexible memory
-> hotplug.
+> This introduces stub implementations of the H_RESIZE_HPT_PREPARE and
+> H_RESIZE_HPT_COMMIT hypercalls which we hope to add in a PAPR
+> extension to allow run time resizing of a guest's hash page
+> table.  It
+> also adds a new machine property for controlling whether this new
+> facility is available, and logic to check that against availability
+> with KVM (only supported with KVM PR for now).
 > 
-> The implementation is partially asynchronous, handled in a special
-> thread
-> running the hpt_prepare_thread() function.  The state of a pending
-> resize
-> is stored in SPAPR_MACHINE->pending_hpt.
-> 
-> The H_RESIZE_HPT_PREPARE hypercall will kick off creation of a new
-> HPT, or,
-> if one is already in progress, monitor it for completion.  If there
-> is an
-> existing HPT resize in progress that doesn't match the size specified
-> in
-> the call, it will cancel it, replacing it with a new one matching the
-> given size.
-> 
-> The H_RESIZE_HPT_COMMIT completes transition to a resized HPT, and
-> can only
-> be called successfully once H_RESIZE_HPT_PREPARE has successfully
-> completed initialization of a new HPT.  The guest must ensure that
-> there
-> are no concurrent accesses to the existing HPT while this is called
-> (this
-> effectively means stop_machine() for Linux guests).
-> 
-> For now H_RESIZE_HPT_COMMIT goes through the whole old HPT, rehashing
-> each
-> HPTE into the new HPT.  This can have quite high latency, but it
-> seems to
-> be of the order of typical migration downtime latencies for HPTs of
-> size
-> up to ~2GiB (which would be used in a 256GiB guest).
-> 
-> In future we probably want to move more of the rehashing to the
-> "prepare"
-> phase, by having H_ENTER and other hcalls update both current and
-> pending HPTs.  That's a project for another day, but should be
-> possible
-> without any changes to the guest interface.
+> Finally, it adds a new string to the hypertas property in the device
+> tree, advertising to the guest the availability of the HPT resizing
+> hypercalls.  This is a tentative suggested value, and would need to
+> be
+> standardized by PAPR before being merged.
 > 
 > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 > ---
->  hw/ppc/spapr.c          |   4 +-
->  hw/ppc/spapr_hcall.c    | 345
-> +++++++++++++++++++++++++++++++++++++++++++++++-
->  include/hw/ppc/spapr.h  |   6 +
->  target-ppc/mmu-hash64.h |   4 +
->  4 files changed, 353 insertions(+), 6 deletions(-)
+>  hw/ppc/spapr.c         | 75
+> ++++++++++++++++++++++++++++++++++++++++++++++++++
+>  hw/ppc/spapr_hcall.c   | 36 ++++++++++++++++++++++++
+>  hw/ppc/trace-events    |  2 ++
+>  include/hw/ppc/spapr.h | 11 ++++++++
+>  target-ppc/kvm.c       | 25 +++++++++++++++++
+>  target-ppc/kvm_ppc.h   |  5 ++++
+>  6 files changed, 154 insertions(+)
 > 
 > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 846ce51..d057031 100644
+> index 0f25e83..846ce51 100644
 > --- a/hw/ppc/spapr.c
 > +++ b/hw/ppc/spapr.c
-> @@ -93,8 +93,6 @@
+> @@ -760,6 +760,11 @@ static void spapr_dt_rtas(sPAPRMachineState
+> *spapr, void *fdt)
+>      if (!kvm_enabled() || kvmppc_spapr_use_multitce()) {
+>          add_str(hypertas, "hcall-multi-tce");
+>      }
+> +
+> +    if (spapr->resize_hpt != SPAPR_RESIZE_HPT_DISABLED) {
+> +        add_str(hypertas, "hcall-hpt-resize");
+> +    }
+> +
+>      _FDT(fdt_setprop(fdt, rtas, "ibm,hypertas-functions",
+>                       hypertas->str, hypertas->len));
+>      g_string_free(hypertas, TRUE);
+> @@ -1839,11 +1844,40 @@ static void ppc_spapr_init(MachineState
+> *machine)
+>      long load_limit, fw_size;
+>      char *filename;
+>      int smt = kvmppc_smt_threads();
+> +    Error *resize_hpt_err = NULL;
 >  
->  #define PHANDLE_XICP            0x00001111
+>      msi_nonbroken = true;
 >  
-> -#define HTAB_SIZE(spapr)        (1ULL << ((spapr)->htab_shift))
-> -
->  static XICSState *try_create_xics(const char *type, int nr_servers,
->                                    int nr_irqs, Error **errp)
->  {
-> @@ -1055,7 +1053,7 @@ static void close_htab_fd(sPAPRMachineState
-> *spapr)
->      spapr->htab_fd = -1;
+>      QLIST_INIT(&spapr->phbs);
+>  
+> +    /* Check HPT resizing availability */
+> +    kvmppc_check_papr_resize_hpt(&resize_hpt_err);
+> +    if (spapr->resize_hpt == SPAPR_RESIZE_HPT_DEFAULT) {
+> +        /*
+> +         * If the user explicitly requested a mode we should either
+> +         * supply it, or fail completely (which we do below).  But
+> if
+> +         * it's not set explicitly, we reset our mode to something
+> +         * that works
+> +         */
+> +        if (resize_hpt_err) {
+> +            spapr->resize_hpt = SPAPR_RESIZE_HPT_DISABLED;
+> +            error_free(resize_hpt_err);
+> +            resize_hpt_err = NULL;
+> +        } else {
+> +            spapr->resize_hpt = smc->resize_hpt_default;
+> +        }
+> +    }
+> +
+> +    assert(spapr->resize_hpt != SPAPR_RESIZE_HPT_DEFAULT);
+> +
+> +    if ((spapr->resize_hpt != SPAPR_RESIZE_HPT_DISABLED) &&
+> resize_hpt_err) {
+> +        /*
+> +         * User requested HPT resize, but this host can't supply
+> it.  Bail out
+> +         */
+> +        error_report_err(resize_hpt_err);
+> +        exit(1);
+> +    }
+> +
+>      /* Allocate RMA if necessary */
+>      rma_alloc_size = kvmppc_alloc_rma(&rma);
+>  
+> @@ -2236,6 +2270,40 @@ static void
+> spapr_set_modern_hotplug_events(Object *obj, bool value,
+>      spapr->use_hotplug_event_source = value;
 >  }
 >  
-> -static int spapr_hpt_shift_for_ramsize(uint64_t ramsize)
-> +int spapr_hpt_shift_for_ramsize(uint64_t ramsize)
+> +static char *spapr_get_resize_hpt(Object *obj, Error **errp)
+> +{
+> +    sPAPRMachineState *spapr = SPAPR_MACHINE(obj);
+> +
+> +    switch (spapr->resize_hpt) {
+> +    case SPAPR_RESIZE_HPT_DEFAULT:
+> +        return g_strdup("default");
+> +    case SPAPR_RESIZE_HPT_DISABLED:
+> +        return g_strdup("disabled");
+> +    case SPAPR_RESIZE_HPT_ENABLED:
+> +        return g_strdup("enabled");
+> +    case SPAPR_RESIZE_HPT_REQUIRED:
+> +        return g_strdup("required");
+> +    }
+> +    assert(0);
+> +}
+> +
+> +static void spapr_set_resize_hpt(Object *obj, const char *value,
+> Error **errp)
+> +{
+> +    sPAPRMachineState *spapr = SPAPR_MACHINE(obj);
+> +
+> +    if (strcmp(value, "default") == 0) {
+> +        spapr->resize_hpt = SPAPR_RESIZE_HPT_DEFAULT;
+> +    } else if (strcmp(value, "disabled") == 0) {
+> +        spapr->resize_hpt = SPAPR_RESIZE_HPT_DISABLED;
+> +    } else if (strcmp(value, "enabled") == 0) {
+> +        spapr->resize_hpt = SPAPR_RESIZE_HPT_ENABLED;
+> +    } else if (strcmp(value, "required") == 0) {
+> +        spapr->resize_hpt = SPAPR_RESIZE_HPT_REQUIRED;
+> +    } else {
+> +        error_setg(errp, "Bad value for \"resize-hpt\" property");
+> +    }
+> +}
+> +
+>  static void spapr_machine_initfn(Object *obj)
 >  {
->      int shift;
+>      sPAPRMachineState *spapr = SPAPR_MACHINE(obj);
+> @@ -2256,6 +2324,12 @@ static void spapr_machine_initfn(Object *obj)
+>                                      " place of standard EPOW events
+> when possible"
+>                                      " (required for memory hot-
+> unplug support)",
+>                                      NULL);
+> +
+> +    object_property_add_str(obj, "resize-hpt",
+> +                            spapr_get_resize_hpt,
+> spapr_set_resize_hpt, NULL);
+> +    object_property_set_description(obj, "resize-hpt",
+> +                                    "Resizing of the Hash Page Table
+> (enabled, disabled, required)",
+> +                                    NULL);
+>  }
 >  
+>  static void spapr_machine_finalizefn(Object *obj)
+> @@ -2707,6 +2781,7 @@ static void
+> spapr_machine_class_init(ObjectClass *oc, void *data)
+>  
+>      smc->dr_lmb_enabled = true;
+>      smc->tcg_default_cpu = "POWER8";
+> +    smc->resize_hpt_default = SPAPR_RESIZE_HPT_DISABLED;
+>      mc->query_hotpluggable_cpus = spapr_query_hotpluggable_cpus;
+>      fwc->get_dev_path = spapr_get_fw_dev_path;
+>      nc->nmi_monitor_handler = spapr_nmi;
 > diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> index 72a9c4d..1e89061 100644
+> index fd9f1d4..72a9c4d 100644
 > --- a/hw/ppc/spapr_hcall.c
 > +++ b/hw/ppc/spapr_hcall.c
-> @@ -2,6 +2,7 @@
->  #include "qapi/error.h"
->  #include "sysemu/sysemu.h"
->  #include "qemu/log.h"
-> +#include "qemu/error-report.h"
->  #include "cpu.h"
->  #include "exec/exec-all.h"
->  #include "helper_regs.h"
-> @@ -355,20 +356,319 @@ static target_ulong h_read(PowerPCCPU *cpu,
+> @@ -355,6 +355,38 @@ static target_ulong h_read(PowerPCCPU *cpu,
 > sPAPRMachineState *spapr,
 >      return H_SUCCESS;
 >  }
 >  
-> +struct sPAPRPendingHPT {
-> +    /* These fields are read-only after initialization */
-> +    int shift;
-> +    QemuThread thread;
-> +
-> +    /* These fields are protected by the BQL */
-> +    bool complete;
-> +
-> +    /* These fields are private to the preparation thread if
-> +     * !complete, otherwise protected by the BQL */
-> +    int ret;
-> +    void *hpt;
-> +};
-> +
-> +static void free_pending_hpt(sPAPRPendingHPT *pending)
+> +static target_ulong h_resize_hpt_prepare(PowerPCCPU *cpu,
+> +                                         sPAPRMachineState *spapr,
+> +                                         target_ulong opcode,
+> +                                         target_ulong *args)
 > +{
-> +    if (pending->hpt) {
-> +        qemu_vfree(pending->hpt);
+> +    target_ulong flags = args[0];
+> +    target_ulong shift = args[1];
+> +
+> +    if (spapr->resize_hpt == SPAPR_RESIZE_HPT_DISABLED) {
+> +        return H_AUTHORITY;
 > +    }
 > +
-> +    g_free(pending);
+> +    trace_spapr_h_resize_hpt_prepare(flags, shift);
+> +    return H_HARDWARE;
 > +}
 > +
-> +static void *hpt_prepare_thread(void *opaque)
+> +static target_ulong h_resize_hpt_commit(PowerPCCPU *cpu,
+> +                                        sPAPRMachineState *spapr,
+> +                                        target_ulong opcode,
+> +                                        target_ulong *args)
 > +{
-> +    sPAPRPendingHPT *pending = opaque;
-> +    size_t size = 1ULL << pending->shift;
+> +    target_ulong flags = args[0];
+> +    target_ulong shift = args[1];
 > +
-> +    pending->hpt = qemu_memalign(size, size);
-> +    if (pending->hpt) {
-> +        memset(pending->hpt, 0, size);
-> +        pending->ret = H_SUCCESS;
-> +    } else {
-> +        pending->ret = H_NO_MEM;
+> +    if (spapr->resize_hpt == SPAPR_RESIZE_HPT_DISABLED) {
+> +        return H_AUTHORITY;
 > +    }
 > +
-> +    qemu_mutex_lock_iothread();
-> +
-> +    if (SPAPR_MACHINE(qdev_get_machine())->pending_hpt == pending) {
-> +        /* Ready to go */
-> +        pending->complete = true;
-> +    } else {
-> +        /* We've been cancelled, clean ourselves up */
-> +        free_pending_hpt(pending);
-> +    }
-> +
-> +    qemu_mutex_unlock_iothread();
-> +    return NULL;
+> +    trace_spapr_h_resize_hpt_commit(flags, shift);
+> +    return H_HARDWARE;
 > +}
 > +
-> +/* Must be called with BQL held */
-> +static void cancel_hpt_prepare(sPAPRMachineState *spapr)
-> +{
-> +    sPAPRPendingHPT *pending = spapr->pending_hpt;
-> +
-> +    /* Let the thread know it's cancelled */
-> +    spapr->pending_hpt = NULL;
-> +
-> +    if (!pending) {
-> +        /* Nothing to do */
-> +        return;
-> +    }
-> +
-> +    if (!pending->complete) {
-> +        /* thread will clean itself up */
-> +        return;
-> +    }
-> +
-> +    free_pending_hpt(pending);
-> +}
-> +
-> +static int build_dimm_list(Object *obj, void *opaque)
-> +{
-> +    GSList **list = opaque;
-> +
-> +    if (object_dynamic_cast(obj, TYPE_PC_DIMM)) {
-> +        DeviceState *dev = DEVICE(obj);
-> +        if (dev->realized) { /* only realized DIMMs matter */
-> +            *list = g_slist_prepend(*list, dev);
-> +        }
-> +    }
-> +
-> +    object_child_foreach(obj, build_dimm_list, opaque);
-> +    return 0;
-> +}
-> +
-> +static ram_addr_t get_current_ram_size(void)
-> +{
-> +    GSList *list = NULL, *item;
-> +    ram_addr_t size = ram_size;
-> +
-> +    build_dimm_list(qdev_get_machine(), &list);
-> +    for (item = list; item; item = g_slist_next(item)) {
-> +        Object *obj = OBJECT(item->data);
-> +        if (!strcmp(object_get_typename(obj), TYPE_PC_DIMM)) {
-> +            size += object_property_get_int(obj, PC_DIMM_SIZE_PROP,
-> +                                            &error_abort);
-> +        }
-> +    }
-> +    g_slist_free(list);
-> +
-> +    return size;
-> +}
-> +
->  static target_ulong h_resize_hpt_prepare(PowerPCCPU *cpu,
->                                           sPAPRMachineState *spapr,
->                                           target_ulong opcode,
->                                           target_ulong *args)
->  {
->      target_ulong flags = args[0];
-> -    target_ulong shift = args[1];
-> +    int shift = args[1];
-> +    sPAPRPendingHPT *pending = spapr->pending_hpt;
->  
->      if (spapr->resize_hpt == SPAPR_RESIZE_HPT_DISABLED) {
->          return H_AUTHORITY;
->      }
->  
->      trace_spapr_h_resize_hpt_prepare(flags, shift);
-> -    return H_HARDWARE;
-> +
-> +    if (flags != 0) {
-> +        return H_PARAMETER;
-> +    }
-> +
-> +    if (shift && ((shift < 18) || (shift > 46))) {
-> +        return H_PARAMETER;
-> +    }
-> +
-> +    if (pending) {
-> +        /* something already in progress */
-> +        if (pending->shift == shift) {
-> +            /* and it's suitable */
-> +            if (pending->complete) {
-> +                return pending->ret;
-> +            } else {
-> +                return H_LONG_BUSY_ORDER_100_MSEC;
-> +            }
-> +        }
-> +
-> +        /* not suitable, cancel and replace */
-> +        cancel_hpt_prepare(spapr);
-> +    }
-> +
-> +    if (!shift) {
-> +        /* nothing to do */
-> +        return H_SUCCESS;
-> +    }
-> +
-> +    /* start new prepare */
-> +
-> +    /* We only allow the guest to allocate an HPT one order above
-> what
-> +     * we'd normally give them (to stop a small guest claiming a
-> huge
-> +     * chunk of resources in the HPT */
-> +    if (shift > (spapr_hpt_shift_for_ramsize(get_current_ram_size())
-> + 1))
-Given we already allocate one lower than recommended in the ISA by
-default, should we set this to 2 to allow an allocation of 1 greater
-than the recommended minimum?
-> +        return H_RESOURCE;
-> +    }
-> +
-> +    pending = g_new0(sPAPRPendingHPT, 1);
-> +    pending->shift = shift;
-> +    pending->ret = H_HARDWARE;
-> +
-> +    qemu_thread_create(&pending->thread, "sPAPR HPT prepare",
-> +                       hpt_prepare_thread, pending,
-> QEMU_THREAD_DETACHED);
-> +
-> +    spapr->pending_hpt = pending;
-> +
-> +    /* In theory we could estimate the time more accurately based on
-> +     * the new size, but there's not much point */
-> +    return H_LONG_BUSY_ORDER_100_MSEC;
-> +}
-> +
-> +static uint64_t new_hpte_load0(void *htab, uint64_t pteg, int slot)
-> +{
-> +    uint8_t *addr = htab;
-> +
-> +    addr += pteg * HASH_PTEG_SIZE_64;
-> +    addr += slot * HASH_PTE_SIZE_64;
-> +    return  ldq_p(addr);
-> +}
-> +
-> +static void new_hpte_store(void *htab, uint64_t pteg, int slot,
-> +                           uint64_t pte0, uint64_t pte1)
-> +{
-> +    uint8_t *addr = htab;
-> +
-> +    addr += pteg * HASH_PTEG_SIZE_64;
-> +    addr += slot * HASH_PTE_SIZE_64;
-> +
-> +    stq_p(addr, pte0);
-> +    stq_p(addr + HASH_PTE_SIZE_64/2, pte1);
-> +}
-> +
-> +static int rehash_hpte(PowerPCCPU *cpu, uint64_t token,
-> +                       void *old, uint64_t oldsize,
-> +                       void *new, uint64_t newsize,
-> +                       uint64_t pteg, int slot)
-> +{
-> +    uint64_t old_hash_mask = (oldsize >> 7) - 1;
-> +    uint64_t new_hash_mask = (newsize >> 7) - 1;
-> +    target_ulong pte0 = ppc_hash64_load_hpte0(cpu, token, slot);
-> +    target_ulong pte1;
-> +    uint64_t avpn;
-> +    unsigned shift;
-> +    uint64_t hash, new_pteg, replace_pte0;
-> +
-> +    if (!(pte0 & HPTE64_V_VALID) || !(pte0 & HPTE64_V_BOLTED)) {
-> +        return H_SUCCESS;
-> +    }
-> +
-> +    pte1 = ppc_hash64_load_hpte1(cpu, token, slot);
-> +
-> +    shift = ppc_hash64_hpte_page_shift_noslb(cpu, pte0, pte1);
-> +    assert(shift); /* H_ENTER should never have allowed a bad
-> encoding */
-> +    avpn = HPTE64_V_AVPN_VAL(pte0) & ~(((1ULL << shift) - 1) >> 23);
-> +
-> +    if (pte0 & HPTE64_V_SECONDARY) {
-> +        pteg = ~pteg;
-> +    }
-> +
-> +    if ((pte0 & HPTE64_V_SSIZE) == HPTE64_V_SSIZE_256M) {
-> +        uint64_t offset, vsid;
-> +
-> +        /* We only have 28 - 23 bits of offset in avpn */
-> +        offset = (avpn & 0x1f) << 23;
-> +        vsid = avpn >> 5;
-> +        /* We can find more bits from the pteg value */
-> +        if (shift < 23) {
-> +            offset |= ((vsid ^ pteg) & old_hash_mask) << shift;
-> +        }
-> +
-> +        hash = vsid ^ (offset >> shift);
-> +    } else if ((pte0 & HPTE64_V_SSIZE) == HPTE64_V_SSIZE_1T) {
-> +        uint64_t offset, vsid;
-> +
-> +        /* We only have 40 - 23 bits of seg_off in avpn */
-> +        offset = (avpn & 0x1ffff) << 23;
-> +        vsid = avpn >> 17;
-> +        if (shift < 23) {
-> +            offset |= ((vsid ^ (vsid << 25) ^ pteg) & old_hash_mask)
-> << shift;
-> +        }
-> +
-> +        hash = vsid ^ (vsid << 25) ^ (offset >> shift);
-> +    } else {
-> +        error_report("rehash_pte: Bad segment size in HPTE");
-> +        return H_HARDWARE;
-> +    }
-> +
-> +    new_pteg = hash & new_hash_mask;
-> +    if (pte0 & HPTE64_V_SECONDARY) {
-> +        assert(~pteg == (hash & old_hash_mask));
-> +        new_pteg = ~new_pteg;
-> +    } else {
-> +        assert(pteg == (hash & old_hash_mask));
-> +    }
-> +    assert((oldsize != newsize) || (pteg == new_pteg));
-> +    replace_pte0 = new_hpte_load0(new, new_pteg, slot);
-> +    if (replace_pte0 & HPTE64_V_VALID) {
-> +        assert(newsize < oldsize);
-> +        if (replace_pte0 & HPTE64_V_BOLTED) {
-> +            if (pte0 & HPTE64_V_BOLTED) {
-> +                /* Bolted collision, nothing we can do */
-> +                return H_PTEG_FULL;
-> +            } else {
-> +                /* Discard this hpte */
-> +                return H_SUCCESS;
-> +            }
-> +        }
-> +    }
-> +
-> +    new_hpte_store(new, new_pteg, slot, pte0, pte1);
-> +    return H_SUCCESS;
-> +}
-> +
-> +static int rehash_hpt(PowerPCCPU *cpu,
-> +                      void *old, uint64_t oldsize,
-> +                      void *new, uint64_t newsize)
-> +{
-> +    CPUPPCState *env = &cpu->env;
-> +    uint64_t n_ptegs = oldsize >> 7;
-> +    uint64_t pteg;
-> +    int slot;
-> +    int rc;
-> +
-> +    assert(env->external_htab == old);
-> +
-> +    for (pteg = 0; pteg < n_ptegs; pteg++) {
-> +        uint64_t token = ppc_hash64_start_access(cpu, pteg *
-> HPTES_PER_GROUP);
-> +
-> +        if (!token) {
-> +            return H_HARDWARE;
-> +        }
-> +
-> +        for (slot = 0; slot < HPTES_PER_GROUP; slot++) {
-> +            rc = rehash_hpte(cpu, token, old, oldsize, new, newsize,
-> +                             pteg, slot);
-> +            if (rc != H_SUCCESS) {
-> +                ppc_hash64_stop_access(cpu, token);
-> +                return rc;
-> +            }
-> +        }
-> +        ppc_hash64_stop_access(cpu, token);
-> +    }
-> +
-> +    return H_SUCCESS;
-> +}
-> +
-> +static void pivot_hpt(CPUState *cs, run_on_cpu_data arg)
-> +{
-> +    sPAPRMachineState *spapr = SPAPR_MACHINE(arg.host_ptr);
-> +    PowerPCCPU *cpu = POWERPC_CPU(cs);
-> +
-> +    cpu_synchronize_state(cs);
-> +    ppc_hash64_set_external_hpt(cpu, spapr->htab, spapr->htab_shift,
-> +                                &error_fatal);
->  }
->  
->  static target_ulong h_resize_hpt_commit(PowerPCCPU *cpu,
-> @@ -378,13 +678,52 @@ static target_ulong
-> h_resize_hpt_commit(PowerPCCPU *cpu,
->  {
->      target_ulong flags = args[0];
->      target_ulong shift = args[1];
-> +    sPAPRPendingHPT *pending = spapr->pending_hpt;
-> +    int rc;
-> +    size_t newsize;
->  
->      if (spapr->resize_hpt == SPAPR_RESIZE_HPT_DISABLED) {
->          return H_AUTHORITY;
->      }
->  
->      trace_spapr_h_resize_hpt_commit(flags, shift);
-> -    return H_HARDWARE;
-> +
-> +    if (flags != 0) {
-> +        return H_PARAMETER;
-> +    }
-> +
-> +    if (!pending || (pending->shift != shift)) {
-> +        /* no matching prepare */
-> +        return H_CLOSED;
-> +    }
-> +
-> +    if (!pending->complete) {
-> +        /* prepare has not completed */
-> +        return H_BUSY;
-> +    }
-> +
-> +    newsize = 1ULL << pending->shift;
-> +    rc = rehash_hpt(cpu, spapr->htab, HTAB_SIZE(spapr),
-> +                    pending->hpt, newsize);
-> +    if (rc == H_SUCCESS) {
-> +        CPUState *cs;
-> +
-> +        qemu_vfree(spapr->htab);
-> +        spapr->htab = pending->hpt;
-> +        spapr->htab_shift = pending->shift;
-> +
-> +        CPU_FOREACH(cs) {
-> +            run_on_cpu(cs, pivot_hpt, RUN_ON_CPU_HOST_PTR(spapr));
-> +        }
-> +
-> +        pending->hpt = NULL; /* so it's not free()d */
-> +    }
-> +
-> +    /* Clean up */
-> +    spapr->pending_hpt = NULL;
-> +    free_pending_hpt(pending);
-> +
-> +    return rc;
->  }
->  
 >  static target_ulong h_set_sprg0(PowerPCCPU *cpu, sPAPRMachineState
 > *spapr,
+>                                  target_ulong opcode, target_ulong
+> *args)
+>  {
+> @@ -1134,6 +1166,10 @@ static void hypercall_register_types(void)
+>      /* hcall-bulk */
+>      spapr_register_hypercall(H_BULK_REMOVE, h_bulk_remove);
+>  
+> +    /* hcall-hpt-resize */
+> +    spapr_register_hypercall(H_RESIZE_HPT_PREPARE,
+> h_resize_hpt_prepare);
+> +    spapr_register_hypercall(H_RESIZE_HPT_COMMIT,
+> h_resize_hpt_commit);
+> +
+>      /* hcall-splpar */
+>      spapr_register_hypercall(H_REGISTER_VPA, h_register_vpa);
+>      spapr_register_hypercall(H_CEDE, h_cede);
+> diff --git a/hw/ppc/trace-events b/hw/ppc/trace-events
+> index 2297ead..bf59a8f 100644
+> --- a/hw/ppc/trace-events
+> +++ b/hw/ppc/trace-events
+> @@ -16,6 +16,8 @@ spapr_cas_continue(unsigned long n) "Copy changes
+> to the guest: %ld bytes"
+>  # hw/ppc/spapr_hcall.c
+>  spapr_cas_pvr_try(uint32_t pvr) "%x"
+>  spapr_cas_pvr(uint32_t cur_pvr, bool cpu_match, uint32_t new_pvr,
+> uint64_t pcr) "current=%x, cpu_match=%u, new=%x, compat
+> flags=%"PRIx64
+> +spapr_h_resize_hpt_prepare(uint64_t flags, uint64_t shift)
+> "flags=0x%"PRIx64", shift=%"PRIu64
+> +spapr_h_resize_hpt_commit(uint64_t flags, uint64_t shift)
+> "flags=0x%"PRIx64", shift=%"PRIu64
+>  
+>  # hw/ppc/spapr_iommu.c
+>  spapr_iommu_put(uint64_t liobn, uint64_t ioba, uint64_t tce,
+> uint64_t ret) "liobn=%"PRIx64" ioba=0x%"PRIx64" tce=0x%"PRIx64"
+> ret=%"PRId64
 > diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index d2c758b..954bada 100644
+> index a2d8964..d2c758b 100644
 > --- a/include/hw/ppc/spapr.h
 > +++ b/include/hw/ppc/spapr.h
-> @@ -14,6 +14,7 @@ struct sPAPRNVRAM;
->  typedef struct sPAPRConfigureConnectorState
-> sPAPRConfigureConnectorState;
->  typedef struct sPAPREventLogEntry sPAPREventLogEntry;
->  typedef struct sPAPREventSource sPAPREventSource;
-> +typedef struct sPAPRPendingHPT sPAPRPendingHPT;
+> @@ -31,6 +31,13 @@ typedef struct sPAPRMachineState
+> sPAPRMachineState;
+>  #define SPAPR_MACHINE_CLASS(klass) \
+>      OBJECT_CLASS_CHECK(sPAPRMachineClass, klass, TYPE_SPAPR_MACHINE)
 >  
->  #define HPTE64_V_HPTE_DIRTY     0x0000000000000040ULL
->  #define SPAPR_ENTRY_POINT       0x100
-> @@ -72,6 +73,8 @@ struct sPAPRMachineState {
->      sPAPRResizeHPT resize_hpt;
+> +typedef enum {
+> +    SPAPR_RESIZE_HPT_DEFAULT = 0,
+> +    SPAPR_RESIZE_HPT_DISABLED,
+> +    SPAPR_RESIZE_HPT_ENABLED,
+> +    SPAPR_RESIZE_HPT_REQUIRED,
+> +} sPAPRResizeHPT;
+> +
+>  /**
+>   * sPAPRMachineClass:
+>   */
+> @@ -46,6 +53,7 @@ struct sPAPRMachineClass {
+>                            uint64_t *buid, hwaddr *pio, 
+>                            hwaddr *mmio32, hwaddr *mmio64,
+>                            unsigned n_dma, uint32_t *liobns, Error
+> **errp);
+> +    sPAPRResizeHPT resize_hpt_default;
+>  };
+>  
+>  /**
+> @@ -61,6 +69,7 @@ struct sPAPRMachineState {
+>      XICSState *xics;
+>      DeviceState *rtc;
+>  
+> +    sPAPRResizeHPT resize_hpt;
 >      void *htab;
 >      uint32_t htab_shift;
-> +    sPAPRPendingHPT *pending_hpt; /* in-progress resize */
-> +
 >      hwaddr rma_size;
->      int vrma_adjust;
->      ssize_t rtas_size;
-> @@ -627,6 +630,7 @@ void
-> spapr_hotplug_req_remove_by_count_indexed(sPAPRDRConnectorType
-> drc_type,
->                                                 uint32_t count,
-> uint32_t index);
->  void *spapr_populate_hotplug_cpu_dt(CPUState *cs, int *fdt_offset,
->                                      sPAPRMachineState *spapr);
-> +int spapr_hpt_shift_for_ramsize(uint64_t ramsize);
+> @@ -347,6 +356,8 @@ struct sPAPRMachineState {
+>  #define H_XIRR_X                0x2FC
+>  #define H_RANDOM                0x300
+>  #define H_SET_MODE              0x31C
+> +#define H_RESIZE_HPT_PREPARE    0x36C
+> +#define H_RESIZE_HPT_COMMIT     0x370
+>  #define H_SIGNAL_SYS_RESET      0x380
+>  #define MAX_HCALL_OPCODE        H_SIGNAL_SYS_RESET
 >  
->  /* rtas-configure-connector state */
->  struct sPAPRConfigureConnectorState {
-> @@ -674,4 +678,6 @@ int spapr_rng_populate_dt(void *fdt);
+> diff --git a/target-ppc/kvm.c b/target-ppc/kvm.c
+> index 15e12f3..39e5753 100644
+> --- a/target-ppc/kvm.c
+> +++ b/target-ppc/kvm.c
+> @@ -22,6 +22,7 @@
+>  #include <linux/kvm.h>
 >  
->  void spapr_do_system_reset_on_cpu(CPUState *cs, run_on_cpu_data
-> arg);
+>  #include "qemu-common.h"
+> +#include "qapi/error.h"
+>  #include "qemu/error-report.h"
+>  #include "cpu.h"
+>  #include "qemu/timer.h"
+> @@ -2672,3 +2673,27 @@ int kvmppc_enable_hwrng(void)
 >  
-> +#define HTAB_SIZE(spapr)        (1ULL << ((spapr)->htab_shift))
+>      return kvmppc_enable_hcall(kvm_state, H_RANDOM);
+>  }
 > +
->  #endif /* HW_SPAPR_H */
-> diff --git a/target-ppc/mmu-hash64.h b/target-ppc/mmu-hash64.h
-> index ab5d347..4a1b781 100644
-> --- a/target-ppc/mmu-hash64.h
-> +++ b/target-ppc/mmu-hash64.h
-> @@ -60,11 +60,15 @@ void ppc_hash64_update_rmls(CPUPPCState *env);
->  #define HASH_PTE_SIZE_64        16
->  #define HASH_PTEG_SIZE_64       (HASH_PTE_SIZE_64 * HPTES_PER_GROUP)
+> +void kvmppc_check_papr_resize_hpt(Error **errp)
+> +{
+> +    if (!kvm_enabled()) {
+> +        return;
+> +    }
+> +
+> +    /* TODO: Check specific capabilities for HPT resize aware host
+> kernels */
+> +
+> +    /*
+> +     * It's tempting to try to check directly if the HPT is under
+> our
+> +     * control or KVM's, which is what's really relevant here.
+> +     * Unfortunately, in order to correctly size the HPT, we need to
+> +     * know if we can do resizing, _before_ we attempt to allocate
+> it
+> +     * with KVM.  Before that point, we don't officially know
+> whether
+> +     * we'll control the HPT or not.  So we have to use a fallback
+> +     * test for PR vs HV KVM to predict that.
+> +     */
+> +    if (kvmppc_is_pr(kvm_state)) {
+> +        return;
+> +    }
+> +
+> +    error_setg(errp, "Hash page table resizing not available with
+> this KVM version");
+> +}
+> diff --git a/target-ppc/kvm_ppc.h b/target-ppc/kvm_ppc.h
+> index 841a29b..3e852ba 100644
+> --- a/target-ppc/kvm_ppc.h
+> +++ b/target-ppc/kvm_ppc.h
+> @@ -59,6 +59,7 @@ bool kvmppc_has_cap_htm(void);
+>  int kvmppc_enable_hwrng(void);
+>  int kvmppc_put_books_sregs(PowerPCCPU *cpu);
+>  PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void);
+> +void kvmppc_check_papr_resize_hpt(Error **errp);
 >  
-> +#define HPTE64_V_SSIZE          SLB_VSID_B
-> +#define HPTE64_V_SSIZE_256M     SLB_VSID_B_256M
-> +#define HPTE64_V_SSIZE_1T       SLB_VSID_B_1T
->  #define HPTE64_V_SSIZE_SHIFT    62
->  #define HPTE64_V_AVPN_SHIFT     7
->  #define HPTE64_V_AVPN           0x3fffffffffffff80ULL
->  #define HPTE64_V_AVPN_VAL(x)    (((x) & HPTE64_V_AVPN) >>
-> HPTE64_V_AVPN_SHIFT)
->  #define HPTE64_V_COMPARE(x, y)  (!(((x) ^ (y)) &
-> 0xffffffffffffff83ULL))
-> +#define HPTE64_V_BOLTED         0x0000000000000010ULL
->  #define HPTE64_V_LARGE          0x0000000000000004ULL
->  #define HPTE64_V_SECONDARY      0x0000000000000002ULL
->  #define HPTE64_V_VALID          0x0000000000000001ULL
+>  #else
+>  
+> @@ -270,6 +271,10 @@ static inline PowerPCCPUClass
+> *kvm_ppc_get_host_cpu_class(void)
+>      return NULL;
+>  }
+>  
+> +static inline void kvmppc_check_papr_resize_hpt(Error **errp)
+> +{
+> +    return;
+> +}
+>  #endif
+>  
+>  #ifndef CONFIG_KVM
+Since you're adding a new machine option it would be nice if this was
+documented in the help message.
+
+Either way it all seems sane:
+
+Reviewed-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
