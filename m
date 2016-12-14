@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34485)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37506)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1cH35x-0003y3-Lp
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 01:31:21 -0500
+	(envelope-from <hangaohuai@huawei.com>) id 1cH3OV-0003Tv-0N
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 01:50:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1cH35u-0004gS-Fm
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 01:31:17 -0500
-Received: from mail.weilnetz.de ([37.221.199.173]:37722)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1cH35u-0004g9-9K
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 01:31:14 -0500
-References: <CAJSP0QUn4OE3_9foGgktt5O_KzrEzV8uhB1mpoS1q5x4DsPTPQ@mail.gmail.com>
-	<CAJSP0QV1S4mohikvxx9OgnsRgMRNmH+a9WjHCeC7gGaeBMyktQ@mail.gmail.com>
-	<CAJSP0QUkFjfsQ21i3-qXQL5N3xJd6WnEmy1BewMV3z=VOpr7BQ@mail.gmail.com>
-	<c246423e-d62b-1572-341d-3a1933e496fa@weilnetz.de>
-	<CAJSP0QW-Mv8N=aULWeXfMQa08DBEC9GPCOnsw6iPiSF_kb3s+g@mail.gmail.com>
-From: Stefan Weil <sw@weilnetz.de>
-Message-ID: <cbc002df-9a0a-613d-f4c3-03de1047be09@weilnetz.de>
-Date: Wed, 14 Dec 2016 07:31:09 +0100
+	(envelope-from <hangaohuai@huawei.com>) id 1cH3OQ-0000oz-8g
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 01:50:27 -0500
+Received: from szxga02-in.huawei.com ([119.145.14.65]:58491)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <hangaohuai@huawei.com>) id 1cH3OP-0000gy-SR
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 01:50:22 -0500
+From: hangaohuai <hangaohuai@huawei.com>
+Date: Wed, 14 Dec 2016 14:48:20 +0800
+Message-ID: <20161214064820.12480-1-hangaohuai@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <CAJSP0QW-Mv8N=aULWeXfMQa08DBEC9GPCOnsw6iPiSF_kb3s+g@mail.gmail.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] QEMU po files / translations (was: Any QEMU 2.8
- release blockers?)
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] bugfix: vm halt when in reset looping
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,27 +23,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
+Cc: mst@redhat.com, pbonzini@redhat.com, arei.gonglei@huawei.com, hangaohuai <hangaohuai@huawei.com>
 
-On 12/13/16 22:52, Stefan Hajnoczi wrote:
-> I've sent a patch to the list and CCed you.  I ran make -C po update.
->
-> Weird that the line numbers are hardcoded in the .po file format.  An
-> addr2line type tool would have been better to avoid the constant
-> outdated line numbers.  That said, I don't know anything about how
-> gettext is designed...
+reset mc146818rtc device when RESET event happens.
 
-xgettext has an optional parameter --no-location which suppresses
-the comments with filename:line.
+Fix the problem:
+  1. Guest boot the second cpu, set CMOS_RESET_CODE 0x0a to protect selfboot;
+  2. VM being reset by others, hmp_system_reset;
+  3. seabios resume check the CMOS_RESET_CODE, if 0x0a, jump to the BDA
+     resume execution by jump via 40h:0067h;
+  4. Guest halt;
 
-All QEMU texts currently come from gtk.c, so that information
-is not very useful. We could try running with --no-location
-for the next release.
+Signed-off-by: hangaohuai <hangaohuai@huawei.com>
+---
+ hw/timer/mc146818rtc.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-Even then the po files need a little bit more maintenance:
-several texts don't have translations. And of course there
-are more strings than those in gtk.c which could be translated,
-e. g. the help texts, monitor output, error messages, ...
-
-Stefan
+diff --git a/hw/timer/mc146818rtc.c b/hw/timer/mc146818rtc.c
+index da209d0..67d707d 100644
+--- a/hw/timer/mc146818rtc.c
++++ b/hw/timer/mc146818rtc.c
+@@ -946,11 +946,19 @@ static Property mc146818rtc_properties[] = {
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
++static void rtc_resetdev(DeviceState *d)
++{
++    RTCState *s = MC146818_RTC(d);
++
++    s->cmos_data[0x0f] = 0x00;
++}
++
+ static void rtc_class_initfn(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
+ 
+     dc->realize = rtc_realizefn;
++    dc->reset = rtc_resetdev;
+     dc->vmsd = &vmstate_rtc;
+     dc->props = mc146818rtc_properties;
+     /* Reason: needs to be wired up by rtc_init() */
+-- 
+1.8.3.1
