@@ -1,39 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46848)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48647)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cH4FU-0000UV-PW
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 02:45:14 -0500
+	(envelope-from <laurent@vivier.eu>) id 1cH4RQ-0000fo-AO
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 02:57:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cornelia.huck@de.ibm.com>) id 1cH4FR-0007gC-LP
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 02:45:12 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41839)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
-	id 1cH4FR-0007fZ-C5
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 02:45:09 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	uBE7iL4f068005
-	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 02:45:08 -0500
-Received: from e06smtp08.uk.ibm.com (e06smtp08.uk.ibm.com [195.75.94.104])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 27b1qyrtj5-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 02:45:07 -0500
-Received: from localhost
-	by e06smtp08.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
-	Wed, 14 Dec 2016 07:45:05 -0000
-Date: Wed, 14 Dec 2016 08:44:51 +0100
-From: Cornelia Huck <cornelia.huck@de.ibm.com>
-In-Reply-To: <20161213212745.1976.91005@loki>
-References: <1473773430-19616-1-git-send-email-maxime.coquelin@redhat.com>
-	<20161213212745.1976.91005@loki>
+	(envelope-from <laurent@vivier.eu>) id 1cH4RN-0001t4-6H
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 02:57:32 -0500
+Received: from mout.kundenserver.de ([212.227.17.13]:54213)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cH4RM-0001sp-Su
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 02:57:29 -0500
+References: <1481285870-3396-1-git-send-email-thuth@redhat.com>
+	<1481285870-3396-6-git-send-email-thuth@redhat.com>
+	<CAFEAcA-BbkYdTkTWQcqyK-jU+dncnrfDyGwQamMTZ4jr1VqL9A@mail.gmail.com>
+	<192aeaa3-042c-6e37-80b3-7a21453c542f@redhat.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <bd4c203a-ac68-2532-b248-41c25bd90065@vivier.eu>
+Date: Wed, 14 Dec 2016 08:56:37 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Message-Id: <20161214084451.2a5236d2.cornelia.huck@de.ibm.com>
-Subject: Re: [Qemu-devel] [Qemu-stable] [PATCH v2] virtio-bus: Plug devices
- after features are negotiated
+In-Reply-To: <192aeaa3-042c-6e37-80b3-7a21453c542f@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 05/20] arm: Move CPU files to target/ folder
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,144 +29,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: Maxime Coquelin <maxime.coquelin@redhat.com>, mst@redhat.com, qemu-devel@nongnu.org, marcel@redhat.com, eblake@redhat.com, qemu-stable@nongnu.org, stefanha@redhat.com, dgilbert@redhat.com
+To: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Aurelien Jarno <aurelien@aurel32.net>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Michael Walle <michael@walle.cc>, Yongbok Kim <yongbok.kim@imgtec.com>, Anthony Green <green@moxielogic.com>, Jia Liu <proljc@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Eduardo Habkost <ehabkost@redhat.com>, Max Filippov <jcmvbkbc@gmail.com>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, James Hogan <james.hogan@imgtec.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Marcelo Tosatti <mtosatti@redhat.com>
 
-On Tue, 13 Dec 2016 15:27:45 -0600
-Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
+Le 14/12/2016 à 08:43, Thomas Huth a écrit :
+> On 13.12.2016 19:19, Peter Maydell wrote:
+>> On 9 December 2016 at 12:17, Thomas Huth <thuth@redhat.com> wrote:
+>>> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+>>> index d4160df..60770d4 100644
+>>> --- a/hw/arm/virt-acpi-build.c
+>>> +++ b/hw/arm/virt-acpi-build.c
+>>> @@ -33,7 +33,7 @@
+>>>  #include "qemu/bitmap.h"
+>>>  #include "trace.h"
+>>>  #include "qom/cpu.h"
+>>> -#include "target-arm/cpu.h"
+>>> +#include "cpu.h"
+>>>  #include "hw/acpi/acpi-defs.h"
+>>>  #include "hw/acpi/acpi.h"
+>>>  #include "hw/nvram/fw_cfg.h"
+>>
+>> Something looks wrong here. We definitely want the ARM
+>> version of cpu.h, not any random cpu.h. The #include
+>> filename should make it clear which file we're getting,
+>> both so it's easier for humans to understand and so that
+>> one day we might be able to build more than one target
+>> CPU into the same QEMU binary.
+> 
+> Right, good catch, thanks! Looks like I did it right in the other
+> patches and used target/ppc/cpu.h there for example ... I'll fix it for
+> ARM in the next version of the patch...
 
-> Quoting Maxime Coquelin (2016-09-13 08:30:30)
-> > Currently, devices are plugged before features are negotiated.
-> > If the backend doesn't support VIRTIO_F_VERSION_1, the transport
-> > needs to rewind some settings.
-> > 
-> > This is the case for CCW, for which a post_plugged callback had
-> > been introduced, where max_rev field is just updated if
-> > VIRTIO_F_VERSION_1 is not supported by the backend.
-> > For PCI, implementing post_plugged would be much more
-> > complicated, so it needs to know whether the backend supports
-> > VIRTIO_F_VERSION_1 at plug time.
-> > 
-> > Currently, nothing is done for PCI. Modern capabilities get
-> > exposed to the guest even if VIRTIO_F_VERSION_1 is not supported
-> > by the backend, which confuses the guest.
-> > 
-> > This patch replaces existing post_plugged solution with an
-> > approach that fits with both transports.
-> > Features negotiation is performed before ->device_plugged() call.
-> > A pre_plugged callback is introduced so that the transports can
-> > set their supported features.
-> > 
-> > Cc: Michael S. Tsirkin <mst@redhat.com>
-> > Cc: qemu-stable@nongnu.org
-> > Tested-by: Cornelia Huck <cornelia.huck@de.ibm.com> [ccw]
-> > Reviewed-by: Cornelia Huck <cornelia.huck@de.ibm.com>
-> > Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
-> > Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
-> 
-> 
-> It looks like this patch breaks migration under certain circumstances.
-> One such scenario is migrating 2.7 -> 2.8.0-rc3 as detailed below on a
-> host that doesn't have support for virtio-1 in vhost (which was
-> introduced via 41e3e42 in kernel 3.18. In my case, I'm using Ubuntu
-> 14.04, kernel 3.13):
-> 
->  source (2.7.0):
->  
->    sudo build/v2.7.0/x86_64-softmmu/qemu-system-x86_64 -enable-kvm -L
->    build/v2.7.0-bios -M pc-i440fx-2.7 -m 512M -drive
->    file=/home/mdroth/vm/win7_home_sp1_virtio_testing.qcow2,if=virtio -vga
->    cirrus -smp 4 -device virtio-net-pci,netdev=net0 -netdev
->    tap,id=net0,vhost=on,script=/etc/qemu-ifup -monitor
->    unix:/tmp/vm-hmp.sock,server,nowait -qmp
->    unix:/tmp/vm-qmp.sock,server,nowait -vnc :200
->   
->  target (2.8.0-rc3):
->    
->    sudo build/v2.8.0-rc3/x86_64-softmmu/qemu-system-x86_64 -enable-kvm
->    -L build/v2.8.0-rc3-bios -M pc-i440fx-2.7 -m 512M -drive
->    file=/home/mdroth/vm/win7_home_sp1_virtio_testing.qcow2,if=virtio -vga
->    cirrus -smp 4 -device virtio-net-pci,netdev=net0 -netdev
->    tap,id=net0,vhost=on,script=/etc/qemu-ifup -monitor
->    unix:/tmp/vm-hmp-incoming.sock,server,nowait -qmp
->    unix:/tmp/vm-qmp-incoming.sock,server,nowait -vnc :201
->    -incoming unix:/tmp/migrate.sock
->     
->  error on target after migration:
->      
->    qemu-system-x86_64: get_pci_config_device: Bad config data: i=0x34
->    read: 98 device: 40 cmask: ff wmask: 0 w1cmask:0
->    qemu-system-x86_64: Failed to load PCIDevice:config
->    qemu-system-x86_64: Failed to load virtio-net:virtio
->    qemu-system-x86_64: error while loading state for instance 0x0 of
->    device '0000:00:03.0/virtio-net'
->    qemu-system-x86_64: load of migration failed: Invalid argument
-> 
+There is the same problem in: m68k, alpha, mips and sh4.
 
-Ugh. Let me double-check what happens for ccw. I could have sworn I
-tested this...
+Could you fix them too?
 
-> 
-> Based on discussion on IRC (excerpts below), I think the new handling needs
-> to be controllable via a machine option that can be disabled by default
-> for older machine types. This is being considered a release blocker for
-> 2.8 since there are still pre-3.18 LTS kernels in the wild.
-> 
-> 
-> root-cause:
-> 
-> 14:35 < stefanha> v3.13 will not work
-> 14:35 < stefanha>         VHOST_FEATURES = (1ULL << VIRTIO_F_NOTIFY_ON_EMPTY) |
-> 14:35 < stefanha>                          (1ULL << VIRTIO_RING_F_INDIRECT_DESC) |
-> 14:35 < stefanha>                          (1ULL << VIRTIO_RING_F_EVENT_IDX) |
-> 14:35 < stefanha>                          (1ULL << VHOST_F_LOG_ALL),
-> 14:35 < stefanha> The kernel side only knows about these guys
-> 14:35 < davidgiluk> our downstream 3.10.0-524 seems to work - but that's probably got all the vhost stuff backported
-> 14:35 < stefanha> plus these guys:
-> 14:35 < stefanha> F        VHOST_NET_FEATURES = VHOST_FEATURES |
-> 14:35 < stefanha>                          (1ULL << VHOST_NET_F_VIRTIO_NET_HDR) |
-> 14:35 < stefanha>                          (1ULL << VIRTIO_NET_F_MRG_RXBUF),
-> 14:36 < stefanha> mdroth: So QEMU is going to check a list of feature bits including VERSION_1
-> 14:36 < stefanha> and it will see that vhost doesn't support them.
-> 14:36 < stefanha> So we're kind of doing the right thing now.
-> 14:36 < stefanha> Before userspace was overriding the fact that vhost cannot handle VERSION_1.
-> 14:36 < stefanha> ...except we broke migration
-> 14:36 < davidgiluk> stefanha: But shouldn't it refuse to startup ?
-> 14:36 < stefanha> Everything is perfect*
-> 14:36 < stefanha> * except we broke migration
-> 14:36 < stefanha> :)
-> 
-> suggestions on how to fix this:
-> 
-> 14:40 < stefanha> My understanding is this bug is vhost-specific.  If you have an old kernel that doesn't support VERSION_1 vhost then migration will break.
-> 14:41 < stefanha> The actual bug is in QEMU though, not vhost
-> 14:42 < stefanha> vhost is reporting the truth.  It's QEMU that has changed behavior.
-> 14:44 < stefanha> mdroth: I think a lame fix would be to make virtio_pci_device_plugged() dependent on a flag that says: use old broken behavior instead of reporting the truth to the guest.
-> 14:44 < stefanha> The flag could be enabled for all old machine types
-> 14:44 < stefanha> and new machine types will report the truth.
-> 14:44 < stefanha> That way migration continues to work.
-
-I'll check whether we would need something for ccw as well.
-
-> 14:44 < stefanha> Not sure if anyone can think of a nicer solution.
-> 14:45 < stefanha> But we're going to have to keep lying to the guest if we want to preserve migration compatibility
-> 14:45 < stefanha> The key change in behavior with the patch you identified is:
-> 14:46 < stefanha> if (!virtio_has_feature(vdev->host_features, VIRTIO_F_VERSION_1)) {
-> 14:46 < stefanha> virtio_pci_disable_modern(proxy);
-> 14:46 < stefanha> Previously it didn't care about vdev->host_features.  It simply allowed VERSION_1 when proxy's disable_modern boolean was false.
-> 14:47 < mdroth> stefanha: ok, that explains why it seems to work with disable-modern=true
-> 14:48 < stefanha> mdroth: Your Ubuntu kernel old but 14.04 LTS is definitely still around so I don't think we can ship QEMU 2.8 like this.
-> 14:49 < stefanha> mdroth: Let's summarize it on the mailing list and see what Michael Tsirkin and Maxime Coquelin think.
-> 14:49 < mdroth> stefanha: i suppose a potential workaround would be to tell users to set disable-modern= to match their vhost capabilities, but it's hard for them to apply that retroactively if they're looking to migrate
-
-Another thought: Maybe this bug only surfaced right now because older
-qemus defaulted virtio-pci to legacy?
-
-(I think modern virtio-pci with old vhost resulted in a config that was
-rejected at least by Linux guests. Because pci defaulted to legacy, we
-only had the post-plugged workaround for ccw before.)
-
-> 14:49 < stefanha> We can delay the release in the meantime.
-> 14:50 < stefanha> mdroth: I don't think a workaround is going to be smooth in this case
-> 14:50 < stefanha> People will only notice once migration fails,
-> 14:50 < stefanha> and that's when you lose your VM state!
+Laurent
