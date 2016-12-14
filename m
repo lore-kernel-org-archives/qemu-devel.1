@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45348)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46691)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cH41y-0002S8-Rj
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 02:31:15 -0500
+	(envelope-from <thuth@redhat.com>) id 1cH4E1-0003kv-D0
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 02:43:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cH41w-0004Dy-9W
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 02:31:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36278)
+	(envelope-from <thuth@redhat.com>) id 1cH4Dy-0007DU-3k
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 02:43:41 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42308)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cH41w-0004Dl-46
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 02:31:12 -0500
-Message-ID: <1481700666.8440.3.camel@redhat.com>
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Wed, 14 Dec 2016 08:31:06 +0100
-In-Reply-To: <7ba29954-e3ad-529c-9978-b10d2788f9e4@cendio.se>
-References: <f460049b-211e-194b-d4c3-a3cc34e4d289@cendio.se>
-	<1481616362.27088.74.camel@redhat.com>
-	<7ba29954-e3ad-529c-9978-b10d2788f9e4@cendio.se>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0
-Subject: Re: [Qemu-devel] VNC LED state buggy, interop issue
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1cH4Dx-0007DJ-Ta
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 02:43:38 -0500
+References: <1481285870-3396-1-git-send-email-thuth@redhat.com>
+	<1481285870-3396-6-git-send-email-thuth@redhat.com>
+	<CAFEAcA-BbkYdTkTWQcqyK-jU+dncnrfDyGwQamMTZ4jr1VqL9A@mail.gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <192aeaa3-042c-6e37-80b3-7a21453c542f@redhat.com>
+Date: Wed, 14 Dec 2016 08:43:25 +0100
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA-BbkYdTkTWQcqyK-jU+dncnrfDyGwQamMTZ4jr1VqL9A@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 05/20] arm: Move CPU files to target/ folder
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,34 +28,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pierre Ossman <ossman@cendio.se>
-Cc: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, Aurelien Jarno <aurelien@aurel32.net>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Michael Walle <michael@walle.cc>, Laurent Vivier <laurent@vivier.eu>, Yongbok Kim <yongbok.kim@imgtec.com>, Anthony Green <green@moxielogic.com>, Jia Liu <proljc@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Eduardo Habkost <ehabkost@redhat.com>, Max Filippov <jcmvbkbc@gmail.com>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, James Hogan <james.hogan@imgtec.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Marcelo Tosatti <mtosatti@redhat.com>
 
-On Di, 2016-12-13 at 14:10 +0100, Pierre Ossman wrote:
-> On 13/12/16 09:06, Gerd Hoffmann wrote:
-> >>   b) Remove the assumption from the code and the protocol.
-> >
-> > Patches are welcome.
-> >
->=20
-> I was just aiming for a consensus on the intended behaviour, rather than=
-=20
-> fix the bug right now. :)
-> But all right, attached patch is an attempt.
->=20
-> Btw, is there any client that implements this extension yet? I couldn't=
-=20
-> find anything.
->=20
-> Regards
+On 13.12.2016 19:19, Peter Maydell wrote:
+> On 9 December 2016 at 12:17, Thomas Huth <thuth@redhat.com> wrote:
+>> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+>> index d4160df..60770d4 100644
+>> --- a/hw/arm/virt-acpi-build.c
+>> +++ b/hw/arm/virt-acpi-build.c
+>> @@ -33,7 +33,7 @@
+>>  #include "qemu/bitmap.h"
+>>  #include "trace.h"
+>>  #include "qom/cpu.h"
+>> -#include "target-arm/cpu.h"
+>> +#include "cpu.h"
+>>  #include "hw/acpi/acpi-defs.h"
+>>  #include "hw/acpi/acpi.h"
+>>  #include "hw/nvram/fw_cfg.h"
+> 
+> Something looks wrong here. We definitely want the ARM
+> version of cpu.h, not any random cpu.h. The #include
+> filename should make it clear which file we're getting,
+> both so it's easier for humans to understand and so that
+> one day we might be able to build more than one target
+> CPU into the same QEMU binary.
 
-Can you send that with git send-email instead of a attachment?
-I can quote the patch for commenting then, also various tools expect
-patches that way.
+Right, good catch, thanks! Looks like I did it right in the other
+patches and used target/ppc/cpu.h there for example ... I'll fix it for
+ARM in the next version of the patch...
 
-Patch looks good.  Commit message is too short.  You are moving the led
-tracking from vncstate to vncdisplay, which makes sense, but this shpuld
-be explained in the commit message too.
-
-thanks,
-  Gerd
+ Thomas
