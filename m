@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45523)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46274)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cHDip-0000Oy-Ps
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:52:08 -0500
+	(envelope-from <clg@kaod.org>) id 1cHDlc-0003II-Py
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:55:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cHDij-0004qZ-Tx
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:52:07 -0500
-Received: from 8.mo178.mail-out.ovh.net ([46.105.74.227]:49982)
+	(envelope-from <clg@kaod.org>) id 1cHDlZ-0005S3-P0
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:55:00 -0500
+Received: from 7.mo178.mail-out.ovh.net ([46.105.58.91]:54690)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cHDij-0004qH-Ne
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:52:01 -0500
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cHDlZ-0005Rf-IJ
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:54:57 -0500
 Received: from player793.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 5409A9EFB
-	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 18:51:58 +0100 (CET)
-References: <1480434248-27138-1-git-send-email-clg@kaod.org>
-	<CAFEAcA96OTfgO9agwKT10XHAPLA1cfme7syA0wTAu5t=zKgyHQ@mail.gmail.com>
+	by mo178.mail-out.ovh.net (Postfix) with ESMTP id D9CA0B2BF
+	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 18:54:55 +0100 (CET)
+References: <20161202054617.6749-1-alastair@au1.ibm.com>
+	<20161202054617.6749-2-alastair@au1.ibm.com>
+	<CAFEAcA8nge_DCESG-4XLzKQG_K0AGjh8RBBMbekSOj7O8KB0ng@mail.gmail.com>
 From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <2220d05d-a814-c5a0-2297-ea57e8cd8566@kaod.org>
-Date: Wed, 14 Dec 2016 18:51:51 +0100
+Message-ID: <61d98d1b-3b9a-78a4-4e8a-5eca250eed5f@kaod.org>
+Date: Wed, 14 Dec 2016 18:54:48 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA96OTfgO9agwKT10XHAPLA1cfme7syA0wTAu5t=zKgyHQ@mail.gmail.com>
+In-Reply-To: <CAFEAcA8nge_DCESG-4XLzKQG_K0AGjh8RBBMbekSOj7O8KB0ng@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-2.9 00/30] Aspeed SoC fixes and model
- improvements
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 1/7] arm: Uniquely name imx25 I2C buses.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,60 +31,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Andrew Jeffery <andrew@aj.id.au>, Marcin Krzeminski <marcin.krzeminski@nokia.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+To: Peter Maydell <peter.maydell@linaro.org>, Alastair D'Silva <alastair@au1.ibm.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Andrew Jeffery <andrew@aj.id.au>, Joel Stanley <joel@jms.id.au>, Alastair D'Silva <alastair@d-silva.org>
 
-On 12/14/2016 06:12 PM, Peter Maydell wrote:
-> On 29 November 2016 at 15:43, C=C3=A9dric Le Goater <clg@kaod.org> wrot=
-e:
->> Here is a collection of fixes and improvements on existing models for
->> the Aspeed SoCs
->=20
-> I have taken into target-arm.next for 2.9 patches 2-13:
->=20
->>   m25p80: add support for the mx66l1g45g
->>   aspeed: QOMify the CPU object and attach it to the SoC
->>   aspeed: remove cannot_destroy_with_object_finalize_yet
->>   aspeed: attach the second SPI controller object to the SoC
->>   aspeed: extend the board configuration with flash models
->>   aspeed: add support for the romulus-bmc board
->>   aspeed: add a memory region for SRAM
->>   aspeed: add the definitions for the AST2400 A1 SoC
->>   aspeed: change SoC revision of the palmetto-bmc machine
->>   aspeed/scu: fix SCU region size
->>   aspeed/smc: improve segment register support
->>   aspeed/smc: set the number of flash modules for the FMC controller
->=20
-> which should at least reduce the size of this patchset for the
-> next round.
+On 12/14/2016 06:41 PM, Peter Maydell wrote:
+> On 2 December 2016 at 05:46, Alastair D'Silva <alastair@au1.ibm.com> wrote:
+>> From: Alastair D'Silva <alastair@d-silva.org>
+>>
+>> The imx25 chip provides 3 i2c buses, but they have all been named
+>> "i2c", which makes it difficult to predict which bus a device will
+>> be connected to when specified on the command line.
+>>
+>> This patch addresses the issue by naming the buses uniquely:
+>>   i2c-bus.0 i2c-bus.1 i2c-bus.2
+>>
+>> Signed-off-by: Alastair D'Silva <alastair@d-silva.org>
+>> ---
+>>  hw/arm/imx25_pdk.c | 4 +---
+>>  hw/i2c/imx_i2c.c   | 2 +-
+>>  2 files changed, 2 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/hw/arm/imx25_pdk.c b/hw/arm/imx25_pdk.c
+>> index 025b608..c6f04d3 100644
+>> --- a/hw/arm/imx25_pdk.c
+>> +++ b/hw/arm/imx25_pdk.c
+>> @@ -138,9 +138,7 @@ static void imx25_pdk_init(MachineState *machine)
+>>           * We add it here (only on qtest usage) to be able to do a bit
+>>           * of simple qtest. See "make check" for details.
+>>           */
+>> -        i2c_create_slave((I2CBus *)qdev_get_child_bus(DEVICE(&s->soc.i2c[0]),
+>> -                                                      "i2c"),
+>> -                         "ds1338", 0x68);
+>> +        i2c_create_slave(s->soc.i2c[0].bus, "ds1338", 0x68);
+> 
+> This bit doesn't look right. The board level code shouldn't be
+> poking around inside the IMXI2CState struct, as that is private
+> to the device implementation. That's why we're calling
+> qdev_get_child_bus().
 
-Thanks a lot, I was going to ask you that :)=20
+That was my suggestion. Sorry about that. 
 
-I think I can simplify easily the vbar patch with the input
-you just gave. I lost my way with the EL3 I guess.
-
-The model option to the drive should be just dropped. However,=20
-using -drive / -device to define the flash modules on the command=20
-line introduces more changes as we need to take them into=20
-account at reset time and not at init time anymore. I need to
-think about it.
-
-Marcin had some concerns on the way the patchset handles the=20
-command mode modeling of the SMC controller. It can be improved=20
-surely but I won't do that right now. So that's a couple of=20
-patches for later.
-
-I will take a look at the crash you spotted. Funny that I did
-not see that.
-
-The watchdog needs some review. It is nice to have as it gives
-Linux reboot.
-
-Alastair has an interesting RTC device we could plug on the=20
-palmetto machine. I have a little TMP421 device on the waiting
-stack after.
+May be, we could use "i2c.0", now that we have numbered the I2C bus 
+names ? 
 
 Thanks,
-
 
 C.
