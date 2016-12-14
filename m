@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47485)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47878)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cH8Ur-0004B7-AL
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 07:17:22 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cH8X8-0004ZF-5Q
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 07:19:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cH8Uo-0002L0-3C
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 07:17:21 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46456)
+	(envelope-from <pbonzini@redhat.com>) id 1cH8X3-0002q8-W6
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 07:19:42 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39550)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cH8Un-0002Kh-T9
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 07:17:18 -0500
-References: <1481683803-10051-1-git-send-email-yi.y.sun@linux.intel.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cH8X3-0002pq-Qa
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 07:19:37 -0500
+References: <20161214064820.12480-1-hangaohuai@huawei.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <50856580-9978-8a5d-e424-ca989b246a8b@redhat.com>
-Date: Wed, 14 Dec 2016 13:17:12 +0100
+Message-ID: <4bfd3066-6c2b-c21f-b6ea-9cc156fa4389@redhat.com>
+Date: Wed, 14 Dec 2016 13:19:34 +0100
 MIME-Version: 1.0
-In-Reply-To: <1481683803-10051-1-git-send-email-yi.y.sun@linux.intel.com>
+In-Reply-To: <20161214064820.12480-1-hangaohuai@huawei.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] target-i386: Add Intel SHA_NI instruction
- support.
+Subject: Re: [Qemu-devel] [PATCH] bugfix: vm halt when in reset looping
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,48 +26,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yi Sun <yi.y.sun@linux.intel.com>, qemu-devel@nongnu.org
-Cc: rth@twiddle.net, ehabkost@redhat.com, chao.p.peng@intel.com
+To: hangaohuai <hangaohuai@huawei.com>, qemu-devel@nongnu.org
+Cc: mst@redhat.com, arei.gonglei@huawei.com
 
 
 
-On 14/12/2016 03:50, Yi Sun wrote:
-> Add SHA_NI feature bit. Its spec can be found at:
-> https://software.intel.com/sites/default/files/managed/39/c5/325462-sdm-vol-1-2abcd-3abcd.pdf
+On 14/12/2016 07:48, hangaohuai wrote:
+> reset mc146818rtc device when RESET event happens.
 > 
-> Signed-off-by: Yi Sun <yi.y.sun@linux.intel.com>
-> ---
->  target-i386/cpu.c | 2 +-
->  target-i386/cpu.h | 1 +
->  2 files changed, 2 insertions(+), 1 deletion(-)
+> Fix the problem:
+>   1. Guest boot the second cpu, set CMOS_RESET_CODE 0x0a to protect selfboot;
+>   2. VM being reset by others, hmp_system_reset;
+>   3. seabios resume check the CMOS_RESET_CODE, if 0x0a, jump to the BDA
+>      resume execution by jump via 40h:0067h;
+>   4. Guest halt;
 > 
-> diff --git a/target-i386/cpu.c b/target-i386/cpu.c
-> index de1f30e..993f825 100644
-> --- a/target-i386/cpu.c
-> +++ b/target-i386/cpu.c
-> @@ -422,7 +422,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
->              "avx512f", "avx512dq", "rdseed", "adx",
->              "smap", "avx512ifma", "pcommit", "clflushopt",
->              "clwb", NULL, "avx512pf", "avx512er",
-> -            "avx512cd", NULL, "avx512bw", "avx512vl",
-> +            "avx512cd", "sha-ni", "avx512bw", "avx512vl",
->          },
->          .cpuid_eax = 7,
->          .cpuid_needs_ecx = true, .cpuid_ecx = 0,
-> diff --git a/target-i386/cpu.h b/target-i386/cpu.h
-> index c605724..d0bf624 100644
-> --- a/target-i386/cpu.h
-> +++ b/target-i386/cpu.h
-> @@ -621,6 +621,7 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
->  #define CPUID_7_0_EBX_AVX512PF (1U << 26) /* AVX-512 Prefetch */
->  #define CPUID_7_0_EBX_AVX512ER (1U << 27) /* AVX-512 Exponential and Reciprocal */
->  #define CPUID_7_0_EBX_AVX512CD (1U << 28) /* AVX-512 Conflict Detection */
-> +#define CPUID_7_0_EBX_SHA_NI   (1U << 29) /* SHA1/SHA256 Instruction Extensions */
->  #define CPUID_7_0_EBX_AVX512BW (1U << 30) /* AVX-512 Byte and Word Instructions */
->  #define CPUID_7_0_EBX_AVX512VL (1U << 31) /* AVX-512 Vector Length Extensions */
->  
-> 
+> Signed-off-by: hangaohuai <hangaohuai@huawei.com>
 
-Looks good, thanks.
+I think this would break S3 resume.
 
 Paolo
+
+> ---
+>  hw/timer/mc146818rtc.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+> 
+> diff --git a/hw/timer/mc146818rtc.c b/hw/timer/mc146818rtc.c
+> index da209d0..67d707d 100644
+> --- a/hw/timer/mc146818rtc.c
+> +++ b/hw/timer/mc146818rtc.c
+> @@ -946,11 +946,19 @@ static Property mc146818rtc_properties[] = {
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>  
+> +static void rtc_resetdev(DeviceState *d)
+> +{
+> +    RTCState *s = MC146818_RTC(d);
+> +
+> +    s->cmos_data[0x0f] = 0x00;
+> +}
+> +
+>  static void rtc_class_initfn(ObjectClass *klass, void *data)
+>  {
+>      DeviceClass *dc = DEVICE_CLASS(klass);
+>  
+>      dc->realize = rtc_realizefn;
+> +    dc->reset = rtc_resetdev;
+>      dc->vmsd = &vmstate_rtc;
+>      dc->props = mc146818rtc_properties;
+>      /* Reason: needs to be wired up by rtc_init() */
+> 
