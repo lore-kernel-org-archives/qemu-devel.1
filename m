@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50990)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55466)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cGzGi-0002QL-5J
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 21:26:09 -0500
+	(envelope-from <mst@redhat.com>) id 1cGzch-00025Q-58
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 21:48:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cGzGf-0006I8-0c
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 21:26:08 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38042)
+	(envelope-from <mst@redhat.com>) id 1cGzcc-0003xM-Ag
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 21:48:51 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50040)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cGzGe-0006Hg-Oj
-	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 21:26:04 -0500
-References: <1481658281-24243-1-git-send-email-hpoussin@reactos.org>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <e4b51a54-86c2-72ce-198a-10393f0e1a5b@redhat.com>
-Date: Wed, 14 Dec 2016 10:25:57 +0800
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cGzcc-0003wr-4x
+	for qemu-devel@nongnu.org; Tue, 13 Dec 2016 21:48:46 -0500
+Date: Wed, 14 Dec 2016 04:48:42 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20161214044741-mutt-send-email-mst@kernel.org>
+References: <1481681345-32424-1-git-send-email-peterx@redhat.com>
+	<1481681345-32424-2-git-send-email-peterx@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1481658281-24243-1-git-send-email-hpoussin@reactos.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] rtl8139: correctly handle PHY reset
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1481681345-32424-2-git-send-email-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 1/2] intel_iommu: check validity for GAW
+ bits in CE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,106 +28,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, kevin.tian@intel.com, famz@redhat.com, jasowang@redhat.com, alex.williamson@redhat.com
 
-
-
-On 2016=E5=B9=B412=E6=9C=8814=E6=97=A5 03:44, Herv=C3=A9 Poussineau wrote=
-:
-> According to datasheet:
-> "[Bit 15 of Basic Mode Control Register] sets the status and control re=
-gisters
-> of the PHY (register 0062-0074) in a default state. This bit is self-cl=
-earing.
-> 1 =3D software reset; 0 =3D normal operation."
->
-> This fixes the netcard detection failure in Minoca OS.
->
-> Signed-off-by: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
+On Wed, Dec 14, 2016 at 10:09:04AM +0800, Peter Xu wrote:
+> Currently vt-d Context Entry (CE) only allows 39/48 bits address width.
+> If guest software configured more than that, we complain and report.
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 > ---
->   hw/net/rtl8139.c | 34 +++++++++++++++++++++-------------
->   1 file changed, 21 insertions(+), 13 deletions(-)
->
-> diff --git a/hw/net/rtl8139.c b/hw/net/rtl8139.c
-> index f05e59c..671c7e4 100644
-> --- a/hw/net/rtl8139.c
-> +++ b/hw/net/rtl8139.c
-> @@ -1205,6 +1205,20 @@ static void rtl8139_reset_rxring(RTL8139State *s=
-, uint32_t bufferSize)
->       s->RxBufAddr =3D 0;
->   }
->  =20
-> +static void rtl8139_reset_phy(RTL8139State *s)
-> +{
-> +    s->BasicModeStatus  =3D 0x7809;
-> +    s->BasicModeStatus |=3D 0x0020; /* autonegotiation completed */
-> +    /* preserve link state */
-> +    s->BasicModeStatus |=3D qemu_get_queue(s->nic)->link_down ? 0 : 0x=
-04;
-> +
-> +    s->NWayAdvert    =3D 0x05e1; /* all modes, full duplex */
-> +    s->NWayLPAR      =3D 0x05e1; /* all modes, full duplex */
-> +    s->NWayExpansion =3D 0x0001; /* autonegotiation supported */
-> +
-> +    s->CSCR =3D CSCR_F_LINK_100 | CSCR_HEART_BIT | CSCR_LD;
-> +}
-> +
->   static void rtl8139_reset(DeviceState *d)
->   {
->       RTL8139State *s =3D RTL8139(d);
-> @@ -1256,25 +1270,14 @@ static void rtl8139_reset(DeviceState *d)
->       s->Config3 =3D 0x1; /* fast back-to-back compatible */
->       s->Config5 =3D 0x0;
->  =20
-> -    s->CSCR =3D CSCR_F_LINK_100 | CSCR_HEART_BIT | CSCR_LD;
-> -
->       s->CpCmd   =3D 0x0; /* reset C+ mode */
->       s->cplus_enabled =3D 0;
->  =20
-> -
->   //    s->BasicModeCtrl =3D 0x3100; // 100Mbps, full duplex, autonegot=
-iation
->   //    s->BasicModeCtrl =3D 0x2100; // 100Mbps, full duplex
->       s->BasicModeCtrl =3D 0x1000; // autonegotiation
->  =20
-> -    s->BasicModeStatus  =3D 0x7809;
-> -    //s->BasicModeStatus |=3D 0x0040; /* UTP medium */
-> -    s->BasicModeStatus |=3D 0x0020; /* autonegotiation completed */
-> -    /* preserve link state */
-> -    s->BasicModeStatus |=3D qemu_get_queue(s->nic)->link_down ? 0 : 0x=
-04;
-> -
-> -    s->NWayAdvert    =3D 0x05e1; /* all modes, full duplex */
-> -    s->NWayLPAR      =3D 0x05e1; /* all modes, full duplex */
-> -    s->NWayExpansion =3D 0x0001; /* autonegotiation supported */
-> +    rtl8139_reset_phy(s);
->  =20
->       /* also reset timer and disable timer interrupt */
->       s->TCTR =3D 0;
-> @@ -1469,7 +1472,7 @@ static void rtl8139_BasicModeCtrl_write(RTL8139St=
-ate *s, uint32_t val)
->       DPRINTF("BasicModeCtrl register write(w) val=3D0x%04x\n", val);
->  =20
->       /* mask unwritable bits */
-> -    uint32_t mask =3D 0x4cff;
-> +    uint32_t mask =3D 0xccff;
->  =20
->       if (1 || !rtl8139_config_writable(s))
->       {
-> @@ -1479,6 +1482,11 @@ static void rtl8139_BasicModeCtrl_write(RTL8139S=
-tate *s, uint32_t val)
->           mask |=3D 0x0100;
->       }
->  =20
-> +    if (val & 0x8000) {
-> +        /* Reset PHY */
-> +        rtl8139_reset_phy(s);
+>  hw/i386/intel_iommu.c          | 17 ++++++++++++++++-
+>  hw/i386/intel_iommu_internal.h |  2 ++
+>  2 files changed, 18 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> index 5f3e351..517a2a3 100644
+> --- a/hw/i386/intel_iommu.c
+> +++ b/hw/i386/intel_iommu.c
+> @@ -599,9 +599,19 @@ static inline uint32_t vtd_get_level_from_context_entry(VTDContextEntry *ce)
+>      return 2 + (ce->hi & VTD_CONTEXT_ENTRY_AW);
+>  }
+>  
+> +/* Return 0 if failed to fetch valid aw */
+>  static inline uint32_t vtd_get_agaw_from_context_entry(VTDContextEntry *ce)
+>  {
+> -    return 30 + (ce->hi & VTD_CONTEXT_ENTRY_AW) * 9;
+> +    uint8_t aw = (ce->hi & VTD_CONTEXT_ENTRY_AW);
+> +    /*
+> +     * According to vt-d spec 10.4.2 bits 12:8, SAGAW only allows
+> +     * 39/48 bits.
+> +     */
+> +    if (aw > VTD_CE_AW_48BIT) {
+
+5-level is almost sure to allow more. I don't see the point of this test.
+
+> +        error_report("Context entry address width not supported (aw=%d)" , aw);
+> +        return 0;
+> +    }
+> +    return 30 + aw * 9;
+>  }
+>  
+>  static const uint64_t vtd_paging_entry_rsvd_field[] = {
+> @@ -642,6 +652,11 @@ static int vtd_gpa_to_slpte(VTDContextEntry *ce, uint64_t gpa, bool is_write,
+>      uint32_t ce_agaw = vtd_get_agaw_from_context_entry(ce);
+>      uint64_t access_right_check;
+>  
+> +    if (!ce_agaw) {
+> +        error_report("Illegal context entry AGAW");
+> +        return -VTD_FR_CONTEXT_ENTRY_INV;
 > +    }
 > +
->       val =3D SET_MASKED(val, mask, s->BasicModeCtrl);
->  =20
->       s->BasicModeCtrl =3D val;
-
-Applied to -net.
-
-Thanks
+>      /* Check if @gpa is above 2^X-1, where X is the minimum of MGAW in CAP_REG
+>       * and AW in context-entry.
+>       */
+> diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
+> index 11abfa2..e808c67 100644
+> --- a/hw/i386/intel_iommu_internal.h
+> +++ b/hw/i386/intel_iommu_internal.h
+> @@ -406,6 +406,8 @@ typedef struct VTDRootEntry VTDRootEntry;
+>  #define VTD_CONTEXT_ENTRY_RSVD_LO   (0xff0ULL | ~VTD_HAW_MASK)
+>  /* hi */
+>  #define VTD_CONTEXT_ENTRY_AW        7ULL /* Adjusted guest-address-width */
+> +#define VTD_CE_AW_39BIT             1
+> +#define VTD_CE_AW_48BIT             2
+>  #define VTD_CONTEXT_ENTRY_DID(val)  (((val) >> 8) & VTD_DOMAIN_ID_MASK)
+>  #define VTD_CONTEXT_ENTRY_RSVD_HI   0xffffffffff000080ULL
+>  
+> -- 
+> 2.7.4
