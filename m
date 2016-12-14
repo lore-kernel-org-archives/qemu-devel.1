@@ -1,15 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33554)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34612)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cHHLe-0005St-PM
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 16:44:27 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cHHQk-0005dF-0J
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 16:49:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cHHLZ-0000Ek-Tf
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 16:44:26 -0500
-From: Thomas Huth <thuth@redhat.com>
-Date: Wed, 14 Dec 2016 22:44:17 +0100
-Message-Id: <1481751857-464-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.9 v2] hw/ppc/spapr: Fix boot path of
- usb-host storage devices
+	(envelope-from <dgibson@ozlabs.org>) id 1cHHQf-0001q2-Sx
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 16:49:42 -0500
+Date: Wed, 14 Dec 2016 17:20:44 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20161214062044.GJ32647@umbus>
+References: <20161212040603.27295-1-david@gibson.dropbear.id.au>
+	<20161212040603.27295-5-david@gibson.dropbear.id.au>
+	<1481693546.1555.26.camel@gmail.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="W/D3X8sky0X3AmG5"
+Content-Disposition: inline
+In-Reply-To: <1481693546.1555.26.camel@gmail.com>
+Subject: Re: [Qemu-devel] [PATCHv3 4/5] pseries: Enable HPT resizing for 2.9
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,123 +25,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-Cc: Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org
+To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Cc: paulus@samba.org, agraf@suse.de, mdroth@linux.vnet.ibm.com, thuth@redhat.com, lvivier@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-When passing through an USB storage device to a pseries guest, it
-is currently not possible to automatically boot from the device
-if the "bootindex" property has been specified, too (e.g. when using
-"-device nec-usb-xhci -device usb-host,hostbus=1,hostaddr=2,bootindex=0"
-at the command line). The problem is that QEMU builds a device tree path
-like "/pci@800000020000000/usb@0/usb-host@1" and passes it to SLOF
-in the /chosen/qemu,boot-list property. SLOF, however, probes the
-USB device, recognizes that it is a storage device and thus changes
-its name to "storage", and additionally adds a child node for the
-SCSI LUN, so the correct boot path in SLOF is something like
-"/pci@800000020000000/usb@0/storage@1/disk@101000000000000" instead.
-So when we detect an USB mass storage device with SCSI interface,
-we've got to adjust the firmware boot-device path properly that
-SLOF can automatically boot from the device.
 
-Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1354177
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- v2: Improved the comment in spapr.c as requested by David
+--W/D3X8sky0X3AmG5
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
- hw/ppc/spapr.c       | 13 +++++++++++++
- hw/usb/host-libusb.c | 29 +++++++++++++++++++++++++++++
- hw/usb/host-stub.c   |  5 +++++
- include/hw/usb.h     |  1 +
- 4 files changed, 48 insertions(+)
+On Wed, Dec 14, 2016 at 04:32:26PM +1100, Suraj Jitindar Singh wrote:
+> On Mon, 2016-12-12 at 15:06 +1100, David Gibson wrote:
+> > We've now implemented a PAPR extensions which allows PAPR guests
+> > (i.e.
+> > "pseries" machine type) to resize their hash page table during
+> > runtime.
+> >=20
+> > However, that extension is only enabled if explicitly chosen on the
+> > command line.=A0=A0This patch enables it by default for spapr-2.9, but
+> > leaves
+> > it disabled (by default) for older machine types.
+> >=20
+> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> > Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+> > ---
+> > =A0hw/ppc/spapr.c | 5 ++++-
+> > =A01 file changed, 4 insertions(+), 1 deletion(-)
+> >=20
+> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > index d057031..f05d0e5 100644
+> > --- a/hw/ppc/spapr.c
+> > +++ b/hw/ppc/spapr.c
+> > @@ -2779,7 +2779,7 @@ static void
+> > spapr_machine_class_init(ObjectClass *oc, void *data)
+> > =A0
+> > =A0=A0=A0=A0=A0smc->dr_lmb_enabled =3D true;
+> > =A0=A0=A0=A0=A0smc->tcg_default_cpu =3D "POWER8";
+> > -=A0=A0=A0=A0smc->resize_hpt_default =3D SPAPR_RESIZE_HPT_DISABLED;
+> > +=A0=A0=A0=A0smc->resize_hpt_default =3D SPAPR_RESIZE_HPT_ENABLED;
+> > =A0=A0=A0=A0=A0mc->query_hotpluggable_cpus =3D spapr_query_hotpluggable=
+_cpus;
+> > =A0=A0=A0=A0=A0fwc->get_dev_path =3D spapr_get_fw_dev_path;
+> > =A0=A0=A0=A0=A0nc->nmi_monitor_handler =3D spapr_nmi;
+> > @@ -2860,8 +2860,11 @@ static void
+> > spapr_machine_2_8_instance_options(MachineState *machine)
+> > =A0
+> > =A0static void spapr_machine_2_8_class_options(MachineClass *mc)
+> > =A0{
+> > +=A0=A0=A0=A0sPAPRMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
+> > +
+> > =A0=A0=A0=A0=A0spapr_machine_2_9_class_options(mc);
+> > =A0=A0=A0=A0=A0SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_8);
+> > +=A0=A0=A0=A0smc->resize_hpt_default =3D SPAPR_RESIZE_HPT_DISABLED;
+> > =A0}
+> > =A0
+> > =A0DEFINE_SPAPR_MACHINE(2_8, "2.8", false);
+> If people don't want this by default they should probably specify on
+> the command line.
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 208ef7b..cd83b2c 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -2185,6 +2185,19 @@ static char *spapr_get_fw_dev_path(FWPathProvider *p, BusState *bus,
-         }
-     }
- 
-+    /*
-+     * SLOF probes the USB devices, and if it recognizes that the device is a
-+     * storage device, it changes its name to "storage" instead of "usb-host",
-+     * and additionally adds a child node for the SCSI LUN, so the correct
-+     * boot path in SLOF is something like .../storage@1/disk@xxx" instead.
-+     */
-+    if (strcmp("usb-host", qdev_fw_name(dev)) == 0) {
-+        USBDevice *usbdev = CAST(USBDevice, dev, TYPE_USB_DEVICE);
-+        if (usb_host_dev_is_scsi_storage(usbdev)) {
-+            return g_strdup_printf("storage@%s/disk", usbdev->port->path);
-+        }
-+    }
-+
-     if (phb) {
-         /* Replace "pci" with "pci@800000020000000" */
-         return g_strdup_printf("pci@%"PRIX64, phb->buid);
-diff --git a/hw/usb/host-libusb.c b/hw/usb/host-libusb.c
-index bd81d71..7791c6d 100644
---- a/hw/usb/host-libusb.c
-+++ b/hw/usb/host-libusb.c
-@@ -1707,6 +1707,35 @@ static void usb_host_auto_check(void *unused)
-     timer_mod(usb_auto_timer, qemu_clock_get_ms(QEMU_CLOCK_REALTIME) + 2000);
- }
- 
-+/**
-+ * Check whether USB host device has a USB mass storage SCSI interface
-+ */
-+bool usb_host_dev_is_scsi_storage(USBDevice *ud)
-+{
-+    USBHostDevice *uhd = USB_HOST_DEVICE(ud);
-+    struct libusb_config_descriptor *conf;
-+    const struct libusb_interface_descriptor *intf;
-+    bool is_scsi_storage = false;
-+    int i;
-+
-+    if (!uhd || libusb_get_active_config_descriptor(uhd->dev, &conf) != 0) {
-+        return false;
-+    }
-+
-+    for (i = 0; i < conf->bNumInterfaces; i++) {
-+        intf = &conf->interface[i].altsetting[ud->altsetting[i]];
-+        if (intf->bInterfaceClass == LIBUSB_CLASS_MASS_STORAGE &&
-+            intf->bInterfaceSubClass == 6) {                 /* 6 means SCSI */
-+            is_scsi_storage = true;
-+            break;
-+        }
-+    }
-+
-+    libusb_free_config_descriptor(conf);
-+
-+    return is_scsi_storage;
-+}
-+
- void hmp_info_usbhost(Monitor *mon, const QDict *qdict)
- {
-     libusb_device **devs = NULL;
-diff --git a/hw/usb/host-stub.c b/hw/usb/host-stub.c
-index 6ba65a1..d0268ba 100644
---- a/hw/usb/host-stub.c
-+++ b/hw/usb/host-stub.c
-@@ -46,3 +46,8 @@ USBDevice *usb_host_device_open(USBBus *bus, const char *devname)
- {
-     return NULL;
- }
-+
-+bool usb_host_dev_is_scsi_storage(USBDevice *ud)
-+{
-+    return false;
-+}
-diff --git a/include/hw/usb.h b/include/hw/usb.h
-index 847c9de..43838c9 100644
---- a/include/hw/usb.h
-+++ b/include/hw/usb.h
-@@ -471,6 +471,7 @@ void usb_generic_async_ctrl_complete(USBDevice *s, USBPacket *p);
- /* usb-linux.c */
- USBDevice *usb_host_device_open(USBBus *bus, const char *devname);
- void hmp_info_usbhost(Monitor *mon, const QDict *qdict);
-+bool usb_host_dev_is_scsi_storage(USBDevice *usbdev);
- 
- /* usb ports of the VM */
- 
--- 
-1.8.3.1
+Uh.. I don't follow you.
+
+> Reviewed-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--W/D3X8sky0X3AmG5
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJYUOS8AAoJEGw4ysog2bOS+6wP/08wNP5q/dx0/kpyNFTNgMOW
+XpEAjJwkEpuXBe9N3361OzqZLMo8qPaE+DkTvc0zuZ1KJmui/AE1fIrBKvnfT9Dn
+d79qpQhj9ufJAO00vz0nCxQg3wxs9eX+1W/gv+rO6O0e6Mf7BST33ghBkLxpTuoO
+szhEA6ZJ++YqjyjzJrZh3hU9+5Wu4MIvJ9LQEmuOFBsBxOZxOTJx+jkpagJnQdOh
+IYzOOdGooxhOZgwj36Cw426eIZgr8lDWvkG98FaOVIdYPJ8ebwpCx4AE8gzPqG8W
+6x0yqID0lRPdmMMcnT9PClPnMZF5Go9XGJkXWGCJzbsC9VIUmRtvBZcG/zkQU1Tr
+eGe6bMDtMKKvmXUEYwEmN+R1mo58DQyORV20tcf8p+JgWSrXPGCtU8osELl9+K0w
+2UaYNuJEihDfUC095kmXLiImFZ206MFMjg2lugMQHmtd/Cj3SlT1CUMjTUKdNCeR
+TzzJAkmHv3nyElkq+Dge2TFm3vIuw7sXGLKpUmuz/dLADCrMugcDvjG0f+5/OEWm
+k/YgPTlqkxnn1AkR49f9qep8Gu5o4F5NaYdBrKRh7A7I34+EZ+gvrE754apRMOIr
+VyuzB6qN2oxiUdTZlfYxlDwnknLFCGUXBTXDz8NeP8WYFetz32bym3JZo9Z82+xI
++em03PlOtE9Y8KBRmn6a
+=SLle
+-----END PGP SIGNATURE-----
+
+--W/D3X8sky0X3AmG5--
