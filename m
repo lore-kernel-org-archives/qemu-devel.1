@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35823)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36369)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aderumier@oxygem.tv>) id 1cHBZh-00040b-1R
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 10:34:36 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cHBby-00039P-MM
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 10:36:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aderumier@oxygem.tv>) id 1cHBZd-00030a-4l
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 10:34:33 -0500
-Received: from mailpro.odiso.net ([89.248.211.110]:51554)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aderumier@oxygem.tv>) id 1cHBZc-0002r4-V4
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 10:34:29 -0500
-Date: Wed, 14 Dec 2016 16:33:58 +0100 (CET)
-From: Alexandre DERUMIER <aderumier@odiso.com>
-Message-ID: <1383290552.4515122.1481729638569.JavaMail.zimbra@oxygem.tv>
-In-Reply-To: <1a3a7aef-55f1-11b6-b33f-621979cbb59f@profihost.ag>
-References: <1a3a7aef-55f1-11b6-b33f-621979cbb59f@profihost.ag>
+	(envelope-from <peter.maydell@linaro.org>) id 1cHBbu-00044K-Pp
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 10:36:54 -0500
+Received: from mail-vk0-f48.google.com ([209.85.213.48]:33956)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cHBbu-0003vy-Bv
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 10:36:50 -0500
+Received: by mail-vk0-f48.google.com with SMTP id x186so33046747vkd.1
+	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 07:36:27 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] any known virtio-net regressions in Qemu 2.7?
+In-Reply-To: <20161208104539.3045-1-fziglio@redhat.com>
+References: <20161208104539.3045-1-fziglio@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 14 Dec 2016 15:28:48 +0000
+Message-ID: <CAFEAcA_qOFap4j82iXOHf9xHoJsbB83Pi08PLs+mj8UZPRH8jg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v2] egl-helpers: Change file licensing to
+ LGPLv2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,31 +29,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Stefan Priebe, Profihost AG" <s.priebe@profihost.ag>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+To: Frediano Ziglio <fziglio@redhat.com>
+Cc: Cole Robinson <crobinso@redhat.com>, Gonglei <arei.gonglei@huawei.com>, Gerd Hoffmann <kraxel@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-Hi Stefan,
+On 8 December 2016 at 10:45, Frediano Ziglio <fziglio@redhat.com> wrote:
+> The relicense permits sharing the code with Spice which
+> is LGPL.
+>
+> All people listed below have agreed to the
+> relicense:
+> - Arei Gonglei;
+> - Cole Robinson;
+> - Gerd Hoffmann;
+> - Peter Maydell.
+>
+> Signed-off-by: Frediano Ziglio <fziglio@redhat.com>
+> Acked-by: Cole Robinson <crobinso@redhat.com>
 
-do you have upgraded kernel ?
+Acked-by: Peter Maydell <peter.maydell@linaro.org>
 
-maybe it could be related to vhost-net module too.
+(Linaro's only change to this file was to add the #include "qemu/osdep.h"
+line, which was done by running an automated script.)
 
-
------ Mail original -----
-De: "Stefan Priebe, Profihost AG" <s.priebe@profihost.ag>
-=C3=80: "qemu-devel" <qemu-devel@nongnu.org>
-Envoy=C3=A9: Mercredi 14 D=C3=A9cembre 2016 16:04:08
-Objet: [Qemu-devel] any known virtio-net regressions in Qemu 2.7?
-
-Hello,=20
-
-after upgrading a cluster OS, Qemu, ... i'm experiencing slow and=20
-volatile network speeds inside my VMs.=20
-
-Currently I've no idea what causes this but it's related to the host=20
-upgrades. Before i was running Qemu 2.6.2.=20
-
-I'm using virtio for the network cards.=20
-
-Greets,=20
-Stefan=20
+thanks
+-- PMM
