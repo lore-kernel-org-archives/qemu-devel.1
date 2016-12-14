@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39401)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39462)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cH9tI-0000hn-0Q
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 08:46:41 -0500
+	(envelope-from <drjones@redhat.com>) id 1cH9tX-0001km-Pk
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 08:46:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cH9tE-0001Jt-S4
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 08:46:40 -0500
-Received: from mail-io0-f194.google.com ([209.85.223.194]:34642)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cH9tE-0001Jj-Me
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 08:46:36 -0500
-Received: by mail-io0-f194.google.com with SMTP id y124so4960643iof.1
-	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 05:46:36 -0800 (PST)
+	(envelope-from <drjones@redhat.com>) id 1cH9tW-0001Ov-Sn
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 08:46:55 -0500
+Date: Wed, 14 Dec 2016 14:46:44 +0100
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20161214134644.4jm4sfv42jai732o@kamzik.brq.redhat.com>
+References: <20161208175030.12269-1-drjones@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <84191a55-6221-7ee0-0990-78f1e657b70a@redhat.com>
-References: <20161214125237.20850-1-maxime.coquelin@redhat.com>
-	<20161214141210.22d12962.cornelia.huck@de.ibm.com>
-	<20161214151332-mutt-send-email-mst@kernel.org>
-	<20161214142101.50010eb4.cornelia.huck@de.ibm.com>
-	<84191a55-6221-7ee0-0990-78f1e657b70a@redhat.com>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Wed, 14 Dec 2016 13:45:35 +0000
-Message-ID: <CAJSP0QU9_m9HnQ0pMaYgN9et6sjHBHO6v8CaWvnxNSvz2nzwRg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH] virtio-pci: Fix cross-version migration
- with older machines
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20161208175030.12269-1-drjones@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH kvm-unit-tests v8 00/10] arm/arm64: add gic
+ framework
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,119 +23,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Maxime Coquelin <maxime.coquelin@redhat.com>
-Cc: Cornelia Huck <cornelia.huck@de.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
+To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, qemu-arm@nongnu.org
+Cc: peter.maydell@linaro.org, marc.zyngier@arm.com, andre.przywara@arm.com, eric.auger@redhat.com, pbonzini@redhat.com, alex.bennee@linaro.org, christoffer.dall@linaro.org
 
-On Wed, Dec 14, 2016 at 1:29 PM, Maxime Coquelin
-<maxime.coquelin@redhat.com> wrote:
-> On 12/14/2016 02:21 PM, Cornelia Huck wrote:
->>
->> On Wed, 14 Dec 2016 15:16:13 +0200
->> "Michael S. Tsirkin" <mst@redhat.com> wrote:
->>
->>> On Wed, Dec 14, 2016 at 02:12:10PM +0100, Cornelia Huck wrote:
->>>>
->>>> On Wed, 14 Dec 2016 13:52:37 +0100
->>>> Maxime Coquelin <maxime.coquelin@redhat.com> wrote:
->>>>
->>>>> This patch fixes a cross-version migration regression introduced
->>>>> by commit d1b4259f ("virtio-bus: Plug devices after features are
->>>>> negotiated").
->>>>>
->>>>> The problem is encountered when host's vhost backend does not support
->>>>> VIRTIO_F_VERSION_1, and migration is initiated from a v2.7 or prior
->>>>> machine with virtio-pci modern capabilities enabled to a v2.8 machine.
->>>>
->>>>
->>>> Wait, machine versions or qemu versions?
->>>>
->>>>>
->>>>> In this case, modern capabilities get exposed to the guest by the
->>>>> source,
->>>>> whereas the target will detect version 1 is not supported so will only
->>>>> expose legacy capabilities.
->>>>>
->>>>> The problem is fixed by introducing a new "x-modern-broken" property,
->>>>> which is set in v2.7 and prior compatibility modes. Doing this, v2.7
->>>>> machine keeps its broken behaviour (enabling modern while version is
->>>>> not supported), and newer machines will behave correctly.
->>>>>
->>>>> Reported-by: Michael Roth <mdroth@linux.vnet.ibm.com>
->>>>> Suggested-by: Stefan Hajnoczi <stefanha@redhat.com>
->>>>> Cc: Michael S. Tsirkin <mst@redhat.com>
->>>>> Cc: Cornelia Huck <cornelia.huck@de.ibm.com>
->>>>> Cc: Marcel Apfelbaum <marcel@redhat.com>
->>>>> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
->>>>> Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
->>>>> ---
->>>>>
->>>>> I'm not sure about the property name, let me know if you have better
->>>>> ideas.
->>>>> I didn't tested migration yet, but I wanted to share the patch while I
->>>>> test it.
->>>>> I tested booting v2.8 and v2.7 machines with !VERSION_1 and get
->>>>> expected result:
->>>>>  - v2.8: Virtio-pci probe succeed
->>>>>  - v2.7: Virtio-pci probe fails
->>>>>
->>>>> Thanks,
->>>>> Maxime
->>>>>
->>>>>  hw/virtio/virtio-pci.c | 4 +++-
->>>>>  hw/virtio/virtio-pci.h | 1 +
->>>>>  include/hw/compat.h    | 4 ++++
->>>>>  3 files changed, 8 insertions(+), 1 deletion(-)
->>>>>
->>>>> diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
->>>>> index 521ba0b..93f6b54 100644
->>>>> --- a/hw/virtio/virtio-pci.c
->>>>> +++ b/hw/virtio/virtio-pci.c
->>>>> @@ -1580,7 +1580,8 @@ static void virtio_pci_device_plugged(DeviceState
->>>>> *d, Error **errp)
->>>>>       * Virtio capabilities present without
->>>>>       * VIRTIO_F_VERSION_1 confuses guests
->>>>>       */
->>>>> -    if (!virtio_has_feature(vdev->host_features, VIRTIO_F_VERSION_1))
->>>>> {
->>>>> +    if (!proxy->modern_broken &&
->>>>
->>>>
->>>> What you are de facto doing here is ignoring the features supported by
->>>> the backend. Call this ->ignore_backend_features or so?
->>>>
->>>>> +            !virtio_has_feature(vdev->host_features,
->>>>> VIRTIO_F_VERSION_1)) {
->>>>>          virtio_pci_disable_modern(proxy);
->>>>>
->>>>>          if (!legacy) {
->>>>> @@ -1852,6 +1853,7 @@ static Property virtio_pci_properties[] = {
->>>>>                      VIRTIO_PCI_FLAG_DISABLE_PCIE_BIT, false),
->>>>>      DEFINE_PROP_BIT("page-per-vq", VirtIOPCIProxy, flags,
->>>>>                      VIRTIO_PCI_FLAG_PAGE_PER_VQ_BIT, false),
->>>>> +    DEFINE_PROP_BOOL("x-modern-broken", VirtIOPCIProxy, modern_broken,
->>>>> false),
->>>>
->>>>
->>>> What about "x-ignore-backend-features"?
->>>
->>>
->>> It's just the capability that ignores that backend is legacy.
->>>
->>> x-cap-ignore-backend-legacy
->>>
->>> ?
->>
->>
->> Sounds good. And has the benefit that nobody will be tempted to set
->> that manually :)
+On Thu, Dec 08, 2016 at 06:50:20PM +0100, Andrew Jones wrote:
+> 
+> v8:
+>  - Main change is rebasing to Wei's sysreg framework, which is part
+>    of his PMU series, which I've applied to arm/next. That rebase
+>    leads to dropping the first two patches of the v7 series, expecting
+>    get_mpidr() to return u64 (with future patches), a rework of the
+>    delay routines (now based on sysreg framework), and changes to all
+>    sysreg asms
+>  - The delay routines also got their own files: delay.[ch]
+>  - Another bigger change was to now keep gic_common_ops local to
+>    lib/arm/gic.c, export the functions from the gic-v[23] instead
+>  - Yet another bigger change was dropping the sender and irq cmdline
+>    inputs, hard coding to '1' is sufficient and much less code
+>  - Other minor changes listed in individual patches   
 >
->
-> Thanks Michael & Cornelia, you're definitely better than me at naming
-> things :)
->
-> I'll send the v2 using this nameing as soon as I get migration case
-> tested.
 
-Once the property is renamed...
+OK, I'm going to go ahead and apply this to arm/next. Before making
+the pull request I'll post another series that includes the 64-bit
+MPIDR fix that Andre pointed out we need, and a couple other fixes,
+though. Assuming nobody complains about that series, then I'll fold
+those patches into arm/next too and make the pull request.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Thanks,
+drew
