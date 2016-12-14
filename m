@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39111)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40733)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1cH83d-0003kR-8B
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 06:49:14 -0500
+	(envelope-from <arei.gonglei@huawei.com>) id 1cH87r-0002xj-O7
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 06:53:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1cH83Y-0000XL-DD
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 06:49:13 -0500
-References: <1473773430-19616-1-git-send-email-maxime.coquelin@redhat.com>
-	<20161213212745.1976.91005@loki>
-	<20161214084451.2a5236d2.cornelia.huck@de.ibm.com>
-	<94a0c474-4998-b03a-9353-d41d0e4e690f@redhat.com>
-	<CAJSP0QUHdEYN+gW61eV-REGYRP84SpdOT8R7OPF5jCjUJpaMEQ@mail.gmail.com>
-	<20161214095906.45e00d81.cornelia.huck@de.ibm.com>
-	<8d1ada4b-2939-5d88-cf8d-b93321f1c81b@redhat.com>
-	<20161214110805.29ae806c.cornelia.huck@de.ibm.com>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <2de60209-c39f-2137-ebf5-bb4dfd4c1193@redhat.com>
-Date: Wed, 14 Dec 2016 13:48:51 +0200
+	(envelope-from <arei.gonglei@huawei.com>) id 1cH87q-0002Ej-6v
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 06:53:35 -0500
+Received: from szxga02-in.huawei.com ([119.145.14.65]:48865)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <arei.gonglei@huawei.com>) id 1cH87p-0002Cl-Ab
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 06:53:34 -0500
+From: Gonglei <arei.gonglei@huawei.com>
+Date: Wed, 14 Dec 2016 19:50:48 +0800
+Message-ID: <1481716249-185392-1-git-send-email-arei.gonglei@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20161214110805.29ae806c.cornelia.huck@de.ibm.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-stable] [PATCH v2] virtio-bus: Plug devices
- after features are negotiated
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v7 0/1] virtio-crypto: add Linux driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,143 +23,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cornelia.huck@de.ibm.com>, Maxime Coquelin <maxime.coquelin@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-stable <qemu-stable@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Dave Gilbert <dgilbert@redhat.com>
+To: linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, virtualization@lists.linux-foundation.org, linux-crypto@vger.kernel.org
+Cc: luonengjun@huawei.com, mst@redhat.com, stefanha@redhat.com, weidong.huang@huawei.com, wu.wubin@huawei.com, xin.zeng@intel.com, claudio.fontana@huawei.com, herbert@gondor.apana.org.au, pasic@linux.vnet.ibm.com, davem@davemloft.net, jianjay.zhou@huawei.com, hanweidong@huawei.com, arei.gonglei@hotmail.com, cornelia.huck@de.ibm.com, xuquan8@huawei.com, longpeng2@huawei.com, wanzongshun@huawei.com, Gonglei <arei.gonglei@huawei.com>
 
-On 12/14/2016 12:08 PM, Cornelia Huck wrote:
-> On Wed, 14 Dec 2016 10:44:05 +0100
-> Maxime Coquelin <maxime.coquelin@redhat.com> wrote:
->
->> On 12/14/2016 09:59 AM, Cornelia Huck wrote:
->>> On Wed, 14 Dec 2016 08:41:55 +0000
->>> Stefan Hajnoczi <stefanha@gmail.com> wrote:
->>>
->>>> On Wed, Dec 14, 2016 at 8:28 AM, Maxime Coquelin
->>>> <maxime.coquelin@redhat.com> wrote:
->>>>>
->>>>>
->>>>> On 12/14/2016 08:44 AM, Cornelia Huck wrote:
->>>>>>>
->>>>>>>> 14:44 < stefanha> Not sure if anyone can think of a nicer solution.
->>>>>>>> 14:45 < stefanha> But we're going to have to keep lying to the guest if
->>>>>>>> we want to preserve migration compatibility
->>>>>>>> 14:45 < stefanha> The key change in behavior with the patch you
->>>>>>>> identified is:
->>>>>>>> 14:46 < stefanha> if (!virtio_has_feature(vdev->host_features,
->>>>>>>> VIRTIO_F_VERSION_1)) {
->>>>>>>> 14:46 < stefanha> virtio_pci_disable_modern(proxy);
->>>>>>>> 14:46 < stefanha> Previously it didn't care about vdev->host_features.
->>>>>>>> It simply allowed VERSION_1 when proxy's disable_modern boolean was false.
->>>>>>>> 14:47 < mdroth> stefanha: ok, that explains why it seems to work with
->>>>>>>> disable-modern=true
->>>>>>>> 14:48 < stefanha> mdroth: Your Ubuntu kernel old but 14.04 LTS is
->>>>>>>> definitely still around so I don't think we can ship QEMU 2.8 like this.
->>>>>>>> 14:49 < stefanha> mdroth: Let's summarize it on the mailing list and
->>>>>>>> see what Michael Tsirkin and Maxime Coquelin think.
->>>>>>>> 14:49 < mdroth> stefanha: i suppose a potential workaround would be to
->>>>>>>> tell users to set disable-modern= to match their vhost capabilities, but
->>>>>>>> it's hard for them to apply that retroactively if they're looking to migrate
->>>>>>
->>>>>> Another thought: Maybe this bug only surfaced right now because older
->>>>>> qemus defaulted virtio-pci to legacy?
->>>>>>
->>>>>> (I think modern virtio-pci with old vhost resulted in a config that was
->>>>>> rejected at least by Linux guests. Because pci defaulted to legacy, we
->>>>>> only had the post-plugged workaround for ccw before.)
->>>>>
->>>>>
->>>>> Yes, for PCI with old vhost, modern enabled and recent kernel on guest,
->>>>> we get this failure at virtio-pci probe time:
->>>>>
->>>>> virtio_net virtio0: virtio: device uses modern interface but does not have
->>>>> VIRTIO_F_VERSION_1.
->>>>
->>>> Is this error a regression in QEMU 2.8?
->>>
->>> I think it pokes up because modern virtio-pci is now by default on. It
->>> was broken before if the user wanted a modern virtio-pci device
->>> explicitly.
->>>
->>> (ccw defaulted to virtio 1.0 much earlier, so we had the post-plugged
->>> solution that this patch replaced and which is basically the same for
->>> ccw.)
->
-> FWIW, I played around a bit with virsh managedsave and the 2.7 ccw
-> machine on a non-virtio-1 vhost kernel. Migrating to/from a 2.7 qemu
-> works fine for ccw both with current master and with this patch
-> reverted. Feature handling and friends are simpler on ccw...
->
->>>
->>>>
->>>> It's better to ship with an existing issue still open than with a new
->>>> regression.  We must not break existing users' setups.
->>>>
->>>> A solution for the next QEMU version is to use a flag in the machine
->>>> type version telling virtio whether or not allow devices (e.g.
->>>> vhost-net) to influence the host feature bits.  Old machine types will
->>>> say no, new machine types will say yes.
->>>>
->>>> In the meantime I would revert your patch for QEMU 2.8.
->>>>
->>>> Maxime, Cornelia, Michael: Do you agree?
->>>>
->>>> Stefan
->>>
->>> Reverting the patch should be fine for ccw. What about the virtio-pci
->>> with old vhost mess, though? Defaulting to modern would mean that users
->>> get unusable devices in that setup.
->>
->> Just did some tests, and can confirm that reverting the patch would
->> re-introduce initial bug, which is breaking virtio-pci when host does
->> not support VERSION_1.
->>
->> Note that this problem is present in v2.7.0 since:
->>
->> commit 9a4c0e220d8a4f82b5665d0ee95ef94d8e1509d5
->> Author: Marcel Apfelbaum <marcel@redhat.com>
->> Date:   Wed Jul 20 18:28:21 2016 +0300
->>
->>      hw/virtio-pci: fix virtio behaviour
->>
->>      Enable transitional virtio devices by default.
->>      Enable virtio-1.0 for devices plugged into
->>      PCIe ports (Root ports or Downstream ports).
->>
->>      Using the virtio-1 mode will remove the limitation
->>      of the number of devices that can be attached to a machine
->>      by removing the need for the IO BAR.
->>
->>      Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
->>      Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
->>      Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->>      Reviewed-by: Cornelia Huck <cornelia.huck@de.ibm.com>
->>
->>
->> Maybe better to implement the workaround you proposed Stefan?
->
-> Let's summarize a bit:
->
-> - current master: default modern, takes vhost capabilities into account
->   -> usable device in all cases, but migration broken with old vhost
-> - reverting this commit: default modern, ignore vhost capabilities
->   -> unusable transitional devices with old vhost, but migration works
-> - lie about features on old machines: default modern, ignore vhost
->   capabilites on old machines
->   -> unusable transitional devices with old vhost _and_ old machines,
->      but migration should work
->
+v7:
+ - fix "BUG: smp_processor_id() in preemptible [00000000] code" reported by Halil,
+   using get_cpu/put_cpu instead of calling smp_processor_id() directly.
+ - fix a possible spinlock recursion in virtcrypto_dataq_callback(), we should
+   release the spinlock before invoking the callback.
+ - rebase on the latest kernel master tree.
 
-Hi,
+v6:
+ - add patch 1/2 to make sparc architecture happy. [Sam]
+ - close created sessions previousely when rekeying.
+ - convert the priority of virtio crypto algs from 4001 to 501
+   which is enough.
 
-> The third option sounds best right now, but it's not perfect, either.
-> It's basically the 2.7 machine where it is most likely to bite people,
-> as older machines defaulted to legacy.
->
+v5:
+ - add comments for algs_lock and table_lock. [Stefan]
+ - use kzfree instead of kfree for key material security. [Stefan]
+ - drop unnecessary spin_lock for struct virtio_crypto_ablkcipher_ctx.
+ - dynamically allocated memory for iv in order to avoid to do DMA from
+   the stack memory in __virtio_crypto_ablkcipher_do_req().
+ - add logs for error path in virtio_crypto_alg_validate_key().
+ - add lock before calling virtio_break_device() in virtcrypto_update_status()
 
-Agreed, the third option is much better than reverting Maxime's patch.
+v4:
+ - rework unknow status bit handler by calling virtio_break_device(). [Cornelia]
+ - convert space to tab in Kconfig. [Stefan]
+ - rename virtio_crypto.c to virtio_crypto_core.c and then make the
+   moudle named virtio_crypto.ko for consistency. [Stefan]
+ - don't call virtcrypto_dev_stop() on failure path. [Stefan]
+ - don't add two empty lines. [Michael]
+ - fix possible race by add spin_lock in virtio_crypto_alg_ablkcipher_init_session() [Michael and Halil]
+ - drop virtcrypto_devmgr_get_first() calling in virtio_crypto_ablkcipher_setkey. [Michael]
+ - drop superfluous assigned value for virtio_crypto_algs[i].cra_flags
+   in virtio_crypto_algs_register(). [Stefan]
+ - decrease virtio_crypto_active_devs if calling crypto_register_algs() failed. [Stefan]
+ - fix some typos here and there. [Stefan]
+ - fix missing table_lock usage in virtio_crypto_mgr.c. [Stefan]
+ - drop confused comments in virtio_crypto_alg_ablkcipher_init_session()
+   for virtqueue_kick(). [Halil]
 
-Adding a property like "x-modern-broke" or "x-modern-with-old-vhost-broken"
-would be the best thing IMHO.
+v3:
+ - set cpu affinity when data queues are not equal to the number of online cpus. [Michael]
+ - add TODO comments for cpu hotplug (changing the relationship of binding virtqueue and cpu)
+ - use __u32/64 in the config space since the virtio->get() doesn't support byte-swap yet. [Michael]
+ - drop the whole patch 1 of v2 because the above reason.
+ - add VERSION_1 check at the beginning of virtcrypto_probe()
+ - s/-1/EPERM/g in virtcrypto_update_status(), don't change err to EFAULT then. [Michael]
+ - add reset operation before delete the virtqueus. [Micheal]
+ - drop an unnecessiry spin_lock calling in virtcrypto_freeze(), avoid possible dead lock. [Micheal]
+ - redefine parameter alg's type in order to use a cast for it. [Michael]
+ - pad all structures to have the same size in one union, and add a member to
+   show the union's size in virtio_crypto.h. [Michael]
+ - update MAINTAINER file to add virtio-crypto stuff to Michael's entry so that
+   the corresponding patches can be CC'ed to Michael as well because the virtio-crypto
+   doesn't lay in driver/virtio directory. 
 
-Thanks,
-Marcel
+The virtio crypto device is a virtual cryptography device
+as well as a kind of virtual hardware accelerator for
+virtual machines. The encryption anddecryption requests
+are placed in the data queue and are ultimately handled by
+thebackend crypto accelerators. The second queue is the
+control queue used to create or destroy sessions for
+symmetric algorithms and will control some advanced features
+in the future. The virtio crypto device provides the following
+cryptoservices: CIPHER, MAC, HASH, and AEAD.
+
+For more information about virtio-crypto device, please see:
+  http://qemu-project.org/Features/VirtioCrypto
+
+For better reviewing, pls see below explaination.
+
+The patch mainly includes five files:
+
+ 1) virtio_crypto.h is the header file for virtio-crypto device,
+which is based on the virtio-crypto specification. 
+ 2) virtio_crypto_core.c is the entry of the driver module,
+which is similar with other virtio devices, such as virtio-net,
+virtio-input etc. 
+ 3) virtio_crypto_mgr.c is used to manage the virtio
+crypto devices in the system. We support up to 32 virtio-crypto
+devices currently. I use a global list to store the virtio crypto
+devices which refer to Intel QAT driver. Meanwhile, the file
+includs the functions of add/del/search/start/stop for virtio
+crypto devices.
+ 4) virtio_crypto_common.h is a private header file for virtio
+crypto driver, includes structure definations, and function declarations.
+ 5) virtio_crypto_algs.c is the realization of algs based on Linux Crypto Framwork,
+which can register different crypto algorithms. Currently it's only support AES-CBC.
+The Crypto guys can mainly focus on this file. 
+
+
+v2:
+ - stop doing DMA from the stack, CONFIG_VMAP_STACK=y [Salvatore]
+ - convert __virtio32/64 to __le32/64 in virtio_crypto.h
+ - remove VIRTIO_CRYPTO_S_STARTED based on the lastest virtio crypto spec.
+ - introduces the little edian functions for VIRTIO_1 devices in patch 1.
+
+
+Gonglei (1):
+  crypto: add virtio-crypto driver
+
+ MAINTAINERS                                  |   9 +
+ drivers/crypto/Kconfig                       |   2 +
+ drivers/crypto/Makefile                      |   1 +
+ drivers/crypto/virtio/Kconfig                |  10 +
+ drivers/crypto/virtio/Makefile               |   5 +
+ drivers/crypto/virtio/virtio_crypto_algs.c   | 541 +++++++++++++++++++++++++++
+ drivers/crypto/virtio/virtio_crypto_common.h | 128 +++++++
+ drivers/crypto/virtio/virtio_crypto_core.c   | 474 +++++++++++++++++++++++
+ drivers/crypto/virtio/virtio_crypto_mgr.c    | 264 +++++++++++++
+ include/uapi/linux/Kbuild                    |   1 +
+ include/uapi/linux/virtio_crypto.h           | 450 ++++++++++++++++++++++
+ include/uapi/linux/virtio_ids.h              |   1 +
+ 12 files changed, 1886 insertions(+)
+ create mode 100644 drivers/crypto/virtio/Kconfig
+ create mode 100644 drivers/crypto/virtio/Makefile
+ create mode 100644 drivers/crypto/virtio/virtio_crypto_algs.c
+ create mode 100644 drivers/crypto/virtio/virtio_crypto_common.h
+ create mode 100644 drivers/crypto/virtio/virtio_crypto_core.c
+ create mode 100644 drivers/crypto/virtio/virtio_crypto_mgr.c
+ create mode 100644 include/uapi/linux/virtio_crypto.h
+
+-- 
+1.8.3.1
