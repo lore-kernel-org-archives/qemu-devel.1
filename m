@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41218)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41743)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cHDRP-00066x-3w
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:34:08 -0500
+	(envelope-from <alex@alex.org.uk>) id 1cHDU6-0002e6-61
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:36:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cHDRL-0008AI-SG
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:34:07 -0500
-Received: from mailhub.sw.ru ([195.214.232.25]:44644 helo=relay.sw.ru)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1cHDRL-00089t-GD
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:34:03 -0500
+	(envelope-from <alex@alex.org.uk>) id 1cHDU5-0000oD-8l
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:36:54 -0500
+Received: from mail.avalus.com ([2001:41c8:10:1dd::10]:50214)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <alex@alex.org.uk>) id 1cHDU5-0000o8-1B
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:36:53 -0500
+Content-Type: text/plain; charset=windows-1252
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+From: Alex Bligh <alex@alex.org.uk>
+In-Reply-To: <5e9150ed-2127-f2e8-f9db-a514e8f0ddf8@virtuozzo.com>
+Date: Wed, 14 Dec 2016 17:36:51 +0000
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <5E697C22-5FBB-49A2-A018-A6B96E29FE84@alex.org.uk>
 References: <20161214150840.10899-1-alex@alex.org.uk>
-	<20161214170956.32o6b27baf3bkmd4@grep.be>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <c8e51c51-e395-5172-092c-f74ccb1791c4@virtuozzo.com>
-Date: Wed, 14 Dec 2016 20:33:48 +0300
-MIME-Version: 1.0
-In-Reply-To: <20161214170956.32o6b27baf3bkmd4@grep.be>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Nbd] [PATCH] Further tidy-up on block status
+	<31576d46-c0ed-29b9-71a0-5aca1790799a@virtuozzo.com>
+	<6D1B30FC-FD7E-474C-A8E3-FD87E7AA1364@alex.org.uk>
+	<5e9150ed-2127-f2e8-f9db-a514e8f0ddf8@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH] Further tidy-up on block status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,73 +29,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wouter Verhelst <w@uter.be>, Alex Bligh <alex@alex.org.uk>
-Cc: nbd-general@lists.sourceforge.net, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Pavel Borzenkov <pborzenkov@virtuozzo.com>, stefanha@redhat.com, "Denis V . Lunev" <den@openvz.org>, Markus Pargmann <mpa@pengutronix.de>, Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: Alex Bligh <alex@alex.org.uk>, Wouter Verhelst <w@uter.be>, "nbd-general@lists.sourceforge.net" <nbd-general@lists.sourceforge.net>, Kevin Wolf <kwolf@redhat.com>, "Stefan stefanha@redhat. com" <stefanha@redhat.com>, John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, "Denis V . Lunev" <den@openvz.org>
 
-14.12.2016 20:09, Wouter Verhelst wrote:
-> On Wed, Dec 14, 2016 at 03:08:40PM +0000, Alex Bligh wrote:
->> (NB: I've already applied this and pushed it)
-> Thanks.
->
->> * Change NBD_OPT_LIST_METADATA etc. to explicitly send a list of queries
->>    and add a count of queries so we can extend the command later (rather than
->>    rely on the length of option)
-> Sure, that works.
->
->> * For NBD_OPT_LIST_METADATA make absence of any query (as opposed to zero
->>    length query) list all contexts, as absence of any query is now simple.
->>
->> * Move definition of namespaces in the document to somewhere more appopriate.
->>
->> * Various other minor changes as discussed on the mailing list
-> Right. I think we're getting close to a good spec now, for this thing.
->
-> One thing I've been thinking about that we might want to add:
->
-> There may be cases where a server, in performing the required calls to
-> be able to handle a BLOCK_STATUS request, will end up with more
-> information than the client asked; e.g., if the client asked information
-> in the base:allocation context on an extent at offset X of length Y,
-> then the server might conceivably do an lseek(SEEK_DATA) and/or
-> lseek(SEEK_HOLE). The result of that call might be that the file offset
-> will now point to a location Z, where Z > (X+Y).
->
-> Currently, our spec says "the sum of the *length* fields MUST not be
-> greater than the overall *length* of request". This means that in
-> essense, the server then has to throw away the information it has on the
-> range Z - (X + Y). In case a client was interested in that information,
-> that seems like a waste. I would therefore like to remove that
-> requirement, by rephrasing that "sum of the *length* fields" thing into
-> something along the following lines:
->
->    In case the server returns N extents, the sum of the *length* fields
->    of the first N-1 extents MUST NOT be greater than the overall *length*
->    of the request. The final extent MAY exceed the length of the request
->    if the server has that information anyway as a side effect of looking
->    up the required information and wishes to share it.
->
-> This would then result in the fact that the "length" field in the
-> BLOCK_STATUS command would be little more than a hint, since we're
-> saying that a server can return more data than requested (if it's
-> available anyway) and less data than requested (if it would be too
-> resource-intensive to provide all the information). Not sure whether all
-> that makes much sense anymore, but hey.
->
-> In addition, the combination of a server providing more information than
-> requested with a "REQ_ONE" flag and a length field of zero could be an
-> interesting way to enumerate a whole export, too. Essentially, we could
-> define that as a client saying "I'm interested in what the size of the
-> extent at offset X is, and what its properties are".
->
-> Thoughts?
->
 
-Good, I'm for it. May be, in such wording there are too much information 
-about implementation (again, server can do it if it _wants_, is it a 
-side effect or not is implementation defined). In other words, "if the 
-server..." is better read as an example, not requirement. But it's not 
-important.
+> On 14 Dec 2016, at 17:05, Vladimir Sementsov-Ogievskiy =
+<vsementsov@virtuozzo.com> wrote:
+>>=20
+>> However, this raises another question. Wouter deliberately made the
+>> query format freeform so that you could e.g. set a context like:
+>>=20
+>>    backup:modtime>201612081034
+>>=20
+>> which might (in theory) return a list of blocks which are newer than
+>> the given timestamp. It would clearly be impossible to return all =
+such
+>> contexts. I wonder if we should carve out an exception here.
+>>=20
+>>=20
+>=20
+> Interesting. Even query 'backup:modtime>*' would be a problem, not =
+only empty query list.
+>=20
+> Actually, we do not need to 'list contexts', as it is about =
+management, not about data transfer. We only need a way to check, that =
+particular query selects all needed contexts and no others. Just to be =
+sure that we are know, what we will select by NBD_OPT_SET_META_CONTEXT =
+with _same_ query.
+>=20
+> So, I suggest just to say, that _LIST_ can return error if too much =
+contexts are selected. And same should be done for _SET_. And it should =
+be documented that this result of query (list or error) should be equal =
+for these two commands.
 
--- 
-Best regards,
-Vladimir
+(two CCs that always bounce removed)
+
+Hmmm... Well in the '*' case, it's up to the namespace as to how it =
+parses things, so '*' could be prohibited entirely or mean 'return the =
+first 20 matching' or similar. So that's less of a problem. And 'set =
+all' doesn't exist (unlike 'list all').
+
+I think in the LIST case we should allow the server to omit contexts =
+under certain circumstances, and allow SET to return ETOOBIG.
+
+--=20
+Alex Bligh
