@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48011)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48742)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cHIML-0004CB-TT
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 17:49:18 -0500
+	(envelope-from <3v0n1d3@gmail.com>) id 1cHIQq-0003FC-39
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 17:53:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cHIMH-0002YD-Uo
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 17:49:13 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60212)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cHIMH-0002Xu-OX
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 17:49:09 -0500
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 16BAD31B312
-	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 22:49:08 +0000 (UTC)
-Date: Thu, 15 Dec 2016 00:49:06 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20161215004752-mutt-send-email-mst@kernel.org>
-References: <20161214142518.10504-1-stefanha@redhat.com>
+	(envelope-from <3v0n1d3@gmail.com>) id 1cHIQm-0003lP-4C
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 17:53:52 -0500
+Received: from mail-yw0-f195.google.com ([209.85.161.195]:35738)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <3v0n1d3@gmail.com>) id 1cHIQl-0003g1-Uj
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 17:53:48 -0500
+Received: by mail-yw0-f195.google.com with SMTP id b66so452855ywh.2
+	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 14:53:25 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20161214142518.10504-1-stefanha@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.8] ui/gtk: fix "Copy" menu item
- segfault
+In-Reply-To: <CAP5jUk1b31i_UH-kx57DijHkm==hH=9XwDNWCH1a8y7DqYoMjA@mail.gmail.com>
+References: <CAP5jUk10i4P0x99n6+yXvDfR=ExN0jxyvF2_Ur_82N1_JTWgxg@mail.gmail.com>
+	<CAJSP0QWj_PB_=ChXOO=PGTdsSRXvRG4CmA1-yvkPrBVomS5Q0w@mail.gmail.com>
+	<CAP5jUk1b31i_UH-kx57DijHkm==hH=9XwDNWCH1a8y7DqYoMjA@mail.gmail.com>
+From: Ruslan Habalov <3v0n1d3@gmail.com>
+Date: Wed, 14 Dec 2016 23:52:23 +0100
+Message-ID: <CAP5jUk3iKwrcyarPk08UNaPN5Q2u+mD1fb9s-cb1mHZqFJzhYw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] Slow qemu guest performance after host is resumed
+ from suspended state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,67 +30,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>
 
-On Wed, Dec 14, 2016 at 02:25:18PM +0000, Stefan Hajnoczi wrote:
-> The "Copy" menu item copies VTE terminal text to the clipboard.  This
-> only works with VTE terminals, not with graphics consoles.
-> 
-> Disable the menu item when the current notebook page isn't a VTE
-> terminal.
-> 
-> This patch fixes a segfault.  Reproducer: Start QEMU and click the Copy
-> menu item when the guest display is visible.
-> 
-> Reported-by: Kevin Wolf <kwolf@redhat.com>
-> Cc: Michael S. Tsirkin <mst@redhat.com>
-> Cc: Gerd Hoffmann <kraxel@redhat.com>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Friendly ping.
 
-I don't think it's 2.8 personally, patch just disables an
-illegal action. Similar to the hotplug crash fix I
-have queued. Just document this as a known issue.
-
-
-
-BTW - any idea how to make paste work?
-
-
-
-> ---
->  ui/gtk.c | 8 ++++++++
->  1 file changed, 8 insertions(+)
-> 
-> Gerd, Michael: if you post Reviewed-by I can merge this directly without
-> requiring you to send a pull request.  It's a user interface segfault so it
-> would be nice to resolve it in QEMU 2.8.
-> 
-> diff --git a/ui/gtk.c b/ui/gtk.c
-> index e816428..a216216 100644
-> --- a/ui/gtk.c
-> +++ b/ui/gtk.c
-> @@ -1581,6 +1581,9 @@ static void gd_change_page(GtkNotebook *nb, gpointer arg1, guint arg2,
->                                         TRUE);
->      }
->      gtk_widget_set_sensitive(s->grab_item, on_vga);
-> +#ifdef CONFIG_VTE
-> +    gtk_widget_set_sensitive(s->copy_item, vc->type == GD_VC_VTE);
-> +#endif
->  
->      gd_update_windowsize(vc);
->      gd_update_cursor(vc);
-> @@ -2246,6 +2249,11 @@ void gtk_display_init(DisplayState *ds, bool full_screen, bool grab_on_hover)
->      }
->  #endif
->  
-> +#ifdef CONFIG_VTE
-> +    gtk_widget_set_sensitive(s->copy_item,
-> +                             gd_vc_find_current(s)->type == GD_VC_VTE);
-> +#endif
-> +
->      if (full_screen) {
->          gtk_menu_item_activate(GTK_MENU_ITEM(s->full_screen_item));
->      }
-> -- 
-> 2.9.3
+On Wed, Dec 7, 2016 at 9:53 PM, Ruslan Habalov <3v0n1d3@gmail.com> wrote:
+> Following Stefan's suggestion I've investigated the possibility of potential
+> problems with interrupts.
+> Unfortunately, I can see no differences between both scenarios regarding the
+> interrupt counter growth (c.f.
+> https://evonide.com/images/qemu_proc_interrupts.png).
+> After a short conversation with him I think we can exclude this as a problem
+> source.
+>
+> Please let me know if you have any further advice how I should proceed
+> further in order to triage this bug.
+>
+> On Wed, Dec 7, 2016 at 7:49 PM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
+>>
+>> On Sun, Dec 4, 2016 at 10:52 PM, Ruslan Habalov <3v0n1d3@gmail.com> wrote:
+>> > Hi everyone,
+>> >
+>> > I'm having the following qemu issue since about February on Xubuntu.
+>> >
+>> > Steps to reproduce:
+>> > 1) Boot host and boot qemu guest - everything works perfect
+>> > 2) Shutdown qemu guest
+>> > 3) Suspend host and resume host
+>> > 4) Boot qemu guest again - the guest is now extremely slow
+>> >
+>> > Current system setup:
+>> > host: kernel 4.8.0-27-generic (also reproducible with older kernel
+>> > versions)
+>> > qemu guest: Linux or Windows affected (tested both)
+>> >
+>> > I've tried to debug the issue on my own with the following results:
+>> >
+>> > ------------------------------------------------------------------------------------------------------------------------------
+>> > https://www.evonide.com/images/qemu_problem.png
+>> > - This shows "perf top $QEMU_PID" from guest boot to shutdown for three
+>> > different scenarios:
+>> >   Left: normal guest behavior after fresh boot of host system
+>> >   Middle: very slow guest after host was suspended and resumed
+>> >   Right: test run with disabled HPET (since I initially assumed some
+>> > problems with HPET)
+>> >
+>> > https://www.evonide.com/images/qemu_hpet_investigation.png
+>> > - Results of "perf record -g" and "perf report"
+>> >   According to stefanha (qemu IRC) this doesn't seem to indicate any
+>> > error
+>> > sources.
+>> >
+>> > https://www.evonide.com/images/qemu_vm_exit_healthy_vs_unhealthy.png
+>> > - Results of running: "perf record -a -e kvm:kvm_exit" and "perf
+>> > report" from guest boot to shutdown
+>> >   - Left: normal situation (after fresh host boot)
+>> >   - Right: bad situation    (after suspend and resume on host and boot
+>> > of
+>> > qemu guest)
+>> >   There were ~300 out of order events reported by perf for the "bad"
+>> > scenario (vs. only 2 for the "good" scenario).
+>> >
+>> > ------------------------------------------------------------------------------------------------------------------------------
+>> > I was also recommended to check the host timers (e.g. /proc/timer_list).
+>> > However, this file has more than 800 lines and I am unsure what to look
+>> > for.
+>> >
+>> > Please let me know if you need further information on this issue.
+>>
+>> Unfortunately I don't see an obvious pattern in the kvm_exit reasons.
+>> Maybe someone on kvm@vger.kernel.org can help, I have CCed the list.
+>>
+>> One idea that might explain the read_hpet trace you collected is an
+>> interrupt storm.  That means an interrupt is firing all the time
+>> without doing useful work.  This could explain why the vcpu keeps
+>> halting (leading to many ktime_get() calls on the host).
+>>
+>> You can check the interrupt storm theory by collecting
+>> /proc/interrupts on the host and inside the guest.  If you compare the
+>> healthy system against the slowed system there might be an obvious
+>> difference in the interrupt counters.  That would allow you to track
+>> down which device keeps firing an interrupt.
+>>
+>> Stefan
+>
+>
