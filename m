@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59658)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60655)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cHCyp-00024r-1J
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:04:40 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cHD0J-0006LH-O7
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:06:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cHCyk-00078g-1H
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:04:35 -0500
-Date: Wed, 14 Dec 2016 15:04:27 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20161214170427.GK3808@thinpad.lan.raisama.net>
-References: <1481575745-26120-1-git-send-email-ehabkost@redhat.com>
-	<20161214164214.54254668@bahia.lan>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cHD0E-00085Z-Ld
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:06:07 -0500
+Received: from mailhub.sw.ru ([195.214.232.25]:37379 helo=relay.sw.ru)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1cHD0E-00084o-9A
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:06:02 -0500
+References: <20161214150840.10899-1-alex@alex.org.uk>
+	<31576d46-c0ed-29b9-71a0-5aca1790799a@virtuozzo.com>
+	<6D1B30FC-FD7E-474C-A8E3-FD87E7AA1364@alex.org.uk>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <5e9150ed-2127-f2e8-f9db-a514e8f0ddf8@virtuozzo.com>
+Date: Wed, 14 Dec 2016 20:05:44 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20161214164214.54254668@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH for-2.8.1 v2] machine: Convert abstract
- typename on compat_props to subclass names
+In-Reply-To: <6D1B30FC-FD7E-474C-A8E3-FD87E7AA1364@alex.org.uk>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] Further tidy-up on block status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,52 +29,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-stable@nongnu.org, Halil Pasic <pasic@linux.vnet.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Alex Bligh <alex@alex.org.uk>
+Cc: Wouter Verhelst <w@uter.be>, "nbd-general@lists.sourceforge.net" <nbd-general@lists.sourceforge.net>, Kevin Wolf <kwolf@redhat.com>, "Stefan stefanha@redhat. com" <stefanha@redhat.com>, John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Pavel Borzenkov <pborzenkov@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, Markus Pargmann <mpa@pengutronix.de>, "Denis V . Lunev" <den@openvz.org>
 
-On Wed, Dec 14, 2016 at 04:42:14PM +0100, Greg Kurz wrote:
-> On Mon, 12 Dec 2016 18:49:05 -0200
-> Eduardo Habkost <ehabkost@redhat.com> wrote:
-> 
-> > Original problem description by Greg Kurz:
-> > 
-> > > Since commit "9a4c0e220d8a hw/virtio-pci: fix virtio
-> > > behaviour", passing -device virtio-blk-pci.disable-modern=off
-> > > has no effect on 2.6 machine types because the internal
-> > > virtio-pci.disable-modern=on compat property always prevail.  
-> > 
-> > The same bug also affects other abstract type names mentioned on
-> > compat_props by machine-types: apic-common, i386-cpu, pci-device,
-> > powerpc64-cpu, s390-skeys, spapr-pci-host-bridge, usb-device,
-> > virtio-pci, x86_64-cpu.
-> > 
-> > The right fix for this problem is to make sure compat_props and
-> > -global options are always applied in the order they are
-> > registered, instead of reordering them based on the type
-> > hierarchy. But changing the ordering rules of -global is risky
-> > and might break existing configurations, so we shouldn't do that
-> > on a stable branch.
-> > 
-> > This is a temporary hack that will work around the bug when
-> > registering compat_props properties: if we find an abstract class
-> > on compat_props, register properties for all its non-abstract
-> > subtypes instead. This will make sure -global won't be overridden
-> > by compat_props, while keeping the existing ordering rules on
-> > -global options.
-> > 
-> > Note that there's one case that won't be fixed by this hack:
-> > "-global spapr-pci-vfio-host-bridge.<option>=<value>" won't be
-> > able to override compat_props, because spapr-pci-host-bridge is
-> > not an abstract class.
-> > 
-> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> > ---
-> 
-> This patch had 3 r-b. Is there any good reason to hold
-> it up to 2.8.1 ?
+14.12.2016 19:38, Alex Bligh wrote:
+> Vladimir,
+>
+>>> +non-zero number of metadata contexts during negotiation. Servers SHOULD
+>>> +reply to clients sending `NBD_CMD_BLOCK_STATUS without
+>> backquote
+> Fixed
+>
+>>> +    If zero queries are sent, then the server MUST return all
+>>> +    the metadata contexts it knows about.
+>> I think that 'all .. it knows about' is too much. What about 'return all available ..'? Anyway 'all ... it knows about' actually equals to 'all ... it wants'. There may be some private, or unrelated contexts, for example..
+> This was not my wording, but I've changed it anyway to:
+>
+>      If zero queries are sent, then the server MUST return all
+>      the metadata contexts that are available to	the client to select
+>      on the given export with `NBD_OPT_SET_META_CONTEXT`.
+>
+> I think if they are available to select, we should list them. Thanks
+> also for reminding me to document why I put the export name into the
+> _LIST_ data (as it is for _SET_).
+>
+> However, this raises another question. Wouter deliberately made the
+> query format freeform so that you could e.g. set a context like:
+>
+>     backup:modtime>201612081034
+>
+> which might (in theory) return a list of blocks which are newer than
+> the given timestamp. It would clearly be impossible to return all such
+> contexts. I wonder if we should carve out an exception here.
+>
 
-Applying it today would mean delaying the 2.8.0 release, and the
-bug is not serious enough to justify that.
+Interesting. Even query 'backup:modtime>*' would be a problem, not only 
+empty query list.
+
+Actually, we do not need to 'list contexts', as it is about management, 
+not about data transfer. We only need a way to check, that particular 
+query selects all needed contexts and no others. Just to be sure that we 
+are know, what we will select by NBD_OPT_SET_META_CONTEXT with _same_ query.
+
+So, I suggest just to say, that _LIST_ can return error if too much 
+contexts are selected.|And same should be done for _SET_. And it should 
+be documented that this result of query (list or error) should be equal 
+for these two commands.
+|
+
 
 -- 
-Eduardo
+Best regards,
+Vladimir
