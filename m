@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37506)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39260)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hangaohuai@huawei.com>) id 1cH3OV-0003Tv-0N
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 01:50:28 -0500
+	(envelope-from <ppandit@redhat.com>) id 1cH3Zo-0000BL-4o
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 02:02:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hangaohuai@huawei.com>) id 1cH3OQ-0000oz-8g
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 01:50:27 -0500
-Received: from szxga02-in.huawei.com ([119.145.14.65]:58491)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <hangaohuai@huawei.com>) id 1cH3OP-0000gy-SR
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 01:50:22 -0500
-From: hangaohuai <hangaohuai@huawei.com>
-Date: Wed, 14 Dec 2016 14:48:20 +0800
-Message-ID: <20161214064820.12480-1-hangaohuai@huawei.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH] bugfix: vm halt when in reset looping
+	(envelope-from <ppandit@redhat.com>) id 1cH3Zj-0003da-SF
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 02:02:08 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52300)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1cH3Zj-0003dS-MM
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 02:02:03 -0500
+From: P J P <ppandit@redhat.com>
+Date: Wed, 14 Dec 2016 12:31:56 +0530
+Message-Id: <20161214070156.23368-1-ppandit@redhat.com>
+Subject: [Qemu-devel] [PATCH] display: virtio-gpu-3d: check virgl
+ capabilities max_size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,46 +22,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: mst@redhat.com, pbonzini@redhat.com, arei.gonglei@huawei.com, hangaohuai <hangaohuai@huawei.com>
+To: Qemu Developers <qemu-devel@nongnu.org>
+Cc: Zhenhao Hong <zhenhaohong@gmail.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, Prasad J Pandit <pjp@fedoraproject.org>
 
-reset mc146818rtc device when RESET event happens.
+From: Prasad J Pandit <pjp@fedoraproject.org>
 
-Fix the problem:
-  1. Guest boot the second cpu, set CMOS_RESET_CODE 0x0a to protect selfboot;
-  2. VM being reset by others, hmp_system_reset;
-  3. seabios resume check the CMOS_RESET_CODE, if 0x0a, jump to the BDA
-     resume execution by jump via 40h:0067h;
-  4. Guest halt;
+Virtio GPU device while processing 'VIRTIO_GPU_CMD_GET_CAPSET'
+command, retrieves the maximum capabilities size to fill in the
+response object. It continues to fill in capabilities even if
+retrieved 'max_size' is zero(0), thus resulting in OOB access.
+Add check to avoid it.
 
-Signed-off-by: hangaohuai <hangaohuai@huawei.com>
+Reported-by: Zhenhao Hong <zhenhaohong@gmail.com>
+Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
 ---
- hw/timer/mc146818rtc.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ hw/display/virtio-gpu-3d.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/hw/timer/mc146818rtc.c b/hw/timer/mc146818rtc.c
-index da209d0..67d707d 100644
---- a/hw/timer/mc146818rtc.c
-+++ b/hw/timer/mc146818rtc.c
-@@ -946,11 +946,19 @@ static Property mc146818rtc_properties[] = {
-     DEFINE_PROP_END_OF_LIST(),
- };
+diff --git a/hw/display/virtio-gpu-3d.c b/hw/display/virtio-gpu-3d.c
+index 758d33a..6ceeba3 100644
+--- a/hw/display/virtio-gpu-3d.c
++++ b/hw/display/virtio-gpu-3d.c
+@@ -370,8 +370,12 @@ static void virgl_cmd_get_capset(VirtIOGPU *g,
  
-+static void rtc_resetdev(DeviceState *d)
-+{
-+    RTCState *s = MC146818_RTC(d);
+     virgl_renderer_get_cap_set(gc.capset_id, &max_ver,
+                                &max_size);
++    if (!max_size) {
++        cmd->error = VIRTIO_GPU_RESP_ERR_INVALID_PARAMETER;
++        return;
++    }
 +
-+    s->cmos_data[0x0f] = 0x00;
-+}
-+
- static void rtc_class_initfn(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(klass);
- 
-     dc->realize = rtc_realizefn;
-+    dc->reset = rtc_resetdev;
-     dc->vmsd = &vmstate_rtc;
-     dc->props = mc146818rtc_properties;
-     /* Reason: needs to be wired up by rtc_init() */
+     resp = g_malloc(sizeof(*resp) + max_size);
+-
+     resp->hdr.type = VIRTIO_GPU_RESP_OK_CAPSET;
+     virgl_renderer_fill_caps(gc.capset_id,
+                              gc.capset_version,
 -- 
-1.8.3.1
+2.9.3
