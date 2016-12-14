@@ -1,24 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35387)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36838)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cHD8m-0007rm-Id
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:14:58 -0500
+	(envelope-from <marcel@redhat.com>) id 1cHDBC-0005Bb-7m
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:17:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cHD8i-0002JT-Fm
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:14:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:18949)
+	(envelope-from <marcel@redhat.com>) id 1cHDB8-0003Ro-4L
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:17:22 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54058)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cHD8i-0002JI-7Q
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:14:48 -0500
-References: <001a113dca8274572005406e03c3@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <08b0eb45-e85e-a68c-aa45-721d8d046376@redhat.com>
-Date: Wed, 14 Dec 2016 18:14:44 +0100
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1cHDB7-0003Ra-S7
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 12:17:18 -0500
+Received: from int-mx13.intmail.prod.int.phx2.redhat.com
+	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0083861E4D
+	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 17:17:16 +0000 (UTC)
+References: <20161208200737.GA29563@thinpad.lan.raisama.net>
+	<87a8c0qedq.fsf@dusky.pond.sub.org>
+	<20161213124239.GO3808@thinpad.lan.raisama.net>
+	<56cc6442-ba4f-6c5e-9c57-8787acccb6f9@redhat.com>
+	<20161213160038.GV3808@thinpad.lan.raisama.net>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <cae49570-bde2-4075-78bb-bb348e7d634e@redhat.com>
+Date: Wed, 14 Dec 2016 19:17:12 +0200
 MIME-Version: 1.0
-In-Reply-To: <001a113dca8274572005406e03c3@google.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20161213160038.GV3808@thinpad.lan.raisama.net>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] x86: Fix x86_64 'g' packet response to gdb
- from 32-bit mode.
+Subject: Re: [Qemu-devel] [RFC] qmp: query-device-slots command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,132 +36,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Doug Evans <dje@google.com>, qemu-devel@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, libvir-list@redhat.com, qemu-devel@nongnu.org, Laine Stump <laine@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
+On 12/13/2016 06:00 PM, Eduardo Habkost wrote:
+> On Tue, Dec 13, 2016 at 04:15:18PM +0200, Marcel Apfelbaum wrote:
+>> On 12/13/2016 02:42 PM, Eduardo Habkost wrote:
+>>> On Tue, Dec 13, 2016 at 12:04:17PM +0100, Markus Armbruster wrote:
+>>>> Quick interface review only:
+>>>>
+>>>> Eduardo Habkost <ehabkost@redhat.com> writes:
+>>>>
+>>>>> This adds a new command to QMP: query-device-slots. It will allow
+>>>>> management software to query possible slots where devices can be
+>>>>> plugged.
+>>>>>
+>>>>> This implementation of the command will return:
+>>>>>
+>>>>> * Multiple PCI slots per bus, in the case of PCI buses;
+>>>>> * One slot per bus in the case of the other buses;
+>>>>
+>>>> Umm, that doesn't seem right.  For instance, a SCSI bus has multiple
+>>>> slots.  The slot address is the SCSI ID.  An IDE bus may have one (SATA)
+>>>> or two (PATA).  For more examples, see qdev-device-use.txt section
+>>>> "Specifying Bus and Address on Bus".
+>>>
+>>> Yes, I should have clarified that: this version changes only PCI
+>>> to expose multiple slots, but other buses also need be changed to
+>>> implement BusClass::enumerate_slots() properly, too.
+>>>
+>>>>
+>>>>> * One slot for each entry from query-hotpluggable-cpus.
+>>>>> In the example below, I am not sure if the PCIe ports are all
+>>>>> supposed to report all slots, but I didn't find any existing
+>>>>> field in PCIBus that would help me figure out the actual number
+>>>>> of slots in a given PCI bus.
+>>>>>
+>>>>> Git tree
+>>>>> --------
+>>>>>
+>>>>> This patch needs the previous query-machines series I am working
+>>>>> on. The full tree can be found on the git tree at:
+>>>>>
+>>>>>   git://github.com/ehabkost/qemu-hacks.git work/query-machines-bus-info
+>>>>>
+>>>>> Example output
+>>>>> --------------
+>>>>>
+>>>>> The following output was returned by QEMU when running it as:
+>>>>>
+>>>>>  $ qemu-system-x86_64 -machine q35 \
+>>>>>    -readconfig docs/q35-chipset.cfg \
+>>>>>    -smp 4,maxcpus=8,sockets=2,cores=2,threads=2
+>>>>>
+>>>>>  {
+>>>>>     "return": [
+>>>>
+>>>> Are you sure >3000 lines of example output make sense here?
+>>>
+>>> I'm not. :)
+>>>
+>>> That's why I need feedback from the PCI experts. I believe most
+>>> of the PCI ports on q35 accept only one device, but I see no code
+>>> implementing that restriction, and no obvious PCIBus or
+>>> PCIBusClass field indicating that.
+>>
+>> Hi,
+>>
+>> Sadly there is no such restriction today as far as I know.
+>> We trust the user that he knows what he is doing :)
+>> and we let libvirt implement the restriction.
+>>
+>> I do agree we should fix that.
+>
+> OK, this matches what I saw on the current code.
+>
+> But I would like to understand what exactly should be the rules
+> if we fix that. Should we report only 1 slot if
+> pci_bus_has_pcie_upstream_port(bus)?
+>
 
+We should report 1 slot for a bus exposed by a PCIe Root Port
+or PCIe Downstream Port.
 
-On 04/11/2016 00:35, Doug Evans wrote:
-> The remote protocol can't handle flipping back and forth
-> between 32-bit and 64-bit regs. To compensate, pretend "as if"
-> on 64-bit cpu when in 32-bit mode.
-> 
-> Signed-off-by: Doug Evans <dje@google.com>
-> ---
->  target-i386/gdbstub.c | 52
-> ++++++++++++++++++++++++++++++++++++++-------------
->  1 file changed, 39 insertions(+), 13 deletions(-)
-> 
-> diff --git a/target-i386/gdbstub.c b/target-i386/gdbstub.c
-> index c494535..9b94ab8 100644
-> --- a/target-i386/gdbstub.c
-> +++ b/target-i386/gdbstub.c
-> @@ -44,10 +44,22 @@ int x86_cpu_gdb_read_register(CPUState *cs, uint8_t
-> *mem_buf, int n)
->      X86CPU *cpu = X86_CPU(cs);
->      CPUX86State *env = &cpu->env;
-> 
-> +    /* N.B. GDB can't deal with changes in registers or sizes in the
-> middle
-> +       of a session. So if we're in 32-bit mode on a 64-bit cpu, still act
-> +       as if we're on a 64-bit cpu. */
-> +
->      if (n < CPU_NB_REGS) {
-> -        if (TARGET_LONG_BITS == 64 && env->hflags & HF_CS64_MASK) {
-> -            return gdb_get_reg64(mem_buf, env->regs[gpr_map[n]]);
-> -        } else if (n < CPU_NB_REGS32) {
-> +        if (TARGET_LONG_BITS == 64) {
-> +            if (env->hflags & HF_CS64_MASK) {
-> +                return gdb_get_reg64(mem_buf, env->regs[gpr_map[n]]);
-> +            } else if (n < CPU_NB_REGS32) {
-> +                return gdb_get_reg64(mem_buf,
-> +                                     env->regs[gpr_map[n]] &
-> 0xffffffffUL);
-> +            } else {
-> +                memset(mem_buf, 0, sizeof(target_ulong));
-> +                return sizeof(target_ulong);
-> +            }
-> +        } else {
->              return gdb_get_reg32(mem_buf, env->regs[gpr_map32[n]]);
->          }
->      } else if (n >= IDX_FP_REGS && n < IDX_FP_REGS + 8) {
-> @@ -60,8 +72,7 @@ int x86_cpu_gdb_read_register(CPUState *cs, uint8_t
-> *mem_buf, int n)
->          return 10;
->      } else if (n >= IDX_XMM_REGS && n < IDX_XMM_REGS + CPU_NB_REGS) {
->          n -= IDX_XMM_REGS;
-> -        if (n < CPU_NB_REGS32 ||
-> -            (TARGET_LONG_BITS == 64 && env->hflags & HF_CS64_MASK)) {
-> +        if (n < CPU_NB_REGS32 || TARGET_LONG_BITS == 64) {
->              stq_p(mem_buf, env->xmm_regs[n].ZMM_Q(0));
->              stq_p(mem_buf + 8, env->xmm_regs[n].ZMM_Q(1));
->              return 16;
-> @@ -69,8 +80,12 @@ int x86_cpu_gdb_read_register(CPUState *cs, uint8_t
-> *mem_buf, int n)
->      } else {
->          switch (n) {
->          case IDX_IP_REG:
-> -            if (TARGET_LONG_BITS == 64 && env->hflags & HF_CS64_MASK) {
-> -                return gdb_get_reg64(mem_buf, env->eip);
-> +            if (TARGET_LONG_BITS == 64) {
-> +                if (env->hflags & HF_CS64_MASK) {
-> +                    return gdb_get_reg64(mem_buf, env->eip);
-> +                } else {
-> +                    return gdb_get_reg64(mem_buf, env->eip &
-> 0xffffffffUL);
-> +                }
->              } else {
->                  return gdb_get_reg32(mem_buf, env->eip);
->              }
-> @@ -151,9 +166,17 @@ int x86_cpu_gdb_write_register(CPUState *cs,
-> uint8_t *mem_buf, int n)
->      CPUX86State *env = &cpu->env;
->      uint32_t tmp;
-> 
-> +    /* N.B. GDB can't deal with changes in registers or sizes in the
-> middle
-> +       of a session. So if we're in 32-bit mode on a 64-bit cpu, still act
-> +       as if we're on a 64-bit cpu. */
-> +
->      if (n < CPU_NB_REGS) {
-> -        if (TARGET_LONG_BITS == 64 && env->hflags & HF_CS64_MASK) {
-> -            env->regs[gpr_map[n]] = ldtul_p(mem_buf);
-> +        if (TARGET_LONG_BITS == 64) {
-> +            if (env->hflags & HF_CS64_MASK) {
-> +                env->regs[gpr_map[n]] = ldtul_p(mem_buf);
-> +            } else if (n < CPU_NB_REGS32) {
-> +                env->regs[gpr_map[n]] = ldtul_p(mem_buf) & 0xffffffffUL;
-> +            }
->              return sizeof(target_ulong);
->          } else if (n < CPU_NB_REGS32) {
->              n = gpr_map32[n];
-> @@ -169,8 +192,7 @@ int x86_cpu_gdb_write_register(CPUState *cs, uint8_t
-> *mem_buf, int n)
->          return 10;
->      } else if (n >= IDX_XMM_REGS && n < IDX_XMM_REGS + CPU_NB_REGS) {
->          n -= IDX_XMM_REGS;
-> -        if (n < CPU_NB_REGS32 ||
-> -            (TARGET_LONG_BITS == 64 && env->hflags & HF_CS64_MASK)) {
-> +        if (n < CPU_NB_REGS32 || TARGET_LONG_BITS == 64) {
->              env->xmm_regs[n].ZMM_Q(0) = ldq_p(mem_buf);
->              env->xmm_regs[n].ZMM_Q(1) = ldq_p(mem_buf + 8);
->              return 16;
-> @@ -178,8 +200,12 @@ int x86_cpu_gdb_write_register(CPUState *cs,
-> uint8_t *mem_buf, int n)
->      } else {
->          switch (n) {
->          case IDX_IP_REG:
-> -            if (TARGET_LONG_BITS == 64 && env->hflags & HF_CS64_MASK) {
-> -                env->eip = ldq_p(mem_buf);
-> +            if (TARGET_LONG_BITS == 64) {
-> +                if (env->hflags & HF_CS64_MASK) {
-> +                    env->eip = ldq_p(mem_buf);
-> +                } else {
-> +                    env->eip = ldq_p(mem_buf) & 0xffffffffUL;
-> +                }
->                  return 8;
->              } else {
->                  env->eip &= ~0xffffffffUL;
+Be aware that 1 slot doesn't necessarily refer to only one device,
+we can have a multi-function device.
 
-Queued for 2.9, thanks.
+Thanks,
+Marcel
 
-Paolo
+> (Note that pci_bus_has_pcie_upstream_port() doesn't exist in the
+> current code, it is added by my patch)
+>
