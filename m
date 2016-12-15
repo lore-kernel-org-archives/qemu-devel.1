@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60576)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60573)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cHeSt-00022C-Jz
+	(envelope-from <bounces@canonical.com>) id 1cHeSt-000223-JP
 	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 17:25:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cHeSq-0005cX-D4
+	(envelope-from <bounces@canonical.com>) id 1cHeSq-0005ct-MM
 	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 17:25:27 -0500
-Received: from indium.canonical.com ([91.189.90.7]:33667)
+Received: from indium.canonical.com ([91.189.90.7]:33673)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cHeSq-0005bd-6y
+	id 1cHeSq-0005c4-HL
 	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 17:25:24 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cHeSo-0003D6-VM
+	id 1cHeSp-0003D0-MO
 	for <qemu-devel@nongnu.org>; Thu, 15 Dec 2016 22:25:23 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id EC1462E8019
-	for <qemu-devel@nongnu.org>; Thu, 15 Dec 2016 22:25:22 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id A72FE2E8019
+	for <qemu-devel@nongnu.org>; Thu, 15 Dec 2016 22:25:23 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 15 Dec 2016 22:10:46 -0000
+Date: Thu, 15 Dec 2016 22:11:40 -0000
 From: Askar Safin <safinaskar@mail.ru>
 Reply-To: Bug 922076 <922076@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20120126133438.17636.69999.malonedeb@soybean.canonical.com>
-Message-Id: <20161215221046.29284.99751.malone@wampee.canonical.com>
+Message-Id: <20161215221140.27855.24541.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 922076] Re: doesn't clear screen on boot
 List-Id: <qemu-devel.nongnu.org>
@@ -38,11 +38,12 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-This is Screenshot_20161216_005859.png , screenshot with grub
+And this is Screenshot_20161216_005917.png . Here (after grub) we see
+"recovering journal" on top of seabios string
 
-** Attachment added: "Screenshot_20161216_005859.png"
-   https://bugs.launchpad.net/qemu/+bug/922076/+attachment/4792205/+files/S=
-creenshot_20161216_005859.png
+** Attachment added: "Screenshot_20161216_005917.png"
+   https://bugs.launchpad.net/qemu/+bug/922076/+attachment/4792206/+files/S=
+creenshot_20161216_005917.png
 
 -- =
 
