@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58896)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58913)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cHPoN-0007c2-OD
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 01:46:40 -0500
+	(envelope-from <aderumier@oxygem.tv>) id 1cHPog-0000H9-QZ
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 01:46:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cHPoJ-00077i-Ro
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 01:46:39 -0500
-Received: from [59.151.112.132] (port=43622 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cHPoJ-00074l-FZ
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 01:46:35 -0500
-References: <1481263496-8004-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<1481263496-8004-2-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<alpine.DEB.2.10.1612131700110.2777@sstabellini-ThinkPad-X260>
-From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Message-ID: <0e652e4a-4abd-92ee-accd-59d3d6b2b4eb@cn.fujitsu.com>
-Date: Thu, 15 Dec 2016 14:46:09 +0800
+	(envelope-from <aderumier@oxygem.tv>) id 1cHPoc-0007Ao-VC
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 01:46:58 -0500
+Received: from mailpro.odiso.net ([89.248.211.110]:43756)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aderumier@oxygem.tv>) id 1cHPoc-0007AU-Oj
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 01:46:54 -0500
+Date: Thu, 15 Dec 2016 07:46:32 +0100 (CET)
+From: Alexandre DERUMIER <aderumier@odiso.com>
+Message-ID: <464605215.4528644.1481784392571.JavaMail.zimbra@oxygem.tv>
+In-Reply-To: <32c0e94e-8beb-03f3-2605-46225500e6ad@profihost.ag>
+References: <1a3a7aef-55f1-11b6-b33f-621979cbb59f@profihost.ag>
+	<1383290552.4515122.1481729638569.JavaMail.zimbra@oxygem.tv>
+	<32c0e94e-8beb-03f3-2605-46225500e6ad@profihost.ag>
 MIME-Version: 1.0
-In-Reply-To: <alpine.DEB.2.10.1612131700110.2777@sstabellini-ThinkPad-X260>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.9 V3 1/3] Migration: Don't load
- vmdesc when xen is enabled
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] any known virtio-net regressions in Qemu 2.7?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,59 +28,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Stabellini <sstabellini@kernel.org>, Wen Congyang <wencongyang@gmail.com>
-Cc: qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>, Eric Blake <eblake@redhat.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, "eddie .
-	dong" <eddie.dong@intel.com>, Bian Naimeng <biannm@cn.fujitsu.com>
+To: "Stefan Priebe, Profihost AG" <s.priebe@profihost.ag>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
+does rollbacking the kernel to previous version fix the problem ?
 
+i'm not sure if "perf" could give you some hints
+----- Mail original -----
+De: "Stefan Priebe, Profihost AG" <s.priebe@profihost.ag>
+=C3=80: "aderumier" <aderumier@odiso.com>
+Cc: "qemu-devel" <qemu-devel@nongnu.org>
+Envoy=C3=A9: Mercredi 14 D=C3=A9cembre 2016 21:36:23
+Objet: Re: [Qemu-devel] any known virtio-net regressions in Qemu 2.7?
 
-On 12/14/2016 09:00 AM, Stefano Stabellini wrote:
-> On Fri, 9 Dec 2016, Zhang Chen wrote:
->> Xen doesn't need this.
-> Could you please elaborate a bit more on what is the problem exactly,
-> and why we don't have any issues with migration with Xen today (COLO
-> use-case aside)?
->
+Am 14.12.2016 um 16:33 schrieb Alexandre DERUMIER:=20
+> Hi Stefan,=20
+>=20
+> do you have upgraded kernel ?=20
 
-I test COLO without this patch, it seems run normally.
-And I review the codes not find why we need this too.
-So, I cc the original author wency about this.
+Yes sure. But i'm out of ideas how to debug. Sometimes it gives me=20
+constant 80MB/s, sometimes 125 and sometimes only 6. While on the host=20
+the cards are not busy.=20
 
-CC. wency.
+Greets,=20
+Stefan=20
 
-Thanks
-Zhang Chen
-
->> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
->> ---
->>   migration/savevm.c | 4 ++++
->>   1 file changed, 4 insertions(+)
->>
->> diff --git a/migration/savevm.c b/migration/savevm.c
->> index 0363372..bec6c7e 100644
->> --- a/migration/savevm.c
->> +++ b/migration/savevm.c
->> @@ -1973,6 +1973,10 @@ int qemu_loadvm_state(QEMUFile *f)
->>           ret = qemu_file_get_error(f);
->>       }
->>   
->> +    if (xen_enabled()) {
->> +        return ret;
->> +    }
->> +
->>       /*
->>        * Try to read in the VMDESC section as well, so that dumping tools that
->>        * intercept our migration stream have the chance to see it.
->> -- 
->> 2.7.4
->>
->>
->>
->>
->
-> .
->
-
--- 
-Thanks
-Zhang Chen
+>=20
+> maybe it could be related to vhost-net module too.=20
+>=20
+>=20
+> ----- Mail original -----=20
+> De: "Stefan Priebe, Profihost AG" <s.priebe@profihost.ag>=20
+> =C3=80: "qemu-devel" <qemu-devel@nongnu.org>=20
+> Envoy=C3=A9: Mercredi 14 D=C3=A9cembre 2016 16:04:08=20
+> Objet: [Qemu-devel] any known virtio-net regressions in Qemu 2.7?=20
+>=20
+> Hello,=20
+>=20
+> after upgrading a cluster OS, Qemu, ... i'm experiencing slow and=20
+> volatile network speeds inside my VMs.=20
+>=20
+> Currently I've no idea what causes this but it's related to the host=20
+> upgrades. Before i was running Qemu 2.6.2.=20
+>=20
+> I'm using virtio for the network cards.=20
+>=20
+> Greets,=20
+> Stefan=20
+>=20
