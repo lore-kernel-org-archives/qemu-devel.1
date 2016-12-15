@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46672)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39642)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <joeyconnelly@u.boisestate.edu>) id 1cHMLj-0007Sd-0i
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 22:04:52 -0500
+	(envelope-from <mst@redhat.com>) id 1cHNlh-0002iI-J6
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 23:35:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <joeyconnelly@u.boisestate.edu>) id 1cHMLf-0007If-S6
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 22:04:51 -0500
-Received: from mail-qt0-f169.google.com ([209.85.216.169]:34952)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <joeyconnelly@u.boisestate.edu>)
-	id 1cHMLf-0007By-KS
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 22:04:47 -0500
-Received: by mail-qt0-f169.google.com with SMTP id c47so44692746qtc.2
-	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 19:04:24 -0800 (PST)
+	(envelope-from <mst@redhat.com>) id 1cHNle-0004Cq-KB
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 23:35:45 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34906)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cHNle-0004CU-56
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 23:35:42 -0500
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com
+	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 783F7C04B926
+	for <qemu-devel@nongnu.org>; Thu, 15 Dec 2016 04:35:40 +0000 (UTC)
+Date: Thu, 15 Dec 2016 06:35:39 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20161215063226-mutt-send-email-mst@kernel.org>
+References: <20161214142518.10504-1-stefanha@redhat.com>
 MIME-Version: 1.0
-From: Joey Connelly <joeyconnelly@u.boisestate.edu>
-Date: Wed, 14 Dec 2016 20:03:03 -0700
-Message-ID: <CAOgv841deahTvPZ3rNvuGUh7xjtvJBRLSWwmCmMU2Ei3MmTrKA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] Nesting QEMU Question
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20161214142518.10504-1-stefanha@redhat.com>
+Subject: [Qemu-devel] regression in 2.8: unable to exit screen grab in SDL
+ mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,56 +33,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-Hey QEMU dev group,
+The problem always reproduces for me:
+- start qemu with -sdl
+- wait for guest to boot
+- click anywhere within guest screen
+- message "press ctrl+alt to exit capture" appears on screen,
+  but pressing that immediately restarts capture again
 
-I have a few questions related to nesting QEMU processes, but first here is
-my system setup:
+Note:
+- had to exit to another VT and kill qemu
+- why was I able to do that?
+  should not ctrl-alt-Fn be captured too?
 
-
-
-   - *HOST MACHINE:* GNU/Linux release 4.5.5 (KVM version follows), Distro
-   Fedora 24, x86_64 arch, supports Intel VT-x, QEMU 2.6.2, libvirt 1.3.3
-
-
-   - *GUEST ISO:* GNU/Linux release 2.6.13 (KVM version follows), Distro
-   SliTaz 4.0, i686 32-bit arch, does not appear to support Intel VT-x, QEM=
-U
-   0.12.5, does not have libvirt
-
-
-My question is primarily in response to this comment from your qemu-devel
-threads:
-
-"qemu-system-x86_64 does not support KVM on a 32-bit host", Daniel Berrange=
-.
-
-https://lists.nongnu.org/archive/html/qemu-devel/2012-09/msg02186.html
-
-
-
-
-
-*[QUESTION#1.]*
-
-Since my guest OS is 32-bit, do I have to use qemu-system-i386 =E2=80=93ena=
-ble-kvm
-on my host so that the guest can create a QEMU process of its own
-supporting KVM? Or are there additional qemu-system-i386 arguments I need
-from my host: =E2=80=93cpu <???> -machine <???>
-
-
-
-
-
-*[QUESTION#2.]*
-
-Since my guest OS does not support Intel VT-x, can I force this with
-qemu-system-i386 arguments? I=E2=80=99m not sure how exactly to do this.
-
-
-
-Thanks,
-
--Joey
+-- 
+MST
