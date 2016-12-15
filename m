@@ -1,36 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58758)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36427)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cHZmj-0000tC-Kz
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 12:25:39 -0500
+	(envelope-from <alex@alex.org.uk>) id 1cHZvr-0000yx-8T
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 12:35:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cHZme-0005ft-KM
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 12:25:37 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45620
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1cHZme-0005fK-Db
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 12:25:32 -0500
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	uBFHNpB5131240
-	for <qemu-devel@nongnu.org>; Thu, 15 Dec 2016 12:25:31 -0500
-Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 27bdmfxtu0-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 15 Dec 2016 12:25:31 -0500
-Received: from localhost
-	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Thu, 15 Dec 2016 10:25:30 -0700
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Thu, 15 Dec 2016 11:24:04 -0600
-In-Reply-To: <1481822644-617-1-git-send-email-mdroth@linux.vnet.ibm.com>
-References: <1481822644-617-1-git-send-email-mdroth@linux.vnet.ibm.com>
-Message-Id: <1481822644-617-3-git-send-email-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 2/2] monitor: fix object_del for
- command-line-created objects
+	(envelope-from <alex@alex.org.uk>) id 1cHZvq-0004Hl-56
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 12:35:03 -0500
+Received: from mail.avalus.com ([2001:41c8:10:1dd::10]:53520)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <alex@alex.org.uk>) id 1cHZvp-0004Fe-UL
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 12:35:02 -0500
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+From: Alex Bligh <alex@alex.org.uk>
+In-Reply-To: <20161215164917.2zzkdwxarf4pnfle@grep.be>
+Date: Thu, 15 Dec 2016 17:34:48 +0000
+Content-Transfer-Encoding: 7bit
+Message-Id: <3DDAB833-51BF-4F73-9F08-E50054B01D24@alex.org.uk>
+References: <5e9150ed-2127-f2e8-f9db-a514e8f0ddf8@virtuozzo.com>
+	<5E697C22-5FBB-49A2-A018-A6B96E29FE84@alex.org.uk>
+	<94ef3ef2-b76f-fa5d-cbaf-8990ce2b1be8@virtuozzo.com>
+	<20161214181323.mehzfmlf6z4pyajp@grep.be>
+	<D71CECFD-E513-4372-BB54-BF8D8D521292@alex.org.uk>
+	<3D392E31-DDA4-4316-B26D-871E94A83935@alex.org.uk>
+	<20161214201858.lblzw2ayddidxfyp@grep.be>
+	<58F412AB-8A4C-403F-AEE2-D2FB958D447A@alex.org.uk>
+	<20161215150312.dmxrxn7ujzq3apy6@grep.be>
+	<78C8A0CB-717D-4925-8AA8-A085DC1F9FB7@alex.org.uk>
+	<20161215164917.2zzkdwxarf4pnfle@grep.be>
+Subject: Re: [Qemu-devel] [Nbd] [PATCH] Further tidy-up on block status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,96 +36,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Daniel Berrange <berrange@redhat.com>, qemu-stable@nongnu.org
+To: Wouter Verhelst <w@uter.be>
+Cc: Alex Bligh <alex@alex.org.uk>, "nbd-general@lists.sourceforge.net" <nbd-general@lists.sourceforge.net>, Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Stefan stefanha@redhat. com" <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Denis V . Lunev" <den@openvz.org>, John Snow <jsnow@redhat.com>
 
-Currently objects specified on the command-line are only partially
-cleaned up when 'object_del' is issued in either HMP or QMP: the
-object itself is fully finalized, but the QemuOpts are not removed.
-This results in the following behavior:
 
-  x86_64-softmmu/qemu-system-x86_64 -monitor stdio \
-    -object memory-backend-ram,id=ram1,size=256M
+> On 15 Dec 2016, at 16:49, Wouter Verhelst <w@uter.be> wrote:
+> 
+>> Because the namespaces and leaf-names are already restricted to
+>> non-whitespace characters. I thought having tabs, line feeds,
+>> returns, em-space, en-space etc. was not particularly useful.
+>> I could be persuaded to relent re spaces.
+> 
+> I could imagine that the context might include as part of its name a
+> user-defined bit. If we're going to disallow whitespace, then that would
+> mean namespaces would have to do all sorts of escaping etc. I don't
+> think that's a good idea.
 
-  QEMU 2.7.91 monitor - type 'help' for more information
-  (qemu) object_del ram1
-  (qemu) object_del ram1
-  object 'ram1' not found
-  (qemu) object_add memory-backend-ram,id=ram1,size=256M
-  Duplicate ID 'ram1' for object
-  Try "help object_add" for more information
+So to be clear do you want to include all whitespace
+everywhere? Or just to the right of the colon in queries?
 
-which can be an issue for use-cases like memory hotplug.
-
-This happens on the HMP side because hmp_object_add() attempts to
-create a temporary QemuOpts entry with ID 'ram1', which ends up
-conflicting with the command-line-created entry, since it was never
-cleaned up during the previous hmp_object_del() call.
-
-We address this by adding a check in user_creatable_del(), which
-is called by both qmp_object_del() and hmp_object_del() to handle
-the actual object cleanup, to determine whether an option group entry
-matching the object's ID is present and removing it if it is.
-
-Note that qmp_object_add() never attempts to create a temporary
-QemuOpts entry, so it does not encounter the duplicate ID error,
-which is why this isn't generally visible in libvirt.
-
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>
-Cc: Daniel Berrange <berrange@redhat.com>
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
----
- qom/object_interfaces.c    | 9 +++++++++
- tests/check-qom-proplist.c | 4 ++--
- 2 files changed, 11 insertions(+), 2 deletions(-)
-
-diff --git a/qom/object_interfaces.c b/qom/object_interfaces.c
-index ded4d84..994d0c7 100644
---- a/qom/object_interfaces.c
-+++ b/qom/object_interfaces.c
-@@ -5,6 +5,7 @@
- #include "qapi-visit.h"
- #include "qapi/qobject-output-visitor.h"
- #include "qapi/opts-visitor.h"
-+#include "qemu/config-file.h"
- 
- void user_creatable_complete(Object *obj, Error **errp)
- {
-@@ -209,6 +210,14 @@ void user_creatable_del(const char *id, Error **errp)
-         error_setg(errp, "object '%s' is in use, can not be deleted", id);
-         return;
-     }
-+
-+    /*
-+     * if object was defined on the command-line, remove its corresponding
-+     * option group entry
-+     */
-+    qemu_opts_del(qemu_opts_find(qemu_find_opts_err("object", &error_abort),
-+                                 id));
-+
-     object_unparent(obj);
- }
- 
-diff --git a/tests/check-qom-proplist.c b/tests/check-qom-proplist.c
-index e3f56ca..ddec574 100644
---- a/tests/check-qom-proplist.c
-+++ b/tests/check-qom-proplist.c
-@@ -437,9 +437,9 @@ static void test_dummy_createcmdl(void)
-      * check for this in user_creatable_del() and remove the QemuOpts if
-      * it is present.
-      *
--     * FIXME: add an assert to verify that the QemuOpts is cleaned up
--     * once the corresponding cleanup code is added.
-+     * The below check ensures this works as expected.
-      */
-+    g_assert_null(qemu_opts_find(&qemu_object_opts, "dev0"));
- }
- 
- static void test_dummy_badenum(void)
 -- 
-1.9.1
+Alex Bligh
