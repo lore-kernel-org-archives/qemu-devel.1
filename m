@@ -1,31 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48879)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60576)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <benh@kernel.crashing.org>) id 1cHe3q-0003Sd-34
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 16:59:35 -0500
+	(envelope-from <bounces@canonical.com>) id 1cHeSt-00022C-Jz
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 17:25:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <benh@kernel.crashing.org>) id 1cHe3l-0001S4-AS
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 16:59:34 -0500
-Message-ID: <1481839150.15937.4.camel@kernel.crashing.org>
-From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Date: Thu, 15 Dec 2016 15:59:10 -0600
-In-Reply-To: <7c5450f6-2688-d643-d020-2dcb92e8e52a@redhat.com>
-References: <1479218565.3319.18.camel@redhat.com>
-	<3353ecef-2308-13e3-025d-df41b2e89945@ozlabs.ru>
-	<1479457042.1391.11.camel@redhat.com>
-	<20161123050049.GD17795@umbus.fritz.box>
-	<1480081581.4367.65.camel@redhat.com>
-	<20161202041835.GF10089@umbus.fritz.box>
-	<1481045447.6553.36.camel@redhat.com>
-	<20161207041121.GB12489@umbus.fritz.box>
-	<1481128923.3620.1.camel@redhat.com>
-	<491c0ca6-c559-441b-7a14-3656bfc0abfc@redhat.com>
-	<20161214024616.GE32647@umbus>
-	<7c5450f6-2688-d643-d020-2dcb92e8e52a@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [RFC PATCH qemu] spapr_pci: Create
- PCI-express root bus by default
+	(envelope-from <bounces@canonical.com>) id 1cHeSq-0005cX-D4
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 17:25:27 -0500
+Received: from indium.canonical.com ([91.189.90.7]:33667)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cHeSq-0005bd-6y
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 17:25:24 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cHeSo-0003D6-VM
+	for <qemu-devel@nongnu.org>; Thu, 15 Dec 2016 22:25:23 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id EC1462E8019
+	for <qemu-devel@nongnu.org>; Thu, 15 Dec 2016 22:25:22 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 15 Dec 2016 22:10:46 -0000
+From: Askar Safin <safinaskar@mail.ru>
+Reply-To: Bug 922076 <922076@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20120126133438.17636.69999.malonedeb@soybean.canonical.com>
+Message-Id: <20161215221046.29284.99751.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 922076] Re: doesn't clear screen on boot
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,35 +36,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
-Cc: Andrea Bolognani <abologna@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>, Greg Kurz <groug@kaod.org>, Paolo Bonzini <pbonzini@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, libvir-list@redhat.com, Michael Roth <mdroth@linux.vnet.ibm.com>, Marcel Apfelbaum <mapfelba@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Wed, 2016-12-14 at 20:26 +0200, Marcel Apfelbaum wrote:
-> > > The Root complex includes the PCI bus, some configuration
-> > > registers if
-> > > needed, provides access to the configuration space, translates
-> > > relevant CPU
-> > > reads/writes to PCI(e) transactions...
-> > 
-> > Do those configuration registers appear within PCI space, or
-> > outside
-> > it (e.g. raw MMIO or PIO registers)?
-> > 
-> 
-> Root Complexes use MMIO to expose the PCI configuration space,
-> they call it ECAM (enhanced configuration access mechanism) or
-> MMConfig.
+This is Screenshot_20161216_005859.png , screenshot with grub
 
-Not all of them do. There are plenty of PCIe RCs out there that
-do config space using different mechanisms such as the good old
-indirect address/data method, such as ours. IE. Even in real "bare
-metal" powernv, where the root port is visible to Linux, we still
-go through firmware for config space to get through to those
-registers (among other things).
+** Attachment added: "Screenshot_20161216_005859.png"
+   https://bugs.launchpad.net/qemu/+bug/922076/+attachment/4792205/+files/S=
+creenshot_20161216_005859.png
 
-My PHB3 implementation (not upstream yet and a bit bitrotted by now)
-exposed PCIe that way including extended config space and that was
-working fine.
+-- =
 
-Cheers,
-Ben.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/922076
+
+Title:
+  doesn't clear screen on boot
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  When I start Linux in Qemu via "qemu -kernel /vmlinuz ...", Qemu
+  window appears and it shows message "Starting Seabios (version
+  0.5.1-2010...)", and then Linux writes messages like "Loading, please
+  wait..." on top of previous message!
+
+  For example, I can see "Loading, please wait...on 0.5.1-2010...)"
+
+  So, Qemu doesn't clean screan before booting OS.
+
+  Moreover, when I start Linux via "qemu /disk-image", Qemu shows
+  "Starting Seabios (version 0.5.1-2010...)", then switches to graphical
+  mode, shows GRUB, then switches back to text mode and shows "Starting
+  Seabios" again! And again Linux prints messages on top of Seabios
+  messages, and we see a mix of symbols on screen.
+
+  Also, I found another bug! I am learning now to write kernels. And I
+  see that operator "*(char *)0xb8000 =3D 0" in C code of kernel doesn't
+  clean first charaster of screen in Qemu in "-curses" mode! If I want
+  to real clean this charaster, I must type "*(char *)0xb8000 =3D ' '".
+
+  I attach a kernel (x86, multiboot) with this bug. Just type "make"
+  (you need gcc) and "qemu -curses -kernel kernel". You will see that
+  screen is not cleared, but kernel tries to clean it. If you change 0
+  to ' ', all will work!
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/922076/+subscriptions
