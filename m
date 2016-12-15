@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39671)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40141)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cHQZn-0006zY-Uq
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 02:35:40 -0500
+	(envelope-from <stefanha@gmail.com>) id 1cHQdI-0007dK-El
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 02:39:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cHQZj-0007Qj-ND
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 02:35:39 -0500
-Received: from mail-wj0-f196.google.com ([209.85.210.196]:34783)
+	(envelope-from <stefanha@gmail.com>) id 1cHQdE-0008NC-Fy
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 02:39:16 -0500
+Received: from mail-wj0-f196.google.com ([209.85.210.196]:36104)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cHQZj-0007Ld-Gy
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 02:35:35 -0500
-Received: by mail-wj0-f196.google.com with SMTP id xy5so8189772wjc.1
-	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 23:35:12 -0800 (PST)
-Date: Thu, 15 Dec 2016 07:34:09 +0000
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cHQdE-0008Mr-9F
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 02:39:12 -0500
+Received: by mail-wj0-f196.google.com with SMTP id j10so8218547wjb.3
+	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 23:39:12 -0800 (PST)
+Date: Thu, 15 Dec 2016 07:38:09 +0000
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20161215073409.GA26169@stefanha-x1.localdomain>
-References: <20161214142518.10504-1-stefanha@redhat.com>
-	<20161215004752-mutt-send-email-mst@kernel.org>
+Message-ID: <20161215073808.GB26169@stefanha-x1.localdomain>
+References: <20161214163035.3297-1-maxime.coquelin@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="TB36FDmn/VVEgNH/"
+	protocol="application/pgp-signature"; boundary="oC1+HKm2/end4ao3"
 Content-Disposition: inline
-In-Reply-To: <20161215004752-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH for-2.8] ui/gtk: fix "Copy" menu item
- segfault
+In-Reply-To: <20161214163035.3297-1-maxime.coquelin@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3] virtio-pci: Fix cross-version migration
+ with older machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,56 +30,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
+To: Maxime Coquelin <maxime.coquelin@redhat.com>
+Cc: mdroth@linux.vnet.ibm.com, stefanha@redhat.com, qemu-devel@nongnu.org, mst@redhat.com, cornelia.huck@de.ibm.com, marcel@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
 
---TB36FDmn/VVEgNH/
+--oC1+HKm2/end4ao3
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Dec 15, 2016 at 12:49:06AM +0200, Michael S. Tsirkin wrote:
-> On Wed, Dec 14, 2016 at 02:25:18PM +0000, Stefan Hajnoczi wrote:
-> > The "Copy" menu item copies VTE terminal text to the clipboard.  This
-> > only works with VTE terminals, not with graphics consoles.
-> >=20
-> > Disable the menu item when the current notebook page isn't a VTE
-> > terminal.
-> >=20
-> > This patch fixes a segfault.  Reproducer: Start QEMU and click the Copy
-> > menu item when the guest display is visible.
-> >=20
-> > Reported-by: Kevin Wolf <kwolf@redhat.com>
-> > Cc: Michael S. Tsirkin <mst@redhat.com>
-> > Cc: Gerd Hoffmann <kraxel@redhat.com>
-> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+On Wed, Dec 14, 2016 at 05:30:35PM +0100, Maxime Coquelin wrote:
+> This patch fixes a cross-version migration regression introduced
+> by commit d1b4259f ("virtio-bus: Plug devices after features are
+> negotiated").
 >=20
-> I don't think it's 2.8 personally, patch just disables an
-> illegal action. Similar to the hotplug crash fix I
-> have queued. Just document this as a known issue.
+> The problem is encountered when host's vhost backend does not support
+> VIRTIO_F_VERSION_1, and migration is initiated from a v2.7 or prior
+> machine with virtio-pci modern capabilities enabled to a v2.8 machine.
 >=20
+> In this case, modern capabilities get exposed to the guest by the source,
+> whereas the target will detect version 1 is not supported so will only
+> expose legacy capabilities.
 >=20
+> The problem is fixed by introducing a new "x-ignore-backend-features"
+> property, which is set in v2.7 and prior compatibility modes. Doing this,
+> v2.7 machine keeps its broken behaviour (enabling modern while version
+> is not supported), and newer machines will behave correctly.
 >=20
-> BTW - any idea how to make paste work?
+> Reported-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+> Suggested-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Cc: Michael S. Tsirkin <mst@redhat.com>
+> Cc: Cornelia Huck <cornelia.huck@de.ibm.com>
+> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Tested-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+> Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
+> ---
+>=20
+> V3 fixes commit message with the new property name.
+> V2 changes the naming as proposed by Michael T.and Cornelia, and
+> fixes commit message.
+>=20
+>  hw/virtio/virtio-pci.c | 5 ++++-
+>  hw/virtio/virtio-pci.h | 1 +
+>  include/hw/compat.h    | 4 ++++
+>  3 files changed, 9 insertions(+), 1 deletion(-)
 
-Maybe Gerd has a recommendation.  I have never touched GTK or VTE before
-this patch.
+Thanks, applied to my staging tree:
+https://github.com/stefanha/qemu/commits/staging
 
 Stefan
 
---TB36FDmn/VVEgNH/
+--oC1+HKm2/end4ao3
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJYUkdxAAoJEJykq7OBq3PImkkH/3EsldNbM3EctQfXfDB+thMk
-3KhPgleHxirFtIUAyNS/HRY6cYanYlmdKiLp74Da4ye8rPo+P/Gx9gzo+WF2q+hd
-4iHQn9q0Q/SIH0XMajijHtypuOCPWiEhskZWT1imqTbqc4NjMzu/Lwj0kWwiV7BN
-MP7MNwoTueILiEXPuRMnbqwKMnsXjn9/+pqiF73Cf5lqt7Eyksd+GLHhfRZ12Wc2
-CktsBim6UFEQ7JSyfKLqypbUPWB6JXMk7jAD3aEtU7yAftoF8kf9jlgA6ttFxnM1
-Fj2WYQqBgMTRv0TPFT2TXvxnOIRUZEM7vMCnDsToznP2G8fxlxN5oQFRkFlctk0=
-=S1o0
+iQEcBAEBAgAGBQJYUkhgAAoJEJykq7OBq3PIjAwH/AuHOMb6y10x2Qhbx1wZ7ne0
+Z0G8Q0WOMiO/4TJ0cFeRNRHkIoLI1Rvsp7ALiugx4tSS6/o8aTFOXYPAoJE+ftFs
+eBnv+XLidGeUy1Ki6wsNZCmqLzk5SXje3UaN1+EYGrr8e7VSYmtShduKsU11bUmj
+llxNklcMyKZE/UPaQL9X84FTpngFDwGgUL+hGjLB1yaC8WTIjjeQHH/CqsRHv16T
+LqgQT7O/LTrp0sFAYJNGG8m4Mp3+56PdWjn/aaC6ULlR0P7TSkimCyExW6rkfX57
+O4BwJR+161IjFj/6BN5BMZC7BIrbetId0NRbVW65eSppARO2rvCJe3B6eAGif/Y=
+=SJFb
 -----END PGP SIGNATURE-----
 
---TB36FDmn/VVEgNH/--
+--oC1+HKm2/end4ao3--
