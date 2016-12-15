@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51916)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53535)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cHYRc-00064H-E0
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 10:59:45 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cHYX4-0004IJ-11
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 11:05:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cHYRZ-00056K-BJ
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 10:59:44 -0500
-Received: from indium.canonical.com ([91.189.90.7]:34289)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cHYRZ-000566-6G
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 10:59:41 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cHYRX-0000Oo-NS
-	for <qemu-devel@nongnu.org>; Thu, 15 Dec 2016 15:59:39 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id AFE4A2E80C4
-	for <qemu-devel@nongnu.org>; Thu, 15 Dec 2016 15:59:39 +0000 (UTC)
+	(envelope-from <dgilbert@redhat.com>) id 1cHYWz-0008DJ-2D
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 11:05:22 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40038)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cHYWy-0008Ci-PP
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 11:05:16 -0500
+Date: Thu, 15 Dec 2016 16:05:10 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20161215160510.GM2509@work-vm>
+References: <1481742422-15969-1-git-send-email-ashijeetacharya@gmail.com>
+	<1481742422-15969-3-git-send-email-ashijeetacharya@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 15 Dec 2016 15:48:57 -0000
-From: Thomas Huth <691424@bugs.launchpad.net>
-Reply-To: Bug 691424 <691424@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20101217063430.31066.66219.malonedeb@palladium.canonical.com>
-Message-Id: <20161215154857.28028.5664.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 691424] Re: qemu/kvm SDL over ssh -X broken
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1481742422-15969-3-git-send-email-ashijeetacharya@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 2/3] migration: Allow "device add" options
+ to only add migratable devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,87 +28,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Ashijeet Acharya <ashijeetacharya@gmail.com>
+Cc: jsnow@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, kwolf@redhat.com, armbru@redhat.com, quintela@redhat.com, mst@redhat.com, marcandre.lureau@redhat.com, groug@kaod.org, aneesh.kumar@linux.vnet.ibm.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-Can you still reproduce this issue with the latest version of QEMU, with
-the latest version of SDL?
+* Ashijeet Acharya (ashijeetacharya@gmail.com) wrote:
+> Introduce checks for the unmigratable flag in the VMStateDescription
+> structs of respective devices when user attempts to add them. If the
+> "--only-migratable" was specified, all unmigratable devices will
+> rightly fail to add. This feature is made compatible for both "-device"
+> and "-usbdevice" command line options and covers their hmp and qmp
+> counterparts as well.
+> 
+> Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
+> ---
+>  hw/usb/bus.c   | 15 +++++++++++++++
+>  qdev-monitor.c |  9 +++++++++
+>  2 files changed, 24 insertions(+)
+> 
+> diff --git a/hw/usb/bus.c b/hw/usb/bus.c
+> index 25913ad..8796788 100644
+> --- a/hw/usb/bus.c
+> +++ b/hw/usb/bus.c
+> @@ -8,6 +8,7 @@
+>  #include "monitor/monitor.h"
+>  #include "trace.h"
+>  #include "qemu/cutils.h"
+> +#include "migration/migration.h"
+>  
+>  static void usb_bus_dev_print(Monitor *mon, DeviceState *qdev, int indent);
+>  
+> @@ -686,6 +687,8 @@ USBDevice *usbdevice_create(const char *cmdline)
+>      const char *params;
+>      int len;
+>      USBDevice *dev;
+> +    ObjectClass *klass;
+> +    DeviceClass *dc;
+>  
+>      params = strchr(cmdline,':');
+>      if (params) {
+> @@ -720,6 +723,18 @@ USBDevice *usbdevice_create(const char *cmdline)
+>          return NULL;
+>      }
+>  
+> +    klass = object_class_by_name(f->name);
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+> +    dc = DEVICE_CLASS(klass);
 
--- =
+Would qdev_get_device_class work here instead of that pair?
+(I was thinking you needed to check klass to make sure it wasn't null)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/691424
-
-Title:
-  qemu/kvm SDL over ssh -X broken
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  qemu/kvm by default uses SDL to render the output of its emulated VGA gra=
-phics.
-  This is broken over ssh -X since quite a while.
-  The only workaround I know, is to use qemu -vnc :0
-  and connect using vncviewer
-
-  =
-
-  How To Reproduce:
-  1. zypper in qemu
-  2. ssh -X localhost qemu -cdrom ANYISOFILE
-
-  Actual Results:
-  qemu hangs in an endless loop on the BIOS display screen
-
-  Expected Results:
-  should boot up the iso as 0.10 versions did
-
-  Reproducible: Always
-
-  =
-
-  this is what broke it:
-  $ git bisect bad
-  c18a2c360e3100bbd71162cf922dcd8c429a8b71 is first bad commit
-  commit c18a2c360e3100bbd71162cf922dcd8c429a8b71
-  Author: Stefano Stabellini <stefano.stabellini@eu.citrix.com>
-  Date:   Wed Jun 24 11:58:25 2009 +0100
-
-      sdl zooming
-
-      Hi all,
-      this patch implements zooming capabilities for the sdl interface.
-      A new sdl_zoom_blit function is added that is able to scale and blit a
-      portion of a surface into another.
-      This way we can enable SDL_RESIZABLE and have a real_screen surface w=
-ith
-      a different size than the guest surface and let sdl_zoom_blit take ca=
-re
-      of the problem.
-
-      Signed-off-by: Stefano Stabellini <stefano.stabellini@eu.citrix.com>
-      Signed-off-by: Anthony Liguori <aliguori@us.ibm.com>
-
-  :100644 100644 a06c9bfc22cc6de1c6e5e9068d6bf59d89613767 f8dc5065dd27010bf=
-dbb6bcfb0c6e3af25024cdb M      Makefile
-  :100644 100644 417217582363a87ee67e746ba798e285a64b6cdc 35183399f65de6f50=
-f3baa4767ab7d4d11d45bca M      console.h
-  :100644 100644 178b5532b8d9dd2194a8662fbfdcd49b4bc04222 d81399e51276e1c97=
-fa1f7272ef16ea4c312b51b M      sdl.c
-  :000000 100644 0000000000000000000000000000000000000000 56d3604fc3d79e4cc=
-4622be8437c78bf70075da3 A      sdl_zoom.c
-  :000000 100644 0000000000000000000000000000000000000000 33dc63408b43a37fd=
-6b1acde3fa62b1a51315e75 A      sdl_zoom.h
-  :000000 100644 0000000000000000000000000000000000000000 64bbca849bd3af678=
-c2259b4d8cc0e48c6a6b43c A      sdl_zoom_template.h
-
-  =
-
-  This problem occurs on both Debian and openSUSE.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/691424/+subscriptions
+> +    if (only_migratable) {
+> +        if (dc->vmsd->unmigratable) {
+> +            error_report("Device %s is not migratable, but --only-migratable "
+> +                         "was specified", f->name);
+> +            return NULL;
+> +        }
+> +    }
+> +
+>      if (f->usbdevice_init) {
+>          dev = f->usbdevice_init(bus, params);
+>      } else {
+> diff --git a/qdev-monitor.c b/qdev-monitor.c
+> index c73410c..81d01df 100644
+> --- a/qdev-monitor.c
+> +++ b/qdev-monitor.c
+> @@ -29,6 +29,7 @@
+>  #include "qemu/error-report.h"
+>  #include "qemu/help_option.h"
+>  #include "sysemu/block-backend.h"
+> +#include "migration/migration.h"
+>  
+>  /*
+>   * Aliases were a bad idea from the start.  Let's keep them
+> @@ -577,6 +578,14 @@ DeviceState *qdev_device_add(QemuOpts *opts, Error **errp)
+>          return NULL;
+>      }
+>  
+> +    if (only_migratable) {
+> +        if (dc->vmsd->unmigratable) {
+> +            error_setg(errp, "Device %s is not migratable, but "
+> +                       "--only-migratable was specified", driver);
+> +            return NULL;
+> +        }
+> +    }
+> +
+>      /* find bus */
+>      path = qemu_opt_get(opts, "bus");
+>      if (path != NULL) {
+> -- 
+> 2.6.2
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
