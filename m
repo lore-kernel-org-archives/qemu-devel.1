@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39698)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39907)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cHUdG-0002vr-OF
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 06:55:34 -0500
+	(envelope-from <drjones@redhat.com>) id 1cHUds-0003Ef-Uq
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 06:56:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cHUdC-0007On-OF
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 06:55:30 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35292)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cHUdC-0007OL-Fh
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 06:55:26 -0500
-Date: Thu, 15 Dec 2016 11:55:21 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20161215115521.GG2509@work-vm>
-References: <20161108095603.72301-1-pasic@linux.vnet.ibm.com>
-	<20161108095603.72301-6-pasic@linux.vnet.ibm.com>
+	(envelope-from <drjones@redhat.com>) id 1cHUdo-0007gU-WE
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 06:56:09 -0500
+Date: Thu, 15 Dec 2016 12:55:56 +0100
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20161215115556.femkg6zkxl6r2kdq@kamzik.brq.redhat.com>
+References: <20161213214522.25548-1-drjones@redhat.com>
+	<20161213214522.25548-4-drjones@redhat.com>
+	<20161215113706.5611c8a7@nial.brq.redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20161108095603.72301-6-pasic@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [RFC PATCH v2 5/8] migration/vmstate: renames in
- (load|save)_state
+In-Reply-To: <20161215113706.5611c8a7@nial.brq.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 03/11] hw/arm/virt: use
+ VirtMachineState.smp_cpus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,112 +25,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, Amit Shah <amit.shah@redhat.com>, Juan Quintela <quintela@redhat.com>, Guenther Hutzl <hutzl@linux.vnet.ibm.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: peter.maydell@linaro.org, ehabkost@redhat.com, mst@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, zhaoshenglong@huawei.com
 
-* Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
-> The vmstate_(load|save)_state start out with an a void *opaque pointing
-> to some struct, and manipulate one or more elements of one field within
-> that struct.
+On Thu, Dec 15, 2016 at 11:37:06AM +0100, Igor Mammedov wrote:
+> On Tue, 13 Dec 2016 22:45:14 +0100
+> Andrew Jones <drjones@redhat.com> wrote:
 > 
-> First the field within the struct is pinpointed as opaque + offset, then
-> if this is a pointer the pointer is dereferenced to obtain a pointer to
-> the first element of the vmstate field. Pointers to further elements if
-> any are calculated as first_element + i * element_size (where i is the
-> zero based index of the element in question).
-> 
-> Currently base_addr and addr is used as a variable name for the pointer
-> to the first element and the pointer to the current element being
-> processed. This is suboptimal because base_addr is somewhat
-> counter-intuitive (because obtained as base + offset) and both base_addr
-> and addr not very descriptive (that we have a pointer should be clear
-> from the fact that it is declared as a pointer).
-> 
-> Let make things easier to understand by renaming base_addr to first_elem
-> and addr to curr_elem. This has the additional benefit of harmonizing
-> with other names within the scope (n_elems, vmstate_n_elems).
-> 
-> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+> > Most places we need smp_cpus we use vms->smp_cpus already. This
+> > cleanup makes sure we do everywhere, preparing for the removal
+> > of the global smp_cpus someday.
+> I'm not sure it's good idea to make/have smp_cpus as ARM specific
+> machine field.
+> It should be MachineState.smp_cpus since it's applicable to all machines.
+> I also fail to see how this patch helps at all as in the end
+> VirtMachineState.smp_cpus should be converted to MachineState.smp_cpus
+> and we'd end up changing the same places twice with this patch.
+> I'd rather see conversion to MachineState.smp_cpus from the beginning.
+> So suggesting to drop this patch if from this series if it doesn't get
+> in the way of removing VirtGuestInfo.
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+All good points. Dropping this patch.
 
-> --
+Thanks,
+drew
+
 > 
-> This patch roots in the difficulties I faced when trying to figure out
-> the code in question. In the meanwhile I'm quite fine with the current
-> names because I have it already figured out (after a couple of months
-> not looking on this code however, who knows). Thus my main motivation
-> is making things easier for the next new guy, but if the old guys say
-> not worth it I can very well accept that too.
-> ---
->  migration/vmstate.c | 22 +++++++++++-----------
->  1 file changed, 11 insertions(+), 11 deletions(-)
 > 
-> diff --git a/migration/vmstate.c b/migration/vmstate.c
-> index 8767e40..a86fb7e 100644
-> --- a/migration/vmstate.c
-> +++ b/migration/vmstate.c
-> @@ -108,21 +108,21 @@ int vmstate_load_state(QEMUFile *f, const VMStateDescription *vmsd,
->               field->field_exists(opaque, version_id)) ||
->              (!field->field_exists &&
->               field->version_id <= version_id)) {
-> -            void *base_addr = vmstate_base_addr(opaque, field, true);
-> +            void *first_elem = vmstate_base_addr(opaque, field, true);
->              int i, n_elems = vmstate_n_elems(opaque, field);
->              int size = vmstate_size(opaque, field);
->  
->              for (i = 0; i < n_elems; i++) {
-> -                void *addr = base_addr + size * i;
-> +                void *curr_elem = first_elem + size * i;
->  
->                  if (field->flags & VMS_ARRAY_OF_POINTER) {
-> -                    addr = *(void **)addr;
-> +                    curr_elem = *(void **)curr_elem;
->                  }
->                  if (field->flags & VMS_STRUCT) {
-> -                    ret = vmstate_load_state(f, field->vmsd, addr,
-> +                    ret = vmstate_load_state(f, field->vmsd, curr_elem,
->                                               field->vmsd->version_id);
->                  } else {
-> -                    ret = field->info->get(f, addr, size);
-> +                    ret = field->info->get(f, curr_elem, size);
->  
->                  }
->                  if (ret >= 0) {
-> @@ -310,25 +310,25 @@ void vmstate_save_state(QEMUFile *f, const VMStateDescription *vmsd,
->      while (field->name) {
->          if (!field->field_exists ||
->              field->field_exists(opaque, vmsd->version_id)) {
-> -            void *base_addr = vmstate_base_addr(opaque, field, false);
-> +            void *first_elem = vmstate_base_addr(opaque, field, false);
->              int i, n_elems = vmstate_n_elems(opaque, field);
->              int size = vmstate_size(opaque, field);
->              int64_t old_offset, written_bytes;
->              QJSON *vmdesc_loop = vmdesc;
->  
->              for (i = 0; i < n_elems; i++) {
-> -                void *addr = base_addr + size * i;
-> +                void *curr_elem = first_elem + size * i;
->  
->                  vmsd_desc_field_start(vmsd, vmdesc_loop, field, i, n_elems);
->                  old_offset = qemu_ftell_fast(f);
-> -
->                  if (field->flags & VMS_ARRAY_OF_POINTER) {
-> -                    addr = *(void **)addr;
-> +                    assert(curr_elem);
-> +                    curr_elem = *(void **)curr_elem;
->                  }
->                  if (field->flags & VMS_STRUCT) {
-> -                    vmstate_save_state(f, field->vmsd, addr, vmdesc_loop);
-> +                    vmstate_save_state(f, field->vmsd, curr_elem, vmdesc_loop);
->                  } else {
-> -                    field->info->put(f, addr, size);
-> +                    field->info->put(f, curr_elem, size);
->                  }
->  
->                  written_bytes = qemu_ftell_fast(f) - old_offset;
-> -- 
-> 2.8.4
+> > Signed-off-by: Andrew Jones <drjones@redhat.com>
+> > ---
+> >  hw/arm/virt.c | 14 +++++++-------
+> >  1 file changed, 7 insertions(+), 7 deletions(-)
+> > 
+> > diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> > index 67c0abb30b5b..18aa3672739d 100644
+> > --- a/hw/arm/virt.c
+> > +++ b/hw/arm/virt.c
+> > @@ -583,7 +583,7 @@ static void create_gic(VirtMachineState *vms, qemu_irq *pic)
+> >  
+> >      gicdev = qdev_create(NULL, gictype);
+> >      qdev_prop_set_uint32(gicdev, "revision", type);
+> > -    qdev_prop_set_uint32(gicdev, "num-cpu", smp_cpus);
+> > +    qdev_prop_set_uint32(gicdev, "num-cpu", vms->smp_cpus);
+> >      /* Note that the num-irq property counts both internal and external
+> >       * interrupts; there are always 32 of the former (mandated by GIC spec).
+> >       */
+> > @@ -604,7 +604,7 @@ static void create_gic(VirtMachineState *vms, qemu_irq *pic)
+> >       * maintenance interrupt signal to the appropriate GIC PPI inputs,
+> >       * and the GIC's IRQ/FIQ/VIRQ/VFIQ interrupt outputs to the CPU's inputs.
+> >       */
+> > -    for (i = 0; i < smp_cpus; i++) {
+> > +    for (i = 0; i < vms->smp_cpus; i++) {
+> >          DeviceState *cpudev = DEVICE(qemu_get_cpu(i));
+> >          int ppibase = NUM_IRQS + i * GIC_INTERNAL + GIC_NR_SGIS;
+> >          int irq;
+> > @@ -629,7 +629,7 @@ static void create_gic(VirtMachineState *vms, qemu_irq *pic)
+> >                                                       + ARCH_GICV3_MAINT_IRQ));
+> >  
+> >          sysbus_connect_irq(gicbusdev, i, qdev_get_gpio_in(cpudev, ARM_CPU_IRQ));
+> > -        sysbus_connect_irq(gicbusdev, i + smp_cpus,
+> > +        sysbus_connect_irq(gicbusdev, i + vms->smp_cpus,
+> >                             qdev_get_gpio_in(cpudev, ARM_CPU_FIQ));
+> >          sysbus_connect_irq(gicbusdev, i + 2 * smp_cpus,
+>                                                  ^^^^^^^^
+> and other places in this file.
 > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> >                             qdev_get_gpio_in(cpudev, ARM_CPU_VIRQ));
+> > @@ -958,7 +958,7 @@ static void create_fw_cfg(const VirtMachineState *vms, AddressSpace *as)
+> >      char *nodename;
+> >  
+> >      fw_cfg = fw_cfg_init_mem_wide(base + 8, base, 8, base + 16, as);
+> > -    fw_cfg_add_i16(fw_cfg, FW_CFG_NB_CPUS, (uint16_t)smp_cpus);
+> > +    fw_cfg_add_i16(fw_cfg, FW_CFG_NB_CPUS, (uint16_t)vms->smp_cpus);
+> >  
+> >      nodename = g_strdup_printf("/fw-cfg@%" PRIx64, base);
+> >      qemu_fdt_add_subnode(vms->fdt, nodename);
+> > @@ -1362,7 +1362,7 @@ static void machvirt_init(MachineState *machine)
+> >          exit(1);
+> >      }
+> >  
+> > -    for (n = 0; n < smp_cpus; n++) {
+> > +    for (n = 0; n < vms->smp_cpus; n++) {
+> >          Object *cpuobj = object_new(typename);
+> >          if (!vmc->disallow_affinity_adjustment) {
+> >              /* Adjust MPIDR like 64-bit KVM hosts, which incorporate the
+> > @@ -1452,7 +1452,7 @@ static void machvirt_init(MachineState *machine)
+> >      create_fw_cfg(vms, &address_space_memory);
+> >      rom_set_fw(fw_cfg_find());
+> >  
+> > -    guest_info->smp_cpus = smp_cpus;
+> > +    guest_info->smp_cpus = vms->smp_cpus;
+> >      guest_info->fw_cfg = fw_cfg_find();
+> >      guest_info->memmap = vms->memmap;
+> >      guest_info->irqmap = vms->irqmap;
+> > @@ -1466,7 +1466,7 @@ static void machvirt_init(MachineState *machine)
+> >      vms->bootinfo.kernel_filename = machine->kernel_filename;
+> >      vms->bootinfo.kernel_cmdline = machine->kernel_cmdline;
+> >      vms->bootinfo.initrd_filename = machine->initrd_filename;
+> > -    vms->bootinfo.nb_cpus = smp_cpus;
+> > +    vms->bootinfo.nb_cpus = vms->smp_cpus;
+> >      vms->bootinfo.board_id = -1;
+> >      vms->bootinfo.loader_start = vms->memmap[VIRT_MEM].base;
+> >      vms->bootinfo.get_dtb = machvirt_dtb;
+> 
+> 
