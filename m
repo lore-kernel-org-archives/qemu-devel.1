@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45346)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49257)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cHUux-0003Lq-UX
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 07:13:48 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cHVAd-0000cq-Rv
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 07:30:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cHUuu-00088t-Pb
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 07:13:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53616)
+	(envelope-from <pbonzini@redhat.com>) id 1cHVAX-00089m-QW
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 07:29:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42068)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cHUuu-00088L-Hp
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 07:13:44 -0500
-References: <CA+scX6=9y4wDBWzXyqpGh9U__usKUa6sxwdc63iA8YRmpWFPqA@mail.gmail.com>
-	<20161214193107.GB20648@stefanha-x1.localdomain>
-	<CA+scX6=oc_eGteY8A0d8tuwzJFSu9M_6wnXBd5Tp=XGrg8FotQ@mail.gmail.com>
-	<20161215080452.GE26169@stefanha-x1.localdomain>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cHVAX-00088O-Kg
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 07:29:53 -0500
+References: <1481796182-12670-1-git-send-email-vlad.lungu@windriver.com>
+	<eee151e4-7cb6-eb26-a125-65757ec84e2e@redhat.com>
+	<8a50b7ac-84cf-1111-0361-b9541fa4e174@windriver.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <63cae630-b193-0074-8aac-68fef47ec691@redhat.com>
-Date: Thu, 15 Dec 2016 13:13:37 +0100
+Message-ID: <ff53b6f1-a373-a4ff-6144-a171151147b2@redhat.com>
+Date: Thu, 15 Dec 2016 13:29:48 +0100
 MIME-Version: 1.0
-In-Reply-To: <20161215080452.GE26169@stefanha-x1.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="SkcbtHCLl1iwhpqpc45b7wsRCESjc7DAM"
-Subject: Re: [Qemu-devel] Lock contention in QEMU
+In-Reply-To: <8a50b7ac-84cf-1111-0361-b9541fa4e174@windriver.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCHv2] multiboot: copy the cmdline verbatim,
+ unescape module strings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,68 +29,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>, Weiwei Jia <harrynjit@gmail.com>
-Cc: qemu-devel@nongnu.org, famz@redhat.com
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---SkcbtHCLl1iwhpqpc45b7wsRCESjc7DAM
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: Stefan Hajnoczi <stefanha@gmail.com>, Weiwei Jia <harrynjit@gmail.com>
-Cc: qemu-devel@nongnu.org, famz@redhat.com
-Message-ID: <63cae630-b193-0074-8aac-68fef47ec691@redhat.com>
-Subject: Re: Lock contention in QEMU
-References: <CA+scX6=9y4wDBWzXyqpGh9U__usKUa6sxwdc63iA8YRmpWFPqA@mail.gmail.com>
- <20161214193107.GB20648@stefanha-x1.localdomain>
- <CA+scX6=oc_eGteY8A0d8tuwzJFSu9M_6wnXBd5Tp=XGrg8FotQ@mail.gmail.com>
- <20161215080452.GE26169@stefanha-x1.localdomain>
-In-Reply-To: <20161215080452.GE26169@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
+To: Vlad Lungu <vlad.lungu@windriver.com>, qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com, rth@twiddle.net
 
 
 
-On 15/12/2016 09:04, Stefan Hajnoczi wrote:
->> Does this feature only work for VirtIO? Does it work for SCSI or IDE?
-> This only works for virtio-blk and virtio-scsi.  The virtio-scsi
-> dataplane support is more recent and I don't remember if it is complete=
-=2E
-> I've CCed Fam and Paolo who worked on virtio-scsi dataplane.
->=20
-> Now that you have mentioned that you aren't using virtio devices, there=
+On 15/12/2016 12:34, Vlad Lungu wrote:
+> 
+> 
+> On 12/15/2016 12:56 PM, Paolo Bonzini wrote:
+>>
+>> On 15/12/2016 11:03, Vlad Lungu wrote:
+>>>  
+>>>      if (initrd_filename) {
+>>> -        char *next_initrd, not_last;
+>>> +        char *next_initrd, not_last, tmpbuf[strlen(initrd_filename) + 1];
+>>>  
+>>>          mbs.offset_mods = mbs.mb_buf_size;
+>>>  
+>>> @@ -299,22 +299,24 @@ int load_multiboot(FWCfgState *fw_cfg,
+>>>              next_initrd = (char *)get_opt_value(NULL, 0, initrd_filename);
+>>>              not_last = *next_initrd;
+>>>              *next_initrd = '\0';
+>>> +            /* Unescape the filename + eventual arguments */
+>>> +            get_opt_value(tmpbuf, strlen(initrd_filename) + 1, initrd_filename);
+>> No need to call get_opt_value twice; you can call it once since you have
+>> declared tmpbuf to hold the entire size of initrd_filename.
+> So what you're saying is to go with
+> 
+>              next_initrd = (char *)get_opt_value(tmpbuf, sizeof(tmpbuf), initrd_filename);
+> 
+> and delete the second call to get_opt_value().
+> 
+> Is that right?
 
-> is another source of lock contention that you will encounter.  I/O
-> request submission takes place in the vcpu thread when ioeventfd is not=
-
-> used.  Only virtio uses ioeventfd so your current QEMU configuration is=
-
-> unable to let the vcpu continue execution during I/O request submission=
-=2E
->=20
-> If you care about performance then using virtio devices is probably the=
-
-> best choice.  Try comparing against virtio-scsi dataplane - you should
-> see a lot less jitter.
-
-Yes, virtio-scsi dataplane is complete.
+Yes, thanks!
 
 Paolo
-
-
---SkcbtHCLl1iwhpqpc45b7wsRCESjc7DAM
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQEcBAEBCAAGBQJYUojxAAoJEL/70l94x66DtAIH/Aj36NabGI5n5ZXs1e38UDRd
-gRbegzfromDZROdElYuoscjPRVBUEVNmTW/JU0qN+p9tbl34Vsgx/13OTN/uQOH9
-ooDD8H0dQQa/6P+uG81JyNgxqD5sFSz+TS7jXorYODIzC+6xWcHlP2BqO2NnbKpO
-RiczHIgGSzQDDugjQV4PGxXxh/XfDVLafr27M/DDTZnB0mBTcQAdsfSyMQHDvNHf
-4AOWH8IoUmAGxVSS4wWdjEItuL/KsGCEjYPYA5tjaRuI81dmilDpXXCdf7KL3NlP
-j24Hey50UYBSHeKv+/exkUboisT+Imp0Ctva/pmLaMHwOHBMhoU9Jf8zxMWTBdU=
-=Q3lF
------END PGP SIGNATURE-----
-
---SkcbtHCLl1iwhpqpc45b7wsRCESjc7DAM--
