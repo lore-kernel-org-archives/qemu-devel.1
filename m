@@ -1,35 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43701)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43444)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cHKCW-0005Fw-Fu
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:47:15 -0500
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cHKCN-0004vn-KN
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:47:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cHKCT-0001mu-Cl
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:47:12 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44988)
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cHKCK-0001fh-38
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:47:03 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51457)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1cHKCT-0001lx-2I
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:47:09 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	id 1cHKCJ-0001ep-Po
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:46:59 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	uBF0jnk4130283
-	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 19:47:08 -0500
-Received: from e37.co.us.ibm.com (e37.co.us.ibm.com [32.97.110.158])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 27bdku13k5-1
+	uBF0hbAZ047977
+	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 19:46:58 -0500
+Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 27bdm3s40c-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 19:47:07 -0500
+	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 19:46:58 -0500
 Received: from localhost
-	by e37.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Wed, 14 Dec 2016 17:47:07 -0700
+	Wed, 14 Dec 2016 17:46:57 -0700
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Wed, 14 Dec 2016 18:45:00 -0600
+Date: Wed, 14 Dec 2016 18:44:54 -0600
 In-Reply-To: <1481762701-4587-1-git-send-email-mdroth@linux.vnet.ibm.com>
 References: <1481762701-4587-1-git-send-email-mdroth@linux.vnet.ibm.com>
-Message-Id: <1481762701-4587-67-git-send-email-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 66/67] msmouse: Fix segfault caused by free the
- chr before chardev cleanup.
+Message-Id: <1481762701-4587-61-git-send-email-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 60/67] pci-assign: sync MSI/MSI-X cap and table
+ with PCIDevice
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,50 +39,75 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Lin Ma <lma@suse.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-stable@nongnu.org, Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-From: Lin Ma <lma@suse.com>
+From: Peter Xu <peterx@redhat.com>
 
-Segfault happens when leaving qemu with msmouse backend:
+Since commit e1d4fb2d ("kvm-irqchip: x86: add msi route notify fn"),
+kvm_irqchip_add_msi_route() starts to use pci_get_msi_message() to fetch
+MSI info. This requires that we setup MSI related fields in PCIDevice.
+For most devices, that won't be a problem, as long as we are using
+general interfaces like msi_init()/msix_init().
 
- #0  0x00007fa8526ac975 in raise () at /lib64/libc.so.6
- #1  0x00007fa8526add8a in abort () at /lib64/libc.so.6
- #2  0x0000558be78846ab in error_exit (err=16, msg=0x558be799da10 ...
- #3  0x0000558be7884717 in qemu_mutex_destroy (mutex=0x558be93be750) at ...
- #4  0x0000558be7549951 in qemu_chr_free_common (chr=0x558be93be750) at ...
- #5  0x0000558be754999c in qemu_chr_free (chr=0x558be93be750) at ...
- #6  0x0000558be7549a20 in qemu_chr_delete (chr=0x558be93be750) at ...
- #7  0x0000558be754a8ef in qemu_chr_cleanup () at qemu-char.c:4643
- #8  0x0000558be755843e in main (argc=5, argv=0x7ffe925d7118, ...
+However, for pci-assign devices, MSI/MSI-X is treated differently - PCI
+assign devices are maintaining its own MSI table and cap information in
+AssignedDevice struct. however that's not synced up with PCIDevice's
+fields. That will leads to pci_get_msi_message() failed to find correct
+MSI capability, even with an NULL msix_table.
 
-The chr was freed by msmouse close callback before chardev cleanup,
-Then qemu_mutex_destroy triggered raise().
+A quick fix is to sync up the two places: both the capability bits and
+table address for MSI/MSI-X.
 
-Because freeing chr is handled by qemu_chr_free_common, Remove the free from
-msmouse_chr_close to avoid double free.
-
-Fixes: c1111a24a3358ecd2f17be7c8b117cfe8bc5e5f8
+Reported-by: Changlimin <changlimin@h3c.com>
+Tested-by: Changlimin <changlimin@h3c.com>
 Cc: qemu-stable@nongnu.org
-Signed-off-by: Lin Ma <lma@suse.com>
-Message-Id: <20160915143158.4796-1-lma@suse.com>
+Fixes: e1d4fb2d ("kvm-irqchip: x86: add msi route notify fn")
+Signed-off-by: Peter Xu <peterx@redhat.com>
+
+Message-Id: <1480042522-16551-1-git-send-email-peterx@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-(cherry picked from commit 9e14037f05e99ca3b8a33d8be9a2a636bbf09326)
+(cherry picked from commit 64e184e2608d3c93dda1bba8ae6dc2185b5228fb)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- backends/msmouse.c | 1 -
- 1 file changed, 1 deletion(-)
+ hw/i386/kvm/pci-assign.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/backends/msmouse.c b/backends/msmouse.c
-index aceb6dc..85d08f7 100644
---- a/backends/msmouse.c
-+++ b/backends/msmouse.c
-@@ -139,7 +139,6 @@ static void msmouse_chr_close (struct CharDriverState *chr)
+diff --git a/hw/i386/kvm/pci-assign.c b/hw/i386/kvm/pci-assign.c
+index 8238fbc..87dcbdd 100644
+--- a/hw/i386/kvm/pci-assign.c
++++ b/hw/i386/kvm/pci-assign.c
+@@ -1251,6 +1251,7 @@ static int assigned_device_pci_cap_init(PCIDevice *pci_dev, Error **errp)
+             error_propagate(errp, local_err);
+             return -ENOTSUP;
+         }
++        dev->dev.cap_present |= QEMU_PCI_CAP_MSI;
+         dev->cap.available |= ASSIGNED_DEVICE_CAP_MSI;
+         /* Only 32-bit/no-mask currently supported */
+         ret = pci_add_capability2(pci_dev, PCI_CAP_ID_MSI, pos, 10,
+@@ -1285,6 +1286,7 @@ static int assigned_device_pci_cap_init(PCIDevice *pci_dev, Error **errp)
+             error_propagate(errp, local_err);
+             return -ENOTSUP;
+         }
++        dev->dev.cap_present |= QEMU_PCI_CAP_MSIX;
+         dev->cap.available |= ASSIGNED_DEVICE_CAP_MSIX;
+         ret = pci_add_capability2(pci_dev, PCI_CAP_ID_MSIX, pos, 12,
+                                   &local_err);
+@@ -1648,6 +1650,7 @@ static void assigned_dev_register_msix_mmio(AssignedDevice *dev, Error **errp)
+         dev->msix_table = NULL;
+         return;
+     }
++    dev->dev.msix_table = (uint8_t *)dev->msix_table;
  
-     qemu_input_handler_unregister(mouse->hs);
-     g_free(mouse);
--    g_free(chr);
+     assigned_dev_msix_reset(dev);
+ 
+@@ -1665,6 +1668,7 @@ static void assigned_dev_unregister_msix_mmio(AssignedDevice *dev)
+         error_report("error unmapping msix_table! %s", strerror(errno));
+     }
+     dev->msix_table = NULL;
++    dev->dev.msix_table = NULL;
  }
  
- static QemuInputHandler msmouse_handler = {
+ static const VMStateDescription vmstate_assigned_device = {
 -- 
 1.9.1
