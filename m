@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38738)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38820)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cHSit-0006JP-MG
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 04:53:12 -0500
+	(envelope-from <stefanha@gmail.com>) id 1cHSjN-00081e-KX
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 04:53:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cHSis-0000vP-NJ
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 04:53:11 -0500
-Date: Thu, 15 Dec 2016 10:53:00 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20161215105300.08136939@nial.brq.redhat.com>
-In-Reply-To: <20161213214522.25548-2-drjones@redhat.com>
-References: <20161213214522.25548-1-drjones@redhat.com>
-	<20161213214522.25548-2-drjones@redhat.com>
+	(envelope-from <stefanha@gmail.com>) id 1cHSjJ-00012f-5x
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 04:53:41 -0500
+Received: from mail-wj0-f196.google.com ([209.85.210.196]:35117)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cHSjI-00012N-Vv
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 04:53:37 -0500
+Received: by mail-wj0-f196.google.com with SMTP id he10so8792899wjc.2
+	for <qemu-devel@nongnu.org>; Thu, 15 Dec 2016 01:53:36 -0800 (PST)
+Date: Thu, 15 Dec 2016 09:52:34 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20161215095234.GC2762@stefanha-x1.localdomain>
+References: <20161215065041.5A9C310200DE@webmail.sinamail.sina.com.cn>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 01/11] hw/arm/virt: parameter passing
- cleanups
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="5QAgd0e35j3NYeGe"
+Content-Disposition: inline
+In-Reply-To: <20161215065041.5A9C310200DE@webmail.sinamail.sina.com.cn>
+Subject: Re: [Qemu-devel] question about qemu IO process
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,100 +29,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jones <drjones@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, zhaoshenglong@huawei.com, mst@redhat.com, ehabkost@redhat.com
+To: ousuju@sina.com
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
-On Tue, 13 Dec 2016 22:45:12 +0100
-Andrew Jones <drjones@redhat.com> wrote:
 
-> Some simple cleanups made possible by "hw/arm/virt: Merge
-> VirtBoardInfo and VirtMachineState"
-> 
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+--5QAgd0e35j3NYeGe
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> ---
->  hw/arm/virt.c | 19 +++++++++----------
->  1 file changed, 9 insertions(+), 10 deletions(-)
-> 
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index 7eec50a82494..d451bc4f6b9b 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -570,10 +570,10 @@ static void create_v2m(VirtMachineState *vms, qemu_irq *pic)
->      fdt_add_v2m_gic_node(vms);
->  }
->  
-> -static void create_gic(VirtMachineState *vms, qemu_irq *pic, int type,
-> -                       bool secure, bool no_its)
-> +static void create_gic(VirtMachineState *vms, qemu_irq *pic, int type)
->  {
->      /* We create a standalone GIC */
-> +    VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
->      DeviceState *gicdev;
->      SysBusDevice *gicbusdev;
->      const char *gictype;
-> @@ -589,7 +589,7 @@ static void create_gic(VirtMachineState *vms, qemu_irq *pic, int type,
->       */
->      qdev_prop_set_uint32(gicdev, "num-irq", NUM_IRQS + 32);
->      if (!kvm_irqchip_in_kernel()) {
-> -        qdev_prop_set_bit(gicdev, "has-security-extensions", secure);
-> +        qdev_prop_set_bit(gicdev, "has-security-extensions", vms->secure);
->      }
->      qdev_init_nofail(gicdev);
->      gicbusdev = SYS_BUS_DEVICE(gicdev);
-> @@ -643,7 +643,7 @@ static void create_gic(VirtMachineState *vms, qemu_irq *pic, int type,
->  
->      fdt_add_gic_node(vms, type);
->  
-> -    if (type == 3 && !no_its) {
-> +    if (type == 3 && !vmc->no_its) {
->          create_its(vms, gicdev);
->      } else if (type == 2) {
->          create_v2m(vms, pic);
-> @@ -1005,8 +1005,7 @@ static void create_pcie_irq_map(const VirtMachineState *vms,
->                             0x7           /* PCI irq */);
->  }
->  
-> -static void create_pcie(const VirtMachineState *vms, qemu_irq *pic,
-> -                        bool use_highmem)
-> +static void create_pcie(const VirtMachineState *vms, qemu_irq *pic)
->  {
->      hwaddr base_mmio = vms->memmap[VIRT_PCIE_MMIO].base;
->      hwaddr size_mmio = vms->memmap[VIRT_PCIE_MMIO].size;
-> @@ -1049,7 +1048,7 @@ static void create_pcie(const VirtMachineState *vms, qemu_irq *pic,
->                               mmio_reg, base_mmio, size_mmio);
->      memory_region_add_subregion(get_system_memory(), base_mmio, mmio_alias);
->  
-> -    if (use_highmem) {
-> +    if (vms->highmem) {
->          /* Map high MMIO space */
->          MemoryRegion *high_mmio_alias = g_new0(MemoryRegion, 1);
->  
-> @@ -1098,7 +1097,7 @@ static void create_pcie(const VirtMachineState *vms, qemu_irq *pic,
->      qemu_fdt_setprop_sized_cells(vms->fdt, nodename, "reg",
->                                   2, base_ecam, 2, size_ecam);
->  
-> -    if (use_highmem) {
-> +    if (vms->highmem) {
->          qemu_fdt_setprop_sized_cells(vms->fdt, nodename, "ranges",
->                                       1, FDT_PCI_RANGE_IOPORT, 2, 0,
->                                       2, base_pio, 2, size_pio,
-> @@ -1428,7 +1427,7 @@ static void machvirt_init(MachineState *machine)
->  
->      create_flash(vms, sysmem, secure_sysmem ? secure_sysmem : sysmem);
->  
-> -    create_gic(vms, pic, gic_version, vms->secure, vmc->no_its);
-> +    create_gic(vms, pic, gic_version);
->  
->      fdt_add_pmu_nodes(vms, gic_version);
->  
-> @@ -1441,7 +1440,7 @@ static void machvirt_init(MachineState *machine)
->  
->      create_rtc(vms, pic);
->  
-> -    create_pcie(vms, pic, vms->highmem);
-> +    create_pcie(vms, pic);
->  
->      create_gpio(vms, pic);
->  
+On Thu, Dec 15, 2016 at 02:50:41PM +0800, ousuju@sina.com wrote:
+> I recently try to figure out the the whole IO process in qemu, I have tra=
+ced most parts of this process, but I'm still confused about how guest OS n=
+otify qemu to handle virtqueue
+> I traced to virtio_queue_host_notifier_read -> event_notifier_test_and_cl=
+ear, and qemu will read e->rfd, so I assumed that some part of code will wr=
+ite to this descriptor, to notify qemu
+> Unfortunatelly, I have set some breakpoints but noting catched yet.
+> Could someone point it out for me which code write to this descriptor? Or=
+ show me the web link about this design?
+
+"The KVM kernel module has a feature known as ioeventfd for taking an
+eventfd and hooking it up to a particular guest I/O exit. QEMU userspace
+registers an ioeventfd for the VIRTIO_PCI_QUEUE_NOTIFY hardware register
+access which kicks the virtqueue."
+
+=46rom http://blog.vmsplice.net/2011/09/qemu-internals-vhost-architecture.h=
+tml
+(careful the rest of the post is about vhost, not QEMU)
+
+http://blog.allenx.org/2015/07/05/kvm-irqfd-and-ioeventfd
+
+--5QAgd0e35j3NYeGe
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJYUmfiAAoJEJykq7OBq3PIHtYH/jiiPgy/8Op19AlUhT1urKyF
+askINpvH0itaLSyVGm70rf+Ie+5hR05YyBiWpXejNlIiqyh1ndgr+FVmipzA8TqX
+dz9O6DcLd4Qo7NN7fjCSW+4xXSdEzEJNZekR5pDxl9DUw/yafzEblloSzKlASSDx
+p9oHnzijRAgZUXQG1Ip7tg8yyVpM7YCCZkOgeaUI7mZH5DtiKctgU6+NP+WY6V3v
+iLm8IY5feuNjMr9cAfHwCArvZ396qdsz/Hz0TYRDPYfBoOFY/G+iIZLT46Xgvcru
+7+QEAnPeJLTLA2p0XodSpWkgYu4dst5QWU2qaIZMoGxbzDU/RIikty5j91lUkv4=
+=Ygdb
+-----END PGP SIGNATURE-----
+
+--5QAgd0e35j3NYeGe--
