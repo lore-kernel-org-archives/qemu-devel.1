@@ -1,24 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51025)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51916)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cHYPH-0006oI-Bm
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 10:57:20 -0500
+	(envelope-from <bounces@canonical.com>) id 1cHYRc-00064H-E0
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 10:59:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cHYPE-0003uP-5x
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 10:57:19 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41443)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cHYPD-0003tB-T8
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 10:57:16 -0500
-Date: Thu, 15 Dec 2016 17:57:13 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20161215175533-mutt-send-email-mst@kernel.org>
-References: <1481742422-15969-1-git-send-email-ashijeetacharya@gmail.com>
+	(envelope-from <bounces@canonical.com>) id 1cHYRZ-00056K-BJ
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 10:59:44 -0500
+Received: from indium.canonical.com ([91.189.90.7]:34289)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cHYRZ-000566-6G
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 10:59:41 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cHYRX-0000Oo-NS
+	for <qemu-devel@nongnu.org>; Thu, 15 Dec 2016 15:59:39 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id AFE4A2E80C4
+	for <qemu-devel@nongnu.org>; Thu, 15 Dec 2016 15:59:39 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1481742422-15969-1-git-send-email-ashijeetacharya@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH 0/3] Introduce a new --only-migratable
- option
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 15 Dec 2016 15:48:57 -0000
+From: Thomas Huth <691424@bugs.launchpad.net>
+Reply-To: Bug 691424 <691424@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20101217063430.31066.66219.malonedeb@palladium.canonical.com>
+Message-Id: <20161215154857.28028.5664.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 691424] Re: qemu/kvm SDL over ssh -X broken
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,61 +36,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ashijeet Acharya <ashijeetacharya@gmail.com>
-Cc: dgilbert@redhat.com, jsnow@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, kwolf@redhat.com, armbru@redhat.com, quintela@redhat.com, marcandre.lureau@redhat.com, groug@kaod.org, aneesh.kumar@linux.vnet.ibm.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-On Thu, Dec 15, 2016 at 12:36:59AM +0530, Ashijeet Acharya wrote:
-> This series adds a new command line option "--only-migratable" which will only
-> allow addition of those devices to a QEMU instance which are migratable and do
-> not abruptly fail QEMU after migration.
-> 
-> Patch 1 adds the new option "-only-migratable".
-> 
-> Patch 2 adds compatibility for various "device adding" options for both via
-> command line and hotplug methods.
-> 
-> Patch 3 handles the special case of devices which become unmigratable dynamically
-> by making call to "migrate_add_blocker". Here we fail the particular action of the
-> device which results in an unmigratable VM.
-> Eg: 9pfs fails to mount the filesystem.
+Can you still reproduce this issue with the latest version of QEMU, with
+the latest version of SDL?
 
-I guess that's possible but wouldn't it be cleaner to add introspection
-so management can find out what can migrate?
-Further, what should be removed (e.g. by hotplug) if you do want
-to migrate.
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
-As it is, you get a failure but no easy way for tools to
-find out what was the failure reason.
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/691424
 
-> Ashijeet Acharya (3):
->   migration: Add a new option to enable only-migratable
->   migration: Allow "device add" options to only add migratable devices
->   migration: disallow migrate_add_blocker during migration
-> 
->  block/qcow.c                  | 11 ++++++++++-
->  block/vdi.c                   | 11 ++++++++++-
->  block/vhdx.c                  | 20 ++++++++++++++------
->  block/vmdk.c                  | 12 +++++++++++-
->  block/vpc.c                   | 15 ++++++++++++---
->  block/vvfat.c                 | 24 ++++++++++++++++--------
->  hw/9pfs/9p.c                  | 22 ++++++++++++++++++----
->  hw/display/virtio-gpu.c       | 35 ++++++++++++++++++++++-------------
->  hw/intc/arm_gic_kvm.c         | 20 ++++++++++++++------
->  hw/intc/arm_gicv3_its_kvm.c   | 21 ++++++++++++++-------
->  hw/intc/arm_gicv3_kvm.c       | 22 +++++++++++++++-------
->  hw/misc/ivshmem.c             | 17 +++++++++++++----
->  hw/scsi/vhost-scsi.c          | 27 +++++++++++++++++++++------
->  hw/usb/bus.c                  | 15 +++++++++++++++
->  hw/virtio/vhost.c             | 11 ++++++++++-
->  include/migration/migration.h |  9 ++++++++-
->  migration/migration.c         | 42 ++++++++++++++++++++++++++++++++++++++++--
->  qdev-monitor.c                |  9 +++++++++
->  qemu-options.hx               | 10 ++++++++++
->  stubs/migr-blocker.c          |  3 ++-
->  target-i386/kvm.c             | 19 ++++++++++++++++---
->  vl.c                          |  4 ++++
->  22 files changed, 304 insertions(+), 75 deletions(-)
-> 
-> -- 
-> 2.6.2
+Title:
+  qemu/kvm SDL over ssh -X broken
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  qemu/kvm by default uses SDL to render the output of its emulated VGA gra=
+phics.
+  This is broken over ssh -X since quite a while.
+  The only workaround I know, is to use qemu -vnc :0
+  and connect using vncviewer
+
+  =
+
+  How To Reproduce:
+  1. zypper in qemu
+  2. ssh -X localhost qemu -cdrom ANYISOFILE
+
+  Actual Results:
+  qemu hangs in an endless loop on the BIOS display screen
+
+  Expected Results:
+  should boot up the iso as 0.10 versions did
+
+  Reproducible: Always
+
+  =
+
+  this is what broke it:
+  $ git bisect bad
+  c18a2c360e3100bbd71162cf922dcd8c429a8b71 is first bad commit
+  commit c18a2c360e3100bbd71162cf922dcd8c429a8b71
+  Author: Stefano Stabellini <stefano.stabellini@eu.citrix.com>
+  Date:   Wed Jun 24 11:58:25 2009 +0100
+
+      sdl zooming
+
+      Hi all,
+      this patch implements zooming capabilities for the sdl interface.
+      A new sdl_zoom_blit function is added that is able to scale and blit a
+      portion of a surface into another.
+      This way we can enable SDL_RESIZABLE and have a real_screen surface w=
+ith
+      a different size than the guest surface and let sdl_zoom_blit take ca=
+re
+      of the problem.
+
+      Signed-off-by: Stefano Stabellini <stefano.stabellini@eu.citrix.com>
+      Signed-off-by: Anthony Liguori <aliguori@us.ibm.com>
+
+  :100644 100644 a06c9bfc22cc6de1c6e5e9068d6bf59d89613767 f8dc5065dd27010bf=
+dbb6bcfb0c6e3af25024cdb M      Makefile
+  :100644 100644 417217582363a87ee67e746ba798e285a64b6cdc 35183399f65de6f50=
+f3baa4767ab7d4d11d45bca M      console.h
+  :100644 100644 178b5532b8d9dd2194a8662fbfdcd49b4bc04222 d81399e51276e1c97=
+fa1f7272ef16ea4c312b51b M      sdl.c
+  :000000 100644 0000000000000000000000000000000000000000 56d3604fc3d79e4cc=
+4622be8437c78bf70075da3 A      sdl_zoom.c
+  :000000 100644 0000000000000000000000000000000000000000 33dc63408b43a37fd=
+6b1acde3fa62b1a51315e75 A      sdl_zoom.h
+  :000000 100644 0000000000000000000000000000000000000000 64bbca849bd3af678=
+c2259b4d8cc0e48c6a6b43c A      sdl_zoom_template.h
+
+  =
+
+  This problem occurs on both Debian and openSUSE.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/691424/+subscriptions
