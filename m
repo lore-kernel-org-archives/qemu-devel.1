@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39907)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45346)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1cHUds-0003Ef-Uq
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 06:56:10 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cHUux-0003Lq-UX
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 07:13:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1cHUdo-0007gU-WE
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 06:56:09 -0500
-Date: Thu, 15 Dec 2016 12:55:56 +0100
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20161215115556.femkg6zkxl6r2kdq@kamzik.brq.redhat.com>
-References: <20161213214522.25548-1-drjones@redhat.com>
-	<20161213214522.25548-4-drjones@redhat.com>
-	<20161215113706.5611c8a7@nial.brq.redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1cHUuu-00088t-Pb
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 07:13:47 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53616)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cHUuu-00088L-Hp
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 07:13:44 -0500
+References: <CA+scX6=9y4wDBWzXyqpGh9U__usKUa6sxwdc63iA8YRmpWFPqA@mail.gmail.com>
+	<20161214193107.GB20648@stefanha-x1.localdomain>
+	<CA+scX6=oc_eGteY8A0d8tuwzJFSu9M_6wnXBd5Tp=XGrg8FotQ@mail.gmail.com>
+	<20161215080452.GE26169@stefanha-x1.localdomain>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <63cae630-b193-0074-8aac-68fef47ec691@redhat.com>
+Date: Thu, 15 Dec 2016 13:13:37 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20161215113706.5611c8a7@nial.brq.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 03/11] hw/arm/virt: use
- VirtMachineState.smp_cpus
+In-Reply-To: <20161215080452.GE26169@stefanha-x1.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="SkcbtHCLl1iwhpqpc45b7wsRCESjc7DAM"
+Subject: Re: [Qemu-devel] Lock contention in QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,107 +30,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: peter.maydell@linaro.org, ehabkost@redhat.com, mst@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, zhaoshenglong@huawei.com
+To: Stefan Hajnoczi <stefanha@gmail.com>, Weiwei Jia <harrynjit@gmail.com>
+Cc: qemu-devel@nongnu.org, famz@redhat.com
 
-On Thu, Dec 15, 2016 at 11:37:06AM +0100, Igor Mammedov wrote:
-> On Tue, 13 Dec 2016 22:45:14 +0100
-> Andrew Jones <drjones@redhat.com> wrote:
-> 
-> > Most places we need smp_cpus we use vms->smp_cpus already. This
-> > cleanup makes sure we do everywhere, preparing for the removal
-> > of the global smp_cpus someday.
-> I'm not sure it's good idea to make/have smp_cpus as ARM specific
-> machine field.
-> It should be MachineState.smp_cpus since it's applicable to all machines.
-> I also fail to see how this patch helps at all as in the end
-> VirtMachineState.smp_cpus should be converted to MachineState.smp_cpus
-> and we'd end up changing the same places twice with this patch.
-> I'd rather see conversion to MachineState.smp_cpus from the beginning.
-> So suggesting to drop this patch if from this series if it doesn't get
-> in the way of removing VirtGuestInfo.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--SkcbtHCLl1iwhpqpc45b7wsRCESjc7DAM
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>, Weiwei Jia <harrynjit@gmail.com>
+Cc: qemu-devel@nongnu.org, famz@redhat.com
+Message-ID: <63cae630-b193-0074-8aac-68fef47ec691@redhat.com>
+Subject: Re: Lock contention in QEMU
+References: <CA+scX6=9y4wDBWzXyqpGh9U__usKUa6sxwdc63iA8YRmpWFPqA@mail.gmail.com>
+ <20161214193107.GB20648@stefanha-x1.localdomain>
+ <CA+scX6=oc_eGteY8A0d8tuwzJFSu9M_6wnXBd5Tp=XGrg8FotQ@mail.gmail.com>
+ <20161215080452.GE26169@stefanha-x1.localdomain>
+In-Reply-To: <20161215080452.GE26169@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
 
-All good points. Dropping this patch.
 
-Thanks,
-drew
 
-> 
-> 
-> > Signed-off-by: Andrew Jones <drjones@redhat.com>
-> > ---
-> >  hw/arm/virt.c | 14 +++++++-------
-> >  1 file changed, 7 insertions(+), 7 deletions(-)
-> > 
-> > diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> > index 67c0abb30b5b..18aa3672739d 100644
-> > --- a/hw/arm/virt.c
-> > +++ b/hw/arm/virt.c
-> > @@ -583,7 +583,7 @@ static void create_gic(VirtMachineState *vms, qemu_irq *pic)
-> >  
-> >      gicdev = qdev_create(NULL, gictype);
-> >      qdev_prop_set_uint32(gicdev, "revision", type);
-> > -    qdev_prop_set_uint32(gicdev, "num-cpu", smp_cpus);
-> > +    qdev_prop_set_uint32(gicdev, "num-cpu", vms->smp_cpus);
-> >      /* Note that the num-irq property counts both internal and external
-> >       * interrupts; there are always 32 of the former (mandated by GIC spec).
-> >       */
-> > @@ -604,7 +604,7 @@ static void create_gic(VirtMachineState *vms, qemu_irq *pic)
-> >       * maintenance interrupt signal to the appropriate GIC PPI inputs,
-> >       * and the GIC's IRQ/FIQ/VIRQ/VFIQ interrupt outputs to the CPU's inputs.
-> >       */
-> > -    for (i = 0; i < smp_cpus; i++) {
-> > +    for (i = 0; i < vms->smp_cpus; i++) {
-> >          DeviceState *cpudev = DEVICE(qemu_get_cpu(i));
-> >          int ppibase = NUM_IRQS + i * GIC_INTERNAL + GIC_NR_SGIS;
-> >          int irq;
-> > @@ -629,7 +629,7 @@ static void create_gic(VirtMachineState *vms, qemu_irq *pic)
-> >                                                       + ARCH_GICV3_MAINT_IRQ));
-> >  
-> >          sysbus_connect_irq(gicbusdev, i, qdev_get_gpio_in(cpudev, ARM_CPU_IRQ));
-> > -        sysbus_connect_irq(gicbusdev, i + smp_cpus,
-> > +        sysbus_connect_irq(gicbusdev, i + vms->smp_cpus,
-> >                             qdev_get_gpio_in(cpudev, ARM_CPU_FIQ));
-> >          sysbus_connect_irq(gicbusdev, i + 2 * smp_cpus,
->                                                  ^^^^^^^^
-> and other places in this file.
-> 
-> >                             qdev_get_gpio_in(cpudev, ARM_CPU_VIRQ));
-> > @@ -958,7 +958,7 @@ static void create_fw_cfg(const VirtMachineState *vms, AddressSpace *as)
-> >      char *nodename;
-> >  
-> >      fw_cfg = fw_cfg_init_mem_wide(base + 8, base, 8, base + 16, as);
-> > -    fw_cfg_add_i16(fw_cfg, FW_CFG_NB_CPUS, (uint16_t)smp_cpus);
-> > +    fw_cfg_add_i16(fw_cfg, FW_CFG_NB_CPUS, (uint16_t)vms->smp_cpus);
-> >  
-> >      nodename = g_strdup_printf("/fw-cfg@%" PRIx64, base);
-> >      qemu_fdt_add_subnode(vms->fdt, nodename);
-> > @@ -1362,7 +1362,7 @@ static void machvirt_init(MachineState *machine)
-> >          exit(1);
-> >      }
-> >  
-> > -    for (n = 0; n < smp_cpus; n++) {
-> > +    for (n = 0; n < vms->smp_cpus; n++) {
-> >          Object *cpuobj = object_new(typename);
-> >          if (!vmc->disallow_affinity_adjustment) {
-> >              /* Adjust MPIDR like 64-bit KVM hosts, which incorporate the
-> > @@ -1452,7 +1452,7 @@ static void machvirt_init(MachineState *machine)
-> >      create_fw_cfg(vms, &address_space_memory);
-> >      rom_set_fw(fw_cfg_find());
-> >  
-> > -    guest_info->smp_cpus = smp_cpus;
-> > +    guest_info->smp_cpus = vms->smp_cpus;
-> >      guest_info->fw_cfg = fw_cfg_find();
-> >      guest_info->memmap = vms->memmap;
-> >      guest_info->irqmap = vms->irqmap;
-> > @@ -1466,7 +1466,7 @@ static void machvirt_init(MachineState *machine)
-> >      vms->bootinfo.kernel_filename = machine->kernel_filename;
-> >      vms->bootinfo.kernel_cmdline = machine->kernel_cmdline;
-> >      vms->bootinfo.initrd_filename = machine->initrd_filename;
-> > -    vms->bootinfo.nb_cpus = smp_cpus;
-> > +    vms->bootinfo.nb_cpus = vms->smp_cpus;
-> >      vms->bootinfo.board_id = -1;
-> >      vms->bootinfo.loader_start = vms->memmap[VIRT_MEM].base;
-> >      vms->bootinfo.get_dtb = machvirt_dtb;
-> 
-> 
+On 15/12/2016 09:04, Stefan Hajnoczi wrote:
+>> Does this feature only work for VirtIO? Does it work for SCSI or IDE?
+> This only works for virtio-blk and virtio-scsi.  The virtio-scsi
+> dataplane support is more recent and I don't remember if it is complete=
+=2E
+> I've CCed Fam and Paolo who worked on virtio-scsi dataplane.
+>=20
+> Now that you have mentioned that you aren't using virtio devices, there=
+
+> is another source of lock contention that you will encounter.  I/O
+> request submission takes place in the vcpu thread when ioeventfd is not=
+
+> used.  Only virtio uses ioeventfd so your current QEMU configuration is=
+
+> unable to let the vcpu continue execution during I/O request submission=
+=2E
+>=20
+> If you care about performance then using virtio devices is probably the=
+
+> best choice.  Try comparing against virtio-scsi dataplane - you should
+> see a lot less jitter.
+
+Yes, virtio-scsi dataplane is complete.
+
+Paolo
+
+
+--SkcbtHCLl1iwhpqpc45b7wsRCESjc7DAM
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQEcBAEBCAAGBQJYUojxAAoJEL/70l94x66DtAIH/Aj36NabGI5n5ZXs1e38UDRd
+gRbegzfromDZROdElYuoscjPRVBUEVNmTW/JU0qN+p9tbl34Vsgx/13OTN/uQOH9
+ooDD8H0dQQa/6P+uG81JyNgxqD5sFSz+TS7jXorYODIzC+6xWcHlP2BqO2NnbKpO
+RiczHIgGSzQDDugjQV4PGxXxh/XfDVLafr27M/DDTZnB0mBTcQAdsfSyMQHDvNHf
+4AOWH8IoUmAGxVSS4wWdjEItuL/KsGCEjYPYA5tjaRuI81dmilDpXXCdf7KL3NlP
+j24Hey50UYBSHeKv+/exkUboisT+Imp0Ctva/pmLaMHwOHBMhoU9Jf8zxMWTBdU=
+=Q3lF
+-----END PGP SIGNATURE-----
+
+--SkcbtHCLl1iwhpqpc45b7wsRCESjc7DAM--
