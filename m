@@ -1,39 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42573)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42688)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cHKBu-00033K-Pr
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:46:36 -0500
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cHKBz-0003NA-TW
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:46:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cHKBs-0001KI-SY
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:46:34 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55897
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cHKBw-0001My-Qu
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:46:39 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57949
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1cHKBs-0001Jv-LL
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:46:32 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	uBF0hbYG007165
-	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 19:46:32 -0500
-Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 27bdm3h0yv-1
+	id 1cHKBw-0001MT-KS
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:46:36 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
+	uBF0haqj007005
+	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 19:46:36 -0500
+Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 27bdm6120q-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 19:46:31 -0500
+	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 19:46:35 -0500
 Received: from localhost
-	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Wed, 14 Dec 2016 17:46:31 -0700
+	Wed, 14 Dec 2016 17:46:35 -0700
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Wed, 14 Dec 2016 18:44:26 -0600
+Date: Wed, 14 Dec 2016 18:44:29 -0600
 In-Reply-To: <1481762701-4587-1-git-send-email-mdroth@linux.vnet.ibm.com>
 References: <1481762701-4587-1-git-send-email-mdroth@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Message-Id: <1481762701-4587-33-git-send-email-mdroth@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 32/67] qmp: fix object-add assert() without
- props
+Message-Id: <1481762701-4587-36-git-send-email-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 35/67] rbd: shift byte count as a 64-bit value
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,69 +39,51 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: qemu-stable@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, kwolf@redhat.com, eblake@redhat.com
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
 
-Since commit ad739706bbadee49, user_creatable_add_type() expects to be
-given a qdict. However, if object-add is called without props, you reach
-the assert: "qemu/qom/object_interfaces.c:115: user_creatable_add_type:
-Assertion `qdict' failed.", because the qdict isn't created in this
-case (it's optional).
+Otherwise, reads of more than 2GB fail.  Until commit
+7bbca9e290a9c7c217b5a24fc6094e91e54bd05d, reads of 2^41
+bytes succeeded at least theoretically.
 
-Furthermore, qmp_input_visitor_new() is not meant to be called without a
-dict, and a further commit will assert in this situation.
+In fact, pdiscard ought to receive a 64-bit integer as the
+count for the same reason.
 
-If none given, create an empty qdict in qmp to avoid the
-user_creatable_add_type() assert(qdict).
+Reported by Coverity.
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20160922203927.28241-2-marcandre.lureau@redhat.com>
-Tested-by: Xiao Long Jiang <zxiaol@linux.vnet.ibm.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-(cherry picked from commit e64c75a9752c5d0fd64eb2e684c656a5ea7d03c6)
+Fixes: 7bbca9e290a9c7c217b5a24fc6094e91e54bd05d
+Cc: qemu-stable@nongnu.org
+Cc: kwolf@redhat.com
+Cc: eblake@redhat.com
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+(cherry picked from commit e948f663e9334249c394b88926addcdd3f9e35cd)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- qmp.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ block/rbd.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/qmp.c b/qmp.c
-index b6d531e..c485abe 100644
---- a/qmp.c
-+++ b/qmp.c
-@@ -654,7 +654,7 @@ void qmp_add_client(const char *protocol, const char =
-*fdname,
- void qmp_object_add(const char *type, const char *id,
-                     bool has_props, QObject *props, Error **errp)
+diff --git a/block/rbd.c b/block/rbd.c
+index 0106fea..5cefdbb 100644
+--- a/block/rbd.c
++++ b/block/rbd.c
+@@ -737,7 +737,7 @@ static BlockAIOCB *qemu_rbd_aio_readv(BlockDriverState *bs,
+                                       void *opaque)
  {
--    const QDict *pdict =3D NULL;
-+    QDict *pdict;
-     Visitor *v;
-     Object *obj;
-=20
-@@ -664,14 +664,18 @@ void qmp_object_add(const char *type, const char *i=
-d,
-             error_setg(errp, QERR_INVALID_PARAMETER_TYPE, "props", "dict=
-");
-             return;
-         }
-+        QINCREF(pdict);
-+    } else {
-+        pdict =3D qdict_new();
-     }
-=20
--    v =3D qmp_input_visitor_new(props, true);
-+    v =3D qmp_input_visitor_new(QOBJECT(pdict), true);
-     obj =3D user_creatable_add_type(type, id, pdict, v, errp);
-     visit_free(v);
-     if (obj) {
-         object_unref(obj);
-     }
-+    QDECREF(pdict);
+     return rbd_start_aio(bs, sector_num << BDRV_SECTOR_BITS, qiov,
+-                         nb_sectors << BDRV_SECTOR_BITS, cb, opaque,
++                         (int64_t) nb_sectors << BDRV_SECTOR_BITS, cb, opaque,
+                          RBD_AIO_READ);
  }
-=20
- void qmp_object_del(const char *id, Error **errp)
---=20
+ 
+@@ -749,7 +749,7 @@ static BlockAIOCB *qemu_rbd_aio_writev(BlockDriverState *bs,
+                                        void *opaque)
+ {
+     return rbd_start_aio(bs, sector_num << BDRV_SECTOR_BITS, qiov,
+-                         nb_sectors << BDRV_SECTOR_BITS, cb, opaque,
++                         (int64_t) nb_sectors << BDRV_SECTOR_BITS, cb, opaque,
+                          RBD_AIO_WRITE);
+ }
+ 
+-- 
 1.9.1
