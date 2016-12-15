@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57646)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58668)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cHbXV-0001N0-5O
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 14:18:01 -0500
+	(envelope-from <mst@redhat.com>) id 1cHbZ2-00006R-Hv
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 14:19:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cHbXQ-0007vG-DV
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 14:18:01 -0500
-Received: from mail-vk0-f46.google.com ([209.85.213.46]:34544)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cHbXQ-0007iA-0I
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 14:17:56 -0500
-Received: by mail-vk0-f46.google.com with SMTP id x186so77269940vkd.1
-	for <qemu-devel@nongnu.org>; Thu, 15 Dec 2016 11:17:33 -0800 (PST)
+	(envelope-from <mst@redhat.com>) id 1cHbYx-0000Va-HQ
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 14:19:36 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37250)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cHbYx-0000V1-B6
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 14:19:31 -0500
+Date: Thu, 15 Dec 2016 21:19:29 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20161215211838-mutt-send-email-mst@kernel.org>
+References: <20161214142518.10504-1-stefanha@redhat.com>
+	<20161215063226-mutt-send-email-mst@kernel.org>
+	<20161215075028.GD26169@stefanha-x1.localdomain>
+	<1481793479.21413.6.camel@redhat.com>
+	<20161215170523-mutt-send-email-mst@kernel.org>
+	<1481819150.21413.21.camel@redhat.com>
+	<20161215202505-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20161215190355.GA16467@work-vm>
-References: <1481742422-15969-1-git-send-email-ashijeetacharya@gmail.com>
-	<20161215175533-mutt-send-email-mst@kernel.org>
-	<20161215160740.GN2509@work-vm>
-	<20161215205122-mutt-send-email-mst@kernel.org>
-	<20161215190355.GA16467@work-vm>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 15 Dec 2016 19:16:12 +0000
-Message-ID: <CAFEAcA8XtikQ54QN1dgCFjwntc==FxRnUH17Hh+NWdJc0aNWMg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH 0/3] Introduce a new --only-migratable
- option
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20161215202505-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] regression in 2.8: unable to exit screen grab in
+ SDL mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,18 +33,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Ashijeet Acharya <ashijeetacharya@gmail.com>, John Snow <jsnow@redhat.com>, Amit Shah <amit.shah@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, Greg Kurz <groug@kaod.org>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Cole Robinson <crobinso@redhat.com>
 
-On 15 December 2016 at 19:03, Dr. David Alan Gilbert
-<dgilbert@redhat.com> wrote:
-> One thing we'd have to do if we did that would be to
-> add another flag to devices to declare that they might
-> sometime in the future call the migrate_add_blocker.
+On Thu, Dec 15, 2016 at 09:15:27PM +0200, Michael S. Tsirkin wrote:
+> On Thu, Dec 15, 2016 at 05:25:50PM +0100, Gerd Hoffmann wrote:
+> >   Hi,
+> > 
+> > > > > > The problem always reproduces for me:
+> > > > > > - start qemu with -sdl
+> > > > > > - wait for guest to boot
+> > > > > > - click anywhere within guest screen
+> > > > > > - message "press ctrl+alt to exit capture" appears on screen,
+> > > > > >   but pressing that immediately restarts capture again
+> > 
+> > [ 2.6 good, 2.7, 2.8 bad ]
+> > 
+> > > I'd say SDL is mostly useless with this bug.
+> > > 
+> > > Do we fix this or disable SDL altogether?
+> > 
+> > Well, it can't be *that* bad, otherwise it would not went unnoticed for
+> > a whole release cycle.
+> 
+> That's what I'm saying, maybe no one uses SDL anymore.
+> 
+> > It doesn't reproduce here.
+> 
+> Are you on Fedora 25 too?
+> 
+> > There must be some other factor which is
+> > needed to trigger this.  What desktop you are using?  gnome?  kde?
+> > something else?
+> 
+> XFCE
+> 
+> >  Xorg or wayland?
+> 
+> Xorg
+> 
+> > Can you try to bisect it?
+> > 
+> > cheers,
+> >   Gerd
+> 
+> 
+> Trying to.
 
-...do you have a third-party library to suggest for
-the "foretell the future" functionality necessary
-for devices to implement this correctly? :-)
 
-thanks
--- PMM
+One strange thing - I only see it when guest is in graphical mode.
+If guest is in text mode it works ok.
+Command line:
+
+./x86_64-softmmu/qemu-system-x86_64 -enable-kvm -m 1000 -cpu host -smp 2
+/home/mst/images/f20-x64.qcow2 -netdev user,id=foo -redir tcp:8022::22
+-device virtio-net,netdev=foo -kernel /boot/vmlinuz-${release} -initrd
+/boot/initramfs-${release}.img -append 'root=/dev/sda3 ro
+vconsole.font=latarcyrheb-sun16  rhgb noquiet LANG=en_US.UTF-8
+console=tty0 console=ttyS0,9600n8,9600n8' -sdl
+
+so nothing special.
