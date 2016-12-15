@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60107)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33756)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1cHSCK-0007d2-R4
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 04:19:34 -0500
+	(envelope-from <kraxel@redhat.com>) id 1cHSKt-0007tu-RT
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 04:28:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1cHSCJ-0003bN-8T
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 04:19:32 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50172)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1cHSCJ-0003ad-3R
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 04:19:31 -0500
-References: <CAH47eN3AVo-4CWN8XHhVz5F811Dc-iS8pVmW+4EW_1mvbpVgpA@mail.gmail.com>
-From: Laurent Vivier <lvivier@redhat.com>
-Message-ID: <6970101a-5eff-9f77-86ec-c142937c1000@redhat.com>
-Date: Thu, 15 Dec 2016 10:19:27 +0100
-MIME-Version: 1.0
-In-Reply-To: <CAH47eN3AVo-4CWN8XHhVz5F811Dc-iS8pVmW+4EW_1mvbpVgpA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Making TCG configurable in system mode
+	(envelope-from <kraxel@redhat.com>) id 1cHSKq-0007lw-NM
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 04:28:23 -0500
+Message-ID: <1481794097.21413.11.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Thu, 15 Dec 2016 10:28:17 +0100
+In-Reply-To: <421b6da7-1197-83a4-a8a1-e34bcf15904e@redhat.com>
+References: <1481633076-24521-1-git-send-email-thuth@redhat.com>
+	<1481637176.27088.132.camel@redhat.com>
+	<282345c0-fad3-eb66-63c5-3d1d24ab6d6d@redhat.com>
+	<1481708165.8440.19.camel@redhat.com>
+	<421b6da7-1197-83a4-a8a1-e34bcf15904e@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH] hw/ppc/spapr: Fix boot path of usb-host
+ storage devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,45 +27,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alvise Rigo <a.rigo@virtualopensystems.com>, QEMU Developers <qemu-devel@nongnu.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, VirtualOpenSystems Technical Team <tech@virtualopensystems.com>, Claudio Fontana <Claudio.Fontana@huawei.com>, chao.p.peng@linux.intel.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org
 
+  Hi,
 
+> That's true for the default case, but for the pseries machine, there is
+> already code that changes the boot path for virtual usb-storage devices,
+> see the function spapr_get_fw_dev_path() :
+>=20
+>         ... else if (usb) {
+>             /*
+>              * We use SRP luns of the form 01000000 | (usb-port << 16) | =
+lun
+>              * in the top 32 bits of the 64-bit LUN
+>              */
+>             unsigned usb_port =3D atoi(usb->port->path);
+>             unsigned id =3D 0x1000000 | (usb_port << 16) | d->lun;
+>             return g_strdup_printf("%s@%"PRIX64, qdev_fw_name(dev),
+>                                    (uint64_t)id << 32);
+>         }
 
-On 14/12/2016 20:30, Alvise Rigo wrote:
-> Hi all,
-> 
-> I am looking at the possibility to add a new QEMU configuration option
-> to make TCG optional (in qemu-system-*). What I am exploring is a way
-> to exclude any of the TCG code not needed by KVM from the QEMU binary.
-> There has been a previous attempt in the past from Paolo Bonzini,
-> namely https://github.com/bonzini/qemu/tree/disable-tcg, that
-> eventually was not upstreamed. I was looking into this work mainly,
-> mostly to understand if the same approach can be respinned and used to
-> support all the QEMU's targets. Any input on this is welcome.
-> 
-> I was also wondering if an approach could be based on the recent patch
-> series that allows to use the TCG frontend as a library --
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg415514.html.
-> Making qemu-user and qemu-system users of such a library might help in
-> having TCG optional. Obviously this solution introduces many other
-> challenges and I'm not even sure if it's actually viable.
+Hmm, I thought the point of using standard open firmware paths was that
+we don't need hacks like this.  Looks like things are not *that*
+standardized then if some archs need extra tweaks ...
 
-To have a library has also another interest: testing.
+But if that is needed for pseries *anyway* it doesn't hurt to do the
+same for usb-host.
 
-For the moment RISU is doing a great job but it needs to be able to
-start a client (the apprentice) in a chroot. So it requires a "viable"
-TCG implementation.
+> > If usb-host (and usb-redir too btw) create paths identical to the ones
+> > created by usb-storage.  Existing firmware should cope just fine
+> > (assuming bootindex for usb-storage works).
+>=20
+> Which firmware can deal with these original device paths with "channel@0"
+> in it? Certainly not SLOF. Maybe OpenBIOS? Does OpenBIOS support USB stor=
+age
+> devices?
 
-If we would have a library we could directly link the "apprentice" with
-the library and it will inject the code to test directly (without
-chroot) in the TCG engine. Moreover, I think we could use single-step
-instead of trap to synchronize master and apprentice.
+seabios does, and I expect ovmf too (didn't test though).
 
-We had something like that to test 680x0 [1], but the main program was
-written in C++ compiling some parts of QEMU inside, and I failed to
-recompile it last time I tried (I use RISU now).
-
-Thanks,
-Laurent
-[1] https://github.com/vivier/m68k-tester
+cheers,
+  Gerd
