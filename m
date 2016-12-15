@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53535)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53604)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cHYX4-0004IJ-11
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 11:05:26 -0500
+	(envelope-from <harrynjit@gmail.com>) id 1cHYXB-0004bX-5Z
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 11:05:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cHYWz-0008DJ-2D
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 11:05:22 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40038)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cHYWy-0008Ci-PP
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 11:05:16 -0500
-Date: Thu, 15 Dec 2016 16:05:10 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20161215160510.GM2509@work-vm>
-References: <1481742422-15969-1-git-send-email-ashijeetacharya@gmail.com>
-	<1481742422-15969-3-git-send-email-ashijeetacharya@gmail.com>
+	(envelope-from <harrynjit@gmail.com>) id 1cHYX6-0008HN-Nk
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 11:05:29 -0500
+Received: from mail-qk0-f193.google.com ([209.85.220.193]:33140)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <harrynjit@gmail.com>) id 1cHYX6-0008H2-In
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 11:05:24 -0500
+Received: by mail-qk0-f193.google.com with SMTP id n21so866624qka.0
+	for <qemu-devel@nongnu.org>; Thu, 15 Dec 2016 08:05:24 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1481742422-15969-3-git-send-email-ashijeetacharya@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH 2/3] migration: Allow "device add" options
- to only add migratable devices
+In-Reply-To: <20161215080634.GF26169@stefanha-x1.localdomain>
+References: <CA+scX6=9y4wDBWzXyqpGh9U__usKUa6sxwdc63iA8YRmpWFPqA@mail.gmail.com>
+	<20161214193107.GB20648@stefanha-x1.localdomain>
+	<CA+scX6=oc_eGteY8A0d8tuwzJFSu9M_6wnXBd5Tp=XGrg8FotQ@mail.gmail.com>
+	<CA+scX6n+xcY7qi=XbBcno=OQOfUfJf77ZGfS2s5FbhUCEHQp3A@mail.gmail.com>
+	<20161215080634.GF26169@stefanha-x1.localdomain>
+From: Weiwei Jia <harrynjit@gmail.com>
+Date: Thu, 15 Dec 2016 11:04:23 -0500
+Message-ID: <CA+scX6=Lk8Ea=vkFt_3c5v+n8gbr+uAb7hZ8vM1svzBZWwX7nQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] Lock contention in QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,95 +31,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ashijeet Acharya <ashijeetacharya@gmail.com>
-Cc: jsnow@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, kwolf@redhat.com, armbru@redhat.com, quintela@redhat.com, mst@redhat.com, marcandre.lureau@redhat.com, groug@kaod.org, aneesh.kumar@linux.vnet.ibm.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel@nongnu.org
 
-* Ashijeet Acharya (ashijeetacharya@gmail.com) wrote:
-> Introduce checks for the unmigratable flag in the VMStateDescription
-> structs of respective devices when user attempts to add them. If the
-> "--only-migratable" was specified, all unmigratable devices will
-> rightly fail to add. This feature is made compatible for both "-device"
-> and "-usbdevice" command line options and covers their hmp and qmp
-> counterparts as well.
-> 
-> Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
-> ---
->  hw/usb/bus.c   | 15 +++++++++++++++
->  qdev-monitor.c |  9 +++++++++
->  2 files changed, 24 insertions(+)
-> 
-> diff --git a/hw/usb/bus.c b/hw/usb/bus.c
-> index 25913ad..8796788 100644
-> --- a/hw/usb/bus.c
-> +++ b/hw/usb/bus.c
-> @@ -8,6 +8,7 @@
->  #include "monitor/monitor.h"
->  #include "trace.h"
->  #include "qemu/cutils.h"
-> +#include "migration/migration.h"
->  
->  static void usb_bus_dev_print(Monitor *mon, DeviceState *qdev, int indent);
->  
-> @@ -686,6 +687,8 @@ USBDevice *usbdevice_create(const char *cmdline)
->      const char *params;
->      int len;
->      USBDevice *dev;
-> +    ObjectClass *klass;
-> +    DeviceClass *dc;
->  
->      params = strchr(cmdline,':');
->      if (params) {
-> @@ -720,6 +723,18 @@ USBDevice *usbdevice_create(const char *cmdline)
->          return NULL;
->      }
->  
-> +    klass = object_class_by_name(f->name);
+On Thu, Dec 15, 2016 at 3:06 AM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
+> On Thu, Dec 15, 2016 at 12:17:09AM -0500, Weiwei Jia wrote:
+>> BTW, do we have an example to show users how to config following
+>> virtio-blk dataplane commands into XML configuration file?
+>>
+>> qemu -object iothread,id=iothread0 \
+>>       -drive if=none,id=drive0,file=test.img,format=raw,cache=none \
+>>       -device virtio-blk-pci,iothread=iothread0,drive=drive0
+>
+> https://libvirt.org/formatdomain.html#elementsIOThreadsAllocation
+>
+> See also <cputune><iothreadpin> and <driver iothread=>.
 
-> +    dc = DEVICE_CLASS(klass);
+It seems that the libvirt XML configuration in above link [1] is
+different from the configuration which you said in your blog [2]. Your
+blog just said how to use x-data-plane for virtio-blk but libvirt XML
+configuration doesn't say anything about x-data-plane. Does it in
+default support by latest QEMU version. If I want to test virtio-blk
+or virtio-scsi data-plane to make timeslice more stable, what version
+of QEMU/KVM should I use? Would you please give me some suggestions?
+Thank you.
 
-Would qdev_get_device_class work here instead of that pair?
-(I was thinking you needed to check klass to make sure it wasn't null)
+[1] https://libvirt.org/formatdomain.html#elementsIOThreadsAllocation
+[2] http://blog.vmsplice.net/2013/03/new-in-qemu-14-high-performance-virtio.html
 
-> +    if (only_migratable) {
-> +        if (dc->vmsd->unmigratable) {
-> +            error_report("Device %s is not migratable, but --only-migratable "
-> +                         "was specified", f->name);
-> +            return NULL;
-> +        }
-> +    }
-> +
->      if (f->usbdevice_init) {
->          dev = f->usbdevice_init(bus, params);
->      } else {
-> diff --git a/qdev-monitor.c b/qdev-monitor.c
-> index c73410c..81d01df 100644
-> --- a/qdev-monitor.c
-> +++ b/qdev-monitor.c
-> @@ -29,6 +29,7 @@
->  #include "qemu/error-report.h"
->  #include "qemu/help_option.h"
->  #include "sysemu/block-backend.h"
-> +#include "migration/migration.h"
->  
->  /*
->   * Aliases were a bad idea from the start.  Let's keep them
-> @@ -577,6 +578,14 @@ DeviceState *qdev_device_add(QemuOpts *opts, Error **errp)
->          return NULL;
->      }
->  
-> +    if (only_migratable) {
-> +        if (dc->vmsd->unmigratable) {
-> +            error_setg(errp, "Device %s is not migratable, but "
-> +                       "--only-migratable was specified", driver);
-> +            return NULL;
-> +        }
-> +    }
-> +
->      /* find bus */
->      path = qemu_opt_get(opts, "bus");
->      if (path != NULL) {
-> -- 
-> 2.6.2
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Cheers,
+Weiwei Jia
