@@ -1,35 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42360)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42403)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cHKBn-0002XI-Fn
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:46:30 -0500
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cHKBp-0002e6-09
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:46:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cHKBk-0001Dv-B5
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:46:27 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49928)
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cHKBl-0001F0-P4
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:46:28 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57711
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1cHKBk-0001Ck-2U
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:46:24 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	uBF0hd9S016417
-	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 19:46:23 -0500
+	id 1cHKBl-0001EV-JT
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:46:25 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
+	uBF0ha8t007030
+	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 19:46:25 -0500
 Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 27bdm5151q-1
+	by mx0b-001b2d01.pphosted.com with ESMTP id 27bdm611t1-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 19:46:22 -0500
+	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 19:46:24 -0500
 Received: from localhost
 	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Wed, 14 Dec 2016 17:46:22 -0700
+	Wed, 14 Dec 2016 17:46:24 -0700
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Wed, 14 Dec 2016 18:44:16 -0600
+Date: Wed, 14 Dec 2016 18:44:19 -0600
 In-Reply-To: <1481762701-4587-1-git-send-email-mdroth@linux.vnet.ibm.com>
 References: <1481762701-4587-1-git-send-email-mdroth@linux.vnet.ibm.com>
-Message-Id: <1481762701-4587-23-git-send-email-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 22/67] vfio/pci: Fix regression in MSI routing
- configuration
+Message-Id: <1481762701-4587-26-git-send-email-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 25/67] block: reintroduce bdrv_flush_all
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,74 +39,82 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Alex Williamson <alex.williamson@redhat.com>, Peter Xu <peterx@redhat.com>, Gavin Shan <gwshan@au1.ibm.com>
+Cc: qemu-stable@nongnu.org, John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-From: David Gibson <david@gibson.dropbear.id.au>
+From: John Snow <jsnow@redhat.com>
 
-d1f6af6 "kvm-irqchip: simplify kvm_irqchip_add_msi_route" was a cleanup
-of kvmchip routing configuration, that was mostly intended for x86.
-However, it also contains a subtle change in behaviour which breaks EEH[1]
-error recovery on certain VFIO passthrough devices on spapr guests.  So far
-it's only been seen on a BCM5719 NIC on a POWER8 server, but there may be
-other hardware with the same problem.  It's also possible there could be
-circumstances where it causes a bug on x86 as well, though I don't know of
-any obvious candidates.
+Commit fe1a9cbc moved the flush_all routine from the bdrv layer to the
+block-backend layer. In doing so, however, the semantics of the routine
+changed slightly such that flush_all now used blk_flush instead of
+bdrv_flush.
 
-Prior to d1f6af6, both vfio_msix_vector_do_use() and
-vfio_add_kvm_msi_virq() used msg == NULL as a special flag to mark this
-as the "dummy" vector used to make the host hardware state sync with the
-guest expected hardware state in terms of MSI configuration.
+blk_flush can fail if the attached device model reports that it is not
+"available," (i.e. the tray is open.) This changed the semantics of
+flush_all such that it can now fail for e.g. open CDROM drives.
 
-Specifically that flag caused vfio_add_kvm_msi_virq() to become a no-op,
-meaning the dummy irq would always be delivered via qemu. d1f6af6 changed
-vfio_add_kvm_msi_virq() so it takes a vector number instead of the msg
-parameter, and determines the correct message itself.  The test for !msg
-was removed, and not replaced with anything there or in the caller.
+Reintroduce bdrv_flush_all to regain the old semantics without having to
+alter the behavior of blk_flush or blk_flush_all, which are already
+'doing the right thing.'
 
-With an spapr guest which has a VFIO device, if an EEH error occurs on the
-host hardware, then the device will be isolated then reset.  This is a
-combination of host and guest action, mediated by some EEH related
-hypercalls.  I haven't fully traced the mechanics, but somehow installing
-the kvm irqchip route for the dummy irq on the BCM5719 means that after EEH
-reset and recovery, at least some irqs are no longer delivered to the
-guest.
-
-In particular, the guest never gets the link up event, and so the NIC is
-effectively dead.
-
-[1] EEH (Enhanced Error Handling) is an IBM POWER server specific PCI-*
-    error reporting and recovery mechanism.  The concept is somewhat
-    similar to PCI-E AER, but the details are different.
-
-Bugzilla: https://bugzilla.redhat.com/show_bug.cgi?id=1373802
-
-Cc: Alex Williamson <alex.williamson@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>
-Cc: Gavin Shan <gwshan@au1.ibm.com>
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-stable@nongnu.org
-Fixes: d1f6af6a17a6 ("kvm-irqchip: simplify kvm_irqchip_add_msi_route")
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-(cherry picked from commit 6d17a018d09801a2b18133a4febd81433bb0cf85)
+Signed-off-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+Acked-by: Fam Zheng <famz@redhat.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+(cherry picked from commit 4085f5c7a239567a292876f46cb59d9b19bcf6ac)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- hw/vfio/pci.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ block/io.c            | 25 +++++++++++++++++++++++++
+ include/block/block.h |  1 +
+ 2 files changed, 26 insertions(+)
 
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index 7bfa17c..a5a620a 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -496,7 +496,9 @@ static int vfio_msix_vector_do_use(PCIDevice *pdev, unsigned int nr,
-             vfio_update_kvm_msi_virq(vector, *msg, pdev);
-         }
-     } else {
--        vfio_add_kvm_msi_virq(vdev, vector, nr, true);
-+        if (msg) {
-+            vfio_add_kvm_msi_virq(vdev, vector, nr, true);
-+        }
-     }
+diff --git a/block/io.c b/block/io.c
+index 420944d..487755a 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -1615,6 +1615,31 @@ int coroutine_fn bdrv_co_pwrite_zeroes(BdrvChild *child, int64_t offset,
+                            BDRV_REQ_ZERO_WRITE | flags);
+ }
  
-     /*
++/*
++ * Flush ALL BDSes regardless of if they are reachable via a BlkBackend or not.
++ */
++int bdrv_flush_all(void)
++{
++    BdrvNextIterator it;
++    BlockDriverState *bs = NULL;
++    int result = 0;
++
++    for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
++        AioContext *aio_context = bdrv_get_aio_context(bs);
++        int ret;
++
++        aio_context_acquire(aio_context);
++        ret = bdrv_flush(bs);
++        if (ret < 0 && !result) {
++            result = ret;
++        }
++        aio_context_release(aio_context);
++    }
++
++    return result;
++}
++
++
+ typedef struct BdrvCoGetBlockStatusData {
+     BlockDriverState *bs;
+     BlockDriverState *base;
+diff --git a/include/block/block.h b/include/block/block.h
+index 11c162d..acddf3b 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -336,6 +336,7 @@ int bdrv_inactivate_all(void);
+ /* Ensure contents are flushed to disk.  */
+ int bdrv_flush(BlockDriverState *bs);
+ int coroutine_fn bdrv_co_flush(BlockDriverState *bs);
++int bdrv_flush_all(void);
+ void bdrv_close_all(void);
+ void bdrv_drain(BlockDriverState *bs);
+ void coroutine_fn bdrv_co_drain(BlockDriverState *bs);
 -- 
 1.9.1
