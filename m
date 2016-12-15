@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38872)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43663)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cHXe8-0007nA-T4
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 10:08:37 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cHXyI-0000hh-1T
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 10:29:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cHXe8-0007D0-1t
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 10:08:36 -0500
-Date: Thu, 15 Dec 2016 16:08:22 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20161215160822.79151aec@nial.brq.redhat.com>
-In-Reply-To: <20161213214522.25548-10-drjones@redhat.com>
-References: <20161213214522.25548-1-drjones@redhat.com>
-	<20161213214522.25548-10-drjones@redhat.com>
+	(envelope-from <dgilbert@redhat.com>) id 1cHXyE-0007Zk-0q
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 10:29:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38138)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cHXyD-0007ZW-P2
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 10:29:21 -0500
+Date: Thu, 15 Dec 2016 15:29:15 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20161215152914.GL2509@work-vm>
+References: <1481742422-15969-1-git-send-email-ashijeetacharya@gmail.com>
+	<1481742422-15969-2-git-send-email-ashijeetacharya@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 09/11] hw/arm/virt-acpi-build: don't save
- VirtGuestInfo on AcpiBuildState
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1481742422-15969-2-git-send-email-ashijeetacharya@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 1/3] migration: Add a new option to enable
+ only-migratable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,63 +28,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jones <drjones@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, zhaoshenglong@huawei.com, mst@redhat.com, ehabkost@redhat.com
+To: Ashijeet Acharya <ashijeetacharya@gmail.com>
+Cc: jsnow@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, kwolf@redhat.com, armbru@redhat.com, quintela@redhat.com, mst@redhat.com, marcandre.lureau@redhat.com, groug@kaod.org, aneesh.kumar@linux.vnet.ibm.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-On Tue, 13 Dec 2016 22:45:20 +0100
-Andrew Jones <drjones@redhat.com> wrote:
-
-> We can get to VirtMachineState without the need for saving a pointer
-> on AcpiBuildState. This is the mach-virt equivalent to "acpi: Don't save
-> PcGuestInfo on AcpiBuildState"
+* Ashijeet Acharya (ashijeetacharya@gmail.com) wrote:
+> Add a new option "--only-migratable" in qemu which will allow to add
+> only those devices which will not fail qemu after migration. Devices
+> set with the flag 'unmigratable' cannot be added when this option will
+> be used.
 > 
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
 > ---
->  hw/arm/virt-acpi-build.c | 7 +++----
->  1 file changed, 3 insertions(+), 4 deletions(-)
+>  include/migration/migration.h |  3 +++
+>  qemu-options.hx               | 10 ++++++++++
+>  vl.c                          |  4 ++++
+>  3 files changed, 17 insertions(+)
 > 
-> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> index 7a1efd0dc538..137781646bec 100644
-> --- a/hw/arm/virt-acpi-build.c
-> +++ b/hw/arm/virt-acpi-build.c
-> @@ -706,7 +706,6 @@ struct AcpiBuildState {
->      MemoryRegion *linker_mr;
->      /* Is table patched? */
->      bool patched;
-> -    VirtGuestInfo *guest_info;
->  } AcpiBuildState;
+> diff --git a/include/migration/migration.h b/include/migration/migration.h
+> index c309d23..40b3697 100644
+> --- a/include/migration/migration.h
+> +++ b/include/migration/migration.h
+> @@ -38,6 +38,9 @@
+>  #define QEMU_VM_COMMAND              0x08
+>  #define QEMU_VM_SECTION_FOOTER       0x7e
 >  
->  static
-> @@ -779,6 +778,8 @@ static void acpi_ram_update(MemoryRegion *mr, GArray *data)
+> +/* for vl.c */
+> +extern int only_migratable;
+> +
+>  struct MigrationParams {
+>      bool blk;
+>      bool shared;
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index c534a2f..7cc2cc5 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -3574,6 +3574,16 @@ be used to change settings (such as migration parameters) prior to issuing
+>  the migrate_incoming to allow the migration to begin.
+>  ETEXI
 >  
->  static void virt_acpi_build_update(void *build_opaque)
->  {
-> +    MachineState *machine = MACHINE(qdev_get_machine());
-> +    VirtMachineState *vms = VIRT_MACHINE(machine);
->      AcpiBuildState *build_state = build_opaque;
->      AcpiBuildTables tables;
->  
-> @@ -790,8 +791,7 @@ static void virt_acpi_build_update(void *build_opaque)
->  
->      acpi_build_tables_init(&tables);
->  
-> -    virt_acpi_build(container_of(build_state->guest_info,
-> -                                 VirtMachineState, acpi_guest_info), &tables);
-> +    virt_acpi_build(vms, &tables);
+> +DEF("only-migratable", 0, QEMU_OPTION_only_migratable, \
+> +    "-only-migratable     allow only migratable devices\n", QEMU_ARCH_ALL)
+> +STEXI
+> +@item -only-migratable
+> +@findex -only-migratable
+> +Don't allow adding devices that will fail QEMU after migration. Devices set with
+> +the flag unmigratable are not allowed to be added neither statically nor
+> +dynamically
+> +ETEXI
 
-virt_acpi_build(VIRT_MACHINE(qdev_get_machine()), &tables);
+Can I suggest rewording that as:
+Only allow migratable devices.  Devices will not be allowed to enter an unmigratable
+state.
 
-or even better do it inside of virt_acpi_build(&tables);
+>  DEF("nodefaults", 0, QEMU_OPTION_nodefaults, \
+>      "-nodefaults     don't create default devices\n", QEMU_ARCH_ALL)
+>  STEXI
+> diff --git a/vl.c b/vl.c
+> index d77dd86..82bffb9 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -180,6 +180,7 @@ bool boot_strict;
+>  uint8_t *boot_splash_filedata;
+>  size_t boot_splash_filedata_size;
+>  uint8_t qemu_extra_params_fw[2];
+> +int only_migratable = 0; /* turn it off unless user states otherwise */
+>  
+>  int icount_align_option;
+>  
+> @@ -3914,6 +3915,9 @@ int main(int argc, char **argv, char **envp)
+>                  }
+>                  incoming = optarg;
+>                  break;
+> +            case QEMU_OPTION_only_migratable:
+> +                only_migratable = 1;
+> +                break;
+>              case QEMU_OPTION_nodefaults:
+>                  has_defaults = 0;
+>                  break;
 
+Does this need to go in the 'first pass of option parsing' loop
+to make sure that it doesn't matter which order it's in and it
+stops other devices on the command line?
 
->  
->      acpi_ram_update(build_state->table_mr, tables.table_data);
->      acpi_ram_update(build_state->rsdp_mr, tables.rsdp);
-> @@ -841,7 +841,6 @@ void virt_acpi_setup(VirtMachineState *vms)
->      }
->  
->      build_state = g_malloc0(sizeof *build_state);
-> -    build_state->guest_info = guest_info;
->  
->      acpi_build_tables_init(&tables);
->      virt_acpi_build(vms, &tables);
+Dave
+
+> -- 
+> 2.6.2
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
