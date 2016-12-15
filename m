@@ -1,30 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37952)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38637)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ashijeetacharya@gmail.com>) id 1cHZ2E-0003vl-Qh
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 11:37:36 -0500
+	(envelope-from <mst@redhat.com>) id 1cHZ3G-00008Z-Gi
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 11:38:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ashijeetacharya@gmail.com>) id 1cHZ2B-0001vh-Kv
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 11:37:34 -0500
-Received: from mail-io0-f195.google.com ([209.85.223.195]:35742)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ashijeetacharya@gmail.com>)
-	id 1cHZ2B-0001vQ-FZ
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 11:37:31 -0500
-Received: by mail-io0-f195.google.com with SMTP id f73so8976057ioe.2
-	for <qemu-devel@nongnu.org>; Thu, 15 Dec 2016 08:37:31 -0800 (PST)
+	(envelope-from <mst@redhat.com>) id 1cHZ3F-0002Zx-JF
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 11:38:38 -0500
+Date: Thu, 15 Dec 2016 18:38:30 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20161215183759-mutt-send-email-mst@kernel.org>
+References: <20161213214522.25548-1-drjones@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20161215161923.GO2509@work-vm>
-References: <1481742422-15969-1-git-send-email-ashijeetacharya@gmail.com>
-	<1481742422-15969-3-git-send-email-ashijeetacharya@gmail.com>
-	<20161215160510.GM2509@work-vm>
-	<CAC2QTZY7NBtCuMoPaXK0XNb+iHCZNFO_TrJr4y+XFXnV+T2hPQ@mail.gmail.com>
-	<20161215161923.GO2509@work-vm>
-From: Ashijeet Acharya <ashijeetacharya@gmail.com>
-Date: Thu, 15 Dec 2016 22:06:30 +0530
-Message-ID: <CAC2QTZaw-OoWciFSLV6hBsjJHE0N+vQ+fiVWWKBF-8bCm0AY-A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH 2/3] migration: Allow "device add" options
- to only add migratable devices
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20161213214522.25548-1-drjones@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 00/11] Remove VirtGuestInfo
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,127 +22,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: John Snow <jsnow@redhat.com>, amit.shah@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, quintela@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>, marcandre.lureau@redhat.com, groug@kaod.org, aneesh.kumar@linux.vnet.ibm.com, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Andrew Jones <drjones@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, zhaoshenglong@huawei.com, imammedo@redhat.com, ehabkost@redhat.com
 
-On Thu, Dec 15, 2016 at 9:49 PM, Dr. David Alan Gilbert
-<dgilbert@redhat.com> wrote:
-> * Ashijeet Acharya (ashijeetacharya@gmail.com) wrote:
->> On Thu, Dec 15, 2016 at 9:35 PM, Dr. David Alan Gilbert
->> <dgilbert@redhat.com> wrote:
->> > * Ashijeet Acharya (ashijeetacharya@gmail.com) wrote:
->> >> Introduce checks for the unmigratable flag in the VMStateDescription
->> >> structs of respective devices when user attempts to add them. If the
->> >> "--only-migratable" was specified, all unmigratable devices will
->> >> rightly fail to add. This feature is made compatible for both "-device"
->> >> and "-usbdevice" command line options and covers their hmp and qmp
->> >> counterparts as well.
->> >>
->> >> Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
->> >> ---
->> >>  hw/usb/bus.c   | 15 +++++++++++++++
->> >>  qdev-monitor.c |  9 +++++++++
->> >>  2 files changed, 24 insertions(+)
->> >>
->> >> diff --git a/hw/usb/bus.c b/hw/usb/bus.c
->> >> index 25913ad..8796788 100644
->> >> --- a/hw/usb/bus.c
->> >> +++ b/hw/usb/bus.c
->> >> @@ -8,6 +8,7 @@
->> >>  #include "monitor/monitor.h"
->> >>  #include "trace.h"
->> >>  #include "qemu/cutils.h"
->> >> +#include "migration/migration.h"
->> >>
->> >>  static void usb_bus_dev_print(Monitor *mon, DeviceState *qdev, int indent);
->> >>
->> >> @@ -686,6 +687,8 @@ USBDevice *usbdevice_create(const char *cmdline)
->> >>      const char *params;
->> >>      int len;
->> >>      USBDevice *dev;
->> >> +    ObjectClass *klass;
->> >> +    DeviceClass *dc;
->> >>
->> >>      params = strchr(cmdline,':');
->> >>      if (params) {
->> >> @@ -720,6 +723,18 @@ USBDevice *usbdevice_create(const char *cmdline)
->> >>          return NULL;
->> >>      }
->> >>
->> >> +    klass = object_class_by_name(f->name);
->> >
->> >> +    dc = DEVICE_CLASS(klass);
->> >
->> > Would qdev_get_device_class work here instead of that pair?
->>
->> No, because I believe that is defined as static in qdev_monitor.c
->> which was one of the reasons I faced a difficulty with this one.
->
-> Hmm, I wonder if Markus can suggest a better way; qdev_get_device_class
-> seems a lot more complex dealing iwth aliases and stuff, if we need that
-> type of stuff.
+On Tue, Dec 13, 2016 at 10:45:11PM +0100, Andrew Jones wrote:
+> This series is based on Peter's qemu-arm gicv3-virt branch. It's
+> main goal (patches 04-10), which was suggested by Eduardo, is to
+> remove an unnecessary structure, VirtGuestInfo, which is a
+> maintenance burden, as it requires duplicating Virt machine state.
+> Additionally patches 01-03 do some mach-virt cleanups and patch 11
+> adds the ACPI equivalent to one of the DT patches in Peter's
+> gicv3-virt branch.
+> 
+> The last patch isn't really tested as the guest kernel versions I
+> used seem to ignore the GTDT irqflags and either just choose edge,
+> 4.5-based kernel, or level, 4.9-based kernel.
+> 
+> Patches available here
+> https://github.com/rhdrjones/qemu/commits/virt/remove-guest-info
 
-Okay. I have grepped around for other uses of the macro DEVICE_CLASS
-which is mostly during the initialization of the various devices and
-we are not dealing with aliases probably because the device name is
-rightly there. But similarly here, I am trusting the device name
-stored in "f->name" more so after following the function call flow to
-the lowest level and finding a similar call to object_class_by_name()
-to get the ObjectClass of the device which passes the same name as
-stored in f->name.
+I like this in general.
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
 
-Ashijeet
->
-> Dave
->
->> > (I was thinking you needed to check klass to make sure it wasn't null)
->>
->> Right. I will include the check in v2.
->>
->> Ashijeet
->> >
->> >> +    if (only_migratable) {
->> >> +        if (dc->vmsd->unmigratable) {
->> >> +            error_report("Device %s is not migratable, but --only-migratable "
->> >> +                         "was specified", f->name);
->> >> +            return NULL;
->> >> +        }
->> >> +    }
->> >> +
->> >>      if (f->usbdevice_init) {
->> >>          dev = f->usbdevice_init(bus, params);
->> >>      } else {
->> >> diff --git a/qdev-monitor.c b/qdev-monitor.c
->> >> index c73410c..81d01df 100644
->> >> --- a/qdev-monitor.c
->> >> +++ b/qdev-monitor.c
->> >> @@ -29,6 +29,7 @@
->> >>  #include "qemu/error-report.h"
->> >>  #include "qemu/help_option.h"
->> >>  #include "sysemu/block-backend.h"
->> >> +#include "migration/migration.h"
->> >>
->> >>  /*
->> >>   * Aliases were a bad idea from the start.  Let's keep them
->> >> @@ -577,6 +578,14 @@ DeviceState *qdev_device_add(QemuOpts *opts, Error **errp)
->> >>          return NULL;
->> >>      }
->> >>
->> >> +    if (only_migratable) {
->> >> +        if (dc->vmsd->unmigratable) {
->> >> +            error_setg(errp, "Device %s is not migratable, but "
->> >> +                       "--only-migratable was specified", driver);
->> >> +            return NULL;
->> >> +        }
->> >> +    }
->> >> +
->> >>      /* find bus */
->> >>      path = qemu_opt_get(opts, "bus");
->> >>      if (path != NULL) {
->> >> --
->> >> 2.6.2
->> >>
->> > --
->> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Pls merge through the ARM tree.
+
+> 
+> Andrew Jones (11):
+>   hw/arm/virt: parameter passing cleanups
+>   hw/arm/virt: use VirtMachineState.gic_version
+>   hw/arm/virt: use VirtMachineState.smp_cpus
+>   hw/arm/virt: eliminate struct VirtGuestInfoState
+>   hw/arm/virt: remove include/hw/arm/virt-acpi-build.h
+>   hw/arm/virt: move VirtMachineState/Class to virt.h
+>   hw/arm/virt: pass VirtMachineState instead of VirtGuestInfo
+>   hw/arm/virt-acpi-build: remove redundant members from VirtGuestInfo
+>   hw/arm/virt-acpi-build: don't save VirtGuestInfo on AcpiBuildState
+>   hw/arm/virt: remove VirtGuestInfo
+>   hw/arm/virt-acpi-build: Don't incorrectly claim architectural timer to
+>     be edge-triggered
+> 
+>  MAINTAINERS                      |   2 -
+>  hw/arm/virt-acpi-build.c         | 103 +++++++++++++-------------
+>  hw/arm/virt.c                    | 152 ++++++++++++++-------------------------
+>  include/hw/arm/virt-acpi-build.h |  47 ------------
+>  include/hw/arm/virt.h            |  45 +++++++++++-
+>  5 files changed, 151 insertions(+), 198 deletions(-)
+>  delete mode 100644 include/hw/arm/virt-acpi-build.h
+> 
+> -- 
+> 2.9.3
