@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37061)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38337)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cHW7o-0001uC-Pu
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 08:31:09 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cHWEk-0000rc-3U
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 08:38:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cHW7l-0003a5-FE
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 08:31:08 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55028)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cHW7l-0003Ze-9C
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 08:31:05 -0500
-Date: Thu, 15 Dec 2016 13:31:00 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20161215133100.GK2509@work-vm>
-References: <20161108095603.72301-1-pasic@linux.vnet.ibm.com>
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cHWEe-0006St-Gd
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 08:38:18 -0500
+Received: from mail-wj0-f195.google.com ([209.85.210.195]:35531)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1cHWEe-0006Se-9u
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 08:38:12 -0500
+Received: by mail-wj0-f195.google.com with SMTP id he10so9828425wjc.2
+	for <qemu-devel@nongnu.org>; Thu, 15 Dec 2016 05:38:12 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <b1ac8aec-e9cc-99f8-0881-bef03acc2954@linux.vnet.ibm.com>
+	<20161215105257.GD2509@work-vm>
+	<b2ad9903-95b4-bf08-f314-c2b250cebb0a@linux.vnet.ibm.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <04b36158-a381-298f-1d81-d1bd18f3cec7@redhat.com>
+Date: Thu, 15 Dec 2016 14:37:08 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20161108095603.72301-1-pasic@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [RFC PATCH v2 0/8] VMS_ARRAY_OF_POINTER with null
- pointers
+In-Reply-To: <b2ad9903-95b4-bf08-f314-c2b250cebb0a@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] commit virtio: recalculate vq->inuse after
+ migration might cause last_avail_idx vs. used_idx failure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,51 +33,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, Amit Shah <amit.shah@redhat.com>, Juan Quintela <quintela@redhat.com>, Guenther Hutzl <hutzl@linux.vnet.ibm.com>
+To: Halil Pasic <pasic@linux.vnet.ibm.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-* Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
-> Make VMS_ARRAY_OF_POINTER cope with null pointers. Currently the reward
-> for trying to migrate an array with some null pointers in it is an
-> illegal memory access, that is a swift and painless death of the
-> process. Let's make vmstate cope with this scenario at least for
-> pointers to structs.
-> 
-> Halil Pasic (7):
->   migration: drop unused VMStateField.start
 
-Note that Jianjun uses .start in the QTAILQ migration series.
 
-Dave
+On 15/12/2016 12:32, Halil Pasic wrote:
+> static inline uint16_t vring_avail_idx(VirtQueue *vq)
+> {
+>     hwaddr pa;
+>     pa = vq->vring.avail + offsetof(VRingAvail, idx);
+>     vq->shadow_avail_idx = virtio_lduw_phys(vq->vdev, pa);
+> 
+> we should have an endiannes handling here before assigning shadow_avail_idx I guess
+> 
+>     return vq->shadow_avail_idx;
+> } 
 
->   tests/test-vmstate.c: add save_buffer util func
->   tests/test-vmstate.c: add array of pointer to struct
->   migration/vmstate: renames in (load|save)_state
->   migration/vmstate: split up vmstate_base_addr
->   migration/vmstate: fix array of pointers to struct
->   tests/test-vmstate.c: add array of pointers to struct with NULL
+Endianness is already handled:
+
+static inline uint16_t virtio_lduw_phys(VirtIODevice *vdev, hwaddr pa)
+{
+    if (virtio_access_is_big_endian(vdev)) {
+        return lduw_be_phys(&address_space_memory, pa);
+    }
+    return lduw_le_phys(&address_space_memory, pa);
+}
+
+> I will meditate a bit more on this and probably create a patch to fix it.
 > 
->  hw/char/exynos4210_uart.c   |   2 +-
->  hw/display/g364fb.c         |   2 +-
->  hw/dma/pl330.c              |   8 +-
->  hw/intc/exynos4210_gic.c    |   2 +-
->  hw/ipmi/isa_ipmi_bt.c       |   4 +-
->  hw/ipmi/isa_ipmi_kcs.c      |   4 +-
->  hw/net/vmxnet3.c            |   2 +-
->  hw/nvram/mac_nvram.c        |   2 +-
->  hw/nvram/spapr_nvram.c      |   2 +-
->  hw/sd/sdhci.c               |   2 +-
->  hw/timer/m48t59.c           |   2 +-
->  include/migration/vmstate.h |  27 +++--
->  migration/savevm.c          |   2 +-
->  migration/vmstate.c         |  91 ++++++++++------
->  target-s390x/machine.c      |   2 +-
->  tests/test-vmstate.c        | 250 +++++++++++++++++++++++++++++++++++++++++---
->  util/fifo8.c                |   2 +-
->  17 files changed, 327 insertions(+), 79 deletions(-)
-> 
-> -- 
-> 2.8.4
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> What make me wonder is that according to the reports live migration usually
+> works (ca 1% fails)...
+
+What is the backtrace of the vring_avail_idx call?  If your device is
+virtio 1.0, and vdev->guest_features has not been initialized correctly,
+you might incorrectly treat LE virtio 1.0 data as BE virtio 0.9 data:
+
+    if (virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1)) {
+        /* Devices conforming to VIRTIO 1.0 or later are always LE. */
+        return false;
+    }
+    return true;
+
+Thanks,
+
+Paolo
