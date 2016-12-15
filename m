@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41095)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41446)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex@alex.org.uk>) id 1cHStZ-0001jq-AC
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 05:04:14 -0500
+	(envelope-from <bounces@canonical.com>) id 1cHSv6-0005iW-1E
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 05:05:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex@alex.org.uk>) id 1cHStW-0005Xf-6G
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 05:04:13 -0500
-Received: from mail.avalus.com ([89.16.176.221]:49396)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex@alex.org.uk>) id 1cHStV-0005XJ-Qe
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 05:04:10 -0500
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-From: Alex Bligh <alex@alex.org.uk>
-In-Reply-To: <20161214201858.lblzw2ayddidxfyp@grep.be>
-Date: Thu, 15 Dec 2016 10:04:05 +0000
-Content-Transfer-Encoding: 7bit
-Message-Id: <58F412AB-8A4C-403F-AEE2-D2FB958D447A@alex.org.uk>
-References: <20161214150840.10899-1-alex@alex.org.uk>
-	<31576d46-c0ed-29b9-71a0-5aca1790799a@virtuozzo.com>
-	<6D1B30FC-FD7E-474C-A8E3-FD87E7AA1364@alex.org.uk>
-	<5e9150ed-2127-f2e8-f9db-a514e8f0ddf8@virtuozzo.com>
-	<5E697C22-5FBB-49A2-A018-A6B96E29FE84@alex.org.uk>
-	<94ef3ef2-b76f-fa5d-cbaf-8990ce2b1be8@virtuozzo.com>
-	<20161214181323.mehzfmlf6z4pyajp@grep.be>
-	<D71CECFD-E513-4372-BB54-BF8D8D521292@alex.org.uk>
-	<3D392E31-DDA4-4316-B26D-871E94A83935@alex.org.uk>
-	<20161214201858.lblzw2ayddidxfyp@grep.be>
-Subject: Re: [Qemu-devel] [Nbd] [PATCH] Further tidy-up on block status
+	(envelope-from <bounces@canonical.com>) id 1cHSv2-0006GS-Sg
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 05:05:48 -0500
+Received: from indium.canonical.com ([91.189.90.7]:40954)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cHSv2-0006F7-Mj
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 05:05:44 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cHSv1-0006hV-Ix
+	for <qemu-devel@nongnu.org>; Thu, 15 Dec 2016 10:05:43 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 700642E80C3
+	for <qemu-devel@nongnu.org>; Thu, 15 Dec 2016 10:05:43 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 15 Dec 2016 09:59:38 -0000
+From: Stefan Hajnoczi <1650175@bugs.launchpad.net>
+Reply-To: Bug 1650175 <1650175@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20161215084056.19927.66069.malonedeb@gac.canonical.com>
+Message-Id: <20161215095938.20195.81474.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1650175] Re: wrong version in 2.8.0-rc03
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,65 +36,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wouter Verhelst <w@uter.be>
-Cc: Alex Bligh <alex@alex.org.uk>, "nbd-general@lists.sourceforge.net" <nbd-general@lists.sourceforge.net>, Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "Stefan stefanha@redhat. com" <stefanha@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, "Denis V . Lunev" <den@openvz.org>, John Snow <jsnow@redhat.com>
+To: qemu-devel@nongnu.org
 
+This is intentional and is the way that QEMU release candidates are
+versioned.
 
-> On 14 Dec 2016, at 20:18, Wouter Verhelst <w@uter.be> wrote:
-> 
->> +    * the server MAY return a context consisting of a namespace and
->> +      a colon only (i.e. omitting the leaf-name) to indicate that
->> +      the namespace contains a large number of possible contexts
->> +      within that namespace (for instance a namespace `X-backup` with
->> +      contexts that indicate whether blocks were written after
->> +      a given date might accept queries of the form
->> +      `'X-backup:modifiedtime>[unixdate]'` where `[unixdate]` is an
->> +      arbitrary integer, and in this case it might simply
->> +      return `X-backup:`)
-> 
-> This is way too detailed, I think. It should just allow namespaces to
-> define what _LIST_ may return, as long as the client is somehow able to
-> distill (through knowledge of the spec as well as the information sent
-> in reply to the _LIST_ command) all the metadata contexts it can
-> possibly select.
+The versioning scheme is MAJOR.MINOR.PATCH where:
 
+0 >=3D PATCH < 90 is a stable release
+PATCH =3D 90 is the development window for the next MINOR release
+91 >=3D PATCH <=3D 99 is a release candidate for the next MINOR release
 
-OK, this part now reads:
+This means 2.7.93 is release candidate 3 for 2.8.
 
-    The server MUST either reply with an error (for instance `EINVAL`
-    if the option is not supported), or reply with a list of
-    `NBD_REP_META_CONTEXT` replies followed by `NBD_REP_ACK`.
+I suppose one reason this scheme has been used is that simple
+MAJOR.MINOR.PATCH version comparison algorithms will work correctly even
+if they do not support -rcN notation.
 
-    If zero queries are sent, then the server MUST return all
-    the metadata contexts that are available to the client to select
-    on the given export with `NBD_OPT_SET_META_CONTEXT`, save that:
+-- =
 
-    If one or more queries are sent, then the server MUST return
-    those metadata contexts that are available to the client to
-    select on the given export with `NBD_OPT_SET_META_CONTEXT`,
-    and which match one or more of the queries given. The
-    support of wildcarding within the leaf-name portion of
-    the query string is dependent upon the namespace.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1650175
 
-    In either case, however, for any given namespace the
-    server MAY, instead of exhaustively listing every
-    matching context available to select (or every context
-    available to select where no query is given), send
-    sufficient context records back to allow a client with
-    knowledge of the namespace to select any context. Each
-    namespace returned MUST still satisfy the rules for
-    namespaces (i.e. they must begin with the relevant
-    namespace, followed	by a colon, then printable non-whitespace
-    UTF-8 characters, with the entire string not exceeding
-    255	bytes). This may be helpful where a client can
-    construct algorithmic queries. For instance, a client might
-    reply simply with the namespace with no leaf-name (e.g.
-    'X-FooBar:') or with a range of values (e.g.
-    'X-ModifiedDate:20160310-20161214'). The semantics of
-    such a reply are a matter for the definition of the
-    namespace.
+Title:
+  wrong version in 2.8.0-rc03
 
-Hope that works.
+Status in QEMU:
+  Invalid
 
--- 
-Alex Bligh
+Bug description:
+  When you compile qemu the version still 2.7.93 instead 2.8.0-rc03
+
+  build/config-host.mak:VERSION=3D2.7.93
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1650175/+subscriptions
