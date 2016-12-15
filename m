@@ -1,34 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49640)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49715)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alastair@au1.ibm.com>) id 1cHOum-0006xA-1e
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 00:49:16 -0500
+	(envelope-from <alastair@au1.ibm.com>) id 1cHOuq-0007B7-Lj
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 00:49:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alastair@au1.ibm.com>) id 1cHOuh-0003Ge-CT
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 00:49:12 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:53977)
+	(envelope-from <alastair@au1.ibm.com>) id 1cHOun-0003Jr-4u
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 00:49:16 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40461
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <alastair@au1.ibm.com>)
-	id 1cHOuh-0003Fc-1u
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 00:49:07 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	id 1cHOum-0003Jb-UJ
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 00:49:13 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	uBF5md5X043736
-	for <qemu-devel@nongnu.org>; Thu, 15 Dec 2016 00:49:06 -0500
-Received: from e23smtp09.au.ibm.com (e23smtp09.au.ibm.com [202.81.31.142])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 27bmwxhs1c-1
+	uBF5mf2p142376
+	for <qemu-devel@nongnu.org>; Thu, 15 Dec 2016 00:49:12 -0500
+Received: from e23smtp08.au.ibm.com (e23smtp08.au.ibm.com [202.81.31.141])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 27bdm41tp5-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 15 Dec 2016 00:49:05 -0500
+	for <qemu-devel@nongnu.org>; Thu, 15 Dec 2016 00:49:11 -0500
 Received: from localhost
-	by e23smtp09.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e23smtp08.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <alastair@au1.ibm.com>;
-	Thu, 15 Dec 2016 15:49:03 +1000
+	Thu, 15 Dec 2016 15:49:07 +1000
 From: "Alastair D'Silva" <alastair@au1.ibm.com>
-Date: Thu, 15 Dec 2016 16:48:05 +1100
+Date: Thu, 15 Dec 2016 16:48:09 +1100
 In-Reply-To: <20161215054812.12602-1-alastair@au1.ibm.com>
 References: <20161215054812.12602-1-alastair@au1.ibm.com>
-Message-Id: <20161215054812.12602-2-alastair@au1.ibm.com>
-Subject: [Qemu-devel] [PATCH v4 1/8] arm: Uniquely name imx25 I2C buses.
+Message-Id: <20161215054812.12602-6-alastair@au1.ibm.com>
+Subject: [Qemu-devel] [PATCH v4 5/8] hw/i2c: Tidy up NULL check for i2c
+ slave init callbacks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,44 +44,28 @@ Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?C
 
 From: Alastair D'Silva <alastair@d-silva.org>
 
-The imx25 chip provides 3 i2c buses, but they have all been named
-"i2c", which makes it difficult to predict which bus a device will
-be connected to when specified on the command line.
-
-This patch addresses the issue by naming the buses uniquely:
-  i2c-bus.0 i2c-bus.1 i2c-bus.2
+Remove unnecessary syntax
 
 Signed-off-by: Alastair D'Silva <alastair@d-silva.org>
 ---
- hw/arm/imx25_pdk.c | 2 +-
- hw/i2c/imx_i2c.c   | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ hw/i2c/core.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/hw/arm/imx25_pdk.c b/hw/arm/imx25_pdk.c
-index 025b608..44e741f 100644
---- a/hw/arm/imx25_pdk.c
-+++ b/hw/arm/imx25_pdk.c
-@@ -139,7 +139,7 @@ static void imx25_pdk_init(MachineState *machine)
-          * of simple qtest. See "make check" for details.
-          */
-         i2c_create_slave((I2CBus *)qdev_get_child_bus(DEVICE(&s->soc.i2c[0]),
--                                                      "i2c"),
-+                                                      "i2c-bus.0"),
-                          "ds1338", 0x68);
+diff --git a/hw/i2c/core.c b/hw/i2c/core.c
+index ae3ca94..e40781e 100644
+--- a/hw/i2c/core.c
++++ b/hw/i2c/core.c
+@@ -262,9 +262,9 @@ static int i2c_slave_qdev_init(DeviceState *dev)
+ 
+     if (sc->init) {
+         return sc->init(s);
+-    } else {
+-        return 0;
      }
- }
-diff --git a/hw/i2c/imx_i2c.c b/hw/i2c/imx_i2c.c
-index 37e5a62..6c81b98 100644
---- a/hw/i2c/imx_i2c.c
-+++ b/hw/i2c/imx_i2c.c
-@@ -310,7 +310,7 @@ static void imx_i2c_realize(DeviceState *dev, Error **errp)
-                           IMX_I2C_MEM_SIZE);
-     sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->iomem);
-     sysbus_init_irq(SYS_BUS_DEVICE(dev), &s->irq);
--    s->bus = i2c_init_bus(DEVICE(dev), "i2c");
-+    s->bus = i2c_init_bus(DEVICE(dev), NULL);
++
++    return 0;
  }
  
- static void imx_i2c_class_init(ObjectClass *klass, void *data)
+ DeviceState *i2c_create_slave(I2CBus *bus, const char *name, uint8_t addr)
 -- 
 2.9.3
