@@ -1,27 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47973)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48293)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cHRLw-0005ys-R4
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 03:25:25 -0500
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cHRNd-0002My-KH
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 03:27:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cHRLr-0007NP-T0
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 03:25:24 -0500
-Received: from mail-wj0-f193.google.com ([209.85.210.193]:36239)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cHRLr-0007N3-Lx
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 03:25:19 -0500
-Received: by mail-wj0-f193.google.com with SMTP id j10so8393884wjb.3
-	for <qemu-devel@nongnu.org>; Thu, 15 Dec 2016 00:25:19 -0800 (PST)
-Date: Thu, 15 Dec 2016 08:24:16 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20161215082416.GG26169@stefanha-x1.localdomain>
-References: <b1ac8aec-e9cc-99f8-0881-bef03acc2954@linux.vnet.ibm.com>
+	(envelope-from <cornelia.huck@de.ibm.com>) id 1cHRNY-0008LH-M2
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 03:27:09 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50472
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cornelia.huck@de.ibm.com>)
+	id 1cHRNY-0008L1-GH
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 03:27:04 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
+	uBF8Nuj9040040
+	for <qemu-devel@nongnu.org>; Thu, 15 Dec 2016 03:27:03 -0500
+Received: from e06smtp08.uk.ibm.com (e06smtp08.uk.ibm.com [195.75.94.104])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 27bnute700-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 15 Dec 2016 03:27:03 -0500
+Received: from localhost
+	by e06smtp08.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <cornelia.huck@de.ibm.com>;
+	Thu, 15 Dec 2016 08:27:01 -0000
+Date: Thu, 15 Dec 2016 09:26:56 +0100
+From: Cornelia Huck <cornelia.huck@de.ibm.com>
+In-Reply-To: <20161215073808.GB26169@stefanha-x1.localdomain>
+References: <20161214163035.3297-1-maxime.coquelin@redhat.com>
+	<20161215073808.GB26169@stefanha-x1.localdomain>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="yQbNiKLmgenwUfTN"
-Content-Disposition: inline
-In-Reply-To: <b1ac8aec-e9cc-99f8-0881-bef03acc2954@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] commit virtio: recalculate vq->inuse after
- migration might cause last_avail_idx vs. used_idx failure
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Message-Id: <20161215092656.2e1244c0.cornelia.huck@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v3] virtio-pci: Fix cross-version migration
+ with older machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,78 +43,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Maxime Coquelin <maxime.coquelin@redhat.com>, mdroth@linux.vnet.ibm.com, stefanha@redhat.com, qemu-devel@nongnu.org, mst@redhat.com, marcel@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
+On Thu, 15 Dec 2016 07:38:09 +0000
+Stefan Hajnoczi <stefanha@gmail.com> wrote:
 
---yQbNiKLmgenwUfTN
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> On Wed, Dec 14, 2016 at 05:30:35PM +0100, Maxime Coquelin wrote:
+> > This patch fixes a cross-version migration regression introduced
+> > by commit d1b4259f ("virtio-bus: Plug devices after features are
+> > negotiated").
+> > 
+> > The problem is encountered when host's vhost backend does not support
+> > VIRTIO_F_VERSION_1, and migration is initiated from a v2.7 or prior
+> > machine with virtio-pci modern capabilities enabled to a v2.8 machine.
+> > 
+> > In this case, modern capabilities get exposed to the guest by the source,
+> > whereas the target will detect version 1 is not supported so will only
+> > expose legacy capabilities.
+> > 
+> > The problem is fixed by introducing a new "x-ignore-backend-features"
+> > property, which is set in v2.7 and prior compatibility modes. Doing this,
+> > v2.7 machine keeps its broken behaviour (enabling modern while version
+> > is not supported), and newer machines will behave correctly.
+> > 
+> > Reported-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+> > Suggested-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > Cc: Michael S. Tsirkin <mst@redhat.com>
+> > Cc: Cornelia Huck <cornelia.huck@de.ibm.com>
+> > Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
+> > Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > Tested-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+> > Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
+> > ---
+> > 
+> > V3 fixes commit message with the new property name.
+> > V2 changes the naming as proposed by Michael T.and Cornelia, and
+> > fixes commit message.
+> > 
+> >  hw/virtio/virtio-pci.c | 5 ++++-
+> >  hw/virtio/virtio-pci.h | 1 +
+> >  include/hw/compat.h    | 4 ++++
+> >  3 files changed, 9 insertions(+), 1 deletion(-)
+> 
+> Thanks, applied to my staging tree:
+> https://github.com/stefanha/qemu/commits/staging
+> 
+> Stefan
 
-On Wed, Dec 14, 2016 at 08:12:17PM +0100, Halil Pasic wrote:
-> We have a migration problem, which is in my opinion caused by a
-> deficiency in how vq->inuse is calculated after the migration (commit
-> bccdef6b  "virtio: recalculate vq->inuse after migration" to
-> blame).
->=20
->=20
-> We got a bugreport with this log for a live migration target.=20
->=20
-> 2016-12-13T18:59:03.647309Z qemu-system-s390x: VQ 1 size 0x100 < last_ava=
-il_idx 0x2f76 - used_idx 0x762f
+Hm, missing my R-b I gave for v2... feel free to add
 
-Thanks for spotting the signedness bug described below.  Regardless of
-the bug last_avail_idx 0x2f76 - used_idx 0x762f is still an invalid
-state and should be treated as an error.  The virtqueue only has 256
-elements so there's no way these descriptor indices can be valid.  I
-wanted to point that out since there must be another problem remaining
-somewhere.
+Reviewed-by: Cornelia Huck <cornelia.huck@de.ibm.com>
 
-> 2016-12-13T18:59:03.647385Z qemu-system-s390x: error while loading state =
-for instance 0x0 of device '/fe.0.0001/virtio-net'
-> 2016-12-13T18:59:03.647540Z qemu-system-s390x: load of migration failed: =
-Operation not permitted
-> 2016-12-13 18:59:03.796+0000: shutting down, reason=3Dfailed
->=20
-> They use QEMU version 2.7 but looking at the current git master
-> I think this did not get fixed in the meanwhile.
->=20
-> So here goes the argument. The recalculation is done like this:
->=20
-> +            vdev->vq[i].inuse =3D vdev->vq[i].last_avail_idx -
-> +                                vdev->vq[i].used_idx;
->=20
-> This does not seem correct when last_avail_idx has already
-> wrapped around but used_idx not yet. We see from the log that
-> last_avail_idx  (0x2f76) less that used_idx (0x762f) thus
-> inuse (of type int) ends up being negative.
-
-Good catch.  This works:
-
-vdev->vq[i].inuse =3D (uint16_t)(vdev->vq[i].last_avail_idx - vdev->vq[i].u=
-sed_idx);
-
-> Do we want to try to fix this for 2.8? I already have a small patch prepa=
-red.
-
-Please send the fix for 2.8.1 (-stable).  2.8.0-rc4 is currently being
-tagged and build tested, it's too late to change it.
-
-Stefan
-
---yQbNiKLmgenwUfTN
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJYUlMwAAoJEJykq7OBq3PIr8gIAKCnHP0c/fT6Vb8UEqYf3hTP
-9An1tGWCoVAhg2QapcYpqwb8dou7egVANWmT9fXJ9TKPnqLIs39KkKW4GThg32ss
-Sjpbn8gFMVY6PKIoeBOBoPq5jGhK+w68ExQqY3YkDMU2beHHGeSsdnbEYKnlXwp0
-aG86uYKXknr/TxfcMCNy6kXvl1OAhsM2BBYIDEFUB+9O036OL2F4aDYRt3gWV0SF
-mLF6zCsvdgU4//dURY81VGfJBoGdx7BHs5BAzmb1VaN4Xa/GizwHfw4gJvNalMgq
-iCtHZlNZKwwEKWd3akxjMfrAHemQm/DHLCsNWZAcIdq2bPCw55i+aa9hAcbQdkI=
-=nUhj
------END PGP SIGNATURE-----
-
---yQbNiKLmgenwUfTN--
+if you still want to change it.
