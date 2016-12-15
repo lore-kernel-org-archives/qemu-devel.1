@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36427)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44757)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex@alex.org.uk>) id 1cHZvr-0000yx-8T
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 12:35:04 -0500
+	(envelope-from <jsnow@redhat.com>) id 1cHaCG-000548-KI
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 12:52:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex@alex.org.uk>) id 1cHZvq-0004Hl-56
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 12:35:03 -0500
-Received: from mail.avalus.com ([2001:41c8:10:1dd::10]:53520)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex@alex.org.uk>) id 1cHZvp-0004Fe-UL
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 12:35:02 -0500
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-From: Alex Bligh <alex@alex.org.uk>
-In-Reply-To: <20161215164917.2zzkdwxarf4pnfle@grep.be>
-Date: Thu, 15 Dec 2016 17:34:48 +0000
+	(envelope-from <jsnow@redhat.com>) id 1cHaCD-00006q-GB
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 12:52:00 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52008)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1cHaCD-00006I-A7
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 12:51:57 -0500
+References: <1481742422-15969-1-git-send-email-ashijeetacharya@gmail.com>
+	<1481742422-15969-4-git-send-email-ashijeetacharya@gmail.com>
+	<20161215171118.GQ2509@work-vm>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <760d279a-0219-9c0f-a3b6-4f177c5b0167@redhat.com>
+Date: Thu, 15 Dec 2016 12:51:53 -0500
+MIME-Version: 1.0
+In-Reply-To: <20161215171118.GQ2509@work-vm>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Message-Id: <3DDAB833-51BF-4F73-9F08-E50054B01D24@alex.org.uk>
-References: <5e9150ed-2127-f2e8-f9db-a514e8f0ddf8@virtuozzo.com>
-	<5E697C22-5FBB-49A2-A018-A6B96E29FE84@alex.org.uk>
-	<94ef3ef2-b76f-fa5d-cbaf-8990ce2b1be8@virtuozzo.com>
-	<20161214181323.mehzfmlf6z4pyajp@grep.be>
-	<D71CECFD-E513-4372-BB54-BF8D8D521292@alex.org.uk>
-	<3D392E31-DDA4-4316-B26D-871E94A83935@alex.org.uk>
-	<20161214201858.lblzw2ayddidxfyp@grep.be>
-	<58F412AB-8A4C-403F-AEE2-D2FB958D447A@alex.org.uk>
-	<20161215150312.dmxrxn7ujzq3apy6@grep.be>
-	<78C8A0CB-717D-4925-8AA8-A085DC1F9FB7@alex.org.uk>
-	<20161215164917.2zzkdwxarf4pnfle@grep.be>
-Subject: Re: [Qemu-devel] [Nbd] [PATCH] Further tidy-up on block status
+Subject: Re: [Qemu-devel] [PATCH 3/3] migration: disallow
+ migrate_add_blocker during migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,24 +29,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wouter Verhelst <w@uter.be>
-Cc: Alex Bligh <alex@alex.org.uk>, "nbd-general@lists.sourceforge.net" <nbd-general@lists.sourceforge.net>, Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Stefan stefanha@redhat. com" <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Denis V . Lunev" <den@openvz.org>, John Snow <jsnow@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Ashijeet Acharya <ashijeetacharya@gmail.com>
+Cc: amit.shah@redhat.com, pbonzini@redhat.com, kwolf@redhat.com, armbru@redhat.com, quintela@redhat.com, mst@redhat.com, marcandre.lureau@redhat.com, groug@kaod.org, aneesh.kumar@linux.vnet.ibm.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
 
-> On 15 Dec 2016, at 16:49, Wouter Verhelst <w@uter.be> wrote:
-> 
->> Because the namespaces and leaf-names are already restricted to
->> non-whitespace characters. I thought having tabs, line feeds,
->> returns, em-space, en-space etc. was not particularly useful.
->> I could be persuaded to relent re spaces.
-> 
-> I could imagine that the context might include as part of its name a
-> user-defined bit. If we're going to disallow whitespace, then that would
-> mean namespaces would have to do all sorts of escaping etc. I don't
-> think that's a good idea.
 
-So to be clear do you want to include all whitespace
-everywhere? Or just to the right of the colon in queries?
+On 12/15/2016 12:11 PM, Dr. David Alan Gilbert wrote:
+>      if (virtio_gpu_virgl_enabled(g->conf)) {
+> +        error_setg(&g->migration_blocker, "virgl is not yet migratable");
+> +        ret = migrate_add_blocker(g->migration_blocker, errp);
+> +        if (ret) {
+> +            if (ret > 0) {
+> +                error_setg(errp, "Cannot use virgl as it does not support live"
+> +                           " migration yet and --only-migratable was "
+> +                           "specified");
+> +            }
+> +            return;
+> +        }
+> +    }
 
--- 
-Alex Bligh
+It may be best to leave this patch as a generic "Failed to add a
+migration blocker" type of patch.
+
+Then, in a fourth patch, you add the --only-migratable specific stuff as
+an enhancement. (Basically, add your changes on top of my patch in your
+own, separate patch.)
+
+I'd also add the "--only-migratable" stuff only inside
+migrate_add_blocker, and whatever the reason happens to be, you can
+append a hint to the error message in the caller above.
+
+e.g.
+
+migrate_add_blocker(..) {
+..
+  error_setg("Failed to add migration blocker: --only-migratable was
+specified")
+..
+}
+
+And in the caller:
+
+r = migrate_add_blocker(.., errp)
+if (r) {
+  error_append_hint(errp, "Failed to initialize virgl, couldn't add
+migration blocker")
+}
+
+Or something along those lines. Maybe even error_prepend in this case
+makes sense.
+
+I'd try to keep all of the --only-migratable logic localized and in a
+separate patch, leaving this patch strictly to deal with the case where
+a migration is already in progress. Of course, you'll be right to notice
+that in many of these initialization cases the error path could never
+trigger, but that's OK. It adds the generic handling necessary to cope
+with an error from a lower layer.
+
+I'd also certainly advise to never return a custom error code from
+migrate_add_blocker if we also wish to return a 'real' error code. Stick
+with POSIX entirely or avoid it entirely.
+
+--js
