@@ -1,21 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54284)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37007)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1cHIsI-0004RI-3T
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 18:22:16 -0500
+	(envelope-from <kirill.shutemov@linux.intel.com>) id 1cHJfm-0000uD-AD
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:13:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1cHIsG-0003WA-AO
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 18:22:14 -0500
-Message-ID: <1481757657.22744.10.camel@gmail.com>
-From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Date: Thu, 15 Dec 2016 10:20:57 +1100
-In-Reply-To: <20161214062008.GI32647@umbus>
-References: <20161212040603.27295-1-david@gibson.dropbear.id.au>
-	<20161212040603.27295-4-david@gibson.dropbear.id.au>
-	<1481693457.1555.25.camel@gmail.com> <20161214062008.GI32647@umbus>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCHv3 3/5] pseries: Implement HPT resizing
+	(envelope-from <kirill.shutemov@linux.intel.com>) id 1cHJfi-0006Pu-Un
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:13:22 -0500
+Received: from mga04.intel.com ([192.55.52.120]:19372)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kirill.shutemov@linux.intel.com>)
+	id 1cHJfi-0006PW-Gn
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:13:18 -0500
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Date: Thu, 15 Dec 2016 03:13:05 +0300
+Message-Id: <20161215001305.146807-1-kirill.shutemov@linux.intel.com>
+Subject: [Qemu-devel] [PATCH] x86: implement la57 paging mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,330 +22,611 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: paulus@samba.org, agraf@suse.de, mdroth@linux.vnet.ibm.com, thuth@redhat.com, lvivier@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, kirill@shutemov.name, "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
 
-On Wed, 2016-12-14 at 17:20 +1100, David Gibson wrote:
-> On Wed, Dec 14, 2016 at 04:30:57PM +1100, Suraj Jitindar Singh wrote:
-> > 
-> > On Mon, 2016-12-12 at 15:06 +1100, David Gibson wrote:
-> [snip]
-> > 
-> > > 
-> > > +    if (!(pte0 & HPTE64_V_VALID) || !(pte0 & HPTE64_V_BOLTED)) {
-> > > +        return H_SUCCESS;
-> > > +    }
-> > > +
-> > > +    pte1 = ppc_hash64_load_hpte1(cpu, token, slot);
-> > > +
-> > > +    shift = ppc_hash64_hpte_page_shift_noslb(cpu, pte0, pte1);
-> > > +    assert(shift); /* H_ENTER should never have allowed a bad
-> > > encoding */
-> > > +    avpn = HPTE64_V_AVPN_VAL(pte0) & ~(((1ULL << shift) - 1) >>
-> > > 23);
-> > > +
-> > > +    if (pte0 & HPTE64_V_SECONDARY) {
-> > > +        pteg = ~pteg;
-> > > +    }
-> > > +
-> > The hash calculation below is pretty hard to follow... That being
-> > said
-> > I don't really see a nicer way of structuring it. I guess you just
-> > have
-> > to wade through the ISA if you actually want to understand what's
-> > happening here (which I assume most people won't bother with).
-> Yeah, the hash calculation is always hard to follow.  Here it's
-> particularly bad because we're essentially doing two: one backwards
-> and one forwards.  Unless someone has a great suggestion, I don't
-> really see a way to make this obvious.
-> 
-> > 
-> > > 
-> > > +    if ((pte0 & HPTE64_V_SSIZE) == HPTE64_V_SSIZE_256M) {
-> > > +        uint64_t offset, vsid;
-> > > +
-> > > +        /* We only have 28 - 23 bits of offset in avpn */
-> > > +        offset = (avpn & 0x1f) << 23;
-> > > +        vsid = avpn >> 5;
-> > > +        /* We can find more bits from the pteg value */
-> > > +        if (shift < 23) {
-> > > +            offset |= ((vsid ^ pteg) & old_hash_mask) << shift;
-> > > +        }
-> > > +
-> > > +        hash = vsid ^ (offset >> shift);
-> > > +    } else if ((pte0 & HPTE64_V_SSIZE) == HPTE64_V_SSIZE_1T) {
-> > > +        uint64_t offset, vsid;
-> > > +
-> > > +        /* We only have 40 - 23 bits of seg_off in avpn */
-> > > +        offset = (avpn & 0x1ffff) << 23;
-> > > +        vsid = avpn >> 17;
-> > > +        if (shift < 23) {
-> > > +            offset |= ((vsid ^ (vsid << 25) ^ pteg) &
-> > > old_hash_mask)
-> > > << shift;
-> > > +        }
-> > > +
-> > > +        hash = vsid ^ (vsid << 25) ^ (offset >> shift);
-> > > +    } else {
-> > > +        error_report("rehash_pte: Bad segment size in HPTE");
-> > > +        return H_HARDWARE;
-> > > +    }
-> > > +
-> > > +    new_pteg = hash & new_hash_mask;
-> > > +    if (pte0 & HPTE64_V_SECONDARY) {
-> > > +        assert(~pteg == (hash & old_hash_mask));
-> > > +        new_pteg = ~new_pteg;
-> > > +    } else {
-> > > +        assert(pteg == (hash & old_hash_mask));
-> > > +    }
-> > > +    assert((oldsize != newsize) || (pteg == new_pteg));
-> > > +    replace_pte0 = new_hpte_load0(new, new_pteg, slot);
-> > > +    if (replace_pte0 & HPTE64_V_VALID) {
-> > > +        assert(newsize < oldsize);
-> > > +        if (replace_pte0 & HPTE64_V_BOLTED) {
-> > Aren't both of these checks for BOLTED redundant? We know that we
-> > are
-> > only rehashing ptes which are both valid and bolted, otherwise we
-> > would
-> > have returned at *** above. Thus the new hpt will only contain
-> > invalid
-> > entries or valid && bolted entries, we don't need to check if
-> > replace_pte is bolted if we know it's valid. Similarly we know the
-> > one
-> > we are replacing it with is bolted, otherwise we wouldn't have
-> > bothered
-> > rehashing it. Thus it's pretty much sufficient to check
-> > replace_pte0
-> > && HPTE64_V_VALID == 1 which implies a bolted collision
-> > irrespective.
-> Ah, so, technically, yes it's redundant.  I'd prefer to leave it as
-> is, in case we ever implement a version which also rehashes non-
-> bolted
-> entries.  As it is we could do that simply by changing the test at
-> the
-> top, without needing a synchronized change here
-Sounds good, may as well keep it as is then to make future updates
-easier.
-> 
-> > 
-> > > 
-> > > +            if (pte0 & HPTE64_V_BOLTED) {
-> > > +                /* Bolted collision, nothing we can do */
-> > > +                return H_PTEG_FULL;
-> > > +            } else {
-> > > +                /* Discard this hpte */
-> > > +                return H_SUCCESS;
-> > > +            }
-> > > +        }
-> > Is there any reason the rehashed pte has to go into the same slot
-> > it
-> > came out of? Isn't it valid to search all of the slots of the new
-> > pteg
-> > for an empty (invalid) one and put it in the first empty space?
-> > Just
-> > because the current slot already contains a bolted entry doesn't
-> > mean
-> > we can't put it in another slot, right?
-> Not in practice.  The guest is allowed to keep track of which slot it
-> loaded an HPTE into and use that for later updates or invalidates -
-> Linux guests do this in practice.  Because of that the PAPR ACR
-> explicitly says the resize must preserve hash slots.
-> 
-> I theory we could implement a variant which didn't do this, but I
-> doubt we'll ever want to because it will be much, much harder to work
-> with on the guest side.
-Didn't manage to get hold of the ACR so didn't realise slots had to be
-preserved. Seems like if you have a bolted collision you would want to
-just use a different slot rather than fail the whole rehash. But I
-didn't realise guests tracked the slot either so this is probably
-difficult to change.
-> 
-> > 
-> > > 
-> > > +    }
-> > > +
-> > > +    new_hpte_store(new, new_pteg, slot, pte0, pte1);
-> > > +    return H_SUCCESS;
-> > > +}
-> > > +
-> > > +static int rehash_hpt(PowerPCCPU *cpu,
-> > > +                      void *old, uint64_t oldsize,
-> > > +                      void *new, uint64_t newsize)
-> > > +{
-> > > +    CPUPPCState *env = &cpu->env;
-> > > +    uint64_t n_ptegs = oldsize >> 7;
-> > > +    uint64_t pteg;
-> > > +    int slot;
-> > > +    int rc;
-> > > +
-> > > +    assert(env->external_htab == old);
-> > > +
-> > > +    for (pteg = 0; pteg < n_ptegs; pteg++) {
-> > Can we rename token to pteg_[base_]addr or something? Token is
-> > very...
-> > generic
-> So the value returned here is supposed to be opaque, and only passed
-> back to the accessor helpers.  It returns different things depending
-> on if we have an external HPT, or an internal HPT (virtual bare metal
-> machine).  Hence the generic name.
-> 
-> > 
-> > > 
-> > > +        uint64_t token = ppc_hash64_start_access(cpu, pteg *
-> > > HPTES_PER_GROUP);
-> > > +
-> > > +        if (!token) {
-> > > +            return H_HARDWARE;
-> > > +        }
-> > > +
-> > > +        for (slot = 0; slot < HPTES_PER_GROUP; slot++) {
-> > > +            rc = rehash_hpte(cpu, token, old, oldsize, new,
-> > > newsize,
-> > > +                             pteg, slot);
-> > > +            if (rc != H_SUCCESS) {
-> > > +                ppc_hash64_stop_access(cpu, token);
-> > > +                return rc;
-> > > +            }
-> > > +        }
-> > > +        ppc_hash64_stop_access(cpu, token);
-> > > +    }
-> > > +
-> > > +    return H_SUCCESS;
-> > > +}
-> > > +
-> > > +static void pivot_hpt(CPUState *cs, run_on_cpu_data arg)
-> > > +{
-> > > +    sPAPRMachineState *spapr = SPAPR_MACHINE(arg.host_ptr);
-> > > +    PowerPCCPU *cpu = POWERPC_CPU(cs);
-> > > +
-> > > +    cpu_synchronize_state(cs);
-> > > +    ppc_hash64_set_external_hpt(cpu, spapr->htab, spapr-
-> > > >htab_shift,
-> > > +                                &error_fatal);
-> > >  }
-> > >  
-> > >  static target_ulong h_resize_hpt_commit(PowerPCCPU *cpu,
-> > > @@ -378,13 +678,52 @@ static target_ulong
-> > > h_resize_hpt_commit(PowerPCCPU *cpu,
-> > >  {
-> > >      target_ulong flags = args[0];
-> > >      target_ulong shift = args[1];
-> > > +    sPAPRPendingHPT *pending = spapr->pending_hpt;
-> > > +    int rc;
-> > > +    size_t newsize;
-> > >  
-> > >      if (spapr->resize_hpt == SPAPR_RESIZE_HPT_DISABLED) {
-> > >          return H_AUTHORITY;
-> > >      }
-> > >  
-> > >      trace_spapr_h_resize_hpt_commit(flags, shift);
-> > > -    return H_HARDWARE;
-> > > +
-> > > +    if (flags != 0) {
-> > > +        return H_PARAMETER;
-> > > +    }
-> > > +
-> > > +    if (!pending || (pending->shift != shift)) {
-> > > +        /* no matching prepare */
-> > > +        return H_CLOSED;
-> > > +    }
-> > > +
-> > > +    if (!pending->complete) {
-> > > +        /* prepare has not completed */
-> > > +        return H_BUSY;
-> > > +    }
-> > > +
-> > > +    newsize = 1ULL << pending->shift;
-> > > +    rc = rehash_hpt(cpu, spapr->htab, HTAB_SIZE(spapr),
-> > > +                    pending->hpt, newsize);
-> > > +    if (rc == H_SUCCESS) {
-> > > +        CPUState *cs;
-> > > +
-> > > +        qemu_vfree(spapr->htab);
-> > > +        spapr->htab = pending->hpt;
-> > > +        spapr->htab_shift = pending->shift;
-> > > +
-> > > +        CPU_FOREACH(cs) {
-> > > +            run_on_cpu(cs, pivot_hpt,
-> > > RUN_ON_CPU_HOST_PTR(spapr));
-> > > +        }
-> > > +
-> > > +        pending->hpt = NULL; /* so it's not free()d */
-> > > +    }
-> > > +
-> > > +    /* Clean up */
-> > > +    spapr->pending_hpt = NULL;
-> > > +    free_pending_hpt(pending);
-> > > +
-> > > +    return rc;
-> > >  }
-> > >  
-> > >  static target_ulong h_set_sprg0(PowerPCCPU *cpu,
-> > > sPAPRMachineState
-> > > *spapr,
-> > > diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> > > index d2c758b..954bada 100644
-> > > --- a/include/hw/ppc/spapr.h
-> > > +++ b/include/hw/ppc/spapr.h
-> > > @@ -14,6 +14,7 @@ struct sPAPRNVRAM;
-> > >  typedef struct sPAPRConfigureConnectorState
-> > > sPAPRConfigureConnectorState;
-> > >  typedef struct sPAPREventLogEntry sPAPREventLogEntry;
-> > >  typedef struct sPAPREventSource sPAPREventSource;
-> > > +typedef struct sPAPRPendingHPT sPAPRPendingHPT;
-> > >  
-> > >  #define HPTE64_V_HPTE_DIRTY     0x0000000000000040ULL
-> > >  #define SPAPR_ENTRY_POINT       0x100
-> > > @@ -72,6 +73,8 @@ struct sPAPRMachineState {
-> > >      sPAPRResizeHPT resize_hpt;
-> > >      void *htab;
-> > >      uint32_t htab_shift;
-> > > +    sPAPRPendingHPT *pending_hpt; /* in-progress resize */
-> > > +
-> > >      hwaddr rma_size;
-> > >      int vrma_adjust;
-> > >      ssize_t rtas_size;
-> > > @@ -627,6 +630,7 @@ void
-> > > spapr_hotplug_req_remove_by_count_indexed(sPAPRDRConnectorType
-> > > drc_type,
-> > >                                                 uint32_t count,
-> > > uint32_t index);
-> > >  void *spapr_populate_hotplug_cpu_dt(CPUState *cs, int
-> > > *fdt_offset,
-> > >                                      sPAPRMachineState *spapr);
-> > > +int spapr_hpt_shift_for_ramsize(uint64_t ramsize);
-> > >  
-> > >  /* rtas-configure-connector state */
-> > >  struct sPAPRConfigureConnectorState {
-> > > @@ -674,4 +678,6 @@ int spapr_rng_populate_dt(void *fdt);
-> > >  
-> > >  void spapr_do_system_reset_on_cpu(CPUState *cs, run_on_cpu_data
-> > > arg);
-> > >  
-> > > +#define HTAB_SIZE(spapr)        (1ULL << ((spapr)->htab_shift))
-> > > +
-> > >  #endif /* HW_SPAPR_H */
-> > > diff --git a/target-ppc/mmu-hash64.h b/target-ppc/mmu-hash64.h
-> > > index ab5d347..4a1b781 100644
-> > > --- a/target-ppc/mmu-hash64.h
-> > > +++ b/target-ppc/mmu-hash64.h
-> > > @@ -60,11 +60,15 @@ void ppc_hash64_update_rmls(CPUPPCState
-> > > *env);
-> > >  #define HASH_PTE_SIZE_64        16
-> > >  #define HASH_PTEG_SIZE_64       (HASH_PTE_SIZE_64 *
-> > > HPTES_PER_GROUP)
-> > >  
-> > > +#define HPTE64_V_SSIZE          SLB_VSID_B
-> > > +#define HPTE64_V_SSIZE_256M     SLB_VSID_B_256M
-> > > +#define HPTE64_V_SSIZE_1T       SLB_VSID_B_1T
-> > >  #define HPTE64_V_SSIZE_SHIFT    62
-> > >  #define HPTE64_V_AVPN_SHIFT     7
-> > >  #define HPTE64_V_AVPN           0x3fffffffffffff80ULL
-> > >  #define HPTE64_V_AVPN_VAL(x)    (((x) & HPTE64_V_AVPN) >>
-> > > HPTE64_V_AVPN_SHIFT)
-> > >  #define HPTE64_V_COMPARE(x, y)  (!(((x) ^ (y)) &
-> > > 0xffffffffffffff83ULL))
-> > > +#define HPTE64_V_BOLTED         0x0000000000000010ULL
-> > >  #define HPTE64_V_LARGE          0x0000000000000004ULL
-> > >  #define HPTE64_V_SECONDARY      0x0000000000000002ULL
-> > >  #define HPTE64_V_VALID          0x0000000000000001ULL
+The new paging more is extension of IA32e mode with more additional page
+table level.
+
+It brings support of 57-bit vitrual address space (128PB) and 52-bit
+physical address space (4PB).
+
+The structure of new page table level is identical to pml4.
+
+The feature is enumerated with CPUID.(EAX=07H, ECX=0):ECX[bit 16].
+
+CR4.LA57[bit 12] need to be set when pageing enables to activate 5-level
+paging mode.
+
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+---
+ target-i386/arch_memory_mapping.c |  42 ++++++-
+ target-i386/cpu.c                 |  16 ++-
+ target-i386/cpu.h                 |   2 +
+ target-i386/helper.c              |  54 +++++++--
+ target-i386/monitor.c             | 234 +++++++++++++++++++++++++++++---------
+ target-i386/translate.c           |   2 +
+ 6 files changed, 276 insertions(+), 74 deletions(-)
+
+diff --git a/target-i386/arch_memory_mapping.c b/target-i386/arch_memory_mapping.c
+index 88f341e1bbd0..826aee597b13 100644
+--- a/target-i386/arch_memory_mapping.c
++++ b/target-i386/arch_memory_mapping.c
+@@ -220,7 +220,8 @@ static void walk_pdpe(MemoryMappingList *list, AddressSpace *as,
+ 
+ /* IA-32e Paging */
+ static void walk_pml4e(MemoryMappingList *list, AddressSpace *as,
+-                       hwaddr pml4e_start_addr, int32_t a20_mask)
++                       hwaddr pml4e_start_addr, int32_t a20_mask,
++                       target_ulong start_line_addr)
+ {
+     hwaddr pml4e_addr, pdpe_start_addr;
+     uint64_t pml4e;
+@@ -236,11 +237,34 @@ static void walk_pml4e(MemoryMappingList *list, AddressSpace *as,
+             continue;
+         }
+ 
+-        line_addr = ((i & 0x1ffULL) << 39) | (0xffffULL << 48);
++        line_addr = start_line_addr | ((i & 0x1ffULL) << 39);
+         pdpe_start_addr = (pml4e & PLM4_ADDR_MASK) & a20_mask;
+         walk_pdpe(list, as, pdpe_start_addr, a20_mask, line_addr);
+     }
+ }
++
++static void walk_pml5e(MemoryMappingList *list, AddressSpace *as,
++                       hwaddr pml5e_start_addr, int32_t a20_mask)
++{
++    hwaddr pml5e_addr, pml4e_start_addr;
++    uint64_t pml5e;
++    target_ulong line_addr;
++    int i;
++
++    for (i = 0; i < 512; i++) {
++        pml5e_addr = (pml5e_start_addr + i * 8) & a20_mask;
++        pml5e = address_space_ldq(as, pml5e_addr, MEMTXATTRS_UNSPECIFIED,
++                                  NULL);
++        if (!(pml5e & PG_PRESENT_MASK)) {
++            /* not present */
++            continue;
++        }
++
++        line_addr = (0x7fULL << 57) | ((i & 0x1ffULL) << 48);
++        pml4e_start_addr = (pml5e & PLM4_ADDR_MASK) & a20_mask;
++        walk_pml4e(list, as, pml4e_start_addr, a20_mask, line_addr);
++    }
++}
+ #endif
+ 
+ void x86_cpu_get_memory_mapping(CPUState *cs, MemoryMappingList *list,
+@@ -257,10 +281,18 @@ void x86_cpu_get_memory_mapping(CPUState *cs, MemoryMappingList *list,
+     if (env->cr[4] & CR4_PAE_MASK) {
+ #ifdef TARGET_X86_64
+         if (env->hflags & HF_LMA_MASK) {
+-            hwaddr pml4e_addr;
++            if (env->cr[4] & CR4_LA57_MASK) {
++                hwaddr pml5e_addr;
++
++                pml5e_addr = (env->cr[3] & PLM4_ADDR_MASK) & env->a20_mask;
++                walk_pml5e(list, cs->as, pml5e_addr, env->a20_mask);
++            } else {
++                hwaddr pml4e_addr;
+ 
+-            pml4e_addr = (env->cr[3] & PLM4_ADDR_MASK) & env->a20_mask;
+-            walk_pml4e(list, cs->as, pml4e_addr, env->a20_mask);
++                pml4e_addr = (env->cr[3] & PLM4_ADDR_MASK) & env->a20_mask;
++                walk_pml4e(list, cs->as, pml4e_addr, env->a20_mask,
++                        0xffffULL << 48);
++            }
+         } else
+ #endif
+         {
+diff --git a/target-i386/cpu.c b/target-i386/cpu.c
+index de1f30eeda63..a4b9832b5916 100644
+--- a/target-i386/cpu.c
++++ b/target-i386/cpu.c
+@@ -238,7 +238,8 @@ static void x86_cpu_vendor_words2str(char *dst, uint32_t vendor1,
+           CPUID_7_0_EBX_HLE, CPUID_7_0_EBX_AVX2,
+           CPUID_7_0_EBX_INVPCID, CPUID_7_0_EBX_RTM,
+           CPUID_7_0_EBX_RDSEED */
+-#define TCG_7_0_ECX_FEATURES (CPUID_7_0_ECX_PKU | CPUID_7_0_ECX_OSPKE)
++#define TCG_7_0_ECX_FEATURES (CPUID_7_0_ECX_PKU | CPUID_7_0_ECX_OSPKE | \
++          CPUID_7_0_ECX_LA57)
+ #define TCG_7_0_EDX_FEATURES 0
+ #define TCG_APM_FEATURES 0
+ #define TCG_6_EAX_FEATURES CPUID_6_EAX_ARAT
+@@ -435,7 +436,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+             "ospke", NULL, NULL, NULL,
+             NULL, NULL, NULL, NULL,
+             NULL, NULL, NULL, NULL,
+-            NULL, NULL, NULL, NULL,
++            "la57", NULL, NULL, NULL,
+             NULL, NULL, "rdpid", NULL,
+             NULL, NULL, NULL, NULL,
+             NULL, NULL, NULL, NULL,
+@@ -2742,10 +2743,13 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+     case 0x80000008:
+         /* virtual & phys address size in low 2 bytes. */
+         if (env->features[FEAT_8000_0001_EDX] & CPUID_EXT2_LM) {
+-            /* 64 bit processor, 48 bits virtual, configurable
+-             * physical bits.
+-             */
+-            *eax = 0x00003000 + cpu->phys_bits;
++            /* 64 bit processor */
++            *eax = cpu->phys_bits; /* configurable physical bits */
++            if  (env->features[FEAT_7_0_ECX] & CPUID_7_0_ECX_LA57) {
++                *eax |= 0x00003900; /* 57 bits virtual */
++            } else {
++                *eax |= 0x00003000; /* 48 bits virtual */
++            }
+         } else {
+             *eax = cpu->phys_bits;
+         }
+diff --git a/target-i386/cpu.h b/target-i386/cpu.h
+index c60572402272..0ba880fc2632 100644
+--- a/target-i386/cpu.h
++++ b/target-i386/cpu.h
+@@ -224,6 +224,7 @@
+ #define CR4_OSFXSR_SHIFT 9
+ #define CR4_OSFXSR_MASK (1U << CR4_OSFXSR_SHIFT)
+ #define CR4_OSXMMEXCPT_MASK  (1U << 10)
++#define CR4_LA57_MASK   (1U << 12)
+ #define CR4_VMXE_MASK   (1U << 13)
+ #define CR4_SMXE_MASK   (1U << 14)
+ #define CR4_FSGSBASE_MASK (1U << 16)
+@@ -628,6 +629,7 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
+ #define CPUID_7_0_ECX_UMIP     (1U << 2)
+ #define CPUID_7_0_ECX_PKU      (1U << 3)
+ #define CPUID_7_0_ECX_OSPKE    (1U << 4)
++#define CPUID_7_0_ECX_LA57     (1U << 16)
+ #define CPUID_7_0_ECX_RDPID    (1U << 22)
+ 
+ #define CPUID_7_0_EDX_AVX512_4VNNIW (1U << 2) /* AVX512 Neural Network Instructions */
+diff --git a/target-i386/helper.c b/target-i386/helper.c
+index 4ecc0912a48a..43e87ddba001 100644
+--- a/target-i386/helper.c
++++ b/target-i386/helper.c
+@@ -651,11 +651,11 @@ void cpu_x86_update_cr4(CPUX86State *env, uint32_t new_cr4)
+     uint32_t hflags;
+ 
+ #if defined(DEBUG_MMU)
+-    printf("CR4 update: CR4=%08x\n", (uint32_t)env->cr[4]);
++    printf("CR4 update: %08x -> %08x\n", (uint32_t)env->cr[4], new_cr4);
+ #endif
+     if ((new_cr4 ^ env->cr[4]) &
+         (CR4_PGE_MASK | CR4_PAE_MASK | CR4_PSE_MASK |
+-         CR4_SMEP_MASK | CR4_SMAP_MASK)) {
++         CR4_SMEP_MASK | CR4_SMAP_MASK | CR4_LA57_MASK)) {
+         tlb_flush(CPU(cpu), 1);
+     }
+ 
+@@ -757,19 +757,41 @@ int x86_cpu_handle_mmu_fault(CPUState *cs, vaddr addr,
+ 
+ #ifdef TARGET_X86_64
+         if (env->hflags & HF_LMA_MASK) {
++            bool la57 = env->cr[4] & CR4_LA57_MASK;
++            uint64_t pml5e_addr, pml5e;
+             uint64_t pml4e_addr, pml4e;
+             int32_t sext;
+ 
+             /* test virtual address sign extension */
+-            sext = (int64_t)addr >> 47;
++            sext = la57 ? (int64_t)addr >> 56 : (int64_t)addr >> 47;
+             if (sext != 0 && sext != -1) {
+                 env->error_code = 0;
+                 cs->exception_index = EXCP0D_GPF;
+                 return 1;
+             }
+ 
+-            pml4e_addr = ((env->cr[3] & ~0xfff) + (((addr >> 39) & 0x1ff) << 3)) &
+-                env->a20_mask;
++            if (la57) {
++                pml5e_addr = ((env->cr[3] & ~0xfff) +
++                        (((addr >> 48) & 0x1ff) << 3)) & env->a20_mask;
++                pml5e = x86_ldq_phys(cs, pml5e_addr);
++                if (!(pml5e & PG_PRESENT_MASK)) {
++                    goto do_fault;
++                }
++                if (pml5e & (rsvd_mask | PG_PSE_MASK)) {
++                    goto do_fault_rsvd;
++                }
++                if (!(pml5e & PG_ACCESSED_MASK)) {
++                    pml5e |= PG_ACCESSED_MASK;
++                    x86_stl_phys_notdirty(cs, pml5e_addr, pml5e);
++                }
++                ptep = pml5e ^ PG_NX_MASK;
++            } else {
++                pml5e = env->cr[3];
++                ptep = PG_NX_MASK | PG_USER_MASK | PG_RW_MASK;
++            }
++
++            pml4e_addr = ((pml5e & PG_ADDRESS_MASK) +
++                    (((addr >> 39) & 0x1ff) << 3)) & env->a20_mask;
+             pml4e = x86_ldq_phys(cs, pml4e_addr);
+             if (!(pml4e & PG_PRESENT_MASK)) {
+                 goto do_fault;
+@@ -781,7 +803,7 @@ int x86_cpu_handle_mmu_fault(CPUState *cs, vaddr addr,
+                 pml4e |= PG_ACCESSED_MASK;
+                 x86_stl_phys_notdirty(cs, pml4e_addr, pml4e);
+             }
+-            ptep = pml4e ^ PG_NX_MASK;
++            ptep &= pml4e ^ PG_NX_MASK;
+             pdpe_addr = ((pml4e & PG_ADDRESS_MASK) + (((addr >> 30) & 0x1ff) << 3)) &
+                 env->a20_mask;
+             pdpe = x86_ldq_phys(cs, pdpe_addr);
+@@ -1024,16 +1046,30 @@ hwaddr x86_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
+ 
+ #ifdef TARGET_X86_64
+         if (env->hflags & HF_LMA_MASK) {
++            bool la57 = env->cr[4] & CR4_LA57_MASK;
++            uint64_t pml5e_addr, pml5e;
+             uint64_t pml4e_addr, pml4e;
+             int32_t sext;
+ 
+             /* test virtual address sign extension */
+-            sext = (int64_t)addr >> 47;
++            sext = la57 ? (int64_t)addr >> 56 : (int64_t)addr >> 47;
+             if (sext != 0 && sext != -1) {
+                 return -1;
+             }
+-            pml4e_addr = ((env->cr[3] & ~0xfff) + (((addr >> 39) & 0x1ff) << 3)) &
+-                env->a20_mask;
++
++            if (la57) {
++                pml5e_addr = ((env->cr[3] & ~0xfff) +
++                        (((addr >> 48) & 0x1ff) << 3)) & env->a20_mask;
++                pml5e = x86_ldq_phys(cs, pml5e_addr);
++                if (!(pml5e & PG_PRESENT_MASK)) {
++                    return -1;
++                }
++            } else {
++                pml5e = env->cr[3];
++            }
++
++            pml4e_addr = ((pml5e & PG_ADDRESS_MASK) +
++                    (((addr >> 39) & 0x1ff) << 3)) & env->a20_mask;
+             pml4e = x86_ldq_phys(cs, pml4e_addr);
+             if (!(pml4e & PG_PRESENT_MASK)) {
+                 return -1;
+diff --git a/target-i386/monitor.c b/target-i386/monitor.c
+index 9a3b4d746e8d..468aa073bcc9 100644
+--- a/target-i386/monitor.c
++++ b/target-i386/monitor.c
+@@ -30,13 +30,18 @@
+ #include "hmp.h"
+ 
+ 
+-static void print_pte(Monitor *mon, hwaddr addr,
+-                      hwaddr pte,
+-                      hwaddr mask)
++static void print_pte(Monitor *mon, CPUArchState *env, hwaddr addr,
++                      hwaddr pte, hwaddr mask)
+ {
+ #ifdef TARGET_X86_64
+-    if (addr & (1ULL << 47)) {
+-        addr |= -1LL << 48;
++    if (env->cr[4] & CR4_LA57_MASK) {
++        if (addr & (1ULL << 56)) {
++            addr |= -1LL << 57;
++        }
++    } else {
++        if (addr & (1ULL << 47)) {
++            addr |= -1LL << 48;
++        }
+     }
+ #endif
+     monitor_printf(mon, TARGET_FMT_plx ": " TARGET_FMT_plx
+@@ -66,13 +71,13 @@ static void tlb_info_32(Monitor *mon, CPUArchState *env)
+         if (pde & PG_PRESENT_MASK) {
+             if ((pde & PG_PSE_MASK) && (env->cr[4] & CR4_PSE_MASK)) {
+                 /* 4M pages */
+-                print_pte(mon, (l1 << 22), pde, ~((1 << 21) - 1));
++                print_pte(mon, env, (l1 << 22), pde, ~((1 << 21) - 1));
+             } else {
+                 for(l2 = 0; l2 < 1024; l2++) {
+                     cpu_physical_memory_read((pde & ~0xfff) + l2 * 4, &pte, 4);
+                     pte = le32_to_cpu(pte);
+                     if (pte & PG_PRESENT_MASK) {
+-                        print_pte(mon, (l1 << 22) + (l2 << 12),
++                        print_pte(mon, env, (l1 << 22) + (l2 << 12),
+                                   pte & ~PG_PSE_MASK,
+                                   ~0xfff);
+                     }
+@@ -100,7 +105,7 @@ static void tlb_info_pae32(Monitor *mon, CPUArchState *env)
+                 if (pde & PG_PRESENT_MASK) {
+                     if (pde & PG_PSE_MASK) {
+                         /* 2M pages with PAE, CR4.PSE is ignored */
+-                        print_pte(mon, (l1 << 30 ) + (l2 << 21), pde,
++                        print_pte(mon, env, (l1 << 30) + (l2 << 21), pde,
+                                   ~((hwaddr)(1 << 20) - 1));
+                     } else {
+                         pt_addr = pde & 0x3fffffffff000ULL;
+@@ -108,7 +113,7 @@ static void tlb_info_pae32(Monitor *mon, CPUArchState *env)
+                             cpu_physical_memory_read(pt_addr + l3 * 8, &pte, 8);
+                             pte = le64_to_cpu(pte);
+                             if (pte & PG_PRESENT_MASK) {
+-                                print_pte(mon, (l1 << 30 ) + (l2 << 21)
++                                print_pte(mon, env, (l1 << 30) + (l2 << 21)
+                                           + (l3 << 12),
+                                           pte & ~PG_PSE_MASK,
+                                           ~(hwaddr)0xfff);
+@@ -122,61 +127,82 @@ static void tlb_info_pae32(Monitor *mon, CPUArchState *env)
+ }
+ 
+ #ifdef TARGET_X86_64
+-static void tlb_info_64(Monitor *mon, CPUArchState *env)
++static void tlb_info_la48(Monitor *mon, CPUArchState *env,
++        uint64_t l0, uint64_t pml4_addr)
+ {
+     uint64_t l1, l2, l3, l4;
+     uint64_t pml4e, pdpe, pde, pte;
+-    uint64_t pml4_addr, pdp_addr, pd_addr, pt_addr;
++    uint64_t pdp_addr, pd_addr, pt_addr;
+ 
+-    pml4_addr = env->cr[3] & 0x3fffffffff000ULL;
+     for (l1 = 0; l1 < 512; l1++) {
+         cpu_physical_memory_read(pml4_addr + l1 * 8, &pml4e, 8);
+         pml4e = le64_to_cpu(pml4e);
+-        if (pml4e & PG_PRESENT_MASK) {
+-            pdp_addr = pml4e & 0x3fffffffff000ULL;
+-            for (l2 = 0; l2 < 512; l2++) {
+-                cpu_physical_memory_read(pdp_addr + l2 * 8, &pdpe, 8);
+-                pdpe = le64_to_cpu(pdpe);
+-                if (pdpe & PG_PRESENT_MASK) {
+-                    if (pdpe & PG_PSE_MASK) {
+-                        /* 1G pages, CR4.PSE is ignored */
+-                        print_pte(mon, (l1 << 39) + (l2 << 30), pdpe,
+-                                  0x3ffffc0000000ULL);
+-                    } else {
+-                        pd_addr = pdpe & 0x3fffffffff000ULL;
+-                        for (l3 = 0; l3 < 512; l3++) {
+-                            cpu_physical_memory_read(pd_addr + l3 * 8, &pde, 8);
+-                            pde = le64_to_cpu(pde);
+-                            if (pde & PG_PRESENT_MASK) {
+-                                if (pde & PG_PSE_MASK) {
+-                                    /* 2M pages, CR4.PSE is ignored */
+-                                    print_pte(mon, (l1 << 39) + (l2 << 30) +
+-                                              (l3 << 21), pde,
+-                                              0x3ffffffe00000ULL);
+-                                } else {
+-                                    pt_addr = pde & 0x3fffffffff000ULL;
+-                                    for (l4 = 0; l4 < 512; l4++) {
+-                                        cpu_physical_memory_read(pt_addr
+-                                                                 + l4 * 8,
+-                                                                 &pte, 8);
+-                                        pte = le64_to_cpu(pte);
+-                                        if (pte & PG_PRESENT_MASK) {
+-                                            print_pte(mon, (l1 << 39) +
+-                                                      (l2 << 30) +
+-                                                      (l3 << 21) + (l4 << 12),
+-                                                      pte & ~PG_PSE_MASK,
+-                                                      0x3fffffffff000ULL);
+-                                        }
+-                                    }
+-                                }
+-                            }
+-                        }
++        if (!(pml4e & PG_PRESENT_MASK)) {
++            continue;
++        }
++
++        pdp_addr = pml4e & 0x3fffffffff000ULL;
++        for (l2 = 0; l2 < 512; l2++) {
++            cpu_physical_memory_read(pdp_addr + l2 * 8, &pdpe, 8);
++            pdpe = le64_to_cpu(pdpe);
++            if (!(pdpe & PG_PRESENT_MASK)) {
++                continue;
++            }
++
++            if (pdpe & PG_PSE_MASK) {
++                /* 1G pages, CR4.PSE is ignored */
++                print_pte(mon, env, (l0 << 48) + (l1 << 39) + (l2 << 30),
++                        pdpe, 0x3ffffc0000000ULL);
++                continue;
++            }
++
++            pd_addr = pdpe & 0x3fffffffff000ULL;
++            for (l3 = 0; l3 < 512; l3++) {
++                cpu_physical_memory_read(pd_addr + l3 * 8, &pde, 8);
++                pde = le64_to_cpu(pde);
++                if (!(pde & PG_PRESENT_MASK)) {
++                    continue;
++                }
++
++                if (pde & PG_PSE_MASK) {
++                    /* 2M pages, CR4.PSE is ignored */
++                    print_pte(mon, env, (l0 << 48) + (l1 << 39) + (l2 << 30) +
++                            (l3 << 21), pde, 0x3ffffffe00000ULL);
++                    continue;
++                }
++
++                pt_addr = pde & 0x3fffffffff000ULL;
++                for (l4 = 0; l4 < 512; l4++) {
++                    cpu_physical_memory_read(pt_addr
++                            + l4 * 8,
++                            &pte, 8);
++                    pte = le64_to_cpu(pte);
++                    if (pte & PG_PRESENT_MASK) {
++                        print_pte(mon, env, (l0 << 48) + (l1 << 39) +
++                                (l2 << 30) + (l3 << 21) + (l4 << 12),
++                                pte & ~PG_PSE_MASK, 0x3fffffffff000ULL);
+                     }
+                 }
+             }
+         }
+     }
+ }
++
++static void tlb_info_la57(Monitor *mon, CPUArchState *env)
++{
++    uint64_t l0;
++    uint64_t pml5e;
++    uint64_t pml5_addr;
++
++    pml5_addr = env->cr[3] & 0x3fffffffff000ULL;
++    for (l0 = 0; l0 < 512; l0++) {
++        cpu_physical_memory_read(pml5_addr + l0 * 8, &pml5e, 8);
++        pml5e = le64_to_cpu(pml5e);
++        if (pml5e & PG_PRESENT_MASK) {
++            tlb_info_la48(mon, env, l0, pml5e & 0x3fffffffff000ULL);
++        }
++    }
++}
+ #endif /* TARGET_X86_64 */
+ 
+ void hmp_info_tlb(Monitor *mon, const QDict *qdict)
+@@ -192,7 +218,11 @@ void hmp_info_tlb(Monitor *mon, const QDict *qdict)
+     if (env->cr[4] & CR4_PAE_MASK) {
+ #ifdef TARGET_X86_64
+         if (env->hflags & HF_LMA_MASK) {
+-            tlb_info_64(mon, env);
++            if (env->cr[4] & CR4_LA57_MASK) {
++                tlb_info_la57(mon, env);
++            } else {
++                tlb_info_la48(mon, env, 0, env->cr[3] & 0x3fffffffff000ULL);
++            }
+         } else
+ #endif
+         {
+@@ -324,7 +354,7 @@ static void mem_info_pae32(Monitor *mon, CPUArchState *env)
+ 
+ 
+ #ifdef TARGET_X86_64
+-static void mem_info_64(Monitor *mon, CPUArchState *env)
++static void mem_info_la48(Monitor *mon, CPUArchState *env)
+ {
+     int prot, last_prot;
+     uint64_t l1, l2, l3, l4;
+@@ -400,6 +430,98 @@ static void mem_info_64(Monitor *mon, CPUArchState *env)
+     /* Flush last range */
+     mem_print(mon, &start, &last_prot, (hwaddr)1 << 48, 0);
+ }
++
++static void mem_info_la57(Monitor *mon, CPUArchState *env)
++{
++    int prot, last_prot;
++    uint64_t l0, l1, l2, l3, l4;
++    uint64_t pml5e, pml4e, pdpe, pde, pte;
++    uint64_t pml5_addr, pml4_addr, pdp_addr, pd_addr, pt_addr, start, end;
++
++    pml5_addr = env->cr[3] & 0x3fffffffff000ULL;
++    last_prot = 0;
++    start = -1;
++    for (l0 = 0; l0 < 512; l0++) {
++        cpu_physical_memory_read(pml5_addr + l0 * 8, &pml5e, 8);
++        pml4e = le64_to_cpu(pml5e);
++        end = l0 << 48;
++        if (!(pml5e & PG_PRESENT_MASK)) {
++            prot = 0;
++            mem_print(mon, &start, &last_prot, end, prot);
++            continue;
++        }
++
++        pml4_addr = pml5e & 0x3fffffffff000ULL;
++        for (l1 = 0; l1 < 512; l1++) {
++            cpu_physical_memory_read(pml4_addr + l1 * 8, &pml4e, 8);
++            pml4e = le64_to_cpu(pml4e);
++            end = (l0 << 48) + (l1 << 39);
++            if (!(pml4e & PG_PRESENT_MASK)) {
++                prot = 0;
++                mem_print(mon, &start, &last_prot, end, prot);
++                continue;
++            }
++
++            pdp_addr = pml4e & 0x3fffffffff000ULL;
++            for (l2 = 0; l2 < 512; l2++) {
++                cpu_physical_memory_read(pdp_addr + l2 * 8, &pdpe, 8);
++                pdpe = le64_to_cpu(pdpe);
++                end = (l0 << 48) + (l1 << 39) + (l2 << 30);
++                if (pdpe & PG_PRESENT_MASK) {
++                    prot = 0;
++                    mem_print(mon, &start, &last_prot, end, prot);
++                    continue;
++                }
++
++                if (pdpe & PG_PSE_MASK) {
++                    prot = pdpe & (PG_USER_MASK | PG_RW_MASK |
++                            PG_PRESENT_MASK);
++                    prot &= pml4e;
++                    mem_print(mon, &start, &last_prot, end, prot);
++                    continue;
++                }
++
++                pd_addr = pdpe & 0x3fffffffff000ULL;
++                for (l3 = 0; l3 < 512; l3++) {
++                    cpu_physical_memory_read(pd_addr + l3 * 8, &pde, 8);
++                    pde = le64_to_cpu(pde);
++                    end = (l0 << 48) + (l1 << 39) + (l2 << 30) + (l3 << 21);
++                    if (pde & PG_PRESENT_MASK) {
++                        prot = 0;
++                        mem_print(mon, &start, &last_prot, end, prot);
++                        continue;
++                    }
++
++                    if (pde & PG_PSE_MASK) {
++                        prot = pde & (PG_USER_MASK | PG_RW_MASK |
++                                PG_PRESENT_MASK);
++                        prot &= pml4e & pdpe;
++                        mem_print(mon, &start, &last_prot, end, prot);
++                        continue;
++                    }
++
++                    pt_addr = pde & 0x3fffffffff000ULL;
++                    for (l4 = 0; l4 < 512; l4++) {
++                        cpu_physical_memory_read(pt_addr + l4 * 8, &pte, 8);
++                        pte = le64_to_cpu(pte);
++                        end = (l0 << 48) + (l1 << 39) + (l2 << 30) +
++                            (l3 << 21) + (l4 << 12);
++                        if (pte & PG_PRESENT_MASK) {
++                            prot = pte & (PG_USER_MASK | PG_RW_MASK |
++                                    PG_PRESENT_MASK);
++                            prot &= pml4e & pdpe & pde;
++                        } else {
++                            prot = 0;
++                        }
++                        mem_print(mon, &start, &last_prot, end, prot);
++                    }
++                }
++            }
++        }
++    }
++    /* Flush last range */
++    mem_print(mon, &start, &last_prot, (hwaddr)1 << 57, 0);
++}
+ #endif /* TARGET_X86_64 */
+ 
+ void hmp_info_mem(Monitor *mon, const QDict *qdict)
+@@ -415,7 +537,11 @@ void hmp_info_mem(Monitor *mon, const QDict *qdict)
+     if (env->cr[4] & CR4_PAE_MASK) {
+ #ifdef TARGET_X86_64
+         if (env->hflags & HF_LMA_MASK) {
+-            mem_info_64(mon, env);
++            if (env->cr[4] & CR4_LA57_MASK) {
++                mem_info_la57(mon, env);
++            } else {
++                mem_info_la48(mon, env);
++            }
+         } else
+ #endif
+         {
+diff --git a/target-i386/translate.c b/target-i386/translate.c
+index 324103c88521..d2aec5c9bf06 100644
+--- a/target-i386/translate.c
++++ b/target-i386/translate.c
+@@ -137,6 +137,7 @@ typedef struct DisasContext {
+     int cpuid_ext2_features;
+     int cpuid_ext3_features;
+     int cpuid_7_0_ebx_features;
++    int cpuid_7_0_ecx_features;
+     int cpuid_xsave_features;
+ } DisasContext;
+ 
+@@ -8350,6 +8351,7 @@ void gen_intermediate_code(CPUX86State *env, TranslationBlock *tb)
+     dc->cpuid_ext2_features = env->features[FEAT_8000_0001_EDX];
+     dc->cpuid_ext3_features = env->features[FEAT_8000_0001_ECX];
+     dc->cpuid_7_0_ebx_features = env->features[FEAT_7_0_EBX];
++    dc->cpuid_7_0_ecx_features = env->features[FEAT_7_0_ECX];
+     dc->cpuid_xsave_features = env->features[FEAT_XSAVE];
+ #ifdef TARGET_X86_64
+     dc->lma = (flags >> HF_LMA_SHIFT) & 1;
+-- 
+2.10.2
