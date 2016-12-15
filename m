@@ -1,39 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42801)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42964)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cHKC3-0003We-NJ
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:46:44 -0500
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cHKC8-0003sr-VY
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:46:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cHKC0-0001Pg-LR
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:46:43 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44822
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cHKC5-0001UD-Rh
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:46:49 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50398)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1cHKC0-0001P9-EI
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:46:40 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	uBF0hfvq136263
-	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 19:46:39 -0500
-Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 27bdm3s0xu-1
+	id 1cHKC5-0001Sd-Hc
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:46:45 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
+	uBF0hbL2016313
+	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 19:46:44 -0500
+Received: from e18.ny.us.ibm.com (e18.ny.us.ibm.com [129.33.205.208])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 27bdm515g7-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 19:46:39 -0500
+	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 19:46:44 -0500
 Received: from localhost
-	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e18.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Wed, 14 Dec 2016 17:46:39 -0700
+	Wed, 14 Dec 2016 19:46:43 -0500
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Wed, 14 Dec 2016 18:43:57 -0600
+Date: Wed, 14 Dec 2016 18:44:40 -0600
 In-Reply-To: <1481762701-4587-1-git-send-email-mdroth@linux.vnet.ibm.com>
 References: <1481762701-4587-1-git-send-email-mdroth@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Message-Id: <1481762701-4587-4-git-send-email-mdroth@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 03/67] hw/ppc/spapr: Fix the selection of the
- processor features
+Message-Id: <1481762701-4587-47-git-send-email-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 46/67] virtio-net: mark VIRTIO_NET_F_GSO as
+ legacy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,53 +39,41 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Thomas Huth <thuth@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-stable@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
 
-From: Thomas Huth <thuth@redhat.com>
+From: "Michael S. Tsirkin" <mst@redhat.com>
 
-The current code uses pa_features_206 for POWERPC_MMU_2_06, and
-for everything else, it uses pa_features_207. This is bad in some
-cases because there is also a "degraded" MMU version of ISA 2.06,
-called POWERPC_MMU_2_06a, which should of course use the flags for
-2.06 instead. And there is also the possibility that the user runs
-the pseries machine with a POWER5+ or even 970 processor. In that
-case we certainly do not want to set the flags for 2.07, and rather
-simply skip the setting of the pa-features property instead.
+virtio 1.0 spec says this is a legacy feature bit,
+hide it from guests in modern mode.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-(cherry picked from commit 4cbec30d769a73853b60dc7f275e6e7da9ab5162)
+Note: for cross-version migration compatibility,
+we keep the bit set in host_features.
+The result will be that a guest migrating cross-version
+will see host features change under it.
+As guests only seem to read it once, this should
+not be an issue. Meanwhile, will work to fix guests to
+ignore this bit in virtio1 mode, too.
+
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Cornelia Huck <cornelia.huck@de.ibm.com>
+(cherry picked from commit 2a083ffd2e37ef08769749a5c7cfc6ca65c9f8ea)
+Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- hw/ppc/spapr.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+ hw/net/virtio-net.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 36d9077..9f0d99b 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -607,12 +607,19 @@ static void spapr_populate_pa_features(CPUPPCState =
-*env, void *fdt, int offset)
-     uint8_t *pa_features;
-     size_t pa_size;
-=20
--    if (env->mmu_model =3D=3D POWERPC_MMU_2_06) {
-+    switch (env->mmu_model) {
-+    case POWERPC_MMU_2_06:
-+    case POWERPC_MMU_2_06a:
-         pa_features =3D pa_features_206;
-         pa_size =3D sizeof(pa_features_206);
--    } else { /* env->mmu_model =3D=3D POWERPC_MMU_2_07 */
-+        break;
-+    case POWERPC_MMU_2_07:
-+    case POWERPC_MMU_2_07a:
-         pa_features =3D pa_features_207;
-         pa_size =3D sizeof(pa_features_207);
-+        break;
-+    default:
-+        return;
-     }
-=20
-     if (env->ci_large_pages) {
---=20
+diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+index 01f1351..abc48d8 100644
+--- a/hw/net/virtio-net.c
++++ b/hw/net/virtio-net.c
+@@ -1904,6 +1904,7 @@ static void virtio_net_class_init(ObjectClass *klass, void *data)
+     vdc->guest_notifier_pending = virtio_net_guest_notifier_pending;
+     vdc->load = virtio_net_load_device;
+     vdc->save = virtio_net_save_device;
++    vdc->legacy_features |= (0x1 << VIRTIO_NET_F_GSO);
+ }
+ 
+ static const TypeInfo virtio_net_info = {
+-- 
 1.9.1
