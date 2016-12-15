@@ -1,22 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40978)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41095)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Vlad.Lungu@windriver.com>) id 1cHSsp-0007sm-Ub
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 05:03:33 -0500
+	(envelope-from <alex@alex.org.uk>) id 1cHStZ-0001jq-AC
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 05:04:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Vlad.Lungu@windriver.com>) id 1cHSsl-0005K9-6o
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 05:03:27 -0500
-Received: from mail1.windriver.com ([147.11.146.13]:51592)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Vlad.Lungu@windriver.com>)
-	id 1cHSsk-0005Ji-So
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 05:03:23 -0500
-From: Vlad Lungu <vlad.lungu@windriver.com>
-Date: Thu, 15 Dec 2016 12:03:02 +0200
-Message-ID: <1481796182-12670-1-git-send-email-vlad.lungu@windriver.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCHv2] multiboot: copy the cmdline verbatim,
- unescape module strings
+	(envelope-from <alex@alex.org.uk>) id 1cHStW-0005Xf-6G
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 05:04:13 -0500
+Received: from mail.avalus.com ([89.16.176.221]:49396)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <alex@alex.org.uk>) id 1cHStV-0005XJ-Qe
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 05:04:10 -0500
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+From: Alex Bligh <alex@alex.org.uk>
+In-Reply-To: <20161214201858.lblzw2ayddidxfyp@grep.be>
+Date: Thu, 15 Dec 2016 10:04:05 +0000
+Content-Transfer-Encoding: 7bit
+Message-Id: <58F412AB-8A4C-403F-AEE2-D2FB958D447A@alex.org.uk>
+References: <20161214150840.10899-1-alex@alex.org.uk>
+	<31576d46-c0ed-29b9-71a0-5aca1790799a@virtuozzo.com>
+	<6D1B30FC-FD7E-474C-A8E3-FD87E7AA1364@alex.org.uk>
+	<5e9150ed-2127-f2e8-f9db-a514e8f0ddf8@virtuozzo.com>
+	<5E697C22-5FBB-49A2-A018-A6B96E29FE84@alex.org.uk>
+	<94ef3ef2-b76f-fa5d-cbaf-8990ce2b1be8@virtuozzo.com>
+	<20161214181323.mehzfmlf6z4pyajp@grep.be>
+	<D71CECFD-E513-4372-BB54-BF8D8D521292@alex.org.uk>
+	<3D392E31-DDA4-4316-B26D-871E94A83935@alex.org.uk>
+	<20161214201858.lblzw2ayddidxfyp@grep.be>
+Subject: Re: [Qemu-devel] [Nbd] [PATCH] Further tidy-up on block status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,71 +35,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, ehabkost@redhat.com, rth@twiddle.net, Vlad Lungu <vlad.lungu@windriver.com>
+To: Wouter Verhelst <w@uter.be>
+Cc: Alex Bligh <alex@alex.org.uk>, "nbd-general@lists.sourceforge.net" <nbd-general@lists.sourceforge.net>, Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "Stefan stefanha@redhat. com" <stefanha@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, "Denis V . Lunev" <den@openvz.org>, John Snow <jsnow@redhat.com>
 
-get_opt_value() truncates the value at the first comma
-Use memcpy() instead
-Unescape the module filename and parameters with get_opt_value()
-before calling mb_add_cmdline()
 
-Signed-off-by: Vlad Lungu <vlad.lungu@windriver.com>
----
- hw/i386/multiboot.c | 18 ++++++++++--------
- 1 file changed, 10 insertions(+), 8 deletions(-)
+> On 14 Dec 2016, at 20:18, Wouter Verhelst <w@uter.be> wrote:
+> 
+>> +    * the server MAY return a context consisting of a namespace and
+>> +      a colon only (i.e. omitting the leaf-name) to indicate that
+>> +      the namespace contains a large number of possible contexts
+>> +      within that namespace (for instance a namespace `X-backup` with
+>> +      contexts that indicate whether blocks were written after
+>> +      a given date might accept queries of the form
+>> +      `'X-backup:modifiedtime>[unixdate]'` where `[unixdate]` is an
+>> +      arbitrary integer, and in this case it might simply
+>> +      return `X-backup:`)
+> 
+> This is way too detailed, I think. It should just allow namespaces to
+> define what _LIST_ may return, as long as the client is somehow able to
+> distill (through knowledge of the spec as well as the information sent
+> in reply to the _LIST_ command) all the metadata contexts it can
+> possibly select.
 
-diff --git a/hw/i386/multiboot.c b/hw/i386/multiboot.c
-index 387caa6..37e27f2 100644
---- a/hw/i386/multiboot.c
-+++ b/hw/i386/multiboot.c
-@@ -109,7 +109,7 @@ static uint32_t mb_add_cmdline(MultibootState *s, const char *cmdline)
-     hwaddr p = s->offset_cmdlines;
-     char *b = (char *)s->mb_buf + p;
- 
--    get_opt_value(b, strlen(cmdline) + 1, cmdline);
-+    memcpy(b, cmdline, strlen(cmdline) + 1);
-     s->offset_cmdlines += strlen(b) + 1;
-     return s->mb_buf_phys + p;
- }
-@@ -287,7 +287,7 @@ int load_multiboot(FWCfgState *fw_cfg,
-     mbs.offset_bootloader = mbs.offset_cmdlines + cmdline_len;
- 
-     if (initrd_filename) {
--        char *next_initrd, not_last;
-+        char *next_initrd, not_last, tmpbuf[strlen(initrd_filename) + 1];
- 
-         mbs.offset_mods = mbs.mb_buf_size;
- 
-@@ -299,22 +299,24 @@ int load_multiboot(FWCfgState *fw_cfg,
-             next_initrd = (char *)get_opt_value(NULL, 0, initrd_filename);
-             not_last = *next_initrd;
-             *next_initrd = '\0';
-+            /* Unescape the filename + eventual arguments */
-+            get_opt_value(tmpbuf, strlen(initrd_filename) + 1, initrd_filename);
-             /* if a space comes after the module filename, treat everything
-                after that as parameters */
--            hwaddr c = mb_add_cmdline(&mbs, initrd_filename);
--            if ((next_space = strchr(initrd_filename, ' ')))
-+            hwaddr c = mb_add_cmdline(&mbs, tmpbuf);
-+            if ((next_space = strchr(tmpbuf, ' ')))
-                 *next_space = '\0';
--            mb_debug("multiboot loading module: %s\n", initrd_filename);
--            mb_mod_length = get_image_size(initrd_filename);
-+            mb_debug("multiboot loading module: %s\n", tmpbuf);
-+            mb_mod_length = get_image_size(tmpbuf);
-             if (mb_mod_length < 0) {
--                fprintf(stderr, "Failed to open file '%s'\n", initrd_filename);
-+                fprintf(stderr, "Failed to open file '%s'\n", tmpbuf);
-                 exit(1);
-             }
- 
-             mbs.mb_buf_size = TARGET_PAGE_ALIGN(mb_mod_length + mbs.mb_buf_size);
-             mbs.mb_buf = g_realloc(mbs.mb_buf, mbs.mb_buf_size);
- 
--            load_image(initrd_filename, (unsigned char *)mbs.mb_buf + offs);
-+            load_image(tmpbuf, (unsigned char *)mbs.mb_buf + offs);
-             mb_add_mod(&mbs, mbs.mb_buf_phys + offs,
-                        mbs.mb_buf_phys + offs + mb_mod_length, c);
- 
+
+OK, this part now reads:
+
+    The server MUST either reply with an error (for instance `EINVAL`
+    if the option is not supported), or reply with a list of
+    `NBD_REP_META_CONTEXT` replies followed by `NBD_REP_ACK`.
+
+    If zero queries are sent, then the server MUST return all
+    the metadata contexts that are available to the client to select
+    on the given export with `NBD_OPT_SET_META_CONTEXT`, save that:
+
+    If one or more queries are sent, then the server MUST return
+    those metadata contexts that are available to the client to
+    select on the given export with `NBD_OPT_SET_META_CONTEXT`,
+    and which match one or more of the queries given. The
+    support of wildcarding within the leaf-name portion of
+    the query string is dependent upon the namespace.
+
+    In either case, however, for any given namespace the
+    server MAY, instead of exhaustively listing every
+    matching context available to select (or every context
+    available to select where no query is given), send
+    sufficient context records back to allow a client with
+    knowledge of the namespace to select any context. Each
+    namespace returned MUST still satisfy the rules for
+    namespaces (i.e. they must begin with the relevant
+    namespace, followed	by a colon, then printable non-whitespace
+    UTF-8 characters, with the entire string not exceeding
+    255	bytes). This may be helpful where a client can
+    construct algorithmic queries. For instance, a client might
+    reply simply with the namespace with no leaf-name (e.g.
+    'X-FooBar:') or with a range of values (e.g.
+    'X-ModifiedDate:20160310-20161214'). The semantics of
+    such a reply are a matter for the definition of the
+    namespace.
+
+Hope that works.
+
 -- 
-1.9.1
+Alex Bligh
