@@ -1,35 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42880)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44388)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1cHT1u-0002Kl-Rx
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 05:12:52 -0500
+	(envelope-from <imammedo@redhat.com>) id 1cHTBv-0005cN-I4
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 05:23:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1cHT1r-0000Wz-Hx
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 05:12:50 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57712)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1cHT1r-0000Wc-9P
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 05:12:47 -0500
-Received: from int-mx11.intmail.prod.int.phx2.redhat.com
-	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7CE1F19D05F
-	for <qemu-devel@nongnu.org>; Thu, 15 Dec 2016 10:12:46 +0000 (UTC)
-References: <20161208200737.GA29563@thinpad.lan.raisama.net>
-	<87a8c0qedq.fsf@dusky.pond.sub.org>
-	<20161213124239.GO3808@thinpad.lan.raisama.net>
-	<56cc6442-ba4f-6c5e-9c57-8787acccb6f9@redhat.com>
-	<20161213160038.GV3808@thinpad.lan.raisama.net>
-	<cae49570-bde2-4075-78bb-bb348e7d634e@redhat.com>
-	<cc92018a-e9c7-e3ab-7c17-556798f62920@redhat.com>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <26fdcd4a-0389-2be6-b55b-e7f237db07a7@redhat.com>
-Date: Thu, 15 Dec 2016 12:12:38 +0200
+	(envelope-from <imammedo@redhat.com>) id 1cHTBu-0004Vz-5c
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 05:23:11 -0500
+Date: Thu, 15 Dec 2016 11:22:59 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20161215112259.45463fcf@nial.brq.redhat.com>
+In-Reply-To: <20161213214522.25548-3-drjones@redhat.com>
+References: <20161213214522.25548-1-drjones@redhat.com>
+	<20161213214522.25548-3-drjones@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <cc92018a-e9c7-e3ab-7c17-556798f62920@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC] qmp: query-device-slots command
+Subject: Re: [Qemu-devel] [PATCH 02/11] hw/arm/virt: use
+ VirtMachineState.gic_version
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,118 +24,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laine Stump <laine@redhat.com>, qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, libvir-list@redhat.com, Igor Mammedov <imammedo@redhat.com>
+To: Andrew Jones <drjones@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, zhaoshenglong@huawei.com, mst@redhat.com, ehabkost@redhat.com
 
-On 12/14/2016 10:10 PM, Laine Stump wrote:
-> On 12/14/2016 12:17 PM, Marcel Apfelbaum wrote:
->> On 12/13/2016 06:00 PM, Eduardo Habkost wrote:
->>> On Tue, Dec 13, 2016 at 04:15:18PM +0200, Marcel Apfelbaum wrote:
->>>> On 12/13/2016 02:42 PM, Eduardo Habkost wrote:
->>>>> On Tue, Dec 13, 2016 at 12:04:17PM +0100, Markus Armbruster wrote:
->>>>>> Quick interface review only:
->>>>>>
->>>>>> Eduardo Habkost <ehabkost@redhat.com> writes:
->>>>>>
->>>>>>> This adds a new command to QMP: query-device-slots. It will allow
->>>>>>> management software to query possible slots where devices can be
->>>>>>> plugged.
->>>>>>>
->>>>>>> This implementation of the command will return:
->>>>>>>
->>>>>>> * Multiple PCI slots per bus, in the case of PCI buses;
->>>>>>> * One slot per bus in the case of the other buses;
->>>>>>
->>>>>> Umm, that doesn't seem right.  For instance, a SCSI bus has multiple
->>>>>> slots.  The slot address is the SCSI ID.  An IDE bus may have one
->>>>>> (SATA)
->>>>>> or two (PATA).  For more examples, see qdev-device-use.txt section
->>>>>> "Specifying Bus and Address on Bus".
->>>>>
->>>>> Yes, I should have clarified that: this version changes only PCI
->>>>> to expose multiple slots, but other buses also need be changed to
->>>>> implement BusClass::enumerate_slots() properly, too.
->>>>>
->>>>>>
->>>>>>> * One slot for each entry from query-hotpluggable-cpus.
->>>>>>> In the example below, I am not sure if the PCIe ports are all
->>>>>>> supposed to report all slots, but I didn't find any existing
->>>>>>> field in PCIBus that would help me figure out the actual number
->>>>>>> of slots in a given PCI bus.
->>>>>>>
->>>>>>> Git tree
->>>>>>> --------
->>>>>>>
->>>>>>> This patch needs the previous query-machines series I am working
->>>>>>> on. The full tree can be found on the git tree at:
->>>>>>>
->>>>>>>   git://github.com/ehabkost/qemu-hacks.git
->>>>>>> work/query-machines-bus-info
->>>>>>>
->>>>>>> Example output
->>>>>>> --------------
->>>>>>>
->>>>>>> The following output was returned by QEMU when running it as:
->>>>>>>
->>>>>>>  $ qemu-system-x86_64 -machine q35 \
->>>>>>>    -readconfig docs/q35-chipset.cfg \
->>>>>>>    -smp 4,maxcpus=8,sockets=2,cores=2,threads=2
->>>>>>>
->>>>>>>  {
->>>>>>>     "return": [
->>>>>>
->>>>>> Are you sure >3000 lines of example output make sense here?
->>>>>
->>>>> I'm not. :)
->>>>>
->>>>> That's why I need feedback from the PCI experts. I believe most
->>>>> of the PCI ports on q35 accept only one device,
->
-> I don't think of it as "one device" but as "only slot 0 can be used" (since, as Marcel pointed out, a different device can be placed on each of the 8 functions of that slot).
->
->> but I see no code
->>>>> implementing that restriction, and no obvious PCIBus or
->>>>> PCIBusClass field indicating that.
->>>>
->>>> Hi,
->>>>
->>>> Sadly there is no such restriction today as far as I know.
->>>> We trust the user that he knows what he is doing :)
->>>> and we let libvirt implement the restriction.
->>>>
->>>> I do agree we should fix that.
->>>
->>> OK, this matches what I saw on the current code.
->>>
->>> But I would like to understand what exactly should be the rules
->>> if we fix that. Should we report only 1 slot if
->>> pci_bus_has_pcie_upstream_port(bus)?
->>>
->>
->> We should report 1 slot for a bus exposed by a PCIe Root Port
->> or PCIe Downstream Port.
->>
->> Be aware that 1 slot doesn't necessarily refer to only one device,
->> we can have a multi-function device.
->
+On Tue, 13 Dec 2016 22:45:13 +0100
+Andrew Jones <drjones@redhat.com> wrote:
 
-Hi Laine,
+> machvirt_init may need to probe for the gic version. If so, then
+> make sure the result is written to VirtMachineState. With the
+> state up to date, use it instead of a local variable. This is a
+> cleanup that prepares for VirtMachineState to be passed to functions
+> even outside hw/arm/virt.c
+> 
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-> Is that a fixed thing? I mean, is it always possible to use all 8 functions of a slot (assuming no hotplug of course)?
->
-
-Yes, you simply add to the function 0 on command line:  with -device ...,multifunction=on.
-
-Thanks,
-Marcel
-
-
->>
->> Thanks,
->> Marcel
->>
->>> (Note that pci_bus_has_pcie_upstream_port() doesn't exist in the
->>> current code, it is added by my patch)
->>>
->>
->
+> ---
+>  hw/arm/virt.c | 35 +++++++++++++++++------------------
+>  1 file changed, 17 insertions(+), 18 deletions(-)
+> 
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index d451bc4f6b9b..67c0abb30b5b 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -319,7 +319,7 @@ static void fdt_add_psci_node(const VirtMachineState *vms)
+>      qemu_fdt_setprop_cell(fdt, "/psci", "migrate", migrate_fn);
+>  }
+>  
+> -static void fdt_add_timer_nodes(const VirtMachineState *vms, int gictype)
+> +static void fdt_add_timer_nodes(const VirtMachineState *vms)
+>  {
+>      /* On real hardware these interrupts are level-triggered.
+>       * On KVM they were edge-triggered before host kernel version 4.4,
+> @@ -347,7 +347,7 @@ static void fdt_add_timer_nodes(const VirtMachineState *vms, int gictype)
+>          irqflags = GIC_FDT_IRQ_FLAGS_EDGE_LO_HI;
+>      }
+>  
+> -    if (gictype == 2) {
+> +    if (vms->gic_version == 2) {
+>          irqflags = deposit32(irqflags, GIC_FDT_IRQ_PPI_CPU_START,
+>                               GIC_FDT_IRQ_PPI_CPU_WIDTH,
+>                               (1 << vms->smp_cpus) - 1);
+> @@ -462,7 +462,7 @@ static void fdt_add_v2m_gic_node(VirtMachineState *vms)
+>      qemu_fdt_setprop_cell(vms->fdt, "/intc/v2m", "phandle", vms->msi_phandle);
+>  }
+>  
+> -static void fdt_add_gic_node(VirtMachineState *vms, int type)
+> +static void fdt_add_gic_node(VirtMachineState *vms)
+>  {
+>      vms->gic_phandle = qemu_fdt_alloc_phandle(vms->fdt);
+>      qemu_fdt_setprop_cell(vms->fdt, "/", "interrupt-parent", vms->gic_phandle);
+> @@ -473,7 +473,7 @@ static void fdt_add_gic_node(VirtMachineState *vms, int type)
+>      qemu_fdt_setprop_cell(vms->fdt, "/intc", "#address-cells", 0x2);
+>      qemu_fdt_setprop_cell(vms->fdt, "/intc", "#size-cells", 0x2);
+>      qemu_fdt_setprop(vms->fdt, "/intc", "ranges", NULL, 0);
+> -    if (type == 3) {
+> +    if (vms->gic_version == 3) {
+>          qemu_fdt_setprop_string(vms->fdt, "/intc", "compatible",
+>                                  "arm,gic-v3");
+>          qemu_fdt_setprop_sized_cells(vms->fdt, "/intc", "reg",
+> @@ -500,7 +500,7 @@ static void fdt_add_gic_node(VirtMachineState *vms, int type)
+>      qemu_fdt_setprop_cell(vms->fdt, "/intc", "phandle", vms->gic_phandle);
+>  }
+>  
+> -static void fdt_add_pmu_nodes(const VirtMachineState *vms, int gictype)
+> +static void fdt_add_pmu_nodes(const VirtMachineState *vms)
+>  {
+>      CPUState *cpu;
+>      ARMCPU *armcpu;
+> @@ -514,7 +514,7 @@ static void fdt_add_pmu_nodes(const VirtMachineState *vms, int gictype)
+>          }
+>      }
+>  
+> -    if (gictype == 2) {
+> +    if (vms->gic_version == 2) {
+>          irqflags = deposit32(irqflags, GIC_FDT_IRQ_PPI_CPU_START,
+>                               GIC_FDT_IRQ_PPI_CPU_WIDTH,
+>                               (1 << vms->smp_cpus) - 1);
+> @@ -570,14 +570,14 @@ static void create_v2m(VirtMachineState *vms, qemu_irq *pic)
+>      fdt_add_v2m_gic_node(vms);
+>  }
+>  
+> -static void create_gic(VirtMachineState *vms, qemu_irq *pic, int type)
+> +static void create_gic(VirtMachineState *vms, qemu_irq *pic)
+>  {
+>      /* We create a standalone GIC */
+>      VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
+>      DeviceState *gicdev;
+>      SysBusDevice *gicbusdev;
+>      const char *gictype;
+> -    int i;
+> +    int type = vms->gic_version, i;
+>  
+>      gictype = (type == 3) ? gicv3_class_name() : gic_class_name();
+>  
+> @@ -641,7 +641,7 @@ static void create_gic(VirtMachineState *vms, qemu_irq *pic, int type)
+>          pic[i] = qdev_get_gpio_in(gicdev, i);
+>      }
+>  
+> -    fdt_add_gic_node(vms, type);
+> +    fdt_add_gic_node(vms);
+>  
+>      if (type == 3 && !vmc->no_its) {
+>          create_its(vms, gicdev);
+> @@ -1237,7 +1237,6 @@ static void machvirt_init(MachineState *machine)
+>      qemu_irq pic[NUM_IRQS];
+>      MemoryRegion *sysmem = get_system_memory();
+>      MemoryRegion *secure_sysmem = NULL;
+> -    int gic_version = vms->gic_version;
+>      int n, virt_max_cpus;
+>      MemoryRegion *ram = g_new(MemoryRegion, 1);
+>      const char *cpu_model = machine->cpu_model;
+> @@ -1258,14 +1257,14 @@ static void machvirt_init(MachineState *machine)
+>      /* We can probe only here because during property set
+>       * KVM is not available yet
+>       */
+> -    if (!gic_version) {
+> +    if (!vms->gic_version) {
+>          if (!kvm_enabled()) {
+>              error_report("gic-version=host requires KVM");
+>              exit(1);
+>          }
+>  
+> -        gic_version = kvm_arm_vgic_probe();
+> -        if (!gic_version) {
+> +        vms->gic_version = kvm_arm_vgic_probe();
+> +        if (!vms->gic_version) {
+>              error_report("Unable to determine GIC version supported by host");
+>              exit(1);
+>          }
+> @@ -1300,7 +1299,7 @@ static void machvirt_init(MachineState *machine)
+>      /* The maximum number of CPUs depends on the GIC version, or on how
+>       * many redistributors we can fit into the memory map.
+>       */
+> -    if (gic_version == 3) {
+> +    if (vms->gic_version == 3) {
+>          virt_max_cpus = vms->memmap[VIRT_GIC_REDIST].size / 0x20000;
+>          clustersz = GICV3_TARGETLIST_BITS;
+>      } else {
+> @@ -1417,7 +1416,7 @@ static void machvirt_init(MachineState *machine)
+>  
+>          object_property_set_bool(cpuobj, true, "realized", NULL);
+>      }
+> -    fdt_add_timer_nodes(vms, gic_version);
+> +    fdt_add_timer_nodes(vms);
+>      fdt_add_cpu_nodes(vms);
+>      fdt_add_psci_node(vms);
+>  
+> @@ -1427,9 +1426,9 @@ static void machvirt_init(MachineState *machine)
+>  
+>      create_flash(vms, sysmem, secure_sysmem ? secure_sysmem : sysmem);
+>  
+> -    create_gic(vms, pic, gic_version);
+> +    create_gic(vms, pic);
+>  
+> -    fdt_add_pmu_nodes(vms, gic_version);
+> +    fdt_add_pmu_nodes(vms);
+>  
+>      create_uart(vms, pic, VIRT_UART, sysmem, serial_hds[0]);
+>  
+> @@ -1458,7 +1457,7 @@ static void machvirt_init(MachineState *machine)
+>      guest_info->memmap = vms->memmap;
+>      guest_info->irqmap = vms->irqmap;
+>      guest_info->use_highmem = vms->highmem;
+> -    guest_info->gic_version = gic_version;
+> +    guest_info->gic_version = vms->gic_version;
+>      guest_info->no_its = vmc->no_its;
+>      guest_info_state->machine_done.notify = virt_guest_info_machine_done;
+>      qemu_add_machine_init_done_notifier(&guest_info_state->machine_done);
