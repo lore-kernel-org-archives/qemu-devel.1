@@ -1,29 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56393)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56636)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cHbV8-0007wM-2f
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 14:15:35 -0500
+	(envelope-from <laine@redhat.com>) id 1cHbVV-000126-Ty
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 14:15:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cHbV4-0006Yc-Jw
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 14:15:33 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51306)
+	(envelope-from <laine@redhat.com>) id 1cHbVS-0006nf-NU
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 14:15:57 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55748)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cHbV4-0006Y3-EU
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 14:15:30 -0500
-Date: Thu, 15 Dec 2016 21:15:27 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20161215202505-mutt-send-email-mst@kernel.org>
-References: <20161214142518.10504-1-stefanha@redhat.com>
-	<20161215063226-mutt-send-email-mst@kernel.org>
-	<20161215075028.GD26169@stefanha-x1.localdomain>
-	<1481793479.21413.6.camel@redhat.com>
-	<20161215170523-mutt-send-email-mst@kernel.org>
-	<1481819150.21413.21.camel@redhat.com>
+	(Exim 4.71) (envelope-from <laine@redhat.com>) id 1cHbVS-0006n6-IC
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 14:15:54 -0500
+Received: from int-mx14.intmail.prod.int.phx2.redhat.com
+	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9CA1119D396
+	for <qemu-devel@nongnu.org>; Thu, 15 Dec 2016 19:15:53 +0000 (UTC)
+References: <20161208200737.GA29563@thinpad.lan.raisama.net>
+	<87a8c0qedq.fsf@dusky.pond.sub.org>
+	<20161213124239.GO3808@thinpad.lan.raisama.net>
+	<56cc6442-ba4f-6c5e-9c57-8787acccb6f9@redhat.com>
+	<20161213160038.GV3808@thinpad.lan.raisama.net>
+	<cae49570-bde2-4075-78bb-bb348e7d634e@redhat.com>
+	<cc92018a-e9c7-e3ab-7c17-556798f62920@redhat.com>
+	<26fdcd4a-0389-2be6-b55b-e7f237db07a7@redhat.com>
+From: Laine Stump <laine@redhat.com>
+Message-ID: <f5266981-3b3c-d129-cc21-89c23cbcb8da@redhat.com>
+Date: Thu, 15 Dec 2016 14:15:51 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1481819150.21413.21.camel@redhat.com>
-Subject: Re: [Qemu-devel] regression in 2.8: unable to exit screen grab in
- SDL mode
+In-Reply-To: <26fdcd4a-0389-2be6-b55b-e7f237db07a7@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC] qmp: query-device-slots command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,48 +39,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Cole Robinson <crobinso@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, libvir-list@redhat.com, Igor Mammedov <imammedo@redhat.com>
 
-On Thu, Dec 15, 2016 at 05:25:50PM +0100, Gerd Hoffmann wrote:
->   Hi,
-> 
-> > > > > The problem always reproduces for me:
-> > > > > - start qemu with -sdl
-> > > > > - wait for guest to boot
-> > > > > - click anywhere within guest screen
-> > > > > - message "press ctrl+alt to exit capture" appears on screen,
-> > > > >   but pressing that immediately restarts capture again
-> 
-> [ 2.6 good, 2.7, 2.8 bad ]
-> 
-> > I'd say SDL is mostly useless with this bug.
-> > 
-> > Do we fix this or disable SDL altogether?
-> 
-> Well, it can't be *that* bad, otherwise it would not went unnoticed for
-> a whole release cycle.
+On 12/15/2016 05:12 AM, Marcel Apfelbaum wrote:
+> On 12/14/2016 10:10 PM, Laine Stump wrote:
+>> On 12/14/2016 12:17 PM, Marcel Apfelbaum wrote:
+>>> Be aware that 1 slot doesn't necessarily refer to only one device,
+>>> we can have a multi-function device.
+>>
+>> Is that a fixed thing? I mean, is it always possible to use all 8
+>> functions of a slot (assuming no hotplug of course)?
+>>
+>
+> Yes, you simply add to the function 0 on command line:  with -device
+> ...,multifunction=on.
 
-That's what I'm saying, maybe no one uses SDL anymore.
-
-> It doesn't reproduce here.
-
-Are you on Fedora 25 too?
-
-> There must be some other factor which is
-> needed to trigger this.  What desktop you are using?  gnome?  kde?
-> something else?
-
-XFCE
-
->  Xorg or wayland?
-
-Xorg
-
-> Can you try to bisect it?
-> 
-> cheers,
->   Gerd
-
-
-Trying to.
+Yes, I know how the commandline works. my question is whether *all* PCI 
+controllers in existence have 8 usable functions per slot, or if that 
+might be another thing that is different from one controller to the next 
+(and thus would have to be reported in these query responses).
