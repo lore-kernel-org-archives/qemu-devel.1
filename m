@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52910)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53178)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cHWms-00081q-VQ
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 09:13:40 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cHWo4-0005eC-CZ
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 09:14:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cHWmr-0000Y2-VI
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 09:13:34 -0500
-Date: Thu, 15 Dec 2016 15:13:24 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20161215151324.2b4e6b74@nial.brq.redhat.com>
-In-Reply-To: <20161213214522.25548-5-drjones@redhat.com>
-References: <20161213214522.25548-1-drjones@redhat.com>
-	<20161213214522.25548-5-drjones@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1cHWnz-0000y5-ER
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 09:14:48 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55730)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cHWnz-0000xe-5Z
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 09:14:43 -0500
+References: <1481810693-13733-1-git-send-email-skiver.cloud.yzy@gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <7a8da28a-25b7-e243-bc72-96d9953619aa@redhat.com>
+Date: Thu, 15 Dec 2016 15:14:39 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <1481810693-13733-1-git-send-email-skiver.cloud.yzy@gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 04/11] hw/arm/virt: eliminate struct
- VirtGuestInfoState
+Subject: Re: [Qemu-devel] [PATCH] hw/block/pflash_cfi*.c: fix confusing
+ assert fail message
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,93 +27,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jones <drjones@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, zhaoshenglong@huawei.com, mst@redhat.com, ehabkost@redhat.com
+To: skiver.cloud.yzy@gmail.com, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Ziyue Yang <yzylivezh@hotmail.com>
 
-On Tue, 13 Dec 2016 22:45:15 +0100
-Andrew Jones <drjones@redhat.com> wrote:
 
-> Instead of allocating a new struct just for VirtGuestInfo and the
-> machine_done Notifier, place them inside VirtMachineState. This
-> is the mach-virt equivalent of "pc: Eliminate struct
-> PcGuestInfoState"
+
+On 15/12/2016 15:04, skiver.cloud.yzy@gmail.com wrote:
+> From: Ziyue Yang <yzylivezh@hotmail.com>
 > 
-> Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-
+> The patch is to fix the confusing assert fail message caused by
+> un-initialized device structure (from bite sized tasks).
+> 
+> The bug can be reproduced by
+> 
+> ./qemu-system-x86_64 -nographic -device cfi.pflash01
+> 
+> The CFI hardware is dynamically loaded by QOM realizing mechanism,
+> however the realizing function in pflash_cfi01_realize function
+> requires the device being initialized manually before calling, like
+> 
+> ./qemu-system-x86_64 -nographic
+> -device cfi.pflash01,num-blocks=1024,sector-length=4096,name=testcard
+> 
+> Once the initializing parameters are left off in the command, it will
+> leave the device structure not initialized, which makes
+> pflash_cfi01_realize try to realize a zero-volume card, causing
+> 
+> /mnt/EXT_volume/projects/qemu/qemu-dev/exec.c:1378:
+> find_ram_offset: Assertion `size != 0\' failed.
+> 
+> Through my test, at least the flash device's block-number, sector-length
+> and its name is needed for pflash_cfi01_realize to behave correctly. So
+> I think the new asserts are needed to hint the QEMU user to specify
+> the device's parameters correctly.
+> 
+> Signed-off-by: Ziyue Yang <skiver.cloud.yzy@gmail.com>
 > ---
->  hw/arm/virt.c                    | 20 +++++++++++---------
->  include/hw/arm/virt-acpi-build.h |  6 ------
->  2 files changed, 11 insertions(+), 15 deletions(-)
+>  hw/block/pflash_cfi01.c | 13 +++++++++++++
+>  hw/block/pflash_cfi02.c | 13 +++++++++++++
+>  2 files changed, 26 insertions(+)
 > 
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index 18aa3672739d..0657f9ae8722 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -76,6 +76,8 @@ typedef struct {
+> diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
+> index 62d7a56..5f0ee9d 100644
+> --- a/hw/block/pflash_cfi01.c
+> +++ b/hw/block/pflash_cfi01.c
+> @@ -707,6 +707,19 @@ static void pflash_cfi01_realize(DeviceState *dev, Error **errp)
+>      int num_devices;
+>      Error *local_err = NULL;
 >  
->  typedef struct {
->      MachineState parent;
-> +    VirtGuestInfo acpi_guest_info;
-> +    Notifier machine_done;
->      bool secure;
->      bool highmem;
->      bool virt;
-> @@ -1222,12 +1224,13 @@ static void virt_build_smbios(VirtGuestInfo *guest_info)
->  }
->  
->  static
-> -void virt_guest_info_machine_done(Notifier *notifier, void *data)
-> +void virt_machine_done(Notifier *notifier, void *data)
->  {
-> -    VirtGuestInfoState *guest_info_state = container_of(notifier,
-> -                                              VirtGuestInfoState, machine_done);
-> -    virt_acpi_setup(&guest_info_state->info);
-> -    virt_build_smbios(&guest_info_state->info);
-> +    VirtMachineState *vms = container_of(notifier, VirtMachineState,
-> +                                         machine_done);
+> +    if (pfl->sector_len == 0) {
+> +        error_setg(errp, "attribute \"sector-length\" not specified or zero.");
+> +        return;
+> +    }
+> +    if (pfl->nb_blocs == 0) {
+> +        error_setg(errp, "attribute \"num-blocks\" not specified or zero.");
+> +        return;
+> +    }
+> +    if (pfl->name == NULL) {
+> +        error_setg(errp, "attribute \"name\" not specified.");
+> +        return;
+> +    }
 > +
-> +    virt_acpi_setup(&vms->acpi_guest_info);
-> +    virt_build_smbios(&vms->acpi_guest_info);
->  }
+>      total_len = pfl->sector_len * pfl->nb_blocs;
 >  
->  static void machvirt_init(MachineState *machine)
-> @@ -1240,8 +1243,7 @@ static void machvirt_init(MachineState *machine)
->      int n, virt_max_cpus;
->      MemoryRegion *ram = g_new(MemoryRegion, 1);
->      const char *cpu_model = machine->cpu_model;
-> -    VirtGuestInfoState *guest_info_state = g_malloc0(sizeof *guest_info_state);
-> -    VirtGuestInfo *guest_info = &guest_info_state->info;
-> +    VirtGuestInfo *guest_info = &vms->acpi_guest_info;
->      char **cpustr;
->      ObjectClass *oc;
->      const char *typename;
-> @@ -1459,8 +1461,8 @@ static void machvirt_init(MachineState *machine)
->      guest_info->use_highmem = vms->highmem;
->      guest_info->gic_version = vms->gic_version;
->      guest_info->no_its = vmc->no_its;
-> -    guest_info_state->machine_done.notify = virt_guest_info_machine_done;
-> -    qemu_add_machine_init_done_notifier(&guest_info_state->machine_done);
-> +    vms->machine_done.notify = virt_machine_done;
-> +    qemu_add_machine_init_done_notifier(&vms->machine_done);
+>      /* These are only used to expose the parameters of each device
+> diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
+> index 4f6105c..ef71322 100644
+> --- a/hw/block/pflash_cfi02.c
+> +++ b/hw/block/pflash_cfi02.c
+> @@ -600,6 +600,19 @@ static void pflash_cfi02_realize(DeviceState *dev, Error **errp)
+>      int ret;
+>      Error *local_err = NULL;
 >  
->      vms->bootinfo.ram_size = machine->ram_size;
->      vms->bootinfo.kernel_filename = machine->kernel_filename;
-> diff --git a/include/hw/arm/virt-acpi-build.h b/include/hw/arm/virt-acpi-build.h
-> index f5ec749b8fea..d74d7a1af650 100644
-> --- a/include/hw/arm/virt-acpi-build.h
-> +++ b/include/hw/arm/virt-acpi-build.h
-> @@ -36,12 +36,6 @@ typedef struct VirtGuestInfo {
->      bool no_its;
->  } VirtGuestInfo;
->  
-> -
-> -typedef struct VirtGuestInfoState {
-> -    VirtGuestInfo info;
-> -    Notifier machine_done;
-> -} VirtGuestInfoState;
-> -
->  void virt_acpi_setup(VirtGuestInfo *guest_info);
->  
->  #endif
+> +    if (pfl->sector_len == 0) {
+> +        error_setg(errp, "attribute \"sector-length\" not specified or zero.");
+> +        return;
+> +    }
+> +    if (pfl->nb_blocs == 0) {
+> +        error_setg(errp, "attribute \"num-blocks\" not specified or zero.");
+> +        return;
+> +    }
+> +    if (pfl->name == NULL) {
+> +        error_setg(errp, "attribute \"name\" not specified.");
+> +        return;
+> +    }
+> +
+>      chip_len = pfl->sector_len * pfl->nb_blocs;
+>      /* XXX: to be fixed */
+>  #if 0
+> 
+
+Looks good, thanks!
+
+Paolo
