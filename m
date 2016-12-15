@@ -1,34 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56996)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57514)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cHYeN-0007Pq-1q
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 11:12:56 -0500
+	(envelope-from <berto@igalia.com>) id 1cHYgC-0002xk-0m
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 11:14:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cHYeI-0003kL-5T
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 11:12:55 -0500
-Received: from indium.canonical.com ([91.189.90.7]:48200)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cHYeI-0003jx-0B
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 11:12:50 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cHYeG-0004V5-HT
-	for <qemu-devel@nongnu.org>; Thu, 15 Dec 2016 16:12:48 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 593B72E80C6
-	for <qemu-devel@nongnu.org>; Thu, 15 Dec 2016 16:12:48 +0000 (UTC)
+	(envelope-from <berto@igalia.com>) id 1cHYgB-0004cB-4t
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 11:14:48 -0500
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20161130011851.24696-2-mreitz@redhat.com>
+References: <20161130011851.24696-1-mreitz@redhat.com>
+	<20161130011851.24696-2-mreitz@redhat.com>
+Date: Thu, 15 Dec 2016 17:14:01 +0100
+Message-ID: <w51r359dvau.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 15 Dec 2016 15:54:39 -0000
-From: Thomas Huth <810588@bugs.launchpad.net>
-Reply-To: Bug 810588 <810588@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20110714164328.4200.70793.malonedeb@wampee.canonical.com>
-Message-Id: <20161215155439.20030.50686.launchpad@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 810588] Re: Unexpected crash of qemu-kvm with
- SCSI disk emulation.
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v3 01/25] block/mirror: Small
+ absolute-paths simplification
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,30 +23,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+On Wed 30 Nov 2016 02:18:27 AM CET, Max Reitz wrote:
+> When invoking drive-mirror in absolute-paths mode, the target's backing
+> BDS is assigned to it in mirror_complete(). The current logic only does
+> so if the target does not have that backing BDS already; but it actually
+> cannot have a backing BDS at all (the BDS is opened with O_NO_BACKING in
+> qmp_drive_mirror()), so just assert that and assign the new backing BDS
+> unconditionally.
+>
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
 
--- =
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/810588
-
-Title:
-  Unexpected crash of qemu-kvm with SCSI disk emulation.
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  Virual machine with MS windows 2003 installed on the virtual scsi disk (-=
-drive file=3D/my/path/myimage.qcow2.img,boot=3Don,if=3Dscsi,media=3Ddisk,bu=
-s=3D0,unit=3D1) unexpectedly crashes without core dump. When the image is c=
-onnected as an ide disk (-hda )  vm flies normally.
-  Qemu-kvm version: 0.12.5
-  Os/distr.: Debian squeeze, x86_64
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/810588/+subscriptions
+Berto
