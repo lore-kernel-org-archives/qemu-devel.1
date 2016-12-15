@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54063)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54592)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <harrynjit@gmail.com>) id 1cHYXx-0006Of-5J
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 11:06:18 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cHYZU-0003BK-Gd
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 11:07:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <harrynjit@gmail.com>) id 1cHYXs-0000J8-8N
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 11:06:17 -0500
-Received: from mail-qk0-f195.google.com ([209.85.220.195]:34951)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <harrynjit@gmail.com>) id 1cHYXs-0000In-4j
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 11:06:12 -0500
-Received: by mail-qk0-f195.google.com with SMTP id n204so7853859qke.2
-	for <qemu-devel@nongnu.org>; Thu, 15 Dec 2016 08:06:12 -0800 (PST)
+	(envelope-from <dgilbert@redhat.com>) id 1cHYZP-00017d-Ib
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 11:07:52 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36986)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cHYZP-00016s-9p
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 11:07:47 -0500
+Date: Thu, 15 Dec 2016 16:07:41 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20161215160740.GN2509@work-vm>
+References: <1481742422-15969-1-git-send-email-ashijeetacharya@gmail.com>
+	<20161215175533-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <63cae630-b193-0074-8aac-68fef47ec691@redhat.com>
-References: <CA+scX6=9y4wDBWzXyqpGh9U__usKUa6sxwdc63iA8YRmpWFPqA@mail.gmail.com>
-	<20161214193107.GB20648@stefanha-x1.localdomain>
-	<CA+scX6=oc_eGteY8A0d8tuwzJFSu9M_6wnXBd5Tp=XGrg8FotQ@mail.gmail.com>
-	<20161215080452.GE26169@stefanha-x1.localdomain>
-	<63cae630-b193-0074-8aac-68fef47ec691@redhat.com>
-From: Weiwei Jia <harrynjit@gmail.com>
-Date: Thu, 15 Dec 2016 11:05:11 -0500
-Message-ID: <CA+scX6nWaHnS2utf9qRVbm0a3v-79aBp98Ow_fs5m8kf5c=EGA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] Lock contention in QEMU
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20161215175533-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH 0/3] Introduce a new --only-migratable
+ option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,34 +28,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org, famz@redhat.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Ashijeet Acharya <ashijeetacharya@gmail.com>, jsnow@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, kwolf@redhat.com, armbru@redhat.com, quintela@redhat.com, marcandre.lureau@redhat.com, groug@kaod.org, aneesh.kumar@linux.vnet.ibm.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-I will try it later on. Thank you.
+* Michael S. Tsirkin (mst@redhat.com) wrote:
+> On Thu, Dec 15, 2016 at 12:36:59AM +0530, Ashijeet Acharya wrote:
+> > This series adds a new command line option "--only-migratable" which will only
+> > allow addition of those devices to a QEMU instance which are migratable and do
+> > not abruptly fail QEMU after migration.
+> > 
+> > Patch 1 adds the new option "-only-migratable".
+> > 
+> > Patch 2 adds compatibility for various "device adding" options for both via
+> > command line and hotplug methods.
+> > 
+> > Patch 3 handles the special case of devices which become unmigratable dynamically
+> > by making call to "migrate_add_blocker". Here we fail the particular action of the
+> > device which results in an unmigratable VM.
+> > Eg: 9pfs fails to mount the filesystem.
+> 
+> I guess that's possible but wouldn't it be cleaner to add introspection
+> so management can find out what can migrate?
+> Further, what should be removed (e.g. by hotplug) if you do want
+> to migrate.
+> 
+> As it is, you get a failure but no easy way for tools to
+> find out what was the failure reason.
 
-Best,
-Weiwei Jia
+You get the device name of the device that's failed don't you?
+Where would you add introspection?
 
-On Thu, Dec 15, 2016 at 7:13 AM, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
->
-> On 15/12/2016 09:04, Stefan Hajnoczi wrote:
->>> Does this feature only work for VirtIO? Does it work for SCSI or IDE?
->> This only works for virtio-blk and virtio-scsi.  The virtio-scsi
->> dataplane support is more recent and I don't remember if it is complete.
->> I've CCed Fam and Paolo who worked on virtio-scsi dataplane.
->>
->> Now that you have mentioned that you aren't using virtio devices, there
->> is another source of lock contention that you will encounter.  I/O
->> request submission takes place in the vcpu thread when ioeventfd is not
->> used.  Only virtio uses ioeventfd so your current QEMU configuration is
->> unable to let the vcpu continue execution during I/O request submission.
->>
->> If you care about performance then using virtio devices is probably the
->> best choice.  Try comparing against virtio-scsi dataplane - you should
->> see a lot less jitter.
->
-> Yes, virtio-scsi dataplane is complete.
->
-> Paolo
->
+Dave
+
+> 
+> > Ashijeet Acharya (3):
+> >   migration: Add a new option to enable only-migratable
+> >   migration: Allow "device add" options to only add migratable devices
+> >   migration: disallow migrate_add_blocker during migration
+> > 
+> >  block/qcow.c                  | 11 ++++++++++-
+> >  block/vdi.c                   | 11 ++++++++++-
+> >  block/vhdx.c                  | 20 ++++++++++++++------
+> >  block/vmdk.c                  | 12 +++++++++++-
+> >  block/vpc.c                   | 15 ++++++++++++---
+> >  block/vvfat.c                 | 24 ++++++++++++++++--------
+> >  hw/9pfs/9p.c                  | 22 ++++++++++++++++++----
+> >  hw/display/virtio-gpu.c       | 35 ++++++++++++++++++++++-------------
+> >  hw/intc/arm_gic_kvm.c         | 20 ++++++++++++++------
+> >  hw/intc/arm_gicv3_its_kvm.c   | 21 ++++++++++++++-------
+> >  hw/intc/arm_gicv3_kvm.c       | 22 +++++++++++++++-------
+> >  hw/misc/ivshmem.c             | 17 +++++++++++++----
+> >  hw/scsi/vhost-scsi.c          | 27 +++++++++++++++++++++------
+> >  hw/usb/bus.c                  | 15 +++++++++++++++
+> >  hw/virtio/vhost.c             | 11 ++++++++++-
+> >  include/migration/migration.h |  9 ++++++++-
+> >  migration/migration.c         | 42 ++++++++++++++++++++++++++++++++++++++++--
+> >  qdev-monitor.c                |  9 +++++++++
+> >  qemu-options.hx               | 10 ++++++++++
+> >  stubs/migr-blocker.c          |  3 ++-
+> >  target-i386/kvm.c             | 19 ++++++++++++++++---
+> >  vl.c                          |  4 ++++
+> >  22 files changed, 304 insertions(+), 75 deletions(-)
+> > 
+> > -- 
+> > 2.6.2
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
