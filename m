@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48039)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51231)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cHTPf-0001pp-WE
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 05:37:25 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cHTeu-0001Na-7y
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 05:53:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cHTPc-00027o-Sn
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 05:37:24 -0500
-Date: Thu, 15 Dec 2016 11:37:06 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20161215113706.5611c8a7@nial.brq.redhat.com>
-In-Reply-To: <20161213214522.25548-4-drjones@redhat.com>
-References: <20161213214522.25548-1-drjones@redhat.com>
-	<20161213214522.25548-4-drjones@redhat.com>
+	(envelope-from <dgilbert@redhat.com>) id 1cHTep-0004rr-CX
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 05:53:08 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55270)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cHTep-0004m3-6n
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 05:53:03 -0500
+Date: Thu, 15 Dec 2016 10:52:57 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20161215105257.GD2509@work-vm>
+References: <b1ac8aec-e9cc-99f8-0881-bef03acc2954@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 03/11] hw/arm/virt: use
- VirtMachineState.smp_cpus
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b1ac8aec-e9cc-99f8-0881-bef03acc2954@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] commit virtio: recalculate vq->inuse after
+ migration might cause last_avail_idx vs. used_idx failure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,98 +27,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jones <drjones@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, zhaoshenglong@huawei.com, mst@redhat.com, ehabkost@redhat.com
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Tue, 13 Dec 2016 22:45:14 +0100
-Andrew Jones <drjones@redhat.com> wrote:
-
-> Most places we need smp_cpus we use vms->smp_cpus already. This
-> cleanup makes sure we do everywhere, preparing for the removal
-> of the global smp_cpus someday.
-I'm not sure it's good idea to make/have smp_cpus as ARM specific
-machine field.
-It should be MachineState.smp_cpus since it's applicable to all machines.
-I also fail to see how this patch helps at all as in the end
-VirtMachineState.smp_cpus should be converted to MachineState.smp_cpus
-and we'd end up changing the same places twice with this patch.
-I'd rather see conversion to MachineState.smp_cpus from the beginning.
-So suggesting to drop this patch if from this series if it doesn't get
-in the way of removing VirtGuestInfo.
-
-
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
-> ---
->  hw/arm/virt.c | 14 +++++++-------
->  1 file changed, 7 insertions(+), 7 deletions(-)
+* Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
+> We have a migration problem, which is in my opinion caused by a
+> deficiency in how vq->inuse is calculated after the migration (commit
+> bccdef6b  "virtio: recalculate vq->inuse after migration" to
+> blame).
 > 
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index 67c0abb30b5b..18aa3672739d 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -583,7 +583,7 @@ static void create_gic(VirtMachineState *vms, qemu_irq *pic)
->  
->      gicdev = qdev_create(NULL, gictype);
->      qdev_prop_set_uint32(gicdev, "revision", type);
-> -    qdev_prop_set_uint32(gicdev, "num-cpu", smp_cpus);
-> +    qdev_prop_set_uint32(gicdev, "num-cpu", vms->smp_cpus);
->      /* Note that the num-irq property counts both internal and external
->       * interrupts; there are always 32 of the former (mandated by GIC spec).
->       */
-> @@ -604,7 +604,7 @@ static void create_gic(VirtMachineState *vms, qemu_irq *pic)
->       * maintenance interrupt signal to the appropriate GIC PPI inputs,
->       * and the GIC's IRQ/FIQ/VIRQ/VFIQ interrupt outputs to the CPU's inputs.
->       */
-> -    for (i = 0; i < smp_cpus; i++) {
-> +    for (i = 0; i < vms->smp_cpus; i++) {
->          DeviceState *cpudev = DEVICE(qemu_get_cpu(i));
->          int ppibase = NUM_IRQS + i * GIC_INTERNAL + GIC_NR_SGIS;
->          int irq;
-> @@ -629,7 +629,7 @@ static void create_gic(VirtMachineState *vms, qemu_irq *pic)
->                                                       + ARCH_GICV3_MAINT_IRQ));
->  
->          sysbus_connect_irq(gicbusdev, i, qdev_get_gpio_in(cpudev, ARM_CPU_IRQ));
-> -        sysbus_connect_irq(gicbusdev, i + smp_cpus,
-> +        sysbus_connect_irq(gicbusdev, i + vms->smp_cpus,
->                             qdev_get_gpio_in(cpudev, ARM_CPU_FIQ));
->          sysbus_connect_irq(gicbusdev, i + 2 * smp_cpus,
-                                                 ^^^^^^^^
-and other places in this file.
+> 
+> We got a bugreport with this log for a live migration target. 
+> 
+> 2016-12-13T18:59:03.647309Z qemu-system-s390x: VQ 1 size 0x100 < last_avail_idx 0x2f76 - used_idx 0x762f
 
->                             qdev_get_gpio_in(cpudev, ARM_CPU_VIRQ));
-> @@ -958,7 +958,7 @@ static void create_fw_cfg(const VirtMachineState *vms, AddressSpace *as)
->      char *nodename;
->  
->      fw_cfg = fw_cfg_init_mem_wide(base + 8, base, 8, base + 16, as);
-> -    fw_cfg_add_i16(fw_cfg, FW_CFG_NB_CPUS, (uint16_t)smp_cpus);
-> +    fw_cfg_add_i16(fw_cfg, FW_CFG_NB_CPUS, (uint16_t)vms->smp_cpus);
->  
->      nodename = g_strdup_printf("/fw-cfg@%" PRIx64, base);
->      qemu_fdt_add_subnode(vms->fdt, nodename);
-> @@ -1362,7 +1362,7 @@ static void machvirt_init(MachineState *machine)
->          exit(1);
->      }
->  
-> -    for (n = 0; n < smp_cpus; n++) {
-> +    for (n = 0; n < vms->smp_cpus; n++) {
->          Object *cpuobj = object_new(typename);
->          if (!vmc->disallow_affinity_adjustment) {
->              /* Adjust MPIDR like 64-bit KVM hosts, which incorporate the
-> @@ -1452,7 +1452,7 @@ static void machvirt_init(MachineState *machine)
->      create_fw_cfg(vms, &address_space_memory);
->      rom_set_fw(fw_cfg_find());
->  
-> -    guest_info->smp_cpus = smp_cpus;
-> +    guest_info->smp_cpus = vms->smp_cpus;
->      guest_info->fw_cfg = fw_cfg_find();
->      guest_info->memmap = vms->memmap;
->      guest_info->irqmap = vms->irqmap;
-> @@ -1466,7 +1466,7 @@ static void machvirt_init(MachineState *machine)
->      vms->bootinfo.kernel_filename = machine->kernel_filename;
->      vms->bootinfo.kernel_cmdline = machine->kernel_cmdline;
->      vms->bootinfo.initrd_filename = machine->initrd_filename;
-> -    vms->bootinfo.nb_cpus = smp_cpus;
-> +    vms->bootinfo.nb_cpus = vms->smp_cpus;
->      vms->bootinfo.board_id = -1;
->      vms->bootinfo.loader_start = vms->memmap[VIRT_MEM].base;
->      vms->bootinfo.get_dtb = machvirt_dtb;
+Is this actually an endian problem - 2f76 vs 762f ?
+
+Dave
+
+> 2016-12-13T18:59:03.647385Z qemu-system-s390x: error while loading state for instance 0x0 of device '/fe.0.0001/virtio-net'
+> 2016-12-13T18:59:03.647540Z qemu-system-s390x: load of migration failed: Operation not permitted
+> 2016-12-13 18:59:03.796+0000: shutting down, reason=failed
+> 
+> They use QEMU version 2.7 but looking at the current git master
+> I think this did not get fixed in the meanwhile.
+> 
+> So here goes the argument. The recalculation is done like this:
+> 
+> +            vdev->vq[i].inuse = vdev->vq[i].last_avail_idx -
+> +                                vdev->vq[i].used_idx;
+> 
+> This does not seem correct when last_avail_idx has already
+> wrapped around but used_idx not yet. We see from the log that
+> last_avail_idx  (0x2f76) less that used_idx (0x762f) thus
+> inuse (of type int) ends up being negative.
+> 
+> +            if (vdev->vq[i].inuse > vdev->vq[i].vring.num) {
+> 
+> Because vdev->vq[i].vring.num is unsigned int ala usual arithmetic
+> conversions ("Otherwise, if the operand that has unsigned integer type
+> has rank greater or equal to the rank of the type of the other operand,
+> then the operand with signed integer type is converted to the type of
+> the operand with unsigned integer type." C99) inuse gets converted to
+> unsigned int.
+> 
+> Thus the check fails and produces the log cited above.
+> 
+> +                error_report("VQ %d size 0x%x < last_avail_idx 0x%x - "
+> +                             "used_idx 0x%x",
+> +                             i, vdev->vq[i].vring.num,
+> +                             vdev->vq[i].last_avail_idx,
+> +                             vdev->vq[i].used_idx);
+> +                return -1;
+> +            }
+> 
+> Do we want to try to fix this for 2.8? I already have a small patch prepared.
+> 
+> Regards,
+> Halil
+> 
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
