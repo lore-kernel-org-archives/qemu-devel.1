@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60573)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60574)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cHeSt-000223-JP
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 17:25:28 -0500
+	(envelope-from <bounces@canonical.com>) id 1cHeSt-000227-JZ
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 17:25:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cHeSq-0005ct-MM
+	(envelope-from <bounces@canonical.com>) id 1cHeSq-0005cS-Cp
 	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 17:25:27 -0500
-Received: from indium.canonical.com ([91.189.90.7]:33673)
+Received: from indium.canonical.com ([91.189.90.7]:33668)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cHeSq-0005c4-HL
+	id 1cHeSq-0005be-6w
 	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 17:25:24 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cHeSp-0003D0-MO
-	for <qemu-devel@nongnu.org>; Thu, 15 Dec 2016 22:25:23 +0000
+	id 1cHeSo-0003D3-7R
+	for <qemu-devel@nongnu.org>; Thu, 15 Dec 2016 22:25:22 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id A72FE2E8019
-	for <qemu-devel@nongnu.org>; Thu, 15 Dec 2016 22:25:23 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 370062E80C1
+	for <qemu-devel@nongnu.org>; Thu, 15 Dec 2016 22:25:22 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 15 Dec 2016 22:11:40 -0000
+Date: Thu, 15 Dec 2016 22:09:23 -0000
 From: Askar Safin <safinaskar@mail.ru>
 Reply-To: Bug 922076 <922076@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20120126133438.17636.69999.malonedeb@soybean.canonical.com>
-Message-Id: <20161215221140.27855.24541.malone@chaenomeles.canonical.com>
+Message-Id: <20161215220923.29145.46844.malone@wampee.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 922076] Re: doesn't clear screen on boot
 List-Id: <qemu-devel.nongnu.org>
@@ -38,12 +38,35 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-And this is Screenshot_20161216_005917.png . Here (after grub) we see
-"recovering journal" on top of seabios string
+The bug still exists in qemu 2.7 (version present in my debian stretch).
+I was not able reproduce the bug with booting kernel directly with 2.7 (-ke=
+rnel ...), but booting disk image causes the bug.
 
-** Attachment added: "Screenshot_20161216_005917.png"
-   https://bugs.launchpad.net/qemu/+bug/922076/+attachment/4792206/+files/S=
-creenshot_20161216_005917.png
+So, I have debian gnu/linux stretch amd64. debian package qemu-
+system-x86 1:2.7+dfsg-3+b1. I run my host system in qemu (i. e. I run in
+qemu same system that running on the host) using well known "-snapshot
+-drive file=3D/dev/sda" trick. Precise command line is:
+
+kdesudo -c "exec qemu-system-x86_64 -m 1024M -enable-kvm -daemonize
+-snapshot -drive file=3D/dev/sda,cache=3Dnone,format=3Draw"
+
+Qemu appears and I see usual "SeaBIOS (version
+1.9.3-20161025_171302-gandalf)" as you can see at screenshot
+Screenshot_20161216_005817.png .
+
+Then qemu switches to grub.
+
+And then qemu switches to text mode back. And fsck prints to console:
+"/dev/sda2: recovering journal", but this words appears on top of that
+SeaBIOS self-adver., so we have the following words mixture:
+
+/dev/sda2: recovering journal25_171302-gandalf)
+
+I use sdl. I don't know build option, this is qemu from debian package
+
+** Attachment added: "Screenshot_20161216_005817.png"
+   https://bugs.launchpad.net/qemu/+bug/922076/+attachment/4792204/+files/S=
+creenshot_20161216_005817.png
 
 -- =
 
