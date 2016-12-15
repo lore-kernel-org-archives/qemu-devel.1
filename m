@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49628)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49962)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <harrynjit@gmail.com>) id 1cHYLh-0006Q8-AK
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 10:53:39 -0500
+	(envelope-from <mst@redhat.com>) id 1cHYMy-0000qu-9n
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 10:54:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <harrynjit@gmail.com>) id 1cHYLc-0001Zc-VG
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 10:53:37 -0500
-Received: from mail-qt0-f194.google.com ([209.85.216.194]:34111)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <harrynjit@gmail.com>) id 1cHYLc-0001Nk-PJ
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 10:53:32 -0500
-Received: by mail-qt0-f194.google.com with SMTP id l20so7447722qta.1
-	for <qemu-devel@nongnu.org>; Thu, 15 Dec 2016 07:53:10 -0800 (PST)
+	(envelope-from <mst@redhat.com>) id 1cHYMv-0002Dj-7h
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 10:54:56 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55338)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cHYMu-0002DD-Vj
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 10:54:53 -0500
+Date: Thu, 15 Dec 2016 17:54:50 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20161215173901-mutt-send-email-mst@kernel.org>
+References: <0b83db29-ebad-2a70-8d61-756d33e33a48@intel.com>
+	<2171e091-46ee-decd-7348-772555d3a5e3@redhat.com>
+	<d3ff453c-56fa-19de-317c-1c82456f2831@intel.com>
+	<20161207183817.GE28786@redhat.com>
+	<b58fd9f6-d9dd-dd56-d476-dd342174dac5@intel.com>
+	<20161207202824.GH28786@redhat.com>
+	<F2CBF3009FA73547804AE4C663CAB28E3A14E2AD@SHSMSX104.ccr.corp.intel.com>
+	<060287c7-d1af-45d5-70ea-ad35d4bbeb84@intel.com>
+	<F2CBF3009FA73547804AE4C663CAB28E3C31D0E6@SHSMSX104.ccr.corp.intel.com>
+	<01886693-c73e-3696-860b-086417d695e1@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20161215080452.GE26169@stefanha-x1.localdomain>
-References: <CA+scX6=9y4wDBWzXyqpGh9U__usKUa6sxwdc63iA8YRmpWFPqA@mail.gmail.com>
-	<20161214193107.GB20648@stefanha-x1.localdomain>
-	<CA+scX6=oc_eGteY8A0d8tuwzJFSu9M_6wnXBd5Tp=XGrg8FotQ@mail.gmail.com>
-	<20161215080452.GE26169@stefanha-x1.localdomain>
-From: Weiwei Jia <harrynjit@gmail.com>
-Date: Thu, 15 Dec 2016 10:52:08 -0500
-Message-ID: <CA+scX6kv+Q5jKR4B7QjN4O+273imH62Q6xZTeoZau6Uo4vDy5g@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] Lock contention in QEMU
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <01886693-c73e-3696-860b-086417d695e1@intel.com>
+Subject: Re: [Qemu-devel] [PATCH kernel v5 0/5] Extend virtio-balloon for
+ fast (de)inflating & fast live migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,147 +36,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-devel@nongnu.org, famz@redhat.com, Paolo Bonzini <pbonzini@redhat.com>
+To: Dave Hansen <dave.hansen@intel.com>
+Cc: "Li, Liang Z" <liang.z.li@intel.com>, Andrea Arcangeli <aarcange@redhat.com>, David Hildenbrand <david@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mhocko@suse.com" <mhocko@suse.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>
 
-On Thu, Dec 15, 2016 at 3:04 AM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
-> On Wed, Dec 14, 2016 at 08:06:10PM -0500, Weiwei Jia wrote:
->> Hi Stefan,
->>
->> Thanks for your reply. Please see the inline replies.
->>
->> On Wed, Dec 14, 2016 at 2:31 PM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
->> > On Wed, Dec 14, 2016 at 12:58:11AM -0500, Weiwei Jia wrote:
->> >> I find the timeslice of vCPU thread in QEMU/KVM is unstable when there
->> >> are lots of read requests (for example, read 4KB each time (8GB in
->> >> total) from one file) from Guest OS. I also find that this phenomenon
->> >> may be caused by lock contention in QEMU layer. I find this problem
->> >> under following workload.
->> >>
->> >> Workload settings:
->> >> In VMM, there are 6 pCPUs which are pCPU0, pCPU1, pCPU2, pCPU3, pCPU4,
->> >> pCPU5. There are two Kernel Virtual Machines (VM1 and VM2) upon VMM.
->> >> In each VM, there are 5 vritual CPUs (vCPU0, vCPU1, vCPU2, vCPU3,
->> >> vCPU4). vCPU0 in VM1 and vCPU0 in VM2 are pinned to pCPU0 and pCPU5
->> >> separately to handle interrupts dedicatedly. vCPU1 in VM1 and vCPU1 in
->> >> VM2 are pinned to pCPU1; vCPU2 in VM1 and vCPU2 in VM2 are pinned to
->> >> pCPU2; vCPU3 in VM1 and vCPU3 in VM2 are pinned to pCPU3; vCPU4 in VM1
->> >> and vCPU4 in VM2 are pinned to pCPU4. Besides vCPU0 in VM2 (pinned to
->> >> pCPU5), other vCPUs all have one CPU intensive thread (while(1){i++})
->> >> upon each of them in VM1 and VM2 to avoid the vCPU to be idle. In VM1,
->> >> I start one I/O thread on vCPU2, which the I/O thread reads 4KB from
->> >> one file each time (reads 8GB in total). The I/O scheduler in VM1 and
->> >> VM2 is NOOP. The I/O scheduler in VMM is CFQ. I also pinned the I/O
->> >> worker threads launched by QEMU to pCPU5 (note: there is no CPU
->> >> intensive thread on pCPU5 so the I/O requests will be handled by QEMU
->> >> I/O thread workers ASAP). The process scheduling class in VM and VMM
->> >> is CFS.
->> >
->> > Did you pin the QEMU main loop to pCPU5?  This is the QEMU process' main
->> > thread and it handles ioeventfd (virtqueue kick) and thread pool
->> > completions.
->>
->> No, I did not pin main loop to pCPU5. Do you mean If I pin QEMU main
->> loop to pCPU5 under above workload, the timeslice of vCPU2 thread will
->> be stable even though there are lots of I/O requests? I didn't use
->> virtio for VM and I use SCSI. My whole VM xml configuration file is as
->> follows.
->
-> Pinning the main loop will probably not solve the problem but it might
-> help a bit.  I just noticed it while reading your email because you
-> pinned everything carefully except the main loop, which is an important
-> thread.
+On Thu, Dec 15, 2016 at 07:34:33AM -0800, Dave Hansen wrote:
+> On 12/14/2016 12:59 AM, Li, Liang Z wrote:
+> >> Subject: Re: [Qemu-devel] [PATCH kernel v5 0/5] Extend virtio-balloon for
+> >> fast (de)inflating & fast live migration
+> >>
+> >> On 12/08/2016 08:45 PM, Li, Liang Z wrote:
+> >>> What's the conclusion of your discussion? It seems you want some
+> >>> statistic before deciding whether to  ripping the bitmap from the ABI,
+> >>> am I right?
+> >>
+> >> I think Andrea and David feel pretty strongly that we should remove the
+> >> bitmap, unless we have some data to support keeping it.  I don't feel as
+> >> strongly about it, but I think their critique of it is pretty valid.  I think the
+> >> consensus is that the bitmap needs to go.
+> >>
+> >> The only real question IMNHO is whether we should do a power-of-2 or a
+> >> length.  But, if we have 12 bits, then the argument for doing length is pretty
+> >> strong.  We don't need anywhere near 12 bits if doing power-of-2.
+> > 
+> > Just found the MAX_ORDER should be limited to 12 if use length instead of order,
+> > If the MAX_ORDER is configured to a value bigger than 12, it will make things more
+> > complex to handle this case. 
+> > 
+> > If use order, we need to break a large memory range whose length is not the power of 2 into several
+> > small ranges, it also make the code complex.
+> 
+> I can't imagine it makes the code that much more complex.  It adds a for
+> loop.  Right?
+> 
+> > It seems we leave too many bit  for the pfn, and the bits leave for length is not enough,
+> > How about keep 45 bits for the pfn and 19 bits for length, 45 bits for pfn can cover 57 bits
+> > physical address, that should be enough in the near feature. 
+> > 
+> > What's your opinion?
+> 
+> I still think 'order' makes a lot of sense.  But, as you say, 57 bits is
+> enough for x86 for a while.  Other architectures.... who knows?
 
-Yes, even pin main loop to dedicated pCPU, the timeslice still jitters
-very much.
+I think you can probably assume page size >= 4K. But I would not want
+to make any other assumptions. E.g. there are systems that absolutely
+require you to set high bits for DMA.
 
->> >>
->> >> Linux Kernel version for VMM is: 3.16.39
->> >> Linux Kernel version for VM1 and VM2 is: 4.7.4
->> >> QEMU emulator version is: 2.0.0
->> >>
->> >> When I test above workload, I find the timeslice of vCPU2 thread
->> >> jitters very much. I suspect this is triggered by lock contention in
->> >> QEMU layer since my debug log in front of VMM Linux Kernel's
->> >> schedule->__schedule->context_switch is like following. Once the
->> >> timeslice jitters very much, following debug information will appear.
->> >>
->> >> 7097537 Dec 13 11:22:33 mobius04 kernel: [39163.015789] Call Trace:
->> >> 7097538 Dec 13 11:22:33 mobius04 kernel: [39163.015791]
->> >> [<ffffffff8176b2f0>] dump_stack+0x64/0x84
->> >> 7097539 Dec 13 11:22:33 mobius04 kernel: [39163.015793]
->> >> [<ffffffff8176bf85>] __schedule+0x5b5/0x960
->> >> 7097540 Dec 13 11:22:33 mobius04 kernel: [39163.015794]
->> >> [<ffffffff8176c409>] schedule+0x29/0x70
->> >> 7097541 Dec 13 11:22:33 mobius04 kernel: [39163.015796]
->> >> [<ffffffff810ef4d8>] futex_wait_queue_me+0xd8/0x150
->> >> 7097542 Dec 13 11:22:33 mobius04 kernel: [39163.015798]
->> >> [<ffffffff810ef6fb>] futex_wait+0x1ab/0x2b0
->> >> 7097543 Dec 13 11:22:33 mobius04 kernel: [39163.015800]
->> >> [<ffffffff810eef00>] ? get_futex_key+0x2d0/0x2e0
->> >> 7097544 Dec 13 11:22:33 mobius04 kernel: [39163.015804]
->> >> [<ffffffffc0290105>] ? __vmx_load_host_state+0x125/0x170 [kv
->> >> m_intel]
->> >> 7097545 Dec 13 11:22:33 mobius04 kernel: [39163.015805]
->> >> [<ffffffff810f1275>] do_futex+0xf5/0xd20
->> >> 7097546 Dec 13 11:22:33 mobius04 kernel: [39163.015813]
->> >> [<ffffffffc0222690>] ? kvm_vcpu_ioctl+0x100/0x560 [kvm]
->> >> 7097547 Dec 13 11:22:33 mobius04 kernel: [39163.015816]
->> >> [<ffffffff810b06f0>] ? __dequeue_entity+0x30/0x50
->> >> 7097548 Dec 13 11:22:33 mobius04 kernel: [39163.015818]
->> >> [<ffffffff81013d06>] ? __switch_to+0x596/0x690
->> >> 7097549 Dec 13 11:22:33 mobius04 kernel: [39163.015820]
->> >> [<ffffffff811f9f23>] ? do_vfs_ioctl+0x93/0x520
->> >> 7097550 Dec 13 11:22:33 mobius04 kernel: [39163.015822]
->> >> [<ffffffff810f1f1d>] SyS_futex+0x7d/0x170
->> >> 7097551 Dec 13 11:22:33 mobius04 kernel: [39163.015824]
->> >> [<ffffffff8116d1b2>] ? fire_user_return_notifiers+0x42/0x50
->> >> 7097552 Dec 13 11:22:33 mobius04 kernel: [39163.015826]
->> >> [<ffffffff810154b5>] ? do_notify_resume+0xc5/0x100
->> >> 7097553 Dec 13 11:22:33 mobius04 kernel: [39163.015828]
->> >> [<ffffffff81770a8d>] system_call_fastpath+0x1a/0x1f
->> >>
->> >>
->> >> If true, I think this may be a scalability problem caused by QEMU I/O
->> >> part. Do we have a feature in QEMU to avoid this? Would you please
->> >> give me some suggestions about how to make the timeslice of vCPU2
->> >> thread stable even though there are lots of I/O Read requests on it.
->> >
->> > Yes, there is a way to reduce jitter caused by the QEMU global mutex:
->> >
->> > qemu -object iothread,id=iothread0 \
->> >      -drive if=none,id=drive0,file=test.img,format=raw,cache=none \
->> >      -device virtio-blk-pci,iothread=iothread0,drive=drive0
->> >
->> > Now the ioeventfd and thread pool completions will be processed in
->> > iothread0 instead of the QEMU main loop thread.  This thread does not
->> > take the QEMU global mutex so vcpu execution is not hindered.
->> >
->> > This feature is called virtio-blk dataplane.
->> >
->> > You can query IOThread thread IDs using the query-iothreads QMP command.
->> > This will allow you to pin iothread0 to pCPU5.
->> >
->> > Please let us know if this helps.
->>
->> Does this feature only work for VirtIO? Does it work for SCSI or IDE?
->
-> This only works for virtio-blk and virtio-scsi.  The virtio-scsi
-> dataplane support is more recent and I don't remember if it is complete.
-> I've CCed Fam and Paolo who worked on virtio-scsi dataplane.
->
-> Now that you have mentioned that you aren't using virtio devices, there
-> is another source of lock contention that you will encounter.  I/O
-> request submission takes place in the vcpu thread when ioeventfd is not
-> used.  Only virtio uses ioeventfd so your current QEMU configuration is
-> unable to let the vcpu continue execution during I/O request submission.
->
-> If you care about performance then using virtio devices is probably the
-> best choice.  Try comparing against virtio-scsi dataplane - you should
-> see a lot less jitter.
+I think we really want both length and order.
 
-I will try virtio-scsi or virtio-blk dataplane solution. Thank you.
+I understand how you are trying to pack them as tightly as possible.
 
+However, I thought of a trick, we don't need to encode all
+possible orders. For example, with 2 bits of order,
+we can make them mean:
+00 - 4K pages
+01 - 2M pages
+02 - 1G pages
 
-Cheers,
-Weiwei Jia
+guest can program the sizes for each order through config space.
+
+We will have 10 bits left for legth.
+
+It might make sense to also allow guest to program the number of bits
+used for order, this will make it easy to extend without
+host changes.
+
+-- 
+MST
