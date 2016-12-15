@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53695)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59961)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.y.sun@linux.intel.com>) id 1cHKvd-0005yv-CN
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 20:33:50 -0500
+	(envelope-from <arei.gonglei@huawei.com>) id 1cHLQY-0006Jx-5W
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 21:05:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.y.sun@linux.intel.com>) id 1cHKvZ-0006Ne-FW
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 20:33:49 -0500
-Received: from mga02.intel.com ([134.134.136.20]:39306)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yi.y.sun@linux.intel.com>)
-	id 1cHKvZ-0006Ms-60
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 20:33:45 -0500
-Date: Thu, 15 Dec 2016 09:33:55 +0800
-From: Yi Sun <yi.y.sun@linux.intel.com>
-Message-ID: <20161215013355.GK7435@yi.y.sun>
-References: <1481683803-10051-1-git-send-email-yi.y.sun@linux.intel.com>
-	<50856580-9978-8a5d-e424-ca989b246a8b@redhat.com>
+	(envelope-from <arei.gonglei@huawei.com>) id 1cHLQV-0002bX-06
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 21:05:46 -0500
+Received: from szxga01-in.huawei.com ([58.251.152.64]:17203)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <arei.gonglei@huawei.com>) id 1cHLQT-0002ZL-Hm
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 21:05:42 -0500
+From: Gonglei <arei.gonglei@huawei.com>
+Date: Thu, 15 Dec 2016 10:03:15 +0800
+Message-ID: <1481767396-187748-1-git-send-email-arei.gonglei@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <50856580-9978-8a5d-e424-ca989b246a8b@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] target-i386: Add Intel SHA_NI instruction
- support.
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v8 0/1] virtio-crypto: add Linux driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,54 +23,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, rth@twiddle.net, ehabkost@redhat.com, chao.p.peng@intel.com
+To: linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, virtualization@lists.linux-foundation.org, linux-crypto@vger.kernel.org
+Cc: luonengjun@huawei.com, mst@redhat.com, stefanha@redhat.com, weidong.huang@huawei.com, wu.wubin@huawei.com, xin.zeng@intel.com, claudio.fontana@huawei.com, herbert@gondor.apana.org.au, pasic@linux.vnet.ibm.com, davem@davemloft.net, jianjay.zhou@huawei.com, hanweidong@huawei.com, arei.gonglei@hotmail.com, cornelia.huck@de.ibm.com, xuquan8@huawei.com, longpeng2@huawei.com, wanzongshun@huawei.com, Gonglei <arei.gonglei@huawei.com>
 
-On 16-12-14 13:17:12, Paolo Bonzini wrote:
-> 
-> 
-> On 14/12/2016 03:50, Yi Sun wrote:
-> > Add SHA_NI feature bit. Its spec can be found at:
-> > https://software.intel.com/sites/default/files/managed/39/c5/325462-sdm-vol-1-2abcd-3abcd.pdf
-> > 
-> > Signed-off-by: Yi Sun <yi.y.sun@linux.intel.com>
-> > ---
-> >  target-i386/cpu.c | 2 +-
-> >  target-i386/cpu.h | 1 +
-> >  2 files changed, 2 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/target-i386/cpu.c b/target-i386/cpu.c
-> > index de1f30e..993f825 100644
-> > --- a/target-i386/cpu.c
-> > +++ b/target-i386/cpu.c
-> > @@ -422,7 +422,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-> >              "avx512f", "avx512dq", "rdseed", "adx",
-> >              "smap", "avx512ifma", "pcommit", "clflushopt",
-> >              "clwb", NULL, "avx512pf", "avx512er",
-> > -            "avx512cd", NULL, "avx512bw", "avx512vl",
-> > +            "avx512cd", "sha-ni", "avx512bw", "avx512vl",
-> >          },
-> >          .cpuid_eax = 7,
-> >          .cpuid_needs_ecx = true, .cpuid_ecx = 0,
-> > diff --git a/target-i386/cpu.h b/target-i386/cpu.h
-> > index c605724..d0bf624 100644
-> > --- a/target-i386/cpu.h
-> > +++ b/target-i386/cpu.h
-> > @@ -621,6 +621,7 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
-> >  #define CPUID_7_0_EBX_AVX512PF (1U << 26) /* AVX-512 Prefetch */
-> >  #define CPUID_7_0_EBX_AVX512ER (1U << 27) /* AVX-512 Exponential and Reciprocal */
-> >  #define CPUID_7_0_EBX_AVX512CD (1U << 28) /* AVX-512 Conflict Detection */
-> > +#define CPUID_7_0_EBX_SHA_NI   (1U << 29) /* SHA1/SHA256 Instruction Extensions */
-> >  #define CPUID_7_0_EBX_AVX512BW (1U << 30) /* AVX-512 Byte and Word Instructions */
-> >  #define CPUID_7_0_EBX_AVX512VL (1U << 31) /* AVX-512 Vector Length Extensions */
-> >  
-> > 
-> 
-> Looks good, thanks.
-> 
-> Paolo
+v8:
+ - use per virtqueue lock instead of a whole device lock
+   for data virtuqueue. [Halil & Xin]
 
-Thank you! :)
+v7:
+ - fix "BUG: smp_processor_id() in preemptible [00000000] code" reported by Halil,
+   using get_cpu/put_cpu instead of calling smp_processor_id() directly.
+ - fix a possible spinlock recursion in virtcrypto_dataq_callback(), we should
+   release the spinlock before invoking the callback.
+ - rebase on the latest kernel master tree.
 
-BRs,
-Sun Yi
+v6:
+ - add patch 1/2 to make sparc architecture happy. [Sam]
+ - close created sessions previousely when rekeying.
+ - convert the priority of virtio crypto algs from 4001 to 501
+   which is enough.
+
+v5:
+ - add comments for algs_lock and table_lock. [Stefan]
+ - use kzfree instead of kfree for key material security. [Stefan]
+ - drop unnecessary spin_lock for struct virtio_crypto_ablkcipher_ctx.
+ - dynamically allocated memory for iv in order to avoid to do DMA from
+   the stack memory in __virtio_crypto_ablkcipher_do_req().
+ - add logs for error path in virtio_crypto_alg_validate_key().
+ - add lock before calling virtio_break_device() in virtcrypto_update_status()
+
+v4:
+ - rework unknow status bit handler by calling virtio_break_device(). [Cornelia]
+ - convert space to tab in Kconfig. [Stefan]
+ - rename virtio_crypto.c to virtio_crypto_core.c and then make the
+   moudle named virtio_crypto.ko for consistency. [Stefan]
+ - don't call virtcrypto_dev_stop() on failure path. [Stefan]
+ - don't add two empty lines. [Michael]
+ - fix possible race by add spin_lock in virtio_crypto_alg_ablkcipher_init_session() [Michael and Halil]
+ - drop virtcrypto_devmgr_get_first() calling in virtio_crypto_ablkcipher_setkey. [Michael]
+ - drop superfluous assigned value for virtio_crypto_algs[i].cra_flags
+   in virtio_crypto_algs_register(). [Stefan]
+ - decrease virtio_crypto_active_devs if calling crypto_register_algs() failed. [Stefan]
+ - fix some typos here and there. [Stefan]
+ - fix missing table_lock usage in virtio_crypto_mgr.c. [Stefan]
+ - drop confused comments in virtio_crypto_alg_ablkcipher_init_session()
+   for virtqueue_kick(). [Halil]
+
+v3:
+ - set cpu affinity when data queues are not equal to the number of online cpus. [Michael]
+ - add TODO comments for cpu hotplug (changing the relationship of binding virtqueue and cpu)
+ - use __u32/64 in the config space since the virtio->get() doesn't support byte-swap yet. [Michael]
+ - drop the whole patch 1 of v2 because the above reason.
+ - add VERSION_1 check at the beginning of virtcrypto_probe()
+ - s/-1/EPERM/g in virtcrypto_update_status(), don't change err to EFAULT then. [Michael]
+ - add reset operation before delete the virtqueus. [Micheal]
+ - drop an unnecessiry spin_lock calling in virtcrypto_freeze(), avoid possible dead lock. [Micheal]
+ - redefine parameter alg's type in order to use a cast for it. [Michael]
+ - pad all structures to have the same size in one union, and add a member to
+   show the union's size in virtio_crypto.h. [Michael]
+ - update MAINTAINER file to add virtio-crypto stuff to Michael's entry so that
+   the corresponding patches can be CC'ed to Michael as well because the virtio-crypto
+   doesn't lay in driver/virtio directory. 
+
+The virtio crypto device is a virtual cryptography device
+as well as a kind of virtual hardware accelerator for
+virtual machines. The encryption anddecryption requests
+are placed in the data queue and are ultimately handled by
+thebackend crypto accelerators. The second queue is the
+control queue used to create or destroy sessions for
+symmetric algorithms and will control some advanced features
+in the future. The virtio crypto device provides the following
+cryptoservices: CIPHER, MAC, HASH, and AEAD.
+
+For more information about virtio-crypto device, please see:
+  http://qemu-project.org/Features/VirtioCrypto
+
+For better reviewing, pls see below explaination.
+
+The patch mainly includes five files:
+
+ 1) virtio_crypto.h is the header file for virtio-crypto device,
+which is based on the virtio-crypto specification. 
+ 2) virtio_crypto_core.c is the entry of the driver module,
+which is similar with other virtio devices, such as virtio-net,
+virtio-input etc. 
+ 3) virtio_crypto_mgr.c is used to manage the virtio
+crypto devices in the system. We support up to 32 virtio-crypto
+devices currently. I use a global list to store the virtio crypto
+devices which refer to Intel QAT driver. Meanwhile, the file
+includs the functions of add/del/search/start/stop for virtio
+crypto devices.
+ 4) virtio_crypto_common.h is a private header file for virtio
+crypto driver, includes structure definations, and function declarations.
+ 5) virtio_crypto_algs.c is the realization of algs based on Linux Crypto Framwork,
+which can register different crypto algorithms. Currently it's only support AES-CBC.
+The Crypto guys can mainly focus on this file. 
+
+v2:
+ - stop doing DMA from the stack, CONFIG_VMAP_STACK=y [Salvatore]
+ - convert __virtio32/64 to __le32/64 in virtio_crypto.h
+ - remove VIRTIO_CRYPTO_S_STARTED based on the lastest virtio crypto spec.
+ - introduces the little edian functions for VIRTIO_1 devices in patch 1.
+
+
+Gonglei (1):
+  crypto: add virtio-crypto driver
+
+ MAINTAINERS                                  |   9 +
+ drivers/crypto/Kconfig                       |   2 +
+ drivers/crypto/Makefile                      |   1 +
+ drivers/crypto/virtio/Kconfig                |  10 +
+ drivers/crypto/virtio/Makefile               |   5 +
+ drivers/crypto/virtio/virtio_crypto_algs.c   | 540 +++++++++++++++++++++++++++
+ drivers/crypto/virtio/virtio_crypto_common.h | 128 +++++++
+ drivers/crypto/virtio/virtio_crypto_core.c   | 476 +++++++++++++++++++++++
+ drivers/crypto/virtio/virtio_crypto_mgr.c    | 264 +++++++++++++
+ include/uapi/linux/Kbuild                    |   1 +
+ include/uapi/linux/virtio_crypto.h           | 450 ++++++++++++++++++++++
+ include/uapi/linux/virtio_ids.h              |   1 +
+ 12 files changed, 1887 insertions(+)
+ create mode 100644 drivers/crypto/virtio/Kconfig
+ create mode 100644 drivers/crypto/virtio/Makefile
+ create mode 100644 drivers/crypto/virtio/virtio_crypto_algs.c
+ create mode 100644 drivers/crypto/virtio/virtio_crypto_common.h
+ create mode 100644 drivers/crypto/virtio/virtio_crypto_core.c
+ create mode 100644 drivers/crypto/virtio/virtio_crypto_mgr.c
+ create mode 100644 include/uapi/linux/virtio_crypto.h
+
+-- 
+1.8.3.1
