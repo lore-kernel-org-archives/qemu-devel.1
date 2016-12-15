@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42633)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53216)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cHQsp-0003pE-UY
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 02:55:21 -0500
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cHRgV-0004vh-PA
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 03:46:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cHQsm-0005Md-SG
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 02:55:20 -0500
-Received: from indium.canonical.com ([91.189.90.7]:60246)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cHQsm-0005LV-Mz
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 02:55:16 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cHQsk-0005aG-4Z
-	for <qemu-devel@nongnu.org>; Thu, 15 Dec 2016 07:55:14 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 133D02E80C1
-	for <qemu-devel@nongnu.org>; Thu, 15 Dec 2016 07:55:14 +0000 (UTC)
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cHRgR-0007Cx-8l
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 03:46:39 -0500
+Received: from [59.151.112.132] (port=55789 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cHRgQ-00079R-Iu
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 03:46:35 -0500
+References: <1481263496-8004-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<1481263496-8004-2-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<alpine.DEB.2.10.1612131700110.2777@sstabellini-ThinkPad-X260>
+	<0e652e4a-4abd-92ee-accd-59d3d6b2b4eb@cn.fujitsu.com>
+From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+Message-ID: <c66eb694-2ffa-b1f1-e33c-778cfed9ed9c@cn.fujitsu.com>
+Date: Thu, 15 Dec 2016 16:46:28 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 15 Dec 2016 07:45:10 -0000
-From: Rowan Potgieter <rowan.potgieter@gmail.com>
-Reply-To: Bug 1267520 <1267520@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20140109160856.15157.6320.malonedeb@wampee.canonical.com>
-Message-Id: <20161215074510.20636.65103.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1267520] Re: Keyboard input not working when the
- "-k en-us" argument is specified.
+In-Reply-To: <0e652e4a-4abd-92ee-accd-59d3d6b2b4eb@cn.fujitsu.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.9 V3 1/3] Migration: Don't load
+ vmdesc when xen is enabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,87 +30,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Stefano Stabellini <sstabellini@kernel.org>, Wen Congyang <wencongyang@gmail.com>
+Cc: qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>, Eric Blake <eblake@redhat.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, "eddie .
+	dong" <eddie.dong@intel.com>, Bian Naimeng <biannm@cn.fujitsu.com>
 
-I can confirm that this issue is still present with:
-QEMU emulator version 2.5.0 (Debian 1:2.5+dfsg-5ubuntu10.6)
-Kernel: 4.4.0-53-generic
 
-I am using Packer and the QEMU builder and only the \ key was working in
-a Windows Guest. I had created folder called "common" to host all the
-Windows Powershell scripts and this is causing the issue.
 
--- =
+On 12/15/2016 02:46 PM, Zhang Chen wrote:
+>
+>
+> On 12/14/2016 09:00 AM, Stefano Stabellini wrote:
+>> On Fri, 9 Dec 2016, Zhang Chen wrote:
+>>> Xen doesn't need this.
+>> Could you please elaborate a bit more on what is the problem exactly,
+>> and why we don't have any issues with migration with Xen today (COLO
+>> use-case aside)?
+>>
+>
+> I test COLO without this patch, it seems run normally.
+> And I review the codes not find why we need this too.
+> So, I cc the original author wency about this.
+>
+> CC. wency.
+>
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1267520
+I contacted wency, Here we can ignore this patch.
+I will remove this patch in next version.
 
-Title:
-  Keyboard input not working when the "-k en-us" argument is specified.
+Thanks
+Zhang Chen
 
-Status in QEMU:
-  New
+> Thanks
+> Zhang Chen
+>
+>>> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+>>> ---
+>>>   migration/savevm.c | 4 ++++
+>>>   1 file changed, 4 insertions(+)
+>>>
+>>> diff --git a/migration/savevm.c b/migration/savevm.c
+>>> index 0363372..bec6c7e 100644
+>>> --- a/migration/savevm.c
+>>> +++ b/migration/savevm.c
+>>> @@ -1973,6 +1973,10 @@ int qemu_loadvm_state(QEMUFile *f)
+>>>           ret = qemu_file_get_error(f);
+>>>       }
+>>>   +    if (xen_enabled()) {
+>>> +        return ret;
+>>> +    }
+>>> +
+>>>       /*
+>>>        * Try to read in the VMDESC section as well, so that dumping 
+>>> tools that
+>>>        * intercept our migration stream have the chance to see it.
+>>> -- 
+>>> 2.7.4
+>>>
+>>>
+>>>
+>>>
+>>
+>> .
+>>
+>
 
-Bug description:
-  This bug occurs on qemu compiled with i386_softmmu and x86-64_softmmu on =
-linux kernel 3.5.0 (64-bit). (Haven't confirmed this for other targets).
-  Whenever I run qemu (both i386 and x86_64) to use the en-us language (eve=
-n though it is the default), I get "Warning: no scancode found for keysym X=
-" (X is an integer).
-  In the disk image I need qemu to run, I had a shell set up.  The shell do=
-esn't register keyboard input when the '-k en-us' command line argument is =
-set to run qemu. I did not have this problem with earlier versions of qemu.
-
-  Additional information:
-  Setting keymaps directory on command line -L doesn't resolve this.
-  Bug occurs with on both curses and sdl VGA output.
-  I am running qemu on Ubuntu 12.04 and I have not been able see if the bug=
- is distribution-specific. However, I am also experiencing the bug on Kali-=
-Linux; another debian based distribution.
-  It turns out that all languages reproduce the bug, not just 'en-us'.
-
-  Update: I have narrowed the bug to be attributable to versions later
-  than qemu-1.1.2.
-
-  Here's a listing of key being mapped:
-
-  Setting keysym exclam (33) to 258
-  Setting keysym at (64) to 259
-  Setting keysym numbersign (35) to 260
-  Setting keysym dollar (36) to 261
-  Setting keysym percent (37) to 262
-  Setting keysym asciicircum (94) to 263
-  Setting keysym ampersand (38) to 264
-  Setting keysym asterisk (42) to 265
-  Setting keysym parenleft (40) to 266
-  Setting keysym parenright (41) to 267
-  Setting keysym minus (45) to 12
-  Setting keysym underscore (95) to 268
-  Setting keysym equal (61) to 13
-  Setting keysym plus (43) to 269
-  Setting keysym bracketleft (91) to 26
-  Setting keysym braceleft (123) to 282
-  Setting keysym bracketright (93) to 27
-  Setting keysym braceright (125) to 283
-  Setting keysym semicolon (59) to 39
-  Setting keysym colon (58) to 295
-  Setting keysym apostrophe (39) to 40
-  Setting keysym quotedbl (34) to 296
-  Setting keysym grave (96) to 41
-  Setting keysym asciitilde (126) to 297
-  Setting keysym backslash (92) to 43
-  Setting keysym bar (124) to 299
-  Setting keysym comma (44) to 51
-  Setting keysym less (60) to 307
-  Setting keysym period (46) to 52
-  Setting keysym greater (62) to 308
-  Setting keysym slash (47) to 53
-  Setting keysym question (63) to 309
-
-  As one can see, the pc-bios/keymaps/common, contaning the QWWERTY
-  keys, is not processed in parse_init_keyboard at ui/keymaps.c even
-  though the XKB map (keymaps/en-us) includes the file.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1267520/+subscriptions
+-- 
+Thanks
+Zhang Chen
