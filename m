@@ -1,36 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42365)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42360)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cHKBn-0002Yb-P4
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cHKBn-0002XI-Fn
 	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:46:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cHKBk-0001E3-HV
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cHKBk-0001Dv-B5
 	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:46:27 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44465
-	helo=mx0a-001b2d01.pphosted.com)
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49928)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1cHKBk-0001DU-B8
+	id 1cHKBk-0001Ck-2U
 	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:46:24 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	uBF0hfvk136263
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
+	uBF0hd9S016417
 	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 19:46:23 -0500
-Received: from e19.ny.us.ibm.com (e19.ny.us.ibm.com [129.33.205.209])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 27bdm3s0mx-1
+Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 27bdm5151q-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 19:46:23 -0500
+	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 19:46:22 -0500
 Received: from localhost
-	by e19.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Wed, 14 Dec 2016 19:46:23 -0500
+	Wed, 14 Dec 2016 17:46:22 -0700
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Wed, 14 Dec 2016 18:44:18 -0600
+Date: Wed, 14 Dec 2016 18:44:16 -0600
 In-Reply-To: <1481762701-4587-1-git-send-email-mdroth@linux.vnet.ibm.com>
 References: <1481762701-4587-1-git-send-email-mdroth@linux.vnet.ibm.com>
-Message-Id: <1481762701-4587-25-git-send-email-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 24/67] iscsi: Fix divide-by-zero regression on
- raw SG devices
+Message-Id: <1481762701-4587-23-git-send-email-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 22/67] vfio/pci: Fix regression in MSI routing
+ configuration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,90 +39,74 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-stable@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Alex Williamson <alex.williamson@redhat.com>, Peter Xu <peterx@redhat.com>, Gavin Shan <gwshan@au1.ibm.com>
 
-From: Eric Blake <eblake@redhat.com>
+From: David Gibson <david@gibson.dropbear.id.au>
 
-When qemu uses iscsi devices in sg mode, iscsilun->block_size
-is left at 0.  Prior to commits cf081fca and similar, when
-block limits were tracked in sectors, this did not matter:
-various block limits were just left at 0.  But when we started
-scaling by block size, this caused SIGFPE.
+d1f6af6 "kvm-irqchip: simplify kvm_irqchip_add_msi_route" was a cleanup
+of kvmchip routing configuration, that was mostly intended for x86.
+However, it also contains a subtle change in behaviour which breaks EEH[1]
+error recovery on certain VFIO passthrough devices on spapr guests.  So far
+it's only been seen on a BCM5719 NIC on a POWER8 server, but there may be
+other hardware with the same problem.  It's also possible there could be
+circumstances where it causes a bug on x86 as well, though I don't know of
+any obvious candidates.
 
-Then, in a later patch, commit a5b8dd2c added an assertion to
-bdrv_open_common() that request_alignment is always non-zero;
-which was not true for SG mode.  Rather than relax that assertion,
-we can just provide a sane value (we don't know of any SG device
-with a block size smaller than qemu's default sizing of 512 bytes).
+Prior to d1f6af6, both vfio_msix_vector_do_use() and
+vfio_add_kvm_msi_virq() used msg == NULL as a special flag to mark this
+as the "dummy" vector used to make the host hardware state sync with the
+guest expected hardware state in terms of MSI configuration.
 
-One possible solution for SG mode is to just blindly skip ALL
-of iscsi_refresh_limits(), since we already short circuit so
-many other things in sg mode.  But this patch takes a slightly
-more conservative approach, and merely guarantees that scaling
-will succeed, while still using multiples of the original size
-where possible.  Resulting limits may still be zero in SG mode
-(that is, we mostly only fix block_size used as a denominator
-or which affect assertions, not all uses).
+Specifically that flag caused vfio_add_kvm_msi_virq() to become a no-op,
+meaning the dummy irq would always be delivered via qemu. d1f6af6 changed
+vfio_add_kvm_msi_virq() so it takes a vector number instead of the msg
+parameter, and determines the correct message itself.  The test for !msg
+was removed, and not replaced with anything there or in the caller.
 
-Reported-by: Holger Schranz <holger@fam-schranz.de>
-Signed-off-by: Eric Blake <eblake@redhat.com>
-CC: qemu-stable@nongnu.org
+With an spapr guest which has a VFIO device, if an EEH error occurs on the
+host hardware, then the device will be isolated then reset.  This is a
+combination of host and guest action, mediated by some EEH related
+hypercalls.  I haven't fully traced the mechanics, but somehow installing
+the kvm irqchip route for the dummy irq on the BCM5719 means that after EEH
+reset and recovery, at least some irqs are no longer delivered to the
+guest.
 
-Message-Id: <1473283640-15756-1-git-send-email-eblake@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-(cherry picked from commit 95eaa78537c734fa3cb3373d47ba8c0099a36ff0)
+In particular, the guest never gets the link up event, and so the NIC is
+effectively dead.
+
+[1] EEH (Enhanced Error Handling) is an IBM POWER server specific PCI-*
+    error reporting and recovery mechanism.  The concept is somewhat
+    similar to PCI-E AER, but the details are different.
+
+Bugzilla: https://bugzilla.redhat.com/show_bug.cgi?id=1373802
+
+Cc: Alex Williamson <alex.williamson@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>
+Cc: Gavin Shan <gwshan@au1.ibm.com>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-stable@nongnu.org
+Fixes: d1f6af6a17a6 ("kvm-irqchip: simplify kvm_irqchip_add_msi_route")
+Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+(cherry picked from commit 6d17a018d09801a2b18133a4febd81433bb0cf85)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- block/iscsi.c | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
+ hw/vfio/pci.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/block/iscsi.c b/block/iscsi.c
-index 95ce9e1..b2b4e5d 100644
---- a/block/iscsi.c
-+++ b/block/iscsi.c
-@@ -1813,19 +1813,22 @@ static void iscsi_refresh_limits(BlockDriverState *bs, Error **errp)
- 
-     IscsiLun *iscsilun = bs->opaque;
-     uint64_t max_xfer_len = iscsilun->use_16_for_rw ? 0xffffffff : 0xffff;
-+    unsigned int block_size = MAX(BDRV_SECTOR_SIZE, iscsilun->block_size);
- 
--    bs->bl.request_alignment = iscsilun->block_size;
-+    assert(iscsilun->block_size >= BDRV_SECTOR_SIZE || bs->sg);
-+
-+    bs->bl.request_alignment = block_size;
- 
-     if (iscsilun->bl.max_xfer_len) {
-         max_xfer_len = MIN(max_xfer_len, iscsilun->bl.max_xfer_len);
-     }
- 
--    if (max_xfer_len * iscsilun->block_size < INT_MAX) {
-+    if (max_xfer_len * block_size < INT_MAX) {
-         bs->bl.max_transfer = max_xfer_len * iscsilun->block_size;
-     }
- 
-     if (iscsilun->lbp.lbpu) {
--        if (iscsilun->bl.max_unmap < 0xffffffff / iscsilun->block_size) {
-+        if (iscsilun->bl.max_unmap < 0xffffffff / block_size) {
-             bs->bl.max_pdiscard =
-                 iscsilun->bl.max_unmap * iscsilun->block_size;
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index 7bfa17c..a5a620a 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -496,7 +496,9 @@ static int vfio_msix_vector_do_use(PCIDevice *pdev, unsigned int nr,
+             vfio_update_kvm_msi_virq(vector, *msg, pdev);
          }
-@@ -1835,7 +1838,7 @@ static void iscsi_refresh_limits(BlockDriverState *bs, Error **errp)
-         bs->bl.pdiscard_alignment = iscsilun->block_size;
+     } else {
+-        vfio_add_kvm_msi_virq(vdev, vector, nr, true);
++        if (msg) {
++            vfio_add_kvm_msi_virq(vdev, vector, nr, true);
++        }
      }
  
--    if (iscsilun->bl.max_ws_len < 0xffffffff / iscsilun->block_size) {
-+    if (iscsilun->bl.max_ws_len < 0xffffffff / block_size) {
-         bs->bl.max_pwrite_zeroes =
-             iscsilun->bl.max_ws_len * iscsilun->block_size;
-     }
-@@ -1846,7 +1849,7 @@ static void iscsi_refresh_limits(BlockDriverState *bs, Error **errp)
-         bs->bl.pwrite_zeroes_alignment = iscsilun->block_size;
-     }
-     if (iscsilun->bl.opt_xfer_len &&
--        iscsilun->bl.opt_xfer_len < INT_MAX / iscsilun->block_size) {
-+        iscsilun->bl.opt_xfer_len < INT_MAX / block_size) {
-         bs->bl.opt_transfer = pow2floor(iscsilun->bl.opt_xfer_len *
-                                         iscsilun->block_size);
-     }
+     /*
 -- 
 1.9.1
