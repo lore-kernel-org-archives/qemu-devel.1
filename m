@@ -1,35 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43307)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43336)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cHKCJ-0004eQ-QE
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:47:01 -0500
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cHKCK-0004ii-OL
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:47:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cHKCG-0001cV-LT
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:46:59 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:43713)
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cHKCH-0001dg-N2
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:47:00 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60192)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1cHKCG-0001bs-1b
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:46:56 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	id 1cHKCH-0001cj-DZ
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:46:57 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	uBF0hahd064456
-	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 19:46:55 -0500
-Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 27bgh8h3yw-1
+	uBF0hZuK130750
+	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 19:46:56 -0500
+Received: from e19.ny.us.ibm.com (e19.ny.us.ibm.com [129.33.205.209])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 27bdkvs7cv-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 19:46:54 -0500
+	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 19:46:56 -0500
 Received: from localhost
-	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e19.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Wed, 14 Dec 2016 17:46:54 -0700
+	Wed, 14 Dec 2016 19:46:54 -0500
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Wed, 14 Dec 2016 18:44:49 -0600
+Date: Wed, 14 Dec 2016 18:44:50 -0600
 In-Reply-To: <1481762701-4587-1-git-send-email-mdroth@linux.vnet.ibm.com>
 References: <1481762701-4587-1-git-send-email-mdroth@linux.vnet.ibm.com>
-Message-Id: <1481762701-4587-56-git-send-email-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 55/67] block/curl: Fix return value from
- curl_read_cb
+Message-Id: <1481762701-4587-57-git-send-email-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 56/67] block/curl: Remember all sockets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,62 +42,124 @@ Cc: qemu-stable@nongnu.org, Max Reitz <mreitz@redhat.com>, Jeff Cody <jcody@redh
 
 From: Max Reitz <mreitz@redhat.com>
 
-While commit 38bbc0a580f9f10570b1d1b5d3e92f0e6feb2970 is correct in that
-the callback is supposed to return the number of bytes handled; what it
-does not mention is that libcurl will throw an error if the callback did
-not "handle" all of the data passed to it.
-
-Therefore, if the callback receives some data that it cannot handle
-(either because the receive buffer has not been set up yet or because it
-would not fit into the receive buffer) and we have to ignore it, we
-still have to report that the data has been handled.
-
-Obviously, this should not happen normally. But it does happen at least
-for FTP connections where some data (that we do not expect) may be
-generated when the connection is established.
+For some connection types (like FTP, generally), more than one socket
+may be used (in FTP's case: control vs. data stream). As of commit
+838ef602498b8d1985a231a06f5e328e2946a81d ("curl: Eliminate unnecessary
+use of curl_multi_socket_all"), we have to remember all of the sockets
+used by libcurl, but in fact we only did that for a single one. Since
+one libcurl connection may use multiple sockets, however, we have to
+remember them all.
 
 Cc: qemu-stable@nongnu.org
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-id: 20161025025431.24714-3-mreitz@redhat.com
+Message-id: 20161025025431.24714-4-mreitz@redhat.com
 Signed-off-by: Jeff Cody <jcody@redhat.com>
-(cherry picked from commit 4e7676571bccb42dd49b5efbb91ac49077ea5197)
+(cherry picked from commit ff5ca1664af85b24a4180d595ea6873fd3deac57)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- block/curl.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+ block/curl.c | 47 +++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 41 insertions(+), 6 deletions(-)
 
 diff --git a/block/curl.c b/block/curl.c
-index a764e32..f47f4e6 100644
+index f47f4e6..600d032 100644
 --- a/block/curl.c
 +++ b/block/curl.c
-@@ -213,12 +213,13 @@ static size_t curl_read_cb(void *ptr, size_t size, size_t nmemb, void *opaque)
+@@ -105,12 +105,17 @@ typedef struct CURLAIOCB {
+     size_t end;
+ } CURLAIOCB;
  
-     DPRINTF("CURL: Just reading %zd bytes\n", realsize);
++typedef struct CURLSocket {
++    int fd;
++    QLIST_ENTRY(CURLSocket) next;
++} CURLSocket;
++
+ typedef struct CURLState
+ {
+     struct BDRVCURLState *s;
+     CURLAIOCB *acb[CURL_NUM_ACB];
+     CURL *curl;
+-    curl_socket_t sock_fd;
++    QLIST_HEAD(, CURLSocket) sockets;
+     char *orig_buf;
+     size_t buf_start;
+     size_t buf_off;
+@@ -164,10 +169,27 @@ static int curl_sock_cb(CURL *curl, curl_socket_t fd, int action,
+ {
+     BDRVCURLState *s;
+     CURLState *state = NULL;
++    CURLSocket *socket;
++
+     curl_easy_getinfo(curl, CURLINFO_PRIVATE, (char **)&state);
+-    state->sock_fd = fd;
+     s = state->s;
  
--    if (!s || !s->orig_buf)
--        return 0;
-+    if (!s || !s->orig_buf) {
-+        goto read_end;
++    QLIST_FOREACH(socket, &state->sockets, next) {
++        if (socket->fd == fd) {
++            if (action == CURL_POLL_REMOVE) {
++                QLIST_REMOVE(socket, next);
++                g_free(socket);
++            }
++            break;
++        }
 +    }
++    if (!socket) {
++        socket = g_new0(CURLSocket, 1);
++        socket->fd = fd;
++        QLIST_INSERT_HEAD(&state->sockets, socket, next);
++    }
++    socket = NULL;
++
+     DPRINTF("CURL (AIO): Sock action %d on fd %d\n", action, (int)fd);
+     switch (action) {
+         case CURL_POLL_IN:
+@@ -355,6 +377,7 @@ static void curl_multi_check_completion(BDRVCURLState *s)
+ static void curl_multi_do(void *arg)
+ {
+     CURLState *s = (CURLState *)arg;
++    CURLSocket *socket, *next_socket;
+     int running;
+     int r;
  
-     if (s->buf_off >= s->buf_len) {
-         /* buffer full, read nothing */
--        return 0;
-+        goto read_end;
-     }
-     realsize = MIN(realsize, s->buf_len - s->buf_off);
-     memcpy(s->orig_buf + s->buf_off, ptr, realsize);
-@@ -239,7 +240,9 @@ static size_t curl_read_cb(void *ptr, size_t size, size_t nmemb, void *opaque)
-         }
+@@ -362,10 +385,13 @@ static void curl_multi_do(void *arg)
+         return;
      }
  
--    return realsize;
-+read_end:
-+    /* curl will error out if we do not return this value */
-+    return size * nmemb;
+-    do {
+-        r = curl_multi_socket_action(s->s->multi, s->sock_fd, 0, &running);
+-    } while(r == CURLM_CALL_MULTI_PERFORM);
+-
++    /* Need to use _SAFE because curl_multi_socket_action() may trigger
++     * curl_sock_cb() which might modify this list */
++    QLIST_FOREACH_SAFE(socket, &s->sockets, next, next_socket) {
++        do {
++            r = curl_multi_socket_action(s->s->multi, socket->fd, 0, &running);
++        } while (r == CURLM_CALL_MULTI_PERFORM);
++    }
  }
  
- static int curl_find_buf(BDRVCURLState *s, size_t start, size_t len,
+ static void curl_multi_read(void *arg)
+@@ -469,6 +495,7 @@ static CURLState *curl_init_state(BlockDriverState *bs, BDRVCURLState *s)
+ #endif
+     }
+ 
++    QLIST_INIT(&state->sockets);
+     state->s = s;
+ 
+     return state;
+@@ -478,6 +505,14 @@ static void curl_clean_state(CURLState *s)
+ {
+     if (s->s->multi)
+         curl_multi_remove_handle(s->s->multi, s->curl);
++
++    while (!QLIST_EMPTY(&s->sockets)) {
++        CURLSocket *socket = QLIST_FIRST(&s->sockets);
++
++        QLIST_REMOVE(socket, next);
++        g_free(socket);
++    }
++
+     s->in_use = 0;
+ }
+ 
 -- 
 1.9.1
