@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51978)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55038)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cHVJz-0001Kx-Kg
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 07:39:41 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cHVWt-0005JK-LW
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 07:53:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cHVJt-00047y-Bx
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 07:39:39 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42338)
+	(envelope-from <dgilbert@redhat.com>) id 1cHVWq-0002RR-Je
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 07:52:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34882)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cHVJt-00047i-3O
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 07:39:33 -0500
-Received: from int-mx13.intmail.prod.int.phx2.redhat.com
-	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3E2B9C056800
-	for <qemu-devel@nongnu.org>; Thu, 15 Dec 2016 12:39:32 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <1481744348-8868-1-git-send-email-ehabkost@redhat.com>
-Date: Thu, 15 Dec 2016 13:39:30 +0100
-In-Reply-To: <1481744348-8868-1-git-send-email-ehabkost@redhat.com> (Eduardo
-	Habkost's message of "Wed, 14 Dec 2016 17:39:08 -0200")
-Message-ID: <87r3591i4d.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cHVWq-0002Ql-A8
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 07:52:56 -0500
+Date: Thu, 15 Dec 2016 12:52:50 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20161215125250.GI2509@work-vm>
+References: <20161108095603.72301-1-pasic@linux.vnet.ibm.com>
+	<20161108095603.72301-9-pasic@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [RFC v2] qmp: query-device-slots command
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20161108095603.72301-9-pasic@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [RFC PATCH v2 8/8] tests/test-vmstate.c: add array
+ of pointers to struct with NULL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,383 +28,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, libvir-list@redhat.com, Igor Mammedov <imammedo@redhat.com>, Laine Stump <laine@redhat.com>
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, Amit Shah <amit.shah@redhat.com>, Juan Quintela <quintela@redhat.com>, Guenther Hutzl <hutzl@linux.vnet.ibm.com>
 
-Eduardo Habkost <ehabkost@redhat.com> writes:
+* Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
+> Increase coverage by testing VMSTATE_ARRAY_OF_POINTER_TO_STRUCT
+> with an array containing some NULL pointer.
+> 
+> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+> ---
+>  tests/test-vmstate.c | 41 +++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 41 insertions(+)
+> 
+> diff --git a/tests/test-vmstate.c b/tests/test-vmstate.c
+> index aa1ccf1..5394119 100644
+> --- a/tests/test-vmstate.c
+> +++ b/tests/test-vmstate.c
+> @@ -651,6 +651,44 @@ static void test_arr_ptr_str_no0_load(void)
+>      }
+>  }
+>  
+> +static void test_arr_ptr_str_0_save(void)
+> +{
+> +    TestStructTriv ar[AR_SIZE] = {{.i = 0}, {.i = 1}, {.i = 2}, {.i = 3} };
+> +    TestArrayOfPtrToStuct sample = {.ar = {&ar[0], NULL, &ar[2], &ar[3]} };
+> +
+> +    save_vmstate(&vmsd_arps, &sample); /* fails with SEGFAULT with master */
 
-> This adds a new command to QMP: query-device-slots. It will allow
-> management software to query possible slots where devices can be
-> plugged.
->
-> This implementation of the command will return:
->
-> * Multiple PCI slots per bus, in the case of PCI buses;
-> * One slot per bus for the other buses (that don't
->   implement slot enumeration yet);
-> * One slot for each entry from query-hotpluggable-cpus.
->
-> Git tree
-> --------
->
-> This patch needs the previous query-machines series I am working
-> on. The full tree can be found on the git tree at:
->
->   git://github.com/ehabkost/qemu-hacks.git work/query-machines-bus-info
->
-> Example output
-> --------------
->
-> The following output was returned by QEMU when running it as:
->
->  $ qemu-system-x86_64 -machine q35 \
->    -readconfig docs/q35-chipset.cfg \
->    -smp 4,maxcpus=8,sockets=2,cores=2,threads=2
->
->   {
->     "return": [
->         {
->             "available": false,
->             "hotpluggable": false,
->             "props": {
->                 "bus": "i2c"
+Should probably remove that comment now; but other than that.
 
-Missing: bus "i2c-bus" device address, property name "address", value
-0..255.
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
->             },
->             "type": "non-slot",
-
-I guess "non-slot" means "props" is incomplete, but the rest should be
-okay.
-
->             "accepted-device-types": [
->                 "i2c-slave"
->             ]
->         },
->         {
->             "available": false,
->             "hotpluggable": false,
->             "props": {
->                 "bus": "ide.4"
-
-Bus "IDE" device address property "unit", value 0 (because this is SATA,
-for PATA it would be 0..1).
-
->             },
->             "type": "non-slot",
->             "accepted-device-types": [
->                 "ide-device"
->             ]
->         },
-[...]
->         {
->             "available": false,
->             "hotpluggable": false,
->             "props": {
->                 "bus": "main-system-bus"
->             },
->             "type": "non-slot",
->             "accepted-device-types": [
->                 "sys-bus-device"
->             ]
->         },
-
-Can't give guidance on this one, I'm afraid.
-
->         {
->             "available": false,
->             "hotpluggable": false,
->             "props": {
->                 "bus": "isa.0"
->             },
->             "type": "non-slot",
->             "accepted-device-types": [
->                 "isa-device"
->             ]
->         },
-
-Bus "ISA" is iffy, too.
-
->         {
->             "available": false,
->             "hotpluggable": false,
->             "props": {
->                 "bus": "pcie.0",
->                 "device-number": 0
-
-Really?  "device_add e1000e,help" shows now property "device-number".
-Oh, I see, you're adding it in this patch, along with "function".
-
->             },
->             "type": "pci",
->             "accepted-device-types": [
->                 "legacy-pci-device",
->                 "pci-express-device"
->             ]
->         },
->         {
->             "available": false,
->             "hotpluggable": false,
->             "props": {
->                 "bus": "pcie.0",
->                 "device-number": 1
->             },
->             "type": "pci",
->             "accepted-device-types": [
->                 "legacy-pci-device",
->                 "pci-express-device"
->             ]
->         },
-[...]
->         {
->             "available": false,
->             "hotpluggable": false,
->             "props": {
->                 "bus": "pcie.0",
->                 "device-number": 31
->             },
->             "type": "pci",
->             "accepted-device-types": [
->                 "legacy-pci-device",
->                 "pci-express-device"
->             ]
->         },
-
-Design question: do we need to describe the bus with 32 separate
-objects, or would a single object do?  The objects only differ in the
-value of props.device-number...
-
-For a hypothetical bus with uint32_t device addresses, separate objects
-would be impossible.  So we probably need to describe slot sets, anyway.
-
->         {
->             "available": true,
->             "hotpluggable": true,
->             "props": {
->                 "bus": "ich9-pcie-port-1",
->                 "device-number": 0
->             },
->             "type": "pci",
->             "accepted-device-types": [
->                 "pci-express-device"
->             ]
->         },
->         {
->             "available": true,
->             "hotpluggable": true,
->             "props": {
->                 "bus": "ich9-pcie-port-2",
->                 "device-number": 0
->             },
->             "type": "pci",
->             "accepted-device-types": [
->                 "pci-express-device"
->             ]
->         },
->         {
->             "available": true,
->             "hotpluggable": true,
->             "props": {
->                 "bus": "ich9-pcie-port-3",
->                 "device-number": 0
->             },
->             "type": "pci",
->             "accepted-device-types": [
->                 "pci-express-device"
->             ]
->         },
->         {
->             "available": true,
->             "hotpluggable": true,
->             "props": {
->                 "bus": "ich9-pcie-port-4",
->                 "device-number": 0
->             },
->             "type": "pci",
->             "accepted-device-types": [
->                 "pci-express-device"
->             ]
->         },
->         {
->             "available": false,
->             "hotpluggable": false,
->             "props": {
->                 "bus": "ich9-pci-bridge",
->                 "device-number": 0
->             },
->             "type": "pci",
->             "accepted-device-types": [
->                 "legacy-pci-device"
->             ]
->         },
-[...]
->         {
->             "available": false,
->             "hotpluggable": false,
->             "props": {
->                 "bus": "ich9-pci-bridge",
->                 "device-number": 31
->             },
->             "type": "pci",
->             "accepted-device-types": [
->                 "legacy-pci-device"
->             ]
->         },
-
-Likewise.
-
->         {
->             "available": true,
->             "hotpluggable": true,
->             "props": {
->                 "bus": "ich9-ehci-1.0"
->             },
->             "type": "non-slot",
->             "accepted-device-types": [
->                 "usb-device"
->             ]
->         },
-
-Okay, more bad news: bus "usb-bus" device address property is "port",
-value is a sequence of port numbers separated by '.'.  The reason is
-"convenience"
-
-A real USB host controller has a fixed number of ports, numbered 1..N.
-This one has six.
-
-A real USB hub device plugs into a port and in turn provides a fixed
-number of ports, numbered 1..N.  The USB hub device we model provides
-eight.
-
-An obvious way to model this would be to have the host controller
-provide a bus with a fixed number of slots, and the usb-hub provide a
-separate bus with eight.  This is how we do PCI bridges.  But it's not
-how we do USB hubs.
-
-Host software can treat the tree formed by USB host controller, hubs and
-other devices as a single bus, and that's how we model it.
-
-A "port" value that is a single number addresses that port on the host
-controller.
-
-A value containing '.' addresses something behind a hub.  The leftmost
-number addresses a host controller port.  A hub must be plugged in
-there.  Recurse for the rest of the port string.
-
-If you device_add an USB device without specifying a port, it picks an
-unused one.  When it has to pick the last port, it tries to add a
-usb-hub device there, which provides eight ports, then picks a port for
-your device.  If adding the usb-hub succeeds, it'll get the new hub's
-port 1.  Else, it gets the last port.  There's a hard-coded limit of
-five on the depth of the hub chain.  So, if you keep adding USB devices
-to the bus provided by ich9-ehci, the first five go into ports "1", ...,
-"5", the sixth goes into "6.1" (with usb-hub in port "6"), and so forth,
-until the 41st goes into "6.8.8.8.8.8".  Adding hubs manually permits
-more devices.
-
-If you do specify "port", then that port must already exist.
-
-I think the sanest way to represent the existing ports is enumerating
-them, like this:
-
-          {
-              "available": true,
-              "hotpluggable": true,
-              "props": {
-                  "bus": "ich9-ehci-1.0", "port": "1"
-              },
-              "type": "usb",
-              "accepted-device-types": [
-                  "usb-device"
-              ]
-          },
-          [...]
-          {
-              "available": true,
-              "hotpluggable": true,
-              "props": {
-                  "bus": "ich9-ehci-1.0", "port": "6"
-              },
-              "type": "usb",
-              "accepted-device-types": [
-                  "usb-device"
-              ]
-          },
-
-Plugging usb-hub into a port with port: "P" then flips that port's
-"available" to false, and adds eight new ports with "port": "P.1",
-... "P.8".
-
-So, plugging a device can not only add buses provided by the device, but
-also, and less obviously, add slots to the bus it plugs into!  Likewise
-for unplug.
-
-Perhaps we should emit events when slots come and go.
-
->         {
->             "available": true,
->             "hotpluggable": true,
->             "props": {
->                 "bus": "ich9-ehci-2.0"
->             },
->             "type": "non-slot",
->             "accepted-device-types": [
->                 "usb-device"
->             ]
->         },
->         {
->             "available": false,
->             "hotpluggable": false,
->             "props": {
->                 "bus": "ich9-hda-audio.0"
-
-Bus "HDA" device address property is "cad", value 0..14.
-
->             },
->             "type": "non-slot",
->             "accepted-device-types": [
->                 "hda-codec"
->             ]
->         },
->         {
->             "available": true,
->             "hotpluggable": true,
->             "props": {
->                 "socket-id": 1,
->                 "core-id": 1,
->                 "thread-id": 1
->             },
->             "type": "cpu",
->             "accepted-device-types": [
->                 "qemu64-x86_64-cpu"
->             ]
->         },
-
-You know CPUs better than me.
-
-[More of them...]
->     ]
->   }
-
-There's still more...
-
-Bus "SCSI" device address property is "scsi-id", value 0..N, where N
-depends on the SCSI HBA.
-
-Bus "virtio-serial-bus" device address property is "nr", value 0..N,
-where N is configurable, currenrly up to 511.
-
-ccid-bus device address property is "slot", value 0..N, where N depends
-on the device providing the bus (I think).
-
-Buses not yet covered by docs/qdev-device-use.txt: "floppy-bus",
-"apple-desktop-bus", "IndustryPack", "aux-bus", "spapr-vio-bus",
-"virtual-css-bus", "s390-sclp-events-bus", "s390-pcibus", "sd-bus",
-"SSI", "virtio-bus", "xen-sysbus".  Grep for ".parent = TYPE_BUS".
-
-To find all buses in a certain build, use:
-
-    { "execute": "qom-list-types", "arguments": { "implements": "bus" } }
-
-[No code review, yet]
+> +}
+> +
+> +static void test_arr_ptr_str_0_load(void)
+> +{
+> +    TestStructTriv ar_gt[AR_SIZE] = {{.i = 0}, {.i = 0}, {.i = 2}, {.i = 3} };
+> +    TestStructTriv ar[AR_SIZE] = {};
+> +    TestArrayOfPtrToStuct obj = {.ar = {&ar[0], NULL, &ar[2], &ar[3]} };
+> +    int idx;
+> +    uint8_t wire_sample[] = {
+> +        0x00, 0x00, 0x00, 0x00,
+> +        VMS_NULLPTR_MARKER,
+> +        0x00, 0x00, 0x00, 0x02,
+> +        0x00, 0x00, 0x00, 0x03,
+> +        QEMU_VM_EOF
+> +    };
+> +
+> +    save_buffer(wire_sample, sizeof(wire_sample));
+> +    SUCCESS(load_vmstate_one(&vmsd_arps, &obj, 1,
+> +                          wire_sample, sizeof(wire_sample)));
+> +    for (idx = 0; idx < AR_SIZE; ++idx) {
+> +        /* compare the target array ar with the ground truth array ar_gt */
+> +        g_assert_cmpint(ar_gt[idx].i, ==, ar[idx].i);
+> +    }
+> +    for (idx = 0; idx < AR_SIZE; ++idx) {
+> +        if (idx == 1) {
+> +            g_assert_cmpint((uint64_t)(obj.ar[idx]), ==, 0);
+> +        } else {
+> +            g_assert_cmpint((uint64_t)(obj.ar[idx]), !=, 0);
+> +        }
+> +    }
+> +}
+> +
+>  int main(int argc, char **argv)
+>  {
+>      temp_fd = mkstemp(temp_file);
+> @@ -670,6 +708,9 @@ int main(int argc, char **argv)
+>                      test_arr_ptr_str_no0_save);
+>      g_test_add_func("/vmstate/array/ptr/str/no0/load",
+>                      test_arr_ptr_str_no0_load);
+> +    g_test_add_func("/vmstate/array/ptr/str/0/save", test_arr_ptr_str_0_save);
+> +    g_test_add_func("/vmstate/array/ptr/str/0/load",
+> +                    test_arr_ptr_str_0_load);
+>      g_test_run();
+>  
+>      close(temp_fd);
+> -- 
+> 2.8.4
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
