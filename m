@@ -1,25 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55038)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34156)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cHVWt-0005JK-LW
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 07:53:00 -0500
+	(envelope-from <ossman@cendio.se>) id 1cHVu9-0006nQ-Ql
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 08:17:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cHVWq-0002RR-Je
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 07:52:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34882)
+	(envelope-from <ossman@cendio.se>) id 1cHVu3-00069A-Pr
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 08:17:01 -0500
+Received: from hayek.cendio.se ([193.12.253.119]:48190 helo=mail.cendio.se)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cHVWq-0002Ql-A8
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 07:52:56 -0500
-Date: Thu, 15 Dec 2016 12:52:50 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20161215125250.GI2509@work-vm>
-References: <20161108095603.72301-1-pasic@linux.vnet.ibm.com>
-	<20161108095603.72301-9-pasic@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20161108095603.72301-9-pasic@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [RFC PATCH v2 8/8] tests/test-vmstate.c: add array
- of pointers to struct with NULL
+	(Exim 4.71) (envelope-from <ossman@cendio.se>) id 1cHVu3-000678-Iy
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 08:16:55 -0500
+From: Pierre Ossman <ossman@cendio.se>
+Date: Thu, 15 Dec 2016 14:16:46 +0100
+Message-Id: <3fcc534530370027118377dc24d4049a1cef590e.1481807806.git.ossman@cendio.se>
+Subject: [Qemu-devel] [PATCH] vnc: track LED state separately
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,84 +21,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, Amit Shah <amit.shah@redhat.com>, Juan Quintela <quintela@redhat.com>, Guenther Hutzl <hutzl@linux.vnet.ibm.com>
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
 
-* Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
-> Increase coverage by testing VMSTATE_ARRAY_OF_POINTER_TO_STRUCT
-> with an array containing some NULL pointer.
-> 
-> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-> ---
->  tests/test-vmstate.c | 41 +++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 41 insertions(+)
-> 
-> diff --git a/tests/test-vmstate.c b/tests/test-vmstate.c
-> index aa1ccf1..5394119 100644
-> --- a/tests/test-vmstate.c
-> +++ b/tests/test-vmstate.c
-> @@ -651,6 +651,44 @@ static void test_arr_ptr_str_no0_load(void)
->      }
->  }
->  
-> +static void test_arr_ptr_str_0_save(void)
-> +{
-> +    TestStructTriv ar[AR_SIZE] = {{.i = 0}, {.i = 1}, {.i = 2}, {.i = 3} };
-> +    TestArrayOfPtrToStuct sample = {.ar = {&ar[0], NULL, &ar[2], &ar[3]} };
-> +
-> +    save_vmstate(&vmsd_arps, &sample); /* fails with SEGFAULT with master */
+Piggy-backing on the modifier state array made it difficult to send
+out updates at the proper times. So keep track of the LED state in
+a separate variable.
 
-Should probably remove that comment now; but other than that.
+This also moves the handling up a layer in to the VNC Display object
+since the state is global, and also makes sure the state is readily
+available directly when a client connects.
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Pierre Ossman <ossman@cendio.se>
+---
+ ui/vnc.c | 56 +++++++++++++-------------------------------------------
+ ui/vnc.h |  3 ++-
+ 2 files changed, 15 insertions(+), 44 deletions(-)
 
-> +}
-> +
-> +static void test_arr_ptr_str_0_load(void)
-> +{
-> +    TestStructTriv ar_gt[AR_SIZE] = {{.i = 0}, {.i = 0}, {.i = 2}, {.i = 3} };
-> +    TestStructTriv ar[AR_SIZE] = {};
-> +    TestArrayOfPtrToStuct obj = {.ar = {&ar[0], NULL, &ar[2], &ar[3]} };
-> +    int idx;
-> +    uint8_t wire_sample[] = {
-> +        0x00, 0x00, 0x00, 0x00,
-> +        VMS_NULLPTR_MARKER,
-> +        0x00, 0x00, 0x00, 0x02,
-> +        0x00, 0x00, 0x00, 0x03,
-> +        QEMU_VM_EOF
-> +    };
-> +
-> +    save_buffer(wire_sample, sizeof(wire_sample));
-> +    SUCCESS(load_vmstate_one(&vmsd_arps, &obj, 1,
-> +                          wire_sample, sizeof(wire_sample)));
-> +    for (idx = 0; idx < AR_SIZE; ++idx) {
-> +        /* compare the target array ar with the ground truth array ar_gt */
-> +        g_assert_cmpint(ar_gt[idx].i, ==, ar[idx].i);
-> +    }
-> +    for (idx = 0; idx < AR_SIZE; ++idx) {
-> +        if (idx == 1) {
-> +            g_assert_cmpint((uint64_t)(obj.ar[idx]), ==, 0);
-> +        } else {
-> +            g_assert_cmpint((uint64_t)(obj.ar[idx]), !=, 0);
-> +        }
-> +    }
-> +}
-> +
->  int main(int argc, char **argv)
->  {
->      temp_fd = mkstemp(temp_file);
-> @@ -670,6 +708,9 @@ int main(int argc, char **argv)
->                      test_arr_ptr_str_no0_save);
->      g_test_add_func("/vmstate/array/ptr/str/no0/load",
->                      test_arr_ptr_str_no0_load);
-> +    g_test_add_func("/vmstate/array/ptr/str/0/save", test_arr_ptr_str_0_save);
-> +    g_test_add_func("/vmstate/array/ptr/str/0/load",
-> +                    test_arr_ptr_str_0_load);
->      g_test_run();
->  
->      close(temp_fd);
-> -- 
-> 2.8.4
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+diff --git a/ui/vnc.c b/ui/vnc.c
+index 2c28a59..c449a7d 100644
+--- a/ui/vnc.c
++++ b/ui/vnc.c
+@@ -1231,8 +1231,6 @@ void vnc_disconnect_finish(VncState *vs)
+         vnc_update_server_surface(vs->vd);
+     }
+ 
+-    if (vs->vd->lock_key_sync)
+-        qemu_remove_led_event_handler(vs->led);
+     vnc_unlock_output(vs);
+ 
+     qemu_mutex_destroy(&vs->output_mutex);
+@@ -1665,69 +1663,38 @@ static void press_key(VncState *vs, int keysym)
+     qemu_input_event_send_key_delay(vs->vd->key_delay_ms);
+ }
+ 
+-static int current_led_state(VncState *vs)
+-{
+-    int ledstate = 0;
+-
+-    if (vs->modifiers_state[0x46]) {
+-        ledstate |= QEMU_SCROLL_LOCK_LED;
+-    }
+-    if (vs->modifiers_state[0x45]) {
+-        ledstate |= QEMU_NUM_LOCK_LED;
+-    }
+-    if (vs->modifiers_state[0x3a]) {
+-        ledstate |= QEMU_CAPS_LOCK_LED;
+-    }
+-
+-    return ledstate;
+-}
+-
+ static void vnc_led_state_change(VncState *vs)
+ {
+-    int ledstate = 0;
+-
+     if (!vnc_has_feature(vs, VNC_FEATURE_LED_STATE)) {
+         return;
+     }
+ 
+-    ledstate = current_led_state(vs);
+     vnc_lock_output(vs);
+     vnc_write_u8(vs, VNC_MSG_SERVER_FRAMEBUFFER_UPDATE);
+     vnc_write_u8(vs, 0);
+     vnc_write_u16(vs, 1);
+     vnc_framebuffer_update(vs, 0, 0, 1, 1, VNC_ENCODING_LED_STATE);
+-    vnc_write_u8(vs, ledstate);
++    vnc_write_u8(vs, vs->vd->ledstate);
+     vnc_unlock_output(vs);
+     vnc_flush(vs);
+ }
+ 
+ static void kbd_leds(void *opaque, int ledstate)
+ {
+-    VncState *vs = opaque;
+-    int caps, num, scr;
+-    bool has_changed = (ledstate != current_led_state(vs));
++    VncDisplay *vd = opaque;
++    VncState *client;
+ 
+     trace_vnc_key_guest_leds((ledstate & QEMU_CAPS_LOCK_LED),
+                              (ledstate & QEMU_NUM_LOCK_LED),
+                              (ledstate & QEMU_SCROLL_LOCK_LED));
+ 
+-    caps = ledstate & QEMU_CAPS_LOCK_LED ? 1 : 0;
+-    num  = ledstate & QEMU_NUM_LOCK_LED  ? 1 : 0;
+-    scr  = ledstate & QEMU_SCROLL_LOCK_LED ? 1 : 0;
++    if (ledstate != vd->ledstate)
++        return;
+ 
+-    if (vs->modifiers_state[0x3a] != caps) {
+-        vs->modifiers_state[0x3a] = caps;
+-    }
+-    if (vs->modifiers_state[0x45] != num) {
+-        vs->modifiers_state[0x45] = num;
+-    }
+-    if (vs->modifiers_state[0x46] != scr) {
+-        vs->modifiers_state[0x46] = scr;
+-    }
++    vd->ledstate = ledstate;
+ 
+-    /* Sending the current led state message to the client */
+-    if (has_changed) {
+-        vnc_led_state_change(vs);
++    QTAILQ_FOREACH(client, &vd->clients, next) {
++        vnc_led_state_change(client);
+     }
+ }
+ 
+@@ -3083,8 +3050,6 @@ void vnc_start_protocol(VncState *vs)
+     vnc_write(vs, "RFB 003.008\n", 12);
+     vnc_flush(vs);
+     vnc_read_when(vs, protocol_version, 12);
+-    if (vs->vd->lock_key_sync)
+-        vs->led = qemu_add_led_event_handler(kbd_leds, vs);
+ 
+     vs->mouse_mode_notifier.notify = check_pointer_type_change;
+     qemu_add_mouse_mode_change_notifier(&vs->mouse_mode_notifier);
+@@ -3191,6 +3156,8 @@ static void vnc_display_close(VncDisplay *vd)
+     }
+     g_free(vd->tlsaclname);
+     vd->tlsaclname = NULL;
++    if (vd->lock_key_sync)
++        qemu_remove_led_event_handler(vd->led);
+ }
+ 
+ int vnc_display_password(const char *id, const char *password)
+@@ -3758,6 +3725,9 @@ void vnc_display_open(const char *id, Error **errp)
+     }
+ #endif
+     vd->lock_key_sync = lock_key_sync;
++    if (lock_key_sync)
++        vd->led = qemu_add_led_event_handler(kbd_leds, vd);
++    vd->ledstate = 0;
+     vd->key_delay_ms = key_delay_ms;
+ 
+     device_id = qemu_opt_get(opts, "display");
+diff --git a/ui/vnc.h b/ui/vnc.h
+index d20b154..d8c9de5 100644
+--- a/ui/vnc.h
++++ b/ui/vnc.h
+@@ -154,6 +154,8 @@ struct VncDisplay
+     DisplayChangeListener dcl;
+     kbd_layout_t *kbd_layout;
+     int lock_key_sync;
++    QEMUPutLEDEntry *led;
++    int ledstate;
+     int key_delay_ms;
+     QemuMutex mutex;
+ 
+@@ -304,7 +306,6 @@ struct VncState
+     size_t read_handler_expect;
+     /* input */
+     uint8_t modifiers_state[256];
+-    QEMUPutLEDEntry *led;
+ 
+     bool abort;
+     QemuMutex output_mutex;
+-- 
+2.7.4
