@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51764)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52910)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cHWjD-0006ZV-2t
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 09:09:51 -0500
+	(envelope-from <imammedo@redhat.com>) id 1cHWms-00081q-VQ
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 09:13:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cHWj7-00075e-T6
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 09:09:47 -0500
-Received: from 8.mo6.mail-out.ovh.net ([178.33.42.204]:35523)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cHWj7-00074V-N7
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 09:09:41 -0500
-Received: from player786.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo6.mail-out.ovh.net (Postfix) with ESMTP id 1A134689E0
-	for <qemu-devel@nongnu.org>; Thu, 15 Dec 2016 15:09:39 +0100 (CET)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Thu, 15 Dec 2016 15:09:30 +0100
-Message-Id: <1481810970-9692-1-git-send-email-clg@kaod.org>
+	(envelope-from <imammedo@redhat.com>) id 1cHWmr-0000Y2-VI
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 09:13:34 -0500
+Date: Thu, 15 Dec 2016 15:13:24 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20161215151324.2b4e6b74@nial.brq.redhat.com>
+In-Reply-To: <20161213214522.25548-5-drjones@redhat.com>
+References: <20161213214522.25548-1-drjones@redhat.com>
+	<20161213214522.25548-5-drjones@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3] target-arm: Add VBAR support to ARM1176 CPUs
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 04/11] hw/arm/virt: eliminate struct
+ VirtGuestInfoState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,122 +24,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: Andrew Jones <drjones@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, zhaoshenglong@huawei.com, mst@redhat.com, ehabkost@redhat.com
 
-ARM1176 CPUs have TrustZone support and can use the Vector Base
-Address Register, but currently, qemu only adds VBAR support to ARMv7
-CPUs. Fix this by adding a new feature ARM_FEATURE_VBAR which can used
-for ARMv7 and ARM1176 CPUs.
+On Tue, 13 Dec 2016 22:45:15 +0100
+Andrew Jones <drjones@redhat.com> wrote:
 
-The VBAR feature is always set for ARMv7 because some legacy boards
-require it even if this is not architecturally correct.
+> Instead of allocating a new struct just for VirtGuestInfo and the
+> machine_done Notifier, place them inside VirtMachineState. This
+> is the mach-virt equivalent of "pc: Eliminate struct
+> PcGuestInfoState"
+> 
+> Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
----
-
- Hopefully, this is correct this time ...
-
- Thanks,
-
- C.
-
- Changes since v2 :
- - simplified the logic leading to the definition of VBAR
-
- Changes since v1 :
- - disable VBAR for non EL3 1176 CPU configs=20
- - always enable VBAR for v7 CPUs
-
- target-arm/cpu.c    |  9 +++++++++
- target-arm/cpu.h    |  1 +
- target-arm/helper.c | 19 +++++++++++++------
- 3 files changed, 23 insertions(+), 6 deletions(-)
-
-diff --git a/target-arm/cpu.c b/target-arm/cpu.c
-index 99f0dbebb9f6..f5dc7ea9544c 100644
---- a/target-arm/cpu.c
-+++ b/target-arm/cpu.c
-@@ -597,6 +597,11 @@ static void arm_cpu_realizefn(DeviceState *dev, Erro=
-r **errp)
-         } else {
-             set_feature(env, ARM_FEATURE_V6);
-         }
-+
-+        /* Always define VBAR for V7 CPUs even if it doesn't exist in
-+         * non-EL3 configs. This is needed by some legacy boards.
-+         */
-+        set_feature(env, ARM_FEATURE_VBAR);
-     }
-     if (arm_feature(env, ARM_FEATURE_V6K)) {
-         set_feature(env, ARM_FEATURE_V6);
-@@ -721,6 +726,10 @@ static void arm_cpu_realizefn(DeviceState *dev, Erro=
-r **errp)
-         }
-     }
-=20
-+    if (arm_feature(env, ARM_FEATURE_EL3)) {
-+        set_feature(env, ARM_FEATURE_VBAR);
-+    }
-+
-     register_cp_regs_for_features(cpu);
-     arm_cpu_register_gdb_regs_for_features(cpu);
-=20
-diff --git a/target-arm/cpu.h b/target-arm/cpu.h
-index ca5c849ed65e..ab119e62ab0f 100644
---- a/target-arm/cpu.h
-+++ b/target-arm/cpu.h
-@@ -1125,6 +1125,7 @@ enum arm_features {
-     ARM_FEATURE_V8_PMULL, /* implements PMULL part of v8 Crypto Extensio=
-ns */
-     ARM_FEATURE_THUMB_DSP, /* DSP insns supported in the Thumb encodings=
- */
-     ARM_FEATURE_PMU, /* has PMU support */
-+    ARM_FEATURE_VBAR, /* has cp15 VBAR */
- };
-=20
- static inline int arm_feature(CPUARMState *env, int feature)
-diff --git a/target-arm/helper.c b/target-arm/helper.c
-index b5b65caadf8a..8dcabbf57654 100644
---- a/target-arm/helper.c
-+++ b/target-arm/helper.c
-@@ -1252,12 +1252,6 @@ static const ARMCPRegInfo v7_cp_reginfo[] =3D {
-       .access =3D PL1_RW, .accessfn =3D access_tpm, .type =3D ARM_CP_ALI=
-AS,
-       .fieldoffset =3D offsetof(CPUARMState, cp15.c9_pminten),
-       .writefn =3D pmintenclr_write },
--    { .name =3D "VBAR", .state =3D ARM_CP_STATE_BOTH,
--      .opc0 =3D 3, .crn =3D 12, .crm =3D 0, .opc1 =3D 0, .opc2 =3D 0,
--      .access =3D PL1_RW, .writefn =3D vbar_write,
--      .bank_fieldoffsets =3D { offsetof(CPUARMState, cp15.vbar_s),
--                             offsetof(CPUARMState, cp15.vbar_ns) },
--      .resetvalue =3D 0 },
-     { .name =3D "CCSIDR", .state =3D ARM_CP_STATE_BOTH,
-       .opc0 =3D 3, .crn =3D 0, .crm =3D 0, .opc1 =3D 1, .opc2 =3D 0,
-       .access =3D PL1_R, .readfn =3D ccsidr_read, .type =3D ARM_CP_NO_RA=
-W },
-@@ -5094,6 +5088,19 @@ void register_cp_regs_for_features(ARMCPU *cpu)
-         }
-     }
-=20
-+    if (arm_feature(env, ARM_FEATURE_VBAR)) {
-+        ARMCPRegInfo vbar_cp_reginfo[] =3D {
-+            { .name =3D "VBAR", .state =3D ARM_CP_STATE_BOTH,
-+              .opc0 =3D 3, .crn =3D 12, .crm =3D 0, .opc1 =3D 0, .opc2 =3D=
- 0,
-+              .access =3D PL1_RW, .writefn =3D vbar_write,
-+              .bank_fieldoffsets =3D { offsetof(CPUARMState, cp15.vbar_s=
-),
-+                                     offsetof(CPUARMState, cp15.vbar_ns)=
- },
-+              .resetvalue =3D 0 },
-+            REGINFO_SENTINEL
-+        };
-+        define_arm_cp_regs(cpu, vbar_cp_reginfo);
-+    }
-+
-     /* Generic registers whose values depend on the implementation */
-     {
-         ARMCPRegInfo sctlr =3D {
---=20
-2.7.4
+> ---
+>  hw/arm/virt.c                    | 20 +++++++++++---------
+>  include/hw/arm/virt-acpi-build.h |  6 ------
+>  2 files changed, 11 insertions(+), 15 deletions(-)
+> 
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index 18aa3672739d..0657f9ae8722 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -76,6 +76,8 @@ typedef struct {
+>  
+>  typedef struct {
+>      MachineState parent;
+> +    VirtGuestInfo acpi_guest_info;
+> +    Notifier machine_done;
+>      bool secure;
+>      bool highmem;
+>      bool virt;
+> @@ -1222,12 +1224,13 @@ static void virt_build_smbios(VirtGuestInfo *guest_info)
+>  }
+>  
+>  static
+> -void virt_guest_info_machine_done(Notifier *notifier, void *data)
+> +void virt_machine_done(Notifier *notifier, void *data)
+>  {
+> -    VirtGuestInfoState *guest_info_state = container_of(notifier,
+> -                                              VirtGuestInfoState, machine_done);
+> -    virt_acpi_setup(&guest_info_state->info);
+> -    virt_build_smbios(&guest_info_state->info);
+> +    VirtMachineState *vms = container_of(notifier, VirtMachineState,
+> +                                         machine_done);
+> +
+> +    virt_acpi_setup(&vms->acpi_guest_info);
+> +    virt_build_smbios(&vms->acpi_guest_info);
+>  }
+>  
+>  static void machvirt_init(MachineState *machine)
+> @@ -1240,8 +1243,7 @@ static void machvirt_init(MachineState *machine)
+>      int n, virt_max_cpus;
+>      MemoryRegion *ram = g_new(MemoryRegion, 1);
+>      const char *cpu_model = machine->cpu_model;
+> -    VirtGuestInfoState *guest_info_state = g_malloc0(sizeof *guest_info_state);
+> -    VirtGuestInfo *guest_info = &guest_info_state->info;
+> +    VirtGuestInfo *guest_info = &vms->acpi_guest_info;
+>      char **cpustr;
+>      ObjectClass *oc;
+>      const char *typename;
+> @@ -1459,8 +1461,8 @@ static void machvirt_init(MachineState *machine)
+>      guest_info->use_highmem = vms->highmem;
+>      guest_info->gic_version = vms->gic_version;
+>      guest_info->no_its = vmc->no_its;
+> -    guest_info_state->machine_done.notify = virt_guest_info_machine_done;
+> -    qemu_add_machine_init_done_notifier(&guest_info_state->machine_done);
+> +    vms->machine_done.notify = virt_machine_done;
+> +    qemu_add_machine_init_done_notifier(&vms->machine_done);
+>  
+>      vms->bootinfo.ram_size = machine->ram_size;
+>      vms->bootinfo.kernel_filename = machine->kernel_filename;
+> diff --git a/include/hw/arm/virt-acpi-build.h b/include/hw/arm/virt-acpi-build.h
+> index f5ec749b8fea..d74d7a1af650 100644
+> --- a/include/hw/arm/virt-acpi-build.h
+> +++ b/include/hw/arm/virt-acpi-build.h
+> @@ -36,12 +36,6 @@ typedef struct VirtGuestInfo {
+>      bool no_its;
+>  } VirtGuestInfo;
+>  
+> -
+> -typedef struct VirtGuestInfoState {
+> -    VirtGuestInfo info;
+> -    Notifier machine_done;
+> -} VirtGuestInfoState;
+> -
+>  void virt_acpi_setup(VirtGuestInfo *guest_info);
+>  
+>  #endif
