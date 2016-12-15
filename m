@@ -1,35 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43677)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43727)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cHKCV-0005Dj-SC
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:47:15 -0500
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cHKCY-0005Mo-3u
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:47:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cHKCT-0001mm-96
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:47:11 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57643)
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cHKCV-0001oD-26
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:47:14 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58691
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1cHKCS-0001lp-Uy
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:47:09 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	uBF0haip129101
-	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 19:47:07 -0500
-Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 27bdkw91e3-1
+	id 1cHKCU-0001ni-Qx
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:47:10 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
+	uBF0hb4H007088
+	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 19:47:10 -0500
+Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 27bdm612r4-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 19:47:07 -0500
+	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 19:47:10 -0500
 Received: from localhost
-	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Wed, 14 Dec 2016 17:47:07 -0700
+	Wed, 14 Dec 2016 17:47:09 -0700
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Wed, 14 Dec 2016 18:45:01 -0600
+Date: Wed, 14 Dec 2016 18:44:02 -0600
 In-Reply-To: <1481762701-4587-1-git-send-email-mdroth@linux.vnet.ibm.com>
 References: <1481762701-4587-1-git-send-email-mdroth@linux.vnet.ibm.com>
-Message-Id: <1481762701-4587-68-git-send-email-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 67/67] vfio/pci: Fix
- vfio_rtl8168_quirk_data_read address offset
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Message-Id: <1481762701-4587-9-git-send-email-mdroth@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 08/67] 9pfs: fix potential segfault during walk
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,38 +42,53 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Thorsten Kohfeldt <thorsten.kohfeldt@gmx.de>, Alex Williamson <alex.williamson@redhat.com>
+Cc: qemu-stable@nongnu.org, Greg Kurz <groug@kaod.org>
 
-From: Thorsten Kohfeldt <thorsten.kohfeldt@gmx.de>
+From: Greg Kurz <groug@kaod.org>
 
-Introductory comment for rtl8168 VFIO MSI-X quirk states:
-At BAR2 offset 0x70 there is a dword data register,
-         offset 0x74 is a dword address register.
-vfio: vfio_bar_read(0000:05:00.0:BAR2+0x70, 4) = 0xfee00398 // read data
+If the call to fid_to_qid() returns an error, we will call v9fs_path_free=
+()
+on uninitialized paths.
 
-Thus, correct offset for data read is 0x70,
-but function vfio_rtl8168_quirk_data_read() wrongfully uses offset 0x74.
+It is a regression introduced by the following commit:
 
-Signed-off-by: Thorsten Kohfeldt <thorsten.kohfeldt@gmx.de>
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-(cherry picked from commit 31e6a7b17b35711eb44f0e686b5ba68d15bfe4c1)
+56f101ecce0e 9pfs: handle walk of ".." in the root directory
+
+Let's fix this by initializing dpath and path before calling fid_to_qid().
+
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+[groug: updated the changelog to indicate this is regression and to provi=
+de
+        the offending commit SHA1]
+Signed-off-by: Greg Kurz <groug@kaod.org>
+
+(cherry picked from commit 13fd08e631ec0c3ff5ad1bdcb6a4474c7d9a024f)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- hw/vfio/pci-quirks.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/9pfs/9p.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
-index bec694c..1e97bc4 100644
---- a/hw/vfio/pci-quirks.c
-+++ b/hw/vfio/pci-quirks.c
-@@ -898,7 +898,7 @@ static uint64_t vfio_rtl8168_quirk_data_read(void *opaque,
- {
-     VFIOrtl8168Quirk *rtl = opaque;
-     VFIOPCIDevice *vdev = rtl->vdev;
--    uint64_t data = vfio_region_read(&vdev->bars[2].region, addr + 0x74, size);
-+    uint64_t data = vfio_region_read(&vdev->bars[2].region, addr + 0x70, size);
- 
-     if (rtl->enabled && (vdev->pdev.cap_present & QEMU_PCI_CAP_MSIX)) {
-         hwaddr offset = rtl->addr & 0xfff;
--- 
+diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+index dfe293d..91a4970 100644
+--- a/hw/9pfs/9p.c
++++ b/hw/9pfs/9p.c
+@@ -1320,13 +1320,14 @@ static void v9fs_walk(void *opaque)
+         goto out_nofid;
+     }
+=20
++    v9fs_path_init(&dpath);
++    v9fs_path_init(&path);
++
+     err =3D fid_to_qid(pdu, fidp, &qid);
+     if (err < 0) {
+         goto out;
+     }
+=20
+-    v9fs_path_init(&dpath);
+-    v9fs_path_init(&path);
+     /*
+      * Both dpath and path initially poin to fidp.
+      * Needed to handle request with nwnames =3D=3D 0
+--=20
 1.9.1
