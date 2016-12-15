@@ -1,39 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42523)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42602)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cHKBs-0002tr-Om
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:46:34 -0500
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cHKBv-00036c-IK
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:46:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cHKBp-0001Hz-Hh
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:46:32 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59252
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cHKBu-0001LP-O2
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:46:35 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44514)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1cHKBp-0001Hf-Bp
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:46:29 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	uBF0jfEw079907
-	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 19:46:28 -0500
-Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 27bdm790b4-1
+	id 1cHKBu-0001Ky-F0
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:46:34 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
+	uBF0jtZZ060451
+	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 19:46:33 -0500
+Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 27bdm90w8y-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 19:46:28 -0500
+	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 19:46:33 -0500
 Received: from localhost
-	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Wed, 14 Dec 2016 19:46:28 -0500
+	Wed, 14 Dec 2016 17:46:32 -0700
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Wed, 14 Dec 2016 18:43:56 -0600
+Date: Wed, 14 Dec 2016 18:44:27 -0600
 In-Reply-To: <1481762701-4587-1-git-send-email-mdroth@linux.vnet.ibm.com>
 References: <1481762701-4587-1-git-send-email-mdroth@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Message-Id: <1481762701-4587-3-git-send-email-mdroth@linux.vnet.ibm.com>
+Message-Id: <1481762701-4587-34-git-send-email-mdroth@linux.vnet.ibm.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 02/67] hw/ppc/spapr: Move code related to "ibm,
- pa-features" to a separate function
+Subject: [Qemu-devel] [PATCH 33/67] qapi: Fix crash when 'any' or 'null'
+ parameter is missing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,127 +42,68 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Thomas Huth <thuth@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-stable@nongnu.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-From: Thomas Huth <thuth@redhat.com>
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-The function spapr_populate_cpu_dt() has become quite big
-already, and since we likely have to extend the pa-features
-property for every new processor generation, it is nicer
-if we put the related code into a separate function.
+Unlike the other visit methods, visit_type_any() and visit_type_null()
+neglect to check whether qmp_input_get_object() succeeded.  They crash
+when it fails.  Reproducer:
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-(cherry picked from commit 230bf719d3a3b144a4ffa441e5d6170ef0ad8999)
+{ "execute": "qom-set",
+  "arguments": { "path": "/machine", "property": "rtc-time" } }
+
+Will crash with:
+
+qapi/qapi-visit-core.c:277: visit_type_any: Assertion `!err !=3D !*obj'
+failed
+
+Broken in commit 5c678ee.  Fix by adding the missing error checks.
+
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Message-Id: <20160922203927.28241-3-marcandre.lureau@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+[Commit message rephrased]
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+
+(cherry picked from commit c489780203f9b22aca5539ec7589b7140bdc951f)
+Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- hw/ppc/spapr.c | 66 ++++++++++++++++++++++++++++++++--------------------=
-------
- 1 file changed, 36 insertions(+), 30 deletions(-)
+ qapi/qmp-input-visitor.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 30d6800..36d9077 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -594,6 +594,41 @@ static int spapr_populate_memory(sPAPRMachineState *=
-spapr, void *fdt)
-     return 0;
+diff --git a/qapi/qmp-input-visitor.c b/qapi/qmp-input-visitor.c
+index 64dd392..fc91e74 100644
+--- a/qapi/qmp-input-visitor.c
++++ b/qapi/qmp-input-visitor.c
+@@ -338,6 +338,12 @@ static void qmp_input_type_any(Visitor *v, const cha=
+r *name, QObject **obj,
+     QmpInputVisitor *qiv =3D to_qiv(v);
+     QObject *qobj =3D qmp_input_get_object(qiv, name, true);
+=20
++    if (!qobj) {
++        error_setg(errp, QERR_MISSING_PARAMETER, name ? name : "null");
++        *obj =3D NULL;
++        return;
++    }
++
+     qobject_incref(qobj);
+     *obj =3D qobj;
  }
+@@ -347,6 +353,11 @@ static void qmp_input_type_null(Visitor *v, const ch=
+ar *name, Error **errp)
+     QmpInputVisitor *qiv =3D to_qiv(v);
+     QObject *qobj =3D qmp_input_get_object(qiv, name, true);
 =20
-+/* Populate the "ibm,pa-features" property */
-+static void spapr_populate_pa_features(CPUPPCState *env, void *fdt, int =
-offset)
-+{
-+    uint8_t pa_features_206[] =3D { 6, 0,
-+        0xf6, 0x1f, 0xc7, 0x00, 0x80, 0xc0 };
-+    uint8_t pa_features_207[] =3D { 24, 0,
-+        0xf6, 0x1f, 0xc7, 0xc0, 0x80, 0xf0,
-+        0x80, 0x00, 0x00, 0x00, 0x00, 0x00,
-+        0x00, 0x00, 0x00, 0x00, 0x80, 0x00,
-+        0x80, 0x00, 0x80, 0x00, 0x80, 0x00 };
-+    uint8_t *pa_features;
-+    size_t pa_size;
-+
-+    if (env->mmu_model =3D=3D POWERPC_MMU_2_06) {
-+        pa_features =3D pa_features_206;
-+        pa_size =3D sizeof(pa_features_206);
-+    } else { /* env->mmu_model =3D=3D POWERPC_MMU_2_07 */
-+        pa_features =3D pa_features_207;
-+        pa_size =3D sizeof(pa_features_207);
++    if (!qobj) {
++        error_setg(errp, QERR_MISSING_PARAMETER, name ? name : "null");
++        return;
 +    }
 +
-+    if (env->ci_large_pages) {
-+        /*
-+         * Note: we keep CI large pages off by default because a 64K cap=
-able
-+         * guest provisioned with large pages might otherwise try to map=
- a qemu
-+         * framebuffer (or other kind of memory mapped PCI BAR) using 64=
-K pages
-+         * even if that qemu runs on a 4k host.
-+         * We dd this bit back here if we are confident this is not an i=
-ssue
-+         */
-+        pa_features[3] |=3D 0x20;
-+    }
-+
-+    _FDT((fdt_setprop(fdt, offset, "ibm,pa-features", pa_features, pa_si=
-ze)));
-+}
-+
- static void spapr_populate_cpu_dt(CPUState *cs, void *fdt, int offset,
-                                   sPAPRMachineState *spapr)
- {
-@@ -621,24 +656,6 @@ static void spapr_populate_cpu_dt(CPUState *cs, void=
- *fdt, int offset,
-         _FDT((fdt_setprop_cell(fdt, offset, "ibm,my-drc-index", drc_inde=
-x)));
-     }
-=20
--    /* Note: we keep CI large pages off for now because a 64K capable gu=
-est
--     * provisioned with large pages might otherwise try to map a qemu
--     * framebuffer (or other kind of memory mapped PCI BAR) using 64K pa=
-ges
--     * even if that qemu runs on a 4k host.
--     *
--     * We can later add this bit back when we are confident this is not
--     * an issue (!HV KVM or 64K host)
--     */
--    uint8_t pa_features_206[] =3D { 6, 0,
--        0xf6, 0x1f, 0xc7, 0x00, 0x80, 0xc0 };
--    uint8_t pa_features_207[] =3D { 24, 0,
--        0xf6, 0x1f, 0xc7, 0xc0, 0x80, 0xf0,
--        0x80, 0x00, 0x00, 0x00, 0x00, 0x00,
--        0x00, 0x00, 0x00, 0x00, 0x80, 0x00,
--        0x80, 0x00, 0x80, 0x00, 0x80, 0x00 };
--    uint8_t *pa_features;
--    size_t pa_size;
--
-     _FDT((fdt_setprop_cell(fdt, offset, "reg", index)));
-     _FDT((fdt_setprop_string(fdt, offset, "device_type", "cpu")));
-=20
-@@ -705,18 +722,7 @@ static void spapr_populate_cpu_dt(CPUState *cs, void=
- *fdt, int offset,
-                           page_sizes_prop, page_sizes_prop_size)));
-     }
-=20
--    /* Do the ibm,pa-features property, adjust it for ci-large-pages */
--    if (env->mmu_model =3D=3D POWERPC_MMU_2_06) {
--        pa_features =3D pa_features_206;
--        pa_size =3D sizeof(pa_features_206);
--    } else /* env->mmu_model =3D=3D POWERPC_MMU_2_07 */ {
--        pa_features =3D pa_features_207;
--        pa_size =3D sizeof(pa_features_207);
--    }
--    if (env->ci_large_pages) {
--        pa_features[3] |=3D 0x20;
--    }
--    _FDT((fdt_setprop(fdt, offset, "ibm,pa-features", pa_features, pa_si=
-ze)));
-+    spapr_populate_pa_features(env, fdt, offset);
-=20
-     _FDT((fdt_setprop_cell(fdt, offset, "ibm,chip-id",
-                            cs->cpu_index / vcpus_per_socket)));
+     if (qobject_type(qobj) !=3D QTYPE_QNULL) {
+         error_setg(errp, QERR_INVALID_PARAMETER_TYPE, name ? name : "nul=
+l",
+                    "null");
 --=20
 1.9.1
