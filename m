@@ -1,41 +1,48 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58564)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58686)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cHZmV-000082-K4
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 12:25:24 -0500
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cHZmf-0000Xf-0S
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 12:25:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cHZmQ-0005UL-LM
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 12:25:23 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46620
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cHZma-0005bn-2f
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 12:25:32 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45488
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1cHZmQ-0005U3-GL
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 12:25:18 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	id 1cHZmZ-0005bQ-Sc
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 12:25:28 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
 	by mx0b-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	uBFHNoqN132261
-	for <qemu-devel@nongnu.org>; Thu, 15 Dec 2016 12:25:17 -0500
-Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 27bvg2esr5-1
+	uBFHNof6131198
+	for <qemu-devel@nongnu.org>; Thu, 15 Dec 2016 12:25:27 -0500
+Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 27bdmfxtp9-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 15 Dec 2016 12:25:17 -0500
+	for <qemu-devel@nongnu.org>; Thu, 15 Dec 2016 12:25:26 -0500
 Received: from localhost
-	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Thu, 15 Dec 2016 10:25:16 -0700
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+	Thu, 15 Dec 2016 12:25:26 -0500
+Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com
+	[9.57.198.29])
+	by d01dlp03.pok.ibm.com (Postfix) with ESMTP id 9389DC90041
+	for <qemu-devel@nongnu.org>; Thu, 15 Dec 2016 12:25:06 -0500 (EST)
+Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com
+	[9.57.199.106])
+	by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+	uBFHPNaR11731432
+	for <qemu-devel@nongnu.org>; Thu, 15 Dec 2016 17:25:23 GMT
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 89F592803F
+	for <qemu-devel@nongnu.org>; Thu, 15 Dec 2016 12:25:23 -0500 (EST)
+Received: from localhost (unknown [9.80.108.238])
+	by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP id 4CFD52803E
+	for <qemu-devel@nongnu.org>; Thu, 15 Dec 2016 12:25:23 -0500 (EST)
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <87oa0h2lfz.fsf@dusky.pond.sub.org>
-References: <1481306681-5760-1-git-send-email-mdroth@linux.vnet.ibm.com>
-	<1481306681-5760-3-git-send-email-mdroth@linux.vnet.ibm.com>
-	<87oa0h2lfz.fsf@dusky.pond.sub.org>
-Date: Thu, 15 Dec 2016 11:25:07 -0600
-Message-Id: <20161215172507.8381.5184@loki>
-Subject: Re: [Qemu-devel] [PATCH v3 2/2] monitor: fix object_del for
- command-line-created objects
+Date: Thu, 15 Dec 2016 11:24:02 -0600
+Message-Id: <1481822644-617-1-git-send-email-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v4 0/2] Fixes/tests for hmp_object_del()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,135 +51,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org, dgilbert@redhat.com, bharata.rao@gmail.com, david@gibson.dropbear.id.au
+To: qemu-devel@nongnu.org
 
-Quoting Markus Armbruster (2016-12-12 09:53:20)
-> Michael Roth <mdroth@linux.vnet.ibm.com> writes:
-> =
+hmp_object_del() followed by a subsequent hmp_object_add() can trigger a
+duplicate ID error if the previous object shared the same ID and was added
+via the command-line. Please see patch 2/2 for more details.
 
-> > Currently objects specified on the command-line are only partially
-> > cleaned up when 'object_del' is issued in either HMP or QMP: the
-> > object itself is fully finalized, but the QemuOpts are not removed.
-> > This results in the following behavior:
-> >
-> >   x86_64-softmmu/qemu-system-x86_64 -monitor stdio \
-> >     -object memory-backend-ram,id=3Dram1,size=3D256M
-> >
-> >   QEMU 2.7.91 monitor - type 'help' for more information
-> >   (qemu) object_del ram1
-> >   (qemu) object_del ram1
-> >   object 'ram1' not found
-> >   (qemu) object_add memory-backend-ram,id=3Dram1,size=3D256M
-> >   Duplicate ID 'ram1' for object
-> >   Try "help object_add" for more information
-> >
-> > which can be an issue for use-cases like memory hotplug.
-> >
-> > This happens on the HMP side because hmp_object_add() attempts to
-> > create a temporary QemuOpts entry with ID 'ram1', which ends up
-> > conflicting with the command-line-created entry, since it was never
-> > cleaned up during the previous hmp_object_del() call.
-> >
-> > We address this by adding a check in user_creatable_del(), which
-> > is called by both qmp_object_del() and hmp_object_del() to handle
-> > the actual object cleanup, to determine whether an option group entry
-> > matching the object's ID is present and removing it if it is.
-> >
-> > Note that qmp_object_add() never attempts to create a temporary
-> > QemuOpts entry, so it does not encounter the duplicate ID error,
-> > which is why this isn't generally visible in libvirt.
-> >
-> > Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > Cc: Markus Armbruster <armbru@redhat.com>
-> > Cc: Eric Blake <eblake@redhat.com>
-> > Cc: Daniel Berrange <berrange@redhat.com>
-> > Cc: qemu-stable@nongnu.org
-> > Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-> > Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
-> > ---
-> >  qom/object_interfaces.c    | 7 +++++++
-> >  tests/check-qom-proplist.c | 4 ++--
-> >  2 files changed, 9 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/qom/object_interfaces.c b/qom/object_interfaces.c
-> > index ded4d84..b462a74 100644
-> > --- a/qom/object_interfaces.c
-> > +++ b/qom/object_interfaces.c
-> > @@ -5,6 +5,7 @@
-> >  #include "qapi-visit.h"
-> >  #include "qapi/qobject-output-visitor.h"
-> >  #include "qapi/opts-visitor.h"
-> > +#include "qemu/config-file.h"
-> >  =
+This patchset fixes the issue in question and adds some general unit tests
+for object created via -object, which we later extend to verify the fix in
+question.
 
-> >  void user_creatable_complete(Object *obj, Error **errp)
-> >  {
-> > @@ -209,6 +210,12 @@ void user_creatable_del(const char *id, Error **er=
-rp)
-> >          error_setg(errp, "object '%s' is in use, can not be deleted", =
-id);
-> >          return;
-> >      }
-> > +
-> > +    /* if object was defined on the command-line, remove its correspon=
-ding
-> > +     * option group entry
-> > +     */
-> =
+Changes since v3:
 
-> Consider adding wings to both ends of multi-line comments.
-> =
+  - Fixed up comment formating (Markus)
+  - Instead of segfaulting, use &error_abort if assumptions about
+    'object' property group existence change (Markus)
+  - Use g_assert_null in place of g_assert(... == NULL) (Markus)
 
-> > +    qemu_opts_del(qemu_opts_find(qemu_find_opts_err("object", NULL), i=
-d));
-> =
+Changes since v2:
 
-> qemu_find_opts_err() can't fail.  If it did, qemu_opts_find() would
-> crash.  Okay.
-> =
+  - Moved the generic unit tests ahead of the fix patch, with a FIXME
+    in place of the actual check for the failure addressed in patch
+    2/2 (Daniel/Markus)
+  - Dropped check for existence of objects' QemuOptsList (Markus)
+  - Dropped unintended whitespace removal in PATCH 1/2
+  - Slight rewording of commit messages to reflect the changes and fix
+    minor grammar errors.
 
-> Elsewhere, we use qemu_opts_find(qemu_find_opts(NAME)), which would
-> report an error to stderr / monitor before crashing.  Also okay.
-> =
+Changes since v1:
 
-> Perhaps the cleanest (but not the tersest) way to skin this cat:
-> qemu_opts_find(qemu_find_opts_err(&error_abort)).
-> =
-
-> Your choice.
-> =
-
-> > +
-> >      object_unparent(obj);
-> >  }
-> >  =
-
-> > diff --git a/tests/check-qom-proplist.c b/tests/check-qom-proplist.c
-> > index e3f56ca..c5d4b60 100644
-> > --- a/tests/check-qom-proplist.c
-> > +++ b/tests/check-qom-proplist.c
-> > @@ -437,9 +437,9 @@ static void test_dummy_createcmdl(void)
-> >       * check for this in user_creatable_del() and remove the QemuOpts =
-if
-> >       * it is present.
-> >       *
-> > -     * FIXME: add an assert to verify that the QemuOpts is cleaned up
-> > -     * once the corresponding cleanup code is added.
-> > +     * The below check ensures this works as expected.
-> >       */
-> > +    g_assert(qemu_opts_find(&qemu_object_opts, "dev0") =3D=3D NULL);
-> =
-
-> There's also g_assert_null(), which could result in a more helpful
-> message when the assertion fails.  Your choice.
-
-Thanks for the suggestions; I've incorporated all of them into v4.
-
-> =
-
-> >  }
-> >  =
-
-> >  static void test_dummy_badenum(void)
->=20
+  - Moved QemuOpt cleanup out of {qmp,hmp}_object_del() and into common
+    user_creatable_del() path (Daniel, David)
+  - Added corresponding test case in check-qom-proplist
