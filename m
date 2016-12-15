@@ -1,35 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42764)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42860)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cHKC2-0003SM-IS
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:46:44 -0500
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cHKC5-0003eJ-TI
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:46:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cHKBz-0001Ob-G8
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:46:42 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44334)
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cHKC2-0001Qv-Lb
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:46:45 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44403)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1cHKBz-0001Nz-6t
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:46:39 -0500
+	id 1cHKC2-0001QO-Cc
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:46:42 -0500
 Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	uBF0jnBL130293
-	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 19:46:38 -0500
-Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 27bdku12vr-1
+	uBF0jnBM130293
+	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 19:46:41 -0500
+Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 27bdku12xq-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 19:46:37 -0500
+	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 19:46:41 -0500
 Received: from localhost
-	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Wed, 14 Dec 2016 17:46:37 -0700
+	Wed, 14 Dec 2016 17:46:40 -0700
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Wed, 14 Dec 2016 18:44:34 -0600
+Date: Wed, 14 Dec 2016 18:44:35 -0600
 In-Reply-To: <1481762701-4587-1-git-send-email-mdroth@linux.vnet.ibm.com>
 References: <1481762701-4587-1-git-send-email-mdroth@linux.vnet.ibm.com>
-Message-Id: <1481762701-4587-41-git-send-email-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 40/67] memory: Replace skip_dump flag with
- "ram_device"
+Message-Id: <1481762701-4587-42-git-send-email-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 41/67] memory: Don't use memcpy for ram_device
+ regions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,177 +43,175 @@ Cc: qemu-stable@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
 
 From: Alex Williamson <alex.williamson@redhat.com>
 
-Setting skip_dump on a MemoryRegion allows us to modify one specific
-code path, but the restriction we're trying to address encompasses
-more than that.  If we have a RAM MemoryRegion backed by a physical
-device, it not only restricts our ability to dump that region, but
-also affects how we should manipulate it.  Here we recognize that
-MemoryRegions do not change to sometimes allow dumps and other times
-not, so we replace setting the skip_dump flag with a new initializer
-so that we know exactly the type of region to which we're applying
-this behavior.
+With a vfio assigned device we lay down a base MemoryRegion registered
+as an IO region, giving us read & write accessors.  If the region
+supports mmap, we lay down a higher priority sub-region MemoryRegion
+on top of the base layer initialized as a RAM device pointer to the
+mmap.  Finally, if we have any quirks for the device (ie. address
+ranges that need additional virtualization support), we put another IO
+sub-region on top of the mmap MemoryRegion.  When this is flattened,
+we now potentially have sub-page mmap MemoryRegions exposed which
+cannot be directly mapped through KVM.
 
+This is as expected, but a subtle detail of this is that we end up
+with two different access mechanisms through QEMU.  If we disable the
+mmap MemoryRegion, we make use of the IO MemoryRegion and service
+accesses using pread and pwrite to the vfio device file descriptor.
+If the mmap MemoryRegion is enabled and results in one of these
+sub-page gaps, QEMU handles the access as RAM, using memcpy to the
+mmap.  Using either pread/pwrite or the mmap directly should be
+correct, but using memcpy causes us problems.  I expect that not only
+does memcpy not necessarily honor the original width and alignment in
+performing a copy, but it potentially also uses processor instructions
+not intended for MMIO spaces.  It turns out that this has been a
+problem for Realtek NIC assignment, which has such a quirk that
+creates a sub-page mmap MemoryRegion access.
+
+To resolve this, we disable memory_access_is_direct() for ram_device
+regions since QEMU assumes that it can use memcpy for those regions.
+Instead we access through MemoryRegionOps, which replaces the memcpy
+with simple de-references of standard sizes to the host memory.
+
+With this patch we attempt to provide unrestricted access to the RAM
+device, allowing byte through qword access as well as unaligned
+access.  The assumption here is that accesses initiated by the VM are
+driven by a device specific driver, which knows the device
+capabilities.  If unaligned accesses are not supported by the device,
+we don't want them to work in a VM by performing multiple aligned
+accesses to compose the unaligned access.  A down-side of this
+philosophy is that the xp command from the monitor attempts to use
+the largest available access weidth, unaware of the underlying
+device.  Using memcpy had this same restriction, but at least now an
+operator can dump individual registers, even if blocks of device
+memory may result in access widths beyond the capabilities of a
+given device (RTL NICs only support up to dword).
+
+Reported-by: Thorsten Kohfeldt <thorsten.kohfeldt@gmx.de>
 Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-(cherry picked from commit 21e00fa55f3fdfcbb20da7c6876c91ef3609b387)
+(cherry picked from commit 4a2e242bbb306ef5c16ce9e7bb2da3bd8a4eb098)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- hw/vfio/common.c      |  9 ++++-----
- hw/vfio/spapr.c       |  2 +-
- include/exec/memory.h | 41 ++++++++++++++++++++++++++++-------------
- memory.c              | 13 +++++++++----
- memory_mapping.c      |  2 +-
- 5 files changed, 43 insertions(+), 24 deletions(-)
+ include/exec/memory.h |  6 +++--
+ memory.c              | 67 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ trace-events          |  2 ++
+ 3 files changed, 73 insertions(+), 2 deletions(-)
 
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index b313e7c..b818723 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -723,12 +723,11 @@ int vfio_region_mmap(VFIORegion *region)
- 
-         name = g_strdup_printf("%s mmaps[%d]",
-                                memory_region_name(region->mem), i);
--        memory_region_init_ram_ptr(&region->mmaps[i].mem,
--                                   memory_region_owner(region->mem),
--                                   name, region->mmaps[i].size,
--                                   region->mmaps[i].mmap);
-+        memory_region_init_ram_device_ptr(&region->mmaps[i].mem,
-+                                          memory_region_owner(region->mem),
-+                                          name, region->mmaps[i].size,
-+                                          region->mmaps[i].mmap);
-         g_free(name);
--        memory_region_set_skip_dump(&region->mmaps[i].mem);
-         memory_region_add_subregion(region->mem, region->mmaps[i].offset,
-                                     &region->mmaps[i].mem);
- 
-diff --git a/hw/vfio/spapr.c b/hw/vfio/spapr.c
-index 7443d34..4409bcc 100644
---- a/hw/vfio/spapr.c
-+++ b/hw/vfio/spapr.c
-@@ -25,7 +25,7 @@ static bool vfio_prereg_listener_skipped_section(MemoryRegionSection *section)
-     }
- 
-     return !memory_region_is_ram(section->mr) ||
--            memory_region_is_skip_dump(section->mr);
-+            memory_region_is_ram_device(section->mr);
- }
- 
- static void *vfio_prereg_gpa_to_vaddr(MemoryRegionSection *section, hwaddr gpa)
 diff --git a/include/exec/memory.h b/include/exec/memory.h
-index 3e4d416..4d2aa63 100644
+index 4d2aa63..10ec0a2 100644
 --- a/include/exec/memory.h
 +++ b/include/exec/memory.h
-@@ -188,7 +188,7 @@ struct MemoryRegion {
-     void (*destructor)(MemoryRegion *mr);
-     uint64_t align;
-     bool terminates;
--    bool skip_dump;
-+    bool ram_device;
-     bool enabled;
-     bool warning_printed; /* For reservations */
-     uint8_t vga_logging_count;
-@@ -426,6 +426,30 @@ void memory_region_init_ram_ptr(MemoryRegion *mr,
-                                 void *ptr);
- 
- /**
-+ * memory_region_init_ram_device_ptr:  Initialize RAM device memory region from
-+ *                                     a user-provided pointer.
-+ *
-+ * A RAM device represents a mapping to a physical device, such as to a PCI
-+ * MMIO BAR of an vfio-pci assigned device.  The memory region may be mapped
-+ * into the VM address space and access to the region will modify memory
-+ * directly.  However, the memory region should not be included in a memory
-+ * dump (device may not be enabled/mapped at the time of the dump), and
-+ * operations incompatible with manipulating MMIO should be avoided.  Replaces
-+ * skip_dump flag.
-+ *
-+ * @mr: the #MemoryRegion to be initialized.
-+ * @owner: the object that tracks the region's reference count
-+ * @name: the name of the region.
-+ * @size: size of the region.
-+ * @ptr: memory to be mapped; must contain at least @size bytes.
-+ */
-+void memory_region_init_ram_device_ptr(MemoryRegion *mr,
-+                                       struct Object *owner,
-+                                       const char *name,
-+                                       uint64_t size,
-+                                       void *ptr);
-+
-+/**
-  * memory_region_init_alias: Initialize a memory region that aliases all or a
-  *                           part of another memory region.
-  *
-@@ -551,22 +575,13 @@ static inline bool memory_region_is_ram(MemoryRegion *mr)
+@@ -1446,9 +1446,11 @@ void *qemu_map_ram_ptr(RAMBlock *ram_block, ram_addr_t addr);
+ static inline bool memory_access_is_direct(MemoryRegion *mr, bool is_write)
+ {
+     if (is_write) {
+-        return memory_region_is_ram(mr) && !mr->readonly;
++        return memory_region_is_ram(mr) &&
++               !mr->readonly && !memory_region_is_ram_device(mr);
+     } else {
+-        return memory_region_is_ram(mr) || memory_region_is_romd(mr);
++        return (memory_region_is_ram(mr) && !memory_region_is_ram_device(mr)) ||
++               memory_region_is_romd(mr);
+     }
  }
  
- /**
-- * memory_region_is_skip_dump: check whether a memory region should not be
-- *                             dumped
-- *
-- * Returns %true is a memory region should not be dumped(e.g. VFIO BAR MMAP).
-+ * memory_region_is_ram_device: check whether a memory region is a ram device
-  *
-- * @mr: the memory region being queried
-- */
--bool memory_region_is_skip_dump(MemoryRegion *mr);
--
--/**
-- * memory_region_set_skip_dump: Set skip_dump flag, dump will ignore this memory
-- *                              region
-+ * Returns %true is a memory region is a device backed ram region
-  *
-  * @mr: the memory region being queried
-  */
--void memory_region_set_skip_dump(MemoryRegion *mr);
-+bool memory_region_is_ram_device(MemoryRegion *mr);
- 
- /**
-  * memory_region_is_romd: check whether a memory region is in ROMD mode
 diff --git a/memory.c b/memory.c
-index 0eb6895..94c55ae 100644
+index 94c55ae..e44aea9 100644
 --- a/memory.c
 +++ b/memory.c
-@@ -1359,9 +1359,14 @@ void memory_region_init_ram_ptr(MemoryRegion *mr,
-     mr->ram_block = qemu_ram_alloc_from_ptr(size, ptr, mr, &error_fatal);
- }
+@@ -1132,6 +1132,71 @@ const MemoryRegionOps unassigned_mem_ops = {
+     .endianness = DEVICE_NATIVE_ENDIAN,
+ };
  
--void memory_region_set_skip_dump(MemoryRegion *mr)
-+void memory_region_init_ram_device_ptr(MemoryRegion *mr,
-+                                       Object *owner,
-+                                       const char *name,
-+                                       uint64_t size,
-+                                       void *ptr)
++static uint64_t memory_region_ram_device_read(void *opaque,
++                                              hwaddr addr, unsigned size)
++{
++    MemoryRegion *mr = opaque;
++    uint64_t data = (uint64_t)~0;
++
++    switch (size) {
++    case 1:
++        data = *(uint8_t *)(mr->ram_block->host + addr);
++        break;
++    case 2:
++        data = *(uint16_t *)(mr->ram_block->host + addr);
++        break;
++    case 4:
++        data = *(uint32_t *)(mr->ram_block->host + addr);
++        break;
++    case 8:
++        data = *(uint64_t *)(mr->ram_block->host + addr);
++        break;
++    }
++
++    trace_memory_region_ram_device_read(get_cpu_index(), mr, addr, data, size);
++
++    return data;
++}
++
++static void memory_region_ram_device_write(void *opaque, hwaddr addr,
++                                           uint64_t data, unsigned size)
++{
++    MemoryRegion *mr = opaque;
++
++    trace_memory_region_ram_device_write(get_cpu_index(), mr, addr, data, size);
++
++    switch (size) {
++    case 1:
++        *(uint8_t *)(mr->ram_block->host + addr) = (uint8_t)data;
++        break;
++    case 2:
++        *(uint16_t *)(mr->ram_block->host + addr) = (uint16_t)data;
++        break;
++    case 4:
++        *(uint32_t *)(mr->ram_block->host + addr) = (uint32_t)data;
++        break;
++    case 8:
++        *(uint64_t *)(mr->ram_block->host + addr) = data;
++        break;
++    }
++}
++
++static const MemoryRegionOps ram_device_mem_ops = {
++    .read = memory_region_ram_device_read,
++    .write = memory_region_ram_device_write,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++    .valid = {
++        .min_access_size = 1,
++        .max_access_size = 8,
++        .unaligned = true,
++    },
++    .impl = {
++        .min_access_size = 1,
++        .max_access_size = 8,
++        .unaligned = true,
++    },
++};
++
+ bool memory_region_access_valid(MemoryRegion *mr,
+                                 hwaddr addr,
+                                 unsigned size,
+@@ -1367,6 +1432,8 @@ void memory_region_init_ram_device_ptr(MemoryRegion *mr,
  {
--    mr->skip_dump = true;
-+    memory_region_init_ram_ptr(mr, owner, name, size, ptr);
-+    mr->ram_device = true;
+     memory_region_init_ram_ptr(mr, owner, name, size, ptr);
+     mr->ram_device = true;
++    mr->ops = &ram_device_mem_ops;
++    mr->opaque = mr;
  }
  
  void memory_region_init_alias(MemoryRegion *mr,
-@@ -1494,9 +1499,9 @@ const char *memory_region_name(const MemoryRegion *mr)
-     return mr->name;
- }
+diff --git a/trace-events b/trace-events
+index 616cc52..3b4c2f5 100644
+--- a/trace-events
++++ b/trace-events
+@@ -139,6 +139,8 @@ memory_region_subpage_read(int cpu_index, void *mr, uint64_t offset, uint64_t va
+ memory_region_subpage_write(int cpu_index, void *mr, uint64_t offset, uint64_t value, unsigned size) "cpu %d mr %p offset %#"PRIx64" value %#"PRIx64" size %u"
+ memory_region_tb_read(int cpu_index, uint64_t addr, uint64_t value, unsigned size) "cpu %d addr %#"PRIx64" value %#"PRIx64" size %u"
+ memory_region_tb_write(int cpu_index, uint64_t addr, uint64_t value, unsigned size) "cpu %d addr %#"PRIx64" value %#"PRIx64" size %u"
++memory_region_ram_device_read(int cpu_index, void *mr, uint64_t addr, uint64_t value, unsigned size) "cpu %d mr %p addr %#"PRIx64" value %#"PRIx64" size %u"
++memory_region_ram_device_write(int cpu_index, void *mr, uint64_t addr, uint64_t value, unsigned size) "cpu %d mr %p addr %#"PRIx64" value %#"PRIx64" size %u"
  
--bool memory_region_is_skip_dump(MemoryRegion *mr)
-+bool memory_region_is_ram_device(MemoryRegion *mr)
- {
--    return mr->skip_dump;
-+    return mr->ram_device;
- }
- 
- uint8_t memory_region_get_dirty_log_mask(MemoryRegion *mr)
-diff --git a/memory_mapping.c b/memory_mapping.c
-index e3e0d95..6a39d71 100644
---- a/memory_mapping.c
-+++ b/memory_mapping.c
-@@ -206,7 +206,7 @@ static void guest_phys_blocks_region_add(MemoryListener *listener,
- 
-     /* we only care about RAM */
-     if (!memory_region_is_ram(section->mr) ||
--        memory_region_is_skip_dump(section->mr)) {
-+        memory_region_is_ram_device(section->mr)) {
-         return;
-     }
+ ### Guest events, keep at bottom
  
 -- 
 1.9.1
