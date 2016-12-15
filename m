@@ -1,38 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42602)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42540)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cHKBv-00036c-IK
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cHKBt-0002wq-G1
 	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:46:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cHKBu-0001LP-O2
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:46:35 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44514)
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cHKBp-0001IW-TQ
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:46:33 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59257
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1cHKBu-0001Ky-F0
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:46:34 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	uBF0jtZZ060451
-	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 19:46:33 -0500
+	id 1cHKBp-0001Ht-M8
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:46:29 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
+	uBF0jfit079896
+	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 19:46:29 -0500
 Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 27bdm90w8y-1
+	by mx0b-001b2d01.pphosted.com with ESMTP id 27bdm790ay-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 19:46:33 -0500
+	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 19:46:28 -0500
 Received: from localhost
 	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Wed, 14 Dec 2016 17:46:32 -0700
+	Wed, 14 Dec 2016 17:46:27 -0700
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Wed, 14 Dec 2016 18:44:27 -0600
+Date: Wed, 14 Dec 2016 18:44:23 -0600
 In-Reply-To: <1481762701-4587-1-git-send-email-mdroth@linux.vnet.ibm.com>
 References: <1481762701-4587-1-git-send-email-mdroth@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Message-Id: <1481762701-4587-34-git-send-email-mdroth@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 33/67] qapi: Fix crash when 'any' or 'null'
- parameter is missing
+Message-Id: <1481762701-4587-30-git-send-email-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 29/67] qht: simplify qht_reset_size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,68 +39,62 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: qemu-stable@nongnu.org, "Emilio G. Cota" <cota@braap.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+From: "Emilio G. Cota" <cota@braap.org>
 
-Unlike the other visit methods, visit_type_any() and visit_type_null()
-neglect to check whether qmp_input_get_object() succeeded.  They crash
-when it fails.  Reproducer:
+Sometimes gcc doesn't pick up the fact that 'new' is properly
+set if 'resize == true', which may generate an unnecessary
+build warning.
 
-{ "execute": "qom-set",
-  "arguments": { "path": "/machine", "property": "rtc-time" } }
+Fix it by removing 'resize' and directly checking that 'new'
+is non-NULL.
 
-Will crash with:
-
-qapi/qapi-visit-core.c:277: visit_type_any: Assertion `!err !=3D !*obj'
-failed
-
-Broken in commit 5c678ee.  Fix by adding the missing error checks.
-
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20160922203927.28241-3-marcandre.lureau@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-[Commit message rephrased]
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-
-(cherry picked from commit c489780203f9b22aca5539ec7589b7140bdc951f)
+Signed-off-by: Emilio G. Cota <cota@braap.org>
+Message-Id: <1475706880-10667-2-git-send-email-cota@braap.org>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+(cherry picked from commit f555a9d0b3c785b698f32e6879e97d0a4b387314)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- qapi/qmp-input-visitor.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ util/qht.c | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
 
-diff --git a/qapi/qmp-input-visitor.c b/qapi/qmp-input-visitor.c
-index 64dd392..fc91e74 100644
---- a/qapi/qmp-input-visitor.c
-+++ b/qapi/qmp-input-visitor.c
-@@ -338,6 +338,12 @@ static void qmp_input_type_any(Visitor *v, const cha=
-r *name, QObject **obj,
-     QmpInputVisitor *qiv =3D to_qiv(v);
-     QObject *qobj =3D qmp_input_get_object(qiv, name, true);
-=20
-+    if (!qobj) {
-+        error_setg(errp, QERR_MISSING_PARAMETER, name ? name : "null");
-+        *obj =3D NULL;
-+        return;
-+    }
-+
-     qobject_incref(qobj);
-     *obj =3D qobj;
+diff --git a/util/qht.c b/util/qht.c
+index 16a8d79..af8da3c 100644
+--- a/util/qht.c
++++ b/util/qht.c
+@@ -410,10 +410,9 @@ void qht_reset(struct qht *ht)
+ 
+ bool qht_reset_size(struct qht *ht, size_t n_elems)
+ {
+-    struct qht_map *new;
++    struct qht_map *new = NULL;
+     struct qht_map *map;
+     size_t n_buckets;
+-    bool resize = false;
+ 
+     n_buckets = qht_elems_to_buckets(n_elems);
+ 
+@@ -421,18 +420,17 @@ bool qht_reset_size(struct qht *ht, size_t n_elems)
+     map = ht->map;
+     if (n_buckets != map->n_buckets) {
+         new = qht_map_create(n_buckets);
+-        resize = true;
+     }
+ 
+     qht_map_lock_buckets(map);
+     qht_map_reset__all_locked(map);
+-    if (resize) {
++    if (new) {
+         qht_do_resize(ht, new);
+     }
+     qht_map_unlock_buckets(map);
+     qemu_mutex_unlock(&ht->lock);
+ 
+-    return resize;
++    return !!new;
  }
-@@ -347,6 +353,11 @@ static void qmp_input_type_null(Visitor *v, const ch=
-ar *name, Error **errp)
-     QmpInputVisitor *qiv =3D to_qiv(v);
-     QObject *qobj =3D qmp_input_get_object(qiv, name, true);
-=20
-+    if (!qobj) {
-+        error_setg(errp, QERR_MISSING_PARAMETER, name ? name : "null");
-+        return;
-+    }
-+
-     if (qobject_type(qobj) !=3D QTYPE_QNULL) {
-         error_setg(errp, QERR_INVALID_PARAMETER_TYPE, name ? name : "nul=
-l",
-                    "null");
---=20
+ 
+ static inline
+-- 
 1.9.1
