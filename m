@@ -1,35 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42229)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42247)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cHKBj-0002Eq-90
-	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:46:24 -0500
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cHKBj-0002H0-St
+	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:46:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cHKBg-0001A1-6N
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cHKBg-0001AY-Q1
 	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:46:23 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44194)
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:43949)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1cHKBf-00019H-S4
+	id 1cHKBg-00019k-GY
 	for qemu-devel@nongnu.org; Wed, 14 Dec 2016 19:46:20 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	uBF0haNR056431
-	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 19:46:18 -0500
-Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 27bdm90vya-1
+	uBF0jnBH130293
+	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 19:46:19 -0500
+Received: from e19.ny.us.ibm.com (e19.ny.us.ibm.com [129.33.205.209])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 27bdku12et-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 19:46:18 -0500
+	for <qemu-devel@nongnu.org>; Wed, 14 Dec 2016 19:46:19 -0500
 Received: from localhost
-	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e19.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Wed, 14 Dec 2016 17:46:17 -0700
+	Wed, 14 Dec 2016 19:46:18 -0500
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Wed, 14 Dec 2016 18:44:13 -0600
+Date: Wed, 14 Dec 2016 18:44:14 -0600
 In-Reply-To: <1481762701-4587-1-git-send-email-mdroth@linux.vnet.ibm.com>
 References: <1481762701-4587-1-git-send-email-mdroth@linux.vnet.ibm.com>
-Message-Id: <1481762701-4587-20-git-send-email-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 19/67] virtio-scsi: Don't abort when media is
- ejected
+Message-Id: <1481762701-4587-21-git-send-email-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 20/67] ahci: clear aiocb in ncq_cb
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,61 +38,35 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Fam Zheng <famz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-stable@nongnu.org, John Snow <jsnow@redhat.com>
 
-From: Fam Zheng <famz@redhat.com>
+From: John Snow <jsnow@redhat.com>
 
-With an ejected block backend, blk_get_aio_context() would return
-qemu_aio_context. In this case don't assert.
+Similar to existing fixes for IDE (87ac25fd) and ATAPI (7f951b2d), the
+AIOCB must be cleared in the callback. Otherwise, we may accidentally
+try to reset a dangling pointer in bdrv_aio_cancel() from a port reset.
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
-Message-Id: <1473848224-24809-3-git-send-email-famz@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-(cherry picked from commit 2a2d69f490c1b1dc6b6d2aef385ee7b654497a77)
+Signed-off-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-id: 1474575040-32079-2-git-send-email-jsnow@redhat.com
+Signed-off-by: John Snow <jsnow@redhat.com>
+(cherry picked from commit df403bc58859c893ebd0accda07678e84d15dc5d)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- hw/scsi/virtio-scsi.c | 15 +++++++++------
- 1 file changed, 9 insertions(+), 6 deletions(-)
+ hw/ide/ahci.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
-index ce57ef6..e596b64 100644
---- a/hw/scsi/virtio-scsi.c
-+++ b/hw/scsi/virtio-scsi.c
-@@ -236,6 +236,13 @@ static void virtio_scsi_cancel_notify(Notifier *notifier, void *data)
-     g_free(n);
- }
+diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
+index f3438ad..63ead21 100644
+--- a/hw/ide/ahci.c
++++ b/hw/ide/ahci.c
+@@ -948,6 +948,7 @@ static void ncq_cb(void *opaque, int ret)
+     NCQTransferState *ncq_tfs = (NCQTransferState *)opaque;
+     IDEState *ide_state = &ncq_tfs->drive->port.ifs[0];
  
-+static inline void virtio_scsi_ctx_check(VirtIOSCSI *s, SCSIDevice *d)
-+{
-+    if (s->dataplane_started && d && blk_is_available(d->conf.blk)) {
-+        assert(blk_get_aio_context(d->conf.blk) == s->ctx);
-+    }
-+}
-+
- /* Return 0 if the request is ready to be completed and return to guest;
-  * -EINPROGRESS if the request is submitted and will be completed later, in the
-  *  case of async cancellation. */
-@@ -247,9 +254,7 @@ static int virtio_scsi_do_tmf(VirtIOSCSI *s, VirtIOSCSIReq *req)
-     int target;
-     int ret = 0;
- 
--    if (s->dataplane_started && d) {
--        assert(blk_get_aio_context(d->conf.blk) == s->ctx);
--    }
-+    virtio_scsi_ctx_check(s, d);
-     /* Here VIRTIO_SCSI_S_OK means "FUNCTION COMPLETE".  */
-     req->resp.tmf.response = VIRTIO_SCSI_S_OK;
- 
-@@ -539,9 +544,7 @@ static bool virtio_scsi_handle_cmd_req_prepare(VirtIOSCSI *s, VirtIOSCSIReq *req
-         virtio_scsi_complete_cmd_req(req);
-         return false;
++    ncq_tfs->aiocb = NULL;
+     if (ret == -ECANCELED) {
+         return;
      }
--    if (s->dataplane_started) {
--        assert(blk_get_aio_context(d->conf.blk) == s->ctx);
--    }
-+    virtio_scsi_ctx_check(s, d);
-     req->sreq = scsi_req_new(d, req->req.cmd.tag,
-                              virtio_scsi_get_lun(req->req.cmd.lun),
-                              req->req.cmd.cdb, req);
 -- 
 1.9.1
