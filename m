@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54248)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58896)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1cHPJ3-0005HC-65
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 01:14:21 -0500
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cHPoN-0007c2-OD
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 01:46:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1cHPJ0-0004Xd-28
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 01:14:17 -0500
-References: <1481762701-4587-1-git-send-email-mdroth@linux.vnet.ibm.com>
-From: Stefan Weil <sw@weilnetz.de>
-Message-ID: <d57a4c3d-19fd-7e2d-4e15-8f4578cf8fcb@weilnetz.de>
-Date: Thu, 15 Dec 2016 07:14:09 +0100
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cHPoJ-00077i-Ro
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 01:46:39 -0500
+Received: from [59.151.112.132] (port=43622 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cHPoJ-00074l-FZ
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 01:46:35 -0500
+References: <1481263496-8004-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<1481263496-8004-2-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<alpine.DEB.2.10.1612131700110.2777@sstabellini-ThinkPad-X260>
+From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+Message-ID: <0e652e4a-4abd-92ee-accd-59d3d6b2b4eb@cn.fujitsu.com>
+Date: Thu, 15 Dec 2016 14:46:09 +0800
 MIME-Version: 1.0
-In-Reply-To: <1481762701-4587-1-git-send-email-mdroth@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <alpine.DEB.2.10.1612131700110.2777@sstabellini-ThinkPad-X260>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 00/67] Patch Round-up for stable 2.7.1,
- freeze on 2016-12-20
+Subject: Re: [Qemu-devel] [PATCH for-2.9 V3 1/3] Migration: Don't load
+ vmdesc when xen is enabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,32 +29,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Kevin Wolf <kwolf@redhat.com>
-
-On 12/15/16 01:43, Michael Roth wrote:
-> Hi everyone,
->
-> The following new patches are queued for QEMU stable v2.7.1:
->
->   https://github.com/mdroth/qemu/commits/stable-2.7-staging
->
-> The release is planned for 2016-12-23:
->
->   http://wiki.qemu.org/Planning/2.7
->
-> Please respond here or CC qemu-stable@nongnu.org on any patches you
-> think should be included in the release.
->
-> Testing/feedback is greatly appreciated.
->
-> Thanks!
+To: Stefano Stabellini <sstabellini@kernel.org>, Wen Congyang <wencongyang@gmail.com>
+Cc: qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>, Eric Blake <eblake@redhat.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, "eddie .
+	dong" <eddie.dong@intel.com>, Bian Naimeng <biannm@cn.fujitsu.com>
 
 
-http://patchwork.ozlabs.org/patch/705682/
-[for-2.8] ui/gtk: fix "Copy" menu item segfault
 
-(still missing in git)
+On 12/14/2016 09:00 AM, Stefano Stabellini wrote:
+> On Fri, 9 Dec 2016, Zhang Chen wrote:
+>> Xen doesn't need this.
+> Could you please elaborate a bit more on what is the problem exactly,
+> and why we don't have any issues with migration with Xen today (COLO
+> use-case aside)?
+>
 
-Regards,
-Stefan
+I test COLO without this patch, it seems run normally.
+And I review the codes not find why we need this too.
+So, I cc the original author wency about this.
+
+CC. wency.
+
+Thanks
+Zhang Chen
+
+>> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+>> ---
+>>   migration/savevm.c | 4 ++++
+>>   1 file changed, 4 insertions(+)
+>>
+>> diff --git a/migration/savevm.c b/migration/savevm.c
+>> index 0363372..bec6c7e 100644
+>> --- a/migration/savevm.c
+>> +++ b/migration/savevm.c
+>> @@ -1973,6 +1973,10 @@ int qemu_loadvm_state(QEMUFile *f)
+>>           ret = qemu_file_get_error(f);
+>>       }
+>>   
+>> +    if (xen_enabled()) {
+>> +        return ret;
+>> +    }
+>> +
+>>       /*
+>>        * Try to read in the VMDESC section as well, so that dumping tools that
+>>        * intercept our migration stream have the chance to see it.
+>> -- 
+>> 2.7.4
+>>
+>>
+>>
+>>
+>
+> .
+>
+
+-- 
+Thanks
+Zhang Chen
