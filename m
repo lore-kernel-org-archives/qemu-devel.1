@@ -1,42 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57863)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58316)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1cHYhg-00071j-AZ
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 11:16:21 -0500
+	(envelope-from <ashijeetacharya@gmail.com>) id 1cHYij-0002sC-2X
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 11:17:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1cHYhc-0005Oc-Bp
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 11:16:20 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33956
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1cHYhc-0005OF-5G
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 11:16:16 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	uBFGFKxb105363
-	for <qemu-devel@nongnu.org>; Thu, 15 Dec 2016 11:16:15 -0500
-Received: from e06smtp08.uk.ibm.com (e06smtp08.uk.ibm.com [195.75.94.104])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 27bt851fcq-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 15 Dec 2016 11:16:15 -0500
-Received: from localhost
-	by e06smtp08.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Thu, 15 Dec 2016 16:16:12 -0000
-References: <b1ac8aec-e9cc-99f8-0881-bef03acc2954@linux.vnet.ibm.com>
-	<20161215105257.GD2509@work-vm>
-	<b2ad9903-95b4-bf08-f314-c2b250cebb0a@linux.vnet.ibm.com>
-	<04b36158-a381-298f-1d81-d1bd18f3cec7@redhat.com>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Thu, 15 Dec 2016 17:16:08 +0100
+	(envelope-from <ashijeetacharya@gmail.com>) id 1cHYif-0005tI-3e
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 11:17:25 -0500
+Received: from mail-io0-f193.google.com ([209.85.223.193]:32968)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ashijeetacharya@gmail.com>)
+	id 1cHYie-0005sf-Up
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 11:17:21 -0500
+Received: by mail-io0-f193.google.com with SMTP id p13so8974592ioi.0
+	for <qemu-devel@nongnu.org>; Thu, 15 Dec 2016 08:17:20 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <04b36158-a381-298f-1d81-d1bd18f3cec7@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 8bit
-Message-Id: <1ca3b865-276d-8618-cd57-33593a82b7d7@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] commit virtio: recalculate vq->inuse after
- migration might cause last_avail_idx vs. used_idx failure
+In-Reply-To: <20161215160740.GN2509@work-vm>
+References: <1481742422-15969-1-git-send-email-ashijeetacharya@gmail.com>
+	<20161215175533-mutt-send-email-mst@kernel.org>
+	<20161215160740.GN2509@work-vm>
+From: Ashijeet Acharya <ashijeetacharya@gmail.com>
+Date: Thu, 15 Dec 2016 21:46:18 +0530
+Message-ID: <CAC2QTZa=Be6pcOUtxfBz+YHmj8sfF7CcB35ATjjd_ErCJSNY7w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH 0/3] Introduce a new --only-migratable
+ option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,69 +31,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, John Snow <jsnow@redhat.com>, amit.shah@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, quintela@redhat.com, marcandre.lureau@redhat.com, groug@kaod.org, aneesh.kumar@linux.vnet.ibm.com, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-
-
-On 12/15/2016 02:37 PM, Paolo Bonzini wrote:
-> 
-> 
-> On 15/12/2016 12:32, Halil Pasic wrote:
->> static inline uint16_t vring_avail_idx(VirtQueue *vq)
->> {
->>     hwaddr pa;
->>     pa = vq->vring.avail + offsetof(VRingAvail, idx);
->>     vq->shadow_avail_idx = virtio_lduw_phys(vq->vdev, pa);
+On Thu, Dec 15, 2016 at 9:37 PM, Dr. David Alan Gilbert
+<dgilbert@redhat.com> wrote:
+> * Michael S. Tsirkin (mst@redhat.com) wrote:
+>> On Thu, Dec 15, 2016 at 12:36:59AM +0530, Ashijeet Acharya wrote:
+>> > This series adds a new command line option "--only-migratable" which will only
+>> > allow addition of those devices to a QEMU instance which are migratable and do
+>> > not abruptly fail QEMU after migration.
+>> >
+>> > Patch 1 adds the new option "-only-migratable".
+>> >
+>> > Patch 2 adds compatibility for various "device adding" options for both via
+>> > command line and hotplug methods.
+>> >
+>> > Patch 3 handles the special case of devices which become unmigratable dynamically
+>> > by making call to "migrate_add_blocker". Here we fail the particular action of the
+>> > device which results in an unmigratable VM.
+>> > Eg: 9pfs fails to mount the filesystem.
 >>
->> we should have an endiannes handling here before assigning shadow_avail_idx I guess
+>> I guess that's possible but wouldn't it be cleaner to add introspection
+>> so management can find out what can migrate?
+>> Further, what should be removed (e.g. by hotplug) if you do want
+>> to migrate.
+
+Actually, I think user never gets to add devices which are
+unmigratable in the first place. So there won't be a possibility to
+remove them because they never get added in the first place.
+
 >>
->>     return vq->shadow_avail_idx;
->> } 
-> 
-> Endianness is already handled:
-> 
-> static inline uint16_t virtio_lduw_phys(VirtIODevice *vdev, hwaddr pa)
-> {
->     if (virtio_access_is_big_endian(vdev)) {
->         return lduw_be_phys(&address_space_memory, pa);
->     }
->     return lduw_le_phys(&address_space_memory, pa);
-> }
+>> As it is, you get a failure but no easy way for tools to
+>> find out what was the failure reason.
+>
+> You get the device name of the device that's failed don't you?
 
-Thanks Paolo, you are obviously right. Sorry for the noise.
+Yes, I have included error messages explaining the cause and the name
+of the device which failed it. Also, I would like opinions of everyone
+on whether they give satisfactory explanation in each case.
 
-> 
->> I will meditate a bit more on this and probably create a patch to fix it.
+Ashijeet
+
+> Where would you add introspection?
+>
+> Dave
+>
 >>
->> What make me wonder is that according to the reports live migration usually
->> works (ca 1% fails)...
-
-
-Seems I will have to get a dump and/or reproduce the problem myself
-before I can tell what is going on there  -- the guru saved me some
-meditation.
-
-> 
-> What is the backtrace of the vring_avail_idx call?  If your device is
-
-As far as I can see from the code the guest features should be already
-loaded from the migration stream.
-
-Thanks again!
-
-Halil
-
-> virtio 1.0, and vdev->guest_features has not been initialized correctly,
-> you might incorrectly treat LE virtio 1.0 data as BE virtio 0.9 data:
-> 
->     if (virtio_vdev_has_feature(vdev, VIRTIO_F_VERSION_1)) {
->         /* Devices conforming to VIRTIO 1.0 or later are always LE. */
->         return false;
->     }
->     return true;
-> 
-> Thanks,
-> 
-> Paolo
-> 
+>> > Ashijeet Acharya (3):
+>> >   migration: Add a new option to enable only-migratable
+>> >   migration: Allow "device add" options to only add migratable devices
+>> >   migration: disallow migrate_add_blocker during migration
+>> >
+>> >  block/qcow.c                  | 11 ++++++++++-
+>> >  block/vdi.c                   | 11 ++++++++++-
+>> >  block/vhdx.c                  | 20 ++++++++++++++------
+>> >  block/vmdk.c                  | 12 +++++++++++-
+>> >  block/vpc.c                   | 15 ++++++++++++---
+>> >  block/vvfat.c                 | 24 ++++++++++++++++--------
+>> >  hw/9pfs/9p.c                  | 22 ++++++++++++++++++----
+>> >  hw/display/virtio-gpu.c       | 35 ++++++++++++++++++++++-------------
+>> >  hw/intc/arm_gic_kvm.c         | 20 ++++++++++++++------
+>> >  hw/intc/arm_gicv3_its_kvm.c   | 21 ++++++++++++++-------
+>> >  hw/intc/arm_gicv3_kvm.c       | 22 +++++++++++++++-------
+>> >  hw/misc/ivshmem.c             | 17 +++++++++++++----
+>> >  hw/scsi/vhost-scsi.c          | 27 +++++++++++++++++++++------
+>> >  hw/usb/bus.c                  | 15 +++++++++++++++
+>> >  hw/virtio/vhost.c             | 11 ++++++++++-
+>> >  include/migration/migration.h |  9 ++++++++-
+>> >  migration/migration.c         | 42 ++++++++++++++++++++++++++++++++++++++++--
+>> >  qdev-monitor.c                |  9 +++++++++
+>> >  qemu-options.hx               | 10 ++++++++++
+>> >  stubs/migr-blocker.c          |  3 ++-
+>> >  target-i386/kvm.c             | 19 ++++++++++++++++---
+>> >  vl.c                          |  4 ++++
+>> >  22 files changed, 304 insertions(+), 75 deletions(-)
+>> >
+>> > --
+>> > 2.6.2
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
