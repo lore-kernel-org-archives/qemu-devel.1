@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44388)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46987)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cHTBv-0005cN-I4
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 05:23:14 -0500
+	(envelope-from <stefanha@redhat.com>) id 1cHTKK-0003Q6-Vg
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 05:31:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cHTBu-0004Vz-5c
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 05:23:11 -0500
-Date: Thu, 15 Dec 2016 11:22:59 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20161215112259.45463fcf@nial.brq.redhat.com>
-In-Reply-To: <20161213214522.25548-3-drjones@redhat.com>
-References: <20161213214522.25548-1-drjones@redhat.com>
-	<20161213214522.25548-3-drjones@redhat.com>
+	(envelope-from <stefanha@redhat.com>) id 1cHTKH-0008PY-S6
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 05:31:53 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49314)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cHTKH-0008Om-KA
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 05:31:49 -0500
+Date: Thu, 15 Dec 2016 10:31:45 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20161215103145.GG2762@stefanha-x1.localdomain>
+References: <20161214163035.3297-1-maxime.coquelin@redhat.com>
+	<20161215073808.GB26169@stefanha-x1.localdomain>
+	<20161215092656.2e1244c0.cornelia.huck@de.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 02/11] hw/arm/virt: use
- VirtMachineState.gic_version
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="L+ofChggJdETEG3Y"
+Content-Disposition: inline
+In-Reply-To: <20161215092656.2e1244c0.cornelia.huck@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v3] virtio-pci: Fix cross-version migration
+ with older machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,171 +30,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jones <drjones@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, zhaoshenglong@huawei.com, mst@redhat.com, ehabkost@redhat.com
+To: Cornelia Huck <cornelia.huck@de.ibm.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, mdroth@linux.vnet.ibm.com, qemu-devel@nongnu.org, mst@redhat.com, marcel@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On Tue, 13 Dec 2016 22:45:13 +0100
-Andrew Jones <drjones@redhat.com> wrote:
 
-> machvirt_init may need to probe for the gic version. If so, then
-> make sure the result is written to VirtMachineState. With the
-> state up to date, use it instead of a local variable. This is a
-> cleanup that prepares for VirtMachineState to be passed to functions
-> even outside hw/arm/virt.c
-> 
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+--L+ofChggJdETEG3Y
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> ---
->  hw/arm/virt.c | 35 +++++++++++++++++------------------
->  1 file changed, 17 insertions(+), 18 deletions(-)
-> 
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index d451bc4f6b9b..67c0abb30b5b 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -319,7 +319,7 @@ static void fdt_add_psci_node(const VirtMachineState *vms)
->      qemu_fdt_setprop_cell(fdt, "/psci", "migrate", migrate_fn);
->  }
->  
-> -static void fdt_add_timer_nodes(const VirtMachineState *vms, int gictype)
-> +static void fdt_add_timer_nodes(const VirtMachineState *vms)
->  {
->      /* On real hardware these interrupts are level-triggered.
->       * On KVM they were edge-triggered before host kernel version 4.4,
-> @@ -347,7 +347,7 @@ static void fdt_add_timer_nodes(const VirtMachineState *vms, int gictype)
->          irqflags = GIC_FDT_IRQ_FLAGS_EDGE_LO_HI;
->      }
->  
-> -    if (gictype == 2) {
-> +    if (vms->gic_version == 2) {
->          irqflags = deposit32(irqflags, GIC_FDT_IRQ_PPI_CPU_START,
->                               GIC_FDT_IRQ_PPI_CPU_WIDTH,
->                               (1 << vms->smp_cpus) - 1);
-> @@ -462,7 +462,7 @@ static void fdt_add_v2m_gic_node(VirtMachineState *vms)
->      qemu_fdt_setprop_cell(vms->fdt, "/intc/v2m", "phandle", vms->msi_phandle);
->  }
->  
-> -static void fdt_add_gic_node(VirtMachineState *vms, int type)
-> +static void fdt_add_gic_node(VirtMachineState *vms)
->  {
->      vms->gic_phandle = qemu_fdt_alloc_phandle(vms->fdt);
->      qemu_fdt_setprop_cell(vms->fdt, "/", "interrupt-parent", vms->gic_phandle);
-> @@ -473,7 +473,7 @@ static void fdt_add_gic_node(VirtMachineState *vms, int type)
->      qemu_fdt_setprop_cell(vms->fdt, "/intc", "#address-cells", 0x2);
->      qemu_fdt_setprop_cell(vms->fdt, "/intc", "#size-cells", 0x2);
->      qemu_fdt_setprop(vms->fdt, "/intc", "ranges", NULL, 0);
-> -    if (type == 3) {
-> +    if (vms->gic_version == 3) {
->          qemu_fdt_setprop_string(vms->fdt, "/intc", "compatible",
->                                  "arm,gic-v3");
->          qemu_fdt_setprop_sized_cells(vms->fdt, "/intc", "reg",
-> @@ -500,7 +500,7 @@ static void fdt_add_gic_node(VirtMachineState *vms, int type)
->      qemu_fdt_setprop_cell(vms->fdt, "/intc", "phandle", vms->gic_phandle);
->  }
->  
-> -static void fdt_add_pmu_nodes(const VirtMachineState *vms, int gictype)
-> +static void fdt_add_pmu_nodes(const VirtMachineState *vms)
->  {
->      CPUState *cpu;
->      ARMCPU *armcpu;
-> @@ -514,7 +514,7 @@ static void fdt_add_pmu_nodes(const VirtMachineState *vms, int gictype)
->          }
->      }
->  
-> -    if (gictype == 2) {
-> +    if (vms->gic_version == 2) {
->          irqflags = deposit32(irqflags, GIC_FDT_IRQ_PPI_CPU_START,
->                               GIC_FDT_IRQ_PPI_CPU_WIDTH,
->                               (1 << vms->smp_cpus) - 1);
-> @@ -570,14 +570,14 @@ static void create_v2m(VirtMachineState *vms, qemu_irq *pic)
->      fdt_add_v2m_gic_node(vms);
->  }
->  
-> -static void create_gic(VirtMachineState *vms, qemu_irq *pic, int type)
-> +static void create_gic(VirtMachineState *vms, qemu_irq *pic)
->  {
->      /* We create a standalone GIC */
->      VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
->      DeviceState *gicdev;
->      SysBusDevice *gicbusdev;
->      const char *gictype;
-> -    int i;
-> +    int type = vms->gic_version, i;
->  
->      gictype = (type == 3) ? gicv3_class_name() : gic_class_name();
->  
-> @@ -641,7 +641,7 @@ static void create_gic(VirtMachineState *vms, qemu_irq *pic, int type)
->          pic[i] = qdev_get_gpio_in(gicdev, i);
->      }
->  
-> -    fdt_add_gic_node(vms, type);
-> +    fdt_add_gic_node(vms);
->  
->      if (type == 3 && !vmc->no_its) {
->          create_its(vms, gicdev);
-> @@ -1237,7 +1237,6 @@ static void machvirt_init(MachineState *machine)
->      qemu_irq pic[NUM_IRQS];
->      MemoryRegion *sysmem = get_system_memory();
->      MemoryRegion *secure_sysmem = NULL;
-> -    int gic_version = vms->gic_version;
->      int n, virt_max_cpus;
->      MemoryRegion *ram = g_new(MemoryRegion, 1);
->      const char *cpu_model = machine->cpu_model;
-> @@ -1258,14 +1257,14 @@ static void machvirt_init(MachineState *machine)
->      /* We can probe only here because during property set
->       * KVM is not available yet
->       */
-> -    if (!gic_version) {
-> +    if (!vms->gic_version) {
->          if (!kvm_enabled()) {
->              error_report("gic-version=host requires KVM");
->              exit(1);
->          }
->  
-> -        gic_version = kvm_arm_vgic_probe();
-> -        if (!gic_version) {
-> +        vms->gic_version = kvm_arm_vgic_probe();
-> +        if (!vms->gic_version) {
->              error_report("Unable to determine GIC version supported by host");
->              exit(1);
->          }
-> @@ -1300,7 +1299,7 @@ static void machvirt_init(MachineState *machine)
->      /* The maximum number of CPUs depends on the GIC version, or on how
->       * many redistributors we can fit into the memory map.
->       */
-> -    if (gic_version == 3) {
-> +    if (vms->gic_version == 3) {
->          virt_max_cpus = vms->memmap[VIRT_GIC_REDIST].size / 0x20000;
->          clustersz = GICV3_TARGETLIST_BITS;
->      } else {
-> @@ -1417,7 +1416,7 @@ static void machvirt_init(MachineState *machine)
->  
->          object_property_set_bool(cpuobj, true, "realized", NULL);
->      }
-> -    fdt_add_timer_nodes(vms, gic_version);
-> +    fdt_add_timer_nodes(vms);
->      fdt_add_cpu_nodes(vms);
->      fdt_add_psci_node(vms);
->  
-> @@ -1427,9 +1426,9 @@ static void machvirt_init(MachineState *machine)
->  
->      create_flash(vms, sysmem, secure_sysmem ? secure_sysmem : sysmem);
->  
-> -    create_gic(vms, pic, gic_version);
-> +    create_gic(vms, pic);
->  
-> -    fdt_add_pmu_nodes(vms, gic_version);
-> +    fdt_add_pmu_nodes(vms);
->  
->      create_uart(vms, pic, VIRT_UART, sysmem, serial_hds[0]);
->  
-> @@ -1458,7 +1457,7 @@ static void machvirt_init(MachineState *machine)
->      guest_info->memmap = vms->memmap;
->      guest_info->irqmap = vms->irqmap;
->      guest_info->use_highmem = vms->highmem;
-> -    guest_info->gic_version = gic_version;
-> +    guest_info->gic_version = vms->gic_version;
->      guest_info->no_its = vmc->no_its;
->      guest_info_state->machine_done.notify = virt_guest_info_machine_done;
->      qemu_add_machine_init_done_notifier(&guest_info_state->machine_done);
+On Thu, Dec 15, 2016 at 09:26:56AM +0100, Cornelia Huck wrote:
+> On Thu, 15 Dec 2016 07:38:09 +0000
+> Stefan Hajnoczi <stefanha@gmail.com> wrote:
+>=20
+> > On Wed, Dec 14, 2016 at 05:30:35PM +0100, Maxime Coquelin wrote:
+> > > This patch fixes a cross-version migration regression introduced
+> > > by commit d1b4259f ("virtio-bus: Plug devices after features are
+> > > negotiated").
+> > >=20
+> > > The problem is encountered when host's vhost backend does not support
+> > > VIRTIO_F_VERSION_1, and migration is initiated from a v2.7 or prior
+> > > machine with virtio-pci modern capabilities enabled to a v2.8 machine.
+> > >=20
+> > > In this case, modern capabilities get exposed to the guest by the sou=
+rce,
+> > > whereas the target will detect version 1 is not supported so will only
+> > > expose legacy capabilities.
+> > >=20
+> > > The problem is fixed by introducing a new "x-ignore-backend-features"
+> > > property, which is set in v2.7 and prior compatibility modes. Doing t=
+his,
+> > > v2.7 machine keeps its broken behaviour (enabling modern while version
+> > > is not supported), and newer machines will behave correctly.
+> > >=20
+> > > Reported-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+> > > Suggested-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > > Cc: Michael S. Tsirkin <mst@redhat.com>
+> > > Cc: Cornelia Huck <cornelia.huck@de.ibm.com>
+> > > Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > > Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
+> > > Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > > Tested-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+> > > Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
+> > > ---
+> > >=20
+> > > V3 fixes commit message with the new property name.
+> > > V2 changes the naming as proposed by Michael T.and Cornelia, and
+> > > fixes commit message.
+> > >=20
+> > >  hw/virtio/virtio-pci.c | 5 ++++-
+> > >  hw/virtio/virtio-pci.h | 1 +
+> > >  include/hw/compat.h    | 4 ++++
+> > >  3 files changed, 9 insertions(+), 1 deletion(-)
+> >=20
+> > Thanks, applied to my staging tree:
+> > https://github.com/stefanha/qemu/commits/staging
+> >=20
+> > Stefan
+>=20
+> Hm, missing my R-b I gave for v2... feel free to add
+>=20
+> Reviewed-by: Cornelia Huck <cornelia.huck@de.ibm.com>
+>=20
+> if you still want to change it.
+
+Sorry, the R-b didn't make it into v2.8.0-rc4.
+
+The patch management scripts I use apply all R-b for a single email
+thread.  They do not look at previous revisions (it would be hard to
+tell which R-b still stand and which do not).  The usual solution is for
+the patch author to include previous R-b in new revisions as long as
+code changes aren't substantial.
+
+Stefan
+
+--L+ofChggJdETEG3Y
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJYUnERAAoJEJykq7OBq3PICwkH/0dJRD7cqolZvcmE/Xfm7W0V
+LnIvV185bRKrYPqLzqUP6szgQTtopKo48b5WQfDtI4F8FpLpBwoFEwaX2He4vbCR
+p/oG3oHgb+E8v5qiHdwI5suXKgDx1BtXfbuXsZtecnnVsi5hAPS3QcxfswTnGy0C
+z9qy3IEBAsFTJwQ4mK6M/UJNAfJEOf0pbsHBGqvQEJAm0CS/JN/XmSe4w82IOPcN
+O4Ok3LZTi/ZAPMN0DZnk0pNTQqTMUXUTylbUP5cNIRNymNrQxycWo5M4GvyKsReo
+2RHUbeDCRkURI+WRNxUbTAdQ0O1HeSGPwjM7564Th27bzoWy60EfAYLWy6MASv4=
+=06yy
+-----END PGP SIGNATURE-----
+
+--L+ofChggJdETEG3Y--
