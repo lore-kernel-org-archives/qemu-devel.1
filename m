@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60160)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60414)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1cHYpN-0005M1-Gk
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 11:24:18 -0500
+	(envelope-from <bounces@canonical.com>) id 1cHYpp-0007Cs-3B
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 11:24:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1cHYpM-0001jW-Gs
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 11:24:17 -0500
-Date: Thu, 15 Dec 2016 17:24:05 +0100
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20161215162405.zh5s3qnlvlpftjel@kamzik.brq.redhat.com>
-References: <20161213214522.25548-1-drjones@redhat.com>
-	<20161213214522.25548-8-drjones@redhat.com>
-	<20161215154555.6137b8f7@nial.brq.redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1cHYpl-000273-3h
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 11:24:45 -0500
+Received: from indium.canonical.com ([91.189.90.7]:60140)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cHYpk-00026S-PN
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 11:24:41 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cHYpj-00032i-Gs
+	for <qemu-devel@nongnu.org>; Thu, 15 Dec 2016 16:24:39 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 38ED62E8190
+	for <qemu-devel@nongnu.org>; Thu, 15 Dec 2016 16:24:37 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20161215154555.6137b8f7@nial.brq.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 07/11] hw/arm/virt: pass VirtMachineState
- instead of VirtGuestInfo
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 15 Dec 2016 15:58:06 -0000
+From: Thomas Huth <897750@bugs.launchpad.net>
+Reply-To: Bug 897750 <897750@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20111129155310.23239.76602.malonedeb@wampee.canonical.com>
+Message-Id: <20161215155806.29145.22114.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 897750] Re: libvirt/kvm problem with disk
+ attach/detach/reattach on running virt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,90 +37,370 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: peter.maydell@linaro.org, ehabkost@redhat.com, mst@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, zhaoshenglong@huawei.com
+To: qemu-devel@nongnu.org
 
-On Thu, Dec 15, 2016 at 03:45:55PM +0100, Igor Mammedov wrote:
-> On Tue, 13 Dec 2016 22:45:18 +0100
-> Andrew Jones <drjones@redhat.com> wrote:
-> 
-> > Only two functions take VirtGuestInfo parameters. Now that guest-info
-> > is part of VirtMachineState, and VirtMachineState is defined in the
-> > virt header, pass that instead.
-> > 
-> > Signed-off-by: Andrew Jones <drjones@redhat.com>
-> > ---
-> >  hw/arm/virt-acpi-build.c | 3 ++-
-> >  hw/arm/virt.c            | 8 ++++----
-> >  include/hw/arm/virt.h    | 2 +-
-> >  3 files changed, 7 insertions(+), 6 deletions(-)
-> > 
-> > diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> > index db44e2dd5f12..f7ce6aeed307 100644
-> > --- a/hw/arm/virt-acpi-build.c
-> > +++ b/hw/arm/virt-acpi-build.c
-> > @@ -822,8 +822,9 @@ static const VMStateDescription vmstate_virt_acpi_build = {
-> >      },
-> >  };
-> >  
-> > -void virt_acpi_setup(VirtGuestInfo *guest_info)
-> > +void virt_acpi_setup(VirtMachineState *vms)
-> >  {
-> > +    VirtGuestInfo *guest_info = &vms->acpi_guest_info;
-> >      AcpiBuildTables tables;
-> >      AcpiBuildState *build_state;
-> >  
-> > diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> > index 7860fade52f1..bcf8a2954c16 100644
-> > --- a/hw/arm/virt.c
-> > +++ b/hw/arm/virt.c
-> > @@ -1156,9 +1156,9 @@ static void *machvirt_dtb(const struct arm_boot_info *binfo, int *fdt_size)
-> >      return board->fdt;
-> >  }
-> >  
-> > -static void virt_build_smbios(VirtGuestInfo *guest_info)
-> > +static void virt_build_smbios(VirtMachineState *vms)
-> Looks like all it needs is 'fw_cfg'
-> If there aren't plans to use more data from VirtMachineState,
-> just passing fw_cfg should be enough.
+Is here still a problem left with upstream QEMU?
 
-I prefer leaving it vms, as that's consistent with pretty much all
-the other functions in this file, and if we do need more state then
-it'll already be there. But I won't insist on this, it can always be
-changed later.
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
-Thanks,
-drew
+-- =
 
-> 
-> >  {
-> > -    FWCfgState *fw_cfg = guest_info->fw_cfg;
-> > +    FWCfgState *fw_cfg = vms->acpi_guest_info.fw_cfg;
-> >      uint8_t *smbios_tables, *smbios_anchor;
-> >      size_t smbios_tables_len, smbios_anchor_len;
-> >      const char *product = "QEMU Virtual Machine";
-> > @@ -1191,8 +1191,8 @@ void virt_machine_done(Notifier *notifier, void *data)
-> >      VirtMachineState *vms = container_of(notifier, VirtMachineState,
-> >                                           machine_done);
-> >  
-> > -    virt_acpi_setup(&vms->acpi_guest_info);
-> > -    virt_build_smbios(&vms->acpi_guest_info);
-> > +    virt_acpi_setup(vms);
-> > +    virt_build_smbios(vms);
-> >  }
-> >  
-> >  static void machvirt_init(MachineState *machine)
-> > diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-> > index 77d25dbddb62..cbedc682ae99 100644
-> > --- a/include/hw/arm/virt.h
-> > +++ b/include/hw/arm/virt.h
-> > @@ -128,6 +128,6 @@ typedef struct {
-> >      OBJECT_CLASS_CHECK(VirtMachineClass, klass, TYPE_VIRT_MACHINE)
-> >  
-> >  
-> > -void virt_acpi_setup(VirtGuestInfo *guest_info);
-> > +void virt_acpi_setup(VirtMachineState *vms);
-> >  
-> >  #endif /* QEMU_ARM_VIRT_H */
-> 
-> 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/897750
+
+Title:
+  libvirt/kvm problem with disk attach/detach/reattach on running virt
+
+Status in QEMU:
+  Incomplete
+Status in qemu-kvm package in Ubuntu:
+  Incomplete
+
+Bug description:
+  Release:         Ubuntu 11.10 (Oneiric)
+  libvirt-bin:      0.9.2-4ubuntu15.1
+  qemu-kvm:   0.14.1+noroms-0ubuntu6
+
+  Summary:    With a running KVM virt,   performing an 'attach-disk',  then=
+ a 'detach-disk', then another 'attach-disk' =
+
+  in an attempt to reattach the volume at the same point on the virt, fails=
+, with the qemu reporting back to
+  libvirt a 'Duplicate ID' error.
+
+  Expected behavior:   The 2nd invocation of 'attach-disk' should have succ=
+eeded
+  Actual behavior:         Duplicate ID error reported
+
+  =
+
+  I believe this is most likely a qemu-kvm issue, as the DOM  kvm spits bac=
+k at libvirt after the 'detach-disk'
+  does not show the just-detached disk.   There is some kind of registry/lo=
+okup for devices in qemu-kvm
+  and for whatever reason, the entry for the disk does not get removed when=
+ it is detached from the
+  virt.   Specifically, the error gets reported at the 2nd attach-disk atte=
+mpt from:
+    =
+
+    qemu-option.c:qemu_opts_create:697
+
+  684 QemuOpts *qemu_opts_create(QemuOptsList *list, const char *id, int fa=
+il_if_exists)                                                  =
+
+  685 {                                                                    =
+                                                               =
+
+  686     QemuOpts *opts =3D NULL;                                         =
+                                                                 =
+
+  687                                                                      =
+                                                               =
+
+  688     if (id) {                                                        =
+                                                               =
+
+  689         if (!id_wellformed(id)) {                                    =
+                                                               =
+
+  690             qerror_report(QERR_INVALID_PARAMETER_VALUE, "id", "an ide=
+ntifier");                                                     =
+
+  691             error_printf_unless_qmp("Identifiers consist of letters, =
+digits, '-', '.', '_', starting with a letter.\n");            =
+
+  692             return NULL;                                             =
+                                                               =
+
+  693         }                                                            =
+                                                               =
+
+  694         opts =3D qemu_opts_find(list, id);                           =
+                                                                 =
+
+  695         if (opts !=3D NULL) {                                        =
+                                                                 =
+
+  696             if (fail_if_exists) {                                    =
+                                                               =
+
+  697                 qerror_report(QERR_DUPLICATE_ID, id, list->name);    =
+       <<<< =3D=3D=3D=3D=3D=3D HERE =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D      =
+                                                    =
+
+  698                 return NULL;                                         =
+                                                               =
+
+  699             } else {                                                 =
+                                                               =
+
+  700                 return opts;                                         =
+                                                               =
+
+  701             }                                                        =
+                                                               =
+
+  702         }                                                            =
+                                                               =
+
+  703     }                                                                =
+                                                               =
+
+  704     opts =3D qemu_mallocz(sizeof(*opts));                            =
+                                                                 =
+
+  705     if (id) {                                                        =
+                                                               =
+
+  706         opts->id =3D qemu_strdup(id);                                =
+                                                                 =
+
+  707     }                                                                =
+                                                               =
+
+  708     opts->list =3D list;                                             =
+                                                                 =
+
+  709     loc_save(&opts->loc);                                            =
+                                                               =
+
+  710     QTAILQ_INIT(&opts->head);                                        =
+                                                               =
+
+  711     QTAILQ_INSERT_TAIL(&list->head, opts, next);                     =
+                                                               =
+
+  712     return opts;                                                     =
+                                                               =
+
+  713 }                                                                    =
+                                                               =
+
+
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+  Output of my  attach/detach/attach
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+  virsh # attach-disk base1 /var/lib/libvirt/images/extrastorage.img vdb
+  Disk attached successfully
+
+  virsh # dumpxml base1
+  <domain type=3D'kvm' id=3D'2'>
+    <name>base1</name>
+    <uuid>9ebebe7f-7dfa-4735-a80c-c19ebe4e1459</uuid>
+    <memory>1048576</memory>
+    <currentMemory>1048576</currentMemory>
+    <vcpu>2</vcpu>
+    <os>
+      <type arch=3D'x86_64' machine=3D'pc-0.14'>hvm</type>
+      <boot dev=3D'hd'/>
+    </os>
+    <features>
+      <acpi/>
+      <apic/>
+      <pae/>
+    </features>
+    <cpu match=3D'exact'>
+      <model>Opteron_G3</model>
+      <vendor>AMD</vendor>
+      <feature policy=3D'require' name=3D'skinit'/>
+      <feature policy=3D'require' name=3D'vme'/>
+      <feature policy=3D'require' name=3D'mmxext'/>
+      <feature policy=3D'require' name=3D'fxsr_opt'/>
+      <feature policy=3D'require' name=3D'cr8legacy'/>
+      <feature policy=3D'require' name=3D'ht'/>
+      <feature policy=3D'require' name=3D'3dnowprefetch'/>
+      <feature policy=3D'require' name=3D'3dnowext'/>
+      <feature policy=3D'require' name=3D'wdt'/>
+      <feature policy=3D'require' name=3D'extapic'/>
+      <feature policy=3D'require' name=3D'pdpe1gb'/>
+      <feature policy=3D'require' name=3D'osvw'/>
+      <feature policy=3D'require' name=3D'cmp_legacy'/>
+      <feature policy=3D'require' name=3D'3dnow'/>
+    </cpu>
+    <clock offset=3D'utc'/>
+    <on_poweroff>destroy</on_poweroff>
+    <on_reboot>restart</on_reboot>
+    <on_crash>restart</on_crash>
+    <devices>
+      <emulator>/usr/bin/kvm</emulator>
+      <disk type=3D'file' device=3D'disk'>
+        <driver name=3D'qemu' type=3D'raw'/>
+        <source file=3D'/dev/rbd1'/>
+        <target dev=3D'vda' bus=3D'virtio'/>
+        <alias name=3D'virtio-disk0'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' =
+function=3D'0x0'/>
+      </disk>
+      <disk type=3D'block' device=3D'disk'>
+        <driver name=3D'qemu' type=3D'raw'/>
+        <source dev=3D'/var/lib/libvirt/images/extrastorage.img'/>
+        <target dev=3D'vdb' bus=3D'virtio'/>
+        <alias name=3D'virtio-disk1'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x07' =
+function=3D'0x0'/>
+      </disk>
+      <controller type=3D'ide' index=3D'0'>
+        <alias name=3D'ide0'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x01' =
+function=3D'0x1'/>
+      </controller>
+      <interface type=3D'bridge'>
+        <mac address=3D'52:54:00:a2:c1:2d'/>
+        <source bridge=3D'br0'/>
+        <target dev=3D'vnet0'/>
+        <model type=3D'virtio'/>
+        <alias name=3D'net0'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x03' =
+function=3D'0x0'/>
+      </interface>
+      <serial type=3D'pty'>
+        <source path=3D'/dev/pts/1'/>
+        <target port=3D'0'/>
+        <alias name=3D'serial0'/>
+      </serial>
+      <console type=3D'pty' tty=3D'/dev/pts/1'>
+        <source path=3D'/dev/pts/1'/>
+        <target type=3D'serial' port=3D'0'/>
+        <alias name=3D'serial0'/>
+      </console>
+      <input type=3D'mouse' bus=3D'ps2'/>
+      <graphics type=3D'vnc' port=3D'5900' autoport=3D'yes'/>
+      <sound model=3D'ich6'>
+        <alias name=3D'sound0'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x04' =
+function=3D'0x0'/>
+      </sound>
+      <video>
+        <model type=3D'cirrus' vram=3D'9216' heads=3D'1'/>
+        <alias name=3D'video0'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x02' =
+function=3D'0x0'/>
+      </video>
+      <memballoon model=3D'virtio'>
+        <alias name=3D'balloon0'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x06' =
+function=3D'0x0'/>
+      </memballoon>
+    </devices>
+    <seclabel type=3D'dynamic' model=3D'apparmor'>
+      <label>libvirt-9ebebe7f-7dfa-4735-a80c-c19ebe4e1459</label>
+      <imagelabel>libvirt-9ebebe7f-7dfa-4735-a80c-c19ebe4e1459</imagelabel>
+    </seclabel>
+  </domain>
+
+  virsh # detach-disk base1 vdb
+  Disk detached successfully
+
+  virsh # dumpxml base1
+  <domain type=3D'kvm' id=3D'2'>
+    <name>base1</name>
+    <uuid>9ebebe7f-7dfa-4735-a80c-c19ebe4e1459</uuid>
+    <memory>1048576</memory>
+    <currentMemory>1048576</currentMemory>
+    <vcpu>2</vcpu>
+    <os>
+      <type arch=3D'x86_64' machine=3D'pc-0.14'>hvm</type>
+      <boot dev=3D'hd'/>
+    </os>
+    <features>
+      <acpi/>
+      <apic/>
+      <pae/>
+    </features>
+    <cpu match=3D'exact'>
+      <model>Opteron_G3</model>
+      <vendor>AMD</vendor>
+      <feature policy=3D'require' name=3D'skinit'/>
+      <feature policy=3D'require' name=3D'vme'/>
+      <feature policy=3D'require' name=3D'mmxext'/>
+      <feature policy=3D'require' name=3D'fxsr_opt'/>
+      <feature policy=3D'require' name=3D'cr8legacy'/>
+      <feature policy=3D'require' name=3D'ht'/>
+      <feature policy=3D'require' name=3D'3dnowprefetch'/>
+      <feature policy=3D'require' name=3D'3dnowext'/>
+      <feature policy=3D'require' name=3D'wdt'/>
+      <feature policy=3D'require' name=3D'extapic'/>
+      <feature policy=3D'require' name=3D'pdpe1gb'/>
+      <feature policy=3D'require' name=3D'osvw'/>
+      <feature policy=3D'require' name=3D'cmp_legacy'/>
+      <feature policy=3D'require' name=3D'3dnow'/>
+    </cpu>
+    <clock offset=3D'utc'/>
+    <on_poweroff>destroy</on_poweroff>
+    <on_reboot>restart</on_reboot>
+    <on_crash>restart</on_crash>
+    <devices>
+      <emulator>/usr/bin/kvm</emulator>
+      <disk type=3D'file' device=3D'disk'>
+        <driver name=3D'qemu' type=3D'raw'/>
+        <source file=3D'/dev/rbd1'/>
+        <target dev=3D'vda' bus=3D'virtio'/>
+        <alias name=3D'virtio-disk0'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' =
+function=3D'0x0'/>
+      </disk>
+      <controller type=3D'ide' index=3D'0'>
+        <alias name=3D'ide0'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x01' =
+function=3D'0x1'/>
+      </controller>
+      <interface type=3D'bridge'>
+        <mac address=3D'52:54:00:a2:c1:2d'/>
+        <source bridge=3D'br0'/>
+        <target dev=3D'vnet0'/>
+        <model type=3D'virtio'/>
+        <alias name=3D'net0'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x03' =
+function=3D'0x0'/>
+      </interface>
+      <serial type=3D'pty'>
+        <source path=3D'/dev/pts/1'/>
+        <target port=3D'0'/>
+        <alias name=3D'serial0'/>
+      </serial>
+      <console type=3D'pty' tty=3D'/dev/pts/1'>
+        <source path=3D'/dev/pts/1'/>
+        <target type=3D'serial' port=3D'0'/>
+        <alias name=3D'serial0'/>
+      </console>
+      <input type=3D'mouse' bus=3D'ps2'/>
+      <graphics type=3D'vnc' port=3D'5900' autoport=3D'yes'/>
+      <sound model=3D'ich6'>
+        <alias name=3D'sound0'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x04' =
+function=3D'0x0'/>
+      </sound>
+      <video>
+        <model type=3D'cirrus' vram=3D'9216' heads=3D'1'/>
+        <alias name=3D'video0'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x02' =
+function=3D'0x0'/>
+      </video>
+      <memballoon model=3D'virtio'>
+        <alias name=3D'balloon0'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x06' =
+function=3D'0x0'/>
+      </memballoon>
+    </devices>
+    <seclabel type=3D'dynamic' model=3D'apparmor'>
+      <label>libvirt-9ebebe7f-7dfa-4735-a80c-c19ebe4e1459</label>
+      <imagelabel>libvirt-9ebebe7f-7dfa-4735-a80c-c19ebe4e1459</imagelabel>
+    </seclabel>
+  </domain>
+
+  virsh # attach-disk base1 /var/lib/libvirt/images/extrastorage.img vdb
+  error: Failed to attach disk
+  error: operation failed: adding virtio-blk-pci,bus=3Dpci.0,addr=3D0x8,dri=
+ve=3Ddrive-virtio-disk1,id=3Dvirtio-disk1 device failed: Duplicate ID 'virt=
+io-disk1' for device
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/897750/+subscriptions
