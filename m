@@ -1,36 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49627)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49640)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alastair@au1.ibm.com>) id 1cHOul-0006wB-Lh
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 00:49:15 -0500
+	(envelope-from <alastair@au1.ibm.com>) id 1cHOum-0006xA-1e
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 00:49:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alastair@au1.ibm.com>) id 1cHOuh-0003GS-9z
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 00:49:11 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:47562
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <alastair@au1.ibm.com>) id 1cHOuh-0003Ge-CT
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 00:49:12 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:53977)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <alastair@au1.ibm.com>)
-	id 1cHOuh-0003GE-3I
+	id 1cHOuh-0003Fc-1u
 	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 00:49:07 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	uBF5mtlt072856
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
+	uBF5md5X043736
 	for <qemu-devel@nongnu.org>; Thu, 15 Dec 2016 00:49:06 -0500
 Received: from e23smtp09.au.ibm.com (e23smtp09.au.ibm.com [202.81.31.142])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 27bn7erhur-1
+	by mx0a-001b2d01.pphosted.com with ESMTP id 27bmwxhs1c-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 15 Dec 2016 00:49:06 -0500
+	for <qemu-devel@nongnu.org>; Thu, 15 Dec 2016 00:49:05 -0500
 Received: from localhost
 	by e23smtp09.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <alastair@au1.ibm.com>;
 	Thu, 15 Dec 2016 15:49:03 +1000
 From: "Alastair D'Silva" <alastair@au1.ibm.com>
-Date: Thu, 15 Dec 2016 16:48:12 +1100
+Date: Thu, 15 Dec 2016 16:48:05 +1100
 In-Reply-To: <20161215054812.12602-1-alastair@au1.ibm.com>
 References: <20161215054812.12602-1-alastair@au1.ibm.com>
-Message-Id: <20161215054812.12602-9-alastair@au1.ibm.com>
-Subject: [Qemu-devel] [PATCH v4 8/8] arm: Add an RX8900 RTC to the ASpeed
- board
+Message-Id: <20161215054812.12602-2-alastair@au1.ibm.com>
+Subject: [Qemu-devel] [PATCH v4 1/8] arm: Uniquely name imx25 I2C buses.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,99 +38,48 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-arm@nongnu.org
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, Andrew Jeffery <andrew@aj.id.au>, Joel Stanley <joel@jms.id.au>, Alastair D'Silva <alastair@d-silva.org>, Chris Smart <chris@distroguy.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, Andrew Jeffery <andrew@aj.id.au>, Joel Stanley <joel@jms.id.au>, Alastair D'Silva <alastair@d-silva.org>
 
 From: Alastair D'Silva <alastair@d-silva.org>
 
-Connect an RX8900 RTC to i2c12 of the AST2500 SOC at address 0x32
+The imx25 chip provides 3 i2c buses, but they have all been named
+"i2c", which makes it difficult to predict which bus a device will
+be connected to when specified on the command line.
+
+This patch addresses the issue by naming the buses uniquely:
+  i2c-bus.0 i2c-bus.1 i2c-bus.2
 
 Signed-off-by: Alastair D'Silva <alastair@d-silva.org>
-Signed-off-by: Chris Smart <chris@distroguy.com>
 ---
- hw/arm/aspeed.c | 29 +++++++++++++++++++++++++++++
- 1 file changed, 29 insertions(+)
+ hw/arm/imx25_pdk.c | 2 +-
+ hw/i2c/imx_i2c.c   | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
-index 40c1383..ef63fd0 100644
---- a/hw/arm/aspeed.c
-+++ b/hw/arm/aspeed.c
-@@ -26,6 +26,12 @@ static struct arm_boot_info aspeed_board_binfo = {
-     .nb_cpus = 1,
- };
- 
-+typedef struct AspeedI2CDevice {
-+    const char *type;
-+    uint8_t address;
-+    int bus;
-+} AspeedI2CDevice;
-+
- typedef struct AspeedBoardState {
-     AspeedSoCState soc;
-     MemoryRegion ram;
-@@ -37,6 +43,7 @@ typedef struct AspeedBoardConfig {
-     const char *fmc_model;
-     const char *spi_model;
-     uint32_t num_cs;
-+    const AspeedI2CDevice *i2c_devices;
- } AspeedBoardConfig;
- 
- enum {
-@@ -80,6 +87,11 @@ enum {
-         SCU_AST2500_HW_STRAP_ACPI_ENABLE |                              \
-         SCU_HW_STRAP_SPI_MODE(SCU_HW_STRAP_SPI_MASTER))
- 
-+
-+static const AspeedI2CDevice ast2500_i2c_devices[] = {
-+        {"rx8900", 0x32, 11}
-+};
-+
- static const AspeedBoardConfig aspeed_boards[] = {
-     [PALMETTO_BMC] = {
-         .soc_name  = "ast2400-a1",
-@@ -94,6 +106,7 @@ static const AspeedBoardConfig aspeed_boards[] = {
-         .fmc_model = "n25q256a",
-         .spi_model = "mx25l25635e",
-         .num_cs    = 1,
-+        .i2c_devices = ast2500_i2c_devices,
-     },
-     [ROMULUS_BMC]  = {
-         .soc_name  = "ast2500-a1",
-@@ -104,6 +117,7 @@ static const AspeedBoardConfig aspeed_boards[] = {
-     },
- };
- 
-+
- static void aspeed_board_init_flashes(AspeedSMCState *s, const char *flashtype,
-                                       Error **errp)
- {
-@@ -130,6 +144,19 @@ static void aspeed_board_init_flashes(AspeedSMCState *s, const char *flashtype,
+diff --git a/hw/arm/imx25_pdk.c b/hw/arm/imx25_pdk.c
+index 025b608..44e741f 100644
+--- a/hw/arm/imx25_pdk.c
++++ b/hw/arm/imx25_pdk.c
+@@ -139,7 +139,7 @@ static void imx25_pdk_init(MachineState *machine)
+          * of simple qtest. See "make check" for details.
+          */
+         i2c_create_slave((I2CBus *)qdev_get_child_bus(DEVICE(&s->soc.i2c[0]),
+-                                                      "i2c"),
++                                                      "i2c-bus.0"),
+                          "ds1338", 0x68);
      }
  }
- 
-+static void aspeed_i2c_init(AspeedBoardState *bmc,
-+        const AspeedBoardConfig *cfg)
-+{
-+    AspeedSoCState *soc = &bmc->soc;
-+    const AspeedI2CDevice *dev;
-+
-+    for (dev = cfg->i2c_devices; dev != NULL && dev->type != NULL; dev++) {
-+        I2CBus *i2c_bus = aspeed_i2c_get_bus((DeviceState *)&soc->i2c,
-+                                             dev->bus);
-+        (void)i2c_create_slave(i2c_bus, dev->type, dev->address);
-+    }
-+}
-+
- static void aspeed_board_init(MachineState *machine,
-                               const AspeedBoardConfig *cfg)
- {
-@@ -174,6 +201,8 @@ static void aspeed_board_init(MachineState *machine,
-     aspeed_board_binfo.ram_size = ram_size;
-     aspeed_board_binfo.loader_start = sc->info->sdram_base;
- 
-+    aspeed_i2c_init(bmc, cfg);
-+
-     arm_load_kernel(ARM_CPU(first_cpu), &aspeed_board_binfo);
+diff --git a/hw/i2c/imx_i2c.c b/hw/i2c/imx_i2c.c
+index 37e5a62..6c81b98 100644
+--- a/hw/i2c/imx_i2c.c
++++ b/hw/i2c/imx_i2c.c
+@@ -310,7 +310,7 @@ static void imx_i2c_realize(DeviceState *dev, Error **errp)
+                           IMX_I2C_MEM_SIZE);
+     sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->iomem);
+     sysbus_init_irq(SYS_BUS_DEVICE(dev), &s->irq);
+-    s->bus = i2c_init_bus(DEVICE(dev), "i2c");
++    s->bus = i2c_init_bus(DEVICE(dev), NULL);
  }
  
+ static void imx_i2c_class_init(ObjectClass *klass, void *data)
 -- 
 2.9.3
