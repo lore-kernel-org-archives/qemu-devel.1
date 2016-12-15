@@ -1,32 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43180)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43376)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wouter@grep.be>) id 1cHZDu-0007MV-Bs
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 11:49:39 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cHZET-0001AL-64
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 11:50:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wouter@grep.be>) id 1cHZDr-0000TC-A9
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 11:49:38 -0500
-Received: from [2a01:4f8:140:52e5::2] (port=40745 helo=latin.grep.be)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <wouter@grep.be>) id 1cHZDr-0000S6-3K
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 11:49:35 -0500
-Date: Thu, 15 Dec 2016 17:49:17 +0100
-From: Wouter Verhelst <w@uter.be>
-Message-ID: <20161215164917.2zzkdwxarf4pnfle@grep.be>
-References: <5e9150ed-2127-f2e8-f9db-a514e8f0ddf8@virtuozzo.com>
-	<5E697C22-5FBB-49A2-A018-A6B96E29FE84@alex.org.uk>
-	<94ef3ef2-b76f-fa5d-cbaf-8990ce2b1be8@virtuozzo.com>
-	<20161214181323.mehzfmlf6z4pyajp@grep.be>
-	<D71CECFD-E513-4372-BB54-BF8D8D521292@alex.org.uk>
-	<3D392E31-DDA4-4316-B26D-871E94A83935@alex.org.uk>
-	<20161214201858.lblzw2ayddidxfyp@grep.be>
-	<58F412AB-8A4C-403F-AEE2-D2FB958D447A@alex.org.uk>
-	<20161215150312.dmxrxn7ujzq3apy6@grep.be>
-	<78C8A0CB-717D-4925-8AA8-A085DC1F9FB7@alex.org.uk>
+	(envelope-from <dgilbert@redhat.com>) id 1cHZEQ-0000pR-4n
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 11:50:13 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34436)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cHZEP-0000ok-Sb
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 11:50:10 -0500
+Date: Thu, 15 Dec 2016 16:50:02 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20161215165001.GP2509@work-vm>
+References: <1481742422-15969-1-git-send-email-ashijeetacharya@gmail.com>
+	<1481742422-15969-2-git-send-email-ashijeetacharya@gmail.com>
+	<20161215152914.GL2509@work-vm>
+	<CAC2QTZZxEfy0YU2uEjt-P3VrJJWPzGfUW-mvFyyrAiiBQ6LorA@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <78C8A0CB-717D-4925-8AA8-A085DC1F9FB7@alex.org.uk>
-Subject: Re: [Qemu-devel] [Nbd] [PATCH] Further tidy-up on block status
+In-Reply-To: <CAC2QTZZxEfy0YU2uEjt-P3VrJJWPzGfUW-mvFyyrAiiBQ6LorA@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 1/3] migration: Add a new option to enable
+ only-migratable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,56 +30,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Bligh <alex@alex.org.uk>
-Cc: "nbd-general@lists.sourceforge.net" <nbd-general@lists.sourceforge.net>, Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Stefan stefanha@redhat. com" <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Denis V . Lunev" <den@openvz.org>, John Snow <jsnow@redhat.com>
+To: Ashijeet Acharya <ashijeetacharya@gmail.com>
+Cc: John Snow <jsnow@redhat.com>, amit.shah@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, quintela@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>, marcandre.lureau@redhat.com, groug@kaod.org, aneesh.kumar@linux.vnet.ibm.com, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Thu, Dec 15, 2016 at 04:32:23PM +0000, Alex Bligh wrote:
-> Wouter,
+* Ashijeet Acharya (ashijeetacharya@gmail.com) wrote:
+> On Thu, Dec 15, 2016 at 8:59 PM, Dr. David Alan Gilbert
+> <dgilbert@redhat.com> wrote:
+> > * Ashijeet Acharya (ashijeetacharya@gmail.com) wrote:
+> >> Add a new option "--only-migratable" in qemu which will allow to add
+> >> only those devices which will not fail qemu after migration. Devices
+> >> set with the flag 'unmigratable' cannot be added when this option will
+> >> be used.
+> >>
+> >> Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
+> >> ---
+> >>  include/migration/migration.h |  3 +++
+> >>  qemu-options.hx               | 10 ++++++++++
+> >>  vl.c                          |  4 ++++
+> >>  3 files changed, 17 insertions(+)
+> >>
+> >> diff --git a/include/migration/migration.h b/include/migration/migration.h
+> >> index c309d23..40b3697 100644
+> >> --- a/include/migration/migration.h
+> >> +++ b/include/migration/migration.h
+> >> @@ -38,6 +38,9 @@
+> >>  #define QEMU_VM_COMMAND              0x08
+> >>  #define QEMU_VM_SECTION_FOOTER       0x7e
+> >>
+> >> +/* for vl.c */
+> >> +extern int only_migratable;
+> >> +
+> >>  struct MigrationParams {
+> >>      bool blk;
+> >>      bool shared;
+> >> diff --git a/qemu-options.hx b/qemu-options.hx
+> >> index c534a2f..7cc2cc5 100644
+> >> --- a/qemu-options.hx
+> >> +++ b/qemu-options.hx
+> >> @@ -3574,6 +3574,16 @@ be used to change settings (such as migration parameters) prior to issuing
+> >>  the migrate_incoming to allow the migration to begin.
+> >>  ETEXI
+> >>
+> >> +DEF("only-migratable", 0, QEMU_OPTION_only_migratable, \
+> >> +    "-only-migratable     allow only migratable devices\n", QEMU_ARCH_ALL)
+> >> +STEXI
+> >> +@item -only-migratable
+> >> +@findex -only-migratable
+> >> +Don't allow adding devices that will fail QEMU after migration. Devices set with
+> >> +the flag unmigratable are not allowed to be added neither statically nor
+> >> +dynamically
+> >> +ETEXI
+> >
+> > Can I suggest rewording that as:
+> > Only allow migratable devices.  Devices will not be allowed to enter an unmigratable
+> > state.
 > 
-> > This reads a bit awkward. I would do:
-> > 
-> > s/save that:/except as explained below/
+> No problem, will fix that in v2.
 > 
-> Possibly a British English thing. Will fix.
-
-It's mostly that the "save that:" suggests to me that the exception
-follows immediately (i.e., in the next paragraph). As you wrote it, it
-doesn't; it shows up in the paragraph after that, with a "however"
-clause. This was very confusing; I had to read it several times before I
-understood what you wanted to say.
-
-> >>    If one or more queries are sent, then the server MUST return
-> >>    those metadata contexts that are available to the client to
-> >>    select on the given export with `NBD_OPT_SET_META_CONTEXT`,
-> >>    and which match one or more of the queries given. The
-> >>    support of wildcarding within the leaf-name portion of
-> >>    the query string is dependent upon the namespace.
-> >> 
-> >>    In either case, however, for any given namespace the
-> >>    server MAY, instead of exhaustively listing every
-> >>    matching context available to select (or every context
-> >>    available to select where no query is given), send
-> >>    sufficient context records back to allow a client with
-> >>    knowledge of the namespace to select any context. Each
-> >>    namespace returned MUST still satisfy the rules for
-> >>    namespaces (i.e. they must begin with the relevant
-> >>    namespace, followed by a colon, then printable non-whitespace
-> >>    UTF-8 characters,
-> > 
-> > Why restrict to non-whitespace characters? (printable makes sense...)
+> >>  DEF("nodefaults", 0, QEMU_OPTION_nodefaults, \
+> >>      "-nodefaults     don't create default devices\n", QEMU_ARCH_ALL)
+> >>  STEXI
+> >> diff --git a/vl.c b/vl.c
+> >> index d77dd86..82bffb9 100644
+> >> --- a/vl.c
+> >> +++ b/vl.c
+> >> @@ -180,6 +180,7 @@ bool boot_strict;
+> >>  uint8_t *boot_splash_filedata;
+> >>  size_t boot_splash_filedata_size;
+> >>  uint8_t qemu_extra_params_fw[2];
+> >> +int only_migratable = 0; /* turn it off unless user states otherwise */
+> >>
+> >>  int icount_align_option;
+> >>
+> >> @@ -3914,6 +3915,9 @@ int main(int argc, char **argv, char **envp)
+> >>                  }
+> >>                  incoming = optarg;
+> >>                  break;
+> >> +            case QEMU_OPTION_only_migratable:
+> >> +                only_migratable = 1;
+> >> +                break;
+> >>              case QEMU_OPTION_nodefaults:
+> >>                  has_defaults = 0;
+> >>                  break;
+> >
+> > Does this need to go in the 'first pass of option parsing' loop
+> > to make sure that it doesn't matter which order it's in and it
+> > stops other devices on the command line?
 > 
-> Because the namespaces and leaf-names are already restricted to
-> non-whitespace characters. I thought having tabs, line feeds,
-> returns, em-space, en-space etc. was not particularly useful.
-> I could be persuaded to relent re spaces.
+> I am not sure what you meant by order here;
+> 
+> Do you mean the order as in the place --only-migratable is used,
+> 
+> 1. ./bin/qemu-system-x86_64 -m 1024 -name f15 -device
+> nec-usb-xhci,id=xhci -device usb-uas,id=uas,bus=xhci.0
+> --only-migratable
+> 2. ./bin/qemu-system-x86_64 -m 1024 -name f15 --only-migratable
+> -device nec-usb-xhci,id=xhci -device usb-uas,id=uas,bus=xhci.0
+> 
+> Because I have tested both and they seem to be working equally fine.
+> Sorry if I understood wrong.
 
-I could imagine that the context might include as part of its name a
-user-defined bit. If we're going to disallow whitespace, then that would
-mean namespaces would have to do all sorts of escaping etc. I don't
-think that's a good idea.
+If that works OK that's fine, no change needed.
 
--- 
-< ron> I mean, the main *practical* problem with C++, is there's like a dozen
-       people in the world who think they really understand all of its rules,
-       and pretty much all of them are just lying to themselves too.
- -- #debian-devel, OFTC, 2016-02-12
+Dave
+
+> 
+> Ashijeet
+> 
+> > Dave
+> >
+> >> --
+> >> 2.6.2
+> >>
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
