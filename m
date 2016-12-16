@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37744)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40013)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cHtLw-0004uJ-LH
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 09:19:17 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cHtSY-00010s-Ir
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 09:26:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cHtLv-0005me-LT
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 09:19:16 -0500
-Received: from mail-ua0-x233.google.com ([2607:f8b0:400c:c08::233]:35965)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cHtLv-0005m7-Gn
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 09:19:15 -0500
-Received: by mail-ua0-x233.google.com with SMTP id 3so23844870uaz.3
-	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 06:19:15 -0800 (PST)
+	(envelope-from <mreitz@redhat.com>) id 1cHtSX-00014r-JI
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 09:26:06 -0500
+References: <1479835586-74394-1-git-send-email-vsementsov@virtuozzo.com>
+	<1479835586-74394-8-git-send-email-vsementsov@virtuozzo.com>
+	<b80f7704-75c4-6390-aacf-d3af1e7853c7@redhat.com>
+	<eb802f93-aeb6-9ec2-651a-f41a4d4902ff@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <0de07570-68fd-432c-fdb6-5c065ac7cc43@redhat.com>
+Date: Fri, 16 Dec 2016 15:25:53 +0100
 MIME-Version: 1.0
-In-Reply-To: <1481894559-13974-2-git-send-email-marcin.krzeminski@nokia.com>
-References: <1481894559-13974-1-git-send-email-marcin.krzeminski@nokia.com>
-	<1481894559-13974-2-git-send-email-marcin.krzeminski@nokia.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 16 Dec 2016 14:18:54 +0000
-Message-ID: <CAFEAcA-ODRCg1t=6iFBE5oue8X5GSHDXYWV2uy6sFttE8_tG6Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [RFC 1/3] nvic: Add CPU numebr property
+In-Reply-To: <eb802f93-aeb6-9ec2-651a-f41a4d4902ff@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="XrbXvSgN5sR3WoKTEA6wVNnoHm2QgwRIC"
+Subject: Re: [Qemu-devel] [PATCH 07/21] qcow2: add bitmaps extension
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,34 +26,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Krzeminski, Marcin (Nokia - PL/Wroclaw)" <marcin.krzeminski@nokia.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, rfsw-patches@mlist.nokia.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
 
-On 16 December 2016 at 13:22,  <marcin.krzeminski@nokia.com> wrote:
-> From: Marcin Krzeminski <marcin.krzeminski@nokia.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--XrbXvSgN5sR3WoKTEA6wVNnoHm2QgwRIC
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com,
+ famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
+Message-ID: <0de07570-68fd-432c-fdb6-5c065ac7cc43@redhat.com>
+Subject: Re: [PATCH 07/21] qcow2: add bitmaps extension
+References: <1479835586-74394-1-git-send-email-vsementsov@virtuozzo.com>
+ <1479835586-74394-8-git-send-email-vsementsov@virtuozzo.com>
+ <b80f7704-75c4-6390-aacf-d3af1e7853c7@redhat.com>
+ <eb802f93-aeb6-9ec2-651a-f41a4d4902ff@virtuozzo.com>
+In-Reply-To: <eb802f93-aeb6-9ec2-651a-f41a4d4902ff@virtuozzo.com>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Transfer-Encoding: quoted-printable
+
+On 14.12.2016 13:23, Vladimir Sementsov-Ogievskiy wrote:
+> 07.12.2016 21:25, Max Reitz wrote:
+>> On 22.11.2016 18:26, Vladimir Sementsov-Ogievskiy wrote:
+>>> Add bitmap extension as specified in docs/specs/qcow2.txt.
+>>> For now, just mirror extension header into Qcow2 state and check
+>>> constraints.
+>>>
+>>> For now, disable image resize if it has bitmaps. It will be fixed lat=
+er.
+>>>
+>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com=
 >
-> In case of MultiCPU SoC M3 is not always CPU0.
-> This commit add cpu_id property to allow set CPU
-> number for NVIC model. Also address space that this used
-> by NVIC is updated to mach CPU's one.
->
-> Signed-off-by: Marcin Krzeminski <marcin.krzeminski@nokia.com>
+>>> Reviewed-by: John Snow <jsnow@redhat.com>
+>>> ---
+>>>   block/qcow2.c | 107
+>>> ++++++++++++++++++++++++++++++++++++++++++++++++++++++++--
+>>>   block/qcow2.h |  24 +++++++++++++
+>>>   2 files changed, 129 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/block/qcow2.c b/block/qcow2.c
+>>> index 6d5689a..7908657 100644
+>>> --- a/block/qcow2.c
+>>> +++ b/block/qcow2.c
+>>> @@ -63,6 +63,7 @@ typedef struct {
+>>>   #define  QCOW2_EXT_MAGIC_END 0
+>>>   #define  QCOW2_EXT_MAGIC_BACKING_FORMAT 0xE2792ACA
+>>>   #define  QCOW2_EXT_MAGIC_FEATURE_TABLE 0x6803f857
+>>> +#define  QCOW2_EXT_MAGIC_BITMAPS 0x23852875
+>>>     static int qcow2_probe(const uint8_t *buf, int buf_size, const
+>>> char *filename)
+>>>   {
+>>> @@ -92,6 +93,7 @@ static int qcow2_read_extensions(BlockDriverState
+>>> *bs, uint64_t start_offset,
+>>>       QCowExtension ext;
+>>>       uint64_t offset;
+>>>       int ret;
+>>> +    Qcow2BitmapHeaderExt bitmaps_ext;
+>>>     #ifdef DEBUG_EXT
+>>>       printf("qcow2_read_extensions: start=3D%ld end=3D%ld\n",
+>>> start_offset, end_offset);
+>>> @@ -162,6 +164,81 @@ static int
+>>> qcow2_read_extensions(BlockDriverState *bs, uint64_t start_offset,
+>>>               }
+>>>               break;
+>>>   +        case QCOW2_EXT_MAGIC_BITMAPS:
+>>> +            if (ext.len !=3D sizeof(bitmaps_ext)) {
+>>> +                error_setg_errno(errp, -ret, "bitmaps_ext: "
+>>> +                                 "Invalid extension length");
+>>> +                return -EINVAL;
+>>> +            }
+>>> +
+>>> +            if (!(s->autoclear_features & QCOW2_AUTOCLEAR_BITMAPS)) =
+{
+>>> +                fprintf(stderr,
+>>> +                        "WARNING: a program lacking bitmap support
+>>> modified "
+>>> +                        "this file, so all bitmaps are now considere=
+d "
+>>> +                        "inconsistent");
+>>> +                break;
+>>> +            }
+>> I think It would be nice if qemu-img check could remove all bitmaps an=
+d
+>> related data if this bit is not set. Otherwise, we're practically
+>> leaking data.
+>=20
+> Is it safe? Can old version somehow reuse these clusters?
 
-The right fix for this I think is probably for the NVIC to
-have an actual pointer to its CPU object, which the armv7m_init
-code sets up (perhaps with QOM links?) when it creates the CPU
-and the NVIC. The two really do need to be closely coupled,
-and the CPU already has a pointer to its NVIC. There's
-no need for the NVIC to get the CPU pointer by looking it up
-by CPU ID.
+You're right, it can. It's not so easy then.
 
-Once I've got the GICv3 virtualization out of the way, the
-next thing on my todo list is to pick up the NVIC refactoring
-that Michael Davidsaver posted last year:
- https://lists.nongnu.org/archive/html/qemu-devel/2015-12/msg00504.html
-which makes some moves in that direction (though it doesn't
-init the NVIC's CPU pointer with a link, it just assumes
-first_cpu).
+>                                                           Actually, all=
 
-thanks
--- PMM
+> data will be removed on check, as there will be no refcounts if this bi=
+t
+> is not set.
+
+The refcounts will be there, but no references, right. So an old
+qemu-img check -r leaks will free the clusters.
+
+We could still remove this extension field, right? Then the clusters are
+at least really leaked so that even a new qemu-img check -r leaks will
+free them.
+
+> So, IMHO, only extension header should be deleted additionally in
+> qemu-img check.
+
+I think we could remove it here instead of only in qemu-img check, but
+either way should be fine. Doing it in qemu-img check is probably
+cleaner, actually.
+
+If you do it there, however, the warning should probably include a hint
+like "(Use 'qemu-img check -r leaks' to reclaim the space used for the
+bitmaps)".
+
+Max
+
+
+--XrbXvSgN5sR3WoKTEA6wVNnoHm2QgwRIC
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlhT+XESHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AsMEH+QFkIedcH7L9t7fDhsLnqeVeapwDzxD3
+4EhSDi9jfiTfaqYtOoyyFYW5eJppNFwgLJaqzgEvnNRk84nxxgcaOPoCKl6tGTuZ
+6AwjetTczlOFotkS7AZNyrK36y+gClsrOE6EbnhC1X8parUmObvOL414TNhYkl9z
+AzNMXkQEdT+X6t5fFsV/4JtrJgLTzLrDlLVwFryqFIFkr/XIiODeWB/5A7G/+VOv
+WJgxHMVvGPB6L19z0gHmCLFreQp0F9Z4k+v4GbBvHaiDURB9cB7ueQTzwqgX2hsG
+yJnx1Jf5LbVkODmBCWMTfGhB96Yr/RmFiB0YPuU3oKD8lVGhVLGvyxM=
+=4VZ8
+-----END PGP SIGNATURE-----
+
+--XrbXvSgN5sR3WoKTEA6wVNnoHm2QgwRIC--
