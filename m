@@ -1,18 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37498)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47830)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liang.z.li@intel.com>) id 1cHgh5-0003k6-2P
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 19:48:15 -0500
+	(envelope-from <dave.hansen@intel.com>) id 1cHh1S-00005D-Lw
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 20:09:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liang.z.li@intel.com>) id 1cHgh2-0001Ru-08
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 19:48:15 -0500
-Received: from mga02.intel.com ([134.134.136.20]:8694)
+	(envelope-from <dave.hansen@intel.com>) id 1cHh1N-0003qk-NY
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 20:09:18 -0500
+Received: from mga02.intel.com ([134.134.136.20]:32514)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <liang.z.li@intel.com>)
-	id 1cHgh1-0001Pt-KM
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 19:48:11 -0500
-From: "Li, Liang Z" <liang.z.li@intel.com>
-Date: Fri, 16 Dec 2016 00:48:07 +0000
-Message-ID: <F2CBF3009FA73547804AE4C663CAB28E3C32985A@shsmsx102.ccr.corp.intel.com>
+	(Exim 4.71) (envelope-from <dave.hansen@intel.com>)
+	id 1cHh1N-0003q9-EK
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 20:09:13 -0500
 References: <1480495397-23225-1-git-send-email-liang.z.li@intel.com>
 	<f67ca79c-ad34-59dd-835f-e7bc9dcaef58@redhat.com>
 	<F2CBF3009FA73547804AE4C663CAB28E3A130C01@shsmsx102.ccr.corp.intel.com>
@@ -27,11 +24,14 @@ References: <1480495397-23225-1-git-send-email-liang.z.li@intel.com>
 	<060287c7-d1af-45d5-70ea-ad35d4bbeb84@intel.com>
 	<F2CBF3009FA73547804AE4C663CAB28E3C31D0E6@SHSMSX104.ccr.corp.intel.com>
 	<01886693-c73e-3696-860b-086417d695e1@intel.com>
-In-Reply-To: <01886693-c73e-3696-860b-086417d695e1@intel.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	<F2CBF3009FA73547804AE4C663CAB28E3C32985A@shsmsx102.ccr.corp.intel.com>
+From: Dave Hansen <dave.hansen@intel.com>
+Message-ID: <f517bfbe-18b8-6962-5c57-545f6ef47ad0@intel.com>
+Date: Thu, 15 Dec 2016 17:09:10 -0800
 MIME-Version: 1.0
+In-Reply-To: <F2CBF3009FA73547804AE4C663CAB28E3C32985A@shsmsx102.ccr.corp.intel.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PATCH kernel v5 0/5] Extend virtio-balloon for
  fast (de)inflating & fast live migration
 List-Id: <qemu-devel.nongnu.org>
@@ -42,56 +42,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Hansen, Dave" <dave.hansen@intel.com>, Andrea Arcangeli <aarcange@redhat.com>
+To: "Li, Liang Z" <liang.z.li@intel.com>, Andrea Arcangeli <aarcange@redhat.com>
 Cc: David Hildenbrand <david@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mhocko@suse.com" <mhocko@suse.com>, "mst@redhat.com" <mst@redhat.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>
 
-> Subject: Re: [Qemu-devel] [PATCH kernel v5 0/5] Extend virtio-balloon for
-> fast (de)inflating & fast live migration
->=20
-> On 12/14/2016 12:59 AM, Li, Liang Z wrote:
-> >> Subject: Re: [Qemu-devel] [PATCH kernel v5 0/5] Extend virtio-balloon
-> >> for fast (de)inflating & fast live migration
-> >>
-> >> On 12/08/2016 08:45 PM, Li, Liang Z wrote:
-> >>> What's the conclusion of your discussion? It seems you want some
-> >>> statistic before deciding whether to  ripping the bitmap from the
-> >>> ABI, am I right?
-> >>
-> >> I think Andrea and David feel pretty strongly that we should remove
-> >> the bitmap, unless we have some data to support keeping it.  I don't
-> >> feel as strongly about it, but I think their critique of it is pretty
-> >> valid.  I think the consensus is that the bitmap needs to go.
-> >>
-> >> The only real question IMNHO is whether we should do a power-of-2 or
-> >> a length.  But, if we have 12 bits, then the argument for doing
-> >> length is pretty strong.  We don't need anywhere near 12 bits if doing
-> power-of-2.
-> >
-> > Just found the MAX_ORDER should be limited to 12 if use length instead
-> > of order, If the MAX_ORDER is configured to a value bigger than 12, it
-> > will make things more complex to handle this case.
-> >
-> > If use order, we need to break a large memory range whose length is
-> > not the power of 2 into several small ranges, it also make the code com=
-plex.
->=20
-> I can't imagine it makes the code that much more complex.  It adds a for =
-loop.
-> Right?
->=20
+On 12/15/2016 04:48 PM, Li, Liang Z wrote:
+>>> It seems we leave too many bit  for the pfn, and the bits leave for
+>>> length is not enough, How about keep 45 bits for the pfn and 19 bits
+>>> for length, 45 bits for pfn can cover 57 bits physical address, that should be
+>> enough in the near feature.
+>>> What's your opinion?
+>> I still think 'order' makes a lot of sense.  But, as you say, 57 bits is enough for
+>> x86 for a while.  Other architectures.... who knows?
 
-Yes, just a little. :)
+Thinking about this some more...  There are really only two cases that
+matter: 4k pages and "much bigger" ones.
 
-> > It seems we leave too many bit  for the pfn, and the bits leave for
-> > length is not enough, How about keep 45 bits for the pfn and 19 bits
-> > for length, 45 bits for pfn can cover 57 bits physical address, that sh=
-ould be
-> enough in the near feature.
-> >
-> > What's your opinion?
->=20
-> I still think 'order' makes a lot of sense.  But, as you say, 57 bits is =
-enough for
-> x86 for a while.  Other architectures.... who knows?
+Squeezing each 4k page into 8 bytes of metadata helps guarantee that
+this scheme won't regress over the old scheme in any cases.  For bigger
+ranges, 8 vs 16 bytes means *nothing*.  And 16 bytes will be as good or
+better than the old scheme for everything which is >4k.
 
-Yes.=20
+How about this:
+ * 52 bits of 'pfn', 5 bits of 'order', 7 bits of 'length'
+ * One special 'length' value to mean "actual length in next 8 bytes"
+
+That should be pretty simple to produce and decode.  We have two record
+sizes, but I think it is manageable.
