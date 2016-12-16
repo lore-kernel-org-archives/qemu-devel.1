@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44039)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46938)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cHtfv-0002dC-VT
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 09:39:56 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cHtlF-0002BQ-50
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 09:45:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cHtfv-0001ox-9H
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 09:39:56 -0500
-Received: from mail-ua0-x22d.google.com ([2607:f8b0:400c:c08::22d]:35791)
+	(envelope-from <peter.maydell@linaro.org>) id 1cHtlE-00055A-9z
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 09:45:25 -0500
+Received: from mail-ua0-x236.google.com ([2607:f8b0:400c:c08::236]:35272)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cHtfv-0001oV-5U
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 09:39:55 -0500
-Received: by mail-ua0-x22d.google.com with SMTP id 12so39782756uas.2
-	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 06:39:55 -0800 (PST)
+	id 1cHtlE-000550-4k
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 09:45:24 -0500
+Received: by mail-ua0-x236.google.com with SMTP id 12so39935529uas.2
+	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 06:45:24 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1480003738-8754-8-git-send-email-Lena.Djokic@rt-rk.com>
+In-Reply-To: <1480003738-8754-5-git-send-email-Lena.Djokic@rt-rk.com>
 References: <1480003738-8754-1-git-send-email-Lena.Djokic@rt-rk.com>
-	<1480003738-8754-8-git-send-email-Lena.Djokic@rt-rk.com>
+	<1480003738-8754-5-git-send-email-Lena.Djokic@rt-rk.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 16 Dec 2016 14:39:34 +0000
-Message-ID: <CAFEAcA-Y8+QUuxT1sf84K_6WFEzU9diJRB=Jfa60SbxgoGitRQ@mail.gmail.com>
+Date: Fri, 16 Dec 2016 14:45:02 +0000
+Message-ID: <CAFEAcA_D6efAX_Hcy4LeTsVvhA1dMAks14v5zptyw-5wvmFarA@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v2 7/7] linux-user: Fix mq_open
+Subject: Re: [Qemu-devel] [PATCH v2 4/7] linux-user: Fix fcnt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,49 +33,61 @@ To: Lena Djokic <Lena.Djokic@rt-rk.com>
 Cc: QEMU Developers <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>
 
 On 24 November 2016 at 16:08, Lena Djokic <Lena.Djokic@rt-rk.com> wrote:
-> If fourth argument is NULL it should be passed without
-> using lock_user function which would, in that case, return
-> EFAULT, and system call supports passing NULL as fourth argument.
+
+Making the subject line "linux-user: fix F_GETSIG and F_SETSIG fcntls"
+would be a bit more precise about what we're fixing here and I think
+that will be helpful for people looking back in the git log later.
+
+> F_GETSIG and F_SETSIG were implemented with default behaviour which
+> simply passes given arguments to fcntl syscall, but since those
+> arguments are signals used for communication between taget and
+
+typo: "target"
+
+> host we need conversion which is done by using host_to_target signal
+> and taget_to_host_signal functions.
+
+"target"
+
 >
 > Signed-off-by: Lena Djokic <Lena.Djokic@rt-rk.com>
 > ---
->  linux-user/syscall.c | 11 ++++++++---
->  1 file changed, 8 insertions(+), 3 deletions(-)
+>  linux-user/syscall.c | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
 >
 > diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index 3faf4f0..dad03e9 100644
+> index 41873ca..1b59a71 100644
 > --- a/linux-user/syscall.c
 > +++ b/linux-user/syscall.c
-> @@ -11694,17 +11694,22 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
->      case TARGET_NR_mq_open:
->          {
->              struct mq_attr posix_mq_attr;
-> +            struct mq_attr *pposix_mq_attr;
->              int host_flags;
+> @@ -6544,14 +6544,18 @@ static abi_long do_fcntl(int fd, int cmd, abi_ulong arg)
 >
->              host_flags = target_to_host_bitmask(arg2, fcntl_flags_tbl);
-> -            if (copy_from_user_mq_attr(&posix_mq_attr, arg4) != 0) {
-> -                goto efault;
-> +            pposix_mq_attr = NULL;
-> +            if (arg4) {
-> +                if (copy_from_user_mq_attr(&posix_mq_attr, arg4) != 0) {
-> +                    goto efault;
-> +                }
-> +                pposix_mq_attr = &posix_mq_attr;
->              }
->              p = lock_user_string(arg1 - 1);
->              if (!p) {
->                  goto efault;
->              }
-> -            ret = get_errno(mq_open(p, host_flags, arg3, &posix_mq_attr));
-> +            ret = get_errno(mq_open(p, host_flags, arg3, pposix_mq_attr));
->              unlock_user (p, arg1, 0);
->          }
+>      case TARGET_F_SETOWN:
+>      case TARGET_F_GETOWN:
+> -    case TARGET_F_SETSIG:
+> -    case TARGET_F_GETSIG:
+>      case TARGET_F_SETLEASE:
+>      case TARGET_F_GETLEASE:
+>      case TARGET_F_SETPIPE_SZ:
+>      case TARGET_F_GETPIPE_SZ:
+>          ret = get_errno(safe_fcntl(fd, host_cmd, arg));
 >          break;
-> --
-> 2.7.4
+> +    case TARGET_F_GETSIG:
+> +        ret = host_to_target_signal(get_errno(fcntl(fd, host_cmd, arg)));
+> +        break;
+> +    case TARGET_F_SETSIG:
+> +        ret = get_errno(fcntl(fd, host_cmd, target_to_host_signal(arg)));
+> +        break;
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+This is basically right, but I suggest some minor changes:
+ * put these special cases above the long list of 'just call fcntl'
+   cases, not below it
+ * these should both call safe_fcntl(), not fcntl()
+ * don't call host_to_target_signal() unless we know the call
+   succeeded (compare the code used for TARGET_F_GETLK, TARGET_F_GETFL, etc)
+
+>
+>      default:
+>          ret = get_errno(safe_fcntl(fd, cmd, arg));
 
 thanks
 -- PMM
