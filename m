@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36456)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37093)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhongjun@sangfor.com.cn>) id 1cHq79-0002kt-16
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 05:51:48 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cHqAO-0002Uo-CO
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 05:55:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhongjun@sangfor.com.cn>) id 1cHq75-0002If-2o
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 05:51:47 -0500
-Received: from mr213107.mail.yeah.net ([223.252.213.107]:17852)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhongjun@sangfor.com.cn>) id 1cHq73-0002GB-KO
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 05:51:43 -0500
-Date: Fri, 16 Dec 2016 18:14:57 +0800
-From: "zhongjun@sangfor.com.cn" <zhongjun@sangfor.com.cn>
-References: <20161216075527.5421-1-zhongjun@sangfor.com.cn>,
-	<698b3cd4-0eeb-7739-e692-58615fc40956@redhat.com>
-Mime-Version: 1.0
-Message-ID: <201612161814568867144@sangfor.com.cn>
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel] [PATCH 1/1] scsi-disk: passthrough VERIFY command
+	(envelope-from <pbonzini@redhat.com>) id 1cHqAI-0003hi-AH
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 05:55:08 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47474)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cHqAI-0003gq-4s
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 05:55:02 -0500
+References: <20161216082322.14160-1-hangaohuai@huawei.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <e85f9602-6914-9664-f3fa-cd37db89caff@redhat.com>
+Date: Fri, 16 Dec 2016 11:54:58 +0100
+MIME-Version: 1.0
+In-Reply-To: <20161216082322.14160-1-hangaohuai@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3] bugfix: vm halt when in reset looping
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,47 +26,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+To: hangaohuai <hangaohuai@huawei.com>, qemu-devel@nongnu.org
+Cc: mst@redhat.com, arei.gonglei@huawei.com
 
-WWVzLCBpdCdzIGFsc28gd29yay4NClNvIHlvdSBwcmVmZXIgdGhlIGxhdHRlcj8NCg0KDQoNCnpo
-b25nanVuQHNhbmdmb3IuY29tLmNuDQogDQpGcm9tOiBQYW9sbyBCb256aW5pDQpEYXRlOiAyMDE2
-LTEyLTE2IDE4OjEwDQpUbzogSnVubGlhbiBCZWxsDQpDQzogcWVtdS1kZXZlbA0KU3ViamVjdDog
-UmU6IFtQQVRDSCAxLzFdIHNjc2ktZGlzazogcGFzc3Rocm91Z2ggVkVSSUZZIGNvbW1hbmQNCiAN
-CiANCk9uIDE2LzEyLzIwMTYgMDg6NTUsIEp1bmxpYW4gQmVsbCB3cm90ZToNCj4gV2hlbiBhIHNj
-c2ktZGlzayBvYmplY3QgcmVjZWl2ZXMgVkVSSUZZIGNvbW1hbmQgd2l0aCBCWVRDSEsgYml0IGJl
-aW5nIHplcm8sDQo+IHNjc2lfYmxvY2tfaXNfcGFzc3Rocm91Z2ggcmV0dXJucyBmYWxzZSBhbmQg
-ZmluYWxseSBtYWtlcyByZXEgYmVpbmcgcHJvY2VlZGVkDQo+IGJ5IHNjc2lfYmxvY2tfZG1hX2Nv
-bW1hbmQuIEJlY2F1c2Ugc2NzaV9ibG9ja19kbWFfY29tbWFuZCBoYXMgcmVtb3ZlZCBwcm9jZXNz
-DQo+IG9mIFZFUklGWSwgUUVNVSB3aWxsIGFib3J0IGluIHRoaXMgZnVuY3Rpb24uDQo+IA0KPiBU
-aGlzIHBhdGNoIG1ha2VzIGFsbCBWRVJJRlkgcGFzc3Rocm91Z2ggdG8gc29sdmUgdGhpcyBwcm9i
-bG9tLg0KPiANCj4gU2lnbmVkLW9mZi1ieTogSnVubGlhbiBCZWxsIDx6aG9uZ2p1bkBzYW5nZm9y
-LmNvbS5jbj4NCj4gLS0tDQo+ICBody9zY3NpL3Njc2ktZGlzay5jIHwgNyAtLS0tLS0tDQo+ICAx
-IGZpbGUgY2hhbmdlZCwgNyBkZWxldGlvbnMoLSkNCj4gDQo+IGRpZmYgLS1naXQgYS9ody9zY3Np
-L3Njc2ktZGlzay5jIGIvaHcvc2NzaS9zY3NpLWRpc2suYw0KPiBpbmRleCBhOTYzMTkxMzhhLi5m
-MzBmOTdmOTc2IDEwMDY0NA0KPiAtLS0gYS9ody9zY3NpL3Njc2ktZGlzay5jDQo+ICsrKyBiL2h3
-L3Njc2kvc2NzaS1kaXNrLmMNCj4gQEAgLTI2OTAsMTMgKzI2OTAsNiBAQCBzdGF0aWMgYm9vbCBz
-Y3NpX2Jsb2NrX2lzX3Bhc3N0aHJvdWdoKFNDU0lEaXNrU3RhdGUgKnMsIHVpbnQ4X3QgKmJ1ZikN
-Cj4gICAgICBjYXNlIFZFUklGWV8xMDoNCj4gICAgICBjYXNlIFZFUklGWV8xMjoNCj4gICAgICBj
-YXNlIFZFUklGWV8xNjoNCj4gLSAgICAgICAgLyogQ2hlY2sgaWYgQllUQ0hLID09IDB4MDEgKGRh
-dGEtb3V0IGJ1ZmZlciBjb250YWlucyBkYXRhDQo+IC0gICAgICAgICAqIGZvciB0aGUgbnVtYmVy
-IG9mIGxvZ2ljYWwgYmxvY2tzIHNwZWNpZmllZCBpbiB0aGUgbGVuZ3RoDQo+IC0gICAgICAgICAq
-IGZpZWxkKS4gIEZvciBvdGhlciBtb2RlcywgZG8gbm90IHVzZSBzY2F0dGVyL2dhdGhlciBvcGVy
-YXRpb24uDQo+IC0gICAgICAgICAqLw0KPiAtICAgICAgICBpZiAoKGJ1ZlsxXSAmIDYpICE9IDIp
-IHsNCj4gLSAgICAgICAgICAgIHJldHVybiBmYWxzZTsNCj4gLSAgICAgICAgfQ0KPiAgICAgICAg
-ICBicmVhazsNCj4gIA0KPiAgICAgIGNhc2UgUkVBRF82Og0KPiANCiANCkRvZXMgdGhpcyB3b3Jr
-IHRvbz8NCiANCmRpZmYgLS1naXQgYS9ody9zY3NpL3Njc2ktZGlzay5jIGIvaHcvc2NzaS9zY3Np
-LWRpc2suYw0KaW5kZXggYTk2MzE5MS4uNjc2MTY0ZCAxMDA2NDQNCi0tLSBhL2h3L3Njc2kvc2Nz
-aS1kaXNrLmMNCisrKyBiL2h3L3Njc2kvc2NzaS1kaXNrLmMNCkBAIC0yMTU3LDYgKzIxNTcsMTMg
-QEAgc3RhdGljIGludDMyX3Qgc2NzaV9kaXNrX2RtYV9jb21tYW5kKFNDU0lSZXF1ZXN0DQoqcmVx
-LCB1aW50OF90ICpidWYpDQogICAgICAgICBEUFJJTlRGKCJXcml0ZSAlcyhzZWN0b3IgJSIgUFJJ
-ZDY0ICIsIGNvdW50ICV1KVxuIiwNCiAgICAgICAgICAgICAgICAgKGNvbW1hbmQgJiAweGUpID09
-IDB4ZSA/ICJBbmQgVmVyaWZ5ICIgOiAiIiwNCiAgICAgICAgICAgICAgICAgci0+cmVxLmNtZC5s
-YmEsIGxlbik7DQorICAgIGNhc2UgVkVSSUZZXzEwOg0KKyAgICBjYXNlIFZFUklGWV8xMjoNCisg
-ICAgY2FzZSBWRVJJRllfMTY6DQorICAgICAgICAvKiBXZSBnZXQgaGVyZSBvbmx5IGZvciBCWVRD
-SEs9MDAgYW5kIG9ubHkgZm9yIHNjc2ktYmxvY2suICBBcw0KKyAgICAgICAgICogZmFyIGFzIERN
-QSBpcyBjb25jZXJuZWQsIHdlIGNhbiB0cmVhdCBpdCBhcyBhIHdyaXRlLCBhbmQNCisgICAgICAg
-ICAqIHNjc2lfYmxvY2tfZG9fc2dpbyB3aWxsIHNlbmQgVkVSSUZZIGNvbW1hbmRzLg0KKyAgICAg
-ICAgICovDQogICAgICAgICBpZiAoci0+cmVxLmNtZC5idWZbMV0gJiAweGUwKSB7DQogICAgICAg
-ICAgICAgZ290byBpbGxlZ2FsX3JlcXVlc3Q7DQogICAgICAgICB9DQogDQpUaGFua3MsDQogDQpQ
-YW9sbw0K
+
+
+On 16/12/2016 09:23, hangaohuai wrote:
+> reset mc146818rtc device when RESET event happens.
+> 
+> Fix the problem:
+>   1. Guest boot the second cpu, set CMOS_RESET_CODE 0x0a to protect selfboot;
+>   2. VM being reset by others, hmp_system_reset;
+>   3. seabios resume check the CMOS_RESET_CODE, if 0x0a, jump to the BDA
+>      resume execution by jump via 40h:0067h;
+>   4. Guest halt;
+> 
+> Signed-off-by: hangaohuai <hangaohuai@huawei.com>
+> ---
+>  hw/timer/mc146818rtc.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+> 
+> diff --git a/hw/timer/mc146818rtc.c b/hw/timer/mc146818rtc.c
+> index da209d0..341b233 100644
+> --- a/hw/timer/mc146818rtc.c
+> +++ b/hw/timer/mc146818rtc.c
+> @@ -946,11 +946,22 @@ static Property mc146818rtc_properties[] = {
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>  
+> +static void rtc_resetdev(DeviceState *d)
+> +{
+> +    RTCState *s = MC146818_RTC(d);
+> +
+> +    /* Reason: VM do suspend self will set 0xfe
+> +     * Only handle the VM boot case */
+> +    if (s->cmos_data[0x0f] == 0x0a)
+> +        s->cmos_data[0x0f] = 0x00;
+> +}
+
+Let's just do it for all values other than 0xfe.  Also, please run
+checkpatch.pl on your patch.
+
+Paolo
+
+>  static void rtc_class_initfn(ObjectClass *klass, void *data)
+>  {
+>      DeviceClass *dc = DEVICE_CLASS(klass);
+>  
+>      dc->realize = rtc_realizefn;
+> +    dc->reset = rtc_resetdev;
+>      dc->vmsd = &vmstate_rtc;
+>      dc->props = mc146818rtc_properties;
+>      /* Reason: needs to be wired up by rtc_init() */
+> 
