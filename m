@@ -1,31 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52463)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53599)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cHnqu-0006EW-1i
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 03:26:52 -0500
+	(envelope-from <bounces@canonical.com>) id 1cHnv1-0002fL-RG
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 03:31:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cHnqq-0002zl-Tr
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 03:26:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59178)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1cHnqq-0002xx-Nm
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 03:26:48 -0500
-References: <20161214142518.10504-1-stefanha@redhat.com>
-	<20161215063226-mutt-send-email-mst@kernel.org>
-	<20161215075028.GD26169@stefanha-x1.localdomain>
-	<1481793479.21413.6.camel@redhat.com>
-	<20161215170523-mutt-send-email-mst@kernel.org>
-	<1481819150.21413.21.camel@redhat.com>
-	<20161215202505-mutt-send-email-mst@kernel.org>
-	<20161215211838-mutt-send-email-mst@kernel.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <d6eb5b6d-3e8b-be10-33b6-289ef1ffec1a@redhat.com>
-Date: Fri, 16 Dec 2016 09:26:43 +0100
+	(envelope-from <bounces@canonical.com>) id 1cHnuy-0007LW-O7
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 03:31:07 -0500
+Received: from indium.canonical.com ([91.189.90.7]:44822)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cHnuy-0007Jd-JZ
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 03:31:04 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cHnux-0006By-79
+	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 08:31:03 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 333242E8043
+	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 08:31:03 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20161215211838-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] regression in 2.8: unable to exit screen grab in
- SDL mode
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 16 Dec 2016 08:19:16 -0000
+From: Thomas Huth <922076@bugs.launchpad.net>
+Reply-To: Bug 922076 <922076@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20120126133438.17636.69999.malonedeb@soybean.canonical.com>
+Message-Id: <20161216081917.20904.80719.launchpad@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 922076] Re: doesn't clear screen on boot
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,37 +36,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Cole Robinson <crobinso@redhat.com>
+To: qemu-devel@nongnu.org
 
-On 15.12.2016 20:19, Michael S. Tsirkin wrote:
-> On Thu, Dec 15, 2016 at 09:15:27PM +0200, Michael S. Tsirkin wrote:
->> On Thu, Dec 15, 2016 at 05:25:50PM +0100, Gerd Hoffmann wrote:
->>>   Hi,
->>>
->>>>>>> The problem always reproduces for me:
->>>>>>> - start qemu with -sdl
->>>>>>> - wait for guest to boot
->>>>>>> - click anywhere within guest screen
->>>>>>> - message "press ctrl+alt to exit capture" appears on screen,
->>>>>>>   but pressing that immediately restarts capture again
->>>
->>> [ 2.6 good, 2.7, 2.8 bad ]
->>>
->>>> I'd say SDL is mostly useless with this bug.
->>>>
->>>> Do we fix this or disable SDL altogether?
->>>
->>> Well, it can't be *that* bad, otherwise it would not went unnoticed for
->>> a whole release cycle.
->>
->> That's what I'm saying, maybe no one uses SDL anymore.
+** Changed in: qemu
+       Status: Incomplete =3D> Triaged
 
-It's maybe not as common as the GTK interface, but as far as I know
-people still use the SDL interface. For example here:
+-- =
 
- https://bugs.launchpad.net/qemu/+bug/922076
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/922076
 
-... so I would recommend to keep the SDL code in QEMU.
+Title:
+  doesn't clear screen on boot
 
- Thomas
+Status in QEMU:
+  Triaged
+
+Bug description:
+  When I start Linux in Qemu via "qemu -kernel /vmlinuz ...", Qemu
+  window appears and it shows message "Starting Seabios (version
+  0.5.1-2010...)", and then Linux writes messages like "Loading, please
+  wait..." on top of previous message!
+
+  For example, I can see "Loading, please wait...on 0.5.1-2010...)"
+
+  So, Qemu doesn't clean screan before booting OS.
+
+  Moreover, when I start Linux via "qemu /disk-image", Qemu shows
+  "Starting Seabios (version 0.5.1-2010...)", then switches to graphical
+  mode, shows GRUB, then switches back to text mode and shows "Starting
+  Seabios" again! And again Linux prints messages on top of Seabios
+  messages, and we see a mix of symbols on screen.
+
+  Also, I found another bug! I am learning now to write kernels. And I
+  see that operator "*(char *)0xb8000 =3D 0" in C code of kernel doesn't
+  clean first charaster of screen in Qemu in "-curses" mode! If I want
+  to real clean this charaster, I must type "*(char *)0xb8000 =3D ' '".
+
+  I attach a kernel (x86, multiboot) with this bug. Just type "make"
+  (you need gcc) and "qemu -curses -kernel kernel". You will see that
+  screen is not cleared, but kernel tries to clean it. If you change 0
+  to ' ', all will work!
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/922076/+subscriptions
