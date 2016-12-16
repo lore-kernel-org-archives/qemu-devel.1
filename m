@@ -1,33 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38858)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39249)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cHqF5-0004Xf-1p
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 06:00:00 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cHqGi-0005YS-81
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 06:01:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cHqF1-00063N-5b
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 05:59:59 -0500
-Received: from indium.canonical.com ([91.189.90.7]:43082)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cHqF0-00062z-W9
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 05:59:55 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cHqEz-00089D-AX
-	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 10:59:53 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 4DED82E80C7
-	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 10:59:53 +0000 (UTC)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cHqGe-0006vA-9q
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 06:01:40 -0500
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:35372)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1cHqGe-0006ut-0R
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 06:01:36 -0500
+Received: by mail-wm0-x244.google.com with SMTP id a20so4662959wme.2
+	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 03:01:35 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <94eb2c0bfa1c6a9fec0543057483@google.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <66919538-7a30-73aa-7b55-13fdf59156cc@redhat.com>
+Date: Fri, 16 Dec 2016 12:01:32 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 16 Dec 2016 10:47:53 -0000
-From: "Bernhard M. Wiedemann" <691424@bugs.launchpad.net>
-Reply-To: Bug 691424 <691424@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20101217063430.31066.66219.malonedeb@palladium.canonical.com>
-Message-Id: <20161216104753.20769.2997.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 691424] Re: qemu/kvm SDL over ssh -X broken
+In-Reply-To: <94eb2c0bfa1c6a9fec0543057483@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] target-i386: Fix eflags.TF/#DB handling of
+ syscall/sysret insns
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,84 +31,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Doug Evans <dje@google.com>, qemu-devel@nongnu.org, rth@twiddle.net
 
-It seems to be working now with current versions, so has probably been
-fixed somewhere.
 
--- =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/691424
+On 07/12/2016 00:06, Doug Evans wrote:
+> Hi.
+> 
+> While qemu's behaviour matches what one would expect from reading
+> the docs, it does not match what I'm seeing on h/w.
+> Can anyone else confirm what the correct behaviour is here?
+> 
+> ---
+> 
+> The syscall and sysret instructions behave a bit differently:
+> TF is checked after the instruction completes.
+> This allows the o/s to disable #DB at a syscall by adding TF to FMASK.
+> And then when the sysret is executed the #DB is taken "as if" the
+> syscall insn just completed.
+> 
+> Signed-off-by: Doug Evans <dje@google.com>
+> ---
+>  target-i386/bpt_helper.c | 12 ++++++++++++
+>  target-i386/helper.h     |  1 +
+>  target-i386/translate.c  | 29 ++++++++++++++++++++++++-----
+>  3 files changed, 37 insertions(+), 5 deletions(-)
+> 
+> diff --git a/target-i386/bpt_helper.c b/target-i386/bpt_helper.c
+> index 6fd7fe0..d771461 100644
+> --- a/target-i386/bpt_helper.c
+> +++ b/target-i386/bpt_helper.c
+> @@ -244,6 +244,18 @@ void helper_single_step(CPUX86State *env)
+>      raise_exception(env, EXCP01_DB);
+>  }
+> 
+> +void helper_rechecking_single_step(CPUX86State *env)
+> +{
+> +    if ((env->eflags & TF_MASK) != 0)
+> +    {
+> +#ifndef CONFIG_USER_ONLY
+> +        check_hw_breakpoints(env, true);
+> +        env->dr[6] |= DR6_BS;
+> +#endif
+> +        raise_exception(env, EXCP01_DB);
+> +    }
 
-Title:
-  qemu/kvm SDL over ssh -X broken
+Please call helper_single_step here.  Also, a comment on coding
+style---the brace goes on the same line as the "if".  You can use
+scripts/checkpatch.pl to check the form of your patch.
 
-Status in QEMU:
-  Incomplete
+Do not use your email client to send patches, as that might result in
+format=flowed messages which look good in the client but cannot be
+processed by the tools.  Use git send-email instead.
 
-Bug description:
-  qemu/kvm by default uses SDL to render the output of its emulated VGA gra=
-phics.
-  This is broken over ssh -X since quite a while.
-  The only workaround I know, is to use qemu -vnc :0
-  and connect using vncviewer
+Thanks,
 
-  =
+Paolo
 
-  How To Reproduce:
-  1. zypper in qemu
-  2. ssh -X localhost qemu -cdrom ANYISOFILE
-
-  Actual Results:
-  qemu hangs in an endless loop on the BIOS display screen
-
-  Expected Results:
-  should boot up the iso as 0.10 versions did
-
-  Reproducible: Always
-
-  =
-
-  this is what broke it:
-  $ git bisect bad
-  c18a2c360e3100bbd71162cf922dcd8c429a8b71 is first bad commit
-  commit c18a2c360e3100bbd71162cf922dcd8c429a8b71
-  Author: Stefano Stabellini <stefano.stabellini@eu.citrix.com>
-  Date:   Wed Jun 24 11:58:25 2009 +0100
-
-      sdl zooming
-
-      Hi all,
-      this patch implements zooming capabilities for the sdl interface.
-      A new sdl_zoom_blit function is added that is able to scale and blit a
-      portion of a surface into another.
-      This way we can enable SDL_RESIZABLE and have a real_screen surface w=
-ith
-      a different size than the guest surface and let sdl_zoom_blit take ca=
-re
-      of the problem.
-
-      Signed-off-by: Stefano Stabellini <stefano.stabellini@eu.citrix.com>
-      Signed-off-by: Anthony Liguori <aliguori@us.ibm.com>
-
-  :100644 100644 a06c9bfc22cc6de1c6e5e9068d6bf59d89613767 f8dc5065dd27010bf=
-dbb6bcfb0c6e3af25024cdb M      Makefile
-  :100644 100644 417217582363a87ee67e746ba798e285a64b6cdc 35183399f65de6f50=
-f3baa4767ab7d4d11d45bca M      console.h
-  :100644 100644 178b5532b8d9dd2194a8662fbfdcd49b4bc04222 d81399e51276e1c97=
-fa1f7272ef16ea4c312b51b M      sdl.c
-  :000000 100644 0000000000000000000000000000000000000000 56d3604fc3d79e4cc=
-4622be8437c78bf70075da3 A      sdl_zoom.c
-  :000000 100644 0000000000000000000000000000000000000000 33dc63408b43a37fd=
-6b1acde3fa62b1a51315e75 A      sdl_zoom.h
-  :000000 100644 0000000000000000000000000000000000000000 64bbca849bd3af678=
-c2259b4d8cc0e48c6a6b43c A      sdl_zoom_template.h
-
-  =
-
-  This problem occurs on both Debian and openSUSE.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/691424/+subscriptions
+> +}
+> +
+>  void helper_set_dr(CPUX86State *env, int reg, target_ulong t0)
+>  {
+>  #ifndef CONFIG_USER_ONLY
+> diff --git a/target-i386/helper.h b/target-i386/helper.h
+> index 4e859eb..bd9b2cf 100644
+> --- a/target-i386/helper.h
+> +++ b/target-i386/helper.h
+> @@ -79,6 +79,7 @@ DEF_HELPER_2(cmpxchg16b_unlocked, void, env, tl)
+>  DEF_HELPER_2(cmpxchg16b, void, env, tl)
+>  #endif
+>  DEF_HELPER_1(single_step, void, env)
+> +DEF_HELPER_1(rechecking_single_step, void, env)
+>  DEF_HELPER_1(cpuid, void, env)
+>  DEF_HELPER_1(rdtsc, void, env)
+>  DEF_HELPER_1(rdtscp, void, env)
+> diff --git a/target-i386/translate.c b/target-i386/translate.c
+> index 9fd1a04..42d036e 100644
+> --- a/target-i386/translate.c
+> +++ b/target-i386/translate.c
+> @@ -2500,8 +2500,10 @@ static void gen_bnd_jmp(DisasContext *s)
+>  }
+> 
+>  /* Generate an end of block. Trace exception is also generated if needed.
+> -   If IIM, set HF_INHIBIT_IRQ_MASK if it isn't already set.  */
+> -static void gen_eob_inhibit_irq(DisasContext *s, bool inhibit)
+> +   If INHIBIT, set HF_INHIBIT_IRQ_MASK if it isn't already set.
+> +   If RECHECK_TF, emit a rechecking helper for #DB, ignoring the state of
+> +   S->TF.  This is used by the syscall/sysret insns.  */
+> +static void gen_eob_worker(DisasContext *s, bool inhibit, bool recheck_tf)
+>  {
+>      gen_update_cc_op(s);
+> 
+> @@ -2517,6 +2519,9 @@ static void gen_eob_inhibit_irq(DisasContext *s,
+> bool inhibit)
+>      }
+>      if (s->singlestep_enabled) {
+>          gen_helper_debug(cpu_env);
+> +    } else if (recheck_tf) {
+> +        gen_helper_rechecking_single_step(cpu_env);
+> +        tcg_gen_exit_tb(0);
+>      } else if (s->tf) {
+>          gen_helper_single_step(cpu_env);
+>      } else {
+> @@ -2525,10 +2530,17 @@ static void gen_eob_inhibit_irq(DisasContext *s,
+> bool inhibit)
+>      s->is_jmp = DISAS_TB_JUMP;
+>  }
+> 
+> +/* End of block.
+> +   If INHIBIT, set HF_INHIBIT_IRQ_MASK if it isn't already set.  */
+> +static void gen_eob_inhibit_irq(DisasContext *s, bool inhibit)
+> +{
+> +    gen_eob_worker(s, inhibit, false);
+> +}
+> +
+>  /* End of block, resetting the inhibit irq flag.  */
+>  static void gen_eob(DisasContext *s)
+>  {
+> -    gen_eob_inhibit_irq(s, false);
+> +    gen_eob_worker(s, false, false);
+>  }
+> 
+>  /* generate a jump to eip. No segment change must happen before as a
+> @@ -7108,7 +7120,10 @@ static target_ulong disas_insn(CPUX86State *env,
+> DisasContext *s,
+>          if (s->lma) {
+>              set_cc_op(s, CC_OP_EFLAGS);
+>          }
+> -        gen_eob(s);
+> +        /* TF handling for the syscall insn is different. The TF bit is
+> checked
+> +           after the syscall insn completes. This allows #DB to not be
+> +           generated after one has entered CPL0 if TF is set in FMASK.  */
+> +        gen_eob_worker(s, false, true);
+>          break;
+>      case 0x107: /* sysret */
+>          if (!s->pe) {
+> @@ -7119,7 +7134,11 @@ static target_ulong disas_insn(CPUX86State *env,
+> DisasContext *s,
+>              if (s->lma) {
+>                  set_cc_op(s, CC_OP_EFLAGS);
+>              }
+> -            gen_eob(s);
+> +            /* TF handling for the sysret insn is different. The TF bit is
+> +               checked after the sysret insn completes. This allows #DB
+> to be
+> +               generated "as if" the syscall insn in userspace has just
+> +               completed.  */
+> +            gen_eob_worker(s, false, true);
+>          }
+>          break;
+>  #endif
