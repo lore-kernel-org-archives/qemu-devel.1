@@ -1,22 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54698)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55427)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <leif.lindholm@linaro.org>) id 1cHuM2-0003IT-2o
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 10:23:27 -0500
+	(envelope-from <groug@kaod.org>) id 1cHuOq-0003yB-Da
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 10:26:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <leif.lindholm@linaro.org>) id 1cHuM0-00017A-Vp
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 10:23:25 -0500
-Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:35564)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <leif.lindholm@linaro.org>)
-	id 1cHuM0-00016b-PC
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 10:23:24 -0500
-Received: by mail-wm0-x22b.google.com with SMTP id a197so36857633wmd.0
-	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 07:23:22 -0800 (PST)
-From: Leif Lindholm <leif.lindholm@linaro.org>
-Date: Fri, 16 Dec 2016 15:23:19 +0000
-Message-Id: <20161216152319.12494-1-leif.lindholm@linaro.org>
-Subject: [Qemu-devel] [PATCH] smbios: stop ignoring command line options for
- TARGET_ARM
+	(envelope-from <groug@kaod.org>) id 1cHuOm-0002Rn-EC
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 10:26:20 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53236
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cHuOm-0002RR-9E
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 10:26:16 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
+	uBGFOVE5119539
+	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 10:26:15 -0500
+Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 27c62bk4vn-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 10:26:15 -0500
+Received: from localhost
+	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
+	Fri, 16 Dec 2016 08:26:14 -0700
+From: Greg Kurz <groug@kaod.org>
+Date: Fri, 16 Dec 2016 16:26:09 +0100
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <148190196925.25504.12830466137601571123.stgit@bahia>
+Subject: [Qemu-devel] [PATCH for-2.9 v3] qapi: add explicit null to string
+ input and output visitors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,75 +40,79 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: David Gibson <david@gibson.dropbear.id.au>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-Commit c30e1565 ("smbios: implement smbios support for mach-virt")
-enabled automatic generation of SMBIOS tables for TARGET_ARM, and
-actually provides data for the "virt" machine.
+This may be used for deprecated object properties that are kept for
+backwards compatibility.
 
-However, do_smbios_option() still had an #ifdef TARGET_I386, preventing
-any -smbios command line options from being parsed for any non-x86
-targets.
-Change this to use a status variable instead of compile-time filtering.
-
-Signed-off-by: Leif Lindholm <leif.lindholm@linaro.org>
+Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
+v3: - input visitor to error out if !siv->string
 
-Verified on ARM mach-virt with UEFI shell "smbiosview" command and QEMU
-command line parameter -smbios type=0,version=foobar.
+v2: - input visitor to reject non-empty strings
+---
+ qapi/string-input-visitor.c  |   11 +++++++++++
+ qapi/string-output-visitor.c |   14 ++++++++++++++
+ 2 files changed, 25 insertions(+)
 
- arch_init.c                | 6 +++---
- include/hw/smbios/smbios.h | 2 ++
- vl.c                       | 2 ++
- 3 files changed, 7 insertions(+), 3 deletions(-)
-
-diff --git a/arch_init.c b/arch_init.c
-index 5cc58b2..d4e28c0 100644
---- a/arch_init.c
-+++ b/arch_init.c
-@@ -250,9 +250,9 @@ void do_acpitable_option(const QemuOpts *opts)
- 
- void do_smbios_option(QemuOpts *opts)
- {
--#ifdef TARGET_I386
--    smbios_entry_add(opts);
--#endif
-+    if (smbios_override) {
-+        smbios_entry_add(opts);
-+    }
+diff --git a/qapi/string-input-visitor.c b/qapi/string-input-visitor.c
+index 8dfa5612522b..7a4efe32e346 100644
+--- a/qapi/string-input-visitor.c
++++ b/qapi/string-input-visitor.c
+@@ -314,6 +314,16 @@ static void parse_type_number(Visitor *v, const char *name, double *obj,
+     *obj = val;
  }
  
- int kvm_available(void)
-diff --git a/include/hw/smbios/smbios.h b/include/hw/smbios/smbios.h
-index 1cd53cc..2a3dca2 100644
---- a/include/hw/smbios/smbios.h
-+++ b/include/hw/smbios/smbios.h
-@@ -267,4 +267,6 @@ void smbios_get_tables(const struct smbios_phys_mem_area *mem_array,
-                        const unsigned int mem_array_size,
-                        uint8_t **tables, size_t *tables_len,
-                        uint8_t **anchor, size_t *anchor_len);
++static void parse_type_null(Visitor *v, const char *name, Error **errp)
++{
++    StringInputVisitor *siv = to_siv(v);
 +
-+extern int smbios_override;
- #endif /* QEMU_SMBIOS_H */
-diff --git a/vl.c b/vl.c
-index d77dd86..8e71b06 100644
---- a/vl.c
-+++ b/vl.c
-@@ -159,6 +159,7 @@ int smp_cpus = 1;
- int max_cpus = 1;
- int smp_cores = 1;
- int smp_threads = 1;
-+int smbios_override = 0;
- int acpi_enabled = 1;
- int no_hpet = 0;
- int fd_bootchk = 1;
-@@ -3711,6 +3712,7 @@ int main(int argc, char **argv, char **envp)
-                 if (!opts) {
-                     exit(1);
-                 }
-+                smbios_override = 1;
-                 do_smbios_option(opts);
-                 break;
-             case QEMU_OPTION_fwcfg:
--- 
-2.10.2
++    if (!siv->string || siv->string[0]) {
++        error_setg(errp, QERR_INVALID_PARAMETER_TYPE, name ? name : "null",
++                   "null");
++    }
++}
++
+ static void parse_optional(Visitor *v, const char *name, bool *present)
+ {
+     StringInputVisitor *siv = to_siv(v);
+@@ -348,6 +358,7 @@ Visitor *string_input_visitor_new(const char *str)
+     v->visitor.type_bool = parse_type_bool;
+     v->visitor.type_str = parse_type_str;
+     v->visitor.type_number = parse_type_number;
++    v->visitor.type_null = parse_type_null;
+     v->visitor.start_list = start_list;
+     v->visitor.next_list = next_list;
+     v->visitor.end_list = end_list;
+diff --git a/qapi/string-output-visitor.c b/qapi/string-output-visitor.c
+index 94ac8211d144..5ec5352ca87c 100644
+--- a/qapi/string-output-visitor.c
++++ b/qapi/string-output-visitor.c
+@@ -266,6 +266,19 @@ static void print_type_number(Visitor *v, const char *name, double *obj,
+     string_output_set(sov, g_strdup_printf("%f", *obj));
+ }
+ 
++static void print_type_null(Visitor *v, const char *name, Error **errp)
++{
++    StringOutputVisitor *sov = to_sov(v);
++    char *out;
++
++    if (sov->human) {
++        out = g_strdup("<null>");
++    } else {
++        out = g_strdup("");
++    }
++    string_output_set(sov, out);
++}
++
+ static void
+ start_list(Visitor *v, const char *name, GenericList **list, size_t size,
+            Error **errp)
+@@ -351,6 +364,7 @@ Visitor *string_output_visitor_new(bool human, char **result)
+     v->visitor.type_bool = print_type_bool;
+     v->visitor.type_str = print_type_str;
+     v->visitor.type_number = print_type_number;
++    v->visitor.type_null = print_type_null;
+     v->visitor.start_list = start_list;
+     v->visitor.next_list = next_list;
+     v->visitor.end_list = end_list;
