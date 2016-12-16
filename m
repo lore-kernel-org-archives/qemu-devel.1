@@ -1,30 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39924)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40502)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cHoUc-0005nM-94
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 04:07:55 -0500
+	(envelope-from <imammedo@redhat.com>) id 1cHoWw-0004jE-OX
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 04:10:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cHoUY-0007vq-Vy
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 04:07:54 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41974)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cHoUY-0007vR-OA
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 04:07:50 -0500
-Received: from int-mx10.intmail.prod.int.phx2.redhat.com
-	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DF13380E4A
-	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 09:07:49 +0000 (UTC)
-Date: Fri, 16 Dec 2016 10:07:46 +0100
+	(envelope-from <imammedo@redhat.com>) id 1cHoWv-0000gr-OU
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 04:10:18 -0500
+Date: Fri, 16 Dec 2016 10:10:05 +0100
 From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20161216100746.553bb47e@nial.brq.redhat.com>
-In-Reply-To: <1480980749-182204-1-git-send-email-imammedo@redhat.com>
-References: <1480980749-182204-1-git-send-email-imammedo@redhat.com>
+Message-ID: <20161216101005.008a1ff3@nial.brq.redhat.com>
+In-Reply-To: <20161215162405.zh5s3qnlvlpftjel@kamzik.brq.redhat.com>
+References: <20161213214522.25548-1-drjones@redhat.com>
+	<20161213214522.25548-8-drjones@redhat.com>
+	<20161215154555.6137b8f7@nial.brq.redhat.com>
+	<20161215162405.zh5s3qnlvlpftjel@kamzik.brq.redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.9 00/10] pc: acpi: memory hotplug
- cleanup/consolidation
+Subject: Re: [Qemu-devel] [PATCH 07/11] hw/arm/virt: pass VirtMachineState
+ instead of VirtGuestInfo
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,82 +26,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Andrew Jones <drjones@redhat.com>
+Cc: peter.maydell@linaro.org, ehabkost@redhat.com, mst@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, zhaoshenglong@huawei.com
 
-On Tue,  6 Dec 2016 00:32:19 +0100
-Igor Mammedov <imammedo@redhat.com> wrote:
+On Thu, 15 Dec 2016 17:24:05 +0100
+Andrew Jones <drjones@redhat.com> wrote:
 
-> Series cleanups and consolidates scattered memory hotplug
-> code so it could be easily reused by ARM target later.
-> 
-> As result:
->  * added memory hotplug variant to bios tables test
->  * all ACPI related parts of memory hotplug are consolidated
->    within memory_hotplug.c
->  * DSDT table size is reduced ~900 bytes when memory hotplug
->    is not enabled (by not generating not used AML)
->  * DSDT table size is reduced on 12 bytes per slot
->    (i.e. up to ~3000 bytes savings for 256 DIMMs) with memory hotplug
->    enabled due AML reorganization that makes calls to common functions
->    smaller as devices and common functions are now within the same scope.
-> 
-> Tested with following guests:
->   - RHEL7.3, WS2008DC, WS2008R2DC, WS2012R2DC, WS2016TP5 - no regressions found
->   - XP3 and WS2003 - boots fine even if memhotplug is enabled (but otherwise
->     it never worked as memhp is not supported there)
-> 
-> Git tree for testing:
->   https://github.com/imammedo/qemu.git memhp_consolidate_v1
-> viewing:
->   https://github.com/imammedo/qemu/commits/memhp_consolidate_v1
-> 
-> Note to maintaner:
->   * blobs patch 2/10 should be merged to patch 1/10
->   * ACPI tables should be regenarated and applied after series is merged
->     as DSDT will cange for all tests cases due removal of inactive
->     memory hotplug code.
-> 
-> CC: "Michael S. Tsirkin" <mst@redhat.com>
-> CC: Eduardo Habkost <ehabkost@redhat.com>
-> CC: Marcel Apfelbaum <marcel@redhat.com>
+> On Thu, Dec 15, 2016 at 03:45:55PM +0100, Igor Mammedov wrote:
+> > On Tue, 13 Dec 2016 22:45:18 +0100
+> > Andrew Jones <drjones@redhat.com> wrote:
+> >   
+> > > Only two functions take VirtGuestInfo parameters. Now that guest-info
+> > > is part of VirtMachineState, and VirtMachineState is defined in the
+> > > virt header, pass that instead.
+> > > 
+> > > Signed-off-by: Andrew Jones <drjones@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-ping,
-
-Michael, Marcel
- Could you take a look
-
- 
-> Igor Mammedov (10):
->   tests: pc: add memory hotplug acpi tables tests
->   tests: pc: acpi: add SRAT and DSDT blobs for memory hotplug variant
->   memhp: move build_memory_hotplug_aml() into memory_hotplug.c
->   memhp: move build_memory_devices() into memory_hotplug.c
->   memhp: consolidate scattered MHPD device declaration
->   memhp: merge build_memory_devices() into build_memory_hotplug_aml()
->   memhp: move GPE handler_E03 into build_memory_hotplug_aml()
->   memhp: move memory hotplug only defines to memory_hotplug.c
->   memhp: don't generate memory hotplug AML if it's not enabled/supported
->   memhp: move DIMM devices into dedicated scope with related common
->     methods
+> > > ---
+> > >  hw/arm/virt-acpi-build.c | 3 ++-
+> > >  hw/arm/virt.c            | 8 ++++----
+> > >  include/hw/arm/virt.h    | 2 +-
+> > >  3 files changed, 7 insertions(+), 6 deletions(-)
+> > > 
+> > > diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+> > > index db44e2dd5f12..f7ce6aeed307 100644
+> > > --- a/hw/arm/virt-acpi-build.c
+> > > +++ b/hw/arm/virt-acpi-build.c
+> > > @@ -822,8 +822,9 @@ static const VMStateDescription vmstate_virt_acpi_build = {
+> > >      },
+> > >  };
+> > >  
+> > > -void virt_acpi_setup(VirtGuestInfo *guest_info)
+> > > +void virt_acpi_setup(VirtMachineState *vms)
+> > >  {
+> > > +    VirtGuestInfo *guest_info = &vms->acpi_guest_info;
+> > >      AcpiBuildTables tables;
+> > >      AcpiBuildState *build_state;
+> > >  
+> > > diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> > > index 7860fade52f1..bcf8a2954c16 100644
+> > > --- a/hw/arm/virt.c
+> > > +++ b/hw/arm/virt.c
+> > > @@ -1156,9 +1156,9 @@ static void *machvirt_dtb(const struct arm_boot_info *binfo, int *fdt_size)
+> > >      return board->fdt;
+> > >  }
+> > >  
+> > > -static void virt_build_smbios(VirtGuestInfo *guest_info)
+> > > +static void virt_build_smbios(VirtMachineState *vms)  
+> > Looks like all it needs is 'fw_cfg'
+> > If there aren't plans to use more data from VirtMachineState,
+> > just passing fw_cfg should be enough.  
 > 
->  include/hw/acpi/memory_hotplug.h    |  12 +-
->  include/hw/acpi/pc-hotplug.h        |  23 --
->  hw/acpi/Makefile.objs               |   2 +-
->  hw/acpi/ich9.c                      |   3 +-
->  hw/acpi/memory_hotplug.c            | 420 +++++++++++++++++++++++++++++++++++-
->  hw/acpi/memory_hotplug_acpi_table.c | 262 ----------------------
->  hw/acpi/piix4.c                     |   3 +-
->  hw/i386/acpi-build.c                | 197 +++--------------
->  tests/acpi-test-data/pc/DSDT.memhp  | Bin 0 -> 6613 bytes
->  tests/acpi-test-data/pc/SRAT.memhp  | Bin 0 -> 224 bytes
->  tests/acpi-test-data/q35/DSDT.memhp | Bin 0 -> 9375 bytes
->  tests/acpi-test-data/q35/SRAT.memhp | Bin 0 -> 224 bytes
->  tests/bios-tables-test.c            |  24 +++
->  13 files changed, 479 insertions(+), 467 deletions(-)
->  delete mode 100644 hw/acpi/memory_hotplug_acpi_table.c
->  create mode 100644 tests/acpi-test-data/pc/DSDT.memhp
->  create mode 100644 tests/acpi-test-data/pc/SRAT.memhp
->  create mode 100644 tests/acpi-test-data/q35/DSDT.memhp
->  create mode 100644 tests/acpi-test-data/q35/SRAT.memhp
+> I prefer leaving it vms, as that's consistent with pretty much all
+> the other functions in this file, and if we do need more state then
+> it'll already be there. But I won't insist on this, it can always be
+> changed later.
+fw_Cfg seems cleaner but I don't mind it as it's now.
+
+
+> 
+> Thanks,
+> drew
+> 
+> >   
+> > >  {
+> > > -    FWCfgState *fw_cfg = guest_info->fw_cfg;
+> > > +    FWCfgState *fw_cfg = vms->acpi_guest_info.fw_cfg;
+> > >      uint8_t *smbios_tables, *smbios_anchor;
+> > >      size_t smbios_tables_len, smbios_anchor_len;
+> > >      const char *product = "QEMU Virtual Machine";
+> > > @@ -1191,8 +1191,8 @@ void virt_machine_done(Notifier *notifier, void *data)
+> > >      VirtMachineState *vms = container_of(notifier, VirtMachineState,
+> > >                                           machine_done);
+> > >  
+> > > -    virt_acpi_setup(&vms->acpi_guest_info);
+> > > -    virt_build_smbios(&vms->acpi_guest_info);
+> > > +    virt_acpi_setup(vms);
+> > > +    virt_build_smbios(vms);
+> > >  }
+> > >  
+> > >  static void machvirt_init(MachineState *machine)
+> > > diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+> > > index 77d25dbddb62..cbedc682ae99 100644
+> > > --- a/include/hw/arm/virt.h
+> > > +++ b/include/hw/arm/virt.h
+> > > @@ -128,6 +128,6 @@ typedef struct {
+> > >      OBJECT_CLASS_CHECK(VirtMachineClass, klass, TYPE_VIRT_MACHINE)
+> > >  
+> > >  
+> > > -void virt_acpi_setup(VirtGuestInfo *guest_info);
+> > > +void virt_acpi_setup(VirtMachineState *vms);
+> > >  
+> > >  #endif /* QEMU_ARM_VIRT_H */  
+> > 
+> >   
 > 
