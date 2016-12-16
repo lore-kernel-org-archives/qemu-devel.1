@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52537)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54213)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cHqm9-0005Fv-GB
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 06:34:10 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cHqto-0002v5-QB
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 06:42:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cHqm8-0007js-G2
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 06:34:09 -0500
-Received: from mail-ua0-x231.google.com ([2607:f8b0:400c:c08::231]:36844)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cHqm8-0007jb-Ax
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 06:34:08 -0500
-Received: by mail-ua0-x231.google.com with SMTP id 3so19967568uaz.3
-	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 03:34:07 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <1481882024-10016-5-git-send-email-ashijeetacharya@gmail.com>
-References: <1481882024-10016-1-git-send-email-ashijeetacharya@gmail.com>
-	<1481882024-10016-5-git-send-email-ashijeetacharya@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 16 Dec 2016 11:33:46 +0000
-Message-ID: <CAFEAcA_nARKG5MHrsj4aAQNYfFyEGT-4TzU=MLi1E+zvsK7b=g@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v2 4/4] migration: Fail migration blocker
- for --only-migratble
+	(envelope-from <dgilbert@redhat.com>) id 1cHqtj-0004D2-Uv
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 06:42:04 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44310)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cHqtj-0004BY-Q7
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 06:41:59 -0500
+Received: from int-mx09.intmail.prod.int.phx2.redhat.com
+	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 129F44D688
+	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 11:41:58 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Date: Fri, 16 Dec 2016 11:41:55 +0000
+Message-Id: <20161216114155.18446-1-dgilbert@redhat.com>
+Subject: [Qemu-devel] [for 2.9] balloon: Don't balloon roms
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,95 +27,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ashijeet Acharya <ashijeetacharya@gmail.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, John Snow <jsnow@redhat.com>, Amit Shah <amit.shah@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, Greg Kurz <groug@kaod.org>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org, mst@redhat.com, pbonzini@redhat.com
+Cc: lcapitulino@redhat.com
 
-On 16 December 2016 at 09:53, Ashijeet Acharya
-<ashijeetacharya@gmail.com> wrote:
-> migrate_add_blocker should rightly fail if the '--only-migratable'
-> option was specified and the device in use should not be able to
-> perform the action which results in an unmigratable VM.
->
-> Make migrate_add_blocker return -EACCES in this case.
->
-> Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-> diff --git a/block/qcow.c b/block/qcow.c
-> index 11526a1..7e5003ac 100644
-> --- a/block/qcow.c
-> +++ b/block/qcow.c
-> @@ -253,8 +253,11 @@ static int qcow_open(BlockDriverState *bs, QDict *options, int flags,
->                 "does not support live migration",
->                 bdrv_get_device_or_node_name(bs));
->      ret = migrate_add_blocker(s->migration_blocker, errp);
-> -    if (ret < 0) {
-> -        error_free(s->migration_blocker);
-> +    if (ret) {
-> +        if (ret == -EACCES) {
-> +            error_append_hint(errp, "Cannot use a node with qcow format as "
-> +                              "it does not support live migration");
-> +        }
->          goto fail;
->      }
+A broken guest can specify physical addresses that correspond
+to any memory region, but it shouldn't be able to change ROM.
 
-> --- a/hw/display/virtio-gpu.c
-> +++ b/hw/display/virtio-gpu.c
-> @@ -1102,6 +1102,7 @@ static void virtio_gpu_device_realize(DeviceState *qdev, Error **errp)
->      VirtIOGPU *g = VIRTIO_GPU(qdev);
->      bool have_virgl;
->      int i;
-> +    int ret;
->
->      if (g->conf.max_outputs > VIRTIO_GPU_MAX_SCANOUTS) {
->          error_setg(errp, "invalid max_outputs > %d", VIRTIO_GPU_MAX_SCANOUTS);
-> @@ -1120,8 +1121,12 @@ static void virtio_gpu_device_realize(DeviceState *qdev, Error **errp)
->
->      if (virtio_gpu_virgl_enabled(g->conf)) {
->          error_setg(&g->migration_blocker, "virgl is not yet migratable");
-> -        if (migrate_add_blocker(g->migration_blocker, errp) < 0) {
-> -            error_free(g->migration_blocker);
-> +        ret = migrate_add_blocker(g->migration_blocker, errp);
-> +        if (ret) {
-> +            if (ret == -EACCES) {
-> +                error_append_hint(errp, "Cannot use virgl as it does not "
-> +                                  "support live migration yet");
-> +            }
->              return;
->          }
->      }
-> diff --git a/hw/intc/arm_gic_kvm.c b/hw/intc/arm_gic_kvm.c
-> index 3614daa..b40ad5f 100644
-> --- a/hw/intc/arm_gic_kvm.c
-> +++ b/hw/intc/arm_gic_kvm.c
-> @@ -514,8 +514,11 @@ static void kvm_arm_gic_realize(DeviceState *dev, Error **errp)
->          error_setg(&s->migration_blocker, "This operating system kernel does "
->                                            "not support vGICv2 migration");
->          ret = migrate_add_blocker(s->migration_blocker, errp);
-> -        if (ret < 0) {
-> -            error_free(s->migration_blocker);
-> +        if (ret) {
-> +            if (ret == -EACCES) {
-> +                error_append_hint(errp, "Failed to realize vGICv2 as its"
-> +                                  " migrataion is not implemented yet");
-> +            }
->              return;
->          }
->      }
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ hw/virtio/trace-events     | 2 ++
+ hw/virtio/virtio-balloon.c | 7 ++++++-
+ 2 files changed, 8 insertions(+), 1 deletion(-)
 
-So if you look at these diff hunks you can see that we effectively
-end up duplicating the "why doesn't this device let you migrate"
-user message -- once in the error_setg(&s->migration_blocker, ...)
-and once with the error_append_hint() call.
-
-Is there some way we can get migrate_add_blocker() to automatically
-incorporate the message when it's failing for the only-migratable case?
-(It's already being passed the errp.)
-That would avoid this duplication of the messages, and should also
-mean we don't need to modify the callers at all.
-
-If the error messages come out looking a bit strangely worded we
-could edit the text in the callers so it works in both situations
-when it will be used.
-
-thanks
--- PMM
+diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
+index 7b6f55e..6926eed 100644
+--- a/hw/virtio/trace-events
++++ b/hw/virtio/trace-events
+@@ -15,6 +15,8 @@ virtio_rng_pushed(void *rng, size_t len) "rng %p: %zd bytes pushed"
+ virtio_rng_request(void *rng, size_t size, unsigned quota) "rng %p: %zd bytes requested, %u bytes quota left"
+ 
+ # hw/virtio/virtio-balloon.c
++#
++virtio_balloon_bad_addr(uint64_t gpa) "%"PRIx64
+ virtio_balloon_handle_output(const char *name, uint64_t gpa) "section name: %s gpa: %"PRIx64
+ virtio_balloon_get_config(uint32_t num_pages, uint32_t actual) "num_pages: %d actual: %d"
+ virtio_balloon_set_config(uint32_t actual, uint32_t oldactual) "actual: %d oldactual: %d"
+diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
+index 884570a..a705e0e 100644
+--- a/hw/virtio/virtio-balloon.c
++++ b/hw/virtio/virtio-balloon.c
+@@ -228,8 +228,13 @@ static void virtio_balloon_handle_output(VirtIODevice *vdev, VirtQueue *vq)
+ 
+             /* FIXME: remove get_system_memory(), but how? */
+             section = memory_region_find(get_system_memory(), pa, 1);
+-            if (!int128_nz(section.size) || !memory_region_is_ram(section.mr))
++            if (!int128_nz(section.size) ||
++                !memory_region_is_ram(section.mr) ||
++                memory_region_is_rom(section.mr) ||
++                memory_region_is_romd(section.mr)) {
++                trace_virtio_balloon_bad_addr(pa);
+                 continue;
++            }
+ 
+             trace_virtio_balloon_handle_output(memory_region_name(section.mr),
+                                                pa);
+-- 
+2.9.3
