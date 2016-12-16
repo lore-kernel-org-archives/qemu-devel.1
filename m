@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33129)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35251)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cHiZm-0004ML-W5
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 21:48:52 -0500
+	(envelope-from <peterx@redhat.com>) id 1cHiel-0000Fn-8s
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 21:54:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cHiZm-0002wJ-3V
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 21:48:51 -0500
-Received: from [59.151.112.132] (port=7012 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cHiZl-0002vG-DK
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 21:48:50 -0500
-From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Date: Fri, 16 Dec 2016 10:46:42 +0800
-Message-ID: <1481856403-23599-2-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-In-Reply-To: <1481856403-23599-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-References: <1481856403-23599-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	(envelope-from <peterx@redhat.com>) id 1cHiei-0007R5-7e
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 21:53:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51534)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cHiei-0007MX-1F
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 21:53:56 -0500
+Date: Fri, 16 Dec 2016 10:53:45 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20161216025345.GA5938@pxdev.xzpeter.org>
+References: <1478502595-8484-1-git-send-email-jasowang@redhat.com>
+	<1478502595-8484-3-git-send-email-jasowang@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH for-2.9 V4 1/2] Add a new qmp command to
- start/stop replication
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1478502595-8484-3-git-send-email-jasowang@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH V3 02/10] intel_iommu: name vtd address
+ space with devfn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,119 +28,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>, Eric Blake <eblake@redhat.com>
-Cc: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, "eddie . dong" <eddie.dong@intel.com>, Bian Naimeng <biannm@cn.fujitsu.com>, Changlong Xie <xiecl.fnst@cn.fujitsu.com>, Wen Congyang <wencongyang@gmail.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: qemu-devel@nongnu.org, mst@redhat.com, pbonzini@redhat.com, cornelia.huck@de.ibm.com, wexu@redhat.com, vkaplans@redhat.com, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-We can call this qmp command to start/stop replication outside of qemu.
-Like Xen colo need this function.
+On Mon, Nov 07, 2016 at 03:09:47PM +0800, Jason Wang wrote:
+> To avoid duplicated name and ease debugging.
+> 
+> Cc: Michael S. Tsirkin <mst@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Richard Henderson <rth@twiddle.net>
+> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> Acked-by: Peter Xu <peterx@redhat.com>
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
+> ---
+>  hw/i386/intel_iommu.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> index 1655a65..5272c30 100644
+> --- a/hw/i386/intel_iommu.c
+> +++ b/hw/i386/intel_iommu.c
+> @@ -2323,6 +2323,7 @@ VTDAddressSpace *vtd_find_add_as(IntelIOMMUState *s, PCIBus *bus, int devfn)
+>      uintptr_t key = (uintptr_t)bus;
+>      VTDBus *vtd_bus = g_hash_table_lookup(s->vtd_as_by_busptr, &key);
+>      VTDAddressSpace *vtd_dev_as;
+> +    char name[128];
+>  
+>      if (!vtd_bus) {
+>          /* No corresponding free() */
+> @@ -2336,6 +2337,7 @@ VTDAddressSpace *vtd_find_add_as(IntelIOMMUState *s, PCIBus *bus, int devfn)
+>      vtd_dev_as = vtd_bus->dev_as[devfn];
+>  
+>      if (!vtd_dev_as) {
+> +        snprintf(name, sizeof(name), "intel_iommu_devfn_%d", devfn);
 
-Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Signed-off-by: Wen Congyang <wencongyang@gmail.com>
----
- docs/qmp-commands.txt | 18 ++++++++++++++++++
- migration/colo.c      | 23 +++++++++++++++++++++++
- qapi-schema.json      | 19 +++++++++++++++++++
- 3 files changed, 60 insertions(+)
+Better with bus number as well? ;)
 
-diff --git a/docs/qmp-commands.txt b/docs/qmp-commands.txt
-index abf210a..a8e9eb6 100644
---- a/docs/qmp-commands.txt
-+++ b/docs/qmp-commands.txt
-@@ -432,6 +432,24 @@ Example:
-      "arguments": { "enable": true } }
- <- { "return": {} }
- 
-+xen-set-replication
-+-------------------
-+
-+Enable or disable replication.
-+
-+Arguments:
-+
-+- "enable": Enable it or disable it.
-+- "primary": True for primary or false for secondary.
-+- "failover": Enable failover when stopping replication, but cannot be
-+              specified if 'enable' is true (optional, default false).
-+
-+Example:
-+
-+-> { "execute": "xen-set-replicate",
-+     "arguments": {"enable": true, "primary": false} }
-+<- { "return": {} }
-+
- migrate
- -------
- 
-diff --git a/migration/colo.c b/migration/colo.c
-index 93c85c5..6fc2ade 100644
---- a/migration/colo.c
-+++ b/migration/colo.c
-@@ -19,6 +19,8 @@
- #include "qemu/error-report.h"
- #include "qapi/error.h"
- #include "migration/failover.h"
-+#include "replication.h"
-+#include "qmp-commands.h"
- 
- #define COLO_BUFFER_BASE_SIZE (4 * 1024 * 1024)
- 
-@@ -104,6 +106,27 @@ void colo_do_failover(MigrationState *s)
-     }
- }
- 
-+void qmp_xen_set_replication(bool enable, bool primary,
-+                             bool has_failover, bool failover,
-+                             Error **errp)
-+{
-+    ReplicationMode mode = primary ?
-+                           REPLICATION_MODE_PRIMARY :
-+                           REPLICATION_MODE_SECONDARY;
-+
-+    if (has_failover && enable) {
-+        error_setg(errp, "Parameter 'failover' is only for"
-+                   " stopping replication");
-+        return;
-+    }
-+
-+    if (enable) {
-+        replication_start_all(mode, errp);
-+    } else {
-+        replication_stop_all(failover, failover ? NULL : errp);
-+    }
-+}
-+
- static void colo_send_message(QEMUFile *f, COLOMessage msg,
-                               Error **errp)
- {
-diff --git a/qapi-schema.json b/qapi-schema.json
-index f3e9bfc..78802f4 100644
---- a/qapi-schema.json
-+++ b/qapi-schema.json
-@@ -4676,6 +4676,25 @@
- { 'command': 'xen-load-devices-state', 'data': {'filename': 'str'} }
- 
- ##
-+# @xen-set-replication
-+#
-+# Enable or disable replication.
-+#
-+# @enable: true to enable, false to disable.
-+#
-+# @primary: true for primary or false for secondary.
-+#
-+# @failover: #optional true to do failover, false to stop. but cannot be
-+#            specified if 'enable' is true. default value is false.
-+#
-+# Returns: nothing.
-+#
-+# Since: 2.9
-+##
-+{ 'command': 'xen-set-replication',
-+  'data': { 'enable': 'bool', 'primary': 'bool', '*failover' : 'bool' } }
-+
-+##
- # @GICCapability:
- #
- # The struct describes capability for a specific GIC (Generic
--- 
-2.7.4
+Like: "%02x:%02x.%x" for (bus, dev, fn).
+
+Thanks,
+
+-- peterx
