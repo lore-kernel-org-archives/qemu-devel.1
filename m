@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58156)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58289)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cHxNd-0005Ox-1B
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 13:37:17 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cHxOF-0007v6-4a
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 13:37:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cHxNc-00025M-6W
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 13:37:17 -0500
-Received: from mail-ua0-x236.google.com ([2607:f8b0:400c:c08::236]:34696)
+	(envelope-from <peter.maydell@linaro.org>) id 1cHxOE-0002Lm-Cv
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 13:37:55 -0500
+Received: from mail-ua0-x232.google.com ([2607:f8b0:400c:c08::232]:33285)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cHxNc-000255-2Q
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 13:37:16 -0500
-Received: by mail-ua0-x236.google.com with SMTP id 51so46398300uai.1
-	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 10:37:15 -0800 (PST)
+	id 1cHxOE-0002Le-8S
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 13:37:54 -0500
+Received: by mail-ua0-x232.google.com with SMTP id b35so18682401uaa.0
+	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 10:37:54 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20161209114830.9158-7-alex.bennee@linaro.org>
+In-Reply-To: <20161209114830.9158-8-alex.bennee@linaro.org>
 References: <20161209114830.9158-1-alex.bennee@linaro.org>
-	<20161209114830.9158-7-alex.bennee@linaro.org>
+	<20161209114830.9158-8-alex.bennee@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 16 Dec 2016 18:36:54 +0000
-Message-ID: <CAFEAcA_g4i1LJEhBd5yNKFCAgwJBU=ENDJ6LxCspGwvbOx-QGQ@mail.gmail.com>
+Date: Fri, 16 Dec 2016 18:37:33 +0000
+Message-ID: <CAFEAcA8WeygE6W3ObsADJq-yE34x6WAm7mtziik4AMxyWgS4Tw@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RISU PATCH v3 06/10] risu_aarch64: it's -> it is
+Subject: Re: [Qemu-devel] [RISU PATCH v3 07/10] risugen: remove grocer's
+ apostrophe from REs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,26 +36,39 @@ Cc: QEMU Developers <qemu-devel@nongnu.org>, Jose Ricardo Ziviani <joserz@linux.
 
 On 9 December 2016 at 11:48, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrot=
 e:
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> ---
->  risu_aarch64.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/risu_aarch64.c b/risu_aarch64.c
-> index 7f9f612..8e3539e 100644
-> --- a/risu_aarch64.c
-> +++ b/risu_aarch64.c
-> @@ -97,7 +97,7 @@ int send_register_info(write_fn write_fn, void *uc)
->   * NB: called from a signal handler.
->   *
->   * We don't have any kind of identifying info in the incoming data
-> - * that says whether it's register or memory data, so if the two
-> + * that says whether it is register or memory data, so if the two
->   * sides get out of sync then we will fail obscurely.
->   */
->  int recv_and_compare_register_info(read_fn read_fn, respond_fn resp_fn, =
-void *uc)
+> This also fixes perl-modes confusion about escaped strings.
 
-Applied to risu master, thanks.
+Missing apostrophe: should be "perl-mode's" :-)
+
+>
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+Applied to risu master with that fixed; thanks.
 
 -- PMM
+
+> ---
+>  risugen | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/risugen b/risugen
+> index a604fe5..77a550b 100755
+> --- a/risugen
+> +++ b/risugen
+> @@ -288,7 +288,7 @@ Valid options:
+>                     'VMULL' will match 'VMULL A1' and 'VMULL A2' but not
+>                     'VMULL_scalar A1'. This is generally what you wanted.
+>      --not-pattern re[,re...] : exclude patterns matching regular express=
+ion.
+> -                   These RE's are applied after the matching pattern whi=
+ch
+> +                   These REs are applied after the matching pattern whic=
+h
+>                     is useful if you want to exclude a specific instructi=
+on from
+>                     a general set you have excluded.
+>       --no-fp      : disable floating point: no fp init, randomization et=
+c.
+> --
+> 2.11.0
+>
