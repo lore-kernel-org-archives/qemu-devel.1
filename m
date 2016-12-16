@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41984)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42533)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <harrynjit@gmail.com>) id 1cHtYW-0006Qo-IW
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 09:32:18 -0500
+	(envelope-from <eblake@redhat.com>) id 1cHtae-0007XO-5k
+	for Qemu-devel@nongnu.org; Fri, 16 Dec 2016 09:34:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <harrynjit@gmail.com>) id 1cHtYV-0004fU-F9
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 09:32:16 -0500
-Received: from mail-qt0-x230.google.com ([2607:f8b0:400d:c0d::230]:36199)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <harrynjit@gmail.com>) id 1cHtYV-0004f1-B3
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 09:32:15 -0500
-Received: by mail-qt0-x230.google.com with SMTP id w33so88135232qtc.3
-	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 06:32:15 -0800 (PST)
+	(envelope-from <eblake@redhat.com>) id 1cHtaZ-0006aC-BQ
+	for Qemu-devel@nongnu.org; Fri, 16 Dec 2016 09:34:28 -0500
+References: <20161216054723.96055-1-haoqf@linux.vnet.ibm.com>
+	<20161216054723.96055-2-haoqf@linux.vnet.ibm.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <b70a8f66-81e9-6e3b-0245-2eab3ec27d0f@redhat.com>
+Date: Fri, 16 Dec 2016 08:34:19 -0600
 MIME-Version: 1.0
-In-Reply-To: <20161216094850.GA4129@stefanha-x1.localdomain>
-References: <CA+scX6=9y4wDBWzXyqpGh9U__usKUa6sxwdc63iA8YRmpWFPqA@mail.gmail.com>
-	<20161214193107.GB20648@stefanha-x1.localdomain>
-	<CA+scX6=oc_eGteY8A0d8tuwzJFSu9M_6wnXBd5Tp=XGrg8FotQ@mail.gmail.com>
-	<CA+scX6n+xcY7qi=XbBcno=OQOfUfJf77ZGfS2s5FbhUCEHQp3A@mail.gmail.com>
-	<20161215080634.GF26169@stefanha-x1.localdomain>
-	<CA+scX6=Lk8Ea=vkFt_3c5v+n8gbr+uAb7hZ8vM1svzBZWwX7nQ@mail.gmail.com>
-	<20161216094850.GA4129@stefanha-x1.localdomain>
-From: Weiwei Jia <harrynjit@gmail.com>
-Date: Fri, 16 Dec 2016 09:32:14 -0500
-Message-ID: <CA+scX6k2u5E0E6M07S_WOd0633=x1OnLi9jvXVrED+YB3bzaWA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] Lock contention in QEMU
+In-Reply-To: <20161216054723.96055-2-haoqf@linux.vnet.ibm.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="TQ3CF31PXsxWAXVg6AjXLmpP4OoUN1IVG"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v1 1/1] iotests: Fix a problem
+ in common.filter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,46 +25,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-devel@nongnu.org
+To: QingFeng Hao <haoqf@linux.vnet.ibm.com>, qemu-block@nongnu.org
+Cc: cornelia.huck@de.ibm.com, borntraeger@de.ibm.com, "Qemu-devel@nongnu.org" <Qemu-devel@nongnu.org>, qemu-trivial <qemu-trivial@nongnu.org>
 
-On Fri, Dec 16, 2016 at 4:48 AM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
-> On Thu, Dec 15, 2016 at 11:04:23AM -0500, Weiwei Jia wrote:
->> On Thu, Dec 15, 2016 at 3:06 AM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
->> > On Thu, Dec 15, 2016 at 12:17:09AM -0500, Weiwei Jia wrote:
->> >> BTW, do we have an example to show users how to config following
->> >> virtio-blk dataplane commands into XML configuration file?
->> >>
->> >> qemu -object iothread,id=iothread0 \
->> >>       -drive if=none,id=drive0,file=test.img,format=raw,cache=none \
->> >>       -device virtio-blk-pci,iothread=iothread0,drive=drive0
->> >
->> > https://libvirt.org/formatdomain.html#elementsIOThreadsAllocation
->> >
->> > See also <cputune><iothreadpin> and <driver iothread=>.
->>
->> It seems that the libvirt XML configuration in above link [1] is
->> different from the configuration which you said in your blog [2]. Your
->> blog just said how to use x-data-plane for virtio-blk but libvirt XML
->> configuration doesn't say anything about x-data-plane. Does it in
->> default support by latest QEMU version. If I want to test virtio-blk
->> or virtio-scsi data-plane to make timeslice more stable, what version
->> of QEMU/KVM should I use? Would you please give me some suggestions?
->> Thank you.
->>
->> [1] https://libvirt.org/formatdomain.html#elementsIOThreadsAllocation
->> [2] http://blog.vmsplice.net/2013/03/new-in-qemu-14-high-performance-virtio.html
->
-> I will update the blog post (from 2013) with the modern libvirt XML
-> syntax.
->
-> Please use the
-> https://libvirt.org/formatdomain.html#elementsIOThreadsAllocation
-> documentation (unless you are using a really old QEMU and libvirt!).
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--TQ3CF31PXsxWAXVg6AjXLmpP4OoUN1IVG
+From: Eric Blake <eblake@redhat.com>
+To: QingFeng Hao <haoqf@linux.vnet.ibm.com>, qemu-block@nongnu.org
+Cc: cornelia.huck@de.ibm.com, borntraeger@de.ibm.com,
+ "Qemu-devel@nongnu.org" <Qemu-devel@nongnu.org>,
+ qemu-trivial <qemu-trivial@nongnu.org>
+Message-ID: <b70a8f66-81e9-6e3b-0245-2eab3ec27d0f@redhat.com>
+Subject: Re: [Qemu-block] [PATCH v1 1/1] iotests: Fix a problem in
+ common.filter
+References: <20161216054723.96055-1-haoqf@linux.vnet.ibm.com>
+ <20161216054723.96055-2-haoqf@linux.vnet.ibm.com>
+In-Reply-To: <20161216054723.96055-2-haoqf@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-I have tried the old libvirt XML way in your blog with QEMU v2.2.0 and
-Libvirt v1.2.2. It seems that everything works well for me. I will try
-the modern libvirt XML syntax with latest QEMU and libvirt.
+[adding qemu-devel, ALL patches should include the main list]
 
-Thank you,
-Weiwei Jia
+On 12/15/2016 11:47 PM, QingFeng Hao wrote:
+> If TEST_DIR is set to /tmp, test case 144 will fail. The reason is that=
+
+> TEST_DIR duplicates with 144's test image name tmp.qcow2.
+
+s/duplicates with/resembles/
+
+> when 144 is testing $TEST_DIR/tmp.qcow2, it wants to replace
+> $TEST_DIR/tmp.qcow2 to TEST_DIR/tmp.qcow2, but actually it will fail
+> and get TEST_DIRTEST_DIR.qcow2 in this case.
+> The fix is just to modify the code to replace $TEST_DIR/ with TEST_DIR/=
+=2E
+>=20
+> Signed-off-by: QingFeng Hao <haoqf@linux.vnet.ibm.com>
+> ---
+>  tests/qemu-iotests/common.filter | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/tests/qemu-iotests/common.filter b/tests/qemu-iotests/comm=
+on.filter
+> index 240ed06..d29e965 100644
+> --- a/tests/qemu-iotests/common.filter
+> +++ b/tests/qemu-iotests/common.filter
+> @@ -35,7 +35,7 @@ _filter_generated_node_ids()
+>  # replace occurrences of the actual TEST_DIR value with TEST_DIR
+>  _filter_testdir()
+>  {
+> -    sed -e "s#$TEST_DIR#TEST_DIR#g"
+> +    sed -e "s#$TEST_DIR\/#TEST_DIR\/#g"
+
+Why do you need \/?  It should be sufficient to use / without escaping.
+
+But overall I agree with including the / in the pattern.  It's too late
+to include this in 2.8, but with the commit message grammar improved and
+\ escape removed, I'm fine with:
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+I'm also adding qemu-trivial in cc, in case we want to take it through
+that tree instead of the usual qemu-iotests.
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--TQ3CF31PXsxWAXVg6AjXLmpP4OoUN1IVG
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYU/trAAoJEKeha0olJ0NqQcAH/0/citGr1oIuV0fuVoHetev0
+sDAI8T6J8zIMqZiCQ0zKz6oPcYWznwWor80a2Fg9/hZsohWxmnL/ZbzHngIyXlCR
+bHpd/jYVAZy3qt03Mrkvs4aZTzIUU9psqR+QYb/LmarhCv+5kGWPnGFwZLkPn/29
+HGVhJBvWIzv2xecckQapQcWz6DAwsGGLYuzrtL7B/ulm1e0IAXpBNrnkyi05X37W
+O3QQdK4EWxMjxie1alnTdzFOmI6mx06+AAyDgxey1zxBMxi6kn9/5JanIoCFKi7j
+DWxtzBiPUzWoyBtZPXbVqz8C/xBkQWNFuN9LWo+eOQn9XEZuVIsCIgH7726iGA8=
+=7rJU
+-----END PGP SIGNATURE-----
+
+--TQ3CF31PXsxWAXVg6AjXLmpP4OoUN1IVG--
