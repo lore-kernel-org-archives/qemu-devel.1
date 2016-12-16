@@ -1,20 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51153)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52463)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hangaohuai@huawei.com>) id 1cHnoA-0007pE-Dj
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 03:24:03 -0500
+	(envelope-from <thuth@redhat.com>) id 1cHnqu-0006EW-1i
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 03:26:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hangaohuai@huawei.com>) id 1cHno7-0000ar-9c
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 03:24:02 -0500
-Received: from szxga03-in.huawei.com ([119.145.14.66]:41351)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <hangaohuai@huawei.com>) id 1cHno6-0000U1-Sv
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 03:23:59 -0500
-From: hangaohuai <hangaohuai@huawei.com>
-Date: Fri, 16 Dec 2016 16:23:22 +0800
-Message-ID: <20161216082322.14160-1-hangaohuai@huawei.com>
+	(envelope-from <thuth@redhat.com>) id 1cHnqq-0002zl-Tr
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 03:26:52 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59178)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1cHnqq-0002xx-Nm
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 03:26:48 -0500
+References: <20161214142518.10504-1-stefanha@redhat.com>
+	<20161215063226-mutt-send-email-mst@kernel.org>
+	<20161215075028.GD26169@stefanha-x1.localdomain>
+	<1481793479.21413.6.camel@redhat.com>
+	<20161215170523-mutt-send-email-mst@kernel.org>
+	<1481819150.21413.21.camel@redhat.com>
+	<20161215202505-mutt-send-email-mst@kernel.org>
+	<20161215211838-mutt-send-email-mst@kernel.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <d6eb5b6d-3e8b-be10-33b6-289ef1ffec1a@redhat.com>
+Date: Fri, 16 Dec 2016 09:26:43 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v3] bugfix: vm halt when in reset looping
+In-Reply-To: <20161215211838-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] regression in 2.8: unable to exit screen grab in
+ SDL mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,49 +34,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: mst@redhat.com, pbonzini@redhat.com, arei.gonglei@huawei.com, hangaohuai@huawei.com
+To: "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Cole Robinson <crobinso@redhat.com>
 
-reset mc146818rtc device when RESET event happens.
+On 15.12.2016 20:19, Michael S. Tsirkin wrote:
+> On Thu, Dec 15, 2016 at 09:15:27PM +0200, Michael S. Tsirkin wrote:
+>> On Thu, Dec 15, 2016 at 05:25:50PM +0100, Gerd Hoffmann wrote:
+>>>   Hi,
+>>>
+>>>>>>> The problem always reproduces for me:
+>>>>>>> - start qemu with -sdl
+>>>>>>> - wait for guest to boot
+>>>>>>> - click anywhere within guest screen
+>>>>>>> - message "press ctrl+alt to exit capture" appears on screen,
+>>>>>>>   but pressing that immediately restarts capture again
+>>>
+>>> [ 2.6 good, 2.7, 2.8 bad ]
+>>>
+>>>> I'd say SDL is mostly useless with this bug.
+>>>>
+>>>> Do we fix this or disable SDL altogether?
+>>>
+>>> Well, it can't be *that* bad, otherwise it would not went unnoticed for
+>>> a whole release cycle.
+>>
+>> That's what I'm saying, maybe no one uses SDL anymore.
 
-Fix the problem:
-  1. Guest boot the second cpu, set CMOS_RESET_CODE 0x0a to protect selfboot;
-  2. VM being reset by others, hmp_system_reset;
-  3. seabios resume check the CMOS_RESET_CODE, if 0x0a, jump to the BDA
-     resume execution by jump via 40h:0067h;
-  4. Guest halt;
+It's maybe not as common as the GTK interface, but as far as I know
+people still use the SDL interface. For example here:
 
-Signed-off-by: hangaohuai <hangaohuai@huawei.com>
----
- hw/timer/mc146818rtc.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ https://bugs.launchpad.net/qemu/+bug/922076
 
-diff --git a/hw/timer/mc146818rtc.c b/hw/timer/mc146818rtc.c
-index da209d0..341b233 100644
---- a/hw/timer/mc146818rtc.c
-+++ b/hw/timer/mc146818rtc.c
-@@ -946,11 +946,22 @@ static Property mc146818rtc_properties[] = {
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-+static void rtc_resetdev(DeviceState *d)
-+{
-+    RTCState *s = MC146818_RTC(d);
-+
-+    /* Reason: VM do suspend self will set 0xfe
-+     * Only handle the VM boot case */
-+    if (s->cmos_data[0x0f] == 0x0a)
-+        s->cmos_data[0x0f] = 0x00;
-+}
-+
- static void rtc_class_initfn(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(klass);
- 
-     dc->realize = rtc_realizefn;
-+    dc->reset = rtc_resetdev;
-     dc->vmsd = &vmstate_rtc;
-     dc->props = mc146818rtc_properties;
-     /* Reason: needs to be wired up by rtc_init() */
--- 
-1.8.3.1
+... so I would recommend to keep the SDL code in QEMU.
+
+ Thomas
