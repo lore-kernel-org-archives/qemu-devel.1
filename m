@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56974)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58156)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cHxK6-0006Eq-4W
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 13:33:38 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cHxNd-0005Ox-1B
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 13:37:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cHxK5-0008Vu-C7
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 13:33:38 -0500
-Received: from mail-vk0-x236.google.com ([2607:f8b0:400c:c05::236]:32927)
+	(envelope-from <peter.maydell@linaro.org>) id 1cHxNc-00025M-6W
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 13:37:17 -0500
+Received: from mail-ua0-x236.google.com ([2607:f8b0:400c:c08::236]:34696)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cHxK5-0008Vg-7v
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 13:33:37 -0500
-Received: by mail-vk0-x236.google.com with SMTP id 137so93268450vkl.0
-	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 10:33:37 -0800 (PST)
+	id 1cHxNc-000255-2Q
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 13:37:16 -0500
+Received: by mail-ua0-x236.google.com with SMTP id 51so46398300uai.1
+	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 10:37:15 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20161209114830.9158-3-alex.bennee@linaro.org>
+In-Reply-To: <20161209114830.9158-7-alex.bennee@linaro.org>
 References: <20161209114830.9158-1-alex.bennee@linaro.org>
-	<20161209114830.9158-3-alex.bennee@linaro.org>
+	<20161209114830.9158-7-alex.bennee@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 16 Dec 2016 18:33:16 +0000
-Message-ID: <CAFEAcA9-pAKxcNjNxiEpewF8Fq2zRWfvdRb7GyyNaBnXvDSqmQ@mail.gmail.com>
+Date: Fri, 16 Dec 2016 18:36:54 +0000
+Message-ID: <CAFEAcA_g4i1LJEhBd5yNKFCAgwJBU=ENDJ6LxCspGwvbOx-QGQ@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RISU PATCH v3 02/10] aarch64: add hand-coded risu
- skeleton for directed testing
+Subject: Re: [Qemu-devel] [RISU PATCH v3 06/10] risu_aarch64: it's -> it is
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,20 +35,26 @@ Cc: QEMU Developers <qemu-devel@nongnu.org>, Jose Ricardo Ziviani <joserz@linux.
 
 On 9 December 2016 at 11:48, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrot=
 e:
-> Sometimes you want absolute control over your test set-up to feed
-> explicit values into the test. This started as an experiment but might
-> be useful for further developing tests.
->
 > Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> ---
+>  risu_aarch64.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/risu_aarch64.c b/risu_aarch64.c
+> index 7f9f612..8e3539e 100644
+> --- a/risu_aarch64.c
+> +++ b/risu_aarch64.c
+> @@ -97,7 +97,7 @@ int send_register_info(write_fn write_fn, void *uc)
+>   * NB: called from a signal handler.
+>   *
+>   * We don't have any kind of identifying info in the incoming data
+> - * that says whether it's register or memory data, so if the two
+> + * that says whether it is register or memory data, so if the two
+>   * sides get out of sync then we will fail obscurely.
+>   */
+>  int recv_and_compare_register_info(read_fn read_fn, respond_fn resp_fn, =
+void *uc)
 
-I really don't like this patch, I'm afraid. I'd rather not have
-it in the tree, because it implies that we expect that people
-might want to write (or contribute back to us) handcoded test cases.
-I don't think we should be encouraging that at all.
+Applied to risu master, thanks.
 
-I only wrote the test_i386.s and test_arm.s originally because I hadn't
-yet written the risugen script and wanted to test the C code I'd written.
-Perhaps we should delete them now as being obsolete...
-
-thanks
 -- PMM
