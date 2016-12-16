@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36051)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36628)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cHxqQ-0001Wu-Mk
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 14:07:04 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cHxtV-0002l8-B1
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 14:10:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cHxqP-0004o8-C0
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 14:07:02 -0500
-Received: from mail-vk0-x233.google.com ([2607:f8b0:400c:c05::233]:36380)
+	(envelope-from <peter.maydell@linaro.org>) id 1cHxtU-0006RR-DJ
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 14:10:13 -0500
+Received: from mail-vk0-x22f.google.com ([2607:f8b0:400c:c05::22f]:34577)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cHxqO-0004nw-TA
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 14:07:01 -0500
-Received: by mail-vk0-x233.google.com with SMTP id p9so93408530vkd.3
-	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 11:07:00 -0800 (PST)
+	id 1cHxtU-0006RF-8h
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 14:10:12 -0500
+Received: by mail-vk0-x22f.google.com with SMTP id x186so93562836vkd.1
+	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 11:10:12 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20161209114830.9158-6-alex.bennee@linaro.org>
+In-Reply-To: <20161209114830.9158-1-alex.bennee@linaro.org>
 References: <20161209114830.9158-1-alex.bennee@linaro.org>
-	<20161209114830.9158-6-alex.bennee@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 16 Dec 2016 19:06:39 +0000
-Message-ID: <CAFEAcA-=qyFT85tkx4vNj-KrXWYc+cuGEXoMDT5QrjL8QdZRJw@mail.gmail.com>
+Date: Fri, 16 Dec 2016 19:09:51 +0000
+Message-ID: <CAFEAcA-1HfBNOxXxK=_5DZ8Ow_bdk4QpCnWnL+UBw-WsayzGMA@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RISU PATCH v3 05/10] risu: add support compressed
- tracefiles
+Subject: Re: [Qemu-devel] [RISU PATCH v3 00/10] Record/payback patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,210 +34,53 @@ Cc: QEMU Developers <qemu-devel@nongnu.org>, Jose Ricardo Ziviani <joserz@linux.
 
 On 9 December 2016 at 11:48, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrot=
 e:
-> This uses the magic of zlib's gzread/write interface to wrap the
-> tracefile in compression. The code changes are tiny. I spent more time
-> messing about with the configure/linker stuff to auto-detect bits.
+> I did a bunch of tweaking to see if I could abstract the hackage for
+> record/replay a bit more. With a little bit of light re-factoring of
+> the send and recv functions I can move all the specific send/recv
+> logic into the main risu.c file and avoid having copy and pasted
+> functions for each architecture.
 >
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> ---
->  Makefile  |  3 ++-
->  configure | 55 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  risu.c    | 15 ++++++++++-----
->  3 files changed, 67 insertions(+), 6 deletions(-)
+> I've also introduced a header which makes tracking where you are in
+> the recorded stream a little easier when debugging.
 >
-> diff --git a/Makefile b/Makefile
-> index 4202c35..4a2ef02 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -14,6 +14,7 @@
->  include Makefile.in
+> It should be noted the functions:
 >
->  CFLAGS ?=3D -g -Wall
-> +LDFLAGS +=3D -lz
+>   int send_register_info(write_fn write_fn, void *uc);
+>   int recv_and_compare_register_info(read_fn read_fn, respond_fn respond,=
+ void *uc);
 >
->  PROG=3Drisu
->  SRCS=3Drisu.c comms.c risu_$(ARCH).c risu_reginfo_$(ARCH).c
-> @@ -31,7 +32,7 @@ all: $(PROG) $(BINS)
->  dump: $(RISU_ASMS)
+> are pretty identical for each arch. I did consider folding even more
+> of the logic into the common code but I wasn't sure if that would
+> loose flexibility in the future for other architectures so I left it
+> as is.
 >
->  $(PROG): $(OBJS)
-> -       $(CC) $(STATIC) $(CFLAGS) -o $@ $^
-> +       $(CC) $(STATIC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+> I've make the same changes to ppc64 although I've been compiling and
+> testing under a qemu linux-user environment which might explain why
+> I'm seeing crashes when I try and run it. I would appreciate the PPC
+> guys trying it on real hardware and debugging if needed.
+>
+> For reference I'm using a linux-user powered docker image (built with
+> the debian-bootstrap recipe in the qemu.git tree) for cross compiling:
+>
+>   docker run --rm -it -v /home/alex/lsrc/qemu/risu.git:/src --user=3Dalex=
+:alex -w /src debian:ppc64el make
+>
+> There have been some minor clean-ups to the helper scripts mainly to
+> aid testing by allowing the override of the RISU binary (I have
+> risu-arm, risu-arm64 and risu-ppc64 in my development directory).
+> Notes in the --- comments on each patch.
 
-(I think there's a stray space at the end of this line.)
+This generally looks good -- I've applied the two trivial typo
+fixes, and commented on the other patches except for the new
+scripts. I don't think there's much more work to do to get these
+applied.
 
->
->  %.risu.asm: %.risu.bin
->         ${OBJDUMP} -b binary -m $(ARCH) -D $^ > $@
-> diff --git a/configure b/configure
-> index f81bdb5..d11680f 100755
-> --- a/configure
-> +++ b/configure
-> @@ -6,6 +6,10 @@ compile() {
->      $CC $CFLAGS -c -o ${1}.o ${1}.c 2>/dev/null
->  }
->
-> +link() {
-> +    $LD $LDFLAGS -l${2} -o ${1} ${1}.o 2>/dev/null
-> +}
+Could we have a patch which updates README to document the
+new functionality?
 
-I would ask you to get the shell quoting right,
-but I see we don't do that in the existing configure
-code, so never mind.
-
-> +
->  check_define() {
->      c=3D${tmp_dir}/check_define_${1}
->      cat > ${c}.c <<EOF
-> @@ -34,6 +38,50 @@ guess_arch() {
->      fi
->  }
->
-> +check_type() {
-> +    c=3D${tmp_dir}/check_type_${1}
-> +    cat > ${c}.c <<EOF
-> +#include <inttypes.h>
-> +#include <stdint.h>
-> +#include <sys/types.h>
-> +#include <sys/socket.h>
-> +
-> +int main(void) { $1 thisone; return 0; }
-> +EOF
-> +    compile $c
-> +}
-> +
-> +check_lib() {
-> +    c=3D${tmp_dir}/check_lib${1}
-> +    cat > ${c}.c <<EOF
-> +#include <stdint.h>
-> +#include <$2.h>
-> +
-> +int main(void) { $3; return 0; }
-> +EOF
-> +    compile $c && link $c $1
-> +}
-> +
-> +generate_config() {
-> +    cfg=3Dconfig.h
-> +    echo "generating config.h..."
-> +
-> +    echo "/* config.h - generated by the 'configure' script */" > $cfg
-> +    echo "#ifndef CONFIG_H" >> $cfg
-> +    echo "#define CONFIG_H 1" >> $cfg
-> +
-> +    if check_type uintptr_t ; then
-> +        echo "#define HAVE_UINTPTR_T 1" >> $cfg
-> +    fi
-> +    if check_type socklen_t ; then
-> +        echo "#define HAVE_SOCKLEN_T 1" >> $cfg
-> +    fi
-
-In what circumstances would we not have uintptr_t and
-socklen_t types? We know we're building for Linux, after all.
-
-> +
-> +    echo "#endif /* CONFIG_H */" >> $cfg
-> +
-> +    echo "...done"
-> +}
-> +
->  generate_makefilein() {
->      m=3DMakefile.in
->      echo "generating Makefile.in..."
-> @@ -93,6 +141,7 @@ done
->
->  CC=3D"${CC-${CROSS_PREFIX}gcc}"
->  AS=3D"${AS-${CROSS_PREFIX}as}"
-> +LD=3D"${LD-${CROSS_PREFIX}ld}"
->  OBJCOPY=3D"${OBJCOPY-${CROSS_PREFIX}objcopy}"
->  OBJDUMP=3D"${OBJDUMP-${CROSS_PREFIX}objdump}"
->
-> @@ -100,6 +149,12 @@ if test "x${ARCH}" =3D "x"; then
->      guess_arch
->  fi
->
-> +if ! check_lib z zlib "zlibVersion()"; then
-> +    echo "Cannot find libz compression library"
-> +    exit 1
-> +fi
-> +
-> +generate_config
->  generate_makefilein
->
->  echo "type 'make' to start the build"
-> diff --git a/risu.c b/risu.c
-> index 173dd3c..3670bb1 100644
-> --- a/risu.c
-> +++ b/risu.c
-> @@ -25,6 +25,7 @@
->  #include <sys/mman.h>
->  #include <fcntl.h>
->  #include <string.h>
-> +#include <zlib.h>
->
->  #include "risu.h"
->
-> @@ -32,6 +33,7 @@ void *memblock =3D 0;
->
->  int apprentice_socket, master_socket;
->  int trace_file =3D 0;
-> +gzFile gz_trace_file;
->
->  sigjmp_buf jmpbuf;
->
-> @@ -59,7 +61,7 @@ int read_sock(void *ptr, size_t bytes)
->
->  int write_trace(void *ptr, size_t bytes)
->  {
-> -   size_t res =3D write(trace_file, ptr, bytes);
-> +   size_t res =3D gzwrite(gz_trace_file, ptr, bytes);
->     return (res =3D=3D bytes) ? 0 : 1;
->  }
->
-> @@ -77,7 +79,7 @@ int write_sock(void *ptr, size_t bytes)
->
->  int read_trace(void *ptr, size_t bytes)
->  {
-> -   size_t res =3D read(trace_file, ptr, bytes);
-> +   size_t res =3D gzread(gz_trace_file, ptr, bytes);
->     return (res =3D=3D bytes) ? 0 : 1;
->  }
->
-> @@ -203,9 +205,10 @@ int master(int sock)
->  {
->     if (sigsetjmp(jmpbuf, 1))
->     {
-> -      if (trace_file) {
-> -         close(trace_file);
-> -         fprintf(stderr,"\nDone...\n");
-> +      if (trace_file)
-> +      {
-> +         gzclose(gz_trace_file);
-> +         fprintf(stderr,"Done...\n");
->           return 0;
->        } else {
->           return report_match_status();
-> @@ -321,6 +324,7 @@ int main(int argc, char **argv)
->       if (trace_fn)
->         {
->           trace_file =3D open(trace_fn, O_WRONLY|O_CREAT, S_IRWXU);
-> +         gz_trace_file =3D gzdopen(trace_file, "wb9");
->         } else {
->           fprintf(stderr, "master port %d\n", port);
->           sock =3D master_connect(port);
-> @@ -332,6 +336,7 @@ int main(int argc, char **argv)
->       if (trace_fn)
->         {
->           trace_file =3D open(trace_fn, O_RDONLY);
-> +         gz_trace_file =3D gzdopen(trace_file, "rb");
->         } else {
->           fprintf(stderr, "apprentice host %s port %d\n", hostname, port)=
-;
->           sock =3D apprentice_connect(hostname, port);
-> --
-> 2.11.0
-
-Changes to the C code are fine.
+I won't have a chance to look at the scripts until next year, I
+expect, but from a quick glance they seem to be reasonably
+separate from the actual record/replay implementation.
 
 thanks
 -- PMM
