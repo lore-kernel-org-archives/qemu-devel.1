@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37448)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38449)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1cHoKa-0002iw-II
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 03:57:33 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cHoNV-0002sS-Ep
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 04:00:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1cHoKZ-0001db-Ks
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 03:57:32 -0500
-Received: from mail-yw0-x243.google.com ([2607:f8b0:4002:c05::243]:34143)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1cHoKZ-0001dN-CB
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 03:57:31 -0500
-Received: by mail-yw0-x243.google.com with SMTP id a10so3461789ywa.1
-	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 00:57:31 -0800 (PST)
+	(envelope-from <kwolf@redhat.com>) id 1cHoNR-0003lA-88
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 04:00:33 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57054)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1cHoNR-0003jY-2L
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 04:00:29 -0500
+Date: Fri, 16 Dec 2016 10:00:24 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20161216090024.GA4434@noname.redhat.com>
+References: <20161214142518.10504-1-stefanha@redhat.com>
+	<20161215063226-mutt-send-email-mst@kernel.org>
+	<20161215075028.GD26169@stefanha-x1.localdomain>
+	<1481793479.21413.6.camel@redhat.com>
+	<20161215170523-mutt-send-email-mst@kernel.org>
+	<1481819150.21413.21.camel@redhat.com>
+	<20161215202505-mutt-send-email-mst@kernel.org>
+	<20161215211838-mutt-send-email-mst@kernel.org>
+	<d6eb5b6d-3e8b-be10-33b6-289ef1ffec1a@redhat.com>
 MIME-Version: 1.0
-References: <585200c9.a968ca0a.1ab80.4c98@mx.google.com>
-In-Reply-To: <585200c9.a968ca0a.1ab80.4c98@mx.google.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Fri, 16 Dec 2016 08:57:20 +0000
-Message-ID: <CAJ+F1C+vrhubB0trANKbgn5UvALpUNK0F_6twan7P2rk86dKgQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3] audio: es1370: add exit function
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d6eb5b6d-3e8b-be10-33b6-289ef1ffec1a@redhat.com>
+Subject: Re: [Qemu-devel] regression in 2.8: unable to exit screen grab in
+ SDL mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,75 +35,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Li Qiang <liq3ea@gmail.com>, kraxel@redhat.com, qemu-devel@nongnu.org
-Cc: Li Qiang <liqiang6-s@360.cn>
+To: Thomas Huth <thuth@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Cole Robinson <crobinso@redhat.com>
 
-On Thu, Dec 15, 2016 at 5:32 AM Li Qiang <liq3ea@gmail.com> wrote:
+Am 16.12.2016 um 09:26 hat Thomas Huth geschrieben:
+> On 15.12.2016 20:19, Michael S. Tsirkin wrote:
+> > On Thu, Dec 15, 2016 at 09:15:27PM +0200, Michael S. Tsirkin wrote:
+> >> On Thu, Dec 15, 2016 at 05:25:50PM +0100, Gerd Hoffmann wrote:
+> >>>> Do we fix this or disable SDL altogether?
+> >>>
+> >>> Well, it can't be *that* bad, otherwise it would not went unnoticed for
+> >>> a whole release cycle.
+> >>
+> >> That's what I'm saying, maybe no one uses SDL anymore.
+> 
+> It's maybe not as common as the GTK interface, but as far as I know
+> people still use the SDL interface. For example here:
+> 
+>  https://bugs.launchpad.net/qemu/+bug/922076
+> 
+> ... so I would recommend to keep the SDL code in QEMU.
 
-> From: Li Qiang <liqiang6-s@360.cn>
->
-> Currently the es1370 device emulation doesn't have a exit function,
-> hot unplug this device will leak some memory. Add a exit function to
-> avoid this.
->
-> Signed-off-by: Li Qiang <liqiang6-s@360.cn>
->
+When I actualy use qemu rather than just doing a quick test, I generally
+prefer SDL, too, because the GTK frontend still grabs some keys like F10
+for itself instead of passing them to the guest. And using HMP for
+something as simple as that - no, thanks.
 
-
-> ---
->
-> Changes since the v2:
-> take out of the null check
->
-> Changes since the v1:
-> close the streams
->
->  hw/audio/es1370.c | 14 ++++++++++++++
->  1 file changed, 14 insertions(+)
->
-> diff --git a/hw/audio/es1370.c b/hw/audio/es1370.c
-> index 8449b5f..883ec69 100644
-> --- a/hw/audio/es1370.c
-> +++ b/hw/audio/es1370.c
-> @@ -1041,6 +1041,19 @@ static void es1370_realize(PCIDevice *dev, Error
-> **errp)
->      es1370_reset (s);
->  }
->
-> +static void es1370_exit(PCIDevice *dev)
-> +{
-> +    ES1370State *s =3D ES1370(dev);
-> +    int i;
-> +
-> +    for (i =3D 0; i < 2; ++i) {
-> +        AUD_close_out(&s->card, s->dac_voice[i]);
->
-
-(I would suggest ARRAY_SIZE instead)
-
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-
-> +    }
-> +
-> +    AUD_close_in(&s->card, s->adc_voice);
-> +    AUD_remove_card(&s->card);
-> +}
-> +
->  static int es1370_init (PCIBus *bus)
->  {
->      pci_create_simple (bus, -1, TYPE_ES1370);
-> @@ -1053,6 +1066,7 @@ static void es1370_class_init (ObjectClass *klass,
-> void *data)
->      PCIDeviceClass *k =3D PCI_DEVICE_CLASS (klass);
->
->      k->realize =3D es1370_realize;
-> +    k->exit =3D es1370_exit;
->      k->vendor_id =3D PCI_VENDOR_ID_ENSONIQ;
->      k->device_id =3D PCI_DEVICE_ID_ENSONIQ_ES1370;
->      k->class_id =3D PCI_CLASS_MULTIMEDIA_AUDIO;
-> --
-> 1.8.3.1
->
-> --
-Marc-Andr=C3=A9 Lureau
+Kevin
