@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43126)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43772)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hsp.cat7@gmail.com>) id 1cHoiJ-0004Vz-La
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 04:22:04 -0500
+	(envelope-from <bounces@canonical.com>) id 1cHolF-0005ye-8b
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 04:25:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hsp.cat7@gmail.com>) id 1cHoiI-00070M-NZ
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 04:22:03 -0500
-Received: from mail-io0-x244.google.com ([2607:f8b0:4001:c06::244]:33581)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <hsp.cat7@gmail.com>) id 1cHoiI-0006xG-IY
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 04:22:02 -0500
-Received: by mail-io0-x244.google.com with SMTP id p13so11298957ioi.0
-	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 01:22:00 -0800 (PST)
+	(envelope-from <bounces@canonical.com>) id 1cHolC-0001Rg-2q
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 04:25:05 -0500
+Received: from indium.canonical.com ([91.189.90.7]:39812)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cHolB-0001QR-Tr
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 04:25:02 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cHolA-0001mF-N9
+	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 09:25:00 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id AA3992E80C3
+	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 09:25:00 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20161216090024.GA4434@noname.redhat.com>
-References: <20161214142518.10504-1-stefanha@redhat.com>
-	<20161215063226-mutt-send-email-mst@kernel.org>
-	<20161215075028.GD26169@stefanha-x1.localdomain>
-	<1481793479.21413.6.camel@redhat.com>
-	<20161215170523-mutt-send-email-mst@kernel.org>
-	<1481819150.21413.21.camel@redhat.com>
-	<20161215202505-mutt-send-email-mst@kernel.org>
-	<20161215211838-mutt-send-email-mst@kernel.org>
-	<d6eb5b6d-3e8b-be10-33b6-289ef1ffec1a@redhat.com>
-	<20161216090024.GA4434@noname.redhat.com>
-From: Howard Spoelstra <hsp.cat7@gmail.com>
-Date: Fri, 16 Dec 2016 10:21:59 +0100
-Message-ID: <CABLmASHHFAWqSHFnc9uDGj6ZJKxP8495dCpKqLj4Kf2e=EOgrw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] regression in 2.8: unable to exit screen grab in
- SDL mode
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 16 Dec 2016 09:14:05 -0000
+From: Thomas Huth <1068900@bugs.launchpad.net>
+Reply-To: Bug 1068900 <1068900@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20121019232243.16004.28788.malonedeb@wampee.canonical.com>
+Message-Id: <20161216091405.20599.3964.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1068900] Re: Thread cancellation broken in
+ app-level emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,42 +37,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel qemu-devel <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Cole Robinson <crobinso@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Fri, Dec 16, 2016 at 10:00 AM, Kevin Wolf <kwolf@redhat.com> wrote:
-> Am 16.12.2016 um 09:26 hat Thomas Huth geschrieben:
->> On 15.12.2016 20:19, Michael S. Tsirkin wrote:
->> > On Thu, Dec 15, 2016 at 09:15:27PM +0200, Michael S. Tsirkin wrote:
->> >> On Thu, Dec 15, 2016 at 05:25:50PM +0100, Gerd Hoffmann wrote:
->> >>>> Do we fix this or disable SDL altogether?
->> >>>
->> >>> Well, it can't be *that* bad, otherwise it would not went unnoticed for
->> >>> a whole release cycle.
->> >>
->> >> That's what I'm saying, maybe no one uses SDL anymore.
->>
->> It's maybe not as common as the GTK interface, but as far as I know
->> people still use the SDL interface. For example here:
->>
->>  https://bugs.launchpad.net/qemu/+bug/922076
->>
->> ... so I would recommend to keep the SDL code in QEMU.
->
-> When I actualy use qemu rather than just doing a quick test, I generally
-> prefer SDL, too, because the GTK frontend still grabs some keys like F10
-> for itself instead of passing them to the guest. And using HMP for
-> something as simple as that - no, thanks.
->
-> Kevin
->
+The URL from comment #1 is unfortunately not valid anymore. If this
+issue is still pending, could you please post your patch again to the
+qemu-devel mailing list to get it discussed and included? Thanks!
 
-I'd like to also point to the recent status report by Stefan Weil
-concerning UI support in Windows builds:
-http://lists.nongnu.org/archive/html/qemu-devel/2016-12/msg01383.html
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
-At least for PPC Mac OS/OSX guests only the SDL1.2 UI is somewhat
-usable, GTK2/3, SDL2 and VNC are all problematic.
+-- =
 
-Best,
-Howard
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1068900
+
+Title:
+  Thread cancellation broken in app-level emulation
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  Thread cancellation (and certain other implementation-internal things
+  such as set*id() and timers) are implemented in userspace on Linux by
+  stealing a couple of the realtime signals for internal use by the
+  implementation, leaving them unavailable to applications.
+  Unfortunately, this bites qemu application-level emulation when the
+  application being run uses thread cancellation or other features that
+  need such signals. The signal handler is unable to be set (because
+  sigaction on the host rejects the signal numbers) and attempts to send
+  the signals result in it being received not by the emulated
+  application code, but by the libc/libpthread code on which qemu is
+  running; this in turn seems to cause qemu to crash.
+
+  The best solution I can think of is for qemu to steal one of the
+  realtime signals for its own use, and multiplex signal numbers outside
+  the range SIGRTMIN..SIGRTMAX, as well as the stolen signal itself, on
+  top of this stolen signal. This would both allow cancellation to work,
+  and would allow applications the full range of realtime signals when
+  the guest has more signals than the host (e.g. MIPS running on x86
+  host).
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1068900/+subscriptions
