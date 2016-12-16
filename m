@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60666)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34383)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.l.liu@intel.com>) id 1cIw4I-0002Z8-Oo
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 06:25:24 -0500
+	(envelope-from <mtosatti@redhat.com>) id 1cIwCH-0006UB-HV
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 06:33:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.l.liu@intel.com>) id 1cIw4E-00022t-MN
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 06:25:22 -0500
-Received: from mga09.intel.com ([134.134.136.24]:54960)
+	(envelope-from <mtosatti@redhat.com>) id 1cIwCE-0005s2-Ey
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 06:33:37 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58786)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1cIw4E-00020E-AA
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 06:25:18 -0500
-From: "Liu, Yi L" <yi.l.liu@intel.com>
-Date: Mon, 19 Dec 2016 11:25:10 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C257438FD9107@shsmsx102.ccr.corp.intel.com>
-References: <1481020588-4245-1-git-send-email-peterx@redhat.com>
-	<20161218084250.GB24337@gmail.com>
-	<20161219092250.GA4155@pxdev.xzpeter.org>
-In-Reply-To: <20161219092250.GA4155@pxdev.xzpeter.org>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(Exim 4.71) (envelope-from <mtosatti@redhat.com>) id 1cIwCE-0005qw-9I
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 06:33:34 -0500
+Date: Fri, 16 Dec 2016 13:59:09 -0200
+From: Marcelo Tosatti <mtosatti@redhat.com>
+Message-ID: <20161216155909.GA22751@amt.cnet>
+References: <20161210172148.361793326@redhat.com>
+	<20161210172324.482367805@redhat.com>
+	<ccb8c6bf-f136-9a6c-fbdc-7e7d4924321e@redhat.com>
+	<20161216134136.GV3808@thinpad.lan.raisama.net>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [RFC PATCH 00/13] VT-d replay and misc cleanup
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20161216134136.GV3808@thinpad.lan.raisama.net>
+Subject: Re: [Qemu-devel] [qemu patch V4 2/2] kvmclock: reduce kvmclock
+ difference on migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,60 +30,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, "Liu, Yi L" <yi.l.liu@linux.intel.com>
-Cc: "Tian, Kevin" <kevin.tian@intel.com>, "Lan, Tianyu" <tianyu.lan@intel.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, qemu-devel@nongnu.org, Dr David Alan Gilbert <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>, Radim Krcmar <rkrcmar@redhat.com>
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBQZXRlciBYdSBbbWFpbHRvOnBl
-dGVyeEByZWRoYXQuY29tXQ0KPiBTZW50OiBNb25kYXksIERlY2VtYmVyIDE5LCAyMDE2IDU6MjMg
-UE0NCj4gVG86IExpdSwgWWkgTCA8eWkubC5saXVAbGludXguaW50ZWwuY29tPg0KPiBDYzogVGlh
-biwgS2V2aW4gPGtldmluLnRpYW5AaW50ZWwuY29tPjsgTGFuLCBUaWFueXUgPHRpYW55dS5sYW5A
-aW50ZWwuY29tPjsNCj4gamFzb3dhbmdAcmVkaGF0LmNvbTsgcWVtdS1kZXZlbEBub25nbnUub3Jn
-OyBMaXUsIFlpIEwgPHlpLmwubGl1QGludGVsLmNvbT4NCj4gU3ViamVjdDogUmU6IFtRZW11LWRl
-dmVsXSBbUkZDIFBBVENIIDAwLzEzXSBWVC1kIHJlcGxheSBhbmQgbWlzYyBjbGVhbnVwDQo+IA0K
-PiBPbiBTdW4sIERlYyAxOCwgMjAxNiBhdCAwNDo0Mjo1MFBNICswODAwLCBMaXUsIFlpIEwgd3Jv
-dGU6DQo+ID4gT24gVHVlLCBEZWMgMDYsIDIwMTYgYXQgMDY6MzY6MTVQTSArMDgwMCwgUGV0ZXIg
-WHUgd3JvdGU6DQo+ID4gPiBUaGlzIFJGQyBzZXJpZXMgaXMgYSBjb250aW51ZSB3b3JrIGZvciBB
-dml2IEIuRC4ncyB2ZmlvIGVuYWJsZW1lbnQNCj4gPiA+IHNlcmllcyB3aXRoIHZ0LWQuIEF2aXYg
-aGFzIGRvbmUgYSBncmVhdCBqb2IgdGhlcmUsIGFuZCB3aGF0IHdlIHN0aWxsDQo+ID4gPiBsYWNr
-IHRoZXJlIGFyZSBtb3N0bHkgdGhlIGZvbGxvd2luZzoNCj4gPiA+DQo+ID4gPiAoMSkgVkZJTyBn
-b3QgZHVwbGljYXRlZCBJT1RMQiBub3RpZmljYXRpb25zIGR1ZSB0byBzcGxpdHRlZCBWVC1kIElP
-TU1VDQo+ID4gPiAgICAgbWVtb3J5IHJlZ2lvbi4NCj4gPiA+DQo+ID4gPiAoMikgVlQtZCBzdGls
-bCBoYXZlbid0IHByb3ZpZGUgYSBjb3JyZWN0IHJlcGxheSgpIG1lY2hhbmlzbSAoZS5nLiwNCj4g
-PiA+ICAgICB3aGVuIElPTU1VIGRvbWFpbiBzd2l0Y2hlcywgdGhpbmdzIHdpbGwgYnJva2UpLg0K
-PiA+ID4NCj4gPiA+IEhlcmUgSSdtIHRyeWluZyB0byBzb2x2ZSB0aGUgYWJvdmUgdHdvIGlzc3Vl
-cy4NCj4gPiA+DQo+ID4gPiAoMSkgaXMgc29sdmVkIGJ5IHBhdGNoIDcsICgyKSBpcyBzb2x2ZWQg
-YnkgcGF0Y2ggMTEtMTIuDQo+ID4gPg0KPiA+ID4gQmFzaWNhbGx5IGl0IGNvbnRhaW5zIHRoZSBm
-b2xsb3dpbmc6DQo+ID4gPg0KPiA+ID4gcGF0Y2ggMTogICAgcGlja2VkIHVwIGZyb20gSmFzb24n
-cyB2aG9zdCBETUFSIHNlcmllcywgd2hpY2ggaXMgYSBidWdmaXgNCj4gPiA+DQo+ID4gPiBwYXRj
-aCAyLTY6ICBDbGVhbnVwcy9FbmhhbmNlbWVudHMgZm9yIGV4aXN0aW5nIHZ0LWQgY29kZXMgKHBs
-ZWFzZSBzZWUNCj4gPiA+ICAgICAgICAgICAgIHNwZWNpZmljIGNvbW1pdCBtZXNzYWdlIGZvciBk
-ZXRhaWxzLCB0aGVyZSBhcmUgcGF0Y2hlcw0KPiA+ID4gICAgICAgICAgICAgdGhhdCBJIHRob3Vn
-aHQgbWF5IGJlIHN1aXRhYmxlIGZvciAyLjggYXMgd2VsbCwgYnV0IGxvb2tzDQo+ID4gPiAgICAg
-ICAgICAgICBsaWtlIGl0J3MgdG9vIGxhdGUpDQo+ID4gPg0KPiA+ID4gcGF0Y2ggNzogICAgU29s
-dmUgdGhlIGlzc3VlIHRoYXQgdmZpbyBpcyBub3RpZmllZCBtb3JlIHRoYW4gb25jZSBmb3INCj4g
-PiA+ICAgICAgICAgICAgIElPVExCIG5vdGlmaWNhdGlvbnMgd2l0aCBBdml2J3MgcGF0Y2hlcw0K
-PiA+ID4NCj4gPiA+IHBhdGNoIDgtMTA6IFNvbWUgdHJpdmlhbCBtZW1vcnkgQVBJcyBhZGRlZCBm
-b3IgZnVydGhlciBwYXRjaGVzLCBhbmQNCj4gPiA+ICAgICAgICAgICAgIGFkZCBjdXN0b21pemUg
-cmVwbGF5KCkgc3VwcG9ydCBmb3IgTWVtb3J5UmVnaW9uIChJIHNlZQ0KPiA+ID4gICAgICAgICAg
-ICAgQXZpdidzIGxhdGVzdCB2NyBjb250YWlucyBzaW1pbGFyIHJlcGxheSwgSSBjYW4gcmViYXNl
-DQo+ID4gPiAgICAgICAgICAgICBvbnRvIHRoYXQsIG1lcmVseSB0aGUgc2FtZSB0aGluZykNCj4g
-PiA+DQo+ID4gPiBwYXRjaCAxMTogICBQcm92aWRlIGEgdmFsaWQgdnQtZCByZXBsYXkoKSBjYWxs
-YmFjaywgdXNpbmcgcGFnZSB3YWxrDQo+ID4gPg0KPiA+IFBldGVyLA0KPiA+IERvZXMgeW91ciBw
-YXRjaCBzZXQgYmFzZWQgb24gQXZpdidzIHBhdGNo77yfIEkgZm91bmQgdGhlIHBhZ2UgY2Fubm90
-IGJlDQo+ID4gYXBwbGllZCBpbiBteSBzaWRlLg0KPiANCj4gSGksIFlpLA0KPiANCj4gVGhpcyBz
-ZXJpZXMgaXMgYmFzZWQgb24gQXZpdidzIHY2IHNlcmllcy4gSWYgeW91IHdhbm5hIHRyeSBpdCwg
-eW91IG1heQ0KPiB3YW50IHRvIGZldGNoIHRoZSB0cmVlIGZyb206DQo+IA0KPiAgaHR0cHM6Ly9n
-aXRodWIuY29tL3h6cGV0ZXIvcWVtdS90cmVlL3Z0ZC12ZmlvLWVuYWJsZW1lbnQNCj4gDQo+IFNv
-IHlvdSB3b24ndCBuZWVkIHRvIGJvdGhlciBvbiB0aGUgYXBwbHlpbmcuDQo+IA0KQWhhLCBsb29r
-cyBsaWtlIHlvdSBtZW50aW9uZWQgeW91IGdpdGh1YiBsaW5rIHByZXZpb3VzbHkuIEkgZm9yZ290
-IGl0LiBXb3VsZA0KdHJ5IGl0IHRoZW4uIEkgbWF5IHJlYmFzZSBteSBjdXJyZW50IHN2bSB3b3Jr
-LiB0aHggZm9yIHlvdXIgY29udHJpYnV0aW9uLl5fXg0KDQo+ID4NCj4gPiBCVFcuIGl0IG1heSBi
-ZSBiZXR0ZXIgaWYgeW91IGNhbiBzcGxpdCB0aGUgcGF0Y2hlcyBmb3IgbWlzIGNsZWFudXANCj4g
-PiBhbmQgdGhlIHBhdGNoZXMgZm9yIHJlcGxheS8iZml4IGR1cGxpY2F0ZSBub3RpZnkiLg0KPiAN
-Cj4gWWVzLiBIZXJlIEkganVzdCB3YW50IHRvIG1ha2Ugc3VyZSB0aGluZ3MgYXJlIHN0aWNrIHRv
-Z2V0aGVyIChlLmcuLCB0bw0KPiB0ZXN0IHRoZSByZXBsYXksIEkgd2lsbCBuZWVkIHRvIHVzZSB0
-aGUgdHJhY2VzKS4gQW5kIEkgZmVlbCBpdCBhd2t3YXJkDQo+IHRvIG1haW50YWluIHNldmVyYWwg
-c2VyaWVzIHVwc3RyZWFtIHdoaWxlIHRoZXkgaW50ZXJhY3Qgd2l0aCBlYWNoDQo+IG90aGVyLiBT
-b3JyeSBmb3IgdGhlIHRyb3VibGVzb21lLg0KPiANCkkgdG90YWxseSB1bmRlcnN0YW5kIHdoYXQg
-Ym90aGVycyB5b3UuIEl0J2xsIGJlIGZpbmUuIEZvbGxvdyB5b3VyIHBsYW5+DQoNClRoYW5rcywN
-CllpIEwNCg0KPiBUaGFua3MsDQo+IA0KPiAtLSBwZXRlcngNCg==
+On Fri, Dec 16, 2016 at 11:41:36AM -0200, Eduardo Habkost wrote:
+> On Fri, Dec 16, 2016 at 11:03:33AM +0100, Paolo Bonzini wrote:
+> > I'd like to make a few cleanups and add more documentation:
+> > 
+> 
+> Looks good to me.
+> 
+> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+
++1
