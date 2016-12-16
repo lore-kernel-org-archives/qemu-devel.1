@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51455)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54436)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ashijeetacharya@gmail.com>) id 1cHpE6-0006XG-RM
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 04:54:56 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cHpMd-0008Nh-NW
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 05:03:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ashijeetacharya@gmail.com>) id 1cHpE2-0003bB-T0
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 04:54:54 -0500
-Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:33787)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cHpMZ-0008Kv-QC
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 05:03:43 -0500
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:33286)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ashijeetacharya@gmail.com>)
-	id 1cHpE2-0003aV-L9
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 04:54:50 -0500
-Received: by mail-pf0-x241.google.com with SMTP id 144so4306522pfv.0
-	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 01:54:50 -0800 (PST)
-From: Ashijeet Acharya <ashijeetacharya@gmail.com>
-Date: Fri, 16 Dec 2016 15:23:44 +0530
-Message-Id: <1481882024-10016-5-git-send-email-ashijeetacharya@gmail.com>
-In-Reply-To: <1481882024-10016-1-git-send-email-ashijeetacharya@gmail.com>
-References: <1481882024-10016-1-git-send-email-ashijeetacharya@gmail.com>
-Subject: [Qemu-devel] [PATCH v2 4/4] migration: Fail migration blocker for
- --only-migratble
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1cHpMZ-0008IJ-I1
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 05:03:39 -0500
+Received: by mail-wm0-x242.google.com with SMTP id u144so4320527wmu.0
+	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 02:03:38 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <20161210172148.361793326@redhat.com>
+	<20161210172324.482367805@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <ccb8c6bf-f136-9a6c-fbdc-7e7d4924321e@redhat.com>
+Date: Fri, 16 Dec 2016 11:03:33 +0100
+MIME-Version: 1.0
+In-Reply-To: <20161210172324.482367805@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu patch V4 2/2] kvmclock: reduce kvmclock
+ difference on migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,375 +32,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: dgilbert@redhat.com
-Cc: jsnow@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, kwolf@redhat.com, armbru@redhat.com, quintela@redhat.com, mst@redhat.com, marcandre.lureau@redhat.com, groug@kaod.org, aneesh.kumar@linux.vnet.ibm.com, peter.maydell@linaro.org, qemu-devel@nongnu.org, Ashijeet Acharya <ashijeetacharya@gmail.com>
+To: Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org
+Cc: qemu-devel@nongnu.org, Dr David Alan Gilbert <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>, Radim Krcmar <rkrcmar@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-migrate_add_blocker should rightly fail if the '--only-migratable'
-option was specified and the device in use should not be able to
-perform the action which results in an unmigratable VM.
+I'd like to make a few cleanups and add more documentation:
 
-Make migrate_add_blocker return -EACCES in this case.
-
-Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
----
- block/qcow.c                |  7 +++++--
- block/vdi.c                 |  7 +++++--
- block/vhdx.c                |  8 +++++---
- block/vmdk.c                |  7 +++++--
- block/vpc.c                 |  7 +++++--
- block/vvfat.c               |  8 +++++---
- hw/9pfs/9p.c                |  9 +++++++--
- hw/display/virtio-gpu.c     |  9 +++++++--
- hw/intc/arm_gic_kvm.c       |  7 +++++--
- hw/intc/arm_gicv3_its_kvm.c |  5 ++++-
- hw/intc/arm_gicv3_kvm.c     |  5 ++++-
- hw/misc/ivshmem.c           | 10 ++++++++--
- hw/scsi/vhost-scsi.c        | 10 ++++++----
- hw/virtio/vhost.c           |  8 +++++---
- migration/migration.c       |  7 +++++++
- target-i386/kvm.c           |  7 +++++--
- 16 files changed, 88 insertions(+), 33 deletions(-)
-
-diff --git a/block/qcow.c b/block/qcow.c
-index 11526a1..7e5003ac 100644
---- a/block/qcow.c
-+++ b/block/qcow.c
-@@ -253,8 +253,11 @@ static int qcow_open(BlockDriverState *bs, QDict *options, int flags,
-                "does not support live migration",
-                bdrv_get_device_or_node_name(bs));
-     ret = migrate_add_blocker(s->migration_blocker, errp);
--    if (ret < 0) {
--        error_free(s->migration_blocker);
-+    if (ret) {
-+        if (ret == -EACCES) {
-+            error_append_hint(errp, "Cannot use a node with qcow format as "
-+                              "it does not support live migration");
-+        }
-         goto fail;
-     }
+diff --git a/hw/i386/kvm/clock.c b/hw/i386/kvm/clock.c
+index eacc9dc..f767ea9 100644
+--- a/hw/i386/kvm/clock.c
++++ b/hw/i386/kvm/clock.c
+@@ -37,7 +37,7 @@ typedef struct KVMClockState {
+     uint64_t clock;
+     bool clock_valid;
  
-diff --git a/block/vdi.c b/block/vdi.c
-index 2b56f52..df45df4 100644
---- a/block/vdi.c
-+++ b/block/vdi.c
-@@ -472,8 +472,11 @@ static int vdi_open(BlockDriverState *bs, QDict *options, int flags,
-                "does not support live migration",
-                bdrv_get_device_or_node_name(bs));
-     ret = migrate_add_blocker(s->migration_blocker, errp);
--    if (ret < 0) {
--        error_free(s->migration_blocker);
-+    if (ret) {
-+        if (ret == -EACCES) {
-+            error_append_hint(errp, "Cannot use a node with vdi format as "
-+                              "it does not support live migration");
-+        }
-         goto fail_free_bmap;
-     }
+-    /* whether machine type supports reliable get clock */
++    /* whether machine type supports reliable KVM_GET_CLOCK */
+     bool mach_use_reliable_get_clock;
  
-diff --git a/block/vhdx.c b/block/vhdx.c
-index d81941b..118134e 100644
---- a/block/vhdx.c
-+++ b/block/vhdx.c
-@@ -996,11 +996,13 @@ static int vhdx_open(BlockDriverState *bs, QDict *options, int flags,
-                "does not support live migration",
-                bdrv_get_device_or_node_name(bs));
-     ret = migrate_add_blocker(s->migration_blocker, errp);
--    if (ret < 0) {
--        error_free(s->migration_blocker);
-+    if (ret) {
-+        if (ret == -EACCES) {
-+            error_append_hint(errp, "Cannot use a node with vhdx format as "
-+                              "it does not support live migration");
-+        }
-         goto fail;
-     }
--
-     if (flags & BDRV_O_RDWR) {
-         ret = vhdx_update_headers(bs, s, false, NULL);
-         if (ret < 0) {
-diff --git a/block/vmdk.c b/block/vmdk.c
-index 4a45a83..cd6a641 100644
---- a/block/vmdk.c
-+++ b/block/vmdk.c
-@@ -977,8 +977,11 @@ static int vmdk_open(BlockDriverState *bs, QDict *options, int flags,
-                "does not support live migration",
-                bdrv_get_device_or_node_name(bs));
-     ret = migrate_add_blocker(s->migration_blocker, errp);
--    if (ret < 0) {
--        error_free(s->migration_blocker);
-+    if (ret) {
-+        if (ret == -EACCES) {
-+            error_append_hint(errp, "Cannot use a node with vmdk format as "
-+                              "it does not support live migration");
-+        }
-         goto fail;
-     }
+     /* whether the 'clock' value was obtained in a host with
+@@ -88,7 +88,7 @@ static uint64_t kvmclock_current_nsec(KVMClockState *s)
+     return nsec + time.system_time;
+ }
  
-diff --git a/block/vpc.c b/block/vpc.c
-index 299a8c8..c935962 100644
---- a/block/vpc.c
-+++ b/block/vpc.c
-@@ -427,8 +427,11 @@ static int vpc_open(BlockDriverState *bs, QDict *options, int flags,
-                "does not support live migration",
-                bdrv_get_device_or_node_name(bs));
-     ret = migrate_add_blocker(s->migration_blocker, errp);
--    if (ret < 0) {
--        error_free(s->migration_blocker);
-+    if (ret) {
-+        if (ret == -EACCES) {
-+            error_append_hint(errp, "Cannot use a node with vpc format as "
-+                              "it does not support live migration");
-+        }
-         goto fail;
-     }
- 
-diff --git a/block/vvfat.c b/block/vvfat.c
-index 3de3320..f9a5f9b 100644
---- a/block/vvfat.c
-+++ b/block/vvfat.c
-@@ -1192,8 +1192,11 @@ static int vvfat_open(BlockDriverState *bs, QDict *options, int flags,
-                    "does not support live migration",
-                    bdrv_get_device_or_node_name(bs));
-         ret = migrate_add_blocker(s->migration_blocker, errp);
--        if (ret < 0) {
--            error_free(s->migration_blocker);
-+        if (ret) {
-+            if (ret == -EACCES) {
-+                error_append_hint(errp, "Cannot use a node with vvfat format "
-+                                  "as it does not support live migration");
-+            }
-             goto fail;
-         }
-     }
-@@ -1202,7 +1205,6 @@ static int vvfat_open(BlockDriverState *bs, QDict *options, int flags,
-         init_mbr(s, cyls, heads, secs);
-     }
- 
--    //    assert(is_consistent(s));
-     qemu_co_mutex_init(&s->lock);
- 
-     ret = 0;
-diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-index e72ef43..01dd67f 100644
---- a/hw/9pfs/9p.c
-+++ b/hw/9pfs/9p.c
-@@ -1020,12 +1020,17 @@ static void coroutine_fn v9fs_attach(void *opaque)
-      */
-     if (!s->migration_blocker) {
-         int ret;
-+        Error *local_err;
-         s->root_fid = fid;
-         error_setg(&s->migration_blocker,
-                    "Migration is disabled when VirtFS export path '%s' is mounted in the guest using mount_tag '%s'",
-                    s->ctx.fs_root ? s->ctx.fs_root : "NULL", s->tag);
--        ret = migrate_add_blocker(s->migration_blocker, NULL);
--        if (ret < 0) {
-+        ret = migrate_add_blocker(s->migration_blocker, &local_err);
-+        if (ret) {
-+            if (ret == -EACCES) {
-+                error_append_hint(&local_err, "Failed to mount VirtFS as it "
-+                                  "does not support live migration");
-+            }
-             err = ret;
-             clunk_fid(s, fid);
-             goto out;
-diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
-index 6e60b8c..1b02f4b 100644
---- a/hw/display/virtio-gpu.c
-+++ b/hw/display/virtio-gpu.c
-@@ -1102,6 +1102,7 @@ static void virtio_gpu_device_realize(DeviceState *qdev, Error **errp)
-     VirtIOGPU *g = VIRTIO_GPU(qdev);
-     bool have_virgl;
-     int i;
-+    int ret;
- 
-     if (g->conf.max_outputs > VIRTIO_GPU_MAX_SCANOUTS) {
-         error_setg(errp, "invalid max_outputs > %d", VIRTIO_GPU_MAX_SCANOUTS);
-@@ -1120,8 +1121,12 @@ static void virtio_gpu_device_realize(DeviceState *qdev, Error **errp)
- 
-     if (virtio_gpu_virgl_enabled(g->conf)) {
-         error_setg(&g->migration_blocker, "virgl is not yet migratable");
--        if (migrate_add_blocker(g->migration_blocker, errp) < 0) {
--            error_free(g->migration_blocker);
-+        ret = migrate_add_blocker(g->migration_blocker, errp);
-+        if (ret) {
-+            if (ret == -EACCES) {
-+                error_append_hint(errp, "Cannot use virgl as it does not "
-+                                  "support live migration yet");
-+            }
-             return;
-         }
-     }
-diff --git a/hw/intc/arm_gic_kvm.c b/hw/intc/arm_gic_kvm.c
-index 3614daa..b40ad5f 100644
---- a/hw/intc/arm_gic_kvm.c
-+++ b/hw/intc/arm_gic_kvm.c
-@@ -514,8 +514,11 @@ static void kvm_arm_gic_realize(DeviceState *dev, Error **errp)
-         error_setg(&s->migration_blocker, "This operating system kernel does "
-                                           "not support vGICv2 migration");
-         ret = migrate_add_blocker(s->migration_blocker, errp);
--        if (ret < 0) {
--            error_free(s->migration_blocker);
-+        if (ret) {
-+            if (ret == -EACCES) {
-+                error_append_hint(errp, "Failed to realize vGICv2 as its"
-+                                  " migrataion is not implemented yet");
-+            }
-             return;
-         }
-     }
-diff --git a/hw/intc/arm_gicv3_its_kvm.c b/hw/intc/arm_gicv3_its_kvm.c
-index 950a02f..3474642 100644
---- a/hw/intc/arm_gicv3_its_kvm.c
-+++ b/hw/intc/arm_gicv3_its_kvm.c
-@@ -70,7 +70,10 @@ static void kvm_arm_its_realize(DeviceState *dev, Error **errp)
-     error_setg(&s->migration_blocker, "vITS migration is not implemented");
-     ret = migrate_add_blocker(s->migration_blocker, errp);
-     if (ret < 0) {
--        error_free(s->migration_blocker);
-+        if (ret == -EACCES) {
-+            error_append_hint(errp, "Failed to realize vITS as its migration "
-+                              "is not implemented yet");
-+        }
-         return;
-     }
- 
-diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
-index 06f6f30..be7b97c 100644
---- a/hw/intc/arm_gicv3_kvm.c
-+++ b/hw/intc/arm_gicv3_kvm.c
-@@ -118,7 +118,10 @@ static void kvm_arm_gicv3_realize(DeviceState *dev, Error **errp)
-     error_setg(&s->migration_blocker, "vGICv3 migration is not implemented");
-     ret = migrate_add_blocker(s->migration_blocker, errp);
-     if (ret < 0) {
--        error_free(s->migration_blocker);
-+        if (ret == -EACCES) {
-+            error_append_hint(errp, "Failed to realize vGICv3 as its migration"
-+                              "is not implemented yet");
-+        }
-         return;
-     }
- 
-diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
-index 585cc5b..58f27b1 100644
---- a/hw/misc/ivshmem.c
-+++ b/hw/misc/ivshmem.c
-@@ -837,6 +837,7 @@ static void ivshmem_common_realize(PCIDevice *dev, Error **errp)
+-static uint64_t kvm_get_clock(void)
++static void kvm_update_clock(void)
  {
-     IVShmemState *s = IVSHMEM_COMMON(dev);
-     Error *err = NULL;
-+    int ret;
-     uint8_t *pci_conf;
-     uint8_t attr = PCI_BASE_ADDRESS_SPACE_MEMORY |
-         PCI_BASE_ADDRESS_MEM_PREFETCH;
-@@ -910,8 +911,13 @@ static void ivshmem_common_realize(PCIDevice *dev, Error **errp)
-     if (!ivshmem_is_master(s)) {
-         error_setg(&s->migration_blocker,
-                    "Migration is disabled when using feature 'peer mode' in device 'ivshmem'");
--        if (migrate_add_blocker(s->migration_blocker, errp) < 0) {
--            error_free(s->migration_blocker);
-+        ret = migrate_add_blocker(s->migration_blocker, errp);
-+        if (ret) {
-+            if (ret == -EACCES) {
-+                error_append_hint(errp, "Cannot use the 'peer mode' feature "
-+                                  "in device 'ivshmem' as it does not "
-+                                  "support live migration");
-+            }
-             return;
-         }
+     struct kvm_clock_data data;
+     int ret;
+@@ -98,7 +98,48 @@ static uint64_t kvm_get_clock(void)
+         fprintf(stderr, "KVM_GET_CLOCK failed: %s\n", strerror(ret));
+                 abort();
      }
-diff --git a/hw/scsi/vhost-scsi.c b/hw/scsi/vhost-scsi.c
-index ff503d0..0c571f8 100644
---- a/hw/scsi/vhost-scsi.c
-+++ b/hw/scsi/vhost-scsi.c
-@@ -244,8 +244,12 @@ static void vhost_scsi_realize(DeviceState *dev, Error **errp)
-     error_setg(&s->migration_blocker,
-                "vhost-scsi does not support migration");
-     ret = migrate_add_blocker(s->migration_blocker, errp);
--    if (ret < 0) {
--        goto free_blocker;
-+    if (ret) {
-+        if (ret == -EACCES) {
-+            error_append_hint(errp, "Cannot use vhost-scsi as it does not "
-+                              "support live migration");
-+        }
-+        goto close_fd;
-     }
- 
-     s->dev.nvqs = VHOST_SCSI_VQ_NUM_FIXED + vs->conf.num_queues;
-@@ -272,8 +276,6 @@ static void vhost_scsi_realize(DeviceState *dev, Error **errp)
-  free_vqs:
-     migrate_del_blocker(s->migration_blocker);
-     g_free(s->dev.vqs);
-- free_blocker:
--    error_free(s->migration_blocker);
-  close_fd:
-     close(vhostfd);
-     return;
-diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index 416fada..1c4a4f9 100644
---- a/hw/virtio/vhost.c
-+++ b/hw/virtio/vhost.c
-@@ -1159,9 +1159,11 @@ int vhost_dev_init(struct vhost_dev *hdev, void *opaque,
-     if (hdev->migration_blocker != NULL) {
-         Error *local_err;
-         r = migrate_add_blocker(hdev->migration_blocker, &local_err);
--        if (r < 0) {
--            error_report_err(local_err);
--            error_free(hdev->migration_blocker);
-+        if (r) {
-+            if (r == -EACCES) {
-+                error_append_hint(&local_err, "Cannot use vhost drivers as "
-+                                  "it does not support live migration");
-+            }
-             goto fail_busyloop;
-         }
-     }
-diff --git a/migration/migration.c b/migration/migration.c
-index 713e012..ab34328 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -1115,9 +1115,16 @@ int migrate_add_blocker(Error *reason, Error **errp)
- {
-     if (migration_is_idle(NULL)) {
-         migration_blockers = g_slist_prepend(migration_blockers, reason);
-+        error_free(reason);
-         return 0;
-     }
- 
-+    if (only_migratable) {
-+        error_setg(errp, "Failed to add migration blocker: --only-migratable "
-+                   "was specified");
-+        return -EACCES;
-+    }
+-    return data.clock;
++    s->clock = data.clock;
 +
-     error_setg(errp, "Cannot block a migration already in-progress");
-     return -EBUSY;
- }
-diff --git a/target-i386/kvm.c b/target-i386/kvm.c
-index 6031a1c..05c8365 100644
---- a/target-i386/kvm.c
-+++ b/target-i386/kvm.c
-@@ -962,7 +962,11 @@ int kvm_arch_init_vcpu(CPUState *cs)
-                    "State blocked by non-migratable CPU device"
-                    " (invtsc flag)");
-         r = migrate_add_blocker(invtsc_mig_blocker, NULL);
--        if (r < 0) {
-+        if (r) {
-+            if (r == -EACCES) {
-+                error_report("kvm: non-migratable CPU device but"
-+                        " --only-migratable was specified");
-+            }
-             error_report("kvm: migrate_add_blocker failed");
-             goto efail;
-         }
-@@ -1009,7 +1013,6 @@ int kvm_arch_init_vcpu(CPUState *cs)
-  fail:
-     migrate_del_blocker(invtsc_mig_blocker);
-  efail:
--    error_free(invtsc_mig_blocker);
-     return r;
++    /* If kvm_has_adjust_clock_stable() is false, KVM_GET_CLOCK returns
++     * essentially CLOCK_MONOTONIC plus a guest-specific adjustment.  This
++     * can drift from the TSC-based value that is computed by the guest,
++     * so we need to go through kvmclock_current_nsec().  If
++     * kvm_has_adjust_clock_stable() is true, and the flags contain
++     * KVM_CLOCK_TSC_STABLE, then KVM_GET_CLOCK returns a TSC-based value
++     * and kvmclock_current_nsec() is not necessary.
++     *
++     * Here, however, we need not check KVM_CLOCK_TSC_STABLE.  This is because:
++     *
++     * - if the host has disabled the kvmclock master clock, the guest already
++     *   has protection against time going backwards.  This "safety net" is only
++     *   absent when kvmclock is stable;
++     *
++     * - therefore, we can replace a check like
++     *
++     *       if last KVM_GET_CLOCK was not reliable
++     *           read from memory
++     *
++     *   with
++     *
++     *       if last KVM_GET_CLOCK was not reliable && masterclock is enabled
++     *           read from memory
++     *
++     * However:
++     *
++     * - if kvm_has_adjust_clock_stable() returns false, the left side is
++     *   always true (KVM_GET_CLOCK is never reliable), and the right side is
++     *   unknown (because we don't have data.flags).  We must assume it's true
++     *   and read from memory.
++     *
++     * - if kvm_has_adjust_clock_stable() returns true, the result of the &&
++     *   is always false (masterclock is enabled iff KVM_GET_CLOCK is reliable)
++     *
++     * So we can just use this instead:
++     *
++     *       if !kvm_has_adjust_clock_stable() then
++     *           read from memory
++     */
++    s->clock_is_reliable = kvm_has_adjust_clock_stable();
  }
  
--- 
-2.6.2
+ static void kvmclock_vm_state_change(void *opaque, int running,
+@@ -111,19 +153,17 @@ static void kvmclock_vm_state_change(void *opaque, int running,
+ 
+     if (running) {
+         struct kvm_clock_data data = {};
+-        uint64_t pvclock_via_mem = 0;
+ 
+         /*
+          * If the host where s->clock was read did not support reliable
+          * KVM_GET_CLOCK, read kvmclock value from memory.
+          */
+         if (!s->clock_is_reliable) {
+-            pvclock_via_mem = kvmclock_current_nsec(s);
+-        }
+-
+-        /* We can't rely on the saved clock value, just discard it */
+-        if (pvclock_via_mem) {
+-            s->clock = pvclock_via_mem;
++            uint64_t pvclock_via_mem = kvmclock_current_nsec(s);
++            /* We can't rely on the saved clock value, just discard it */
++            if (pvclock_via_mem) {
++                s->clock = pvclock_via_mem;
++            }
+         }
+ 
+         s->clock_valid = false;
+@@ -155,11 +195,7 @@ static void kvmclock_vm_state_change(void *opaque, int running,
+ 
+         kvm_synchronize_all_tsc();
+ 
+-        s->clock = kvm_get_clock();
+-        /* any code that sets s->clock needs to ensure clock_is_reliable
+-         * is correctly set.
+-         */
+-        s->clock_is_reliable = kvm_has_adjust_clock_stable();
++        kvm_update_clock();
+         /*
+          * If the VM is stopped, declare the clock state valid to
+          * avoid re-reading it on next vmsave (which would return
+@@ -173,9 +209,7 @@ static void kvmclock_realize(DeviceState *dev, Error **errp)
+ {
+     KVMClockState *s = KVM_CLOCK(dev);
+ 
+-    if (kvm_has_adjust_clock_stable()) {
+-        s->clock_is_reliable = true;
+-    }
++    kvm_update_clock();
+ 
+     qemu_add_vm_change_state_handler(kvmclock_vm_state_change, s);
+ }
+@@ -216,7 +250,7 @@ static void kvmclock_pre_save(void *opaque)
+ {
+     KVMClockState *s = opaque;
+ 
+-    s->clock = kvm_get_clock();
++    kvm_update_clock();
+ }
+ 
+ static const VMStateDescription kvmclock_vmsd = {
