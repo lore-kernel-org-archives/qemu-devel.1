@@ -1,19 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35760)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43756)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cHraN-0000he-Qu
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 07:26:04 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cHs4K-000550-WB
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 07:57:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cHraK-0002GC-M9
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 07:26:03 -0500
-References: <20161216114155.18446-1-dgilbert@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e430d91b-30db-54e4-6c02-fe70f56e5d8f@redhat.com>
-Date: Fri, 16 Dec 2016 13:25:56 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1cHs4J-00044l-Vz
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 07:57:01 -0500
+Received: from mail-vk0-x231.google.com ([2607:f8b0:400c:c05::231]:33559)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cHs4J-00043j-Hw
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 07:56:59 -0500
+Received: by mail-vk0-x231.google.com with SMTP id 137so88414764vkl.0
+	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 04:56:59 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20161216114155.18446-1-dgilbert@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [for 2.9] balloon: Don't balloon roms
+In-Reply-To: <20161215054812.12602-6-alastair@au1.ibm.com>
+References: <20161215054812.12602-1-alastair@au1.ibm.com>
+	<20161215054812.12602-6-alastair@au1.ibm.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 16 Dec 2016 12:56:38 +0000
+Message-ID: <CAFEAcA94pqzDmwhJqOehAd7biugqSQH8JWytJGFFus0F92YCAg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v4 5/8] hw/i2c: Tidy up NULL check for i2c
+ slave init callbacks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,56 +30,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, mst@redhat.com
-Cc: lcapitulino@redhat.com, qemu-stable <qemu-stable@nongnu.org>
+To: Alastair D'Silva <alastair@au1.ibm.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, Andrew Jeffery <andrew@aj.id.au>, Joel Stanley <joel@jms.id.au>, Alastair D'Silva <alastair@d-silva.org>
 
-
-
-On 16/12/2016 12:41, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> 
-> A broken guest can specify physical addresses that correspond
-> to any memory region, but it shouldn't be able to change ROM.
-> 
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+On 15 December 2016 at 05:48, Alastair D'Silva <alastair@au1.ibm.com> wrote:
+> From: Alastair D'Silva <alastair@d-silva.org>
+>
+> Remove unnecessary syntax
+>
+> Signed-off-by: Alastair D'Silva <alastair@d-silva.org>
 > ---
->  hw/virtio/trace-events     | 2 ++
->  hw/virtio/virtio-balloon.c | 7 ++++++-
->  2 files changed, 8 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-> index 7b6f55e..6926eed 100644
-> --- a/hw/virtio/trace-events
-> +++ b/hw/virtio/trace-events
-> @@ -15,6 +15,8 @@ virtio_rng_pushed(void *rng, size_t len) "rng %p: %zd bytes pushed"
->  virtio_rng_request(void *rng, size_t size, unsigned quota) "rng %p: %zd bytes requested, %u bytes quota left"
->  
->  # hw/virtio/virtio-balloon.c
-> +#
-> +virtio_balloon_bad_addr(uint64_t gpa) "%"PRIx64
->  virtio_balloon_handle_output(const char *name, uint64_t gpa) "section name: %s gpa: %"PRIx64
->  virtio_balloon_get_config(uint32_t num_pages, uint32_t actual) "num_pages: %d actual: %d"
->  virtio_balloon_set_config(uint32_t actual, uint32_t oldactual) "actual: %d oldactual: %d"
-> diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-> index 884570a..a705e0e 100644
-> --- a/hw/virtio/virtio-balloon.c
-> +++ b/hw/virtio/virtio-balloon.c
-> @@ -228,8 +228,13 @@ static void virtio_balloon_handle_output(VirtIODevice *vdev, VirtQueue *vq)
->  
->              /* FIXME: remove get_system_memory(), but how? */
->              section = memory_region_find(get_system_memory(), pa, 1);
-> -            if (!int128_nz(section.size) || !memory_region_is_ram(section.mr))
-> +            if (!int128_nz(section.size) ||
-> +                !memory_region_is_ram(section.mr) ||
-> +                memory_region_is_rom(section.mr) ||
-> +                memory_region_is_romd(section.mr)) {
-> +                trace_virtio_balloon_bad_addr(pa);
->                  continue;
-> +            }
->  
->              trace_virtio_balloon_handle_output(memory_region_name(section.mr),
->                                                 pa);
-> 
+>  hw/i2c/core.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/hw/i2c/core.c b/hw/i2c/core.c
+> index ae3ca94..e40781e 100644
+> --- a/hw/i2c/core.c
+> +++ b/hw/i2c/core.c
+> @@ -262,9 +262,9 @@ static int i2c_slave_qdev_init(DeviceState *dev)
+>
+>      if (sc->init) {
+>          return sc->init(s);
+> -    } else {
+> -        return 0;
+>      }
+> +
+> +    return 0;
+>  }
+>
+>  DeviceState *i2c_create_slave(I2CBus *bus, const char *name, uint8_t addr)
 
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-stable@nongnu.org
+I'll just squash this change into the 'hw/i2c: Add a NULL check for i2c
+slave init callbacks' patch since that's still only in target-arm.next.
+
+thanks
+-- PMM
