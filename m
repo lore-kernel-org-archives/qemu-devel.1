@@ -1,32 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41432)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43358)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wouter@grep.be>) id 1cHuot-0004eb-OV
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 10:53:17 -0500
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1cHusz-0004eJ-FZ
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 10:57:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wouter@grep.be>) id 1cHuoq-0002Z4-Cn
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 10:53:15 -0500
-Received: from [2a01:4f8:140:52e5::2] (port=42405 helo=latin.grep.be)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <wouter@grep.be>) id 1cHuoq-0002TU-5u
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 10:53:12 -0500
-Date: Fri, 16 Dec 2016 16:52:48 +0100
-From: Wouter Verhelst <w@uter.be>
-Message-ID: <20161216155248.2r2yzthuvn76nprq@grep.be>
-References: <94ef3ef2-b76f-fa5d-cbaf-8990ce2b1be8@virtuozzo.com>
-	<20161214181323.mehzfmlf6z4pyajp@grep.be>
-	<D71CECFD-E513-4372-BB54-BF8D8D521292@alex.org.uk>
-	<3D392E31-DDA4-4316-B26D-871E94A83935@alex.org.uk>
-	<20161214201858.lblzw2ayddidxfyp@grep.be>
-	<58F412AB-8A4C-403F-AEE2-D2FB958D447A@alex.org.uk>
-	<20161215150312.dmxrxn7ujzq3apy6@grep.be>
-	<78C8A0CB-717D-4925-8AA8-A085DC1F9FB7@alex.org.uk>
-	<20161215164917.2zzkdwxarf4pnfle@grep.be>
-	<3DDAB833-51BF-4F73-9F08-E50054B01D24@alex.org.uk>
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1cHust-0005sL-NG
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 10:57:29 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45045
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1cHust-0005rs-IA
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 10:57:23 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
+	uBGFsGQO135805
+	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 10:57:22 -0500
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 27cguvgew8-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 10:57:22 -0500
+Received: from localhost
+	by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Fri, 16 Dec 2016 15:57:20 -0000
+References: <20161108095603.72301-1-pasic@linux.vnet.ibm.com>
+	<20161108095603.72301-7-pasic@linux.vnet.ibm.com>
+	<20161215132901.GJ2509@work-vm>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Fri, 16 Dec 2016 16:57:16 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3DDAB833-51BF-4F73-9F08-E50054B01D24@alex.org.uk>
-Subject: Re: [Qemu-devel] [Nbd] [PATCH] Further tidy-up on block status
+In-Reply-To: <20161215132901.GJ2509@work-vm>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 8bit
+Message-Id: <9e79129e-131c-987c-6c13-261be9aee769@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [RFC PATCH v2 6/8] migration/vmstate: split up
+ vmstate_base_addr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,31 +44,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Bligh <alex@alex.org.uk>
-Cc: "nbd-general@lists.sourceforge.net" <nbd-general@lists.sourceforge.net>, Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Stefan stefanha@redhat. com" <stefanha@redhat.com>, "Denis V . Lunev" <den@openvz.org>, Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, Amit Shah <amit.shah@redhat.com>, Juan Quintela <quintela@redhat.com>, Guenther Hutzl <hutzl@linux.vnet.ibm.com>
 
-On Thu, Dec 15, 2016 at 05:34:48PM +0000, Alex Bligh wrote:
+
+
+On 12/15/2016 02:29 PM, Dr. David Alan Gilbert wrote:
+>> +            vmstate_handle_alloc(first_elem, field, opaque);
+>> +            if (field->flags & VMS_POINTER) {
+>> +                first_elem = *(void **)first_elem;
+>> +                assert(first_elem);
+>> +            }
+>>              for (i = 0; i < n_elems; i++) {
+>>                  void *curr_elem = first_elem + size * i;
+>>  
+>> @@ -310,12 +301,16 @@ void vmstate_save_state(QEMUFile *f, const VMStateDescription *vmsd,
+>>      while (field->name) {
+>>          if (!field->field_exists ||
+>>              field->field_exists(opaque, vmsd->version_id)) {
+>> -            void *first_elem = vmstate_base_addr(opaque, field, false);
+>> +            void *first_elem = opaque + field->offset;
+>>              int i, n_elems = vmstate_n_elems(opaque, field);
+>>              int size = vmstate_size(opaque, field);
+>>              int64_t old_offset, written_bytes;
+>>              QJSON *vmdesc_loop = vmdesc;
+>>  
+>> +            if (field->flags & VMS_POINTER) {
+>> +                first_elem = *(void **)first_elem;
+>> +                assert(first_elem);
+> Can you make that   assert(first_elem || !n_elems) please.
+> and same above.
 > 
-> > On 15 Dec 2016, at 16:49, Wouter Verhelst <w@uter.be> wrote:
-> > 
-> >> Because the namespaces and leaf-names are already restricted to
-> >> non-whitespace characters. I thought having tabs, line feeds,
-> >> returns, em-space, en-space etc. was not particularly useful.
-> >> I could be persuaded to relent re spaces.
-> > 
-> > I could imagine that the context might include as part of its name a
-> > user-defined bit. If we're going to disallow whitespace, then that would
-> > mean namespaces would have to do all sorts of escaping etc. I don't
-> > think that's a good idea.
+> Dave
+
+Good catch! This could indeed be some dynamic length
+thing with 0 elements.
+
+I'm not sure if I'm going to respin this year though.
+
+Halil
+
 > 
-> So to be clear do you want to include all whitespace
-> everywhere? Or just to the right of the colon in queries?
-
-Just in queries. I agree that in namespace names, it doesn't make much
-sense.
-
--- 
-< ron> I mean, the main *practical* problem with C++, is there's like a dozen
-       people in the world who think they really understand all of its rules,
-       and pretty much all of them are just lying to themselves too.
- -- #debian-devel, OFTC, 2016-02-12
+>> +            }
+>>              for (i = 0; i < n_elems; i++) {
+>>                  void *curr_elem = first_elem + size * i;
+>>  
+>> -- 
+>> 2.8.4
+>>
