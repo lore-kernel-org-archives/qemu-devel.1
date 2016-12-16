@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44126)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44583)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aarcange@redhat.com>) id 1cHuwh-0007LB-4x
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 11:01:22 -0500
+	(envelope-from <jdenemar@redhat.com>) id 1cHuy4-0003wZ-E7
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 11:02:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aarcange@redhat.com>) id 1cHuwe-000862-37
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 11:01:19 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43604)
+	(envelope-from <jdenemar@redhat.com>) id 1cHuy1-0000dt-Dh
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 11:02:44 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35956)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aarcange@redhat.com>) id 1cHuwd-00085n-UJ
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 11:01:16 -0500
-Date: Fri, 16 Dec 2016 17:01:12 +0100
-From: Andrea Arcangeli <aarcange@redhat.com>
-Message-ID: <20161216160112.GC6168@redhat.com>
-References: <b58fd9f6-d9dd-dd56-d476-dd342174dac5@intel.com>
-	<20161207202824.GH28786@redhat.com>
-	<F2CBF3009FA73547804AE4C663CAB28E3A14E2AD@SHSMSX104.ccr.corp.intel.com>
-	<060287c7-d1af-45d5-70ea-ad35d4bbeb84@intel.com>
-	<F2CBF3009FA73547804AE4C663CAB28E3C31D0E6@SHSMSX104.ccr.corp.intel.com>
-	<01886693-c73e-3696-860b-086417d695e1@intel.com>
-	<F2CBF3009FA73547804AE4C663CAB28E3C32985A@shsmsx102.ccr.corp.intel.com>
-	<f517bfbe-18b8-6962-5c57-545f6ef47ad0@intel.com>
-	<F2CBF3009FA73547804AE4C663CAB28E3C32A8D6@shsmsx102.ccr.corp.intel.com>
-	<84ac9822-880d-b998-52ca-6aa87e0f7a43@intel.com>
+	(Exim 4.71) (envelope-from <jdenemar@redhat.com>) id 1cHuy1-0000dW-7z
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 11:02:41 -0500
+Received: from int-mx14.intmail.prod.int.phx2.redhat.com
+	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id DCF5D7F746
+	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 16:02:39 +0000 (UTC)
+Date: Fri, 16 Dec 2016 17:02:36 +0100
+From: Jiri Denemark <jdenemar@redhat.com>
+Message-ID: <20161216160236.GA964730@orkuz.home>
+References: <1480713496-11213-1-git-send-email-ehabkost@redhat.com>
+	<1480713496-11213-16-git-send-email-ehabkost@redhat.com>
+	<df0f3ade-bd09-58a0-ac83-3775d4ab7c6c@redhat.com>
+	<20161205235745.GJ13060@thinpad.lan.raisama.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <84ac9822-880d-b998-52ca-6aa87e0f7a43@intel.com>
-Subject: Re: [Qemu-devel] [PATCH kernel v5 0/5] Extend virtio-balloon for
- fast (de)inflating & fast live migration
+In-Reply-To: <20161205235745.GJ13060@thinpad.lan.raisama.net>
+Subject: Re: [Qemu-devel] [PATCH for-2.9 15/17] target-i386: Define static
+ "base" CPU model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,38 +36,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dave Hansen <dave.hansen@intel.com>
-Cc: "Li, Liang Z" <liang.z.li@intel.com>, David Hildenbrand <david@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mhocko@suse.com" <mhocko@suse.com>, "mst@redhat.com" <mst@redhat.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org, libvir-list@redhat.com
 
-On Thu, Dec 15, 2016 at 05:40:45PM -0800, Dave Hansen wrote:
-> On 12/15/2016 05:38 PM, Li, Liang Z wrote:
+On Mon, Dec 05, 2016 at 21:57:45 -0200, Eduardo Habkost wrote:
+> On Mon, Dec 05, 2016 at 07:18:47PM +0100, David Hildenbrand wrote:
+> > Am 02.12.2016 um 22:18 schrieb Eduardo Habkost:
+> > > The query-cpu-model-expand QMP command needs at least one static
+> > > model, to allow the "static" expansion mode to be implemented.
+> > > Instead of defining static versions of every CPU model, define a
+> > > "base" CPU model that has absolutely no feature flag enabled.
+> > > 
 > > 
-> > Use 52 bits for 'pfn', 12 bits for 'length', when the 12 bits is not long enough for the 'length'
-> > Set the 'length' to a special value to indicate the "actual length in next 8 bytes".
-> > 
-> > That will be much more simple. Right?
+> > Introducing separate ones makes feature lists presented to the user much
+> > shorter (and therefore easier to maintain). But I don't know how libvirt
+> > wants to deal with models on x86 in the future.
 > 
-> Sounds fine to me.
+> I understand that having a larger set of static models would make
+> expansions shorter. But I worry that by defining a complete set
+> of static models on x86 would require extra maintenance work on
+> the QEMU side with no visible benefit for libvirt.
 > 
+> I would like to hear from libvirt developers what they think. I
+> still don't know what they plan to use the type=static expansion
+> results for.
 
-Sounds fine to me too indeed.
+Currently we are mostly interested in the expansion of the "host" CPU
+model. We're fine with the expansion based on the "basic" static model
+with no features. Returning some real model instead of "basic" would be
+OK as long as it would be one of the existing CPU models. Adding special
+static models, such as Broadwell-base would actually be a complication
+since we would need to provide some translation to the existing models
+for backward compatibility. I'd appreciate if we could avoid doing this.
 
-I'm only wondering what is the major point for compressing gpfn+len in
-8 bytes in the common case, you already use sg_init_table to send down
-two pages, we could send three as well and avoid all math and bit
-shifts and ors, or not?
-
-I agree with the above because from a performance prospective I tend
-to think the above proposal will run at least theoretically faster
-because the other way is to waste double amount of CPU cache, and bit
-mangling in the encoding and the later decoding on qemu side should be
-faster than accessing an array of double size, but then I'm not sure
-if it's measurable optimization. So I'd be curious to know the exact
-motivation and if it is to reduce the CPU cache usage or if there's
-some other fundamental reason to compress it.
-
-The header already tells qemu how big is the array payload, couldn't
-we just add more pages if one isn't enough?
-
-Thanks,
-Andrea
+Jirka
