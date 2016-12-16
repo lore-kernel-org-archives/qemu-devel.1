@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47830)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49170)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dave.hansen@intel.com>) id 1cHh1S-00005D-Lw
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 20:09:19 -0500
+	(envelope-from <liang.z.li@intel.com>) id 1cHh4Z-000878-B6
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 20:12:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dave.hansen@intel.com>) id 1cHh1N-0003qk-NY
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 20:09:18 -0500
-Received: from mga02.intel.com ([134.134.136.20]:32514)
+	(envelope-from <liang.z.li@intel.com>) id 1cHh4U-0006Qa-Dd
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 20:12:31 -0500
+Received: from mga06.intel.com ([134.134.136.31]:53882)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dave.hansen@intel.com>)
-	id 1cHh1N-0003q9-EK
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 20:09:13 -0500
-References: <1480495397-23225-1-git-send-email-liang.z.li@intel.com>
-	<f67ca79c-ad34-59dd-835f-e7bc9dcaef58@redhat.com>
-	<F2CBF3009FA73547804AE4C663CAB28E3A130C01@shsmsx102.ccr.corp.intel.com>
-	<0b18c636-ee67-cbb4-1ba3-81a06150db76@redhat.com>
-	<0b83db29-ebad-2a70-8d61-756d33e33a48@intel.com>
+	(Exim 4.71) (envelope-from <liang.z.li@intel.com>)
+	id 1cHh4U-0006Pf-3N
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 20:12:26 -0500
+From: "Li, Liang Z" <liang.z.li@intel.com>
+Date: Fri, 16 Dec 2016 01:12:21 +0000
+Message-ID: <F2CBF3009FA73547804AE4C663CAB28E3C32A899@shsmsx102.ccr.corp.intel.com>
+References: <0b83db29-ebad-2a70-8d61-756d33e33a48@intel.com>
 	<2171e091-46ee-decd-7348-772555d3a5e3@redhat.com>
 	<d3ff453c-56fa-19de-317c-1c82456f2831@intel.com>
 	<20161207183817.GE28786@redhat.com>
@@ -24,14 +23,12 @@ References: <1480495397-23225-1-git-send-email-liang.z.li@intel.com>
 	<060287c7-d1af-45d5-70ea-ad35d4bbeb84@intel.com>
 	<F2CBF3009FA73547804AE4C663CAB28E3C31D0E6@SHSMSX104.ccr.corp.intel.com>
 	<01886693-c73e-3696-860b-086417d695e1@intel.com>
-	<F2CBF3009FA73547804AE4C663CAB28E3C32985A@shsmsx102.ccr.corp.intel.com>
-From: Dave Hansen <dave.hansen@intel.com>
-Message-ID: <f517bfbe-18b8-6962-5c57-545f6ef47ad0@intel.com>
-Date: Thu, 15 Dec 2016 17:09:10 -0800
+	<20161215173901-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20161215173901-mutt-send-email-mst@kernel.org>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <F2CBF3009FA73547804AE4C663CAB28E3C32985A@shsmsx102.ccr.corp.intel.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PATCH kernel v5 0/5] Extend virtio-balloon for
  fast (de)inflating & fast live migration
 List-Id: <qemu-devel.nongnu.org>
@@ -42,29 +39,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Li, Liang Z" <liang.z.li@intel.com>, Andrea Arcangeli <aarcange@redhat.com>
-Cc: David Hildenbrand <david@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mhocko@suse.com" <mhocko@suse.com>, "mst@redhat.com" <mst@redhat.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>, "Hansen, Dave" <dave.hansen@intel.com>
+Cc: Andrea Arcangeli <aarcange@redhat.com>, David Hildenbrand <david@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mhocko@suse.com" <mhocko@suse.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>
 
-On 12/15/2016 04:48 PM, Li, Liang Z wrote:
->>> It seems we leave too many bit  for the pfn, and the bits leave for
->>> length is not enough, How about keep 45 bits for the pfn and 19 bits
->>> for length, 45 bits for pfn can cover 57 bits physical address, that should be
->> enough in the near feature.
->>> What's your opinion?
->> I still think 'order' makes a lot of sense.  But, as you say, 57 bits is enough for
->> x86 for a while.  Other architectures.... who knows?
+> On Thu, Dec 15, 2016 at 07:34:33AM -0800, Dave Hansen wrote:
+> > On 12/14/2016 12:59 AM, Li, Liang Z wrote:
+> > >> Subject: Re: [Qemu-devel] [PATCH kernel v5 0/5] Extend
+> > >> virtio-balloon for fast (de)inflating & fast live migration
+> > >>
+> > >> On 12/08/2016 08:45 PM, Li, Liang Z wrote:
+> > >>> What's the conclusion of your discussion? It seems you want some
+> > >>> statistic before deciding whether to  ripping the bitmap from the
+> > >>> ABI, am I right?
+> > >>
+> > >> I think Andrea and David feel pretty strongly that we should remove
+> > >> the bitmap, unless we have some data to support keeping it.  I
+> > >> don't feel as strongly about it, but I think their critique of it
+> > >> is pretty valid.  I think the consensus is that the bitmap needs to =
+go.
+> > >>
+> > >> The only real question IMNHO is whether we should do a power-of-2
+> > >> or a length.  But, if we have 12 bits, then the argument for doing
+> > >> length is pretty strong.  We don't need anywhere near 12 bits if doi=
+ng
+> power-of-2.
+> > >
+> > > Just found the MAX_ORDER should be limited to 12 if use length
+> > > instead of order, If the MAX_ORDER is configured to a value bigger
+> > > than 12, it will make things more complex to handle this case.
+> > >
+> > > If use order, we need to break a large memory range whose length is
+> > > not the power of 2 into several small ranges, it also make the code
+> complex.
+> >
+> > I can't imagine it makes the code that much more complex.  It adds a
+> > for loop.  Right?
+> >
+> > > It seems we leave too many bit  for the pfn, and the bits leave for
+> > > length is not enough, How about keep 45 bits for the pfn and 19 bits
+> > > for length, 45 bits for pfn can cover 57 bits physical address, that =
+should
+> be enough in the near feature.
+> > >
+> > > What's your opinion?
+> >
+> > I still think 'order' makes a lot of sense.  But, as you say, 57 bits
+> > is enough for x86 for a while.  Other architectures.... who knows?
+>=20
+> I think you can probably assume page size >=3D 4K. But I would not want t=
+o
+> make any other assumptions. E.g. there are systems that absolutely requir=
+e
+> you to set high bits for DMA.
+>=20
+> I think we really want both length and order.
+>=20
+> I understand how you are trying to pack them as tightly as possible.
+>=20
+> However, I thought of a trick, we don't need to encode all possible order=
+s.
+> For example, with 2 bits of order, we can make them mean:
+> 00 - 4K pages
+> 01 - 2M pages
+> 02 - 1G pages
+>=20
+> guest can program the sizes for each order through config space.
+>=20
+> We will have 10 bits left for legth.
+>=20
 
-Thinking about this some more...  There are really only two cases that
-matter: 4k pages and "much bigger" ones.
+Please don't, we just get rid of the bitmap for simplification. :)
 
-Squeezing each 4k page into 8 bytes of metadata helps guarantee that
-this scheme won't regress over the old scheme in any cases.  For bigger
-ranges, 8 vs 16 bytes means *nothing*.  And 16 bytes will be as good or
-better than the old scheme for everything which is >4k.
+> It might make sense to also allow guest to program the number of bits use=
+d
+> for order, this will make it easy to extend without host changes.
+>=20
 
-How about this:
- * 52 bits of 'pfn', 5 bits of 'order', 7 bits of 'length'
- * One special 'length' value to mean "actual length in next 8 bytes"
+There still exist the case if the MAX_ORDER is configured to a large value,=
+ e.g. 36 for a system
+with huge amount of memory, then there is only 28 bits left for the pfn, wh=
+ich is not enough.
+Should  we limit the MAX_ORDER? I don't think so.
 
-That should be pretty simple to produce and decode.  We have two record
-sizes, but I think it is manageable.
+It seems use order is better.=20
+
+Thanks!
+Liang
+> --
+> MST
