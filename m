@@ -1,18 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32847)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34327)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcin.krzeminski@nokia.com>) id 1cHt41-0005di-Ed
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 09:00:51 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cHt8M-0006Ze-PO
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 09:05:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcin.krzeminski@nokia.com>) id 1cHt3x-0000sm-F5
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 09:00:45 -0500
-From: <marcin.krzeminski@nokia.com>
-Date: Fri, 16 Dec 2016 14:27:42 +0100
-Message-ID: <1481894862-14102-3-git-send-email-marcin.krzeminski@nokia.com>
-In-Reply-To: <1481894862-14102-1-git-send-email-marcin.krzeminski@nokia.com>
-References: <1481894862-14102-1-git-send-email-marcin.krzeminski@nokia.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1cHt8L-0005MP-Md
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 09:05:14 -0500
+Received: from mail-ua0-x235.google.com ([2607:f8b0:400c:c08::235]:33234)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cHt8L-0005MA-Is
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 09:05:13 -0500
+Received: by mail-ua0-x235.google.com with SMTP id b35so11148419uaa.0
+	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 06:05:13 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 2/2] block: m25p80: Introduce Die Erase command
+In-Reply-To: <1481130374-5147-3-git-send-email-vijay.kilari@gmail.com>
+References: <1481130374-5147-1-git-send-email-vijay.kilari@gmail.com>
+	<1481130374-5147-3-git-send-email-vijay.kilari@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 16 Dec 2016 14:04:31 +0000
+Message-ID: <CAFEAcA_hfxvW9do3xTP4KoEKMWk4NOUKJZFMiTVbJV3hY48HGA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v5 2/3] utils: Add helper to read arm
+ MIDR_EL1 register
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,128 +30,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org, peter.maydell@linaro.org, rfsw-patches@mlist.nokia.com, clg@kaod.org
+To: Vijay Kilari <vijay.kilari@gmail.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, QEMU Developers <qemu-devel@nongnu.org>, Vijaya Kumar K <Vijaya.Kumar@cavium.com>
 
-From: Marcin Krzeminski <marcin.krzeminski@nokia.com>
+On 7 December 2016 at 17:06,  <vijay.kilari@gmail.com> wrote:
+> From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+>
+> Add helper API to read MIDR_EL1 registers to fetch
+> cpu identification information. This helps in
+> adding errata's and architecture specific features.
+>
+> This is implemented only for arm architecture.
+>
+> Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+> ---
+>  include/qemu/aarch64-cpuid.h | 38 ++++++++++++++++++++++++++++++++
+>  util/Makefile.objs           |  1 +
+>  util/aarch64-cpuid.c         | 52 ++++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 91 insertions(+)
+>
+> diff --git a/include/qemu/aarch64-cpuid.h b/include/qemu/aarch64-cpuid.h
+> new file mode 100644
+> index 0000000..fb88ed8
+> --- /dev/null
+> +++ b/include/qemu/aarch64-cpuid.h
+> @@ -0,0 +1,38 @@
+> +#ifndef QEMU_AARCH64_CPUID_H
+> +#define QEMU_AARCH64_CPUID_H
+> +
+> +#if defined(__aarch64__) && defined(CONFIG_LINUX)
+> +#define MIDR_IMPLEMENTER_SHIFT  24
+> +#define MIDR_IMPLEMENTER_MASK   (0xffULL << MIDR_IMPLEMENTER_SHIFT)
+> +#define MIDR_ARCHITECTURE_SHIFT 16
+> +#define MIDR_ARCHITECTURE_MASK  (0xf << MIDR_ARCHITECTURE_SHIFT)
+> +#define MIDR_PARTNUM_SHIFT      4
+> +#define MIDR_PARTNUM_MASK       (0xfff << MIDR_PARTNUM_SHIFT)
+> +
+> +#define MIDR_CPU_PART(imp, partnum) \
+> +        (((imp)                 << MIDR_IMPLEMENTER_SHIFT)  | \
+> +        (0xf                    << MIDR_ARCHITECTURE_SHIFT) | \
+> +        ((partnum)              << MIDR_PARTNUM_SHIFT))
+> +
+> +#define ARM_CPU_IMP_CAVIUM        0x43
+> +#define CAVIUM_CPU_PART_THUNDERX  0x0A1
+> +
+> +#define MIDR_THUNDERX_PASS2  \
+> +               MIDR_CPU_PART(ARM_CPU_IMP_CAVIUM, CAVIUM_CPU_PART_THUNDERX)
+> +#define CPU_MODEL_MASK  (MIDR_IMPLEMENTER_MASK | MIDR_ARCHITECTURE_MASK | \
+> +                         MIDR_PARTNUM_MASK)
+> +
+> +uint64_t get_aarch64_cpu_id(void);
+> +bool is_thunderx_pass2_cpu(void);
+> +#else
+> +static inline uint64_t get_aarch64_cpu_id(void)
+> +{
+> +    return 0;
+> +}
+> +
+> +static inline bool is_thunderx_pass2_cpu(void)
+> +{
+> +    return false;
+> +}
+> +#endif
+> +#endif
+> diff --git a/util/Makefile.objs b/util/Makefile.objs
+> index ad0f9c7..a9585c9 100644
+> --- a/util/Makefile.objs
+> +++ b/util/Makefile.objs
+> @@ -36,3 +36,4 @@ util-obj-y += log.o
+>  util-obj-y += qdist.o
+>  util-obj-y += qht.o
+>  util-obj-y += range.o
+> +util-obj-$(CONFIG_LINUX) += aarch64-cpuid.o
+> diff --git a/util/aarch64-cpuid.c b/util/aarch64-cpuid.c
+> new file mode 100644
+> index 0000000..575f52e
+> --- /dev/null
+> +++ b/util/aarch64-cpuid.c
+> @@ -0,0 +1,52 @@
+> +/*
+> + * Dealing with arm cpu identification information.
+> + *
+> + * Copyright (C) 2016 Cavium, Inc.
+> + *
+> + * Authors:
+> + *  Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+> + *
+> + * This work is licensed under the terms of the GNU LGPL, version 2.1
+> + * or later.  See the COPYING.LIB file in the top-level directory.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qemu/cutils.h"
+> +#include "qemu/aarch64-cpuid.h"
+> +
+> +#if defined(__aarch64__)
+> +static uint64_t qemu_read_aarch64_midr_el1(void)
+> +{
+> +    const char *file = "/sys/devices/system/cpu/cpu0/regs/identification/midr_el1";
 
-Big flash chips (like mt25qu01g) are consisted from dies.
-Because of that some manufactures remove support for Chip
-Erase giving Die Erase command instead.To avoid unnecessary
-code complication, support for chip erase for mt25qu01g
-is not removed.
+If CPU0 happens to be offline (eg hot-unplugged) then this file
+won't exist, and we'll fail to identify any MIDR value.
 
-Signed-off-by: Marcin Krzeminski <marcin.krzeminski@nokia.com>
----
- hw/block/m25p80.c | 33 +++++++++++++++++++++++++++++----
- 1 file changed, 29 insertions(+), 4 deletions(-)
+The API as designed here also doesn't seem to consider
+the idea of big.LITTLE systems -- if there are multiple
+CPUs with different MIDRs, which one should we return here?
 
-diff --git a/hw/block/m25p80.c b/hw/block/m25p80.c
-index 2bc7028..0bc1fbf 100644
---- a/hw/block/m25p80.c
-+++ b/hw/block/m25p80.c
-@@ -216,8 +216,8 @@ static const FlashPartInfo known_devices[] = {
-     { INFO("n25q128",     0x20ba18,      0,  64 << 10, 256, 0) },
-     { INFO("n25q256a",    0x20ba19,      0,  64 << 10, 512, ER_4K) },
-     { INFO("n25q512a",    0x20ba20,      0,  64 << 10, 1024, ER_4K) },
--    { INFO("mt25ql01g",   0x20ba21,      0,  64 << 10, 2048, ER_4K) },
--    { INFO("mt25qu01g",   0x20bb21,      0,  64 << 10, 2048, ER_4K) },
-+    { INFO("mt25ql01g",   0x20ba21, 0x1040,  64 << 10, 2048, ER_4K) },
-+    { INFO("mt25qu01g",   0x20bb21, 0x1040,  64 << 10, 2048, ER_4K) },
- 
-     /* Spansion -- single (large) sector size only, at least
-      * for the chips listed here (without boot sectors).
-@@ -358,6 +358,8 @@ typedef enum {
- 
-     REVCR = 0x65,
-     WEVCR = 0x61,
-+
-+    DIE_ERASE = 0xC4,
- } FlashCMD;
- 
- typedef enum {
-@@ -411,6 +413,7 @@ typedef struct Flash {
-     bool reset_enable;
-     bool quad_enable;
-     uint8_t ear;
-+    uint32_t die_cnt;
- 
-     int64_t dirty_page;
- 
-@@ -492,7 +495,7 @@ static inline void flash_sync_area(Flash *s, int64_t off, int64_t len)
- 
- static void flash_erase(Flash *s, int offset, FlashCMD cmd)
- {
--    uint32_t len;
-+    uint32_t len = 0;
-     uint8_t capa_to_assert = 0;
- 
-     switch (cmd) {
-@@ -513,6 +516,16 @@ static void flash_erase(Flash *s, int offset, FlashCMD cmd)
-     case BULK_ERASE:
-         len = s->size;
-         break;
-+    case DIE_ERASE:
-+        if (s->die_cnt) {
-+            len = s->size / s->die_cnt;
-+            offset = offset & (~(len-1));
-+        } else {
-+            qemu_log_mask(LOG_GUEST_ERROR, "M25P80: %d die erase not supported by"
-+                          " device\n", len);
-+            return;
-+        }
-+        break;
-     default:
-         abort();
-     }
-@@ -634,6 +647,7 @@ static void complete_collecting_data(Flash *s)
-     case ERASE4_32K:
-     case ERASE_SECTOR:
-     case ERASE4_SECTOR:
-+    case DIE_ERASE:
-         flash_erase(s, s->cur_addr, s->cmd_in_progress);
-         break;
-     case WRSR:
-@@ -684,6 +698,7 @@ static void reset_memory(Flash *s)
-     s->write_enable = false;
-     s->reset_enable = false;
-     s->quad_enable = false;
-+    s->die_cnt = 0;
- 
-     switch (get_man(s)) {
-     case MAN_NUMONYX:
-@@ -716,7 +731,15 @@ static void reset_memory(Flash *s)
-             s->four_bytes_address_mode = true;
-         }
-         if (!(s->nonvolatile_cfg & NVCFG_LOWER_SEGMENT_MASK)) {
--            s->ear = s->size / MAX_3BYTES_SIZE - 1;
-+            s->ear = ( s->size > MAX_3BYTES_SIZE ? s->size / MAX_3BYTES_SIZE - 1 : 0);
-+        }
-+        /* 1GiB devices */
-+        if (s->pi->id[2] == 0x21) {
-+            /* MT25Q00 has 2 dies N25Q00 has 4 */
-+            if (s->pi->id[4] & BIT(6))
-+                s->die_cnt = 2;
-+            else
-+                s->die_cnt = 4;
-         }
-         break;
-     case MAN_MACRONIX:
-@@ -880,6 +903,7 @@ static void decode_new_cmd(Flash *s, uint32_t value)
-     case PP:
-     case PP4:
-     case PP4_4:
-+    case DIE_ERASE:
-         s->needed_bytes = get_addr_length(s);
-         s->pos = 0;
-         s->len = 0;
-@@ -1217,6 +1241,7 @@ static const VMStateDescription vmstate_m25p80 = {
-         VMSTATE_UINT8(spansion_cr2nv, Flash),
-         VMSTATE_UINT8(spansion_cr3nv, Flash),
-         VMSTATE_UINT8(spansion_cr4nv, Flash),
-+        VMSTATE_UINT32(die_cnt, Flash),
-         VMSTATE_END_OF_LIST()
-     }
- };
--- 
-2.7.4
+> +    char *buf;
+> +    uint64_t midr = 0;
+> +
+> +    if (!g_file_get_contents(file, &buf, 0, NULL)) {
+> +        goto out;
+> +    }
+> +
+> +    if (qemu_strtoull(buf, NULL, 0, &midr) < 0) {
+> +        midr = 0;
+> +        goto out;
+> +    }
+> +
+> +out:
+> +    g_free(buf);
+> +
+> +    return midr;
+
+thanks
+-- PMM
