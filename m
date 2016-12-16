@@ -1,23 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41044)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42729)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.l.liu@intel.com>) id 1cHoYu-0002Rv-RC
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 04:12:22 -0500
+	(envelope-from <bounces@canonical.com>) id 1cHogO-00066G-56
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 04:20:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.l.liu@intel.com>) id 1cHoYr-0001mT-Hx
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 04:12:20 -0500
-Received: from mga04.intel.com ([192.55.52.120]:53613)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1cHoYr-0001lr-5K
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 04:12:17 -0500
-From: "Liu, Yi L" <yi.l.liu@intel.com>
-Date: Fri, 16 Dec 2016 09:12:05 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C257438FD8042@shsmsx102.ccr.corp.intel.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <bounces@canonical.com>) id 1cHogK-0005m2-WF
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 04:20:04 -0500
+Received: from indium.canonical.com ([91.189.90.7]:39381)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cHogK-0005lI-Qx
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 04:20:00 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cHogJ-0001TK-NW
+	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 09:19:59 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id AE1062E80C7
+	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 09:19:59 +0000 (UTC)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v7 3/5] IOMMU: enable intel_iommu map and
- unmap notifiers
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 16 Dec 2016 09:06:38 -0000
+From: Thomas Huth <1042561@bugs.launchpad.net>
+Reply-To: Bug 1042561 <1042561@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20120828062147.16130.99989.malonedeb@wampee.canonical.com>
+Message-Id: <20161216090638.19642.72509.launchpad@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1042561] Re: Guest has no "xsave" feature with
+ parameter "-cpu qemu64, +xsave" in qemu command line.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,246 +37,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "bd.aviv@gmail.com" <bd.aviv@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, ", Jan Kiszka" <jan.kiszka@siemens.com>, ", Peter Xu" <peterx@redhat.com>, ", Alex
-	Williamson" <alex.williamson@redhat.com>, ", Jason Wang" <jasowang@redhat.com>, "Lan, Tianyu" <tianyu.lan@intel.com>, "Tian, Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>
+To: qemu-devel@nongnu.org
 
-> From: "Aviv Ben-David" <address@hidden>
->=20
-> Adds a list of registered vtd_as's to intel iommu state to save
-> iteration over each PCI device in a search of the corrosponding domain.
->=20
-> Signed-off-by: Aviv Ben-David <address@hidden>
-> ---
->  hw/i386/intel_iommu.c          | 94 ++++++++++++++++++++++++++++++++++++=
-++----
->  hw/i386/intel_iommu_internal.h |  2 +
->  include/hw/i386/intel_iommu.h  |  9 ++++
->  3 files changed, 98 insertions(+), 7 deletions(-)
->=20
-> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> index 05973b9..d872969 100644
-> --- a/hw/i386/intel_iommu.c
-> +++ b/hw/i386/intel_iommu.c
-> @@ -679,7 +679,7 @@ static int vtd_gpa_to_slpte(VTDContextEntry *ce, uint=
-64_t=20
-> gpa,
->          }
->          *reads =3D (*reads) && (slpte & VTD_SL_R);
->          *writes =3D (*writes) && (slpte & VTD_SL_W);
-> -        if (!(slpte & access_right_check)) {
-> +        if (!(slpte & access_right_check) && !(flags & IOMMU_NO_FAIL)) {
->              VTD_DPRINTF(GENERAL, "error: lack of %s permission for "
->                          "gpa 0x%"PRIx64 " slpte 0x%"PRIx64,
->                          (flags & IOMMU_WO ? "write" : "read"), gpa, slpt=
-e);
-> @@ -978,6 +978,23 @@ static VTDBus *vtd_find_as_from_bus_num(IntelIOMMUSt=
-ate=20
-> *s, uint8_t bus_num)
->      return vtd_bus;
->  }
-> =20
-> +static int vtd_get_did_dev(IntelIOMMUState *s, uint8_t bus_num, uint8_t =
-devfn,
-> +                           uint16_t *domain_id)
-> +{
-> +    VTDContextEntry ce;
-> +    int ret_fr;
-> +
-> +    assert(domain_id);
-> +
-> +    ret_fr =3D vtd_dev_to_context_entry(s, bus_num, devfn, &ce);
-> +    if (ret_fr) {
-> +        return -1;
-> +    }
-> +
-> +    *domain_id =3D  VTD_CONTEXT_ENTRY_DID(ce.hi);
-> +    return 0;
-> +}
-> +
->  /* Do a context-cache device-selective invalidation.
->   * @func_mask: FM field after shifting
->   */
-> @@ -1064,6 +1081,45 @@ static void vtd_iotlb_domain_invalidate(IntelIOMMU=
-State=20
-> *s, uint16_t domain_id)
->                                  &domain_id);
->  }
-> =20
-> +static void vtd_iotlb_page_invalidate_notify(IntelIOMMUState *s,
-> +                                           uint16_t domain_id, hwaddr ad=
-dr,
-> +                                           uint8_t am)
-> +{
-> +    IntelIOMMUNotifierNode *node;
-> +
-> +    QLIST_FOREACH(node, &(s->notifiers_list), next) {
-Aviv,
+** Changed in: qemu
+       Status: New =3D> Invalid
 
-Regards to the s->notifiers_list, I didn't see the init op to it. Does it h=
-appen
-in another patch? If so, it may be better to move it in this patch since th=
-is=20
-patch introduces both the definition and usage of notifiers_list.
+-- =
 
-If it is already clarified, then ignore it.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1042561
 
-Thanks,
-Yi L
-> +        VTDAddressSpace *vtd_as =3D node->vtd_as;
-> +        uint16_t vfio_domain_id;
-> +        int ret =3D vtd_get_did_dev(s, pci_bus_num(vtd_as->bus), vtd_as-=
->devfn,
-> +                                  &vfio_domain_id);
-> +
-> +        if (!ret && domain_id =3D=3D vfio_domain_id) {
-> +            hwaddr original_addr =3D addr;
-> +
-> +            while (addr < original_addr + (1 << am) * VTD_PAGE_SIZE) {
-> +                IOMMUTLBEntry entry =3D s->iommu_ops.translate(
-> +                                                         &node->vtd_as->=
-iommu,
-> +                                                         addr,
-> +                                                         IOMMU_NO_FAIL);
-> +
-> +                if (entry.perm =3D=3D IOMMU_NONE &&
-> +                        node->notifier_flag & IOMMU_NOTIFIER_UNMAP) {
-> +                    entry.target_as =3D &address_space_memory;
-> +                    entry.iova =3D addr & VTD_PAGE_MASK_4K;
-> +                    entry.translated_addr =3D 0;
-> +                    entry.addr_mask =3D ~VTD_PAGE_MASK(VTD_PAGE_SHIFT);
-> +                    memory_region_notify_iommu(&node->vtd_as->iommu, ent=
-ry);
-> +                    addr +=3D VTD_PAGE_SIZE;
-> +                } else if (node->notifier_flag & IOMMU_NOTIFIER_MAP) {
-> +                        memory_region_notify_iommu(&node->vtd_as->iommu,=
-=20
-> entry);
-> +                        addr +=3D entry.addr_mask + 1;
-> +                }
-> +            }
-> +        }
-> +    }
-> +}
-> +
->  static void vtd_iotlb_page_invalidate(IntelIOMMUState *s, uint16_t domai=
-n_id,
->                                        hwaddr addr, uint8_t am)
->  {
-> @@ -1074,6 +1130,8 @@ static void vtd_iotlb_page_invalidate(IntelIOMMUSta=
-te *s,=20
-> uint16_t domain_id,
->      info.addr =3D addr;
->      info.mask =3D ~((1 << am) - 1);
->      g_hash_table_foreach_remove(s->iotlb, vtd_hash_remove_by_page, &info=
-);
-> +
-> +    vtd_iotlb_page_invalidate_notify(s, domain_id, addr, am);
->  }
-> =20
->  /* Flush IOTLB
-> @@ -1999,15 +2057,37 @@ static void vtd_iommu_notify_flag_changed(MemoryR=
-egion=20
-> *iommu,
->                                            IOMMUNotifierFlag new)
->  {
->      VTDAddressSpace *vtd_as =3D container_of(iommu, VTDAddressSpace, iom=
-mu);
-> +    IntelIOMMUState *s =3D vtd_as->iommu_state;
-> +    IntelIOMMUNotifierNode *node =3D NULL;
-> +    IntelIOMMUNotifierNode *next_node =3D NULL;
-> =20
-> -    if (new & IOMMU_NOTIFIER_MAP) {
-> -        error_report("Device at bus %s addr %02x.%d requires iommu "
-> -                     "notifier which is currently not supported by "
-> -                     "intel-iommu emulation",
-> -                     vtd_as->bus->qbus.name, PCI_SLOT(vtd_as->devfn),
-> -                     PCI_FUNC(vtd_as->devfn));
-> +    if (!s->cache_mode_enabled && new & IOMMU_NOTIFIER_MAP) {
-> +        error_report("We need to set cache_mode=3D1 for intel-iommu to e=
-nable "
-> +                     "device assignment with IOMMU protection.");
->          exit(1);
->      }
-> +
-> +    /* Add new ndoe if no mapping was exising before this call */
-> +    if (old =3D=3D IOMMU_NOTIFIER_NONE) {
-> +        node =3D g_malloc0(sizeof(*node));
-> +        node->vtd_as =3D vtd_as;
-> +        node->notifier_flag =3D new;
-> +        QLIST_INSERT_HEAD(&s->notifiers_list, node, next);
-> +        return;
-> +    }
-> +
-> +    /* update notifier node with new flags */
-> +    QLIST_FOREACH_SAFE(node, &s->notifiers_list, next, next_node) {
-> +        if (node->vtd_as =3D=3D vtd_as) {
-> +            if (new =3D=3D IOMMU_NOTIFIER_NONE) {
-> +                QLIST_REMOVE(node, next);
-> +                g_free(node);
-> +            } else {
-> +                node->notifier_flag =3D new;
-> +            }
-> +            return;
-> +        }
-> +    }
->  }
-> =20
->  static const VMStateDescription vtd_vmstate =3D {
-> diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_interna=
-l.h
-> index 00cbe0d..c1b9cfc 100644
-> --- a/hw/i386/intel_iommu_internal.h
-> +++ b/hw/i386/intel_iommu_internal.h
-> @@ -381,6 +381,8 @@ typedef struct VTDIOTLBPageInvInfo VTDIOTLBPageInvInf=
-o;
->  #define VTD_PAGE_SHIFT_1G           30
->  #define VTD_PAGE_MASK_1G            (~((1ULL << VTD_PAGE_SHIFT_1G) - 1))
-> =20
-> +#define VTD_PAGE_MASK(shift)        (~((1ULL << (shift)) - 1))
-> +
->  struct VTDRootEntry {
->      uint64_t val;
->      uint64_t rsvd;
-> diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.=
-h
-> index 749eef9..1a355c1 100644
-> --- a/include/hw/i386/intel_iommu.h
-> +++ b/include/hw/i386/intel_iommu.h
-> @@ -63,6 +63,7 @@ typedef union VTD_IR_TableEntry VTD_IR_TableEntry;
->  typedef union VTD_IR_MSIAddress VTD_IR_MSIAddress;
->  typedef struct VTDIrq VTDIrq;
->  typedef struct VTD_MSIMessage VTD_MSIMessage;
-> +typedef struct IntelIOMMUNotifierNode IntelIOMMUNotifierNode;
-> =20
->  /* Context-Entry */
->  struct VTDContextEntry {
-> @@ -247,6 +248,12 @@ struct VTD_MSIMessage {
->  /* When IR is enabled, all MSI/MSI-X data bits should be zero */
->  #define VTD_IR_MSI_DATA          (0)
-> =20
-> +struct IntelIOMMUNotifierNode {
-> +    VTDAddressSpace *vtd_as;
-> +    IOMMUNotifierFlag notifier_flag;
-> +    QLIST_ENTRY(IntelIOMMUNotifierNode) next;
-> +};
-> +
->  /* The iommu (DMAR) device state struct */
->  struct IntelIOMMUState {
->      X86IOMMUState x86_iommu;
-> @@ -284,6 +291,8 @@ struct IntelIOMMUState {
->      MemoryRegionIOMMUOps iommu_ops;
->      GHashTable *vtd_as_by_busptr;   /* VTDBus objects indexed by PCIBus*=
-=20
-> reference */
->      VTDBus *vtd_as_by_bus_num[VTD_PCI_BUS_MAX]; /* VTDBus objects indexe=
-d by=20
-> bus number */
-> +    /* list of registered notifiers */
-> +    QLIST_HEAD(, IntelIOMMUNotifierNode) notifiers_list;
-> =20
->      /* interrupt remapping */
->      bool intr_enabled;              /* Whether guest enabled IR */
-> --=20
-> 1.9.1
->
+Title:
+  Guest has no "xsave" feature with parameter "-cpu qemu64,+xsave" in
+  qemu command line.
+
+Status in QEMU:
+  Invalid
+
+Bug description:
+  Environment:
+  ------------
+  Host OS (ia32/ia32e/IA64):ia32e
+  Guest OS (ia32/ia32e/IA64):ia32e
+  Guest OS Type (Linux/Windows):Linux
+  kvm.git Commit:1a577b72475d161b6677c05abe57301362023bb2
+  qemu-kvm Commit:98f1f30a89901c416e51cc70c1a08d9dc15a2ad4
+  Host Kernel Version:3.5.0-rc1
+  Hardware:Romley-EP, Ivy-bridge
+
+  =
+
+  Bug detailed description:
+  --------------------------
+  Guest has no "xsave" feature when create guest with parameter "-cpu qemu6=
+4,+xsave,+avx" in qemu command line, but the guest has avx feature.
+  When starting a guest with parameter "-cpu host" in qemu command line, th=
+e guest has 'avx' and 'xsave' features (as /proc/cpuinfo shows).
+
+  This is not a recent regression; it exists for a long time.
+
+  Reproduce steps:
+  ----------------
+  1. qemu-system-x86_64 -m 1024 -smp 2 -hda rhel6u3.img -cpu qemu64,+xsave
+  2. cat /proc/cpuinfo | grep xsave     ( check guest's xsave feature)
+
+  Current result:
+  ----------------
+  The guest has no xsave feature
+
+  Expected result:
+  ----------------
+  The guest has xsave feature
+
+  Basic root-causing log:
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1042561/+subscriptions
