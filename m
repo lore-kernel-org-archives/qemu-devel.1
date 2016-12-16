@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39133)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42589)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <SRS0=thZ3=X7=redhat.com=mst@kernel.org>)
-	id 1cHztD-00047V-FC
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 16:18:04 -0500
+	(envelope-from <no-reply@patchew.org>) id 1cI06x-0001TN-Vy
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 16:32:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <SRS0=thZ3=X7=redhat.com=mst@kernel.org>)
-	id 1cHzt8-0007oW-Ec
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 16:18:03 -0500
-Received: from mail.kernel.org ([198.145.29.136]:48990)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <SRS0=thZ3=X7=redhat.com=mst@kernel.org>)
-	id 1cHzt8-0007nn-7p
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 16:17:58 -0500
-Date: Fri, 16 Dec 2016 23:17:53 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1481922841-4324-10-git-send-email-mst@redhat.com>
-References: <1481922841-4324-1-git-send-email-mst@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+	(envelope-from <no-reply@patchew.org>) id 1cI06u-0007BS-1V
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 16:32:15 -0500
+Resent-Message-Id: <E1cI06u-0007BS-1V@eggs.gnu.org>
+Received: from sender163-mail.zoho.com ([74.201.84.163]:21323)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1cI06t-0007AM-Pu
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 16:32:11 -0500
 In-Reply-To: <1481922841-4324-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL for-2.9 9/9] virtio: avoid using
- guest_notifier_mask in vhost-user mode
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <148192392306.37.10111381964118487672@790289a7ca88>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 16 Dec 2016 13:32:04 -0800 (PST)
+Subject: Re: [Qemu-devel] [PULL for-2.9 0/9] virtio, vhost, pc: fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,61 +28,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Wei Huang <wei@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, stefanha@redhat.com
+To: mst@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, stefanha@redhat.com
 
-From: Wei Huang <wei@redhat.com>
-
-Because guest mask notifier cannot be used in vhost-user mode, a boolean
-flag "use_guest_notifier_mask" was added in commit 5669655aafd to disable
-the use of guest mask notifier under virtio-pci. However this flag wasn't
-checked in other virtio devices, such as virtio-mmio. In our tests, it
-caused assertion error under "vhost-user + virtio-mmio". This patch
-addresses this problem by adding a check before guest_notifier_mask is
-called.
-
-Signed-off-by: Wei Huang <wei@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
- hw/s390x/virtio-ccw.c   | 4 ++--
- hw/virtio/virtio-mmio.c | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
-index f5c1d98..0765068 100644
---- a/hw/s390x/virtio-ccw.c
-+++ b/hw/s390x/virtio-ccw.c
-@@ -1098,7 +1098,7 @@ static int virtio_ccw_set_guest_notifier(VirtioCcwDevice *dev, int n,
-          * We do not support individual masking for channel devices, so we
-          * need to manually trigger any guest masking callbacks here.
-          */
--        if (k->guest_notifier_mask) {
-+        if (k->guest_notifier_mask && vdev->use_guest_notifier_mask) {
-             k->guest_notifier_mask(vdev, n, false);
-         }
-         /* get lost events and re-inject */
-@@ -1107,7 +1107,7 @@ static int virtio_ccw_set_guest_notifier(VirtioCcwDevice *dev, int n,
-             event_notifier_set(notifier);
-         }
-     } else {
--        if (k->guest_notifier_mask) {
-+        if (k->guest_notifier_mask && vdev->use_guest_notifier_mask) {
-             k->guest_notifier_mask(vdev, n, true);
-         }
-         if (with_irqfd) {
-diff --git a/hw/virtio/virtio-mmio.c b/hw/virtio/virtio-mmio.c
-index 17412cb..60654dc 100644
---- a/hw/virtio/virtio-mmio.c
-+++ b/hw/virtio/virtio-mmio.c
-@@ -402,7 +402,7 @@ static int virtio_mmio_set_guest_notifier(DeviceState *d, int n, bool assign,
-         event_notifier_cleanup(notifier);
-     }
- 
--    if (vdc->guest_notifier_mask) {
-+    if (vdc->guest_notifier_mask && vdev->use_guest_notifier_mask) {
-         vdc->guest_notifier_mask(vdev, n, !assign);
-     }
- 
--- 
-MST
+SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
+YmplY3Q6IFtRZW11LWRldmVsXSBbUFVMTCBmb3ItMi45IDAvOV0gdmlydGlvLCB2aG9zdCwgcGM6
+IGZpeGVzCk1lc3NhZ2UtaWQ6IDE0ODE5MjI4NDEtNDMyNC0xLWdpdC1zZW5kLWVtYWlsLW1zdEBy
+ZWRoYXQuY29tCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJh
+c2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9
+MAoKIyBVc2VmdWwgZ2l0IG9wdGlvbnMKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGlt
+aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0
+IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBk
+bwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZv
+cm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9z
+Y3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEK
+ICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09
+IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3
+ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3Fl
+bXUKICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8xNDgxOTIyODQxLTQzMjQtMS1naXQtc2Vu
+ZC1lbWFpbC1tc3RAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzE0ODE5MjI4NDEtNDMyNC0xLWdpdC1z
+ZW5kLWVtYWlsLW1zdEByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcK
+Zjk5YWIzYiB2aXJ0aW86IGF2b2lkIHVzaW5nIGd1ZXN0X25vdGlmaWVyX21hc2sgaW4gdmhvc3Qt
+dXNlciBtb2RlCjNmYjcwMWMgcGNpOiBmaXggZXJyb3IgbWVzc2FnZSBmb3IgZXhwcmVzcyBzbG90
+cwo4ODM2MGU2IGkzODY6IGFtZF9pb21tdTogZml4IE1NSU8gcmVnaXN0ZXIgY291bnQgYW5kIGFj
+Y2Vzcwo2NWU1Nzc2IHRlc3RzL3Zob3N0LXVzZXItYnJpZGdlOiB1c2UgY29udHJpYi9saWJ2aG9z
+dC11c2VyCmI3MGM5NzYgY29udHJpYjogYWRkIGxpYnZob3N0LXVzZXIKYjY0MTM2NiB0ZXN0cy92
+aG9zdC11c2VyLWJyaWRnZTogZG8gbm90IGFjY2VwdCBtb3JlIHRoYW4gb25lIGNvbm5lY3Rpb24K
+YTE0MTZhNyB0ZXN0cy92aG9zdC11c2VyLWJyaWRnZTogaW5kaWNhdGUgcGVlciBkaXNjb25uZWN0
+ZWQKNWNlZDBiNyB0ZXN0cy92aG9zdC11c2VyLWJyaWRnZTogcmVtb3ZlIHVubmVjZXNzYXJ5IGRp
+c3BhdGNoZXJfcmVtb3ZlCmVlNWZiZjggdGVzdHMvdmhvc3QtdXNlci1icmlkZ2U6IHJlbW92ZSBm
+YWxzZSBjb21tZW50Cgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzk6IHRl
+c3RzL3Zob3N0LXVzZXItYnJpZGdlOiByZW1vdmUgZmFsc2UgY29tbWVudC4uLgpDaGVja2luZyBQ
+QVRDSCAyLzk6IHRlc3RzL3Zob3N0LXVzZXItYnJpZGdlOiByZW1vdmUgdW5uZWNlc3NhcnkgZGlz
+cGF0Y2hlcl9yZW1vdmUuLi4KQ2hlY2tpbmcgUEFUQ0ggMy85OiB0ZXN0cy92aG9zdC11c2VyLWJy
+aWRnZTogaW5kaWNhdGUgcGVlciBkaXNjb25uZWN0ZWQuLi4KQ2hlY2tpbmcgUEFUQ0ggNC85OiB0
+ZXN0cy92aG9zdC11c2VyLWJyaWRnZTogZG8gbm90IGFjY2VwdCBtb3JlIHRoYW4gb25lIGNvbm5l
+Y3Rpb24uLi4KQ2hlY2tpbmcgUEFUQ0ggNS85OiBjb250cmliOiBhZGQgbGlidmhvc3QtdXNlci4u
+LgpFUlJPUjogSW52YWxpZCBVVEYtOCwgcGF0Y2ggYW5kIGNvbW1pdCBtZXNzYWdlIHNob3VsZCBi
+ZSBlbmNvZGVkIGluIFVURi04CiM3NTogRklMRTogY29udHJpYi9saWJ2aG9zdC11c2VyL2xpYnZo
+b3N0LXVzZXIuYzo5OgorICogIE1hcmMtQW5kciBMdXJlYXUgPG1sdXJlYXVAcmVkaGF0LmNvbT4K
+ICAgICAgICAgICAgICBeCgpFUlJPUjogSW52YWxpZCBVVEYtOCwgcGF0Y2ggYW5kIGNvbW1pdCBt
+ZXNzYWdlIHNob3VsZCBiZSBlbmNvZGVkIGluIFVURi04CiMxNTc5OiBGSUxFOiBjb250cmliL2xp
+YnZob3N0LXVzZXIvbGlidmhvc3QtdXNlci5oOjg6CisgKiAgTWFyYy1BbmRyIEx1cmVhdSA8bWx1
+cmVhdUByZWRoYXQuY29tPgogICAgICAgICAgICAgIF4KCnRvdGFsOiAyIGVycm9ycywgMCB3YXJu
+aW5ncywgMTk1MCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywg
+cGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZl
+cyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRB
+SU5FUlMuCgpDaGVja2luZyBQQVRDSCA2Lzk6IHRlc3RzL3Zob3N0LXVzZXItYnJpZGdlOiB1c2Ug
+Y29udHJpYi9saWJ2aG9zdC11c2VyLi4uCkNoZWNraW5nIFBBVENIIDcvOTogaTM4NjogYW1kX2lv
+bW11OiBmaXggTU1JTyByZWdpc3RlciBjb3VudCBhbmQgYWNjZXNzLi4uCkNoZWNraW5nIFBBVENI
+IDgvOTogcGNpOiBmaXggZXJyb3IgbWVzc2FnZSBmb3IgZXhwcmVzcyBzbG90cy4uLgpDaGVja2lu
+ZyBQQVRDSCA5Lzk6IHZpcnRpbzogYXZvaWQgdXNpbmcgZ3Vlc3Rfbm90aWZpZXJfbWFzayBpbiB2
+aG9zdC11c2VyIG1vZGUuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVk
+IHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRj
+aGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBw
+YXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
