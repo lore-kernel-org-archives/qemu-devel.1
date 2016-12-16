@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37544)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37588)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cHxxW-0001pA-Sz
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 14:14:24 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cHxxZ-00024I-S1
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 14:14:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cHxxV-0000S9-Fb
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 14:14:22 -0500
-Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:33596)
+	(envelope-from <rth7680@gmail.com>) id 1cHxxY-0000V0-55
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 14:14:25 -0500
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:33806)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cHxxV-0000RH-8Y
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 14:14:21 -0500
-Received: by mail-pg0-x241.google.com with SMTP id 3so10556503pgd.0
-	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 11:14:21 -0800 (PST)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cHxxX-0000Tx-TH
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 14:14:24 -0500
+Received: by mail-pg0-x241.google.com with SMTP id b1so506635pgc.1
+	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 11:14:23 -0800 (PST)
+Received: from bigtime.domain ([2602:47:d954:1500:5e51:4fff:fe40:9c64])
+	by smtp.gmail.com with ESMTPSA id
+	c22sm13735067pgn.12.2016.12.16.11.14.22 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Fri, 16 Dec 2016 11:14:22 -0800 (PST)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Fri, 16 Dec 2016 11:13:55 -0800
-Message-Id: <20161216191405.9473-17-rth@twiddle.net>
+Date: Fri, 16 Dec 2016 11:13:58 -0800
+Message-Id: <20161216191405.9473-20-rth@twiddle.net>
 In-Reply-To: <20161216191405.9473-1-rth@twiddle.net>
 References: <20161216191405.9473-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH 16/26] linux-user: Add HPPA startup and main
- loop
+Subject: [Qemu-devel] [PATCH 19/26] target-hppa: Add nullification framework
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,241 +32,329 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Riku Voipio <riku.voipio@iki.fi>
 
-Including support for the atomic memory op syscalls.
+The HPPA cpu has a unique form of predicated execution in which
+almost any instruction can set the PSW[N] (or "nullify") bit,
+which suppresses execution (and even decoding) of the following
+instruction.  Execution of a nullified insn clears the PSW[N] bit.
 
-Cc: Riku Voipio <riku.voipio@iki.fi>
+This adds a generic framework for branching over nullified insns,
+or for sufficiently simple insns, transforming the writeback of
+the result to a conditional move.  In the process, we want to be
+able to represent PSW[N] as a TCG condition, which implies management
+of the related tcg temps.
+
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- linux-user/elfload.c |  24 +++++++
- linux-user/main.c    | 172 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 196 insertions(+)
+ target-hppa/translate.c | 228 +++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 224 insertions(+), 4 deletions(-)
 
-diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-index 5cea39d..51794bb 100644
---- a/linux-user/elfload.c
-+++ b/linux-user/elfload.c
-@@ -1215,6 +1215,30 @@ static inline void init_thread(struct target_pt_regs *regs,
- 
- #endif /* TARGET_TILEGX */
- 
-+#ifdef TARGET_HPPA
-+
-+#define ELF_START_MMAP  0x80000000
-+#define ELF_CLASS       ELFCLASS32
-+#define ELF_ARCH        EM_PARISC
-+#define ELF_PLATFORM    "PARISC"
-+#define STACK_GROWS_DOWN 0
-+#define STACK_ALIGNMENT  64
-+
-+static inline void init_thread(struct target_pt_regs *regs,
-+                               struct image_info *infop)
-+{
-+    regs->iaoq[0] = infop->entry;
-+    regs->iaoq[1] = infop->entry + 4;
-+    regs->gr[23] = 0;
-+    regs->gr[24] = infop->arg_start;
-+    regs->gr[25] = (infop->arg_end - infop->arg_start) / sizeof(abi_ulong);
-+    /* The top-of-stack contains a linkage buffer.  */
-+    regs->gr[30] = infop->start_stack + 64;
-+    regs->gr[31] = infop->entry;
-+}
-+
-+#endif /* TARGET_HPPA */
-+
- #ifndef ELF_PLATFORM
- #define ELF_PLATFORM (NULL)
- #endif
-diff --git a/linux-user/main.c b/linux-user/main.c
-index 8251027..68ee0cd 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -3505,6 +3505,169 @@ void cpu_loop(CPUTLGState *env)
- 
- #endif
- 
-+#ifdef TARGET_HPPA
-+
-+static abi_ulong hppa_lws(CPUHPPAState *env)
-+{
-+    uint32_t which = env->gr[20];
-+    abi_ulong addr = env->gr[26];
-+    abi_ulong old = env->gr[25];
-+    abi_ulong new = env->gr[24];
-+    abi_ulong size, ret;
-+
-+    switch (which) {
-+    default:
-+        return -TARGET_ENOSYS;
-+
-+    case 0: /* elf32 atomic 32bit cmpxchg */
-+        if ((addr & 3) || !access_ok(VERIFY_WRITE, addr, 4)) {
-+            return -TARGET_EFAULT;
-+        }
-+        old = tswap32(old);
-+        new = tswap32(new);
-+        ret = atomic_cmpxchg((uint32_t *)g2h(addr), old, new);
-+        ret = tswap32(ret);
-+        break;
-+
-+    case 2: /* elf32 atomic "new" cmpxchg */
-+        size = env->gr[23];
-+        if (size >= 4) {
-+            return -TARGET_ENOSYS;
-+        }
-+        if (((addr | old | new) & ((1 << size) - 1))
-+            || !access_ok(VERIFY_WRITE, addr, 1 << size)
-+            || !access_ok(VERIFY_READ, old, 1 << size)
-+            || !access_ok(VERIFY_READ, new, 1 << size)) {
-+            return -TARGET_EFAULT;
-+        }
-+        /* Note that below we use host-endian loads so that the cmpxchg
-+           can be host-endian as well.  */
-+        switch (size) {
-+        case 0:
-+            old = *(uint8_t *)g2h(old);
-+            new = *(uint8_t *)g2h(new);
-+            ret = atomic_cmpxchg((uint8_t *)g2h(addr), old, new);
-+            ret = ret != old;
-+            break;
-+        case 1:
-+            old = *(uint16_t *)g2h(old);
-+            new = *(uint16_t *)g2h(new);
-+            ret = atomic_cmpxchg((uint16_t *)g2h(addr), old, new);
-+            ret = ret != old;
-+            break;
-+        case 2:
-+            old = *(uint32_t *)g2h(old);
-+            new = *(uint32_t *)g2h(new);
-+            ret = atomic_cmpxchg((uint32_t *)g2h(addr), old, new);
-+            ret = ret != old;
-+            break;
-+        case 3:
-+            {
-+                uint64_t o64, n64, r64;
-+                o64 = *(uint64_t *)g2h(old);
-+                n64 = *(uint64_t *)g2h(new);
-+#ifdef CONFIG_ATOMIC64
-+                r64 = atomic_cmpxchg__nocheck((uint64_t *)g2h(addr), o64, n64);
-+                ret = r64 != o64;
-+#else
-+                start_exclusive();
-+                r64 = *(uint64_t *)g2h(addr);
-+                ret = 1;
-+                if (r64 == o64) {
-+                    *(uint64_t *)g2h(addr) = n64;
-+                    ret = 0;
-+                }
-+                end_exclusive();
-+#endif
-+            }
-+            break;
-+        }
-+        break;
-+    }
-+
-+    env->gr[28] = ret;
-+    return 0;
-+}
-+
-+void cpu_loop(CPUHPPAState *env)
-+{
-+    CPUState *cs = CPU(hppa_env_get_cpu(env));
-+    target_siginfo_t info;
-+    abi_ulong ret;
-+    int trapnr;
-+
-+    while (1) {
-+        cpu_exec_start(cs);
-+        trapnr = cpu_exec(cs);
-+        cpu_exec_end(cs);
-+        process_queued_cpu_work(cs);
-+
-+        switch (trapnr) {
-+        case EXCP_SYSCALL:
-+            ret = do_syscall(env, env->gr[20],
-+                             env->gr[26], env->gr[25],
-+                             env->gr[24], env->gr[23],
-+                             env->gr[22], env->gr[21], 0, 0);
-+            switch (ret) {
-+            default:
-+                env->gr[28] = ret;
-+                /* We arrived here by faking the gateway page.  Return.  */
-+                env->iaoq_f = env->gr[31];
-+                env->iaoq_b = env->gr[31] + 4;
-+                break;
-+            case -TARGET_ERESTARTSYS:
-+            case -TARGET_QEMU_ESIGRETURN:
-+                break;
-+            }
-+            break;
-+        case EXCP_SYSCALL_LWS:
-+            env->gr[21] = hppa_lws(env);
-+            /* We arrived here by faking the gateway page.  Return.  */
-+            env->iaoq_f = env->gr[31];
-+            env->iaoq_b = env->gr[31] + 4;
-+            break;
-+        case EXCP_SIGSEGV:
-+            info.si_signo = TARGET_SIGSEGV;
-+            info.si_errno = 0;
-+            info.si_code = TARGET_SEGV_ACCERR;
-+            info._sifields._sigfault._addr = env->ior;
-+            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+            break;
-+        case EXCP_SIGILL:
-+            info.si_signo = TARGET_SIGILL;
-+            info.si_errno = 0;
-+            info.si_code = TARGET_ILL_ILLOPN;
-+            info._sifields._sigfault._addr = env->iaoq_f;
-+            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+            break;
-+        case EXCP_SIGFPE:
-+            info.si_signo = TARGET_SIGFPE;
-+            info.si_errno = 0;
-+            info.si_code = 0;
-+            info._sifields._sigfault._addr = env->iaoq_f;
-+            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-+            break;
-+        case EXCP_DEBUG:
-+            trapnr = gdb_handlesig(cs, TARGET_SIGTRAP);
-+            if (trapnr) {
-+                info.si_signo = trapnr;
-+                info.si_errno = 0;
-+                info.si_code = TARGET_TRAP_BRKPT;
-+                queue_signal(env, trapnr, QEMU_SI_FAULT, &info);
-+            }
-+            break;
-+        case EXCP_INTERRUPT:
-+            /* just indicate that signals should be handled asap */
-+            break;
-+        default:
-+            g_assert_not_reached();
-+        }
-+        process_pending_signals(env);
-+    }
-+}
-+
-+#endif /* TARGET_HPPA */
-+
- THREAD CPUState *thread_cpu;
- 
- bool qemu_cpu_is_self(CPUState *cpu)
-@@ -4532,6 +4695,15 @@ int main(int argc, char **argv, char **envp)
-         }
-         env->pc = regs->pc;
+diff --git a/target-hppa/translate.c b/target-hppa/translate.c
+index 8d61853..22dfb73 100644
+--- a/target-hppa/translate.c
++++ b/target-hppa/translate.c
+@@ -151,6 +151,78 @@ void hppa_translate_init(void)
      }
-+#elif defined(TARGET_HPPA)
-+    {
-+        int i;
-+        for (i = 1; i < 32; i++) {
-+            env->gr[i] = regs->gr[i];
-+        }
-+        env->iaoq_f = regs->iaoq[0];
-+        env->iaoq_b = regs->iaoq[1];
+ }
+ 
++static DisasCond cond_make_f(void)
++{
++    DisasCond r = { .c = TCG_COND_NEVER };
++    TCGV_UNUSED(r.a0);
++    TCGV_UNUSED(r.a1);
++    return r;
++}
++
++static DisasCond cond_make_n(void)
++{
++    DisasCond r = { .c = TCG_COND_NE, .a0_is_n = true, .a1_is_0 = true };
++    r.a0 = cpu_psw_n;
++    TCGV_UNUSED(r.a1);
++    return r;
++}
++
++static DisasCond cond_make_0(TCGCond c, TCGv a0)
++{
++    DisasCond r = { .c = c, .a1_is_0 = true };
++
++    assert (c != TCG_COND_NEVER && c != TCG_COND_ALWAYS);
++    r.a0 = tcg_temp_new();
++    tcg_gen_mov_tl(r.a0, a0);
++    TCGV_UNUSED(r.a1);
++
++    return r;
++}
++
++static DisasCond cond_make(TCGCond c, TCGv a0, TCGv a1)
++{
++    DisasCond r = { .c = c };
++
++    assert (c != TCG_COND_NEVER && c != TCG_COND_ALWAYS);
++    r.a0 = tcg_temp_new();
++    tcg_gen_mov_tl(r.a0, a0);
++    r.a1 = tcg_temp_new();
++    tcg_gen_mov_tl(r.a1, a1);
++
++    return r;
++}
++
++static void cond_prep(DisasCond *cond)
++{
++    if (cond->a1_is_0) {
++        cond->a1_is_0 = false;
++        cond->a1 = tcg_const_tl(0);
 +    }
- #else
- #error unsupported target CPU
- #endif
++}
++
++static void cond_free(DisasCond *cond)
++{
++    switch (cond->c) {
++    default:
++        if (!cond->a0_is_n) {
++            tcg_temp_free(cond->a0);
++        }
++        if (!cond->a1_is_0) {
++            tcg_temp_free(cond->a1);
++        }
++        cond->a0_is_n = false;
++        cond->a1_is_0 = false;
++        TCGV_UNUSED(cond->a0);
++        TCGV_UNUSED(cond->a1);
++        /* fallthru */
++    case TCG_COND_ALWAYS:
++        cond->c = TCG_COND_NEVER;
++        break;
++    case TCG_COND_NEVER:
++        break;
++    }
++}
++
+ static TCGv get_temp(DisasContext *ctx)
+ {
+     unsigned i = ctx->ntemps++;
+@@ -178,13 +250,125 @@ static TCGv load_gpr(DisasContext *ctx, unsigned reg)
+ 
+ static TCGv dest_gpr(DisasContext *ctx, unsigned reg)
+ {
+-    if (reg == 0) {
++    if (reg == 0 || ctx->null_cond.c != TCG_COND_NEVER) {
+         return get_temp(ctx);
+     } else {
+         return cpu_gr[reg];
+     }
+ }
+ 
++static void save_or_nullify(DisasContext *ctx, TCGv dest, TCGv t)
++{
++    if (ctx->null_cond.c != TCG_COND_NEVER) {
++        cond_prep(&ctx->null_cond);
++        tcg_gen_movcond_tl(ctx->null_cond.c, dest, ctx->null_cond.a0,
++                           ctx->null_cond.a1, dest, t);
++    } else {
++        tcg_gen_mov_tl(dest, t);
++    }
++}
++
++static void save_gpr(DisasContext *ctx, unsigned reg, TCGv t)
++{
++    if (reg != 0) {
++        save_or_nullify(ctx, cpu_gr[reg], t);
++    }
++}
++
++/* Skip over the implementation of an insn that has been nullified.
++   Use this when the insn is too complex for a conditional move.  */
++static void nullify_over(DisasContext *ctx)
++{
++    if (ctx->null_cond.c != TCG_COND_NEVER) {
++        /* The always condition should have been handled in the main loop.  */
++        assert(ctx->null_cond.c != TCG_COND_ALWAYS);
++
++        ctx->null_lab = gen_new_label();
++        cond_prep(&ctx->null_cond);
++
++        /* If we're using PSW[N], copy it to a temp because... */
++        if (ctx->null_cond.a0_is_n) {
++            ctx->null_cond.a0_is_n = false;
++            ctx->null_cond.a0 = tcg_temp_new();
++            tcg_gen_mov_tl(ctx->null_cond.a0, cpu_psw_n);
++        }
++        /* ... we clear it before branching over the implementation,
++           so that (1) it's clear after nullifying this insn and
++           (2) if this insn nullifies the next, PSW[N] is valid.  */
++        if (ctx->psw_n_nonzero) {
++            ctx->psw_n_nonzero = false;
++            tcg_gen_movi_tl(cpu_psw_n, 0);
++        }
++
++        tcg_gen_brcond_tl(ctx->null_cond.c, ctx->null_cond.a0,
++                          ctx->null_cond.a1, ctx->null_lab);
++        cond_free(&ctx->null_cond);
++    }
++}
++
++/* Save the current nullification state to PSW[N].  */
++static void nullify_save(DisasContext *ctx)
++{
++    if (ctx->null_cond.c == TCG_COND_NEVER) {
++        if (ctx->psw_n_nonzero) {
++            tcg_gen_movi_tl(cpu_psw_n, 0);
++        }
++        return;
++    }
++    if (!ctx->null_cond.a0_is_n) {
++        cond_prep(&ctx->null_cond);
++        tcg_gen_setcond_tl(ctx->null_cond.c, cpu_psw_n,
++                           ctx->null_cond.a0, ctx->null_cond.a1);
++        ctx->psw_n_nonzero = true;
++    }
++    cond_free(&ctx->null_cond);
++}
++
++/* Set a PSW[N] to X.  The intention is that this is used immediately
++   before a goto_tb/exit_tb, so that there is no fallthru path to other
++   code within the TB.  Therefore we do not update psw_n_nonzero.  */
++static void nullify_set(DisasContext *ctx, bool x)
++{
++    if (ctx->psw_n_nonzero || x) {
++        tcg_gen_movi_tl(cpu_psw_n, x);
++    }
++}
++
++/* Mark the end of an instruction that may have been nullified.
++   This is the pair to nullify_over.  */
++static ExitStatus nullify_end(DisasContext *ctx, ExitStatus status)
++{
++    TCGLabel *null_lab = ctx->null_lab;
++
++    if (likely(null_lab == NULL)) {
++        /* The current insn wasn't conditional or handled the condition
++           applied to it without a branch, so the (new) setting of
++           NULL_COND can be applied directly to the next insn.  */
++        return status;
++    }
++    ctx->null_lab = NULL;
++
++    if (likely(ctx->null_cond.c == TCG_COND_NEVER)) {
++        /* The next instruction will be unconditional,
++           and NULL_COND already reflects that.  */
++        gen_set_label(null_lab);
++    } else {
++        /* The insn that we just executed is itself nullifying the next
++           instruction.  Store the condition in the PSW[N] global.
++           We asserted PSW[N] = 0 in nullify_over, so that after the
++           label we have the proper value in place.  */
++        nullify_save(ctx);
++        gen_set_label(null_lab);
++        ctx->null_cond = cond_make_n();
++    }
++
++    assert(status != EXIT_GOTO_TB && status != EXIT_IAQ_N_UPDATED);
++    if (status == EXIT_NORETURN) {
++        status = NO_EXIT;
++    }
++    return status;
++}
++
+ static void copy_iaoq_entry(TCGv dest, target_ulong ival, TCGv vval)
+ {
+     if (unlikely(ival == -1)) {
+@@ -210,13 +394,15 @@ static ExitStatus gen_excp(DisasContext *ctx, int exception)
+ {
+     copy_iaoq_entry(cpu_iaoq_f, ctx->iaoq_f, cpu_iaoq_f);
+     copy_iaoq_entry(cpu_iaoq_b, ctx->iaoq_b, cpu_iaoq_b);
++    nullify_save(ctx);
+     gen_excp_1(exception);
+     return EXIT_NORETURN;
+ }
+ 
+ static ExitStatus gen_illegal(DisasContext *ctx)
+ {
+-    return gen_excp(ctx, EXCP_SIGILL);
++    nullify_over(ctx);
++    return nullify_end(ctx, gen_excp(ctx, EXCP_SIGILL));
+ }
+ 
+ static bool use_goto_tb(DisasContext *ctx, target_ulong dest)
+@@ -228,6 +414,16 @@ static bool use_goto_tb(DisasContext *ctx, target_ulong dest)
+     return true;
+ }
+ 
++/* If the next insn is to be nullified, and it's on the same page,
++   and we're not attempting to set a breakpoint on it, then we can
++   totally skip the nullified insn.  This avoids creating and
++   executing a TB that merely branches to the next TB.  */
++static bool use_nullify_skip(DisasContext *ctx)
++{
++    return (((ctx->iaoq_b ^ ctx->iaoq_f) & TARGET_PAGE_MASK) == 0
++            && !cpu_breakpoint_test(ctx->cs, ctx->iaoq_b, BP_ANY));
++}
++
+ static void gen_goto_tb(DisasContext *ctx, int which,
+                         target_ulong f, target_ulong b)
+ {
+@@ -308,6 +504,15 @@ void gen_intermediate_code(CPUHPPAState *env, struct TranslationBlock *tb)
+     num_insns = 0;
+     gen_tb_start(tb);
+ 
++    /* Seed the nullification status from PSW[N], as shown in TB->FLAGS.  */
++    ctx.null_cond = cond_make_f();
++    ctx.psw_n_nonzero = false;
++    if (tb->flags & 1) {
++        ctx.null_cond.c = TCG_COND_ALWAYS;
++        ctx.psw_n_nonzero = true;
++    }
++    ctx.null_lab = NULL;
++
+     do {
+         tcg_gen_insn_start(ctx.iaoq_f, ctx.iaoq_b);
+         num_insns++;
+@@ -336,7 +541,13 @@ void gen_intermediate_code(CPUHPPAState *env, struct TranslationBlock *tb)
+                 TCGV_UNUSED(ctx.iaoq_n_var);
+             }
+ 
+-            ret = translate_one(&ctx, insn);
++            if (unlikely(ctx.null_cond.c == TCG_COND_ALWAYS)) {
++                ctx.null_cond.c = TCG_COND_NEVER;
++                ret = NO_EXIT;
++            } else {
++                ret = translate_one(&ctx, insn);
++                assert(ctx.null_lab == NULL);
++            }
+         }
+ 
+         for (i = 0; i < ctx.ntemps; ++i) {
+@@ -354,7 +565,14 @@ void gen_intermediate_code(CPUHPPAState *env, struct TranslationBlock *tb)
+             && (ctx.iaoq_b != ctx.iaoq_f + 4
+                 || num_insns >= max_insns
+                 || tcg_op_buf_full())) {
+-            ret = EXIT_IAQ_N_STALE;
++            if (ctx.null_cond.c == TCG_COND_NEVER
++                || ctx.null_cond.c == TCG_COND_ALWAYS) {
++                nullify_set(&ctx, ctx.null_cond.c == TCG_COND_ALWAYS);
++                gen_goto_tb(&ctx, 0, ctx.iaoq_b, ctx.iaoq_n);
++                ret = EXIT_GOTO_TB;
++            } else {
++                ret = EXIT_IAQ_N_STALE;
++            }
+         }
+ 
+         ctx.iaoq_f = ctx.iaoq_b;
+@@ -367,6 +585,7 @@ void gen_intermediate_code(CPUHPPAState *env, struct TranslationBlock *tb)
+         if (ctx.iaoq_f == -1) {
+             tcg_gen_mov_tl(cpu_iaoq_f, cpu_iaoq_b);
+             copy_iaoq_entry(cpu_iaoq_b, ctx.iaoq_n, ctx.iaoq_n_var);
++            nullify_save(&ctx);
+             ret = EXIT_IAQ_N_UPDATED;
+             break;
+         }
+@@ -386,6 +605,7 @@ void gen_intermediate_code(CPUHPPAState *env, struct TranslationBlock *tb)
+     case EXIT_IAQ_N_STALE:
+         copy_iaoq_entry(cpu_iaoq_f, ctx.iaoq_f, cpu_iaoq_f);
+         copy_iaoq_entry(cpu_iaoq_b, ctx.iaoq_b, cpu_iaoq_b);
++        nullify_save(&ctx);
+         /* FALLTHRU */
+     case EXIT_IAQ_N_UPDATED:
+         if (ctx.singlestep_enabled) {
 -- 
 2.9.3
