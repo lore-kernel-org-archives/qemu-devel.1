@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34327)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34846)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cHt8M-0006Ze-PO
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 09:05:15 -0500
+	(envelope-from <no-reply@patchew.org>) id 1cHtAH-0002ww-VN
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 09:07:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cHt8L-0005MP-Md
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 09:05:14 -0500
-Received: from mail-ua0-x235.google.com ([2607:f8b0:400c:c08::235]:33234)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cHt8L-0005MA-Is
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 09:05:13 -0500
-Received: by mail-ua0-x235.google.com with SMTP id b35so11148419uaa.0
-	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 06:05:13 -0800 (PST)
+	(envelope-from <no-reply@patchew.org>) id 1cHtAG-00069p-R0
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 09:07:13 -0500
+Resent-Message-Id: <E1cHtAG-00069p-R0@eggs.gnu.org>
+In-Reply-To: <1481894559-13974-1-git-send-email-marcin.krzeminski@nokia.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <148189721994.31.4382817436141231579@790289a7ca88>
 MIME-Version: 1.0
-In-Reply-To: <1481130374-5147-3-git-send-email-vijay.kilari@gmail.com>
-References: <1481130374-5147-1-git-send-email-vijay.kilari@gmail.com>
-	<1481130374-5147-3-git-send-email-vijay.kilari@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 16 Dec 2016 14:04:31 +0000
-Message-ID: <CAFEAcA_hfxvW9do3xTP4KoEKMWk4NOUKJZFMiTVbJV3hY48HGA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v5 2/3] utils: Add helper to read arm
- MIDR_EL1 register
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 16 Dec 2016 06:07:01 -0800 (PST)
+Subject: Re: [Qemu-devel] [RFC 0/3] MultiCPU changes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,128 +23,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vijay Kilari <vijay.kilari@gmail.com>
-Cc: qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, QEMU Developers <qemu-devel@nongnu.org>, Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+To: marcin.krzeminski@nokia.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, rfsw-patches@mlist.nokia.com, qemu-arm@nongnu.org
 
-On 7 December 2016 at 17:06,  <vijay.kilari@gmail.com> wrote:
-> From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
->
-> Add helper API to read MIDR_EL1 registers to fetch
-> cpu identification information. This helps in
-> adding errata's and architecture specific features.
->
-> This is implemented only for arm architecture.
->
-> Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
-> ---
->  include/qemu/aarch64-cpuid.h | 38 ++++++++++++++++++++++++++++++++
->  util/Makefile.objs           |  1 +
->  util/aarch64-cpuid.c         | 52 ++++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 91 insertions(+)
->
-> diff --git a/include/qemu/aarch64-cpuid.h b/include/qemu/aarch64-cpuid.h
-> new file mode 100644
-> index 0000000..fb88ed8
-> --- /dev/null
-> +++ b/include/qemu/aarch64-cpuid.h
-> @@ -0,0 +1,38 @@
-> +#ifndef QEMU_AARCH64_CPUID_H
-> +#define QEMU_AARCH64_CPUID_H
-> +
-> +#if defined(__aarch64__) && defined(CONFIG_LINUX)
-> +#define MIDR_IMPLEMENTER_SHIFT  24
-> +#define MIDR_IMPLEMENTER_MASK   (0xffULL << MIDR_IMPLEMENTER_SHIFT)
-> +#define MIDR_ARCHITECTURE_SHIFT 16
-> +#define MIDR_ARCHITECTURE_MASK  (0xf << MIDR_ARCHITECTURE_SHIFT)
-> +#define MIDR_PARTNUM_SHIFT      4
-> +#define MIDR_PARTNUM_MASK       (0xfff << MIDR_PARTNUM_SHIFT)
-> +
-> +#define MIDR_CPU_PART(imp, partnum) \
-> +        (((imp)                 << MIDR_IMPLEMENTER_SHIFT)  | \
-> +        (0xf                    << MIDR_ARCHITECTURE_SHIFT) | \
-> +        ((partnum)              << MIDR_PARTNUM_SHIFT))
-> +
-> +#define ARM_CPU_IMP_CAVIUM        0x43
-> +#define CAVIUM_CPU_PART_THUNDERX  0x0A1
-> +
-> +#define MIDR_THUNDERX_PASS2  \
-> +               MIDR_CPU_PART(ARM_CPU_IMP_CAVIUM, CAVIUM_CPU_PART_THUNDERX)
-> +#define CPU_MODEL_MASK  (MIDR_IMPLEMENTER_MASK | MIDR_ARCHITECTURE_MASK | \
-> +                         MIDR_PARTNUM_MASK)
-> +
-> +uint64_t get_aarch64_cpu_id(void);
-> +bool is_thunderx_pass2_cpu(void);
-> +#else
-> +static inline uint64_t get_aarch64_cpu_id(void)
-> +{
-> +    return 0;
-> +}
-> +
-> +static inline bool is_thunderx_pass2_cpu(void)
-> +{
-> +    return false;
-> +}
-> +#endif
-> +#endif
-> diff --git a/util/Makefile.objs b/util/Makefile.objs
-> index ad0f9c7..a9585c9 100644
-> --- a/util/Makefile.objs
-> +++ b/util/Makefile.objs
-> @@ -36,3 +36,4 @@ util-obj-y += log.o
->  util-obj-y += qdist.o
->  util-obj-y += qht.o
->  util-obj-y += range.o
-> +util-obj-$(CONFIG_LINUX) += aarch64-cpuid.o
-> diff --git a/util/aarch64-cpuid.c b/util/aarch64-cpuid.c
-> new file mode 100644
-> index 0000000..575f52e
-> --- /dev/null
-> +++ b/util/aarch64-cpuid.c
-> @@ -0,0 +1,52 @@
-> +/*
-> + * Dealing with arm cpu identification information.
-> + *
-> + * Copyright (C) 2016 Cavium, Inc.
-> + *
-> + * Authors:
-> + *  Vijaya Kumar K <Vijaya.Kumar@cavium.com>
-> + *
-> + * This work is licensed under the terms of the GNU LGPL, version 2.1
-> + * or later.  See the COPYING.LIB file in the top-level directory.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qemu/cutils.h"
-> +#include "qemu/aarch64-cpuid.h"
-> +
-> +#if defined(__aarch64__)
-> +static uint64_t qemu_read_aarch64_midr_el1(void)
-> +{
-> +    const char *file = "/sys/devices/system/cpu/cpu0/regs/identification/midr_el1";
-
-If CPU0 happens to be offline (eg hot-unplugged) then this file
-won't exist, and we'll fail to identify any MIDR value.
-
-The API as designed here also doesn't seem to consider
-the idea of big.LITTLE systems -- if there are multiple
-CPUs with different MIDRs, which one should we return here?
-
-> +    char *buf;
-> +    uint64_t midr = 0;
-> +
-> +    if (!g_file_get_contents(file, &buf, 0, NULL)) {
-> +        goto out;
-> +    }
-> +
-> +    if (qemu_strtoull(buf, NULL, 0, &midr) < 0) {
-> +        midr = 0;
-> +        goto out;
-> +    }
-> +
-> +out:
-> +    g_free(buf);
-> +
-> +    return midr;
-
-thanks
--- PMM
+SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
+YmplY3Q6IFtRZW11LWRldmVsXSBbUkZDIDAvM10gTXVsdGlDUFUgY2hhbmdlcwpNZXNzYWdlLWlk
+OiAxNDgxODk0NTU5LTEzOTc0LTEtZ2l0LXNlbmQtZW1haWwtbWFyY2luLmtyemVtaW5za2lAbm9r
+aWEuY29tCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UK
+bj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoK
+IyBVc2VmdWwgZ2l0IG9wdGlvbnMKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQg
+MApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxv
+ZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwog
+ICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1h
+dD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3Jp
+cHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAg
+ICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRF
+U1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0
+YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUK
+ICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8xNDgxODk0NTU5LTEzOTc0LTEtZ2l0LXNlbmQt
+ZW1haWwtbWFyY2luLmtyemVtaW5za2lAbm9raWEuY29tIC0+IHBhdGNoZXcvMTQ4MTg5NDU1OS0x
+Mzk3NC0xLWdpdC1zZW5kLWVtYWlsLW1hcmNpbi5rcnplbWluc2tpQG5va2lhLmNvbQpTd2l0Y2hl
+ZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmE0ODNkYTggZXhlYzogQWxsb3cgdG8gY2hhbmdlIEFk
+ZHJlc3MgU3BhY2UgZnJvbSBib2FyZCBsZXZlbAoyODg5NTI4IEFSTTogYm9vdDogQWRkIG9wdGlv
+biB0byBza2lwIEZEVCBtZW1vcnkgbm9kZSB1cGRhdGUKN2E0YWE1YSBudmljOiBBZGQgQ1BVIG51
+bWViciBwcm9wZXJ0eQoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8zOiBu
+dmljOiBBZGQgQ1BVIG51bWViciBwcm9wZXJ0eS4uLgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxk
+IG5ldmVyIHVzZSB0YWJzCiM4MjogRklMRTogaHcvaW50Yy9hcm12N21fbnZpYy5jOjQ3NzoKK15J
+Vk1TVEFURV9VSU5UMzIoY3B1X2lkLCBudmljX3N0YXRlKSwkCgp0b3RhbDogMSBlcnJvcnMsIDAg
+d2FybmluZ3MsIDg3IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1z
+LCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRp
+dmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlO
+VEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDIvMzogQVJNOiBib290OiBBZGQgb3B0aW9uIHRvIHNr
+aXAgRkRUIG1lbW9yeSBub2RlIHVwZGF0ZS4uLgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFj
+dGVycwojNDQ6IEZJTEU6IGh3L2FybS9ib290LmM6NTAwOgorICAgICAgICAgICAgICAgIHFlbXVf
+ZmR0X3NldHByb3Bfc3RyaW5nKGZkdCwgIi9tZW1vcnkiLCAiZGV2aWNlX3R5cGUiLCAibWVtb3J5
+Iik7Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDQ4IGxpbmVzIGNoZWNrZWQKCllvdXIg
+cGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
+IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
+LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggMy8zOiBleGVj
+OiBBbGxvdyB0byBjaGFuZ2UgQWRkcmVzcyBTcGFjZSBmcm9tIGJvYXJkIGxldmVsLi4uCj09PSBP
+VVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1h
+aWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3Jn
+L10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMu
+b3Jn
