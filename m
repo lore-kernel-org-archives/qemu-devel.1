@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56605)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58419)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <a.rigo@virtualopensystems.com>) id 1cHr1a-0005JD-C1
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 06:50:09 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cHrAw-0005tk-Is
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 06:59:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <a.rigo@virtualopensystems.com>) id 1cHr1W-0008KN-Co
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 06:50:06 -0500
-Received: from mail-it0-x243.google.com ([2607:f8b0:4001:c0b::243]:36678)
+	(envelope-from <peter.maydell@linaro.org>) id 1cHrAv-0005yq-Fs
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 06:59:46 -0500
+Received: from mail-ua0-x22f.google.com ([2607:f8b0:400c:c08::22f]:34672)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <a.rigo@virtualopensystems.com>)
-	id 1cHr1W-0008Jp-8c
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 06:50:02 -0500
-Received: by mail-it0-x243.google.com with SMTP id n68so2274483itn.3
-	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 03:50:00 -0800 (PST)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cHrAv-0005y8-2g
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 06:59:45 -0500
+Received: by mail-ua0-x22f.google.com with SMTP id 51so35914206uai.1
+	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 03:59:44 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <391977981.4066351.1481752314886.JavaMail.zimbra@redhat.com>
+In-Reply-To: <CAH47eN3roJHEezvR_ijdiS36kQaKLUCd-8h4uiGeFT1CUp3Qgg@mail.gmail.com>
 References: <CAH47eN3AVo-4CWN8XHhVz5F811Dc-iS8pVmW+4EW_1mvbpVgpA@mail.gmail.com>
 	<391977981.4066351.1481752314886.JavaMail.zimbra@redhat.com>
-From: Alvise Rigo <a.rigo@virtualopensystems.com>
-Date: Fri, 16 Dec 2016 12:49:44 +0100
-Message-ID: <CAH47eN3roJHEezvR_ijdiS36kQaKLUCd-8h4uiGeFT1CUp3Qgg@mail.gmail.com>
+	<CAH47eN3roJHEezvR_ijdiS36kQaKLUCd-8h4uiGeFT1CUp3Qgg@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 16 Dec 2016 11:59:23 +0000
+Message-ID: <CAFEAcA9UUGoq+EFQ5P4=vRu=+AdvhnDha6bNJbzY=mNNjMo-rw@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Subject: Re: [Qemu-devel] Making TCG configurable in system mode
 List-Id: <qemu-devel.nongnu.org>
@@ -29,51 +30,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, chao p peng <chao.p.peng@linux.intel.com>, Claudio Fontana <Claudio.Fontana@huawei.com>, VirtualOpenSystems Technical Team <tech@virtualopensystems.com>
+To: Alvise Rigo <a.rigo@virtualopensystems.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, chao p peng <chao.p.peng@linux.intel.com>, VirtualOpenSystems Technical Team <tech@virtualopensystems.com>, Claudio Fontana <Claudio.Fontana@huawei.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Wed, Dec 14, 2016 at 10:51 PM, Paolo Bonzini <pbonzini@redhat.com> wrote:
+On 16 December 2016 at 11:49, Alvise Rigo <a.rigo@virtualopensystems.com> wrote:
+> On Wed, Dec 14, 2016 at 10:51 PM, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>> The hardest part is making sure that it doesn't bitrot, and it's hard
+>> because we don't have CI for architectures other than x86.  But at least
+>> Peter builds on ARM, and target submaintainers do build on PPC and s390
+>> so it's not that bad perhaps.
 >
->> I am looking at the possibility to add a new QEMU configuration option
->> to make TCG optional (in qemu-system-*). What I am exploring is a way
->> to exclude any of the TCG code not needed by KVM from the QEMU binary.
->> There has been a previous attempt in the past from Paolo Bonzini,
->> namely https://github.com/bonzini/qemu/tree/disable-tcg, that
->> eventually was not upstreamed. I was looking into this work mainly,
->> mostly to understand if the same approach can be respinned and used to
->> support all the QEMU's targets. Any input on this is welcome.
->
-> Yes, it sure can!  However I suggest doing it one target at a time,
-> because there can be tricky dependencies between helper files and
+> Would a CI set up just to test this feature make sense?
 
-Indeed, doing it gradually is the right way to tackle it. I might be
-back with some more concrete work. Thank you for the time being.
+If we had CI for multiple host architectures we'd just use it
+routinely for everything. The difficulty is that there's nothing
+public like Travis for non-x86 and historically we as a project
+have not managed to maintain a local CI solution (we used to
+have buildbots but their config just bitrotted).
 
-> KVM support code.  It's fine as long as the configure script only
-> allows --disable-tcg for specific targets where it works.
->
-> IIRC my branch only covered x86 (or maybe PPC too?!?  I don't remember).
->
-> The hardest part is making sure that it doesn't bitrot, and it's hard
-> because we don't have CI for architectures other than x86.  But at least
-> Peter builds on ARM, and target submaintainers do build on PPC and s390
-> so it's not that bad perhaps.
+We do include ARM and PPC in the standard set of build tests
+before merging pull requests, though, so those are not completely
+untested.
 
-Would a CI set up just to test this feature make sense?
-
-Thank you,
-alvise
-
->
->> I was also wondering if an approach could be based on the recent patch
->> series that allows to use the TCG frontend as a library --
->> https://www.mail-archive.com/qemu-devel@nongnu.org/msg415514.html.
->> Making qemu-user and qemu-system users of such a library might help in
->> having TCG optional. Obviously this solution introduces many other
->> challenges and I'm not even sure if it's actually viable.
->
-> I think making qemu-system use such a library would be very hard, because
-> of the different implementation of qemu_ld/qemu_st in user and system
-> emulation.  I don't think it's important for your purpose.
->
-> Paolo
+thanks
+-- PMM
