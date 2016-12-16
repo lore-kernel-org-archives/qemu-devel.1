@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43707)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52537)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cHqUF-0003t4-BP
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 06:15:40 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cHqm9-0005Fv-GB
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 06:34:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cHqUB-0006FT-Ss
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 06:15:39 -0500
-Received: from indium.canonical.com ([91.189.90.7]:47435)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cHqUB-0006Eb-Ll
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 06:15:35 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cHqUA-0005dk-Kf
-	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 11:15:34 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 9A9942E80C3
-	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 11:15:34 +0000 (UTC)
+	(envelope-from <peter.maydell@linaro.org>) id 1cHqm8-0007js-G2
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 06:34:09 -0500
+Received: from mail-ua0-x231.google.com ([2607:f8b0:400c:c08::231]:36844)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cHqm8-0007jb-Ax
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 06:34:08 -0500
+Received: by mail-ua0-x231.google.com with SMTP id 3so19967568uaz.3
+	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 03:34:07 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 16 Dec 2016 11:01:45 -0000
-From: Thomas Huth <691424@bugs.launchpad.net>
-Reply-To: Bug 691424 <691424@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20101217063430.31066.66219.malonedeb@palladium.canonical.com>
-Message-Id: <20161216110145.20636.43962.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 691424] Re: qemu/kvm SDL over ssh -X broken
+In-Reply-To: <1481882024-10016-5-git-send-email-ashijeetacharya@gmail.com>
+References: <1481882024-10016-1-git-send-email-ashijeetacharya@gmail.com>
+	<1481882024-10016-5-git-send-email-ashijeetacharya@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 16 Dec 2016 11:33:46 +0000
+Message-ID: <CAFEAcA_nARKG5MHrsj4aAQNYfFyEGT-4TzU=MLi1E+zvsK7b=g@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v2 4/4] migration: Fail migration blocker
+ for --only-migratble
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,86 +30,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Ashijeet Acharya <ashijeetacharya@gmail.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, John Snow <jsnow@redhat.com>, Amit Shah <amit.shah@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, Juan Quintela <quintela@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, Greg Kurz <groug@kaod.org>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-OK, thanks a lot for testing it again!
+On 16 December 2016 at 09:53, Ashijeet Acharya
+<ashijeetacharya@gmail.com> wrote:
+> migrate_add_blocker should rightly fail if the '--only-migratable'
+> option was specified and the device in use should not be able to
+> perform the action which results in an unmigratable VM.
+>
+> Make migrate_add_blocker return -EACCES in this case.
+>
+> Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
 
-** Changed in: qemu
-       Status: Incomplete =3D> Fix Released
+> diff --git a/block/qcow.c b/block/qcow.c
+> index 11526a1..7e5003ac 100644
+> --- a/block/qcow.c
+> +++ b/block/qcow.c
+> @@ -253,8 +253,11 @@ static int qcow_open(BlockDriverState *bs, QDict *options, int flags,
+>                 "does not support live migration",
+>                 bdrv_get_device_or_node_name(bs));
+>      ret = migrate_add_blocker(s->migration_blocker, errp);
+> -    if (ret < 0) {
+> -        error_free(s->migration_blocker);
+> +    if (ret) {
+> +        if (ret == -EACCES) {
+> +            error_append_hint(errp, "Cannot use a node with qcow format as "
+> +                              "it does not support live migration");
+> +        }
+>          goto fail;
+>      }
 
--- =
+> --- a/hw/display/virtio-gpu.c
+> +++ b/hw/display/virtio-gpu.c
+> @@ -1102,6 +1102,7 @@ static void virtio_gpu_device_realize(DeviceState *qdev, Error **errp)
+>      VirtIOGPU *g = VIRTIO_GPU(qdev);
+>      bool have_virgl;
+>      int i;
+> +    int ret;
+>
+>      if (g->conf.max_outputs > VIRTIO_GPU_MAX_SCANOUTS) {
+>          error_setg(errp, "invalid max_outputs > %d", VIRTIO_GPU_MAX_SCANOUTS);
+> @@ -1120,8 +1121,12 @@ static void virtio_gpu_device_realize(DeviceState *qdev, Error **errp)
+>
+>      if (virtio_gpu_virgl_enabled(g->conf)) {
+>          error_setg(&g->migration_blocker, "virgl is not yet migratable");
+> -        if (migrate_add_blocker(g->migration_blocker, errp) < 0) {
+> -            error_free(g->migration_blocker);
+> +        ret = migrate_add_blocker(g->migration_blocker, errp);
+> +        if (ret) {
+> +            if (ret == -EACCES) {
+> +                error_append_hint(errp, "Cannot use virgl as it does not "
+> +                                  "support live migration yet");
+> +            }
+>              return;
+>          }
+>      }
+> diff --git a/hw/intc/arm_gic_kvm.c b/hw/intc/arm_gic_kvm.c
+> index 3614daa..b40ad5f 100644
+> --- a/hw/intc/arm_gic_kvm.c
+> +++ b/hw/intc/arm_gic_kvm.c
+> @@ -514,8 +514,11 @@ static void kvm_arm_gic_realize(DeviceState *dev, Error **errp)
+>          error_setg(&s->migration_blocker, "This operating system kernel does "
+>                                            "not support vGICv2 migration");
+>          ret = migrate_add_blocker(s->migration_blocker, errp);
+> -        if (ret < 0) {
+> -            error_free(s->migration_blocker);
+> +        if (ret) {
+> +            if (ret == -EACCES) {
+> +                error_append_hint(errp, "Failed to realize vGICv2 as its"
+> +                                  " migrataion is not implemented yet");
+> +            }
+>              return;
+>          }
+>      }
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/691424
+So if you look at these diff hunks you can see that we effectively
+end up duplicating the "why doesn't this device let you migrate"
+user message -- once in the error_setg(&s->migration_blocker, ...)
+and once with the error_append_hint() call.
 
-Title:
-  qemu/kvm SDL over ssh -X broken
+Is there some way we can get migrate_add_blocker() to automatically
+incorporate the message when it's failing for the only-migratable case?
+(It's already being passed the errp.)
+That would avoid this duplication of the messages, and should also
+mean we don't need to modify the callers at all.
 
-Status in QEMU:
-  Fix Released
+If the error messages come out looking a bit strangely worded we
+could edit the text in the callers so it works in both situations
+when it will be used.
 
-Bug description:
-  qemu/kvm by default uses SDL to render the output of its emulated VGA gra=
-phics.
-  This is broken over ssh -X since quite a while.
-  The only workaround I know, is to use qemu -vnc :0
-  and connect using vncviewer
-
-  =
-
-  How To Reproduce:
-  1. zypper in qemu
-  2. ssh -X localhost qemu -cdrom ANYISOFILE
-
-  Actual Results:
-  qemu hangs in an endless loop on the BIOS display screen
-
-  Expected Results:
-  should boot up the iso as 0.10 versions did
-
-  Reproducible: Always
-
-  =
-
-  this is what broke it:
-  $ git bisect bad
-  c18a2c360e3100bbd71162cf922dcd8c429a8b71 is first bad commit
-  commit c18a2c360e3100bbd71162cf922dcd8c429a8b71
-  Author: Stefano Stabellini <stefano.stabellini@eu.citrix.com>
-  Date:   Wed Jun 24 11:58:25 2009 +0100
-
-      sdl zooming
-
-      Hi all,
-      this patch implements zooming capabilities for the sdl interface.
-      A new sdl_zoom_blit function is added that is able to scale and blit a
-      portion of a surface into another.
-      This way we can enable SDL_RESIZABLE and have a real_screen surface w=
-ith
-      a different size than the guest surface and let sdl_zoom_blit take ca=
-re
-      of the problem.
-
-      Signed-off-by: Stefano Stabellini <stefano.stabellini@eu.citrix.com>
-      Signed-off-by: Anthony Liguori <aliguori@us.ibm.com>
-
-  :100644 100644 a06c9bfc22cc6de1c6e5e9068d6bf59d89613767 f8dc5065dd27010bf=
-dbb6bcfb0c6e3af25024cdb M      Makefile
-  :100644 100644 417217582363a87ee67e746ba798e285a64b6cdc 35183399f65de6f50=
-f3baa4767ab7d4d11d45bca M      console.h
-  :100644 100644 178b5532b8d9dd2194a8662fbfdcd49b4bc04222 d81399e51276e1c97=
-fa1f7272ef16ea4c312b51b M      sdl.c
-  :000000 100644 0000000000000000000000000000000000000000 56d3604fc3d79e4cc=
-4622be8437c78bf70075da3 A      sdl_zoom.c
-  :000000 100644 0000000000000000000000000000000000000000 33dc63408b43a37fd=
-6b1acde3fa62b1a51315e75 A      sdl_zoom.h
-  :000000 100644 0000000000000000000000000000000000000000 64bbca849bd3af678=
-c2259b4d8cc0e48c6a6b43c A      sdl_zoom_template.h
-
-  =
-
-  This problem occurs on both Debian and openSUSE.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/691424/+subscriptions
+thanks
+-- PMM
