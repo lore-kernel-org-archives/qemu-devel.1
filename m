@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55567)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55953)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cHpQn-0004Kd-Kl
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 05:08:02 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cHpSo-0005IU-HN
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 05:10:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cHpQk-00026k-Dd
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 05:08:01 -0500
-Resent-Message-Id: <E1cHpQk-00026k-Dd@eggs.gnu.org>
-Received: from sender163-mail.zoho.com ([74.201.84.163]:21409)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1cHpQk-00026E-67
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 05:07:58 -0500
-In-Reply-To: <1481882024-10016-1-git-send-email-ashijeetacharya@gmail.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <148188286635.31.34184530960406725@790289a7ca88>
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cHpSl-0002mG-Br
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 05:10:06 -0500
+Received: from mail-wj0-x243.google.com ([2a00:1450:400c:c01::243]:33117)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1cHpSl-0002m2-5O
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 05:10:03 -0500
+Received: by mail-wj0-x243.google.com with SMTP id kp2so13713439wjc.0
+	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 02:10:03 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <20161216075527.5421-1-zhongjun@sangfor.com.cn>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <698b3cd4-0eeb-7739-e692-58615fc40956@redhat.com>
+Date: Fri, 16 Dec 2016 11:10:00 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 16 Dec 2016 02:07:48 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v2 0/4] Introduce a new --only-migratable
- option
+In-Reply-To: <20161216075527.5421-1-zhongjun@sangfor.com.cn>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/1] scsi-disk: passthrough VERIFY command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,51 +30,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: ashijeetacharya@gmail.com
-Cc: famz@redhat.com, dgilbert@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, quintela@redhat.com, qemu-devel@nongnu.org, mst@redhat.com, armbru@redhat.com, groug@kaod.org, aneesh.kumar@linux.vnet.ibm.com, marcandre.lureau@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, jsnow@redhat.com
+To: Junlian Bell <zhongjun@sangfor.com.cn>
+Cc: qemu-devel@nongnu.org
 
-SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
-YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIgMC80XSBJbnRyb2R1Y2UgYSBuZXcgLS1vbmx5
-LW1pZ3JhdGFibGUgb3B0aW9uCk1lc3NhZ2UtaWQ6IDE0ODE4ODIwMjQtMTAwMTYtMS1naXQtc2Vu
-ZC1lbWFpbC1hc2hpamVldGFjaGFyeWFAZ21haWwuY29tCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4g
-PT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUg
-JEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKIyBVc2VmdWwgZ2l0IG9wdGlvbnMKZ2l0IGNvbmZp
-ZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5h
-bWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0Uu
-LikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRv
-dGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93
-ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAt
-OyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEp
-KQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNj
-OGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1
-Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8x
-NDgxODgyMDI0LTEwMDE2LTEtZ2l0LXNlbmQtZW1haWwtYXNoaWplZXRhY2hhcnlhQGdtYWlsLmNv
-bSAtPiBwYXRjaGV3LzE0ODE4ODIwMjQtMTAwMTYtMS1naXQtc2VuZC1lbWFpbC1hc2hpamVldGFj
-aGFyeWFAZ21haWwuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKNDhlNjVlYSBt
-aWdyYXRpb246IEZhaWwgbWlncmF0aW9uIGJsb2NrZXIgZm9yIC0tb25seS1taWdyYXRibGUKNWRh
-ZmRhMSBtaWdyYXRpb246IGRpc2FsbG93IG1pZ3JhdGVfYWRkX2Jsb2NrZXIgZHVyaW5nIG1pZ3Jh
-dGlvbgpiMGY2YTU5IG1pZ3JhdGlvbjogQWxsb3cgImRldmljZSBhZGQiIG9wdGlvbnMgdG8gb25s
-eSBhZGQgbWlncmF0YWJsZSBkZXZpY2VzCjMwMzZkNDYgbWlncmF0aW9uOiBBZGQgYSBuZXcgb3B0
-aW9uIHRvIGVuYWJsZSBvbmx5LW1pZ3JhdGFibGUKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNr
-aW5nIFBBVENIIDEvNDogbWlncmF0aW9uOiBBZGQgYSBuZXcgb3B0aW9uIHRvIGVuYWJsZSBvbmx5
-LW1pZ3JhdGFibGUuLi4KRVJST1I6IGRvIG5vdCBpbml0aWFsaXNlIGdsb2JhbHMgdG8gMCBvciBO
-VUxMCiM1NjogRklMRTogdmwuYzoxODM6CitpbnQgb25seV9taWdyYXRhYmxlID0gMDsgLyogdHVy
-biBpdCBvZmYgdW5sZXNzIHVzZXIgc3RhdGVzIG90aGVyd2lzZSAqLwoKdG90YWw6IDEgZXJyb3Jz
-LCAwIHdhcm5pbmdzLCA0MCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9i
-bGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBv
-c2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4g
-TUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAyLzQ6IG1pZ3JhdGlvbjogQWxsb3cgImRldmlj
-ZSBhZGQiIG9wdGlvbnMgdG8gb25seSBhZGQgbWlncmF0YWJsZSBkZXZpY2VzLi4uCkNoZWNraW5n
-IFBBVENIIDMvNDogbWlncmF0aW9uOiBkaXNhbGxvdyBtaWdyYXRlX2FkZF9ibG9ja2VyIGR1cmlu
-ZyBtaWdyYXRpb24uLi4KRVJST1I6IGRvIG5vdCB1c2UgQzk5IC8vIGNvbW1lbnRzCiMxNTk6IEZJ
-TEU6IGJsb2NrL3Z2ZmF0LmM6MTIwNToKKyAgICAvLyAgICBhc3NlcnQoaXNfY29uc2lzdGVudChz
-KSk7Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDQ4OSBsaW5lcyBjaGVja2VkCgpZb3Vy
-IHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVz
-ZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5l
-ciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA0LzQ6IG1p
-Z3JhdGlvbjogRmFpbCBtaWdyYXRpb24gYmxvY2tlciBmb3IgLS1vbmx5LW1pZ3JhdGJsZS4uLgo9
-PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0t
-CkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3
-Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxp
-c3RzLm9yZw==
+
+
+On 16/12/2016 08:55, Junlian Bell wrote:
+> When a scsi-disk object receives VERIFY command with BYTCHK bit being zero,
+> scsi_block_is_passthrough returns false and finally makes req being proceeded
+> by scsi_block_dma_command. Because scsi_block_dma_command has removed process
+> of VERIFY, QEMU will abort in this function.
+> 
+> This patch makes all VERIFY passthrough to solve this problom.
+> 
+> Signed-off-by: Junlian Bell <zhongjun@sangfor.com.cn>
+> ---
+>  hw/scsi/scsi-disk.c | 7 -------
+>  1 file changed, 7 deletions(-)
+> 
+> diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
+> index a96319138a..f30f97f976 100644
+> --- a/hw/scsi/scsi-disk.c
+> +++ b/hw/scsi/scsi-disk.c
+> @@ -2690,13 +2690,6 @@ static bool scsi_block_is_passthrough(SCSIDiskState *s, uint8_t *buf)
+>      case VERIFY_10:
+>      case VERIFY_12:
+>      case VERIFY_16:
+> -        /* Check if BYTCHK == 0x01 (data-out buffer contains data
+> -         * for the number of logical blocks specified in the length
+> -         * field).  For other modes, do not use scatter/gather operation.
+> -         */
+> -        if ((buf[1] & 6) != 2) {
+> -            return false;
+> -        }
+>          break;
+>  
+>      case READ_6:
+> 
+
+Does this work too?
+
+diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
+index a963191..676164d 100644
+--- a/hw/scsi/scsi-disk.c
++++ b/hw/scsi/scsi-disk.c
+@@ -2157,6 +2157,13 @@ static int32_t scsi_disk_dma_command(SCSIRequest
+*req, uint8_t *buf)
+         DPRINTF("Write %s(sector %" PRId64 ", count %u)\n",
+                 (command & 0xe) == 0xe ? "And Verify " : "",
+                 r->req.cmd.lba, len);
++    case VERIFY_10:
++    case VERIFY_12:
++    case VERIFY_16:
++        /* We get here only for BYTCHK=00 and only for scsi-block.  As
++         * far as DMA is concerned, we can treat it as a write, and
++         * scsi_block_do_sgio will send VERIFY commands.
++         */
+         if (r->req.cmd.buf[1] & 0xe0) {
+             goto illegal_request;
+         }
+
+Thanks,
+
+Paolo
