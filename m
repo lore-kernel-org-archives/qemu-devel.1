@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34846)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37355)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cHtAH-0002ww-VN
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 09:07:19 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cHtKL-0006xD-Sm
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 09:17:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cHtAG-00069p-R0
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 09:07:13 -0500
-Resent-Message-Id: <E1cHtAG-00069p-R0@eggs.gnu.org>
-In-Reply-To: <1481894559-13974-1-git-send-email-marcin.krzeminski@nokia.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <148189721994.31.4382817436141231579@790289a7ca88>
+	(envelope-from <alex.bennee@linaro.org>) id 1cHtKI-0004wR-Jh
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 09:17:37 -0500
+Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:35848)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cHtKI-0004uj-C1
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 09:17:34 -0500
+Received: by mail-wm0-x22e.google.com with SMTP id g23so35100743wme.1
+	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 06:17:32 -0800 (PST)
+References: <CAH47eN3AVo-4CWN8XHhVz5F811Dc-iS8pVmW+4EW_1mvbpVgpA@mail.gmail.com>
+	<6970101a-5eff-9f77-86ec-c142937c1000@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <6970101a-5eff-9f77-86ec-c142937c1000@redhat.com>
+Date: Fri, 16 Dec 2016 14:17:30 +0000
+Message-ID: <87twa4rm9x.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 16 Dec 2016 06:07:01 -0800 (PST)
-Subject: Re: [Qemu-devel] [RFC 0/3] MultiCPU changes
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] Making TCG configurable in system mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,47 +30,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: marcin.krzeminski@nokia.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, rfsw-patches@mlist.nokia.com, qemu-arm@nongnu.org
+To: Laurent Vivier <lvivier@redhat.com>
+Cc: Alvise Rigo <a.rigo@virtualopensystems.com>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, VirtualOpenSystems Technical Team <tech@virtualopensystems.com>, Claudio Fontana <Claudio.Fontana@huawei.com>, chao.p.peng@linux.intel.com
 
-SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
-YmplY3Q6IFtRZW11LWRldmVsXSBbUkZDIDAvM10gTXVsdGlDUFUgY2hhbmdlcwpNZXNzYWdlLWlk
-OiAxNDgxODk0NTU5LTEzOTc0LTEtZ2l0LXNlbmQtZW1haWwtbWFyY2luLmtyemVtaW5za2lAbm9r
-aWEuY29tCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UK
-bj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoK
-IyBVc2VmdWwgZ2l0IG9wdGlvbnMKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQg
-MApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxv
-ZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwog
-ICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1h
-dD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3Jp
-cHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAg
-ICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRF
-U1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0
-YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUK
-ICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8xNDgxODk0NTU5LTEzOTc0LTEtZ2l0LXNlbmQt
-ZW1haWwtbWFyY2luLmtyemVtaW5za2lAbm9raWEuY29tIC0+IHBhdGNoZXcvMTQ4MTg5NDU1OS0x
-Mzk3NC0xLWdpdC1zZW5kLWVtYWlsLW1hcmNpbi5rcnplbWluc2tpQG5va2lhLmNvbQpTd2l0Y2hl
-ZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmE0ODNkYTggZXhlYzogQWxsb3cgdG8gY2hhbmdlIEFk
-ZHJlc3MgU3BhY2UgZnJvbSBib2FyZCBsZXZlbAoyODg5NTI4IEFSTTogYm9vdDogQWRkIG9wdGlv
-biB0byBza2lwIEZEVCBtZW1vcnkgbm9kZSB1cGRhdGUKN2E0YWE1YSBudmljOiBBZGQgQ1BVIG51
-bWViciBwcm9wZXJ0eQoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8zOiBu
-dmljOiBBZGQgQ1BVIG51bWViciBwcm9wZXJ0eS4uLgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxk
-IG5ldmVyIHVzZSB0YWJzCiM4MjogRklMRTogaHcvaW50Yy9hcm12N21fbnZpYy5jOjQ3NzoKK15J
-Vk1TVEFURV9VSU5UMzIoY3B1X2lkLCBudmljX3N0YXRlKSwkCgp0b3RhbDogMSBlcnJvcnMsIDAg
-d2FybmluZ3MsIDg3IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1z
-LCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRp
-dmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlO
-VEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDIvMzogQVJNOiBib290OiBBZGQgb3B0aW9uIHRvIHNr
-aXAgRkRUIG1lbW9yeSBub2RlIHVwZGF0ZS4uLgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFj
-dGVycwojNDQ6IEZJTEU6IGh3L2FybS9ib290LmM6NTAwOgorICAgICAgICAgICAgICAgIHFlbXVf
-ZmR0X3NldHByb3Bfc3RyaW5nKGZkdCwgIi9tZW1vcnkiLCAiZGV2aWNlX3R5cGUiLCAibWVtb3J5
-Iik7Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDQ4IGxpbmVzIGNoZWNrZWQKCllvdXIg
-cGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
-IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
-LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggMy8zOiBleGVj
-OiBBbGxvdyB0byBjaGFuZ2UgQWRkcmVzcyBTcGFjZSBmcm9tIGJvYXJkIGxldmVsLi4uCj09PSBP
-VVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1h
-aWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3Jn
-L10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMu
-b3Jn
+
+Laurent Vivier <lvivier@redhat.com> writes:
+
+> On 14/12/2016 20:30, Alvise Rigo wrote:
+>> Hi all,
+>>
+>> I am looking at the possibility to add a new QEMU configuration option
+>> to make TCG optional (in qemu-system-*). What I am exploring is a way
+>> to exclude any of the TCG code not needed by KVM from the QEMU binary.
+>> There has been a previous attempt in the past from Paolo Bonzini,
+>> namely https://github.com/bonzini/qemu/tree/disable-tcg, that
+>> eventually was not upstreamed. I was looking into this work mainly,
+>> mostly to understand if the same approach can be respinned and used to
+>> support all the QEMU's targets. Any input on this is welcome.
+>>
+>> I was also wondering if an approach could be based on the recent patch
+>> series that allows to use the TCG frontend as a library --
+>> https://www.mail-archive.com/qemu-devel@nongnu.org/msg415514.html.
+>> Making qemu-user and qemu-system users of such a library might help in
+>> having TCG optional. Obviously this solution introduces many other
+>> challenges and I'm not even sure if it's actually viable.
+>
+> To have a library has also another interest: testing.
+>
+> For the moment RISU is doing a great job but it needs to be able to
+> start a client (the apprentice) in a chroot. So it requires a "viable"
+> TCG implementation.
+
+FWIW you have to use a chroot. risu is simple enough to build statically
+which is what I do.
+
+That said I'd love to be able to add some test cases into "make check"
+which could build a sequence of TCGops and then test things like
+constant folding and other optimisations where being done correctly. I
+don' know if this needs a library or just the ability to initialise the
+TCG functions without everything else in a qtest binary.
+
+> If we would have a library we could directly link the "apprentice" with
+> the library and it will inject the code to test directly (without
+> chroot) in the TCG engine. Moreover, I think we could use single-step
+> instead of trap to synchronize master and apprentice.
+
+Please also see the record/playback patches recently posted on the list:
+
+  https://lists.gnu.org/archive/html/qemu-devel/2016-12/msg01265.html
+
+>
+> We had something like that to test 680x0 [1], but the main program was
+> written in C++ compiling some parts of QEMU inside, and I failed to
+> recompile it last time I tried (I use RISU now).
+>
+> Thanks,
+> Laurent
+> [1] https://github.com/vivier/m68k-tester
+
+
+--
+Alex Bennée
