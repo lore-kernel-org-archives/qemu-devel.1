@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46633)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47708)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cHv4d-00006N-EH
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 11:09:35 -0500
+	(envelope-from <stefanha@gmail.com>) id 1cHv7T-0002Hx-AV
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 11:12:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cHv4c-0005ID-79
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 11:09:31 -0500
-Resent-Message-Id: <E1cHv4c-0005ID-79@eggs.gnu.org>
-In-Reply-To: <1481894862-14102-1-git-send-email-marcin.krzeminski@nokia.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <148190455153.31.11980243308320502782@790289a7ca88>
+	(envelope-from <stefanha@gmail.com>) id 1cHv7S-0006fB-9W
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 11:12:27 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 16 Dec 2016 08:09:12 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH 0/2]block: m25p80: Improve mt25qu01g chip
- model
+In-Reply-To: <86f7031a-981a-ef51-8a20-0a3c38e88835@linux.vnet.ibm.com>
+References: <20161215154330.700-1-pasic@linux.vnet.ibm.com>
+	<20161216102528.GB4129@stefanha-x1.localdomain>
+	<86f7031a-981a-ef51-8a20-0a3c38e88835@linux.vnet.ibm.com>
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Fri, 16 Dec 2016 16:12:24 +0000
+Message-ID: <CAJSP0QVZQ=AXb+gZ3VftkYZ2y=SM_3uhV4VMAmK7GEmJYmpgHQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH] virtio: fix vring->inuse recalc after migr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,51 +23,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: marcin.krzeminski@nokia.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, rfsw-patches@mlist.nokia.com, qemu-arm@nongnu.org, clg@kaod.org
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-stable <qemu-stable@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
 
-SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
-YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMC8yXWJsb2NrOiBtMjVwODA6IEltcHJvdmUgbXQy
-NXF1MDFnIGNoaXAgbW9kZWwKTWVzc2FnZS1pZDogMTQ4MTg5NDg2Mi0xNDEwMi0xLWdpdC1zZW5k
-LWVtYWlsLW1hcmNpbi5rcnplbWluc2tpQG5va2lhLmNvbQoKPT09IFRFU1QgU0NSSVBUIEJFR0lO
-ID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5l
-ICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCiMgVXNlZnVsIGdpdCBvcHRpb25zCmdpdCBjb25m
-aWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVu
-YW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNF
-Li4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0
-b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hv
-dyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sg
-LTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisx
-KSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAz
-YzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRo
-dWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcv
-MTQ4MTg5NDg2Mi0xNDEwMi0xLWdpdC1zZW5kLWVtYWlsLW1hcmNpbi5rcnplbWluc2tpQG5va2lh
-LmNvbSAtPiBwYXRjaGV3LzE0ODE4OTQ4NjItMTQxMDItMS1naXQtc2VuZC1lbWFpbC1tYXJjaW4u
-a3J6ZW1pbnNraUBub2tpYS5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo0NGFl
-Mjk4IGJsb2NrOiBtMjVwODA6IEludHJvZHVjZSBEaWUgRXJhc2UgY29tbWFuZAoxYzUwZTJlIGJs
-b2NrOiBtMjVwODA6IEFkZCBRdWFkIFBhZ2UgUHJvZ3JhbSA0Ynl0ZSB2ZXJzaW9uIG9wCgo9PT0g
-T1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzI6IGJsb2NrOiBtMjVwODA6IEFkZCBR
-dWFkIFBhZ2UgUHJvZ3JhbSA0Ynl0ZSB2ZXJzaW9uIG9wLi4uCkNoZWNraW5nIFBBVENIIDIvMjog
-YmxvY2s6IG0yNXA4MDogSW50cm9kdWNlIERpZSBFcmFzZSBjb21tYW5kLi4uCkVSUk9SOiBzcGFj
-ZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJy0nIChjdHg6VnhWKQojNjM6IEZJTEU6IGh3L2Jsb2Nr
-L20yNXA4MC5jOjUyMjoKKyAgICAgICAgICAgIG9mZnNldCA9IG9mZnNldCAmICh+KGxlbi0xKSk7
-CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpXQVJOSU5HOiBsaW5lIG92
-ZXIgODAgY2hhcmFjdGVycwojNjU6IEZJTEU6IGh3L2Jsb2NrL20yNXA4MC5jOjUyNDoKKyAgICAg
-ICAgICAgIHFlbXVfbG9nX21hc2soTE9HX0dVRVNUX0VSUk9SLCAiTTI1UDgwOiAlZCBkaWUgZXJh
-c2Ugbm90IHN1cHBvcnRlZCBieSIKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM5
-NDogRklMRTogaHcvYmxvY2svbTI1cDgwLmM6NzM0OgorICAgICAgICAgICAgcy0+ZWFyID0gKCBz
-LT5zaXplID4gTUFYXzNCWVRFU19TSVpFID8gcy0+c2l6ZSAvIE1BWF8zQllURVNfU0laRSAtIDEg
-OiAwKTsKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGFmdGVyIHRoYXQgb3BlbiBwYXJlbnRoZXNp
-cyAnKCcKIzk0OiBGSUxFOiBody9ibG9jay9tMjVwODAuYzo3MzQ6CisgICAgICAgICAgICBzLT5l
-YXIgPSAoIHMtPnNpemUgPiBNQVhfM0JZVEVTX1NJWkUgPyBzLT5zaXplIC8gTUFYXzNCWVRFU19T
-SVpFIC0gMSA6IDApOwoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJt
-cyBvZiB0aGlzIHN0YXRlbWVudAojOTk6IEZJTEU6IGh3L2Jsb2NrL20yNXA4MC5jOjczOToKKyAg
-ICAgICAgICAgIGlmIChzLT5waS0+aWRbNF0gJiBCSVQoNikpClsuLi5dCisgICAgICAgICAgICBl
-bHNlClsuLi5dCgp0b3RhbDogMyBlcnJvcnMsIDIgd2FybmluZ3MsIDkzIGxpbmVzIGNoZWNrZWQK
-CllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9m
-IHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWlu
-dGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09
-PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVk
-IGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBz
-ZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+On Fri, Dec 16, 2016 at 3:41 PM, Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+> On 12/16/2016 11:25 AM, Stefan Hajnoczi wrote:
+>> On Thu, Dec 15, 2016 at 04:43:30PM +0100, Halil Pasic wrote:
+>>> Correct recalculation of vring->inuse after migration for
+>>> the corner case where the avail_idx has already wrapped
+>>> but used_idx not yet.
+>>>
+>>> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+>>> Fixes: bccdef6b ("virtio: recalculate vq->inuse after migration")
+>>> CC: qemu-stable@nongnu.org
+>>> ---
+>>>
+>>> I think we could also change the type of inuse to uint16_t.
+>>> Would this be considered a good idea?
+>>
+>> VRing.num is unsigned int.  I would use the same type as num since this
+>> is a size, not an index.
+>>
+>
+> Thanks. I asked myself the question why are VRing.num and inuse (at
+> least theoretically arch depended width but at least 16 bit) int while
+> the indexes of the available and used rings uint16_t. Only thing I can
+> think of is some sort of optimization, because the only difference I can
+> see is that the VRing.num is communicated via the transport while the
+> indexes are a part (and/or corresponding to) of the ring layout (that is
+> the shared memory virtio structures and have a fixed width).
+>
+> Now I'm kind of in doubt: I think having a signed has the benefit of a
+> negative value being more obviously wrong size (for a human looking at
+> it) that a to large positive, but purely theoretically the maximum value
+> of inuse is not guaranteed to fit int (as in C99 MIN_INT is 2^15 - 1).
+>
+> What is your opinion? Should we keep 'inuse' as is, or should I change
+> it to unsigned with v2 (or prepare a separate patch)?
+
+I'm happy with unsigned.  I've CCed Michael Tsirkin in case he has a preference.
+
+>>> ---
+>>>  hw/virtio/virtio.c | 7 +++++--
+>>>  1 file changed, 5 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+>>> index 1af2de2..089c6f6 100644
+>>> --- a/hw/virtio/virtio.c
+>>> +++ b/hw/virtio/virtio.c
+>>> @@ -1855,9 +1855,12 @@ int virtio_load(VirtIODevice *vdev, QEMUFile *f, int version_id)
+>>>              /*
+>>>               * Some devices migrate VirtQueueElements that have been popped
+>>>               * from the avail ring but not yet returned to the used ring.
+>>> +             * Cast to uint16_t is OK because max ring size is 0x8000. Thus
+>>> +             * no the size of largest array indexable by an integral type
+>>> +             * can not be represented by the same type problem.
+>>
+>> I think it would be safe up to max ring size UINT16_MAX - 1 (we need
+>> that extra value to distinguish between empty and full avail rings)?
+>>
+>
+> Yeah.
+>
+>> The last sentence is hard to understand due to the double negative.  I
+>> think you are saying "Since max ring size < UINT16_MAX it's safe to use
+>> uint16_t to represent the size of the ring".
+>>
+>
+> You are not the first one complaining, so the sentence is definitively
+> bad. What disturbs me regarding your formulation is that we do not use
+> uint16_t to represent neither the ring size nor inuse.
+>
+> How about "Since max ring size < UINT16_MAX it's safe to use modulo
+> UINT16_MAX + 1 subtraction."?
+
+That doesn't mention "representing the size of the ring" so it's
+unclear what "safe" means.
+
+Stefan
