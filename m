@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34988)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36051)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cHxkr-0006fS-0b
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 14:01:18 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cHxqQ-0001Wu-Mk
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 14:07:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cHxkp-0001j9-NK
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 14:01:17 -0500
-Received: from mail-ua0-x229.google.com ([2607:f8b0:400c:c08::229]:32928)
+	(envelope-from <peter.maydell@linaro.org>) id 1cHxqP-0004o8-C0
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 14:07:02 -0500
+Received: from mail-vk0-x233.google.com ([2607:f8b0:400c:c05::233]:36380)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cHxkp-0001ia-8a
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 14:01:15 -0500
-Received: by mail-ua0-x229.google.com with SMTP id b35so19255938uaa.0
-	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 11:01:15 -0800 (PST)
+	id 1cHxqO-0004nw-TA
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 14:07:01 -0500
+Received: by mail-vk0-x233.google.com with SMTP id p9so93408530vkd.3
+	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 11:07:00 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20161209114830.9158-5-alex.bennee@linaro.org>
+In-Reply-To: <20161209114830.9158-6-alex.bennee@linaro.org>
 References: <20161209114830.9158-1-alex.bennee@linaro.org>
-	<20161209114830.9158-5-alex.bennee@linaro.org>
+	<20161209114830.9158-6-alex.bennee@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 16 Dec 2016 19:00:53 +0000
-Message-ID: <CAFEAcA8cnxe6+3L2EBvavLbbWgiWN7r=rvjn-Vav7oJZBXEi-g@mail.gmail.com>
+Date: Fri, 16 Dec 2016 19:06:39 +0000
+Message-ID: <CAFEAcA-=qyFT85tkx4vNj-KrXWYc+cuGEXoMDT5QrjL8QdZRJw@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RISU PATCH v3 04/10] risu: add simple trace and
- replay support
+Subject: Re: [Qemu-devel] [RISU PATCH v3 05/10] risu: add support compressed
+ tracefiles
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,318 +36,210 @@ Cc: QEMU Developers <qemu-devel@nongnu.org>, Jose Ricardo Ziviani <joserz@linux.
 
 On 9 December 2016 at 11:48, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrot=
 e:
-> This adds a very dumb and easily breakable trace and replay support. In
-> --master mode the various risu ops trigger a write of register/memory
-> state into a binary file which can be played back to an apprentice.
-> Currently there is no validation of the image source so feeding the
-> wrong image will fail straight away.
->
-> The trace files will get very big for any appreciable sized test file
-> and this will be addressed in later patches.
+> This uses the magic of zlib's gzread/write interface to wrap the
+> tracefile in compression. The code changes are tiny. I spent more time
+> messing about with the configure/linker stuff to auto-detect bits.
 >
 > Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-Most of this looks good.
-
 > ---
+>  Makefile  |  3 ++-
+>  configure | 55 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  risu.c    | 15 ++++++++++-----
+>  3 files changed, 67 insertions(+), 6 deletions(-)
 >
-> v2
->   - moved read/write functions into main risu.c
->   - cleaned up formatting
->   - report more in apprentice --trace mode
-> v3
->   - fix options parsing
->   - re-factored so no need for copy & paste
-> ---
->  risu.c         | 108 +++++++++++++++++++++++++++++++++++++++++++++++----=
-------
->  risu_aarch64.c |   5 ++-
->  risu_arm.c     |   4 +--
->  3 files changed, 93 insertions(+), 24 deletions(-)
+> diff --git a/Makefile b/Makefile
+> index 4202c35..4a2ef02 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -14,6 +14,7 @@
+>  include Makefile.in
 >
+>  CFLAGS ?=3D -g -Wall
+> +LDFLAGS +=3D -lz
+>
+>  PROG=3Drisu
+>  SRCS=3Drisu.c comms.c risu_$(ARCH).c risu_reginfo_$(ARCH).c
+> @@ -31,7 +32,7 @@ all: $(PROG) $(BINS)
+>  dump: $(RISU_ASMS)
+>
+>  $(PROG): $(OBJS)
+> -       $(CC) $(STATIC) $(CFLAGS) -o $@ $^
+> +       $(CC) $(STATIC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+
+(I think there's a stray space at the end of this line.)
+
+>
+>  %.risu.asm: %.risu.bin
+>         ${OBJDUMP} -b binary -m $(ARCH) -D $^ > $@
+> diff --git a/configure b/configure
+> index f81bdb5..d11680f 100755
+> --- a/configure
+> +++ b/configure
+> @@ -6,6 +6,10 @@ compile() {
+>      $CC $CFLAGS -c -o ${1}.o ${1}.c 2>/dev/null
+>  }
+>
+> +link() {
+> +    $LD $LDFLAGS -l${2} -o ${1} ${1}.o 2>/dev/null
+> +}
+
+I would ask you to get the shell quoting right,
+but I see we don't do that in the existing configure
+code, so never mind.
+
+> +
+>  check_define() {
+>      c=3D${tmp_dir}/check_define_${1}
+>      cat > ${c}.c <<EOF
+> @@ -34,6 +38,50 @@ guess_arch() {
+>      fi
+>  }
+>
+> +check_type() {
+> +    c=3D${tmp_dir}/check_type_${1}
+> +    cat > ${c}.c <<EOF
+> +#include <inttypes.h>
+> +#include <stdint.h>
+> +#include <sys/types.h>
+> +#include <sys/socket.h>
+> +
+> +int main(void) { $1 thisone; return 0; }
+> +EOF
+> +    compile $c
+> +}
+> +
+> +check_lib() {
+> +    c=3D${tmp_dir}/check_lib${1}
+> +    cat > ${c}.c <<EOF
+> +#include <stdint.h>
+> +#include <$2.h>
+> +
+> +int main(void) { $3; return 0; }
+> +EOF
+> +    compile $c && link $c $1
+> +}
+> +
+> +generate_config() {
+> +    cfg=3Dconfig.h
+> +    echo "generating config.h..."
+> +
+> +    echo "/* config.h - generated by the 'configure' script */" > $cfg
+> +    echo "#ifndef CONFIG_H" >> $cfg
+> +    echo "#define CONFIG_H 1" >> $cfg
+> +
+> +    if check_type uintptr_t ; then
+> +        echo "#define HAVE_UINTPTR_T 1" >> $cfg
+> +    fi
+> +    if check_type socklen_t ; then
+> +        echo "#define HAVE_SOCKLEN_T 1" >> $cfg
+> +    fi
+
+In what circumstances would we not have uintptr_t and
+socklen_t types? We know we're building for Linux, after all.
+
+> +
+> +    echo "#endif /* CONFIG_H */" >> $cfg
+> +
+> +    echo "...done"
+> +}
+> +
+>  generate_makefilein() {
+>      m=3DMakefile.in
+>      echo "generating Makefile.in..."
+> @@ -93,6 +141,7 @@ done
+>
+>  CC=3D"${CC-${CROSS_PREFIX}gcc}"
+>  AS=3D"${AS-${CROSS_PREFIX}as}"
+> +LD=3D"${LD-${CROSS_PREFIX}ld}"
+>  OBJCOPY=3D"${OBJCOPY-${CROSS_PREFIX}objcopy}"
+>  OBJDUMP=3D"${OBJDUMP-${CROSS_PREFIX}objdump}"
+>
+> @@ -100,6 +149,12 @@ if test "x${ARCH}" =3D "x"; then
+>      guess_arch
+>  fi
+>
+> +if ! check_lib z zlib "zlibVersion()"; then
+> +    echo "Cannot find libz compression library"
+> +    exit 1
+> +fi
+> +
+> +generate_config
+>  generate_makefilein
+>
+>  echo "type 'make' to start the build"
 > diff --git a/risu.c b/risu.c
-> index 22571cd..173dd3c 100644
+> index 173dd3c..3670bb1 100644
 > --- a/risu.c
 > +++ b/risu.c
-> @@ -31,6 +31,7 @@
->  void *memblock =3D 0;
+> @@ -25,6 +25,7 @@
+>  #include <sys/mman.h>
+>  #include <fcntl.h>
+>  #include <string.h>
+> +#include <zlib.h>
+>
+>  #include "risu.h"
+>
+> @@ -32,6 +33,7 @@ void *memblock =3D 0;
 >
 >  int apprentice_socket, master_socket;
-> +int trace_file =3D 0;
+>  int trace_file =3D 0;
+> +gzFile gz_trace_file;
 >
 >  sigjmp_buf jmpbuf;
 >
-> @@ -40,10 +41,12 @@ int test_fp_exc =3D 0;
->  long executed_tests =3D 0;
->  void report_test_status(void *pc)
+> @@ -59,7 +61,7 @@ int read_sock(void *ptr, size_t bytes)
+>
+>  int write_trace(void *ptr, size_t bytes)
 >  {
-> -   executed_tests +=3D 1;
-> -   if (executed_tests % 100 =3D=3D 0) {
-> -      fprintf(stderr,"Executed %ld test instructions (pc=3D%p)\r",
-> -              executed_tests, pc);
-> +   if (ismaster || trace_file) {
-> +      executed_tests +=3D 1;
-> +      if (executed_tests % 100 =3D=3D 0) {
-> +         fprintf(stderr,"Executed %ld test instructions (pc=3D%p)\r",
-> +                 executed_tests, pc);
-> +      }
->     }
+> -   size_t res =3D write(trace_file, ptr, bytes);
+> +   size_t res =3D gzwrite(gz_trace_file, ptr, bytes);
+>     return (res =3D=3D bytes) ? 0 : 1;
 >  }
 >
-> @@ -54,6 +57,12 @@ int read_sock(void *ptr, size_t bytes)
->     return recv_data_pkt(master_socket, ptr, bytes);
+> @@ -77,7 +79,7 @@ int write_sock(void *ptr, size_t bytes)
+>
+>  int read_trace(void *ptr, size_t bytes)
+>  {
+> -   size_t res =3D read(trace_file, ptr, bytes);
+> +   size_t res =3D gzread(gz_trace_file, ptr, bytes);
+>     return (res =3D=3D bytes) ? 0 : 1;
 >  }
 >
-> +int write_trace(void *ptr, size_t bytes)
-> +{
-> +   size_t res =3D write(trace_file, ptr, bytes);
-> +   return (res =3D=3D bytes) ? 0 : 1;
-> +}
-> +
->  void respond_sock(int r)
->  {
->     send_response_byte(master_socket, r);
-> @@ -66,26 +75,62 @@ int write_sock(void *ptr, size_t bytes)
->     return send_data_pkt(apprentice_socket, ptr, bytes);
->  }
->
-> +int read_trace(void *ptr, size_t bytes)
-> +{
-> +   size_t res =3D read(trace_file, ptr, bytes);
-> +   return (res =3D=3D bytes) ? 0 : 1;
-> +}
-> +
-> +void respond_trace(int r)
-> +{
-> +   switch (r) {
-> +      case 0: /* test ok */
-> +      case 1: /* end of test */
-> +         break;
-> +      default:
-> +         fprintf(stderr,"%s: got response of %d\n", __func__, r);
-
-Is this a "something is broken/can't happen" case?
-
-Anyway, you're in a signal handler so shouldn't use fprintf.
-
-> +         break;
-> +   }
-> +}
-> +
->  void master_sigill(int sig, siginfo_t *si, void *uc)
->  {
-> -   switch (recv_and_compare_register_info(read_sock, respond_sock, uc))
-> +   int r;
-> +
-> +   if (trace_file) {
-> +      r =3D send_register_info(write_trace, uc);
-> +   } else {
-> +      r =3D recv_and_compare_register_info(read_sock, respond_sock, uc);
-> +   }
-> +
-> +   switch (r)
->     {
->        case 0:
-> -         /* match OK */
-> +         /* All OK */
->           advance_pc(uc);
->           return;
->        default:
->           /* mismatch, or end of test */
->           siglongjmp(jmpbuf, 1);
-> +         /* never */
-> +         return;
-
-Is your compiler complaining about this? You should probably
-get a better compiler (others will likely complain that the
-return is dead, because siglongjmp is marked 'noreturn' in the
-system headers).
-
->     }
->  }
->
->  void apprentice_sigill(int sig, siginfo_t *si, void *uc)
->  {
-> -   switch (send_register_info(write_sock, uc))
-> +   int r;
-> +
-> +   if (trace_file) {
-> +      r =3D recv_and_compare_register_info(read_trace, respond_trace, uc=
-);
-> +   } else {
-> +      r =3D send_register_info(write_sock, uc);
-> +   }
-> +
-> +   switch (r)
->     {
->        case 0:
-> -         /* match OK */
-> +         /* All OK */
->           advance_pc(uc);
->           return;
->        case 1:
-> @@ -94,6 +139,9 @@ void apprentice_sigill(int sig, siginfo_t *si, void *u=
-c)
->           exit(0);
->        default:
->           /* mismatch */
-> +         if (trace_file) {
-> +            report_match_status();
-> +         }
->           exit(1);
->     }
->  }
-> @@ -155,7 +203,13 @@ int master(int sock)
+> @@ -203,9 +205,10 @@ int master(int sock)
 >  {
 >     if (sigsetjmp(jmpbuf, 1))
 >     {
-> -      return report_match_status();
-> +      if (trace_file) {
-> +         close(trace_file);
-> +         fprintf(stderr,"\nDone...\n");
-> +         return 0;
-> +      } else {
-> +         return report_match_status();
-> +      }
->     }
->     master_socket =3D sock;
->     set_sigill_handler(&master_sigill);
-> @@ -184,6 +238,7 @@ void usage (void)
->     fprintf(stderr, "between master and apprentice risu processes.\n\n");
->     fprintf(stderr, "Options:\n");
->     fprintf(stderr, "  --master          Be the master (server)\n");
-> +   fprintf(stderr, "  -t, --trace=3DFILE  Record/playback trace file\n")=
+> -      if (trace_file) {
+> -         close(trace_file);
+> -         fprintf(stderr,"\nDone...\n");
+> +      if (trace_file)
+> +      {
+> +         gzclose(gz_trace_file);
+> +         fprintf(stderr,"Done...\n");
+>           return 0;
+>        } else {
+>           return report_match_status();
+> @@ -321,6 +324,7 @@ int main(int argc, char **argv)
+>       if (trace_fn)
+>         {
+>           trace_file =3D open(trace_fn, O_WRONLY|O_CREAT, S_IRWXU);
+> +         gz_trace_file =3D gzdopen(trace_file, "wb9");
+>         } else {
+>           fprintf(stderr, "master port %d\n", port);
+>           sock =3D master_connect(port);
+> @@ -332,6 +336,7 @@ int main(int argc, char **argv)
+>       if (trace_fn)
+>         {
+>           trace_file =3D open(trace_fn, O_RDONLY);
+> +         gz_trace_file =3D gzdopen(trace_file, "rb");
+>         } else {
+>           fprintf(stderr, "apprentice host %s port %d\n", hostname, port)=
 ;
->     fprintf(stderr, "  -h, --host=3DHOST   Specify master host machine (a=
-pprentice only)\n");
->     fprintf(stderr, "  -p, --port=3DPORT   Specify the port to connect to=
-/listen on (default 9191)\n");
->  }
-> @@ -194,6 +249,7 @@ int main(int argc, char **argv)
->     uint16_t port =3D 9191;
->     char *hostname =3D "localhost";
->     char *imgfile;
-> +   char *trace_fn =3D NULL;
->     int sock;
->
->     // TODO clean this up later
-> @@ -204,13 +260,14 @@ int main(int argc, char **argv)
->           {
->              { "help", no_argument, 0, '?'},
->              { "master", no_argument, &ismaster, 1 },
-> +            { "trace", required_argument, 0, 't' },
->              { "host", required_argument, 0, 'h' },
->              { "port", required_argument, 0, 'p' },
->              { "test-fp-exc", no_argument, &test_fp_exc, 1 },
->              { 0,0,0,0 }
->           };
->        int optidx =3D 0;
-> -      int c =3D getopt_long(argc, argv, "h:p:", longopts, &optidx);
-> +      int c =3D getopt_long(argc, argv, "h:p:t:", longopts, &optidx);
->        if (c =3D=3D -1)
->        {
->           break;
-> @@ -223,6 +280,11 @@ int main(int argc, char **argv)
->              /* flag set by getopt_long, do nothing */
->              break;
->           }
-> +         case 't':
-> +         {
-> +           trace_fn =3D optarg;
-> +           break;
-> +         }
->           case 'h':
->           {
->              hostname =3D optarg;
-> @@ -253,18 +315,28 @@ int main(int argc, char **argv)
->     }
->
->     load_image(imgfile);
-> -
-> +
->     if (ismaster)
->     {
-> -      fprintf(stderr, "master port %d\n", port);
-> -      sock =3D master_connect(port);
-> -      return master(sock);
-> +     if (trace_fn)
-> +       {
-> +         trace_file =3D open(trace_fn, O_WRONLY|O_CREAT, S_IRWXU);
-> +       } else {
-> +         fprintf(stderr, "master port %d\n", port);
-> +         sock =3D master_connect(port);
-> +       }
-
-GNU coding standards indentation ? I know risu's indenting
-is a bit of a mess but we have not quite sunk that low yet :-)
-
-> +     return master(sock);
->     }
->     else
-> -   {
-> -      fprintf(stderr, "apprentice host %s port %d\n", hostname, port);
-> -      sock =3D apprentice_connect(hostname, port);
-> -      return apprentice(sock);
-> +     {
-> +     if (trace_fn)
-> +       {
-> +         trace_file =3D open(trace_fn, O_RDONLY);
-> +       } else {
-> +         fprintf(stderr, "apprentice host %s port %d\n", hostname, port)=
-;
-> +         sock =3D apprentice_connect(hostname, port);
-> +       }
-> +     return apprentice(sock);
->     }
->  }
->
-> diff --git a/risu_aarch64.c b/risu_aarch64.c
-> index c4c0d4d..7f9f612 100644
-> --- a/risu_aarch64.c
-> +++ b/risu_aarch64.c
-> @@ -13,6 +13,7 @@
->  #include <stdio.h>
->  #include <ucontext.h>
->  #include <string.h>
-> +#include <unistd.h>
-
-Why this include?
-
->
->  #include "risu.h"
->  #include "risu_reginfo_aarch64.h"
-> @@ -28,9 +29,7 @@ void advance_pc(void *vuc)
->  {
->      ucontext_t *uc =3D vuc;
->      uc->uc_mcontext.pc +=3D 4;
-> -    if (ismaster) {
-> -      report_test_status((void *) uc->uc_mcontext.pc);
-> -    }
-> +    report_test_status((void *) uc->uc_mcontext.pc);
->  }
->
->  static void set_x0(void *vuc, uint64_t x0)
-> diff --git a/risu_arm.c b/risu_arm.c
-> index 474729c..77bdcac 100644
-> --- a/risu_arm.c
-> +++ b/risu_arm.c
-> @@ -50,9 +50,7 @@ void advance_pc(void *vuc)
->  {
->     ucontext_t *uc =3D vuc;
->     uc->uc_mcontext.arm_pc +=3D insnsize(uc);
-> -   if (ismaster) {
-> -      report_test_status((void *) uc->uc_mcontext.arm_pc);
-> -   }
-> +   report_test_status((void *) uc->uc_mcontext.arm_pc);
->  }
-
-These bits should just vanish if you fix or drop the
-earlier patch that added report_test_status() calls here.
-
->
->  static void set_r0(void *vuc, uint32_t r0)
+>           sock =3D apprentice_connect(hostname, port);
 > --
 > 2.11.0
+
+Changes to the C code are fine.
 
 thanks
 -- PMM
