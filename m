@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44583)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46633)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jdenemar@redhat.com>) id 1cHuy4-0003wZ-E7
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 11:02:45 -0500
+	(envelope-from <no-reply@patchew.org>) id 1cHv4d-00006N-EH
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 11:09:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jdenemar@redhat.com>) id 1cHuy1-0000dt-Dh
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 11:02:44 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35956)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jdenemar@redhat.com>) id 1cHuy1-0000dW-7z
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 11:02:41 -0500
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DCF5D7F746
-	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 16:02:39 +0000 (UTC)
-Date: Fri, 16 Dec 2016 17:02:36 +0100
-From: Jiri Denemark <jdenemar@redhat.com>
-Message-ID: <20161216160236.GA964730@orkuz.home>
-References: <1480713496-11213-1-git-send-email-ehabkost@redhat.com>
-	<1480713496-11213-16-git-send-email-ehabkost@redhat.com>
-	<df0f3ade-bd09-58a0-ac83-3775d4ab7c6c@redhat.com>
-	<20161205235745.GJ13060@thinpad.lan.raisama.net>
+	(envelope-from <no-reply@patchew.org>) id 1cHv4c-0005ID-79
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 11:09:31 -0500
+Resent-Message-Id: <E1cHv4c-0005ID-79@eggs.gnu.org>
+In-Reply-To: <1481894862-14102-1-git-send-email-marcin.krzeminski@nokia.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <148190455153.31.11980243308320502782@790289a7ca88>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20161205235745.GJ13060@thinpad.lan.raisama.net>
-Subject: Re: [Qemu-devel] [PATCH for-2.9 15/17] target-i386: Define static
- "base" CPU model
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 16 Dec 2016 08:09:12 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH 0/2]block: m25p80: Improve mt25qu01g chip
+ model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,37 +24,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org, libvir-list@redhat.com
+To: marcin.krzeminski@nokia.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, rfsw-patches@mlist.nokia.com, qemu-arm@nongnu.org, clg@kaod.org
 
-On Mon, Dec 05, 2016 at 21:57:45 -0200, Eduardo Habkost wrote:
-> On Mon, Dec 05, 2016 at 07:18:47PM +0100, David Hildenbrand wrote:
-> > Am 02.12.2016 um 22:18 schrieb Eduardo Habkost:
-> > > The query-cpu-model-expand QMP command needs at least one static
-> > > model, to allow the "static" expansion mode to be implemented.
-> > > Instead of defining static versions of every CPU model, define a
-> > > "base" CPU model that has absolutely no feature flag enabled.
-> > > 
-> > 
-> > Introducing separate ones makes feature lists presented to the user much
-> > shorter (and therefore easier to maintain). But I don't know how libvirt
-> > wants to deal with models on x86 in the future.
-> 
-> I understand that having a larger set of static models would make
-> expansions shorter. But I worry that by defining a complete set
-> of static models on x86 would require extra maintenance work on
-> the QEMU side with no visible benefit for libvirt.
-> 
-> I would like to hear from libvirt developers what they think. I
-> still don't know what they plan to use the type=static expansion
-> results for.
-
-Currently we are mostly interested in the expansion of the "host" CPU
-model. We're fine with the expansion based on the "basic" static model
-with no features. Returning some real model instead of "basic" would be
-OK as long as it would be one of the existing CPU models. Adding special
-static models, such as Broadwell-base would actually be a complication
-since we would need to provide some translation to the existing models
-for backward compatibility. I'd appreciate if we could avoid doing this.
-
-Jirka
+SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
+YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMC8yXWJsb2NrOiBtMjVwODA6IEltcHJvdmUgbXQy
+NXF1MDFnIGNoaXAgbW9kZWwKTWVzc2FnZS1pZDogMTQ4MTg5NDg2Mi0xNDEwMi0xLWdpdC1zZW5k
+LWVtYWlsLW1hcmNpbi5rcnplbWluc2tpQG5va2lhLmNvbQoKPT09IFRFU1QgU0NSSVBUIEJFR0lO
+ID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5l
+ICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCiMgVXNlZnVsIGdpdCBvcHRpb25zCmdpdCBjb25m
+aWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVu
+YW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNF
+Li4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0
+b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hv
+dyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sg
+LTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisx
+KSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAz
+YzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRo
+dWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcv
+MTQ4MTg5NDg2Mi0xNDEwMi0xLWdpdC1zZW5kLWVtYWlsLW1hcmNpbi5rcnplbWluc2tpQG5va2lh
+LmNvbSAtPiBwYXRjaGV3LzE0ODE4OTQ4NjItMTQxMDItMS1naXQtc2VuZC1lbWFpbC1tYXJjaW4u
+a3J6ZW1pbnNraUBub2tpYS5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo0NGFl
+Mjk4IGJsb2NrOiBtMjVwODA6IEludHJvZHVjZSBEaWUgRXJhc2UgY29tbWFuZAoxYzUwZTJlIGJs
+b2NrOiBtMjVwODA6IEFkZCBRdWFkIFBhZ2UgUHJvZ3JhbSA0Ynl0ZSB2ZXJzaW9uIG9wCgo9PT0g
+T1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzI6IGJsb2NrOiBtMjVwODA6IEFkZCBR
+dWFkIFBhZ2UgUHJvZ3JhbSA0Ynl0ZSB2ZXJzaW9uIG9wLi4uCkNoZWNraW5nIFBBVENIIDIvMjog
+YmxvY2s6IG0yNXA4MDogSW50cm9kdWNlIERpZSBFcmFzZSBjb21tYW5kLi4uCkVSUk9SOiBzcGFj
+ZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJy0nIChjdHg6VnhWKQojNjM6IEZJTEU6IGh3L2Jsb2Nr
+L20yNXA4MC5jOjUyMjoKKyAgICAgICAgICAgIG9mZnNldCA9IG9mZnNldCAmICh+KGxlbi0xKSk7
+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpXQVJOSU5HOiBsaW5lIG92
+ZXIgODAgY2hhcmFjdGVycwojNjU6IEZJTEU6IGh3L2Jsb2NrL20yNXA4MC5jOjUyNDoKKyAgICAg
+ICAgICAgIHFlbXVfbG9nX21hc2soTE9HX0dVRVNUX0VSUk9SLCAiTTI1UDgwOiAlZCBkaWUgZXJh
+c2Ugbm90IHN1cHBvcnRlZCBieSIKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM5
+NDogRklMRTogaHcvYmxvY2svbTI1cDgwLmM6NzM0OgorICAgICAgICAgICAgcy0+ZWFyID0gKCBz
+LT5zaXplID4gTUFYXzNCWVRFU19TSVpFID8gcy0+c2l6ZSAvIE1BWF8zQllURVNfU0laRSAtIDEg
+OiAwKTsKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGFmdGVyIHRoYXQgb3BlbiBwYXJlbnRoZXNp
+cyAnKCcKIzk0OiBGSUxFOiBody9ibG9jay9tMjVwODAuYzo3MzQ6CisgICAgICAgICAgICBzLT5l
+YXIgPSAoIHMtPnNpemUgPiBNQVhfM0JZVEVTX1NJWkUgPyBzLT5zaXplIC8gTUFYXzNCWVRFU19T
+SVpFIC0gMSA6IDApOwoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJt
+cyBvZiB0aGlzIHN0YXRlbWVudAojOTk6IEZJTEU6IGh3L2Jsb2NrL20yNXA4MC5jOjczOToKKyAg
+ICAgICAgICAgIGlmIChzLT5waS0+aWRbNF0gJiBCSVQoNikpClsuLi5dCisgICAgICAgICAgICBl
+bHNlClsuLi5dCgp0b3RhbDogMyBlcnJvcnMsIDIgd2FybmluZ3MsIDkzIGxpbmVzIGNoZWNrZWQK
+CllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9m
+IHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWlu
+dGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09
+PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVk
+IGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBz
+ZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
