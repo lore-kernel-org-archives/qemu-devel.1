@@ -1,35 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42168)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45754)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cHyIf-0004Mo-OJ
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 14:36:14 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cHyTY-00017x-30
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 14:47:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cHyIb-0003so-Mg
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 14:36:13 -0500
-Received: from indium.canonical.com ([91.189.90.7]:47216)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cHyIb-0003rv-HH
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 14:36:09 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cHyIZ-0004q7-QR
-	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 19:36:08 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C58CA2E80BF
-	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 19:36:07 +0000 (UTC)
+	(envelope-from <dgilbert@redhat.com>) id 1cHyTU-0003zD-33
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 14:47:28 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53934)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cHyTT-0003xh-TM
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 14:47:24 -0500
+Date: Fri, 16 Dec 2016 19:47:16 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20161216194715.GG2642@work-vm>
+References: <20161108095603.72301-1-pasic@linux.vnet.ibm.com>
+	<20161108095603.72301-7-pasic@linux.vnet.ibm.com>
+	<20161215132901.GJ2509@work-vm>
+	<9e79129e-131c-987c-6c13-261be9aee769@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 16 Dec 2016 19:15:58 -0000
-From: Erik Rull <906221@bugs.launchpad.net>
-Reply-To: Bug 906221 <906221@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20111219101920.8813.57045.malonedeb@wampee.canonical.com>
-	<20161215174024.29048.32926.malone@wampee.canonical.com>
-Message-Id: <58543D6E.506@rdsoftware.de>
-Errors-To: bounces@canonical.com
-Subject: Re: [Qemu-devel] [Bug 906221] Re: USBDEVFS_CLEAR_HALT stall with
- USB-CDROM qemu-1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9e79129e-131c-987c-6c13-261be9aee769@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [RFC PATCH v2 6/8] migration/vmstate: split up
+ vmstate_base_addr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,77 +30,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, Amit Shah <amit.shah@redhat.com>, Juan Quintela <quintela@redhat.com>, Guenther Hutzl <hutzl@linux.vnet.ibm.com>
 
-Meanwhile it works.
+* Halil Pasic (pasic@linux.vnet.ibm.com) wrote:
+> 
+> 
+> On 12/15/2016 02:29 PM, Dr. David Alan Gilbert wrote:
+> >> +            vmstate_handle_alloc(first_elem, field, opaque);
+> >> +            if (field->flags & VMS_POINTER) {
+> >> +                first_elem = *(void **)first_elem;
+> >> +                assert(first_elem);
+> >> +            }
+> >>              for (i = 0; i < n_elems; i++) {
+> >>                  void *curr_elem = first_elem + size * i;
+> >>  
+> >> @@ -310,12 +301,16 @@ void vmstate_save_state(QEMUFile *f, const VMStateDescription *vmsd,
+> >>      while (field->name) {
+> >>          if (!field->field_exists ||
+> >>              field->field_exists(opaque, vmsd->version_id)) {
+> >> -            void *first_elem = vmstate_base_addr(opaque, field, false);
+> >> +            void *first_elem = opaque + field->offset;
+> >>              int i, n_elems = vmstate_n_elems(opaque, field);
+> >>              int size = vmstate_size(opaque, field);
+> >>              int64_t old_offset, written_bytes;
+> >>              QJSON *vmdesc_loop = vmdesc;
+> >>  
+> >> +            if (field->flags & VMS_POINTER) {
+> >> +                first_elem = *(void **)first_elem;
+> >> +                assert(first_elem);
+> > Can you make that   assert(first_elem || !n_elems) please.
+> > and same above.
+> > 
+> > Dave
+> 
+> Good catch! This could indeed be some dynamic length
+> thing with 0 elements.
+> 
+> I'm not sure if I'm going to respin this year though.
 
-Thomas Huth wrote:
-> Triaging old bug tickets ... Can you still reproduce this problem with
-> the latest version of QEMU and the latest version of libusb? If so,
-> could you please also provide the command line options that you used to
-> start QEMU?
-> =
+Well I'm not going to review it this year if you do :-)
+So have a good new year and lets see to it then!
 
-> ** Changed in: qemu
->        Status: New =3D> Incomplete
->
+Dave
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/906221
-
-Title:
-  USBDEVFS_CLEAR_HALT stall with USB-CDROM qemu-1.0
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  When connecting a USB DVD/CDROM drive to the linux host, it works fine an=
-d I can mount the inserted DVD properly and work with it. After unmounting =
-the DVD and routing the USB drive to the linux guest (same kernel version),=
- both host and guest become unresponsive and on the QEMU console I get the =
-QEMU console flodded with the message:
-  USBDEVFS_CLEAR_HALT: Connection timed out
-  again and again, approx. each 10-20 seconds.
-
-  When I unplug the device from the host, the message
-  USBDEVFS_CLEAR_HALT: No such device
-  comes up in one block at least 100 times (my scrollback history of the di=
-splay is limited, so I cannot say how often it actually appreared)
-
-  On the guest side linux, I see the following dmesg after having it routed=
- from the host to the guest:
-  [  160.292231] usb 1-2.1: new full speed USB device using uhci_hcd and ad=
-dress 5
-  [  160.475762] usb 1-2.1: configuration #1 chosen from 1 choice
-  [  160.478553] scsi3 : SCSI emulation for USB Mass Storage devices
-  [  160.479689] usb-storage: device found at 5
-  [  160.480121] usb-storage: waiting for device to settle before scanning
-  [  165.494016] scsi 3:0:0:0: CD-ROM            slimtype  eTDU108   1     =
-SL03 PQ: 0 ANSI: 0
-
-  then, the guest stalls and on the host side the USBDEVFS_CLEAR_HALT
-  appears until I unplug the hardware from the host - pay also attention
-  on the stalled dmesg timestamp! The "real" timegap between the last
-  line above and the first line below is more than 20 seconds!
-
-  [  165.645735] usb 1-2.1: USB disconnect, address 5
-  [  165.663770] sr0: scsi3-mmc drive: 24x/24x cd/rw xa/form2 cdda pop-up
-  [  165.664416] sr 3:0:0:0: Attached scsi CD-ROM sr0
-  [  165.664623] sr 3:0:0:0: Attached scsi generic sg1 type 5
-  [  165.665565] usb-storage: device scan complete
-
-  The drive used is a self-powered LITEON External Slim DVD-ROM Drive (Mode=
-l number eTDU108-02 1)
-  The power is not a problem, because the drive works fine on the host dire=
-ctly.
-
-  Best regards,
-
-  Erik
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/906221/+subscriptions
+> Halil
+> 
+> > 
+> >> +            }
+> >>              for (i = 0; i < n_elems; i++) {
+> >>                  void *curr_elem = first_elem + size * i;
+> >>  
+> >> -- 
+> >> 2.8.4
+> >>
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
