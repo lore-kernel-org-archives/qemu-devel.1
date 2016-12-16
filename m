@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34358)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36456)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cHpzL-0004ux-8M
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 05:43:44 -0500
+	(envelope-from <zhongjun@sangfor.com.cn>) id 1cHq79-0002kt-16
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 05:51:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cHpzG-0006Ry-DN
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 05:43:43 -0500
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:32902)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cHpzG-0006RO-6J
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 05:43:38 -0500
-Received: by mail-wm0-x242.google.com with SMTP id u144so4553246wmu.0
-	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 02:43:38 -0800 (PST)
-Date: Fri, 16 Dec 2016 10:43:34 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20161216104334.GC4129@stefanha-x1.localdomain>
-References: <871sx9pj0o.fsf@163.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="xesSdrSSBC0PokLI"
-Content-Disposition: inline
-In-Reply-To: <871sx9pj0o.fsf@163.com>
-Subject: Re: [Qemu-devel] Measure virtio-vsock speed
+	(envelope-from <zhongjun@sangfor.com.cn>) id 1cHq75-0002If-2o
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 05:51:47 -0500
+Received: from mr213107.mail.yeah.net ([223.252.213.107]:17852)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <zhongjun@sangfor.com.cn>) id 1cHq73-0002GB-KO
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 05:51:43 -0500
+Date: Fri, 16 Dec 2016 18:14:57 +0800
+From: "zhongjun@sangfor.com.cn" <zhongjun@sangfor.com.cn>
+References: <20161216075527.5421-1-zhongjun@sangfor.com.cn>,
+	<698b3cd4-0eeb-7739-e692-58615fc40956@redhat.com>
+Mime-Version: 1.0
+Message-ID: <201612161814568867144@sangfor.com.cn>
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: base64
+Subject: Re: [Qemu-devel] [PATCH 1/1] scsi-disk: passthrough VERIFY command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,90 +27,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhang Shuaiyi <zhang_syi@163.com>
-Cc: qemu-devel@nongnu.org, stefanha@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
-
---xesSdrSSBC0PokLI
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, Dec 15, 2016 at 05:00:35PM +0800, Zhang Shuaiyi wrote:
-> I used kernel 4.8 and qemu v2.8.0-rc3.
-> Qemu command line:
->   -device vhost-vsock-pci,id=3Dvhost-vsock-pci0,guest-cid=3D3
->=20
-> I try to use nc-vsock to test vsock speed.
-> 1. In host:
->   # modprobe vhost-vsock
->   # ./nc-vsock -l 1234 > /dev/null
-> 2. In guest:
->   a. use pv and nc-vsock, speed is about 62MB/s.
->      # pv /dev/zero | ./nc-vsock 3 1234
->   b. use dd and nc-vsock, speed is about 67MB/s.
->      # dd if=3D/dev/zero bs=3D1M count=3D2000 | ./nc-vsock 3 1234
->     =20
-> I think nc-vsock can not get the maximum speed, so I modified
-> nc-vsock.c.
-
-Good idea, nc-vsock is not a performance benchmark.
-
-> 1. In host, just recv data without printf.
-> 2. In guest, use gettimeofday to record interval and send zero bufs.
->   #define MAXLEN 65536
->   char buf[MAXLEN] =3D {0};
->   unsigned long long num =3D 0;
->=20
->   gettimeofday(&start_time, NULL);
->   for (n =3D 0; n  1000000; n++) {
->       ret =3D send(fd, buf, MAXLEN, 0);
->       if (ret  0) {
->          fprintf(stderr, "send error ret:%d\n", ret);
->          break;
->       }
->       num +=3D ret;
->   }
->   gettimeofday(&end_time, NULL);
-
-This is benchmarking how quickly send(2) returns but it doesn't
-guarantee that the guest has received everything.  Is it necessary to
-add a final recv(fd, &status, sizeof(status), 0) to check that the other
-side has seen all the data?
-
-> In this way, the virtio-vsock speed is about 500MB/s. But use iperf to
-> test virtio-net, the speed is about 1.5GB/s.
-
-Your vsock benchmark may not be doing the same thing as iperf.  I
-suggest adding AF_VSOCK support to iperf for a fair comparison.
-
-> Iperf can be used to test virtio-net, is there a tool to test maximum vir=
-tio-vsock speed?
-> At present, virtio-vsock is faster than virtio-net?
-
-I expect virtio-net to be faster than virtio-vsock and to remain faster
-in the future.  The goal of vsock is to provide reliable,
-zero-configuration communication between guest and host.  The goal is
-not to be a faster transport than virtio-net.
-
-If you are considering running something over AF_VSOCK for performance
-reasons then that's not what it was designed for.  If performance is the
-*most* important thing look at vhost-user (i.e. shared memory) but it
-has a lot of trade-offs because you need to implement virtio-net and a
-network stack.
-
---xesSdrSSBC0PokLI
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJYU8VWAAoJEJykq7OBq3PIudgH/RcWxwUtVYy2BP62KH8mUzCx
-n1NtnjnCl+iszRfNp/S0hXn5OuMTn1McxrnBEP1MxUnjnDvEch0WsU6KnSiJdjDM
-dtlZuxFwfvGKo7iVbSAeJdz58DUibDwmuX98wU9yioJN0l5F/RzMAee4YFNqRluI
-IXKPl30f7u9sNf6OPCBurz1ytz2RXPnLDD+Zr3ll4loGWXnxZVsSEIlfyJofJUsd
-Mny+8HfyzD7ne3PA7Frn+eaMyTXdCmfwlCxBXVEGNwvvn+wgIGDnYH5oMkSQpprz
-QyiBoXdnudBlNpdxTOk0xwLAIXUmErOkSCSxgq4VJ/mkF8gdE5ZjeaaLlcZV9cI=
-=mLFq
------END PGP SIGNATURE-----
-
---xesSdrSSBC0PokLI--
+WWVzLCBpdCdzIGFsc28gd29yay4NClNvIHlvdSBwcmVmZXIgdGhlIGxhdHRlcj8NCg0KDQoNCnpo
+b25nanVuQHNhbmdmb3IuY29tLmNuDQogDQpGcm9tOiBQYW9sbyBCb256aW5pDQpEYXRlOiAyMDE2
+LTEyLTE2IDE4OjEwDQpUbzogSnVubGlhbiBCZWxsDQpDQzogcWVtdS1kZXZlbA0KU3ViamVjdDog
+UmU6IFtQQVRDSCAxLzFdIHNjc2ktZGlzazogcGFzc3Rocm91Z2ggVkVSSUZZIGNvbW1hbmQNCiAN
+CiANCk9uIDE2LzEyLzIwMTYgMDg6NTUsIEp1bmxpYW4gQmVsbCB3cm90ZToNCj4gV2hlbiBhIHNj
+c2ktZGlzayBvYmplY3QgcmVjZWl2ZXMgVkVSSUZZIGNvbW1hbmQgd2l0aCBCWVRDSEsgYml0IGJl
+aW5nIHplcm8sDQo+IHNjc2lfYmxvY2tfaXNfcGFzc3Rocm91Z2ggcmV0dXJucyBmYWxzZSBhbmQg
+ZmluYWxseSBtYWtlcyByZXEgYmVpbmcgcHJvY2VlZGVkDQo+IGJ5IHNjc2lfYmxvY2tfZG1hX2Nv
+bW1hbmQuIEJlY2F1c2Ugc2NzaV9ibG9ja19kbWFfY29tbWFuZCBoYXMgcmVtb3ZlZCBwcm9jZXNz
+DQo+IG9mIFZFUklGWSwgUUVNVSB3aWxsIGFib3J0IGluIHRoaXMgZnVuY3Rpb24uDQo+IA0KPiBU
+aGlzIHBhdGNoIG1ha2VzIGFsbCBWRVJJRlkgcGFzc3Rocm91Z2ggdG8gc29sdmUgdGhpcyBwcm9i
+bG9tLg0KPiANCj4gU2lnbmVkLW9mZi1ieTogSnVubGlhbiBCZWxsIDx6aG9uZ2p1bkBzYW5nZm9y
+LmNvbS5jbj4NCj4gLS0tDQo+ICBody9zY3NpL3Njc2ktZGlzay5jIHwgNyAtLS0tLS0tDQo+ICAx
+IGZpbGUgY2hhbmdlZCwgNyBkZWxldGlvbnMoLSkNCj4gDQo+IGRpZmYgLS1naXQgYS9ody9zY3Np
+L3Njc2ktZGlzay5jIGIvaHcvc2NzaS9zY3NpLWRpc2suYw0KPiBpbmRleCBhOTYzMTkxMzhhLi5m
+MzBmOTdmOTc2IDEwMDY0NA0KPiAtLS0gYS9ody9zY3NpL3Njc2ktZGlzay5jDQo+ICsrKyBiL2h3
+L3Njc2kvc2NzaS1kaXNrLmMNCj4gQEAgLTI2OTAsMTMgKzI2OTAsNiBAQCBzdGF0aWMgYm9vbCBz
+Y3NpX2Jsb2NrX2lzX3Bhc3N0aHJvdWdoKFNDU0lEaXNrU3RhdGUgKnMsIHVpbnQ4X3QgKmJ1ZikN
+Cj4gICAgICBjYXNlIFZFUklGWV8xMDoNCj4gICAgICBjYXNlIFZFUklGWV8xMjoNCj4gICAgICBj
+YXNlIFZFUklGWV8xNjoNCj4gLSAgICAgICAgLyogQ2hlY2sgaWYgQllUQ0hLID09IDB4MDEgKGRh
+dGEtb3V0IGJ1ZmZlciBjb250YWlucyBkYXRhDQo+IC0gICAgICAgICAqIGZvciB0aGUgbnVtYmVy
+IG9mIGxvZ2ljYWwgYmxvY2tzIHNwZWNpZmllZCBpbiB0aGUgbGVuZ3RoDQo+IC0gICAgICAgICAq
+IGZpZWxkKS4gIEZvciBvdGhlciBtb2RlcywgZG8gbm90IHVzZSBzY2F0dGVyL2dhdGhlciBvcGVy
+YXRpb24uDQo+IC0gICAgICAgICAqLw0KPiAtICAgICAgICBpZiAoKGJ1ZlsxXSAmIDYpICE9IDIp
+IHsNCj4gLSAgICAgICAgICAgIHJldHVybiBmYWxzZTsNCj4gLSAgICAgICAgfQ0KPiAgICAgICAg
+ICBicmVhazsNCj4gIA0KPiAgICAgIGNhc2UgUkVBRF82Og0KPiANCiANCkRvZXMgdGhpcyB3b3Jr
+IHRvbz8NCiANCmRpZmYgLS1naXQgYS9ody9zY3NpL3Njc2ktZGlzay5jIGIvaHcvc2NzaS9zY3Np
+LWRpc2suYw0KaW5kZXggYTk2MzE5MS4uNjc2MTY0ZCAxMDA2NDQNCi0tLSBhL2h3L3Njc2kvc2Nz
+aS1kaXNrLmMNCisrKyBiL2h3L3Njc2kvc2NzaS1kaXNrLmMNCkBAIC0yMTU3LDYgKzIxNTcsMTMg
+QEAgc3RhdGljIGludDMyX3Qgc2NzaV9kaXNrX2RtYV9jb21tYW5kKFNDU0lSZXF1ZXN0DQoqcmVx
+LCB1aW50OF90ICpidWYpDQogICAgICAgICBEUFJJTlRGKCJXcml0ZSAlcyhzZWN0b3IgJSIgUFJJ
+ZDY0ICIsIGNvdW50ICV1KVxuIiwNCiAgICAgICAgICAgICAgICAgKGNvbW1hbmQgJiAweGUpID09
+IDB4ZSA/ICJBbmQgVmVyaWZ5ICIgOiAiIiwNCiAgICAgICAgICAgICAgICAgci0+cmVxLmNtZC5s
+YmEsIGxlbik7DQorICAgIGNhc2UgVkVSSUZZXzEwOg0KKyAgICBjYXNlIFZFUklGWV8xMjoNCisg
+ICAgY2FzZSBWRVJJRllfMTY6DQorICAgICAgICAvKiBXZSBnZXQgaGVyZSBvbmx5IGZvciBCWVRD
+SEs9MDAgYW5kIG9ubHkgZm9yIHNjc2ktYmxvY2suICBBcw0KKyAgICAgICAgICogZmFyIGFzIERN
+QSBpcyBjb25jZXJuZWQsIHdlIGNhbiB0cmVhdCBpdCBhcyBhIHdyaXRlLCBhbmQNCisgICAgICAg
+ICAqIHNjc2lfYmxvY2tfZG9fc2dpbyB3aWxsIHNlbmQgVkVSSUZZIGNvbW1hbmRzLg0KKyAgICAg
+ICAgICovDQogICAgICAgICBpZiAoci0+cmVxLmNtZC5idWZbMV0gJiAweGUwKSB7DQogICAgICAg
+ICAgICAgZ290byBpbGxlZ2FsX3JlcXVlc3Q7DQogICAgICAgICB9DQogDQpUaGFua3MsDQogDQpQ
+YW9sbw0K
