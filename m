@@ -1,23 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37093)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38858)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cHqAO-0002Uo-CO
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 05:55:09 -0500
+	(envelope-from <bounces@canonical.com>) id 1cHqF5-0004Xf-1p
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 06:00:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cHqAI-0003hi-AH
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 05:55:08 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47474)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cHqAI-0003gq-4s
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 05:55:02 -0500
-References: <20161216082322.14160-1-hangaohuai@huawei.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e85f9602-6914-9664-f3fa-cd37db89caff@redhat.com>
-Date: Fri, 16 Dec 2016 11:54:58 +0100
+	(envelope-from <bounces@canonical.com>) id 1cHqF1-00063N-5b
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 05:59:59 -0500
+Received: from indium.canonical.com ([91.189.90.7]:43082)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cHqF0-00062z-W9
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 05:59:55 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cHqEz-00089D-AX
+	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 10:59:53 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 4DED82E80C7
+	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 10:59:53 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20161216082322.14160-1-hangaohuai@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3] bugfix: vm halt when in reset looping
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 16 Dec 2016 10:47:53 -0000
+From: "Bernhard M. Wiedemann" <691424@bugs.launchpad.net>
+Reply-To: Bug 691424 <691424@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20101217063430.31066.66219.malonedeb@palladium.canonical.com>
+Message-Id: <20161216104753.20769.2997.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 691424] Re: qemu/kvm SDL over ssh -X broken
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,56 +36,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: hangaohuai <hangaohuai@huawei.com>, qemu-devel@nongnu.org
-Cc: mst@redhat.com, arei.gonglei@huawei.com
+To: qemu-devel@nongnu.org
 
+It seems to be working now with current versions, so has probably been
+fixed somewhere.
 
+-- =
 
-On 16/12/2016 09:23, hangaohuai wrote:
-> reset mc146818rtc device when RESET event happens.
-> 
-> Fix the problem:
->   1. Guest boot the second cpu, set CMOS_RESET_CODE 0x0a to protect selfboot;
->   2. VM being reset by others, hmp_system_reset;
->   3. seabios resume check the CMOS_RESET_CODE, if 0x0a, jump to the BDA
->      resume execution by jump via 40h:0067h;
->   4. Guest halt;
-> 
-> Signed-off-by: hangaohuai <hangaohuai@huawei.com>
-> ---
->  hw/timer/mc146818rtc.c | 11 +++++++++++
->  1 file changed, 11 insertions(+)
-> 
-> diff --git a/hw/timer/mc146818rtc.c b/hw/timer/mc146818rtc.c
-> index da209d0..341b233 100644
-> --- a/hw/timer/mc146818rtc.c
-> +++ b/hw/timer/mc146818rtc.c
-> @@ -946,11 +946,22 @@ static Property mc146818rtc_properties[] = {
->      DEFINE_PROP_END_OF_LIST(),
->  };
->  
-> +static void rtc_resetdev(DeviceState *d)
-> +{
-> +    RTCState *s = MC146818_RTC(d);
-> +
-> +    /* Reason: VM do suspend self will set 0xfe
-> +     * Only handle the VM boot case */
-> +    if (s->cmos_data[0x0f] == 0x0a)
-> +        s->cmos_data[0x0f] = 0x00;
-> +}
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/691424
 
-Let's just do it for all values other than 0xfe.  Also, please run
-checkpatch.pl on your patch.
+Title:
+  qemu/kvm SDL over ssh -X broken
 
-Paolo
+Status in QEMU:
+  Incomplete
 
->  static void rtc_class_initfn(ObjectClass *klass, void *data)
->  {
->      DeviceClass *dc = DEVICE_CLASS(klass);
->  
->      dc->realize = rtc_realizefn;
-> +    dc->reset = rtc_resetdev;
->      dc->vmsd = &vmstate_rtc;
->      dc->props = mc146818rtc_properties;
->      /* Reason: needs to be wired up by rtc_init() */
-> 
+Bug description:
+  qemu/kvm by default uses SDL to render the output of its emulated VGA gra=
+phics.
+  This is broken over ssh -X since quite a while.
+  The only workaround I know, is to use qemu -vnc :0
+  and connect using vncviewer
+
+  =
+
+  How To Reproduce:
+  1. zypper in qemu
+  2. ssh -X localhost qemu -cdrom ANYISOFILE
+
+  Actual Results:
+  qemu hangs in an endless loop on the BIOS display screen
+
+  Expected Results:
+  should boot up the iso as 0.10 versions did
+
+  Reproducible: Always
+
+  =
+
+  this is what broke it:
+  $ git bisect bad
+  c18a2c360e3100bbd71162cf922dcd8c429a8b71 is first bad commit
+  commit c18a2c360e3100bbd71162cf922dcd8c429a8b71
+  Author: Stefano Stabellini <stefano.stabellini@eu.citrix.com>
+  Date:   Wed Jun 24 11:58:25 2009 +0100
+
+      sdl zooming
+
+      Hi all,
+      this patch implements zooming capabilities for the sdl interface.
+      A new sdl_zoom_blit function is added that is able to scale and blit a
+      portion of a surface into another.
+      This way we can enable SDL_RESIZABLE and have a real_screen surface w=
+ith
+      a different size than the guest surface and let sdl_zoom_blit take ca=
+re
+      of the problem.
+
+      Signed-off-by: Stefano Stabellini <stefano.stabellini@eu.citrix.com>
+      Signed-off-by: Anthony Liguori <aliguori@us.ibm.com>
+
+  :100644 100644 a06c9bfc22cc6de1c6e5e9068d6bf59d89613767 f8dc5065dd27010bf=
+dbb6bcfb0c6e3af25024cdb M      Makefile
+  :100644 100644 417217582363a87ee67e746ba798e285a64b6cdc 35183399f65de6f50=
+f3baa4767ab7d4d11d45bca M      console.h
+  :100644 100644 178b5532b8d9dd2194a8662fbfdcd49b4bc04222 d81399e51276e1c97=
+fa1f7272ef16ea4c312b51b M      sdl.c
+  :000000 100644 0000000000000000000000000000000000000000 56d3604fc3d79e4cc=
+4622be8437c78bf70075da3 A      sdl_zoom.c
+  :000000 100644 0000000000000000000000000000000000000000 33dc63408b43a37fd=
+6b1acde3fa62b1a51315e75 A      sdl_zoom.h
+  :000000 100644 0000000000000000000000000000000000000000 64bbca849bd3af678=
+c2259b4d8cc0e48c6a6b43c A      sdl_zoom_template.h
+
+  =
+
+  This problem occurs on both Debian and openSUSE.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/691424/+subscriptions
