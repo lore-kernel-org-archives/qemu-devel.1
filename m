@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39067)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39133)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <SRS0=thZ3=X7=redhat.com=mst@kernel.org>)
-	id 1cHzsy-0003xN-Jh
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 16:17:49 -0500
+	id 1cHztD-00047V-FC
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 16:18:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <SRS0=thZ3=X7=redhat.com=mst@kernel.org>)
-	id 1cHzst-0007eF-Kv
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 16:17:48 -0500
-Date: Fri, 16 Dec 2016 23:17:39 +0200
+	id 1cHzt8-0007oW-Ec
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 16:18:03 -0500
+Received: from mail.kernel.org ([198.145.29.136]:48990)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <SRS0=thZ3=X7=redhat.com=mst@kernel.org>)
+	id 1cHzt8-0007nn-7p
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 16:17:58 -0500
+Date: Fri, 16 Dec 2016 23:17:53 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1481922841-4324-9-git-send-email-mst@redhat.com>
+Message-ID: <1481922841-4324-10-git-send-email-mst@redhat.com>
 References: <1481922841-4324-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1481922841-4324-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL for-2.9 8/9] pci: fix error message for express
- slots
+Subject: [Qemu-devel] [PULL for-2.9 9/9] virtio: avoid using
+ guest_notifier_mask in vhost-user mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,46 +31,60 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-stable@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Cao jin <caoj.fnst@cn.fujitsu.com>, Marcel Apfelbaum <marcel@redhat.com>, stefanha@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>, Wei Huang <wei@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, stefanha@redhat.com
 
-PCI Express downstream slot has a single PCI slot
-behind it, using PCI_DEVFN(PCI_SLOT(devfn), 0)
-does not give you function 0 in cases such as ARI
-as well as some error cases.
+From: Wei Huang <wei@redhat.com>
 
-This is exactly what we are hitting:
-   $ qemu-system-x86_64 -machine q35 -readconfig docs/q35-chipset.cfg
--monitor stdio
-   (qemu) device_add e1000e,bus=ich9-pcie-port-4,addr=00
-   (qemu) device_add e1000e,bus=ich9-pcie-port-4,addr=08
-   Segmentation fault (core dumped)
+Because guest mask notifier cannot be used in vhost-user mode, a boolean
+flag "use_guest_notifier_mask" was added in commit 5669655aafd to disable
+the use of guest mask notifier under virtio-pci. However this flag wasn't
+checked in other virtio devices, such as virtio-mmio. In our tests, it
+caused assertion error under "vhost-user + virtio-mmio". This patch
+addresses this problem by adding a check before guest_notifier_mask is
+called.
 
-The fix is to use the pci_get_function_0 API.
-
-Cc: qemu-stable@nongnu.org
+Signed-off-by: Wei Huang <wei@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Reported-by: Eduardo Habkost <ehabkost@redhat.com>
-Tested-by: Cao jin <caoj.fnst@cn.fujitsu.com>
-Tested-by: Eduardo Habkost <ehabkost@redhat.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- hw/pci/pci.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/s390x/virtio-ccw.c   | 4 ++--
+ hw/virtio/virtio-mmio.c | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-index 24fae16..637d545 100644
---- a/hw/pci/pci.c
-+++ b/hw/pci/pci.c
-@@ -982,8 +982,8 @@ static PCIDevice *do_pci_register_device(PCIDevice *pci_dev, PCIBus *bus,
-                pci_get_function_0(pci_dev)) {
-         error_setg(errp, "PCI: slot %d function 0 already ocuppied by %s,"
-                    " new func %s cannot be exposed to guest.",
--                   PCI_SLOT(devfn),
--                   bus->devices[PCI_DEVFN(PCI_SLOT(devfn), 0)]->name,
-+                   PCI_SLOT(pci_get_function_0(pci_dev)->devfn),
-+                   pci_get_function_0(pci_dev)->name,
-                    name);
+diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
+index f5c1d98..0765068 100644
+--- a/hw/s390x/virtio-ccw.c
++++ b/hw/s390x/virtio-ccw.c
+@@ -1098,7 +1098,7 @@ static int virtio_ccw_set_guest_notifier(VirtioCcwDevice *dev, int n,
+          * We do not support individual masking for channel devices, so we
+          * need to manually trigger any guest masking callbacks here.
+          */
+-        if (k->guest_notifier_mask) {
++        if (k->guest_notifier_mask && vdev->use_guest_notifier_mask) {
+             k->guest_notifier_mask(vdev, n, false);
+         }
+         /* get lost events and re-inject */
+@@ -1107,7 +1107,7 @@ static int virtio_ccw_set_guest_notifier(VirtioCcwDevice *dev, int n,
+             event_notifier_set(notifier);
+         }
+     } else {
+-        if (k->guest_notifier_mask) {
++        if (k->guest_notifier_mask && vdev->use_guest_notifier_mask) {
+             k->guest_notifier_mask(vdev, n, true);
+         }
+         if (with_irqfd) {
+diff --git a/hw/virtio/virtio-mmio.c b/hw/virtio/virtio-mmio.c
+index 17412cb..60654dc 100644
+--- a/hw/virtio/virtio-mmio.c
++++ b/hw/virtio/virtio-mmio.c
+@@ -402,7 +402,7 @@ static int virtio_mmio_set_guest_notifier(DeviceState *d, int n, bool assign,
+         event_notifier_cleanup(notifier);
+     }
  
-        return NULL;
+-    if (vdc->guest_notifier_mask) {
++    if (vdc->guest_notifier_mask && vdev->use_guest_notifier_mask) {
+         vdc->guest_notifier_mask(vdev, n, !assign);
+     }
+ 
 -- 
 MST
