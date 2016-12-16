@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33144)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33127)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cHiZn-0004Nq-JO
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 21:48:52 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cHiZm-0002wt-Mp
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cHiZm-0004Ly-QV
 	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 21:48:51 -0500
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cHiZj-0002uy-OV
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 21:48:50 -0500
 Received: from [59.151.112.132] (port=49220 helo=heian.cn.fujitsu.com)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cHiZk-0002mT-H9
-	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 21:48:50 -0500
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cHiZi-0002mT-BB
+	for qemu-devel@nongnu.org; Thu, 15 Dec 2016 21:48:47 -0500
 From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Date: Fri, 16 Dec 2016 10:46:43 +0800
-Message-ID: <1481856403-23599-3-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-In-Reply-To: <1481856403-23599-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-References: <1481856403-23599-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+Date: Fri, 16 Dec 2016 10:46:41 +0800
+Message-ID: <1481856403-23599-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH for-2.9 V4 2/2] Add a new qmp command to do
- checkpoint, get replication error
+Subject: [Qemu-devel] [PATCH for-2.9 V4 0/2] Add new qmp commands to suppurt
+ Xen COLO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,107 +25,29 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>, Eric Blake <eblake@redhat.com>
-Cc: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, "eddie . dong" <eddie.dong@intel.com>, Bian Naimeng <biannm@cn.fujitsu.com>, Changlong Xie <xiecl.fnst@cn.fujitsu.com>, Wen Congyang <wencongyang@gmail.com>
+Cc: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, "eddie . dong" <eddie.dong@intel.com>, Bian Naimeng <biannm@cn.fujitsu.com>, Changlong Xie <xiecl.fnst@cn.fujitsu.com>
 
-We can call this qmp command to do checkpoint outside of qemu.
-Like Xen colo need this function.
+Xen COLO depend on qemu COLO replication function.
+So, We need new qmp commands for Xen to use qemu replication.
 
-Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Signed-off-by: Wen Congyang <wencongyang@gmail.com>
----
- docs/qmp-commands.txt | 24 ++++++++++++++++++++++++
- migration/colo.c      | 10 ++++++++++
- qapi-schema.json      | 22 ++++++++++++++++++++++
- 3 files changed, 56 insertions(+)
+Corresponding libxl patches already in xen.git.
+Commit ID:
 
-diff --git a/docs/qmp-commands.txt b/docs/qmp-commands.txt
-index a8e9eb6..093b7eb 100644
---- a/docs/qmp-commands.txt
-+++ b/docs/qmp-commands.txt
-@@ -450,6 +450,30 @@ Example:
-      "arguments": {"enable": true, "primary": false} }
- <- { "return": {} }
- 
-+xen-get-replication-error
-+-------------------------
-+
-+Get replication error that occurs when vm is running.
-+
-+Arguments: None.
-+
-+Example:
-+
-+-> { "execute": "xen-get-replication-error" }
-+<- { "return": {} }
-+
-+xen-do-checkpoint
-+-----------------
-+
-+Do checkpoint.
-+
-+Arguments: None.
-+
-+Example:
-+
-+-> { "execute": "xen-do-checkpoint" }
-+<- { "return": {} }
-+
- migrate
- -------
- 
-diff --git a/migration/colo.c b/migration/colo.c
-index 6fc2ade..1e962f6 100644
---- a/migration/colo.c
-+++ b/migration/colo.c
-@@ -127,6 +127,16 @@ void qmp_xen_set_replication(bool enable, bool primary,
-     }
- }
- 
-+void qmp_xen_get_replication_error(Error **errp)
-+    {
-+        replication_get_error_all(errp);
-+    }
-+
-+void qmp_xen_do_checkpoint(Error **errp)
-+    {
-+        replication_do_checkpoint_all(errp);
-+    }
-+
- static void colo_send_message(QEMUFile *f, COLOMessage msg,
-                               Error **errp)
- {
-diff --git a/qapi-schema.json b/qapi-schema.json
-index 78802f4..79fe4dd 100644
---- a/qapi-schema.json
-+++ b/qapi-schema.json
-@@ -4695,6 +4695,28 @@
-   'data': { 'enable': 'bool', 'primary': 'bool', '*failover' : 'bool' } }
- 
- ##
-+# @xen-get-replication-error
-+#
-+# Get replication error that occurs when the vm is running.
-+#
-+# Returns: nothing.
-+#
-+# Since: 2.9
-+##
-+{ 'command': 'xen-get-replication-error' }
-+
-+##
-+# @xen-do-checkpoint
-+#
-+# Do checkpoint.
-+#
-+# Returns: nothing.
-+#
-+# Since: 2.9
-+##
-+{ 'command': 'xen-do-checkpoint' }
-+
-+##
- # @GICCapability:
- #
- # The struct describes capability for a specific GIC (Generic
+ed37ef1f91c20f0ab162ce60f8c38400b917fa64
+COLO: introduce new API to prepare/start/do/get_error/stop replication
+
+a0ddc0b359375b2418213966dfbdbfab593ecc6f
+tools/libxl: introduction of libxl__qmp_restore to load qemu state
+
+
+Zhang Chen (2):
+  Add a new qmp command to start/stop replication
+  Add a new qmp command to do checkpoint, get replication error
+
+ docs/qmp-commands.txt | 42 ++++++++++++++++++++++++++++++++++++++++++
+ migration/colo.c      | 33 +++++++++++++++++++++++++++++++++
+ qapi-schema.json      | 41 +++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 116 insertions(+)
+
 -- 
 2.7.4
