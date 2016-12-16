@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33951)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39594)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cHvvU-0001IQ-1K
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 12:04:09 -0500
+	(envelope-from <clg@kaod.org>) id 1cHwFF-0003B3-Rc
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 12:24:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cHvvQ-0006n8-2D
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 12:04:08 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57482)
+	(envelope-from <clg@kaod.org>) id 1cHwFA-0004rg-Qi
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 12:24:33 -0500
+Received: from 20.mo5.mail-out.ovh.net ([91.121.55.239]:37334)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cHvvP-0006mm-TH
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 12:04:04 -0500
-Date: Fri, 16 Dec 2016 17:03:57 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20161216170357.GD2642@work-vm>
-References: <1478265017-5700-1-git-send-email-thuth@redhat.com>
-	<87wpg5di5o.fsf@emacs.mitica>
-	<20161117034511.GG18808@umbus.fritz.box>
-	<b20c6b22-fc3a-b37a-6ea0-169be815864a@redhat.com>
-	<401600f0-8a1c-22c7-b9f3-7424426ec699@redhat.com>
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cHwFA-0004pO-KG
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 12:24:28 -0500
+Received: from player760.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id F2C45570E5
+	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 18:24:17 +0100 (CET)
+References: <1480441323-31417-1-git-send-email-clg@kaod.org>
+	<CAFEAcA9SVh-pUS+mnPWBYgWR9is49ysh9O_y35K-x2iyDwhfNg@mail.gmail.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <f7bba440-f985-3fc4-cc93-f12dac768426@kaod.org>
+Date: Fri, 16 Dec 2016 18:24:08 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <401600f0-8a1c-22c7-b9f3-7424426ec699@redhat.com>
-Subject: Re: [Qemu-devel] Is block_save_iterate() dead code? (was:
- migration: Fix return code of ram_save_iterate() )
+In-Reply-To: <CAFEAcA9SVh-pUS+mnPWBYgWR9is49ysh9O_y35K-x2iyDwhfNg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH 0/4] FTGMAC100 model for the Aspeed SoCs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,64 +30,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, Juan Quintela <quintela@redhat.com>, Amit Shah <amit.shah@redhat.com>, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Jason Wang <jasowang@redhat.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Dmitry Fleytman <dmitry@daynix.com>, Jan Kiszka <jan.kiszka@siemens.com>
 
-* Thomas Huth (thuth@redhat.com) wrote:
-> On 18.11.2016 09:13, Thomas Huth wrote:
-> > On 17.11.2016 04:45, David Gibson wrote:
-> >> On Mon, Nov 14, 2016 at 07:34:59PM +0100, Juan Quintela wrote:
-> >>> Thomas Huth <thuth@redhat.com> wrote:
-> >>>> qemu_savevm_state_iterate() expects the iterators to return 1
-> >>>> when they are done, and 0 if there is still something left to do.
-> >>>> However, ram_save_iterate() does not obey this rule and returns
-> >>>> the number of saved pages instead. This causes a fatal hang with
-> >>>> ppc64 guests when you run QEMU like this (also works with TCG):
-> >>>>
-> >>>>  qemu-img create -f qcow2  /tmp/test.qcow2 1M
-> >>>>  qemu-system-ppc64 -nographic -nodefaults -m 256 \
-> >>>>                    -hda /tmp/test.qcow2 -serial mon:stdio
-> >>>>
-> >>>> ... then switch to the monitor by pressing CTRL-a c and try to
-> >>>> save a snapshot with "savevm test1" for example.
-> >>>>
-> >>>> After the first iteration, ram_save_iterate() always returns 0 here,
-> >>>> so that qemu_savevm_state_iterate() hangs in an endless loop and you
-> >>>> can only "kill -9" the QEMU process.
-> >>>> Fix it by using proper return values in ram_save_iterate().
-> >>>>
-> >>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> >>>
-> >>> Reviewed-by: Juan Quintela <quintela@redhat.com>
-> >>>
-> >>> Applied.
-> >>>
-> >>> I don't know how we broked this so much.
-> >>
-> >> Note that block save iterate has the same bug...
-> > 
-> > I think you're right. Care to send a patch?
-> 
-> Looking at this issue again ... could it be that block_save_iterate() is
-> currently just dead code?
-> As far as I can see, the ->save_live_iterate() handlers are only called
-> from qemu_savevm_state_iterate(), right? And qemu_savevm_state_iterate()
-> only calls the handlers if se->ops->is_active(se->opaque) returns true.
-> But block_is_active() seems to only return 0 during savevm, most likely
-> because qemu_savevm_state() explicitly sets the "blk" and "shared"
-> MigrationParams to zero.
-> So to me, it looks like we could also just remove block_save_iterate()
-> completely ... or did I miss something here?
+On 12/16/2016 05:48 PM, Peter Maydell wrote:
+> On 29 November 2016 at 17:41, C=C3=A9dric Le Goater <clg@kaod.org> wrot=
+e:
+>> The Aspeed SoCs AST2400 and AST2500 have two FTGMAC100 ethernet
+>> controllers. This serie proposes a model for this device and a way to
+>> customize the bit definitions which are slightly different from the
+>> Faraday definitions.
+>>
+>> The last patch adds a fake NC-SI (Network Controller Sideband
+>> Interface) backend to pretend a NIC is being managed.
+>=20
+> Could you explain in a bit more detail why the patchset is
+> marked "RFC" and what parts you want comments on?  (An RFC
+> patchset that doesn't say this kind of thing in the cover letter
+> is dangerously close to being a "please ignore me" request :-))
 
-Doesn't it get called by migrate -b ?
+This is true. I didn't take the time to do so ...
 
-Dave
+Well, first, this is not an area I am familiar with, so this=20
+might look more like a draft for experts and the review should=20
+take that into account :)=20
 
->  Thomas
-> 
-> 
+Also, I am not entirely satisfied with how the model looks for=20
+the first descriptor to transmit. May be I am trying to fit=20
+too well the driver.
 
+And, the NC-SI is just a fake one to exercise the linux driver=20
+(we did find bugs with it) but I am wondering how far we should=20
+push the model. It's a rather complex interface.
 
+Thanks,
 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+C.=20
