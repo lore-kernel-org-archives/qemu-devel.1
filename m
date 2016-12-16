@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52524)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54673)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex@alex.org.uk>) id 1cHvK6-0000DQ-RN
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 11:25:31 -0500
+	(envelope-from <edgar.iglesias@gmail.com>) id 1cHvU6-0001Fr-Hu
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 11:35:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex@alex.org.uk>) id 1cHvK5-0006ey-TA
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 11:25:30 -0500
-Received: from mail.avalus.com ([2001:41c8:10:1dd::10]:51720)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex@alex.org.uk>) id 1cHvK5-0006di-Ll
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 11:25:29 -0500
+	(envelope-from <edgar.iglesias@gmail.com>) id 1cHvU1-0003cI-JX
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 11:35:50 -0500
+Date: Fri, 16 Dec 2016 17:35:42 +0100
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Message-ID: <20161216163542.GQ9606@toto>
+References: <1481894862-14102-1-git-send-email-marcin.krzeminski@nokia.com>
+	<1481894862-14102-3-git-send-email-marcin.krzeminski@nokia.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-From: Alex Bligh <alex@alex.org.uk>
-In-Reply-To: <20161216155248.2r2yzthuvn76nprq@grep.be>
-Date: Fri, 16 Dec 2016 16:25:27 +0000
-Content-Transfer-Encoding: 7bit
-Message-Id: <82CDF60E-994F-453F-8B34-181C86001A82@alex.org.uk>
-References: <94ef3ef2-b76f-fa5d-cbaf-8990ce2b1be8@virtuozzo.com>
-	<20161214181323.mehzfmlf6z4pyajp@grep.be>
-	<D71CECFD-E513-4372-BB54-BF8D8D521292@alex.org.uk>
-	<3D392E31-DDA4-4316-B26D-871E94A83935@alex.org.uk>
-	<20161214201858.lblzw2ayddidxfyp@grep.be>
-	<58F412AB-8A4C-403F-AEE2-D2FB958D447A@alex.org.uk>
-	<20161215150312.dmxrxn7ujzq3apy6@grep.be>
-	<78C8A0CB-717D-4925-8AA8-A085DC1F9FB7@alex.org.uk>
-	<20161215164917.2zzkdwxarf4pnfle@grep.be>
-	<3DDAB833-51BF-4F73-9F08-E50054B01D24@alex.org.uk>
-	<20161216155248.2r2yzthuvn76nprq@grep.be>
-Subject: Re: [Qemu-devel] [Nbd] [PATCH] Further tidy-up on block status
+Content-Disposition: inline
+In-Reply-To: <1481894862-14102-3-git-send-email-marcin.krzeminski@nokia.com>
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 2/2] block: m25p80: Introduce
+ Die Erase command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,39 +24,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wouter Verhelst <w@uter.be>
-Cc: Alex Bligh <alex@alex.org.uk>, "nbd-general@lists.sourceforge.net" <nbd-general@lists.sourceforge.net>, Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Stefan stefanha@redhat. com" <stefanha@redhat.com>, "Denis V . Lunev" <den@openvz.org>, Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>
+To: marcin.krzeminski@nokia.com
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, rfsw-patches@mlist.nokia.com, qemu-arm@nongnu.org, clg@kaod.org
 
-
-> On 16 Dec 2016, at 15:52, Wouter Verhelst <w@uter.be> wrote:
+On Fri, Dec 16, 2016 at 02:27:42PM +0100, marcin.krzeminski@nokia.com wrote:
+> From: Marcin Krzeminski <marcin.krzeminski@nokia.com>
 > 
-> On Thu, Dec 15, 2016 at 05:34:48PM +0000, Alex Bligh wrote:
->> 
->>> On 15 Dec 2016, at 16:49, Wouter Verhelst <w@uter.be> wrote:
->>> 
->>>> Because the namespaces and leaf-names are already restricted to
->>>> non-whitespace characters. I thought having tabs, line feeds,
->>>> returns, em-space, en-space etc. was not particularly useful.
->>>> I could be persuaded to relent re spaces.
->>> 
->>> I could imagine that the context might include as part of its name a
->>> user-defined bit. If we're going to disallow whitespace, then that would
->>> mean namespaces would have to do all sorts of escaping etc. I don't
->>> think that's a good idea.
->> 
->> So to be clear do you want to include all whitespace
->> everywhere? Or just to the right of the colon in queries?
+> Big flash chips (like mt25qu01g) are consisted from dies.
+> Because of that some manufactures remove support for Chip
+> Erase giving Die Erase command instead.To avoid unnecessary
+> code complication, support for chip erase for mt25qu01g
+> is not removed.
 > 
-> Just in queries. I agree that in namespace names, it doesn't make much
-> sense.
+> Signed-off-by: Marcin Krzeminski <marcin.krzeminski@nokia.com>
+> ---
+>  hw/block/m25p80.c | 33 +++++++++++++++++++++++++++++----
+>  1 file changed, 29 insertions(+), 4 deletions(-)
+> 
+> diff --git a/hw/block/m25p80.c b/hw/block/m25p80.c
+> index 2bc7028..0bc1fbf 100644
+> --- a/hw/block/m25p80.c
+> +++ b/hw/block/m25p80.c
+> @@ -216,8 +216,8 @@ static const FlashPartInfo known_devices[] = {
+>      { INFO("n25q128",     0x20ba18,      0,  64 << 10, 256, 0) },
+>      { INFO("n25q256a",    0x20ba19,      0,  64 << 10, 512, ER_4K) },
+>      { INFO("n25q512a",    0x20ba20,      0,  64 << 10, 1024, ER_4K) },
+> -    { INFO("mt25ql01g",   0x20ba21,      0,  64 << 10, 2048, ER_4K) },
+> -    { INFO("mt25qu01g",   0x20bb21,      0,  64 << 10, 2048, ER_4K) },
+> +    { INFO("mt25ql01g",   0x20ba21, 0x1040,  64 << 10, 2048, ER_4K) },
+> +    { INFO("mt25qu01g",   0x20bb21, 0x1040,  64 << 10, 2048, ER_4K) },
+>  
+>      /* Spansion -- single (large) sector size only, at least
+>       * for the chips listed here (without boot sectors).
+> @@ -358,6 +358,8 @@ typedef enum {
+>  
+>      REVCR = 0x65,
+>      WEVCR = 0x61,
+> +
+> +    DIE_ERASE = 0xC4,
+>  } FlashCMD;
+>  
+>  typedef enum {
+> @@ -411,6 +413,7 @@ typedef struct Flash {
+>      bool reset_enable;
+>      bool quad_enable;
+>      uint8_t ear;
+> +    uint32_t die_cnt;
+>  
+>      int64_t dirty_page;
+>  
+> @@ -492,7 +495,7 @@ static inline void flash_sync_area(Flash *s, int64_t off, int64_t len)
+>  
+>  static void flash_erase(Flash *s, int offset, FlashCMD cmd)
+>  {
+> -    uint32_t len;
+> +    uint32_t len = 0;
 
-I've changed it so the returns from queries can now have spaces to
-the right of the colon if they aren't returning complete context names.
-Obviously if they are returning context names, by the definition of
-leaf-names they can't have spaces in the leaf-name.
+Do you really need this?
 
-The queries themselves can consist of anything (currently),
-save that they must begin with a namespace and a colon.
+>      uint8_t capa_to_assert = 0;
+>  
+>      switch (cmd) {
+> @@ -513,6 +516,16 @@ static void flash_erase(Flash *s, int offset, FlashCMD cmd)
+>      case BULK_ERASE:
+>          len = s->size;
+>          break;
+> +    case DIE_ERASE:
+> +        if (s->die_cnt) {
+> +            len = s->size / s->die_cnt;
+> +            offset = offset & (~(len-1));
+> +        } else {
+> +            qemu_log_mask(LOG_GUEST_ERROR, "M25P80: %d die erase not supported by"
+> +                          " device\n", len);
+> +            return;
+> +        }
+> +        break;
+>      default:
+>          abort();
+>      }
+> @@ -634,6 +647,7 @@ static void complete_collecting_data(Flash *s)
+>      case ERASE4_32K:
+>      case ERASE_SECTOR:
+>      case ERASE4_SECTOR:
+> +    case DIE_ERASE:
+>          flash_erase(s, s->cur_addr, s->cmd_in_progress);
+>          break;
+>      case WRSR:
+> @@ -684,6 +698,7 @@ static void reset_memory(Flash *s)
+>      s->write_enable = false;
+>      s->reset_enable = false;
+>      s->quad_enable = false;
+> +    s->die_cnt = 0;
+>  
+>      switch (get_man(s)) {
+>      case MAN_NUMONYX:
+> @@ -716,7 +731,15 @@ static void reset_memory(Flash *s)
+>              s->four_bytes_address_mode = true;
+>          }
+>          if (!(s->nonvolatile_cfg & NVCFG_LOWER_SEGMENT_MASK)) {
+> -            s->ear = s->size / MAX_3BYTES_SIZE - 1;
+> +            s->ear = ( s->size > MAX_3BYTES_SIZE ? s->size / MAX_3BYTES_SIZE - 1 : 0);
+> +        }
+> +        /* 1GiB devices */
+> +        if (s->pi->id[2] == 0x21) {
+> +            /* MT25Q00 has 2 dies N25Q00 has 4 */
+> +            if (s->pi->id[4] & BIT(6))
+> +                s->die_cnt = 2;
+> +            else
+> +                s->die_cnt = 4;
 
--- 
-Alex Bligh
+Decoding of die_cnt should probably be done in realize().
+
+>          }
+>          break;
+>      case MAN_MACRONIX:
+> @@ -880,6 +903,7 @@ static void decode_new_cmd(Flash *s, uint32_t value)
+>      case PP:
+>      case PP4:
+>      case PP4_4:
+> +    case DIE_ERASE:
+>          s->needed_bytes = get_addr_length(s);
+>          s->pos = 0;
+>          s->len = 0;
+> @@ -1217,6 +1241,7 @@ static const VMStateDescription vmstate_m25p80 = {
+>          VMSTATE_UINT8(spansion_cr2nv, Flash),
+>          VMSTATE_UINT8(spansion_cr3nv, Flash),
+>          VMSTATE_UINT8(spansion_cr4nv, Flash),
+> +        VMSTATE_UINT32(die_cnt, Flash),
+
+die_cnt is fixed per instance. Since it doesn't change, it doesn't need to be part of VMSTATE.
+
+>          VMSTATE_END_OF_LIST()
+>      }
+>  };
+> -- 
+> 2.7.4
+> 
+> 
