@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53405)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60253)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcd@tribudubois.net>) id 1cHywT-0006oD-GK
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 15:17:22 -0500
+	(envelope-from <mst@redhat.com>) id 1cHzTz-0002im-Q4
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 15:52:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcd@tribudubois.net>) id 1cHywS-0005Kz-Lk
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 15:17:21 -0500
-References: <20161215054812.12602-1-alastair@au1.ibm.com>
-	<20161215054812.12602-2-alastair@au1.ibm.com>
-	<CAFEAcA9RpMAHTrPb2GNQYh+P-svcpHB90h0qcs27CUBDyY1=Ng@mail.gmail.com>
-From: Jean-Christophe DUBOIS <jcd@tribudubois.net>
-Message-ID: <f85d31c0-8cc2-611d-0058-2db4d0d8e943@tribudubois.net>
-Date: Fri, 16 Dec 2016 21:17:03 +0100
+	(envelope-from <mst@redhat.com>) id 1cHzTw-0000YL-LS
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 15:51:59 -0500
+Date: Fri, 16 Dec 2016 22:51:53 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20161216225144-mutt-send-email-mst@kernel.org>
+References: <20161215154330.700-1-pasic@linux.vnet.ibm.com>
+	<20161216102528.GB4129@stefanha-x1.localdomain>
+	<86f7031a-981a-ef51-8a20-0a3c38e88835@linux.vnet.ibm.com>
+	<CAJSP0QVZQ=AXb+gZ3VftkYZ2y=SM_3uhV4VMAmK7GEmJYmpgHQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9RpMAHTrPb2GNQYh+P-svcpHB90h0qcs27CUBDyY1=Ng@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v4 1/8] arm: Uniquely name imx25 I2C buses.
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAJSP0QVZQ=AXb+gZ3VftkYZ2y=SM_3uhV4VMAmK7GEmJYmpgHQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH] virtio: fix vring->inuse recalc after migr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,65 +25,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Alastair D'Silva <alastair@au1.ibm.com>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, Andrew Jeffery <andrew@aj.id.au>, Joel Stanley <joel@jms.id.au>, Alastair D'Silva <alastair@d-silva.org>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Halil Pasic <pasic@linux.vnet.ibm.com>, qemu-devel <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-stable <qemu-stable@nongnu.org>
 
-Le 16/12/2016 à 14:03, Peter Maydell a écrit :
-> On 15 December 2016 at 05:48, Alastair D'Silva <alastair@au1.ibm.com> wrote:
->> From: Alastair D'Silva <alastair@d-silva.org>
->>
->> The imx25 chip provides 3 i2c buses, but they have all been named
->> "i2c", which makes it difficult to predict which bus a device will
->> be connected to when specified on the command line.
->>
->> This patch addresses the issue by naming the buses uniquely:
->>    i2c-bus.0 i2c-bus.1 i2c-bus.2
->>
->> Signed-off-by: Alastair D'Silva <alastair@d-silva.org>
->> ---
->>   hw/arm/imx25_pdk.c | 2 +-
->>   hw/i2c/imx_i2c.c   | 2 +-
->>   2 files changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/hw/arm/imx25_pdk.c b/hw/arm/imx25_pdk.c
->> index 025b608..44e741f 100644
->> --- a/hw/arm/imx25_pdk.c
->> +++ b/hw/arm/imx25_pdk.c
->> @@ -139,7 +139,7 @@ static void imx25_pdk_init(MachineState *machine)
->>            * of simple qtest. See "make check" for details.
->>            */
->>           i2c_create_slave((I2CBus *)qdev_get_child_bus(DEVICE(&s->soc.i2c[0]),
->> -                                                      "i2c"),
->> +                                                      "i2c-bus.0"),
->>                            "ds1338", 0x68);
->>       }
->>   }
->> diff --git a/hw/i2c/imx_i2c.c b/hw/i2c/imx_i2c.c
->> index 37e5a62..6c81b98 100644
->> --- a/hw/i2c/imx_i2c.c
->> +++ b/hw/i2c/imx_i2c.c
->> @@ -310,7 +310,7 @@ static void imx_i2c_realize(DeviceState *dev, Error **errp)
->>                             IMX_I2C_MEM_SIZE);
->>       sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->iomem);
->>       sysbus_init_irq(SYS_BUS_DEVICE(dev), &s->irq);
->> -    s->bus = i2c_init_bus(DEVICE(dev), "i2c");
->> +    s->bus = i2c_init_bus(DEVICE(dev), NULL);
->>   }
->>
->>   static void imx_i2c_class_init(ObjectClass *klass, void *data)
-> This change looks OK to me, but it is an incompatible change to the
-> command line (albeit only one where you couldn't have reliably
-> used the command line to start with), so I'm just cc'ing
-> Jean-Christophe Dubois, who's been active with the iMX code in the
-> past, for a second opinion.
+On Fri, Dec 16, 2016 at 04:12:24PM +0000, Stefan Hajnoczi wrote:
+> On Fri, Dec 16, 2016 at 3:41 PM, Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+> > On 12/16/2016 11:25 AM, Stefan Hajnoczi wrote:
+> >> On Thu, Dec 15, 2016 at 04:43:30PM +0100, Halil Pasic wrote:
+> >>> Correct recalculation of vring->inuse after migration for
+> >>> the corner case where the avail_idx has already wrapped
+> >>> but used_idx not yet.
+> >>>
+> >>> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+> >>> Fixes: bccdef6b ("virtio: recalculate vq->inuse after migration")
+> >>> CC: qemu-stable@nongnu.org
+> >>> ---
+> >>>
+> >>> I think we could also change the type of inuse to uint16_t.
+> >>> Would this be considered a good idea?
+> >>
+> >> VRing.num is unsigned int.  I would use the same type as num since this
+> >> is a size, not an index.
+> >>
+> >
+> > Thanks. I asked myself the question why are VRing.num and inuse (at
+> > least theoretically arch depended width but at least 16 bit) int while
+> > the indexes of the available and used rings uint16_t. Only thing I can
+> > think of is some sort of optimization, because the only difference I can
+> > see is that the VRing.num is communicated via the transport while the
+> > indexes are a part (and/or corresponding to) of the ring layout (that is
+> > the shared memory virtio structures and have a fixed width).
+> >
+> > Now I'm kind of in doubt: I think having a signed has the benefit of a
+> > negative value being more obviously wrong size (for a human looking at
+> > it) that a to large positive, but purely theoretically the maximum value
+> > of inuse is not guaranteed to fit int (as in C99 MIN_INT is 2^15 - 1).
+> >
+> > What is your opinion? Should we keep 'inuse' as is, or should I change
+> > it to unsigned with v2 (or prepare a separate patch)?
+> 
+> I'm happy with unsigned.  I've CCed Michael Tsirkin in case he has a preference.
 
-This change seems fine to me too.
+I don't mind.
 
-JC
-
->
-> We should flag this up in 2.9's Changelog as well.
->
-> thanks
-> -- PMM
->
+> >>> ---
+> >>>  hw/virtio/virtio.c | 7 +++++--
+> >>>  1 file changed, 5 insertions(+), 2 deletions(-)
+> >>>
+> >>> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+> >>> index 1af2de2..089c6f6 100644
+> >>> --- a/hw/virtio/virtio.c
+> >>> +++ b/hw/virtio/virtio.c
+> >>> @@ -1855,9 +1855,12 @@ int virtio_load(VirtIODevice *vdev, QEMUFile *f, int version_id)
+> >>>              /*
+> >>>               * Some devices migrate VirtQueueElements that have been popped
+> >>>               * from the avail ring but not yet returned to the used ring.
+> >>> +             * Cast to uint16_t is OK because max ring size is 0x8000. Thus
+> >>> +             * no the size of largest array indexable by an integral type
+> >>> +             * can not be represented by the same type problem.
+> >>
+> >> I think it would be safe up to max ring size UINT16_MAX - 1 (we need
+> >> that extra value to distinguish between empty and full avail rings)?
+> >>
+> >
+> > Yeah.
+> >
+> >> The last sentence is hard to understand due to the double negative.  I
+> >> think you are saying "Since max ring size < UINT16_MAX it's safe to use
+> >> uint16_t to represent the size of the ring".
+> >>
+> >
+> > You are not the first one complaining, so the sentence is definitively
+> > bad. What disturbs me regarding your formulation is that we do not use
+> > uint16_t to represent neither the ring size nor inuse.
+> >
+> > How about "Since max ring size < UINT16_MAX it's safe to use modulo
+> > UINT16_MAX + 1 subtraction."?
+> 
+> That doesn't mention "representing the size of the ring" so it's
+> unclear what "safe" means.
+> 
+> Stefan
