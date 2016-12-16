@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37516)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37544)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cHxxV-0001gk-82
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 14:14:22 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cHxxW-0001pA-Sz
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 14:14:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cHxxQ-0000Nk-Ky
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 14:14:21 -0500
-Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:34842)
+	(envelope-from <rth7680@gmail.com>) id 1cHxxV-0000S9-Fb
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 14:14:22 -0500
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:33596)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cHxxQ-0000NU-D1
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 14:14:16 -0500
-Received: by mail-pg0-x243.google.com with SMTP id p66so10545775pga.2
-	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 11:14:16 -0800 (PST)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cHxxV-0000RH-8Y
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 14:14:21 -0500
+Received: by mail-pg0-x241.google.com with SMTP id 3so10556503pgd.0
+	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 11:14:21 -0800 (PST)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Fri, 16 Dec 2016 11:13:49 -0800
-Message-Id: <20161216191405.9473-11-rth@twiddle.net>
+Date: Fri, 16 Dec 2016 11:13:55 -0800
+Message-Id: <20161216191405.9473-17-rth@twiddle.net>
 In-Reply-To: <20161216191405.9473-1-rth@twiddle.net>
 References: <20161216191405.9473-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH 10/26] linux-user: Add HPPA termbits.h
+Subject: [Qemu-devel] [PATCH 16/26] linux-user: Add HPPA startup and main
+ loop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,237 +30,239 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Riku Voipio <riku.voipio@iki.fi>
 
+Including support for the atomic memory op syscalls.
+
 Cc: Riku Voipio <riku.voipio@iki.fi>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- linux-user/hppa/termbits.h | 219 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 219 insertions(+)
- create mode 100644 linux-user/hppa/termbits.h
+ linux-user/elfload.c |  24 +++++++
+ linux-user/main.c    | 172 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 196 insertions(+)
 
-diff --git a/linux-user/hppa/termbits.h b/linux-user/hppa/termbits.h
-new file mode 100644
-index 0000000..e9633ef
---- /dev/null
-+++ b/linux-user/hppa/termbits.h
-@@ -0,0 +1,219 @@
-+/* from asm/termbits.h */
+diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+index 5cea39d..51794bb 100644
+--- a/linux-user/elfload.c
++++ b/linux-user/elfload.c
+@@ -1215,6 +1215,30 @@ static inline void init_thread(struct target_pt_regs *regs,
+ 
+ #endif /* TARGET_TILEGX */
+ 
++#ifdef TARGET_HPPA
 +
-+#define TARGET_NCCS 19
++#define ELF_START_MMAP  0x80000000
++#define ELF_CLASS       ELFCLASS32
++#define ELF_ARCH        EM_PARISC
++#define ELF_PLATFORM    "PARISC"
++#define STACK_GROWS_DOWN 0
++#define STACK_ALIGNMENT  64
 +
-+struct target_termios {
-+    unsigned int c_iflag;               /* input mode flags */
-+    unsigned int c_oflag;               /* output mode flags */
-+    unsigned int c_cflag;               /* control mode flags */
-+    unsigned int c_lflag;               /* local mode flags */
-+    unsigned char c_line;                    /* line discipline */
-+    unsigned char c_cc[TARGET_NCCS];                /* control characters */
-+};
++static inline void init_thread(struct target_pt_regs *regs,
++                               struct image_info *infop)
++{
++    regs->iaoq[0] = infop->entry;
++    regs->iaoq[1] = infop->entry + 4;
++    regs->gr[23] = 0;
++    regs->gr[24] = infop->arg_start;
++    regs->gr[25] = (infop->arg_end - infop->arg_start) / sizeof(abi_ulong);
++    /* The top-of-stack contains a linkage buffer.  */
++    regs->gr[30] = infop->start_stack + 64;
++    regs->gr[31] = infop->entry;
++}
 +
-+/* c_iflag bits */
-+#define TARGET_IGNBRK  0000001
-+#define TARGET_BRKINT  0000002
-+#define TARGET_IGNPAR  0000004
-+#define TARGET_PARMRK  0000010
-+#define TARGET_INPCK   0000020
-+#define TARGET_ISTRIP  0000040
-+#define TARGET_INLCR   0000100
-+#define TARGET_IGNCR   0000200
-+#define TARGET_ICRNL   0000400
-+#define TARGET_IUCLC   0001000
-+#define TARGET_IXON    0002000
-+#define TARGET_IXANY   0004000
-+#define TARGET_IXOFF   0010000
-+#define TARGET_IMAXBEL 0040000
-+#define TARGET_IUTF8   0100000
++#endif /* TARGET_HPPA */
 +
-+/* c_oflag bits */
-+#define TARGET_OPOST   0000001
-+#define TARGET_OLCUC   0000002
-+#define TARGET_ONLCR   0000004
-+#define TARGET_OCRNL   0000010
-+#define TARGET_ONOCR   0000020
-+#define TARGET_ONLRET  0000040
-+#define TARGET_OFILL   0000100
-+#define TARGET_OFDEL   0000200
-+#define TARGET_NLDLY   0000400
-+#define   TARGET_NL0   0000000
-+#define   TARGET_NL1   0000400
-+#define TARGET_CRDLY   0003000
-+#define   TARGET_CR0   0000000
-+#define   TARGET_CR1   0001000
-+#define   TARGET_CR2   0002000
-+#define   TARGET_CR3   0003000
-+#define TARGET_TABDLY  0014000
-+#define   TARGET_TAB0  0000000
-+#define   TARGET_TAB1  0004000
-+#define   TARGET_TAB2  0010000
-+#define   TARGET_TAB3  0014000
-+#define   TARGET_XTABS 0014000
-+#define TARGET_BSDLY   0020000
-+#define   TARGET_BS0   0000000
-+#define   TARGET_BS1   0020000
-+#define TARGET_VTDLY   0040000
-+#define   TARGET_VT0   0000000
-+#define   TARGET_VT1   0040000
-+#define TARGET_FFDLY   0100000
-+#define   TARGET_FF0   0000000
-+#define   TARGET_FF1   0100000
+ #ifndef ELF_PLATFORM
+ #define ELF_PLATFORM (NULL)
+ #endif
+diff --git a/linux-user/main.c b/linux-user/main.c
+index 8251027..68ee0cd 100644
+--- a/linux-user/main.c
++++ b/linux-user/main.c
+@@ -3505,6 +3505,169 @@ void cpu_loop(CPUTLGState *env)
+ 
+ #endif
+ 
++#ifdef TARGET_HPPA
 +
-+/* c_cflag bit meaning */
-+#define TARGET_CBAUD   0010017
-+#define  TARGET_B0     0000000         /* hang up */
-+#define  TARGET_B50    0000001
-+#define  TARGET_B75    0000002
-+#define  TARGET_B110   0000003
-+#define  TARGET_B134   0000004
-+#define  TARGET_B150   0000005
-+#define  TARGET_B200   0000006
-+#define  TARGET_B300   0000007
-+#define  TARGET_B600   0000010
-+#define  TARGET_B1200  0000011
-+#define  TARGET_B1800  0000012
-+#define  TARGET_B2400  0000013
-+#define  TARGET_B4800  0000014
-+#define  TARGET_B9600  0000015
-+#define  TARGET_B19200 0000016
-+#define  TARGET_B38400 0000017
-+#define TARGET_EXTA B19200
-+#define TARGET_EXTB B38400
-+#define TARGET_CSIZE   0000060
-+#define   TARGET_CS5   0000000
-+#define   TARGET_CS6   0000020
-+#define   TARGET_CS7   0000040
-+#define   TARGET_CS8   0000060
-+#define TARGET_CSTOPB  0000100
-+#define TARGET_CREAD   0000200
-+#define TARGET_PARENB  0000400
-+#define TARGET_PARODD  0001000
-+#define TARGET_HUPCL   0002000
-+#define TARGET_CLOCAL  0004000
-+#define TARGET_CBAUDEX 0010000
-+#define  TARGET_B57600  0010001
-+#define  TARGET_B115200 0010002
-+#define  TARGET_B230400 0010003
-+#define  TARGET_B460800 0010004
-+#define TARGET_CIBAUD    002003600000  /* input baud rate (not used) */
-+#define TARGET_CMSPAR    010000000000  /* mark or space (stick) parity */
-+#define TARGET_CRTSCTS   020000000000  /* flow control */
++static abi_ulong hppa_lws(CPUHPPAState *env)
++{
++    uint32_t which = env->gr[20];
++    abi_ulong addr = env->gr[26];
++    abi_ulong old = env->gr[25];
++    abi_ulong new = env->gr[24];
++    abi_ulong size, ret;
 +
-+/* c_lflag bits */
-+#define TARGET_ISIG    0000001
-+#define TARGET_ICANON  0000002
-+#define TARGET_XCASE   0000004
-+#define TARGET_ECHO    0000010
-+#define TARGET_ECHOE   0000020
-+#define TARGET_ECHOK   0000040
-+#define TARGET_ECHONL  0000100
-+#define TARGET_NOFLSH  0000200
-+#define TARGET_TOSTOP  0000400
-+#define TARGET_ECHOCTL 0001000
-+#define TARGET_ECHOPRT 0002000
-+#define TARGET_ECHOKE  0004000
-+#define TARGET_FLUSHO  0010000
-+#define TARGET_PENDIN  0040000
-+#define TARGET_IEXTEN  0100000
++    switch (which) {
++    default:
++        return -TARGET_ENOSYS;
 +
-+/* c_cc character offsets */
-+#define TARGET_VINTR    0
-+#define TARGET_VQUIT    1
-+#define TARGET_VERASE   2
-+#define TARGET_VKILL    3
-+#define TARGET_VEOF     4
-+#define TARGET_VTIME    5
-+#define TARGET_VMIN     6
-+#define TARGET_VSWTC    7
-+#define TARGET_VSTART   8
-+#define TARGET_VSTOP    9
-+#define TARGET_VSUSP    10
-+#define TARGET_VEOL     11
-+#define TARGET_VREPRINT 12
-+#define TARGET_VDISCARD 13
-+#define TARGET_VWERASE  14
-+#define TARGET_VLNEXT   15
-+#define TARGET_VEOL2    16
++    case 0: /* elf32 atomic 32bit cmpxchg */
++        if ((addr & 3) || !access_ok(VERIFY_WRITE, addr, 4)) {
++            return -TARGET_EFAULT;
++        }
++        old = tswap32(old);
++        new = tswap32(new);
++        ret = atomic_cmpxchg((uint32_t *)g2h(addr), old, new);
++        ret = tswap32(ret);
++        break;
 +
-+/* ioctls */
++    case 2: /* elf32 atomic "new" cmpxchg */
++        size = env->gr[23];
++        if (size >= 4) {
++            return -TARGET_ENOSYS;
++        }
++        if (((addr | old | new) & ((1 << size) - 1))
++            || !access_ok(VERIFY_WRITE, addr, 1 << size)
++            || !access_ok(VERIFY_READ, old, 1 << size)
++            || !access_ok(VERIFY_READ, new, 1 << size)) {
++            return -TARGET_EFAULT;
++        }
++        /* Note that below we use host-endian loads so that the cmpxchg
++           can be host-endian as well.  */
++        switch (size) {
++        case 0:
++            old = *(uint8_t *)g2h(old);
++            new = *(uint8_t *)g2h(new);
++            ret = atomic_cmpxchg((uint8_t *)g2h(addr), old, new);
++            ret = ret != old;
++            break;
++        case 1:
++            old = *(uint16_t *)g2h(old);
++            new = *(uint16_t *)g2h(new);
++            ret = atomic_cmpxchg((uint16_t *)g2h(addr), old, new);
++            ret = ret != old;
++            break;
++        case 2:
++            old = *(uint32_t *)g2h(old);
++            new = *(uint32_t *)g2h(new);
++            ret = atomic_cmpxchg((uint32_t *)g2h(addr), old, new);
++            ret = ret != old;
++            break;
++        case 3:
++            {
++                uint64_t o64, n64, r64;
++                o64 = *(uint64_t *)g2h(old);
++                n64 = *(uint64_t *)g2h(new);
++#ifdef CONFIG_ATOMIC64
++                r64 = atomic_cmpxchg__nocheck((uint64_t *)g2h(addr), o64, n64);
++                ret = r64 != o64;
++#else
++                start_exclusive();
++                r64 = *(uint64_t *)g2h(addr);
++                ret = 1;
++                if (r64 == o64) {
++                    *(uint64_t *)g2h(addr) = n64;
++                    ret = 0;
++                }
++                end_exclusive();
++#endif
++            }
++            break;
++        }
++        break;
++    }
 +
-+#define TARGET_TCGETS           TARGET_IOR('T', 16, struct target_termios)
-+#define TARGET_TCSETS           TARGET_IOW('T', 17, struct target_termios)
-+#define TARGET_TCSETSW          TARGET_IOW('T', 18, struct target_termios)
-+#define TARGET_TCSETSF          TARGET_IOW('T', 19, struct target_termios)
-+#define TARGET_TCGETA           TARGET_IOR('T', 1, struct target_termios)
-+#define TARGET_TCSETA           TARGET_IOW('T', 2, struct target_termios)
-+#define TARGET_TCSETAW          TARGET_IOW('T', 3, struct target_termios)
-+#define TARGET_TCSETAF          TARGET_IOW('T', 4, struct target_termios)
-+#define TARGET_TCSBRK           TARGET_IO('T', 5)
-+#define TARGET_TCXONC           TARGET_IO('T', 6)
-+#define TARGET_TCFLSH           TARGET_IO('T', 7)
++    env->gr[28] = ret;
++    return 0;
++}
 +
-+#define TARGET_TIOCEXCL         0x540C
-+#define TARGET_TIOCNXCL         0x540D
-+#define TARGET_TIOCSCTTY        0x540E
-+#define TARGET_TIOCGPGRP        TARGET_IOR('T', 30, int)
-+#define TARGET_TIOCSPGRP        TARGET_IOW('T', 29, int)
-+#define TARGET_TIOCOUTQ         0x5411
-+#define TARGET_TIOCSTI          0x5412
-+#define TARGET_TIOCGWINSZ       0x5413
-+#define TARGET_TIOCSWINSZ       0x5414
-+#define TARGET_TIOCMGET         0x5415
-+#define TARGET_TIOCMBIS         0x5416
-+#define TARGET_TIOCMBIC         0x5417
-+#define TARGET_TIOCMSET         0x5418
-+#define TARGET_TIOCGSOFTCAR     0x5419
-+#define TARGET_TIOCSSOFTCAR     0x541A
-+#define TARGET_FIONREAD         0x541B
-+#define TARGET_TIOCINQ          TARGET_FIONREAD
-+#define TARGET_TIOCLINUX        0x541C
-+#define TARGET_TIOCCONS         0x541D
-+#define TARGET_TIOCGSERIAL      0x541E
-+#define TARGET_TIOCSSERIAL      0x541F
-+#define TARGET_TIOCPKT          0x5420
-+#define TARGET_FIONBIO          0x5421
-+#define TARGET_TIOCNOTTY        0x5422
-+#define TARGET_TIOCSETD         0x5423
-+#define TARGET_TIOCGETD         0x5424
-+#define TARGET_TCSBRKP          0x5425 /* Needed for POSIX tcsendbreak() */
-+#define TARGET_TIOCTTYGSTRUCT   0x5426 /* For debugging only */
-+#define TARGET_TIOCSBRK         0x5427 /* BSD compatibility */
-+#define TARGET_TIOCCBRK         0x5428 /* BSD compatibility */
-+#define TARGET_TIOCGSID         TARGET_IOR('T', 20, int)
-+#define TARGET_TIOCGPTN         TARGET_IOR('T', 0x30, unsigned int)
-+        /* Get Pty Number (of pty-mux device) */
-+#define TARGET_TIOCSPTLCK       TARGET_IOW('T', 0x31, int)
-+        /* Lock/unlock Pty */
++void cpu_loop(CPUHPPAState *env)
++{
++    CPUState *cs = CPU(hppa_env_get_cpu(env));
++    target_siginfo_t info;
++    abi_ulong ret;
++    int trapnr;
 +
-+#define TARGET_FIONCLEX         0x5450  /* these numbers need to be adjusted. */
-+#define TARGET_FIOCLEX          0x5451
-+#define TARGET_FIOASYNC         0x5452
-+#define TARGET_TIOCSERCONFIG    0x5453
-+#define TARGET_TIOCSERGWILD     0x5454
-+#define TARGET_TIOCSERSWILD     0x5455
-+#define TARGET_TIOCGLCKTRMIOS   0x5456
-+#define TARGET_TIOCSLCKTRMIOS   0x5457
-+#define TARGET_TIOCSERGSTRUCT   0x5458 /* For debugging only */
-+#define TARGET_TIOCSERGETLSR    0x5459 /* Get line status register */
-+#define TARGET_TIOCSERGETMULTI  0x545A /* Get multiport config  */
-+#define TARGET_TIOCSERSETMULTI  0x545B /* Set multiport config */
++    while (1) {
++        cpu_exec_start(cs);
++        trapnr = cpu_exec(cs);
++        cpu_exec_end(cs);
++        process_queued_cpu_work(cs);
 +
-+#define TARGET_TIOCMIWAIT      0x545C  /* wait for a change on serial */
-+#define TARGET_TIOCGICOUNT     0x545D
-+#define TARGET_FIOQSIZE        0x5460
-+#define TARGET_TIOCSTART       0x5461
-+#define TARGET_TIOCSTOP        0x5462
-+#define TARGET_TIOCSLTC        0x5462
++        switch (trapnr) {
++        case EXCP_SYSCALL:
++            ret = do_syscall(env, env->gr[20],
++                             env->gr[26], env->gr[25],
++                             env->gr[24], env->gr[23],
++                             env->gr[22], env->gr[21], 0, 0);
++            switch (ret) {
++            default:
++                env->gr[28] = ret;
++                /* We arrived here by faking the gateway page.  Return.  */
++                env->iaoq_f = env->gr[31];
++                env->iaoq_b = env->gr[31] + 4;
++                break;
++            case -TARGET_ERESTARTSYS:
++            case -TARGET_QEMU_ESIGRETURN:
++                break;
++            }
++            break;
++        case EXCP_SYSCALL_LWS:
++            env->gr[21] = hppa_lws(env);
++            /* We arrived here by faking the gateway page.  Return.  */
++            env->iaoq_f = env->gr[31];
++            env->iaoq_b = env->gr[31] + 4;
++            break;
++        case EXCP_SIGSEGV:
++            info.si_signo = TARGET_SIGSEGV;
++            info.si_errno = 0;
++            info.si_code = TARGET_SEGV_ACCERR;
++            info._sifields._sigfault._addr = env->ior;
++            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++            break;
++        case EXCP_SIGILL:
++            info.si_signo = TARGET_SIGILL;
++            info.si_errno = 0;
++            info.si_code = TARGET_ILL_ILLOPN;
++            info._sifields._sigfault._addr = env->iaoq_f;
++            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++            break;
++        case EXCP_SIGFPE:
++            info.si_signo = TARGET_SIGFPE;
++            info.si_errno = 0;
++            info.si_code = 0;
++            info._sifields._sigfault._addr = env->iaoq_f;
++            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++            break;
++        case EXCP_DEBUG:
++            trapnr = gdb_handlesig(cs, TARGET_SIGTRAP);
++            if (trapnr) {
++                info.si_signo = trapnr;
++                info.si_errno = 0;
++                info.si_code = TARGET_TRAP_BRKPT;
++                queue_signal(env, trapnr, QEMU_SI_FAULT, &info);
++            }
++            break;
++        case EXCP_INTERRUPT:
++            /* just indicate that signals should be handled asap */
++            break;
++        default:
++            g_assert_not_reached();
++        }
++        process_pending_signals(env);
++    }
++}
 +
-+/* Used for packet mode */
-+#define TARGET_TIOCPKT_DATA              0
-+#define TARGET_TIOCPKT_FLUSHREAD         1
-+#define TARGET_TIOCPKT_FLUSHWRITE        2
-+#define TARGET_TIOCPKT_STOP              4
-+#define TARGET_TIOCPKT_START             8
-+#define TARGET_TIOCPKT_NOSTOP           16
-+#define TARGET_TIOCPKT_DOSTOP           32
++#endif /* TARGET_HPPA */
 +
-+#define TARGET_TIOCSER_TEMT    0x01 /* Transmitter physically empty */
+ THREAD CPUState *thread_cpu;
+ 
+ bool qemu_cpu_is_self(CPUState *cpu)
+@@ -4532,6 +4695,15 @@ int main(int argc, char **argv, char **envp)
+         }
+         env->pc = regs->pc;
+     }
++#elif defined(TARGET_HPPA)
++    {
++        int i;
++        for (i = 1; i < 32; i++) {
++            env->gr[i] = regs->gr[i];
++        }
++        env->iaoq_f = regs->iaoq[0];
++        env->iaoq_b = regs->iaoq[1];
++    }
+ #else
+ #error unsupported target CPU
+ #endif
 -- 
 2.9.3
