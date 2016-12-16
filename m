@@ -1,21 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54673)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56806)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1cHvU6-0001Fr-Hu
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 11:35:56 -0500
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1cHvbj-0001Br-25
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 11:43:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1cHvU1-0003cI-JX
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 11:35:50 -0500
-Date: Fri, 16 Dec 2016 17:35:42 +0100
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Message-ID: <20161216163542.GQ9606@toto>
-References: <1481894862-14102-1-git-send-email-marcin.krzeminski@nokia.com>
-	<1481894862-14102-3-git-send-email-marcin.krzeminski@nokia.com>
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1cHvbe-000690-6k
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 11:43:43 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52737)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1cHvbd-00068g-SF
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 11:43:38 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
+	uBGGNlRO119444
+	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 11:43:36 -0500
+Received: from e06smtp08.uk.ibm.com (e06smtp08.uk.ibm.com [195.75.94.104])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 27che80cty-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 11:43:35 -0500
+Received: from localhost
+	by e06smtp08.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Fri, 16 Dec 2016 16:43:33 -0000
+References: <20161215154330.700-1-pasic@linux.vnet.ibm.com>
+	<20161216102528.GB4129@stefanha-x1.localdomain>
+	<86f7031a-981a-ef51-8a20-0a3c38e88835@linux.vnet.ibm.com>
+	<CAJSP0QVZQ=AXb+gZ3VftkYZ2y=SM_3uhV4VMAmK7GEmJYmpgHQ@mail.gmail.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Fri, 16 Dec 2016 17:43:29 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1481894862-14102-3-git-send-email-marcin.krzeminski@nokia.com>
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 2/2] block: m25p80: Introduce
- Die Erase command
+In-Reply-To: <CAJSP0QVZQ=AXb+gZ3VftkYZ2y=SM_3uhV4VMAmK7GEmJYmpgHQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Message-Id: <c34179a0-edbb-cc28-7c28-aa34936877bd@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH] virtio: fix vring->inuse recalc after migr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,140 +43,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: marcin.krzeminski@nokia.com
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, rfsw-patches@mlist.nokia.com, qemu-arm@nongnu.org, clg@kaod.org
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-stable <qemu-stable@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
 
-On Fri, Dec 16, 2016 at 02:27:42PM +0100, marcin.krzeminski@nokia.com wrote:
-> From: Marcin Krzeminski <marcin.krzeminski@nokia.com>
+
+
+On 12/16/2016 05:12 PM, Stefan Hajnoczi wrote:
+>> You are not the first one complaining, so the sentence is definitively
+>> bad. What disturbs me regarding your formulation is that we do not use
+>> uint16_t to represent neither the ring size nor inuse.
+>>
+>> How about "Since max ring size < UINT16_MAX it's safe to use modulo
+>> UINT16_MAX + 1 subtraction."?
+> That doesn't mention "representing the size of the ring" so it's
+> unclear what "safe" means.
 > 
-> Big flash chips (like mt25qu01g) are consisted from dies.
-> Because of that some manufactures remove support for Chip
-> Erase giving Die Erase command instead.To avoid unnecessary
-> code complication, support for chip erase for mt25qu01g
-> is not removed.
+> Stefan
 > 
-> Signed-off-by: Marcin Krzeminski <marcin.krzeminski@nokia.com>
-> ---
->  hw/block/m25p80.c | 33 +++++++++++++++++++++++++++++----
->  1 file changed, 29 insertions(+), 4 deletions(-)
-> 
-> diff --git a/hw/block/m25p80.c b/hw/block/m25p80.c
-> index 2bc7028..0bc1fbf 100644
-> --- a/hw/block/m25p80.c
-> +++ b/hw/block/m25p80.c
-> @@ -216,8 +216,8 @@ static const FlashPartInfo known_devices[] = {
->      { INFO("n25q128",     0x20ba18,      0,  64 << 10, 256, 0) },
->      { INFO("n25q256a",    0x20ba19,      0,  64 << 10, 512, ER_4K) },
->      { INFO("n25q512a",    0x20ba20,      0,  64 << 10, 1024, ER_4K) },
-> -    { INFO("mt25ql01g",   0x20ba21,      0,  64 << 10, 2048, ER_4K) },
-> -    { INFO("mt25qu01g",   0x20bb21,      0,  64 << 10, 2048, ER_4K) },
-> +    { INFO("mt25ql01g",   0x20ba21, 0x1040,  64 << 10, 2048, ER_4K) },
-> +    { INFO("mt25qu01g",   0x20bb21, 0x1040,  64 << 10, 2048, ER_4K) },
->  
->      /* Spansion -- single (large) sector size only, at least
->       * for the chips listed here (without boot sectors).
-> @@ -358,6 +358,8 @@ typedef enum {
->  
->      REVCR = 0x65,
->      WEVCR = 0x61,
-> +
-> +    DIE_ERASE = 0xC4,
->  } FlashCMD;
->  
->  typedef enum {
-> @@ -411,6 +413,7 @@ typedef struct Flash {
->      bool reset_enable;
->      bool quad_enable;
->      uint8_t ear;
-> +    uint32_t die_cnt;
->  
->      int64_t dirty_page;
->  
-> @@ -492,7 +495,7 @@ static inline void flash_sync_area(Flash *s, int64_t off, int64_t len)
->  
->  static void flash_erase(Flash *s, int offset, FlashCMD cmd)
->  {
-> -    uint32_t len;
-> +    uint32_t len = 0;
 
-Do you really need this?
+IMHO it is not about representation but about correct arithmetic.
+We introduce the cast, not because representing the ring size as
+int is necessarily an issue, but because we ended up with a wrong
+result. In my opinion how can 'inuse' be represented correctly and
+efficiently concerns the member of struct VirtQueue.
 
->      uint8_t capa_to_assert = 0;
->  
->      switch (cmd) {
-> @@ -513,6 +516,16 @@ static void flash_erase(Flash *s, int offset, FlashCMD cmd)
->      case BULK_ERASE:
->          len = s->size;
->          break;
-> +    case DIE_ERASE:
-> +        if (s->die_cnt) {
-> +            len = s->size / s->die_cnt;
-> +            offset = offset & (~(len-1));
-> +        } else {
-> +            qemu_log_mask(LOG_GUEST_ERROR, "M25P80: %d die erase not supported by"
-> +                          " device\n", len);
-> +            return;
-> +        }
-> +        break;
->      default:
->          abort();
->      }
-> @@ -634,6 +647,7 @@ static void complete_collecting_data(Flash *s)
->      case ERASE4_32K:
->      case ERASE_SECTOR:
->      case ERASE4_SECTOR:
-> +    case DIE_ERASE:
->          flash_erase(s, s->cur_addr, s->cmd_in_progress);
->          break;
->      case WRSR:
-> @@ -684,6 +698,7 @@ static void reset_memory(Flash *s)
->      s->write_enable = false;
->      s->reset_enable = false;
->      s->quad_enable = false;
-> +    s->die_cnt = 0;
->  
->      switch (get_man(s)) {
->      case MAN_NUMONYX:
-> @@ -716,7 +731,15 @@ static void reset_memory(Flash *s)
->              s->four_bytes_address_mode = true;
->          }
->          if (!(s->nonvolatile_cfg & NVCFG_LOWER_SEGMENT_MASK)) {
-> -            s->ear = s->size / MAX_3BYTES_SIZE - 1;
-> +            s->ear = ( s->size > MAX_3BYTES_SIZE ? s->size / MAX_3BYTES_SIZE - 1 : 0);
-> +        }
-> +        /* 1GiB devices */
-> +        if (s->pi->id[2] == 0x21) {
-> +            /* MT25Q00 has 2 dies N25Q00 has 4 */
-> +            if (s->pi->id[4] & BIT(6))
-> +                s->die_cnt = 2;
-> +            else
-> +                s->die_cnt = 4;
+Here the important point is how conversions between signed unsigned
+integer types work in C.
 
-Decoding of die_cnt should probably be done in realize().
+"""
+6.3.1.3 Signed and unsigned integers
+1 When a value with integer type is converted to another integer
+type other than _Bool, if  the value can be represented by the new
+type, it is unchanged.
+2 Otherwise, if the new type is unsigned, the value is converted by
+repeatedly adding or  subtracting one more than the maximum value that
+can be represented in the new type until the value is in the range
+of the new type.
+"""
 
->          }
->          break;
->      case MAN_MACRONIX:
-> @@ -880,6 +903,7 @@ static void decode_new_cmd(Flash *s, uint32_t value)
->      case PP:
->      case PP4:
->      case PP4_4:
-> +    case DIE_ERASE:
->          s->needed_bytes = get_addr_length(s);
->          s->pos = 0;
->          s->len = 0;
-> @@ -1217,6 +1241,7 @@ static const VMStateDescription vmstate_m25p80 = {
->          VMSTATE_UINT8(spansion_cr2nv, Flash),
->          VMSTATE_UINT8(spansion_cr3nv, Flash),
->          VMSTATE_UINT8(spansion_cr4nv, Flash),
-> +        VMSTATE_UINT32(die_cnt, Flash),
+That is we get mod UINT16_MAX + 1  subtraction which is what we
+need if we want to calculate the difference between the two counters
+under the assumption that the actual conceptual difference (that
+is if the counters where of type arbitrary natural) is less or equal that
+queue size which is less than UINT16_MAX.
 
-die_cnt is fixed per instance. Since it doesn't change, it doesn't need to be part of VMSTATE.
+But no strong opinion here. If I did not manage to convince you
+now, just tell, and I will be happy to just go with your formulation.
 
->          VMSTATE_END_OF_LIST()
->      }
->  };
-> -- 
-> 2.7.4
-> 
-> 
+Thanks,
+
+Halil
