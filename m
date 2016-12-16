@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36628)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37368)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cHxtV-0002l8-B1
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 14:10:14 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cHxxL-0001Fa-68
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 14:14:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cHxtU-0006RR-DJ
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 14:10:13 -0500
-Received: from mail-vk0-x22f.google.com ([2607:f8b0:400c:c05::22f]:34577)
+	(envelope-from <rth7680@gmail.com>) id 1cHxxJ-0000JY-Uf
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 14:14:11 -0500
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:34829)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cHxtU-0006RF-8h
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 14:10:12 -0500
-Received: by mail-vk0-x22f.google.com with SMTP id x186so93562836vkd.1
-	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 11:10:12 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <20161209114830.9158-1-alex.bennee@linaro.org>
-References: <20161209114830.9158-1-alex.bennee@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 16 Dec 2016 19:09:51 +0000
-Message-ID: <CAFEAcA-1HfBNOxXxK=_5DZ8Ow_bdk4QpCnWnL+UBw-WsayzGMA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RISU PATCH v3 00/10] Record/payback patches
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cHxxJ-0000IJ-OY
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 14:14:09 -0500
+Received: by mail-pg0-x242.google.com with SMTP id p66so10545445pga.2
+	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 11:14:08 -0800 (PST)
+Received: from bigtime.domain ([2602:47:d954:1500:5e51:4fff:fe40:9c64])
+	by smtp.gmail.com with ESMTPSA id
+	c22sm13735067pgn.12.2016.12.16.11.14.06 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Fri, 16 Dec 2016 11:14:06 -0800 (PST)
+Sender: Richard Henderson <rth7680@gmail.com>
+From: Richard Henderson <rth@twiddle.net>
+Date: Fri, 16 Dec 2016 11:13:39 -0800
+Message-Id: <20161216191405.9473-1-rth@twiddle.net>
+Subject: [Qemu-devel] [PATCH 00/26] New hppa-linux-user target
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,58 +29,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
 
-On 9 December 2016 at 11:48, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrot=
-e:
-> I did a bunch of tweaking to see if I could abstract the hackage for
-> record/replay a bit more. With a little bit of light re-factoring of
-> the send and recv functions I can move all the specific send/recv
-> logic into the main risu.c file and avoid having copy and pasted
-> functions for each architecture.
->
-> I've also introduced a header which makes tracking where you are in
-> the recorded stream a little easier when debugging.
->
-> It should be noted the functions:
->
->   int send_register_info(write_fn write_fn, void *uc);
->   int recv_and_compare_register_info(read_fn read_fn, respond_fn respond,=
- void *uc);
->
-> are pretty identical for each arch. I did consider folding even more
-> of the logic into the common code but I wasn't sure if that would
-> loose flexibility in the future for other architectures so I left it
-> as is.
->
-> I've make the same changes to ppc64 although I've been compiling and
-> testing under a qemu linux-user environment which might explain why
-> I'm seeing crashes when I try and run it. I would appreciate the PPC
-> guys trying it on real hardware and debugging if needed.
->
-> For reference I'm using a linux-user powered docker image (built with
-> the debian-bootstrap recipe in the qemu.git tree) for cross compiling:
->
->   docker run --rm -it -v /home/alex/lsrc/qemu/risu.git:/src --user=3Dalex=
-:alex -w /src debian:ppc64el make
->
-> There have been some minor clean-ups to the helper scripts mainly to
-> aid testing by allowing the override of the RISU binary (I have
-> risu-arm, risu-arm64 and risu-ppc64 in my development directory).
-> Notes in the --- comments on each patch.
+This is a linux-user only port, emulating a 32-bit only version of a
+pa-2.0 cpu.  This is good enough to do well with both the gcc and glibc
+testsuites.  Helge Deller has provided invaluable assistance testing 
+with a more complete debian chroot.
 
-This generally looks good -- I've applied the two trivial typo
-fixes, and commented on the other patches except for the new
-scripts. I don't think there's much more work to do to get these
-applied.
+What's missing:
+  * Space registers.  Since Linux sets them all equal (for a flat
+    address space) and uses them like address-space identifiers,
+    we can simply set them all to 0 and ignore them.
 
-Could we have a patch which updates README to document the
-new functionality?
+  * Architecture subsets.  There's no markup for running a pure pa1.0
+    or pa1.1 cpu.  I happily accept everything up to pa2.0 at the moment.
 
-I won't have a chance to look at the scripts until next year, I
-expect, but from a quick glance they seem to be reasonably
-separate from the actual record/replay implementation.
+  * Wide mode.  While I have pa2.0 instructions, I don't support running
+    in 64-bit mode.  Since neither the linux kernel nor glibc support a
+    64-bit userland, it would be a lot more work than just adding the insns.
 
-thanks
--- PMM
+  * Multimedia instructions.  These are tied to wide mode, so...
+
+When squashing the patches down from my development tree, I wanted to
+preserve Helge's contributions, so the linux-user part is more patches
+than I would normally have preserved.
+
+
+r~
+
+
+Helge Deller (3):
+  linux-user: Handle TIOCSTART and TIOCSTOP
+  linux-user: Add SIOCGPGRP, SIOCGSTAMP, SIOCGSTAMPNS
+  linux-user: Add some hppa ioctls
+
+Richard Henderson (23):
+  Revert "Remove remainders of HPPA backend"
+  linux-user: Support stack-grows-up in elfload.c
+  linux-user: Handle ERFKILL and EHWPOISON
+  linux-user: Handle more IPV6 sockopts
+  linux-user: Add HPPA socket.h definitions
+  linux-user: Add HPPA syscall numbers
+  linux-user: Add HPPA termbits.h
+  linux-user: Add HPPA target_syscall.h
+  linux-user: Add HPPA definitions to syscall_defs.h
+  linux-user: Add HPPA target_structs.h
+  linux-user: Add HPPA target_signal.h and target_cpu.h
+  linux-user: Add HPPA signal handling
+  linux-user: Add HPPA startup and main loop
+  target-hppa: Add softfloat specializations
+  target-hppa: Add framework and enable compilation
+  target-hppa: Add nullification framework
+  target-hppa: Implement basic arithmetic
+  target-hppa: Implement branches
+  target-hppa: Implement linux-user gateway page
+  target-hppa: Implement shifts and deposits
+  target-hppa: Implement loads and stores
+  target-hppa: Implement system and memory-management insns
+  target-hppa: Implement floating-point insns
+
+ configure                           |    7 +-
+ default-configs/hppa-linux-user.mak |    1 +
+ disas.c                             |    2 +
+ disas/Makefile.objs                 |    1 +
+ disas/hppa.c                        | 2832 +++++++++++++++++++++++++
+ fpu/softfloat-specialize.h          |   20 +-
+ linux-user/alpha/target_syscall.h   |    2 +
+ linux-user/elfload.c                |  259 ++-
+ linux-user/errno_defs.h             |    3 +
+ linux-user/hppa/sockbits.h          |   97 +
+ linux-user/hppa/syscall_nr.h        |  353 ++++
+ linux-user/hppa/target_cpu.h        |   35 +
+ linux-user/hppa/target_signal.h     |   29 +
+ linux-user/hppa/target_structs.h    |   54 +
+ linux-user/hppa/target_syscall.h    |  237 +++
+ linux-user/hppa/termbits.h          |  219 ++
+ linux-user/ioctls.h                 |    8 +
+ linux-user/main.c                   |  185 +-
+ linux-user/mips/target_syscall.h    |    5 +
+ linux-user/mips64/target_syscall.h  |    5 +
+ linux-user/qemu.h                   |    3 +
+ linux-user/signal.c                 |  191 +-
+ linux-user/socket.h                 |    2 +
+ linux-user/syscall.c                |   41 +-
+ linux-user/syscall_defs.h           |  154 +-
+ linux-user/syscall_types.h          |    6 +
+ target-hppa/Makefile.objs           |    1 +
+ target-hppa/cpu-qom.h               |   52 +
+ target-hppa/cpu.c                   |  165 ++
+ target-hppa/cpu.h                   |  144 ++
+ target-hppa/gdbstub.c               |  111 +
+ target-hppa/helper.c                |  137 ++
+ target-hppa/helper.h                |   66 +
+ target-hppa/op_helper.c             |  570 +++++
+ target-hppa/translate.c             | 3946 +++++++++++++++++++++++++++++++++++
+ 35 files changed, 9864 insertions(+), 79 deletions(-)
+ create mode 100644 default-configs/hppa-linux-user.mak
+ create mode 100644 disas/hppa.c
+ create mode 100644 linux-user/hppa/sockbits.h
+ create mode 100644 linux-user/hppa/syscall_nr.h
+ create mode 100644 linux-user/hppa/target_cpu.h
+ create mode 100644 linux-user/hppa/target_signal.h
+ create mode 100644 linux-user/hppa/target_structs.h
+ create mode 100644 linux-user/hppa/target_syscall.h
+ create mode 100644 linux-user/hppa/termbits.h
+ create mode 100644 target-hppa/Makefile.objs
+ create mode 100644 target-hppa/cpu-qom.h
+ create mode 100644 target-hppa/cpu.c
+ create mode 100644 target-hppa/cpu.h
+ create mode 100644 target-hppa/gdbstub.c
+ create mode 100644 target-hppa/helper.c
+ create mode 100644 target-hppa/helper.h
+ create mode 100644 target-hppa/op_helper.c
+ create mode 100644 target-hppa/translate.c
+
+-- 
+2.9.3
