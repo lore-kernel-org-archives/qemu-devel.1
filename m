@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37530)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37469)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cHxxW-0001la-7F
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 14:14:23 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cHxxU-0000RD-P1
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 14:14:22 -0500
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:33594)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cHxxU-0000Qp-Ha
+	(envelope-from <rth7680@gmail.com>) id 1cHxxS-0001WH-TL
 	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 14:14:20 -0500
-Received: by mail-pg0-x242.google.com with SMTP id 3so10556479pgd.0
-	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 11:14:20 -0800 (PST)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <rth7680@gmail.com>) id 1cHxxR-0000Of-JE
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 14:14:18 -0500
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:33796)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cHxxR-0000O1-BQ
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 14:14:17 -0500
+Received: by mail-pg0-x242.google.com with SMTP id b1so506416pgc.1
+	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 11:14:17 -0800 (PST)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Fri, 16 Dec 2016 11:13:54 -0800
-Message-Id: <20161216191405.9473-16-rth@twiddle.net>
+Date: Fri, 16 Dec 2016 11:13:50 -0800
+Message-Id: <20161216191405.9473-12-rth@twiddle.net>
 In-Reply-To: <20161216191405.9473-1-rth@twiddle.net>
 References: <20161216191405.9473-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH 15/26] linux-user: Add HPPA signal handling
+Subject: [Qemu-devel] [PATCH 11/26] linux-user: Add HPPA target_syscall.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,220 +29,257 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Riku Voipio <riku.voipio@iki.fi>
 
+Which is primarily a re-definition of errno numbers.
+
 Cc: Riku Voipio <riku.voipio@iki.fi>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- linux-user/signal.c | 191 +++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 190 insertions(+), 1 deletion(-)
+ linux-user/hppa/target_syscall.h | 237 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 237 insertions(+)
+ create mode 100644 linux-user/hppa/target_syscall.h
 
-diff --git a/linux-user/signal.c b/linux-user/signal.c
-index c750053..0a5bb4e 100644
---- a/linux-user/signal.c
-+++ b/linux-user/signal.c
-@@ -5888,6 +5888,195 @@ long do_rt_sigreturn(CPUTLGState *env)
-     return -TARGET_QEMU_ESIGRETURN;
- }
- 
-+#elif defined(TARGET_HPPA)
+diff --git a/linux-user/hppa/target_syscall.h b/linux-user/hppa/target_syscall.h
+new file mode 100644
+index 0000000..ac18a9c
+--- /dev/null
++++ b/linux-user/hppa/target_syscall.h
+@@ -0,0 +1,237 @@
++#ifndef HPPA_TARGET_SYSCALL_H
++#define HPPA_TARGET_SYSCALL_H
 +
-+struct target_sigcontext {
-+    abi_ulong sc_flags;
-+    abi_ulong sc_gr[32];
-+    uint64_t sc_fr[32];
-+    abi_ulong sc_iasq[2];
-+    abi_ulong sc_iaoq[2];
-+    abi_ulong sc_sar;
++struct target_pt_regs {
++    target_ulong gr[32];
++    uint64_t     fr[32];
++    target_ulong sr[8];
++    target_ulong iasq[2];
++    target_ulong iaoq[2];
++    target_ulong cr27;
++    target_ulong __pad0;
++    target_ulong orig_r28;
++    target_ulong ksp;
++    target_ulong kpc;
++    target_ulong sar;
++    target_ulong iir;
++    target_ulong isr;
++    target_ulong ior;
++    target_ulong ipsw;
 +};
 +
-+struct target_ucontext {
-+    abi_uint tuc_flags;
-+    abi_ulong tuc_link;
-+    target_stack_t tuc_stack;
-+    abi_uint pad[1];
-+    struct target_sigcontext tuc_mcontext;
-+    target_sigset_t tuc_sigmask;
-+};
++#define UNAME_MACHINE "hppa"
++#define UNAME_MINIMUM_RELEASE "2.6.32"
++#define TARGET_CLONE_BACKWARDS
++#define TARGET_MINSIGSTKSZ       2048
++#define TARGET_MLOCKALL_MCL_CURRENT 1
++#define TARGET_MLOCKALL_MCL_FUTURE  2
 +
-+struct target_rt_sigframe {
-+    abi_uint tramp[9];
-+    target_siginfo_t info;
-+    struct target_ucontext uc;
-+    /* hidden location of upper halves of pa2.0 64-bit gregs */
-+};
++#undef  TARGET_ENOMSG
++#define TARGET_ENOMSG          35
++#undef  TARGET_EIDRM
++#define TARGET_EIDRM           36
++#undef  TARGET_ECHRNG
++#define TARGET_ECHRNG          37
++#undef  TARGET_EL2NSYNC
++#define TARGET_EL2NSYNC        38
++#undef  TARGET_EL3HLT
++#define TARGET_EL3HLT          39
++#undef  TARGET_EL3RST
++#define TARGET_EL3RST          40
++#undef  TARGET_ELNRNG
++#define TARGET_ELNRNG          41
++#undef  TARGET_EUNATCH
++#define TARGET_EUNATCH         42
++#undef  TARGET_ENOCSI
++#define TARGET_ENOCSI          43
++#undef  TARGET_EL2HLT
++#define TARGET_EL2HLT          44
++#undef  TARGET_EDEADLK
++#define TARGET_EDEADLK         45
++#undef  TARGET_ENOLCK
++#define TARGET_ENOLCK          46
++#undef  TARGET_EILSEQ
++#define TARGET_EILSEQ          47
 +
-+static void setup_sigcontext(struct target_sigcontext *sc, CPUArchState *env)
-+{
-+    int flags = 0;
-+    int i;
++#undef  TARGET_ENONET
++#define TARGET_ENONET          50
++#undef  TARGET_ENODATA
++#define TARGET_ENODATA         51
++#undef  TARGET_ETIME
++#define TARGET_ETIME           52
++#undef  TARGET_ENOSR
++#define TARGET_ENOSR           53
++#undef  TARGET_ENOSTR
++#define TARGET_ENOSTR          54
++#undef  TARGET_ENOPKG
++#define TARGET_ENOPKG          55
 +
-+    /* ??? if on_sig_stack, flags |= 1 (PARISC_SC_FLAG_ONSTACK).  */
++#undef  TARGET_ENOLINK
++#define TARGET_ENOLINK         57
++#undef  TARGET_EADV
++#define TARGET_EADV            58
++#undef  TARGET_ESRMNT
++#define TARGET_ESRMNT          59
++#undef  TARGET_ECOMM
++#define TARGET_ECOMM           60
++#undef  TARGET_EPROTO
++#define TARGET_EPROTO          61
 +
-+    if (env->iaoq_f < TARGET_PAGE_SIZE) {
-+        /* In the gateway page, executing a syscall.  */
-+        flags |= 2; /* PARISC_SC_FLAG_IN_SYSCALL */
-+        __put_user(env->gr[31], &sc->sc_iaoq[0]);
-+        __put_user(env->gr[31] + 4, &sc->sc_iaoq[1]);
-+    } else {
-+        __put_user(env->iaoq_f, &sc->sc_iaoq[0]);
-+        __put_user(env->iaoq_b, &sc->sc_iaoq[1]);
-+    }
-+    __put_user(0, &sc->sc_iasq[0]);
-+    __put_user(0, &sc->sc_iasq[1]);
-+    __put_user(flags, &sc->sc_flags);
++#undef  TARGET_EMULTIHOP
++#define TARGET_EMULTIHOP       64
 +
-+    __put_user(cpu_hppa_get_psw(env), &sc->sc_gr[0]);
-+    for (i = 1; i < 32; ++i) {
-+        __put_user(env->gr[i], &sc->sc_gr[i]);
-+    }
++#undef  TARGET_EDOTDOT
++#define TARGET_EDOTDOT         66
++#undef  TARGET_EBADMSG
++#define TARGET_EBADMSG         67
++#undef  TARGET_EUSERS
++#define TARGET_EUSERS          68
++#undef  TARGET_EDQUOT
++#define TARGET_EDQUOT          69
++#undef  TARGET_ESTALE
++#define TARGET_ESTALE          70
++#undef  TARGET_EREMOTE
++#define TARGET_EREMOTE         71
++#undef  TARGET_EOVERFLOW
++#define TARGET_EOVERFLOW       72
 +
-+    __put_user((uint64_t)env->fr0_shadow << 32, &sc->sc_fr[0]);
-+    for (i = 1; i < 32; ++i) {
-+        __put_user(env->fr[i], &sc->sc_fr[i]);
-+    }
++#undef  TARGET_EBADE
++#define TARGET_EBADE           160
++#undef  TARGET_EBADR
++#define TARGET_EBADR           161
++#undef  TARGET_EXFULL
++#define TARGET_EXFULL          162
++#undef  TARGET_ENOANO
++#define TARGET_ENOANO          163
++#undef  TARGET_EBADRQC
++#define TARGET_EBADRQC         164
++#undef  TARGET_EBADSLT
++#define TARGET_EBADSLT         165
++#undef  TARGET_EBFONT
++#define TARGET_EBFONT          166
++#undef  TARGET_ENOTUNIQ
++#define TARGET_ENOTUNIQ        167
++#undef  TARGET_EBADFD
++#define TARGET_EBADFD          168
++#undef  TARGET_EREMCHG
++#define TARGET_EREMCHG         169
++#undef  TARGET_ELIBACC
++#define TARGET_ELIBACC         170
++#undef  TARGET_ELIBBAD
++#define TARGET_ELIBBAD         171
++#undef  TARGET_ELIBSCN
++#define TARGET_ELIBSCN         172
++#undef  TARGET_ELIBMAX
++#define TARGET_ELIBMAX         173
++#undef  TARGET_ELIBEXEC
++#define TARGET_ELIBEXEC        174
++#undef  TARGET_ERESTART
++#define TARGET_ERESTART        175
++#undef  TARGET_ESTRPIPE
++#define TARGET_ESTRPIPE        176
++#undef  TARGET_EUCLEAN
++#define TARGET_EUCLEAN         177
++#undef  TARGET_ENOTNAM
++#define TARGET_ENOTNAM         178
++#undef  TARGET_ENAVAIL
++#define TARGET_ENAVAIL         179
++#undef  TARGET_EISNAM
++#define TARGET_EISNAM          180
++#undef  TARGET_EREMOTEIO
++#define TARGET_EREMOTEIO       181
++#undef  TARGET_ENOMEDIUM
++#define TARGET_ENOMEDIUM       182
++#undef  TARGET_EMEDIUMTYPE
++#define TARGET_EMEDIUMTYPE     183
++#undef  TARGET_ENOKEY
++#define TARGET_ENOKEY          184
++#undef  TARGET_EKEYEXPIRED
++#define TARGET_EKEYEXPIRED     185
++#undef  TARGET_EKEYREVOKED
++#define TARGET_EKEYREVOKED     186
++#undef  TARGET_EKEYREJECTED
++#define TARGET_EKEYREJECTED    187
 +
-+    __put_user(env->sar, &sc->sc_sar);
-+}
++/* Never used in linux.  */
++/* #define TARGET_ENOSYM          215 */
++#undef  TARGET_ENOTSOCK
++#define TARGET_ENOTSOCK        216
++#undef  TARGET_EDESTADDRREQ
++#define TARGET_EDESTADDRREQ    217
++#undef  TARGET_EMSGSIZE
++#define TARGET_EMSGSIZE        218
++#undef  TARGET_EPROTOTYPE
++#define TARGET_EPROTOTYPE      219
++#undef  TARGET_ENOPROTOOPT
++#define TARGET_ENOPROTOOPT     220
++#undef  TARGET_EPROTONOSUPPORT
++#define TARGET_EPROTONOSUPPORT 221
++#undef  TARGET_ESOCKTNOSUPPORT
++#define TARGET_ESOCKTNOSUPPORT 222
++#undef  TARGET_EOPNOTSUPP
++#define TARGET_EOPNOTSUPP      223
++#undef  TARGET_EPFNOSUPPORT
++#define TARGET_EPFNOSUPPORT    224
++#undef  TARGET_EAFNOSUPPORT
++#define TARGET_EAFNOSUPPORT    225
++#undef  TARGET_EADDRINUSE
++#define TARGET_EADDRINUSE      226
++#undef  TARGET_EADDRNOTAVAIL
++#define TARGET_EADDRNOTAVAIL   227
++#undef  TARGET_ENETDOWN
++#define TARGET_ENETDOWN        228
++#undef  TARGET_ENETUNREACH
++#define TARGET_ENETUNREACH     229
++#undef  TARGET_ENETRESET
++#define TARGET_ENETRESET       230
++#undef  TARGET_ECONNABORTED
++#define TARGET_ECONNABORTED    231
++#undef  TARGET_ECONNRESET
++#define TARGET_ECONNRESET      232
++#undef  TARGET_ENOBUFS
++#define TARGET_ENOBUFS         233
++#undef  TARGET_EISCONN
++#define TARGET_EISCONN         234
++#undef  TARGET_ENOTCONN
++#define TARGET_ENOTCONN        235
++#undef  TARGET_ESHUTDOWN
++#define TARGET_ESHUTDOWN       236
++#undef  TARGET_ETOOMANYREFS
++#define TARGET_ETOOMANYREFS    237
++#undef  TARGET_ETIMEDOUT
++#define TARGET_ETIMEDOUT       238
++#undef  TARGET_ECONNREFUSED
++#define TARGET_ECONNREFUSED    239
++#define TARGET_EREMOTERELEASE  240
++#undef  TARGET_EHOSTDOWN
++#define TARGET_EHOSTDOWN       241
++#undef  TARGET_EHOSTUNREACH
++#define TARGET_EHOSTUNREACH    242
 +
-+static void restore_sigcontext(CPUArchState *env, struct target_sigcontext *sc)
-+{
-+    target_ulong psw;
-+    int i;
++#undef  TARGET_EALREADY
++#define TARGET_EALREADY        244
++#undef  TARGET_EINPROGRESS
++#define TARGET_EINPROGRESS     245
++#undef  TARGET_ENOTEMPTY
++#define TARGET_ENOTEMPTY       247
++#undef  TARGET_ENAMETOOLONG
++#define TARGET_ENAMETOOLONG    248
++#undef  TARGET_ELOOP
++#define TARGET_ELOOP           249
++#undef  TARGET_ENOSYS
++#define TARGET_ENOSYS          251
 +
-+    __get_user(psw, &sc->sc_gr[0]);
-+    cpu_hppa_put_psw(env, psw);
++#undef  TARGET_ECANCELED
++#define TARGET_ECANCELED       253
 +
-+    for (i = 1; i < 32; ++i) {
-+        __get_user(env->gr[i], &sc->sc_gr[i]);
-+    }
-+    for (i = 0; i < 32; ++i) {
-+        __get_user(env->fr[i], &sc->sc_fr[i]);
-+    }
-+    cpu_hppa_loaded_fr0(env);
++#undef  TARGET_EOWNERDEAD
++#define TARGET_EOWNERDEAD      254
++#undef  TARGET_ENOTRECOVERABLE
++#define TARGET_ENOTRECOVERABLE 255
 +
-+    __get_user(env->iaoq_f, &sc->sc_iaoq[0]);
-+    __get_user(env->iaoq_b, &sc->sc_iaoq[1]);
-+    __get_user(env->sar, &sc->sc_sar);
-+}
++#undef  TARGET_ERFKILL
++#define TARGET_ERFKILL         256
++#undef  TARGET_EHWPOISON
++#define TARGET_EHWPOISON       257
 +
-+/* No, this doesn't look right, but it's copied straight from the kernel.  */
-+#define PARISC_RT_SIGFRAME_SIZE32 \
-+    ((sizeof(struct target_rt_sigframe) + 48 + 64) & -64)
-+
-+static void setup_rt_frame(int sig, struct target_sigaction *ka,
-+                           target_siginfo_t *info,
-+                           target_sigset_t *set, CPUArchState *env)
-+{
-+    abi_ulong frame_addr, sp, haddr;
-+    struct target_rt_sigframe *frame;
-+    int i;
-+
-+    sp = env->gr[30];
-+    if (ka->sa_flags & TARGET_SA_ONSTACK) {
-+        if (sas_ss_flags(sp) == 0) {
-+            sp = (target_sigaltstack_used.ss_sp + 0x7f) & ~0x3f;
-+        }
-+    }
-+    frame_addr = QEMU_ALIGN_UP(sp, 64);
-+    sp = frame_addr + PARISC_RT_SIGFRAME_SIZE32;
-+
-+    trace_user_setup_rt_frame(env, frame_addr);
-+
-+    if (!lock_user_struct(VERIFY_WRITE, frame, frame_addr, 0)) {
-+        goto give_sigsegv;
-+    }
-+
-+    tswap_siginfo(&frame->info, info);
-+    frame->uc.tuc_flags = 0;
-+    frame->uc.tuc_link = 0;
-+
-+    __put_user(target_sigaltstack_used.ss_sp, &frame->uc.tuc_stack.ss_sp);
-+    __put_user(sas_ss_flags(get_sp_from_cpustate(env)),
-+               &frame->uc.tuc_stack.ss_flags);
-+    __put_user(target_sigaltstack_used.ss_size,
-+               &frame->uc.tuc_stack.ss_size);
-+
-+    for (i = 0; i < TARGET_NSIG_WORDS; i++) {
-+        __put_user(set->sig[i], &frame->uc.tuc_sigmask.sig[i]);
-+    }
-+
-+    setup_sigcontext(&frame->uc.tuc_mcontext, env);
-+
-+    __put_user(0x34190000, frame->tramp + 0); /* ldi 0,%r25 */
-+    __put_user(0x3414015a, frame->tramp + 1); /* ldi __NR_rt_sigreturn,%r20 */
-+    __put_user(0xe4008200, frame->tramp + 2); /* be,l 0x100(%sr2,%r0) */
-+    __put_user(0x08000240, frame->tramp + 3); /* nop */
-+
-+    unlock_user_struct(frame, frame_addr, 1);
-+
-+    env->gr[2] = h2g(frame->tramp);
-+    env->gr[30] = sp;
-+    env->gr[26] = sig;
-+    env->gr[25] = h2g(&frame->info);
-+    env->gr[24] = h2g(&frame->uc);
-+
-+    haddr = ka->_sa_handler;
-+    if (haddr & 2) {
-+        /* Function descriptor.  */
-+        target_ulong *fdesc, dest;
-+
-+        haddr &= -4;
-+        if (!lock_user_struct(VERIFY_READ, fdesc, haddr, 1)) {
-+            goto give_sigsegv;
-+        }
-+        __get_user(dest, fdesc);
-+        __get_user(env->gr[19], fdesc + 1);
-+        unlock_user_struct(fdesc, haddr, 1);
-+        haddr = dest;
-+    }
-+    env->iaoq_f = haddr;
-+    env->iaoq_b = haddr + 4;;
-+    return;
-+
-+ give_sigsegv:
-+    force_sigsegv(sig);
-+}
-+
-+long do_rt_sigreturn(CPUArchState *env)
-+{
-+    abi_ulong frame_addr = env->gr[30] - PARISC_RT_SIGFRAME_SIZE32;
-+    struct target_rt_sigframe *frame;
-+    sigset_t set;
-+
-+    trace_user_do_rt_sigreturn(env, frame_addr);
-+    if (!lock_user_struct(VERIFY_READ, frame, frame_addr, 1)) {
-+        goto badframe;
-+    }
-+    target_to_host_sigset(&set, &frame->uc.tuc_sigmask);
-+    set_sigmask(&set);
-+
-+    restore_sigcontext(env, &frame->uc.tuc_mcontext);
-+    unlock_user_struct(frame, frame_addr, 0);
-+
-+    if (do_sigaltstack(frame_addr + offsetof(struct target_rt_sigframe,
-+                                             uc.tuc_stack),
-+                       0, env->gr[30]) == -EFAULT) {
-+        goto badframe;
-+    }
-+
-+    unlock_user_struct(frame, frame_addr, 0);
-+    return -TARGET_QEMU_ESIGRETURN;
-+
-+ badframe:
-+    force_sig(TARGET_SIGSEGV);
-+    return -TARGET_QEMU_ESIGRETURN;
-+}
-+
- #else
- 
- static void setup_frame(int sig, struct target_sigaction *ka,
-@@ -5989,7 +6178,7 @@ static void handle_pending_signal(CPUArchState *cpu_env, int sig,
-         /* prepare the stack frame of the virtual CPU */
- #if defined(TARGET_ABI_MIPSN32) || defined(TARGET_ABI_MIPSN64) \
-         || defined(TARGET_OPENRISC) || defined(TARGET_TILEGX) \
--        || defined(TARGET_PPC64)
-+        || defined(TARGET_PPC64) || defined(TARGET_HPPA)
-         /* These targets do not have traditional signals.  */
-         setup_rt_frame(sig, sa, &k->info, &target_old_set, cpu_env);
- #else
++#endif /* HPPA_TARGET_SYSCALL_H */
 -- 
 2.9.3
