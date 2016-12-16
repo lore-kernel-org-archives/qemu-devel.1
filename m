@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42589)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45479)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cI06x-0001TN-Vy
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 16:32:17 -0500
+	(envelope-from <drjones@redhat.com>) id 1cI0HG-0001gX-Uq
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 16:42:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cI06u-0007BS-1V
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 16:32:15 -0500
-Resent-Message-Id: <E1cI06u-0007BS-1V@eggs.gnu.org>
-Received: from sender163-mail.zoho.com ([74.201.84.163]:21323)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1cI06t-0007AM-Pu
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 16:32:11 -0500
-In-Reply-To: <1481922841-4324-1-git-send-email-mst@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <148192392306.37.10111381964118487672@790289a7ca88>
+	(envelope-from <drjones@redhat.com>) id 1cI0HF-0005GA-QV
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 16:42:54 -0500
+Date: Fri, 16 Dec 2016 22:42:43 +0100
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20161216214243.gwoxt5yz7qyqbvhi@kamzik.brq.redhat.com>
+References: <1481625384-15077-1-git-send-email-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 16 Dec 2016 13:32:04 -0800 (PST)
-Subject: Re: [Qemu-devel] [PULL for-2.9 0/9] virtio, vhost, pc: fixes
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1481625384-15077-1-git-send-email-peter.maydell@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH 00/23] arm: Add virtualization to GICv3,
+ and enable EL2 on 64-bit CPUs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,59 +23,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mst@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, stefanha@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Christoffer Dall <christoffer.dall@linaro.org>
 
-SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
-YmplY3Q6IFtRZW11LWRldmVsXSBbUFVMTCBmb3ItMi45IDAvOV0gdmlydGlvLCB2aG9zdCwgcGM6
-IGZpeGVzCk1lc3NhZ2UtaWQ6IDE0ODE5MjI4NDEtNDMyNC0xLWdpdC1zZW5kLWVtYWlsLW1zdEBy
-ZWRoYXQuY29tCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJh
-c2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9
-MAoKIyBVc2VmdWwgZ2l0IG9wdGlvbnMKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGlt
-aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0
-IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBk
-bwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZv
-cm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9z
-Y3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEK
-ICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09
-IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3
-ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3Fl
-bXUKICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8xNDgxOTIyODQxLTQzMjQtMS1naXQtc2Vu
-ZC1lbWFpbC1tc3RAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzE0ODE5MjI4NDEtNDMyNC0xLWdpdC1z
-ZW5kLWVtYWlsLW1zdEByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcK
-Zjk5YWIzYiB2aXJ0aW86IGF2b2lkIHVzaW5nIGd1ZXN0X25vdGlmaWVyX21hc2sgaW4gdmhvc3Qt
-dXNlciBtb2RlCjNmYjcwMWMgcGNpOiBmaXggZXJyb3IgbWVzc2FnZSBmb3IgZXhwcmVzcyBzbG90
-cwo4ODM2MGU2IGkzODY6IGFtZF9pb21tdTogZml4IE1NSU8gcmVnaXN0ZXIgY291bnQgYW5kIGFj
-Y2Vzcwo2NWU1Nzc2IHRlc3RzL3Zob3N0LXVzZXItYnJpZGdlOiB1c2UgY29udHJpYi9saWJ2aG9z
-dC11c2VyCmI3MGM5NzYgY29udHJpYjogYWRkIGxpYnZob3N0LXVzZXIKYjY0MTM2NiB0ZXN0cy92
-aG9zdC11c2VyLWJyaWRnZTogZG8gbm90IGFjY2VwdCBtb3JlIHRoYW4gb25lIGNvbm5lY3Rpb24K
-YTE0MTZhNyB0ZXN0cy92aG9zdC11c2VyLWJyaWRnZTogaW5kaWNhdGUgcGVlciBkaXNjb25uZWN0
-ZWQKNWNlZDBiNyB0ZXN0cy92aG9zdC11c2VyLWJyaWRnZTogcmVtb3ZlIHVubmVjZXNzYXJ5IGRp
-c3BhdGNoZXJfcmVtb3ZlCmVlNWZiZjggdGVzdHMvdmhvc3QtdXNlci1icmlkZ2U6IHJlbW92ZSBm
-YWxzZSBjb21tZW50Cgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzk6IHRl
-c3RzL3Zob3N0LXVzZXItYnJpZGdlOiByZW1vdmUgZmFsc2UgY29tbWVudC4uLgpDaGVja2luZyBQ
-QVRDSCAyLzk6IHRlc3RzL3Zob3N0LXVzZXItYnJpZGdlOiByZW1vdmUgdW5uZWNlc3NhcnkgZGlz
-cGF0Y2hlcl9yZW1vdmUuLi4KQ2hlY2tpbmcgUEFUQ0ggMy85OiB0ZXN0cy92aG9zdC11c2VyLWJy
-aWRnZTogaW5kaWNhdGUgcGVlciBkaXNjb25uZWN0ZWQuLi4KQ2hlY2tpbmcgUEFUQ0ggNC85OiB0
-ZXN0cy92aG9zdC11c2VyLWJyaWRnZTogZG8gbm90IGFjY2VwdCBtb3JlIHRoYW4gb25lIGNvbm5l
-Y3Rpb24uLi4KQ2hlY2tpbmcgUEFUQ0ggNS85OiBjb250cmliOiBhZGQgbGlidmhvc3QtdXNlci4u
-LgpFUlJPUjogSW52YWxpZCBVVEYtOCwgcGF0Y2ggYW5kIGNvbW1pdCBtZXNzYWdlIHNob3VsZCBi
-ZSBlbmNvZGVkIGluIFVURi04CiM3NTogRklMRTogY29udHJpYi9saWJ2aG9zdC11c2VyL2xpYnZo
-b3N0LXVzZXIuYzo5OgorICogIE1hcmMtQW5kciBMdXJlYXUgPG1sdXJlYXVAcmVkaGF0LmNvbT4K
-ICAgICAgICAgICAgICBeCgpFUlJPUjogSW52YWxpZCBVVEYtOCwgcGF0Y2ggYW5kIGNvbW1pdCBt
-ZXNzYWdlIHNob3VsZCBiZSBlbmNvZGVkIGluIFVURi04CiMxNTc5OiBGSUxFOiBjb250cmliL2xp
-YnZob3N0LXVzZXIvbGlidmhvc3QtdXNlci5oOjg6CisgKiAgTWFyYy1BbmRyIEx1cmVhdSA8bWx1
-cmVhdUByZWRoYXQuY29tPgogICAgICAgICAgICAgIF4KCnRvdGFsOiAyIGVycm9ycywgMCB3YXJu
-aW5ncywgMTk1MCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywg
-cGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZl
-cyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRB
-SU5FUlMuCgpDaGVja2luZyBQQVRDSCA2Lzk6IHRlc3RzL3Zob3N0LXVzZXItYnJpZGdlOiB1c2Ug
-Y29udHJpYi9saWJ2aG9zdC11c2VyLi4uCkNoZWNraW5nIFBBVENIIDcvOTogaTM4NjogYW1kX2lv
-bW11OiBmaXggTU1JTyByZWdpc3RlciBjb3VudCBhbmQgYWNjZXNzLi4uCkNoZWNraW5nIFBBVENI
-IDgvOTogcGNpOiBmaXggZXJyb3IgbWVzc2FnZSBmb3IgZXhwcmVzcyBzbG90cy4uLgpDaGVja2lu
-ZyBQQVRDSCA5Lzk6IHZpcnRpbzogYXZvaWQgdXNpbmcgZ3Vlc3Rfbm90aWZpZXJfbWFzayBpbiB2
-aG9zdC11c2VyIG1vZGUuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVk
-IHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRj
-aGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBw
-YXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+On Tue, Dec 13, 2016 at 10:36:01AM +0000, Peter Maydell wrote:
+> This patchset adds support for the Virtualization extensions to QEMU's
+> GICv3 emulation. This was the last missing piece that was stopping
+> us from turning on the EL2 support in the CPU model, so the patchset
+> also adds support for enabling it all on the virt board via the
+> '-machine virtualization=on' option.
+> 
+> The result works well enough to allow booting a KVM outer guest kernel
+> and then running QEMU + an inner guest under KVM inside it. The outer
+> guest KVM also passes the kvm-unit-tests GIC tests.
+
+After seeing that multiple cpus didn't work with Linux, I modified
+my EL2 supporting kvm-unit-tests branch to also output what level
+each cpu starts in. I see the same issue - only cpu0 starts in El2.
+Here's the new kvm-unit-tests branch
+
+ https://github.com/rhdrjones/kvm-unit-tests/commits/arm64/hyp-test
+
+ $ ./configure --arch=arm64 --cross-prefix=aarch64-linux-gnu-
+ $ make
+
+ $ arm/run arm/hyp-mode.flat -smp 4 -machine virtualization=on
+ INFO: cpu1 did not start in HYP
+ INFO: cpu2 did not start in HYP
+ INFO: cpu3 did not start in HYP
+ INFO: cpu0 started in HYP
+ FAIL: HYP start
+
+Thanks,
+drew
