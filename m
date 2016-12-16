@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48329)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55972)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cHwmE-0003dp-4n
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 12:58:39 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cHxEs-0000yg-JZ
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 13:28:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cHwmA-0007SI-WE
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 12:58:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37720)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1cHwmA-0007RS-Qs
-	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 12:58:34 -0500
-References: <CAOgv841deahTvPZ3rNvuGUh7xjtvJBRLSWwmCmMU2Ei3MmTrKA@mail.gmail.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <b42d4aff-4ea4-a254-1534-191d50c4fb15@redhat.com>
-Date: Fri, 16 Dec 2016 12:58:31 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cHxEr-0003NP-FN
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 13:28:14 -0500
+Received: from mail-vk0-x233.google.com ([2607:f8b0:400c:c05::233]:32866)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cHxEr-0003Mk-Bd
+	for qemu-devel@nongnu.org; Fri, 16 Dec 2016 13:28:13 -0500
+Received: by mail-vk0-x233.google.com with SMTP id 137so93196531vkl.0
+	for <qemu-devel@nongnu.org>; Fri, 16 Dec 2016 10:28:13 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAOgv841deahTvPZ3rNvuGUh7xjtvJBRLSWwmCmMU2Ei3MmTrKA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20161209114830.9158-2-alex.bennee@linaro.org>
+References: <20161209114830.9158-1-alex.bennee@linaro.org>
+	<20161209114830.9158-2-alex.bennee@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 16 Dec 2016 18:27:51 +0000
+Message-ID: <CAFEAcA_ZzZzYahd7Lnswh3Ld9tRR562iS_VDeYYmSxaWXZ__6g@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Nesting QEMU Question
+Subject: Re: [Qemu-devel] [RISU PATCH v3 01/10] risu: a bit more verbosity
+ when running
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,84 +31,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Joey Connelly <joeyconnelly@u.boisestate.edu>, qemu-devel@nongnu.org
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
 
+On 9 December 2016 at 11:48, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrot=
+e:
+> Before this is could seem a little quite when running as you had no
+> indication stuff was happening (or how fast). I only dump on the master
+> side as I want to minimise the amount of qemu logs to sift through.
 
+Yeah, more progress info would be good. (I used to have a patchset
+that made risu print '.' every so often but I dunno where
+that disappeared to.)
 
-On 12/14/2016 10:03 PM, Joey Connelly wrote:
-> Hey QEMU dev group,
->=20
-> I have a few questions related to nesting QEMU processes, but first her=
-e is
-> my system setup:
->=20
->=20
->=20
->    - *HOST MACHINE:* GNU/Linux release 4.5.5 (KVM version follows), Dis=
-tro
->    Fedora 24, x86_64 arch, supports Intel VT-x, QEMU 2.6.2, libvirt 1.3=
-.3
->=20
->=20
->    - *GUEST ISO:* GNU/Linux release 2.6.13 (KVM version follows), Distr=
-o
->    SliTaz 4.0, i686 32-bit arch, does not appear to support Intel VT-x,=
- QEMU
->    0.12.5, does not have libvirt
->=20
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>
+> --
+> v3
+>   - use portable fmt string for image_start_address
+>   - include arm dumping position
+> ---
+>  risu.c         | 15 +++++++++++++--
+>  risu.h         |  3 +++
+>  risu_aarch64.c |  3 +++
+>  risu_arm.c     |  3 +++
+>  4 files changed, 22 insertions(+), 2 deletions(-)
+>
+> diff --git a/risu.c b/risu.c
+> index 7e42160..bcdc219 100644
+> --- a/risu.c
+> +++ b/risu.c
+> @@ -37,6 +37,16 @@ sigjmp_buf jmpbuf;
+>  /* Should we test for FP exception status bits? */
+>  int test_fp_exc =3D 0;
+>
+> +long executed_tests =3D 0;
+> +void report_test_status(void *pc)
+> +{
+> +   executed_tests +=3D 1;
+> +   if (executed_tests % 100 =3D=3D 0) {
+> +      fprintf(stderr,"Executed %ld test instructions (pc=3D%p)\r",
+> +              executed_tests, pc);
+> +   }
 
-I'm not sure what you might mean by a guest OS having KVM and QEMU
-packages but not "supporting" VT-x. KVM on Intel platforms _is_ the
-support for VT-x.
+I think this is too much info to be printing every 100
+instructions, though. We should either just print '.'s or
+print info less often.
 
-You might be discovering that when you launch this guest environment
-that it does not think your virtual CPU has VT-x, but that's a different
-matter. Try searching around for how to enable Nested Virt for KVM.
+Also, you're inside a signal handler, so trying to use
+libc stdio is probably a bad idea. With '.' you can at
+least stick to write() which is OK inside signal handlers.
 
-"by default" this is off, AFAIK:
+> +}
+> +
+>  void master_sigill(int sig, siginfo_t *si, void *uc)
+>  {
+>     switch (recv_and_compare_register_info(master_socket, uc))
+> @@ -61,6 +71,7 @@ void apprentice_sigill(int sig, siginfo_t *si, void *uc=
+)
+>           return;
+>        case 1:
+>           /* end of test */
+> +         fprintf(stderr, "\nend of test\n");
+>           exit(0);
 
-https://fedoraproject.org/wiki/How_to_enable_nested_virtualization_in_KVM
+This is also inside a signal handler. (If that's too annoying
+you can do what master_sigill() does for this, and siglongjmp()
+out to somewhere more convenient.)
 
-(Also, QEMU 0.12.5 is practically Precambrian in its age -- I have
-massive reservations about your ability to use it to accomplish nested
-virt...)
+>        default:
+>           /* mismatch */
 
->=20
-> My question is primarily in response to this comment from your qemu-dev=
-el
-> threads:
->=20
-> "qemu-system-x86_64 does not support KVM on a 32-bit host", Daniel Berr=
-ange.
->=20
-> https://lists.nongnu.org/archive/html/qemu-devel/2012-09/msg02186.html
->=20
->=20
->=20
->=20
->=20
-> *[QUESTION#1.]*
->=20
-> Since my guest OS is 32-bit, do I have to use qemu-system-i386 =E2=80=93=
-enable-kvm
-> on my host so that the guest can create a QEMU process of its own
-> supporting KVM? Or are there additional qemu-system-i386 arguments I ne=
-ed
-> from my host: =E2=80=93cpu <???> -machine <???>
->=20
->=20
->=20
->=20
->=20
-> *[QUESTION#2.]*
->=20
-> Since my guest OS does not support Intel VT-x, can I force this with
-> qemu-system-i386 arguments? I=E2=80=99m not sure how exactly to do this=
-.
->=20
->=20
->=20
-> Thanks,
->=20
-> -Joey
->=20
+The default case is about to do 'exit(1);' -- should we print
+something there too?
+
+> @@ -129,7 +140,7 @@ int master(int sock)
+>     }
+>     master_socket =3D sock;
+>     set_sigill_handler(&master_sigill);
+> -   fprintf(stderr, "starting image\n");
+> +   fprintf(stderr, "starting master image at 0x%"PRIxPTR"\n", image_star=
+t_address);
+>     image_start();
+>     fprintf(stderr, "image returned unexpectedly\n");
+>     exit(1);
+> @@ -139,7 +150,7 @@ int apprentice(int sock)
+>  {
+>     apprentice_socket =3D sock;
+>     set_sigill_handler(&apprentice_sigill);
+> -   fprintf(stderr, "starting image\n");
+> +   fprintf(stderr, "starting apprentice image at 0x%"PRIxPTR"\n", image_=
+start_address);
+>     image_start();
+>     fprintf(stderr, "image returned unexpectedly\n");
+>     exit(1);
+> diff --git a/risu.h b/risu.h
+> index 26ed834..e4bb323 100644
+> --- a/risu.h
+> +++ b/risu.h
+> @@ -26,6 +26,7 @@ extern uintptr_t image_start_address;
+>  extern void *memblock;
+>
+>  extern int test_fp_exc;
+> +extern int ismaster;
+>
+>  /* Ops code under test can request from risu: */
+>  #define OP_COMPARE 0
+> @@ -59,6 +60,8 @@ int recv_and_compare_register_info(int sock, void *uc);
+>   */
+>  int report_match_status(void);
+>
+> +void report_test_status(void *pc);
+> +
+>  /* Move the PC past this faulting insn by adjusting ucontext
+>   */
+>  void advance_pc(void *uc);
+> diff --git a/risu_aarch64.c b/risu_aarch64.c
+> index 547f987..1595604 100644
+> --- a/risu_aarch64.c
+> +++ b/risu_aarch64.c
+> @@ -28,6 +28,9 @@ void advance_pc(void *vuc)
+>  {
+>      ucontext_t *uc =3D vuc;
+>      uc->uc_mcontext.pc +=3D 4;
+> +    if (ismaster) {
+> +      report_test_status((void *) uc->uc_mcontext.pc);
+> +    }
+>  }
+
+I think it would be nicer to do the progress info
+directly from master_sigill()/apprentice_sigill(). That
+means that you don't have to change the advance_pc() function for
+every architecture, and you don't need a global for ismaster either,
+because you know by virtue of which function you were in.
+(If you're dead set on printing the guest PC we should add a
+uint64_t get_guest_pc(void *vuc) function for the progress info
+function to use, but I'd rather not bother.)
+
+>  static void set_x0(void *vuc, uint64_t x0)
+> diff --git a/risu_arm.c b/risu_arm.c
+> index bdfb59b..c3fe3d3 100644
+> --- a/risu_arm.c
+> +++ b/risu_arm.c
+> @@ -50,6 +50,9 @@ void advance_pc(void *vuc)
+>  {
+>     ucontext_t *uc =3D vuc;
+>     uc->uc_mcontext.arm_pc +=3D insnsize(uc);
+> +   if (ismaster) {
+> +      report_test_status((void *) uc->uc_mcontext.arm_pc);
+> +   }
+>  }
+>
+>  static void set_r0(void *vuc, uint32_t r0)
+> --
+> 2.11.0
+
+thanks
+-- PMM
