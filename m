@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53595)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53575)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1cICV5-0000Dx-58
-	for qemu-devel@nongnu.org; Sat, 17 Dec 2016 05:46:01 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1cICV2-0008T4-ES
+	(envelope-from <wei.w.wang@intel.com>) id 1cICV1-00008D-Sz
 	for qemu-devel@nongnu.org; Sat, 17 Dec 2016 05:45:59 -0500
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <wei.w.wang@intel.com>) id 1cICV0-0008R0-RY
+	for qemu-devel@nongnu.org; Sat, 17 Dec 2016 05:45:55 -0500
 Received: from mga05.intel.com ([192.55.52.43]:21540)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1cICV2-0007ss-67
-	for qemu-devel@nongnu.org; Sat, 17 Dec 2016 05:45:56 -0500
+	id 1cICV0-0007ss-Ew
+	for qemu-devel@nongnu.org; Sat, 17 Dec 2016 05:45:54 -0500
 From: Wei Wang <wei.w.wang@intel.com>
-Date: Sat, 17 Dec 2016 18:43:43 +0800
-Message-Id: <1481971427-11094-34-git-send-email-wei.w.wang@intel.com>
+Date: Sat, 17 Dec 2016 18:43:42 +0800
+Message-Id: <1481971427-11094-33-git-send-email-wei.w.wang@intel.com>
 In-Reply-To: <1481971427-11094-1-git-send-email-wei.w.wang@intel.com>
 References: <1481971427-11094-1-git-send-email-wei.w.wang@intel.com>
-Subject: [Qemu-devel] [PATCH v1 33/37] vhost-pci-net: send the negotiated
- feature bits to the master
+Subject: [Qemu-devel] [PATCH v1 32/37] vhost-user: add asynchronous read for
+ the vhost-user master
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,89 +28,151 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: marcandre.lureau@gmail.com, mst@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org
 Cc: Wei Wang <wei.w.wang@intel.com>
 
-The slave actively sends the negotiated feature bits to the master.
-"need_send" is used to detect if the 64-bit feature bits are ready to
-be sent.
+Enable the vhost-user master to asynchronously receive messages
+from the slave.
 
 Signed-off-by: Wei Wang <wei.w.wang@intel.com>
 ---
- hw/net/vhost-pci-net.c              | 12 ++++++++++++
- hw/virtio/vhost-pci-slave.c         | 21 +++++++++++++++++++++
- include/hw/virtio/vhost-pci-slave.h |  2 ++
- 3 files changed, 35 insertions(+)
+ hw/virtio/vhost-user.c         | 42 +++++++++++++++++++++++++++++++++++++++++-
+ include/hw/virtio/vhost-user.h |  4 ++++
+ include/net/vhost-user.h       |  4 ++++
+ net/vhost-user.c               | 20 ++++++++++++++++++--
+ 4 files changed, 67 insertions(+), 3 deletions(-)
 
-diff --git a/hw/net/vhost-pci-net.c b/hw/net/vhost-pci-net.c
-index 0198686..567fb86 100644
---- a/hw/net/vhost-pci-net.c
-+++ b/hw/net/vhost-pci-net.c
-@@ -15,6 +15,7 @@
- 
- #include "qemu/osdep.h"
- #include "qemu/iov.h"
-+#include "qemu/error-report.h"
- #include "hw/virtio/virtio-access.h"
- #include "hw/virtio/vhost-pci-net.h"
- 
-@@ -136,6 +137,17 @@ static uint64_t vpnet_get_features(VirtIODevice *vdev, uint64_t features, Error
- 
- static void vpnet_set_features(VirtIODevice *vdev, uint64_t features)
- {
-+    static bool need_send;
-+    int ret;
-+
-+    if (need_send) {
-+        need_send = 0;
-+        ret = vp_slave_send_feature_bits(features);
-+        if (ret < 0)
-+            error_report("failed to send feature bits to the master");
-+    } else {
-+        need_send = 1;
-+    }
+diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+index ce92140..800b8ed 100644
+--- a/hw/virtio/vhost-user.c
++++ b/hw/virtio/vhost-user.c
+@@ -14,7 +14,7 @@
+ #include "hw/virtio/vhost-backend.h"
+ #include "hw/virtio/vhost-user.h"
+ #include "hw/virtio/virtio-net.h"
+-#include "sysemu/char.h"
++#include "net/vhost-user.h"
+ #include "sysemu/kvm.h"
+ #include "qemu/error-report.h"
+ #include "qemu/sockets.h"
+@@ -75,6 +75,46 @@ fail:
+     return -1;
  }
  
- static void vpnet_get_config(VirtIODevice *vdev, uint8_t *config)
-diff --git a/hw/virtio/vhost-pci-slave.c b/hw/virtio/vhost-pci-slave.c
-index 427d618..d3c3443 100644
---- a/hw/virtio/vhost-pci-slave.c
-+++ b/hw/virtio/vhost-pci-slave.c
-@@ -85,6 +85,27 @@ static void vp_slave_set_features(VhostUserMsg *msg)
-                              & ~(1 << VHOST_USER_F_PROTOCOL_FEATURES);
- }
- 
-+static int vp_slave_send_u64(int request, uint64_t u64)
++int vhost_user_can_read(void *opaque)
 +{
-+    VhostUserMsg msg = {
-+        .request = request,
-+        .flags = VHOST_USER_VERSION,
-+        .payload.u64 = u64,
-+        .size = sizeof(msg.payload.u64),
-+    };
++    return VHOST_USER_HDR_SIZE;
++}
 +
-+    if (vp_slave_write(&vp_slave->chr_be, &msg) < 0) {
-+        return -1;
++void vhost_user_asyn_read(void *opaque, const uint8_t *buf, int size)
++{
++    const char *name = opaque;
++    VhostUserMsg msg;
++    uint8_t *p = (uint8_t *) &msg;
++    CharBackend *chr_be = net_name_to_chr_be(name);
++
++    if (size != VHOST_USER_HDR_SIZE) {
++        error_report("Wrong message size received %d\n", size);
++        return;
 +    }
 +
-+    return 0;
++    memcpy(p, buf, VHOST_USER_HDR_SIZE);
++
++    if (msg.size) {
++        p += VHOST_USER_HDR_SIZE;
++        size = qemu_chr_fe_read_all(chr_be, p, msg.size);
++        if (size != msg.size) {
++            error_report("Wrong message size received %d != %d\n",
++                           size, msg.size);
++            return;
++        }
++    }
++
++    if (msg.request > VHOST_USER_MAX)
++        error_report("vhost-user master read incorrect msg \n");
++
++    switch(msg.request) {
++    default:
++        error_report("vhost-user master does not support msg request = %d\n",
++                     msg.request);
++        break;
++    }
 +}
 +
-+int vp_slave_send_feature_bits(uint64_t features)
-+{
-+    return vp_slave_send_u64(VHOST_USER_SET_FEATURES, features);
-+}
-+
- static DeviceState *virtio_to_pci_dev(VirtIODevice *vdev, uint16_t virtio_id)
+ static int process_message_reply(struct vhost_dev *dev,
+                                  VhostUserRequest request)
  {
-     DeviceState *qdev;
-diff --git a/include/hw/virtio/vhost-pci-slave.h b/include/hw/virtio/vhost-pci-slave.h
-index 79e1ffd..e60580a 100644
---- a/include/hw/virtio/vhost-pci-slave.h
-+++ b/include/hw/virtio/vhost-pci-slave.h
-@@ -40,4 +40,6 @@ extern int vhost_pci_slave_init(QemuOpts *opts);
+diff --git a/include/hw/virtio/vhost-user.h b/include/hw/virtio/vhost-user.h
+index 12e4dc9..142ea52 100644
+--- a/include/hw/virtio/vhost-user.h
++++ b/include/hw/virtio/vhost-user.h
+@@ -102,4 +102,8 @@ static VhostUserMsg m __attribute__ ((unused));
+ /* The version of the protocol we support */
+ #define VHOST_USER_VERSION    (0x1)
  
- extern int vhost_pci_slave_cleanup(void);
- 
-+extern int vp_slave_send_feature_bits(uint64_t features);
++int vhost_user_can_read(void *opaque);
++
++void vhost_user_asyn_read(void *opaque, const uint8_t *buf, int size);
 +
  #endif
+diff --git a/include/net/vhost-user.h b/include/net/vhost-user.h
+index d9e328d..1bb5f1a 100644
+--- a/include/net/vhost-user.h
++++ b/include/net/vhost-user.h
+@@ -11,8 +11,12 @@
+ #ifndef NET_VHOST_USER_H
+ #define NET_VHOST_USER_H
+ 
++#include "sysemu/char.h"
++
+ struct vhost_net;
+ struct vhost_net *vhost_user_get_vhost_net(NetClientState *nc);
+ uint64_t vhost_user_get_acked_features(NetClientState *nc);
+ 
++CharBackend *net_name_to_chr_be(const char *name);
++
+ #endif /* VHOST_USER_H */
+diff --git a/net/vhost-user.c b/net/vhost-user.c
+index 7aff77e..58eee6a 100644
+--- a/net/vhost-user.c
++++ b/net/vhost-user.c
+@@ -12,7 +12,7 @@
+ #include "clients.h"
+ #include "net/vhost_net.h"
+ #include "net/vhost-user.h"
+-#include "sysemu/char.h"
++#include "hw/virtio/vhost-user.h"
+ #include "qemu/config-file.h"
+ #include "qemu/error-report.h"
+ #include "qmp-commands.h"
+@@ -190,6 +190,22 @@ static gboolean net_vhost_user_watch(GIOChannel *chan, GIOCondition cond,
+     return FALSE;
+ }
+ 
++CharBackend *net_name_to_chr_be(const char *name)
++{
++    NetClientState *ncs[MAX_QUEUE_NUM];
++    VhostUserState *s;
++    int queues;
++
++    queues = qemu_find_net_clients_except(name, ncs,
++                                          NET_CLIENT_DRIVER_NIC,
++                                          MAX_QUEUE_NUM);
++    assert(queues < MAX_QUEUE_NUM);
++
++    s = DO_UPCAST(VhostUserState, nc, ncs[0]);
++
++    return &s->chr;
++}
++
+ static void net_vhost_user_event(void *opaque, int event)
+ {
+     const char *name = opaque;
+@@ -265,7 +281,7 @@ static int net_vhost_user_init(NetClientState *peer, const char *device,
+             error_report_err(err);
+             return -1;
+         }
+-        qemu_chr_fe_set_handlers(&s->chr, NULL, NULL,
++        qemu_chr_fe_set_handlers(&s->chr, vhost_user_can_read, vhost_user_asyn_read,
+                                  net_vhost_user_event, nc0->name, NULL, true);
+     } while (!s->started);
+ 
 -- 
 2.7.4
