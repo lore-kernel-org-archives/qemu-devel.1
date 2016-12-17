@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53536)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53558)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1cICUy-0008VW-7P
-	for qemu-devel@nongnu.org; Sat, 17 Dec 2016 05:45:54 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1cICV0-00005J-23
+	for qemu-devel@nongnu.org; Sat, 17 Dec 2016 05:45:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1cICUv-0008Nj-Il
-	for qemu-devel@nongnu.org; Sat, 17 Dec 2016 05:45:52 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1cICUy-0008Py-Ut
+	for qemu-devel@nongnu.org; Sat, 17 Dec 2016 05:45:54 -0500
 Received: from mga05.intel.com ([192.55.52.43]:21540)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1cICUv-0007ss-7J
-	for qemu-devel@nongnu.org; Sat, 17 Dec 2016 05:45:49 -0500
+	id 1cICUy-0007ss-NG
+	for qemu-devel@nongnu.org; Sat, 17 Dec 2016 05:45:52 -0500
 From: Wei Wang <wei.w.wang@intel.com>
-Date: Sat, 17 Dec 2016 18:43:39 +0800
-Message-Id: <1481971427-11094-30-git-send-email-wei.w.wang@intel.com>
+Date: Sat, 17 Dec 2016 18:43:41 +0800
+Message-Id: <1481971427-11094-32-git-send-email-wei.w.wang@intel.com>
 In-Reply-To: <1481971427-11094-1-git-send-email-wei.w.wang@intel.com>
 References: <1481971427-11094-1-git-send-email-wei.w.wang@intel.com>
-Subject: [Qemu-devel] [PATCH v1 29/37] vhost-pci-slave/msg:
- VHOST_USER_SET_VHOST_PCI (start)
+Subject: [Qemu-devel] [PATCH v1 31/37] vhost-user/msg: send
+ VHOST_USER_SET_VHOST_PCI (start/stop)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,117 +28,161 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: marcandre.lureau@gmail.com, mst@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org
 Cc: Wei Wang <wei.w.wang@intel.com>
 
-The VHOST_USER_SET_VHOST_PCI msg is used to request the start or
-stop of the vhost-pci device.
-
-This patch handles the start commandin the slave. When receiving
-the SET_VHOST_PCI request with the start command, the slave creates
-a vhost-pci device based on the previously received virtio_id.
+The master requests the slave to create or destroy a vhost-pci device.
 
 Signed-off-by: Wei Wang <wei.w.wang@intel.com>
 ---
- hw/virtio/vhost-pci-slave.c    | 51 ++++++++++++++++++++++++++++++++++++++++++
- include/hw/virtio/vhost-user.h |  5 +++++
- 2 files changed, 56 insertions(+)
+ hw/net/vhost_net.c                | 34 ++++++++++++++++++++++++++++++++++
+ hw/virtio/vhost-user.c            | 17 +++++++++++++++++
+ include/hw/virtio/vhost-backend.h |  2 ++
+ include/net/vhost_net.h           |  2 ++
+ 4 files changed, 55 insertions(+)
 
-diff --git a/hw/virtio/vhost-pci-slave.c b/hw/virtio/vhost-pci-slave.c
-index cdeb710..73d3f71 100644
---- a/hw/virtio/vhost-pci-slave.c
-+++ b/hw/virtio/vhost-pci-slave.c
-@@ -13,6 +13,7 @@
- #include <qemu/osdep.h>
- #include <qemu/sockets.h>
+diff --git a/hw/net/vhost_net.c b/hw/net/vhost_net.c
+index 6524503..7f64be3 100644
+--- a/hw/net/vhost_net.c
++++ b/hw/net/vhost_net.c
+@@ -18,6 +18,7 @@
+ #include "net/tap.h"
+ #include "net/vhost-user.h"
  
-+#include "monitor/qdev.h"
- #include "qapi/error.h"
++#include "hw/virtio/vhost-user.h"
+ #include "hw/virtio/virtio-net.h"
+ #include "net/vhost_net.h"
  #include "qemu/error-report.h"
- #include "hw/virtio/virtio-pci.h"
-@@ -260,6 +261,51 @@ static void vp_slave_set_vring_enable(VhostUserMsg *msg)
+@@ -293,6 +294,7 @@ int vhost_net_start(VirtIODevice *dev, NetClientState *ncs,
+     BusState *qbus = BUS(qdev_get_parent_bus(DEVICE(dev)));
+     VirtioBusState *vbus = VIRTIO_BUS(qbus);
+     VirtioBusClass *k = VIRTIO_BUS_GET_CLASS(vbus);
++    struct vhost_net *last_net;
+     int r, e, i;
+ 
+     if (!k->set_guest_notifiers) {
+@@ -338,6 +340,14 @@ int vhost_net_start(VirtIODevice *dev, NetClientState *ncs,
+         }
      }
+ 
++    last_net = get_vhost_net(ncs[total_queues-1].peer);
++    if (vhost_pci_enabled(&last_net->dev)) {
++        r = vhost_set_vhost_pci(ncs[total_queues-1].peer,
++                              VHOST_USER_SET_VHOST_PCI_start);
++        if (r < 0)
++            goto err_start;
++    }
++
+     return 0;
+ 
+ err_start:
+@@ -359,8 +369,14 @@ void vhost_net_stop(VirtIODevice *dev, NetClientState *ncs,
+     BusState *qbus = BUS(qdev_get_parent_bus(DEVICE(dev)));
+     VirtioBusState *vbus = VIRTIO_BUS(qbus);
+     VirtioBusClass *k = VIRTIO_BUS_GET_CLASS(vbus);
++    struct vhost_net *last_net;
+     int i, r;
+ 
++    last_net = get_vhost_net(ncs[total_queues-1].peer);
++    if (vhost_pci_enabled(&last_net->dev))
++        vhost_set_vhost_pci(ncs[total_queues-1].peer,
++                              VHOST_USER_SET_VHOST_PCI_stop);
++
+     for (i = 0; i < total_queues; i++) {
+         vhost_net_stop_one(get_vhost_net(ncs[i].peer), dev);
+     }
+@@ -436,6 +452,18 @@ int vhost_set_vring_enable(NetClientState *nc, int enable)
+     return 0;
  }
  
-+static int vp_slave_device_create(uint16_t virtio_id)
++int vhost_set_vhost_pci(NetClientState *nc, uint8_t cmd)
 +{
-+    Error *local_err = NULL;
-+    QemuOpts *opts;
-+    DeviceState *dev;
-+    char params[50];
++    VHostNetState *net = get_vhost_net(nc);
++    const VhostOps *vhost_ops = net->dev.vhost_ops;
 +
-+    switch (virtio_id) {
-+    case VIRTIO_ID_NET:
-+        strcpy(params, "driver=vhost-pci-net-pci,id=vhost-pci-0");
-+        break;
-+    default:
-+        error_report("vhost-pci device create: device type %d not supported",
-+                     virtio_id);
++    if (vhost_ops && vhost_ops->vhost_set_vhost_pci) {
++        return vhost_ops->vhost_set_vhost_pci(&net->dev, cmd);
 +    }
 +
-+    opts = qemu_opts_parse_noisily(qemu_find_opts("device"), params, true);
-+    dev = qdev_device_add(opts, &local_err);
-+    if (!dev) {
-+        qemu_opts_del(opts);
-+        return -1;
-+    }
-+    object_unref(OBJECT(dev));
 +    return 0;
 +}
 +
-+static int vp_slave_set_vhost_pci(CharBackend *chr_be, VhostUserMsg *msg)
-+{
-+    int ret;
-+    uint8_t cmd = (uint8_t)msg->payload.u64;
+ #else
+ uint64_t vhost_net_get_max_queues(VHostNetState *net)
+ {
+@@ -502,4 +530,10 @@ int vhost_set_vring_enable(NetClientState *nc, int enable)
+ {
+     return 0;
+ }
 +
-+    switch (cmd) {
-+    case VHOST_USER_SET_VHOST_PCI_start:
-+        ret = vp_slave_device_create(vp_slave->dev_type);
-+        if (ret < 0)
-+            return ret;
-+        break;
-+    default:
-+        error_report("slave pconnection: cmd %d not supported yet", cmd);
++int vhost_set_vhost_pci(NetClientState *nc, uint8_t cmd)
++{
++    return 0;
++}
++
+ #endif
+diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+index 8b5ac0b..ce92140 100644
+--- a/hw/virtio/vhost-user.c
++++ b/hw/virtio/vhost-user.c
+@@ -312,6 +312,22 @@ static int vhost_user_set_vring_enable(struct vhost_dev *dev, int enable)
+     return 0;
+ }
+ 
++static int vhost_user_set_vhost_pci(struct vhost_dev *dev, uint8_t cmd)
++{
++    VhostUserMsg msg = {
++        .request = VHOST_USER_SET_VHOST_PCI,
++        .flags = VHOST_USER_VERSION,
++        .payload.u64 = (uint64_t)cmd,
++        .size = sizeof(msg.payload.u64),
++    };
++
++    if (vhost_user_write(dev, &msg, NULL, 0) < 0) {
 +        return -1;
 +    }
 +
-+    return ret;
++    return 0;
 +}
 +
- static int vp_slave_can_read(void *opaque)
+ static int vhost_user_get_vring_base(struct vhost_dev *dev,
+                                      struct vhost_vring_state *ring)
  {
-     return VHOST_USER_HDR_SIZE;
-@@ -370,6 +416,11 @@ static void vp_slave_read(void *opaque, const uint8_t *buf, int size)
-         break;
-     case VHOST_USER_SEND_RARP:
-         break;
-+    case VHOST_USER_SET_VHOST_PCI:
-+        ret = vp_slave_set_vhost_pci(chr_be, &msg);
-+        if (ret < 0)
-+            goto err_handling;
-+        break;
-     default:
-         error_report("vhost-pci-slave does not support msg request = %d",
-                      msg.request);
-diff --git a/include/hw/virtio/vhost-user.h b/include/hw/virtio/vhost-user.h
-index 45f11be..12e4dc9 100644
---- a/include/hw/virtio/vhost-user.h
-+++ b/include/hw/virtio/vhost-user.h
-@@ -25,6 +25,10 @@ enum VhostUserProtocolFeature {
-                                       (1ULL << VHOST_USER_PROTOCOL_F_VHOST_PCI) | \
-                                       (1ULL << VHOST_USER_PROTOCOL_F_SET_DEVICE_ID)
+@@ -639,6 +655,7 @@ const VhostOps user_ops = {
+         .vhost_reset_device = vhost_user_reset_device,
+         .vhost_get_vq_index = vhost_user_get_vq_index,
+         .vhost_set_vring_enable = vhost_user_set_vring_enable,
++        .vhost_set_vhost_pci = vhost_user_set_vhost_pci,
+         .vhost_requires_shm_log = vhost_user_requires_shm_log,
+         .vhost_migration_done = vhost_user_migration_done,
+         .vhost_backend_can_merge = vhost_user_can_merge,
+diff --git a/include/hw/virtio/vhost-backend.h b/include/hw/virtio/vhost-backend.h
+index 6e90703..60c0833 100644
+--- a/include/hw/virtio/vhost-backend.h
++++ b/include/hw/virtio/vhost-backend.h
+@@ -67,6 +67,7 @@ typedef int (*vhost_reset_device_op)(struct vhost_dev *dev);
+ typedef int (*vhost_get_vq_index_op)(struct vhost_dev *dev, int idx);
+ typedef int (*vhost_set_vring_enable_op)(struct vhost_dev *dev,
+                                          int enable);
++typedef int (*vhost_set_vhost_pci_op)(struct vhost_dev *dev, uint8_t cmd);
+ typedef bool (*vhost_requires_shm_log_op)(struct vhost_dev *dev);
+ typedef int (*vhost_migration_done_op)(struct vhost_dev *dev,
+                                        char *mac_addr);
+@@ -102,6 +103,7 @@ typedef struct VhostOps {
+     vhost_reset_device_op vhost_reset_device;
+     vhost_get_vq_index_op vhost_get_vq_index;
+     vhost_set_vring_enable_op vhost_set_vring_enable;
++    vhost_set_vhost_pci_op vhost_set_vhost_pci;
+     vhost_requires_shm_log_op vhost_requires_shm_log;
+     vhost_migration_done_op vhost_migration_done;
+     vhost_backend_can_merge_op vhost_backend_can_merge;
+diff --git a/include/net/vhost_net.h b/include/net/vhost_net.h
+index 5a08eff..82d5987 100644
+--- a/include/net/vhost_net.h
++++ b/include/net/vhost_net.h
+@@ -35,4 +35,6 @@ int vhost_set_vring_enable(NetClientState * nc, int enable);
  
-+/* control/status of the vhost-pci device */
-+#define VHOST_USER_SET_VHOST_PCI_start    0
-+#define VHOST_USER_SET_VHOST_PCI_stop     1
+ uint64_t vhost_net_get_acked_features(VHostNetState *net);
+ 
++int vhost_set_vhost_pci(NetClientState *nc, uint8_t cmd);
 +
- typedef enum VhostUserRequest {
-     VHOST_USER_NONE = 0,
-     VHOST_USER_GET_FEATURES = 1,
-@@ -47,6 +51,7 @@ typedef enum VhostUserRequest {
-     VHOST_USER_SET_VRING_ENABLE = 18,
-     VHOST_USER_SEND_RARP = 19,
-     VHOST_USER_SET_DEVICE_ID = 20,
-+    VHOST_USER_SET_VHOST_PCI = 21,
-     VHOST_USER_MAX
- } VhostUserRequest;
- 
+ #endif
 -- 
 2.7.4
