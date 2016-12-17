@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53345)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53366)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1cICUd-0007k5-IW
-	for qemu-devel@nongnu.org; Sat, 17 Dec 2016 05:45:32 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1cICUg-0007qx-Ax
+	for qemu-devel@nongnu.org; Sat, 17 Dec 2016 05:45:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1cICUb-0008CU-GF
-	for qemu-devel@nongnu.org; Sat, 17 Dec 2016 05:45:31 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1cICUf-0008EC-CP
+	for qemu-devel@nongnu.org; Sat, 17 Dec 2016 05:45:34 -0500
 Received: from mga05.intel.com ([192.55.52.43]:21540)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1cICUb-0007ss-6i
-	for qemu-devel@nongnu.org; Sat, 17 Dec 2016 05:45:29 -0500
+	id 1cICUe-0007ss-Sf
+	for qemu-devel@nongnu.org; Sat, 17 Dec 2016 05:45:33 -0500
 From: Wei Wang <wei.w.wang@intel.com>
-Date: Sat, 17 Dec 2016 18:43:28 +0800
-Message-Id: <1481971427-11094-19-git-send-email-wei.w.wang@intel.com>
+Date: Sat, 17 Dec 2016 18:43:30 +0800
+Message-Id: <1481971427-11094-21-git-send-email-wei.w.wang@intel.com>
 In-Reply-To: <1481971427-11094-1-git-send-email-wei.w.wang@intel.com>
 References: <1481971427-11094-1-git-send-email-wei.w.wang@intel.com>
-Subject: [Qemu-devel] [PATCH v1 18/37] vhost-user: send guest physical
- address of virtqueues to the slave
+Subject: [Qemu-devel] [PATCH v1 20/37] vhost-pci-slave/msg:
+ VHOST_USER_SET_VRING_KICK
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,125 +28,72 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: marcandre.lureau@gmail.com, mst@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org
 Cc: Wei Wang <wei.w.wang@intel.com>
 
-In the vhost-pci case, the slave needs the master side guest physical
-address, rather than the qemu virtual address.
+Update the kickfd to the head node in the list.
+
+This version of vhost-pci expects the driver to use polling to receive
+packets. So, other than storing the kickfd, we don't do anything more.
 
 Signed-off-by: Wei Wang <wei.w.wang@intel.com>
 ---
- hw/virtio/vhost.c         | 61 ++++++++++++++++++++++++++++++++---------------
- include/hw/virtio/vhost.h |  2 ++
- 2 files changed, 44 insertions(+), 19 deletions(-)
+ hw/virtio/vhost-pci-slave.c         | 19 +++++++++++++++++++
+ include/hw/virtio/vhost-pci-slave.h |  1 +
+ 2 files changed, 20 insertions(+)
 
-diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index f7f7023..df04375 100644
---- a/hw/virtio/vhost.c
-+++ b/hw/virtio/vhost.c
-@@ -26,6 +26,7 @@
- #include "hw/virtio/virtio-bus.h"
- #include "hw/virtio/virtio-access.h"
- #include "migration/migration.h"
-+#include "hw/virtio/vhost-user.h"
+diff --git a/hw/virtio/vhost-pci-slave.c b/hw/virtio/vhost-pci-slave.c
+index a55861a..dff1c88 100644
+--- a/hw/virtio/vhost-pci-slave.c
++++ b/hw/virtio/vhost-pci-slave.c
+@@ -11,6 +11,7 @@
+  */
  
- /* enabled until disconnected backend stabilizes */
- #define _VHOST_DEBUG 1
-@@ -858,6 +859,12 @@ static int vhost_virtqueue_set_vring_endian_legacy(struct vhost_dev *dev,
-     return -errno;
+ #include <qemu/osdep.h>
++#include <qemu/sockets.h>
+ 
+ #include "qapi/error.h"
+ #include "qemu/error-report.h"
+@@ -223,6 +224,13 @@ static void vp_slave_set_vring_addr(VhostUserMsg *msg)
+            sizeof(struct vhost_vring_addr));
  }
  
-+bool vhost_pci_enabled(struct vhost_dev *dev)
++static void vp_slave_set_vring_kick(int fd)
 +{
-+    return ((dev->protocol_features &
-+            (1ULL << VHOST_USER_PROTOCOL_F_VHOST_PCI)) != 0);
++    PeerVqNode *pvq_node = QLIST_FIRST(&vp_slave->pvq_list);
++    if (!pvq_node)
++        pvq_node->kickfd = fd;
 +}
 +
- static int vhost_virtqueue_start(struct vhost_dev *dev,
-                                 struct VirtIODevice *vdev,
-                                 struct vhost_virtqueue *vq,
-@@ -901,26 +908,40 @@ static int vhost_virtqueue_start(struct vhost_dev *dev,
-         }
-     }
- 
--    vq->desc_size = s = l = virtio_queue_get_desc_size(vdev, idx);
-     vq->desc_phys = a = virtio_queue_get_desc_addr(vdev, idx);
--    vq->desc = cpu_physical_memory_map(a, &l, 0);
--    if (!vq->desc || l != s) {
--        r = -ENOMEM;
--        goto fail_alloc_desc;
-+    if (vhost_pci_enabled(dev)) {
-+        vq->desc = (void *)a;
-+    } else {
-+        vq->desc_size = s = l = virtio_queue_get_desc_size(vdev, idx);
-+        vq->desc = cpu_physical_memory_map(a, &l, 0);
-+        if (!vq->desc || l != s) {
-+            r = -ENOMEM;
-+            goto fail_alloc_desc;
-+        }
-     }
-+
-     vq->avail_size = s = l = virtio_queue_get_avail_size(vdev, idx);
-     vq->avail_phys = a = virtio_queue_get_avail_addr(vdev, idx);
--    vq->avail = cpu_physical_memory_map(a, &l, 0);
--    if (!vq->avail || l != s) {
--        r = -ENOMEM;
--        goto fail_alloc_avail;
-+    if (vhost_pci_enabled(dev)) {
-+        vq->avail = (void *)a;
-+    } else {
-+        vq->avail = cpu_physical_memory_map(a, &l, 0);
-+        if (!vq->avail || l != s) {
-+            r = -ENOMEM;
-+            goto fail_alloc_avail;
-+        }
-     }
-+
-     vq->used_size = s = l = virtio_queue_get_used_size(vdev, idx);
-     vq->used_phys = a = virtio_queue_get_used_addr(vdev, idx);
--    vq->used = cpu_physical_memory_map(a, &l, 1);
--    if (!vq->used || l != s) {
--        r = -ENOMEM;
--        goto fail_alloc_used;
-+    if (vhost_pci_enabled(dev)) {
-+        vq->used = (void *)a;
-+    } else {
-+        vq->used = cpu_physical_memory_map(a, &l, 1);
-+        if (!vq->used || l != s) {
-+            r = -ENOMEM;
-+            goto fail_alloc_used;
-+        }
-     }
- 
-     r = vhost_virtqueue_set_addr(dev, vq, vhost_vq_index, dev->log_enabled);
-@@ -1003,12 +1024,14 @@ static void vhost_virtqueue_stop(struct vhost_dev *dev,
-                                                 vhost_vq_index);
-     }
- 
--    cpu_physical_memory_unmap(vq->used, virtio_queue_get_used_size(vdev, idx),
--                              1, virtio_queue_get_used_size(vdev, idx));
--    cpu_physical_memory_unmap(vq->avail, virtio_queue_get_avail_size(vdev, idx),
--                              0, virtio_queue_get_avail_size(vdev, idx));
--    cpu_physical_memory_unmap(vq->desc, virtio_queue_get_desc_size(vdev, idx),
--                              0, virtio_queue_get_desc_size(vdev, idx));
-+    if (!vhost_pci_enabled(dev)) {
-+        cpu_physical_memory_unmap(vq->used, virtio_queue_get_used_size(vdev, idx),
-+                                  1, virtio_queue_get_used_size(vdev, idx));
-+        cpu_physical_memory_unmap(vq->avail, virtio_queue_get_avail_size(vdev, idx),
-+                                  0, virtio_queue_get_avail_size(vdev, idx));
-+        cpu_physical_memory_unmap(vq->desc, virtio_queue_get_desc_size(vdev, idx),
-+                                  0, virtio_queue_get_desc_size(vdev, idx));
-+    }
- }
- 
- static void vhost_eventfd_add(MemoryListener *listener,
-diff --git a/include/hw/virtio/vhost.h b/include/hw/virtio/vhost.h
-index 9cf32e2..9955e07 100644
---- a/include/hw/virtio/vhost.h
-+++ b/include/hw/virtio/vhost.h
-@@ -92,4 +92,6 @@ bool vhost_has_free_slot(void);
- int vhost_net_set_backend(struct vhost_dev *hdev,
-                           struct vhost_vring_file *file);
- 
-+bool vhost_pci_enabled(struct vhost_dev *dev);
-+
- #endif
+ static int vp_slave_can_read(void *opaque)
+ {
+     return VHOST_USER_HDR_SIZE;
+@@ -295,6 +303,17 @@ static void vp_slave_read(void *opaque, const uint8_t *buf, int size)
+     case VHOST_USER_SET_VRING_ADDR:
+         vp_slave_set_vring_addr(&msg);
+         break;
++    case VHOST_USER_SET_VRING_KICK:
++        /* consume the fd */
++        qemu_chr_fe_get_msgfds(chr_be, fds, 1);
++        vp_slave_set_vring_kick(fds[0]);
++        /*
++         * This is a non-blocking eventfd.
++         * The receive function forces it to be blocking,
++         * so revert it back to non-blocking.
++         */
++        qemu_set_nonblock(fds[0]);
++        break;
+     default:
+         error_report("vhost-pci-slave does not support msg request = %d",
+                      msg.request);
+diff --git a/include/hw/virtio/vhost-pci-slave.h b/include/hw/virtio/vhost-pci-slave.h
+index 439198d..4b6b213 100644
+--- a/include/hw/virtio/vhost-pci-slave.h
++++ b/include/hw/virtio/vhost-pci-slave.h
+@@ -10,6 +10,7 @@
+ typedef struct PeerVqNode {
+     uint16_t last_avail_idx;
+     uint32_t vring_num;
++    int kickfd;
+     struct vhost_vring_addr addr;
+     QLIST_ENTRY(PeerVqNode) node;
+ } PeerVqNode;
 -- 
 2.7.4
