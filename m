@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53575)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53607)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1cICV1-00008D-Sz
-	for qemu-devel@nongnu.org; Sat, 17 Dec 2016 05:45:59 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1cICV7-0000GP-Aq
+	for qemu-devel@nongnu.org; Sat, 17 Dec 2016 05:46:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1cICV0-0008R0-RY
-	for qemu-devel@nongnu.org; Sat, 17 Dec 2016 05:45:55 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1cICV4-0008UU-8t
+	for qemu-devel@nongnu.org; Sat, 17 Dec 2016 05:46:01 -0500
 Received: from mga05.intel.com ([192.55.52.43]:21540)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1cICV0-0007ss-Ew
-	for qemu-devel@nongnu.org; Sat, 17 Dec 2016 05:45:54 -0500
+	id 1cICV3-0007ss-Uu
+	for qemu-devel@nongnu.org; Sat, 17 Dec 2016 05:45:58 -0500
 From: Wei Wang <wei.w.wang@intel.com>
-Date: Sat, 17 Dec 2016 18:43:42 +0800
-Message-Id: <1481971427-11094-33-git-send-email-wei.w.wang@intel.com>
+Date: Sat, 17 Dec 2016 18:43:44 +0800
+Message-Id: <1481971427-11094-35-git-send-email-wei.w.wang@intel.com>
 In-Reply-To: <1481971427-11094-1-git-send-email-wei.w.wang@intel.com>
 References: <1481971427-11094-1-git-send-email-wei.w.wang@intel.com>
-Subject: [Qemu-devel] [PATCH v1 32/37] vhost-user: add asynchronous read for
- the vhost-user master
+Subject: [Qemu-devel] [PATCH v1 34/37] vhost-pci-slave: add "peer_reset"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,151 +27,95 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: marcandre.lureau@gmail.com, mst@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org
 Cc: Wei Wang <wei.w.wang@intel.com>
 
-Enable the vhost-user master to asynchronously receive messages
-from the slave.
+Setting "peer_reset" flags that the peer device is about to be reset.
+This happens when the slave side device driver only accepts a subset
+of the feature bits offered by the peer device.
+
+The peer device is expected to have a second run of the vhost-user
+protocol for the re-setup.
 
 Signed-off-by: Wei Wang <wei.w.wang@intel.com>
 ---
- hw/virtio/vhost-user.c         | 42 +++++++++++++++++++++++++++++++++++++++++-
- include/hw/virtio/vhost-user.h |  4 ++++
- include/net/vhost-user.h       |  4 ++++
- net/vhost-user.c               | 20 ++++++++++++++++++--
- 4 files changed, 67 insertions(+), 3 deletions(-)
+ hw/net/vhost-pci-net.c              |  4 ++++
+ hw/virtio/vhost-pci-slave.c         | 17 +++++++++++++++--
+ include/hw/virtio/vhost-pci-slave.h |  1 +
+ 3 files changed, 20 insertions(+), 2 deletions(-)
 
-diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-index ce92140..800b8ed 100644
---- a/hw/virtio/vhost-user.c
-+++ b/hw/virtio/vhost-user.c
-@@ -14,7 +14,7 @@
- #include "hw/virtio/vhost-backend.h"
- #include "hw/virtio/vhost-user.h"
- #include "hw/virtio/virtio-net.h"
--#include "sysemu/char.h"
-+#include "net/vhost-user.h"
- #include "sysemu/kvm.h"
- #include "qemu/error-report.h"
- #include "qemu/sockets.h"
-@@ -75,6 +75,46 @@ fail:
-     return -1;
- }
+diff --git a/hw/net/vhost-pci-net.c b/hw/net/vhost-pci-net.c
+index 567fb86..6d4db6c 100644
+--- a/hw/net/vhost-pci-net.c
++++ b/hw/net/vhost-pci-net.c
+@@ -141,6 +141,10 @@ static void vpnet_set_features(VirtIODevice *vdev, uint64_t features)
+     int ret;
  
-+int vhost_user_can_read(void *opaque)
-+{
-+    return VHOST_USER_HDR_SIZE;
-+}
-+
-+void vhost_user_asyn_read(void *opaque, const uint8_t *buf, int size)
-+{
-+    const char *name = opaque;
-+    VhostUserMsg msg;
-+    uint8_t *p = (uint8_t *) &msg;
-+    CharBackend *chr_be = net_name_to_chr_be(name);
-+
-+    if (size != VHOST_USER_HDR_SIZE) {
-+        error_report("Wrong message size received %d\n", size);
-+        return;
-+    }
-+
-+    memcpy(p, buf, VHOST_USER_HDR_SIZE);
-+
-+    if (msg.size) {
-+        p += VHOST_USER_HDR_SIZE;
-+        size = qemu_chr_fe_read_all(chr_be, p, msg.size);
-+        if (size != msg.size) {
-+            error_report("Wrong message size received %d != %d\n",
-+                           size, msg.size);
-+            return;
+     if (need_send) {
++        if (vp_slave->feature_bits != features) {
++            vp_slave->feature_bits = features;
++            vp_slave->peer_reset = 1;
 +        }
-+    }
-+
-+    if (msg.request > VHOST_USER_MAX)
-+        error_report("vhost-user master read incorrect msg \n");
-+
-+    switch(msg.request) {
-+    default:
-+        error_report("vhost-user master does not support msg request = %d\n",
-+                     msg.request);
-+        break;
-+    }
-+}
-+
- static int process_message_reply(struct vhost_dev *dev,
-                                  VhostUserRequest request)
- {
-diff --git a/include/hw/virtio/vhost-user.h b/include/hw/virtio/vhost-user.h
-index 12e4dc9..142ea52 100644
---- a/include/hw/virtio/vhost-user.h
-+++ b/include/hw/virtio/vhost-user.h
-@@ -102,4 +102,8 @@ static VhostUserMsg m __attribute__ ((unused));
- /* The version of the protocol we support */
- #define VHOST_USER_VERSION    (0x1)
+         need_send = 0;
+         ret = vp_slave_send_feature_bits(features);
+         if (ret < 0)
+diff --git a/hw/virtio/vhost-pci-slave.c b/hw/virtio/vhost-pci-slave.c
+index d3c3443..5cfa335 100644
+--- a/hw/virtio/vhost-pci-slave.c
++++ b/hw/virtio/vhost-pci-slave.c
+@@ -37,6 +37,14 @@ static void vp_slave_cleanup(void)
+     if (!vp_slave->vdev)
+         return;
  
-+int vhost_user_can_read(void *opaque);
++    /*
++     * if this cleanup is not invoked due to peer reset, re-initialize
++     * the feature bits, so that the slave can work with a new master
++     */
++    if (!vp_slave->peer_reset)
++        vp_slave->feature_bits =
++                1ULL << VHOST_USER_F_PROTOCOL_FEATURES;
 +
-+void vhost_user_asyn_read(void *opaque, const uint8_t *buf, int size);
-+
- #endif
-diff --git a/include/net/vhost-user.h b/include/net/vhost-user.h
-index d9e328d..1bb5f1a 100644
---- a/include/net/vhost-user.h
-+++ b/include/net/vhost-user.h
-@@ -11,8 +11,12 @@
- #ifndef NET_VHOST_USER_H
- #define NET_VHOST_USER_H
+     nregions = vp_slave->pmem_msg.nregions;
+     for (i = 0; i < nregions; i++) {
+         ret = munmap(vp_slave->mr_map_base[i], vp_slave->mr_map_size[i]);
+@@ -163,8 +171,10 @@ static void vp_slave_set_device_type(VhostUserMsg *msg)
  
-+#include "sysemu/char.h"
-+
- struct vhost_net;
- struct vhost_net *vhost_user_get_vhost_net(NetClientState *nc);
- uint64_t vhost_user_get_acked_features(NetClientState *nc);
+     switch (vp_slave->dev_type) {
+     case VIRTIO_ID_NET:
+-        vp_slave->feature_bits |= (VHOST_PCI_FEATURE_BITS
+-                                   | VHOST_PCI_NET_FEATURE_BITS);
++        /* Don't initialize the feature bits if they have been negotiated */
++        if (!vp_slave->peer_reset)
++            vp_slave->feature_bits |= (VHOST_PCI_FEATURE_BITS
++                                       | VHOST_PCI_NET_FEATURE_BITS);
+         break;
+     default:
+         error_report("device type %d is not supported", vp_slave->dev_type);
+@@ -351,6 +361,8 @@ static int vp_slave_set_vhost_pci(CharBackend *chr_be, VhostUserMsg *msg)
  
-+CharBackend *net_name_to_chr_be(const char *name);
-+
- #endif /* VHOST_USER_H */
-diff --git a/net/vhost-user.c b/net/vhost-user.c
-index 7aff77e..58eee6a 100644
---- a/net/vhost-user.c
-+++ b/net/vhost-user.c
-@@ -12,7 +12,7 @@
- #include "clients.h"
- #include "net/vhost_net.h"
- #include "net/vhost-user.h"
--#include "sysemu/char.h"
-+#include "hw/virtio/vhost-user.h"
- #include "qemu/config-file.h"
- #include "qemu/error-report.h"
- #include "qmp-commands.h"
-@@ -190,6 +190,22 @@ static gboolean net_vhost_user_watch(GIOChannel *chan, GIOCondition cond,
-     return FALSE;
- }
- 
-+CharBackend *net_name_to_chr_be(const char *name)
-+{
-+    NetClientState *ncs[MAX_QUEUE_NUM];
-+    VhostUserState *s;
-+    int queues;
-+
-+    queues = qemu_find_net_clients_except(name, ncs,
-+                                          NET_CLIENT_DRIVER_NIC,
-+                                          MAX_QUEUE_NUM);
-+    assert(queues < MAX_QUEUE_NUM);
-+
-+    s = DO_UPCAST(VhostUserState, nc, ncs[0]);
-+
-+    return &s->chr;
-+}
-+
- static void net_vhost_user_event(void *opaque, int event)
- {
-     const char *name = opaque;
-@@ -265,7 +281,7 @@ static int net_vhost_user_init(NetClientState *peer, const char *device,
-             error_report_err(err);
-             return -1;
-         }
--        qemu_chr_fe_set_handlers(&s->chr, NULL, NULL,
-+        qemu_chr_fe_set_handlers(&s->chr, vhost_user_can_read, vhost_user_asyn_read,
-                                  net_vhost_user_event, nc0->name, NULL, true);
-     } while (!s->started);
- 
+     switch (cmd) {
+     case VHOST_USER_SET_VHOST_PCI_start:
++        if (vp_slave->peer_reset)
++            vp_slave->peer_reset = 0;
+         ret = vp_slave_device_create(vp_slave->dev_type);
+         if (ret < 0)
+             return ret;
+@@ -519,6 +531,7 @@ int vhost_pci_slave_init(QemuOpts *opts)
+     vp_slave->sub_mr = NULL;
+     QLIST_INIT(&vp_slave->pvq_list);
+     vp_slave->pvq_num = 0;
++    vp_slave->peer_reset = 0;
+     qemu_chr_fe_init(&vp_slave->chr_be, chr, &error_abort);
+     qemu_chr_fe_set_handlers(&vp_slave->chr_be, vp_slave_can_read,
+                              vp_slave_read, vp_slave_event,
+diff --git a/include/hw/virtio/vhost-pci-slave.h b/include/hw/virtio/vhost-pci-slave.h
+index e60580a..dd78ed4 100644
+--- a/include/hw/virtio/vhost-pci-slave.h
++++ b/include/hw/virtio/vhost-pci-slave.h
+@@ -21,6 +21,7 @@ typedef struct VhostPCISlave {
+     CharBackend chr_be;
+     /* Ponnter to the slave device */
+     VirtIODevice *vdev;
++    bool peer_reset;
+     uint16_t dev_type;
+     uint64_t feature_bits;
+     /* hotplugged memory should be mapped following the offset */
 -- 
 2.7.4
