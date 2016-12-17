@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53112)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53144)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1cICUD-0007B4-G8
-	for qemu-devel@nongnu.org; Sat, 17 Dec 2016 05:45:06 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1cICUF-0007CF-Jk
+	for qemu-devel@nongnu.org; Sat, 17 Dec 2016 05:45:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1cICUC-0007ti-1H
-	for qemu-devel@nongnu.org; Sat, 17 Dec 2016 05:45:05 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1cICUE-0007wb-LA
+	for qemu-devel@nongnu.org; Sat, 17 Dec 2016 05:45:07 -0500
 Received: from mga05.intel.com ([192.55.52.43]:21540)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1cICUB-0007ss-Lh
-	for qemu-devel@nongnu.org; Sat, 17 Dec 2016 05:45:03 -0500
+	id 1cICUE-0007ss-CR
+	for qemu-devel@nongnu.org; Sat, 17 Dec 2016 05:45:06 -0500
 From: Wei Wang <wei.w.wang@intel.com>
-Date: Sat, 17 Dec 2016 18:43:13 +0800
-Message-Id: <1481971427-11094-4-git-send-email-wei.w.wang@intel.com>
+Date: Sat, 17 Dec 2016 18:43:15 +0800
+Message-Id: <1481971427-11094-6-git-send-email-wei.w.wang@intel.com>
 In-Reply-To: <1481971427-11094-1-git-send-email-wei.w.wang@intel.com>
 References: <1481971427-11094-1-git-send-email-wei.w.wang@intel.com>
-Subject: [Qemu-devel] [PATCH v1 03/37] vhost-user: share the vhost-user
- protocol related structures
+Subject: [Qemu-devel] [PATCH v1 05/37] vhost-pci-slave: start the
+ implementation of vhost-pci-slave
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,234 +28,110 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: marcandre.lureau@gmail.com, mst@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org
 Cc: Wei Wang <wei.w.wang@intel.com>
 
-Put the vhost-user protocol related data structures into vhost-user.h,
-so that they can be used in other implementations (e.g. a slave
-implementation).
+Vhost-pci-slave uses a QEMU socket to talk to the master. This patch
+associates the slave with the qemu sever socket.
 
 Signed-off-by: Wei Wang <wei.w.wang@intel.com>
 ---
- hw/virtio/vhost-user.c         | 87 +---------------------------------------
- include/hw/virtio/vhost-user.h | 91 ++++++++++++++++++++++++++++++++++++++++++
- include/net/vhost-user.h       |  4 +-
- 3 files changed, 94 insertions(+), 88 deletions(-)
- create mode 100644 include/hw/virtio/vhost-user.h
+ hw/virtio/Makefile.objs             |  1 +
+ hw/virtio/vhost-pci-slave.c         | 53 +++++++++++++++++++++++++++++++++++++
+ include/hw/virtio/vhost-pci-slave.h | 16 +++++++++++
+ 3 files changed, 70 insertions(+)
+ create mode 100644 hw/virtio/vhost-pci-slave.c
+ create mode 100644 include/hw/virtio/vhost-pci-slave.h
 
-diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-index 7ee92b3..9e089d4 100644
---- a/hw/virtio/vhost-user.c
-+++ b/hw/virtio/vhost-user.c
-@@ -12,6 +12,7 @@
- #include "qapi/error.h"
- #include "hw/virtio/vhost.h"
- #include "hw/virtio/vhost-backend.h"
-+#include "hw/virtio/vhost-user.h"
- #include "hw/virtio/virtio-net.h"
- #include "sysemu/char.h"
- #include "sysemu/kvm.h"
-@@ -22,92 +23,6 @@
- #include <sys/ioctl.h>
- #include <sys/socket.h>
- #include <sys/un.h>
--#include <linux/vhost.h>
--
--#define VHOST_MEMORY_MAX_NREGIONS    8
--#define VHOST_USER_F_PROTOCOL_FEATURES 30
--
--enum VhostUserProtocolFeature {
--    VHOST_USER_PROTOCOL_F_MQ = 0,
--    VHOST_USER_PROTOCOL_F_LOG_SHMFD = 1,
--    VHOST_USER_PROTOCOL_F_RARP = 2,
--    VHOST_USER_PROTOCOL_F_REPLY_ACK = 3,
--
--    VHOST_USER_PROTOCOL_F_MAX
--};
--
--#define VHOST_USER_PROTOCOL_FEATURE_MASK ((1 << VHOST_USER_PROTOCOL_F_MAX) - 1)
--
--typedef enum VhostUserRequest {
--    VHOST_USER_NONE = 0,
--    VHOST_USER_GET_FEATURES = 1,
--    VHOST_USER_SET_FEATURES = 2,
--    VHOST_USER_SET_OWNER = 3,
--    VHOST_USER_RESET_OWNER = 4,
--    VHOST_USER_SET_MEM_TABLE = 5,
--    VHOST_USER_SET_LOG_BASE = 6,
--    VHOST_USER_SET_LOG_FD = 7,
--    VHOST_USER_SET_VRING_NUM = 8,
--    VHOST_USER_SET_VRING_ADDR = 9,
--    VHOST_USER_SET_VRING_BASE = 10,
--    VHOST_USER_GET_VRING_BASE = 11,
--    VHOST_USER_SET_VRING_KICK = 12,
--    VHOST_USER_SET_VRING_CALL = 13,
--    VHOST_USER_SET_VRING_ERR = 14,
--    VHOST_USER_GET_PROTOCOL_FEATURES = 15,
--    VHOST_USER_SET_PROTOCOL_FEATURES = 16,
--    VHOST_USER_GET_QUEUE_NUM = 17,
--    VHOST_USER_SET_VRING_ENABLE = 18,
--    VHOST_USER_SEND_RARP = 19,
--    VHOST_USER_MAX
--} VhostUserRequest;
--
--typedef struct VhostUserMemoryRegion {
--    uint64_t guest_phys_addr;
--    uint64_t memory_size;
--    uint64_t userspace_addr;
--    uint64_t mmap_offset;
--} VhostUserMemoryRegion;
--
--typedef struct VhostUserMemory {
--    uint32_t nregions;
--    uint32_t padding;
--    VhostUserMemoryRegion regions[VHOST_MEMORY_MAX_NREGIONS];
--} VhostUserMemory;
--
--typedef struct VhostUserLog {
--    uint64_t mmap_size;
--    uint64_t mmap_offset;
--} VhostUserLog;
--
--typedef struct VhostUserMsg {
--    VhostUserRequest request;
--
--#define VHOST_USER_VERSION_MASK     (0x3)
--#define VHOST_USER_REPLY_MASK       (0x1<<2)
--#define VHOST_USER_NEED_REPLY_MASK  (0x1 << 3)
--    uint32_t flags;
--    uint32_t size; /* the following payload size */
--    union {
--#define VHOST_USER_VRING_IDX_MASK   (0xff)
--#define VHOST_USER_VRING_NOFD_MASK  (0x1<<8)
--        uint64_t u64;
--        struct vhost_vring_state state;
--        struct vhost_vring_addr addr;
--        VhostUserMemory memory;
--        VhostUserLog log;
--    } payload;
--} QEMU_PACKED VhostUserMsg;
--
--static VhostUserMsg m __attribute__ ((unused));
--#define VHOST_USER_HDR_SIZE (sizeof(m.request) \
--                            + sizeof(m.flags) \
--                            + sizeof(m.size))
--
--#define VHOST_USER_PAYLOAD_SIZE (sizeof(m) - VHOST_USER_HDR_SIZE)
--
--/* The version of the protocol we support */
--#define VHOST_USER_VERSION    (0x1)
+diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
+index 95c4c30..3af6787 100644
+--- a/hw/virtio/Makefile.objs
++++ b/hw/virtio/Makefile.objs
+@@ -2,6 +2,7 @@ common-obj-y += virtio-rng.o
+ common-obj-$(CONFIG_VIRTIO_PCI) += virtio-pci.o
+ common-obj-y += virtio-bus.o
+ common-obj-y += virtio-mmio.o
++common-obj-y += vhost-pci-slave.o
  
- static bool ioeventfd_enabled(void)
- {
-diff --git a/include/hw/virtio/vhost-user.h b/include/hw/virtio/vhost-user.h
+ obj-y += virtio.o virtio-balloon.o 
+ obj-$(CONFIG_LINUX) += vhost.o vhost-backend.o vhost-user.o
+diff --git a/hw/virtio/vhost-pci-slave.c b/hw/virtio/vhost-pci-slave.c
 new file mode 100644
-index 0000000..c189b26
+index 0000000..5ff9a09
 --- /dev/null
-+++ b/include/hw/virtio/vhost-user.h
-@@ -0,0 +1,91 @@
-+#ifndef VHOST_USER_H
-+#define VHOST_USER_H
++++ b/hw/virtio/vhost-pci-slave.c
+@@ -0,0 +1,53 @@
++/*
++ * Vhost-pci Slave
++ *
++ * Copyright Intel Corp. 2016
++ *
++ * Authors:
++ * Wei Wang    <wei.w.wang@intel.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
 +
-+#include <linux/vhost.h>
++#include <qemu/osdep.h>
 +
-+#define VHOST_MEMORY_MAX_NREGIONS    8
-+#define VHOST_USER_F_PROTOCOL_FEATURES 30
++#include "qapi/error.h"
++#include "qemu/error-report.h"
++#include "hw/virtio/vhost-pci-slave.h"
 +
-+enum VhostUserProtocolFeature {
-+    VHOST_USER_PROTOCOL_F_MQ = 0,
-+    VHOST_USER_PROTOCOL_F_LOG_SHMFD = 1,
-+    VHOST_USER_PROTOCOL_F_RARP = 2,
-+    VHOST_USER_PROTOCOL_F_REPLY_ACK = 3,
++VhostPCISlave *vp_slave;
 +
-+    VHOST_USER_PROTOCOL_F_MAX
-+};
++static CharDriverState *vp_slave_parse_chardev(const char *id)
++{
++    CharDriverState *chr = qemu_chr_find(id);
++    if (chr == NULL) {
++        error_report("chardev \"%s\" not found", id);
++        return NULL;
++    }
 +
-+#define VHOST_USER_PROTOCOL_FEATURE_MASK ((1 << VHOST_USER_PROTOCOL_F_MAX) - 1)
++    return chr;
++}
 +
-+typedef enum VhostUserRequest {
-+    VHOST_USER_NONE = 0,
-+    VHOST_USER_GET_FEATURES = 1,
-+    VHOST_USER_SET_FEATURES = 2,
-+    VHOST_USER_SET_OWNER = 3,
-+    VHOST_USER_RESET_OWNER = 4,
-+    VHOST_USER_SET_MEM_TABLE = 5,
-+    VHOST_USER_SET_LOG_BASE = 6,
-+    VHOST_USER_SET_LOG_FD = 7,
-+    VHOST_USER_SET_VRING_NUM = 8,
-+    VHOST_USER_SET_VRING_ADDR = 9,
-+    VHOST_USER_SET_VRING_BASE = 10,
-+    VHOST_USER_GET_VRING_BASE = 11,
-+    VHOST_USER_SET_VRING_KICK = 12,
-+    VHOST_USER_SET_VRING_CALL = 13,
-+    VHOST_USER_SET_VRING_ERR = 14,
-+    VHOST_USER_GET_PROTOCOL_FEATURES = 15,
-+    VHOST_USER_SET_PROTOCOL_FEATURES = 16,
-+    VHOST_USER_GET_QUEUE_NUM = 17,
-+    VHOST_USER_SET_VRING_ENABLE = 18,
-+    VHOST_USER_SEND_RARP = 19,
-+    VHOST_USER_MAX
-+} VhostUserRequest;
++int vhost_pci_slave_init(QemuOpts *opts)
++{
++    CharDriverState *chr;
++    const char *chardev_id = qemu_opt_get(opts, "chardev");
 +
-+typedef struct VhostUserMemoryRegion {
-+    uint64_t guest_phys_addr;
-+    uint64_t memory_size;
-+    uint64_t userspace_addr;
-+    uint64_t mmap_offset;
-+} VhostUserMemoryRegion;
++    vp_slave = (VhostPCISlave *)g_malloc(sizeof(VhostPCISlave));
++    chr = vp_slave_parse_chardev(chardev_id);
++    if (!chr) {
++        return -1;
++    }
++    qemu_chr_fe_init(&vp_slave->chr_be, chr, &error_abort);
 +
-+typedef struct VhostUserMemory {
-+    uint32_t nregions;
-+    uint32_t padding;
-+    VhostUserMemoryRegion regions[VHOST_MEMORY_MAX_NREGIONS];
-+} VhostUserMemory;
++    return 0;
++}
 +
-+typedef struct VhostUserLog {
-+    uint64_t mmap_size;
-+    uint64_t mmap_offset;
-+} VhostUserLog;
++int vhost_pci_slave_cleanup(void)
++{
++    qemu_chr_fe_deinit(&vp_slave->chr_be);
++    g_free(vp_slave);
 +
-+typedef struct VhostUserMsg {
-+    VhostUserRequest request;
++    return 0;
++}
+diff --git a/include/hw/virtio/vhost-pci-slave.h b/include/hw/virtio/vhost-pci-slave.h
+new file mode 100644
+index 0000000..c82c775
+--- /dev/null
++++ b/include/hw/virtio/vhost-pci-slave.h
+@@ -0,0 +1,16 @@
++#ifndef QEMU_VHOST_PCI_SLAVE_H
++#define QEMU_VHOST_PCI_SLAVE_H
 +
-+#define VHOST_USER_VERSION_MASK     (0x3)
-+#define VHOST_USER_REPLY_MASK       (0x1<<2)
-+#define VHOST_USER_NEED_REPLY_MASK  (0x1 << 3)
-+    uint32_t flags;
-+    uint32_t size; /* the following payload size */
-+    union {
-+#define VHOST_USER_VRING_IDX_MASK   (0xff)
-+#define VHOST_USER_VRING_NOFD_MASK  (0x1<<8)
-+        uint64_t u64;
-+        struct vhost_vring_state state;
-+        struct vhost_vring_addr addr;
-+        VhostUserMemory memory;
-+        VhostUserLog log;
-+    } payload;
-+} QEMU_PACKED VhostUserMsg;
++#include "sysemu/char.h"
 +
-+static VhostUserMsg m __attribute__ ((unused));
-+#define VHOST_USER_HDR_SIZE (sizeof(m.request) \
-+                            + sizeof(m.flags) \
-+                            + sizeof(m.size))
++typedef struct VhostPCISlave {
++    CharBackend chr_be;
++} VhostPCISlave;
 +
-+#define VHOST_USER_PAYLOAD_SIZE (sizeof(m) - VHOST_USER_HDR_SIZE)
++extern VhostPCISlave *vp_slave;
 +
-+/* The version of the protocol we support */
-+#define VHOST_USER_VERSION    (0x1)
++extern int vhost_pci_slave_init(QemuOpts *opts);
++
++extern int vhost_pci_slave_cleanup(void);
 +
 +#endif
-diff --git a/include/net/vhost-user.h b/include/net/vhost-user.h
-index 5bcd8a6..d9e328d 100644
---- a/include/net/vhost-user.h
-+++ b/include/net/vhost-user.h
-@@ -8,8 +8,8 @@
-  *
-  */
- 
--#ifndef VHOST_USER_H
--#define VHOST_USER_H
-+#ifndef NET_VHOST_USER_H
-+#define NET_VHOST_USER_H
- 
- struct vhost_net;
- struct vhost_net *vhost_user_get_vhost_net(NetClientState *nc);
 -- 
 2.7.4
