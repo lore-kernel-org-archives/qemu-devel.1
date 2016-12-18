@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52564)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59851)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <th.huth@gmail.com>) id 1cIVOr-0001XX-Qg
-	for qemu-devel@nongnu.org; Sun, 18 Dec 2016 01:56:51 -0500
+	(envelope-from <dmitry@daynix.com>) id 1cIWIg-0008R1-RD
+	for qemu-devel@nongnu.org; Sun, 18 Dec 2016 02:54:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <th.huth@gmail.com>) id 1cIVOo-0001aE-P3
-	for qemu-devel@nongnu.org; Sun, 18 Dec 2016 01:56:49 -0500
-Received: from mail-wj0-f194.google.com ([209.85.210.194]:36024)
+	(envelope-from <dmitry@daynix.com>) id 1cIWId-0006R8-LO
+	for qemu-devel@nongnu.org; Sun, 18 Dec 2016 02:54:30 -0500
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:36015)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <th.huth@gmail.com>) id 1cIVOo-0001a4-Hr
-	for qemu-devel@nongnu.org; Sun, 18 Dec 2016 01:56:46 -0500
-Received: by mail-wj0-f194.google.com with SMTP id j10so19561392wjb.3
-	for <qemu-devel@nongnu.org>; Sat, 17 Dec 2016 22:56:44 -0800 (PST)
-References: <20161216191405.9473-1-rth@twiddle.net>
-From: Thomas Huth <huth@tuxfamily.org>
-Message-ID: <91a51975-dad9-d029-c2c8-2497f188b1a3@tuxfamily.org>
-Date: Sun, 18 Dec 2016 07:56:41 +0100
-MIME-Version: 1.0
-In-Reply-To: <20161216191405.9473-1-rth@twiddle.net>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 00/26] New hppa-linux-user target
+	(Exim 4.71) (envelope-from <dmitry@daynix.com>) id 1cIWId-0006QQ-9C
+	for qemu-devel@nongnu.org; Sun, 18 Dec 2016 02:54:27 -0500
+Received: by mail-wm0-x242.google.com with SMTP id m203so12975668wma.3
+	for <qemu-devel@nongnu.org>; Sat, 17 Dec 2016 23:54:24 -0800 (PST)
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
+From: Dmitry Fleytman <dmitry@daynix.com>
+In-Reply-To: <20161216121906.GC2642@work-vm>
+Date: Sun, 18 Dec 2016 09:54:27 +0200
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <65721110-904C-4A02-9BFF-6FA5764E4F5D@daynix.com>
+References: <20161215200509.2239-1-dgilbert@redhat.com>
+	<20161215200509.2239-3-dgilbert@redhat.com>
+	<20161216121906.GC2642@work-vm>
+Subject: Re: [Qemu-devel] [PATCH 2/2] vmxnet3: VMStatify rx/tx q_descr and
+ int_state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,125 +31,360 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org, deller@gmx.de
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com, amit.shah@redhat.com
 
-On 16.12.2016 20:13, Richard Henderson wrote:
-> This is a linux-user only port, emulating a 32-bit only version of a
-> pa-2.0 cpu.  This is good enough to do well with both the gcc and glibc
-> testsuites.  Helge Deller has provided invaluable assistance testing 
-> with a more complete debian chroot.
-> 
-> What's missing:
->   * Space registers.  Since Linux sets them all equal (for a flat
->     address space) and uses them like address-space identifiers,
->     we can simply set them all to 0 and ignore them.
-> 
->   * Architecture subsets.  There's no markup for running a pure pa1.0
->     or pa1.1 cpu.  I happily accept everything up to pa2.0 at the moment.
-> 
->   * Wide mode.  While I have pa2.0 instructions, I don't support running
->     in 64-bit mode.  Since neither the linux kernel nor glibc support a
->     64-bit userland, it would be a lot more work than just adding the insns.
-> 
->   * Multimedia instructions.  These are tied to wide mode, so...
-> 
-> When squashing the patches down from my development tree, I wanted to
-> preserve Helge's contributions, so the linux-user part is more patches
-> than I would normally have preserved.
-> 
-> 
-> r~
-> 
-> 
-> Helge Deller (3):
->   linux-user: Handle TIOCSTART and TIOCSTOP
->   linux-user: Add SIOCGPGRP, SIOCGSTAMP, SIOCGSTAMPNS
->   linux-user: Add some hppa ioctls
-> 
-> Richard Henderson (23):
->   Revert "Remove remainders of HPPA backend"
->   linux-user: Support stack-grows-up in elfload.c
->   linux-user: Handle ERFKILL and EHWPOISON
->   linux-user: Handle more IPV6 sockopts
->   linux-user: Add HPPA socket.h definitions
->   linux-user: Add HPPA syscall numbers
->   linux-user: Add HPPA termbits.h
->   linux-user: Add HPPA target_syscall.h
->   linux-user: Add HPPA definitions to syscall_defs.h
->   linux-user: Add HPPA target_structs.h
->   linux-user: Add HPPA target_signal.h and target_cpu.h
->   linux-user: Add HPPA signal handling
->   linux-user: Add HPPA startup and main loop
->   target-hppa: Add softfloat specializations
->   target-hppa: Add framework and enable compilation
->   target-hppa: Add nullification framework
->   target-hppa: Implement basic arithmetic
->   target-hppa: Implement branches
->   target-hppa: Implement linux-user gateway page
->   target-hppa: Implement shifts and deposits
->   target-hppa: Implement loads and stores
->   target-hppa: Implement system and memory-management insns
->   target-hppa: Implement floating-point insns
-> 
->  configure                           |    7 +-
->  default-configs/hppa-linux-user.mak |    1 +
->  disas.c                             |    2 +
->  disas/Makefile.objs                 |    1 +
->  disas/hppa.c                        | 2832 +++++++++++++++++++++++++
->  fpu/softfloat-specialize.h          |   20 +-
->  linux-user/alpha/target_syscall.h   |    2 +
->  linux-user/elfload.c                |  259 ++-
->  linux-user/errno_defs.h             |    3 +
->  linux-user/hppa/sockbits.h          |   97 +
->  linux-user/hppa/syscall_nr.h        |  353 ++++
->  linux-user/hppa/target_cpu.h        |   35 +
->  linux-user/hppa/target_signal.h     |   29 +
->  linux-user/hppa/target_structs.h    |   54 +
->  linux-user/hppa/target_syscall.h    |  237 +++
->  linux-user/hppa/termbits.h          |  219 ++
->  linux-user/ioctls.h                 |    8 +
->  linux-user/main.c                   |  185 +-
->  linux-user/mips/target_syscall.h    |    5 +
->  linux-user/mips64/target_syscall.h  |    5 +
->  linux-user/qemu.h                   |    3 +
->  linux-user/signal.c                 |  191 +-
->  linux-user/socket.h                 |    2 +
->  linux-user/syscall.c                |   41 +-
->  linux-user/syscall_defs.h           |  154 +-
->  linux-user/syscall_types.h          |    6 +
->  target-hppa/Makefile.objs           |    1 +
->  target-hppa/cpu-qom.h               |   52 +
->  target-hppa/cpu.c                   |  165 ++
->  target-hppa/cpu.h                   |  144 ++
->  target-hppa/gdbstub.c               |  111 +
->  target-hppa/helper.c                |  137 ++
->  target-hppa/helper.h                |   66 +
->  target-hppa/op_helper.c             |  570 +++++
->  target-hppa/translate.c             | 3946 +++++++++++++++++++++++++++++++++++
->  35 files changed, 9864 insertions(+), 79 deletions(-)
->  create mode 100644 default-configs/hppa-linux-user.mak
->  create mode 100644 disas/hppa.c
->  create mode 100644 linux-user/hppa/sockbits.h
->  create mode 100644 linux-user/hppa/syscall_nr.h
->  create mode 100644 linux-user/hppa/target_cpu.h
->  create mode 100644 linux-user/hppa/target_signal.h
->  create mode 100644 linux-user/hppa/target_structs.h
->  create mode 100644 linux-user/hppa/target_syscall.h
->  create mode 100644 linux-user/hppa/termbits.h
->  create mode 100644 target-hppa/Makefile.objs
->  create mode 100644 target-hppa/cpu-qom.h
->  create mode 100644 target-hppa/cpu.c
->  create mode 100644 target-hppa/cpu.h
->  create mode 100644 target-hppa/gdbstub.c
->  create mode 100644 target-hppa/helper.c
->  create mode 100644 target-hppa/helper.h
->  create mode 100644 target-hppa/op_helper.c
->  create mode 100644 target-hppa/translate.c
+>=20
+> On 16 Dec 2016, at 14:19 PM, Dr. David Alan Gilbert =
+<dgilbert@redhat.com> wrote:
+>=20
+> * Dr. David Alan Gilbert (git) (dgilbert@redhat.com) wrote:
+>> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>>=20
+>> Fairly simple mechanical conversion of all fields.
+>>=20
+>> TODO!!!!
+>> The problem is vmxnet3-ring size/cell_size/next are declared as =
+size_t
+>> but written as 32bit.
+>=20
+> Oops, I should have removed that warning in the commit message when
+> I added the 1st patch in.
 
-IMHO we should not add new targets without having somebody volunteering
-to look after them, too. So there should be an update to MAINTAINERS
-here, too, even if it's just for "Odd fixes". So could you or Helge
-please volunteer for the maintainers job here, too?
 
- Thanks,
-  Thomas
+
+Acked-by: Dmitry Fleytman <dmitry@daynix.com>
+
+>=20
+> Dave
+>=20
+>> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>> ---
+>> hw/net/vmxnet3.c | 272 =
+++++++++++++++++++-------------------------------------
+>> 1 file changed, 90 insertions(+), 182 deletions(-)
+>>=20
+>> diff --git a/hw/net/vmxnet3.c b/hw/net/vmxnet3.c
+>> index 7853174..4f7dbaf 100644
+>> --- a/hw/net/vmxnet3.c
+>> +++ b/hw/net/vmxnet3.c
+>> @@ -2403,155 +2403,87 @@ static const VMStateDescription =
+vmxstate_vmxnet3_mcast_list =3D {
+>>     }
+>> };
+>>=20
+>> -static void vmxnet3_get_ring_from_file(QEMUFile *f, Vmxnet3Ring *r)
+>> -{
+>> -    r->pa =3D qemu_get_be64(f);
+>> -    r->size =3D qemu_get_be32(f);
+>> -    r->cell_size =3D qemu_get_be32(f);
+>> -    r->next =3D qemu_get_be32(f);
+>> -    r->gen =3D qemu_get_byte(f);
+>> -}
+>> -
+>> -static void vmxnet3_put_ring_to_file(QEMUFile *f, Vmxnet3Ring *r)
+>> -{
+>> -    qemu_put_be64(f, r->pa);
+>> -    qemu_put_be32(f, r->size);
+>> -    qemu_put_be32(f, r->cell_size);
+>> -    qemu_put_be32(f, r->next);
+>> -    qemu_put_byte(f, r->gen);
+>> -}
+>> -
+>> -static void vmxnet3_get_tx_stats_from_file(QEMUFile *f,
+>> -    struct UPT1_TxStats *tx_stat)
+>> -{
+>> -    tx_stat->TSOPktsTxOK =3D qemu_get_be64(f);
+>> -    tx_stat->TSOBytesTxOK =3D qemu_get_be64(f);
+>> -    tx_stat->ucastPktsTxOK =3D qemu_get_be64(f);
+>> -    tx_stat->ucastBytesTxOK =3D qemu_get_be64(f);
+>> -    tx_stat->mcastPktsTxOK =3D qemu_get_be64(f);
+>> -    tx_stat->mcastBytesTxOK =3D qemu_get_be64(f);
+>> -    tx_stat->bcastPktsTxOK =3D qemu_get_be64(f);
+>> -    tx_stat->bcastBytesTxOK =3D qemu_get_be64(f);
+>> -    tx_stat->pktsTxError =3D qemu_get_be64(f);
+>> -    tx_stat->pktsTxDiscard =3D qemu_get_be64(f);
+>> -}
+>> -
+>> -static void vmxnet3_put_tx_stats_to_file(QEMUFile *f,
+>> -    struct UPT1_TxStats *tx_stat)
+>> -{
+>> -    qemu_put_be64(f, tx_stat->TSOPktsTxOK);
+>> -    qemu_put_be64(f, tx_stat->TSOBytesTxOK);
+>> -    qemu_put_be64(f, tx_stat->ucastPktsTxOK);
+>> -    qemu_put_be64(f, tx_stat->ucastBytesTxOK);
+>> -    qemu_put_be64(f, tx_stat->mcastPktsTxOK);
+>> -    qemu_put_be64(f, tx_stat->mcastBytesTxOK);
+>> -    qemu_put_be64(f, tx_stat->bcastPktsTxOK);
+>> -    qemu_put_be64(f, tx_stat->bcastBytesTxOK);
+>> -    qemu_put_be64(f, tx_stat->pktsTxError);
+>> -    qemu_put_be64(f, tx_stat->pktsTxDiscard);
+>> -}
+>> -
+>> -static int vmxnet3_get_txq_descr(QEMUFile *f, void *pv, size_t size,
+>> -    VMStateField *field)
+>> -{
+>> -    Vmxnet3TxqDescr *r =3D pv;
+>> -
+>> -    vmxnet3_get_ring_from_file(f, &r->tx_ring);
+>> -    vmxnet3_get_ring_from_file(f, &r->comp_ring);
+>> -    r->intr_idx =3D qemu_get_byte(f);
+>> -    r->tx_stats_pa =3D qemu_get_be64(f);
+>> -
+>> -    vmxnet3_get_tx_stats_from_file(f, &r->txq_stats);
+>> -
+>> -    return 0;
+>> -}
+>> -
+>> -static int vmxnet3_put_txq_descr(QEMUFile *f, void *pv, size_t size,
+>> -                                 VMStateField *field, QJSON *vmdesc)
+>> -{
+>> -    Vmxnet3TxqDescr *r =3D pv;
+>> -
+>> -    vmxnet3_put_ring_to_file(f, &r->tx_ring);
+>> -    vmxnet3_put_ring_to_file(f, &r->comp_ring);
+>> -    qemu_put_byte(f, r->intr_idx);
+>> -    qemu_put_be64(f, r->tx_stats_pa);
+>> -    vmxnet3_put_tx_stats_to_file(f, &r->txq_stats);
+>> -
+>> -    return 0;
+>> -}
+>> -
+>> -static const VMStateInfo txq_descr_info =3D {
+>> -    .name =3D "txq_descr",
+>> -    .get =3D vmxnet3_get_txq_descr,
+>> -    .put =3D vmxnet3_put_txq_descr
+>> +static const VMStateDescription vmstate_vmxnet3_ring =3D {
+>> +    .name =3D "vmxnet3-ring",
+>> +    .version_id =3D 0,
+>> +    .fields =3D (VMStateField[]) {
+>> +        VMSTATE_UINT64(pa, Vmxnet3Ring),
+>> +        VMSTATE_UINT32(size, Vmxnet3Ring),
+>> +        VMSTATE_UINT32(cell_size, Vmxnet3Ring),
+>> +        VMSTATE_UINT32(next, Vmxnet3Ring),
+>> +        VMSTATE_UINT8(gen, Vmxnet3Ring),
+>> +        VMSTATE_END_OF_LIST()
+>> +    }
+>> };
+>>=20
+>> -static void vmxnet3_get_rx_stats_from_file(QEMUFile *f,
+>> -    struct UPT1_RxStats *rx_stat)
+>> -{
+>> -    rx_stat->LROPktsRxOK =3D qemu_get_be64(f);
+>> -    rx_stat->LROBytesRxOK =3D qemu_get_be64(f);
+>> -    rx_stat->ucastPktsRxOK =3D qemu_get_be64(f);
+>> -    rx_stat->ucastBytesRxOK =3D qemu_get_be64(f);
+>> -    rx_stat->mcastPktsRxOK =3D qemu_get_be64(f);
+>> -    rx_stat->mcastBytesRxOK =3D qemu_get_be64(f);
+>> -    rx_stat->bcastPktsRxOK =3D qemu_get_be64(f);
+>> -    rx_stat->bcastBytesRxOK =3D qemu_get_be64(f);
+>> -    rx_stat->pktsRxOutOfBuf =3D qemu_get_be64(f);
+>> -    rx_stat->pktsRxError =3D qemu_get_be64(f);
+>> -}
+>> -
+>> -static void vmxnet3_put_rx_stats_to_file(QEMUFile *f,
+>> -    struct UPT1_RxStats *rx_stat)
+>> -{
+>> -    qemu_put_be64(f, rx_stat->LROPktsRxOK);
+>> -    qemu_put_be64(f, rx_stat->LROBytesRxOK);
+>> -    qemu_put_be64(f, rx_stat->ucastPktsRxOK);
+>> -    qemu_put_be64(f, rx_stat->ucastBytesRxOK);
+>> -    qemu_put_be64(f, rx_stat->mcastPktsRxOK);
+>> -    qemu_put_be64(f, rx_stat->mcastBytesRxOK);
+>> -    qemu_put_be64(f, rx_stat->bcastPktsRxOK);
+>> -    qemu_put_be64(f, rx_stat->bcastBytesRxOK);
+>> -    qemu_put_be64(f, rx_stat->pktsRxOutOfBuf);
+>> -    qemu_put_be64(f, rx_stat->pktsRxError);
+>> -}
+>> -
+>> -static int vmxnet3_get_rxq_descr(QEMUFile *f, void *pv, size_t size,
+>> -    VMStateField *field)
+>> -{
+>> -    Vmxnet3RxqDescr *r =3D pv;
+>> -    int i;
+>> -
+>> -    for (i =3D 0; i < VMXNET3_RX_RINGS_PER_QUEUE; i++) {
+>> -        vmxnet3_get_ring_from_file(f, &r->rx_ring[i]);
+>> +static const VMStateDescription vmstate_vmxnet3_tx_stats =3D {
+>> +    .name =3D "vmxnet3-tx-stats",
+>> +    .version_id =3D 0,
+>> +    .fields =3D (VMStateField[]) {
+>> +        VMSTATE_UINT64(TSOPktsTxOK, struct UPT1_TxStats),
+>> +        VMSTATE_UINT64(TSOBytesTxOK, struct UPT1_TxStats),
+>> +        VMSTATE_UINT64(ucastPktsTxOK, struct UPT1_TxStats),
+>> +        VMSTATE_UINT64(ucastBytesTxOK, struct UPT1_TxStats),
+>> +        VMSTATE_UINT64(mcastPktsTxOK, struct UPT1_TxStats),
+>> +        VMSTATE_UINT64(mcastBytesTxOK, struct UPT1_TxStats),
+>> +        VMSTATE_UINT64(bcastPktsTxOK, struct UPT1_TxStats),
+>> +        VMSTATE_UINT64(bcastBytesTxOK, struct UPT1_TxStats),
+>> +        VMSTATE_UINT64(pktsTxError, struct UPT1_TxStats),
+>> +        VMSTATE_UINT64(pktsTxDiscard, struct UPT1_TxStats),
+>> +        VMSTATE_END_OF_LIST()
+>>     }
+>> +};
+>>=20
+>> -    vmxnet3_get_ring_from_file(f, &r->comp_ring);
+>> -    r->intr_idx =3D qemu_get_byte(f);
+>> -    r->rx_stats_pa =3D qemu_get_be64(f);
+>> -
+>> -    vmxnet3_get_rx_stats_from_file(f, &r->rxq_stats);
+>> -
+>> -    return 0;
+>> -}
+>> -
+>> -static int vmxnet3_put_rxq_descr(QEMUFile *f, void *pv, size_t size,
+>> -                                 VMStateField *field, QJSON *vmdesc)
+>> -{
+>> -    Vmxnet3RxqDescr *r =3D pv;
+>> -    int i;
+>> -
+>> -    for (i =3D 0; i < VMXNET3_RX_RINGS_PER_QUEUE; i++) {
+>> -        vmxnet3_put_ring_to_file(f, &r->rx_ring[i]);
+>> +static const VMStateDescription vmstate_vmxnet3_txq_descr =3D {
+>> +    .name =3D "vmxnet3-txq-descr",
+>> +    .version_id =3D 0,
+>> +    .fields =3D (VMStateField[]) {
+>> +        VMSTATE_STRUCT(tx_ring, Vmxnet3TxqDescr, 0, =
+vmstate_vmxnet3_ring,
+>> +                       Vmxnet3Ring),
+>> +        VMSTATE_STRUCT(comp_ring, Vmxnet3TxqDescr, 0, =
+vmstate_vmxnet3_ring,
+>> +                       Vmxnet3Ring),
+>> +        VMSTATE_UINT8(intr_idx, Vmxnet3TxqDescr),
+>> +        VMSTATE_UINT64(tx_stats_pa, Vmxnet3TxqDescr),
+>> +        VMSTATE_STRUCT(txq_stats, Vmxnet3TxqDescr, 0, =
+vmstate_vmxnet3_tx_stats,
+>> +                       struct UPT1_TxStats),
+>> +        VMSTATE_END_OF_LIST()
+>>     }
+>> +};
+>>=20
+>> -    vmxnet3_put_ring_to_file(f, &r->comp_ring);
+>> -    qemu_put_byte(f, r->intr_idx);
+>> -    qemu_put_be64(f, r->rx_stats_pa);
+>> -    vmxnet3_put_rx_stats_to_file(f, &r->rxq_stats);
+>> +static const VMStateDescription vmstate_vmxnet3_rx_stats =3D {
+>> +    .name =3D "vmxnet3-rx-stats",
+>> +    .version_id =3D 0,
+>> +    .fields =3D (VMStateField[]) {
+>> +        VMSTATE_UINT64(LROPktsRxOK, struct UPT1_RxStats),
+>> +        VMSTATE_UINT64(LROBytesRxOK, struct UPT1_RxStats),
+>> +        VMSTATE_UINT64(ucastPktsRxOK, struct UPT1_RxStats),
+>> +        VMSTATE_UINT64(ucastBytesRxOK, struct UPT1_RxStats),
+>> +        VMSTATE_UINT64(mcastPktsRxOK, struct UPT1_RxStats),
+>> +        VMSTATE_UINT64(mcastBytesRxOK, struct UPT1_RxStats),
+>> +        VMSTATE_UINT64(bcastPktsRxOK, struct UPT1_RxStats),
+>> +        VMSTATE_UINT64(bcastBytesRxOK, struct UPT1_RxStats),
+>> +        VMSTATE_UINT64(pktsRxOutOfBuf, struct UPT1_RxStats),
+>> +        VMSTATE_UINT64(pktsRxError, struct UPT1_RxStats),
+>> +        VMSTATE_END_OF_LIST()
+>> +    }
+>> +};
+>>=20
+>> -    return 0;
+>> -}
+>> +static const VMStateDescription vmstate_vmxnet3_rxq_descr =3D {
+>> +    .name =3D "vmxnet3-rxq-descr",
+>> +    .version_id =3D 0,
+>> +    .fields =3D (VMStateField[]) {
+>> +        VMSTATE_STRUCT_ARRAY(rx_ring, Vmxnet3RxqDescr,
+>> +                             VMXNET3_RX_RINGS_PER_QUEUE, 0,
+>> +                             vmstate_vmxnet3_ring, Vmxnet3Ring),
+>> +        VMSTATE_STRUCT(comp_ring, Vmxnet3RxqDescr, 0, =
+vmstate_vmxnet3_ring,
+>> +                       Vmxnet3Ring),
+>> +        VMSTATE_UINT8(intr_idx, Vmxnet3RxqDescr),
+>> +        VMSTATE_UINT64(rx_stats_pa, Vmxnet3RxqDescr),
+>> +        VMSTATE_STRUCT(rxq_stats, Vmxnet3RxqDescr, 0, =
+vmstate_vmxnet3_rx_stats,
+>> +                       struct UPT1_RxStats),
+>> +        VMSTATE_END_OF_LIST()
+>> +    }
+>> +};
+>>=20
+>> static int vmxnet3_post_load(void *opaque, int version_id)
+>> {
+>> @@ -2577,40 +2509,15 @@ static int vmxnet3_post_load(void *opaque, =
+int version_id)
+>>     return 0;
+>> }
+>>=20
+>> -static const VMStateInfo rxq_descr_info =3D {
+>> -    .name =3D "rxq_descr",
+>> -    .get =3D vmxnet3_get_rxq_descr,
+>> -    .put =3D vmxnet3_put_rxq_descr
+>> -};
+>> -
+>> -static int vmxnet3_get_int_state(QEMUFile *f, void *pv, size_t size,
+>> -    VMStateField *field)
+>> -{
+>> -    Vmxnet3IntState *r =3D pv;
+>> -
+>> -    r->is_masked =3D qemu_get_byte(f);
+>> -    r->is_pending =3D qemu_get_byte(f);
+>> -    r->is_asserted =3D qemu_get_byte(f);
+>> -
+>> -    return 0;
+>> -}
+>> -
+>> -static int vmxnet3_put_int_state(QEMUFile *f, void *pv, size_t size,
+>> -                                 VMStateField *field, QJSON *vmdesc)
+>> -{
+>> -    Vmxnet3IntState *r =3D pv;
+>> -
+>> -    qemu_put_byte(f, r->is_masked);
+>> -    qemu_put_byte(f, r->is_pending);
+>> -    qemu_put_byte(f, r->is_asserted);
+>> -
+>> -    return 0;
+>> -}
+>> -
+>> -static const VMStateInfo int_state_info =3D {
+>> -    .name =3D "int_state",
+>> -    .get =3D vmxnet3_get_int_state,
+>> -    .put =3D vmxnet3_put_int_state
+>> +static const VMStateDescription vmstate_vmxnet3_int_state =3D {
+>> +    .name =3D "vmxnet3-int-state",
+>> +    .version_id =3D 0,
+>> +    .fields =3D (VMStateField[]) {
+>> +        VMSTATE_BOOL(is_masked, Vmxnet3IntState),
+>> +        VMSTATE_BOOL(is_pending, Vmxnet3IntState),
+>> +        VMSTATE_BOOL(is_asserted, Vmxnet3IntState),
+>> +        VMSTATE_END_OF_LIST()
+>> +    }
+>> };
+>>=20
+>> static bool vmxnet3_vmstate_need_pcie_device(void *opaque)
+>> @@ -2667,14 +2574,15 @@ static const VMStateDescription =
+vmstate_vmxnet3 =3D {
+>>             VMSTATE_UINT64(drv_shmem, VMXNET3State),
+>>             VMSTATE_UINT64(temp_shared_guest_driver_memory, =
+VMXNET3State),
+>>=20
+>> -            VMSTATE_ARRAY(txq_descr, VMXNET3State,
+>> -                VMXNET3_DEVICE_MAX_TX_QUEUES, 0, txq_descr_info,
+>> +            VMSTATE_STRUCT_ARRAY(txq_descr, VMXNET3State,
+>> +                VMXNET3_DEVICE_MAX_TX_QUEUES, 0, =
+vmstate_vmxnet3_txq_descr,
+>>                 Vmxnet3TxqDescr),
+>> -            VMSTATE_ARRAY(rxq_descr, VMXNET3State,
+>> -                VMXNET3_DEVICE_MAX_RX_QUEUES, 0, rxq_descr_info,
+>> +            VMSTATE_STRUCT_ARRAY(rxq_descr, VMXNET3State,
+>> +                VMXNET3_DEVICE_MAX_RX_QUEUES, 0, =
+vmstate_vmxnet3_rxq_descr,
+>>                 Vmxnet3RxqDescr),
+>> -            VMSTATE_ARRAY(interrupt_states, VMXNET3State, =
+VMXNET3_MAX_INTRS,
+>> -                0, int_state_info, Vmxnet3IntState),
+>> +            VMSTATE_STRUCT_ARRAY(interrupt_states, VMXNET3State,
+>> +                VMXNET3_MAX_INTRS, 0, vmstate_vmxnet3_int_state,
+>> +                Vmxnet3IntState),
+>>=20
+>>             VMSTATE_END_OF_LIST()
+>>     },
+>> --=20
+>> 2.9.3
+>>=20
+>>=20
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
