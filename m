@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58608)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59160)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.l.liu@linux.intel.com>) id 1cIthu-0005GM-4f
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 03:54:07 -0500
+	(envelope-from <yi.l.liu@linux.intel.com>) id 1cItl4-0007Sk-I6
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 03:57:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.l.liu@linux.intel.com>) id 1cIthp-0000Vl-9y
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 03:54:06 -0500
-Received: from mga07.intel.com ([134.134.136.100]:5161)
+	(envelope-from <yi.l.liu@linux.intel.com>) id 1cItl0-0002HK-Ki
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 03:57:22 -0500
+Received: from mga04.intel.com ([192.55.52.120]:39625)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <yi.l.liu@linux.intel.com>)
-	id 1cItho-0000N0-UI
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 03:54:01 -0500
-Date: Sun, 18 Dec 2016 16:39:11 +0800
+	id 1cItl0-0002H9-8N
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 03:57:18 -0500
+Date: Sun, 18 Dec 2016 16:42:50 +0800
 From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
-Message-ID: <20161218083911.GA24337@gmail.com>
+Message-ID: <20161218084250.GB24337@gmail.com>
 References: <1481020588-4245-1-git-send-email-peterx@redhat.com>
-	<1481020588-4245-4-git-send-email-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1481020588-4245-4-git-send-email-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 03/13] intel_iommu: renaming gpa to
- iova where proper
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <1481020588-4245-1-git-send-email-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 00/13] VT-d replay and misc cleanup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,143 +31,161 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Xu <peterx@redhat.com>
 Cc: kevin.tian@intel.com, tianyu.lan@intel.com, jasowang@redhat.com, qemu-devel@nongnu.org, yi.l.liu@intel.com
 
-On Tue, Dec 06, 2016 at 06:36:18PM +0800, Peter Xu wrote:
-> There are lots of places in current intel_iommu.c codes that named
-> "iova" as "gpa". It is really confusing to use a name "gpa" in these
-> places (which is very easily to be understood as "Guest Physical
-> Address", while it's not). To make the codes (much) easier to be read, I
-> decided to do this once and for all.
+On Tue, Dec 06, 2016 at 06:36:15PM +0800, Peter Xu wrote:
+> This RFC series is a continue work for Aviv B.D.'s vfio enablement
+> series with vt-d. Aviv has done a great job there, and what we still
+> lack there are mostly the following:
 > 
-> No functional change is made. Only literal ones.
+> (1) VFIO got duplicated IOTLB notifications due to splitted VT-d IOMMU
+>     memory region.
 > 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  hw/i386/intel_iommu.c | 46 +++++++++++++++++++++++-----------------------
->  1 file changed, 23 insertions(+), 23 deletions(-)
+> (2) VT-d still haven't provide a correct replay() mechanism (e.g.,
+>     when IOMMU domain switches, things will broke).
 > 
-> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> index f19a8b3..3d98797 100644
-> --- a/hw/i386/intel_iommu.c
-> +++ b/hw/i386/intel_iommu.c
-> @@ -279,7 +279,7 @@ static void vtd_update_iotlb(IntelIOMMUState *s, uint16_t source_id,
->      uint64_t *key = g_malloc(sizeof(*key));
->      uint64_t gfn = vtd_get_iotlb_gfn(addr, level);
->  
-> -    VTD_DPRINTF(CACHE, "update iotlb sid 0x%"PRIx16 " gpa 0x%"PRIx64
-> +    VTD_DPRINTF(CACHE, "update iotlb sid 0x%"PRIx16 " iova 0x%"PRIx64
->                  " slpte 0x%"PRIx64 " did 0x%"PRIx16, source_id, addr, slpte,
->                  domain_id);
->      if (g_hash_table_size(s->iotlb) >= VTD_IOTLB_MAX_SIZE) {
-> @@ -595,12 +595,12 @@ static uint64_t vtd_get_slpte(dma_addr_t base_addr, uint32_t index)
->      return slpte;
->  }
->  
-> -/* Given a gpa and the level of paging structure, return the offset of current
-> - * level.
-> +/* Given a iova and the level of paging structure, return the offset
-maybe "an iova" instead of "a iova"
-> + * of current level.
->   */
-> -static inline uint32_t vtd_gpa_level_offset(uint64_t gpa, uint32_t level)
-> +static inline uint32_t vtd_iova_level_offset(uint64_t iova, uint32_t level)
->  {
-> -    return (gpa >> vtd_slpt_level_shift(level)) &
-> +    return (iova >> vtd_slpt_level_shift(level)) &
->              ((1ULL << VTD_SL_LEVEL_BITS) - 1);
->  }
->  
-> @@ -648,13 +648,13 @@ static bool vtd_slpte_nonzero_rsvd(uint64_t slpte, uint32_t level)
->      }
->  }
->  
-> -/* Given the @gpa, get relevant @slptep. @slpte_level will be the last level
-> +/* Given the @iova, get relevant @slptep. @slpte_level will be the last level
->   * of the translation, can be used for deciding the size of large page.
->   */
-> -static int vtd_gpa_to_slpte(VTDContextEntry *ce, uint64_t gpa,
-> -                            IOMMUAccessFlags flags,
-> -                            uint64_t *slptep, uint32_t *slpte_level,
-> -                            bool *reads, bool *writes)
-> +static int vtd_iova_to_slpte(VTDContextEntry *ce, uint64_t iova,
-> +                             IOMMUAccessFlags flags,
-> +                             uint64_t *slptep, uint32_t *slpte_level,
-> +                             bool *reads, bool *writes)
->  {
->      dma_addr_t addr = vtd_get_slpt_base_from_context(ce);
->      uint32_t level = vtd_get_level_from_context_entry(ce);
-> @@ -663,11 +663,11 @@ static int vtd_gpa_to_slpte(VTDContextEntry *ce, uint64_t gpa,
->      uint32_t ce_agaw = vtd_get_agaw_from_context_entry(ce);
->      uint64_t access_right_check = 0;
->  
-> -    /* Check if @gpa is above 2^X-1, where X is the minimum of MGAW in CAP_REG
-> -     * and AW in context-entry.
-> +    /* Check if @iova is above 2^X-1, where X is the minimum of MGAW
-> +     * in CAP_REG and AW in context-entry.
->       */
-> -    if (gpa & ~((1ULL << MIN(ce_agaw, VTD_MGAW)) - 1)) {
-> -        VTD_DPRINTF(GENERAL, "error: gpa 0x%"PRIx64 " exceeds limits", gpa);
-> +    if (iova & ~((1ULL << MIN(ce_agaw, VTD_MGAW)) - 1)) {
-> +        VTD_DPRINTF(GENERAL, "error: iova 0x%"PRIx64 " exceeds limits", iova);
->          return -VTD_FR_ADDR_BEYOND_MGAW;
->      }
->  
-> @@ -683,13 +683,13 @@ static int vtd_gpa_to_slpte(VTDContextEntry *ce, uint64_t gpa,
->      }
->  
->      while (true) {
-> -        offset = vtd_gpa_level_offset(gpa, level);
-> +        offset = vtd_iova_level_offset(iova, level);
->          slpte = vtd_get_slpte(addr, offset);
->  
->          if (slpte == (uint64_t)-1) {
->              VTD_DPRINTF(GENERAL, "error: fail to access second-level paging "
-> -                        "entry at level %"PRIu32 " for gpa 0x%"PRIx64,
-> -                        level, gpa);
-> +                        "entry at level %"PRIu32 " for iova 0x%"PRIx64,
-> +                        level, iova);
->              if (level == vtd_get_level_from_context_entry(ce)) {
->                  /* Invalid programming of context-entry */
->                  return -VTD_FR_CONTEXT_ENTRY_INV;
-> @@ -701,8 +701,8 @@ static int vtd_gpa_to_slpte(VTDContextEntry *ce, uint64_t gpa,
->          *writes = (*writes) && (slpte & VTD_SL_W);
->          if (!(slpte & access_right_check) && !(flags & IOMMU_NO_FAIL)) {
->              VTD_DPRINTF(GENERAL, "error: lack of %s permission for "
-> -                        "gpa 0x%"PRIx64 " slpte 0x%"PRIx64,
-> -                        (flags & IOMMU_WO ? "write" : "read"), gpa, slpte);
-> +                        "iova 0x%"PRIx64 " slpte 0x%"PRIx64,
-> +                        (flags & IOMMU_WO ? "write" : "read"), iova, slpte);
->              return (flags & IOMMU_WO) ? -VTD_FR_WRITE : -VTD_FR_READ;
->          }
->          if (vtd_slpte_nonzero_rsvd(slpte, level)) {
-> @@ -851,7 +851,7 @@ static void vtd_do_iommu_translate(VTDAddressSpace *vtd_as, PCIBus *bus,
->      /* Try to fetch slpte form IOTLB */
->      iotlb_entry = vtd_lookup_iotlb(s, source_id, addr);
->      if (iotlb_entry) {
-> -        VTD_DPRINTF(CACHE, "hit iotlb sid 0x%"PRIx16 " gpa 0x%"PRIx64
-> +        VTD_DPRINTF(CACHE, "hit iotlb sid 0x%"PRIx16 " iova 0x%"PRIx64
->                      " slpte 0x%"PRIx64 " did 0x%"PRIx16, source_id, addr,
->                      iotlb_entry->slpte, iotlb_entry->domain_id);
->          slpte = iotlb_entry->slpte;
-> @@ -894,8 +894,8 @@ static void vtd_do_iommu_translate(VTDAddressSpace *vtd_as, PCIBus *bus,
->          cc_entry->context_cache_gen = s->context_cache_gen;
->      }
->  
-> -    ret_fr = vtd_gpa_to_slpte(&ce, addr, flags, &slpte, &level,
-> -                              &reads, &writes);
-> +    ret_fr = vtd_iova_to_slpte(&ce, addr, flags, &slpte, &level,
-> +                               &reads, &writes);
->      if (ret_fr) {
->          ret_fr = -ret_fr;
->          if (!(flags & IOMMU_NO_FAIL)) {
-> @@ -2032,7 +2032,7 @@ static IOMMUTLBEntry vtd_iommu_translate(MemoryRegion *iommu, hwaddr addr,
->                             flags, &ret);
->      VTD_DPRINTF(MMU,
->                  "bus %"PRIu8 " slot %"PRIu8 " func %"PRIu8 " devfn %"PRIu8
-> -                " gpa 0x%"PRIx64 " hpa 0x%"PRIx64, pci_bus_num(vtd_as->bus),
-> +                " iova 0x%"PRIx64 " hpa 0x%"PRIx64, pci_bus_num(vtd_as->bus),
->                  VTD_PCI_SLOT(vtd_as->devfn), VTD_PCI_FUNC(vtd_as->devfn),
->                  vtd_as->devfn, addr, ret.translated_addr);
->      return ret;
+> Here I'm trying to solve the above two issues.
+> 
+> (1) is solved by patch 7, (2) is solved by patch 11-12.
+> 
+> Basically it contains the following:
+> 
+> patch 1:    picked up from Jason's vhost DMAR series, which is a bugfix
+> 
+> patch 2-6:  Cleanups/Enhancements for existing vt-d codes (please see
+>             specific commit message for details, there are patches
+>             that I thought may be suitable for 2.8 as well, but looks
+>             like it's too late)
+> 
+> patch 7:    Solve the issue that vfio is notified more than once for
+>             IOTLB notifications with Aviv's patches
+> 
+> patch 8-10: Some trivial memory APIs added for further patches, and
+>             add customize replay() support for MemoryRegion (I see
+>             Aviv's latest v7 contains similar replay, I can rebase
+>             onto that, merely the same thing)
+> 
+> patch 11:   Provide a valid vt-d replay() callback, using page walk
+> 
+Peter,
+Does your patch set based on Aviv's patch？ I found the page cannot be
+applied in my side.
+
+BTW. it may be better if you can split the patches for mis cleanup
+and the patches for replay/"fix duplicate notify".
+
+Thanks,
+Yi L
+> patch 12:   Enable the domain switch support - we replay() when
+>             context entry got invalidated
+> 
+> patch 13:   Enhancement for existing invalidation notification,
+>             instead of using translate() for each page, we leverage
+>             the new vtd_page_walk() interface, which should be faster.
+> 
+> I would glad to hear about any review comments for above patches
+> (especially patch 8-13, which is the main part of this series),
+> especially any issue I missed in the series.
+> 
+> =========
+> Test Done
+> =========
+> 
+> Build test passed for x86_64/arm/ppc64.
+> 
+> Simply tested with x86_64, assigning two PCI devices to a single VM,
+> boot the VM using:
+> 
+> bin=x86_64-softmmu/qemu-system-x86_64
+> $bin -M q35,accel=kvm,kernel-irqchip=split -m 1G \
+>      -device intel-iommu,intremap=on,eim=off,cache-mode=on \
+>      -netdev user,id=net0,hostfwd=tcp::5555-:22 \
+>      -device virtio-net-pci,netdev=net0 \
+>      -device vfio-pci,host=03:00.0 \
+>      -device vfio-pci,host=02:00.0 \
+>      -trace events=".trace.vfio" \
+>      /var/lib/libvirt/images/vm1.qcow2
+> 
+> pxdev:bin [vtd-vfio-enablement]# cat .trace.vfio
+> vtd_page_walk*
+> vtd_replay*
+> vtd_inv_desc*
+> 
+> Then, in the guest, run the following tool:
+> 
+>   https://github.com/xzpeter/clibs/blob/master/gpl/userspace/vfio-bind-group/vfio-bind-group.c
+> 
+> With parameter:
+> 
+>   ./vfio-bind-group 00:03.0 00:04.0
+> 
+> Check host side trace log, I can see pages are replayed and mapped in
+> 00:04.0 device address space, like:
+> 
+> ...
+> vtd_replay_ce_valid replay valid context device 00:04.00 hi 0x301 lo 0x3be77001
+> vtd_page_walk Page walk for ce (0x301, 0x3be77001) iova range 0x0 - 0x8000000000
+> vtd_page_walk_level Page walk (base=0x3be77000, level=3) iova range 0x0 - 0x8000000000
+> vtd_page_walk_level Page walk (base=0x3c88a000, level=2) iova range 0x0 - 0x40000000
+> vtd_page_walk_level Page walk (base=0x366cb000, level=1) iova range 0x0 - 0x200000
+> vtd_page_walk_one Page walk detected map level 0x1 iova 0x0 -> gpa 0x366cb000 mask 0xfff perm 3
+> vtd_page_walk_one Page walk detected map level 0x1 iova 0x1000 -> gpa 0x366cb000 mask 0xfff perm 3
+> vtd_page_walk_one Page walk detected map level 0x1 iova 0x2000 -> gpa 0x366cb000 mask 0xfff perm 3
+> vtd_page_walk_one Page walk detected map level 0x1 iova 0x3000 -> gpa 0x366cb000 mask 0xfff perm 3
+> vtd_page_walk_one Page walk detected map level 0x1 iova 0x4000 -> gpa 0x366cb000 mask 0xfff perm 3
+> vtd_page_walk_one Page walk detected map level 0x1 iova 0x5000 -> gpa 0x366cb000 mask 0xfff perm 3
+> vtd_page_walk_one Page walk detected map level 0x1 iova 0x6000 -> gpa 0x366cb000 mask 0xfff perm 3
+> vtd_page_walk_one Page walk detected map level 0x1 iova 0x7000 -> gpa 0x366cb000 mask 0xfff perm 3
+> vtd_page_walk_one Page walk detected map level 0x1 iova 0x8000 -> gpa 0x366cb000 mask 0xfff perm 3
+> vtd_page_walk_one Page walk detected map level 0x1 iova 0x9000 -> gpa 0x366cb000 mask 0xfff perm 3
+> vtd_page_walk_one Page walk detected map level 0x1 iova 0xa000 -> gpa 0x366cb000 mask 0xfff perm 3
+> vtd_page_walk_one Page walk detected map level 0x1 iova 0xb000 -> gpa 0x366cb000 mask 0xfff perm 3
+> vtd_page_walk_one Page walk detected map level 0x1 iova 0xc000 -> gpa 0x366cb000 mask 0xfff perm 3
+> vtd_page_walk_one Page walk detected map level 0x1 iova 0xd000 -> gpa 0x366cb000 mask 0xfff perm 3
+> vtd_page_walk_one Page walk detected map level 0x1 iova 0xe000 -> gpa 0x366cb000 mask 0xfff perm 3
+> ...
+> 
+> =========
+> Todo List
+> =========
+> 
+> - error reporting for the assigned devices (as Tianyu has mentioned)
+> 
+> - per-domain address-space: A better solution in the future may be -
+>   we maintain one address space per IOMMU domain in the guest (so
+>   multiple devices can share a same address space if they are sharing
+>   the same IOMMU domains in the guest), rather than one address space
+>   per device (which is current implementation of vt-d). However that's
+>   a step further than this series, and let's see whether we can first
+>   provide a workable version of device assignment with vt-d
+>   protection.
+> 
+> - more to come...
+> 
+> Thanks,
+> 
+> Jason Wang (1):
+>   intel_iommu: allocate new key when creating new address space
+> 
+> Peter Xu (12):
+>   intel_iommu: simplify irq region translation
+>   intel_iommu: renaming gpa to iova where proper
+>   intel_iommu: fix trace for inv desc handling
+>   intel_iommu: fix trace for addr translation
+>   intel_iommu: vtd_slpt_level_shift check level
+>   memory: add section range info for IOMMU notifier
+>   memory: provide iommu_replay_all()
+>   memory: introduce memory_region_notify_one()
+>   memory: add MemoryRegionIOMMUOps.replay() callback
+>   intel_iommu: provide its own replay() callback
+>   intel_iommu: do replay when context invalidate
+>   intel_iommu: use page_walk for iotlb inv notify
+> 
+>  hw/i386/intel_iommu.c | 521 ++++++++++++++++++++++++++++++++------------------
+>  hw/i386/trace-events  |  27 +++
+>  hw/vfio/common.c      |   7 +-
+>  include/exec/memory.h |  30 +++
+>  memory.c              |  42 +++-
+>  5 files changed, 432 insertions(+), 195 deletions(-)
+> 
 > -- 
 > 2.7.4
 > 
