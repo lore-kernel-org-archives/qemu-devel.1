@@ -1,28 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50799)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52943)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cIyn4-0006xs-UR
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 09:19:51 -0500
+	(envelope-from <groug@kaod.org>) id 1cIyvL-0001PI-NA
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 09:28:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cIyn0-0007RE-1o
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 09:19:46 -0500
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:33485)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cIymz-0007QT-Q1
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 09:19:41 -0500
-Received: by mail-wm0-x243.google.com with SMTP id u144so18893138wmu.0
-	for <qemu-devel@nongnu.org>; Mon, 19 Dec 2016 06:19:41 -0800 (PST)
-Date: Mon, 19 Dec 2016 14:19:38 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20161219141938.GF17374@stefanha-x1.localdomain>
-References: <1482137486-9843-1-git-send-email-douly.fnst@cn.fujitsu.com>
-	<1482137486-9843-2-git-send-email-douly.fnst@cn.fujitsu.com>
+	(envelope-from <groug@kaod.org>) id 1cIyvI-0004zt-Lm
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 09:28:19 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38420
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cIyvI-0004z2-EU
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 09:28:16 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
+	uBJENWOi010078
+	for <qemu-devel@nongnu.org>; Mon, 19 Dec 2016 09:28:14 -0500
+Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 27egyu9dan-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 19 Dec 2016 09:28:14 -0500
+Received: from localhost
+	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
+	Mon, 19 Dec 2016 07:28:13 -0700
+From: Greg Kurz <groug@kaod.org>
+Date: Mon, 19 Dec 2016 15:28:07 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="xkXJwpr35CY/Lc3I"
-Content-Disposition: inline
-In-Reply-To: <1482137486-9843-2-git-send-email-douly.fnst@cn.fujitsu.com>
-Subject: Re: [Qemu-devel] [PATCH RFC v2 1/4] block: refactor bdrv_next_node
- for readability
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <148215768690.13973.9042496691140000163.stgit@bahia>
+Subject: [Qemu-devel] [PATCH] 9pfs: fix crash when fsdev is missing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,71 +38,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dou Liyang <douly.fnst@cn.fujitsu.com>
-Cc: stefanha@redhat.com, kwolf@redhat.com, armbru@redhat.com, mreitz@redhat.com, eblake@redhat.com, famz@redhat.com, danpb@redhat.com, izumi.taku@jp.fujitsu.com, caoj.fnst@cn.fujitsu.com, fanc.fnst@cn.fujitsu.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, liq3ea@gmail.com, qemu-stable@nongnu.org, Greg Kurz <groug@kaod.org>
 
+If the user passes -device virtio-9p without the corresponding -fsdev, QEMU
+dereferences a NULL pointer and crashes.
 
---xkXJwpr35CY/Lc3I
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This is a 2.8 regression introduced by commit 702dbcc274e2c.
 
-On Mon, Dec 19, 2016 at 04:51:23PM +0800, Dou Liyang wrote:
-> make the bdrv_next_node() clearly and add some comments.
->=20
-> Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
-> ---
->  block.c | 16 ++++++++++++----
->  1 file changed, 12 insertions(+), 4 deletions(-)
->=20
-> diff --git a/block.c b/block.c
-> index 39ddea3..01c9e51 100644
-> --- a/block.c
-> +++ b/block.c
-> @@ -2931,12 +2931,20 @@ bool bdrv_chain_contains(BlockDriverState *top, B=
-lockDriverState *base)
->      return top !=3D NULL;
->  }
-> =20
-> +/*
-> + * Return the BlockDriverStates of all the named nodes.
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+ hw/9pfs/9p.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-This sentence describes how this function is used in a loop.  The
-semantics of one call to this function are different: only a *single*
-named node's BlockDriverState is returned.
-
-> + * If @bs is null, return the first one.
-> + * Else, return @bs's next sibling, which may be null.
-> + *
-> + * To iterate over all BlockDriverStates, do
-> + * for (bs =3D bdrv_next_node(NULL); bs; bs =3D bdrv_next_node(blk)) {
-> + *     ...
-> + * }
-> + */
->  BlockDriverState *bdrv_next_node(BlockDriverState *bs)
->  {
-> -    if (!bs) {
-> -        return QTAILQ_FIRST(&graph_bdrv_states);
-> -    }
-> -    return QTAILQ_NEXT(bs, node_list);
-> +    return bs ? QTAILQ_NEXT(bs, node_list)
-> +            : QTAILQ_FIRST(&graph_bdrv_states);
-
-The conditional operator (?:) is often considered harder to read than an
-if statement.  I see no reason to modify the code.
-
---xkXJwpr35CY/Lc3I
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJYV+x6AAoJEJykq7OBq3PIsH0H/29WBGGPY3CN1eh4sIIbNQBK
-qm9A0zietb48ynabKCpQR8cAX/d1PTVeii1CqdFP7IJcmxKaFsaRt02BQ2vSjkp4
-VivQXKkH2GTO/ULqVMIcVeZACWB5aETU/9/C6jL5EBIsV58tBWiQtnTL5Jz48tzR
-U4ph4Ho/qVPAOYbyjpOYZbw9SPxEVR1EsQOm5a4HLDKEdyUTxhJsslC/hjVRodgR
-lj0ao93pHvw9shOKdH2lAbOwoBVhi2rymtYI13Oga700wujQ2suvFhsrSGqeY5I1
-ZaITuBtmCbSQno6BTsMto59irFc8ySny7j3Qfk0DQzWk5vXCe7pegvxMGQzSkW4=
-=dLre
------END PGP SIGNATURE-----
-
---xkXJwpr35CY/Lc3I--
+diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+index faebd91f5fab..68725b7a1c97 100644
+--- a/hw/9pfs/9p.c
++++ b/hw/9pfs/9p.c
+@@ -3521,7 +3521,7 @@ int v9fs_device_realize_common(V9fsState *s, Error **errp)
+     rc = 0;
+ out:
+     if (rc) {
+-        if (s->ops->cleanup && s->ctx.private) {
++        if (s->ops && s->ops->cleanup && s->ctx.private) {
+             s->ops->cleanup(&s->ctx);
+         }
+         g_free(s->tag);
