@@ -1,34 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55022)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56007)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cIvew-0008HJ-Vh
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 05:59:11 -0500
+	(envelope-from <stefanha@gmail.com>) id 1cIvjW-0001Uw-EB
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 06:03:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cIver-0005g7-E7
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 05:59:11 -0500
-Received: from mail-wj0-x22d.google.com ([2a00:1450:400c:c01::22d]:33152)
+	(envelope-from <stefanha@gmail.com>) id 1cIvjR-0008BU-Ek
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 06:03:54 -0500
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:35712)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cIver-0005e7-7q
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 05:59:05 -0500
-Received: by mail-wj0-x22d.google.com with SMTP id xy5so145529332wjc.0
-	for <qemu-devel@nongnu.org>; Mon, 19 Dec 2016 02:59:02 -0800 (PST)
-Date: Mon, 19 Dec 2016 10:58:59 +0000
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cIvjR-0008BI-88
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 06:03:49 -0500
+Received: by mail-wm0-x242.google.com with SMTP id a20so17970787wme.2
+	for <qemu-devel@nongnu.org>; Mon, 19 Dec 2016 03:03:49 -0800 (PST)
+Date: Mon, 19 Dec 2016 11:03:46 +0000
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20161219105859.GB17374@stefanha-x1.localdomain>
-References: <CA+scX6=9y4wDBWzXyqpGh9U__usKUa6sxwdc63iA8YRmpWFPqA@mail.gmail.com>
-	<20161214193107.GB20648@stefanha-x1.localdomain>
-	<CA+scX6=oc_eGteY8A0d8tuwzJFSu9M_6wnXBd5Tp=XGrg8FotQ@mail.gmail.com>
-	<CA+scX6n+xcY7qi=XbBcno=OQOfUfJf77ZGfS2s5FbhUCEHQp3A@mail.gmail.com>
-	<20161215080634.GF26169@stefanha-x1.localdomain>
-	<CA+scX6=Lk8Ea=vkFt_3c5v+n8gbr+uAb7hZ8vM1svzBZWwX7nQ@mail.gmail.com>
-	<20161216094850.GA4129@stefanha-x1.localdomain>
-	<CA+scX6k2u5E0E6M07S_WOd0633=x1OnLi9jvXVrED+YB3bzaWA@mail.gmail.com>
-	<CA+scX6kS1CB8RcFgG-ErgEf7qS2YakNmo0hiEJfmpPfmEReG+w@mail.gmail.com>
+Message-ID: <20161219110346.GC17374@stefanha-x1.localdomain>
+References: <1a3a7aef-55f1-11b6-b33f-621979cbb59f@profihost.ag>
+	<1383290552.4515122.1481729638569.JavaMail.zimbra@oxygem.tv>
+	<32c0e94e-8beb-03f3-2605-46225500e6ad@profihost.ag>
+	<464605215.4528644.1481784392571.JavaMail.zimbra@oxygem.tv>
+	<ba2e2786-a7ba-5ad9-86ef-aae1c4def034@profihost.ag>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="neYutvxvOLaeuPCA"
+	protocol="application/pgp-signature"; boundary="/e2eDi0V/xtL+Mc8"
 Content-Disposition: inline
-In-Reply-To: <CA+scX6kS1CB8RcFgG-ErgEf7qS2YakNmo0hiEJfmpPfmEReG+w@mail.gmail.com>
-Subject: Re: [Qemu-devel] Lock contention in QEMU
+In-Reply-To: <ba2e2786-a7ba-5ad9-86ef-aae1c4def034@profihost.ag>
+Subject: Re: [Qemu-devel] any known virtio-net regressions in Qemu 2.7?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,43 +33,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Weiwei Jia <harrynjit@gmail.com>
-Cc: qemu-devel@nongnu.org
+To: Stefan Priebe - Profihost AG <s.priebe@profihost.ag>
+Cc: Alexandre DERUMIER <aderumier@odiso.com>, qemu-devel <qemu-devel@nongnu.org>, power-management@lists.fedoraproject.org, jskarvad@redhat.com
 
 
---neYutvxvOLaeuPCA
+--/e2eDi0V/xtL+Mc8
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Dec 16, 2016 at 04:42:54PM -0500, Weiwei Jia wrote:
-> Has x-data-plane been used (or accepted) widely in systems. I have
-> this concern since if it hasn't been widely accepted, it may
-> have/cause some problems we don't know. Do you know some hidden
-> problems which may caused by QEMU x-data-plane feature in systems?
+On Fri, Dec 16, 2016 at 10:00:36PM +0100, Stefan Priebe - Profihost AG wrot=
+e:
+>=20
+> Am 15.12.2016 um 07:46 schrieb Alexandre DERUMIER:
+> > does rollbacking the kernel to previous version fix the problem ?
+>=20
+> The culprit is the used tuned agent from Redhat
+> (https://github.com/redhat-performance/tuned). The used profile
+> virtual-host results in these problems. Stopping tuned or using another
+> profile like throughput-performance everything is fine again.
 
-By now virtio-blk dataplane has been tested a fair amount.  virtio-scsi
-dataplane is more recent.
+Interesting discovery.  Have you filed a bug report about it?
 
-I'm not aware of known issues with virtio-blk dataplane in modern QEMU
-but you seem to be using an older QEMU.  Originally dataplane had a lot
-of limitations (no live migration, no image file formats, no block
-jobs) so be sure to check that your QEMU supports these things with
-dataplane if you need the features.
+> after upgrading a cluster OS, Qemu, ... i'm experiencing slow and
+> volatile network speeds inside my VMs.
+>
+> Currently I've no idea what causes this but it's related to the host
+> upgrades. Before i was running Qemu 2.6.2.
+>
+> I'm using virtio for the network cards.
 
 Stefan
 
---neYutvxvOLaeuPCA
+--/e2eDi0V/xtL+Mc8
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJYV71zAAoJEJykq7OBq3PI9n4IAKQla+WKJnlQTcvPtxTtaa8p
-sa2oo8C/uqbpDrRP6JW7CPIS2fG4JhOKMbctk0oWwY2UWlqyUR02raKqNm0GT5cy
-OEJ+E0ZchxCyFfk+Z2OWt2h0JT8sMdQU2p8LUPCtQMMFPzYu/Co7OT817jpD2aEm
-/VWbtKeL1f4De1tGJ8qbTFwMXa6e5M0MYggpaV1HhUiEimi0lYPEobo27lSPJ5oj
-siXfVZ6W67cF9VzFDGx+2bdXjyBF03rpnB/ka+MWq9QT2RpZP1BxjNraaWypEJbi
-4HSZeJLm+zNPAvzQHbloAo1MQBnS0Bq0RcuNiKYpdEzKrdEGAOwjzIM9KaLsfko=
-=jxR+
+iQEcBAEBAgAGBQJYV76SAAoJEJykq7OBq3PIQWgH/1UXqzj9958yGas+bqxiK1y9
+UAJqx5t5JApLs8jXALmkgEW8MvHcxBmOyKpYsps9pa93akZPF1d9Rx5FPAvYN25x
+MVn+AG5/CTmdIliodwJK9mn+DZVdlB/CEF9+YFDqbMnCVbVzWrTUZ042tshTTBZz
+5sWhkOcRW3dhjNeY8tBL/9fzlpmqmf9IwBSiEEyf5AYMFWCio//ZiKzISZDqdkaj
+aoQNvHhWgl1PWcB9jYtj1MpbuH8ueUZ2xBKtRd2/HDii30n/Y91uZP4BSoOgSm/w
+Zh0gRo8H4vU2zOYAI3rC0yqkMxBkXnI+rKiFzxmws/Rx+Q5d+sCnp4EdjoZrR7Y=
+=ziXf
 -----END PGP SIGNATURE-----
 
---neYutvxvOLaeuPCA--
+--/e2eDi0V/xtL+Mc8--
