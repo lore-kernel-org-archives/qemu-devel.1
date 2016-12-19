@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42328)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51658)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <leif.lindholm@linaro.org>) id 1cJ3gm-0000Dm-El
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 14:33:37 -0500
+	(envelope-from <jsnow@redhat.com>) id 1cJ4Pc-0004rP-Bs
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 15:19:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <leif.lindholm@linaro.org>) id 1cJ3gl-0001IU-Dj
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 14:33:36 -0500
-Received: from mail-wj0-x231.google.com ([2a00:1450:400c:c01::231]:33973)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <leif.lindholm@linaro.org>)
-	id 1cJ3gk-0001H6-V6
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 14:33:35 -0500
-Received: by mail-wj0-x231.google.com with SMTP id tg4so159605241wjb.1
-	for <qemu-devel@nongnu.org>; Mon, 19 Dec 2016 11:33:33 -0800 (PST)
-Date: Mon, 19 Dec 2016 19:33:29 +0000
-From: Leif Lindholm <leif.lindholm@linaro.org>
-Message-ID: <20161219193329.GR17590@bivouac.eciton.net>
-References: <20161216152319.12494-1-leif.lindholm@linaro.org>
+	(envelope-from <jsnow@redhat.com>) id 1cJ4PZ-0002lR-7w
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 15:19:56 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35660)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1cJ4PY-0002lL-VE
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 15:19:53 -0500
+References: <1478265017-5700-1-git-send-email-thuth@redhat.com>
+	<87wpg5di5o.fsf@emacs.mitica> <20161117034511.GG18808@umbus.fritz.box>
+	<b20c6b22-fc3a-b37a-6ea0-169be815864a@redhat.com>
+	<401600f0-8a1c-22c7-b9f3-7424426ec699@redhat.com>
+	<20161216170357.GD2642@work-vm>
+	<5a7603d3-aa76-aa93-b6a0-80496284cecf@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <93a4e714-f77a-ba16-70d8-e33dbd860e48@redhat.com>
+Date: Mon, 19 Dec 2016 15:19:50 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20161216152319.12494-1-leif.lindholm@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH] smbios: stop ignoring command line options
- for TARGET_ARM
+In-Reply-To: <5a7603d3-aa76-aa93-b6a0-80496284cecf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Is block_save_iterate() dead code?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,88 +31,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Amit Shah <amit.shah@redhat.com>, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-So, in addition to the style issue I was automatically notified of, I
-also neglected to CC the appropriate people - adding them here.
 
-As for the style issue - is it more important to adhere to
-checkpatch.pl or to surrounding definitions?
 
-Regards,
+On 12/19/2016 11:30 AM, Thomas Huth wrote:
+> On 16.12.2016 18:03, Dr. David Alan Gilbert wrote:
+>> * Thomas Huth (thuth@redhat.com) wrote:
+>>> On 18.11.2016 09:13, Thomas Huth wrote:
+>>>> On 17.11.2016 04:45, David Gibson wrote:
+>>>>> On Mon, Nov 14, 2016 at 07:34:59PM +0100, Juan Quintela wrote:
+>>>>>> Thomas Huth <thuth@redhat.com> wrote:
+>>>>>>> qemu_savevm_state_iterate() expects the iterators to return 1
+>>>>>>> when they are done, and 0 if there is still something left to do.
+>>>>>>> However, ram_save_iterate() does not obey this rule and returns
+>>>>>>> the number of saved pages instead. This causes a fatal hang with
+>>>>>>> ppc64 guests when you run QEMU like this (also works with TCG):
+>>>>>>>
+>>>>>>>  qemu-img create -f qcow2  /tmp/test.qcow2 1M
+>>>>>>>  qemu-system-ppc64 -nographic -nodefaults -m 256 \
+>>>>>>>                    -hda /tmp/test.qcow2 -serial mon:stdio
+>>>>>>>
+>>>>>>> ... then switch to the monitor by pressing CTRL-a c and try to
+>>>>>>> save a snapshot with "savevm test1" for example.
+>>>>>>>
+>>>>>>> After the first iteration, ram_save_iterate() always returns 0 here,
+>>>>>>> so that qemu_savevm_state_iterate() hangs in an endless loop and you
+>>>>>>> can only "kill -9" the QEMU process.
+>>>>>>> Fix it by using proper return values in ram_save_iterate().
+>>>>>>>
+>>>>>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>>>>>>
+>>>>>> Reviewed-by: Juan Quintela <quintela@redhat.com>
+>>>>>>
+>>>>>> Applied.
+>>>>>>
+>>>>>> I don't know how we broked this so much.
+>>>>>
+>>>>> Note that block save iterate has the same bug...
+>>>>
+>>>> I think you're right. Care to send a patch?
+>>>
+>>> Looking at this issue again ... could it be that block_save_iterate() is
+>>> currently just dead code?
+>>> As far as I can see, the ->save_live_iterate() handlers are only called
+>>> from qemu_savevm_state_iterate(), right? And qemu_savevm_state_iterate()
+>>> only calls the handlers if se->ops->is_active(se->opaque) returns true.
+>>> But block_is_active() seems to only return 0 during savevm, most likely
+>>> because qemu_savevm_state() explicitly sets the "blk" and "shared"
+>>> MigrationParams to zero.
+>>> So to me, it looks like we could also just remove block_save_iterate()
+>>> completely ... or did I miss something here?
+>>
+>> Doesn't it get called by migrate -b ?
+> 
+> Ah, right, yes, I somehow missed that ... I probably shouldn't do such
+> experiments at the end of Friday afternoon ;-)
+> 
+> OK, so it seems that
+> - block_save_iterate() is not called during savevm at all
+>   (and thus the bad return code does not matter here)
+> - migrate -b runs block_save_iterate() but the return code is ignored in
+>   migration_thread()
+> 
+> So we do not have a real problem here, but I think we should still clean
+> up the return code of block_save_iterate() to be on the safe side for
+> the future...
+> 
+>  Thomas
+> 
+> 
 
-Leif
+If it confused you, it'll confuse someone else. Worth fixing for
+consistency's sake alone.
 
-On Fri, Dec 16, 2016 at 03:23:19PM +0000, Leif Lindholm wrote:
-> Commit c30e1565 ("smbios: implement smbios support for mach-virt")
-> enabled automatic generation of SMBIOS tables for TARGET_ARM, and
-> actually provides data for the "virt" machine.
-> 
-> However, do_smbios_option() still had an #ifdef TARGET_I386, preventing
-> any -smbios command line options from being parsed for any non-x86
-> targets.
-> Change this to use a status variable instead of compile-time filtering.
-> 
-> Signed-off-by: Leif Lindholm <leif.lindholm@linaro.org>
-> ---
-> 
-> Verified on ARM mach-virt with UEFI shell "smbiosview" command and QEMU
-> command line parameter -smbios type=0,version=foobar.
-> 
->  arch_init.c                | 6 +++---
->  include/hw/smbios/smbios.h | 2 ++
->  vl.c                       | 2 ++
->  3 files changed, 7 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch_init.c b/arch_init.c
-> index 5cc58b2..d4e28c0 100644
-> --- a/arch_init.c
-> +++ b/arch_init.c
-> @@ -250,9 +250,9 @@ void do_acpitable_option(const QemuOpts *opts)
->  
->  void do_smbios_option(QemuOpts *opts)
->  {
-> -#ifdef TARGET_I386
-> -    smbios_entry_add(opts);
-> -#endif
-> +    if (smbios_override) {
-> +        smbios_entry_add(opts);
-> +    }
->  }
->  
->  int kvm_available(void)
-> diff --git a/include/hw/smbios/smbios.h b/include/hw/smbios/smbios.h
-> index 1cd53cc..2a3dca2 100644
-> --- a/include/hw/smbios/smbios.h
-> +++ b/include/hw/smbios/smbios.h
-> @@ -267,4 +267,6 @@ void smbios_get_tables(const struct smbios_phys_mem_area *mem_array,
->                         const unsigned int mem_array_size,
->                         uint8_t **tables, size_t *tables_len,
->                         uint8_t **anchor, size_t *anchor_len);
-> +
-> +extern int smbios_override;
->  #endif /* QEMU_SMBIOS_H */
-> diff --git a/vl.c b/vl.c
-> index d77dd86..8e71b06 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -159,6 +159,7 @@ int smp_cpus = 1;
->  int max_cpus = 1;
->  int smp_cores = 1;
->  int smp_threads = 1;
-> +int smbios_override = 0;
->  int acpi_enabled = 1;
->  int no_hpet = 0;
->  int fd_bootchk = 1;
-> @@ -3711,6 +3712,7 @@ int main(int argc, char **argv, char **envp)
->                  if (!opts) {
->                      exit(1);
->                  }
-> +                smbios_override = 1;
->                  do_smbios_option(opts);
->                  break;
->              case QEMU_OPTION_fwcfg:
-> -- 
-> 2.10.2
-> 
+--js
