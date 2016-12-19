@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43493)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43829)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cIyNu-0002Jv-Gk
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 08:53:48 -0500
+	(envelope-from <cminyard@mvista.com>) id 1cIyPB-0002xv-EY
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 08:55:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cIyNr-0005Sc-CJ
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 08:53:46 -0500
-Date: Mon, 19 Dec 2016 13:53:39 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20161219135339.GD17374@stefanha-x1.localdomain>
-References: <20161215154330.700-1-pasic@linux.vnet.ibm.com>
-	<20161216102528.GB4129@stefanha-x1.localdomain>
-	<86f7031a-981a-ef51-8a20-0a3c38e88835@linux.vnet.ibm.com>
-	<CAJSP0QVZQ=AXb+gZ3VftkYZ2y=SM_3uhV4VMAmK7GEmJYmpgHQ@mail.gmail.com>
-	<c34179a0-edbb-cc28-7c28-aa34936877bd@linux.vnet.ibm.com>
+	(envelope-from <cminyard@mvista.com>) id 1cIyPA-0006C2-8x
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 08:55:05 -0500
+Received: from mail-oi0-x22e.google.com ([2607:f8b0:4003:c06::22e]:33767)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <cminyard@mvista.com>) id 1cIyPA-0006A9-1V
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 08:55:04 -0500
+Received: by mail-oi0-x22e.google.com with SMTP id w63so145463056oiw.0
+	for <qemu-devel@nongnu.org>; Mon, 19 Dec 2016 05:55:02 -0800 (PST)
+References: <20161123194605.94717-1-flus@cesar.org.br>
+	<20161129193052.11736-1-flus@cesar.org.br>
+	<CAFEAcA--cM3Sn+Y4RA8BwsPCOWsJEPbQ3Npue32RPa7wLDCz2A@mail.gmail.com>
+	<1482112026.17769.25.camel@au1.ibm.com>
+From: Corey Minyard <cminyard@mvista.com>
+Message-ID: <f4e17469-ae67-271e-0645-b069df34e0f9@mvista.com>
+Date: Mon, 19 Dec 2016 07:55:00 -0600
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="+B+y8wtTXqdUj1xM"
-Content-Disposition: inline
-In-Reply-To: <c34179a0-edbb-cc28-7c28-aa34936877bd@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] virtio: fix vring->inuse recalc after migr
+In-Reply-To: <1482112026.17769.25.camel@au1.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 0/2] Add Atmel I2C TPM AT97SC3204T
+ emulated device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,94 +32,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-stable <qemu-stable@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Alastair D'Silva <alastair@au1.ibm.com>, Peter Maydell <peter.maydell@linaro.org>, Fabio Urquiza <flus@cesar.org.br>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
+On 12/18/2016 07:47 PM, Alastair D'Silva wrote:
+> On Fri, 2016-12-16 at 17:35 +0000, Peter Maydell wrote:
+>> (added a couple of people to cc who might have an opinion on the i2c
+>> protocol questions below)
+> I'm certainly no expert, but I'll try :)
 
---+B+y8wtTXqdUj1xM
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I know a little bit and I've implemented some stuff, so I'll try, too :).
 
-On Fri, Dec 16, 2016 at 05:43:29PM +0100, Halil Pasic wrote:
->=20
->=20
-> On 12/16/2016 05:12 PM, Stefan Hajnoczi wrote:
-> >> You are not the first one complaining, so the sentence is definitively
-> >> bad. What disturbs me regarding your formulation is that we do not use
-> >> uint16_t to represent neither the ring size nor inuse.
-> >>
-> >> How about "Since max ring size < UINT16_MAX it's safe to use modulo
-> >> UINT16_MAX + 1 subtraction."?
-> > That doesn't mention "representing the size of the ring" so it's
-> > unclear what "safe" means.
-> >=20
-> > Stefan
-> >=20
->=20
-> IMHO it is not about representation but about correct arithmetic.
-> We introduce the cast, not because representing the ring size as
-> int is necessarily an issue, but because we ended up with a wrong
-> result. In my opinion how can 'inuse' be represented correctly and
-> efficiently concerns the member of struct VirtQueue.
+>> On 29 November 2016 at 19:30, Fabio Urquiza <flus@cesar.org.br>
+>> wrote:
+> <snip>
+<snip> some more
+>> For recv I'm less sure how it ought to work, so if you can explain
+>> in terms of the i2c protocol what slave h/w behaviour we're trying
+>> to emulate that would help. At what points in the protocol can
+>> the slave return a NAK?
+>>
+>> Our current API seems to envisage that the slave can return a
+>> negative value from I2CSlaveClass::recv instead of a data byte,
+>> but I'm not sure what this means in the i2c protocol.
+> Negative values are propagated upwards, where they are treated as
+> errors, eg, in hw/i2c/aspeed_i2c.c:aspeed_i2c_bus_handle_cmd():
+>
+> int ret = i2c_recv(bus->bus);
+> if (ret < 0) {
+>      qemu_log_mask(LOG_GUEST_ERROR, "%s: read failed\n", __func__);
+>      ret = 0xff;
+> }
+>
+> The call to i2c_recv is too late to issue the NAK, I believe they occur
+> during the start_transfer() call.
 
-Fair enough, the type of VirtQueue.inuse doesn't need to be justified at
-this point in the code.
+Indeed, it is.  On the wire, a NAK after the address bits have been sent 
+terminates
+the transaction normally.
 
-> Here the important point is how conversions between signed unsigned
-> integer types work in C.
->=20
-> """
-> 6.3.1.3 Signed and unsigned integers
-> 1 When a value with integer type is converted to another integer
-> type other than _Bool, if  the value can be represented by the new
-> type, it is unchanged.
-> 2 Otherwise, if the new type is unsigned, the value is converted by
-> repeatedly adding or  subtracting one more than the maximum value that
-> can be represented in the new type until the value is in the range
-> of the new type.
-> """
->=20
-> That is we get mod UINT16_MAX + 1  subtraction which is what we
-> need if we want to calculate the difference between the two counters
-> under the assumption that the actual conceptual difference (that
-> is if the counters where of type arbitrary natural) is less or equal that
-> queue size which is less than UINT16_MAX.
+>
+>> If I understand your patch correctly, this is adding support
+>> for the slave refusing to ACK when the master sends out the
+>> slave address and r/w bit. I think that makes sense, but rather
+>> than having a state flag in the I2CSlave struct, we should
+>> change the prototype of the I2CSlaveClass event method so that
+>> it can return a value indicating ack or nak.
+>>
+> Hmm, this could end up being quite an invasive change, but ultimately
+> more elegant. I'm not sure which way the community prefers.
 
--            vdev->vq[i].inuse =3D vdev->vq[i].last_avail_idx -
--                                vdev->vq[i].used_idx;
-+            vdev->vq[i].inuse =3D (uint16_t)(vdev->vq[i].last_avail_idx -
-+                                vdev->vq[i].used_idx);
+I have a patch that adds a check_event() handler along side the event() 
+handler.
+If a device wants to send a NAK, it can implement check_event() instead of
+event() and return non-zero to NAK.
 
-Looking at C99 I learnt the cause of the bug is the integer promotion
-performed on the uint16_t subtraction operands.  Previously I was only
-aware of integer promotion on varargs and function arguments where no
-prototype is declared.
+I toyed with just changing all the event() calls, but there are a 
+bunch.  This seemed
+like the better approach.  I can send if you like.
 
-So the original statement behaves like:
+-corey
 
-vdev->vq[i].inuse =3D (int)vdev->vq[i].last_avail_idx -
-                    (int)vdev->vq[i].used_idx;
-
-This is the real gotcha for me.
-
-If you feel it helps to explain the signed -> unsigned cast behavior,
-feel free.  I don't think it's necessary.
-
-Stefan
-
---+B+y8wtTXqdUj1xM
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJYV+ZjAAoJEJykq7OBq3PI7QAH/RBd2aAKcMlXzSLFYBLvuhN0
-3RPg6aodUIffltRRItt6x0tYgGv81UGqPVzrt3ZwvK9lzQQItmE6Bi6q3U7oaqZB
-3EZipeynjWHin7EtzPKlyymVc9O2lLaYX2hndgH884O4/xPF503I0SXWPZEcZpzB
-s4Ao2IecgdBeYtLvdyw4qRPFNUEV3p3+wLyxqTiOxLsLFxpcRvPhQXLH/A1D94PJ
-iG7OY7cdcewBKuCX8JTKcsF44OVFRHeZF2pNj7dBuQX44eq6vMZZ7scc+3yJ53+B
-DEYroKPymxoi2E70x89ISqZaaPd988zDeuC1D200O1/ncPFrNvEebLTnluUHAEo=
-=rOMT
------END PGP SIGNATURE-----
-
---+B+y8wtTXqdUj1xM--
+>> thanks
+>> -- PMM
