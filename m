@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53273)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58404)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1cItIT-0006Ge-Dm
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 03:27:50 -0500
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1cItgD-0004B5-7b
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 03:52:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1cItIQ-0005ms-Ai
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 03:27:49 -0500
-Received: from mga14.intel.com ([192.55.52.115]:2344)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1cItIP-0005lX-PL
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 03:27:46 -0500
-Message-ID: <58579A1A.60107@intel.com>
-Date: Mon, 19 Dec 2016 16:28:10 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1cItg8-0007yT-DO
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 03:52:21 -0500
+Received: from [59.151.112.132] (port=17864 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1cItg6-0007mf-PI
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 03:52:16 -0500
+From: Dou Liyang <douly.fnst@cn.fujitsu.com>
+Date: Mon, 19 Dec 2016 16:51:22 +0800
+Message-ID: <1482137486-9843-1-git-send-email-douly.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-References: <1482127152-84732-1-git-send-email-wei.w.wang@intel.com>
-	<1482127152-84732-37-git-send-email-wei.w.wang@intel.com>
-In-Reply-To: <1482127152-84732-37-git-send-email-wei.w.wang@intel.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RESEND Patch v1 36/37] vhost-user/msg: handling
- VHOST_USER_SET_FEATURES
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH RFC v2 0/4] block/qapi: refactor and optimize
+ the qmp_query_blockstats()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,55 +24,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>
-Cc: marcandre.lureau@gmail.com, mst@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org
+To: stefanha@redhat.com, kwolf@redhat.com, armbru@redhat.com, mreitz@redhat.com, eblake@redhat.com, famz@redhat.com, danpb@redhat.com
+Cc: qemu-devel@nongnu.org, izumi.taku@jp.fujitsu.com, caoj.fnst@cn.fujitsu.com, fanc.fnst@cn.fujitsu.com, douly.fnst@cn.fujitsu.com
 
-On 12/19/2016 01:59 PM, Wei Wang wrote:
-> If the featuer bits sent by the slave are not equal to the ones that
-> were sent by the master, perform a reset of the master device.
->
-> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
-> ---
->   hw/net/vhost_net.c       |  2 ++
->   hw/virtio/vhost-user.c   | 20 ++++++++++++++++++++
->   hw/virtio/virtio-pci.c   | 20 ++++++++++++++++++++
->   hw/virtio/virtio-pci.h   |  2 ++
->   include/net/vhost-user.h | 14 ++++++++++++++
->   net/vhost-user.c         | 14 +++++---------
->   6 files changed, 63 insertions(+), 9 deletions(-)
->
-> diff --git a/hw/net/vhost_net.c b/hw/net/vhost_net.c
-> index 8256018..e8a2d4f 100644
-> --- a/hw/net/vhost_net.c
-> +++ b/hw/net/vhost_net.c
->   
->   /* virtio-net-pci */
->   
-> +void master_reset_virtio_net(VirtIODevice *vdev)
-> +{
-> +    VirtIONet *net = VIRTIO_NET(vdev);
-> +    VirtIONetPCI *net_pci = container_of(net, VirtIONetPCI, vdev);
-> +    VirtIOPCIProxy *proxy = &net_pci->parent_obj;
-> +    DeviceState *qdev = DEVICE(proxy);
-> +    DeviceState *qdev_new;
-> +    Error *err = NULL;
-> +
-> +    virtio_pci_reset(qdev);
-> +    qdev_unplug(qdev, &err);
-> +    qdev->realized = false;
-> +    qdev_new = qdev_device_add(qdev->opts, &err);
-> +    if (!qdev_new) {
-> +        qemu_opts_del(qdev->opts);
-> +    }
-> +    object_unref(OBJECT(qdev));
-> +}
-> +
+These patches aim to refactor the qmp_query_blockstats() and
+improve the performance by reducing the running time of it.
 
-I still have a problem with this patch. Looks like the virtio reset here 
-only clears the registers and queue related things. Do we have a power 
-reset of virtio, which has the same effect as re-plugging into the 
-virtio device (the driver probe() are re-invoked and feature bits are 
-re-negotiated). Thanks.
+qmp_query_blockstats() is used to monitor the blockstats, it
+querys all the graph_bdrv_states or monitor_block_backends.
 
-Best,
-Wei
+There are the two jobs:
+
+1 For the performance:
+
+1.1 the time it takes(ns) in each time:
+the disk numbers     | 10    | 500
+-------------------------------------
+before these patches | 19429 | 667722 
+after these patches  | 17516 | 557044
+
+1.2 the I/O performance is degraded(%) during the monitor:
+
+the disk numbers     | 10    | 500
+-------------------------------------
+before these patches | 1.3   | 14.2
+after these patches  | 0.8   | 9.1
+
+used the dd command likes this to test: 
+dd if=date_1.dat of=date_2.dat conv=fsync oflag=direct bs=1k count=100k.
+
+2 refactor qmp_query_blockstats():
+
+From:
+
++--------------+      +---------------------+
+ | 1            |      | 4.                  |
+ |next_query_bds|      |bdrv_query_bds_stats +---+
+ |              |      |                     |   |
+ +--------^-----+      +-------------^-------+   |
+          |                          |           |
++---------+----------+      +--------+-------+   |
+| 0.                 |      | 2.             |   |
+|qmp_query_blockstats+------>bdrv_query_stats<----
+|                    |      |                |
++--------------------+      +--------+-------+
+                                     |
+                       +-------------v-------+
+                       | 3.                  |
+                       |bdrv_query_blk_stats |
+                       |                     |
+                       +---------------------+
+
+To:
+
+                                    +--------------+
+                                    |              |
+                           +--------v-----------+  |
+                       +--->  3.                |  |
++-------------------+  |   |bdrv_query_bds_stats+--+
+| 1.                +--+   |                    |
+|                   +      +--------------------+
+|qmp_query_blockstats--+
+|                   |  |
++-------------------+  |   +--------------------+
+                       |   | 2.                 |
+                       +--->                    |
+                           |bdrv_query_blk_stats|
+                           |                    |
+                           +--------------------+
+
+
+Dou Liyang (4):
+  block: refactor the bdrv_next_node and add some comments
+  block/qapi: reduce the coupling between the bdrv_query_stats and
+    bdrv_query_bds_stats
+  block/qapi: acquire a reference instead of a lock during querying
+    blockstats
+  block/qapi: optimize the query function of the blockstats
+
+ block.c      | 16 ++++++++---
+ block/qapi.c | 92 +++++++++++++++++++++++++-----------------------------------
+ 2 files changed, 50 insertions(+), 58 deletions(-)
+
+-- 
+2.5.5
