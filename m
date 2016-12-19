@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53961)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53987)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1cIr0b-0003Pf-5x
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 01:01:14 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1cIr0f-0003oT-Pz
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 01:01:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1cIr0a-0004nc-92
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 01:01:13 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1cIr0b-0004os-Ux
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 01:01:17 -0500
 Received: from mga06.intel.com ([134.134.136.31]:33815)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1cIr0Z-0004Vl-W6
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 01:01:12 -0500
+	id 1cIr0b-0004Vl-NE
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 01:01:13 -0500
 From: Wei Wang <wei.w.wang@intel.com>
-Date: Mon, 19 Dec 2016 13:59:04 +0800
-Message-Id: <1482127152-84732-30-git-send-email-wei.w.wang@intel.com>
+Date: Mon, 19 Dec 2016 13:59:05 +0800
+Message-Id: <1482127152-84732-31-git-send-email-wei.w.wang@intel.com>
 In-Reply-To: <1482127152-84732-1-git-send-email-wei.w.wang@intel.com>
 References: <1482127152-84732-1-git-send-email-wei.w.wang@intel.com>
-Subject: [Qemu-devel] [RESEND Patch v1 29/37] vhost-pci-slave/msg:
- VHOST_USER_SET_VHOST_PCI (start)
+Subject: [Qemu-devel] [RESEND Patch v1 30/37] vhost-pci-slave/msg:
+ VHOST_USER_SET_VHOST_PCI (stop)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,119 +28,124 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: marcandre.lureau@gmail.com, mst@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org
 Cc: Wei Wang <wei.w.wang@intel.com>
 
-The VHOST_USER_SET_VHOST_PCI msg is used to request the start or
-stop of the vhost-pci device.
+The slave removes the slave device when receiving the request with the
+stop command.
 
-This patch handles the start commandin the slave. When receiving
-the SET_VHOST_PCI request with the start command, the slave creates
-a vhost-pci device based on the previously received virtio_id.
+In the case that the master side guest crashes, the crashed guest, typically,
+will be killed by the admin. This event will be captured via the close of the
+socket connection, so we can remove the vhost-pci device and free the related
+resources there.
 
 Signed-off-by: Wei Wang <wei.w.wang@intel.com>
 ---
- hw/virtio/vhost-pci-slave.c    | 53 ++++++++++++++++++++++++++++++++++++++++++
- include/hw/virtio/vhost-user.h |  5 ++++
- 2 files changed, 58 insertions(+)
+ hw/net/vhost-pci-net.c              |  1 +
+ hw/virtio/vhost-pci-slave.c         | 41 +++++++++++++++++++++++++++++++++++++
+ include/hw/virtio/vhost-pci-slave.h |  2 ++
+ 3 files changed, 44 insertions(+)
 
-diff --git a/hw/virtio/vhost-pci-slave.c b/hw/virtio/vhost-pci-slave.c
-index ff9a251..5c16365 100644
---- a/hw/virtio/vhost-pci-slave.c
-+++ b/hw/virtio/vhost-pci-slave.c
-@@ -13,6 +13,7 @@
- #include <qemu/osdep.h>
- #include <qemu/sockets.h>
- 
-+#include "monitor/qdev.h"
- #include "qapi/error.h"
- #include "qemu/error-report.h"
- #include "hw/virtio/virtio-pci.h"
-@@ -267,6 +268,52 @@ static void vp_slave_set_vring_enable(VhostUserMsg *msg)
+diff --git a/hw/net/vhost-pci-net.c b/hw/net/vhost-pci-net.c
+index 2560e3d..5ad4a9f 100644
+--- a/hw/net/vhost-pci-net.c
++++ b/hw/net/vhost-pci-net.c
+@@ -173,6 +173,7 @@ static void vpnet_device_realize(DeviceState *dev, Error **errp)
+                                          vpnet_handle_rq);
      }
+     vpnet->status = 0;
++    vp_slave->vdev = vdev;
  }
  
-+static int vp_slave_device_create(uint16_t virtio_id)
+ static void vpnet_device_unrealize(DeviceState *dev, Error **errp)
+diff --git a/hw/virtio/vhost-pci-slave.c b/hw/virtio/vhost-pci-slave.c
+index 5c16365..de08324 100644
+--- a/hw/virtio/vhost-pci-slave.c
++++ b/hw/virtio/vhost-pci-slave.c
+@@ -34,6 +34,10 @@ static void vp_slave_cleanup(void)
+     uint32_t i, nregions;
+     PeerVqNode *pvq_node;
+ 
++    if (!vp_slave->vdev) {
++        return;
++    }
++
+     nregions = vp_slave->pmem_msg.nregions;
+     for (i = 0; i < nregions; i++) {
+         ret = munmap(vp_slave->mr_map_base[i], vp_slave->mr_map_size[i]);
+@@ -49,6 +53,7 @@ static void vp_slave_cleanup(void)
+     }
+     QLIST_INIT(&vp_slave->pvq_list);
+     vp_slave->pvq_num = 0;
++    vp_slave->vdev = NULL;
+ }
+ 
+ static int vp_slave_write(CharBackend *chr_be, VhostUserMsg *msg)
+@@ -83,12 +88,44 @@ static void vp_slave_set_features(VhostUserMsg *msg)
+                              & ~(1 << VHOST_USER_F_PROTOCOL_FEATURES);
+ }
+ 
++static DeviceState *virtio_to_pci_dev(VirtIODevice *vdev, uint16_t virtio_id)
 +{
-+    Error *local_err = NULL;
-+    QemuOpts *opts;
-+    DeviceState *dev;
-+    char params[50];
++    DeviceState *qdev;
++    VhostPCINet *vpnet;
++    VhostPCINetPCI *netpci;
 +
 +    switch (virtio_id) {
 +    case VIRTIO_ID_NET:
-+        strcpy(params, "driver=vhost-pci-net-pci,id=vhost-pci-0");
++        vpnet = VHOST_PCI_NET(vdev);
++        netpci = container_of(vpnet, VhostPCINetPCI, vdev);
++        qdev = &netpci->parent_obj.pci_dev.qdev;
 +        break;
 +    default:
-+        error_report("vhost-pci device create: device type %d not supported",
++        error_report("virtio_to_pci_dev: device type %d not supported",
 +                     virtio_id);
 +    }
 +
-+    opts = qemu_opts_parse_noisily(qemu_find_opts("device"), params, true);
-+    dev = qdev_device_add(opts, &local_err);
-+    if (!dev) {
-+        qemu_opts_del(opts);
-+        return -1;
-+    }
-+    object_unref(OBJECT(dev));
-+    return 0;
++    return qdev;
 +}
 +
-+static int vp_slave_set_vhost_pci(CharBackend *chr_be, VhostUserMsg *msg)
++static void vp_slave_device_del(VirtIODevice *vdev)
 +{
-+    int ret;
-+    uint8_t cmd = (uint8_t)msg->payload.u64;
++    Error *errp = NULL;
++    DeviceState *qdev = virtio_to_pci_dev(vdev, vp_slave->dev_type);
 +
-+    switch (cmd) {
-+    case VHOST_USER_SET_VHOST_PCI_start:
-+        ret = vp_slave_device_create(vp_slave->dev_type);
-+        if (ret < 0) {
-+            return ret;
-+        }
-+        break;
-+    default:
-+        error_report("slave pconnection: cmd %d not supported yet", cmd);
-+        return -1;
++    if (vdev != NULL) {
++        qdev_unplug(qdev, &errp);
++        vp_slave_cleanup();
 +    }
-+
-+    return ret;
 +}
 +
- static int vp_slave_can_read(void *opaque)
+ static void vp_slave_event(void *opaque, int event)
  {
-     return VHOST_USER_HDR_SIZE;
-@@ -382,6 +429,12 @@ static void vp_slave_read(void *opaque, const uint8_t *buf, int size)
+     switch (event) {
+     case CHR_EVENT_OPENED:
          break;
-     case VHOST_USER_SEND_RARP:
+     case CHR_EVENT_CLOSED:
++        vp_slave_device_del(vp_slave->vdev);
          break;
-+    case VHOST_USER_SET_VHOST_PCI:
-+        ret = vp_slave_set_vhost_pci(chr_be, &msg);
-+        if (ret < 0) {
-+            goto err_handling;
-+        }
+     }
+ }
+@@ -306,6 +343,10 @@ static int vp_slave_set_vhost_pci(CharBackend *chr_be, VhostUserMsg *msg)
+             return ret;
+         }
+         break;
++    case VHOST_USER_SET_VHOST_PCI_stop:
++        vp_slave_device_del(vp_slave->vdev);
++        ret = 0;
 +        break;
      default:
-         error_report("vhost-pci-slave does not support msg request = %d",
-                      msg.request);
-diff --git a/include/hw/virtio/vhost-user.h b/include/hw/virtio/vhost-user.h
-index e79a2ec..bf8c6ee 100644
---- a/include/hw/virtio/vhost-user.h
-+++ b/include/hw/virtio/vhost-user.h
-@@ -25,6 +25,10 @@ enum VhostUserProtocolFeature {
-                                (1ULL << VHOST_USER_PROTOCOL_F_VHOST_PCI) | \
-                           (1ULL << VHOST_USER_PROTOCOL_F_SET_DEVICE_ID))
+         error_report("slave pconnection: cmd %d not supported yet", cmd);
+         return -1;
+diff --git a/include/hw/virtio/vhost-pci-slave.h b/include/hw/virtio/vhost-pci-slave.h
+index 3e0f4c7..79e1ffd 100644
+--- a/include/hw/virtio/vhost-pci-slave.h
++++ b/include/hw/virtio/vhost-pci-slave.h
+@@ -19,6 +19,8 @@ typedef struct PeerVqNode {
  
-+/* control/status of the vhost-pci device */
-+#define VHOST_USER_SET_VHOST_PCI_start    0
-+#define VHOST_USER_SET_VHOST_PCI_stop     1
-+
- typedef enum VhostUserRequest {
-     VHOST_USER_NONE = 0,
-     VHOST_USER_GET_FEATURES = 1,
-@@ -47,6 +51,7 @@ typedef enum VhostUserRequest {
-     VHOST_USER_SET_VRING_ENABLE = 18,
-     VHOST_USER_SEND_RARP = 19,
-     VHOST_USER_SET_DEVICE_ID = 20,
-+    VHOST_USER_SET_VHOST_PCI = 21,
-     VHOST_USER_MAX
- } VhostUserRequest;
- 
+ typedef struct VhostPCISlave {
+     CharBackend chr_be;
++    /* Ponnter to the slave device */
++    VirtIODevice *vdev;
+     uint16_t dev_type;
+     uint64_t feature_bits;
+     /* hotplugged memory should be mapped following the offset */
 -- 
 2.7.4
