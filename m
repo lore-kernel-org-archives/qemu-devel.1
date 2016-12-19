@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36089)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38600)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aarcange@redhat.com>) id 1cIwLE-0001E2-1m
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 06:42:53 -0500
+	(envelope-from <yi.l.liu@intel.com>) id 1cIwVh-0006Hs-2R
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 06:53:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aarcange@redhat.com>) id 1cIwL9-00021y-4f
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 06:42:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36748)
+	(envelope-from <yi.l.liu@intel.com>) id 1cIwVc-0007BX-VC
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 06:53:41 -0500
+Received: from mga02.intel.com ([134.134.136.20]:49905)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aarcange@redhat.com>) id 1cIwL8-00021R-Rc
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 06:42:47 -0500
-Date: Mon, 19 Dec 2016 12:42:41 +0100
-From: Andrea Arcangeli <aarcange@redhat.com>
-Message-ID: <20161219114241.GD4927@redhat.com>
-References: <1478077718-37424-1-git-send-email-xinhui.pan@linux.vnet.ibm.com>
-	<1478077718-37424-9-git-send-email-xinhui.pan@linux.vnet.ibm.com>
+	(Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1cIwVc-0007BR-J7
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 06:53:36 -0500
+From: "Liu, Yi L" <yi.l.liu@intel.com>
+Date: Mon, 19 Dec 2016 11:53:32 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C257438FD9142@shsmsx102.ccr.corp.intel.com>
+References: <A2975661238FB949B60364EF0F2C257438FD8042@shsmsx102.ccr.corp.intel.com>
+	<20161219100053.GD4155@pxdev.xzpeter.org>
+In-Reply-To: <20161219100053.GD4155@pxdev.xzpeter.org>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1478077718-37424-9-git-send-email-xinhui.pan@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v7 08/11] x86,
- kvm/x86.c: support vcpu preempted check
+Subject: Re: [Qemu-devel] [PATCH v7 3/5] IOMMU: enable intel_iommu map and
+ unmap notifiers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,156 +29,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pan Xinhui <xinhui.pan@linux.vnet.ibm.com>
-Cc: linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, rkrcmar@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: "bd.aviv@gmail.com" <bd.aviv@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, ", Jan
+	Kiszka" <jan.kiszka@siemens.com>, ", Alex Williamson" <alex.williamson@redhat.com>, ", Jason Wang" <jasowang@redhat.com>, "Lan,
+	Tianyu" <tianyu.lan@intel.com>, "Tian, Kevin" <kevin.tian@intel.com>
 
-Hello,
-
-On Wed, Nov 02, 2016 at 05:08:35AM -0400, Pan Xinhui wrote:
-> Support the vcpu_is_preempted() functionality under KVM. This will
-> enhance lock performance on overcommitted hosts (more runnable vcpus
-> than physical cpus in the system) as doing busy waits for preempted
-> vcpus will hurt system performance far worse than early yielding.
-> 
-> Use one field of struct kvm_steal_time ::preempted to indicate that if
-> one vcpu is running or not.
-> 
-> Signed-off-by: Pan Xinhui <xinhui.pan@linux.vnet.ibm.com>
-> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  arch/x86/include/uapi/asm/kvm_para.h |  4 +++-
->  arch/x86/kvm/x86.c                   | 16 ++++++++++++++++
->  2 files changed, 19 insertions(+), 1 deletion(-)
-> 
-[..]
-> +static void kvm_steal_time_set_preempted(struct kvm_vcpu *vcpu)
-> +{
-> +	if (!(vcpu->arch.st.msr_val & KVM_MSR_ENABLED))
-> +		return;
-> +
-> +	vcpu->arch.st.steal.preempted = 1;
-> +
-> +	kvm_write_guest_offset_cached(vcpu->kvm, &vcpu->arch.st.stime,
-> +			&vcpu->arch.st.steal.preempted,
-> +			offsetof(struct kvm_steal_time, preempted),
-> +			sizeof(vcpu->arch.st.steal.preempted));
-> +}
-> +
->  void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
->  {
-> +	kvm_steal_time_set_preempted(vcpu);
->  	kvm_x86_ops->vcpu_put(vcpu);
->  	kvm_put_guest_fpu(vcpu);
->  	vcpu->arch.last_host_tsc = rdtsc();
-
-You can't call kvm_steal_time_set_preempted in atomic context (neither
-in sched_out notifier nor in vcpu_put() after
-preempt_disable)). __copy_to_user in kvm_write_guest_offset_cached
-schedules and locks up the host.
-
-kvm->srcu (or kvm->slots_lock) is also not taken and
-kvm_write_guest_offset_cached needs to call kvm_memslots which
-requires it.
-
-This I think is why postcopy live migration locks up with current
-upstream, and it doesn't seem related to userfaultfd at all (initially
-I suspected the vmf conversion but it wasn't that) and in theory it
-can happen with heavy swapping or page migration too.
-
-Just the page is written so frequently it's unlikely to be swapped
-out. The page being written so frequently also means it's very likely
-found as re-dirtied when postcopy starts and that pretty much
-guarantees an userfault will trigger a scheduling event in
-kvm_steal_time_set_preempted in destination. There are opposite
-probabilities of reproducing this with swapping vs postcopy live
-migration.
-
-For now I applied the below two patches, but this just will skip the
-write and only prevent the host instability as nobody checks the
-retval of __copy_to_user (what happens to guest after the write is
-skipped is not as clear and should be investigated, but at least the
-host will survive and not all guests will care about this flag being
-updated). For this to be fully safe the preempted information should
-be just an hint and not fundamental for correct functionality of the
-guest pv spinlock code.
-
-This bug was introduced in commit
-0b9f6c4615c993d2b552e0d2bd1ade49b56e5beb in v4.9-rc7.
-
->From 458897fd44aa9b91459a006caa4051a7d1628a23 Mon Sep 17 00:00:00 2001
-From: Andrea Arcangeli <aarcange@redhat.com>
-Date: Sat, 17 Dec 2016 18:43:52 +0100
-Subject: [PATCH 1/2] kvm: fix schedule in atomic in
- kvm_steal_time_set_preempted()
-
-kvm_steal_time_set_preempted() isn't disabling the pagefaults before
-calling __copy_to_user and the kernel debug notices.
-
-Signed-off-by: Andrea Arcangeli <aarcange@redhat.com>
----
- arch/x86/kvm/x86.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 1f0d238..2dabaeb 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -2844,7 +2844,17 @@ static void kvm_steal_time_set_preempted(struct kvm_vcpu *vcpu)
- 
- void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
- {
-+	/*
-+	 * Disable page faults because we're in atomic context here.
-+	 * kvm_write_guest_offset_cached() would call might_fault()
-+	 * that relies on pagefault_disable() to tell if there's a
-+	 * bug. NOTE: the write to guest memory may not go through if
-+	 * during postcopy live migration or if there's heavy guest
-+	 * paging.
-+	 */
-+	pagefault_disable();
- 	kvm_steal_time_set_preempted(vcpu);
-+	pagefault_enable();
- 	kvm_x86_ops->vcpu_put(vcpu);
- 	kvm_put_guest_fpu(vcpu);
- 	vcpu->arch.last_host_tsc = rdtsc();
-
-
->From 2845eba22ac74c5e313e3b590f9dac33e1b3cfef Mon Sep 17 00:00:00 2001
-From: Andrea Arcangeli <aarcange@redhat.com>
-Date: Sat, 17 Dec 2016 19:13:32 +0100
-Subject: [PATCH 2/2] kvm: take srcu lock around kvm_steal_time_set_preempted()
-
-kvm_memslots() will be called by kvm_write_guest_offset_cached() so
-take the srcu lock.
-
-Signed-off-by: Andrea Arcangeli <aarcange@redhat.com>
----
- arch/x86/kvm/x86.c | 7 +++++++
- 1 file changed, 7 insertions(+)
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 2dabaeb..02e6ab4 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -2844,6 +2844,7 @@ static void kvm_steal_time_set_preempted(struct kvm_vcpu *vcpu)
- 
- void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
- {
-+	int idx;
- 	/*
- 	 * Disable page faults because we're in atomic context here.
- 	 * kvm_write_guest_offset_cached() would call might_fault()
-@@ -2853,7 +2854,13 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
- 	 * paging.
- 	 */
- 	pagefault_disable();
-+	/*
-+	 * kvm_memslots() will be called by
-+	 * kvm_write_guest_offset_cached() so take the srcu lock.
-+	 */
-+	idx = srcu_read_lock(&vcpu->kvm->srcu);
- 	kvm_steal_time_set_preempted(vcpu);
-+	srcu_read_unlock(&vcpu->kvm->srcu, idx);
- 	pagefault_enable();
- 	kvm_x86_ops->vcpu_put(vcpu);
- 	kvm_put_guest_fpu(vcpu);
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBQZXRlciBYdSBbbWFpbHRvOnBl
+dGVyeEByZWRoYXQuY29tXQ0KPiBTZW50OiBNb25kYXksIERlY2VtYmVyIDE5LCAyMDE2IDY6MDEg
+UE0NCj4gVG86IExpdSwgWWkgTCA8eWkubC5saXVAaW50ZWwuY29tPg0KPiBDYzogYmQuYXZpdkBn
+bWFpbC5jb207IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZzsgTWljaGFlbCBTLiBUc2lya2luDQo+IDxt
+c3RAcmVkaGF0LmNvbT47ICwgSmFuIEtpc3prYSA8amFuLmtpc3prYUBzaWVtZW5zLmNvbT47ICwg
+QWxleCBXaWxsaWFtc29uDQo+IDxhbGV4LndpbGxpYW1zb25AcmVkaGF0LmNvbT47ICwgSmFzb24g
+V2FuZyA8amFzb3dhbmdAcmVkaGF0LmNvbT47IExhbiwNCj4gVGlhbnl1IDx0aWFueXUubGFuQGlu
+dGVsLmNvbT47IFRpYW4sIEtldmluIDxrZXZpbi50aWFuQGludGVsLmNvbT4NCj4gU3ViamVjdDog
+UmU6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjcgMy81XSBJT01NVTogZW5hYmxlIGludGVsX2lvbW11
+IG1hcA0KPiBhbmQgdW5tYXAgbm90aWZpZXJzDQo+IA0KPiBPbiBGcmksIERlYyAxNiwgMjAxNiBh
+dCAwOToxMjowNUFNICswMDAwLCBMaXUsIFlpIEwgd3JvdGU6DQo+ID4gPiBGcm9tOiAiQXZpdiBC
+ZW4tRGF2aWQiIDxhZGRyZXNzQGhpZGRlbj4NCj4gPiA+DQo+ID4gPiBBZGRzIGEgbGlzdCBvZiBy
+ZWdpc3RlcmVkIHZ0ZF9hcydzIHRvIGludGVsIGlvbW11IHN0YXRlIHRvIHNhdmUNCj4gPiA+IGl0
+ZXJhdGlvbiBvdmVyIGVhY2ggUENJIGRldmljZSBpbiBhIHNlYXJjaCBvZiB0aGUgY29ycm9zcG9u
+ZGluZyBkb21haW4uDQo+ID4gPg0KPiA+ID4gU2lnbmVkLW9mZi1ieTogQXZpdiBCZW4tRGF2aWQg
+PGFkZHJlc3NAaGlkZGVuPg0KPiA+ID4gLS0tDQo+ID4gPiAgaHcvaTM4Ni9pbnRlbF9pb21tdS5j
+ICAgICAgICAgIHwgOTQNCj4gKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKyst
+LS0tDQo+ID4gPiAgaHcvaTM4Ni9pbnRlbF9pb21tdV9pbnRlcm5hbC5oIHwgIDIgKw0KPiA+ID4g
+IGluY2x1ZGUvaHcvaTM4Ni9pbnRlbF9pb21tdS5oICB8ICA5ICsrKysNCj4gPiA+ICAzIGZpbGVz
+IGNoYW5nZWQsIDk4IGluc2VydGlvbnMoKyksIDcgZGVsZXRpb25zKC0pDQo+ID4gPg0KPiA+ID4g
+ZGlmZiAtLWdpdCBhL2h3L2kzODYvaW50ZWxfaW9tbXUuYyBiL2h3L2kzODYvaW50ZWxfaW9tbXUu
+Yw0KPiA+ID4gaW5kZXggMDU5NzNiOS4uZDg3Mjk2OSAxMDA2NDQNCj4gPiA+IC0tLSBhL2h3L2kz
+ODYvaW50ZWxfaW9tbXUuYw0KPiA+ID4gKysrIGIvaHcvaTM4Ni9pbnRlbF9pb21tdS5jDQo+ID4g
+PiBAQCAtNjc5LDcgKzY3OSw3IEBAIHN0YXRpYyBpbnQgdnRkX2dwYV90b19zbHB0ZShWVERDb250
+ZXh0RW50cnkgKmNlLA0KPiB1aW50NjRfdA0KPiA+ID4gZ3BhLA0KPiA+ID4gICAgICAgICAgfQ0K
+PiA+ID4gICAgICAgICAgKnJlYWRzID0gKCpyZWFkcykgJiYgKHNscHRlICYgVlREX1NMX1IpOw0K
+PiA+ID4gICAgICAgICAgKndyaXRlcyA9ICgqd3JpdGVzKSAmJiAoc2xwdGUgJiBWVERfU0xfVyk7
+DQo+ID4gPiAtICAgICAgICBpZiAoIShzbHB0ZSAmIGFjY2Vzc19yaWdodF9jaGVjaykpIHsNCj4g
+PiA+ICsgICAgICAgIGlmICghKHNscHRlICYgYWNjZXNzX3JpZ2h0X2NoZWNrKSAmJiAhKGZsYWdz
+ICYgSU9NTVVfTk9fRkFJTCkpIHsNCj4gPiA+ICAgICAgICAgICAgICBWVERfRFBSSU5URihHRU5F
+UkFMLCAiZXJyb3I6IGxhY2sgb2YgJXMgcGVybWlzc2lvbiBmb3IgIg0KPiA+ID4gICAgICAgICAg
+ICAgICAgICAgICAgICAgICJncGEgMHglIlBSSXg2NCAiIHNscHRlIDB4JSJQUkl4NjQsDQo+ID4g
+PiAgICAgICAgICAgICAgICAgICAgICAgICAgKGZsYWdzICYgSU9NTVVfV08gPyAid3JpdGUiIDog
+InJlYWQiKSwgZ3BhLCBzbHB0ZSk7DQo+ID4gPiBAQCAtOTc4LDYgKzk3OCwyMyBAQCBzdGF0aWMg
+VlREQnVzDQo+ICp2dGRfZmluZF9hc19mcm9tX2J1c19udW0oSW50ZWxJT01NVVN0YXRlDQo+ID4g
+PiAqcywgdWludDhfdCBidXNfbnVtKQ0KPiA+ID4gICAgICByZXR1cm4gdnRkX2J1czsNCj4gPiA+
+ICB9DQo+ID4gPg0KPiA+ID4gK3N0YXRpYyBpbnQgdnRkX2dldF9kaWRfZGV2KEludGVsSU9NTVVT
+dGF0ZSAqcywgdWludDhfdCBidXNfbnVtLCB1aW50OF90DQo+IGRldmZuLA0KPiA+ID4gKyAgICAg
+ICAgICAgICAgICAgICAgICAgICAgIHVpbnQxNl90ICpkb21haW5faWQpDQo+ID4gPiArew0KPiA+
+ID4gKyAgICBWVERDb250ZXh0RW50cnkgY2U7DQo+ID4gPiArICAgIGludCByZXRfZnI7DQo+ID4g
+PiArDQo+ID4gPiArICAgIGFzc2VydChkb21haW5faWQpOw0KPiA+ID4gKw0KPiA+ID4gKyAgICBy
+ZXRfZnIgPSB2dGRfZGV2X3RvX2NvbnRleHRfZW50cnkocywgYnVzX251bSwgZGV2Zm4sICZjZSk7
+DQo+ID4gPiArICAgIGlmIChyZXRfZnIpIHsNCj4gPiA+ICsgICAgICAgIHJldHVybiAtMTsNCj4g
+PiA+ICsgICAgfQ0KPiA+ID4gKw0KPiA+ID4gKyAgICAqZG9tYWluX2lkID0gIFZURF9DT05URVhU
+X0VOVFJZX0RJRChjZS5oaSk7DQo+ID4gPiArICAgIHJldHVybiAwOw0KPiA+ID4gK30NCj4gPiA+
+ICsNCj4gPiA+ICAvKiBEbyBhIGNvbnRleHQtY2FjaGUgZGV2aWNlLXNlbGVjdGl2ZSBpbnZhbGlk
+YXRpb24uDQo+ID4gPiAgICogQGZ1bmNfbWFzazogRk0gZmllbGQgYWZ0ZXIgc2hpZnRpbmcNCj4g
+PiA+ICAgKi8NCj4gPiA+IEBAIC0xMDY0LDYgKzEwODEsNDUgQEAgc3RhdGljIHZvaWQNCj4gdnRk
+X2lvdGxiX2RvbWFpbl9pbnZhbGlkYXRlKEludGVsSU9NTVVTdGF0ZQ0KPiA+ID4gKnMsIHVpbnQx
+Nl90IGRvbWFpbl9pZCkNCj4gPiA+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICZk
+b21haW5faWQpOw0KPiA+ID4gIH0NCj4gPiA+DQo+ID4gPiArc3RhdGljIHZvaWQgdnRkX2lvdGxi
+X3BhZ2VfaW52YWxpZGF0ZV9ub3RpZnkoSW50ZWxJT01NVVN0YXRlICpzLA0KPiA+ID4gKyAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB1aW50MTZfdCBkb21haW5faWQs
+IGh3YWRkciBhZGRyLA0KPiA+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICB1aW50OF90IGFtKQ0KPiA+ID4gK3sNCj4gPiA+ICsgICAgSW50ZWxJT01NVU5vdGlm
+aWVyTm9kZSAqbm9kZTsNCj4gPiA+ICsNCj4gPiA+ICsgICAgUUxJU1RfRk9SRUFDSChub2RlLCAm
+KHMtPm5vdGlmaWVyc19saXN0KSwgbmV4dCkgew0KPiA+IEF2aXYsDQo+ID4NCj4gPiBSZWdhcmRz
+IHRvIHRoZSBzLT5ub3RpZmllcnNfbGlzdCwgSSBkaWRuJ3Qgc2VlIHRoZSBpbml0IG9wIHRvIGl0
+LiBEb2VzIGl0IGhhcHBlbg0KPiA+IGluIGFub3RoZXIgcGF0Y2g/IElmIHNvLCBpdCBtYXkgYmUg
+YmV0dGVyIHRvIG1vdmUgaXQgaW4gdGhpcyBwYXRjaCBzaW5jZSB0aGlzDQo+ID4gcGF0Y2ggaW50
+cm9kdWNlcyBib3RoIHRoZSBkZWZpbml0aW9uIGFuZCB1c2FnZSBvZiBub3RpZmllcnNfbGlzdC4N
+Cj4gPg0KPiA+IElmIGl0IGlzIGFscmVhZHkgY2xhcmlmaWVkLCB0aGVuIGlnbm9yZSBpdC4NCj4g
+DQo+IEkgdGhpbmsgaXQgd2FzIG1pc3NpbmcuIEl0IElNSE8gYWNjaWRlbnRhbGx5IHdvcmtlZCBz
+aW5jZSBRTElTVF9JTklUKCkNCj4ganVzdCBzZXQgdGhlIGhlYWQgdG8gTlVMTCBhbmQgdGhhdCdz
+IHdoYXQgd2UgZGlkIHdoZW4gd2UgY3JlYXRlIHRoZQ0KPiBJbnRlbElPTU1VU3RhdGUgb2JqZWN0
+Lg0KPiANCj4gQW5kIHdoYXQncyB3b3JzZSAtIEkgZm91bmQgdGhpcyBhcHByb2FjaCBtYXkgbm90
+IHdvcmsgaWYgd2UgZG8NCj4gUUxJU1RfSU5TRVJUKCkgaW4gdGhlIGNoYW5nZWQoKSBob29rLCBz
+aW5jZSBpZiB3ZSBoYXZlIG1vcmUgdGhhbiBvbmUNCj4gYXNzaWduZWQgZGV2aWNlcyB3ZSB3aWxs
+IG9ubHkgcmVnaXN0ZXIgdGhlIGZpcnN0IG9uZSBub3QgdGhlIHJlc3QuIEENCj4gYmV0dGVyIGFw
+cHJvYWNoIG1heSBiZSB0cmF2ZXJzaW5nIHRoZSB2dC1kIGJ1c2VzIHZpYQ0KPiBJbnRlbElPTU1V
+U3RhdGUudnRkX2FzX2J5X2J1c3B0ci4NCj4gDQpQZXRlciwNCg0KSW4gT2N0LCBJIGFsc28gbWFp
+bGVkIEF2aXYgYWJvdXQgdXNpbmcgSW50ZWxJT01NVVN0YXRlLnZ0ZF9hc19ieV9idXNwdHINCndo
+ZW4gdHJ5aW5nIHRvIGNvbm5lY3QgdGhlIHZmaW8gbm90aWZpZXJzKG1hcC91bm1hcCkgYW5kIHZJ
+T01NVS4gDQpIb3dldmVyLCBJIHJlY29uc2lkZXJlZCBpdCBsYXRlci4gSWYgSSByZW1lbWJlciBj
+b3JyZWN0bHksIA0KSW50ZWxJT01NVVN0YXRlLnZ0ZF9hc19ieV9idXNwdHIgbm90IG9ubHkgaW5j
+bHVkZXMgdnRkX2FzIGZvciBhc3NpZ25lZCBkZXZpY2VzLA0KYnV0IGFsc28gaW5jbHVkZXMgdmly
+dHVhbCBkZXZpY2VzLiBXaGVuIGlvdGxiIGludmFsaWRhdGlvbiBjb21lcyB0byB2SU9NTVUsIHRo
+ZXJlDQppcyBubyBpbmRpY2F0aW9uIGZvciB3aGljaCBkZXZpY2UgaW4gaW90bGJfaW52X2Rlc2Mu
+IFNvIHN0aWxsIG5lZWQgdG8gaGF2ZSBhIGxpc3QgdG8gcmVjb3JkDQp2dGRfYXMgd2hpY2ggbmVl
+ZHMgdG8gYmUgbG9vcGVkLiBTbyBJIGtlZXAgc2lsZW50IG9uIGl0IGFmdGVyIHRoYXQgdGhvdWdo
+dC4NCg0KTm93LCB5b3UgbWVudGlvbmVkIGl0IG1heSBub3Qgd29yayBpbiBtdWx0aS1hc3NpZ25l
+ZCBzY2VuYXJpby4gTWF5YmUgaXQncw0KdGltZSB0byByZWNvbnNpZGVyIGl0IGFnYWluLiANCg0K
+UmVnYXJkcywNCllpIEwNCg==
