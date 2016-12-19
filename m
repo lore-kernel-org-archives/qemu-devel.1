@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57021)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60666)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1cIvp9-0005Te-Gp
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 06:09:44 -0500
+	(envelope-from <yi.l.liu@intel.com>) id 1cIw4I-0002Z8-Oo
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 06:25:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1cIvp4-00030n-F9
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 06:09:43 -0500
-Received: from mx5-phx2.redhat.com ([209.132.183.37]:60498)
+	(envelope-from <yi.l.liu@intel.com>) id 1cIw4E-00022t-MN
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 06:25:22 -0500
+Received: from mga09.intel.com ([134.134.136.24]:54960)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1cIvp4-0002zS-6N
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 06:09:38 -0500
-Date: Mon, 19 Dec 2016 06:09:34 -0500 (EST)
-From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <mlureau@redhat.com>
-Message-ID: <903503264.6427014.1482145774126.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20161214171244.26813-1-alex.bennee@linaro.org>
-References: <20161214171244.26813-1-alex.bennee@linaro.org>
+	(Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1cIw4E-00020E-AA
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 06:25:18 -0500
+From: "Liu, Yi L" <yi.l.liu@intel.com>
+Date: Mon, 19 Dec 2016 11:25:10 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C257438FD9107@shsmsx102.ccr.corp.intel.com>
+References: <1481020588-4245-1-git-send-email-peterx@redhat.com>
+	<20161218084250.GB24337@gmail.com>
+	<20161219092250.GA4155@pxdev.xzpeter.org>
+In-Reply-To: <20161219092250.GA4155@pxdev.xzpeter.org>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC/POC PATCH 0/4] Building TCG tests with
- emdebian cross compilers
+Subject: Re: [Qemu-devel] [RFC PATCH 00/13] VT-d replay and misc cleanup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,58 +29,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Cc: bobby prani <bobby.prani@gmail.com>, marcandre lureau <marcandre.lureau@redhat.com>, peter maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>, "Liu, Yi L" <yi.l.liu@linux.intel.com>
+Cc: "Tian, Kevin" <kevin.tian@intel.com>, "Lan, Tianyu" <tianyu.lan@intel.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-Hi
-
------ Original Message -----
-> Hi Pranith,
->=20
-> Here is a proof-of-concept series for you to consider rolling into the TC=
-G
-> tests
-> cleanup. It uses the existing docker make machinery to build a Debian
-> image which has arm, arm64 and ppc64el cross compilers in it. Now if
-> you run:
->=20
->   make arm-tcg-tests
->=20
-> It will do the requisite build of the docker image and then use that
-> to build the TCG tests in the appropriate build directory.
->=20
-> These apply on top of your existing series. There is also a quick hack
-> to disable the running of the tests by default. I think we need two
-> stages, maybe a build-FOO-tcg-tests and run-FOO-tcg-tests.
->=20
-> What do you think?
-
-I like the idea, as long as you can also run the tcg tests without docker. =
-How many of the qemu archs debian cross tools support? last time I looked t=
-here was annoying limitations, but I can't remember the details.
-
-crosstool-ng has perhaps more potential, especially if devs would share the=
-ir config/samples (we could then have a cross-distro packaging with flatpac=
-k?)
-
-> Alex Benn=C3=A9e (4):
->   tests/docker: add basic user mapping support
->   new tests/docker/dockerfiles/debian-multiarch-cross.docker
->   tests/tcg: don't run tests by default
->   tests/tcg/Makefile: use docker target for arm-tcg-tests
->=20
->  tests/docker/docker.py                             | 19 +++++++++++
->  tests/docker/dockerfiles/debian-bootstrap.docker   |  3 ++
->  .../dockerfiles/debian-multiarch-cross.docker      | 39
->  ++++++++++++++++++++++
->  tests/tcg/Makefile.include                         | 20 +++++++++--
->  tests/tcg/arm/Makefile                             |  2 +-
->  tests/tcg/misc/Makefile                            |  4 +--
->  6 files changed, 81 insertions(+), 6 deletions(-)
->  create mode 100644 tests/docker/dockerfiles/debian-multiarch-cross.docke=
-r
->=20
-> --
-> 2.11.0
->=20
->=20
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBQZXRlciBYdSBbbWFpbHRvOnBl
+dGVyeEByZWRoYXQuY29tXQ0KPiBTZW50OiBNb25kYXksIERlY2VtYmVyIDE5LCAyMDE2IDU6MjMg
+UE0NCj4gVG86IExpdSwgWWkgTCA8eWkubC5saXVAbGludXguaW50ZWwuY29tPg0KPiBDYzogVGlh
+biwgS2V2aW4gPGtldmluLnRpYW5AaW50ZWwuY29tPjsgTGFuLCBUaWFueXUgPHRpYW55dS5sYW5A
+aW50ZWwuY29tPjsNCj4gamFzb3dhbmdAcmVkaGF0LmNvbTsgcWVtdS1kZXZlbEBub25nbnUub3Jn
+OyBMaXUsIFlpIEwgPHlpLmwubGl1QGludGVsLmNvbT4NCj4gU3ViamVjdDogUmU6IFtRZW11LWRl
+dmVsXSBbUkZDIFBBVENIIDAwLzEzXSBWVC1kIHJlcGxheSBhbmQgbWlzYyBjbGVhbnVwDQo+IA0K
+PiBPbiBTdW4sIERlYyAxOCwgMjAxNiBhdCAwNDo0Mjo1MFBNICswODAwLCBMaXUsIFlpIEwgd3Jv
+dGU6DQo+ID4gT24gVHVlLCBEZWMgMDYsIDIwMTYgYXQgMDY6MzY6MTVQTSArMDgwMCwgUGV0ZXIg
+WHUgd3JvdGU6DQo+ID4gPiBUaGlzIFJGQyBzZXJpZXMgaXMgYSBjb250aW51ZSB3b3JrIGZvciBB
+dml2IEIuRC4ncyB2ZmlvIGVuYWJsZW1lbnQNCj4gPiA+IHNlcmllcyB3aXRoIHZ0LWQuIEF2aXYg
+aGFzIGRvbmUgYSBncmVhdCBqb2IgdGhlcmUsIGFuZCB3aGF0IHdlIHN0aWxsDQo+ID4gPiBsYWNr
+IHRoZXJlIGFyZSBtb3N0bHkgdGhlIGZvbGxvd2luZzoNCj4gPiA+DQo+ID4gPiAoMSkgVkZJTyBn
+b3QgZHVwbGljYXRlZCBJT1RMQiBub3RpZmljYXRpb25zIGR1ZSB0byBzcGxpdHRlZCBWVC1kIElP
+TU1VDQo+ID4gPiAgICAgbWVtb3J5IHJlZ2lvbi4NCj4gPiA+DQo+ID4gPiAoMikgVlQtZCBzdGls
+bCBoYXZlbid0IHByb3ZpZGUgYSBjb3JyZWN0IHJlcGxheSgpIG1lY2hhbmlzbSAoZS5nLiwNCj4g
+PiA+ICAgICB3aGVuIElPTU1VIGRvbWFpbiBzd2l0Y2hlcywgdGhpbmdzIHdpbGwgYnJva2UpLg0K
+PiA+ID4NCj4gPiA+IEhlcmUgSSdtIHRyeWluZyB0byBzb2x2ZSB0aGUgYWJvdmUgdHdvIGlzc3Vl
+cy4NCj4gPiA+DQo+ID4gPiAoMSkgaXMgc29sdmVkIGJ5IHBhdGNoIDcsICgyKSBpcyBzb2x2ZWQg
+YnkgcGF0Y2ggMTEtMTIuDQo+ID4gPg0KPiA+ID4gQmFzaWNhbGx5IGl0IGNvbnRhaW5zIHRoZSBm
+b2xsb3dpbmc6DQo+ID4gPg0KPiA+ID4gcGF0Y2ggMTogICAgcGlja2VkIHVwIGZyb20gSmFzb24n
+cyB2aG9zdCBETUFSIHNlcmllcywgd2hpY2ggaXMgYSBidWdmaXgNCj4gPiA+DQo+ID4gPiBwYXRj
+aCAyLTY6ICBDbGVhbnVwcy9FbmhhbmNlbWVudHMgZm9yIGV4aXN0aW5nIHZ0LWQgY29kZXMgKHBs
+ZWFzZSBzZWUNCj4gPiA+ICAgICAgICAgICAgIHNwZWNpZmljIGNvbW1pdCBtZXNzYWdlIGZvciBk
+ZXRhaWxzLCB0aGVyZSBhcmUgcGF0Y2hlcw0KPiA+ID4gICAgICAgICAgICAgdGhhdCBJIHRob3Vn
+aHQgbWF5IGJlIHN1aXRhYmxlIGZvciAyLjggYXMgd2VsbCwgYnV0IGxvb2tzDQo+ID4gPiAgICAg
+ICAgICAgICBsaWtlIGl0J3MgdG9vIGxhdGUpDQo+ID4gPg0KPiA+ID4gcGF0Y2ggNzogICAgU29s
+dmUgdGhlIGlzc3VlIHRoYXQgdmZpbyBpcyBub3RpZmllZCBtb3JlIHRoYW4gb25jZSBmb3INCj4g
+PiA+ICAgICAgICAgICAgIElPVExCIG5vdGlmaWNhdGlvbnMgd2l0aCBBdml2J3MgcGF0Y2hlcw0K
+PiA+ID4NCj4gPiA+IHBhdGNoIDgtMTA6IFNvbWUgdHJpdmlhbCBtZW1vcnkgQVBJcyBhZGRlZCBm
+b3IgZnVydGhlciBwYXRjaGVzLCBhbmQNCj4gPiA+ICAgICAgICAgICAgIGFkZCBjdXN0b21pemUg
+cmVwbGF5KCkgc3VwcG9ydCBmb3IgTWVtb3J5UmVnaW9uIChJIHNlZQ0KPiA+ID4gICAgICAgICAg
+ICAgQXZpdidzIGxhdGVzdCB2NyBjb250YWlucyBzaW1pbGFyIHJlcGxheSwgSSBjYW4gcmViYXNl
+DQo+ID4gPiAgICAgICAgICAgICBvbnRvIHRoYXQsIG1lcmVseSB0aGUgc2FtZSB0aGluZykNCj4g
+PiA+DQo+ID4gPiBwYXRjaCAxMTogICBQcm92aWRlIGEgdmFsaWQgdnQtZCByZXBsYXkoKSBjYWxs
+YmFjaywgdXNpbmcgcGFnZSB3YWxrDQo+ID4gPg0KPiA+IFBldGVyLA0KPiA+IERvZXMgeW91ciBw
+YXRjaCBzZXQgYmFzZWQgb24gQXZpdidzIHBhdGNo77yfIEkgZm91bmQgdGhlIHBhZ2UgY2Fubm90
+IGJlDQo+ID4gYXBwbGllZCBpbiBteSBzaWRlLg0KPiANCj4gSGksIFlpLA0KPiANCj4gVGhpcyBz
+ZXJpZXMgaXMgYmFzZWQgb24gQXZpdidzIHY2IHNlcmllcy4gSWYgeW91IHdhbm5hIHRyeSBpdCwg
+eW91IG1heQ0KPiB3YW50IHRvIGZldGNoIHRoZSB0cmVlIGZyb206DQo+IA0KPiAgaHR0cHM6Ly9n
+aXRodWIuY29tL3h6cGV0ZXIvcWVtdS90cmVlL3Z0ZC12ZmlvLWVuYWJsZW1lbnQNCj4gDQo+IFNv
+IHlvdSB3b24ndCBuZWVkIHRvIGJvdGhlciBvbiB0aGUgYXBwbHlpbmcuDQo+IA0KQWhhLCBsb29r
+cyBsaWtlIHlvdSBtZW50aW9uZWQgeW91IGdpdGh1YiBsaW5rIHByZXZpb3VzbHkuIEkgZm9yZ290
+IGl0LiBXb3VsZA0KdHJ5IGl0IHRoZW4uIEkgbWF5IHJlYmFzZSBteSBjdXJyZW50IHN2bSB3b3Jr
+LiB0aHggZm9yIHlvdXIgY29udHJpYnV0aW9uLl5fXg0KDQo+ID4NCj4gPiBCVFcuIGl0IG1heSBi
+ZSBiZXR0ZXIgaWYgeW91IGNhbiBzcGxpdCB0aGUgcGF0Y2hlcyBmb3IgbWlzIGNsZWFudXANCj4g
+PiBhbmQgdGhlIHBhdGNoZXMgZm9yIHJlcGxheS8iZml4IGR1cGxpY2F0ZSBub3RpZnkiLg0KPiAN
+Cj4gWWVzLiBIZXJlIEkganVzdCB3YW50IHRvIG1ha2Ugc3VyZSB0aGluZ3MgYXJlIHN0aWNrIHRv
+Z2V0aGVyIChlLmcuLCB0bw0KPiB0ZXN0IHRoZSByZXBsYXksIEkgd2lsbCBuZWVkIHRvIHVzZSB0
+aGUgdHJhY2VzKS4gQW5kIEkgZmVlbCBpdCBhd2t3YXJkDQo+IHRvIG1haW50YWluIHNldmVyYWwg
+c2VyaWVzIHVwc3RyZWFtIHdoaWxlIHRoZXkgaW50ZXJhY3Qgd2l0aCBlYWNoDQo+IG90aGVyLiBT
+b3JyeSBmb3IgdGhlIHRyb3VibGVzb21lLg0KPiANCkkgdG90YWxseSB1bmRlcnN0YW5kIHdoYXQg
+Ym90aGVycyB5b3UuIEl0J2xsIGJlIGZpbmUuIEZvbGxvdyB5b3VyIHBsYW5+DQoNClRoYW5rcywN
+CllpIEwNCg0KPiBUaGFua3MsDQo+IA0KPiAtLSBwZXRlcngNCg==
