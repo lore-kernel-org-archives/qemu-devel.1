@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42505)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43023)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cIzuy-0002m0-2G
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 10:32:01 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cIzx7-0004Vu-L0
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 10:34:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cIzuw-0001Vz-QH
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 10:32:00 -0500
-Received: from mail-ua0-x22d.google.com ([2607:f8b0:400c:c08::22d]:36168)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cIzuw-0001Uo-CV
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 10:31:58 -0500
-Received: by mail-ua0-x22d.google.com with SMTP id 3so89529745uaz.3
-	for <qemu-devel@nongnu.org>; Mon, 19 Dec 2016 07:31:56 -0800 (PST)
+	(envelope-from <mreitz@redhat.com>) id 1cIzx5-0002L1-W9
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 10:34:13 -0500
+References: <1479835586-74394-1-git-send-email-vsementsov@virtuozzo.com>
+	<1479835586-74394-14-git-send-email-vsementsov@virtuozzo.com>
+	<919ac9f1-cc7a-8679-c9f4-1da26bc27bf4@redhat.com>
+	<6d72606d-7e76-8f53-ed5f-b37838666e1e@virtuozzo.com>
+	<a8e92d90-b8d2-a26d-458e-82fd1f1a00dd@redhat.com>
+	<f3e9d063-7f2e-8308-38cb-fc61e6e9fcce@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <de2ebda3-a6db-d9da-9514-e86e3d9afa86@redhat.com>
+Date: Mon, 19 Dec 2016 16:34:00 +0100
 MIME-Version: 1.0
-In-Reply-To: <f4e17469-ae67-271e-0645-b069df34e0f9@mvista.com>
-References: <20161123194605.94717-1-flus@cesar.org.br>
-	<20161129193052.11736-1-flus@cesar.org.br>
-	<CAFEAcA--cM3Sn+Y4RA8BwsPCOWsJEPbQ3Npue32RPa7wLDCz2A@mail.gmail.com>
-	<1482112026.17769.25.camel@au1.ibm.com>
-	<f4e17469-ae67-271e-0645-b069df34e0f9@mvista.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 19 Dec 2016 15:31:35 +0000
-Message-ID: <CAFEAcA84Ab393fUB=UKDqtJYpZhHUEsZp6wEV3PpdjqCAfvuew@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v1 0/2] Add Atmel I2C TPM AT97SC3204T
- emulated device
+In-Reply-To: <f3e9d063-7f2e-8308-38cb-fc61e6e9fcce@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Rw5QnQ2eQrtgNr5GPs9sRdRNKdaXtxlTt"
+Subject: Re: [Qemu-devel] [PATCH 13/21] qcow2: add
+ .bdrv_store_persistent_dirty_bitmaps()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,57 +29,190 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Corey Minyard <cminyard@mvista.com>
-Cc: Alastair D'Silva <alastair@au1.ibm.com>, Fabio Urquiza <flus@cesar.org.br>, QEMU Developers <qemu-devel@nongnu.org>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
 
-On 19 December 2016 at 13:55, Corey Minyard <cminyard@mvista.com> wrote:
-> On 12/18/2016 07:47 PM, Alastair D'Silva wrote:
->>
->> On Fri, 2016-12-16 at 17:35 +0000, Peter Maydell wrote:
->>> Our current API seems to envisage that the slave can return a
->>> negative value from I2CSlaveClass::recv instead of a data byte,
->>> but I'm not sure what this means in the i2c protocol.
->>
->> Negative values are propagated upwards, where they are treated as
->> errors, eg, in hw/i2c/aspeed_i2c.c:aspeed_i2c_bus_handle_cmd():
->>
->> int ret = i2c_recv(bus->bus);
->> if (ret < 0) {
->>      qemu_log_mask(LOG_GUEST_ERROR, "%s: read failed\n", __func__);
->>      ret = 0xff;
->> }
->>
->> The call to i2c_recv is too late to issue the NAK, I believe they occur
->> during the start_transfer() call.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Rw5QnQ2eQrtgNr5GPs9sRdRNKdaXtxlTt
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com,
+ famz@redhat.com, den@openvz.org, stefanha@redhat.com, pbonzini@redhat.com
+Message-ID: <de2ebda3-a6db-d9da-9514-e86e3d9afa86@redhat.com>
+Subject: Re: [PATCH 13/21] qcow2: add .bdrv_store_persistent_dirty_bitmaps()
+References: <1479835586-74394-1-git-send-email-vsementsov@virtuozzo.com>
+ <1479835586-74394-14-git-send-email-vsementsov@virtuozzo.com>
+ <919ac9f1-cc7a-8679-c9f4-1da26bc27bf4@redhat.com>
+ <6d72606d-7e76-8f53-ed5f-b37838666e1e@virtuozzo.com>
+ <a8e92d90-b8d2-a26d-458e-82fd1f1a00dd@redhat.com>
+ <f3e9d063-7f2e-8308-38cb-fc61e6e9fcce@virtuozzo.com>
+In-Reply-To: <f3e9d063-7f2e-8308-38cb-fc61e6e9fcce@virtuozzo.com>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Transfer-Encoding: quoted-printable
 
-OK, so if returning negative values from i2c_recv() isn't
-the device saying "I am NAKing this", what *do* they mean?
+On 19.12.2016 16:26, Vladimir Sementsov-Ogievskiy wrote:
+> 19.12.2016 18:14, Max Reitz wrote:
+>> On 17.12.2016 15:58, Vladimir Sementsov-Ogievskiy wrote:
+>>> 09.12.2016 20:05, Max Reitz wrote:
+>>>> On 22.11.2016 18:26, Vladimir Sementsov-Ogievskiy wrote:
+>>>>> Realize block bitmap storing interface, to allow qcow2 images store=
 
->>> If I understand your patch correctly, this is adding support
->>> for the slave refusing to ACK when the master sends out the
->>> slave address and r/w bit. I think that makes sense, but rather
->>> than having a state flag in the I2CSlave struct, we should
->>> change the prototype of the I2CSlaveClass event method so that
->>> it can return a value indicating ack or nak.
+>>>>> persistent bitmaps.
+>>>>>
+>>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.c=
+om>
+>>>>> ---
+>>>>>   block/qcow2-bitmap.c | 451
+>>>>> +++++++++++++++++++++++++++++++++++++++++++++++++++
+>>>>>   block/qcow2.c        |   1 +
+>>> [...]
 >>>
->> Hmm, this could end up being quite an invasive change, but ultimately
->> more elegant. I'm not sure which way the community prefers.
->
->
-> I have a patch that adds a check_event() handler along side the event()
-> handler.
-> If a device wants to send a NAK, it can implement check_event() instead of
-> event() and return non-zero to NAK.
->
-> I toyed with just changing all the event() calls, but there are a bunch.
-> This seemed
-> like the better approach.  I can send if you like.
+>>>>> +
+>>>>> +/* store_bitmap_data()
+>>>>> + * Store bitmap to image, filling bitmap table accordingly.
+>>>>> + */
+>>>>> +static uint64_t *store_bitmap_data(BlockDriverState *bs,
+>>>>> +                                   BdrvDirtyBitmap *bitmap,
+>>>>> +                                   uint32_t *bitmap_table_size,
+>>>>> Error **errp)
+>>>>> +{
+>>>>> +    int ret;
+>>>>> +    BDRVQcow2State *s =3D bs->opaque;
+>>>>> +    int64_t sector;
+>>>>> +    uint64_t dsc;
+>>>>> +    uint64_t bm_size =3D bdrv_dirty_bitmap_size(bitmap);
+>>>>> +    const char *bm_name =3D bdrv_dirty_bitmap_name(bitmap);
+>>>>> +    uint8_t *buf =3D NULL;
+>>>>> +    BdrvDirtyBitmapIter *dbi;
+>>>>> +    uint64_t *tb;
+>>>>> +    uint64_t tb_size =3D
+>>>>> +            size_to_clusters(s,
+>>>>> +                bdrv_dirty_bitmap_serialization_size(bitmap, 0,
+>>>>> bm_size));
+>>>>> +
+>>>>> +    if (tb_size > BME_MAX_TABLE_SIZE ||
+>>>>> +            tb_size * s->cluster_size > BME_MAX_PHYS_SIZE) {
+>>>> Alignment to the opening parenthesis, please.
+>>>>
+>>>>> +        error_setg(errp, "Bitmap '%s' is too big", bm_name);
+>>>>> +        return NULL;
+>>>>> +    }
+>>>>> +
+>>>>> +    tb =3D g_try_new0(uint64_t, tb_size);
+>>>>> +    if (tb =3D=3D NULL) {
+>>>>> +        error_setg(errp, "No memory");
+>>>>> +        return NULL;
+>>>>> +    }
+>>>>> +
+>>>>> +    dbi =3D bdrv_dirty_iter_new(bitmap, 0);
+>>>>> +    buf =3D g_malloc(s->cluster_size);
+>>>>> +    dsc =3D disk_sectors_in_bitmap_cluster(s, bitmap);
+>>>>> +
+>>>>> +    while ((sector =3D bdrv_dirty_iter_next(dbi)) !=3D -1) {
+>>>>> +        uint64_t cluster =3D sector / dsc;
+>>>>> +        uint64_t end, write_size;
+>>>>> +        int64_t off;
+>>>>> +
+>>>>> +        sector =3D cluster * dsc;
+>>>>> +        end =3D MIN(bm_size, sector + dsc);
+>>>>> +        write_size =3D
+>>>>> +            bdrv_dirty_bitmap_serialization_size(bitmap, sector,
+>>>>> end - sector);
+>>>>> +
+>>>>> +        off =3D qcow2_alloc_clusters(bs, s->cluster_size);
+>>>>> +        if (off < 0) {
+>>>>> +            error_setg_errno(errp, -off,
+>>>>> +                             "Failed to allocate clusters for
+>>>>> bitmap '%s'",
+>>>>> +                             bm_name);
+>>>>> +            goto fail;
+>>>>> +        }
+>>>>> +        tb[cluster] =3D off;
+>>>> Somehow I would feel better with either an assert(cluster < tb_size)=
+;
+>>>> here or an assert(bdrv_nb_sectors(bs) / dsc =3D=3D tb_size); (plus t=
+he
+>>>> error
+>>>> handling for bdrv_nb_sectors()) above the loop.
+>>> assert((bm_size - 1) / dsc =3D=3D tb_size - 1) seems ok. and no addit=
+ional
+>>> error handling. Right?
+>> Right, bm_size is already equal to bdrv_nb_sectors(bs), and it's not
+>> necessarily a multiple of dsc. So that should be good. Alternatively, =
+I
+>> think the following would be slightly easier to read:
+>>
+>> assert(DIV_ROUND_UP(bm_size, dsc) =3D=3D tb_size);
+>>
+>>>>> +
+>>>>> +        bdrv_dirty_bitmap_serialize_part(bitmap, buf, sector, end
+>>>>> - sector);
+>>>>> +        if (write_size < s->cluster_size) {
+>>>>> +            memset(buf + write_size, 0, s->cluster_size -
+>>>>> write_size);
+>>>>> +        }
+>>>> Should we assert that write_size <=3D s->cluster_size?
+>>> Ok
+>>>
+>>> [...].
+>>>
+>>>>> +        const char *name =3D bdrv_dirty_bitmap_name(bitmap);
+>>>>> +        uint32_t granularity =3D bdrv_dirty_bitmap_granularity(bit=
+map);
+>>>>> +        Qcow2Bitmap *bm;
+>>>>> +
+>>>>> +        if (!bdrv_dirty_bitmap_get_persistance(bitmap)) {
+>>>>> +            continue;
+>>>>> +        }
+>>>>> +
+>>>>> +        if (++new_nb_bitmaps > QCOW2_MAX_BITMAPS) {
+>>>>> +            error_setg(errp, "Too many persistent bitmaps");
+>>>>> +            goto fail;
+>>>>> +        }
+>>>>> +
+>>>>> +        new_dir_size +=3D calc_dir_entry_size(strlen(name), 0);
+>>>>> +        if (new_dir_size > QCOW2_MAX_BITMAP_DIRECTORY_SIZE) {
+>>>>> +            error_setg(errp, "Too large bitmap directory");
+>>>>> +            goto fail;
+>>>>> +        }
+>>>> You only need to increment new_nb_bitmaps and increase new_dir_size =
+if
+>>>> the bitmap does not already exist in the image (i.e. if
+>>>> find_bitmap_by_name() below returns NULL).
+>>> Why? No, I need to check the whole sum and the whole size.
+>> If the bitmap already exists, you don't create a new directory entry b=
+ut
+>> reuse the existing one. Therefore, the number of bitmaps in the image
+>> and the directory size will not grow then.
+>=20
+> new_nb_bitmaps is not number of "newly created bitmaps", but just new
+> value of field nb_bitmaps, so, all bitmaps - old and new are calculated=
 
-It looks like there are only a dozen or so. I think it would
-be better for the long term just to change the event calls.
-We should also document in the comments in the I2CSlaveClass
-struct definition exactly what the semantics of the various
-functions are.
+> into new_nb_bitmaps. Anyway, this misunderstanding shows that variable
+> name is bad..
 
-thanks
--- PMM
+Yes. But when you store a bitmap of the same name as an existing one,
+you are replacing it. The number of bitmaps does not grow in that case.
+
+Max
+
+
+--Rw5QnQ2eQrtgNr5GPs9sRdRNKdaXtxlTt
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlhX/egSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9ApysH/392tVvaEr3t5KN6zf/ZsflRZyGKgj01
+KPxvqv1vSwLjcfV90QmmXRB8K5vScbWndouhEo2yZ27riCZQf5T6q6LXj1/i4FRi
+xBzQEWWL0ICitbFhvm/JiBhpZn/QGIZNHqR6+kNGl4HW4JEMoSHUA3NMk6NHqKVB
+8Cb21wnwbdV/Epq4HXTcwftyw/5782qImz6Qrv7PM9ka9s0fECh6PfY7pJV82pEF
+93zNjwjZ/O5Zkpkz5XfajIZr1fEBUU+Z37JPx8lWBKlBd8QeYNRKd72nymlX9ZEb
+oKD04syd+31Il/7KdGTNmcQjVxqlauqsEC4P1v6vHM+gwc415GGWyws=
+=V/dF
+-----END PGP SIGNATURE-----
+
+--Rw5QnQ2eQrtgNr5GPs9sRdRNKdaXtxlTt--
