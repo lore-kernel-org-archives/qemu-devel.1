@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56111)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56585)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cJ0qA-0005dA-Vp
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 11:31:08 -0500
+	(envelope-from <famz@redhat.com>) id 1cJ0ro-0007VQ-4Y
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 11:32:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cJ0q7-0002RI-2c
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 11:31:07 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60394)
+	(envelope-from <famz@redhat.com>) id 1cJ0rk-000322-6y
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 11:32:48 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57982)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1cJ0q6-0002Qu-Q9
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 11:31:02 -0500
-References: <1478265017-5700-1-git-send-email-thuth@redhat.com>
-	<87wpg5di5o.fsf@emacs.mitica> <20161117034511.GG18808@umbus.fritz.box>
-	<b20c6b22-fc3a-b37a-6ea0-169be815864a@redhat.com>
-	<401600f0-8a1c-22c7-b9f3-7424426ec699@redhat.com>
-	<20161216170357.GD2642@work-vm>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <5a7603d3-aa76-aa93-b6a0-80496284cecf@redhat.com>
-Date: Mon, 19 Dec 2016 17:30:58 +0100
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1cJ0rk-00031p-1c
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 11:32:44 -0500
+Date: Tue, 20 Dec 2016 00:32:40 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20161219163214.GA9801@lemon>
+References: <1482137486-9843-1-git-send-email-douly.fnst@cn.fujitsu.com>
+	<20161219150230.GA20757@stefanha-x1.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <20161216170357.GD2642@work-vm>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Is block_save_iterate() dead code?
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20161219150230.GA20757@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [PATCH RFC v2 0/4] block/qapi: refactor and
+ optimize the qmp_query_blockstats()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,76 +28,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, Juan Quintela <quintela@redhat.com>, Amit Shah <amit.shah@redhat.com>, qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Dou Liyang <douly.fnst@cn.fujitsu.com>, stefanha@redhat.com, kwolf@redhat.com, armbru@redhat.com, mreitz@redhat.com, eblake@redhat.com, izumi.taku@jp.fujitsu.com, caoj.fnst@cn.fujitsu.com, fanc.fnst@cn.fujitsu.com, qemu-devel@nongnu.org
 
-On 16.12.2016 18:03, Dr. David Alan Gilbert wrote:
-> * Thomas Huth (thuth@redhat.com) wrote:
->> On 18.11.2016 09:13, Thomas Huth wrote:
->>> On 17.11.2016 04:45, David Gibson wrote:
->>>> On Mon, Nov 14, 2016 at 07:34:59PM +0100, Juan Quintela wrote:
->>>>> Thomas Huth <thuth@redhat.com> wrote:
->>>>>> qemu_savevm_state_iterate() expects the iterators to return 1
->>>>>> when they are done, and 0 if there is still something left to do.
->>>>>> However, ram_save_iterate() does not obey this rule and returns
->>>>>> the number of saved pages instead. This causes a fatal hang with
->>>>>> ppc64 guests when you run QEMU like this (also works with TCG):
->>>>>>
->>>>>>  qemu-img create -f qcow2  /tmp/test.qcow2 1M
->>>>>>  qemu-system-ppc64 -nographic -nodefaults -m 256 \
->>>>>>                    -hda /tmp/test.qcow2 -serial mon:stdio
->>>>>>
->>>>>> ... then switch to the monitor by pressing CTRL-a c and try to
->>>>>> save a snapshot with "savevm test1" for example.
->>>>>>
->>>>>> After the first iteration, ram_save_iterate() always returns 0 her=
-e,
->>>>>> so that qemu_savevm_state_iterate() hangs in an endless loop and y=
-ou
->>>>>> can only "kill -9" the QEMU process.
->>>>>> Fix it by using proper return values in ram_save_iterate().
->>>>>>
->>>>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>>>>
->>>>> Reviewed-by: Juan Quintela <quintela@redhat.com>
->>>>>
->>>>> Applied.
->>>>>
->>>>> I don't know how we broked this so much.
->>>>
->>>> Note that block save iterate has the same bug...
->>>
->>> I think you're right. Care to send a patch?
->>
->> Looking at this issue again ... could it be that block_save_iterate() =
-is
->> currently just dead code?
->> As far as I can see, the ->save_live_iterate() handlers are only calle=
-d
->> from qemu_savevm_state_iterate(), right? And qemu_savevm_state_iterate=
-()
->> only calls the handlers if se->ops->is_active(se->opaque) returns true=
-.
->> But block_is_active() seems to only return 0 during savevm, most likel=
-y
->> because qemu_savevm_state() explicitly sets the "blk" and "shared"
->> MigrationParams to zero.
->> So to me, it looks like we could also just remove block_save_iterate()
->> completely ... or did I miss something here?
->=20
-> Doesn't it get called by migrate -b ?
+On Mon, 12/19 15:02, Stefan Hajnoczi wrote:
+> On Mon, Dec 19, 2016 at 04:51:22PM +0800, Dou Liyang wrote:
+> > These patches aim to refactor the qmp_query_blockstats() and
+> > improve the performance by reducing the running time of it.
+> > 
+> > qmp_query_blockstats() is used to monitor the blockstats, it
+> > querys all the graph_bdrv_states or monitor_block_backends.
+> > 
+> > There are the two jobs:
+> > 
+> > 1 For the performance:
+> > 
+> > 1.1 the time it takes(ns) in each time:
+> > the disk numbers     | 10    | 500
+> > -------------------------------------
+> > before these patches | 19429 | 667722 
+> > after these patches  | 17516 | 557044
+> > 
+> > 1.2 the I/O performance is degraded(%) during the monitor:
+> > 
+> > the disk numbers     | 10    | 500
+> > -------------------------------------
+> > before these patches | 1.3   | 14.2
+> > after these patches  | 0.8   | 9.1
+> 
+> Do you know what is consuming the remaining 9.1%?
+> 
+> I'm surprised to see such a high performance impact caused by a QMP
+> command.
 
-Ah, right, yes, I somehow missed that ... I probably shouldn't do such
-experiments at the end of Friday afternoon ;-)
+If it's "performance is 9.1% worse only during the 557044 ns when the QMP
+command is being processed", it's probably becaues the main loop is stalled a
+bit, and it's not a big problem. I'd be very surprised if the degradation is
+more longer than that.
 
-OK, so it seems that
-- block_save_iterate() is not called during savevm at all
-  (and thus the bad return code does not matter here)
-- migrate -b runs block_save_iterate() but the return code is ignored in
-  migration_thread()
+Fam
 
-So we do not have a real problem here, but I think we should still clean
-up the return code of block_save_iterate() to be on the safe side for
-the future...
-
- Thomas
+> 
+> Please post your QEMU command-line.
