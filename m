@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59160)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32811)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.l.liu@linux.intel.com>) id 1cItl4-0007Sk-I6
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 03:57:24 -0500
+	(envelope-from <holger@fam-schranz.de>) id 1cIttJ-0003lA-VD
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 04:05:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.l.liu@linux.intel.com>) id 1cItl0-0002HK-Ki
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 03:57:22 -0500
-Received: from mga04.intel.com ([192.55.52.120]:39625)
+	(envelope-from <holger@fam-schranz.de>) id 1cIttF-0005O9-UR
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 04:05:53 -0500
+Received: from smtp3.goneo.de ([85.220.129.37]:59884)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yi.l.liu@linux.intel.com>)
-	id 1cItl0-0002H9-8N
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 03:57:18 -0500
-Date: Sun, 18 Dec 2016 16:42:50 +0800
-From: "Liu, Yi L" <yi.l.liu@linux.intel.com>
-Message-ID: <20161218084250.GB24337@gmail.com>
-References: <1481020588-4245-1-git-send-email-peterx@redhat.com>
+	(Exim 4.71) (envelope-from <holger@fam-schranz.de>)
+	id 1cIttF-0005NB-Kk
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 04:05:49 -0500
+From: Holger Schranz <holger@fam-schranz.de>
+Message-ID: <c532ac07-fd54-eedb-b3f0-548aeacf0a04@fam-schranz.de>
+Date: Mon, 19 Dec 2016 10:05:04 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <1481020588-4245-1-git-send-email-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 00/13] VT-d replay and misc cleanup
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] Strange/wrong behavior with iSCSI Tape devices in QEMU
+ 2.8.0-rc4
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,165 +26,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: kevin.tian@intel.com, tianyu.lan@intel.com, jasowang@redhat.com, qemu-devel@nongnu.org, yi.l.liu@intel.com
+To: qemu-devel@nongnu.org
+Cc: mueller-ralf@t-online.de
 
-On Tue, Dec 06, 2016 at 06:36:15PM +0800, Peter Xu wrote:
-> This RFC series is a continue work for Aviv B.D.'s vfio enablement
-> series with vt-d. Aviv has done a great job there, and what we still
-> lack there are mostly the following:
-> 
-> (1) VFIO got duplicated IOTLB notifications due to splitted VT-d IOMMU
->     memory region.
-> 
-> (2) VT-d still haven't provide a correct replay() mechanism (e.g.,
->     when IOMMU domain switches, things will broke).
-> 
-> Here I'm trying to solve the above two issues.
-> 
-> (1) is solved by patch 7, (2) is solved by patch 11-12.
-> 
-> Basically it contains the following:
-> 
-> patch 1:    picked up from Jason's vhost DMAR series, which is a bugfix
-> 
-> patch 2-6:  Cleanups/Enhancements for existing vt-d codes (please see
->             specific commit message for details, there are patches
->             that I thought may be suitable for 2.8 as well, but looks
->             like it's too late)
-> 
-> patch 7:    Solve the issue that vfio is notified more than once for
->             IOTLB notifications with Aviv's patches
-> 
-> patch 8-10: Some trivial memory APIs added for further patches, and
->             add customize replay() support for MemoryRegion (I see
->             Aviv's latest v7 contains similar replay, I can rebase
->             onto that, merely the same thing)
-> 
-> patch 11:   Provide a valid vt-d replay() callback, using page walk
-> 
-Peter,
-Does your patch set based on Aviv's patch？ I found the page cannot be
-applied in my side.
+# Strange/wrong behavior in QEMU 2.8.0-rc4
 
-BTW. it may be better if you can split the patches for mis cleanup
-and the patches for replay/"fix duplicate notify".
+After update from QEMU 2.6.2 to 2.8.0-rc4 the tape devices
+and the corresponding medium changer are no longer available
+in the VM quest system.
 
-Thanks,
-Yi L
-> patch 12:   Enable the domain switch support - we replay() when
->             context entry got invalidated
-> 
-> patch 13:   Enhancement for existing invalidation notification,
->             instead of using translate() for each page, we leverage
->             the new vtd_page_walk() interface, which should be faster.
-> 
-> I would glad to hear about any review comments for above patches
-> (especially patch 8-13, which is the main part of this series),
-> especially any issue I missed in the series.
-> 
-> =========
-> Test Done
-> =========
-> 
-> Build test passed for x86_64/arm/ppc64.
-> 
-> Simply tested with x86_64, assigning two PCI devices to a single VM,
-> boot the VM using:
-> 
-> bin=x86_64-softmmu/qemu-system-x86_64
-> $bin -M q35,accel=kvm,kernel-irqchip=split -m 1G \
->      -device intel-iommu,intremap=on,eim=off,cache-mode=on \
->      -netdev user,id=net0,hostfwd=tcp::5555-:22 \
->      -device virtio-net-pci,netdev=net0 \
->      -device vfio-pci,host=03:00.0 \
->      -device vfio-pci,host=02:00.0 \
->      -trace events=".trace.vfio" \
->      /var/lib/libvirt/images/vm1.qcow2
-> 
-> pxdev:bin [vtd-vfio-enablement]# cat .trace.vfio
-> vtd_page_walk*
-> vtd_replay*
-> vtd_inv_desc*
-> 
-> Then, in the guest, run the following tool:
-> 
->   https://github.com/xzpeter/clibs/blob/master/gpl/userspace/vfio-bind-group/vfio-bind-group.c
-> 
-> With parameter:
-> 
->   ./vfio-bind-group 00:03.0 00:04.0
-> 
-> Check host side trace log, I can see pages are replayed and mapped in
-> 00:04.0 device address space, like:
-> 
-> ...
-> vtd_replay_ce_valid replay valid context device 00:04.00 hi 0x301 lo 0x3be77001
-> vtd_page_walk Page walk for ce (0x301, 0x3be77001) iova range 0x0 - 0x8000000000
-> vtd_page_walk_level Page walk (base=0x3be77000, level=3) iova range 0x0 - 0x8000000000
-> vtd_page_walk_level Page walk (base=0x3c88a000, level=2) iova range 0x0 - 0x40000000
-> vtd_page_walk_level Page walk (base=0x366cb000, level=1) iova range 0x0 - 0x200000
-> vtd_page_walk_one Page walk detected map level 0x1 iova 0x0 -> gpa 0x366cb000 mask 0xfff perm 3
-> vtd_page_walk_one Page walk detected map level 0x1 iova 0x1000 -> gpa 0x366cb000 mask 0xfff perm 3
-> vtd_page_walk_one Page walk detected map level 0x1 iova 0x2000 -> gpa 0x366cb000 mask 0xfff perm 3
-> vtd_page_walk_one Page walk detected map level 0x1 iova 0x3000 -> gpa 0x366cb000 mask 0xfff perm 3
-> vtd_page_walk_one Page walk detected map level 0x1 iova 0x4000 -> gpa 0x366cb000 mask 0xfff perm 3
-> vtd_page_walk_one Page walk detected map level 0x1 iova 0x5000 -> gpa 0x366cb000 mask 0xfff perm 3
-> vtd_page_walk_one Page walk detected map level 0x1 iova 0x6000 -> gpa 0x366cb000 mask 0xfff perm 3
-> vtd_page_walk_one Page walk detected map level 0x1 iova 0x7000 -> gpa 0x366cb000 mask 0xfff perm 3
-> vtd_page_walk_one Page walk detected map level 0x1 iova 0x8000 -> gpa 0x366cb000 mask 0xfff perm 3
-> vtd_page_walk_one Page walk detected map level 0x1 iova 0x9000 -> gpa 0x366cb000 mask 0xfff perm 3
-> vtd_page_walk_one Page walk detected map level 0x1 iova 0xa000 -> gpa 0x366cb000 mask 0xfff perm 3
-> vtd_page_walk_one Page walk detected map level 0x1 iova 0xb000 -> gpa 0x366cb000 mask 0xfff perm 3
-> vtd_page_walk_one Page walk detected map level 0x1 iova 0xc000 -> gpa 0x366cb000 mask 0xfff perm 3
-> vtd_page_walk_one Page walk detected map level 0x1 iova 0xd000 -> gpa 0x366cb000 mask 0xfff perm 3
-> vtd_page_walk_one Page walk detected map level 0x1 iova 0xe000 -> gpa 0x366cb000 mask 0xfff perm 3
-> ...
-> 
-> =========
-> Todo List
-> =========
-> 
-> - error reporting for the assigned devices (as Tianyu has mentioned)
-> 
-> - per-domain address-space: A better solution in the future may be -
->   we maintain one address space per IOMMU domain in the guest (so
->   multiple devices can share a same address space if they are sharing
->   the same IOMMU domains in the guest), rather than one address space
->   per device (which is current implementation of vt-d). However that's
->   a step further than this series, and let's see whether we can first
->   provide a workable version of device assignment with vt-d
->   protection.
-> 
-> - more to come...
-> 
-> Thanks,
-> 
-> Jason Wang (1):
->   intel_iommu: allocate new key when creating new address space
-> 
-> Peter Xu (12):
->   intel_iommu: simplify irq region translation
->   intel_iommu: renaming gpa to iova where proper
->   intel_iommu: fix trace for inv desc handling
->   intel_iommu: fix trace for addr translation
->   intel_iommu: vtd_slpt_level_shift check level
->   memory: add section range info for IOMMU notifier
->   memory: provide iommu_replay_all()
->   memory: introduce memory_region_notify_one()
->   memory: add MemoryRegionIOMMUOps.replay() callback
->   intel_iommu: provide its own replay() callback
->   intel_iommu: do replay when context invalidate
->   intel_iommu: use page_walk for iotlb inv notify
-> 
->  hw/i386/intel_iommu.c | 521 ++++++++++++++++++++++++++++++++------------------
->  hw/i386/trace-events  |  27 +++
->  hw/vfio/common.c      |   7 +-
->  include/exec/memory.h |  30 +++
->  memory.c              |  42 +++-
->  5 files changed, 432 insertions(+), 195 deletions(-)
-> 
-> -- 
-> 2.7.4
-> 
-> 
+The tape devices and the media changer are declared in the
+xml-file for libvirt. Both, tape drives and medium changer
+are avalilable via iSCSI.
+
+In a first rough investigation the login in iSCSI runs well
+but in QEMU, it seems the devices doesn't reported to the VM-Quest.
+
+------------------
+
+Best regards
+
+Holger
+
+=====================================================================
+
+XML-Declration:
+
+.
+.
+.
+
+<!-- SCSI 2 -->
+     <controller type='scsi' model='virtio-scsi' index='1'>
+       <alias name='scsi1'/>
+     </controller>
+
+<!-- 2 x LTO5 -->
+     <hostdev mode='subsystem' type='scsi' managed='no' rawio='yes'>
+       <source protocol='iscsi' 
+name='iqn.2008-09.net.fsc:server.LT260_61003/4'>
+       <host name='etcsvms2.abg.fsc.net' port='3260'/>
+       </source>
+       <address type='drive' controller='1' bus='0' target='2' unit='1'/>
+     </hostdev>
+
+     <hostdev mode='subsystem' type='scsi' managed='no' rawio='yes'>
+       <source protocol='iscsi' 
+name='iqn.2008-09.net.fsc:server.LT260_61003/5'>
+       <host name='etcsvms2.abg.fsc.net' port='3260'/>
+       </source>
+       <address type='drive' controller='1' bus='0' target='2' unit='2'/>
+     </hostdev>
+
+<!-- Virtual media changer Fujitsu LT260 -->
+     <hostdev mode='subsystem' type='scsi' managed='no' rawio='yes'>
+       <source protocol='iscsi' 
+name='iqn.2008-09.net.fsc:server.LT260_61003/6'>
+       <host name='etcsvms2.abg.fsc.net' port='3260'/>
+       </source>
+       <address type='drive' controller='1' bus='0' target='2' unit='3'/>
+     </hostdev>
+
+<!-- 2 x LTO6 (via PLP(LAN-attached library)) -->
+     <hostdev mode='subsystem' type='scsi' managed='no' rawio='yes'>
+       <source protocol='iscsi' 
+name='iqn.2008-09.net.fsc:server.LT60_61005/3'>
+       <host name='etcsvms2.abg.fsc.net' port='3260'/>
+       </source>
+       <address type='drive' controller='1' bus='0' target='2' unit='4'/>
+     </hostdev>
+
+     <hostdev mode='subsystem' type='scsi' managed='no' rawio='yes'>
+       <source protocol='iscsi' 
+name='iqn.2008-09.net.fsc:server.LT60_61005/4'>
+       <host name='etcsvms2.abg.fsc.net' port='3260'/>
+       </source>
+       <address type='drive' controller='1' bus='0' target='2' unit='5'/>
+     </hostdev>
+.
+.
+.
+
+===============================================================================
+
+correct behavior/Result inside the VM-Quest together with QEMU/KVM 2.6.2 
+/ 2.7.0
+--
+(VCSTCS82:A)IUP1:~ # lsscsi -g
+[0:2:0:0]    disk    FTS      PRAID EP420i     4.25  /dev/sda /dev/sg0
+[3:0:0:0]    cd/dvd  QEMU     QEMU DVD-ROM     2.5+  /dev/sr0 /dev/sg1
+[8:0:2:1]    tape    HP       Ultrium 5-SCSI   0001  /dev/st3 /dev/sg6
+[8:0:2:2]    tape    HP       Ultrium 5-SCSI   0001  /dev/st2 /dev/sg5
+[8:0:2:3]    mediumx FUJITSU  ETERNUS LT260    6.20  - /dev/sg4
+[8:0:2:4]    tape    HP       Ultrium 6-SCSI   23AB  /dev/st1 /dev/sg3
+[8:0:2:5]    tape    HP       Ultrium 6-SCSI   23AB  /dev/st0 /dev/sg2
+[11:0:0:0]   disk    FUJITSU  ETERNUS_DXL      0000  /dev/sdb /dev/sg7
+[11:0:0:2]   disk    FUJITSU  ETERNUS_DXL      0000  /dev/sdh /dev/sg13
+[11:0:0:3]   disk    FUJITSU  ETERNUS_DXL      0000  /dev/sdg /dev/sg12
+[11:0:0:4]   disk    FUJITSU  ETERNUS_DXL      0000  /dev/sdf /dev/sg11
+[11:0:0:5]   disk    FUJITSU  ETERNUS_DXL      0000  /dev/sde /dev/sg10
+[11:0:0:6]   disk    FUJITSU  ETERNUS_DXL      0000  /dev/sdd /dev/sg9
+[11:0:0:7]   disk    FUJITSU  ETERNUS_DXL      0000  /dev/sdc /dev/sg8
+[11:0:0:15]  disk    FUJITSU  ETERNUS_DXL      0000  /dev/sdi /dev/sg14
+(VCSTCS82:A)IUP1:~ #
+
+
+
+Wrong behavior/Result inside the VM-Quest together with QEMU/KVM 2.8.0-RC4
+--
+(VCSTCS82:A)IUP1:~ # lsscsi -g
+[0:2:0:0]    disk    FTS      PRAID EP420i     4.25  /dev/sda /dev/sg0
+[3:0:0:0]    cd/dvd  QEMU     QEMU DVD-ROM     2.5+  /dev/sr0 /dev/sg1
+[11:0:1:0]   disk    FUJITSU  ETERNUS_DXL      0000  /dev/sdj /dev/sg10
+[11:0:1:2]   disk    FUJITSU  ETERNUS_DXL      0000  /dev/sdp /dev/sg16
+[11:0:1:3]   disk    FUJITSU  ETERNUS_DXL      0000  /dev/sdo /dev/sg15
+[11:0:1:4]   disk    FUJITSU  ETERNUS_DXL      0000  /dev/sdn /dev/sg14
+[11:0:1:5]   disk    FUJITSU  ETERNUS_DXL      0000  /dev/sdm /dev/sg13
+[11:0:1:6]   disk    FUJITSU  ETERNUS_DXL      0000  /dev/sdl /dev/sg12
+[11:0:1:7]   disk    FUJITSU  ETERNUS_DXL      0000  /dev/sdk /dev/sg11
+[11:0:1:15]  disk    FUJITSU  ETERNUS_DXL      0000  /dev/sdq /dev/sg17
+(VCSTCS82:A)IUP1:~ #
