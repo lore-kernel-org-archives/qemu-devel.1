@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34337)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35353)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pavel.dovgaluk@ispras.ru>) id 1cIxtD-0007nX-QN
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 08:22:05 -0500
+	(envelope-from <peterx@redhat.com>) id 1cIxy6-0004jz-Rz
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 08:27:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pavel.dovgaluk@ispras.ru>) id 1cIxtA-0007vb-K1
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 08:22:03 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:46382)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pavel.dovgaluk@ispras.ru>) id 1cIxtA-0007uZ-81
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 08:22:00 -0500
-From: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-Date: Mon, 19 Dec 2016 16:21:56 +0300
-Message-ID: <20161219132155.3016.36478.stgit@PASHA-ISP>
-In-Reply-To: <20161219132102.3016.46687.stgit@PASHA-ISP>
-References: <20161219132102.3016.46687.stgit@PASHA-ISP>
+	(envelope-from <peterx@redhat.com>) id 1cIxy3-0001Zj-Kg
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 08:27:06 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49950)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cIxy3-0001Zb-Eh
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 08:27:03 -0500
+Date: Mon, 19 Dec 2016 21:26:49 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20161219132649.GE4155@pxdev.xzpeter.org>
+References: <A2975661238FB949B60364EF0F2C257438FD8042@shsmsx102.ccr.corp.intel.com>
+	<20161219100053.GD4155@pxdev.xzpeter.org>
+	<A2975661238FB949B60364EF0F2C257438FD9142@shsmsx102.ccr.corp.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v6 9/9] blkreplay: create temporary overlay for
- underlaying devices
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <A2975661238FB949B60364EF0F2C257438FD9142@shsmsx102.ccr.corp.intel.com>
+Subject: Re: [Qemu-devel] [PATCH v7 3/5] IOMMU: enable intel_iommu map and
+ unmap notifiers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,150 +29,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, pbonzini@redhat.com
+To: "Liu, Yi L" <yi.l.liu@intel.com>
+Cc: "bd.aviv@gmail.com" <bd.aviv@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, ", Jan Kiszka" <jan.kiszka@siemens.com>, ", Alex Williamson" <alex.williamson@redhat.com>, ", Jason Wang" <jasowang@redhat.com>, "Lan, Tianyu" <tianyu.lan@intel.com>, "Tian, Kevin" <kevin.tian@intel.com>
 
-This patch allows using '-snapshot' behavior in record/replay mode.
-blkreplay layer creates temporary overlays on top of underlaying
-disk images. It is needed, because creating an overlay over blkreplay
-breaks the determinism.
+On Mon, Dec 19, 2016 at 11:53:32AM +0000, Liu, Yi L wrote:
 
-Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
----
- block/blkreplay.c |   76 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- stubs/replay.c    |    1 +
- vl.c              |    2 +
- 3 files changed, 78 insertions(+), 1 deletion(-)
+[...]
 
-diff --git a/block/blkreplay.c b/block/blkreplay.c
-index 8a03d62..172642f 100644
---- a/block/blkreplay.c
-+++ b/block/blkreplay.c
-@@ -14,12 +14,76 @@
- #include "block/block_int.h"
- #include "sysemu/replay.h"
- #include "qapi/error.h"
-+#include "qapi/qmp/qstring.h"
- 
- typedef struct Request {
-     Coroutine *co;
-     QEMUBH *bh;
- } Request;
- 
-+static BlockDriverState *blkreplay_append_snapshot(BlockDriverState *bs,
-+                                                   Error **errp)
-+{
-+    int ret;
-+    BlockDriverState *bs_snapshot;
-+    int64_t total_size;
-+    QemuOpts *opts = NULL;
-+    char tmp_filename[PATH_MAX + 1];
-+    QDict *snapshot_options = qdict_new();
-+
-+    /* Prepare options QDict for the overlay file */
-+    qdict_put(snapshot_options, "file.driver",
-+              qstring_from_str("file"));
-+    qdict_put(snapshot_options, "driver",
-+              qstring_from_str("qcow2"));
-+
-+    /* Create temporary file */
-+    ret = get_tmp_filename(tmp_filename, PATH_MAX + 1);
-+    if (ret < 0) {
-+        error_setg_errno(errp, -ret, "Could not get temporary filename");
-+        goto out;
-+    }
-+    qdict_put(snapshot_options, "file.filename",
-+              qstring_from_str(tmp_filename));
-+
-+    /* Get the required size from the image */
-+    total_size = bdrv_getlength(bs);
-+    if (total_size < 0) {
-+        error_setg_errno(errp, -total_size, "Could not get image size");
-+        goto out;
-+    }
-+
-+    opts = qemu_opts_create(bdrv_qcow2.create_opts, NULL, 0, &error_abort);
-+    qemu_opt_set_number(opts, BLOCK_OPT_SIZE, total_size, &error_abort);
-+    ret = bdrv_create(&bdrv_qcow2, tmp_filename, opts, errp);
-+    qemu_opts_del(opts);
-+    if (ret < 0) {
-+        error_prepend(errp, "Could not create temporary overlay '%s': ",
-+                      tmp_filename);
-+        goto out;
-+    }
-+
-+    bs_snapshot = bdrv_open(NULL, NULL, snapshot_options,
-+                            BDRV_O_RDWR | BDRV_O_TEMPORARY, errp);
-+    snapshot_options = NULL;
-+    if (!bs_snapshot) {
-+        ret = -EINVAL;
-+        goto out;
-+    }
-+
-+    /* bdrv_append() consumes a strong reference to bs_snapshot (i.e. it will
-+     * call bdrv_unref() on it), so in order to be able to return one, we have
-+     * to increase bs_snapshot's refcount here */
-+    bdrv_ref(bs_snapshot);
-+    bdrv_append(bs_snapshot, bs);
-+
-+    return bs_snapshot;
-+
-+out:
-+    QDECREF(snapshot_options);
-+    return NULL;
-+}
-+
- static int blkreplay_open(BlockDriverState *bs, QDict *options, int flags,
-                           Error **errp)
- {
-@@ -35,6 +99,14 @@ static int blkreplay_open(BlockDriverState *bs, QDict *options, int flags,
-         goto fail;
-     }
- 
-+    /* Add temporary snapshot to preserve the image */
-+    if (!replay_snapshot
-+        && !blkreplay_append_snapshot(bs->file->bs, &local_err)) {
-+        ret = -EINVAL;
-+        error_propagate(errp, local_err);
-+        goto fail;
-+    }
-+
-     ret = 0;
- fail:
-     if (ret < 0) {
-@@ -45,6 +117,10 @@ fail:
- 
- static void blkreplay_close(BlockDriverState *bs)
- {
-+    if (!replay_snapshot) {
-+        /* Unref created snapshot file */
-+        bdrv_unref(bs->file->bs);
-+    }
- }
- 
- static int64_t blkreplay_getlength(BlockDriverState *bs)
-diff --git a/stubs/replay.c b/stubs/replay.c
-index d9a6da9..e43e467 100644
---- a/stubs/replay.c
-+++ b/stubs/replay.c
-@@ -3,6 +3,7 @@
- #include "sysemu/sysemu.h"
- 
- ReplayMode replay_mode;
-+char *replay_snapshot;
- 
- int64_t replay_save_clock(unsigned int kind, int64_t clock)
- {
-diff --git a/vl.c b/vl.c
-index f2cb4cf..ebc32e0 100644
---- a/vl.c
-+++ b/vl.c
-@@ -4479,7 +4479,7 @@ int main(int argc, char **argv, char **envp)
-     }
- 
-     /* open the virtual block devices */
--    if (snapshot || replay_mode != REPLAY_MODE_NONE) {
-+    if (snapshot) {
-         qemu_opts_foreach(qemu_find_opts("drive"), drive_enable_snapshot,
-                           NULL, NULL);
-     }
+> > > Regards to the s->notifiers_list, I didn't see the init op to it. Does it happen
+> > > in another patch? If so, it may be better to move it in this patch since this
+> > > patch introduces both the definition and usage of notifiers_list.
+> > >
+> > > If it is already clarified, then ignore it.
+> > 
+> > I think it was missing. It IMHO accidentally worked since QLIST_INIT()
+> > just set the head to NULL and that's what we did when we create the
+> > IntelIOMMUState object.
+> > 
+> > And what's worse - I found this approach may not work if we do
+> > QLIST_INSERT() in the changed() hook, since if we have more than one
+> > assigned devices we will only register the first one not the rest. A
+> > better approach may be traversing the vt-d buses via
+> > IntelIOMMUState.vtd_as_by_busptr.
+> > 
+> Peter,
+> 
+> In Oct, I also mailed Aviv about using IntelIOMMUState.vtd_as_by_busptr
+> when trying to connect the vfio notifiers(map/unmap) and vIOMMU. 
+> However, I reconsidered it later. If I remember correctly, 
+> IntelIOMMUState.vtd_as_by_busptr not only includes vtd_as for assigned devices,
+> but also includes virtual devices. When iotlb invalidation comes to vIOMMU, there
+> is no indication for which device in iotlb_inv_desc. So still need to have a list to record
+> vtd_as which needs to be looped. So I keep silent on it after that thought.
+> 
+> Now, you mentioned it may not work in multi-assigned scenario. Maybe it's
+> time to reconsider it again. 
+
+Hmm, first parameter of vtd_iommu_notify_flag_changed() is memory
+region, and that's per-device. So current approach should work even
+with multiple devices. Looks like I made a mistake, sorry. :) 
+
+Thanks,
+
+-- peterx
