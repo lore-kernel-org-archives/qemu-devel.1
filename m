@@ -1,21 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42441)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42505)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cIzuq-0002d1-Mz
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 10:31:53 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cIzuy-0002m0-2G
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 10:32:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cIzup-0001Sa-PM
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 10:31:52 -0500
-References: <1482187106-85065-1-git-send-email-sochin.jiang@huawei.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <5c75620e-6c60-5cae-a0d7-9d64c3de6044@redhat.com>
-Date: Mon, 19 Dec 2016 16:31:40 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1cIzuw-0001Vz-QH
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 10:32:00 -0500
+Received: from mail-ua0-x22d.google.com ([2607:f8b0:400c:c08::22d]:36168)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cIzuw-0001Uo-CV
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 10:31:58 -0500
+Received: by mail-ua0-x22d.google.com with SMTP id 3so89529745uaz.3
+	for <qemu-devel@nongnu.org>; Mon, 19 Dec 2016 07:31:56 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1482187106-85065-1-git-send-email-sochin.jiang@huawei.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="nPUVpQWG2LcM27WebGCofdaPOpuPfEnlr"
-Subject: Re: [Qemu-devel] [PATCH] mirror: prevent 'top' mode mirroring when
- no backing file specified on the destination
+In-Reply-To: <f4e17469-ae67-271e-0645-b069df34e0f9@mvista.com>
+References: <20161123194605.94717-1-flus@cesar.org.br>
+	<20161129193052.11736-1-flus@cesar.org.br>
+	<CAFEAcA--cM3Sn+Y4RA8BwsPCOWsJEPbQ3Npue32RPa7wLDCz2A@mail.gmail.com>
+	<1482112026.17769.25.camel@au1.ibm.com>
+	<f4e17469-ae67-271e-0645-b069df34e0f9@mvista.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 19 Dec 2016 15:31:35 +0000
+Message-ID: <CAFEAcA84Ab393fUB=UKDqtJYpZhHUEsZp6wEV3PpdjqCAfvuew@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v1 0/2] Add Atmel I2C TPM AT97SC3204T
+ emulated device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,102 +33,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: sochin jiang <sochin.jiang@huawei.com>, jcody@redhat.com, kwolf@redhat.com
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, xieyingtai@huawei.com, eric.fangyi@huawei.com, subo7@huawei.com, wangjie88@huawei.com
+To: Corey Minyard <cminyard@mvista.com>
+Cc: Alastair D'Silva <alastair@au1.ibm.com>, Fabio Urquiza <flus@cesar.org.br>, QEMU Developers <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---nPUVpQWG2LcM27WebGCofdaPOpuPfEnlr
-From: Max Reitz <mreitz@redhat.com>
-To: sochin jiang <sochin.jiang@huawei.com>, jcody@redhat.com, kwolf@redhat.com
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, xieyingtai@huawei.com,
- eric.fangyi@huawei.com, subo7@huawei.com, wangjie88@huawei.com
-Message-ID: <5c75620e-6c60-5cae-a0d7-9d64c3de6044@redhat.com>
-Subject: Re: [PATCH] mirror: prevent 'top' mode mirroring when no backing file
- specified on the destination
-References: <1482187106-85065-1-git-send-email-sochin.jiang@huawei.com>
-In-Reply-To: <1482187106-85065-1-git-send-email-sochin.jiang@huawei.com>
-Content-Type: text/plain; charset=iso-8859-15
-Content-Transfer-Encoding: quoted-printable
+On 19 December 2016 at 13:55, Corey Minyard <cminyard@mvista.com> wrote:
+> On 12/18/2016 07:47 PM, Alastair D'Silva wrote:
+>>
+>> On Fri, 2016-12-16 at 17:35 +0000, Peter Maydell wrote:
+>>> Our current API seems to envisage that the slave can return a
+>>> negative value from I2CSlaveClass::recv instead of a data byte,
+>>> but I'm not sure what this means in the i2c protocol.
+>>
+>> Negative values are propagated upwards, where they are treated as
+>> errors, eg, in hw/i2c/aspeed_i2c.c:aspeed_i2c_bus_handle_cmd():
+>>
+>> int ret = i2c_recv(bus->bus);
+>> if (ret < 0) {
+>>      qemu_log_mask(LOG_GUEST_ERROR, "%s: read failed\n", __func__);
+>>      ret = 0xff;
+>> }
+>>
+>> The call to i2c_recv is too late to issue the NAK, I believe they occur
+>> during the start_transfer() call.
 
-On 19.12.2016 23:38, sochin jiang wrote:
->  Mirroring using 'top' mode without backing file specified on the targe=
-t can be success,
->  but end with a disaster.
->=20
->  For example:
->    Migration can be success in this situation while the virtual machine=
- on the destination
->  is no longer usable because of backing lost.
->=20
->  Remind the user earlier and return error in case of misoperation.
->=20
-> Signed-off-by: sochin jiang <sochin.jiang@huawei.com>
-> ---
->  block/mirror.c | 6 ++++++
->  1 file changed, 6 insertions(+)
->=20
-> diff --git a/block/mirror.c b/block/mirror.c
-> index 301ba92..3476696 100644
-> --- a/block/mirror.c
-> +++ b/block/mirror.c
-> @@ -1038,6 +1038,12 @@ void mirror_start(const char *job_id, BlockDrive=
-rState *bs,
->          error_setg(errp, "Sync mode 'incremental' not supported");
->          return;
->      }
-> +    if (mode =3D=3D MIRROR_SYNC_MODE_TOP && !backing_bs(target))
-> +    {
+OK, so if returning negative values from i2c_recv() isn't
+the device saying "I am NAKing this", what *do* they mean?
 
-Syntactic issue: The opening brace should be on the same line as the "if"=
-=2E
+>>> If I understand your patch correctly, this is adding support
+>>> for the slave refusing to ACK when the master sends out the
+>>> slave address and r/w bit. I think that makes sense, but rather
+>>> than having a state flag in the I2CSlave struct, we should
+>>> change the prototype of the I2CSlaveClass event method so that
+>>> it can return a value indicating ack or nak.
+>>>
+>> Hmm, this could end up being quite an invasive change, but ultimately
+>> more elegant. I'm not sure which way the community prefers.
+>
+>
+> I have a patch that adds a check_event() handler along side the event()
+> handler.
+> If a device wants to send a NAK, it can implement check_event() instead of
+> event() and return non-zero to NAK.
+>
+> I toyed with just changing all the event() calls, but there are a bunch.
+> This seemed
+> like the better approach.  I can send if you like.
 
-> +        error_setg(errp, "Target Backing required using Sync mode 'top=
-'");
-> +        return;
-> +    }
-> +
->      is_none_mode =3D mode =3D=3D MIRROR_SYNC_MODE_NONE;
->      base =3D mode =3D=3D MIRROR_SYNC_MODE_TOP ? backing_bs(bs) : NULL;=
+It looks like there are only a dozen or so. I think it would
+be better for the long term just to change the event calls.
+We should also document in the comments in the I2CSlaveClass
+struct definition exactly what the semantics of the various
+functions are.
 
->      mirror_start_job(job_id, bs, BLOCK_JOB_DEFAULT, target, replaces,
-
-General issue: For blockdev-mirror, I think this is a legitimate use
-case. As far as I'm aware, libvirt uses the mirror block job for all
-backups -- they do so by cancelling the block job after the
-BLOCK_JOB_READY event instead of letting it complete. So a user might
-want to mirror some drive somewhere else (in sync=3Dtop mode, with the ne=
-w
-location not yet having assigned a backing file to it), then cancel the
-block job after BLOCK_JOB_READY and only assign the backing file at some
-later point.
-
-An even greater issue is that qmp_drive_mirror() opens the target BDS
-with BDRV_O_NO_BACKING. Therefore, this will always error out with
-drive-mirror and sync=3Dtop (unless the source image does not have a
-backing file, in which case the sync=3Dtop will silently be converted to
-sync=3Dfull).
-
-For drive-mirror, the target's backing chain will not be set up until
-mirror_complete().
-
-Max
-
-
---nPUVpQWG2LcM27WebGCofdaPOpuPfEnlr
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlhX/VwSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AT74IAKOLc52kfqix0veS9o84e92/r6p9HS8v
-4AS9mYjnA0tr7V4qdZ6k6iCqyrofatKtx3GylONyWhiWNNMtUWQ73v5DaMzlExRV
-1bTZVy2lEHWXCnsd/RBy4CwKceTQiQ8ZTpIPBV6cfShIpjBvBG2W5kI7tJz00ERu
-XURhwl1+/rQN45dKNJfpgN+ct8I/ebRxQKIdPlXvce4m7D8xHNaflK4IsjCExwNq
-xuyhMohSZKaIyTQKxyGEm9V7ATwDGc25QNLE5mpWnPMQr7WrtWuFxRzzdSBnKw5V
-qGFTMHab3aTtjwmE4EPfXL3WtQEIq/Vzl4YgH7SA3lRXbsjOpoyRpUI=
-=OnOq
------END PGP SIGNATURE-----
-
---nPUVpQWG2LcM27WebGCofdaPOpuPfEnlr--
+thanks
+-- PMM
