@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35497)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42695)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1cJ1FC-0006ki-3m
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 11:56:59 -0500
+	(envelope-from <eric.auger@redhat.com>) id 1cJ1aL-0003uV-MF
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 12:18:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1cJ1F7-00080J-4v
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 11:56:58 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57882)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1cJ1F6-0007yo-SP
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 11:56:53 -0500
-Date: Mon, 19 Dec 2016 09:56:50 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20161219095650.0a3ac113@t450s.home>
-In-Reply-To: <1482158486-18597-1-git-send-email-peterx@redhat.com>
-References: <1482158486-18597-1-git-send-email-peterx@redhat.com>
+	(envelope-from <eric.auger@redhat.com>) id 1cJ1aI-0001iS-La
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 12:18:49 -0500
+References: <1479904764-15532-1-git-send-email-vijay.kilari@gmail.com>
+	<1479904764-15532-3-git-send-email-vijay.kilari@gmail.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <11ef1395-918b-ed8d-215a-10fbbda9ec7a@redhat.com>
+Date: Mon, 19 Dec 2016 18:18:31 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <1479904764-15532-3-git-send-email-vijay.kilari@gmail.com>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] intel_iommu: allow dynamic switch of IOMMU
- region
+Subject: Re: [Qemu-devel] [PATCH v6 2/4] hw/intc/arm_gicv3_kvm: Implement
+ get/put functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,199 +24,674 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, bd.aviv@gmail.com, david@gibson.dropbear.id.au
+To: vijay.kilari@gmail.com, qemu-arm@nongnu.org, peter.maydell@linaro.org, pbonzini@redhat.com, rth@twiddle.net
+Cc: p.fedin@samsung.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, qemu-devel@nongnu.org, Vijaya Kumar K <Vijaya.Kumar@cavium.com>
 
-On Mon, 19 Dec 2016 22:41:26 +0800
-Peter Xu <peterx@redhat.com> wrote:
+Hi Vijaya,
 
-> This is preparation work to finally enabled dynamic switching ON/OFF for
-> VT-d protection. The old VT-d codes is using static IOMMU region, and
-> that won't satisfy vfio-pci device listeners.
+On 23/11/2016 13:39, vijay.kilari@gmail.com wrote:
+> From: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
 > 
-> Let me explain.
+> This actually implements pre_save and post_load methods for in-kernel
+> vGICv3.
 > 
-> vfio-pci devices depend on the memory region listener and IOMMU replay
-> mechanism to make sure the device mapping is coherent with the guest
-> even if there are domain switches. And there are two kinds of domain
-> switches:
-> 
->   (1) switch from domain A -> B
->   (2) switch from domain A -> no domain (e.g., turn DMAR off)
-> 
-> Case (1) is handled by the context entry invalidation handling by the
-> VT-d replay logic. What the replay function should do here is to replay
-> the existing page mappings in domain B.
-> 
-> However for case (2), we don't want to replay any domain mappings - we
-> just need the default GPA->HPA mappings (the address_space_memory
-> mapping). And this patch helps on case (2) to build up the mapping
-> automatically by leveraging the vfio-pci memory listeners.
-> 
-> Another important thing that this patch does is to seperate
-> IR (Interrupt Remapping) from DMAR (DMA Remapping). IR region should not
-> depend on the DMAR region (like before this patch). It should be a
-> standalone region, and it should be able to be activated without
-> DMAR (which is a common behavior of Linux kernel - by default it enables
-> IR while disabled DMAR).
-
-
-This seems like an improvement, but I will note that there are existing
-locked memory accounting issues inherent with VT-d and vfio.  With
-VT-d, each device has a unique AddressSpace.  This requires that each
-is managed via a separate vfio container.  Each container is accounted
-for separately for locked pages.  libvirt currently only knows that if
-any vfio devices are attached that the locked memory limit for the
-process needs to be set sufficient for the VM memory.  When VT-d is
-involved, we either need to figure out how to associate otherwise
-independent vfio containers to share locked page accounting or teach
-libvirt that the locked memory requirement needs to be multiplied by
-the number of attached vfio devices.  The latter seems far less
-complicated but reduces the containment of QEMU a bit since the
-process has the ability to lock potentially many multiples of the VM
-address size.  Thanks,
-
-Alex
-
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+> Signed-off-by: Pavel Fedin <p.fedin@samsung.com>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> [PMM:
+>  * use decimal, not 0bnnn
+>  * fixed typo in names of ICC_APR0R_EL1 and ICC_AP1R_EL1
+>  * completely rearranged the get and put functions to read and write
+>    the state in a natural order, rather than mixing distributor and
+>    redistributor state together]
+> Signed-off-by: Vijaya Kumar K <Vijaya.Kumar@cavium.com>
+> [Vijay:
+>  * Update macro KVM_VGIC_ATTR
+>  * Use 32 bit access for gicd and gicr
+>  * GICD_IROUTER, GICD_TYPER, GICR_PROPBASER and GICR_PENDBASER reg
+>    access  are changed from 64-bit to 32-bit access
+>  * Add ICC_SRE_EL1 save and restore
+>  * Dropped translate_fn mechanism and coded functions to handle
+>    save and restore of edge_trigger and priority
+>  * Number of APnR register saved/restored based on number of
+>    priority bits supported]
 > ---
->  hw/i386/intel_iommu.c         | 75 ++++++++++++++++++++++++++++++++++++++++---
->  hw/i386/trace-events          |  3 ++
->  include/hw/i386/intel_iommu.h |  2 ++
->  3 files changed, 76 insertions(+), 4 deletions(-)
+> ---
+>  hw/intc/arm_gicv3_kvm.c  | 559 ++++++++++++++++++++++++++++++++++++++++++++++-
+>  hw/intc/gicv3_internal.h |   1 +
+>  2 files changed, 549 insertions(+), 11 deletions(-)
 > 
-> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> index 5f3e351..75a3f4e 100644
-> --- a/hw/i386/intel_iommu.c
-> +++ b/hw/i386/intel_iommu.c
-> @@ -1179,9 +1179,42 @@ static void vtd_handle_gcmd_sirtp(IntelIOMMUState *s)
->      vtd_set_clear_mask_long(s, DMAR_GSTS_REG, 0, VTD_GSTS_IRTPS);
+> diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
+> index 199a439..a317fbf 100644
+> --- a/hw/intc/arm_gicv3_kvm.c
+> +++ b/hw/intc/arm_gicv3_kvm.c
+> @@ -23,8 +23,10 @@
+>  #include "qapi/error.h"
+>  #include "hw/intc/arm_gicv3_common.h"
+>  #include "hw/sysbus.h"
+> +#include "qemu/error-report.h"
+>  #include "sysemu/kvm.h"
+>  #include "kvm_arm.h"
+> +#include "gicv3_internal.h"
+>  #include "vgic_common.h"
+>  #include "migration/migration.h"
+> 
+> @@ -44,6 +46,30 @@
+>  #define KVM_ARM_GICV3_GET_CLASS(obj) \
+>       OBJECT_GET_CLASS(KVMARMGICv3Class, (obj), TYPE_KVM_ARM_GICV3)
+>  
+> +#define   KVM_DEV_ARM_VGIC_SYSREG(op0, op1, crn, crm, op2)         \
+> +                             (ARM64_SYS_REG_SHIFT_MASK(op0, OP0) | \
+> +                              ARM64_SYS_REG_SHIFT_MASK(op1, OP1) | \
+> +                              ARM64_SYS_REG_SHIFT_MASK(crn, CRN) | \
+> +                              ARM64_SYS_REG_SHIFT_MASK(crm, CRM) | \
+> +                              ARM64_SYS_REG_SHIFT_MASK(op2, OP2))
+> +
+> +#define ICC_PMR_EL1     \
+> +    KVM_DEV_ARM_VGIC_SYSREG(3, 0, 4, 6, 0)
+> +#define ICC_BPR0_EL1    \
+> +    KVM_DEV_ARM_VGIC_SYSREG(3, 0, 12, 8, 3)
+> +#define ICC_AP0R_EL1(n) \
+> +    KVM_DEV_ARM_VGIC_SYSREG(3, 0, 12, 8, 4 | n)
+> +#define ICC_AP1R_EL1(n) \
+> +    KVM_DEV_ARM_VGIC_SYSREG(3, 0, 12, 9, n)
+> +#define ICC_BPR1_EL1    \
+> +    KVM_DEV_ARM_VGIC_SYSREG(3, 0, 12, 12, 3)
+> +#define ICC_CTLR_EL1    \
+> +    KVM_DEV_ARM_VGIC_SYSREG(3, 0, 12, 12, 4)
+> +#define ICC_IGRPEN0_EL1 \
+> +    KVM_DEV_ARM_VGIC_SYSREG(3, 0, 12, 12, 6)
+> +#define ICC_IGRPEN1_EL1 \
+> +    KVM_DEV_ARM_VGIC_SYSREG(3, 0, 12, 12, 7)
+> +
+>  typedef struct KVMARMGICv3Class {
+>      ARMGICv3CommonClass parent_class;
+>      DeviceRealize parent_realize;
+> @@ -57,16 +83,521 @@ static void kvm_arm_gicv3_set_irq(void *opaque, int irq, int level)
+>      kvm_arm_gic_set_irq(s->num_irq, irq, level);
 >  }
 >  
-> +static void vtd_switch_address_space(IntelIOMMUState *s, bool enabled)
-> +{
-> +    GHashTableIter iter;
-> +    VTDBus *vtd_bus;
-> +    VTDAddressSpace *as;
-> +    int i;
+> +#define KVM_VGIC_ATTR(reg, typer) \
+> +    ((typer & KVM_DEV_ARM_VGIC_V3_MPIDR_MASK) | (reg))
 > +
-> +    g_hash_table_iter_init(&iter, s->vtd_as_by_busptr);
-> +    while (g_hash_table_iter_next (&iter, NULL, (void**)&vtd_bus)) {
-> +        for (i = 0; i < X86_IOMMU_PCI_DEVFN_MAX; i++) {
-> +            as = vtd_bus->dev_as[i];
-> +            if (as == NULL) {
-> +                continue;
-> +            }
-> +            trace_vtd_switch_address_space(pci_bus_num(vtd_bus->bus),
-> +                                           VTD_PCI_SLOT(i), VTD_PCI_FUNC(i),
-> +                                           enabled);
-> +            if (enabled) {
-> +                memory_region_add_subregion_overlap(&as->root, 0,
-> +                                                    &as->iommu, 2);
-> +            } else {
-> +                memory_region_del_subregion(&as->root, &as->iommu);
-> +            }
-> +        }
+> +static inline void kvm_gicd_access(GICv3State *s, int offset,
+> +                                   uint32_t *val, bool write)
+> +{
+> +    kvm_device_access(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_DIST_REGS,
+> +                      KVM_VGIC_ATTR(offset, 0),
+> +                      val, write);
+> +}
+> +
+> +static inline void kvm_gicr_access(GICv3State *s, int offset, int cpu,
+> +                                   uint32_t *val, bool write)
+> +{
+> +    kvm_device_access(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_REDIST_REGS,
+> +                      KVM_VGIC_ATTR(offset, s->cpu[cpu].gicr_typer),
+> +                      val, write);
+> +}
+> +
+> +static inline void kvm_gicc_access(GICv3State *s, uint64_t reg, int cpu,
+> +                                   uint64_t *val, bool write)
+> +{
+> +    kvm_device_access(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS,
+> +                      KVM_VGIC_ATTR(reg, s->cpu[cpu].gicr_typer),
+> +                      val, write);
+There is a mismatch here between the kernel define
+(KVM_DEV_ARM_VGIC_CPU_SYSREGS in v10) and the QEMU define. I think we
+should rather fix that at kernel API level.
+./scripts/update-linux-headers.sh normally leaves the kernel header
+untouched.
+
+Thanks
+
+Eric
+> +}
+> +
+> +static inline void kvm_gic_line_level_access(GICv3State *s, int irq, int cpu,
+> +                                             uint32_t *val, bool write)
+> +{
+> +    kvm_device_access(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO,
+> +                      KVM_VGIC_ATTR(irq, s->cpu[cpu].gicr_typer) |
+> +                      (VGIC_LEVEL_INFO_LINE_LEVEL <<
+> +                       KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT),
+> +                      val, write);
+> +}
+> +
+> +/* Loop through each distributor IRQ related register; since bits
+> + * corresponding to SPIs and PPIs are RAZ/WI when affinity routing
+> + * is enabled, we skip those.
+> + */
+> +#define for_each_dist_irq_reg(_irq, _max, _field_width) \
+> +    for (_irq = GIC_INTERNAL; _irq < _max; _irq += (32 / _field_width))
+> +
+> +static void kvm_dist_get_priority(GICv3State *s, uint32_t offset, uint8_t *bmp)
+> +{
+> +    uint32_t reg, *field;
+> +    int irq;
+> +
+> +    field = (uint32_t *)bmp;
+> +    for_each_dist_irq_reg(irq, s->num_irq, 8) {
+> +        kvm_gicd_access(s, offset, &reg, false);
+> +        *field = reg;
+> +        offset += 4;
+> +        field++;
 > +    }
 > +}
 > +
->  /* Handle Translation Enable/Disable */
->  static void vtd_handle_gcmd_te(IntelIOMMUState *s, bool en)
->  {
-> +    bool old = s->dmar_enabled;
+> +static void kvm_dist_put_priority(GICv3State *s, uint32_t offset, uint8_t *bmp)
+> +{
+> +    uint32_t reg, *field;
+> +    int irq;
 > +
-> +    if (old == en) {
+> +    field = (uint32_t *)bmp;
+> +    for_each_dist_irq_reg(irq, s->num_irq, 8) {
+> +        reg = *field;
+> +        kvm_gicd_access(s, offset, &reg, true);
+> +        offset += 4;
+> +        field++;
+> +    }
+> +}
+> +
+> +static void kvm_dist_get_edge_trigger(GICv3State *s, uint32_t offset,
+> +                                      uint32_t *bmp)
+> +{
+> +    uint32_t reg;
+> +    int irq;
+> +
+> +    for_each_dist_irq_reg(irq, s->num_irq, 2) {
+> +        kvm_gicd_access(s, offset, &reg, false);
+> +        reg = half_unshuffle32(reg >> 1);
+> +        if (irq % 32 != 0) {
+> +            reg = (reg << 16);
+> +        }
+> +        *gic_bmp_ptr32(bmp, irq) |=  reg;
+> +        offset += 4;
+> +    }
+> +}
+> +
+> +static void kvm_dist_put_edge_trigger(GICv3State *s, uint32_t offset,
+> +                                      uint32_t *bmp)
+> +{
+> +    uint32_t reg;
+> +    int irq;
+> +
+> +    for_each_dist_irq_reg(irq, s->num_irq, 2) {
+> +        reg = *gic_bmp_ptr32(bmp, irq);
+> +        if (irq % 32 != 0) {
+> +            reg = (reg & 0xffff0000) >> 16;
+> +        } else {
+> +            reg = reg & 0xffff;
+> +        }
+> +        reg = half_shuffle32(reg) << 1;
+> +        kvm_gicd_access(s, offset, &reg, true);
+> +        offset += 4;
+> +    }
+> +}
+> +
+> +static void kvm_gic_get_line_level_bmp(GICv3State *s, uint32_t *bmp)
+> +{
+> +    uint32_t reg;
+> +    int irq;
+> +
+> +    for_each_dist_irq_reg(irq, s->num_irq, 1) {
+> +        kvm_gic_line_level_access(s, irq, 0, &reg, false);
+> +        *gic_bmp_ptr32(bmp, irq) = reg;
+> +    }
+> +}
+> +
+> +static void kvm_gic_put_line_level_bmp(GICv3State *s, uint32_t *bmp)
+> +{
+> +    uint32_t reg;
+> +    int irq;
+> +
+> +    for_each_dist_irq_reg(irq, s->num_irq, 1) {
+> +        reg = *gic_bmp_ptr32(bmp, irq);
+> +        kvm_gic_line_level_access(s, irq, 0, &reg, true);
+> +    }
+> +}
+> +
+> +/* Read a bitmap register group from the kernel VGIC. */
+> +static void kvm_dist_getbmp(GICv3State *s, uint32_t offset, uint32_t *bmp)
+> +{
+> +    uint32_t reg;
+> +    int irq;
+> +
+> +    for_each_dist_irq_reg(irq, s->num_irq, 1) {
+> +        kvm_gicd_access(s, offset, &reg, false);
+> +        *gic_bmp_ptr32(bmp, irq) = reg;
+> +        offset += 4;
+> +    }
+> +}
+> +
+> +static void kvm_dist_putbmp(GICv3State *s, uint32_t offset,
+> +                            uint32_t clroffset, uint32_t *bmp)
+> +{
+> +    uint32_t reg;
+> +    int irq;
+> +
+> +    for_each_dist_irq_reg(irq, s->num_irq, 1) {
+> +        /* If this bitmap is a set/clear register pair, first write to the
+> +         * clear-reg to clear all bits before using the set-reg to write
+> +         * the 1 bits.
+> +         */
+> +        if (clroffset != 0) {
+> +            reg = 0;
+> +            kvm_gicd_access(s, clroffset, &reg, true);
+> +        }
+> +        reg = *gic_bmp_ptr32(bmp, irq);
+> +        kvm_gicd_access(s, offset, &reg, true);
+> +        offset += 4;
+> +    }
+> +}
+> +
+> +static void kvm_arm_gicv3_check(GICv3State *s)
+> +{
+> +    uint32_t reg;
+> +    uint32_t num_irq;
+> +
+> +    /* Sanity checking s->num_irq */
+> +    kvm_gicd_access(s, GICD_TYPER, &reg, false);
+> +    num_irq = ((reg & 0x1f) + 1) * 32;
+> +
+> +    if (num_irq < s->num_irq) {
+> +        error_report("Model requests %u IRQs, but kernel supports max %u",
+> +                     s->num_irq, num_irq);
+> +        abort();
+> +    }
+> +}
+> +
+>  static void kvm_arm_gicv3_put(GICv3State *s)
+>  {
+> -    /* TODO */
+> -    DPRINTF("Cannot put kernel gic state, no kernel interface\n");
+> +    uint32_t regl, regh, reg;
+> +    uint64_t reg64, redist_typer;
+> +    int ncpu, i;
+> +
+> +    kvm_arm_gicv3_check(s);
+> +
+> +    kvm_gicr_access(s, GICR_TYPER, 0, &regl, false);
+> +    kvm_gicr_access(s, GICR_TYPER + 4, 0, &regh, false);
+> +    redist_typer = ((uint64_t)regh << 32) | regl;
+> +
+> +    reg = s->gicd_ctlr;
+> +    kvm_gicd_access(s, GICD_CTLR, &reg, true);
+> +
+> +    if (redist_typer & GICR_TYPER_PLPIS) {
+> +        /* Set base addresses before LPIs are enabled by GICR_CTLR write */
+> +        for (ncpu = 0; ncpu < s->num_cpu; ncpu++) {
+> +            GICv3CPUState *c = &s->cpu[ncpu];
+> +
+> +            reg64 = c->gicr_propbaser;
+> +            regl = (uint32_t)reg64;
+> +            kvm_gicr_access(s, GICR_PROPBASER, ncpu, &regl, true);
+> +            regh = (uint32_t)(reg64 >> 32);
+> +            kvm_gicr_access(s, GICR_PROPBASER + 4, ncpu, &regh, true);
+> +
+> +            reg64 = c->gicr_pendbaser;
+> +            if (!c->gicr_ctlr & GICR_CTLR_ENABLE_LPIS) {
+> +                /* Setting PTZ is advised if LPIs are disabled, to reduce
+> +                 * GIC initialization time.
+> +                 */
+> +                reg64 |= GICR_PENDBASER_PTZ;
+> +            }
+> +            regl = (uint32_t)reg64;
+> +            kvm_gicr_access(s, GICR_PENDBASER, ncpu, &regl, true);
+> +            regh = (uint32_t)(reg64 >> 32);
+> +            kvm_gicr_access(s, GICR_PENDBASER + 4, ncpu, &regh, true);
+> +        }
+> +    }
+> +
+> +    /* Redistributor state (one per CPU) */
+> +
+> +    for (ncpu = 0; ncpu < s->num_cpu; ncpu++) {
+> +        GICv3CPUState *c = &s->cpu[ncpu];
+> +
+> +        reg = c->gicr_ctlr;
+> +        kvm_gicr_access(s, GICR_CTLR, ncpu, &reg, true);
+> +
+> +        reg = c->gicr_statusr[GICV3_NS];
+> +        kvm_gicr_access(s, GICR_STATUSR, ncpu, &reg, true);
+> +
+> +        reg = c->gicr_waker;
+> +        kvm_gicr_access(s, GICR_WAKER, ncpu, &reg, true);
+> +
+> +        reg = c->gicr_igroupr0;
+> +        kvm_gicr_access(s, GICR_IGROUPR0, ncpu, &reg, true);
+> +
+> +        reg = ~0;
+> +        kvm_gicr_access(s, GICR_ICENABLER0, ncpu, &reg, true);
+> +        reg = c->gicr_ienabler0;
+> +        kvm_gicr_access(s, GICR_ISENABLER0, ncpu, &reg, true);
+> +
+> +        /* Restore config before pending so we treat level/edge correctly */
+> +        reg = half_shuffle32(c->edge_trigger >> 16) << 1;
+> +        kvm_gicr_access(s, GICR_ICFGR1, ncpu, &reg, true);
+> +
+> +        reg = c->level;
+> +        kvm_gic_line_level_access(s, 0, ncpu, &reg, true);
+> +
+> +        reg = ~0;
+> +        kvm_gicr_access(s, GICR_ICPENDR0, ncpu, &reg, true);
+> +        reg = c->gicr_ipendr0;
+> +        kvm_gicr_access(s, GICR_ISPENDR0, ncpu, &reg, true);
+> +
+> +        reg = ~0;
+> +        kvm_gicr_access(s, GICR_ICACTIVER0, ncpu, &reg, true);
+> +        reg = c->gicr_iactiver0;
+> +        kvm_gicr_access(s, GICR_ISACTIVER0, ncpu, &reg, true);
+> +
+> +        for (i = 0; i < GIC_INTERNAL; i += 4) {
+> +            reg = c->gicr_ipriorityr[i] |
+> +                (c->gicr_ipriorityr[i + 1] << 8) |
+> +                (c->gicr_ipriorityr[i + 2] << 16) |
+> +                (c->gicr_ipriorityr[i + 3] << 24);
+> +            kvm_gicr_access(s, GICR_IPRIORITYR + i, ncpu, &reg, true);
+> +        }
+> +    }
+> +
+> +    /* Distributor state (shared between all CPUs */
+> +    reg = s->gicd_statusr[GICV3_NS];
+> +    kvm_gicd_access(s, GICD_STATUSR, &reg, true);
+> +
+> +    /* s->enable bitmap -> GICD_ISENABLERn */
+> +    kvm_dist_putbmp(s, GICD_ISENABLER, GICD_ICENABLER, s->enabled);
+> +
+> +    /* s->group bitmap -> GICD_IGROUPRn */
+> +    kvm_dist_putbmp(s, GICD_IGROUPR, 0, s->group);
+> +
+> +    /* Restore targets before pending to ensure the pending state is set on
+> +     * the appropriate CPU interfaces in the kernel
+> +     */
+> +
+> +    /* s->gicd_irouter[irq] -> GICD_IROUTERn
+> +     * We can't use kvm_dist_put() here because the registers are 64-bit
+> +     */
+> +    for (i = GIC_INTERNAL; i < s->num_irq; i++) {
+> +        uint32_t offset;
+> +
+> +        offset = GICD_IROUTER + (sizeof(uint32_t) * i);
+> +        reg = (uint32_t)s->gicd_irouter[i];
+> +        kvm_gicd_access(s, offset, &reg, true);
+> +
+> +        offset = GICD_IROUTER + (sizeof(uint32_t) * i) + 4;
+> +        reg = (uint32_t)(s->gicd_irouter[i] >> 32);
+> +        kvm_gicd_access(s, offset, &reg, true);
+> +    }
+> +
+> +    /* s->trigger bitmap -> GICD_ICFGRn
+> +     * (restore configuration registers before pending IRQs so we treat
+> +     * level/edge correctly)
+> +     */
+> +    kvm_dist_put_edge_trigger(s, GICD_ICFGR, s->edge_trigger);
+> +
+> +    /* s->level bitmap ->  line_level */
+> +    kvm_gic_put_line_level_bmp(s, s->level);
+> +
+> +    /* s->pending bitmap -> GICD_ISPENDRn */
+> +    kvm_dist_putbmp(s, GICD_ISPENDR, GICD_ICPENDR, s->pending);
+> +
+> +    /* s->active bitmap -> GICD_ISACTIVERn */
+> +    kvm_dist_putbmp(s, GICD_ISACTIVER, GICD_ICACTIVER, s->active);
+> +
+> +    /* s->gicd_ipriority[] -> GICD_IPRIORITYRn */
+> +    kvm_dist_put_priority(s, GICD_IPRIORITYR, s->gicd_ipriority);
+> +
+> +    /* CPU Interface state (one per CPU) */
+> +
+> +    for (ncpu = 0; ncpu < s->num_cpu; ncpu++) {
+> +        GICv3CPUState *c = &s->cpu[ncpu];
+> +        int num_pri_bits;
+> +
+> +        kvm_gicc_access(s, ICC_CTLR_EL1, ncpu,
+> +                        &c->icc_ctlr_el1[GICV3_NS], true);
+> +        kvm_gicc_access(s, ICC_IGRPEN0_EL1, ncpu,
+> +                        &c->icc_igrpen[GICV3_G0], true);
+> +        kvm_gicc_access(s, ICC_IGRPEN1_EL1, ncpu,
+> +                        &c->icc_igrpen[GICV3_G1NS], true);
+> +        kvm_gicc_access(s, ICC_PMR_EL1, ncpu, &c->icc_pmr_el1, true);
+> +        kvm_gicc_access(s, ICC_BPR0_EL1, ncpu, &c->icc_bpr[GICV3_G0], true);
+> +        kvm_gicc_access(s, ICC_BPR1_EL1, ncpu, &c->icc_bpr[GICV3_G1NS], true);
+> +
+> +        num_pri_bits = ((c->icc_ctlr_el1[GICV3_NS] &
+> +                        ICC_CTLR_EL1_PRIBITS_MASK) >>
+> +                        ICC_CTLR_EL1_PRIBITS_SHIFT) + 1;
+> +
+> +        switch (num_pri_bits) {
+> +        case 7:
+> +            reg64 = c->icc_apr[GICV3_G0][3];
+> +            kvm_gicc_access(s, ICC_AP0R_EL1(3), ncpu, &reg64, true);
+> +            reg64 = c->icc_apr[GICV3_G0][2];
+> +            kvm_gicc_access(s, ICC_AP0R_EL1(2), ncpu, &reg64, true);
+> +        case 6:
+> +            reg64 = c->icc_apr[GICV3_G0][1];
+> +            kvm_gicc_access(s, ICC_AP0R_EL1(1), ncpu, &reg64, true);
+> +        default:
+> +            reg64 = c->icc_apr[GICV3_G0][0];
+> +            kvm_gicc_access(s, ICC_AP0R_EL1(0), ncpu, &reg64, true);
+> +        }
+> +
+> +        switch (num_pri_bits) {
+> +        case 7:
+> +            reg64 = c->icc_apr[GICV3_G1NS][3];
+> +            kvm_gicc_access(s, ICC_AP1R_EL1(3), ncpu, &reg64, true);
+> +            reg64 = c->icc_apr[GICV3_G1NS][2];
+> +            kvm_gicc_access(s, ICC_AP1R_EL1(2), ncpu, &reg64, true);
+> +        case 6:
+> +            reg64 = c->icc_apr[GICV3_G1NS][1];
+> +            kvm_gicc_access(s, ICC_AP1R_EL1(1), ncpu, &reg64, true);
+> +        default:
+> +            reg64 = c->icc_apr[GICV3_G1NS][0];
+> +            kvm_gicc_access(s, ICC_AP1R_EL1(0), ncpu, &reg64, true);
+> +        }
+> +    }
+>  }
+>  
+>  static void kvm_arm_gicv3_get(GICv3State *s)
+>  {
+> -    /* TODO */
+> -    DPRINTF("Cannot get kernel gic state, no kernel interface\n");
+> +    uint32_t regl, regh, reg;
+> +    uint64_t reg64, redist_typer;
+> +    int ncpu, i;
+> +
+> +    kvm_arm_gicv3_check(s);
+> +
+> +    kvm_gicr_access(s, GICR_TYPER, 0, &regl, false);
+> +    kvm_gicr_access(s, GICR_TYPER + 4, 0, &regh, false);
+> +    redist_typer = ((uint64_t)regh << 32) | regl;
+> +
+> +    kvm_gicd_access(s, GICD_CTLR, &reg, false);
+> +    s->gicd_ctlr = reg;
+> +
+> +    /* Redistributor state (one per CPU) */
+> +
+> +    for (ncpu = 0; ncpu < s->num_cpu; ncpu++) {
+> +        GICv3CPUState *c = &s->cpu[ncpu];
+> +
+> +        kvm_gicr_access(s, GICR_CTLR, ncpu, &reg, false);
+> +        c->gicr_ctlr = reg;
+> +
+> +        kvm_gicr_access(s, GICR_STATUSR, ncpu, &reg, false);
+> +        c->gicr_statusr[GICV3_NS] = reg;
+> +
+> +        kvm_gicr_access(s, GICR_WAKER, ncpu, &reg, false);
+> +        c->gicr_waker = reg;
+> +
+> +        kvm_gicr_access(s, GICR_IGROUPR0, ncpu, &reg, false);
+> +        c->gicr_igroupr0 = reg;
+> +        kvm_gicr_access(s, GICR_ISENABLER0, ncpu, &reg, false);
+> +        c->gicr_ienabler0 = reg;
+> +        kvm_gicr_access(s, GICR_ICFGR1, ncpu, &reg, false);
+> +        c->edge_trigger = half_unshuffle32(reg >> 1) << 16;
+> +        kvm_gic_line_level_access(s, 0, ncpu, &reg, false);
+> +        c->level = reg;
+> +        kvm_gicr_access(s, GICR_ISPENDR0, ncpu, &reg, false);
+> +        c->gicr_ipendr0 = reg;
+> +        kvm_gicr_access(s, GICR_ISACTIVER0, ncpu, &reg, false);
+> +        c->gicr_iactiver0 = reg;
+> +
+> +        for (i = 0; i < GIC_INTERNAL; i += 4) {
+> +            kvm_gicr_access(s, GICR_IPRIORITYR + i, ncpu, &reg, false);
+> +            c->gicr_ipriorityr[i] = extract32(reg, 0, 8);
+> +            c->gicr_ipriorityr[i + 1] = extract32(reg, 8, 8);
+> +            c->gicr_ipriorityr[i + 2] = extract32(reg, 16, 8);
+> +            c->gicr_ipriorityr[i + 3] = extract32(reg, 24, 8);
+> +        }
+> +    }
+> +
+> +    if (redist_typer & GICR_TYPER_PLPIS) {
+> +        for (ncpu = 0; ncpu < s->num_cpu; ncpu++) {
+> +            GICv3CPUState *c = &s->cpu[ncpu];
+> +
+> +            kvm_gicr_access(s, GICR_PROPBASER, ncpu, &regl, false);
+> +            kvm_gicr_access(s, GICR_PROPBASER + 4, ncpu, &regh, false);
+> +            c->gicr_propbaser = ((uint64_t)regh << 32) | regl;
+> +
+> +            kvm_gicr_access(s, GICR_PENDBASER, ncpu, &regl, false);
+> +            kvm_gicr_access(s, GICR_PENDBASER + 4, ncpu, &regh, false);
+> +            c->gicr_pendbaser = ((uint64_t)regh << 32) | regl;
+> +        }
+> +    }
+> +
+> +    /* Distributor state (shared between all CPUs */
+> +
+> +    kvm_gicd_access(s, GICD_STATUSR, &reg, false);
+> +    s->gicd_statusr[GICV3_NS] = reg;
+> +
+> +    /* GICD_IGROUPRn -> s->group bitmap */
+> +    kvm_dist_getbmp(s, GICD_IGROUPR, s->group);
+> +
+> +    /* GICD_ISENABLERn -> s->enabled bitmap */
+> +    kvm_dist_getbmp(s, GICD_ISENABLER, s->enabled);
+> +
+> +    /* Line level of irq */
+> +    kvm_gic_get_line_level_bmp(s, s->level);
+> +    /* GICD_ISPENDRn -> s->pending bitmap */
+> +    kvm_dist_getbmp(s, GICD_ISPENDR, s->pending);
+> +
+> +    /* GICD_ISACTIVERn -> s->active bitmap */
+> +    kvm_dist_getbmp(s, GICD_ISACTIVER, s->active);
+> +
+> +    /* GICD_ICFGRn -> s->trigger bitmap */
+> +    kvm_dist_get_edge_trigger(s, GICD_ICFGR, s->edge_trigger);
+> +
+> +    /* GICD_IPRIORITYRn -> s->gicd_ipriority[] */
+> +    kvm_dist_get_priority(s, GICD_IPRIORITYR, s->gicd_ipriority);
+> +
+> +    /* GICD_IROUTERn -> s->gicd_irouter[irq] */
+> +    for (i = GIC_INTERNAL; i < s->num_irq; i++) {
+> +        uint32_t offset;
+> +
+> +        offset = GICD_IROUTER + (sizeof(uint32_t) * i);
+> +        kvm_gicd_access(s, offset, &regl, false);
+> +        offset = GICD_IROUTER + (sizeof(uint32_t) * i) + 4;
+> +        kvm_gicd_access(s, offset, &regh, false);
+> +        s->gicd_irouter[i] = ((uint64_t)regh << 32) | regl;
+> +    }
+> +
+> +    /*****************************************************************
+> +     * CPU Interface(s) State
+> +     */
+> +
+> +    for (ncpu = 0; ncpu < s->num_cpu; ncpu++) {
+> +        GICv3CPUState *c = &s->cpu[ncpu];
+> +        int num_pri_bits;
+> +
+> +        kvm_gicc_access(s, ICC_CTLR_EL1, ncpu,
+> +                        &c->icc_ctlr_el1[GICV3_NS], false);
+> +        kvm_gicc_access(s, ICC_IGRPEN0_EL1, ncpu,
+> +                        &c->icc_igrpen[GICV3_G0], false);
+> +        kvm_gicc_access(s, ICC_IGRPEN1_EL1, ncpu,
+> +                        &c->icc_igrpen[GICV3_G1NS], false);
+> +        kvm_gicc_access(s, ICC_PMR_EL1, ncpu, &c->icc_pmr_el1, false);
+> +        kvm_gicc_access(s, ICC_BPR0_EL1, ncpu, &c->icc_bpr[GICV3_G0], false);
+> +        kvm_gicc_access(s, ICC_BPR1_EL1, ncpu, &c->icc_bpr[GICV3_G1NS], false);
+> +        num_pri_bits = ((c->icc_ctlr_el1[GICV3_NS] &
+> +                        ICC_CTLR_EL1_PRIBITS_MASK) >>
+> +                        ICC_CTLR_EL1_PRIBITS_SHIFT) + 1;
+> +
+> +        switch (num_pri_bits) {
+> +        case 7:
+> +            kvm_gicc_access(s, ICC_AP0R_EL1(3), ncpu, &reg64, false);
+> +            c->icc_apr[GICV3_G0][3] = reg64;
+> +            kvm_gicc_access(s, ICC_AP0R_EL1(2), ncpu, &reg64, false);
+> +            c->icc_apr[GICV3_G0][2] = reg64;
+> +        case 6:
+> +            kvm_gicc_access(s, ICC_AP0R_EL1(1), ncpu, &reg64, false);
+> +            c->icc_apr[GICV3_G0][1] = reg64;
+> +        default:
+> +            kvm_gicc_access(s, ICC_AP0R_EL1(0), ncpu, &reg64, false);
+> +            c->icc_apr[GICV3_G0][0] = reg64;
+> +        }
+> +
+> +        switch (num_pri_bits) {
+> +        case 7:
+> +            kvm_gicc_access(s, ICC_AP1R_EL1(3), ncpu, &reg64, false);
+> +            c->icc_apr[GICV3_G1NS][3] = reg64;
+> +            kvm_gicc_access(s, ICC_AP1R_EL1(2), ncpu, &reg64, false);
+> +            c->icc_apr[GICV3_G1NS][2] = reg64;
+> +        case 6:
+> +            kvm_gicc_access(s, ICC_AP1R_EL1(1), ncpu, &reg64, false);
+> +            c->icc_apr[GICV3_G1NS][1] = reg64;
+> +        default:
+> +            kvm_gicc_access(s, ICC_AP1R_EL1(0), ncpu, &reg64, false);
+> +            c->icc_apr[GICV3_G1NS][0] = reg64;
+> +        }
+> +    }
+>  }
+>  
+>  static void kvm_arm_gicv3_reset(DeviceState *dev)
+> @@ -77,6 +608,12 @@ static void kvm_arm_gicv3_reset(DeviceState *dev)
+>      DPRINTF("Reset\n");
+>  
+>      kgc->parent_reset(dev);
+> +
+> +    if (s->migration_blocker) {
+> +        DPRINTF("Cannot put kernel gic state, no kernel interface\n");
 > +        return;
 > +    }
 > +
->      VTD_DPRINTF(CSR, "Translation Enable %s", (en ? "on" : "off"));
->  
->      if (en) {
-> @@ -1196,6 +1229,8 @@ static void vtd_handle_gcmd_te(IntelIOMMUState *s, bool en)
->          /* Ok - report back to driver */
->          vtd_set_clear_mask_long(s, DMAR_GSTS_REG, VTD_GSTS_TES, 0);
->      }
-> +
-> +    vtd_switch_address_space(s, en);
+>      kvm_arm_gicv3_put(s);
 >  }
 >  
->  /* Handle Interrupt Remap Enable/Disable */
-> @@ -2343,15 +2378,47 @@ VTDAddressSpace *vtd_find_add_as(IntelIOMMUState *s, PCIBus *bus, int devfn)
->          vtd_dev_as->devfn = (uint8_t)devfn;
->          vtd_dev_as->iommu_state = s;
->          vtd_dev_as->context_cache_entry.context_cache_gen = 0;
-> +
-> +        /*
-> +         * When DMAR is disabled, memory region relationships looks
-> +         * like:
-> +         *
-> +         * 0000000000000000-ffffffffffffffff (prio 0, RW): vtd_root
-> +         *  0000000000000000-ffffffffffffffff (prio 1, RW): vtd_sys_alias
-> +         *  00000000fee00000-00000000feefffff (prio 64, RW): intel_iommu_ir
-> +         *
-> +         * When DMAR is disabled, it becomes:
-> +         *
-> +         * 0000000000000000-ffffffffffffffff (prio 0, RW): vtd_root
-> +         *  0000000000000000-ffffffffffffffff (prio 2, RW): intel_iommu
-> +         *  0000000000000000-ffffffffffffffff (prio 1, RW): vtd_sys_alias
-> +         *  00000000fee00000-00000000feefffff (prio 64, RW): intel_iommu_ir
-> +         *
-> +         * The intel_iommu region is dynamically added/removed.
-> +         */
->          memory_region_init_iommu(&vtd_dev_as->iommu, OBJECT(s),
->                                   &s->iommu_ops, "intel_iommu", UINT64_MAX);
-> +        memory_region_init_alias(&vtd_dev_as->sys_alias, OBJECT(s),
-> +                                 "vtd_sys_alias", get_system_memory(),
-> +                                 0, memory_region_size(get_system_memory()));
->          memory_region_init_io(&vtd_dev_as->iommu_ir, OBJECT(s),
->                                &vtd_mem_ir_ops, s, "intel_iommu_ir",
->                                VTD_INTERRUPT_ADDR_SIZE);
-> -        memory_region_add_subregion(&vtd_dev_as->iommu, VTD_INTERRUPT_ADDR_FIRST,
-> -                                    &vtd_dev_as->iommu_ir);
-> -        address_space_init(&vtd_dev_as->as,
-> -                           &vtd_dev_as->iommu, "intel_iommu");
-> +        memory_region_init(&vtd_dev_as->root, OBJECT(s),
-> +                           "vtd_root", UINT64_MAX);
-> +        memory_region_add_subregion_overlap(&vtd_dev_as->root,
-> +                                            VTD_INTERRUPT_ADDR_FIRST,
-> +                                            &vtd_dev_as->iommu_ir, 64);
-> +        address_space_init(&vtd_dev_as->as, &vtd_dev_as->root, name);
-> +        memory_region_add_subregion_overlap(&vtd_dev_as->root, 0,
-> +                                            &vtd_dev_as->sys_alias, 1);
-> +        if (s->dmar_enabled) {
-> +            memory_region_add_subregion_overlap(&vtd_dev_as->root, 0,
-> +                                                &vtd_dev_as->iommu, 2);
-> +        }
-> +        trace_vtd_switch_address_space(pci_bus_num(vtd_bus->bus),
-> +                                       VTD_PCI_SLOT(devfn), VTD_PCI_FUNC(devfn),
-> +                                       s->dmar_enabled);
->      }
->      return vtd_dev_as;
->  }
-> diff --git a/hw/i386/trace-events b/hw/i386/trace-events
-> index d2b4973..aee93bb 100644
-> --- a/hw/i386/trace-events
-> +++ b/hw/i386/trace-events
-> @@ -10,6 +10,9 @@ xen_pv_mmio_write(uint64_t addr) "WARNING: write to Xen PV Device MMIO space (ad
->  # hw/i386/x86-iommu.c
->  x86_iommu_iec_notify(bool global, uint32_t index, uint32_t mask) "Notify IEC invalidation: global=%d index=%" PRIu32 " mask=%" PRIu32
+> @@ -122,13 +659,6 @@ static void kvm_arm_gicv3_realize(DeviceState *dev, Error **errp)
+>      kvm_arm_register_device(&s->iomem_redist, -1, KVM_DEV_ARM_VGIC_GRP_ADDR,
+>                              KVM_VGIC_V3_ADDR_TYPE_REDIST, s->dev_fd);
 >  
-> +# hw/i386/intel_iommu.c
-> +vtd_switch_address_space(uint8_t bus, uint8_t slot, uint8_t fn, bool on) "Device %02x:%02x.%x switching address space (iommu enabled=%d)"
+> -    /* Block migration of a KVM GICv3 device: the API for saving and restoring
+> -     * the state in the kernel is not yet finalised in the kernel or
+> -     * implemented in QEMU.
+> -     */
+> -    error_setg(&s->migration_blocker, "vGICv3 migration is not implemented");
+> -    migrate_add_blocker(s->migration_blocker);
+> -
+>      if (kvm_has_gsi_routing()) {
+>          /* set up irq routing */
+>          kvm_init_irq_routing(kvm_state);
+> @@ -140,6 +670,13 @@ static void kvm_arm_gicv3_realize(DeviceState *dev, Error **errp)
+>  
+>          kvm_irqchip_commit_routes(kvm_state);
+>      }
 > +
->  # hw/i386/amd_iommu.c
->  amdvi_evntlog_fail(uint64_t addr, uint32_t head) "error: fail to write at addr 0x%"PRIx64" +  offset 0x%"PRIx32
->  amdvi_cache_update(uint16_t domid, uint8_t bus, uint8_t slot, uint8_t func, uint64_t gpa, uint64_t txaddr) " update iotlb domid 0x%"PRIx16" devid: %02x:%02x.%x gpa 0x%"PRIx64" hpa 0x%"PRIx64
-> diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
-> index 405c9d1..85c1b9b 100644
-> --- a/include/hw/i386/intel_iommu.h
-> +++ b/include/hw/i386/intel_iommu.h
-> @@ -83,6 +83,8 @@ struct VTDAddressSpace {
->      uint8_t devfn;
->      AddressSpace as;
->      MemoryRegion iommu;
-> +    MemoryRegion root;
-> +    MemoryRegion sys_alias;
->      MemoryRegion iommu_ir;      /* Interrupt region: 0xfeeXXXXX */
->      IntelIOMMUState *iommu_state;
->      VTDContextCacheEntry context_cache_entry;
+> +    if (!kvm_device_check_attr(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_DIST_REGS,
+> +                               GICD_CTLR)) {
+> +        error_setg(&s->migration_blocker, "This operating system kernel does "
+> +                                          "not support vGICv3 migration");
+> +        migrate_add_blocker(s->migration_blocker);
+> +    }
+>  }
+>  
+>  static void kvm_arm_gicv3_class_init(ObjectClass *klass, void *data)
+> diff --git a/hw/intc/gicv3_internal.h b/hw/intc/gicv3_internal.h
+> index 8f3567e..179556f 100644
+> --- a/hw/intc/gicv3_internal.h
+> +++ b/hw/intc/gicv3_internal.h
+> @@ -138,6 +138,7 @@
+>  #define ICC_CTLR_EL1_EOIMODE        (1U << 1)
+>  #define ICC_CTLR_EL1_PMHE           (1U << 6)
+>  #define ICC_CTLR_EL1_PRIBITS_SHIFT 8
+> +#define ICC_CTLR_EL1_PRIBITS_MASK   (7U << ICC_CTLR_EL1_PRIBITS_SHIFT)
+>  #define ICC_CTLR_EL1_IDBITS_SHIFT 11
+>  #define ICC_CTLR_EL1_SEIS           (1U << 14)
+>  #define ICC_CTLR_EL1_A3V            (1U << 15)
+> 
