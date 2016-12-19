@@ -1,33 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33332)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33379)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <joserz@linux.vnet.ibm.com>) id 1cJ16g-00070N-Pt
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 11:48:14 -0500
+	(envelope-from <joserz@linux.vnet.ibm.com>) id 1cJ16k-00072S-Ay
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 11:48:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <joserz@linux.vnet.ibm.com>) id 1cJ16c-0003zp-IX
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 11:48:10 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40525)
+	(envelope-from <joserz@linux.vnet.ibm.com>) id 1cJ16h-00041A-7B
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 11:48:14 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34610
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <joserz@linux.vnet.ibm.com>)
-	id 1cJ16c-0003zT-8o
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 11:48:06 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	uBJGiOlr099847
-	for <qemu-devel@nongnu.org>; Mon, 19 Dec 2016 11:48:05 -0500
-Received: from e24smtp05.br.ibm.com (e24smtp05.br.ibm.com [32.104.18.26])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 27ecg38dwd-1
+	id 1cJ16h-00040v-1m
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 11:48:11 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
+	uBJGiOdB114988
+	for <qemu-devel@nongnu.org>; Mon, 19 Dec 2016 11:48:10 -0500
+Received: from e24smtp04.br.ibm.com (e24smtp04.br.ibm.com [32.104.18.25])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 27egyuj4un-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 19 Dec 2016 11:48:04 -0500
+	for <qemu-devel@nongnu.org>; Mon, 19 Dec 2016 11:48:10 -0500
 Received: from localhost
-	by e24smtp05.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e24smtp04.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <joserz@linux.vnet.ibm.com>;
-	Mon, 19 Dec 2016 14:48:02 -0200
+	Mon, 19 Dec 2016 14:48:08 -0200
 From: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
-Date: Mon, 19 Dec 2016 14:47:38 -0200
-Message-Id: <1482166064-18121-1-git-send-email-joserz@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v4 0/6] POWER9 TCG enablements - BCD functions
- - final part
+Date: Mon, 19 Dec 2016 14:47:40 -0200
+In-Reply-To: <1482166064-18121-1-git-send-email-joserz@linux.vnet.ibm.com>
+References: <1482166064-18121-1-git-send-email-joserz@linux.vnet.ibm.com>
+Message-Id: <1482166064-18121-3-git-send-email-joserz@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v4 2/6] target-ppc: Implement bcds. instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,50 +41,114 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-ppc@nongnu.org
 Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au, nikunj@linux.vnet.ibm.com, bharata@linux.vnet.ibm.com
 
-v4:
- - improves functions to behave exactly like the target
+bcds.: Decimal shift. Given two registers vra and vrb, this instruction
+shift the vrb value by vra bits into the result register.
 
-v3:
- - moves shift functions to host-utils.c and added config_int128 guard
- - changes Makefile to always compile host-utils.c
- - redesigns bcd[u]trunc to use bitwise operations
- - removes "target-ppc: Implement bcd_is_valid function" (merged)
+Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
+---
+ target-ppc/helper.h                 |  1 +
+ target-ppc/int_helper.c             | 40 +++++++++++++++++++++++++++++++++++++
+ target-ppc/translate/vmx-impl.inc.c |  3 +++
+ target-ppc/translate/vmx-ops.inc.c  |  3 ++-
+ 4 files changed, 46 insertions(+), 1 deletion(-)
 
-v2:
- - bcd[s,sr,us] uses 1 byte for shifting instead of 4 bytes
- - left/right functions in host-utils are out of CONFIG_INT128
- - fixes overflowing issue in left shift and added a testcase
-
-This serie contains 5 new instructions for POWER9 ISA3.0, left/right shifts for 
-unsigned quadwords and a small improvement to check whether a bcd value is 
-valid or not.
-
-bcds.: Decimal signed shift
-bcdus.: Decimal unsigned shift
-bcdsr.: Decimal shift and round
-bcdtrunc.: Decimal signed trucate
-bcdutrunc.: Decimal unsigned truncate
-
-Jose Ricardo Ziviani (6):
-  target-ppc: Implement unsigned quadword left/right shift and unit
-    tests
-  target-ppc: Implement bcds. instruction
-  target-ppc: Implement bcdus. instruction
-  target-ppc: Implement bcdsr. instruction
-  target-ppc: Implement bcdtrunc. instruction
-  target-ppc: Implement bcdutrunc. instruction
-
- include/qemu/host-utils.h           |   3 +
- target-ppc/helper.h                 |   5 +
- target-ppc/int_helper.c             | 217 ++++++++++++++++++++++++++++++++++++
- target-ppc/translate/vmx-impl.inc.c |  16 +++
- target-ppc/translate/vmx-ops.inc.c  |  13 ++-
- tests/Makefile.include              |   5 +-
- tests/test-shift128.c               |  98 ++++++++++++++++
- util/Makefile.objs                  |   2 +-
- util/host-utils.c                   |  44 ++++++++
- 9 files changed, 396 insertions(+), 7 deletions(-)
- create mode 100644 tests/test-shift128.c
-
+diff --git a/target-ppc/helper.h b/target-ppc/helper.h
+index 4707db4..1a49b40 100644
+--- a/target-ppc/helper.h
++++ b/target-ppc/helper.h
+@@ -398,6 +398,7 @@ DEF_HELPER_3(bcdcfsq, i32, avr, avr, i32)
+ DEF_HELPER_3(bcdctsq, i32, avr, avr, i32)
+ DEF_HELPER_4(bcdcpsgn, i32, avr, avr, avr, i32)
+ DEF_HELPER_3(bcdsetsgn, i32, avr, avr, i32)
++DEF_HELPER_4(bcds, i32, avr, avr, avr, i32)
+ 
+ DEF_HELPER_2(xsadddp, void, env, i32)
+ DEF_HELPER_2(xssubdp, void, env, i32)
+diff --git a/target-ppc/int_helper.c b/target-ppc/int_helper.c
+index 7989b1f..35e14dc 100644
+--- a/target-ppc/int_helper.c
++++ b/target-ppc/int_helper.c
+@@ -3043,6 +3043,46 @@ uint32_t helper_bcdsetsgn(ppc_avr_t *r, ppc_avr_t *b, uint32_t ps)
+     return bcd_cmp_zero(r);
+ }
+ 
++uint32_t helper_bcds(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b, uint32_t ps)
++{
++    int cr;
++#if defined(HOST_WORDS_BIGENDIAN)
++    int i = a->s8[7];
++#else
++    int i = a->s8[8];
++#endif
++    bool ox_flag = false;
++    int sgnb = bcd_get_sgn(b);
++    ppc_avr_t ret = *b;
++    ret.u64[LO_IDX] &= ~0xf;
++
++    if (bcd_is_valid(b) == false) {
++        return CRF_SO;
++    }
++
++    if (unlikely(i > 31)) {
++        i = 31;
++    } else if (unlikely(i < -31)) {
++        i = -31;
++    }
++
++    if (i > 0) {
++        ulshift(&ret.u64[LO_IDX], &ret.u64[HI_IDX], i * 4, &ox_flag);
++    } else {
++        urshift(&ret.u64[LO_IDX], &ret.u64[HI_IDX], -i * 4);
++    }
++    bcd_put_digit(&ret, bcd_preferred_sgn(sgnb, ps), 0);
++
++    *r = ret;
++
++    cr = bcd_cmp_zero(r);
++    if (unlikely(ox_flag)) {
++        cr |= CRF_SO;
++    }
++
++    return cr;
++}
++
+ void helper_vsbox(ppc_avr_t *r, ppc_avr_t *a)
+ {
+     int i;
+diff --git a/target-ppc/translate/vmx-impl.inc.c b/target-ppc/translate/vmx-impl.inc.c
+index e8e527f..84ebb7e 100644
+--- a/target-ppc/translate/vmx-impl.inc.c
++++ b/target-ppc/translate/vmx-impl.inc.c
+@@ -1016,6 +1016,7 @@ GEN_BCD2(bcdcfsq)
+ GEN_BCD2(bcdctsq)
+ GEN_BCD2(bcdsetsgn)
+ GEN_BCD(bcdcpsgn);
++GEN_BCD(bcds);
+ 
+ static void gen_xpnd04_1(DisasContext *ctx)
+ {
+@@ -1090,6 +1091,8 @@ GEN_VXFORM_DUAL(vsubuhs, PPC_ALTIVEC, PPC_NONE, \
+                 bcdsub, PPC_NONE, PPC2_ALTIVEC_207)
+ GEN_VXFORM_DUAL(vaddshs, PPC_ALTIVEC, PPC_NONE, \
+                 bcdcpsgn, PPC_NONE, PPC2_ISA300)
++GEN_VXFORM_DUAL(vsubudm, PPC2_ALTIVEC_207, PPC_NONE, \
++                bcds, PPC_NONE, PPC2_ISA300)
+ 
+ static void gen_vsbox(DisasContext *ctx)
+ {
+diff --git a/target-ppc/translate/vmx-ops.inc.c b/target-ppc/translate/vmx-ops.inc.c
+index 57dce6e..7b4b009 100644
+--- a/target-ppc/translate/vmx-ops.inc.c
++++ b/target-ppc/translate/vmx-ops.inc.c
+@@ -62,7 +62,8 @@ GEN_VXFORM_207(vaddudm, 0, 3),
+ GEN_VXFORM_DUAL(vsububm, bcdadd, 0, 16, PPC_ALTIVEC, PPC_NONE),
+ GEN_VXFORM_DUAL(vsubuhm, bcdsub, 0, 17, PPC_ALTIVEC, PPC_NONE),
+ GEN_VXFORM(vsubuwm, 0, 18),
+-GEN_VXFORM_207(vsubudm, 0, 19),
++GEN_VXFORM_DUAL(vsubudm, bcds, 0, 19, PPC2_ALTIVEC_207, PPC2_ISA300),
++GEN_VXFORM_300(bcds, 0, 27),
+ GEN_VXFORM(vmaxub, 1, 0),
+ GEN_VXFORM(vmaxuh, 1, 1),
+ GEN_VXFORM(vmaxuw, 1, 2),
 -- 
 2.7.4
