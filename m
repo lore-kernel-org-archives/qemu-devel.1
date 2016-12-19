@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42100)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42473)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1cJ5qr-0007YO-8y
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 16:52:10 -0500
+	(envelope-from <alistair23@gmail.com>) id 1cJ5tM-0000Nc-Ji
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 16:54:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1cJ5qq-0005C3-DN
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 16:52:09 -0500
+	(envelope-from <alistair23@gmail.com>) id 1cJ5tL-0005uZ-Pk
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 16:54:44 -0500
 MIME-Version: 1.0
-In-Reply-To: <1481625384-15077-2-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <1481625384-15077-10-git-send-email-peter.maydell@linaro.org>
 References: <1481625384-15077-1-git-send-email-peter.maydell@linaro.org>
-	<1481625384-15077-2-git-send-email-peter.maydell@linaro.org>
+	<1481625384-15077-10-git-send-email-peter.maydell@linaro.org>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 19 Dec 2016 13:51:33 -0800
-Message-ID: <CAKmqyKMLCYLdqGmXdAFQqxqpwuyY0VHpiu9GOd0mjXyJV6tyQA@mail.gmail.com>
+Date: Mon, 19 Dec 2016 13:54:10 -0800
+Message-ID: <CAKmqyKPcO3SS6ZF7+3_a-oPeXvg1N3-zhhwj1krvew7NmpcgUw@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH 01/23] target-arm: Log AArch64 exception
- returns
+Subject: Re: [Qemu-devel] [PATCH 09/23] hw/intc/arm_gic: Add external IRQ
+ lines for VIRQ and VFIQ
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,11 +27,16 @@ To: Peter Maydell <peter.maydell@linaro.org>
 Cc: qemu-arm <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Andrew Jones <drjones@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, Patch Tracking <patches@linaro.org>
 
 On Tue, Dec 13, 2016 at 2:36 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
-> We already log exception entry; add logging of the AArch64 exception
-> return path as well.
+> Augment the GIC's QOM device interface by adding two
+> new sets of sysbus IRQ lines, to signal VIRQ and VFIQ to
+> each CPU.
+>
+> We never use these, but it's helpful to keep the v2-and-earlier
+> GIC's external interface in line with that of the GICv3 to
+> avoid board code having to add extra code conditional on which
+> version of the GIC is in use.
 >
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 
 Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 
@@ -40,50 +45,40 @@ Thanks,
 Alistair
 
 > ---
->  target-arm/op_helper.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
+>  include/hw/intc/arm_gic_common.h | 2 ++
+>  hw/intc/arm_gic_common.c         | 6 ++++++
+>  2 files changed, 8 insertions(+)
 >
-> diff --git a/target-arm/op_helper.c b/target-arm/op_helper.c
-> index cd94216..ba796d8 100644
-> --- a/target-arm/op_helper.c
-> +++ b/target-arm/op_helper.c
-> @@ -17,6 +17,7 @@
->   * License along with this library; if not, see <http://www.gnu.org/licenses/>.
->   */
->  #include "qemu/osdep.h"
-> +#include "qemu/log.h"
->  #include "cpu.h"
->  #include "exec/helper-proto.h"
->  #include "internals.h"
-> @@ -972,6 +973,9 @@ void HELPER(exception_return)(CPUARMState *env)
->          } else {
->              env->regs[15] = env->elr_el[cur_el] & ~0x3;
->          }
-> +        qemu_log_mask(CPU_LOG_INT, "Exception return from AArch64 EL%d to "
-> +                      "AArch32 EL%d PC 0x%" PRIx32 "\n",
-> +                      cur_el, new_el, env->regs[15]);
->      } else {
->          env->aarch64 = 1;
->          pstate_write(env, spsr);
-> @@ -980,6 +984,9 @@ void HELPER(exception_return)(CPUARMState *env)
->          }
->          aarch64_restore_sp(env, new_el);
->          env->pc = env->elr_el[cur_el];
-> +        qemu_log_mask(CPU_LOG_INT, "Exception return from AArch64 EL%d to "
-> +                      "AArch64 EL%d PC 0x%" PRIx64 "\n",
-> +                      cur_el, new_el, env->pc);
+> diff --git a/include/hw/intc/arm_gic_common.h b/include/hw/intc/arm_gic_common.h
+> index f4c349a..af3ca18 100644
+> --- a/include/hw/intc/arm_gic_common.h
+> +++ b/include/hw/intc/arm_gic_common.h
+> @@ -55,6 +55,8 @@ typedef struct GICState {
+>
+>      qemu_irq parent_irq[GIC_NCPU];
+>      qemu_irq parent_fiq[GIC_NCPU];
+> +    qemu_irq parent_virq[GIC_NCPU];
+> +    qemu_irq parent_vfiq[GIC_NCPU];
+>      /* GICD_CTLR; for a GIC with the security extensions the NS banked version
+>       * of this register is just an alias of bit 1 of the S banked version.
+>       */
+> diff --git a/hw/intc/arm_gic_common.c b/hw/intc/arm_gic_common.c
+> index 0a1f56a..4a8df44 100644
+> --- a/hw/intc/arm_gic_common.c
+> +++ b/hw/intc/arm_gic_common.c
+> @@ -110,6 +110,12 @@ void gic_init_irqs_and_mmio(GICState *s, qemu_irq_handler handler,
+>      for (i = 0; i < s->num_cpu; i++) {
+>          sysbus_init_irq(sbd, &s->parent_fiq[i]);
 >      }
+> +    for (i = 0; i < s->num_cpu; i++) {
+> +        sysbus_init_irq(sbd, &s->parent_virq[i]);
+> +    }
+> +    for (i = 0; i < s->num_cpu; i++) {
+> +        sysbus_init_irq(sbd, &s->parent_vfiq[i]);
+> +    }
 >
->      arm_call_el_change_hook(arm_env_get_cpu(env));
-> @@ -1002,6 +1009,8 @@ illegal_return:
->      if (!arm_singlestep_active(env)) {
->          env->pstate &= ~PSTATE_SS;
->      }
-> +    qemu_log_mask(LOG_GUEST_ERROR, "Illegal exception return at EL%d: "
-> +                  "resuming execution at 0x%" PRIx64 "\n", cur_el, env->pc);
->  }
->
->  /* Return true if the linked breakpoint entry lbn passes its checks */
+>      /* Distributor */
+>      memory_region_init_io(&s->iomem, OBJECT(s), ops, s, "gic_dist", 0x1000);
 > --
 > 2.7.4
 >
