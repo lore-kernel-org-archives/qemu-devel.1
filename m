@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43696)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47981)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cIukh-00076N-MF
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 05:01:04 -0500
+	(envelope-from <armbru@redhat.com>) id 1cIv4z-0003Zc-QI
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 05:22:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cIuke-0004vA-LI
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 05:01:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47292)
+	(envelope-from <armbru@redhat.com>) id 1cIv4u-0005yh-Sy
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 05:22:01 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39836)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cIuke-0004uN-E4
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 05:01:00 -0500
-Date: Mon, 19 Dec 2016 18:00:53 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20161219100053.GD4155@pxdev.xzpeter.org>
-References: <A2975661238FB949B60364EF0F2C257438FD8042@shsmsx102.ccr.corp.intel.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cIv4u-0005y4-KO
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 05:21:56 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <1481567461-2341-1-git-send-email-ehabkost@redhat.com>
+	<87zijyfyq5.fsf@dusky.pond.sub.org>
+	<20161214134841.GG3808@thinpad.lan.raisama.net>
+	<b5cf13d0-d03f-d477-20ce-211948b315ee@redhat.com>
+	<87oa0e8kt5.fsf@dusky.pond.sub.org>
+	<66ac2973-03c3-a04a-bead-981314e63bbd@redhat.com>
+Date: Mon, 19 Dec 2016 11:21:52 +0100
+In-Reply-To: <66ac2973-03c3-a04a-bead-981314e63bbd@redhat.com> (Paolo
+	Bonzini's message of "Thu, 15 Dec 2016 14:45:34 +0100")
+Message-ID: <87lgvcte0v.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <A2975661238FB949B60364EF0F2C257438FD8042@shsmsx102.ccr.corp.intel.com>
-Subject: Re: [Qemu-devel] [PATCH v7 3/5] IOMMU: enable intel_iommu map and
- unmap notifiers
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH for-2.9 v2] qom: Make all interface types
+ abstract
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,91 +32,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Liu, Yi L" <yi.l.liu@intel.com>
-Cc: "bd.aviv@gmail.com" <bd.aviv@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, ", Jan Kiszka" <jan.kiszka@siemens.com>, ", Alex Williamson" <alex.williamson@redhat.com>, ", Jason Wang" <jasowang@redhat.com>, "Lan, Tianyu" <tianyu.lan@intel.com>, "Tian, Kevin" <kevin.tian@intel.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Lin Ma <lma@suse.com>, qemu-devel@nongnu.org, Andreas =?utf-8?Q?F?= =?utf-8?Q?=C3=A4rber?= <afaerber@suse.de>, Eduardo Habkost <ehabkost@redhat.com>
 
-On Fri, Dec 16, 2016 at 09:12:05AM +0000, Liu, Yi L wrote:
-> > From: "Aviv Ben-David" <address@hidden>
-> > 
-> > Adds a list of registered vtd_as's to intel iommu state to save
-> > iteration over each PCI device in a search of the corrosponding domain.
-> > 
-> > Signed-off-by: Aviv Ben-David <address@hidden>
-> > ---
-> >  hw/i386/intel_iommu.c          | 94 ++++++++++++++++++++++++++++++++++++++----
-> >  hw/i386/intel_iommu_internal.h |  2 +
-> >  include/hw/i386/intel_iommu.h  |  9 ++++
-> >  3 files changed, 98 insertions(+), 7 deletions(-)
-> > 
-> > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> > index 05973b9..d872969 100644
-> > --- a/hw/i386/intel_iommu.c
-> > +++ b/hw/i386/intel_iommu.c
-> > @@ -679,7 +679,7 @@ static int vtd_gpa_to_slpte(VTDContextEntry *ce, uint64_t 
-> > gpa,
-> >          }
-> >          *reads = (*reads) && (slpte & VTD_SL_R);
-> >          *writes = (*writes) && (slpte & VTD_SL_W);
-> > -        if (!(slpte & access_right_check)) {
-> > +        if (!(slpte & access_right_check) && !(flags & IOMMU_NO_FAIL)) {
-> >              VTD_DPRINTF(GENERAL, "error: lack of %s permission for "
-> >                          "gpa 0x%"PRIx64 " slpte 0x%"PRIx64,
-> >                          (flags & IOMMU_WO ? "write" : "read"), gpa, slpte);
-> > @@ -978,6 +978,23 @@ static VTDBus *vtd_find_as_from_bus_num(IntelIOMMUState 
-> > *s, uint8_t bus_num)
-> >      return vtd_bus;
-> >  }
-> >  
-> > +static int vtd_get_did_dev(IntelIOMMUState *s, uint8_t bus_num, uint8_t devfn,
-> > +                           uint16_t *domain_id)
-> > +{
-> > +    VTDContextEntry ce;
-> > +    int ret_fr;
-> > +
-> > +    assert(domain_id);
-> > +
-> > +    ret_fr = vtd_dev_to_context_entry(s, bus_num, devfn, &ce);
-> > +    if (ret_fr) {
-> > +        return -1;
-> > +    }
-> > +
-> > +    *domain_id =  VTD_CONTEXT_ENTRY_DID(ce.hi);
-> > +    return 0;
-> > +}
-> > +
-> >  /* Do a context-cache device-selective invalidation.
-> >   * @func_mask: FM field after shifting
-> >   */
-> > @@ -1064,6 +1081,45 @@ static void vtd_iotlb_domain_invalidate(IntelIOMMUState 
-> > *s, uint16_t domain_id)
-> >                                  &domain_id);
-> >  }
-> >  
-> > +static void vtd_iotlb_page_invalidate_notify(IntelIOMMUState *s,
-> > +                                           uint16_t domain_id, hwaddr addr,
-> > +                                           uint8_t am)
-> > +{
-> > +    IntelIOMMUNotifierNode *node;
-> > +
-> > +    QLIST_FOREACH(node, &(s->notifiers_list), next) {
-> Aviv,
-> 
-> Regards to the s->notifiers_list, I didn't see the init op to it. Does it happen
-> in another patch? If so, it may be better to move it in this patch since this 
-> patch introduces both the definition and usage of notifiers_list.
-> 
-> If it is already clarified, then ignore it.
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-I think it was missing. It IMHO accidentally worked since QLIST_INIT()
-just set the head to NULL and that's what we did when we create the
-IntelIOMMUState object.
+> On 14/12/2016 18:47, Markus Armbruster wrote:
+>> Paolo Bonzini <pbonzini@redhat.com> writes:
+>> 
+>>> On 14/12/2016 14:48, Eduardo Habkost wrote:
+>>>>> How do you find all abstract TypeInfo in the source?  The uninitiated
+>>>>> might grep for .abstract = true, and be misled.  The initiated will be
+>>>>> annoyed instead, because grepping for *absence* of .instance_size = is
+>>>>> bothersome.
+>>>>>
+>>>>> I suspect life could be easier going forward if we instead required
+>>>>> .abstract = true for interfaces, and enforced it with
+>>>>> assert(ti->instance_size || ti->abstract) here.
+>>>> I was doing that before deciding to change type_initialize(). I
+>>>> think I still have the commit in my git reflog, I will recover it
+>>>> and submit it as v3.
+>>>
+>>> I think it's worse.
+>>>
+>>> Interfaces are abstract by definition.  Requiring ".abstract = true"
+>>> makes things less intuitive.  v2 seems good.
+>> 
+>> What makes a TypeInfo declaration an interface?  Whatever it is, it
+>> better be *locally* obvious.
+>
+> The fact that the superclass is an interface:
+>
+> 1) most interface names are (or should be) "interfacey".  Compare
+> device, memory backend, console (all classes) with user-creatable, fw
+> path provider, hotplug handler.  A few others simply end with "_IF".  Of
+> course naming is the hardest problem in computer science so there are
+> some interfaces whose name might apply just as well to a class (stream
+> slave, ISA DMA).  However...
+>
+> 2) ... currently we don't have a single case of an interface that
+> doesn't inherit from TYPE_INTERFACE, so all interfaces are declared with
+> ".parent = TYPE_INTERFACE".  That does make a TypeInfo obviously an
+> interface.
+>
+> If we ever have a case of interface inheritance, the supertype had
+> better have a good name.
 
-And what's worse - I found this approach may not work if we do
-QLIST_INSERT() in the changed() hook, since if we have more than one
-assigned devices we will only register the first one not the rest. A
-better approach may be traversing the vt-d buses via
-IntelIOMMUState.vtd_as_by_busptr.
+I see.
 
-Thanks,
+The choice is between a complex default for .abstract that permits us to
+elide .abstract = true for interface types, and a simple default that
+requires us to spell it out explicitly.
 
--- peterx
+Given that we have the grand total of thirteen interface types, I prefer
+simple & explicit.  Thirteen obvious .abstract = true are less of a
+mental burden than a complex default.  Even 25 would be for me.
