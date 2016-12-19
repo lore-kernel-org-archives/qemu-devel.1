@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54691)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55636)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cIz1m-0004LQ-N5
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 09:34:59 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cIz6K-000615-Gx
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 09:39:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cIz1j-0007YH-L3
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 09:34:58 -0500
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:35166)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cIz1j-0007Y3-EE
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 09:34:55 -0500
-Received: by mail-wm0-x244.google.com with SMTP id a20so19034326wme.2
-	for <qemu-devel@nongnu.org>; Mon, 19 Dec 2016 06:34:55 -0800 (PST)
-Date: Mon, 19 Dec 2016 14:34:52 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20161219143452.GG17374@stefanha-x1.localdomain>
-References: <1482137486-9843-1-git-send-email-douly.fnst@cn.fujitsu.com>
-	<1482137486-9843-4-git-send-email-douly.fnst@cn.fujitsu.com>
+	(envelope-from <pbonzini@redhat.com>) id 1cIz6F-0000uR-V0
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 09:39:40 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34654)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cIz6F-0000tb-Lg
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 09:39:35 -0500
+References: <1478077718-37424-1-git-send-email-xinhui.pan@linux.vnet.ibm.com>
+	<1478077718-37424-9-git-send-email-xinhui.pan@linux.vnet.ibm.com>
+	<20161219114241.GD4927@redhat.com>
+	<91437232-cb48-18e1-672f-d2d04a780169@linux.vnet.ibm.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <1dbf5452-49c2-a2cb-c71f-b11b13c4f7da@redhat.com>
+Date: Mon, 19 Dec 2016 15:39:29 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="RMedoP2+Pr6Rq0N2"
-Content-Disposition: inline
-In-Reply-To: <1482137486-9843-4-git-send-email-douly.fnst@cn.fujitsu.com>
-Subject: Re: [Qemu-devel] [PATCH RFC v2 3/4] block/qapi: acquire a reference
- instead of a lock during querying blockstats
+In-Reply-To: <91437232-cb48-18e1-672f-d2d04a780169@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v7 08/11] x86,
+ kvm/x86.c: support vcpu preempted check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,105 +30,197 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dou Liyang <douly.fnst@cn.fujitsu.com>
-Cc: stefanha@redhat.com, kwolf@redhat.com, armbru@redhat.com, mreitz@redhat.com, eblake@redhat.com, famz@redhat.com, danpb@redhat.com, izumi.taku@jp.fujitsu.com, caoj.fnst@cn.fujitsu.com, fanc.fnst@cn.fujitsu.com, qemu-devel@nongnu.org
+To: Pan Xinhui <xinhui@linux.vnet.ibm.com>, Andrea Arcangeli <aarcange@redhat.com>, Pan Xinhui <xinhui.pan@linux.vnet.ibm.com>
+Cc: linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, rkrcmar@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
 
---RMedoP2+Pr6Rq0N2
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, Dec 19, 2016 at 04:51:25PM +0800, Dou Liyang wrote:
-> This patch works to improve the performance of the query requests.
+On 19/12/2016 14:56, Pan Xinhui wrote:
+> hi, Andrea
+>     thanks for your reply. :)
 >=20
-> From the commit 13344f3a, it adds a lock to make query-blockstats
-> safe by the aio_context_acquire(). the qmp_query_blockstats func
-> requires/releases the AioContext lock, which takes some time and
-> blocks the I/O processing. It affects the performance, especially
-> in the multi-disks guests.
+> =E5=9C=A8 2016/12/19 19:42, Andrea Arcangeli =E5=86=99=E9=81=93:
+>> Hello,
+>>
+>> On Wed, Nov 02, 2016 at 05:08:35AM -0400, Pan Xinhui wrote:
+>>> Support the vcpu_is_preempted() functionality under KVM. This will
+>>> enhance lock performance on overcommitted hosts (more runnable vcpus
+>>> than physical cpus in the system) as doing busy waits for preempted
+>>> vcpus will hurt system performance far worse than early yielding.
+>>>
+>>> Use one field of struct kvm_steal_time ::preempted to indicate that i=
+f
+>>> one vcpu is running or not.
+>>>
+>>> Signed-off-by: Pan Xinhui <xinhui.pan@linux.vnet.ibm.com>
+>>> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+>>> ---
+>>>  arch/x86/include/uapi/asm/kvm_para.h |  4 +++-
+>>>  arch/x86/kvm/x86.c                   | 16 ++++++++++++++++
+>>>  2 files changed, 19 insertions(+), 1 deletion(-)
+>>>
+>> [..]
+>>> +static void kvm_steal_time_set_preempted(struct kvm_vcpu *vcpu)
+>>> +{
+>>> +    if (!(vcpu->arch.st.msr_val & KVM_MSR_ENABLED))
+>>> +        return;
+>>> +
+>>> +    vcpu->arch.st.steal.preempted =3D 1;
+>>> +
+>>> +    kvm_write_guest_offset_cached(vcpu->kvm, &vcpu->arch.st.stime,
+>>> +            &vcpu->arch.st.steal.preempted,
+>>> +            offsetof(struct kvm_steal_time, preempted),
+>>> +            sizeof(vcpu->arch.st.steal.preempted));
+>>> +}
+>>> +
+>>>  void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+>>>  {
+>>> +    kvm_steal_time_set_preempted(vcpu);
+>>>      kvm_x86_ops->vcpu_put(vcpu);
+>>>      kvm_put_guest_fpu(vcpu);
+>>>      vcpu->arch.last_host_tsc =3D rdtsc();
+>>
+>> You can't call kvm_steal_time_set_preempted in atomic context (neither
+>> in sched_out notifier nor in vcpu_put() after
+>> preempt_disable)). __copy_to_user in kvm_write_guest_offset_cached
+>> schedules and locks up the host.
+>>
+> yes, you are right! :) we have known the problems.
+> I am going to introduce something like kvm_write_guest_XXX_atomic and
+> use them instead of kvm_write_guest_offset_cached.
+> within pagefault_disable()/enable(), we can not call __copy_to_user I
+> think.
+
+Since I have already botched the revert and need to resend the fix, I'm
+going to apply Andrea's patches.  The preempted flag is only advisory
+anyway.
+
+Thanks,
+
+Paolo
+
+>> kvm->srcu (or kvm->slots_lock) is also not taken and
+>> kvm_write_guest_offset_cached needs to call kvm_memslots which
+>> requires it.
+>>
+> let me check the details later. thanks for pointing it out.
 >=20
-> As the low-level details of block statistics inside QEMU, we can
-> acquire a reference instead of the lock.
+>> This I think is why postcopy live migration locks up with current
+>> upstream, and it doesn't seem related to userfaultfd at all (initially
+>> I suspected the vmf conversion but it wasn't that) and in theory it
+>> can happen with heavy swapping or page migration too.
+>>
+>> Just the page is written so frequently it's unlikely to be swapped
+>> out. The page being written so frequently also means it's very likely
+>> found as re-dirtied when postcopy starts and that pretty much
+>> guarantees an userfault will trigger a scheduling event in
+>> kvm_steal_time_set_preempted in destination. There are opposite
+>> probabilities of reproducing this with swapping vs postcopy live
+>> migration.
+>>
 >=20
-> Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
-> ---
->  block/qapi.c | 11 +++++------
->  1 file changed, 5 insertions(+), 6 deletions(-)
-
-This patch changes the locking rules for blk_get_stats() (this covers a
-lot of fields), bdrv_get_node_name(), and blk_name().
-
-You must document the new locking rules for these fields in
-block-backend.h, block_int.h, etc.
-
-> diff --git a/block/qapi.c b/block/qapi.c
-> index bc622cd..2262918 100644
-> --- a/block/qapi.c
-> +++ b/block/qapi.c
-> @@ -457,17 +457,21 @@ static BlockStats *bdrv_query_bds_stats(const Block=
-DriverState *bs,
->  }
-> =20
->  static BlockStats *bdrv_query_stats(BlockBackend *blk,
-> -                                    const BlockDriverState *bs,
-> +                                    BlockDriverState *bs,
->                                      bool query_backing)
->  {
->      BlockStats *s;
-> =20
-> +    bdrv_ref(bs);
->      s =3D bdrv_query_bds_stats(bs, query_backing);
-> +    bdrv_unref(bs);
-> =20
->      if (blk) {
-> +        blk_ref(blk);
->          s->has_device =3D true;
->          s->device =3D g_strdup(blk_name(blk));
->          bdrv_query_blk_stats(s->stats, blk);
-> +        blk_unref(blk);
-
-This does not look correct.  The caller passed in bs and blk so they
-must already have a reference.  If not, then what protects bs and blk
-=66rom deletion before/after this function is called?
-
->      }
-> =20
->      return s;
-> @@ -523,13 +527,8 @@ BlockStatsList *qmp_query_blockstats(bool has_query_=
-nodes,
-> =20
->      while (next_query_bds(&blk, &bs, query_nodes)) {
->          BlockStatsList *info =3D g_malloc0(sizeof(*info));
-> -        AioContext *ctx =3D blk ? blk_get_aio_context(blk)
-> -                              : bdrv_get_aio_context(bs);
-> =20
-> -        aio_context_acquire(ctx);
->          info->value =3D bdrv_query_stats(blk, bs, !query_nodes);
-> -        aio_context_release(ctx);
-> -
->          *p_next =3D info;
->          p_next =3D &info->next;
->      }
-> --=20
-> 2.5.5
+> Good analyze. :)
 >=20
+>> For now I applied the below two patches, but this just will skip the
+>> write and only prevent the host instability as nobody checks the
+>> retval of __copy_to_user (what happens to guest after the write is
+>> skipped is not as clear and should be investigated, but at least the
+>> host will survive and not all guests will care about this flag being
+>> updated). For this to be fully safe the preempted information should
+>> be just an hint and not fundamental for correct functionality of the
+>> guest pv spinlock code.
+>>
+>> This bug was introduced in commit
+>> 0b9f6c4615c993d2b552e0d2bd1ade49b56e5beb in v4.9-rc7.
+>>
+>> From 458897fd44aa9b91459a006caa4051a7d1628a23 Mon Sep 17 00:00:00 2001
+>> From: Andrea Arcangeli <aarcange@redhat.com>
+>> Date: Sat, 17 Dec 2016 18:43:52 +0100
+>> Subject: [PATCH 1/2] kvm: fix schedule in atomic in
+>>  kvm_steal_time_set_preempted()
+>>
+>> kvm_steal_time_set_preempted() isn't disabling the pagefaults before
+>> calling __copy_to_user and the kernel debug notices.
+>>
+>> Signed-off-by: Andrea Arcangeli <aarcange@redhat.com>
+>> ---
+>>  arch/x86/kvm/x86.c | 10 ++++++++++
+>>  1 file changed, 10 insertions(+)
+>>
+>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+>> index 1f0d238..2dabaeb 100644
+>> --- a/arch/x86/kvm/x86.c
+>> +++ b/arch/x86/kvm/x86.c
+>> @@ -2844,7 +2844,17 @@ static void kvm_steal_time_set_preempted(struct
+>> kvm_vcpu *vcpu)
+>>
+>>  void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+>>  {
+>> +    /*
+>> +     * Disable page faults because we're in atomic context here.
+>> +     * kvm_write_guest_offset_cached() would call might_fault()
+>> +     * that relies on pagefault_disable() to tell if there's a
+>> +     * bug. NOTE: the write to guest memory may not go through if
+>> +     * during postcopy live migration or if there's heavy guest
+>> +     * paging.
+>> +     */
+>> +    pagefault_disable();
+>>      kvm_steal_time_set_preempted(vcpu);
+>> +    pagefault_enable();
+> can we just add this?
+> I think it is better to modify kvm_steal_time_set_preempted() and let i=
+t
+> run correctly in atomic context.
 >=20
+> thanks
+> xinhui
 >=20
+>>      kvm_x86_ops->vcpu_put(vcpu);
+>>      kvm_put_guest_fpu(vcpu);
+>>      vcpu->arch.last_host_tsc =3D rdtsc();
+>>
+>>
+>> From 2845eba22ac74c5e313e3b590f9dac33e1b3cfef Mon Sep 17 00:00:00 2001
+>> From: Andrea Arcangeli <aarcange@redhat.com>
+>> Date: Sat, 17 Dec 2016 19:13:32 +0100
+>> Subject: [PATCH 2/2] kvm: take srcu lock around
+>> kvm_steal_time_set_preempted()
+>>
+>> kvm_memslots() will be called by kvm_write_guest_offset_cached() so
+>> take the srcu lock.
+>>
+>> Signed-off-by: Andrea Arcangeli <aarcange@redhat.com>
+>> ---
+>>  arch/x86/kvm/x86.c | 7 +++++++
+>>  1 file changed, 7 insertions(+)
+>>
+>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+>> index 2dabaeb..02e6ab4 100644
+>> --- a/arch/x86/kvm/x86.c
+>> +++ b/arch/x86/kvm/x86.c
+>> @@ -2844,6 +2844,7 @@ static void kvm_steal_time_set_preempted(struct
+>> kvm_vcpu *vcpu)
+>>
+>>  void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+>>  {
+>> +    int idx;
+>>      /*
+>>       * Disable page faults because we're in atomic context here.
+>>       * kvm_write_guest_offset_cached() would call might_fault()
+>> @@ -2853,7 +2854,13 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+>>       * paging.
+>>       */
+>>      pagefault_disable();
+>> +    /*
+>> +     * kvm_memslots() will be called by
+>> +     * kvm_write_guest_offset_cached() so take the srcu lock.
+>> +     */
+>> +    idx =3D srcu_read_lock(&vcpu->kvm->srcu);
+>>      kvm_steal_time_set_preempted(vcpu);
+>> +    srcu_read_unlock(&vcpu->kvm->srcu, idx);
+>>      pagefault_enable();
+>>      kvm_x86_ops->vcpu_put(vcpu);
+>>      kvm_put_guest_fpu(vcpu);
+>>
+>>
 >=20
-
---RMedoP2+Pr6Rq0N2
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJYV/AMAAoJEJykq7OBq3PIvhcH/RuwWEb4kQ0UYTIQvoDcdUt5
-eGpcPL0S1J7qI2Pyp6/buXnPwGLqIbQdcL8LrMkXUDb6RmKef5oZ6F7oW1zzwoT+
-V3m52CZRE5SW7XFeFeHQ479IGni9V8FsMjJVjbzFNZHJnrQDFHtYTvMGOJ3yqZn0
-s0zYQyDkPncDc+4u5W9nn6BpTmtgxBA4zNX/pSMeuI9fFmwk/VLfXD/AXAUQ6iY6
-/ylPNflQdIqTQUid6GDWddL67Ogew050SkuIosT+sMXlflHnORhfKUurBWCI2xWL
-k6OXxjOTC9hqrR+jD7BQEtrl2AZkaWs/WD0vpGVw/61maYtk/Ck8CiSpDQxr4PI=
-=Xrkb
------END PGP SIGNATURE-----
-
---RMedoP2+Pr6Rq0N2--
