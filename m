@@ -1,33 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59051)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59273)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cJ2ne-000507-Fm
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 13:36:39 -0500
+	(envelope-from <s.priebe@profihost.ag>) id 1cJ2oe-0005j6-Ve
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 13:37:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cJ2nb-00044h-Aq
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 13:36:38 -0500
-Received: from indium.canonical.com ([91.189.90.7]:48533)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cJ2nb-00044L-4c
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 13:36:35 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cJ2nZ-0008M4-SM
-	for <qemu-devel@nongnu.org>; Mon, 19 Dec 2016 18:36:33 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B97B62E80C2
-	for <qemu-devel@nongnu.org>; Mon, 19 Dec 2016 18:36:33 +0000 (UTC)
+	(envelope-from <s.priebe@profihost.ag>) id 1cJ2ob-0004IA-UH
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 13:37:41 -0500
+Received: from cloud1-vm154.de-nserver.de ([178.250.10.56]:17546)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <s.priebe@profihost.ag>)
+	id 1cJ2ob-0004EN-KM
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 13:37:37 -0500
+References: <1a3a7aef-55f1-11b6-b33f-621979cbb59f@profihost.ag>
+	<1383290552.4515122.1481729638569.JavaMail.zimbra@oxygem.tv>
+	<32c0e94e-8beb-03f3-2605-46225500e6ad@profihost.ag>
+	<464605215.4528644.1481784392571.JavaMail.zimbra@oxygem.tv>
+	<ba2e2786-a7ba-5ad9-86ef-aae1c4def034@profihost.ag>
+	<20161219110346.GC17374@stefanha-x1.localdomain>
+From: Stefan Priebe - Profihost AG <s.priebe@profihost.ag>
+Message-ID: <549beab5-be5b-f8dc-ff3a-a7ce483324e3@profihost.ag>
+Date: Mon, 19 Dec 2016 19:37:30 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 19 Dec 2016 18:22:47 -0000
-From: Thomas Huth <682360@bugs.launchpad.net>
-Reply-To: Bug 682360 <682360@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20101128141117.27491.10254.malonedeb@palladium.canonical.com>
-Message-Id: <20161219182247.3274.12848.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 682360] Re: Unaccessible memory
+In-Reply-To: <20161219110346.GC17374@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] any known virtio-net regressions in Qemu 2.7?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,62 +32,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Alexandre DERUMIER <aderumier@odiso.com>, qemu-devel <qemu-devel@nongnu.org>, power-management@lists.fedoraproject.org, jskarvad@redhat.com
 
-QEMU 0.13 is pretty much outdated nowadays ... can you still reproduce
-this issue with the latest version of QEMU?
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+Am 19.12.2016 um 12:03 schrieb Stefan Hajnoczi:
+> On Fri, Dec 16, 2016 at 10:00:36PM +0100, Stefan Priebe - Profihost AG wrote:
+>>
+>> Am 15.12.2016 um 07:46 schrieb Alexandre DERUMIER:
+>>> does rollbacking the kernel to previous version fix the problem ?
+>>
+>> The culprit is the used tuned agent from Redhat
+>> (https://github.com/redhat-performance/tuned). The used profile
+>> virtual-host results in these problems. Stopping tuned or using another
+>> profile like throughput-performance everything is fine again.
+> 
+> Interesting discovery.  Have you filed a bug report about it?
 
--- =
+As we're not using RHEL, nor CentOS i didn't expect this to make sense
+;-) I just believed that something in the kernel changed.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/682360
+Greets,
+Stefan
 
-Title:
-  Unaccessible memory
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  Hello,
-
-  I'm trying to develop a OS over L4/X2 microkernel and I use Linux
-  debian and qemu 0.13 in 64 bits mode. When I start qemu with qemu-
-  system-x86_64 -hdc freevms.img -smp 1 -serial stdio -m 128M -k fr, my
-  kernel boots fine. If I modify this command line with -m 384M (for
-  example), my kernel is loaded but enter in a deadlock. I have found a
-  bug in my code until I have tried to use the _same_ disk image under
-  virtualbox and it works without any trouble. I runs fine on a real PC
-  also.
-
-  I have bissected my code and qemu stops (maybe in a deadlock) when I try =
-to access to memory :
-  %MEM-I-VM_ALLOC, adding $0000000000045000 - $0000000000108FFF to VM alloc=
-ator
-  %MEM-I-VM_ALLOC, adding $000000000010B000 - $00000000003F2FFF to VM alloc=
-ator
-  %MEM-I-VM_ALLOC, adding $000000000040C000 - $0000000000FFFFFF to VM alloc=
-ator
-  %MEM-I-VM_ALLOC, adding $000000000100F000 - $FFFFFEFFFFFFFFFF to VM alloc=
-ator
-  %MEM-I-ACCMAP, accepting mapping
-  %MEM-I-ACCMAP, virtual  $FFFF000000000000 - $FFFF000000000FFF
-  %MEM-I-ACCMAP, physical $000000000009E000 - $000000000009EFFF
-
-  Note that qemu doesn't crash. It only stops. My virtual memory
-  subsystem maps $FFFF000000000000 in physical memory ($9E000). And when
-  I try to initialize this memory, qemu enters in deadlock.
-
-  A disk image to reproduce this bug is available at
-  http://www.systella.fr/~bertrand/freevms.img.bz2
-
-  Regards,
-
-  JKB
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/682360/+subscriptions
+>> after upgrading a cluster OS, Qemu, ... i'm experiencing slow and
+>> volatile network speeds inside my VMs.
+>>
+>> Currently I've no idea what causes this but it's related to the host
+>> upgrades. Before i was running Qemu 2.6.2.
+>>
+>> I'm using virtio for the network cards.
+> 
+> Stefan
+> 
