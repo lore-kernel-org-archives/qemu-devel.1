@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48164)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50799)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cIyeD-0000pc-Un
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 09:10:38 -0500
+	(envelope-from <stefanha@gmail.com>) id 1cIyn4-0006xs-UR
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 09:19:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cIyeC-0003Pq-W8
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 09:10:37 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53650)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cIyeC-0003PS-Jq
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 09:10:36 -0500
-Received: from int-mx13.intmail.prod.int.phx2.redhat.com
-	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D902E4E4E6
-	for <qemu-devel@nongnu.org>; Mon, 19 Dec 2016 14:10:35 +0000 (UTC)
-From: Peter Xu <peterx@redhat.com>
-Date: Mon, 19 Dec 2016 22:10:23 +0800
-Message-Id: <1482156623-9111-3-git-send-email-peterx@redhat.com>
-In-Reply-To: <1482156623-9111-1-git-send-email-peterx@redhat.com>
-References: <1482156623-9111-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/2] memory: hmp: dump flat view for 'info
- mtree'
+	(envelope-from <stefanha@gmail.com>) id 1cIyn0-0007RE-1o
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 09:19:46 -0500
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:33485)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cIymz-0007QT-Q1
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 09:19:41 -0500
+Received: by mail-wm0-x243.google.com with SMTP id u144so18893138wmu.0
+	for <qemu-devel@nongnu.org>; Mon, 19 Dec 2016 06:19:41 -0800 (PST)
+Date: Mon, 19 Dec 2016 14:19:38 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20161219141938.GF17374@stefanha-x1.localdomain>
+References: <1482137486-9843-1-git-send-email-douly.fnst@cn.fujitsu.com>
+	<1482137486-9843-2-git-send-email-douly.fnst@cn.fujitsu.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="xkXJwpr35CY/Lc3I"
+Content-Disposition: inline
+In-Reply-To: <1482137486-9843-2-git-send-email-douly.fnst@cn.fujitsu.com>
+Subject: Re: [Qemu-devel] [PATCH RFC v2 1/4] block: refactor bdrv_next_node
+ for readability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,66 +31,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, peterx@redhat.com
+To: Dou Liyang <douly.fnst@cn.fujitsu.com>
+Cc: stefanha@redhat.com, kwolf@redhat.com, armbru@redhat.com, mreitz@redhat.com, eblake@redhat.com, famz@redhat.com, danpb@redhat.com, izumi.taku@jp.fujitsu.com, caoj.fnst@cn.fujitsu.com, fanc.fnst@cn.fujitsu.com, qemu-devel@nongnu.org
 
-Dumping flat view will be useful to debug the memory rendering logic,
-also it'll be much easier with it to know what memory region is handling
-what address range.
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- memory.c | 31 +++++++++++++++++++++++++++++++
- 1 file changed, 31 insertions(+)
+--xkXJwpr35CY/Lc3I
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/memory.c b/memory.c
-index 5dcc2e1..a9154aa 100644
---- a/memory.c
-+++ b/memory.c
-@@ -2545,6 +2545,36 @@ static void mtree_print_mr(fprintf_function mon_printf, void *f,
-     }
- }
- 
-+static void mtree_print_flatview(fprintf_function p, void *f,
-+                                 AddressSpace *as)
-+{
-+    FlatView *view = address_space_get_flatview(as);
-+    FlatRange *range = &view->ranges[0];
-+    MemoryRegion *mr;
-+    int n = view->nr;
-+
-+    if (n <= 0) {
-+        p(f, MTREE_INDENT "No rendered FlatView for "
-+          "address space '%s'\n", as->name);
-+        return;
-+    }
-+
-+    p(f, MTREE_INDENT "FlatView (address space '%s'):\n", as->name);
-+
-+    while (n--) {
-+        mr = range->mr;
-+        p(f, MTREE_INDENT MTREE_INDENT TARGET_FMT_plx "-"
-+          TARGET_FMT_plx " (prio %d, %c%c): %s\n",
-+          int128_get64(range->addr.start),
-+          int128_get64(range->addr.start) + MR_SIZE(mr->size),
-+          mr->priority, MR_CHAR_RD(mr), MR_CHAR_WR(mr),
-+          memory_region_name(mr));
-+        range++;
-+    }
-+
-+    flatview_unref(view);
-+}
-+
- void mtree_info(fprintf_function mon_printf, void *f)
- {
-     MemoryRegionListHead ml_head;
-@@ -2556,6 +2586,7 @@ void mtree_info(fprintf_function mon_printf, void *f)
-     QTAILQ_FOREACH(as, &address_spaces, address_spaces_link) {
-         mon_printf(f, "address-space: %s\n", as->name);
-         mtree_print_mr(mon_printf, f, as->root, 1, 0, &ml_head);
-+        mtree_print_flatview(mon_printf, f, as);
-         mon_printf(f, "\n");
-     }
- 
--- 
-2.7.4
+On Mon, Dec 19, 2016 at 04:51:23PM +0800, Dou Liyang wrote:
+> make the bdrv_next_node() clearly and add some comments.
+>=20
+> Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
+> ---
+>  block.c | 16 ++++++++++++----
+>  1 file changed, 12 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/block.c b/block.c
+> index 39ddea3..01c9e51 100644
+> --- a/block.c
+> +++ b/block.c
+> @@ -2931,12 +2931,20 @@ bool bdrv_chain_contains(BlockDriverState *top, B=
+lockDriverState *base)
+>      return top !=3D NULL;
+>  }
+> =20
+> +/*
+> + * Return the BlockDriverStates of all the named nodes.
+
+This sentence describes how this function is used in a loop.  The
+semantics of one call to this function are different: only a *single*
+named node's BlockDriverState is returned.
+
+> + * If @bs is null, return the first one.
+> + * Else, return @bs's next sibling, which may be null.
+> + *
+> + * To iterate over all BlockDriverStates, do
+> + * for (bs =3D bdrv_next_node(NULL); bs; bs =3D bdrv_next_node(blk)) {
+> + *     ...
+> + * }
+> + */
+>  BlockDriverState *bdrv_next_node(BlockDriverState *bs)
+>  {
+> -    if (!bs) {
+> -        return QTAILQ_FIRST(&graph_bdrv_states);
+> -    }
+> -    return QTAILQ_NEXT(bs, node_list);
+> +    return bs ? QTAILQ_NEXT(bs, node_list)
+> +            : QTAILQ_FIRST(&graph_bdrv_states);
+
+The conditional operator (?:) is often considered harder to read than an
+if statement.  I see no reason to modify the code.
+
+--xkXJwpr35CY/Lc3I
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJYV+x6AAoJEJykq7OBq3PIsH0H/29WBGGPY3CN1eh4sIIbNQBK
+qm9A0zietb48ynabKCpQR8cAX/d1PTVeii1CqdFP7IJcmxKaFsaRt02BQ2vSjkp4
+VivQXKkH2GTO/ULqVMIcVeZACWB5aETU/9/C6jL5EBIsV58tBWiQtnTL5Jz48tzR
+U4ph4Ho/qVPAOYbyjpOYZbw9SPxEVR1EsQOm5a4HLDKEdyUTxhJsslC/hjVRodgR
+lj0ao93pHvw9shOKdH2lAbOwoBVhi2rymtYI13Oga700wujQ2suvFhsrSGqeY5I1
+ZaITuBtmCbSQno6BTsMto59irFc8ySny7j3Qfk0DQzWk5vXCe7pegvxMGQzSkW4=
+=dLre
+-----END PGP SIGNATURE-----
+
+--xkXJwpr35CY/Lc3I--
