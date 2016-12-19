@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53071)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59053)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <harrynjit@gmail.com>) id 1cJ2O1-0005Tl-IN
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 13:10:10 -0500
+	(envelope-from <bounces@canonical.com>) id 1cJ2ne-00050C-Fo
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 13:36:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <harrynjit@gmail.com>) id 1cJ2O0-0006Y9-Nh
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 13:10:09 -0500
-Received: from mail-qt0-x231.google.com ([2607:f8b0:400d:c0d::231]:33752)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <harrynjit@gmail.com>) id 1cJ2O0-0006WD-KL
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 13:10:08 -0500
-Received: by mail-qt0-x231.google.com with SMTP id p16so152360954qta.0
-	for <qemu-devel@nongnu.org>; Mon, 19 Dec 2016 10:10:07 -0800 (PST)
+	(envelope-from <bounces@canonical.com>) id 1cJ2nb-00044x-KP
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 13:36:38 -0500
+Received: from indium.canonical.com ([91.189.90.7]:48555)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cJ2nb-00044R-Eq
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 13:36:35 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cJ2na-0008Lz-Gj
+	for <qemu-devel@nongnu.org>; Mon, 19 Dec 2016 18:36:34 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 7C2DB2E80C2
+	for <qemu-devel@nongnu.org>; Mon, 19 Dec 2016 18:36:34 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20161219105859.GB17374@stefanha-x1.localdomain>
-References: <CA+scX6=9y4wDBWzXyqpGh9U__usKUa6sxwdc63iA8YRmpWFPqA@mail.gmail.com>
-	<20161214193107.GB20648@stefanha-x1.localdomain>
-	<CA+scX6=oc_eGteY8A0d8tuwzJFSu9M_6wnXBd5Tp=XGrg8FotQ@mail.gmail.com>
-	<CA+scX6n+xcY7qi=XbBcno=OQOfUfJf77ZGfS2s5FbhUCEHQp3A@mail.gmail.com>
-	<20161215080634.GF26169@stefanha-x1.localdomain>
-	<CA+scX6=Lk8Ea=vkFt_3c5v+n8gbr+uAb7hZ8vM1svzBZWwX7nQ@mail.gmail.com>
-	<20161216094850.GA4129@stefanha-x1.localdomain>
-	<CA+scX6k2u5E0E6M07S_WOd0633=x1OnLi9jvXVrED+YB3bzaWA@mail.gmail.com>
-	<CA+scX6kS1CB8RcFgG-ErgEf7qS2YakNmo0hiEJfmpPfmEReG+w@mail.gmail.com>
-	<20161219105859.GB17374@stefanha-x1.localdomain>
-From: Weiwei Jia <harrynjit@gmail.com>
-Date: Mon, 19 Dec 2016 13:10:05 -0500
-Message-ID: <CA+scX6nk746G7qPdyJ_ik3uF3UnymUVXSbkG_oP0gFzCwP4uPw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] Lock contention in QEMU
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 19 Dec 2016 18:18:41 -0000
+From: Thomas Huth <597575@bugs.launchpad.net>
+Reply-To: Bug 597575 <597575@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20100623080638.15164.21600.malonedeb@potassium.ubuntu.com>
+Message-Id: <20161219181841.17640.82177.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 597575] Re: Hangs on HTTP errors when using the
+ curl block driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,28 +37,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-Got it. Thank you very much.
+QEMU 0.11 / 0.12 are pretty much outdated nowadays ... can you still
+reproduce this issue with the latest version of QEMU?
 
-Best,
-Weiwei Jia
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
-On Mon, Dec 19, 2016 at 5:58 AM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
-> On Fri, Dec 16, 2016 at 04:42:54PM -0500, Weiwei Jia wrote:
->> Has x-data-plane been used (or accepted) widely in systems. I have
->> this concern since if it hasn't been widely accepted, it may
->> have/cause some problems we don't know. Do you know some hidden
->> problems which may caused by QEMU x-data-plane feature in systems?
->
-> By now virtio-blk dataplane has been tested a fair amount.  virtio-scsi
-> dataplane is more recent.
->
-> I'm not aware of known issues with virtio-blk dataplane in modern QEMU
-> but you seem to be using an older QEMU.  Originally dataplane had a lot
-> of limitations (no live migration, no image file formats, no block
-> jobs) so be sure to check that your QEMU supports these things with
-> dataplane if you need the features.
->
-> Stefan
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/597575
+
+Title:
+  Hangs on HTTP errors when using the curl block driver
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  Hi,
+
+  It seems that qemu-kvm does not handle HTTP errors gracefully when
+  using the curl block driver and a synchronous request is made (i.e.
+  one using bdrv_read_em() for example). In these cases, if an HTTP
+  error (such as 404 or 416) is returned, the aio thread exits but the
+  main thread never finishes waiting for I/O completion, thus freezing
+  KVM.
+
+  Versions affected:
+  At least 0.11.1 and 0.12.4 were tested and found to be affected.
+
+  How to reproduce:
+  Simply specify a non-existing path for an HTTP URL as a CDROM drive.
+  kvm -drive file=3Dtest.img,format=3Dqcow2,if=3Dide,index=3D0,boot=3Don -d=
+rive file=3Dhttp://127.0.0.1/static/test1.iso,media=3Dcdrom,index=3D2,if=3D=
+ide -boot c
+
+  qemu-kvm will hang on boot using 100% cpu as it will try to open the
+  block device. At that point, the backtrace is (qemu-kvm-0.12.4):
+
+  #0  0x000000000047aaaf in qemu_aio_wait () at aio.c:163
+  #1  0x000000000047a055 in bdrv_read_em (bs=3D0x1592320, sector_num=3D0, b=
+uf=3D0x7fffcf7e9ae0 "=C2=A8\237~=C3=8F=C3=BF\177", nb_sectors=3D4)
+      at block.c:1939
+  #2  0x0000000000479c0e in bdrv_pread (bs=3D0x1592320, offset=3D<value opt=
+imized out>, buf=3D0x7fffcf7e9ae0, count1=3D2048)
+      at block.c:716
+  #3  0x000000000047a862 in bdrv_open2 (bs=3D0x1591a30, filename=3D0x1559f0=
+0 "http://127.0.0.1/static/test1.iso", =
+
+      flags=3D0, drv=3D0x84eca0) at block.c:316
+  #4  0x000000000040dcb4 in drive_init (opts=3D0x1559e60, opaque=3D<value o=
+ptimized out>, fatal_error=3D0x7fffcf7ea494)
+      at /build/buildd-qemu-kvm_0.12.4+dfsg-1~bpo50+1-amd64-KOah5G/qemu-kvm=
+-0.12.4+dfsg/vl.c:2471
+  #5  0x000000000040e086 in drive_init_func (opts=3D0x155db00, opaque=3D0x0)
+      at /build/buildd-qemu-kvm_0.12.4+dfsg-1~bpo50+1-amd64-KOah5G/qemu-kvm=
+-0.12.4+dfsg/vl.c:2488
+  #6  0x0000000000475421 in qemu_opts_foreach (list=3D<value optimized out>=
+, func=3D0x40e070 <drive_init_func>, =
+
+      opaque=3D0x8495e0, abort_on_failure=3D12) at qemu-option.c:817
+  #7  0x000000000040e9af in main (argc=3D7, argv=3D0x7fffcf7ea838, envp=3D<=
+value optimized out>)
+      at /build/buildd-qemu-kvm_0.12.4+dfsg-1~bpo50+1-amd64-KOah5G/qemu-kvm=
+-0.12.4+dfsg/vl.c:6011
+
+  Thanks
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/597575/+subscriptions
