@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54018)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53989)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1cIr0h-00040P-Tf
+	(envelope-from <wei.w.wang@intel.com>) id 1cIr0f-0003ob-Qf
 	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 01:01:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1cIr0h-0004ss-2c
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 01:01:20 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1cIr0e-0004qC-6E
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 01:01:17 -0500
 Received: from mga06.intel.com ([134.134.136.31]:33815)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1cIr0g-0004Vl-Rj
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 01:01:19 -0500
+	id 1cIr0d-0004Vl-R6
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 01:01:16 -0500
 From: Wei Wang <wei.w.wang@intel.com>
-Date: Mon, 19 Dec 2016 13:59:08 +0800
-Message-Id: <1482127152-84732-34-git-send-email-wei.w.wang@intel.com>
+Date: Mon, 19 Dec 2016 13:59:06 +0800
+Message-Id: <1482127152-84732-32-git-send-email-wei.w.wang@intel.com>
 In-Reply-To: <1482127152-84732-1-git-send-email-wei.w.wang@intel.com>
 References: <1482127152-84732-1-git-send-email-wei.w.wang@intel.com>
-Subject: [Qemu-devel] [RESEND Patch v1 33/37] vhost-pci-net: send the
- negotiated feature bits to the master
+Subject: [Qemu-devel] [RESEND Patch v1 31/37] vhost-user/msg: send
+ VHOST_USER_SET_VHOST_PCI (start/stop)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,89 +28,162 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: marcandre.lureau@gmail.com, mst@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org
 Cc: Wei Wang <wei.w.wang@intel.com>
 
-The slave actively sends the negotiated feature bits to the master.
-"need_send" is used to detect if the 64-bit feature bits are ready to
-be sent.
+The master requests the slave to create or destroy a vhost-pci device.
 
 Signed-off-by: Wei Wang <wei.w.wang@intel.com>
 ---
- hw/net/vhost-pci-net.c              | 13 +++++++++++++
- hw/virtio/vhost-pci-slave.c         | 21 +++++++++++++++++++++
- include/hw/virtio/vhost-pci-slave.h |  2 ++
- 3 files changed, 36 insertions(+)
+ hw/net/vhost_net.c                | 36 ++++++++++++++++++++++++++++++++++++
+ hw/virtio/vhost-user.c            | 17 +++++++++++++++++
+ include/hw/virtio/vhost-backend.h |  2 ++
+ include/net/vhost_net.h           |  2 ++
+ 4 files changed, 57 insertions(+)
 
-diff --git a/hw/net/vhost-pci-net.c b/hw/net/vhost-pci-net.c
-index 5ad4a9f..8e30281 100644
---- a/hw/net/vhost-pci-net.c
-+++ b/hw/net/vhost-pci-net.c
-@@ -15,6 +15,7 @@
+diff --git a/hw/net/vhost_net.c b/hw/net/vhost_net.c
+index 6524503..8256018 100644
+--- a/hw/net/vhost_net.c
++++ b/hw/net/vhost_net.c
+@@ -18,6 +18,7 @@
+ #include "net/tap.h"
+ #include "net/vhost-user.h"
  
- #include "qemu/osdep.h"
- #include "qemu/iov.h"
-+#include "qemu/error-report.h"
- #include "hw/virtio/virtio-access.h"
- #include "hw/virtio/vhost-pci-net.h"
++#include "hw/virtio/vhost-user.h"
+ #include "hw/virtio/virtio-net.h"
+ #include "net/vhost_net.h"
+ #include "qemu/error-report.h"
+@@ -293,6 +294,7 @@ int vhost_net_start(VirtIODevice *dev, NetClientState *ncs,
+     BusState *qbus = BUS(qdev_get_parent_bus(DEVICE(dev)));
+     VirtioBusState *vbus = VIRTIO_BUS(qbus);
+     VirtioBusClass *k = VIRTIO_BUS_GET_CLASS(vbus);
++    struct vhost_net *last_net;
+     int r, e, i;
  
-@@ -139,6 +140,18 @@ static uint64_t vpnet_get_features(VirtIODevice *vdev, uint64_t features,
+     if (!k->set_guest_notifiers) {
+@@ -338,6 +340,15 @@ int vhost_net_start(VirtIODevice *dev, NetClientState *ncs,
+         }
+     }
  
- static void vpnet_set_features(VirtIODevice *vdev, uint64_t features)
- {
-+    static bool need_send;
-+    int ret;
-+
-+    if (need_send) {
-+        need_send = 0;
-+        ret = vp_slave_send_feature_bits(features);
-+        if (ret < 0) {
-+            error_report("failed to send feature bits to the master");
++    last_net = get_vhost_net(ncs[total_queues - 1].peer);
++    if (vhost_pci_enabled(&last_net->dev)) {
++        r = vhost_set_vhost_pci(ncs[total_queues - 1].peer,
++                              VHOST_USER_SET_VHOST_PCI_start);
++        if (r < 0) {
++            goto err_start;
 +        }
-+    } else {
-+        need_send = 1;
 +    }
++
+     return 0;
+ 
+ err_start:
+@@ -359,8 +370,15 @@ void vhost_net_stop(VirtIODevice *dev, NetClientState *ncs,
+     BusState *qbus = BUS(qdev_get_parent_bus(DEVICE(dev)));
+     VirtioBusState *vbus = VIRTIO_BUS(qbus);
+     VirtioBusClass *k = VIRTIO_BUS_GET_CLASS(vbus);
++    struct vhost_net *last_net;
+     int i, r;
+ 
++    last_net = get_vhost_net(ncs[total_queues - 1].peer);
++    if (vhost_pci_enabled(&last_net->dev)) {
++        vhost_set_vhost_pci(ncs[total_queues - 1].peer,
++                              VHOST_USER_SET_VHOST_PCI_stop);
++    }
++
+     for (i = 0; i < total_queues; i++) {
+         vhost_net_stop_one(get_vhost_net(ncs[i].peer), dev);
+     }
+@@ -436,6 +454,18 @@ int vhost_set_vring_enable(NetClientState *nc, int enable)
+     return 0;
  }
  
- static void vpnet_get_config(VirtIODevice *vdev, uint8_t *config)
-diff --git a/hw/virtio/vhost-pci-slave.c b/hw/virtio/vhost-pci-slave.c
-index de08324..a966885 100644
---- a/hw/virtio/vhost-pci-slave.c
-+++ b/hw/virtio/vhost-pci-slave.c
-@@ -88,6 +88,27 @@ static void vp_slave_set_features(VhostUserMsg *msg)
-                              & ~(1 << VHOST_USER_F_PROTOCOL_FEATURES);
++int vhost_set_vhost_pci(NetClientState *nc, uint8_t cmd)
++{
++    VHostNetState *net = get_vhost_net(nc);
++    const VhostOps *vhost_ops = net->dev.vhost_ops;
++
++    if (vhost_ops && vhost_ops->vhost_set_vhost_pci) {
++        return vhost_ops->vhost_set_vhost_pci(&net->dev, cmd);
++    }
++
++    return 0;
++}
++
+ #else
+ uint64_t vhost_net_get_max_queues(VHostNetState *net)
+ {
+@@ -502,4 +532,10 @@ int vhost_set_vring_enable(NetClientState *nc, int enable)
+ {
+     return 0;
+ }
++
++int vhost_set_vhost_pci(NetClientState *nc, uint8_t cmd)
++{
++    return 0;
++}
++
+ #endif
+diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+index 6391d10..75e3998 100644
+--- a/hw/virtio/vhost-user.c
++++ b/hw/virtio/vhost-user.c
+@@ -312,6 +312,22 @@ static int vhost_user_set_vring_enable(struct vhost_dev *dev, int enable)
+     return 0;
  }
  
-+static int vp_slave_send_u64(int request, uint64_t u64)
++static int vhost_user_set_vhost_pci(struct vhost_dev *dev, uint8_t cmd)
 +{
 +    VhostUserMsg msg = {
-+        .request = request,
++        .request = VHOST_USER_SET_VHOST_PCI,
 +        .flags = VHOST_USER_VERSION,
-+        .payload.u64 = u64,
++        .payload.u64 = (uint64_t)cmd,
 +        .size = sizeof(msg.payload.u64),
 +    };
 +
-+    if (vp_slave_write(&vp_slave->chr_be, &msg) < 0) {
++    if (vhost_user_write(dev, &msg, NULL, 0) < 0) {
 +        return -1;
 +    }
 +
 +    return 0;
 +}
 +
-+int vp_slave_send_feature_bits(uint64_t features)
-+{
-+    return vp_slave_send_u64(VHOST_USER_SET_FEATURES, features);
-+}
-+
- static DeviceState *virtio_to_pci_dev(VirtIODevice *vdev, uint16_t virtio_id)
+ static int vhost_user_get_vring_base(struct vhost_dev *dev,
+                                      struct vhost_vring_state *ring)
  {
-     DeviceState *qdev;
-diff --git a/include/hw/virtio/vhost-pci-slave.h b/include/hw/virtio/vhost-pci-slave.h
-index 79e1ffd..e60580a 100644
---- a/include/hw/virtio/vhost-pci-slave.h
-+++ b/include/hw/virtio/vhost-pci-slave.h
-@@ -40,4 +40,6 @@ extern int vhost_pci_slave_init(QemuOpts *opts);
+@@ -640,6 +656,7 @@ const VhostOps user_ops = {
+         .vhost_reset_device = vhost_user_reset_device,
+         .vhost_get_vq_index = vhost_user_get_vq_index,
+         .vhost_set_vring_enable = vhost_user_set_vring_enable,
++        .vhost_set_vhost_pci = vhost_user_set_vhost_pci,
+         .vhost_requires_shm_log = vhost_user_requires_shm_log,
+         .vhost_migration_done = vhost_user_migration_done,
+         .vhost_backend_can_merge = vhost_user_can_merge,
+diff --git a/include/hw/virtio/vhost-backend.h b/include/hw/virtio/vhost-backend.h
+index 6e90703..60c0833 100644
+--- a/include/hw/virtio/vhost-backend.h
++++ b/include/hw/virtio/vhost-backend.h
+@@ -67,6 +67,7 @@ typedef int (*vhost_reset_device_op)(struct vhost_dev *dev);
+ typedef int (*vhost_get_vq_index_op)(struct vhost_dev *dev, int idx);
+ typedef int (*vhost_set_vring_enable_op)(struct vhost_dev *dev,
+                                          int enable);
++typedef int (*vhost_set_vhost_pci_op)(struct vhost_dev *dev, uint8_t cmd);
+ typedef bool (*vhost_requires_shm_log_op)(struct vhost_dev *dev);
+ typedef int (*vhost_migration_done_op)(struct vhost_dev *dev,
+                                        char *mac_addr);
+@@ -102,6 +103,7 @@ typedef struct VhostOps {
+     vhost_reset_device_op vhost_reset_device;
+     vhost_get_vq_index_op vhost_get_vq_index;
+     vhost_set_vring_enable_op vhost_set_vring_enable;
++    vhost_set_vhost_pci_op vhost_set_vhost_pci;
+     vhost_requires_shm_log_op vhost_requires_shm_log;
+     vhost_migration_done_op vhost_migration_done;
+     vhost_backend_can_merge_op vhost_backend_can_merge;
+diff --git a/include/net/vhost_net.h b/include/net/vhost_net.h
+index 5a08eff..82d5987 100644
+--- a/include/net/vhost_net.h
++++ b/include/net/vhost_net.h
+@@ -35,4 +35,6 @@ int vhost_set_vring_enable(NetClientState * nc, int enable);
  
- extern int vhost_pci_slave_cleanup(void);
+ uint64_t vhost_net_get_acked_features(VHostNetState *net);
  
-+extern int vp_slave_send_feature_bits(uint64_t features);
++int vhost_set_vhost_pci(NetClientState *nc, uint8_t cmd);
 +
  #endif
 -- 
