@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38600)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38796)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.l.liu@intel.com>) id 1cIwVh-0006Hs-2R
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 06:53:42 -0500
+	(envelope-from <yi.l.liu@intel.com>) id 1cIwWz-0006u6-GP
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 06:55:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.l.liu@intel.com>) id 1cIwVc-0007BX-VC
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 06:53:41 -0500
-Received: from mga02.intel.com ([134.134.136.20]:49905)
+	(envelope-from <yi.l.liu@intel.com>) id 1cIwWv-0007TQ-DK
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 06:55:01 -0500
+Received: from mga14.intel.com ([192.55.52.115]:12071)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1cIwVc-0007BR-J7
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 06:53:36 -0500
+	(Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1cIwWv-0007Ss-2K
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 06:54:57 -0500
 From: "Liu, Yi L" <yi.l.liu@intel.com>
-Date: Mon, 19 Dec 2016 11:53:32 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C257438FD9142@shsmsx102.ccr.corp.intel.com>
+Date: Mon, 19 Dec 2016 11:54:52 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C257438FD9150@shsmsx102.ccr.corp.intel.com>
 References: <A2975661238FB949B60364EF0F2C257438FD8042@shsmsx102.ccr.corp.intel.com>
-	<20161219100053.GD4155@pxdev.xzpeter.org>
-In-Reply-To: <20161219100053.GD4155@pxdev.xzpeter.org>
+In-Reply-To: <A2975661238FB949B60364EF0F2C257438FD8042@shsmsx102.ccr.corp.intel.com>
 Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 Subject: Re: [Qemu-devel] [PATCH v7 3/5] IOMMU: enable intel_iommu map and
  unmap notifiers
@@ -29,91 +28,215 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: "bd.aviv@gmail.com" <bd.aviv@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, ", Jan
-	Kiszka" <jan.kiszka@siemens.com>, ", Alex Williamson" <alex.williamson@redhat.com>, ", Jason Wang" <jasowang@redhat.com>, "Lan,
-	Tianyu" <tianyu.lan@intel.com>, "Tian, Kevin" <kevin.tian@intel.com>
+To: "'bd.aviv@gmail.com'" <bd.aviv@gmail.com>, "'qemu-devel@nongnu.org'" <qemu-devel@nongnu.org>
+Cc: "'Michael S. Tsirkin'" <mst@redhat.com>, "', Jan Kiszka'" <jan.kiszka@siemens.com>, "', Peter Xu'" <peterx@redhat.com>, "', Alex
+	Williamson'" <alex.williamson@redhat.com>, "', Jason Wang'" <jasowang@redhat.com>, "Lan, Tianyu" <tianyu.lan@intel.com>, "Tian, Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBQZXRlciBYdSBbbWFpbHRvOnBl
-dGVyeEByZWRoYXQuY29tXQ0KPiBTZW50OiBNb25kYXksIERlY2VtYmVyIDE5LCAyMDE2IDY6MDEg
-UE0NCj4gVG86IExpdSwgWWkgTCA8eWkubC5saXVAaW50ZWwuY29tPg0KPiBDYzogYmQuYXZpdkBn
-bWFpbC5jb207IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZzsgTWljaGFlbCBTLiBUc2lya2luDQo+IDxt
-c3RAcmVkaGF0LmNvbT47ICwgSmFuIEtpc3prYSA8amFuLmtpc3prYUBzaWVtZW5zLmNvbT47ICwg
-QWxleCBXaWxsaWFtc29uDQo+IDxhbGV4LndpbGxpYW1zb25AcmVkaGF0LmNvbT47ICwgSmFzb24g
-V2FuZyA8amFzb3dhbmdAcmVkaGF0LmNvbT47IExhbiwNCj4gVGlhbnl1IDx0aWFueXUubGFuQGlu
-dGVsLmNvbT47IFRpYW4sIEtldmluIDxrZXZpbi50aWFuQGludGVsLmNvbT4NCj4gU3ViamVjdDog
-UmU6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjcgMy81XSBJT01NVTogZW5hYmxlIGludGVsX2lvbW11
-IG1hcA0KPiBhbmQgdW5tYXAgbm90aWZpZXJzDQo+IA0KPiBPbiBGcmksIERlYyAxNiwgMjAxNiBh
-dCAwOToxMjowNUFNICswMDAwLCBMaXUsIFlpIEwgd3JvdGU6DQo+ID4gPiBGcm9tOiAiQXZpdiBC
-ZW4tRGF2aWQiIDxhZGRyZXNzQGhpZGRlbj4NCj4gPiA+DQo+ID4gPiBBZGRzIGEgbGlzdCBvZiBy
-ZWdpc3RlcmVkIHZ0ZF9hcydzIHRvIGludGVsIGlvbW11IHN0YXRlIHRvIHNhdmUNCj4gPiA+IGl0
-ZXJhdGlvbiBvdmVyIGVhY2ggUENJIGRldmljZSBpbiBhIHNlYXJjaCBvZiB0aGUgY29ycm9zcG9u
-ZGluZyBkb21haW4uDQo+ID4gPg0KPiA+ID4gU2lnbmVkLW9mZi1ieTogQXZpdiBCZW4tRGF2aWQg
-PGFkZHJlc3NAaGlkZGVuPg0KPiA+ID4gLS0tDQo+ID4gPiAgaHcvaTM4Ni9pbnRlbF9pb21tdS5j
-ICAgICAgICAgIHwgOTQNCj4gKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKyst
-LS0tDQo+ID4gPiAgaHcvaTM4Ni9pbnRlbF9pb21tdV9pbnRlcm5hbC5oIHwgIDIgKw0KPiA+ID4g
-IGluY2x1ZGUvaHcvaTM4Ni9pbnRlbF9pb21tdS5oICB8ICA5ICsrKysNCj4gPiA+ICAzIGZpbGVz
-IGNoYW5nZWQsIDk4IGluc2VydGlvbnMoKyksIDcgZGVsZXRpb25zKC0pDQo+ID4gPg0KPiA+ID4g
-ZGlmZiAtLWdpdCBhL2h3L2kzODYvaW50ZWxfaW9tbXUuYyBiL2h3L2kzODYvaW50ZWxfaW9tbXUu
-Yw0KPiA+ID4gaW5kZXggMDU5NzNiOS4uZDg3Mjk2OSAxMDA2NDQNCj4gPiA+IC0tLSBhL2h3L2kz
-ODYvaW50ZWxfaW9tbXUuYw0KPiA+ID4gKysrIGIvaHcvaTM4Ni9pbnRlbF9pb21tdS5jDQo+ID4g
-PiBAQCAtNjc5LDcgKzY3OSw3IEBAIHN0YXRpYyBpbnQgdnRkX2dwYV90b19zbHB0ZShWVERDb250
-ZXh0RW50cnkgKmNlLA0KPiB1aW50NjRfdA0KPiA+ID4gZ3BhLA0KPiA+ID4gICAgICAgICAgfQ0K
-PiA+ID4gICAgICAgICAgKnJlYWRzID0gKCpyZWFkcykgJiYgKHNscHRlICYgVlREX1NMX1IpOw0K
-PiA+ID4gICAgICAgICAgKndyaXRlcyA9ICgqd3JpdGVzKSAmJiAoc2xwdGUgJiBWVERfU0xfVyk7
-DQo+ID4gPiAtICAgICAgICBpZiAoIShzbHB0ZSAmIGFjY2Vzc19yaWdodF9jaGVjaykpIHsNCj4g
-PiA+ICsgICAgICAgIGlmICghKHNscHRlICYgYWNjZXNzX3JpZ2h0X2NoZWNrKSAmJiAhKGZsYWdz
-ICYgSU9NTVVfTk9fRkFJTCkpIHsNCj4gPiA+ICAgICAgICAgICAgICBWVERfRFBSSU5URihHRU5F
-UkFMLCAiZXJyb3I6IGxhY2sgb2YgJXMgcGVybWlzc2lvbiBmb3IgIg0KPiA+ID4gICAgICAgICAg
-ICAgICAgICAgICAgICAgICJncGEgMHglIlBSSXg2NCAiIHNscHRlIDB4JSJQUkl4NjQsDQo+ID4g
-PiAgICAgICAgICAgICAgICAgICAgICAgICAgKGZsYWdzICYgSU9NTVVfV08gPyAid3JpdGUiIDog
-InJlYWQiKSwgZ3BhLCBzbHB0ZSk7DQo+ID4gPiBAQCAtOTc4LDYgKzk3OCwyMyBAQCBzdGF0aWMg
-VlREQnVzDQo+ICp2dGRfZmluZF9hc19mcm9tX2J1c19udW0oSW50ZWxJT01NVVN0YXRlDQo+ID4g
-PiAqcywgdWludDhfdCBidXNfbnVtKQ0KPiA+ID4gICAgICByZXR1cm4gdnRkX2J1czsNCj4gPiA+
-ICB9DQo+ID4gPg0KPiA+ID4gK3N0YXRpYyBpbnQgdnRkX2dldF9kaWRfZGV2KEludGVsSU9NTVVT
-dGF0ZSAqcywgdWludDhfdCBidXNfbnVtLCB1aW50OF90DQo+IGRldmZuLA0KPiA+ID4gKyAgICAg
-ICAgICAgICAgICAgICAgICAgICAgIHVpbnQxNl90ICpkb21haW5faWQpDQo+ID4gPiArew0KPiA+
-ID4gKyAgICBWVERDb250ZXh0RW50cnkgY2U7DQo+ID4gPiArICAgIGludCByZXRfZnI7DQo+ID4g
-PiArDQo+ID4gPiArICAgIGFzc2VydChkb21haW5faWQpOw0KPiA+ID4gKw0KPiA+ID4gKyAgICBy
-ZXRfZnIgPSB2dGRfZGV2X3RvX2NvbnRleHRfZW50cnkocywgYnVzX251bSwgZGV2Zm4sICZjZSk7
-DQo+ID4gPiArICAgIGlmIChyZXRfZnIpIHsNCj4gPiA+ICsgICAgICAgIHJldHVybiAtMTsNCj4g
-PiA+ICsgICAgfQ0KPiA+ID4gKw0KPiA+ID4gKyAgICAqZG9tYWluX2lkID0gIFZURF9DT05URVhU
-X0VOVFJZX0RJRChjZS5oaSk7DQo+ID4gPiArICAgIHJldHVybiAwOw0KPiA+ID4gK30NCj4gPiA+
-ICsNCj4gPiA+ICAvKiBEbyBhIGNvbnRleHQtY2FjaGUgZGV2aWNlLXNlbGVjdGl2ZSBpbnZhbGlk
-YXRpb24uDQo+ID4gPiAgICogQGZ1bmNfbWFzazogRk0gZmllbGQgYWZ0ZXIgc2hpZnRpbmcNCj4g
-PiA+ICAgKi8NCj4gPiA+IEBAIC0xMDY0LDYgKzEwODEsNDUgQEAgc3RhdGljIHZvaWQNCj4gdnRk
-X2lvdGxiX2RvbWFpbl9pbnZhbGlkYXRlKEludGVsSU9NTVVTdGF0ZQ0KPiA+ID4gKnMsIHVpbnQx
-Nl90IGRvbWFpbl9pZCkNCj4gPiA+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICZk
-b21haW5faWQpOw0KPiA+ID4gIH0NCj4gPiA+DQo+ID4gPiArc3RhdGljIHZvaWQgdnRkX2lvdGxi
-X3BhZ2VfaW52YWxpZGF0ZV9ub3RpZnkoSW50ZWxJT01NVVN0YXRlICpzLA0KPiA+ID4gKyAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB1aW50MTZfdCBkb21haW5faWQs
-IGh3YWRkciBhZGRyLA0KPiA+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICB1aW50OF90IGFtKQ0KPiA+ID4gK3sNCj4gPiA+ICsgICAgSW50ZWxJT01NVU5vdGlm
-aWVyTm9kZSAqbm9kZTsNCj4gPiA+ICsNCj4gPiA+ICsgICAgUUxJU1RfRk9SRUFDSChub2RlLCAm
-KHMtPm5vdGlmaWVyc19saXN0KSwgbmV4dCkgew0KPiA+IEF2aXYsDQo+ID4NCj4gPiBSZWdhcmRz
-IHRvIHRoZSBzLT5ub3RpZmllcnNfbGlzdCwgSSBkaWRuJ3Qgc2VlIHRoZSBpbml0IG9wIHRvIGl0
-LiBEb2VzIGl0IGhhcHBlbg0KPiA+IGluIGFub3RoZXIgcGF0Y2g/IElmIHNvLCBpdCBtYXkgYmUg
-YmV0dGVyIHRvIG1vdmUgaXQgaW4gdGhpcyBwYXRjaCBzaW5jZSB0aGlzDQo+ID4gcGF0Y2ggaW50
-cm9kdWNlcyBib3RoIHRoZSBkZWZpbml0aW9uIGFuZCB1c2FnZSBvZiBub3RpZmllcnNfbGlzdC4N
-Cj4gPg0KPiA+IElmIGl0IGlzIGFscmVhZHkgY2xhcmlmaWVkLCB0aGVuIGlnbm9yZSBpdC4NCj4g
-DQo+IEkgdGhpbmsgaXQgd2FzIG1pc3NpbmcuIEl0IElNSE8gYWNjaWRlbnRhbGx5IHdvcmtlZCBz
-aW5jZSBRTElTVF9JTklUKCkNCj4ganVzdCBzZXQgdGhlIGhlYWQgdG8gTlVMTCBhbmQgdGhhdCdz
-IHdoYXQgd2UgZGlkIHdoZW4gd2UgY3JlYXRlIHRoZQ0KPiBJbnRlbElPTU1VU3RhdGUgb2JqZWN0
-Lg0KPiANCj4gQW5kIHdoYXQncyB3b3JzZSAtIEkgZm91bmQgdGhpcyBhcHByb2FjaCBtYXkgbm90
-IHdvcmsgaWYgd2UgZG8NCj4gUUxJU1RfSU5TRVJUKCkgaW4gdGhlIGNoYW5nZWQoKSBob29rLCBz
-aW5jZSBpZiB3ZSBoYXZlIG1vcmUgdGhhbiBvbmUNCj4gYXNzaWduZWQgZGV2aWNlcyB3ZSB3aWxs
-IG9ubHkgcmVnaXN0ZXIgdGhlIGZpcnN0IG9uZSBub3QgdGhlIHJlc3QuIEENCj4gYmV0dGVyIGFw
-cHJvYWNoIG1heSBiZSB0cmF2ZXJzaW5nIHRoZSB2dC1kIGJ1c2VzIHZpYQ0KPiBJbnRlbElPTU1V
-U3RhdGUudnRkX2FzX2J5X2J1c3B0ci4NCj4gDQpQZXRlciwNCg0KSW4gT2N0LCBJIGFsc28gbWFp
-bGVkIEF2aXYgYWJvdXQgdXNpbmcgSW50ZWxJT01NVVN0YXRlLnZ0ZF9hc19ieV9idXNwdHINCndo
-ZW4gdHJ5aW5nIHRvIGNvbm5lY3QgdGhlIHZmaW8gbm90aWZpZXJzKG1hcC91bm1hcCkgYW5kIHZJ
-T01NVS4gDQpIb3dldmVyLCBJIHJlY29uc2lkZXJlZCBpdCBsYXRlci4gSWYgSSByZW1lbWJlciBj
-b3JyZWN0bHksIA0KSW50ZWxJT01NVVN0YXRlLnZ0ZF9hc19ieV9idXNwdHIgbm90IG9ubHkgaW5j
-bHVkZXMgdnRkX2FzIGZvciBhc3NpZ25lZCBkZXZpY2VzLA0KYnV0IGFsc28gaW5jbHVkZXMgdmly
-dHVhbCBkZXZpY2VzLiBXaGVuIGlvdGxiIGludmFsaWRhdGlvbiBjb21lcyB0byB2SU9NTVUsIHRo
-ZXJlDQppcyBubyBpbmRpY2F0aW9uIGZvciB3aGljaCBkZXZpY2UgaW4gaW90bGJfaW52X2Rlc2Mu
-IFNvIHN0aWxsIG5lZWQgdG8gaGF2ZSBhIGxpc3QgdG8gcmVjb3JkDQp2dGRfYXMgd2hpY2ggbmVl
-ZHMgdG8gYmUgbG9vcGVkLiBTbyBJIGtlZXAgc2lsZW50IG9uIGl0IGFmdGVyIHRoYXQgdGhvdWdo
-dC4NCg0KTm93LCB5b3UgbWVudGlvbmVkIGl0IG1heSBub3Qgd29yayBpbiBtdWx0aS1hc3NpZ25l
-ZCBzY2VuYXJpby4gTWF5YmUgaXQncw0KdGltZSB0byByZWNvbnNpZGVyIGl0IGFnYWluLiANCg0K
-UmVnYXJkcywNCllpIEwNCg==
+> -----Original Message-----
+> From: Liu, Yi L
+> Sent: Friday, December 16, 2016 5:12 PM
+> To: bd.aviv@gmail.com; qemu-devel@nongnu.org
+> Cc: Michael S. Tsirkin <mst@redhat.com>; , Jan Kiszka
+> <jan.kiszka@siemens.com>; , Peter Xu <peterx@redhat.com>; , Alex Williams=
+on
+> <alex.williamson@redhat.com>; , Jason Wang <jasowang@redhat.com>; Lan,
+> Tianyu <tianyu.lan@intel.com>; Tian, Kevin <kevin.tian@intel.com>; Liu, Y=
+i L
+> <yi.l.liu@intel.com>
+> Subject: RE: [Qemu-devel] [PATCH v7 3/5] IOMMU: enable intel_iommu map
+> and unmap notifiers
+>=20
+> > From: "Aviv Ben-David" <address@hidden>
+> >
+> > Adds a list of registered vtd_as's to intel iommu state to save
+> > iteration over each PCI device in a search of the corrosponding domain.
+> >
+> > Signed-off-by: Aviv Ben-David <address@hidden>
+> > ---
+> >  hw/i386/intel_iommu.c          | 94
+> ++++++++++++++++++++++++++++++++++++++----
+> >  hw/i386/intel_iommu_internal.h |  2 +
+> >  include/hw/i386/intel_iommu.h  |  9 ++++
+> >  3 files changed, 98 insertions(+), 7 deletions(-)
+> >
+> > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> > index 05973b9..d872969 100644
+> > --- a/hw/i386/intel_iommu.c
+> > +++ b/hw/i386/intel_iommu.c
+> > @@ -679,7 +679,7 @@ static int vtd_gpa_to_slpte(VTDContextEntry *ce,
+> uint64_t
+> > gpa,
+> >          }
+> >          *reads =3D (*reads) && (slpte & VTD_SL_R);
+> >          *writes =3D (*writes) && (slpte & VTD_SL_W);
+> > -        if (!(slpte & access_right_check)) {
+> > +        if (!(slpte & access_right_check) && !(flags & IOMMU_NO_FAIL))=
+ {
+> >              VTD_DPRINTF(GENERAL, "error: lack of %s permission for "
+> >                          "gpa 0x%"PRIx64 " slpte 0x%"PRIx64,
+> >                          (flags & IOMMU_WO ? "write" : "read"), gpa, sl=
+pte);
+> > @@ -978,6 +978,23 @@ static VTDBus
+> *vtd_find_as_from_bus_num(IntelIOMMUState
+> > *s, uint8_t bus_num)
+> >      return vtd_bus;
+> >  }
+> >
+> > +static int vtd_get_did_dev(IntelIOMMUState *s, uint8_t bus_num, uint8_=
+t
+> devfn,
+> > +                           uint16_t *domain_id)
+> > +{
+> > +    VTDContextEntry ce;
+> > +    int ret_fr;
+> > +
+> > +    assert(domain_id);
+> > +
+> > +    ret_fr =3D vtd_dev_to_context_entry(s, bus_num, devfn, &ce);
+> > +    if (ret_fr) {
+> > +        return -1;
+> > +    }
+> > +
+> > +    *domain_id =3D  VTD_CONTEXT_ENTRY_DID(ce.hi);
+> > +    return 0;
+> > +}
+> > +
+> >  /* Do a context-cache device-selective invalidation.
+> >   * @func_mask: FM field after shifting
+> >   */
+> > @@ -1064,6 +1081,45 @@ static void
+> vtd_iotlb_domain_invalidate(IntelIOMMUState
+> > *s, uint16_t domain_id)
+> >                                  &domain_id);
+> >  }
+> >
+> > +static void vtd_iotlb_page_invalidate_notify(IntelIOMMUState *s,
+> > +                                           uint16_t domain_id, hwaddr =
+addr,
+> > +                                           uint8_t am)
+> > +{
+> > +    IntelIOMMUNotifierNode *node;
+> > +
+> > +    QLIST_FOREACH(node, &(s->notifiers_list), next) {
+> Aviv,
+>=20
+> Regards to the s->notifiers_list, I didn't see the init op to it. Does it=
+ happen
+> in another patch? If so, it may be better to move it in this patch since =
+this
+> patch introduces both the definition and usage of notifiers_list.
+>=20
+> If it is already clarified, then ignore it.
+>=20
+> Thanks,
+> Yi L
+> > +        VTDAddressSpace *vtd_as =3D node->vtd_as;
+> > +        uint16_t vfio_domain_id;
+> > +        int ret =3D vtd_get_did_dev(s, pci_bus_num(vtd_as->bus), vtd_a=
+s->devfn,
+> > +                                  &vfio_domain_id);
+> > +
+> > +        if (!ret && domain_id =3D=3D vfio_domain_id) {
+> > +            hwaddr original_addr =3D addr;
+> > +
+> > +            while (addr < original_addr + (1 << am) * VTD_PAGE_SIZE) {
+> > +                IOMMUTLBEntry entry =3D s->iommu_ops.translate(
+> > +                                                         &node->vtd_as=
+->iommu,
+> > +                                                         addr,
+> > +                                                         IOMMU_NO_FAIL=
+);
+> > +
+> > +                if (entry.perm =3D=3D IOMMU_NONE &&
+> > +                        node->notifier_flag & IOMMU_NOTIFIER_UNMAP) {
+> > +                    entry.target_as =3D &address_space_memory;
+> > +                    entry.iova =3D addr & VTD_PAGE_MASK_4K;
+> > +                    entry.translated_addr =3D 0;
+> > +                    entry.addr_mask =3D ~VTD_PAGE_MASK(VTD_PAGE_SHIFT)=
+;
+> > +                    memory_region_notify_iommu(&node->vtd_as->iommu, e=
+ntry);
+> > +                    addr +=3D VTD_PAGE_SIZE;
+> > +                } else if (node->notifier_flag & IOMMU_NOTIFIER_MAP) {
+> > +                        memory_region_notify_iommu(&node->vtd_as->iomm=
+u,
+> > entry);
+> > +                        addr +=3D entry.addr_mask + 1;
+> > +                }
+> > +            }
+> > +        }
+> > +    }
+> > +}
+> > +
+> >  static void vtd_iotlb_page_invalidate(IntelIOMMUState *s, uint16_t
+> domain_id,
+> >                                        hwaddr addr, uint8_t am)
+> >  {
+> > @@ -1074,6 +1130,8 @@ static void
+> vtd_iotlb_page_invalidate(IntelIOMMUState *s,
+> > uint16_t domain_id,
+> >      info.addr =3D addr;
+> >      info.mask =3D ~((1 << am) - 1);
+> >      g_hash_table_foreach_remove(s->iotlb, vtd_hash_remove_by_page,
+> &info);
+> > +
+> > +    vtd_iotlb_page_invalidate_notify(s, domain_id, addr, am);
+> >  }
+> >
+> >  /* Flush IOTLB
+> > @@ -1999,15 +2057,37 @@ static void
+> vtd_iommu_notify_flag_changed(MemoryRegion
+> > *iommu,
+> >                                            IOMMUNotifierFlag new)
+> >  {
+> >      VTDAddressSpace *vtd_as =3D container_of(iommu, VTDAddressSpace,
+> iommu);
+> > +    IntelIOMMUState *s =3D vtd_as->iommu_state;
+> > +    IntelIOMMUNotifierNode *node =3D NULL;
+> > +    IntelIOMMUNotifierNode *next_node =3D NULL;
+> >
+> > -    if (new & IOMMU_NOTIFIER_MAP) {
+> > -        error_report("Device at bus %s addr %02x.%d requires iommu "
+> > -                     "notifier which is currently not supported by "
+> > -                     "intel-iommu emulation",
+> > -                     vtd_as->bus->qbus.name, PCI_SLOT(vtd_as->devfn),
+> > -                     PCI_FUNC(vtd_as->devfn));
+> > +    if (!s->cache_mode_enabled && new & IOMMU_NOTIFIER_MAP) {
+> > +        error_report("We need to set cache_mode=3D1 for intel-iommu to=
+ enable
+> "
+> > +                     "device assignment with IOMMU protection.");
+> >          exit(1);
+> >      }
+> > +
+> > +    /* Add new ndoe if no mapping was exising before this call */
+
+a typo needed. "/* Add new node if no mapping was existing before this call=
+ */"
+
+Regards,
+Yi L
+
+> > +    if (old =3D=3D IOMMU_NOTIFIER_NONE) {
+> > +        node =3D g_malloc0(sizeof(*node));
+> > +        node->vtd_as =3D vtd_as;
+> > +        node->notifier_flag =3D new;
+> > +        QLIST_INSERT_HEAD(&s->notifiers_list, node, next);
+> > +        return;
+> > +    }
+> > +
+> > +    /* update notifier node with new flags */
+> > +    QLIST_FOREACH_SAFE(node, &s->notifiers_list, next, next_node) {
+> > +        if (node->vtd_as =3D=3D vtd_as) {
+> > +            if (new =3D=3D IOMMU_NOTIFIER_NONE) {
+> > +                QLIST_REMOVE(node, next);
+> > +                g_free(node);
+> > +            } else {
+> > +                node->notifier_flag =3D new;
+> > +            }
+> > +            return;
+> > +        }
+> > +    }
+> >  }
+> >
+> >
