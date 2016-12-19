@@ -1,36 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33484)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35497)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <joserz@linux.vnet.ibm.com>) id 1cJ16x-0007A7-1V
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 11:48:28 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1cJ1FC-0006ki-3m
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 11:56:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <joserz@linux.vnet.ibm.com>) id 1cJ16t-00044D-UE
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 11:48:27 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59643
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <joserz@linux.vnet.ibm.com>)
-	id 1cJ16t-000449-PG
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 11:48:23 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	uBJGiVx3067966
-	for <qemu-devel@nongnu.org>; Mon, 19 Dec 2016 11:48:23 -0500
-Received: from e24smtp05.br.ibm.com (e24smtp05.br.ibm.com [32.104.18.26])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 27efv569vf-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 19 Dec 2016 11:48:23 -0500
-Received: from localhost
-	by e24smtp05.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <joserz@linux.vnet.ibm.com>;
-	Mon, 19 Dec 2016 14:48:21 -0200
-From: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
-Date: Mon, 19 Dec 2016 14:47:44 -0200
-In-Reply-To: <1482166064-18121-1-git-send-email-joserz@linux.vnet.ibm.com>
-References: <1482166064-18121-1-git-send-email-joserz@linux.vnet.ibm.com>
-Message-Id: <1482166064-18121-7-git-send-email-joserz@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v4 6/6] target-ppc: Implement bcdutrunc.
- instruction
+	(envelope-from <alex.williamson@redhat.com>) id 1cJ1F7-00080J-4v
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 11:56:58 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57882)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1cJ1F6-0007yo-SP
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 11:56:53 -0500
+Date: Mon, 19 Dec 2016 09:56:50 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20161219095650.0a3ac113@t450s.home>
+In-Reply-To: <1482158486-18597-1-git-send-email-peterx@redhat.com>
+References: <1482158486-18597-1-git-send-email-peterx@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] intel_iommu: allow dynamic switch of IOMMU
+ region
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,129 +28,199 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-ppc@nongnu.org
-Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au, nikunj@linux.vnet.ibm.com, bharata@linux.vnet.ibm.com
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, bd.aviv@gmail.com, david@gibson.dropbear.id.au
 
-bcdutrunc. Decimal unsigned truncate. Works like bcdtrunc. with
-unsigned BCD numbers.
+On Mon, 19 Dec 2016 22:41:26 +0800
+Peter Xu <peterx@redhat.com> wrote:
 
-Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
----
- target-ppc/helper.h                 |  1 +
- target-ppc/int_helper.c             | 51 +++++++++++++++++++++++++++++++++++++
- target-ppc/translate/vmx-impl.inc.c |  4 +++
- target-ppc/translate/vmx-ops.inc.c  |  2 +-
- 4 files changed, 57 insertions(+), 1 deletion(-)
+> This is preparation work to finally enabled dynamic switching ON/OFF for
+> VT-d protection. The old VT-d codes is using static IOMMU region, and
+> that won't satisfy vfio-pci device listeners.
+> 
+> Let me explain.
+> 
+> vfio-pci devices depend on the memory region listener and IOMMU replay
+> mechanism to make sure the device mapping is coherent with the guest
+> even if there are domain switches. And there are two kinds of domain
+> switches:
+> 
+>   (1) switch from domain A -> B
+>   (2) switch from domain A -> no domain (e.g., turn DMAR off)
+> 
+> Case (1) is handled by the context entry invalidation handling by the
+> VT-d replay logic. What the replay function should do here is to replay
+> the existing page mappings in domain B.
+> 
+> However for case (2), we don't want to replay any domain mappings - we
+> just need the default GPA->HPA mappings (the address_space_memory
+> mapping). And this patch helps on case (2) to build up the mapping
+> automatically by leveraging the vfio-pci memory listeners.
+> 
+> Another important thing that this patch does is to seperate
+> IR (Interrupt Remapping) from DMAR (DMA Remapping). IR region should not
+> depend on the DMAR region (like before this patch). It should be a
+> standalone region, and it should be able to be activated without
+> DMAR (which is a common behavior of Linux kernel - by default it enables
+> IR while disabled DMAR).
 
-diff --git a/target-ppc/helper.h b/target-ppc/helper.h
-index 7f053d8..38e5246 100644
---- a/target-ppc/helper.h
-+++ b/target-ppc/helper.h
-@@ -402,6 +402,7 @@ DEF_HELPER_4(bcds, i32, avr, avr, avr, i32)
- DEF_HELPER_4(bcdus, i32, avr, avr, avr, i32)
- DEF_HELPER_4(bcdsr, i32, avr, avr, avr, i32)
- DEF_HELPER_4(bcdtrunc, i32, avr, avr, avr, i32)
-+DEF_HELPER_4(bcdutrunc, i32, avr, avr, avr, i32)
- 
- DEF_HELPER_2(xsadddp, void, env, i32)
- DEF_HELPER_2(xssubdp, void, env, i32)
-diff --git a/target-ppc/int_helper.c b/target-ppc/int_helper.c
-index edcaa12..77f8c13 100644
---- a/target-ppc/int_helper.c
-+++ b/target-ppc/int_helper.c
-@@ -3209,6 +3209,57 @@ uint32_t helper_bcdtrunc(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b, uint32_t ps)
-     return bcd_cmp_zero(&ret) | ox_flag;
- }
- 
-+uint32_t helper_bcdutrunc(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b, uint32_t ps)
-+{
-+    int i;
-+    uint64_t mask;
-+    uint32_t ox_flag = 0;
-+    int invalid = 0;
-+    ppc_avr_t ret = *b;
-+
-+    for (i = 0; i < 32; i++) {
-+        bcd_get_digit(b, i, &invalid);
-+
-+        if (unlikely(invalid)) {
-+            return CRF_SO;
-+        }
-+    }
-+
-+#if defined(HOST_WORDS_BIGENDIAN)
-+    i = a->s16[3];
-+#else
-+    i = a->s16[4];
-+#endif
-+    if (i > 16 && i < 33) {
-+        if (ret.u64[HI_IDX] >> (i * 4 - 64)) {
-+            ox_flag = CRF_SO;
-+        }
-+
-+        mask = (uint64_t)-1 >> (128 - i * 4);
-+        ret.u64[HI_IDX] &= mask;
-+    } else if (i > 0 && i <= 16) {
-+        if (ret.u64[HI_IDX] || (i < 16 && ret.u64[LO_IDX] >> (i * 4))) {
-+            ox_flag = CRF_SO;
-+        }
-+
-+        mask = (uint64_t)-1 >> (64 - i * 4);
-+        ret.u64[LO_IDX] &= mask;
-+        ret.u64[HI_IDX] = 0;
-+    } else if (i == 0) {
-+        if (ret.u64[HI_IDX] || ret.u64[LO_IDX]) {
-+            ox_flag = CRF_SO;
-+        }
-+        ret.u64[HI_IDX] = ret.u64[LO_IDX] = 0;
-+    }
-+
-+    *r = ret;
-+    if (r->u64[HI_IDX] == 0 && r->u64[LO_IDX] == 0) {
-+        return ox_flag | CRF_EQ;
-+    }
-+
-+    return ox_flag | CRF_GT;
-+}
-+
- void helper_vsbox(ppc_avr_t *r, ppc_avr_t *a)
- {
-     int i;
-diff --git a/target-ppc/translate/vmx-impl.inc.c b/target-ppc/translate/vmx-impl.inc.c
-index 1683f42..3cb6fc2 100644
---- a/target-ppc/translate/vmx-impl.inc.c
-+++ b/target-ppc/translate/vmx-impl.inc.c
-@@ -1020,6 +1020,7 @@ GEN_BCD(bcds);
- GEN_BCD(bcdus);
- GEN_BCD(bcdsr);
- GEN_BCD(bcdtrunc);
-+GEN_BCD(bcdutrunc);
- 
- static void gen_xpnd04_1(DisasContext *ctx)
- {
-@@ -1102,6 +1103,9 @@ GEN_VXFORM_DUAL(vsubsbs, PPC_ALTIVEC, PPC_NONE, \
-                 bcdtrunc, PPC_NONE, PPC2_ISA300)
- GEN_VXFORM_DUAL(vsubuqm, PPC2_ALTIVEC_207, PPC_NONE, \
-                 bcdtrunc, PPC_NONE, PPC2_ISA300)
-+GEN_VXFORM_DUAL(vsubcuq, PPC2_ALTIVEC_207, PPC_NONE, \
-+                bcdutrunc, PPC_NONE, PPC2_ISA300)
-+
- 
- static void gen_vsbox(DisasContext *ctx)
- {
-diff --git a/target-ppc/translate/vmx-ops.inc.c b/target-ppc/translate/vmx-ops.inc.c
-index e6167a4..139f80c 100644
---- a/target-ppc/translate/vmx-ops.inc.c
-+++ b/target-ppc/translate/vmx-ops.inc.c
-@@ -149,8 +149,8 @@ GEN_VXFORM_DUAL(vsubsws, xpnd04_2, 0, 30, PPC_ALTIVEC, PPC_NONE),
- GEN_VXFORM_207(vadduqm, 0, 4),
- GEN_VXFORM_207(vaddcuq, 0, 5),
- GEN_VXFORM_DUAL(vaddeuqm, vaddecuq, 30, 0xFF, PPC_NONE, PPC2_ALTIVEC_207),
--GEN_VXFORM_207(vsubcuq, 0, 21),
- GEN_VXFORM_DUAL(vsubuqm, bcdtrunc, 0, 20, PPC2_ALTIVEC_207, PPC2_ISA300),
-+GEN_VXFORM_DUAL(vsubcuq, bcdutrunc, 0, 21, PPC2_ALTIVEC_207, PPC2_ISA300),
- GEN_VXFORM_DUAL(vsubeuqm, vsubecuq, 31, 0xFF, PPC_NONE, PPC2_ALTIVEC_207),
- GEN_VXFORM(vrlb, 2, 0),
- GEN_VXFORM(vrlh, 2, 1),
--- 
-2.7.4
+
+This seems like an improvement, but I will note that there are existing
+locked memory accounting issues inherent with VT-d and vfio.  With
+VT-d, each device has a unique AddressSpace.  This requires that each
+is managed via a separate vfio container.  Each container is accounted
+for separately for locked pages.  libvirt currently only knows that if
+any vfio devices are attached that the locked memory limit for the
+process needs to be set sufficient for the VM memory.  When VT-d is
+involved, we either need to figure out how to associate otherwise
+independent vfio containers to share locked page accounting or teach
+libvirt that the locked memory requirement needs to be multiplied by
+the number of attached vfio devices.  The latter seems far less
+complicated but reduces the containment of QEMU a bit since the
+process has the ability to lock potentially many multiples of the VM
+address size.  Thanks,
+
+Alex
+
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  hw/i386/intel_iommu.c         | 75 ++++++++++++++++++++++++++++++++++++++++---
+>  hw/i386/trace-events          |  3 ++
+>  include/hw/i386/intel_iommu.h |  2 ++
+>  3 files changed, 76 insertions(+), 4 deletions(-)
+> 
+> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> index 5f3e351..75a3f4e 100644
+> --- a/hw/i386/intel_iommu.c
+> +++ b/hw/i386/intel_iommu.c
+> @@ -1179,9 +1179,42 @@ static void vtd_handle_gcmd_sirtp(IntelIOMMUState *s)
+>      vtd_set_clear_mask_long(s, DMAR_GSTS_REG, 0, VTD_GSTS_IRTPS);
+>  }
+>  
+> +static void vtd_switch_address_space(IntelIOMMUState *s, bool enabled)
+> +{
+> +    GHashTableIter iter;
+> +    VTDBus *vtd_bus;
+> +    VTDAddressSpace *as;
+> +    int i;
+> +
+> +    g_hash_table_iter_init(&iter, s->vtd_as_by_busptr);
+> +    while (g_hash_table_iter_next (&iter, NULL, (void**)&vtd_bus)) {
+> +        for (i = 0; i < X86_IOMMU_PCI_DEVFN_MAX; i++) {
+> +            as = vtd_bus->dev_as[i];
+> +            if (as == NULL) {
+> +                continue;
+> +            }
+> +            trace_vtd_switch_address_space(pci_bus_num(vtd_bus->bus),
+> +                                           VTD_PCI_SLOT(i), VTD_PCI_FUNC(i),
+> +                                           enabled);
+> +            if (enabled) {
+> +                memory_region_add_subregion_overlap(&as->root, 0,
+> +                                                    &as->iommu, 2);
+> +            } else {
+> +                memory_region_del_subregion(&as->root, &as->iommu);
+> +            }
+> +        }
+> +    }
+> +}
+> +
+>  /* Handle Translation Enable/Disable */
+>  static void vtd_handle_gcmd_te(IntelIOMMUState *s, bool en)
+>  {
+> +    bool old = s->dmar_enabled;
+> +
+> +    if (old == en) {
+> +        return;
+> +    }
+> +
+>      VTD_DPRINTF(CSR, "Translation Enable %s", (en ? "on" : "off"));
+>  
+>      if (en) {
+> @@ -1196,6 +1229,8 @@ static void vtd_handle_gcmd_te(IntelIOMMUState *s, bool en)
+>          /* Ok - report back to driver */
+>          vtd_set_clear_mask_long(s, DMAR_GSTS_REG, VTD_GSTS_TES, 0);
+>      }
+> +
+> +    vtd_switch_address_space(s, en);
+>  }
+>  
+>  /* Handle Interrupt Remap Enable/Disable */
+> @@ -2343,15 +2378,47 @@ VTDAddressSpace *vtd_find_add_as(IntelIOMMUState *s, PCIBus *bus, int devfn)
+>          vtd_dev_as->devfn = (uint8_t)devfn;
+>          vtd_dev_as->iommu_state = s;
+>          vtd_dev_as->context_cache_entry.context_cache_gen = 0;
+> +
+> +        /*
+> +         * When DMAR is disabled, memory region relationships looks
+> +         * like:
+> +         *
+> +         * 0000000000000000-ffffffffffffffff (prio 0, RW): vtd_root
+> +         *  0000000000000000-ffffffffffffffff (prio 1, RW): vtd_sys_alias
+> +         *  00000000fee00000-00000000feefffff (prio 64, RW): intel_iommu_ir
+> +         *
+> +         * When DMAR is disabled, it becomes:
+> +         *
+> +         * 0000000000000000-ffffffffffffffff (prio 0, RW): vtd_root
+> +         *  0000000000000000-ffffffffffffffff (prio 2, RW): intel_iommu
+> +         *  0000000000000000-ffffffffffffffff (prio 1, RW): vtd_sys_alias
+> +         *  00000000fee00000-00000000feefffff (prio 64, RW): intel_iommu_ir
+> +         *
+> +         * The intel_iommu region is dynamically added/removed.
+> +         */
+>          memory_region_init_iommu(&vtd_dev_as->iommu, OBJECT(s),
+>                                   &s->iommu_ops, "intel_iommu", UINT64_MAX);
+> +        memory_region_init_alias(&vtd_dev_as->sys_alias, OBJECT(s),
+> +                                 "vtd_sys_alias", get_system_memory(),
+> +                                 0, memory_region_size(get_system_memory()));
+>          memory_region_init_io(&vtd_dev_as->iommu_ir, OBJECT(s),
+>                                &vtd_mem_ir_ops, s, "intel_iommu_ir",
+>                                VTD_INTERRUPT_ADDR_SIZE);
+> -        memory_region_add_subregion(&vtd_dev_as->iommu, VTD_INTERRUPT_ADDR_FIRST,
+> -                                    &vtd_dev_as->iommu_ir);
+> -        address_space_init(&vtd_dev_as->as,
+> -                           &vtd_dev_as->iommu, "intel_iommu");
+> +        memory_region_init(&vtd_dev_as->root, OBJECT(s),
+> +                           "vtd_root", UINT64_MAX);
+> +        memory_region_add_subregion_overlap(&vtd_dev_as->root,
+> +                                            VTD_INTERRUPT_ADDR_FIRST,
+> +                                            &vtd_dev_as->iommu_ir, 64);
+> +        address_space_init(&vtd_dev_as->as, &vtd_dev_as->root, name);
+> +        memory_region_add_subregion_overlap(&vtd_dev_as->root, 0,
+> +                                            &vtd_dev_as->sys_alias, 1);
+> +        if (s->dmar_enabled) {
+> +            memory_region_add_subregion_overlap(&vtd_dev_as->root, 0,
+> +                                                &vtd_dev_as->iommu, 2);
+> +        }
+> +        trace_vtd_switch_address_space(pci_bus_num(vtd_bus->bus),
+> +                                       VTD_PCI_SLOT(devfn), VTD_PCI_FUNC(devfn),
+> +                                       s->dmar_enabled);
+>      }
+>      return vtd_dev_as;
+>  }
+> diff --git a/hw/i386/trace-events b/hw/i386/trace-events
+> index d2b4973..aee93bb 100644
+> --- a/hw/i386/trace-events
+> +++ b/hw/i386/trace-events
+> @@ -10,6 +10,9 @@ xen_pv_mmio_write(uint64_t addr) "WARNING: write to Xen PV Device MMIO space (ad
+>  # hw/i386/x86-iommu.c
+>  x86_iommu_iec_notify(bool global, uint32_t index, uint32_t mask) "Notify IEC invalidation: global=%d index=%" PRIu32 " mask=%" PRIu32
+>  
+> +# hw/i386/intel_iommu.c
+> +vtd_switch_address_space(uint8_t bus, uint8_t slot, uint8_t fn, bool on) "Device %02x:%02x.%x switching address space (iommu enabled=%d)"
+> +
+>  # hw/i386/amd_iommu.c
+>  amdvi_evntlog_fail(uint64_t addr, uint32_t head) "error: fail to write at addr 0x%"PRIx64" +  offset 0x%"PRIx32
+>  amdvi_cache_update(uint16_t domid, uint8_t bus, uint8_t slot, uint8_t func, uint64_t gpa, uint64_t txaddr) " update iotlb domid 0x%"PRIx16" devid: %02x:%02x.%x gpa 0x%"PRIx64" hpa 0x%"PRIx64
+> diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
+> index 405c9d1..85c1b9b 100644
+> --- a/include/hw/i386/intel_iommu.h
+> +++ b/include/hw/i386/intel_iommu.h
+> @@ -83,6 +83,8 @@ struct VTDAddressSpace {
+>      uint8_t devfn;
+>      AddressSpace as;
+>      MemoryRegion iommu;
+> +    MemoryRegion root;
+> +    MemoryRegion sys_alias;
+>      MemoryRegion iommu_ir;      /* Interrupt region: 0xfeeXXXXX */
+>      IntelIOMMUState *iommu_state;
+>      VTDContextCacheEntry context_cache_entry;
