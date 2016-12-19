@@ -1,40 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45179)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53555)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <haoqf@linux.vnet.ibm.com>) id 1cIq3e-0002iB-DQ
-	for Qemu-devel@nongnu.org; Mon, 19 Dec 2016 00:00:19 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1cIqzt-0002ow-Ml
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 01:00:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <haoqf@linux.vnet.ibm.com>) id 1cIq3Z-0006Ge-VE
-	for Qemu-devel@nongnu.org; Mon, 19 Dec 2016 00:00:18 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47309)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <haoqf@linux.vnet.ibm.com>)
-	id 1cIq3Z-0006GG-LU
-	for Qemu-devel@nongnu.org; Mon, 19 Dec 2016 00:00:13 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	uBJ4x66x040260
-	for <Qemu-devel@nongnu.org>; Mon, 19 Dec 2016 00:00:12 -0500
-Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 27dw84u8t6-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <Qemu-devel@nongnu.org>; Mon, 19 Dec 2016 00:00:11 -0500
-Received: from localhost
-	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <Qemu-devel@nongnu.org> from <haoqf@linux.vnet.ibm.com>;
-	Sun, 18 Dec 2016 22:00:11 -0700
-References: <20161216054723.96055-1-haoqf@linux.vnet.ibm.com>
-	<20161216054723.96055-2-haoqf@linux.vnet.ibm.com>
-	<b70a8f66-81e9-6e3b-0245-2eab3ec27d0f@redhat.com>
-From: Hao QingFeng <haoqf@linux.vnet.ibm.com>
-Date: Mon, 19 Dec 2016 13:00:09 +0800
-MIME-Version: 1.0
-In-Reply-To: <b70a8f66-81e9-6e3b-0245-2eab3ec27d0f@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Message-Id: <b30264d5-9d80-dfdc-4178-47d5543c3592@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v1 1/1] iotests: Fix a problem
- in common.filter
+	(envelope-from <wei.w.wang@intel.com>) id 1cIqzs-0004Vz-CF
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 01:00:29 -0500
+Received: from mga06.intel.com ([134.134.136.31]:33815)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1cIqzr-0004Vl-Vr
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 01:00:28 -0500
+From: Wei Wang <wei.w.wang@intel.com>
+Date: Mon, 19 Dec 2016 13:58:38 +0800
+Message-Id: <1482127152-84732-4-git-send-email-wei.w.wang@intel.com>
+In-Reply-To: <1482127152-84732-1-git-send-email-wei.w.wang@intel.com>
+References: <1482127152-84732-1-git-send-email-wei.w.wang@intel.com>
+Subject: [Qemu-devel] [RESEND Patch v1 03/37] vhost-user: share the
+ vhost-user protocol related structures
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,55 +25,237 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: cornelia.huck@de.ibm.com, borntraeger@de.ibm.com, "Qemu-devel@nongnu.org" <Qemu-devel@nongnu.org>, qemu-trivial <qemu-trivial@nongnu.org>
+To: marcandre.lureau@gmail.com, mst@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org
+Cc: Wei Wang <wei.w.wang@intel.com>
 
+Put the vhost-user protocol related data structures into vhost-user.h,
+so that they can be used in other implementations (e.g. a slave
+implementation).
 
+Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+---
+ hw/virtio/vhost-user.c         | 87 +---------------------------------------
+ include/hw/virtio/vhost-user.h | 91 ++++++++++++++++++++++++++++++++++++++++++
+ include/net/vhost-user.h       |  4 +-
+ 3 files changed, 94 insertions(+), 88 deletions(-)
+ create mode 100644 include/hw/virtio/vhost-user.h
 
-=E5=9C=A8 2016-12-16 22:34, Eric Blake =E5=86=99=E9=81=93:
-> [adding qemu-devel, ALL patches should include the main list]
->
-> On 12/15/2016 11:47 PM, QingFeng Hao wrote:
->> If TEST_DIR is set to /tmp, test case 144 will fail. The reason is tha=
-t
->> TEST_DIR duplicates with 144's test image name tmp.qcow2.
-> s/duplicates with/resembles/
-yes
->
->> when 144 is testing $TEST_DIR/tmp.qcow2, it wants to replace
->> $TEST_DIR/tmp.qcow2 to TEST_DIR/tmp.qcow2, but actually it will fail
->> and get TEST_DIRTEST_DIR.qcow2 in this case.
->> The fix is just to modify the code to replace $TEST_DIR/ with TEST_DIR=
-/.
->>
->> Signed-off-by: QingFeng Hao <haoqf@linux.vnet.ibm.com>
->> ---
->>   tests/qemu-iotests/common.filter | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/tests/qemu-iotests/common.filter b/tests/qemu-iotests/com=
-mon.filter
->> index 240ed06..d29e965 100644
->> --- a/tests/qemu-iotests/common.filter
->> +++ b/tests/qemu-iotests/common.filter
->> @@ -35,7 +35,7 @@ _filter_generated_node_ids()
->>   # replace occurrences of the actual TEST_DIR value with TEST_DIR
->>   _filter_testdir()
->>   {
->> -    sed -e "s#$TEST_DIR#TEST_DIR#g"
->> +    sed -e "s#$TEST_DIR\/#TEST_DIR\/#g"
-> Why do you need \/?  It should be sufficient to use / without escaping.
->
-> But overall I agree with including the / in the pattern.  It's too late
-> to include this in 2.8, but with the commit message grammar improved an=
-d
-> \ escape removed, I'm fine with:
->
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-Right! We can use / directly in this case. Thanks :-)
-> I'm also adding qemu-trivial in cc, in case we want to take it through
-> that tree instead of the usual qemu-iotests.
->
-
---=20
-QingFeng Hao(Robin)
+diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+index 7ee92b3..9e089d4 100644
+--- a/hw/virtio/vhost-user.c
++++ b/hw/virtio/vhost-user.c
+@@ -12,6 +12,7 @@
+ #include "qapi/error.h"
+ #include "hw/virtio/vhost.h"
+ #include "hw/virtio/vhost-backend.h"
++#include "hw/virtio/vhost-user.h"
+ #include "hw/virtio/virtio-net.h"
+ #include "sysemu/char.h"
+ #include "sysemu/kvm.h"
+@@ -22,92 +23,6 @@
+ #include <sys/ioctl.h>
+ #include <sys/socket.h>
+ #include <sys/un.h>
+-#include <linux/vhost.h>
+-
+-#define VHOST_MEMORY_MAX_NREGIONS    8
+-#define VHOST_USER_F_PROTOCOL_FEATURES 30
+-
+-enum VhostUserProtocolFeature {
+-    VHOST_USER_PROTOCOL_F_MQ = 0,
+-    VHOST_USER_PROTOCOL_F_LOG_SHMFD = 1,
+-    VHOST_USER_PROTOCOL_F_RARP = 2,
+-    VHOST_USER_PROTOCOL_F_REPLY_ACK = 3,
+-
+-    VHOST_USER_PROTOCOL_F_MAX
+-};
+-
+-#define VHOST_USER_PROTOCOL_FEATURE_MASK ((1 << VHOST_USER_PROTOCOL_F_MAX) - 1)
+-
+-typedef enum VhostUserRequest {
+-    VHOST_USER_NONE = 0,
+-    VHOST_USER_GET_FEATURES = 1,
+-    VHOST_USER_SET_FEATURES = 2,
+-    VHOST_USER_SET_OWNER = 3,
+-    VHOST_USER_RESET_OWNER = 4,
+-    VHOST_USER_SET_MEM_TABLE = 5,
+-    VHOST_USER_SET_LOG_BASE = 6,
+-    VHOST_USER_SET_LOG_FD = 7,
+-    VHOST_USER_SET_VRING_NUM = 8,
+-    VHOST_USER_SET_VRING_ADDR = 9,
+-    VHOST_USER_SET_VRING_BASE = 10,
+-    VHOST_USER_GET_VRING_BASE = 11,
+-    VHOST_USER_SET_VRING_KICK = 12,
+-    VHOST_USER_SET_VRING_CALL = 13,
+-    VHOST_USER_SET_VRING_ERR = 14,
+-    VHOST_USER_GET_PROTOCOL_FEATURES = 15,
+-    VHOST_USER_SET_PROTOCOL_FEATURES = 16,
+-    VHOST_USER_GET_QUEUE_NUM = 17,
+-    VHOST_USER_SET_VRING_ENABLE = 18,
+-    VHOST_USER_SEND_RARP = 19,
+-    VHOST_USER_MAX
+-} VhostUserRequest;
+-
+-typedef struct VhostUserMemoryRegion {
+-    uint64_t guest_phys_addr;
+-    uint64_t memory_size;
+-    uint64_t userspace_addr;
+-    uint64_t mmap_offset;
+-} VhostUserMemoryRegion;
+-
+-typedef struct VhostUserMemory {
+-    uint32_t nregions;
+-    uint32_t padding;
+-    VhostUserMemoryRegion regions[VHOST_MEMORY_MAX_NREGIONS];
+-} VhostUserMemory;
+-
+-typedef struct VhostUserLog {
+-    uint64_t mmap_size;
+-    uint64_t mmap_offset;
+-} VhostUserLog;
+-
+-typedef struct VhostUserMsg {
+-    VhostUserRequest request;
+-
+-#define VHOST_USER_VERSION_MASK     (0x3)
+-#define VHOST_USER_REPLY_MASK       (0x1<<2)
+-#define VHOST_USER_NEED_REPLY_MASK  (0x1 << 3)
+-    uint32_t flags;
+-    uint32_t size; /* the following payload size */
+-    union {
+-#define VHOST_USER_VRING_IDX_MASK   (0xff)
+-#define VHOST_USER_VRING_NOFD_MASK  (0x1<<8)
+-        uint64_t u64;
+-        struct vhost_vring_state state;
+-        struct vhost_vring_addr addr;
+-        VhostUserMemory memory;
+-        VhostUserLog log;
+-    } payload;
+-} QEMU_PACKED VhostUserMsg;
+-
+-static VhostUserMsg m __attribute__ ((unused));
+-#define VHOST_USER_HDR_SIZE (sizeof(m.request) \
+-                            + sizeof(m.flags) \
+-                            + sizeof(m.size))
+-
+-#define VHOST_USER_PAYLOAD_SIZE (sizeof(m) - VHOST_USER_HDR_SIZE)
+-
+-/* The version of the protocol we support */
+-#define VHOST_USER_VERSION    (0x1)
+ 
+ static bool ioeventfd_enabled(void)
+ {
+diff --git a/include/hw/virtio/vhost-user.h b/include/hw/virtio/vhost-user.h
+new file mode 100644
+index 0000000..8d43ffc
+--- /dev/null
++++ b/include/hw/virtio/vhost-user.h
+@@ -0,0 +1,91 @@
++#ifndef VHOST_USER_H
++#define VHOST_USER_H
++
++#include <linux/vhost.h>
++
++#define VHOST_MEMORY_MAX_NREGIONS    8
++#define VHOST_USER_F_PROTOCOL_FEATURES 30
++
++enum VhostUserProtocolFeature {
++    VHOST_USER_PROTOCOL_F_MQ = 0,
++    VHOST_USER_PROTOCOL_F_LOG_SHMFD = 1,
++    VHOST_USER_PROTOCOL_F_RARP = 2,
++    VHOST_USER_PROTOCOL_F_REPLY_ACK = 3,
++
++    VHOST_USER_PROTOCOL_F_MAX
++};
++
++#define VHOST_USER_PROTOCOL_FEATURE_MASK ((1 << VHOST_USER_PROTOCOL_F_MAX) - 1)
++
++typedef enum VhostUserRequest {
++    VHOST_USER_NONE = 0,
++    VHOST_USER_GET_FEATURES = 1,
++    VHOST_USER_SET_FEATURES = 2,
++    VHOST_USER_SET_OWNER = 3,
++    VHOST_USER_RESET_OWNER = 4,
++    VHOST_USER_SET_MEM_TABLE = 5,
++    VHOST_USER_SET_LOG_BASE = 6,
++    VHOST_USER_SET_LOG_FD = 7,
++    VHOST_USER_SET_VRING_NUM = 8,
++    VHOST_USER_SET_VRING_ADDR = 9,
++    VHOST_USER_SET_VRING_BASE = 10,
++    VHOST_USER_GET_VRING_BASE = 11,
++    VHOST_USER_SET_VRING_KICK = 12,
++    VHOST_USER_SET_VRING_CALL = 13,
++    VHOST_USER_SET_VRING_ERR = 14,
++    VHOST_USER_GET_PROTOCOL_FEATURES = 15,
++    VHOST_USER_SET_PROTOCOL_FEATURES = 16,
++    VHOST_USER_GET_QUEUE_NUM = 17,
++    VHOST_USER_SET_VRING_ENABLE = 18,
++    VHOST_USER_SEND_RARP = 19,
++    VHOST_USER_MAX
++} VhostUserRequest;
++
++typedef struct VhostUserMemoryRegion {
++    uint64_t guest_phys_addr;
++    uint64_t memory_size;
++    uint64_t userspace_addr;
++    uint64_t mmap_offset;
++} VhostUserMemoryRegion;
++
++typedef struct VhostUserMemory {
++    uint32_t nregions;
++    uint32_t padding;
++    VhostUserMemoryRegion regions[VHOST_MEMORY_MAX_NREGIONS];
++} VhostUserMemory;
++
++typedef struct VhostUserLog {
++    uint64_t mmap_size;
++    uint64_t mmap_offset;
++} VhostUserLog;
++
++typedef struct VhostUserMsg {
++    VhostUserRequest request;
++
++#define VHOST_USER_VERSION_MASK     (0x3)
++#define VHOST_USER_REPLY_MASK       (0x1 << 2)
++#define VHOST_USER_NEED_REPLY_MASK  (0x1 << 3)
++    uint32_t flags;
++    uint32_t size; /* the following payload size */
++    union {
++#define VHOST_USER_VRING_IDX_MASK   (0xff)
++#define VHOST_USER_VRING_NOFD_MASK  (0x1 << 8)
++        uint64_t u64;
++        struct vhost_vring_state state;
++        struct vhost_vring_addr addr;
++        VhostUserMemory memory;
++        VhostUserLog log;
++    } payload;
++} QEMU_PACKED VhostUserMsg;
++
++static VhostUserMsg m __attribute__ ((unused));
++#define VHOST_USER_HDR_SIZE (sizeof(m.request) \
++                            + sizeof(m.flags) \
++                            + sizeof(m.size))
++
++#define VHOST_USER_PAYLOAD_SIZE (sizeof(m) - VHOST_USER_HDR_SIZE)
++
++/* The version of the protocol we support */
++#define VHOST_USER_VERSION    (0x1)
++
++#endif
+diff --git a/include/net/vhost-user.h b/include/net/vhost-user.h
+index 5bcd8a6..d9e328d 100644
+--- a/include/net/vhost-user.h
++++ b/include/net/vhost-user.h
+@@ -8,8 +8,8 @@
+  *
+  */
+ 
+-#ifndef VHOST_USER_H
+-#define VHOST_USER_H
++#ifndef NET_VHOST_USER_H
++#define NET_VHOST_USER_H
+ 
+ struct vhost_net;
+ struct vhost_net *vhost_user_get_vhost_net(NetClientState *nc);
+-- 
+2.7.4
