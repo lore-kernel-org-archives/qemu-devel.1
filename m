@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53548)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53585)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1cIqzt-0002ov-Au
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 01:00:30 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1cIqzv-0002pI-UW
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 01:00:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1cIqzp-0004VH-EI
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 01:00:29 -0500
-Received: from mga06.intel.com ([134.134.136.31]:8534)
+	(envelope-from <wei.w.wang@intel.com>) id 1cIqzu-0004XK-Tw
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 01:00:31 -0500
+Received: from mga06.intel.com ([134.134.136.31]:33815)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1cIqzp-0004Ug-5d
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 01:00:25 -0500
+	id 1cIqzu-0004Vl-KJ
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 01:00:30 -0500
 From: Wei Wang <wei.w.wang@intel.com>
-Date: Mon, 19 Dec 2016 13:58:35 +0800
-Message-Id: <1482127152-84732-1-git-send-email-wei.w.wang@intel.com>
-Subject: [Qemu-devel] [RESEND Patch v1 00/37] Implementation of vhost-pci
- for inter-vm commucation
+Date: Mon, 19 Dec 2016 13:58:40 +0800
+Message-Id: <1482127152-84732-6-git-send-email-wei.w.wang@intel.com>
+In-Reply-To: <1482127152-84732-1-git-send-email-wei.w.wang@intel.com>
+References: <1482127152-84732-1-git-send-email-wei.w.wang@intel.com>
+Subject: [Qemu-devel] [RESEND Patch v1 05/37] vhost-pci-slave: start the
+ implementation of vhost-pci-slave
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,86 +28,110 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: marcandre.lureau@gmail.com, mst@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org
 Cc: Wei Wang <wei.w.wang@intel.com>
 
-This patch series implements vhost-pci, which is a point-to-point based inter-vm
-communication solution. The QEMU side implementation includes the vhost-user
-extension, vhost-pci device emulation and management. The current device part
-implementation is based on virtio 1.0, but it can be easily upgraded to support
-the upcoming virtio 1.1. 
+Vhost-pci-slave uses a QEMU socket to talk to the master. This patch
+associates the slave with the qemu sever socket.
 
-The current QEMU implementation supports the polling mode driver on both sides
-to receive packets. More features, such as interrupt support, live migration
-support, protected memory accesses will be added later.
-
-RESEND change: Fixed some coding style issue
-
-Wei Wang (37):
-  vhost-pci-net: the fundamental vhost-pci-net device emulation
-  vhost-pci-net: the fundamental implementation of vhost-pci-net-pci
-  vhost-user: share the vhost-user protocol related structures
-  vl: add the vhost-pci-slave command line option
-  vhost-pci-slave: start the implementation of vhost-pci-slave
-  vhost-pci-slave: set up the fundamental handlers for the server socket
-  vhost-pci-slave/msg: VHOST_USER_GET_FEATURES
-  vhost-pci-slave/msg: VHOST_USER_SET_FEATURES
-  vhost-pci-slave/msg: VHOST_USER_GET_PROTOCOL_FEATURES
-  vhost-pci-slave/msg: VHOST_USER_SET_PROTOCOL_FEATURES
-  vhost-user/msg: VHOST_USER_PROTOCOL_F_SET_DEVICE_ID
-  vhost-pci-slave/msg: VHOST_USER_SET_DEVICE_ID
-  vhost-pci-slave/msg: VHOST_USER_GET_QUEUE_NUM
-  vhost-pci-slave/msg: VHOST_USER_SET_OWNER
-  vhost-pci-slave/msg: VHOST_USER_SET_MEM_TABLE
-  vhost-pci-slave/msg: VHOST_USER_SET_VRING_NUM
-  vhost-pci-slave/msg: VHOST_USER_SET_VRING_BASE
-  vhost-user: send guest physical address of virtqueues to the slave
-  vhost-pci-slave/msg: VHOST_USER_SET_VRING_ADDR
-  vhost-pci-slave/msg: VHOST_USER_SET_VRING_KICK
-  vhost-pci-slave/msg: VHOST_USER_SET_VRING_CALL
-  vhost-pci-slave/msg: VHOST_USER_SET_VRING_ENABLE
-  vhost-pci-slave/msg: VHOST_USER_SET_LOG_BASE
-  vhost-pci-slave/msg: VHOST_USER_SET_LOG_FD
-  vhost-pci-slave/msg: VHOST_USER_SEND_RARP
-  vhost-pci-slave/msg: VHOST_USER_GET_VRING_BASE
-  vhost-pci-net: pass the info collected by vp_slave to the device
-  vhost-pci-net: pass the mem and vring info to the driver
-  vhost-pci-slave/msg: VHOST_USER_SET_VHOST_PCI (start)
-  vhost-pci-slave/msg: VHOST_USER_SET_VHOST_PCI (stop)
-  vhost-user/msg: send VHOST_USER_SET_VHOST_PCI (start/stop)
-  vhost-user: add asynchronous read for the vhost-user master
-  vhost-pci-net: send the negotiated feature bits to the master
-  vhost-pci-slave: add "peer_reset"
-  vhost-pci-net: start the vhost-pci-net device
-  vhost-user/msg: handling VHOST_USER_SET_FEATURES
-  vl: enable vhost-pci-slave
-
- hw/net/Makefile.objs                           |   2 +-
- hw/net/vhost-pci-net.c                         | 268 ++++++++++++
- hw/net/vhost_net.c                             |  39 ++
- hw/virtio/Makefile.objs                        |   1 +
- hw/virtio/vhost-pci-slave.c                    | 570 +++++++++++++++++++++++++
- hw/virtio/vhost-user.c                         | 187 ++++----
- hw/virtio/vhost.c                              |  64 ++-
- hw/virtio/virtio-pci.c                         |  80 ++++
- hw/virtio/virtio-pci.h                         |  16 +
- include/hw/pci/pci.h                           |   1 +
- include/hw/virtio/vhost-backend.h              |   2 +
- include/hw/virtio/vhost-pci-net.h              |  45 ++
- include/hw/virtio/vhost-pci-slave.h            |  46 ++
- include/hw/virtio/vhost-user.h                 | 109 +++++
- include/hw/virtio/vhost.h                      |   3 +
- include/net/vhost-user.h                       |  22 +-
- include/net/vhost_net.h                        |   2 +
- include/standard-headers/linux/vhost_pci_net.h |  85 ++++
- include/standard-headers/linux/virtio_ids.h    |  29 +-
- net/vhost-user.c                               |  37 +-
- qemu-options.hx                                |   4 +
- vl.c                                           |  43 ++
- 22 files changed, 1520 insertions(+), 135 deletions(-)
- create mode 100644 hw/net/vhost-pci-net.c
+Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+---
+ hw/virtio/Makefile.objs             |  1 +
+ hw/virtio/vhost-pci-slave.c         | 53 +++++++++++++++++++++++++++++++++++++
+ include/hw/virtio/vhost-pci-slave.h | 16 +++++++++++
+ 3 files changed, 70 insertions(+)
  create mode 100644 hw/virtio/vhost-pci-slave.c
- create mode 100644 include/hw/virtio/vhost-pci-net.h
  create mode 100644 include/hw/virtio/vhost-pci-slave.h
- create mode 100644 include/hw/virtio/vhost-user.h
- create mode 100644 include/standard-headers/linux/vhost_pci_net.h
 
+diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
+index 95c4c30..3af6787 100644
+--- a/hw/virtio/Makefile.objs
++++ b/hw/virtio/Makefile.objs
+@@ -2,6 +2,7 @@ common-obj-y += virtio-rng.o
+ common-obj-$(CONFIG_VIRTIO_PCI) += virtio-pci.o
+ common-obj-y += virtio-bus.o
+ common-obj-y += virtio-mmio.o
++common-obj-y += vhost-pci-slave.o
+ 
+ obj-y += virtio.o virtio-balloon.o 
+ obj-$(CONFIG_LINUX) += vhost.o vhost-backend.o vhost-user.o
+diff --git a/hw/virtio/vhost-pci-slave.c b/hw/virtio/vhost-pci-slave.c
+new file mode 100644
+index 0000000..6b6deb2
+--- /dev/null
++++ b/hw/virtio/vhost-pci-slave.c
+@@ -0,0 +1,53 @@
++/*
++ * Vhost-pci Slave
++ *
++ * Copyright Intel Corp. 2016
++ *
++ * Authors:
++ * Wei Wang    <wei.w.wang@intel.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++
++#include <qemu/osdep.h>
++
++#include "qapi/error.h"
++#include "qemu/error-report.h"
++#include "hw/virtio/vhost-pci-slave.h"
++
++VhostPCISlave *vp_slave;
++
++static CharDriverState *vp_slave_parse_chardev(const char *id)
++{
++    CharDriverState *chr = qemu_chr_find(id);
++    if (chr == NULL) {
++        error_report("chardev \"%s\" not found", id);
++        return NULL;
++    }
++
++    return chr;
++}
++
++int vhost_pci_slave_init(QemuOpts *opts)
++{
++    CharDriverState *chr;
++    const char *chardev_id = qemu_opt_get(opts, "chardev");
++
++    vp_slave = g_malloc(sizeof(VhostPCISlave));
++    chr = vp_slave_parse_chardev(chardev_id);
++    if (!chr) {
++        return -1;
++    }
++    qemu_chr_fe_init(&vp_slave->chr_be, chr, &error_abort);
++
++    return 0;
++}
++
++int vhost_pci_slave_cleanup(void)
++{
++    qemu_chr_fe_deinit(&vp_slave->chr_be);
++    g_free(vp_slave);
++
++    return 0;
++}
+diff --git a/include/hw/virtio/vhost-pci-slave.h b/include/hw/virtio/vhost-pci-slave.h
+new file mode 100644
+index 0000000..c82c775
+--- /dev/null
++++ b/include/hw/virtio/vhost-pci-slave.h
+@@ -0,0 +1,16 @@
++#ifndef QEMU_VHOST_PCI_SLAVE_H
++#define QEMU_VHOST_PCI_SLAVE_H
++
++#include "sysemu/char.h"
++
++typedef struct VhostPCISlave {
++    CharBackend chr_be;
++} VhostPCISlave;
++
++extern VhostPCISlave *vp_slave;
++
++extern int vhost_pci_slave_init(QemuOpts *opts);
++
++extern int vhost_pci_slave_cleanup(void);
++
++#endif
 -- 
 2.7.4
