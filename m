@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53944)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53932)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1cIr0Z-0003PY-BG
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 01:01:13 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1cIr0X-0003O0-Qa
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 01:01:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1cIr0Y-0004mq-E5
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 01:01:11 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1cIr0W-0004lc-NS
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 01:01:09 -0500
 Received: from mga06.intel.com ([134.134.136.31]:33815)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1cIr0Y-0004Vl-6R
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 01:01:10 -0500
+	id 1cIr0W-0004Vl-GA
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 01:01:08 -0500
 From: Wei Wang <wei.w.wang@intel.com>
-Date: Mon, 19 Dec 2016 13:59:03 +0800
-Message-Id: <1482127152-84732-29-git-send-email-wei.w.wang@intel.com>
+Date: Mon, 19 Dec 2016 13:59:02 +0800
+Message-Id: <1482127152-84732-28-git-send-email-wei.w.wang@intel.com>
 In-Reply-To: <1482127152-84732-1-git-send-email-wei.w.wang@intel.com>
 References: <1482127152-84732-1-git-send-email-wei.w.wang@intel.com>
-Subject: [Qemu-devel] [RESEND Patch v1 28/37] vhost-pci-net: pass the mem
- and vring info to the driver
+Subject: [Qemu-devel] [RESEND Patch v1 27/37] vhost-pci-net: pass the info
+ collected by vp_slave to the device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,127 +28,132 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: marcandre.lureau@gmail.com, mst@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org
 Cc: Wei Wang <wei.w.wang@intel.com>
 
-When DRIVER_OK, the device sends the mem and vring info to the driver
-via the controlq.
+When the device is realized, pass the vring info to the device from
+the slave maintained list. The device uses bar2 to hold the peer VM
+memory.
 
 Signed-off-by: Wei Wang <wei.w.wang@intel.com>
 ---
- hw/net/vhost-pci-net.c                         | 68 ++++++++++++++++++++++++++
- include/standard-headers/linux/vhost_pci_net.h | 17 +++++++
- 2 files changed, 85 insertions(+)
+ hw/net/vhost-pci-net.c                         | 29 ++++++++++++++++++++++++++
+ hw/virtio/virtio-pci.c                         | 14 +++++++++++++
+ include/hw/virtio/vhost-pci-net.h              |  9 ++++++++
+ include/standard-headers/linux/vhost_pci_net.h | 14 +++++++++++++
+ 4 files changed, 66 insertions(+)
 
 diff --git a/hw/net/vhost-pci-net.c b/hw/net/vhost-pci-net.c
-index b3475c2..2560e3d 100644
+index b9141fd..b3475c2 100644
 --- a/hw/net/vhost-pci-net.c
 +++ b/hw/net/vhost-pci-net.c
-@@ -14,6 +14,7 @@
-  */
+@@ -20,6 +20,35 @@
+ #define VPNET_CQ_SIZE 32
+ #define VPNET_RQ_SIZE 256
  
- #include "qemu/osdep.h"
-+#include "qemu/iov.h"
- #include "hw/virtio/virtio-access.h"
- #include "hw/virtio/vhost-pci-net.h"
- 
-@@ -57,8 +58,75 @@ static void vpnet_handle_crq(VirtIODevice *vdev, VirtQueue *vq)
- {
- }
- 
-+static size_t vpnet_send_crq_msg(VhostPCINet *vpnet,
-+                                 struct vpnet_controlq_msg *msg)
++void vpnet_set_peer_vq_num(VhostPCINet *vpnet, uint16_t num)
 +{
-+    VirtQueueElement *elem;
-+    VirtQueue *vq;
-+    size_t msg_len = VPNET_CQ_MSG_HDR_SIZE + msg->size;
-+
-+    vq = vpnet->crq;
-+    if (!virtio_queue_ready(vq)) {
-+        return 0;
-+    }
-+
-+    elem = virtqueue_pop(vq, sizeof(VirtQueueElement));
-+    if (!elem) {
-+        return 0;
-+    }
-+
-+    /* TODO: detect a buffer that's too short, set NEEDS_RESET */
-+    iov_from_buf(elem->in_sg, elem->in_num, 0, msg, msg_len);
-+
-+    virtqueue_push(vq, elem, msg_len);
-+    virtio_notify(VIRTIO_DEVICE(vpnet), vq);
-+    g_free(elem);
-+
-+    return msg_len;
++    vpnet->peer_vq_num = num;
 +}
 +
-+static void vpnet_send_peer_mem_msg(VhostPCINet *vpnet)
++void vpnet_init_device_features(VhostPCINet *vpnet, uint64_t features)
 +{
-+    struct vpnet_controlq_msg msg = {
-+        .class = VHOST_PCI_CTRL_PEER_MEM_MSG,
-+        .size = sizeof(struct peer_mem_msg),
-+    };
-+    memcpy(&msg.payload.pmem_msg, &vp_slave->pmem_msg, msg.size);
-+    vpnet_send_crq_msg(vpnet, &msg);
++    vpnet->device_features = features;
 +}
 +
-+static void vpnet_send_peer_vq_msg(VhostPCINet *vpnet)
++void vpnet_set_peer_vq_msg(VhostPCINet *vpnet, PeerVqNode *vq_node)
 +{
-+    struct vpnet_controlq_msg *msg;
-+    struct peer_vqs_msg *pvqs_msg;
 +    struct peer_vq_msg *pvq_msg;
-+    uint16_t pvq_num, msg_size, payload_size;
++    uint32_t vring_num = vq_node->vring_num;
 +
-+    pvq_num = vpnet->peer_vq_num;
-+    payload_size = sizeof(struct peer_vqs_msg)
-+                   + sizeof(struct peer_vq_msg) * pvq_num;
-+    msg_size = VPNET_CQ_MSG_HDR_SIZE + payload_size;
-+    msg = g_malloc(msg_size);
-+    msg->class = VHOST_PCI_CTRL_PEER_VQ_MSG,
-+    msg->size = msg_size;
++    if (vpnet->pvq_msg == NULL) {
++        vpnet->pvq_msg = g_malloc0(sizeof(struct peer_vq_msg) *
++                                  (vring_num + 1));
++    }
 +
-+    pvqs_msg = &msg->payload.pvqs_msg;
-+    pvqs_msg->nvqs = pvq_num;
-+    pvq_msg = pvqs_msg->pvq_msg;
-+    memcpy(pvq_msg, vpnet->pvq_msg, payload_size);
-+
-+    vpnet_send_crq_msg(vpnet, msg);
-+    g_free(msg);
++    pvq_msg = vpnet->pvq_msg + vring_num;
++    pvq_msg->last_avail_idx = vq_node->last_avail_idx;
++    pvq_msg->vring_num = vring_num;
++    pvq_msg->vring_enable = vq_node->enabled;
++    pvq_msg->desc_gpa = vq_node->addr.desc_user_addr;
++    pvq_msg->avail_gpa = vq_node->addr.avail_user_addr;
++    pvq_msg->used_gpa = vq_node->addr.used_user_addr;
 +}
 +
- static void vpnet_set_status(struct VirtIODevice *vdev, uint8_t status)
+ static void vpnet_handle_rq(VirtIODevice *vdev, VirtQueue *vq)
  {
-+    VhostPCINet *vpnet = VHOST_PCI_NET(vdev);
+ }
+diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+index baf70b4..20cbefc 100644
+--- a/hw/virtio/virtio-pci.c
++++ b/hw/virtio/virtio-pci.c
+@@ -2320,7 +2320,21 @@ static void vpnet_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
+ {
+     VhostPCINetPCI *dev = VHOST_PCI_NET_PCI(vpci_dev);
+     DeviceState *vdev = DEVICE(&dev->vdev);
++    int bar_id = 2;
++    PeerVqNode *vq_node;
+ 
++    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
 +
-+    if (status & VIRTIO_CONFIG_S_DRIVER_OK) {
-+        vpnet_send_peer_mem_msg(vpnet);
-+        vpnet_send_peer_vq_msg(vpnet);
++    pci_register_bar(&vpci_dev->pci_dev, bar_id,
++                      PCI_BASE_ADDRESS_SPACE_MEMORY |
++                      PCI_BASE_ADDRESS_MEM_PREFETCH |
++                      PCI_BASE_ADDRESS_MEM_TYPE_64,
++                      vp_slave->bar_mr);
++    vpnet_set_peer_vq_num(&dev->vdev, vp_slave->pvq_num);
++    vpnet_init_device_features(&dev->vdev, vp_slave->feature_bits);
++    QLIST_FOREACH(vq_node, &vp_slave->pvq_list, node) {
++        vpnet_set_peer_vq_msg(&dev->vdev, vq_node);
 +    }
+     object_property_set_bool(OBJECT(vdev), true, "realized", errp);
  }
  
- static uint64_t vpnet_get_features(VirtIODevice *vdev, uint64_t features,
+diff --git a/include/hw/virtio/vhost-pci-net.h b/include/hw/virtio/vhost-pci-net.h
+index 8f2e65f..e813119 100644
+--- a/include/hw/virtio/vhost-pci-net.h
++++ b/include/hw/virtio/vhost-pci-net.h
+@@ -16,6 +16,7 @@
+ 
+ #include "standard-headers/linux/vhost_pci_net.h"
+ #include "hw/virtio/virtio.h"
++#include "hw/virtio/vhost-pci-slave.h"
+ 
+ #define TYPE_VHOST_PCI_NET "vhost-pci-net-device"
+ #define VHOST_PCI_NET(obj) \
+@@ -31,6 +32,14 @@ typedef struct VhostPCINet {
+     uint16_t peer_vq_num;
+     size_t config_size;
+     uint64_t device_features;
++    struct peer_mem_msg pmem_msg;
++    struct peer_vq_msg *pvq_msg;
+ } VhostPCINet;
+ 
++void vpnet_set_peer_vq_num(VhostPCINet *vpnet, uint16_t num);
++
++void vpnet_init_device_features(VhostPCINet *vpnet, uint64_t features);
++
++void vpnet_set_peer_vq_msg(VhostPCINet *vpnet, PeerVqNode *vq_node);
++
+ #endif
 diff --git a/include/standard-headers/linux/vhost_pci_net.h b/include/standard-headers/linux/vhost_pci_net.h
-index e525569..770171e 100644
+index f4c8d0b..e525569 100644
 --- a/include/standard-headers/linux/vhost_pci_net.h
 +++ b/include/standard-headers/linux/vhost_pci_net.h
-@@ -65,4 +65,21 @@ struct peer_vqs_msg {
- 	struct peer_vq_msg pvq_msg[];
- };
+@@ -51,4 +51,18 @@ struct vhost_pci_net_config {
+ 	uint16_t status;
+ } QEMU_PACKED;
  
-+#define VHOST_PCI_CTRL_PEER_MEM_MSG    0
-+#define VHOST_PCI_CTRL_PEER_VQ_MSG     1
-+struct vpnet_controlq_msg {
-+	uint8_t class;
-+	uint8_t cmd;
-+	uint16_t size;
-+        union {
-+		struct peer_mem_msg pmem_msg;
-+		struct peer_vqs_msg pvqs_msg;
-+	} payload;
-+} __attribute__((packed));
++struct peer_vq_msg {
++	uint16_t last_avail_idx;
++        int32_t  vring_enable;
++	uint32_t vring_num;
++	uint64_t desc_gpa;
++	uint64_t avail_gpa;
++	uint64_t used_gpa;
++};
 +
-+static struct vpnet_controlq_msg vpnet_msg __attribute__ ((unused));
-+#define VPNET_CQ_MSG_HDR_SIZE (sizeof(vpnet_msg.class) \
-+			      + sizeof(vpnet_msg.cmd)  \
-+			      + sizeof(vpnet_msg.size))
++struct peer_vqs_msg {
++	uint32_t nvqs;
++	struct peer_vq_msg pvq_msg[];
++};
 +
  #endif
 -- 
