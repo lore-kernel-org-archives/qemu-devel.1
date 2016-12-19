@@ -1,32 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33412)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42100)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cJ5IM-0004SC-Rl
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 16:16:31 -0500
+	(envelope-from <alistair23@gmail.com>) id 1cJ5qr-0007YO-8y
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 16:52:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cJ5IH-0008QK-Ux
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 16:16:30 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39326)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cJ5IH-0008Q2-PC
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 16:16:25 -0500
-Received: from int-mx10.intmail.prod.int.phx2.redhat.com
-	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B745F68E3B
-	for <qemu-devel@nongnu.org>; Mon, 19 Dec 2016 21:16:24 +0000 (UTC)
-References: <20161212224325.20790-1-marcandre.lureau@redhat.com>
-	<20161212224325.20790-7-marcandre.lureau@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <72ddda8b-d4d2-b282-4565-c8328414b986@redhat.com>
-Date: Mon, 19 Dec 2016 15:16:23 -0600
+	(envelope-from <alistair23@gmail.com>) id 1cJ5qq-0005C3-DN
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 16:52:09 -0500
 MIME-Version: 1.0
-In-Reply-To: <20161212224325.20790-7-marcandre.lureau@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Sv2P3EhkblXdrSF09l0MAw4rxHjrRRevO"
-Subject: Re: [Qemu-devel] [PATCH 06/54] char: introduce generic
- qemu_chr_get_kind()
+In-Reply-To: <1481625384-15077-2-git-send-email-peter.maydell@linaro.org>
+References: <1481625384-15077-1-git-send-email-peter.maydell@linaro.org>
+	<1481625384-15077-2-git-send-email-peter.maydell@linaro.org>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Mon, 19 Dec 2016 13:51:33 -0800
+Message-ID: <CAKmqyKMLCYLdqGmXdAFQqxqpwuyY0VHpiu9GOd0mjXyJV6tyQA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH 01/23] target-arm: Log AArch64 exception
+ returns
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,59 +23,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Andrew Jones <drjones@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, Patch Tracking <patches@linaro.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Sv2P3EhkblXdrSF09l0MAw4rxHjrRRevO
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com
-Message-ID: <72ddda8b-d4d2-b282-4565-c8328414b986@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 06/54] char: introduce generic
- qemu_chr_get_kind()
-References: <20161212224325.20790-1-marcandre.lureau@redhat.com>
- <20161212224325.20790-7-marcandre.lureau@redhat.com>
-In-Reply-To: <20161212224325.20790-7-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Tue, Dec 13, 2016 at 2:36 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
+> We already log exception entry; add logging of the AArch64 exception
+> return path as well.
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 
-On 12/12/2016 04:42 PM, Marc-Andr=C3=A9 Lureau wrote:
-> This allows to remove the "is_mux" field from CharDriverState.
->=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
+
+Thanks,
+
+Alistair
+
 > ---
->  monitor.c             |  2 +-
->  qemu-char.c           | 21 ++++++++++-----------
->  include/sysemu/char.h | 15 +++++++++++++--
->  3 files changed, 24 insertions(+), 14 deletions(-)
->=20
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---Sv2P3EhkblXdrSF09l0MAw4rxHjrRRevO
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYWE4nAAoJEKeha0olJ0Nq7TIH/jUjmN/4L4CguLidgvOwI5Yd
-7BbbN0JMqFUp4FyoWucXKdyu0M+C3Pl3UmDDBpfwnclUeTX+FuH01gheJDKEx1GD
-xk7b0G9CEr6cyj/DndztT0fFNoYnJBQbD3U1kimZo1G4ll+88AbUmefc2s1zd57v
-FMUhGRMnyRnoOFP0grW0pb1b7ny5mJKCS2zyWIn52P6xLTXLW3zzkPA/OZ0nVtHz
-R9lEbe7G1fjBsFWoCBtpMP6RZVS8ll7ahvaaIe8D61uN+HUpntXfoWKdM/QwpNOk
-COgNntejnvJC+UA7A8xxCxnj+HRZRZD8F0LR7FTKLWAvaDFboDjzQ0smUF3NyEg=
-=l6RZ
------END PGP SIGNATURE-----
-
---Sv2P3EhkblXdrSF09l0MAw4rxHjrRRevO--
+>  target-arm/op_helper.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+>
+> diff --git a/target-arm/op_helper.c b/target-arm/op_helper.c
+> index cd94216..ba796d8 100644
+> --- a/target-arm/op_helper.c
+> +++ b/target-arm/op_helper.c
+> @@ -17,6 +17,7 @@
+>   * License along with this library; if not, see <http://www.gnu.org/licenses/>.
+>   */
+>  #include "qemu/osdep.h"
+> +#include "qemu/log.h"
+>  #include "cpu.h"
+>  #include "exec/helper-proto.h"
+>  #include "internals.h"
+> @@ -972,6 +973,9 @@ void HELPER(exception_return)(CPUARMState *env)
+>          } else {
+>              env->regs[15] = env->elr_el[cur_el] & ~0x3;
+>          }
+> +        qemu_log_mask(CPU_LOG_INT, "Exception return from AArch64 EL%d to "
+> +                      "AArch32 EL%d PC 0x%" PRIx32 "\n",
+> +                      cur_el, new_el, env->regs[15]);
+>      } else {
+>          env->aarch64 = 1;
+>          pstate_write(env, spsr);
+> @@ -980,6 +984,9 @@ void HELPER(exception_return)(CPUARMState *env)
+>          }
+>          aarch64_restore_sp(env, new_el);
+>          env->pc = env->elr_el[cur_el];
+> +        qemu_log_mask(CPU_LOG_INT, "Exception return from AArch64 EL%d to "
+> +                      "AArch64 EL%d PC 0x%" PRIx64 "\n",
+> +                      cur_el, new_el, env->pc);
+>      }
+>
+>      arm_call_el_change_hook(arm_env_get_cpu(env));
+> @@ -1002,6 +1009,8 @@ illegal_return:
+>      if (!arm_singlestep_active(env)) {
+>          env->pstate &= ~PSTATE_SS;
+>      }
+> +    qemu_log_mask(LOG_GUEST_ERROR, "Illegal exception return at EL%d: "
+> +                  "resuming execution at 0x%" PRIx64 "\n", cur_el, env->pc);
+>  }
+>
+>  /* Return true if the linked breakpoint entry lbn passes its checks */
+> --
+> 2.7.4
+>
+>
