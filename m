@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51658)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58783)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cJ4Pc-0004rP-Bs
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 15:19:57 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1cJ53V-0006s5-N0
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 16:01:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cJ4PZ-0002lR-7w
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 15:19:56 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35660)
+	(envelope-from <ehabkost@redhat.com>) id 1cJ53S-0002K8-M4
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 16:01:09 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56264)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1cJ4PY-0002lL-VE
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 15:19:53 -0500
-References: <1478265017-5700-1-git-send-email-thuth@redhat.com>
-	<87wpg5di5o.fsf@emacs.mitica> <20161117034511.GG18808@umbus.fritz.box>
-	<b20c6b22-fc3a-b37a-6ea0-169be815864a@redhat.com>
-	<401600f0-8a1c-22c7-b9f3-7424426ec699@redhat.com>
-	<20161216170357.GD2642@work-vm>
-	<5a7603d3-aa76-aa93-b6a0-80496284cecf@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <93a4e714-f77a-ba16-70d8-e33dbd860e48@redhat.com>
-Date: Mon, 19 Dec 2016 15:19:50 -0500
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cJ53S-0002IH-Gl
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 16:01:06 -0500
+Date: Mon, 19 Dec 2016 19:01:02 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20161219210102.GD3808@thinpad.lan.raisama.net>
+References: <1481805124-16242-1-git-send-email-vlad.lungu@windriver.com>
+	<20161218202527.GZ3808@thinpad.lan.raisama.net>
+	<8ae3da37-2b4c-3a3f-5adc-d657112979b6@windriver.com>
 MIME-Version: 1.0
-In-Reply-To: <5a7603d3-aa76-aa93-b6a0-80496284cecf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Is block_save_iterate() dead code?
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8ae3da37-2b4c-3a3f-5adc-d657112979b6@windriver.com>
+Subject: Re: [Qemu-devel] [PATCHv3] multiboot: copy the cmdline verbatim,
+ unescape module strings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,79 +29,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Amit Shah <amit.shah@redhat.com>, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Vlad Lungu <vlad.lungu@windriver.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net
 
+On Mon, Dec 19, 2016 at 11:35:34AM +0200, Vlad Lungu wrote:
+> On 12/18/2016 10:25 PM, Eduardo Habkost wrote:
+> > On Thu, Dec 15, 2016 at 02:32:04PM +0200, Vlad Lungu wrote:
+> >> get_opt_value() truncates the value at the first comma
+> >> Use memcpy() instead
+> >> Unescape the module filename and parameters with get_opt_value()
+> >> before calling mb_add_cmdline()
+> >>
+> >> Signed-off-by: Vlad Lungu <vlad.lungu@windriver.com>
+> >> ---
+> >>  hw/i386/multiboot.c | 19 +++++++++----------
+> >>  1 file changed, 9 insertions(+), 10 deletions(-)
+> >>
+> >> diff --git a/hw/i386/multiboot.c b/hw/i386/multiboot.c
+> >> index 387caa6..6b7b5a9 100644
+> >> --- a/hw/i386/multiboot.c
+> >> +++ b/hw/i386/multiboot.c
+> >> @@ -109,7 +109,7 @@ static uint32_t mb_add_cmdline(MultibootState *s, const char *cmdline)
+> >>      hwaddr p = s->offset_cmdlines;
+> >>      char *b = (char *)s->mb_buf + p;
+> >>  
+> >> -    get_opt_value(b, strlen(cmdline) + 1, cmdline);
+> >> +    memcpy(b, cmdline, strlen(cmdline) + 1);
+> >>      s->offset_cmdlines += strlen(b) + 1;
+> >>      return s->mb_buf_phys + p;
+> >>  }
+> >> @@ -287,7 +287,7 @@ int load_multiboot(FWCfgState *fw_cfg,
+> >>      mbs.offset_bootloader = mbs.offset_cmdlines + cmdline_len;
+> >>  
+> >>      if (initrd_filename) {
+> >> -        char *next_initrd, not_last;
+> >> +        char *next_initrd, not_last, tmpbuf[strlen(initrd_filename) + 1];
+> >>  
+> >>          mbs.offset_mods = mbs.mb_buf_size;
+> >>  
+> >> @@ -296,25 +296,24 @@ int load_multiboot(FWCfgState *fw_cfg,
+> >>              int mb_mod_length;
+> >>              uint32_t offs = mbs.mb_buf_size;
+> >>  
+> >> -            next_initrd = (char *)get_opt_value(NULL, 0, initrd_filename);
+> >> +            next_initrd = (char *)get_opt_value(tmpbuf, strlen(initrd_filename) + 1, initrd_filename);
+> > I would prefer to use sizeof(initrd_filename) like Paolo
+> > suggested.
+> sizeof(initrd_filename) is 8 (on my machine, x86_64). Maybe sizeof(tmpbuf) would be a better idea :-)
 
+Oops, yes. I meant sizeof(tmpbuf).  :)
 
-On 12/19/2016 11:30 AM, Thomas Huth wrote:
-> On 16.12.2016 18:03, Dr. David Alan Gilbert wrote:
->> * Thomas Huth (thuth@redhat.com) wrote:
->>> On 18.11.2016 09:13, Thomas Huth wrote:
->>>> On 17.11.2016 04:45, David Gibson wrote:
->>>>> On Mon, Nov 14, 2016 at 07:34:59PM +0100, Juan Quintela wrote:
->>>>>> Thomas Huth <thuth@redhat.com> wrote:
->>>>>>> qemu_savevm_state_iterate() expects the iterators to return 1
->>>>>>> when they are done, and 0 if there is still something left to do.
->>>>>>> However, ram_save_iterate() does not obey this rule and returns
->>>>>>> the number of saved pages instead. This causes a fatal hang with
->>>>>>> ppc64 guests when you run QEMU like this (also works with TCG):
->>>>>>>
->>>>>>>  qemu-img create -f qcow2  /tmp/test.qcow2 1M
->>>>>>>  qemu-system-ppc64 -nographic -nodefaults -m 256 \
->>>>>>>                    -hda /tmp/test.qcow2 -serial mon:stdio
->>>>>>>
->>>>>>> ... then switch to the monitor by pressing CTRL-a c and try to
->>>>>>> save a snapshot with "savevm test1" for example.
->>>>>>>
->>>>>>> After the first iteration, ram_save_iterate() always returns 0 here,
->>>>>>> so that qemu_savevm_state_iterate() hangs in an endless loop and you
->>>>>>> can only "kill -9" the QEMU process.
->>>>>>> Fix it by using proper return values in ram_save_iterate().
->>>>>>>
->>>>>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>>>>>
->>>>>> Reviewed-by: Juan Quintela <quintela@redhat.com>
->>>>>>
->>>>>> Applied.
->>>>>>
->>>>>> I don't know how we broked this so much.
->>>>>
->>>>> Note that block save iterate has the same bug...
->>>>
->>>> I think you're right. Care to send a patch?
->>>
->>> Looking at this issue again ... could it be that block_save_iterate() is
->>> currently just dead code?
->>> As far as I can see, the ->save_live_iterate() handlers are only called
->>> from qemu_savevm_state_iterate(), right? And qemu_savevm_state_iterate()
->>> only calls the handlers if se->ops->is_active(se->opaque) returns true.
->>> But block_is_active() seems to only return 0 during savevm, most likely
->>> because qemu_savevm_state() explicitly sets the "blk" and "shared"
->>> MigrationParams to zero.
->>> So to me, it looks like we could also just remove block_save_iterate()
->>> completely ... or did I miss something here?
->>
->> Doesn't it get called by migrate -b ?
-> 
-> Ah, right, yes, I somehow missed that ... I probably shouldn't do such
-> experiments at the end of Friday afternoon ;-)
-> 
-> OK, so it seems that
-> - block_save_iterate() is not called during savevm at all
->   (and thus the bad return code does not matter here)
-> - migrate -b runs block_save_iterate() but the return code is ignored in
->   migration_thread()
-> 
-> So we do not have a real problem here, but I think we should still clean
-> up the return code of block_save_iterate() to be on the safe side for
-> the future...
-> 
->  Thomas
-> 
-> 
-
-If it confused you, it'll confuse someone else. Worth fixing for
-consistency's sake alone.
-
---js
+-- 
+Eduardo
