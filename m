@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34059)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39169)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cJBMB-0001rD-Sw
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 22:44:52 -0500
+	(envelope-from <peterx@redhat.com>) id 1cJBrI-0002OB-NG
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 23:17:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cJBM8-0006Xn-Pp
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 22:44:51 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46390)
+	(envelope-from <peterx@redhat.com>) id 1cJBrF-000683-IE
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 23:17:00 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40162)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cJBM8-0006WV-Iq
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 22:44:48 -0500
-Date: Tue, 20 Dec 2016 11:44:41 +0800
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cJBrF-00067P-A9
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 23:16:57 -0500
+Date: Tue, 20 Dec 2016 12:16:50 +0800
 From: Peter Xu <peterx@redhat.com>
-Message-ID: <20161220034441.GA19964@pxdev.xzpeter.org>
+Message-ID: <20161220041650.GA22006@pxdev.xzpeter.org>
 References: <1482158486-18597-1-git-send-email-peterx@redhat.com>
-	<20161219095650.0a3ac113@t450s.home>
+	<20161219233012.GF23176@umbus.fritz.box>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20161219095650.0a3ac113@t450s.home>
+In-Reply-To: <20161219233012.GF23176@umbus.fritz.box>
 Subject: Re: [Qemu-devel] [PATCH] intel_iommu: allow dynamic switch of IOMMU
  region
 List-Id: <qemu-devel.nongnu.org>
@@ -28,72 +28,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, bd.aviv@gmail.com, david@gibson.dropbear.id.au
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, alex.williamson@redhat.com, bd.aviv@gmail.com
 
-On Mon, Dec 19, 2016 at 09:56:50AM -0700, Alex Williamson wrote:
-> On Mon, 19 Dec 2016 22:41:26 +0800
-> Peter Xu <peterx@redhat.com> wrote:
+On Tue, Dec 20, 2016 at 10:30:12AM +1100, David Gibson wrote:
+
+[...]
+
+> > +static void vtd_switch_address_space(IntelIOMMUState *s, bool enabled)
+> > +{
+> > +    GHashTableIter iter;
+> > +    VTDBus *vtd_bus;
+> > +    VTDAddressSpace *as;
+> > +    int i;
+> > +
+> > +    g_hash_table_iter_init(&iter, s->vtd_as_by_busptr);
+> > +    while (g_hash_table_iter_next (&iter, NULL, (void**)&vtd_bus)) {
+> > +        for (i = 0; i < X86_IOMMU_PCI_DEVFN_MAX; i++) {
+> > +            as = vtd_bus->dev_as[i];
+> > +            if (as == NULL) {
+> > +                continue;
+> > +            }
+> > +            trace_vtd_switch_address_space(pci_bus_num(vtd_bus->bus),
+> > +                                           VTD_PCI_SLOT(i), VTD_PCI_FUNC(i),
+> > +                                           enabled);
+> > +            if (enabled) {
+> > +                memory_region_add_subregion_overlap(&as->root, 0,
+> > +                                                    &as->iommu, 2);
+> > +            } else {
+> > +                memory_region_del_subregion(&as->root, &as->iommu);
 > 
-> > This is preparation work to finally enabled dynamic switching ON/OFF for
-> > VT-d protection. The old VT-d codes is using static IOMMU region, and
-> > that won't satisfy vfio-pci device listeners.
-> > 
-> > Let me explain.
-> > 
-> > vfio-pci devices depend on the memory region listener and IOMMU replay
-> > mechanism to make sure the device mapping is coherent with the guest
-> > even if there are domain switches. And there are two kinds of domain
-> > switches:
-> > 
-> >   (1) switch from domain A -> B
-> >   (2) switch from domain A -> no domain (e.g., turn DMAR off)
-> > 
-> > Case (1) is handled by the context entry invalidation handling by the
-> > VT-d replay logic. What the replay function should do here is to replay
-> > the existing page mappings in domain B.
-> > 
-> > However for case (2), we don't want to replay any domain mappings - we
-> > just need the default GPA->HPA mappings (the address_space_memory
-> > mapping). And this patch helps on case (2) to build up the mapping
-> > automatically by leveraging the vfio-pci memory listeners.
-> > 
-> > Another important thing that this patch does is to seperate
-> > IR (Interrupt Remapping) from DMAR (DMA Remapping). IR region should not
-> > depend on the DMAR region (like before this patch). It should be a
-> > standalone region, and it should be able to be activated without
-> > DMAR (which is a common behavior of Linux kernel - by default it enables
-> > IR while disabled DMAR).
+> Why not use memory_region_set_enabled() rather than actually
+> adding/deleting the subregion?
+
+Good idea, thanks. :-)
+
+[...]
+
+> > @@ -2343,15 +2378,47 @@ VTDAddressSpace *vtd_find_add_as(IntelIOMMUState *s, PCIBus *bus, int devfn)
+> >          vtd_dev_as->devfn = (uint8_t)devfn;
+> >          vtd_dev_as->iommu_state = s;
+> >          vtd_dev_as->context_cache_entry.context_cache_gen = 0;
+> > +
+> > +        /*
+> > +         * When DMAR is disabled, memory region relationships looks
+> > +         * like:
+> > +         *
+> > +         * 0000000000000000-ffffffffffffffff (prio 0, RW): vtd_root
+> > +         *  0000000000000000-ffffffffffffffff (prio 1, RW): vtd_sys_alias
+> > +         *  00000000fee00000-00000000feefffff (prio 64, RW): intel_iommu_ir
+> > +         *
+> > +         * When DMAR is disabled, it becomes:
+> > +         *
+> > +         * 0000000000000000-ffffffffffffffff (prio 0, RW): vtd_root
+> > +         *  0000000000000000-ffffffffffffffff (prio 2, RW): intel_iommu
+> > +         *  0000000000000000-ffffffffffffffff (prio 1, RW): vtd_sys_alias
+> > +         *  00000000fee00000-00000000feefffff (prio 64, RW): intel_iommu_ir
+> > +         *
+> > +         * The intel_iommu region is dynamically added/removed.
+> > +         */
+> >          memory_region_init_iommu(&vtd_dev_as->iommu, OBJECT(s),
+> >                                   &s->iommu_ops, "intel_iommu", UINT64_MAX);
 > 
+> I'm almost certain UINT64_MAX is wrong here.  For one thing it would
+> collide with PCI BARs.  For another, I can't imagine that the IOMMU
+> page tables can really span an entire 2^64 space.
+
+Could you explain why here device address space has things to do with
+PCI BARs? I thought BARs are for CPU address space only (so that CPU
+can access PCI registers via MMIO manner), am I wrong?
+
+I think we should have a big enough IOMMU region size here. If device
+writes to invalid addresses, IMHO we should trap it and report to
+guest. If we have a smaller size than UINT64_MAX, how we can trap this
+behavior and report for the whole address space (it should cover [0,
+2^64-1])?
+
 > 
-> This seems like an improvement, but I will note that there are existing
-> locked memory accounting issues inherent with VT-d and vfio.  With
-> VT-d, each device has a unique AddressSpace.  This requires that each
-> is managed via a separate vfio container.  Each container is accounted
-> for separately for locked pages.  libvirt currently only knows that if
-> any vfio devices are attached that the locked memory limit for the
-> process needs to be set sufficient for the VM memory.  When VT-d is
-> involved, we either need to figure out how to associate otherwise
-> independent vfio containers to share locked page accounting or teach
-> libvirt that the locked memory requirement needs to be multiplied by
-> the number of attached vfio devices.  The latter seems far less
-> complicated but reduces the containment of QEMU a bit since the
-> process has the ability to lock potentially many multiples of the VM
-> address size.  Thanks,
+> > +        memory_region_init_alias(&vtd_dev_as->sys_alias, OBJECT(s),
+> > +                                 "vtd_sys_alias", get_system_memory(),
+> > +                                 0, memory_region_size(get_system_memory()));
+> 
+> I strongly suspect using memory_region_size(get_system_memory()) is
+> also incorrect here.  System memory has size UINT64_MAX, but I'll bet
+> you you can't actually access all of that via PCI space (again, it
+> would collide with actual PCI BARs).  I also suspect you can't reach
+> CPU MMIO regions via the PCI DMA space.
 
-Yes, this patch just tried to move VT-d forward a bit, rather than do
-it once and for all. I think we can do better than this in the future,
-for example, one address space per guest IOMMU domain (as you have
-mentioned before). However I suppose that will need more work (which I
-still can't estimate on the amount of work). So I am considering to
-enable the device assignments functionally first, then we can further
-improve based on a workable version. Same thoughts apply to the IOMMU
-replay RFC series.
+Hmm, sounds correct.
 
-Regarding to the locked memory accounting issue: do we have existing
-way to do the accounting? If so, would you (or anyone) please
-elaborate a bit? If not, is that an ongoing/planned work?
+However if so we will have the same problem if without IOMMU? See
+pci_device_iommu_address_space() - address_space_memory will be the
+default if we have no IOMMU protection, and that will cover e.g. CPU
+MMIO regions as well.
 
-Thanks,
+> 
+> So, I think you should find out what this limit actually is and
+> restrict the alias to that window.
+
+/me needs some more reading to figure this out. Still not quite
+familiar with the whole VM memory regions. Hints are welcomed...
+
+> 
+> >          memory_region_init_io(&vtd_dev_as->iommu_ir, OBJECT(s),
+> >                                &vtd_mem_ir_ops, s, "intel_iommu_ir",
+> >                                VTD_INTERRUPT_ADDR_SIZE);
+> > -        memory_region_add_subregion(&vtd_dev_as->iommu, VTD_INTERRUPT_ADDR_FIRST,
+> > -                                    &vtd_dev_as->iommu_ir);
+> > -        address_space_init(&vtd_dev_as->as,
+> > -                           &vtd_dev_as->iommu, "intel_iommu");
+> > +        memory_region_init(&vtd_dev_as->root, OBJECT(s),
+> > +                           "vtd_root", UINT64_MAX);
+> > +        memory_region_add_subregion_overlap(&vtd_dev_as->root,
+> > +                                            VTD_INTERRUPT_ADDR_FIRST,
+> > +                                            &vtd_dev_as->iommu_ir, 64);
+> > +        address_space_init(&vtd_dev_as->as, &vtd_dev_as->root, name);
+> > +        memory_region_add_subregion_overlap(&vtd_dev_as->root, 0,
+> > +                                            &vtd_dev_as->sys_alias, 1);
+> > +        if (s->dmar_enabled) {
+> > +            memory_region_add_subregion_overlap(&vtd_dev_as->root, 0,
+> > +                                                &vtd_dev_as->iommu, 2);
+> > +        }
+> 
+> Hmm.  You have the IOMMU translated region overlaying the
+> direct-mapped alias.  You enable and disable the IOMMU subregion, but
+> you always leave the direct mapping enabled.  You might get away with
+> this because the size of the IOMMU region is UINT64_MAX, which will
+> overlay everything - but as above, I think that's wrong.  If that's
+> changed then guest devices may be able to access portions of the raw
+> address space outside the IOMMU mapped region, which could break the
+> guest's expectations of device isolation.
+> 
+> I think it would be much safer to disable the system memory alias when
+> the IOMMU is enabled.
+
+Reasonable. Will adopt.
+
+Thanks!
 
 -- peterx
