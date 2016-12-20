@@ -1,28 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57508)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57558)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cJPso-0007tD-2C
-	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 14:15:31 -0500
+	(envelope-from <eblake@redhat.com>) id 1cJPsq-0007tg-Ix
+	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 14:15:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cJPsk-0007Hg-3N
-	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 14:15:30 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33838)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cJPsj-0007H8-Ua
-	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 14:15:26 -0500
-Received: from int-mx11.intmail.prod.int.phx2.redhat.com
-	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5376991D2B
-	for <qemu-devel@nongnu.org>; Tue, 20 Dec 2016 19:15:24 +0000 (UTC)
-Received: from red.redhat.com (ovpn-117-53.rdu2.redhat.com [10.10.117.53])
-	by int-mx11.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
-	id uBKJFNIe004510
-	for <qemu-devel@nongnu.org>; Tue, 20 Dec 2016 14:15:23 -0500
+	(envelope-from <eblake@redhat.com>) id 1cJPsp-0007LH-K7
+	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 14:15:32 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Tue, 20 Dec 2016 13:15:16 -0600
-Message-Id: <20161220191523.5779-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 0/7] add blkdebug tests
+Date: Tue, 20 Dec 2016 13:15:17 -0600
+Message-Id: <20161220191523.5779-2-eblake@redhat.com>
+In-Reply-To: <20161220191523.5779-1-eblake@redhat.com>
+References: <20161220191523.5779-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 1/7] qcow2: Assert that cluster operations
+ are aligned
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,52 +21,67 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:qcow2" <qemu-block@nongnu.org>
 
-Based on Kevin's block-next branch:
-http://repo.or.cz/qemu/kevin.git/shortlog/refs/heads/block-next
+qcow2_discard_clusters() is set up to silently ignore sub-cluster
+head or tail on unaligned requests.  However, it is easy to audit
+the various callers: qcow2_snapshot_create() has always passed
+aligned data since the call was introduced in 1ebf561;
+qcow2_co_pdiscard() has passed aligned clusters since commit
+ecdbead taught the block layer the preferred discard alignment (the
+block layer can still pass sub-cluster values, but those are
+handled directly in qcow2_co_pdiscard()); and qcow2_make_empty()
+was fixed to pass aligned clusters in commit a3e1505.  Replace
+rounding with assertions to hold us to the tighter contract,
+eliminating the now-impossible case of an early exit for a
+sub-cluster request.
 
-Available as a tag at:
-git fetch git://repo.or.cz/qemu/ericb.git nbd-blkdebug-v4
+qcow2_zero_clusters() has always been called with cluster-aligned
+arguments from its lone caller qcow2_co_pwrite_zeroes() (like
+qcow2_co_pdiscard(), the caller takes care of sub-cluster requests
+from the block layer; and qcow2_zero_clusters() would have
+misbehaved on unaligned requests), but it deserves the same
+assertion for symmetry.
 
-v3 was:
-https://lists.gnu.org/archive/html/qemu-devel/2016-12/msg00278.html
+Signed-off-by: Eric Blake <eblake@redhat.com>
 
-Since then:
-- Address comments from Max and Kevin
-  - typo cleanups
-  - no longer force 512-byte alignment
-  - better naming
-- Merge two series into one
+---
+v4: new patch
+---
+ block/qcow2-cluster.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-001/7:[down] 'qcow2: Assert that cluster operations are aligned'
-002/7:[down] 'qcow2: Discard/zero clusters by byte count'
-003/7:[----] [--] 'blkdebug: Sanity check block layer guarantees'
-004/7:[0015] [FC] 'blkdebug: Add pass-through write_zero and discard support'
-005/7:[0002] [FC] 'blkdebug: Simplify override logic'
-006/7:[0046] [FC] 'blkdebug: Add ability to override unmap geometries'
-007/7:[0015] [FC] 'tests: Add coverage for recent block geometry fixes'
+diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+index 928c1e2..3304a15 100644
+--- a/block/qcow2-cluster.c
++++ b/block/qcow2-cluster.c
+@@ -1521,13 +1521,9 @@ int qcow2_discard_clusters(BlockDriverState *bs, uint64_t offset,
 
-Eric Blake (7):
-  qcow2: Assert that cluster operations are aligned
-  qcow2: Discard/zero clusters by byte count
-  blkdebug: Sanity check block layer guarantees
-  blkdebug: Add pass-through write_zero and discard support
-  blkdebug: Simplify override logic
-  blkdebug: Add ability to override unmap geometries
-  tests: Add coverage for recent block geometry fixes
+     end_offset = offset + (nb_sectors << BDRV_SECTOR_BITS);
 
- qapi/block-core.json       |  24 +++++-
- block/qcow2.h              |   9 +-
- block/blkdebug.c           | 204 +++++++++++++++++++++++++++++++++++++++++++--
- block/qcow2-cluster.c      |  29 ++++---
- block/qcow2-snapshot.c     |   7 +-
- block/qcow2.c              |  21 ++---
- tests/qemu-iotests/173     | 114 +++++++++++++++++++++++++
- tests/qemu-iotests/173.out |  49 +++++++++++
- tests/qemu-iotests/group   |   1 +
- 9 files changed, 413 insertions(+), 45 deletions(-)
- create mode 100755 tests/qemu-iotests/173
- create mode 100644 tests/qemu-iotests/173.out
+-    /* Round start up and end down */
+-    offset = align_offset(offset, s->cluster_size);
+-    end_offset = start_of_cluster(s, end_offset);
+-
+-    if (offset > end_offset) {
+-        return 0;
+-    }
++    /* Caller must pass aligned values */
++    assert(QEMU_IS_ALIGNED(offset, s->cluster_size));
++    assert(QEMU_IS_ALIGNED(end_offset, s->cluster_size));
 
+     nb_clusters = size_to_clusters(s, end_offset - offset);
+
+@@ -1602,6 +1598,10 @@ int qcow2_zero_clusters(BlockDriverState *bs, uint64_t offset, int nb_sectors,
+     uint64_t nb_clusters;
+     int ret;
+
++    /* Caller must pass aligned values */
++    assert(QEMU_IS_ALIGNED(offset, s->cluster_size));
++    assert(QEMU_IS_ALIGNED(nb_sectors, s->cluster_size >> BDRV_SECTOR_BITS));
++
+     /* The zero flag is only supported by version 3 and newer */
+     if (s->qcow_version < 3) {
+         return -ENOTSUP;
 -- 
 2.9.3
