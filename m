@@ -1,17 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55983)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cJDSk-0004Ix-3f
-	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 00:59:47 -0500
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56634)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <jgj@qq.com>)
+	id 1cJDV5-0006aR-MJ
+	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 01:02:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cJDSg-0000OR-VP
-	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 00:59:46 -0500
-From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 20 Dec 2016 16:58:57 +1100
-Message-Id: <20161220055857.9674-7-david@gibson.dropbear.id.au>
-In-Reply-To: <20161220055857.9674-1-david@gibson.dropbear.id.au>
-References: <20161220055857.9674-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PATCHv5 for 2.9 6/6] pseries: Allow HPT resizing with
- KVM
+	(envelope-from <jgj@qq.com>) id 1cJDV2-0001DJ-G5
+	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 01:02:11 -0500
+Received: from smtpbgau1.qq.com ([54.206.16.166]:53079)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jgj@qq.com>) id 1cJDV1-0001Ai-MS
+	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 01:02:08 -0500
+From: "=?utf-8?B?SmluIEd1b2ppZQ==?=" <jinguojie@loongson.cn>
+Sender: jinguojie@loongson.cn
+Mime-Version: 1.0
+Date: Tue, 20 Dec 2016 14:01:51 +0800
+Message-ID: <tencent_1E9EE8C4080125B34108FFF1@qq.com>
+Content-Type: text/plain;
+	charset="utf-8"
+Content-Transfer-Encoding: base64
+Subject: Re: [Qemu-devel] [PATCH v6 00/10] tcg mips64 and mips r6
+ improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,251 +27,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: paulus@samba.org, sjitindarsingh@gmail.com
-Cc: thuth@redhat.com, lvivier@redhat.com, agraf@suse.de, mdroth@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: =?utf-8?B?cWVtdS1kZXZlbA==?= <qemu-devel@nongnu.org>
+Cc: =?utf-8?B?QXVyZWxpZW4gSmFybm8=?= <aurelien@aurel32.net>, =?utf-8?B?SmFtZXMgSG9nYW4=?= <james.hogan@imgtec.com>, =?utf-8?B?WXVuUWlhbmcgU3U=?= <wzssyqa@gmail.com>, =?utf-8?B?UmljaGFyZCBIZW5kZXJzb24=?= <rth@twiddle.net>, =?utf-8?B?amluZ3Vvamll?= <jinguojie@loongson.cn>
 
-So far, qemu implements the PAPR Hash Page Table (HPT) resizing extension
-with TCG.  The same implementation will work with KVM PR, but we don't
-currently allow that.  For KVM HV we can only implement resizing with the
-assistance of the host kernel, which needs a new capability and ioctl()s.
-
-This patch adds support for testing the new KVM capability and implementing
-the resize in terms of KVM facilities when necessary.  If we're running on
-a kernel which doesn't have the new capability flag at all, we fall back to
-testing for PR vs. HV KVM using the same hack that we already use in a
-number of places for older kernels.
-
-NOTE: This patch updates the linux-headers tree with the define for the
-new capability and ioctl()s.  Since the corresponding kernel changes aren't
-yet upstream this is a temporary hack to be replaced by a proper headers
-update before merge.
-
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- hw/ppc/spapr_hcall.c      | 49 +++++++++++++++++++++++++++++++++++++++++++++++
- linux-headers/linux/kvm.h | 11 +++++++++++
- target-ppc/kvm.c          | 43 +++++++++++++++++++++++++++++++++++++++--
- target-ppc/kvm_ppc.h      | 14 ++++++++++++++
- 4 files changed, 115 insertions(+), 2 deletions(-)
-
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index 3991c15..a42d0cb 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -460,6 +460,44 @@ static ram_addr_t get_current_ram_size(void)
-     return size;
- }
- 
-+/* Convert a return code from the KVM ioctl()s implementing resize HPT
-+ * into a PAPR hypercall return code */
-+static target_ulong resize_hpt_convert_rc(int ret)
-+{
-+    if (ret >= 100000) {
-+        return H_LONG_BUSY_ORDER_100_SEC;
-+    } else if (ret >= 10000) {
-+        return H_LONG_BUSY_ORDER_10_SEC;
-+    } else if (ret >= 1000) {
-+        return H_LONG_BUSY_ORDER_1_SEC;
-+    } else if (ret >= 100) {
-+        return H_LONG_BUSY_ORDER_100_MSEC;
-+    } else if (ret >= 10) {
-+        return H_LONG_BUSY_ORDER_10_MSEC;
-+    } else if (ret > 0) {
-+        return H_LONG_BUSY_ORDER_1_MSEC;
-+    }
-+
-+    switch (ret) {
-+    case 0:
-+        return H_SUCCESS;
-+    case -EPERM:
-+        return H_AUTHORITY;
-+    case -EINVAL:
-+        return H_PARAMETER;
-+    case -ENXIO:
-+        return H_CLOSED;
-+    case -ENOSPC:
-+        return H_PTEG_FULL;
-+    case -EBUSY:
-+        return H_BUSY;
-+    case -ENOMEM:
-+        return H_NO_MEM;
-+    default:
-+        return H_HARDWARE;
-+    }
-+}
-+
- static target_ulong h_resize_hpt_prepare(PowerPCCPU *cpu,
-                                          sPAPRMachineState *spapr,
-                                          target_ulong opcode,
-@@ -468,6 +506,7 @@ static target_ulong h_resize_hpt_prepare(PowerPCCPU *cpu,
-     target_ulong flags = args[0];
-     int shift = args[1];
-     sPAPRPendingHPT *pending = spapr->pending_hpt;
-+    int rc;
- 
-     if (spapr->resize_hpt == SPAPR_RESIZE_HPT_DISABLED) {
-         return H_AUTHORITY;
-@@ -491,6 +530,11 @@ static target_ulong h_resize_hpt_prepare(PowerPCCPU *cpu,
-         return H_RESOURCE;
-     }
- 
-+    rc = kvmppc_resize_hpt_prepare(cpu, flags, shift);
-+    if (rc != -ENOSYS) {
-+        return resize_hpt_convert_rc(rc);
-+    }
-+
-     if (pending) {
-         /* something already in progress */
-         if (pending->shift == shift) {
-@@ -696,6 +740,11 @@ static target_ulong h_resize_hpt_commit(PowerPCCPU *cpu,
- 
-     trace_spapr_h_resize_hpt_commit(flags, shift);
- 
-+    rc = kvmppc_resize_hpt_commit(cpu, flags, shift);
-+    if (rc != -ENOSYS) {
-+        return resize_hpt_convert_rc(rc);
-+    }
-+
-     if (flags != 0) {
-         return H_PARAMETER;
-     }
-diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
-index 4806e06..da85bbd 100644
---- a/linux-headers/linux/kvm.h
-+++ b/linux-headers/linux/kvm.h
-@@ -684,6 +684,13 @@ struct kvm_ppc_smmu_info {
- 
- #define KVM_PPC_PVINFO_FLAGS_EV_IDLE   (1<<0)
- 
-+/* for KVM_PPC_RESIZE_HPT_{PREPARE,COMMIT} */
-+struct kvm_ppc_resize_hpt {
-+	__u64 flags;
-+	__u32 shift;
-+	__u32 pad;
-+};
-+
- #define KVMIO 0xAE
- 
- /* machine type bits, to be used as argument to KVM_CREATE_VM */
-@@ -870,6 +877,7 @@ struct kvm_ppc_smmu_info {
- #define KVM_CAP_S390_USER_INSTR0 130
- #define KVM_CAP_MSI_DEVID 131
- #define KVM_CAP_PPC_HTM 132
-+#define KVM_CAP_SPAPR_RESIZE_HPT 133
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
-@@ -1179,6 +1187,9 @@ struct kvm_s390_ucas_mapping {
- #define KVM_ARM_SET_DEVICE_ADDR	  _IOW(KVMIO,  0xab, struct kvm_arm_device_addr)
- /* Available with KVM_CAP_PPC_RTAS */
- #define KVM_PPC_RTAS_DEFINE_TOKEN _IOW(KVMIO,  0xac, struct kvm_rtas_token_args)
-+/* Available with KVM_CAP_SPAPR_RESIZE_HPT */
-+#define KVM_PPC_RESIZE_HPT_PREPARE _IOR(KVMIO, 0xad, struct kvm_ppc_resize_hpt)
-+#define KVM_PPC_RESIZE_HPT_COMMIT _IOR(KVMIO, 0xae, struct kvm_ppc_resize_hpt)
- 
- /* ioctl for vm fd */
- #define KVM_CREATE_DEVICE	  _IOWR(KVMIO,  0xe0, struct kvm_create_device)
-diff --git a/target-ppc/kvm.c b/target-ppc/kvm.c
-index f015d56..d3b314c 100644
---- a/target-ppc/kvm.c
-+++ b/target-ppc/kvm.c
-@@ -82,6 +82,7 @@ static int cap_papr;
- static int cap_htab_fd;
- static int cap_fixup_hcalls;
- static int cap_htm;             /* Hardware transactional memory support */
-+static int cap_resize_hpt;
- 
- static uint32_t debug_inst_opcode;
- 
-@@ -135,6 +136,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-     cap_htab_fd = kvm_check_extension(s, KVM_CAP_PPC_HTAB_FD);
-     cap_fixup_hcalls = kvm_check_extension(s, KVM_CAP_PPC_FIXUP_HCALL);
-     cap_htm = kvm_vm_check_extension(s, KVM_CAP_PPC_HTM);
-+    cap_resize_hpt = kvm_vm_check_extension(s, KVM_CAP_SPAPR_RESIZE_HPT);
- 
-     if (!cap_interrupt_level) {
-         fprintf(stderr, "KVM: Couldn't find level irq capability. Expect the "
-@@ -2677,10 +2679,47 @@ int kvmppc_enable_hwrng(void)
- void kvmppc_check_papr_resize_hpt(Error **errp)
- {
-     if (!kvm_enabled()) {
--        return;
-+        return; /* No KVM, we're good */
-+    }
-+
-+    if (cap_resize_hpt) {
-+        return; /* Kernel has explicit support, we're good */
-     }
- 
--    /* TODO: Check for resize-capable KVM implementations */
-+    /* Otherwise fallback on looking for PR KVM */
-+    if (kvmppc_is_pr(kvm_state)) {
-+        return;
-+    }
- 
-     error_setg(errp, "Hash page table resizing not available with this KVM version");
- }
-+
-+int kvmppc_resize_hpt_prepare(PowerPCCPU *cpu, target_ulong flags, int shift)
-+{
-+    CPUState *cs = CPU(cpu);
-+    struct kvm_ppc_resize_hpt rhpt = {
-+        .flags = flags,
-+        .shift = shift,
-+    };
-+
-+    if (!cap_resize_hpt) {
-+        return -ENOSYS;
-+    }
-+
-+    return kvm_vm_ioctl(cs->kvm_state, KVM_PPC_RESIZE_HPT_PREPARE, &rhpt);
-+}
-+
-+int kvmppc_resize_hpt_commit(PowerPCCPU *cpu, target_ulong flags, int shift)
-+{
-+    CPUState *cs = CPU(cpu);
-+    struct kvm_ppc_resize_hpt rhpt = {
-+        .flags = flags,
-+        .shift = shift,
-+    };
-+
-+    if (!cap_resize_hpt) {
-+        return -ENOSYS;
-+    }
-+
-+    return kvm_vm_ioctl(cs->kvm_state, KVM_PPC_RESIZE_HPT_COMMIT, &rhpt);
-+}
-diff --git a/target-ppc/kvm_ppc.h b/target-ppc/kvm_ppc.h
-index 3e852ba..a3e3b1e 100644
---- a/target-ppc/kvm_ppc.h
-+++ b/target-ppc/kvm_ppc.h
-@@ -60,6 +60,8 @@ int kvmppc_enable_hwrng(void);
- int kvmppc_put_books_sregs(PowerPCCPU *cpu);
- PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void);
- void kvmppc_check_papr_resize_hpt(Error **errp);
-+int kvmppc_resize_hpt_prepare(PowerPCCPU *cpu, target_ulong flags, int shift);
-+int kvmppc_resize_hpt_commit(PowerPCCPU *cpu, target_ulong flags, int shift);
- 
- #else
- 
-@@ -275,6 +277,18 @@ static inline void kvmppc_check_papr_resize_hpt(Error **errp)
- {
-     return;
- }
-+
-+static inline int kvmppc_resize_hpt_prepare(PowerPCCPU *cpu,
-+                                            target_ulong flags, int shift)
-+{
-+    return -ENOSYS;
-+}
-+
-+static inline int kvmppc_resize_hpt_commit(PowerPCCPU *cpu,
-+                                           target_ulong flags, int shift)
-+{
-+    return -ENOSYS;
-+}
- #endif
- 
- #ifndef CONFIG_KVM
--- 
-2.9.3
+cGluZyAgICAgaHR0cDovL3BhdGNod29yay5vemxhYnMub3JnL3BhdGNoLzcwNDgyOS8NCg0K
+UGxlYXNlIGdpdmUgbWUgYW55IGFkdmljZSBhbmQgY29tbWVudCBmb3Igc3BlZWRpbmcgdXAg
+dGhlIHJldmlldyBwcm9jZXNzLg0KVGhhbmsgeW91IGFsbCENCg0KSmluIEd1b2ppZQ0KDQot
+LS0tLS0tLS0tLS0tLS0tLS0gT3JpZ2luYWwgLS0tLS0tLS0tLS0tLS0tLS0tDQpGcm9tOiAg
+Imppbmd1b2ppZSI7PGppbmd1b2ppZUBsb29uZ3Nvbi5jbj47DQpTZW5kIHRpbWU6IFN1bmRh
+eSwgRGVjIDExLCAyMDE2IDk6MzYgUE0NClRvOiAicWVtdS1kZXZlbCI8cWVtdS1kZXZlbEBu
+b25nbnUub3JnPjsgDQpDYzogIkF1cmVsaWVuIEphcm5vIjxhdXJlbGllbkBhdXJlbDMyLm5l
+dD47ICJKYW1lcyBIb2dhbiI8amFtZXMuaG9nYW5AaW1ndGVjLmNvbT47ICJZdW5RaWFuZyBT
+dSI8d3pzc3lxYUBnbWFpbC5jb20+OyAiUmljaGFyZCBIZW5kZXJzb24iPHJ0aEB0d2lkZGxl
+Lm5ldD47ICJKaW4gR3VvamllIjxqaW5ndW9qaWVAbG9vbmdzb24uY24+OyANClN1YmplY3Q6
+ICBbUEFUQ0ggdjYgMDAvMTBdIHRjZyBtaXBzNjQgYW5kIG1pcHMgcjYgaW1wcm92ZW1lbnRz
+DQoNCg0KDQpDaGFuZ2VzIGluIHY2Og0KICAqIFVwZGF0ZSBhZ2FpbnN0IG1hc3Rlcih2Mi44
+LjAtcmMzKQ0KICAqIEZpeCB0d28gYnVncyBhY2NvcmRpbmcgdG8gUmljaGFyZCBIZW5kZXJz
+b24ncyByZXZpZXcgY29tbWVudHMNCiAgICAoMSkgbWFzazogZXh0ZW5kIFRBUkdFVF9QQUdF
+X01BU0sgdG8gdGhlIHByb3BlciB0eXBlDQogICAgKDIpIHplcm8tZXh0ZW5kIHRoZSBndWVz
+dCBhZGRyZXNzLCBub3QgdGhlIGFkZHJlc3MgbG9hZGVkIGZyb20gQ01QX09GRg0KICAqIE1J
+UFMgUjY6IHRlc3RlZCBzdWNjZXNzZnVsbHkgb24gYSBxZW11IG1pcHNlbDY0cjYgaG9zdCAo
+ZW11bGF0aW5nIEk2NDAwKQ0KICAgIC0gRGViaWFuIGFtZDY0IHdpdGggcWVtdS1zeXN0ZW0t
+eDg2XzY0DQoNCkNoYW5nZXMgaW4gdjU6DQogICogVXBkYXRlIGFnYWluc3QgbWFzdGVyKHYy
+LjguMC1yYzIpDQogICogRml4IGEgYnVnOiA2NC1iaXQgYmlnLWVuZGlhbiBndWVzdHMgaGFu
+ZyBvbiBtaXBzNjQgbGl0dGxlLWVuZGlhbg0KICAgICAgaG9zdHMsIGFuZCB2aWNlIHZlcnNh
+LiBUaGlzIGJ1ZyB3YXMgZmlyc3QgaW50cm9kdWNlZCBpbiB2MiBwYXRjaCwNCiAgICAgIGR1
+ZSB0byBvYnZpb3VzIG1pc3VzZSBvZiByZXQvYXJnIHJlZ2lzdGVycyBpbiB0Y2dfb3V0X2Jz
+d2FwNjQoKS4NCg0KICAgICAgICB0Y2dfb3V0X29wY19yZWcocywgT1BDX0RTQkgsIHJldCwg
+MCwgYXJnKTsNCiAgICAgIC0gdGNnX291dF9vcGNfcmVnKHMsIE9QQ19EU0hELCByZXQsIDAs
+IGFyZyk7DQogICAgICArIHRjZ19vdXRfb3BjX3JlZyhzLCBPUENfRFNIRCwgcmV0LCAwLCBy
+ZXQpOw0KDQogICogRml4IGEgc3R5bGUgcHJvYmxlbTogY2hlY2twYXRjaC5wbCBmb3JiaWRz
+ICdleHRlcm4nIHRvIGJlIHVzZWQgaW4gLmMuDQoNCiAgICAgIEVSUk9SOiBleHRlcm5zIHNo
+b3VsZCBiZSBhdm9pZGVkIGluIC5jIGZpbGVzDQogICAgICAjMjg6IEZJTEU6IHRjZy9taXBz
+L3RjZy10YXJnZXQuaW5jLmM6Mzk6DQogICAgICArZXh0ZXJuIGludCBsaW5rX2Vycm9yKHZv
+aWQpOw0KDQogICAgICBTaW1wbHkgY29tbWVudCB0aGUgdHlwZSBpZGVudGlmaWVyIHRvIHBh
+c3MgdGhlIGNoZWNrLg0KDQogICogVGVzdGVkIHN1Y2Nlc3NmdWxseSBvbiBmb2xsb3dpbmcg
+bWFjaGluZXM6DQogIA0KICAgIHwgSE9TVCAgICAgICAgfCBxZW11LXN5c3RlbSB8IERlYmlh
+biBJU08gIHwNCiAgICB8LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS18DQogICAgfCBtaXBzIDMyIGxlICB8ICAgIGkzODYgICAgIHwgICAgaTM4NiAgICAgfA0K
+ICAgIHwgbWlwcyAzMiBsZSAgfCAgICB4ODZfNjQgICB8ICAgIGkzODYgICAgIHwNCiAgICB8
+IG1pcHMgMzIgbGUgIHwgICAgeDg2XzY0ICAgfCAgICBhbWQ2NCAgICB8DQogICAgfCBtaXBz
+IDY0IGxlICB8ICAgIGkzODYgICAgIHwgICAgaTM4NiAgICAgfA0KICAgIHwgbWlwcyA2NCBs
+ZSAgfCAgICB4ODZfNjQgICB8ICAgIGkzODYgICAgIHwNCiAgICB8IG1pcHMgNjQgbGUgIHwg
+ICAgeDg2XzY0ICAgfCAgICBhbWQ2NCAgICB8DQogICAgfCBtaXBzIDY0IGxlICB8ICBtaXBz
+IDY0IGJlIHwgIG1pcHMgNjQgYmUgfA0KICAgIHwtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLXwNCiAgICB8IG1pcHMgMzIgYmUgIHwgICAgaTM4NiAgICAgfCAg
+ICAgaTM4NiAgICB8DQogICAgfCBtaXBzIDMyIGJlICB8ICAgIHg4Nl82NCAgIHwgICAgIGkz
+ODYgICAgfA0KICAgIHwgbWlwcyAzMiBiZSAgfCAgICB4ODZfNjQgICB8ICAgICBhbWQ2NCAg
+IHwNCiAgICB8IG1pcHMgNjQgYmUgIHwgICAgaTM4NiAgICAgfCAgICAgaTM4NiAgICB8DQog
+ICAgfCBtaXBzIDY0IGJlICB8ICAgIHg4Nl82NCAgIHwgICAgIGkzODYgICAgfA0KICAgIHwg
+bWlwcyA2NCBiZSAgfCAgICB4ODZfNjQgICB8ICAgICBhbWQ2NCAgIHwNCiAgICB8IG1pcHMg
+bjMyIGJlIHwgICAgMzg2ICAgICAgfCAgICAgaTM4NiAgICB8DQogICAgfCBtaXBzIG4zMiBi
+ZSB8ICAgIHg4Nl82NCAgIHwgICAgIGkzODYgICAgfA0KICAgIHwgbWlwcyBuMzIgYmUgfCAg
+ICB4ODZfNjQgICB8ICAgICBhbWQ2NCAgIHwNCg0KICAgIChObyBwbGFuIHRvIHRlc3QgTUlQ
+UyBSNiBpbiB0aGlzIHBhdGNoLikNCg0KICBTdW1tYXJ5IG9mIGNoYW5nZXMgZnJvbSB2NDoN
+Cg0KICB8IHRjZy1taXBzOiBTdXBwb3J0IDY0LWJpdCBvcGNvZGVzICAgICAgIHwgRml4IHRj
+Z19vdXRfYnN3YXA2NCgpIHwNCiAgfCB0Y2ctbWlwczogQWRqdXN0IHFlbXVfbGQvc3QgZm9y
+IG1pcHM2NCB8IEZpeCBhIHN0eWxlIHByb2JsZW0gICB8DQoNCg0KQ2hhbmdlcyBpbiB2NDoN
+CiAgKiB0Y2dfb3V0X3FlbXVfbGRfc2xvd19wYXRoOiBhbHdheXMgc2lnbi1leHRlbmQgMzIt
+Yml0IGxvYWRzLg0KICAgIFByb3ZpZGUgYSBiZXR0ZXIgc29sdXRpb24gdGhhbiBwYXRjaDEx
+IGluIHYzLg0KICAgIEZpeCB0aGUgYmxvY2tpbmcgYnVnIHdoZW4gZW11bGF0aW5nIGkzODYg
+a2VybmVsIG9uIG1pcHM2NGVsLg0KICAqIFJlZGVmaW5lIExPX09GRi9ISV9PRkYgYXMgdjIu
+DQogICAgT24gbWlwczY0IGhvc3QsIHRoZXkgYXJlIGRlZmluZWQgYXMgbGlua19lcnJvciwg
+dG8gZW5zdXJlIHRoYXQNCiAgICBhbGwgcGF0aHMgdGhhdCBsZWFkIHRvIHRoZSB1c2Ugb2Yg
+dGhlIHN5bWJvbCBhcmUgZWxpbWluYXRlZCBieQ0KICAgIHRoZSBjb21waWxlci4NCg0KQ2hh
+bmdlcyBpbiB2MzoNCiAgKiBVcGRhdGUgYWdhaW5zdCBtYXN0ZXIodjIuOC4wLXJjMSkNCiAg
+KiBUZXN0ZWQgb24gTG9vbmdzb24gYXMgbWlwczMycjIoZWwpIGFuZCBtaXBzNjRyMihlbCkg
+aG9zdHMuDQogICAgTG9vbmdzb24gb25seSBpbXBsZW1lbnRzIGxpdHRsZS1lbmRpYW4gbWlw
+czMyL21pcHM2NCBJU0EuDQogICogRnVsbHkgd29yayBmb3IgMzItYml0IGFuZCA2NC1iaXQg
+Z3Vlc3RzLg0KICAgIEZpeCB0d28gYnVnc++8mnNlZ21lbnRhdGlvbiBmYXVsdCBvbiBtaXBz
+NjRlbCB3aXRoIDMyLWJpdCBndWVzdHMsDQogICAgICAgICAgICAgICAgICBibG9ja2luZyB3
+aGVuIGVtdWxhdGluZyBpMzg2IGtlcm5lbCBvbiBtaXBzNjRlbC4NCiAgKiBGaXggc29tZSBt
+aW5vciBzdHlsZSBwcm9ibGVtcy4NCiAgKiBQQVRDSCB2MiAxMn4xNiBhcmUgbm90IGV4YW1p
+bmVkIGR1ZSB0byB0aGUgbGFjayBvZiBSNiBtYWNoaW5lLiANCg0KVGVzdGVkLWJ5OiBBdXJl
+bGllbiBKYXJubyA8YXVyZWxpZW5AYXVyZWwzMi5uZXQ+DQpUZXN0ZWQtYnk6IEphbWVzIEhv
+Z2FuIDxqYW1lcy5ob2dhbkBpbWd0ZWMuY29tPg0KVGVzdGVkLWJ5OiBZdW5RaWFuZyBTdSA8
+d3pzc3lxYUBnbWFpbC5jb20+DQpTaWduZWQtb2ZmLWJ5OiBSaWNoYXJkIEhlbmRlcnNvbiA8
+cnRoQHR3aWRkbGUubmV0Pg0KU2lnbmVkLW9mZi1ieTogSmluIEd1b2ppZSA8amluZ3Vvamll
+QGxvb25nc29uLmNuPg0KDQpKaW4gR3VvamllICgxMCk6DQogIHRjZy1taXBzOiBNb3ZlIGJz
+d2FwIGNvZGUgdG8gYSBzdWJyb3V0aW5lDQogIHRjZy1taXBzOiBBZGQgbWlwczY0IG9wY29k
+ZXMNCiAgdGNnLW1pcHM6IFN1cHBvcnQgNjQtYml0IG9wY29kZXMNCiAgdGNnLW1pcHM6IEFk
+ZCBic3dhcDMydSBhbmQgYnN3YXA2NA0KICB0Y2ctbWlwczogQWRqdXN0IG1vdmUgZnVuY3Rp
+b25zIGZvciBtaXBzNjQNCiAgdGNnLW1pcHM6IEFkanVzdCBsb2FkL3N0b3JlIGZ1bmN0aW9u
+cyBmb3IgbWlwczY0DQogIHRjZy1taXBzOiBBZGp1c3QgcHJvbG9ndWUgZm9yIG1pcHM2NA0K
+ICB0Y2ctbWlwczogQWRkIHRjZyB1bndpbmQgaW5mbw0KICB0Y2ctbWlwczogQWRqdXN0IGNh
+bGxpbmcgY29udmVudGlvbnMgZm9yIG1pcHM2NA0KICB0Y2ctbWlwczogQWRqdXN0IHFlbXVf
+bGQvc3QgZm9yIG1pcHM2NA0KDQogdGNnL21pcHMvdGNnLXRhcmdldC5oICAgICB8ICAgNjAg
+KystDQogdGNnL21pcHMvdGNnLXRhcmdldC5pbmMuYyB8IDExNzAgKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKystLS0tLS0tLS0tDQogMiBmaWxlcyBjaGFuZ2VkLCA5Nzcg
+aW5zZXJ0aW9ucygrKSwgMjUzIGRlbGV0aW9ucygtKQ0KDQotLSANCjIuMS4w
