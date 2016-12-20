@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35012)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35619)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cJTSs-0000tO-KA
-	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 18:04:59 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1cJTVR-0003TJ-30
+	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 18:07:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cJTSr-0005TH-AQ
-	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 18:04:58 -0500
-Resent-Message-Id: <E1cJTSr-0005TH-AQ@eggs.gnu.org>
-In-Reply-To: <20161220163139.12016-1-famz@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <148227508365.73.4716554489460240685@790289a7ca88>
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1cJTVQ-0006f0-2q
+	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 18:07:37 -0500
+Received: from hera.aquilenet.fr ([2a01:474::1]:39497)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1cJTVP-0006eo-TD
+	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 18:07:36 -0500
+From: Samuel Thibault <samuel.thibault@ens-lyon.org>
+Date: Wed, 21 Dec 2016 00:07:30 +0100
+Message-Id: <20161220230732.17862-1-samuel.thibault@ens-lyon.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 20 Dec 2016 15:04:45 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH 0/4] RFC: A VFIO based block driver for
- NVMe device
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 0/2] slirp updates: MIN/MAX, tftp dynamic blocks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,72 +24,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: famz@redhat.com
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com, borntraeger@de.ibm.com, stefanha@redhat.com, pbonzini@redhat.com, krister@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>, stefanha@redhat.com, jan.kiszka@siemens.com
 
-SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQQVRDSCAwLzRdIFJGQzogQSBWRklPIGJhc2VkIGJsb2NrIGRyaXZlciBmb3IgTlZN
-ZSBkZXZpY2UKTWVzc2FnZS1pZDogMjAxNjEyMjAxNjMxMzkuMTIwMTYtMS1mYW16QHJlZGhhdC5j
-b20KVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpC
-QVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpm
-YWlsZWQ9MAoKIyBVc2VmdWwgZ2l0IG9wdGlvbnMKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVu
-YW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9
-IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21t
-aXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4g
-MSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWls
-IHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFp
-bGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWls
-ZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0
-ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpkZGMw
-MjZiIGJsb2NrOiBBZGQgVkZJTyBiYXNlZCBOVk1lIGRyaXZlcgpmNWRkNjE5IHV0aWw6IEFkZCBW
-RklPIGhlbHBlciBsaWJyYXJ5CjU2MDhhNWMgdXRpbDogQWRkIGEgbm90aWZpZXIgbGlzdCBmb3Ig
-cWVtdV92ZnJlZSgpCjgyMjQ2MmQgcmFtYmxvY2stbm90aWZpZXI6IG5ldwoKPT09IE9VVFBVVCBC
-RUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS80OiByYW1ibG9jay1ub3RpZmllcjogbmV3Li4uCkNo
-ZWNraW5nIFBBVENIIDIvNDogdXRpbDogQWRkIGEgbm90aWZpZXIgbGlzdCBmb3IgcWVtdV92ZnJl
-ZSgpLi4uCkNoZWNraW5nIFBBVENIIDMvNDogdXRpbDogQWRkIFZGSU8gaGVscGVyIGxpYnJhcnku
-Li4KV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzE4NDogRklMRTogdXRpbC92Zmlv
-LWhlbHBlcnMuYzoxMTE6CisgICAgaWYgKGlvY3RsKHMtPmRldmljZSwgVkZJT19ERVZJQ0VfR0VU
-X1JFR0lPTl9JTkZPLCAmcy0+YmFyX3JlZ2lvbl9pbmZvW2luZGV4XSkpIHsKCldBUk5JTkc6IGxp
-bmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMyNjI6IEZJTEU6IHV0aWwvdmZpby1oZWxwZXJzLmM6MTg5
-Ogorc3RhdGljIGludCBxZW11X3ZmaW9fcGNpX3JlYWRfY29uZmlnKFFFTVVWRklPU3RhdGUgKnMs
-IHZvaWQgKmJ1ZiwgaW50IHNpemUsIGludCBvZnMpCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hh
-cmFjdGVycwojMjY0OiBGSUxFOiB1dGlsL3ZmaW8taGVscGVycy5jOjE5MToKKyAgICBpZiAocHJl
-YWQocy0+ZGV2aWNlLCBidWYsIHNpemUsIHMtPmNvbmZpZ19yZWdpb25faW5mby5vZmZzZXQgKyBv
-ZnMpID09IHNpemUpIHsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMyNzA6IEZJ
-TEU6IHV0aWwvdmZpby1oZWxwZXJzLmM6MTk3Ogorc3RhdGljIGludCBxZW11X3ZmaW9fcGNpX3dy
-aXRlX2NvbmZpZyhRRU1VVkZJT1N0YXRlICpzLCB2b2lkICpidWYsIGludCBzaXplLCBpbnQgb2Zz
-KQoKRVJST1I6IHRoYXQgb3BlbiBicmFjZSB7IHNob3VsZCBiZSBvbiB0aGUgcHJldmlvdXMgbGlu
-ZQojMjg3OiBGSUxFOiB1dGlsL3ZmaW8taGVscGVycy5jOjIxNDoKKyAgICBzdHJ1Y3QgdmZpb19n
-cm91cF9zdGF0dXMgZ3JvdXBfc3RhdHVzID0KKyAgICB7IC5hcmdzeiA9IHNpemVvZihncm91cF9z
-dGF0dXMpIH07CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojNDA3OiBGSUxFOiB1
-dGlsL3ZmaW8taGVscGVycy5jOjMzNDoKK3N0YXRpYyB2b2lkIHFlbXVfdmZpb19yYW1fYmxvY2tf
-YWRkZWQoUkFNQmxvY2tOb3RpZmllciAqbiwgdm9pZCAqaG9zdCwgc2l6ZV90IHNpemUpCgpXQVJO
-SU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojNDE1OiBGSUxFOiB1dGlsL3ZmaW8taGVscGVy
-cy5jOjM0MjoKK3N0YXRpYyB2b2lkIHFlbXVfdmZpb19yYW1fYmxvY2tfcmVtb3ZlZChSQU1CbG9j
-a05vdGlmaWVyICpuLCB2b2lkICpob3N0LCBzaXplX3Qgc2l6ZSkKCnRvdGFsOiAxIGVycm9ycywg
-NiB3YXJuaW5ncywgNzQ2IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2Js
-ZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9z
-aXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBN
-QUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDQvNDogYmxvY2s6IEFkZCBWRklPIGJhc2VkIE5W
-TWUgZHJpdmVyLi4uCkVSUk9SOiBVc2Ugb2Ygdm9sYXRpbGUgaXMgdXN1YWxseSB3cm9uZzogc2Vl
-IERvY3VtZW50YXRpb24vdm9sYXRpbGUtY29uc2lkZXJlZC1oYXJtZnVsLnR4dAojMTQ1OiBGSUxF
-OiBibG9jay9udm1lLmM6OTI6CisgICAgdm9sYXRpbGUgdWludDMyX3QgKmRvb3JiZWxsOwoKRVJS
-T1I6IFVzZSBvZiB2b2xhdGlsZSBpcyB1c3VhbGx5IHdyb25nOiBzZWUgRG9jdW1lbnRhdGlvbi92
-b2xhdGlsZS1jb25zaWRlcmVkLWhhcm1mdWwudHh0CiMxNjk6IEZJTEU6IGJsb2NrL252bWUuYzox
-MTY6Cit0eXBlZGVmIHZvbGF0aWxlIHN0cnVjdCB7CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hh
-cmFjdGVycwojMzM5OiBGSUxFOiBibG9jay9udm1lLmM6Mjg2OgorICAgICAgICBEUFJJTlRGKCJO
-Vk1lIGVycm9yIGNtZCBzcGVjaWZpYyAleCBzcSBoZWFkICV4IHNxaWQgJXggY2lkICV4IHN0YXR1
-cyAleFxuIiwKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM2MjY6IEZJTEU6IGJs
-b2NrL252bWUuYzo1NzM6CisgICAgICAgICAgICBlcnJvcl9zZXRnKGVycnAsICJUaW1lb3V0IHdo
-aWxlIHdhaXRpbmcgZm9yIGRldmljZSB0byByZXNldCAoJWxkIG1zKSIsCgpXQVJOSU5HOiBsaW5l
-IG92ZXIgODAgY2hhcmFjdGVycwojNjU1OiBGSUxFOiBibG9jay9udm1lLmM6NjAyOgorICAgICAg
-ICAgICAgZXJyb3Jfc2V0ZyhlcnJwLCAiVGltZW91dCB3aGlsZSB3YWl0aW5nIGZvciBkZXZpY2Ug
-dG8gc3RhcnQgKCVsZCBtcykiLAoKdG90YWw6IDIgZXJyb3JzLCAzIHdhcm5pbmdzLCAxMDMzIGxp
-bmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
-LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
-IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBP
-VVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1h
-aWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3Jn
-L10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMu
-b3Jn
+The following changes since commit 82ecffa8c050bf5bbc13329e9b65eac1caa5b5=
+5c:
+
+  Open 2.9 development tree (2016-12-20 16:20:16 +0000)
+
+are available in the git repository at:
+
+  http://people.debian.org/~sthibault/qemu.git tags/samuel-thibault
+
+for you to fetch changes up to 9443598d7e2f2c0a6493d97b3f11dd04837b08e8:
+
+  slirp: support dynamic block size for TFTP transfers (2016-12-21 00:02:=
+15 +0100)
+
+----------------------------------------------------------------
+slirp updates
+
+----------------------------------------------------------------
+Herv=C3=A9 Poussineau (1):
+      slirp: support dynamic block size for TFTP transfers
+
+Yuval Shaia (1):
+      slirp, disas: Replace min/max with MIN/MAX macros
+
+ disas/m68k.c       |  8 ++------
+ slirp/dhcpv6.c     |  2 +-
+ slirp/ip6_icmp.c   |  2 +-
+ slirp/slirp.c      |  2 +-
+ slirp/slirp.h      |  5 -----
+ slirp/tcp_input.c  | 16 ++++++++--------
+ slirp/tcp_output.c |  6 +++---
+ slirp/tcp_timer.c  |  2 +-
+ slirp/tcpip.h      |  2 +-
+ slirp/tftp.c       | 26 ++++++++++++++------------
+ slirp/tftp.h       |  8 +++++---
+ 11 files changed, 37 insertions(+), 42 deletions(-)
