@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57612)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57683)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cJPss-0007wX-T1
-	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 14:15:35 -0500
+	(envelope-from <eblake@redhat.com>) id 1cJPt1-00083m-OW
+	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 14:15:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cJPsr-0007Mk-Jj
-	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 14:15:34 -0500
+	(envelope-from <eblake@redhat.com>) id 1cJPt0-0007RW-7w
+	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 14:15:43 -0500
 From: Eric Blake <eblake@redhat.com>
-Date: Tue, 20 Dec 2016 13:15:20 -0600
-Message-Id: <20161220191523.5779-5-eblake@redhat.com>
+Date: Tue, 20 Dec 2016 13:15:22 -0600
+Message-Id: <20161220191523.5779-7-eblake@redhat.com>
 In-Reply-To: <20161220191523.5779-1-eblake@redhat.com>
 References: <20161220191523.5779-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 4/7] blkdebug: Add pass-through write_zero
- and discard support
+Subject: [Qemu-devel] [PATCH v4 6/7] blkdebug: Add ability to override unmap
+ geometries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,168 +21,203 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:blkdebug" <qemu-block@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, "open list:blkdebug" <qemu-block@nongnu.org>
 
-In order to test the effects of artificial geometry constraints
-on operations like write zero or discard, we first need blkdebug
-to manage these actions.  It also allows us to inject errors on
-those operations, just like we can for read/write/flush.
-
-We can also test the contract promised by the block layer; namely,
-if a device has specified limits on alignment or maximum size,
-then those limits must be obeyed (for now, the blkdebug driver
-merely inherits limits from whatever it is wrapping, but the next
-patch will further enhance it to allow specific limit overrides).
-
-This patch intentionally refuses to service requests smaller than
-the requested alignments; this is because an upcoming patch adds
-a qemu-iotest to prove that the block layer is correctly handling
-fragmentation, but the test only works if there is a way to tell
-the difference at artificial alignment boundaries when blkdebug is
-using a larger-than-default alignment.  If we let the blkdebug
-layer always defer to the underlying layer, which potentially has
-a smaller granularity, the iotest will be thwarted.
-
-Tested by setting up an NBD server with export 'foo', then invoking:
-$ ./qemu-io
-qemu-io> open -o driver=blkdebug blkdebug::nbd://localhost:10809/foo
-qemu-io> d 0 15M
-qemu-io> w -z 0 15M
-
-Pre-patch, the server never sees the discard (it was silently
-eaten by the block layer); post-patch it is passed across the
-wire.  Likewise, pre-patch the write is always passed with
-NBD_WRITE (with 15M of zeroes on the wire), while post-patch
-it can utilize NBD_WRITE_ZEROES (for less traffic).
+Make it easier to simulate various unusual hardware setups (for
+example, recent commits 3482b9b and b8d0a98 affect the Dell
+Equallogic iSCSI with its 15M preferred and maximum unmap and
+write zero sizing, or b2f95fe deals with the Linux loopback
+block device having a max_transfer of 64k), by allowing blkdebug
+to wrap any other device with further restrictions on various
+alignments.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 
 ---
-v4: correct error injection to respect byte range, tweak formatting
-v3: rebase to byte-based read/write, improve docs on why no
-partial write zero passthrough
+v4: relax 512 byte minimum now that blkdebug is byte-based, fix doc typo
+v3: improve legibility of bounds checking, improve docs
 v2: new patch
 ---
- block/blkdebug.c | 86 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 86 insertions(+)
+ qapi/block-core.json | 24 +++++++++++++-
+ block/blkdebug.c     | 91 +++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 113 insertions(+), 2 deletions(-)
+
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 6b42216..6561409 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -2072,6 +2072,26 @@
+ # @align:           #optional required alignment for requests in bytes,
+ #                   must be power of 2, or 0 for default
+ #
++# @max-transfer:    #optional maximum size for I/O transfers in bytes,
++#                   must be multiple of @align (but need not be a power of
++#                   2), or 0 for default (since 2.9)
++#
++# @opt-write-zero:  #optional preferred alignment for write zero requests
++#                   in bytes, must be multiple of @align (but need not be
++#                   a power of 2), or 0 for default (since 2.9)
++#
++# @max-write-zero:  #optional maximum size for write zero requests in bytes,
++#                   must be multiple of @align (but need not be a power of
++#                   2), or 0 for default (since 2.9)
++#
++# @opt-discard:     #optional preferred alignment for discard requests
++#                   in bytes, must be multiple of @align (but need not be
++#                   a power of 2), or 0 for default (since 2.9)
++#
++# @max-discard:     #optional maximum size for discard requests in bytes,
++#                   must be multiple of @align (but need not be a power of
++#                   2), or 0 for default (since 2.9)
++#
+ # @inject-error:    #optional array of error injection descriptions
+ #
+ # @set-state:       #optional array of state-change descriptions
+@@ -2081,7 +2101,9 @@
+ { 'struct': 'BlockdevOptionsBlkdebug',
+   'data': { 'image': 'BlockdevRef',
+             '*config': 'str',
+-            '*align': 'int',
++            '*align': 'int', '*max-transfer': 'int32',
++            '*opt-write-zero': 'int32', '*max-write-zero': 'int32',
++            '*opt-discard': 'int32', '*max-discard': 'int32',
+             '*inject-error': ['BlkdebugInjectErrorOptions'],
+             '*set-state': ['BlkdebugSetStateOptions'] } }
 
 diff --git a/block/blkdebug.c b/block/blkdebug.c
-index 37094a2..b85a291 100644
+index df68d0f..6f9db15 100644
 --- a/block/blkdebug.c
 +++ b/block/blkdebug.c
-@@ -1,6 +1,7 @@
- /*
-  * Block protocol for I/O error injection
-  *
-+ * Copyright (C) 2016 Red Hat, Inc.
-  * Copyright (c) 2010 Kevin Wolf <kwolf@redhat.com>
-  *
-  * Permission is hereby granted, free of charge, to any person obtaining a copy
-@@ -382,6 +383,11 @@ static int blkdebug_open(BlockDriverState *bs, QDict *options, int flags,
-         goto out;
-     }
+@@ -39,6 +39,11 @@ typedef struct BDRVBlkdebugState {
+     int state;
+     int new_state;
+     uint64_t align;
++    uint64_t max_transfer;
++    uint64_t opt_write_zero;
++    uint64_t max_write_zero;
++    uint64_t opt_discard;
++    uint64_t max_discard;
 
-+    bs->supported_write_flags = BDRV_REQ_FUA &
-+        bs->file->bs->supported_write_flags;
-+    bs->supported_zero_flags = (BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP) &
-+        bs->file->bs->supported_zero_flags;
+     /* For blkdebug_refresh_filename() */
+     char *config_file;
+@@ -343,6 +348,31 @@ static QemuOptsList runtime_opts = {
+             .type = QEMU_OPT_SIZE,
+             .help = "Required alignment in bytes",
+         },
++        {
++            .name = "max-transfer",
++            .type = QEMU_OPT_SIZE,
++            .help = "Maximum transfer size in bytes",
++        },
++        {
++            .name = "opt-write-zero",
++            .type = QEMU_OPT_SIZE,
++            .help = "Optimum write zero alignment in bytes",
++        },
++        {
++            .name = "max-write-zero",
++            .type = QEMU_OPT_SIZE,
++            .help = "Maximum write zero size in bytes",
++        },
++        {
++            .name = "opt-discard",
++            .type = QEMU_OPT_SIZE,
++            .help = "Optimum discard alignment in bytes",
++        },
++        {
++            .name = "max-discard",
++            .type = QEMU_OPT_SIZE,
++            .help = "Maximum discard size in bytes",
++        },
+         { /* end of list */ }
+     },
+ };
+@@ -354,6 +384,7 @@ static int blkdebug_open(BlockDriverState *bs, QDict *options, int flags,
+     QemuOpts *opts;
+     Error *local_err = NULL;
+     int ret;
++    uint64_t align;
+
+     opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
+     qemu_opts_absorb_qdict(opts, options, &local_err);
+@@ -387,12 +418,55 @@ static int blkdebug_open(BlockDriverState *bs, QDict *options, int flags,
+     bs->supported_zero_flags = (BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP) &
+         bs->file->bs->supported_zero_flags;
+
+-    /* Set request alignment */
++    /* Set alignment overrides */
+     s->align = qemu_opt_get_size(opts, "align", 0);
+     if (s->align && (s->align >= INT_MAX || !is_power_of_2(s->align))) {
+         error_setg(errp, "Invalid alignment, align must be integer power of 2");
+         goto fail_unref;
+     }
++    align = MAX(s->align, bs->file->bs->bl.request_alignment);
 +
-     /* Set request alignment */
-     align = qemu_opt_get_size(opts, "align", 0);
-     if (align < INT_MAX && is_power_of_2(align)) {
-@@ -511,6 +517,84 @@ static int blkdebug_co_flush(BlockDriverState *bs)
-     return bdrv_co_flush(bs->file->bs);
++    s->max_transfer = qemu_opt_get_size(opts, "max-transfer", 0);
++    if (s->max_transfer &&
++        (s->max_transfer >= INT_MAX ||
++         !QEMU_IS_ALIGNED(s->max_transfer, align))) {
++        error_setg(errp, "Invalid max-transfer, must be multiple of align");
++        goto fail_unref;
++    }
++
++    s->opt_write_zero = qemu_opt_get_size(opts, "opt-write-zero", 0);
++    if (s->opt_write_zero &&
++        (s->opt_write_zero >= INT_MAX ||
++         !QEMU_IS_ALIGNED(s->opt_write_zero, align))) {
++        error_setg(errp, "Invalid opt-write-zero, not consistent with align");
++        goto fail_unref;
++    }
++
++    s->max_write_zero = qemu_opt_get_size(opts, "max-write-zero", 0);
++    if (s->max_write_zero &&
++        (s->max_write_zero >= INT_MAX ||
++         !QEMU_IS_ALIGNED(s->max_write_zero,
++                          MAX(s->opt_write_zero, align)))) {
++        error_setg(errp, "Invalid max-write-zero, not consistent with align");
++        goto fail_unref;
++    }
++
++    s->opt_discard = qemu_opt_get_size(opts, "opt-discard", 0);
++    if (s->opt_discard &&
++        (s->opt_discard >= INT_MAX ||
++         !QEMU_IS_ALIGNED(s->opt_discard, align))) {
++        error_setg(errp, "Invalid opt-discard, not consistent with align");
++        goto fail_unref;
++    }
++
++    s->max_discard = qemu_opt_get_size(opts, "max-discard", 0);
++    if (s->max_discard &&
++        (s->max_discard >= INT_MAX ||
++         !QEMU_IS_ALIGNED(s->max_discard,
++                          MAX(s->opt_discard, align)))) {
++        error_setg(errp, "Invalid max-discard, not consistent with align");
++        goto fail_unref;
++    }
+
+     ret = 0;
+     goto out;
+@@ -819,6 +893,21 @@ static void blkdebug_refresh_limits(BlockDriverState *bs, Error **errp)
+     if (s->align) {
+         bs->bl.request_alignment = s->align;
+     }
++    if (s->max_transfer) {
++        bs->bl.max_transfer = s->max_transfer;
++    }
++    if (s->opt_write_zero) {
++        bs->bl.pwrite_zeroes_alignment = s->opt_write_zero;
++    }
++    if (s->max_write_zero) {
++        bs->bl.max_pwrite_zeroes = s->max_write_zero;
++    }
++    if (s->opt_discard) {
++        bs->bl.pdiscard_alignment = s->opt_discard;
++    }
++    if (s->max_discard) {
++        bs->bl.max_pdiscard = s->max_discard;
++    }
  }
 
-+static int coroutine_fn blkdebug_co_pwrite_zeroes(BlockDriverState *bs,
-+                                                  int64_t offset, int count,
-+                                                  BdrvRequestFlags flags)
-+{
-+    BDRVBlkdebugState *s = bs->opaque;
-+    BlkdebugRule *rule = NULL;
-+    uint32_t align = MAX(bs->bl.request_alignment,
-+                         bs->bl.pwrite_zeroes_alignment);
-+
-+    /* Only pass through requests that are larger than requested
-+     * preferred alignment (so that we test the fallback to writes on
-+     * unaligned portions), and check that the block layer never hands
-+     * us anything crossing an alignment boundary.  */
-+    if (count < align) {
-+        return -ENOTSUP;
-+    }
-+    assert(QEMU_IS_ALIGNED(offset, align));
-+    assert(QEMU_IS_ALIGNED(count, align));
-+    if (bs->bl.max_pwrite_zeroes) {
-+        assert(count <= bs->bl.max_pwrite_zeroes);
-+    }
-+
-+    QSIMPLEQ_FOREACH(rule, &s->active_rules, active_next) {
-+        uint64_t inject_offset = rule->options.inject.offset;
-+
-+        if (inject_offset == -1 ||
-+            (inject_offset >= offset && inject_offset < offset + count))
-+        {
-+            break;
-+        }
-+    }
-+
-+    if (rule && rule->options.inject.error) {
-+        return inject_error(bs, rule);
-+    }
-+
-+    return bdrv_co_pwrite_zeroes(bs->file, offset, count, flags);
-+}
-+
-+static int coroutine_fn blkdebug_co_pdiscard(BlockDriverState *bs,
-+                                             int64_t offset, int count)
-+{
-+    BDRVBlkdebugState *s = bs->opaque;
-+    BlkdebugRule *rule = NULL;
-+    uint32_t align = bs->bl.pdiscard_alignment;
-+
-+    /* Only pass through requests that are larger than requested
-+     * minimum alignment, and ensure that unaligned requests do not
-+     * cross optimum discard boundaries. */
-+    if (count < bs->bl.request_alignment) {
-+        return -ENOTSUP;
-+    }
-+    assert(QEMU_IS_ALIGNED(offset, bs->bl.request_alignment));
-+    assert(QEMU_IS_ALIGNED(count, bs->bl.request_alignment));
-+    if (align && count >= align) {
-+        assert(QEMU_IS_ALIGNED(offset, align));
-+        assert(QEMU_IS_ALIGNED(count, align));
-+    }
-+    if (bs->bl.max_pdiscard) {
-+        assert(count <= bs->bl.max_pdiscard);
-+    }
-+
-+    QSIMPLEQ_FOREACH(rule, &s->active_rules, active_next) {
-+        uint64_t inject_offset = rule->options.inject.offset;
-+
-+        if (inject_offset == -1 ||
-+            (inject_offset >= offset && inject_offset < offset + count))
-+        {
-+            break;
-+        }
-+    }
-+
-+    if (rule && rule->options.inject.error) {
-+        return inject_error(bs, rule);
-+    }
-+
-+    return bdrv_co_pdiscard(bs->file->bs, offset, count);
-+}
-
- static void blkdebug_close(BlockDriverState *bs)
- {
-@@ -763,6 +847,8 @@ static BlockDriver bdrv_blkdebug = {
-     .bdrv_co_preadv         = blkdebug_co_preadv,
-     .bdrv_co_pwritev        = blkdebug_co_pwritev,
-     .bdrv_co_flush_to_disk  = blkdebug_co_flush,
-+    .bdrv_co_pwrite_zeroes  = blkdebug_co_pwrite_zeroes,
-+    .bdrv_co_pdiscard       = blkdebug_co_pdiscard,
-
-     .bdrv_debug_event           = blkdebug_debug_event,
-     .bdrv_debug_breakpoint      = blkdebug_debug_breakpoint,
+ static int blkdebug_reopen_prepare(BDRVReopenState *reopen_state,
 -- 
 2.9.3
