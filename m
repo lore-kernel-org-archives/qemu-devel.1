@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46285)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47912)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1cJI0Z-0001nE-6U
-	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 05:51:00 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cJI4T-0004Eb-7h
+	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 05:55:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1cJI0X-0004qf-LM
-	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 05:50:59 -0500
-Received: from mail-yb0-x244.google.com ([2607:f8b0:4002:c09::244]:35231)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cJI4S-0007BO-1L
+	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 05:55:01 -0500
+Received: from mail-yw0-x241.google.com ([2607:f8b0:4002:c05::241]:33143)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1cJI0X-0004qA-F1
-	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 05:50:57 -0500
-Received: by mail-yb0-x244.google.com with SMTP id d59so1075443ybi.2
-	for <qemu-devel@nongnu.org>; Tue, 20 Dec 2016 02:50:57 -0800 (PST)
+	id 1cJI4R-0007B1-R3
+	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 05:54:59 -0500
+Received: by mail-yw0-x241.google.com with SMTP id s68so10414002ywg.0
+	for <qemu-devel@nongnu.org>; Tue, 20 Dec 2016 02:54:59 -0800 (PST)
 MIME-Version: 1.0
 References: <1482156623-9111-1-git-send-email-peterx@redhat.com>
 	<1482156623-9111-2-git-send-email-peterx@redhat.com>
-In-Reply-To: <1482156623-9111-2-git-send-email-peterx@redhat.com>
+	<CAJ+F1CLyx97pFp=7tsmUeRPAJ03zWsOdZXMGUdiALC5tUBHhoA@mail.gmail.com>
+In-Reply-To: <CAJ+F1CLyx97pFp=7tsmUeRPAJ03zWsOdZXMGUdiALC5tUBHhoA@mail.gmail.com>
 From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 20 Dec 2016 10:50:45 +0000
-Message-ID: <CAJ+F1CLyx97pFp=7tsmUeRPAJ03zWsOdZXMGUdiALC5tUBHhoA@mail.gmail.com>
+Date: Tue, 20 Dec 2016 10:54:48 +0000
+Message-ID: <CAJ+F1CJ44dPH-HrhOdA-h09KNGWW42Ap=Sm7VzTSo_p56eqJow@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [PATCH 1/2] memory: provide common macros for
@@ -36,8 +37,13 @@ Cc: pbonzini@redhat.com
 
 Hi
 
-On Mon, Dec 19, 2016 at 3:11 PM Peter Xu <peterx@redhat.com> wrote:
+On Tue, Dec 20, 2016 at 11:50 AM Marc-Andr=C3=A9 Lureau <
+marcandre.lureau@gmail.com> wrote:
 
+> Hi
+>
+> On Mon, Dec 19, 2016 at 3:11 PM Peter Xu <peterx@redhat.com> wrote:
+>
 > mtree_print_mr() has some common codes. Generalize it.
 >
 > Signed-off-by: Peter Xu <peterx@redhat.com>
@@ -72,10 +78,15 @@ On Mon, Dec 19, 2016 at 3:11 PM Peter Xu <peterx@redhat.com> wrote:
 > -        mon_printf(f, "  ");
 > +        mon_printf(f, MTREE_INDENT);
 >
+>
+> This one is perhaps superfluous
+>
 
-This one is perhaps superfluous
+nevermind, just realized you used it in next patch
 
 
+>
+>
 >      }
 >
 >      if (mr->alias) {
@@ -132,13 +143,16 @@ This one is perhaps superfluous
 >      }
 > --
 >
-
-
-looks good,
-
-
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-
+>
+>
+> looks good,
+>
+>
+> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>
+>
+> --
+> Marc-Andr=C3=A9 Lureau
+>
 --=20
 Marc-Andr=C3=A9 Lureau
