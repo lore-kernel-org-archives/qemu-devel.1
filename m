@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42793)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54094)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cJLcG-0003A9-Lr
-	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 09:42:09 -0500
+	(envelope-from <drjones@redhat.com>) id 1cJMNt-0006ND-EC
+	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 10:31:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cJLcC-0008VA-H5
-	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 09:42:08 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54880)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cJLcC-0008US-8E
-	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 09:42:04 -0500
-References: <1481856403-23599-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<1481856403-23599-3-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <7b040d96-15b8-4102-432f-0fb5c3454d79@redhat.com>
-Date: Tue, 20 Dec 2016 08:42:01 -0600
+	(envelope-from <drjones@redhat.com>) id 1cJMNp-0000uq-Fp
+	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 10:31:21 -0500
+Date: Tue, 20 Dec 2016 16:31:03 +0100
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20161220153103.mkhz74wlkr3dfrxt@kamzik.brq.redhat.com>
+References: <1481625384-15077-1-git-send-email-peter.maydell@linaro.org>
+	<1481625384-15077-2-git-send-email-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <1481856403-23599-3-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="SbA7i5NDl0oGAXknjFfJJR1fCBSGcQshS"
-Subject: Re: [Qemu-devel] [PATCH for-2.9 V4 2/2] Add a new qmp command to do
- checkpoint, get replication error
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1481625384-15077-2-git-send-email-peter.maydell@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH 01/23] target-arm: Log AArch64 exception
+ returns
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,113 +24,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
-Cc: Li Zhijian <lizhijian@cn.fujitsu.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, "eddie . dong" <eddie.dong@intel.com>, Bian Naimeng <biannm@cn.fujitsu.com>, Changlong Xie <xiecl.fnst@cn.fujitsu.com>, Wen Congyang <wencongyang@gmail.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Christoffer Dall <christoffer.dall@linaro.org>, patches@linaro.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---SbA7i5NDl0oGAXknjFfJJR1fCBSGcQshS
-From: Eric Blake <eblake@redhat.com>
-To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>,
- qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
-Cc: Li Zhijian <lizhijian@cn.fujitsu.com>,
- zhanghailiang <zhang.zhanghailiang@huawei.com>,
- "eddie . dong" <eddie.dong@intel.com>, Bian Naimeng <biannm@cn.fujitsu.com>,
- Changlong Xie <xiecl.fnst@cn.fujitsu.com>,
- Wen Congyang <wencongyang@gmail.com>
-Message-ID: <7b040d96-15b8-4102-432f-0fb5c3454d79@redhat.com>
-Subject: Re: [PATCH for-2.9 V4 2/2] Add a new qmp command to do checkpoint,
- get replication error
-References: <1481856403-23599-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
- <1481856403-23599-3-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-In-Reply-To: <1481856403-23599-3-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 12/15/2016 08:46 PM, Zhang Chen wrote:
-> We can call this qmp command to do checkpoint outside of qemu.
-> Like Xen colo need this function.
->=20
-> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-> Signed-off-by: Wen Congyang <wencongyang@gmail.com>
+On Tue, Dec 13, 2016 at 10:36:02AM +0000, Peter Maydell wrote:
+> We already log exception entry; add logging of the AArch64 exception
+> return path as well.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 > ---
->  docs/qmp-commands.txt | 24 ++++++++++++++++++++++++
->  migration/colo.c      | 10 ++++++++++
->  qapi-schema.json      | 22 ++++++++++++++++++++++
->  3 files changed, 56 insertions(+)
->=20
+>  target-arm/op_helper.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+> 
+> diff --git a/target-arm/op_helper.c b/target-arm/op_helper.c
+> index cd94216..ba796d8 100644
+> --- a/target-arm/op_helper.c
+> +++ b/target-arm/op_helper.c
+> @@ -17,6 +17,7 @@
+>   * License along with this library; if not, see <http://www.gnu.org/licenses/>.
+>   */
+>  #include "qemu/osdep.h"
+> +#include "qemu/log.h"
+>  #include "cpu.h"
+>  #include "exec/helper-proto.h"
+>  #include "internals.h"
+> @@ -972,6 +973,9 @@ void HELPER(exception_return)(CPUARMState *env)
+>          } else {
+>              env->regs[15] = env->elr_el[cur_el] & ~0x3;
+>          }
+> +        qemu_log_mask(CPU_LOG_INT, "Exception return from AArch64 EL%d to "
+> +                      "AArch32 EL%d PC 0x%" PRIx32 "\n",
+> +                      cur_el, new_el, env->regs[15]);
+>      } else {
+>          env->aarch64 = 1;
+>          pstate_write(env, spsr);
+> @@ -980,6 +984,9 @@ void HELPER(exception_return)(CPUARMState *env)
+>          }
+>          aarch64_restore_sp(env, new_el);
+>          env->pc = env->elr_el[cur_el];
+> +        qemu_log_mask(CPU_LOG_INT, "Exception return from AArch64 EL%d to "
+> +                      "AArch64 EL%d PC 0x%" PRIx64 "\n",
+> +                      cur_el, new_el, env->pc);
+>      }
+>  
+>      arm_call_el_change_hook(arm_env_get_cpu(env));
+> @@ -1002,6 +1009,8 @@ illegal_return:
+>      if (!arm_singlestep_active(env)) {
+>          env->pstate &= ~PSTATE_SS;
+>      }
+> +    qemu_log_mask(LOG_GUEST_ERROR, "Illegal exception return at EL%d: "
+> +                  "resuming execution at 0x%" PRIx64 "\n", cur_el, env->pc);
+>  }
+>  
+>  /* Return true if the linked breakpoint entry lbn passes its checks */
+> -- 
+> 2.7.4
+> 
+>
 
-> =20
-> +void qmp_xen_get_replication_error(Error **errp)
-> +    {
-> +        replication_get_error_all(errp);
-> +    }
+Should we output both the destination PC (ELR) and the source PC (where
+the eret was)? Otherwise if there are many erets to the same entry point,
+then the logs won't fully enlighten us.
 
-Is this trying to cause a replication error, or is it trying to collect
-status on whether an error has occurred? The name 'get' usually implies
-a query that does not change state, but a query usually needs some way
-to return what was queried back to the user, so a void function with no
-parameters other than error is odd (either the command succeeds because
-there was no error, or the command fails with an error message because
-the query had something to get?).
-
-
-> +++ b/qapi-schema.json
-> @@ -4695,6 +4695,28 @@
->    'data': { 'enable': 'bool', 'primary': 'bool', '*failover' : 'bool' =
-} }
-> =20
->  ##
-> +# @xen-get-replication-error
-> +#
-> +# Get replication error that occurs when the vm is running.
-> +#
-> +# Returns: nothing.
-> +#
-> +# Since: 2.9
-> +##
-> +{ 'command': 'xen-get-replication-error' }
-
-So I don't think this is the right name for its signature, but I don't
-know what you are trying to accomplish with this command to suggest the
-right name.
-
-> +
-> +##
-> +# @xen-do-checkpoint
-> +#
-> +# Do checkpoint.
-> +#
-> +# Returns: nothing.
-> +#
-> +# Since: 2.9
-> +##
-> +{ 'command': 'xen-do-checkpoint' }
-
-This one is probably okay.
-
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---SbA7i5NDl0oGAXknjFfJJR1fCBSGcQshS
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYWUM5AAoJEKeha0olJ0Nqpx0H/1CFRqJXKvdQBHpBV7DcwjjR
-LT2Topm7ESaZtx/OlGWT9HvYuW2uK1mEp11A55ElQDcbPCzqytujNJUoVyymSj9A
-7QEX4lp5tCoUk0ie02B6/utbfnLi14DMk9aMRVXAHTDfu6r2ZgLe5asSawua9l6J
-7lkTWZDgMWklDpTTF0dgP9rrgxTBZLfjMVFllKLy3nYbCl9RKo+uC2M97OjJIDoW
-8uRlAYQjjNdZXK+mj3hxRoSoukUxWkcnj6xy3bqkeqhyjiH/MwEdsA/dtKyMGIWq
-+XyALkg5ogmLsQVt4ALQwtLGkaEUojyyYpBmVsPGQpRS91d/s3r90EuljEThO2A=
-=iqNc
------END PGP SIGNATURE-----
-
---SbA7i5NDl0oGAXknjFfJJR1fCBSGcQshS--
+Thanks,
+drew
