@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41129)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41175)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cJNKa-0001U4-VX
-	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 11:32:07 -0500
+	(envelope-from <famz@redhat.com>) id 1cJNKf-0001gh-Oj
+	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 11:32:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1cJNKW-0007Gz-Bo
-	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 11:32:01 -0500
+	(envelope-from <famz@redhat.com>) id 1cJNKc-0007Jd-UG
+	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 11:32:05 -0500
 From: Fam Zheng <famz@redhat.com>
-Date: Wed, 21 Dec 2016 00:31:36 +0800
-Message-Id: <20161220163139.12016-2-famz@redhat.com>
+Date: Wed, 21 Dec 2016 00:31:38 +0800
+Message-Id: <20161220163139.12016-4-famz@redhat.com>
 In-Reply-To: <20161220163139.12016-1-famz@redhat.com>
 References: <20161220163139.12016-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/4] ramblock-notifier: new
+Subject: [Qemu-devel] [PATCH 3/4] util: Add VFIO helper library
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,319 +22,792 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Karl Rister <krister@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, borntraeger@de.ibm.com, Stefan Hajnoczi <stefanha@redhat.com>
 
-From: Paolo Bonzini <pbonzini@redhat.com>
+This is a simple helper library to be used by VFIO device drivers in
+QEMU, makeing it very easy to interface with /dev/vfio and do DMA
+mappings.
 
-This adds a notify interface of ram block additions and removals.
+Especially, once initialized, this module proactively maps all guest ram
+regions to IO address space (in the host IOMMU context) so that in
+further I/O paths, it's very cheap to look up the list of IOVAs of
+SG buffers that we get from guest driver, without doing any syscall.
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+For bounce buffers that are allocated by QEMU, we do lazy mapping
+transparently when the caller is invoking the same DMA mapping function.
+This is relatively slower but should still be efficient thanks to
+HBitmap.  However, caller is responsible for unmapping bounce buffers
+explicitly.
+
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- exec.c                  |  5 ++++
- include/exec/memory.h   |  6 +----
- include/exec/ram_addr.h | 46 ++-----------------------------
- include/exec/ramlist.h  | 72 +++++++++++++++++++++++++++++++++++++++++++++++++
- numa.c                  | 29 ++++++++++++++++++++
- stubs/Makefile.objs     |  1 +
- stubs/ram.c             | 10 +++++++
- xen-mapcache.c          |  3 +++
- 8 files changed, 123 insertions(+), 49 deletions(-)
- create mode 100644 include/exec/ramlist.h
- create mode 100644 stubs/ram.c
+ include/qemu/vfio-helpers.h |  29 ++
+ util/Makefile.objs          |   1 +
+ util/vfio-helpers.c         | 713 ++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 743 insertions(+)
+ create mode 100644 include/qemu/vfio-helpers.h
+ create mode 100644 util/vfio-helpers.c
 
-diff --git a/exec.c b/exec.c
-index 08c558e..027c301 100644
---- a/exec.c
-+++ b/exec.c
-@@ -1654,6 +1654,7 @@ static void ram_block_add(RAMBlock *new_block, Error **errp)
-         qemu_madvise(new_block->host, new_block->max_length, QEMU_MADV_HUGEPAGE);
-         /* MADV_DONTFORK is also needed by KVM in absence of synchronous MMU */
-         qemu_madvise(new_block->host, new_block->max_length, QEMU_MADV_DONTFORK);
-+        ram_block_notify_add(new_block->host, new_block->max_length);
-     }
- }
- 
-@@ -1784,6 +1785,10 @@ void qemu_ram_free(RAMBlock *block)
-         return;
-     }
- 
-+    if (block->host) {
-+        ram_block_notify_remove(block->host, block->max_length);
+diff --git a/include/qemu/vfio-helpers.h b/include/qemu/vfio-helpers.h
+new file mode 100644
+index 0000000..4096dd8
+--- /dev/null
++++ b/include/qemu/vfio-helpers.h
+@@ -0,0 +1,29 @@
++/*
++ * VFIO helper functions
++ *
++ * Copyright 2016 Red Hat, Inc.
++ *
++ * Authors:
++ *   Fam Zheng <famz@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++
++#ifndef QEMU_VFIO_H
++#define QEMU_VFIO_H
++#include "qemu/queue.h"
++
++typedef struct QEMUVFIOState QEMUVFIOState;
++
++QEMUVFIOState *qemu_vfio_open_pci(const char *device, Error **errp);
++void qemu_vfio_close(QEMUVFIOState *s);
++int qemu_vfio_dma_map(QEMUVFIOState *s, void *host, size_t size,
++                      bool contiguous, uint64_t *iova_list);
++void qemu_vfio_dma_unmap(QEMUVFIOState *s, void *host);
++void *qemu_vfio_pci_map_bar(QEMUVFIOState *s, int index, Error **errp);
++void qemu_vfio_pci_unmap_bar(QEMUVFIOState *s, int index, void *bar);
++int qemu_vfio_pci_init_irq(QEMUVFIOState *s, EventNotifier *e,
++                           int irq_type, Error **errp);
++
++#endif
+diff --git a/util/Makefile.objs b/util/Makefile.objs
+index ad0f9c7..16c714a 100644
+--- a/util/Makefile.objs
++++ b/util/Makefile.objs
+@@ -36,3 +36,4 @@ util-obj-y += log.o
+ util-obj-y += qdist.o
+ util-obj-y += qht.o
+ util-obj-y += range.o
++util-obj-y += vfio-helpers.o
+diff --git a/util/vfio-helpers.c b/util/vfio-helpers.c
+new file mode 100644
+index 0000000..55d35e7
+--- /dev/null
++++ b/util/vfio-helpers.c
+@@ -0,0 +1,713 @@
++/*
++ * VFIO helper functions
++ *
++ * Copyright 2016 Red Hat, Inc.
++ *
++ * Authors:
++ *   Fam Zheng <famz@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include <sys/ioctl.h>
++#include <linux/vfio.h>
++#include "qapi/error.h"
++#include "exec/ramlist.h"
++#include "trace.h"
++#include "qemu/queue.h"
++#include "qemu/vfio-helpers.h"
++#include "qemu/error-report.h"
++#include "standard-headers/linux/pci_regs.h"
++#include "qemu/event_notifier.h"
++#include "qemu/hbitmap.h"
++
++#define VFIO_DEBUG 0
++
++#define DPRINTF(...) \
++    if (VFIO_DEBUG) { \
++        printf(__VA_ARGS__); \
 +    }
 +
-     qemu_mutex_lock_ramlist();
-     QLIST_REMOVE_RCU(block, next);
-     ram_list.mru_block = NULL;
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index 9728a2f..fbc0a8f 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -16,16 +16,12 @@
- 
- #ifndef CONFIG_USER_ONLY
- 
--#define DIRTY_MEMORY_VGA       0
--#define DIRTY_MEMORY_CODE      1
--#define DIRTY_MEMORY_MIGRATION 2
--#define DIRTY_MEMORY_NUM       3        /* num of dirty bits */
--
- #include "exec/cpu-common.h"
- #ifndef CONFIG_USER_ONLY
- #include "exec/hwaddr.h"
- #endif
- #include "exec/memattrs.h"
-+#include "exec/ramlist.h"
- #include "qemu/queue.h"
- #include "qemu/int128.h"
- #include "qemu/notify.h"
-diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
-index 54d7108..3e79466 100644
---- a/include/exec/ram_addr.h
-+++ b/include/exec/ram_addr.h
-@@ -21,6 +21,7 @@
- 
- #ifndef CONFIG_USER_ONLY
- #include "hw/xen/xen.h"
-+#include "exec/ramlist.h"
- 
- struct RAMBlock {
-     struct rcu_head rcu;
-@@ -35,6 +36,7 @@ struct RAMBlock {
-     char idstr[256];
-     /* RCU-enabled, writes protected by the ramlist lock */
-     QLIST_ENTRY(RAMBlock) next;
-+    QLIST_HEAD(, RAMBlockNotifier) ramblock_notifiers;
-     int fd;
-     size_t page_size;
- };
-@@ -50,51 +52,7 @@ static inline void *ramblock_ptr(RAMBlock *block, ram_addr_t offset)
-     return (char *)block->host + offset;
- }
- 
--/* The dirty memory bitmap is split into fixed-size blocks to allow growth
-- * under RCU.  The bitmap for a block can be accessed as follows:
-- *
-- *   rcu_read_lock();
-- *
-- *   DirtyMemoryBlocks *blocks =
-- *       atomic_rcu_read(&ram_list.dirty_memory[DIRTY_MEMORY_MIGRATION]);
-- *
-- *   ram_addr_t idx = (addr >> TARGET_PAGE_BITS) / DIRTY_MEMORY_BLOCK_SIZE;
-- *   unsigned long *block = blocks.blocks[idx];
-- *   ...access block bitmap...
-- *
-- *   rcu_read_unlock();
-- *
-- * Remember to check for the end of the block when accessing a range of
-- * addresses.  Move on to the next block if you reach the end.
-- *
-- * Organization into blocks allows dirty memory to grow (but not shrink) under
-- * RCU.  When adding new RAMBlocks requires the dirty memory to grow, a new
-- * DirtyMemoryBlocks array is allocated with pointers to existing blocks kept
-- * the same.  Other threads can safely access existing blocks while dirty
-- * memory is being grown.  When no threads are using the old DirtyMemoryBlocks
-- * anymore it is freed by RCU (but the underlying blocks stay because they are
-- * pointed to from the new DirtyMemoryBlocks).
-- */
--#define DIRTY_MEMORY_BLOCK_SIZE ((ram_addr_t)256 * 1024 * 8)
--typedef struct {
--    struct rcu_head rcu;
--    unsigned long *blocks[];
--} DirtyMemoryBlocks;
--
--typedef struct RAMList {
--    QemuMutex mutex;
--    RAMBlock *mru_block;
--    /* RCU-enabled, writes protected by the ramlist lock. */
--    QLIST_HEAD(, RAMBlock) blocks;
--    DirtyMemoryBlocks *dirty_memory[DIRTY_MEMORY_NUM];
--    uint32_t version;
--} RAMList;
--extern RAMList ram_list;
--
- ram_addr_t last_ram_offset(void);
--void qemu_mutex_lock_ramlist(void);
--void qemu_mutex_unlock_ramlist(void);
--
- RAMBlock *qemu_ram_alloc_from_file(ram_addr_t size, MemoryRegion *mr,
-                                    bool share, const char *mem_path,
-                                    Error **errp);
-diff --git a/include/exec/ramlist.h b/include/exec/ramlist.h
-new file mode 100644
-index 0000000..c59880d
---- /dev/null
-+++ b/include/exec/ramlist.h
-@@ -0,0 +1,72 @@
-+#ifndef RAMLIST_H
-+#define RAMLIST_H
++/* XXX: Once VFIO exposes the iova bit width in the IOMMU capability interface,
++ * we can use a runtime limit. It's also possible to do platform specific
++ * detection by reading sysfs entries. Until then, 39 is a safe bet. */
++#define QEMU_VFIO_IOVA_MAX (1ULL << 39)
 +
-+#include "qemu/queue.h"
-+#include "qemu/thread.h"
-+#include "qemu/rcu.h"
++/* DMA address space is managed in chunks. */
++#define QEMU_VFIO_CHUNK_SIZE (2ULL << 20)
 +
-+typedef struct RAMBlockNotifier RAMBlockNotifier;
++#define QEMU_VFIO_ALLOC_BITMAP_SIZE (QEMU_VFIO_IOVA_MAX / QEMU_VFIO_CHUNK_SIZE)
 +
-+#define DIRTY_MEMORY_VGA       0
-+#define DIRTY_MEMORY_CODE      1
-+#define DIRTY_MEMORY_MIGRATION 2
-+#define DIRTY_MEMORY_NUM       3        /* num of dirty bits */
++typedef struct IOVARange {
++    uint64_t iova;
++    uint64_t nr_pages;
++    QSIMPLEQ_ENTRY(IOVARange) next;
++} IOVARange;
 +
-+/* The dirty memory bitmap is split into fixed-size blocks to allow growth
-+ * under RCU.  The bitmap for a block can be accessed as follows:
-+ *
-+ *   rcu_read_lock();
-+ *
-+ *   DirtyMemoryBlocks *blocks =
-+ *       atomic_rcu_read(&ram_list.dirty_memory[DIRTY_MEMORY_MIGRATION]);
-+ *
-+ *   ram_addr_t idx = (addr >> TARGET_PAGE_BITS) / DIRTY_MEMORY_BLOCK_SIZE;
-+ *   unsigned long *block = blocks.blocks[idx];
-+ *   ...access block bitmap...
-+ *
-+ *   rcu_read_unlock();
-+ *
-+ * Remember to check for the end of the block when accessing a range of
-+ * addresses.  Move on to the next block if you reach the end.
-+ *
-+ * Organization into blocks allows dirty memory to grow (but not shrink) under
-+ * RCU.  When adding new RAMBlocks requires the dirty memory to grow, a new
-+ * DirtyMemoryBlocks array is allocated with pointers to existing blocks kept
-+ * the same.  Other threads can safely access existing blocks while dirty
-+ * memory is being grown.  When no threads are using the old DirtyMemoryBlocks
-+ * anymore it is freed by RCU (but the underlying blocks stay because they are
-+ * pointed to from the new DirtyMemoryBlocks).
-+ */
-+#define DIRTY_MEMORY_BLOCK_SIZE ((ram_addr_t)256 * 1024 * 8)
 +typedef struct {
-+    struct rcu_head rcu;
-+    unsigned long *blocks[];
-+} DirtyMemoryBlocks;
++    /* Page aligned. */
++    void *host;
++    size_t size;
++    /* The IOVA range list to which the [host, host + size) area is mapped. */
++    QSIMPLEQ_HEAD(, IOVARange) iova_list;
++} IOVAMapping;
 +
-+typedef struct RAMList {
-+    QemuMutex mutex;
-+    RAMBlock *mru_block;
-+    /* RCU-enabled, writes protected by the ramlist lock. */
-+    QLIST_HEAD(, RAMBlock) blocks;
-+    DirtyMemoryBlocks *dirty_memory[DIRTY_MEMORY_NUM];
-+    uint32_t version;
-+    QLIST_HEAD(, RAMBlockNotifier) ramblock_notifiers;
-+} RAMList;
-+extern RAMList ram_list;
++struct QEMUVFIOState {
++    int container;
++    int group;
++    int device;
++    RAMBlockNotifier ram_notifier;
++    struct vfio_region_info config_region_info, bar_region_info[6];
 +
-+void qemu_mutex_lock_ramlist(void);
-+void qemu_mutex_unlock_ramlist(void);
-+
-+struct RAMBlockNotifier {
-+    void (*ram_block_added)(RAMBlockNotifier *n, void *host, size_t size);
-+    void (*ram_block_removed)(RAMBlockNotifier *n, void *host, size_t size);
-+    QLIST_ENTRY(RAMBlockNotifier) next;
++    /* Allocation bitmap of IOVA address space, each bit represents
++     * QEMU_VFIO_CHUNK_SIZE bytes. Set bits mean free, unset for used/reserved.
++     **/
++    HBitmap *free_chunks;
++    IOVAMapping *mappings;
++    int nr_mappings;
 +};
 +
-+void ram_block_notifier_add(RAMBlockNotifier *n);
-+void ram_block_notifier_remove(RAMBlockNotifier *n);
-+void ram_block_notify_add(void *host, size_t size);
-+void ram_block_notify_remove(void *host, size_t size);
-+
-+
-+#endif /* RAMLIST_H */
-diff --git a/numa.c b/numa.c
-index 9c09e45..81f29f4 100644
---- a/numa.c
-+++ b/numa.c
-@@ -25,6 +25,7 @@
- #include "qemu/osdep.h"
- #include "sysemu/numa.h"
- #include "exec/cpu-common.h"
-+#include "exec/ramlist.h"
- #include "qemu/bitmap.h"
- #include "qom/cpu.h"
- #include "qemu/error-report.h"
-@@ -562,3 +563,31 @@ int numa_get_node_for_cpu(int idx)
-     }
-     return i;
- }
-+
-+void ram_block_notifier_add(RAMBlockNotifier *n)
++static int sysfs_find_group_file(const char *device, char **path, Error **errp)
 +{
-+    QLIST_INSERT_HEAD(&ram_list.ramblock_notifiers, n, next);
++    int ret;
++    char *sysfs_link = NULL;
++    char *sysfs_group = NULL;
++    char *p;
++
++    sysfs_link = g_strdup_printf("/sys/bus/pci/devices/%s/iommu_group",
++                                 device);
++    sysfs_group = g_malloc(PATH_MAX);
++    ret = readlink(sysfs_link, sysfs_group, PATH_MAX - 1);
++    if (ret == -1) {
++        error_setg_errno(errp, errno, "Failed to find iommu group sysfs path");
++        ret = -errno;
++        goto out;
++    }
++    ret = 0;
++    p = strrchr(sysfs_group, '/');
++    if (!p) {
++        error_setg(errp, "Failed to find iommu group number");
++        ret = -errno;
++        goto out;
++    }
++
++    *path = g_strdup_printf("/dev/vfio/%s", p + 1);
++out:
++    g_free(sysfs_link);
++    g_free(sysfs_group);
++    return ret;
 +}
 +
-+void ram_block_notifier_remove(RAMBlockNotifier *n)
++static int qemu_vfio_pci_init_bar(QEMUVFIOState *s, unsigned int index,
++                                  Error **errp)
 +{
-+    QLIST_REMOVE(n, next);
++    assert(index < ARRAY_SIZE(s->bar_region_info));
++    s->bar_region_info[index] = (struct vfio_region_info) {
++        .index = VFIO_PCI_BAR0_REGION_INDEX + index,
++        .argsz = sizeof(struct vfio_region_info),
++    };
++    if (ioctl(s->device, VFIO_DEVICE_GET_REGION_INFO, &s->bar_region_info[index])) {
++        error_setg_errno(errp, errno, "Failed to get BAR region info");
++        return -errno;
++    }
++
++    return 0;
 +}
 +
-+void ram_block_notify_add(void *host, size_t size)
++/**
++ * Map a PCI bar area.
++ */
++void *qemu_vfio_pci_map_bar(QEMUVFIOState *s, int index, Error **errp)
 +{
-+    RAMBlockNotifier *notifier;
++    void *p;
++    assert(index >= 0 && index < 6);
++    p = mmap(NULL, MIN(8192, s->bar_region_info[index].size),
++             PROT_READ | PROT_WRITE, MAP_SHARED,
++             s->device, s->bar_region_info[index].offset);
++    if (p == MAP_FAILED) {
++        error_setg_errno(errp, errno, "Failed to map BAR region");
++        p = NULL;
++    }
++    return p;
++}
 +
-+    QLIST_FOREACH(notifier, &ram_list.ramblock_notifiers, next) {
-+        notifier->ram_block_added(notifier, host, size);
++/**
++ * Unmap a PCI bar area.
++ */
++void qemu_vfio_pci_unmap_bar(QEMUVFIOState *s, int index, void *bar)
++{
++    if (bar) {
++        munmap(bar, MIN(8192, s->bar_region_info[index].size));
 +    }
 +}
 +
-+void ram_block_notify_remove(void *host, size_t size)
++/**
++ * Initialize device IRQ with @irq_type and and register an event notifier.
++ */
++int qemu_vfio_pci_init_irq(QEMUVFIOState *s, EventNotifier *e,
++                           int irq_type, Error **errp)
 +{
-+    RAMBlockNotifier *notifier;
++    int r;
++    struct vfio_irq_set *irq_set;
++    size_t irq_set_size;
++    struct vfio_irq_info irq_info = { .argsz = sizeof(irq_info) };
 +
-+    QLIST_FOREACH(notifier, &ram_list.ramblock_notifiers, next) {
-+        notifier->ram_block_removed(notifier, host, size);
++    irq_info.index = irq_type;
++    if (ioctl(s->device, VFIO_DEVICE_GET_IRQ_INFO, &irq_info)) {
++        error_setg_errno(errp, errno, "Failed to get device interrupt info");
++        return -errno;
++    }
++    if (!(irq_info.flags & VFIO_IRQ_INFO_EVENTFD)) {
++        error_setg(errp, "Device interrupt doesn't support eventfd");
++        return -EINVAL;
++    }
++
++    irq_set_size = sizeof(*irq_set) + sizeof(int);
++    irq_set = g_malloc0(irq_set_size);
++
++    /* Get to a known IRQ state */
++    *irq_set = (struct vfio_irq_set) {
++        .argsz = irq_set_size,
++        .flags = VFIO_IRQ_SET_DATA_EVENTFD | VFIO_IRQ_SET_ACTION_TRIGGER,
++        .index = irq_info.index,
++        .start = 0,
++        .count = 1,
++    };
++
++    *(int *)&irq_set->data = event_notifier_get_fd(e);
++    r = ioctl(s->device, VFIO_DEVICE_SET_IRQS, irq_set);
++    g_free(irq_set);
++    if (r) {
++        error_setg_errno(errp, errno, "Failed to setup device interrupt");
++        return -errno;
++    }
++    return 0;
++}
++
++static int qemu_vfio_pci_read_config(QEMUVFIOState *s, void *buf, int size, int ofs)
++{
++    if (pread(s->device, buf, size, s->config_region_info.offset + ofs) == size) {
++        return 0;
++    }
++    return -1;
++}
++
++static int qemu_vfio_pci_write_config(QEMUVFIOState *s, void *buf, int size, int ofs)
++{
++    if (pwrite(s->device, buf, size,
++               s->config_region_info.offset + ofs) == size) {
++        return 0;
++    }
++
++    return -1;
++}
++
++static int qemu_vfio_init_pci(QEMUVFIOState *s, const char *device,
++                              Error **errp)
++{
++    int ret;
++    int i;
++    uint16_t pci_cmd;
++    struct vfio_group_status group_status =
++    { .argsz = sizeof(group_status) };
++    struct vfio_iommu_type1_info iommu_info = { .argsz = sizeof(iommu_info) };
++    struct vfio_device_info device_info = { .argsz = sizeof(device_info) };
++    char *group_file = NULL;
++
++    /* Create a new container */
++    s->container = open("/dev/vfio/vfio", O_RDWR);
++
++    if (ioctl(s->container, VFIO_GET_API_VERSION) != VFIO_API_VERSION) {
++        error_setg(errp, "Invalid VFIO version");
++        ret = -EINVAL;
++        goto out;
++    }
++
++    if (!ioctl(s->container, VFIO_CHECK_EXTENSION, VFIO_TYPE1_IOMMU)) {
++        error_setg_errno(errp, errno, "VFIO IOMMU check failed");
++        ret = -EINVAL;
++        goto out;
++    }
++
++    /* Open the group */
++    ret = sysfs_find_group_file(device, &group_file, errp);
++    if (ret) {
++        goto out;
++    }
++
++    s->group = open(group_file, O_RDWR);
++    g_free(group_file);
++    if (s->group <= 0) {
++        error_setg_errno(errp, errno, "Failed to open VFIO group file");
++        ret = -errno;
++        goto out;
++    }
++
++    /* Test the group is viable and available */
++    if (ioctl(s->group, VFIO_GROUP_GET_STATUS, &group_status)) {
++        error_setg_errno(errp, errno, "Failed to get VFIO group status");
++        ret = -errno;
++        goto out;
++    }
++
++    if (!(group_status.flags & VFIO_GROUP_FLAGS_VIABLE)) {
++        error_setg(errp, "VFIO group is not viable");
++        ret = -EINVAL;
++        goto out;
++    }
++
++    /* Add the group to the container */
++    if (ioctl(s->group, VFIO_GROUP_SET_CONTAINER, &s->container)) {
++        error_setg_errno(errp, errno, "Failed to add group to VFIO container");
++        ret = -errno;
++        goto out;
++    }
++
++    /* Enable the IOMMU model we want */
++    if (ioctl(s->container, VFIO_SET_IOMMU, VFIO_TYPE1_IOMMU)) {
++        error_setg_errno(errp, errno, "Failed to set VFIO IOMMU type");
++        ret = -errno;
++        goto out;
++    }
++
++    /* Get additional IOMMU info */
++    if (ioctl(s->container, VFIO_IOMMU_GET_INFO, &iommu_info)) {
++        error_setg_errno(errp, errno, "Failed to get IOMMU info");
++        ret = -errno;
++        goto out;
++    }
++
++    s->device = ioctl(s->group, VFIO_GROUP_GET_DEVICE_FD, device);
++
++    if (s->device < 0) {
++        error_setg_errno(errp, errno, "Failed to get device fd");
++        ret = -errno;
++        goto out;
++    }
++
++    /* Test and setup the device */
++    if (ioctl(s->device, VFIO_DEVICE_GET_INFO, &device_info)) {
++        error_setg_errno(errp, errno, "Failed to get device info");
++        ret = -errno;
++        goto out;
++    }
++
++    if (device_info.num_regions < VFIO_PCI_CONFIG_REGION_INDEX) {
++        error_setg(errp, "Invalid device regions");
++        ret = -EINVAL;
++        goto out;
++    }
++
++    s->config_region_info = (struct vfio_region_info) {
++        .index = VFIO_PCI_CONFIG_REGION_INDEX,
++        .argsz = sizeof(struct vfio_region_info),
++    };
++    if (ioctl(s->device, VFIO_DEVICE_GET_REGION_INFO, &s->config_region_info)) {
++        error_setg_errno(errp, errno, "Failed to get config region info");
++        ret = -errno;
++        goto out;
++    }
++
++    for (i = 0; i < 6; i++) {
++        ret = qemu_vfio_pci_init_bar(s, i, errp);
++        if (ret) {
++            goto out;
++        }
++    }
++
++    /* Enable bus master */
++    if (qemu_vfio_pci_read_config(s, &pci_cmd, sizeof(pci_cmd),
++                                  PCI_COMMAND) < 0) {
++        goto out;
++    }
++    pci_cmd |= PCI_COMMAND_MASTER;
++    if (qemu_vfio_pci_write_config(s, &pci_cmd, sizeof(pci_cmd),
++                                   PCI_COMMAND) < 0) {
++        goto out;
++    }
++out:
++    return ret;
++}
++
++static void qemu_vfio_ram_block_added(RAMBlockNotifier *n, void *host, size_t size)
++{
++    QEMUVFIOState *s = container_of(n, QEMUVFIOState, ram_notifier);
++    /* XXX: handle existing ram regions? */
++    DPRINTF("ram block added %p %lx\n", host, size);
++    qemu_vfio_dma_map(s, host, size, true, NULL);
++}
++
++static void qemu_vfio_ram_block_removed(RAMBlockNotifier *n, void *host, size_t size)
++{
++    QEMUVFIOState *s = container_of(n, QEMUVFIOState, ram_notifier);
++    if (host) {
++        DPRINTF("ram block removed %p %lx\n", host, size);
++        qemu_vfio_dma_unmap(s, host);
 +    }
 +}
-diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-index 2b5bb74..1829c7f 100644
---- a/stubs/Makefile.objs
-+++ b/stubs/Makefile.objs
-@@ -27,6 +27,7 @@ stub-obj-y += mon-is-qmp.o
- stub-obj-y += monitor-init.o
- stub-obj-y += notify-event.o
- stub-obj-y += qtest.o
-+stub-obj-y += ram.o
- stub-obj-y += replay.o
- stub-obj-y += replay-user.o
- stub-obj-y += reset.o
-diff --git a/stubs/ram.c b/stubs/ram.c
-new file mode 100644
-index 0000000..ea5d528
---- /dev/null
-+++ b/stubs/ram.c
-@@ -0,0 +1,10 @@
-+#include "qemu/osdep.h"
-+#include "exec/ramlist.h"
 +
-+void ram_block_notifier_add(RAMBlockNotifier *n)
++/**
++ * Open a PCI device, e.g. "0000:00:01.0".
++ */
++QEMUVFIOState *qemu_vfio_open_pci(const char *device, Error **errp)
 +{
++    int r;
++    QEMUVFIOState *s = g_new0(QEMUVFIOState, 1);
++
++    r = qemu_vfio_init_pci(s, device, errp);
++    if (r) {
++        g_free(s);
++        return NULL;
++    }
++
++    s->ram_notifier.ram_block_added = qemu_vfio_ram_block_added;
++    s->ram_notifier.ram_block_removed = qemu_vfio_ram_block_removed;
++    ram_block_notifier_add(&s->ram_notifier);
++    s->free_chunks = hbitmap_alloc(QEMU_VFIO_ALLOC_BITMAP_SIZE, 0);
++    hbitmap_set(s->free_chunks, 1, QEMU_VFIO_ALLOC_BITMAP_SIZE - 1);
++
++    return s;
 +}
 +
-+void ram_block_notifier_remove(RAMBlockNotifier *n)
++static void qemu_vfio_dump_mapping(IOVAMapping *m)
 +{
++    DPRINTF("  vfio mapping %p %lx\n", m->host, m->size);
++    IOVARange *r;
++
++    QSIMPLEQ_FOREACH(r, &m->iova_list, next) {
++        DPRINTF("   IOVA %lx len %lx\n", r->iova, r->nr_pages * getpagesize());
++    }
 +}
-diff --git a/xen-mapcache.c b/xen-mapcache.c
-index 8f3a592..dc9b321 100644
---- a/xen-mapcache.c
-+++ b/xen-mapcache.c
-@@ -163,6 +163,7 @@ static void xen_remap_bucket(MapCacheEntry *entry,
-     err = g_malloc0(nb_pfn * sizeof (int));
- 
-     if (entry->vaddr_base != NULL) {
-+        ram_block_removed(entry->vaddr_base, entry->size);
-         if (munmap(entry->vaddr_base, entry->size) != 0) {
-             perror("unmap fails");
-             exit(-1);
-@@ -188,6 +189,7 @@ static void xen_remap_bucket(MapCacheEntry *entry,
-     entry->valid_mapping = (unsigned long *) g_malloc0(sizeof(unsigned long) *
-             BITS_TO_LONGS(size >> XC_PAGE_SHIFT));
- 
-+    ram_block_added(entry->vaddr_base, entry->size);
-     bitmap_zero(entry->valid_mapping, nb_pfn);
-     for (i = 0; i < nb_pfn; i++) {
-         if (!err[i]) {
-@@ -397,6 +399,7 @@ static void xen_invalidate_map_cache_entry_unlocked(uint8_t *buffer)
-     }
- 
-     pentry->next = entry->next;
-+    ram_block_removed(entry->vaddr_base, entry->size);
-     if (munmap(entry->vaddr_base, entry->size) != 0) {
-         perror("unmap fails");
-         exit(-1);
++
++static void qemu_vfio_dump_mappings(QEMUVFIOState *s)
++{
++    int i;
++    DPRINTF("vfio mappings\n");
++    for (i = 0; i < s->nr_mappings; ++i) {
++        qemu_vfio_dump_mapping(&s->mappings[i]);
++    }
++}
++
++/**
++ * Find the mapping entry that contains [host, host + size) and set @index to
++ * the position. If no entry contains it, @index is the position _after_ which
++ * to insert the new mapping. IOW, it is the index of the largest element that
++ * is smaller than @host, or -1 if no entry is. */
++static IOVAMapping *qemu_vfio_find_mapping(QEMUVFIOState *s,
++                                           void *host, size_t size,
++                                           int *index)
++{
++    IOVAMapping *p = s->mappings;
++    IOVAMapping *q = p ? p + s->nr_mappings - 1 : NULL;
++    IOVAMapping *mid = p ? p + (q - p) / 2 : NULL;
++    DPRINTF("qemu vfio find mapping %p %lx... ", host, size);
++    if (!p) {
++        *index = -1;
++        return NULL;
++    }
++    while (true) {
++        mid = p + (q - p) / 2;
++        if (mid == p) {
++            break;
++        }
++        if (mid->host > host) {
++            q = mid;
++        } else if (mid->host < host) {
++            p = mid;
++        } else {
++            break;
++        }
++    }
++    if (mid->host > host) {
++        mid--;
++    } else if (mid < &s->mappings[s->nr_mappings - 1]
++               && (mid + 1)->host <= host) {
++        mid++;
++    }
++    *index = mid - &s->mappings[0];
++    if (mid >= &s->mappings[0] &&
++        mid->host <= host && mid->host + mid->size > host) {
++        assert(mid < &s->mappings[s->nr_mappings]);
++        assert(mid->host + mid->size >= host + size);
++        DPRINTF("found, index %d\n", *index);
++        return mid;
++    }
++    DPRINTF("not found, index %d\n", *index);
++    return NULL;
++}
++
++/**
++ * Allocate IOVA and and create a new mapping record and insert it in @s. If
++ * contiguous is true, the mapped IOVA must be contiguous, otherwise
++ * segmentation is allowed to make the allocation more likely to succeed.
++ */
++static IOVAMapping *qemu_vfio_new_mapping(QEMUVFIOState *s,
++                                          void *host, size_t size,
++                                          int index,
++                                          bool contiguous)
++{
++    int i;
++    int shift;
++    const size_t pages_per_chunk = QEMU_VFIO_CHUNK_SIZE / getpagesize();
++    size_t pages = DIV_ROUND_UP(size, getpagesize());
++    size_t chunks = DIV_ROUND_UP(pages, pages_per_chunk);
++    int64_t next;
++    IOVAMapping m = {.host = host, .size = size};
++    IOVAMapping *insert;
++    HBitmapIter iter;
++    IOVARange *r;
++
++    if (DIV_ROUND_UP(pages, pages_per_chunk) > hbitmap_count(s->free_chunks)) {
++        return NULL;
++    }
++    QSIMPLEQ_INIT(&m.iova_list);
++
++    r = NULL;
++    hbitmap_iter_init(&iter, s->free_chunks, 1);
++    if (contiguous) {
++        while (true) {
++            bool satisfy = true;
++            next = hbitmap_iter_next(&iter);
++            if (next < 0) {
++                return NULL;
++            }
++            for (i = 1; i < chunks; i++) {
++                if (!hbitmap_get(s->free_chunks, next + i)) {
++                    satisfy = false;
++                    break;
++                }
++            }
++            if (satisfy) {
++                break;
++            }
++        }
++        hbitmap_reset(s->free_chunks, next, chunks);
++        r = g_new(IOVARange, 1);
++        r->iova = next * pages_per_chunk * getpagesize();
++        r->nr_pages = pages;
++        QSIMPLEQ_INSERT_TAIL(&m.iova_list, r, next);
++    } else {
++        next = hbitmap_iter_next(&iter);
++        while (pages) {
++            uint64_t chunk;
++            if (next < 0) {
++                hbitmap_iter_init(&iter, s->free_chunks, 1);
++                next = hbitmap_iter_next(&iter);
++            }
++            assert(next >= 0);
++            chunk = next;
++            DPRINTF("using chunk %ld\n", chunk);
++            next = hbitmap_iter_next(&iter);
++            hbitmap_reset(s->free_chunks, chunk, 1);
++            if (r && r->iova + r->nr_pages == chunk * pages_per_chunk) {
++                r->nr_pages += MIN(pages, pages_per_chunk);
++            } else {
++                r = g_new(IOVARange, 1);
++                r->iova = chunk * pages_per_chunk * getpagesize();
++                r->nr_pages = MIN(pages, pages_per_chunk);
++                QSIMPLEQ_INSERT_TAIL(&m.iova_list, r, next);
++            }
++            pages -= MIN(pages, pages_per_chunk);
++        }
++    }
++
++    assert(index >= 0);
++    s->nr_mappings++;
++    s->mappings = g_realloc_n(s->mappings, sizeof(s->mappings[0]),
++                              s->nr_mappings);
++    insert = &s->mappings[index];
++    shift = s->nr_mappings - index - 1;
++    DPRINTF("inserting to %d shift %d\n", index, shift);
++    if (shift) {
++        memmove(insert + 1, insert, shift * sizeof(s->mappings[0]));
++    }
++    *insert = m;
++    return insert;
++}
++
++/* Remove the mapping record from @s and undo the IOVA mapping with VFIO. */
++static void qemu_vfio_free_mapping(QEMUVFIOState *s, IOVAMapping *mapping,
++                                   bool can_fail)
++{
++    IOVARange *r, *tmp;
++
++    QSIMPLEQ_FOREACH_SAFE(r, &mapping->iova_list, next, tmp) {
++        size_t size = r->nr_pages * getpagesize();
++        struct vfio_iommu_type1_dma_unmap unmap = {
++            .argsz = sizeof(unmap),
++            .flags = 0,
++            .iova = r->iova,
++            .size = size,
++        };
++        if (ioctl(s->container, VFIO_IOMMU_UNMAP_DMA, &unmap)) {
++            if (!can_fail) {
++                error_report("VFIO_UNMAP_DMA: %d", -errno);
++            }
++        }
++        hbitmap_set(s->free_chunks, r->iova / QEMU_VFIO_CHUNK_SIZE,
++                    DIV_ROUND_UP(size, QEMU_VFIO_CHUNK_SIZE));
++        g_free(r);
++    }
++}
++
++/* Do the DMA mapping with VFIO. */
++static int qemu_vfio_do_mapping(QEMUVFIOState *s, IOVAMapping *mapping)
++{
++    IOVARange *r;
++    uint8_t *p = mapping->host;
++
++    QSIMPLEQ_FOREACH(r, &mapping->iova_list, next) {
++        struct vfio_iommu_type1_dma_map dma_map = {
++            .argsz = sizeof(dma_map),
++            .flags = VFIO_DMA_MAP_FLAG_READ | VFIO_DMA_MAP_FLAG_WRITE,
++            .iova = r->iova,
++            .vaddr = (uintptr_t)p,
++            .size = r->nr_pages * getpagesize(),
++        };
++        DPRINTF("vfio map %p pages %ld to %lx\n", p, r->nr_pages, r->iova);
++
++        if (ioctl(s->container, VFIO_IOMMU_MAP_DMA, &dma_map)) {
++            error_report("VFIO_MAP_DMA: %d", -errno);
++            return -errno;
++        }
++        p += r->nr_pages * getpagesize();
++    }
++    return 0;
++}
++
++/* Check if the mapping list is (ascending) ordered. */
++static bool qemu_vfio_verify_mappings(QEMUVFIOState *s)
++{
++    int i;
++    for (i = 0; i < s->nr_mappings - 1; ++i) {
++        if (!(s->mappings[i].host < s->mappings[i + 1].host)) {
++            fprintf(stderr, "item %d not sorted!\n", i);
++            qemu_vfio_dump_mappings(s);
++            return false;
++        }
++        if (!(s->mappings[i].host + s->mappings[i].size <=
++              s->mappings[i + 1].host)) {
++            fprintf(stderr, "item %d overlap with next!\n", i);
++            qemu_vfio_dump_mappings(s);
++            return false;
++        }
++    }
++    return true;
++}
++
++/* Map [host, host + size) area, and optionally store the IOVA in iova_list
++ * buffer. The area must be aligned to page size, and mustn't overlap or cross
++ * boundary of existing mappings.
++ *
++ * If the area is already mapped, this function can be used to retrieve the
++ * IOVA by passing non-NULL iova_list: for contiguous=true, only one entry is
++ * stored to @iova_list; otherwise, up to (size / page_size) entries will be
++ * written. The caller must ensure the passed buffer is big enough.
++ *
++ * If the area is not mapped, this will try to allocate a sequence of free
++ * IOVAs (contiguous can be enforced by passing true), and report them to
++ * iova_list.
++ */
++int qemu_vfio_dma_map(QEMUVFIOState *s, void *host, size_t size,
++                      bool contiguous, uint64_t *iova_list)
++{
++    int ret;
++    int index;
++    IOVAMapping *mapping;
++
++    DPRINTF("vfio dma map %p %lx contiguous %d\n", host, size, contiguous);
++    assert(QEMU_PTR_IS_ALIGNED(host, getpagesize()));
++    assert(QEMU_IS_ALIGNED(size, getpagesize()));
++    mapping = qemu_vfio_find_mapping(s, host, size, &index);
++    if (!mapping) {
++        mapping = qemu_vfio_new_mapping(s, host, size, index + 1, contiguous);
++        if (!mapping) {
++            return -ENOMEM;
++        }
++        assert(qemu_vfio_verify_mappings(s));
++        ret = qemu_vfio_do_mapping(s, mapping);
++        if (ret) {
++            qemu_vfio_free_mapping(s, mapping, true);
++            return ret;
++        }
++        qemu_vfio_dump_mappings(s);
++    } else {
++        /* XXX: check contiguous for existing mapping? */
++    }
++    if (!mapping) {
++        return -ENOMEM;
++    }
++    if (iova_list) {
++        uint64_t *p = iova_list;
++        uint64_t skip_pages = (host - mapping->host) / getpagesize();
++        IOVARange *r;
++        for (r = QSIMPLEQ_FIRST(&mapping->iova_list);
++             skip_pages > r->nr_pages;
++             r = QSIMPLEQ_NEXT(r, next)) {
++            skip_pages -= r->nr_pages;
++        }
++        while (size) {
++            uint64_t i;
++            assert(r);
++            for (i = skip_pages; size && i < r->nr_pages; ++i) {
++                *p = r->iova + i * getpagesize();
++                assert(*p >= r->iova);
++                assert(*p < r->iova + r->nr_pages * getpagesize());
++                p++;
++                size -= getpagesize();
++                if (contiguous) {
++                    goto out;
++                }
++            }
++            r = QSIMPLEQ_NEXT(r, next);
++            skip_pages = 0;
++        }
++    }
++out:
++    return 0;
++}
++
++/* Unmapping the whole area that was previously mapped with
++ * qemu_vfio_dma_map(). */
++void qemu_vfio_dma_unmap(QEMUVFIOState *s, void *host)
++{
++    int index = 0;
++    IOVAMapping *m;
++
++    if (!host) {
++        return;
++    }
++
++    DPRINTF("vfio unmap %p\n", host);
++    m = qemu_vfio_find_mapping(s, host, 4096, &index);
++    if (!m) {
++        return;
++    }
++    qemu_vfio_free_mapping(s, m, false);
++    assert(s->nr_mappings);
++    memmove(&s->mappings[index], &s->mappings[index + 1],
++            sizeof(s->mappings[0]) * (s->nr_mappings - index - 1));
++    s->nr_mappings--;
++    s->mappings = g_realloc_n(s->mappings, sizeof(s->mappings[0]),
++                              s->nr_mappings);
++}
++
++/* Close and free the VFIO resources. */
++void qemu_vfio_close(QEMUVFIOState *s)
++{
++    int i;
++
++    if (!s) {
++        return;
++    }
++    for (i = 0; i < s->nr_mappings; ++i) {
++        qemu_vfio_free_mapping(s, &s->mappings[i], false);
++    }
++    hbitmap_free(s->free_chunks);
++    ram_block_notifier_remove(&s->ram_notifier);
++    close(s->device);
++    close(s->group);
++    close(s->container);
++}
 -- 
 2.9.3
