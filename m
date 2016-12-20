@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54054)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57470)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1cJIJb-0004vw-Qz
-	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 06:10:41 -0500
+	(envelope-from <xiecl.fnst@cn.fujitsu.com>) id 1cJIWF-00030i-4e
+	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 06:23:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1cJIJW-0006Gf-Pi
-	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 06:10:39 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:51308)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1cJIJW-0006F8-64
-	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 06:10:34 -0500
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <000301d259dc$f9d097c0$ed71c740$@ru>
-	<000601d25a95$12b1b9f0$38152dd0$@ru>
-	<20161220102126.GE5602@stefanha-x1.localdomain>
-In-Reply-To: <20161220102126.GE5602@stefanha-x1.localdomain>
-Date: Tue, 20 Dec 2016 14:10:33 +0300
-Message-ID: <002501d25ab1$af024b00$0d06e100$@ru>
+	(envelope-from <xiecl.fnst@cn.fujitsu.com>) id 1cJIW9-0003A0-Kd
+	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 06:23:43 -0500
+Message-ID: <585914B1.1030309@cn.fujitsu.com>
+Date: Tue, 20 Dec 2016 19:23:29 +0800
+From: Changlong Xie <xiecl.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
+References: <1480926904-17596-1-git-send-email-zhang.zhanghailiang@huawei.com>
+	<1480926904-17596-2-git-send-email-zhang.zhanghailiang@huawei.com>
+In-Reply-To: <1480926904-17596-2-git-send-email-zhang.zhanghailiang@huawei.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-Content-Language: ru
-Subject: Re: [Qemu-devel] qemu-2.8-rc4 is broken
+Subject: Re: [Qemu-devel] [PATCH RFC v2 1/6] docs/block-replication: Add
+ description for shared-disk case
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,125 +24,202 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Stefan Hajnoczi' <stefanha@gmail.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, 'Pavel Dovgalyuk' <pavel.dovgaluk@ispras.ru>, peter.maydell@linaro.org
+To: zhanghailiang <zhang.zhanghailiang@huawei.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: stefanha@redhat.com, kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, wency@cn.fujitsu.com, Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
 
-> From: Stefan Hajnoczi [mailto:stefanha@gmail.com]
-> On Tue, Dec 20, 2016 at 10:45:44AM +0300, Pavel Dovgalyuk wrote:
-> > It also fails much earlier when I enable logs with "-d int -D log".
-> >
-> > Here is backtrace for this failure:
-> >
-> >
-> >
-> > #0  0x0000000076e79e52 in ntdll!EtwpCreateEtwThread ()
-> >
-> >    from /c/Windows/SYSTEM32/ntdll.dll
-> >
-> > #1  0x0000000076e56965 in ntdll!EtwEventSetInformation ()
-> >
-> >    from /c/Windows/SYSTEM32/ntdll.dll
-> >
-> > #2  0x0000000076e942d9 in ntdll!RtlLogStackBackTrace ()
-> >
-> >    from /c/Windows/SYSTEM32/ntdll.dll
-> >
-> > #3  0x0000000076e3797c in ntdll!TpAlpcRegisterCompletionList ()
-> >
-> >    from /c/Windows/SYSTEM32/ntdll.dll
-> >
-> > #4  0x000007fefdc810c8 in msvcrt!free () from /c/Windows/system32/msvcrt.dll
-> 
-> Looks like a heap corruption bug since free() is failing.
+On 12/05/2016 04:34 PM, zhanghailiang wrote:
+> Introuduce the scenario of shared-disk block replication
+> and how to use it.
+>
+> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+> Signed-off-by: Wen Congyang <wency@cn.fujitsu.com>
+> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+> ---
+> v2:
+> - fix some problems found by Changlong
+> ---
+>   docs/block-replication.txt | 139 +++++++++++++++++++++++++++++++++++++++++++--
+>   1 file changed, 135 insertions(+), 4 deletions(-)
+>
+> diff --git a/docs/block-replication.txt b/docs/block-replication.txt
+> index 6bde673..fbfe005 100644
+> --- a/docs/block-replication.txt
+> +++ b/docs/block-replication.txt
+> @@ -24,7 +24,7 @@ only dropped at next checkpoint time. To reduce the network transportation
+>   effort during a vmstate checkpoint, the disk modification operations of
+>   the Primary disk are asynchronously forwarded to the Secondary node.
+>
+> -== Workflow ==
+> +== Non-shared disk workflow ==
+>   The following is the image of block replication workflow:
+>
+>           +----------------------+            +------------------------+
+> @@ -57,7 +57,7 @@ The following is the image of block replication workflow:
+>       4) Secondary write requests will be buffered in the Disk buffer and it
+>          will overwrite the existing sector content in the buffer.
+>
+> -== Architecture ==
+> +== Non-shared disk architecture ==
+>   We are going to implement block replication from many basic
+>   blocks that are already in QEMU.
+>
+> @@ -106,6 +106,74 @@ any state that would otherwise be lost by the speculative write-through
+>   of the NBD server into the secondary disk. So before block replication,
+>   the primary disk and secondary disk should contain the same data.
+>
+> +== Shared Disk Mode Workflow ==
+> +The following is the image of block replication workflow:
+> +
+> +        +----------------------+            +------------------------+
+> +        |Primary Write Requests|            |Secondary Write Requests|
+> +        +----------------------+            +------------------------+
+> +                  |                                       |
+> +                  |                                      (4)
+> +                  |                                       V
+> +                  |                              /-------------\
+> +                  | (2)Forward and write through |             |
+> +                  | +--------------------------> | Disk Buffer |
+> +                  | |                            |             |
+> +                  | |                            \-------------/
+> +                  | |(1)read                           |
+> +                  | |                                  |
+> +       (3)write   | |                                  | backing file
+> +                  V |                                  |
+> +                 +-----------------------------+       |
+> +                 | Shared Disk                 | <-----+
+> +                 +-----------------------------+
+> +
+> +    1) Primary writes will read original data and forward it to Secondary
+> +       QEMU.
+> +    2) Before Primary write requests are written to Shared disk, the
+> +       original sector content will be read from Shared disk and
+> +       forwarded and buffered in the Disk buffer on the secondary site,
+> +       but it will not overwrite the existing sector content (it could be
+> +       from either "Secondary Write Requests" or previous COW of "Primary
+> +       Write Requests") in the Disk buffer.
+> +    3) Primary write requests will be written to Shared disk.
+> +    4) Secondary write requests will be buffered in the Disk buffer and it
+> +       will overwrite the existing sector content in the buffer.
+> +
+> +== Shared Disk Mode Architecture ==
+> +We are going to implement block replication from many basic
+> +blocks that are already in QEMU.
+> +         virtio-blk                     ||                               .----------
+> +             /                          ||                               | Secondary
+> +            /                           ||                               '----------
+> +           /                            ||                                 virtio-blk
+> +          /                             ||                                      |
+> +          |                             ||                               replication(5)
+> +          |                    NBD  -------->   NBD   (2)                       |
+> +          |                  client     ||    server ---> hidden disk <-- active disk(4)
+> +          |                     ^       ||                      |
+> +          |              replication(1) ||                      |
+> +          |                     |       ||                      |
+> +          |   +-----------------'       ||                      |
+> +         (3)  |drive-backup sync=none   ||                      |
+> +--------. |   +-----------------+       ||                      |
+> +Primary | |                     |       ||           backing    |
+> +--------' |                     |       ||                      |
+> +          V                     |                               |
+> +       +-------------------------------------------+            |
+> +       |               shared disk                 | <----------+
+> +       +-------------------------------------------+
+> +
+> +
+> +    1) Primary writes will read original data and forward it to Secondary
+> +       QEMU.
+> +    2) The hidden-disk buffers the original content that is modified by the
+> +       primary VM. It should also be an empty disk, and the driver supports
+> +       bdrv_make_empty() and backing file.
+> +    3) Primary write requests will be written to Shared disk.
+> +    4) Secondary write requests will be buffered in the active disk and it
+> +       will overwrite the existing sector content in the buffer.
+> +
+>   == Failure Handling ==
+>   There are 7 internal errors when block replication is running:
+>   1. I/O error on primary disk
+> @@ -145,7 +213,7 @@ d. replication_stop_all()
+>      things except failover. The caller must hold the I/O mutex lock if it is
+>      in migration/checkpoint thread.
+>
+> -== Usage ==
+> +== Non-shared disk usage ==
+>   Primary:
+>     -drive if=xxx,driver=quorum,read-pattern=fifo,id=colo1,vote-threshold=1,\
+>            children.0.file.filename=1.raw,\
+> @@ -234,6 +302,69 @@ Secondary:
+>     The primary host is down, so we should do the following thing:
+>     { 'execute': 'nbd-server-stop' }
+>
+> +== Shared disk usage ==
+> +Primary:
+> + -drive if=virtio,id=primary_disk0,file.filename=1.raw,driver=raw
+> +
+> +Issue qmp command:
+> +  { 'execute': 'blockdev-add',
+> +    'arguments': {
+> +        'driver': 'replication',
+> +        'node-name': 'rep',
+> +        'mode': 'primary',
+> +        'shared-disk-id': 'primary_disk0',
+> +        'shared-disk': true,
+> +        'file': {
+> +            'driver': 'nbd',
+> +            'export': 'hidden_disk0',
+> +            'server': {
+> +                'type': 'inet',
+> +                'data': {
+> +                    'host': 'xxx.xxx.xxx.xxx',
+> +                    'port': 'yyy'
+> +                }
+> +            }
+> +        }
+> +     }
+> +  }
+> +
+> +Secondary:
+> + -drive if=none,driver=qcow2,file.filename=/mnt/ramfs/hidden_disk.img,id=hidden_disk0,\
+> +        backing.driver=raw,backing.file.filename=1.raw \
+> + -drive if=virtio,id=active-disk0,driver=replication,mode=secondary,\
+> +        file.driver=qcow2,top-id=active-disk0,\
+> +        file.file.filename=/mnt/ramfs/active_disk.img,\
+> +        file.backing=hidden_disk0,shared-disk=on
+> +
+> +Issue qmp command:
+> +1. { 'execute': 'nbd-server-start',
+> +     'arguments': {
+> +        'addr': {
+> +            'type': 'inet',
+> +            'data': {
+> +                'host': '0',
+> +                'port': 'yyy'
+> +            }
+> +        }
+> +     }
+> +   }
+> +2. { 'execute': 'nbd-server-add',
+> +     'arguments': {
+> +        'device': 'hidden_disk0',
+> +        'writable': true
+> +    }
+> +  }
+> +
+> +After Failover:
+> +Primary:
+> +  { 'execute': 'x-blockdev-del',
+> +    'arguments': {
+> +        'node-name': 'rep'
+> +    }
+> +  }
+> +
+> +Secondary:
+> +  {'execute': 'nbd-server-stop' }
+> +
+>   TODO:
+>   1. Continuous block replication
+> -2. Shared disk
+>
 
-Seems to be a race condition.
-When I add logs into invalidate_page_bitmap, the bug disappears.
-It seems that someone tries to free the same page bitmap twice and simultaneously.
+Looks good to me
 
-Here is the stack trace for two threads at the moment when qemu fails:
-Failed thread:
-#0  0x0000000076e79e52 in ntdll!EtwpCreateEtwThread ()
-   from /c/Windows/SYSTEM32/ntdll.dll
-#1  0x0000000076e56965 in ntdll!EtwEventSetInformation ()
-   from /c/Windows/SYSTEM32/ntdll.dll
-#2  0x0000000076e942d9 in ntdll!RtlLogStackBackTrace ()
-   from /c/Windows/SYSTEM32/ntdll.dll
-#3  0x0000000076e3797c in ntdll!TpAlpcRegisterCompletionList ()
-   from /c/Windows/SYSTEM32/ntdll.dll
-#4  0x000007fefdc810c8 in msvcrt!free () from /c/Windows/system32/msvcrt.dll
-#5  0x000000000040c57d in invalidate_page_bitmap (p=<optimized out>,
-    p=<optimized out>) at D:/Projects/QEMU/qemu/translate-all.c:881
-#6  tb_invalidate_phys_page_range (start=826113, end=end@entry=826116,
-    is_cpu_write_access=is_cpu_write_access@entry=0)
-    at D:/Projects/QEMU/qemu/translate-all.c:1527
-#7  0x000000000040c5ed in tb_invalidate_phys_range_1 (end=826116,
-    start=<optimized out>) at D:/Projects/QEMU/qemu/translate-all.c:1414
-#8  tb_invalidate_phys_range (start=start@entry=826113, end=end@entry=826116)
-    at D:/Projects/QEMU/qemu/translate-all.c:1424
-#9  0x0000000000402e5f in invalidate_and_set_dirty (mr=mr@entry=0x569e980,
-    addr=<optimized out>, length=<optimized out>)
-    at D:/Projects/QEMU/qemu/exec.c:2511
-#10 0x0000000000406af7 in cpu_physical_memory_write_rom_internal (
-    type=WRITE_DATA, len=3, buf=0x22f411 "", addr=826113,
-    as=0xab4280 <address_space_memory>) at D:/Projects/QEMU/qemu/exec.c:2795
-<and more>
-
-Another thread:
-#0  0x00000000007411b0 in g_free ()
-#1  0x000000000040b6b4 in invalidate_page_bitmap (p=0x1143f738, p=0x1143f738)
-    at D:/Projects/QEMU/qemu/translate-all.c:881
-#2  page_flush_tb_1 (level=level@entry=0, lp=0x5715058)
-    at D:/Projects/QEMU/qemu/translate-all.c:900
-#3  0x000000000040b6ee in page_flush_tb_1 (level=1, lp=0xac8ac0 <l1_map>)
-    at D:/Projects/QEMU/qemu/translate-all.c:906
-#4  0x000000000040b7b3 in page_flush_tb ()
-    at D:/Projects/QEMU/qemu/translate-all.c:916
-#5  do_tb_flush (cpu=<optimized out>, tb_flush_count=...)
-    at D:/Projects/QEMU/qemu/translate-all.c:954
-#6  0x0000000000519ac1 in process_queued_cpu_work (cpu=0x5632fd0)
-    at cpus-common.c:338
-#7  0x0000000000439761 in qemu_wait_io_event_common (cpu=0x5632fd0)
-    at D:/Projects/QEMU/qemu/cpus.c:942
-#8  qemu_tcg_wait_io_event (cpu=<optimized out>)
-    at D:/Projects/QEMU/qemu/cpus.c:957
-#9  qemu_tcg_cpu_thread_fn (arg=arg@entry=0x5632fd0)
-    at D:/Projects/QEMU/qemu/cpus.c:1216
-#10 0x000000000072c285 in win32_start_routine (arg=0x565ba40)
-    at util/qemu-thread-win32.c:406
-#11 0x000007fefdc8415f in srand () from /c/Windows/system32/msvcrt.dll
-#12 0x000007fefdc86ebd in msvcrt!_ftime64_s ()
-<and more>
-
-> 
-> QEMU 2.8.0 is scheduled for release today.  I have checked that
-> qemu-system-i386.exe works but without playing an MP3 file in Windows
-> XP.
-> 
-> I plan to go ahead with the release unless information becomes available
-> that suggests it affects more than just this one scenario.
-
-> >
-> >
-> > I encountered the following bug with the latest version of QEMU.
-> >
-> > I use windows host and start qemu with the following command line:
-> >
-> > qemu-system-i386.exe -soundhw ac97 -snapshot -hda disk.qcow2 -net none
-> >
-> >
-> >
-> > Guest system is Windows XP 32-bit. It founds new hardware (including audio controller)
-> >
-> > and I start playing mp3 file.
-> >
-> > After seconds of playing qemu fails with an exception.
-> >
-> >
-> >
-> > I tried to bisect between 2.7 and 2.8, but bug is not stable.
-> >
-> > It manifested itself at commits "68701de1362b29fd6941a2021e9393ddbe60edd8" and
-> > "6a928d25b6d8bc3729c3d28326c6db13b9481059".
-
-
-Pavel Dovgalyuk
+Reviewed-by: Changlong Xie <xiecl.fnst@cn.fujitsu.com>
