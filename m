@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59765)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35324)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <xiecl.fnst@cn.fujitsu.com>) id 1cJIg3-0006Ry-5g
-	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 06:33:51 -0500
+	(envelope-from <ppandit@redhat.com>) id 1cJJ21-0004eV-9b
+	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 06:56:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <xiecl.fnst@cn.fujitsu.com>) id 1cJIg2-00073i-At
-	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 06:33:51 -0500
-Message-ID: <5859172D.7080602@cn.fujitsu.com>
-Date: Tue, 20 Dec 2016 19:34:05 +0800
-From: Changlong Xie <xiecl.fnst@cn.fujitsu.com>
+	(envelope-from <ppandit@redhat.com>) id 1cJJ1y-0005nG-7c
+	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 06:56:33 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37654)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1cJJ1y-0005n1-1F
+	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 06:56:30 -0500
+Date: Tue, 20 Dec 2016 17:26:16 +0530 (IST)
+From: P J P <ppandit@redhat.com>
+In-Reply-To: <CAJ+F1CJq2tp+-sDjX6EqZ7mFx63uUkc3=i8yaQyVmmG1c1RTNw@mail.gmail.com>
+Message-ID: <alpine.LFD.2.20.1612201723570.28755@wniryva>
+References: <20161214070156.23368-1-ppandit@redhat.com>
+	<CAJ+F1CJq2tp+-sDjX6EqZ7mFx63uUkc3=i8yaQyVmmG1c1RTNw@mail.gmail.com>
 MIME-Version: 1.0
-References: <1480926904-17596-1-git-send-email-zhang.zhanghailiang@huawei.com>
-	<1480926904-17596-3-git-send-email-zhang.zhanghailiang@huawei.com>
-In-Reply-To: <1480926904-17596-3-git-send-email-zhang.zhanghailiang@huawei.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC v2 2/6] replication: add shared-disk
- and shared-disk-id options
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] display: virtio-gpu-3d: check virgl
+ capabilities max_size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,42 +28,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: zhanghailiang <zhang.zhanghailiang@huawei.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: stefanha@redhat.com, kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, wency@cn.fujitsu.com, Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+To: =?ISO-8859-15?Q?Marc-Andr=E9_Lureau?= <marcandre.lureau@gmail.com>
+Cc: Qemu Developers <qemu-devel@nongnu.org>, Zhenhao Hong <zhenhaohong@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-On 12/05/2016 04:35 PM, zhanghailiang wrote:
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index c29bef7..52d7e0d 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -2232,12 +2232,19 @@
->   #          node who owns the replication node chain. Must not be given in
->   #          primary mode.
->   #
-> +# @shared-disk-id: #optional The id of shared disk while in replication mode.
-> +#
-> +# @shared-disk: #optional To indicate whether or not a disk is shared by
-> +#               primary VM and secondary VM.
-> +#
+  Hello Marc,
 
-I think we need more detailed description here.
++-- On Tue, 20 Dec 2016, Marc-Andr=C3=A9 Lureau wrote --+
+| > +    if (!max_size) {
+|=20
+| Shouldn't it check for >=3D sizeof(union virgl_caps) ? (since that's wh=
+at
+| virglrenderer vrend_renderer_fill_caps() expects)
 
-For @shared-disk, we can only both enable or disable it on both side.
-For @shared-disk-id, it must/only be given when @shared-disk enable on 
-Primary side.
+  No, 'max_size' isn't set by a user, it's set by the library function=20
+'vrend_renderer_get_cap_set'.
 
-More, you also need to perfect the replication_open() logic.
+  -> https://cgit.freedesktop.org/~airlied/virglrenderer/tree/src/vrend_r=
+enderer.c#n6280
 
->   # Since: 2.8
->   ##
->   { 'struct': 'BlockdevOptionsReplication',
->     'base': 'BlockdevOptionsGenericFormat',
->     'data': { 'mode': 'ReplicationMode',
-> -            '*top-id': 'str' } }
-> +            '*top-id': 'str',
-> +            '*shared-disk-id': 'str',
-> +            '*shared-disk': 'bool' } }
->
->   ##
->   # @NFSTransport
-> --
+And if not zero, it'll be set to sizeof(union virgl_caps).
+
+Thank you.
+--
+Prasad J Pandit / Red Hat Product Security Team
+47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
