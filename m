@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45532)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46407)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1cJNbh-0007pv-KV
-	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 11:49:42 -0500
+	(envelope-from <holger@fam-schranz.de>) id 1cJNfp-0002W6-Sf
+	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 11:53:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1cJNbd-0007CU-Kc
-	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 11:49:41 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55620)
+	(envelope-from <holger@fam-schranz.de>) id 1cJNfl-00085h-T0
+	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 11:53:57 -0500
+Received: from smtp1.goneo.de ([85.220.129.30]:36486)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1cJNbd-00079f-Ez
-	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 11:49:37 -0500
-Received: from int-mx13.intmail.prod.int.phx2.redhat.com
-	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7C5AC91D2F
-	for <qemu-devel@nongnu.org>; Tue, 20 Dec 2016 16:49:35 +0000 (UTC)
-References: <1480713496-11213-1-git-send-email-ehabkost@redhat.com>
-	<1480713496-11213-16-git-send-email-ehabkost@redhat.com>
-	<df0f3ade-bd09-58a0-ac83-3775d4ab7c6c@redhat.com>
-	<20161205235745.GJ13060@thinpad.lan.raisama.net>
-	<20161216160236.GA964730@orkuz.home>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <5ce94d10-dfa9-39d7-a77f-3ab5cb7584e5@redhat.com>
-Date: Tue, 20 Dec 2016 17:49:32 +0100
+	(Exim 4.71) (envelope-from <holger@fam-schranz.de>)
+	id 1cJNfl-00084q-JH
+	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 11:53:53 -0500
+References: <c532ac07-fd54-eedb-b3f0-548aeacf0a04@fam-schranz.de>
+	<3dce9a63-6472-54c2-3455-52521a0a3651@redhat.com>
+From: Holger Schranz <holger@fam-schranz.de>
+Message-ID: <89d9fe09-3bdc-3c84-3ddf-f9462adb2068@fam-schranz.de>
+Date: Tue, 20 Dec 2016 17:53:37 +0100
 MIME-Version: 1.0
-In-Reply-To: <20161216160236.GA964730@orkuz.home>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.9 15/17] target-i386: Define static
- "base" CPU model
+In-Reply-To: <3dce9a63-6472-54c2-3455-52521a0a3651@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Strange/wrong behavior with iSCSI Tape devices in
+ QEMU 2.8.0-rc4
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,52 +29,179 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, libvir-list@redhat.com
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+Cc: mueller-ralf@t-online.de
 
-Am 16.12.2016 um 17:02 schrieb Jiri Denemark:
-> On Mon, Dec 05, 2016 at 21:57:45 -0200, Eduardo Habkost wrote:
->> On Mon, Dec 05, 2016 at 07:18:47PM +0100, David Hildenbrand wrote:
->>> Am 02.12.2016 um 22:18 schrieb Eduardo Habkost:
->>>> The query-cpu-model-expand QMP command needs at least one static
->>>> model, to allow the "static" expansion mode to be implemented.
->>>> Instead of defining static versions of every CPU model, define a
->>>> "base" CPU model that has absolutely no feature flag enabled.
->>>>
->>>
->>> Introducing separate ones makes feature lists presented to the user much
->>> shorter (and therefore easier to maintain). But I don't know how libvirt
->>> wants to deal with models on x86 in the future.
+Hi John,
+
+sorry or late. I will reproduce it and send you the QEMU command line 
+instruction.
+
+About the guest system: LINUX SuSE SLES11 SP4.
+
+About 2.7.0 Release: it doesn't run without the patches for the issue:
+[Qemu-devel] [PATCH] iscsi: Fix divide-by-zero regression on raw SG devices=
+
+
+(I can't find the issue number).
+
+Best regards
+
+Holger
+
+Am 19.12.2016 um 18:30 schrieb John Snow:
+>
+> On 12/19/2016 04:05 AM, Holger Schranz wrote:
+>> # Strange/wrong behavior in QEMU 2.8.0-rc4
 >>
->> I understand that having a larger set of static models would make
->> expansions shorter. But I worry that by defining a complete set
->> of static models on x86 would require extra maintenance work on
->> the QEMU side with no visible benefit for libvirt.
+>> After update from QEMU 2.6.2 to 2.8.0-rc4 the tape devices
+>> and the corresponding medium changer are no longer available
+>> in the VM quest system.
 >>
->> I would like to hear from libvirt developers what they think. I
->> still don't know what they plan to use the type=static expansion
->> results for.
+>> The tape devices and the media changer are declared in the
+>> xml-file for libvirt. Both, tape drives and medium changer
+>> are avalilable via iSCSI.
+>>
+>> In a first rough investigation the login in iSCSI runs well
+>> but in QEMU, it seems the devices doesn't reported to the VM-Quest.
+>>
+>> ------------------
+>>
+>> Best regards
+>>
+>> Holger
+>>
+> Hi, thanks for the report; do you have a QEMU command line that we can
+> use to help reproduce the problem? It's easiest if we can cut libvirt
+> out of the loop.
 >
-> Currently we are mostly interested in the expansion of the "host" CPU
-> model. We're fine with the expansion based on the "basic" static model
-> with no features. Returning some real model instead of "basic" would be
-> OK as long as it would be one of the existing CPU models. Adding special
-> static models, such as Broadwell-base would actually be a complication
-
-I agree, mixing names would be confusing. So if we would want to 
-introduce static CPU models for x86 in QEMU, they would have to be named
-exactly like the libvirt models and contain the exact same feature set.
-
-> since we would need to provide some translation to the existing models
-> for backward compatibility. I'd appreciate if we could avoid doing this.
-
-Right and translation would only confuse people, especially if the CPU
-models in libvirt and QEMU behave differently.
-
+> What is the architecture and version of the guest?
 >
-> Jirka
+> Lastly, it looks like this worked in our 2.7 release if I'm reading you
+> correctly, so this is a change for the 2.8 release as far as you can
+> tell, right?
 >
+> --js
+>
+>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>>
+>> XML-Declration:
+>>
+>> .
+>> .
+>> .
+>>
+>> <!-- SCSI 2 -->
+>>      <controller type=3D'scsi' model=3D'virtio-scsi' index=3D'1'>
+>>        <alias name=3D'scsi1'/>
+>>      </controller>
+>>
+>> <!-- 2 x LTO5 -->
+>>      <hostdev mode=3D'subsystem' type=3D'scsi' managed=3D'no' rawio=3D'y=
+es'>
+>>        <source protocol=3D'iscsi'
+>> name=3D'iqn.2008-09.net.fsc:server.LT260_61003/4'>
+>>        <host name=3D'etcsvms2.abg.fsc.net' port=3D'3260'/>
+>>        </source>
+>>        <address type=3D'drive' controller=3D'1' bus=3D'0' target=3D'2' u=
+nit=3D'1'/>
+>>      </hostdev>
+>>
+>>      <hostdev mode=3D'subsystem' type=3D'scsi' managed=3D'no' rawio=3D'y=
+es'>
+>>        <source protocol=3D'iscsi'
+>> name=3D'iqn.2008-09.net.fsc:server.LT260_61003/5'>
+>>        <host name=3D'etcsvms2.abg.fsc.net' port=3D'3260'/>
+>>        </source>
+>>        <address type=3D'drive' controller=3D'1' bus=3D'0' target=3D'2' u=
+nit=3D'2'/>
+>>      </hostdev>
+>>
+>> <!-- Virtual media changer Fujitsu LT260 -->
+>>      <hostdev mode=3D'subsystem' type=3D'scsi' managed=3D'no' rawio=3D'y=
+es'>
+>>        <source protocol=3D'iscsi'
+>> name=3D'iqn.2008-09.net.fsc:server.LT260_61003/6'>
+>>        <host name=3D'etcsvms2.abg.fsc.net' port=3D'3260'/>
+>>        </source>
+>>        <address type=3D'drive' controller=3D'1' bus=3D'0' target=3D'2' u=
+nit=3D'3'/>
+>>      </hostdev>
+>>
+>> <!-- 2 x LTO6 (via PLP(LAN-attached library)) -->
+>>      <hostdev mode=3D'subsystem' type=3D'scsi' managed=3D'no' rawio=3D'y=
+es'>
+>>        <source protocol=3D'iscsi'
+>> name=3D'iqn.2008-09.net.fsc:server.LT60_61005/3'>
+>>        <host name=3D'etcsvms2.abg.fsc.net' port=3D'3260'/>
+>>        </source>
+>>        <address type=3D'drive' controller=3D'1' bus=3D'0' target=3D'2' u=
+nit=3D'4'/>
+>>      </hostdev>
+>>
+>>      <hostdev mode=3D'subsystem' type=3D'scsi' managed=3D'no' rawio=3D'y=
+es'>
+>>        <source protocol=3D'iscsi'
+>> name=3D'iqn.2008-09.net.fsc:server.LT60_61005/4'>
+>>        <host name=3D'etcsvms2.abg.fsc.net' port=3D'3260'/>
+>>        </source>
+>>        <address type=3D'drive' controller=3D'1' bus=3D'0' target=3D'2' u=
+nit=3D'5'/>
+>>      </hostdev>
+>> .
+>> .
+>> .
+>>
+>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D
+>>
+>>
+>> correct behavior/Result inside the VM-Quest together with QEMU/KVM 2.6.2=
+
+>> / 2.7.0
+>> -- 
+>> (VCSTCS82:A)IUP1:~ # lsscsi -g
+>> [0:2:0:0]    disk    FTS      PRAID EP420i     4.25  /dev/sda /dev/sg0
+>> [3:0:0:0]    cd/dvd  QEMU     QEMU DVD-ROM     2.5+  /dev/sr0 /dev/sg1
+>> [8:0:2:1]    tape    HP       Ultrium 5-SCSI   0001  /dev/st3 /dev/sg6
+>> [8:0:2:2]    tape    HP       Ultrium 5-SCSI   0001  /dev/st2 /dev/sg5
+>> [8:0:2:3]    mediumx FUJITSU  ETERNUS LT260    6.20  - /dev/sg4
+>> [8:0:2:4]    tape    HP       Ultrium 6-SCSI   23AB  /dev/st1 /dev/sg3
+>> [8:0:2:5]    tape    HP       Ultrium 6-SCSI   23AB  /dev/st0 /dev/sg2
+>> [11:0:0:0]   disk    FUJITSU  ETERNUS_DXL      0000  /dev/sdb /dev/sg7
+>> [11:0:0:2]   disk    FUJITSU  ETERNUS_DXL      0000  /dev/sdh /dev/sg13
+>> [11:0:0:3]   disk    FUJITSU  ETERNUS_DXL      0000  /dev/sdg /dev/sg12
+>> [11:0:0:4]   disk    FUJITSU  ETERNUS_DXL      0000  /dev/sdf /dev/sg11
+>> [11:0:0:5]   disk    FUJITSU  ETERNUS_DXL      0000  /dev/sde /dev/sg10
+>> [11:0:0:6]   disk    FUJITSU  ETERNUS_DXL      0000  /dev/sdd /dev/sg9
+>> [11:0:0:7]   disk    FUJITSU  ETERNUS_DXL      0000  /dev/sdc /dev/sg8
+>> [11:0:0:15]  disk    FUJITSU  ETERNUS_DXL      0000  /dev/sdi /dev/sg14
+>> (VCSTCS82:A)IUP1:~ #
+>>
+>>
+>>
+>> Wrong behavior/Result inside the VM-Quest together with QEMU/KVM 2.8.0-R=
+C4
+>> -- 
+>> (VCSTCS82:A)IUP1:~ # lsscsi -g
+>> [0:2:0:0]    disk    FTS      PRAID EP420i     4.25  /dev/sda /dev/sg0
+>> [3:0:0:0]    cd/dvd  QEMU     QEMU DVD-ROM     2.5+  /dev/sr0 /dev/sg1
+>> [11:0:1:0]   disk    FUJITSU  ETERNUS_DXL      0000  /dev/sdj /dev/sg10
+>> [11:0:1:2]   disk    FUJITSU  ETERNUS_DXL      0000  /dev/sdp /dev/sg16
+>> [11:0:1:3]   disk    FUJITSU  ETERNUS_DXL      0000  /dev/sdo /dev/sg15
+>> [11:0:1:4]   disk    FUJITSU  ETERNUS_DXL      0000  /dev/sdn /dev/sg14
+>> [11:0:1:5]   disk    FUJITSU  ETERNUS_DXL      0000  /dev/sdm /dev/sg13
+>> [11:0:1:6]   disk    FUJITSU  ETERNUS_DXL      0000  /dev/sdl /dev/sg12
+>> [11:0:1:7]   disk    FUJITSU  ETERNUS_DXL      0000  /dev/sdk /dev/sg11
+>> [11:0:1:15]  disk    FUJITSU  ETERNUS_DXL      0000  /dev/sdq /dev/sg17
+>> (VCSTCS82:A)IUP1:~ #
+>>
 
 
--- 
-
-David
+---
+Diese E-Mail wurde von Avast Antivirus-Software auf Viren gepr=C3=BCft.
+https://www.avast.com/antivirus
