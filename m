@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35324)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43423)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1cJJ21-0004eV-9b
-	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 06:56:34 -0500
+	(envelope-from <xiecl.fnst@cn.fujitsu.com>) id 1cJJjL-0008JX-UF
+	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 07:41:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1cJJ1y-0005nG-7c
-	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 06:56:33 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37654)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1cJJ1y-0005n1-1F
-	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 06:56:30 -0500
-Date: Tue, 20 Dec 2016 17:26:16 +0530 (IST)
-From: P J P <ppandit@redhat.com>
-In-Reply-To: <CAJ+F1CJq2tp+-sDjX6EqZ7mFx63uUkc3=i8yaQyVmmG1c1RTNw@mail.gmail.com>
-Message-ID: <alpine.LFD.2.20.1612201723570.28755@wniryva>
-References: <20161214070156.23368-1-ppandit@redhat.com>
-	<CAJ+F1CJq2tp+-sDjX6EqZ7mFx63uUkc3=i8yaQyVmmG1c1RTNw@mail.gmail.com>
+	(envelope-from <xiecl.fnst@cn.fujitsu.com>) id 1cJJjK-0003Fd-Qc
+	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 07:41:19 -0500
+Message-ID: <585926E7.2020006@cn.fujitsu.com>
+Date: Tue, 20 Dec 2016 20:41:11 +0800
+From: Changlong Xie <xiecl.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] display: virtio-gpu-3d: check virgl
- capabilities max_size
+References: <1480926904-17596-1-git-send-email-zhang.zhanghailiang@huawei.com>
+	<1480926904-17596-4-git-send-email-zhang.zhanghailiang@huawei.com>
+In-Reply-To: <1480926904-17596-4-git-send-email-zhang.zhanghailiang@huawei.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RFC v2 3/6] replication: Split out
+ backup_do_checkpoint() from secondary_do_checkpoint()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,27 +24,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?ISO-8859-15?Q?Marc-Andr=E9_Lureau?= <marcandre.lureau@gmail.com>
-Cc: Qemu Developers <qemu-devel@nongnu.org>, Zhenhao Hong <zhenhaohong@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: zhanghailiang <zhang.zhanghailiang@huawei.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: stefanha@redhat.com, kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, wency@cn.fujitsu.com
 
-  Hello Marc,
+On 12/05/2016 04:35 PM, zhanghailiang wrote:
+> The helper backup_do_checkpoint() will be used for primary related
+> codes. Here we split it out from secondary_do_checkpoint().
+>
+> Besides, it is unnecessary to call backup_do_checkpoint() in
+> replication starting and normally stop replication path.
+> We only need call it while do real checkpointing.
+>
+> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+> ---
+>   block/replication.c | 36 +++++++++++++++++++-----------------
+>   1 file changed, 19 insertions(+), 17 deletions(-)
+>
+> diff --git a/block/replication.c b/block/replication.c
+> index e87ae87..35e9ab3 100644
+> --- a/block/replication.c
+> +++ b/block/replication.c
+> @@ -332,20 +332,8 @@ static bool replication_recurse_is_first_non_filter(BlockDriverState *bs,
+>
+>   static void secondary_do_checkpoint(BDRVReplicationState *s, Error **errp)
+>   {
+> -    Error *local_err = NULL;
+>       int ret;
+>
+> -    if (!s->secondary_disk->bs->job) {
+> -        error_setg(errp, "Backup job was cancelled unexpectedly");
+> -        return;
+> -    }
+> -
+> -    backup_do_checkpoint(s->secondary_disk->bs->job, &local_err);
+> -    if (local_err) {
+> -        error_propagate(errp, local_err);
+> -        return;
+> -    }
+> -
+>       ret = s->active_disk->bs->drv->bdrv_make_empty(s->active_disk->bs);
+>       if (ret < 0) {
+>           error_setg(errp, "Cannot make active disk empty");
+> @@ -558,6 +546,8 @@ static void replication_start(ReplicationState *rs, ReplicationMode mode,
+>               return;
+>           }
+>           block_job_start(job);
+> +
+> +        secondary_do_checkpoint(s, errp);
+>           break;
+>       default:
+>           aio_context_release(aio_context);
+> @@ -566,10 +556,6 @@ static void replication_start(ReplicationState *rs, ReplicationMode mode,
+>
+>       s->replication_state = BLOCK_REPLICATION_RUNNING;
+>
+> -    if (s->mode == REPLICATION_MODE_SECONDARY) {
+> -        secondary_do_checkpoint(s, errp);
+> -    }
+> -
+>       s->error = 0;
+>       aio_context_release(aio_context);
+>   }
+> @@ -579,13 +565,29 @@ static void replication_do_checkpoint(ReplicationState *rs, Error **errp)
+>       BlockDriverState *bs = rs->opaque;
+>       BDRVReplicationState *s;
+>       AioContext *aio_context;
+> +    Error *local_err = NULL;
+>
+>       aio_context = bdrv_get_aio_context(bs);
+>       aio_context_acquire(aio_context);
+>       s = bs->opaque;
+>
+> -    if (s->mode == REPLICATION_MODE_SECONDARY) {
+> +    switch (s->mode) {
+> +    case REPLICATION_MODE_PRIMARY:
+> +        break;
+> +    case REPLICATION_MODE_SECONDARY:
+> +        if (!s->secondary_disk->bs->job) {
+> +            error_setg(errp, "Backup job was cancelled unexpectedly");
+> +            break;
+> +        }
+> +        backup_do_checkpoint(s->secondary_disk->bs->job, &local_err);
+> +        if (local_err) {
+> +            error_propagate(errp, local_err);
+> +            break;
+> +        }
+>           secondary_do_checkpoint(s, errp);
+> +        break;
+> +    default:
+> +        abort();
+>       }
+>       aio_context_release(aio_context);
+>   }
+>
 
-+-- On Tue, 20 Dec 2016, Marc-Andr=C3=A9 Lureau wrote --+
-| > +    if (!max_size) {
-|=20
-| Shouldn't it check for >=3D sizeof(union virgl_caps) ? (since that's wh=
-at
-| virglrenderer vrend_renderer_fill_caps() expects)
+Looks good to me
 
-  No, 'max_size' isn't set by a user, it's set by the library function=20
-'vrend_renderer_get_cap_set'.
-
-  -> https://cgit.freedesktop.org/~airlied/virglrenderer/tree/src/vrend_r=
-enderer.c#n6280
-
-And if not zero, it'll be set to sizeof(union virgl_caps).
-
-Thank you.
---
-Prasad J Pandit / Red Hat Product Security Team
-47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
+Reviewed-by: Changlong Xie <xiecl.fnst@cn.fujitsu.com>
