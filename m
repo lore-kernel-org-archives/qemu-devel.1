@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34715)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34813)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1cJTS1-0000HT-Oh
-	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 18:04:06 -0500
+	(envelope-from <no-reply@patchew.org>) id 1cJTSH-0000TT-NF
+	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 18:04:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1cJTRw-00052I-Kd
-	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 18:04:05 -0500
-Received: from hera.aquilenet.fr ([141.255.128.1]:59442)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1cJTRw-00051f-EB
-	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 18:04:00 -0500
-Date: Wed, 21 Dec 2016 00:03:57 +0100
-From: Samuel Thibault <samuel.thibault@gnu.org>
-Message-ID: <20161220230357.GQ3258@var.home>
-References: <1479757549-18672-1-git-send-email-hpoussin@reactos.org>
+	(envelope-from <no-reply@patchew.org>) id 1cJTSD-00058q-5l
+	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 18:04:21 -0500
+Resent-Message-Id: <E1cJTSD-00058q-5l@eggs.gnu.org>
+Received: from sender163-mail.zoho.com ([74.201.84.163]:21372)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1cJTSC-00058D-TB
+	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 18:04:17 -0500
+In-Reply-To: <cover.1482187052.git.ben@skyportsystems.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <148227505065.73.3127664400578936980@790289a7ca88>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <1479757549-18672-1-git-send-email-hpoussin@reactos.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] slirp: support dynamic block size for TFTP
- transfers
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 20 Dec 2016 15:04:11 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH 0/5] RFC: Add support for VM Generation ID
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,16 +28,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>
-Cc: qemu-devel@nongnu.org, hpa@zytor.com, Stefan Hajnoczi <stefanha@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>
+To: ben@skyportsystems.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org
 
-Herv=E9 Poussineau, on Mon 21 Nov 2016 20:45:49 +0100, wrote:
-> The blocksize option is defined in RFC 1783.
-> We now support block sizes between 1 and 1432 bytes, instead of 512 onl=
-y.
->=20
-> Signed-off-by: Herv=E9 Poussineau <hpoussin@reactos.org>
-
-I fixed a couple of trivial things and commited to my tree, thanks!
-
-Samuel
+SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
+ZGV2ZWxdIFtQQVRDSCAwLzVdIFJGQzogQWRkIHN1cHBvcnQgZm9yIFZNIEdlbmVyYXRpb24gSUQK
+TWVzc2FnZS1pZDogY292ZXIuMTQ4MjE4NzA1Mi5naXQuYmVuQHNreXBvcnRzeXN0ZW1zLmNvbQpU
+eXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9
+YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxl
+ZD0wCgojIFVzZWZ1bCBnaXQgb3B0aW9ucwpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVs
+aW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChn
+aXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7
+IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0t
+Zm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAu
+L3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9
+MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9
+PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRl
+ZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjYxMWM5M2Qg
+cW1wL2htcDogYWRkIHNldC12bS1nZW5lcmF0aW9uLWlkIGNvbW1hbmRzCjQ3MTVmZWQgcW1wL2ht
+cDogYWRkIHF1ZXJ5LXZtLWdlbmVyYXRpb24taWQgYW5kICdpbmZvIHZtLWdlbmVyYXRpb24taWQn
+IGNvbW1hbmRzCjlmYmNlMjkgQUNQSTogQWRkIFZpcnR1YWwgTWFjaGluZSBHZW5lcmF0aW9uIElE
+IHN1cHBvcnQKZGJlNTAyOSBBQ1BJOiBBZGQgYSBmdW5jdGlvbiBmb3IgYnVpbGRpbmcgbmFtZWQg
+cXdvcmQgZW50cmllcwo0ODc1ODYyIGRvY3M6IHZtIGdlbmVyYXRpb24gaWQgZGV2aWNlJ3MgZGVz
+Y3JpcHRpb24KCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvNTogZG9jczog
+dm0gZ2VuZXJhdGlvbiBpZCBkZXZpY2UncyBkZXNjcmlwdGlvbi4uLgpDaGVja2luZyBQQVRDSCAy
+LzU6IEFDUEk6IEFkZCBhIGZ1bmN0aW9uIGZvciBidWlsZGluZyBuYW1lZCBxd29yZCBlbnRyaWVz
+Li4uCkNoZWNraW5nIFBBVENIIDMvNTogQUNQSTogQWRkIFZpcnR1YWwgTWFjaGluZSBHZW5lcmF0
+aW9uIElEIHN1cHBvcnQuLi4KRVJST1I6IHNwYWNlIHJlcXVpcmVkIGFmdGVyIHRoYXQgJywnIChj
+dHg6VnhWKQojMTMxOiBGSUxFOiBody9hY3BpL3ZtZ2VuaWQuYzo3OToKKyAgICBhbWxfYXBwZW5k
+KG1ldGhvZCxhbWxfc3RvcmUoYW1sX2FuZChhbWxfbmFtZSgiVkdJQSIpLAogICAgICAgICAgICAg
+ICAgICAgICAgXgoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMjA3
+OiBGSUxFOiBody9hY3BpL3ZtZ2VuaWQuYzoxNTU6CisgICAgLnBhcmVudF5JICAgICAgID0gVFlQ
+RV9TWVNfQlVTX0RFVklDRSwkCgp0b3RhbDogMiBlcnJvcnMsIDAgd2FybmluZ3MsIDI2NiBsaW5l
+cyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4g
+IElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0
+byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2lu
+ZyBQQVRDSCA0LzU6IHFtcC9obXA6IGFkZCBxdWVyeS12bS1nZW5lcmF0aW9uLWlkIGFuZCAnaW5m
+byB2bS1nZW5lcmF0aW9uLWlkJyBjb21tYW5kcy4uLgpDaGVja2luZyBQQVRDSCA1LzU6IHFtcC9o
+bXA6IGFkZCBzZXQtdm0tZ2VuZXJhdGlvbi1pZCBjb21tYW5kcy4uLgo9PT0gT1VUUFVUIEVORCA9
+PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRl
+ZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ug
+c2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
