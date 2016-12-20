@@ -1,36 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38677)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43611)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cJRXd-0004pk-9s
-	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 16:01:46 -0500
+	(envelope-from <andrew.smirnov@gmail.com>) id 1cJRhW-0001i9-8x
+	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 16:11:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cJRXZ-0006Kf-Dw
-	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 16:01:45 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55736
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1cJRXZ-0006Jp-9Q
-	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 16:01:41 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	uBKKxRvK005238
-	for <qemu-devel@nongnu.org>; Tue, 20 Dec 2016 16:01:39 -0500
-Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 27f70uck7n-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 20 Dec 2016 16:01:39 -0500
-Received: from localhost
-	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Tue, 20 Dec 2016 14:01:38 -0700
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Tue, 20 Dec 2016 15:00:53 -0600
-Message-Id: <20161220210053.31842.32241@loki>
-Subject: [Qemu-devel] [ANNOUNCE] QEMU 2.8.0 is now available
+	(envelope-from <andrew.smirnov@gmail.com>) id 1cJRhV-0005En-2N
+	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 16:11:58 -0500
+From: Andrey Smirnov <andrew.smirnov@gmail.com>
+Date: Tue, 20 Dec 2016 13:11:40 -0800
+Message-Id: <1482268300-10082-1-git-send-email-andrew.smirnov@gmail.com>
+Subject: [Qemu-devel] [PATCH] fsl_etsec: Fix Tx BD ring wrapping handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,44 +17,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, stefanha@redhat.com
+To: qemu-ppc@nongnu.org
+Cc: Alexander Graf <agraf@suse.de>, Scott Wood <scottwood@freescale.com>, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, Andrey Smirnov <andrew.smirnov@gmail.com>
 
-Hello,
+Current code that handles Tx buffer desciprtor ring scanning employs the
+following algorithm:
 
-On behalf of the QEMU Team, I'd like to announce the availability of
-the QEMU 2.8.0 release. This release contains 1900+ commits from 201
-authors.
+	1. Restore current buffer descriptor pointer from TBPTRn
 
-You can grab the tarball from our download page here:
+	2. Process current descriptor
 
-  http://wiki.qemu.org/Download
+	3. If current descriptor has BD_WRAP flag set set current
+	   descriptor pointer to start of the descriptor ring
 
-The full list of changes are available at:
+	4. If current descriptor points to start of the ring exit the
+	   loop, otherwise increment current descriptor pointer and go
+	   to #2
 
-  http://wiki.qemu.org/ChangeLog/2.8
+	5. Store current descriptor in TBPTRn
 
-Highlights include:
+As it can be seen the way the code is implemented results in buffer
+descriptor ring being scanned starting at offset/descriptor #0. While
+covering proverbial "99%" of the cases, this algorithm becomes
+problematic for a number of edge cases.
 
- * Support for fault-tolerant guests via COLO (COarse-grained LOck-stepping)
- * Support for fast host/guest socket communication over virtio via AF_VSOCK
- * Support for compressed formats when generating live backups
- * Support for new virtio-crypto device
- * Improved display rendering when using SPICE GUI in OpenGL mode
- * ACPI support for NVDIMM device hotplug
+Consider the following scenario: guest OS driver initializes descriptor
+ring to N individual descriptors and starts sending data out. Depending
+on the volume of traffic and probably guest OS driver implementation it
+is possible that an edge case where a packet, spread across 2
+descriptors is placed in descriptors N - 1 and 0 in that order(it is
+easy to imagine similar examples involving more than 2 descriptors).
 
- * ARM: 'virt' machine support for ITS when using ACPI
- * ARM: Aspeed board improvements
- * ARM: STM32F2xx board (Netduino 2) support for ADC and SPI devices
- * MIPS: support for 24KEc CPUs
- * PPC: support for POWER9 CPUs and powernv platform
- * PPC: pseries support for more the 1TiB of guest memory and memory unplug
- * PPC: pseries support PCI host bridge NUMA affinities
- * s390: support for CPU models and virtio-ccw revision 2
- * x86: support for Extended Interrupt Mode in emulated IOMMUs
- * x86: support for up to 288 CPUs on q35 machine type
- * Xen: unplug support for SCSI disks and xenlinux-compatible devices
+What happens then is aforementioned algorithm starts at descriptor 0,
+sees a descriptor marked as BD_LAST, which it happily sends out as a
+separate packet(very much malformed at this point) then the iteration
+continues and the first part of the original packet is tacked to the
+next transmission which ends up being bogus as well.
 
- * and lots more...
+This behvaiour can be pretty reliably observed when scp'ing data from a
+guest OS via TAP interface for files larger than 160K (every time for
+700K+).
 
-Thank you to everyone involved!
+This patch changes the scanning algorithm to do the following:
+
+	1. Restore "current" and "start" buffer descriptor pointer from
+	   TBPTRn
+
+	2. If "current" descriptor has BD_WRAP flag set "next"
+	   descriptor pointer to start of the descriptor ring otherwise
+	   set "next" to descriptor right after "current"
+
+	3. Process current descriptor
+
+	4. If current descriptore has BD_LAST(end of a packet) set save
+	   "next" descriptor pointer in TBPTRn
+
+	5. Set "current" descriptor pointer to "next"
+
+	6. If "current" descriptor points to "start" (from #1) exit the loop
+	   loop, otherwise go to #2
+
+This way emulation code always keeps track where guest OS driver was
+driving data to last while still going full "loop" over every descriptor
+in a ring, which, hopefully, should fix any potential "wrapping" issues.
+
+Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+---
+ hw/net/fsl_etsec/rings.c | 40 +++++++++++++++++++++++++---------------
+ 1 file changed, 25 insertions(+), 15 deletions(-)
+
+diff --git a/hw/net/fsl_etsec/rings.c b/hw/net/fsl_etsec/rings.c
+index 54c0127..3aebd59 100644
+--- a/hw/net/fsl_etsec/rings.c
++++ b/hw/net/fsl_etsec/rings.c
+@@ -332,7 +332,7 @@ static void process_tx_bd(eTSEC         *etsec,
+ void etsec_walk_tx_ring(eTSEC *etsec, int ring_nbr)
+ {
+     hwaddr        ring_base = 0;
+-    hwaddr        bd_addr   = 0;
++    hwaddr        bd_addr, bd_addr_start, bd_addr_next;
+     eTSEC_rxtx_bd bd;
+     uint16_t      bd_flags;
+ 
+@@ -343,7 +343,7 @@ void etsec_walk_tx_ring(eTSEC *etsec, int ring_nbr)
+ 
+     ring_base = (hwaddr)(etsec->regs[TBASEH].value & 0xF) << 32;
+     ring_base += etsec->regs[TBASE0 + ring_nbr].value & ~0x7;
+-    bd_addr    = etsec->regs[TBPTR0 + ring_nbr].value & ~0x7;
++    bd_addr_start = bd_addr = etsec->regs[TBPTR0 + ring_nbr].value & ~0x7;
+ 
+     do {
+         read_buffer_descriptor(etsec, bd_addr, &bd);
+@@ -358,26 +358,36 @@ void etsec_walk_tx_ring(eTSEC *etsec, int ring_nbr)
+         /* Save flags before BD update */
+         bd_flags = bd.flags;
+ 
+-        if (bd_flags & BD_TX_READY) {
+-            process_tx_bd(etsec, &bd);
+-
+-            /* Write back BD after update */
+-            write_buffer_descriptor(etsec, bd_addr, &bd);
+-        }
+-
+         /* Wrap or next BD */
+         if (bd_flags & BD_WRAP) {
+-            bd_addr = ring_base;
++            bd_addr_next = ring_base;
+         } else {
+-            bd_addr += sizeof(eTSEC_rxtx_bd);
++            bd_addr_next = bd_addr + sizeof(eTSEC_rxtx_bd);
+         }
+ 
+-    } while (bd_addr != ring_base);
++        if (bd_flags & BD_TX_READY) {
++            if (bd_flags & BD_LAST) {
++                /* If we encounter a descriptor marking end of a
++                 * packet - save a pointer to descriptor after that as
++                 * a place to resume descriptor processing for next
++                 * time.
++                 *
++                 * As we iterate through a ring we progressively move
++                 * this point forward and at the end of one cycle end
++                 * up with the position right after the last packet we
++                 * encountered.
++                 */
++                etsec->regs[TBPTR0 + ring_nbr].value = bd_addr_next;
++            }
++
++            process_tx_bd(etsec, &bd);
+ 
+-    bd_addr = ring_base;
++            /* Write back BD after update */
++            write_buffer_descriptor(etsec, bd_addr, &bd);
++        }
+ 
+-    /* Save the Buffer Descriptor Pointers to current bd */
+-    etsec->regs[TBPTR0 + ring_nbr].value = bd_addr;
++        bd_addr = bd_addr_next;
++    } while (bd_addr != bd_addr_start);
+ 
+     /* Set transmit halt THLTx */
+     etsec->regs[TSTAT].value |= 1 << (31 - ring_nbr);
+-- 
+2.5.5
