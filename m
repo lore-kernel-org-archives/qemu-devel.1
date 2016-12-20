@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44523)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46285)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1cJHuI-0007oj-Ok
-	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 05:44:32 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cJI0Z-0001nE-6U
+	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 05:51:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1cJHuE-0002DX-KN
-	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 05:44:30 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44410)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1cJHuE-0002D2-B3
-	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 05:44:26 -0500
-Received: from int-mx11.intmail.prod.int.phx2.redhat.com
-	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6D56283F3E
-	for <qemu-devel@nongnu.org>; Tue, 20 Dec 2016 10:44:25 +0000 (UTC)
-References: <1480980749-182204-1-git-send-email-imammedo@redhat.com>
-	<1480980749-182204-5-git-send-email-imammedo@redhat.com>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <ada80dce-9b7f-8cab-408d-4b1a05f34cd6@redhat.com>
-Date: Tue, 20 Dec 2016 12:44:22 +0200
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cJI0X-0004qf-LM
+	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 05:50:59 -0500
+Received: from mail-yb0-x244.google.com ([2607:f8b0:4002:c09::244]:35231)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1cJI0X-0004qA-F1
+	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 05:50:57 -0500
+Received: by mail-yb0-x244.google.com with SMTP id d59so1075443ybi.2
+	for <qemu-devel@nongnu.org>; Tue, 20 Dec 2016 02:50:57 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1480980749-182204-5-git-send-email-imammedo@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.9 04/10] memhp: move
- build_memory_devices() into memory_hotplug.c
+References: <1482156623-9111-1-git-send-email-peterx@redhat.com>
+	<1482156623-9111-2-git-send-email-peterx@redhat.com>
+In-Reply-To: <1482156623-9111-2-git-send-email-peterx@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 20 Dec 2016 10:50:45 +0000
+Message-ID: <CAJ+F1CLyx97pFp=7tsmUeRPAJ03zWsOdZXMGUdiALC5tUBHhoA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/2] memory: provide common macros for
+ mtree_print_mr()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,303 +31,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com
 
-On 12/06/2016 01:32 AM, Igor Mammedov wrote:
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Hi
+
+On Mon, Dec 19, 2016 at 3:11 PM Peter Xu <peterx@redhat.com> wrote:
+
+> mtree_print_mr() has some common codes. Generalize it.
+>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 > ---
->  include/hw/acpi/memory_hotplug.h |   2 +
->  hw/acpi/memory_hotplug.c         | 124 +++++++++++++++++++++++++++++++++++++++
->  hw/i386/acpi-build.c             | 124 ---------------------------------------
->  3 files changed, 126 insertions(+), 124 deletions(-)
+>  memory.c | 34 +++++++++++++++-------------------
+>  1 file changed, 15 insertions(+), 19 deletions(-)
 >
-> diff --git a/include/hw/acpi/memory_hotplug.h b/include/hw/acpi/memory_hotplug.h
-> index d2c7452..964c244 100644
-> --- a/include/hw/acpi/memory_hotplug.h
-> +++ b/include/hw/acpi/memory_hotplug.h
-> @@ -54,4 +54,6 @@ void acpi_memory_ospm_status(MemHotplugState *mem_st, ACPIOSTInfoList ***list);
+> diff --git a/memory.c b/memory.c
+> index 33110e9..5dcc2e1 100644
+> --- a/memory.c
+> +++ b/memory.c
+> @@ -2450,6 +2450,13 @@ struct MemoryRegionList {
 >
->  void build_memory_hotplug_aml(Aml *ctx, uint32_t nr_mem,
->                                uint16_t io_base, uint16_t io_len);
-> +void build_memory_devices(Aml *sb_scope, int nr_mem,
-> +                          uint16_t io_base, uint16_t io_len);
-
-
-We add an extra function to the header file, but if it can be used
-by the ARM machines is worth it.
-
-Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
-
-Thanks,
-Marcel
-
->  #endif
-> diff --git a/hw/acpi/memory_hotplug.c b/hw/acpi/memory_hotplug.c
-> index 57ac4fc..67dd3f8 100644
-> --- a/hw/acpi/memory_hotplug.c
-> +++ b/hw/acpi/memory_hotplug.c
-> @@ -553,3 +553,127 @@ void build_memory_hotplug_aml(Aml *ctx, uint32_t nr_mem,
->      aml_append(pci_scope, mem_ctrl_dev);
->      aml_append(ctx, pci_scope);
->  }
-> +
-> +void build_memory_devices(Aml *sb_scope, int nr_mem,
-> +                          uint16_t io_base, uint16_t io_len)
-> +{
-> +    int i;
-> +    Aml *scope;
-> +    Aml *crs;
-> +    Aml *field;
-> +    Aml *dev;
-> +    Aml *method;
-> +    Aml *ifctx;
-> +
-> +    /* build memory devices */
-> +    assert(nr_mem <= ACPI_MAX_RAM_SLOTS);
-> +    scope = aml_scope("\\_SB.PCI0." MEMORY_HOTPLUG_DEVICE);
-> +    aml_append(scope,
-> +        aml_name_decl(MEMORY_SLOTS_NUMBER, aml_int(nr_mem))
-> +    );
-> +
-> +    crs = aml_resource_template();
-> +    aml_append(crs,
-> +        aml_io(AML_DECODE16, io_base, io_base, 0, io_len)
-> +    );
-> +    aml_append(scope, aml_name_decl("_CRS", crs));
-> +
-> +    aml_append(scope, aml_operation_region(
-> +        MEMORY_HOTPLUG_IO_REGION, AML_SYSTEM_IO,
-> +        aml_int(io_base), io_len)
-> +    );
-> +
-> +    field = aml_field(MEMORY_HOTPLUG_IO_REGION, AML_DWORD_ACC,
-> +                      AML_NOLOCK, AML_PRESERVE);
-> +    aml_append(field, /* read only */
-> +        aml_named_field(MEMORY_SLOT_ADDR_LOW, 32));
-> +    aml_append(field, /* read only */
-> +        aml_named_field(MEMORY_SLOT_ADDR_HIGH, 32));
-> +    aml_append(field, /* read only */
-> +        aml_named_field(MEMORY_SLOT_SIZE_LOW, 32));
-> +    aml_append(field, /* read only */
-> +        aml_named_field(MEMORY_SLOT_SIZE_HIGH, 32));
-> +    aml_append(field, /* read only */
-> +        aml_named_field(MEMORY_SLOT_PROXIMITY, 32));
-> +    aml_append(scope, field);
-> +
-> +    field = aml_field(MEMORY_HOTPLUG_IO_REGION, AML_BYTE_ACC,
-> +                      AML_NOLOCK, AML_WRITE_AS_ZEROS);
-> +    aml_append(field, aml_reserved_field(160 /* bits, Offset(20) */));
-> +    aml_append(field, /* 1 if enabled, read only */
-> +        aml_named_field(MEMORY_SLOT_ENABLED, 1));
-> +    aml_append(field,
-> +        /*(read) 1 if has a insert event. (write) 1 to clear event */
-> +        aml_named_field(MEMORY_SLOT_INSERT_EVENT, 1));
-> +    aml_append(field,
-> +        /* (read) 1 if has a remove event. (write) 1 to clear event */
-> +        aml_named_field(MEMORY_SLOT_REMOVE_EVENT, 1));
-> +    aml_append(field,
-> +        /* initiates device eject, write only */
-> +        aml_named_field(MEMORY_SLOT_EJECT, 1));
-> +    aml_append(scope, field);
-> +
-> +    field = aml_field(MEMORY_HOTPLUG_IO_REGION, AML_DWORD_ACC,
-> +                      AML_NOLOCK, AML_PRESERVE);
-> +    aml_append(field, /* DIMM selector, write only */
-> +        aml_named_field(MEMORY_SLOT_SLECTOR, 32));
-> +    aml_append(field, /* _OST event code, write only */
-> +        aml_named_field(MEMORY_SLOT_OST_EVENT, 32));
-> +    aml_append(field, /* _OST status code, write only */
-> +        aml_named_field(MEMORY_SLOT_OST_STATUS, 32));
-> +    aml_append(scope, field);
-> +    aml_append(sb_scope, scope);
-> +
-> +    for (i = 0; i < nr_mem; i++) {
-> +        #define BASEPATH "\\_SB.PCI0." MEMORY_HOTPLUG_DEVICE "."
-> +        const char *s;
-> +
-> +        dev = aml_device("MP%02X", i);
-> +        aml_append(dev, aml_name_decl("_UID", aml_string("0x%02X", i)));
-> +        aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0C80")));
-> +
-> +        method = aml_method("_CRS", 0, AML_NOTSERIALIZED);
-> +        s = BASEPATH MEMORY_SLOT_CRS_METHOD;
-> +        aml_append(method, aml_return(aml_call1(s, aml_name("_UID"))));
-> +        aml_append(dev, method);
-> +
-> +        method = aml_method("_STA", 0, AML_NOTSERIALIZED);
-> +        s = BASEPATH MEMORY_SLOT_STATUS_METHOD;
-> +        aml_append(method, aml_return(aml_call1(s, aml_name("_UID"))));
-> +        aml_append(dev, method);
-> +
-> +        method = aml_method("_PXM", 0, AML_NOTSERIALIZED);
-> +        s = BASEPATH MEMORY_SLOT_PROXIMITY_METHOD;
-> +        aml_append(method, aml_return(aml_call1(s, aml_name("_UID"))));
-> +        aml_append(dev, method);
-> +
-> +        method = aml_method("_OST", 3, AML_NOTSERIALIZED);
-> +        s = BASEPATH MEMORY_SLOT_OST_METHOD;
-> +
-> +        aml_append(method, aml_return(aml_call4(
-> +            s, aml_name("_UID"), aml_arg(0), aml_arg(1), aml_arg(2)
-> +        )));
-> +        aml_append(dev, method);
-> +
-> +        method = aml_method("_EJ0", 1, AML_NOTSERIALIZED);
-> +        s = BASEPATH MEMORY_SLOT_EJECT_METHOD;
-> +        aml_append(method, aml_return(aml_call2(
-> +                   s, aml_name("_UID"), aml_arg(0))));
-> +        aml_append(dev, method);
-> +
-> +        aml_append(sb_scope, dev);
-> +    }
-> +
-> +    /* build Method(MEMORY_SLOT_NOTIFY_METHOD, 2) {
-> +     *     If (LEqual(Arg0, 0x00)) {Notify(MP00, Arg1)} ... }
-> +     */
-> +    method = aml_method(MEMORY_SLOT_NOTIFY_METHOD, 2, AML_NOTSERIALIZED);
-> +    for (i = 0; i < nr_mem; i++) {
-> +        ifctx = aml_if(aml_equal(aml_arg(0), aml_int(i)));
-> +        aml_append(ifctx,
-> +            aml_notify(aml_name("MP%.02X", i), aml_arg(1))
-> +        );
-> +        aml_append(method, ifctx);
-> +    }
-> +    aml_append(sb_scope, method);
-> +}
-> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> index 9708cdc..38dcac7 100644
-> --- a/hw/i386/acpi-build.c
-> +++ b/hw/i386/acpi-build.c
-> @@ -1038,130 +1038,6 @@ static Aml *build_crs(PCIHostState *host, CrsRangeSet *range_set)
->      return crs;
->  }
+>  typedef QTAILQ_HEAD(queue, MemoryRegionList) MemoryRegionListHead;
 >
-> -static void build_memory_devices(Aml *sb_scope, int nr_mem,
-> -                                 uint16_t io_base, uint16_t io_len)
-> -{
-> -    int i;
-> -    Aml *scope;
-> -    Aml *crs;
-> -    Aml *field;
-> -    Aml *dev;
-> -    Aml *method;
-> -    Aml *ifctx;
-> -
-> -    /* build memory devices */
-> -    assert(nr_mem <= ACPI_MAX_RAM_SLOTS);
-> -    scope = aml_scope("\\_SB.PCI0." MEMORY_HOTPLUG_DEVICE);
-> -    aml_append(scope,
-> -        aml_name_decl(MEMORY_SLOTS_NUMBER, aml_int(nr_mem))
-> -    );
-> -
-> -    crs = aml_resource_template();
-> -    aml_append(crs,
-> -        aml_io(AML_DECODE16, io_base, io_base, 0, io_len)
-> -    );
-> -    aml_append(scope, aml_name_decl("_CRS", crs));
-> -
-> -    aml_append(scope, aml_operation_region(
-> -        MEMORY_HOTPLUG_IO_REGION, AML_SYSTEM_IO,
-> -        aml_int(io_base), io_len)
-> -    );
-> -
-> -    field = aml_field(MEMORY_HOTPLUG_IO_REGION, AML_DWORD_ACC,
-> -                      AML_NOLOCK, AML_PRESERVE);
-> -    aml_append(field, /* read only */
-> -        aml_named_field(MEMORY_SLOT_ADDR_LOW, 32));
-> -    aml_append(field, /* read only */
-> -        aml_named_field(MEMORY_SLOT_ADDR_HIGH, 32));
-> -    aml_append(field, /* read only */
-> -        aml_named_field(MEMORY_SLOT_SIZE_LOW, 32));
-> -    aml_append(field, /* read only */
-> -        aml_named_field(MEMORY_SLOT_SIZE_HIGH, 32));
-> -    aml_append(field, /* read only */
-> -        aml_named_field(MEMORY_SLOT_PROXIMITY, 32));
-> -    aml_append(scope, field);
-> -
-> -    field = aml_field(MEMORY_HOTPLUG_IO_REGION, AML_BYTE_ACC,
-> -                      AML_NOLOCK, AML_WRITE_AS_ZEROS);
-> -    aml_append(field, aml_reserved_field(160 /* bits, Offset(20) */));
-> -    aml_append(field, /* 1 if enabled, read only */
-> -        aml_named_field(MEMORY_SLOT_ENABLED, 1));
-> -    aml_append(field,
-> -        /*(read) 1 if has a insert event. (write) 1 to clear event */
-> -        aml_named_field(MEMORY_SLOT_INSERT_EVENT, 1));
-> -    aml_append(field,
-> -        /* (read) 1 if has a remove event. (write) 1 to clear event */
-> -        aml_named_field(MEMORY_SLOT_REMOVE_EVENT, 1));
-> -    aml_append(field,
-> -        /* initiates device eject, write only */
-> -        aml_named_field(MEMORY_SLOT_EJECT, 1));
-> -    aml_append(scope, field);
-> -
-> -    field = aml_field(MEMORY_HOTPLUG_IO_REGION, AML_DWORD_ACC,
-> -                      AML_NOLOCK, AML_PRESERVE);
-> -    aml_append(field, /* DIMM selector, write only */
-> -        aml_named_field(MEMORY_SLOT_SLECTOR, 32));
-> -    aml_append(field, /* _OST event code, write only */
-> -        aml_named_field(MEMORY_SLOT_OST_EVENT, 32));
-> -    aml_append(field, /* _OST status code, write only */
-> -        aml_named_field(MEMORY_SLOT_OST_STATUS, 32));
-> -    aml_append(scope, field);
-> -    aml_append(sb_scope, scope);
-> -
-> -    for (i = 0; i < nr_mem; i++) {
-> -        #define BASEPATH "\\_SB.PCI0." MEMORY_HOTPLUG_DEVICE "."
-> -        const char *s;
-> -
-> -        dev = aml_device("MP%02X", i);
-> -        aml_append(dev, aml_name_decl("_UID", aml_string("0x%02X", i)));
-> -        aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0C80")));
-> -
-> -        method = aml_method("_CRS", 0, AML_NOTSERIALIZED);
-> -        s = BASEPATH MEMORY_SLOT_CRS_METHOD;
-> -        aml_append(method, aml_return(aml_call1(s, aml_name("_UID"))));
-> -        aml_append(dev, method);
-> -
-> -        method = aml_method("_STA", 0, AML_NOTSERIALIZED);
-> -        s = BASEPATH MEMORY_SLOT_STATUS_METHOD;
-> -        aml_append(method, aml_return(aml_call1(s, aml_name("_UID"))));
-> -        aml_append(dev, method);
-> -
-> -        method = aml_method("_PXM", 0, AML_NOTSERIALIZED);
-> -        s = BASEPATH MEMORY_SLOT_PROXIMITY_METHOD;
-> -        aml_append(method, aml_return(aml_call1(s, aml_name("_UID"))));
-> -        aml_append(dev, method);
-> -
-> -        method = aml_method("_OST", 3, AML_NOTSERIALIZED);
-> -        s = BASEPATH MEMORY_SLOT_OST_METHOD;
-> -
-> -        aml_append(method, aml_return(aml_call4(
-> -            s, aml_name("_UID"), aml_arg(0), aml_arg(1), aml_arg(2)
-> -        )));
-> -        aml_append(dev, method);
-> -
-> -        method = aml_method("_EJ0", 1, AML_NOTSERIALIZED);
-> -        s = BASEPATH MEMORY_SLOT_EJECT_METHOD;
-> -        aml_append(method, aml_return(aml_call2(
-> -                   s, aml_name("_UID"), aml_arg(0))));
-> -        aml_append(dev, method);
-> -
-> -        aml_append(sb_scope, dev);
-> -    }
-> -
-> -    /* build Method(MEMORY_SLOT_NOTIFY_METHOD, 2) {
-> -     *     If (LEqual(Arg0, 0x00)) {Notify(MP00, Arg1)} ... }
-> -     */
-> -    method = aml_method(MEMORY_SLOT_NOTIFY_METHOD, 2, AML_NOTSERIALIZED);
-> -    for (i = 0; i < nr_mem; i++) {
-> -        ifctx = aml_if(aml_equal(aml_arg(0), aml_int(i)));
-> -        aml_append(ifctx,
-> -            aml_notify(aml_name("MP%.02X", i), aml_arg(1))
-> -        );
-> -        aml_append(method, ifctx);
-> -    }
-> -    aml_append(sb_scope, method);
-> -}
-> -
->  static void build_hpet_aml(Aml *table)
->  {
->      Aml *crs;
+> +#define MR_CHAR_RD(mr) ((mr)->romd_mode ? 'R' : '-')
+> +#define MR_CHAR_WR(mr) (!(mr)->readonly && !((mr)->rom_device && \
+> +                                             (mr)->romd_mode) ? 'W' : '-=
+')
+> +#define MR_SIZE(size) (int128_nz(size) ? (hwaddr)int128_get64( \
+> +                           int128_sub((size), int128_one())) : 0)
+> +#define MTREE_INDENT "  "
+> +
+>  static void mtree_print_mr(fprintf_function mon_printf, void *f,
+>                             const MemoryRegion *mr, unsigned int level,
+>                             hwaddr base,
+> @@ -2465,7 +2472,7 @@ static void mtree_print_mr(fprintf_function
+> mon_printf, void *f,
+>      }
 >
+>      for (i =3D 0; i < level; i++) {
+> -        mon_printf(f, "  ");
+> +        mon_printf(f, MTREE_INDENT);
+>
+
+This one is perhaps superfluous
+
+
+>      }
+>
+>      if (mr->alias) {
+> @@ -2488,34 +2495,23 @@ static void mtree_print_mr(fprintf_function
+> mon_printf, void *f,
+>                     " (prio %d, %c%c): alias %s @%s " TARGET_FMT_plx
+>                     "-" TARGET_FMT_plx "%s\n",
+>                     base + mr->addr,
+> -                   base + mr->addr
+> -                   + (int128_nz(mr->size) ?
+> -                      (hwaddr)int128_get64(int128_sub(mr->size,
+> -                                                      int128_one())) : 0=
+),
+> +                   base + mr->addr + MR_SIZE(mr->size),
+>                     mr->priority,
+> -                   mr->romd_mode ? 'R' : '-',
+> -                   !mr->readonly && !(mr->rom_device && mr->romd_mode) ?
+> 'W'
+> -                                                                       :
+> '-',
+> +                   MR_CHAR_RD(mr),
+> +                   MR_CHAR_WR(mr),
+>                     memory_region_name(mr),
+>                     memory_region_name(mr->alias),
+>                     mr->alias_offset,
+> -                   mr->alias_offset
+> -                   + (int128_nz(mr->size) ?
+> -                      (hwaddr)int128_get64(int128_sub(mr->size,
+> -                                                      int128_one())) : 0=
+),
+> +                   mr->alias_offset + MR_SIZE(mr->size),
+>                     mr->enabled ? "" : " [disabled]");
+>      } else {
+>          mon_printf(f,
+>                     TARGET_FMT_plx "-" TARGET_FMT_plx " (prio %d, %c%c):
+> %s%s\n",
+>                     base + mr->addr,
+> -                   base + mr->addr
+> -                   + (int128_nz(mr->size) ?
+> -                      (hwaddr)int128_get64(int128_sub(mr->size,
+> -                                                      int128_one())) : 0=
+),
+> +                   base + mr->addr + MR_SIZE(mr->size),
+>                     mr->priority,
+> -                   mr->romd_mode ? 'R' : '-',
+> -                   !mr->readonly && !(mr->rom_device && mr->romd_mode) ?
+> 'W'
+> -                                                                       :
+> '-',
+> +                   MR_CHAR_RD(mr),
+> +                   MR_CHAR_WR(mr),
+>                     memory_region_name(mr),
+>                     mr->enabled ? "" : " [disabled]");
+>      }
+> --
+>
+
+
+looks good,
+
+
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
