@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54899)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54948)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1cJT8e-0004i8-2H
-	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 17:44:05 -0500
+	(envelope-from <alistair23@gmail.com>) id 1cJT8j-0004lY-Nw
+	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 17:44:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1cJT8a-00040Y-Mc
-	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 17:44:04 -0500
-Received: from mail-co1nam03on0065.outbound.protection.outlook.com
-	([104.47.40.65]:57952
-	helo=NAM03-CO1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1cJT8a-000405-CW
-	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 17:44:00 -0500
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Tue, 20 Dec 2016 14:42:04 -0800
-Message-ID: <b9c61e0c893b6215531ea210e566c9057d28c792.1482265908.git.alistair.francis@xilinx.com>
-In-Reply-To: <cover.1482265908.git.alistair.francis@xilinx.com>
-References: <cover.1482265908.git.alistair.francis@xilinx.com>
+	(envelope-from <alistair23@gmail.com>) id 1cJT8i-000446-Ff
+	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 17:44:09 -0500
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v3 2/3] arm_generic_timer: Add support for the
- ReadBase memory map
+Sender: alistair23@gmail.com
+In-Reply-To: <CAKmqyKOY4ZZrRDcp29QWszAJw-pTrasFUq94Xbm5YqrxFgfCaw@mail.gmail.com>
+References: <cover.1478566669.git.alistair.francis@xilinx.com>
+	<71bc12badf4f3125765146c21b4976b1d07dce46.1478566669.git.alistair.francis@xilinx.com>
+	<CAFEAcA9vrhPyHbpWqxjS167f_aG-NRf7EVms=dg6ULah_fwmgw@mail.gmail.com>
+	<CAKmqyKOY4ZZrRDcp29QWszAJw-pTrasFUq94Xbm5YqrxFgfCaw@mail.gmail.com>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Tue, 20 Dec 2016 14:43:35 -0800
+Message-ID: <CAKmqyKMPV8JsTRf4qDV0JisbeqV2YSN4Qx7EgDREmwmq8jns_Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] arm_generic_timer: Add the ARM
+ Generic Timer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,110 +26,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, fred.konrad@greensocs.com
-Cc: alistair.francis@xilinx.com, alistair23@gmail.com
+To: Alistair Francis <alistair.francis@xilinx.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, =?UTF-8?B?S09OUkFEIEZyw6lkw6lyaWM=?= <fred.konrad@greensocs.com>
 
-Add support for the read only regions in the ReadBase memory map.
+On Fri, Dec 16, 2016 at 1:03 PM, Alistair Francis
+<alistair.francis@xilinx.com> wrote:
+> On Tue, Dec 13, 2016 at 5:11 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
+>> On 8 November 2016 at 00:58, Alistair Francis
+>> <alistair.francis@xilinx.com> wrote:
+>>> Add the ARM generic timer. This allows the guest to poll the timer for
+>>> values and also supports secure writes only.
+>>>
+>>> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+>>> ---
+>>> V2:
+>>>  - Fix couter/counter typo
+>>>
+>>>  hw/timer/Makefile.objs               |   1 +
+>>>  hw/timer/arm_generic_timer.c         | 216 +++++++++++++++++++++++++++++++++++
+>>>  include/hw/timer/arm_generic_timer.h |  60 ++++++++++
+>>>  3 files changed, 277 insertions(+)
+>>>  create mode 100644 hw/timer/arm_generic_timer.c
+>>>  create mode 100644 include/hw/timer/arm_generic_timer.h
+>>
+>> I can't quite seem to make this line up with the spec in the v8
+>> ARM ARM (chapter 11 "System Level Implementation of the Generic
+>> Timer"). The generic timer documented there looks quite like this,
+>> but has extra ID registers at 0xFD0..0xFFC which this code doesn't
+>> implement, and also has the "CNTReadBase" memory map (which
+>> exposes just the count value and ID registers) as well as the
+>> "CNTControlBase" map that looks like what you have here.
+>> (The register names here differ from the conventions in the
+>> ARM ARM too.)
+>
+> Of course they don't line up :(
+>
+> I wrote it based off the Xilinx documentation, I (wrongly) assumed
+> that we would follow the normal convention but apparently not.
+>
+>>
+>> Is this code trying to implement that Generic Timer, or something
+>> else with a similar name?
+>
+> I'm not sure now which one it is.
+>
+> I will dig into this and hopefully can respin this based on what is in
+> the ARM ARM.
 
-Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
----
+It turns out it is pretty close.
 
- hw/timer/arm_generic_timer.c         | 27 +++++++++++++++++++++++++++
- include/hw/timer/arm_generic_timer.h | 12 ++++++++++++
- 2 files changed, 39 insertions(+)
+I have fixed up the names to be more like the ARM ARM. I have added
+some comments about the implementation specific registers and I have
+added the read base registers as well.
 
-diff --git a/hw/timer/arm_generic_timer.c b/hw/timer/arm_generic_timer.c
-index da434a7..5392657 100644
---- a/hw/timer/arm_generic_timer.c
-+++ b/hw/timer/arm_generic_timer.c
-@@ -100,6 +100,17 @@ static RegisterAccessInfo arm_gen_timer_regs_info[] = {
-     /* We don't model the CounterID registers either */
- };
- 
-+static RegisterAccessInfo arm_gen_timer_read_regs_info[] = {
-+    {   .name = "CNTCV_READ_LOWER",
-+        .addr = A_CNTCV_READ_LOWER, .ro = 0xFFFF,
-+        .post_read = counter_low_value_postr,
-+    },{ .name = "CNTCV_READ_UPPER",
-+        .addr = A_CNTCV_READ_UPPER, .ro = 0xFFFF,
-+        .post_read = counter_high_value_postr,
-+    }
-+    /* We don't model the CounterID registers */
-+};
-+
- static void arm_gen_timer_reset(DeviceState *dev)
- {
-     ARMGenTimer *s = ARM_GEN_TIMER(dev);
-@@ -166,6 +177,7 @@ static void arm_gen_timer_init(Object *obj)
-     SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-     RegisterInfoArray *reg_array;
- 
-+    /* Create the ControlBase memory region */
-     memory_region_init_io(&s->iomem, obj, &arm_gen_timer_ops, s,
-                           TYPE_ARM_GEN_TIMER, R_ARM_GEN_TIMER_MAX * 4);
-     reg_array =
-@@ -179,6 +191,21 @@ static void arm_gen_timer_init(Object *obj)
-                                 A_CNTCR,
-                                 &reg_array->mem);
-     sysbus_init_mmio(sbd, &s->iomem);
-+
-+    /* Create the ReadBase memory region */
-+    memory_region_init_io(&s->iomem_read, obj, &arm_gen_timer_ops, s,
-+                          TYPE_ARM_GEN_TIMER "-read", R_ARM_GEN_TIMER_READ_MAX * 4);
-+    reg_array =
-+        register_init_block32(DEVICE(obj), arm_gen_timer_read_regs_info,
-+                              ARRAY_SIZE(arm_gen_timer_read_regs_info),
-+                              s->regs_read_info, s->regs_read,
-+                              &arm_gen_timer_ops,
-+                              ARM_GEN_TIMER_ERR_DEBUG,
-+                              R_ARM_GEN_TIMER_READ_MAX * 4);
-+    memory_region_add_subregion(&s->iomem_read,
-+                                R_CNTCV_READ_LOWER,
-+                                &reg_array->mem);
-+    sysbus_init_mmio(sbd, &s->iomem_read);
- }
- 
- static void arm_gen_timer_class_init(ObjectClass *klass, void *data)
-diff --git a/include/hw/timer/arm_generic_timer.h b/include/hw/timer/arm_generic_timer.h
-index ae4319c..462ee5b 100644
---- a/include/hw/timer/arm_generic_timer.h
-+++ b/include/hw/timer/arm_generic_timer.h
-@@ -33,6 +33,7 @@
- #define ARM_GEN_TIMER(obj) \
-             OBJECT_CHECK(ARMGenTimer, (obj), TYPE_ARM_GEN_TIMER)
- 
-+/* ControlBase Memory Map */
- REG32(CNTCR, 0x00)
-     FIELD(CNTCR, EN, 0, 1)
-     FIELD(CNTCR, HDBG, 1, 1)
-@@ -46,10 +47,18 @@ REG32(CNTFID0, 0x20)
- 
- #define R_ARM_GEN_TIMER_MAX (R_CNTFID0 + 1)
- 
-+/* Read Base Memory Map */
-+REG32(CNTCV_READ_LOWER, 0x00)
-+REG32(CNTCV_READ_UPPER, 0x04)
-+/* We don't model the CounterID registers */
-+
-+#define R_ARM_GEN_TIMER_READ_MAX (R_CNTCV_READ_UPPER + 1)
-+
- typedef struct ARMGenTimer {
-     /* <private> */
-     SysBusDevice parent_obj;
-     MemoryRegion iomem;
-+    MemoryRegion iomem_read;
- 
-     /* <public> */
-     bool enabled;
-@@ -57,6 +66,9 @@ typedef struct ARMGenTimer {
- 
-     uint32_t regs[R_ARM_GEN_TIMER_MAX];
-     RegisterInfo regs_info[R_ARM_GEN_TIMER_MAX];
-+
-+    uint32_t regs_read[R_ARM_GEN_TIMER_READ_MAX];
-+    RegisterInfo regs_read_info[R_ARM_GEN_TIMER_READ_MAX];
- } ARMGenTimer;
- 
- #endif
--- 
-2.7.4
+Sending out a V3.
+
+Thanks,
+
+Alistair
+
+>
+>>
+>>> diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
+>>> index 7ba8c23..f88c468 100644
+>>> --- a/hw/timer/Makefile.objs
+>>> +++ b/hw/timer/Makefile.objs
+>>> @@ -17,6 +17,7 @@ common-obj-$(CONFIG_IMX) += imx_epit.o
+>>>  common-obj-$(CONFIG_IMX) += imx_gpt.o
+>>>  common-obj-$(CONFIG_LM32) += lm32_timer.o
+>>>  common-obj-$(CONFIG_MILKYMIST) += milkymist-sysctl.o
+>>> +common-obj-$(CONFIG_XLNX_ZYNQMP) += arm_generic_timer.o
+>>
+>> If this is really generic I think it ought to have its own
+>> CONFIG_foo rather than using the XLNX_ZYNQMP symbol.
+>
+> Yes, Fred pointed that out as well. I will fix that up in the next version.
+>
+>>
+>>>
+>>>  obj-$(CONFIG_EXYNOS4) += exynos4210_mct.o
+>>>  obj-$(CONFIG_EXYNOS4) += exynos4210_pwm.o
+>>
+>>> +static uint64_t counter_low_value_postr(RegisterInfo *reg, uint64_t val64)
+>>> +{
+>>> +    ARMGenTimer *s = ARM_GEN_TIMER(reg->opaque);
+>>> +    uint64_t current_ticks, total_ticks;
+>>> +    uint32_t low_ticks;
+>>> +
+>>> +    if (s->enabled) {
+>>> +        current_ticks = muldiv64(qemu_clock_get_us(QEMU_CLOCK_VIRTUAL),
+>>> +                                 NANOSECONDS_PER_SECOND, 1000000);
+>>> +        total_ticks = current_ticks - s->tick_offset;
+>>> +        low_ticks = (uint32_t) total_ticks;
+>>> +    } else {
+>>> +        /* Timer is disabled, return the time when it was disabled */
+>>> +        low_ticks = (uint32_t) s->tick_offset;
+>>> +    }
+>>> +
+>>> +    return low_ticks;
+>>> +}
+>>> +
+>>> +static uint64_t counter_high_value_postr(RegisterInfo *reg, uint64_t val64)
+>>> +{
+>>> +    ARMGenTimer *s = ARM_GEN_TIMER(reg->opaque);
+>>> +    uint64_t current_ticks, total_ticks;
+>>> +    uint32_t high_ticks;
+>>> +
+>>> +    if (s->enabled) {
+>>> +        current_ticks = muldiv64(qemu_clock_get_us(QEMU_CLOCK_VIRTUAL),
+>>> +                                 NANOSECONDS_PER_SECOND, 1000000);
+>>> +        total_ticks = current_ticks - s->tick_offset;
+>>> +        high_ticks = (uint32_t) (total_ticks >> 32);
+>>> +    } else {
+>>> +        /* Timer is disabled, return the time when it was disabled */
+>>> +        high_ticks = (uint32_t) (s->tick_offset >> 32);
+>>> +    }
+>>> +
+>>> +    return high_ticks;
+>>
+>> These two functions are very similar and would benefit from
+>> being refactored to call a utility function that just returned
+>> the 64-bit count.
+>
+> Good point.
+>
+> Thanks,
+>
+> Alistair
+>
+>>
+>> thanks
+>> -- PMM
