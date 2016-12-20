@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37403)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38375)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1cJTfJ-0004Vf-Q3
-	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 18:17:50 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1cJTjM-0006mi-Ks
+	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 18:22:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1cJTfE-0002Ce-Qa
-	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 18:17:49 -0500
-Received: from mail-bl2nam02on0068.outbound.protection.outlook.com
-	([104.47.38.68]:45216
-	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1cJTfE-0002C4-LN
-	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 18:17:44 -0500
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Tue, 20 Dec 2016 14:42:06 -0800
-Message-ID: <5b9a682feb30a4c22b068d698d65063c299d24cf.1482265908.git.alistair.francis@xilinx.com>
-In-Reply-To: <cover.1482265908.git.alistair.francis@xilinx.com>
-References: <cover.1482265908.git.alistair.francis@xilinx.com>
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1cJTjL-0003wy-Ta
+	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 18:22:00 -0500
+Received: from hera.aquilenet.fr ([2a01:474::1]:39556)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1cJTjL-0003wn-NC
+	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 18:21:59 -0500
+Date: Wed, 21 Dec 2016 00:21:55 +0100
+From: Samuel Thibault <samuel.thibault@gnu.org>
+Message-ID: <20161220232155.GS3258@var.home>
+References: <20161220230732.17862-1-samuel.thibault@ens-lyon.org>
+	<148227574230.73.12239976842886455682@790289a7ca88>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v3 3/3] xlnx-zynqmp: Connect the ARM Generic
- Timer
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <148227574230.73.12239976842886455682@790289a7ca88>
+Subject: Re: [Qemu-devel] [PULL 0/2] slirp updates: MIN/MAX,
+ tftp dynamic blocks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,74 +28,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, fred.konrad@greensocs.com
-Cc: alistair.francis@xilinx.com, alistair23@gmail.com
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com, stefanha@redhat.com, jan.kiszka@siemens.com
 
-Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
----
+no-reply@patchew.org, on Tue 20 Dec 2016 15:15:43 -0800, wrote:
+> Your series seems to have some coding style problems. See output below for
+> more information:
 
- hw/arm/xlnx-zynqmp.c         | 14 ++++++++++++++
- include/hw/arm/xlnx-zynqmp.h |  2 ++
- 2 files changed, 16 insertions(+)
 
-diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
-index 0d86ba3..f3891ae 100644
---- a/hw/arm/xlnx-zynqmp.c
-+++ b/hw/arm/xlnx-zynqmp.c
-@@ -38,6 +38,8 @@
- #define SATA_ADDR           0xFD0C0000
- #define SATA_NUM_PORTS      2
- 
-+#define ARM_GEN_TIMER_ADDR  0xFF260000
-+
- #define DP_ADDR             0xfd4a0000
- #define DP_IRQ              113
- 
-@@ -172,6 +174,10 @@ static void xlnx_zynqmp_init(Object *obj)
-         qdev_set_parent_bus(DEVICE(&s->spi[i]), sysbus_get_default());
-     }
- 
-+    object_initialize(&s->arm_gen_timer, sizeof(s->arm_gen_timer),
-+                      TYPE_ARM_GEN_TIMER);
-+    qdev_set_parent_bus(DEVICE(&s->arm_gen_timer), sysbus_get_default());
-+
-     object_initialize(&s->dp, sizeof(s->dp), TYPE_XLNX_DP);
-     qdev_set_parent_bus(DEVICE(&s->dp), sysbus_get_default());
- 
-@@ -405,6 +411,14 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
-         g_free(bus_name);
-     }
- 
-+    object_property_set_bool(OBJECT(&s->arm_gen_timer), true, "realized", &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->arm_gen_timer), 0, ARM_GEN_TIMER_ADDR);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->arm_gen_timer), 1, ARM_GEN_TIMER_ADDR - 0x10000);
-+
-     object_property_set_bool(OBJECT(&s->dp), true, "realized", &err);
-     if (err) {
-         error_propagate(errp, err);
-diff --git a/include/hw/arm/xlnx-zynqmp.h b/include/hw/arm/xlnx-zynqmp.h
-index c2931bf..8deabb4 100644
---- a/include/hw/arm/xlnx-zynqmp.h
-+++ b/include/hw/arm/xlnx-zynqmp.h
-@@ -26,6 +26,7 @@
- #include "hw/ide/ahci.h"
- #include "hw/sd/sdhci.h"
- #include "hw/ssi/xilinx_spips.h"
-+#include "hw/timer/arm_generic_timer.h"
- #include "hw/dma/xlnx_dpdma.h"
- #include "hw/display/xlnx_dp.h"
- 
-@@ -83,6 +84,7 @@ typedef struct XlnxZynqMPState {
-     SysbusAHCIState sata;
-     SDHCIState sdhci[XLNX_ZYNQMP_NUM_SDHCI];
-     XilinxSPIPS spi[XLNX_ZYNQMP_NUM_SPIS];
-+    ARMGenTimer arm_gen_timer;
-     XlnxDPState dp;
-     XlnxDPDMAState dpdma;
- 
--- 
-2.7.4
+> ERROR: suspect code indent for conditional statements (10, 14)
+> #90: FILE: slirp/tftp.c:393:
+> +          if (blksize > 0) {
+> +              spt->block_size = MIN(blksize, TFTP_BLOCKSIZE_MAX);
+
+This is a false positive.
+
+Samuel
