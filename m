@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50783)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54893)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1cJRvP-0001Gf-Jo
-	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 16:26:21 -0500
+	(envelope-from <alistai@xilinx.com>) id 1cJT8d-0004i6-La
+	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 17:44:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1cJRvN-0008GK-OY
-	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 16:26:19 -0500
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:33085)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1cJRvN-0008Ex-Fq
-	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 16:26:17 -0500
-Received: by mail-pg0-x242.google.com with SMTP id g1so11799131pgn.0
-	for <qemu-devel@nongnu.org>; Tue, 20 Dec 2016 13:26:15 -0800 (PST)
-Sender: Corey Minyard <tcminyard@gmail.com>
-From: minyard@acm.org
-Date: Tue, 20 Dec 2016 15:26:04 -0600
-Message-Id: <1482269164-14642-1-git-send-email-minyard@acm.org>
-In-Reply-To: <CAFEAcA84Ab393fUB=UKDqtJYpZhHUEsZp6wEV3PpdjqCAfvuew@mail.gmail.com>
-References: <CAFEAcA84Ab393fUB=UKDqtJYpZhHUEsZp6wEV3PpdjqCAfvuew@mail.gmail.com>
-Subject: [Qemu-devel] [PATCH] i2c: Allow I2C devices to NAK start events
+	(envelope-from <alistai@xilinx.com>) id 1cJT8a-00040N-Fh
+	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 17:44:03 -0500
+Received: from mail-by2nam03on0058.outbound.protection.outlook.com
+	([104.47.42.58]:20386
+	helo=NAM03-BY2-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1cJT8a-0003zX-4n
+	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 17:44:00 -0500
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Tue, 20 Dec 2016 14:41:59 -0800
+Message-ID: <cover.1482265908.git.alistair.francis@xilinx.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v3 0/3]  Add the generic ARM timer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,430 +25,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Alastair D'Silva <alastair@au1.ibm.com>, Fabio Urquiza <flus@cesar.org.br>, QEMU Developers <qemu-devel@nongnu.org>
-Cc: Corey Minyard <cminyard@mvista.com>
+To: qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, fred.konrad@greensocs.com
+Cc: alistair.francis@xilinx.com, alistair23@gmail.com
 
-From: Corey Minyard <cminyard@mvista.com>
+These three patches and and connect the Generic ARM Timer. This includes
+support for dropping insecure writes and includes the ReadBase memory
+map.
 
-Add a return value to the event handler.  Some I2C devices will
-NAK if they have no data, so allow them to do this.  This required
-the following changes:
+V3:
+ - Add the ReadBase memory map
+ - Update the names to match the ARM ARM
+V2:
+ - Fix couter/counter typo
 
-Go through all the event handlers and change them to return int
-and return 0.
 
-Modify i2c_start_transfer to terminate the transaction on a NAK.
+Alistair Francis (3):
+  arm_generic_timer: Add the ARM Generic Timer
+  arm_generic_timer: Add support for the ReadBase memory map
+  xlnx-zynqmp: Connect the ARM Generic Timer
 
-Modify smbus handing to not assert if a NAK occurs on a second
-operation, and terminate the transaction and return -1 instead.
+ hw/arm/xlnx-zynqmp.c                 |  14 +++
+ hw/timer/Makefile.objs               |   1 +
+ hw/timer/arm_generic_timer.c         | 232 +++++++++++++++++++++++++++++++++++
+ include/hw/arm/xlnx-zynqmp.h         |   2 +
+ include/hw/timer/arm_generic_timer.h |  74 +++++++++++
+ 5 files changed, 323 insertions(+)
+ create mode 100644 hw/timer/arm_generic_timer.c
+ create mode 100644 include/hw/timer/arm_generic_timer.h
 
-Add some information on semantics to I2CSlaveClass.
-
-Signed-off-by: Corey Minyard <cminyard@mvista.com>
----
- hw/arm/pxa2xx.c      |  4 +++-
- hw/arm/tosa.c        |  4 +++-
- hw/arm/z2.c          |  4 +++-
- hw/audio/wm8750.c    |  4 +++-
- hw/display/ssd0303.c |  4 +++-
- hw/gpio/max7310.c    |  4 +++-
- hw/i2c/core.c        | 31 +++++++++++++++++++++++++------
- hw/i2c/i2c-ddc.c     |  4 +++-
- hw/i2c/smbus.c       | 13 +++++++++----
- hw/input/lm832x.c    |  4 +++-
- hw/misc/tmp105.c     |  3 ++-
- hw/timer/ds1338.c    |  4 +++-
- hw/timer/twl92230.c  |  4 +++-
- include/hw/i2c/i2c.h | 16 ++++++++++++----
- 14 files changed, 78 insertions(+), 25 deletions(-)
-
-diff --git a/hw/arm/pxa2xx.c b/hw/arm/pxa2xx.c
-index 21ea1d6..4d3179e 100644
---- a/hw/arm/pxa2xx.c
-+++ b/hw/arm/pxa2xx.c
-@@ -1258,7 +1258,7 @@ static void pxa2xx_i2c_update(PXA2xxI2CState *s)
- }
- 
- /* These are only stubs now.  */
--static void pxa2xx_i2c_event(I2CSlave *i2c, enum i2c_event event)
-+static int pxa2xx_i2c_event(I2CSlave *i2c, enum i2c_event event)
- {
-     PXA2xxI2CSlaveState *slave = PXA2XX_I2C_SLAVE(i2c);
-     PXA2xxI2CState *s = slave->host;
-@@ -1280,6 +1280,8 @@ static void pxa2xx_i2c_event(I2CSlave *i2c, enum i2c_event event)
-         break;
-     }
-     pxa2xx_i2c_update(s);
-+
-+    return 0;
- }
- 
- static int pxa2xx_i2c_rx(I2CSlave *i2c)
-diff --git a/hw/arm/tosa.c b/hw/arm/tosa.c
-index 1ee12f4..1165303 100644
---- a/hw/arm/tosa.c
-+++ b/hw/arm/tosa.c
-@@ -172,7 +172,7 @@ static int tosa_dac_send(I2CSlave *i2c, uint8_t data)
-     return 0;
- }
- 
--static void tosa_dac_event(I2CSlave *i2c, enum i2c_event event)
-+static int tosa_dac_event(I2CSlave *i2c, enum i2c_event event)
- {
-     TosaDACState *s = TOSA_DAC(i2c);
- 
-@@ -194,6 +194,8 @@ static void tosa_dac_event(I2CSlave *i2c, enum i2c_event event)
-     default:
-         break;
-     }
-+
-+    return 0;
- }
- 
- static int tosa_dac_recv(I2CSlave *s)
-diff --git a/hw/arm/z2.c b/hw/arm/z2.c
-index 68a92f3..e2d8160 100644
---- a/hw/arm/z2.c
-+++ b/hw/arm/z2.c
-@@ -220,7 +220,7 @@ static int aer915_send(I2CSlave *i2c, uint8_t data)
-     return 0;
- }
- 
--static void aer915_event(I2CSlave *i2c, enum i2c_event event)
-+static int aer915_event(I2CSlave *i2c, enum i2c_event event)
- {
-     AER915State *s = AER915(i2c);
- 
-@@ -238,6 +238,8 @@ static void aer915_event(I2CSlave *i2c, enum i2c_event event)
-     default:
-         break;
-     }
-+
-+    return 0;
- }
- 
- static int aer915_recv(I2CSlave *slave)
-diff --git a/hw/audio/wm8750.c b/hw/audio/wm8750.c
-index 0c6500e..f8b5beb 100644
---- a/hw/audio/wm8750.c
-+++ b/hw/audio/wm8750.c
-@@ -303,7 +303,7 @@ static void wm8750_reset(I2CSlave *i2c)
-     s->i2c_len = 0;
- }
- 
--static void wm8750_event(I2CSlave *i2c, enum i2c_event event)
-+static int wm8750_event(I2CSlave *i2c, enum i2c_event event)
- {
-     WM8750State *s = WM8750(i2c);
- 
-@@ -321,6 +321,8 @@ static void wm8750_event(I2CSlave *i2c, enum i2c_event event)
-     default:
-         break;
-     }
-+
-+    return 0;
- }
- 
- #define WM8750_LINVOL	0x00
-diff --git a/hw/display/ssd0303.c b/hw/display/ssd0303.c
-index d301756..68a80b9 100644
---- a/hw/display/ssd0303.c
-+++ b/hw/display/ssd0303.c
-@@ -179,7 +179,7 @@ static int ssd0303_send(I2CSlave *i2c, uint8_t data)
-     return 0;
- }
- 
--static void ssd0303_event(I2CSlave *i2c, enum i2c_event event)
-+static int ssd0303_event(I2CSlave *i2c, enum i2c_event event)
- {
-     ssd0303_state *s = SSD0303(i2c);
- 
-@@ -193,6 +193,8 @@ static void ssd0303_event(I2CSlave *i2c, enum i2c_event event)
-         /* Nothing to do.  */
-         break;
-     }
-+
-+    return 0;
- }
- 
- static void ssd0303_update_display(void *opaque)
-diff --git a/hw/gpio/max7310.c b/hw/gpio/max7310.c
-index 1bd5eaf..f82e3e6 100644
---- a/hw/gpio/max7310.c
-+++ b/hw/gpio/max7310.c
-@@ -129,7 +129,7 @@ static int max7310_tx(I2CSlave *i2c, uint8_t data)
-     return 0;
- }
- 
--static void max7310_event(I2CSlave *i2c, enum i2c_event event)
-+static int max7310_event(I2CSlave *i2c, enum i2c_event event)
- {
-     MAX7310State *s = MAX7310(i2c);
-     s->len = 0;
-@@ -147,6 +147,8 @@ static void max7310_event(I2CSlave *i2c, enum i2c_event event)
-     default:
-         break;
-     }
-+
-+    return 0;
- }
- 
- static const VMStateDescription vmstate_max7310 = {
-diff --git a/hw/i2c/core.c b/hw/i2c/core.c
-index abd4c4c..584b76d 100644
---- a/hw/i2c/core.c
-+++ b/hw/i2c/core.c
-@@ -88,18 +88,26 @@ int i2c_bus_busy(I2CBus *bus)
-     return !QLIST_EMPTY(&bus->current_devs);
- }
- 
-+/* TODO: Make this handle multiple masters.  */
- /*
-- * Returns non-zero if the address is not valid.  If this is called
-- * again without an intervening i2c_end_transfer(), like in the SMBus
-- * case where the operation is switched from write to read, this
-- * function will not rescan the bus and thus cannot fail.
-+ * Start or continue an i2c transaction.  When this is called for the
-+ * first time or after an i2c_end_transfer(), if it returns an error
-+ * the bus transaction is terminated (or really never started).  If
-+ * this is called after another i2c_start_transfer() without an
-+ * intervening i2c_end_transfer(), and it returns an error, the
-+ * transaction will not be terminated.  The caller must do it.
-+ *
-+ * This corresponds with the way real hardware works.  The SMBus
-+ * protocol uses a start transfer to switch from write to read mode
-+ * without releasing the bus.  If that fails, the bus is still
-+ * in a transaction.
-  */
--/* TODO: Make this handle multiple masters.  */
- int i2c_start_transfer(I2CBus *bus, uint8_t address, int recv)
- {
-     BusChild *kid;
-     I2CSlaveClass *sc;
-     I2CNode *node;
-+    bool bus_scanned = false;
- 
-     if (address == I2C_BROADCAST) {
-         /*
-@@ -130,6 +138,7 @@ int i2c_start_transfer(I2CBus *bus, uint8_t address, int recv)
-                 }
-             }
-         }
-+        bus_scanned = true;
-     }
- 
-     if (QLIST_EMPTY(&bus->current_devs)) {
-@@ -137,11 +146,21 @@ int i2c_start_transfer(I2CBus *bus, uint8_t address, int recv)
-     }
- 
-     QLIST_FOREACH(node, &bus->current_devs, next) {
-+        int rv;
-+
-         sc = I2C_SLAVE_GET_CLASS(node->elt);
-         /* If the bus is already busy, assume this is a repeated
-            start condition.  */
-+
-         if (sc->event) {
--            sc->event(node->elt, recv ? I2C_START_RECV : I2C_START_SEND);
-+            rv = sc->event(node->elt, recv ? I2C_START_RECV : I2C_START_SEND);
-+            if (rv && !bus->broadcast) {
-+                if (bus_scanned) {
-+                    /* First call, terminate the transfer. */
-+                    i2c_end_transfer(bus);
-+                }
-+                return rv;
-+            }
-         }
-     }
-     return 0;
-diff --git a/hw/i2c/i2c-ddc.c b/hw/i2c/i2c-ddc.c
-index 1227212..66899d7 100644
---- a/hw/i2c/i2c-ddc.c
-+++ b/hw/i2c/i2c-ddc.c
-@@ -230,13 +230,15 @@ static void i2c_ddc_reset(DeviceState *ds)
-     s->reg = 0;
- }
- 
--static void i2c_ddc_event(I2CSlave *i2c, enum i2c_event event)
-+static int i2c_ddc_event(I2CSlave *i2c, enum i2c_event event)
- {
-     I2CDDCState *s = I2CDDC(i2c);
- 
-     if (event == I2C_START_SEND) {
-         s->firstbyte = true;
-     }
-+
-+    return 0;
- }
- 
- static int i2c_ddc_rx(I2CSlave *i2c)
-diff --git a/hw/i2c/smbus.c b/hw/i2c/smbus.c
-index 5b4dd3e..2d1b79a 100644
---- a/hw/i2c/smbus.c
-+++ b/hw/i2c/smbus.c
-@@ -67,7 +67,7 @@ static void smbus_do_write(SMBusDevice *dev)
-     }
- }
- 
--static void smbus_i2c_event(I2CSlave *s, enum i2c_event event)
-+static int smbus_i2c_event(I2CSlave *s, enum i2c_event event)
- {
-     SMBusDevice *dev = SMBUS_DEVICE(s);
- 
-@@ -148,6 +148,8 @@ static void smbus_i2c_event(I2CSlave *s, enum i2c_event event)
-             break;
-         }
-     }
-+
-+    return 0;
- }
- 
- static int smbus_i2c_recv(I2CSlave *s)
-@@ -249,7 +251,8 @@ int smbus_read_byte(I2CBus *bus, uint8_t addr, uint8_t command)
-     }
-     i2c_send(bus, command);
-     if (i2c_start_transfer(bus, addr, 1)) {
--        assert(0);
-+        i2c_end_transfer(bus);
-+        return -1;
-     }
-     data = i2c_recv(bus);
-     i2c_nack(bus);
-@@ -276,7 +279,8 @@ int smbus_read_word(I2CBus *bus, uint8_t addr, uint8_t command)
-     }
-     i2c_send(bus, command);
-     if (i2c_start_transfer(bus, addr, 1)) {
--        assert(0);
-+        i2c_end_transfer(bus);
-+        return -1;
-     }
-     data = i2c_recv(bus);
-     data |= i2c_recv(bus) << 8;
-@@ -307,7 +311,8 @@ int smbus_read_block(I2CBus *bus, uint8_t addr, uint8_t command, uint8_t *data)
-     }
-     i2c_send(bus, command);
-     if (i2c_start_transfer(bus, addr, 1)) {
--        assert(0);
-+        i2c_end_transfer(bus);
-+        return -1;
-     }
-     len = i2c_recv(bus);
-     if (len > 32) {
-diff --git a/hw/input/lm832x.c b/hw/input/lm832x.c
-index 539682c..2340523 100644
---- a/hw/input/lm832x.c
-+++ b/hw/input/lm832x.c
-@@ -383,7 +383,7 @@ static void lm_kbd_write(LM823KbdState *s, int reg, int byte, uint8_t value)
-     }
- }
- 
--static void lm_i2c_event(I2CSlave *i2c, enum i2c_event event)
-+static int lm_i2c_event(I2CSlave *i2c, enum i2c_event event)
- {
-     LM823KbdState *s = LM8323(i2c);
- 
-@@ -397,6 +397,8 @@ static void lm_i2c_event(I2CSlave *i2c, enum i2c_event event)
-     default:
-         break;
-     }
-+
-+    return 0;
- }
- 
- static int lm_i2c_rx(I2CSlave *i2c)
-diff --git a/hw/misc/tmp105.c b/hw/misc/tmp105.c
-index f5c2472..04e8378 100644
---- a/hw/misc/tmp105.c
-+++ b/hw/misc/tmp105.c
-@@ -176,7 +176,7 @@ static int tmp105_tx(I2CSlave *i2c, uint8_t data)
-     return 0;
- }
- 
--static void tmp105_event(I2CSlave *i2c, enum i2c_event event)
-+static int tmp105_event(I2CSlave *i2c, enum i2c_event event)
- {
-     TMP105State *s = TMP105(i2c);
- 
-@@ -185,6 +185,7 @@ static void tmp105_event(I2CSlave *i2c, enum i2c_event event)
-     }
- 
-     s->len = 0;
-+    return 0;
- }
- 
- static int tmp105_post_load(void *opaque, int version_id)
-diff --git a/hw/timer/ds1338.c b/hw/timer/ds1338.c
-index 0112949..18c8e38 100644
---- a/hw/timer/ds1338.c
-+++ b/hw/timer/ds1338.c
-@@ -94,7 +94,7 @@ static void inc_regptr(DS1338State *s)
-     }
- }
- 
--static void ds1338_event(I2CSlave *i2c, enum i2c_event event)
-+static int ds1338_event(I2CSlave *i2c, enum i2c_event event)
- {
-     DS1338State *s = DS1338(i2c);
- 
-@@ -113,6 +113,8 @@ static void ds1338_event(I2CSlave *i2c, enum i2c_event event)
-     default:
-         break;
-     }
-+
-+    return 0;
- }
- 
- static int ds1338_recv(I2CSlave *i2c)
-diff --git a/hw/timer/twl92230.c b/hw/timer/twl92230.c
-index 7ba4e9a..b8d914e 100644
---- a/hw/timer/twl92230.c
-+++ b/hw/timer/twl92230.c
-@@ -713,12 +713,14 @@ static void menelaus_write(void *opaque, uint8_t addr, uint8_t value)
-     }
- }
- 
--static void menelaus_event(I2CSlave *i2c, enum i2c_event event)
-+static int menelaus_event(I2CSlave *i2c, enum i2c_event event)
- {
-     MenelausState *s = TWL92230(i2c);
- 
-     if (event == I2C_START_SEND)
-         s->firstbyte = 1;
-+
-+    return 0;
- }
- 
- static int menelaus_tx(I2CSlave *i2c, uint8_t data)
-diff --git a/include/hw/i2c/i2c.h b/include/hw/i2c/i2c.h
-index c4085aa..2ce611d 100644
---- a/include/hw/i2c/i2c.h
-+++ b/include/hw/i2c/i2c.h
-@@ -32,14 +32,22 @@ typedef struct I2CSlaveClass
-     /* Callbacks provided by the device.  */
-     int (*init)(I2CSlave *dev);
- 
--    /* Master to slave.  */
-+    /* Master to slave. Returns non-zero for a NAK, 0 for success. */
-     int (*send)(I2CSlave *s, uint8_t data);
- 
--    /* Slave to master.  */
-+    /*
-+     * Slave to master.  This cannot fail, the device should always
-+     * return something here.  Negative values probably result in 0xff
-+     * and a possible log from the driver, and shouldn't be used.
-+     */
-     int (*recv)(I2CSlave *s);
- 
--    /* Notify the slave of a bus state change.  */
--    void (*event)(I2CSlave *s, enum i2c_event event);
-+    /*
-+     * Notify the slave of a bus state change.  For start event,
-+     * returns non-zero to NAK an operation.  For other events the
-+     * return code is not used and should be zero.
-+     */
-+    int (*event)(I2CSlave *s, enum i2c_event event);
- } I2CSlaveClass;
- 
- struct I2CSlave
 -- 
 2.7.4
