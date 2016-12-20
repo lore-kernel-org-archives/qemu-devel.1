@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39169)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40838)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cJBrI-0002OB-NG
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 23:17:01 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1cJC5z-0006TJ-CM
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 23:32:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cJBrF-000683-IE
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 23:17:00 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40162)
+	(envelope-from <wei.w.wang@intel.com>) id 1cJC5w-0001tp-9C
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 23:32:11 -0500
+Received: from mga02.intel.com ([134.134.136.20]:41729)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cJBrF-00067P-A9
-	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 23:16:57 -0500
-Date: Tue, 20 Dec 2016 12:16:50 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20161220041650.GA22006@pxdev.xzpeter.org>
-References: <1482158486-18597-1-git-send-email-peterx@redhat.com>
-	<20161219233012.GF23176@umbus.fritz.box>
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1cJC5v-0001tI-TG
+	for qemu-devel@nongnu.org; Mon, 19 Dec 2016 23:32:08 -0500
+Message-ID: <5858B472.9000007@intel.com>
+Date: Tue, 20 Dec 2016 12:32:50 +0800
+From: Wei Wang <wei.w.wang@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20161219233012.GF23176@umbus.fritz.box>
-Subject: Re: [Qemu-devel] [PATCH] intel_iommu: allow dynamic switch of IOMMU
- region
+References: <1482127152-84732-1-git-send-email-wei.w.wang@intel.com>
+	<CAJ+F1CKWSznG3hxj0=F1UAJD+ZOZg=q+Oio1YnbsRyz6vy51FQ@mail.gmail.com>
+In-Reply-To: <CAJ+F1CKWSznG3hxj0=F1UAJD+ZOZg=q+Oio1YnbsRyz6vy51FQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RESEND Patch v1 00/37] Implementation of
+ vhost-pci for inter-vm commucation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,142 +29,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, alex.williamson@redhat.com, bd.aviv@gmail.com
+To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Cc: mst@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org
 
-On Tue, Dec 20, 2016 at 10:30:12AM +1100, David Gibson wrote:
+Hi Marc-André, thanks for the comments.
 
-[...]
+On 12/20/2016 12:43 AM, Marc-André Lureau wrote:
+> Hi Wei,
+>
+> On Mon, Dec 19, 2016 at 7:00 AM Wei Wang <wei.w.wang@intel.com 
+> <mailto:wei.w.wang@intel.com>> wrote:
+>
+>     This patch series implements vhost-pci, which is a point-to-point
+>     based inter-vm
+>     communication solution. The QEMU side implementation includes the
+>     vhost-user
+>     extension, vhost-pci device emulation and management. The current
+>     device part
+>     implementation is based on virtio 1.0, but it can be easily
+>     upgraded to support
+>     the upcoming virtio 1.1.
+>
+>     The current QEMU implementation supports the polling mode driver
+>     on both sides
+>     to receive packets. More features, such as interrupt support, live
+>     migration
+>     support, protected memory accesses will be added later.
+>
+>
+>
+> I highly appreciate the effort you put in splitting the patch series 
+> and commenting each, although some are probably superfluous.
 
-> > +static void vtd_switch_address_space(IntelIOMMUState *s, bool enabled)
-> > +{
-> > +    GHashTableIter iter;
-> > +    VTDBus *vtd_bus;
-> > +    VTDAddressSpace *as;
-> > +    int i;
-> > +
-> > +    g_hash_table_iter_init(&iter, s->vtd_as_by_busptr);
-> > +    while (g_hash_table_iter_next (&iter, NULL, (void**)&vtd_bus)) {
-> > +        for (i = 0; i < X86_IOMMU_PCI_DEVFN_MAX; i++) {
-> > +            as = vtd_bus->dev_as[i];
-> > +            if (as == NULL) {
-> > +                continue;
-> > +            }
-> > +            trace_vtd_switch_address_space(pci_bus_num(vtd_bus->bus),
-> > +                                           VTD_PCI_SLOT(i), VTD_PCI_FUNC(i),
-> > +                                           enabled);
-> > +            if (enabled) {
-> > +                memory_region_add_subregion_overlap(&as->root, 0,
-> > +                                                    &as->iommu, 2);
-> > +            } else {
-> > +                memory_region_del_subregion(&as->root, &as->iommu);
-> 
-> Why not use memory_region_set_enabled() rather than actually
-> adding/deleting the subregion?
+I will see if I can combine some of the unnecessary splits in the next 
+version.
 
-Good idea, thanks. :-)
+> Before going into details, I suppose you have kernel side bits too. 
+> I'd suggest before sending individual patches for review, that you 
+> send a RFC with links to the various git trees and instructions to 
+> test the proposed device. This would really help things and 
+> potentially bring more people for testing and comments (think about 
+> libvirt side etc). Even better would be to have some tests (with qtest).
 
-[...]
+The driver is still in the draft version (functional with simple tests 
+like Ping, but not ready for a robust test yet).  If that helps, I can 
+share the draft version and people can use that to verify the 
+correctness of the device part implementation in QEMU.
 
-> > @@ -2343,15 +2378,47 @@ VTDAddressSpace *vtd_find_add_as(IntelIOMMUState *s, PCIBus *bus, int devfn)
-> >          vtd_dev_as->devfn = (uint8_t)devfn;
-> >          vtd_dev_as->iommu_state = s;
-> >          vtd_dev_as->context_cache_entry.context_cache_gen = 0;
-> > +
-> > +        /*
-> > +         * When DMAR is disabled, memory region relationships looks
-> > +         * like:
-> > +         *
-> > +         * 0000000000000000-ffffffffffffffff (prio 0, RW): vtd_root
-> > +         *  0000000000000000-ffffffffffffffff (prio 1, RW): vtd_sys_alias
-> > +         *  00000000fee00000-00000000feefffff (prio 64, RW): intel_iommu_ir
-> > +         *
-> > +         * When DMAR is disabled, it becomes:
-> > +         *
-> > +         * 0000000000000000-ffffffffffffffff (prio 0, RW): vtd_root
-> > +         *  0000000000000000-ffffffffffffffff (prio 2, RW): intel_iommu
-> > +         *  0000000000000000-ffffffffffffffff (prio 1, RW): vtd_sys_alias
-> > +         *  00000000fee00000-00000000feefffff (prio 64, RW): intel_iommu_ir
-> > +         *
-> > +         * The intel_iommu region is dynamically added/removed.
-> > +         */
-> >          memory_region_init_iommu(&vtd_dev_as->iommu, OBJECT(s),
-> >                                   &s->iommu_ops, "intel_iommu", UINT64_MAX);
-> 
-> I'm almost certain UINT64_MAX is wrong here.  For one thing it would
-> collide with PCI BARs.  For another, I can't imagine that the IOMMU
-> page tables can really span an entire 2^64 space.
+> High level question, why do you need to create device dynamically? I 
+> would rather have the following qemu setup:
+>
+> -chardev socket,id=chr,path=.. -device vhost-pci-net,chardev=chr
+>
+> This would also avoid some global state (vp_slave etc)
 
-Could you explain why here device address space has things to do with
-PCI BARs? I thought BARs are for CPU address space only (so that CPU
-can access PCI registers via MMIO manner), am I wrong?
+With the above commands, the slave QEMU will create and plug in the 
+vhost-pci-net device at the QEMU booting time. I think this won't work, 
+because at the slave QEMU booting time, the master, in most cases, 
+hasn't connected to the slave to transmit the info (e.g. memory info) 
+that's required for the device setup - for example, the device bar can't 
+be constructed without the memory info passed from the master, and if 
+the device is created and plugged in the VM without a bar at the 
+beginning, I think we don't have another chance to add a bar on the fly 
+when the device is already driven in the guest. That's the reason that I 
+get a global vp_slave to manage (dynamically create/destroy a device 
+when requested by the master) the vhost-pci device.
 
-I think we should have a big enough IOMMU region size here. If device
-writes to invalid addresses, IMHO we should trap it and report to
-guest. If we have a smaller size than UINT64_MAX, how we can trap this
-behavior and report for the whole address space (it should cover [0,
-2^64-1])?
+>
+> Regarding the protocol changes to support slave request: I tried to 
+> explained that before, apprently I didn't manage to. It is not enough 
+> to support bidirectionnal communications to simply add chardev 
+> frontend handlers. Until now, qemu's code expects an immediate reply 
+> after a request. With your protocol change, it must now also consider 
+> that the slave may send a request before the master request reaches 
+> the slave handler. So all req/reply write()/read() must now handle in 
+> between requests from slave to be race-free (master can read back a 
+> request when it expects a reply). That's not really trivial change, 
+> that's why I proposed to have a secondary channel for slave->master 
+> communications in the past. Not only would this be easier to 
+> implement, but the protocol documentation would also be simpler, the 
+> cost is simply 1 additional unix socket (that I proposed to setup and 
+> pass with ancilliary data on the main channel).
 
-> 
-> > +        memory_region_init_alias(&vtd_dev_as->sys_alias, OBJECT(s),
-> > +                                 "vtd_sys_alias", get_system_memory(),
-> > +                                 0, memory_region_size(get_system_memory()));
-> 
-> I strongly suspect using memory_region_size(get_system_memory()) is
-> also incorrect here.  System memory has size UINT64_MAX, but I'll bet
-> you you can't actually access all of that via PCI space (again, it
-> would collide with actual PCI BARs).  I also suspect you can't reach
-> CPU MMIO regions via the PCI DMA space.
+I don't disagree with the second channel method. That implementation 
+hasn't been in the upstream QEMU yet, are you planning to get it in 
+first, so that we can upstream vhost-pci based on that?
 
-Hmm, sounds correct.
+> Another question, what are vpnet->rqs used for?
 
-However if so we will have the same problem if without IOMMU? See
-pci_device_iommu_address_space() - address_space_memory will be the
-default if we have no IOMMU protection, and that will cover e.g. CPU
-MMIO regions as well.
+This should be redundant, I will remove it.
 
-> 
-> So, I think you should find out what this limit actually is and
-> restrict the alias to that window.
+>
+>
+>     RESEND change: Fixed some coding style issue
+>
+>
+> there are some spelling to be fixed, and perhaps some variables/fields 
+> to rename  (asyn -> async, crq -> ctrlq?) That can be addressed in a 
+> detailed review.
 
-/me needs some more reading to figure this out. Still not quite
-familiar with the whole VM memory regions. Hints are welcomed...
+Sure, I will fix them.
 
-> 
-> >          memory_region_init_io(&vtd_dev_as->iommu_ir, OBJECT(s),
-> >                                &vtd_mem_ir_ops, s, "intel_iommu_ir",
-> >                                VTD_INTERRUPT_ADDR_SIZE);
-> > -        memory_region_add_subregion(&vtd_dev_as->iommu, VTD_INTERRUPT_ADDR_FIRST,
-> > -                                    &vtd_dev_as->iommu_ir);
-> > -        address_space_init(&vtd_dev_as->as,
-> > -                           &vtd_dev_as->iommu, "intel_iommu");
-> > +        memory_region_init(&vtd_dev_as->root, OBJECT(s),
-> > +                           "vtd_root", UINT64_MAX);
-> > +        memory_region_add_subregion_overlap(&vtd_dev_as->root,
-> > +                                            VTD_INTERRUPT_ADDR_FIRST,
-> > +                                            &vtd_dev_as->iommu_ir, 64);
-> > +        address_space_init(&vtd_dev_as->as, &vtd_dev_as->root, name);
-> > +        memory_region_add_subregion_overlap(&vtd_dev_as->root, 0,
-> > +                                            &vtd_dev_as->sys_alias, 1);
-> > +        if (s->dmar_enabled) {
-> > +            memory_region_add_subregion_overlap(&vtd_dev_as->root, 0,
-> > +                                                &vtd_dev_as->iommu, 2);
-> > +        }
-> 
-> Hmm.  You have the IOMMU translated region overlaying the
-> direct-mapped alias.  You enable and disable the IOMMU subregion, but
-> you always leave the direct mapping enabled.  You might get away with
-> this because the size of the IOMMU region is UINT64_MAX, which will
-> overlay everything - but as above, I think that's wrong.  If that's
-> changed then guest devices may be able to access portions of the raw
-> address space outside the IOMMU mapped region, which could break the
-> guest's expectations of device isolation.
-> 
-> I think it would be much safer to disable the system memory alias when
-> the IOMMU is enabled.
-
-Reasonable. Will adopt.
-
-Thanks!
-
--- peterx
+Best,
+Wei
