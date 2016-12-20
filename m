@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56634)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <jgj@qq.com>)
-	id 1cJDV5-0006aR-MJ
-	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 01:02:13 -0500
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36220)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <peterx@redhat.com>) id 1cJE3v-0004tl-DF
+	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 01:38:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jgj@qq.com>) id 1cJDV2-0001DJ-G5
-	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 01:02:11 -0500
-Received: from smtpbgau1.qq.com ([54.206.16.166]:53079)
+	(envelope-from <peterx@redhat.com>) id 1cJE3s-00031G-9O
+	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 01:38:11 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55716)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jgj@qq.com>) id 1cJDV1-0001Ai-MS
-	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 01:02:08 -0500
-From: "=?utf-8?B?SmluIEd1b2ppZQ==?=" <jinguojie@loongson.cn>
-Sender: jinguojie@loongson.cn
-Mime-Version: 1.0
-Date: Tue, 20 Dec 2016 14:01:51 +0800
-Message-ID: <tencent_1E9EE8C4080125B34108FFF1@qq.com>
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel] [PATCH v6 00/10] tcg mips64 and mips r6
- improvements
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cJE3s-000315-1V
+	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 01:38:08 -0500
+Date: Tue, 20 Dec 2016 14:38:01 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20161220063801.GB22006@pxdev.xzpeter.org>
+References: <1482158486-18597-1-git-send-email-peterx@redhat.com>
+	<20161219095650.0a3ac113@t450s.home>
+	<20161220034441.GA19964@pxdev.xzpeter.org>
+	<20161219215252.6b0a6e8b@t450s.home>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20161219215252.6b0a6e8b@t450s.home>
+Subject: Re: [Qemu-devel] [PATCH] intel_iommu: allow dynamic switch of IOMMU
+ region
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,92 +30,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?B?cWVtdS1kZXZlbA==?= <qemu-devel@nongnu.org>
-Cc: =?utf-8?B?QXVyZWxpZW4gSmFybm8=?= <aurelien@aurel32.net>, =?utf-8?B?SmFtZXMgSG9nYW4=?= <james.hogan@imgtec.com>, =?utf-8?B?WXVuUWlhbmcgU3U=?= <wzssyqa@gmail.com>, =?utf-8?B?UmljaGFyZCBIZW5kZXJzb24=?= <rth@twiddle.net>, =?utf-8?B?amluZ3Vvamll?= <jinguojie@loongson.cn>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, bd.aviv@gmail.com, david@gibson.dropbear.id.au
 
-cGluZyAgICAgaHR0cDovL3BhdGNod29yay5vemxhYnMub3JnL3BhdGNoLzcwNDgyOS8NCg0K
-UGxlYXNlIGdpdmUgbWUgYW55IGFkdmljZSBhbmQgY29tbWVudCBmb3Igc3BlZWRpbmcgdXAg
-dGhlIHJldmlldyBwcm9jZXNzLg0KVGhhbmsgeW91IGFsbCENCg0KSmluIEd1b2ppZQ0KDQot
-LS0tLS0tLS0tLS0tLS0tLS0gT3JpZ2luYWwgLS0tLS0tLS0tLS0tLS0tLS0tDQpGcm9tOiAg
-Imppbmd1b2ppZSI7PGppbmd1b2ppZUBsb29uZ3Nvbi5jbj47DQpTZW5kIHRpbWU6IFN1bmRh
-eSwgRGVjIDExLCAyMDE2IDk6MzYgUE0NClRvOiAicWVtdS1kZXZlbCI8cWVtdS1kZXZlbEBu
-b25nbnUub3JnPjsgDQpDYzogIkF1cmVsaWVuIEphcm5vIjxhdXJlbGllbkBhdXJlbDMyLm5l
-dD47ICJKYW1lcyBIb2dhbiI8amFtZXMuaG9nYW5AaW1ndGVjLmNvbT47ICJZdW5RaWFuZyBT
-dSI8d3pzc3lxYUBnbWFpbC5jb20+OyAiUmljaGFyZCBIZW5kZXJzb24iPHJ0aEB0d2lkZGxl
-Lm5ldD47ICJKaW4gR3VvamllIjxqaW5ndW9qaWVAbG9vbmdzb24uY24+OyANClN1YmplY3Q6
-ICBbUEFUQ0ggdjYgMDAvMTBdIHRjZyBtaXBzNjQgYW5kIG1pcHMgcjYgaW1wcm92ZW1lbnRz
-DQoNCg0KDQpDaGFuZ2VzIGluIHY2Og0KICAqIFVwZGF0ZSBhZ2FpbnN0IG1hc3Rlcih2Mi44
-LjAtcmMzKQ0KICAqIEZpeCB0d28gYnVncyBhY2NvcmRpbmcgdG8gUmljaGFyZCBIZW5kZXJz
-b24ncyByZXZpZXcgY29tbWVudHMNCiAgICAoMSkgbWFzazogZXh0ZW5kIFRBUkdFVF9QQUdF
-X01BU0sgdG8gdGhlIHByb3BlciB0eXBlDQogICAgKDIpIHplcm8tZXh0ZW5kIHRoZSBndWVz
-dCBhZGRyZXNzLCBub3QgdGhlIGFkZHJlc3MgbG9hZGVkIGZyb20gQ01QX09GRg0KICAqIE1J
-UFMgUjY6IHRlc3RlZCBzdWNjZXNzZnVsbHkgb24gYSBxZW11IG1pcHNlbDY0cjYgaG9zdCAo
-ZW11bGF0aW5nIEk2NDAwKQ0KICAgIC0gRGViaWFuIGFtZDY0IHdpdGggcWVtdS1zeXN0ZW0t
-eDg2XzY0DQoNCkNoYW5nZXMgaW4gdjU6DQogICogVXBkYXRlIGFnYWluc3QgbWFzdGVyKHYy
-LjguMC1yYzIpDQogICogRml4IGEgYnVnOiA2NC1iaXQgYmlnLWVuZGlhbiBndWVzdHMgaGFu
-ZyBvbiBtaXBzNjQgbGl0dGxlLWVuZGlhbg0KICAgICAgaG9zdHMsIGFuZCB2aWNlIHZlcnNh
-LiBUaGlzIGJ1ZyB3YXMgZmlyc3QgaW50cm9kdWNlZCBpbiB2MiBwYXRjaCwNCiAgICAgIGR1
-ZSB0byBvYnZpb3VzIG1pc3VzZSBvZiByZXQvYXJnIHJlZ2lzdGVycyBpbiB0Y2dfb3V0X2Jz
-d2FwNjQoKS4NCg0KICAgICAgICB0Y2dfb3V0X29wY19yZWcocywgT1BDX0RTQkgsIHJldCwg
-MCwgYXJnKTsNCiAgICAgIC0gdGNnX291dF9vcGNfcmVnKHMsIE9QQ19EU0hELCByZXQsIDAs
-IGFyZyk7DQogICAgICArIHRjZ19vdXRfb3BjX3JlZyhzLCBPUENfRFNIRCwgcmV0LCAwLCBy
-ZXQpOw0KDQogICogRml4IGEgc3R5bGUgcHJvYmxlbTogY2hlY2twYXRjaC5wbCBmb3JiaWRz
-ICdleHRlcm4nIHRvIGJlIHVzZWQgaW4gLmMuDQoNCiAgICAgIEVSUk9SOiBleHRlcm5zIHNo
-b3VsZCBiZSBhdm9pZGVkIGluIC5jIGZpbGVzDQogICAgICAjMjg6IEZJTEU6IHRjZy9taXBz
-L3RjZy10YXJnZXQuaW5jLmM6Mzk6DQogICAgICArZXh0ZXJuIGludCBsaW5rX2Vycm9yKHZv
-aWQpOw0KDQogICAgICBTaW1wbHkgY29tbWVudCB0aGUgdHlwZSBpZGVudGlmaWVyIHRvIHBh
-c3MgdGhlIGNoZWNrLg0KDQogICogVGVzdGVkIHN1Y2Nlc3NmdWxseSBvbiBmb2xsb3dpbmcg
-bWFjaGluZXM6DQogIA0KICAgIHwgSE9TVCAgICAgICAgfCBxZW11LXN5c3RlbSB8IERlYmlh
-biBJU08gIHwNCiAgICB8LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS18DQogICAgfCBtaXBzIDMyIGxlICB8ICAgIGkzODYgICAgIHwgICAgaTM4NiAgICAgfA0K
-ICAgIHwgbWlwcyAzMiBsZSAgfCAgICB4ODZfNjQgICB8ICAgIGkzODYgICAgIHwNCiAgICB8
-IG1pcHMgMzIgbGUgIHwgICAgeDg2XzY0ICAgfCAgICBhbWQ2NCAgICB8DQogICAgfCBtaXBz
-IDY0IGxlICB8ICAgIGkzODYgICAgIHwgICAgaTM4NiAgICAgfA0KICAgIHwgbWlwcyA2NCBs
-ZSAgfCAgICB4ODZfNjQgICB8ICAgIGkzODYgICAgIHwNCiAgICB8IG1pcHMgNjQgbGUgIHwg
-ICAgeDg2XzY0ICAgfCAgICBhbWQ2NCAgICB8DQogICAgfCBtaXBzIDY0IGxlICB8ICBtaXBz
-IDY0IGJlIHwgIG1pcHMgNjQgYmUgfA0KICAgIHwtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLXwNCiAgICB8IG1pcHMgMzIgYmUgIHwgICAgaTM4NiAgICAgfCAg
-ICAgaTM4NiAgICB8DQogICAgfCBtaXBzIDMyIGJlICB8ICAgIHg4Nl82NCAgIHwgICAgIGkz
-ODYgICAgfA0KICAgIHwgbWlwcyAzMiBiZSAgfCAgICB4ODZfNjQgICB8ICAgICBhbWQ2NCAg
-IHwNCiAgICB8IG1pcHMgNjQgYmUgIHwgICAgaTM4NiAgICAgfCAgICAgaTM4NiAgICB8DQog
-ICAgfCBtaXBzIDY0IGJlICB8ICAgIHg4Nl82NCAgIHwgICAgIGkzODYgICAgfA0KICAgIHwg
-bWlwcyA2NCBiZSAgfCAgICB4ODZfNjQgICB8ICAgICBhbWQ2NCAgIHwNCiAgICB8IG1pcHMg
-bjMyIGJlIHwgICAgMzg2ICAgICAgfCAgICAgaTM4NiAgICB8DQogICAgfCBtaXBzIG4zMiBi
-ZSB8ICAgIHg4Nl82NCAgIHwgICAgIGkzODYgICAgfA0KICAgIHwgbWlwcyBuMzIgYmUgfCAg
-ICB4ODZfNjQgICB8ICAgICBhbWQ2NCAgIHwNCg0KICAgIChObyBwbGFuIHRvIHRlc3QgTUlQ
-UyBSNiBpbiB0aGlzIHBhdGNoLikNCg0KICBTdW1tYXJ5IG9mIGNoYW5nZXMgZnJvbSB2NDoN
-Cg0KICB8IHRjZy1taXBzOiBTdXBwb3J0IDY0LWJpdCBvcGNvZGVzICAgICAgIHwgRml4IHRj
-Z19vdXRfYnN3YXA2NCgpIHwNCiAgfCB0Y2ctbWlwczogQWRqdXN0IHFlbXVfbGQvc3QgZm9y
-IG1pcHM2NCB8IEZpeCBhIHN0eWxlIHByb2JsZW0gICB8DQoNCg0KQ2hhbmdlcyBpbiB2NDoN
-CiAgKiB0Y2dfb3V0X3FlbXVfbGRfc2xvd19wYXRoOiBhbHdheXMgc2lnbi1leHRlbmQgMzIt
-Yml0IGxvYWRzLg0KICAgIFByb3ZpZGUgYSBiZXR0ZXIgc29sdXRpb24gdGhhbiBwYXRjaDEx
-IGluIHYzLg0KICAgIEZpeCB0aGUgYmxvY2tpbmcgYnVnIHdoZW4gZW11bGF0aW5nIGkzODYg
-a2VybmVsIG9uIG1pcHM2NGVsLg0KICAqIFJlZGVmaW5lIExPX09GRi9ISV9PRkYgYXMgdjIu
-DQogICAgT24gbWlwczY0IGhvc3QsIHRoZXkgYXJlIGRlZmluZWQgYXMgbGlua19lcnJvciwg
-dG8gZW5zdXJlIHRoYXQNCiAgICBhbGwgcGF0aHMgdGhhdCBsZWFkIHRvIHRoZSB1c2Ugb2Yg
-dGhlIHN5bWJvbCBhcmUgZWxpbWluYXRlZCBieQ0KICAgIHRoZSBjb21waWxlci4NCg0KQ2hh
-bmdlcyBpbiB2MzoNCiAgKiBVcGRhdGUgYWdhaW5zdCBtYXN0ZXIodjIuOC4wLXJjMSkNCiAg
-KiBUZXN0ZWQgb24gTG9vbmdzb24gYXMgbWlwczMycjIoZWwpIGFuZCBtaXBzNjRyMihlbCkg
-aG9zdHMuDQogICAgTG9vbmdzb24gb25seSBpbXBsZW1lbnRzIGxpdHRsZS1lbmRpYW4gbWlw
-czMyL21pcHM2NCBJU0EuDQogICogRnVsbHkgd29yayBmb3IgMzItYml0IGFuZCA2NC1iaXQg
-Z3Vlc3RzLg0KICAgIEZpeCB0d28gYnVnc++8mnNlZ21lbnRhdGlvbiBmYXVsdCBvbiBtaXBz
-NjRlbCB3aXRoIDMyLWJpdCBndWVzdHMsDQogICAgICAgICAgICAgICAgICBibG9ja2luZyB3
-aGVuIGVtdWxhdGluZyBpMzg2IGtlcm5lbCBvbiBtaXBzNjRlbC4NCiAgKiBGaXggc29tZSBt
-aW5vciBzdHlsZSBwcm9ibGVtcy4NCiAgKiBQQVRDSCB2MiAxMn4xNiBhcmUgbm90IGV4YW1p
-bmVkIGR1ZSB0byB0aGUgbGFjayBvZiBSNiBtYWNoaW5lLiANCg0KVGVzdGVkLWJ5OiBBdXJl
-bGllbiBKYXJubyA8YXVyZWxpZW5AYXVyZWwzMi5uZXQ+DQpUZXN0ZWQtYnk6IEphbWVzIEhv
-Z2FuIDxqYW1lcy5ob2dhbkBpbWd0ZWMuY29tPg0KVGVzdGVkLWJ5OiBZdW5RaWFuZyBTdSA8
-d3pzc3lxYUBnbWFpbC5jb20+DQpTaWduZWQtb2ZmLWJ5OiBSaWNoYXJkIEhlbmRlcnNvbiA8
-cnRoQHR3aWRkbGUubmV0Pg0KU2lnbmVkLW9mZi1ieTogSmluIEd1b2ppZSA8amluZ3Vvamll
-QGxvb25nc29uLmNuPg0KDQpKaW4gR3VvamllICgxMCk6DQogIHRjZy1taXBzOiBNb3ZlIGJz
-d2FwIGNvZGUgdG8gYSBzdWJyb3V0aW5lDQogIHRjZy1taXBzOiBBZGQgbWlwczY0IG9wY29k
-ZXMNCiAgdGNnLW1pcHM6IFN1cHBvcnQgNjQtYml0IG9wY29kZXMNCiAgdGNnLW1pcHM6IEFk
-ZCBic3dhcDMydSBhbmQgYnN3YXA2NA0KICB0Y2ctbWlwczogQWRqdXN0IG1vdmUgZnVuY3Rp
-b25zIGZvciBtaXBzNjQNCiAgdGNnLW1pcHM6IEFkanVzdCBsb2FkL3N0b3JlIGZ1bmN0aW9u
-cyBmb3IgbWlwczY0DQogIHRjZy1taXBzOiBBZGp1c3QgcHJvbG9ndWUgZm9yIG1pcHM2NA0K
-ICB0Y2ctbWlwczogQWRkIHRjZyB1bndpbmQgaW5mbw0KICB0Y2ctbWlwczogQWRqdXN0IGNh
-bGxpbmcgY29udmVudGlvbnMgZm9yIG1pcHM2NA0KICB0Y2ctbWlwczogQWRqdXN0IHFlbXVf
-bGQvc3QgZm9yIG1pcHM2NA0KDQogdGNnL21pcHMvdGNnLXRhcmdldC5oICAgICB8ICAgNjAg
-KystDQogdGNnL21pcHMvdGNnLXRhcmdldC5pbmMuYyB8IDExNzAgKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKystLS0tLS0tLS0tDQogMiBmaWxlcyBjaGFuZ2VkLCA5Nzcg
-aW5zZXJ0aW9ucygrKSwgMjUzIGRlbGV0aW9ucygtKQ0KDQotLSANCjIuMS4w
+On Mon, Dec 19, 2016 at 09:52:52PM -0700, Alex Williamson wrote:
+
+[...]
+
+> > Yes, this patch just tried to move VT-d forward a bit, rather than do
+> > it once and for all. I think we can do better than this in the future,
+> > for example, one address space per guest IOMMU domain (as you have
+> > mentioned before). However I suppose that will need more work (which I
+> > still can't estimate on the amount of work). So I am considering to
+> > enable the device assignments functionally first, then we can further
+> > improve based on a workable version. Same thoughts apply to the IOMMU
+> > replay RFC series.
+> 
+> I'm not arguing against it, I'm just trying to set expectations for
+> where this gets us.  An AddressSpace per guest iommu domain seems like
+> the right model for QEMU, but it has some fundamental issues with
+> vfio.  We currently tie a QEMU AddressSpace to a vfio container, which
+> represents the host IOMMU context.  The AddressSpace of a device is
+> currently assumed to be fixed in QEMU, guest IOMMU domains clearly
+> are not.  vfio only let's us have access to a device while it's
+> protected within a container.  Therefore in order to move a device to a
+> different AddressSpace based on the guest domain configuration, we'd
+> need to tear down the vfio configuration, including releasing the
+> device.
+
+I assume this is VT-d specific issue, right? Looks like ppc is using a
+totally differnet way to manage the mapping, and devices can share the
+same address space.
+
+>  
+> > Regarding to the locked memory accounting issue: do we have existing
+> > way to do the accounting? If so, would you (or anyone) please
+> > elaborate a bit? If not, is that an ongoing/planned work?
+> 
+> As I describe above, there's a vfio container per AddressSpace, each
+> container is an IOMMU domain in the host.  In the guest, an IOMMU
+> domain can include multiple AddressSpaces, one for each context entry
+> that's part of the domain.  When the guest programs a translation for
+> an IOMMU domain, that maps a guest IOVA to a guest physical address,
+> for each AddressSpace.  Each AddressSpace is backed by a vfio
+> container, which needs to pin the pages of that translation in order to
+> get a host physical address, which then gets programmed into the host
+> IOMMU domain with the guest-IOVA and host physical address.  The
+> pinning process is where page accounting is done.  It's done per vfio
+> context.  The worst case scenario for accounting is thus when VT-d is
+> present but disabled (or in passthrough mode) as each AddressSpace
+> duplicates address_space_memory and every page of guest memory is
+> pinned and accounted for each vfio container.
+
+IIUC this accounting issue will solve itself if we can solve the
+previous issue. While we don't have it now, so ...
+
+> 
+> That's the existing way we do accounting.  There is no current
+> development that I'm aware of to change this.  As above, the simplest
+> stop-gap solution is that libvirt would need to be aware when VT-d is
+> present for a VM and use a different algorithm to set QEMU locked
+> memory limit, but it's not without its downsides.
+
+... here I think it's sensible to consider a specific algorithm for
+vt-d use case. I am just curious about how should we define this
+algorithm.
+
+First of all, when the devices are not sharing domain (or say, one
+guest iommu domain per assigned device), everything should be fine. No
+special algorithm needed. IMHO the problem will happen only if there
+are assigned devices that share a same address space (either system,
+or specific iommu domain). In that case, the accounted value (or say,
+current->mm->locked_vm iiuc) will be bigger than the real locked
+memory size.
+
+However, I think the problem is whether devices will be put into same
+address space depends on guest behavior - the guest can either use
+iommu=pt, or manually putting devices into the same guest iommu region
+to achieve that. But from hypervisor POV, how should we estimate this?
+Can we really?
+
+> Alternatively, a new
+> IOMMU model would need to be developed for vfio.  The type1 model was
+> only ever intended to be used for relatively static user mappings and I
+> expect it to have horrendous performance when backing a dynamic guest
+> IOMMU domain.  Really the only guest IOMMU usage model that makes any
+> sort of sense with type1 is to run the guest with passthrough (iommu=pt)
+> and only pull devices out of passthrough for relatively static mapping
+> cases within the guest userspace (nested assigned devices or dpdk).  If
+> the expectation is that we just need this one little bit more code to
+> make vfio usable in the guest, that may be true, but it really is just
+> barely usable.  It's not going to be fast for any sort of dynamic
+> mapping and it's going to have accounting issues that are not
+> compatible with how libvirt sets locked memory limits for QEMU as soon
+> as you go beyond a single device.  Thanks,
+
+I can totally understand that the performance will suck if dynamic
+mapping is used. AFAIU this work will only be used with static dma
+mapping like running DPDK in guest (besides other trivial goals, like,
+development purpose).
+
+Regarding to "the other" iommu model you mentioned besides type1, is
+there any existing discussions out there? Any further learning
+material/links would be greatly welcomed.
+
+Thanks!
+
+-- peterx
