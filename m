@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46559)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59683)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cJoHK-0006em-Ae
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 16:18:27 -0500
+	(envelope-from <felipe@nutanix.com>) id 1cJpEh-0006B1-80
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 17:19:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cJoHJ-00044C-8o
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 16:18:26 -0500
-References: <20161207150827.23791-1-pbonzini@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <ab051ebd-bda2-e17a-ddf7-330825644f3a@redhat.com>
-Date: Wed, 21 Dec 2016 16:18:17 -0500
-MIME-Version: 1.0
-In-Reply-To: <20161207150827.23791-1-pbonzini@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2] qemu-img: fix in-flight
- count for qemu-img bench
+	(envelope-from <felipe@nutanix.com>) id 1cJpEf-0006KZ-6x
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 17:19:47 -0500
+Received: from 206-15-90-246.static.twtelecom.net ([206.15.90.246]:49431
+	helo=felipe-franciosi.localdomain)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <felipe@nutanix.com>) id 1cJpEf-0006Jk-1F
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 17:19:45 -0500
+From: Felipe Franciosi <felipe@nutanix.com>
+Date: Wed, 21 Dec 2016 14:17:36 -0800
+Message-Id: <1482358659-4288-1-git-send-email-felipe@nutanix.com>
+Subject: [Qemu-devel] [PATCH v3 0/3] Introduce vhost-user-scsi and sample
+ application
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,58 +23,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Marc-Andre Lureau <marcandre.lureau@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Felipe Franciosi <felipe@nutanix.com>
 
+Based on various discussions on the 2016 KVM Forum, I'm sending over a
+vhost-user-scsi implementation for your consideration.
 
+This patchset introduces a new vhost-user SCSI device. While heavily
+based on vhost-scsi, it is implemented using vhost's userspace
+counterpart. The device has been coded and tested to work with live
+migration.
 
-On 12/07/2016 10:08 AM, Paolo Bonzini wrote:
-> With aio=native (qemu-img bench -n) one or more requests can be completed
-> when a new request is submitted.  This in turn can cause bench_cb to
-> recurse before b->in_flight is updated.  This causes multiple I/Os
-> to be submitted with the same offset and, furthermore, the blk_aio_*
-> coroutines are never freed and qemu-img aborts.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  qemu-img.c | 17 ++++++++++-------
->  1 file changed, 10 insertions(+), 7 deletions(-)
-> 
-> diff --git a/qemu-img.c b/qemu-img.c
-> index 6949b73..5df66fe 100644
-> --- a/qemu-img.c
-> +++ b/qemu-img.c
-> @@ -3559,20 +3559,23 @@ static void bench_cb(void *opaque, int ret)
->      }
->  
->      while (b->n > b->in_flight && b->in_flight < b->nrreq) {
-> +        int64_t offset = b->offset;
-> +        /* blk_aio_* might look for completed I/Os and kick bench_cb
-> +         * again, so make sure this operation is counted by in_flight
-> +         * and b->offset is ready for the next submission.
-> +         */
-> +        b->in_flight++;
-> +        b->offset += b->step;
-> +        b->offset %= b->image_size;
->          if (b->write) {
-> -            acb = blk_aio_pwritev(b->blk, b->offset, b->qiov, 0,
-> -                                  bench_cb, b);
-> +            acb = blk_aio_pwritev(b->blk, offset, b->qiov, 0, bench_cb, b);
->          } else {
-> -            acb = blk_aio_preadv(b->blk, b->offset, b->qiov, 0,
-> -                                 bench_cb, b);
-> +            acb = blk_aio_preadv(b->blk, offset, b->qiov, 0, bench_cb, b);
->          }
->          if (!acb) {
->              error_report("Failed to issue request");
->              exit(EXIT_FAILURE);
->          }
-> -        b->in_flight++;
-> -        b->offset += b->step;
-> -        b->offset %= b->image_size;
->      }
->  }
->  
-> 
+As part of this work, a new vhost-scsi-common device was created and
+the existing vhost-scsi device moved underneath it. The new
+vhost-user-scsi device is also placed underneath it.
 
-Reviewed-by: John Snow <jsnow@redhat.com>
+A sample application based on the newly introduced libvhost-user is
+also included. It makes use of libiscsi for simplicity.
+
+For convenience, I'm maintaining an up-to-date version of these
+patches (including some necessary fixes for libvhost-user) on:
+
+https://github.com/franciozzy/qemu/tree/vus-upstream-3
+
+See the individual patches for build and use instructions.
+
+Signed-off-by: Felipe Franciosi <felipe@nutanix.com>
+
+v2 -> v3:
+ - Rebase after vhost notifier fixes by Paolo.
+ - Exposed F_HOTPLUG and F_CHANGE on vhost-user-scsi.
+
+v1 -> v2:
+ - Introduce new vhost-scsi-common device type.
+ - Move vhost-scsi device underneath vhost-scsi-common.
+ - Move sample application from tests/ to contrib/.
+ - Make sample application use the glib event loop.
+ - Minor fixes.
+
+Felipe Franciosi (3):
+  vhost-scsi: create a vhost-scsi-common abstraction
+  vus: Introduce vhost-user-scsi host device
+  vus: Introduce a vhost-user-scsi sample application
+
+ Makefile                                  |   3 +
+ Makefile.objs                             |   4 +
+ configure                                 |  11 +
+ contrib/vhost-user-scsi/Makefile.objs     |   1 +
+ contrib/vhost-user-scsi/vhost-user-scsi.c | 886 ++++++++++++++++++++++++++++++
+ hw/scsi/Makefile.objs                     |   3 +-
+ hw/scsi/vhost-scsi-common.c               | 143 +++++
+ hw/scsi/vhost-scsi.c                      | 188 ++-----
+ hw/scsi/vhost-user-scsi.c                 | 215 ++++++++
+ hw/virtio/virtio-pci.c                    |  58 ++
+ hw/virtio/virtio-pci.h                    |  15 +
+ include/hw/virtio/vhost-scsi-common.h     |  48 ++
+ include/hw/virtio/vhost-scsi.h            |  11 +-
+ include/hw/virtio/vhost-user-scsi.h       |  35 ++
+ include/hw/virtio/virtio-scsi.h           |   7 +
+ 15 files changed, 1483 insertions(+), 145 deletions(-)
+ create mode 100644 contrib/vhost-user-scsi/Makefile.objs
+ create mode 100644 contrib/vhost-user-scsi/vhost-user-scsi.c
+ create mode 100644 hw/scsi/vhost-scsi-common.c
+ create mode 100644 hw/scsi/vhost-user-scsi.c
+ create mode 100644 include/hw/virtio/vhost-scsi-common.h
+ create mode 100644 include/hw/virtio/vhost-user-scsi.h
+
+-- 
+1.9.4
