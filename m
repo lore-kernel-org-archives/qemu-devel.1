@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39053)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43216)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <holger@fam-schranz.de>) id 1cJZIC-00026I-MN
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 00:18:21 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cJZjR-0003mM-QW
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 00:46:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <holger@fam-schranz.de>) id 1cJZI7-0007ln-OX
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 00:18:20 -0500
-Received: from smtp2-2.goneo.de ([85.220.129.34]:38695)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <holger@fam-schranz.de>)
-	id 1cJZI7-0007lK-Hw
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 00:18:15 -0500
-References: <20161220210053.31842.32241@loki>
-From: Holger Schranz <holger@fam-schranz.de>
-Message-ID: <c1db276f-4e5b-5953-df0d-c07130bbd0ff@fam-schranz.de>
-Date: Wed, 21 Dec 2016 06:18:00 +0100
+	(envelope-from <dgibson@ozlabs.org>) id 1cJZjO-0000Vm-OV
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 00:46:29 -0500
+Date: Wed, 21 Dec 2016 15:52:45 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20161221045245.GE13024@umbus.fritz.box>
+References: <20161215061128.30792-1-david@gibson.dropbear.id.au>
+	<1482160529.3732.2.camel@redhat.com>
+	<20161219234717.GG23176@umbus.fritz.box>
+	<1482225561.3732.12.camel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20161220210053.31842.32241@loki>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [ANNOUNCE] QEMU 2.8.0 is now available
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="qOrJKOH36bD5yhNe"
+Content-Disposition: inline
+In-Reply-To: <1482225561.3732.12.camel@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCHv3 for-2.9 0/6] HPT resizing for
+ pseries guests (qemu part)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,64 +27,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, stefanha@redhat.com
-
-Hi Michael,
-
-could it be, that the link to qemu-2.8.0.tar.bz2 is linked to the
-qemu-2.8.0-rc4.tar.bz2? The link for signature seems it is correct.
-
-Best regards
-
-Holger
-
-Am 20.12.2016 um 22:00 schrieb Michael Roth:
-> Hello,
->
-> On behalf of the QEMU Team, I'd like to announce the availability of
-> the QEMU 2.8.0 release. This release contains 1900+ commits from 201
-> authors.
->
-> You can grab the tarball from our download page here:
->
->    http://wiki.qemu.org/Download
->
-> The full list of changes are available at:
->
->    http://wiki.qemu.org/ChangeLog/2.8
->
-> Highlights include:
->
->   * Support for fault-tolerant guests via COLO (COarse-grained LOck-stepp=
-ing)
->   * Support for fast host/guest socket communication over virtio via AF_V=
-SOCK
->   * Support for compressed formats when generating live backups
->   * Support for new virtio-crypto device
->   * Improved display rendering when using SPICE GUI in OpenGL mode
->   * ACPI support for NVDIMM device hotplug
->
->   * ARM: 'virt' machine support for ITS when using ACPI
->   * ARM: Aspeed board improvements
->   * ARM: STM32F2xx board (Netduino 2) support for ADC and SPI devices
->   * MIPS: support for 24KEc CPUs
->   * PPC: support for POWER9 CPUs and powernv platform
->   * PPC: pseries support for more the 1TiB of guest memory and memory unp=
-lug
->   * PPC: pseries support PCI host bridge NUMA affinities
->   * s390: support for CPU models and virtio-ccw revision 2
->   * x86: support for Extended Interrupt Mode in emulated IOMMUs
->   * x86: support for up to 288 CPUs on q35 machine type
->   * Xen: unplug support for SCSI disks and xenlinux-compatible devices
->
->   * and lots more...
->
-> Thank you to everyone involved!
->
->
+To: Andrea Bolognani <abologna@redhat.com>
+Cc: paulus@samba.org, sjitindarsingh@gmail.com, lvivier@redhat.com, thuth@redhat.com, mdroth@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
----
-Diese E-Mail wurde von Avast Antivirus-Software auf Viren gepr=C3=BCft.
-https://www.avast.com/antivirus
+--qOrJKOH36bD5yhNe
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, Dec 20, 2016 at 10:19:21AM +0100, Andrea Bolognani wrote:
+> On Tue, 2016-12-20 at 10:47 +1100, David Gibson wrote:
+> > > Do we want to expose a knob for controlling this
+> > > to the user at the libvirt level, or should we just enable
+> > > resize-hpt unconditionally whenever we detect that the QEMU
+> > > binary supports it?
+> >=A0
+> > I'm not sure if we need a knob.=A0=A0I think in general enabling for
+> > pseries-2.9 and later machine types is correct.=A0=A0The difficulty is
+> > that for HV guests, we can only enable it if the host kernel also has
+> > support.=A0=A0Explicitly setting "resize-hpt=3Denable" means qemu will =
+not
+> > start if the kernel doesn't support it.
+>=20
+> I thought that would be the case for resize-hpt=3Drequired,
+> not resized-hpt=3Denabled.
+
+resize-hpt=3Denabled requires the host to support resizing, but not the
+guest.  resize-hpt=3Drequired requires both the host and the guest to
+support resizing.
+
+If you can think of a less ambiguous word for it, let me know.
+
+> > My inclination would be to enable unconditionally for pseries-2.9 and
+> > later machine types.
+>=20
+> So I guess the question is, will users want to enable this
+> manually for older machine types, or is it reasonable to
+> expect them to simply switch to pseries-2.9 if they want
+> the feature?
+
+I can't see any particular reason you'd enable it on an old machine
+type.
+
+> Moreover, do you foresee any situation in which users
+> might reasonably want to turn the feature off even though
+> the entire stack (host kernel, QEMU, guest kernel)
+> understands it?
+
+Nothing clearly compelling.  In the nearish term, being able to turn
+it off to isolate possible bugs could be useful of course.  It's also
+possible that you could have a VM where the latency of each resize
+could be too much downtime - although in that case I doubt you'd want
+to hotplug memory anyway.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--qOrJKOH36bD5yhNe
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJYWgqYAAoJEGw4ysog2bOSbWIP/AisdTx4opP0yeu9qKy3gs/h
+ZE8PnJ9pJHJJVF+Vrh6mIOqqFkFSPg/rhVKzhEKhgYARVVk6zUoM7wq9xAUm9MyE
+hYER09x7ykEbbehvPZVI+GvM7vTkNiPAee8WgFE/HwczSHuXM1GNjeg2JS4Y9bNF
+Qx/NJIJ4IrVADX2N6WQyYDu16943cuL37K+5sE9VrXcgnsUSzpLXjpyRudxuS+k2
+ybtLTNRsrFX/USTKpZJpugh7AyrYLrwfhBJDV6sgAnwsV+rWwzIlfRXO/carJBS3
+I1r0ta34ui8lQ6FVhHGef4GabHqRQz7JVuKkvCvMDtB2yBmy8jr9/pABTAzFenvR
+mKPOIPaFMFGpZQrrMJ1pldWdnPpHDjUyGL3p4AYlNkDKIMv/kI70JapBWB/PDAzB
+gkSPA/2U7k4UQojD2+EnhpVsSn9Gpu1csUGSh+UK7xnq0CDl/U5g9eMHVcNLB9W0
+BSGI0Cgi/D3KU4dVigeTvOy3BvT22OXf3WKgmuO5uvAOk41luVSNI4rlGkJdkSXo
+nxiNE6EGMfnSUjULfOWibsgEfkwuJQOz/lcm/NvQSOFp2yI2oRB2n2yZ5zcEZ+Ue
+GCulnG4HNY8uGWxhL0wcD49y+undR4x4k0enKv78+16uZ/rPYk1nzsCNqsJ5DK1c
+NFdeSo6/6Zg1iqszPnxJ
+=gPJO
+-----END PGP SIGNATURE-----
+
+--qOrJKOH36bD5yhNe--
