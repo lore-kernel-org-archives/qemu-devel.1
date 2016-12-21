@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46729)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48337)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cJa8C-0005Ef-BE
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 01:12:05 -0500
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cJaKR-0001eI-Tr
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 01:24:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cJa89-0000Xn-3p
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 01:12:04 -0500
-Received: from [59.151.112.132] (port=12225 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cJa88-0000TL-N2
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 01:12:01 -0500
-References: <1479108340-3453-1-git-send-email-caoj.fnst@cn.fujitsu.com>
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cJaKO-00046y-Ps
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 01:24:43 -0500
+References: <1478833296-25853-1-git-send-email-caoj.fnst@cn.fujitsu.com>
 From: Cao jin <caoj.fnst@cn.fujitsu.com>
-Message-ID: <585A1E33.1090002@cn.fujitsu.com>
-Date: Wed, 21 Dec 2016 14:16:19 +0800
+Message-ID: <585A213C.4090706@cn.fujitsu.com>
+Date: Wed, 21 Dec 2016 14:29:16 +0800
 MIME-Version: 1.0
-In-Reply-To: <1479108340-3453-1-git-send-email-caoj.fnst@cn.fujitsu.com>
+In-Reply-To: <1478833296-25853-1-git-send-email-caoj.fnst@cn.fujitsu.com>
 Content-Type: text/plain; charset="windows-1252"
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v7 00/10] Convert msix_init() to error
+Subject: Re: [Qemu-devel] [PATCH 1/2] vfio: remove a duplicated word in
+ comments
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,59 +23,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
+To: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+Cc: alex.williamson@redhat.com
 
 ping
 
-On 11/14/2016 03:25 PM, Cao jin wrote:
-> v7 changelog:
-> 1. fix the segfaut bug in patch 2. So drop the all the R-b of it,
->    please take a look, there is detailed description in the patch.
-> 2. add the R-b from Hannes Reinecke
+On 11/11/2016 11:01 AM, Cao jin wrote:
+> Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
+> ---
+>  hw/vfio/pci.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> Test:
-> 1. make check: pass
-> 2. After applied all the patch, command line test for all the
->    affected devices, just make sure device realize process is ok,
->    no crash, but no further use of device.
-> 
-> CC: Jiri Pirko <jiri@resnulli.us>
-> CC: Gerd Hoffmann <kraxel@redhat.com>
-> CC: Dmitry Fleytman <dmitry@daynix.com>
-> CC: Jason Wang <jasowang@redhat.com>
-> CC: Michael S. Tsirkin <mst@redhat.com>
-> CC: Hannes Reinecke <hare@suse.de>
-> CC: Paolo Bonzini <pbonzini@redhat.com>
-> CC: Alex Williamson <alex.williamson@redhat.com>
-> CC: Markus Armbruster <armbru@redhat.com>
-> CC: Marcel Apfelbaum <marcel@redhat.com>
-> 
-> Cao jin (10):
->   msix: Follow CODING_STYLE
->   hcd-xhci: check & correct param before using it
->   pci: Convert msix_init() to Error and fix callers to check it
->   megasas: change behaviour of msix switch
->   hcd-xhci: change behaviour of msix switch
->   megasas: remove unnecessary megasas_use_msix()
->   megasas: undo the overwrites of msi user configuration
->   vmxnet3: fix reference leak issue
->   vmxnet3: remove unnecessary internal msix flag
->   msi_init: convert assert to return -errno
-> 
->  hw/block/nvme.c        |  5 +++-
->  hw/misc/ivshmem.c      |  8 +++---
->  hw/net/e1000e.c        |  6 ++++-
->  hw/net/rocker/rocker.c |  7 ++++-
->  hw/net/vmxnet3.c       | 46 +++++++++++++++------------------
->  hw/pci/msi.c           |  9 ++++---
->  hw/pci/msix.c          | 42 +++++++++++++++++++++++++-----
->  hw/scsi/megasas.c      | 49 ++++++++++++++++++++---------------
->  hw/usb/hcd-xhci.c      | 69 ++++++++++++++++++++++++++++++--------------------
->  hw/vfio/pci.c          |  8 ++++--
->  hw/virtio/virtio-pci.c | 11 ++++----
->  include/hw/pci/msix.h  |  5 ++--
->  12 files changed, 164 insertions(+), 101 deletions(-)
+> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> index 31aaecb..c94987c 100644
+> --- a/hw/vfio/pci.c
+> +++ b/hw/vfio/pci.c
+> @@ -1881,8 +1881,8 @@ static void vfio_add_ext_cap(VFIOPCIDevice *vdev)
+>       * 0 is reserved for this since absence of capabilities is indicated by
+>       * 0 for the ID, version, AND next pointer.  However, pcie_add_capability()
+>       * uses ID 0 as reserved for list management and will incorrectly match and
+> -     * assert if we attempt to pre-load the head of the chain with with this
+> -     * ID.  Use ID 0xFFFF temporarily since it is also seems to be reserved in
+> +     * assert if we attempt to pre-load the head of the chain with this ID.
+> +     * Use ID 0xFFFF temporarily since it is also seems to be reserved in
+>       * part for identifying absence of capabilities in a root complex register
+>       * block.  If the ID still exists after adding capabilities, switch back to
+>       * zero.  We'll mark this entire first dword as emulated for this purpose.
 > 
 
 -- 
