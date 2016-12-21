@@ -1,39 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46695)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47258)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cJhSK-0003EY-Qu
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 09:01:24 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cJhUv-0005tq-CL
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 09:04:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cJhSB-0000Ig-AG
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 09:01:20 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55722
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1cJhSB-0000IW-4H
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 09:01:11 -0500
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	uBLDxR2B096968
-	for <qemu-devel@nongnu.org>; Wed, 21 Dec 2016 09:01:10 -0500
-Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 27ftcajqd0-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 21 Dec 2016 09:01:10 -0500
-Received: from localhost
-	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Wed, 21 Dec 2016 07:01:08 -0700
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <c1db276f-4e5b-5953-df0d-c07130bbd0ff@fam-schranz.de>
-References: <20161220210053.31842.32241@loki>
-	<c1db276f-4e5b-5953-df0d-c07130bbd0ff@fam-schranz.de>
-Date: Wed, 21 Dec 2016 08:00:52 -0600
-Message-Id: <20161221140052.9877.16212@loki>
-Subject: Re: [Qemu-devel] [ANNOUNCE] QEMU 2.8.0 is now available
+	(envelope-from <pbonzini@redhat.com>) id 1cJhUu-00012G-CJ
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 09:04:01 -0500
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Wed, 21 Dec 2016 15:03:44 +0100
+Message-Id: <20161221140351.30652-4-pbonzini@redhat.com>
+In-Reply-To: <20161221140351.30652-1-pbonzini@redhat.com>
+References: <20161221140351.30652-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH 03/10] aio: make ctx->list_lock a QemuLockCnt,
+ subsuming ctx->walking_bh
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,77 +20,172 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Holger Schranz <holger@fam-schranz.de>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, stefanha@redhat.com
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org
 
-Quoting Holger Schranz (2016-12-20 23:18:00)
-> Hi Michael,
-> =
+This will make it possible to walk the list of bottom halves without
+holding the AioContext lock---and in turn to call bottom half
+handlers without holding the lock.
 
-> could it be, that the link to qemu-2.8.0.tar.bz2 is linked to the
-> qemu-2.8.0-rc4.tar.bz2? The link for signature seems it is correct.
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ async.c             | 35 ++++++++++++++++-------------------
+ include/block/aio.h | 12 +++++-------
+ 2 files changed, 21 insertions(+), 26 deletions(-)
 
-Argh, yes only one link was updated. Both links are correct now.
-
-Thanks!
-
-> =
-
-> Best regards
-> =
-
-> Holger
-> =
-
-> Am 20.12.2016 um 22:00 schrieb Michael Roth:
-> > Hello,
-> >
-> > On behalf of the QEMU Team, I'd like to announce the availability of
-> > the QEMU 2.8.0 release. This release contains 1900+ commits from 201
-> > authors.
-> >
-> > You can grab the tarball from our download page here:
-> >
-> >    http://wiki.qemu.org/Download
-> >
-> > The full list of changes are available at:
-> >
-> >    http://wiki.qemu.org/ChangeLog/2.8
-> >
-> > Highlights include:
-> >
-> >   * Support for fault-tolerant guests via COLO (COarse-grained LOck-ste=
-pping)
-> >   * Support for fast host/guest socket communication over virtio via AF=
-_VSOCK
-> >   * Support for compressed formats when generating live backups
-> >   * Support for new virtio-crypto device
-> >   * Improved display rendering when using SPICE GUI in OpenGL mode
-> >   * ACPI support for NVDIMM device hotplug
-> >
-> >   * ARM: 'virt' machine support for ITS when using ACPI
-> >   * ARM: Aspeed board improvements
-> >   * ARM: STM32F2xx board (Netduino 2) support for ADC and SPI devices
-> >   * MIPS: support for 24KEc CPUs
-> >   * PPC: support for POWER9 CPUs and powernv platform
-> >   * PPC: pseries support for more the 1TiB of guest memory and memory u=
-nplug
-> >   * PPC: pseries support PCI host bridge NUMA affinities
-> >   * s390: support for CPU models and virtio-ccw revision 2
-> >   * x86: support for Extended Interrupt Mode in emulated IOMMUs
-> >   * x86: support for up to 288 CPUs on q35 machine type
-> >   * Xen: unplug support for SCSI disks and xenlinux-compatible devices
-> >
-> >   * and lots more...
-> >
-> > Thank you to everyone involved!
-> >
-> >
-> =
-
-> =
-
-> ---
-> Diese E-Mail wurde von Avast Antivirus-Software auf Viren gepr=C3=BCft.
-> https://www.avast.com/antivirus
->=20
+diff --git a/async.c b/async.c
+index 69292fa..2305e11 100644
+--- a/async.c
++++ b/async.c
+@@ -53,14 +53,14 @@ void aio_bh_schedule_oneshot(AioContext *ctx, QEMUBHFunc *cb, void *opaque)
+         .cb = cb,
+         .opaque = opaque,
+     };
+-    qemu_mutex_lock(&ctx->list_lock);
++    qemu_lockcnt_lock(&ctx->list_lock);
+     bh->next = ctx->first_bh;
+     bh->scheduled = 1;
+     bh->deleted = 1;
+     /* Make sure that the members are ready before putting bh into list */
+     smp_wmb();
+     ctx->first_bh = bh;
+-    qemu_mutex_unlock(&ctx->list_lock);
++    qemu_lockcnt_unlock(&ctx->list_lock);
+     aio_notify(ctx);
+ }
+ 
+@@ -73,12 +73,12 @@ QEMUBH *aio_bh_new(AioContext *ctx, QEMUBHFunc *cb, void *opaque)
+         .cb = cb,
+         .opaque = opaque,
+     };
+-    qemu_mutex_lock(&ctx->list_lock);
++    qemu_lockcnt_lock(&ctx->list_lock);
+     bh->next = ctx->first_bh;
+     /* Make sure that the members are ready before putting bh into list */
+     smp_wmb();
+     ctx->first_bh = bh;
+-    qemu_mutex_unlock(&ctx->list_lock);
++    qemu_lockcnt_unlock(&ctx->list_lock);
+     return bh;
+ }
+ 
+@@ -93,13 +93,11 @@ int aio_bh_poll(AioContext *ctx)
+     QEMUBH *bh, **bhp, *next;
+     int ret;
+ 
+-    ctx->walking_bh++;
++    qemu_lockcnt_inc(&ctx->list_lock);
+ 
+     ret = 0;
+-    for (bh = ctx->first_bh; bh; bh = next) {
+-        /* Make sure that fetching bh happens before accessing its members */
+-        smp_read_barrier_depends();
+-        next = bh->next;
++    for (bh = atomic_rcu_read(&ctx->first_bh); bh; bh = next) {
++        next = atomic_rcu_read(&bh->next);
+         /* The atomic_xchg is paired with the one in qemu_bh_schedule.  The
+          * implicit memory barrier ensures that the callback sees all writes
+          * done by the scheduling thread.  It also ensures that the scheduling
+@@ -116,11 +114,8 @@ int aio_bh_poll(AioContext *ctx)
+         }
+     }
+ 
+-    ctx->walking_bh--;
+-
+     /* remove deleted bhs */
+-    if (!ctx->walking_bh) {
+-        qemu_mutex_lock(&ctx->list_lock);
++    if (qemu_lockcnt_dec_and_lock(&ctx->list_lock)) {
+         bhp = &ctx->first_bh;
+         while (*bhp) {
+             bh = *bhp;
+@@ -131,7 +126,7 @@ int aio_bh_poll(AioContext *ctx)
+                 bhp = &bh->next;
+             }
+         }
+-        qemu_mutex_unlock(&ctx->list_lock);
++        qemu_lockcnt_unlock(&ctx->list_lock);
+     }
+ 
+     return ret;
+@@ -187,7 +182,8 @@ aio_compute_timeout(AioContext *ctx)
+     int timeout = -1;
+     QEMUBH *bh;
+ 
+-    for (bh = ctx->first_bh; bh; bh = bh->next) {
++    for (bh = atomic_rcu_read(&ctx->first_bh); bh;
++         bh = atomic_rcu_read(&bh->next)) {
+         if (bh->scheduled) {
+             if (bh->idle) {
+                 /* idle bottom halves will be polled at least
+@@ -270,7 +266,8 @@ aio_ctx_finalize(GSource     *source)
+     }
+ #endif
+ 
+-    qemu_mutex_lock(&ctx->list_lock);
++    qemu_lockcnt_lock(&ctx->list_lock);
++    assert(!qemu_lockcnt_count(&ctx->list_lock));
+     while (ctx->first_bh) {
+         QEMUBH *next = ctx->first_bh->next;
+ 
+@@ -280,12 +277,12 @@ aio_ctx_finalize(GSource     *source)
+         g_free(ctx->first_bh);
+         ctx->first_bh = next;
+     }
+-    qemu_mutex_unlock(&ctx->list_lock);
++    qemu_lockcnt_unlock(&ctx->list_lock);
+ 
+     aio_set_event_notifier(ctx, &ctx->notifier, false, NULL, NULL);
+     event_notifier_cleanup(&ctx->notifier);
+     qemu_rec_mutex_destroy(&ctx->lock);
+-    qemu_mutex_destroy(&ctx->list_lock);
++    qemu_lockcnt_destroy(&ctx->list_lock);
+     timerlistgroup_deinit(&ctx->tlg);
+ }
+ 
+@@ -372,6 +369,7 @@ AioContext *aio_context_new(Error **errp)
+         goto fail;
+     }
+     g_source_set_can_recurse(&ctx->source, true);
++    qemu_lockcnt_init(&ctx->list_lock);
+     aio_set_event_notifier(ctx, &ctx->notifier,
+                            false,
+                            (EventNotifierHandler *)
+@@ -381,7 +379,6 @@ AioContext *aio_context_new(Error **errp)
+     ctx->linux_aio = NULL;
+ #endif
+     ctx->thread_pool = NULL;
+-    qemu_mutex_init(&ctx->list_lock);
+     qemu_rec_mutex_init(&ctx->lock);
+     timerlistgroup_init(&ctx->tlg, aio_timerlist_notify, ctx);
+ 
+diff --git a/include/block/aio.h b/include/block/aio.h
+index 87d025d..2e06ae2 100644
+--- a/include/block/aio.h
++++ b/include/block/aio.h
+@@ -90,17 +90,15 @@ struct AioContext {
+      */
+     uint32_t notify_me;
+ 
+-    /* lock to protect between bh's adders and deleter */
+-    QemuMutex list_lock;
++    /* A lock to protect between bh's adders and deleter, and to ensure
++     * that no callbacks are removed while we're walking and dispatching
++     * them.
++     */
++    QemuLockCnt list_lock;
+ 
+     /* Anchor of the list of Bottom Halves belonging to the context */
+     struct QEMUBH *first_bh;
+ 
+-    /* A simple lock used to protect the first_bh list, and ensure that
+-     * no callbacks are removed while we're walking and dispatching callbacks.
+-     */
+-    int walking_bh;
+-
+     /* Used by aio_notify.
+      *
+      * "notified" is used to avoid expensive event_notifier_test_and_clear
+-- 
+2.9.3
