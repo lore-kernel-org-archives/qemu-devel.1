@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60049)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33027)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cJgjI-0005VC-0N
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 08:14:49 -0500
+	(envelope-from <Vlad.Lungu@windriver.com>) id 1cJgob-0008Sx-Lz
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 08:20:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cJgjE-0004Dq-0N
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 08:14:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38264)
+	(envelope-from <Vlad.Lungu@windriver.com>) id 1cJgoX-0006N1-NV
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 08:20:17 -0500
+Received: from mail1.windriver.com ([147.11.146.13]:52026)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cJgjD-0004Cn-O2
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 08:14:43 -0500
-Date: Wed, 21 Dec 2016 11:14:38 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20161221131438.GF3808@thinpad.lan.raisama.net>
-References: <1482255793-19057-1-git-send-email-ehabkost@redhat.com>
-	<70e1f758-6f18-9821-b48e-bdebdfc0befc@redhat.com>
+	(Exim 4.71) (envelope-from <Vlad.Lungu@windriver.com>)
+	id 1cJgoX-0006LS-FT
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 08:20:13 -0500
+From: Vlad Lungu <vlad.lungu@windriver.com>
+Date: Wed, 21 Dec 2016 15:20:02 +0200
+Message-ID: <1482326402-6963-1-git-send-email-vlad.lungu@windriver.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <70e1f758-6f18-9821-b48e-bdebdfc0befc@redhat.com>
-Subject: Re: [Qemu-devel] [RFC 0/7] Move accel, KVM, Xen,
- qtest files to accel/ subdir
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCHv5] multiboot: copy the cmdline verbatim,
+ unescape module strings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,107 +25,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, Christoffer Dall <christoffer.dall@linaro.org>, Anthony Perard <anthony.perard@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xensource.com
+To: qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com, pbonzini@redhat.com, Vlad Lungu <vlad.lungu@windriver.com>
 
-On Wed, Dec 21, 2016 at 12:21:44PM +0100, Paolo Bonzini wrote:
-> 
-> 
-> On 20/12/2016 18:43, Eduardo Habkost wrote:
-> > This moves the KVM and Xen files to the an accel/ subdir.
-> > 
-> > Instead of moving the *-stubs.c file to accel/ as-is, I tried to
-> > move most of the stub code to libqemustub.a. This way the obj-y
-> > logic for accel/ is simpler: obj-y includes accel/ only if
-> > CONFIG_SOFTMMU is set.
-> > 
-> > The Xen stubs could be moved completely to stubs/, but some of
-> > the KVM stubs depend on cpu.h. So most of the kvm-stub.c code was
-> > moved to stubs/kvm.c, but some of that code was kept in
-> > accel/kvm-stub.c.
-> 
-> I think we need to decide what libqemustub is for.
-> 
-> The original purpose was to provide different implementations of some
-> functions for tools vs. emulators or (more rarely) for user-mode vs.
-> system emulation.
-> 
+get_opt_value() truncates the value at the first comma
+Use memcpy() instead
+Unescape the module filename and parameters with get_opt_value()
+before calling mb_add_cmdline()
 
-So, is sysemu vs user-mode a valid reason for using libqemustub?
-The main reason I have moved some code to sbus/kvm.c is to avoid
-having to include accel/kvm-stub.c in *-user.
+Signed-off-by: Vlad Lungu <vlad.lungu@windriver.com>
+---
+ hw/i386/multiboot.c | 21 +++++++++++----------
+ 1 file changed, 11 insertions(+), 10 deletions(-)
 
-Moving xen-stub.c to libqemustub, on the other hand, is really
-unnecessary.
-
-> There are also some cases where we use it for functions that are only
-> implemented by some targets.
-> 
-> In general, I think libqemustub should be the last resort.  If possible,
-> inlines in headers should be the first choice, and stubs in objs-y or
-> common-objs-y (using $(call lnot) in the Makefile) should be the second.
-
-I understand the reasoning, but I fail to see cases when
-libqemustub would be considered appropriate. Using stubs in
-obj-y/common-obj-y using $(call lnot) is always possible, isn't
-it?
-
-Hmm, maybe on cases where the decision to use the stub doesn't
-depend on a single build variable (e.g. a function implemented by
-a handful of targets, but not all of them). Are there other
-examples?
-
-> 
-> The reason is that stubs/ hides files from the corresponding maintainer;
-> for example, commit 07a32d6b's addition of stubs/get-next-serial.c was
-> in all likelihood unnecessary, but the new file went in without an ack
-> for a character device maintainer.  Tracking stubs in the MAINTAINERS
-> file is unwieldy and, from this point of view, I find
-> 
-> 	F: accel/kvm*
-> 
-> to be preferrable to
-> 
-> 	F: accel/kvm*
-> 	F: stubs/kvm.c
-
-> 
-> Thanks,
-> 
-> Paolo
-> 
-> > About TCG:
-> > ----------
-> > 
-> > It is not obvious to me which TCG-related files could be moved to
-> > accel/, so this series don't move any of them yet.
-> > 
-> > About other CONFIG_SOFTMMU top-level files:
-> > -------------------------------------------
-> > 
-> > I would like to know what we should do with the top-level
-> > CONFIG_SOFTMMU-only files that don't belong to hw/. Some
-> > candidates: arch_init.c cpus.c monitor.c gdbstub.c balloon.c
-> > ioport.c bootdevice.c memory.c cputlb.c memory_mapping.c dump.c.
-> > 
-> > Maybe a sysemu/ subdir? In that case, should we still create an
-> > accel/ subdir, or move xen-*, kvm-* and friends to sysemu/ too?
-> > 
-> > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > Cc: kvm@vger.kernel.org
-> > Cc: Christoffer Dall <christoffer.dall@linaro.org>
-> > Cc: Anthony Perard <anthony.perard@citrix.com>
-> > Cc: Stefano Stabellini <sstabellini@kernel.org>
-> > Cc: xen-devel@lists.xensource.com
-> > 
-> > Eduardo Habkost (7):
-> >   xen: Move xen-*-stub.c to stubs/
-> >   xen: Move xen files to accel/
-> >   kvm: Move some kvm-stub.c code to stubs/kvm.c
-> >   kvm: Include kvm-stub.o only on CONFIG_SOFTMMU
-> >   kvm: Move kvm*.c files to accel/
-> >   accel: Move accel.c to accel/
-> >   accel: Move qtest.c to accel/
-
+diff --git a/hw/i386/multiboot.c b/hw/i386/multiboot.c
+index 387caa6..d16777e 100644
+--- a/hw/i386/multiboot.c
++++ b/hw/i386/multiboot.c
+@@ -109,7 +109,7 @@ static uint32_t mb_add_cmdline(MultibootState *s, const char *cmdline)
+     hwaddr p = s->offset_cmdlines;
+     char *b = (char *)s->mb_buf + p;
+ 
+-    get_opt_value(b, strlen(cmdline) + 1, cmdline);
++    memcpy(b, cmdline, strlen(cmdline) + 1);
+     s->offset_cmdlines += strlen(b) + 1;
+     return s->mb_buf_phys + p;
+ }
+@@ -287,7 +287,7 @@ int load_multiboot(FWCfgState *fw_cfg,
+     mbs.offset_bootloader = mbs.offset_cmdlines + cmdline_len;
+ 
+     if (initrd_filename) {
+-        char *next_initrd, not_last;
++        char *next_initrd, not_last, tmpbuf[strlen(initrd_filename) + 1];
+ 
+         mbs.offset_mods = mbs.mb_buf_size;
+ 
+@@ -296,25 +296,26 @@ int load_multiboot(FWCfgState *fw_cfg,
+             int mb_mod_length;
+             uint32_t offs = mbs.mb_buf_size;
+ 
+-            next_initrd = (char *)get_opt_value(NULL, 0, initrd_filename);
++            next_initrd = (char *)get_opt_value(tmpbuf, sizeof(tmpbuf), initrd_filename);
+             not_last = *next_initrd;
+-            *next_initrd = '\0';
+             /* if a space comes after the module filename, treat everything
+                after that as parameters */
+-            hwaddr c = mb_add_cmdline(&mbs, initrd_filename);
+-            if ((next_space = strchr(initrd_filename, ' ')))
++            hwaddr c = mb_add_cmdline(&mbs, tmpbuf);
++            next_space = strchr(tmpbuf, ' ');
++            if (next_space) {
+                 *next_space = '\0';
+-            mb_debug("multiboot loading module: %s\n", initrd_filename);
+-            mb_mod_length = get_image_size(initrd_filename);
++            }
++            mb_debug("multiboot loading module: %s\n", tmpbuf);
++            mb_mod_length = get_image_size(tmpbuf);
+             if (mb_mod_length < 0) {
+-                fprintf(stderr, "Failed to open file '%s'\n", initrd_filename);
++                fprintf(stderr, "Failed to open file '%s'\n", tmpbuf);
+                 exit(1);
+             }
+ 
+             mbs.mb_buf_size = TARGET_PAGE_ALIGN(mb_mod_length + mbs.mb_buf_size);
+             mbs.mb_buf = g_realloc(mbs.mb_buf, mbs.mb_buf_size);
+ 
+-            load_image(initrd_filename, (unsigned char *)mbs.mb_buf + offs);
++            load_image(tmpbuf, (unsigned char *)mbs.mb_buf + offs);
+             mb_add_mod(&mbs, mbs.mb_buf_phys + offs,
+                        mbs.mb_buf_phys + offs + mb_mod_length, c);
+ 
 -- 
-Eduardo
+1.9.1
