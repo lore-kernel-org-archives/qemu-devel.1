@@ -1,17 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47448)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47742)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cJhV7-00062e-OE
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 09:04:20 -0500
+	(envelope-from <famz@redhat.com>) id 1cJhWE-00077L-UJ
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 09:05:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cJhV1-00016D-Jf
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 09:04:13 -0500
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 21 Dec 2016 15:03:48 +0100
-Message-Id: <20161221140351.30652-8-pbonzini@redhat.com>
-In-Reply-To: <20161221140351.30652-1-pbonzini@redhat.com>
-References: <20161221140351.30652-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 07/10] aio-posix: remove walking_handlers,
- protecting AioHandler list with list_lock
+	(envelope-from <famz@redhat.com>) id 1cJhWA-0001Wf-Rr
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 09:05:22 -0500
+Date: Wed, 21 Dec 2016 22:05:06 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20161221140506.GA12620@lemon>
+References: <20161220163139.12016-1-famz@redhat.com>
+	<20161220163139.12016-5-famz@redhat.com>
+	<20161221115956.GF9482@stefanha-x1.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20161221115956.GF9482@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 4/4] block: Add VFIO based
+ NVMe driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,230 +25,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, borntraeger@de.ibm.com, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Karl Rister <krister@redhat.com>
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- aio-posix.c | 64 ++++++++++++++++++++++++++++++++++++-------------------------
- 1 file changed, 38 insertions(+), 26 deletions(-)
+On Wed, 12/21 11:59, Stefan Hajnoczi wrote:
+> On Wed, Dec 21, 2016 at 12:31:39AM +0800, Fam Zheng wrote:
+> > This is a new protocol driver that exclusively opens a host NVMe
+> > controller through VFIO. It achieves better latency than linux-aio.
+> 
+> This is an interesting block driver to have for performance comparisons.
+> Definitely something that is worth merging.
+> 
+> >                                          nvme://    linux-aio
+> > ------------------------------------------------------------------
+> >   fio bs=4k  iodepth=1 (IOPS)             30014      24009
+> >   fio bs=4k  iodepth=1 (IOPS)  +polling   45148      34689
+> >   fio bs=64k iodepth=1 (IOPS)             17801      14954
+> >   fio bs=64k iodepth=1 (IOPS)  +polling   17970      14564
+> > 
+> >   fio bs=4k  iodepth=32 (IOPS)           110637     121480
+> >   fio bs=4k  iodepth=32 (IOPS) +polling  145533     166878
+> >   fio bs=64k iodepth=32 (IOPS)            50525      50596
+> >   fio bs=64k iodepth=32 (IOPS) +polling   50482      50534
+> > 
+> >   (host) qemu-img bench -c 8000000 (sec)  15.00      43.13
+> > 
+> > ("+polling" means poll-max-ns=18000 which is a rule of thumb value for
+> > the used NVMe device, otherwise it defaults to 0).
+> > 
+> > For the rows where linux-aio is faster, a lot of evidence shows that the
+> > io queue is more likely to stay full if the request completions happen
+> > faster, as in the nvme:// case, hence less batch submission and request
+> > merging than linux-aio.
+> 
+> I'm not sure I understand this paragraph.  Sounds like you are saying
+> that nvme:// has lower latency and this defeats batch submission.
+> Higher numbers are still better at the end of the day so it's worth
+> studying this more closely and coming up with solutions.  Maybe at a
+> certain rate of submission it makes sense to favor throughput
+> (batching) even with nvme://.
 
-diff --git a/aio-posix.c b/aio-posix.c
-index f83b7af..9b13182 100644
---- a/aio-posix.c
-+++ b/aio-posix.c
-@@ -16,7 +16,7 @@
- #include "qemu/osdep.h"
- #include "qemu-common.h"
- #include "block/block.h"
--#include "qemu/queue.h"
-+#include "qemu/rcu_queue.h"
- #include "qemu/sockets.h"
- #include "qemu/cutils.h"
- #include "trace.h"
-@@ -66,7 +66,7 @@ static bool aio_epoll_try_enable(AioContext *ctx)
-     AioHandler *node;
-     struct epoll_event event;
- 
--    QLIST_FOREACH(node, &ctx->aio_handlers, node) {
-+    QLIST_FOREACH_RCU(node, &ctx->aio_handlers, node) {
-         int r;
-         if (node->deleted || !node->pfd.events) {
-             continue;
-@@ -212,6 +212,8 @@ void aio_set_fd_handler(AioContext *ctx,
-     bool is_new = false;
-     bool deleted = false;
- 
-+    qemu_lockcnt_lock(&ctx->list_lock);
-+
-     node = find_aio_handler(ctx, fd);
- 
-     /* Are we deleting the fd handler? */
-@@ -223,13 +225,13 @@ void aio_set_fd_handler(AioContext *ctx,
-         g_source_remove_poll(&ctx->source, &node->pfd);
- 
-         /* If the lock is held, just mark the node as deleted */
--        if (ctx->walking_handlers) {
-+        if (qemu_lockcnt_count(&ctx->list_lock)) {
-             node->deleted = 1;
-             node->pfd.revents = 0;
-         } else {
-             /* Otherwise, delete it for real.  We can't just mark it as
--             * deleted because deleted nodes are only cleaned up after
--             * releasing the walking_handlers lock.
-+             * deleted because deleted nodes are only cleaned up while
-+             * no one is walking the handlers list.
-              */
-             QLIST_REMOVE(node, node);
-             deleted = true;
-@@ -243,7 +245,7 @@ void aio_set_fd_handler(AioContext *ctx,
-             /* Alloc and insert if it's not already there */
-             node = g_new0(AioHandler, 1);
-             node->pfd.fd = fd;
--            QLIST_INSERT_HEAD(&ctx->aio_handlers, node, node);
-+            QLIST_INSERT_HEAD_RCU(&ctx->aio_handlers, node, node);
- 
-             g_source_add_poll(&ctx->source, &node->pfd);
-             is_new = true;
-@@ -265,6 +267,7 @@ void aio_set_fd_handler(AioContext *ctx,
-     }
- 
-     aio_epoll_update(ctx, node, is_new);
-+    qemu_lockcnt_unlock(&ctx->list_lock);
-     aio_notify(ctx);
- 
-     if (deleted) {
-@@ -316,8 +319,8 @@ static void poll_set_started(AioContext *ctx, bool started)
- 
-     ctx->poll_started = started;
- 
--    ctx->walking_handlers++;
--    QLIST_FOREACH(node, &ctx->aio_handlers, node) {
-+    qemu_lockcnt_inc(&ctx->list_lock);
-+    QLIST_FOREACH_RCU(node, &ctx->aio_handlers, node) {
-         IOHandler *fn;
- 
-         if (node->deleted) {
-@@ -334,7 +337,7 @@ static void poll_set_started(AioContext *ctx, bool started)
-             fn(node->opaque);
-         }
-     }
--    ctx->walking_handlers--;
-+    qemu_lockcnt_dec(&ctx->list_lock);
- }
- 
- 
-@@ -349,22 +352,32 @@ bool aio_prepare(AioContext *ctx)
- bool aio_pending(AioContext *ctx)
- {
-     AioHandler *node;
-+    bool result = false;
- 
--    QLIST_FOREACH(node, &ctx->aio_handlers, node) {
-+    /*
-+     * We have to walk very carefully in case aio_set_fd_handler is
-+     * called while we're walking.
-+     */
-+    qemu_lockcnt_inc(&ctx->list_lock);
-+
-+    QLIST_FOREACH_RCU(node, &ctx->aio_handlers, node) {
-         int revents;
- 
-         revents = node->pfd.revents & node->pfd.events;
-         if (revents & (G_IO_IN | G_IO_HUP | G_IO_ERR) && node->io_read &&
-             aio_node_check(ctx, node->is_external)) {
--            return true;
-+            result = true;
-+            break;
-         }
-         if (revents & (G_IO_OUT | G_IO_ERR) && node->io_write &&
-             aio_node_check(ctx, node->is_external)) {
--            return true;
-+            result = true;
-+            break;
-         }
-     }
-+    qemu_lockcnt_dec(&ctx->list_lock);
- 
--    return false;
-+    return result;
- }
- 
- static bool aio_dispatch_handlers(AioContext *ctx)
-@@ -376,9 +389,9 @@ static bool aio_dispatch_handlers(AioContext *ctx)
-      * We have to walk very carefully in case aio_set_fd_handler is
-      * called while we're walking.
-      */
--    ctx->walking_handlers++;
-+    qemu_lockcnt_inc(&ctx->list_lock);
- 
--    QLIST_FOREACH_SAFE(node, &ctx->aio_handlers, node, tmp) {
-+    QLIST_FOREACH_SAFE_RCU(node, &ctx->aio_handlers, node, tmp) {
-         int revents;
- 
-         revents = node->pfd.revents & node->pfd.events;
-@@ -404,16 +417,15 @@ static bool aio_dispatch_handlers(AioContext *ctx)
-         }
- 
-         if (node->deleted) {
--            ctx->walking_handlers--;
--            if (!ctx->walking_handlers) {
-+            if (qemu_lockcnt_dec_if_lock(&ctx->list_lock)) {
-                 QLIST_REMOVE(node, node);
-                 g_free(node);
-+                qemu_lockcnt_inc_and_unlock(&ctx->list_lock);
-             }
--            ctx->walking_handlers++;
-         }
-     }
- 
--    ctx->walking_handlers--;
-+    qemu_lockcnt_dec(&ctx->list_lock);
-     return progress;
- }
- 
-@@ -493,7 +505,7 @@ static bool run_poll_handlers_once(AioContext *ctx)
-     bool progress = false;
-     AioHandler *node;
- 
--    QLIST_FOREACH(node, &ctx->aio_handlers, node) {
-+    QLIST_FOREACH_RCU(node, &ctx->aio_handlers, node) {
-         if (!node->deleted && node->io_poll &&
-                 node->io_poll(node->opaque)) {
-             progress = true;
-@@ -514,7 +526,7 @@ static bool run_poll_handlers_once(AioContext *ctx)
-  * Note that ctx->notify_me must be non-zero so this function can detect
-  * aio_notify().
-  *
-- * Note that the caller must have incremented ctx->walking_handlers.
-+ * Note that the caller must have incremented ctx->list_lock.
-  *
-  * Returns: true if progress was made, false otherwise
-  */
-@@ -524,7 +536,7 @@ static bool run_poll_handlers(AioContext *ctx, int64_t max_ns)
-     int64_t end_time;
- 
-     assert(ctx->notify_me);
--    assert(ctx->walking_handlers > 0);
-+    assert(qemu_lockcnt_count(&ctx->list_lock) > 0);
-     assert(ctx->poll_disable_cnt == 0);
- 
-     trace_run_poll_handlers_begin(ctx, max_ns);
-@@ -546,7 +558,7 @@ static bool run_poll_handlers(AioContext *ctx, int64_t max_ns)
-  *
-  * ctx->notify_me must be non-zero so this function can detect aio_notify().
-  *
-- * Note that the caller must have incremented ctx->walking_handlers.
-+ * Note that the caller must have incremented ctx->list_lock.
-  *
-  * Returns: true if progress was made, false otherwise
-  */
-@@ -597,7 +609,7 @@ bool aio_poll(AioContext *ctx, bool blocking)
-         atomic_add(&ctx->notify_me, 2);
-     }
- 
--    ctx->walking_handlers++;
-+    qemu_lockcnt_inc(&ctx->list_lock);
- 
-     if (ctx->poll_max_ns) {
-         start = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
-@@ -611,7 +623,7 @@ bool aio_poll(AioContext *ctx, bool blocking)
-         /* fill pollfds */
- 
-         if (!aio_epoll_enabled(ctx)) {
--            QLIST_FOREACH(node, &ctx->aio_handlers, node) {
-+            QLIST_FOREACH_RCU(node, &ctx->aio_handlers, node) {
-                 if (!node->deleted && node->pfd.events
-                     && aio_node_check(ctx, node->is_external)) {
-                     add_pollfd(node);
-@@ -696,7 +708,7 @@ bool aio_poll(AioContext *ctx, bool blocking)
-     }
- 
-     npfd = 0;
--    ctx->walking_handlers--;
-+    qemu_lockcnt_dec(&ctx->list_lock);
- 
-     /* Run dispatch even if there were no readable fds to run timers */
-     if (aio_dispatch(ctx, ret > 0)) {
--- 
-2.9.3
+Good question! Busy polling at nvme:// side reduces batched completion, and busy
+polling at virtio side reduces batched submission. I think this is a common
+pattern and we should figure out a general strategy to "favor throughput"
+based on the rate.
+
+> 
+> Regarding merging: are you doing sequential I/O?  Please try random
+> instead.
+
+Yes, it is sequential. I've also tried random but the results are mostly the
+same.  It means merging is the smaller factor here, and host <-> guest
+communication is the bigger one. Maybe we should go ahead to expriment busy
+polling at driver side now.
+
+> > +typedef struct {
+> > +    int         index;
+> > +    NVMeQueue   sq, cq;
+> > +    int         cq_phase;
+> > +    uint8_t     *prp_list_pages;
+> > +    uint64_t    prp_list_base_iova;
+> > +    NVMeRequest reqs[NVME_QUEUE_SIZE];
+> > +    CoQueue     wait_queue;
+> 
+> "free_req_queue" describes the purpose of this queue.
+
+OK, I'll rename it.
+
+> 
+> > +    bool        busy;
+> > +    int         need_kick;
+> > +    int         inflight;
+> > +} NVMeQueuePair;
+> > +
+> > +typedef volatile struct {
+> > +    uint64_t cap;
+> > +    uint32_t vs;
+> > +    uint32_t intms;
+> > +    uint32_t intmc;
+> > +    uint32_t cc;
+> > +    uint32_t reserved0;
+> > +    uint32_t csts;
+> > +    uint32_t nssr;
+> > +    uint32_t aqa;
+> > +    uint64_t asq;
+> > +    uint64_t acq;
+> > +    uint32_t cmbloc;
+> > +    uint32_t cmbsz;
+> > +    uint8_t  reserved1[0xec0];
+> > +    uint8_t  cmd_set_specfic[0x100];
+> > +    uint32_t doorbells[];
+> > +} QEMU_PACKED NVMeRegs;
+> > +
+> > +QEMU_BUILD_BUG_ON(offsetof(NVMeRegs, doorbells) != 0x1000);
+> > +
+> > +typedef struct {
+> > +    QEMUVFIOState *vfio;
+> > +    NVMeRegs *regs;
+> > +    /* The submission/completion queue pairs.
+> > +     * [0]: admin queue.
+> > +     * [1..]: io queues.
+> > +     */
+> > +    NVMeQueuePair **queues;
+> > +    int nr_queues;
+> > +    size_t page_size;
+> > +    /* How many uint32_t elements does each doorbell entry take. */
+> > +    size_t doorbell_scale;
+> > +    bool write_cache;
+> > +    EventNotifier event_notifier;
+> 
+> "event_notifier" describes the type, not the purpose of the field.
+> "irq_notifier" is clearer.
+
+Good idea.
+
+> > +    while (true) {
+> > +        req = nvme_get_free_req(ioq);
+> > +        if (req) {
+> > +            break;
+> > +        }
+> > +        DPRINTF("nvme wait req\n");
+> > +        qemu_co_queue_wait(&ioq->wait_queue);
+> > +        DPRINTF("nvme wait req done\n");
+> > +    }
+> > +
+> > +    r = nvme_cmd_map_qiov(bs, &cmd, req, qiov);
+> > +    if (r) {
+> > +        return r;
+> 
+> Is req leaked?
+
+No. It is a pointer to an ioq->reqs element. ioq->reqs is an object pool with
+the same lifecycle of ioq. Until nvme_submit_command() is called, *req is still
+"free".
+
+Fam
