@@ -1,17 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47258)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47323)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cJhUv-0005tq-CL
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 09:04:02 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cJhUz-0005yN-NK
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 09:04:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cJhUu-00012G-CJ
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 09:04:01 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cJhUv-00013G-U8
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 09:04:05 -0500
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 21 Dec 2016 15:03:44 +0100
-Message-Id: <20161221140351.30652-4-pbonzini@redhat.com>
-In-Reply-To: <20161221140351.30652-1-pbonzini@redhat.com>
-References: <20161221140351.30652-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 03/10] aio: make ctx->list_lock a QemuLockCnt,
- subsuming ctx->walking_bh
+Date: Wed, 21 Dec 2016 15:03:41 +0100
+Message-Id: <20161221140351.30652-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 00/10] aio_context_acquire/release pushdown,
+ part 1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,169 +21,55 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org
 
-This will make it possible to walk the list of bottom halves without
-holding the AioContext lock---and in turn to call bottom half
-handlers without holding the lock.
+This is the first step of pushing down the AioContext lock.  Bottom halves
+are already protected by their own lock, use it also for walking_bh
+and for the handlers list (including walking_handlers).  The (lock,
+walking_foo) pair is wrapped into the QemuLockCnt primitive.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- async.c             | 35 ++++++++++++++++-------------------
- include/block/aio.h | 12 +++++-------
- 2 files changed, 21 insertions(+), 26 deletions(-)
+Paolo
 
-diff --git a/async.c b/async.c
-index 69292fa..2305e11 100644
---- a/async.c
-+++ b/async.c
-@@ -53,14 +53,14 @@ void aio_bh_schedule_oneshot(AioContext *ctx, QEMUBHFunc *cb, void *opaque)
-         .cb = cb,
-         .opaque = opaque,
-     };
--    qemu_mutex_lock(&ctx->list_lock);
-+    qemu_lockcnt_lock(&ctx->list_lock);
-     bh->next = ctx->first_bh;
-     bh->scheduled = 1;
-     bh->deleted = 1;
-     /* Make sure that the members are ready before putting bh into list */
-     smp_wmb();
-     ctx->first_bh = bh;
--    qemu_mutex_unlock(&ctx->list_lock);
-+    qemu_lockcnt_unlock(&ctx->list_lock);
-     aio_notify(ctx);
- }
- 
-@@ -73,12 +73,12 @@ QEMUBH *aio_bh_new(AioContext *ctx, QEMUBHFunc *cb, void *opaque)
-         .cb = cb,
-         .opaque = opaque,
-     };
--    qemu_mutex_lock(&ctx->list_lock);
-+    qemu_lockcnt_lock(&ctx->list_lock);
-     bh->next = ctx->first_bh;
-     /* Make sure that the members are ready before putting bh into list */
-     smp_wmb();
-     ctx->first_bh = bh;
--    qemu_mutex_unlock(&ctx->list_lock);
-+    qemu_lockcnt_unlock(&ctx->list_lock);
-     return bh;
- }
- 
-@@ -93,13 +93,11 @@ int aio_bh_poll(AioContext *ctx)
-     QEMUBH *bh, **bhp, *next;
-     int ret;
- 
--    ctx->walking_bh++;
-+    qemu_lockcnt_inc(&ctx->list_lock);
- 
-     ret = 0;
--    for (bh = ctx->first_bh; bh; bh = next) {
--        /* Make sure that fetching bh happens before accessing its members */
--        smp_read_barrier_depends();
--        next = bh->next;
-+    for (bh = atomic_rcu_read(&ctx->first_bh); bh; bh = next) {
-+        next = atomic_rcu_read(&bh->next);
-         /* The atomic_xchg is paired with the one in qemu_bh_schedule.  The
-          * implicit memory barrier ensures that the callback sees all writes
-          * done by the scheduling thread.  It also ensures that the scheduling
-@@ -116,11 +114,8 @@ int aio_bh_poll(AioContext *ctx)
-         }
-     }
- 
--    ctx->walking_bh--;
--
-     /* remove deleted bhs */
--    if (!ctx->walking_bh) {
--        qemu_mutex_lock(&ctx->list_lock);
-+    if (qemu_lockcnt_dec_and_lock(&ctx->list_lock)) {
-         bhp = &ctx->first_bh;
-         while (*bhp) {
-             bh = *bhp;
-@@ -131,7 +126,7 @@ int aio_bh_poll(AioContext *ctx)
-                 bhp = &bh->next;
-             }
-         }
--        qemu_mutex_unlock(&ctx->list_lock);
-+        qemu_lockcnt_unlock(&ctx->list_lock);
-     }
- 
-     return ret;
-@@ -187,7 +182,8 @@ aio_compute_timeout(AioContext *ctx)
-     int timeout = -1;
-     QEMUBH *bh;
- 
--    for (bh = ctx->first_bh; bh; bh = bh->next) {
-+    for (bh = atomic_rcu_read(&ctx->first_bh); bh;
-+         bh = atomic_rcu_read(&bh->next)) {
-         if (bh->scheduled) {
-             if (bh->idle) {
-                 /* idle bottom halves will be polled at least
-@@ -270,7 +266,8 @@ aio_ctx_finalize(GSource     *source)
-     }
- #endif
- 
--    qemu_mutex_lock(&ctx->list_lock);
-+    qemu_lockcnt_lock(&ctx->list_lock);
-+    assert(!qemu_lockcnt_count(&ctx->list_lock));
-     while (ctx->first_bh) {
-         QEMUBH *next = ctx->first_bh->next;
- 
-@@ -280,12 +277,12 @@ aio_ctx_finalize(GSource     *source)
-         g_free(ctx->first_bh);
-         ctx->first_bh = next;
-     }
--    qemu_mutex_unlock(&ctx->list_lock);
-+    qemu_lockcnt_unlock(&ctx->list_lock);
- 
-     aio_set_event_notifier(ctx, &ctx->notifier, false, NULL, NULL);
-     event_notifier_cleanup(&ctx->notifier);
-     qemu_rec_mutex_destroy(&ctx->lock);
--    qemu_mutex_destroy(&ctx->list_lock);
-+    qemu_lockcnt_destroy(&ctx->list_lock);
-     timerlistgroup_deinit(&ctx->tlg);
- }
- 
-@@ -372,6 +369,7 @@ AioContext *aio_context_new(Error **errp)
-         goto fail;
-     }
-     g_source_set_can_recurse(&ctx->source, true);
-+    qemu_lockcnt_init(&ctx->list_lock);
-     aio_set_event_notifier(ctx, &ctx->notifier,
-                            false,
-                            (EventNotifierHandler *)
-@@ -381,7 +379,6 @@ AioContext *aio_context_new(Error **errp)
-     ctx->linux_aio = NULL;
- #endif
-     ctx->thread_pool = NULL;
--    qemu_mutex_init(&ctx->list_lock);
-     qemu_rec_mutex_init(&ctx->lock);
-     timerlistgroup_init(&ctx->tlg, aio_timerlist_notify, ctx);
- 
-diff --git a/include/block/aio.h b/include/block/aio.h
-index 87d025d..2e06ae2 100644
---- a/include/block/aio.h
-+++ b/include/block/aio.h
-@@ -90,17 +90,15 @@ struct AioContext {
-      */
-     uint32_t notify_me;
- 
--    /* lock to protect between bh's adders and deleter */
--    QemuMutex list_lock;
-+    /* A lock to protect between bh's adders and deleter, and to ensure
-+     * that no callbacks are removed while we're walking and dispatching
-+     * them.
-+     */
-+    QemuLockCnt list_lock;
- 
-     /* Anchor of the list of Bottom Halves belonging to the context */
-     struct QEMUBH *first_bh;
- 
--    /* A simple lock used to protect the first_bh list, and ensure that
--     * no callbacks are removed while we're walking and dispatching callbacks.
--     */
--    int walking_bh;
--
-     /* Used by aio_notify.
-      *
-      * "notified" is used to avoid expensive event_notifier_test_and_clear
+v1->v2:
+        rebased on top of polling patches
+        moved documentation to include/
+        new patch "aio-posix: split aio_dispatch_handlers out of aio_dispatch"
+        replaced atomic_read with atomic_mb_read in qemu_lockcnt_inc
+        replaced futex* function and macro names with qemu_futex*
+        removed atomic access to node->pfd.revents (because there is no
+          concurrent aio_poll anymore after the BDRV_POLL_WHILE series)
+        left "aio: push aio_context_acquire/release down to dispatching"
+          to a later series
+
+Paolo Bonzini (10):
+  aio: rename bh_lock to list_lock
+  qemu-thread: introduce QemuLockCnt
+  aio: make ctx->list_lock a QemuLockCnt, subsuming ctx->walking_bh
+  qemu-thread: optimize QemuLockCnt with futexes on Linux
+  aio-posix: split aio_dispatch_handlers out of aio_dispatch
+  aio: tweak walking in dispatch phase
+  aio-posix: remove walking_handlers, protecting AioHandler list with
+    list_lock
+  aio-win32: remove walking_handlers, protecting AioHandler list with
+    list_lock
+  aio: document locking
+  async: optimize aio_bh_poll
+
+ aio-posix.c                 | 115 +++++++------
+ aio-win32.c                 |  83 ++++++----
+ async.c                     |  45 ++---
+ docs/lockcnt.txt            | 277 +++++++++++++++++++++++++++++++
+ docs/multiple-iothreads.txt |  13 +-
+ include/block/aio.h         |  38 ++---
+ include/qemu/futex.h        |  36 ++++
+ include/qemu/thread.h       | 111 +++++++++++++
+ util/Makefile.objs          |   1 +
+ util/lockcnt.c              | 395 ++++++++++++++++++++++++++++++++++++++++++++
+ util/qemu-thread-posix.c    |  35 +---
+ util/qemu-thread-win32.c    |   2 +-
+ util/trace-events           |  10 ++
+ 13 files changed, 1002 insertions(+), 159 deletions(-)
+ create mode 100644 docs/lockcnt.txt
+ create mode 100644 include/qemu/futex.h
+ create mode 100644 util/lockcnt.c
+
 -- 
 2.9.3
