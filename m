@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58730)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58833)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cJiIV-0003nC-C9
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cJiIX-0003oC-Ic
 	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 09:55:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cJiIR-0006k6-Bf
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 09:55:15 -0500
-Received: from mailhub.sw.ru ([195.214.232.25]:27118 helo=relay.sw.ru)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cJiIR-0006kN-Bn
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 09:55:17 -0500
+Received: from mailhub.sw.ru ([195.214.232.25]:48614 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1cJiIQ-0006Y4-JB
+	id 1cJiIQ-0006dU-V0
 	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 09:55:11 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 21 Dec 2016 17:54:45 +0300
-Message-Id: <1482332102-131788-8-git-send-email-vsementsov@virtuozzo.com>
+Date: Wed, 21 Dec 2016 17:54:59 +0300
+Message-Id: <1482332102-131788-22-git-send-email-vsementsov@virtuozzo.com>
 In-Reply-To: <1482332102-131788-1-git-send-email-vsementsov@virtuozzo.com>
 References: <1482332102-131788-1-git-send-email-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 07/24] qcow2: add bitmaps extension
+Subject: [Qemu-devel] [PATCH 21/24] qcow2-bitmap: refcounts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,245 +27,133 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, vsementsov@virtuozzo.com, pbonzini@redhat.com
 
-Add bitmap extension as specified in docs/specs/qcow2.txt.
-For now, just mirror extension header into Qcow2 state and check
-constraints.
-
-For now, disable image resize if it has bitmaps. It will be fixed later.
+Calculate refcounts for qcow2 bitmaps. It is needed for qcow2's qemu-img
+check implementation.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- block/qcow2.c | 119 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- block/qcow2.h |  24 ++++++++++++
- 2 files changed, 141 insertions(+), 2 deletions(-)
+ block/qcow2-bitmap.c   | 80 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ block/qcow2-refcount.c |  6 ++++
+ block/qcow2.h          |  3 ++
+ 3 files changed, 89 insertions(+)
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 96fb8a8..a883598 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -63,6 +63,7 @@ typedef struct {
- #define  QCOW2_EXT_MAGIC_END 0
- #define  QCOW2_EXT_MAGIC_BACKING_FORMAT 0xE2792ACA
- #define  QCOW2_EXT_MAGIC_FEATURE_TABLE 0x6803f857
-+#define  QCOW2_EXT_MAGIC_BITMAPS 0x23852875
- 
- static int qcow2_probe(const uint8_t *buf, int buf_size, const char *filename)
- {
-@@ -92,6 +93,8 @@ static int qcow2_read_extensions(BlockDriverState *bs, uint64_t start_offset,
-     QCowExtension ext;
-     uint64_t offset;
-     int ret;
-+    Qcow2BitmapHeaderExt bitmaps_ext;
-+    bool need_update;
- 
- #ifdef DEBUG_EXT
-     printf("qcow2_read_extensions: start=%ld end=%ld\n", start_offset, end_offset);
-@@ -162,6 +165,83 @@ static int qcow2_read_extensions(BlockDriverState *bs, uint64_t start_offset,
-             }
-             break;
- 
-+        case QCOW2_EXT_MAGIC_BITMAPS:
-+            if (ext.len != sizeof(bitmaps_ext)) {
-+                error_setg_errno(errp, -ret, "bitmaps_ext: "
-+                                 "Invalid extension length");
-+                return -EINVAL;
-+            }
+diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
+index 8b8f2d1..2687a3a 100644
+--- a/block/qcow2-bitmap.c
++++ b/block/qcow2-bitmap.c
+@@ -1232,3 +1232,83 @@ common_errp:
+                name, bdrv_get_device_or_node_name(bs), reason);
+     return false;
+ }
 +
-+            if (!(s->autoclear_features & QCOW2_AUTOCLEAR_BITMAPS)) {
-+                fprintf(stderr,
-+                        "WARNING: a program lacking bitmap support modified "
-+                        "this file, so all bitmaps are now considered "
-+                        "inconsistent. Some clusters may be leaked, run "
-+                        "'qemu-img check -r' on the image file to fix.");
-+                need_update = true;
-+                break;
-+            }
++int qcow2_check_bitmaps_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
++                                  void **refcount_table,
++                                  int64_t *refcount_table_size)
++{
++    int ret;
++    BDRVQcow2State *s = bs->opaque;
++    Qcow2BitmapList *bm_list;
++    Qcow2Bitmap *bm;
 +
-+            ret = bdrv_pread(bs->file, offset, &bitmaps_ext, ext.len);
-+            if (ret < 0) {
-+                error_setg_errno(errp, -ret, "bitmaps_ext: "
-+                                 "Could not read ext header");
-+                return ret;
-+            }
-+
-+            if (bitmaps_ext.reserved32 != 0) {
-+                error_setg_errno(errp, -ret, "bitmaps_ext: "
-+                                 "Reserved field is not zero");
-+                return -EINVAL;
-+            }
-+
-+            be32_to_cpus(&bitmaps_ext.nb_bitmaps);
-+            be64_to_cpus(&bitmaps_ext.bitmap_directory_size);
-+            be64_to_cpus(&bitmaps_ext.bitmap_directory_offset);
-+
-+            if (bitmaps_ext.nb_bitmaps > QCOW2_MAX_BITMAPS) {
-+                error_setg(errp,
-+                           "bitmaps_ext: File %s has %" PRIu32 " bitmaps, "
-+                           "exceeding the QEMU supported maximum of %d",
-+                           bs->filename, bitmaps_ext.nb_bitmaps,
-+                           QCOW2_MAX_BITMAPS);
-+                return -EINVAL;
-+            }
-+
-+            if (bitmaps_ext.nb_bitmaps == 0) {
-+                error_setg(errp, "found bitmaps extension with zero bitmaps");
-+                return -EINVAL;
-+            }
-+
-+            if (bitmaps_ext.bitmap_directory_offset & (s->cluster_size - 1)) {
-+                error_setg(errp, "bitmaps_ext: "
-+                                 "invalid bitmap directory offset");
-+                return -EINVAL;
-+            }
-+
-+            if (bitmaps_ext.bitmap_directory_size >
-+                QCOW2_MAX_BITMAP_DIRECTORY_SIZE) {
-+                error_setg(errp, "bitmaps_ext: "
-+                                 "bitmap directory size (%" PRIu64 ") exceeds "
-+                                 "the maximum supported size (%d)",
-+                                 bitmaps_ext.bitmap_directory_size,
-+                                 QCOW2_MAX_BITMAP_DIRECTORY_SIZE);
-+                return -EINVAL;
-+            }
-+
-+            s->nb_bitmaps = bitmaps_ext.nb_bitmaps;
-+            s->bitmap_directory_offset =
-+                    bitmaps_ext.bitmap_directory_offset;
-+            s->bitmap_directory_size =
-+                    bitmaps_ext.bitmap_directory_size;
-+
-+#ifdef DEBUG_EXT
-+            printf("Qcow2: Got bitmaps extension: "
-+                   "offset=%" PRIu64 " nb_bitmaps=%" PRIu32 "\n",
-+                   s->bitmap_directory_offset, s->nb_bitmaps);
-+#endif
-+            break;
-+
-         default:
-             /* unknown magic - save it in case we need to rewrite the header */
-             {
-@@ -185,6 +265,15 @@ static int qcow2_read_extensions(BlockDriverState *bs, uint64_t start_offset,
-         offset += ((ext.len + 7) & ~7);
-     }
- 
-+    if (need_update && !bdrv_is_root_node(bs) &&
-+        !(bdrv_get_flags(bs) & BDRV_O_INACTIVE))
-+    {
-+        ret = qcow2_update_header(bs);
-+        if (ret < 0) {
-+            return ret;
-+        }
++    if (s->nb_bitmaps == 0) {
++        return 0;
 +    }
 +
-     return 0;
++    ret = qcow2_inc_refcounts_imrt(bs, res, refcount_table, refcount_table_size,
++                                   s->bitmap_directory_offset,
++                                   s->bitmap_directory_size);
++    if (ret < 0) {
++        return ret;
++    }
++
++    bm_list = bitmap_list_load(bs, s->bitmap_directory_offset,
++                               s->bitmap_directory_size, NULL);
++    if (bm_list == NULL) {
++        res->corruptions++;
++        return -EINVAL;
++    }
++
++    QSIMPLEQ_FOREACH(bm, bm_list, entry) {
++        uint64_t *bitmap_table = NULL;
++        int i;
++
++        ret = qcow2_inc_refcounts_imrt(bs, res,
++                                       refcount_table, refcount_table_size,
++                                       bm->table.offset,
++                                       bm->table.size * sizeof(uint64_t));
++        if (ret < 0) {
++            goto out;
++        }
++
++        ret = bitmap_table_load(bs, &bm->table, &bitmap_table);
++        if (ret < 0) {
++            res->corruptions++;
++            goto out;
++        }
++
++        for (i = 0; i < bm->table.size; ++i) {
++            uint64_t entry = bitmap_table[i];
++            uint64_t offset = entry & BME_TABLE_ENTRY_OFFSET_MASK;
++
++            if (check_table_entry(entry, s->cluster_size) < 0) {
++                res->corruptions++;
++                continue;
++            }
++
++            if (offset == 0) {
++                continue;
++            }
++
++            ret = qcow2_inc_refcounts_imrt(bs, res,
++                                           refcount_table, refcount_table_size,
++                                           offset, s->cluster_size);
++            if (ret < 0) {
++                g_free(bitmap_table);
++                goto out;
++            }
++        }
++
++        g_free(bitmap_table);
++    }
++
++    if (res->corruptions > 0) {
++        ret = -EINVAL;
++    }
++
++out:
++    bitmap_list_free(bm_list);
++
++    return ret;
++}
+diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+index 14a736d..cdb74ba 100644
+--- a/block/qcow2-refcount.c
++++ b/block/qcow2-refcount.c
+@@ -1846,6 +1846,12 @@ static int calculate_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
+         return ret;
+     }
+ 
++    /* bitmaps */
++    ret = qcow2_check_bitmaps_refcounts(bs, res, refcount_table, nb_clusters);
++    if (ret < 0) {
++        return ret;
++    }
++
+     return check_refblocks(bs, res, fix, rebuild, refcount_table, nb_clusters);
  }
  
-@@ -1152,8 +1241,9 @@ static int qcow2_open(BlockDriverState *bs, QDict *options, int flags,
-     }
- 
-     /* Clear unknown autoclear feature bits */
--    if (!bs->read_only && !(flags & BDRV_O_INACTIVE) && s->autoclear_features) {
--        s->autoclear_features = 0;
-+    if (!bs->read_only && !(flags & BDRV_O_INACTIVE) &&
-+        (s->autoclear_features & ~QCOW2_AUTOCLEAR_MASK)) {
-+        s->autoclear_features &= QCOW2_AUTOCLEAR_MASK;
-         ret = qcow2_update_header(bs);
-         if (ret < 0) {
-             error_setg_errno(errp, -ret, "Could not update qcow2 header");
-@@ -1953,6 +2043,24 @@ int qcow2_update_header(BlockDriverState *bs)
-         buflen -= ret;
-     }
- 
-+    if (s->nb_bitmaps > 0) {
-+        Qcow2BitmapHeaderExt bitmaps_header = {
-+            .nb_bitmaps = cpu_to_be32(s->nb_bitmaps),
-+            .bitmap_directory_size =
-+                    cpu_to_be64(s->bitmap_directory_size),
-+            .bitmap_directory_offset =
-+                    cpu_to_be64(s->bitmap_directory_offset)
-+        };
-+        ret = header_ext_add(buf, QCOW2_EXT_MAGIC_BITMAPS,
-+                             &bitmaps_header, sizeof(bitmaps_header),
-+                             buflen);
-+        if (ret < 0) {
-+            goto fail;
-+        }
-+        buf += ret;
-+        buflen -= ret;
-+    }
-+
-     /* Keep unknown header extensions */
-     QLIST_FOREACH(uext, &s->unknown_header_ext, next) {
-         ret = header_ext_add(buf, uext->magic, uext->data, uext->len, buflen);
-@@ -2528,6 +2636,13 @@ static int qcow2_truncate(BlockDriverState *bs, int64_t offset)
-         return -ENOTSUP;
-     }
- 
-+    /* cannot proceed if image has bitmaps */
-+    if (s->nb_bitmaps) {
-+        /* TODO: resize bitmaps in the image */
-+        error_report("Can't resize an image which has bitmaps");
-+        return -ENOTSUP;
-+    }
-+
-     /* shrinking is currently not supported */
-     if (offset < bs->total_sectors * 512) {
-         error_report("qcow2 doesn't support shrinking images yet");
 diff --git a/block/qcow2.h b/block/qcow2.h
-index 1823414..861b501 100644
+index 0a3708d..eaad34a 100644
 --- a/block/qcow2.h
 +++ b/block/qcow2.h
-@@ -52,6 +52,10 @@
-  * space for snapshot names and IDs */
- #define QCOW_MAX_SNAPSHOTS_SIZE (1024 * QCOW_MAX_SNAPSHOTS)
+@@ -624,5 +624,8 @@ bool qcow2_can_store_new_dirty_bitmap(BlockDriverState *bs,
+                                       const char *name,
+                                       uint32_t granularity,
+                                       Error **errp);
++int qcow2_check_bitmaps_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
++                                  void **refcount_table,
++                                  int64_t *refcount_table_size);
  
-+/* Bitmap header extension constraints */
-+#define QCOW2_MAX_BITMAPS 65535
-+#define QCOW2_MAX_BITMAP_DIRECTORY_SIZE (1024 * QCOW2_MAX_BITMAPS)
-+
- /* indicate that the refcount of the referenced cluster is exactly one. */
- #define QCOW_OFLAG_COPIED     (1ULL << 63)
- /* indicate that the cluster is compressed (they never have the copied flag) */
-@@ -195,6 +199,15 @@ enum {
-     QCOW2_COMPAT_FEAT_MASK            = QCOW2_COMPAT_LAZY_REFCOUNTS,
- };
- 
-+/* Autoclear feature bits */
-+enum {
-+    QCOW2_AUTOCLEAR_BITMAPS_BITNR = 0,
-+    QCOW2_AUTOCLEAR_BITMAPS       =
-+        1 << QCOW2_AUTOCLEAR_BITMAPS_BITNR,
-+
-+    QCOW2_AUTOCLEAR_MASK                = QCOW2_AUTOCLEAR_BITMAPS,
-+};
-+
- enum qcow2_discard_type {
-     QCOW2_DISCARD_NEVER = 0,
-     QCOW2_DISCARD_ALWAYS,
-@@ -222,6 +235,13 @@ typedef uint64_t Qcow2GetRefcountFunc(const void *refcount_array,
- typedef void Qcow2SetRefcountFunc(void *refcount_array,
-                                   uint64_t index, uint64_t value);
- 
-+typedef struct Qcow2BitmapHeaderExt {
-+    uint32_t nb_bitmaps;
-+    uint32_t reserved32;
-+    uint64_t bitmap_directory_size;
-+    uint64_t bitmap_directory_offset;
-+} QEMU_PACKED Qcow2BitmapHeaderExt;
-+
- typedef struct BDRVQcow2State {
-     int cluster_bits;
-     int cluster_size;
-@@ -263,6 +283,10 @@ typedef struct BDRVQcow2State {
-     unsigned int nb_snapshots;
-     QCowSnapshot *snapshots;
- 
-+    uint32_t nb_bitmaps;
-+    uint64_t bitmap_directory_size;
-+    uint64_t bitmap_directory_offset;
-+
-     int flags;
-     int qcow_version;
-     bool use_lazy_refcounts;
+ #endif
 -- 
 1.8.3.1
