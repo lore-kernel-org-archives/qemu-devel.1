@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53828)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58695)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cJi01-0004pm-29
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 09:36:13 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cJiIU-0003n5-CM
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 09:55:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cJhzu-0006h4-Ux
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 09:36:09 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50164)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cJiIR-0006hN-1A
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 09:55:14 -0500
+Received: from mailhub.sw.ru ([195.214.232.25]:43999 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cJhzu-0006ft-Mc
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 09:36:02 -0500
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Wed, 21 Dec 2016 14:35:38 +0000
-Message-Id: <20161221143541.9260-5-berrange@redhat.com>
-In-Reply-To: <20161221143541.9260-1-berrange@redhat.com>
-References: <20161221143541.9260-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PULL v1 4/7] crypto: support HMAC algorithms based on
- libgcrypt
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1cJiIQ-0006aK-IP
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 09:55:10 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Wed, 21 Dec 2016 17:54:52 +0300
+Message-Id: <1482332102-131788-15-git-send-email-vsementsov@virtuozzo.com>
+In-Reply-To: <1482332102-131788-1-git-send-email-vsementsov@virtuozzo.com>
+References: <1482332102-131788-1-git-send-email-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH 14/24] block: add
+ bdrv_can_store_new_dirty_bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,159 +25,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, "Longpeng(Mike)" <longpeng2@huawei.com>, "Daniel P . Berrange" <berrange@redhat.com>
+To: qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, vsementsov@virtuozzo.com, pbonzini@redhat.com
 
-From: "Longpeng(Mike)" <longpeng2@huawei.com>
+This will be needed to check some restrictions before making bitmap
+persistent in qmp-block-dirty-bitmap-add (this functionality will be
+added by future patch)
 
-This patch add HMAC algorithms based on libgcrypt support
-
-Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- crypto/hmac-gcrypt.c | 111 ++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 109 insertions(+), 2 deletions(-)
+ block.c                   | 22 ++++++++++++++++++++++
+ include/block/block.h     |  2 ++
+ include/block/block_int.h |  2 ++
+ 3 files changed, 26 insertions(+)
 
-diff --git a/crypto/hmac-gcrypt.c b/crypto/hmac-gcrypt.c
-index 6e07415..21189e6 100644
---- a/crypto/hmac-gcrypt.c
-+++ b/crypto/hmac-gcrypt.c
-@@ -17,8 +17,28 @@
- #include "crypto/hmac.h"
- #include <gcrypt.h>
+diff --git a/block.c b/block.c
+index 646ea50..c20b22f 100644
+--- a/block.c
++++ b/block.c
+@@ -4139,3 +4139,25 @@ void bdrv_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp)
  
-+static int qcrypto_hmac_alg_map[QCRYPTO_HASH_ALG__MAX] = {
-+    [QCRYPTO_HASH_ALG_MD5] = GCRY_MAC_HMAC_MD5,
-+    [QCRYPTO_HASH_ALG_SHA1] = GCRY_MAC_HMAC_SHA1,
-+    [QCRYPTO_HASH_ALG_SHA224] = GCRY_MAC_HMAC_SHA224,
-+    [QCRYPTO_HASH_ALG_SHA256] = GCRY_MAC_HMAC_SHA256,
-+    [QCRYPTO_HASH_ALG_SHA384] = GCRY_MAC_HMAC_SHA384,
-+    [QCRYPTO_HASH_ALG_SHA512] = GCRY_MAC_HMAC_SHA512,
-+    [QCRYPTO_HASH_ALG_RIPEMD160] = GCRY_MAC_HMAC_RMD160,
-+};
+     drv->bdrv_store_persistent_dirty_bitmaps(bs, errp);
+ }
 +
-+typedef struct QCryptoHmacGcrypt QCryptoHmacGcrypt;
-+struct QCryptoHmacGcrypt {
-+    gcry_mac_hd_t handle;
-+};
++bool bdrv_can_store_new_dirty_bitmap(BlockDriverState *bs, const char *name,
++                                     uint32_t granularity, Error **errp)
++{
++    BlockDriver *drv = bs->drv;
 +
- bool qcrypto_hmac_supports(QCryptoHashAlgorithm alg)
- {
-+    if (alg < G_N_ELEMENTS(qcrypto_hmac_alg_map) &&
-+        qcrypto_hmac_alg_map[alg] != GCRY_MAC_NONE) {
-+        return true;
++    if (!drv) {
++        error_setg_errno(errp, ENOMEDIUM,
++                         "Can't store persistent bitmaps to %s",
++                         bdrv_get_device_or_node_name(bs));
++        return false;
 +    }
 +
-     return false;
- }
++    if (!drv->bdrv_can_store_new_dirty_bitmap) {
++        error_setg_errno(errp, ENOTSUP,
++                         "Can't store persistent bitmaps to %s",
++                         bdrv_get_device_or_node_name(bs));
++        return false;
++    }
++
++    return drv->bdrv_can_store_new_dirty_bitmap(bs, name, granularity, errp);
++}
+diff --git a/include/block/block.h b/include/block/block.h
+index e3175b5..1b5f270 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -554,5 +554,7 @@ void bdrv_del_child(BlockDriverState *parent, BdrvChild *child, Error **errp);
  
-@@ -26,12 +46,58 @@ QCryptoHmac *qcrypto_hmac_new(QCryptoHashAlgorithm alg,
-                               const uint8_t *key, size_t nkey,
-                               Error **errp)
- {
-+    QCryptoHmac *hmac;
-+    QCryptoHmacGcrypt *ctx;
-+    gcry_error_t err;
-+
-+    if (!qcrypto_hmac_supports(alg)) {
-+        error_setg(errp, "Unsupported hmac algorithm %s",
-+                   QCryptoHashAlgorithm_lookup[alg]);
-+        return NULL;
-+    }
-+
-+    hmac = g_new0(QCryptoHmac, 1);
-+    hmac->alg = alg;
-+
-+    ctx = g_new0(QCryptoHmacGcrypt, 1);
-+
-+    err = gcry_mac_open(&ctx->handle, qcrypto_hmac_alg_map[alg],
-+                        GCRY_MAC_FLAG_SECURE, NULL);
-+    if (err != 0) {
-+        error_setg(errp, "Cannot initialize hmac: %s",
-+                   gcry_strerror(err));
-+        goto error;
-+    }
-+
-+    err = gcry_mac_setkey(ctx->handle, (const void *)key, nkey);
-+    if (err != 0) {
-+        error_setg(errp, "Cannot set key: %s",
-+                   gcry_strerror(err));
-+        goto error;
-+    }
-+
-+    hmac->opaque = ctx;
-+    return hmac;
-+
-+error:
-+    g_free(ctx);
-+    g_free(hmac);
-     return NULL;
- }
+ void bdrv_load_autoloading_dirty_bitmaps(BlockDriverState *bs, Error **errp);
+ void bdrv_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp);
++bool bdrv_can_store_new_dirty_bitmap(BlockDriverState *bs, const char *name,
++                                     uint32_t granularity, Error **errp);
  
- void qcrypto_hmac_free(QCryptoHmac *hmac)
- {
--    return;
-+    QCryptoHmacGcrypt *ctx;
-+
-+    if (!hmac) {
-+        return;
-+    }
-+
-+    ctx = hmac->opaque;
-+    gcry_mac_close(ctx->handle);
-+
-+    g_free(ctx);
-+    g_free(hmac);
- }
+ #endif
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index e8d9210..b38b3aa 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -324,6 +324,8 @@ struct BlockDriver {
+                                                 Error **errp);
+     void (*bdrv_store_persistent_dirty_bitmaps)(BlockDriverState *bs,
+                                                 Error **errp);
++    bool (*bdrv_can_store_new_dirty_bitmap)(BlockDriverState *bs, const char *name,
++                                            uint32_t granularity, Error **errp);
  
- int qcrypto_hmac_bytesv(QCryptoHmac *hmac,
-@@ -41,5 +107,46 @@ int qcrypto_hmac_bytesv(QCryptoHmac *hmac,
-                         size_t *resultlen,
-                         Error **errp)
- {
--    return -1;
-+    QCryptoHmacGcrypt *ctx;
-+    gcry_error_t err;
-+    uint32_t ret;
-+    int i;
-+
-+    ctx = hmac->opaque;
-+
-+    for (i = 0; i < niov; i++) {
-+        gcry_mac_write(ctx->handle, iov[i].iov_base, iov[i].iov_len);
-+    }
-+
-+    ret = gcry_mac_get_algo_maclen(qcrypto_hmac_alg_map[hmac->alg]);
-+    if (ret <= 0) {
-+        error_setg(errp, "Unable to get hmac length: %s",
-+                   gcry_strerror(ret));
-+        return -1;
-+    }
-+
-+    if (*resultlen == 0) {
-+        *resultlen = ret;
-+        *result = g_new0(uint8_t, *resultlen);
-+    } else if (*resultlen != ret) {
-+        error_setg(errp, "Result buffer size %zu is smaller than hmac %d",
-+                   *resultlen, ret);
-+        return -1;
-+    }
-+
-+    err = gcry_mac_read(ctx->handle, *result, resultlen);
-+    if (err != 0) {
-+        error_setg(errp, "Cannot get result: %s",
-+                   gcry_strerror(err));
-+        return -1;
-+    }
-+
-+    err = gcry_mac_reset(ctx->handle);
-+    if (err != 0) {
-+        error_setg(errp, "Cannot reset hmac context: %s",
-+                   gcry_strerror(err));
-+        return -1;
-+    }
-+
-+    return 0;
- }
+     QLIST_ENTRY(BlockDriver) list;
+ };
 -- 
-2.9.3
+1.8.3.1
