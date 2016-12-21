@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52797)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52822)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liang.z.li@intel.com>) id 1cJarJ-0007Qj-HX
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 01:58:42 -0500
+	(envelope-from <liang.z.li@intel.com>) id 1cJarO-0007WQ-Rq
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 01:58:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liang.z.li@intel.com>) id 1cJarG-0006eh-FB
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 01:58:41 -0500
-Received: from mga11.intel.com ([192.55.52.93]:25760)
+	(envelope-from <liang.z.li@intel.com>) id 1cJarL-0006fu-Pq
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 01:58:46 -0500
+Received: from mga07.intel.com ([134.134.136.100]:13473)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <liang.z.li@intel.com>)
-	id 1cJarG-0006dm-2d
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 01:58:38 -0500
+	id 1cJarL-0006ff-Gx
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 01:58:43 -0500
 From: Liang Li <liang.z.li@intel.com>
-Date: Wed, 21 Dec 2016 14:52:24 +0800
-Message-Id: <1482303148-22059-2-git-send-email-liang.z.li@intel.com>
+Date: Wed, 21 Dec 2016 14:52:25 +0800
+Message-Id: <1482303148-22059-3-git-send-email-liang.z.li@intel.com>
 In-Reply-To: <1482303148-22059-1-git-send-email-liang.z.li@intel.com>
 References: <1482303148-22059-1-git-send-email-liang.z.li@intel.com>
-Subject: [Qemu-devel] [PATCH v6 kernel 1/5] virtio-balloon: rework deflate
- to add page to a list
+Subject: [Qemu-devel] [PATCH v6 kernel 2/5] virtio-balloon: define new
+ feature bit and head struct
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +28,13 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: kvm@vger.kernel.org
 Cc: virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, amit.shah@redhat.com, dave.hansen@intel.com, cornelia.huck@de.ibm.com, pbonzini@redhat.com, mst@redhat.com, david@redhat.com, aarcange@redhat.com, dgilbert@redhat.com, quintela@redhat.com, Liang Li <liang.z.li@intel.com>
 
-When doing the inflating/deflating operation, the current virtio-balloon
-implementation uses an array to save 256 PFNS, then send these PFNS to
-host through virtio and process each PFN one by one. This way is not
-efficient when inflating/deflating a large mount of memory because too
-many times of the following operations:
-
-    1. Virtio data transmission
-    2. Page allocate/free
-    3. Address translation(GPA->HVA)
-    4. madvise
-
-The over head of these operations will consume a lot of CPU cycles and
-will take a long time to complete, it may impact the QoS of the guest as
-well as the host. The overhead will be reduced a lot if batch processing
-is used. E.g. If there are several pages whose address are physical
-contiguous in the guest, these bulk pages can be processed in one
-operation.
-
-The main idea for the optimization is to reduce the above operations as
-much as possible. And it can be achieved by using a {pfn|length} array
-instead of a PFN array. Comparing with PFN array, {pfn|length} array can
-present more pages and is fit for batch processing.
-
-This patch saves the deflated pages to a list instead of the PFN array,
-which will allow faster notifications using the {pfn|length} down the
-road. balloon_pfn_to_page() can be removed because it's useless.
+Add a new feature which supports sending the page information
+with range array. The current implementation uses PFNs array,
+which is not very efficient. Using ranges can improve the
+performance of inflating/deflating significantly.
 
 Signed-off-by: Liang Li <liang.z.li@intel.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Cc: Michael S. Tsirkin <mst@redhat.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Cornelia Huck <cornelia.huck@de.ibm.com>
 Cc: Amit Shah <amit.shah@redhat.com>
@@ -64,74 +42,40 @@ Cc: Dave Hansen <dave.hansen@intel.com>
 Cc: Andrea Arcangeli <aarcange@redhat.com>
 Cc: David Hildenbrand <david@redhat.com>
 ---
- drivers/virtio/virtio_balloon.c | 22 ++++++++--------------
- 1 file changed, 8 insertions(+), 14 deletions(-)
+ include/uapi/linux/virtio_balloon.h | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/drivers/virtio/virtio_balloon.c b/drivers/virtio/virtio_balloon.c
-index 181793f..f59cb4f 100644
---- a/drivers/virtio/virtio_balloon.c
-+++ b/drivers/virtio/virtio_balloon.c
-@@ -103,12 +103,6 @@ static u32 page_to_balloon_pfn(struct page *page)
- 	return pfn * VIRTIO_BALLOON_PAGES_PER_PAGE;
- }
+diff --git a/include/uapi/linux/virtio_balloon.h b/include/uapi/linux/virtio_balloon.h
+index 343d7dd..2f850bf 100644
+--- a/include/uapi/linux/virtio_balloon.h
++++ b/include/uapi/linux/virtio_balloon.h
+@@ -34,10 +34,14 @@
+ #define VIRTIO_BALLOON_F_MUST_TELL_HOST	0 /* Tell before reclaiming pages */
+ #define VIRTIO_BALLOON_F_STATS_VQ	1 /* Memory Stats virtqueue */
+ #define VIRTIO_BALLOON_F_DEFLATE_ON_OOM	2 /* Deflate balloon on OOM */
++#define VIRTIO_BALLOON_F_PAGE_RANGE	3 /* Send page info with ranges */
  
--static struct page *balloon_pfn_to_page(u32 pfn)
--{
--	BUG_ON(pfn % VIRTIO_BALLOON_PAGES_PER_PAGE);
--	return pfn_to_page(pfn / VIRTIO_BALLOON_PAGES_PER_PAGE);
--}
--
- static void balloon_ack(struct virtqueue *vq)
- {
- 	struct virtio_balloon *vb = vq->vdev->priv;
-@@ -181,18 +175,16 @@ static unsigned fill_balloon(struct virtio_balloon *vb, size_t num)
- 	return num_allocated_pages;
- }
+ /* Size of a PFN in the balloon interface. */
+ #define VIRTIO_BALLOON_PFN_SHIFT 12
  
--static void release_pages_balloon(struct virtio_balloon *vb)
-+static void release_pages_balloon(struct virtio_balloon *vb,
-+				 struct list_head *pages)
- {
--	unsigned int i;
--	struct page *page;
-+	struct page *page, *next;
++/* Bits width for the length of the pfn range */
++#define VIRTIO_BALLOON_NR_PFN_BITS 12
++
+ struct virtio_balloon_config {
+ 	/* Number of pages host wants Guest to give up. */
+ 	__u32 num_pages;
+@@ -82,4 +86,12 @@ struct virtio_balloon_stat {
+ 	__virtio64 val;
+ } __attribute__((packed));
  
--	/* Find pfns pointing at start of each page, get pages and free them. */
--	for (i = 0; i < vb->num_pfns; i += VIRTIO_BALLOON_PAGES_PER_PAGE) {
--		page = balloon_pfn_to_page(virtio32_to_cpu(vb->vdev,
--							   vb->pfns[i]));
-+	list_for_each_entry_safe(page, next, pages, lru) {
- 		if (!virtio_has_feature(vb->vdev,
- 					VIRTIO_BALLOON_F_DEFLATE_ON_OOM))
- 			adjust_managed_page_count(page, 1);
-+		list_del(&page->lru);
- 		put_page(page); /* balloon reference */
- 	}
- }
-@@ -202,6 +194,7 @@ static unsigned leak_balloon(struct virtio_balloon *vb, size_t num)
- 	unsigned num_freed_pages;
- 	struct page *page;
- 	struct balloon_dev_info *vb_dev_info = &vb->vb_dev_info;
-+	LIST_HEAD(pages);
- 
- 	/* We can only do one array worth at a time. */
- 	num = min(num, ARRAY_SIZE(vb->pfns));
-@@ -215,6 +208,7 @@ static unsigned leak_balloon(struct virtio_balloon *vb, size_t num)
- 		if (!page)
- 			break;
- 		set_page_pfns(vb, vb->pfns + vb->num_pfns, page);
-+		list_add(&page->lru, &pages);
- 		vb->num_pages -= VIRTIO_BALLOON_PAGES_PER_PAGE;
- 	}
- 
-@@ -226,7 +220,7 @@ static unsigned leak_balloon(struct virtio_balloon *vb, size_t num)
- 	 */
- 	if (vb->num_pfns != 0)
- 		tell_host(vb, vb->deflate_vq);
--	release_pages_balloon(vb);
-+	release_pages_balloon(vb, &pages);
- 	mutex_unlock(&vb->balloon_lock);
- 	return num_freed_pages;
- }
++/* Response header structure */
++struct virtio_balloon_resp_hdr {
++	__le64 cmd : 8; /* Distinguish different requests type */
++	__le64 flag: 8; /* Mark status for a specific request type */
++	__le64 id : 16; /* Distinguish requests of a specific type */
++	__le64 data_len: 32; /* Length of the following data, in bytes */
++};
++
+ #endif /* _LINUX_VIRTIO_BALLOON_H */
 -- 
 1.9.1
