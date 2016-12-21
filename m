@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50613)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51701)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1cJUoe-0006ee-Gx
-	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 19:31:33 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1cJUvA-0001h1-7n
+	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 19:38:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1cJUob-0004OO-AC
-	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 19:31:32 -0500
-Received: from mail.kernel.org ([198.145.29.136]:55032)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1cJUoa-0004ND-Ve
-	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 19:31:29 -0500
-Date: Tue, 20 Dec 2016 16:31:23 -0800 (PST)
-From: Stefano Stabellini <sstabellini@kernel.org>
-In-Reply-To: <1482255793-19057-1-git-send-email-ehabkost@redhat.com>
-Message-ID: <alpine.DEB.2.10.1612201621500.13831@sstabellini-ThinkPad-X260>
-References: <1482255793-19057-1-git-send-email-ehabkost@redhat.com>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: Re: [Qemu-devel] [RFC 0/7] Move accel, KVM, Xen,
- qtest files to accel/ subdir
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1cJUv7-00087h-EH
+	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 19:38:16 -0500
+Received: from hera.aquilenet.fr ([141.255.128.1]:59703)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1cJUv7-00087R-7W
+	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 19:38:13 -0500
+From: Samuel Thibault <samuel.thibault@ens-lyon.org>
+Date: Wed, 21 Dec 2016 01:38:06 +0100
+Message-Id: <20161221003806.22412-4-samuel.thibault@ens-lyon.org>
+In-Reply-To: <20161221003806.22412-1-samuel.thibault@ens-lyon.org>
+References: <20161221003806.22412-1-samuel.thibault@ens-lyon.org>
+Subject: [Qemu-devel] [PATCH 3/3] sdl2: set window ID
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,85 +23,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, Christoffer Dall <christoffer.dall@linaro.org>, Anthony Perard <anthony.perard@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xensource.com
+To: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>
 
-On Tue, 20 Dec 2016, Eduardo Habkost wrote:
-> This moves the KVM and Xen files to the an accel/ subdir.
-> 
-> Instead of moving the *-stubs.c file to accel/ as-is, I tried to
-> move most of the stub code to libqemustub.a. This way the obj-y
-> logic for accel/ is simpler: obj-y includes accel/ only if
-> CONFIG_SOFTMMU is set.
-> 
-> The Xen stubs could be moved completely to stubs/, but some of
-> the KVM stubs depend on cpu.h. So most of the kvm-stub.c code was
-> moved to stubs/kvm.c, but some of that code was kept in
-> accel/kvm-stub.c.
+This uses the console API to record the window ID of the SDL2 windows.
 
-Fine by me. My build test succeeded.
+Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
+---
+ ui/sdl2.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-
-> About TCG:
-> ----------
-> 
-> It is not obvious to me which TCG-related files could be moved to
-> accel/, so this series don't move any of them yet.
-> 
-> About other CONFIG_SOFTMMU top-level files:
-> -------------------------------------------
-> 
-> I would like to know what we should do with the top-level
-> CONFIG_SOFTMMU-only files that don't belong to hw/. Some
-> candidates: arch_init.c cpus.c monitor.c gdbstub.c balloon.c
-> ioport.c bootdevice.c memory.c cputlb.c memory_mapping.c dump.c.
-> 
-> Maybe a sysemu/ subdir? In that case, should we still create an
-> accel/ subdir, or move xen-*, kvm-* and friends to sysemu/ too?
-> 
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: kvm@vger.kernel.org
-> Cc: Christoffer Dall <christoffer.dall@linaro.org>
-> Cc: Anthony Perard <anthony.perard@citrix.com>
-> Cc: Stefano Stabellini <sstabellini@kernel.org>
-> Cc: xen-devel@lists.xensource.com
-> 
-> Eduardo Habkost (7):
->   xen: Move xen-*-stub.c to stubs/
->   xen: Move xen files to accel/
->   kvm: Move some kvm-stub.c code to stubs/kvm.c
->   kvm: Include kvm-stub.o only on CONFIG_SOFTMMU
->   kvm: Move kvm*.c files to accel/
->   accel: Move accel.c to accel/
->   accel: Move qtest.c to accel/
-> 
->  Makefile.objs                          |  2 +-
->  Makefile.target                        | 10 ++----
->  accel.c => accel/accel.c               |  0
->  kvm-all.c => accel/kvm-common.c        |  0
->  kvm-stub.c => accel/kvm-stub.c         | 51 --------------------------
->  qtest.c => accel/qtest.c               |  0
->  xen-common.c => accel/xen-common.c     |  0
->  xen-hvm.c => accel/xen-hvm.c           |  0
->  xen-mapcache.c => accel/xen-mapcache.c |  0
->  stubs/kvm.c                            | 65 ++++++++++++++++++++++++++++++++++
->  xen-hvm-stub.c => stubs/xen-hvm.c      |  0
->  xen-common-stub.c => stubs/xen.c       |  0
->  MAINTAINERS                            |  4 +--
->  accel/Makefile.objs                    |  9 +++++
->  stubs/Makefile.objs                    |  2 ++
->  15 files changed, 80 insertions(+), 63 deletions(-)
->  rename accel.c => accel/accel.c (100%)
->  rename kvm-all.c => accel/kvm-common.c (100%)
->  rename kvm-stub.c => accel/kvm-stub.c (71%)
->  rename qtest.c => accel/qtest.c (100%)
->  rename xen-common.c => accel/xen-common.c (100%)
->  rename xen-hvm.c => accel/xen-hvm.c (100%)
->  rename xen-mapcache.c => accel/xen-mapcache.c (100%)
->  rename xen-hvm-stub.c => stubs/xen-hvm.c (100%)
->  rename xen-common-stub.c => stubs/xen.c (100%)
->  create mode 100644 accel/Makefile.objs
-> 
-> -- 
-> 2.7.4
-> 
+diff --git a/ui/sdl2.c b/ui/sdl2.c
+index 30d2a3c35d..9a79b17b92 100644
+--- a/ui/sdl2.c
++++ b/ui/sdl2.c
+@@ -761,6 +761,7 @@ void sdl_display_init(DisplayState *ds, int full_screen, int no_frame)
+     uint8_t data = 0;
+     char *filename;
+     int i;
++    SDL_SysWMinfo info;
+ 
+     if (no_frame) {
+         gui_noframe = 1;
+@@ -786,6 +787,8 @@ void sdl_display_init(DisplayState *ds, int full_screen, int no_frame)
+         exit(1);
+     }
+     SDL_SetHint(SDL_HINT_GRAB_KEYBOARD, "1");
++    memset(&info, 0, sizeof(info));
++    SDL_VERSION(&info.version);
+ 
+     for (i = 0;; i++) {
+         QemuConsole *con = qemu_console_lookup_by_index(i);
+@@ -813,6 +816,10 @@ void sdl_display_init(DisplayState *ds, int full_screen, int no_frame)
+ #endif
+         sdl2_console[i].dcl.con = con;
+         register_displaychangelistener(&sdl2_console[i].dcl);
++
++        if (SDL_GetWindowWMInfo(sdl2_console[i].real_window, &info)) {
++            qemu_console_set_window_id(con, info.info.x11.window);
++        }
+     }
+ 
+     /* Load a 32x32x4 image. White pixels are transparent. */
+-- 
+2.11.0
