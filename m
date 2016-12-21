@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34332)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37393)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cJboA-0004zQ-Pu
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 02:59:31 -0500
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cJc5M-0004ju-Tc
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 03:17:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cJbo7-0002ex-Nu
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 02:59:30 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59194)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cJbo7-0002eQ-I0
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 02:59:27 -0500
-From: Peter Xu <peterx@redhat.com>
-Date: Wed, 21 Dec 2016 15:58:57 +0800
-Message-Id: <1482307137-5106-3-git-send-email-peterx@redhat.com>
-In-Reply-To: <1482307137-5106-1-git-send-email-peterx@redhat.com>
-References: <1482307137-5106-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 2/2] memory: hmp: dump flat view for 'info
- mtree'
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cJc5I-0000CD-Ai
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 03:17:16 -0500
+Received: from [59.151.112.132] (port=4212 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cJc5H-0000Aa-2L
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 03:17:12 -0500
+From: Cao jin <caoj.fnst@cn.fujitsu.com>
+Date: Wed, 21 Dec 2016 16:21:31 +0800
+Message-ID: <1482308491-25426-3-git-send-email-caoj.fnst@cn.fujitsu.com>
+In-Reply-To: <1482308491-25426-1-git-send-email-caoj.fnst@cn.fujitsu.com>
+References: <1482308491-25426-1-git-send-email-caoj.fnst@cn.fujitsu.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v4 2/2] pcie_aer: support configurable AER capa
+ version
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,65 +27,113 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, marcandre.lureau@gmail.com, peterx@redhat.com
+Cc: mst@redhat.com, marcel@redhat.com, dmitry@daynix.com, jasowang@redhat.com, Dou Liyang <douly.fnst@cn.fujitsu.com>
 
-Dumping flat view will be useful to debug the memory rendering logic,
-also it'll be much easier with it to know what memory region is handling
-what address range.
+From: Dou Liyang <douly.fnst@cn.fujitsu.com>
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
+Now, AER capa version is fixed to v2, if assigned device isn't v2,
+then this value will be inconsistent between guest and host
+
+Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
+Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- memory.c | 31 +++++++++++++++++++++++++++++++
- 1 file changed, 31 insertions(+)
+ hw/net/e1000e.c                    | 3 ++-
+ hw/pci-bridge/ioh3420.c            | 3 ++-
+ hw/pci-bridge/xio3130_downstream.c | 3 ++-
+ hw/pci-bridge/xio3130_upstream.c   | 3 ++-
+ hw/pci/pcie_aer.c                  | 6 +++---
+ include/hw/pci/pcie_aer.h          | 4 ++--
+ 6 files changed, 13 insertions(+), 9 deletions(-)
 
-diff --git a/memory.c b/memory.c
-index 5dcc2e1..91341d3 100644
---- a/memory.c
-+++ b/memory.c
-@@ -2545,6 +2545,36 @@ static void mtree_print_mr(fprintf_function mon_printf, void *f,
+diff --git a/hw/net/e1000e.c b/hw/net/e1000e.c
+index 89f96eb4a076..77a4b3e5bf9d 100644
+--- a/hw/net/e1000e.c
++++ b/hw/net/e1000e.c
+@@ -472,7 +472,8 @@ static void e1000e_pci_realize(PCIDevice *pci_dev, Error **errp)
+         hw_error("Failed to initialize PM capability");
      }
+ 
+-    if (pcie_aer_init(pci_dev, e1000e_aer_offset, PCI_ERR_SIZEOF, NULL) < 0) {
++    if (pcie_aer_init(pci_dev, PCI_ERR_VER, e1000e_aer_offset,
++                      PCI_ERR_SIZEOF, NULL) < 0) {
+         hw_error("Failed to initialize AER capability");
+     }
+ 
+diff --git a/hw/pci-bridge/ioh3420.c b/hw/pci-bridge/ioh3420.c
+index 04180af79471..84b7946c3136 100644
+--- a/hw/pci-bridge/ioh3420.c
++++ b/hw/pci-bridge/ioh3420.c
+@@ -135,7 +135,8 @@ static int ioh3420_initfn(PCIDevice *d)
+         goto err_pcie_cap;
+     }
+ 
+-    rc = pcie_aer_init(d, IOH_EP_AER_OFFSET, PCI_ERR_SIZEOF, &err);
++    rc = pcie_aer_init(d, PCI_ERR_VER, IOH_EP_AER_OFFSET,
++                       PCI_ERR_SIZEOF, &err);
+     if (rc < 0) {
+         error_report_err(err);
+         goto err;
+diff --git a/hw/pci-bridge/xio3130_downstream.c b/hw/pci-bridge/xio3130_downstream.c
+index 571334185b42..04b8e5b8479e 100644
+--- a/hw/pci-bridge/xio3130_downstream.c
++++ b/hw/pci-bridge/xio3130_downstream.c
+@@ -97,7 +97,8 @@ static int xio3130_downstream_initfn(PCIDevice *d)
+         goto err_pcie_cap;
+     }
+ 
+-    rc = pcie_aer_init(d, XIO3130_AER_OFFSET, PCI_ERR_SIZEOF, &err);
++    rc = pcie_aer_init(d, PCI_ERR_VER, XIO3130_AER_OFFSET,
++                       PCI_ERR_SIZEOF, &err);
+     if (rc < 0) {
+         error_report_err(err);
+         goto err;
+diff --git a/hw/pci-bridge/xio3130_upstream.c b/hw/pci-bridge/xio3130_upstream.c
+index 94c16910069e..d1f59c883477 100644
+--- a/hw/pci-bridge/xio3130_upstream.c
++++ b/hw/pci-bridge/xio3130_upstream.c
+@@ -85,7 +85,8 @@ static int xio3130_upstream_initfn(PCIDevice *d)
+     pcie_cap_flr_init(d);
+     pcie_cap_deverr_init(d);
+ 
+-    rc = pcie_aer_init(d, XIO3130_AER_OFFSET, PCI_ERR_SIZEOF, &err);
++    rc = pcie_aer_init(d, PCI_ERR_VER, XIO3130_AER_OFFSET,
++                       PCI_ERR_SIZEOF, &err);
+     if (rc < 0) {
+         error_report_err(err);
+         goto err;
+diff --git a/hw/pci/pcie_aer.c b/hw/pci/pcie_aer.c
+index 2a4bd5aef639..daf1f65427c2 100644
+--- a/hw/pci/pcie_aer.c
++++ b/hw/pci/pcie_aer.c
+@@ -97,10 +97,10 @@ static void aer_log_clear_all_err(PCIEAERLog *aer_log)
+     aer_log->log_num = 0;
  }
  
-+static void mtree_print_flatview(fprintf_function p, void *f,
-+                                 AddressSpace *as)
-+{
-+    FlatView *view = address_space_get_flatview(as);
-+    FlatRange *range = &view->ranges[0];
-+    MemoryRegion *mr;
-+    int n = view->nr;
-+
-+    if (n <= 0) {
-+        p(f, MTREE_INDENT "No rendered FlatView for "
-+          "address space '%s'\n", as->name);
-+        return;
-+    }
-+
-+    p(f, MTREE_INDENT "FlatView (address space '%s'):\n", as->name);
-+
-+    while (n--) {
-+        mr = range->mr;
-+        p(f, MTREE_INDENT MTREE_INDENT TARGET_FMT_plx "-"
-+          TARGET_FMT_plx " (prio %d, %c%c): %s\n",
-+          int128_get64(range->addr.start),
-+          int128_get64(range->addr.start) + MR_SIZE(range->addr.size),
-+          mr->priority, MR_CHAR_RD(mr), MR_CHAR_WR(mr),
-+          memory_region_name(mr));
-+        range++;
-+    }
-+
-+    flatview_unref(view);
-+}
-+
- void mtree_info(fprintf_function mon_printf, void *f)
+-int pcie_aer_init(PCIDevice *dev, uint16_t offset, uint16_t size,
+-                  Error **errp)
++int pcie_aer_init(PCIDevice *dev, uint8_t cap_ver, uint16_t offset,
++                  uint16_t size, Error **errp)
  {
-     MemoryRegionListHead ml_head;
-@@ -2556,6 +2586,7 @@ void mtree_info(fprintf_function mon_printf, void *f)
-     QTAILQ_FOREACH(as, &address_spaces, address_spaces_link) {
-         mon_printf(f, "address-space: %s\n", as->name);
-         mtree_print_mr(mon_printf, f, as->root, 1, 0, &ml_head);
-+        mtree_print_flatview(mon_printf, f, as);
-         mon_printf(f, "\n");
-     }
+-    pcie_add_capability(dev, PCI_EXT_CAP_ID_ERR, PCI_ERR_VER,
++    pcie_add_capability(dev, PCI_EXT_CAP_ID_ERR, cap_ver,
+                         offset, size);
+     dev->exp.aer_cap = offset;
  
+diff --git a/include/hw/pci/pcie_aer.h b/include/hw/pci/pcie_aer.h
+index 5891b6816e85..526802bd312b 100644
+--- a/include/hw/pci/pcie_aer.h
++++ b/include/hw/pci/pcie_aer.h
+@@ -86,8 +86,8 @@ struct PCIEAERErr {
+ 
+ extern const VMStateDescription vmstate_pcie_aer_log;
+ 
+-int pcie_aer_init(PCIDevice *dev, uint16_t offset, uint16_t size,
+-                  Error **errp);
++int pcie_aer_init(PCIDevice *dev, uint8_t cap_ver, uint16_t offset,
++                  uint16_t size, Error **errp);
+ void pcie_aer_exit(PCIDevice *dev);
+ void pcie_aer_write_config(PCIDevice *dev,
+                            uint32_t addr, uint32_t val, int len);
 -- 
-2.7.4
+2.1.0
