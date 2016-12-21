@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51702)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51704)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1cJUvA-0001h2-80
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1cJUvA-0001h5-8A
 	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 19:38:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1cJUv7-00087b-5t
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1cJUv8-000884-M3
 	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 19:38:16 -0500
-Received: from hera.aquilenet.fr ([141.255.128.1]:59698)
+Received: from hera.aquilenet.fr ([141.255.128.1]:59709)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1cJUv6-00087C-UD
-	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 19:38:13 -0500
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1cJUv8-00087q-AM
+	for qemu-devel@nongnu.org; Tue, 20 Dec 2016 19:38:14 -0500
 From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Wed, 21 Dec 2016 01:38:04 +0100
-Message-Id: <20161221003806.22412-2-samuel.thibault@ens-lyon.org>
+Date: Wed, 21 Dec 2016 01:38:05 +0100
+Message-Id: <20161221003806.22412-3-samuel.thibault@ens-lyon.org>
 In-Reply-To: <20161221003806.22412-1-samuel.thibault@ens-lyon.org>
 References: <20161221003806.22412-1-samuel.thibault@ens-lyon.org>
-Subject: [Qemu-devel] [PATCH 1/3] console: add API to get underlying gui
- window ID
+Subject: [Qemu-devel] [PATCH 2/3] console: move window ID code from baum to
+ sdl
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,63 +27,120 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
 Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>
 
-This adds two console functions, qemu_console_set_window_id and
-qemu_graphic_console_get_window_id, to let graphical backend record the
-window id in the QemuConsole structure, and let the baum driver read it.
+This moves the SDL bits for window ID from the baum driver to SDL, as
+well as fixing the build for non-X11.
 
 Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 
 ---
-Difference from v4: select console with a QemuConsole* parameter instead
-of an integer index.
+Difference from v3: Use qemu_console_lookup_by_index and
+qemu_console_is_graphic to access the console
 ---
- include/ui/console.h |  4 ++++
- ui/console.c         | 11 +++++++++++
- 2 files changed, 15 insertions(+)
+ backends/baum.c | 31 ++++++++-----------------------
+ ui/sdl.c        | 25 +++++++++++++++++++++++++
+ 2 files changed, 33 insertions(+), 23 deletions(-)
 
-diff --git a/include/ui/console.h b/include/ui/console.h
-index e2589e2134..ee8c407cac 100644
---- a/include/ui/console.h
-+++ b/include/ui/console.h
-@@ -394,6 +394,10 @@ uint32_t qemu_console_get_head(QemuConsole *con);
- QemuUIInfo *qemu_console_get_ui_info(QemuConsole *con);
- int qemu_console_get_width(QemuConsole *con, int fallback);
- int qemu_console_get_height(QemuConsole *con, int fallback);
-+/* Return the low-level window id for the console */
-+int qemu_console_get_window_id(QemuConsole *con);
-+/* Set the low-level window id for the console */
-+void qemu_console_set_window_id(QemuConsole *con, int window_id);
+diff --git a/backends/baum.c b/backends/baum.c
+index b92369d840..b045ef49c5 100644
+--- a/backends/baum.c
++++ b/backends/baum.c
+@@ -27,12 +27,10 @@
+ #include "sysemu/char.h"
+ #include "qemu/timer.h"
+ #include "hw/usb.h"
++#include "ui/console.h"
+ #include <brlapi.h>
+ #include <brlapi_constants.h>
+ #include <brlapi_keycodes.h>
+-#ifdef CONFIG_SDL
+-#include <SDL_syswm.h>
+-#endif
  
- void console_select(unsigned int index);
- void qemu_console_resize(QemuConsole *con, int width, int height);
-diff --git a/ui/console.c b/ui/console.c
-index ed888e55ea..b9575f2ee5 100644
---- a/ui/console.c
-+++ b/ui/console.c
-@@ -124,6 +124,7 @@ struct QemuConsole {
-     int dcls;
-     DisplayChangeListener *gl;
-     bool gl_block;
-+    int window_id;
- 
-     /* Graphic console state.  */
-     Object *device;
-@@ -273,6 +274,16 @@ void graphic_hw_gl_block(QemuConsole *con, bool block)
-     }
- }
- 
-+int qemu_console_get_window_id(QemuConsole *con)
-+{
-+    return con->window_id;
-+}
-+
-+void qemu_console_set_window_id(QemuConsole *con, int window_id)
-+{
-+    con->window_id = window_id;
-+}
-+
- void graphic_hw_invalidate(QemuConsole *con)
+ #if 0
+ #define DPRINTF(fmt, ...) \
+@@ -227,12 +225,8 @@ static const uint8_t nabcc_translation[2][256] = {
+ /* The guest OS has started discussing with us, finish initializing BrlAPI */
+ static int baum_deferred_init(BaumDriverState *baum)
  {
-     if (!con) {
+-#if defined(CONFIG_SDL)
+-#if SDL_COMPILEDVERSION < SDL_VERSIONNUM(2, 0, 0)
+-    SDL_SysWMinfo info;
+-#endif
+-#endif
+-    int tty;
++    int tty = BRLAPI_TTY_DEFAULT;
++    QemuConsole *con;
+ 
+     if (baum->deferred_init) {
+         return 1;
+@@ -243,21 +237,12 @@ static int baum_deferred_init(BaumDriverState *baum)
+         return 0;
+     }
+ 
+-#if defined(CONFIG_SDL)
+-#if SDL_COMPILEDVERSION < SDL_VERSIONNUM(2, 0, 0)
+-    memset(&info, 0, sizeof(info));
+-    SDL_VERSION(&info.version);
+-    if (SDL_GetWMInfo(&info)) {
+-        tty = info.info.x11.wmwindow;
+-    } else {
+-#endif
+-#endif
+-        tty = BRLAPI_TTY_DEFAULT;
+-#if defined(CONFIG_SDL)
+-#if SDL_COMPILEDVERSION < SDL_VERSIONNUM(2, 0, 0)
++    con = qemu_console_lookup_by_index(0);
++    if (con && qemu_console_is_graphic(con)) {
++        tty = qemu_console_get_window_id(con);
++        if (tty == -1)
++            tty = BRLAPI_TTY_DEFAULT;
+     }
+-#endif
+-#endif
+ 
+     if (brlapi__enterTtyMode(baum->brlapi, tty, NULL) == -1) {
+         brlapi_perror("baum: brlapi__enterTtyMode");
+diff --git a/ui/sdl.c b/ui/sdl.c
+index d8cf5bcf74..19e8a848a7 100644
+--- a/ui/sdl.c
++++ b/ui/sdl.c
+@@ -947,6 +947,7 @@ void sdl_display_init(DisplayState *ds, int full_screen, int no_frame)
+     int flags;
+     uint8_t data = 0;
+     const SDL_VideoInfo *vi;
++    SDL_SysWMinfo info;
+     char *filename;
+ 
+ #if defined(__APPLE__)
+@@ -1023,5 +1024,29 @@ void sdl_display_init(DisplayState *ds, int full_screen, int no_frame)
+     sdl_cursor_hidden = SDL_CreateCursor(&data, &data, 8, 1, 0, 0);
+     sdl_cursor_normal = SDL_GetCursor();
+ 
++    memset(&info, 0, sizeof(info));
++    SDL_VERSION(&info.version);
++    if (SDL_GetWMInfo(&info)) {
++        int i;
++        for (i = 0; ; i++) {
++            /* All consoles share the same window */
++            QemuConsole *con = qemu_console_lookup_by_index(i);
++            if (con) {
++#if defined(SDL_VIDEO_DRIVER_X11)
++                qemu_console_set_window_id(con, info.info.x11.wmwindow);
++#elif defined(SDL_VIDEO_DRIVER_NANOX) || \
++      defined(SDL_VIDEO_DRIVER_WINDIB) || defined(SDL_VIDEO_DRIVER_DDRAW) || \
++      defined(SDL_VIDEO_DRIVER_GAPI) || \
++      defined(SDL_VIDEO_DRIVER_RISCOS)
++                qemu_console_set_window_id(con, (int) (uintptr_t) info.window);
++#else
++                qemu_console_set_window_id(con, info.data);
++#endif
++            } else {
++                break;
++            }
++        }
++    }
++
+     atexit(sdl_cleanup);
+ }
 -- 
 2.11.0
