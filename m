@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34317)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34332)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cJbo3-0004uI-D4
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 02:59:24 -0500
+	(envelope-from <peterx@redhat.com>) id 1cJboA-0004zQ-Pu
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 02:59:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cJbo2-0002dU-K7
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 02:59:23 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37256)
+	(envelope-from <peterx@redhat.com>) id 1cJbo7-0002ex-Nu
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 02:59:30 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59194)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cJbo2-0002dQ-BA
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 02:59:22 -0500
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cJbo7-0002eQ-I0
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 02:59:27 -0500
 From: Peter Xu <peterx@redhat.com>
-Date: Wed, 21 Dec 2016 15:58:56 +0800
-Message-Id: <1482307137-5106-2-git-send-email-peterx@redhat.com>
+Date: Wed, 21 Dec 2016 15:58:57 +0800
+Message-Id: <1482307137-5106-3-git-send-email-peterx@redhat.com>
 In-Reply-To: <1482307137-5106-1-git-send-email-peterx@redhat.com>
 References: <1482307137-5106-1-git-send-email-peterx@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 1/2] memory: provide common macros for
- mtree_print_mr()
+Subject: [Qemu-devel] [PATCH v2 2/2] memory: hmp: dump flat view for 'info
+ mtree'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,93 +27,63 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, marcandre.lureau@gmail.com, peterx@redhat.com
 
-mtree_print_mr() has some common codes. Generalize it.
+Dumping flat view will be useful to debug the memory rendering logic,
+also it'll be much easier with it to know what memory region is handling
+what address range.
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- memory.c | 34 +++++++++++++++-------------------
- 1 file changed, 15 insertions(+), 19 deletions(-)
+ memory.c | 31 +++++++++++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
 
 diff --git a/memory.c b/memory.c
-index 33110e9..5dcc2e1 100644
+index 5dcc2e1..91341d3 100644
 --- a/memory.c
 +++ b/memory.c
-@@ -2450,6 +2450,13 @@ struct MemoryRegionList {
-=20
- typedef QTAILQ_HEAD(queue, MemoryRegionList) MemoryRegionListHead;
-=20
-+#define MR_CHAR_RD(mr) ((mr)->romd_mode ? 'R' : '-')
-+#define MR_CHAR_WR(mr) (!(mr)->readonly && !((mr)->rom_device && \
-+                                             (mr)->romd_mode) ? 'W' : '-=
-')
-+#define MR_SIZE(size) (int128_nz(size) ? (hwaddr)int128_get64( \
-+                           int128_sub((size), int128_one())) : 0)
-+#define MTREE_INDENT "  "
+@@ -2545,6 +2545,36 @@ static void mtree_print_mr(fprintf_function mon_printf, void *f,
+     }
+ }
+ 
++static void mtree_print_flatview(fprintf_function p, void *f,
++                                 AddressSpace *as)
++{
++    FlatView *view = address_space_get_flatview(as);
++    FlatRange *range = &view->ranges[0];
++    MemoryRegion *mr;
++    int n = view->nr;
 +
- static void mtree_print_mr(fprintf_function mon_printf, void *f,
-                            const MemoryRegion *mr, unsigned int level,
-                            hwaddr base,
-@@ -2465,7 +2472,7 @@ static void mtree_print_mr(fprintf_function mon_pri=
-ntf, void *f,
++    if (n <= 0) {
++        p(f, MTREE_INDENT "No rendered FlatView for "
++          "address space '%s'\n", as->name);
++        return;
++    }
++
++    p(f, MTREE_INDENT "FlatView (address space '%s'):\n", as->name);
++
++    while (n--) {
++        mr = range->mr;
++        p(f, MTREE_INDENT MTREE_INDENT TARGET_FMT_plx "-"
++          TARGET_FMT_plx " (prio %d, %c%c): %s\n",
++          int128_get64(range->addr.start),
++          int128_get64(range->addr.start) + MR_SIZE(range->addr.size),
++          mr->priority, MR_CHAR_RD(mr), MR_CHAR_WR(mr),
++          memory_region_name(mr));
++        range++;
++    }
++
++    flatview_unref(view);
++}
++
+ void mtree_info(fprintf_function mon_printf, void *f)
+ {
+     MemoryRegionListHead ml_head;
+@@ -2556,6 +2586,7 @@ void mtree_info(fprintf_function mon_printf, void *f)
+     QTAILQ_FOREACH(as, &address_spaces, address_spaces_link) {
+         mon_printf(f, "address-space: %s\n", as->name);
+         mtree_print_mr(mon_printf, f, as->root, 1, 0, &ml_head);
++        mtree_print_flatview(mon_printf, f, as);
+         mon_printf(f, "\n");
      }
-=20
-     for (i =3D 0; i < level; i++) {
--        mon_printf(f, "  ");
-+        mon_printf(f, MTREE_INDENT);
-     }
-=20
-     if (mr->alias) {
-@@ -2488,34 +2495,23 @@ static void mtree_print_mr(fprintf_function mon_p=
-rintf, void *f,
-                    " (prio %d, %c%c): alias %s @%s " TARGET_FMT_plx
-                    "-" TARGET_FMT_plx "%s\n",
-                    base + mr->addr,
--                   base + mr->addr
--                   + (int128_nz(mr->size) ?
--                      (hwaddr)int128_get64(int128_sub(mr->size,
--                                                      int128_one())) : 0=
-),
-+                   base + mr->addr + MR_SIZE(mr->size),
-                    mr->priority,
--                   mr->romd_mode ? 'R' : '-',
--                   !mr->readonly && !(mr->rom_device && mr->romd_mode) ?=
- 'W'
--                                                                       :=
- '-',
-+                   MR_CHAR_RD(mr),
-+                   MR_CHAR_WR(mr),
-                    memory_region_name(mr),
-                    memory_region_name(mr->alias),
-                    mr->alias_offset,
--                   mr->alias_offset
--                   + (int128_nz(mr->size) ?
--                      (hwaddr)int128_get64(int128_sub(mr->size,
--                                                      int128_one())) : 0=
-),
-+                   mr->alias_offset + MR_SIZE(mr->size),
-                    mr->enabled ? "" : " [disabled]");
-     } else {
-         mon_printf(f,
-                    TARGET_FMT_plx "-" TARGET_FMT_plx " (prio %d, %c%c): =
-%s%s\n",
-                    base + mr->addr,
--                   base + mr->addr
--                   + (int128_nz(mr->size) ?
--                      (hwaddr)int128_get64(int128_sub(mr->size,
--                                                      int128_one())) : 0=
-),
-+                   base + mr->addr + MR_SIZE(mr->size),
-                    mr->priority,
--                   mr->romd_mode ? 'R' : '-',
--                   !mr->readonly && !(mr->rom_device && mr->romd_mode) ?=
- 'W'
--                                                                       :=
- '-',
-+                   MR_CHAR_RD(mr),
-+                   MR_CHAR_WR(mr),
-                    memory_region_name(mr),
-                    mr->enabled ? "" : " [disabled]");
-     }
---=20
+ 
+-- 
 2.7.4
