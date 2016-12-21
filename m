@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42286)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42471)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <a175818323@gmail.com>) id 1cJcVS-0001BK-Bz
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 03:44:15 -0500
+	(envelope-from <david@redhat.com>) id 1cJcW3-0001Sx-Mz
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 03:44:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <a175818323@gmail.com>) id 1cJcVR-00018j-Hi
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 03:44:14 -0500
-Received: from mail-lf0-x235.google.com ([2a00:1450:4010:c07::235]:35433)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <a175818323@gmail.com>)
-	id 1cJcVR-00016Q-9r
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 03:44:13 -0500
-Received: by mail-lf0-x235.google.com with SMTP id b14so92998986lfg.2
-	for <qemu-devel@nongnu.org>; Wed, 21 Dec 2016 00:44:11 -0800 (PST)
+	(envelope-from <david@redhat.com>) id 1cJcW0-0001PY-L4
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 03:44:51 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49530)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1cJcW0-0001PF-Eq
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 03:44:48 -0500
+References: <1482255793-19057-1-git-send-email-ehabkost@redhat.com>
+	<1482255793-19057-5-git-send-email-ehabkost@redhat.com>
+	<584d77b6-f7dc-4a96-d7ee-fe8cba9cedea@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <8ed18bc4-00f5-3553-edd0-5f1ac3293b41@redhat.com>
+Date: Wed, 21 Dec 2016 09:44:44 +0100
 MIME-Version: 1.0
-From: Bob Chen <a175818323@gmail.com>
-Date: Wed, 21 Dec 2016 16:44:08 +0800
-Message-ID: <CAMxP3BREAp7wm8B8=z0d1qAcG18Pv19UpU7RrSikGBunScNNOw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: [Qemu-devel] QEMU -smp paramater: Will multiplue threads and cores
- improve performance?
+In-Reply-To: <584d77b6-f7dc-4a96-d7ee-fe8cba9cedea@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC 4/7] kvm: Include kvm-stub.o only on
+ CONFIG_SOFTMMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,17 +29,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-
-Hi,
-
--smp 16
-
--smp cores=4,threads=4,sockets=1
+To: Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
 
 
-Which one has better performance? The scenario is guest VMs running on
-cloud server.
+>>  obj-$(CONFIG_LIBDECNUMBER) += libdecnumber/decContext.o
+>>  obj-$(CONFIG_LIBDECNUMBER) += libdecnumber/decNumber.o
+>> @@ -138,6 +137,7 @@ obj-y += arch_init.o cpus.o monitor.o gdbstub.o balloon.o ioport.o numa.o
+>>  obj-y += qtest.o bootdevice.o
+>>  obj-y += hw/
+>>  obj-$(CONFIG_KVM) += kvm-all.o
+>> +obj-$(call lnot,$(CONFIG_KVM)) += kvm-stub.o
+>>  obj-y += memory.o cputlb.o
+>>  obj-y += memory_mapping.o
+>>  obj-y += dump.o
+>
+> <bikeshedding>
+> IMHO you could also squash this change into the next patch (and just
+> mention it in the commit description).
+> </bikeshedding>
 
++1
 
--Bob
+-- 
+
+David
