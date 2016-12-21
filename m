@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44603)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46729)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1cJZuK-0007Gm-Ms
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 00:57:46 -0500
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cJa8C-0005Ef-BE
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 01:12:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1cJZuH-00044r-Mg
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 00:57:44 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:49838)
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cJa89-0000Xn-3p
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 01:12:04 -0500
+Received: from [59.151.112.132] (port=12225 helo=heian.cn.fujitsu.com)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1cJZuH-00044c-Ex
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 00:57:41 -0500
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <000301d259dc$f9d097c0$ed71c740$@ru>
-	<000601d25a95$12b1b9f0$38152dd0$@ru>
-	<20161220102126.GE5602@stefanha-x1.localdomain>
-	<002501d25ab1$af024b00$0d06e100$@ru>
-	<CAJSP0QXm9ssLC5C+gV_agkEW_fdUY=NWBMvHqMh55UhYTR276g@mail.gmail.com>
-In-Reply-To: <CAJSP0QXm9ssLC5C+gV_agkEW_fdUY=NWBMvHqMh55UhYTR276g@mail.gmail.com>
-Date: Wed, 21 Dec 2016 08:57:34 +0300
-Message-ID: <000301d25b4f$20018440$60048cc0$@ru>
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cJa88-0000TL-N2
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 01:12:01 -0500
+References: <1479108340-3453-1-git-send-email-caoj.fnst@cn.fujitsu.com>
+From: Cao jin <caoj.fnst@cn.fujitsu.com>
+Message-ID: <585A1E33.1090002@cn.fujitsu.com>
+Date: Wed, 21 Dec 2016 14:16:19 +0800
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="UTF-8"
+In-Reply-To: <1479108340-3453-1-git-send-email-caoj.fnst@cn.fujitsu.com>
+Content-Type: text/plain; charset="windows-1252"
 Content-Transfer-Encoding: 7bit
-Content-Language: ru
-Subject: Re: [Qemu-devel] qemu-2.8-rc4 is broken
+Subject: Re: [Qemu-devel] [PATCH v7 00/10] Convert msix_init() to error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,28 +26,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Stefan Hajnoczi' <stefanha@gmail.com>
-Cc: 'qemu-devel' <qemu-devel@nongnu.org>, 'Paolo Bonzini' <pbonzini@redhat.com>, 'Pavel Dovgalyuk' <pavel.dovgaluk@ispras.ru>, 'Peter Maydell' <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
 
+ping
 
-> -----Original Message-----
-> From: Stefan Hajnoczi [mailto:stefanha@gmail.com]
-> On Tue, Dec 20, 2016 at 11:10 AM, Pavel Dovgalyuk <dovgaluk@ispras.ru> wrote:
-> >> From: Stefan Hajnoczi [mailto:stefanha@gmail.com]
-> >> On Tue, Dec 20, 2016 at 10:45:44AM +0300, Pavel Dovgalyuk wrote:
-> >> > It also fails much earlier when I enable logs with "-d int -D log".
-> >> >
-> >> Looks like a heap corruption bug since free() is failing.
-> >
-> > Seems to be a race condition.
-> > When I add logs into invalidate_page_bitmap, the bug disappears.
-> > It seems that someone tries to free the same page bitmap twice and simultaneously.
+On 11/14/2016 03:25 PM, Cao jin wrote:
+> v7 changelog:
+> 1. fix the segfaut bug in patch 2. So drop the all the R-b of it,
+>    please take a look, there is detailed description in the patch.
+> 2. add the R-b from Hannes Reinecke
 > 
-> Does the following workaround prevent the crashes?
+> Test:
+> 1. make check: pass
+> 2. After applied all the patch, command line test for all the
+>    affected devices, just make sure device realize process is ok,
+>    no crash, but no further use of device.
 > 
-> -global apic-common.vapic=off
+> CC: Jiri Pirko <jiri@resnulli.us>
+> CC: Gerd Hoffmann <kraxel@redhat.com>
+> CC: Dmitry Fleytman <dmitry@daynix.com>
+> CC: Jason Wang <jasowang@redhat.com>
+> CC: Michael S. Tsirkin <mst@redhat.com>
+> CC: Hannes Reinecke <hare@suse.de>
+> CC: Paolo Bonzini <pbonzini@redhat.com>
+> CC: Alex Williamson <alex.williamson@redhat.com>
+> CC: Markus Armbruster <armbru@redhat.com>
+> CC: Marcel Apfelbaum <marcel@redhat.com>
+> 
+> Cao jin (10):
+>   msix: Follow CODING_STYLE
+>   hcd-xhci: check & correct param before using it
+>   pci: Convert msix_init() to Error and fix callers to check it
+>   megasas: change behaviour of msix switch
+>   hcd-xhci: change behaviour of msix switch
+>   megasas: remove unnecessary megasas_use_msix()
+>   megasas: undo the overwrites of msi user configuration
+>   vmxnet3: fix reference leak issue
+>   vmxnet3: remove unnecessary internal msix flag
+>   msi_init: convert assert to return -errno
+> 
+>  hw/block/nvme.c        |  5 +++-
+>  hw/misc/ivshmem.c      |  8 +++---
+>  hw/net/e1000e.c        |  6 ++++-
+>  hw/net/rocker/rocker.c |  7 ++++-
+>  hw/net/vmxnet3.c       | 46 +++++++++++++++------------------
+>  hw/pci/msi.c           |  9 ++++---
+>  hw/pci/msix.c          | 42 +++++++++++++++++++++++++-----
+>  hw/scsi/megasas.c      | 49 ++++++++++++++++++++---------------
+>  hw/usb/hcd-xhci.c      | 69 ++++++++++++++++++++++++++++++--------------------
+>  hw/vfio/pci.c          |  8 ++++--
+>  hw/virtio/virtio-pci.c | 11 ++++----
+>  include/hw/pci/msix.h  |  5 ++--
+>  12 files changed, 164 insertions(+), 101 deletions(-)
+> 
 
-Yes, this option helps.
-Thank you.
-
-Pavel Dovgalyuk
+-- 
+Sincerely,
+Cao jin
