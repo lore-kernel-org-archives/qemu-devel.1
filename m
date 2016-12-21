@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57930)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60160)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cJnbu-00052y-Ty
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 15:35:40 -0500
+	(envelope-from <bounces@canonical.com>) id 1cJnl0-0002rt-1W
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 15:45:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cJnbr-00019j-Rg
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 15:35:38 -0500
-Received: from indium.canonical.com ([91.189.90.7]:37984)
+	(envelope-from <bounces@canonical.com>) id 1cJnkw-0004hR-Vn
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 15:45:02 -0500
+Received: from indium.canonical.com ([91.189.90.7]:39237)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cJnbr-00018k-Ls
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 15:35:35 -0500
+	id 1cJnkw-0004gV-Pb
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 15:44:58 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cJnbq-0008Og-Q1
-	for <qemu-devel@nongnu.org>; Wed, 21 Dec 2016 20:35:34 +0000
+	id 1cJnku-0004bf-Ij
+	for <qemu-devel@nongnu.org>; Wed, 21 Dec 2016 20:44:56 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C2AC32E8060
-	for <qemu-devel@nongnu.org>; Wed, 21 Dec 2016 20:35:34 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 7B2ED2E80AD
+	for <qemu-devel@nongnu.org>; Wed, 21 Dec 2016 20:44:56 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 21 Dec 2016 20:29:30 -0000
-From: Thomas Huth <1649040@bugs.launchpad.net>
-Reply-To: Bug 1649040 <1649040@bugs.launchpad.net>
+Date: Wed, 21 Dec 2016 20:33:58 -0000
+From: Thomas Huth <502107@bugs.launchpad.net>
+Reply-To: Bug 502107 <502107@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20161211031531.25603.88090.malonedeb@gac.canonical.com>
-Message-Id: <20161221202930.1379.53816.malone@soybean.canonical.com>
+References: <20100101165222.10901.36970.malonedeb@potassium.ubuntu.com>
+Message-Id: <20161221203358.1461.86805.malone@soybean.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1649040] Re: Ubuntu 16.04.1 Grub Splash Doesn't
- Appear
+Subject: [Qemu-devel] [Bug 502107] Re: qemu-kvm 0.12.1.2 crashes booting
+ Ubuntu 9.10 with "-vga std"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,87 +39,82 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Why are you using "-vga vmware" ? Can't you use "-vga std" instead?
-Also, now that QEMU 2.8 has been released, could you please test again
-with this latest version? Thanks!
+Triaging old bug tickets ... can you still reproduce this problem with
+the latest version of QEMU (v2.8)?
+
+** Changed in: qemu
+       Status: Confirmed =3D> Incomplete
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1649040
+https://bugs.launchpad.net/bugs/502107
 
 Title:
-  Ubuntu 16.04.1 Grub Splash Doesn't Appear
+  qemu-kvm 0.12.1.2 crashes booting Ubuntu 9.10 with "-vga std"
 
 Status in QEMU:
-  New
+  Incomplete
 
 Bug description:
-  My Specs:
+  I have an Ubuntu VM that works fine without "-vga std" but crashes if
+  I add "-vga std".  This is the full command line:
 
-  Slackware 14.2 x86_64 > Host
-  QEMU 2.7.0
+  qemu-system-x86_64 -vga std -drive
+  cache=3Dwriteback,index=3D0,media=3Ddisk,file=3Dubuntu.img -k en-us -m 20=
+48 -smp 2 -vnc
+  :3102 -usbdevice tablet -enable-kvm &
 
-  Ubuntu 16.04.1 x86_64 > Guest
+  I get this error:
 
-  Start options for Ubuntu:
+   KVM internal error. Suberror: 1
+  rax 00007f789177e000 rbx 0000000000000000 rcx 0000000000000000 rdx
+  0000000000000000
+  rsi 0000000000000000 rdi 00007f789177e000 rsp 00007fff361775e8 rbp
+  00007fff36177600
+  r8  000000000000ff80 r9  0000000000200000 r10 0000000000000000 r11
+  00007f789100a3f0
+  r12 00000000004017c0 r13 00007fff36178cf0 r14 0000000000000000 r15
+  0000000000000000
+  rip 00007f789100aa7b rflags 00013206
+  cs 0033 (00000000/ffffffff p 1 dpl 3 db 0 s 1 type b l 1 g 1 avl 0)
+  ds 0000 (00000000/ffffffff p 0 dpl 0 db 0 s 0 type 0 l 0 g 0 avl 0)
+  es 0000 (00000000/ffffffff p 0 dpl 0 db 0 s 0 type 0 l 0 g 0 avl 0)
+  ss 002b (00000000/ffffffff p 1 dpl 3 db 1 s 1 type 3 l 0 g 1 avl 0)
+  fs 0000 (7f78917906f0/ffffffff p 0 dpl 0 db 0 s 0 type 0 l 0 g 0 avl 0)
+  gs 0000 (00000000/ffffffff p 0 dpl 0 db 0 s 0 type 0 l 0 g 0 avl 0)
+  tr 0040 (ffff880001a09440/00002087 p 1 dpl 0 db 0 s 0 type b l 0 g 0 avl =
+0)
+  ldt 0000 (00000000/ffffffff p 0 dpl 0 db 0 s 0 type 0 l 0 g 0 avl 0)
+  gdt ffff8800019fa000/7f
+  idt ffffffff818fd000/fff
+  cr0 80050033 cr2 2408000 cr3 379d4000 cr4 6f0 cr8 0 efer d01
+  emulation failure, check dmesg for details
 
-  qemu-system-x86_64 -drive format=3Draw,file=3Dubuntu.img \
-  -cpu host \
-  --enable-kvm \
-  -smp 2 \
-  -m 4096 \
-  -vga vmware \
-  -soundhw ac97 \
-  -usbdevice tablet \
-  -rtc base=3Dlocaltime \
-  -usbdevice host:0781:5575
+  I'm running kernel 2.6.32, and I have the kvm stuff compiled directly int=
+o the
+  kernel.  There's nothing in dmesg about kvm at all.
 
-  I've started Ubuntu around 6-8 times, and I have only see the Grub
-  Boot Splash appear twice, so pretty much without fail it typically
-  boots past the grub splash and automatically boots...
+  Note that in the VM grub comes up, but the VM dies when I boot the
+  kernel.
 
-  These are the /etc/default/grub settings; (I only changed these
-  options GRUB_TIMEOUT=3D15 and GRUB_GFXMODE=3D1440x900)
+  This command line works:
 
-  # If you change this file, run 'update-grub' afterwards to update
-  # /boot/grub/grub.cfg.
-  # For full documentation of the options in this file, see:
-  #   info -f grub -n 'Simple configuration'
+  qemu-system-x86_64 -drive cache=3Dwriteback,index=3D0,media=3Ddisk,file=
+=3Dubuntu.img -k
+  en-us -m 2048 -smp 2 -vnc :3102 -usbdevice tablet -enable-kvm &
 
-  GRUB_DEFAULT=3D0
-  GRUB_HIDDEN_TIMEOUT=3D0
-  GRUB_HIDDEN_TIMEOUT_QUIET=3Dtrue
-  GRUB_TIMEOUT=3D15
-  GRUB_DISTRIBUTOR=3D`lsb_release -i -s 2> /dev/null || echo Debian`
-  GRUB_CMDLINE_LINUX_DEFAULT=3D"quiet splash"
-  GRUB_CMDLINE_LINUX=3D""
+  That is, removing "-vga std" fixes the problem.
 
-  # Uncomment to enable BadRAM filtering, modify to suit your needs
-  # This works with Linux (no patch required) and with any kernel that obta=
-ins
-  # the memory map information from GRUB (GNU Mach, kernel of FreeBSD ...)
-  #GRUB_BADRAM=3D"0x01234567,0xfefefefe,0x89abcdef,0xefefefef"
+  I recently added this option to both my Ubuntu and Windows XP VMs.
+  The Windows VM still works fine.  If Windows can detect that the
+  graphics card has changed, then Ubuntu should also have no problem.
+  That being said, I added the std option when using 0.12.1.1, so there
+  may be a qemu regression.
 
-  # Uncomment to disable graphical terminal (grub-pc only)
-  #GRUB_TERMINAL=3Dconsole
-
-  # The resolution used on graphical terminal
-  # note that you can use only modes which your graphic card supports via V=
-BE
-  # you can see them in real GRUB with the command `vbeinfo'
-  GRUB_GFXMODE=3D1440x900
-
-  # Uncomment if you don't want GRUB to pass "root=3DUUID=3Dxxx" parameter =
-to Linux
-  #GRUB_DISABLE_LINUX_UUID=3Dtrue
-
-  # Uncomment to disable generation of recovery mode menu entries
-  #GRUB_DISABLE_RECOVERY=3D"true"
-
-  # Uncomment to get a beep at grub start
-  #GRUB_INIT_TUNE=3D"480 440 1"
+  I have reported this bug elsewhere:
+  http://bugs.gentoo.org/show_bug.cgi?id=3D299211
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1649040/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/502107/+subscriptions
