@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47454)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47479)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cJhV9-00064i-DF
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 09:04:16 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cJhVB-000682-G3
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 09:04:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cJhV6-00018o-9n
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 09:04:15 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cJhV5-00018M-Ly
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 09:04:17 -0500
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 21 Dec 2016 15:03:49 +0100
-Message-Id: <20161221140351.30652-9-pbonzini@redhat.com>
+Date: Wed, 21 Dec 2016 15:03:50 +0100
+Message-Id: <20161221140351.30652-10-pbonzini@redhat.com>
 In-Reply-To: <20161221140351.30652-1-pbonzini@redhat.com>
 References: <20161221140351.30652-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 08/10] aio-win32: remove walking_handlers,
- protecting AioHandler list with list_lock
+Subject: [Qemu-devel] [PATCH 09/10] aio: document locking
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,239 +25,120 @@ Cc: qemu-block@nongnu.org
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- aio-win32.c | 73 +++++++++++++++++++++++++++++++++++++++----------------------
- 1 file changed, 47 insertions(+), 26 deletions(-)
+ docs/multiple-iothreads.txt | 13 +++++--------
+ include/block/aio.h         | 32 ++++++++++++++++----------------
+ 2 files changed, 21 insertions(+), 24 deletions(-)
 
-diff --git a/aio-win32.c b/aio-win32.c
-index 1ad459d..900524c 100644
---- a/aio-win32.c
-+++ b/aio-win32.c
-@@ -21,6 +21,7 @@
- #include "qemu/queue.h"
- #include "qemu/sockets.h"
- #include "qapi/error.h"
-+#include "qemu/rcu_queue.h"
+diff --git a/docs/multiple-iothreads.txt b/docs/multiple-iothreads.txt
+index 0e7cdb2..e4d340b 100644
+--- a/docs/multiple-iothreads.txt
++++ b/docs/multiple-iothreads.txt
+@@ -84,9 +84,8 @@ How to synchronize with an IOThread
+ AioContext is not thread-safe so some rules must be followed when using file
+ descriptors, event notifiers, timers, or BHs across threads:
  
- struct AioHandler {
-     EventNotifier *e;
-@@ -45,6 +46,7 @@ void aio_set_fd_handler(AioContext *ctx,
-     /* fd is a SOCKET in our case */
-     AioHandler *node;
+-1. AioContext functions can be called safely from file descriptor, event
+-notifier, timer, or BH callbacks invoked by the AioContext.  No locking is
+-necessary.
++1. AioContext functions can always be called safely.  They handle their
++own locking internally.
  
-+    qemu_lockcnt_lock(&ctx->list_lock);
-     QLIST_FOREACH(node, &ctx->aio_handlers, node) {
-         if (node->pfd.fd == fd && !node->deleted) {
-             break;
-@@ -54,14 +56,14 @@ void aio_set_fd_handler(AioContext *ctx,
-     /* Are we deleting the fd handler? */
-     if (!io_read && !io_write) {
-         if (node) {
--            /* If the lock is held, just mark the node as deleted */
--            if (ctx->walking_handlers) {
-+            /* If aio_poll is in progress, just mark the node as deleted */
-+            if (qemu_lockcnt_count(&ctx->list_lock)) {
-                 node->deleted = 1;
-                 node->pfd.revents = 0;
-             } else {
-                 /* Otherwise, delete it for real.  We can't just mark it as
-                  * deleted because deleted nodes are only cleaned up after
--                 * releasing the walking_handlers lock.
-+                 * releasing the list_lock.
-                  */
-                 QLIST_REMOVE(node, node);
-                 g_free(node);
-@@ -74,7 +76,7 @@ void aio_set_fd_handler(AioContext *ctx,
-             /* Alloc and insert if it's not already there */
-             node = g_new0(AioHandler, 1);
-             node->pfd.fd = fd;
--            QLIST_INSERT_HEAD(&ctx->aio_handlers, node, node);
-+            QLIST_INSERT_HEAD_RCU(&ctx->aio_handlers, node, node);
-         }
+ 2. Other threads wishing to access the AioContext must use
+ aio_context_acquire()/aio_context_release() for mutual exclusion.  Once the
+@@ -94,16 +93,14 @@ context is acquired no other thread can access it or run event loop iterations
+ in this AioContext.
  
-         node->pfd.events = 0;
-@@ -99,6 +101,7 @@ void aio_set_fd_handler(AioContext *ctx,
-                        FD_CONNECT | FD_WRITE | FD_OOB);
-     }
+ aio_context_acquire()/aio_context_release() calls may be nested.  This
+-means you can call them if you're not sure whether #1 applies.
++means you can call them if you're not sure whether #2 applies.
  
-+    qemu_lockcnt_unlock(&ctx->list_lock);
-     aio_notify(ctx);
- }
+ There is currently no lock ordering rule if a thread needs to acquire multiple
+ AioContexts simultaneously.  Therefore, it is only safe for code holding the
+ QEMU global mutex to acquire other AioContexts.
  
-@@ -117,6 +120,7 @@ void aio_set_event_notifier(AioContext *ctx,
- {
-     AioHandler *node;
+-Side note: the best way to schedule a function call across threads is to create
+-a BH in the target AioContext beforehand and then call qemu_bh_schedule().  No
+-acquire/release or locking is needed for the qemu_bh_schedule() call.  But be
+-sure to acquire the AioContext for aio_bh_new() if necessary.
++Side note: the best way to schedule a function call across threads is to call
++aio_bh_schedule_oneshot().  No acquire/release or locking is needed.
  
-+    qemu_lockcnt_lock(&ctx->list_lock);
-     QLIST_FOREACH(node, &ctx->aio_handlers, node) {
-         if (node->e == e && !node->deleted) {
-             break;
-@@ -128,14 +132,14 @@ void aio_set_event_notifier(AioContext *ctx,
-         if (node) {
-             g_source_remove_poll(&ctx->source, &node->pfd);
+ AioContext and the block layer
+ ------------------------------
+diff --git a/include/block/aio.h b/include/block/aio.h
+index 2e06ae2..67a5ae7 100644
+--- a/include/block/aio.h
++++ b/include/block/aio.h
+@@ -53,18 +53,12 @@ struct LinuxAioState;
+ struct AioContext {
+     GSource source;
  
--            /* If the lock is held, just mark the node as deleted */
--            if (ctx->walking_handlers) {
-+            /* aio_poll is in progress, just mark the node as deleted */
-+            if (qemu_lockcnt_count(&ctx->list_lock)) {
-                 node->deleted = 1;
-                 node->pfd.revents = 0;
-             } else {
-                 /* Otherwise, delete it for real.  We can't just mark it as
-                  * deleted because deleted nodes are only cleaned up after
--                 * releasing the walking_handlers lock.
-+                 * releasing the list_lock.
-                  */
-                 QLIST_REMOVE(node, node);
-                 g_free(node);
-@@ -149,7 +153,7 @@ void aio_set_event_notifier(AioContext *ctx,
-             node->pfd.fd = (uintptr_t)event_notifier_get_handle(e);
-             node->pfd.events = G_IO_IN;
-             node->is_external = is_external;
--            QLIST_INSERT_HEAD(&ctx->aio_handlers, node, node);
-+            QLIST_INSERT_HEAD_RCU(&ctx->aio_handlers, node, node);
+-    /* Protects all fields from multi-threaded access */
++    /* Used by AioContext users to protect from multi-threaded access.  */
+     QemuRecMutex lock;
  
-             g_source_add_poll(&ctx->source, &node->pfd);
-         }
-@@ -157,6 +161,7 @@ void aio_set_event_notifier(AioContext *ctx,
-         node->io_notify = io_notify;
-     }
+-    /* The list of registered AIO handlers */
++    /* The list of registered AIO handlers.  Protected by ctx->list_lock. */
+     QLIST_HEAD(, AioHandler) aio_handlers;
  
-+    qemu_lockcnt_unlock(&ctx->list_lock);
-     aio_notify(ctx);
- }
- 
-@@ -175,10 +180,16 @@ bool aio_prepare(AioContext *ctx)
-     bool have_select_revents = false;
-     fd_set rfds, wfds;
- 
-+    /*
-+     * We have to walk very carefully in case aio_set_fd_handler is
-+     * called while we're walking.
-+     */
-+    qemu_lockcnt_inc(&ctx->list_lock);
-+
-     /* fill fd sets */
-     FD_ZERO(&rfds);
-     FD_ZERO(&wfds);
--    QLIST_FOREACH(node, &ctx->aio_handlers, node) {
-+    QLIST_FOREACH_RCU(node, &ctx->aio_handlers, node) {
-         if (node->io_read) {
-             FD_SET ((SOCKET)node->pfd.fd, &rfds);
-         }
-@@ -188,7 +199,7 @@ bool aio_prepare(AioContext *ctx)
-     }
- 
-     if (select(0, &rfds, &wfds, NULL, &tv0) > 0) {
--        QLIST_FOREACH(node, &ctx->aio_handlers, node) {
-+        QLIST_FOREACH_RCU(node, &ctx->aio_handlers, node) {
-             node->pfd.revents = 0;
-             if (FD_ISSET(node->pfd.fd, &rfds)) {
-                 node->pfd.revents |= G_IO_IN;
-@@ -202,41 +213,53 @@ bool aio_prepare(AioContext *ctx)
-         }
-     }
- 
-+    qemu_lockcnt_dec(&ctx->list_lock);
-     return have_select_revents;
- }
- 
- bool aio_pending(AioContext *ctx)
- {
-     AioHandler *node;
-+    bool result = false;
- 
--    QLIST_FOREACH(node, &ctx->aio_handlers, node) {
-+    /*
-+     * We have to walk very carefully in case aio_set_fd_handler is
-+     * called while we're walking.
-+     */
-+    qemu_lockcnt_inc(&ctx->list_lock);
-+    QLIST_FOREACH_RCU(node, &ctx->aio_handlers, node) {
-         if (node->pfd.revents && node->io_notify) {
--            return true;
-+            result = true;
-+            break;
-         }
- 
-         if ((node->pfd.revents & G_IO_IN) && node->io_read) {
--            return true;
-+            result = true;
-+            break;
-         }
-         if ((node->pfd.revents & G_IO_OUT) && node->io_write) {
--            return true;
-+            result = true;
-+            break;
-         }
-     }
- 
--    return false;
-+    qemu_lockcnt_dec(&ctx->list_lock);
-+    return result;
- }
- 
- static bool aio_dispatch_handlers(AioContext *ctx, HANDLE event)
- {
--    AioHandler *node, *tmp;
-+    AioHandler *node;
-     bool progress = false;
-+    AioHandler *tmp;
- 
--    ctx->walking_handlers++;
-+    qemu_lockcnt_inc(&ctx->list_lock);
- 
-     /*
-      * We have to walk very carefully in case aio_set_fd_handler is
-      * called while we're walking.
-      */
--    QLIST_FOREACH_SAFE(node, &ctx->aio_handlers, node, tmp) {
-+    QLIST_FOREACH_SAFE_RCU(node, &ctx->aio_handlers, node, tmp) {
-         int revents = node->pfd.revents;
- 
-         if (!node->deleted &&
-@@ -274,16 +297,15 @@ static bool aio_dispatch_handlers(AioContext *ctx, HANDLE event)
-         }
- 
-         if (node->deleted) {
--            ctx->walking_handlers--;
--            if (!ctx->walking_handlers) {
-+            if (qemu_lockcnt_dec_if_lock(&ctx->list_lock)) {
-                 QLIST_REMOVE(node, node);
-                 g_free(node);
-+                qemu_lockcnt_inc_and_unlock(&ctx->list_lock);
-             }
--            ctx->walking_handlers++;
-         }
-     }
- 
--    ctx->walking_handlers--;
-+    qemu_lockcnt_dec(&ctx->list_lock);
-     return progress;
- }
- 
-@@ -321,20 +343,19 @@ bool aio_poll(AioContext *ctx, bool blocking)
-         atomic_add(&ctx->notify_me, 2);
-     }
- 
-+    qemu_lockcnt_inc(&ctx->list_lock);
-     have_select_revents = aio_prepare(ctx);
- 
--    ctx->walking_handlers++;
+-    /* This is a simple lock used to protect the aio_handlers list.
+-     * Specifically, it's used to ensure that no callbacks are removed while
+-     * we're walking and dispatching callbacks.
+-     */
+-    int walking_handlers;
 -
-     /* fill fd sets */
-     count = 0;
--    QLIST_FOREACH(node, &ctx->aio_handlers, node) {
-+    QLIST_FOREACH_RCU(node, &ctx->aio_handlers, node) {
-         if (!node->deleted && node->io_notify
-             && aio_node_check(ctx, node->is_external)) {
-             events[count++] = event_notifier_get_handle(node->e);
-         }
-     }
+     /* Used to avoid unnecessary event_notifier_set calls in aio_notify;
+      * accessed with atomic primitives.  If this field is 0, everything
+      * (file descriptors, bottom halves, timers) will be re-evaluated
+@@ -90,9 +84,9 @@ struct AioContext {
+      */
+     uint32_t notify_me;
  
--    ctx->walking_handlers--;
-+    qemu_lockcnt_dec(&ctx->list_lock);
-     first = true;
+-    /* A lock to protect between bh's adders and deleter, and to ensure
+-     * that no callbacks are removed while we're walking and dispatching
+-     * them.
++    /* A lock to protect between QEMUBH and AioHandler adders and deleter,
++     * and to ensure that no callbacks are removed while we're walking and
++     * dispatching them.
+      */
+     QemuLockCnt list_lock;
  
-     /* ctx->notifier is always registered.  */
+@@ -114,7 +108,9 @@ struct AioContext {
+     bool notified;
+     EventNotifier notifier;
+ 
+-    /* Thread pool for performing work and receiving completion callbacks */
++    /* Thread pool for performing work and receiving completion callbacks.
++     * Has its own locking.
++     */
+     struct ThreadPool *thread_pool;
+ 
+ #ifdef CONFIG_LINUX_AIO
+@@ -124,7 +120,9 @@ struct AioContext {
+     struct LinuxAioState *linux_aio;
+ #endif
+ 
+-    /* TimerLists for calling timers - one per clock type */
++    /* TimerLists for calling timers - one per clock type.  Has its own
++     * locking.
++     */
+     QEMUTimerListGroup tlg;
+ 
+     int external_disable_cnt;
+@@ -178,9 +176,11 @@ void aio_context_unref(AioContext *ctx);
+  * automatically takes care of calling aio_context_acquire and
+  * aio_context_release.
+  *
+- * Access to timers and BHs from a thread that has not acquired AioContext
+- * is possible.  Access to callbacks for now must be done while the AioContext
+- * is owned by the thread (FIXME).
++ * Note that this is separate from bdrv_drained_begin/bdrv_drained_end.  A
++ * thread still has to call those to avoid being interrupted by the guest.
++ *
++ * Bottom halves, timers and callbacks can be created or removed without
++ * acquiring the AioContext.
+  */
+ void aio_context_acquire(AioContext *ctx);
+ 
 -- 
 2.9.3
