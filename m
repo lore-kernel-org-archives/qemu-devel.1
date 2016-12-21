@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38447)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46278)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cJhFT-0005YH-5q
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 08:48:04 -0500
+	(envelope-from <imammedo@redhat.com>) id 1cJhQu-0002Rd-Vn
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 08:59:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cJhFO-0000Wr-6j
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 08:48:03 -0500
-Received: from mail-wj0-x244.google.com ([2a00:1450:400c:c01::244]:34955)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1cJhFN-0000WX-W6
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 08:47:58 -0500
-Received: by mail-wj0-x244.google.com with SMTP id o3so2907526wjo.2
-	for <qemu-devel@nongnu.org>; Wed, 21 Dec 2016 05:47:57 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <1482255793-19057-1-git-send-email-ehabkost@redhat.com>
-	<70e1f758-6f18-9821-b48e-bdebdfc0befc@redhat.com>
-	<20161221131438.GF3808@thinpad.lan.raisama.net>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <00508a0d-4279-298e-cbe2-217e7d2adab7@redhat.com>
-Date: Wed, 21 Dec 2016 14:47:54 +0100
+	(envelope-from <imammedo@redhat.com>) id 1cJhQr-00080z-TH
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 08:59:53 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48486)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cJhQr-0007zm-Kj
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 08:59:49 -0500
+Date: Wed, 21 Dec 2016 14:59:34 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20161221145934.219d73fd@nial.brq.redhat.com>
+In-Reply-To: <20161221123509.GC16872@bivouac.eciton.net>
+References: <20161216152319.12494-1-leif.lindholm@linaro.org>
+	<20161221115102.251224b8@nial.brq.redhat.com>
+	<20161221123509.GC16872@bivouac.eciton.net>
 MIME-Version: 1.0
-In-Reply-To: <20161221131438.GF3808@thinpad.lan.raisama.net>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC 0/7] Move accel, KVM, Xen,
- qtest files to accel/ subdir
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] smbios: stop ignoring command line options
+ for TARGET_ARM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,102 +29,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, Christoffer Dall <christoffer.dall@linaro.org>, Anthony Perard <anthony.perard@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xensource.com
+To: Leif Lindholm <leif.lindholm@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
+On Wed, 21 Dec 2016 12:35:09 +0000
+Leif Lindholm <leif.lindholm@linaro.org> wrote:
 
-
-On 21/12/2016 14:14, Eduardo Habkost wrote:
-> On Wed, Dec 21, 2016 at 12:21:44PM +0100, Paolo Bonzini wrote:
->>
->>
->> On 20/12/2016 18:43, Eduardo Habkost wrote:
->>> This moves the KVM and Xen files to the an accel/ subdir.
->>>
->>> Instead of moving the *-stubs.c file to accel/ as-is, I tried to
->>> move most of the stub code to libqemustub.a. This way the obj-y
->>> logic for accel/ is simpler: obj-y includes accel/ only if
->>> CONFIG_SOFTMMU is set.
->>>
->>> The Xen stubs could be moved completely to stubs/, but some of
->>> the KVM stubs depend on cpu.h. So most of the kvm-stub.c code was
->>> moved to stubs/kvm.c, but some of that code was kept in
->>> accel/kvm-stub.c.
->>
->> I think we need to decide what libqemustub is for.
->>
->> The original purpose was to provide different implementations of some
->> functions for tools vs. emulators or (more rarely) for user-mode vs.
->> system emulation.
+> On Wed, Dec 21, 2016 at 11:51:02AM +0100, Igor Mammedov wrote:
+> > On Fri, 16 Dec 2016 15:23:19 +0000  
+> > > Verified on ARM mach-virt with UEFI shell "smbiosview" command and QEMU
+> > > command line parameter -smbios type=0,version=foobar.
+> > > 
+> > >  arch_init.c                | 6 +++---
+> > >  include/hw/smbios/smbios.h | 2 ++
+> > >  vl.c                       | 2 ++
+> > >  3 files changed, 7 insertions(+), 3 deletions(-)
+> > > 
+> > > diff --git a/arch_init.c b/arch_init.c
+> > > index 5cc58b2..d4e28c0 100644
+> > > --- a/arch_init.c
+> > > +++ b/arch_init.c
+> > > @@ -250,9 +250,9 @@ void do_acpitable_option(const QemuOpts *opts)
+> > >  
+> > >  void do_smbios_option(QemuOpts *opts)
+> > >  {
+> > > -#ifdef TARGET_I386  
+> > extending above condition to make it compiled for ARM
+> > would do what you need  
 > 
-> So, is sysemu vs user-mode a valid reason for using libqemustub?
-
-Yes, but I was thinking of a different distinction.
-
-You'd use libqemustub if user-mode emulation (or tools) only needs 2-3
-functions out of a large file, while system-mode emulation needs all of it.
-
-For example, of the entire monitor API, the tools need pretty much
-nothing but monitor_init, monitor_get_fd, cur_mon and
-monitor_cur_is_qmp.  Such a small extract of the API makes little sense
-except for "this is what is needed to compile the tools", so it's stubs/
-rather than monitor-stub.c.
-
-Instead, non-KVM targets need a stub implementation of the entire API,
-so it's kvm-stub.c rather than stubs/kvm.c (kvm-stub.c depends on cpu.h
-but that's really only needed to compile it---the kvm-stub.c code
-actually has no dependency).
-
-There are certainly cases where libqemustub is used instead of lnot.  In
-the specific case of sysemu vs. user-mode, stubs/cpus.c and
-stubs/replay-user.c should not be in libqemustub.  They should be in a
-separate file user-exec-stub.c, which is only used if !CONFIG_SOFTMMU.
-
-> The main reason I have moved some code to sbus/kvm.c is to avoid
-> having to include accel/kvm-stub.c in *-user.
-
-What's wrong with
-
-ifeq ($(CONFIG_SOFTMMU),y)
-obj-$(CONFIG_KVM) += kvm-all.c
-obj-$(call lnot, $(CONFIG_KVM)) += kvm-stub.c
-endif
-
-similar to what is done already in Makefile.objs?
-
-> Moving xen-stub.c to libqemustub, on the other hand, is really
-> unnecessary.
-
-Why would it be different?
-
->> In general, I think libqemustub should be the last resort.  If possible,
->> inlines in headers should be the first choice, and stubs in objs-y or
->> common-objs-y (using $(call lnot) in the Makefile) should be the second.
+> Yes, but given how tedious that was to track down without a decent
+> grasp of the source tree structure I had hoped to improve the
+> experience for future newcomers.
 > 
-> I understand the reasoning, but I fail to see cases when
-> libqemustub would be considered appropriate. Using stubs in
-> obj-y/common-obj-y using $(call lnot) is always possible, isn't
-> it?
+> If that's not considered important, sure, I could hack together a v2
+> consisting only of that.
 > 
-> Hmm, maybe on cases where the decision to use the stub doesn't
-> depend on a single build variable (e.g. a function implemented by
-> a handful of targets, but not all of them).
+> > > -    smbios_entry_add(opts);
+> > > -#endif
+> > > +    if (smbios_override) {
+> > > +        smbios_entry_add(opts);
+> > > +    }
+> > >  }
+> > >  
+> > >  int kvm_available(void)
+> > > diff --git a/include/hw/smbios/smbios.h b/include/hw/smbios/smbios.h
+> > > index 1cd53cc..2a3dca2 100644
+> > > --- a/include/hw/smbios/smbios.h
+> > > +++ b/include/hw/smbios/smbios.h
+> > > @@ -267,4 +267,6 @@ void smbios_get_tables(const struct smbios_phys_mem_area *mem_array,
+> > >                         const unsigned int mem_array_size,
+> > >                         uint8_t **tables, size_t *tables_len,
+> > >                         uint8_t **anchor, size_t *anchor_len);
+> > > +
+> > > +extern int smbios_override;  
+> > Adding global variables generally is not welcomed and one
+> > should try to avoid it if it could be helped.  
+> 
+> That is certainly a fair comment. Not being too familiar with the
+> codebase I was slavishly trying to follow the style of the surrounding
+> code. Will avoid that in future.
+> 
+> > >  #endif /* QEMU_SMBIOS_H */
+> > > diff --git a/vl.c b/vl.c
+> > > index d77dd86..8e71b06 100644
+> > > --- a/vl.c
+> > > +++ b/vl.c
+> > > @@ -159,6 +159,7 @@ int smp_cpus = 1;
+> > >  int max_cpus = 1;
+> > >  int smp_cores = 1;
+> > >  int smp_threads = 1;
+> > > +int smbios_override = 0;
+> > >  int acpi_enabled = 1;
+> > >  int no_hpet = 0;
+> > >  int fd_bootchk = 1;
+> > > @@ -3711,6 +3712,7 @@ int main(int argc, char **argv, char **envp)
+> > >                  if (!opts) {
+> > >                      exit(1);
+> > >                  }
+> > > +                smbios_override = 1;  
+> >                    ^^^ practically turns follow up call into unconditional
+> > smbios_entry_add(opts) call,  
+> 
+> Which is what it already is for TARGET_I386.
+> 
+> > so what's the point for adding 'smbios_override' at all?  
+> 
+> Apparently a misunderstanding of the underlying command line handling
+> mechanics.
+> 
+> > Also this patch would break build for targets that don't link smbios.c
+> > (i.e. which don't have CONFIG_SMBIOS=y)  
+> 
+> Ah, I hadn't spotted that - apologies.
+Just do 1 build for all targets before posting patches to avoid
+such kind of errors.
 
-This is a good one.
 
-> Are there other examples?
+> 
+> So a simpler, and more correct fix would rather be to change the
+> #ifdef TARGET_I386
+> in arch_init.c to
+> #ifdef CONFIG_SMBIOS
+it looks better to me than enumerating targets explicitly,
+CCing Paolo for another opinion
 
-Does the one above (extract a small part of an API) make sense?
 
-libqemustub is a necessary evil and it's almost never necessary.  It
-basically exists for cases where you cannot replace a source file with
-another wholesale.
+> ... if there had been a conveniently available CONFIG_SMBIOS.
+> Would it be acceptable to add one to config-target.h or is that
+> reserved for host-specific options?
 
-There are also some cases of premature optimization.  For example reset
-handlers are stubbed, but: 1) system emulation implements them in vl.c
-which is an antipattern of its own, and 2) they are small enough that
-including them in user-mode emulators (together with the rest of qdev)
-is not a big deal.  (I'm planning to remove some stubs in 2.9, so I'm
-taking these examples from that branch).
-
-Paolo
+> 
+> Regards,
+> 
+> Leif
+> 
+> > >                  do_smbios_option(opts);
+> > >                  break;
+> > >              case QEMU_OPTION_fwcfg:  
+> >   
+> 
