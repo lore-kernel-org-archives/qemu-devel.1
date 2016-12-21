@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58694)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58791)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cJiIU-0003n4-CL
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 09:55:17 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cJiIW-0003nW-Au
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 09:55:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cJiIR-0006iI-5v
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 09:55:14 -0500
-Received: from mailhub.sw.ru ([195.214.232.25]:38519 helo=relay.sw.ru)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cJiIR-0006kX-Cr
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 09:55:16 -0500
+Received: from mailhub.sw.ru ([195.214.232.25]:15580 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1cJiIQ-0006aC-J2
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 09:55:10 -0500
+	id 1cJiIR-0006ds-0u
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 09:55:11 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 21 Dec 2016 17:54:57 +0300
-Message-Id: <1482332102-131788-20-git-send-email-vsementsov@virtuozzo.com>
+Date: Wed, 21 Dec 2016 17:55:00 +0300
+Message-Id: <1482332102-131788-23-git-send-email-vsementsov@virtuozzo.com>
 In-Reply-To: <1482332102-131788-1-git-send-email-vsementsov@virtuozzo.com>
 References: <1482332102-131788-1-git-send-email-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 19/24] iotests: test qcow2 persistent dirty
- bitmap
+Subject: [Qemu-devel] [PATCH 22/24] block/dirty-bitmap: deep release dirty
+ bitmaps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,133 +28,81 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, vsementsov@virtuozzo.com, pbonzini@redhat.com
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
----
- tests/qemu-iotests/165     | 89 ++++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/165.out |  5 +++
- tests/qemu-iotests/group   |  1 +
- 3 files changed, 95 insertions(+)
- create mode 100755 tests/qemu-iotests/165
- create mode 100644 tests/qemu-iotests/165.out
+Remove persistent bitmap from its storage on bdrv_release_dirty_bitmap.
 
-diff --git a/tests/qemu-iotests/165 b/tests/qemu-iotests/165
-new file mode 100755
-index 0000000..11d2e22
---- /dev/null
-+++ b/tests/qemu-iotests/165
-@@ -0,0 +1,89 @@
-+#!/usr/bin/env python
-+#
-+# Tests for persistent dirty bitmaps.
-+#
-+# Copyright: Vladimir Sementsov-Ogievskiy 2015-2016
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ block/dirty-bitmap.c      | 21 ++++++++++++++++++---
+ include/block/block_int.h |  3 +++
+ 2 files changed, 21 insertions(+), 3 deletions(-)
+
+diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+index 775181c..0977df6 100644
+--- a/block/dirty-bitmap.c
++++ b/block/dirty-bitmap.c
+@@ -297,7 +297,8 @@ void bdrv_dirty_bitmap_truncate(BlockDriverState *bs)
+ 
+ static void bdrv_do_release_matching_dirty_bitmap(BlockDriverState *bs,
+                                                   BdrvDirtyBitmap *bitmap,
+-                                                  bool only_named)
++                                                  bool only_named,
++                                                  bool deep)
+ {
+     BdrvDirtyBitmap *bm, *next;
+     QLIST_FOREACH_SAFE(bm, &bs->dirty_bitmaps, list, next) {
+@@ -305,6 +306,19 @@ static void bdrv_do_release_matching_dirty_bitmap(BlockDriverState *bs,
+             assert(!bm->active_iterators);
+             assert(!bdrv_dirty_bitmap_frozen(bm));
+             assert(!bm->meta);
 +
-+import os
-+import iotests
-+from iotests import qemu_img
++            if (deep && bm->persistent && bs->drv &&
++                bs->drv->bdrv_remove_persistent_dirty_bitmap)
++            {
++                Error *local_err = NULL;
++                bs->drv->bdrv_remove_persistent_dirty_bitmap(bs, bm->name,
++                                                             &local_err);
++                if (local_err != NULL) {
++                    error_report_err(local_err);
++                }
++            }
 +
-+disk = os.path.join(iotests.test_dir, 'disk')
-+disk_size = 0x40000000 # 1G
 +
-+# regions for qemu_io: (start, count) in bytes
-+regions1 = ((0,        0x100000),
-+            (0x200000, 0x100000))
-+
-+regions2 = ((0x10000000, 0x20000),
-+            (0x3fff0000, 0x10000))
-+
-+class TestPersistentDirtyBitmap(iotests.QMPTestCase):
-+
-+    def setUp(self):
-+        qemu_img('create', '-f', iotests.imgfmt, disk, str(disk_size))
-+
-+    def tearDown(self):
-+        os.remove(disk)
-+
-+    def mkVm(self):
-+        return iotests.VM().add_drive(disk)
-+
-+    def getSha256(self):
-+        result = self.vm.qmp('x-debug-block-dirty-bitmap-sha256',
-+                             node='drive0', name='bitmap0')
-+        return result['return']['sha256']
-+
-+    def checkBitmap(self, sha256):
-+        result = self.vm.qmp('x-debug-block-dirty-bitmap-sha256',
-+                             node='drive0', name='bitmap0')
-+        self.assert_qmp(result, 'return/sha256', sha256);
-+
-+    def writeRegions(self, regions):
-+        for r in regions:
-+            self.vm.hmp_qemu_io('drive0',
-+                                'write %d %d' % r)
-+
-+    def qmpAddBitmap(self):
-+        self.vm.qmp('block-dirty-bitmap-add', node='drive0',
-+                    name='bitmap0', persistent=True, autoload=True)
-+
-+    def test_persistent(self):
-+        self.vm = self.mkVm()
-+        self.vm.launch()
-+        self.qmpAddBitmap()
-+
-+        self.writeRegions(regions1)
-+        sha256 = self.getSha256()
-+
-+        self.vm.shutdown()
-+        self.vm = self.mkVm()
-+        self.vm.launch()
-+
-+        self.checkBitmap(sha256)
-+        self.writeRegions(regions2)
-+        sha256 = self.getSha256()
-+
-+        self.vm.shutdown()
-+        self.vm.launch()
-+
-+        self.checkBitmap(sha256)
-+
-+        self.vm.shutdown()
-+
-+if __name__ == '__main__':
-+    iotests.main(supported_fmts=['qcow2'])
-diff --git a/tests/qemu-iotests/165.out b/tests/qemu-iotests/165.out
-new file mode 100644
-index 0000000..ae1213e
---- /dev/null
-+++ b/tests/qemu-iotests/165.out
-@@ -0,0 +1,5 @@
-+.
-+----------------------------------------------------------------------
-+Ran 1 tests
-+
-+OK
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 866c1a0..8bd7a84 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -162,6 +162,7 @@
- 159 rw auto quick
- 160 rw auto quick
- 162 auto quick
-+165 rw auto quick
- 170 rw auto quick
- 171 rw auto quick
- 172 auto
+             QLIST_REMOVE(bm, list);
+             hbitmap_free(bm->bitmap);
+             g_free(bm->name);
+@@ -322,16 +336,17 @@ static void bdrv_do_release_matching_dirty_bitmap(BlockDriverState *bs,
+ 
+ void bdrv_release_dirty_bitmap(BlockDriverState *bs, BdrvDirtyBitmap *bitmap)
+ {
+-    bdrv_do_release_matching_dirty_bitmap(bs, bitmap, false);
++    bdrv_do_release_matching_dirty_bitmap(bs, bitmap, false, true);
+ }
+ 
+ /**
+  * Release all named dirty bitmaps attached to a BDS (for use in bdrv_close()).
+  * There must not be any frozen bitmaps attached.
++ * This function do not remove persistent bitmaps from the storage.
+  */
+ void bdrv_release_named_dirty_bitmaps(BlockDriverState *bs)
+ {
+-    bdrv_do_release_matching_dirty_bitmap(bs, NULL, true);
++    bdrv_do_release_matching_dirty_bitmap(bs, NULL, true, false);
+ }
+ 
+ void bdrv_disable_dirty_bitmap(BdrvDirtyBitmap *bitmap)
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index b38b3aa..3e080d6 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -326,6 +326,9 @@ struct BlockDriver {
+                                                 Error **errp);
+     bool (*bdrv_can_store_new_dirty_bitmap)(BlockDriverState *bs, const char *name,
+                                             uint32_t granularity, Error **errp);
++    void (*bdrv_remove_persistent_dirty_bitmap)(BlockDriverState *bs,
++                                                const char *name,
++                                                Error **errp);
+ 
+     QLIST_ENTRY(BlockDriver) list;
+ };
 -- 
 1.8.3.1
