@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53816)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53828)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cJi00-0004p4-8S
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 09:36:10 -0500
+	(envelope-from <berrange@redhat.com>) id 1cJi01-0004pm-29
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 09:36:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cJhzy-0006mB-Nr
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 09:36:08 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43010)
+	(envelope-from <berrange@redhat.com>) id 1cJhzu-0006h4-Ux
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 09:36:09 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50164)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cJhzy-0006lp-FA
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 09:36:06 -0500
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cJhzu-0006ft-Mc
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 09:36:02 -0500
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Wed, 21 Dec 2016 14:35:41 +0000
-Message-Id: <20161221143541.9260-8-berrange@redhat.com>
+Date: Wed, 21 Dec 2016 14:35:38 +0000
+Message-Id: <20161221143541.9260-5-berrange@redhat.com>
 In-Reply-To: <20161221143541.9260-1-berrange@redhat.com>
 References: <20161221143541.9260-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PULL v1 7/7] crypto: add HMAC algorithms testcases
+Subject: [Qemu-devel] [PULL v1 4/7] crypto: support HMAC algorithms based on
+ libgcrypt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,307 +29,154 @@ Cc: Peter Maydell <peter.maydell@linaro.org>, "Longpeng(Mike)" <longpeng2@huawei
 
 From: "Longpeng(Mike)" <longpeng2@huawei.com>
 
-This patch add HMAC algorithms testcases
+This patch add HMAC algorithms based on libgcrypt support
 
 Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- tests/Makefile.include   |   2 +
- tests/test-crypto-hmac.c | 266 +++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 268 insertions(+)
- create mode 100644 tests/test-crypto-hmac.c
+ crypto/hmac-gcrypt.c | 111 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 109 insertions(+), 2 deletions(-)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index e98d3b6..4841d58 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -91,6 +91,7 @@ gcov-files-test-qemu-opts-y = qom/test-qemu-opts.c
- check-unit-y += tests/test-write-threshold$(EXESUF)
- gcov-files-test-write-threshold-y = block/write-threshold.c
- check-unit-y += tests/test-crypto-hash$(EXESUF)
-+check-unit-y += tests/test-crypto-hmac$(EXESUF)
- check-unit-y += tests/test-crypto-cipher$(EXESUF)
- check-unit-y += tests/test-crypto-secret$(EXESUF)
- check-unit-$(CONFIG_GNUTLS) += tests/test-crypto-tlscredsx509$(EXESUF)
-@@ -571,6 +572,7 @@ tests/test-opts-visitor$(EXESUF): tests/test-opts-visitor.o $(test-qapi-obj-y)
- tests/test-mul64$(EXESUF): tests/test-mul64.o $(test-util-obj-y)
- tests/test-bitops$(EXESUF): tests/test-bitops.o $(test-util-obj-y)
- tests/test-crypto-hash$(EXESUF): tests/test-crypto-hash.o $(test-crypto-obj-y)
-+tests/test-crypto-hmac$(EXESUF): tests/test-crypto-hmac.o $(test-crypto-obj-y)
- tests/test-crypto-cipher$(EXESUF): tests/test-crypto-cipher.o $(test-crypto-obj-y)
- tests/test-crypto-secret$(EXESUF): tests/test-crypto-secret.o $(test-crypto-obj-y)
- tests/test-crypto-xts$(EXESUF): tests/test-crypto-xts.o $(test-crypto-obj-y)
-diff --git a/tests/test-crypto-hmac.c b/tests/test-crypto-hmac.c
-new file mode 100644
-index 0000000..ee55382
---- /dev/null
-+++ b/tests/test-crypto-hmac.c
-@@ -0,0 +1,266 @@
-+/*
-+ * QEMU Crypto hmac algorithms tests
-+ *
-+ * Copyright (c) 2016 HUAWEI TECHNOLOGIES CO., LTD.
-+ *
-+ * Authors:
-+ *    Longpeng(Mike) <longpeng2@huawei.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or
-+ * (at your option) any later version.  See the COPYING file in the
-+ * top-level directory.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "crypto/init.h"
-+#include "crypto/hmac.h"
-+
-+#define INPUT_TEXT1 "ABCDEFGHIJKLMNOPQRSTUVWXY"
-+#define INPUT_TEXT2 "Zabcdefghijklmnopqrstuvwx"
-+#define INPUT_TEXT3 "yz0123456789"
-+#define INPUT_TEXT INPUT_TEXT1 \
-+              INPUT_TEXT2 \
-+              INPUT_TEXT3
-+
-+#define KEY "monkey monkey monkey monkey"
-+
-+typedef struct QCryptoHmacTestData QCryptoHmacTestData;
-+struct QCryptoHmacTestData {
-+    QCryptoHashAlgorithm alg;
-+    const char *hex_digest;
+diff --git a/crypto/hmac-gcrypt.c b/crypto/hmac-gcrypt.c
+index 6e07415..21189e6 100644
+--- a/crypto/hmac-gcrypt.c
++++ b/crypto/hmac-gcrypt.c
+@@ -17,8 +17,28 @@
+ #include "crypto/hmac.h"
+ #include <gcrypt.h>
+ 
++static int qcrypto_hmac_alg_map[QCRYPTO_HASH_ALG__MAX] = {
++    [QCRYPTO_HASH_ALG_MD5] = GCRY_MAC_HMAC_MD5,
++    [QCRYPTO_HASH_ALG_SHA1] = GCRY_MAC_HMAC_SHA1,
++    [QCRYPTO_HASH_ALG_SHA224] = GCRY_MAC_HMAC_SHA224,
++    [QCRYPTO_HASH_ALG_SHA256] = GCRY_MAC_HMAC_SHA256,
++    [QCRYPTO_HASH_ALG_SHA384] = GCRY_MAC_HMAC_SHA384,
++    [QCRYPTO_HASH_ALG_SHA512] = GCRY_MAC_HMAC_SHA512,
++    [QCRYPTO_HASH_ALG_RIPEMD160] = GCRY_MAC_HMAC_RMD160,
 +};
 +
-+static QCryptoHmacTestData test_data[] = {
-+    {
-+        .alg = QCRYPTO_HASH_ALG_MD5,
-+        .hex_digest =
-+            "ede9cb83679ba82d88fbeae865b3f8fc",
-+    },
-+    {
-+        .alg = QCRYPTO_HASH_ALG_SHA1,
-+        .hex_digest =
-+            "c7b5a631e3aac975c4ededfcd346e469"
-+            "dbc5f2d1",
-+    },
-+    {
-+        .alg = QCRYPTO_HASH_ALG_SHA224,
-+        .hex_digest =
-+            "5f768179dbb29ca722875d0f461a2e2f"
-+            "597d0210340a84df1a8e9c63",
-+    },
-+    {
-+        .alg = QCRYPTO_HASH_ALG_SHA256,
-+        .hex_digest =
-+            "3798f363c57afa6edaffe39016ca7bad"
-+            "efd1e670afb0e3987194307dec3197db",
-+    },
-+    {
-+        .alg = QCRYPTO_HASH_ALG_SHA384,
-+        .hex_digest =
-+            "d218680a6032d33dccd9882d6a6a7164"
-+            "64f26623be257a9b2919b185294f4a49"
-+            "9e54b190bfd6bc5cedd2cd05c7e65e82",
-+    },
-+    {
-+        .alg = QCRYPTO_HASH_ALG_SHA512,
-+        .hex_digest =
-+            "835a4f5b3750b4c1fccfa88da2f746a4"
-+            "900160c9f18964309bb736c13b59491b"
-+            "8e32d37b724cc5aebb0f554c6338a3b5"
-+            "94c4ba26862b2dadb59b7ede1d08d53e",
-+    },
-+    {
-+        .alg = QCRYPTO_HASH_ALG_RIPEMD160,
-+        .hex_digest =
-+            "94964ed4c1155b62b668c241d67279e5"
-+            "8a711676",
-+    },
++typedef struct QCryptoHmacGcrypt QCryptoHmacGcrypt;
++struct QCryptoHmacGcrypt {
++    gcry_mac_hd_t handle;
 +};
 +
-+static const char hex[] = "0123456789abcdef";
-+
-+static void test_hmac_alloc(void)
-+{
-+    size_t i;
-+
-+    for (i = 0; i < G_N_ELEMENTS(test_data); i++) {
-+        QCryptoHmacTestData *data = &test_data[i];
-+        QCryptoHmac *hmac = NULL;
-+        uint8_t *result = NULL;
-+        size_t resultlen = 0;
-+        Error *err = NULL;
-+        const char *exp_output = NULL;
-+        int ret;
-+        size_t j;
-+
-+        if (!qcrypto_hmac_supports(data->alg)) {
-+            return;
-+        }
-+
-+        exp_output = data->hex_digest;
-+
-+        hmac = qcrypto_hmac_new(data->alg, (const uint8_t *)KEY,
-+                                strlen(KEY), &err);
-+        g_assert(err == NULL);
-+        g_assert(hmac != NULL);
-+
-+        ret = qcrypto_hmac_bytes(hmac, (const char *)INPUT_TEXT,
-+                                 strlen(INPUT_TEXT), &result,
-+                                 &resultlen, &err);
-+        g_assert(err == NULL);
-+        g_assert(ret == 0);
-+
-+        for (j = 0; j < resultlen; j++) {
-+            g_assert(exp_output[j * 2] == hex[(result[j] >> 4) & 0xf]);
-+            g_assert(exp_output[j * 2 + 1] == hex[result[j] & 0xf]);
-+        }
-+
-+        qcrypto_hmac_free(hmac);
-+
-+        g_free(result);
+ bool qcrypto_hmac_supports(QCryptoHashAlgorithm alg)
+ {
++    if (alg < G_N_ELEMENTS(qcrypto_hmac_alg_map) &&
++        qcrypto_hmac_alg_map[alg] != GCRY_MAC_NONE) {
++        return true;
 +    }
-+}
 +
-+static void test_hmac_prealloc(void)
-+{
-+    size_t i;
+     return false;
+ }
+ 
+@@ -26,12 +46,58 @@ QCryptoHmac *qcrypto_hmac_new(QCryptoHashAlgorithm alg,
+                               const uint8_t *key, size_t nkey,
+                               Error **errp)
+ {
++    QCryptoHmac *hmac;
++    QCryptoHmacGcrypt *ctx;
++    gcry_error_t err;
 +
-+    for (i = 0; i < G_N_ELEMENTS(test_data); i++) {
-+        QCryptoHmacTestData *data = &test_data[i];
-+        QCryptoHmac *hmac = NULL;
-+        uint8_t *result = NULL;
-+        size_t resultlen = 0;
-+        Error *err = NULL;
-+        const char *exp_output = NULL;
-+        int ret;
-+        size_t j;
-+
-+        if (!qcrypto_hmac_supports(data->alg)) {
-+            return;
-+        }
-+
-+        exp_output = data->hex_digest;
-+
-+        resultlen = strlen(exp_output) / 2;
-+        result = g_new0(uint8_t, resultlen);
-+
-+        hmac = qcrypto_hmac_new(data->alg, (const uint8_t *)KEY,
-+                                strlen(KEY), &err);
-+        g_assert(err == NULL);
-+        g_assert(hmac != NULL);
-+
-+        ret = qcrypto_hmac_bytes(hmac, (const char *)INPUT_TEXT,
-+                                 strlen(INPUT_TEXT), &result,
-+                                 &resultlen, &err);
-+        g_assert(err == NULL);
-+        g_assert(ret == 0);
-+
-+        exp_output = data->hex_digest;
-+        for (j = 0; j < resultlen; j++) {
-+            g_assert(exp_output[j * 2] == hex[(result[j] >> 4) & 0xf]);
-+            g_assert(exp_output[j * 2 + 1] == hex[result[j] & 0xf]);
-+        }
-+
-+        qcrypto_hmac_free(hmac);
-+
-+        g_free(result);
++    if (!qcrypto_hmac_supports(alg)) {
++        error_setg(errp, "Unsupported hmac algorithm %s",
++                   QCryptoHashAlgorithm_lookup[alg]);
++        return NULL;
 +    }
-+}
 +
-+static void test_hmac_iov(void)
-+{
-+    size_t i;
++    hmac = g_new0(QCryptoHmac, 1);
++    hmac->alg = alg;
 +
-+    for (i = 0; i < G_N_ELEMENTS(test_data); i++) {
-+        QCryptoHmacTestData *data = &test_data[i];
-+        QCryptoHmac *hmac = NULL;
-+        uint8_t *result = NULL;
-+        size_t resultlen = 0;
-+        Error *err = NULL;
-+        const char *exp_output = NULL;
-+        int ret;
-+        size_t j;
-+        struct iovec iov[3] = {
-+            { .iov_base = (char *)INPUT_TEXT1, .iov_len = strlen(INPUT_TEXT1) },
-+            { .iov_base = (char *)INPUT_TEXT2, .iov_len = strlen(INPUT_TEXT2) },
-+            { .iov_base = (char *)INPUT_TEXT3, .iov_len = strlen(INPUT_TEXT3) },
-+        };
++    ctx = g_new0(QCryptoHmacGcrypt, 1);
 +
-+        if (!qcrypto_hmac_supports(data->alg)) {
-+            return;
-+        }
-+
-+        exp_output = data->hex_digest;
-+
-+        hmac = qcrypto_hmac_new(data->alg, (const uint8_t *)KEY,
-+                                strlen(KEY), &err);
-+        g_assert(err == NULL);
-+        g_assert(hmac != NULL);
-+
-+        ret = qcrypto_hmac_bytesv(hmac, iov, 3, &result,
-+                                  &resultlen, &err);
-+        g_assert(err == NULL);
-+        g_assert(ret == 0);
-+
-+        for (j = 0; j < resultlen; j++) {
-+            g_assert(exp_output[j * 2] == hex[(result[j] >> 4) & 0xf]);
-+            g_assert(exp_output[j * 2 + 1] == hex[result[j] & 0xf]);
-+        }
-+
-+        qcrypto_hmac_free(hmac);
-+
-+        g_free(result);
++    err = gcry_mac_open(&ctx->handle, qcrypto_hmac_alg_map[alg],
++                        GCRY_MAC_FLAG_SECURE, NULL);
++    if (err != 0) {
++        error_setg(errp, "Cannot initialize hmac: %s",
++                   gcry_strerror(err));
++        goto error;
 +    }
-+}
 +
-+static void test_hmac_digest(void)
-+{
-+    size_t i;
-+
-+    for (i = 0; i < G_N_ELEMENTS(test_data); i++) {
-+        QCryptoHmacTestData *data = &test_data[i];
-+        QCryptoHmac *hmac = NULL;
-+        uint8_t *result = NULL;
-+        Error *err = NULL;
-+        const char *exp_output = NULL;
-+        int ret;
-+
-+        if (!qcrypto_hmac_supports(data->alg)) {
-+            return;
-+        }
-+
-+        exp_output = data->hex_digest;
-+
-+        hmac = qcrypto_hmac_new(data->alg, (const uint8_t *)KEY,
-+                                strlen(KEY), &err);
-+        g_assert(err == NULL);
-+        g_assert(hmac != NULL);
-+
-+        ret = qcrypto_hmac_digest(hmac, (const char *)INPUT_TEXT,
-+                                  strlen(INPUT_TEXT), (char **)&result,
-+                                  &err);
-+        g_assert(err == NULL);
-+        g_assert(ret == 0);
-+
-+        g_assert_cmpstr((const char *)result, ==, exp_output);
-+
-+        qcrypto_hmac_free(hmac);
-+
-+        g_free(result);
++    err = gcry_mac_setkey(ctx->handle, (const void *)key, nkey);
++    if (err != 0) {
++        error_setg(errp, "Cannot set key: %s",
++                   gcry_strerror(err));
++        goto error;
 +    }
-+}
 +
-+int main(int argc, char **argv)
-+{
-+    g_test_init(&argc, &argv, NULL);
++    hmac->opaque = ctx;
++    return hmac;
 +
-+    g_assert(qcrypto_init(NULL) == 0);
++error:
++    g_free(ctx);
++    g_free(hmac);
+     return NULL;
+ }
+ 
+ void qcrypto_hmac_free(QCryptoHmac *hmac)
+ {
+-    return;
++    QCryptoHmacGcrypt *ctx;
 +
-+    g_test_add_func("/crypto/hmac/iov", test_hmac_iov);
-+    g_test_add_func("/crypto/hmac/alloc", test_hmac_alloc);
-+    g_test_add_func("/crypto/hmac/prealloc", test_hmac_prealloc);
-+    g_test_add_func("/crypto/hmac/digest", test_hmac_digest);
++    if (!hmac) {
++        return;
++    }
 +
-+    return g_test_run();
-+}
++    ctx = hmac->opaque;
++    gcry_mac_close(ctx->handle);
++
++    g_free(ctx);
++    g_free(hmac);
+ }
+ 
+ int qcrypto_hmac_bytesv(QCryptoHmac *hmac,
+@@ -41,5 +107,46 @@ int qcrypto_hmac_bytesv(QCryptoHmac *hmac,
+                         size_t *resultlen,
+                         Error **errp)
+ {
+-    return -1;
++    QCryptoHmacGcrypt *ctx;
++    gcry_error_t err;
++    uint32_t ret;
++    int i;
++
++    ctx = hmac->opaque;
++
++    for (i = 0; i < niov; i++) {
++        gcry_mac_write(ctx->handle, iov[i].iov_base, iov[i].iov_len);
++    }
++
++    ret = gcry_mac_get_algo_maclen(qcrypto_hmac_alg_map[hmac->alg]);
++    if (ret <= 0) {
++        error_setg(errp, "Unable to get hmac length: %s",
++                   gcry_strerror(ret));
++        return -1;
++    }
++
++    if (*resultlen == 0) {
++        *resultlen = ret;
++        *result = g_new0(uint8_t, *resultlen);
++    } else if (*resultlen != ret) {
++        error_setg(errp, "Result buffer size %zu is smaller than hmac %d",
++                   *resultlen, ret);
++        return -1;
++    }
++
++    err = gcry_mac_read(ctx->handle, *result, resultlen);
++    if (err != 0) {
++        error_setg(errp, "Cannot get result: %s",
++                   gcry_strerror(err));
++        return -1;
++    }
++
++    err = gcry_mac_reset(ctx->handle);
++    if (err != 0) {
++        error_setg(errp, "Cannot reset hmac context: %s",
++                   gcry_strerror(err));
++        return -1;
++    }
++
++    return 0;
+ }
 -- 
 2.9.3
