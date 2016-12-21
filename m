@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52871)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54464)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liang.z.li@intel.com>) id 1cJarf-0007qJ-CT
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 01:59:05 -0500
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cJb29-000871-41
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 02:09:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liang.z.li@intel.com>) id 1cJarc-0006iv-9Q
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 01:59:03 -0500
-Received: from mga11.intel.com ([192.55.52.93]:53811)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <liang.z.li@intel.com>)
-	id 1cJarb-0006iR-SX
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 01:59:00 -0500
-From: Liang Li <liang.z.li@intel.com>
-Date: Wed, 21 Dec 2016 14:52:28 +0800
-Message-Id: <1482303148-22059-6-git-send-email-liang.z.li@intel.com>
-In-Reply-To: <1482303148-22059-1-git-send-email-liang.z.li@intel.com>
-References: <1482303148-22059-1-git-send-email-liang.z.li@intel.com>
-Subject: [Qemu-devel] [PATCH v6 kernel 5/5] virtio-balloon: tell host vm's
- unused page info
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cJb25-0002K2-U5
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 02:09:53 -0500
+Received: from [59.151.112.132] (port=10356 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cJb25-0002HP-2W
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 02:09:49 -0500
+References: <1481856403-23599-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<1481856403-23599-3-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<alpine.DEB.2.10.1612201616530.13831@sstabellini-ThinkPad-X260>
+From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+Message-ID: <e01c2c38-55ea-1399-3614-ea80a2be2773@cn.fujitsu.com>
+Date: Wed, 21 Dec 2016 15:10:02 +0800
+MIME-Version: 1.0
+In-Reply-To: <alpine.DEB.2.10.1612201616530.13831@sstabellini-ThinkPad-X260>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.9 V4 2/2] Add a new qmp command to do
+ checkpoint, get replication error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,401 +29,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kvm@vger.kernel.org
-Cc: virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, amit.shah@redhat.com, dave.hansen@intel.com, cornelia.huck@de.ibm.com, pbonzini@redhat.com, mst@redhat.com, david@redhat.com, aarcange@redhat.com, dgilbert@redhat.com, quintela@redhat.com, Liang Li <liang.z.li@intel.com>, Andrew Morton <akpm@linux-foundation.org>, Mel Gorman <mgorman@techsingularity.net>
+To: Stefano Stabellini <sstabellini@kernel.org>
+Cc: qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>, Eric Blake <eblake@redhat.com>, Changlong Xie <xiecl.fnst@cn.fujitsu.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, "eddie . dong" <eddie.dong@intel.com>, Wen Congyang <wencongyang@gmail.com>, Bian Naimeng <biannm@cn.fujitsu.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>
 
-This patch contains two parts:
 
-One is to add a new API to mm go get the unused page information.
-The virtio balloon driver will use this new API added to get the
-unused page info and send it to hypervisor(QEMU) to speed up live
-migration. During sending the bitmap, some the pages may be modified
-and are used by the guest, this inaccuracy can be corrected by the
-dirty page logging mechanism.
 
-One is to add support the request for vm's unused page information,
-QEMU can make use of unused page information and the dirty page
-logging mechanism to skip the transportation of some of these unused
-pages, this is very helpful to reduce the network traffic and speed
-up the live migration process.
+On 12/21/2016 08:18 AM, Stefano Stabellini wrote:
+> On Fri, 16 Dec 2016, Zhang Chen wrote:
+>> We can call this qmp command to do checkpoint outside of qemu.
+>> Like Xen colo need this function.
+>>
+>> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+>> Signed-off-by: Wen Congyang <wencongyang@gmail.com>
+>> ---
+>>   docs/qmp-commands.txt | 24 ++++++++++++++++++++++++
+>>   migration/colo.c      | 10 ++++++++++
+>>   qapi-schema.json      | 22 ++++++++++++++++++++++
+>>   3 files changed, 56 insertions(+)
+>>
+>> diff --git a/docs/qmp-commands.txt b/docs/qmp-commands.txt
+>> index a8e9eb6..093b7eb 100644
+>> --- a/docs/qmp-commands.txt
+>> +++ b/docs/qmp-commands.txt
+>> @@ -450,6 +450,30 @@ Example:
+>>        "arguments": {"enable": true, "primary": false} }
+>>   <- { "return": {} }
+>>   
+>> +xen-get-replication-error
+>> +-------------------------
+>> +
+>> +Get replication error that occurs when vm is running.
+>> +
+>> +Arguments: None.
+>> +
+>> +Example:
+>> +
+>> +-> { "execute": "xen-get-replication-error" }
+>> +<- { "return": {} }
+>> +
+>> +xen-do-checkpoint
+>> +-----------------
+>> +
+>> +Do checkpoint.
+>> +
+>> +Arguments: None.
+>> +
+>> +Example:
+>> +
+>> +-> { "execute": "xen-do-checkpoint" }
+>> +<- { "return": {} }
+> I don't know much about QMP, but shouldn't these two functions return a
+> success or failure at least? Especially xen-get-replication-error? How
+> does xen-get-replication-error actually return the error?
+>
+> Please also write this info on the description of the commands
+> (docs/qmp-commands.txt, qapi-schema.json).
+>
 
-Signed-off-by: Liang Li <liang.z.li@intel.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>
-Cc: Mel Gorman <mgorman@techsingularity.net>
-Cc: Michael S. Tsirkin <mst@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Cornelia Huck <cornelia.huck@de.ibm.com>
-Cc: Amit Shah <amit.shah@redhat.com>
-Cc: Dave Hansen <dave.hansen@intel.com>
-Cc: Andrea Arcangeli <aarcange@redhat.com>
-Cc: David Hildenbrand <david@redhat.com>
----
- drivers/virtio/virtio_balloon.c | 144 ++++++++++++++++++++++++++++++++++++++--
- include/linux/mm.h              |   3 +
- mm/page_alloc.c                 | 120 +++++++++++++++++++++++++++++++++
- 3 files changed, 261 insertions(+), 6 deletions(-)
+OK, I will add more description of the commands in next version.
 
-diff --git a/drivers/virtio/virtio_balloon.c b/drivers/virtio/virtio_balloon.c
-index 03383b3..b67f865 100644
---- a/drivers/virtio/virtio_balloon.c
-+++ b/drivers/virtio/virtio_balloon.c
-@@ -56,7 +56,7 @@
- 
- struct virtio_balloon {
- 	struct virtio_device *vdev;
--	struct virtqueue *inflate_vq, *deflate_vq, *stats_vq;
-+	struct virtqueue *inflate_vq, *deflate_vq, *stats_vq, *req_vq;
- 
- 	/* The balloon servicing is delegated to a freezable workqueue. */
- 	struct work_struct update_balloon_stats_work;
-@@ -85,6 +85,8 @@ struct virtio_balloon {
- 	unsigned int nr_page_bmap;
- 	/* Used to record the processed pfn range */
- 	unsigned long min_pfn, max_pfn, start_pfn, end_pfn;
-+	/* Request header */
-+	struct virtio_balloon_req_hdr req_hdr;
- 	/*
- 	 * The pages we've told the Host we're not using are enqueued
- 	 * at vb_dev_info->pages list.
-@@ -505,6 +507,80 @@ static void update_balloon_stats(struct virtio_balloon *vb)
- 				pages_to_bytes(available));
- }
- 
-+static void __send_unused_pages(struct virtio_balloon *vb,
-+	unsigned long req_id, unsigned int pos, bool done)
-+{
-+	struct virtio_balloon_resp_hdr *hdr = vb->resp_hdr;
-+	struct virtqueue *vq = vb->req_vq;
-+
-+	vb->resp_pos = pos;
-+	hdr->cmd = BALLOON_GET_UNUSED_PAGES;
-+	hdr->id = req_id;
-+	if (!done)
-+		hdr->flag = BALLOON_FLAG_CONT;
-+	else
-+		hdr->flag = BALLOON_FLAG_DONE;
-+
-+	if (pos > 0 || done)
-+		send_resp_data(vb, vq, true);
-+
-+}
-+
-+static void send_unused_pages(struct virtio_balloon *vb,
-+				unsigned long req_id)
-+{
-+	struct scatterlist sg_in;
-+	unsigned int pos = 0;
-+	struct virtqueue *vq = vb->req_vq;
-+	int ret, order;
-+	struct zone *zone = NULL;
-+	bool part_fill = false;
-+
-+	mutex_lock(&vb->balloon_lock);
-+
-+	for (order = MAX_ORDER - 1; order >= 0; order--) {
-+		ret = mark_unused_pages(&zone, order, vb->resp_data,
-+			 vb->resp_buf_size / sizeof(__le64),
-+			 &pos, VIRTIO_BALLOON_NR_PFN_BITS, part_fill);
-+		if (ret == -ENOSPC) {
-+			if (pos == 0) {
-+				void *new_resp_data;
-+
-+				new_resp_data = kmalloc(2 * vb->resp_buf_size,
-+							GFP_KERNEL);
-+				if (new_resp_data) {
-+					kfree(vb->resp_data);
-+					vb->resp_data = new_resp_data;
-+					vb->resp_buf_size *= 2;
-+				} else {
-+					part_fill = true;
-+					dev_warn(&vb->vdev->dev,
-+						 "%s: part fill order: %d\n",
-+						 __func__, order);
-+				}
-+			} else {
-+				__send_unused_pages(vb, req_id, pos, false);
-+				pos = 0;
-+			}
-+
-+			if (!part_fill) {
-+				order++;
-+				continue;
-+			}
-+		} else
-+			zone = NULL;
-+
-+		if (order == 0)
-+			__send_unused_pages(vb, req_id, pos, true);
-+
-+	}
-+
-+	mutex_unlock(&vb->balloon_lock);
-+	sg_init_one(&sg_in, &vb->req_hdr, sizeof(vb->req_hdr));
-+	virtqueue_add_inbuf(vq, &sg_in, 1, &vb->req_hdr, GFP_KERNEL);
-+	virtqueue_kick(vq);
-+}
-+
- /*
-  * While most virtqueues communicate guest-initiated requests to the hypervisor,
-  * the stats queue operates in reverse.  The driver initializes the virtqueue
-@@ -639,11 +715,38 @@ static void update_balloon_size_func(struct work_struct *work)
- 		queue_work(system_freezable_wq, work);
- }
- 
-+static void misc_handle_rq(struct virtio_balloon *vb)
-+{
-+	struct virtio_balloon_req_hdr *ptr_hdr;
-+	unsigned int len;
-+
-+	ptr_hdr = virtqueue_get_buf(vb->req_vq, &len);
-+	if (!ptr_hdr || len != sizeof(vb->req_hdr))
-+		return;
-+
-+	switch (ptr_hdr->cmd) {
-+	case BALLOON_GET_UNUSED_PAGES:
-+		send_unused_pages(vb, ptr_hdr->param);
-+		break;
-+	default:
-+		break;
-+	}
-+}
-+
-+static void misc_request(struct virtqueue *vq)
-+{
-+	struct virtio_balloon *vb = vq->vdev->priv;
-+
-+	misc_handle_rq(vb);
-+}
-+
- static int init_vqs(struct virtio_balloon *vb)
- {
--	struct virtqueue *vqs[3];
--	vq_callback_t *callbacks[] = { balloon_ack, balloon_ack, stats_request };
--	static const char * const names[] = { "inflate", "deflate", "stats" };
-+	struct virtqueue *vqs[4];
-+	vq_callback_t *callbacks[] = { balloon_ack, balloon_ack,
-+					 stats_request, misc_request };
-+	static const char * const names[] = { "inflate", "deflate", "stats",
-+						 "misc" };
- 	int err, nvqs;
- 
- 	/*
-@@ -651,6 +754,18 @@ static int init_vqs(struct virtio_balloon *vb)
- 	 * optionally stat.
- 	 */
- 	nvqs = virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_STATS_VQ) ? 3 : 2;
-+	if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_HOST_REQ_VQ))
-+		nvqs = 4;
-+	else if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_STATS_VQ))
-+		nvqs = 3;
-+	else
-+		nvqs = 2;
-+
-+	if (!virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_STATS_VQ)) {
-+		__virtio_clear_bit(vb->vdev, VIRTIO_BALLOON_F_PAGE_RANGE);
-+		__virtio_clear_bit(vb->vdev, VIRTIO_BALLOON_F_HOST_REQ_VQ);
-+	}
-+
- 	err = vb->vdev->config->find_vqs(vb->vdev, nvqs, vqs, callbacks, names);
- 	if (err)
- 		return err;
-@@ -671,6 +786,18 @@ static int init_vqs(struct virtio_balloon *vb)
- 			BUG();
- 		virtqueue_kick(vb->stats_vq);
- 	}
-+	if (virtio_has_feature(vb->vdev, VIRTIO_BALLOON_F_HOST_REQ_VQ)) {
-+		struct scatterlist sg_in;
-+
-+		vb->req_vq = vqs[3];
-+		sg_init_one(&sg_in, &vb->req_hdr, sizeof(vb->req_hdr));
-+		if (virtqueue_add_inbuf(vb->req_vq, &sg_in, 1,
-+		    &vb->req_hdr, GFP_KERNEL) < 0)
-+			__virtio_clear_bit(vb->vdev,
-+					VIRTIO_BALLOON_F_HOST_REQ_VQ);
-+		else
-+			virtqueue_kick(vb->req_vq);
-+	}
- 	return 0;
- }
- 
-@@ -802,12 +929,14 @@ static int virtballoon_probe(struct virtio_device *vdev)
- 	vb->resp_hdr = kzalloc(sizeof(struct virtio_balloon_resp_hdr),
- 				 GFP_KERNEL);
- 	/* Clear the feature bit if memory allocation fails */
--	if (!vb->resp_hdr)
-+	if (!vb->resp_hdr) {
- 		__virtio_clear_bit(vdev, VIRTIO_BALLOON_F_PAGE_RANGE);
--	else {
-+		__virtio_clear_bit(vdev, VIRTIO_BALLOON_F_HOST_REQ_VQ);
-+	} else {
- 		vb->page_bitmap[0] = kmalloc(BALLOON_BMAP_SIZE, GFP_KERNEL);
- 		if (!vb->page_bitmap[0]) {
- 			__virtio_clear_bit(vdev, VIRTIO_BALLOON_F_PAGE_RANGE);
-+			__virtio_clear_bit(vdev, VIRTIO_BALLOON_F_HOST_REQ_VQ);
- 			kfree(vb->resp_hdr);
- 		} else {
- 			vb->nr_page_bmap = 1;
-@@ -815,6 +944,8 @@ static int virtballoon_probe(struct virtio_device *vdev)
- 			if (!vb->resp_data) {
- 				__virtio_clear_bit(vdev,
- 						VIRTIO_BALLOON_F_PAGE_RANGE);
-+				__virtio_clear_bit(vdev,
-+						VIRTIO_BALLOON_F_HOST_REQ_VQ);
- 				kfree(vb->page_bitmap[0]);
- 				kfree(vb->resp_hdr);
- 			}
-@@ -941,6 +1072,7 @@ static int virtballoon_restore(struct virtio_device *vdev)
- 	VIRTIO_BALLOON_F_STATS_VQ,
- 	VIRTIO_BALLOON_F_DEFLATE_ON_OOM,
- 	VIRTIO_BALLOON_F_PAGE_RANGE,
-+	VIRTIO_BALLOON_F_HOST_REQ_VQ,
- };
- 
- static struct virtio_driver virtio_balloon_driver = {
-diff --git a/include/linux/mm.h b/include/linux/mm.h
-index 4424784..a80b8f3 100644
---- a/include/linux/mm.h
-+++ b/include/linux/mm.h
-@@ -1762,6 +1762,9 @@ static inline spinlock_t *pmd_lock(struct mm_struct *mm, pmd_t *pmd)
- extern void free_area_init_node(int nid, unsigned long * zones_size,
- 		unsigned long zone_start_pfn, unsigned long *zholes_size);
- extern void free_initmem(void);
-+extern int mark_unused_pages(struct zone **start_zone, int order,
-+		__le64 *pages, unsigned int size, unsigned int *pos,
-+		u8 len_bits, bool part_fill);
- 
- /*
-  * Free reserved pages within range [PAGE_ALIGN(start), end & PAGE_MASK)
-diff --git a/mm/page_alloc.c b/mm/page_alloc.c
-index 2c6d5f6..de0e7a4 100644
---- a/mm/page_alloc.c
-+++ b/mm/page_alloc.c
-@@ -4479,6 +4479,126 @@ void show_free_areas(unsigned int filter)
- 	show_swap_cache_info();
- }
- 
-+static int  __mark_unused_pages(struct zone *zone, int order,
-+		__le64 *pages, unsigned int size, unsigned int *pos,
-+		u8 len_bits, bool part_fill)
-+{
-+	unsigned long pfn, flags;
-+	int t, ret = 0;
-+	struct list_head *curr;
-+	__le64 *range;
-+
-+	if (zone_is_empty(zone))
-+		return 0;
-+
-+	spin_lock_irqsave(&zone->lock, flags);
-+
-+	if (*pos + zone->free_area[order].nr_free > size && !part_fill) {
-+		ret = -ENOSPC;
-+		goto out;
-+	}
-+	for (t = 0; t < MIGRATE_TYPES; t++) {
-+		list_for_each(curr, &zone->free_area[order].free_list[t]) {
-+			pfn = page_to_pfn(list_entry(curr, struct page, lru));
-+			range = pages + *pos;
-+			if (order < len_bits) {
-+				if (*pos + 1 > size) {
-+					ret = -ENOSPC;
-+					goto out;
-+				}
-+				*range = cpu_to_le64((pfn << len_bits)
-+							| 1 << order);
-+				*pos += 1;
-+			} else {
-+				if (*pos + 2 > size) {
-+					ret = -ENOSPC;
-+					goto out;
-+				}
-+				*range = cpu_to_le64((pfn << len_bits) | 0);
-+				*(range + 1) = cpu_to_le64(1 << order);
-+				*pos += 2;
-+			}
-+		}
-+	}
-+
-+out:
-+	spin_unlock_irqrestore(&zone->lock, flags);
-+
-+	return ret;
-+}
-+
-+/*
-+ * During live migration, page is discardable unless it's content
-+ * is needed by the system.
-+ * mark_unused_pages provides an API to mark the unused pages, these
-+ * unused pages can be discarded if there is no modification since
-+ * the request. Some other mechanism, like the dirty page logging
-+ * can be used to track the modification.
-+ *
-+ * This function scans the free page list to mark the unused pages
-+ * with the specified order, and set the corresponding range element
-+ * in the array 'pages' if unused pages are found for the specified
-+ * order.
-+ *
-+ * @start_zone: zone to start the mark operation.
-+ * @order: page order to mark.
-+ * @pages: array to save the unused page info.
-+ * @size: size of array pages.
-+ * @pos: offset in the array to save the page info.
-+ * @len_bits: bits for the length field of the range.
-+ * @part_fill: indicate if partial fill is used.
-+ *
-+ * return -EINVAL if parameter is invalid
-+ * return -ENOSPC when bitmap can't contain the pages
-+ * return 0 when sccess
-+ */
-+int mark_unused_pages(struct zone **start_zone, int order,
-+	__le64 *pages, unsigned int size, unsigned int *pos,
-+	u8 len_bits, bool part_fill)
-+{
-+	struct zone *zone;
-+	int ret = 0;
-+	bool skip_check = false;
-+
-+	/* make sure all the parameters are valid */
-+	if (pages == NULL || pos == NULL || *pos < 0
-+		|| order >= MAX_ORDER || len_bits > 64)
-+		return -EINVAL;
-+	if (*start_zone != NULL) {
-+		bool found = false;
-+
-+		for_each_populated_zone(zone) {
-+			if (zone != *start_zone)
-+				continue;
-+			found = true;
-+			break;
-+		}
-+		if (!found)
-+			return -EINVAL;
-+	} else
-+		skip_check = true;
-+
-+	for_each_populated_zone(zone) {
-+		/* Start from *start_zone if it's not NULL */
-+		if (!skip_check) {
-+			if (*start_zone != zone)
-+				continue;
-+			else
-+				skip_check = true;
-+		}
-+		ret = __mark_unused_pages(zone, order, pages, size,
-+					pos, len_bits, part_fill);
-+		if (ret < 0) {
-+			/* record the failed zone */
-+			*start_zone = zone;
-+			break;
-+		}
-+	}
-+
-+	return ret;
-+}
-+EXPORT_SYMBOL(mark_unused_pages);
-+
- static void zoneref_set_zone(struct zone *zone, struct zoneref *zoneref)
- {
- 	zoneref->zone = zone;
+Thanks
+Zhang Chen
+
+>>   migrate
+>>   -------
+>>   
+>> diff --git a/migration/colo.c b/migration/colo.c
+>> index 6fc2ade..1e962f6 100644
+>> --- a/migration/colo.c
+>> +++ b/migration/colo.c
+>> @@ -127,6 +127,16 @@ void qmp_xen_set_replication(bool enable, bool primary,
+>>       }
+>>   }
+>>   
+>> +void qmp_xen_get_replication_error(Error **errp)
+>> +    {
+>> +        replication_get_error_all(errp);
+>> +    }
+>> +
+>> +void qmp_xen_do_checkpoint(Error **errp)
+>> +    {
+>> +        replication_do_checkpoint_all(errp);
+>> +    }
+>> +
+>>   static void colo_send_message(QEMUFile *f, COLOMessage msg,
+>>                                 Error **errp)
+>>   {
+>> diff --git a/qapi-schema.json b/qapi-schema.json
+>> index 78802f4..79fe4dd 100644
+>> --- a/qapi-schema.json
+>> +++ b/qapi-schema.json
+>> @@ -4695,6 +4695,28 @@
+>>     'data': { 'enable': 'bool', 'primary': 'bool', '*failover' : 'bool' } }
+>>   
+>>   ##
+>> +# @xen-get-replication-error
+>> +#
+>> +# Get replication error that occurs when the vm is running.
+>> +#
+>> +# Returns: nothing.
+>> +#
+>> +# Since: 2.9
+>> +##
+>> +{ 'command': 'xen-get-replication-error' }
+>> +
+>> +##
+>> +# @xen-do-checkpoint
+>> +#
+>> +# Do checkpoint.
+>> +#
+>> +# Returns: nothing.
+>> +#
+>> +# Since: 2.9
+>> +##
+>> +{ 'command': 'xen-do-checkpoint' }
+>> +
+>> +##
+>>   # @GICCapability:
+>>   #
+>>   # The struct describes capability for a specific GIC (Generic
+>> -- 
+>> 2.7.4
+>>
+>>
+>>
+>>
+>
+> .
+>
+
 -- 
-1.9.1
+Thanks
+Zhang Chen
