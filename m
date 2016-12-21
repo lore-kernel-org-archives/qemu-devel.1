@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47337)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48604)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cJlAC-0002lU-F3
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 12:58:53 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1cJlDN-0005Ad-Dr
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 13:02:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cJlA9-0006tG-AZ
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 12:58:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44820)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cJlA9-0006sL-4O
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 12:58:49 -0500
-References: <20161216152319.12494-1-leif.lindholm@linaro.org>
-	<20161221115102.251224b8@nial.brq.redhat.com>
-	<20161221123509.GC16872@bivouac.eciton.net>
-	<20161221145934.219d73fd@nial.brq.redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d0a8813e-1407-f6a7-a70e-387071aed93a@redhat.com>
-Date: Wed, 21 Dec 2016 18:58:44 +0100
+	(envelope-from <ehabkost@redhat.com>) id 1cJlDH-0008OJ-Og
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 13:02:09 -0500
+Date: Wed, 21 Dec 2016 16:01:55 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20161221180155.GI3808@thinpad.lan.raisama.net>
+References: <20161201170624.26496-1-lersek@redhat.com>
+	<148227487620.73.10055858460424473693@790289a7ca88>
+	<20161221152226.GH3808@thinpad.lan.raisama.net>
+	<70b42a58-381d-7011-7eef-2120af178f91@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20161221145934.219d73fd@nial.brq.redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] smbios: stop ignoring command line options
- for TARGET_ARM
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <70b42a58-381d-7011-7eef-2120af178f91@redhat.com>
+Subject: Re: [Qemu-devel] checkpatch.pl false positive (was Re: [PATCH v4
+ 0/7] q35: add negotiable broadcast SMI)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,43 +26,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, Leif Lindholm <leif.lindholm@linaro.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, famz@redhat.com, mst@redhat.com, somlo@cmu.edu, Markus Armbruster <armbru@redhat.com>, michael@walle.cc, qemu-arm@nongnu.org, kraxel@redhat.com, zhaoshenglong@huawei.com, lersek@redhat.com, imammedo@redhat.com
 
-
-
-On 21/12/2016 14:59, Igor Mammedov wrote:
->> Apparently a misunderstanding of the underlying command line handling
->> mechanics.
->>
->>> Also this patch would break build for targets that don't link smbios.c
->>> (i.e. which don't have CONFIG_SMBIOS=y)  
->> 
->> Ah, I hadn't spotted that - apologies.
+On Wed, Dec 21, 2016 at 06:47:01PM +0100, Paolo Bonzini wrote:
 > 
-> Just do 1 build for all targets before posting patches to avoid
-> such kind of errors.
 > 
->> So a simpler, and more correct fix would rather be to change the
->> #ifdef TARGET_I386
->> in arch_init.c to
->> #ifdef CONFIG_SMBIOS
+> On 21/12/2016 16:22, Eduardo Habkost wrote:
+> > On Tue, Dec 20, 2016 at 03:01:17PM -0800, no-reply@patchew.org wrote:
+> > [...]
+> >> Checking PATCH 4/7: hw/i386/pc: introduce 2.9 machine types with 0x20 fw_cfg file slots...
+> >> ERROR: Macros with multiple statements should be enclosed in a do - while loop
+> >> #126: FILE: include/hw/compat.h:4:
+> >> +#define HW_COMPAT_2_8 \
+> >> +    {\
+> >> +        .driver   = "fw_cfg_mem",\
+> >> +        .property = "file_slots",\
+> >> +        .value    = stringify(0x10),\
+> >> +    },{\
+> >> +        .driver   = "fw_cfg_io",\
+> >> +        .property = "file_slots",\
+> >> +        .value    = stringify(0x10),\
+> >> +    },
+> >>
+> >> total: 1 errors, 0 warnings, 119 lines checked
+> >>
+> >> Your patch has style problems, please review.  If any of these errors
+> >> are false positives report them to the maintainer, see
+> >> CHECKPATCH in MAINTAINERS.
+> > 
+> > It is a false positive, but how exactly can we fix it? Should it
+> > become a warning instead of an error?
 > 
-> it looks better to me than enumerating targets explicitly,
-> CCing Paolo for another opinion
+> It should already be treated as an exception:
+> 
+>                         my $exceptions = qr{
+>                                 $Declare|
+>                                 module_param_named|
+>                                 MODULE_PARAM_DESC|
+>                                 DECLARE_PER_CPU|
+>                                 DEFINE_PER_CPU|
+>                                 __typeof__\(|
+>                                 union|
+>                                 struct|
+>                                 \.$Ident\s*=\s*|       # <---- see here
+>                                 ^\"|\"$
+>                         }x;
+>                         #print "REST<$rest> dstat<$dstat> ctx<$ctx>\n";
+>                         if ($rest ne '' && $rest ne ',') {
+>                                 if ($rest !~ /while\s*\(/ &&
+>                                     $dstat !~ /$exceptions/)
+>                                 {
+>                                         ERROR("Macros with multiple statements should be enclosed in a do - while loop\n" . "$here\n$ctx\n");
+>                                 }
+> 
+> 
+> so I guess the first step is debugging it. :)
 
-I don't think CONFIG_SMBIOS is visible from C, is it?
+The following code replaces the whole "{ .driver = ... }" block
+with "1":
 
-However, the solution is to:
+	# Flatten any parentheses and braces
+	while ($dstat =~ s/\([^\(\)]*\)/1/ ||
+	       $dstat =~ s/\{[^\{\}]*\}/1/ ||
+	       $dstat =~ s/\[[^\{\}]*\]/1/)
+	{
+	}
 
-1) add a smbios-stub.c file to hw/smbios, containing a dummy
-implementation of smbios_entry_add.  For the Makefile magic see
-hw/pci/Makefile.objs.
+The following change fixes the bug, but I don't know if it has
+unwanted side-effects:
 
-2) add an Error * argument to smbios_entry_add, and make the stub
-version fail
+diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+index f084542..0aab3ac 100755
+--- a/scripts/checkpatch.pl
++++ b/scripts/checkpatch.pl
+@@ -2200,6 +2200,10 @@ sub process {
+                        $dstat =~ s/^\s*//s;
+                        $dstat =~ s/\s*$//s;
+ 
++                       # remove braces that cover the whole block, if any:
++                       $dstat =~ s/^\{//;
++                       $dstat =~ s/\}$//;
++
+                        # Flatten any parentheses and braces
+                        while ($dstat =~ s/\([^\(\)]*\)/1/ ||
+                               $dstat =~ s/\{[^\{\}]*\}/1/ ||
 
-3) remove do_smbios_option altogether, and make vl.c call
-smbios_entry_add directly.
 
-Paolo
+-- 
+Eduardo
