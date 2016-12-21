@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58693)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58689)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cJiIU-0003n3-CD
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cJiIU-0003mz-Ao
 	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 09:55:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cJiIR-0006hv-5B
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cJiIR-0006hS-1K
 	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 09:55:14 -0500
-Received: from mailhub.sw.ru ([195.214.232.25]:18716 helo=relay.sw.ru)
+Received: from mailhub.sw.ru ([195.214.232.25]:15632 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1cJiIQ-0006YV-J6
+	id 1cJiIQ-0006a4-Io
 	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 09:55:10 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 21 Dec 2016 17:54:50 +0300
-Message-Id: <1482332102-131788-13-git-send-email-vsementsov@virtuozzo.com>
+Date: Wed, 21 Dec 2016 17:54:53 +0300
+Message-Id: <1482332102-131788-16-git-send-email-vsementsov@virtuozzo.com>
 In-Reply-To: <1482332102-131788-1-git-send-email-vsementsov@virtuozzo.com>
 References: <1482332102-131788-1-git-send-email-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 12/24] block/dirty-bitmap: add
- bdrv_dirty_bitmap_next()
+Subject: [Qemu-devel] [PATCH 15/24] qcow2: add
+ .bdrv_can_store_new_dirty_bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,40 +28,87 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, vsementsov@virtuozzo.com, pbonzini@redhat.com
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
----
- block/dirty-bitmap.c         | 7 +++++++
- include/block/dirty-bitmap.h | 3 +++
- 2 files changed, 10 insertions(+)
+Realize .bdrv_can_store_new_dirty_bitmap interface.
 
-diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index 4d026df..fe34d48 100644
---- a/block/dirty-bitmap.c
-+++ b/block/dirty-bitmap.c
-@@ -582,3 +582,10 @@ bool bdrv_has_persistent_bitmaps(BlockDriverState *bs)
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ block/qcow2-bitmap.c | 40 ++++++++++++++++++++++++++++++++++++++++
+ block/qcow2.c        |  1 +
+ block/qcow2.h        |  4 ++++
+ 3 files changed, 45 insertions(+)
+
+diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
+index a2b857e..8b8f2d1 100644
+--- a/block/qcow2-bitmap.c
++++ b/block/qcow2-bitmap.c
+@@ -1192,3 +1192,43 @@ fail:
  
-     return false;
+     bitmap_list_free(bm_list);
  }
 +
-+BdrvDirtyBitmap *bdrv_dirty_bitmap_next(BlockDriverState *bs,
-+                                        BdrvDirtyBitmap *bitmap)
++bool qcow2_can_store_new_dirty_bitmap(BlockDriverState *bs,
++                                      const char *name,
++                                      uint32_t granularity,
++                                      Error **errp)
 +{
-+    return bitmap == NULL ? QLIST_FIRST(&bs->dirty_bitmaps) :
-+                            QLIST_NEXT(bitmap, list);
-+}
-diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
-index 8dbd16b..d71edc4 100644
---- a/include/block/dirty-bitmap.h
-+++ b/include/block/dirty-bitmap.h
-@@ -81,6 +81,9 @@ void bdrv_dirty_bitmap_set_persistance(BdrvDirtyBitmap *bitmap,
-                                                 bool persistent);
- bool bdrv_dirty_bitmap_get_persistance(BdrvDirtyBitmap *bitmap);
- 
-+BdrvDirtyBitmap *bdrv_dirty_bitmap_next(BlockDriverState *bs,
-+                                        BdrvDirtyBitmap *bitmap);
++    BDRVQcow2State *s = bs->opaque;
++    const char *reason = NULL;
++    bool found;
++    Qcow2BitmapList *bm_list;
 +
- bool bdrv_has_persistent_bitmaps(BlockDriverState *bs);
++    if (check_constraints_on_bitmap(bs, name, granularity) != 0) {
++        reason = "it doesn't satisfy the constraints";
++        goto common_errp;
++    }
++
++    if (s->nb_bitmaps == 0) {
++        return true;
++    }
++
++    bm_list = bitmap_list_load(bs, s->bitmap_directory_offset,
++                               s->bitmap_directory_size, errp);
++    if (bm_list == NULL) {
++        return false;
++    }
++
++    found = find_bitmap_by_name(bm_list, name);
++    bitmap_list_free(bm_list);
++    if (found) {
++        reason = "bitmap with the same name is already stored";
++        goto common_errp;
++    }
++
++    return true;
++
++common_errp:
++    error_setg(errp, "Can't make bitmap '%s' persistent in '%s', as %s.",
++               name, bdrv_get_device_or_node_name(bs), reason);
++    return false;
++}
+diff --git a/block/qcow2.c b/block/qcow2.c
+index af580d2..76a6a2b 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -3543,6 +3543,7 @@ BlockDriver bdrv_qcow2 = {
+ 
+     .bdrv_load_autoloading_dirty_bitmaps = qcow2_load_autoloading_dirty_bitmaps,
+     .bdrv_store_persistent_dirty_bitmaps = qcow2_store_persistent_dirty_bitmaps,
++    .bdrv_can_store_new_dirty_bitmap = qcow2_can_store_new_dirty_bitmap,
+ };
+ 
+ static void bdrv_qcow2_init(void)
+diff --git a/block/qcow2.h b/block/qcow2.h
+index d9a7643..749710d 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -616,5 +616,9 @@ void qcow2_cache_put(BlockDriverState *bs, Qcow2Cache *c, void **table);
+ /* qcow2-bitmap.c functions */
+ void qcow2_load_autoloading_dirty_bitmaps(BlockDriverState *bs, Error **errp);
+ void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp);
++bool qcow2_can_store_new_dirty_bitmap(BlockDriverState *bs,
++                                      const char *name,
++                                      uint32_t granularity,
++                                      Error **errp);
  
  #endif
 -- 
