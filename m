@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41399)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42081)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cJj1o-0005zz-Fn
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 10:42:05 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cJj6a-0002HR-Ep
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 10:47:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cJj1l-0001AC-CG
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 10:42:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50614)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cJj1l-00019w-7I
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 10:42:01 -0500
-References: <1482255793-19057-1-git-send-email-ehabkost@redhat.com>
-	<70e1f758-6f18-9821-b48e-bdebdfc0befc@redhat.com>
-	<20161221131438.GF3808@thinpad.lan.raisama.net>
-	<00508a0d-4279-298e-cbe2-217e7d2adab7@redhat.com>
-	<20161221141541.GG3808@thinpad.lan.raisama.net>
+	(envelope-from <pbonzini@redhat.com>) id 1cJj6Z-0002YD-Jf
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 10:47:00 -0500
+References: <20161220163139.12016-1-famz@redhat.com>
+	<20161220163139.12016-4-famz@redhat.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <72085b3e-9fe2-965d-fcbb-55f916c2642b@redhat.com>
-Date: Wed, 21 Dec 2016 16:41:02 +0100
+Message-ID: <405aa216-ab28-51e3-c81c-78a841605c01@redhat.com>
+Date: Wed, 21 Dec 2016 16:46:00 +0100
 MIME-Version: 1.0
-In-Reply-To: <20161221141541.GG3808@thinpad.lan.raisama.net>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <20161220163139.12016-4-famz@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC 0/7] Move accel, KVM, Xen,
- qtest files to accel/ subdir
+Subject: Re: [Qemu-devel] [PATCH 3/4] util: Add VFIO helper library
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,32 +23,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, Christoffer Dall <christoffer.dall@linaro.org>, Anthony Perard <anthony.perard@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xensource.com
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Karl Rister <krister@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, borntraeger@de.ibm.com, Stefan Hajnoczi <stefanha@redhat.com>
 
 
 
-On 21/12/2016 15:15, Eduardo Habkost wrote:
->>
->> ifeq ($(CONFIG_SOFTMMU),y)
->> obj-$(CONFIG_KVM) += kvm-all.c
->> obj-$(call lnot, $(CONFIG_KVM)) += kvm-stub.c
->> endif
->>
->> similar to what is done already in Makefile.objs?
-> I assume you mean:
-> 
->  ifeq ($(CONFIG_SOFTMMU),y)
->  obj-$(CONFIG_KVM) += kvm-all.c
->  endif
->  obj-$(call lnot, $(CONFIG_KVM)) += kvm-stub.c
-> 
-> Nothing really wrong, we can do that to avoid using libqemustub.
-> I was just trying to avoid a more complex rule involving
-> ifeq+lnot, and to avoid including accel/ in obj-y on the
-> non-softmmu case.
+On 20/12/2016 17:31, Fam Zheng wrote:
+> +    hbitmap_iter_init(&iter, s->free_chunks, 1);
+> +    if (contiguous) {
+> +        while (true) {
+> +            bool satisfy = true;
+> +            next = hbitmap_iter_next(&iter);
+> +            if (next < 0) {
+> +                return NULL;
+> +            }
+> +            for (i = 1; i < chunks; i++) {
+> +                if (!hbitmap_get(s->free_chunks, next + i)) {
+> +                    satisfy = false;
+> +                    break;
+> +                }
+> +            }
+> +            if (satisfy) {
+> +                break;
+> +            }
+> +        }
+> +        hbitmap_reset(s->free_chunks, next, chunks);
+> +        r = g_new(IOVARange, 1);
+> +        r->iova = next * pages_per_chunk * getpagesize();
+> +        r->nr_pages = pages;
+> +        QSIMPLEQ_INSERT_TAIL(&m.iova_list, r, next);
+> +    } else {
+> +        next = hbitmap_iter_next(&iter);
+> +        while (pages) {
+> +            uint64_t chunk;
+> +            if (next < 0) {
+> +                hbitmap_iter_init(&iter, s->free_chunks, 1);
+> +                next = hbitmap_iter_next(&iter);
+> +            }
+> +            assert(next >= 0);
+> +            chunk = next;
+> +            DPRINTF("using chunk %ld\n", chunk);
+> +            next = hbitmap_iter_next(&iter);
+> +            hbitmap_reset(s->free_chunks, chunk, 1);
+> +            if (r && r->iova + r->nr_pages == chunk * pages_per_chunk) {
+> +                r->nr_pages += MIN(pages, pages_per_chunk);
+> +            } else {
+> +                r = g_new(IOVARange, 1);
+> +                r->iova = chunk * pages_per_chunk * getpagesize();
+> +                r->nr_pages = MIN(pages, pages_per_chunk);
+> +                QSIMPLEQ_INSERT_TAIL(&m.iova_list, r, next);
+> +            }
+> +            pages -= MIN(pages, pages_per_chunk);
+> +        }
 
-TCG would need accel/ in obj-y in the non-softmmu case, for things such
-as cpu-exec.c and translate-all.c.
+I'm not sure HBitmap tracking is useful.  If we exhaust the IOVA space,
+we can just throw everything away with a single VFIO_IOMMU_UNMAP_DMA.
+Then replay the RAMBlockNotifier mappings (we need to add this anyway
+for hotplug support) and keep on mapping lazily whatever comes later.
+
+Thanks,
 
 Paolo
