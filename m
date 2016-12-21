@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42471)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52803)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1cJcW3-0001Sx-Mz
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 03:44:52 -0500
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1cJcyL-00060X-AK
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 04:14:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1cJcW0-0001PY-L4
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 03:44:51 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49530)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1cJcW0-0001PF-Eq
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 03:44:48 -0500
-References: <1482255793-19057-1-git-send-email-ehabkost@redhat.com>
-	<1482255793-19057-5-git-send-email-ehabkost@redhat.com>
-	<584d77b6-f7dc-4a96-d7ee-fe8cba9cedea@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <8ed18bc4-00f5-3553-edd0-5f1ac3293b41@redhat.com>
-Date: Wed, 21 Dec 2016 09:44:44 +0100
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1cJcyG-0004CZ-Bt
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 04:14:05 -0500
+Received: from [59.151.112.132] (port=60139 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1cJcyF-0004CA-TG
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 04:14:00 -0500
+References: <1482137486-9843-1-git-send-email-douly.fnst@cn.fujitsu.com>
+	<20161219150230.GA20757@stefanha-x1.localdomain>
+	<20161219163214.GA9801@lemon>
+	<20161220093938.GB5602@stefanha-x1.localdomain>
+From: Dou Liyang <douly.fnst@cn.fujitsu.com>
+Message-ID: <d6502c6d-616c-66dc-9c49-0fff7f1ee28c@cn.fujitsu.com>
+Date: Wed, 21 Dec 2016 17:13:39 +0800
 MIME-Version: 1.0
-In-Reply-To: <584d77b6-f7dc-4a96-d7ee-fe8cba9cedea@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20161220093938.GB5602@stefanha-x1.localdomain>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC 4/7] kvm: Include kvm-stub.o only on
- CONFIG_SOFTMMU
+Subject: Re: [Qemu-devel] [PATCH RFC v2 0/4] block/qapi: refactor and
+ optimize the qmp_query_blockstats()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,28 +30,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+To: Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, kwolf@redhat.com, armbru@redhat.com, mreitz@redhat.com, eblake@redhat.com, izumi.taku@jp.fujitsu.com, caoj.fnst@cn.fujitsu.com, fanc.fnst@cn.fujitsu.com, qemu-devel@nongnu.org
 
+Hi Stefan,
 
->>  obj-$(CONFIG_LIBDECNUMBER) += libdecnumber/decContext.o
->>  obj-$(CONFIG_LIBDECNUMBER) += libdecnumber/decNumber.o
->> @@ -138,6 +137,7 @@ obj-y += arch_init.o cpus.o monitor.o gdbstub.o balloon.o ioport.o numa.o
->>  obj-y += qtest.o bootdevice.o
->>  obj-y += hw/
->>  obj-$(CONFIG_KVM) += kvm-all.o
->> +obj-$(call lnot,$(CONFIG_KVM)) += kvm-stub.o
->>  obj-y += memory.o cputlb.o
->>  obj-y += memory_mapping.o
->>  obj-y += dump.o
+At 12/20/2016 05:39 PM, Stefan Hajnoczi wrote:
+> On Tue, Dec 20, 2016 at 12:32:40AM +0800, Fam Zheng wrote:
+>> On Mon, 12/19 15:02, Stefan Hajnoczi wrote:
+>>> On Mon, Dec 19, 2016 at 04:51:22PM +0800, Dou Liyang wrote:
+>>>> These patches aim to refactor the qmp_query_blockstats() and
+>>>> improve the performance by reducing the running time of it.
+>>>>
+>>>> qmp_query_blockstats() is used to monitor the blockstats, it
+>>>> querys all the graph_bdrv_states or monitor_block_backends.
+>>>>
+>>>> There are the two jobs:
+>>>>
+>>>> 1 For the performance:
+>>>>
+>>>> 1.1 the time it takes(ns) in each time:
+>>>> the disk numbers     | 10    | 500
+>>>> -------------------------------------
+>>>> before these patches | 19429 | 667722
+>>>> after these patches  | 17516 | 557044
+>>>>
+>>>> 1.2 the I/O performance is degraded(%) during the monitor:
+>>>>
+>>>> the disk numbers     | 10    | 500
+>>>> -------------------------------------
+>>>> before these patches | 1.3   | 14.2
+>>>> after these patches  | 0.8   | 9.1
+>>>
+>>> Do you know what is consuming the remaining 9.1%?
+>>>
+>>> I'm surprised to see such a high performance impact caused by a QMP
+>>> command.
+>>
+>> If it's "performance is 9.1% worse only during the 557044 ns when the QMP
+>> command is being processed", it's probably becaues the main loop is stalled a
+>> bit, and it's not a big problem. I'd be very surprised if the degradation is
+>> more longer than that.
 >
-> <bikeshedding>
-> IMHO you could also squash this change into the next patch (and just
-> mention it in the commit description).
-> </bikeshedding>
+> It would be interesting to compare against virtio-blk dataplane.  That
+> way the QMP command can execute without interfering with disk I/O activity.
+>
+> qemu-system-x86_64 ... \
+>     -object iothread,id=iothread0 \
+>     -drive if=none,id=drive0,file=vm.img,format=raw,aio=native,cache=none \
+>     -device virtio-blk-pci,drive=drive0,iothread=iothread0
 
-+1
+Here is the result in the guest with 500 disks:
 
--- 
+QMP command     | not execute | execute in each 0.5s |
+-------------------------------------------------------
+Average Times/s | 102.34675   | 103.128              |
 
-David
+the degradation is 0.76%, that can be ignored.
+
+the dd command:
+dd if=date_1.dat of=date_2.dat conv=fsync oflag=direct bs=1k count=400k
+
+
+Thanks,
+
+   Liyang.
