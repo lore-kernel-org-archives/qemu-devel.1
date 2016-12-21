@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41154)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41878)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1cJcPv-00064J-GV
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 03:38:32 -0500
+	(envelope-from <david@redhat.com>) id 1cJcTP-0007T2-K6
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 03:42:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1cJcPs-0007H7-Ec
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 03:38:31 -0500
-Message-ID: <1482309497.3732.30.camel@redhat.com>
-From: Andrea Bolognani <abologna@redhat.com>
-Date: Wed, 21 Dec 2016 09:38:17 +0100
-In-Reply-To: <20161221045245.GE13024@umbus.fritz.box>
-References: <20161215061128.30792-1-david@gibson.dropbear.id.au>
-	<1482160529.3732.2.camel@redhat.com>
-	<20161219234717.GG23176@umbus.fritz.box>
-	<1482225561.3732.12.camel@redhat.com>
-	<20161221045245.GE13024@umbus.fritz.box>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCHv3 for-2.9 0/6] HPT resizing for
- pseries guests (qemu part)
+	(envelope-from <david@redhat.com>) id 1cJcTM-0000Bc-I8
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 03:42:07 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48592)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1cJcTM-0000BO-C1
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 03:42:04 -0500
+References: <1482255793-19057-1-git-send-email-ehabkost@redhat.com>
+	<1482255793-19057-4-git-send-email-ehabkost@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <7452fc0c-805c-d644-1e28-4c32bd430e5f@redhat.com>
+Date: Wed, 21 Dec 2016 09:42:00 +0100
+MIME-Version: 1.0
+In-Reply-To: <1482255793-19057-4-git-send-email-ehabkost@redhat.com>
+Content-Type: text/plain; charset=iso-8859-15; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC 3/7] kvm: Move some kvm-stub.c code to
+ stubs/kvm.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,51 +28,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: paulus@samba.org, sjitindarsingh@gmail.com, lvivier@redhat.com, thuth@redhat.com, mdroth@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, Christoffer Dall <christoffer.dall@linaro.org>
 
-On Wed, 2016-12-21 at 15:52 +1100, David Gibson wrote:
-> > > I'm not sure if we need a knob.=C2=A0=C2=A0I think in general enabl=
-ing for
-> > > pseries-2.9 and later machine types is correct.=C2=A0=C2=A0The diff=
-iculty is
-> > > that for HV guests, we can only enable it if the host kernel also h=
-as
-> > > support.=C2=A0=C2=A0Explicitly setting "resize-hpt=3Denable" means =
-qemu will not
-> > > start if the kernel doesn't support it.
-> >=C2=A0
-> > I thought that would be the case for resize-hpt=3Drequired,
-> > not resized-hpt=3Denabled.
->=C2=A0
-> resize-hpt=3Denabled requires the host to support resizing, but not the
-> guest.=C2=A0=C2=A0resize-hpt=3Drequired requires both the host and the =
-guest to
-> support resizing.
->=C2=A0
-> If you can think of a less ambiguous word for it, let me know.
+Am 20.12.2016 um 18:43 schrieb Eduardo Habkost:
+> Move the kvm-stub.c code that doesn't depend on cpu.h or CONFIG_*
+> defines to stubs/kvm.c.
+>
+> Notes about copyright, licensing, and authorship:
+>
+> * There was no copyright not on the original stubs/kvm.c file.
+> * As include/sysemu/kvm.h and kvm-all.c are licensed as
+>   GPLv2+, I am assuming stubs/kvm.c file is also licensed as
+>   GPLv2+.
+> * I have copied the copyright info from kvm-stub.c and added the
+>   original author of stubs/kvm.c (Christoffer Dall) to the author
+>   list.
+>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: kvm@vger.kernel.org
+> Cc: Christoffer Dall <christoffer.dall@linaro.org>
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 
-The name makes sense, we just need to document the host
-kernel requirement properly. The error message should of
-course mention it as well.
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
-> > Moreover, do you foresee any situation in which users
-> > might reasonably want to turn the feature off even though
-> > the entire stack (host kernel, QEMU, guest kernel)
-> > understands it?
->=C2=A0
-> Nothing clearly compelling.=C2=A0=C2=A0In the nearish term, being able =
-to turn
-> it off to isolate possible bugs could be useful of course.=C2=A0=C2=A0I=
-t's also
-> possible that you could have a VM where the latency of each resize
-> could be too much downtime - although in that case I doubt you'd want
-> to hotplug memory anyway.
+Guess we have to wait for an ack of paolo and christoffer.
 
-It seems like the use case would be fairly narrow, if it
-existed at all. Given that, I think we should avoid adding
-yet another knob to libvirt until its value can be
-unquestionably proven.
+-- 
 
---=C2=A0
-Andrea Bolognani / Red Hat / Virtualization
+David
