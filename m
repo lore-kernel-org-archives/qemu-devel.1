@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58696)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58703)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cJiIU-0003n6-CU
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cJiIU-0003n7-DH
 	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 09:55:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cJiIR-0006iC-4v
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cJiIR-0006ht-3y
 	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 09:55:14 -0500
-Received: from mailhub.sw.ru ([195.214.232.25]:9416 helo=relay.sw.ru)
+Received: from mailhub.sw.ru ([195.214.232.25]:40404 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1cJiIQ-0006aD-Iy
+	id 1cJiIQ-0006YJ-JA
 	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 09:55:10 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 21 Dec 2016 17:54:48 +0300
-Message-Id: <1482332102-131788-11-git-send-email-vsementsov@virtuozzo.com>
+Date: Wed, 21 Dec 2016 17:54:39 +0300
+Message-Id: <1482332102-131788-2-git-send-email-vsementsov@virtuozzo.com>
 In-Reply-To: <1482332102-131788-1-git-send-email-vsementsov@virtuozzo.com>
 References: <1482332102-131788-1-git-send-email-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 10/24] block/dirty-bitmap: add autoload field
- to BdrvDirtyBitmap
+Subject: [Qemu-devel] [PATCH 01/24] specs/qcow2: fix bitmap granularity
+ qemu-specific note
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,86 +28,25 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, eblake@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, vsementsov@virtuozzo.com, pbonzini@redhat.com
 
-Mirror AUTO flag from Qcow2 bitmap in BdrvDirtyBitmap. This will be
-needed in future, to save this flag back to Qcow2 for persistent
-bitmaps.
-
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
 ---
- block/dirty-bitmap.c         | 16 ++++++++++++++++
- block/qcow2-bitmap.c         |  2 ++
- include/block/dirty-bitmap.h |  2 ++
- 3 files changed, 20 insertions(+)
+ docs/specs/qcow2.txt | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index 90af372..2d27494 100644
---- a/block/dirty-bitmap.c
-+++ b/block/dirty-bitmap.c
-@@ -44,6 +44,8 @@ struct BdrvDirtyBitmap {
-     int64_t size;               /* Size of the bitmap (Number of sectors) */
-     bool disabled;              /* Bitmap is read-only */
-     int active_iterators;       /* How many iterators are active */
-+    bool autoload;              /* For persistent bitmaps: bitmap must be
-+                                   autoloaded on image opening */
-     QLIST_ENTRY(BdrvDirtyBitmap) list;
- };
+diff --git a/docs/specs/qcow2.txt b/docs/specs/qcow2.txt
+index 80cdfd0..dda53dd 100644
+--- a/docs/specs/qcow2.txt
++++ b/docs/specs/qcow2.txt
+@@ -472,8 +472,7 @@ Structure of a bitmap directory entry:
+              17:    granularity_bits
+                     Granularity bits. Valid values: 0 - 63.
  
-@@ -70,6 +72,8 @@ void bdrv_dirty_bitmap_make_anon(BdrvDirtyBitmap *bitmap)
-     assert(!bdrv_dirty_bitmap_frozen(bitmap));
-     g_free(bitmap->name);
-     bitmap->name = NULL;
-+
-+    bitmap->autoload = false;
- }
+-                    Note: Qemu currently doesn't support granularity_bits
+-                    greater than 31.
++                    Note: Qemu currently supports only values 9 - 31.
  
- BdrvDirtyBitmap *bdrv_create_dirty_bitmap(BlockDriverState *bs,
-@@ -238,6 +242,8 @@ BdrvDirtyBitmap *bdrv_dirty_bitmap_abdicate(BlockDriverState *bs,
-     bitmap->name = NULL;
-     successor->name = name;
-     bitmap->successor = NULL;
-+    successor->autoload = bitmap->autoload;
-+    bitmap->autoload = false;
-     bdrv_release_dirty_bitmap(bs, bitmap);
- 
-     return successor;
-@@ -540,3 +546,13 @@ int64_t bdrv_get_meta_dirty_count(BdrvDirtyBitmap *bitmap)
- {
-     return hbitmap_count(bitmap->meta);
- }
-+
-+void bdrv_dirty_bitmap_set_autoload(BdrvDirtyBitmap *bitmap, bool autoload)
-+{
-+    bitmap->autoload = autoload;
-+}
-+
-+bool bdrv_dirty_bitmap_get_autoload(const BdrvDirtyBitmap *bitmap)
-+{
-+    return bitmap->autoload;
-+}
-diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-index 758622d..277e678 100644
---- a/block/qcow2-bitmap.c
-+++ b/block/qcow2-bitmap.c
-@@ -685,6 +685,8 @@ void qcow2_load_autoloading_dirty_bitmaps(BlockDriverState *bs, Error **errp)
-             if (bitmap == NULL) {
-                 goto fail;
-             }
-+
-+            bdrv_dirty_bitmap_set_autoload(bitmap, true);
-             bm->flags |= BME_FLAG_IN_USE;
-             created_dirty_bitmaps =
-                     g_slist_append(created_dirty_bitmaps, bitmap);
-diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
-index 1e17729..45a389a 100644
---- a/include/block/dirty-bitmap.h
-+++ b/include/block/dirty-bitmap.h
-@@ -75,4 +75,6 @@ void bdrv_dirty_bitmap_deserialize_ones(BdrvDirtyBitmap *bitmap,
-                                         bool finish);
- void bdrv_dirty_bitmap_deserialize_finish(BdrvDirtyBitmap *bitmap);
- 
-+void bdrv_dirty_bitmap_set_autoload(BdrvDirtyBitmap *bitmap, bool autoload);
-+bool bdrv_dirty_bitmap_get_autoload(const BdrvDirtyBitmap *bitmap);
- #endif
+                     Granularity is calculated as
+                         granularity = 1 << granularity_bits
 -- 
 1.8.3.1
