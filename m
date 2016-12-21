@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60160)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35983)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cJnl0-0002rt-1W
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 15:45:03 -0500
+	(envelope-from <bounces@canonical.com>) id 1cJnpe-0005xU-7y
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 15:49:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cJnkw-0004hR-Vn
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 15:45:02 -0500
-Received: from indium.canonical.com ([91.189.90.7]:39237)
+	(envelope-from <bounces@canonical.com>) id 1cJnpV-0007Qv-1d
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 15:49:50 -0500
+Received: from indium.canonical.com ([91.189.90.7]:40022)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cJnkw-0004gV-Pb
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 15:44:58 -0500
+	id 1cJnpU-0007PY-Gg
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 15:49:40 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cJnku-0004bf-Ij
-	for <qemu-devel@nongnu.org>; Wed, 21 Dec 2016 20:44:56 +0000
+	id 1cJnpT-00052Y-4Q
+	for <qemu-devel@nongnu.org>; Wed, 21 Dec 2016 20:49:39 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 7B2ED2E80AD
-	for <qemu-devel@nongnu.org>; Wed, 21 Dec 2016 20:44:56 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 1B2792E80C7
+	for <qemu-devel@nongnu.org>; Wed, 21 Dec 2016 20:49:39 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 21 Dec 2016 20:33:58 -0000
-From: Thomas Huth <502107@bugs.launchpad.net>
-Reply-To: Bug 502107 <502107@bugs.launchpad.net>
+Date: Wed, 21 Dec 2016 20:36:38 -0000
+From: Thomas Huth <696530@bugs.launchpad.net>
+Reply-To: Bug 696530 <696530@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20100101165222.10901.36970.malonedeb@potassium.ubuntu.com>
-Message-Id: <20161221203358.1461.86805.malone@soybean.canonical.com>
+References: <20110102153123.20075.24776.malonedeb@soybean.canonical.com>
+Message-Id: <20161221203638.536.67305.malone@wampee.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 502107] Re: qemu-kvm 0.12.1.2 crashes booting
- Ubuntu 9.10 with "-vga std"
+Subject: [Qemu-devel] [Bug 696530] Re: qemu-0.13.0-r2 special keys different
+ when using -alt-grab
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,82 +39,35 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Triaging old bug tickets ... can you still reproduce this problem with
-the latest version of QEMU (v2.8)?
+Comment #1 sounds like this issue has been dealt with? Is there still
+something left that needs to be fixed here?
 
 ** Changed in: qemu
-       Status: Confirmed =3D> Incomplete
+       Status: New =3D> Incomplete
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/502107
+https://bugs.launchpad.net/bugs/696530
 
 Title:
-  qemu-kvm 0.12.1.2 crashes booting Ubuntu 9.10 with "-vga std"
+  qemu-0.13.0-r2 special keys different when using -alt-grab
 
 Status in QEMU:
   Incomplete
 
 Bug description:
-  I have an Ubuntu VM that works fine without "-vga std" but crashes if
-  I add "-vga std".  This is the full command line:
+  I use -alt-grab with qemu-0.13.0-r2 and special keys like Ctrl-Alt-f
+  for full screen did not work for me with a windows guest. They work
+  normally when omitting the -alt-grab startup parameter.
 
-  qemu-system-x86_64 -vga std -drive
-  cache=3Dwriteback,index=3D0,media=3Ddisk,file=3Dubuntu.img -k en-us -m 20=
-48 -smp 2 -vnc
-  :3102 -usbdevice tablet -enable-kvm &
+  After quite a long time, I found out that I have to add the shift key
+  to the keys from the documentation when I use the -alt-grab option.
 
-  I get this error:
-
-   KVM internal error. Suberror: 1
-  rax 00007f789177e000 rbx 0000000000000000 rcx 0000000000000000 rdx
-  0000000000000000
-  rsi 0000000000000000 rdi 00007f789177e000 rsp 00007fff361775e8 rbp
-  00007fff36177600
-  r8  000000000000ff80 r9  0000000000200000 r10 0000000000000000 r11
-  00007f789100a3f0
-  r12 00000000004017c0 r13 00007fff36178cf0 r14 0000000000000000 r15
-  0000000000000000
-  rip 00007f789100aa7b rflags 00013206
-  cs 0033 (00000000/ffffffff p 1 dpl 3 db 0 s 1 type b l 1 g 1 avl 0)
-  ds 0000 (00000000/ffffffff p 0 dpl 0 db 0 s 0 type 0 l 0 g 0 avl 0)
-  es 0000 (00000000/ffffffff p 0 dpl 0 db 0 s 0 type 0 l 0 g 0 avl 0)
-  ss 002b (00000000/ffffffff p 1 dpl 3 db 1 s 1 type 3 l 0 g 1 avl 0)
-  fs 0000 (7f78917906f0/ffffffff p 0 dpl 0 db 0 s 0 type 0 l 0 g 0 avl 0)
-  gs 0000 (00000000/ffffffff p 0 dpl 0 db 0 s 0 type 0 l 0 g 0 avl 0)
-  tr 0040 (ffff880001a09440/00002087 p 1 dpl 0 db 0 s 0 type b l 0 g 0 avl =
-0)
-  ldt 0000 (00000000/ffffffff p 0 dpl 0 db 0 s 0 type 0 l 0 g 0 avl 0)
-  gdt ffff8800019fa000/7f
-  idt ffffffff818fd000/fff
-  cr0 80050033 cr2 2408000 cr3 379d4000 cr4 6f0 cr8 0 efer d01
-  emulation failure, check dmesg for details
-
-  I'm running kernel 2.6.32, and I have the kvm stuff compiled directly int=
-o the
-  kernel.  There's nothing in dmesg about kvm at all.
-
-  Note that in the VM grub comes up, but the VM dies when I boot the
-  kernel.
-
-  This command line works:
-
-  qemu-system-x86_64 -drive cache=3Dwriteback,index=3D0,media=3Ddisk,file=
-=3Dubuntu.img -k
-  en-us -m 2048 -smp 2 -vnc :3102 -usbdevice tablet -enable-kvm &
-
-  That is, removing "-vga std" fixes the problem.
-
-  I recently added this option to both my Ubuntu and Windows XP VMs.
-  The Windows VM still works fine.  If Windows can detect that the
-  graphics card has changed, then Ubuntu should also have no problem.
-  That being said, I added the std option when using 0.12.1.1, so there
-  may be a qemu regression.
-
-  I have reported this bug elsewhere:
-  http://bugs.gentoo.org/show_bug.cgi?id=3D299211
+  Probably -ctrl-grab behaves similarly. It would be really nice to have
+  this documented in the default documentation in the man page as has
+  not been documented there yet.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/502107/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/696530/+subscriptions
