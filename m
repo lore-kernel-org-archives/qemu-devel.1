@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52505)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52781)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cJap6-0005kv-Sm
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 01:56:25 -0500
+	(envelope-from <liang.z.li@intel.com>) id 1cJarG-0007QN-OG
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 01:58:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cJap3-00065C-Qz
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 01:56:24 -0500
-Received: from [59.151.112.132] (port=44884 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cJap2-000635-T9
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 01:56:21 -0500
-References: <1481856403-23599-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<1481856403-23599-3-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<7b040d96-15b8-4102-432f-0fb5c3454d79@redhat.com>
-From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Message-ID: <0b0990d4-4040-3a51-1790-edce9a31a8d3@cn.fujitsu.com>
-Date: Wed, 21 Dec 2016 14:56:19 +0800
-MIME-Version: 1.0
-In-Reply-To: <7b040d96-15b8-4102-432f-0fb5c3454d79@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.9 V4 2/2] Add a new qmp command to do
- checkpoint, get replication error
+	(envelope-from <liang.z.li@intel.com>) id 1cJarD-0006dL-L7
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 01:58:38 -0500
+Received: from mga05.intel.com ([192.55.52.43]:16597)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <liang.z.li@intel.com>)
+	id 1cJarD-0006dB-BA
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 01:58:35 -0500
+From: Liang Li <liang.z.li@intel.com>
+Date: Wed, 21 Dec 2016 14:52:23 +0800
+Message-Id: <1482303148-22059-1-git-send-email-liang.z.li@intel.com>
+Subject: [Qemu-devel] [PATCH v6 kernel 0/5] Extend virtio-balloon for fast
+ (de)inflating & fast live migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,83 +23,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
-Cc: Li Zhijian <lizhijian@cn.fujitsu.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, "eddie . dong" <eddie.dong@intel.com>, Bian Naimeng <biannm@cn.fujitsu.com>, Changlong Xie <xiecl.fnst@cn.fujitsu.com>, Wen Congyang <wencongyang@gmail.com>
+To: kvm@vger.kernel.org
+Cc: virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, amit.shah@redhat.com, dave.hansen@intel.com, cornelia.huck@de.ibm.com, pbonzini@redhat.com, mst@redhat.com, david@redhat.com, aarcange@redhat.com, dgilbert@redhat.com, quintela@redhat.com, Liang Li <liang.z.li@intel.com>
 
+This patch set contains two parts of changes to the virtio-balloon.
+ 
+One is the change for speeding up the inflating & deflating process,
+the main idea of this optimization is to use {pfn|length} to present
+the page information instead of the PFNs, to reduce the overhead of
+virtio data transmission, address translation and madvise(). This can
+help to improve the performance by about 85%.
+ 
+Another change is for speeding up live migration. By skipping process
+guest's unused pages in the first round of data copy, to reduce needless
+data processing, this can help to save quite a lot of CPU cycles and
+network bandwidth. We put guest's unused page information in a
+{pfn|length} array and send it to host with the virt queue of
+virtio-balloon. For an idle guest with 8GB RAM, this can help to shorten
+the total live migration time from 2Sec to about 500ms in 10Gbps network
+environment. For an guest with quite a lot of page cache and with little
+unused pages, it's possible to let the guest drop it's page cache before
+live migration, this case can benefit from this new feature too.
+ 
+Changes from v5 to v6:
+    * Drop the bitmap from the virtio ABI, use {pfn|length} only.
+    * Enhance the API to get the unused page information from mm. 
 
+Changes from v4 to v5:
+    * Drop the code to get the max_pfn, use another way instead.
+    * Simplify the API to get the unused page information from mm. 
 
-On 12/20/2016 10:42 PM, Eric Blake wrote:
-> On 12/15/2016 08:46 PM, Zhang Chen wrote:
->> We can call this qmp command to do checkpoint outside of qemu.
->> Like Xen colo need this function.
->>
->> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
->> Signed-off-by: Wen Congyang <wencongyang@gmail.com>
->> ---
->>   docs/qmp-commands.txt | 24 ++++++++++++++++++++++++
->>   migration/colo.c      | 10 ++++++++++
->>   qapi-schema.json      | 22 ++++++++++++++++++++++
->>   3 files changed, 56 insertions(+)
->>
->>   
->> +void qmp_xen_get_replication_error(Error **errp)
->> +    {
->> +        replication_get_error_all(errp);
->> +    }
-> Is this trying to cause a replication error, or is it trying to collect
-> status on whether an error has occurred? The name 'get' usually implies
-> a query that does not change state, but a query usually needs some way
-> to return what was queried back to the user, so a void function with no
-> parameters other than error is odd (either the command succeeds because
-> there was no error, or the command fails with an error message because
-> the query had something to get?).
+Changes from v3 to v4:
+    * Use the new scheme suggested by Dave Hansen to encode the bitmap.
+    * Add code which is missed in v3 to handle migrate page. 
+    * Free the memory for bitmap intime once the operation is done.
+    * Address some of the comments in v3.
 
-Make sense, this command trying to collect status on whether
-an error has occurred, and the "replication_get_error_all(errp)"
-is always succeeds. So, Can you suggest to me the right name?
+Changes from v2 to v3:
+    * Change the name of 'free page' to 'unused page'.
+    * Use the scatter & gather bitmap instead of a 1MB page bitmap.
+    * Fix overwriting the page bitmap after kicking.
+    * Some of MST's comments for v2.
+ 
+Changes from v1 to v2:
+    * Abandon the patch for dropping page cache.
+    * Put some structures to uapi head file.
+    * Use a new way to determine the page bitmap size.
+    * Use a unified way to send the free page information with the bitmap
+    * Address the issues referred in MST's comments
 
+Liang Li (5):
+  virtio-balloon: rework deflate to add page to a list
+  virtio-balloon: define new feature bit and head struct
+  virtio-balloon: speed up inflate/deflate process
+  virtio-balloon: define flags and head for host request vq
+  virtio-balloon: tell host vm's unused page info
 
->
->
->> +++ b/qapi-schema.json
->> @@ -4695,6 +4695,28 @@
->>     'data': { 'enable': 'bool', 'primary': 'bool', '*failover' : 'bool' } }
->>   
->>   ##
->> +# @xen-get-replication-error
->> +#
->> +# Get replication error that occurs when the vm is running.
->> +#
->> +# Returns: nothing.
->> +#
->> +# Since: 2.9
->> +##
->> +{ 'command': 'xen-get-replication-error' }
-> So I don't think this is the right name for its signature, but I don't
-> know what you are trying to accomplish with this command to suggest the
-> right name.
-
-This interface is called to check if error happened in replication.
-
-Thanks
-Zhang Chen
-
-
->> +
->> +##
->> +# @xen-do-checkpoint
->> +#
->> +# Do checkpoint.
->> +#
->> +# Returns: nothing.
->> +#
->> +# Since: 2.9
->> +##
->> +{ 'command': 'xen-do-checkpoint' }
-> This one is probably okay.
->
->
+ drivers/virtio/virtio_balloon.c     | 510 ++++++++++++++++++++++++++++++++----
+ include/linux/mm.h                  |   3 +
+ include/uapi/linux/virtio_balloon.h |  34 +++
+ mm/page_alloc.c                     | 120 +++++++++
+ 4 files changed, 621 insertions(+), 46 deletions(-)
 
 -- 
-Thanks
-Zhang Chen
+1.9.1
