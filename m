@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52741)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57447)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cJejh-0003kS-UO
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 06:07:11 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cJey0-0002X7-Mz
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 06:21:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cJejc-0004Ha-V5
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 06:07:05 -0500
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:36491)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cJexw-0002Ul-Mj
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 06:21:52 -0500
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:32999)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cJejc-0004HO-PD
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 06:07:00 -0500
-Received: by mail-wm0-x244.google.com with SMTP id m203so29752707wma.3
-	for <qemu-devel@nongnu.org>; Wed, 21 Dec 2016 03:07:00 -0800 (PST)
-Date: Wed, 21 Dec 2016 11:06:57 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20161221110657.GD9482@stefanha-x1.localdomain>
-References: <1482137486-9843-1-git-send-email-douly.fnst@cn.fujitsu.com>
-	<20161219150230.GA20757@stefanha-x1.localdomain>
-	<20161219163214.GA9801@lemon>
-	<20161220093938.GB5602@stefanha-x1.localdomain>
-	<d6502c6d-616c-66dc-9c49-0fff7f1ee28c@cn.fujitsu.com>
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1cJexw-0002TI-G7
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 06:21:48 -0500
+Received: by mail-wm0-x244.google.com with SMTP id u144so29859057wmu.0
+	for <qemu-devel@nongnu.org>; Wed, 21 Dec 2016 03:21:46 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <1482255793-19057-1-git-send-email-ehabkost@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <70e1f758-6f18-9821-b48e-bdebdfc0befc@redhat.com>
+Date: Wed, 21 Dec 2016 12:21:44 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="BI5RvnYi6R4T2M87"
-Content-Disposition: inline
-In-Reply-To: <d6502c6d-616c-66dc-9c49-0fff7f1ee28c@cn.fujitsu.com>
-Subject: Re: [Qemu-devel] [PATCH RFC v2 0/4] block/qapi: refactor and
- optimize the qmp_query_blockstats()
+In-Reply-To: <1482255793-19057-1-git-send-email-ehabkost@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RFC 0/7] Move accel, KVM, Xen,
+ qtest files to accel/ subdir
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,97 +31,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dou Liyang <douly.fnst@cn.fujitsu.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, kwolf@redhat.com, armbru@redhat.com, mreitz@redhat.com, eblake@redhat.com, izumi.taku@jp.fujitsu.com, caoj.fnst@cn.fujitsu.com, fanc.fnst@cn.fujitsu.com, qemu-devel@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+Cc: kvm@vger.kernel.org, Christoffer Dall <christoffer.dall@linaro.org>, Anthony Perard <anthony.perard@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xensource.com
 
 
---BI5RvnYi6R4T2M87
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Dec 21, 2016 at 05:13:39PM +0800, Dou Liyang wrote:
-> Hi Stefan,
->=20
-> At 12/20/2016 05:39 PM, Stefan Hajnoczi wrote:
-> > On Tue, Dec 20, 2016 at 12:32:40AM +0800, Fam Zheng wrote:
-> > > On Mon, 12/19 15:02, Stefan Hajnoczi wrote:
-> > > > On Mon, Dec 19, 2016 at 04:51:22PM +0800, Dou Liyang wrote:
-> > > > > These patches aim to refactor the qmp_query_blockstats() and
-> > > > > improve the performance by reducing the running time of it.
-> > > > >=20
-> > > > > qmp_query_blockstats() is used to monitor the blockstats, it
-> > > > > querys all the graph_bdrv_states or monitor_block_backends.
-> > > > >=20
-> > > > > There are the two jobs:
-> > > > >=20
-> > > > > 1 For the performance:
-> > > > >=20
-> > > > > 1.1 the time it takes(ns) in each time:
-> > > > > the disk numbers     | 10    | 500
-> > > > > -------------------------------------
-> > > > > before these patches | 19429 | 667722
-> > > > > after these patches  | 17516 | 557044
-> > > > >=20
-> > > > > 1.2 the I/O performance is degraded(%) during the monitor:
-> > > > >=20
-> > > > > the disk numbers     | 10    | 500
-> > > > > -------------------------------------
-> > > > > before these patches | 1.3   | 14.2
-> > > > > after these patches  | 0.8   | 9.1
-> > > >=20
-> > > > Do you know what is consuming the remaining 9.1%?
-> > > >=20
-> > > > I'm surprised to see such a high performance impact caused by a QMP
-> > > > command.
-> > >=20
-> > > If it's "performance is 9.1% worse only during the 557044 ns when the=
- QMP
-> > > command is being processed", it's probably becaues the main loop is s=
-talled a
-> > > bit, and it's not a big problem. I'd be very surprised if the degrada=
-tion is
-> > > more longer than that.
-> >=20
-> > It would be interesting to compare against virtio-blk dataplane.  That
-> > way the QMP command can execute without interfering with disk I/O activ=
-ity.
-> >=20
-> > qemu-system-x86_64 ... \
-> >     -object iothread,id=3Diothread0 \
-> >     -drive if=3Dnone,id=3Ddrive0,file=3Dvm.img,format=3Draw,aio=3Dnativ=
-e,cache=3Dnone \
-> >     -device virtio-blk-pci,drive=3Ddrive0,iothread=3Diothread0
->=20
-> Here is the result in the guest with 500 disks:
->=20
-> QMP command     | not execute | execute in each 0.5s |
-> -------------------------------------------------------
-> Average Times/s | 102.34675   | 103.128              |
->=20
-> the degradation is 0.76%, that can be ignored.
->=20
-> the dd command:
-> dd if=3Ddate_1.dat of=3Ddate_2.dat conv=3Dfsync oflag=3Ddirect bs=3D1k co=
-unt=3D400k
+On 20/12/2016 18:43, Eduardo Habkost wrote:
+> This moves the KVM and Xen files to the an accel/ subdir.
+> 
+> Instead of moving the *-stubs.c file to accel/ as-is, I tried to
+> move most of the stub code to libqemustub.a. This way the obj-y
+> logic for accel/ is simpler: obj-y includes accel/ only if
+> CONFIG_SOFTMMU is set.
+> 
+> The Xen stubs could be moved completely to stubs/, but some of
+> the KVM stubs depend on cpu.h. So most of the kvm-stub.c code was
+> moved to stubs/kvm.c, but some of that code was kept in
+> accel/kvm-stub.c.
 
-Excellent.  It's good to know that dataplane is a solution to this
-problem.
+I think we need to decide what libqemustub is for.
 
-Stefan
+The original purpose was to provide different implementations of some
+functions for tools vs. emulators or (more rarely) for user-mode vs.
+system emulation.
 
---BI5RvnYi6R4T2M87
-Content-Type: application/pgp-signature; name="signature.asc"
+There are also some cases where we use it for functions that are only
+implemented by some targets.
 
------BEGIN PGP SIGNATURE-----
+In general, I think libqemustub should be the last resort.  If possible,
+inlines in headers should be the first choice, and stubs in objs-y or
+common-objs-y (using $(call lnot) in the Makefile) should be the second.
 
-iQEcBAEBAgAGBQJYWmJRAAoJEJykq7OBq3PIGaAIAJY6c2Sbmdoe2uKH2M5LSpJi
-CrnkKaH2+ZMW+zlyVnhNv/qIbWmE0Phicx8InPEZ9+986SO8757j4yhzz9G017/1
-G0Gp/fPnHyNAJTMrWtwxcj3Gp7Dwn4HEHjXjUW3WAHWiJNhiqFPDJT7WA2k8szU8
-InflacPeLRnZGF0d1zo3IeiG5n0pHxSB/A+Lp/08L1j7KLo/jKU2qHq4AxACk+I1
-w4cMWm1K0Uf0K24L9UyV70xZaaP7P0WAYFTb1I+HNgdrkvC6ax0BY8Gmr10XNLZX
-jFeTC68EZDJeoB5ecnFyqqu5FdOpGv8FJXM6cZYs+JuY0n6RMjcoPuhyEl8qpTA=
-=fr9j
------END PGP SIGNATURE-----
+The reason is that stubs/ hides files from the corresponding maintainer;
+for example, commit 07a32d6b's addition of stubs/get-next-serial.c was
+in all likelihood unnecessary, but the new file went in without an ack
+for a character device maintainer.  Tracking stubs in the MAINTAINERS
+file is unwieldy and, from this point of view, I find
 
---BI5RvnYi6R4T2M87--
+	F: accel/kvm*
+
+to be preferrable to
+
+	F: accel/kvm*
+	F: stubs/kvm.c
+
+Thanks,
+
+Paolo
+
+> About TCG:
+> ----------
+> 
+> It is not obvious to me which TCG-related files could be moved to
+> accel/, so this series don't move any of them yet.
+> 
+> About other CONFIG_SOFTMMU top-level files:
+> -------------------------------------------
+> 
+> I would like to know what we should do with the top-level
+> CONFIG_SOFTMMU-only files that don't belong to hw/. Some
+> candidates: arch_init.c cpus.c monitor.c gdbstub.c balloon.c
+> ioport.c bootdevice.c memory.c cputlb.c memory_mapping.c dump.c.
+> 
+> Maybe a sysemu/ subdir? In that case, should we still create an
+> accel/ subdir, or move xen-*, kvm-* and friends to sysemu/ too?
+> 
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: kvm@vger.kernel.org
+> Cc: Christoffer Dall <christoffer.dall@linaro.org>
+> Cc: Anthony Perard <anthony.perard@citrix.com>
+> Cc: Stefano Stabellini <sstabellini@kernel.org>
+> Cc: xen-devel@lists.xensource.com
+> 
+> Eduardo Habkost (7):
+>   xen: Move xen-*-stub.c to stubs/
+>   xen: Move xen files to accel/
+>   kvm: Move some kvm-stub.c code to stubs/kvm.c
+>   kvm: Include kvm-stub.o only on CONFIG_SOFTMMU
+>   kvm: Move kvm*.c files to accel/
+>   accel: Move accel.c to accel/
+>   accel: Move qtest.c to accel/
