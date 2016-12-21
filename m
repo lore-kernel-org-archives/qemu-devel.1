@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57820)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60396)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cJezu-0003kJ-MZ
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 06:23:51 -0500
+	(envelope-from <berrange@redhat.com>) id 1cJf9a-0008Vu-S2
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 06:33:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cJezq-0002q0-OO
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 06:23:50 -0500
-Received: from mail-wj0-x22c.google.com ([2a00:1450:400c:c01::22c]:33472)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cJezq-0002pk-I4
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 06:23:46 -0500
-Received: by mail-wj0-x22c.google.com with SMTP id xy5so199551689wjc.0
-	for <qemu-devel@nongnu.org>; Wed, 21 Dec 2016 03:23:44 -0800 (PST)
-Date: Wed, 21 Dec 2016 11:23:42 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20161221112342.GE9482@stefanha-x1.localdomain>
+	(envelope-from <berrange@redhat.com>) id 1cJf9X-0006VF-32
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 06:33:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:10232)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cJf9W-0006Ul-Th
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 06:33:47 -0500
+Date: Wed, 21 Dec 2016 11:33:41 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20161221113341.GB2498@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
 References: <CAMxP3BREAp7wm8B8=z0d1qAcG18Pv19UpU7RrSikGBunScNNOw@mail.gmail.com>
+	<20161221112342.GE9482@stefanha-x1.localdomain>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="Qz2CZ664xQdCRdPu"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CAMxP3BREAp7wm8B8=z0d1qAcG18Pv19UpU7RrSikGBunScNNOw@mail.gmail.com>
+In-Reply-To: <20161221112342.GE9482@stefanha-x1.localdomain>
 Subject: Re: [Qemu-devel] QEMU -smp paramater: Will multiplue threads and
  cores improve performance?
 List-Id: <qemu-devel.nongnu.org>
@@ -30,50 +29,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bob Chen <a175818323@gmail.com>
-Cc: qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Bob Chen <a175818323@gmail.com>, qemu-devel@nongnu.org
 
+On Wed, Dec 21, 2016 at 11:23:42AM +0000, Stefan Hajnoczi wrote:
+> On Wed, Dec 21, 2016 at 04:44:08PM +0800, Bob Chen wrote:
+> > -smp 16
+> > 
+> > -smp cores=4,threads=4,sockets=1
+> > 
+> > 
+> > Which one has better performance? The scenario is guest VMs running on
+> > cloud server.
+> 
+> It's more complicated than that.
+> 
+> The CPU topology (cores, threads, sockets) can be used by guest kernels
+> to make scheduling decisions.
 
---Qz2CZ664xQdCRdPu
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+cores vs sockets will have little difference, but cores or sockets
+vs threads will definitely affect guest schedular.
 
-On Wed, Dec 21, 2016 at 04:44:08PM +0800, Bob Chen wrote:
-> -smp 16
->=20
-> -smp cores=3D4,threads=3D4,sockets=3D1
->=20
->=20
-> Which one has better performance? The scenario is guest VMs running on
-> cloud server.
+> If you pin vcpu threads to host cpus and configure the guest with
+> an accurate CPU topology then you can expect the guest kernel to make
+> the best decisions.
+> 
+> If you do not pin vcpu threads then you cannot expect any consistent
+> performance advantage by specifying the CPU topology.
 
-It's more complicated than that.
+In fact if you do not pin threads and you specify a CPU topology that
+has > 1 hyperthread, you may well make performance of the guest worse.
 
-The CPU topology (cores, threads, sockets) can be used by guest kernels
-to make scheduling decisions.
+Essentially you never want to use threads>1, unless pinning guest CPUs
+to host CPUs 1:1
 
-If you pin vcpu threads to host cpus and configure the guest with
-an accurate CPU topology then you can expect the guest kernel to make
-the best decisions.
-
-If you do not pin vcpu threads then you cannot expect any consistent
-performance advantage by specifying the CPU topology.
-
-Stefan
-
---Qz2CZ664xQdCRdPu
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJYWmY9AAoJEJykq7OBq3PIMagIAJqrPmYnW1I4pC4vCCDcWMaM
-eu1vM6XjPefhUKAoLSFq/N0ZgNIzkfLmzGJLz8e120YvzvhYd6LO33ecMpCz74UA
-tKxwqpHd7MDofd/Ml5W1Qvzb9WHeAWmAzDIwPpSXhLIEsdwxLqTFj46x1HbJtezP
-SHVmyijAnyv+JUG730V7IceFQNUvX9c/5UkRNJ8gqlzChK55HURfKRvG5FAbs6tW
-9iDl5zpxxVXlNyDKRkq9/FZLz/ZiNXvMycVN/zWuN9Um4/7WJWaGwv1D9ymxhdYc
-BKquVUzSBXmr+8DxR4lUWzvI8xkR1NfbiAzS+mWV1YT+2LgYOLrJf5t+vtosVYc=
-=IQSb
------END PGP SIGNATURE-----
-
---Qz2CZ664xQdCRdPu--
+Regards,
+Daniel
+-- 
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
