@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38358)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44704)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cK5FT-0001Rr-JK
-	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 10:25:41 -0500
+	(envelope-from <no-reply@patchew.org>) id 1cK5lL-0006Tc-VM
+	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 10:58:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cK5FP-0007yM-Ai
-	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 10:25:39 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36712)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cK5FP-0007y6-1Z
-	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 10:25:35 -0500
-References: <20161222151828.28292-1-leif.lindholm@linaro.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ed47e562-0824-e676-4c82-de88b78bc55a@redhat.com>
-Date: Thu, 22 Dec 2016 16:25:31 +0100
+	(envelope-from <no-reply@patchew.org>) id 1cK5lI-0003JA-T6
+	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 10:58:36 -0500
+Resent-Message-Id: <E1cK5lI-0003JA-T6@eggs.gnu.org>
+Received: from sender163-mail.zoho.com ([74.201.84.163]:21315)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1cK5lI-0003I8-Jd
+	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 10:58:32 -0500
+In-Reply-To: <20161222152300.32395-1-pbonzini@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <148242230795.100.5079678067445963349@790289a7ca88>
 MIME-Version: 1.0
-In-Reply-To: <20161222151828.28292-1-leif.lindholm@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] smbios: filter based on CONFIG_SMBIOS
- rather than TARGET
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 22 Dec 2016 07:58:29 -0800 (PST)
+Subject: Re: [Qemu-devel] [PULL 00/25] First round of misc patches for QEMU
+ 2.9
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,163 +29,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Leif Lindholm <leif.lindholm@linaro.org>, qemu-devel@nongnu.org
-Cc: Igor Mammedov <imammedo@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+To: pbonzini@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org
 
-
-
-On 22/12/2016 16:18, Leif Lindholm wrote:
-> -smbios command line options were accepted but silently ignored on
-> TARGET_ARM, due to a test for TARGET_I386 in arch_init.c.
-> 
-> Copy the mechanism of hw/pci/pci-stub.c to implement an smbios-stub
-> instead, enabled for all targets without CONFIG_SMBIOS.
-> 
-> Signed-off-by: Leif Lindholm <leif.lindholm@linaro.org>
-> ---
-> 
-> Not sure if Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-> is semantically correct in this instance, but if it is, please
-> add it.
-> 
->  arch_init.c                |  8 --------
->  hw/Makefile.objs           |  2 +-
->  hw/smbios/Makefile.objs    |  3 +++
->  hw/smbios/smbios-stub.c    | 31 +++++++++++++++++++++++++++++++
->  hw/smbios/smbios.c         |  2 +-
->  include/hw/smbios/smbios.h |  2 +-
->  vl.c                       |  2 +-
->  7 files changed, 38 insertions(+), 12 deletions(-)
->  create mode 100644 hw/smbios/smbios-stub.c
-> 
-> diff --git a/arch_init.c b/arch_init.c
-> index 5cc58b2..34e7694 100644
-> --- a/arch_init.c
-> +++ b/arch_init.c
-> @@ -28,7 +28,6 @@
->  #include "sysemu/arch_init.h"
->  #include "hw/pci/pci.h"
->  #include "hw/audio/audio.h"
-> -#include "hw/smbios/smbios.h"
->  #include "qemu/config-file.h"
->  #include "qemu/error-report.h"
->  #include "qmp-commands.h"
-> @@ -248,13 +247,6 @@ void do_acpitable_option(const QemuOpts *opts)
->  #endif
->  }
->  
-> -void do_smbios_option(QemuOpts *opts)
-> -{
-> -#ifdef TARGET_I386
-> -    smbios_entry_add(opts);
-> -#endif
-> -}
-> -
->  int kvm_available(void)
->  {
->  #ifdef CONFIG_KVM
-> diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-> index 0ffd281..2a73ae5 100644
-> --- a/hw/Makefile.objs
-> +++ b/hw/Makefile.objs
-> @@ -33,7 +33,7 @@ devices-dirs-$(CONFIG_VIRTIO) += virtio/
->  devices-dirs-$(CONFIG_SOFTMMU) += watchdog/
->  devices-dirs-$(CONFIG_SOFTMMU) += xen/
->  devices-dirs-$(CONFIG_MEM_HOTPLUG) += mem/
-> -devices-dirs-$(CONFIG_SMBIOS) += smbios/
-> +devices-dirs-$(CONFIG_SOFTMMU) += smbios/
->  devices-dirs-y += core/
->  common-obj-y += $(devices-dirs-y)
->  obj-y += $(devices-dirs-y)
-> diff --git a/hw/smbios/Makefile.objs b/hw/smbios/Makefile.objs
-> index c3d3753..ee0712b 100644
-> --- a/hw/smbios/Makefile.objs
-> +++ b/hw/smbios/Makefile.objs
-> @@ -1,2 +1,5 @@
->  common-obj-$(CONFIG_SMBIOS) += smbios.o
->  common-obj-$(call land,$(CONFIG_SMBIOS),$(CONFIG_IPMI)) += smbios_type_38.o
-> +
-> +common-obj-$(call lnot,$(CONFIG_SMBIOS)) += smbios-stub.o
-> +common-obj-$(CONFIG_ALL) += smbios-stub.o
-> diff --git a/hw/smbios/smbios-stub.c b/hw/smbios/smbios-stub.c
-> new file mode 100644
-> index 0000000..3087394
-> --- /dev/null
-> +++ b/hw/smbios/smbios-stub.c
-> @@ -0,0 +1,31 @@
-> +/*
-> + * SMBIOS stubs for platforms that don't support SMBIOS.
-> + *
-> + * Copyright (c) 2010 Isaku Yamahata <yamahata at valinux co jp>
-> + *                    VA Linux Systems Japan K.K.
-> + * Copyright (c) 2016 Leif Lindholm <leif.lindholm@linaro.org>
-> + *                    Linaro Ltd.
-> + *
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License as published by
-> + * the Free Software Foundation; either version 2 of the License, or
-> + * (at your option) any later version.
-> + *
-> + * This program is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + * GNU General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU General Public License along
-> + * with this program; if not, see <http://www.gnu.org/licenses/>.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qapi/qmp/qerror.h"
-> +#include "qmp-commands.h"
-> +#include "hw/smbios/smbios.h"
-> +
-> +void smbios_entry_add(QemuOpts *opts, Error **errp)
-> +{
-> +    error_setg(errp, QERR_UNSUPPORTED);
-> +}
-> diff --git a/hw/smbios/smbios.c b/hw/smbios/smbios.c
-> index 3a96ced..1a5437a 100644
-> --- a/hw/smbios/smbios.c
-> +++ b/hw/smbios/smbios.c
-> @@ -882,7 +882,7 @@ static void save_opt(const char **dest, QemuOpts *opts, const char *name)
->      }
->  }
->  
-> -void smbios_entry_add(QemuOpts *opts)
-> +void smbios_entry_add(QemuOpts *opts, Error **errp)
->  {
->      const char *val;
->  
-> diff --git a/include/hw/smbios/smbios.h b/include/hw/smbios/smbios.h
-> index 1cd53cc..31e8d5f 100644
-> --- a/include/hw/smbios/smbios.h
-> +++ b/include/hw/smbios/smbios.h
-> @@ -257,7 +257,7 @@ struct smbios_type_127 {
->      struct smbios_structure_header header;
->  } QEMU_PACKED;
->  
-> -void smbios_entry_add(QemuOpts *opts);
-> +void smbios_entry_add(QemuOpts *opts, Error **errp);
->  void smbios_set_cpuid(uint32_t version, uint32_t features);
->  void smbios_set_defaults(const char *manufacturer, const char *product,
->                           const char *version, bool legacy_mode,
-> diff --git a/vl.c b/vl.c
-> index d77dd86..d2a0d75 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -3711,7 +3711,7 @@ int main(int argc, char **argv, char **envp)
->                  if (!opts) {
->                      exit(1);
->                  }
-> -                do_smbios_option(opts);
-> +                smbios_entry_add(opts, &error_abort);
-
-This should be error_fatal.  Will fix and apply.
-
-Paolo
-
->                  break;
->              case QEMU_OPTION_fwcfg:
->                  opts = qemu_opts_parse_noisily(qemu_find_opts("fw_cfg"),
-> 
+SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
+NjEyMjIxNTIzMDAuMzIzOTUtMS1wYm9uemluaUByZWRoYXQuY29tClR5cGU6IHNlcmllcwpTdWJq
+ZWN0OiBbUWVtdS1kZXZlbF0gW1BVTEwgMDAvMjVdIEZpcnN0IHJvdW5kIG9mIG1pc2MgcGF0Y2hl
+cyBmb3IgUUVNVSAyLjkKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJB
+U0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZh
+aWxlZD0wCgojIFVzZWZ1bCBnaXQgb3B0aW9ucwpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5h
+bWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0i
+JChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1p
+dHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAx
+IC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwg
+fCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWls
+ZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxl
+ZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRk
+MWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2pl
+Y3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMTYxMjIyMTUyMzAwLjMyMzk1
+LTEtcGJvbnppbmlAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTYxMjIyMTUyMzAwLjMyMzk1LTEt
+cGJvbnppbmlAcmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjFmMWFh
+ZDcgeDg2OiBpbXBsZW1lbnQgbGE1NyBwYWdpbmcgbW9kZQozMTFiYTEwIHRhcmdldC1pMzg2OiBG
+aXggZWZsYWdzLlRGLyNEQiBoYW5kbGluZyBvZiBzeXNjYWxsL3N5c3JldCBpbnNucwo5ZDY0ZmNj
+IGt2bWNsb2NrOiByZWR1Y2Uga3ZtY2xvY2sgZGlmZmVyZW5jZSBvbiBtaWdyYXRpb24KYmZhMjE1
+YyBrdm06IHN5bmMgbGludXggaGVhZGVycwo1ZjBlMzYxIHNjc2ktZGlzazogZml4IFZFUklGWSBm
+b3Igc2NzaS1ibG9jawo5NDc2NDAxIGh3L2Jsb2NrL3BmbGFzaF9jZmkqLmM6IGZpeCBjb25mdXNp
+bmcgYXNzZXJ0IGZhaWwgbWVzc2FnZQo3ZGQ0M2ZhIG11bHRpYm9vdDogY29weSB0aGUgY21kbGlu
+ZSB2ZXJiYXRpbSwgdW5lc2NhcGUgbW9kdWxlIHN0cmluZ3MKZmI1NDk3NyB4ODY6IEZpeCB4ODZf
+NjQgJ2cnIHBhY2tldCByZXNwb25zZSB0byBnZGIgZnJvbSAzMi1iaXQgbW9kZS4KZGE1N2Q5ZSBw
+YzogbWFrZSBwaXQgY29uZmlndXJhYmxlCjRiY2UwMjcgcGM6IG1ha2Ugc2F0YSBjb25maWd1cmFi
+bGUKMzRiNjI5YyBwYzogbWFrZSBzbWJ1cyBjb25maWd1cmFibGUKMzQwMDdiMSB0YXJnZXQtaTM4
+NjogQWRkIEludGVsIFNIQV9OSSBpbnN0cnVjdGlvbiBzdXBwb3J0LgpmOGY1ZjIzIGJsb2NrOiBk
+cm9wIHJlbWFpbmluZyBsZWdhY3kgYWlvIGZ1bmN0aW9ucyBpbiBjb21tZW50CmYyNjUzZDIgbWFp
+bi1sb29wOiB1cGRhdGUgY29tbWVudCBmb3IgcWVtdV9tdXRleF9sb2NrL3VubG9ja19pb3RocmVh
+ZAplZTY1Zjg1IHRpbWVyOiBmaXggbWlzbGVhZGluZyBjb21tZW50IGluIHRpbWVyLmgKM2QzN2Nh
+YyBxZW11LXRpbWVyOiBjaGVjayBhY3RpdmVfdGltZXJzIG91dHNpZGUgbG9jay9ldmVudAoxYzI3
+OGE5IHZpcnRpby1zY3NpOiBpbnRyb2R1Y2UgdmlydGlvX3Njc2lfYWNxdWlyZS9yZWxlYXNlCmMw
+MGNhNGUgYnVpbGQtc3lzOiByZW1vdmUgbGlidG9vbCBsZWZ0LW92ZXIKOTAwMWIzMCBydWxlcy5t
+YWs6IGFkZCBtb3JlIHJ1bGVzIHRvIGF2b2lkIGNoYWluaW5nCjRlOTYxMDkgcnVsZXMubWFrOiBz
+cGVlZHVwIHNhdmUtdmFycyBsb2FkLXZhcnMKODg0MzI0NyB3YXRjaGRvZzogNjMwMGVzYjogYWRk
+IGV4aXQgZnVuY3Rpb24KY2UxYjdmNyBleGVjOiBpbnRyb2R1Y2UgTWVtb3J5UmVnaW9uQ2FjaGUK
+YzYzZGY5MSBleGVjOiBpbnRyb2R1Y2UgYWRkcmVzc19zcGFjZV9leHRlbmRfdHJhbnNsYXRpb24K
+NWY1NjdlOCBleGVjOiBpbnRyb2R1Y2UgbWVtb3J5X2xkc3QuaW5jLmMKMDU0NzUyNiBleGVjOiBv
+cHRpbWl6ZSByZW1haW5pbmcgYWRkcmVzc19zcGFjZV8qIGNhc2VzCgo9PT0gT1VUUFVUIEJFR0lO
+ID09PQpDaGVja2luZyBQQVRDSCAxLzI1OiBleGVjOiBvcHRpbWl6ZSByZW1haW5pbmcgYWRkcmVz
+c19zcGFjZV8qIGNhc2VzLi4uCkNoZWNraW5nIFBBVENIIDIvMjU6IGV4ZWM6IGludHJvZHVjZSBt
+ZW1vcnlfbGRzdC5pbmMuYy4uLgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTEz
+MzogRklMRTogbWVtb3J5X2xkc3QuaW5jLmM6MzcwOgorICAgICAgICBjcHVfcGh5c2ljYWxfbWVt
+b3J5X3NldF9kaXJ0eV9yYW5nZShtZW1vcnlfcmVnaW9uX2dldF9yYW1fYWRkcihtcikgKyBhZGRy
+LAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAxNDM4IGxpbmVzIGNoZWNrZWQKCllvdXIg
+cGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
+IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
+LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggMy8yNTogZXhl
+YzogaW50cm9kdWNlIGFkZHJlc3Nfc3BhY2VfZXh0ZW5kX3RyYW5zbGF0aW9uLi4uCldBUk5JTkc6
+IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMyMjogRklMRTogZXhlYy5jOjI5NDI6CithZGRyZXNz
+X3NwYWNlX2V4dGVuZF90cmFuc2xhdGlvbihBZGRyZXNzU3BhY2UgKmFzLCBod2FkZHIgYWRkciwg
+aHdhZGRyIHRhcmdldF9sZW4sCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojODU6
+IEZJTEU6IGV4ZWMuYzozMDE2OgorICAgICpwbGVuID0gYWRkcmVzc19zcGFjZV9leHRlbmRfdHJh
+bnNsYXRpb24oYXMsIGFkZHIsIGxlbiwgbXIsIHhsYXQsIGwsIGlzX3dyaXRlKTsKCnRvdGFsOiAw
+IGVycm9ycywgMiB3YXJuaW5ncywgNzAgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5
+bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBm
+YWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BB
+VENIIGluIE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCA0LzI1OiBleGVjOiBpbnRyb2R1Y2Ug
+TWVtb3J5UmVnaW9uQ2FjaGUuLi4KV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzkz
+OiBGSUxFOiBleGVjLmM6MzE0ODoKKyNkZWZpbmUgVFJBTlNMQVRFKC4uLikgICAgICAgICAgIGFk
+ZHJlc3Nfc3BhY2VfdHJhbnNsYXRlX2NhY2hlZChjYWNoZSwgX19WQV9BUkdTX18pCgpXQVJOSU5H
+OiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTE2OiBGSUxFOiBpbmNsdWRlL2V4ZWMvY3B1LWFs
+bC5oOjE5MzoKK3ZvaWQgc3RsX3BoeXNfbm90ZGlydHlfY2FjaGVkKE1lbW9yeVJlZ2lvbkNhY2hl
+ICpjYWNoZSwgaHdhZGRyIGFkZHIsIHVpbnQzMl90IHZhbCk7CgpXQVJOSU5HOiBsaW5lIG92ZXIg
+ODAgY2hhcmFjdGVycwojMTI4OiBGSUxFOiBpbmNsdWRlL2V4ZWMvY3B1LWFsbC5oOjIwNToKKyAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICB1aW50MzJfdCB2YWwsIE1lbVR4QXR0cnMgYXR0cnMs
+IE1lbVR4UmVzdWx0ICpyZXN1bHQpOwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMK
+IzEyOTogRklMRTogaW5jbHVkZS9leGVjL2NwdS1hbGwuaDoyMDY6Cit2b2lkIGFkZHJlc3Nfc3Bh
+Y2Vfc3R3X2NhY2hlZChNZW1vcnlSZWdpb25DYWNoZSAqY2FjaGUsIGh3YWRkciBhZGRyLCB1aW50
+MzJfdCB2YWwsCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTMxOiBGSUxFOiBp
+bmNsdWRlL2V4ZWMvY3B1LWFsbC5oOjIwODoKK3ZvaWQgYWRkcmVzc19zcGFjZV9zdGxfY2FjaGVk
+KE1lbW9yeVJlZ2lvbkNhY2hlICpjYWNoZSwgaHdhZGRyIGFkZHIsIHVpbnQzMl90IHZhbCwKCldB
+Uk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxMzM6IEZJTEU6IGluY2x1ZGUvZXhlYy9j
+cHUtYWxsLmg6MjEwOgordm9pZCBhZGRyZXNzX3NwYWNlX3N0cV9jYWNoZWQoTWVtb3J5UmVnaW9u
+Q2FjaGUgKmNhY2hlLCBod2FkZHIgYWRkciwgdWludDY0X3QgdmFsLAoKV0FSTklORzogbGluZSBv
+dmVyIDgwIGNoYXJhY3RlcnMKIzIzNTogRklMRTogaW5jbHVkZS9leGVjL21lbW9yeS5oOjE1MTE6
+Cit2b2lkIGFkZHJlc3Nfc3BhY2Vfc3RiX2NhY2hlZChNZW1vcnlSZWdpb25DYWNoZSAqY2FjaGUs
+IGh3YWRkciBhZGRyLCB1aW50MzJfdCB2YWwsCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFj
+dGVycwojMjM3OiBGSUxFOiBpbmNsdWRlL2V4ZWMvbWVtb3J5Lmg6MTUxMzoKK3ZvaWQgYWRkcmVz
+c19zcGFjZV9zdHdfbGVfY2FjaGVkKE1lbW9yeVJlZ2lvbkNhY2hlICpjYWNoZSwgaHdhZGRyIGFk
+ZHIsIHVpbnQzMl90IHZhbCwKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMyMzk6
+IEZJTEU6IGluY2x1ZGUvZXhlYy9tZW1vcnkuaDoxNTE1Ogordm9pZCBhZGRyZXNzX3NwYWNlX3N0
+d19iZV9jYWNoZWQoTWVtb3J5UmVnaW9uQ2FjaGUgKmNhY2hlLCBod2FkZHIgYWRkciwgdWludDMy
+X3QgdmFsLAoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzI0MTogRklMRTogaW5j
+bHVkZS9leGVjL21lbW9yeS5oOjE1MTc6Cit2b2lkIGFkZHJlc3Nfc3BhY2Vfc3RsX2xlX2NhY2hl
+ZChNZW1vcnlSZWdpb25DYWNoZSAqY2FjaGUsIGh3YWRkciBhZGRyLCB1aW50MzJfdCB2YWwsCgpX
+QVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMjQzOiBGSUxFOiBpbmNsdWRlL2V4ZWMv
+bWVtb3J5Lmg6MTUxOToKK3ZvaWQgYWRkcmVzc19zcGFjZV9zdGxfYmVfY2FjaGVkKE1lbW9yeVJl
+Z2lvbkNhY2hlICpjYWNoZSwgaHdhZGRyIGFkZHIsIHVpbnQzMl90IHZhbCwKCldBUk5JTkc6IGxp
+bmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMyNDU6IEZJTEU6IGluY2x1ZGUvZXhlYy9tZW1vcnkuaDox
+NTIxOgordm9pZCBhZGRyZXNzX3NwYWNlX3N0cV9sZV9jYWNoZWQoTWVtb3J5UmVnaW9uQ2FjaGUg
+KmNhY2hlLCBod2FkZHIgYWRkciwgdWludDY0X3QgdmFsLAoKV0FSTklORzogbGluZSBvdmVyIDgw
+IGNoYXJhY3RlcnMKIzI0NzogRklMRTogaW5jbHVkZS9leGVjL21lbW9yeS5oOjE1MjM6Cit2b2lk
+IGFkZHJlc3Nfc3BhY2Vfc3RxX2JlX2NhY2hlZChNZW1vcnlSZWdpb25DYWNoZSAqY2FjaGUsIGh3
+YWRkciBhZGRyLCB1aW50NjRfdCB2YWwsCgp0b3RhbDogMCBlcnJvcnMsIDEzIHdhcm5pbmdzLCAy
+ODEgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSBy
+ZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0
+IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgpD
+aGVja2luZyBQQVRDSCA1LzI1OiB3YXRjaGRvZzogNjMwMGVzYjogYWRkIGV4aXQgZnVuY3Rpb24u
+Li4KQ2hlY2tpbmcgUEFUQ0ggNi8yNTogcnVsZXMubWFrOiBzcGVlZHVwIHNhdmUtdmFycyBsb2Fk
+LXZhcnMuLi4KQ2hlY2tpbmcgUEFUQ0ggNy8yNTogcnVsZXMubWFrOiBhZGQgbW9yZSBydWxlcyB0
+byBhdm9pZCBjaGFpbmluZy4uLgpDaGVja2luZyBQQVRDSCA4LzI1OiBidWlsZC1zeXM6IHJlbW92
+ZSBsaWJ0b29sIGxlZnQtb3Zlci4uLgpDaGVja2luZyBQQVRDSCA5LzI1OiB2aXJ0aW8tc2NzaTog
+aW50cm9kdWNlIHZpcnRpb19zY3NpX2FjcXVpcmUvcmVsZWFzZS4uLgpDaGVja2luZyBQQVRDSCAx
+MC8yNTogcWVtdS10aW1lcjogY2hlY2sgYWN0aXZlX3RpbWVycyBvdXRzaWRlIGxvY2svZXZlbnQu
+Li4KQ2hlY2tpbmcgUEFUQ0ggMTEvMjU6IHRpbWVyOiBmaXggbWlzbGVhZGluZyBjb21tZW50IGlu
+IHRpbWVyLmguLi4KQ2hlY2tpbmcgUEFUQ0ggMTIvMjU6IG1haW4tbG9vcDogdXBkYXRlIGNvbW1l
+bnQgZm9yIHFlbXVfbXV0ZXhfbG9jay91bmxvY2tfaW90aHJlYWQuLi4KQ2hlY2tpbmcgUEFUQ0gg
+MTMvMjU6IGJsb2NrOiBkcm9wIHJlbWFpbmluZyBsZWdhY3kgYWlvIGZ1bmN0aW9ucyBpbiBjb21t
+ZW50Li4uCkNoZWNraW5nIFBBVENIIDE0LzI1OiB0YXJnZXQtaTM4NjogQWRkIEludGVsIFNIQV9O
+SSBpbnN0cnVjdGlvbiBzdXBwb3J0Li4uLgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVy
+cwojMzU6IEZJTEU6IHRhcmdldC9pMzg2L2NwdS5oOjYyNDoKKyNkZWZpbmUgQ1BVSURfN18wX0VC
+WF9TSEFfTkkgICAoMVUgPDwgMjkpIC8qIFNIQTEvU0hBMjU2IEluc3RydWN0aW9uIEV4dGVuc2lv
+bnMgKi8KCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTUgbGluZXMgY2hlY2tlZAoKWW91
+ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
+c2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWlu
+ZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCAxNS8yNTog
+cGM6IG1ha2Ugc21idXMgY29uZmlndXJhYmxlLi4uCkNoZWNraW5nIFBBVENIIDE2LzI1OiBwYzog
+bWFrZSBzYXRhIGNvbmZpZ3VyYWJsZS4uLgpDaGVja2luZyBQQVRDSCAxNy8yNTogcGM6IG1ha2Ug
+cGl0IGNvbmZpZ3VyYWJsZS4uLgpDaGVja2luZyBQQVRDSCAxOC8yNTogeDg2OiBGaXggeDg2XzY0
+ICdnJyBwYWNrZXQgcmVzcG9uc2UgdG8gZ2RiIGZyb20gMzItYml0IG1vZGUuLi4uCkNoZWNraW5n
+IFBBVENIIDE5LzI1OiBtdWx0aWJvb3Q6IGNvcHkgdGhlIGNtZGxpbmUgdmVyYmF0aW0sIHVuZXNj
+YXBlIG1vZHVsZSBzdHJpbmdzLi4uCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM0
+NTogRklMRTogaHcvaTM4Ni9tdWx0aWJvb3QuYzozMDA6CisgICAgICAgICAgICBuZXh0X2luaXRy
+ZCA9IGdldF9vcHRfdmFsdWUodG1wYnVmLCBzaXplb2YodG1wYnVmKSwgaW5pdHJkX2ZpbGVuYW1l
+KTsKCkVSUk9SOiBkbyBub3QgdXNlIGFzc2lnbm1lbnQgaW4gaWYgY29uZGl0aW9uCiM1MzogRklM
+RTogaHcvaTM4Ni9tdWx0aWJvb3QuYzozMDU6CisgICAgICAgICAgICBpZiAoKG5leHRfc3BhY2Ug
+PSBzdHJjaHIodG1wYnVmLCAnICcpKSkKCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBm
+b3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzUzOiBGSUxFOiBody9pMzg2L211bHRpYm9v
+dC5jOjMwNToKKyAgICAgICAgICAgIGlmICgobmV4dF9zcGFjZSA9IHN0cmNocih0bXBidWYsICcg
+JykpKQpbLi4uXQoKdG90YWw6IDIgZXJyb3JzLCAxIHdhcm5pbmdzLCA0OSBsaW5lcyBjaGVja2Vk
+CgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBv
+ZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFp
+bnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAy
+MC8yNTogaHcvYmxvY2svcGZsYXNoX2NmaSouYzogZml4IGNvbmZ1c2luZyBhc3NlcnQgZmFpbCBt
+ZXNzYWdlLi4uCkNoZWNraW5nIFBBVENIIDIxLzI1OiBzY3NpLWRpc2s6IGZpeCBWRVJJRlkgZm9y
+IHNjc2ktYmxvY2suLi4KQ2hlY2tpbmcgUEFUQ0ggMjIvMjU6IGt2bTogc3luYyBsaW51eCBoZWFk
+ZXJzLi4uCkNoZWNraW5nIFBBVENIIDIzLzI1OiBrdm1jbG9jazogcmVkdWNlIGt2bWNsb2NrIGRp
+ZmZlcmVuY2Ugb24gbWlncmF0aW9uLi4uCkNoZWNraW5nIFBBVENIIDI0LzI1OiB0YXJnZXQtaTM4
+NjogRml4IGVmbGFncy5URi8jREIgaGFuZGxpbmcgb2Ygc3lzY2FsbC9zeXNyZXQgaW5zbnMuLi4K
+Q2hlY2tpbmcgUEFUQ0ggMjUvMjU6IHg4NjogaW1wbGVtZW50IGxhNTcgcGFnaW5nIG1vZGUuLi4K
+PT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0t
+LQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hl
+dy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVs
+aXN0cy5vcmc=
