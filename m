@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32836)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33215)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dmitry@daynix.com>) id 1cK4rO-0007mv-5G
-	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 10:00:50 -0500
+	(envelope-from <eblake@redhat.com>) id 1cK4sL-0000ak-RU
+	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 10:01:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dmitry@daynix.com>) id 1cK4rK-0006S1-MJ
-	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 10:00:46 -0500
-Received: from mail-wj0-x241.google.com ([2a00:1450:400c:c01::241]:33729)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <dmitry@daynix.com>) id 1cK4rK-0006RW-2r
-	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 10:00:42 -0500
-Received: by mail-wj0-x241.google.com with SMTP id kp2so36619089wjc.0
-	for <qemu-devel@nongnu.org>; Thu, 22 Dec 2016 07:00:41 -0800 (PST)
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
-From: Dmitry Fleytman <dmitry@daynix.com>
-In-Reply-To: <1482308491-25426-2-git-send-email-caoj.fnst@cn.fujitsu.com>
-Date: Thu, 22 Dec 2016 17:00:38 +0200
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <1B38E649-282F-4FAB-9B4B-C754B6F8ABED@daynix.com>
-References: <1482308491-25426-1-git-send-email-caoj.fnst@cn.fujitsu.com>
-	<1482308491-25426-2-git-send-email-caoj.fnst@cn.fujitsu.com>
-Subject: Re: [Qemu-devel] [PATCH v4 1/2] pcie_aer: Convert pcie_aer_init to
- Error
+	(envelope-from <eblake@redhat.com>) id 1cK4sI-0006yl-N3
+	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 10:01:45 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43894)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cK4sI-0006xd-FD
+	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 10:01:42 -0500
+References: <20161219154752.14563.46483.malonedeb@wampee.canonical.com>
+	<1482417047-15588-1-git-send-email-minyard@acm.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <b9a532a5-2527-0e6e-6c16-c4d23b62b8ef@redhat.com>
+Date: Thu, 22 Dec 2016 09:01:39 -0600
+MIME-Version: 1.0
+In-Reply-To: <1482417047-15588-1-git-send-email-minyard@acm.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="XmfDDt5Xoeo4scdkCMScSe1SC8djh7kmp"
+Subject: Re: [Qemu-devel] [PATCH] ipmi: Add parenthesis around some macro
+ parameters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,163 +29,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cao jin <caoj.fnst@cn.fujitsu.com>
-Cc: qemu-devel@nongnu.org, mst@redhat.com, marcel@redhat.com, jasowang@redhat.com
+To: minyard@acm.org, Bug 1651167 <1651167@bugs.launchpad.net>, qemu-devel@nongnu.org
+Cc: Corey Minyard <cminyard@mvista.com>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--XmfDDt5Xoeo4scdkCMScSe1SC8djh7kmp
+From: Eric Blake <eblake@redhat.com>
+To: minyard@acm.org, Bug 1651167 <1651167@bugs.launchpad.net>,
+ qemu-devel@nongnu.org
+Cc: Corey Minyard <cminyard@mvista.com>
+Message-ID: <b9a532a5-2527-0e6e-6c16-c4d23b62b8ef@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] ipmi: Add parenthesis around some macro
+ parameters
+References: <20161219154752.14563.46483.malonedeb@wampee.canonical.com>
+ <1482417047-15588-1-git-send-email-minyard@acm.org>
+In-Reply-To: <1482417047-15588-1-git-send-email-minyard@acm.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Acked-by: Dmitry Fleytman <dmitry@daynix.com>
-
-> On 21 Dec 2016, at 10:21 AM, Cao jin <caoj.fnst@cn.fujitsu.com> wrote:
+On 12/22/2016 08:30 AM, minyard@acm.org wrote:
+> From: Corey Minyard <cminyard@mvista.com>
 >=20
-> When user specify invalid value for property aer_log_max, device =
-should
-> fail to create, and report appropriate message.
+> Macro parameters should almost always have () around them when used.
+> llvm reported an error on this.
 >=20
-> Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
-> Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
-> Acked-by: Dmitry Fleytman <dmitry@daynix.com>
+> Reported in https://bugs.launchpad.net/bugs/1651167
+>=20
+> Signed-off-by: Corey Minyard <cminyard@mvista.com>
 > ---
-> hw/net/e1000e.c                    |  2 +-
-> hw/pci-bridge/ioh3420.c            |  3 ++-
-> hw/pci-bridge/xio3130_downstream.c |  3 ++-
-> hw/pci-bridge/xio3130_upstream.c   |  3 ++-
-> hw/pci/pcie_aer.c                  | 17 +++++++----------
-> include/hw/pci/pcie_aer.h          |  4 ++--
-> 6 files changed, 16 insertions(+), 16 deletions(-)
+>  hw/ipmi/isa_ipmi_bt.c | 18 +++++++++---------
+>  1 file changed, 9 insertions(+), 9 deletions(-)
 >=20
-> diff --git a/hw/net/e1000e.c b/hw/net/e1000e.c
-> index 4994e1ca0062..89f96eb4a076 100644
-> --- a/hw/net/e1000e.c
-> +++ b/hw/net/e1000e.c
-> @@ -472,7 +472,7 @@ static void e1000e_pci_realize(PCIDevice *pci_dev, =
-Error **errp)
->         hw_error("Failed to initialize PM capability");
->     }
->=20
-> -    if (pcie_aer_init(pci_dev, e1000e_aer_offset, PCI_ERR_SIZEOF) < =
-0) {
-> +    if (pcie_aer_init(pci_dev, e1000e_aer_offset, PCI_ERR_SIZEOF, =
-NULL) < 0) {
->         hw_error("Failed to initialize AER capability");
->     }
->=20
-> diff --git a/hw/pci-bridge/ioh3420.c b/hw/pci-bridge/ioh3420.c
-> index c8b5ac4207c5..04180af79471 100644
-> --- a/hw/pci-bridge/ioh3420.c
-> +++ b/hw/pci-bridge/ioh3420.c
-> @@ -135,8 +135,9 @@ static int ioh3420_initfn(PCIDevice *d)
->         goto err_pcie_cap;
->     }
->=20
-> -    rc =3D pcie_aer_init(d, IOH_EP_AER_OFFSET, PCI_ERR_SIZEOF);
-> +    rc =3D pcie_aer_init(d, IOH_EP_AER_OFFSET, PCI_ERR_SIZEOF, &err);
->     if (rc < 0) {
-> +        error_report_err(err);
->         goto err;
->     }
->     pcie_aer_root_init(d);
-> diff --git a/hw/pci-bridge/xio3130_downstream.c =
-b/hw/pci-bridge/xio3130_downstream.c
-> index cef6e1325ebf..571334185b42 100644
-> --- a/hw/pci-bridge/xio3130_downstream.c
-> +++ b/hw/pci-bridge/xio3130_downstream.c
-> @@ -97,8 +97,9 @@ static int xio3130_downstream_initfn(PCIDevice *d)
->         goto err_pcie_cap;
->     }
->=20
-> -    rc =3D pcie_aer_init(d, XIO3130_AER_OFFSET, PCI_ERR_SIZEOF);
-> +    rc =3D pcie_aer_init(d, XIO3130_AER_OFFSET, PCI_ERR_SIZEOF, =
-&err);
->     if (rc < 0) {
-> +        error_report_err(err);
->         goto err;
->     }
->=20
-> diff --git a/hw/pci-bridge/xio3130_upstream.c =
-b/hw/pci-bridge/xio3130_upstream.c
-> index 4ad0440aa164..94c16910069e 100644
-> --- a/hw/pci-bridge/xio3130_upstream.c
-> +++ b/hw/pci-bridge/xio3130_upstream.c
-> @@ -85,8 +85,9 @@ static int xio3130_upstream_initfn(PCIDevice *d)
->     pcie_cap_flr_init(d);
->     pcie_cap_deverr_init(d);
->=20
-> -    rc =3D pcie_aer_init(d, XIO3130_AER_OFFSET, PCI_ERR_SIZEOF);
-> +    rc =3D pcie_aer_init(d, XIO3130_AER_OFFSET, PCI_ERR_SIZEOF, =
-&err);
->     if (rc < 0) {
-> +        error_report_err(err);
->         goto err;
->     }
->=20
-> diff --git a/hw/pci/pcie_aer.c b/hw/pci/pcie_aer.c
-> index 048ce6a42455..2a4bd5aef639 100644
-> --- a/hw/pci/pcie_aer.c
-> +++ b/hw/pci/pcie_aer.c
-> @@ -29,6 +29,7 @@
-> #include "hw/pci/msi.h"
-> #include "hw/pci/pci_bus.h"
-> #include "hw/pci/pcie_regs.h"
-> +#include "qapi/error.h"
->=20
-> //#define DEBUG_PCIE
-> #ifdef DEBUG_PCIE
-> @@ -96,21 +97,17 @@ static void aer_log_clear_all_err(PCIEAERLog =
-*aer_log)
->     aer_log->log_num =3D 0;
-> }
->=20
-> -int pcie_aer_init(PCIDevice *dev, uint16_t offset, uint16_t size)
-> +int pcie_aer_init(PCIDevice *dev, uint16_t offset, uint16_t size,
-> +                  Error **errp)
-> {
-> -    PCIExpressDevice *exp;
-> -
->     pcie_add_capability(dev, PCI_EXT_CAP_ID_ERR, PCI_ERR_VER,
->                         offset, size);
-> -    exp =3D &dev->exp;
-> -    exp->aer_cap =3D offset;
-> +    dev->exp.aer_cap =3D offset;
->=20
-> -    /* log_max is property */
-> -    if (dev->exp.aer_log.log_max =3D=3D PCIE_AER_LOG_MAX_UNSET) {
-> -        dev->exp.aer_log.log_max =3D PCIE_AER_LOG_MAX_DEFAULT;
-> -    }
-> -    /* clip down the value to avoid unreasobale memory usage */
-> +    /* clip down the value to avoid unreasonable memory usage */
->     if (dev->exp.aer_log.log_max > PCIE_AER_LOG_MAX_LIMIT) {
-> +        error_setg(errp, "Invalid aer_log_max %d. The max number of =
-aer log "
-> +                "is %d", dev->exp.aer_log.log_max, =
-PCIE_AER_LOG_MAX_LIMIT);
->         return -EINVAL;
->     }
->     dev->exp.aer_log.log =3D g_malloc0(sizeof dev->exp.aer_log.log[0] =
-*
-> diff --git a/include/hw/pci/pcie_aer.h b/include/hw/pci/pcie_aer.h
-> index c2ee4e2bdbfc..5891b6816e85 100644
-> --- a/include/hw/pci/pcie_aer.h
-> +++ b/include/hw/pci/pcie_aer.h
-> @@ -44,7 +44,6 @@ struct PCIEAERLog {
->      */
-> #define PCIE_AER_LOG_MAX_DEFAULT        8
-> #define PCIE_AER_LOG_MAX_LIMIT          128
-> -#define PCIE_AER_LOG_MAX_UNSET          0xffff
->     uint16_t log_max;
->=20
->     /* Error log. log_max-sized array */
-> @@ -87,7 +86,8 @@ struct PCIEAERErr {
->=20
-> extern const VMStateDescription vmstate_pcie_aer_log;
->=20
-> -int pcie_aer_init(PCIDevice *dev, uint16_t offset, uint16_t size);
-> +int pcie_aer_init(PCIDevice *dev, uint16_t offset, uint16_t size,
-> +                  Error **errp);
-> void pcie_aer_exit(PCIDevice *dev);
-> void pcie_aer_write_config(PCIDevice *dev,
->                            uint32_t addr, uint32_t val, int len);
-> --=20
-> 2.1.0
->=20
->=20
->=20
+> diff --git a/hw/ipmi/isa_ipmi_bt.c b/hw/ipmi/isa_ipmi_bt.c
+> index f036617..8a97314 100644
+> --- a/hw/ipmi/isa_ipmi_bt.c
+> +++ b/hw/ipmi/isa_ipmi_bt.c
+> @@ -40,37 +40,37 @@
+>  #define IPMI_BT_CLR_WR_MASK        (1 << IPMI_BT_CLR_WR_BIT)
+>  #define IPMI_BT_GET_CLR_WR(d)      (((d) >> IPMI_BT_CLR_WR_BIT) & 0x1)=
+
+>  #define IPMI_BT_SET_CLR_WR(d, v)   (d) =3D (((d) & ~IPMI_BT_CLR_WR_MAS=
+K) | \
+
+Still under-parenthesized, if the result of IPMI_BT_SET_CLR_WR() is used
+in any larger expression;
+
+> -                                       (((v & 1) << IPMI_BT_CLR_WR_BIT=
+)))
+> +                                       ((((v) & 1) << IPMI_BT_CLR_WR_B=
+IT)))
+
+and at the same time, you (still) have a redundant set on the second line=
+=2E
+
+Better would be:
+
+((d) =3D (((d) & ~IPMI_BD_CLR_WR_MASK) | \
+        (((v) & 1) << IPMI_BT_CLR_WR_BIT)))
+
+> =20
+>  #define IPMI_BT_CLR_RD_MASK        (1 << IPMI_BT_CLR_RD_BIT)
+>  #define IPMI_BT_GET_CLR_RD(d)      (((d) >> IPMI_BT_CLR_RD_BIT) & 0x1)=
+
+>  #define IPMI_BT_SET_CLR_RD(d, v)   (d) =3D (((d) & ~IPMI_BT_CLR_RD_MAS=
+K) | \
+> -                                       (((v & 1) << IPMI_BT_CLR_RD_BIT=
+)))
+> +                                       ((((v) & 1) << IPMI_BT_CLR_RD_B=
+IT)))
+
+and again, throughout the patch.
+
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--XmfDDt5Xoeo4scdkCMScSe1SC8djh7kmp
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYW+rTAAoJEKeha0olJ0Nq2+IH/jU4O4MjrrPH3IQAjwj35GOe
+oX9X0/LMeL9003C2Du6tTddM/MG2eDQg/PR+n7UOvZnmT/5E+638dH6AvzC6A5Pu
+9wo8+JzuELe3CzdKzufmnpTE7FC6UUliQMOO0LaaDbW39nYqKOh1VLTA1nU3MrE7
+SjbjVTtJpdQwz51zABSMer4YVxAtQZ80XU/a/49iogD2OgF96VNvfqAmwGc4cnom
+36DxQDD4ERW1U9kAkqS+MpUAeUf8B3TEsd8bClL4hP7sclvF25AwUUGLAdbvstAN
+anPqqa7TkNRqgE2vYxnbUjlsBprEeLFrpc6xrzA5I+WgsWmgeW49VLz7Yxoyf+M=
+=wlyx
+-----END PGP SIGNATURE-----
+
+--XmfDDt5Xoeo4scdkCMScSe1SC8djh7kmp--
