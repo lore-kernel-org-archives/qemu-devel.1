@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44872)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44874)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cK5m5-00077S-Ad
+	(envelope-from <pbonzini@redhat.com>) id 1cK5m5-00077U-Az
 	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 10:59:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cK5m3-0003Xs-9O
+	(envelope-from <pbonzini@redhat.com>) id 1cK5m2-0003XS-9z
 	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 10:59:21 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41446)
+Received: from mx1.redhat.com ([209.132.183.28]:41434)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cK5m3-0003XX-3O
-	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 10:59:19 -0500
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cK5m2-0003X2-29
+	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 10:59:18 -0500
 Received: from int-mx10.intmail.prod.int.phx2.redhat.com
 	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2C5798E3E5
-	for <qemu-devel@nongnu.org>; Thu, 22 Dec 2016 15:59:18 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 05A7D7AEB3
+	for <qemu-devel@nongnu.org>; Thu, 22 Dec 2016 15:59:17 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 22 Dec 2016 16:59:05 +0100
-Message-Id: <20161222155915.7232-2-pbonzini@redhat.com>
-In-Reply-To: <20161222155915.7232-1-pbonzini@redhat.com>
-References: <20161222155915.7232-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 01/11] stubs: merge all monitor stubs in one
- file, remove monitor_cur_is_qmp stub
+Date: Thu, 22 Dec 2016 16:59:04 +0100
+Message-Id: <20161222155915.7232-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [RFC PATCH 00/11] Stubs cleanup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,93 +30,94 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: ehabkost@redhat.com
 
-monitor_cur_is_qmp was previously used by other stubs, but it's not
-since 397d30e ("qemu-error: remove dependency of stubs on monitor",
-2016-11-01).
+This moves out of libqemustub.a those functions which can be handled
+simply by $(call lnot), like we already do for pci-stub.c or kvm-stub.c.
+libqemustub.a keep the more complex cases where a small part of the
+executables we build needs an implementation of a small subset of an API.
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- stubs/Makefile.objs           |  4 +---
- stubs/mon-is-qmp.c            | 10 ----------
- stubs/monitor-init.c          |  7 -------
- stubs/{get-fd.c => monitor.c} |  6 ++++++
- 4 files changed, 7 insertions(+), 20 deletions(-)
+Paolo
+
+Paolo Bonzini (11):
+  stubs: merge all monitor stubs in one file, remove monitor_cur_is_qmp stub
+  stubs: move smbios stubs to hw/smbios
+  stubs: move acpi stubs to hw/acpi
+  stubs: remove unused stub for serial_hd
+  hw: move reset handlers from vl.c to hw/core
+  stubs: group stubs for user-mode emulation
+  stubs: group all monitor_fdset_* functions in a single file
+  stubs: move vhost stubs to stubs/vhost.o
+  event_notifier: cleanups around event_notifier_set_handler
+  build: remove --enable-colo/--disable-colo
+  stubs: remove stubs/kvm.c
+
+ MAINTAINERS                                        |  1 +
+ Makefile.target                                    |  4 +-
+ configure                                          | 11 ----
+ hw/Makefile.objs                                   |  2 +-
+ hw/acpi/Makefile.objs                              | 12 ++--
+ stubs/ipmi.c => hw/acpi/ipmi-stub.c                |  0
+ hw/core/Makefile.objs                              |  2 +-
+ hw/core/reset.c                                    | 72 ++++++++++++++++++++++
+ hw/smbios/Makefile.objs                            | 11 +++-
+ .../smbios/smbios_type_38-stub.c                   |  0
+ hw/usb/ccid-card-emulated.c                        |  2 +-
+ hw/virtio/Makefile.objs                            |  6 +-
+ stubs/vhost.c => hw/virtio/vhost-stub.c            |  0
+ hw/virtio/virtio.c                                 | 10 +--
+ include/hw/hw.h                                    |  6 +-
+ include/qemu/event_notifier.h                      |  3 -
+ include/qemu/main-loop.h                           | 15 +++++
+ include/sysemu/reset.h                             | 10 +++
+ include/sysemu/sysemu.h                            |  1 -
+ iohandler.c                                        |  7 +++
+ migration/Makefile.objs                            |  3 +-
+ stubs/Makefile.objs                                | 19 +-----
+ stubs/cpus.c                                       | 11 ----
+ stubs/fdset-add-fd.c                               |  8 ---
+ stubs/fdset-find-fd.c                              |  8 ---
+ stubs/fdset-get-fd.c                               |  8 ---
+ stubs/fdset-remove-fd.c                            |  7 ---
+ stubs/fdset.c                                      | 22 +++++++
+ stubs/get-next-serial.c                            |  4 --
+ stubs/iohandler.c                                  |  8 ---
+ stubs/kvm.c                                        |  8 ---
+ stubs/migration-colo.c                             | 46 --------------
+ stubs/mon-is-qmp.c                                 | 10 ---
+ stubs/monitor-init.c                               |  7 ---
+ stubs/{get-fd.c => monitor.c}                      |  6 ++
+ stubs/replay-user.c                                | 33 ----------
+ stubs/reset.c                                      | 14 -----
+ target/i386/hyperv.c                               |  7 ++-
+ target/mips/kvm.c                                  |  5 ++
+ target/ppc/kvm.c                                   |  5 ++
+ target/s390x/kvm.c                                 |  5 ++
+ tests/Makefile.include                             |  1 +
+ user-exec-stub.c                                   | 34 ++++++++++
+ util/event_notifier-posix.c                        |  9 ---
+ util/event_notifier-win32.c                        | 12 ----
+ vl.c                                               | 42 -------------
+ 46 files changed, 222 insertions(+), 295 deletions(-)
+ rename stubs/ipmi.c => hw/acpi/ipmi-stub.c (100%)
+ create mode 100644 hw/core/reset.c
+ rename stubs/smbios_type_38.c => hw/smbios/smbios_type_38-stub.c (100%)
+ rename stubs/vhost.c => hw/virtio/vhost-stub.c (100%)
+ create mode 100644 include/sysemu/reset.h
+ delete mode 100644 stubs/cpus.c
+ delete mode 100644 stubs/fdset-add-fd.c
+ delete mode 100644 stubs/fdset-find-fd.c
+ delete mode 100644 stubs/fdset-get-fd.c
+ delete mode 100644 stubs/fdset-remove-fd.c
+ create mode 100644 stubs/fdset.c
+ delete mode 100644 stubs/get-next-serial.c
+ delete mode 100644 stubs/iohandler.c
+ delete mode 100644 stubs/kvm.c
+ delete mode 100644 stubs/migration-colo.c
  delete mode 100644 stubs/mon-is-qmp.c
  delete mode 100644 stubs/monitor-init.c
  rename stubs/{get-fd.c => monitor.c} (75%)
+ delete mode 100644 stubs/replay-user.c
+ delete mode 100644 stubs/reset.c
+ create mode 100644 user-exec-stub.c
 
-diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-index 2b5bb74..9fc373e 100644
---- a/stubs/Makefile.objs
-+++ b/stubs/Makefile.objs
-@@ -15,7 +15,6 @@ stub-obj-y += fdset-find-fd.o
- stub-obj-y += fdset-get-fd.o
- stub-obj-y += fdset-remove-fd.o
- stub-obj-y += gdbstub.o
--stub-obj-y += get-fd.o
- stub-obj-y += get-next-serial.o
- stub-obj-y += get-vm-name.o
- stub-obj-y += iothread.o
-@@ -23,8 +22,7 @@ stub-obj-y += iothread-lock.o
- stub-obj-y += is-daemonized.o
- stub-obj-y += machine-init-done.o
- stub-obj-y += migr-blocker.o
--stub-obj-y += mon-is-qmp.o
--stub-obj-y += monitor-init.o
-+stub-obj-y += monitor.o
- stub-obj-y += notify-event.o
- stub-obj-y += qtest.o
- stub-obj-y += replay.o
-diff --git a/stubs/mon-is-qmp.c b/stubs/mon-is-qmp.c
-deleted file mode 100644
-index a8344ce..0000000
---- a/stubs/mon-is-qmp.c
-+++ /dev/null
-@@ -1,10 +0,0 @@
--#include "qemu/osdep.h"
--#include "qemu-common.h"
--#include "monitor/monitor.h"
--
--Monitor *cur_mon;
--
--bool monitor_cur_is_qmp(void)
--{
--    return false;
--}
-diff --git a/stubs/monitor-init.c b/stubs/monitor-init.c
-deleted file mode 100644
-index de1bc7c..0000000
---- a/stubs/monitor-init.c
-+++ /dev/null
-@@ -1,7 +0,0 @@
--#include "qemu/osdep.h"
--#include "qemu-common.h"
--#include "monitor/monitor.h"
--
--void monitor_init(CharDriverState *chr, int flags)
--{
--}
-diff --git a/stubs/get-fd.c b/stubs/monitor.c
-similarity index 75%
-rename from stubs/get-fd.c
-rename to stubs/monitor.c
-index 7dfdfb5..1d574b1 100644
---- a/stubs/get-fd.c
-+++ b/stubs/monitor.c
-@@ -3,8 +3,14 @@
- #include "qemu-common.h"
- #include "monitor/monitor.h"
- 
-+Monitor *cur_mon = NULL;
-+
- int monitor_get_fd(Monitor *mon, const char *name, Error **errp)
- {
-     error_setg(errp, "only QEMU supports file descriptor passing");
-     return -1;
- }
-+
-+void monitor_init(CharDriverState *chr, int flags)
-+{
-+}
 -- 
 2.9.3
