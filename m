@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35509)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37352)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1cK8sb-0002jZ-JW
-	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 14:18:18 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cK8y4-0004vG-8P
+	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 14:23:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1cK8sY-0000a7-Bd
-	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 14:18:17 -0500
-Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:36357)
+	(envelope-from <peter.maydell@linaro.org>) id 1cK8y3-0004Nv-9J
+	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 14:23:56 -0500
+Received: from mail-ua0-x22a.google.com ([2607:f8b0:400c:c08::22a]:35758)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1cK8sY-0000ZM-4m
-	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 14:18:14 -0500
-Received: by mail-pf0-x241.google.com with SMTP id c4so12812891pfb.3
-	for <qemu-devel@nongnu.org>; Thu, 22 Dec 2016 11:18:14 -0800 (PST)
-Sender: Corey Minyard <tcminyard@gmail.com>
-From: minyard@acm.org
-Date: Thu, 22 Dec 2016 13:18:07 -0600
-Message-Id: <1482434287-26044-1-git-send-email-minyard@acm.org>
-In-Reply-To: <20161219154752.14563.46483.malonedeb@wampee.canonical.com>
-References: <20161219154752.14563.46483.malonedeb@wampee.canonical.com>
-Subject: [Qemu-devel] [PATCH v2] ipmi: Fix macro issues
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cK8y3-0004Nb-3y
+	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 14:23:55 -0500
+Received: by mail-ua0-x22a.google.com with SMTP id 2so116254265uax.2
+	for <qemu-devel@nongnu.org>; Thu, 22 Dec 2016 11:23:54 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <20161222104740.19606-1-berrange@redhat.com>
+References: <20161222104740.19606-1-berrange@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 22 Dec 2016 19:23:34 +0000
+Message-ID: <CAFEAcA-A3jD7EFvo5sio5F5f4=EjByyZHj6exXzPHk-YibKCSA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL v2 0/8] Merge qcrypto 2016-12-21
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,101 +29,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bug 1651167 <1651167@bugs.launchpad.net>, qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>
-Cc: Corey Minyard <cminyard@mvista.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-From: Corey Minyard <cminyard@mvista.com>
+On 22 December 2016 at 10:47, Daniel P. Berrange <berrange@redhat.com> wrot=
+e:
+> The following changes since commit 82ecffa8c050bf5bbc13329e9b65eac1caa5b5=
+5c:
+>
+>   Open 2.9 development tree (2016-12-20 16:20:16 +0000)
+>
+> are available in the git repository at:
+>
+>   git://github.com/berrange/qemu pull-qcrypto-2016-12-21-2
+>
+> for you to fetch changes up to 4fd460bf25b197f94b9db463b77a69433901ac92:
+>
+>   crypto: add HMAC algorithms testcases (2016-12-22 09:24:59 +0000)
+>
+> ----------------------------------------------------------------
+> Merge qcrypto 2016/12/21 v2
+>
+> ----------------------------------------------------------------
+>
+> Longpeng(Mike) (7):
+>   crypto: add 3des-ede support when using libgcrypt/nettle
+>   configure: add CONFIG_GCRYPT_HMAC item
+>   crypto: add HMAC algorithms framework
+>   crypto: support HMAC algorithms based on libgcrypt
+>   crypto: support HMAC algorithms based on glib
+>   crypto: support HMAC algorithms based on nettle
+>   crypto: add HMAC algorithms testcases
+>
+> Marc-Andr=C3=A9 Lureau (1):
+>   cipher: fix leak on initialization error
 
-Macro parameters should almost always have () around them when used.
-llvm reported an error on this.
+Applied, thanks.
 
-Remove redundant parenthesis and put parenthesis around the entire
-macros with assignments in case they are used in an expression.
-
-Remove some unused macros.
-
-Reported in https://bugs.launchpad.net/bugs/1651167
-
-Signed-off-by: Corey Minyard <cminyard@mvista.com>
----
- hw/ipmi/isa_ipmi_bt.c | 34 ++++++++++++----------------------
- 1 file changed, 12 insertions(+), 22 deletions(-)
-
-Changes in v2:
-  * Put parenthesis around macros that had assignment in them.
-  * Removed some redundant parenthesis.
-  * Removed some macros that were not used.
-
-diff --git a/hw/ipmi/isa_ipmi_bt.c b/hw/ipmi/isa_ipmi_bt.c
-index f036617..68bf5cd 100644
---- a/hw/ipmi/isa_ipmi_bt.c
-+++ b/hw/ipmi/isa_ipmi_bt.c
-@@ -37,40 +37,30 @@
- #define IPMI_BT_HBUSY_BIT          6
- #define IPMI_BT_BBUSY_BIT          7
- 
--#define IPMI_BT_CLR_WR_MASK        (1 << IPMI_BT_CLR_WR_BIT)
- #define IPMI_BT_GET_CLR_WR(d)      (((d) >> IPMI_BT_CLR_WR_BIT) & 0x1)
--#define IPMI_BT_SET_CLR_WR(d, v)   (d) = (((d) & ~IPMI_BT_CLR_WR_MASK) | \
--                                       (((v & 1) << IPMI_BT_CLR_WR_BIT)))
- 
--#define IPMI_BT_CLR_RD_MASK        (1 << IPMI_BT_CLR_RD_BIT)
- #define IPMI_BT_GET_CLR_RD(d)      (((d) >> IPMI_BT_CLR_RD_BIT) & 0x1)
--#define IPMI_BT_SET_CLR_RD(d, v)   (d) = (((d) & ~IPMI_BT_CLR_RD_MASK) | \
--                                       (((v & 1) << IPMI_BT_CLR_RD_BIT)))
- 
--#define IPMI_BT_H2B_ATN_MASK       (1 << IPMI_BT_H2B_ATN_BIT)
- #define IPMI_BT_GET_H2B_ATN(d)     (((d) >> IPMI_BT_H2B_ATN_BIT) & 0x1)
--#define IPMI_BT_SET_H2B_ATN(d, v)  (d) = (((d) & ~IPMI_BT_H2B_ATN_MASK) | \
--                                        (((v & 1) << IPMI_BT_H2B_ATN_BIT)))
- 
- #define IPMI_BT_B2H_ATN_MASK       (1 << IPMI_BT_B2H_ATN_BIT)
- #define IPMI_BT_GET_B2H_ATN(d)     (((d) >> IPMI_BT_B2H_ATN_BIT) & 0x1)
--#define IPMI_BT_SET_B2H_ATN(d, v)  (d) = (((d) & ~IPMI_BT_B2H_ATN_MASK) | \
--                                        (((v & 1) << IPMI_BT_B2H_ATN_BIT)))
-+#define IPMI_BT_SET_B2H_ATN(d, v)  ((d) = (((d) & ~IPMI_BT_B2H_ATN_MASK) | \
-+                                        (((v) & 1) << IPMI_BT_B2H_ATN_BIT)))
- 
- #define IPMI_BT_SMS_ATN_MASK       (1 << IPMI_BT_SMS_ATN_BIT)
- #define IPMI_BT_GET_SMS_ATN(d)     (((d) >> IPMI_BT_SMS_ATN_BIT) & 0x1)
--#define IPMI_BT_SET_SMS_ATN(d, v)  (d) = (((d) & ~IPMI_BT_SMS_ATN_MASK) | \
--                                        (((v & 1) << IPMI_BT_SMS_ATN_BIT)))
-+#define IPMI_BT_SET_SMS_ATN(d, v)  ((d) = (((d) & ~IPMI_BT_SMS_ATN_MASK) | \
-+                                        (((v) & 1) << IPMI_BT_SMS_ATN_BIT)))
- 
- #define IPMI_BT_HBUSY_MASK         (1 << IPMI_BT_HBUSY_BIT)
- #define IPMI_BT_GET_HBUSY(d)       (((d) >> IPMI_BT_HBUSY_BIT) & 0x1)
--#define IPMI_BT_SET_HBUSY(d, v)    (d) = (((d) & ~IPMI_BT_HBUSY_MASK) | \
--                                       (((v & 1) << IPMI_BT_HBUSY_BIT)))
-+#define IPMI_BT_SET_HBUSY(d, v)    ((d) = (((d) & ~IPMI_BT_HBUSY_MASK) | \
-+                                       (((v) & 1) << IPMI_BT_HBUSY_BIT)))
- 
- #define IPMI_BT_BBUSY_MASK         (1 << IPMI_BT_BBUSY_BIT)
--#define IPMI_BT_GET_BBUSY(d)       (((d) >> IPMI_BT_BBUSY_BIT) & 0x1)
--#define IPMI_BT_SET_BBUSY(d, v)    (d) = (((d) & ~IPMI_BT_BBUSY_MASK) | \
--                                       (((v & 1) << IPMI_BT_BBUSY_BIT)))
-+#define IPMI_BT_SET_BBUSY(d, v)    ((d) = (((d) & ~IPMI_BT_BBUSY_MASK) | \
-+                                       (((v) & 1) << IPMI_BT_BBUSY_BIT)))
- 
- 
- /* Mask register */
-@@ -79,13 +69,13 @@
- 
- #define IPMI_BT_B2H_IRQ_EN_MASK      (1 << IPMI_BT_B2H_IRQ_EN_BIT)
- #define IPMI_BT_GET_B2H_IRQ_EN(d)    (((d) >> IPMI_BT_B2H_IRQ_EN_BIT) & 0x1)
--#define IPMI_BT_SET_B2H_IRQ_EN(d, v) (d) = (((d) & ~IPMI_BT_B2H_IRQ_EN_MASK) | \
--                                        (((v & 1) << IPMI_BT_B2H_IRQ_EN_BIT)))
-+#define IPMI_BT_SET_B2H_IRQ_EN(d, v) ((d) = (((d) & ~IPMI_BT_B2H_IRQ_EN_MASK) |\
-+                                        (((v) & 1) << IPMI_BT_B2H_IRQ_EN_BIT)))
- 
- #define IPMI_BT_B2H_IRQ_MASK         (1 << IPMI_BT_B2H_IRQ_BIT)
- #define IPMI_BT_GET_B2H_IRQ(d)       (((d) >> IPMI_BT_B2H_IRQ_BIT) & 0x1)
--#define IPMI_BT_SET_B2H_IRQ(d, v)    (d) = (((d) & ~IPMI_BT_B2H_IRQ_MASK) | \
--                                        (((v & 1) << IPMI_BT_B2H_IRQ_BIT)))
-+#define IPMI_BT_SET_B2H_IRQ(d, v)    ((d) = (((d) & ~IPMI_BT_B2H_IRQ_MASK) | \
-+                                        (((v) & 1) << IPMI_BT_B2H_IRQ_BIT)))
- 
- typedef struct IPMIBT {
-     IPMIBmc *bmc;
--- 
-2.7.4
+-- PMM
