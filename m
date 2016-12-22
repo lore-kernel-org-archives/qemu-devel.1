@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48017)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35509)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1cK8Ij-0007Gy-4O
-	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 13:41:15 -0500
+	(envelope-from <tcminyard@gmail.com>) id 1cK8sb-0002jZ-JW
+	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 14:18:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1cK8If-0004u3-Uq
-	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 13:41:13 -0500
-Received: from roura.ac.upc.es ([147.83.33.10]:35594)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1cK8If-0004tM-C6
-	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 13:41:09 -0500
-From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
-Date: Thu, 22 Dec 2016 19:36:04 +0100
-Message-Id: <148243176446.7321.1668498196893049922.stgit@fimbulvetr.bsc.es>
-In-Reply-To: <148243173750.7321.8231977784466776952.stgit@fimbulvetr.bsc.es>
-References: <148243173750.7321.8231977784466776952.stgit@fimbulvetr.bsc.es>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 5/6] trace: [tcg] Do not generate TCG code
- to trace dinamically-disabled events
+	(envelope-from <tcminyard@gmail.com>) id 1cK8sY-0000a7-Bd
+	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 14:18:17 -0500
+Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:36357)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1cK8sY-0000ZM-4m
+	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 14:18:14 -0500
+Received: by mail-pf0-x241.google.com with SMTP id c4so12812891pfb.3
+	for <qemu-devel@nongnu.org>; Thu, 22 Dec 2016 11:18:14 -0800 (PST)
+Sender: Corey Minyard <tcminyard@gmail.com>
+From: minyard@acm.org
+Date: Thu, 22 Dec 2016 13:18:07 -0600
+Message-Id: <1482434287-26044-1-git-send-email-minyard@acm.org>
+In-Reply-To: <20161219154752.14563.46483.malonedeb@wampee.canonical.com>
+References: <20161219154752.14563.46483.malonedeb@wampee.canonical.com>
+Subject: [Qemu-devel] [PATCH v2] ipmi: Fix macro issues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,143 +26,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Bug 1651167 <1651167@bugs.launchpad.net>, qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>
+Cc: Corey Minyard <cminyard@mvista.com>
 
-If an event is dynamically disabled, the TCG code that calls the
-execution-time tracer is not generated.
+From: Corey Minyard <cminyard@mvista.com>
 
-Removes the overheads of execution-time tracers for dynamically disabled
-events. As a bonus, also avoids checking the event state when the
-execution-time tracer is called from TCG-generated code (since otherwise
-TCG would simply not call it).
+Macro parameters should almost always have () around them when used.
+llvm reported an error on this.
 
-Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+Remove redundant parenthesis and put parenthesis around the entire
+macros with assignments in case they are used in an expression.
+
+Remove some unused macros.
+
+Reported in https://bugs.launchpad.net/bugs/1651167
+
+Signed-off-by: Corey Minyard <cminyard@mvista.com>
 ---
- scripts/tracetool/__init__.py            |    1 +
- scripts/tracetool/format/h.py            |   24 ++++++++++++++++++------
- scripts/tracetool/format/tcg_h.py        |   19 ++++++++++++++++---
- scripts/tracetool/format/tcg_helper_c.py |    3 ++-
- 4 files changed, 37 insertions(+), 10 deletions(-)
+ hw/ipmi/isa_ipmi_bt.c | 34 ++++++++++++----------------------
+ 1 file changed, 12 insertions(+), 22 deletions(-)
 
-diff --git a/scripts/tracetool/__init__.py b/scripts/tracetool/__init__.p=
-y
-index 365446fa53..63168ccdf0 100644
---- a/scripts/tracetool/__init__.py
-+++ b/scripts/tracetool/__init__.py
-@@ -264,6 +264,7 @@ class Event(object):
-         return self._FMT.findall(self.fmt)
-=20
-     QEMU_TRACE               =3D "trace_%(name)s"
-+    QEMU_TRACE_NOCHECK       =3D "_nocheck__" + QEMU_TRACE
-     QEMU_TRACE_TCG           =3D QEMU_TRACE + "_tcg"
-     QEMU_DSTATE              =3D "_TRACE_%(NAME)s_DSTATE"
-     QEMU_EVENT               =3D "_TRACE_%(NAME)s_EVENT"
-diff --git a/scripts/tracetool/format/h.py b/scripts/tracetool/format/h.p=
-y
-index 3682f4e6a8..a78e50ef35 100644
---- a/scripts/tracetool/format/h.py
-+++ b/scripts/tracetool/format/h.py
-@@ -49,6 +49,19 @@ def generate(events, backend, group):
-     backend.generate_begin(events, group)
-=20
-     for e in events:
-+        # tracer without checks
-+        out('',
-+            'static inline void %(api)s(%(args)s)',
-+            '{',
-+            api=3De.api(e.QEMU_TRACE_NOCHECK),
-+            args=3De.args)
-+
-+        if "disable" not in e.properties:
-+            backend.generate(e, group)
-+
-+        out('}')
-+
-+        # tracer wrapper with checks (per-vCPU tracing)
-         if "vcpu" in e.properties:
-             trace_cpu =3D next(iter(e.args))[1]
-             cond =3D "trace_event_get_vcpu_state(%(cpu)s,"\
-@@ -63,16 +76,15 @@ def generate(events, backend, group):
-             'static inline void %(api)s(%(args)s)',
-             '{',
-             '    if (%(cond)s) {',
-+            '        %(api_nocheck)s(%(names)s);',
-+            '    }',
-+            '}',
-             api=3De.api(),
-+            api_nocheck=3De.api(e.QEMU_TRACE_NOCHECK),
-             args=3De.args,
-+            names=3D", ".join(e.args.names()),
-             cond=3Dcond)
-=20
--        if "disable" not in e.properties:
--            backend.generate(e, group)
--
--        out('    }',
--            '}')
--
-     backend.generate_end(events, group)
-=20
-     out('#endif /* TRACE_%s_GENERATED_TRACERS_H */' % group.upper())
-diff --git a/scripts/tracetool/format/tcg_h.py b/scripts/tracetool/format=
-/tcg_h.py
-index 5f213f6cba..71b5c09432 100644
---- a/scripts/tracetool/format/tcg_h.py
-+++ b/scripts/tracetool/format/tcg_h.py
-@@ -41,7 +41,7 @@ def generate(events, backend, group):
-=20
-     for e in events:
-         # just keep one of them
--        if "tcg-trans" not in e.properties:
-+        if "tcg-exec" not in e.properties:
-             continue
-=20
-         out('static inline void %(name_tcg)s(%(args)s)',
-@@ -53,12 +53,25 @@ def generate(events, backend, group):
-             args_trans =3D e.original.event_trans.args
-             args_exec =3D tracetool.vcpu.transform_args(
-                 "tcg_helper_c", e.original.event_exec, "wrapper")
-+            if "vcpu" in e.properties:
-+                trace_cpu =3D e.args.names()[0]
-+                cond =3D "trace_event_get_vcpu_state(%(cpu)s,"\
-+                       " TRACE_%(id)s)"\
-+                       % dict(
-+                           cpu=3Dtrace_cpu,
-+                           id=3De.original.event_exec.name.upper())
-+            else:
-+                cond =3D "true"
-+
-             out('    %(name_trans)s(%(argnames_trans)s);',
--                '    gen_helper_%(name_exec)s(%(argnames_exec)s);',
-+                '    if (%(cond)s) {',
-+                '        gen_helper_%(name_exec)s(%(argnames_exec)s);',
-+                '    }',
-                 name_trans=3De.original.event_trans.api(e.QEMU_TRACE),
-                 name_exec=3De.original.event_exec.api(e.QEMU_TRACE),
-                 argnames_trans=3D", ".join(args_trans.names()),
--                argnames_exec=3D", ".join(args_exec.names()))
-+                argnames_exec=3D", ".join(args_exec.names()),
-+                cond=3Dcond)
-=20
-         out('}')
-=20
-diff --git a/scripts/tracetool/format/tcg_helper_c.py b/scripts/tracetool=
-/format/tcg_helper_c.py
-index cc26e03008..c2a05d756c 100644
---- a/scripts/tracetool/format/tcg_helper_c.py
-+++ b/scripts/tracetool/format/tcg_helper_c.py
-@@ -66,10 +66,11 @@ def generate(events, backend, group):
-=20
-         out('void %(name_tcg)s(%(args_api)s)',
-             '{',
-+            # NOTE: the check was already performed at TCG-generation ti=
-me
-             '    %(name)s(%(args_call)s);',
-             '}',
-             name_tcg=3D"helper_%s_proxy" % e.api(),
--            name=3De.api(),
-+            name=3De.api(e.QEMU_TRACE_NOCHECK),
-             args_api=3De_args_api,
-             args_call=3D", ".join(e_args_call.casted()),
-             )
+Changes in v2:
+  * Put parenthesis around macros that had assignment in them.
+  * Removed some redundant parenthesis.
+  * Removed some macros that were not used.
+
+diff --git a/hw/ipmi/isa_ipmi_bt.c b/hw/ipmi/isa_ipmi_bt.c
+index f036617..68bf5cd 100644
+--- a/hw/ipmi/isa_ipmi_bt.c
++++ b/hw/ipmi/isa_ipmi_bt.c
+@@ -37,40 +37,30 @@
+ #define IPMI_BT_HBUSY_BIT          6
+ #define IPMI_BT_BBUSY_BIT          7
+ 
+-#define IPMI_BT_CLR_WR_MASK        (1 << IPMI_BT_CLR_WR_BIT)
+ #define IPMI_BT_GET_CLR_WR(d)      (((d) >> IPMI_BT_CLR_WR_BIT) & 0x1)
+-#define IPMI_BT_SET_CLR_WR(d, v)   (d) = (((d) & ~IPMI_BT_CLR_WR_MASK) | \
+-                                       (((v & 1) << IPMI_BT_CLR_WR_BIT)))
+ 
+-#define IPMI_BT_CLR_RD_MASK        (1 << IPMI_BT_CLR_RD_BIT)
+ #define IPMI_BT_GET_CLR_RD(d)      (((d) >> IPMI_BT_CLR_RD_BIT) & 0x1)
+-#define IPMI_BT_SET_CLR_RD(d, v)   (d) = (((d) & ~IPMI_BT_CLR_RD_MASK) | \
+-                                       (((v & 1) << IPMI_BT_CLR_RD_BIT)))
+ 
+-#define IPMI_BT_H2B_ATN_MASK       (1 << IPMI_BT_H2B_ATN_BIT)
+ #define IPMI_BT_GET_H2B_ATN(d)     (((d) >> IPMI_BT_H2B_ATN_BIT) & 0x1)
+-#define IPMI_BT_SET_H2B_ATN(d, v)  (d) = (((d) & ~IPMI_BT_H2B_ATN_MASK) | \
+-                                        (((v & 1) << IPMI_BT_H2B_ATN_BIT)))
+ 
+ #define IPMI_BT_B2H_ATN_MASK       (1 << IPMI_BT_B2H_ATN_BIT)
+ #define IPMI_BT_GET_B2H_ATN(d)     (((d) >> IPMI_BT_B2H_ATN_BIT) & 0x1)
+-#define IPMI_BT_SET_B2H_ATN(d, v)  (d) = (((d) & ~IPMI_BT_B2H_ATN_MASK) | \
+-                                        (((v & 1) << IPMI_BT_B2H_ATN_BIT)))
++#define IPMI_BT_SET_B2H_ATN(d, v)  ((d) = (((d) & ~IPMI_BT_B2H_ATN_MASK) | \
++                                        (((v) & 1) << IPMI_BT_B2H_ATN_BIT)))
+ 
+ #define IPMI_BT_SMS_ATN_MASK       (1 << IPMI_BT_SMS_ATN_BIT)
+ #define IPMI_BT_GET_SMS_ATN(d)     (((d) >> IPMI_BT_SMS_ATN_BIT) & 0x1)
+-#define IPMI_BT_SET_SMS_ATN(d, v)  (d) = (((d) & ~IPMI_BT_SMS_ATN_MASK) | \
+-                                        (((v & 1) << IPMI_BT_SMS_ATN_BIT)))
++#define IPMI_BT_SET_SMS_ATN(d, v)  ((d) = (((d) & ~IPMI_BT_SMS_ATN_MASK) | \
++                                        (((v) & 1) << IPMI_BT_SMS_ATN_BIT)))
+ 
+ #define IPMI_BT_HBUSY_MASK         (1 << IPMI_BT_HBUSY_BIT)
+ #define IPMI_BT_GET_HBUSY(d)       (((d) >> IPMI_BT_HBUSY_BIT) & 0x1)
+-#define IPMI_BT_SET_HBUSY(d, v)    (d) = (((d) & ~IPMI_BT_HBUSY_MASK) | \
+-                                       (((v & 1) << IPMI_BT_HBUSY_BIT)))
++#define IPMI_BT_SET_HBUSY(d, v)    ((d) = (((d) & ~IPMI_BT_HBUSY_MASK) | \
++                                       (((v) & 1) << IPMI_BT_HBUSY_BIT)))
+ 
+ #define IPMI_BT_BBUSY_MASK         (1 << IPMI_BT_BBUSY_BIT)
+-#define IPMI_BT_GET_BBUSY(d)       (((d) >> IPMI_BT_BBUSY_BIT) & 0x1)
+-#define IPMI_BT_SET_BBUSY(d, v)    (d) = (((d) & ~IPMI_BT_BBUSY_MASK) | \
+-                                       (((v & 1) << IPMI_BT_BBUSY_BIT)))
++#define IPMI_BT_SET_BBUSY(d, v)    ((d) = (((d) & ~IPMI_BT_BBUSY_MASK) | \
++                                       (((v) & 1) << IPMI_BT_BBUSY_BIT)))
+ 
+ 
+ /* Mask register */
+@@ -79,13 +69,13 @@
+ 
+ #define IPMI_BT_B2H_IRQ_EN_MASK      (1 << IPMI_BT_B2H_IRQ_EN_BIT)
+ #define IPMI_BT_GET_B2H_IRQ_EN(d)    (((d) >> IPMI_BT_B2H_IRQ_EN_BIT) & 0x1)
+-#define IPMI_BT_SET_B2H_IRQ_EN(d, v) (d) = (((d) & ~IPMI_BT_B2H_IRQ_EN_MASK) | \
+-                                        (((v & 1) << IPMI_BT_B2H_IRQ_EN_BIT)))
++#define IPMI_BT_SET_B2H_IRQ_EN(d, v) ((d) = (((d) & ~IPMI_BT_B2H_IRQ_EN_MASK) |\
++                                        (((v) & 1) << IPMI_BT_B2H_IRQ_EN_BIT)))
+ 
+ #define IPMI_BT_B2H_IRQ_MASK         (1 << IPMI_BT_B2H_IRQ_BIT)
+ #define IPMI_BT_GET_B2H_IRQ(d)       (((d) >> IPMI_BT_B2H_IRQ_BIT) & 0x1)
+-#define IPMI_BT_SET_B2H_IRQ(d, v)    (d) = (((d) & ~IPMI_BT_B2H_IRQ_MASK) | \
+-                                        (((v & 1) << IPMI_BT_B2H_IRQ_BIT)))
++#define IPMI_BT_SET_B2H_IRQ(d, v)    ((d) = (((d) & ~IPMI_BT_B2H_IRQ_MASK) | \
++                                        (((v) & 1) << IPMI_BT_B2H_IRQ_BIT)))
+ 
+ typedef struct IPMIBT {
+     IPMIBmc *bmc;
+-- 
+2.7.4
