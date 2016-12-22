@@ -1,33 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58542)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59040)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cK0QP-0001Pt-OE
-	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 05:16:39 -0500
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1cK0US-0004gW-U8
+	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 05:20:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cK0QK-00075i-PZ
-	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 05:16:37 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55124)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cK0QK-00074N-GY
-	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 05:16:32 -0500
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DEECE37F1F
-	for <qemu-devel@nongnu.org>; Thu, 22 Dec 2016 10:16:30 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20161206141343.28044-1-marcandre.lureau@redhat.com>
-	<20161206141343.28044-8-marcandre.lureau@redhat.com>
-Date: Thu, 22 Dec 2016 11:16:28 +0100
-In-Reply-To: <20161206141343.28044-8-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
-	Lureau"'s message of "Tue, 6 Dec 2016 17:13:33 +0300")
-Message-ID: <87wpes46bn.fsf@dusky.pond.sub.org>
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1cK0UN-0000NP-VU
+	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 05:20:48 -0500
+Received: from [59.151.112.132] (port=58523 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1cK0UN-0000HF-9Q
+	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 05:20:43 -0500
+References: <1482137486-9843-1-git-send-email-douly.fnst@cn.fujitsu.com>
+	<20161219150230.GA20757@stefanha-x1.localdomain>
+	<20161219163214.GA9801@lemon>
+	<20161220093938.GB5602@stefanha-x1.localdomain>
+	<d6502c6d-616c-66dc-9c49-0fff7f1ee28c@cn.fujitsu.com>
+	<20161221110657.GD9482@stefanha-x1.localdomain>
+From: Dou Liyang <douly.fnst@cn.fujitsu.com>
+Message-ID: <4b7fa12f-7c6d-7a84-37e8-b4cb393059d9@cn.fujitsu.com>
+Date: Thu, 22 Dec 2016 18:20:14 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 07/17] qapi: use a QAPIParseError in
- parser
+In-Reply-To: <20161221110657.GD9482@stefanha-x1.localdomain>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RFC v2 0/4] block/qapi: refactor and
+ optimize the qmp_query_blockstats()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,143 +32,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, kwolf@redhat.com, armbru@redhat.com, mreitz@redhat.com, eblake@redhat.com, izumi.taku@jp.fujitsu.com, caoj.fnst@cn.fujitsu.com, fanc.fnst@cn.fujitsu.com, qemu-devel@nongnu.org
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  scripts/qapi.py                          | 13 +++++++------
->  tests/qapi-schema/include-cycle.err      |  2 +-
->  tests/qapi-schema/include-format-err.err |  2 +-
->  tests/qapi-schema/include-no-file.err    |  2 +-
->  tests/qapi-schema/include-non-file.err   |  2 +-
->  tests/qapi-schema/include-self-cycle.err |  2 +-
->  6 files changed, 12 insertions(+), 11 deletions(-)
+
+At 12/21/2016 07:06 PM, Stefan Hajnoczi wrote:
+> On Wed, Dec 21, 2016 at 05:13:39PM +0800, Dou Liyang wrote:
+>> Hi Stefan,
+>>
+>> At 12/20/2016 05:39 PM, Stefan Hajnoczi wrote:
+>>> On Tue, Dec 20, 2016 at 12:32:40AM +0800, Fam Zheng wrote:
+>>>> On Mon, 12/19 15:02, Stefan Hajnoczi wrote:
+>>>>> On Mon, Dec 19, 2016 at 04:51:22PM +0800, Dou Liyang wrote:
+>>>>>> These patches aim to refactor the qmp_query_blockstats() and
+>>>>>> improve the performance by reducing the running time of it.
+>>>>>>
+>>>>>> qmp_query_blockstats() is used to monitor the blockstats, it
+>>>>>> querys all the graph_bdrv_states or monitor_block_backends.
+>>>>>>
+>>>>>> There are the two jobs:
+>>>>>>
+>>>>>> 1 For the performance:
+>>>>>>
+>>>>>> 1.1 the time it takes(ns) in each time:
+>>>>>> the disk numbers     | 10    | 500
+>>>>>> -------------------------------------
+>>>>>> before these patches | 19429 | 667722
+>>>>>> after these patches  | 17516 | 557044
+>>>>>>
+>>>>>> 1.2 the I/O performance is degraded(%) during the monitor:
+>>>>>>
+>>>>>> the disk numbers     | 10    | 500
+>>>>>> -------------------------------------
+>>>>>> before these patches | 1.3   | 14.2
+>>>>>> after these patches  | 0.8   | 9.1
+>>>>>
+>>>>> Do you know what is consuming the remaining 9.1%?
+>>>>>
+>>>>> I'm surprised to see such a high performance impact caused by a QMP
+>>>>> command.
+>>>>
+>>>> If it's "performance is 9.1% worse only during the 557044 ns when the QMP
+>>>> command is being processed", it's probably becaues the main loop is stalled a
+>>>> bit, and it's not a big problem. I'd be very surprised if the degradation is
+>>>> more longer than that.
+>>>
+>>> It would be interesting to compare against virtio-blk dataplane.  That
+>>> way the QMP command can execute without interfering with disk I/O activity.
+>>>
+>>> qemu-system-x86_64 ... \
+>>>     -object iothread,id=iothread0 \
+>>>     -drive if=none,id=drive0,file=vm.img,format=raw,aio=native,cache=none \
+>>>     -device virtio-blk-pci,drive=drive0,iothread=iothread0
+>>
+>> Here is the result in the guest with 500 disks:
+>>
+>> QMP command     | not execute | execute in each 0.5s |
+>> -------------------------------------------------------
+>> Average Times/s | 102.34675   | 103.128              |
+>>
+>> the degradation is 0.76%, that can be ignored.
+>>
+>> the dd command:
+>> dd if=date_1.dat of=date_2.dat conv=fsync oflag=direct bs=1k count=400k
 >
-> diff --git a/scripts/qapi.py b/scripts/qapi.py
-> index 5885c9e4ad..5423b64b23 100644
-> --- a/scripts/qapi.py
-> +++ b/scripts/qapi.py
-> @@ -148,19 +148,19 @@ class QAPISchemaParser(object):
->              expr =3D self.get_expr(False)
->              if isinstance(expr, dict) and "include" in expr:
->                  if len(expr) !=3D 1:
-> -                    raise QAPISemError(info, "Invalid 'include' directiv=
-e")
-> +                    raise QAPIParseError(self, "Invalid 'include' direct=
-ive")
->                  include =3D expr["include"]
->                  if not isinstance(include, str):
-> -                    raise QAPISemError(info,
-> -                                       "Value of 'include' must be a str=
-ing")
-> +                    raise QAPIParseError(self,
-> +                                         "Value of 'include' must be a s=
-tring")
->                  incl_abs_fname =3D os.path.join(os.path.dirname(abs_fnam=
-e),
->                                                include)
->                  # catch inclusion cycle
->                  inf =3D info
->                  while inf:
->                      if incl_abs_fname =3D=3D os.path.abspath(inf['file']=
-):
-> -                        raise QAPISemError(info, "Inclusion loop for %s"
-> -                                           % include)
-> +                        raise QAPIParseError(self, "Inclusion loop for %=
-s"
-> +                                             % include)
->                      inf =3D inf['parent']
->                  # skip multiple include of the same file
->                  if incl_abs_fname in previously_included:
-> @@ -168,7 +168,8 @@ class QAPISchemaParser(object):
->                  try:
->                      fobj =3D open(incl_abs_fname, 'r')
->                  except IOError as e:
-> -                    raise QAPISemError(info, '%s: %s' % (e.strerror, inc=
-lude))
-> +                    raise QAPIParseError(self, '%s: %s' %
-> +                                         (e.strerror, include))
->                  exprs_include =3D QAPISchemaParser(fobj, previously_incl=
-uded,
->                                                   info)
->                  self.exprs.extend(exprs_include.exprs)
-> diff --git a/tests/qapi-schema/include-cycle.err b/tests/qapi-schema/incl=
-ude-cycle.err
-> index bdcd07dce2..f96edd2eff 100644
-> --- a/tests/qapi-schema/include-cycle.err
-> +++ b/tests/qapi-schema/include-cycle.err
-> @@ -1,3 +1,3 @@
->  In file included from tests/qapi-schema/include-cycle.json:1:
->  In file included from tests/qapi-schema/include-cycle-b.json:1:
-> -tests/qapi-schema/include-cycle-c.json:1: Inclusion loop for include-cyc=
-le.json
-> +tests/qapi-schema/include-cycle-c.json:1:36: Inclusion loop for include-=
-cycle.json
+> Excellent.  It's good to know that dataplane is a solution to this
+> problem.
+>
 
-Location :1:36 points to end of include expression.
+Yes, Thanks very much.
 
-> diff --git a/tests/qapi-schema/include-format-err.err b/tests/qapi-schema=
-/include-format-err.err
-> index 721ff4eccc..ac79ee4769 100644
-> --- a/tests/qapi-schema/include-format-err.err
-> +++ b/tests/qapi-schema/include-format-err.err
-> @@ -1 +1 @@
-> -tests/qapi-schema/include-format-err.json:1: Invalid 'include' directive
-> +tests/qapi-schema/include-format-err.json:2:17: Invalid 'include' direct=
-ive
-> diff --git a/tests/qapi-schema/include-no-file.err b/tests/qapi-schema/in=
-clude-no-file.err
+now, I am not sure if these patches are needed. the patches just shorten 
+the QMP command time.
 
-Likewise.
+No matter how, I will clarify their real purpose in the next version.
 
-> index d5b9b22d85..de321ac477 100644
-> --- a/tests/qapi-schema/include-no-file.err
-> +++ b/tests/qapi-schema/include-no-file.err
-> @@ -1 +1 @@
-> -tests/qapi-schema/include-no-file.json:1: No such file or directory: inc=
-lude-no-file-sub.json
-> +tests/qapi-schema/include-no-file.json:1:42: No such file or directory: =
-include-no-file-sub.json
-> diff --git a/tests/qapi-schema/include-non-file.err b/tests/qapi-schema/i=
-nclude-non-file.err
-> index faae1eacf1..345f6803eb 100644
-> --- a/tests/qapi-schema/include-non-file.err
-> +++ b/tests/qapi-schema/include-non-file.err
-> @@ -1 +1 @@
-> -tests/qapi-schema/include-non-file.json:1: Value of 'include' must be a =
-string
-> +tests/qapi-schema/include-non-file.json:1:18: Value of 'include' must be=
- a string
+Thanks,
 
-Likewise.
-
-> diff --git a/tests/qapi-schema/include-self-cycle.err b/tests/qapi-schema=
-/include-self-cycle.err
-> index 981742ae5f..abfc3ed6f3 100644
-> --- a/tests/qapi-schema/include-self-cycle.err
-> +++ b/tests/qapi-schema/include-self-cycle.err
-> @@ -1 +1 @@
-> -tests/qapi-schema/include-self-cycle.json:1: Inclusion loop for include-=
-self-cycle.json
-> +tests/qapi-schema/include-self-cycle.json:1:41: Inclusion loop for inclu=
-de-self-cycle.json
-
-Likewise.
-
-The reason for this location is that the error isn't actually a parse
-error.
-
-Parse errors happen when the parser runs into a unexpected token, and
-then the location stored in the parser points exactly there.  Good.
-
-The errors above happen while checking an expression the parser
-accepted, in other words, they're semantic errors.  Because the parser
-already accepted the expression, the location stored in it points beyond
-the expression.  Using it is not so good.
-
-I proposed to use QAPIParseError here.  Sorry for misleading you.
-
-Thankfully, you made it its own patch, which should be easy to drop.
+   Liyang
