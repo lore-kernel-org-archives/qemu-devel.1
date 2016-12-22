@@ -1,20 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36673)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37930)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cK0uq-0004ry-6T
-	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 05:48:08 -0500
+	(envelope-from <marcel@redhat.com>) id 1cK12G-0004cP-LM
+	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 05:55:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cK0uo-0006Dt-QN
-	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 05:48:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38608)
+	(envelope-from <marcel@redhat.com>) id 1cK12D-0001G8-Eb
+	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 05:55:44 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38886)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cK0uo-0006DX-HH
-	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 05:48:02 -0500
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Thu, 22 Dec 2016 10:47:40 +0000
-Message-Id: <20161222104740.19606-9-berrange@redhat.com>
-In-Reply-To: <20161222104740.19606-1-berrange@redhat.com>
-References: <20161222104740.19606-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PULL v2 8/8] crypto: add HMAC algorithms testcases
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1cK12D-0001FU-5n
+	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 05:55:41 -0500
+Received: from int-mx13.intmail.prod.int.phx2.redhat.com
+	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3985C3DEEB
+	for <qemu-devel@nongnu.org>; Thu, 22 Dec 2016 10:55:40 +0000 (UTC)
+References: <1480980749-182204-1-git-send-email-imammedo@redhat.com>
+	<1480980749-182204-10-git-send-email-imammedo@redhat.com>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <72ca867b-65b1-e636-5026-72aacb84f979@redhat.com>
+Date: Thu, 22 Dec 2016 12:55:37 +0200
+MIME-Version: 1.0
+In-Reply-To: <1480980749-182204-10-git-send-email-imammedo@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.9 09/10] memhp: don't generate memory
+ hotplug AML if it's not enabled/supported
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,312 +34,216 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, "Longpeng(Mike)" <longpeng2@huawei.com>, "Daniel P . Berrange" <berrange@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-From: "Longpeng(Mike)" <longpeng2@huawei.com>
+On 12/06/2016 01:32 AM, Igor Mammedov wrote:
+> That reduces DSDT by 910 bytes when memory hotplug
+> isn't enabled.
+>
+> While doing so drop intermediate variables/arguments
+> passing around ACPI_MEMORY_HOTPLUG_IO_LEN and making
+> it local to memory_hotplug.c, hardcoding it there as
+> it can't change.
+>
+> Also don't pass around ACPI_MEMORY_HOTPLUG_BASE through
+> intermediate variables/arguments where it's not needed.
+> Instead initialize in module static variable when MMIO
+> region is mapped and use that within memory_hotplug.c
+> whenever it's required.
+> That way MMIO base specified only at one place and AML
+> with MMIO would always use the same value.
+>
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+>  include/hw/acpi/memory_hotplug.h |  3 +--
+>  include/hw/acpi/pc-hotplug.h     |  1 -
+>  hw/acpi/ich9.c                   |  3 ++-
+>  hw/acpi/memory_hotplug.c         | 24 +++++++++++++++++-------
+>  hw/acpi/piix4.c                  |  3 ++-
+>  hw/i386/acpi-build.c             |  9 +--------
+>  6 files changed, 23 insertions(+), 20 deletions(-)
+>
+> diff --git a/include/hw/acpi/memory_hotplug.h b/include/hw/acpi/memory_hotplug.h
+> index 91d4045..db8ebc9 100644
+> --- a/include/hw/acpi/memory_hotplug.h
+> +++ b/include/hw/acpi/memory_hotplug.h
+> @@ -30,7 +30,7 @@ typedef struct MemHotplugState {
+>  } MemHotplugState;
+>
+>  void acpi_memory_hotplug_init(MemoryRegion *as, Object *owner,
+> -                              MemHotplugState *state);
+> +                              MemHotplugState *state, uint16_t io_base);
+>
+>  void acpi_memory_plug_cb(HotplugHandler *hotplug_dev, MemHotplugState *mem_st,
+>                           DeviceState *dev, Error **errp);
+> @@ -48,7 +48,6 @@ extern const VMStateDescription vmstate_memory_hotplug;
+>  void acpi_memory_ospm_status(MemHotplugState *mem_st, ACPIOSTInfoList ***list);
+>
+>  void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
+> -                              uint16_t io_base, uint16_t io_len,
+>                                const char *res_root,
+>                                const char *event_handler_method);
+>  #endif
+> diff --git a/include/hw/acpi/pc-hotplug.h b/include/hw/acpi/pc-hotplug.h
+> index a4f513d..31bc919 100644
+> --- a/include/hw/acpi/pc-hotplug.h
+> +++ b/include/hw/acpi/pc-hotplug.h
+> @@ -29,7 +29,6 @@
+>  #define PIIX4_CPU_HOTPLUG_IO_BASE 0xaf00
+>  #define CPU_HOTPLUG_RESOURCE_DEVICE PRES
+>
+> -#define ACPI_MEMORY_HOTPLUG_IO_LEN 24
+>  #define ACPI_MEMORY_HOTPLUG_BASE 0x0a00
+>
+>  #endif
+> diff --git a/hw/acpi/ich9.c b/hw/acpi/ich9.c
+> index 830c475..5c279bb 100644
+> --- a/hw/acpi/ich9.c
+> +++ b/hw/acpi/ich9.c
+> @@ -306,7 +306,8 @@ void ich9_pm_init(PCIDevice *lpc_pci, ICH9LPCPMRegs *pm,
+>
+>      if (pm->acpi_memory_hotplug.is_enabled) {
+>          acpi_memory_hotplug_init(pci_address_space_io(lpc_pci), OBJECT(lpc_pci),
+> -                                 &pm->acpi_memory_hotplug);
+> +                                 &pm->acpi_memory_hotplug,
+> +                                 ACPI_MEMORY_HOTPLUG_BASE);
+>      }
+>  }
+>
+> diff --git a/hw/acpi/memory_hotplug.c b/hw/acpi/memory_hotplug.c
+> index da29332..fb04d24 100644
+> --- a/hw/acpi/memory_hotplug.c
+> +++ b/hw/acpi/memory_hotplug.c
+> @@ -30,6 +30,9 @@
+>  #define MEMORY_SLOT_NOTIFY_METHOD    "MTFY"
+>  #define MEMORY_SLOT_SCAN_METHOD      "MSCN"
+>  #define MEMORY_HOTPLUG_DEVICE        "MHPD"
+> +#define MEMORY_HOTPLUG_IO_LEN         24
+> +
+> +static uint16_t memhp_io_base;
+>
+>  static ACPIOSTInfo *acpi_memory_device_status(int slot, MemStatus *mdev)
+>  {
+> @@ -202,7 +205,7 @@ static const MemoryRegionOps acpi_memory_hotplug_ops = {
+>  };
+>
+>  void acpi_memory_hotplug_init(MemoryRegion *as, Object *owner,
+> -                              MemHotplugState *state)
+> +                              MemHotplugState *state, uint16_t io_base)
+>  {
+>      MachineState *machine = MACHINE(qdev_get_machine());
+>
+> @@ -211,10 +214,12 @@ void acpi_memory_hotplug_init(MemoryRegion *as, Object *owner,
+>          return;
+>      }
+>
+> +    assert(!memhp_io_base);
+> +    memhp_io_base = io_base;
+>      state->devs = g_malloc0(sizeof(*state->devs) * state->dev_count);
+>      memory_region_init_io(&state->io, owner, &acpi_memory_hotplug_ops, state,
+> -                          "acpi-mem-hotplug", ACPI_MEMORY_HOTPLUG_IO_LEN);
+> -    memory_region_add_subregion(as, ACPI_MEMORY_HOTPLUG_BASE, &state->io);
+> +                          "acpi-mem-hotplug", MEMORY_HOTPLUG_IO_LEN);
+> +    memory_region_add_subregion(as, memhp_io_base, &state->io);
+>  }
+>
+>  /**
+> @@ -332,7 +337,6 @@ const VMStateDescription vmstate_memory_hotplug = {
+>  };
+>
+>  void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
+> -                              uint16_t io_base, uint16_t io_len,
+>                                const char *res_root,
+>                                const char *event_handler_method)
+>  {
+> @@ -342,8 +346,13 @@ void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
+>      Aml *sb_scope;
+>      Aml *mem_ctrl_dev;
+>      char *scan_path;
+> -    char *mhp_res_path = g_strdup_printf("%s." MEMORY_HOTPLUG_DEVICE, res_root);
+> +    char *mhp_res_path;
+> +
+> +    if (!memhp_io_base) {
+> +        return;
+> +    }
+>
 
-This patch add HMAC algorithms testcases
+I would split the functional change from the refactoring  code,
+but if Michael is OK with it:
 
-Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
----
- tests/Makefile.include   |   2 +
- tests/test-crypto-hmac.c | 266 +++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 268 insertions(+)
- create mode 100644 tests/test-crypto-hmac.c
+Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index e98d3b6..4841d58 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -91,6 +91,7 @@ gcov-files-test-qemu-opts-y = qom/test-qemu-opts.c
- check-unit-y += tests/test-write-threshold$(EXESUF)
- gcov-files-test-write-threshold-y = block/write-threshold.c
- check-unit-y += tests/test-crypto-hash$(EXESUF)
-+check-unit-y += tests/test-crypto-hmac$(EXESUF)
- check-unit-y += tests/test-crypto-cipher$(EXESUF)
- check-unit-y += tests/test-crypto-secret$(EXESUF)
- check-unit-$(CONFIG_GNUTLS) += tests/test-crypto-tlscredsx509$(EXESUF)
-@@ -571,6 +572,7 @@ tests/test-opts-visitor$(EXESUF): tests/test-opts-visitor.o $(test-qapi-obj-y)
- tests/test-mul64$(EXESUF): tests/test-mul64.o $(test-util-obj-y)
- tests/test-bitops$(EXESUF): tests/test-bitops.o $(test-util-obj-y)
- tests/test-crypto-hash$(EXESUF): tests/test-crypto-hash.o $(test-crypto-obj-y)
-+tests/test-crypto-hmac$(EXESUF): tests/test-crypto-hmac.o $(test-crypto-obj-y)
- tests/test-crypto-cipher$(EXESUF): tests/test-crypto-cipher.o $(test-crypto-obj-y)
- tests/test-crypto-secret$(EXESUF): tests/test-crypto-secret.o $(test-crypto-obj-y)
- tests/test-crypto-xts$(EXESUF): tests/test-crypto-xts.o $(test-crypto-obj-y)
-diff --git a/tests/test-crypto-hmac.c b/tests/test-crypto-hmac.c
-new file mode 100644
-index 0000000..ee55382
---- /dev/null
-+++ b/tests/test-crypto-hmac.c
-@@ -0,0 +1,266 @@
-+/*
-+ * QEMU Crypto hmac algorithms tests
-+ *
-+ * Copyright (c) 2016 HUAWEI TECHNOLOGIES CO., LTD.
-+ *
-+ * Authors:
-+ *    Longpeng(Mike) <longpeng2@huawei.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or
-+ * (at your option) any later version.  See the COPYING file in the
-+ * top-level directory.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "crypto/init.h"
-+#include "crypto/hmac.h"
-+
-+#define INPUT_TEXT1 "ABCDEFGHIJKLMNOPQRSTUVWXY"
-+#define INPUT_TEXT2 "Zabcdefghijklmnopqrstuvwx"
-+#define INPUT_TEXT3 "yz0123456789"
-+#define INPUT_TEXT INPUT_TEXT1 \
-+              INPUT_TEXT2 \
-+              INPUT_TEXT3
-+
-+#define KEY "monkey monkey monkey monkey"
-+
-+typedef struct QCryptoHmacTestData QCryptoHmacTestData;
-+struct QCryptoHmacTestData {
-+    QCryptoHashAlgorithm alg;
-+    const char *hex_digest;
-+};
-+
-+static QCryptoHmacTestData test_data[] = {
-+    {
-+        .alg = QCRYPTO_HASH_ALG_MD5,
-+        .hex_digest =
-+            "ede9cb83679ba82d88fbeae865b3f8fc",
-+    },
-+    {
-+        .alg = QCRYPTO_HASH_ALG_SHA1,
-+        .hex_digest =
-+            "c7b5a631e3aac975c4ededfcd346e469"
-+            "dbc5f2d1",
-+    },
-+    {
-+        .alg = QCRYPTO_HASH_ALG_SHA224,
-+        .hex_digest =
-+            "5f768179dbb29ca722875d0f461a2e2f"
-+            "597d0210340a84df1a8e9c63",
-+    },
-+    {
-+        .alg = QCRYPTO_HASH_ALG_SHA256,
-+        .hex_digest =
-+            "3798f363c57afa6edaffe39016ca7bad"
-+            "efd1e670afb0e3987194307dec3197db",
-+    },
-+    {
-+        .alg = QCRYPTO_HASH_ALG_SHA384,
-+        .hex_digest =
-+            "d218680a6032d33dccd9882d6a6a7164"
-+            "64f26623be257a9b2919b185294f4a49"
-+            "9e54b190bfd6bc5cedd2cd05c7e65e82",
-+    },
-+    {
-+        .alg = QCRYPTO_HASH_ALG_SHA512,
-+        .hex_digest =
-+            "835a4f5b3750b4c1fccfa88da2f746a4"
-+            "900160c9f18964309bb736c13b59491b"
-+            "8e32d37b724cc5aebb0f554c6338a3b5"
-+            "94c4ba26862b2dadb59b7ede1d08d53e",
-+    },
-+    {
-+        .alg = QCRYPTO_HASH_ALG_RIPEMD160,
-+        .hex_digest =
-+            "94964ed4c1155b62b668c241d67279e5"
-+            "8a711676",
-+    },
-+};
-+
-+static const char hex[] = "0123456789abcdef";
-+
-+static void test_hmac_alloc(void)
-+{
-+    size_t i;
-+
-+    for (i = 0; i < G_N_ELEMENTS(test_data); i++) {
-+        QCryptoHmacTestData *data = &test_data[i];
-+        QCryptoHmac *hmac = NULL;
-+        uint8_t *result = NULL;
-+        size_t resultlen = 0;
-+        Error *err = NULL;
-+        const char *exp_output = NULL;
-+        int ret;
-+        size_t j;
-+
-+        if (!qcrypto_hmac_supports(data->alg)) {
-+            return;
-+        }
-+
-+        exp_output = data->hex_digest;
-+
-+        hmac = qcrypto_hmac_new(data->alg, (const uint8_t *)KEY,
-+                                strlen(KEY), &err);
-+        g_assert(err == NULL);
-+        g_assert(hmac != NULL);
-+
-+        ret = qcrypto_hmac_bytes(hmac, (const char *)INPUT_TEXT,
-+                                 strlen(INPUT_TEXT), &result,
-+                                 &resultlen, &err);
-+        g_assert(err == NULL);
-+        g_assert(ret == 0);
-+
-+        for (j = 0; j < resultlen; j++) {
-+            g_assert(exp_output[j * 2] == hex[(result[j] >> 4) & 0xf]);
-+            g_assert(exp_output[j * 2 + 1] == hex[result[j] & 0xf]);
-+        }
-+
-+        qcrypto_hmac_free(hmac);
-+
-+        g_free(result);
-+    }
-+}
-+
-+static void test_hmac_prealloc(void)
-+{
-+    size_t i;
-+
-+    for (i = 0; i < G_N_ELEMENTS(test_data); i++) {
-+        QCryptoHmacTestData *data = &test_data[i];
-+        QCryptoHmac *hmac = NULL;
-+        uint8_t *result = NULL;
-+        size_t resultlen = 0;
-+        Error *err = NULL;
-+        const char *exp_output = NULL;
-+        int ret;
-+        size_t j;
-+
-+        if (!qcrypto_hmac_supports(data->alg)) {
-+            return;
-+        }
-+
-+        exp_output = data->hex_digest;
-+
-+        resultlen = strlen(exp_output) / 2;
-+        result = g_new0(uint8_t, resultlen);
-+
-+        hmac = qcrypto_hmac_new(data->alg, (const uint8_t *)KEY,
-+                                strlen(KEY), &err);
-+        g_assert(err == NULL);
-+        g_assert(hmac != NULL);
-+
-+        ret = qcrypto_hmac_bytes(hmac, (const char *)INPUT_TEXT,
-+                                 strlen(INPUT_TEXT), &result,
-+                                 &resultlen, &err);
-+        g_assert(err == NULL);
-+        g_assert(ret == 0);
-+
-+        exp_output = data->hex_digest;
-+        for (j = 0; j < resultlen; j++) {
-+            g_assert(exp_output[j * 2] == hex[(result[j] >> 4) & 0xf]);
-+            g_assert(exp_output[j * 2 + 1] == hex[result[j] & 0xf]);
-+        }
-+
-+        qcrypto_hmac_free(hmac);
-+
-+        g_free(result);
-+    }
-+}
-+
-+static void test_hmac_iov(void)
-+{
-+    size_t i;
-+
-+    for (i = 0; i < G_N_ELEMENTS(test_data); i++) {
-+        QCryptoHmacTestData *data = &test_data[i];
-+        QCryptoHmac *hmac = NULL;
-+        uint8_t *result = NULL;
-+        size_t resultlen = 0;
-+        Error *err = NULL;
-+        const char *exp_output = NULL;
-+        int ret;
-+        size_t j;
-+        struct iovec iov[3] = {
-+            { .iov_base = (char *)INPUT_TEXT1, .iov_len = strlen(INPUT_TEXT1) },
-+            { .iov_base = (char *)INPUT_TEXT2, .iov_len = strlen(INPUT_TEXT2) },
-+            { .iov_base = (char *)INPUT_TEXT3, .iov_len = strlen(INPUT_TEXT3) },
-+        };
-+
-+        if (!qcrypto_hmac_supports(data->alg)) {
-+            return;
-+        }
-+
-+        exp_output = data->hex_digest;
-+
-+        hmac = qcrypto_hmac_new(data->alg, (const uint8_t *)KEY,
-+                                strlen(KEY), &err);
-+        g_assert(err == NULL);
-+        g_assert(hmac != NULL);
-+
-+        ret = qcrypto_hmac_bytesv(hmac, iov, 3, &result,
-+                                  &resultlen, &err);
-+        g_assert(err == NULL);
-+        g_assert(ret == 0);
-+
-+        for (j = 0; j < resultlen; j++) {
-+            g_assert(exp_output[j * 2] == hex[(result[j] >> 4) & 0xf]);
-+            g_assert(exp_output[j * 2 + 1] == hex[result[j] & 0xf]);
-+        }
-+
-+        qcrypto_hmac_free(hmac);
-+
-+        g_free(result);
-+    }
-+}
-+
-+static void test_hmac_digest(void)
-+{
-+    size_t i;
-+
-+    for (i = 0; i < G_N_ELEMENTS(test_data); i++) {
-+        QCryptoHmacTestData *data = &test_data[i];
-+        QCryptoHmac *hmac = NULL;
-+        uint8_t *result = NULL;
-+        Error *err = NULL;
-+        const char *exp_output = NULL;
-+        int ret;
-+
-+        if (!qcrypto_hmac_supports(data->alg)) {
-+            return;
-+        }
-+
-+        exp_output = data->hex_digest;
-+
-+        hmac = qcrypto_hmac_new(data->alg, (const uint8_t *)KEY,
-+                                strlen(KEY), &err);
-+        g_assert(err == NULL);
-+        g_assert(hmac != NULL);
-+
-+        ret = qcrypto_hmac_digest(hmac, (const char *)INPUT_TEXT,
-+                                  strlen(INPUT_TEXT), (char **)&result,
-+                                  &err);
-+        g_assert(err == NULL);
-+        g_assert(ret == 0);
-+
-+        g_assert_cmpstr((const char *)result, ==, exp_output);
-+
-+        qcrypto_hmac_free(hmac);
-+
-+        g_free(result);
-+    }
-+}
-+
-+int main(int argc, char **argv)
-+{
-+    g_test_init(&argc, &argv, NULL);
-+
-+    g_assert(qcrypto_init(NULL) == 0);
-+
-+    g_test_add_func("/crypto/hmac/iov", test_hmac_iov);
-+    g_test_add_func("/crypto/hmac/alloc", test_hmac_alloc);
-+    g_test_add_func("/crypto/hmac/prealloc", test_hmac_prealloc);
-+    g_test_add_func("/crypto/hmac/digest", test_hmac_digest);
-+
-+    return g_test_run();
-+}
--- 
-2.9.3
+Thanks,
+Marcel
+
+> +    mhp_res_path = g_strdup_printf("%s." MEMORY_HOTPLUG_DEVICE, res_root);
+>      mem_ctrl_dev = aml_device("%s", mhp_res_path);
+>      {
+>          Aml *crs;
+> @@ -367,13 +376,14 @@ void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
+>
+>          crs = aml_resource_template();
+>          aml_append(crs,
+> -            aml_io(AML_DECODE16, io_base, io_base, 0, io_len)
+> +            aml_io(AML_DECODE16, memhp_io_base, memhp_io_base, 0,
+> +                   MEMORY_HOTPLUG_IO_LEN)
+>          );
+>          aml_append(mem_ctrl_dev, aml_name_decl("_CRS", crs));
+>
+>          aml_append(mem_ctrl_dev, aml_operation_region(
+>              MEMORY_HOTPLUG_IO_REGION, AML_SYSTEM_IO,
+> -            aml_int(io_base), io_len)
+> +            aml_int(memhp_io_base), MEMORY_HOTPLUG_IO_LEN)
+>          );
+>
+>          field = aml_field(MEMORY_HOTPLUG_IO_REGION, AML_DWORD_ACC,
+> diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
+> index 17d36bd..6d99fe4 100644
+> --- a/hw/acpi/piix4.c
+> +++ b/hw/acpi/piix4.c
+> @@ -644,7 +644,8 @@ static void piix4_acpi_system_hot_add_init(MemoryRegion *parent,
+>                                   PIIX4_CPU_HOTPLUG_IO_BASE);
+>
+>      if (s->acpi_memory_hotplug.is_enabled) {
+> -        acpi_memory_hotplug_init(parent, OBJECT(s), &s->acpi_memory_hotplug);
+> +        acpi_memory_hotplug_init(parent, OBJECT(s), &s->acpi_memory_hotplug,
+> +                                 ACPI_MEMORY_HOTPLUG_BASE);
+>      }
+>  }
+>
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index b7f4682..f207d4f 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -101,8 +101,6 @@ typedef struct AcpiPmInfo {
+>      uint32_t gpe0_blk_len;
+>      uint32_t io_base;
+>      uint16_t cpu_hp_io_base;
+> -    uint16_t mem_hp_io_base;
+> -    uint16_t mem_hp_io_len;
+>      uint16_t pcihp_io_base;
+>      uint16_t pcihp_io_len;
+>  } AcpiPmInfo;
+> @@ -148,9 +146,6 @@ static void acpi_get_pm_info(AcpiPmInfo *pm)
+>      }
+>      assert(obj);
+>
+> -    pm->mem_hp_io_base = ACPI_MEMORY_HOTPLUG_BASE;
+> -    pm->mem_hp_io_len = ACPI_MEMORY_HOTPLUG_IO_LEN;
+> -
+>      /* Fill in optional s3/s4 related properties */
+>      o = object_property_get_qobject(obj, ACPI_PM_PROP_S3_DISABLED, NULL);
+>      if (o) {
+> @@ -1925,9 +1920,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+>          build_cpus_aml(dsdt, machine, opts, pm->cpu_hp_io_base,
+>                         "\\_SB.PCI0", "\\_GPE._E02");
+>      }
+> -    build_memory_hotplug_aml(dsdt, nr_mem, pm->mem_hp_io_base,
+> -                             pm->mem_hp_io_len,
+> -                             "\\_SB.PCI0", "\\_GPE._E03");
+> +    build_memory_hotplug_aml(dsdt, nr_mem, "\\_SB.PCI0", "\\_GPE._E03");
+>
+>      scope =  aml_scope("_GPE");
+>      {
+>
