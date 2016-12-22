@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51925)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52813)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cJzkX-0001kd-By
-	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 04:33:22 -0500
+	(envelope-from <eduardo.otubo@profitbricks.com>) id 1cJzre-0004hE-57
+	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 04:40:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cJzkT-0004RR-Kj
-	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 04:33:21 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45564)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cJzkT-0004RI-En
-	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 04:33:17 -0500
-Date: Thu, 22 Dec 2016 09:33:11 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20161222093311.GJ965@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <CA+scX6nh8NeTWZ44KG85T_ywzVnSc6bMhO69hhGhzbh8ZLnwOg@mail.gmail.com>
+	(envelope-from <eduardo.otubo@profitbricks.com>) id 1cJzrZ-0007jU-7C
+	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 04:40:42 -0500
+Received: from mail-wj0-x234.google.com ([2a00:1450:400c:c01::234]:35994)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <eduardo.otubo@profitbricks.com>)
+	id 1cJzrY-0007fV-UO
+	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 04:40:37 -0500
+Received: by mail-wj0-x234.google.com with SMTP id c11so18244175wjx.3
+	for <qemu-devel@nongnu.org>; Thu, 22 Dec 2016 01:40:33 -0800 (PST)
+Received: from vader ([62.217.45.26]) by smtp.gmail.com with ESMTPSA id
+	v2sm34755703wja.41.2016.12.22.01.40.31 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Thu, 22 Dec 2016 01:40:31 -0800 (PST)
+Date: Thu, 22 Dec 2016 10:40:29 +0100
+From: Eduardo Otubo <eduardo.otubo@profitbricks.com>
+Message-ID: <20161222094029.GA1571@vader>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="liOOAslEiF7prFVr"
 Content-Disposition: inline
-In-Reply-To: <CA+scX6nh8NeTWZ44KG85T_ywzVnSc6bMhO69hhGhzbh8ZLnwOg@mail.gmail.com>
-Subject: Re: [Qemu-devel] [libvirt] Cannot add iothreads label in libvirt
- xml configuration file
+Subject: [Qemu-devel] CPU hotplug on Windows 2016 as guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,29 +32,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Weiwei Jia <harrynjit@gmail.com>
-Cc: libvir-list@redhat.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-On Wed, Dec 21, 2016 at 12:11:51PM -0500, Weiwei Jia wrote:
-> Hi,
-> 
-> I cannot add iothreads
-> (https://libvirt.org/formatdomain.html#elementsIOThreadsAllocation) in
-> the libvirt xml configuration file. Once I add
-> "<iothreads>4</iothreads>" and other related config for IOthreads into
-> the libvirt xml configuration file with virsh command and save it,
-> these iothreads related configuration will disappear after I open
-> libvirt xml configuration file again for double-check.
 
-If XML disappears after saving it, this usually indicates that either you
-made a mistake and used the wrong XML element or in the wrong place, or
-that your libvirt version is too old to support it. You can use the
-virt-xml-validate too to verify your XML file against the schema for
-your installed version of libvirt, which will report any errrors.
+--liOOAslEiF7prFVr
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+Hi guys,
+
+I'm just trying Qemu 2.7 and 2.8 and Windows 2016 as guest and cpu
+hotplug doesn't seem to be working. CPU appears on qemu device tree, but
+doesn't appear inside the guest (nor control panel, performance monitor
+or device manager)
+
+Anyone going through this?
+
+--=20
+Eduardo Otubo
+ProfitBricks GmbH
+
+--liOOAslEiF7prFVr
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJYW5+NAAoJEP0M/1sS+L0v/X8IAJR0MaSryEB8p6tbprwUmlKn
+1oerQ/YIb+DI6sxqf6Xu0sKlI8DWFAt2+pVGUK5AnGQBMZqkEV5ETvxNTNXSrOJH
++jErGiH8NTRoFu6L5K09Flrtbr7Y0CQvV6tZsT5ANSxd39AsQKwuhFHTUOrR4p84
+vqSwU1sFFq1B2MZYluDaGdh12twod/jJrvzDMcYQ289runKc+b5xFAb/OgjJpSRC
+avQ6YNm9gi0TPOGvzjAgAHfrr6+sildHbpJvjvXPLuaoVEahfOEtplk1kggAFojJ
+FqxFTtXMmiF6Nh98Jj75vSdoi7P3XInULSYj82SuImOOa3EozwFPooWh1tHlRL8=
+=eQc9
+-----END PGP SIGNATURE-----
+
+--liOOAslEiF7prFVr--
