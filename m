@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37970)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37972)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cK5Da-00085n-18
-	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 10:23:43 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cK5Da-00085o-1N
+	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 10:23:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cK5DV-0007Fl-A7
+	(envelope-from <pbonzini@redhat.com>) id 1cK5DX-0007GP-Cr
 	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 10:23:42 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52220)
+Received: from mx1.redhat.com ([209.132.183.28]:42138)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cK5DU-0007FA-Vh
-	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 10:23:37 -0500
-Received: from int-mx10.intmail.prod.int.phx2.redhat.com
-	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 19C6F804E2
-	for <qemu-devel@nongnu.org>; Thu, 22 Dec 2016 15:23:36 +0000 (UTC)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cK5DX-0007GC-2n
+	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 10:23:39 -0500
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 22 Dec 2016 16:22:58 +0100
-Message-Id: <20161222152300.32395-24-pbonzini@redhat.com>
+Date: Thu, 22 Dec 2016 16:23:00 +0100
+Message-Id: <20161222152300.32395-26-pbonzini@redhat.com>
 In-Reply-To: <20161222152300.32395-1-pbonzini@redhat.com>
 References: <20161222152300.32395-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 23/25] kvmclock: reduce kvmclock difference on
- migration
+Subject: [Qemu-devel] [PULL 25/25] x86: implement la57 paging mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,286 +24,594 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Marcelo Tosatti <mtosatti@redhat.com>
+Cc: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
 
-From: Marcelo Tosatti <mtosatti@redhat.com>
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
 
-Check for KVM_CAP_ADJUST_CLOCK capability KVM_CLOCK_TSC_STABLE, which
-indicates that KVM_GET_CLOCK returns a value as seen by the guest at
-that moment.
+The new paging more is extension of IA32e mode with more additional page
+table level.
 
-For new machine types, use this value rather than reading
-from guest memory.
+It brings support of 57-bit vitrual address space (128PB) and 52-bit
+physical address space (4PB).
 
-This reduces kvmclock difference on migration from 5s to 0.1s
-(when max_downtime == 5s).
+The structure of new page table level is identical to pml4.
 
-Signed-off-by: Marcelo Tosatti <mtosatti@redhat.com>
-Message-Id: <20161121105052.598267440@redhat.com>
-[Add comment explaining what is going on. - Paolo]
+The feature is enumerated with CPUID.(EAX=07H, ECX=0):ECX[bit 16].
+
+CR4.LA57[bit 12] need to be set when pageing enables to activate 5-level
+paging mode.
+
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+Message-Id: <20161215001305.146807-1-kirill.shutemov@linux.intel.com>
+[Drop changes to target-i386/translate.c. - Paolo]
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/i386/kvm/clock.c    | 142 +++++++++++++++++++++++++++++++++++++++++++------
- include/hw/i386/pc.h   |   5 ++
- target/i386/kvm.c      |   7 +++
- target/i386/kvm_i386.h |   1 +
- 4 files changed, 140 insertions(+), 15 deletions(-)
+ target/i386/arch_memory_mapping.c |  42 ++++++-
+ target/i386/cpu.c                 |  16 ++-
+ target/i386/cpu.h                 |   2 +
+ target/i386/helper.c              |  54 +++++++--
+ target/i386/monitor.c             | 234 +++++++++++++++++++++++++++++---------
+ 5 files changed, 274 insertions(+), 74 deletions(-)
 
-diff --git a/hw/i386/kvm/clock.c b/hw/i386/kvm/clock.c
-index 0f75dd3..ef9d560 100644
---- a/hw/i386/kvm/clock.c
-+++ b/hw/i386/kvm/clock.c
-@@ -36,6 +36,13 @@ typedef struct KVMClockState {
+diff --git a/target/i386/arch_memory_mapping.c b/target/i386/arch_memory_mapping.c
+index 88f341e..826aee5 100644
+--- a/target/i386/arch_memory_mapping.c
++++ b/target/i386/arch_memory_mapping.c
+@@ -220,7 +220,8 @@ static void walk_pdpe(MemoryMappingList *list, AddressSpace *as,
  
-     uint64_t clock;
-     bool clock_valid;
-+
-+    /* whether machine type supports reliable KVM_GET_CLOCK */
-+    bool mach_use_reliable_get_clock;
-+
-+    /* whether the 'clock' value was obtained in a host with
-+     * reliable KVM_GET_CLOCK */
-+    bool clock_is_reliable;
- } KVMClockState;
- 
- struct pvclock_vcpu_time_info {
-@@ -81,6 +88,60 @@ static uint64_t kvmclock_current_nsec(KVMClockState *s)
-     return nsec + time.system_time;
- }
- 
-+static void kvm_update_clock(KVMClockState *s)
-+{
-+    struct kvm_clock_data data;
-+    int ret;
-+
-+    ret = kvm_vm_ioctl(kvm_state, KVM_GET_CLOCK, &data);
-+    if (ret < 0) {
-+        fprintf(stderr, "KVM_GET_CLOCK failed: %s\n", strerror(ret));
-+                abort();
-+    }
-+    s->clock = data.clock;
-+
-+    /* If kvm_has_adjust_clock_stable() is false, KVM_GET_CLOCK returns
-+     * essentially CLOCK_MONOTONIC plus a guest-specific adjustment.  This
-+     * can drift from the TSC-based value that is computed by the guest,
-+     * so we need to go through kvmclock_current_nsec().  If
-+     * kvm_has_adjust_clock_stable() is true, and the flags contain
-+     * KVM_CLOCK_TSC_STABLE, then KVM_GET_CLOCK returns a TSC-based value
-+     * and kvmclock_current_nsec() is not necessary.
-+     *
-+     * Here, however, we need not check KVM_CLOCK_TSC_STABLE.  This is because:
-+     *
-+     * - if the host has disabled the kvmclock master clock, the guest already
-+     *   has protection against time going backwards.  This "safety net" is only
-+     *   absent when kvmclock is stable;
-+     *
-+     * - therefore, we can replace a check like
-+     *
-+     *       if last KVM_GET_CLOCK was not reliable then
-+     *               read from memory
-+     *
-+     *   with
-+     *
-+     *       if last KVM_GET_CLOCK was not reliable && masterclock is enabled
-+     *               read from memory
-+     *
-+     * However:
-+     *
-+     * - if kvm_has_adjust_clock_stable() returns false, the left side is
-+     *   always true (KVM_GET_CLOCK is never reliable), and the right side is
-+     *   unknown (because we don't have data.flags).  We must assume it's true
-+     *   and read from memory.
-+     *
-+     * - if kvm_has_adjust_clock_stable() returns true, the result of the &&
-+     *   is always false (masterclock is enabled iff KVM_GET_CLOCK is reliable)
-+     *
-+     * So we can just use this instead:
-+     *
-+     *       if !kvm_has_adjust_clock_stable() then
-+     *               read from memory
-+     */
-+    s->clock_is_reliable = kvm_has_adjust_clock_stable();
-+}
-+
- static void kvmclock_vm_state_change(void *opaque, int running,
-                                      RunState state)
+ /* IA-32e Paging */
+ static void walk_pml4e(MemoryMappingList *list, AddressSpace *as,
+-                       hwaddr pml4e_start_addr, int32_t a20_mask)
++                       hwaddr pml4e_start_addr, int32_t a20_mask,
++                       target_ulong start_line_addr)
  {
-@@ -91,15 +152,21 @@ static void kvmclock_vm_state_change(void *opaque, int running,
- 
-     if (running) {
-         struct kvm_clock_data data = {};
--        uint64_t time_at_migration = kvmclock_current_nsec(s);
--
--        s->clock_valid = false;
- 
--        /* We can't rely on the migrated clock value, just discard it */
--        if (time_at_migration) {
--            s->clock = time_at_migration;
-+        /*
-+         * If the host where s->clock was read did not support reliable
-+         * KVM_GET_CLOCK, read kvmclock value from memory.
-+         */
-+        if (!s->clock_is_reliable) {
-+            uint64_t pvclock_via_mem = kvmclock_current_nsec(s);
-+            /* We can't rely on the saved clock value, just discard it */
-+            if (pvclock_via_mem) {
-+                s->clock = pvclock_via_mem;
-+            }
+     hwaddr pml4e_addr, pdpe_start_addr;
+     uint64_t pml4e;
+@@ -236,11 +237,34 @@ static void walk_pml4e(MemoryMappingList *list, AddressSpace *as,
+             continue;
          }
  
-+        s->clock_valid = false;
+-        line_addr = ((i & 0x1ffULL) << 39) | (0xffffULL << 48);
++        line_addr = start_line_addr | ((i & 0x1ffULL) << 39);
+         pdpe_start_addr = (pml4e & PLM4_ADDR_MASK) & a20_mask;
+         walk_pdpe(list, as, pdpe_start_addr, a20_mask, line_addr);
+     }
+ }
 +
-         data.clock = s->clock;
-         ret = kvm_vm_ioctl(kvm_state, KVM_SET_CLOCK, &data);
-         if (ret < 0) {
-@@ -120,8 +187,6 @@ static void kvmclock_vm_state_change(void *opaque, int running,
++static void walk_pml5e(MemoryMappingList *list, AddressSpace *as,
++                       hwaddr pml5e_start_addr, int32_t a20_mask)
++{
++    hwaddr pml5e_addr, pml4e_start_addr;
++    uint64_t pml5e;
++    target_ulong line_addr;
++    int i;
++
++    for (i = 0; i < 512; i++) {
++        pml5e_addr = (pml5e_start_addr + i * 8) & a20_mask;
++        pml5e = address_space_ldq(as, pml5e_addr, MEMTXATTRS_UNSPECIFIED,
++                                  NULL);
++        if (!(pml5e & PG_PRESENT_MASK)) {
++            /* not present */
++            continue;
++        }
++
++        line_addr = (0x7fULL << 57) | ((i & 0x1ffULL) << 48);
++        pml4e_start_addr = (pml5e & PLM4_ADDR_MASK) & a20_mask;
++        walk_pml4e(list, as, pml4e_start_addr, a20_mask, line_addr);
++    }
++}
+ #endif
+ 
+ void x86_cpu_get_memory_mapping(CPUState *cs, MemoryMappingList *list,
+@@ -257,10 +281,18 @@ void x86_cpu_get_memory_mapping(CPUState *cs, MemoryMappingList *list,
+     if (env->cr[4] & CR4_PAE_MASK) {
+ #ifdef TARGET_X86_64
+         if (env->hflags & HF_LMA_MASK) {
+-            hwaddr pml4e_addr;
++            if (env->cr[4] & CR4_LA57_MASK) {
++                hwaddr pml5e_addr;
++
++                pml5e_addr = (env->cr[3] & PLM4_ADDR_MASK) & env->a20_mask;
++                walk_pml5e(list, cs->as, pml5e_addr, env->a20_mask);
++            } else {
++                hwaddr pml4e_addr;
+ 
+-            pml4e_addr = (env->cr[3] & PLM4_ADDR_MASK) & env->a20_mask;
+-            walk_pml4e(list, cs->as, pml4e_addr, env->a20_mask);
++                pml4e_addr = (env->cr[3] & PLM4_ADDR_MASK) & env->a20_mask;
++                walk_pml4e(list, cs->as, pml4e_addr, env->a20_mask,
++                        0xffffULL << 48);
++            }
+         } else
+ #endif
+         {
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 993f825..b0640f1 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -238,7 +238,8 @@ static void x86_cpu_vendor_words2str(char *dst, uint32_t vendor1,
+           CPUID_7_0_EBX_HLE, CPUID_7_0_EBX_AVX2,
+           CPUID_7_0_EBX_INVPCID, CPUID_7_0_EBX_RTM,
+           CPUID_7_0_EBX_RDSEED */
+-#define TCG_7_0_ECX_FEATURES (CPUID_7_0_ECX_PKU | CPUID_7_0_ECX_OSPKE)
++#define TCG_7_0_ECX_FEATURES (CPUID_7_0_ECX_PKU | CPUID_7_0_ECX_OSPKE | \
++          CPUID_7_0_ECX_LA57)
+ #define TCG_7_0_EDX_FEATURES 0
+ #define TCG_APM_FEATURES 0
+ #define TCG_6_EAX_FEATURES CPUID_6_EAX_ARAT
+@@ -435,7 +436,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+             "ospke", NULL, NULL, NULL,
+             NULL, NULL, NULL, NULL,
+             NULL, NULL, NULL, NULL,
+-            NULL, NULL, NULL, NULL,
++            "la57", NULL, NULL, NULL,
+             NULL, NULL, "rdpid", NULL,
+             NULL, NULL, NULL, NULL,
+             NULL, NULL, NULL, NULL,
+@@ -2742,10 +2743,13 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+     case 0x80000008:
+         /* virtual & phys address size in low 2 bytes. */
+         if (env->features[FEAT_8000_0001_EDX] & CPUID_EXT2_LM) {
+-            /* 64 bit processor, 48 bits virtual, configurable
+-             * physical bits.
+-             */
+-            *eax = 0x00003000 + cpu->phys_bits;
++            /* 64 bit processor */
++            *eax = cpu->phys_bits; /* configurable physical bits */
++            if  (env->features[FEAT_7_0_ECX] & CPUID_7_0_ECX_LA57) {
++                *eax |= 0x00003900; /* 57 bits virtual */
++            } else {
++                *eax |= 0x00003000; /* 48 bits virtual */
++            }
+         } else {
+             *eax = cpu->phys_bits;
+         }
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index d0bf624..a7f2f60 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -224,6 +224,7 @@
+ #define CR4_OSFXSR_SHIFT 9
+ #define CR4_OSFXSR_MASK (1U << CR4_OSFXSR_SHIFT)
+ #define CR4_OSXMMEXCPT_MASK  (1U << 10)
++#define CR4_LA57_MASK   (1U << 12)
+ #define CR4_VMXE_MASK   (1U << 13)
+ #define CR4_SMXE_MASK   (1U << 14)
+ #define CR4_FSGSBASE_MASK (1U << 16)
+@@ -629,6 +630,7 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
+ #define CPUID_7_0_ECX_UMIP     (1U << 2)
+ #define CPUID_7_0_ECX_PKU      (1U << 3)
+ #define CPUID_7_0_ECX_OSPKE    (1U << 4)
++#define CPUID_7_0_ECX_LA57     (1U << 16)
+ #define CPUID_7_0_ECX_RDPID    (1U << 22)
+ 
+ #define CPUID_7_0_EDX_AVX512_4VNNIW (1U << 2) /* AVX512 Neural Network Instructions */
+diff --git a/target/i386/helper.c b/target/i386/helper.c
+index 4ecc091..43e87dd 100644
+--- a/target/i386/helper.c
++++ b/target/i386/helper.c
+@@ -651,11 +651,11 @@ void cpu_x86_update_cr4(CPUX86State *env, uint32_t new_cr4)
+     uint32_t hflags;
+ 
+ #if defined(DEBUG_MMU)
+-    printf("CR4 update: CR4=%08x\n", (uint32_t)env->cr[4]);
++    printf("CR4 update: %08x -> %08x\n", (uint32_t)env->cr[4], new_cr4);
+ #endif
+     if ((new_cr4 ^ env->cr[4]) &
+         (CR4_PGE_MASK | CR4_PAE_MASK | CR4_PSE_MASK |
+-         CR4_SMEP_MASK | CR4_SMAP_MASK)) {
++         CR4_SMEP_MASK | CR4_SMAP_MASK | CR4_LA57_MASK)) {
+         tlb_flush(CPU(cpu), 1);
+     }
+ 
+@@ -757,19 +757,41 @@ int x86_cpu_handle_mmu_fault(CPUState *cs, vaddr addr,
+ 
+ #ifdef TARGET_X86_64
+         if (env->hflags & HF_LMA_MASK) {
++            bool la57 = env->cr[4] & CR4_LA57_MASK;
++            uint64_t pml5e_addr, pml5e;
+             uint64_t pml4e_addr, pml4e;
+             int32_t sext;
+ 
+             /* test virtual address sign extension */
+-            sext = (int64_t)addr >> 47;
++            sext = la57 ? (int64_t)addr >> 56 : (int64_t)addr >> 47;
+             if (sext != 0 && sext != -1) {
+                 env->error_code = 0;
+                 cs->exception_index = EXCP0D_GPF;
+                 return 1;
+             }
+ 
+-            pml4e_addr = ((env->cr[3] & ~0xfff) + (((addr >> 39) & 0x1ff) << 3)) &
+-                env->a20_mask;
++            if (la57) {
++                pml5e_addr = ((env->cr[3] & ~0xfff) +
++                        (((addr >> 48) & 0x1ff) << 3)) & env->a20_mask;
++                pml5e = x86_ldq_phys(cs, pml5e_addr);
++                if (!(pml5e & PG_PRESENT_MASK)) {
++                    goto do_fault;
++                }
++                if (pml5e & (rsvd_mask | PG_PSE_MASK)) {
++                    goto do_fault_rsvd;
++                }
++                if (!(pml5e & PG_ACCESSED_MASK)) {
++                    pml5e |= PG_ACCESSED_MASK;
++                    x86_stl_phys_notdirty(cs, pml5e_addr, pml5e);
++                }
++                ptep = pml5e ^ PG_NX_MASK;
++            } else {
++                pml5e = env->cr[3];
++                ptep = PG_NX_MASK | PG_USER_MASK | PG_RW_MASK;
++            }
++
++            pml4e_addr = ((pml5e & PG_ADDRESS_MASK) +
++                    (((addr >> 39) & 0x1ff) << 3)) & env->a20_mask;
+             pml4e = x86_ldq_phys(cs, pml4e_addr);
+             if (!(pml4e & PG_PRESENT_MASK)) {
+                 goto do_fault;
+@@ -781,7 +803,7 @@ int x86_cpu_handle_mmu_fault(CPUState *cs, vaddr addr,
+                 pml4e |= PG_ACCESSED_MASK;
+                 x86_stl_phys_notdirty(cs, pml4e_addr, pml4e);
+             }
+-            ptep = pml4e ^ PG_NX_MASK;
++            ptep &= pml4e ^ PG_NX_MASK;
+             pdpe_addr = ((pml4e & PG_ADDRESS_MASK) + (((addr >> 30) & 0x1ff) << 3)) &
+                 env->a20_mask;
+             pdpe = x86_ldq_phys(cs, pdpe_addr);
+@@ -1024,16 +1046,30 @@ hwaddr x86_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
+ 
+ #ifdef TARGET_X86_64
+         if (env->hflags & HF_LMA_MASK) {
++            bool la57 = env->cr[4] & CR4_LA57_MASK;
++            uint64_t pml5e_addr, pml5e;
+             uint64_t pml4e_addr, pml4e;
+             int32_t sext;
+ 
+             /* test virtual address sign extension */
+-            sext = (int64_t)addr >> 47;
++            sext = la57 ? (int64_t)addr >> 56 : (int64_t)addr >> 47;
+             if (sext != 0 && sext != -1) {
+                 return -1;
+             }
+-            pml4e_addr = ((env->cr[3] & ~0xfff) + (((addr >> 39) & 0x1ff) << 3)) &
+-                env->a20_mask;
++
++            if (la57) {
++                pml5e_addr = ((env->cr[3] & ~0xfff) +
++                        (((addr >> 48) & 0x1ff) << 3)) & env->a20_mask;
++                pml5e = x86_ldq_phys(cs, pml5e_addr);
++                if (!(pml5e & PG_PRESENT_MASK)) {
++                    return -1;
++                }
++            } else {
++                pml5e = env->cr[3];
++            }
++
++            pml4e_addr = ((pml5e & PG_ADDRESS_MASK) +
++                    (((addr >> 39) & 0x1ff) << 3)) & env->a20_mask;
+             pml4e = x86_ldq_phys(cs, pml4e_addr);
+             if (!(pml4e & PG_PRESENT_MASK)) {
+                 return -1;
+diff --git a/target/i386/monitor.c b/target/i386/monitor.c
+index 9a3b4d7..468aa07 100644
+--- a/target/i386/monitor.c
++++ b/target/i386/monitor.c
+@@ -30,13 +30,18 @@
+ #include "hmp.h"
+ 
+ 
+-static void print_pte(Monitor *mon, hwaddr addr,
+-                      hwaddr pte,
+-                      hwaddr mask)
++static void print_pte(Monitor *mon, CPUArchState *env, hwaddr addr,
++                      hwaddr pte, hwaddr mask)
+ {
+ #ifdef TARGET_X86_64
+-    if (addr & (1ULL << 47)) {
+-        addr |= -1LL << 48;
++    if (env->cr[4] & CR4_LA57_MASK) {
++        if (addr & (1ULL << 56)) {
++            addr |= -1LL << 57;
++        }
++    } else {
++        if (addr & (1ULL << 47)) {
++            addr |= -1LL << 48;
++        }
+     }
+ #endif
+     monitor_printf(mon, TARGET_FMT_plx ": " TARGET_FMT_plx
+@@ -66,13 +71,13 @@ static void tlb_info_32(Monitor *mon, CPUArchState *env)
+         if (pde & PG_PRESENT_MASK) {
+             if ((pde & PG_PSE_MASK) && (env->cr[4] & CR4_PSE_MASK)) {
+                 /* 4M pages */
+-                print_pte(mon, (l1 << 22), pde, ~((1 << 21) - 1));
++                print_pte(mon, env, (l1 << 22), pde, ~((1 << 21) - 1));
+             } else {
+                 for(l2 = 0; l2 < 1024; l2++) {
+                     cpu_physical_memory_read((pde & ~0xfff) + l2 * 4, &pte, 4);
+                     pte = le32_to_cpu(pte);
+                     if (pte & PG_PRESENT_MASK) {
+-                        print_pte(mon, (l1 << 22) + (l2 << 12),
++                        print_pte(mon, env, (l1 << 22) + (l2 << 12),
+                                   pte & ~PG_PSE_MASK,
+                                   ~0xfff);
+                     }
+@@ -100,7 +105,7 @@ static void tlb_info_pae32(Monitor *mon, CPUArchState *env)
+                 if (pde & PG_PRESENT_MASK) {
+                     if (pde & PG_PSE_MASK) {
+                         /* 2M pages with PAE, CR4.PSE is ignored */
+-                        print_pte(mon, (l1 << 30 ) + (l2 << 21), pde,
++                        print_pte(mon, env, (l1 << 30) + (l2 << 21), pde,
+                                   ~((hwaddr)(1 << 20) - 1));
+                     } else {
+                         pt_addr = pde & 0x3fffffffff000ULL;
+@@ -108,7 +113,7 @@ static void tlb_info_pae32(Monitor *mon, CPUArchState *env)
+                             cpu_physical_memory_read(pt_addr + l3 * 8, &pte, 8);
+                             pte = le64_to_cpu(pte);
+                             if (pte & PG_PRESENT_MASK) {
+-                                print_pte(mon, (l1 << 30 ) + (l2 << 21)
++                                print_pte(mon, env, (l1 << 30) + (l2 << 21)
+                                           + (l3 << 12),
+                                           pte & ~PG_PSE_MASK,
+                                           ~(hwaddr)0xfff);
+@@ -122,61 +127,82 @@ static void tlb_info_pae32(Monitor *mon, CPUArchState *env)
+ }
+ 
+ #ifdef TARGET_X86_64
+-static void tlb_info_64(Monitor *mon, CPUArchState *env)
++static void tlb_info_la48(Monitor *mon, CPUArchState *env,
++        uint64_t l0, uint64_t pml4_addr)
+ {
+     uint64_t l1, l2, l3, l4;
+     uint64_t pml4e, pdpe, pde, pte;
+-    uint64_t pml4_addr, pdp_addr, pd_addr, pt_addr;
++    uint64_t pdp_addr, pd_addr, pt_addr;
+ 
+-    pml4_addr = env->cr[3] & 0x3fffffffff000ULL;
+     for (l1 = 0; l1 < 512; l1++) {
+         cpu_physical_memory_read(pml4_addr + l1 * 8, &pml4e, 8);
+         pml4e = le64_to_cpu(pml4e);
+-        if (pml4e & PG_PRESENT_MASK) {
+-            pdp_addr = pml4e & 0x3fffffffff000ULL;
+-            for (l2 = 0; l2 < 512; l2++) {
+-                cpu_physical_memory_read(pdp_addr + l2 * 8, &pdpe, 8);
+-                pdpe = le64_to_cpu(pdpe);
+-                if (pdpe & PG_PRESENT_MASK) {
+-                    if (pdpe & PG_PSE_MASK) {
+-                        /* 1G pages, CR4.PSE is ignored */
+-                        print_pte(mon, (l1 << 39) + (l2 << 30), pdpe,
+-                                  0x3ffffc0000000ULL);
+-                    } else {
+-                        pd_addr = pdpe & 0x3fffffffff000ULL;
+-                        for (l3 = 0; l3 < 512; l3++) {
+-                            cpu_physical_memory_read(pd_addr + l3 * 8, &pde, 8);
+-                            pde = le64_to_cpu(pde);
+-                            if (pde & PG_PRESENT_MASK) {
+-                                if (pde & PG_PSE_MASK) {
+-                                    /* 2M pages, CR4.PSE is ignored */
+-                                    print_pte(mon, (l1 << 39) + (l2 << 30) +
+-                                              (l3 << 21), pde,
+-                                              0x3ffffffe00000ULL);
+-                                } else {
+-                                    pt_addr = pde & 0x3fffffffff000ULL;
+-                                    for (l4 = 0; l4 < 512; l4++) {
+-                                        cpu_physical_memory_read(pt_addr
+-                                                                 + l4 * 8,
+-                                                                 &pte, 8);
+-                                        pte = le64_to_cpu(pte);
+-                                        if (pte & PG_PRESENT_MASK) {
+-                                            print_pte(mon, (l1 << 39) +
+-                                                      (l2 << 30) +
+-                                                      (l3 << 21) + (l4 << 12),
+-                                                      pte & ~PG_PSE_MASK,
+-                                                      0x3fffffffff000ULL);
+-                                        }
+-                                    }
+-                                }
+-                            }
+-                        }
++        if (!(pml4e & PG_PRESENT_MASK)) {
++            continue;
++        }
++
++        pdp_addr = pml4e & 0x3fffffffff000ULL;
++        for (l2 = 0; l2 < 512; l2++) {
++            cpu_physical_memory_read(pdp_addr + l2 * 8, &pdpe, 8);
++            pdpe = le64_to_cpu(pdpe);
++            if (!(pdpe & PG_PRESENT_MASK)) {
++                continue;
++            }
++
++            if (pdpe & PG_PSE_MASK) {
++                /* 1G pages, CR4.PSE is ignored */
++                print_pte(mon, env, (l0 << 48) + (l1 << 39) + (l2 << 30),
++                        pdpe, 0x3ffffc0000000ULL);
++                continue;
++            }
++
++            pd_addr = pdpe & 0x3fffffffff000ULL;
++            for (l3 = 0; l3 < 512; l3++) {
++                cpu_physical_memory_read(pd_addr + l3 * 8, &pde, 8);
++                pde = le64_to_cpu(pde);
++                if (!(pde & PG_PRESENT_MASK)) {
++                    continue;
++                }
++
++                if (pde & PG_PSE_MASK) {
++                    /* 2M pages, CR4.PSE is ignored */
++                    print_pte(mon, env, (l0 << 48) + (l1 << 39) + (l2 << 30) +
++                            (l3 << 21), pde, 0x3ffffffe00000ULL);
++                    continue;
++                }
++
++                pt_addr = pde & 0x3fffffffff000ULL;
++                for (l4 = 0; l4 < 512; l4++) {
++                    cpu_physical_memory_read(pt_addr
++                            + l4 * 8,
++                            &pte, 8);
++                    pte = le64_to_cpu(pte);
++                    if (pte & PG_PRESENT_MASK) {
++                        print_pte(mon, env, (l0 << 48) + (l1 << 39) +
++                                (l2 << 30) + (l3 << 21) + (l4 << 12),
++                                pte & ~PG_PSE_MASK, 0x3fffffffff000ULL);
+                     }
+                 }
              }
          }
-     } else {
--        struct kvm_clock_data data;
--        int ret;
- 
-         if (s->clock_valid) {
-             return;
-@@ -129,13 +194,7 @@ static void kvmclock_vm_state_change(void *opaque, int running,
- 
-         kvm_synchronize_all_tsc();
- 
--        ret = kvm_vm_ioctl(kvm_state, KVM_GET_CLOCK, &data);
--        if (ret < 0) {
--            fprintf(stderr, "KVM_GET_CLOCK failed: %s\n", strerror(ret));
--            abort();
--        }
--        s->clock = data.clock;
--
-+        kvm_update_clock(s);
-         /*
-          * If the VM is stopped, declare the clock state valid to
-          * avoid re-reading it on next vmsave (which would return
-@@ -149,25 +208,78 @@ static void kvmclock_realize(DeviceState *dev, Error **errp)
- {
-     KVMClockState *s = KVM_CLOCK(dev);
- 
-+    kvm_update_clock(s);
-+
-     qemu_add_vm_change_state_handler(kvmclock_vm_state_change, s);
- }
- 
-+static bool kvmclock_clock_is_reliable_needed(void *opaque)
-+{
-+    KVMClockState *s = opaque;
-+
-+    return s->mach_use_reliable_get_clock;
-+}
-+
-+static const VMStateDescription kvmclock_reliable_get_clock = {
-+    .name = "kvmclock/clock_is_reliable",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = kvmclock_clock_is_reliable_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_BOOL(clock_is_reliable, KVMClockState),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+/*
-+ * When migrating, read the clock just before migration,
-+ * so that the guest clock counts during the events
-+ * between:
-+ *
-+ *  * vm_stop()
-+ *  *
-+ *  * pre_save()
-+ *
-+ *  This reduces kvmclock difference on migration from 5s
-+ *  to 0.1s (when max_downtime == 5s), because sending the
-+ *  final pages of memory (which happens between vm_stop()
-+ *  and pre_save()) takes max_downtime.
-+ */
-+static void kvmclock_pre_save(void *opaque)
-+{
-+    KVMClockState *s = opaque;
-+
-+    kvm_update_clock(s);
-+}
-+
- static const VMStateDescription kvmclock_vmsd = {
-     .name = "kvmclock",
-     .version_id = 1,
-     .minimum_version_id = 1,
-+    .pre_save = kvmclock_pre_save,
-     .fields = (VMStateField[]) {
-         VMSTATE_UINT64(clock, KVMClockState),
-         VMSTATE_END_OF_LIST()
-+    },
-+    .subsections = (const VMStateDescription * []) {
-+        &kvmclock_reliable_get_clock,
-+        NULL
      }
- };
- 
-+static Property kvmclock_properties[] = {
-+    DEFINE_PROP_BOOL("x-mach-use-reliable-get-clock", KVMClockState,
-+                      mach_use_reliable_get_clock, true),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
+ }
 +
- static void kvmclock_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(klass);
- 
-     dc->realize = kvmclock_realize;
-     dc->vmsd = &kvmclock_vmsd;
-+    dc->props = kvmclock_properties;
- }
- 
- static const TypeInfo kvmclock_info = {
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index b37bc5b..b22e699 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -379,6 +379,11 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
- #define PC_COMPAT_2_7 \
-     HW_COMPAT_2_7 \
-     {\
-+        .driver   = "kvmclock",\
-+        .property = "x-mach-use-reliable-get-clock",\
-+        .value    = "off",\
-+    },\
-+    {\
-         .driver   = TYPE_X86_CPU,\
-         .property = "l3-cache",\
-         .value    = "off",\
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index f62264a..10a9cd8 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -117,6 +117,13 @@ bool kvm_has_smm(void)
-     return kvm_check_extension(kvm_state, KVM_CAP_X86_SMM);
- }
- 
-+bool kvm_has_adjust_clock_stable(void)
++static void tlb_info_la57(Monitor *mon, CPUArchState *env)
 +{
-+    int ret = kvm_check_extension(kvm_state, KVM_CAP_ADJUST_CLOCK);
++    uint64_t l0;
++    uint64_t pml5e;
++    uint64_t pml5_addr;
 +
-+    return (ret == KVM_CLOCK_TSC_STABLE);
++    pml5_addr = env->cr[3] & 0x3fffffffff000ULL;
++    for (l0 = 0; l0 < 512; l0++) {
++        cpu_physical_memory_read(pml5_addr + l0 * 8, &pml5e, 8);
++        pml5e = le64_to_cpu(pml5e);
++        if (pml5e & PG_PRESENT_MASK) {
++            tlb_info_la48(mon, env, l0, pml5e & 0x3fffffffff000ULL);
++        }
++    }
 +}
-+
- bool kvm_allows_irq0_override(void)
- {
-     return !kvm_irqchip_in_kernel() || kvm_has_gsi_routing();
-diff --git a/target/i386/kvm_i386.h b/target/i386/kvm_i386.h
-index 7607929..bfce427 100644
---- a/target/i386/kvm_i386.h
-+++ b/target/i386/kvm_i386.h
-@@ -17,6 +17,7 @@
+ #endif /* TARGET_X86_64 */
  
- bool kvm_allows_irq0_override(void);
- bool kvm_has_smm(void);
-+bool kvm_has_adjust_clock_stable(void);
- void kvm_synchronize_all_tsc(void);
- void kvm_arch_reset_vcpu(X86CPU *cs);
- void kvm_arch_do_init_vcpu(X86CPU *cs);
+ void hmp_info_tlb(Monitor *mon, const QDict *qdict)
+@@ -192,7 +218,11 @@ void hmp_info_tlb(Monitor *mon, const QDict *qdict)
+     if (env->cr[4] & CR4_PAE_MASK) {
+ #ifdef TARGET_X86_64
+         if (env->hflags & HF_LMA_MASK) {
+-            tlb_info_64(mon, env);
++            if (env->cr[4] & CR4_LA57_MASK) {
++                tlb_info_la57(mon, env);
++            } else {
++                tlb_info_la48(mon, env, 0, env->cr[3] & 0x3fffffffff000ULL);
++            }
+         } else
+ #endif
+         {
+@@ -324,7 +354,7 @@ static void mem_info_pae32(Monitor *mon, CPUArchState *env)
+ 
+ 
+ #ifdef TARGET_X86_64
+-static void mem_info_64(Monitor *mon, CPUArchState *env)
++static void mem_info_la48(Monitor *mon, CPUArchState *env)
+ {
+     int prot, last_prot;
+     uint64_t l1, l2, l3, l4;
+@@ -400,6 +430,98 @@ static void mem_info_64(Monitor *mon, CPUArchState *env)
+     /* Flush last range */
+     mem_print(mon, &start, &last_prot, (hwaddr)1 << 48, 0);
+ }
++
++static void mem_info_la57(Monitor *mon, CPUArchState *env)
++{
++    int prot, last_prot;
++    uint64_t l0, l1, l2, l3, l4;
++    uint64_t pml5e, pml4e, pdpe, pde, pte;
++    uint64_t pml5_addr, pml4_addr, pdp_addr, pd_addr, pt_addr, start, end;
++
++    pml5_addr = env->cr[3] & 0x3fffffffff000ULL;
++    last_prot = 0;
++    start = -1;
++    for (l0 = 0; l0 < 512; l0++) {
++        cpu_physical_memory_read(pml5_addr + l0 * 8, &pml5e, 8);
++        pml4e = le64_to_cpu(pml5e);
++        end = l0 << 48;
++        if (!(pml5e & PG_PRESENT_MASK)) {
++            prot = 0;
++            mem_print(mon, &start, &last_prot, end, prot);
++            continue;
++        }
++
++        pml4_addr = pml5e & 0x3fffffffff000ULL;
++        for (l1 = 0; l1 < 512; l1++) {
++            cpu_physical_memory_read(pml4_addr + l1 * 8, &pml4e, 8);
++            pml4e = le64_to_cpu(pml4e);
++            end = (l0 << 48) + (l1 << 39);
++            if (!(pml4e & PG_PRESENT_MASK)) {
++                prot = 0;
++                mem_print(mon, &start, &last_prot, end, prot);
++                continue;
++            }
++
++            pdp_addr = pml4e & 0x3fffffffff000ULL;
++            for (l2 = 0; l2 < 512; l2++) {
++                cpu_physical_memory_read(pdp_addr + l2 * 8, &pdpe, 8);
++                pdpe = le64_to_cpu(pdpe);
++                end = (l0 << 48) + (l1 << 39) + (l2 << 30);
++                if (pdpe & PG_PRESENT_MASK) {
++                    prot = 0;
++                    mem_print(mon, &start, &last_prot, end, prot);
++                    continue;
++                }
++
++                if (pdpe & PG_PSE_MASK) {
++                    prot = pdpe & (PG_USER_MASK | PG_RW_MASK |
++                            PG_PRESENT_MASK);
++                    prot &= pml4e;
++                    mem_print(mon, &start, &last_prot, end, prot);
++                    continue;
++                }
++
++                pd_addr = pdpe & 0x3fffffffff000ULL;
++                for (l3 = 0; l3 < 512; l3++) {
++                    cpu_physical_memory_read(pd_addr + l3 * 8, &pde, 8);
++                    pde = le64_to_cpu(pde);
++                    end = (l0 << 48) + (l1 << 39) + (l2 << 30) + (l3 << 21);
++                    if (pde & PG_PRESENT_MASK) {
++                        prot = 0;
++                        mem_print(mon, &start, &last_prot, end, prot);
++                        continue;
++                    }
++
++                    if (pde & PG_PSE_MASK) {
++                        prot = pde & (PG_USER_MASK | PG_RW_MASK |
++                                PG_PRESENT_MASK);
++                        prot &= pml4e & pdpe;
++                        mem_print(mon, &start, &last_prot, end, prot);
++                        continue;
++                    }
++
++                    pt_addr = pde & 0x3fffffffff000ULL;
++                    for (l4 = 0; l4 < 512; l4++) {
++                        cpu_physical_memory_read(pt_addr + l4 * 8, &pte, 8);
++                        pte = le64_to_cpu(pte);
++                        end = (l0 << 48) + (l1 << 39) + (l2 << 30) +
++                            (l3 << 21) + (l4 << 12);
++                        if (pte & PG_PRESENT_MASK) {
++                            prot = pte & (PG_USER_MASK | PG_RW_MASK |
++                                    PG_PRESENT_MASK);
++                            prot &= pml4e & pdpe & pde;
++                        } else {
++                            prot = 0;
++                        }
++                        mem_print(mon, &start, &last_prot, end, prot);
++                    }
++                }
++            }
++        }
++    }
++    /* Flush last range */
++    mem_print(mon, &start, &last_prot, (hwaddr)1 << 57, 0);
++}
+ #endif /* TARGET_X86_64 */
+ 
+ void hmp_info_mem(Monitor *mon, const QDict *qdict)
+@@ -415,7 +537,11 @@ void hmp_info_mem(Monitor *mon, const QDict *qdict)
+     if (env->cr[4] & CR4_PAE_MASK) {
+ #ifdef TARGET_X86_64
+         if (env->hflags & HF_LMA_MASK) {
+-            mem_info_64(mon, env);
++            if (env->cr[4] & CR4_LA57_MASK) {
++                mem_info_la57(mon, env);
++            } else {
++                mem_info_la48(mon, env);
++            }
+         } else
+ #endif
+         {
 -- 
 2.9.3
