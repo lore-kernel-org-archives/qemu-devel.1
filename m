@@ -1,24 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59038)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59819)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1cJrr5-0000mN-Bs
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 20:07:36 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1cJrwj-0003gV-Uo
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 20:13:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1cJrr2-0000k9-5R
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 20:07:35 -0500
-Received: from szxga03-in.huawei.com ([119.145.14.66]:15160)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1cJrr1-0000iG-O2
-	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 20:07:32 -0500
-Message-ID: <585B2737.8010006@huawei.com>
-Date: Thu, 22 Dec 2016 09:07:03 +0800
-From: "Longpeng (Mike)" <longpeng2@huawei.com>
-MIME-Version: 1.0
-References: <20161221143541.9260-1-berrange@redhat.com>
-	<20161221143541.9260-4-berrange@redhat.com>
-In-Reply-To: <20161221143541.9260-4-berrange@redhat.com>
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL v1 3/7] crypto: add HMAC algorithms framework
+	(envelope-from <aik@ozlabs.ru>) id 1cJrwf-0002th-8Q
+	for qemu-devel@nongnu.org; Wed, 21 Dec 2016 20:13:25 -0500
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Date: Thu, 22 Dec 2016 12:13:12 +1100
+Message-Id: <20161222011312.12778-1-aik@ozlabs.ru>
+Subject: [Qemu-devel] [PATCH qemu] target-ppc: kvm: make use of
+ KVM_CREATE_SPAPR_TCE_64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,31 +18,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-Hi Daniel,
+KVM_CAP_SPAPR_TCE capability allows creating TCE tables in KVM which
+allows having in-kernel acceleration for H_PUT_TCE_xxx hypercalls.
+However it only supports 32bit DMA windows at zero bus offset.
 
-Can you pick this patch together ?
-[PATCH for-2.9 v4 1/6] configure: add CONFIG_GCRYPT_HMAC item
+There is a new KVM_CAP_SPAPR_TCE_64 capability which supports 64bit
+window size, variable page size and bus offset.
 
-Or it will be picked by somebody else ?
-:)
+This makes use of the new capability. The kernel headers are already
+updated as the kernel support went in to v4.6.
 
-On 2016/12/21 22:35, Daniel P. Berrange wrote:
+Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+---
+ target-ppc/kvm_ppc.h | 12 +++++++-----
+ hw/ppc/spapr_iommu.c |  8 +++++---
+ target-ppc/kvm.c     | 48 +++++++++++++++++++++++++++++++++++++-----------
+ 3 files changed, 49 insertions(+), 19 deletions(-)
 
-> From: "Longpeng(Mike)" <longpeng2@huawei.com>
-> 
-> This patch introduce HMAC algorithms framework.
-> 
-> Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
-......
-> +
-> +#endif
-
-
+diff --git a/target-ppc/kvm_ppc.h b/target-ppc/kvm_ppc.h
+index bd1d78bfbe..14320c2378 100644
+--- a/target-ppc/kvm_ppc.h
++++ b/target-ppc/kvm_ppc.h
+@@ -36,8 +36,9 @@ int kvmppc_booke_watchdog_enable(PowerPCCPU *cpu);
+ #ifndef CONFIG_USER_ONLY
+ off_t kvmppc_alloc_rma(void **rma);
+ bool kvmppc_spapr_use_multitce(void);
+-void *kvmppc_create_spapr_tce(uint32_t liobn, uint32_t window_size, int *pfd,
+-                              bool need_vfio);
++void *kvmppc_create_spapr_tce(uint32_t liobn, uint32_t page_shift,
++                              uint64_t bus_offset, uint32_t nb_table,
++                              int *pfd, bool need_vfio);
+ int kvmppc_remove_spapr_tce(void *table, int pfd, uint32_t window_size);
+ int kvmppc_reset_htab(int shift_hint);
+ uint64_t kvmppc_rma_size(uint64_t current_size, unsigned int hash_shift);
+@@ -168,9 +169,10 @@ static inline bool kvmppc_spapr_use_multitce(void)
+     return false;
+ }
+ 
+-static inline void *kvmppc_create_spapr_tce(uint32_t liobn,
+-                                            uint32_t window_size, int *fd,
+-                                            bool need_vfio)
++static inline void *kvmppc_create_spapr_tce(uint32_t liobn, uint32_t page_shift,
++                                            uint64_t bus_offset,
++                                            uint32_t nb_table,
++                                            int *pfd, bool need_vfio)
+ {
+     return NULL;
+ }
+diff --git a/hw/ppc/spapr_iommu.c b/hw/ppc/spapr_iommu.c
+index ae30bbe30f..29c80bb3c8 100644
+--- a/hw/ppc/spapr_iommu.c
++++ b/hw/ppc/spapr_iommu.c
+@@ -79,15 +79,16 @@ static IOMMUAccessFlags spapr_tce_iommu_access_flags(uint64_t tce)
+ 
+ static uint64_t *spapr_tce_alloc_table(uint32_t liobn,
+                                        uint32_t page_shift,
++                                       uint64_t bus_offset,
+                                        uint32_t nb_table,
+                                        int *fd,
+                                        bool need_vfio)
+ {
+     uint64_t *table = NULL;
+-    uint64_t window_size = (uint64_t)nb_table << page_shift;
+ 
+-    if (kvm_enabled() && !(window_size >> 32)) {
+-        table = kvmppc_create_spapr_tce(liobn, window_size, fd, need_vfio);
++    if (kvm_enabled()) {
++        table = kvmppc_create_spapr_tce(liobn, page_shift, bus_offset, nb_table,
++                                        fd, need_vfio);
+     }
+ 
+     if (!table) {
+@@ -342,6 +343,7 @@ void spapr_tce_table_enable(sPAPRTCETable *tcet,
+     tcet->nb_table = nb_table;
+     tcet->table = spapr_tce_alloc_table(tcet->liobn,
+                                         tcet->page_shift,
++                                        tcet->bus_offset,
+                                         tcet->nb_table,
+                                         &tcet->fd,
+                                         tcet->need_vfio);
+diff --git a/target-ppc/kvm.c b/target-ppc/kvm.c
+index 9c4834c4fc..6e91a4d8bb 100644
+--- a/target-ppc/kvm.c
++++ b/target-ppc/kvm.c
+@@ -71,6 +71,7 @@ static int cap_booke_sregs;
+ static int cap_ppc_smt;
+ static int cap_ppc_rma;
+ static int cap_spapr_tce;
++static int cap_spapr_tce_64;
+ static int cap_spapr_multitce;
+ static int cap_spapr_vfio;
+ static int cap_hior;
+@@ -123,6 +124,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+     cap_ppc_smt = kvm_check_extension(s, KVM_CAP_PPC_SMT);
+     cap_ppc_rma = kvm_check_extension(s, KVM_CAP_PPC_RMA);
+     cap_spapr_tce = kvm_check_extension(s, KVM_CAP_SPAPR_TCE);
++    cap_spapr_tce_64 = kvm_check_extension(s, KVM_CAP_SPAPR_TCE_64);
+     cap_spapr_multitce = kvm_check_extension(s, KVM_CAP_SPAPR_MULTITCE);
+     cap_spapr_vfio = false;
+     cap_one_reg = kvm_check_extension(s, KVM_CAP_ONE_REG);
+@@ -2201,13 +2203,10 @@ bool kvmppc_spapr_use_multitce(void)
+     return cap_spapr_multitce;
+ }
+ 
+-void *kvmppc_create_spapr_tce(uint32_t liobn, uint32_t window_size, int *pfd,
+-                              bool need_vfio)
++void *kvmppc_create_spapr_tce(uint32_t liobn, uint32_t page_shift,
++                              uint64_t bus_offset, uint32_t nb_table,
++                              int *pfd, bool need_vfio)
+ {
+-    struct kvm_create_spapr_tce args = {
+-        .liobn = liobn,
+-        .window_size = window_size,
+-    };
+     long len;
+     int fd;
+     void *table;
+@@ -2220,14 +2219,41 @@ void *kvmppc_create_spapr_tce(uint32_t liobn, uint32_t window_size, int *pfd,
+         return NULL;
+     }
+ 
+-    fd = kvm_vm_ioctl(kvm_state, KVM_CREATE_SPAPR_TCE, &args);
+-    if (fd < 0) {
+-        fprintf(stderr, "KVM: Failed to create TCE table for liobn 0x%x\n",
+-                liobn);
++    if (cap_spapr_tce_64) {
++        struct kvm_create_spapr_tce_64 args = {
++            .liobn = liobn,
++            .page_shift = page_shift,
++            .offset = bus_offset >> page_shift,
++            .size = nb_table,
++            .flags = 0
++        };
++        fd = kvm_vm_ioctl(kvm_state, KVM_CREATE_SPAPR_TCE_64, &args);
++        if (fd < 0) {
++            fprintf(stderr,
++                    "KVM: Failed to create TCE64 table for liobn 0x%x\n",
++                    liobn);
++            return NULL;
++        }
++    } else if (cap_spapr_tce) {
++        uint64_t window_size = (uint64_t) nb_table << page_shift;
++        struct kvm_create_spapr_tce args = {
++            .liobn = liobn,
++            .window_size = window_size,
++        };
++        if ((window_size != args.window_size) || bus_offset) {
++            return NULL;
++        }
++        fd = kvm_vm_ioctl(kvm_state, KVM_CREATE_SPAPR_TCE, &args);
++        if (fd < 0) {
++            fprintf(stderr, "KVM: Failed to create TCE table for liobn 0x%x\n",
++                    liobn);
++            return NULL;
++        }
++    } else {
+         return NULL;
+     }
+ 
+-    len = (window_size / SPAPR_TCE_PAGE_SIZE) * sizeof(uint64_t);
++    len = nb_table * sizeof(uint64_t);
+     /* FIXME: round this up to page size */
+ 
+     table = mmap(NULL, len, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
 -- 
-Regards,
-Longpeng(Mike)
+2.11.0
