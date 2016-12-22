@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44935)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44944)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cK5mA-0007BE-94
-	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 10:59:27 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cK5mA-0007Bj-QF
+	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 10:59:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cK5m9-0003ab-0w
+	(envelope-from <pbonzini@redhat.com>) id 1cK5mA-0003az-2k
 	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 10:59:26 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41498)
+Received: from mx1.redhat.com ([209.132.183.28]:51720)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cK5m8-0003aE-PC
-	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 10:59:24 -0500
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cK5m9-0003ag-QZ
+	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 10:59:26 -0500
 Received: from int-mx10.intmail.prod.int.phx2.redhat.com
 	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C93557AEA2
-	for <qemu-devel@nongnu.org>; Thu, 22 Dec 2016 15:59:23 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id E1438A4558
+	for <qemu-devel@nongnu.org>; Thu, 22 Dec 2016 15:59:24 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 22 Dec 2016 16:59:10 +0100
-Message-Id: <20161222155915.7232-7-pbonzini@redhat.com>
+Date: Thu, 22 Dec 2016 16:59:11 +0100
+Message-Id: <20161222155915.7232-8-pbonzini@redhat.com>
 In-Reply-To: <20161222155915.7232-1-pbonzini@redhat.com>
 References: <20161222155915.7232-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 06/11] stubs: group stubs for user-mode
- emulation
+Subject: [Qemu-devel] [PATCH 07/11] stubs: group all monitor_fdset_*
+ functions in a single file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,171 +33,122 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: ehabkost@redhat.com
 
-Some stubs are used for user-mode emulation only; they are not
-needed by tools.  Move them out of stubs/.
+It makes little sense to implement only one of them, so avoid
+proliferation of stubs files.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- MAINTAINERS         |  1 +
- Makefile.target     |  4 ++--
- stubs/Makefile.objs |  2 --
- stubs/cpus.c        | 11 -----------
- stubs/replay-user.c | 33 ---------------------------------
- user-exec-stub.c    | 34 ++++++++++++++++++++++++++++++++++
- 6 files changed, 37 insertions(+), 48 deletions(-)
- delete mode 100644 stubs/cpus.c
- delete mode 100644 stubs/replay-user.c
- create mode 100644 user-exec-stub.c
+ stubs/Makefile.objs     |  5 +----
+ stubs/fdset-add-fd.c    |  8 --------
+ stubs/fdset-find-fd.c   |  8 --------
+ stubs/fdset-get-fd.c    |  8 --------
+ stubs/fdset-remove-fd.c |  7 -------
+ stubs/fdset.c           | 22 ++++++++++++++++++++++
+ 6 files changed, 23 insertions(+), 35 deletions(-)
+ delete mode 100644 stubs/fdset-add-fd.c
+ delete mode 100644 stubs/fdset-find-fd.c
+ delete mode 100644 stubs/fdset-get-fd.c
+ delete mode 100644 stubs/fdset-remove-fd.c
+ create mode 100644 stubs/fdset.c
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 585cd5a..ac04e79 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1496,6 +1496,7 @@ M: Riku Voipio <riku.voipio@iki.fi>
- S: Maintained
- F: thunk.c
- F: user-exec.c
-+F: user-exec-stub.c
- 
- BSD user
- S: Orphan
-diff --git a/Makefile.target b/Makefile.target
-index 8ae82cb..9e8edd9 100644
---- a/Makefile.target
-+++ b/Makefile.target
-@@ -115,7 +115,7 @@ QEMU_CFLAGS+=-I$(SRC_PATH)/linux-user/$(TARGET_ABI_DIR) \
-              -I$(SRC_PATH)/linux-user
- 
- obj-y += linux-user/
--obj-y += gdbstub.o thunk.o user-exec.o
-+obj-y += gdbstub.o thunk.o user-exec.o user-exec-stub.o
- 
- endif #CONFIG_LINUX_USER
- 
-@@ -128,7 +128,7 @@ QEMU_CFLAGS+=-I$(SRC_PATH)/bsd-user -I$(SRC_PATH)/bsd-user/$(TARGET_ABI_DIR) \
- 			 -I$(SRC_PATH)/bsd-user/$(HOST_VARIANT_DIR)
- 
- obj-y += bsd-user/
--obj-y += gdbstub.o user-exec.o
-+obj-y += gdbstub.o user-exec.o user-exec-stub.o
- 
- endif #CONFIG_BSD_USER
- 
 diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-index c89a9da..1eec1fb 100644
+index 1eec1fb..40b4e15 100644
 --- a/stubs/Makefile.objs
 +++ b/stubs/Makefile.objs
-@@ -25,7 +25,6 @@ stub-obj-y += monitor.o
- stub-obj-y += notify-event.o
- stub-obj-y += qtest.o
- stub-obj-y += replay.o
--stub-obj-y += replay-user.o
- stub-obj-y += runstate-check.o
- stub-obj-y += set-fd-handler.o
- stub-obj-y += slirp.o
-@@ -35,7 +34,6 @@ stub-obj-y += uuid.o
- stub-obj-y += vm-stop.o
- stub-obj-y += vmstate.o
- stub-obj-$(CONFIG_WIN32) += fd-register.o
--stub-obj-y += cpus.o
- stub-obj-y += kvm.o
- stub-obj-y += qmp_pc_dimm_device_list.o
- stub-obj-y += target-monitor-defs.o
-diff --git a/stubs/cpus.c b/stubs/cpus.c
+@@ -10,10 +10,7 @@ stub-obj-y += cpu-get-clock.o
+ stub-obj-y += cpu-get-icount.o
+ stub-obj-y += dump.o
+ stub-obj-y += error-printf.o
+-stub-obj-y += fdset-add-fd.o
+-stub-obj-y += fdset-find-fd.o
+-stub-obj-y += fdset-get-fd.o
+-stub-obj-y += fdset-remove-fd.o
++stub-obj-y += fdset.o
+ stub-obj-y += gdbstub.o
+ stub-obj-y += get-vm-name.o
+ stub-obj-y += iothread.o
+diff --git a/stubs/fdset-add-fd.c b/stubs/fdset-add-fd.c
 deleted file mode 100644
-index e192722..0000000
---- a/stubs/cpus.c
+index bf9e60a..0000000
+--- a/stubs/fdset-add-fd.c
 +++ /dev/null
-@@ -1,11 +0,0 @@
+@@ -1,8 +0,0 @@
 -#include "qemu/osdep.h"
 -#include "qemu-common.h"
--#include "qom/cpu.h"
+-#include "monitor/monitor.h"
 -
--void cpu_resume(CPUState *cpu)
+-int monitor_fdset_dup_fd_add(int64_t fdset_id, int dup_fd)
 -{
+-    return -1;
 -}
--
--void qemu_init_vcpu(CPUState *cpu)
--{
--}
-diff --git a/stubs/replay-user.c b/stubs/replay-user.c
+diff --git a/stubs/fdset-find-fd.c b/stubs/fdset-find-fd.c
 deleted file mode 100644
-index b29e7eb..0000000
---- a/stubs/replay-user.c
+index 1d9caf3..0000000
+--- a/stubs/fdset-find-fd.c
 +++ /dev/null
-@@ -1,33 +0,0 @@
--/*
-- * replay.c
-- *
-- * Copyright (c) 2010-2015 Institute for System Programming
-- *                         of the Russian Academy of Sciences.
-- *
-- * This work is licensed under the terms of the GNU GPL, version 2 or later.
-- * See the COPYING file in the top-level directory.
-- *
-- */
--
+@@ -1,8 +0,0 @@
 -#include "qemu/osdep.h"
--#include "sysemu/replay.h"
+-#include "qemu-common.h"
+-#include "monitor/monitor.h"
 -
--bool replay_exception(void)
+-int monitor_fdset_dup_fd_find(int dup_fd)
 -{
--    return true;
+-    return -1;
 -}
+diff --git a/stubs/fdset-get-fd.c b/stubs/fdset-get-fd.c
+deleted file mode 100644
+index 5325044..0000000
+--- a/stubs/fdset-get-fd.c
++++ /dev/null
+@@ -1,8 +0,0 @@
+-#include "qemu/osdep.h"
+-#include "qemu-common.h"
+-#include "monitor/monitor.h"
 -
--bool replay_has_exception(void)
+-int monitor_fdset_get_fd(int64_t fdset_id, int flags)
 -{
--    return false;
+-    return -1;
 -}
+diff --git a/stubs/fdset-remove-fd.c b/stubs/fdset-remove-fd.c
+deleted file mode 100644
+index 47ea297..0000000
+--- a/stubs/fdset-remove-fd.c
++++ /dev/null
+@@ -1,7 +0,0 @@
+-#include "qemu/osdep.h"
+-#include "qemu-common.h"
+-#include "monitor/monitor.h"
 -
--bool replay_interrupt(void)
+-void monitor_fdset_dup_fd_remove(int dupfd)
 -{
--    return true;
 -}
--
--bool replay_has_interrupt(void)
--{
--    return false;
--}
-diff --git a/user-exec-stub.c b/user-exec-stub.c
+diff --git a/stubs/fdset.c b/stubs/fdset.c
 new file mode 100644
-index 0000000..dbcf1ad
+index 0000000..6020cf2
 --- /dev/null
-+++ b/user-exec-stub.c
-@@ -0,0 +1,34 @@
++++ b/stubs/fdset.c
+@@ -0,0 +1,22 @@
 +#include "qemu/osdep.h"
 +#include "qemu-common.h"
-+#include "qom/cpu.h"
-+#include "sysemu/replay.h"
++#include "monitor/monitor.h"
 +
-+void cpu_resume(CPUState *cpu)
++int monitor_fdset_dup_fd_add(int64_t fdset_id, int dup_fd)
 +{
++    return -1;
 +}
 +
-+void qemu_init_vcpu(CPUState *cpu)
++int monitor_fdset_dup_fd_find(int dup_fd)
 +{
++    return -1;
 +}
 +
-+/* User mode emulation does not support record/replay yet.  */
-+
-+bool replay_exception(void)
++int monitor_fdset_get_fd(int64_t fdset_id, int flags)
 +{
-+    return true;
++    return -1;
 +}
 +
-+bool replay_has_exception(void)
++void monitor_fdset_dup_fd_remove(int dupfd)
 +{
-+    return false;
-+}
-+
-+bool replay_interrupt(void)
-+{
-+    return true;
-+}
-+
-+bool replay_has_interrupt(void)
-+{
-+    return false;
 +}
 -- 
 2.9.3
