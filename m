@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38019)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50835)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1cJyru-000776-Ad
-	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 03:36:55 -0500
+	(envelope-from <berrange@redhat.com>) id 1cJzdi-0004fB-Ed
+	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 04:26:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1cJyrr-0007qE-85
-	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 03:36:54 -0500
-Message-ID: <1482395799.3732.45.camel@redhat.com>
-From: Andrea Bolognani <abologna@redhat.com>
-Date: Thu, 22 Dec 2016 09:36:39 +0100
-In-Reply-To: <20161221224326.GB14282@umbus.fritz.box>
-References: <20161215061128.30792-1-david@gibson.dropbear.id.au>
-	<1482160529.3732.2.camel@redhat.com>
-	<20161219234717.GG23176@umbus.fritz.box>
-	<1482225561.3732.12.camel@redhat.com>
-	<20161221045245.GE13024@umbus.fritz.box>
-	<1482309497.3732.30.camel@redhat.com>
-	<20161221224326.GB14282@umbus.fritz.box>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCHv3 for-2.9 0/6] HPT resizing for
- pseries guests (qemu part)
+	(envelope-from <berrange@redhat.com>) id 1cJzdf-0000RD-95
+	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 04:26:18 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53308)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cJzdf-0000Qm-33
+	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 04:26:15 -0500
+Date: Thu, 22 Dec 2016 09:26:08 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20161222092608.GH965@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20161221143541.9260-1-berrange@redhat.com>
+	<20161221143541.9260-4-berrange@redhat.com>
+	<585B2737.8010006@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <585B2737.8010006@huawei.com>
+Subject: Re: [Qemu-devel] [PULL v1 3/7] crypto: add HMAC algorithms framework
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,21 +29,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: paulus@samba.org, sjitindarsingh@gmail.com, lvivier@redhat.com, thuth@redhat.com, mdroth@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: "Longpeng (Mike)" <longpeng2@huawei.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 
-On Thu, 2016-12-22 at 09:43 +1100, David Gibson wrote:
-> > The name makes sense, we just need to document the host
-> > kernel requirement properly. The error message should of
-> > course mention it as well.
+On Thu, Dec 22, 2016 at 09:07:03AM +0800, Longpeng (Mike) wrote:
+> Hi Daniel,
 > 
-> The error message is currently
-> 
-> "Hash page table resizing not available with this KVM version"
-> 
-> Does that cover it?
+> Can you pick this patch together ?
+> [PATCH for-2.9 v4 1/6] configure: add CONFIG_GCRYPT_HMAC item
 
-Sounds good to me.
+Sigh yes. I don't know how i screwed up and missed that patch.
 
+Will send a v2 pull request.
+
+
+Regards,
+Daniel
 -- 
-Andrea Bolognani / Red Hat / Virtualization
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
