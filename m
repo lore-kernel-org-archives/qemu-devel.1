@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55129)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55174)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cK07S-00085q-4I
-	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 04:57:07 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cK07s-0000D1-Kz
+	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 04:57:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cK07R-0006Wr-9w
-	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 04:57:02 -0500
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <20161220163139.12016-1-famz@redhat.com>
-	<20161220163139.12016-2-famz@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1cK07p-0006dJ-JO
+	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 04:57:28 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33864)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cK07p-0006cr-D8
+	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 04:57:25 -0500
+References: <cover.1482164622.git.vpalatin@chromium.org>
+	<85250fb0450b5b95232b39c82ab310a0632fd23f.1482164622.git.vpalatin@chromium.org>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d7a2cfc9-ec55-b50c-d2ea-078d425d94e2@redhat.com>
-Date: Thu, 22 Dec 2016 10:56:50 +0100
+Message-ID: <fda5a694-d02f-269e-e155-1822276d74f6@redhat.com>
+Date: Thu, 22 Dec 2016 10:57:20 +0100
 MIME-Version: 1.0
-In-Reply-To: <20161220163139.12016-2-famz@redhat.com>
+In-Reply-To: <85250fb0450b5b95232b39c82ab310a0632fd23f.1482164622.git.vpalatin@chromium.org>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/4] ramblock-notifier: new
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5 3/4] Plumb the HAXM-based hardware
+ acceleration support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,40 +28,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, borntraeger@de.ibm.com, Stefan Hajnoczi <stefanha@redhat.com>, Karl Rister <krister@redhat.com>
+To: Vincent Palatin <vpalatin@chromium.org>, qemu-devel <qemu-devel@nongnu.org>
+Cc: Yu Ning <yu.ning@linux.intel.com>, Stefan Weil <sw@weilnetz.de>, "Michael S . Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>
 
 
-> diff --git a/xen-mapcache.c b/xen-mapcache.c
-> index 8f3a592..dc9b321 100644
-> --- a/xen-mapcache.c
-> +++ b/xen-mapcache.c
-> @@ -163,6 +163,7 @@ static void xen_remap_bucket(MapCacheEntry *entry,
->      err = g_malloc0(nb_pfn * sizeof (int));
->  
->      if (entry->vaddr_base != NULL) {
-> +        ram_block_removed(entry->vaddr_base, entry->size);
->          if (munmap(entry->vaddr_base, entry->size) != 0) {
->              perror("unmap fails");
->              exit(-1);
-> @@ -188,6 +189,7 @@ static void xen_remap_bucket(MapCacheEntry *entry,
->      entry->valid_mapping = (unsigned long *) g_malloc0(sizeof(unsigned long) *
->              BITS_TO_LONGS(size >> XC_PAGE_SHIFT));
->  
-> +    ram_block_added(entry->vaddr_base, entry->size);
->      bitmap_zero(entry->valid_mapping, nb_pfn);
->      for (i = 0; i < nb_pfn; i++) {
->          if (!err[i]) {
-> @@ -397,6 +399,7 @@ static void xen_invalidate_map_cache_entry_unlocked(uint8_t *buffer)
->      }
->  
->      pentry->next = entry->next;
-> +    ram_block_removed(entry->vaddr_base, entry->size);
->      if (munmap(entry->vaddr_base, entry->size) != 0) {
->          perror("unmap fails");
->          exit(-1);
-> 
 
-My mistake here, these should be ram_block_notify_{add,remove} instead.
+On 19/12/2016 17:24, Vincent Palatin wrote:
+>  #else /* _WIN32 */
+> -    abort();
+> +    if (!qemu_cpu_is_self(cpu)) {
+> +        CONTEXT context;
+> +        if (SuspendThread(cpu->hThread) =3D=3D (DWORD)(-1)) {
+> +            fprintf(stderr, "qemu:%s: GetLastError:%lu\n", __func__,
+> +                    GetLastError());
+> +            exit(1);
+> +        }
+> +
+> +        /* On multi-core systems, we are not sure that the thread is a=
+ctually
+> +         * suspended until we can get the context.
+> +         */
+> +        context.ContextFlags =3D CONTEXT_CONTROL;
+> +        while (GetThreadContext(cpu->hThread, &context) !=3D 0) {
+> +            continue;
+> +        }
+> +
+> +        if (hax_enabled()) {
+> +            cpu->exit_request =3D 1;
+> +        }
+
+As mentioned in the reply to patch 4, please leave the cpu->exit_request
+=3D 1 assignment to the caller.
+
+Apart from the above change, can you check if there are some less
+heavyeight methods to force an exit?  I can think of QueueUserAPC with
+an empty pfnAPC here, and SleepEx(0, TRUE) in qemu_hax_cpu_thread_fn
+before qemu_wait_io_event_common.
+
+> +        if (ResumeThread(cpu->hThread) =3D=3D (DWORD)(-1)) {
+> +            fprintf(stderr, "qemu:%s: GetLastError:%lu\n", __func__,
+> +                    GetLastError());
+> +            exit(1);
+> +        }
+> +    }
+
+[...]
+
+>=20
+> +            /*
+> +             * In Hax, the qemu allocate the virtual address, and HAX =
+kernel
+> +             * populate the memory with physical memory. Currently we =
+have no
+> +             * paging, so user should make sure enough free memory in =
+advance
+> +             */
+> +            if (hax_enabled()) {
+> +                int ret;
+> +                ret =3D hax_populate_ram((uint64_t)(uintptr_t)new_bloc=
+k->host,
+> +                                       new_block->max_length);
+> +                if (ret < 0) {
+> +                    error_setg(errp, "Hax failed to populate ram");
+> +                    return;
+> +                }
+> +            }
+> +
+
+Can you check if the interface at
+http://marc.info/?l=3Dqemu-devel&m=3D148225154320642&q=3Draw would be goo=
+d for
+your purposes, and if so include that patch in your v6?
+
+Otherwise looks great, so I'm confident we can add this in QEMU 2.9.
 
 Paolo
