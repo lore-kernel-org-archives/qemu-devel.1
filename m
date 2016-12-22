@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37926)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37928)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cK5DU-0007x4-TK
+	(envelope-from <pbonzini@redhat.com>) id 1cK5DU-0007x7-V2
 	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 10:23:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cK5DS-0007EJ-DK
+	(envelope-from <pbonzini@redhat.com>) id 1cK5DT-0007Ex-Jj
 	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 10:23:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54656)
+Received: from mx1.redhat.com ([209.132.183.28]:54562)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cK5DS-0007E1-6O
-	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 10:23:34 -0500
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cK5DT-0007EP-B9
+	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 10:23:35 -0500
 Received: from int-mx10.intmail.prod.int.phx2.redhat.com
 	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5083743A3C
-	for <qemu-devel@nongnu.org>; Thu, 22 Dec 2016 15:23:33 +0000 (UTC)
-Received: from donizetti.redhat.com (ovpn-116-19.ams2.redhat.com
-	[10.36.116.19])
-	by int-mx10.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
-	id uBMFN1xY027210
-	for <qemu-devel@nongnu.org>; Thu, 22 Dec 2016 10:23:32 -0500
+	by mx1.redhat.com (Postfix) with ESMTPS id 7B52FC05AA57
+	for <qemu-devel@nongnu.org>; Thu, 22 Dec 2016 15:23:34 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 22 Dec 2016 16:22:56 +0100
-Message-Id: <20161222152300.32395-22-pbonzini@redhat.com>
+Date: Thu, 22 Dec 2016 16:22:57 +0100
+Message-Id: <20161222152300.32395-23-pbonzini@redhat.com>
 In-Reply-To: <20161222152300.32395-1-pbonzini@redhat.com>
 References: <20161222152300.32395-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 21/25] scsi-disk: fix VERIFY for scsi-block
+Subject: [Qemu-devel] [PULL 22/25] kvm: sync linux headers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,44 +30,164 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Marcelo Tosatti <mtosatti@redhat.com>
 
-When a scsi-disk object receives VERIFY command with BYTCHK bit being zero,
-scsi_block_is_passthrough returns false and finally makes req being proceeded
-by scsi_block_dma_command. Because scsi_block_dma_command has removed process
-of VERIFY, QEMU will abort in this function.
+From: Marcelo Tosatti <mtosatti@redhat.com>
 
-Reported-by: Junlian Bell <zhongjun@sangfor.com.cn>
+Import KVM_CLOCK_TSC_STABLE.
+
+Signed-off-by: Marcelo Tosatti <mtosatti@redhat.com>
+
+Message-Id: <20161210172324.402794293@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/scsi/scsi-disk.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ include/standard-headers/linux/input.h    |  1 +
+ include/standard-headers/linux/pci_regs.h | 15 ++++++++++++++-
+ linux-headers/asm-arm/kvm.h               |  7 +++++++
+ linux-headers/asm-x86/unistd_32.h         |  3 +++
+ linux-headers/asm-x86/unistd_64.h         |  3 +++
+ linux-headers/asm-x86/unistd_x32.h        |  3 +++
+ linux-headers/linux/kvm.h                 |  7 +++++++
+ 7 files changed, 38 insertions(+), 1 deletion(-)
 
-diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-index a963191..bdd1e5f 100644
---- a/hw/scsi/scsi-disk.c
-+++ b/hw/scsi/scsi-disk.c
-@@ -2157,6 +2157,13 @@ static int32_t scsi_disk_dma_command(SCSIRequest *req, uint8_t *buf)
-         DPRINTF("Write %s(sector %" PRId64 ", count %u)\n",
-                 (command & 0xe) == 0xe ? "And Verify " : "",
-                 r->req.cmd.lba, len);
-+    case VERIFY_10:
-+    case VERIFY_12:
-+    case VERIFY_16:
-+        /* We get here only for BYTCHK == 0x01 and only for scsi-block.
-+         * As far as DMA is concerned, we can treat it the same as a write;
-+         * scsi_block_do_sgio will send VERIFY commands.
-+         */
-         if (r->req.cmd.buf[1] & 0xe0) {
-             goto illegal_request;
-         }
-@@ -2712,7 +2719,7 @@ static bool scsi_block_is_passthrough(SCSIDiskState *s, uint8_t *buf)
-     case WRITE_VERIFY_16:
-         /* MMC writing cannot be done via DMA helpers, because it sometimes
-          * involves writing beyond the maximum LBA or to negative LBA (lead-in).
--         * We might use scsi_disk_dma_reqops as long as no writing commands are
-+         * We might use scsi_block_dma_reqops as long as no writing commands are
-          * seen, but performance usually isn't paramount on optical media.  So,
-          * just make scsi-block operate the same as scsi-generic for them.
-          */
+diff --git a/include/standard-headers/linux/input.h b/include/standard-headers/linux/input.h
+index 7361a16..b472b85 100644
+--- a/include/standard-headers/linux/input.h
++++ b/include/standard-headers/linux/input.h
+@@ -245,6 +245,7 @@ struct input_mask {
+ #define BUS_SPI			0x1C
+ #define BUS_RMI			0x1D
+ #define BUS_CEC			0x1E
++#define BUS_INTEL_ISHTP		0x1F
+ 
+ /*
+  * MT_TOOL types
+diff --git a/include/standard-headers/linux/pci_regs.h b/include/standard-headers/linux/pci_regs.h
+index 4040951..e5a2e68 100644
+--- a/include/standard-headers/linux/pci_regs.h
++++ b/include/standard-headers/linux/pci_regs.h
+@@ -612,6 +612,8 @@
+  */
+ #define PCI_EXP_DEVCAP2		36	/* Device Capabilities 2 */
+ #define  PCI_EXP_DEVCAP2_ARI		0x00000020 /* Alternative Routing-ID */
++#define  PCI_EXP_DEVCAP2_ATOMIC_ROUTE	0x00000040 /* Atomic Op routing */
++#define PCI_EXP_DEVCAP2_ATOMIC_COMP64	0x00000100 /* Atomic 64-bit compare */
+ #define  PCI_EXP_DEVCAP2_LTR		0x00000800 /* Latency tolerance reporting */
+ #define  PCI_EXP_DEVCAP2_OBFF_MASK	0x000c0000 /* OBFF support mechanism */
+ #define  PCI_EXP_DEVCAP2_OBFF_MSG	0x00040000 /* New message signaling */
+@@ -619,6 +621,7 @@
+ #define PCI_EXP_DEVCTL2		40	/* Device Control 2 */
+ #define  PCI_EXP_DEVCTL2_COMP_TIMEOUT	0x000f	/* Completion Timeout Value */
+ #define  PCI_EXP_DEVCTL2_ARI		0x0020	/* Alternative Routing-ID */
++#define PCI_EXP_DEVCTL2_ATOMIC_REQ	0x0040	/* Set Atomic requests */
+ #define  PCI_EXP_DEVCTL2_IDO_REQ_EN	0x0100	/* Allow IDO for requests */
+ #define  PCI_EXP_DEVCTL2_IDO_CMP_EN	0x0200	/* Allow IDO for completions */
+ #define  PCI_EXP_DEVCTL2_LTR_EN		0x0400	/* Enable LTR mechanism */
+@@ -671,7 +674,8 @@
+ #define PCI_EXT_CAP_ID_PMUX	0x1A	/* Protocol Multiplexing */
+ #define PCI_EXT_CAP_ID_PASID	0x1B	/* Process Address Space ID */
+ #define PCI_EXT_CAP_ID_DPC	0x1D	/* Downstream Port Containment */
+-#define PCI_EXT_CAP_ID_MAX	PCI_EXT_CAP_ID_DPC
++#define PCI_EXT_CAP_ID_PTM	0x1F	/* Precision Time Measurement */
++#define PCI_EXT_CAP_ID_MAX	PCI_EXT_CAP_ID_PTM
+ 
+ #define PCI_EXT_CAP_DSN_SIZEOF	12
+ #define PCI_EXT_CAP_MCAST_ENDPOINT_SIZEOF 40
+@@ -964,4 +968,13 @@
+ 
+ #define PCI_EXP_DPC_SOURCE_ID		10	/* DPC Source Identifier */
+ 
++/* Precision Time Measurement */
++#define PCI_PTM_CAP			0x04	    /* PTM Capability */
++#define  PCI_PTM_CAP_REQ		0x00000001  /* Requester capable */
++#define  PCI_PTM_CAP_ROOT		0x00000004  /* Root capable */
++#define  PCI_PTM_GRANULARITY_MASK	0x0000FF00  /* Clock granularity */
++#define PCI_PTM_CTRL			0x08	    /* PTM Control */
++#define  PCI_PTM_CTRL_ENABLE		0x00000001  /* PTM enable */
++#define  PCI_PTM_CTRL_ROOT		0x00000002  /* Root select */
++
+ #endif /* LINUX_PCI_REGS_H */
+diff --git a/linux-headers/asm-arm/kvm.h b/linux-headers/asm-arm/kvm.h
+index 541268c..2fb7859 100644
+--- a/linux-headers/asm-arm/kvm.h
++++ b/linux-headers/asm-arm/kvm.h
+@@ -84,6 +84,13 @@ struct kvm_regs {
+ #define KVM_VGIC_V2_DIST_SIZE		0x1000
+ #define KVM_VGIC_V2_CPU_SIZE		0x2000
+ 
++/* Supported VGICv3 address types  */
++#define KVM_VGIC_V3_ADDR_TYPE_DIST	2
++#define KVM_VGIC_V3_ADDR_TYPE_REDIST	3
++
++#define KVM_VGIC_V3_DIST_SIZE		SZ_64K
++#define KVM_VGIC_V3_REDIST_SIZE		(2 * SZ_64K)
++
+ #define KVM_ARM_VCPU_POWER_OFF		0 /* CPU is started in OFF state */
+ #define KVM_ARM_VCPU_PSCI_0_2		1 /* CPU uses PSCI v0.2 */
+ 
+diff --git a/linux-headers/asm-x86/unistd_32.h b/linux-headers/asm-x86/unistd_32.h
+index abeaf40..d45ea28 100644
+--- a/linux-headers/asm-x86/unistd_32.h
++++ b/linux-headers/asm-x86/unistd_32.h
+@@ -377,5 +377,8 @@
+ #define __NR_copy_file_range 377
+ #define __NR_preadv2 378
+ #define __NR_pwritev2 379
++#define __NR_pkey_mprotect 380
++#define __NR_pkey_alloc 381
++#define __NR_pkey_free 382
+ 
+ #endif /* _ASM_X86_UNISTD_32_H */
+diff --git a/linux-headers/asm-x86/unistd_64.h b/linux-headers/asm-x86/unistd_64.h
+index 73c3d1f..e22db91 100644
+--- a/linux-headers/asm-x86/unistd_64.h
++++ b/linux-headers/asm-x86/unistd_64.h
+@@ -330,5 +330,8 @@
+ #define __NR_copy_file_range 326
+ #define __NR_preadv2 327
+ #define __NR_pwritev2 328
++#define __NR_pkey_mprotect 329
++#define __NR_pkey_alloc 330
++#define __NR_pkey_free 331
+ 
+ #endif /* _ASM_X86_UNISTD_64_H */
+diff --git a/linux-headers/asm-x86/unistd_x32.h b/linux-headers/asm-x86/unistd_x32.h
+index e5aea76..84e58b2 100644
+--- a/linux-headers/asm-x86/unistd_x32.h
++++ b/linux-headers/asm-x86/unistd_x32.h
+@@ -283,6 +283,9 @@
+ #define __NR_membarrier (__X32_SYSCALL_BIT + 324)
+ #define __NR_mlock2 (__X32_SYSCALL_BIT + 325)
+ #define __NR_copy_file_range (__X32_SYSCALL_BIT + 326)
++#define __NR_pkey_mprotect (__X32_SYSCALL_BIT + 329)
++#define __NR_pkey_alloc (__X32_SYSCALL_BIT + 330)
++#define __NR_pkey_free (__X32_SYSCALL_BIT + 331)
+ #define __NR_rt_sigaction (__X32_SYSCALL_BIT + 512)
+ #define __NR_rt_sigreturn (__X32_SYSCALL_BIT + 513)
+ #define __NR_ioctl (__X32_SYSCALL_BIT + 514)
+diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+index 4806e06..bb0ed71 100644
+--- a/linux-headers/linux/kvm.h
++++ b/linux-headers/linux/kvm.h
+@@ -972,12 +972,19 @@ struct kvm_irqfd {
+ 	__u8  pad[16];
+ };
+ 
++/* For KVM_CAP_ADJUST_CLOCK */
++
++/* Do not use 1, KVM_CHECK_EXTENSION returned it before we had flags.  */
++#define KVM_CLOCK_TSC_STABLE		2
++
+ struct kvm_clock_data {
+ 	__u64 clock;
+ 	__u32 flags;
+ 	__u32 pad[9];
+ };
+ 
++/* For KVM_CAP_SW_TLB */
++
+ #define KVM_MMU_FSL_BOOKE_NOHV		0
+ #define KVM_MMU_FSL_BOOKE_HV		1
+ 
 -- 
 2.9.3
