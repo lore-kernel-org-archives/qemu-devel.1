@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34907)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36729)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cK50n-00065l-PR
-	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 10:10:30 -0500
+	(envelope-from <leif.lindholm@linaro.org>) id 1cK58b-0003ae-Hy
+	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 10:18:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cK50k-00022H-H8
-	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 10:10:29 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59715)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cK50k-00021o-8h
-	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 10:10:26 -0500
-Received: from int-mx10.intmail.prod.int.phx2.redhat.com
-	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2AA17C04B320
-	for <qemu-devel@nongnu.org>; Thu, 22 Dec 2016 15:10:25 +0000 (UTC)
-From: Igor Mammedov <imammedo@redhat.com>
-Date: Thu, 22 Dec 2016 16:10:20 +0100
-Message-Id: <1482419420-277133-1-git-send-email-imammedo@redhat.com>
-In-Reply-To: <1480980749-182204-8-git-send-email-imammedo@redhat.com>
-References: <1480980749-182204-8-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH for-2.9 v2 07/10] memhp: move GPE handler_E03
- into build_memory_hotplug_aml()
+	(envelope-from <leif.lindholm@linaro.org>) id 1cK58a-0005Tu-Ba
+	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 10:18:33 -0500
+Received: from mail-wj0-x232.google.com ([2a00:1450:400c:c01::232]:33045)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <leif.lindholm@linaro.org>)
+	id 1cK58a-0005Ti-1T
+	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 10:18:32 -0500
+Received: by mail-wj0-x232.google.com with SMTP id ez4so12910424wjd.0
+	for <qemu-devel@nongnu.org>; Thu, 22 Dec 2016 07:18:31 -0800 (PST)
+From: Leif Lindholm <leif.lindholm@linaro.org>
+Date: Thu, 22 Dec 2016 15:18:28 +0000
+Message-Id: <20161222151828.28292-1-leif.lindholm@linaro.org>
+Subject: [Qemu-devel] [PATCH] smbios: filter based on CONFIG_SMBIOS rather
+ than TARGET
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,173 +26,155 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: marcel@redhat.com, mst@redhat.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-build hotplug event handler method body in generic
-hw/acpi/memory_hotplug.c and make hw/i386/acpi-build.c
-only provide target specific full name of the event
-handler.
-That removes hardcoded MEMORY_HOTPLUG_HANDLER_PATH and
-allows to do target specific memory hotplug AML placement
-and wiring it with a target specific hotplug event handler
-(it's GPE for i386 and would be GPIO for ARM).
+-smbios command line options were accepted but silently ignored on
+TARGET_ARM, due to a test for TARGET_I386 in arch_init.c.
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
+Copy the mechanism of hw/pci/pci-stub.c to implement an smbios-stub
+instead, enabled for all targets without CONFIG_SMBIOS.
+
+Signed-off-by: Leif Lindholm <leif.lindholm@linaro.org>
 ---
-v2:
-  - fix commit message
 
----
- include/hw/acpi/memory_hotplug.h |  6 +++---
- hw/acpi/memory_hotplug.c         | 42 ++++++++++++++++++++++++++--------------
- hw/i386/acpi-build.c             |  7 ++-----
- 3 files changed, 32 insertions(+), 23 deletions(-)
+Not sure if Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+is semantically correct in this instance, but if it is, please
+add it.
 
-diff --git a/include/hw/acpi/memory_hotplug.h b/include/hw/acpi/memory_hotplug.h
-index 6dc48d2..37e2706 100644
---- a/include/hw/acpi/memory_hotplug.h
-+++ b/include/hw/acpi/memory_hotplug.h
-@@ -49,9 +49,9 @@ void acpi_memory_ospm_status(MemHotplugState *mem_st, ACPIOSTInfoList ***list);
- 
- #define MEMORY_HOTPLUG_DEVICE        "MHPD"
- #define MEMORY_SLOT_SCAN_METHOD      "MSCN"
--#define MEMORY_HOTPLUG_HANDLER_PATH "\\_SB.PCI0." \
--     MEMORY_HOTPLUG_DEVICE "." MEMORY_SLOT_SCAN_METHOD
- 
- void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
--                              uint16_t io_base, uint16_t io_len);
-+                              uint16_t io_base, uint16_t io_len,
-+                              const char *res_root,
-+                              const char *event_handler_method);
+ arch_init.c                |  8 --------
+ hw/Makefile.objs           |  2 +-
+ hw/smbios/Makefile.objs    |  3 +++
+ hw/smbios/smbios-stub.c    | 31 +++++++++++++++++++++++++++++++
+ hw/smbios/smbios.c         |  2 +-
+ include/hw/smbios/smbios.h |  2 +-
+ vl.c                       |  2 +-
+ 7 files changed, 38 insertions(+), 12 deletions(-)
+ create mode 100644 hw/smbios/smbios-stub.c
+
+diff --git a/arch_init.c b/arch_init.c
+index 5cc58b2..34e7694 100644
+--- a/arch_init.c
++++ b/arch_init.c
+@@ -28,7 +28,6 @@
+ #include "sysemu/arch_init.h"
+ #include "hw/pci/pci.h"
+ #include "hw/audio/audio.h"
+-#include "hw/smbios/smbios.h"
+ #include "qemu/config-file.h"
+ #include "qemu/error-report.h"
+ #include "qmp-commands.h"
+@@ -248,13 +247,6 @@ void do_acpitable_option(const QemuOpts *opts)
  #endif
-diff --git a/hw/acpi/memory_hotplug.c b/hw/acpi/memory_hotplug.c
-index 18b95f2..49e856f 100644
---- a/hw/acpi/memory_hotplug.c
-+++ b/hw/acpi/memory_hotplug.c
-@@ -308,18 +308,19 @@ const VMStateDescription vmstate_memory_hotplug = {
- };
- 
- void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
--                              uint16_t io_base, uint16_t io_len)
-+                              uint16_t io_base, uint16_t io_len,
-+                              const char *res_root,
-+                              const char *event_handler_method)
- {
-     int i;
-     Aml *ifctx;
-     Aml *method;
--    Aml *pci_scope;
-     Aml *sb_scope;
-     Aml *mem_ctrl_dev;
-+    char *scan_path;
-+    char *mhp_res_path = g_strdup_printf("%s." MEMORY_HOTPLUG_DEVICE, res_root);
- 
--    /* scope for memory hotplug controller device node */
--    pci_scope = aml_scope("_SB.PCI0");
--    mem_ctrl_dev = aml_device(MEMORY_HOTPLUG_DEVICE);
-+    mem_ctrl_dev = aml_device("%s", mhp_res_path);
-     {
-         Aml *crs;
-         Aml *field;
-@@ -610,47 +611,50 @@ void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
-         }
-         aml_append(mem_ctrl_dev, method);
-     }
--    aml_append(pci_scope, mem_ctrl_dev);
--    aml_append(table, pci_scope);
-+    aml_append(table, mem_ctrl_dev);
- 
-     sb_scope = aml_scope("_SB");
-     /* build memory devices */
-     for (i = 0; i < nr_mem; i++) {
--        #define BASEPATH "\\_SB.PCI0." MEMORY_HOTPLUG_DEVICE "."
-         Aml *dev;
--        const char *s;
-+        char *s;
- 
-         dev = aml_device("MP%02X", i);
-         aml_append(dev, aml_name_decl("_UID", aml_string("0x%02X", i)));
-         aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0C80")));
- 
-         method = aml_method("_CRS", 0, AML_NOTSERIALIZED);
--        s = BASEPATH MEMORY_SLOT_CRS_METHOD;
-+        s = g_strdup_printf("%s.%s", mhp_res_path, MEMORY_SLOT_CRS_METHOD);
-         aml_append(method, aml_return(aml_call1(s, aml_name("_UID"))));
-+        g_free(s);
-         aml_append(dev, method);
- 
-         method = aml_method("_STA", 0, AML_NOTSERIALIZED);
--        s = BASEPATH MEMORY_SLOT_STATUS_METHOD;
-+        s = g_strdup_printf("%s.%s", mhp_res_path, MEMORY_SLOT_STATUS_METHOD);
-         aml_append(method, aml_return(aml_call1(s, aml_name("_UID"))));
-+        g_free(s);
-         aml_append(dev, method);
- 
-         method = aml_method("_PXM", 0, AML_NOTSERIALIZED);
--        s = BASEPATH MEMORY_SLOT_PROXIMITY_METHOD;
-+        s = g_strdup_printf("%s.%s", mhp_res_path,
-+                            MEMORY_SLOT_PROXIMITY_METHOD);
-         aml_append(method, aml_return(aml_call1(s, aml_name("_UID"))));
-+        g_free(s);
-         aml_append(dev, method);
- 
-         method = aml_method("_OST", 3, AML_NOTSERIALIZED);
--        s = BASEPATH MEMORY_SLOT_OST_METHOD;
--
-+        s = g_strdup_printf("%s.%s", mhp_res_path, MEMORY_SLOT_OST_METHOD);
-         aml_append(method, aml_return(aml_call4(
-             s, aml_name("_UID"), aml_arg(0), aml_arg(1), aml_arg(2)
-         )));
-+        g_free(s);
-         aml_append(dev, method);
- 
-         method = aml_method("_EJ0", 1, AML_NOTSERIALIZED);
--        s = BASEPATH MEMORY_SLOT_EJECT_METHOD;
-+        s = g_strdup_printf("%s.%s", mhp_res_path, MEMORY_SLOT_EJECT_METHOD);
-         aml_append(method, aml_return(aml_call2(
-                    s, aml_name("_UID"), aml_arg(0))));
-+        g_free(s);
-         aml_append(dev, method);
- 
-         aml_append(sb_scope, dev);
-@@ -669,4 +673,12 @@ void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
-     }
-     aml_append(sb_scope, method);
-     aml_append(table, sb_scope);
-+
-+    method = aml_method(event_handler_method, 0, AML_NOTSERIALIZED);
-+    scan_path = g_strdup_printf("%s.%s", mhp_res_path, MEMORY_SLOT_SCAN_METHOD);
-+    aml_append(method, aml_call0(scan_path));
-+    g_free(scan_path);
-+    aml_append(table, method);
-+
-+    g_free(mhp_res_path);
  }
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index f8a5f47..034f2b4 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -1926,7 +1926,8 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-                        "\\_SB.PCI0", "\\_GPE._E02");
-     }
-     build_memory_hotplug_aml(dsdt, nr_mem, pm->mem_hp_io_base,
--                             pm->mem_hp_io_len);
-+                             pm->mem_hp_io_len,
-+                             "\\_SB.PCI0", "\\_GPE._E03");
  
-     scope =  aml_scope("_GPE");
-     {
-@@ -1941,10 +1942,6 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-             aml_append(scope, method);
-         }
- 
--        method = aml_method("_E03", 0, AML_NOTSERIALIZED);
--        aml_append(method, aml_call0(MEMORY_HOTPLUG_HANDLER_PATH));
--        aml_append(scope, method);
+-void do_smbios_option(QemuOpts *opts)
+-{
+-#ifdef TARGET_I386
+-    smbios_entry_add(opts);
+-#endif
+-}
 -
-         if (pcms->acpi_nvdimm_state.is_enabled) {
-             method = aml_method("_E04", 0, AML_NOTSERIALIZED);
-             aml_append(method, aml_notify(aml_name("\\_SB.NVDR"),
+ int kvm_available(void)
+ {
+ #ifdef CONFIG_KVM
+diff --git a/hw/Makefile.objs b/hw/Makefile.objs
+index 0ffd281..2a73ae5 100644
+--- a/hw/Makefile.objs
++++ b/hw/Makefile.objs
+@@ -33,7 +33,7 @@ devices-dirs-$(CONFIG_VIRTIO) += virtio/
+ devices-dirs-$(CONFIG_SOFTMMU) += watchdog/
+ devices-dirs-$(CONFIG_SOFTMMU) += xen/
+ devices-dirs-$(CONFIG_MEM_HOTPLUG) += mem/
+-devices-dirs-$(CONFIG_SMBIOS) += smbios/
++devices-dirs-$(CONFIG_SOFTMMU) += smbios/
+ devices-dirs-y += core/
+ common-obj-y += $(devices-dirs-y)
+ obj-y += $(devices-dirs-y)
+diff --git a/hw/smbios/Makefile.objs b/hw/smbios/Makefile.objs
+index c3d3753..ee0712b 100644
+--- a/hw/smbios/Makefile.objs
++++ b/hw/smbios/Makefile.objs
+@@ -1,2 +1,5 @@
+ common-obj-$(CONFIG_SMBIOS) += smbios.o
+ common-obj-$(call land,$(CONFIG_SMBIOS),$(CONFIG_IPMI)) += smbios_type_38.o
++
++common-obj-$(call lnot,$(CONFIG_SMBIOS)) += smbios-stub.o
++common-obj-$(CONFIG_ALL) += smbios-stub.o
+diff --git a/hw/smbios/smbios-stub.c b/hw/smbios/smbios-stub.c
+new file mode 100644
+index 0000000..3087394
+--- /dev/null
++++ b/hw/smbios/smbios-stub.c
+@@ -0,0 +1,31 @@
++/*
++ * SMBIOS stubs for platforms that don't support SMBIOS.
++ *
++ * Copyright (c) 2010 Isaku Yamahata <yamahata at valinux co jp>
++ *                    VA Linux Systems Japan K.K.
++ * Copyright (c) 2016 Leif Lindholm <leif.lindholm@linaro.org>
++ *                    Linaro Ltd.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License along
++ * with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "qapi/qmp/qerror.h"
++#include "qmp-commands.h"
++#include "hw/smbios/smbios.h"
++
++void smbios_entry_add(QemuOpts *opts, Error **errp)
++{
++    error_setg(errp, QERR_UNSUPPORTED);
++}
+diff --git a/hw/smbios/smbios.c b/hw/smbios/smbios.c
+index 3a96ced..1a5437a 100644
+--- a/hw/smbios/smbios.c
++++ b/hw/smbios/smbios.c
+@@ -882,7 +882,7 @@ static void save_opt(const char **dest, QemuOpts *opts, const char *name)
+     }
+ }
+ 
+-void smbios_entry_add(QemuOpts *opts)
++void smbios_entry_add(QemuOpts *opts, Error **errp)
+ {
+     const char *val;
+ 
+diff --git a/include/hw/smbios/smbios.h b/include/hw/smbios/smbios.h
+index 1cd53cc..31e8d5f 100644
+--- a/include/hw/smbios/smbios.h
++++ b/include/hw/smbios/smbios.h
+@@ -257,7 +257,7 @@ struct smbios_type_127 {
+     struct smbios_structure_header header;
+ } QEMU_PACKED;
+ 
+-void smbios_entry_add(QemuOpts *opts);
++void smbios_entry_add(QemuOpts *opts, Error **errp);
+ void smbios_set_cpuid(uint32_t version, uint32_t features);
+ void smbios_set_defaults(const char *manufacturer, const char *product,
+                          const char *version, bool legacy_mode,
+diff --git a/vl.c b/vl.c
+index d77dd86..d2a0d75 100644
+--- a/vl.c
++++ b/vl.c
+@@ -3711,7 +3711,7 @@ int main(int argc, char **argv, char **envp)
+                 if (!opts) {
+                     exit(1);
+                 }
+-                do_smbios_option(opts);
++                smbios_entry_add(opts, &error_abort);
+                 break;
+             case QEMU_OPTION_fwcfg:
+                 opts = qemu_opts_parse_noisily(qemu_find_opts("fw_cfg"),
 -- 
-2.7.4
+2.10.2
