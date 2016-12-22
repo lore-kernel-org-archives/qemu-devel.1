@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54205)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54582)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cK00F-0002Od-Mc
-	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 04:49:36 -0500
+	(envelope-from <jasowang@redhat.com>) id 1cK03h-0005ac-CM
+	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 04:53:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cK00F-0003JY-1i
-	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 04:49:35 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45374)
+	(envelope-from <jasowang@redhat.com>) id 1cK03e-00051T-BX
+	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 04:53:09 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50846)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cK00E-0003IE-Rq
-	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 04:49:34 -0500
-References: <cover.1482164622.git.vpalatin@chromium.org>
-	<bc2fa770d55e472477bcd5fef1524a2c5314d7f0.1482164622.git.vpalatin@chromium.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <3de5e377-b08e-d286-219f-36e4208bdfdc@redhat.com>
-Date: Thu, 22 Dec 2016 10:49:30 +0100
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cK03e-000511-5O
+	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 04:53:06 -0500
+References: <1482400096-23078-1-git-send-email-peterx@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <b2b1424c-1bd0-00ea-8d14-f935b8901629@redhat.com>
+Date: Thu, 22 Dec 2016 17:52:58 +0800
 MIME-Version: 1.0
-In-Reply-To: <bc2fa770d55e472477bcd5fef1524a2c5314d7f0.1482164622.git.vpalatin@chromium.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 4/4] hax: add Darwin support
+In-Reply-To: <1482400096-23078-1-git-send-email-peterx@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3] intel_iommu: allow dynamic switch of
+ IOMMU region
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,32 +27,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vincent Palatin <vpalatin@chromium.org>, qemu-devel <qemu-devel@nongnu.org>
-Cc: Yu Ning <yu.ning@linux.intel.com>, Stefan Weil <sw@weilnetz.de>, "Michael S . Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+Cc: tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, alex.williamson@redhat.com, bd.aviv@gmail.com, david@gibson.dropbear.id.au
 
 
 
-On 19/12/2016 17:24, Vincent Palatin wrote:
-> diff --git a/cpus.c b/cpus.c
-> index 0e01791..b8db313 100644
-> --- a/cpus.c
-> +++ b/cpus.c
-> @@ -1264,6 +1264,11 @@ static void qemu_cpu_kick_thread(CPUState *cpu)
->          return;
->      }
->      cpu->thread_kicked = true;
-> +#ifdef CONFIG_DARWIN
-> +    if (hax_enabled()) {
-> +        cpu->exit_request = 1;
+On 2016=E5=B9=B412=E6=9C=8822=E6=97=A5 17:48, Peter Xu wrote:
+>   /* Handle Translation Enable/Disable */
+>   static void vtd_handle_gcmd_te(IntelIOMMUState *s, bool en)
+>   {
+> +    if (s->dmar_enabled =3D=3D en) {
+> +        return;
 > +    }
-> +#endif
->      err = pthread_kill(cpu->thread->thread, SIG_IPI);
->      if (err) {
->          fprintf(stderr, "qemu:%s: %s", __func__, strerror(err));
+> +
+>       VTD_DPRINTF(CSR, "Translation Enable %s", (en ? "on" : "off"));
+>  =20
+>       if (en) {
+> @@ -1196,6 +1237,8 @@ static void vtd_handle_gcmd_te(IntelIOMMUState *s=
+, bool en)
+>           /* Ok - report back to driver */
+>           vtd_set_clear_mask_long(s, DMAR_GSTS_REG, VTD_GSTS_TES, 0);
+>       }
+> +
+> +    vtd_switch_address_space_all(s, en);
+>   }
 
-Instead of this, please place the "if" in qemu_cpu_kick before the call
-to qemu_cpu_kick_thread.  This way, it will be common to Win32 and Darwin.
-
-Thanks,
-
-Paolo
+We may need something like notifier here to tell e.g vhost to stop=20
+device IOTLB. (Since it's likely this series were applied after device=20
+IOTLB patches)
