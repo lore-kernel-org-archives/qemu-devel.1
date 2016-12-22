@@ -1,29 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37733)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37670)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cK5DD-0007OQ-GS
-	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 10:23:20 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cK5D9-00078k-VO
+	(envelope-from <pbonzini@redhat.com>) id 1cK5D8-0007KH-LY
 	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 10:23:19 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49564)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <pbonzini@redhat.com>) id 1cK5D7-00077f-L2
+	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 10:23:14 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35320)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cK5D9-00078Z-Ms
-	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 10:23:15 -0500
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cK5D7-00077F-FT
+	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 10:23:13 -0500
 Received: from int-mx10.intmail.prod.int.phx2.redhat.com
 	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DED506826
-	for <qemu-devel@nongnu.org>; Thu, 22 Dec 2016 15:23:14 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id AA33FC0586AA
+	for <qemu-devel@nongnu.org>; Thu, 22 Dec 2016 15:23:12 +0000 (UTC)
+Received: from donizetti.redhat.com (ovpn-116-19.ams2.redhat.com
+	[10.36.116.19])
+	by int-mx10.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
+	id uBMFN1xJ027210
+	for <qemu-devel@nongnu.org>; Thu, 22 Dec 2016 10:23:12 -0500
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 22 Dec 2016 16:22:43 +0100
-Message-Id: <20161222152300.32395-9-pbonzini@redhat.com>
+Date: Thu, 22 Dec 2016 16:22:41 +0100
+Message-Id: <20161222152300.32395-7-pbonzini@redhat.com>
 In-Reply-To: <20161222152300.32395-1-pbonzini@redhat.com>
 References: <20161222152300.32395-1-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 08/25] build-sys: remove libtool left-over
+Subject: [Qemu-devel] [PULL 06/25] rules.mak: speedup save-vars load-vars
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,101 +35,65 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Unnesting variables spends a lot of time parsing and executing foreach
+and if functions.  Because actually very few variables have to be
+saved and restored, a good strategy is to remember what has to be done
+in load-vars, and only iterate the right variables in load-vars.
+For save-vars, unroll the foreach loop to provide another small
+improvement.
 
-Libtool support was removed in commit e999ee44349, there is a few
-left-over.
+This speeds up a "noop" build from around 15.5 seconds on my laptop
+to 11.7 (25% roughly).
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Message-Id: <20161108070513.30274-1-marcandre.lureau@redhat.com>
+Reviewed-by: Fam Zheng <famz@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- .gitignore    | 4 ----
- Makefile      | 9 +++------
- Makefile.objs | 1 -
- configure     | 2 --
- 4 files changed, 3 insertions(+), 13 deletions(-)
+ rules.mak | 22 ++++++++++------------
+ 1 file changed, 10 insertions(+), 12 deletions(-)
 
-diff --git a/.gitignore b/.gitignore
-index 3d7848c..e43c304 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -82,10 +82,6 @@
- *.d
- !/scripts/qemu-guest-agent/fsfreeze-hook.d
- *.o
--*.lo
--*.la
--*.pc
--.libs
- .sdk
- *.gcda
- *.gcno
-diff --git a/Makefile b/Makefile
-index 474cc5e..214cbad 100644
---- a/Makefile
-+++ b/Makefile
-@@ -231,12 +231,10 @@ ALL_SUBDIRS=3D$(TARGET_DIRS) $(patsubst %,pc-bios/%=
-, $(ROMS))
-=20
- recurse-all: $(SUBDIR_RULES) $(ROMSUBDIR_RULES)
-=20
--$(BUILD_DIR)/version.o: $(SRC_PATH)/version.rc config-host.h | $(BUILD_D=
-IR)/version.lo
-+$(BUILD_DIR)/version.o: $(SRC_PATH)/version.rc config-host.h
- 	$(call quiet-command,$(WINDRES) -I$(BUILD_DIR) -o $@ $<,"RC","version.o=
-")
--$(BUILD_DIR)/version.lo: $(SRC_PATH)/version.rc config-host.h
--	$(call quiet-command,$(WINDRES) -I$(BUILD_DIR) -o $@ $<,"RC","version.l=
-o")
-=20
--Makefile: $(version-obj-y) $(version-lobj-y)
-+Makefile: $(version-obj-y)
-=20
- ######################################################################
- # Build libraries
-@@ -358,10 +356,9 @@ clean:
- 	rm -f config.mak op-i386.h opc-i386.h gen-op-i386.h op-arm.h opc-arm.h =
-gen-op-arm.h
- 	rm -f qemu-options.def
- 	rm -f *.msi
--	find . \( -name '*.l[oa]' -o -name '*.so' -o -name '*.dll' -o -name '*.=
-mo' -o -name '*.[oda]' \) -type f -exec rm {} +
-+	find . \( -name '*.so' -o -name '*.dll' -o -name '*.mo' -o -name '*.[od=
-a]' \) -type f -exec rm {} +
- 	rm -f $(filter-out %.tlb,$(TOOLS)) $(HELPERS-y) qemu-ga TAGS cscope.* *=
-.pod *~ */*~
- 	rm -f fsdev/*.pod
--	rm -rf .libs */.libs
- 	rm -f qemu-img-cmds.h
- 	rm -f ui/shader/*-vert.h ui/shader/*-frag.h
- 	@# May not be present in GENERATED_HEADERS
-diff --git a/Makefile.objs b/Makefile.objs
-index e59b979..51c36a4 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -97,7 +97,6 @@ common-obj-y +=3D disas/
- ######################################################################
- # Resource file for Windows executables
- version-obj-$(CONFIG_WIN32) +=3D $(BUILD_DIR)/version.o
--version-lobj-$(CONFIG_WIN32) +=3D $(BUILD_DIR)/version.lo
-=20
- ######################################################################
- # tracing
-diff --git a/configure b/configure
-index 3770d7c..7dec6cd 100755
---- a/configure
-+++ b/configure
-@@ -28,8 +28,6 @@ TMPB=3D"qemu-conf"
- TMPC=3D"${TMPDIR1}/${TMPB}.c"
- TMPO=3D"${TMPDIR1}/${TMPB}.o"
- TMPCXX=3D"${TMPDIR1}/${TMPB}.cxx"
--TMPL=3D"${TMPDIR1}/${TMPB}.lo"
--TMPA=3D"${TMPDIR1}/lib${TMPB}.la"
- TMPE=3D"${TMPDIR1}/${TMPB}.exe"
- TMPMO=3D"${TMPDIR1}/${TMPB}.mo"
-=20
---=20
+diff --git a/rules.mak b/rules.mak
+index f4839d2..c69863f 100644
+--- a/rules.mak
++++ b/rules.mak
+@@ -192,15 +192,15 @@ clean: clean-timestamp
+ # save-vars
+ # Usage: $(call save-vars, vars)
+ # Save each variable $v in $vars as save-vars-$v, save their object's
+-# variables, then clear $v.
++# variables, then clear $v.  saved-vars-$v contains the variables that
++# where saved for the objects, in order to speedup load-vars.
+ define save-vars
+     $(foreach v,$1,
+         $(eval save-vars-$v := $(value $v))
+-        $(foreach o,$($v),
+-            $(foreach k,cflags libs objs,
+-                $(if $($o-$k),
+-                    $(eval save-vars-$o-$k := $($o-$k))
+-                    $(eval $o-$k := ))))
++        $(eval saved-vars-$v := $(foreach o,$($v), \
++            $(if $($o-cflags), $o-cflags $(eval save-vars-$o-cflags := $($o-cflags))$(eval $o-cflags := )) \
++            $(if $($o-libs), $o-libs $(eval save-vars-$o-libs := $($o-libs))$(eval $o-libs := )) \
++            $(if $($o-objs), $o-objs $(eval save-vars-$o-objs := $($o-objs))$(eval $o-objs := ))))
+         $(eval $v := ))
+ endef
+ 
+@@ -213,12 +213,10 @@ define load-vars
+     $(eval $2-new-value := $(value $2))
+     $(foreach v,$1,
+         $(eval $v := $(value save-vars-$v))
+-        $(foreach o,$($v),
+-            $(foreach k,cflags libs objs,
+-                $(if $(save-vars-$o-$k),
+-                    $(eval $o-$k := $(save-vars-$o-$k))
+-                    $(eval save-vars-$o-$k := ))))
+-        $(eval save-vars-$v := ))
++        $(foreach o,$(saved-vars-$v),
++            $(eval $o := $(save-vars-$o)) $(eval save-vars-$o := ))
++        $(eval save-vars-$v := )
++        $(eval saved-vars-$v := ))
+     $(eval $2 := $(value $2) $($2-new-value))
+ endef
+ 
+-- 
 2.9.3
