@@ -1,21 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53214)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54018)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cJzu6-0007Uh-6w
-	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 04:43:15 -0500
+	(envelope-from <peterx@redhat.com>) id 1cJzz8-0001un-QF
+	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 04:48:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cJzu1-0000QF-7a
-	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 04:43:13 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47242)
+	(envelope-from <peterx@redhat.com>) id 1cJzz5-0002kb-OC
+	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 04:48:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44908)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cJzu0-0000Ow-V3
-	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 04:43:09 -0500
-Date: Thu, 22 Dec 2016 17:42:40 +0800
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cJzz5-0002kB-F8
+	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 04:48:23 -0500
 From: Peter Xu <peterx@redhat.com>
-Message-ID: <20161222094240.GA26435@pxdev.xzpeter.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Subject: [Qemu-devel] A question about PCI device address spaces
+Date: Thu, 22 Dec 2016 17:48:16 +0800
+Message-Id: <1482400096-23078-1-git-send-email-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH v3] intel_iommu: allow dynamic switch of IOMMU
+ region
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,87 +22,205 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Devel Mailing List <qemu-devel@nongnu.org>
-Cc: David Gibson <david@gibson.dropbear.id.au>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, peterx@redhat.com, alex.williamson@redhat.com, bd.aviv@gmail.com, david@gibson.dropbear.id.au
 
-Hello,
+This is preparation work to finally enabled dynamic switching ON/OFF for
+VT-d protection. The old VT-d codes is using static IOMMU region, and
+that won't satisfy vfio-pci device listeners.
 
-Since this is a general topic, I picked it out from the VT-d
-discussion and put it here, just want to be more clear of it.
+Let me explain.
 
-The issue is, whether we have exposed too much address spaces for
-emulated PCI devices?
+vfio-pci devices depend on the memory region listener and IOMMU replay
+mechanism to make sure the device mapping is coherent with the guest
+even if there are domain switches. And there are two kinds of domain
+switches:
 
-Now for each PCI device, we are having PCIDevice::bus_master_as for
-the device visible address space, which derived from
-pci_device_iommu_address_space():
+  (1) switch from domain A -> B
+  (2) switch from domain A -> no domain (e.g., turn DMAR off)
 
-AddressSpace *pci_device_iommu_address_space(PCIDevice *dev)
-{
-    PCIBus *bus = PCI_BUS(dev->bus);
-    PCIBus *iommu_bus = bus;
+Case (1) is handled by the context entry invalidation handling by the
+VT-d replay logic. What the replay function should do here is to replay
+the existing page mappings in domain B.
 
-    while(iommu_bus && !iommu_bus->iommu_fn && iommu_bus->parent_dev) {
-        iommu_bus = PCI_BUS(iommu_bus->parent_dev->bus);
-    }
-    if (iommu_bus && iommu_bus->iommu_fn) {
-        return iommu_bus->iommu_fn(bus, iommu_bus->iommu_opaque, dev->devfn);
-    }
-    return &address_space_memory;
-}
+However for case (2), we don't want to replay any domain mappings - we
+just need the default GPA->HPA mappings (the address_space_memory
+mapping). And this patch helps on case (2) to build up the mapping
+automatically by leveraging the vfio-pci memory listeners.
 
-By default (for no-iommu case), it's pointed to system memory space,
-which includes MMIO, and looks wrong - PCI device should not be able to
-write to MMIO regions.
+Another important thing that this patch does is to seperate
+IR (Interrupt Remapping) from DMAR (DMA Remapping). IR region should not
+depend on the DMAR region (like before this patch). It should be a
+standalone region, and it should be able to be activated without
+DMAR (which is a common behavior of Linux kernel - by default it enables
+IR while disabled DMAR).
 
-As an example, if we dump a PCI device address space into detail on
-x86_64 system, we can see (this is address space for a virtio-net-pci
-device on an Q35 machine with 6G memory):
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+v3:
+- fix another trivial style issue patchew reported but I missed in v2
 
-    0000000000000000-000000000009ffff (prio 0, RW): pc.ram
-    00000000000a0000-00000000000affff (prio 1, RW): vga.vram
-    00000000000b0000-00000000000bffff (prio 1, RW): vga-lowmem
-    00000000000c0000-00000000000c9fff (prio 0, RW): pc.ram
-    00000000000ca000-00000000000ccfff (prio 0, RW): pc.ram
-    00000000000cd000-00000000000ebfff (prio 0, RW): pc.ram
-    00000000000ec000-00000000000effff (prio 0, RW): pc.ram
-    00000000000f0000-00000000000fffff (prio 0, RW): pc.ram
-    0000000000100000-000000007fffffff (prio 0, RW): pc.ram
-    00000000b0000000-00000000bfffffff (prio 0, RW): pcie-mmcfg-mmio
-    00000000fd000000-00000000fdffffff (prio 1, RW): vga.vram
-    00000000fe000000-00000000fe000fff (prio 0, RW): virtio-pci-common
-    00000000fe001000-00000000fe001fff (prio 0, RW): virtio-pci-isr
-    00000000fe002000-00000000fe002fff (prio 0, RW): virtio-pci-device
-    00000000fe003000-00000000fe003fff (prio 0, RW): virtio-pci-notify
-    00000000febd0400-00000000febd041f (prio 0, RW): vga ioports remapped
-    00000000febd0500-00000000febd0515 (prio 0, RW): bochs dispi interface
-    00000000febd0600-00000000febd0607 (prio 0, RW): qemu extended regs
-    00000000febd1000-00000000febd102f (prio 0, RW): msix-table
-    00000000febd1800-00000000febd1807 (prio 0, RW): msix-pba
-    00000000febd2000-00000000febd2fff (prio 1, RW): ahci
-    00000000fec00000-00000000fec00fff (prio 0, RW): kvm-ioapic
-    00000000fed00000-00000000fed003ff (prio 0, RW): hpet
-    00000000fed1c000-00000000fed1ffff (prio 1, RW): lpc-rcrb-mmio
-    00000000fee00000-00000000feefffff (prio 4096, RW): kvm-apic-msi
-    00000000fffc0000-00000000ffffffff (prio 0, R-): pc.bios
-    0000000100000000-00000001ffffffff (prio 0, RW): pc.ram
+v2:
+- fix issues reported by patchew
+- switch domain by enable/disable memory regions [David]
+- provide vtd_switch_address_space{_all}()
+- provide a better comment on the memory regions
 
-So here are the "pc.ram" regions the only ones that we should expose
-to PCI devices? (it should contain all of them, including the low-mem
-ones and the >=4g one)
+test done: with intel_iommu device, boot vm with/without
+"intel_iommu=on" parameter.
 
-And, should this rule work for all platforms? Or say, would it be a
-problem if I directly change address_space_memory in
-pci_device_iommu_address_space() into something else, which only
-contains RAMs? (of course this won't affect any platform that has
-IOMMU, aka, customized PCIBus::iommu_fn function)
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+ hw/i386/intel_iommu.c         | 79 ++++++++++++++++++++++++++++++++++++++++---
+ hw/i386/trace-events          |  3 ++
+ include/hw/i386/intel_iommu.h |  2 ++
+ 3 files changed, 80 insertions(+), 4 deletions(-)
 
-(btw, I'd appreciate if anyone has quick answer on why we have lots of
- continuous "pc.ram" in low 2g range - from can_merge() I guess they
- seem to have different dirty_log_mask, romd_mode, etc., but I still
- would like to know why they are having these difference. Anyway, this
- is totally an "optional question" just to satisfy my own curiosity :)
-
-Thanks,
-
--- peterx
+diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+index 5f3e351..2710ee774 100644
+--- a/hw/i386/intel_iommu.c
++++ b/hw/i386/intel_iommu.c
+@@ -35,6 +35,7 @@
+ #include "sysemu/kvm.h"
+ #include "hw/i386/apic_internal.h"
+ #include "kvm_i386.h"
++#include "trace.h"
+ 
+ /*#define DEBUG_INTEL_IOMMU*/
+ #ifdef DEBUG_INTEL_IOMMU
+@@ -1179,9 +1180,49 @@ static void vtd_handle_gcmd_sirtp(IntelIOMMUState *s)
+     vtd_set_clear_mask_long(s, DMAR_GSTS_REG, 0, VTD_GSTS_IRTPS);
+ }
+ 
++static void vtd_switch_address_space(VTDAddressSpace *as, bool iommu_enabled)
++{
++    assert(as);
++
++    trace_vtd_switch_address_space(pci_bus_num(as->bus),
++                                   VTD_PCI_SLOT(as->devfn),
++                                   VTD_PCI_FUNC(as->devfn),
++                                   iommu_enabled);
++
++    /* Turn off first then on the other */
++    if (iommu_enabled) {
++        memory_region_set_enabled(&as->sys_alias, false);
++        memory_region_set_enabled(&as->iommu, true);
++    } else {
++        memory_region_set_enabled(&as->iommu, false);
++        memory_region_set_enabled(&as->sys_alias, true);
++    }
++}
++
++static void vtd_switch_address_space_all(IntelIOMMUState *s, bool enabled)
++{
++    GHashTableIter iter;
++    VTDBus *vtd_bus;
++    int i;
++
++    g_hash_table_iter_init(&iter, s->vtd_as_by_busptr);
++    while (g_hash_table_iter_next(&iter, NULL, (void **)&vtd_bus)) {
++        for (i = 0; i < X86_IOMMU_PCI_DEVFN_MAX; i++) {
++            if (!vtd_bus->dev_as[i]) {
++                continue;
++            }
++            vtd_switch_address_space(vtd_bus->dev_as[i], enabled);
++        }
++    }
++}
++
+ /* Handle Translation Enable/Disable */
+ static void vtd_handle_gcmd_te(IntelIOMMUState *s, bool en)
+ {
++    if (s->dmar_enabled == en) {
++        return;
++    }
++
+     VTD_DPRINTF(CSR, "Translation Enable %s", (en ? "on" : "off"));
+ 
+     if (en) {
+@@ -1196,6 +1237,8 @@ static void vtd_handle_gcmd_te(IntelIOMMUState *s, bool en)
+         /* Ok - report back to driver */
+         vtd_set_clear_mask_long(s, DMAR_GSTS_REG, VTD_GSTS_TES, 0);
+     }
++
++    vtd_switch_address_space_all(s, en);
+ }
+ 
+ /* Handle Interrupt Remap Enable/Disable */
+@@ -2343,15 +2386,43 @@ VTDAddressSpace *vtd_find_add_as(IntelIOMMUState *s, PCIBus *bus, int devfn)
+         vtd_dev_as->devfn = (uint8_t)devfn;
+         vtd_dev_as->iommu_state = s;
+         vtd_dev_as->context_cache_entry.context_cache_gen = 0;
++
++        /*
++         * Memory region relationships looks like (Address range shows
++         * only lower 32 bits to make it short in length...):
++         *
++         * |-----------------+-------------------+----------|
++         * | Name            | Address range     | Priority |
++         * |-----------------+-------------------+----------+
++         * | vtd_root        | 00000000-ffffffff |        0 |
++         * |  intel_iommu    | 00000000-ffffffff |        1 |
++         * |  vtd_sys_alias  | 00000000-ffffffff |        1 |
++         * |  intel_iommu_ir | fee00000-feefffff |       64 |
++         * |-----------------+-------------------+----------|
++         *
++         * We enable/disable DMAR by switching enablement for
++         * vtd_sys_alias and intel_iommu regions. IR region is always
++         * enabled.
++         */
+         memory_region_init_iommu(&vtd_dev_as->iommu, OBJECT(s),
+                                  &s->iommu_ops, "intel_iommu", UINT64_MAX);
++        memory_region_init_alias(&vtd_dev_as->sys_alias, OBJECT(s),
++                                 "vtd_sys_alias", get_system_memory(),
++                                 0, memory_region_size(get_system_memory()));
+         memory_region_init_io(&vtd_dev_as->iommu_ir, OBJECT(s),
+                               &vtd_mem_ir_ops, s, "intel_iommu_ir",
+                               VTD_INTERRUPT_ADDR_SIZE);
+-        memory_region_add_subregion(&vtd_dev_as->iommu, VTD_INTERRUPT_ADDR_FIRST,
+-                                    &vtd_dev_as->iommu_ir);
+-        address_space_init(&vtd_dev_as->as,
+-                           &vtd_dev_as->iommu, "intel_iommu");
++        memory_region_init(&vtd_dev_as->root, OBJECT(s),
++                           "vtd_root", UINT64_MAX);
++        memory_region_add_subregion_overlap(&vtd_dev_as->root,
++                                            VTD_INTERRUPT_ADDR_FIRST,
++                                            &vtd_dev_as->iommu_ir, 64);
++        address_space_init(&vtd_dev_as->as, &vtd_dev_as->root, "intel_iommu");
++        memory_region_add_subregion_overlap(&vtd_dev_as->root, 0,
++                                            &vtd_dev_as->sys_alias, 1);
++        memory_region_add_subregion_overlap(&vtd_dev_as->root, 0,
++                                            &vtd_dev_as->iommu, 1);
++        vtd_switch_address_space(vtd_dev_as, s->dmar_enabled);
+     }
+     return vtd_dev_as;
+ }
+diff --git a/hw/i386/trace-events b/hw/i386/trace-events
+index d2b4973..aee93bb 100644
+--- a/hw/i386/trace-events
++++ b/hw/i386/trace-events
+@@ -10,6 +10,9 @@ xen_pv_mmio_write(uint64_t addr) "WARNING: write to Xen PV Device MMIO space (ad
+ # hw/i386/x86-iommu.c
+ x86_iommu_iec_notify(bool global, uint32_t index, uint32_t mask) "Notify IEC invalidation: global=%d index=%" PRIu32 " mask=%" PRIu32
+ 
++# hw/i386/intel_iommu.c
++vtd_switch_address_space(uint8_t bus, uint8_t slot, uint8_t fn, bool on) "Device %02x:%02x.%x switching address space (iommu enabled=%d)"
++
+ # hw/i386/amd_iommu.c
+ amdvi_evntlog_fail(uint64_t addr, uint32_t head) "error: fail to write at addr 0x%"PRIx64" +  offset 0x%"PRIx32
+ amdvi_cache_update(uint16_t domid, uint8_t bus, uint8_t slot, uint8_t func, uint64_t gpa, uint64_t txaddr) " update iotlb domid 0x%"PRIx16" devid: %02x:%02x.%x gpa 0x%"PRIx64" hpa 0x%"PRIx64
+diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
+index 405c9d1..85c1b9b 100644
+--- a/include/hw/i386/intel_iommu.h
++++ b/include/hw/i386/intel_iommu.h
+@@ -83,6 +83,8 @@ struct VTDAddressSpace {
+     uint8_t devfn;
+     AddressSpace as;
+     MemoryRegion iommu;
++    MemoryRegion root;
++    MemoryRegion sys_alias;
+     MemoryRegion iommu_ir;      /* Interrupt region: 0xfeeXXXXX */
+     IntelIOMMUState *iommu_state;
+     VTDContextCacheEntry context_cache_entry;
+-- 
+2.7.4
