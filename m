@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37928)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37969)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cK5DU-0007x7-V2
-	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 10:23:41 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cK5Da-00085i-0k
+	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 10:23:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cK5DT-0007Ex-Jj
-	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 10:23:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54562)
+	(envelope-from <pbonzini@redhat.com>) id 1cK5DW-0007G5-2a
+	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 10:23:42 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35544)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cK5DT-0007EP-B9
-	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 10:23:35 -0500
-Received: from int-mx10.intmail.prod.int.phx2.redhat.com
-	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7B52FC05AA57
-	for <qemu-devel@nongnu.org>; Thu, 22 Dec 2016 15:23:34 +0000 (UTC)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cK5DV-0007FS-Oi
+	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 10:23:38 -0500
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 22 Dec 2016 16:22:57 +0100
-Message-Id: <20161222152300.32395-23-pbonzini@redhat.com>
+Date: Thu, 22 Dec 2016 16:22:59 +0100
+Message-Id: <20161222152300.32395-25-pbonzini@redhat.com>
 In-Reply-To: <20161222152300.32395-1-pbonzini@redhat.com>
 References: <20161222152300.32395-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 22/25] kvm: sync linux headers
+Subject: [Qemu-devel] [PULL 24/25] target-i386: Fix eflags.TF/#DB handling
+ of syscall/sysret insns
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,164 +25,125 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Marcelo Tosatti <mtosatti@redhat.com>
+Cc: Doug Evans <dje@google.com>
 
-From: Marcelo Tosatti <mtosatti@redhat.com>
+From: Doug Evans <dje@google.com>
 
-Import KVM_CLOCK_TSC_STABLE.
+The syscall and sysret instructions behave a bit differently:
+TF is checked after the instruction completes.
+This allows the o/s to disable #DB at a syscall by adding TF to FMASK.
+And then when the sysret is executed the #DB is taken "as if" the
+syscall insn just completed.
 
-Signed-off-by: Marcelo Tosatti <mtosatti@redhat.com>
-
-Message-Id: <20161210172324.402794293@redhat.com>
+Signed-off-by: Doug Evans <dje@google.com>
+Message-Id: <94eb2c0bfa1c6a9fec0543057483@google.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- include/standard-headers/linux/input.h    |  1 +
- include/standard-headers/linux/pci_regs.h | 15 ++++++++++++++-
- linux-headers/asm-arm/kvm.h               |  7 +++++++
- linux-headers/asm-x86/unistd_32.h         |  3 +++
- linux-headers/asm-x86/unistd_64.h         |  3 +++
- linux-headers/asm-x86/unistd_x32.h        |  3 +++
- linux-headers/linux/kvm.h                 |  7 +++++++
- 7 files changed, 38 insertions(+), 1 deletion(-)
+ target/i386/bpt_helper.c |  7 +++++++
+ target/i386/helper.h     |  1 +
+ target/i386/translate.c  | 29 ++++++++++++++++++++++++-----
+ 3 files changed, 32 insertions(+), 5 deletions(-)
 
-diff --git a/include/standard-headers/linux/input.h b/include/standard-headers/linux/input.h
-index 7361a16..b472b85 100644
---- a/include/standard-headers/linux/input.h
-+++ b/include/standard-headers/linux/input.h
-@@ -245,6 +245,7 @@ struct input_mask {
- #define BUS_SPI			0x1C
- #define BUS_RMI			0x1D
- #define BUS_CEC			0x1E
-+#define BUS_INTEL_ISHTP		0x1F
+diff --git a/target/i386/bpt_helper.c b/target/i386/bpt_helper.c
+index 6fd7fe0..b3efdc7 100644
+--- a/target/i386/bpt_helper.c
++++ b/target/i386/bpt_helper.c
+@@ -244,6 +244,13 @@ void helper_single_step(CPUX86State *env)
+     raise_exception(env, EXCP01_DB);
+ }
  
- /*
-  * MT_TOOL types
-diff --git a/include/standard-headers/linux/pci_regs.h b/include/standard-headers/linux/pci_regs.h
-index 4040951..e5a2e68 100644
---- a/include/standard-headers/linux/pci_regs.h
-+++ b/include/standard-headers/linux/pci_regs.h
-@@ -612,6 +612,8 @@
-  */
- #define PCI_EXP_DEVCAP2		36	/* Device Capabilities 2 */
- #define  PCI_EXP_DEVCAP2_ARI		0x00000020 /* Alternative Routing-ID */
-+#define  PCI_EXP_DEVCAP2_ATOMIC_ROUTE	0x00000040 /* Atomic Op routing */
-+#define PCI_EXP_DEVCAP2_ATOMIC_COMP64	0x00000100 /* Atomic 64-bit compare */
- #define  PCI_EXP_DEVCAP2_LTR		0x00000800 /* Latency tolerance reporting */
- #define  PCI_EXP_DEVCAP2_OBFF_MASK	0x000c0000 /* OBFF support mechanism */
- #define  PCI_EXP_DEVCAP2_OBFF_MSG	0x00040000 /* New message signaling */
-@@ -619,6 +621,7 @@
- #define PCI_EXP_DEVCTL2		40	/* Device Control 2 */
- #define  PCI_EXP_DEVCTL2_COMP_TIMEOUT	0x000f	/* Completion Timeout Value */
- #define  PCI_EXP_DEVCTL2_ARI		0x0020	/* Alternative Routing-ID */
-+#define PCI_EXP_DEVCTL2_ATOMIC_REQ	0x0040	/* Set Atomic requests */
- #define  PCI_EXP_DEVCTL2_IDO_REQ_EN	0x0100	/* Allow IDO for requests */
- #define  PCI_EXP_DEVCTL2_IDO_CMP_EN	0x0200	/* Allow IDO for completions */
- #define  PCI_EXP_DEVCTL2_LTR_EN		0x0400	/* Enable LTR mechanism */
-@@ -671,7 +674,8 @@
- #define PCI_EXT_CAP_ID_PMUX	0x1A	/* Protocol Multiplexing */
- #define PCI_EXT_CAP_ID_PASID	0x1B	/* Process Address Space ID */
- #define PCI_EXT_CAP_ID_DPC	0x1D	/* Downstream Port Containment */
--#define PCI_EXT_CAP_ID_MAX	PCI_EXT_CAP_ID_DPC
-+#define PCI_EXT_CAP_ID_PTM	0x1F	/* Precision Time Measurement */
-+#define PCI_EXT_CAP_ID_MAX	PCI_EXT_CAP_ID_PTM
- 
- #define PCI_EXT_CAP_DSN_SIZEOF	12
- #define PCI_EXT_CAP_MCAST_ENDPOINT_SIZEOF 40
-@@ -964,4 +968,13 @@
- 
- #define PCI_EXP_DPC_SOURCE_ID		10	/* DPC Source Identifier */
- 
-+/* Precision Time Measurement */
-+#define PCI_PTM_CAP			0x04	    /* PTM Capability */
-+#define  PCI_PTM_CAP_REQ		0x00000001  /* Requester capable */
-+#define  PCI_PTM_CAP_ROOT		0x00000004  /* Root capable */
-+#define  PCI_PTM_GRANULARITY_MASK	0x0000FF00  /* Clock granularity */
-+#define PCI_PTM_CTRL			0x08	    /* PTM Control */
-+#define  PCI_PTM_CTRL_ENABLE		0x00000001  /* PTM enable */
-+#define  PCI_PTM_CTRL_ROOT		0x00000002  /* Root select */
++void helper_rechecking_single_step(CPUX86State *env)
++{
++    if ((env->eflags & TF_MASK) != 0) {
++        helper_single_step(env);
++    }
++}
 +
- #endif /* LINUX_PCI_REGS_H */
-diff --git a/linux-headers/asm-arm/kvm.h b/linux-headers/asm-arm/kvm.h
-index 541268c..2fb7859 100644
---- a/linux-headers/asm-arm/kvm.h
-+++ b/linux-headers/asm-arm/kvm.h
-@@ -84,6 +84,13 @@ struct kvm_regs {
- #define KVM_VGIC_V2_DIST_SIZE		0x1000
- #define KVM_VGIC_V2_CPU_SIZE		0x2000
+ void helper_set_dr(CPUX86State *env, int reg, target_ulong t0)
+ {
+ #ifndef CONFIG_USER_ONLY
+diff --git a/target/i386/helper.h b/target/i386/helper.h
+index 4e859eb..bd9b2cf 100644
+--- a/target/i386/helper.h
++++ b/target/i386/helper.h
+@@ -79,6 +79,7 @@ DEF_HELPER_2(cmpxchg16b_unlocked, void, env, tl)
+ DEF_HELPER_2(cmpxchg16b, void, env, tl)
+ #endif
+ DEF_HELPER_1(single_step, void, env)
++DEF_HELPER_1(rechecking_single_step, void, env)
+ DEF_HELPER_1(cpuid, void, env)
+ DEF_HELPER_1(rdtsc, void, env)
+ DEF_HELPER_1(rdtscp, void, env)
+diff --git a/target/i386/translate.c b/target/i386/translate.c
+index 324103c..59e11fc 100644
+--- a/target/i386/translate.c
++++ b/target/i386/translate.c
+@@ -2500,8 +2500,10 @@ static void gen_bnd_jmp(DisasContext *s)
+ }
  
-+/* Supported VGICv3 address types  */
-+#define KVM_VGIC_V3_ADDR_TYPE_DIST	2
-+#define KVM_VGIC_V3_ADDR_TYPE_REDIST	3
+ /* Generate an end of block. Trace exception is also generated if needed.
+-   If IIM, set HF_INHIBIT_IRQ_MASK if it isn't already set.  */
+-static void gen_eob_inhibit_irq(DisasContext *s, bool inhibit)
++   If INHIBIT, set HF_INHIBIT_IRQ_MASK if it isn't already set.
++   If RECHECK_TF, emit a rechecking helper for #DB, ignoring the state of
++   S->TF.  This is used by the syscall/sysret insns.  */
++static void gen_eob_worker(DisasContext *s, bool inhibit, bool recheck_tf)
+ {
+     gen_update_cc_op(s);
+ 
+@@ -2517,6 +2519,9 @@ static void gen_eob_inhibit_irq(DisasContext *s, bool inhibit)
+     }
+     if (s->singlestep_enabled) {
+         gen_helper_debug(cpu_env);
++    } else if (recheck_tf) {
++        gen_helper_rechecking_single_step(cpu_env);
++        tcg_gen_exit_tb(0);
+     } else if (s->tf) {
+         gen_helper_single_step(cpu_env);
+     } else {
+@@ -2525,10 +2530,17 @@ static void gen_eob_inhibit_irq(DisasContext *s, bool inhibit)
+     s->is_jmp = DISAS_TB_JUMP;
+ }
+ 
++/* End of block.
++   If INHIBIT, set HF_INHIBIT_IRQ_MASK if it isn't already set.  */
++static void gen_eob_inhibit_irq(DisasContext *s, bool inhibit)
++{
++    gen_eob_worker(s, inhibit, false);
++}
 +
-+#define KVM_VGIC_V3_DIST_SIZE		SZ_64K
-+#define KVM_VGIC_V3_REDIST_SIZE		(2 * SZ_64K)
-+
- #define KVM_ARM_VCPU_POWER_OFF		0 /* CPU is started in OFF state */
- #define KVM_ARM_VCPU_PSCI_0_2		1 /* CPU uses PSCI v0.2 */
+ /* End of block, resetting the inhibit irq flag.  */
+ static void gen_eob(DisasContext *s)
+ {
+-    gen_eob_inhibit_irq(s, false);
++    gen_eob_worker(s, false, false);
+ }
  
-diff --git a/linux-headers/asm-x86/unistd_32.h b/linux-headers/asm-x86/unistd_32.h
-index abeaf40..d45ea28 100644
---- a/linux-headers/asm-x86/unistd_32.h
-+++ b/linux-headers/asm-x86/unistd_32.h
-@@ -377,5 +377,8 @@
- #define __NR_copy_file_range 377
- #define __NR_preadv2 378
- #define __NR_pwritev2 379
-+#define __NR_pkey_mprotect 380
-+#define __NR_pkey_alloc 381
-+#define __NR_pkey_free 382
- 
- #endif /* _ASM_X86_UNISTD_32_H */
-diff --git a/linux-headers/asm-x86/unistd_64.h b/linux-headers/asm-x86/unistd_64.h
-index 73c3d1f..e22db91 100644
---- a/linux-headers/asm-x86/unistd_64.h
-+++ b/linux-headers/asm-x86/unistd_64.h
-@@ -330,5 +330,8 @@
- #define __NR_copy_file_range 326
- #define __NR_preadv2 327
- #define __NR_pwritev2 328
-+#define __NR_pkey_mprotect 329
-+#define __NR_pkey_alloc 330
-+#define __NR_pkey_free 331
- 
- #endif /* _ASM_X86_UNISTD_64_H */
-diff --git a/linux-headers/asm-x86/unistd_x32.h b/linux-headers/asm-x86/unistd_x32.h
-index e5aea76..84e58b2 100644
---- a/linux-headers/asm-x86/unistd_x32.h
-+++ b/linux-headers/asm-x86/unistd_x32.h
-@@ -283,6 +283,9 @@
- #define __NR_membarrier (__X32_SYSCALL_BIT + 324)
- #define __NR_mlock2 (__X32_SYSCALL_BIT + 325)
- #define __NR_copy_file_range (__X32_SYSCALL_BIT + 326)
-+#define __NR_pkey_mprotect (__X32_SYSCALL_BIT + 329)
-+#define __NR_pkey_alloc (__X32_SYSCALL_BIT + 330)
-+#define __NR_pkey_free (__X32_SYSCALL_BIT + 331)
- #define __NR_rt_sigaction (__X32_SYSCALL_BIT + 512)
- #define __NR_rt_sigreturn (__X32_SYSCALL_BIT + 513)
- #define __NR_ioctl (__X32_SYSCALL_BIT + 514)
-diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
-index 4806e06..bb0ed71 100644
---- a/linux-headers/linux/kvm.h
-+++ b/linux-headers/linux/kvm.h
-@@ -972,12 +972,19 @@ struct kvm_irqfd {
- 	__u8  pad[16];
- };
- 
-+/* For KVM_CAP_ADJUST_CLOCK */
-+
-+/* Do not use 1, KVM_CHECK_EXTENSION returned it before we had flags.  */
-+#define KVM_CLOCK_TSC_STABLE		2
-+
- struct kvm_clock_data {
- 	__u64 clock;
- 	__u32 flags;
- 	__u32 pad[9];
- };
- 
-+/* For KVM_CAP_SW_TLB */
-+
- #define KVM_MMU_FSL_BOOKE_NOHV		0
- #define KVM_MMU_FSL_BOOKE_HV		1
- 
+ /* generate a jump to eip. No segment change must happen before as a
+@@ -6423,7 +6435,10 @@ static target_ulong disas_insn(CPUX86State *env, DisasContext *s,
+                                       tcg_const_i32(s->pc - s->cs_base));
+             set_cc_op(s, CC_OP_EFLAGS);
+         }
+-        gen_eob(s);
++        /* TF handling for the syscall insn is different. The TF bit is checked
++           after the syscall insn completes. This allows #DB to not be
++           generated after one has entered CPL0 if TF is set in FMASK.  */
++        gen_eob_worker(s, false, true);
+         break;
+     case 0xe8: /* call im */
+         {
+@@ -7115,7 +7130,11 @@ static target_ulong disas_insn(CPUX86State *env, DisasContext *s,
+             if (s->lma) {
+                 set_cc_op(s, CC_OP_EFLAGS);
+             }
+-            gen_eob(s);
++            /* TF handling for the sysret insn is different. The TF bit is
++               checked after the sysret insn completes. This allows #DB to be
++               generated "as if" the syscall insn in userspace has just
++               completed.  */
++            gen_eob_worker(s, false, true);
+         }
+         break;
+ #endif
 -- 
 2.9.3
