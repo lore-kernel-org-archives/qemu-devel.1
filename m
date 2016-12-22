@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51599)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38019)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1cJxKS-0007cB-0W
-	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 01:58:17 -0500
+	(envelope-from <abologna@redhat.com>) id 1cJyru-000776-Ad
+	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 03:36:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1cJxKQ-0005Ja-WA
-	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 01:58:16 -0500
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <001501d2196b$496b4e90$dc41ebb0$@ru>
-	<20160928094313.GI5236@noname.redhat.com>
-	<000001d21986$b68cd280$23a67780$@ru>
-	<001d01d23fee$b962ec40$2c28c4c0$@ru>
-	<20161116122001.GA5407@noname.str.redhat.com>
-	<001b01d243f1$e2313260$a6939720$@ru>
-	<20161121155458.GD5876@noname.redhat.com>
-	<001201d24ecb$36f94880$a4ebd980$@ru>
-	<20161205103416.GA4870@noname.redhat.com>
-	<002201d24eed$acc39440$064abcc0$@ru>
-	<20161205124457.GB4870@noname.redhat.com>
-In-Reply-To: <20161205124457.GB4870@noname.redhat.com>
-Date: Thu, 22 Dec 2016 09:58:11 +0300
-Message-ID: <000401d25c20$c23be620$46b3b260$@ru>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
+	(envelope-from <abologna@redhat.com>) id 1cJyrr-0007qE-85
+	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 03:36:54 -0500
+Message-ID: <1482395799.3732.45.camel@redhat.com>
+From: Andrea Bolognani <abologna@redhat.com>
+Date: Thu, 22 Dec 2016 09:36:39 +0100
+In-Reply-To: <20161221224326.GB14282@umbus.fritz.box>
+References: <20161215061128.30792-1-david@gibson.dropbear.id.au>
+	<1482160529.3732.2.camel@redhat.com>
+	<20161219234717.GG23176@umbus.fritz.box>
+	<1482225561.3732.12.camel@redhat.com>
+	<20161221045245.GE13024@umbus.fritz.box>
+	<1482309497.3732.30.camel@redhat.com>
+	<20161221224326.GB14282@umbus.fritz.box>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
-Content-Language: ru
-Subject: Re: [Qemu-devel] [PATCH v5 7/9] block: don't make snapshots for
- filters
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCHv3 for-2.9 0/6] HPT resizing for
+ pseries guests (qemu part)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,38 +29,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Kevin Wolf' <kwolf@redhat.com>
-Cc: pbonzini@redhat.com, 'Pavel Dovgalyuk' <pavel.dovgaluk@ispras.ru>, qemu-devel@nongnu.org, peter.maydell@linaro.org, quintela@redhat.com, jasowang@redhat.com, mst@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, armbru@redhat.com
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: paulus@samba.org, sjitindarsingh@gmail.com, lvivier@redhat.com, thuth@redhat.com, mdroth@linux.vnet.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-Kevin,
-
-> From: Kevin Wolf [mailto:kwolf@redhat.com]
-> Am 05.12.2016 um 12:49 hat Pavel Dovgalyuk geschrieben:
-> > > From: Kevin Wolf [mailto:kwolf@redhat.com]
-> >
-> > It's not a requirement. But to make replay deterministic we have to
-> > start with the same image every time. As I know, this may be achieved by:
-> > 1. Restoring original disk image manually
-> > 2. Using vm snapshot to start execution from
-> > 3. Using -snapshot option
-> > 4. Not using disks at all
-> >
-> > > Because if it has to be
-> > > there, the next step could be that blkreplay creates temporary-overlay
-> > > internally in its .bdrv_open().
-> >
-> > Here is your answer about such an approach :)
-> > https://lists.gnu.org/archive/html/qemu-devel/2016-09/msg04687.html
+On Thu, 2016-12-22 at 09:43 +1100, David Gibson wrote:
+> > The name makes sense, we just need to document the host
+> > kernel requirement properly. The error message should of
+> > course mention it as well.
 > 
-> Right, and unfortunately these are still good points.
+> The error message is currently
 > 
-> Especially the part where you allowed to give the overlay filename
-> really needs to work the way it does now with the 'image' option. We
-> might not need to be that strict with temporary overlays, restricting to
-> qcow2 with default options could be acceptable there - but whatever I
-> think of to support both cases results in something that isn't really
-> easier than the manual way that we figured out above.
+> "Hash page table resizing not available with this KVM version"
+> 
+> Does that cover it?
 
-What about the new version?
+Sounds good to me.
 
-Pavel Dovgalyuk
+-- 
+Andrea Bolognani / Red Hat / Virtualization
