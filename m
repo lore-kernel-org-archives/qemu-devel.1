@@ -1,31 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37930)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38968)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1cK12G-0004cP-LM
-	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 05:55:46 -0500
+	(envelope-from <bounces@canonical.com>) id 1cK17X-0000hi-0d
+	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 06:01:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1cK12D-0001G8-Eb
-	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 05:55:44 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38886)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1cK12D-0001FU-5n
-	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 05:55:41 -0500
-Received: from int-mx13.intmail.prod.int.phx2.redhat.com
-	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3985C3DEEB
-	for <qemu-devel@nongnu.org>; Thu, 22 Dec 2016 10:55:40 +0000 (UTC)
-References: <1480980749-182204-1-git-send-email-imammedo@redhat.com>
-	<1480980749-182204-10-git-send-email-imammedo@redhat.com>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <72ca867b-65b1-e636-5026-72aacb84f979@redhat.com>
-Date: Thu, 22 Dec 2016 12:55:37 +0200
+	(envelope-from <bounces@canonical.com>) id 1cK17S-0003wc-7d
+	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 06:01:11 -0500
+Received: from indium.canonical.com ([91.189.90.7]:44209)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cK17R-0003w6-VK
+	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 06:01:06 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cK17P-00087c-1Y
+	for <qemu-devel@nongnu.org>; Thu, 22 Dec 2016 11:01:03 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 0BE942E80D5
+	for <qemu-devel@nongnu.org>; Thu, 22 Dec 2016 11:01:02 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <1480980749-182204-10-git-send-email-imammedo@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.9 09/10] memhp: don't generate memory
- hotplug AML if it's not enabled/supported
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 22 Dec 2016 10:48:41 -0000
+From: Andrew Parker <1652011@bugs.launchpad.net>
+Reply-To: Bug 1652011 <1652011@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <20161222104842.1045.42075.malonedeb@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1652011] [NEW] VM shuts down due to error in qemu
+ block.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,216 +36,201 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: qemu-devel@nongnu.org
 
-On 12/06/2016 01:32 AM, Igor Mammedov wrote:
-> That reduces DSDT by 910 bytes when memory hotplug
-> isn't enabled.
->
-> While doing so drop intermediate variables/arguments
-> passing around ACPI_MEMORY_HOTPLUG_IO_LEN and making
-> it local to memory_hotplug.c, hardcoding it there as
-> it can't change.
->
-> Also don't pass around ACPI_MEMORY_HOTPLUG_BASE through
-> intermediate variables/arguments where it's not needed.
-> Instead initialize in module static variable when MMIO
-> region is mapped and use that within memory_hotplug.c
-> whenever it's required.
-> That way MMIO base specified only at one place and AML
-> with MMIO would always use the same value.
->
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> ---
->  include/hw/acpi/memory_hotplug.h |  3 +--
->  include/hw/acpi/pc-hotplug.h     |  1 -
->  hw/acpi/ich9.c                   |  3 ++-
->  hw/acpi/memory_hotplug.c         | 24 +++++++++++++++++-------
->  hw/acpi/piix4.c                  |  3 ++-
->  hw/i386/acpi-build.c             |  9 +--------
->  6 files changed, 23 insertions(+), 20 deletions(-)
->
-> diff --git a/include/hw/acpi/memory_hotplug.h b/include/hw/acpi/memory_hotplug.h
-> index 91d4045..db8ebc9 100644
-> --- a/include/hw/acpi/memory_hotplug.h
-> +++ b/include/hw/acpi/memory_hotplug.h
-> @@ -30,7 +30,7 @@ typedef struct MemHotplugState {
->  } MemHotplugState;
->
->  void acpi_memory_hotplug_init(MemoryRegion *as, Object *owner,
-> -                              MemHotplugState *state);
-> +                              MemHotplugState *state, uint16_t io_base);
->
->  void acpi_memory_plug_cb(HotplugHandler *hotplug_dev, MemHotplugState *mem_st,
->                           DeviceState *dev, Error **errp);
-> @@ -48,7 +48,6 @@ extern const VMStateDescription vmstate_memory_hotplug;
->  void acpi_memory_ospm_status(MemHotplugState *mem_st, ACPIOSTInfoList ***list);
->
->  void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
-> -                              uint16_t io_base, uint16_t io_len,
->                                const char *res_root,
->                                const char *event_handler_method);
->  #endif
-> diff --git a/include/hw/acpi/pc-hotplug.h b/include/hw/acpi/pc-hotplug.h
-> index a4f513d..31bc919 100644
-> --- a/include/hw/acpi/pc-hotplug.h
-> +++ b/include/hw/acpi/pc-hotplug.h
-> @@ -29,7 +29,6 @@
->  #define PIIX4_CPU_HOTPLUG_IO_BASE 0xaf00
->  #define CPU_HOTPLUG_RESOURCE_DEVICE PRES
->
-> -#define ACPI_MEMORY_HOTPLUG_IO_LEN 24
->  #define ACPI_MEMORY_HOTPLUG_BASE 0x0a00
->
->  #endif
-> diff --git a/hw/acpi/ich9.c b/hw/acpi/ich9.c
-> index 830c475..5c279bb 100644
-> --- a/hw/acpi/ich9.c
-> +++ b/hw/acpi/ich9.c
-> @@ -306,7 +306,8 @@ void ich9_pm_init(PCIDevice *lpc_pci, ICH9LPCPMRegs *pm,
->
->      if (pm->acpi_memory_hotplug.is_enabled) {
->          acpi_memory_hotplug_init(pci_address_space_io(lpc_pci), OBJECT(lpc_pci),
-> -                                 &pm->acpi_memory_hotplug);
-> +                                 &pm->acpi_memory_hotplug,
-> +                                 ACPI_MEMORY_HOTPLUG_BASE);
->      }
->  }
->
-> diff --git a/hw/acpi/memory_hotplug.c b/hw/acpi/memory_hotplug.c
-> index da29332..fb04d24 100644
-> --- a/hw/acpi/memory_hotplug.c
-> +++ b/hw/acpi/memory_hotplug.c
-> @@ -30,6 +30,9 @@
->  #define MEMORY_SLOT_NOTIFY_METHOD    "MTFY"
->  #define MEMORY_SLOT_SCAN_METHOD      "MSCN"
->  #define MEMORY_HOTPLUG_DEVICE        "MHPD"
-> +#define MEMORY_HOTPLUG_IO_LEN         24
-> +
-> +static uint16_t memhp_io_base;
->
->  static ACPIOSTInfo *acpi_memory_device_status(int slot, MemStatus *mdev)
->  {
-> @@ -202,7 +205,7 @@ static const MemoryRegionOps acpi_memory_hotplug_ops = {
->  };
->
->  void acpi_memory_hotplug_init(MemoryRegion *as, Object *owner,
-> -                              MemHotplugState *state)
-> +                              MemHotplugState *state, uint16_t io_base)
->  {
->      MachineState *machine = MACHINE(qdev_get_machine());
->
-> @@ -211,10 +214,12 @@ void acpi_memory_hotplug_init(MemoryRegion *as, Object *owner,
->          return;
->      }
->
-> +    assert(!memhp_io_base);
-> +    memhp_io_base = io_base;
->      state->devs = g_malloc0(sizeof(*state->devs) * state->dev_count);
->      memory_region_init_io(&state->io, owner, &acpi_memory_hotplug_ops, state,
-> -                          "acpi-mem-hotplug", ACPI_MEMORY_HOTPLUG_IO_LEN);
-> -    memory_region_add_subregion(as, ACPI_MEMORY_HOTPLUG_BASE, &state->io);
-> +                          "acpi-mem-hotplug", MEMORY_HOTPLUG_IO_LEN);
-> +    memory_region_add_subregion(as, memhp_io_base, &state->io);
->  }
->
->  /**
-> @@ -332,7 +337,6 @@ const VMStateDescription vmstate_memory_hotplug = {
->  };
->
->  void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
-> -                              uint16_t io_base, uint16_t io_len,
->                                const char *res_root,
->                                const char *event_handler_method)
->  {
-> @@ -342,8 +346,13 @@ void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
->      Aml *sb_scope;
->      Aml *mem_ctrl_dev;
->      char *scan_path;
-> -    char *mhp_res_path = g_strdup_printf("%s." MEMORY_HOTPLUG_DEVICE, res_root);
-> +    char *mhp_res_path;
-> +
-> +    if (!memhp_io_base) {
-> +        return;
-> +    }
->
+Public bug reported:
 
-I would split the functional change from the refactoring  code,
-but if Michael is OK with it:
+On a Trusty KVM host one of the guest VMs shut down without any user
+interaction. The system is running:
 
-Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
+$ cat /etc/lsb-release
+DISTRIB_ID=3DUbuntu
+DISTRIB_RELEASE=3D14.04
+DISTRIB_CODENAME=3Dtrusty
+DISTRIB_DESCRIPTION=3D"Ubuntu 14.04.5 LTS"
 
-Thanks,
-Marcel
+$ dpkg -l libvirt0 qemu-kvm qemu-system-common qemu-system-x86
+Desired=3DUnknown/Install/Remove/Purge/Hold
+| Status=3DNot/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig=
+-pend
+|/ Err?=3D(none)/Reinst-required (Status,Err: uppercase=3Dbad)
+||/ Name                                                         Version   =
+                          Architecture                        Description
++++-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D-=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+ii  libvirt0                                                     1.2.2-0ubu=
+ntu13.1.17                amd64                               library for i=
+nterfacing with different virtualization systems
+ii  qemu-kvm                                                     2.0.0+dfsg=
+-2ubuntu1.27              amd64                               QEMU Full vir=
+tualization
+ii  qemu-system-common                                           2.0.0+dfsg=
+-2ubuntu1.27              amd64                               QEMU full sys=
+tem emulation binaries (common files)
+ii  qemu-system-x86                                              2.0.0+dfsg=
+-2ubuntu1.27              amd64                               QEMU full sys=
+tem emulation binaries (x86)
 
-> +    mhp_res_path = g_strdup_printf("%s." MEMORY_HOTPLUG_DEVICE, res_root);
->      mem_ctrl_dev = aml_device("%s", mhp_res_path);
->      {
->          Aml *crs;
-> @@ -367,13 +376,14 @@ void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
->
->          crs = aml_resource_template();
->          aml_append(crs,
-> -            aml_io(AML_DECODE16, io_base, io_base, 0, io_len)
-> +            aml_io(AML_DECODE16, memhp_io_base, memhp_io_base, 0,
-> +                   MEMORY_HOTPLUG_IO_LEN)
->          );
->          aml_append(mem_ctrl_dev, aml_name_decl("_CRS", crs));
->
->          aml_append(mem_ctrl_dev, aml_operation_region(
->              MEMORY_HOTPLUG_IO_REGION, AML_SYSTEM_IO,
-> -            aml_int(io_base), io_len)
-> +            aml_int(memhp_io_base), MEMORY_HOTPLUG_IO_LEN)
->          );
->
->          field = aml_field(MEMORY_HOTPLUG_IO_REGION, AML_DWORD_ACC,
-> diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
-> index 17d36bd..6d99fe4 100644
-> --- a/hw/acpi/piix4.c
-> +++ b/hw/acpi/piix4.c
-> @@ -644,7 +644,8 @@ static void piix4_acpi_system_hot_add_init(MemoryRegion *parent,
->                                   PIIX4_CPU_HOTPLUG_IO_BASE);
->
->      if (s->acpi_memory_hotplug.is_enabled) {
-> -        acpi_memory_hotplug_init(parent, OBJECT(s), &s->acpi_memory_hotplug);
-> +        acpi_memory_hotplug_init(parent, OBJECT(s), &s->acpi_memory_hotplug,
-> +                                 ACPI_MEMORY_HOTPLUG_BASE);
->      }
->  }
->
-> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> index b7f4682..f207d4f 100644
-> --- a/hw/i386/acpi-build.c
-> +++ b/hw/i386/acpi-build.c
-> @@ -101,8 +101,6 @@ typedef struct AcpiPmInfo {
->      uint32_t gpe0_blk_len;
->      uint32_t io_base;
->      uint16_t cpu_hp_io_base;
-> -    uint16_t mem_hp_io_base;
-> -    uint16_t mem_hp_io_len;
->      uint16_t pcihp_io_base;
->      uint16_t pcihp_io_len;
->  } AcpiPmInfo;
-> @@ -148,9 +146,6 @@ static void acpi_get_pm_info(AcpiPmInfo *pm)
->      }
->      assert(obj);
->
-> -    pm->mem_hp_io_base = ACPI_MEMORY_HOTPLUG_BASE;
-> -    pm->mem_hp_io_len = ACPI_MEMORY_HOTPLUG_IO_LEN;
-> -
->      /* Fill in optional s3/s4 related properties */
->      o = object_property_get_qobject(obj, ACPI_PM_PROP_S3_DISABLED, NULL);
->      if (o) {
-> @@ -1925,9 +1920,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
->          build_cpus_aml(dsdt, machine, opts, pm->cpu_hp_io_base,
->                         "\\_SB.PCI0", "\\_GPE._E02");
->      }
-> -    build_memory_hotplug_aml(dsdt, nr_mem, pm->mem_hp_io_base,
-> -                             pm->mem_hp_io_len,
-> -                             "\\_SB.PCI0", "\\_GPE._E03");
-> +    build_memory_hotplug_aml(dsdt, nr_mem, "\\_SB.PCI0", "\\_GPE._E03");
->
->      scope =  aml_scope("_GPE");
->      {
->
+In the VMs log in /var/lib/libvirt/qemu/hostname we see:
+
+2016-11-17 09:18:42.603+0000: starting up
+LC_ALL=3DC PATH=3D/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/sbin:/sbin:/=
+bin QEMU_AUDIO_DRV=3Dnone /usr/bin/kvm -name hostname,process=3Dqemu:hostna=
+me -S -machine pc-i440fx-trusty,accel=3Dkvm,usb=3Doff -m 12697 -realtime ml=
+ock=3Doff -smp 4,sockets=3D4,cores=3D1,threads=3D1 -uuid 51766564-ed8e-41aa=
+-91b5-574220af4ac3 -no-user-config -nodefaults -chardev socket,id=3Dcharmon=
+itor,path=3D/var/lib/libvirt/qemu/hostname.monitor,server,nowait -mon chard=
+ev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc base=3Dutc -no-shutdown -=
+boot strict=3Don -device piix3-usb-uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2=
+ -drive file=3D/dev/disk1/hostname,if=3Dnone,id=3Ddrive-virtio-disk0,format=
+=3Draw -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x4,drive=3Ddri=
+ve-virtio-disk0,id=3Dvirtio-disk0,bootindex=3D1 -drive file=3D/dev/disk2/ho=
+stname_mnt_data,if=3Dnone,id=3Ddrive-virtio-disk1,format=3Draw -device virt=
+io-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x5,drive=3Ddrive-virtio-disk1,id=
+=3Dvirtio-disk1 -drive file=3D/dev/disk1/hostname_tmp,if=3Dnone,id=3Ddrive-=
+virtio-disk2,format=3Draw -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,add=
+r=3D0x8,drive=3Ddrive-virtio-disk2,id=3Dvirtio-disk2 -netdev tap,fd=3D24,id=
+=3Dhostnet0,vhost=3Don,vhostfd=3D30 -device virtio-net-pci,tx=3Dbh,netdev=
+=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:45:e7:d9,bus=3Dpci.0,addr=3D0x6 -netde=
+v tap,fd=3D31,id=3Dhostnet1,vhost=3Don,vhostfd=3D32 -device virtio-net-pci,=
+tx=3Dbh,netdev=3Dhostnet1,id=3Dnet1,mac=3D52:54:00:f6:6c:77,bus=3Dpci.0,add=
+r=3D0x7 -chardev pty,id=3Dcharserial0 -device isa-serial,chardev=3Dcharseri=
+al0,id=3Dserial0 -device usb-tablet,id=3Dinput0 -vnc 0.0.0.0:5 -device VGA,=
+id=3Dvideo0,bus=3Dpci.0,addr=3D0x2 -device AC97,id=3Dsound0,bus=3Dpci.0,add=
+r=3D0x3 -device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x9
+char device redirected to /dev/pts/6 (label charserial0)
+qemu-system-x86_64: /build/qemu-PVxDqC/qemu-2.0.0+dfsg/block.c:3491: bdrv_e=
+rror_action: Assertion `error >=3D 0' failed.
+2016-12-22 09:49:49.392+0000: shutting down
+
+In /var/lib/libvirt/libvirtd.log we see:
+
+2016-12-22 09:49:49.298+0000: 6946: error : qemuMonitorIO:656 : internal
+error: End of file from monitor
+
+We investigated to see if this is a known issue and came across a bug
+report for Fedora (https://bugzilla.redhat.com/show_bug.cgi?id=3D1147398),
+but nothing references changes upstream that fix this.
+
+The guest OS is Ubuntu Precise (12.04.5) running kernel linux-
+image-3.2.0-101-virtual 3.2.0-101.141. There wasn't any significant load
+(CPU or IO) on the guest at the time that it shut down and there wasn't
+any appreciable disk IO on the KVM host either. The disks for the guest
+are on the KVM host box.
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1652011
+
+Title:
+  VM shuts down due to error in qemu block.c
+
+Status in QEMU:
+  New
+
+Bug description:
+  On a Trusty KVM host one of the guest VMs shut down without any user
+  interaction. The system is running:
+
+  $ cat /etc/lsb-release
+  DISTRIB_ID=3DUbuntu
+  DISTRIB_RELEASE=3D14.04
+  DISTRIB_CODENAME=3Dtrusty
+  DISTRIB_DESCRIPTION=3D"Ubuntu 14.04.5 LTS"
+
+  $ dpkg -l libvirt0 qemu-kvm qemu-system-common qemu-system-x86
+  Desired=3DUnknown/Install/Remove/Purge/Hold
+  | Status=3DNot/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Tr=
+ig-pend
+  |/ Err?=3D(none)/Reinst-required (Status,Err: uppercase=3Dbad)
+  ||/ Name                                                         Version =
+                            Architecture                        Description
+  +++-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D-=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+  ii  libvirt0                                                     1.2.2-0u=
+buntu13.1.17                amd64                               library for=
+ interfacing with different virtualization systems
+  ii  qemu-kvm                                                     2.0.0+df=
+sg-2ubuntu1.27              amd64                               QEMU Full v=
+irtualization
+  ii  qemu-system-common                                           2.0.0+df=
+sg-2ubuntu1.27              amd64                               QEMU full s=
+ystem emulation binaries (common files)
+  ii  qemu-system-x86                                              2.0.0+df=
+sg-2ubuntu1.27              amd64                               QEMU full s=
+ystem emulation binaries (x86)
+
+  In the VMs log in /var/lib/libvirt/qemu/hostname we see:
+
+  2016-11-17 09:18:42.603+0000: starting up
+  LC_ALL=3DC PATH=3D/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/sbin:/sbin=
+:/bin QEMU_AUDIO_DRV=3Dnone /usr/bin/kvm -name hostname,process=3Dqemu:host=
+name -S -machine pc-i440fx-trusty,accel=3Dkvm,usb=3Doff -m 12697 -realtime =
+mlock=3Doff -smp 4,sockets=3D4,cores=3D1,threads=3D1 -uuid 51766564-ed8e-41=
+aa-91b5-574220af4ac3 -no-user-config -nodefaults -chardev socket,id=3Dcharm=
+onitor,path=3D/var/lib/libvirt/qemu/hostname.monitor,server,nowait -mon cha=
+rdev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc base=3Dutc -no-shutdown=
+ -boot strict=3Don -device piix3-usb-uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0=
+x2 -drive file=3D/dev/disk1/hostname,if=3Dnone,id=3Ddrive-virtio-disk0,form=
+at=3Draw -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x4,drive=3Dd=
+rive-virtio-disk0,id=3Dvirtio-disk0,bootindex=3D1 -drive file=3D/dev/disk2/=
+hostname_mnt_data,if=3Dnone,id=3Ddrive-virtio-disk1,format=3Draw -device vi=
+rtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x5,drive=3Ddrive-virtio-disk1,i=
+d=3Dvirtio-disk1 -drive file=3D/dev/disk1/hostname_tmp,if=3Dnone,id=3Ddrive=
+-virtio-disk2,format=3Draw -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,ad=
+dr=3D0x8,drive=3Ddrive-virtio-disk2,id=3Dvirtio-disk2 -netdev tap,fd=3D24,i=
+d=3Dhostnet0,vhost=3Don,vhostfd=3D30 -device virtio-net-pci,tx=3Dbh,netdev=
+=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:45:e7:d9,bus=3Dpci.0,addr=3D0x6 -netde=
+v tap,fd=3D31,id=3Dhostnet1,vhost=3Don,vhostfd=3D32 -device virtio-net-pci,=
+tx=3Dbh,netdev=3Dhostnet1,id=3Dnet1,mac=3D52:54:00:f6:6c:77,bus=3Dpci.0,add=
+r=3D0x7 -chardev pty,id=3Dcharserial0 -device isa-serial,chardev=3Dcharseri=
+al0,id=3Dserial0 -device usb-tablet,id=3Dinput0 -vnc 0.0.0.0:5 -device VGA,=
+id=3Dvideo0,bus=3Dpci.0,addr=3D0x2 -device AC97,id=3Dsound0,bus=3Dpci.0,add=
+r=3D0x3 -device virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x9
+  char device redirected to /dev/pts/6 (label charserial0)
+  qemu-system-x86_64: /build/qemu-PVxDqC/qemu-2.0.0+dfsg/block.c:3491: bdrv=
+_error_action: Assertion `error >=3D 0' failed.
+  2016-12-22 09:49:49.392+0000: shutting down
+
+  In /var/lib/libvirt/libvirtd.log we see:
+
+  2016-12-22 09:49:49.298+0000: 6946: error : qemuMonitorIO:656 :
+  internal error: End of file from monitor
+
+  We investigated to see if this is a known issue and came across a bug
+  report for Fedora
+  (https://bugzilla.redhat.com/show_bug.cgi?id=3D1147398), but nothing
+  references changes upstream that fix this.
+
+  The guest OS is Ubuntu Precise (12.04.5) running kernel linux-
+  image-3.2.0-101-virtual 3.2.0-101.141. There wasn't any significant
+  load (CPU or IO) on the guest at the time that it shut down and there
+  wasn't any appreciable disk IO on the KVM host either. The disks for
+  the guest are on the KVM host box.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1652011/+subscriptions
