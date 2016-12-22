@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37021)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39435)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cKAjW-0005ou-8R
-	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 16:17:03 -0500
+	(envelope-from <armbru@redhat.com>) id 1cKAox-0008Qi-0G
+	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 16:22:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cKAjV-0004v4-Gt
-	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 16:17:02 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37952)
+	(envelope-from <armbru@redhat.com>) id 1cKAot-0001zN-Tz
+	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 16:22:39 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48348)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cKAjV-0004uY-BJ
-	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 16:17:01 -0500
-Received: from int-mx11.intmail.prod.int.phx2.redhat.com
-	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cKAot-0001yw-OL
+	for qemu-devel@nongnu.org; Thu, 22 Dec 2016 16:22:35 -0500
+Received: from int-mx14.intmail.prod.int.phx2.redhat.com
+	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 932A6804EF
-	for <qemu-devel@nongnu.org>; Thu, 22 Dec 2016 21:17:00 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id BD60113A5E
+	for <qemu-devel@nongnu.org>; Thu, 22 Dec 2016 21:22:34 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
 References: <20161206141343.28044-1-marcandre.lureau@redhat.com>
-	<20161206141343.28044-17-marcandre.lureau@redhat.com>
-Date: Thu, 22 Dec 2016 22:16:58 +0100
-In-Reply-To: <20161206141343.28044-17-marcandre.lureau@redhat.com>
+	<20161206141343.28044-18-marcandre.lureau@redhat.com>
+Date: Thu, 22 Dec 2016 22:22:32 +0100
+In-Reply-To: <20161206141343.28044-18-marcandre.lureau@redhat.com>
 	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Tue, 6 Dec 2016
-	17:13:42 +0300")
-Message-ID: <87a8bnr7ed.fsf@dusky.pond.sub.org>
+	17:13:43 +0300")
+Message-ID: <871swzr753.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 16/17] build-sys: add txt documentation
- rules
+Subject: Re: [Qemu-devel] [PATCH v6 17/17] build-sys: add qapi doc
+ generation targets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,11 +41,12 @@ Cc: qemu-devel@nongnu.org
 
 Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-> Build txt documentation, and install it.
+> Generate and install the man, txt and html versions of QAPI
+> documentation (generate and install qemu-doc.txt too).
 
-Suggest "Build plain text documentation".  Can touch up on commit.
+Sure you don't install qemu-doc.txt in the previous patch already?
 
 >
+> Add it also to optional pdf/info targets.
+>
 > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
