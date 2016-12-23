@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43700)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43701)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cKUYM-0001jM-2I
+	(envelope-from <pbonzini@redhat.com>) id 1cKUYM-0001jN-2P
 	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 13:26:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cKUYH-0006GB-K3
+	(envelope-from <pbonzini@redhat.com>) id 1cKUYK-0006Ie-3L
 	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 13:26:50 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52030)
+Received: from mx1.redhat.com ([209.132.183.28]:51804)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cKUYH-0006FY-Ah
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 13:26:45 -0500
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cKUYJ-0006Hi-R5
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 13:26:48 -0500
 Received: from int-mx10.intmail.prod.int.phx2.redhat.com
 	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 86BC885365
-	for <qemu-devel@nongnu.org>; Fri, 23 Dec 2016 18:26:44 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 094CB3D951
+	for <qemu-devel@nongnu.org>; Fri, 23 Dec 2016 18:26:47 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 23 Dec 2016 19:26:39 +0100
-Message-Id: <20161223182641.2718-2-pbonzini@redhat.com>
+Date: Fri, 23 Dec 2016 19:26:41 +0100
+Message-Id: <20161223182641.2718-4-pbonzini@redhat.com>
 In-Reply-To: <20161223182641.2718-1-pbonzini@redhat.com>
 References: <20161223182641.2718-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/3] io: add methods to set I/O handlers on
- AioContext
+Subject: [Qemu-devel] [PATCH 3/3] nbd: do not block on partial reply header
+ reads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,234 +32,257 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-This is in preparation for making qio_channel_yield work on
-AioContexts other than the main one.
+Read the replies from a coroutine.  qio_channel_yield is used so that
+the right coroutine is restarted automatically, eliminating the need
+for send_coroutine in NBDClientSession.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- include/io/channel.h | 42 ++++++++++++++++++++++++++++++++++++++++++
- io/channel-socket.c  | 16 +++++++++++-----
- io/channel-tls.c     | 12 ++++++++++++
- io/channel-watch.c   |  6 ++++++
- io/channel.c         | 25 +++++++++++++++++++++++++
- 5 files changed, 96 insertions(+), 5 deletions(-)
+ block/nbd-client.c | 108 +++++++++++++++++++++--------------------------------
+ 1 file changed, 42 insertions(+), 66 deletions(-)
 
-diff --git a/include/io/channel.h b/include/io/channel.h
-index 32a9470..248bc76 100644
---- a/include/io/channel.h
-+++ b/include/io/channel.h
-@@ -23,6 +23,7 @@
+diff --git a/block/nbd-client.c b/block/nbd-client.c
+index 06f1532..a3c2c19 100644
+--- a/block/nbd-client.c
++++ b/block/nbd-client.c
+@@ -33,8 +33,9 @@
+ #define HANDLE_TO_INDEX(bs, handle) ((handle) ^ ((uint64_t)(intptr_t)bs))
+ #define INDEX_TO_HANDLE(bs, index)  ((index)  ^ ((uint64_t)(intptr_t)bs))
  
- #include "qemu-common.h"
- #include "qom/object.h"
-+#include "block/aio.h"
+-static void nbd_recv_coroutines_enter_all(NBDClientSession *s)
++static void nbd_recv_coroutines_enter_all(BlockDriverState *bs)
+ {
++    NBDClientSession *s = nbd_get_client_session(bs);
+     int i;
  
- #define TYPE_QIO_CHANNEL "qio-channel"
- #define QIO_CHANNEL(obj)                                    \
-@@ -58,6 +59,8 @@ typedef gboolean (*QIOChannelFunc)(QIOChannel *ioc,
-                                    GIOCondition condition,
-                                    gpointer data);
- 
-+typedef struct QIOChannelRestart QIOChannelRestart;
-+
- /**
-  * QIOChannel:
-  *
-@@ -80,6 +83,9 @@ struct QIOChannel {
-     Object parent;
-     unsigned int features; /* bitmask of QIOChannelFeatures */
-     char *name;
-+    AioContext *ctx;
-+    QIOChannelRestart *read_coroutine;
-+    QIOChannelRestart *write_coroutine;
- #ifdef _WIN32
-     HANDLE event; /* For use with GSource on Win32 */
- #endif
-@@ -132,6 +138,11 @@ struct QIOChannelClass {
-                      off_t offset,
-                      int whence,
-                      Error **errp);
-+    void (*io_set_fd_handler)(QIOChannel *ioc,
-+                              AioContext *ctx,
-+                              IOHandler *io_read,
-+                              IOHandler *io_write,
-+                              void *opaque);
- };
- 
- /* General I/O handling functions */
-@@ -497,6 +508,18 @@ guint qio_channel_add_watch(QIOChannel *ioc,
- 
- 
- /**
-+ * qio_channel_set_aio_context:
-+ * @ioc: the channel object
-+ * @ctx: the #AioContext to set the handlers on
-+ *
-+ * Request that qio_channel_yield() sets I/O handlers on
-+ * the given #AioContext.  If @ctx is %NULL, qio_channel_yield()
-+ * uses QEMU's main thread event loop.
-+ */
-+void qio_channel_set_aio_context(QIOChannel *ioc,
-+                                 AioContext *ctx);
-+
-+/**
-  * qio_channel_yield:
-  * @ioc: the channel object
-  * @condition: the I/O condition to wait for
-@@ -525,4 +548,23 @@ void qio_channel_yield(QIOChannel *ioc,
- void qio_channel_wait(QIOChannel *ioc,
-                       GIOCondition condition);
- 
-+/**
-+ * qio_channel_set_fd_handler:
-+ * @ioc: the channel object
-+ * @ctx: the AioContext to set the handlers on
-+ * @io_read: the read handler
-+ * @io_write: the write handler
-+ * @opaque: the opaque value passed to the handler
-+ *
-+ * This is used internally by qio_channel_yield().  It can
-+ * be used by channel implementations to forward the handlers
-+ * to another channel (e.g. from #QIOChannelTLS to the
-+ * underlying socket).
-+ */
-+void qio_channel_set_fd_handler(QIOChannel *ioc,
-+                                AioContext *ctx,
-+                                IOHandler *io_read,
-+                                IOHandler *io_write,
-+                                void *opaque);
-+
- #endif /* QIO_CHANNEL_H */
-diff --git a/io/channel-socket.c b/io/channel-socket.c
-index d7e03f6..4d5f180 100644
---- a/io/channel-socket.c
-+++ b/io/channel-socket.c
-@@ -661,11 +661,6 @@ qio_channel_socket_set_blocking(QIOChannel *ioc,
-         qemu_set_block(sioc->fd);
-     } else {
-         qemu_set_nonblock(sioc->fd);
--#ifdef WIN32
--        WSAEventSelect(sioc->fd, ioc->event,
--                       FD_READ | FD_ACCEPT | FD_CLOSE |
--                       FD_CONNECT | FD_WRITE | FD_OOB);
--#endif
+     for (i = 0; i < MAX_NBD_REQUESTS; i++) {
+@@ -42,6 +43,7 @@ static void nbd_recv_coroutines_enter_all(NBDClientSession *s)
+             qemu_coroutine_enter(s->recv_coroutine[i]);
+         }
      }
-     return 0;
- }
-@@ -745,6 +740,16 @@ qio_channel_socket_shutdown(QIOChannel *ioc,
-     return 0;
++    BDRV_POLL_WHILE(bs, s->read_reply_co);
  }
  
-+static GSource *qio_channel_socket_set_fd_handler(QIOChannel *ioc,
-+                                                  AioContext *ctx,
-+                                                  IOHandler *io_read,
-+                                                  IOHandler *io_write,
-+                                                  void *opaque)
-+{
-+    QIOChannelSocket *sioc = QIO_CHANNEL_SOCKET(ioc);
-+    aio_set_fd_handler(ctx, sioc->fd, false, io_read, io_write, opaque);
-+}
-+
- static GSource *qio_channel_socket_create_watch(QIOChannel *ioc,
-                                                 GIOCondition condition)
+ static void nbd_teardown_connection(BlockDriverState *bs)
+@@ -56,7 +58,7 @@ static void nbd_teardown_connection(BlockDriverState *bs)
+     qio_channel_shutdown(client->ioc,
+                          QIO_CHANNEL_SHUTDOWN_BOTH,
+                          NULL);
+-    nbd_recv_coroutines_enter_all(client);
++    nbd_recv_coroutines_enter_all(bs);
+ 
+     nbd_client_detach_aio_context(bs);
+     object_unref(OBJECT(client->sioc));
+@@ -65,54 +67,34 @@ static void nbd_teardown_connection(BlockDriverState *bs)
+     client->ioc = NULL;
+ }
+ 
+-static void nbd_reply_ready(void *opaque)
++static void nbd_read_reply_entry(void *opaque)
  {
-@@ -767,6 +772,7 @@ static void qio_channel_socket_class_init(ObjectClass *klass,
-     ioc_klass->io_set_cork = qio_channel_socket_set_cork;
-     ioc_klass->io_set_delay = qio_channel_socket_set_delay;
-     ioc_klass->io_create_watch = qio_channel_socket_create_watch;
-+    ioc_klass->io_set_fd_handler = qio_channel_socket_set_fd_handler;
- }
+-    BlockDriverState *bs = opaque;
+-    NBDClientSession *s = nbd_get_client_session(bs);
++    NBDClientSession *s = opaque;
+     uint64_t i;
+     int ret;
  
- static const TypeInfo qio_channel_socket_info = {
-diff --git a/io/channel-tls.c b/io/channel-tls.c
-index d24dc8c..bd2239c 100644
---- a/io/channel-tls.c
-+++ b/io/channel-tls.c
-@@ -349,6 +349,17 @@ static int qio_channel_tls_close(QIOChannel *ioc,
-     return qio_channel_close(tioc->master, errp);
- }
+-    if (!s->ioc) { /* Already closed */
+-        return;
+-    }
+-
+-    if (s->reply.handle == 0) {
+-        /* No reply already in flight.  Fetch a header.  It is possible
+-         * that another thread has done the same thing in parallel, so
+-         * the socket is not readable anymore.
+-         */
++    for (;;) {
++        assert(s->reply.handle == 0);
+         ret = nbd_receive_reply(s->ioc, &s->reply);
+-        if (ret == -EAGAIN) {
+-            return;
+-        }
+         if (ret < 0) {
+-            s->reply.handle = 0;
+-            goto fail;
++            break;
+         }
+-    }
+-
+-    /* There's no need for a mutex on the receive side, because the
+-     * handler acts as a synchronization point and ensures that only
+-     * one coroutine is called until the reply finishes.  */
+-    i = HANDLE_TO_INDEX(s, s->reply.handle);
+-    if (i >= MAX_NBD_REQUESTS) {
+-        goto fail;
+-    }
  
-+static void qio_channel_tls_set_fd_handler(QIOChannel *ioc,
-+                                           AioContext *ctx,
-+                                           IOHandler *io_read,
-+                                           IOHandler *io_write,
-+                                           void *opaque)
-+{
-+    QIOChannelTLS *tioc = QIO_CHANNEL_TLS(ioc);
-+
-+    qio_channel_set_fd_handler(tioc->master, ctx, io_read, io_write, opaque);
-+}
-+
- static GSource *qio_channel_tls_create_watch(QIOChannel *ioc,
-                                              GIOCondition condition)
- {
-@@ -376,6 +387,7 @@ static void qio_channel_tls_class_init(ObjectClass *klass,
-     ioc_klass->io_close = qio_channel_tls_close;
-     ioc_klass->io_shutdown = qio_channel_tls_shutdown;
-     ioc_klass->io_create_watch = qio_channel_tls_create_watch;
-+    ioc_klass->io_set_fd_handler = qio_channel_tls_set_fd_handler;
- }
+-    if (s->recv_coroutine[i]) {
+-        qemu_coroutine_enter(s->recv_coroutine[i]);
+-        return;
+-    }
+-
+-fail:
+-    nbd_teardown_connection(bs);
+-}
++        /* There's no need for a mutex on the receive side, because the
++         * handler acts as a synchronization point and ensures that only
++         * one coroutine is called until the reply finishes.
++         */
++        i = HANDLE_TO_INDEX(s, s->reply.handle);
++        if (i >= MAX_NBD_REQUESTS || !s->recv_coroutine[i]) {
++            break;
++        }
  
- static const TypeInfo qio_channel_tls_info = {
-diff --git a/io/channel-watch.c b/io/channel-watch.c
-index cf1cdff..8640d1c 100644
---- a/io/channel-watch.c
-+++ b/io/channel-watch.c
-@@ -285,6 +285,12 @@ GSource *qio_channel_create_socket_watch(QIOChannel *ioc,
-     GSource *source;
-     QIOChannelSocketSource *ssource;
+-static void nbd_restart_write(void *opaque)
+-{
+-    BlockDriverState *bs = opaque;
++        aio_co_wake(s->recv_coroutine[i]);
  
-+#ifdef WIN32
-+    WSAEventSelect(socket, ioc->event,
-+                   FD_READ | FD_ACCEPT | FD_CLOSE |
-+                   FD_CONNECT | FD_WRITE | FD_OOB);
-+#endif
-+
-     source = g_source_new(&qio_channel_socket_source_funcs,
-                           sizeof(QIOChannelSocketSource));
-     ssource = (QIOChannelSocketSource *)source;
-diff --git a/io/channel.c b/io/channel.c
-index 80924c1..9ef683c 100644
---- a/io/channel.c
-+++ b/io/channel.c
-@@ -154,6 +154,17 @@ GSource *qio_channel_create_watch(QIOChannel *ioc,
- }
- 
- 
-+void qio_channel_set_fd_handler(QIOChannel *ioc,
-+                                AioContext *ctx,
-+                                IOHandler *io_read,
-+                                IOHandler *io_write,
-+                                void *opaque)
-+{
-+    QIOChannelClass *klass = QIO_CHANNEL_GET_CLASS(ioc);
-+
-+    klass->io_set_fd_handler(ioc, ctx, io_read, io_write, opaque);
-+}
-+
- guint qio_channel_add_watch(QIOChannel *ioc,
-                             GIOCondition condition,
-                             QIOChannelFunc func,
-@@ -244,6 +255,20 @@ static gboolean qio_channel_yield_enter(QIOChannel *ioc,
- }
- 
- 
-+void qio_channel_set_aio_context(QIOChannel *ioc,
-+                                 AioContext *ctx)
-+{
-+    if (ioc->ctx == ctx) {
-+        return;
+-    qemu_coroutine_enter(nbd_get_client_session(bs)->send_coroutine);
++        /* We're woken up by the recv_coroutine itself.  */
++        qemu_coroutine_yield();
 +    }
-+
-+    qio_channel_set_fd_handler(ioc,
-+                               ioc->ctx ? ioc->ctx : iohandler_get_aio_context(),
-+                               NULL, NULL, NULL);
-+    ioc->ctx = ctx;
-+    qio_channel_set_fd_handlers(ioc);
-+}
-+
- void coroutine_fn qio_channel_yield(QIOChannel *ioc,
-                                     GIOCondition condition)
++    s->read_reply_co = NULL;
+ }
+ 
+ static int nbd_co_send_request(BlockDriverState *bs,
+@@ -120,7 +102,6 @@ static int nbd_co_send_request(BlockDriverState *bs,
+                                QEMUIOVector *qiov)
  {
+     NBDClientSession *s = nbd_get_client_session(bs);
+-    AioContext *aio_context;
+     int rc, ret, i;
+ 
+     qemu_co_mutex_lock(&s->send_mutex);
+@@ -141,11 +122,6 @@ static int nbd_co_send_request(BlockDriverState *bs,
+         return -EPIPE;
+     }
+ 
+-    s->send_coroutine = qemu_coroutine_self();
+-    aio_context = bdrv_get_aio_context(bs);
+-
+-    aio_set_fd_handler(aio_context, s->sioc->fd, false,
+-                       nbd_reply_ready, nbd_restart_write, NULL, bs);
+     if (qiov) {
+         qio_channel_set_cork(s->ioc, true);
+         rc = nbd_send_request(s->ioc, request);
+@@ -160,9 +136,6 @@ static int nbd_co_send_request(BlockDriverState *bs,
+     } else {
+         rc = nbd_send_request(s->ioc, request);
+     }
+-    aio_set_fd_handler(aio_context, s->sioc->fd, false,
+-                       nbd_reply_ready, NULL, NULL, bs);
+-    s->send_coroutine = NULL;
+     qemu_co_mutex_unlock(&s->send_mutex);
+     return rc;
+ }
+@@ -174,8 +147,7 @@ static void nbd_co_receive_reply(NBDClientSession *s,
+ {
+     int ret;
+ 
+-    /* Wait until we're woken up by the read handler.  TODO: perhaps
+-     * peek at the next reply and avoid yielding if it's ours?  */
++    /* Wait until we're woken up by nbd_read_reply_entry.  */
+     qemu_coroutine_yield();
+     *reply = s->reply;
+     if (reply->handle != request->handle ||
+@@ -209,14 +181,18 @@ static void nbd_coroutine_start(NBDClientSession *s,
+     /* s->recv_coroutine[i] is set as soon as we get the send_lock.  */
+ }
+ 
+-static void nbd_coroutine_end(NBDClientSession *s,
++static void nbd_coroutine_end(BlockDriverState *bs,
+                               NBDRequest *request)
+ {
++    NBDClientSession *s = nbd_get_client_session(bs);
+     int i = HANDLE_TO_INDEX(s, request->handle);
++
+     s->recv_coroutine[i] = NULL;
+-    if (s->in_flight-- == MAX_NBD_REQUESTS) {
+-        qemu_co_queue_next(&s->free_sema);
+-    }
++
++    /* Kick the read_reply_co to get the next reply.  */
++    aio_co_wake(s->read_reply_co);
++    s->in_flight--;
++    qemu_co_queue_next(&s->free_sema);
+ }
+ 
+ int nbd_client_co_preadv(BlockDriverState *bs, uint64_t offset,
+@@ -241,7 +217,7 @@ int nbd_client_co_preadv(BlockDriverState *bs, uint64_t offset,
+     } else {
+         nbd_co_receive_reply(client, &request, &reply, qiov);
+     }
+-    nbd_coroutine_end(client, &request);
++    nbd_coroutine_end(bs, &request);
+     return -reply.error;
+ }
+ 
+@@ -271,7 +247,7 @@ int nbd_client_co_pwritev(BlockDriverState *bs, uint64_t offset,
+     } else {
+         nbd_co_receive_reply(client, &request, &reply, NULL);
+     }
+-    nbd_coroutine_end(client, &request);
++    nbd_coroutine_end(bs, &request);
+     return -reply.error;
+ }
+ 
+@@ -306,7 +282,7 @@ int nbd_client_co_pwrite_zeroes(BlockDriverState *bs, int64_t offset,
+     } else {
+         nbd_co_receive_reply(client, &request, &reply, NULL);
+     }
+-    nbd_coroutine_end(client, &request);
++    nbd_coroutine_end(bs, &request);
+     return -reply.error;
+ }
+ 
+@@ -331,7 +307,7 @@ int nbd_client_co_flush(BlockDriverState *bs)
+     } else {
+         nbd_co_receive_reply(client, &request, &reply, NULL);
+     }
+-    nbd_coroutine_end(client, &request);
++    nbd_coroutine_end(bs, &request);
+     return -reply.error;
+ }
+ 
+@@ -357,23 +333,23 @@ int nbd_client_co_pdiscard(BlockDriverState *bs, int64_t offset, int count)
+     } else {
+         nbd_co_receive_reply(client, &request, &reply, NULL);
+     }
+-    nbd_coroutine_end(client, &request);
++    nbd_coroutine_end(bs, &request);
+     return -reply.error;
+ 
+ }
+ 
+ void nbd_client_detach_aio_context(BlockDriverState *bs)
+ {
+-    aio_set_fd_handler(bdrv_get_aio_context(bs),
+-                       nbd_get_client_session(bs)->sioc->fd,
+-                       false, NULL, NULL, NULL, NULL);
++    NBDClientSession *client = nbd_get_client_session(bs);
++    qio_channel_set_aio_context(QIO_CHANNEL(client->sioc), NULL);
+ }
+ 
+ void nbd_client_attach_aio_context(BlockDriverState *bs,
+                                    AioContext *new_context)
+ {
+-    aio_set_fd_handler(new_context, nbd_get_client_session(bs)->sioc->fd,
+-                       false, nbd_reply_ready, NULL, NULL, bs);
++    NBDClientSession *client = nbd_get_client_session(bs);
++    qio_channel_set_aio_context(QIO_CHANNEL(client->sioc), new_context);
++    aio_co_schedule(new_context, client->read_reply_co);
+ }
+ 
+ void nbd_client_close(BlockDriverState *bs)
+@@ -434,7 +410,7 @@ int nbd_client_init(BlockDriverState *bs,
+     /* Now that we're connected, set the socket to be non-blocking and
+      * kick the reply mechanism.  */
+     qio_channel_set_blocking(QIO_CHANNEL(sioc), false, NULL);
+-
++    client->read_reply_co = qemu_coroutine_create(nbd_read_reply_entry, client);
+     nbd_client_attach_aio_context(bs, bdrv_get_aio_context(bs));
+ 
+     logout("Established connection with NBD server\n");
 -- 
 2.9.3
