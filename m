@@ -1,18 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59027)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37778)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cKTET-00010D-MG
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 12:02:15 -0500
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cKTta-0003pa-5Z
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 12:44:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cKTES-0005bM-Hw
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 12:02:13 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri, 23 Dec 2016 17:28:49 +0300
-Message-ID: <1482503344-6424-7-git-send-email-vsementsov@virtuozzo.com>
-In-Reply-To: <1482503344-6424-1-git-send-email-vsementsov@virtuozzo.com>
-References: <1482503344-6424-1-git-send-email-vsementsov@virtuozzo.com>
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1cKTtX-0006vH-17
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 12:44:42 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:56737
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+	id 1cKTtW-0006uC-SA
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 12:44:38 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
+	uBNHht6U036720
+	for <qemu-devel@nongnu.org>; Fri, 23 Dec 2016 12:44:35 -0500
+Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 27h5mxpr6j-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 23 Dec 2016 12:44:35 -0500
+Received: from localhost
+	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+	Fri, 23 Dec 2016 10:44:34 -0700
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 06/21] backup: rewrite top mode cluster skipping
+Content-Transfer-Encoding: quoted-printable
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+Date: Fri, 23 Dec 2016 11:44:14 -0600
+Message-Id: <20161223174414.26007.53899@loki>
+Subject: [Qemu-devel] [ANNOUNCE] QEMU 2.7.1 Stable released
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,188 +39,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, vsementsov@virtuozzo.com, pbonzini@redhat.com, jcody@redhat.com
+To: qemu-devel@nongnu.org
+Cc: qemu-stable@nongnu.org
 
-TOP backup mode skips not allocated clusters. This patch mark skipped
-clusters in copy_bitmap to prevent their writing in write notifier
-(however, they may be written before skipping, but that is not
-critical).
+Hi everyone,
 
-Also, update job->common.offset appropriately, to come eventually to
-job->common.len.
+I am pleased to announce that the QEMU v2.7.1 stable release is now
+available:
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- block/backup.c | 135 ++++++++++++++++++++++++++++++++++++++++++++-------------
- 1 file changed, 104 insertions(+), 31 deletions(-)
+  http://wiki.qemu.org/download/qemu-2.7.1.tar.bz2
 
-diff --git a/block/backup.c b/block/backup.c
-index 938b7df..e2b944a 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -53,6 +53,11 @@ static inline int64_t cluster_size_sectors(BackupBlockJob *job)
-   return job->cluster_size / BDRV_SECTOR_SIZE;
- }
- 
-+static inline int64_t max_query_sectors(BackupBlockJob *job)
-+{
-+    return (INT_MAX & ~(job->cluster_size - 1)) >> BDRV_SECTOR_BITS;
-+}
-+
- /* See if in-flight requests overlap and wait for them to complete */
- static void coroutine_fn wait_for_overlapping_requests(BackupBlockJob *job,
-                                                        int64_t start,
-@@ -374,6 +379,101 @@ static bool coroutine_fn yield_and_check(BackupBlockJob *job)
-     return false;
- }
- 
-+static void backup_skip_clusters(BackupBlockJob *job,
-+                                 int64_t start, int64_t end)
-+{
-+    CowRequest cow_request;
-+
-+    wait_for_overlapping_requests(job, start, end);
-+    cow_request_begin(&cow_request, job, start, end);
-+
-+    if (end * job->cluster_size > job->common.len) {
-+        int64_t n;
-+        end--;
-+        n = job->common.len - end * job->cluster_size;
-+        assert(n > 0);
-+
-+        if (hbitmap_get(job->copy_bitmap, end)) {
-+            hbitmap_reset(job->copy_bitmap, end, 1);
-+            job->common.offset += n;
-+        }
-+    }
-+
-+    for ( ; start < end; start++) {
-+        if (!hbitmap_get(job->copy_bitmap, start)) {
-+            continue;
-+        }
-+
-+        hbitmap_reset(job->copy_bitmap, start, 1);
-+        job->common.offset += job->cluster_size;
-+    }
-+
-+    cow_request_end(&cow_request);
-+}
-+
-+static int backup_skip_unallocated_clusters(BackupBlockJob *job,
-+                                            BlockDriverState *base,
-+                                            int64_t start, int *n)
-+{
-+    int ret;
-+    int64_t sectors_per_cluster = cluster_size_sectors(job);
-+    BlockDriverState *bs = blk_bs(job->common.blk);
-+    int64_t sector_end = job->common.len >> BDRV_SECTOR_BITS;
-+    int64_t sector = start * sectors_per_cluster;
-+    int max_sectors = MIN(max_query_sectors(job), sector_end - sector);
-+    int n_sectors = 0;
-+
-+    ret = bdrv_is_allocated_above(bs, base, sector, max_sectors, &n_sectors);
-+    if (ret < 0) {
-+        return ret;
-+    }
-+
-+    if (sector + n_sectors == sector_end || ret == 1) {
-+        *n = DIV_ROUND_UP(n_sectors, sectors_per_cluster);
-+    } else if (n_sectors < sectors_per_cluster) {
-+        *n = 1;
-+        ret = 1;
-+    } else {
-+        *n = n_sectors / sectors_per_cluster;
-+    }
-+
-+    if (ret == 0) {
-+        backup_skip_clusters(job, start, start + *n);
-+    }
-+
-+    return 0;
-+}
-+
-+static void backup_skip_loop(BackupBlockJob *job, BlockDriverState *base)
-+{
-+    HBitmapIter hbi;
-+    int64_t cluster;
-+    int64_t end = DIV_ROUND_UP(job->common.len, job->cluster_size);
-+
-+    hbitmap_iter_init(&hbi, job->copy_bitmap, 0);
-+    while ((cluster = hbitmap_iter_next(&hbi)) != -1) {
-+        int n, ret;
-+
-+        if (yield_and_check(job)) {
-+            return;
-+        }
-+
-+        ret = backup_skip_unallocated_clusters(job, base, cluster, &n);
-+        if (ret < 0) {
-+            n = 1;
-+        }
-+
-+        cluster += n;
-+        if (cluster >= end) {
-+            return;
-+        }
-+
-+        if (n > 1) {
-+            hbitmap_iter_init(&hbi, job->copy_bitmap, cluster);
-+        }
-+    }
-+}
-+
- static int coroutine_fn backup_run_incremental(BackupBlockJob *job)
- {
-     int ret;
-@@ -465,6 +565,10 @@ static void coroutine_fn backup_run(void *opaque)
-         ret = backup_run_incremental(job);
-     } else {
-         hbitmap_set(job->copy_bitmap, 0, end);
-+        if (job->sync_mode == MIRROR_SYNC_MODE_TOP) {
-+            backup_skip_loop(job, backing_bs(blk_bs(job->common.blk)));
-+        }
-+
-         /* Both FULL and TOP SYNC_MODE's require copying.. */
-         for (; start < end; start++) {
-             bool error_is_read;
-@@ -472,37 +576,6 @@ static void coroutine_fn backup_run(void *opaque)
-                 break;
-             }
- 
--            if (job->sync_mode == MIRROR_SYNC_MODE_TOP) {
--                int i, n;
--                int alloced = 0;
--
--                /* Check to see if these blocks are already in the
--                 * backing file. */
--
--                for (i = 0; i < sectors_per_cluster;) {
--                    /* bdrv_is_allocated() only returns true/false based
--                     * on the first set of sectors it comes across that
--                     * are are all in the same state.
--                     * For that reason we must verify each sector in the
--                     * backup cluster length.  We end up copying more than
--                     * needed but at some point that is always the case. */
--                    alloced =
--                        bdrv_is_allocated(bs,
--                                start * sectors_per_cluster + i,
--                                sectors_per_cluster - i, &n);
--                    i += n;
--
--                    if (alloced == 1 || n == 0) {
--                        break;
--                    }
--                }
--
--                /* If the above loop never found any sectors that are in
--                 * the topmost image, skip this backup. */
--                if (alloced == 0) {
--                    continue;
--                }
--            }
-             /* FULL sync mode we copy the whole drive. */
-             ret = backup_do_cow(job, start * sectors_per_cluster,
-                                 sectors_per_cluster, &error_is_read, false);
--- 
-1.8.3.1
+v2.7.1 is now tagged in the official qemu.git repository,
+and the stable-2.7 branch has been updated accordingly:
+
+  http://git.qemu.org/?p=3Dqemu.git;a=3Dshortlog;h=3Drefs/heads/stable-2.7
+
+This update fixes a number of issues relating to migration for
+both x86 and pseries guests, and addresses a broad range of bugs.
+Users should upgrade accordingly.
+
+Thank you to everyone involved!
+
+CHANGELOG:
+
+0d83fcc: Update version for 2.7.1 release (Michael Roth)
+4dde694: ide: Fix memory leak in ide_register_restart_cb() (Ashijeet Achary=
+a)
+7d17d68: portio: keep references on portio (Marc-Andr=C3=A9 Lureau)
+345f1cd: block-backend: Always notify on blk_eject (John Snow)
+8d5f2a7: dma-helpers: explicitly pass alignment into DMA helpers (Mark Cave=
+-Ayland)
+5f20161: atapi: classify read_cd as conditionally returning data (John Snow)
+05838b4: ui/gtk: fix "Copy" menu item segfault (Stefan Hajnoczi)
+223d1a2: vfio/pci: Fix vfio_rtl8168_quirk_data_read address offset (Thorste=
+n Kohfeldt)
+7f7ac21: msmouse: Fix segfault caused by free the chr before chardev cleanu=
+p. (Lin Ma)
+db1604c: Revert "megasas: remove useless check for cmd->frame" (Paolo Bonzi=
+ni)
+cc1fd25: vl: Delay initialization of memory backends (Eduardo Habkost)
+ee99e42: vhost-user-test: Use libqos instead of pxe-virtio.rom (Eduardo Hab=
+kost)
+0ef167c: intel_iommu: fix incorrect device invalidate (Peter Xu)
+248a780: rules.mak: Use -r instead of -Wl, -r to fix building when PIE is d=
+efault (Adrian Bunk)
+80f630b: pci-assign: sync MSI/MSI-X cap and table with PCIDevice (Peter Xu)
+353801c: ivshmem: Fix 64 bit memory bar configuration (Zhuang Yanying)
+c8a3159: vhost: drop legacy vring layout bits (Greg Kurz)
+48fdfeb: block/curl: Do not wait for data beyond EOF (Max Reitz)
+6eb194d: block/curl: Remember all sockets (Max Reitz)
+7e278ef: block/curl: Fix return value from curl_read_cb (Max Reitz)
+6a5ea68: block/curl: Use BDRV_SECTOR_SIZE (Max Reitz)
+31454eb: block: Pass unaligned discard requests to drivers (Eric Blake)
+5e4eb85: block: Return -ENOTSUP rather than assert on unaligned discards (E=
+ric Blake)
+dd11d33: block: Let write zeroes fallback work even with small max_transfer=
+ (Eric Blake)
+c4bf37e: qcow2: Inform block layer about discard boundaries (Eric Blake)
+e9dbd28: slirp: Fix access to freed memory (Samuel Thibault)
+92230a5: vhost: adapt vhost_verify_ring_mappings() to virtio 1 ring layout =
+(Greg Kurz)
+48b3aa2: block: Don't mark node clean after failed flush (Kevin Wolf)
+f1372d6: virtio-net: mark VIRTIO_NET_F_GSO as legacy (Michael S. Tsirkin)
+63087cd: virtio: allow per-device-class legacy features (Michael S. Tsirkin)
+9df69dc: target-ppc: Fix CPU migration from qemu-2.6 <-> later versions (Da=
+vid Gibson)
+95a0638: net: fix sending of data with -net socket, listen backend (Daniel =
+P. Berrange)
+1790a9d: acpi/ipmi: Initialize the fwinfo before fetching it (Corey Minyard)
+1b16ded: memory: Don't use memcpy for ram_device regions (Alex Williamson)
+ca83f87: memory: Replace skip_dump flag with "ram_device" (Alex Williamson)
+2817466: net: rtl8139: limit processing of ring descriptors (Prasad J Pandi=
+t)
+e389e44: qemu-iotests: Test I/O in a single drive from a throttling group (=
+Alberto Garcia)
+b1fdc94: throttle: Correct access to wrong BlockBackendPublic structures (A=
+lberto Garcia)
+6178198: ppc/kvm: Mark 64kB page size support as disabled if not available =
+(Thomas Huth)
+857efec: rbd: shift byte count as a 64-bit value (Paolo Bonzini)
+99837b0: tests/test-qmp-input-strict: Cover missing struct members (Markus =
+Armbruster)
+b34c7bd: qapi: Fix crash when 'any' or 'null' parameter is missing (Marc-An=
+dr=C3=A9 Lureau)
+f3467f5: qmp: fix object-add assert() without props (Marc-Andr=C3=A9 Lureau)
+5be5335: char: fix missing return in error path for chardev TLS init (Danie=
+l P. Berrange)
+af29bd3: qht: fix unlock-after-free segfault upon resizing (Emilio G. Cota)
+f72ca1a: qht: simplify qht_reset_size (Emilio G. Cota)
+4d45fe1: migrate: Fix cpu-throttle-increment regression in HMP (Eric Blake)
+4a25ab2: block-backend: remove blk_flush_all (John Snow)
+95200eb: qemu: use bdrv_flush_all for vm_stop et al (John Snow)
+8e94512: block: reintroduce bdrv_flush_all (John Snow)
+d40d148: iscsi: Fix divide-by-zero regression on raw SG devices (Eric Blake)
+f985602: qcow2: fix encryption during cow of sectors (Daniel P. Berrange)
+a3a2545: vfio/pci: Fix regression in MSI routing configuration (David Gibso=
+n)
+533dedf: s390x/css: handle cssid 255 correctly (Cornelia Huck)
+54c26b7: ahci: clear aiocb in ncq_cb (John Snow)
+f5436d1: virtio-scsi: Don't abort when media is ejected (Fam Zheng)
+3550eea: scsi-disk: Cleaning up around tray open state (Fam Zheng)
+316c2c9: iothread: Stop threads before main() quits (Fam Zheng)
+98b4465: crypto: ensure XTS is only used with ciphers with 16 byte blocks (=
+Daniel P. Berrange)
+8342e12: scsi: mptconfig: fix misuse of MPTSAS_CONFIG_PACK (Paolo Bonzini)
+0b6ab25: scsi: mptconfig: fix an assert expression (Prasad J Pandit)
+7428865: vmw_pvscsi: check page count while initialising descriptor rings (=
+Prasad J Pandit)
+2f8e8c7: scsi-disk: change disk serial length from 20 to 36 (Rony Weng)
+069e885: qemu-char: avoid segfault if user lacks of permisson of a given lo=
+gfile (Lin Ma)
+bfb15f7: scsi: pvscsi: limit process IO loop to ring size (Prasad J Pandit)
+c6a7b92: scsi: mptsas: use g_new0 to allocate MPTSASRequest object (Li Qian=
+g)
+d06c61f: 9pfs: fix potential segfault during walk (Greg Kurz)
+91a2f46: vnc: fix qemu crash because of SIGSEGV (Gonglei)
+520d4b2: virtio-balloon: discard virtqueue element on reset (Ladi Prosek)
+4b6542d: virtio: zero vq->inuse in virtio_reset() (Stefan Hajnoczi)
+2e68f28: ppc: Check the availability of transactional memory (Thomas Huth)
+45a4f18: hw/ppc/spapr: Fix the selection of the processor features (Thomas =
+Huth)
+5c17966: hw/ppc/spapr: Move code related to "ibm,pa-features" to a separate=
+ function (Thomas Huth)
+6ff3ab0: linux-headers: update (Cornelia Huck)
