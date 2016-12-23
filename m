@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43483)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43522)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cKNpK-0005So-BG
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 06:15:56 -0500
+	(envelope-from <bounces@canonical.com>) id 1cKNpf-0005c7-As
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 06:16:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cKNpJ-0002oO-9X
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 06:15:54 -0500
-Received: from mail-vk0-x22c.google.com ([2607:f8b0:400c:c05::22c]:33076)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cKNpJ-0002o6-4I
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 06:15:53 -0500
-Received: by mail-vk0-x22c.google.com with SMTP id 137so176507021vkl.0
-	for <qemu-devel@nongnu.org>; Fri, 23 Dec 2016 03:15:53 -0800 (PST)
+	(envelope-from <bounces@canonical.com>) id 1cKNpb-0002vc-Lh
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 06:16:14 -0500
+Received: from indium.canonical.com ([91.189.90.7]:41990)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cKNpb-0002v3-Fd
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 06:16:11 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cKNpY-0006V8-J5
+	for <qemu-devel@nongnu.org>; Fri, 23 Dec 2016 11:16:08 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 7BE142F6166
+	for <qemu-devel@nongnu.org>; Fri, 23 Dec 2016 11:16:04 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20161222152300.32395-1-pbonzini@redhat.com>
-References: <20161222152300.32395-1-pbonzini@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 23 Dec 2016 11:15:32 +0000
-Message-ID: <CAFEAcA_EyA1WycYOoqZP767GiufX=DV59v4Hgb=dhk+NoE3X5w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 00/25] First round of misc patches for QEMU
- 2.9
+Date: Fri, 23 Dec 2016 11:07:48 -0000
+From: LPNow <77777@tutanota.de>
+Reply-To: Bug 1649040 <1649040@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20161211031531.25603.88090.malonedeb@gac.canonical.com>
+Message-Id: <20161223110748.981.55073.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1649040] Re: Ubuntu 16.04.1 Grub Splash Doesn't
+ Appear
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,38 +37,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-On 22 December 2016 at 15:22, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> The following changes since commit d1e8e8ecc3d2a1a72504912d671f1cbbac1b06=
-e5:
->
->   Merge remote-tracking branch 'remotes/huth/tags/target-dirs-20161220' i=
-nto staging (2016-12-21 21:11:48 +0000)
->
-> are available in the git repository at:
->
->   git://github.com/bonzini/qemu.git tags/for-upstream
->
-> for you to fetch changes up to 6c7c3c21f95dd9af8a0691c0dd29b07247984122:
->
->   x86: implement la57 paging mode (2016-12-22 16:01:04 +0100)
->
-> ----------------------------------------------------------------
-> * core support for MemoryRegionCache from myself
-> * rules.mak speedup and cleanups from myself and Marc-Adnr=C3=A9
-> * multiboot command line fix from Vlad
-> * SCSI fixes from myself
-> * small qemu-timer speedup from myself
-> * x86 debugging improvements from Doug
-> * configurable Q35 devices from  Chao
-> * x86 5-level paging support from Kirill
-> * x86 SHA_NI support for KVM from Yi Sun
-> * improved kvmclock migration logic from Marcelo
-> * bugfixes and doc fixes from others
+I switched to boot scsi and when I start it, the screen is just blank...
 
-Applied, thanks. (Nice to see that git is smart enough to
-be able to merge this on top of the earlier target-* rename.)
 
--- PMM
+qemu-system-x86_64 -drive if=3Dnone,id=3Dhd,cache=3Dnone,aio=3Dthreads,form=
+at=3Draw,file=3Dubuntu.img,index=3D0 \
+-object iothread,id=3Diothread0 \
+-machine type=3Dq35,accel=3Dkvm,kernel_irqchip=3Don \
+-device virtio-scsi-pci,iothread=3Diothread0,id=3Dscsi -device scsi-hd,driv=
+e=3Dhd \
+-cpu host \
+--enable-kvm \
+-smp 2 \
+-m 4096 \
+-vga virtio \
+-soundhw hda \
+-usbdevice tablet \
+-rtc base=3Dlocaltime
+
+Sometimes when I restart it, I'll get the grub menu and I boot it, then
+it just sits at the console login, for me to log in with a username and
+pass, it doesn't go to the DM.
+
+I get this message, not sure if it's related;
+
+intel_rapl no valid rapl domains found in package 0
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1649040
+
+Title:
+  Ubuntu 16.04.1 Grub Splash Doesn't Appear
+
+Status in QEMU:
+  New
+
+Bug description:
+  My Specs:
+
+  Slackware 14.2 x86_64 > Host
+  QEMU 2.7.0
+
+  Ubuntu 16.04.1 x86_64 > Guest
+
+  Start options for Ubuntu:
+
+  qemu-system-x86_64 -drive format=3Draw,file=3Dubuntu.img \
+  -cpu host \
+  --enable-kvm \
+  -smp 2 \
+  -m 4096 \
+  -vga vmware \
+  -soundhw ac97 \
+  -usbdevice tablet \
+  -rtc base=3Dlocaltime \
+  -usbdevice host:0781:5575
+
+  I've started Ubuntu around 6-8 times, and I have only see the Grub
+  Boot Splash appear twice, so pretty much without fail it typically
+  boots past the grub splash and automatically boots...
+
+  These are the /etc/default/grub settings; (I only changed these
+  options GRUB_TIMEOUT=3D15 and GRUB_GFXMODE=3D1440x900)
+
+  # If you change this file, run 'update-grub' afterwards to update
+  # /boot/grub/grub.cfg.
+  # For full documentation of the options in this file, see:
+  #   info -f grub -n 'Simple configuration'
+
+  GRUB_DEFAULT=3D0
+  GRUB_HIDDEN_TIMEOUT=3D0
+  GRUB_HIDDEN_TIMEOUT_QUIET=3Dtrue
+  GRUB_TIMEOUT=3D15
+  GRUB_DISTRIBUTOR=3D`lsb_release -i -s 2> /dev/null || echo Debian`
+  GRUB_CMDLINE_LINUX_DEFAULT=3D"quiet splash"
+  GRUB_CMDLINE_LINUX=3D""
+
+  # Uncomment to enable BadRAM filtering, modify to suit your needs
+  # This works with Linux (no patch required) and with any kernel that obta=
+ins
+  # the memory map information from GRUB (GNU Mach, kernel of FreeBSD ...)
+  #GRUB_BADRAM=3D"0x01234567,0xfefefefe,0x89abcdef,0xefefefef"
+
+  # Uncomment to disable graphical terminal (grub-pc only)
+  #GRUB_TERMINAL=3Dconsole
+
+  # The resolution used on graphical terminal
+  # note that you can use only modes which your graphic card supports via V=
+BE
+  # you can see them in real GRUB with the command `vbeinfo'
+  GRUB_GFXMODE=3D1440x900
+
+  # Uncomment if you don't want GRUB to pass "root=3DUUID=3Dxxx" parameter =
+to Linux
+  #GRUB_DISABLE_LINUX_UUID=3Dtrue
+
+  # Uncomment to disable generation of recovery mode menu entries
+  #GRUB_DISABLE_RECOVERY=3D"true"
+
+  # Uncomment to get a beep at grub start
+  #GRUB_INIT_TUNE=3D"480 440 1"
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1649040/+subscriptions
