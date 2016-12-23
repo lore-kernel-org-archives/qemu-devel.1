@@ -1,23 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39963)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38333)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <msuchanek@suse.de>) id 1cKS5e-000358-Ob
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 10:49:04 -0500
+	(envelope-from <bounces@canonical.com>) id 1cKRsf-0000ez-GD
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 10:35:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <msuchanek@suse.de>) id 1cKS5b-0005m3-M3
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 10:49:02 -0500
-Received: from mx2.suse.de ([195.135.220.15]:44798)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <msuchanek@suse.de>) id 1cKS5b-0005la-Fk
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 10:48:59 -0500
-Received: from relay1.suse.de (charybdis-ext.suse.de [195.135.220.254])
-	by mx2.suse.de (Postfix) with ESMTP id 95AFDAC40
-	for <qemu-devel@nongnu.org>; Fri, 23 Dec 2016 15:48:57 +0000 (UTC)
-From: Michal Suchanek <msuchanek@suse.de>
-Date: Fri, 23 Dec 2016 16:48:53 +0100
-Message-Id: <20161223154853.23672-1-msuchanek@suse.de>
-In-Reply-To: <20161223151253.21338-1-msuchanek@suse.de>
-References: <20161223151253.21338-1-msuchanek@suse.de>
-Subject: [Qemu-devel] [RFC PATCH] Fix pasting into serial console in GTK ui
+	(envelope-from <bounces@canonical.com>) id 1cKRsa-0007H4-BK
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 10:35:37 -0500
+Received: from indium.canonical.com ([91.189.90.7]:45944)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cKRsa-0007Gf-2q
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 10:35:32 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cKRsY-0008Of-SR
+	for <qemu-devel@nongnu.org>; Fri, 23 Dec 2016 15:35:30 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id B95D62E80C8
+	for <qemu-devel@nongnu.org>; Fri, 23 Dec 2016 15:35:30 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 23 Dec 2016 15:26:52 -0000
+From: =?utf-8?q?Javier_Pe=C3=B1a?= <jpena@redhat.com>
+Reply-To: Bug 1652333 <1652333@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <20161223152652.14283.5770.malonedeb@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1652333] [NEW] TCG mode fails to boot Linux
+ kernel with qemu 2.6.0 and libvirt 2.0.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,97 +37,120 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Michal Suchanek <msuchanek@suse.de>
 
-This copies the timer hack from ui/console.c kbd_send_chars to ui/gtk.c
-gd_vc_in.
+Public bug reported:
 
-There is no fd-like object to peek repatedly so the paste data is saved
-in a free-floating buffer only submitted to gtk_timeout_add. Multiple
-pastes can potentially interleave if qemu blocks for long or the user
-pastes fast.
+Trying to boot a Cirros (minimal Linux) VM with qemu 2.6.0 and libvirt
+2.0.0 in TCG mode fails for me. The VM gets stuck in "Starting up ..."
+and never moves on. The command line used to boot the VM was:
 
-Signed-off-by: Michal Suchanek <msuchanek@suse.de>
----
- ui/gtk.c | 58 ++++++++++++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 54 insertions(+), 4 deletions(-)
+LC_ALL=3DC PATH=3D/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin
+QEMU_AUDIO_DRV=3Dnone /usr/libexec/qemu-kvm -name guest=3Dinstance-00000002
+,debug-threads=3Don -S -object
+secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/domain-1-i=
+nstance-00000002
+/master-key.aes -machine pc-i440fx-rhel7.3.0,accel=3Dtcg,usb=3Doff -cpu
+SandyBridge,+osxsave,+hypervisor,+xsaveopt -m 512 -realtime mlock=3Doff
+-smp 1,sockets=3D1,cores=3D1,threads=3D1 -uuid ae38b0e1-b3ae-41ec-
+8e50-c89669a2ec1c -smbios 'type=3D1,manufacturer=3DRed Hat,product=3DOpenSt=
+ack
+Compute,version=3D14.0.2-7.el7ost,serial=3Dedd3a67d-
+6ce5-4c36-8f20-085d1097abb7,uuid=3Dae38b0e1-b3ae-41ec-
+8e50-c89669a2ec1c,family=3DVirtual Machine' -no-user-config -nodefaults
+-chardev
+socket,id=3Dcharmonitor,path=3D/var/lib/libvirt/qemu/domain-1-instance-0000=
+0002/monitor.sock,server,nowait
+-mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc base=3Dutc -no-
+shutdown -boot strict=3Don -device piix3-usb-
+uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2 -drive
+file=3D/var/lib/nova/instances/ae38b0e1-b3ae-41ec-
+8e50-c89669a2ec1c/disk,format=3Dqcow2,if=3Dnone,id=3Ddrive-virtio-
+disk0,cache=3Dnone -device virtio-blk-
+pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x4,drive=3Ddrive-virtio-disk0,id=3Dvirti=
+o-
+disk0,bootindex=3D1 -netdev tap,fd=3D28,id=3Dhostnet0 -device virtio-net-
+pci,netdev=3Dhostnet0,id=3Dnet0,mac=3Dfa:16:3e:c1:27:73,bus=3Dpci.0,addr=3D=
+0x3
+-add-fd set=3D1,fd=3D31 -chardev
+file,id=3Dcharserial0,path=3D/dev/fdset/1,append=3Don -device isa-
+serial,chardev=3Dcharserial0,id=3Dserial0 -chardev pty,id=3Dcharserial1
+-device isa-serial,chardev=3Dcharserial1,id=3Dserial1 -device usb-
+tablet,id=3Dinput0,bus=3Dusb.0,port=3D1 -vnc 0.0.0.0:0 -k en-us -device
+cirrus-vga,id=3Dvideo0,bus=3Dpci.0,addr=3D0x2 -device virtio-balloon-
+pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x5 -msg timestamp=3Don
 
-diff --git a/ui/gtk.c b/ui/gtk.c
-index a216216..58e97ab 100644
---- a/ui/gtk.c
-+++ b/ui/gtk.c
-@@ -1715,11 +1715,15 @@ static CharDriverState *gd_vc_handler(ChardevVC *vc, Error **errp)
-     return chr;
- }
- 
--static gboolean gd_vc_in(VteTerminal *terminal, gchar *text, guint size,
--                         gpointer user_data)
--{
--    VirtualConsole *vc = user_data;
-+struct vc_in_buffer {
-+    VirtualConsole *vc;
-+    gchar *text;
-+    guint size;
-+    guint sent;
-+};
- 
-+static gboolean do_gd_vc_in(VirtualConsole *vc, gchar *text, guint size)
-+{
-     if (vc->vte.echo) {
-         VteTerminal *term = VTE_TERMINAL(vc->vte.terminal);
-         int i;
-@@ -1742,6 +1746,52 @@ static gboolean gd_vc_in(VteTerminal *terminal, gchar *text, guint size,
-     return TRUE;
- }
- 
-+static gint gd_vc_in_timer(gpointer data)
-+{
-+    struct vc_in_buffer *inbuf = data;
-+    VirtualConsole *vc = inbuf->vc;
-+    int len = qemu_chr_be_can_write(vc->vte.chr);
-+    int size = inbuf->size - inbuf->sent;
-+    if (size > len) {
-+        size = len;
-+    }
-+    do_gd_vc_in(vc, inbuf->text + inbuf->sent, size);
-+
-+    inbuf->sent += size;
-+    if (inbuf->sent < inbuf->size) {
-+        return TRUE;
-+    } else {
-+        g_clear_pointer(&inbuf->text, g_free);
-+        g_free(inbuf);
-+        return FALSE;
-+    }
-+}
-+
-+static gboolean gd_vc_in(VteTerminal *terminal, gchar *text, guint size,
-+                         gpointer user_data)
-+{
-+    VirtualConsole *vc = user_data;
-+    int len = qemu_chr_be_can_write(vc->vte.chr);
-+
-+    if (size > len) {
-+        struct vc_in_buffer *inbuf = g_try_new0(struct vc_in_buffer, 1);
-+        if (!inbuf) {
-+            return FALSE;
-+        }
-+        inbuf->text = g_strndup(text, size);
-+        if (!inbuf->text) {
-+            g_free(inbuf);
-+            return FALSE;
-+        }
-+        inbuf->vc = vc;
-+        inbuf->size = size;
-+        inbuf->sent = len;
-+        size = len;
-+        g_timeout_add(1, gd_vc_in_timer, inbuf);
-+    }
-+    return do_gd_vc_in(vc, text, size);
-+}
-+
- static GSList *gd_vc_vte_init(GtkDisplayState *s, VirtualConsole *vc,
-                               CharDriverState *chr, int idx,
-                               GSList *group, GtkWidget *view_menu)
--- 
-2.10.2
+A qcow2 image can be downloaded from http://download.cirros-
+cloud.net/0.3.4/cirros-0.3.4-x86_64-disk.img to reproduce the issue.
+I've seen a similar failure with a CentOS 7.2 image.
+
+I am also attaching the libvirt log from the failed VM.
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+** Attachment added: "Libvirt log from failed VM"
+   https://bugs.launchpad.net/bugs/1652333/+attachment/4795733/+files/insta=
+nce-00000002.log
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1652333
+
+Title:
+  TCG mode fails to boot Linux kernel with qemu 2.6.0 and libvirt 2.0.0
+
+Status in QEMU:
+  New
+
+Bug description:
+  Trying to boot a Cirros (minimal Linux) VM with qemu 2.6.0 and libvirt
+  2.0.0 in TCG mode fails for me. The VM gets stuck in "Starting up ..."
+  and never moves on. The command line used to boot the VM was:
+
+  LC_ALL=3DC PATH=3D/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin
+  QEMU_AUDIO_DRV=3Dnone /usr/libexec/qemu-kvm -name
+  guest=3Dinstance-00000002,debug-threads=3Don -S -object
+  secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/domain-1=
+-instance-00000002
+  /master-key.aes -machine pc-i440fx-rhel7.3.0,accel=3Dtcg,usb=3Doff -cpu
+  SandyBridge,+osxsave,+hypervisor,+xsaveopt -m 512 -realtime mlock=3Doff
+  -smp 1,sockets=3D1,cores=3D1,threads=3D1 -uuid ae38b0e1-b3ae-41ec-
+  8e50-c89669a2ec1c -smbios 'type=3D1,manufacturer=3DRed
+  Hat,product=3DOpenStack Compute,version=3D14.0.2-7.el7ost,serial=3Dedd3a6=
+7d-
+  6ce5-4c36-8f20-085d1097abb7,uuid=3Dae38b0e1-b3ae-41ec-
+  8e50-c89669a2ec1c,family=3DVirtual Machine' -no-user-config -nodefaults
+  -chardev
+  socket,id=3Dcharmonitor,path=3D/var/lib/libvirt/qemu/domain-1-instance-00=
+000002/monitor.sock,server,nowait
+  -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc base=3Dutc -n=
+o-
+  shutdown -boot strict=3Don -device piix3-usb-
+  uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2 -drive
+  file=3D/var/lib/nova/instances/ae38b0e1-b3ae-41ec-
+  8e50-c89669a2ec1c/disk,format=3Dqcow2,if=3Dnone,id=3Ddrive-virtio-
+  disk0,cache=3Dnone -device virtio-blk-
+  pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x4,drive=3Ddrive-virtio-disk0,id=3Dvir=
+tio-
+  disk0,bootindex=3D1 -netdev tap,fd=3D28,id=3Dhostnet0 -device virtio-net-
+  pci,netdev=3Dhostnet0,id=3Dnet0,mac=3Dfa:16:3e:c1:27:73,bus=3Dpci.0,addr=
+=3D0x3
+  -add-fd set=3D1,fd=3D31 -chardev
+  file,id=3Dcharserial0,path=3D/dev/fdset/1,append=3Don -device isa-
+  serial,chardev=3Dcharserial0,id=3Dserial0 -chardev pty,id=3Dcharserial1
+  -device isa-serial,chardev=3Dcharserial1,id=3Dserial1 -device usb-
+  tablet,id=3Dinput0,bus=3Dusb.0,port=3D1 -vnc 0.0.0.0:0 -k en-us -device
+  cirrus-vga,id=3Dvideo0,bus=3Dpci.0,addr=3D0x2 -device virtio-balloon-
+  pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x5 -msg timestamp=3Don
+
+  A qcow2 image can be downloaded from http://download.cirros-
+  cloud.net/0.3.4/cirros-0.3.4-x86_64-disk.img to reproduce the issue.
+  I've seen a similar failure with a CentOS 7.2 image.
+
+  I am also attaching the libvirt log from the failed VM.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1652333/+subscriptions
