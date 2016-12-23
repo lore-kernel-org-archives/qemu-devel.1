@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53864)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58542)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cKSjb-00085Z-6s
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 11:30:20 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cKTDF-0008Dq-BV
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 12:00:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cKSja-0005nF-D3
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 11:30:19 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cKTDE-00050f-D5
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 12:00:57 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri, 23 Dec 2016 17:29:00 +0300
-Message-ID: <1482503344-6424-18-git-send-email-vsementsov@virtuozzo.com>
+Date: Fri, 23 Dec 2016 17:28:47 +0300
+Message-ID: <1482503344-6424-5-git-send-email-vsementsov@virtuozzo.com>
 In-Reply-To: <1482503344-6424-1-git-send-email-vsementsov@virtuozzo.com>
 References: <1482503344-6424-1-git-send-email-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 17/21] backup: make all reads not serializing
+Subject: [Qemu-devel] [PATCH 04/21] backup: use copy_bitmap in incremental
+ backup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,92 +25,88 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, vsementsov@virtuozzo.com, pbonzini@redhat.com, jcody@redhat.com
 
-To simplify things make all reads not serializing, not only from
-notifiers. This is needed because after the following patch, there would
-not be strong division between reads from notifiers or not - they all
-would be called from one place.
+We can use copy_bitmap instead of sync_bitmap. copy_bitmap is
+initialized from sync_bitmap and it is more informative: we will not try
+to process data, that is already in progress (by write notifier).
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- block/backup.c | 20 ++++++++------------
- 1 file changed, 8 insertions(+), 12 deletions(-)
+ block/backup.c | 58 +++++++++++++++++++---------------------------------------
+ 1 file changed, 19 insertions(+), 39 deletions(-)
 
 diff --git a/block/backup.c b/block/backup.c
-index 442e6da..c2f7665 100644
+index f1f87f6..938b7df 100644
 --- a/block/backup.c
 +++ b/block/backup.c
-@@ -134,14 +134,13 @@ static bool coroutine_fn yield_and_check(BackupBlockJob *job)
+@@ -376,50 +376,30 @@ static bool coroutine_fn yield_and_check(BackupBlockJob *job)
  
- static int coroutine_fn backup_do_read(BackupBlockJob *job,
-                                        int64_t offset, unsigned int bytes,
--                                       QEMUIOVector *qiov,
--                                       bool is_write_notifier)
-+                                       QEMUIOVector *qiov)
+ static int coroutine_fn backup_run_incremental(BackupBlockJob *job)
  {
-     int ret;
--    BdrvRequestFlags flags = is_write_notifier ? BDRV_REQ_NO_SERIALISING : 0;
++    int ret;
+     bool error_is_read;
+-    int ret = 0;
+-    int clusters_per_iter;
+-    uint32_t granularity;
+-    int64_t sector;
+-    int64_t cluster;
+-    int64_t end;
+     int64_t sectors_per_cluster = cluster_size_sectors(job);
+-    BdrvDirtyBitmapIter *dbi;
+-
+-    granularity = bdrv_dirty_bitmap_granularity(job->sync_bitmap);
+-    clusters_per_iter = MAX((granularity / job->cluster_size), 1);
+-    dbi = bdrv_dirty_iter_new(job->sync_bitmap, 0);
+-
+-    /* Find the next dirty sector(s) */
+-    while ((sector = bdrv_dirty_iter_next(dbi)) != -1) {
+-        cluster = sector / sectors_per_cluster;
+-
+-        for (end = cluster + clusters_per_iter; cluster < end; cluster++) {
+-            do {
+-                if (yield_and_check(job)) {
+-                    goto out;
+-                }
+-                ret = backup_do_cow(job, cluster * sectors_per_cluster,
+-                                    sectors_per_cluster, &error_is_read,
+-                                    false);
+-                if ((ret < 0) &&
+-                    backup_error_action(job, error_is_read, -ret) ==
+-                    BLOCK_ERROR_ACTION_REPORT) {
+-                    goto out;
+-                }
+-            } while (ret < 0);
+-        }
++    int64_t cluster;
++    HBitmapIter hbi;
  
- retry:
--    ret = blk_co_preadv(job->common.blk, offset, bytes, qiov, flags);
-+    ret = blk_co_preadv(job->common.blk, offset, bytes, qiov,
-+                        BDRV_REQ_NO_SERIALISING);
-     if (ret < 0) {
-         trace_backup_do_read_fail(job, offset, bytes, ret);
- 
-@@ -190,7 +189,6 @@ retry:
- 
- static int coroutine_fn backup_copy_cluster(BackupBlockJob *job,
-                                             int64_t cluster,
--                                            bool is_write_notifier,
-                                             void *bounce_buffer)
- {
-     int n;
-@@ -210,8 +208,7 @@ static int coroutine_fn backup_copy_cluster(BackupBlockJob *job,
-     iov.iov_len = n * BDRV_SECTOR_SIZE;
-     qemu_iovec_init_external(&bounce_qiov, &iov, 1);
- 
--    ret = backup_do_read(job, offset, bounce_qiov.size, &bounce_qiov,
--                         is_write_notifier);
-+    ret = backup_do_read(job, offset, bounce_qiov.size, &bounce_qiov);
-     if (ret < 0) {
-         return ret;
+-        /* If the bitmap granularity is smaller than the backup granularity,
+-         * we need to advance the iterator pointer to the next cluster. */
+-        if (granularity < job->cluster_size) {
+-            bdrv_set_dirty_iter(dbi, cluster * sectors_per_cluster);
+-        }
++    hbitmap_iter_init(&hbi, job->copy_bitmap, 0);
++    while ((cluster = hbitmap_iter_next(&hbi)) != -1) {
++        do {
++            if (yield_and_check(job)) {
++                return 0;
++            }
++            ret = backup_do_cow(job, cluster * sectors_per_cluster,
++                                sectors_per_cluster, &error_is_read,
++                                false);
++            if ((ret < 0) &&
++                backup_error_action(job, error_is_read, -ret) ==
++                BLOCK_ERROR_ACTION_REPORT) {
++                return ret;
++            }
++        } while (ret < 0);
      }
-@@ -231,8 +228,7 @@ static int coroutine_fn backup_copy_cluster(BackupBlockJob *job,
+ 
+-out:
+-    bdrv_dirty_iter_free(dbi);
+-    return ret;
++    return 0;
  }
  
- static int coroutine_fn backup_do_cow(BackupBlockJob *job,
--                                      int64_t sector_num, int nb_sectors,
--                                      bool is_write_notifier)
-+                                      int64_t sector_num, int nb_sectors)
- {
-     BlockBackend *blk = job->common.blk;
-     CowRequest cow_request;
-@@ -262,7 +258,7 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
-             bounce_buffer = blk_blockalign(blk, job->cluster_size);
-         }
- 
--        ret = backup_copy_cluster(job, start, is_write_notifier, bounce_buffer);
-+        ret = backup_copy_cluster(job, start, bounce_buffer);
-         if (ret < 0) {
-             hbitmap_set(job->copy_bitmap, start, 1);
-             goto out;
-@@ -296,7 +292,7 @@ static int coroutine_fn backup_before_write_notify(
-     assert((req->offset & (BDRV_SECTOR_SIZE - 1)) == 0);
-     assert((req->bytes & (BDRV_SECTOR_SIZE - 1)) == 0);
- 
--    return backup_do_cow(job, sector_num, nb_sectors, true);
-+    return backup_do_cow(job, sector_num, nb_sectors);
- }
- 
- static void backup_set_speed(BlockJob *job, int64_t speed, Error **errp)
-@@ -544,7 +540,7 @@ static int coroutine_fn backup_loop(BackupBlockJob *job)
-         }
- 
-         ret = backup_do_cow(job, cluster * sectors_per_cluster,
--                            sectors_per_cluster, false);
-+                            sectors_per_cluster);
-         if (ret < 0) {
-             return ret;
-         }
+ /* init copy_bitmap from sync_bitmap */
 -- 
 1.8.3.1
