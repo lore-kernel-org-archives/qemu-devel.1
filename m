@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40549)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40742)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cKUBL-0000cw-O4
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 13:03:04 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cKUC3-00010N-AT
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 13:03:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cKUBK-0005IK-NE
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 13:03:03 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cKUC2-0005Tv-IB
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 13:03:47 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri, 23 Dec 2016 17:28:57 +0300
-Message-ID: <1482503344-6424-15-git-send-email-vsementsov@virtuozzo.com>
+Date: Fri, 23 Dec 2016 17:28:55 +0300
+Message-ID: <1482503344-6424-13-git-send-email-vsementsov@virtuozzo.com>
 In-Reply-To: <1482503344-6424-1-git-send-email-vsementsov@virtuozzo.com>
 References: <1482503344-6424-1-git-send-email-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 14/21] block: add trace point on bdrv_close_all
+Subject: [Qemu-devel] [PATCH 12/21] iotests: add supported_cache_modes to
+ main function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,33 +27,40 @@ Cc: kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, famz@redhat.com, den@
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- block.c            | 1 +
- block/trace-events | 1 +
- 2 files changed, 2 insertions(+)
+ tests/qemu-iotests/iotests.py | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/block.c b/block.c
-index 39ddea3..3aa433b 100644
---- a/block.c
-+++ b/block.c
-@@ -2372,6 +2372,7 @@ static void bdrv_close(BlockDriverState *bs)
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+index bec8eb4..a5ef9c3 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -348,6 +348,10 @@ def verify_platform(supported_oses=['linux']):
+     if True not in [sys.platform.startswith(x) for x in supported_oses]:
+         notrun('not suitable for this OS: %s' % sys.platform)
  
- void bdrv_close_all(void)
- {
-+    trace_bdrv_close_all();
-     block_job_cancel_sync_all();
-     nbd_export_close_all();
++def verify_cache_mode(supported_cache_modes=[]):
++    if supported_cache_modes and (cachemode not in supported_cache_modes):
++        notrun('not suitable for this cache mode: %s' % cachemode)
++
+ def supports_quorum():
+     return 'quorum' in qemu_img_pipe('--help')
  
-diff --git a/block/trace-events b/block/trace-events
-index 832e8ed..e7a7372 100644
---- a/block/trace-events
-+++ b/block/trace-events
-@@ -3,6 +3,7 @@
- # block.c
- bdrv_open_common(void *bs, const char *filename, int flags, const char *format_name) "bs %p filename \"%s\" flags %#x format_name \"%s\""
- bdrv_lock_medium(void *bs, bool locked) "bs %p locked %d"
-+bdrv_close_all(void) ""
+@@ -356,7 +360,7 @@ def verify_quorum():
+     if not supports_quorum():
+         notrun('quorum support missing')
  
- # block/block-backend.c
- blk_co_preadv(void *blk, void *bs, int64_t offset, unsigned int bytes, int flags) "blk %p bs %p offset %"PRId64" bytes %u flags %x"
+-def main(supported_fmts=[], supported_oses=['linux']):
++def main(supported_fmts=[], supported_oses=['linux'], supported_cache_modes=[]):
+     '''Run tests'''
+ 
+     global debug
+@@ -373,6 +377,7 @@ def main(supported_fmts=[], supported_oses=['linux']):
+     verbosity = 1
+     verify_image_format(supported_fmts)
+     verify_platform(supported_oses)
++    verify_cache_mode(supported_cache_modes)
+ 
+     # We need to filter out the time taken from the output so that qemu-iotest
+     # can reliably diff the results against master output.
 -- 
 1.8.3.1
