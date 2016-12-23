@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53496)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58256)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cKORs-0000Qw-0B
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 06:55:45 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cKOhu-0003PO-US
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 07:12:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cKORo-0001rH-Tn
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 06:55:44 -0500
-Received: from indium.canonical.com ([91.189.90.7]:47785)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cKORo-0001qz-LP
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 06:55:40 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cKORn-00072D-7p
-	for <qemu-devel@nongnu.org>; Fri, 23 Dec 2016 11:55:39 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 297152E80AF
-	for <qemu-devel@nongnu.org>; Fri, 23 Dec 2016 11:55:39 +0000 (UTC)
+	(envelope-from <pbonzini@redhat.com>) id 1cKOhp-00088O-TA
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 07:12:18 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45540)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cKOhp-00088C-N7
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 07:12:13 -0500
+References: <20161222152300.32395-1-pbonzini@redhat.com>
+	<CAFEAcA_EyA1WycYOoqZP767GiufX=DV59v4Hgb=dhk+NoE3X5w@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <5c86185e-a0bb-504e-c8eb-94e07530ed2e@redhat.com>
+Date: Fri, 23 Dec 2016 13:12:10 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <CAFEAcA_EyA1WycYOoqZP767GiufX=DV59v4Hgb=dhk+NoE3X5w@mail.gmail.com>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 23 Dec 2016 11:48:29 -0000
-From: LPNow <77777@tutanota.de>
-Reply-To: Bug 1652286 <1652286@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <20161223114830.15083.74920.malonedeb@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1652286] [NEW] man qemu 2.8.0
+Subject: Re: [Qemu-devel] [PULL 00/25] First round of misc patches for QEMU
+ 2.9
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,45 +28,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-
-Public bug reported:
-
-I noticed when I ran 'man qemu' for version 2.8.0 I am getting this back
-at the terminal;
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
 
-<standard input>:1674: warning [p 1, 188.5i, div `an-div', 0.2i]: can't bre=
-ak line
-<standard input>:1677: warning [p 1, 188.8i, div `an-div', 0.2i]: can't bre=
-ak line
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+On 23/12/2016 12:15, Peter Maydell wrote:
+>> * core support for MemoryRegionCache from myself
+>> * rules.mak speedup and cleanups from myself and Marc-Adnr=E9
+>> * multiboot command line fix from Vlad
+>> * SCSI fixes from myself
+>> * small qemu-timer speedup from myself
+>> * x86 debugging improvements from Doug
+>> * configurable Q35 devices from  Chao
+>> * x86 5-level paging support from Kirill
+>> * x86 SHA_NI support for KVM from Yi Sun
+>> * improved kvmclock migration logic from Marcelo
+>> * bugfixes and doc fixes from others
+> Applied, thanks. (Nice to see that git is smart enough to
+> be able to merge this on top of the earlier target-* rename.)
 
--- =
+Actually I did the rebase myself.  But yes, I also hardly noticed the
+rename.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1652286
-
-Title:
-  man qemu 2.8.0
-
-Status in QEMU:
-  New
-
-Bug description:
-  I noticed when I ran 'man qemu' for version 2.8.0 I am getting this
-  back at the terminal;
-
-  =
-
-  <standard input>:1674: warning [p 1, 188.5i, div `an-div', 0.2i]: can't b=
-reak line
-  <standard input>:1677: warning [p 1, 188.8i, div `an-div', 0.2i]: can't b=
-reak line
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1652286/+subscriptions
+Paolo
