@@ -1,28 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53540)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53862)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cKSit-0007ZG-Ca
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 11:29:36 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cKSjb-00085S-2P
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 11:30:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cKSip-0005EZ-FV
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 11:29:35 -0500
-Received: from mail-wj0-x242.google.com ([2a00:1450:400c:c01::242]:35402)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1cKSip-0005EB-9c
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 11:29:31 -0500
-Received: by mail-wj0-x242.google.com with SMTP id hb5so7719929wjc.2
-	for <qemu-devel@nongnu.org>; Fri, 23 Dec 2016 08:29:31 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <20161223151253.21338-1-msuchanek@suse.de>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <81f6aacf-018f-254a-5b85-6d8d9e93adbd@redhat.com>
-Date: Fri, 23 Dec 2016 17:29:28 +0100
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cKSja-0005mr-4s
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 11:30:19 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Fri, 23 Dec 2016 17:28:58 +0300
+Message-ID: <1482503344-6424-16-git-send-email-vsementsov@virtuozzo.com>
+In-Reply-To: <1482503344-6424-1-git-send-email-vsementsov@virtuozzo.com>
+References: <1482503344-6424-1-git-send-email-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <20161223151253.21338-1-msuchanek@suse.de>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC PATCH] Fix pasting into serial console in GTK
- ui
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH 15/21] bitmap: add bitmap_count_between()
+ function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,22 +22,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michal Suchanek <msuchanek@suse.de>, qemu-devel@nongnu.org
+To: qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, vsementsov@virtuozzo.com, pbonzini@redhat.com, jcody@redhat.com
 
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
+---
+ include/qemu/bitmap.h |  4 ++++
+ util/bitmap.c         | 27 +++++++++++++++++++++++++++
+ 2 files changed, 31 insertions(+)
 
-
-On 23/12/2016 16:12, Michal Suchanek wrote:
-> This copies the timer hack from ui/console.c kbd_send_chars to ui/gtk.c
-> gd_vc_in.
-> 
-> There is no fd-like object to peek repatedly so the paste data is saved
-> in a free-floating buffer only submitted to gtk_timeout_add. Multiple
-> pastes can potentially interleave if qemu blocks for long or the user
-> pastes fast.
-
-Do not use a timer, instead set chr->chr_accept_input in gd_vc_handler.
-The callback can do basically what you are doing in gd_vc_in_timer.  The
-buffer can be just a GString plus a "head" pointer, in VirtualConsole.
-Once the head catches up with the tail, you can free the GString.
-
-Paolo
+diff --git a/include/qemu/bitmap.h b/include/qemu/bitmap.h
+index 63ea2d0..3bfc33e 100644
+--- a/include/qemu/bitmap.h
++++ b/include/qemu/bitmap.h
+@@ -216,6 +216,10 @@ static inline int bitmap_intersects(const unsigned long *src1,
+     }
+ }
+ 
++unsigned long bitmap_count_between(const unsigned long *src,
++                                   unsigned long start,
++                                   unsigned long end);
++
+ void bitmap_set(unsigned long *map, long i, long len);
+ void bitmap_set_atomic(unsigned long *map, long i, long len);
+ void bitmap_clear(unsigned long *map, long start, long nr);
+diff --git a/util/bitmap.c b/util/bitmap.c
+index 43ed011..e5aaa1c 100644
+--- a/util/bitmap.c
++++ b/util/bitmap.c
+@@ -336,3 +336,30 @@ int slow_bitmap_intersects(const unsigned long *bitmap1,
+     }
+     return 0;
+ }
++
++unsigned long bitmap_count_between(const unsigned long *src,
++                                   unsigned long start,
++                                   unsigned long end)
++{
++    unsigned long first = start / BITS_PER_LONG;
++    unsigned long lim = end / BITS_PER_LONG;
++    unsigned long sum, i;
++
++    assert(start < end);
++
++    sum = ctpopl(src[first] & BITMAP_FIRST_WORD_MASK(start));
++
++    for (i = first + 1; i < lim; ++i) {
++        sum += ctpopl(src[i]);
++    }
++
++    if (end % BITS_PER_LONG) {
++        if (first == lim) {
++            sum -= ctpopl(src[first] & BITMAP_FIRST_WORD_MASK(end));
++        } else {
++            sum += ctpopl(src[i] & BITMAP_LAST_WORD_MASK(end));
++        }
++    }
++
++    return sum;
++}
+-- 
+1.8.3.1
