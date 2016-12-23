@@ -1,18 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58952)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59860)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cKW4G-0001dk-9p
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 15:03:53 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cKW9i-0003NV-4g
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 15:09:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cKW4F-0008Ks-Ho
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 15:03:52 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri, 23 Dec 2016 17:28:56 +0300
-Message-ID: <1482503344-6424-14-git-send-email-vsementsov@virtuozzo.com>
-In-Reply-To: <1482503344-6424-1-git-send-email-vsementsov@virtuozzo.com>
-References: <1482503344-6424-1-git-send-email-vsementsov@virtuozzo.com>
+	(envelope-from <rth7680@gmail.com>) id 1cKW9g-0001Ep-I6
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 15:09:30 -0500
+Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:33076)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cKW9g-0001Dv-8M
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 15:09:28 -0500
+Received: by mail-pg0-x243.google.com with SMTP id g1so1479202pgn.0
+	for <qemu-devel@nongnu.org>; Fri, 23 Dec 2016 12:09:28 -0800 (PST)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <148243173750.7321.8231977784466776952.stgit@fimbulvetr.bsc.es>
+	<cf19ab2b-ef52-9fa3-dea8-662c4513379c@twiddle.net>
+	<87bmw24gy2.fsf@fimbulvetr.bsc.es>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <09280ca2-06f0-12f5-4217-0d9f79e4ee90@twiddle.net>
+Date: Fri, 23 Dec 2016 12:09:24 -0800
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 13/21] coroutine: add qemu_coroutine_add_next
+In-Reply-To: <87bmw24gy2.fsf@fimbulvetr.bsc.es>
+Content-Type: multipart/mixed; boundary="------------47074E00914B58EBF7FE77F0"
+Subject: Re: [Qemu-devel] [PATCH v3 0/6] trace: [tcg] Optimize per-vCPU
+ tracing states with separate TB caches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,42 +31,181 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, vsementsov@virtuozzo.com, pbonzini@redhat.com, jcody@redhat.com
+To: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Simple add coroutine to self->co_queue_wakeup.
+This is a multi-part message in MIME format.
+--------------47074E00914B58EBF7FE77F0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- include/qemu/coroutine.h | 2 ++
- util/qemu-coroutine.c    | 7 +++++++
- 2 files changed, 9 insertions(+)
+On 12/23/2016 10:51 AM, Lluís Vilanova wrote:
+>> On 12/22/2016 10:35 AM, Lluís Vilanova wrote:
+>>> To handle both issues, this series replicates the shared physical TB cache,
+>>> creating a separate physical TB cache for every combination of event states
+>>> (those with the 'vcpu' and 'tcg' properties). Then, all vCPUs tracing the same
+>>> events will use the same physical TB cache.
+> 
+>> Why do we need to "split the physical TB cache" as opposed to simply including
+>> the trace state into the TB hash function?
+> 
+> Mmmm, that's an interesting alternative I did not consider. Are you aiming at
+> minimizing the changes, or do you also think it would be more efficient?
 
-diff --git a/include/qemu/coroutine.h b/include/qemu/coroutine.h
-index e6a60d5..6e87c87 100644
---- a/include/qemu/coroutine.h
-+++ b/include/qemu/coroutine.h
-@@ -226,4 +226,6 @@ void coroutine_fn co_aio_sleep_ns(AioContext *ctx, QEMUClockType type,
-  */
- void coroutine_fn yield_until_fd_readable(int fd);
- 
-+void qemu_coroutine_add_next(Coroutine *next);
-+
- #endif /* QEMU_COROUTINE_H */
-diff --git a/util/qemu-coroutine.c b/util/qemu-coroutine.c
-index 737bffa..300b96d 100644
---- a/util/qemu-coroutine.c
-+++ b/util/qemu-coroutine.c
-@@ -151,3 +151,10 @@ bool qemu_coroutine_entered(Coroutine *co)
- {
-     return co->caller;
- }
-+
-+void qemu_coroutine_add_next(Coroutine *next)
-+{
-+    Coroutine *self = qemu_coroutine_self();
-+    QSIMPLEQ_INSERT_TAIL(&self->co_queue_wakeup, next, co_queue_next);
-+    trace_qemu_co_queue_next(next);
-+}
--- 
-1.8.3.1
+I suspect that it will be more efficient.
+
+> The dynamic tracing state would then be an arbitrarily long bitmap (defined by
+> the number of events with the 'vcpu' property), so I'm not sure how to fit it
+> into the hashing function with minimal collisions (the bitmap is now limited to
+> an unsigned long to use it as an index to the TB cache "matrix").
+
+You could consider that index a unique identifier for the tracing state, and
+then only compare and hash that integer.
+
+> The other drawback I see is that then it would also take longer to compute the
+> hashing function, instead of the simpler array indexing. As a benefit, workloads
+> with a high frequency of TB-flushing operations might be a bit faster (there
+> would be a single QHT).
+
+I don't see adding one more integer to the hashing function to be significant
+at all.  Certainly not the 15% that you describe in your cover letter.
+
+> If someone can provide me the code for the modified hash lookup function to
+> account for the trace dstate bitmap contents, I will integrate it and measure if
+> there is any important change in performance.
+
+Something like the following should do it.  There are two /* cpu->??? */
+markers that would need to be filled in.
+
+If you can reduce the tracing identifier to 8 bits, that would be excellent.
+I've been wanting to make some other changes to TB hashing, and that would fit
+in well with a second "flags" value.
+
+
+r~
+
+--------------47074E00914B58EBF7FE77F0
+Content-Type: text/plain; charset=UTF-8;
+ name="z"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+ filename="z"
+
+ZGlmZiAtLWdpdCBhL2NwdS1leGVjLmMgYi9jcHUtZXhlYy5jCmluZGV4IDQxODhmZWQuLjNi
+NTQzMTcgMTAwNjQ0Ci0tLSBhL2NwdS1leGVjLmMKKysrIGIvY3B1LWV4ZWMuYwpAQCAtMjYx
+LDYgKzI2MSw3IEBAIHN0cnVjdCB0Yl9kZXNjIHsKICAgICBDUFVBcmNoU3RhdGUgKmVudjsK
+ICAgICB0Yl9wYWdlX2FkZHJfdCBwaHlzX3BhZ2UxOwogICAgIHVpbnQzMl90IGZsYWdzOwor
+ICAgIHVpbnQzMl90IHRyYWNlaWQ7CiB9OwogCiBzdGF0aWMgYm9vbCB0Yl9jbXAoY29uc3Qg
+dm9pZCAqcCwgY29uc3Qgdm9pZCAqZCkKQEAgLTI3Miw2ICsyNzMsNyBAQCBzdGF0aWMgYm9v
+bCB0Yl9jbXAoY29uc3Qgdm9pZCAqcCwgY29uc3Qgdm9pZCAqZCkKICAgICAgICAgdGItPnBh
+Z2VfYWRkclswXSA9PSBkZXNjLT5waHlzX3BhZ2UxICYmCiAgICAgICAgIHRiLT5jc19iYXNl
+ID09IGRlc2MtPmNzX2Jhc2UgJiYKICAgICAgICAgdGItPmZsYWdzID09IGRlc2MtPmZsYWdz
+ICYmCisgICAgICAgIHRiLT50cmFjZWlkID09IGRlc2MtPnRyYWNlaWQgJiYKICAgICAgICAg
+IWF0b21pY19yZWFkKCZ0Yi0+aW52YWxpZCkpIHsKICAgICAgICAgLyogY2hlY2sgbmV4dCBw
+YWdlIGlmIG5lZWRlZCAqLwogICAgICAgICBpZiAodGItPnBhZ2VfYWRkclsxXSA9PSAtMSkg
+ewpAQCAtMjkzLDcgKzI5NSw4IEBAIHN0YXRpYyBib29sIHRiX2NtcChjb25zdCB2b2lkICpw
+LCBjb25zdCB2b2lkICpkKQogc3RhdGljIFRyYW5zbGF0aW9uQmxvY2sgKnRiX2h0YWJsZV9s
+b29rdXAoQ1BVU3RhdGUgKmNwdSwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgIHRhcmdldF91bG9uZyBwYywKICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgIHRhcmdldF91bG9uZyBjc19iYXNlLAotICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgdWludDMyX3QgZmxhZ3MpCisgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB1aW50MzJfdCBmbGFncywKKyAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHVpbnQzMl90IHRyYWNlaWQp
+CiB7CiAgICAgdGJfcGFnZV9hZGRyX3QgcGh5c19wYzsKICAgICBzdHJ1Y3QgdGJfZGVzYyBk
+ZXNjOwpAQCAtMzAyLDEwICszMDUsMTEgQEAgc3RhdGljIFRyYW5zbGF0aW9uQmxvY2sgKnRi
+X2h0YWJsZV9sb29rdXAoQ1BVU3RhdGUgKmNwdSwKICAgICBkZXNjLmVudiA9IChDUFVBcmNo
+U3RhdGUgKiljcHUtPmVudl9wdHI7CiAgICAgZGVzYy5jc19iYXNlID0gY3NfYmFzZTsKICAg
+ICBkZXNjLmZsYWdzID0gZmxhZ3M7CisgICAgZGVzYy50cmFjZWlkID0gdHJhY2VpZDsKICAg
+ICBkZXNjLnBjID0gcGM7CiAgICAgcGh5c19wYyA9IGdldF9wYWdlX2FkZHJfY29kZShkZXNj
+LmVudiwgcGMpOwogICAgIGRlc2MucGh5c19wYWdlMSA9IHBoeXNfcGMgJiBUQVJHRVRfUEFH
+RV9NQVNLOwotICAgIGggPSB0Yl9oYXNoX2Z1bmMocGh5c19wYywgcGMsIGZsYWdzKTsKKyAg
+ICBoID0gdGJfaGFzaF9mdW5jKHBoeXNfcGMsIHBjLCBmbGFncywgdHJhY2VpZCk7CiAgICAg
+cmV0dXJuIHFodF9sb29rdXAoJnRjZ19jdHgudGJfY3R4Lmh0YWJsZSwgdGJfY21wLCAmZGVz
+YywgaCk7CiB9CiAKQEAgLTMxNyw2ICszMjEsNyBAQCBzdGF0aWMgaW5saW5lIFRyYW5zbGF0
+aW9uQmxvY2sgKnRiX2ZpbmQoQ1BVU3RhdGUgKmNwdSwKICAgICBUcmFuc2xhdGlvbkJsb2Nr
+ICp0YjsKICAgICB0YXJnZXRfdWxvbmcgY3NfYmFzZSwgcGM7CiAgICAgdWludDMyX3QgZmxh
+Z3M7CisgICAgdWludDMyX3QgdHJhY2VpZCA9IDAgLyogY3B1LT4/Pz8gKi87CiAgICAgYm9v
+bCBoYXZlX3RiX2xvY2sgPSBmYWxzZTsKIAogICAgIC8qIHdlIHJlY29yZCBhIHN1YnNldCBv
+ZiB0aGUgQ1BVIHN0YXRlLiBJdCB3aWxsCkBAIC0zMjUsOCArMzMwLDggQEAgc3RhdGljIGlu
+bGluZSBUcmFuc2xhdGlvbkJsb2NrICp0Yl9maW5kKENQVVN0YXRlICpjcHUsCiAgICAgY3B1
+X2dldF90Yl9jcHVfc3RhdGUoZW52LCAmcGMsICZjc19iYXNlLCAmZmxhZ3MpOwogICAgIHRi
+ID0gYXRvbWljX3JjdV9yZWFkKCZjcHUtPnRiX2ptcF9jYWNoZVt0Yl9qbXBfY2FjaGVfaGFz
+aF9mdW5jKHBjKV0pOwogICAgIGlmICh1bmxpa2VseSghdGIgfHwgdGItPnBjICE9IHBjIHx8
+IHRiLT5jc19iYXNlICE9IGNzX2Jhc2UgfHwKLSAgICAgICAgICAgICAgICAgdGItPmZsYWdz
+ICE9IGZsYWdzKSkgewotICAgICAgICB0YiA9IHRiX2h0YWJsZV9sb29rdXAoY3B1LCBwYywg
+Y3NfYmFzZSwgZmxhZ3MpOworICAgICAgICAgICAgICAgICB0Yi0+ZmxhZ3MgIT0gZmxhZ3Mg
+fHwgdGItPnRyYWNlaWQgIT0gdHJhY2VpZCkpIHsKKyAgICAgICAgdGIgPSB0Yl9odGFibGVf
+bG9va3VwKGNwdSwgcGMsIGNzX2Jhc2UsIGZsYWdzLCB0cmFjZWlkKTsKICAgICAgICAgaWYg
+KCF0YikgewogCiAgICAgICAgICAgICAvKiBtbWFwX2xvY2sgaXMgbmVlZGVkIGJ5IHRiX2dl
+bl9jb2RlLCBhbmQgbW1hcF9sb2NrIG11c3QgYmUKQEAgLTM0MCw3ICszNDUsNyBAQCBzdGF0
+aWMgaW5saW5lIFRyYW5zbGF0aW9uQmxvY2sgKnRiX2ZpbmQoQ1BVU3RhdGUgKmNwdSwKICAg
+ICAgICAgICAgIC8qIFRoZXJlJ3MgYSBjaGFuY2UgdGhhdCBvdXIgZGVzaXJlZCB0YiBoYXMg
+YmVlbiB0cmFuc2xhdGVkIHdoaWxlCiAgICAgICAgICAgICAgKiB0YWtpbmcgdGhlIGxvY2tz
+IHNvIHdlIGNoZWNrIGFnYWluIGluc2lkZSB0aGUgbG9jay4KICAgICAgICAgICAgICAqLwot
+ICAgICAgICAgICAgdGIgPSB0Yl9odGFibGVfbG9va3VwKGNwdSwgcGMsIGNzX2Jhc2UsIGZs
+YWdzKTsKKyAgICAgICAgICAgIHRiID0gdGJfaHRhYmxlX2xvb2t1cChjcHUsIHBjLCBjc19i
+YXNlLCBmbGFncywgdHJhY2VpZCk7CiAgICAgICAgICAgICBpZiAoIXRiKSB7CiAgICAgICAg
+ICAgICAgICAgLyogaWYgbm8gdHJhbnNsYXRlZCBjb2RlIGF2YWlsYWJsZSwgdGhlbiB0cmFu
+c2xhdGUgaXQgbm93ICovCiAgICAgICAgICAgICAgICAgdGIgPSB0Yl9nZW5fY29kZShjcHUs
+IHBjLCBjc19iYXNlLCBmbGFncywgMCk7CmRpZmYgLS1naXQgYS9pbmNsdWRlL2V4ZWMvZXhl
+Yy1hbGwuaCBiL2luY2x1ZGUvZXhlYy9leGVjLWFsbC5oCmluZGV4IGE4YzEzY2UuLjQwZTg2
+N2QgMTAwNjQ0Ci0tLSBhL2luY2x1ZGUvZXhlYy9leGVjLWFsbC5oCisrKyBiL2luY2x1ZGUv
+ZXhlYy9leGVjLWFsbC5oCkBAIC0yMTUsNiArMjE1LDcgQEAgc3RydWN0IFRyYW5zbGF0aW9u
+QmxvY2sgewogI2RlZmluZSBDRl9JR05PUkVfSUNPVU5UIDB4NDAwMDAgLyogRG8gbm90IGdl
+bmVyYXRlIGljb3VudCBjb2RlICovCiAKICAgICB1aW50MTZfdCBpbnZhbGlkOworICAgIHVp
+bnQxNl90IHRyYWNlaWQ7IC8qIGlkZW50aWZpZXIgZm9yIHRyYWNpbmcgc3RhdGUgKi8KIAog
+ICAgIHZvaWQgKnRjX3B0cjsgICAgLyogcG9pbnRlciB0byB0aGUgdHJhbnNsYXRlZCBjb2Rl
+ICovCiAgICAgdWludDhfdCAqdGNfc2VhcmNoOyAgLyogcG9pbnRlciB0byBzZWFyY2ggZGF0
+YSAqLwpkaWZmIC0tZ2l0IGEvaW5jbHVkZS9leGVjL3RiLWhhc2gteHguaCBiL2luY2x1ZGUv
+ZXhlYy90Yi1oYXNoLXh4LmgKaW5kZXggMmM0MGI1Yy4uNzg3Mzc0MCAxMDA2NDQKLS0tIGEv
+aW5jbHVkZS9leGVjL3RiLWhhc2gteHguaAorKysgYi9pbmNsdWRlL2V4ZWMvdGItaGFzaC14
+eC5oCkBAIC00OSw3ICs0OSw3IEBACiAgKiBjb250aWd1b3VzIGluIG1lbW9yeS4KICAqLwog
+c3RhdGljIGlubGluZQotdWludDMyX3QgdGJfaGFzaF9mdW5jNSh1aW50NjRfdCBhMCwgdWlu
+dDY0X3QgYjAsIHVpbnQzMl90IGUpCit1aW50MzJfdCB0Yl9oYXNoX2Z1bmM2KHVpbnQ2NF90
+IGEwLCB1aW50NjRfdCBiMCwgdWludDMyX3QgZSwgdWludDMyX3QgZikKIHsKICAgICB1aW50
+MzJfdCB2MSA9IFRCX0hBU0hfWFhfU0VFRCArIFBSSU1FMzJfMSArIFBSSU1FMzJfMjsKICAg
+ICB1aW50MzJfdCB2MiA9IFRCX0hBU0hfWFhfU0VFRCArIFBSSU1FMzJfMjsKQEAgLTgzLDYg
+KzgzLDkgQEAgdWludDMyX3QgdGJfaGFzaF9mdW5jNSh1aW50NjRfdCBhMCwgdWludDY0X3Qg
+YjAsIHVpbnQzMl90IGUpCiAgICAgaDMyICs9IGUgKiBQUklNRTMyXzM7CiAgICAgaDMyICA9
+IHJvbDMyKGgzMiwgMTcpICogUFJJTUUzMl80OwogCisgICAgaDMyICs9IGYgKiBQUklNRTMy
+XzM7CisgICAgaDMyICA9IHJvbDMyKGgzMiwgMTcpICogUFJJTUUzMl80OworCiAgICAgaDMy
+IF49IGgzMiA+PiAxNTsKICAgICBoMzIgKj0gUFJJTUUzMl8yOwogICAgIGgzMiBePSBoMzIg
+Pj4gMTM7CmRpZmYgLS1naXQgYS9pbmNsdWRlL2V4ZWMvdGItaGFzaC5oIGIvaW5jbHVkZS9l
+eGVjL3RiLWhhc2guaAppbmRleCAyYzI3NDkwLi41NjY0ODUxIDEwMDY0NAotLS0gYS9pbmNs
+dWRlL2V4ZWMvdGItaGFzaC5oCisrKyBiL2luY2x1ZGUvZXhlYy90Yi1oYXNoLmgKQEAgLTQ2
+LDkgKzQ2LDEwIEBAIHN0YXRpYyBpbmxpbmUgdW5zaWduZWQgaW50IHRiX2ptcF9jYWNoZV9o
+YXNoX2Z1bmModGFyZ2V0X3Vsb25nIHBjKQogfQogCiBzdGF0aWMgaW5saW5lCi11aW50MzJf
+dCB0Yl9oYXNoX2Z1bmModGJfcGFnZV9hZGRyX3QgcGh5c19wYywgdGFyZ2V0X3Vsb25nIHBj
+LCB1aW50MzJfdCBmbGFncykKK3VpbnQzMl90IHRiX2hhc2hfZnVuYyh0Yl9wYWdlX2FkZHJf
+dCBwaHlzX3BjLCB0YXJnZXRfdWxvbmcgcGMsCisgICAgICAgICAgICAgICAgICAgICAgdWlu
+dDMyX3QgZmxhZ3MsIHVpbnQzMl90IHRyYWNlaWQpCiB7Ci0gICAgcmV0dXJuIHRiX2hhc2hf
+ZnVuYzUocGh5c19wYywgcGMsIGZsYWdzKTsKKyAgICByZXR1cm4gdGJfaGFzaF9mdW5jNihw
+aHlzX3BjLCBwYywgZmxhZ3MsIHRyYWNlaWQpOwogfQogCiAjZW5kaWYKZGlmZiAtLWdpdCBh
+L3Rlc3RzL3FodC1iZW5jaC5jIGIvdGVzdHMvcWh0LWJlbmNoLmMKaW5kZXggMmFmYTA5ZC4u
+MTFjMWNlYyAxMDA2NDQKLS0tIGEvdGVzdHMvcWh0LWJlbmNoLmMKKysrIGIvdGVzdHMvcWh0
+LWJlbmNoLmMKQEAgLTEwMyw3ICsxMDMsNyBAQCBzdGF0aWMgYm9vbCBpc19lcXVhbChjb25z
+dCB2b2lkICpvYmosIGNvbnN0IHZvaWQgKnVzZXJwKQogCiBzdGF0aWMgaW5saW5lIHVpbnQz
+Ml90IGgodW5zaWduZWQgbG9uZyB2KQogewotICAgIHJldHVybiB0Yl9oYXNoX2Z1bmM1KHYs
+IDAsIDApOworICAgIHJldHVybiB0Yl9oYXNoX2Z1bmM2KHYsIDAsIDAsIDApOwogfQogCiAv
+KgpkaWZmIC0tZ2l0IGEvdHJhbnNsYXRlLWFsbC5jIGIvdHJhbnNsYXRlLWFsbC5jCmluZGV4
+IDNkZDkyMTQuLmVlODY4MjIgMTAwNjQ0Ci0tLSBhL3RyYW5zbGF0ZS1hbGwuYworKysgYi90
+cmFuc2xhdGUtYWxsLmMKQEAgLTExMTAsNyArMTExMCw3IEBAIHZvaWQgdGJfcGh5c19pbnZh
+bGlkYXRlKFRyYW5zbGF0aW9uQmxvY2sgKnRiLCB0Yl9wYWdlX2FkZHJfdCBwYWdlX2FkZHIp
+CiAKICAgICAvKiByZW1vdmUgdGhlIFRCIGZyb20gdGhlIGhhc2ggbGlzdCAqLwogICAgIHBo
+eXNfcGMgPSB0Yi0+cGFnZV9hZGRyWzBdICsgKHRiLT5wYyAmIH5UQVJHRVRfUEFHRV9NQVNL
+KTsKLSAgICBoID0gdGJfaGFzaF9mdW5jKHBoeXNfcGMsIHRiLT5wYywgdGItPmZsYWdzKTsK
+KyAgICBoID0gdGJfaGFzaF9mdW5jKHBoeXNfcGMsIHRiLT5wYywgdGItPmZsYWdzLCB0Yi0+
+dHJhY2VpZCk7CiAgICAgcWh0X3JlbW92ZSgmdGNnX2N0eC50Yl9jdHguaHRhYmxlLCB0Yiwg
+aCk7CiAKICAgICAvKiByZW1vdmUgdGhlIFRCIGZyb20gdGhlIHBhZ2UgbGlzdCAqLwpAQCAt
+MTI1NSw3ICsxMjU1LDcgQEAgc3RhdGljIHZvaWQgdGJfbGlua19wYWdlKFRyYW5zbGF0aW9u
+QmxvY2sgKnRiLCB0Yl9wYWdlX2FkZHJfdCBwaHlzX3BjLAogICAgIH0KIAogICAgIC8qIGFk
+ZCBpbiB0aGUgaGFzaCB0YWJsZSAqLwotICAgIGggPSB0Yl9oYXNoX2Z1bmMocGh5c19wYywg
+dGItPnBjLCB0Yi0+ZmxhZ3MpOworICAgIGggPSB0Yl9oYXNoX2Z1bmMocGh5c19wYywgdGIt
+PnBjLCB0Yi0+ZmxhZ3MsIHRiLT50cmFjZWlkKTsKICAgICBxaHRfaW5zZXJ0KCZ0Y2dfY3R4
+LnRiX2N0eC5odGFibGUsIHRiLCBoKTsKIAogI2lmZGVmIERFQlVHX1RCX0NIRUNLCkBAIC0x
+Mjk4LDYgKzEyOTgsNyBAQCBUcmFuc2xhdGlvbkJsb2NrICp0Yl9nZW5fY29kZShDUFVTdGF0
+ZSAqY3B1LAogICAgIHRiLT5jc19iYXNlID0gY3NfYmFzZTsKICAgICB0Yi0+ZmxhZ3MgPSBm
+bGFnczsKICAgICB0Yi0+Y2ZsYWdzID0gY2ZsYWdzOworICAgIHRiLT50cmFjZWlkID0gMCAv
+KiBjcHUtPj8/PyAqLzsKIAogI2lmZGVmIENPTkZJR19QUk9GSUxFUgogICAgIHRjZ19jdHgu
+dGJfY291bnQxKys7IC8qIGluY2x1ZGVzIGFib3J0ZWQgdHJhbnNsYXRpb25zIGJlY2F1c2Ug
+b2YK
+--------------47074E00914B58EBF7FE77F0--
