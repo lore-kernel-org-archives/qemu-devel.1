@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58870)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34397)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hirofumi@parknet.co.jp>) id 1cKRBL-0006m0-KX
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 09:50:52 -0500
+	(envelope-from <msuchanek@suse.de>) id 1cKRWy-0001do-FJ
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 10:13:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hirofumi@parknet.co.jp>) id 1cKRBI-0001tK-FX
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 09:50:51 -0500
-Received: from mail.parknet.co.jp ([210.171.160.6]:38967)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hirofumi@parknet.co.jp>) id 1cKRBI-0001sr-6d
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 09:50:48 -0500
-From: OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
-Date: Fri, 23 Dec 2016 23:50:41 +0900
-Message-ID: <87bmw2vgvy.fsf@mail.parknet.co.jp>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH] ui/gtk: Fix mouse wheel on 3.4.0 or later
+	(envelope-from <msuchanek@suse.de>) id 1cKRWv-0004Bp-M2
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 10:13:12 -0500
+Received: from mx2.suse.de ([195.135.220.15]:43237)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <msuchanek@suse.de>) id 1cKRWv-00048U-A9
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 10:13:09 -0500
+Received: from relay1.suse.de (charybdis-ext.suse.de [195.135.220.254])
+	by mx2.suse.de (Postfix) with ESMTP id EB08BACA3
+	for <qemu-devel@nongnu.org>; Fri, 23 Dec 2016 15:13:03 +0000 (UTC)
+From: Michal Suchanek <msuchanek@suse.de>
+Date: Fri, 23 Dec 2016 16:12:53 +0100
+Message-Id: <20161223151253.21338-1-msuchanek@suse.de>
+Subject: [Qemu-devel] [RFC PATCH] Fix pasting into serial console in GTK ui
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,41 +25,96 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Michal Suchanek <msuchanek@suse.de>
 
-On 3.4.0 or later, send GDK_SCROLL_SMOOTH event, instead of
-GDK_SCROLL_UP/DOWN.
+This copies the timer hack from ui/console.c kbd_send_chars to ui/gtk.c
+gd_vc_in.
 
-This fixes it by converting any smooth scroll to up/down.
-(I.e. without smooth support)
+There is no fd-like object to peek repatedly so the paste data is saved
+in a free-floating buffer only submitted to gtk_timeout_add. Multiple
+pastes can potentially interleave if qemu blocks for long or the user
+pastes fast.
 
-Signed-off-by: OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
+Signed-off-by: Michal Suchanek <msuchanek@suse.de>
 ---
+ ui/gtk.c | 57 +++++++++++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 53 insertions(+), 4 deletions(-)
 
- ui/gtk.c |   10 ++++++++++
- 1 file changed, 10 insertions(+)
-
-diff -puN ui/gtk.c~mouse-wheel-fix ui/gtk.c
---- qemu/ui/gtk.c~mouse-wheel-fix	2016-12-23 23:39:24.419659012 +0900
-+++ qemu-hirofumi/ui/gtk.c	2016-12-23 23:39:37.540735673 +0900
-@@ -1015,6 +1015,16 @@ static gboolean gd_scroll_event(GtkWidge
-         btn = INPUT_BUTTON_WHEEL_UP;
-     } else if (scroll->direction == GDK_SCROLL_DOWN) {
-         btn = INPUT_BUTTON_WHEEL_DOWN;
-+#if GTK_CHECK_VERSION(3, 4, 0)
-+    } else if (scroll->direction == GDK_SCROLL_SMOOTH) {
-+        gdouble delta_x, delta_y;
-+        if (!gdk_event_get_scroll_deltas((GdkEvent*)scroll, &delta_x, &delta_y))
-+            return TRUE;
-+        if (delta_y > 0)
-+            btn = INPUT_BUTTON_WHEEL_DOWN;
-+        else
-+            btn = INPUT_BUTTON_WHEEL_UP;
-+#endif
-     } else {
-         return TRUE;
-     }
-_
-
+diff --git a/ui/gtk.c b/ui/gtk.c
+index a216216..b3810c7 100644
+--- a/ui/gtk.c
++++ b/ui/gtk.c
+@@ -1715,11 +1715,15 @@ static CharDriverState *gd_vc_handler(ChardevVC *vc, Error **errp)
+     return chr;
+ }
+ 
+-static gboolean gd_vc_in(VteTerminal *terminal, gchar *text, guint size,
+-                         gpointer user_data)
+-{
+-    VirtualConsole *vc = user_data;
++struct vc_in_buffer {
++    VirtualConsole *vc;
++    gchar *text;
++    guint size;
++    guint sent;
++};
+ 
++static gboolean do_gd_vc_in(VirtualConsole *vc, gchar *text, guint size)
++{
+     if (vc->vte.echo) {
+         VteTerminal *term = VTE_TERMINAL(vc->vte.terminal);
+         int i;
+@@ -1742,6 +1746,51 @@ static gboolean gd_vc_in(VteTerminal *terminal, gchar *text, guint size,
+     return TRUE;
+ }
+ 
++static gint gd_vc_in_timer(gpointer data)
++{
++    struct vc_in_buffer *inbuf = data;
++    VirtualConsole *vc = inbuf->vc;
++    int len = qemu_chr_be_can_write(vc->vte.chr);
++    int size = inbuf->size - inbuf->sent;
++    if ( size > len) {
++        size = len;
++    }
++    do_gd_vc_in(vc, inbuf->text + inbuf->sent, size);
++
++    inbuf->sent += size;
++    if (inbuf->sent < inbuf->size)
++        return TRUE;
++    else {
++        g_clear_pointer(&inbuf->text, g_free);
++        g_free(inbuf);
++        return FALSE;
++    }
++}
++
++static gboolean gd_vc_in(VteTerminal *terminal, gchar *text, guint size,
++                         gpointer user_data)
++{
++    VirtualConsole *vc = user_data;
++    int len = qemu_chr_be_can_write(vc->vte.chr);
++
++    if (size > len) {
++        struct vc_in_buffer *inbuf = g_try_new0(struct vc_in_buffer, 1);
++        if (!inbuf)
++            return FALSE;
++        inbuf->text = g_strndup(text, size);
++        if (!inbuf->text) {
++            g_free(inbuf);
++            return FALSE;
++        }
++        inbuf->vc = vc;
++        inbuf->size = size;
++        inbuf->sent = len;
++        size = len;
++        g_timeout_add(1, gd_vc_in_timer, inbuf);
++    }
++    return do_gd_vc_in(vc, text, size);
++}
++
+ static GSList *gd_vc_vte_init(GtkDisplayState *s, VirtualConsole *vc,
+                               CharDriverState *chr, int idx,
+                               GSList *group, GtkWidget *view_menu)
 -- 
-OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
+2.10.2
