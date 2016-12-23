@@ -1,34 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40170)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43712)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cKS7F-0003rS-1x
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 10:50:43 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cKSJ9-0006qS-Jg
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 11:03:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cKS7B-0006bw-Qk
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 10:50:41 -0500
-Received: from indium.canonical.com ([91.189.90.7]:48302)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cKS7B-0006bG-FG
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 10:50:37 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cKS7A-0005CO-7P
-	for <qemu-devel@nongnu.org>; Fri, 23 Dec 2016 15:50:36 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 0527B2E80C2
-	for <qemu-devel@nongnu.org>; Fri, 23 Dec 2016 15:50:36 +0000 (UTC)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cKSJ7-0005Y4-MW
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 11:02:59 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Fri, 23 Dec 2016 17:28:44 +0300
+Message-ID: <1482503344-6424-2-git-send-email-vsementsov@virtuozzo.com>
+In-Reply-To: <1482503344-6424-1-git-send-email-vsementsov@virtuozzo.com>
+References: <1482503344-6424-1-git-send-email-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 23 Dec 2016 15:45:27 -0000
-From: =?utf-8?q?Javier_Pe=C3=B1a?= <jpena@redhat.com>
-Reply-To: Bug 1652333 <1652333@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20161223152652.14283.5770.malonedeb@wampee.canonical.com>
-Message-Id: <20161223154527.665.99121.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1652333] Re: TCG mode fails to boot Linux kernel
- with qemu 2.6.0 and libvirt 2.0.0
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH 01/21] backup: move from done_bitmap to
+ copy_bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,68 +22,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, vsementsov@virtuozzo.com, pbonzini@redhat.com, jcody@redhat.com
 
-The Cirros image has a 3.2.0 kernel, in case it helps.
+Use HBitmap copy_bitmap instead of done_bitmap. This is needed to unify
+backup loop for full/incremental modes in future patches.
 
--- =
+We reset bit of the copy_bitmap immediately after checking it in
+backup_do_cow(). It is safe, because all other intersecting requests
+will wait for our request finish anyway.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1652333
+The other difference is that in case of error we will have zeroed bit in
+copy_bitmap, when in done_bitmap we have not set bit.
 
-Title:
-  TCG mode fails to boot Linux kernel with qemu 2.6.0 and libvirt 2.0.0
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ block/backup.c | 17 ++++++++++-------
+ 1 file changed, 10 insertions(+), 7 deletions(-)
 
-Status in QEMU:
-  New
-
-Bug description:
-  Trying to boot a Cirros (minimal Linux) VM with qemu 2.6.0 and libvirt
-  2.0.0 in TCG mode fails for me. The VM gets stuck in "Starting up ..."
-  and never moves on. The command line used to boot the VM was:
-
-  LC_ALL=3DC PATH=3D/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin
-  QEMU_AUDIO_DRV=3Dnone /usr/libexec/qemu-kvm -name
-  guest=3Dinstance-00000002,debug-threads=3Don -S -object
-  secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/domain-1=
--instance-00000002
-  /master-key.aes -machine pc-i440fx-rhel7.3.0,accel=3Dtcg,usb=3Doff -cpu
-  SandyBridge,+osxsave,+hypervisor,+xsaveopt -m 512 -realtime mlock=3Doff
-  -smp 1,sockets=3D1,cores=3D1,threads=3D1 -uuid ae38b0e1-b3ae-41ec-
-  8e50-c89669a2ec1c -smbios 'type=3D1,manufacturer=3DRed
-  Hat,product=3DOpenStack Compute,version=3D14.0.2-7.el7ost,serial=3Dedd3a6=
-7d-
-  6ce5-4c36-8f20-085d1097abb7,uuid=3Dae38b0e1-b3ae-41ec-
-  8e50-c89669a2ec1c,family=3DVirtual Machine' -no-user-config -nodefaults
-  -chardev
-  socket,id=3Dcharmonitor,path=3D/var/lib/libvirt/qemu/domain-1-instance-00=
-000002/monitor.sock,server,nowait
-  -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc base=3Dutc -n=
-o-
-  shutdown -boot strict=3Don -device piix3-usb-
-  uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2 -drive
-  file=3D/var/lib/nova/instances/ae38b0e1-b3ae-41ec-
-  8e50-c89669a2ec1c/disk,format=3Dqcow2,if=3Dnone,id=3Ddrive-virtio-
-  disk0,cache=3Dnone -device virtio-blk-
-  pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x4,drive=3Ddrive-virtio-disk0,id=3Dvir=
-tio-
-  disk0,bootindex=3D1 -netdev tap,fd=3D28,id=3Dhostnet0 -device virtio-net-
-  pci,netdev=3Dhostnet0,id=3Dnet0,mac=3Dfa:16:3e:c1:27:73,bus=3Dpci.0,addr=
-=3D0x3
-  -add-fd set=3D1,fd=3D31 -chardev
-  file,id=3Dcharserial0,path=3D/dev/fdset/1,append=3Don -device isa-
-  serial,chardev=3Dcharserial0,id=3Dserial0 -chardev pty,id=3Dcharserial1
-  -device isa-serial,chardev=3Dcharserial1,id=3Dserial1 -device usb-
-  tablet,id=3Dinput0,bus=3Dusb.0,port=3D1 -vnc 0.0.0.0:0 -k en-us -device
-  cirrus-vga,id=3Dvideo0,bus=3Dpci.0,addr=3D0x2 -device virtio-balloon-
-  pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x5 -msg timestamp=3Don
-
-  A qcow2 image can be downloaded from http://download.cirros-
-  cloud.net/0.3.4/cirros-0.3.4-x86_64-disk.img to reproduce the issue.
-  I've seen a similar failure with a CentOS 7.2 image.
-
-  I am also attaching the libvirt log from the failed VM.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1652333/+subscriptions
+diff --git a/block/backup.c b/block/backup.c
+index ea38733..6b27e55 100644
+--- a/block/backup.c
++++ b/block/backup.c
+@@ -39,11 +39,12 @@ typedef struct BackupBlockJob {
+     BlockdevOnError on_target_error;
+     CoRwlock flush_rwlock;
+     uint64_t sectors_read;
+-    unsigned long *done_bitmap;
+     int64_t cluster_size;
+     bool compress;
+     NotifierWithReturn before_write;
+     QLIST_HEAD(, CowRequest) inflight_reqs;
++
++    HBitmap *copy_bitmap;
+ } BackupBlockJob;
+ 
+ /* Size of a cluster in sectors, instead of bytes. */
+@@ -115,10 +116,11 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
+     cow_request_begin(&cow_request, job, start, end);
+ 
+     for (; start < end; start++) {
+-        if (test_bit(start, job->done_bitmap)) {
++        if (!hbitmap_get(job->copy_bitmap, start)) {
+             trace_backup_do_cow_skip(job, start);
+             continue; /* already copied */
+         }
++        hbitmap_reset(job->copy_bitmap, start, 1);
+ 
+         trace_backup_do_cow_process(job, start);
+ 
+@@ -141,6 +143,7 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
+             if (error_is_read) {
+                 *error_is_read = true;
+             }
++            hbitmap_set(job->copy_bitmap, start, 1);
+             goto out;
+         }
+ 
+@@ -157,11 +160,10 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
+             if (error_is_read) {
+                 *error_is_read = false;
+             }
++            hbitmap_set(job->copy_bitmap, start, 1);
+             goto out;
+         }
+ 
+-        set_bit(start, job->done_bitmap);
+-
+         /* Publish progress, guest I/O counts as progress too.  Note that the
+          * offset field is an opaque progress value, it is not a disk offset.
+          */
+@@ -271,7 +273,7 @@ void backup_do_checkpoint(BlockJob *job, Error **errp)
+     }
+ 
+     len = DIV_ROUND_UP(backup_job->common.len, backup_job->cluster_size);
+-    bitmap_zero(backup_job->done_bitmap, len);
++    hbitmap_set(backup_job->copy_bitmap, 0, len);
+ }
+ 
+ void backup_wait_for_overlapping_requests(BlockJob *job, int64_t sector_num,
+@@ -450,7 +452,8 @@ static void coroutine_fn backup_run(void *opaque)
+     start = 0;
+     end = DIV_ROUND_UP(job->common.len, job->cluster_size);
+ 
+-    job->done_bitmap = bitmap_new(end);
++    job->copy_bitmap = hbitmap_alloc(end, 0);
++    hbitmap_set(job->copy_bitmap, 0, end);
+ 
+     job->before_write.notify = backup_before_write_notify;
+     bdrv_add_before_write_notifier(bs, &job->before_write);
+@@ -524,7 +527,7 @@ static void coroutine_fn backup_run(void *opaque)
+     /* wait until pending backup_do_cow() calls have completed */
+     qemu_co_rwlock_wrlock(&job->flush_rwlock);
+     qemu_co_rwlock_unlock(&job->flush_rwlock);
+-    g_free(job->done_bitmap);
++    hbitmap_free(job->copy_bitmap);
+ 
+     data = g_malloc(sizeof(*data));
+     data->ret = ret;
+-- 
+1.8.3.1
