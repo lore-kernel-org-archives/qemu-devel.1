@@ -1,26 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34815)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37047)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cKRa4-0002h6-QS
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 10:16:25 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cKRnZ-0006lZ-Bg
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 10:30:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cKRa1-0005jL-Bq
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 10:16:24 -0500
-Resent-Message-Id: <E1cKRa1-0005jL-Bq@eggs.gnu.org>
-Received: from sender163-mail.zoho.com ([74.201.84.163]:21363)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1cKRa1-0005i0-3l
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 10:16:21 -0500
-In-Reply-To: <20161223151253.21338-1-msuchanek@suse.de>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <148250617624.127.8347420154284875205@790289a7ca88>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cKRnY-0004cU-6L
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 10:30:21 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Fri, 23 Dec 2016 17:29:04 +0300
+Message-ID: <1482503344-6424-22-git-send-email-vsementsov@virtuozzo.com>
+In-Reply-To: <1482503344-6424-1-git-send-email-vsementsov@virtuozzo.com>
+References: <1482503344-6424-1-git-send-email-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 23 Dec 2016 07:16:17 -0800 (PST)
-Subject: Re: [Qemu-devel] [RFC PATCH] Fix pasting into serial console in GTK
- ui
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH 21/21] backup: refactor: remove backup_do_cow()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,40 +21,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: msuchanek@suse.de
-Cc: famz@redhat.com, qemu-devel@nongnu.org
+To: qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, vsementsov@virtuozzo.com, pbonzini@redhat.com, jcody@redhat.com
 
-SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTYxMjIzMTUxMjUzLjIxMzM4LTEtbXN1Y2hhbmVrQHN1c2UuZGUKU3ViamVj
-dDogW1FlbXUtZGV2ZWxdIFtSRkMgUEFUQ0hdIEZpeCBwYXN0aW5nIGludG8gc2VyaWFsIGNvbnNv
-bGUgaW4gR1RLIHVpCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNF
-PWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWls
-ZWQ9MAoKIyBVc2VmdWwgZ2l0IG9wdGlvbnMKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1l
-bGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQo
-Z2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRz
-OyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAt
-LWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwg
-Li9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVk
-PTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQK
-PT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFk
-ZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0
-L3FlbXUKICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8yMDE2MTIyMzE1MTI1My4yMTMzOC0x
-LW1zdWNoYW5la0BzdXNlLmRlIC0+IHBhdGNoZXcvMjAxNjEyMjMxNTEyNTMuMjEzMzgtMS1tc3Vj
-aGFuZWtAc3VzZS5kZQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjc0ZTk2NDYgRml4
-IHBhc3RpbmcgaW50byBzZXJpYWwgY29uc29sZSBpbiBHVEsgdWkKCj09PSBPVVRQVVQgQkVHSU4g
-PT09CkNoZWNraW5nIFBBVENIIDEvMTogRml4IHBhc3RpbmcgaW50byBzZXJpYWwgY29uc29sZSBp
-biBHVEsgdWkuLi4KRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYWZ0ZXIgdGhhdCBvcGVuIHBhcmVu
-dGhlc2lzICcoJwojNTE6IEZJTEU6IHVpL2d0ay5jOjE3NTU6CisgICAgaWYgKCBzaXplID4gbGVu
-KSB7CgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMg
-c3RhdGVtZW50CiM1NzogRklMRTogdWkvZ3RrLmM6MTc2MToKKyAgICBpZiAoaW5idWYtPnNlbnQg
-PCBpbmJ1Zi0+c2l6ZSkKWy4uLl0KKyAgICBlbHNlIHsKWy4uLl0KCkVSUk9SOiBicmFjZXMge30g
-YXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzc0OiBGSUxFOiB1
-aS9ndGsuYzoxNzc4OgorICAgICAgICBpZiAoIWluYnVmKQpbLi4uXQoKdG90YWw6IDMgZXJyb3Jz
-LCAwIHdhcm5pbmdzLCA3MCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9i
-bGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBv
-c2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4g
-TUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0
-aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcg
-W2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNo
-ZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+Call backup_copy_cluster directly from backup_worker_co. Move io buffer
+allocation to backup_worker_co (and do not reallocate it for each
+cluster).
+
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ block/backup.c     | 28 +++++++++-------------------
+ block/trace-events |  6 ++----
+ 2 files changed, 11 insertions(+), 23 deletions(-)
+
+diff --git a/block/backup.c b/block/backup.c
+index b79a481..4a3a874 100644
+--- a/block/backup.c
++++ b/block/backup.c
+@@ -222,8 +222,6 @@ static void release_pending_notifiers(BackupBlockJob *job)
+     }
+ }
+ 
+-static void coroutine_fn backup_do_cow(BackupBlockJob *job, int64_t cluster);
+-
+ /* Size of a cluster in sectors, instead of bytes. */
+ static inline int64_t cluster_size_sectors(BackupBlockJob *job)
+ {
+@@ -403,9 +401,14 @@ static inline int64_t backup_get_work(BackupBlockJob *job)
+     return cluster;
+ }
+ 
++static void coroutine_fn backup_copy_cluster(BackupBlockJob *job,
++                                            int64_t cluster,
++                                            void *bounce_buffer);
++
+ static void coroutine_fn backup_worker_co(void *opaque)
+ {
+     BackupBlockJob *job = opaque;
++    void *io_buf = blk_blockalign(job->common.blk, job->cluster_size);
+ 
+     job->running_workers++;
+     job->nb_busy_workers++;
+@@ -424,12 +427,13 @@ static void coroutine_fn backup_worker_co(void *opaque)
+             trace_backup_worker_stop(qemu_coroutine_self(),
+                                      job->nb_busy_workers, job->running_workers,
+                                      job->waiting_for_workers);
++            qemu_vfree(io_buf);
+             return;
+         case BACKUP_WORKER_PAUSE:
+             backup_worker_pause(job);
+             break;
+         default:
+-            backup_do_cow(job, cluster);
++            backup_copy_cluster(job, cluster, io_buf);
+         }
+     }
+ }
+@@ -546,8 +550,7 @@ static void coroutine_fn backup_copy_cluster(BackupBlockJob *job,
+     int64_t sectors_per_cluster = cluster_size_sectors(job);
+     int64_t offset = cluster * job->cluster_size;
+ 
+-    trace_backup_do_cow_process(job, cluster);
+-
++    trace_backup_copy_cluster_enter(job, qemu_coroutine_self(), cluster);
+     n = MIN(sectors_per_cluster,
+             job->common.len / BDRV_SECTOR_SIZE -
+             cluster * sectors_per_cluster);
+@@ -579,20 +582,7 @@ static void coroutine_fn backup_copy_cluster(BackupBlockJob *job,
+      */
+     job->sectors_read += n;
+     job->common.offset += n * BDRV_SECTOR_SIZE;
+-}
+-
+-static void coroutine_fn backup_do_cow(BackupBlockJob *job, int64_t cluster)
+-{
+-    BlockBackend *blk = job->common.blk;
+-    void *bounce_buffer;
+-
+-    trace_backup_do_cow_enter(job, qemu_coroutine_self(), cluster);
+-
+-    bounce_buffer = blk_blockalign(blk, job->cluster_size);
+-    backup_copy_cluster(job, cluster, bounce_buffer);
+-    qemu_vfree(bounce_buffer);
+-
+-    trace_backup_do_cow_return(job, qemu_coroutine_self(), cluster);
++    trace_backup_copy_cluster_success(job, qemu_coroutine_self(), cluster);
+ }
+ 
+ static int coroutine_fn backup_before_write_notify(
+diff --git a/block/trace-events b/block/trace-events
+index 54cde28..770b407 100644
+--- a/block/trace-events
++++ b/block/trace-events
+@@ -40,10 +40,8 @@ mirror_yield_buf_busy(void *s, int nb_chunks, int in_flight) "s %p requested chu
+ mirror_break_buf_busy(void *s, int nb_chunks, int in_flight) "s %p requested chunks %d in_flight %d"
+ 
+ # block/backup.c
+-backup_do_cow_enter(void *job, void *self, int64_t cluster) "job %p self %p cluster %"PRId64
+-backup_do_cow_return(void *job, void *self, int64_t cluster) "job %p self %p cluster %"PRId64
+-backup_do_cow_skip(void *job, int64_t cluster) "job %p cluster %"PRId64
+-backup_do_cow_process(void *job, int64_t cluster) "job %p cluster %"PRId64
++backup_copy_cluster_enter(void *job, void *self, int64_t cluster) "job %p self %p cluster %"PRId64
++backup_copy_cluster_success(void *job, void *self, int64_t cluster) "job %p self %p cluster %"PRId64
+ backup_do_read_fail(void *job, void *self, int64_t offset, unsigned bytes, int ret) "job %p self %p offset %"PRId64" bytes %u ret %d"
+ backup_do_write_fail(void *job, void *self, int64_t offset, unsigned bytes, int ret) "job %p self %p offset %"PRId64" bytes %u ret %d"
+ backup_job_wait_workers_start(void) ""
+-- 
+1.8.3.1
