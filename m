@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44580)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49854)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cKNvT-0008AE-VJ
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 06:22:16 -0500
+	(envelope-from <bounces@canonical.com>) id 1cKODj-0004Oz-Ly
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 06:41:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cKNvT-0004dm-21
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 06:22:15 -0500
-Received: from mail-ua0-x22d.google.com ([2607:f8b0:400c:c08::22d]:32949)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cKNvS-0004db-Ks
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 06:22:14 -0500
-Received: by mail-ua0-x22d.google.com with SMTP id i68so5295599uad.0
-	for <qemu-devel@nongnu.org>; Fri, 23 Dec 2016 03:22:14 -0800 (PST)
+	(envelope-from <bounces@canonical.com>) id 1cKODf-0004p4-PU
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 06:41:07 -0500
+Received: from indium.canonical.com ([91.189.90.7]:45058)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cKODf-0004oh-Jm
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 06:41:03 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cKODc-0005E2-Ni
+	for <qemu-devel@nongnu.org>; Fri, 23 Dec 2016 11:41:00 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id D95502E80C8
+	for <qemu-devel@nongnu.org>; Fri, 23 Dec 2016 11:40:59 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20161222094240.GA26435@pxdev.xzpeter.org>
-References: <20161222094240.GA26435@pxdev.xzpeter.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 23 Dec 2016 11:21:53 +0000
-Message-ID: <CAFEAcA-6CtHq7w-i=_X9zbBsKeKD1sLsWGze4hgw14er_sd9Vw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] A question about PCI device address spaces
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 23 Dec 2016 11:31:38 -0000
+From: LPNow <77777@tutanota.de>
+Reply-To: Bug 1649042 <1649042@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20161211032601.16375.45078.malonedeb@soybean.canonical.com>
+Message-Id: <20161223113139.2847.77412.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1649042] Re: Ubuntu 16.04.1 LightDM Resolution
+ Not Correct
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,50 +37,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: QEMU Devel Mailing List <qemu-devel@nongnu.org>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org
 
-On 22 December 2016 at 09:42, Peter Xu <peterx@redhat.com> wrote:
-> Hello,
->
-> Since this is a general topic, I picked it out from the VT-d
-> discussion and put it here, just want to be more clear of it.
->
-> The issue is, whether we have exposed too much address spaces for
-> emulated PCI devices?
->
-> Now for each PCI device, we are having PCIDevice::bus_master_as for
-> the device visible address space, which derived from
-> pci_device_iommu_address_space():
->
-> AddressSpace *pci_device_iommu_address_space(PCIDevice *dev)
-> {
->     PCIBus *bus = PCI_BUS(dev->bus);
->     PCIBus *iommu_bus = bus;
->
->     while(iommu_bus && !iommu_bus->iommu_fn && iommu_bus->parent_dev) {
->         iommu_bus = PCI_BUS(iommu_bus->parent_dev->bus);
->     }
->     if (iommu_bus && iommu_bus->iommu_fn) {
->         return iommu_bus->iommu_fn(bus, iommu_bus->iommu_opaque, dev->devfn);
->     }
->     return &address_space_memory;
-> }
->
-> By default (for no-iommu case), it's pointed to system memory space,
-> which includes MMIO, and looks wrong - PCI device should not be able to
-> write to MMIO regions.
+Hi I'll just post to here for both issues;
 
-This is just legacy, I think, ie a combination of "this used to
-be system memory space so let's not break things" and "PC works
-mostly like this". It should be possible for the PCI host bridge
-emulation to set things up so that the device's visible address
-space is whatever it feels like. The PCI APIs we have for doing
-this have "iommu" in the name but they work just as well even
-if the host bridge doesn't actually have an iommu and is just
-setting up a fixed or slightly configurable mapping.
-I think it just hasn't been implemented because for guests which
-aren't misbehaving it doesn't make any difference.
+https://bugs.launchpad.net/qemu/+bug/1649042
 
-thanks
--- PMM
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1649042
+
+Title:
+  Ubuntu 16.04.1 LightDM Resolution Not Correct
+
+Status in QEMU:
+  New
+
+Bug description:
+  My Specs:
+
+  Slackware 14.2 x86_64 > Host
+  Nvidia GPU GTX660M
+  nvidia-driver-352.63
+  QEMU 2.7.0
+
+  Ubuntu 16.04.1 x86_64 > Guest
+  Unity
+  Xorg nouveau - 1:1.0.12-1build2
+
+  These are the startup options for Ubuntu:
+
+  qemu-system-x86_64 -drive format=3Draw,file=3Dubuntu.img \
+  -cpu host \
+  --enable-kvm \
+  -smp 2 \
+  -m 4096 \
+  -vga vmware \
+  -soundhw ac97 \
+  -usbdevice tablet \
+  -rtc base=3Dlocaltime \
+  -usbdevice host:0781:5575
+
+  Unity desktop resolution set for 1440x900.
+
+  I noticed when I come to the login screen to enter my password the
+  LightDM resolution fills my entire desktop.
+
+  I searched online and found this solution;
+
+  cp ~/.config/monitor.xml /var/lib/lightdm/.config
+
+  For now I'm assuming this step should not be needed and the resolution
+  should be correctly detected and set?
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1649042/+subscriptions
