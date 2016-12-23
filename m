@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52087)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cKVOT-00081C-8K
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 14:20:42 -0500
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53934)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from
+	<373tdWAMKCiYFLGIQQING.EQOSGOW-FGXGNPQPIPW.QTI@flex--dje.bounces.google.com>)
+	id 1cKVaV-0002NN-E5
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 14:33:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cKVOQ-0000Mp-4Z
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 14:20:41 -0500
-Received: from indium.canonical.com ([91.189.90.7]:53358)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cKVOP-0000Mg-Ug
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 14:20:38 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cKVOO-0004Ln-PL
-	for <qemu-devel@nongnu.org>; Fri, 23 Dec 2016 19:20:36 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B59F22E80BF
-	for <qemu-devel@nongnu.org>; Fri, 23 Dec 2016 19:20:36 +0000 (UTC)
+	(envelope-from
+	<373tdWAMKCiYFLGIQQING.EQOSGOW-FGXGNPQPIPW.QTI@flex--dje.bounces.google.com>)
+	id 1cKVaU-0005Bv-Hh
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 14:33:07 -0500
+Received: from mail-pg0-x24a.google.com ([2607:f8b0:400e:c05::24a]:33726)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from
+	<373tdWAMKCiYFLGIQQING.EQOSGOW-FGXGNPQPIPW.QTI@flex--dje.bounces.google.com>)
+	id 1cKVaU-0005B9-B1
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 14:33:06 -0500
+Received: by mail-pg0-x24a.google.com with SMTP id o123so4902334pga.0
+	for <qemu-devel@nongnu.org>; Fri, 23 Dec 2016 11:33:04 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 23 Dec 2016 19:12:37 -0000
-From: =?utf-8?q?Llu=C3=ADs_Vilanova?= <1652373@bugs.launchpad.net>
-Reply-To: Bug 1652373 <1652373@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <20161223191237.2387.49621.malonedeb@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1652373] [NEW] User-mode QEMU is not deterministic
+Message-ID: <f403045e2f8a5b916c0544587499@google.com>
+Date: Fri, 23 Dec 2016 19:33:03 +0000
+From: Doug Evans <dje@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed; delsp=yes
+Subject: Re: [Qemu-devel] [PULL 24/25] target-i386: Fix eflags.TF/#DB
+ handling of syscall/sysret insns
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,50 +31,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-Public bug reported:
+Paolo Bonzini writes:
+  > From: Doug Evans <dje@google.com>
+  >
+  > The syscall and sysret instructions behave a bit differently:
+  > TF is checked after the instruction completes.
+  > This allows the o/s to disable #DB at a syscall by adding TF to FMASK.
+  > And then when the sysret is executed the #DB is taken "as if" the
+  > syscall insn just completed.
+  >
+  > Signed-off-by: Doug Evans <dje@google.com>
+  > Message-Id: <94eb2c0bfa1c6a9fec0543057483@google.com>
+  > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+  > ---
+  >  target/i386/bpt_helper.c |  7 +++++++
+  >  target/i386/helper.h     |  1 +
+  >  target/i386/translate.c  | 29 ++++++++++++++++++++++++-----
+  >  3 files changed, 32 insertions(+), 5 deletions(-)
+  >
+  > ...
+  > diff --git a/target/i386/translate.c b/target/i386/translate.c
+  > index 324103c..59e11fc 100644
+  > --- a/target/i386/translate.c
+  > +++ b/target/i386/translate.c
+  > @@ -6423,7 +6435,10 @@ static target_ulong disas_insn(CPUX86State *env,  
+DisasContext *s,
+  >                                        tcg_const_i32(s->pc -  
+s->cs_base));
+  >              set_cc_op(s, CC_OP_EFLAGS);
+  >          }
+  > -        gen_eob(s);
+  > +        /* TF handling for the syscall insn is different. The TF bit is  
+checked
+  > +           after the syscall insn completes. This allows #DB to not be
+  > +           generated after one has entered CPL0 if TF is set in FMASK.   
+*/
+  > +        gen_eob_worker(s, false, true);
+  >          break;
+  >      case 0xe8: /* call im */
+  >          {
+  > @@ -7115,7 +7130,11 @@ static target_ulong disas_insn(CPUX86State *env,  
+DisasContext *s,
+  >              if (s->lma) {
+  >                  set_cc_op(s, CC_OP_EFLAGS);
+  >              }
+  > -            gen_eob(s);
+  > +            /* TF handling for the sysret insn is different. The TF bit  
+is
+  > +               checked after the sysret insn completes. This allows #DB  
+to be
+  > +               generated "as if" the syscall insn in userspace has just
+  > +               completed.  */
+  > +            gen_eob_worker(s, false, true);
+  >          }
+  >          break;
+  >  #endif
 
-QEMU in user-mode (linux-user or bsd-user) has no way to get the
-equivalent of the "-icount" argument found in softmmu mode.
+Hi. Just a heads up that this patch got applied wrong (patch does that some  
+times).
 
-It is true that some system calls in user-mode can prevent deterministic
-execution, but it would be very simple to patch time-related syscalls to
-return a number based on icount when in deterministic mode.
+The change to the "syscall" insn got applied to the "iret" instruction  
+instead.
 
-Putting both changes together (icount + time-related syscalls) would
-cover the needs for deterministic execution of most benchmarks (i.e.,
-those not interacting with the network or other programs in the system).
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1652373
-
-Title:
-  User-mode QEMU is not deterministic
-
-Status in QEMU:
-  New
-
-Bug description:
-  QEMU in user-mode (linux-user or bsd-user) has no way to get the
-  equivalent of the "-icount" argument found in softmmu mode.
-
-  It is true that some system calls in user-mode can prevent
-  deterministic execution, but it would be very simple to patch time-
-  related syscalls to return a number based on icount when in
-  deterministic mode.
-
-  Putting both changes together (icount + time-related syscalls) would
-  cover the needs for deterministic execution of most benchmarks (i.e.,
-  those not interacting with the network or other programs in the
-  system).
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1652373/+subscriptions
+Working on a fix.
