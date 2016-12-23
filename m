@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53862)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53866)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cKSjb-00085S-2P
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cKSjb-00085i-Am
 	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 11:30:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cKSja-0005mr-4s
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cKSja-0005nL-IA
 	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 11:30:19 -0500
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri, 23 Dec 2016 17:28:58 +0300
-Message-ID: <1482503344-6424-16-git-send-email-vsementsov@virtuozzo.com>
+Date: Fri, 23 Dec 2016 17:28:59 +0300
+Message-ID: <1482503344-6424-17-git-send-email-vsementsov@virtuozzo.com>
 In-Reply-To: <1482503344-6424-1-git-send-email-vsementsov@virtuozzo.com>
 References: <1482503344-6424-1-git-send-email-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 15/21] bitmap: add bitmap_count_between()
+Subject: [Qemu-devel] [PATCH 16/21] hbitmap: add hbitmap_count_between()
  function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -25,62 +25,45 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, vsementsov@virtuozzo.com, pbonzini@redhat.com, jcody@redhat.com
 
+Add this function only for HBitmap's with greanularity = 0.
+
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Reviewed-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
 ---
- include/qemu/bitmap.h |  4 ++++
- util/bitmap.c         | 27 +++++++++++++++++++++++++++
- 2 files changed, 31 insertions(+)
+ include/qemu/hbitmap.h | 2 ++
+ util/hbitmap.c         | 9 +++++++++
+ 2 files changed, 11 insertions(+)
 
-diff --git a/include/qemu/bitmap.h b/include/qemu/bitmap.h
-index 63ea2d0..3bfc33e 100644
---- a/include/qemu/bitmap.h
-+++ b/include/qemu/bitmap.h
-@@ -216,6 +216,10 @@ static inline int bitmap_intersects(const unsigned long *src1,
-     }
+diff --git a/include/qemu/hbitmap.h b/include/qemu/hbitmap.h
+index 2873a46..1967e13 100644
+--- a/include/qemu/hbitmap.h
++++ b/include/qemu/hbitmap.h
+@@ -314,4 +314,6 @@ static inline size_t hbitmap_iter_next_word(HBitmapIter *hbi, unsigned long *p_c
  }
  
-+unsigned long bitmap_count_between(const unsigned long *src,
-+                                   unsigned long start,
-+                                   unsigned long end);
+ 
++uint64_t hbitmap_count_between(HBitmap *hb, uint64_t start, uint64_t end);
 +
- void bitmap_set(unsigned long *map, long i, long len);
- void bitmap_set_atomic(unsigned long *map, long i, long len);
- void bitmap_clear(unsigned long *map, long start, long nr);
-diff --git a/util/bitmap.c b/util/bitmap.c
-index 43ed011..e5aaa1c 100644
---- a/util/bitmap.c
-+++ b/util/bitmap.c
-@@ -336,3 +336,30 @@ int slow_bitmap_intersects(const unsigned long *bitmap1,
-     }
-     return 0;
+ #endif
+diff --git a/util/hbitmap.c b/util/hbitmap.c
+index 48d8b2d..d06bfa3 100644
+--- a/util/hbitmap.c
++++ b/util/hbitmap.c
+@@ -232,6 +232,15 @@ static uint64_t hb_count_between(HBitmap *hb, uint64_t start, uint64_t last)
+     return count;
  }
-+
-+unsigned long bitmap_count_between(const unsigned long *src,
-+                                   unsigned long start,
-+                                   unsigned long end)
+ 
++/* hbitmap_count_between() is only for HBitmap's with granularity = 0 */
++uint64_t hbitmap_count_between(HBitmap *hb, uint64_t start, uint64_t end)
 +{
-+    unsigned long first = start / BITS_PER_LONG;
-+    unsigned long lim = end / BITS_PER_LONG;
-+    unsigned long sum, i;
-+
++    assert(hb->granularity == 0);
 +    assert(start < end);
 +
-+    sum = ctpopl(src[first] & BITMAP_FIRST_WORD_MASK(start));
-+
-+    for (i = first + 1; i < lim; ++i) {
-+        sum += ctpopl(src[i]);
-+    }
-+
-+    if (end % BITS_PER_LONG) {
-+        if (first == lim) {
-+            sum -= ctpopl(src[first] & BITMAP_FIRST_WORD_MASK(end));
-+        } else {
-+            sum += ctpopl(src[i] & BITMAP_LAST_WORD_MASK(end));
-+        }
-+    }
-+
-+    return sum;
++    return hb_count_between(hb, start, end - 1);
 +}
++
+ /* Setting starts at the last layer and propagates up if an element
+  * changes.
+  */
 -- 
 1.8.3.1
