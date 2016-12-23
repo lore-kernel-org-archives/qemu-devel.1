@@ -1,26 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47116)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49126)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1cKUwW-0001eG-OS
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 13:51:49 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cKV6t-000549-No
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 14:02:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1cKUwT-0005ax-Nm
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 13:51:48 -0500
-Received: from roura.ac.upc.edu ([147.83.33.10]:59479 helo=roura.ac.upc.es)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1cKUwT-0005WX-BN
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 13:51:45 -0500
-From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
-References: <148243173750.7321.8231977784466776952.stgit@fimbulvetr.bsc.es>
-	<cf19ab2b-ef52-9fa3-dea8-662c4513379c@twiddle.net>
-Date: Fri, 23 Dec 2016 19:51:33 +0100
-In-Reply-To: <cf19ab2b-ef52-9fa3-dea8-662c4513379c@twiddle.net> (Richard
-	Henderson's message of "Fri, 23 Dec 2016 10:05:53 -0800")
-Message-ID: <87bmw24gy2.fsf@fimbulvetr.bsc.es>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cKV6s-0001ym-JL
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 14:02:31 -0500
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Fri, 23 Dec 2016 17:28:52 +0300
+Message-ID: <1482503344-6424-10-git-send-email-vsementsov@virtuozzo.com>
+In-Reply-To: <1482503344-6424-1-git-send-email-vsementsov@virtuozzo.com>
+References: <1482503344-6424-1-git-send-email-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 0/6] trace: [tcg] Optimize per-vCPU
- tracing states with separate TB caches
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH 09/21] backup: separate copy function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,48 +21,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, vsementsov@virtuozzo.com, pbonzini@redhat.com, jcody@redhat.com
 
-Richard Henderson writes:
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ block/backup.c | 103 ++++++++++++++++++++++++++++++++++-----------------------
+ 1 file changed, 61 insertions(+), 42 deletions(-)
 
-> On 12/22/2016 10:35 AM, Llu=C3=ADs Vilanova wrote:
->> To handle both issues, this series replicates the shared physical TB cac=
-he,
->> creating a separate physical TB cache for every combination of event sta=
-tes
->> (those with the 'vcpu' and 'tcg' properties). Then, all vCPUs tracing th=
-e same
->> events will use the same physical TB cache.
-
-> Why do we need to "split the physical TB cache" as opposed to simply incl=
-uding
-> the trace state into the TB hash function?
-
-Mmmm, that's an interesting alternative I did not consider. Are you aiming =
-at
-minimizing the changes, or do you also think it would be more efficient?
-
-The dynamic tracing state would then be an arbitrarily long bitmap (defined=
- by
-the number of events with the 'vcpu' property), so I'm not sure how to fit =
-it
-into the hashing function with minimal collisions (the bitmap is now limite=
-d to
-an unsigned long to use it as an index to the TB cache "matrix").
-
-The other drawback I see is that then it would also take longer to compute =
-the
-hashing function, instead of the simpler array indexing. As a benefit, work=
-loads
-with a high frequency of TB-flushing operations might be a bit faster (there
-would be a single QHT).
-
-If someone can provide me the code for the modified hash lookup function to
-account for the trace dstate bitmap contents, I will integrate it and measu=
-re if
-there is any important change in performance.
-
-
-Cheers,
-  Lluis
+diff --git a/block/backup.c b/block/backup.c
+index 4ef8daf..2c8b7ba 100644
+--- a/block/backup.c
++++ b/block/backup.c
+@@ -95,6 +95,65 @@ static void cow_request_end(CowRequest *req)
+     qemu_co_queue_restart_all(&req->wait_queue);
+ }
+ 
++static int coroutine_fn backup_copy_cluster(BackupBlockJob *job,
++                                            int64_t cluster,
++                                            bool *error_is_read,
++                                            bool is_write_notifier,
++                                            void *bounce_buffer)
++{
++    BlockBackend *blk = job->common.blk;
++    int n;
++    struct iovec iov;
++    QEMUIOVector bounce_qiov;
++    int ret = 0;
++    int64_t sectors_per_cluster = cluster_size_sectors(job);
++
++    trace_backup_do_cow_process(job, cluster);
++
++    n = MIN(sectors_per_cluster,
++            job->common.len / BDRV_SECTOR_SIZE -
++            cluster * sectors_per_cluster);
++
++    iov.iov_base = bounce_buffer;
++    iov.iov_len = n * BDRV_SECTOR_SIZE;
++    qemu_iovec_init_external(&bounce_qiov, &iov, 1);
++
++    ret = blk_co_preadv(blk, cluster * job->cluster_size,
++                        bounce_qiov.size, &bounce_qiov,
++                        is_write_notifier ? BDRV_REQ_NO_SERIALISING : 0);
++    if (ret < 0) {
++        trace_backup_do_cow_read_fail(job, cluster, ret);
++        if (error_is_read) {
++            *error_is_read = true;
++        }
++        return ret;
++    }
++
++    if (buffer_is_zero(iov.iov_base, iov.iov_len)) {
++        ret = blk_co_pwrite_zeroes(job->target, cluster * job->cluster_size,
++                                   bounce_qiov.size, BDRV_REQ_MAY_UNMAP);
++    } else {
++        ret = blk_co_pwritev(job->target, cluster * job->cluster_size,
++                             bounce_qiov.size, &bounce_qiov,
++                             job->compress ? BDRV_REQ_WRITE_COMPRESSED : 0);
++    }
++    if (ret < 0) {
++        trace_backup_do_cow_write_fail(job, cluster, ret);
++        if (error_is_read) {
++            *error_is_read = false;
++        }
++        return ret;
++    }
++
++    /* Publish progress, guest I/O counts as progress too.  Note that the
++     * offset field is an opaque progress value, it is not a disk offset.
++     */
++    job->sectors_read += n;
++    job->common.offset += n * BDRV_SECTOR_SIZE;
++
++    return 0;
++}
++
+ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
+                                       int64_t sector_num, int nb_sectors,
+                                       bool *error_is_read,
+@@ -102,13 +161,10 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
+ {
+     BlockBackend *blk = job->common.blk;
+     CowRequest cow_request;
+-    struct iovec iov;
+-    QEMUIOVector bounce_qiov;
+     void *bounce_buffer = NULL;
+     int ret = 0;
+     int64_t sectors_per_cluster = cluster_size_sectors(job);
+     int64_t start, end;
+-    int n;
+ 
+     qemu_co_rwlock_rdlock(&job->flush_rwlock);
+ 
+@@ -127,53 +183,16 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
+         }
+         hbitmap_reset(job->copy_bitmap, start, 1);
+ 
+-        trace_backup_do_cow_process(job, start);
+-
+-        n = MIN(sectors_per_cluster,
+-                job->common.len / BDRV_SECTOR_SIZE -
+-                start * sectors_per_cluster);
+-
+         if (!bounce_buffer) {
+             bounce_buffer = blk_blockalign(blk, job->cluster_size);
+         }
+-        iov.iov_base = bounce_buffer;
+-        iov.iov_len = n * BDRV_SECTOR_SIZE;
+-        qemu_iovec_init_external(&bounce_qiov, &iov, 1);
+ 
+-        ret = blk_co_preadv(blk, start * job->cluster_size,
+-                            bounce_qiov.size, &bounce_qiov,
+-                            is_write_notifier ? BDRV_REQ_NO_SERIALISING : 0);
++        ret = backup_copy_cluster(job, start, error_is_read, is_write_notifier,
++                                  bounce_buffer);
+         if (ret < 0) {
+-            trace_backup_do_cow_read_fail(job, start, ret);
+-            if (error_is_read) {
+-                *error_is_read = true;
+-            }
+-            hbitmap_set(job->copy_bitmap, start, 1);
+-            goto out;
+-        }
+-
+-        if (buffer_is_zero(iov.iov_base, iov.iov_len)) {
+-            ret = blk_co_pwrite_zeroes(job->target, start * job->cluster_size,
+-                                       bounce_qiov.size, BDRV_REQ_MAY_UNMAP);
+-        } else {
+-            ret = blk_co_pwritev(job->target, start * job->cluster_size,
+-                                 bounce_qiov.size, &bounce_qiov,
+-                                 job->compress ? BDRV_REQ_WRITE_COMPRESSED : 0);
+-        }
+-        if (ret < 0) {
+-            trace_backup_do_cow_write_fail(job, start, ret);
+-            if (error_is_read) {
+-                *error_is_read = false;
+-            }
+             hbitmap_set(job->copy_bitmap, start, 1);
+             goto out;
+         }
+-
+-        /* Publish progress, guest I/O counts as progress too.  Note that the
+-         * offset field is an opaque progress value, it is not a disk offset.
+-         */
+-        job->sectors_read += n;
+-        job->common.offset += n * BDRV_SECTOR_SIZE;
+     }
+ 
+ out:
+-- 
+1.8.3.1
