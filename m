@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45359)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45357)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cKkgw-0007KF-Cm
+	(envelope-from <laurent@vivier.eu>) id 1cKkgw-0007KE-Bt
 	for qemu-devel@nongnu.org; Sat, 24 Dec 2016 06:40:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cKkgt-0007xg-0L
+	(envelope-from <laurent@vivier.eu>) id 1cKkgt-0007y2-RT
 	for qemu-devel@nongnu.org; Sat, 24 Dec 2016 06:40:46 -0500
-Received: from mout.kundenserver.de ([217.72.192.74]:55326)
+Received: from mout.kundenserver.de ([217.72.192.74]:53510)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cKkgs-0007xH-Ej
-	for qemu-devel@nongnu.org; Sat, 24 Dec 2016 06:40:42 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cKkgt-0007xV-Am
+	for qemu-devel@nongnu.org; Sat, 24 Dec 2016 06:40:43 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Sat, 24 Dec 2016 12:40:25 +0100
-Message-Id: <1482579633-3393-5-git-send-email-laurent@vivier.eu>
+Date: Sat, 24 Dec 2016 12:40:27 +0100
+Message-Id: <1482579633-3393-7-git-send-email-laurent@vivier.eu>
 In-Reply-To: <1482579633-3393-1-git-send-email-laurent@vivier.eu>
 References: <1482579633-3393-1-git-send-email-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL 04/12] target-m68k: add 64bit mull
+Subject: [Qemu-devel] [PULL 06/12] target-m68k: add abcd/sbcd/nbcd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,89 +27,262 @@ To: qemu-devel@nongnu.org
 Cc: Laurent Vivier <laurent@vivier.eu>
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Richard Henderson <rth@twidle.net>
+Reviewed-by: Richard Henderson <rth@twiddle.net>
 ---
- target/m68k/translate.c | 62 +++++++++++++++++++++++++++++++++++++++----------
- 1 file changed, 50 insertions(+), 12 deletions(-)
+ target/m68k/translate.c | 220 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 220 insertions(+)
 
 diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index 97edb7b..6678b57 100644
+index 737009e..1567647 100644
 --- a/target/m68k/translate.c
 +++ b/target/m68k/translate.c
-@@ -1863,24 +1863,62 @@ DISAS_INSN(tas)
- DISAS_INSN(mull)
- {
-     uint16_t ext;
--    TCGv reg;
-     TCGv src1;
--    TCGv dest;
-+    int sign;
- 
--    /* The upper 32 bits of the product are discarded, so
--       muls.l and mulu.l are functionally equivalent.  */
-     ext = read_im16(env, s);
--    if (ext & 0x87ff) {
--        gen_exception(s, s->pc - 4, EXCP_UNSUPPORTED);
-+
-+    sign = ext & 0x800;
-+
-+    if (ext & 0x400) {
-+        if (!m68k_feature(s->env, M68K_FEATURE_QUAD_MULDIV)) {
-+            gen_exception(s, s->pc - 4, EXCP_UNSUPPORTED);
-+            return;
-+        }
-+
-+        SRC_EA(env, src1, OS_LONG, 0, NULL);
-+
-+        if (sign) {
-+            tcg_gen_muls2_i32(QREG_CC_Z, QREG_CC_N, src1, DREG(ext, 12));
-+        } else {
-+            tcg_gen_mulu2_i32(QREG_CC_Z, QREG_CC_N, src1, DREG(ext, 12));
-+        }
-+        /* if Dl == Dh, 68040 returns low word */
-+        tcg_gen_mov_i32(DREG(ext, 0), QREG_CC_N);
-+        tcg_gen_mov_i32(DREG(ext, 12), QREG_CC_Z);
-+        tcg_gen_or_i32(QREG_CC_Z, QREG_CC_Z, QREG_CC_N);
-+
-+        tcg_gen_movi_i32(QREG_CC_V, 0);
-+        tcg_gen_movi_i32(QREG_CC_C, 0);
-+
-+        set_cc_op(s, CC_OP_FLAGS);
-         return;
-     }
--    reg = DREG(ext, 12);
-     SRC_EA(env, src1, OS_LONG, 0, NULL);
--    dest = tcg_temp_new();
--    tcg_gen_mul_i32(dest, src1, reg);
--    tcg_gen_mov_i32(reg, dest);
--    /* Unlike m68k, coldfire always clears the overflow bit.  */
--    gen_logic_cc(s, dest, OS_LONG);
-+    if (m68k_feature(s->env, M68K_FEATURE_M68000)) {
-+        tcg_gen_movi_i32(QREG_CC_C, 0);
-+        if (sign) {
-+            tcg_gen_muls2_i32(QREG_CC_N, QREG_CC_V, src1, DREG(ext, 12));
-+            /* QREG_CC_V is -(QREG_CC_V != (QREG_CC_N >> 31)) */
-+            tcg_gen_sari_i32(QREG_CC_Z, QREG_CC_N, 31);
-+            tcg_gen_setcond_i32(TCG_COND_NE, QREG_CC_V, QREG_CC_V, QREG_CC_Z);
-+        } else {
-+            tcg_gen_mulu2_i32(QREG_CC_N, QREG_CC_V, src1, DREG(ext, 12));
-+            /* QREG_CC_V is -(QREG_CC_V != 0), use QREG_CC_C as 0 */
-+            tcg_gen_setcond_i32(TCG_COND_NE, QREG_CC_V, QREG_CC_V, QREG_CC_C);
-+        }
-+        tcg_gen_neg_i32(QREG_CC_V, QREG_CC_V);
-+        tcg_gen_mov_i32(DREG(ext, 12), QREG_CC_N);
-+
-+        tcg_gen_mov_i32(QREG_CC_Z, QREG_CC_N);
-+
-+        set_cc_op(s, CC_OP_FLAGS);
-+    } else {
-+        /* The upper 32 bits of the product are discarded, so
-+           muls.l and mulu.l are functionally equivalent.  */
-+        tcg_gen_mul_i32(DREG(ext, 12), src1, DREG(ext, 12));
-+        gen_logic_cc(s, DREG(ext, 12), OS_LONG);
-+    }
+@@ -1313,6 +1313,221 @@ DISAS_INSN(divl)
+     set_cc_op(s, CC_OP_FLAGS);
  }
  
- static void gen_link(DisasContext *s, uint16_t insn, int32_t offset)
++static void bcd_add(TCGv dest, TCGv src)
++{
++    TCGv t0, t1;
++
++    /*  dest10 = dest10 + src10 + X
++     *
++     *        t1 = src
++     *        t2 = t1 + 0x066
++     *        t3 = t2 + dest + X
++     *        t4 = t2 ^ dest
++     *        t5 = t3 ^ t4
++     *        t6 = ~t5 & 0x110
++     *        t7 = (t6 >> 2) | (t6 >> 3)
++     *        return t3 - t7
++     */
++
++    /* t1 = (src + 0x066) + dest + X
++     *    = result with some possible exceding 0x6
++     */
++
++    t0 = tcg_const_i32(0x066);
++    tcg_gen_add_i32(t0, t0, src);
++
++    t1 = tcg_temp_new();
++    tcg_gen_add_i32(t1, t0, dest);
++    tcg_gen_add_i32(t1, t1, QREG_CC_X);
++
++    /* we will remove exceding 0x6 where there is no carry */
++
++    /* t0 = (src + 0x0066) ^ dest
++     *    = t1 without carries
++     */
++
++    tcg_gen_xor_i32(t0, t0, dest);
++
++    /* extract the carries
++     * t0 = t0 ^ t1
++     *    = only the carries
++     */
++
++    tcg_gen_xor_i32(t0, t0, t1);
++
++    /* generate 0x1 where there is no carry
++     * and for each 0x10, generate a 0x6
++     */
++
++    tcg_gen_shri_i32(t0, t0, 3);
++    tcg_gen_not_i32(t0, t0);
++    tcg_gen_andi_i32(t0, t0, 0x22);
++    tcg_gen_add_i32(dest, t0, t0);
++    tcg_gen_add_i32(dest, dest, t0);
++    tcg_temp_free(t0);
++
++    /* remove the exceding 0x6
++     * for digits that have not generated a carry
++     */
++
++    tcg_gen_sub_i32(dest, t1, dest);
++    tcg_temp_free(t1);
++}
++
++static void bcd_sub(TCGv dest, TCGv src)
++{
++    TCGv t0, t1, t2;
++
++    /*  dest10 = dest10 - src10 - X
++     *         = bcd_add(dest + 1 - X, 0x199 - src)
++     */
++
++    /* t0 = 0x066 + (0x199 - src) */
++
++    t0 = tcg_temp_new();
++    tcg_gen_subfi_i32(t0, 0x1ff, src);
++
++    /* t1 = t0 + dest + 1 - X*/
++
++    t1 = tcg_temp_new();
++    tcg_gen_add_i32(t1, t0, dest);
++    tcg_gen_addi_i32(t1, t1, 1);
++    tcg_gen_sub_i32(t1, t1, QREG_CC_X);
++
++    /* t2 = t0 ^ dest */
++
++    t2 = tcg_temp_new();
++    tcg_gen_xor_i32(t2, t0, dest);
++
++    /* t0 = t1 ^ t2 */
++
++    tcg_gen_xor_i32(t0, t1, t2);
++
++    /* t2 = ~t0 & 0x110
++     * t0 = (t2 >> 2) | (t2 >> 3)
++     *
++     * to fit on 8bit operands, changed in:
++     *
++     * t2 = ~(t0 >> 3) & 0x22
++     * t0 = t2 + t2
++     * t0 = t0 + t2
++     */
++
++    tcg_gen_shri_i32(t2, t0, 3);
++    tcg_gen_not_i32(t2, t2);
++    tcg_gen_andi_i32(t2, t2, 0x22);
++    tcg_gen_add_i32(t0, t2, t2);
++    tcg_gen_add_i32(t0, t0, t2);
++    tcg_temp_free(t2);
++
++    /* return t1 - t0 */
++
++    tcg_gen_sub_i32(dest, t1, t0);
++    tcg_temp_free(t0);
++    tcg_temp_free(t1);
++}
++
++static void bcd_flags(TCGv val)
++{
++    tcg_gen_andi_i32(QREG_CC_C, val, 0x0ff);
++    tcg_gen_or_i32(QREG_CC_Z, QREG_CC_Z, QREG_CC_C);
++
++    tcg_gen_shri_i32(QREG_CC_C, val, 8);
++    tcg_gen_andi_i32(QREG_CC_C, QREG_CC_C, 1);
++
++    tcg_gen_mov_i32(QREG_CC_X, QREG_CC_C);
++}
++
++DISAS_INSN(abcd_reg)
++{
++    TCGv src;
++    TCGv dest;
++
++    gen_flush_flags(s); /* !Z is sticky */
++
++    src = gen_extend(DREG(insn, 0), OS_BYTE, 0);
++    dest = gen_extend(DREG(insn, 9), OS_BYTE, 0);
++    bcd_add(dest, src);
++    gen_partset_reg(OS_BYTE, DREG(insn, 9), dest);
++
++    bcd_flags(dest);
++}
++
++DISAS_INSN(abcd_mem)
++{
++    TCGv src, dest, addr;
++
++    gen_flush_flags(s); /* !Z is sticky */
++
++    /* Indirect pre-decrement load (mode 4) */
++
++    src = gen_ea_mode(env, s, 4, REG(insn, 0), OS_BYTE,
++                      NULL_QREG, NULL, EA_LOADU);
++    dest = gen_ea_mode(env, s, 4, REG(insn, 9), OS_BYTE,
++                       NULL_QREG, &addr, EA_LOADU);
++
++    bcd_add(dest, src);
++
++    gen_ea_mode(env, s, 4, REG(insn, 9), OS_BYTE, dest, &addr, EA_STORE);
++
++    bcd_flags(dest);
++}
++
++DISAS_INSN(sbcd_reg)
++{
++    TCGv src, dest;
++
++    gen_flush_flags(s); /* !Z is sticky */
++
++    src = gen_extend(DREG(insn, 0), OS_BYTE, 0);
++    dest = gen_extend(DREG(insn, 9), OS_BYTE, 0);
++
++    bcd_sub(dest, src);
++
++    gen_partset_reg(OS_BYTE, DREG(insn, 9), dest);
++
++    bcd_flags(dest);
++}
++
++DISAS_INSN(sbcd_mem)
++{
++    TCGv src, dest, addr;
++
++    gen_flush_flags(s); /* !Z is sticky */
++
++    /* Indirect pre-decrement load (mode 4) */
++
++    src = gen_ea_mode(env, s, 4, REG(insn, 0), OS_BYTE,
++                      NULL_QREG, NULL, EA_LOADU);
++    dest = gen_ea_mode(env, s, 4, REG(insn, 9), OS_BYTE,
++                       NULL_QREG, &addr, EA_LOADU);
++
++    bcd_sub(dest, src);
++
++    gen_ea_mode(env, s, 4, REG(insn, 9), OS_BYTE, dest, &addr, EA_STORE);
++
++    bcd_flags(dest);
++}
++
++DISAS_INSN(nbcd)
++{
++    TCGv src, dest;
++    TCGv addr;
++
++    gen_flush_flags(s); /* !Z is sticky */
++
++    SRC_EA(env, src, OS_BYTE, 0, &addr);
++
++    dest = tcg_const_i32(0);
++    bcd_sub(dest, src);
++
++    DEST_EA(env, insn, OS_BYTE, dest, &addr);
++
++    bcd_flags(dest);
++
++    tcg_temp_free(dest);
++}
++
+ DISAS_INSN(addsub)
+ {
+     TCGv reg;
+@@ -3448,6 +3663,7 @@ void register_m68k_insns (CPUM68KState *env)
+     INSN(not,       4600, ff00, M68000);
+     INSN(undef,     46c0, ffc0, M68000);
+     INSN(move_to_sr, 46c0, ffc0, CF_ISA_A);
++    INSN(nbcd,      4800, ffc0, M68000);
+     INSN(linkl,     4808, fff8, M68000);
+     BASE(pea,       4840, ffc0);
+     BASE(swap,      4840, fff8);
+@@ -3499,6 +3715,8 @@ void register_m68k_insns (CPUM68KState *env)
+     INSN(mvzs,      7100, f100, CF_ISA_B);
+     BASE(or,        8000, f000);
+     BASE(divw,      80c0, f0c0);
++    INSN(sbcd_reg,  8100, f1f8, M68000);
++    INSN(sbcd_mem,  8108, f1f8, M68000);
+     BASE(addsub,    9000, f000);
+     INSN(undef,     90c0, f0c0, CF_ISA_A);
+     INSN(subx_reg,  9180, f1f8, CF_ISA_A);
+@@ -3536,6 +3754,8 @@ void register_m68k_insns (CPUM68KState *env)
+     INSN(exg_aa,    c148, f1f8, M68000);
+     INSN(exg_da,    c188, f1f8, M68000);
+     BASE(mulw,      c0c0, f0c0);
++    INSN(abcd_reg,  c100, f1f8, M68000);
++    INSN(abcd_mem,  c108, f1f8, M68000);
+     BASE(addsub,    d000, f000);
+     INSN(undef,     d0c0, f0c0, CF_ISA_A);
+     INSN(addx_reg,      d180, f1f8, CF_ISA_A);
 -- 
 2.7.4
