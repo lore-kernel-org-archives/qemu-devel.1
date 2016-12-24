@@ -1,32 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55132)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55216)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cKdVn-0006PV-Gp
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:00:48 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cKdVr-0006Rq-Rp
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:00:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cKdVm-0005Og-NB
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:00:47 -0500
-Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:35987)
+	(envelope-from <rth7680@gmail.com>) id 1cKdVr-0005Ug-23
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:00:51 -0500
+Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:33752)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cKdVm-0005O4-Iv
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:00:46 -0500
-Received: by mail-pf0-x244.google.com with SMTP id c4so14580001pfb.3
-	for <qemu-devel@nongnu.org>; Fri, 23 Dec 2016 20:00:46 -0800 (PST)
-Received: from bigtime.domain ([2602:47:d954:1500:5e51:4fff:fe40:9c64])
-	by smtp.gmail.com with ESMTPSA id
-	n25sm65339316pfi.33.2016.12.23.20.00.44 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 23 Dec 2016 20:00:44 -0800 (PST)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cKdVq-0005Tw-Se
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:00:50 -0500
+Received: by mail-pf0-x244.google.com with SMTP id 127so4599825pfg.0
+	for <qemu-devel@nongnu.org>; Fri, 23 Dec 2016 20:00:50 -0800 (PST)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Fri, 23 Dec 2016 19:59:39 -0800
-Message-Id: <20161224040042.12654-3-rth@twiddle.net>
+Date: Fri, 23 Dec 2016 19:59:45 -0800
+Message-Id: <20161224040042.12654-9-rth@twiddle.net>
 In-Reply-To: <20161224040042.12654-1-rth@twiddle.net>
 References: <20161224040042.12654-1-rth@twiddle.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 02/65] tcg: Minor adjustments to deposit
- expanders
+Subject: [Qemu-devel] [PATCH 08/65] tcg/mips: Implement field extraction
+ opcodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,47 +28,49 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Yongbok Kim <yongbok.kim@imgtec.com>
 
-Assert that len is not 0.
-
-Since we have asserted that ofs + len <= N, a later
-check for len == N implies that ofs == 0.
-
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Cc: Yongbok Kim <yongbok.kim@imgtec.com>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- tcg/tcg-op.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ tcg/mips/tcg-target.h     | 2 +-
+ tcg/mips/tcg-target.inc.c | 4 ++++
+ 2 files changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
-index c185b9c..b17f03f 100644
---- a/tcg/tcg-op.c
-+++ b/tcg/tcg-op.c
-@@ -533,10 +533,11 @@ void tcg_gen_deposit_i32(TCGv_i32 ret, TCGv_i32 arg1, TCGv_i32 arg2,
-     TCGv_i32 t1;
+diff --git a/tcg/mips/tcg-target.h b/tcg/mips/tcg-target.h
+index 1bcea3b..f1c3137 100644
+--- a/tcg/mips/tcg-target.h
++++ b/tcg/mips/tcg-target.h
+@@ -123,7 +123,7 @@ extern bool use_mips32r2_instructions;
+ #define TCG_TARGET_HAS_bswap16_i32      use_mips32r2_instructions
+ #define TCG_TARGET_HAS_bswap32_i32      use_mips32r2_instructions
+ #define TCG_TARGET_HAS_deposit_i32      use_mips32r2_instructions
+-#define TCG_TARGET_HAS_extract_i32      0
++#define TCG_TARGET_HAS_extract_i32      use_mips32r2_instructions
+ #define TCG_TARGET_HAS_sextract_i32     0
+ #define TCG_TARGET_HAS_ext8s_i32        use_mips32r2_instructions
+ #define TCG_TARGET_HAS_ext16s_i32       use_mips32r2_instructions
+diff --git a/tcg/mips/tcg-target.inc.c b/tcg/mips/tcg-target.inc.c
+index abce602..1ecae08 100644
+--- a/tcg/mips/tcg-target.inc.c
++++ b/tcg/mips/tcg-target.inc.c
+@@ -1637,6 +1637,9 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
+     case INDEX_op_deposit_i32:
+         tcg_out_opc_bf(s, OPC_INS, a0, a2, args[3] + args[4] - 1, args[3]);
+         break;
++    case INDEX_op_extract_i32:
++        tcg_out_opc_bf(s, OPC_EXT, a0, a1, a2 + args[3] - 1, a2);
++        break;
  
-     tcg_debug_assert(ofs < 32);
-+    tcg_debug_assert(len > 0);
-     tcg_debug_assert(len <= 32);
-     tcg_debug_assert(ofs + len <= 32);
+     case INDEX_op_brcond_i32:
+         tcg_out_brcond(s, a2, a0, a1, arg_label(args[3]));
+@@ -1736,6 +1739,7 @@ static const TCGTargetOpDef mips_op_defs[] = {
+     { INDEX_op_ext16s_i32, { "r", "rZ" } },
  
--    if (ofs == 0 && len == 32) {
-+    if (len == 32) {
-         tcg_gen_mov_i32(ret, arg2);
-         return;
-     }
-@@ -1718,10 +1719,11 @@ void tcg_gen_deposit_i64(TCGv_i64 ret, TCGv_i64 arg1, TCGv_i64 arg2,
-     TCGv_i64 t1;
+     { INDEX_op_deposit_i32, { "r", "0", "rZ" } },
++    { INDEX_op_extract_i32, { "r", "r" } },
  
-     tcg_debug_assert(ofs < 64);
-+    tcg_debug_assert(len > 0);
-     tcg_debug_assert(len <= 64);
-     tcg_debug_assert(ofs + len <= 64);
- 
--    if (ofs == 0 && len == 64) {
-+    if (len == 64) {
-         tcg_gen_mov_i64(ret, arg2);
-         return;
-     }
+     { INDEX_op_brcond_i32, { "rZ", "rZ" } },
+ #if use_mips32r6_instructions
 -- 
 2.9.3
