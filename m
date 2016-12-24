@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56026)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55980)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cKdWb-0007BK-K8
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:01:38 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cKdWa-00069Q-PN
+	(envelope-from <rth7680@gmail.com>) id 1cKdWZ-00079W-T8
 	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:01:37 -0500
-Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:36021)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <rth7680@gmail.com>) id 1cKdWY-00067G-Rd
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:01:35 -0500
+Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:34865)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cKdWa-000694-Kr
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:01:36 -0500
-Received: by mail-pf0-x241.google.com with SMTP id c4so14580923pfb.3
-	for <qemu-devel@nongnu.org>; Fri, 23 Dec 2016 20:01:36 -0800 (PST)
-Received: from bigtime.domain ([2602:47:d954:1500:5e51:4fff:fe40:9c64])
-	by smtp.gmail.com with ESMTPSA id
-	n25sm65339316pfi.33.2016.12.23.20.01.35 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 23 Dec 2016 20:01:35 -0800 (PST)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cKdWY-00066z-KI
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:01:34 -0500
+Received: by mail-pg0-x244.google.com with SMTP id i5so2481128pgh.2
+	for <qemu-devel@nongnu.org>; Fri, 23 Dec 2016 20:01:34 -0800 (PST)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Fri, 23 Dec 2016 20:00:42 -0800
-Message-Id: <20161224040042.12654-66-rth@twiddle.net>
+Date: Fri, 23 Dec 2016 20:00:39 -0800
+Message-Id: <20161224040042.12654-63-rth@twiddle.net>
 In-Reply-To: <20161224040042.12654-1-rth@twiddle.net>
 References: <20161224040042.12654-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH 65/65] tcg/i386: Handle ctpop opcode
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 62/65] tests: New test-bitcnt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,95 +30,200 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
+From: Alex Bennée <alex.bennee@linaro.org>
+
+Add some unit tests for bit count functions (currently only ctpop). As
+the routines are based on the Hackers Delight optimisations I based
+the test patterns on their tests.
+
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- tcg/i386/tcg-target.h     |  5 +++--
- tcg/i386/tcg-target.inc.c | 12 +++++++++++-
- 2 files changed, 14 insertions(+), 3 deletions(-)
+ tests/.gitignore       |   1 +
+ tests/Makefile.include |   2 +
+ tests/test-bitcnt.c    | 140 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 143 insertions(+)
+ create mode 100644 tests/test-bitcnt.c
 
-diff --git a/tcg/i386/tcg-target.h b/tcg/i386/tcg-target.h
-index b8f73f5..21d96ec 100644
---- a/tcg/i386/tcg-target.h
-+++ b/tcg/i386/tcg-target.h
-@@ -76,6 +76,7 @@ typedef enum {
- #endif
+diff --git a/tests/.gitignore b/tests/.gitignore
+index e9b182e..7357d0a 100644
+--- a/tests/.gitignore
++++ b/tests/.gitignore
+@@ -13,6 +13,7 @@ rcutorture
+ test-aio
+ test-base64
+ test-bitops
++test-bitcnt
+ test-blockjob
+ test-blockjob-txn
+ test-bufferiszero
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 4841d58..42a5697 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -81,6 +81,7 @@ gcov-files-test-qht-y = util/qht.c
+ check-unit-y += tests/test-qht-par$(EXESUF)
+ gcov-files-test-qht-par-y = util/qht.c
+ check-unit-y += tests/test-bitops$(EXESUF)
++check-unit-y += tests/test-bitcnt$(EXESUF)
+ check-unit-$(CONFIG_HAS_GLIB_SUBPROCESS_TESTS) += tests/test-qdev-global-props$(EXESUF)
+ check-unit-y += tests/check-qom-interface$(EXESUF)
+ gcov-files-check-qom-interface-y = qom/object.c
+@@ -571,6 +572,7 @@ tests/test-opts-visitor$(EXESUF): tests/test-opts-visitor.o $(test-qapi-obj-y)
  
- extern bool have_bmi1;
-+extern bool have_popcnt;
- 
- /* optional instructions */
- #define TCG_TARGET_HAS_div2_i32         1
-@@ -95,7 +96,7 @@ extern bool have_bmi1;
- #define TCG_TARGET_HAS_nor_i32          0
- #define TCG_TARGET_HAS_clz_i32          1
- #define TCG_TARGET_HAS_ctz_i32          1
--#define TCG_TARGET_HAS_ctpop_i32        0
-+#define TCG_TARGET_HAS_ctpop_i32        have_popcnt
- #define TCG_TARGET_HAS_deposit_i32      1
- #define TCG_TARGET_HAS_extract_i32      1
- #define TCG_TARGET_HAS_sextract_i32     1
-@@ -130,7 +131,7 @@ extern bool have_bmi1;
- #define TCG_TARGET_HAS_nor_i64          0
- #define TCG_TARGET_HAS_clz_i64          1
- #define TCG_TARGET_HAS_ctz_i64          1
--#define TCG_TARGET_HAS_ctpop_i64        0
-+#define TCG_TARGET_HAS_ctpop_i64        have_popcnt
- #define TCG_TARGET_HAS_deposit_i64      1
- #define TCG_TARGET_HAS_extract_i64      1
- #define TCG_TARGET_HAS_sextract_i64     0
-diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
-index 3650340..01177a9 100644
---- a/tcg/i386/tcg-target.inc.c
-+++ b/tcg/i386/tcg-target.inc.c
-@@ -130,9 +130,10 @@ static bool have_movbe;
- # define have_movbe 0
- #endif
- 
--/* We need this symbol in tcg-target.h, and we can't properly conditionalize
-+/* We need these symbols in tcg-target.h, and we can't properly conditionalize
-    it there.  Therefore we always define the variable.  */
- bool have_bmi1;
-+bool have_popcnt;
- 
- #if defined(CONFIG_CPUID_H) && defined(bit_BMI2)
- static bool have_bmi2;
-@@ -337,6 +338,7 @@ static inline int tcg_target_const_match(tcg_target_long val, TCGType type,
- #define OPC_MOVZBL	(0xb6 | P_EXT)
- #define OPC_MOVZWL	(0xb7 | P_EXT)
- #define OPC_POP_r32	(0x58)
-+#define OPC_POPCNT      (0xb8 | P_EXT | P_SIMDF3)
- #define OPC_PUSH_r32	(0x50)
- #define OPC_PUSH_Iv	(0x68)
- #define OPC_PUSH_Ib	(0x6a)
-@@ -2083,6 +2085,9 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
-     OP_32_64(clz):
-         tcg_out_clz(s, rexw, args[0], args[1], args[2], const_args[2]);
-         break;
-+    OP_32_64(ctpop):
-+        tcg_out_modrm(s, OPC_POPCNT + rexw, a0, a1);
-+        break;
- 
-     case INDEX_op_brcond_i32:
-         tcg_out_brcond32(s, a2, a0, a1, const_args[1], arg_label(args[3]), 0);
-@@ -2398,6 +2403,8 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
-     case INDEX_op_extract_i32:
-     case INDEX_op_extract_i64:
-     case INDEX_op_sextract_i32:
-+    case INDEX_op_ctpop_i32:
-+    case INDEX_op_ctpop_i64:
-         return &r_r;
- 
-     case INDEX_op_deposit_i32:
-@@ -2602,6 +2609,9 @@ static void tcg_target_init(TCGContext *s)
-            need to probe for it.  */
-         have_movbe = (c & bit_MOVBE) != 0;
- #endif
-+#ifdef bit_POPCNT
-+        have_popcnt = (c & bit_POPCNT) != 0;
-+#endif
-     }
- 
-     if (max >= 7) {
+ tests/test-mul64$(EXESUF): tests/test-mul64.o $(test-util-obj-y)
+ tests/test-bitops$(EXESUF): tests/test-bitops.o $(test-util-obj-y)
++tests/test-bitcnt$(EXESUF): tests/test-bitcnt.o $(test-util-obj-y)
+ tests/test-crypto-hash$(EXESUF): tests/test-crypto-hash.o $(test-crypto-obj-y)
+ tests/test-crypto-hmac$(EXESUF): tests/test-crypto-hmac.o $(test-crypto-obj-y)
+ tests/test-crypto-cipher$(EXESUF): tests/test-crypto-cipher.o $(test-crypto-obj-y)
+diff --git a/tests/test-bitcnt.c b/tests/test-bitcnt.c
+new file mode 100644
+index 0000000..e153dcb
+--- /dev/null
++++ b/tests/test-bitcnt.c
+@@ -0,0 +1,140 @@
++/*
++ * Test bit count routines
++ *
++ * This work is licensed under the terms of the GNU LGPL, version 2 or later.
++ * See the COPYING.LIB file in the top-level directory.
++ *
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/host-utils.h"
++
++struct bitcnt_test_data {
++    /* value to count */
++    union {
++        uint8_t  w8;
++        uint16_t w16;
++        uint32_t w32;
++        uint64_t w64;
++    } value;
++    /* expected result */
++    int popct;
++};
++
++struct bitcnt_test_data eight_bit_data[] = {
++    { { .w8 = 0x00 }, .popct=0 },
++    { { .w8 = 0x01 }, .popct=1 },
++    { { .w8 = 0x03 }, .popct=2 },
++    { { .w8 = 0x04 }, .popct=1 },
++    { { .w8 = 0x0f }, .popct=4 },
++    { { .w8 = 0x3f }, .popct=6 },
++    { { .w8 = 0x40 }, .popct=1 },
++    { { .w8 = 0xf0 }, .popct=4 },
++    { { .w8 = 0x7f }, .popct=7 },
++    { { .w8 = 0x80 }, .popct=1 },
++    { { .w8 = 0xf1 }, .popct=5 },
++    { { .w8 = 0xfe }, .popct=7 },
++    { { .w8 = 0xff }, .popct=8 },
++};
++
++static void test_ctpop8(void)
++{
++    int i;
++
++    for (i = 0; i < ARRAY_SIZE(eight_bit_data); i++) {
++        struct bitcnt_test_data *d = &eight_bit_data[i];
++        g_assert(ctpop8(d->value.w8)==d->popct);
++    }
++}
++
++struct bitcnt_test_data sixteen_bit_data[] = {
++    { { .w16 = 0x0000 }, .popct=0 },
++    { { .w16 = 0x0001 }, .popct=1 },
++    { { .w16 = 0x0003 }, .popct=2 },
++    { { .w16 = 0x000f }, .popct=4 },
++    { { .w16 = 0x003f }, .popct=6 },
++    { { .w16 = 0x00f0 }, .popct=4 },
++    { { .w16 = 0x0f0f }, .popct=8 },
++    { { .w16 = 0x1f1f }, .popct=10 },
++    { { .w16 = 0x4000 }, .popct=1 },
++    { { .w16 = 0x4001 }, .popct=2 },
++    { { .w16 = 0x7000 }, .popct=3 },
++    { { .w16 = 0x7fff }, .popct=15 },
++};
++
++static void test_ctpop16(void)
++{
++    int i;
++
++    for (i = 0; i < ARRAY_SIZE(sixteen_bit_data); i++) {
++        struct bitcnt_test_data *d = &sixteen_bit_data[i];
++        g_assert(ctpop16(d->value.w16)==d->popct);
++    }
++}
++
++struct bitcnt_test_data thirtytwo_bit_data[] = {
++    { { .w32 = 0x00000000 }, .popct=0 },
++    { { .w32 = 0x00000001 }, .popct=1 },
++    { { .w32 = 0x0000000f }, .popct=4 },
++    { { .w32 = 0x00000f0f }, .popct=8 },
++    { { .w32 = 0x00001f1f }, .popct=10 },
++    { { .w32 = 0x00004001 }, .popct=2 },
++    { { .w32 = 0x00007000 }, .popct=3 },
++    { { .w32 = 0x00007fff }, .popct=15 },
++    { { .w32 = 0x55555555 }, .popct=16 },
++    { { .w32 = 0xaaaaaaaa }, .popct=16 },
++    { { .w32 = 0xff000000 }, .popct=8 },
++    { { .w32 = 0xc0c0c0c0 }, .popct=8 },
++    { { .w32 = 0x0ffffff0 }, .popct=24 },
++    { { .w32 = 0x80000000 }, .popct=1 },
++    { { .w32 = 0xffffffff }, .popct=32 },
++};
++
++static void test_ctpop32(void)
++{
++    int i;
++
++    for (i = 0; i < ARRAY_SIZE(thirtytwo_bit_data); i++) {
++        struct bitcnt_test_data *d = &thirtytwo_bit_data[i];
++        g_assert(ctpop32(d->value.w32)==d->popct);
++    }
++}
++
++struct bitcnt_test_data sixtyfour_bit_data[] = {
++    { { .w64 = 0x0000000000000000ULL }, .popct=0 },
++    { { .w64 = 0x0000000000000001ULL }, .popct=1 },
++    { { .w64 = 0x000000000000000fULL }, .popct=4 },
++    { { .w64 = 0x0000000000000f0fULL }, .popct=8 },
++    { { .w64 = 0x0000000000001f1fULL }, .popct=10 },
++    { { .w64 = 0x0000000000004001ULL }, .popct=2 },
++    { { .w64 = 0x0000000000007000ULL }, .popct=3 },
++    { { .w64 = 0x0000000000007fffULL }, .popct=15 },
++    { { .w64 = 0x0000005500555555ULL }, .popct=16 },
++    { { .w64 = 0x00aa0000aaaa00aaULL }, .popct=16 },
++    { { .w64 = 0x000f000000f00000ULL }, .popct=8 },
++    { { .w64 = 0x0c0c0000c0c0c0c0ULL }, .popct=12 },
++    { { .w64 = 0xf00f00f0f0f0f000ULL }, .popct=24 },
++    { { .w64 = 0x8000000000000000ULL }, .popct=1 },
++    { { .w64 = 0xf0f0f0f0f0f0f0f0ULL }, .popct=32 },
++    { { .w64 = 0xffffffffffffffffULL }, .popct=64 },
++};
++
++static void test_ctpop64(void)
++{
++    int i;
++
++    for (i = 0; i < ARRAY_SIZE(sixtyfour_bit_data); i++) {
++        struct bitcnt_test_data *d = &sixtyfour_bit_data[i];
++        g_assert(ctpop64(d->value.w64)==d->popct);
++    }
++}
++
++int main(int argc, char **argv)
++{
++    g_test_init(&argc, &argv, NULL);
++    g_test_add_func("/bitcnt/ctpop8", test_ctpop8);
++    g_test_add_func("/bitcnt/ctpop16", test_ctpop16);
++    g_test_add_func("/bitcnt/ctpop32", test_ctpop32);
++    g_test_add_func("/bitcnt/ctpop64", test_ctpop64);
++    return g_test_run();
++}
 -- 
 2.9.3
