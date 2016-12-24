@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55711)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55724)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cKdWN-00070d-R8
+	(envelope-from <rth7680@gmail.com>) id 1cKdWO-00071Z-RH
 	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:01:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cKdWM-0005vY-A7
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:01:23 -0500
-Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:33310)
+	(envelope-from <rth7680@gmail.com>) id 1cKdWN-0005xG-Uz
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:01:24 -0500
+Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:36013)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cKdWM-0005uy-38
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:01:22 -0500
-Received: by mail-pg0-x244.google.com with SMTP id g1so2479943pgn.0
-	for <qemu-devel@nongnu.org>; Fri, 23 Dec 2016 20:01:21 -0800 (PST)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cKdWN-0005wz-QU
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:01:23 -0500
+Received: by mail-pf0-x241.google.com with SMTP id c4so14580706pfb.3
+	for <qemu-devel@nongnu.org>; Fri, 23 Dec 2016 20:01:23 -0800 (PST)
 Received: from bigtime.domain ([2602:47:d954:1500:5e51:4fff:fe40:9c64])
 	by smtp.gmail.com with ESMTPSA id
-	n25sm65339316pfi.33.2016.12.23.20.01.20 for <qemu-devel@nongnu.org>
+	n25sm65339316pfi.33.2016.12.23.20.01.21 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 23 Dec 2016 20:01:20 -0800 (PST)
+	Fri, 23 Dec 2016 20:01:21 -0800 (PST)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Fri, 23 Dec 2016 20:00:22 -0800
-Message-Id: <20161224040042.12654-46-rth@twiddle.net>
+Date: Fri, 23 Dec 2016 20:00:24 -0800
+Message-Id: <20161224040042.12654-48-rth@twiddle.net>
 In-Reply-To: <20161224040042.12654-1-rth@twiddle.net>
 References: <20161224040042.12654-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH 45/65] tcg/i386: Fuly convert tcg_target_op_def
+Subject: [Qemu-devel] [PATCH 47/65] tcg/i386: Allow bmi2 shiftx to have
+ non-matching operands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,382 +34,104 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Use a switch instead of searching a table.  Share constraints between
-32-bit and 64-bit, when at all possible.
+Previously we could not have different constraints for different ISA levels,
+which prevented us from eliding the matching constraint for shifts.
+
+We do now have to make sure that the operands match for constant shifts.
+We can also handle some small left shifts via lea.
 
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- tcg/i386/tcg-target.inc.c | 340 +++++++++++++++++++++++++++-------------------
- 1 file changed, 198 insertions(+), 142 deletions(-)
+ tcg/i386/tcg-target.inc.c | 33 +++++++++++++++++++--------------
+ 1 file changed, 19 insertions(+), 14 deletions(-)
 
 diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
-index aa5a248..e497bef 100644
+index 83572ac..651d96c 100644
 --- a/tcg/i386/tcg-target.inc.c
 +++ b/tcg/i386/tcg-target.inc.c
-@@ -237,13 +237,13 @@ static const char *target_parse_constraint(TCGArgConstraint *ct,
+@@ -179,7 +179,6 @@ static const char *target_parse_constraint(TCGArgConstraint *ct,
+         tcg_regset_set_reg(ct->u.regs, TCG_REG_EBX);
          break;
- 
-     case 'e':
--        ct->ct |= TCG_CT_CONST_S32;
-+        ct->ct |= (type == TCG_TYPE_I32 ? TCG_CT_CONST : TCG_CT_CONST_S32);
+     case 'c':
+-    case_c:
+         ct->ct |= TCG_CT_REG;
+         tcg_regset_set_reg(ct->u.regs, TCG_REG_ECX);
          break;
-     case 'Z':
--        ct->ct |= TCG_CT_CONST_U32;
-+        ct->ct |= (type == TCG_TYPE_I32 ? TCG_CT_CONST : TCG_CT_CONST_U32);
+@@ -208,7 +207,6 @@ static const char *target_parse_constraint(TCGArgConstraint *ct,
+         tcg_regset_set32(ct->u.regs, 0, 0xf);
          break;
-     case 'I':
--        ct->ct |= TCG_CT_CONST_I32;
-+        ct->ct |= (type == TCG_TYPE_I32 ? TCG_CT_CONST : TCG_CT_CONST_I32);
-         break;
- 
-     default:
-@@ -2188,152 +2188,208 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
- #undef OP_32_64
- }
- 
--static const TCGTargetOpDef x86_op_defs[] = {
--    { INDEX_op_exit_tb, { } },
--    { INDEX_op_goto_tb, { } },
--    { INDEX_op_br, { } },
--    { INDEX_op_ld8u_i32, { "r", "r" } },
--    { INDEX_op_ld8s_i32, { "r", "r" } },
--    { INDEX_op_ld16u_i32, { "r", "r" } },
--    { INDEX_op_ld16s_i32, { "r", "r" } },
--    { INDEX_op_ld_i32, { "r", "r" } },
--    { INDEX_op_st8_i32, { "qi", "r" } },
--    { INDEX_op_st16_i32, { "ri", "r" } },
--    { INDEX_op_st_i32, { "ri", "r" } },
--
--    { INDEX_op_add_i32, { "r", "r", "ri" } },
--    { INDEX_op_sub_i32, { "r", "0", "ri" } },
--    { INDEX_op_mul_i32, { "r", "0", "ri" } },
--    { INDEX_op_div2_i32, { "a", "d", "0", "1", "r" } },
--    { INDEX_op_divu2_i32, { "a", "d", "0", "1", "r" } },
--    { INDEX_op_and_i32, { "r", "0", "ri" } },
--    { INDEX_op_or_i32, { "r", "0", "ri" } },
--    { INDEX_op_xor_i32, { "r", "0", "ri" } },
--    { INDEX_op_andc_i32, { "r", "r", "ri" } },
--
--    { INDEX_op_shl_i32, { "r", "0", "Ci" } },
--    { INDEX_op_shr_i32, { "r", "0", "Ci" } },
--    { INDEX_op_sar_i32, { "r", "0", "Ci" } },
--    { INDEX_op_rotl_i32, { "r", "0", "ci" } },
--    { INDEX_op_rotr_i32, { "r", "0", "ci" } },
--
--    { INDEX_op_brcond_i32, { "r", "ri" } },
--
--    { INDEX_op_bswap16_i32, { "r", "0" } },
--    { INDEX_op_bswap32_i32, { "r", "0" } },
--
--    { INDEX_op_neg_i32, { "r", "0" } },
--
--    { INDEX_op_not_i32, { "r", "0" } },
--
--    { INDEX_op_ext8s_i32, { "r", "q" } },
--    { INDEX_op_ext16s_i32, { "r", "r" } },
--    { INDEX_op_ext8u_i32, { "r", "q" } },
--    { INDEX_op_ext16u_i32, { "r", "r" } },
--
--    { INDEX_op_setcond_i32, { "q", "r", "ri" } },
--
--    { INDEX_op_deposit_i32, { "Q", "0", "Q" } },
--    { INDEX_op_extract_i32, { "r", "r" } },
--    { INDEX_op_sextract_i32, { "r", "r" } },
--
--    { INDEX_op_movcond_i32, { "r", "r", "ri", "r", "0" } },
-+static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
-+{
-+    static const TCGTargetOpDef ri_r = { .args_ct_str = { "ri", "r" } };
-+    static const TCGTargetOpDef re_r = { .args_ct_str = { "re", "r" } };
-+    static const TCGTargetOpDef qi_r = { .args_ct_str = { "qi", "r" } };
-+    static const TCGTargetOpDef r_r = { .args_ct_str = { "r", "r" } };
-+    static const TCGTargetOpDef r_q = { .args_ct_str = { "r", "q" } };
-+    static const TCGTargetOpDef r_re = { .args_ct_str = { "r", "re" } };
-+    static const TCGTargetOpDef r_0 = { .args_ct_str = { "r", "0" } };
-+    static const TCGTargetOpDef r_r_re = { .args_ct_str = { "r", "r", "re" } };
-+    static const TCGTargetOpDef r_0_re = { .args_ct_str = { "r", "0", "re" } };
-+    static const TCGTargetOpDef r_0_Ci = { .args_ct_str = { "r", "0", "Ci" } };
-+    static const TCGTargetOpDef r_0_ci = { .args_ct_str = { "r", "0", "ci" } };
-+    static const TCGTargetOpDef r_L = { .args_ct_str = { "r", "L" } };
-+    static const TCGTargetOpDef L_L = { .args_ct_str = { "L", "L" } };
-+    static const TCGTargetOpDef r_L_L = { .args_ct_str = { "r", "L", "L" } };
-+    static const TCGTargetOpDef r_r_L = { .args_ct_str = { "r", "r", "L" } };
-+    static const TCGTargetOpDef L_L_L = { .args_ct_str = { "L", "L", "L" } };
-+    static const TCGTargetOpDef r_r_L_L
-+        = { .args_ct_str = { "r", "r", "L", "L" } };
-+    static const TCGTargetOpDef L_L_L_L
-+        = { .args_ct_str = { "L", "L", "L", "L" } };
-+
-+    switch (op) {
-+    case INDEX_op_ld8u_i32:
-+    case INDEX_op_ld8u_i64:
-+    case INDEX_op_ld8s_i32:
-+    case INDEX_op_ld8s_i64:
-+    case INDEX_op_ld16u_i32:
-+    case INDEX_op_ld16u_i64:
-+    case INDEX_op_ld16s_i32:
-+    case INDEX_op_ld16s_i64:
-+    case INDEX_op_ld_i32:
-+    case INDEX_op_ld32u_i64:
-+    case INDEX_op_ld32s_i64:
-+    case INDEX_op_ld_i64:
-+        return &r_r;
- 
--    { INDEX_op_mulu2_i32, { "a", "d", "a", "r" } },
--    { INDEX_op_muls2_i32, { "a", "d", "a", "r" } },
--    { INDEX_op_add2_i32, { "r", "r", "0", "1", "ri", "ri" } },
--    { INDEX_op_sub2_i32, { "r", "r", "0", "1", "ri", "ri" } },
-+    case INDEX_op_st8_i32:
-+    case INDEX_op_st8_i64:
-+        return &qi_r;
-+    case INDEX_op_st16_i32:
-+    case INDEX_op_st16_i64:
-+    case INDEX_op_st_i32:
-+    case INDEX_op_st32_i64:
-+        return &ri_r;
-+    case INDEX_op_st_i64:
-+        return &re_r;
-+
-+    case INDEX_op_add_i32:
-+    case INDEX_op_add_i64:
-+        return &r_r_re;
-+    case INDEX_op_sub_i32:
-+    case INDEX_op_sub_i64:
-+    case INDEX_op_mul_i32:
-+    case INDEX_op_mul_i64:
-+    case INDEX_op_or_i32:
-+    case INDEX_op_or_i64:
-+    case INDEX_op_xor_i32:
-+    case INDEX_op_xor_i64:
-+        return &r_0_re;
-+
-+    case INDEX_op_and_i32:
-+    case INDEX_op_and_i64:
-+        {
-+            static const TCGTargetOpDef and
-+                = { .args_ct_str = { "r", "0", "reZ" } };
-+            return &and;
-+        }
-+        break;
-+    case INDEX_op_andc_i32:
-+    case INDEX_op_andc_i64:
-+        {
-+            static const TCGTargetOpDef andc
-+                = { .args_ct_str = { "r", "r", "rI" } };
-+            return &andc;
-+        }
-+        break;
- 
--    { INDEX_op_mb, { } },
-+    case INDEX_op_shl_i32:
-+    case INDEX_op_shl_i64:
-+    case INDEX_op_shr_i32:
-+    case INDEX_op_shr_i64:
-+    case INDEX_op_sar_i32:
-+    case INDEX_op_sar_i64:
-+        return &r_0_Ci;
-+    case INDEX_op_rotl_i32:
-+    case INDEX_op_rotl_i64:
-+    case INDEX_op_rotr_i32:
-+    case INDEX_op_rotr_i64:
-+        return &r_0_ci;
- 
--#if TCG_TARGET_REG_BITS == 32
--    { INDEX_op_brcond2_i32, { "r", "r", "ri", "ri" } },
--    { INDEX_op_setcond2_i32, { "r", "r", "r", "ri", "ri" } },
--#else
--    { INDEX_op_ld8u_i64, { "r", "r" } },
--    { INDEX_op_ld8s_i64, { "r", "r" } },
--    { INDEX_op_ld16u_i64, { "r", "r" } },
--    { INDEX_op_ld16s_i64, { "r", "r" } },
--    { INDEX_op_ld32u_i64, { "r", "r" } },
--    { INDEX_op_ld32s_i64, { "r", "r" } },
--    { INDEX_op_ld_i64, { "r", "r" } },
--    { INDEX_op_st8_i64, { "ri", "r" } },
--    { INDEX_op_st16_i64, { "ri", "r" } },
--    { INDEX_op_st32_i64, { "ri", "r" } },
--    { INDEX_op_st_i64, { "re", "r" } },
--
--    { INDEX_op_add_i64, { "r", "r", "re" } },
--    { INDEX_op_mul_i64, { "r", "0", "re" } },
--    { INDEX_op_div2_i64, { "a", "d", "0", "1", "r" } },
--    { INDEX_op_divu2_i64, { "a", "d", "0", "1", "r" } },
--    { INDEX_op_sub_i64, { "r", "0", "re" } },
--    { INDEX_op_and_i64, { "r", "0", "reZ" } },
--    { INDEX_op_or_i64, { "r", "0", "re" } },
--    { INDEX_op_xor_i64, { "r", "0", "re" } },
--    { INDEX_op_andc_i64, { "r", "r", "rI" } },
--
--    { INDEX_op_shl_i64, { "r", "0", "Ci" } },
--    { INDEX_op_shr_i64, { "r", "0", "Ci" } },
--    { INDEX_op_sar_i64, { "r", "0", "Ci" } },
--    { INDEX_op_rotl_i64, { "r", "0", "ci" } },
--    { INDEX_op_rotr_i64, { "r", "0", "ci" } },
--
--    { INDEX_op_brcond_i64, { "r", "re" } },
--    { INDEX_op_setcond_i64, { "r", "r", "re" } },
--
--    { INDEX_op_bswap16_i64, { "r", "0" } },
--    { INDEX_op_bswap32_i64, { "r", "0" } },
--    { INDEX_op_bswap64_i64, { "r", "0" } },
--    { INDEX_op_neg_i64, { "r", "0" } },
--    { INDEX_op_not_i64, { "r", "0" } },
--
--    { INDEX_op_ext8s_i64, { "r", "r" } },
--    { INDEX_op_ext16s_i64, { "r", "r" } },
--    { INDEX_op_ext32s_i64, { "r", "r" } },
--    { INDEX_op_ext8u_i64, { "r", "r" } },
--    { INDEX_op_ext16u_i64, { "r", "r" } },
--    { INDEX_op_ext32u_i64, { "r", "r" } },
--
--    { INDEX_op_ext_i32_i64, { "r", "r" } },
--    { INDEX_op_extu_i32_i64, { "r", "r" } },
--
--    { INDEX_op_deposit_i64, { "Q", "0", "Q" } },
--    { INDEX_op_extract_i64, { "r", "r" } },
--    { INDEX_op_movcond_i64, { "r", "r", "re", "r", "0" } },
--
--    { INDEX_op_mulu2_i64, { "a", "d", "a", "r" } },
--    { INDEX_op_muls2_i64, { "a", "d", "a", "r" } },
--    { INDEX_op_add2_i64, { "r", "r", "0", "1", "re", "re" } },
--    { INDEX_op_sub2_i64, { "r", "r", "0", "1", "re", "re" } },
--#endif
-+    case INDEX_op_brcond_i32:
-+    case INDEX_op_brcond_i64:
-+        return &r_re;
- 
--#if TCG_TARGET_REG_BITS == 64
--    { INDEX_op_qemu_ld_i32, { "r", "L" } },
--    { INDEX_op_qemu_st_i32, { "L", "L" } },
--    { INDEX_op_qemu_ld_i64, { "r", "L" } },
--    { INDEX_op_qemu_st_i64, { "L", "L" } },
--#elif TARGET_LONG_BITS <= TCG_TARGET_REG_BITS
--    { INDEX_op_qemu_ld_i32, { "r", "L" } },
--    { INDEX_op_qemu_st_i32, { "L", "L" } },
--    { INDEX_op_qemu_ld_i64, { "r", "r", "L" } },
--    { INDEX_op_qemu_st_i64, { "L", "L", "L" } },
--#else
--    { INDEX_op_qemu_ld_i32, { "r", "L", "L" } },
--    { INDEX_op_qemu_st_i32, { "L", "L", "L" } },
--    { INDEX_op_qemu_ld_i64, { "r", "r", "L", "L" } },
--    { INDEX_op_qemu_st_i64, { "L", "L", "L", "L" } },
--#endif
--    { -1 },
--};
-+    case INDEX_op_bswap16_i32:
-+    case INDEX_op_bswap16_i64:
-+    case INDEX_op_bswap32_i32:
-+    case INDEX_op_bswap32_i64:
-+    case INDEX_op_bswap64_i64:
-+    case INDEX_op_neg_i32:
-+    case INDEX_op_neg_i64:
-+    case INDEX_op_not_i32:
-+    case INDEX_op_not_i64:
-+        return &r_0;
-+
-+    case INDEX_op_ext8s_i32:
-+    case INDEX_op_ext8s_i64:
-+    case INDEX_op_ext8u_i32:
-+    case INDEX_op_ext8u_i64:
-+        return &r_q;
-+    case INDEX_op_ext16s_i32:
-+    case INDEX_op_ext16s_i64:
-+    case INDEX_op_ext16u_i32:
-+    case INDEX_op_ext16u_i64:
-+    case INDEX_op_ext32s_i64:
-+    case INDEX_op_ext32u_i64:
-+    case INDEX_op_ext_i32_i64:
-+    case INDEX_op_extu_i32_i64:
-+    case INDEX_op_extract_i32:
-+    case INDEX_op_extract_i64:
-+    case INDEX_op_sextract_i32:
-+        return &r_r;
-+
-+    case INDEX_op_deposit_i32:
-+    case INDEX_op_deposit_i64:
-+        {
-+            static const TCGTargetOpDef dep
-+                = { .args_ct_str = { "Q", "0", "Q" } };
-+            return &dep;
-+        }
-+    case INDEX_op_setcond_i32:
-+    case INDEX_op_setcond_i64:
-+        {
-+            static const TCGTargetOpDef setc
-+                = { .args_ct_str = { "q", "r", "re" } };
-+            return &setc;
-+        }
-+    case INDEX_op_movcond_i32:
-+    case INDEX_op_movcond_i64:
-+        {
-+            static const TCGTargetOpDef movc
-+                = { .args_ct_str = { "r", "r", "re", "r", "0" } };
-+            return &movc;
-+        }
-+    case INDEX_op_div2_i32:
-+    case INDEX_op_div2_i64:
-+    case INDEX_op_divu2_i32:
-+    case INDEX_op_divu2_i64:
-+        {
-+            static const TCGTargetOpDef div2
-+                = { .args_ct_str = { "a", "d", "0", "1", "r" } };
-+            return &div2;
-+        }
-+    case INDEX_op_mulu2_i32:
-+    case INDEX_op_mulu2_i64:
-+    case INDEX_op_muls2_i32:
-+    case INDEX_op_muls2_i64:
-+        {
-+            static const TCGTargetOpDef mul2
-+                = { .args_ct_str = { "a", "d", "a", "r" } };
-+            return &mul2;
-+        }
-+    case INDEX_op_add2_i32:
-+    case INDEX_op_add2_i64:
-+    case INDEX_op_sub2_i32:
-+    case INDEX_op_sub2_i64:
-+        {
-+            static const TCGTargetOpDef arith2
-+                = { .args_ct_str = { "r", "r", "0", "1", "re", "re" } };
-+            return &arith2;
-+        }
- 
--static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
--{
--    int i, n = ARRAY_SIZE(x86_op_defs);
-+    case INDEX_op_qemu_ld_i32:
-+        return TARGET_LONG_BITS <= TCG_TARGET_REG_BITS ? &r_L : &r_L_L;
-+    case INDEX_op_qemu_st_i32:
-+        return TARGET_LONG_BITS <= TCG_TARGET_REG_BITS ? &L_L : &L_L_L;
-+    case INDEX_op_qemu_ld_i64:
-+        return (TCG_TARGET_REG_BITS == 64 ? &r_L
-+                : TARGET_LONG_BITS <= TCG_TARGET_REG_BITS ? &r_r_L
-+                : &r_r_L_L);
-+    case INDEX_op_qemu_st_i64:
-+        return (TCG_TARGET_REG_BITS == 64 ? &L_L
-+                : TARGET_LONG_BITS <= TCG_TARGET_REG_BITS ? &L_L_L
-+                : &L_L_L_L);
- 
--    for (i = 0; i < n; ++i) {
--        if (x86_op_defs[i].op == op) {
--            return &x86_op_defs[i];
-+    case INDEX_op_brcond2_i32:
-+        {
-+            static const TCGTargetOpDef b2
-+                = { .args_ct_str = { "r", "r", "ri", "ri" } };
-+            return &b2;
-+        }
-+    case INDEX_op_setcond2_i32:
-+        {
-+            static const TCGTargetOpDef s2
-+                = { .args_ct_str = { "r", "r", "r", "ri", "ri" } };
-+            return &s2;
+     case 'r':
+-    case_r:
+         ct->ct |= TCG_CT_REG;
+         if (TCG_TARGET_REG_BITS == 64) {
+             tcg_regset_set32(ct->u.regs, 0, 0xffff);
+@@ -216,13 +214,6 @@ static const char *target_parse_constraint(TCGArgConstraint *ct,
+             tcg_regset_set32(ct->u.regs, 0, 0xff);
          }
-+
-+    default:
-+        break;
-     }
-     return NULL;
- }
+         break;
+-    case 'C':
+-        /* With SHRX et al, we need not use ECX as shift count register.  */
+-        if (have_bmi2) {
+-            goto case_r;
+-        } else {
+-            goto case_c;
+-        }
+ 
+         /* qemu_ld/st address constraint */
+     case 'L':
+@@ -1959,6 +1950,17 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
+         break;
+ 
+     OP_32_64(shl):
++        /* For small constant 3-operand shift, use LEA.  */
++        if (const_a2 && a0 != a1 && (a2 - 1) < 3) {
++            if (a2 - 1 == 0) {
++                /* shl $1,a1,a0 -> lea (a1,a1),a0 */
++                tcg_out_modrm_sib_offset(s, OPC_LEA + rexw, a0, a1, a1, 0, 0);
++            } else {
++                /* shl $n,a1,a0 -> lea 0(,a1,n),a0 */
++                tcg_out_modrm_sib_offset(s, OPC_LEA + rexw, a0, -1, a1, a2, 0);
++            }
++            break;
++        }
+         c = SHIFT_SHL;
+         vexop = OPC_SHLX;
+         goto gen_shift_maybe_vex;
+@@ -1977,9 +1979,12 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
+         c = SHIFT_ROR;
+         goto gen_shift;
+     gen_shift_maybe_vex:
+-        if (have_bmi2 && !const_a2) {
+-            tcg_out_vex_modrm(s, vexop + rexw, a0, a2, a1);
+-            break;
++        if (have_bmi2) {
++            if (!const_a2) {
++                tcg_out_vex_modrm(s, vexop + rexw, a0, a2, a1);
++                break;
++            }
++            tcg_out_mov(s, rexw ? TCG_TYPE_I64 : TCG_TYPE_I32, a0, a1);
+         }
+         /* FALLTHRU */
+     gen_shift:
+@@ -2190,9 +2195,9 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
+     static const TCGTargetOpDef r_q = { .args_ct_str = { "r", "q" } };
+     static const TCGTargetOpDef r_re = { .args_ct_str = { "r", "re" } };
+     static const TCGTargetOpDef r_0 = { .args_ct_str = { "r", "0" } };
++    static const TCGTargetOpDef r_r_ri = { .args_ct_str = { "r", "r", "ri" } };
+     static const TCGTargetOpDef r_r_re = { .args_ct_str = { "r", "r", "re" } };
+     static const TCGTargetOpDef r_0_re = { .args_ct_str = { "r", "0", "re" } };
+-    static const TCGTargetOpDef r_0_Ci = { .args_ct_str = { "r", "0", "Ci" } };
+     static const TCGTargetOpDef r_0_ci = { .args_ct_str = { "r", "0", "ci" } };
+     static const TCGTargetOpDef r_L = { .args_ct_str = { "r", "L" } };
+     static const TCGTargetOpDef L_L = { .args_ct_str = { "L", "L" } };
+@@ -2266,7 +2271,7 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
+     case INDEX_op_shr_i64:
+     case INDEX_op_sar_i32:
+     case INDEX_op_sar_i64:
+-        return &r_0_Ci;
++        return have_bmi2 ? &r_r_ri : &r_0_ci;
+     case INDEX_op_rotl_i32:
+     case INDEX_op_rotl_i64:
+     case INDEX_op_rotr_i32:
 -- 
 2.9.3
