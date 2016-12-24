@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55595)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55606)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cKdWI-0006tf-2r
+	(envelope-from <rth7680@gmail.com>) id 1cKdWI-0006uf-Q6
 	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:01:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cKdWG-0005rN-Ua
+	(envelope-from <rth7680@gmail.com>) id 1cKdWH-0005rn-Mj
 	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:01:18 -0500
-Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:34042)
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:34043)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cKdWG-0005qz-NS
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:01:16 -0500
-Received: by mail-pg0-x241.google.com with SMTP id b1so2475916pgc.1
-	for <qemu-devel@nongnu.org>; Fri, 23 Dec 2016 20:01:16 -0800 (PST)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cKdWH-0005rV-Hj
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:01:17 -0500
+Received: by mail-pg0-x242.google.com with SMTP id b1so2475953pgc.1
+	for <qemu-devel@nongnu.org>; Fri, 23 Dec 2016 20:01:17 -0800 (PST)
 Received: from bigtime.domain ([2602:47:d954:1500:5e51:4fff:fe40:9c64])
 	by smtp.gmail.com with ESMTPSA id
 	n25sm65339316pfi.33.2016.12.23.20.01.15 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 23 Dec 2016 20:01:15 -0800 (PST)
+	Fri, 23 Dec 2016 20:01:16 -0800 (PST)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Fri, 23 Dec 2016 20:00:15 -0800
-Message-Id: <20161224040042.12654-39-rth@twiddle.net>
+Date: Fri, 23 Dec 2016 20:00:16 -0800
+Message-Id: <20161224040042.12654-40-rth@twiddle.net>
 In-Reply-To: <20161224040042.12654-1-rth@twiddle.net>
 References: <20161224040042.12654-1-rth@twiddle.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 38/65] target-arm: Use clz opcode
+Subject: [Qemu-devel] [PATCH 39/65] target-i386: Use clz and ctz opcodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,151 +33,108 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- target/arm/helper-a64.c    | 10 ----------
- target/arm/helper-a64.h    |  2 --
- target/arm/helper.c        |  5 -----
- target/arm/helper.h        |  1 -
- target/arm/translate-a64.c |  8 ++++----
- target/arm/translate.c     |  6 +++---
- 6 files changed, 7 insertions(+), 25 deletions(-)
+ target/i386/helper.h     |  2 --
+ target/i386/int_helper.c | 11 -----------
+ target/i386/translate.c  | 31 ++++++++++++++-----------------
+ 3 files changed, 14 insertions(+), 30 deletions(-)
 
-diff --git a/target/arm/helper-a64.c b/target/arm/helper-a64.c
-index 98b97df..77999ff 100644
---- a/target/arm/helper-a64.c
-+++ b/target/arm/helper-a64.c
-@@ -54,11 +54,6 @@ int64_t HELPER(sdiv64)(int64_t num, int64_t den)
-     return num / den;
- }
+diff --git a/target/i386/helper.h b/target/i386/helper.h
+index bd9b2cf..4c1aaff 100644
+--- a/target/i386/helper.h
++++ b/target/i386/helper.h
+@@ -202,8 +202,6 @@ DEF_HELPER_FLAGS_3(xsetbv, TCG_CALL_NO_WG, void, env, i32, i64)
+ DEF_HELPER_FLAGS_2(rdpkru, TCG_CALL_NO_WG, i64, env, i32)
+ DEF_HELPER_FLAGS_3(wrpkru, TCG_CALL_NO_WG, void, env, i32, i64)
  
--uint64_t HELPER(clz64)(uint64_t x)
+-DEF_HELPER_FLAGS_1(clz, TCG_CALL_NO_RWG_SE, tl, tl)
+-DEF_HELPER_FLAGS_1(ctz, TCG_CALL_NO_RWG_SE, tl, tl)
+ DEF_HELPER_FLAGS_2(pdep, TCG_CALL_NO_RWG_SE, tl, tl, tl)
+ DEF_HELPER_FLAGS_2(pext, TCG_CALL_NO_RWG_SE, tl, tl, tl)
+ 
+diff --git a/target/i386/int_helper.c b/target/i386/int_helper.c
+index 9e873ac..4dc5c65 100644
+--- a/target/i386/int_helper.c
++++ b/target/i386/int_helper.c
+@@ -417,17 +417,6 @@ void helper_idivq_EAX(CPUX86State *env, target_ulong t0)
+ # define clztl  clz64
+ #endif
+ 
+-/* bit operations */
+-target_ulong helper_ctz(target_ulong t0)
 -{
--    return clz64(x);
+-    return ctztl(t0);
 -}
 -
- uint64_t HELPER(cls64)(uint64_t x)
- {
-     return clrsb64(x);
-@@ -69,11 +64,6 @@ uint32_t HELPER(cls32)(uint32_t x)
-     return clrsb32(x);
- }
- 
--uint32_t HELPER(clz32)(uint32_t x)
+-target_ulong helper_clz(target_ulong t0)
 -{
--    return clz32(x);
+-    return clztl(t0);
 -}
 -
- uint64_t HELPER(rbit64)(uint64_t x)
+ target_ulong helper_pdep(target_ulong src, target_ulong mask)
  {
-     return revbit64(x);
-diff --git a/target/arm/helper-a64.h b/target/arm/helper-a64.h
-index dd32000..d320f96 100644
---- a/target/arm/helper-a64.h
-+++ b/target/arm/helper-a64.h
-@@ -18,10 +18,8 @@
-  */
- DEF_HELPER_FLAGS_2(udiv64, TCG_CALL_NO_RWG_SE, i64, i64, i64)
- DEF_HELPER_FLAGS_2(sdiv64, TCG_CALL_NO_RWG_SE, s64, s64, s64)
--DEF_HELPER_FLAGS_1(clz64, TCG_CALL_NO_RWG_SE, i64, i64)
- DEF_HELPER_FLAGS_1(cls64, TCG_CALL_NO_RWG_SE, i64, i64)
- DEF_HELPER_FLAGS_1(cls32, TCG_CALL_NO_RWG_SE, i32, i32)
--DEF_HELPER_FLAGS_1(clz32, TCG_CALL_NO_RWG_SE, i32, i32)
- DEF_HELPER_FLAGS_1(rbit64, TCG_CALL_NO_RWG_SE, i64, i64)
- DEF_HELPER_3(vfp_cmps_a64, i64, f32, f32, ptr)
- DEF_HELPER_3(vfp_cmpes_a64, i64, f32, f32, ptr)
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index b5b65ca..0cafdbc 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -5718,11 +5718,6 @@ uint32_t HELPER(uxtb16)(uint32_t x)
-     return res;
- }
- 
--uint32_t HELPER(clz)(uint32_t x)
--{
--    return clz32(x);
--}
--
- int32_t HELPER(sdiv)(int32_t num, int32_t den)
- {
-     if (den == 0)
-diff --git a/target/arm/helper.h b/target/arm/helper.h
-index 84aa637..df86bf7 100644
---- a/target/arm/helper.h
-+++ b/target/arm/helper.h
-@@ -1,4 +1,3 @@
--DEF_HELPER_FLAGS_1(clz, TCG_CALL_NO_RWG_SE, i32, i32)
- DEF_HELPER_FLAGS_1(sxtb16, TCG_CALL_NO_RWG_SE, i32, i32)
- DEF_HELPER_FLAGS_1(uxtb16, TCG_CALL_NO_RWG_SE, i32, i32)
- 
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 5ba5c3e..7ef1548 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -3953,11 +3953,11 @@ static void handle_clz(DisasContext *s, unsigned int sf,
-     tcg_rn = cpu_reg(s, rn);
- 
-     if (sf) {
--        gen_helper_clz64(tcg_rd, tcg_rn);
-+        tcg_gen_clzi_i64(tcg_rd, tcg_rn, 64);
-     } else {
-         TCGv_i32 tcg_tmp32 = tcg_temp_new_i32();
-         tcg_gen_extrl_i64_i32(tcg_tmp32, tcg_rn);
--        gen_helper_clz(tcg_tmp32, tcg_tmp32);
-+        tcg_gen_clzi_i32(tcg_tmp32, tcg_tmp32, 32);
-         tcg_gen_extu_i32_i64(tcg_rd, tcg_tmp32);
-         tcg_temp_free_i32(tcg_tmp32);
-     }
-@@ -7590,7 +7590,7 @@ static void handle_2misc_64(DisasContext *s, int opcode, bool u,
-     switch (opcode) {
-     case 0x4: /* CLS, CLZ */
-         if (u) {
--            gen_helper_clz64(tcg_rd, tcg_rn);
-+            tcg_gen_clzi_i64(tcg_rd, tcg_rn, 64);
-         } else {
-             gen_helper_cls64(tcg_rd, tcg_rn);
-         }
-@@ -10260,7 +10260,7 @@ static void disas_simd_two_reg_misc(DisasContext *s, uint32_t insn)
-                     goto do_cmop;
-                 case 0x4: /* CLS */
-                     if (u) {
--                        gen_helper_clz32(tcg_res, tcg_op);
-+                        tcg_gen_clzi_i32(tcg_res, tcg_op, 32);
-                     } else {
-                         gen_helper_cls32(tcg_res, tcg_op);
-                     }
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 08da9ac..c9186b6 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -7037,7 +7037,7 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
-                             switch (size) {
-                             case 0: gen_helper_neon_clz_u8(tmp, tmp); break;
-                             case 1: gen_helper_neon_clz_u16(tmp, tmp); break;
--                            case 2: gen_helper_clz(tmp, tmp); break;
-+                            case 2: tcg_gen_clzi_i32(tmp, tmp, 32); break;
-                             default: abort();
-                             }
-                             break;
-@@ -8219,7 +8219,7 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
-                 ARCH(5);
-                 rd = (insn >> 12) & 0xf;
-                 tmp = load_reg(s, rm);
--                gen_helper_clz(tmp, tmp);
-+                tcg_gen_clzi_i32(tmp, tmp, 32);
-                 store_reg(s, rd, tmp);
+     target_ulong dest = 0;
+diff --git a/target/i386/translate.c b/target/i386/translate.c
+index 816d0b1..ce9ccb8 100644
+--- a/target/i386/translate.c
++++ b/target/i386/translate.c
+@@ -6807,21 +6807,18 @@ static target_ulong disas_insn(CPUX86State *env, DisasContext *s,
+                 ? s->cpuid_ext3_features & CPUID_EXT3_ABM
+                 : s->cpuid_7_0_ebx_features & CPUID_7_0_EBX_BMI1)) {
+             int size = 8 << ot;
++            /* For lzcnt/tzcnt, C bit is defined related to the input. */
+             tcg_gen_mov_tl(cpu_cc_src, cpu_T0);
+             if (b & 1) {
+                 /* For lzcnt, reduce the target_ulong result by the
+                    number of zeros that we expect to find at the top.  */
+-                gen_helper_clz(cpu_T0, cpu_T0);
++                tcg_gen_clzi_tl(cpu_T0, cpu_T0, TARGET_LONG_BITS);
+                 tcg_gen_subi_tl(cpu_T0, cpu_T0, TARGET_LONG_BITS - size);
              } else {
-                 goto illegal_op;
-@@ -9992,7 +9992,7 @@ static int disas_thumb2_insn(CPUARMState *env, DisasContext *s, uint16_t insn_hw
-                     tcg_temp_free_i32(tmp2);
-                     break;
-                 case 0x18: /* clz */
--                    gen_helper_clz(tmp, tmp);
-+                    tcg_gen_clzi_i32(tmp, tmp, 32);
-                     break;
-                 case 0x20:
-                 case 0x21:
+-                /* For tzcnt, a zero input must return the operand size:
+-                   force all bits outside the operand size to 1.  */
+-                target_ulong mask = (target_ulong)-2 << (size - 1);
+-                tcg_gen_ori_tl(cpu_T0, cpu_T0, mask);
+-                gen_helper_ctz(cpu_T0, cpu_T0);
+-            }
+-            /* For lzcnt/tzcnt, C and Z bits are defined and are
+-               related to the result.  */
++                /* For tzcnt, a zero input must return the operand size.  */
++                tcg_gen_ctzi_tl(cpu_T0, cpu_T0, size);
++            }
++            /* For lzcnt/tzcnt, Z bit is defined related to the result.  */
+             gen_op_update1_cc();
+             set_cc_op(s, CC_OP_BMILGB + ot);
+         } else {
+@@ -6829,20 +6826,20 @@ static target_ulong disas_insn(CPUX86State *env, DisasContext *s,
+                to the input and not the result.  */
+             tcg_gen_mov_tl(cpu_cc_dst, cpu_T0);
+             set_cc_op(s, CC_OP_LOGICB + ot);
++
++            /* ??? The manual says that the output is undefined when the
++               input is zero, but real hardware leaves it unchanged, and
++               real programs appear to depend on that.  Accomplish this
++               by passing the output as the value to return upon zero.  */
+             if (b & 1) {
+                 /* For bsr, return the bit index of the first 1 bit,
+                    not the count of leading zeros.  */
+-                gen_helper_clz(cpu_T0, cpu_T0);
++                tcg_gen_xori_tl(cpu_T1, cpu_regs[reg], TARGET_LONG_BITS - 1);
++                tcg_gen_clz_tl(cpu_T0, cpu_T0, cpu_T1);
+                 tcg_gen_xori_tl(cpu_T0, cpu_T0, TARGET_LONG_BITS - 1);
+             } else {
+-                gen_helper_ctz(cpu_T0, cpu_T0);
++                tcg_gen_ctz_tl(cpu_T0, cpu_T0, cpu_regs[reg]);
+             }
+-            /* ??? The manual says that the output is undefined when the
+-               input is zero, but real hardware leaves it unchanged, and
+-               real programs appear to depend on that.  */
+-            tcg_gen_movi_tl(cpu_tmp0, 0);
+-            tcg_gen_movcond_tl(TCG_COND_EQ, cpu_T0, cpu_cc_dst, cpu_tmp0,
+-                               cpu_regs[reg], cpu_T0);
+         }
+         gen_op_mov_reg_v(ot, reg, cpu_T0);
+         break;
 -- 
 2.9.3
