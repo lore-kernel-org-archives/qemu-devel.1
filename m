@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55941)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55761)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cKdWY-00079T-7P
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:01:36 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cKdWS-00074c-RL
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:01:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cKdWX-00066A-52
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:01:34 -0500
-Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:33321)
+	(envelope-from <rth7680@gmail.com>) id 1cKdWR-0005zY-Ot
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:01:28 -0500
+Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:34853)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cKdWW-00065e-UE
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:01:33 -0500
-Received: by mail-pg0-x243.google.com with SMTP id g1so2480255pgn.0
-	for <qemu-devel@nongnu.org>; Fri, 23 Dec 2016 20:01:32 -0800 (PST)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cKdWR-0005xn-J1
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:01:27 -0500
+Received: by mail-pg0-x243.google.com with SMTP id i5so2480811pgh.2
+	for <qemu-devel@nongnu.org>; Fri, 23 Dec 2016 20:01:25 -0800 (PST)
 Received: from bigtime.domain ([2602:47:d954:1500:5e51:4fff:fe40:9c64])
 	by smtp.gmail.com with ESMTPSA id
-	n25sm65339316pfi.33.2016.12.23.20.01.31 for <qemu-devel@nongnu.org>
+	n25sm65339316pfi.33.2016.12.23.20.01.23 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 23 Dec 2016 20:01:31 -0800 (PST)
+	Fri, 23 Dec 2016 20:01:23 -0800 (PST)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Fri, 23 Dec 2016 20:00:37 -0800
-Message-Id: <20161224040042.12654-61-rth@twiddle.net>
+Date: Fri, 23 Dec 2016 20:00:26 -0800
+Message-Id: <20161224040042.12654-50-rth@twiddle.net>
 In-Reply-To: <20161224040042.12654-1-rth@twiddle.net>
 References: <20161224040042.12654-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH 60/65] target-i386: Use ctpop helper
+Subject: [Qemu-devel] [PATCH 49/65] tcg/i386: Rely on undefined/undocumented
+ behaviour of BSF/BSR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,157 +34,94 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
+The ISA manual documents the output is undefined if the input was zero.
+
+However, we document in target-i386 that the behavior of real silicon
+is to preserve the contents of the output register.  We also mention
+that there are real applications that depend on this.  That this is
+baked into silicon is mentioned as a potential cause for some false
+sharing behaviour wrt lzcnt/tzcnt.
+
+Taking advantage of this allows us to save 2 insns in the normal case,
+and 4 insns for i686 emulating a 64-bit clz.
+
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- target/i386/cc_helper.c      |  3 +++
- target/i386/cpu.h            |  1 +
- target/i386/ops_sse.h        | 26 --------------------------
- target/i386/ops_sse_header.h |  1 -
- target/i386/translate.c      | 13 +++++++++++--
- 5 files changed, 15 insertions(+), 29 deletions(-)
+ tcg/i386/tcg-target.inc.c | 35 ++++++++++++++++++++++-------------
+ 1 file changed, 22 insertions(+), 13 deletions(-)
 
-diff --git a/target/i386/cc_helper.c b/target/i386/cc_helper.c
-index 83af223..c9c90e1 100644
---- a/target/i386/cc_helper.c
-+++ b/target/i386/cc_helper.c
-@@ -105,6 +105,8 @@ target_ulong helper_cc_compute_all(target_ulong dst, target_ulong src1,
-         return src1;
-     case CC_OP_CLR:
-         return CC_Z | CC_P;
-+    case CC_OP_POPCNT:
-+        return src1 ? 0 : CC_Z;
- 
-     case CC_OP_MULB:
-         return compute_all_mulb(dst, src1);
-@@ -232,6 +234,7 @@ target_ulong helper_cc_compute_c(target_ulong dst, target_ulong src1,
-     case CC_OP_LOGICL:
-     case CC_OP_LOGICQ:
-     case CC_OP_CLR:
-+    case CC_OP_POPCNT:
-         return 0;
- 
-     case CC_OP_EFLAGS:
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index a7f2f60..a04e46b 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -777,6 +777,7 @@ typedef enum {
-     CC_OP_ADCOX, /* CC_DST = C, CC_SRC2 = O, CC_SRC = rest.  */
- 
-     CC_OP_CLR, /* Z set, all other flags clear.  */
-+    CC_OP_POPCNT, /* Z via CC_SRC, all other flags clear.  */
- 
-     CC_OP_NB,
- } CCOp;
-diff --git a/target/i386/ops_sse.h b/target/i386/ops_sse.h
-index 7a98f53..16509d0 100644
---- a/target/i386/ops_sse.h
-+++ b/target/i386/ops_sse.h
-@@ -2157,32 +2157,6 @@ target_ulong helper_crc32(uint32_t crc1, target_ulong msg, uint32_t len)
-     return crc;
+diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
+index 3ed8cd1..3650340 100644
+--- a/tcg/i386/tcg-target.inc.c
++++ b/tcg/i386/tcg-target.inc.c
+@@ -1146,9 +1146,12 @@ static void tcg_out_ctz(TCGContext *s, int rexw, TCGReg dest, TCGReg arg1,
+         tcg_debug_assert(arg2 == (rexw ? 64 : 32));
+         tcg_out_modrm(s, OPC_TZCNT + rexw, dest, arg1);
+     } else {
+-        tcg_debug_assert(dest != arg2);
++        /* ??? The manual says that the output is undefined when the
++           input is zero, but real hardware leaves it unchanged.  As
++           noted in target-i386/translate.c, real programs depend on
++           this -- now we are one more of those.  */
++        tcg_debug_assert(dest == arg2);
+         tcg_out_modrm(s, OPC_BSF + rexw, dest, arg1);
+-        tcg_out_cmov(s, TCG_COND_EQ, rexw, dest, arg2);
+     }
  }
  
--#define POPMASK(i)     ((target_ulong) -1 / ((1LL << (1 << i)) + 1))
--#define POPCOUNT(n, i) ((n & POPMASK(i)) + ((n >> (1 << i)) & POPMASK(i)))
--target_ulong helper_popcnt(CPUX86State *env, target_ulong n, uint32_t type)
--{
--    CC_SRC = n ? 0 : CC_Z;
--
--    n = POPCOUNT(n, 0);
--    n = POPCOUNT(n, 1);
--    n = POPCOUNT(n, 2);
--    n = POPCOUNT(n, 3);
--    if (type == 1) {
--        return n & 0xff;
--    }
--
--    n = POPCOUNT(n, 4);
--#ifndef TARGET_X86_64
--    return n;
--#else
--    if (type == 2) {
--        return n & 0xff;
--    }
--
--    return POPCOUNT(n, 5);
--#endif
--}
--
- void glue(helper_pclmulqdq, SUFFIX)(CPUX86State *env, Reg *d, Reg *s,
-                                     uint32_t ctrl)
- {
-diff --git a/target/i386/ops_sse_header.h b/target/i386/ops_sse_header.h
-index 64c5857..094aafc 100644
---- a/target/i386/ops_sse_header.h
-+++ b/target/i386/ops_sse_header.h
-@@ -333,7 +333,6 @@ DEF_HELPER_4(glue(pcmpestrm, SUFFIX), void, env, Reg, Reg, i32)
- DEF_HELPER_4(glue(pcmpistri, SUFFIX), void, env, Reg, Reg, i32)
- DEF_HELPER_4(glue(pcmpistrm, SUFFIX), void, env, Reg, Reg, i32)
- DEF_HELPER_3(crc32, tl, i32, tl, i32)
--DEF_HELPER_3(popcnt, tl, env, tl, i32)
- #endif
- 
- /* AES-NI op helpers */
-diff --git a/target/i386/translate.c b/target/i386/translate.c
-index ce9ccb8..5f5e60d 100644
---- a/target/i386/translate.c
-+++ b/target/i386/translate.c
-@@ -222,6 +222,7 @@ static const uint8_t cc_op_live[CC_OP_NB] = {
-     [CC_OP_ADOX] = USES_CC_SRC | USES_CC_SRC2,
-     [CC_OP_ADCOX] = USES_CC_DST | USES_CC_SRC | USES_CC_SRC2,
-     [CC_OP_CLR] = 0,
-+    [CC_OP_POPCNT] = USES_CC_SRC,
- };
- 
- static void set_cc_op(DisasContext *s, CCOp op)
-@@ -757,6 +758,7 @@ static CCPrepare gen_prepare_eflags_c(DisasContext *s, TCGv reg)
- 
-     case CC_OP_LOGICB ... CC_OP_LOGICQ:
-     case CC_OP_CLR:
-+    case CC_OP_POPCNT:
-         return (CCPrepare) { .cond = TCG_COND_NEVER, .mask = -1 };
- 
-     case CC_OP_INCB ... CC_OP_INCQ:
-@@ -824,6 +826,7 @@ static CCPrepare gen_prepare_eflags_s(DisasContext *s, TCGv reg)
-         return (CCPrepare) { .cond = TCG_COND_NE, .reg = cpu_cc_src,
-                              .mask = CC_S };
-     case CC_OP_CLR:
-+    case CC_OP_POPCNT:
-         return (CCPrepare) { .cond = TCG_COND_NEVER, .mask = -1 };
-     default:
-         {
-@@ -843,6 +846,7 @@ static CCPrepare gen_prepare_eflags_o(DisasContext *s, TCGv reg)
-         return (CCPrepare) { .cond = TCG_COND_NE, .reg = cpu_cc_src2,
-                              .mask = -1, .no_setcond = true };
-     case CC_OP_CLR:
-+    case CC_OP_POPCNT:
-         return (CCPrepare) { .cond = TCG_COND_NEVER, .mask = -1 };
-     default:
-         gen_compute_eflags(s);
-@@ -866,6 +870,9 @@ static CCPrepare gen_prepare_eflags_z(DisasContext *s, TCGv reg)
-                              .mask = CC_Z };
-     case CC_OP_CLR:
-         return (CCPrepare) { .cond = TCG_COND_ALWAYS, .mask = -1 };
-+    case CC_OP_POPCNT:
-+        return (CCPrepare) { .cond = TCG_COND_EQ, .reg = cpu_cc_src,
-+                             .mask = -1 };
-     default:
-         {
-             TCGMemOp size = (s->cc_op - CC_OP_ADDB) & 3;
-@@ -8205,10 +8212,12 @@ static target_ulong disas_insn(CPUX86State *env, DisasContext *s,
+@@ -1161,20 +1164,26 @@ static void tcg_out_clz(TCGContext *s, int rexw, TCGReg dest, TCGReg arg1,
+             tcg_debug_assert(arg2 == (rexw ? 64 : 32));
+         } else {
+             tcg_debug_assert(dest != arg2);
++            /* LZCNT sets C if the input was zero.  */
+             tcg_out_cmov(s, TCG_COND_LTU, rexw, dest, arg2);
          }
+     } else {
+-        tcg_debug_assert(!const_a2);
+-        tcg_debug_assert(dest != arg1);
+-        tcg_debug_assert(dest != arg2);
++        TCGType type = rexw ? TCG_TYPE_I64: TCG_TYPE_I32;
++        TCGArg rev = rexw ? 63 : 31;
  
-         gen_ldst_modrm(env, s, modrm, ot, OR_TMP0, 0);
--        gen_helper_popcnt(cpu_T0, cpu_env, cpu_T0, tcg_const_i32(ot));
-+        gen_extu(ot, cpu_T0);
-+        tcg_gen_mov_tl(cpu_cc_src, cpu_T0);
-+        tcg_gen_ctpop_tl(cpu_T0, cpu_T0);
-         gen_op_mov_reg_v(ot, reg, cpu_T0);
+-        /* Recall that the output of BSR is the index not the count.  */
++        /* Recall that the output of BSR is the index not the count.
++           Therefore we must adjust the result by ^ (SIZE-1).  In some
++           cases below, we prefer an extra XOR to a JMP.  */
++        /* ??? See the comment in tcg_out_ctz re BSF.  */
++        if (const_a2) {
++            tcg_debug_assert(dest != arg1);
++            tcg_out_movi(s, type, dest, arg2 ^ rev);
++        } else {
++            tcg_debug_assert(dest == arg2);
++            tgen_arithi(s, ARITH_XOR + rexw, dest, rev, 0);
++        }
+         tcg_out_modrm(s, OPC_BSR + rexw, dest, arg1);
+-        tgen_arithi(s, ARITH_XOR + rexw, dest, rexw ? 63 : 31, 0);
+-
+-        /* Since we have destroyed the flags from BSR, we have to re-test.  */
+-        tcg_out_cmp(s, arg1, 0, 1, rexw);
+-        tcg_out_cmov(s, TCG_COND_EQ, rexw, dest, arg2);
++        tgen_arithi(s, ARITH_XOR + rexw, dest, rev, 0);
+     }
+ }
  
--        set_cc_op(s, CC_OP_EFLAGS);
-+        set_cc_op(s, CC_OP_POPCNT);
-         break;
-     case 0x10e ... 0x10f:
-         /* 3DNow! instructions, ignore prefixes */
+@@ -2443,7 +2452,7 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
+     case INDEX_op_ctz_i64:
+         {
+             static const TCGTargetOpDef ctz[2] = {
+-                { .args_ct_str = { "&r", "r", "r" } },
++                { .args_ct_str = { "r", "r", "0" } },
+                 { .args_ct_str = { "&r", "r", "rW" } },
+             };
+             return &ctz[have_bmi1];
+@@ -2452,7 +2461,7 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
+     case INDEX_op_clz_i64:
+         {
+             static const TCGTargetOpDef clz[2] = {
+-                { .args_ct_str = { "&r", "r", "r" } },
++                { .args_ct_str = { "&r", "r", "0i" } },
+                 { .args_ct_str = { "&r", "r", "rW" } },
+             };
+             return &clz[have_lzcnt];
 -- 
 2.9.3
