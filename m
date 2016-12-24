@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55198)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55320)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cKdVr-0006Qz-5j
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:00:52 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cKdW0-0006bb-OH
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:01:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cKdVq-0005Tq-9y
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:00:51 -0500
-Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:35829)
+	(envelope-from <rth7680@gmail.com>) id 1cKdVz-0005b7-Su
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:01:00 -0500
+Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:34015)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cKdVq-0005So-3I
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:00:50 -0500
-Received: by mail-pg0-x241.google.com with SMTP id i5so2479495pgh.2
-	for <qemu-devel@nongnu.org>; Fri, 23 Dec 2016 20:00:49 -0800 (PST)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cKdVz-0005al-OA
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:00:59 -0500
+Received: by mail-pg0-x244.google.com with SMTP id b1so2475201pgc.1
+	for <qemu-devel@nongnu.org>; Fri, 23 Dec 2016 20:00:59 -0800 (PST)
 Received: from bigtime.domain ([2602:47:d954:1500:5e51:4fff:fe40:9c64])
 	by smtp.gmail.com with ESMTPSA id
-	n25sm65339316pfi.33.2016.12.23.20.00.48 for <qemu-devel@nongnu.org>
+	n25sm65339316pfi.33.2016.12.23.20.00.57 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 23 Dec 2016 20:00:48 -0800 (PST)
+	Fri, 23 Dec 2016 20:00:58 -0800 (PST)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Fri, 23 Dec 2016 19:59:44 -0800
-Message-Id: <20161224040042.12654-8-rth@twiddle.net>
+Date: Fri, 23 Dec 2016 19:59:54 -0800
+Message-Id: <20161224040042.12654-18-rth@twiddle.net>
 In-Reply-To: <20161224040042.12654-1-rth@twiddle.net>
 References: <20161224040042.12654-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH 07/65] tcg/i386: Implement field extraction
- opcodes
+Subject: [Qemu-devel] [PATCH 17/65] target-ppc: Use the new deposit and
+ extract ops
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,111 +34,74 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
+Use the new primitives for RDWINM and RLDICL.
+
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- tcg/i386/tcg-target.h     | 12 +++++++++---
- tcg/i386/tcg-target.inc.c | 38 ++++++++++++++++++++++++++++++++++++++
- 2 files changed, 47 insertions(+), 3 deletions(-)
+ target/ppc/translate.c | 35 +++++++++++++++++++----------------
+ 1 file changed, 19 insertions(+), 16 deletions(-)
 
-diff --git a/tcg/i386/tcg-target.h b/tcg/i386/tcg-target.h
-index 7625188..dc19c47 100644
---- a/tcg/i386/tcg-target.h
-+++ b/tcg/i386/tcg-target.h
-@@ -94,8 +94,8 @@ extern bool have_bmi1;
- #define TCG_TARGET_HAS_nand_i32         0
- #define TCG_TARGET_HAS_nor_i32          0
- #define TCG_TARGET_HAS_deposit_i32      1
--#define TCG_TARGET_HAS_extract_i32      0
--#define TCG_TARGET_HAS_sextract_i32     0
-+#define TCG_TARGET_HAS_extract_i32      1
-+#define TCG_TARGET_HAS_sextract_i32     1
- #define TCG_TARGET_HAS_movcond_i32      1
- #define TCG_TARGET_HAS_add2_i32         1
- #define TCG_TARGET_HAS_sub2_i32         1
-@@ -126,7 +126,7 @@ extern bool have_bmi1;
- #define TCG_TARGET_HAS_nand_i64         0
- #define TCG_TARGET_HAS_nor_i64          0
- #define TCG_TARGET_HAS_deposit_i64      1
--#define TCG_TARGET_HAS_extract_i64      0
-+#define TCG_TARGET_HAS_extract_i64      1
- #define TCG_TARGET_HAS_sextract_i64     0
- #define TCG_TARGET_HAS_movcond_i64      1
- #define TCG_TARGET_HAS_add2_i64         1
-@@ -142,6 +142,12 @@ extern bool have_bmi1;
-      ((ofs) == 0 && (len) == 16))
- #define TCG_TARGET_deposit_i64_valid    TCG_TARGET_deposit_i32_valid
- 
-+/* Check for the possibility of high-byte extraction and, for 64-bit,
-+   zero-extending 32-bit right-shift.  */
-+#define TCG_TARGET_extract_i32_valid(ofs, len) ((ofs) == 8 && (len) == 8)
-+#define TCG_TARGET_extract_i64_valid(ofs, len) \
-+    (((ofs) == 8 && (len) == 8) || ((ofs) + (len)) == 32)
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index 59e9552..435c6f0 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -1975,16 +1975,16 @@ static void gen_rlwinm(DisasContext *ctx)
+ {
+     TCGv t_ra = cpu_gpr[rA(ctx->opcode)];
+     TCGv t_rs = cpu_gpr[rS(ctx->opcode)];
+-    uint32_t sh = SH(ctx->opcode);
+-    uint32_t mb = MB(ctx->opcode);
+-    uint32_t me = ME(ctx->opcode);
+-
+-    if (mb == 0 && me == (31 - sh)) {
+-        tcg_gen_shli_tl(t_ra, t_rs, sh);
+-        tcg_gen_ext32u_tl(t_ra, t_ra);
+-    } else if (sh != 0 && me == 31 && sh == (32 - mb)) {
+-        tcg_gen_ext32u_tl(t_ra, t_rs);
+-        tcg_gen_shri_tl(t_ra, t_ra, mb);
++    int sh = SH(ctx->opcode);
++    int mb = MB(ctx->opcode);
++    int me = ME(ctx->opcode);
++    int len = me - mb + 1;
++    int rsh = (32 - sh) & 31;
 +
- #if TCG_TARGET_REG_BITS == 64
- # define TCG_AREG0 TCG_REG_R14
- #else
-diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
-index eeb1777..39f62bd 100644
---- a/tcg/i386/tcg-target.inc.c
-+++ b/tcg/i386/tcg-target.inc.c
-@@ -2143,6 +2143,40 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
-         }
-         break;
++    if (sh != 0 && len > 0 && me == (31 - sh)) {
++        tcg_gen_deposit_z_tl(t_ra, t_rs, sh, len);
++    } else if (me == 31 && rsh + len <= 32) {
++        tcg_gen_extract_tl(t_ra, t_rs, rsh, len);
+     } else {
+         target_ulong mask;
+ #if defined(TARGET_PPC64)
+@@ -1992,8 +1992,9 @@ static void gen_rlwinm(DisasContext *ctx)
+         me += 32;
+ #endif
+         mask = MASK(mb, me);
+-
+-        if (mask <= 0xffffffffu) {
++        if (sh == 0) {
++            tcg_gen_andi_tl(t_ra, t_rs, mask);
++        } else if (mask <= 0xffffffffu) {
+             TCGv_i32 t0 = tcg_temp_new_i32();
+             tcg_gen_trunc_tl_i32(t0, t_rs);
+             tcg_gen_rotli_i32(t0, t0, sh);
+@@ -2096,11 +2097,13 @@ static void gen_rldinm(DisasContext *ctx, int mb, int me, int sh)
+ {
+     TCGv t_ra = cpu_gpr[rA(ctx->opcode)];
+     TCGv t_rs = cpu_gpr[rS(ctx->opcode)];
++    int len = me - mb + 1;
++    int rsh = (64 - sh) & 63;
  
-+    case INDEX_op_extract_i64:
-+        if (args[2] + args[3] == 32) {
-+            /* This is a 32-bit zero-extending right shift.  */
-+            tcg_out_mov(s, TCG_TYPE_I32, args[0], args[1]);
-+            tcg_out_shifti(s, SHIFT_SHR, args[0], args[2]);
-+            break;
-+        }
-+        /* FALLTHRU */
-+    case INDEX_op_extract_i32:
-+        /* On the off-chance that we can use the high-byte registers.
-+           Otherwise we emit the same ext16 + shift pattern that we
-+           would have gotten from the normal tcg-op.c expansion.  */
-+        tcg_debug_assert(args[2] == 8 && args[3] == 8);
-+        if (args[1] < 4 && args[0] < 8) {
-+            tcg_out_modrm(s, OPC_MOVZBL, args[0], args[1] + 4);
-+        } else {
-+            tcg_out_ext16u(s, args[0], args[1]);
-+            tcg_out_shifti(s, SHIFT_SHR, args[0], 8);
-+        }
-+        break;
-+
-+    case INDEX_op_sextract_i32:
-+        /* We don't implement sextract_i64, as we cannot sign-extend to
-+           64-bits without using the REX prefix that explicitly excludes
-+           access to the high-byte registers.  */
-+        tcg_debug_assert(args[2] == 8 && args[3] == 8);
-+        if (args[1] < 4 && args[0] < 8) {
-+            tcg_out_modrm(s, OPC_MOVSBL, args[0], args[1] + 4);
-+        } else {
-+            tcg_out_ext16s(s, args[0], args[1], 0);
-+            tcg_out_shifti(s, SHIFT_SAR, args[0], 8);
-+        }
-+        break;
-+
-     case INDEX_op_mb:
-         tcg_out_mb(s, args[0]);
-         break;
-@@ -2204,6 +2238,9 @@ static const TCGTargetOpDef x86_op_defs[] = {
-     { INDEX_op_setcond_i32, { "q", "r", "ri" } },
- 
-     { INDEX_op_deposit_i32, { "Q", "0", "Q" } },
-+    { INDEX_op_extract_i32, { "r", "r" } },
-+    { INDEX_op_sextract_i32, { "r", "r" } },
-+
-     { INDEX_op_movcond_i32, { "r", "r", "ri", "r", "0" } },
- 
-     { INDEX_op_mulu2_i32, { "a", "d", "a", "r" } },
-@@ -2265,6 +2302,7 @@ static const TCGTargetOpDef x86_op_defs[] = {
-     { INDEX_op_extu_i32_i64, { "r", "r" } },
- 
-     { INDEX_op_deposit_i64, { "Q", "0", "Q" } },
-+    { INDEX_op_extract_i64, { "r", "r" } },
-     { INDEX_op_movcond_i64, { "r", "r", "re", "r", "0" } },
- 
-     { INDEX_op_mulu2_i64, { "a", "d", "a", "r" } },
+-    if (sh != 0 && mb == 0 && me == (63 - sh)) {
+-        tcg_gen_shli_tl(t_ra, t_rs, sh);
+-    } else if (sh != 0 && me == 63 && sh == (64 - mb)) {
+-        tcg_gen_shri_tl(t_ra, t_rs, mb);
++    if (sh != 0 && len > 0 && me == (63 - sh)) {
++        tcg_gen_deposit_z_tl(t_ra, t_rs, sh, len);
++    } else if (me == 63 && rsh + len <= 64) {
++        tcg_gen_extract_tl(t_ra, t_rs, rsh, len);
+     } else {
+         tcg_gen_rotli_tl(t_ra, t_rs, sh);
+         tcg_gen_andi_tl(t_ra, t_ra, MASK(mb, me));
 -- 
 2.9.3
