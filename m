@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45394)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45375)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cKkh0-0007Lw-0u
-	for qemu-devel@nongnu.org; Sat, 24 Dec 2016 06:40:51 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cKkgw-0007z6-R6
+	(envelope-from <laurent@vivier.eu>) id 1cKkgx-0007L6-Ns
 	for qemu-devel@nongnu.org; Sat, 24 Dec 2016 06:40:50 -0500
-Received: from mout.kundenserver.de ([212.227.17.10]:62775)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <laurent@vivier.eu>) id 1cKkgu-0007yD-Hs
+	for qemu-devel@nongnu.org; Sat, 24 Dec 2016 06:40:47 -0500
+Received: from mout.kundenserver.de ([212.227.17.13]:53023)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cKkgw-0007yd-Ej
-	for qemu-devel@nongnu.org; Sat, 24 Dec 2016 06:40:46 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cKkgu-0007xe-0i
+	for qemu-devel@nongnu.org; Sat, 24 Dec 2016 06:40:44 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Sat, 24 Dec 2016 12:40:32 +0100
-Message-Id: <1482579633-3393-12-git-send-email-laurent@vivier.eu>
+Date: Sat, 24 Dec 2016 12:40:28 +0100
+Message-Id: <1482579633-3393-8-git-send-email-laurent@vivier.eu>
 In-Reply-To: <1482579633-3393-1-git-send-email-laurent@vivier.eu>
 References: <1482579633-3393-1-git-send-email-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL 11/12] target-m68k: add rol/ror/roxl/roxr
- instructions
+Subject: [Qemu-devel] [PULL 07/12] target-m68k: add cas/cas2 ops
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,420 +26,321 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Laurent Vivier <laurent@vivier.eu>
 
+Implement CAS using cmpxchg.
+Implement CAS2 using helper and either cmpxchg when
+the 32bit addresses are consecutive, or with
+parallel_cpus+cpu_loop_exit_atomic() otherwise.
+
+Suggested-by: Richard Henderson <rth@twiddle.net>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 Reviewed-by: Richard Henderson <rth@twiddle.net>
 ---
- target/m68k/translate.c | 391 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 391 insertions(+)
+ target/m68k/helper.h    |   2 +
+ target/m68k/op_helper.c | 109 ++++++++++++++++++++++++++++++++++
+ target/m68k/translate.c | 154 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 265 insertions(+)
 
-diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index 76c77ee..bb5a299 100644
---- a/target/m68k/translate.c
-+++ b/target/m68k/translate.c
-@@ -3097,6 +3097,390 @@ DISAS_INSN(shift_mem)
-     set_cc_op(s, CC_OP_FLAGS);
- }
+diff --git a/target/m68k/helper.h b/target/m68k/helper.h
+index 6180dc5..a6f88fc 100644
+--- a/target/m68k/helper.h
++++ b/target/m68k/helper.h
+@@ -12,6 +12,8 @@ DEF_HELPER_3(shr_cc, i32, env, i32, i32)
+ DEF_HELPER_3(sar_cc, i32, env, i32, i32)
+ DEF_HELPER_2(set_sr, void, env, i32)
+ DEF_HELPER_3(movec, void, env, i32, i32)
++DEF_HELPER_4(cas2w, void, env, i32, i32, i32)
++DEF_HELPER_4(cas2l, void, env, i32, i32, i32)
  
-+static void rotate(TCGv reg, TCGv shift, int left, int size)
+ DEF_HELPER_2(f64_to_i32, f32, env, f64)
+ DEF_HELPER_2(f64_to_f32, f32, env, f64)
+diff --git a/target/m68k/op_helper.c b/target/m68k/op_helper.c
+index 04246a9..58d5675 100644
+--- a/target/m68k/op_helper.c
++++ b/target/m68k/op_helper.c
+@@ -360,3 +360,112 @@ void HELPER(divsll)(CPUM68KState *env, int numr, int regr, int32_t den)
+     env->dregs[regr] = rem;
+     env->dregs[numr] = quot;
+ }
++
++void HELPER(cas2w)(CPUM68KState *env, uint32_t regs, uint32_t a1, uint32_t a2)
 +{
-+    switch (size) {
-+    case 8:
-+        /* Replicate the 8-bit input so that a 32-bit rotate works.  */
-+        tcg_gen_ext8u_i32(reg, reg);
-+        tcg_gen_muli_i32(reg, reg, 0x01010101);
-+        goto do_long;
-+    case 16:
-+        /* Replicate the 16-bit input so that a 32-bit rotate works.  */
-+        tcg_gen_deposit_i32(reg, reg, reg, 16, 16);
-+        goto do_long;
-+    do_long:
-+    default:
-+        if (left) {
-+            tcg_gen_rotl_i32(reg, reg, shift);
-+        } else {
-+            tcg_gen_rotr_i32(reg, reg, shift);
++    uint32_t Dc1 = extract32(regs, 9, 3);
++    uint32_t Dc2 = extract32(regs, 6, 3);
++    uint32_t Du1 = extract32(regs, 3, 3);
++    uint32_t Du2 = extract32(regs, 0, 3);
++    int16_t c1 = env->dregs[Dc1];
++    int16_t c2 = env->dregs[Dc2];
++    int16_t u1 = env->dregs[Du1];
++    int16_t u2 = env->dregs[Du2];
++    int16_t l1, l2;
++    uintptr_t ra = GETPC();
++
++    if (parallel_cpus) {
++        /* Tell the main loop we need to serialize this insn.  */
++        cpu_loop_exit_atomic(ENV_GET_CPU(env), ra);
++    } else {
++        /* We're executing in a serial context -- no need to be atomic.  */
++        l1 = cpu_lduw_data_ra(env, a1, ra);
++        l2 = cpu_lduw_data_ra(env, a2, ra);
++        if (l1 == c1 && l2 == c2) {
++            cpu_stw_data_ra(env, a1, u1, ra);
++            cpu_stw_data_ra(env, a2, u2, ra);
 +        }
 +    }
 +
-+    /* compute flags */
-+
-+    switch (size) {
-+    case 8:
-+        tcg_gen_ext8s_i32(reg, reg);
-+        break;
-+    case 16:
-+        tcg_gen_ext16s_i32(reg, reg);
-+        break;
-+    default:
-+        break;
-+    }
-+
-+    /* QREG_CC_X is not affected */
-+
-+    tcg_gen_mov_i32(QREG_CC_N, reg);
-+    tcg_gen_mov_i32(QREG_CC_Z, reg);
-+
-+    if (left) {
-+        tcg_gen_andi_i32(QREG_CC_C, reg, 1);
++    if (c1 != l1) {
++        env->cc_n = l1;
++        env->cc_v = c1;
 +    } else {
-+        tcg_gen_shri_i32(QREG_CC_C, reg, 31);
++        env->cc_n = l2;
++        env->cc_v = c2;
 +    }
-+
-+    tcg_gen_movi_i32(QREG_CC_V, 0); /* always cleared */
++    env->cc_op = CC_OP_CMPW;
++    env->dregs[Dc1] = deposit32(env->dregs[Dc1], 0, 16, l1);
++    env->dregs[Dc2] = deposit32(env->dregs[Dc2], 0, 16, l2);
 +}
 +
-+static void rotate_x_flags(TCGv reg, TCGv X, int size)
++void HELPER(cas2l)(CPUM68KState *env, uint32_t regs, uint32_t a1, uint32_t a2)
 +{
-+    switch (size) {
-+    case 8:
-+        tcg_gen_ext8s_i32(reg, reg);
-+        break;
-+    case 16:
-+        tcg_gen_ext16s_i32(reg, reg);
-+        break;
-+    default:
-+        break;
-+    }
-+    tcg_gen_mov_i32(QREG_CC_N, reg);
-+    tcg_gen_mov_i32(QREG_CC_Z, reg);
-+    tcg_gen_mov_i32(QREG_CC_X, X);
-+    tcg_gen_mov_i32(QREG_CC_C, X);
-+    tcg_gen_movi_i32(QREG_CC_V, 0);
-+}
++    uint32_t Dc1 = extract32(regs, 9, 3);
++    uint32_t Dc2 = extract32(regs, 6, 3);
++    uint32_t Du1 = extract32(regs, 3, 3);
++    uint32_t Du2 = extract32(regs, 0, 3);
++    uint32_t c1 = env->dregs[Dc1];
++    uint32_t c2 = env->dregs[Dc2];
++    uint32_t u1 = env->dregs[Du1];
++    uint32_t u2 = env->dregs[Du2];
++    uint32_t l1, l2;
++    uint64_t c, u, l;
++    uintptr_t ra = GETPC();
++#if defined(CONFIG_ATOMIC64) && !defined(CONFIG_USER_ONLY)
++    int mmu_idx = cpu_mmu_index(env, 0);
++    TCGMemOpIdx oi;
++#endif
 +
-+/* Result of rotate_x() is valid if 0 <= shift <= size */
-+static TCGv rotate_x(TCGv reg, TCGv shift, int left, int size)
-+{
-+    TCGv X, shl, shr, shx, sz, zero;
-+
-+    sz = tcg_const_i32(size);
-+
-+    shr = tcg_temp_new();
-+    shl = tcg_temp_new();
-+    shx = tcg_temp_new();
-+    if (left) {
-+        tcg_gen_mov_i32(shl, shift);      /* shl = shift */
-+        tcg_gen_movi_i32(shr, size + 1);
-+        tcg_gen_sub_i32(shr, shr, shift); /* shr = size + 1 - shift */
-+        tcg_gen_subi_i32(shx, shift, 1);  /* shx = shift - 1 */
-+        /* shx = shx < 0 ? size : shx; */
-+        zero = tcg_const_i32(0);
-+        tcg_gen_movcond_i32(TCG_COND_LT, shx, shx, zero, sz, shx);
-+        tcg_temp_free(zero);
++    if (parallel_cpus) {
++        /* We're executing in a parallel context -- must be atomic.  */
++#ifdef CONFIG_ATOMIC64
++        if ((a1 & 7) == 0 && a2 == a1 + 4) {
++            c = deposit64(c2, 32, 32, c1);
++            u = deposit64(u2, 32, 32, u1);
++#ifdef CONFIG_USER_ONLY
++            l = helper_atomic_cmpxchgq_be(env, a1, c, u);
++#else
++            oi = make_memop_idx(MO_BEQ, mmu_idx);
++            l = helper_atomic_cmpxchgq_be_mmu(env, a1, c, u, oi, ra);
++#endif
++            l1 = l >> 32;
++            l2 = l;
++        } else if ((a2 & 7) == 0 && a1 == a2 + 4) {
++            c = deposit64(c1, 32, 32, c2);
++            u = deposit64(u1, 32, 32, u2);
++#ifdef CONFIG_USER_ONLY
++            l = helper_atomic_cmpxchgq_be(env, a2, c, u);
++#else
++            oi = make_memop_idx(MO_BEQ, mmu_idx);
++            l = helper_atomic_cmpxchgq_be_mmu(env, a2, c, u, oi, ra);
++#endif
++            l2 = l >> 32;
++            l1 = l;
++        } else
++#endif
++        {
++            /* Tell the main loop we need to serialize this insn.  */
++            cpu_loop_exit_atomic(ENV_GET_CPU(env), ra);
++        }
 +    } else {
-+        tcg_gen_mov_i32(shr, shift);      /* shr = shift */
-+        tcg_gen_movi_i32(shl, size + 1);
-+        tcg_gen_sub_i32(shl, shl, shift); /* shl = size + 1 - shift */
-+        tcg_gen_sub_i32(shx, sz, shift); /* shx = size - shift */
++        /* We're executing in a serial context -- no need to be atomic.  */
++        l1 = cpu_ldl_data_ra(env, a1, ra);
++        l2 = cpu_ldl_data_ra(env, a2, ra);
++        if (l1 == c1 && l2 == c2) {
++            cpu_stl_data_ra(env, a1, u1, ra);
++            cpu_stl_data_ra(env, a2, u2, ra);
++        }
 +    }
 +
-+    /* reg = (reg << shl) | (reg >> shr) | (x << shx); */
-+
-+    tcg_gen_shl_i32(shl, reg, shl);
-+    tcg_gen_shr_i32(shr, reg, shr);
-+    tcg_gen_or_i32(reg, shl, shr);
-+    tcg_temp_free(shl);
-+    tcg_temp_free(shr);
-+    tcg_gen_shl_i32(shx, QREG_CC_X, shx);
-+    tcg_gen_or_i32(reg, reg, shx);
-+    tcg_temp_free(shx);
-+
-+    /* X = (reg >> size) & 1 */
-+
-+    X = tcg_temp_new();
-+    tcg_gen_shr_i32(X, reg, sz);
-+    tcg_gen_andi_i32(X, X, 1);
-+    tcg_temp_free(sz);
-+
-+    return X;
-+}
-+
-+/* Result of rotate32_x() is valid if 0 <= shift < 33 */
-+static TCGv rotate32_x(TCGv reg, TCGv shift, int left)
-+{
-+    TCGv_i64 t0, shift64;
-+    TCGv X, lo, hi, zero;
-+
-+    shift64 = tcg_temp_new_i64();
-+    tcg_gen_extu_i32_i64(shift64, shift);
-+
-+    t0 = tcg_temp_new_i64();
-+
-+    X = tcg_temp_new();
-+    lo = tcg_temp_new();
-+    hi = tcg_temp_new();
-+
-+    if (left) {
-+        /* create [reg:X:..] */
-+
-+        tcg_gen_shli_i32(lo, QREG_CC_X, 31);
-+        tcg_gen_concat_i32_i64(t0, lo, reg);
-+
-+        /* rotate */
-+
-+        tcg_gen_rotl_i64(t0, t0, shift64);
-+        tcg_temp_free_i64(shift64);
-+
-+        /* result is [reg:..:reg:X] */
-+
-+        tcg_gen_extr_i64_i32(lo, hi, t0);
-+        tcg_gen_andi_i32(X, lo, 1);
-+
-+        tcg_gen_shri_i32(lo, lo, 1);
++    if (c1 != l1) {
++        env->cc_n = l1;
++        env->cc_v = c1;
 +    } else {
-+        /* create [..:X:reg] */
-+
-+        tcg_gen_concat_i32_i64(t0, reg, QREG_CC_X);
-+
-+        tcg_gen_rotr_i64(t0, t0, shift64);
-+        tcg_temp_free_i64(shift64);
-+
-+        /* result is value: [X:reg:..:reg] */
-+
-+        tcg_gen_extr_i64_i32(lo, hi, t0);
-+
-+        /* extract X */
-+
-+        tcg_gen_shri_i32(X, hi, 31);
-+
-+        /* extract result */
-+
-+        tcg_gen_shli_i32(hi, hi, 1);
++        env->cc_n = l2;
++        env->cc_v = c2;
 +    }
-+    tcg_temp_free_i64(t0);
-+    tcg_gen_or_i32(lo, lo, hi);
-+    tcg_temp_free(hi);
-+
-+    /* if shift == 0, register and X are not affected */
-+
-+    zero = tcg_const_i32(0);
-+    tcg_gen_movcond_i32(TCG_COND_EQ, X, shift, zero, QREG_CC_X, X);
-+    tcg_gen_movcond_i32(TCG_COND_EQ, reg, shift, zero, reg, lo);
-+    tcg_temp_free(zero);
-+    tcg_temp_free(lo);
-+
-+    return X;
++    env->cc_op = CC_OP_CMPL;
++    env->dregs[Dc1] = l1;
++    env->dregs[Dc2] = l2;
 +}
-+
-+DISAS_INSN(rotate_im)
+diff --git a/target/m68k/translate.c b/target/m68k/translate.c
+index 1567647..0124820 100644
+--- a/target/m68k/translate.c
++++ b/target/m68k/translate.c
+@@ -1798,6 +1798,155 @@ DISAS_INSN(arith_im)
+     tcg_temp_free(dest);
+ }
+ 
++DISAS_INSN(cas)
 +{
-+    TCGv shift;
-+    int tmp;
-+    int left = (insn & 0x100);
-+
-+    tmp = (insn >> 9) & 7;
-+    if (tmp == 0) {
-+        tmp = 8;
-+    }
-+
-+    shift = tcg_const_i32(tmp);
-+    if (insn & 8) {
-+        rotate(DREG(insn, 0), shift, left, 32);
-+    } else {
-+        TCGv X = rotate32_x(DREG(insn, 0), shift, left);
-+        rotate_x_flags(DREG(insn, 0), X, 32);
-+        tcg_temp_free(X);
-+    }
-+    tcg_temp_free(shift);
-+
-+    set_cc_op(s, CC_OP_FLAGS);
-+}
-+
-+DISAS_INSN(rotate8_im)
-+{
-+    int left = (insn & 0x100);
-+    TCGv reg;
-+    TCGv shift;
-+    int tmp;
-+
-+    reg = gen_extend(DREG(insn, 0), OS_BYTE, 0);
-+
-+    tmp = (insn >> 9) & 7;
-+    if (tmp == 0) {
-+        tmp = 8;
-+    }
-+
-+    shift = tcg_const_i32(tmp);
-+    if (insn & 8) {
-+        rotate(reg, shift, left, 8);
-+    } else {
-+        TCGv X = rotate_x(reg, shift, left, 8);
-+        rotate_x_flags(reg, X, 8);
-+        tcg_temp_free(X);
-+    }
-+    tcg_temp_free(shift);
-+    gen_partset_reg(OS_BYTE, DREG(insn, 0), reg);
-+    set_cc_op(s, CC_OP_FLAGS);
-+}
-+
-+DISAS_INSN(rotate16_im)
-+{
-+    int left = (insn & 0x100);
-+    TCGv reg;
-+    TCGv shift;
-+    int tmp;
-+
-+    reg = gen_extend(DREG(insn, 0), OS_WORD, 0);
-+    tmp = (insn >> 9) & 7;
-+    if (tmp == 0) {
-+        tmp = 8;
-+    }
-+
-+    shift = tcg_const_i32(tmp);
-+    if (insn & 8) {
-+        rotate(reg, shift, left, 16);
-+    } else {
-+        TCGv X = rotate_x(reg, shift, left, 16);
-+        rotate_x_flags(reg, X, 16);
-+        tcg_temp_free(X);
-+    }
-+    tcg_temp_free(shift);
-+    gen_partset_reg(OS_WORD, DREG(insn, 0), reg);
-+    set_cc_op(s, CC_OP_FLAGS);
-+}
-+
-+DISAS_INSN(rotate_reg)
-+{
-+    TCGv reg;
-+    TCGv src;
-+    TCGv t0, t1;
-+    int left = (insn & 0x100);
-+
-+    reg = DREG(insn, 0);
-+    src = DREG(insn, 9);
-+    /* shift in [0..63] */
-+    t0 = tcg_temp_new();
-+    tcg_gen_andi_i32(t0, src, 63);
-+    t1 = tcg_temp_new_i32();
-+    if (insn & 8) {
-+        tcg_gen_andi_i32(t1, src, 31);
-+        rotate(reg, t1, left, 32);
-+        /* if shift == 0, clear C */
-+        tcg_gen_movcond_i32(TCG_COND_EQ, QREG_CC_C,
-+                            t0, QREG_CC_V /* 0 */,
-+                            QREG_CC_V /* 0 */, QREG_CC_C);
-+    } else {
-+        TCGv X;
-+        /* modulo 33 */
-+        tcg_gen_movi_i32(t1, 33);
-+        tcg_gen_remu_i32(t1, t0, t1);
-+        X = rotate32_x(DREG(insn, 0), t1, left);
-+        rotate_x_flags(DREG(insn, 0), X, 32);
-+        tcg_temp_free(X);
-+    }
-+    tcg_temp_free(t1);
-+    tcg_temp_free(t0);
-+    set_cc_op(s, CC_OP_FLAGS);
-+}
-+
-+DISAS_INSN(rotate8_reg)
-+{
-+    TCGv reg;
-+    TCGv src;
-+    TCGv t0, t1;
-+    int left = (insn & 0x100);
-+
-+    reg = gen_extend(DREG(insn, 0), OS_BYTE, 0);
-+    src = DREG(insn, 9);
-+    /* shift in [0..63] */
-+    t0 = tcg_temp_new_i32();
-+    tcg_gen_andi_i32(t0, src, 63);
-+    t1 = tcg_temp_new_i32();
-+    if (insn & 8) {
-+        tcg_gen_andi_i32(t1, src, 7);
-+        rotate(reg, t1, left, 8);
-+        /* if shift == 0, clear C */
-+        tcg_gen_movcond_i32(TCG_COND_EQ, QREG_CC_C,
-+                            t0, QREG_CC_V /* 0 */,
-+                            QREG_CC_V /* 0 */, QREG_CC_C);
-+    } else {
-+        TCGv X;
-+        /* modulo 9 */
-+        tcg_gen_movi_i32(t1, 9);
-+        tcg_gen_remu_i32(t1, t0, t1);
-+        X = rotate_x(reg, t1, left, 8);
-+        rotate_x_flags(reg, X, 8);
-+        tcg_temp_free(X);
-+    }
-+    tcg_temp_free(t1);
-+    tcg_temp_free(t0);
-+    gen_partset_reg(OS_BYTE, DREG(insn, 0), reg);
-+    set_cc_op(s, CC_OP_FLAGS);
-+}
-+
-+DISAS_INSN(rotate16_reg)
-+{
-+    TCGv reg;
-+    TCGv src;
-+    TCGv t0, t1;
-+    int left = (insn & 0x100);
-+
-+    reg = gen_extend(DREG(insn, 0), OS_WORD, 0);
-+    src = DREG(insn, 9);
-+    /* shift in [0..63] */
-+    t0 = tcg_temp_new_i32();
-+    tcg_gen_andi_i32(t0, src, 63);
-+    t1 = tcg_temp_new_i32();
-+    if (insn & 8) {
-+        tcg_gen_andi_i32(t1, src, 15);
-+        rotate(reg, t1, left, 16);
-+        /* if shift == 0, clear C */
-+        tcg_gen_movcond_i32(TCG_COND_EQ, QREG_CC_C,
-+                            t0, QREG_CC_V /* 0 */,
-+                            QREG_CC_V /* 0 */, QREG_CC_C);
-+    } else {
-+        TCGv X;
-+        /* modulo 17 */
-+        tcg_gen_movi_i32(t1, 17);
-+        tcg_gen_remu_i32(t1, t0, t1);
-+        X = rotate_x(reg, t1, left, 16);
-+        rotate_x_flags(reg, X, 16);
-+        tcg_temp_free(X);
-+    }
-+    tcg_temp_free(t1);
-+    tcg_temp_free(t0);
-+    gen_partset_reg(OS_WORD, DREG(insn, 0), reg);
-+    set_cc_op(s, CC_OP_FLAGS);
-+}
-+
-+DISAS_INSN(rotate_mem)
-+{
-+    TCGv src;
++    int opsize;
 +    TCGv addr;
-+    TCGv shift;
-+    int left = (insn & 0x100);
++    uint16_t ext;
++    TCGv load;
++    TCGv cmp;
++    TCGMemOp opc;
 +
-+    SRC_EA(env, src, OS_WORD, 0, &addr);
-+
-+    shift = tcg_const_i32(1);
-+    if (insn & 0x0200) {
-+        rotate(src, shift, left, 16);
-+    } else {
-+        TCGv X = rotate_x(src, shift, left, 16);
-+        rotate_x_flags(src, X, 16);
-+        tcg_temp_free(X);
++    switch ((insn >> 9) & 3) {
++    case 1:
++        opsize = OS_BYTE;
++        opc = MO_SB;
++        break;
++    case 2:
++        opsize = OS_WORD;
++        opc = MO_TESW;
++        break;
++    case 3:
++        opsize = OS_LONG;
++        opc = MO_TESL;
++        break;
++    default:
++        g_assert_not_reached();
 +    }
-+    tcg_temp_free(shift);
-+    DEST_EA(env, insn, OS_WORD, src, &addr);
-+    set_cc_op(s, CC_OP_FLAGS);
++    opc |= MO_ALIGN;
++
++    ext = read_im16(env, s);
++
++    /* cas Dc,Du,<EA> */
++
++    addr = gen_lea(env, s, insn, opsize);
++    if (IS_NULL_QREG(addr)) {
++        gen_addr_fault(s);
++        return;
++    }
++
++    cmp = gen_extend(DREG(ext, 0), opsize, 1);
++
++    /* if  <EA> == Dc then
++     *     <EA> = Du
++     *     Dc = <EA> (because <EA> == Dc)
++     * else
++     *     Dc = <EA>
++     */
++
++    load = tcg_temp_new();
++    tcg_gen_atomic_cmpxchg_i32(load, addr, cmp, DREG(ext, 6),
++                               IS_USER(s), opc);
++    /* update flags before setting cmp to load */
++    gen_update_cc_cmp(s, load, cmp, opsize);
++    gen_partset_reg(opsize, DREG(ext, 0), load);
++
++    tcg_temp_free(load);
 +}
 +
- DISAS_INSN(ff1)
++DISAS_INSN(cas2w)
++{
++    uint16_t ext1, ext2;
++    TCGv addr1, addr2;
++    TCGv regs;
++
++    /* cas2 Dc1:Dc2,Du1:Du2,(Rn1):(Rn2) */
++
++    ext1 = read_im16(env, s);
++
++    if (ext1 & 0x8000) {
++        /* Address Register */
++        addr1 = AREG(ext1, 12);
++    } else {
++        /* Data Register */
++        addr1 = DREG(ext1, 12);
++    }
++
++    ext2 = read_im16(env, s);
++    if (ext2 & 0x8000) {
++        /* Address Register */
++        addr2 = AREG(ext2, 12);
++    } else {
++        /* Data Register */
++        addr2 = DREG(ext2, 12);
++    }
++
++    /* if (R1) == Dc1 && (R2) == Dc2 then
++     *     (R1) = Du1
++     *     (R2) = Du2
++     * else
++     *     Dc1 = (R1)
++     *     Dc2 = (R2)
++     */
++
++    regs = tcg_const_i32(REG(ext2, 6) |
++                         (REG(ext1, 6) << 3) |
++                         (REG(ext2, 0) << 6) |
++                         (REG(ext1, 0) << 9));
++    gen_helper_cas2w(cpu_env, regs, addr1, addr2);
++    tcg_temp_free(regs);
++
++    /* Note that cas2w also assigned to env->cc_op.  */
++    s->cc_op = CC_OP_CMPW;
++    s->cc_op_synced = 1;
++}
++
++DISAS_INSN(cas2l)
++{
++    uint16_t ext1, ext2;
++    TCGv addr1, addr2, regs;
++
++    /* cas2 Dc1:Dc2,Du1:Du2,(Rn1):(Rn2) */
++
++    ext1 = read_im16(env, s);
++
++    if (ext1 & 0x8000) {
++        /* Address Register */
++        addr1 = AREG(ext1, 12);
++    } else {
++        /* Data Register */
++        addr1 = DREG(ext1, 12);
++    }
++
++    ext2 = read_im16(env, s);
++    if (ext2 & 0x8000) {
++        /* Address Register */
++        addr2 = AREG(ext2, 12);
++    } else {
++        /* Data Register */
++        addr2 = DREG(ext2, 12);
++    }
++
++    /* if (R1) == Dc1 && (R2) == Dc2 then
++     *     (R1) = Du1
++     *     (R2) = Du2
++     * else
++     *     Dc1 = (R1)
++     *     Dc2 = (R2)
++     */
++
++    regs = tcg_const_i32(REG(ext2, 6) |
++                         (REG(ext1, 6) << 3) |
++                         (REG(ext2, 0) << 6) |
++                         (REG(ext1, 0) << 9));
++    gen_helper_cas2l(cpu_env, regs, addr1, addr2);
++    tcg_temp_free(regs);
++
++    /* Note that cas2l also assigned to env->cc_op.  */
++    s->cc_op = CC_OP_CMPL;
++    s->cc_op_synced = 1;
++}
++
+ DISAS_INSN(byterev)
  {
      TCGv reg;
-@@ -4181,6 +4565,13 @@ void register_m68k_insns (CPUM68KState *env)
-     INSN(shift16_reg, e060, f0f0, M68000);
-     INSN(shift_reg, e0a0, f0f0, M68000);
-     INSN(shift_mem, e0c0, fcc0, M68000);
-+    INSN(rotate_im, e090, f0f0, M68000);
-+    INSN(rotate8_im, e010, f0f0, M68000);
-+    INSN(rotate16_im, e050, f0f0, M68000);
-+    INSN(rotate_reg, e0b0, f0f0, M68000);
-+    INSN(rotate8_reg, e030, f0f0, M68000);
-+    INSN(rotate16_reg, e070, f0f0, M68000);
-+    INSN(rotate_mem, e4c0, fcc0, M68000);
-     INSN(undef_fpu, f000, f000, CF_ISA_A);
-     INSN(fpu,       f200, ffc0, CF_FPU);
-     INSN(fbcc,      f280, ffc0, CF_FPU);
+@@ -3641,6 +3790,11 @@ void register_m68k_insns (CPUM68KState *env)
+     BASE(bitop_im,  08c0, ffc0);
+     INSN(arith_im,  0a80, fff8, CF_ISA_A);
+     INSN(arith_im,  0a00, ff00, M68000);
++    INSN(cas,       0ac0, ffc0, CAS);
++    INSN(cas,       0cc0, ffc0, CAS);
++    INSN(cas,       0ec0, ffc0, CAS);
++    INSN(cas2w,     0cfc, ffff, CAS);
++    INSN(cas2l,     0efc, ffff, CAS);
+     BASE(move,      1000, f000);
+     BASE(move,      2000, f000);
+     BASE(move,      3000, f000);
 -- 
 2.7.4
