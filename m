@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55578)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55684)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cKdWG-0006sP-U4
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:01:17 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cKdWM-0006yl-HC
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:01:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cKdWG-0005qu-5d
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:01:17 -0500
-Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:34387)
+	(envelope-from <rth7680@gmail.com>) id 1cKdWL-0005us-F9
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:01:22 -0500
+Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:33769)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cKdWG-0005qd-14
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:01:16 -0500
-Received: by mail-pf0-x244.google.com with SMTP id y68so14578555pfb.1
-	for <qemu-devel@nongnu.org>; Fri, 23 Dec 2016 20:01:15 -0800 (PST)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cKdWL-0005uR-AK
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:01:21 -0500
+Received: by mail-pf0-x242.google.com with SMTP id 127so4600434pfg.0
+	for <qemu-devel@nongnu.org>; Fri, 23 Dec 2016 20:01:21 -0800 (PST)
+Received: from bigtime.domain ([2602:47:d954:1500:5e51:4fff:fe40:9c64])
+	by smtp.gmail.com with ESMTPSA id
+	n25sm65339316pfi.33.2016.12.23.20.01.19 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Fri, 23 Dec 2016 20:01:19 -0800 (PST)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Fri, 23 Dec 2016 20:00:14 -0800
-Message-Id: <20161224040042.12654-38-rth@twiddle.net>
+Date: Fri, 23 Dec 2016 20:00:21 -0800
+Message-Id: <20161224040042.12654-45-rth@twiddle.net>
 In-Reply-To: <20161224040042.12654-1-rth@twiddle.net>
 References: <20161224040042.12654-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH 37/65] target-xtensa: Use clz opcode
+Subject: [Qemu-devel] [PATCH 44/65] tcg/s390: Handle clz opcode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,82 +32,100 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Max Filippov <jcmvbkbc@gmail.com>
 
-Cc: Max Filippov <jcmvbkbc@gmail.com>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- target/xtensa/helper.h    |  2 --
- target/xtensa/op_helper.c | 13 -------------
- target/xtensa/translate.c | 13 +++++++++++--
- 3 files changed, 11 insertions(+), 17 deletions(-)
+ tcg/s390/tcg-target.h     |  2 +-
+ tcg/s390/tcg-target.inc.c | 36 +++++++++++++++++++++++++++++++++++-
+ 2 files changed, 36 insertions(+), 2 deletions(-)
 
-diff --git a/target/xtensa/helper.h b/target/xtensa/helper.h
-index 5ea9c5b..0c8adae 100644
---- a/target/xtensa/helper.h
-+++ b/target/xtensa/helper.h
-@@ -3,8 +3,6 @@ DEF_HELPER_3(exception_cause, noreturn, env, i32, i32)
- DEF_HELPER_4(exception_cause_vaddr, noreturn, env, i32, i32, i32)
- DEF_HELPER_3(debug_exception, noreturn, env, i32, i32)
+diff --git a/tcg/s390/tcg-target.h b/tcg/s390/tcg-target.h
+index 3ac2dc9..22500ba 100644
+--- a/tcg/s390/tcg-target.h
++++ b/tcg/s390/tcg-target.h
+@@ -110,7 +110,7 @@ extern uint64_t s390_facilities;
+ #define TCG_TARGET_HAS_eqv_i64        0
+ #define TCG_TARGET_HAS_nand_i64       0
+ #define TCG_TARGET_HAS_nor_i64        0
+-#define TCG_TARGET_HAS_clz_i64        0
++#define TCG_TARGET_HAS_clz_i64        (s390_facilities & FACILITY_EXT_IMM)
+ #define TCG_TARGET_HAS_ctz_i64        0
+ #define TCG_TARGET_HAS_deposit_i64    (s390_facilities & FACILITY_GEN_INST_EXT)
+ #define TCG_TARGET_HAS_extract_i64    (s390_facilities & FACILITY_GEN_INST_EXT)
+diff --git a/tcg/s390/tcg-target.inc.c b/tcg/s390/tcg-target.inc.c
+index 5275297..e8d56a0 100644
+--- a/tcg/s390/tcg-target.inc.c
++++ b/tcg/s390/tcg-target.inc.c
+@@ -50,7 +50,7 @@
+ #define TCG_REG_NONE    0
  
--DEF_HELPER_FLAGS_1(nsa, TCG_CALL_NO_RWG_SE, i32, i32)
--DEF_HELPER_FLAGS_1(nsau, TCG_CALL_NO_RWG_SE, i32, i32)
- DEF_HELPER_2(wsr_windowbase, void, env, i32)
- DEF_HELPER_4(entry, void, env, i32, i32, i32)
- DEF_HELPER_2(retw, i32, env, i32)
-diff --git a/target/xtensa/op_helper.c b/target/xtensa/op_helper.c
-index 0a4b214..dc25625 100644
---- a/target/xtensa/op_helper.c
-+++ b/target/xtensa/op_helper.c
-@@ -161,19 +161,6 @@ void HELPER(debug_exception)(CPUXtensaState *env, uint32_t pc, uint32_t cause)
-     HELPER(exception)(env, EXC_DEBUG);
+ /* A scratch register that may be be used throughout the backend.  */
+-#define TCG_TMP0        TCG_REG_R14
++#define TCG_TMP0        TCG_REG_R1
+ 
+ #ifndef CONFIG_SOFTMMU
+ #define TCG_GUEST_BASE_REG TCG_REG_R13
+@@ -133,6 +133,7 @@ typedef enum S390Opcode {
+     RRE_DLR     = 0xb997,
+     RRE_DSGFR   = 0xb91d,
+     RRE_DSGR    = 0xb90d,
++    RRE_FLOGR   = 0xb983,
+     RRE_LGBR    = 0xb906,
+     RRE_LCGR    = 0xb903,
+     RRE_LGFR    = 0xb914,
+@@ -1241,6 +1242,33 @@ static void tgen_movcond(TCGContext *s, TCGType type, TCGCond c, TCGReg dest,
+     }
  }
  
--uint32_t HELPER(nsa)(uint32_t v)
--{
--    if (v & 0x80000000) {
--        v = ~v;
--    }
--    return v ? clz32(v) - 1 : 31;
--}
--
--uint32_t HELPER(nsau)(uint32_t v)
--{
--    return v ? clz32(v) : 32;
--}
--
- static void copy_window_from_phys(CPUXtensaState *env,
-         uint32_t window, uint32_t phys, uint32_t n)
++static void tgen_clz(TCGContext *s, TCGReg dest, TCGReg a1,
++                     TCGArg a2, int a2const)
++{
++    /* Since this sets both R and R+1, we have no choice but to store the
++       result into R0, allowing R1 == TCG_TMP0 to be clobbered as well.  */
++    QEMU_BUILD_BUG_ON(TCG_TMP0 != TCG_REG_R1);
++    tcg_out_insn(s, RRE, FLOGR, TCG_REG_R0, a1);
++
++    if (a2const && a2 == 64) {
++        tcg_out_mov(s, TCG_TYPE_I64, dest, TCG_REG_R0);
++    } else {
++        if (a2const) {
++            tcg_out_movi(s, TCG_TYPE_I64, dest, a2);
++        } else {
++            tcg_out_mov(s, TCG_TYPE_I64, dest, a2);
++        }
++        if (s390_facilities & FACILITY_LOAD_ON_COND) {
++            /* Emit: if (one bit found) dest = r0.  */
++            tcg_out_insn(s, RRF, LOCGR, dest, TCG_REG_R0, 2);
++        } else {
++            /* Emit: if (no one bit found) goto over; dest = r0; over:  */
++            tcg_out_insn(s, RI, BRC, 8, (4 + 4) >> 1);
++            tcg_out_insn(s, RRE, LGR, dest, TCG_REG_R0);
++        }
++    }
++}
++
+ static void tgen_deposit(TCGContext *s, TCGReg dest, TCGReg src,
+                          int ofs, int len, int z)
  {
-diff --git a/target/xtensa/translate.c b/target/xtensa/translate.c
-index 0858c29..5c719a4 100644
---- a/target/xtensa/translate.c
-+++ b/target/xtensa/translate.c
-@@ -1372,14 +1372,23 @@ static void disas_xtensa_insn(CPUXtensaState *env, DisasContext *dc)
-                 case 14: /*NSAu*/
-                     HAS_OPTION(XTENSA_OPTION_MISC_OP_NSA);
-                     if (gen_window_check2(dc, RRR_S, RRR_T)) {
--                        gen_helper_nsa(cpu_R[RRR_T], cpu_R[RRR_S]);
-+                        TCGv_i32 t0 = tcg_temp_new_i32();
-+
-+                        /* if (v & 0x80000000) v = ~v; */
-+                        tcg_gen_sari_i32(t0, cpu_R[RRR_S], 31);
-+                        tcg_gen_xor_i32(t0, t0, cpu_R[RRR_S]);
-+
-+                        /* r = (v ? clz(v) : 32) - 1; */
-+                        tcg_gen_clzi_i32(t0, t0, 32);
-+                        tcg_gen_subi_i32(cpu_R[RRR_T], t0, 1);
-+                        tcg_temp_free_i32(t0);
-                     }
-                     break;
+@@ -2181,6 +2209,10 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
+         tgen_extract(s, args[0], args[1], args[2], args[3]);
+         break;
  
-                 case 15: /*NSAUu*/
-                     HAS_OPTION(XTENSA_OPTION_MISC_OP_NSA);
-                     if (gen_window_check2(dc, RRR_S, RRR_T)) {
--                        gen_helper_nsau(cpu_R[RRR_T], cpu_R[RRR_S]);
-+                        tcg_gen_clzi_i32(cpu_R[RRR_T], cpu_R[RRR_S], 32);
-                     }
-                     break;
++    case INDEX_op_clz_i64:
++        tgen_clz(s, args[0], args[1], args[2], const_args[2]);
++        break;
++
+     case INDEX_op_mb:
+         /* The host memory model is quite strong, we simply need to
+            serialize the instruction stream.  */
+@@ -2304,6 +2336,8 @@ static const TCGTargetOpDef s390_op_defs[] = {
+     { INDEX_op_bswap32_i64, { "r", "r" } },
+     { INDEX_op_bswap64_i64, { "r", "r" } },
+ 
++    { INDEX_op_clz_i64, { "r", "r", "ri" } },
++
+     { INDEX_op_add2_i64, { "r", "r", "0", "1", "rA", "r" } },
+     { INDEX_op_sub2_i64, { "r", "r", "0", "1", "rA", "r" } },
  
 -- 
 2.9.3
