@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55241)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55130)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cKdVu-0006UX-BI
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:00:55 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cKdVn-0006PU-CP
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:00:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cKdVt-0005Wd-H4
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:00:54 -0500
-Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:35834)
+	(envelope-from <rth7680@gmail.com>) id 1cKdVm-0005O6-1r
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:00:47 -0500
+Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:33258)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cKdVt-0005W6-BY
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:00:53 -0500
-Received: by mail-pg0-x243.google.com with SMTP id i5so2479624pgh.2
-	for <qemu-devel@nongnu.org>; Fri, 23 Dec 2016 20:00:53 -0800 (PST)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cKdVl-0005Nd-P9
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:00:45 -0500
+Received: by mail-pg0-x244.google.com with SMTP id g1so2478602pgn.0
+	for <qemu-devel@nongnu.org>; Fri, 23 Dec 2016 20:00:45 -0800 (PST)
 Received: from bigtime.domain ([2602:47:d954:1500:5e51:4fff:fe40:9c64])
 	by smtp.gmail.com with ESMTPSA id
-	n25sm65339316pfi.33.2016.12.23.20.00.51 for <qemu-devel@nongnu.org>
+	n25sm65339316pfi.33.2016.12.23.20.00.43 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 23 Dec 2016 20:00:51 -0800 (PST)
+	Fri, 23 Dec 2016 20:00:43 -0800 (PST)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Fri, 23 Dec 2016 19:59:48 -0800
-Message-Id: <20161224040042.12654-12-rth@twiddle.net>
-In-Reply-To: <20161224040042.12654-1-rth@twiddle.net>
-References: <20161224040042.12654-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH 11/65] tcg/s390: Implement field extraction
- opcodes
+Date: Fri, 23 Dec 2016 19:59:37 -0800
+Message-Id: <20161224040042.12654-1-rth@twiddle.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v5 00/65] tcg 2.9 patch queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,76 +34,193 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Signed-off-by: Richard Henderson <rth@twiddle.net>
----
- tcg/s390/tcg-target.h     |  4 ++--
- tcg/s390/tcg-target.inc.c | 11 +++++++++++
- 2 files changed, 13 insertions(+), 2 deletions(-)
+This is a combination of two patch sets that have had previous
+revisions, as well as some new patches.  I wanted to post this
+all together since Alex was having trouble with prerequisites.
 
-diff --git a/tcg/s390/tcg-target.h b/tcg/s390/tcg-target.h
-index d650a72..e9ac12e 100644
---- a/tcg/s390/tcg-target.h
-+++ b/tcg/s390/tcg-target.h
-@@ -78,7 +78,7 @@ extern uint64_t s390_facilities;
- #define TCG_TARGET_HAS_nand_i32       0
- #define TCG_TARGET_HAS_nor_i32        0
- #define TCG_TARGET_HAS_deposit_i32    (s390_facilities & FACILITY_GEN_INST_EXT)
--#define TCG_TARGET_HAS_extract_i32    0
-+#define TCG_TARGET_HAS_extract_i32    (s390_facilities & FACILITY_GEN_INST_EXT)
- #define TCG_TARGET_HAS_sextract_i32   0
- #define TCG_TARGET_HAS_movcond_i32    1
- #define TCG_TARGET_HAS_add2_i32       1
-@@ -109,7 +109,7 @@ extern uint64_t s390_facilities;
- #define TCG_TARGET_HAS_nand_i64       0
- #define TCG_TARGET_HAS_nor_i64        0
- #define TCG_TARGET_HAS_deposit_i64    (s390_facilities & FACILITY_GEN_INST_EXT)
--#define TCG_TARGET_HAS_extract_i64    0
-+#define TCG_TARGET_HAS_extract_i64    (s390_facilities & FACILITY_GEN_INST_EXT)
- #define TCG_TARGET_HAS_sextract_i64   0
- #define TCG_TARGET_HAS_movcond_i64    1
- #define TCG_TARGET_HAS_add2_i64       1
-diff --git a/tcg/s390/tcg-target.inc.c b/tcg/s390/tcg-target.inc.c
-index 9f51133..083c992 100644
---- a/tcg/s390/tcg-target.inc.c
-+++ b/tcg/s390/tcg-target.inc.c
-@@ -1247,6 +1247,12 @@ static void tgen_deposit(TCGContext *s, TCGReg dest, TCGReg src,
-     tcg_out_risbg(s, dest, src, msb, lsb, ofs, 0);
- }
- 
-+static void tgen_extract(TCGContext *s, TCGReg dest, TCGReg src,
-+                         int ofs, int len)
-+{
-+    tcg_out_risbg(s, dest, src, 64 - len, 63, 64 - ofs, 1);
-+}
-+
- static void tgen_gotoi(TCGContext *s, int cc, tcg_insn_unit *dest)
- {
-     ptrdiff_t off = dest - s->code_ptr;
-@@ -2153,6 +2159,9 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
-     OP_32_64(deposit):
-         tgen_deposit(s, args[0], args[2], args[3], args[4]);
-         break;
-+    OP_32_64(extract):
-+        tgen_extract(s, args[0], args[1], args[2], args[3]);
-+        break;
- 
-     case INDEX_op_mb:
-         /* The host memory model is quite strong, we simply need to
-@@ -2222,6 +2231,7 @@ static const TCGTargetOpDef s390_op_defs[] = {
-     { INDEX_op_setcond_i32, { "r", "r", "rC" } },
-     { INDEX_op_movcond_i32, { "r", "r", "rC", "r", "0" } },
-     { INDEX_op_deposit_i32, { "r", "0", "r" } },
-+    { INDEX_op_extract_i32, { "r", "r" } },
- 
-     { INDEX_op_qemu_ld_i32, { "r", "L" } },
-     { INDEX_op_qemu_ld_i64, { "r", "L" } },
-@@ -2283,6 +2293,7 @@ static const TCGTargetOpDef s390_op_defs[] = {
-     { INDEX_op_setcond_i64, { "r", "r", "rC" } },
-     { INDEX_op_movcond_i64, { "r", "r", "rC", "r", "0" } },
-     { INDEX_op_deposit_i64, { "r", "0", "r" } },
-+    { INDEX_op_extract_i64, { "r", "r" } },
- 
-     { INDEX_op_mb, { } },
-     { -1 },
+The full tree is at
+
+  git://github.com/rth7680/qemu.git tcg-2.9
+
+Changes sinve v4:
+  * Feedback from Alex Bennee, including aarch64 guest fixes
+    and a new test case.
+
+Changes since v3:
+  * PPC host patches have been properly annotated for cpu revision,
+    - cnttz[wd] are power9 inventions,
+    - cntpop[wd] are power7 inventions.
+
+  * X86 host checks the correct cpuid bit for lzcnt.
+
+  * Generic TCG has significant changes to enable "interesting"
+    combinations of constraints for X86 host bsr/bsf and to some
+    extent lzcnt/tzcnt.
+
+  * Opcode for ctpop.  I had begun with only the helpers for ctpop,
+    but added the opcode after I discovered that power7/8 could use
+    that as a better alternative for implementing ctz.
+
+  * Updates to the i386 and ppc disassemblers, to handle the new
+    insns that we're emitting.
+
+
+r~
+
+
+Alex Bennée (1):
+  tests: New test-bitcnt
+
+Richard Henderson (64):
+  tcg: Add field extraction primitives
+  tcg: Minor adjustments to deposit expanders
+  tcg: Add deposit_z expander
+  tcg/aarch64: Implement field extraction opcodes
+  tcg/arm: Move isa detection to tcg-target.h
+  tcg/arm: Implement field extraction opcodes
+  tcg/i386: Implement field extraction opcodes
+  tcg/mips: Implement field extraction opcodes
+  tcg/ppc: Implement field extraction opcodes
+  tcg/s390: Expose host facilities to tcg-target.h
+  tcg/s390: Implement field extraction opcodes
+  tcg/s390: Support deposit into zero
+  target-alpha: Use deposit and extract ops
+  target-arm: Use new deposit and extract ops
+  target-i386: Use new deposit and extract ops
+  target-mips: Use the new extract op
+  target-ppc: Use the new deposit and extract ops
+  target-s390x: Use the new deposit and extract ops
+  tcg/optimize: Fold movcond 0/1 into setcond
+  tcg: Add markup for output requires new register
+  tcg: Transition flat op_defs array to a target callback
+  tcg: Pass the opcode width to target_parse_constraint
+  tcg: Allow an operand to be matching or a constant
+  tcg: Add clz and ctz opcodes
+  disas/i386.c: Handle tzcnt
+  disas/ppc: Handle popcnt and cnttz
+  target-alpha: Use the ctz and clz opcodes
+  target-cris: Use clz opcode
+  target-microblaze: Use clz opcode
+  target-mips: Use clz opcode
+  target-openrisc: Use clz and ctz opcodes
+  target-ppc: Use clz and ctz opcodes
+  target-s390x: Use clz opcode
+  target-tilegx: Use clz and ctz opcodes
+  target-tricore: Use clz opcode
+  target-unicore32: Use clz opcode
+  target-xtensa: Use clz opcode
+  target-arm: Use clz opcode
+  target-i386: Use clz and ctz opcodes
+  tcg/ppc: Handle ctz and clz opcodes
+  tcg/aarch64: Handle ctz and clz opcodes
+  tcg/arm: Handle ctz and clz opcodes
+  tcg/mips: Handle clz opcode
+  tcg/s390: Handle clz opcode
+  tcg/i386: Fuly convert tcg_target_op_def
+  tcg/i386: Hoist common arguments in tcg_out_op
+  tcg/i386: Allow bmi2 shiftx to have non-matching operands
+  tcg/i386: Handle ctz and clz opcodes
+  tcg/i386: Rely on undefined/undocumented behaviour of BSF/BSR
+  tcg: Add helpers for clrsb
+  target-arm: Use clrsb helper
+  target-tricore: Use clrsb helper
+  target-xtensa: Use clrsb helper
+  tcg: Add opcode for ctpop
+  target-alpha: Use ctpop helper
+  target-ppc: Use ctpop helper
+  target-s390x: Avoid a loop for popcnt
+  target-sparc: Use ctpop helper
+  target-tilegx: Use ctpop helper
+  target-i386: Use ctpop helper
+  qemu/host-utils.h: Reduce the operation count in the fallback ctpop
+  tcg: Use ctpop to generate ctz if needed
+  tcg/ppc: Handle ctpop opcode
+  tcg/i386: Handle ctpop opcode
+
+ disas/i386.c                  |  12 +-
+ disas/ppc.c                   |  10 +
+ include/qemu/host-utils.h     |  25 +-
+ target/alpha/helper.h         |   4 -
+ target/alpha/int_helper.c     |  15 -
+ target/alpha/translate.c      |  73 +++--
+ target/arm/helper-a64.c       |  20 --
+ target/arm/helper-a64.h       |   4 -
+ target/arm/helper.c           |   5 -
+ target/arm/helper.h           |   1 -
+ target/arm/translate-a64.c    |  97 +++---
+ target/arm/translate.c        |  43 +--
+ target/cris/helper.h          |   1 -
+ target/cris/op_helper.c       |   5 -
+ target/cris/translate.c       |   2 +-
+ target/i386/cc_helper.c       |   3 +
+ target/i386/cpu.h             |   1 +
+ target/i386/helper.h          |   2 -
+ target/i386/int_helper.c      |  11 -
+ target/i386/ops_sse.h         |  26 --
+ target/i386/ops_sse_header.h  |   1 -
+ target/i386/translate.c       |  89 ++---
+ target/microblaze/helper.h    |   1 -
+ target/microblaze/op_helper.c |   5 -
+ target/microblaze/translate.c |   2 +-
+ target/mips/helper.h          |   7 -
+ target/mips/op_helper.c       |  22 --
+ target/mips/translate.c       |  35 +-
+ target/openrisc/helper.h      |   2 -
+ target/openrisc/int_helper.c  |  19 --
+ target/openrisc/translate.c   |   6 +-
+ target/ppc/helper.h           |   7 +-
+ target/ppc/int_helper.c       |  38 +--
+ target/ppc/translate.c        |  61 ++--
+ target/s390x/helper.h         |   1 -
+ target/s390x/int_helper.c     |  21 +-
+ target/s390x/translate.c      |  36 ++-
+ target/sparc/helper.c         |   5 -
+ target/sparc/helper.h         |   1 -
+ target/sparc/translate.c      |   2 +-
+ target/tilegx/helper.c        |  15 -
+ target/tilegx/helper.h        |   3 -
+ target/tilegx/translate.c     |   6 +-
+ target/tricore/helper.h       |   3 -
+ target/tricore/op_helper.c    |  15 -
+ target/tricore/translate.c    |   7 +-
+ target/unicore32/helper.c     |  10 -
+ target/unicore32/helper.h     |   3 -
+ target/unicore32/translate.c  |   6 +-
+ target/xtensa/helper.h        |   2 -
+ target/xtensa/op_helper.c     |  13 -
+ target/xtensa/translate.c     |   4 +-
+ tcg-runtime.c                 |  40 +++
+ tcg/README                    |  41 ++-
+ tcg/aarch64/tcg-target.h      |  10 +
+ tcg/aarch64/tcg-target.inc.c  |  91 +++++-
+ tcg/arm/tcg-target.h          |  41 ++-
+ tcg/arm/tcg-target.inc.c      | 121 ++++---
+ tcg/i386/tcg-target.h         |  17 +
+ tcg/i386/tcg-target.inc.c     | 732 +++++++++++++++++++++++++++---------------
+ tcg/ia64/tcg-target.h         |  10 +
+ tcg/ia64/tcg-target.inc.c     |  28 +-
+ tcg/mips/tcg-target.h         |   5 +
+ tcg/mips/tcg-target.inc.c     |  66 +++-
+ tcg/optimize.c                |  94 ++++++
+ tcg/ppc/tcg-target.h          |  13 +
+ tcg/ppc/tcg-target.inc.c      | 117 ++++++-
+ tcg/s390/tcg-target.h         | 128 ++++----
+ tcg/s390/tcg-target.inc.c     | 173 ++++++----
+ tcg/sparc/tcg-target.h        |  10 +
+ tcg/sparc/tcg-target.inc.c    |  28 +-
+ tcg/tcg-op.c                  | 692 ++++++++++++++++++++++++++++++++++++++-
+ tcg/tcg-op.h                  |  42 +++
+ tcg/tcg-opc.h                 |  10 +
+ tcg/tcg-runtime.h             |   9 +
+ tcg/tcg.c                     | 173 +++++-----
+ tcg/tcg.h                     |  14 +-
+ tcg/tci/tcg-target.h          |  10 +
+ tcg/tci/tcg-target.inc.c      |  25 +-
+ tests/.gitignore              |   1 +
+ tests/Makefile.include        |   2 +
+ tests/test-bitcnt.c           | 140 ++++++++
+ 82 files changed, 2580 insertions(+), 1111 deletions(-)
+ create mode 100644 tests/test-bitcnt.c
+
 -- 
 2.9.3
