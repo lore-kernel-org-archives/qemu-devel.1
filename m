@@ -1,18 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55291)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55198)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cKdVy-0006Zh-Sm
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:01:00 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cKdVr-0006Qz-5j
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:00:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cKdVx-0005ZO-N4
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:00:59 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cKdVq-0005Tq-9y
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:00:51 -0500
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:35829)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cKdVq-0005So-3I
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:00:50 -0500
+Received: by mail-pg0-x241.google.com with SMTP id i5so2479495pgh.2
+	for <qemu-devel@nongnu.org>; Fri, 23 Dec 2016 20:00:49 -0800 (PST)
+Received: from bigtime.domain ([2602:47:d954:1500:5e51:4fff:fe40:9c64])
+	by smtp.gmail.com with ESMTPSA id
+	n25sm65339316pfi.33.2016.12.23.20.00.48 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Fri, 23 Dec 2016 20:00:48 -0800 (PST)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Fri, 23 Dec 2016 19:59:51 -0800
-Message-Id: <20161224040042.12654-15-rth@twiddle.net>
+Date: Fri, 23 Dec 2016 19:59:44 -0800
+Message-Id: <20161224040042.12654-8-rth@twiddle.net>
 In-Reply-To: <20161224040042.12654-1-rth@twiddle.net>
 References: <20161224040042.12654-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH 14/65] target-arm: Use new deposit and extract
- ops
+Subject: [Qemu-devel] [PATCH 07/65] tcg/i386: Implement field extraction
+ opcodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,185 +33,112 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org
 
-Use the new primitives for UBFX and SBFX.
-
-Cc: qemu-arm@nongnu.org
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- target/arm/translate-a64.c | 81 +++++++++++++++++-----------------------------
- target/arm/translate.c     | 37 +++++----------------
- 2 files changed, 37 insertions(+), 81 deletions(-)
+ tcg/i386/tcg-target.h     | 12 +++++++++---
+ tcg/i386/tcg-target.inc.c | 38 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 47 insertions(+), 3 deletions(-)
 
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 6dc27a6..5ba5c3e 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -3215,67 +3215,44 @@ static void disas_bitfield(DisasContext *s, uint32_t insn)
-        low 32-bits anyway.  */
-     tcg_tmp = read_cpu_reg(s, rn, 1);
+diff --git a/tcg/i386/tcg-target.h b/tcg/i386/tcg-target.h
+index 7625188..dc19c47 100644
+--- a/tcg/i386/tcg-target.h
++++ b/tcg/i386/tcg-target.h
+@@ -94,8 +94,8 @@ extern bool have_bmi1;
+ #define TCG_TARGET_HAS_nand_i32         0
+ #define TCG_TARGET_HAS_nor_i32          0
+ #define TCG_TARGET_HAS_deposit_i32      1
+-#define TCG_TARGET_HAS_extract_i32      0
+-#define TCG_TARGET_HAS_sextract_i32     0
++#define TCG_TARGET_HAS_extract_i32      1
++#define TCG_TARGET_HAS_sextract_i32     1
+ #define TCG_TARGET_HAS_movcond_i32      1
+ #define TCG_TARGET_HAS_add2_i32         1
+ #define TCG_TARGET_HAS_sub2_i32         1
+@@ -126,7 +126,7 @@ extern bool have_bmi1;
+ #define TCG_TARGET_HAS_nand_i64         0
+ #define TCG_TARGET_HAS_nor_i64          0
+ #define TCG_TARGET_HAS_deposit_i64      1
+-#define TCG_TARGET_HAS_extract_i64      0
++#define TCG_TARGET_HAS_extract_i64      1
+ #define TCG_TARGET_HAS_sextract_i64     0
+ #define TCG_TARGET_HAS_movcond_i64      1
+ #define TCG_TARGET_HAS_add2_i64         1
+@@ -142,6 +142,12 @@ extern bool have_bmi1;
+      ((ofs) == 0 && (len) == 16))
+ #define TCG_TARGET_deposit_i64_valid    TCG_TARGET_deposit_i32_valid
  
--    /* Recognize the common aliases.  */
--    if (opc == 0) { /* SBFM */
--        if (ri == 0) {
--            if (si == 7) { /* SXTB */
--                tcg_gen_ext8s_i64(tcg_rd, tcg_tmp);
--                goto done;
--            } else if (si == 15) { /* SXTH */
--                tcg_gen_ext16s_i64(tcg_rd, tcg_tmp);
--                goto done;
--            } else if (si == 31) { /* SXTW */
--                tcg_gen_ext32s_i64(tcg_rd, tcg_tmp);
--                goto done;
--            }
--        }
--        if (si == 63 || (si == 31 && ri <= si)) { /* ASR */
--            if (si == 31) {
--                tcg_gen_ext32s_i64(tcg_tmp, tcg_tmp);
--            }
--            tcg_gen_sari_i64(tcg_rd, tcg_tmp, ri);
-+    /* Recognize simple(r) extractions.  */
-+    if (si <= ri) {
-+        /* Wd<s-r:0> = Wn<s:r> */
-+        len = (si - ri) + 1;
-+        if (opc == 0) { /* SBFM: ASR, SBFX, SXTB, SXTH, SXTW */
-+            tcg_gen_sextract_i64(tcg_rd, tcg_tmp, ri, len);
-             goto done;
--        }
--    } else if (opc == 2) { /* UBFM */
--        if (ri == 0) { /* UXTB, UXTH, plus non-canonical AND */
--            tcg_gen_andi_i64(tcg_rd, tcg_tmp, bitmask64(si + 1));
-+        } else if (opc == 2) { /* UBFM: UBFX, LSR, UXTB, UXTH */
-+            tcg_gen_extract_i64(tcg_rd, tcg_tmp, ri, len);
-             return;
++/* Check for the possibility of high-byte extraction and, for 64-bit,
++   zero-extending 32-bit right-shift.  */
++#define TCG_TARGET_extract_i32_valid(ofs, len) ((ofs) == 8 && (len) == 8)
++#define TCG_TARGET_extract_i64_valid(ofs, len) \
++    (((ofs) == 8 && (len) == 8) || ((ofs) + (len)) == 32)
++
+ #if TCG_TARGET_REG_BITS == 64
+ # define TCG_AREG0 TCG_REG_R14
+ #else
+diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
+index eeb1777..39f62bd 100644
+--- a/tcg/i386/tcg-target.inc.c
++++ b/tcg/i386/tcg-target.inc.c
+@@ -2143,6 +2143,40 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
          }
--        if (si == 63 || (si == 31 && ri <= si)) { /* LSR */
--            if (si == 31) {
--                tcg_gen_ext32u_i64(tcg_tmp, tcg_tmp);
--            }
--            tcg_gen_shri_i64(tcg_rd, tcg_tmp, ri);
--            return;
--        }
--        if (si + 1 == ri && si != bitsize - 1) { /* LSL */
--            int shift = bitsize - 1 - si;
--            tcg_gen_shli_i64(tcg_rd, tcg_tmp, shift);
--            goto done;
--        }
--    }
--
--    if (opc != 1) { /* SBFM or UBFM */
--        tcg_gen_movi_i64(tcg_rd, 0);
--    }
--
--    /* do the bit move operation */
--    if (si >= ri) {
--        /* Wd<s-r:0> = Wn<s:r> */
--        tcg_gen_shri_i64(tcg_tmp, tcg_tmp, ri);
-+        /* opc == 1, BXFIL fall through to deposit */
-+        tcg_gen_extract_i64(tcg_tmp, tcg_tmp, ri, len);
-         pos = 0;
--        len = (si - ri) + 1;
-     } else {
--        /* Wd<32+s-r,32-r> = Wn<s:0> */
--        pos = bitsize - ri;
-+        /* Handle the ri > si case with a deposit
-+         * Wd<32+s-r,32-r> = Wn<s:0>
-+         */
-         len = si + 1;
-+        pos = (bitsize - ri) & (bitsize - 1);
-     }
+         break;
  
--    tcg_gen_deposit_i64(tcg_rd, tcg_rd, tcg_tmp, pos, len);
-+    if (opc == 0 && len < ri) {
-+        /* SBFM: sign extend the destination field from len to fill
-+           the balance of the word.  Let the deposit below insert all
-+           of those sign bits.  */
-+        tcg_gen_sextract_i64(tcg_tmp, tcg_tmp, 0, len);
-+        len = ri;
-+    }
++    case INDEX_op_extract_i64:
++        if (args[2] + args[3] == 32) {
++            /* This is a 32-bit zero-extending right shift.  */
++            tcg_out_mov(s, TCG_TYPE_I32, args[0], args[1]);
++            tcg_out_shifti(s, SHIFT_SHR, args[0], args[2]);
++            break;
++        }
++        /* FALLTHRU */
++    case INDEX_op_extract_i32:
++        /* On the off-chance that we can use the high-byte registers.
++           Otherwise we emit the same ext16 + shift pattern that we
++           would have gotten from the normal tcg-op.c expansion.  */
++        tcg_debug_assert(args[2] == 8 && args[3] == 8);
++        if (args[1] < 4 && args[0] < 8) {
++            tcg_out_modrm(s, OPC_MOVZBL, args[0], args[1] + 4);
++        } else {
++            tcg_out_ext16u(s, args[0], args[1]);
++            tcg_out_shifti(s, SHIFT_SHR, args[0], 8);
++        }
++        break;
++
++    case INDEX_op_sextract_i32:
++        /* We don't implement sextract_i64, as we cannot sign-extend to
++           64-bits without using the REX prefix that explicitly excludes
++           access to the high-byte registers.  */
++        tcg_debug_assert(args[2] == 8 && args[3] == 8);
++        if (args[1] < 4 && args[0] < 8) {
++            tcg_out_modrm(s, OPC_MOVSBL, args[0], args[1] + 4);
++        } else {
++            tcg_out_ext16s(s, args[0], args[1], 0);
++            tcg_out_shifti(s, SHIFT_SAR, args[0], 8);
++        }
++        break;
++
+     case INDEX_op_mb:
+         tcg_out_mb(s, args[0]);
+         break;
+@@ -2204,6 +2238,9 @@ static const TCGTargetOpDef x86_op_defs[] = {
+     { INDEX_op_setcond_i32, { "q", "r", "ri" } },
  
--    if (opc == 0) { /* SBFM - sign extend the destination field */
--        tcg_gen_shli_i64(tcg_rd, tcg_rd, 64 - (pos + len));
--        tcg_gen_sari_i64(tcg_rd, tcg_rd, 64 - (pos + len));
-+    if (opc == 1) { /* BFM, BXFIL */
-+        tcg_gen_deposit_i64(tcg_rd, tcg_rd, tcg_tmp, pos, len);
-+    } else {
-+        /* SBFM or UBFM: We start with zero, and we haven't modified
-+           any bits outside bitsize, therefore the zero-extension
-+           below is unneeded.  */
-+        tcg_gen_deposit_z_i64(tcg_rd, tcg_tmp, pos, len);
-+        return;
-     }
+     { INDEX_op_deposit_i32, { "Q", "0", "Q" } },
++    { INDEX_op_extract_i32, { "r", "r" } },
++    { INDEX_op_sextract_i32, { "r", "r" } },
++
+     { INDEX_op_movcond_i32, { "r", "r", "ri", "r", "0" } },
  
-  done:
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 0ad9070..08da9ac 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -288,29 +288,6 @@ static void gen_revsh(TCGv_i32 var)
-     tcg_gen_ext16s_i32(var, var);
- }
+     { INDEX_op_mulu2_i32, { "a", "d", "a", "r" } },
+@@ -2265,6 +2302,7 @@ static const TCGTargetOpDef x86_op_defs[] = {
+     { INDEX_op_extu_i32_i64, { "r", "r" } },
  
--/* Unsigned bitfield extract.  */
--static void gen_ubfx(TCGv_i32 var, int shift, uint32_t mask)
--{
--    if (shift)
--        tcg_gen_shri_i32(var, var, shift);
--    tcg_gen_andi_i32(var, var, mask);
--}
--
--/* Signed bitfield extract.  */
--static void gen_sbfx(TCGv_i32 var, int shift, int width)
--{
--    uint32_t signbit;
--
--    if (shift)
--        tcg_gen_sari_i32(var, var, shift);
--    if (shift + width < 32) {
--        signbit = 1u << (width - 1);
--        tcg_gen_andi_i32(var, var, (1u << width) - 1);
--        tcg_gen_xori_i32(var, var, signbit);
--        tcg_gen_subi_i32(var, var, signbit);
--    }
--}
--
- /* Return (b << 32) + a. Mark inputs as dead */
- static TCGv_i64 gen_addq_msw(TCGv_i64 a, TCGv_i32 b)
- {
-@@ -9178,9 +9155,9 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
-                             goto illegal_op;
-                         if (i < 32) {
-                             if (op1 & 0x20) {
--                                gen_ubfx(tmp, shift, (1u << i) - 1);
-+                                tcg_gen_extract_i32(tmp, tmp, shift, i);
-                             } else {
--                                gen_sbfx(tmp, shift, i);
-+                                tcg_gen_sextract_i32(tmp, tmp, shift, i);
-                             }
-                         }
-                         store_reg(s, rd, tmp);
-@@ -10497,15 +10474,17 @@ static int disas_thumb2_insn(CPUARMState *env, DisasContext *s, uint16_t insn_hw
-                         imm++;
-                         if (shift + imm > 32)
-                             goto illegal_op;
--                        if (imm < 32)
--                            gen_sbfx(tmp, shift, imm);
-+                        if (imm < 32) {
-+                            tcg_gen_sextract_i32(tmp, tmp, shift, imm);
-+                        }
-                         break;
-                     case 6: /* Unsigned bitfield extract.  */
-                         imm++;
-                         if (shift + imm > 32)
-                             goto illegal_op;
--                        if (imm < 32)
--                            gen_ubfx(tmp, shift, (1u << imm) - 1);
-+                        if (imm < 32) {
-+                            tcg_gen_extract_i32(tmp, tmp, shift, imm);
-+                        }
-                         break;
-                     case 3: /* Bitfield insert/clear.  */
-                         if (imm < shift)
+     { INDEX_op_deposit_i64, { "Q", "0", "Q" } },
++    { INDEX_op_extract_i64, { "r", "r" } },
+     { INDEX_op_movcond_i64, { "r", "r", "re", "r", "0" } },
+ 
+     { INDEX_op_mulu2_i64, { "a", "d", "a", "r" } },
 -- 
 2.9.3
