@@ -1,19 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33277)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45419)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cKZnq-0000jM-Hk
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 19:03:11 -0500
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cKbec-0003Us-Km
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 21:01:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cKZnp-0003mN-8J
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 19:03:10 -0500
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri, 23 Dec 2016 17:28:54 +0300
-Message-ID: <1482503344-6424-12-git-send-email-vsementsov@virtuozzo.com>
-In-Reply-To: <1482503344-6424-1-git-send-email-vsementsov@virtuozzo.com>
-References: <1482503344-6424-1-git-send-email-vsementsov@virtuozzo.com>
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cKbeb-0005Ss-Mm
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 21:01:46 -0500
+From: zhanghailiang <zhang.zhanghailiang@huawei.com>
+Date: Sat, 24 Dec 2016 10:00:50 +0800
+Message-ID: <1482544850-6544-1-git-send-email-zhang.zhanghailiang@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 11/21] backup: move r/w error handling code to
- r/w functions
+Subject: [Qemu-devel] [PATCH] The QEMU crashes since invoking
+ qemu_thread_set_name(), the backtrace is:
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,260 +20,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, famz@redhat.com, den@openvz.org, stefanha@redhat.com, vsementsov@virtuozzo.com, pbonzini@redhat.com, jcody@redhat.com
+To: qemu-devel@nongnu.org
+Cc: qemu-stable@nongnu.org, pbonzini@redhat.com, Caoxinhua <caoxinhua@huawei.com>
 
-It simplifies code: we do not need error_is_read parameter and
-retrying in backup_loop. Also, retrying for read and write are separate,
-so we will not reread if write failed after successfull read.
+From: Caoxinhua <caoxinhua@huawei.com>
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+(gdb) bt
+#0 0x00007f9a68b095d7 in __GI_raise (sig=sig@entry=6) at ../nptl/sysdeps/unix/sysv/linux/raise.c:56
+#1 0x00007f9a68b0acc8 in __GI_abort () at abort.c:90
+#2 0x00007f9a69cda389 in PAT_abort () from /usr/lib64/libuvpuserhotfix.so
+#3 0x00007f9a69cdda0d in patchIllInsHandler () from /usr/lib64/libuvpuserhotfix.so
+#4 <signal handler called>
+#5 pthread_setname_np (th=140298470549248, name=name@entry=0x8cc74a "io-task-worker") at ../nptl/sysdeps/unix/sysv/linux/pthread_setname.c:49
+#6 0x00000000007f5f20 in qemu_thread_set_name (thread=thread@entry=0x7ffd2ac09680, name=name@entry=0x8cc74a "io-task-worker") at util/qemu_thread_posix.c:459
+#7 0x00000000007f679e in qemu_thread_create (thread=thread@entry=0x7ffd2ac09680, name=name@entry=0x8cc74a "io-task-worker",start_routine=start_routine@entry=0x7c1300 <qio_task_thread_worker>, arg=arg@entry=0x7f99b8001720, mode=mode@entry=1) at util/qemu_thread_posix.c:498
+#8 0x00000000007c15b6 in qio_task_run_in_thread (task=task@entry=0x7f99b80033d0, worker=worker@entry=0x7bd920 <qio_channel_socket_connect_worker>, opaque=0x7f99b8003370, destroy=0x7c6220 <qapi_free_SocketAddress>) at io/task.c:133
+#9 0x00000000007bda04 in qio_channel_socket_connect_async (ioc=0x7f99b80014c0, addr=0x37235d0, callback=callback@entry=0x54ad00 <qemu_chr_socket_connected>, opaque=opaque@entry=0x38118b0, destroy=destroy@entry=0x0) at io/channel_socket.c:191
+#10 0x00000000005487f6 in socket_reconnect_timeout (opaque=0x38118b0) at qemu_char.c:4402
+#11 0x00007f9a6a1533b3 in g_timeout_dispatch () from /usr/lib64/libglib-2.0.so.0
+#12 0x00007f9a6a15299a in g_main_context_dispatch () from /usr/lib64/libglib-2.0.so.0
+#13 0x0000000000747386 in glib_pollfds_poll () at main_loop.c:227
+#14 0x0000000000747424 in os_host_main_loop_wait (timeout=404000000) at main_loop.c:272
+#15 0x0000000000747575 in main_loop_wait (nonblocking=nonblocking@entry=0) at main_loop.c:520
+#16 0x0000000000557d31 in main_loop () at vl.c:2170
+#17 0x000000000041c8b7 in main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>) at vl.c:5083
+
+That's because the corresponding child thread has been exited before the main thread calling qemu_thread_set_name().
+Let's detach the thread after calling qemu_thread_set_name().
+
+Signed-off-by: Caoxinhua <caoxinhua@huawei.com>
 ---
- block/backup.c | 141 ++++++++++++++++++++++++++++++---------------------------
- 1 file changed, 74 insertions(+), 67 deletions(-)
+ util/qemu-thread-posix.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/block/backup.c b/block/backup.c
-index 5c31607..442e6da 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -95,18 +95,65 @@ static void cow_request_end(CowRequest *req)
-     qemu_co_queue_restart_all(&req->wait_queue);
- }
- 
-+static BlockErrorAction backup_error_action(BackupBlockJob *job,
-+                                            bool read, int error)
-+{
-+    if (read) {
-+        return block_job_error_action(&job->common, job->on_source_error,
-+                                      true, error);
-+    } else {
-+        return block_job_error_action(&job->common, job->on_target_error,
-+                                      false, error);
-+    }
-+}
-+
-+static bool coroutine_fn yield_and_check(BackupBlockJob *job)
-+{
-+    if (block_job_is_cancelled(&job->common)) {
-+        return true;
-+    }
-+
-+    /* we need to yield so that bdrv_drain_all() returns.
-+     * (without, VM does not reboot)
-+     */
-+    if (job->common.speed) {
-+        uint64_t delay_ns = ratelimit_calculate_delay(&job->limit,
-+                                                      job->sectors_read);
-+        job->sectors_read = 0;
-+        block_job_sleep_ns(&job->common, QEMU_CLOCK_REALTIME, delay_ns);
-+    } else {
-+        block_job_sleep_ns(&job->common, QEMU_CLOCK_REALTIME, 0);
-+    }
-+
-+    if (block_job_is_cancelled(&job->common)) {
-+        return true;
-+    }
-+
-+    return false;
-+}
-+
- static int coroutine_fn backup_do_read(BackupBlockJob *job,
-                                        int64_t offset, unsigned int bytes,
-                                        QEMUIOVector *qiov,
-                                        bool is_write_notifier)
- {
--    int ret = blk_co_preadv(job->common.blk, offset, bytes, qiov,
--                            is_write_notifier ? BDRV_REQ_NO_SERIALISING : 0);
-+    int ret;
-+    BdrvRequestFlags flags = is_write_notifier ? BDRV_REQ_NO_SERIALISING : 0;
-+
-+retry:
-+    ret = blk_co_preadv(job->common.blk, offset, bytes, qiov, flags);
-     if (ret < 0) {
-         trace_backup_do_read_fail(job, offset, bytes, ret);
-+
-+        BlockErrorAction action = backup_error_action(job, true, -ret);
-+        if (action != BLOCK_ERROR_ACTION_REPORT && !yield_and_check(job)) {
-+            goto retry;
-+        }
-+
-+        return ret;
+diff --git a/util/qemu-thread-posix.c b/util/qemu-thread-posix.c
+index d20cdde..d31793d 100644
+--- a/util/qemu-thread-posix.c
++++ b/util/qemu-thread-posix.c
+@@ -481,12 +481,6 @@ void qemu_thread_create(QemuThread *thread, const char *name,
+     if (err) {
+         error_exit(err, __func__);
      }
- 
--    return ret;
-+    return 0;
- }
- 
- static int coroutine_fn backup_do_write(BackupBlockJob *job,
-@@ -114,9 +161,13 @@ static int coroutine_fn backup_do_write(BackupBlockJob *job,
-                                         QEMUIOVector *qiov)
- {
-     int ret;
-+    bool zeroes;
-+
-     assert(qiov->niov == 1);
-+    zeroes = buffer_is_zero(qiov->iov->iov_base, qiov->iov->iov_len);
- 
--    if (buffer_is_zero(qiov->iov->iov_base, qiov->iov->iov_len)) {
-+retry:
-+    if (zeroes) {
-         ret = blk_co_pwrite_zeroes(job->target, offset, bytes,
-                                    BDRV_REQ_MAY_UNMAP);
-     } else {
-@@ -125,14 +176,20 @@ static int coroutine_fn backup_do_write(BackupBlockJob *job,
-     }
-     if (ret < 0) {
-         trace_backup_do_write_fail(job, offset, bytes, ret);
-+
-+        BlockErrorAction action = backup_error_action(job, false, -ret);
-+        if (action != BLOCK_ERROR_ACTION_REPORT && !yield_and_check(job)) {
-+            goto retry;
-+        }
-+
-+        return ret;
-     }
- 
--    return ret;
-+    return 0;
- }
- 
- static int coroutine_fn backup_copy_cluster(BackupBlockJob *job,
-                                             int64_t cluster,
--                                            bool *error_is_read,
-                                             bool is_write_notifier,
-                                             void *bounce_buffer)
- {
-@@ -156,17 +213,11 @@ static int coroutine_fn backup_copy_cluster(BackupBlockJob *job,
-     ret = backup_do_read(job, offset, bounce_qiov.size, &bounce_qiov,
-                          is_write_notifier);
-     if (ret < 0) {
--        if (error_is_read) {
--            *error_is_read = true;
+-    if (mode == QEMU_THREAD_DETACHED) {
+-        err = pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+-        if (err) {
+-            error_exit(err, __func__);
 -        }
-         return ret;
+-    }
+ 
+     /* Leave signal handling to the iothread.  */
+     sigfillset(&set);
+@@ -499,6 +493,12 @@ void qemu_thread_create(QemuThread *thread, const char *name,
+         qemu_thread_set_name(thread, name);
      }
  
-     ret = backup_do_write(job, offset, bounce_qiov.size, &bounce_qiov);
-     if (ret < 0) {
--        if (error_is_read) {
--            *error_is_read = false;
--        }
-         return ret;
-     }
- 
-@@ -181,7 +232,6 @@ static int coroutine_fn backup_copy_cluster(BackupBlockJob *job,
- 
- static int coroutine_fn backup_do_cow(BackupBlockJob *job,
-                                       int64_t sector_num, int nb_sectors,
--                                      bool *error_is_read,
-                                       bool is_write_notifier)
- {
-     BlockBackend *blk = job->common.blk;
-@@ -212,8 +262,7 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
-             bounce_buffer = blk_blockalign(blk, job->cluster_size);
-         }
- 
--        ret = backup_copy_cluster(job, start, error_is_read, is_write_notifier,
--                                  bounce_buffer);
-+        ret = backup_copy_cluster(job, start, is_write_notifier, bounce_buffer);
-         if (ret < 0) {
-             hbitmap_set(job->copy_bitmap, start, 1);
-             goto out;
-@@ -247,7 +296,7 @@ static int coroutine_fn backup_before_write_notify(
-     assert((req->offset & (BDRV_SECTOR_SIZE - 1)) == 0);
-     assert((req->bytes & (BDRV_SECTOR_SIZE - 1)) == 0);
- 
--    return backup_do_cow(job, sector_num, nb_sectors, NULL, true);
-+    return backup_do_cow(job, sector_num, nb_sectors, true);
- }
- 
- static void backup_set_speed(BlockJob *job, int64_t speed, Error **errp)
-@@ -374,18 +423,6 @@ static void backup_drain(BlockJob *job)
-     }
- }
- 
--static BlockErrorAction backup_error_action(BackupBlockJob *job,
--                                            bool read, int error)
--{
--    if (read) {
--        return block_job_error_action(&job->common, job->on_source_error,
--                                      true, error);
--    } else {
--        return block_job_error_action(&job->common, job->on_target_error,
--                                      false, error);
--    }
--}
--
- typedef struct {
-     int ret;
- } BackupCompleteData;
-@@ -398,31 +435,6 @@ static void backup_complete(BlockJob *job, void *opaque)
-     g_free(data);
- }
- 
--static bool coroutine_fn yield_and_check(BackupBlockJob *job)
--{
--    if (block_job_is_cancelled(&job->common)) {
--        return true;
--    }
--
--    /* we need to yield so that bdrv_drain_all() returns.
--     * (without, VM does not reboot)
--     */
--    if (job->common.speed) {
--        uint64_t delay_ns = ratelimit_calculate_delay(&job->limit,
--                                                      job->sectors_read);
--        job->sectors_read = 0;
--        block_job_sleep_ns(&job->common, QEMU_CLOCK_REALTIME, delay_ns);
--    } else {
--        block_job_sleep_ns(&job->common, QEMU_CLOCK_REALTIME, 0);
--    }
--
--    if (block_job_is_cancelled(&job->common)) {
--        return true;
--    }
--
--    return false;
--}
--
- static void backup_skip_clusters(BackupBlockJob *job,
-                                  int64_t start, int64_t end)
- {
-@@ -521,26 +533,21 @@ static void backup_skip_loop(BackupBlockJob *job, BlockDriverState *base)
- static int coroutine_fn backup_loop(BackupBlockJob *job)
- {
-     int ret;
--    bool error_is_read;
-     int64_t sectors_per_cluster = cluster_size_sectors(job);
-     int64_t cluster;
-     HBitmapIter hbi;
- 
-     hbitmap_iter_init(&hbi, job->copy_bitmap, 0);
-     while ((cluster = hbitmap_iter_next(&hbi)) != -1) {
--        do {
--            if (yield_and_check(job)) {
--                return 0;
--            }
--            ret = backup_do_cow(job, cluster * sectors_per_cluster,
--                                sectors_per_cluster, &error_is_read,
--                                false);
--            if ((ret < 0) &&
--                backup_error_action(job, error_is_read, -ret) ==
--                BLOCK_ERROR_ACTION_REPORT) {
--                return ret;
--            }
--        } while (ret < 0);
-+        if (yield_and_check(job)) {
-+            return 0;
++    if (mode == QEMU_THREAD_DETACHED) {
++        err = pthread_detach(thread->thread);
++        if (err) {
++            error_exit(err, __func__);
 +        }
-+
-+        ret = backup_do_cow(job, cluster * sectors_per_cluster,
-+                            sectors_per_cluster, false);
-+        if (ret < 0) {
-+            return ret;
-+        }
-     }
++    }
+     pthread_sigmask(SIG_SETMASK, &oldset, NULL);
  
-     return 0;
+     pthread_attr_destroy(&attr);
 -- 
 1.8.3.1
