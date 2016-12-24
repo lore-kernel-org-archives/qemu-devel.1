@@ -1,28 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55684)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55625)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cKdWM-0006yl-HC
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:01:23 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cKdWL-0005us-F9
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:01:22 -0500
-Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:33769)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cKdWL-0005uR-AK
+	(envelope-from <rth7680@gmail.com>) id 1cKdWJ-0006vc-N4
 	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:01:21 -0500
-Received: by mail-pf0-x242.google.com with SMTP id 127so4600434pfg.0
-	for <qemu-devel@nongnu.org>; Fri, 23 Dec 2016 20:01:21 -0800 (PST)
-Received: from bigtime.domain ([2602:47:d954:1500:5e51:4fff:fe40:9c64])
-	by smtp.gmail.com with ESMTPSA id
-	n25sm65339316pfi.33.2016.12.23.20.01.19 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 23 Dec 2016 20:01:19 -0800 (PST)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <rth7680@gmail.com>) id 1cKdWI-0005sK-Jf
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:01:19 -0500
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Fri, 23 Dec 2016 20:00:21 -0800
-Message-Id: <20161224040042.12654-45-rth@twiddle.net>
+Date: Fri, 23 Dec 2016 20:00:17 -0800
+Message-Id: <20161224040042.12654-41-rth@twiddle.net>
 In-Reply-To: <20161224040042.12654-1-rth@twiddle.net>
 References: <20161224040042.12654-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH 44/65] tcg/s390: Handle clz opcode
+Subject: [Qemu-devel] [PATCH 40/65] tcg/ppc: Handle ctz and clz opcodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,100 +21,191 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org
 
+Cc: qemu-ppc@nongnu.org
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- tcg/s390/tcg-target.h     |  2 +-
- tcg/s390/tcg-target.inc.c | 36 +++++++++++++++++++++++++++++++++++-
- 2 files changed, 36 insertions(+), 2 deletions(-)
+ tcg/ppc/tcg-target.h     | 10 +++++---
+ tcg/ppc/tcg-target.inc.c | 67 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 73 insertions(+), 4 deletions(-)
 
-diff --git a/tcg/s390/tcg-target.h b/tcg/s390/tcg-target.h
-index 3ac2dc9..22500ba 100644
---- a/tcg/s390/tcg-target.h
-+++ b/tcg/s390/tcg-target.h
-@@ -110,7 +110,7 @@ extern uint64_t s390_facilities;
- #define TCG_TARGET_HAS_eqv_i64        0
- #define TCG_TARGET_HAS_nand_i64       0
- #define TCG_TARGET_HAS_nor_i64        0
--#define TCG_TARGET_HAS_clz_i64        0
-+#define TCG_TARGET_HAS_clz_i64        (s390_facilities & FACILITY_EXT_IMM)
- #define TCG_TARGET_HAS_ctz_i64        0
- #define TCG_TARGET_HAS_deposit_i64    (s390_facilities & FACILITY_GEN_INST_EXT)
- #define TCG_TARGET_HAS_extract_i64    (s390_facilities & FACILITY_GEN_INST_EXT)
-diff --git a/tcg/s390/tcg-target.inc.c b/tcg/s390/tcg-target.inc.c
-index 5275297..e8d56a0 100644
---- a/tcg/s390/tcg-target.inc.c
-+++ b/tcg/s390/tcg-target.inc.c
-@@ -50,7 +50,7 @@
- #define TCG_REG_NONE    0
+diff --git a/tcg/ppc/tcg-target.h b/tcg/ppc/tcg-target.h
+index 698a599..c798c9c 100644
+--- a/tcg/ppc/tcg-target.h
++++ b/tcg/ppc/tcg-target.h
+@@ -49,6 +49,8 @@ typedef enum {
+     TCG_AREG0 = TCG_REG_R27
+ } TCGReg;
  
- /* A scratch register that may be be used throughout the backend.  */
--#define TCG_TMP0        TCG_REG_R14
-+#define TCG_TMP0        TCG_REG_R1
++extern bool have_isa_3_00;
++
+ /* optional instructions automatically implemented */
+ #define TCG_TARGET_HAS_ext8u_i32        0 /* andi */
+ #define TCG_TARGET_HAS_ext16u_i32       0
+@@ -68,8 +70,8 @@ typedef enum {
+ #define TCG_TARGET_HAS_eqv_i32          1
+ #define TCG_TARGET_HAS_nand_i32         1
+ #define TCG_TARGET_HAS_nor_i32          1
+-#define TCG_TARGET_HAS_clz_i32          0
+-#define TCG_TARGET_HAS_ctz_i32          0
++#define TCG_TARGET_HAS_clz_i32          1
++#define TCG_TARGET_HAS_ctz_i32          have_isa_3_00
+ #define TCG_TARGET_HAS_deposit_i32      1
+ #define TCG_TARGET_HAS_extract_i32      1
+ #define TCG_TARGET_HAS_sextract_i32     0
+@@ -103,8 +105,8 @@ typedef enum {
+ #define TCG_TARGET_HAS_eqv_i64          1
+ #define TCG_TARGET_HAS_nand_i64         1
+ #define TCG_TARGET_HAS_nor_i64          1
+-#define TCG_TARGET_HAS_clz_i64          0
+-#define TCG_TARGET_HAS_ctz_i64          0
++#define TCG_TARGET_HAS_clz_i64          1
++#define TCG_TARGET_HAS_ctz_i64          have_isa_3_00
+ #define TCG_TARGET_HAS_deposit_i64      1
+ #define TCG_TARGET_HAS_extract_i64      1
+ #define TCG_TARGET_HAS_sextract_i64     0
+diff --git a/tcg/ppc/tcg-target.inc.c b/tcg/ppc/tcg-target.inc.c
+index bf17161..766bc1a 100644
+--- a/tcg/ppc/tcg-target.inc.c
++++ b/tcg/ppc/tcg-target.inc.c
+@@ -77,11 +77,15 @@
+ #define TCG_CT_CONST_U32  0x800
+ #define TCG_CT_CONST_ZERO 0x1000
+ #define TCG_CT_CONST_MONE 0x2000
++#define TCG_CT_CONST_WSZ  0x4000
  
- #ifndef CONFIG_SOFTMMU
- #define TCG_GUEST_BASE_REG TCG_REG_R13
-@@ -133,6 +133,7 @@ typedef enum S390Opcode {
-     RRE_DLR     = 0xb997,
-     RRE_DSGFR   = 0xb91d,
-     RRE_DSGR    = 0xb90d,
-+    RRE_FLOGR   = 0xb983,
-     RRE_LGBR    = 0xb906,
-     RRE_LCGR    = 0xb903,
-     RRE_LGFR    = 0xb914,
-@@ -1241,6 +1242,33 @@ static void tgen_movcond(TCGContext *s, TCGType type, TCGCond c, TCGReg dest,
+ static tcg_insn_unit *tb_ret_addr;
+ 
+ #include "elf.h"
++
+ static bool have_isa_2_06;
++bool have_isa_3_00;
++
+ #define HAVE_ISA_2_06  have_isa_2_06
+ #define HAVE_ISEL      have_isa_2_06
+ 
+@@ -305,6 +309,9 @@ static const char *target_parse_constraint(TCGArgConstraint *ct,
+     case 'U':
+         ct->ct |= TCG_CT_CONST_U32;
+         break;
++    case 'W':
++        ct->ct |= TCG_CT_CONST_WSZ;
++        break;
+     case 'Z':
+         ct->ct |= TCG_CT_CONST_ZERO;
+         break;
+@@ -341,6 +348,9 @@ static int tcg_target_const_match(tcg_target_long val, TCGType type,
+         return 1;
+     } else if ((ct & TCG_CT_CONST_MONE) && val == -1) {
+         return 1;
++    } else if ((ct & TCG_CT_CONST_WSZ)
++               && val == (type == TCG_TYPE_I32 ? 32 : 64)) {
++        return 1;
+     }
+     return 0;
+ }
+@@ -445,6 +455,8 @@ static int tcg_target_const_match(tcg_target_long val, TCGType type,
+ #define NOR    XO31(124)
+ #define CNTLZW XO31( 26)
+ #define CNTLZD XO31( 58)
++#define CNTTZW XO31(538)
++#define CNTTZD XO31(570)
+ #define ANDC   XO31( 60)
+ #define ORC    XO31(412)
+ #define EQV    XO31(284)
+@@ -1166,6 +1178,32 @@ static void tcg_out_movcond(TCGContext *s, TCGType type, TCGCond cond,
      }
  }
  
-+static void tgen_clz(TCGContext *s, TCGReg dest, TCGReg a1,
-+                     TCGArg a2, int a2const)
++static void tcg_out_cntxz(TCGContext *s, TCGType type, uint32_t opc,
++                          TCGArg a0, TCGArg a1, TCGArg a2, bool const_a2)
 +{
-+    /* Since this sets both R and R+1, we have no choice but to store the
-+       result into R0, allowing R1 == TCG_TMP0 to be clobbered as well.  */
-+    QEMU_BUILD_BUG_ON(TCG_TMP0 != TCG_REG_R1);
-+    tcg_out_insn(s, RRE, FLOGR, TCG_REG_R0, a1);
-+
-+    if (a2const && a2 == 64) {
-+        tcg_out_mov(s, TCG_TYPE_I64, dest, TCG_REG_R0);
++    if (const_a2 && a2 == (type == TCG_TYPE_I32 ? 32 : 64)) {
++        tcg_out32(s, opc | RA(a0) | RS(a1));
 +    } else {
-+        if (a2const) {
-+            tcg_out_movi(s, TCG_TYPE_I64, dest, a2);
++        tcg_out_cmp(s, TCG_COND_EQ, a1, 0, 1, 7, type);
++        /* Note that the only other valid constant for a2 is 0.  */
++        if (HAVE_ISEL) {
++            tcg_out32(s, opc | RA(TCG_REG_R0) | RS(a1));
++            tcg_out32(s, tcg_to_isel[TCG_COND_EQ] | TAB(a0, a2, TCG_REG_R0));
++        } else if (!const_a2 && a0 == a2) {
++            tcg_out32(s, tcg_to_bc[TCG_COND_EQ] | 8);
++            tcg_out32(s, opc | RA(a0) | RS(a1));
 +        } else {
-+            tcg_out_mov(s, TCG_TYPE_I64, dest, a2);
-+        }
-+        if (s390_facilities & FACILITY_LOAD_ON_COND) {
-+            /* Emit: if (one bit found) dest = r0.  */
-+            tcg_out_insn(s, RRF, LOCGR, dest, TCG_REG_R0, 2);
-+        } else {
-+            /* Emit: if (no one bit found) goto over; dest = r0; over:  */
-+            tcg_out_insn(s, RI, BRC, 8, (4 + 4) >> 1);
-+            tcg_out_insn(s, RRE, LGR, dest, TCG_REG_R0);
++            tcg_out32(s, opc | RA(a0) | RS(a1));
++            tcg_out32(s, tcg_to_bc[TCG_COND_NE] | 8);
++            if (const_a2) {
++                tcg_out_movi(s, type, a0, 0);
++            } else {
++                tcg_out_mov(s, type, a0, a2);
++            }
 +        }
 +    }
 +}
 +
- static void tgen_deposit(TCGContext *s, TCGReg dest, TCGReg src,
-                          int ofs, int len, int z)
+ static void tcg_out_cmp2(TCGContext *s, const TCGArg *args,
+                          const int *const_args)
  {
-@@ -2181,6 +2209,10 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
-         tgen_extract(s, args[0], args[1], args[2], args[3]);
+@@ -2103,6 +2141,24 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc, const TCGArg *args,
+         tcg_out32(s, NOR | SAB(args[1], args[0], args[2]));
          break;
  
-+    case INDEX_op_clz_i64:
-+        tgen_clz(s, args[0], args[1], args[2], const_args[2]);
++    case INDEX_op_clz_i32:
++        tcg_out_cntxz(s, TCG_TYPE_I32, CNTLZW, args[0], args[1],
++                      args[2], const_args[2]);
++        break;
++    case INDEX_op_ctz_i32:
++        tcg_out_cntxz(s, TCG_TYPE_I32, CNTTZW, args[0], args[1],
++                      args[2], const_args[2]);
 +        break;
 +
-     case INDEX_op_mb:
-         /* The host memory model is quite strong, we simply need to
-            serialize the instruction stream.  */
-@@ -2304,6 +2336,8 @@ static const TCGTargetOpDef s390_op_defs[] = {
-     { INDEX_op_bswap32_i64, { "r", "r" } },
-     { INDEX_op_bswap64_i64, { "r", "r" } },
- 
-+    { INDEX_op_clz_i64, { "r", "r", "ri" } },
++    case INDEX_op_clz_i64:
++        tcg_out_cntxz(s, TCG_TYPE_I64, CNTLZD, args[0], args[1],
++                      args[2], const_args[2]);
++        break;
++    case INDEX_op_ctz_i64:
++        tcg_out_cntxz(s, TCG_TYPE_I64, CNTTZD, args[0], args[1],
++                      args[2], const_args[2]);
++        break;
 +
-     { INDEX_op_add2_i64, { "r", "r", "0", "1", "rA", "r" } },
-     { INDEX_op_sub2_i64, { "r", "r", "0", "1", "rA", "r" } },
+     case INDEX_op_mul_i32:
+         a0 = args[0], a1 = args[1], a2 = args[2];
+         if (const_args[2]) {
+@@ -2515,6 +2571,8 @@ static const TCGTargetOpDef ppc_op_defs[] = {
+     { INDEX_op_eqv_i32, { "r", "r", "ri" } },
+     { INDEX_op_nand_i32, { "r", "r", "r" } },
+     { INDEX_op_nor_i32, { "r", "r", "r" } },
++    { INDEX_op_clz_i32, { "r", "r", "rZW" } },
++    { INDEX_op_ctz_i32, { "r", "r", "rZW" } },
  
+     { INDEX_op_shl_i32, { "r", "r", "ri" } },
+     { INDEX_op_shr_i32, { "r", "r", "ri" } },
+@@ -2563,6 +2621,8 @@ static const TCGTargetOpDef ppc_op_defs[] = {
+     { INDEX_op_eqv_i64, { "r", "r", "r" } },
+     { INDEX_op_nand_i64, { "r", "r", "r" } },
+     { INDEX_op_nor_i64, { "r", "r", "r" } },
++    { INDEX_op_clz_i64, { "r", "r", "rZW" } },
++    { INDEX_op_ctz_i64, { "r", "r", "rZW" } },
+ 
+     { INDEX_op_shl_i64, { "r", "r", "ri" } },
+     { INDEX_op_shr_i64, { "r", "r", "ri" } },
+@@ -2645,9 +2705,16 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
+ static void tcg_target_init(TCGContext *s)
+ {
+     unsigned long hwcap = qemu_getauxval(AT_HWCAP);
++    unsigned long hwcap2 = qemu_getauxval(AT_HWCAP2);
++
+     if (hwcap & PPC_FEATURE_ARCH_2_06) {
+         have_isa_2_06 = true;
+     }
++#ifdef PPC_FEATURE2_ARCH_3_00
++    if (hwcap2 & PPC_FEATURE2_ARCH_3_00) {
++        have_isa_3_00 = true;
++    }
++#endif
+ 
+     tcg_regset_set32(tcg_target_available_regs[TCG_TYPE_I32], 0, 0xffffffff);
+     tcg_regset_set32(tcg_target_available_regs[TCG_TYPE_I64], 0, 0xffffffff);
 -- 
 2.9.3
