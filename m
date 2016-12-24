@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55666)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55578)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cKdWL-0006xe-Mi
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:01:22 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cKdWG-0006sP-U4
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:01:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cKdWK-0005uT-Pp
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:01:21 -0500
-Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:36008)
+	(envelope-from <rth7680@gmail.com>) id 1cKdWG-0005qu-5d
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:01:17 -0500
+Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:34387)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cKdWK-0005uA-LW
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:01:20 -0500
-Received: by mail-pf0-x244.google.com with SMTP id c4so14580640pfb.3
-	for <qemu-devel@nongnu.org>; Fri, 23 Dec 2016 20:01:20 -0800 (PST)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cKdWG-0005qd-14
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:01:16 -0500
+Received: by mail-pf0-x244.google.com with SMTP id y68so14578555pfb.1
+	for <qemu-devel@nongnu.org>; Fri, 23 Dec 2016 20:01:15 -0800 (PST)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Fri, 23 Dec 2016 20:00:20 -0800
-Message-Id: <20161224040042.12654-44-rth@twiddle.net>
+Date: Fri, 23 Dec 2016 20:00:14 -0800
+Message-Id: <20161224040042.12654-38-rth@twiddle.net>
 In-Reply-To: <20161224040042.12654-1-rth@twiddle.net>
 References: <20161224040042.12654-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PATCH 43/65] tcg/mips: Handle clz opcode
+Subject: [Qemu-devel] [PATCH 37/65] target-xtensa: Use clz opcode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,123 +27,82 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Yongbok Kim <yongbok.kim@imgtec.com>
+Cc: Max Filippov <jcmvbkbc@gmail.com>
 
-Cc: Yongbok Kim <yongbok.kim@imgtec.com>
+Cc: Max Filippov <jcmvbkbc@gmail.com>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- tcg/mips/tcg-target.h     |  4 ++--
- tcg/mips/tcg-target.inc.c | 34 ++++++++++++++++++++++++++++++++++
- 2 files changed, 36 insertions(+), 2 deletions(-)
+ target/xtensa/helper.h    |  2 --
+ target/xtensa/op_helper.c | 13 -------------
+ target/xtensa/translate.c | 13 +++++++++++--
+ 3 files changed, 11 insertions(+), 17 deletions(-)
 
-diff --git a/tcg/mips/tcg-target.h b/tcg/mips/tcg-target.h
-index f133684..0526018 100644
---- a/tcg/mips/tcg-target.h
-+++ b/tcg/mips/tcg-target.h
-@@ -109,8 +109,6 @@ extern bool use_mips32r2_instructions;
- #define TCG_TARGET_HAS_rem_i32          1
- #define TCG_TARGET_HAS_not_i32          1
- #define TCG_TARGET_HAS_nor_i32          1
--#define TCG_TARGET_HAS_clz_i32          0
--#define TCG_TARGET_HAS_ctz_i32          0
- #define TCG_TARGET_HAS_andc_i32         0
- #define TCG_TARGET_HAS_orc_i32          0
- #define TCG_TARGET_HAS_eqv_i32          0
-@@ -130,6 +128,8 @@ extern bool use_mips32r2_instructions;
- #define TCG_TARGET_HAS_ext8s_i32        use_mips32r2_instructions
- #define TCG_TARGET_HAS_ext16s_i32       use_mips32r2_instructions
- #define TCG_TARGET_HAS_rot_i32          use_mips32r2_instructions
-+#define TCG_TARGET_HAS_clz_i32          use_mips32r2_instructions
-+#define TCG_TARGET_HAS_ctz_i32          0
+diff --git a/target/xtensa/helper.h b/target/xtensa/helper.h
+index 5ea9c5b..0c8adae 100644
+--- a/target/xtensa/helper.h
++++ b/target/xtensa/helper.h
+@@ -3,8 +3,6 @@ DEF_HELPER_3(exception_cause, noreturn, env, i32, i32)
+ DEF_HELPER_4(exception_cause_vaddr, noreturn, env, i32, i32, i32)
+ DEF_HELPER_3(debug_exception, noreturn, env, i32, i32)
  
- /* optional instructions automatically implemented */
- #define TCG_TARGET_HAS_neg_i32          0 /* sub  rd, zero, rt   */
-diff --git a/tcg/mips/tcg-target.inc.c b/tcg/mips/tcg-target.inc.c
-index 4341ea2..732246a 100644
---- a/tcg/mips/tcg-target.inc.c
-+++ b/tcg/mips/tcg-target.inc.c
-@@ -160,6 +160,7 @@ static void patch_reloc(tcg_insn_unit *code_ptr, int type,
- #define TCG_CT_CONST_S16  0x400    /* Signed 16-bit: -32768 - 32767 */
- #define TCG_CT_CONST_P2M1 0x800    /* Power of 2 minus 1.  */
- #define TCG_CT_CONST_N16  0x1000   /* "Negatable" 16-bit: -32767 - 32767 */
-+#define TCG_CT_CONST_WSZ  0x2000   /* word size */
- 
- static inline bool is_p2m1(tcg_target_long val)
- {
-@@ -215,6 +216,9 @@ static const char *target_parse_constraint(TCGArgConstraint *ct,
-     case 'N':
-         ct->ct |= TCG_CT_CONST_N16;
-         break;
-+    case 'W':
-+        ct->ct |= TCG_CT_CONST_WSZ;
-+        break;
-     case 'Z':
-         /* We are cheating a bit here, using the fact that the register
-            ZERO is also the register number 0. Hence there is no need
-@@ -246,6 +250,8 @@ static inline int tcg_target_const_match(tcg_target_long val, TCGType type,
-     } else if ((ct & TCG_CT_CONST_P2M1)
-                && use_mips32r2_instructions && is_p2m1(val)) {
-         return 1;
-+    } else if ((ct & TCG_CT_CONST_WSZ) && val == 32) {
-+        return 1;
-     }
-     return 0;
+-DEF_HELPER_FLAGS_1(nsa, TCG_CALL_NO_RWG_SE, i32, i32)
+-DEF_HELPER_FLAGS_1(nsau, TCG_CALL_NO_RWG_SE, i32, i32)
+ DEF_HELPER_2(wsr_windowbase, void, env, i32)
+ DEF_HELPER_4(entry, void, env, i32, i32, i32)
+ DEF_HELPER_2(retw, i32, env, i32)
+diff --git a/target/xtensa/op_helper.c b/target/xtensa/op_helper.c
+index 0a4b214..dc25625 100644
+--- a/target/xtensa/op_helper.c
++++ b/target/xtensa/op_helper.c
+@@ -161,19 +161,6 @@ void HELPER(debug_exception)(CPUXtensaState *env, uint32_t pc, uint32_t cause)
+     HELPER(exception)(env, EXC_DEBUG);
  }
-@@ -313,6 +319,7 @@ typedef enum {
-     OPC_SLTU     = OPC_SPECIAL | 0x2B,
-     OPC_SELEQZ   = OPC_SPECIAL | 0x35,
-     OPC_SELNEZ   = OPC_SPECIAL | 0x37,
-+    OPC_CLZ_R6   = OPC_SPECIAL | 0120,
  
-     OPC_REGIMM   = 0x01 << 26,
-     OPC_BLTZ     = OPC_REGIMM | (0x00 << 16),
-@@ -320,6 +327,7 @@ typedef enum {
- 
-     OPC_SPECIAL2 = 0x1c << 26,
-     OPC_MUL_R5   = OPC_SPECIAL2 | 0x002,
-+    OPC_CLZ      = OPC_SPECIAL2 | 040,
- 
-     OPC_SPECIAL3 = 0x1f << 26,
-     OPC_EXT      = OPC_SPECIAL3 | 0x000,
-@@ -1625,6 +1633,31 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
-         }
-         break;
- 
-+    case INDEX_op_clz_i32:
-+        if (use_mips32r6_instructions) {
-+            if (a2 == 32) {
-+                tcg_out_opc_reg(s, OPC_CLZ_R6, a0, a1, 0);
-+            } else {
-+                tcg_out_opc_reg(s, OPC_CLZ_R6, TCG_TMP0, a1, 0);
-+                tcg_out_movcond(s, TCG_COND_EQ, a0, a1, 0, a2, TCG_TMP0);
-+            }
-+        } else {
-+            if (a2 == 32) {
-+                tcg_out_opc_reg(s, OPC_CLZ, a0, a1, a1);
-+            } else if (a0 == a2) {
-+                tcg_out_opc_reg(s, OPC_CLZ, TCG_TMP0, a1, a1);
-+                tcg_out_opc_reg(s, OPC_MOVN, a0, TCG_TMP0, a1);
-+            } else if (a0 != a1) {
-+                tcg_out_opc_reg(s, OPC_CLZ, a0, a1, a1);
-+                tcg_out_opc_reg(s, OPC_MOVZ, a0, a2, a1);
-+            } else {
-+                tcg_out_opc_reg(s, OPC_CLZ, TCG_TMP0, a1, a1);
-+                tcg_out_opc_reg(s, OPC_MOVZ, TCG_TMP0, a2, a1);
-+                tcg_out_mov(s, TCG_TYPE_REG, a0, TCG_TMP0);
-+            }
-+        }
-+        break;
+-uint32_t HELPER(nsa)(uint32_t v)
+-{
+-    if (v & 0x80000000) {
+-        v = ~v;
+-    }
+-    return v ? clz32(v) - 1 : 31;
+-}
+-
+-uint32_t HELPER(nsau)(uint32_t v)
+-{
+-    return v ? clz32(v) : 32;
+-}
+-
+ static void copy_window_from_phys(CPUXtensaState *env,
+         uint32_t window, uint32_t phys, uint32_t n)
+ {
+diff --git a/target/xtensa/translate.c b/target/xtensa/translate.c
+index 0858c29..5c719a4 100644
+--- a/target/xtensa/translate.c
++++ b/target/xtensa/translate.c
+@@ -1372,14 +1372,23 @@ static void disas_xtensa_insn(CPUXtensaState *env, DisasContext *dc)
+                 case 14: /*NSAu*/
+                     HAS_OPTION(XTENSA_OPTION_MISC_OP_NSA);
+                     if (gen_window_check2(dc, RRR_S, RRR_T)) {
+-                        gen_helper_nsa(cpu_R[RRR_T], cpu_R[RRR_S]);
++                        TCGv_i32 t0 = tcg_temp_new_i32();
 +
-     case INDEX_op_bswap32_i32:
-         tcg_out_opc_reg(s, OPC_WSBH, a0, 0, a1);
-         tcg_out_opc_sa(s, OPC_ROTR, a0, a0, 16);
-@@ -1727,6 +1760,7 @@ static const TCGTargetOpDef mips_op_defs[] = {
-     { INDEX_op_sar_i32, { "r", "rZ", "ri" } },
-     { INDEX_op_rotr_i32, { "r", "rZ", "ri" } },
-     { INDEX_op_rotl_i32, { "r", "rZ", "ri" } },
-+    { INDEX_op_clz_i32,  { "r", "r", "rWZ" } },
++                        /* if (v & 0x80000000) v = ~v; */
++                        tcg_gen_sari_i32(t0, cpu_R[RRR_S], 31);
++                        tcg_gen_xor_i32(t0, t0, cpu_R[RRR_S]);
++
++                        /* r = (v ? clz(v) : 32) - 1; */
++                        tcg_gen_clzi_i32(t0, t0, 32);
++                        tcg_gen_subi_i32(cpu_R[RRR_T], t0, 1);
++                        tcg_temp_free_i32(t0);
+                     }
+                     break;
  
-     { INDEX_op_bswap16_i32, { "r", "r" } },
-     { INDEX_op_bswap32_i32, { "r", "r" } },
+                 case 15: /*NSAUu*/
+                     HAS_OPTION(XTENSA_OPTION_MISC_OP_NSA);
+                     if (gen_window_check2(dc, RRR_S, RRR_T)) {
+-                        gen_helper_nsau(cpu_R[RRR_T], cpu_R[RRR_S]);
++                        tcg_gen_clzi_i32(cpu_R[RRR_T], cpu_R[RRR_S], 32);
+                     }
+                     break;
+ 
 -- 
 2.9.3
