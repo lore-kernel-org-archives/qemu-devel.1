@@ -1,31 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55785)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55858)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cKdWT-00074f-Hj
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:01:30 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cKdWV-00076y-Gy
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:01:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cKdWS-00060r-FV
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:01:29 -0500
-Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:34853)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cKdWS-0005yu-AR
-	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:01:28 -0500
-Received: by mail-pg0-x244.google.com with SMTP id i5so2480843pgh.2
-	for <qemu-devel@nongnu.org>; Fri, 23 Dec 2016 20:01:25 -0800 (PST)
-Received: from bigtime.domain ([2602:47:d954:1500:5e51:4fff:fe40:9c64])
-	by smtp.gmail.com with ESMTPSA id
-	n25sm65339316pfi.33.2016.12.23.20.01.24 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 23 Dec 2016 20:01:24 -0800 (PST)
+	(envelope-from <rth7680@gmail.com>) id 1cKdWU-000638-J4
+	for qemu-devel@nongnu.org; Fri, 23 Dec 2016 23:01:31 -0500
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Fri, 23 Dec 2016 20:00:27 -0800
-Message-Id: <20161224040042.12654-51-rth@twiddle.net>
+Date: Fri, 23 Dec 2016 20:00:33 -0800
+Message-Id: <20161224040042.12654-57-rth@twiddle.net>
 In-Reply-To: <20161224040042.12654-1-rth@twiddle.net>
 References: <20161224040042.12654-1-rth@twiddle.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 50/65] tcg: Add helpers for clrsb
+Subject: [Qemu-devel] [PATCH 56/65] target-ppc: Use ctpop helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,135 +21,108 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org
 
-The number of actual invocations does not warrent an opcode,
-and the backends generating it.  But at least we can eliminate
-redundant helpers.
-
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Cc: qemu-ppc@nongnu.org
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- tcg-runtime.c     | 10 ++++++++++
- tcg/tcg-op.c      | 28 ++++++++++++++++++++++++++++
- tcg/tcg-op.h      |  4 ++++
- tcg/tcg-runtime.h |  2 ++
- 4 files changed, 44 insertions(+)
+ target/ppc/helper.h     |  3 +--
+ target/ppc/int_helper.c | 18 +++---------------
+ target/ppc/translate.c  |  6 +++++-
+ 3 files changed, 9 insertions(+), 18 deletions(-)
 
-diff --git a/tcg-runtime.c b/tcg-runtime.c
-index eb3bade..c8b98df 100644
---- a/tcg-runtime.c
-+++ b/tcg-runtime.c
-@@ -121,6 +121,16 @@ uint64_t HELPER(ctz_i64)(uint64_t arg, uint64_t zero_val)
-     return arg ? ctz64(arg) : zero_val;
+diff --git a/target/ppc/helper.h b/target/ppc/helper.h
+index 1ed1d2c..0a8fbba 100644
+--- a/target/ppc/helper.h
++++ b/target/ppc/helper.h
+@@ -39,12 +39,11 @@ DEF_HELPER_4(divweu, tl, env, tl, tl, i32)
+ DEF_HELPER_4(divwe, tl, env, tl, tl, i32)
+ 
+ DEF_HELPER_FLAGS_1(popcntb, TCG_CALL_NO_RWG_SE, tl, tl)
+-DEF_HELPER_FLAGS_1(popcntw, TCG_CALL_NO_RWG_SE, tl, tl)
+ DEF_HELPER_FLAGS_2(cmpb, TCG_CALL_NO_RWG_SE, tl, tl, tl)
+ DEF_HELPER_3(sraw, tl, env, tl, tl)
+ #if defined(TARGET_PPC64)
+ DEF_HELPER_FLAGS_2(cmpeqb, TCG_CALL_NO_RWG_SE, i32, tl, tl)
+-DEF_HELPER_FLAGS_1(popcntd, TCG_CALL_NO_RWG_SE, tl, tl)
++DEF_HELPER_FLAGS_1(popcntw, TCG_CALL_NO_RWG_SE, tl, tl)
+ DEF_HELPER_FLAGS_2(bpermd, TCG_CALL_NO_RWG_SE, i64, i64, i64)
+ DEF_HELPER_3(srad, tl, env, tl, tl)
+ DEF_HELPER_0(darn32, tl)
+diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
+index e1bb695..1871792 100644
+--- a/target/ppc/int_helper.c
++++ b/target/ppc/int_helper.c
+@@ -272,6 +272,7 @@ target_ulong helper_srad(CPUPPCState *env, target_ulong value,
+ #if defined(TARGET_PPC64)
+ target_ulong helper_popcntb(target_ulong val)
+ {
++    /* Note that we don't fold past bytes */
+     val = (val & 0x5555555555555555ULL) + ((val >>  1) &
+                                            0x5555555555555555ULL);
+     val = (val & 0x3333333333333333ULL) + ((val >>  2) &
+@@ -283,6 +284,7 @@ target_ulong helper_popcntb(target_ulong val)
+ 
+ target_ulong helper_popcntw(target_ulong val)
+ {
++    /* Note that we don't fold past words.  */
+     val = (val & 0x5555555555555555ULL) + ((val >>  1) &
+                                            0x5555555555555555ULL);
+     val = (val & 0x3333333333333333ULL) + ((val >>  2) &
+@@ -295,29 +297,15 @@ target_ulong helper_popcntw(target_ulong val)
+                                            0x0000ffff0000ffffULL);
+     return val;
+ }
+-
+-target_ulong helper_popcntd(target_ulong val)
+-{
+-    return ctpop64(val);
+-}
+ #else
+ target_ulong helper_popcntb(target_ulong val)
+ {
++    /* Note that we don't fold past bytes */
+     val = (val & 0x55555555) + ((val >>  1) & 0x55555555);
+     val = (val & 0x33333333) + ((val >>  2) & 0x33333333);
+     val = (val & 0x0f0f0f0f) + ((val >>  4) & 0x0f0f0f0f);
+     return val;
+ }
+-
+-target_ulong helper_popcntw(target_ulong val)
+-{
+-    val = (val & 0x55555555) + ((val >>  1) & 0x55555555);
+-    val = (val & 0x33333333) + ((val >>  2) & 0x33333333);
+-    val = (val & 0x0f0f0f0f) + ((val >>  4) & 0x0f0f0f0f);
+-    val = (val & 0x00ff00ff) + ((val >>  8) & 0x00ff00ff);
+-    val = (val & 0x0000ffff) + ((val >> 16) & 0x0000ffff);
+-    return val;
+-}
+ #endif
+ 
+ /*****************************************************************************/
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index 1224f56..1212180 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -1844,14 +1844,18 @@ static void gen_popcntb(DisasContext *ctx)
+ 
+ static void gen_popcntw(DisasContext *ctx)
+ {
++#if defined(TARGET_PPC64)
+     gen_helper_popcntw(cpu_gpr[rA(ctx->opcode)], cpu_gpr[rS(ctx->opcode)]);
++#else
++    tcg_gen_ctpop_i32(cpu_gpr[rA(ctx->opcode)], cpu_gpr[rS(ctx->opcode)]);
++#endif
  }
  
-+uint32_t HELPER(clrsb_i32)(uint32_t arg)
-+{
-+    return clrsb32(arg);
-+}
-+
-+uint64_t HELPER(clrsb_i64)(uint64_t arg)
-+{
-+    return clrsb64(arg);
-+}
-+
- void HELPER(exit_atomic)(CPUArchState *env)
+ #if defined(TARGET_PPC64)
+ /* popcntd: PowerPC 2.06 specification */
+ static void gen_popcntd(DisasContext *ctx)
  {
-     cpu_loop_exit_atomic(ENV_GET_CPU(env), GETPC());
-diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
-index 2b520c1..620e268 100644
---- a/tcg/tcg-op.c
-+++ b/tcg/tcg-op.c
-@@ -536,6 +536,20 @@ void tcg_gen_ctzi_i32(TCGv_i32 ret, TCGv_i32 arg1, uint32_t arg2)
-     tcg_temp_free_i32(t);
+-    gen_helper_popcntd(cpu_gpr[rA(ctx->opcode)], cpu_gpr[rS(ctx->opcode)]);
++    tcg_gen_ctpop_i64(cpu_gpr[rA(ctx->opcode)], cpu_gpr[rS(ctx->opcode)]);
  }
- 
-+void tcg_gen_clrsb_i32(TCGv_i32 ret, TCGv_i32 arg)
-+{
-+    if (TCG_TARGET_HAS_clz_i32) {
-+        TCGv_i32 t = tcg_temp_new_i32();
-+        tcg_gen_sari_i32(t, arg, 31);
-+        tcg_gen_xor_i32(t, t, arg);
-+        tcg_gen_clzi_i32(t, t, 32);
-+        tcg_gen_subi_i32(ret, t, 1);
-+        tcg_temp_free_i32(t);
-+    } else {
-+        gen_helper_clrsb_i32(ret, arg);
-+    }
-+}
-+
- void tcg_gen_rotl_i32(TCGv_i32 ret, TCGv_i32 arg1, TCGv_i32 arg2)
- {
-     if (TCG_TARGET_HAS_rot_i32) {
-@@ -1846,6 +1860,20 @@ void tcg_gen_ctzi_i64(TCGv_i64 ret, TCGv_i64 arg1, uint64_t arg2)
-     }
- }
- 
-+void tcg_gen_clrsb_i64(TCGv_i64 ret, TCGv_i64 arg)
-+{
-+    if (TCG_TARGET_HAS_clz_i64 || TCG_TARGET_HAS_clz_i32) {
-+        TCGv_i64 t = tcg_temp_new_i64();
-+        tcg_gen_sari_i64(t, arg, 63);
-+        tcg_gen_xor_i64(t, t, arg);
-+        tcg_gen_clzi_i64(t, t, 64);
-+        tcg_gen_subi_i64(ret, t, 1);
-+        tcg_temp_free_i64(t);
-+    } else {
-+        gen_helper_clrsb_i64(ret, arg);
-+    }
-+}
-+
- void tcg_gen_rotl_i64(TCGv_i64 ret, TCGv_i64 arg1, TCGv_i64 arg2)
- {
-     if (TCG_TARGET_HAS_rot_i64) {
-diff --git a/tcg/tcg-op.h b/tcg/tcg-op.h
-index 7a24e84..c2f3db9 100644
---- a/tcg/tcg-op.h
-+++ b/tcg/tcg-op.h
-@@ -290,6 +290,7 @@ void tcg_gen_clz_i32(TCGv_i32 ret, TCGv_i32 arg1, TCGv_i32 arg2);
- void tcg_gen_ctz_i32(TCGv_i32 ret, TCGv_i32 arg1, TCGv_i32 arg2);
- void tcg_gen_clzi_i32(TCGv_i32 ret, TCGv_i32 arg1, uint32_t arg2);
- void tcg_gen_ctzi_i32(TCGv_i32 ret, TCGv_i32 arg1, uint32_t arg2);
-+void tcg_gen_clrsb_i32(TCGv_i32 ret, TCGv_i32 arg);
- void tcg_gen_rotl_i32(TCGv_i32 ret, TCGv_i32 arg1, TCGv_i32 arg2);
- void tcg_gen_rotli_i32(TCGv_i32 ret, TCGv_i32 arg1, unsigned arg2);
- void tcg_gen_rotr_i32(TCGv_i32 ret, TCGv_i32 arg1, TCGv_i32 arg2);
-@@ -477,6 +478,7 @@ void tcg_gen_clz_i64(TCGv_i64 ret, TCGv_i64 arg1, TCGv_i64 arg2);
- void tcg_gen_ctz_i64(TCGv_i64 ret, TCGv_i64 arg1, TCGv_i64 arg2);
- void tcg_gen_clzi_i64(TCGv_i64 ret, TCGv_i64 arg1, uint64_t arg2);
- void tcg_gen_ctzi_i64(TCGv_i64 ret, TCGv_i64 arg1, uint64_t arg2);
-+void tcg_gen_clrsb_i64(TCGv_i64 ret, TCGv_i64 arg);
- void tcg_gen_rotl_i64(TCGv_i64 ret, TCGv_i64 arg1, TCGv_i64 arg2);
- void tcg_gen_rotli_i64(TCGv_i64 ret, TCGv_i64 arg1, unsigned arg2);
- void tcg_gen_rotr_i64(TCGv_i64 ret, TCGv_i64 arg1, TCGv_i64 arg2);
-@@ -970,6 +972,7 @@ void tcg_gen_atomic_xor_fetch_i64(TCGv_i64, TCGv, TCGv_i64, TCGArg, TCGMemOp);
- #define tcg_gen_ctz_tl tcg_gen_ctz_i64
- #define tcg_gen_clzi_tl tcg_gen_clzi_i64
- #define tcg_gen_ctzi_tl tcg_gen_ctzi_i64
-+#define tcg_gen_clrsb_tl tcg_gen_clrsb_i64
- #define tcg_gen_rotl_tl tcg_gen_rotl_i64
- #define tcg_gen_rotli_tl tcg_gen_rotli_i64
- #define tcg_gen_rotr_tl tcg_gen_rotr_i64
-@@ -1065,6 +1068,7 @@ void tcg_gen_atomic_xor_fetch_i64(TCGv_i64, TCGv, TCGv_i64, TCGArg, TCGMemOp);
- #define tcg_gen_ctz_tl tcg_gen_ctz_i32
- #define tcg_gen_clzi_tl tcg_gen_clzi_i32
- #define tcg_gen_ctzi_tl tcg_gen_ctzi_i32
-+#define tcg_gen_clrsb_tl tcg_gen_clrsb_i32
- #define tcg_gen_rotl_tl tcg_gen_rotl_i32
- #define tcg_gen_rotli_tl tcg_gen_rotli_i32
- #define tcg_gen_rotr_tl tcg_gen_rotr_i32
-diff --git a/tcg/tcg-runtime.h b/tcg/tcg-runtime.h
-index eb1cd76..0d30f1a 100644
---- a/tcg/tcg-runtime.h
-+++ b/tcg/tcg-runtime.h
-@@ -19,6 +19,8 @@ DEF_HELPER_FLAGS_2(clz_i32, TCG_CALL_NO_RWG_SE, i32, i32, i32)
- DEF_HELPER_FLAGS_2(ctz_i32, TCG_CALL_NO_RWG_SE, i32, i32, i32)
- DEF_HELPER_FLAGS_2(clz_i64, TCG_CALL_NO_RWG_SE, i64, i64, i64)
- DEF_HELPER_FLAGS_2(ctz_i64, TCG_CALL_NO_RWG_SE, i64, i64, i64)
-+DEF_HELPER_FLAGS_1(clrsb_i32, TCG_CALL_NO_RWG_SE, i32, i32)
-+DEF_HELPER_FLAGS_1(clrsb_i64, TCG_CALL_NO_RWG_SE, i64, i64)
- 
- DEF_HELPER_FLAGS_1(exit_atomic, TCG_CALL_NO_WG, noreturn, env)
+ #endif
  
 -- 
 2.9.3
