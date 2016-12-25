@@ -1,23 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50637)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45586)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zxq_yx_007@163.com>) id 1cL0IG-0002lu-UZ
-	for qemu-devel@nongnu.org; Sat, 24 Dec 2016 23:20:21 -0500
+	(envelope-from <zxq_yx_007@163.com>) id 1cL48g-0000oc-3c
+	for qemu-devel@nongnu.org; Sun, 25 Dec 2016 03:26:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zxq_yx_007@163.com>) id 1cL0ID-0000Br-OB
-	for qemu-devel@nongnu.org; Sat, 24 Dec 2016 23:20:20 -0500
-Received: from m12-15.163.com ([220.181.12.15]:38262)
+	(envelope-from <zxq_yx_007@163.com>) id 1cL48d-0001Ay-0a
+	for qemu-devel@nongnu.org; Sun, 25 Dec 2016 03:26:42 -0500
+Received: from m12-11.163.com ([220.181.12.11]:45836)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zxq_yx_007@163.com>) id 1cL0IC-00009f-Iu
-	for qemu-devel@nongnu.org; Sat, 24 Dec 2016 23:20:17 -0500
-Date: Sun, 25 Dec 2016 12:02:17 +0800 (CST)
-From: =?GBK?B?1dTQoce/?= <zxq_yx_007@163.com>
-In-Reply-To: <20161023063135.21058-1-zxq_yx_007@163.com>
-References: <20161023063135.21058-1-zxq_yx_007@163.com>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=GBK
-MIME-Version: 1.0
-Message-ID: <2f476a20.17fe.1593424b176.Coremail.zxq_yx_007@163.com>
-Subject: Re: [Qemu-devel] [PATCH 0/9] QOM'ify work for sparc
+	(envelope-from <zxq_yx_007@163.com>) id 1cL48c-0001A9-5o
+	for qemu-devel@nongnu.org; Sun, 25 Dec 2016 03:26:38 -0500
+From: xiaoqiang zhao <zxq_yx_007@163.com>
+Date: Sun, 25 Dec 2016 16:25:59 +0800
+Message-Id: <20161225082559.2095-1-zxq_yx_007@163.com>
+Subject: [Qemu-devel] [PATCH] hw/display: QOM'ify g364fb.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,25 +21,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel <qemu-devel@nongnu.org>
-Cc: pbonzini@redhat.com, peter.maydell@linaro.org, mark.cave-ayland@ilande.co.uk, atar4qemu@gmail.com
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org
 
-cGluZyAuLi4uIAoKQXQgMjAxNi0xMC0yMyAxNDozMToyNiwgInhpYW9xaWFuZyB6aGFvIiA8enhx
-X3l4XzAwN0AxNjMuY29tPiB3cm90ZToKPlRoaXMgcGF0Y2ggc2V0IGFpbXMgZm9yIFFPTSdpZnlp
-bmcgY29kZSByZWxhdGUgd2l0aCBzcGFyYy4KPkl0IGlzIHBhcnQgb2YgbXkgUU9NJ2lmeSB3b3Jr
-IG9mIHFlbXUgY29kZSBiYXNlLgo+Cj54aWFvcWlhbmcgemhhbyAoOSk6Cj4gIGh3L21pc2M6IFFP
-TSdpZnkgZWNjbWVtY3RsLmMKPiAgaHcvZG1hOiBRT00naWZ5IHNwYXJjMzJfZG1hLmMKPiAgaHcv
-ZG1hOiBRT00naWZ5IHN1bjRtX2lvbW11LmMKPiAgaHcvbWlzYzogUU9NJ2lmeSBzbGF2aW9fbWlz
-Yy5jCj4gIGh3L3RpbWVyOiBRT00naWZ5IG00OHR4eF9zeXNidXMgKHBhc3MgMSkKPiAgaHcvdGlt
-ZXI6IFFPTSdpZnkgbTQ4dHh4X3N5c2J1cyAocGFzcyAyKQo+ICBody90aW1lcjogUU9NJ2lmeSBz
-bGF2aW9fdGltZXIKPiAgaHcvc3BhcmM6IFFPTSdpZnkgc3VuNG0uYwo+ICBody9zcGFyYzY0OiBR
-T00naWZ5IHN1bjR1LmMKPgo+IGh3L2RtYS9zcGFyYzMyX2RtYS5jICAgIHwgMjUgKysrKysrKysr
-KysrLS0tLS0tLS0KPiBody9kbWEvc3VuNG1faW9tbXUuYyAgICB8IDEyICsrKystLS0tLS0KPiBo
-dy9taXNjL2VjY21lbWN0bC5jICAgICB8IDI1ICsrKysrKysrKysrKy0tLS0tLS0tCj4gaHcvbWlz
-Yy9zbGF2aW9fbWlzYy5jICAgfCA0MyArKysrKysrKysrKysrKy0tLS0tLS0tLS0tLS0tLS0tLS0t
-Cj4gaHcvc3BhcmMvc3VuNG0uYyAgICAgICAgfCA1NCArKysrKysrKysrKysrKystLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tCj4gaHcvc3BhcmM2NC9zdW40dS5jICAgICAgfCAyMCArKysrKysr
-Ky0tLS0tLS0tCj4gaHcvdGltZXIvbTQ4dDU5LmMgICAgICAgfCA2MSArKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrLS0tLS0tLS0tLS0tLS0tCj4gaHcvdGltZXIvc2xhdmlvX3RpbWVy
-LmMgfCAxMiArKysrLS0tLS0tCj4gOCBmaWxlcyBjaGFuZ2VkLCAxMjggaW5zZXJ0aW9ucygrKSwg
-MTI0IGRlbGV0aW9ucygtKQo+Cj4tLSAKPjIuOS4zCj4K
+Drop the old Sysbus init and use instance_init and
+DeviceClass::realize instead
+
+Signed-off-by: xiaoqiang zhao <zxq_yx_007@163.com>
+---
+ hw/display/g364fb.c | 16 +++++++++++-----
+ 1 file changed, 11 insertions(+), 5 deletions(-)
+
+diff --git a/hw/display/g364fb.c b/hw/display/g364fb.c
+index 70ef2c7453..7a0fe48dd5 100644
+--- a/hw/display/g364fb.c
++++ b/hw/display/g364fb.c
+@@ -504,18 +504,24 @@ typedef struct {
+     G364State g364;
+ } G364SysBusState;
+ 
+-static int g364fb_sysbus_init(SysBusDevice *sbd)
++static void g364fb_sysbus_init(Object *obj)
+ {
++    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
+     DeviceState *dev = DEVICE(sbd);
+     G364SysBusState *sbs = G364(dev);
+     G364State *s = &sbs->g364;
+ 
+-    g364fb_init(dev, s);
+     sysbus_init_irq(sbd, &s->irq);
+     sysbus_init_mmio(sbd, &s->mem_ctrl);
+     sysbus_init_mmio(sbd, &s->mem_vram);
++}
+ 
+-    return 0;
++static void g364fb_sysbus_realize(DeviceState *dev, Error **errp)
++{
++    G364SysBusState *sbs = G364(dev);
++    G364State *s = &sbs->g364;
++
++    g364fb_init(dev, s);
+ }
+ 
+ static void g364fb_sysbus_reset(DeviceState *d)
+@@ -534,9 +540,8 @@ static Property g364fb_sysbus_properties[] = {
+ static void g364fb_sysbus_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
+-    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
+ 
+-    k->init = g364fb_sysbus_init;
++    dc->realize = g364fb_sysbus_realize;
+     set_bit(DEVICE_CATEGORY_DISPLAY, dc->categories);
+     dc->desc = "G364 framebuffer";
+     dc->reset = g364fb_sysbus_reset;
+@@ -548,6 +553,7 @@ static const TypeInfo g364fb_sysbus_info = {
+     .name          = TYPE_G364,
+     .parent        = TYPE_SYS_BUS_DEVICE,
+     .instance_size = sizeof(G364SysBusState),
++    .instance_init = g364fb_sysbus_init,
+     .class_init    = g364fb_sysbus_class_init,
+ };
+ 
+-- 
+2.11.0
