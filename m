@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44213)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49416)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cLcBf-0001l4-Sg
-	for qemu-devel@nongnu.org; Mon, 26 Dec 2016 15:48:05 -0500
+	(envelope-from <vilanova@ac.upc.edu>) id 1cLcl5-0007nr-AD
+	for qemu-devel@nongnu.org; Mon, 26 Dec 2016 16:24:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cLcBb-0006nq-IS
-	for qemu-devel@nongnu.org; Mon, 26 Dec 2016 15:48:03 -0500
-Resent-Message-Id: <E1cLcBb-0006nq-IS@eggs.gnu.org>
-Received: from sender163-mail.zoho.com ([74.201.84.163]:21474)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1cLcBb-0006nM-9o
-	for qemu-devel@nongnu.org; Mon, 26 Dec 2016 15:47:59 -0500
-In-Reply-To: <148278447806.8988.12706825771606357198.stgit@fimbulvetr.bsc.es>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <148278526518.127.1083706177210209274@790289a7ca88>
+	(envelope-from <vilanova@ac.upc.edu>) id 1cLcl0-0001yJ-EU
+	for qemu-devel@nongnu.org; Mon, 26 Dec 2016 16:24:39 -0500
+Received: from roura.ac.upc.es ([147.83.33.10]:44293)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <vilanova@ac.upc.edu>) id 1cLcl0-0001xi-3S
+	for qemu-devel@nongnu.org; Mon, 26 Dec 2016 16:24:34 -0500
+From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
+Date: Mon, 26 Dec 2016 22:24:29 +0100
+Message-Id: <148278746972.1404.10574428039766667311.stgit@fimbulvetr.bsc.es>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 26 Dec 2016 12:47:46 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v4 0/6] hypertrace: Lightweight
- guest-to-QEMU trace channel
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 0/3] trace: Fix event tracing during vCPU
+ hot-unplug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,58 +25,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: vilanova@ac.upc.edu
-Cc: famz@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com, lcapitulino@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
 
-SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
-YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjQgMC82XSBoeXBlcnRyYWNlOiBMaWdodHdlaWdo
-dCBndWVzdC10by1RRU1VIHRyYWNlIGNoYW5uZWwKTWVzc2FnZS1pZDogMTQ4Mjc4NDQ3ODA2Ljg5
-ODguMTI3MDY4MjU3NzE2MDYzNTcxOTguc3RnaXRAZmltYnVsdmV0ci5ic2MuZXMKCj09PSBURVNU
-IFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQg
-bG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgojIFVzZWZ1bCBnaXQgb3B0
-aW9ucwpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1s
-b2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0t
-cmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2lu
-ZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAg
-IGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5w
-bCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZp
-CiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09
-PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9t
-IGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAg
-ICAgICBwYXRjaGV3LzE0ODI3ODQ0NzgwNi44OTg4LjEyNzA2ODI1NzcxNjA2MzU3MTk4LnN0Z2l0
-QGZpbWJ1bHZldHIuYnNjLmVzIC0+IHBhdGNoZXcvMTQ4Mjc4NDQ3ODA2Ljg5ODguMTI3MDY4MjU3
-NzE2MDYzNTcxOTguc3RnaXRAZmltYnVsdmV0ci5ic2MuZXMKU3dpdGNoZWQgdG8gYSBuZXcgYnJh
-bmNoICd0ZXN0JwpmYjQ2MzE4IGh5cGVydHJhY2U6IEFkZCBndWVzdC1zaWRlIExpbnV4IG1vZHVs
-ZQo0OTlhMTdmIGh5cGVydHJhY2U6IEFkZCBndWVzdC1zaWRlIHVzZXItbGV2ZWwgbGlicmFyeQo5
-ZWI2OGFmIGh5cGVydHJhY2U6IFtzb2Z0bW11XSBBZGQgUUVNVS1zaWRlIHByb3h5IHRvICJndWVz
-dF9oeXBlcnRyYWNlIiBldmVudApiZTcwZjAyIGh5cGVydHJhY2U6IFsqLXVzZXJdIEFkZCBRRU1V
-LXNpZGUgcHJveHkgdG8gImd1ZXN0X2h5cGVydHJhY2UiIGV2ZW50CjdjYzU5NzggaHlwZXJ0cmFj
-ZTogQWRkIHRyYWNpbmcgZXZlbnQgImd1ZXN0X2h5cGVydHJhY2UiCjhkNzFiMjggaHlwZXJ0cmFj
-ZTogQWRkIGRvY3VtZW50YXRpb24KCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENI
-IDEvNjogaHlwZXJ0cmFjZTogQWRkIGRvY3VtZW50YXRpb24uLi4KQ2hlY2tpbmcgUEFUQ0ggMi82
-OiBoeXBlcnRyYWNlOiBBZGQgdHJhY2luZyBldmVudCAiZ3Vlc3RfaHlwZXJ0cmFjZSIuLi4KQ2hl
-Y2tpbmcgUEFUQ0ggMy82OiBoeXBlcnRyYWNlOiBbKi11c2VyXSBBZGQgUUVNVS1zaWRlIHByb3h5
-IHRvICJndWVzdF9oeXBlcnRyYWNlIiBldmVudC4uLgpXQVJOSU5HOiBhcmNoaXRlY3R1cmUgc3Bl
-Y2lmaWMgZGVmaW5lcyBzaG91bGQgYmUgYXZvaWRlZAojMzA2OiBGSUxFOiBoeXBlcnRyYWNlL2Nv
-bW1vbi5oOjEwOgorI2lmICFkZWZpbmVkKF9fS0VSTkVMX18pCgp0b3RhbDogMCBlcnJvcnMsIDEg
-d2FybmluZ3MsIDgzMSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVt
-cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
-aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
-TlRBSU5FUlMuCkNoZWNraW5nIFBBVENIIDQvNjogaHlwZXJ0cmFjZTogW3NvZnRtbXVdIEFkZCBR
-RU1VLXNpZGUgcHJveHkgdG8gImd1ZXN0X2h5cGVydHJhY2UiIGV2ZW50Li4uCkNoZWNraW5nIFBB
-VENIIDUvNjogaHlwZXJ0cmFjZTogQWRkIGd1ZXN0LXNpZGUgdXNlci1sZXZlbCBsaWJyYXJ5Li4u
-CldBUk5JTkc6IGFyY2hpdGVjdHVyZSBzcGVjaWZpYyBkZWZpbmVzIHNob3VsZCBiZSBhdm9pZGVk
-CiMxNzE6IEZJTEU6IGh5cGVydHJhY2UvZ3Vlc3QvdXNlci9jb21tb24uYzo4MzoKKyNpZiAhZGVm
-aW5lZChDT05GSUdfVVNFUl9PTkxZKSAmJiBkZWZpbmVkKF9fbGludXhfXykKCkVSUk9SOiBjb25z
-aWRlciB1c2luZyBxZW11X3N0cnRvdWxsIGluIHByZWZlcmVuY2UgdG8gc3RydG91bGwKIzE5MTog
-RklMRTogaHlwZXJ0cmFjZS9ndWVzdC91c2VyL2NvbW1vbi5jOjEwMzoKKyAgICB1aW50NjRfdCB2
-diA9IHN0cnRvdWxsKHYsICZyZXMsIDE2KTsKCnRvdGFsOiAxIGVycm9ycywgMSB3YXJuaW5ncywg
-NDI4IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
-cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
-dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
-CkNoZWNraW5nIFBBVENIIDYvNjogaHlwZXJ0cmFjZTogQWRkIGd1ZXN0LXNpZGUgTGludXggbW9k
-dWxlLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6
-IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDov
-L3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZl
-bEBmcmVlbGlzdHMub3Jn
+The vCPU list needs to be locked to avoid memory corruption with concurre=
+nt
+hot-(un)plugs, and per-vCPU events need to be disabled during vCPU hot-un=
+plug.
+
+Also adds event "guest_cpu_exit" to track vCPU hot-unplugging.
+
+Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+---
+
+
+Llu=C3=ADs Vilanova (3):
+      trace: Lock vCPU list when initializing dynamic tracing state
+      trace: Fix dynamic event state on vCPU hot-unplug
+      trace: Add event "guest_cpu_exit"
+
+
+ qom/cpu.c              |    2 ++
+ trace-events           |    6 ++++++
+ trace/control-target.c |   11 ++++++++++-
+ trace/control.c        |   19 +++++++++++++++++++
+ trace/control.h        |    8 ++++++++
+ 5 files changed, 45 insertions(+), 1 deletion(-)
+
+
+To: qemu-devel@nongnu.org
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
