@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49434)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49458)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1cLcl8-0007oa-Vs
-	for qemu-devel@nongnu.org; Mon, 26 Dec 2016 16:24:43 -0500
+	(envelope-from <vilanova@ac.upc.edu>) id 1cLclI-0007xa-Hp
+	for qemu-devel@nongnu.org; Mon, 26 Dec 2016 16:24:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1cLcl8-000203-4K
-	for qemu-devel@nongnu.org; Mon, 26 Dec 2016 16:24:43 -0500
-Received: from roura.ac.upc.es ([147.83.33.10]:44298)
+	(envelope-from <vilanova@ac.upc.edu>) id 1cLclD-00021f-MH
+	for qemu-devel@nongnu.org; Mon, 26 Dec 2016 16:24:52 -0500
+Received: from roura.ac.upc.es ([147.83.33.10]:44300)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1cLcl7-0001zc-OR
-	for qemu-devel@nongnu.org; Mon, 26 Dec 2016 16:24:42 -0500
+	(envelope-from <vilanova@ac.upc.edu>) id 1cLclD-00021V-7c
+	for qemu-devel@nongnu.org; Mon, 26 Dec 2016 16:24:47 -0500
 From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
-Date: Mon, 26 Dec 2016 22:24:40 +0100
-Message-Id: <148278748055.1404.1570530281528619895.stgit@fimbulvetr.bsc.es>
+Date: Mon, 26 Dec 2016 22:24:46 +0100
+Message-Id: <148278748597.1404.10546320797997984932.stgit@fimbulvetr.bsc.es>
 In-Reply-To: <148278746972.1404.10574428039766667311.stgit@fimbulvetr.bsc.es>
 References: <148278746972.1404.10574428039766667311.stgit@fimbulvetr.bsc.es>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 2/3] trace: Fix dynamic event state on vCPU
- hot-unplug
+Subject: [Qemu-devel] [PATCH 3/3] trace: Add event "guest_cpu_exit"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,73 +29,50 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Stefan Hajnoczi <stefanha@redhat.com>
 
-We need to disable per-vCPU events on a vCPU that is hot-unplugged to
-keep the dynamic event state global counters consistent.
+Signals the hot-unplugging of a virtual (guest) CPU.
 
 Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
 ---
- qom/cpu.c       |    2 ++
- trace/control.c |   16 ++++++++++++++++
- trace/control.h |    8 ++++++++
- 3 files changed, 26 insertions(+)
+ trace-events    |    6 ++++++
+ trace/control.c |    3 +++
+ 2 files changed, 9 insertions(+)
 
-diff --git a/qom/cpu.c b/qom/cpu.c
-index 03d9190f8c..93e41056d9 100644
---- a/qom/cpu.c
-+++ b/qom/cpu.c
-@@ -348,6 +348,8 @@ static void cpu_common_realizefn(DeviceState *dev, Er=
-ror **errp)
- static void cpu_common_unrealizefn(DeviceState *dev, Error **errp)
- {
-     CPUState *cpu =3D CPU(dev);
-+    /* NOTE: latest generic point before the cpu is fully unrealized */
-+    trace_fini_vcpu(cpu);
-     cpu_exec_unrealizefn(cpu);
- }
+diff --git a/trace-events b/trace-events
+index f74e1d3d22..f3894f5b38 100644
+--- a/trace-events
++++ b/trace-events
+@@ -135,6 +135,12 @@ memory_region_ram_device_write(int cpu_index, void *=
+mr, uint64_t addr, uint64_t
+ # Targets: all
+ vcpu guest_cpu_enter(void)
 =20
++# Hot-unplug a virtual (guest) CPU
++#
++# Mode: user, softmmu
++# Targets: all
++vcpu guest_cpu_exit(void)
++
+ # Reset the state of a virtual (guest) CPU
+ #
+ # Mode: user, softmmu
 diff --git a/trace/control.c b/trace/control.c
-index 1a7bee6ddc..cb79bb17ec 100644
+index cb79bb17ec..56a2632584 100644
 --- a/trace/control.c
 +++ b/trace/control.c
-@@ -259,6 +259,22 @@ void trace_init_file(const char *file)
- #endif
- }
+@@ -26,6 +26,7 @@
+ #include "qemu/error-report.h"
+ #include "qemu/config-file.h"
+ #include "monitor/monitor.h"
++#include "trace.h"
 =20
-+void trace_fini_vcpu(CPUState *vcpu)
-+{
-+    TraceEventIter iter;
-+    TraceEvent *ev;
-+
-+    trace_event_iter_init(&iter, NULL);
-+    while ((ev =3D trace_event_iter_next(&iter)) !=3D NULL) {
-+        if (trace_event_is_vcpu(ev) &&
-+            trace_event_get_state_static(ev) &&
-+            trace_event_get_vcpu_state_dynamic(vcpu, ev)) {
-+            /* must disable to affect the global counter */
-+            trace_event_set_vcpu_state_dynamic(vcpu, ev, false);
-+        }
-+    }
-+}
-+
- bool trace_init_backends(void)
- {
- #ifdef CONFIG_TRACE_SIMPLE
-diff --git a/trace/control.h b/trace/control.h
-index ccaeac8552..4ea53e2986 100644
---- a/trace/control.h
-+++ b/trace/control.h
-@@ -202,6 +202,14 @@ void trace_init_file(const char *file);
- void trace_init_vcpu(CPUState *vcpu);
+ int trace_events_enabled_count;
 =20
- /**
-+ * trace_fini_vcpu:
-+ * @vcpu: Removed vCPU.
-+ *
-+ * Disable dynamic event state for a hot-unplugged vCPU.
-+ */
-+void trace_fini_vcpu(CPUState *vcpu);
+@@ -264,6 +265,8 @@ void trace_fini_vcpu(CPUState *vcpu)
+     TraceEventIter iter;
+     TraceEvent *ev;
+=20
++    trace_guest_cpu_exit(vcpu);
 +
-+/**
-  * trace_list_events:
-  *
-  * List all available events.
+     trace_event_iter_init(&iter, NULL);
+     while ((ev =3D trace_event_iter_next(&iter)) !=3D NULL) {
+         if (trace_event_is_vcpu(ev) &&
