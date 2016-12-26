@@ -1,33 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35249)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34641)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cLXf4-0000kC-CO
-	for qemu-devel@nongnu.org; Mon, 26 Dec 2016 10:58:07 -0500
+	(envelope-from <vilanova@ac.upc.edu>) id 1cLb92-0001p1-GT
+	for qemu-devel@nongnu.org; Mon, 26 Dec 2016 14:41:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1cLXf0-0003FB-DB
-	for qemu-devel@nongnu.org; Mon, 26 Dec 2016 10:58:06 -0500
-Received: from mailhub.sw.ru ([195.214.232.25]:4941 helo=relay.sw.ru)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1cLXez-0003Ei-Vu
-	for qemu-devel@nongnu.org; Mon, 26 Dec 2016 10:58:02 -0500
-References: <20161214150840.10899-1-alex@alex.org.uk>
-	<31576d46-c0ed-29b9-71a0-5aca1790799a@virtuozzo.com>
-	<6D1B30FC-FD7E-474C-A8E3-FD87E7AA1364@alex.org.uk>
-	<5e9150ed-2127-f2e8-f9db-a514e8f0ddf8@virtuozzo.com>
-	<5E697C22-5FBB-49A2-A018-A6B96E29FE84@alex.org.uk>
-	<94ef3ef2-b76f-fa5d-cbaf-8990ce2b1be8@virtuozzo.com>
-	<20161214181323.mehzfmlf6z4pyajp@grep.be>
-	<D71CECFD-E513-4372-BB54-BF8D8D521292@alex.org.uk>
-	<20161214184937.uv5gwkijaofhjfd7@grep.be>
-	<95CEC42B-486F-45F2-8879-ACF48C2380FD@alex.org.uk>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <d7e58b6e-815c-ffb6-ac68-ef52b0082c50@virtuozzo.com>
-Date: Mon, 26 Dec 2016 18:57:47 +0300
+	(envelope-from <vilanova@ac.upc.edu>) id 1cLb8z-0003dz-ES
+	for qemu-devel@nongnu.org; Mon, 26 Dec 2016 14:41:16 -0500
+Received: from roura.ac.upc.edu ([147.83.33.10]:32919 helo=roura.ac.upc.es)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <vilanova@ac.upc.edu>) id 1cLb8z-0003cU-3e
+	for qemu-devel@nongnu.org; Mon, 26 Dec 2016 14:41:13 -0500
+From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
+References: <148243173750.7321.8231977784466776952.stgit@fimbulvetr.bsc.es>
+	<cf19ab2b-ef52-9fa3-dea8-662c4513379c@twiddle.net>
+	<87bmw24gy2.fsf@fimbulvetr.bsc.es>
+	<09280ca2-06f0-12f5-4217-0d9f79e4ee90@twiddle.net>
+Date: Mon, 26 Dec 2016 20:41:07 +0100
+In-Reply-To: <09280ca2-06f0-12f5-4217-0d9f79e4ee90@twiddle.net> (Richard
+	Henderson's message of "Fri, 23 Dec 2016 12:09:24 -0800")
+Message-ID: <87inq6wka4.fsf@fimbulvetr.bsc.es>
 MIME-Version: 1.0
-In-Reply-To: <95CEC42B-486F-45F2-8879-ACF48C2380FD@alex.org.uk>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Nbd] [PATCH] Further tidy-up on block status
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 0/6] trace: [tcg] Optimize per-vCPU
+ tracing states with separate TB caches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,65 +31,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Bligh <alex@alex.org.uk>, Wouter Verhelst <w@uter.be>
-Cc: "nbd-general@lists.sourceforge.net" <nbd-general@lists.sourceforge.net>, Kevin Wolf <kwolf@redhat.com>, "Stefan stefanha@redhat. com" <stefanha@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, "Denis V . Lunev" <den@openvz.org>, John Snow <jsnow@redhat.com>
+To: Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-14.12.2016 22:01, Alex Bligh wrote:
-> Wouter,
->
-> (Our mails crossed and I've actually pushed something, but no matter)
->
->> On 14 Dec 2016, at 18:49, Wouter Verhelst <w@uter.be> wrote:
->>
->> What I was trying to say is that I think the result to _LIST_ with no
->> queries should return all information the client needs to theoretically
->> build the list of all possible contexts, even if that list may be
->> so large as to be unfeasible for it to be built (e.g., in case of a
->> cartesian product between all possible other contexts). I gave one
->> example, but there may be more.
->>
->> My point is that if the query includes a namespace, the result should
->> not be defined by our spec. If the query does not include a namespace,
->> the result should be "complete" by whatever definition, but not
->> unreasonable (i.e., don't just write a cartesian product to a client).
->>
->> This could allow an interactive client to present a user with a list of
->> possible contexts before performing analysis on the block device, say.
-> OK, so first of all, one of the changes I made earlier was that now
-> each of the commands carries a list of queries, the way you list
-> everything is not 'having a query that doesn't contain a namespace'
-> but rather doing a _LIST_ with no queries at all. But that's semantics
-> and orthogonal to the main point.
->
-> What I've proposed (and pushed - but feel free to alter it) is that
+Richard Henderson writes:
 
-I think, an overview in "## Metadata querying" should be updated too.
+> On 12/23/2016 10:51 AM, Llu=C3=ADs Vilanova wrote:
+>>> On 12/22/2016 10:35 AM, Llu=C3=ADs Vilanova wrote:
+>>>> To handle both issues, this series replicates the shared physical TB c=
+ache,
+>>>> creating a separate physical TB cache for every combination of event s=
+tates
+>>>> (those with the 'vcpu' and 'tcg' properties). Then, all vCPUs tracing =
+the same
+>>>> events will use the same physical TB cache.
+>>=20
+>>> Why do we need to "split the physical TB cache" as opposed to simply in=
+cluding
+>>> the trace state into the TB hash function?
+>>=20
+>> Mmmm, that's an interesting alternative I did not consider. Are you aimi=
+ng at
+>> minimizing the changes, or do you also think it would be more efficient?
 
->
-> 1. on _LIST_, the server can return fewer contexts than are available
->     if returning all of them would consume undue levels of resources.
->
-> 2. on _LIST_ where the contexts are 'algorithmic', the server can
->     return e.g. 'X-Backup:' rather than 'X-Backup:modified>' and
->     every integer.
->
-> 3. On _SET_ if too many contexts are requested, the server may return
->     an error (I think we need this anyway).
->
-> That nearly does what you ask for, but I'm not sure how you any query
-> could 'return all the information the client needs to build
-> the list of all possible contexts'. For instance, in my backup
-> example 'X-Backup:modified>[integer]' doesn't itself tell you
-> anything, as you don't know whether the integer is a unix
-> date time, in seconds after the epoch, milliseconds or whatever.
-> What, surely, as a client you want to know is 'does it support
-> the X-Backup: extension because I've read the spec for that and
-> know that it has X-Backup:modified if so'. So I've suggested it
-> return 'X-Backup:' only in that case, in which case from that
-> (*and the spec*) you know how to build any query.
->
+> I suspect that it will be more efficient.
+
+I discovered that I ran my tests with "--enable-debug". Without it, the
+performance changes for this series look within the noise range (great news!
+guest code events are now for free), and the TB hash function approach shou=
+ld
+show the same type of results on the hot path:
+
+* vanilla, statically disabled
+real	0m2,259s
+user	0m2,252s
+sys	0m0,004s
+
+* vanilla, statically enabled (overhead: 2.18x)
+real	0m4,921s
+user	0m4,912s
+sys	0m0,008s
+
+* multi-tb, statically disabled (overhead: 1.00x)
+real	0m2,269s
+user	0m2,248s
+sys	0m0,020s
+
+* multi-tb, statically enabled (overhead: 0.98x)
+real	0m2,223s
+user	0m2,204s
+sys	0m0,016s
 
 
--- 
-Best regards,
-Vladimir
+The only drawback I see with going for your proposal is the possibility of a
+higher TB collision rate when users set vCPUs with different tracing states
+(after all, my series has a separate QHT for each combination of tracing
+states).
+
+
+>> The dynamic tracing state would then be an arbitrarily long bitmap (defi=
+ned by
+>> the number of events with the 'vcpu' property), so I'm not sure how to f=
+it it
+>> into the hashing function with minimal collisions (the bitmap is now lim=
+ited to
+>> an unsigned long to use it as an index to the TB cache "matrix").
+
+> You could consider that index a unique identifier for the tracing state, =
+and
+> then only compare and hash that integer.
+
+Yes, I get that. I meant that the bitmap has a theoretically unbounded size=
+. But
+we can limit that to some arbitrary number to keep the hashing function fix=
+ed
+(in your example, you're using 32 bits, which should be enough).
+
+
+>> The other drawback I see is that then it would also take longer to compu=
+te the
+>> hashing function, instead of the simpler array indexing. As a benefit, w=
+orkloads
+>> with a high frequency of TB-flushing operations might be a bit faster (t=
+here
+>> would be a single QHT).
+
+> I don't see adding one more integer to the hashing function to be signifi=
+cant
+> at all.  Certainly not the 15% that you describe in your cover letter.
+
+See results above.
+
+
+>> If someone can provide me the code for the modified hash lookup function=
+ to
+>> account for the trace dstate bitmap contents, I will integrate it and me=
+asure if
+>> there is any important change in performance.
+
+> Something like the following should do it.  There are two /* cpu->??? */
+> markers that would need to be filled in.
+
+Thanks for the code! If you think the TB hash function is a less invasive
+change, then I'll send a new series with that.
+
+
+> If you can reduce the tracing identifier to 8 bits, that would be excelle=
+nt.
+> I've been wanting to make some other changes to TB hashing, and that woul=
+d fit
+> in well with a second "flags" value.
+
+With all the vCPU events I have in the queue, it should be on the order of =
+16
+bits. But we cannot shrink it down to 8 bits at compile time now, since we =
+no
+longer have a define with the number of vCPU events.
+
+
+Cheers,
+  Lluis
