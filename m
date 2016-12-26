@@ -1,19 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40043)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42359)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cLMdy-0004kW-17
-	for qemu-devel@nongnu.org; Sun, 25 Dec 2016 23:12:15 -0500
+	(envelope-from <bounces@canonical.com>) id 1cLN0h-0008MJ-5N
+	for qemu-devel@nongnu.org; Sun, 25 Dec 2016 23:35:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cLMdu-0000o1-SZ
-	for qemu-devel@nongnu.org; Sun, 25 Dec 2016 23:12:14 -0500
-References: <1482268300-10082-1-git-send-email-andrew.smirnov@gmail.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <1ab62b16-8c59-ccd6-9011-43e4571a75fb@redhat.com>
-Date: Mon, 26 Dec 2016 12:12:04 +0800
+	(envelope-from <bounces@canonical.com>) id 1cLN0e-0006BO-2T
+	for qemu-devel@nongnu.org; Sun, 25 Dec 2016 23:35:43 -0500
+Received: from indium.canonical.com ([91.189.90.7]:52048)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cLN0d-0006Al-Qf
+	for qemu-devel@nongnu.org; Sun, 25 Dec 2016 23:35:39 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cLN0c-0000Lu-1N
+	for <qemu-devel@nongnu.org>; Mon, 26 Dec 2016 04:35:38 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id DCC432E80CA
+	for <qemu-devel@nongnu.org>; Mon, 26 Dec 2016 04:35:37 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <1482268300-10082-1-git-send-email-andrew.smirnov@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] fsl_etsec: Fix Tx BD ring wrapping handling
+Date: Mon, 26 Dec 2016 04:17:18 -0000
+From: Launchpad Bug Tracker <705931@bugs.launchpad.net>
+Reply-To: Bug 705931 <705931@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20110121152557.9687.39583.malonedeb@palladium.canonical.com>
+Message-Id: <20161226041719.31686.97659.malone@loganberry.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 705931] Re: make ui sdl error 1 on git devel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,70 +36,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrey Smirnov <andrew.smirnov@gmail.com>, qemu-ppc@nongnu.org
-Cc: Scott Wood <scottwood@freescale.com>, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+
+[Expired for QEMU because there has been no activity for 60 days.]
+
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/705931
+
+Title:
+  make ui sdl error 1 on git devel
+
+Status in QEMU:
+  Expired
+
+Bug description:
+  after clone git devel, try compile on slackware 13.1 32 bit machine
+  got error:
+
+  ui/sdl.c:809:1: error: expected '=3D', ',', ';', 'asm' or '__attribute__'=
+ before '{' token
+  ui/sdl.c:815:36: error: expected ')' before '*' token
+  /usr/include/X11/Xlib.h:3575:14: error: old-style parameter declarations =
+in prototyped function definition
+  /usr/include/X11/Xlib.h:3576:5: error: parameter name omitted
+  ui/sdl.c:883:1: error: expected '{' at end of input
+  ui/sdl.c:883:1: error: control reaches end of non-void function
+  make: *** [ui/sdl.o] Error 1
+
+  =
+
+  root@darkstar:/usr/src/qemu/qemu# gcc -v
+  Reading specs from /usr/lib/gcc/i486-slackware-linux/4.5.1/specs
+  COLLECT_GCC=3Dgcc
+  COLLECT_LTO_WRAPPER=3D/usr/libexec/gcc/i486-slackware-linux/4.5.1/lto-wra=
+pper
+  Target: i486-slackware-linux
+  Configured with: ../gcc-4.5.1/configure --prefix=3D/usr --libdir=3D/usr/l=
+ib --mandir=3D/usr/man --infodir=3D/usr/info --enable-shared --enable-boots=
+trap --enable-languages=3Dada,c,c++,fortran,java,objc,lto --enable-threads=
+=3Dposix --enable-checking=3Drelease --with-system-zlib --with-python-dir=
+=3D/lib/python2.6/site-packages --disable-libunwind-exceptions --enable-__c=
+xa_atexit --enable-libssp --enable-lto --with-gnu-ld --verbose --with-arch=
+=3Di486 --target=3Di486-slackware-linux --build=3Di486-slackware-linux --ho=
+st=3Di486-slackware-linux
+  Thread model: posix
+  gcc version 4.5.1 (GCC) =
 
 
+  =
 
-On 2016=E5=B9=B412=E6=9C=8821=E6=97=A5 05:11, Andrey Smirnov wrote:
-> Current code that handles Tx buffer desciprtor ring scanning employs th=
-e
-> following algorithm:
->
-> 	1. Restore current buffer descriptor pointer from TBPTRn
->
-> 	2. Process current descriptor
->
-> 	3. If current descriptor has BD_WRAP flag set set current
-> 	   descriptor pointer to start of the descriptor ring
->
-> 	4. If current descriptor points to start of the ring exit the
-> 	   loop, otherwise increment current descriptor pointer and go
-> 	   to #2
->
-> 	5. Store current descriptor in TBPTRn
->
-> As it can be seen the way the code is implemented results in buffer
-> descriptor ring being scanned starting at offset/descriptor #0. While
-> covering proverbial "99%" of the cases, this algorithm becomes
-> problematic for a number of edge cases.
->
-> Consider the following scenario: guest OS driver initializes descriptor
-> ring to N individual descriptors and starts sending data out. Depending
-> on the volume of traffic and probably guest OS driver implementation it
-> is possible that an edge case where a packet, spread across 2
-> descriptors is placed in descriptors N - 1 and 0 in that order(it is
-> easy to imagine similar examples involving more than 2 descriptors).
->
-> What happens then is aforementioned algorithm starts at descriptor 0,
-> sees a descriptor marked as BD_LAST, which it happily sends out as a
-> separate packet(very much malformed at this point) then the iteration
-> continues and the first part of the original packet is tacked to the
-> next transmission which ends up being bogus as well.
->
-> This behvaiour can be pretty reliably observed when scp'ing data from a
-> guest OS via TAP interface for files larger than 160K (every time for
-> 700K+).
->
-> This patch changes the scanning algorithm to do the following:
->
-> 	1. Restore "current" and "start" buffer descriptor pointer from
-> 	   TBPTRn
->
-> 	2. If "current" descriptor has BD_WRAP flag set "next"
-> 	   descriptor pointer to start of the descriptor ring otherwise
-> 	   set "next" to descriptor right after "current"
->
-> 	3. Process current descriptor
->
-> 	4. If current descriptore has BD_LAST(end of a packet) set save
-> 	   "next" descriptor pointer in TBPTRn
->
-> 	5. Set "current" descriptor pointer to "next"
->
-> 	6. If "current" descriptor points to "start" (from #1) exit the loop
-> 	   loop, otherwise go to #2
+  root@darkstar:/usr/src/qemu/qemu# uname -a
+  Linux darkstar 2.6.35.7-smp #2 SMP Mon Oct 11 14:52:09 CDT 2010 i686 Inte=
+l(R) Core(TM)2 Duo CPU     T7100  @ 1.80GHz GenuineIntel GNU/Linux
+  root@darkstar:/usr/src/qemu/qemu# cat /etc/slackware-version =
 
-Hi, I'm not familiar with this card but this seems could be simply=20
-addressed by exiting the loop when bd_flags !=3D BD_TX_READY instead of=20
-bd_addr !=3D ring_base (which seems buggy for heavy load)?
+  Slackware 13.1.0
+
+  thanks
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/705931/+subscriptions
