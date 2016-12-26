@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53099)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56412)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cLP9z-0007Ip-GB
-	for qemu-devel@nongnu.org; Mon, 26 Dec 2016 01:53:28 -0500
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cLPfS-00034q-SN
+	for qemu-devel@nongnu.org; Mon, 26 Dec 2016 02:25:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cLP9w-0004xP-FG
-	for qemu-devel@nongnu.org; Mon, 26 Dec 2016 01:53:27 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49960)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cLP9w-0004wi-9s
-	for qemu-devel@nongnu.org; Mon, 26 Dec 2016 01:53:24 -0500
-Date: Mon, 26 Dec 2016 14:53:16 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20161226065316.GB4295@pxdev.xzpeter.org>
-References: <20161222094240.GA26435@pxdev.xzpeter.org>
-	<CAFEAcA-6CtHq7w-i=_X9zbBsKeKD1sLsWGze4hgw14er_sd9Vw@mail.gmail.com>
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cLPfP-0004b7-Oo
+	for qemu-devel@nongnu.org; Mon, 26 Dec 2016 02:25:58 -0500
+References: <1480575357-25056-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<a1593129-ddb9-8e74-5865-b1e8400c991d@redhat.com>
+	<8b90a1da-a129-f2cb-4545-355348387925@cn.fujitsu.com>
+	<063dfa33-2015-e566-c623-d59578c20fcd@redhat.com>
+	<13aed710-c5d1-b1de-5922-52e3e53029f9@cn.fujitsu.com>
+	<956d6c43-0904-e094-1adb-bb7c584967d0@vivier.eu>
+	<20161207133049.GA32099@stefanha-x1.localdomain>
+	<fc30a10e-10d5-6b53-d098-f00780cdbe16@cn.fujitsu.com>
+From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+Message-ID: <5dd2f20f-07dd-5120-13bf-ea5700880ecf@cn.fujitsu.com>
+Date: Mon, 26 Dec 2016 15:26:12 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA-6CtHq7w-i=_X9zbBsKeKD1sLsWGze4hgw14er_sd9Vw@mail.gmail.com>
-Subject: Re: [Qemu-devel] A question about PCI device address spaces
+In-Reply-To: <fc30a10e-10d5-6b53-d098-f00780cdbe16@cn.fujitsu.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH for-2.9] docs: Fix
+ description of the sentence
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,57 +30,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
-Cc: QEMU Devel Mailing List <qemu-devel@nongnu.org>, Marcel Apfelbaum <marcel@redhat.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Laurent Vivier <laurent@vivier.eu>, Laurent Vivier <lvivier@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>, Stefan Weil <sw@weilnetz.de>, qemu devel <qemu-devel@nongnu.org>
 
-On Fri, Dec 23, 2016 at 11:21:53AM +0000, Peter Maydell wrote:
-> On 22 December 2016 at 09:42, Peter Xu <peterx@redhat.com> wrote:
-> > Hello,
-> >
-> > Since this is a general topic, I picked it out from the VT-d
-> > discussion and put it here, just want to be more clear of it.
-> >
-> > The issue is, whether we have exposed too much address spaces for
-> > emulated PCI devices?
-> >
-> > Now for each PCI device, we are having PCIDevice::bus_master_as for
-> > the device visible address space, which derived from
-> > pci_device_iommu_address_space():
-> >
-> > AddressSpace *pci_device_iommu_address_space(PCIDevice *dev)
-> > {
-> >     PCIBus *bus = PCI_BUS(dev->bus);
-> >     PCIBus *iommu_bus = bus;
-> >
-> >     while(iommu_bus && !iommu_bus->iommu_fn && iommu_bus->parent_dev) {
-> >         iommu_bus = PCI_BUS(iommu_bus->parent_dev->bus);
-> >     }
-> >     if (iommu_bus && iommu_bus->iommu_fn) {
-> >         return iommu_bus->iommu_fn(bus, iommu_bus->iommu_opaque, dev->devfn);
-> >     }
-> >     return &address_space_memory;
-> > }
-> >
-> > By default (for no-iommu case), it's pointed to system memory space,
-> > which includes MMIO, and looks wrong - PCI device should not be able to
-> > write to MMIO regions.
-> 
-> This is just legacy, I think, ie a combination of "this used to
-> be system memory space so let's not break things" and "PC works
-> mostly like this". It should be possible for the PCI host bridge
-> emulation to set things up so that the device's visible address
-> space is whatever it feels like. The PCI APIs we have for doing
-> this have "iommu" in the name but they work just as well even
-> if the host bridge doesn't actually have an iommu and is just
-> setting up a fixed or slightly configurable mapping.
-> I think it just hasn't been implemented because for guests which
-> aren't misbehaving it doesn't make any difference.
+Hi~~ Jason.
 
-Hmm, yes I see ppc e500 is using that for setting up its own address
-space, possibly x86 can leverage it too when we really need this. For
-now, I see no strong reason for this enhancement, so let me keep it as
-it is, and wait until we have both a strong reason and a PCI guru.
+Can you pick up this patch?
 
-Thank you for your answer! (to Paolo/David as well)
+Thanks
 
--- peterx
+Zhang Chen
+
+
+On 12/08/2016 09:32 AM, Zhang Chen wrote:
+>
+>
+> On 12/07/2016 09:30 PM, Stefan Hajnoczi wrote:
+>> On Wed, Dec 07, 2016 at 10:01:49AM +0100, Laurent Vivier wrote:
+>>> Le 07/12/2016 à 09:58, Zhang Chen a écrit :
+>>>>
+>>>> On 12/02/2016 03:57 PM, Laurent Vivier wrote:
+>>>>> On 02/12/2016 03:59, Zhang Chen wrote:
+>>>>>> On 12/01/2016 10:57 PM, Eric Blake wrote:
+>>>>>>> On 12/01/2016 12:55 AM, Zhang Chen wrote:
+>>>>>>>> Say it in another way to make it easier to understand.
+>>>>>>>>
+>>>>>>>> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+>>>>>>>> Signed-off-by: Eric Blake <eblake@redhat.com>
+>>>>>>> I guess that's because I suggested the replacement text to use, 
+>>>>>>> even
+>>>>>>> though I didn't write the patch.
+>>>>>> Yes, In that case, should I change the signed-off-by to acked-by or
+>>>>>> remove it?
+>>>>> You can use "Suggested-by:"
+>>>>>
+>>>>> https://www.kernel.org/doc/Documentation/SubmittingPatches
+>>>>>
+>>>>> Laurent
+>>>>>
+>>>> Should I fix it? or can you pick up this directly for 2.8?
+>>> I don't think it is needed.
+>>> Perhaps Stefan H can take it directly in his staging tree?
+>> Too late for that now.  This should be merged through Jason Wang (net
+>> maintainer) like any other colo-proxy patch.
+>>
+>
+> OK~ I change the subject to "for-2.9" and cc Jason.
+>
+> Thanks
+> Zhang Chen
+>
+>
+
+-- 
+Thanks
+Zhang Chen
