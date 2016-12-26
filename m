@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36721)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41857)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cLbMq-0004bt-0A
-	for qemu-devel@nongnu.org; Mon, 26 Dec 2016 14:55:33 -0500
+	(envelope-from <vilanova@ac.upc.edu>) id 1cLbyr-00022m-J1
+	for qemu-devel@nongnu.org; Mon, 26 Dec 2016 15:34:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cLbMo-00081j-Vn
-	for qemu-devel@nongnu.org; Mon, 26 Dec 2016 14:55:32 -0500
-Received: from mail-ua0-x22b.google.com ([2607:f8b0:400c:c08::22b]:32829)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cLbMo-00081E-Gp
-	for qemu-devel@nongnu.org; Mon, 26 Dec 2016 14:55:30 -0500
-Received: by mail-ua0-x22b.google.com with SMTP id i68so64661422uad.0
-	for <qemu-devel@nongnu.org>; Mon, 26 Dec 2016 11:55:28 -0800 (PST)
+	(envelope-from <vilanova@ac.upc.edu>) id 1cLbyk-0002kk-9S
+	for qemu-devel@nongnu.org; Mon, 26 Dec 2016 15:34:45 -0500
+Received: from roura.ac.upc.edu ([147.83.33.10]:50864 helo=roura.ac.upc.es)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <vilanova@ac.upc.edu>) id 1cLbyj-0002iF-UM
+	for qemu-devel@nongnu.org; Mon, 26 Dec 2016 15:34:42 -0500
+From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
+Date: Mon, 26 Dec 2016 21:34:38 +0100
+Message-Id: <148278447806.8988.12706825771606357198.stgit@fimbulvetr.bsc.es>
 MIME-Version: 1.0
-In-Reply-To: <0505bf58-21d7-7f77-a0f8-25c5a9586c7f@freebsd.org>
-References: <0505bf58-21d7-7f77-a0f8-25c5a9586c7f@freebsd.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 26 Dec 2016 19:55:07 +0000
-Message-ID: <CAFEAcA-PuTRPUOfpV6Y6aLpBMiFSWmJmKjgytL=Z1MDh3MXHJg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] Extra linked objects in qemu-system-aarch64
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v4 0/6] hypertrace: Lightweight guest-to-QEMU
+ trace channel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,36 +25,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sean Bruno <sbruno@freebsd.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Daniel P Berrange <berrange@redhat.com>, Luiz Capitulino <lcapitulino@redhat.com>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 26 December 2016 at 15:01, Sean Bruno <sbruno@freebsd.org> wrote:
-> FreeBSD detects undeclared dependencies when building "ports" and I've
-> been ignoring a bunch of warnings from qemu-system-aarch64 that I'm a
-> bit puzzled by.  It appears that we're linking qemu-system-aarch64
-> differently than the other system emulator targets:
->
-> https://gist.github.com/seanbruno/dd992cc1e425d708e53dc0fd0f958b92
->
-> I would have expected that all the system targets have the same non-qemu
-> objects linked against it.  Is this something specific to the aarc64
-> emulator that needs to be there?
+The hypertrace channel allows guest code to emit events in QEMU (the host=
+) using
+its tracing infrastructure (see "docs/trace.txt"). This works in both 'sy=
+stem'
+and 'user' modes, is architecture-agnostic and introduces minimal noise o=
+n the
+guest.
 
-You don't give the other system targets for comparison so it's
-hard to tell. I would expect for instance that the system
-emulators would pull in various things like X11 for the GUI.
-The link lines ought not to be any different, though -- often
-aarch64 appears in warnings just because it happens to be
-lexicographically the first target architecture. Is the
-ports setup just suppressing later identical warnings about
-the same libraries on other binaries?
+See first commit for a full description, use-cases and an example.
 
-In any case, it looks like a packaging problem to me.
-https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=209813
-might or might not be relevant to whether this should be
-fixed in the QEMU packaging or in the handling of the
-things like Gnome we might be linking against (just a
-random related-looking google hit).
+Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+---
 
-thanks
--- PMM
+Changes in v4
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Fix typo in stap script example.
+* Fix compilation instructions in doc/hypertrace.txt.
+* Rebase on 0737f32daf.
+
+
+Changes in v3
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Rebase on 4a58f35.
+* Remove debugging printf's.
+* Fix style issues identified by checkpatch.
+* Fix control channel mapping in guest linux module.
+* Add a short event description in "trace-events".
+* Polish documentation in 1st patch.
+
+
+Changes in v2
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Remove unnecessary casts for g2h() [Eric Blake].
+* Use perror() [Eric Blake].
+* Avoid expansions in application example [Eric Blake].
+* Add copyright in document "hypertrace.txt" [Eric Blake].
+* Make the user-mode hypertrace invocations thread-safe [Stefan Hajnoczi].
+* Split dynamic hypertrace configuration into a separate "config" channel.
+
+Llu=C3=ADs Vilanova (6):
+      hypertrace: Add documentation
+      hypertrace: Add tracing event "guest_hypertrace"
+      hypertrace: [*-user] Add QEMU-side proxy to "guest_hypertrace" even=
+t
+      hypertrace: [softmmu] Add QEMU-side proxy to "guest_hypertrace" eve=
+nt
+      hypertrace: Add guest-side user-level library
+      hypertrace: Add guest-side Linux module
+
+
+ Makefile                                           |    8=20
+ Makefile.objs                                      |    6=20
+ bsd-user/main.c                                    |   17 +
+ bsd-user/mmap.c                                    |   15 +
+ bsd-user/syscall.c                                 |   34 +-
+ configure                                          |   40 ++
+ docs/hypertrace.txt                                |  237 ++++++++++++++
+ docs/tracing.txt                                   |    3=20
+ hypertrace/Makefile.objs                           |   21 +
+ hypertrace/common.c                                |   26 ++
+ hypertrace/common.h                                |   23 +
+ hypertrace/guest/linux-module/Kbuild.in            |    7=20
+ hypertrace/guest/linux-module/Makefile             |   23 +
+ .../include/linux/qemu-hypertrace-internal.h       |   46 +++
+ .../linux-module/include/linux/qemu-hypertrace.h   |   73 ++++
+ hypertrace/guest/linux-module/qemu-hypertrace.c    |  149 +++++++++
+ hypertrace/guest/user/Makefile                     |   30 ++
+ hypertrace/guest/user/common.c                     |  296 ++++++++++++++=
+++++
+ hypertrace/guest/user/qemu-hypertrace.h            |   80 +++++
+ hypertrace/softmmu.c                               |  235 ++++++++++++++
+ hypertrace/user.c                                  |  332 ++++++++++++++=
+++++++
+ hypertrace/user.h                                  |   63 ++++
+ include/hw/pci/pci.h                               |    2=20
+ include/qom/cpu.h                                  |    4=20
+ linux-user/main.c                                  |   19 +
+ linux-user/mmap.c                                  |   17 +
+ linux-user/qemu.h                                  |    3=20
+ linux-user/syscall.c                               |   31 +-
+ trace-events                                       |   11 +
+ trace/Makefile.objs                                |    2=20
+ 30 files changed, 1826 insertions(+), 27 deletions(-)
+ create mode 100644 docs/hypertrace.txt
+ create mode 100644 hypertrace/Makefile.objs
+ create mode 100644 hypertrace/common.c
+ create mode 100644 hypertrace/common.h
+ create mode 100644 hypertrace/guest/linux-module/Kbuild.in
+ create mode 100644 hypertrace/guest/linux-module/Makefile
+ create mode 100644 hypertrace/guest/linux-module/include/linux/qemu-hype=
+rtrace-internal.h
+ create mode 100644 hypertrace/guest/linux-module/include/linux/qemu-hype=
+rtrace.h
+ create mode 100644 hypertrace/guest/linux-module/qemu-hypertrace.c
+ create mode 100644 hypertrace/guest/user/Makefile
+ create mode 100644 hypertrace/guest/user/common.c
+ create mode 100644 hypertrace/guest/user/qemu-hypertrace.h
+ create mode 100644 hypertrace/softmmu.c
+ create mode 100644 hypertrace/user.c
+ create mode 100644 hypertrace/user.h
+
+
+To: qemu-devel@nongnu.org
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>
+Cc: Luiz Capitulino <lcapitulino@redhat.com>
+Cc: Daniel P Berrange <berrange@redhat.com>
