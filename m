@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54280)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55216)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jitendra.kolhe@hpe.com>) id 1cLTly-0003vW-Rz
-	for qemu-devel@nongnu.org; Mon, 26 Dec 2016 06:49:00 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cLWeI-0007G8-RK
+	for qemu-devel@nongnu.org; Mon, 26 Dec 2016 09:53:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jitendra.kolhe@hpe.com>) id 1cLTlv-0001e8-OE
-	for qemu-devel@nongnu.org; Mon, 26 Dec 2016 06:48:58 -0500
-Received: from g4t3426.houston.hpe.com ([15.241.140.75]:21659)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cLWeF-0007W7-PL
+	for qemu-devel@nongnu.org; Mon, 26 Dec 2016 09:53:14 -0500
+Received: from mailhub.sw.ru ([195.214.232.25]:35771 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jitendra.kolhe@hpe.com>)
-	id 1cLTlv-0001cT-Iq
-	for qemu-devel@nongnu.org; Mon, 26 Dec 2016 06:48:55 -0500
-References: <1463570440-29685-1-git-send-email-jitendra.kolhe@hpe.com>
-	<F2CBF3009FA73547804AE4C663CAB28E3C34811E@shsmsx102.ccr.corp.intel.com>
-From: Jitendra Kolhe <jitendra.kolhe@hpe.com>
-Message-ID: <30aa996b-d801-70eb-d889-fe2c2525906f@hpe.com>
-Date: Mon, 26 Dec 2016 17:17:58 +0530
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1cLWeF-0007VB-7a
+	for qemu-devel@nongnu.org; Mon, 26 Dec 2016 09:53:11 -0500
+References: <20161214150840.10899-1-alex@alex.org.uk>
+	<31576d46-c0ed-29b9-71a0-5aca1790799a@virtuozzo.com>
+	<6D1B30FC-FD7E-474C-A8E3-FD87E7AA1364@alex.org.uk>
+	<5e9150ed-2127-f2e8-f9db-a514e8f0ddf8@virtuozzo.com>
+	<5E697C22-5FBB-49A2-A018-A6B96E29FE84@alex.org.uk>
+	<94ef3ef2-b76f-fa5d-cbaf-8990ce2b1be8@virtuozzo.com>
+	<0F1DC4AE-5C9E-4AE6-8141-AE6B398EBF73@alex.org.uk>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <2812e3e2-983a-42de-a55f-590a87b7fece@virtuozzo.com>
+Date: Mon, 26 Dec 2016 17:52:54 +0300
 MIME-Version: 1.0
-In-Reply-To: <F2CBF3009FA73547804AE4C663CAB28E3C34811E@shsmsx102.ccr.corp.intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 0/4] migration: skip scanning and
- migrating ram pages released by virtio-balloon driver.
+In-Reply-To: <0F1DC4AE-5C9E-4AE6-8141-AE6B398EBF73@alex.org.uk>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] Further tidy-up on block status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,125 +33,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Li, Liang Z" <liang.z.li@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "renganathan.meenakshisundaram@hpe.com" <renganathan.meenakshisundaram@hpe.com>, "JBottomley@Odin.com" <JBottomley@Odin.com>, "ehabkost@redhat.com" <ehabkost@redhat.com>, "crosthwaite.peter@gmail.com" <crosthwaite.peter@gmail.com>, "simhan@hpe.com" <simhan@hpe.com>, "quintela@redhat.com" <quintela@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>, "lcapitulino@redhat.com" <lcapitulino@redhat.com>, "borntraeger@de.ibm.com" <borntraeger@de.ibm.com>, "mst@redhat.com" <mst@redhat.com>, "mohan_parthasarathy@hpe.com" <mohan_parthasarathy@hpe.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "den@openvz.org" <den@openvz.org>, "amit.shah@redhat.com" <amit.shah@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>
+To: Alex Bligh <alex@alex.org.uk>
+Cc: Wouter Verhelst <w@uter.be>, "nbd-general@lists.sourceforge.net" <nbd-general@lists.sourceforge.net>, Kevin Wolf <kwolf@redhat.com>, "Stefan stefanha@redhat. com" <stefanha@redhat.com>, John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, "Denis V . Lunev" <den@openvz.org>
 
-On 12/23/2016 8:20 AM, Li, Liang Z wrote:
->> While measuring live migration performance for qemu/kvm guest, it was
->> observed that the qemu doesn=E2=80=99t maintain any intelligence for t=
-he guest ram
->> pages released by the guest balloon driver and treat such pages as any=
- other
->> normal guest ram pages. This has direct impact on overall migration ti=
-me for
->> the guest which has released (ballooned out) memory to the host.
+14.12.2016 21:17, Alex Bligh wrote:
+>> On 14 Dec 2016, at 17:55, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> wrote:
 >>
->> In case of large systems, where we can configure large guests with 1TB=
- and
->> with considerable amount of memory released by balloon driver to the h=
-ost,
->> the migration time gets worse.
+>>> Hmmm... Well in the '*' case, it's up to the namespace as to how it parses things, so '*' could be prohibited entirely or mean 'return the first 20 matching' or similar. So that's less of a problem. And 'set all' doesn't exist (unlike 'list all').
+>>>
+>>> I think in the LIST case we should allow the server to omit contexts under certain circumstances, and allow SET to return ETOOBIG.
+>>>
+>> We can't prohibit '*' as query string as implementation defined. And we shouldn't (I think) define its meaning.
+> Those two statements appear to me to contradict each other. The current documentation *does* define the query string (to the right of the colon) as implementation defined. I'm thus not sure what you mean.
+>
+>> Opposite, we can define, that query must not select more than 20 contexts, but I'm not sure that this is good.
+> Each query can select from only one namespace in the current document (Wouter explained why). However, you can specify multiple queries.
+>
+> I don't think we need to define a hard limit of a particular number.
+>
+>> So, do you mean
 >>
->> The solution proposed below is local to qemu (and does not require any
->> modification to Linux kernel or any guest driver). We have verified th=
-e fix for
->> large guests =3D1TB on HPE Superdome X (which can support up to 240 co=
-res
->> and 12TB of memory).
->>
->> During live migration, as part of first iteration in ram_save_iterate(=
-) ->
->> ram_find_and_save_block () will try to migrate ram pages even if they =
-are
->> released by vitrio-balloon driver (balloon inflate). Although these pa=
-ges
->> which are returned to the host by virtio-balloon driver are zero pages=
-, the
->> migration algorithm will still end up scanning the entire page
->> ram_find_and_save_block() ->
->> ram_save_page()/ram_save_compressed_page() ->
->> save_zero_page() -> is_zero_range(). We also end-up sending header
->> information over network for these pages during migration. This adds t=
-o the
->> total migration time.
->>
->> The solution creates a balloon bitmap ramblock as a part of virtio-bal=
-loon
->> device initialization. The bits in the balloon bitmap represent a gues=
-t ram
->> page of size 1UL << VIRTIO_BALLOON_PFN_SHIFT or 4K. If
->> TARGET_PAGE_BITS <=3D VIRTIO_BALLOON_PFN_SHIFT, ram_addr offset for
->> the dirty page which is used by dirty page bitmap during migration is =
-checked
->> against the balloon bitmap as is, if the bit is set in the balloon bit=
-map, the
->> corresponding ram page will be excluded from scanning and sending head=
-er
->> information during migration. In case TARGET_PAGE_BITS >
->> VIRTIO_BALLOON_PFN_SHIFT for a given dirty page ram_addr, all sub-page=
-s
->> of 1UL << VIRTIO_BALLOON_PFN_SHIFT size should be ballooned out to
->> avoid zero page scan and sending header information.
->>
->> The bitmap represents entire guest ram memory till max configured memo=
-ry.
->> Guest ram pages claimed by the virtio-balloon driver will be represent=
-ed by 1
->> in the bitmap. Since the bitmap is maintained as a ramblock, it=E2=80=99=
-s migrated to
->> target as part migration=E2=80=99s ram iterative and ram complete phas=
-e. So that
->> substituent migrations from the target can continue to use optimizatio=
-n.
->>
->> A new migration capability called skip-balloon is introduced. The user=
- can
->> disable the capability in cases where user does not expect much benefi=
-t or in
->> case the migration is from an older version.
->>
->> During live migration setup the optimization can be set to disabled st=
-ate if .
->> no virtio-balloon device is initialized.
->> . skip-balloon migration capability is disabled.
->> . If the guest virtio-balloon driver has not set
->> VIRTIO_BALLOON_F_MUST_TELL_HOST
->>   flag. Which means the guest may start using a ram pages freed by gue=
-st
->> balloon
->>   driver, even before the host/qemu is aware of it. In such case, the
->>   optimization is disabled so that the ram pages that are being used b=
-y the
->>   guest will continue to be scanned and migrated.
->>
->> Balloon bitmap ramblock size is set to zero if the optimization is dis=
-abled, to
->> avoid overhead of migrating the bitmap. If the bitmap is not migrated =
-to the
->> target, the destination starts with a fresh bitmap and tracks the ball=
-ooning
->> operation thereafter.
->>
->=20
-> I have a better way to get rid of the bitmap.
-> We should not maintain the inflating pages in the bitmap, instead, we
-> can get them from the guest if it's needed, just like what we did for t=
-he guest's=20
-> unused pages. Then we can combine the inflating page info with the unus=
-ed page
-> info together, and skip them during live migration.
->=20
+>>   list('backup:modtime>*') -> empty list
+> The result of that would depend on however the 'backup' context was defined, meaning it had the options of:
+> * ETOOBIG
+> * Listing some subset of available contexts (arguably 'none' is a subset)
+>
+>>   set('backup:modtime>*') -> ETOOBIG
+> Again, the result of that would depend on however the 'backup' context was defined, meaning it had the options of:
+> * ETOOBIG
+> * Listing some subset of available contexts (arguably 'none' is a subset)
+> ... and it need not make the same choice as above, but I agree it would be logical for it to do so.
+>
+> As any form of wildcarding within a query refers to one particular namespace (as a query by its nature specifies a single namespace), we don't have to worry about the way wildcarding works in the standard, as Wouter pointed out. We merely need to provide that ETOOBIG and listing a subset are acceptable responses.
+>
+> What we do need to decide is what the response to list() (i.e. a list with a zero length list of queries) does. It's currently defined to return every context from every namespace. Options would include
+> * ETOOBIG
+> * Listing some subset of available contexts (arguably 'none' is a subset)
+> * Allowing abbreviation of algorithmically specified contexts (e.g. in this case just returning 'backup:' to represent all available backup contexts)
 
-Thanks for your response. I will try and work on top of your patch set to=
- use=20
-the same framework which skips migrating guest's unused pages, for balloo=
-ned out=20
-pages too.
+Shouldn't we add some flags to REP_META_CONTEXT, for client to be 
+insure, is returned string a direct context name or some kind of 
+wildcard?|| Just a flags field, with one flag defined for now: 
+|NBD_REP_META_CONTEXT_LEAF and others reserved.|
 
-Thanks,
-- Jitendra
 
-> Thanks!
-> Liang
->=20
->=20
+-- 
+Best regards,
+Vladimir
