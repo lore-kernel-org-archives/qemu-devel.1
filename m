@@ -1,16 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33389)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48880)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gadrenayan@gmail.com>) id 1cLQep-0003PU-31
-	for qemu-devel@nongnu.org; Mon, 26 Dec 2016 03:29:24 -0500
+	(envelope-from <marcel@redhat.com>) id 1cLT2J-00066I-6J
+	for qemu-devel@nongnu.org; Mon, 26 Dec 2016 06:01:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gadrenayan@gmail.com>) id 1cLQej-000184-LR
-	for qemu-devel@nongnu.org; Mon, 26 Dec 2016 03:29:18 -0500
+	(envelope-from <marcel@redhat.com>) id 1cLT2E-0001bq-Ai
+	for qemu-devel@nongnu.org; Mon, 26 Dec 2016 06:01:47 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37850)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1cLT2E-0001bV-3i
+	for qemu-devel@nongnu.org; Mon, 26 Dec 2016 06:01:42 -0500
+References: <20161222094240.GA26435@pxdev.xzpeter.org>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <d4e36417-3005-0d5f-63b4-ebe621f3a763@redhat.com>
+Date: Mon, 26 Dec 2016 13:01:34 +0200
 MIME-Version: 1.0
-From: Gadre Nayan <gadrenayan@gmail.com>
-Date: Mon, 26 Dec 2016 13:59:13 +0530
-Message-ID: <CAKJ7aR7kDde_KrCMojwdU1kaSvK+zw_wM49__EcA+=kO+fT+Hw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: [Qemu-devel] Qemu NVME ubuntu 16.04 setup problems
+In-Reply-To: <20161222094240.GA26435@pxdev.xzpeter.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] A question about PCI device address spaces
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,23 +26,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-discuss@nongnu.org, qemu-devel@nongnu.org, linux-nvme@lists.infradead.org
+To: Peter Xu <peterx@redhat.com>, QEMU Devel Mailing List <qemu-devel@nongnu.org>
+Cc: David Gibson <david@gibson.dropbear.id.au>, Paolo Bonzini <pbonzini@redhat.com>
 
-Hi,
+On 12/22/2016 11:42 AM, Peter Xu wrote:
+> Hello,
+>
 
-I am trying to test SPDK on a Virtual Machine with NVME support. I do not
-have NVME cards on the Host hence wanted to simulate the Hardware, I have
-install nvmeqemu (https://github.com/nvmeqemu/nvmeqemu) for that purpose.
+Hi Peter,
+
+> Since this is a general topic, I picked it out from the VT-d
+> discussion and put it here, just want to be more clear of it.
+>
+> The issue is, whether we have exposed too much address spaces for
+> emulated PCI devices?
+>
+> Now for each PCI device, we are having PCIDevice::bus_master_as for
+> the device visible address space, which derived from
+> pci_device_iommu_address_space():
+>
+> AddressSpace *pci_device_iommu_address_space(PCIDevice *dev)
+> {
+>     PCIBus *bus = PCI_BUS(dev->bus);
+>     PCIBus *iommu_bus = bus;
+>
+>     while(iommu_bus && !iommu_bus->iommu_fn && iommu_bus->parent_dev) {
+>         iommu_bus = PCI_BUS(iommu_bus->parent_dev->bus);
+>     }
+>     if (iommu_bus && iommu_bus->iommu_fn) {
+>         return iommu_bus->iommu_fn(bus, iommu_bus->iommu_opaque, dev->devfn);
+>     }
+>     return &address_space_memory;
+> }
+>
+> By default (for no-iommu case), it's pointed to system memory space,
+> which includes MMIO, and looks wrong - PCI device should not be able to
+> write to MMIO regions.
+>
+
+Why? As far as I know a PCI device can start a read/write transaction
+to virtually any address, it doesn't matter if it 'lands' in RAM or a MMIO
+region mapped by other device. But I might be wrong, need to read the spec again...
+
+The PCI transaction will eventually reach the Root Complex/PCI host bridge
+where an IOMMU or some other hw entity can sanitize/translate, but is out of
+the scope of the device itself.
+
+The Root Complex will 'translate' the transaction into a memory read/write
+in the behalf of the device and pass it to the memory controller.
+If the transaction target is another device, I am not sure if the
+Root Complex will re-route by itself or pass it to the Memory Controller.
 
 
-I installed Ubuntu 16.04 server on this, however when I use the "-smp 2"
-options for qemu the VM boots but becomes unresponsive after some time, I
-require the smp 2 switch because dpdk requires atleast 2 cores I guess for
-compilation ( I got errors regarding some in-lining issues when I tried to
-install dpdk with just 1 core.)
+> As an example, if we dump a PCI device address space into detail on
+> x86_64 system, we can see (this is address space for a virtio-net-pci
+> device on an Q35 machine with 6G memory):
+>
+>     0000000000000000-000000000009ffff (prio 0, RW): pc.ram
+>     00000000000a0000-00000000000affff (prio 1, RW): vga.vram
+>     00000000000b0000-00000000000bffff (prio 1, RW): vga-lowmem
+>     00000000000c0000-00000000000c9fff (prio 0, RW): pc.ram
+>     00000000000ca000-00000000000ccfff (prio 0, RW): pc.ram
+>     00000000000cd000-00000000000ebfff (prio 0, RW): pc.ram
+>     00000000000ec000-00000000000effff (prio 0, RW): pc.ram
+>     00000000000f0000-00000000000fffff (prio 0, RW): pc.ram
+>     0000000000100000-000000007fffffff (prio 0, RW): pc.ram
+>     00000000b0000000-00000000bfffffff (prio 0, RW): pcie-mmcfg-mmio
+>     00000000fd000000-00000000fdffffff (prio 1, RW): vga.vram
+>     00000000fe000000-00000000fe000fff (prio 0, RW): virtio-pci-common
+>     00000000fe001000-00000000fe001fff (prio 0, RW): virtio-pci-isr
+>     00000000fe002000-00000000fe002fff (prio 0, RW): virtio-pci-device
+>     00000000fe003000-00000000fe003fff (prio 0, RW): virtio-pci-notify
+>     00000000febd0400-00000000febd041f (prio 0, RW): vga ioports remapped
+>     00000000febd0500-00000000febd0515 (prio 0, RW): bochs dispi interface
+>     00000000febd0600-00000000febd0607 (prio 0, RW): qemu extended regs
+>     00000000febd1000-00000000febd102f (prio 0, RW): msix-table
+>     00000000febd1800-00000000febd1807 (prio 0, RW): msix-pba
+>     00000000febd2000-00000000febd2fff (prio 1, RW): ahci
+>     00000000fec00000-00000000fec00fff (prio 0, RW): kvm-ioapic
+>     00000000fed00000-00000000fed003ff (prio 0, RW): hpet
+>     00000000fed1c000-00000000fed1ffff (prio 1, RW): lpc-rcrb-mmio
+>     00000000fee00000-00000000feefffff (prio 4096, RW): kvm-apic-msi
+>     00000000fffc0000-00000000ffffffff (prio 0, R-): pc.bios
+>     0000000100000000-00000001ffffffff (prio 0, RW): pc.ram
+>
+> So here are the "pc.ram" regions the only ones that we should expose
+> to PCI devices? (it should contain all of them, including the low-mem
+> ones and the >=4g one)
+>
 
-So Has anyone tried working on getting this setup up and running.
+As I previously said, it does not have to be RAM only, but let's wait
+also for Michael's opinion.
 
-Please suggest.
-Thanks
-Nayan Gadre.
+> And, should this rule work for all platforms?
+
+The PCI rules should be generic for all platforms, but I don't know
+the other platforms.
+
+Thanks,
+Marcel
+
+Or say, would it be a
+> problem if I directly change address_space_memory in
+> pci_device_iommu_address_space() into something else, which only
+> contains RAMs? (of course this won't affect any platform that has
+> IOMMU, aka, customized PCIBus::iommu_fn function)
+>
+> (btw, I'd appreciate if anyone has quick answer on why we have lots of
+>  continuous "pc.ram" in low 2g range - from can_merge() I guess they
+>  seem to have different dirty_log_mask, romd_mode, etc., but I still
+>  would like to know why they are having these difference. Anyway, this
+>  is totally an "optional question" just to satisfy my own curiosity :)
+>
+> Thanks,
+>
+> -- peterx
+>
