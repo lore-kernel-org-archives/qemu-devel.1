@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35669)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35680)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cLtaZ-0002ry-0M
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 10:22:56 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cLtac-0002vA-9I
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 10:22:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cLtaX-0001Tm-Q8
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 10:22:55 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:47884)
+	(envelope-from <pm215@archaic.org.uk>) id 1cLtab-0001V6-9Q
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 10:22:58 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:47885)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1cLtaX-0001TX-Io
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 10:22:53 -0500
+	id 1cLtab-0001Uk-1n
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 10:22:57 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.84_2)
-	(envelope-from <pm215@archaic.org.uk>) id 1cLtaW-0003yY-O3
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 15:22:52 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1cLtaa-0003yv-6y
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 15:22:56 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 27 Dec 2016 15:21:16 +0000
-Message-Id: <1482852077-19397-25-git-send-email-peter.maydell@linaro.org>
+Date: Tue, 27 Dec 2016 15:21:17 +0000
+Message-Id: <1482852077-19397-26-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1482852077-19397-1-git-send-email-peter.maydell@linaro.org>
 References: <1482852077-19397-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 24/25] hw/i2c: Add a NULL check for i2c slave
- init callbacks
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 25/25] target-arm: Add VBAR support to ARM1176
+ CPUs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,136 +33,101 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Alastair D'Silva <alastair@d-silva.org>
+From: Cédric Le Goater <clg@kaod.org>
 
-Add a NULL check for i2c slave init callbacks, so that we no longer
-need to implement empty init functions.
+ARM1176 CPUs have TrustZone support and can use the Vector Base
+Address Register, but currently, qemu only adds VBAR support to ARMv7
+CPUs. Fix this by adding a new feature ARM_FEATURE_VBAR which can used
+for ARMv7 and ARM1176 CPUs.
 
-Signed-off-by: Alastair D'Silva <alastair@d-silva.org>
-Message-id: 20161202054617.6749-4-alastair@au1.ibm.com
+The VBAR feature is always set for ARMv7 because some legacy boards
+require it even if this is not architecturally correct.
+
+Signed-off-by: Cédric Le Goater <clg@kaod.org>
+Message-id: 1481810970-9692-1-git-send-email-clg@kaod.org
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-[PMM: squashed in later tweak from Alistair to if() phrasing]
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/arm/pxa2xx.c   | 7 -------
- hw/arm/tosa.c     | 7 -------
- hw/arm/z2.c       | 7 -------
- hw/i2c/core.c     | 6 +++++-
- hw/timer/ds1338.c | 6 ------
- 5 files changed, 5 insertions(+), 28 deletions(-)
+ target/arm/cpu.h    |  1 +
+ target/arm/cpu.c    |  9 +++++++++
+ target/arm/helper.c | 19 +++++++++++++------
+ 3 files changed, 23 insertions(+), 6 deletions(-)
 
-diff --git a/hw/arm/pxa2xx.c b/hw/arm/pxa2xx.c
-index 8aa0f8a..bdcf6bc 100644
---- a/hw/arm/pxa2xx.c
-+++ b/hw/arm/pxa2xx.c
-@@ -1449,17 +1449,10 @@ static const VMStateDescription vmstate_pxa2xx_i2c = {
-     }
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index ca5c849..ab119e6 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -1125,6 +1125,7 @@ enum arm_features {
+     ARM_FEATURE_V8_PMULL, /* implements PMULL part of v8 Crypto Extensions */
+     ARM_FEATURE_THUMB_DSP, /* DSP insns supported in the Thumb encodings */
+     ARM_FEATURE_PMU, /* has PMU support */
++    ARM_FEATURE_VBAR, /* has cp15 VBAR */
  };
  
--static int pxa2xx_i2c_slave_init(I2CSlave *i2c)
--{
--    /* Nothing to do.  */
--    return 0;
--}
--
- static void pxa2xx_i2c_slave_class_init(ObjectClass *klass, void *data)
- {
-     I2CSlaveClass *k = I2C_SLAVE_CLASS(klass);
+ static inline int arm_feature(CPUARMState *env, int feature)
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 98e2c68..f5cb30a 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -597,6 +597,11 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+         } else {
+             set_feature(env, ARM_FEATURE_V6);
+         }
++
++        /* Always define VBAR for V7 CPUs even if it doesn't exist in
++         * non-EL3 configs. This is needed by some legacy boards.
++         */
++        set_feature(env, ARM_FEATURE_VBAR);
+     }
+     if (arm_feature(env, ARM_FEATURE_V6K)) {
+         set_feature(env, ARM_FEATURE_V6);
+@@ -721,6 +726,10 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+         }
+     }
  
--    k->init = pxa2xx_i2c_slave_init;
-     k->event = pxa2xx_i2c_event;
-     k->recv = pxa2xx_i2c_rx;
-     k->send = pxa2xx_i2c_tx;
-diff --git a/hw/arm/tosa.c b/hw/arm/tosa.c
-index 1ee12f4..39d9dbb 100644
---- a/hw/arm/tosa.c
-+++ b/hw/arm/tosa.c
-@@ -202,12 +202,6 @@ static int tosa_dac_recv(I2CSlave *s)
-     return -1;
- }
- 
--static int tosa_dac_init(I2CSlave *i2c)
--{
--    /* Nothing to do.  */
--    return 0;
--}
--
- static void tosa_tg_init(PXA2xxState *cpu)
- {
-     I2CBus *bus = pxa2xx_i2c_bus(cpu->i2c[0]);
-@@ -275,7 +269,6 @@ static void tosa_dac_class_init(ObjectClass *klass, void *data)
- {
-     I2CSlaveClass *k = I2C_SLAVE_CLASS(klass);
- 
--    k->init = tosa_dac_init;
-     k->event = tosa_dac_event;
-     k->recv = tosa_dac_recv;
-     k->send = tosa_dac_send;
-diff --git a/hw/arm/z2.c b/hw/arm/z2.c
-index 68a92f3..b3a6bbd 100644
---- a/hw/arm/z2.c
-+++ b/hw/arm/z2.c
-@@ -263,12 +263,6 @@ static int aer915_recv(I2CSlave *slave)
-     return retval;
- }
- 
--static int aer915_init(I2CSlave *i2c)
--{
--    /* Nothing to do.  */
--    return 0;
--}
--
- static VMStateDescription vmstate_aer915_state = {
-     .name = "aer915",
-     .version_id = 1,
-@@ -285,7 +279,6 @@ static void aer915_class_init(ObjectClass *klass, void *data)
-     DeviceClass *dc = DEVICE_CLASS(klass);
-     I2CSlaveClass *k = I2C_SLAVE_CLASS(klass);
- 
--    k->init = aer915_init;
-     k->event = aer915_event;
-     k->recv = aer915_recv;
-     k->send = aer915_send;
-diff --git a/hw/i2c/core.c b/hw/i2c/core.c
-index abd4c4c..e40781e 100644
---- a/hw/i2c/core.c
-+++ b/hw/i2c/core.c
-@@ -260,7 +260,11 @@ static int i2c_slave_qdev_init(DeviceState *dev)
-     I2CSlave *s = I2C_SLAVE(dev);
-     I2CSlaveClass *sc = I2C_SLAVE_GET_CLASS(s);
- 
--    return sc->init(s);
-+    if (sc->init) {
-+        return sc->init(s);
++    if (arm_feature(env, ARM_FEATURE_EL3)) {
++        set_feature(env, ARM_FEATURE_VBAR);
 +    }
 +
-+    return 0;
- }
+     register_cp_regs_for_features(cpu);
+     arm_cpu_register_gdb_regs_for_features(cpu);
  
- DeviceState *i2c_create_slave(I2CBus *bus, const char *name, uint8_t addr)
-diff --git a/hw/timer/ds1338.c b/hw/timer/ds1338.c
-index 0112949..f5d04dd 100644
---- a/hw/timer/ds1338.c
-+++ b/hw/timer/ds1338.c
-@@ -198,11 +198,6 @@ static int ds1338_send(I2CSlave *i2c, uint8_t data)
-     return 0;
- }
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index b5b65ca..8dcabbf 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -1252,12 +1252,6 @@ static const ARMCPRegInfo v7_cp_reginfo[] = {
+       .access = PL1_RW, .accessfn = access_tpm, .type = ARM_CP_ALIAS,
+       .fieldoffset = offsetof(CPUARMState, cp15.c9_pminten),
+       .writefn = pmintenclr_write },
+-    { .name = "VBAR", .state = ARM_CP_STATE_BOTH,
+-      .opc0 = 3, .crn = 12, .crm = 0, .opc1 = 0, .opc2 = 0,
+-      .access = PL1_RW, .writefn = vbar_write,
+-      .bank_fieldoffsets = { offsetof(CPUARMState, cp15.vbar_s),
+-                             offsetof(CPUARMState, cp15.vbar_ns) },
+-      .resetvalue = 0 },
+     { .name = "CCSIDR", .state = ARM_CP_STATE_BOTH,
+       .opc0 = 3, .crn = 0, .crm = 0, .opc1 = 1, .opc2 = 0,
+       .access = PL1_R, .readfn = ccsidr_read, .type = ARM_CP_NO_RAW },
+@@ -5094,6 +5088,19 @@ void register_cp_regs_for_features(ARMCPU *cpu)
+         }
+     }
  
--static int ds1338_init(I2CSlave *i2c)
--{
--    return 0;
--}
--
- static void ds1338_reset(DeviceState *dev)
- {
-     DS1338State *s = DS1338(dev);
-@@ -220,7 +215,6 @@ static void ds1338_class_init(ObjectClass *klass, void *data)
-     DeviceClass *dc = DEVICE_CLASS(klass);
-     I2CSlaveClass *k = I2C_SLAVE_CLASS(klass);
- 
--    k->init = ds1338_init;
-     k->event = ds1338_event;
-     k->recv = ds1338_recv;
-     k->send = ds1338_send;
++    if (arm_feature(env, ARM_FEATURE_VBAR)) {
++        ARMCPRegInfo vbar_cp_reginfo[] = {
++            { .name = "VBAR", .state = ARM_CP_STATE_BOTH,
++              .opc0 = 3, .crn = 12, .crm = 0, .opc1 = 0, .opc2 = 0,
++              .access = PL1_RW, .writefn = vbar_write,
++              .bank_fieldoffsets = { offsetof(CPUARMState, cp15.vbar_s),
++                                     offsetof(CPUARMState, cp15.vbar_ns) },
++              .resetvalue = 0 },
++            REGINFO_SENTINEL
++        };
++        define_arm_cp_regs(cpu, vbar_cp_reginfo);
++    }
++
+     /* Generic registers whose values depend on the implementation */
+     {
+         ARMCPRegInfo sctlr = {
 -- 
 2.7.4
