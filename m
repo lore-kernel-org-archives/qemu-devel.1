@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35298)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35315)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cLtZZ-0001pN-VQ
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 10:21:55 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cLtZd-0001wu-FX
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 10:21:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cLtZZ-0001Cv-1G
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 10:21:53 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:47867)
+	(envelope-from <pm215@archaic.org.uk>) id 1cLtZc-0001DV-CE
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 10:21:57 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:47868)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1cLtZY-0001Cj-Qd
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 10:21:52 -0500
+	id 1cLtZc-0001DG-5C
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 10:21:56 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.84_2)
-	(envelope-from <pm215@archaic.org.uk>) id 1cLtZX-0003sF-Vk
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 15:21:51 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1cLtZb-0003sc-AM
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 15:21:55 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 27 Dec 2016 15:20:59 +0000
-Message-Id: <1482852077-19397-8-git-send-email-peter.maydell@linaro.org>
+Date: Tue, 27 Dec 2016 15:21:00 +0000
+Message-Id: <1482852077-19397-9-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1482852077-19397-1-git-send-email-peter.maydell@linaro.org>
 References: <1482852077-19397-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 07/25] target-arm: Log AArch64 exception returns
+Subject: [Qemu-devel] [PULL 08/25] hw/intc/arm_gicv3: Remove incorrect usage
+ of fieldoffset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,55 +30,83 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-We already log exception entry; add logging of the AArch64 exception
-return path as well.
+In the ARMCPRegInfo definitions for the GICv3 CPU interface
+registers, we were trying to use .fieldoffset to specify
+the locations of data fields within the GICv3CPUState struct.
+This is completely broken, because .fieldoffset is for offsets
+into the CPUARMState struct. We didn't notice because we
+were only using this for reads to BPR0, AP0R<n>, IGRPEN0
+and CTLR_EL3, and Linux doesn't use these registers.
+
+Replace the .fieldoffset uses with explicit read functions.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 ---
- target/arm/op_helper.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ hw/intc/arm_gicv3_cpuif.c | 13 ++++++-------
+ 1 file changed, 6 insertions(+), 7 deletions(-)
 
-diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
-index cd94216..ba796d8 100644
---- a/target/arm/op_helper.c
-+++ b/target/arm/op_helper.c
-@@ -17,6 +17,7 @@
-  * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-  */
- #include "qemu/osdep.h"
-+#include "qemu/log.h"
- #include "cpu.h"
- #include "exec/helper-proto.h"
- #include "internals.h"
-@@ -972,6 +973,9 @@ void HELPER(exception_return)(CPUARMState *env)
-         } else {
-             env->regs[15] = env->elr_el[cur_el] & ~0x3;
-         }
-+        qemu_log_mask(CPU_LOG_INT, "Exception return from AArch64 EL%d to "
-+                      "AArch32 EL%d PC 0x%" PRIx32 "\n",
-+                      cur_el, new_el, env->regs[15]);
-     } else {
-         env->aarch64 = 1;
-         pstate_write(env, spsr);
-@@ -980,6 +984,9 @@ void HELPER(exception_return)(CPUARMState *env)
-         }
-         aarch64_restore_sp(env, new_el);
-         env->pc = env->elr_el[cur_el];
-+        qemu_log_mask(CPU_LOG_INT, "Exception return from AArch64 EL%d to "
-+                      "AArch64 EL%d PC 0x%" PRIx64 "\n",
-+                      cur_el, new_el, env->pc);
-     }
- 
-     arm_call_el_change_hook(arm_env_get_cpu(env));
-@@ -1002,6 +1009,8 @@ illegal_return:
-     if (!arm_singlestep_active(env)) {
-         env->pstate &= ~PSTATE_SS;
-     }
-+    qemu_log_mask(LOG_GUEST_ERROR, "Illegal exception return at EL%d: "
-+                  "resuming execution at 0x%" PRIx64 "\n", cur_el, env->pc);
- }
- 
- /* Return true if the linked breakpoint entry lbn passes its checks */
+diff --git a/hw/intc/arm_gicv3_cpuif.c b/hw/intc/arm_gicv3_cpuif.c
+index bca30c4..35e8eb3 100644
+--- a/hw/intc/arm_gicv3_cpuif.c
++++ b/hw/intc/arm_gicv3_cpuif.c
+@@ -1118,35 +1118,35 @@ static const ARMCPRegInfo gicv3_cpuif_reginfo[] = {
+       .opc0 = 3, .opc1 = 0, .crn = 12, .crm = 8, .opc2 = 3,
+       .type = ARM_CP_IO | ARM_CP_NO_RAW,
+       .access = PL1_RW, .accessfn = gicv3_fiq_access,
+-      .fieldoffset = offsetof(GICv3CPUState, icc_bpr[GICV3_G0]),
++      .readfn = icc_bpr_read,
+       .writefn = icc_bpr_write,
+     },
+     { .name = "ICC_AP0R0_EL1", .state = ARM_CP_STATE_BOTH,
+       .opc0 = 3, .opc1 = 0, .crn = 12, .crm = 8, .opc2 = 4,
+       .type = ARM_CP_IO | ARM_CP_NO_RAW,
+       .access = PL1_RW, .accessfn = gicv3_fiq_access,
+-      .fieldoffset = offsetof(GICv3CPUState, icc_apr[GICV3_G0][0]),
++      .readfn = icc_ap_read,
+       .writefn = icc_ap_write,
+     },
+     { .name = "ICC_AP0R1_EL1", .state = ARM_CP_STATE_BOTH,
+       .opc0 = 3, .opc1 = 0, .crn = 12, .crm = 8, .opc2 = 5,
+       .type = ARM_CP_IO | ARM_CP_NO_RAW,
+       .access = PL1_RW, .accessfn = gicv3_fiq_access,
+-      .fieldoffset = offsetof(GICv3CPUState, icc_apr[GICV3_G0][1]),
++      .readfn = icc_ap_read,
+       .writefn = icc_ap_write,
+     },
+     { .name = "ICC_AP0R2_EL1", .state = ARM_CP_STATE_BOTH,
+       .opc0 = 3, .opc1 = 0, .crn = 12, .crm = 8, .opc2 = 6,
+       .type = ARM_CP_IO | ARM_CP_NO_RAW,
+       .access = PL1_RW, .accessfn = gicv3_fiq_access,
+-      .fieldoffset = offsetof(GICv3CPUState, icc_apr[GICV3_G0][2]),
++      .readfn = icc_ap_read,
+       .writefn = icc_ap_write,
+     },
+     { .name = "ICC_AP0R3_EL1", .state = ARM_CP_STATE_BOTH,
+       .opc0 = 3, .opc1 = 0, .crn = 12, .crm = 8, .opc2 = 7,
+       .type = ARM_CP_IO | ARM_CP_NO_RAW,
+       .access = PL1_RW, .accessfn = gicv3_fiq_access,
+-      .fieldoffset = offsetof(GICv3CPUState, icc_apr[GICV3_G0][3]),
++      .readfn = icc_ap_read,
+       .writefn = icc_ap_write,
+     },
+     /* All the ICC_AP1R*_EL1 registers are banked */
+@@ -1275,7 +1275,7 @@ static const ARMCPRegInfo gicv3_cpuif_reginfo[] = {
+       .opc0 = 3, .opc1 = 0, .crn = 12, .crm = 12, .opc2 = 6,
+       .type = ARM_CP_IO | ARM_CP_NO_RAW,
+       .access = PL1_RW, .accessfn = gicv3_fiq_access,
+-      .fieldoffset = offsetof(GICv3CPUState, icc_igrpen[GICV3_G0]),
++      .readfn = icc_igrpen_read,
+       .writefn = icc_igrpen_write,
+     },
+     /* This register is banked */
+@@ -1299,7 +1299,6 @@ static const ARMCPRegInfo gicv3_cpuif_reginfo[] = {
+       .opc0 = 3, .opc1 = 6, .crn = 12, .crm = 12, .opc2 = 4,
+       .type = ARM_CP_IO | ARM_CP_NO_RAW,
+       .access = PL3_RW,
+-      .fieldoffset = offsetof(GICv3CPUState, icc_ctlr_el3),
+       .readfn = icc_ctlr_el3_read,
+       .writefn = icc_ctlr_el3_write,
+     },
 -- 
 2.7.4
