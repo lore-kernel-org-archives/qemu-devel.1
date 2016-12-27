@@ -1,33 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40158)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41284)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cLmCi-0000Ef-24
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 02:29:49 -0500
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cLmIQ-0002T0-6X
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 02:35:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cLmCe-0001TG-VK
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 02:29:48 -0500
-Received: from indium.canonical.com ([91.189.90.7]:46820)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cLmCe-0001T8-Pr
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 02:29:44 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cLmCd-0004X6-EW
-	for <qemu-devel@nongnu.org>; Tue, 27 Dec 2016 07:29:43 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 60D8D2E80C9
-	for <qemu-devel@nongnu.org>; Tue, 27 Dec 2016 07:29:43 +0000 (UTC)
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cLmIN-0003PJ-03
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 02:35:42 -0500
+Received: from [59.151.112.132] (port=24803 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cLmIM-0003NK-In
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 02:35:38 -0500
+From: Cao jin <caoj.fnst@cn.fujitsu.com>
+Date: Tue, 27 Dec 2016 15:40:13 +0800
+Message-ID: <1482824413-25837-1-git-send-email-caoj.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 27 Dec 2016 07:15:52 -0000
-From: Thomas Huth <692570@bugs.launchpad.net>
-Reply-To: Bug 692570 <692570@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20101220141548.20409.39982.malonedeb@soybean.canonical.com>
-Message-Id: <20161227071552.1274.4864.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 692570] Re: APIC Latency causing BSOD.
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] doc/pcie: correct command line examples
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,168 +24,47 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: mst@redhat.com, marcel@redhat.com
 
-Since there hasn't been an answer to this within the last years, it
-looks like nobody here knows about Proxmox problems. So let's close this
-ticket...
+Nit picking: Multi-function PCI Express Root Ports should mean that
+'addr' property is mandatory, and slot is optional because it is default
+to 0, and 'chassis' is mandatory for 2nd & 3rd root port because it is
+default to 0 too.
 
-** Changed in: qemu
-       Status: New =3D> Invalid
+Bonus: fix a typo(2->3)
+Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
+---
+ docs/pcie.txt | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/692570
-
-Title:
-  APIC Latency causing BSOD.
-
-Status in QEMU:
-  Invalid
-
-Bug description:
-  I have a Proxmox Server with the following specs:
-
-  Version:
-
-  pve-manager: 1.7-10 (pve-manager/1.7/5323)
-  running kernel: 2.6.32-4-pve
-  proxmox-ve-2.6.32: 1.7-28
-  pve-kernel-2.6.32-4-pve: 2.6.32-28
-  qemu-server: 1.1-25
-  pve-firmware: 1.0-9
-  libpve-storage-perl: 1.0-16
-  vncterm: 0.9-2
-  vzctl: 3.0.24-1pve4
-  vzdump: 1.2-9
-  vzprocps: 2.0.11-1dso2
-  vzquota: 3.0.11-1
-  pve-qemu-kvm: 0.13.0-2
-  ksm-control-daemon: 1.0-4
-
-  VM Configuration:
-
-  name: TS64
-  ide2: none,media=3Dcdrom
-  bootdisk: ide0
-  ostype: w2k3
-  ide0: data:vm-104-disk-1
-  memory: 10240
-  sockets: 1
-  vlan0: virtio=3DC6:4C:B3:BB:AD:67
-  onboot: 1
-  cores: 4
-  boot: cad
-  freeze: 0
-  cpuunits: 1000
-  acpi: 1
-  kvm: 1
-
-  CPU 2x Xeon Quad Core E5620 2.4GHZ Processors:
-
-  processor : 0
-  vendor_id : GenuineIntel
-  cpu family : 6
-  model : 44
-  model name : Intel(R) Xeon(R) CPU E5620 @ 2.40GHz
-  stepping : 2
-  cpu MHz : 2400.323
-  cache size : 12288 KB
-  physical id : 0
-  siblings : 8
-  core id : 9
-  cpu cores : 4
-  apicid : 19
-  initial apicid : 19
-  fpu : yes
-  fpu_exception : yes
-  cpuid level : 11
-  wp : yes
-  flags : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat=
- pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall pdpe1gb rdts=
-cp lm constant_tsc arch_perfmon pebs bts rep_good xtopology nonstop_tsc ape=
-rfmperf pni dtes64 monitor ds_cpl vmx smx est tm2 ssse3 cx16 xtpr pdcm dca =
-sse4_1 sse4_2 popcnt lahf_lm ida arat tpr_shadow vnmi flexpriority ept vpid
-  bogomips : 4800.19
-  clflush size : 64
-  cache_alignment : 64
-  address sizes : 40 bits physical, 48 bits virtual
-  power management:
-
-  Performance:
-
-  CPU BOGOMIPS: 76803.21
-  REGEX/SECOND: 850066
-  HD SIZE: 33.96 GB (/dev/mapper/pve-root)
-  BUFFERED READS: 333.03 MB/sec
-  AVERAGE SEEK TIME: 6.10 ms
-  FSYNCS/SECOND: 2948.85
-  DNS EXT: 131.42 ms
-  DNS INT: 1.28 ms
-
-  I've been successfully running 2 Windows 2003 32-Bit Standard Edition
-  Servers on this server for over a month now. Both were migrations from
-  actual physical servers. However, I've continued to receive random
-  crashes on a Windows 2003 64-bit standard edition running terminal
-  services, which was a fresh install. The server runs fine for hours
-  under a decent load (20 users) and then will crash with a 3B bug check
-  code (System_Service_Exception). I opened a ticket with Microsoft and
-  submitted multiple memory dumps and their engineers suggested the
-  following:
-
-  Dump Analyses Result:
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-  What happened is that the OS initiated an APIC /software interrupt.
-  This is handled by the APIC in real hardware. In your Virtual
-  Environment case where you are using Linux based VM =E2=80=93 Proxmox, th=
-e VM
-  implementation somehow has to make it happen on a virtual machine with
-  the same latency in the virtual APIC. The problem is that there is a
-  latency between when it was initiated and when it happened.
-
-  =
-
-  Below are the details for understanding the process or concept of APIC in=
-terrupts:
-
-  What the Local APIC Is
-  The Local APIC (LAPIC) is a circuit that is part of the CPU chip. It cont=
-ains these basic elements:
-  A mechanism for generating
-  1. interrupts
-  2. A mechanism for accepting interrupts
-  3. A timer
-
-  If you have a multiprocessor system, the APIC's are wired together so
-  they can communicate. So the LAPIC on CPU 0 can communicate with the
-  LAPIC on CPU 1, etc.
-
-  =
-
-  What the IO APIC Is
-
-  This is a separate chip that is wired to the Local APIC's so it can forwa=
-rd interrupts on to the CPU chips. It is programmed similar to the 8259's b=
-ut has more flexibility.
-  It is wired to the same bus as the Local APIC's so it can communicate wit=
-h them.
-
-  Note:- In our scenario, it=E2=80=99s all Virtualized interrupts or calls =
-because of hypervisor in picture and thus we need to contact the VM applica=
-tion vendor to get a check of this latency issue in APIC interrupt.
-  ------------------------------------------------End of Message-----------=
------------------------
-
-
-  Their engineers are saying that there is a latency issue with APIC.
-  I'm not exactly sure how this can be corrected. Is this a known issue
-  and is their a solution to this problem. I love Proxmox, but my main
-  reason for using it was to upgrade my terminal server to better
-  hardware, while leveraging it for other virtual machines as well.  The
-  forum administrator for Proxmox, suggested I bring this issue to your
-  attention.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/692570/+subscriptions
+diff --git a/docs/pcie.txt b/docs/pcie.txt
+index 9fb20aaed9f4..54f05eaa71dc 100644
+--- a/docs/pcie.txt
++++ b/docs/pcie.txt
+@@ -110,18 +110,18 @@ Plug only PCI Express devices into PCI Express Ports.
+           -device ioh3420,id=root_port1,chassis=x,slot=y[,bus=pcie.0][,addr=z]  \
+           -device <dev>,bus=root_port1
+ 2.2.2 Using multi-function PCI Express Root Ports:
+-      -device ioh3420,id=root_port1,multifunction=on,chassis=x,slot=y[,bus=pcie.0][,addr=z.0] \
+-      -device ioh3420,id=root_port2,chassis=x1,slot=y1[,bus=pcie.0][,addr=z.1] \
+-      -device ioh3420,id=root_port3,chassis=x2,slot=y2[,bus=pcie.0][,addr=z.2] \
+-2.2.2 Plugging a PCI Express device into a Switch:
++      -device ioh3420,id=root_port1,multifunction=on,chassis=x,addr=z.0[,slot=y][,bus=pcie.0] \
++      -device ioh3420,id=root_port2,chassis=x1,addr=z.1[,slot=y1][,bus=pcie.0] \
++      -device ioh3420,id=root_port3,chassis=x2,addr=z.2[,slot=y2][,bus=pcie.0] \
++2.2.3 Plugging a PCI Express device into a Switch:
+       -device ioh3420,id=root_port1,chassis=x,slot=y[,bus=pcie.0][,addr=z]  \
+       -device x3130-upstream,id=upstream_port1,bus=root_port1[,addr=x]          \
+       -device xio3130-downstream,id=downstream_port1,bus=upstream_port1,chassis=x1,slot=y1[,addr=z1]] \
+       -device <dev>,bus=downstream_port1
+ 
+ Notes:
+-  - (slot, chassis) pair is mandatory and must be
+-     unique for each PCI Express Root Port.
++  - (slot, chassis) pair is mandatory and must be unique for each
++    PCI Express Root Port. slot is default to 0 when doesn't specify it.
+   - 'addr' parameter can be 0 for all the examples above.
+ 
+ 
+-- 
+2.1.0
