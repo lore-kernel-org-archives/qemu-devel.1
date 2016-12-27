@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37499)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37501)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cLvxE-0000Hw-UU
+	(envelope-from <laurent@vivier.eu>) id 1cLvxF-0000IA-1p
 	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 12:54:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cLvxA-0000MF-MY
+	(envelope-from <laurent@vivier.eu>) id 1cLvxA-0000MU-P5
 	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 12:54:29 -0500
-Received: from mout.kundenserver.de ([212.227.126.130]:63890)
+Received: from mout.kundenserver.de ([212.227.126.131]:56367)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cLvxA-0000LV-D7
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cLvxA-0000Lf-FK
 	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 12:54:24 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Tue, 27 Dec 2016 18:53:52 +0100
-Message-Id: <1482861241-17678-4-git-send-email-laurent@vivier.eu>
+Date: Tue, 27 Dec 2016 18:53:58 +0100
+Message-Id: <1482861241-17678-10-git-send-email-laurent@vivier.eu>
 In-Reply-To: <1482861241-17678-1-git-send-email-laurent@vivier.eu>
 References: <1482861241-17678-1-git-send-email-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL v2 03/12] target-m68k: add cmpm
+Subject: [Qemu-devel] [PULL v2 09/12] target-m68k: Do not cpu_abort on
+ undefined insns
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,50 +25,40 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Laurent Vivier <laurent@vivier.eu>, Richard Henderson <rth@twiddle.net>
+Cc: Richard Henderson <rth@twiddle.net>, Laurent Vivier <laurent@vivier.eu>
 
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Richard Henderson <rth@twiddle.net>
-Message-Id: <1477604609-2206-2-git-send-email-laurent@vivier.eu>
+From: Richard Henderson <rth@twiddle.net>
+
+Report this properly via exception and, importantly, allow
+the disassembler the chance to tell us what insn is not handled.
+
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
-Message-Id: <1478206203-4606-4-git-send-email-rth@twiddle.net>
+Message-Id: <1478699171-10637-3-git-send-email-rth@twiddle.net>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- target/m68k/translate.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ target/m68k/translate.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
 diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index aaa221e..97edb7b 100644
+index acc8182..0417c32 100644
 --- a/target/m68k/translate.c
 +++ b/target/m68k/translate.c
-@@ -2224,6 +2224,21 @@ DISAS_INSN(cmpa)
-     gen_update_cc_cmp(s, reg, src, OS_LONG);
+@@ -1214,10 +1214,12 @@ DISAS_INSN(undef_fpu)
+ 
+ DISAS_INSN(undef)
+ {
+-    M68kCPU *cpu = m68k_env_get_cpu(env);
+-
++    /* ??? This is both instructions that are as yet unimplemented
++       for the 680x0 series, as well as those that are implemented
++       but actually illegal for CPU32 or pre-68020.  */
++    qemu_log_mask(LOG_UNIMP, "Illegal instruction: %04x @ %08x",
++                  insn, s->pc - 2);
+     gen_exception(s, s->pc - 2, EXCP_UNSUPPORTED);
+-    cpu_abort(CPU(cpu), "Illegal instruction: %04x @ %08x", insn, s->pc - 2);
  }
  
-+DISAS_INSN(cmpm)
-+{
-+    int opsize = insn_opsize(insn);
-+    TCGv src, dst;
-+
-+    /* Post-increment load (mode 3) from Ay.  */
-+    src = gen_ea_mode(env, s, 3, REG(insn, 0), opsize,
-+                      NULL_QREG, NULL, EA_LOADS);
-+    /* Post-increment load (mode 3) from Ax.  */
-+    dst = gen_ea_mode(env, s, 3, REG(insn, 9), opsize,
-+                      NULL_QREG, NULL, EA_LOADS);
-+
-+    gen_update_cc_cmp(s, dst, src, opsize);
-+}
-+
- DISAS_INSN(eor)
- {
-     TCGv src;
-@@ -3465,6 +3480,7 @@ void register_m68k_insns (CPUM68KState *env)
-     INSN(cmpa,      b1c0, f1c0, CF_ISA_A);
-     INSN(cmp,       b000, f100, M68000);
-     INSN(eor,       b100, f100, M68000);
-+    INSN(cmpm,      b108, f138, M68000);
-     INSN(cmpa,      b0c0, f0c0, M68000);
-     INSN(eor,       b180, f1c0, CF_ISA_A);
-     BASE(and,       c000, f000);
+ DISAS_INSN(mulw)
 -- 
 2.7.4
