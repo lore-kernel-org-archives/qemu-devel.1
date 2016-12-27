@@ -1,34 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49344)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40158)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cLjOg-0006yV-0Z
-	for qemu-devel@nongnu.org; Mon, 26 Dec 2016 23:29:59 -0500
+	(envelope-from <bounces@canonical.com>) id 1cLmCi-0000Ef-24
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 02:29:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cLjOb-0001DL-3v
-	for qemu-devel@nongnu.org; Mon, 26 Dec 2016 23:29:58 -0500
-Received: from indium.canonical.com ([91.189.90.7]:37017)
+	(envelope-from <bounces@canonical.com>) id 1cLmCe-0001TG-VK
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 02:29:48 -0500
+Received: from indium.canonical.com ([91.189.90.7]:46820)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cLjOa-0001D2-TD
-	for qemu-devel@nongnu.org; Mon, 26 Dec 2016 23:29:53 -0500
+	id 1cLmCe-0001T8-Pr
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 02:29:44 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cLjOZ-0007W7-0K
-	for <qemu-devel@nongnu.org>; Tue, 27 Dec 2016 04:29:51 +0000
+	id 1cLmCd-0004X6-EW
+	for <qemu-devel@nongnu.org>; Tue, 27 Dec 2016 07:29:43 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B03632E80DE
-	for <qemu-devel@nongnu.org>; Tue, 27 Dec 2016 04:29:50 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 60D8D2E80C9
+	for <qemu-devel@nongnu.org>; Tue, 27 Dec 2016 07:29:43 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 27 Dec 2016 04:17:32 -0000
-From: Launchpad Bug Tracker <974229@bugs.launchpad.net>
-Reply-To: Bug 974229 <974229@bugs.launchpad.net>
+Date: Tue, 27 Dec 2016 07:15:52 -0000
+From: Thomas Huth <692570@bugs.launchpad.net>
+Reply-To: Bug 692570 <692570@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20120405131052.2192.6517.malonedeb@gac.canonical.com>
-Message-Id: <20161227041733.3765.6073.malone@loganberry.canonical.com>
+References: <20101220141548.20409.39982.malonedeb@soybean.canonical.com>
+Message-Id: <20161227071552.1274.4864.malone@soybean.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 974229] Re: qemu-kvm-1.0: segfault using
- vnc-console => not threadsafe!
+Subject: [Qemu-devel] [Bug 692570] Re: APIC Latency causing BSOD.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,94 +38,167 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-[Expired for QEMU because there has been no activity for 60 days.]
+Since there hasn't been an answer to this within the last years, it
+looks like nobody here knows about Proxmox problems. So let's close this
+ticket...
 
 ** Changed in: qemu
-       Status: Incomplete =3D> Expired
+       Status: New =3D> Invalid
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/974229
+https://bugs.launchpad.net/bugs/692570
 
 Title:
-  qemu-kvm-1.0: segfault using vnc-console =3D> not threadsafe!
+  APIC Latency causing BSOD.
 
 Status in QEMU:
-  Expired
-Status in qemu-kvm package in Ubuntu:
   Invalid
 
 Bug description:
-  after failure using qemu-kvm-0.14.1 I've tried v1.0, but there's a
-  problem if compiled with vnc-thread-support:
+  I have a Proxmox Server with the following specs:
 
-  Program received signal SIGSEGV, Segmentation fault.
-  0x0000000000000000 in ?? ()
-  (gdb) bt
-  #0  0x0000000000000000 in ?? ()
-  #1  0x00007f3ac48ca10a in qemu_iohandler_poll (readfds=3D0x7fff12379ac0, =
-writefds=3D0x7fff12379b40, xfds=3D0x7fff12379bc0, ret=3D3)
-      at iohandler.c:124
-  #2  0x00007f3ac4964387 in main_loop_wait (nonblocking=3D0) at main-loop.c=
-:463
-  #3  0x00007f3ac4958fb1 in main_loop () at /opt/workspace/oneiric64/qemu-k=
-vm-1.0/vl.c:1482
-  #4  0x00007f3ac495e1ec in main (argc=3D68, argv=3D0x7fff1237a088, envp=3D=
-0x7fff1237a2b0)
-      at /opt/workspace/oneiric64/qemu-kvm-1.0/vl.c:3523
-  (gdb) up
-  #1  0x00007f3ac48ca10a in qemu_iohandler_poll (readfds=3D0x7fff12379ac0, =
-writefds=3D0x7fff12379b40, xfds=3D0x7fff12379bc0, ret=3D3)
-      at iohandler.c:124
-  124	                ioh->fd_write(ioh->opaque);
+  Version:
 
-  (gdb) print *ioh
-  $4 =3D {fd =3D 29, fd_read_poll =3D 0, fd_read =3D 0x7f3ac49de158 <vnc_cl=
-ient_read>, fd_write =3D 0, deleted =3D 0, =
+  pve-manager: 1.7-10 (pve-manager/1.7/5323)
+  running kernel: 2.6.32-4-pve
+  proxmox-ve-2.6.32: 1.7-28
+  pve-kernel-2.6.32-4-pve: 2.6.32-28
+  qemu-server: 1.1-25
+  pve-firmware: 1.0-9
+  libpve-storage-perl: 1.0-16
+  vncterm: 0.9-2
+  vzctl: 3.0.24-1pve4
+  vzdump: 1.2-9
+  vzprocps: 2.0.11-1dso2
+  vzquota: 3.0.11-1
+  pve-qemu-kvm: 0.13.0-2
+  ksm-control-daemon: 1.0-4
 
-    opaque =3D 0x7f3ac7978d50, next =3D {le_next =3D 0x7f3ac6add2e0, le_pre=
-v =3D 0x7f3ac52bde90}}
+  VM Configuration:
+
+  name: TS64
+  ide2: none,media=3Dcdrom
+  bootdisk: ide0
+  ostype: w2k3
+  ide0: data:vm-104-disk-1
+  memory: 10240
+  sockets: 1
+  vlan0: virtio=3DC6:4C:B3:BB:AD:67
+  onboot: 1
+  cores: 4
+  boot: cad
+  freeze: 0
+  cpuunits: 1000
+  acpi: 1
+  kvm: 1
+
+  CPU 2x Xeon Quad Core E5620 2.4GHZ Processors:
+
+  processor : 0
+  vendor_id : GenuineIntel
+  cpu family : 6
+  model : 44
+  model name : Intel(R) Xeon(R) CPU E5620 @ 2.40GHz
+  stepping : 2
+  cpu MHz : 2400.323
+  cache size : 12288 KB
+  physical id : 0
+  siblings : 8
+  core id : 9
+  cpu cores : 4
+  apicid : 19
+  initial apicid : 19
+  fpu : yes
+  fpu_exception : yes
+  cpuid level : 11
+  wp : yes
+  flags : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat=
+ pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall pdpe1gb rdts=
+cp lm constant_tsc arch_perfmon pebs bts rep_good xtopology nonstop_tsc ape=
+rfmperf pni dtes64 monitor ds_cpl vmx smx est tm2 ssse3 cx16 xtpr pdcm dca =
+sse4_1 sse4_2 popcnt lahf_lm ida arat tpr_shadow vnmi flexpriority ept vpid
+  bogomips : 4800.19
+  clflush size : 64
+  cache_alignment : 64
+  address sizes : 40 bits physical, 48 bits virtual
+  power management:
+
+  Performance:
+
+  CPU BOGOMIPS: 76803.21
+  REGEX/SECOND: 850066
+  HD SIZE: 33.96 GB (/dev/mapper/pve-root)
+  BUFFERED READS: 333.03 MB/sec
+  AVERAGE SEEK TIME: 6.10 ms
+  FSYNCS/SECOND: 2948.85
+  DNS EXT: 131.42 ms
+  DNS INT: 1.28 ms
+
+  I've been successfully running 2 Windows 2003 32-Bit Standard Edition
+  Servers on this server for over a month now. Both were migrations from
+  actual physical servers. However, I've continued to receive random
+  crashes on a Windows 2003 64-bit standard edition running terminal
+  services, which was a fresh install. The server runs fine for hours
+  under a decent load (20 users) and then will crash with a 3B bug check
+  code (System_Service_Exception). I opened a ticket with Microsoft and
+  submitted multiple memory dumps and their engineers suggested the
+  following:
+
+  Dump Analyses Result:
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+  What happened is that the OS initiated an APIC /software interrupt.
+  This is handled by the APIC in real hardware. In your Virtual
+  Environment case where you are using Linux based VM =E2=80=93 Proxmox, th=
+e VM
+  implementation somehow has to make it happen on a virtual machine with
+  the same latency in the virtual APIC. The problem is that there is a
+  latency between when it was initiated and when it happened.
 
   =
 
-  ok, how could that happen?
-  loooking deeper at the code and backtraces shows, that iohandler.c:124 is=
- called within the main-loop, while iohandler.c:77 is called within the vnc=
--thread-loop
+  Below are the details for understanding the process or concept of APIC in=
+terrupts:
 
-  mmmh, but where the hell is the threadsafe-locking of the ioh-
-  structure????
+  What the Local APIC Is
+  The Local APIC (LAPIC) is a circuit that is part of the CPU chip. It cont=
+ains these basic elements:
+  A mechanism for generating
+  1. interrupts
+  2. A mechanism for accepting interrupts
+  3. A timer
 
-  I didn't found anything...
+  If you have a multiprocessor system, the APIC's are wired together so
+  they can communicate. So the LAPIC on CPU 0 can communicate with the
+  LAPIC on CPU 1, etc.
 
-  the resetting in line 77 is called from vnc_client_write_plain(),
-  where following code can be found:
+  =
 
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-     if (vs->output.offset =3D=3D 0) {
-          qemu_set_fd_handler2(vs->csock, NULL, vnc_client_read, NULL, vs);
-      }
-  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+  What the IO APIC Is
 
-  why should the function-ptrs should be zeroed?
+  This is a separate chip that is wired to the Local APIC's so it can forwa=
+rd interrupts on to the CPU chips. It is programmed similar to the 8259's b=
+ut has more flexibility.
+  It is wired to the same bus as the Local APIC's so it can communicate wit=
+h them.
 
-  further tracing shows, that the vnc-thread sometimes seems to exits
-  normally and a new one is started (I haven't verified that), but this
-  would be a reason for zeroing function-ptrs, which may point to code
-  inside the thread, which will exit...
+  Note:- In our scenario, it=E2=80=99s all Virtualized interrupts or calls =
+because of hypervisor in picture and thus we need to contact the VM applica=
+tion vendor to get a check of this latency issue in APIC interrupt.
+  ------------------------------------------------End of Message-----------=
+-----------------------
 
-  but why should this be done? and why there's no threadsafe-
-  modification of the structure?
 
-  well: disabling vnc-thread at configure-state leads into a normal
-  running machine, but threading would be nice here...
-
-  so a quick fix could be, to drop the call above and make the vnc-thread s=
-taying for the whole session, but I don't know all mechanisms of vnc-suppor=
-t within kvm.
-  but a better solution would be usage of clean locking-mechanisms
+  Their engineers are saying that there is a latency issue with APIC.
+  I'm not exactly sure how this can be corrected. Is this a known issue
+  and is their a solution to this problem. I love Proxmox, but my main
+  reason for using it was to upgrade my terminal server to better
+  hardware, while leveraging it for other virtual machines as well.  The
+  forum administrator for Proxmox, suggested I bring this issue to your
+  attention.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/974229/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/692570/+subscriptions
