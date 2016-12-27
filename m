@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49352)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52885)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <th.huth@gmail.com>) id 1cLsGr-0005Jb-5m
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 08:58:30 -0500
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cLsRg-00079G-GJ
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 09:09:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <th.huth@gmail.com>) id 1cLsGn-0002QY-6B
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 08:58:29 -0500
-Date: Tue, 27 Dec 2016 14:58:05 +0100
-From: Thomas Huth <huth@tuxfamily.org>
-Message-ID: <20161227145805.5a19af6b@thl530>
-In-Reply-To: <80f9cbae-8548-4d5e-2543-1d95020eddb1@vivier.eu>
-References: <b0619e40-daca-9b28-2c78-1e2709d9f0ad@tuxfamily.org>
-	<80f9cbae-8548-4d5e-2543-1d95020eddb1@vivier.eu>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1cLsRd-0006kT-9f
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 09:09:40 -0500
+Received: from mailhub.sw.ru ([195.214.232.25]:1903 helo=relay.sw.ru)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1cLsRc-0006k9-TV
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 09:09:37 -0500
+References: <20161214150840.10899-1-alex@alex.org.uk>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <71d6f278-be19-eaeb-7277-c3e6e4512e67@virtuozzo.com>
+Date: Tue, 27 Dec 2016 17:09:21 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] m68k: Remove dummy machine
+In-Reply-To: <20161214150840.10899-1-alex@alex.org.uk>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] Further tidy-up on block status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,154 +27,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>
+To: Alex Bligh <alex@alex.org.uk>, Wouter Verheist <w@uter.be>, nbd-general@lists.sourceforge.net
+Cc: Kevin Wolf <kwolf@redhat.com>, stefanha@redhat.com, John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, Pavel Borzenkov <pborzenkov@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, Markus Pargmann <mpa@pengutronix.de>, "Denis V . Lunev" <den@openvz.org>
 
-Am Tue, 27 Dec 2016 12:52:30 +0100
-schrieb Laurent Vivier <laurent@vivier.eu>:
+A bit out of topic, but...
 
-> Le 20/12/2016 =C3=A0 15:32, Thomas Huth a =C3=A9crit :
-> > You can get an empty machine with "-M none" nowadays, so the
-> > m68k dummy board (introduced in 2007) seems to be pretty
-> > redundant since the "none" machine has been added in 2012.
-> >=20
-> > Signed-off-by: Thomas Huth <huth@tuxfamily.org>
-> > ---
-> >  MAINTAINERS           |  4 ---
-> >  hw/m68k/Makefile.objs |  2 --
-> >  hw/m68k/dummy_m68k.c  | 84
-> > --------------------------------------------------- 3 files
-> > changed, 90 deletions(-) delete mode 100644 hw/m68k/dummy_m68k.c
-> >=20
-> > diff --git a/MAINTAINERS b/MAINTAINERS
-> > index 4a60579..88ee8cd 100644
-> > --- a/MAINTAINERS
-> > +++ b/MAINTAINERS
-> > @@ -552,10 +552,6 @@ S: Orphan
-> >  F: hw/m68k/an5206.c
-> >  F: hw/m68k/mcf5206.c
-> > =20
-> > -dummy_m68k
-> > -S: Orphan
-> > -F: hw/m68k/dummy_m68k.c
-> > -
-> >  mcf5208
-> >  S: Orphan
-> >  F: hw/m68k/mcf5208.c
-> > diff --git a/hw/m68k/Makefile.objs b/hw/m68k/Makefile.objs
-> > index c4352e7..d1f089c 100644
-> > --- a/hw/m68k/Makefile.objs
-> > +++ b/hw/m68k/Makefile.objs
-> > @@ -1,4 +1,2 @@
-> >  obj-y +=3D an5206.o mcf5208.o
-> > -obj-y +=3D dummy_m68k.o
-> > -
-> >  obj-y +=3D mcf5206.o mcf_intc.o
-> > diff --git a/hw/m68k/dummy_m68k.c b/hw/m68k/dummy_m68k.c
-> > deleted file mode 100644
-> > index 0b11d20..0000000
-> > --- a/hw/m68k/dummy_m68k.c
-> > +++ /dev/null
-> > @@ -1,84 +0,0 @@
-> > -/*
-> > - * Dummy board with just RAM and CPU for use as an ISS.
-> > - *
-> > - * Copyright (c) 2007 CodeSourcery.
-> > - *
-> > - * This code is licensed under the GPL
-> > - */
-> > -
-> > -#include "qemu/osdep.h"
-> > -#include "qemu-common.h"
-> > -#include "cpu.h"
-> > -#include "hw/hw.h"
-> > -#include "hw/boards.h"
-> > -#include "hw/loader.h"
-> > -#include "elf.h"
-> > -#include "exec/address-spaces.h"
-> > -
-> > -#define KERNEL_LOAD_ADDR 0x10000
-> > -
-> > -/* Board init.  */
-> > -
-> > -static void dummy_m68k_init(MachineState *machine)
-> > -{
-> > -    ram_addr_t ram_size =3D machine->ram_size;
-> > -    const char *cpu_model =3D machine->cpu_model;
-> > -    const char *kernel_filename =3D machine->kernel_filename;
-> > -    M68kCPU *cpu;
-> > -    CPUM68KState *env;
-> > -    MemoryRegion *address_space_mem =3D  get_system_memory();
-> > -    MemoryRegion *ram =3D g_new(MemoryRegion, 1);
-> > -    int kernel_size;
-> > -    uint64_t elf_entry;
-> > -    hwaddr entry;
-> > -
-> > -    if (!cpu_model)
-> > -        cpu_model =3D "cfv4e";
-> > -    cpu =3D cpu_m68k_init(cpu_model);
-> > -    if (!cpu) {
-> > -        fprintf(stderr, "Unable to find m68k CPU definition\n");
-> > -        exit(1);
-> > -    }
-> > -    env =3D &cpu->env;
-> > -
-> > -    /* Initialize CPU registers.  */
-> > -    env->vbr =3D 0;
-> > -
-> > -    /* RAM at address zero */
-> > -    memory_region_allocate_system_memory(ram, NULL,
-> > "dummy_m68k.ram",
-> > -                                         ram_size);
-> > -    memory_region_add_subregion(address_space_mem, 0, ram);
-> > -
-> > -    /* Load kernel.  */
-> > -    if (kernel_filename) {
-> > -        kernel_size =3D load_elf(kernel_filename, NULL, NULL,
-> > &elf_entry,
-> > -                               NULL, NULL, 1, EM_68K, 0, 0);
-> > -        entry =3D elf_entry;
-> > -        if (kernel_size < 0) {
-> > -            kernel_size =3D load_uimage(kernel_filename, &entry,
-> > NULL, NULL,
-> > -                                      NULL, NULL);
-> > -        }
-> > -        if (kernel_size < 0) {
-> > -            kernel_size =3D load_image_targphys(kernel_filename,
-> > -                                              KERNEL_LOAD_ADDR,
-> > -                                              ram_size -
-> > KERNEL_LOAD_ADDR);
-> > -            entry =3D KERNEL_LOAD_ADDR;
-> > -        }
-> > -        if (kernel_size < 0) {
-> > -            fprintf(stderr, "qemu: could not load kernel '%s'\n",
-> > -                    kernel_filename);
-> > -            exit(1);
-> > -        }
-> > -    } else {
-> > -        entry =3D 0;
-> > -    }
-> > -    env->pc =3D entry;
-> > -}
-> > -
-> > -static void dummy_m68k_machine_init(MachineClass *mc)
-> > -{
-> > -    mc->desc =3D "Dummy board";
-> > -    mc->init =3D dummy_m68k_init;
-> > -}
-> > -
-> > -DEFINE_MACHINE("dummy", dummy_m68k_machine_init)
-> >=20
->=20
-> I'm not sure the "none" machine can replace the "dummy" machine as the
-> "dummy" machine can load a kernel whereas it seems the "none" one
-> can't.
+> structured replies via `NBD_OPT_STRUCTURED_REPLY`.  Conversely, if
+> structured replies are negotiated, the server MUST use a
+> structured reply for any response with a payload, and MUST NOT use
+> a simple reply for `NBD_CMD_READ` (even for the case of an early
+> `EINVAL` due to bad flags), but MAY use either a simple reply or a
+> structured reply to all other requests.
 
-Oh, that's true ... I did not notice it 'cause there was no error
-message when I tried to start the "none" machine with "-kernel". But
-looking at the code in hw/core/null-machine.c, it really seems that
-there is nothing in here :-( So never mind, please forget about this
-patch. (but now I wonder whether the "none" machine could be improved to
-provide the features of the "dummy" machine, too?)
+What was the reason for it? Why not to negotiate forced structured read 
+separately? Actually, this spec forces any server, which wants to 
+implement structured reply implement structured read too. But what if it 
+don't want to? If it only wants to implement BLOCK_STATUS?
 
- Thomas
+So, what about changing it, to allow BLOCK_STATUS (or other future 
+structured replies) without structured read? Structured read is good 
+only for sparse formats, when BLOCK_STATUS is more global. I understand, 
+that servers may implement simple (and useless) one-chunk structured 
+read, but I think that it is better to fix the spec, to not provoke 
+servers use such workaround.
+
+
+-- 
+Best regards,
+Vladimir
