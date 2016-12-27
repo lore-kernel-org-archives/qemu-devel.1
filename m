@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54457)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47606)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vave1313@gmail.com>) id 1cLxNK-0008FH-6d
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 14:25:31 -0500
+	(envelope-from <no-reply@patchew.org>) id 1cLyO0-0003jC-DE
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 15:30:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vave1313@gmail.com>) id 1cLxNI-0007mR-Pr
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 14:25:30 -0500
+	(envelope-from <no-reply@patchew.org>) id 1cLyNx-0001MT-A4
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 15:30:16 -0500
+Resent-Message-Id: <E1cLyNx-0001MT-A4@eggs.gnu.org>
+Received: from sender163-mail.zoho.com ([74.201.84.163]:21371)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1cLyNx-0001LV-2A
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 15:30:13 -0500
+In-Reply-To: <20161227165947.20184-1-Sergio.G.DelReal@gmail.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <148287060398.127.456458115700006245@790289a7ca88>
 MIME-Version: 1.0
-In-Reply-To: <7094FB37-03A9-4511-B4A6-519CDA1E6854@gmail.com>
-References: <516AC28F-18A9-4FC9-8028-5AE2F37CB897@gmail.com>
-	<C50D14FE-4C5D-4944-948B-09376B20FF16@gmail.com>
-	<CAK5BdwOhfw2t=AYqs-Bu4sFJcRe4a-aq7k+2G-boLbV-P+5MyQ@mail.gmail.com>
-	<5A9C1952-461A-4829-8916-C2F40EE8E5D8@gmail.com>
-	<CAK5BdwN8hXReei6YAUs=9OmNqF1DTxmH+q2BSuvUESWLf_1ABw@mail.gmail.com>
-	<7094FB37-03A9-4511-B4A6-519CDA1E6854@gmail.com>
-From: =?UTF-8?B?0JTQvNC40YLRgNC40Lkg0KHQvNC40YDQvdC+0LI=?= <vave1313@gmail.com>
-Date: Tue, 27 Dec 2016 22:25:27 +0300
-Message-ID: <CAK5BdwMi82wiefTqr_gLKtw7sUv24OWDdr0U6VDvpq9eK8wVdQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] PowerPC question
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 27 Dec 2016 12:30:05 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH] hw/dma: Fix dead code in pl080.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,104 +28,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Programmingkid <programmingkidx@gmail.com>
-Cc: qemu-devel qemu-devel <qemu-devel@nongnu.org>, "list@suse.de:PowerPC list:PowerPC" <qemu-ppc@nongnu.org>
+To: sergio.g.delreal@gmail.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, Sergio.G.DelReal@gmail.com, peter.maydell@linaro.org
 
-An old RealTime-OS. The requirements -- use QEMU 2.5.1.1
-
-2016-12-27 22:18 GMT+03:00 Programmingkid <programmingkidx@gmail.com>:
-
->
-> On Dec 27, 2016, at 2:16 PM, =D0=94=D0=BC=D0=B8=D1=82=D1=80=D0=B8=D0=B9 =
-=D0=A1=D0=BC=D0=B8=D1=80=D0=BD=D0=BE=D0=B2 wrote:
->
-> > Unfortunately, I have to use version 2.5.1.1. Can I do something in thi=
-s
-> case?
->
-> Why do you need to use it? What is the guest operating system you are
-> using? Version 2.8 has a lot more bug fixes in it. You might find it easi=
-er
-> to use.
->
-> >
-> > 2016-12-27 22:01 GMT+03:00 G 3 <programmingkidx@gmail.com>:
-> > The version of qemu-system-ppc you are using is kind of old. Version
-> 2.8.0 is the newest version. I suggest trying the newest version before
-> trying to fix a broken feature in an older version.
-> >
-> > http://wiki.qemu.org/Download
-> >
-> >
-> > On Dec 27, 2016, at 1:57 PM, =D0=94=D0=BC=D0=B8=D1=82=D1=80=D0=B8=D0=B9=
- =D0=A1=D0=BC=D0=B8=D1=80=D0=BD=D0=BE=D0=B2 wrote:
-> >
-> > qemu-system-ppc version: 2.5.1.1
-> >
-> > Ubuntu 14.04
-> > gcc version 4.8.4 (Ubuntu 4.8.4-2ubuntu1~14.04)
-> > GTK 2.0, libsdl1.2-dev
-> > ./configure --target-list=3D"ppc-softmmu" --disable-xfsctl
-> >
-> > By zero meaning, do you mean this: decr =3D 0
-> > Yes.
-> >
-> >
-> > 2016-12-27 21:16 GMT+03:00 G 3 <programmingkidx@gmail.com>:
-> > When I type 'info registers', I see 'DECR 3919147695' at the top of the
-> screen, so it appears to be working. I think we need more information fro=
-m
-> you.
-> >
-> > qemu-system-ppc version:
-> >
-> > gcc version (gcc -v):
-> >
-> > Host info: Ubuntu <version>
-> >
-> > Front-end (GTK, SDL, ...):
-> >
-> > Compile command: ./configure ....
-> >
-> > Note: please respond to this email with "reply all". That way everyone
-> can try to help you.
-> >
-> > On Dec 27, 2016, at 1:06 PM, =D0=94=D0=BC=D0=B8=D1=82=D1=80=D0=B8=D0=B9=
- =D0=A1=D0=BC=D0=B8=D1=80=D0=BD=D0=BE=D0=B2 wrote:
-> >
-> > All the registers, which are printing with 'info registers', dump to
-> file before (./target-ppc/translate.c), but there is no SPR_DECR.
-> > I tried to add in 'translate.c' and ./monitor.c some code (print of
-> cpu_ppc_load_decr(env), print of env->spr[SPR_DECR]), but I have zero
-> meaning. Also I tried 'p $decr' with the same answer.
-> >
-> > By zero meaning, do you mean this: decr =3D 0
-> >
-> > Maybe I have this problem, because I using VirtualBox->Ubuntu->Qemu?
-> >
-> > This should not be a problem. An emulator can run anywhere.
-> >
-> >
-> > 2016-12-27 18:52 GMT+03:00 G 3 <programmingkidx@gmail.com>:
-> >
-> >
-> > On Dec 27, 2016, at 10:38 AM, qemu-ppc-request@nongnu.org wrote:
-> >
-> > Hello, devs!
-> >
-> > I'm using ppc-softmmu target, and in my qemu monitor I need to print th=
-e
-> > SPR_DECR meaning, but I don't understand how.
-> > Could anyone help me with my problem?
-> >
-> > Best regards!
-> >
-> > I think you want to try the 'info registers' command in the monitor.
-> >
-> >
-> >
-> >
-> >
-> >
->
->
+SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
+NjEyMjcxNjU5NDcuMjAxODQtMS1TZXJnaW8uRy5EZWxSZWFsQGdtYWlsLmNvbQpUeXBlOiBzZXJp
+ZXMKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSF0gaHcvZG1hOiBGaXggZGVhZCBjb2RlIGlu
+IHBsMDgwLmMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFz
+ZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0w
+CgojIFVzZWZ1bCBnaXQgb3B0aW9ucwpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1p
+dCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQg
+bG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRv
+CiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9y
+bWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3Nj
+cmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQog
+ICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0g
+VEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdm
+NDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVt
+dQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMTYxMjI3MTY1OTQ3LjIwMTg0LTEtU2Vy
+Z2lvLkcuRGVsUmVhbEBnbWFpbC5jb20gLT4gcGF0Y2hldy8yMDE2MTIyNzE2NTk0Ny4yMDE4NC0x
+LVNlcmdpby5HLkRlbFJlYWxAZ21haWwuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVz
+dCcKNjgyY2ZhMiBody9kbWE6IEZpeCBkZWFkIGNvZGUgaW4gcGwwODAuYwoKPT09IE9VVFBVVCBC
+RUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xOiBody9kbWE6IEZpeCBkZWFkIGNvZGUgaW4gcGww
+ODAuYy4uLgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICctJyAoY3R4OlZ4VikK
+IzI4OiBGSUxFOiBody9kbWEvcGwwODAuYzoyNTg6CisgICAgICAgIHN3aXRjaCAoKG9mZnNldC0w
+eDEwMCkgPj4gMikgewogICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2VzIHJl
+cXVpcmVkIGFyb3VuZCB0aGF0ICctJyAoY3R4OlZ4VikKIzM3OiBGSUxFOiBody9kbWEvcGwwODAu
+YzozMTk6CisgICAgICAgIHN3aXRjaCAoKG9mZnNldC0weDEwMCkgPj4gMikgewogICAgICAgICAg
+ICAgICAgICAgICAgICBeCgp0b3RhbDogMiBlcnJvcnMsIDAgd2FybmluZ3MsIDE2IGxpbmVzIGNo
+ZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYg
+YW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRo
+ZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQg
+RU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2Vu
+ZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBs
+ZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
