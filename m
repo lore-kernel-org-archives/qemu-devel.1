@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35621)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35632)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cLtaO-0002jM-Jy
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 10:22:45 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cLtaS-0002mV-2d
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 10:22:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cLtaN-0001Pm-RH
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 10:22:44 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:47881)
+	(envelope-from <pm215@archaic.org.uk>) id 1cLtaR-0001Qu-1s
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 10:22:48 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:47882)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1cLtaN-0001PR-L3
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 10:22:43 -0500
+	id 1cLtaQ-0001Qc-Qi
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 10:22:46 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.84_2)
-	(envelope-from <pm215@archaic.org.uk>) id 1cLtaM-0003xR-Qr
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 15:22:42 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1cLtaP-0003xo-W1
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 15:22:46 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 27 Dec 2016 15:21:13 +0000
-Message-Id: <1482852077-19397-22-git-send-email-peter.maydell@linaro.org>
+Date: Tue, 27 Dec 2016 15:21:14 +0000
+Message-Id: <1482852077-19397-23-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1482852077-19397-1-git-send-email-peter.maydell@linaro.org>
 References: <1482852077-19397-1-git-send-email-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 21/25] aspeed/smc: improve segment register
- support
+Subject: [Qemu-devel] [PULL 22/25] aspeed/smc: set the number of flash
+ modules for the FMC controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,65 +35,85 @@ To: qemu-devel@nongnu.org
 
 From: Cédric Le Goater <clg@kaod.org>
 
-The HW does not enforce all the rules in the specs and allows a few
-"curious" setups like zero size segments and overlaps. So change the
-model to be in sync but keep the warnings which are always interesting
-for debug.
+Add a new configuration field at the board level and propagate the
+value using the "num-cs" property of the FMC controller model.
 
 Signed-off-by: Cédric Le Goater <clg@kaod.org>
-Reviewed-by: Joel Stanley <joel@jms.id.au>
-Message-id: 1480434248-27138-13-git-send-email-clg@kaod.org
+Message-id: 1480434248-27138-14-git-send-email-clg@kaod.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/ssi/aspeed_smc.c | 17 +++++++++--------
- 1 file changed, 9 insertions(+), 8 deletions(-)
+ hw/arm/aspeed.c     | 6 ++++++
+ hw/arm/aspeed_soc.c | 8 ++++----
+ 2 files changed, 10 insertions(+), 4 deletions(-)
 
-diff --git a/hw/ssi/aspeed_smc.c b/hw/ssi/aspeed_smc.c
-index 6e8403e..78f5aed 100644
---- a/hw/ssi/aspeed_smc.c
-+++ b/hw/ssi/aspeed_smc.c
-@@ -253,7 +253,8 @@ static void aspeed_smc_flash_set_segment(AspeedSMCState *s, int cs,
-         qemu_log_mask(LOG_GUEST_ERROR,
-                       "%s: Tried to change CS0 start address to 0x%"
-                       HWADDR_PRIx "\n", s->ctrl->name, seg.addr);
--        return;
-+        seg.addr = s->ctrl->flash_window_base;
-+        new = aspeed_smc_segment_to_reg(&seg);
-     }
+diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
+index bc70b38..40c1383 100644
+--- a/hw/arm/aspeed.c
++++ b/hw/arm/aspeed.c
+@@ -36,6 +36,7 @@ typedef struct AspeedBoardConfig {
+     uint32_t hw_strap1;
+     const char *fmc_model;
+     const char *spi_model;
++    uint32_t num_cs;
+ } AspeedBoardConfig;
  
-     /*
-@@ -267,8 +268,10 @@ static void aspeed_smc_flash_set_segment(AspeedSMCState *s, int cs,
-         s->ctrl->segments[cs].size) {
-         qemu_log_mask(LOG_GUEST_ERROR,
-                       "%s: Tried to change CS%d end address to 0x%"
--                      HWADDR_PRIx "\n", s->ctrl->name, cs, seg.addr);
--        return;
-+                      HWADDR_PRIx "\n", s->ctrl->name, cs, seg.addr + seg.size);
-+        seg.size = s->ctrl->segments[cs].addr + s->ctrl->segments[cs].size -
-+            seg.addr;
-+        new = aspeed_smc_segment_to_reg(&seg);
-     }
+ enum {
+@@ -85,18 +86,21 @@ static const AspeedBoardConfig aspeed_boards[] = {
+         .hw_strap1 = PALMETTO_BMC_HW_STRAP1,
+         .fmc_model = "n25q256a",
+         .spi_model = "mx25l25635e",
++        .num_cs    = 1,
+     },
+     [AST2500_EVB]  = {
+         .soc_name  = "ast2500-a1",
+         .hw_strap1 = AST2500_EVB_HW_STRAP1,
+         .fmc_model = "n25q256a",
+         .spi_model = "mx25l25635e",
++        .num_cs    = 1,
+     },
+     [ROMULUS_BMC]  = {
+         .soc_name  = "ast2500-a1",
+         .hw_strap1 = ROMULUS_BMC_HW_STRAP1,
+         .fmc_model = "n25q256a",
+         .spi_model = "mx66l1g45g",
++        .num_cs    = 2,
+     },
+ };
  
-     /* Keep the segment in the overall flash window */
-@@ -281,16 +284,14 @@ static void aspeed_smc_flash_set_segment(AspeedSMCState *s, int cs,
-     }
+@@ -143,6 +147,8 @@ static void aspeed_board_init(MachineState *machine,
+                            &error_abort);
+     object_property_set_int(OBJECT(&bmc->soc), cfg->hw_strap1, "hw-strap1",
+                             &error_abort);
++    object_property_set_int(OBJECT(&bmc->soc), cfg->num_cs, "num-cs",
++                            &error_abort);
+     object_property_set_bool(OBJECT(&bmc->soc), true, "realized",
+                              &error_abort);
  
-     /* Check start address vs. alignment */
--    if (seg.addr % seg.size) {
-+    if (seg.size && !QEMU_IS_ALIGNED(seg.addr, seg.size)) {
-         qemu_log_mask(LOG_GUEST_ERROR, "%s: new segment for CS%d is not "
-                       "aligned : [ 0x%"HWADDR_PRIx" - 0x%"HWADDR_PRIx" ]\n",
-                       s->ctrl->name, cs, seg.addr, seg.addr + seg.size);
-     }
+diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
+index d111d2e..b3e7f07 100644
+--- a/hw/arm/aspeed_soc.c
++++ b/hw/arm/aspeed_soc.c
+@@ -153,6 +153,8 @@ static void aspeed_soc_init(Object *obj)
+     object_initialize(&s->fmc, sizeof(s->fmc), sc->info->fmc_typename);
+     object_property_add_child(obj, "fmc", OBJECT(&s->fmc), NULL);
+     qdev_set_parent_bus(DEVICE(&s->fmc), sysbus_get_default());
++    object_property_add_alias(obj, "num-cs", OBJECT(&s->fmc), "num-cs",
++                              &error_abort);
  
--    /* And segments should not overlap */
--    if (aspeed_smc_flash_overlap(s, &seg, cs)) {
--        return;
--    }
-+    /* And segments should not overlap (in the specs) */
-+    aspeed_smc_flash_overlap(s, &seg, cs);
+     for (i = 0; i < sc->info->spis_num; i++) {
+         object_initialize(&s->spi[i], sizeof(s->spi[i]),
+@@ -250,10 +252,8 @@ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
+     sysbus_connect_irq(SYS_BUS_DEVICE(&s->i2c), 0,
+                        qdev_get_gpio_in(DEVICE(&s->vic), 12));
  
-     /* All should be fine now to move the region */
-     memory_region_transaction_begin();
+-    /* FMC */
+-    object_property_set_int(OBJECT(&s->fmc), 1, "num-cs", &err);
+-    object_property_set_bool(OBJECT(&s->fmc), true, "realized", &local_err);
+-    error_propagate(&err, local_err);
++    /* FMC, The number of CS is set at the board level */
++    object_property_set_bool(OBJECT(&s->fmc), true, "realized", &err);
+     if (err) {
+         error_propagate(errp, err);
+         return;
 -- 
 2.7.4
