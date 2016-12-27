@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35204)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35216)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cLtZF-0001aL-Sp
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 10:21:34 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cLtZJ-0001bo-13
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 10:21:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cLtZF-00018U-0w
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 10:21:33 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:47861)
+	(envelope-from <pm215@archaic.org.uk>) id 1cLtZI-00019n-8L
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 10:21:37 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:47862)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1cLtZE-00017i-RM
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 10:21:32 -0500
+	id 1cLtZI-00019j-1Y
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 10:21:36 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.84_2)
-	(envelope-from <pm215@archaic.org.uk>) id 1cLtZE-0003q1-1B
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 15:21:32 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1cLtZH-0003qO-71
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 15:21:35 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 27 Dec 2016 15:20:53 +0000
-Message-Id: <1482852077-19397-2-git-send-email-peter.maydell@linaro.org>
+Date: Tue, 27 Dec 2016 15:20:54 +0000
+Message-Id: <1482852077-19397-3-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1482852077-19397-1-git-send-email-peter.maydell@linaro.org>
 References: <1482852077-19397-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 01/25] cadence_uart: Check baud rate generator
- and divider values on migration
+Subject: [Qemu-devel] [PULL 02/25] cadence_uart: Check if receiver timeout
+ counter is disabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,43 +30,37 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Alistair Francis <alistair.francis@xilinx.com>
+From: Andrew Gacek <andrew.gacek@gmail.com>
 
-The Cadence UART device emulator calculates speed by dividing the
-baud rate by a 'baud rate generator' & 'baud rate divider' value.
-The device specification defines these register values to be
-non-zero and within certain limits. Checks were recently added when
-writing to these registers but not when restoring from migration.
+When register Rcvr_timeout_reg0 (R_RTOR in cadence_uart.c) is set to
+0, the receiver timeout counter should be disabled. See page 1801 of
+"Zynq-7000 AP SoC Technical Reference Manual". This commit adds a
+such a check before setting the receive timeout interrupt.
 
-This patch adds checks when restoring from migration to avoid divide by
-zero errors.
-
-Reported-by: Huawei PSIRT <psirt@huawei.com>
-Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-Message-id: 04ae30ed8ee1758cd2d2af880da4d28f74c67738.1481132150.git.alistair.francis@xilinx.com
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Andrew Gacek <andrew.gacek@gmail.com>
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/char/cadence_uart.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ hw/char/cadence_uart.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
 diff --git a/hw/char/cadence_uart.c b/hw/char/cadence_uart.c
-index 0215d65..dba1c53 100644
+index dba1c53..4dcee57 100644
 --- a/hw/char/cadence_uart.c
 +++ b/hw/char/cadence_uart.c
-@@ -502,6 +502,13 @@ static int cadence_uart_post_load(void *opaque, int version_id)
+@@ -138,9 +138,10 @@ static void fifo_trigger_update(void *opaque)
  {
      CadenceUARTState *s = opaque;
  
-+    /* Ensure these two aren't invalid numbers */
-+    if (s->r[R_BRGR] < 1 || s->r[R_BRGR] & ~0xFFFF ||
-+        s->r[R_BDIV] <= 3 || s->r[R_BDIV] & ~0xFF) {
-+        /* Value is invalid, abort */
-+        return 1;
+-    s->r[R_CISR] |= UART_INTR_TIMEOUT;
+-
+-    uart_update_status(s);
++    if (s->r[R_RTOR]) {
++        s->r[R_CISR] |= UART_INTR_TIMEOUT;
++        uart_update_status(s);
 +    }
-+
-     uart_parameters_setup(s);
-     uart_update_status(s);
-     return 0;
+ }
+ 
+ static void uart_rx_reset(CadenceUARTState *s)
 -- 
 2.7.4
