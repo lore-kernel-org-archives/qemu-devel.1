@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37554)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37576)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1cLtod-0006TS-W4
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 10:37:28 -0500
+	(envelope-from <vilanova@ac.upc.edu>) id 1cLtoh-0006Wn-Tr
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 10:37:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1cLtoa-00077a-Ub
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 10:37:28 -0500
-Received: from roura.ac.upc.es ([147.83.33.10]:44892)
+	(envelope-from <vilanova@ac.upc.edu>) id 1cLtog-00079N-HL
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 10:37:31 -0500
+Received: from roura.ac.upc.es ([147.83.33.10]:44897)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1cLtoa-00077C-GR
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 10:37:24 -0500
+	(envelope-from <vilanova@ac.upc.edu>) id 1cLtof-000792-Vn
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 10:37:30 -0500
 From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
-Date: Tue, 27 Dec 2016 16:37:22 +0100
-Message-Id: <148285304262.12721.17599380934779528989.stgit@fimbulvetr.bsc.es>
+Date: Tue, 27 Dec 2016 16:37:28 +0100
+Message-Id: <148285304797.12721.1472007290821551143.stgit@fimbulvetr.bsc.es>
 In-Reply-To: <148285303159.12721.5833400768046299304.stgit@fimbulvetr.bsc.es>
 References: <148285303159.12721.5833400768046299304.stgit@fimbulvetr.bsc.es>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 2/6] queue: Add macro for incremental
- traversal
+Subject: [Qemu-devel] [PATCH v3 3/6] target: [tcg] Add generic translation
+ framework
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,35 +30,368 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Adds macro QTAILQ_FOREACH_CONTINUE to support incremental list
-traversal.
-
 Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
 ---
- include/qemu/queue.h |    5 +++++
- 1 file changed, 5 insertions(+)
+ include/exec/gen-icount.h             |    2=20
+ include/exec/translate-all_template.h |   76 ++++++++++++
+ include/qom/cpu.h                     |   21 +++
+ translate-all_template.h              |  202 +++++++++++++++++++++++++++=
+++++++
+ 4 files changed, 300 insertions(+), 1 deletion(-)
+ create mode 100644 include/exec/translate-all_template.h
+ create mode 100644 translate-all_template.h
 
-diff --git a/include/qemu/queue.h b/include/qemu/queue.h
-index 342073fb4d..0d709016f4 100644
---- a/include/qemu/queue.h
-+++ b/include/qemu/queue.h
-@@ -415,6 +415,11 @@ struct {                                            =
-                    \
-                 (var);                                                  =
-\
-                 (var) =3D ((var)->field.tqe_next))
+diff --git a/include/exec/gen-icount.h b/include/exec/gen-icount.h
+index 050de59b38..c91ac95ed7 100644
+--- a/include/exec/gen-icount.h
++++ b/include/exec/gen-icount.h
+@@ -45,7 +45,7 @@ static inline void gen_tb_start(TranslationBlock *tb)
+     tcg_temp_free_i32(count);
+ }
 =20
-+#define QTAILQ_FOREACH_CONTINUE(var, field)                             =
-\
-+        for ((var) =3D ((var)->field.tqe_next);                         =
-  \
-+                (var);                                                  =
-\
-+                (var) =3D ((var)->field.tqe_next))
+-static void gen_tb_end(TranslationBlock *tb, int num_insns)
++static inline void gen_tb_end(TranslationBlock *tb, int num_insns)
+ {
+     gen_set_label(exitreq_label);
+     tcg_gen_exit_tb((uintptr_t)tb + TB_EXIT_REQUESTED);
+diff --git a/include/exec/translate-all_template.h b/include/exec/transla=
+te-all_template.h
+new file mode 100644
+index 0000000000..a552db02c8
+--- /dev/null
++++ b/include/exec/translate-all_template.h
+@@ -0,0 +1,76 @@
++/*
++ * Generic intermediate code generation.
++ *
++ * Copyright (C) 2016 Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
++ */
 +
- #define QTAILQ_FOREACH_SAFE(var, head, field, next_var)                 =
-\
-         for ((var) =3D ((head)->tqh_first);                             =
-  \
-                 (var) && ((next_var) =3D ((var)->field.tqe_next), 1);   =
-  \
++#ifndef EXEC__TRANSLATE_ALL_TEMPLATE_H
++#define EXEC__TRANSLATE_ALL_TEMPLATE_H
++
++/*
++ * Include this header from a target-specific file, and add a
++ *
++ *     DisasContextBase base;
++ *
++ * member in your target-specific DisasContext.
++ */
++
++
++#include "exec/exec-all.h"
++
++
++/**
++ * BreakpointHitType:
++ * @BH_MISS: No hit
++ * @BH_HIT_INSN: Hit, but continue translating instruction
++ * @BH_HIT_TB: Hit, stop translating TB
++ *
++ * How to react to a breakpoint hit.
++ */
++typedef enum BreakpointHitType
++{
++    BH_MISS,
++    BH_HIT_INSN,
++    BH_HIT_TB,
++} BreakpointHitType;
++
++/**
++ * DisasJumpType:
++ * @DJ_NEXT: Next instruction in program order
++ * @DJ_TOO_MANY: Too many instructions executed
++ * @DJ_TARGET: Start of target-specific conditions
++ *
++ * What instruction to disassemble next.
++ */
++typedef enum DisasJumpType
++{
++    DJ_NEXT,
++    DJ_TOO_MANY,
++    DJ_TARGET,
++} DisasJumpType;
++
++/**
++ * DisasContextBase:
++ * @tb: Translation block for this disassembly.
++ * @singlestep_enabled: "Hardware" single stepping enabled.
++ * @pc_first: Address of first guest instruction in this TB.
++ * @pc_next: Address of next guest instruction in this TB (current durin=
+g
++ *           disassembly).
++ * @num_insns: Number of translated instructions (including current).
++ *
++ * Architecture-agnostic disassembly context.
++ */
++typedef struct DisasContextBase
++{
++    TranslationBlock *tb;
++    bool singlestep_enabled;
++    target_ulong pc_first;
++    target_ulong pc_next;
++    DisasJumpType jmp_type;
++    unsigned int num_insns;
++} DisasContextBase;
++
++#endif  /* EXEC__TRANSLATE_ALL_TEMPLATE_H */
+diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+index 3f79a8e955..40c1ecb255 100644
+--- a/include/qom/cpu.h
++++ b/include/qom/cpu.h
+@@ -948,6 +948,27 @@ static inline bool cpu_breakpoint_test(CPUState *cpu=
+, vaddr pc, int mask)
+     return false;
+ }
+=20
++/* Get first breakpoint matching a PC */
++static inline CPUBreakpoint *cpu_breakpoint_get(CPUState *cpu, vaddr pc,=
+ CPUBreakpoint *bp)
++{
++    if (likely(bp =3D=3D NULL)) {
++        if (unlikely(!QTAILQ_EMPTY(&cpu->breakpoints))) {
++            QTAILQ_FOREACH(bp, &cpu->breakpoints, entry) {
++                if (bp->pc =3D=3D pc) {
++                    return bp;
++                }
++            }
++        }
++    } else {
++        QTAILQ_FOREACH_CONTINUE(bp, entry) {
++            if (bp->pc =3D=3D pc) {
++                return bp;
++            }
++        }
++    }
++    return NULL;
++}
++
+ int cpu_watchpoint_insert(CPUState *cpu, vaddr addr, vaddr len,
+                           int flags, CPUWatchpoint **watchpoint);
+ int cpu_watchpoint_remove(CPUState *cpu, vaddr addr,
+diff --git a/translate-all_template.h b/translate-all_template.h
+new file mode 100644
+index 0000000000..80b56e5820
+--- /dev/null
++++ b/translate-all_template.h
+@@ -0,0 +1,202 @@
++/*
++ * Generic intermediate code generation.
++ *
++ * Copyright (C) 2016 Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
++ */
++
++#ifndef TRANSLATE_ALL_TEMPLATE_H
++#define TRANSLATE_ALL_TEMPLATE_H
++
++/*
++ * Include this header from a target-specific file, which must define th=
+e
++ * target-specific functions declared below.
++ *
++ * These must be paired with instructions in "exec/translate-all_templat=
+e.h".
++ */
++
++
++#include "cpu.h"
++#include "qemu/error-report.h"
++
++
++static void gen_intermediate_code_target_init_disas_context(
++    DisasContext * restrict dc, CPUArchState * restrict env);
++
++static void gen_intermediate_code_target_init_globals(
++    DisasContext * restrict dc, CPUArchState * restrict env);
++
++static void gen_intermediate_code_target_tb_start(
++    DisasContext * restrict dc, CPUArchState * restrict env);
++
++static void gen_intermediate_code_target_insn_start(
++    DisasContext * restrict dc, CPUArchState * restrict env);
++
++static BreakpointHitType gen_intermediate_code_target_breakpoint_hit(
++    DisasContext * restrict dc, CPUArchState * restrict env,
++    const CPUBreakpoint * restrict bp);
++
++static target_ulong gen_intermediate_code_target_disas_insn(
++    DisasContext * restrict dc, CPUArchState * restrict env);
++
++static DisasJumpType gen_intermediate_code_target_stop_check(
++    DisasContext * restrict dc, CPUArchState * restrict env);
++
++static void gen_intermediate_code_target_stop(
++    DisasContext * restrict dc, CPUArchState * restrict env);
++
++static int gen_intermediate_code_target_get_disas_flags(
++    const DisasContext *dc);
++
++
++static inline void gen_intermediate_code_tcg_check(const DisasContext *d=
+c)
++{
++    if (tcg_check_temp_count()) {
++        error_report("warning: TCG temporary leaks before "TARGET_FMT_lx=
+,
++                     dc->base.pc_next);
++    }
++}
++
++void gen_intermediate_code(CPUState *cpu, struct TranslationBlock *tb)
++{
++    CPUArchState *env =3D cpu->env_ptr;
++    DisasContext dc1, *dc =3D &dc1;
++    int max_insns;
++
++    /* Initialize DisasContext */
++    dc->base.tb =3D tb;
++    dc->base.singlestep_enabled =3D cpu->singlestep_enabled;
++    dc->base.pc_first =3D tb->pc;
++    dc->base.pc_next =3D dc->base.pc_first;
++    dc->base.jmp_type =3D DJ_NEXT;
++    dc->base.num_insns =3D 0;
++    gen_intermediate_code_target_init_disas_context(dc, env);
++
++    /* Initialize globals */
++    gen_intermediate_code_target_init_globals(dc, env);
++    tcg_clear_temp_count();
++
++    /* Instruction counting */
++    max_insns =3D dc->base.tb->cflags & CF_COUNT_MASK;
++    if (max_insns =3D=3D 0) {
++        max_insns =3D CF_COUNT_MASK;
++    }
++    if (max_insns > TCG_MAX_INSNS) {
++        max_insns =3D TCG_MAX_INSNS;
++    }
++    if (dc->base.singlestep_enabled || singlestep) {
++        max_insns =3D 1;
++    }
++
++    /* Start translating */
++    gen_tb_start(dc->base.tb);
++    gen_intermediate_code_target_tb_start(dc, env);
++
++    while (true) {
++        CPUBreakpoint *bp;
++
++        dc->base.num_insns++;
++        gen_intermediate_code_target_insn_start(dc, env);
++
++        /* Early exit before breakpoint checks */
++        if (unlikely(dc->base.jmp_type !=3D DJ_NEXT)) {
++            break;
++        }
++
++        /* Pass breakpoint hits to target for further processing */
++        bp =3D NULL;
++        do {
++            bp =3D cpu_breakpoint_get(cpu, dc->base.pc_next, bp);
++            if (unlikely(bp)) {
++                BreakpointHitType bh =3D gen_intermediate_code_target_br=
+eakpoint_hit(dc, env, bp);
++                if (bh =3D=3D BH_HIT_INSN) {
++                    /* Hit, keep translating */
++                    /*
++                     * TODO: if we're never going to have more than one =
+BP in a
++                     *       single address, we can simply use a bool he=
+re.
++                     */
++                    break;
++                } else if (bh =3D=3D BH_HIT_TB) {
++                    goto done_generating;
++                }
++            }
++        } while (bp !=3D NULL);
++
++        /* Accept I/O on last instruction */
++        if (dc->base.num_insns =3D=3D max_insns &&
++            (dc->base.tb->cflags & CF_LAST_IO)) {
++            gen_io_start();
++        }
++
++        /* Disassemble one instruction */
++        dc->base.pc_next =3D gen_intermediate_code_target_disas_insn(dc,=
+ env);
++
++        /**************************************************/
++        /* Conditions to stop translation                 */
++        /**************************************************/
++
++        /* Disassembly already set a stop condition */
++        if (dc->base.jmp_type >=3D DJ_TARGET) {
++            break;
++        }
++
++        /* Target-specific conditions */
++        dc->base.jmp_type =3D gen_intermediate_code_target_stop_check(dc=
+, env);
++        if (dc->base.jmp_type >=3D DJ_TARGET) {
++            break;
++        }
++
++        /* Too many instructions */
++        if (tcg_op_buf_full() || dc->base.num_insns >=3D max_insns) {
++            dc->base.jmp_type =3D DJ_TOO_MANY;
++            break;
++        }
++
++        /*
++         * Check if next instruction is on next page, which can cause an
++         * exception.
++         *
++         * NOTE: Target-specific code must check a single instruction do=
+es not
++         *       cross page boundaries; the first in the TB is always al=
+lowed to
++         *       cross pages (never goes through this check).
++         */
++        if ((dc->base.pc_first & TARGET_PAGE_MASK)
++            !=3D (dc->base.pc_next & TARGET_PAGE_MASK)) {
++            dc->base.jmp_type =3D DJ_TOO_MANY;
++            break;
++        }
++
++        gen_intermediate_code_tcg_check(dc);
++    }
++
++    gen_intermediate_code_target_stop(dc, env);
++
++    if (dc->base.tb->cflags & CF_LAST_IO) {
++        gen_io_end();
++    }
++
++done_generating:
++    gen_tb_end(dc->base.tb, dc->base.num_insns);
++
++    gen_intermediate_code_tcg_check(dc);
++
++#ifdef DEBUG_DISAS
++    if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM) &&
++        qemu_log_in_addr_range(dc->base.pc_first)) {
++        qemu_log_lock();
++        qemu_log("----------------\n");
++        qemu_log("IN: %s\n", lookup_symbol(dc->base.pc_first));
++        log_target_disas(cpu, dc->base.pc_first, dc->base.pc_next - dc->=
+base.pc_first,
++                         gen_intermediate_code_target_get_disas_flags(dc=
+));
++        qemu_log("\n");
++        qemu_log_unlock();
++    }
++#endif
++
++    dc->base.tb->size =3D dc->base.pc_next - dc->base.pc_first;
++    dc->base.tb->icount =3D dc->base.num_insns;
++}
++
++#endif  /* TRANSLATE_ALL_TEMPLATE_H */
