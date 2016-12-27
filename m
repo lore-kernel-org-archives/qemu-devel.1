@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37519)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37525)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cLvxH-0000Iu-US
+	(envelope-from <laurent@vivier.eu>) id 1cLvxJ-0000L8-V0
 	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 12:54:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cLvxD-0000OR-LT
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 12:54:32 -0500
-Received: from mout.kundenserver.de ([212.227.126.187]:59527)
+	(envelope-from <laurent@vivier.eu>) id 1cLvxF-0000Oj-In
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 12:54:34 -0500
+Received: from mout.kundenserver.de ([212.227.126.135]:53690)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cLvxD-0000OB-9P
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 12:54:27 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cLvxF-0000OV-7X
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 12:54:29 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Tue, 27 Dec 2016 18:53:57 +0100
-Message-Id: <1482861241-17678-9-git-send-email-laurent@vivier.eu>
+Date: Tue, 27 Dec 2016 18:53:59 +0100
+Message-Id: <1482861241-17678-11-git-send-email-laurent@vivier.eu>
 In-Reply-To: <1482861241-17678-1-git-send-email-laurent@vivier.eu>
 References: <1482861241-17678-1-git-send-email-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL v2 08/12] target-m68k: Implement 680x0 movem
+Subject: [Qemu-devel] [PULL v2 10/12] target-m68k: Inline shifts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,178 +24,359 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Laurent Vivier <laurent@vivier.eu>, Richard Henderson <rth@twiddle.net>
+Cc: Richard Henderson <rth@twiddle.net>, Laurent Vivier <laurent@vivier.eu>
 
-680x0 movem can load/store words and long words and can use more
-addressing modes.  Coldfire can only use long words with (Ax) and
-(d16,Ax) addressing modes.
+From: Richard Henderson <rth@twiddle.net>
+
+Also manage word and byte operands and fix the computation of
+overflow in the case of M68000 arithmetic shifts.
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
-Message-Id: <1478699171-10637-2-git-send-email-rth@twiddle.net>
+Message-Id: <1478699171-10637-4-git-send-email-rth@twiddle.net>
 ---
- target/m68k/translate.c | 130 +++++++++++++++++++++++++++++++++++++++---------
- 1 file changed, 107 insertions(+), 23 deletions(-)
+ target/m68k/helper.c    |  52 -----------
+ target/m68k/helper.h    |   3 -
+ target/m68k/translate.c | 226 ++++++++++++++++++++++++++++++++++++++++++------
+ 3 files changed, 201 insertions(+), 80 deletions(-)
 
-diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index 0124820..acc8182 100644
---- a/target/m68k/translate.c
-+++ b/target/m68k/translate.c
-@@ -1645,40 +1645,122 @@ static void gen_push(DisasContext *s, TCGv val)
-     tcg_gen_mov_i32(QREG_SP, tmp);
+diff --git a/target/m68k/helper.c b/target/m68k/helper.c
+index 7aed9ff..f750d3d 100644
+--- a/target/m68k/helper.c
++++ b/target/m68k/helper.c
+@@ -284,58 +284,6 @@ void HELPER(set_sr)(CPUM68KState *env, uint32_t val)
+     m68k_switch_sp(env);
  }
  
-+static TCGv mreg(int reg)
-+{
-+    if (reg < 8) {
-+        /* Dx */
-+        return cpu_dregs[reg];
-+    }
-+    /* Ax */
-+    return cpu_aregs[reg & 7];
-+}
-+
- DISAS_INSN(movem)
+-uint32_t HELPER(shl_cc)(CPUM68KState *env, uint32_t val, uint32_t shift)
+-{
+-    uint64_t result;
+-
+-    shift &= 63;
+-    result = (uint64_t)val << shift;
+-
+-    env->cc_c = (result >> 32) & 1;
+-    env->cc_n = result;
+-    env->cc_z = result;
+-    env->cc_v = 0;
+-    env->cc_x = shift ? env->cc_c : env->cc_x;
+-
+-    return result;
+-}
+-
+-uint32_t HELPER(shr_cc)(CPUM68KState *env, uint32_t val, uint32_t shift)
+-{
+-    uint64_t temp;
+-    uint32_t result;
+-
+-    shift &= 63;
+-    temp = (uint64_t)val << 32 >> shift;
+-    result = temp >> 32;
+-
+-    env->cc_c = (temp >> 31) & 1;
+-    env->cc_n = result;
+-    env->cc_z = result;
+-    env->cc_v = 0;
+-    env->cc_x = shift ? env->cc_c : env->cc_x;
+-
+-    return result;
+-}
+-
+-uint32_t HELPER(sar_cc)(CPUM68KState *env, uint32_t val, uint32_t shift)
+-{
+-    uint64_t temp;
+-    uint32_t result;
+-
+-    shift &= 63;
+-    temp = (int64_t)val << 32 >> shift;
+-    result = temp >> 32;
+-
+-    env->cc_c = (temp >> 31) & 1;
+-    env->cc_n = result;
+-    env->cc_z = result;
+-    env->cc_v = result ^ val;
+-    env->cc_x = shift ? env->cc_c : env->cc_x;
+-
+-    return result;
+-}
+-
+ /* FPU helpers.  */
+ uint32_t HELPER(f64_to_i32)(CPUM68KState *env, float64 val)
  {
--    TCGv addr;
-+    TCGv addr, incr, tmp, r[16];
-+    int is_load = (insn & 0x0400) != 0;
-+    int opsize = (insn & 0x40) != 0 ? OS_LONG : OS_WORD;
-+    uint16_t mask = read_im16(env, s);
-+    int mode = extract32(insn, 3, 3);
-+    int reg0 = REG(insn, 0);
-     int i;
--    uint16_t mask;
--    TCGv reg;
--    TCGv tmp;
--    int is_load;
+diff --git a/target/m68k/helper.h b/target/m68k/helper.h
+index a6f88fc..17ec342 100644
+--- a/target/m68k/helper.h
++++ b/target/m68k/helper.h
+@@ -7,9 +7,6 @@ DEF_HELPER_4(divul, void, env, int, int, i32)
+ DEF_HELPER_4(divsl, void, env, int, int, s32)
+ DEF_HELPER_4(divull, void, env, int, int, i32)
+ DEF_HELPER_4(divsll, void, env, int, int, s32)
+-DEF_HELPER_3(shl_cc, i32, env, i32, i32)
+-DEF_HELPER_3(shr_cc, i32, env, i32, i32)
+-DEF_HELPER_3(sar_cc, i32, env, i32, i32)
+ DEF_HELPER_2(set_sr, void, env, i32)
+ DEF_HELPER_3(movec, void, env, i32, i32)
+ DEF_HELPER_4(cas2w, void, env, i32, i32, i32)
+diff --git a/target/m68k/translate.c b/target/m68k/translate.c
+index 0417c32..76c77ee 100644
+--- a/target/m68k/translate.c
++++ b/target/m68k/translate.c
+@@ -2883,48 +2883,217 @@ DISAS_INSN(addx_mem)
+     gen_store(s, opsize, addr_dest, QREG_CC_N);
+ }
  
--    mask = read_im16(env, s);
--    tmp = gen_lea(env, s, insn, OS_LONG);
--    if (IS_NULL_QREG(tmp)) {
-+    tmp = cpu_aregs[reg0];
+-/* TODO: This could be implemented without helper functions.  */
+-DISAS_INSN(shift_im)
++static inline void shift_im(DisasContext *s, uint16_t insn, int opsize)
+ {
+-    TCGv reg;
+-    int tmp;
+-    TCGv shift;
++    int count = (insn >> 9) & 7;
++    int logical = insn & 8;
++    int left = insn & 0x100;
++    int bits = opsize_bytes(opsize) * 8;
++    TCGv reg = gen_extend(DREG(insn, 0), opsize, !logical);
 +
-+    switch (mode) {
-+    case 0: /* data register direct */
-+    case 1: /* addr register direct */
-+    do_addr_fault:
-         gen_addr_fault(s);
-         return;
++    if (count == 0) {
++        count = 8;
++    }
 +
-+    case 2: /* indirect */
-+        break;
++    tcg_gen_movi_i32(QREG_CC_V, 0);
++    if (left) {
++        tcg_gen_shri_i32(QREG_CC_C, reg, bits - count);
++        tcg_gen_shli_i32(QREG_CC_N, reg, count);
 +
-+    case 3: /* indirect post-increment */
-+        if (!is_load) {
-+            /* post-increment is not allowed */
-+            goto do_addr_fault;
-+        }
-+        break;
-+
-+    case 4: /* indirect pre-decrement */
-+        if (is_load) {
-+            /* pre-decrement is not allowed */
-+            goto do_addr_fault;
-+        }
-+        /* We want a bare copy of the address reg, without any pre-decrement
-+           adjustment, as gen_lea would provide.  */
-+        break;
-+
-+    default:
-+        tmp = gen_lea_mode(env, s, mode, reg0, opsize);
-+        if (IS_NULL_QREG(tmp)) {
-+            goto do_addr_fault;
-+        }
-+        break;
-     }
-+
-     addr = tcg_temp_new();
-     tcg_gen_mov_i32(addr, tmp);
--    is_load = ((insn & 0x0400) != 0);
--    for (i = 0; i < 16; i++, mask >>= 1) {
--        if (mask & 1) {
--            if (i < 8)
--                reg = DREG(i, 0);
--            else
--                reg = AREG(i, 0);
--            if (is_load) {
--                tmp = gen_load(s, OS_LONG, addr, 0);
--                tcg_gen_mov_i32(reg, tmp);
--            } else {
--                gen_store(s, OS_LONG, addr, reg);
-+    incr = tcg_const_i32(opsize_bytes(opsize));
-+
-+    if (is_load) {
-+        /* memory to register */
-+        for (i = 0; i < 16; i++) {
-+            if (mask & (1 << i)) {
-+                r[i] = gen_load(s, opsize, addr, 1);
-+                tcg_gen_add_i32(addr, addr, incr);
++        /* Note that ColdFire always clears V (done above),
++           while M68000 sets if the most significant bit is changed at
++           any time during the shift operation */
++        if (!logical && m68k_feature(s->env, M68K_FEATURE_M68000)) {
++            /* if shift count >= bits, V is (reg != 0) */
++            if (count >= bits) {
++                tcg_gen_setcond_i32(TCG_COND_NE, QREG_CC_V, reg, QREG_CC_V);
++            } else {
++                TCGv t0 = tcg_temp_new();
++                tcg_gen_sari_i32(QREG_CC_V, reg, bits - 1);
++                tcg_gen_sari_i32(t0, reg, bits - count - 1);
++                tcg_gen_setcond_i32(TCG_COND_NE, QREG_CC_V, QREG_CC_V, t0);
++                tcg_temp_free(t0);
 +            }
-+        }
-+        for (i = 0; i < 16; i++) {
-+            if (mask & (1 << i)) {
-+                tcg_gen_mov_i32(mreg(i), r[i]);
-+                tcg_temp_free(r[i]);
-+            }
-+        }
-+        if (mode == 3) {
-+            /* post-increment: movem (An)+,X */
-+            tcg_gen_mov_i32(cpu_aregs[reg0], addr);
++            tcg_gen_neg_i32(QREG_CC_V, QREG_CC_V);
 +        }
 +    } else {
-+        /* register to memory */
-+        if (mode == 4) {
-+            /* pre-decrement: movem X,-(An) */
-+            for (i = 15; i >= 0; i--) {
-+                if ((mask << i) & 0x8000) {
-+                    tcg_gen_sub_i32(addr, addr, incr);
-+                    if (reg0 + 8 == i &&
-+                        m68k_feature(s->env, M68K_FEATURE_EXT_FULL)) {
-+                        /* M68020+: if the addressing register is the
-+                         * register moved to memory, the value written
-+                         * is the initial value decremented by the size of
-+                         * the operation, regardless of how many actual
-+                         * stores have been performed until this point.
-+                         * M68000/M68010: the value is the initial value.
-+                         */
-+                        tmp = tcg_temp_new();
-+                        tcg_gen_sub_i32(tmp, cpu_aregs[reg0], incr);
-+                        gen_store(s, opsize, addr, tmp);
-+                        tcg_temp_free(tmp);
-+                    } else {
-+                        gen_store(s, opsize, addr, mreg(i));
-+                    }
-+                }
-+            }
-+            tcg_gen_mov_i32(cpu_aregs[reg0], addr);
++        tcg_gen_shri_i32(QREG_CC_C, reg, count - 1);
++        if (logical) {
++            tcg_gen_shri_i32(QREG_CC_N, reg, count);
 +        } else {
-+            for (i = 0; i < 16; i++) {
-+                if (mask & (1 << i)) {
-+                    gen_store(s, opsize, addr, mreg(i));
-+                    tcg_gen_add_i32(addr, addr, incr);
-+                }
-             }
--            if (mask != 1)
--                tcg_gen_addi_i32(addr, addr, 4);
++            tcg_gen_sari_i32(QREG_CC_N, reg, count);
++        }
++    }
++
++    gen_ext(QREG_CC_N, QREG_CC_N, opsize, 1);
++    tcg_gen_andi_i32(QREG_CC_C, QREG_CC_C, 1);
++    tcg_gen_mov_i32(QREG_CC_Z, QREG_CC_N);
++    tcg_gen_mov_i32(QREG_CC_X, QREG_CC_C);
+ 
++    gen_partset_reg(opsize, DREG(insn, 0), QREG_CC_N);
+     set_cc_op(s, CC_OP_FLAGS);
++}
+ 
+-    reg = DREG(insn, 0);
+-    tmp = (insn >> 9) & 7;
+-    if (tmp == 0)
+-        tmp = 8;
+-    shift = tcg_const_i32(tmp);
+-    /* No need to flush flags becuse we know we will set C flag.  */
+-    if (insn & 0x100) {
+-        gen_helper_shl_cc(reg, cpu_env, reg, shift);
++static inline void shift_reg(DisasContext *s, uint16_t insn, int opsize)
++{
++    int logical = insn & 8;
++    int left = insn & 0x100;
++    int bits = opsize_bytes(opsize) * 8;
++    TCGv reg = gen_extend(DREG(insn, 0), opsize, !logical);
++    TCGv s32;
++    TCGv_i64 t64, s64;
++
++    t64 = tcg_temp_new_i64();
++    s64 = tcg_temp_new_i64();
++    s32 = tcg_temp_new();
++
++    /* Note that m68k truncates the shift count modulo 64, not 32.
++       In addition, a 64-bit shift makes it easy to find "the last
++       bit shifted out", for the carry flag.  */
++    tcg_gen_andi_i32(s32, DREG(insn, 9), 63);
++    tcg_gen_extu_i32_i64(s64, s32);
++    tcg_gen_extu_i32_i64(t64, reg);
++
++    /* Optimistically set V=0.  Also used as a zero source below.  */
++    tcg_gen_movi_i32(QREG_CC_V, 0);
++    if (left) {
++        tcg_gen_shl_i64(t64, t64, s64);
++
++        if (opsize == OS_LONG) {
++            tcg_gen_extr_i64_i32(QREG_CC_N, QREG_CC_C, t64);
++            /* Note that C=0 if shift count is 0, and we get that for free.  */
++        } else {
++            TCGv zero = tcg_const_i32(0);
++            tcg_gen_extrl_i64_i32(QREG_CC_N, t64);
++            tcg_gen_shri_i32(QREG_CC_C, QREG_CC_N, bits);
++            tcg_gen_movcond_i32(TCG_COND_EQ, QREG_CC_C,
++                                s32, zero, zero, QREG_CC_C);
++            tcg_temp_free(zero);
++        }
++        tcg_gen_andi_i32(QREG_CC_C, QREG_CC_C, 1);
++
++        /* X = C, but only if the shift count was non-zero.  */
++        tcg_gen_movcond_i32(TCG_COND_NE, QREG_CC_X, s32, QREG_CC_V,
++                            QREG_CC_C, QREG_CC_X);
++
++        /* M68000 sets V if the most significant bit is changed at
++         * any time during the shift operation.  Do this via creating
++         * an extension of the sign bit, comparing, and discarding
++         * the bits below the sign bit.  I.e.
++         *     int64_t s = (intN_t)reg;
++         *     int64_t t = (int64_t)(intN_t)reg << count;
++         *     V = ((s ^ t) & (-1 << (bits - 1))) != 0
++         */
++        if (!logical && m68k_feature(s->env, M68K_FEATURE_M68000)) {
++            TCGv_i64 tt = tcg_const_i64(32);
++            /* if shift is greater than 32, use 32 */
++            tcg_gen_movcond_i64(TCG_COND_GT, s64, s64, tt, tt, s64);
++            tcg_temp_free_i64(tt);
++            /* Sign extend the input to 64 bits; re-do the shift.  */
++            tcg_gen_ext_i32_i64(t64, reg);
++            tcg_gen_shl_i64(s64, t64, s64);
++            /* Clear all bits that are unchanged.  */
++            tcg_gen_xor_i64(t64, t64, s64);
++            /* Ignore the bits below the sign bit.  */
++            tcg_gen_andi_i64(t64, t64, -1ULL << (bits - 1));
++            /* If any bits remain set, we have overflow.  */
++            tcg_gen_setcondi_i64(TCG_COND_NE, t64, t64, 0);
++            tcg_gen_extrl_i64_i32(QREG_CC_V, t64);
++            tcg_gen_neg_i32(QREG_CC_V, QREG_CC_V);
++        }
+     } else {
+-        if (insn & 8) {
+-            gen_helper_shr_cc(reg, cpu_env, reg, shift);
++        tcg_gen_shli_i64(t64, t64, 32);
++        if (logical) {
++            tcg_gen_shr_i64(t64, t64, s64);
+         } else {
+-            gen_helper_sar_cc(reg, cpu_env, reg, shift);
++            tcg_gen_sar_i64(t64, t64, s64);
+         }
++        tcg_gen_extr_i64_i32(QREG_CC_C, QREG_CC_N, t64);
++
++        /* Note that C=0 if shift count is 0, and we get that for free.  */
++        tcg_gen_shri_i32(QREG_CC_C, QREG_CC_C, 31);
++
++        /* X = C, but only if the shift count was non-zero.  */
++        tcg_gen_movcond_i32(TCG_COND_NE, QREG_CC_X, s32, QREG_CC_V,
++                            QREG_CC_C, QREG_CC_X);
+     }
++    gen_ext(QREG_CC_N, QREG_CC_N, opsize, 1);
++    tcg_gen_mov_i32(QREG_CC_Z, QREG_CC_N);
++
++    tcg_temp_free(s32);
++    tcg_temp_free_i64(s64);
++    tcg_temp_free_i64(t64);
++
++    /* Write back the result.  */
++    gen_partset_reg(opsize, DREG(insn, 0), QREG_CC_N);
++    set_cc_op(s, CC_OP_FLAGS);
++}
++
++DISAS_INSN(shift8_im)
++{
++    shift_im(s, insn, OS_BYTE);
++}
++
++DISAS_INSN(shift16_im)
++{
++    shift_im(s, insn, OS_WORD);
++}
++
++DISAS_INSN(shift_im)
++{
++    shift_im(s, insn, OS_LONG);
++}
++
++DISAS_INSN(shift8_reg)
++{
++    shift_reg(s, insn, OS_BYTE);
++}
++
++DISAS_INSN(shift16_reg)
++{
++    shift_reg(s, insn, OS_WORD);
+ }
+ 
+ DISAS_INSN(shift_reg)
+ {
+-    TCGv reg;
+-    TCGv shift;
++    shift_reg(s, insn, OS_LONG);
++}
+ 
+-    reg = DREG(insn, 0);
+-    shift = DREG(insn, 9);
+-    if (insn & 0x100) {
+-        gen_helper_shl_cc(reg, cpu_env, reg, shift);
++DISAS_INSN(shift_mem)
++{
++    int logical = insn & 8;
++    int left = insn & 0x100;
++    TCGv src;
++    TCGv addr;
++
++    SRC_EA(env, src, OS_WORD, !logical, &addr);
++    tcg_gen_movi_i32(QREG_CC_V, 0);
++    if (left) {
++        tcg_gen_shri_i32(QREG_CC_C, src, 15);
++        tcg_gen_shli_i32(QREG_CC_N, src, 1);
++
++        /* Note that ColdFire always clears V,
++           while M68000 sets if the most significant bit is changed at
++           any time during the shift operation */
++        if (!logical && m68k_feature(s->env, M68K_FEATURE_M68000)) {
++            src = gen_extend(src, OS_WORD, 1);
++            tcg_gen_xor_i32(QREG_CC_V, QREG_CC_N, src);
++        }
+     } else {
+-        if (insn & 8) {
+-            gen_helper_shr_cc(reg, cpu_env, reg, shift);
++        tcg_gen_mov_i32(QREG_CC_C, src);
++        if (logical) {
++            tcg_gen_shri_i32(QREG_CC_N, src, 1);
+         } else {
+-            gen_helper_sar_cc(reg, cpu_env, reg, shift);
++            tcg_gen_sari_i32(QREG_CC_N, src, 1);
          }
      }
 +
-+    tcg_temp_free(incr);
-+    tcg_temp_free(addr);
++    gen_ext(QREG_CC_N, QREG_CC_N, OS_WORD, 1);
++    tcg_gen_andi_i32(QREG_CC_C, QREG_CC_C, 1);
++    tcg_gen_mov_i32(QREG_CC_Z, QREG_CC_N);
++    tcg_gen_mov_i32(QREG_CC_X, QREG_CC_C);
++
++    DEST_EA(env, insn, OS_WORD, QREG_CC_N, &addr);
+     set_cc_op(s, CC_OP_FLAGS);
  }
  
- DISAS_INSN(bitop_im)
-@@ -3822,7 +3904,9 @@ void register_m68k_insns (CPUM68KState *env)
-     BASE(pea,       4840, ffc0);
-     BASE(swap,      4840, fff8);
-     INSN(bkpt,      4848, fff8, BKPT);
--    BASE(movem,     48c0, fbc0);
-+    INSN(movem,     48d0, fbf8, CF_ISA_A);
-+    INSN(movem,     48e8, fbf8, CF_ISA_A);
-+    INSN(movem,     4880, fb80, M68000);
-     BASE(ext,       4880, fff8);
-     BASE(ext,       48c0, fff8);
-     BASE(ext,       49c0, fff8);
+@@ -4005,6 +4174,13 @@ void register_m68k_insns (CPUM68KState *env)
+     INSN(adda,      d0c0, f0c0, M68000);
+     INSN(shift_im,  e080, f0f0, CF_ISA_A);
+     INSN(shift_reg, e0a0, f0f0, CF_ISA_A);
++    INSN(shift8_im, e000, f0f0, M68000);
++    INSN(shift16_im, e040, f0f0, M68000);
++    INSN(shift_im,  e080, f0f0, M68000);
++    INSN(shift8_reg, e020, f0f0, M68000);
++    INSN(shift16_reg, e060, f0f0, M68000);
++    INSN(shift_reg, e0a0, f0f0, M68000);
++    INSN(shift_mem, e0c0, fcc0, M68000);
+     INSN(undef_fpu, f000, f000, CF_ISA_A);
+     INSN(fpu,       f200, ffc0, CF_FPU);
+     INSN(fbcc,      f280, ffc0, CF_FPU);
 -- 
 2.7.4
