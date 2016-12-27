@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35283)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35298)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cLtZV-0001lD-Ty
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 10:21:51 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cLtZZ-0001pN-VQ
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 10:21:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cLtZV-0001CK-9g
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 10:21:49 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:47866)
+	(envelope-from <pm215@archaic.org.uk>) id 1cLtZZ-0001Cv-1G
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 10:21:53 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:47867)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1cLtZV-0001C8-36
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 10:21:49 -0500
+	id 1cLtZY-0001Cj-Qd
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 10:21:52 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.84_2)
-	(envelope-from <pm215@archaic.org.uk>) id 1cLtZU-0003rs-8Y
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 15:21:48 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1cLtZX-0003sF-Vk
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 15:21:51 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 27 Dec 2016 15:20:58 +0000
-Message-Id: <1482852077-19397-7-git-send-email-peter.maydell@linaro.org>
+Date: Tue, 27 Dec 2016 15:20:59 +0000
+Message-Id: <1482852077-19397-8-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1482852077-19397-1-git-send-email-peter.maydell@linaro.org>
 References: <1482852077-19397-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 06/25] hw/intc/arm_gicv3_common: fix aff3 in
- typer
+Subject: [Qemu-devel] [PULL 07/25] target-arm: Log AArch64 exception returns
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,29 +29,55 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Andrew Jones <drjones@redhat.com>
+We already log exception entry; add logging of the AArch64 exception
+return path as well.
 
-Signed-off-by: Andrew Jones <drjones@redhat.com>
-Message-id: 20161209143703.29457-1-drjones@redhat.com
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 ---
- hw/intc/arm_gicv3_common.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ target/arm/op_helper.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/hw/intc/arm_gicv3_common.c b/hw/intc/arm_gicv3_common.c
-index 0f8c4b8..0aa9b9c 100644
---- a/hw/intc/arm_gicv3_common.c
-+++ b/hw/intc/arm_gicv3_common.c
-@@ -204,7 +204,8 @@ static void arm_gicv3_common_realize(DeviceState *dev, Error **errp)
-         /* The CPU mp-affinity property is in MPIDR register format; squash
-          * the affinity bytes into 32 bits as the GICR_TYPER has them.
-          */
--        cpu_affid = (cpu_affid & 0xFF00000000ULL >> 8) | (cpu_affid & 0xFFFFFF);
-+        cpu_affid = ((cpu_affid & 0xFF00000000ULL) >> 8) |
-+                     (cpu_affid & 0xFFFFFF);
-         s->cpu[i].gicr_typer = (cpu_affid << 32) |
-             (1 << 24) |
-             (i << 8) |
+diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
+index cd94216..ba796d8 100644
+--- a/target/arm/op_helper.c
++++ b/target/arm/op_helper.c
+@@ -17,6 +17,7 @@
+  * License along with this library; if not, see <http://www.gnu.org/licenses/>.
+  */
+ #include "qemu/osdep.h"
++#include "qemu/log.h"
+ #include "cpu.h"
+ #include "exec/helper-proto.h"
+ #include "internals.h"
+@@ -972,6 +973,9 @@ void HELPER(exception_return)(CPUARMState *env)
+         } else {
+             env->regs[15] = env->elr_el[cur_el] & ~0x3;
+         }
++        qemu_log_mask(CPU_LOG_INT, "Exception return from AArch64 EL%d to "
++                      "AArch32 EL%d PC 0x%" PRIx32 "\n",
++                      cur_el, new_el, env->regs[15]);
+     } else {
+         env->aarch64 = 1;
+         pstate_write(env, spsr);
+@@ -980,6 +984,9 @@ void HELPER(exception_return)(CPUARMState *env)
+         }
+         aarch64_restore_sp(env, new_el);
+         env->pc = env->elr_el[cur_el];
++        qemu_log_mask(CPU_LOG_INT, "Exception return from AArch64 EL%d to "
++                      "AArch64 EL%d PC 0x%" PRIx64 "\n",
++                      cur_el, new_el, env->pc);
+     }
+ 
+     arm_call_el_change_hook(arm_env_get_cpu(env));
+@@ -1002,6 +1009,8 @@ illegal_return:
+     if (!arm_singlestep_active(env)) {
+         env->pstate &= ~PSTATE_SS;
+     }
++    qemu_log_mask(LOG_GUEST_ERROR, "Illegal exception return at EL%d: "
++                  "resuming execution at 0x%" PRIx64 "\n", cur_el, env->pc);
+ }
+ 
+ /* Return true if the linked breakpoint entry lbn passes its checks */
 -- 
 2.7.4
