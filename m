@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35268)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35283)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cLtZS-0001k3-RW
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 10:21:49 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cLtZV-0001lD-Ty
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 10:21:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cLtZS-0001Bl-4o
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 10:21:46 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:47865)
+	(envelope-from <pm215@archaic.org.uk>) id 1cLtZV-0001CK-9g
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 10:21:49 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:47866)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1cLtZR-0001BZ-Tm
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 10:21:46 -0500
+	id 1cLtZV-0001C8-36
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 10:21:49 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.84_2)
-	(envelope-from <pm215@archaic.org.uk>) id 1cLtZR-0003rV-2f
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 15:21:45 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1cLtZU-0003rs-8Y
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 15:21:48 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 27 Dec 2016 15:20:57 +0000
-Message-Id: <1482852077-19397-6-git-send-email-peter.maydell@linaro.org>
+Date: Tue, 27 Dec 2016 15:20:58 +0000
+Message-Id: <1482852077-19397-7-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1482852077-19397-1-git-send-email-peter.maydell@linaro.org>
 References: <1482852077-19397-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 05/25] target-arm: Fix aarch64
- disas_ldst_single_struct
+Subject: [Qemu-devel] [PULL 06/25] hw/intc/arm_gicv3_common: fix aff3 in
+ typer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,35 +30,29 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Richard Henderson <rth@twiddle.net>
+From: Andrew Jones <drjones@redhat.com>
 
-We add s->be_data within do_vec_ld/st.  Adding it here means that
-we have the wrong bits set in SIZE for a big-endian host, leading
-to g_assert_not_reached in write_vec_element and read_vec_element.
-
-Signed-off-by: Richard Henderson <rth@twiddle.net>
-Message-id: 1481085020-2614-3-git-send-email-rth@twiddle.net
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+Message-id: 20161209143703.29457-1-drjones@redhat.com
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/translate-a64.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/intc/arm_gicv3_common.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index ef7601b..f673d93 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -2830,9 +2830,9 @@ static void disas_ldst_single_struct(DisasContext *s, uint32_t insn)
-         } else {
-             /* Load/store one element per register */
-             if (is_load) {
--                do_vec_ld(s, rt, index, tcg_addr, s->be_data + scale);
-+                do_vec_ld(s, rt, index, tcg_addr, scale);
-             } else {
--                do_vec_st(s, rt, index, tcg_addr, s->be_data + scale);
-+                do_vec_st(s, rt, index, tcg_addr, scale);
-             }
-         }
-         tcg_gen_addi_i64(tcg_addr, tcg_addr, ebytes);
+diff --git a/hw/intc/arm_gicv3_common.c b/hw/intc/arm_gicv3_common.c
+index 0f8c4b8..0aa9b9c 100644
+--- a/hw/intc/arm_gicv3_common.c
++++ b/hw/intc/arm_gicv3_common.c
+@@ -204,7 +204,8 @@ static void arm_gicv3_common_realize(DeviceState *dev, Error **errp)
+         /* The CPU mp-affinity property is in MPIDR register format; squash
+          * the affinity bytes into 32 bits as the GICR_TYPER has them.
+          */
+-        cpu_affid = (cpu_affid & 0xFF00000000ULL >> 8) | (cpu_affid & 0xFFFFFF);
++        cpu_affid = ((cpu_affid & 0xFF00000000ULL) >> 8) |
++                     (cpu_affid & 0xFFFFFF);
+         s->cpu[i].gicr_typer = (cpu_affid << 32) |
+             (1 << 24) |
+             (i << 8) |
 -- 
 2.7.4
