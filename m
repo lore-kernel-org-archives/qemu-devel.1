@@ -1,25 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33210)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37396)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cLvZB-000518-2Q
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 12:29:38 -0500
+	(envelope-from <laurent@vivier.eu>) id 1cLvwy-0008UM-TJ
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 12:54:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cLvZ9-00031G-QN
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 12:29:37 -0500
-Received: from mail-ua0-x234.google.com ([2607:f8b0:400c:c08::234]:35441)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cLvZ9-000319-M6
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 12:29:35 -0500
-Received: by mail-ua0-x234.google.com with SMTP id v2so13028574uac.2
-	for <qemu-devel@nongnu.org>; Tue, 27 Dec 2016 09:29:35 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <1482559948-22772-1-git-send-email-arei.gonglei@huawei.com>
-References: <1482559948-22772-1-git-send-email-arei.gonglei@huawei.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 27 Dec 2016 17:29:14 +0000
-Message-ID: <CAFEAcA9VcFR1hPbn25mr7Wx5gwfQSV0N0AXPJrOVf-ib5ahQsw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL 0/4] cryptodev patches
+	(envelope-from <laurent@vivier.eu>) id 1cLvwu-00006w-3G
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 12:54:12 -0500
+Received: from mout.kundenserver.de ([212.227.126.187]:60230)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cLvwt-00006o-Or
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 12:54:08 -0500
+From: Laurent Vivier <laurent@vivier.eu>
+Date: Tue, 27 Dec 2016 18:53:49 +0100
+Message-Id: <1482861241-17678-1-git-send-email-laurent@vivier.eu>
+Subject: [Qemu-devel] [PULL v2 00/12] M68k for 2.9 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,42 +21,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gonglei <arei.gonglei@huawei.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Laurent Vivier <laurent@vivier.eu>
 
-On 24 December 2016 at 06:12, Gonglei <arei.gonglei@huawei.com> wrote:
-> The following changes since commit a470b33259bf82ef2336bfcd5d07640562d3f63b:
->
->   Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2016-12-22 19:23:51 +0000)
->
-> are available in the git repository at:
->
->
->   https://github.com/gongleiarei/qemu.git tags/cryptodev-next-20161224
->
-> for you to fetch changes up to 48ae36c0ad16bb757d4f6e243b8e9072fc8e8c8e:
->
->   cryptodev: add 3des-ede support (2016-12-24 13:46:27 +0800)
->
-> ----------------------------------------------------------------
-> - add xts mode support
-> - add 3DES algorithm support
-> - other trivial fixes
->
-> ----------------------------------------------------------------
-> Longpeng(Mike) (4):
->       cryptodev: fix the check of aes algorithm
->       cryptodev: add xts(aes) support
->       cryptodev: remove single-DES support in cryptodev
->       cryptodev: add 3des-ede support
->
->  backends/cryptodev-builtin.c | 65 ++++++++++++++++++++++++++++++++++++++++++++++++++---------------
->  1 file changed, 50 insertions(+), 15 deletions(-)
+The following changes since commit e5fdf663cf01f824f0e29701551a2c29554d80a4:
 
-Hi. This pull request does not appear to be signed by the GPG
-key that I have on record for you, and the key it is signed
-by seems to be only self-signed and not signed by anybody
-else...
+  Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20161223' into staging (2016-12-27 14:56:47 +0000)
 
-thanks
--- PMM
+are available in the git repository at:
+
+  git://github.com/vivier/qemu-m68k.git tags/m68k-for-2.9-pull-request
+
+for you to fetch changes up to 2b5e2170678af36df48ab4b05dff81fe40b41a65:
+
+  target-m68k: free TCG variables that are not (2016-12-27 18:28:40 +0100)
+
+----------------------------------------------------------------
+A series of patches queued since the beginning of the freeze period.
+Compared to the m68k-for-2.9 branch, 3 patches implementing bitfield
+ops are missing as they need new TCG functions. They will be pushed
+later.
+v2: remove warning for unused variables.
+----------------------------------------------------------------
+
+Laurent Vivier (8):
+  target-m68k: add cmpm
+  target-m68k: add 64bit mull
+  target-m68k: add 680x0 divu/divs variants
+  target-m68k: add abcd/sbcd/nbcd
+  target-m68k: add cas/cas2 ops
+  target-m68k: Implement 680x0 movem
+  target-m68k: add rol/ror/roxl/roxr instructions
+  target-m68k: free TCG variables that are not
+
+Richard Henderson (4):
+  target-m68k: Delay autoinc writeback
+  target-m68k: Split gen_lea and gen_ea
+  target-m68k: Do not cpu_abort on undefined insns
+  target-m68k: Inline shifts
+
+ linux-user/main.c       |    7 +
+ target/m68k/cpu.h       |    4 -
+ target/m68k/helper.c    |   52 --
+ target/m68k/helper.h    |   13 +-
+ target/m68k/op_helper.c |  292 ++++++++-
+ target/m68k/qregs.def   |    2 -
+ target/m68k/translate.c | 1520 +++++++++++++++++++++++++++++++++++++++++------
+ 7 files changed, 1624 insertions(+), 266 deletions(-)
+
+-- 
+2.7.4
