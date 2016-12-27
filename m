@@ -1,23 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33999)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39011)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <adeelbm@outlook.com>) id 1cLzYy-0002mq-78
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 16:45:41 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cM0Eu-0008Lq-Ew
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 17:29:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <adeelbm@outlook.com>) id 1cLzYv-0004uI-4y
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 16:45:40 -0500
-Received: from bay004-omc3s2.hotmail.com ([65.54.190.140]:65355)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <adeelbm@outlook.com>) id 1cLzYu-0004r3-By
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 16:45:36 -0500
-From: Adeel Mujahid <adeelbm@outlook.com>
-Date: Tue, 27 Dec 2016 21:45:32 +0000
-Message-ID: <DB6PR0401MB2613DAE7BA80EA45AA90C416BA690@DB6PR0401MB2613.eurprd04.prod.outlook.com>
-Content-Language: en-US
+	(envelope-from <peter.maydell@linaro.org>) id 1cM0Et-0006c3-LT
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 17:29:00 -0500
+Received: from mail-vk0-x22f.google.com ([2607:f8b0:400c:c05::22f]:34773)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cM0Et-0006bu-E5
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 17:28:59 -0500
+Received: by mail-vk0-x22f.google.com with SMTP id x186so214553658vkd.1
+	for <qemu-devel@nongnu.org>; Tue, 27 Dec 2016 14:28:57 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
+In-Reply-To: <CAK5BdwNYBgHBqiByVeZqtz6+VqB-2FY5vkP3Q8trRJm8hxrADg@mail.gmail.com>
+References: <516AC28F-18A9-4FC9-8028-5AE2F37CB897@gmail.com>
+	<C50D14FE-4C5D-4944-948B-09376B20FF16@gmail.com>
+	<CAK5BdwOhfw2t=AYqs-Bu4sFJcRe4a-aq7k+2G-boLbV-P+5MyQ@mail.gmail.com>
+	<5A9C1952-461A-4829-8916-C2F40EE8E5D8@gmail.com>
+	<CAK5BdwN8hXReei6YAUs=9OmNqF1DTxmH+q2BSuvUESWLf_1ABw@mail.gmail.com>
+	<7094FB37-03A9-4511-B4A6-519CDA1E6854@gmail.com>
+	<CAK5BdwMi82wiefTqr_gLKtw7sUv24OWDdr0U6VDvpq9eK8wVdQ@mail.gmail.com>
+	<6B96C329-A972-4CBE-A021-36DBAF92EFF9@gmail.com>
+	<CAK5BdwNYBgHBqiByVeZqtz6+VqB-2FY5vkP3Q8trRJm8hxrADg@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 27 Dec 2016 22:28:36 +0000
+Message-ID: <CAFEAcA9nGKzZfXjKt9hV_O0HqFB_66QpTaZzV7Ld8CHHCsHUOA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] Question - Is precise assembly code transpilation
- possible?
+Subject: Re: [Qemu-devel] [Qemu-ppc] PowerPC question
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,37 +37,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: =?UTF-8?B?0JTQvNC40YLRgNC40Lkg0KHQvNC40YDQvdC+0LI=?= <vave1313@gmail.com>
+Cc: Programmingkid <programmingkidx@gmail.com>, "list@suse.de:PowerPC list:PowerPC" <qemu-ppc@nongnu.org>, qemu-devel qemu-devel <qemu-devel@nongnu.org>
 
-Hello,
+On 27 December 2016 at 19:50, =D0=94=D0=BC=D0=B8=D1=82=D1=80=D0=B8=D0=B9 =
+=D0=A1=D0=BC=D0=B8=D1=80=D0=BD=D0=BE=D0=B2 <vave1313@gmail.com> wrote:
+> I haven't tried QEMU 2.8.0, because the job-task requires use QEMU 2.5.1.=
+1.
+> So I need to decide this problem on 2.5.1.1 version:(
 
+You haven't really explained what the job-task is or why
+it requires 2.5.1.1 in particular. Does this RTOS not work
+on more recent versions?
 
-[sorry in advance -- this is bit of an off-topic / academic question w.r.t =
-qemu-devel]
+That said, it looks like QEMU has supported displaying
+the DECR value in the monitor 'info registers' command
+for a very long time, so it probably should work in 2.5.
+Could you say clearly:
+ * what monitor command you're trying
+ * what output it gives
+ * why you think that's not right and what the output should be
+?
 
-
-Given the userspace virtualization capability of qemu, is it possible to sh=
-ip the code that deals with source-to-source mapping of assembly code (say =
-MIPS64 <-> AMD64) as a separate library, so we can potentially build assemb=
-ly language converter utility?
-
-
-For instance, consider a C/C++ project with couple of .asm/.S files contain=
-ing Intel or ATT flavored assembly code for AMD64, and the aim is to port t=
-o AARCH64 -- is it even a deterministic problem to transpile precise and bu=
-g free AARCH64 assembly code, given the full usage context and all code pat=
-hs at our disposal? In my understanding, qemu is doing something very simil=
-ar; but I am not sure as there might be missing optimization opportunities,=
- which render machine converted asm code less likely to match the one hand-=
-roled by humans.
-
-
-To this date, there are not many tools for assembly language, that convert =
-between different dialects (ATT to Intel) or various architecture instructi=
-on sets. I have heard that LLVM has certain project, which aim to convert a=
-smA -> via IR -> asmB but I haven't found it yet.
-
-
--- best
-
-Adeel
+thanks
+-- PMM
