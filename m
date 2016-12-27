@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44493)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56808)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cLyAn-0004j1-VX
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 15:16:39 -0500
+	(envelope-from <sergio.g.delreal@gmail.com>) id 1cLv6Y-0004Je-LM
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 12:00:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cLyAk-0006Q4-QF
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 15:16:37 -0500
-Resent-Message-Id: <E1cLyAk-0006Q4-QF@eggs.gnu.org>
-Received: from sender163-mail.zoho.com ([74.201.84.163]:21461)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1cLyAk-0006OZ-I2
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 15:16:34 -0500
-In-Reply-To: <1482869621-24808-1-git-send-email-nutarojj@ornl.gov>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <148286976399.127.14090524255978217457@790289a7ca88>
+	(envelope-from <sergio.g.delreal@gmail.com>) id 1cLv6V-0003Ed-FD
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 12:00:02 -0500
+Received: from mail-yw0-x243.google.com ([2607:f8b0:4002:c05::243]:34283)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sergio.g.delreal@gmail.com>)
+	id 1cLv6V-0003ET-AW
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 11:59:59 -0500
+Received: by mail-yw0-x243.google.com with SMTP id a10so22762953ywa.1
+	for <qemu-devel@nongnu.org>; Tue, 27 Dec 2016 08:59:57 -0800 (PST)
+From: "=?UTF-8?q?Sergio=20Andr=C3=A9s=20G=C3=B3mez=20Del=20Real?="
+	<sergio.g.delreal@gmail.com>
+Date: Tue, 27 Dec 2016 11:59:47 -0500
+Message-Id: <20161227165947.20184-1-Sergio.G.DelReal@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 27 Dec 2016 12:16:05 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v4] qqq: module for synchronizing with a
- simulation clock
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] hw/dma: Fix dead code in pl080.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,72 +28,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: nutarojj@ornl.gov
-Cc: famz@redhat.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, =?UTF-8?q?Sergio=20Andr=C3=A9s=20G=C3=B3mez=20Del=20Real?= <Sergio.G.DelReal@gmail.com>
 
-SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMTQ4
-Mjg2OTYyMS0yNDgwOC0xLWdpdC1zZW5kLWVtYWlsLW51dGFyb2pqQG9ybmwuZ292ClR5cGU6IHNl
-cmllcwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHY0XSBxcXE6IG1vZHVsZSBmb3Igc3lu
-Y2hyb25pemluZyB3aXRoIGEgc2ltdWxhdGlvbiBjbG9jawoKPT09IFRFU1QgU0NSSVBUIEJFR0lO
-ID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5l
-ICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCiMgVXNlZnVsIGdpdCBvcHRpb25zCmdpdCBjb25m
-aWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVu
-YW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNF
-Li4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0
-b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hv
-dyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sg
-LTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisx
-KSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAz
-YzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRo
-dWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcv
-MTQ4Mjg2OTYyMS0yNDgwOC0xLWdpdC1zZW5kLWVtYWlsLW51dGFyb2pqQG9ybmwuZ292IC0+IHBh
-dGNoZXcvMTQ4Mjg2OTYyMS0yNDgwOC0xLWdpdC1zZW5kLWVtYWlsLW51dGFyb2pqQG9ybmwuZ292
-ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKNjJiN2U0NyBxcXE6IG1vZHVsZSBmb3Ig
-c3luY2hyb25pemluZyB3aXRoIGEgc2ltdWxhdGlvbiBjbG9jawoKPT09IE9VVFBVVCBCRUdJTiA9
-PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xOiBxcXE6IG1vZHVsZSBmb3Igc3luY2hyb25pemluZyB3aXRo
-IGEgc2ltdWxhdGlvbiBjbG9jay4uLgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0
-ICctJyAoY3R4OlZ4VikKIzE5NzogRklMRTogaW5jbHVkZS9xZW11L3RpbWVyLmg6ODE2OgorICAg
-IHJldHVybiAoKHR2LnR2X3NlYyAqIDEwMDAwMDAwMDBMTCArICh0di50dl91c2VjICogMTAwMCkp
-LWdldF9pY2VkX25zKCkpOwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHJldHVybiBpcyBub3QgYSBmdW5jdGlvbiwg
-cGFyZW50aGVzZXMgYXJlIG5vdCByZXF1aXJlZAojMTk3OiBGSUxFOiBpbmNsdWRlL3FlbXUvdGlt
-ZXIuaDo4MTY6CisgICAgcmV0dXJuICgodHYudHZfc2VjICogMTAwMDAwMDAwMExMICsgKHR2LnR2
-X3VzZWMgKiAxMDAwKSktZ2V0X2ljZWRfbnMoKSk7CgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFy
-b3VuZCB0aGF0ICctJyAoY3R4OlZ4VikKIzIxMDogRklMRTogaW5jbHVkZS9xZW11L3RpbWVyLmg6
-ODQ1OgorICAgICAgICByZXR1cm4gKHRzLnR2X3NlYyAqIDEwMDAwMDAwMDBMTCArIHRzLnR2X25z
-ZWMpLWdldF9pY2VkX25zKCk7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3VzcGVjdCBjb2RlIGluZGVudCBmb3IgY29uZGl0
-aW9uYWwgc3RhdGVtZW50cyAoNCwgOSkKIzIxODogRklMRTogaW5jbHVkZS9xZW11L3RpbWVyLmg6
-ODk2OgorICAgIGlmICh0aWNrc19pc19mcm96ZW4oKSA+IDApIHsKKyAgICAgICAgIHJldHVybiB0
-aWNrc19pc19mcm96ZW4oKTsKCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJy0n
-IChjdHg6VnhWKQojMjIzOiBGSUxFOiBpbmNsdWRlL3FlbXUvdGltZXIuaDo5MDA6CisgICAgcmV0
-dXJuIHZhbC1nZXRfaWNlZF90aWNrcygpOwogICAgICAgICAgICAgICBeCgpFUlJPUjogc3VzcGVj
-dCBjb2RlIGluZGVudCBmb3IgY29uZGl0aW9uYWwgc3RhdGVtZW50cyAoNCwgOSkKIzIzMTogRklM
-RTogaW5jbHVkZS9xZW11L3RpbWVyLmg6OTA5OgorICAgIGlmICh0aWNrc19pc19mcm96ZW4oKSA+
-IDApIHsKKyAgICAgICAgIHJldHVybiB0aWNrc19pc19mcm96ZW4oKTsKCkVSUk9SOiBzcGFjZXMg
-cmVxdWlyZWQgYXJvdW5kIHRoYXQgJy0nIChjdHg6VnhWKQojMjM5OiBGSUxFOiBpbmNsdWRlL3Fl
-bXUvdGltZXIuaDo5MTY6CisgICAgcmV0dXJuIHZhbC1nZXRfaWNlZF90aWNrcygpOwogICAgICAg
-ICAgICAgICBeCgpFUlJPUjogc3VzcGVjdCBjb2RlIGluZGVudCBmb3IgY29uZGl0aW9uYWwgc3Rh
-dGVtZW50cyAoNCwgOSkKIzI0NzogRklMRTogaW5jbHVkZS9xZW11L3RpbWVyLmg6OTMzOgorICAg
-IGlmICh0aWNrc19pc19mcm96ZW4oKSA+IDApIHsKKyAgICAgICAgIHJldHVybiB0aWNrc19pc19m
-cm96ZW4oKTsKCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJy0nIChjdHg6VnhW
-KQojMjUyOiBGSUxFOiBpbmNsdWRlL3FlbXUvdGltZXIuaDo5Mzc6CisgICAgcmV0dXJuIHZhbC1n
-ZXRfaWNlZF90aWNrcygpOwogICAgICAgICAgICAgICBeCgpFUlJPUjogZG8gbm90IGluaXRpYWxp
-c2Ugc3RhdGljcyB0byAwIG9yIE5VTEwKIzM0OTogRklMRTogcXFxLmM6MTU6CitzdGF0aWMgYm9v
-bCBlbmFibGVkID0gZmFsc2UsIHN5bmNpbmcgPSBmYWxzZTsKCkVSUk9SOiBkbyBub3QgdXNlIEM5
-OSAvLyBjb21tZW50cwojMzUwOiBGSUxFOiBxcXEuYzoxNjoKK3N0YXRpYyBpbnQgZWxhcHNlZDsg
-Ly8gVGhpcyBtdXN0IGJlIHplcm8gb24gaW5pdGlhbGl6YXRpb24KCkVSUk9SOiB0cmFpbGluZyB3
-aGl0ZXNwYWNlCiM0MDU6IEZJTEU6IHFxcS5jOjcxOgorICAgIGlmICh0aW1lX2FkdmFuY2UgPCAw
-KSAkCgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMg
-c3RhdGVtZW50CiM0MDU6IEZJTEU6IHFxcS5jOjcxOgorICAgIGlmICh0aW1lX2FkdmFuY2UgPCAw
-KSAKWy4uLl0KCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM0MjU6IEZJTEU6IHFx
-cS5jOjkxOgorICAgICAgICAvKiBTZXQgdGhlIHN5bmMgZmxhZyB0aGF0IHdpbGwgY2F1c2UgdGhl
-IHZjcHUgdG8gd2FpdCBmb3Igc3luY2hyb25pemF0aW9uCgp0b3RhbDogMTMgZXJyb3JzLCAxIHdh
-cm5pbmdzLCA1MTkgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMs
-IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
-ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
-QUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29k
-ZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRw
-Oi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRl
-dmVsQGZyZWVsaXN0cy5vcmc=
+The patch fixes dead code in pl080_read() and pl080_write() as reported
+in bug #1637974. According to ARM's official Technical Reference Manual,
+offsets handled by the switch statement are 0x100, 0x104, 0x108, 0x10C
+and 0x110, so the solution suggested by the guy who reported the bug is
+right.
+
+Signed-off-by: Sergio Andrés Gómez Del Real <Sergio.G.DelReal@gmail.com>
+---
+ hw/dma/pl080.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/hw/dma/pl080.c b/hw/dma/pl080.c
+index 7724c93..8f34f24 100644
+--- a/hw/dma/pl080.c
++++ b/hw/dma/pl080.c
+@@ -255,7 +255,7 @@ static uint64_t pl080_read(void *opaque, hwaddr offset,
+         i = (offset & 0xe0) >> 5;
+         if (i >= s->nchannels)
+             goto bad_offset;
+-        switch (offset >> 2) {
++        switch ((offset-0x100) >> 2) {
+         case 0: /* SrcAddr */
+             return s->chan[i].src;
+         case 1: /* DestAddr */
+@@ -316,7 +316,7 @@ static void pl080_write(void *opaque, hwaddr offset,
+         i = (offset & 0xe0) >> 5;
+         if (i >= s->nchannels)
+             goto bad_offset;
+-        switch (offset >> 2) {
++        switch ((offset-0x100) >> 2) {
+         case 0: /* SrcAddr */
+             s->chan[i].src = value;
+             break;
+-- 
+2.10.2
