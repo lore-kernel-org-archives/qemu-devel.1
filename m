@@ -1,24 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48205)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58240)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cLpC6-00076z-Ks
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 05:41:24 -0500
+	(envelope-from <laurent@vivier.eu>) id 1cLqJ9-0006GI-5C
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 06:52:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cLpC3-0001JO-FY
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 05:41:22 -0500
-References: <1479555831-30960-1-git-send-email-zhang.zhanghailiang@huawei.com>
-	<20161206134211.GD4990@noname.str.redhat.com>
-	<20161206152415.GF2125@work-vm>
-	<5848F139.1020402@huawei.com> <20161208200230.GH2054@work-vm>
-	<585B40C5.9020603@huawei.com>
-From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
-Message-ID: <58624490.1090609@huawei.com>
-Date: Tue, 27 Dec 2016 18:38:08 +0800
+	(envelope-from <laurent@vivier.eu>) id 1cLqJ8-0002A6-45
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 06:52:43 -0500
+References: <b0619e40-daca-9b28-2c78-1e2709d9f0ad@tuxfamily.org>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <80f9cbae-8548-4d5e-2543-1d95020eddb1@vivier.eu>
+Date: Tue, 27 Dec 2016 12:52:30 +0100
 MIME-Version: 1.0
-In-Reply-To: <585B40C5.9020603@huawei.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+In-Reply-To: <b0619e40-daca-9b28-2c78-1e2709d9f0ad@tuxfamily.org>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] migration: re-active images when migration
- fails to complete
+Subject: Re: [Qemu-devel] m68k: Remove dummy machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,307 +22,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, amit.shah@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, quintela@redhat.com
+To: Thomas Huth <huth@tuxfamily.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>
 
-On 2016/12/22 10:56, Hailiang Zhang wrote:
-> On 2016/12/9 4:02, Dr. David Alan Gilbert wrote:
->> * Hailiang Zhang (zhang.zhanghailiang@huawei.com) wrote:
->>> Hi，
->>>
->>> On 2016/12/6 23:24, Dr. David Alan Gilbert wrote:
->>>> * Kevin Wolf (kwolf@redhat.com) wrote:
->>>>> Am 19.11.2016 um 12:43 hat zhanghailiang geschrieben:
->>>>>> commit fe904ea8242cbae2d7e69c052c754b8f5f1ba1d6 fixed a case
->>>>>> which migration aborted QEMU because it didn't regain the control
->>>>>> of images while some errors happened.
->>>>>>
->>>>>> Actually, we have another case in that error path to abort QEMU
->>>>>> because of the same reason:
->>>>>>        migration_thread()
->>>>>>            migration_completion()
->>>>>>               bdrv_inactivate_all() ----------------> inactivate images
->>>>>>               qemu_savevm_state_complete_precopy()
->>>>>>                   socket_writev_buffer() --------> error because destination fails
->>>>>>                 qemu_fflush() -------------------> set error on migration stream
->>>>>>               qemu_mutex_unlock_iothread() ------> unlock
->>>>>>        qmp_migrate_cancel() ---------------------> user cancelled migration
->>>>>>            migrate_set_state() ------------------> set migrate CANCELLING
->>>>>
->>>>> Important to note here: qmp_migrate_cancel() is executed by a concurrent
->>>>> thread, it doesn't depend on any code paths in migration_completion().
->>>>>
->>>>>>        migration_completion() -----------------> go on to fail_invalidate
->>>>>>            if (s->state == MIGRATION_STATUS_ACTIVE) -> Jump this branch
->>>>>>        migration_thread() -----------------------> break migration loop
->>>>>>          vm_start() -----------------------------> restart guest with inactive
->>>>>>                                                    images
->>>>>> We failed to regain the control of images because we only regain it
->>>>>> while the migration state is "active", but here users cancelled the migration
->>>>>> when they found some errors happened (for example, libvirtd daemon is shutdown
->>>>>> in destination unexpectedly).
->>>>>>
->>>>>> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
->>>>>> ---
->>>>>>     migration/migration.c | 3 ++-
->>>>>>     1 file changed, 2 insertions(+), 1 deletion(-)
->>>>>>
->>>>>> diff --git a/migration/migration.c b/migration/migration.c
->>>>>> index f498ab8..0c1ee6d 100644
->>>>>> --- a/migration/migration.c
->>>>>> +++ b/migration/migration.c
->>>>>> @@ -1752,7 +1752,8 @@ fail_invalidate:
->>>>>>         /* If not doing postcopy, vm_start() will be called: let's regain
->>>>>>          * control on images.
->>>>>>          */
->>>>>> -    if (s->state == MIGRATION_STATUS_ACTIVE) {
->>>>>
->>>>> This if condition tries to check whether we ran the code path that
->>>>> called bdrv_inactivate_all(), so that we only try to reactivate images
->>>>> it if we really inactivated them first.
->>>>>
->>>>> The problem with it is that it ignores a possible concurrent
->>>>> modification of s->state.
->>>>>
->>>>>> +    if (s->state == MIGRATION_STATUS_ACTIVE ||
->>>>>> +        s->state == MIGRATION_STATUS_CANCELLING) {
->>>>>
->>>>> This adds another state that we could end up with with a concurrent
->>>>> modification, so that even in this case we undo the inactivation.
->>>>>
->>>>> However, it is no longer limited to the cases where we inactivated the
->>>>> image. It also applies to other code paths (like the postcopy one) where
->>>>> we didn't inactivate images.
->>>>>
->>>>> What saves the patch is that bdrv_invalidate_cache() is a no-op for
->>>>> block devices that aren't inactivated, so calling it more often than
->>>>> necessary is okay.
->>>>>
->>>>> But then, if we're going to rely on this, it would be much better to
->>>>> just remove the if altogether. I can't say whether there are any other
->>>>> possible values of s->state that we should consider, and by removing the
->>>>> if we would be guaranteed to catch all of them.
->>>>>
->>>>> If we don't want to rely on it, just keep a local bool that remembers
->>>>> whether we inactivated images and check that here.
->>>>>
->>>>>>             Error *local_err = NULL;
->>>>>>
->>>>>>             bdrv_invalidate_cache_all(&local_err);
->>>>>
->>>>> So in summary, this is a horrible patch because it checks the wrong
->>>>> thing, and for I can't really say if it covers everything it needs to
->>>>> cover, but arguably it happens to correctly fix the outcome of a
->>>>> previously failing case.
->>>>>
->>>>> Normally I would reject such a patch and require a clean solution, but
->>>>> then we're on the day of -rc3, so if you can't send v2 right away, we
->>>>> might not have the time for it.
->>>>>
->>>>> Tough call...
->>>>
->>>> Hmm, this case is messy; I created this function having split it out
->>>> of the main loop a couple of years back but it did get more messy
->>>> with more s->state checks; as far as I can tell it's always
->>>> done the transition to COMPLETED at the end well after the locked
->>>> section, so there's always been that chance that cancellation sneaks
->>>> in just before or just after the locked section.
->>>>
->>>> Some of the bad cases that can happen:
->>>>       a) A cancel sneaks in after the ACTIVE check but before or after
->>>>         the locked section;  should we reactivate the disks? Well that
->>>>         depends on whether the destination actually got the full migration
->>>>         stream - we don't know!
->>>>            If the destination actually starts running we must not reactivate
->>>>            the disk on the source even if the CPU is stopped.
->>>>
->>>
->>> Yes, we didn't have a mechanism to know exactly whether or not the VM in
->>> destination is well received.
->>>
->>>>       b) If the bdrv_inactive_all fails for one device, but the others
->>>>          are fine, we go down the fail: label and don't reactivate, so
->>>>          the source dies even though it might have been mostly OK.
->>>>
->>>
->>>> We can move the _lock to before the check of s->state at the top,
->>>> which would stop the cancel sneaking in early.
->>>> In the case where postcopy was never enabled (!migrate_postcopy_ram())
->>>> we can move the COMPLETED transition into the lock as well; so I think
->>>> then we kind of become safe.
->>>> In the case where postcopy was enabled I think we can do the COMPLETED
->>>> transition before waiting for the return path to close - I think but
->>>> I need to think more about that.
->>>> And there seem to be some dodgy cases where we call the invalidate
->>>> there after a late postcopy failure; that's bad, we shouldn't reactivate
->>>> the source disks after going into postcopy.
->>>>
->>>> So, in summary; this function is a mess - it needs a much bigger
->>>> fix than this patch.
->>>>
->>>
->>> So what's the conclusion ?
->>> Will you send a patch to fix it ? Or let's fix it step by step ?
->>> I think Kevin's suggestion which just remove the *if* check is OK.
->>
->> I don't see any of the simple solutions are easy;  so I plan
->> to look at it properly, but am not sure when;  if you have time
->> to do it then feel free.
->>
->
-> Hmm, we still have gaps between bdrv_inactivate_all() and migration thread
-> totally exit, which migration cancelling can slip in.
-> We do caught that case while we finished migration_completion() but
-> before the begin of cleanup work (It has global lock to be protected).
-> The related codes is:
->
->                   migration_completion(s, current_active_state,
->                                        &old_vm_running, &start_time);
->                   break;
->               }
->           }
-> ------------------------------------------------------> gap begin
->           if (qemu_file_get_error(s->to_dst_file)) {
->               migrate_set_state(&s->state, current_active_state,
->                                 MIGRATION_STATUS_FAILED);
->               trace_migration_thread_file_err();
->               break;
->           }
->           current_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
->           if (current_time >= initial_time + BUFFER_DELAY) {
->               uint64_t transferred_bytes = qemu_ftell(s->to_dst_file) -
->                                            initial_bytes;
->               uint64_t time_spent = current_time - initial_time;
->               double bandwidth = (double)transferred_bytes / time_spent;
->               max_size = bandwidth * s->parameters.downtime_limit;
->
->               s->mbps = (((double) transferred_bytes * 8.0) /
->                       ((double) time_spent / 1000.0)) / 1000.0 / 1000.0;
->
->               trace_migrate_transferred(transferred_bytes, time_spent,
->                                         bandwidth, max_size);
->               /* if we haven't sent anything, we don't want to recalculate
->                  10000 is a small enough number for our purposes */
->               if (s->dirty_bytes_rate && transferred_bytes > 10000) {
->                   s->expected_downtime = s->dirty_bytes_rate / bandwidth;
->               }
->
->               qemu_file_reset_rate_limit(s->to_dst_file);
->               initial_time = current_time;
->               initial_bytes = qemu_ftell(s->to_dst_file);
->           }
->           if (qemu_file_rate_limit(s->to_dst_file)) {
->               /* usleep expects microseconds */
->               g_usleep((initial_time + BUFFER_DELAY - current_time)*1000);
->           }
->       }
->
->       trace_migration_thread_after_loop();
->       /* If we enabled cpu throttling for auto-converge, turn it off. */
->       cpu_throttle_stop();
->       end_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
-> --------------------------------------------------------------> gap end
->       qemu_mutex_lock_iothread();
->       /*
->
-> So maybe we should call bdrv_invalidate_cache_all() in qmp_migrate_cancel()
-> directly ? which i think will cover all the cases. (Including another potential
-> case, which QEMU has finished the migration process, but libvirtd decides to
-> cancel the migration before shutdown it.)
->
-> The things here I'm not sure is, is it OK to call bdrv_invalidate_cache_all()
-> without bdrv_inactivate_all() has been called ? If not, we need to record
-> if we have inactive all blocks before call bdrv_invalidate_cache_all()。
->
+Le 20/12/2016 à 15:32, Thomas Huth a écrit :
+> You can get an empty machine with "-M none" nowadays, so the
+> m68k dummy board (introduced in 2007) seems to be pretty
+> redundant since the "none" machine has been added in 2012.
+> 
+> Signed-off-by: Thomas Huth <huth@tuxfamily.org>
+> ---
+>  MAINTAINERS           |  4 ---
+>  hw/m68k/Makefile.objs |  2 --
+>  hw/m68k/dummy_m68k.c  | 84 ---------------------------------------------------
+>  3 files changed, 90 deletions(-)
+>  delete mode 100644 hw/m68k/dummy_m68k.c
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 4a60579..88ee8cd 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -552,10 +552,6 @@ S: Orphan
+>  F: hw/m68k/an5206.c
+>  F: hw/m68k/mcf5206.c
+>  
+> -dummy_m68k
+> -S: Orphan
+> -F: hw/m68k/dummy_m68k.c
+> -
+>  mcf5208
+>  S: Orphan
+>  F: hw/m68k/mcf5208.c
+> diff --git a/hw/m68k/Makefile.objs b/hw/m68k/Makefile.objs
+> index c4352e7..d1f089c 100644
+> --- a/hw/m68k/Makefile.objs
+> +++ b/hw/m68k/Makefile.objs
+> @@ -1,4 +1,2 @@
+>  obj-y += an5206.o mcf5208.o
+> -obj-y += dummy_m68k.o
+> -
+>  obj-y += mcf5206.o mcf_intc.o
+> diff --git a/hw/m68k/dummy_m68k.c b/hw/m68k/dummy_m68k.c
+> deleted file mode 100644
+> index 0b11d20..0000000
+> --- a/hw/m68k/dummy_m68k.c
+> +++ /dev/null
+> @@ -1,84 +0,0 @@
+> -/*
+> - * Dummy board with just RAM and CPU for use as an ISS.
+> - *
+> - * Copyright (c) 2007 CodeSourcery.
+> - *
+> - * This code is licensed under the GPL
+> - */
+> -
+> -#include "qemu/osdep.h"
+> -#include "qemu-common.h"
+> -#include "cpu.h"
+> -#include "hw/hw.h"
+> -#include "hw/boards.h"
+> -#include "hw/loader.h"
+> -#include "elf.h"
+> -#include "exec/address-spaces.h"
+> -
+> -#define KERNEL_LOAD_ADDR 0x10000
+> -
+> -/* Board init.  */
+> -
+> -static void dummy_m68k_init(MachineState *machine)
+> -{
+> -    ram_addr_t ram_size = machine->ram_size;
+> -    const char *cpu_model = machine->cpu_model;
+> -    const char *kernel_filename = machine->kernel_filename;
+> -    M68kCPU *cpu;
+> -    CPUM68KState *env;
+> -    MemoryRegion *address_space_mem =  get_system_memory();
+> -    MemoryRegion *ram = g_new(MemoryRegion, 1);
+> -    int kernel_size;
+> -    uint64_t elf_entry;
+> -    hwaddr entry;
+> -
+> -    if (!cpu_model)
+> -        cpu_model = "cfv4e";
+> -    cpu = cpu_m68k_init(cpu_model);
+> -    if (!cpu) {
+> -        fprintf(stderr, "Unable to find m68k CPU definition\n");
+> -        exit(1);
+> -    }
+> -    env = &cpu->env;
+> -
+> -    /* Initialize CPU registers.  */
+> -    env->vbr = 0;
+> -
+> -    /* RAM at address zero */
+> -    memory_region_allocate_system_memory(ram, NULL, "dummy_m68k.ram",
+> -                                         ram_size);
+> -    memory_region_add_subregion(address_space_mem, 0, ram);
+> -
+> -    /* Load kernel.  */
+> -    if (kernel_filename) {
+> -        kernel_size = load_elf(kernel_filename, NULL, NULL, &elf_entry,
+> -                               NULL, NULL, 1, EM_68K, 0, 0);
+> -        entry = elf_entry;
+> -        if (kernel_size < 0) {
+> -            kernel_size = load_uimage(kernel_filename, &entry, NULL, NULL,
+> -                                      NULL, NULL);
+> -        }
+> -        if (kernel_size < 0) {
+> -            kernel_size = load_image_targphys(kernel_filename,
+> -                                              KERNEL_LOAD_ADDR,
+> -                                              ram_size - KERNEL_LOAD_ADDR);
+> -            entry = KERNEL_LOAD_ADDR;
+> -        }
+> -        if (kernel_size < 0) {
+> -            fprintf(stderr, "qemu: could not load kernel '%s'\n",
+> -                    kernel_filename);
+> -            exit(1);
+> -        }
+> -    } else {
+> -        entry = 0;
+> -    }
+> -    env->pc = entry;
+> -}
+> -
+> -static void dummy_m68k_machine_init(MachineClass *mc)
+> -{
+> -    mc->desc = "Dummy board";
+> -    mc->init = dummy_m68k_init;
+> -}
+> -
+> -DEFINE_MACHINE("dummy", dummy_m68k_machine_init)
+> 
 
-Examples codes:
+I'm not sure the "none" machine can replace the "dummy" machine as the
+"dummy" machine can load a kernel whereas it seems the "none" one can't.
 
-Subject: [PATCH] migration: re-active images while migration been canceled
-  after inactive them
-
-Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
----
-  include/migration/migration.h |  3 +++
-  migration/migration.c         | 13 +++++++++++++
-  2 files changed, 16 insertions(+)
-
-diff --git a/include/migration/migration.h b/include/migration/migration.h
-index c309d23..2d5b724 100644
---- a/include/migration/migration.h
-+++ b/include/migration/migration.h
-@@ -177,6 +177,9 @@ struct MigrationState
-      /* Flag set once the migration thread is running (and needs joining) */
-      bool migration_thread_running;
-
-+    /* Flag set once the migration thread called bdrv_inactivate_all */
-+    bool block_inactive;
-+
-      /* Queue of outstanding page requests from the destination */
-      QemuMutex src_page_req_mutex;
-      QSIMPLEQ_HEAD(src_page_requests, MigrationSrcPageRequest) src_page_requests;
-diff --git a/migration/migration.c b/migration/migration.c
-index f498ab8..8525c00 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -1006,6 +1006,16 @@ static void migrate_fd_cancel(MigrationState *s)
-      if (s->state == MIGRATION_STATUS_CANCELLING && f) {
-          qemu_file_shutdown(f);
-      }
-+    if (s->block_inactive) {
-+        Error *local_err = NULL;
-+
-+        bdrv_invalidate_cache_all(&local_err);
-+        if (local_err) {
-+            error_report_err(local_err);
-+        } else {
-+            s->block_inactive = false;
-+        }
-+    }
-  }
-
-  void add_migration_state_change_notifier(Notifier *notify)
-@@ -1705,6 +1715,7 @@ static void migration_completion(MigrationState *s, int current_active_state,
-              if (ret >= 0) {
-                  qemu_file_set_rate_limit(s->to_dst_file, INT64_MAX);
-                  qemu_savevm_state_complete_precopy(s->to_dst_file, false);
-+                s->block_inactive = true;
-              }
-          }
-          qemu_mutex_unlock_iothread();
-@@ -1758,6 +1769,8 @@ fail_invalidate:
-          bdrv_invalidate_cache_all(&local_err);
-          if (local_err) {
-              error_report_err(local_err);
-+        } else {
-+            s->block_inactive = false;
-          }
-      }
-
--- 
-1.8.3.1
-
-> Any ideas ?
->
-> Hailiang
->
->> Dave
->>
->>>
->>> Thanks,
->>> Hailiang
->>>
->>>> Dave
->>>>
->>>>> Kevin
->>>>>
->>>> --
->>>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->>>>
->>>> .
->>>>
->>>
->> --
->> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->>
->> .
->>
+Laurent
