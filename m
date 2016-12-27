@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37457)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37477)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cLvx3-00006R-IM
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 12:54:18 -0500
+	(envelope-from <laurent@vivier.eu>) id 1cLvx9-0000DO-U1
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 12:54:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cLvx2-0000CS-43
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 12:54:17 -0500
-Received: from mout.kundenserver.de ([212.227.126.134]:52583)
+	(envelope-from <laurent@vivier.eu>) id 1cLvx5-0000ES-9E
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 12:54:24 -0500
+Received: from mout.kundenserver.de ([212.227.126.133]:52051)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cLvx1-0000CC-ON
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 12:54:16 -0500
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cLvx4-0000DO-U8
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 12:54:19 -0500
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Tue, 27 Dec 2016 18:53:51 +0100
-Message-Id: <1482861241-17678-3-git-send-email-laurent@vivier.eu>
+Date: Tue, 27 Dec 2016 18:53:50 +0100
+Message-Id: <1482861241-17678-2-git-send-email-laurent@vivier.eu>
 In-Reply-To: <1482861241-17678-1-git-send-email-laurent@vivier.eu>
 References: <1482861241-17678-1-git-send-email-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL v2 02/12] target-m68k: Split gen_lea and gen_ea
+Subject: [Qemu-devel] [PULL v2 01/12] target-m68k: Delay autoinc writeback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,216 +28,175 @@ Cc: Richard Henderson <rth@twiddle.net>
 
 From: Richard Henderson <rth@twiddle.net>
 
-Provide gen_lea_mode and gen_ea_mode, where the mode can be
-specified manually, rather than taken from the instruction.
-
 Signed-off-by: Richard Henderson <rth@twiddle.net>
-Message-Id: <1478206203-4606-3-git-send-email-rth@twiddle.net>
+Message-Id: <1478206203-4606-2-git-send-email-rth@twiddle.net>
 ---
- target/m68k/translate.c | 112 +++++++++++++++++++++++++-----------------------
- 1 file changed, 59 insertions(+), 53 deletions(-)
+ target/m68k/translate.c | 84 +++++++++++++++++++++++++++++++++++++------------
+ 1 file changed, 64 insertions(+), 20 deletions(-)
 
 diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index a9066dc..aaa221e 100644
+index d6ed883..a9066dc 100644
 --- a/target/m68k/translate.c
 +++ b/target/m68k/translate.c
-@@ -697,37 +697,37 @@ static void gen_partset_reg(int opsize, TCGv reg, TCGv val)
+@@ -59,12 +59,12 @@ static TCGv cpu_aregs[8];
+ static TCGv_i64 cpu_fregs[8];
+ static TCGv_i64 cpu_macc[4];
  
- /* Generate code for an "effective address".  Does not adjust the base
-    register for autoincrement addressing modes.  */
--static TCGv gen_lea(CPUM68KState *env, DisasContext *s, uint16_t insn,
--                    int opsize)
-+static TCGv gen_lea_mode(CPUM68KState *env, DisasContext *s,
-+                         int mode, int reg0, int opsize)
- {
-     TCGv reg;
-     TCGv tmp;
-     uint16_t ext;
-     uint32_t offset;
+-#define REG(insn, pos) (((insn) >> (pos)) & 7)
++#define REG(insn, pos)  (((insn) >> (pos)) & 7)
+ #define DREG(insn, pos) cpu_dregs[REG(insn, pos)]
+-#define AREG(insn, pos) cpu_aregs[REG(insn, pos)]
++#define AREG(insn, pos) get_areg(s, REG(insn, pos))
+ #define FREG(insn, pos) cpu_fregs[REG(insn, pos)]
+-#define MACREG(acc) cpu_macc[acc]
+-#define QREG_SP cpu_aregs[7]
++#define MACREG(acc)     cpu_macc[acc]
++#define QREG_SP         get_areg(s, 7)
  
--    switch ((insn >> 3) & 7) {
-+    switch (mode) {
-     case 0: /* Data register direct.  */
-     case 1: /* Address register direct.  */
-         return NULL_QREG;
-     case 2: /* Indirect register */
-     case 3: /* Indirect postincrement.  */
--        return AREG(insn, 0);
-+        return get_areg(s, reg0);
-     case 4: /* Indirect predecrememnt.  */
--        reg = AREG(insn, 0);
-+        reg = get_areg(s, reg0);
-         tmp = tcg_temp_new();
-         tcg_gen_subi_i32(tmp, reg, opsize_bytes(opsize));
-         return tmp;
-     case 5: /* Indirect displacement.  */
--        reg = AREG(insn, 0);
-+        reg = get_areg(s, reg0);
-         tmp = tcg_temp_new();
-         ext = read_im16(env, s);
-         tcg_gen_addi_i32(tmp, reg, (int16_t)ext);
-         return tmp;
-     case 6: /* Indirect index + displacement.  */
--        reg = AREG(insn, 0);
-+        reg = get_areg(s, reg0);
-         return gen_lea_indexed(env, s, reg);
-     case 7: /* Other */
--        switch (insn & 7) {
-+        switch (reg0) {
-         case 0: /* Absolute short.  */
-             offset = (int16_t)read_im16(env, s);
-             return tcg_const_i32(offset);
-@@ -749,39 +749,26 @@ static TCGv gen_lea(CPUM68KState *env, DisasContext *s, uint16_t insn,
-     return NULL_QREG;
- }
+ static TCGv NULL_QREG;
+ #define IS_NULL_QREG(t) (TCGV_EQUAL(t, NULL_QREG))
+@@ -141,8 +141,55 @@ typedef struct DisasContext {
+     int singlestep_enabled;
+     TCGv_i64 mactmp;
+     int done_mac;
++    int writeback_mask;
++    TCGv writeback[8];
+ } DisasContext;
  
--/* Helper function for gen_ea. Reuse the computed address between the
--   for read/write operands.  */
--static inline TCGv gen_ea_once(CPUM68KState *env, DisasContext *s,
--                               uint16_t insn, int opsize, TCGv val,
--                               TCGv *addrp, ea_what what)
-+static TCGv gen_lea(CPUM68KState *env, DisasContext *s, uint16_t insn,
-+                    int opsize)
- {
--    TCGv tmp;
--
--    if (addrp && what == EA_STORE) {
--        tmp = *addrp;
--    } else {
--        tmp = gen_lea(env, s, insn, opsize);
--        if (IS_NULL_QREG(tmp))
--            return tmp;
--        if (addrp)
--            *addrp = tmp;
--    }
--    return gen_ldst(s, opsize, tmp, val, what);
-+    int mode = extract32(insn, 3, 3);
-+    int reg0 = REG(insn, 0);
-+    return gen_lea_mode(env, s, mode, reg0, opsize);
- }
- 
--/* Generate code to load/store a value from/into an EA.  If VAL > 0 this is
-+/* Generate code to load/store a value from/into an EA.  If WHAT > 0 this is
-    a write otherwise it is a read (0 == sign extend, -1 == zero extend).
-    ADDRP is non-null for readwrite operands.  */
--static TCGv gen_ea(CPUM68KState *env, DisasContext *s, uint16_t insn,
--                   int opsize, TCGv val, TCGv *addrp, ea_what what)
-+static TCGv gen_ea_mode(CPUM68KState *env, DisasContext *s, int mode, int reg0,
-+                        int opsize, TCGv val, TCGv *addrp, ea_what what)
- {
--    TCGv reg;
--    TCGv result;
--    uint32_t offset;
-+    TCGv reg, tmp, result;
-+    int32_t offset;
- 
--    switch ((insn >> 3) & 7) {
-+    switch (mode) {
-     case 0: /* Data register direct.  */
--        reg = DREG(insn, 0);
-+        reg = cpu_dregs[reg0];
-         if (what == EA_STORE) {
-             gen_partset_reg(opsize, reg, val);
-             return store_dummy;
-@@ -789,7 +776,7 @@ static TCGv gen_ea(CPUM68KState *env, DisasContext *s, uint16_t insn,
-             return gen_extend(reg, opsize, what == EA_LOADS);
-         }
-     case 1: /* Address register direct.  */
--        reg = AREG(insn, 0);
-+        reg = get_areg(s, reg0);
-         if (what == EA_STORE) {
-             tcg_gen_mov_i32(reg, val);
-             return store_dummy;
-@@ -797,45 +784,56 @@ static TCGv gen_ea(CPUM68KState *env, DisasContext *s, uint16_t insn,
-             return gen_extend(reg, opsize, what == EA_LOADS);
-         }
-     case 2: /* Indirect register */
--        reg = AREG(insn, 0);
-+        reg = get_areg(s, reg0);
-         return gen_ldst(s, opsize, reg, val, what);
-     case 3: /* Indirect postincrement.  */
--        reg = AREG(insn, 0);
-+        reg = get_areg(s, reg0);
-         result = gen_ldst(s, opsize, reg, val, what);
-         if (what == EA_STORE || !addrp) {
-             TCGv tmp = tcg_temp_new();
-             tcg_gen_addi_i32(tmp, reg, opsize_bytes(opsize));
--            delay_set_areg(s, REG(insn, 0), tmp, true);
-+            delay_set_areg(s, reg0, tmp, true);
-         }
-         return result;
-     case 4: /* Indirect predecrememnt.  */
--        {
--            TCGv tmp;
--            if (addrp && what == EA_STORE) {
--                tmp = *addrp;
--            } else {
--                tmp = gen_lea(env, s, insn, opsize);
--                if (IS_NULL_QREG(tmp))
--                    return tmp;
--                if (addrp)
--                    *addrp = tmp;
-+        if (addrp && what == EA_STORE) {
-+            tmp = *addrp;
-+        } else {
-+            tmp = gen_lea_mode(env, s, mode, reg0, opsize);
-+            if (IS_NULL_QREG(tmp)) {
-+                return tmp;
-             }
--            result = gen_ldst(s, opsize, tmp, val, what);
--            if (what == EA_STORE || !addrp) {
--                delay_set_areg(s, REG(insn, 0), tmp, false);
-+            if (addrp) {
-+                *addrp = tmp;
-             }
-         }
-+        result = gen_ldst(s, opsize, tmp, val, what);
-+        if (what == EA_STORE || !addrp) {
-+            delay_set_areg(s, reg0, tmp, false);
-+        }
-         return result;
-     case 5: /* Indirect displacement.  */
-     case 6: /* Indirect index + displacement.  */
--        return gen_ea_once(env, s, insn, opsize, val, addrp, what);
-+    do_indirect:
-+        if (addrp && what == EA_STORE) {
-+            tmp = *addrp;
-+        } else {
-+            tmp = gen_lea_mode(env, s, mode, reg0, opsize);
-+            if (IS_NULL_QREG(tmp)) {
-+                return tmp;
-+            }
-+            if (addrp) {
-+                *addrp = tmp;
-+            }
-+        }
-+        return gen_ldst(s, opsize, tmp, val, what);
-     case 7: /* Other */
--        switch (insn & 7) {
-+        switch (reg0) {
-         case 0: /* Absolute short.  */
-         case 1: /* Absolute long.  */
-         case 2: /* pc displacement  */
-         case 3: /* pc index+displacement.  */
--            return gen_ea_once(env, s, insn, opsize, val, addrp, what);
-+            goto do_indirect;
-         case 4: /* Immediate.  */
-             /* Sign extend values for consistency.  */
-             switch (opsize) {
-@@ -868,6 +866,14 @@ static TCGv gen_ea(CPUM68KState *env, DisasContext *s, uint16_t insn,
-     return NULL_QREG;
- }
- 
-+static TCGv gen_ea(CPUM68KState *env, DisasContext *s, uint16_t insn,
-+                   int opsize, TCGv val, TCGv *addrp, ea_what what)
++static TCGv get_areg(DisasContext *s, unsigned regno)
 +{
-+    int mode = extract32(insn, 3, 3);
-+    int reg0 = REG(insn, 0);
-+    return gen_ea_mode(env, s, mode, reg0, opsize, val, addrp, what);
++    if (s->writeback_mask & (1 << regno)) {
++        return s->writeback[regno];
++    } else {
++        return cpu_aregs[regno];
++    }
 +}
 +
- typedef struct {
-     TCGCond tcond;
-     bool g1;
++static void delay_set_areg(DisasContext *s, unsigned regno,
++                           TCGv val, bool give_temp)
++{
++    if (s->writeback_mask & (1 << regno)) {
++        if (give_temp) {
++            tcg_temp_free(s->writeback[regno]);
++            s->writeback[regno] = val;
++        } else {
++            tcg_gen_mov_i32(s->writeback[regno], val);
++        }
++    } else {
++        s->writeback_mask |= 1 << regno;
++        if (give_temp) {
++            s->writeback[regno] = val;
++        } else {
++            TCGv tmp = tcg_temp_new();
++            s->writeback[regno] = tmp;
++            tcg_gen_mov_i32(tmp, val);
++        }
++    }
++}
++
++static void do_writebacks(DisasContext *s)
++{
++    unsigned mask = s->writeback_mask;
++    if (mask) {
++        s->writeback_mask = 0;
++        do {
++            unsigned regno = ctz32(mask);
++            tcg_gen_mov_i32(cpu_aregs[regno], s->writeback[regno]);
++            tcg_temp_free(s->writeback[regno]);
++            mask &= mask - 1;
++        } while (mask);
++    }
++}
++
+ #define DISAS_JUMP_NEXT 4
+ 
+ #if defined(CONFIG_USER_ONLY)
+@@ -331,7 +378,7 @@ static inline uint32_t read_im32(CPUM68KState *env, DisasContext *s)
+ }
+ 
+ /* Calculate and address index.  */
+-static TCGv gen_addr_index(uint16_t ext, TCGv tmp)
++static TCGv gen_addr_index(DisasContext *s, uint16_t ext, TCGv tmp)
+ {
+     TCGv add;
+     int scale;
+@@ -388,7 +435,7 @@ static TCGv gen_lea_indexed(CPUM68KState *env, DisasContext *s, TCGv base)
+         tmp = tcg_temp_new();
+         if ((ext & 0x44) == 0) {
+             /* pre-index */
+-            add = gen_addr_index(ext, tmp);
++            add = gen_addr_index(s, ext, tmp);
+         } else {
+             add = NULL_QREG;
+         }
+@@ -417,7 +464,7 @@ static TCGv gen_lea_indexed(CPUM68KState *env, DisasContext *s, TCGv base)
+             /* memory indirect */
+             base = gen_load(s, OS_LONG, add, 0);
+             if ((ext & 0x44) == 4) {
+-                add = gen_addr_index(ext, tmp);
++                add = gen_addr_index(s, ext, tmp);
+                 tcg_gen_add_i32(tmp, add, base);
+                 add = tmp;
+             } else {
+@@ -441,7 +488,7 @@ static TCGv gen_lea_indexed(CPUM68KState *env, DisasContext *s, TCGv base)
+     } else {
+         /* brief extension word format */
+         tmp = tcg_temp_new();
+-        add = gen_addr_index(ext, tmp);
++        add = gen_addr_index(s, ext, tmp);
+         if (!IS_NULL_QREG(base)) {
+             tcg_gen_add_i32(tmp, add, base);
+             if ((int8_t)ext)
+@@ -755,10 +802,11 @@ static TCGv gen_ea(CPUM68KState *env, DisasContext *s, uint16_t insn,
+     case 3: /* Indirect postincrement.  */
+         reg = AREG(insn, 0);
+         result = gen_ldst(s, opsize, reg, val, what);
+-        /* ??? This is not exception safe.  The instruction may still
+-           fault after this point.  */
+-        if (what == EA_STORE || !addrp)
+-            tcg_gen_addi_i32(reg, reg, opsize_bytes(opsize));
++        if (what == EA_STORE || !addrp) {
++            TCGv tmp = tcg_temp_new();
++            tcg_gen_addi_i32(tmp, reg, opsize_bytes(opsize));
++            delay_set_areg(s, REG(insn, 0), tmp, true);
++        }
+         return result;
+     case 4: /* Indirect predecrememnt.  */
+         {
+@@ -773,11 +821,8 @@ static TCGv gen_ea(CPUM68KState *env, DisasContext *s, uint16_t insn,
+                     *addrp = tmp;
+             }
+             result = gen_ldst(s, opsize, tmp, val, what);
+-            /* ??? This is not exception safe.  The instruction may still
+-               fault after this point.  */
+             if (what == EA_STORE || !addrp) {
+-                reg = AREG(insn, 0);
+-                tcg_gen_mov_i32(reg, tmp);
++                delay_set_areg(s, REG(insn, 0), tmp, false);
+             }
+         }
+         return result;
+@@ -3446,11 +3491,9 @@ void register_m68k_insns (CPUM68KState *env)
+    write back the result to memory before setting the condition codes.  */
+ static void disas_m68k_insn(CPUM68KState * env, DisasContext *s)
+ {
+-    uint16_t insn;
+-
+-    insn = read_im16(env, s);
+-
++    uint16_t insn = read_im16(env, s);
+     opcode_table[insn](env, s, insn);
++    do_writebacks(s);
+ }
+ 
+ /* generate intermediate code for basic block 'tb'.  */
+@@ -3478,6 +3521,7 @@ void gen_intermediate_code(CPUM68KState *env, TranslationBlock *tb)
+     dc->fpcr = env->fpcr;
+     dc->user = (env->sr & SR_S) == 0;
+     dc->done_mac = 0;
++    dc->writeback_mask = 0;
+     num_insns = 0;
+     max_insns = tb->cflags & CF_COUNT_MASK;
+     if (max_insns == 0) {
 -- 
 2.7.4
