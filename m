@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38404)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43698)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cMIjR-0005IN-OS
-	for qemu-devel@nongnu.org; Wed, 28 Dec 2016 13:13:46 -0500
+	(envelope-from <vilanova@ac.upc.edu>) id 1cMJ9q-0004OQ-0M
+	for qemu-devel@nongnu.org; Wed, 28 Dec 2016 13:41:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cMIjQ-0001hr-LA
-	for qemu-devel@nongnu.org; Wed, 28 Dec 2016 13:13:45 -0500
-Received: from mail-ua0-x230.google.com ([2607:f8b0:400c:c08::230]:33590)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cMIjQ-0001hm-Cm
-	for qemu-devel@nongnu.org; Wed, 28 Dec 2016 13:13:44 -0500
-Received: by mail-ua0-x230.google.com with SMTP id i68so108603136uad.0
-	for <qemu-devel@nongnu.org>; Wed, 28 Dec 2016 10:13:44 -0800 (PST)
+	(envelope-from <vilanova@ac.upc.edu>) id 1cMJ9m-0001Eg-Pe
+	for qemu-devel@nongnu.org; Wed, 28 Dec 2016 13:41:02 -0500
+Received: from roura.ac.upc.edu ([147.83.33.10]:48432 helo=roura.ac.upc.es)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <vilanova@ac.upc.edu>) id 1cMJ9m-0001EB-Ct
+	for qemu-devel@nongnu.org; Wed, 28 Dec 2016 13:40:58 -0500
+From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
+Date: Wed, 28 Dec 2016 19:40:54 +0100
+Message-Id: <148295045448.19871.9819696634619157347.stgit@fimbulvetr.bsc.es>
 MIME-Version: 1.0
-In-Reply-To: <db8a59e9-f4b3-1cb5-c1ed-82158b61b008@freebsd.org>
-References: <098092bd-b92b-4fb8-5061-f77f9f75e392@freebsd.org>
-	<CAFEAcA8ZuCxeFz83moePn80GFUbh0wGu4+T2wHdTSN=LE6-1CQ@mail.gmail.com>
-	<db8a59e9-f4b3-1cb5-c1ed-82158b61b008@freebsd.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 28 Dec 2016 18:13:23 +0000
-Message-ID: <CAFEAcA_DMEoAW7WP+7XsmnN4rZVjVL7WzZdDa1kn-rK_xGMXzw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] Looking for a linux-user mode test
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v6 0/7] trace: [tcg] Optimize per-vCPU tracing
+ states with separate TB caches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,23 +25,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sean Bruno <sbruno@freebsd.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Eric Blake <eblake@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 28 December 2016 at 17:12, Sean Bruno <sbruno@freebsd.org> wrote:
-> On 12/28/16 10:05, Peter Maydell wrote:
->> Ideally all of that rework (including the support for properly
->> interrupting syscalls without races) should be ported over to
->> bsd-user at some point.
->
-> If you have a moment to point me at the merge commit that pulled in the
-> majority of this overhaul, I'll take a moment to review it for
-> application to bsd-user.
+Optimizes tracing of events with the 'tcg' and 'vcpu' properties (e.g., m=
+emory
+accesses), making it feasible to statically enable them by default on all=
+ QEMU
+builds.
 
-Merges 430da7a81d356e3, 3e904d6ade7f36, b66e10e4c9ae7,
-d6550e9ed2e1a60 (listed here latest first but probably more
-helpfully examined the other way round) have the bulk of it,
-there are probably some bugfixes that got in via other merges.
+Some quick'n'dirty numbers with 400.perlbench (SPECcpu2006) on the train =
+input
+(medium size - suns.pl) and the guest_mem_before event:
 
-thanks
--- PMM
+* vanilla, statically disabled
+real	0m2,259s
+user	0m2,252s
+sys	0m0,004s
+
+* vanilla, statically enabled (overhead: 2.18x)
+real	0m4,921s
+user	0m4,912s
+sys	0m0,008s
+
+* multi-tb, statically disabled (overhead: 0.99x) [within noise range]
+real	0m2,228s
+user	0m2,216s
+sys	0m0,008s
+
+* multi-tb, statically enabled (overhead: 0.99x) [within noise range]
+real	0m2,229s
+user	0m2,224s
+sys	0m0,004s
+
+
+Right now, events with the 'tcg' property always generate TCG code to tra=
+ce that
+event at guest code execution time, where the event's dynamic state is ch=
+ecked.
+
+This series adds a performance optimization where TCG code for events wit=
+h the
+'tcg' and 'vcpu' properties is not generated if the event is dynamically
+disabled. This optimization raises two issues:
+
+* An event can be dynamically disabled/enabled after the corresponding TC=
+G code
+  has been generated (i.e., a new TB with the corresponding code should b=
+e
+  used).
+
+* Each vCPU can have a different dynamic state for the same event (i.e., =
+tracing
+  the memory accesses of only one process pinned to a vCPU).
+
+To handle both issues, this series integrates the dynamic tracing event s=
+tate
+into the TB hashing function, so that vCPUs tracing different events will=
+ use
+separate TBs. Note that only events with the 'vcpu' property are used for
+hashing (as stored in the bitmap of CPUState->trace_dstate).
+
+This makes dynamic event state changes on vCPUs very efficient, since the=
+y can
+use TBs produced by other vCPUs while on the same event state combination=
+ (or
+produced by the same vCPU, earlier).
+
+Discarded alternatives:
+
+* Emitting TCG code to check if an event needs tracing, where we should s=
+till
+  move the tracing call code to either a cold path (making tracing perfor=
+mance
+  worse), or leave it inlined (making non-tracing performance worse).
+
+* Eliding TCG code only when *zero* vCPUs are tracing an event, since ena=
+bling
+  it on a single vCPU will impact the performance of all other vCPUs that=
+ are
+  not tracing that event.
+
+Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+---
+
+Changes in v6
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Check hashing size error with QEMU_BUILD_BUG_ON [Richard Henderson].
+
+
+Changes in v5
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Move define into "qemu-common.h" to allow compilation of tests.
+
+
+Changes in v4
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Incorporate trace_dstate into the TB hashing function instead of using
+  multiple physical TB caches [suggested by Richard Henderson].
+
+
+Changes in v3
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Rebase on 0737f32daf.
+* Do not use reserved symbol prefixes ("__") [Stefan Hajnoczi].
+* Refactor trace_get_vcpu_event_count() to be inlinable.
+* Optimize cpu_tb_cache_set_requested() (hottest path).
+
+
+Changes in v2
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Fix bitmap copy in cpu_tb_cache_set_apply().
+* Split generated code re-alignment into a separate patch [Daniel P. Berr=
+ange].
+
+
+Llu=C3=ADs Vilanova (7):
+      exec: [tcg] Refactor flush of per-CPU virtual TB cache
+      trace: Make trace_get_vcpu_event_count() inlinable
+      trace: [tcg] Delay changes to dynamic state when translating
+      exec: [tcg] Use different TBs according to the vCPU's dynamic traci=
+ng state
+      trace: [tcg] Do not generate TCG code to trace dinamically-disabled=
+ events
+      trace: [tcg,trivial] Re-align generated code
+      trace: [trivial] Statically enable all guest events
+
+
+ cpu-exec.c                               |   52 ++++++++++++++++++++++++=
++++---
+ cputlb.c                                 |    2 +
+ include/exec/exec-all.h                  |   11 ++++++
+ include/exec/tb-hash-xx.h                |    8 ++++-
+ include/exec/tb-hash.h                   |    5 ++-
+ include/qemu-common.h                    |    3 ++
+ include/qom/cpu.h                        |    7 ++++
+ qom/cpu.c                                |    4 ++
+ scripts/tracetool/__init__.py            |    1 +
+ scripts/tracetool/backend/dtrace.py      |    2 +
+ scripts/tracetool/backend/ftrace.py      |   20 ++++++------
+ scripts/tracetool/backend/log.py         |   17 +++++-----
+ scripts/tracetool/backend/simple.py      |    2 +
+ scripts/tracetool/backend/syslog.py      |    6 ++-
+ scripts/tracetool/backend/ust.py         |    2 +
+ scripts/tracetool/format/h.py            |   24 ++++++++++----
+ scripts/tracetool/format/tcg_h.py        |   19 +++++++++--
+ scripts/tracetool/format/tcg_helper_c.py |    3 +-
+ tests/qht-bench.c                        |    2 +
+ trace-events                             |    6 ++-
+ trace/control-internal.h                 |    5 +++
+ trace/control-target.c                   |   14 +++++++-
+ trace/control.c                          |    9 +----
+ trace/control.h                          |    5 ++-
+ translate-all.c                          |   30 +++++++++++++----
+ 25 files changed, 195 insertions(+), 64 deletions(-)
+
+
+To: qemu-devel@nongnu.org
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>
