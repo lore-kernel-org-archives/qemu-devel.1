@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50727)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50767)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1cMEtT-0001UJ-3b
-	for qemu-devel@nongnu.org; Wed, 28 Dec 2016 09:07:52 -0500
+	(envelope-from <vilanova@ac.upc.edu>) id 1cMEtb-0001cE-06
+	for qemu-devel@nongnu.org; Wed, 28 Dec 2016 09:08:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1cMEtO-0003SE-EC
-	for qemu-devel@nongnu.org; Wed, 28 Dec 2016 09:07:51 -0500
-Received: from roura.ac.upc.es ([147.83.33.10]:35125)
+	(envelope-from <vilanova@ac.upc.edu>) id 1cMEtW-0003TW-Ll
+	for qemu-devel@nongnu.org; Wed, 28 Dec 2016 09:07:58 -0500
+Received: from roura.ac.upc.es ([147.83.33.10]:35131)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1cMEtO-0003S2-1T
-	for qemu-devel@nongnu.org; Wed, 28 Dec 2016 09:07:46 -0500
+	(envelope-from <vilanova@ac.upc.edu>) id 1cMEtW-0003TN-8k
+	for qemu-devel@nongnu.org; Wed, 28 Dec 2016 09:07:54 -0500
 From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
-Date: Wed, 28 Dec 2016 15:07:42 +0100
-Message-Id: <148293406236.28901.9490775858242540392.stgit@fimbulvetr.bsc.es>
+Date: Wed, 28 Dec 2016 15:07:53 +0100
+Message-Id: <148293407313.28901.16350296471570196043.stgit@fimbulvetr.bsc.es>
+In-Reply-To: <148293406236.28901.9490775858242540392.stgit@fimbulvetr.bsc.es>
+References: <148293406236.28901.9490775858242540392.stgit@fimbulvetr.bsc.es>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v5 0/7] trace: [tcg] Optimize per-vCPU tracing
- states with separate TB caches
+Subject: [Qemu-devel] [PATCH v5 2/7] trace: Make
+ trace_get_vcpu_event_count() inlinable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,159 +30,81 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Eric Blake <eblake@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Optimizes tracing of events with the 'tcg' and 'vcpu' properties (e.g., m=
-emory
-accesses), making it feasible to statically enable them by default on all=
- QEMU
-builds.
-
-Some quick'n'dirty numbers with 400.perlbench (SPECcpu2006) on the train =
-input
-(medium size - suns.pl) and the guest_mem_before event:
-
-* vanilla, statically disabled
-real	0m2,259s
-user	0m2,252s
-sys	0m0,004s
-
-* vanilla, statically enabled (overhead: 2.18x)
-real	0m4,921s
-user	0m4,912s
-sys	0m0,008s
-
-* multi-tb, statically disabled (overhead: 0.99x) [within noise range]
-real	0m2,228s
-user	0m2,216s
-sys	0m0,008s
-
-* multi-tb, statically enabled (overhead: 0.99x) [within noise range]
-real	0m2,229s
-user	0m2,224s
-sys	0m0,004s
-
-
-Right now, events with the 'tcg' property always generate TCG code to tra=
-ce that
-event at guest code execution time, where the event's dynamic state is ch=
-ecked.
-
-This series adds a performance optimization where TCG code for events wit=
-h the
-'tcg' and 'vcpu' properties is not generated if the event is dynamically
-disabled. This optimization raises two issues:
-
-* An event can be dynamically disabled/enabled after the corresponding TC=
-G code
-  has been generated (i.e., a new TB with the corresponding code should b=
-e
-  used).
-
-* Each vCPU can have a different dynamic state for the same event (i.e., =
-tracing
-  the memory accesses of only one process pinned to a vCPU).
-
-To handle both issues, this series integrates the dynamic tracing event s=
-tate
-into the TB hashing function, so that vCPUs tracing different events will=
- use
-separate TBs. Note that only events with the 'vcpu' property are used for
-hashing (as stored in the bitmap of CPUState->trace_dstate).
-
-This makes dynamic event state changes on vCPUs very efficient, since the=
-y can
-use TBs produced by other vCPUs while on the same event state combination=
- (or
-produced by the same vCPU, earlier).
-
-Discarded alternatives:
-
-* Emitting TCG code to check if an event needs tracing, where we should s=
-till
-  move the tracing call code to either a cold path (making tracing perfor=
-mance
-  worse), or leave it inlined (making non-tracing performance worse).
-
-* Eliding TCG code only when *zero* vCPUs are tracing an event, since ena=
-bling
-  it on a single vCPU will impact the performance of all other vCPUs that=
- are
-  not tracing that event.
+Later patches will make use of it.
 
 Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
 ---
+ trace/control-internal.h |    5 +++++
+ trace/control.c          |    9 ++-------
+ trace/control.h          |    2 +-
+ 3 files changed, 8 insertions(+), 8 deletions(-)
 
-Changes in v5
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-* Move define into "qemu-common.h" to allow compilation of tests.
-
-
-Changes in v4
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-* Incorporate trace_dstate into the TB hashing function instead of using
-  multiple physical TB caches [suggested by Richard Henderson].
-
-
-Changes in v3
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-* Rebase on 0737f32daf.
-* Do not use reserved symbol prefixes ("__") [Stefan Hajnoczi].
-* Refactor trace_get_vcpu_event_count() to be inlinable.
-* Optimize cpu_tb_cache_set_requested() (hottest path).
-
-
-Changes in v2
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-* Fix bitmap copy in cpu_tb_cache_set_apply().
-* Split generated code re-alignment into a separate patch [Daniel P. Berr=
-ange].
-
-
-Llu=C3=ADs Vilanova (7):
-      exec: [tcg] Refactor flush of per-CPU virtual TB cache
-      trace: Make trace_get_vcpu_event_count() inlinable
-      trace: [tcg] Delay changes to dynamic state when translating
-      exec: [tcg] Use different TBs according to the vCPU's dynamic traci=
-ng state
-      trace: [tcg] Do not generate TCG code to trace dinamically-disabled=
- events
-      trace: [tcg,trivial] Re-align generated code
-      trace: [trivial] Statically enable all guest events
-
-
- cpu-exec.c                               |   52 ++++++++++++++++++++++++=
-+++---
- cputlb.c                                 |    2 +
- include/exec/exec-all.h                  |   11 ++++++
- include/exec/tb-hash-xx.h                |   11 ++++++
- include/exec/tb-hash.h                   |    5 ++-
- include/qemu-common.h                    |    3 ++
- include/qom/cpu.h                        |    7 ++++
- qom/cpu.c                                |    4 ++
- scripts/tracetool/__init__.py            |    1 +
- scripts/tracetool/backend/dtrace.py      |    2 +
- scripts/tracetool/backend/ftrace.py      |   20 ++++++------
- scripts/tracetool/backend/log.py         |   17 +++++-----
- scripts/tracetool/backend/simple.py      |    2 +
- scripts/tracetool/backend/syslog.py      |    6 ++-
- scripts/tracetool/backend/ust.py         |    2 +
- scripts/tracetool/format/h.py            |   24 ++++++++++----
- scripts/tracetool/format/tcg_h.py        |   19 +++++++++--
- scripts/tracetool/format/tcg_helper_c.py |    3 +-
- tests/qht-bench.c                        |    2 +
- trace-events                             |    6 ++-
- trace/control-internal.h                 |    5 +++
- trace/control-target.c                   |   14 +++++++-
- trace/control.c                          |    9 +----
- trace/control.h                          |    5 ++-
- translate-all.c                          |   30 +++++++++++++----
- 25 files changed, 198 insertions(+), 64 deletions(-)
-
-
-To: qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>
+diff --git a/trace/control-internal.h b/trace/control-internal.h
+index a9d395a587..beb98a0d2c 100644
+--- a/trace/control-internal.h
++++ b/trace/control-internal.h
+@@ -16,6 +16,7 @@
+=20
+=20
+ extern int trace_events_enabled_count;
++extern uint32_t trace_next_vcpu_id;
+=20
+=20
+ static inline bool trace_event_is_pattern(const char *str)
+@@ -82,6 +83,10 @@ static inline bool trace_event_get_vcpu_state_dynamic(=
+CPUState *vcpu,
+     return trace_event_get_vcpu_state_dynamic_by_vcpu_id(vcpu, vcpu_id);
+ }
+=20
++static inline uint32_t trace_get_vcpu_event_count(void)
++{
++    return trace_next_vcpu_id;
++}
+=20
+ void trace_event_register_group(TraceEvent **events);
+=20
+diff --git a/trace/control.c b/trace/control.c
+index 1a7bee6ddc..52d0e343fa 100644
+--- a/trace/control.c
++++ b/trace/control.c
+@@ -36,7 +36,7 @@ typedef struct TraceEventGroup {
+ static TraceEventGroup *event_groups;
+ static size_t nevent_groups;
+ static uint32_t next_id;
+-static uint32_t next_vcpu_id;
++uint32_t trace_next_vcpu_id;
+=20
+ QemuOptsList qemu_trace_opts =3D {
+     .name =3D "trace",
+@@ -65,7 +65,7 @@ void trace_event_register_group(TraceEvent **events)
+     for (i =3D 0; events[i] !=3D NULL; i++) {
+         events[i]->id =3D next_id++;
+         if (events[i]->vcpu_id !=3D TRACE_VCPU_EVENT_NONE) {
+-            events[i]->vcpu_id =3D next_vcpu_id++;
++            events[i]->vcpu_id =3D trace_next_vcpu_id++;
+         }
+     }
+     event_groups =3D g_renew(TraceEventGroup, event_groups, nevent_group=
+s + 1);
+@@ -299,8 +299,3 @@ char *trace_opt_parse(const char *optarg)
+=20
+     return trace_file;
+ }
+-
+-uint32_t trace_get_vcpu_event_count(void)
+-{
+-    return next_vcpu_id;
+-}
+diff --git a/trace/control.h b/trace/control.h
+index ccaeac8552..80d326c4d1 100644
+--- a/trace/control.h
++++ b/trace/control.h
+@@ -237,7 +237,7 @@ char *trace_opt_parse(const char *optarg);
+  *
+  * Return the number of known vcpu-specific events
+  */
+-uint32_t trace_get_vcpu_event_count(void);
++static uint32_t trace_get_vcpu_event_count(void);
+=20
+=20
+ #include "trace/control-internal.h"
