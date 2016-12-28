@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59250)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33243)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sbruno@freebsd.org>) id 1cMFoL-0007gA-Sd
-	for qemu-devel@nongnu.org; Wed, 28 Dec 2016 10:06:38 -0500
+	(envelope-from <drjones@redhat.com>) id 1cMG3C-0001Co-Vr
+	for qemu-devel@nongnu.org; Wed, 28 Dec 2016 10:22:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sbruno@freebsd.org>) id 1cMFoH-0002OP-O0
-	for qemu-devel@nongnu.org; Wed, 28 Dec 2016 10:06:37 -0500
-Received: from ignoranthack.me ([199.102.79.106]:54662
-	helo=mail.ignoranthack.me)
+	(envelope-from <drjones@redhat.com>) id 1cMG39-00063R-JI
+	for qemu-devel@nongnu.org; Wed, 28 Dec 2016 10:21:58 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58566)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sbruno@freebsd.org>) id 1cMFoH-0002O8-J6
-	for qemu-devel@nongnu.org; Wed, 28 Dec 2016 10:06:33 -0500
-Received: from [192.168.0.6] (67-0-254-111.albq.qwest.net [67.0.254.111])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	(Authenticated sender: sbruno@ignoranthack.me)
-	by mail.ignoranthack.me (Postfix) with ESMTPSA id 997EC1928BA
-	for <qemu-devel@nongnu.org>; Wed, 28 Dec 2016 15:06:29 +0000 (UTC)
-From: Sean Bruno <sbruno@freebsd.org>
-Message-ID: <098092bd-b92b-4fb8-5061-f77f9f75e392@freebsd.org>
-Date: Wed, 28 Dec 2016 08:06:26 -0700
+	(Exim 4.71) (envelope-from <drjones@redhat.com>) id 1cMG39-00063N-Db
+	for qemu-devel@nongnu.org; Wed, 28 Dec 2016 10:21:55 -0500
+Date: Wed, 28 Dec 2016 16:21:50 +0100
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20161228152150.qpnf25jsf5ps4yna@kamzik.brq.redhat.com>
+References: <1482824413-25837-1-git-send-email-caoj.fnst@cn.fujitsu.com>
+	<6daeb5be-96d5-b474-9708-5d9041cdd0e2@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature";
-	boundary="UnsI568FKQ8AMbMlGdeAlUI64hP4Haf3m"
-Subject: [Qemu-devel] Looking for a linux-user mode test
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6daeb5be-96d5-b474-9708-5d9041cdd0e2@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] doc/pcie: correct command line examples
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,56 +27,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
+To: Marcel Apfelbaum <marcel@redhat.com>
+Cc: Cao jin <caoj.fnst@cn.fujitsu.com>, qemu-devel@nongnu.org, mst@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---UnsI568FKQ8AMbMlGdeAlUI64hP4Haf3m
-From: Sean Bruno <sbruno@freebsd.org>
-To: QEMU Developers <qemu-devel@nongnu.org>
-Message-ID: <098092bd-b92b-4fb8-5061-f77f9f75e392@freebsd.org>
-Subject: Looking for a linux-user mode test
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Wed, Dec 28, 2016 at 03:24:30PM +0200, Marcel Apfelbaum wrote:
+> On 12/27/2016 09:40 AM, Cao jin wrote:
+> > Nit picking: Multi-function PCI Express Root Ports should mean that
+> > 'addr' property is mandatory, and slot is optional because it is default
+> > to 0, and 'chassis' is mandatory for 2nd & 3rd root port because it is
+> > default to 0 too.
+> > 
+> > Bonus: fix a typo(2->3)
+> > Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
+> > ---
+> >  docs/pcie.txt | 12 ++++++------
+> >  1 file changed, 6 insertions(+), 6 deletions(-)
+> > 
+> > diff --git a/docs/pcie.txt b/docs/pcie.txt
+> > index 9fb20aaed9f4..54f05eaa71dc 100644
+> > --- a/docs/pcie.txt
+> > +++ b/docs/pcie.txt
+> > @@ -110,18 +110,18 @@ Plug only PCI Express devices into PCI Express Ports.
+> >            -device ioh3420,id=root_port1,chassis=x,slot=y[,bus=pcie.0][,addr=z]  \
+> >            -device <dev>,bus=root_port1
+> >  2.2.2 Using multi-function PCI Express Root Ports:
+> > -      -device ioh3420,id=root_port1,multifunction=on,chassis=x,slot=y[,bus=pcie.0][,addr=z.0] \
+> > -      -device ioh3420,id=root_port2,chassis=x1,slot=y1[,bus=pcie.0][,addr=z.1] \
+> > -      -device ioh3420,id=root_port3,chassis=x2,slot=y2[,bus=pcie.0][,addr=z.2] \
+> > -2.2.2 Plugging a PCI Express device into a Switch:
+> > +      -device ioh3420,id=root_port1,multifunction=on,chassis=x,addr=z.0[,slot=y][,bus=pcie.0] \
+> > +      -device ioh3420,id=root_port2,chassis=x1,addr=z.1[,slot=y1][,bus=pcie.0] \
+> > +      -device ioh3420,id=root_port3,chassis=x2,addr=z.2[,slot=y2][,bus=pcie.0] \
+> > +2.2.3 Plugging a PCI Express device into a Switch:
+> >        -device ioh3420,id=root_port1,chassis=x,slot=y[,bus=pcie.0][,addr=z]  \
+> >        -device x3130-upstream,id=upstream_port1,bus=root_port1[,addr=x]          \
+> >        -device xio3130-downstream,id=downstream_port1,bus=upstream_port1,chassis=x1,slot=y1[,addr=z1]] \
+> >        -device <dev>,bus=downstream_port1
+> > 
+> >  Notes:
+> > -  - (slot, chassis) pair is mandatory and must be
+> > -     unique for each PCI Express Root Port.
+> > +  - (slot, chassis) pair is mandatory and must be unique for each
+> > +    PCI Express Root Port. slot is default to 0 when doesn't specify it.
 
-After some recent-ish changes to how user mode executes things/stuff,
-I'm running into issues with the out of tree bsd-user mode code that
-FreeBSD has been maintaining.  It looks like the host_signal_handler()
-is never executed or registered correctly in our code.  I'm curious if
-the linux-user code can handle this bit of configure script from m4.
+Please rewrite last sentence as
 
-https://people.freebsd.org/~sbruno/stack.c
+ slot defaults to 0 when not specified.
 
-If someone has the time/inclination, can this code be compiled for ARMv6
-and executed in a linux chroot with the -strace argument applied?  I see
-the following, which after much debugging seems to indicate that the
-host_signal_handler() code is never executed as this code is requesting
-that SIGSEGV be masked to its own handler.
+> >    - 'addr' parameter can be 0 for all the examples above.
+> > 
+> > 
+> > 
+> 
+> Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
+> 
+> Thanks,
+> Marcel
+> 
 
-https://people.freebsd.org/~sbruno/qemu-bsd-user-arm.txt
-
-Prior to 7e6c57e2957c7d868f74bd0d53b5e861b495e1c7 this DTRT for our
-ARMv6 targets.
-
-sean
-
-
---UnsI568FKQ8AMbMlGdeAlUI64hP4Haf3m
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQGTBAEBCgB9FiEEuq1GMucSHejSCZfdEgHvyh5yfmQFAlhj1PJfFIAAAAAALgAo
-aXNzdWVyLWZwckBub3RhdGlvbnMub3BlbnBncC5maWZ0aGhvcnNlbWFuLm5ldEJB
-QUQ0NjMyRTcxMjFERThEMjA5OTdERDEyMDFFRkNBMUU3MjdFNjQACgkQEgHvyh5y
-fmTBXAf+KiOhuLGdk1q8meJhh6+XtXRUmIa39lpF5G6np1TJtODCbFzHlbu9YKB3
-PBXRSuNt2a4gtlvQjP0OUqpaolmKt4b+3S8Mui82vnXrJJWmySIz9bojuCHGpFoT
-pJpIUXWE9RbrDWfORSeNVV5K3iQdbah50R4zkEp1tqmnyAab9YxgJ1MuTGAJko8+
-YIkIVl5Pbq5t8HSRgAoYvgH84AlHc9cJ7H/KUHco7DTsJK49VzyyfNaTPKwZ+QR4
-y8uAtqP9MpDHzdeOhDNsR3PaEfnNEmNO/c8jIXJ78RH8gB9mQMZPI+OrpOHGqjeb
-tYcNTf+s/YMbVf0RF4vuIyBt/wy5tw==
-=QxHJ
------END PGP SIGNATURE-----
-
---UnsI568FKQ8AMbMlGdeAlUI64hP4Haf3m--
+Thanks,
+drew
