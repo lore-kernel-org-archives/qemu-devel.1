@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34198)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38036)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cMGBz-00037F-Uw
-	for qemu-devel@nongnu.org; Wed, 28 Dec 2016 10:31:05 -0500
+	(envelope-from <vilanova@ac.upc.edu>) id 1cMGPE-0000D9-GS
+	for qemu-devel@nongnu.org; Wed, 28 Dec 2016 10:44:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cMGBw-0008S1-KV
-	for qemu-devel@nongnu.org; Wed, 28 Dec 2016 10:31:03 -0500
-Received: from indium.canonical.com ([91.189.90.7]:59362)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cMGBw-0008Rc-EX
-	for qemu-devel@nongnu.org; Wed, 28 Dec 2016 10:31:00 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cMGBt-0005T1-0V
-	for <qemu-devel@nongnu.org>; Wed, 28 Dec 2016 15:30:57 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 2D32C2E80EC
-	for <qemu-devel@nongnu.org>; Wed, 28 Dec 2016 15:30:51 +0000 (UTC)
+	(envelope-from <vilanova@ac.upc.edu>) id 1cMGPB-0004TL-RW
+	for qemu-devel@nongnu.org; Wed, 28 Dec 2016 10:44:44 -0500
+Received: from roura.ac.upc.es ([147.83.33.10]:60249)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <vilanova@ac.upc.edu>) id 1cMGPB-0004QF-FC
+	for qemu-devel@nongnu.org; Wed, 28 Dec 2016 10:44:41 -0500
+From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
+Date: Wed, 28 Dec 2016 16:44:37 +0100
+Message-Id: <148293987753.31645.8166717498506500137.stgit@fimbulvetr.bsc.es>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 28 Dec 2016 15:18:19 -0000
-From: Thomas Huth <1649042@bugs.launchpad.net>
-Reply-To: Bug 1649042 <1649042@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20161211032601.16375.45078.malonedeb@soybean.canonical.com>
-Message-Id: <20161228151819.3309.78918.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1649042] Re: Ubuntu 16.04.1 LightDM Resolution
- Not Correct
+Subject: [Qemu-devel] [RFC PATCH v4 0/6] translate: [tcg] Generic
+ translation framework
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,63 +26,100 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-OK, if it works with -vga virtio, I think we should close this bug as
-WONTFIX, since the -vga vmware code is pretty much unmaintained as far
-as I know (if somebody is willing to fix this there, too, feel free to
-open this bug again).
+This series proposes a generic (target-agnostic) instruction translation
+framework.
 
-** Changed in: qemu
-       Status: New =3D> Won't Fix
+It basically provides a generic main loop for instruction disassembly, wh=
+ich
+calls target-specific functions when necessary. This generalization makes
+inserting new code in the main loop easier, and helps in keeping all targ=
+ets in
+synch as to the contents of it.
 
--- =
+This series also paves the way towards adding events to trace guest code
+execution (BBLs and instructions).
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1649042
+I've ported i386/x86-64 and arm/aarch64 as an example to see how it fits =
+in the
+current organization, but will port the rest when this series gets merged.
 
-Title:
-  Ubuntu 16.04.1 LightDM Resolution Not Correct
+Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+---
 
-Status in QEMU:
-  Won't Fix
+Changes in v4
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
 
-Bug description:
-  My Specs:
+* Document new macro QTAILQ_FOREACH_CONTINUE [Peter Maydell].
+* Fix coding style errors reported by checkpatch.
+* Remove use of "restrict" in added functions; it makes older gcc version=
+s barf
+  about compilation errors.
 
-  Slackware 14.2 x86_64 > Host
-  Nvidia GPU GTX660M
-  nvidia-driver-352.63
-  QEMU 2.7.0
 
-  Ubuntu 16.04.1 x86_64 > Guest
-  Unity
-  Xorg nouveau - 1:1.0.12-1build2
+Changes in v3
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
 
-  These are the startup options for Ubuntu:
+* Rebase on 0737f32daf.
 
-  qemu-system-x86_64 -drive format=3Draw,file=3Dubuntu.img \
-  -cpu host \
-  --enable-kvm \
-  -smp 2 \
-  -m 4096 \
-  -vga vmware \
-  -soundhw ac97 \
-  -usbdevice tablet \
-  -rtc base=3Dlocaltime \
-  -usbdevice host:0781:5575
 
-  Unity desktop resolution set for 1440x900.
+Changes in v2
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
 
-  I noticed when I come to the login screen to enter my password the
-  LightDM resolution fills my entire desktop.
+* Port ARM and AARCH64 targets.
+* Fold single-stepping checks into "max_insns" [Richard Henderson].
+* Move instruction start marks to target code [Richard Henderson].
+* Add target hook for TB start.
+* Check for TCG temporary leaks.
+* Move instruction disassembly into a target hook.
+* Make breakpoint_hit() return an enum to accomodate target's needs (ARM).
 
-  I searched online and found this solution;
 
-  cp ~/.config/monitor.xml /var/lib/lightdm/.config
+Llu=C3=ADs Vilanova (6):
+      Pass generic CPUState to gen_intermediate_code()
+      queue: Add macro for incremental traversal
+      target: [tcg] Add generic translation framework
+      target: [tcg] Redefine DISAS_* onto the generic translation framewo=
+rk (DJ_*)
+      target: [tcg,i386] Port to generic translation framework
+      target: [tcg,arm] Port to generic translation framework
 
-  For now I'm assuming this step should not be needed and the resolution
-  should be correctly detected and set?
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1649042/+subscriptions
+ include/exec/exec-all.h               |   13 -
+ include/exec/gen-icount.h             |    2=20
+ include/exec/translate-all_template.h |   73 +++
+ include/qemu/queue.h                  |   12 +
+ include/qom/cpu.h                     |   22 +
+ target-alpha/translate.c              |   11 -
+ target-arm/translate-a64.c            |  346 ++++++++--------
+ target-arm/translate.c                |  720 +++++++++++++++++----------=
+------
+ target-arm/translate.h                |   41 +-
+ target-cris/translate.c               |   20 -
+ target-i386/translate.c               |  305 ++++++--------
+ target-lm32/translate.c               |   22 +
+ target-m68k/translate.c               |   18 -
+ target-microblaze/translate.c         |   22 +
+ target-mips/translate.c               |   15 -
+ target-moxie/translate.c              |   14 -
+ target-openrisc/translate.c           |   22 +
+ target-ppc/translate.c                |   15 -
+ target-s390x/translate.c              |   16 -
+ target-sh4/translate.c                |   15 -
+ target-sparc/translate.c              |   11 -
+ target-tilegx/translate.c             |    7=20
+ target-tricore/translate.c            |    9=20
+ target-unicore32/translate.c          |   20 -
+ target-xtensa/translate.c             |   13 -
+ translate-all.c                       |    2=20
+ translate-all_template.h              |  204 +++++++++
+ 27 files changed, 1137 insertions(+), 853 deletions(-)
+ create mode 100644 include/exec/translate-all_template.h
+ create mode 100644 translate-all_template.h
+
+
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>
+Cc: Richard Henderson <rth@twiddle.net>
