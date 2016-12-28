@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43769)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43858)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1cMJAE-0004fF-5H
-	for qemu-devel@nongnu.org; Wed, 28 Dec 2016 13:41:29 -0500
+	(envelope-from <vilanova@ac.upc.edu>) id 1cMJAR-0004wK-Jf
+	for qemu-devel@nongnu.org; Wed, 28 Dec 2016 13:41:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1cMJAA-0001KG-Um
-	for qemu-devel@nongnu.org; Wed, 28 Dec 2016 13:41:26 -0500
-Received: from roura.ac.upc.edu ([147.83.33.10]:48444 helo=roura.ac.upc.es)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1cMJAA-0001K6-IR
-	for qemu-devel@nongnu.org; Wed, 28 Dec 2016 13:41:22 -0500
+	(envelope-from <vilanova@ac.upc.edu>) id 1cMJAQ-0001O8-LB
+	for qemu-devel@nongnu.org; Wed, 28 Dec 2016 13:41:39 -0500
 From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
-Date: Wed, 28 Dec 2016 19:41:21 +0100
-Message-Id: <148295048135.19871.12852642671384038461.stgit@fimbulvetr.bsc.es>
+Date: Wed, 28 Dec 2016 19:41:32 +0100
+Message-Id: <148295049207.19871.7803795601750850862.stgit@fimbulvetr.bsc.es>
 In-Reply-To: <148295045448.19871.9819696634619157347.stgit@fimbulvetr.bsc.es>
 References: <148295045448.19871.9819696634619157347.stgit@fimbulvetr.bsc.es>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v6 5/7] trace: [tcg] Do not generate TCG code
- to trace dinamically-disabled events
+Subject: [Qemu-devel] [PATCH v6 7/7] trace: [trivial] Statically enable all
+ guest events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,142 +24,55 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>, "open list:Trivial patches" <qemu-trivial@nongnu.org>
 
-If an event is dynamically disabled, the TCG code that calls the
-execution-time tracer is not generated.
-
-Removes the overheads of execution-time tracers for dynamically disabled
-events. As a bonus, also avoids checking the event state when the
-execution-time tracer is called from TCG-generated code (since otherwise
-TCG would simply not call it).
+The optimizations of this series makes it feasible to have them
+available on all builds.
 
 Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
 ---
- scripts/tracetool/__init__.py            |    1 +
- scripts/tracetool/format/h.py            |   24 ++++++++++++++++++------
- scripts/tracetool/format/tcg_h.py        |   19 ++++++++++++++++---
- scripts/tracetool/format/tcg_helper_c.py |    3 ++-
- 4 files changed, 37 insertions(+), 10 deletions(-)
+ trace-events |    6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/scripts/tracetool/__init__.py b/scripts/tracetool/__init__.p=
-y
-index 365446fa53..63168ccdf0 100644
---- a/scripts/tracetool/__init__.py
-+++ b/scripts/tracetool/__init__.py
-@@ -264,6 +264,7 @@ class Event(object):
-         return self._FMT.findall(self.fmt)
+diff --git a/trace-events b/trace-events
+index f74e1d3d22..0a0f4d9cd6 100644
+--- a/trace-events
++++ b/trace-events
+@@ -159,7 +159,7 @@ vcpu guest_cpu_reset(void)
+ #
+ # Mode: user, softmmu
+ # Targets: TCG(all)
+-disable vcpu tcg guest_mem_before(TCGv vaddr, uint8_t info) "info=3D%d",=
+ "vaddr=3D0x%016"PRIx64" info=3D%d"
++vcpu tcg guest_mem_before(TCGv vaddr, uint8_t info) "info=3D%d", "vaddr=3D=
+0x%016"PRIx64" info=3D%d"
 =20
-     QEMU_TRACE               =3D "trace_%(name)s"
-+    QEMU_TRACE_NOCHECK       =3D "_nocheck__" + QEMU_TRACE
-     QEMU_TRACE_TCG           =3D QEMU_TRACE + "_tcg"
-     QEMU_DSTATE              =3D "_TRACE_%(NAME)s_DSTATE"
-     QEMU_EVENT               =3D "_TRACE_%(NAME)s_EVENT"
-diff --git a/scripts/tracetool/format/h.py b/scripts/tracetool/format/h.p=
-y
-index 3682f4e6a8..a78e50ef35 100644
---- a/scripts/tracetool/format/h.py
-+++ b/scripts/tracetool/format/h.py
-@@ -49,6 +49,19 @@ def generate(events, backend, group):
-     backend.generate_begin(events, group)
+ # @num: System call number.
+ # @arg*: System call argument value.
+@@ -168,7 +168,7 @@ disable vcpu tcg guest_mem_before(TCGv vaddr, uint8_t=
+ info) "info=3D%d", "vaddr=3D0x
+ #
+ # Mode: user
+ # Targets: TCG(all)
+-disable vcpu guest_user_syscall(uint64_t num, uint64_t arg1, uint64_t ar=
+g2, uint64_t arg3, uint64_t arg4, uint64_t arg5, uint64_t arg6, uint64_t =
+arg7, uint64_t arg8) "num=3D0x%016"PRIx64" arg1=3D0x%016"PRIx64" arg2=3D0=
+x%016"PRIx64" arg3=3D0x%016"PRIx64" arg4=3D0x%016"PRIx64" arg5=3D0x%016"P=
+RIx64" arg6=3D0x%016"PRIx64" arg7=3D0x%016"PRIx64" arg8=3D0x%016"PRIx64
++vcpu guest_user_syscall(uint64_t num, uint64_t arg1, uint64_t arg2, uint=
+64_t arg3, uint64_t arg4, uint64_t arg5, uint64_t arg6, uint64_t arg7, ui=
+nt64_t arg8) "num=3D0x%016"PRIx64" arg1=3D0x%016"PRIx64" arg2=3D0x%016"PR=
+Ix64" arg3=3D0x%016"PRIx64" arg4=3D0x%016"PRIx64" arg5=3D0x%016"PRIx64" a=
+rg6=3D0x%016"PRIx64" arg7=3D0x%016"PRIx64" arg8=3D0x%016"PRIx64
 =20
-     for e in events:
-+        # tracer without checks
-+        out('',
-+            'static inline void %(api)s(%(args)s)',
-+            '{',
-+            api=3De.api(e.QEMU_TRACE_NOCHECK),
-+            args=3De.args)
-+
-+        if "disable" not in e.properties:
-+            backend.generate(e, group)
-+
-+        out('}')
-+
-+        # tracer wrapper with checks (per-vCPU tracing)
-         if "vcpu" in e.properties:
-             trace_cpu =3D next(iter(e.args))[1]
-             cond =3D "trace_event_get_vcpu_state(%(cpu)s,"\
-@@ -63,16 +76,15 @@ def generate(events, backend, group):
-             'static inline void %(api)s(%(args)s)',
-             '{',
-             '    if (%(cond)s) {',
-+            '        %(api_nocheck)s(%(names)s);',
-+            '    }',
-+            '}',
-             api=3De.api(),
-+            api_nocheck=3De.api(e.QEMU_TRACE_NOCHECK),
-             args=3De.args,
-+            names=3D", ".join(e.args.names()),
-             cond=3Dcond)
-=20
--        if "disable" not in e.properties:
--            backend.generate(e, group)
--
--        out('    }',
--            '}')
--
-     backend.generate_end(events, group)
-=20
-     out('#endif /* TRACE_%s_GENERATED_TRACERS_H */' % group.upper())
-diff --git a/scripts/tracetool/format/tcg_h.py b/scripts/tracetool/format=
-/tcg_h.py
-index 5f213f6cba..71b5c09432 100644
---- a/scripts/tracetool/format/tcg_h.py
-+++ b/scripts/tracetool/format/tcg_h.py
-@@ -41,7 +41,7 @@ def generate(events, backend, group):
-=20
-     for e in events:
-         # just keep one of them
--        if "tcg-trans" not in e.properties:
-+        if "tcg-exec" not in e.properties:
-             continue
-=20
-         out('static inline void %(name_tcg)s(%(args)s)',
-@@ -53,12 +53,25 @@ def generate(events, backend, group):
-             args_trans =3D e.original.event_trans.args
-             args_exec =3D tracetool.vcpu.transform_args(
-                 "tcg_helper_c", e.original.event_exec, "wrapper")
-+            if "vcpu" in e.properties:
-+                trace_cpu =3D e.args.names()[0]
-+                cond =3D "trace_event_get_vcpu_state(%(cpu)s,"\
-+                       " TRACE_%(id)s)"\
-+                       % dict(
-+                           cpu=3Dtrace_cpu,
-+                           id=3De.original.event_exec.name.upper())
-+            else:
-+                cond =3D "true"
-+
-             out('    %(name_trans)s(%(argnames_trans)s);',
--                '    gen_helper_%(name_exec)s(%(argnames_exec)s);',
-+                '    if (%(cond)s) {',
-+                '        gen_helper_%(name_exec)s(%(argnames_exec)s);',
-+                '    }',
-                 name_trans=3De.original.event_trans.api(e.QEMU_TRACE),
-                 name_exec=3De.original.event_exec.api(e.QEMU_TRACE),
-                 argnames_trans=3D", ".join(args_trans.names()),
--                argnames_exec=3D", ".join(args_exec.names()))
-+                argnames_exec=3D", ".join(args_exec.names()),
-+                cond=3Dcond)
-=20
-         out('}')
-=20
-diff --git a/scripts/tracetool/format/tcg_helper_c.py b/scripts/tracetool=
-/format/tcg_helper_c.py
-index cc26e03008..c2a05d756c 100644
---- a/scripts/tracetool/format/tcg_helper_c.py
-+++ b/scripts/tracetool/format/tcg_helper_c.py
-@@ -66,10 +66,11 @@ def generate(events, backend, group):
-=20
-         out('void %(name_tcg)s(%(args_api)s)',
-             '{',
-+            # NOTE: the check was already performed at TCG-generation ti=
-me
-             '    %(name)s(%(args_call)s);',
-             '}',
-             name_tcg=3D"helper_%s_proxy" % e.api(),
--            name=3De.api(),
-+            name=3De.api(e.QEMU_TRACE_NOCHECK),
-             args_api=3De_args_api,
-             args_call=3D", ".join(e_args_call.casted()),
-             )
+ # @num: System call number.
+ # @ret: System call result value.
+@@ -177,4 +177,4 @@ disable vcpu guest_user_syscall(uint64_t num, uint64_=
+t arg1, uint64_t arg2, uint
+ #
+ # Mode: user
+ # Targets: TCG(all)
+-disable vcpu guest_user_syscall_ret(uint64_t num, uint64_t ret) "num=3D0=
+x%016"PRIx64" ret=3D0x%016"PRIx64
++vcpu guest_user_syscall_ret(uint64_t num, uint64_t ret) "num=3D0x%016"PR=
+Ix64" ret=3D0x%016"PRIx64
