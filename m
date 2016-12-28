@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38250)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39973)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1cMGQY-0001H4-8i
-	for qemu-devel@nongnu.org; Wed, 28 Dec 2016 10:46:11 -0500
+	(envelope-from <no-reply@patchew.org>) id 1cMGde-0000p5-KP
+	for qemu-devel@nongnu.org; Wed, 28 Dec 2016 10:59:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1cMGQU-0004ys-2o
-	for qemu-devel@nongnu.org; Wed, 28 Dec 2016 10:46:06 -0500
-From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
-Date: Wed, 28 Dec 2016 16:44:43 +0100
-Message-Id: <148293988310.31645.17310296111845545049.stgit@fimbulvetr.bsc.es>
+	(envelope-from <no-reply@patchew.org>) id 1cMGdZ-0007FB-OK
+	for qemu-devel@nongnu.org; Wed, 28 Dec 2016 10:59:38 -0500
+Resent-Message-Id: <E1cMGdZ-0007FB-OK@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21400)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1cMGdZ-0007Ei-Cd
+	for qemu-devel@nongnu.org; Wed, 28 Dec 2016 10:59:33 -0500
 In-Reply-To: <148293987753.31645.8166717498506500137.stgit@fimbulvetr.bsc.es>
-References: <148293987753.31645.8166717498506500137.stgit@fimbulvetr.bsc.es>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <148294074463.127.13007157172340216335@790289a7ca88>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 1/6] Pass generic CPUState to
- gen_intermediate_code()
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 28 Dec 2016 07:59:05 -0800 (PST)
+Subject: Re: [Qemu-devel] [RFC PATCH v4 0/6] translate: [tcg] Generic
+ translation framework
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,1258 +29,799 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Michael Walle <michael@walle.cc>, Laurent Vivier <laurent@vivier.eu>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>, Anthony Green <green@moxielogic.com>, Jia Liu <proljc@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Max Filippov <jcmvbkbc@gmail.com>, "open list:ARM" <qemu-arm@nongnu.org>, "open list:PowerPC" <qemu-ppc@nongnu.org>
+To: vilanova@ac.upc.edu
+Cc: famz@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com, crosthwaite.peter@gmail.com, rth@twiddle.net
 
-Needed to implement a target-agnostic gen_intermediate_code() in the
-future.
-
-Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
----
- include/exec/exec-all.h       |    2 +-
- target-alpha/translate.c      |   11 +++++------
- target-arm/translate.c        |   24 ++++++++++++------------
- target-cris/translate.c       |   17 ++++++++---------
- target-i386/translate.c       |   13 ++++++-------
- target-lm32/translate.c       |   22 +++++++++++-----------
- target-m68k/translate.c       |   15 +++++++--------
- target-microblaze/translate.c |   22 +++++++++++-----------
- target-mips/translate.c       |   15 +++++++--------
- target-moxie/translate.c      |   14 +++++++-------
- target-openrisc/translate.c   |   22 +++++++++++-----------
- target-ppc/translate.c        |   15 +++++++--------
- target-s390x/translate.c      |   13 ++++++-------
- target-sh4/translate.c        |   15 +++++++--------
- target-sparc/translate.c      |   11 +++++------
- target-tilegx/translate.c     |    7 +++----
- target-tricore/translate.c    |    9 ++++-----
- target-unicore32/translate.c  |   17 ++++++++---------
- target-xtensa/translate.c     |   13 ++++++-------
- translate-all.c               |    2 +-
- 20 files changed, 133 insertions(+), 146 deletions(-)
-
-diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
-index a8c13cee66..0e45e1aedc 100644
---- a/include/exec/exec-all.h
-+++ b/include/exec/exec-all.h
-@@ -43,7 +43,7 @@ typedef ram_addr_t tb_page_addr_t;
-=20
- #include "qemu/log.h"
-=20
--void gen_intermediate_code(CPUArchState *env, struct TranslationBlock *t=
-b);
-+void gen_intermediate_code(CPUState *env, struct TranslationBlock *tb);
- void restore_state_to_opc(CPUArchState *env, struct TranslationBlock *tb=
-,
-                           target_ulong *data);
-=20
-diff --git a/target-alpha/translate.c b/target-alpha/translate.c
-index 114927b751..6759ec28cc 100644
---- a/target-alpha/translate.c
-+++ b/target-alpha/translate.c
-@@ -2873,10 +2873,9 @@ static ExitStatus translate_one(DisasContext *ctx,=
- uint32_t insn)
-     return ret;
- }
-=20
--void gen_intermediate_code(CPUAlphaState *env, struct TranslationBlock *=
-tb)
-+void gen_intermediate_code(CPUState *cpu, struct TranslationBlock *tb)
- {
--    AlphaCPU *cpu =3D alpha_env_get_cpu(env);
--    CPUState *cs =3D CPU(cpu);
-+    CPUAlphaState *env =3D cpu->env_ptr;
-     DisasContext ctx, *ctxp =3D &ctx;
-     target_ulong pc_start;
-     target_ulong pc_mask;
-@@ -2891,7 +2890,7 @@ void gen_intermediate_code(CPUAlphaState *env, stru=
-ct TranslationBlock *tb)
-     ctx.pc =3D pc_start;
-     ctx.mem_idx =3D cpu_mmu_index(env, false);
-     ctx.implver =3D env->implver;
--    ctx.singlestep_enabled =3D cs->singlestep_enabled;
-+    ctx.singlestep_enabled =3D cpu->singlestep_enabled;
-=20
- #ifdef CONFIG_USER_ONLY
-     ctx.ir =3D cpu_std_ir;
-@@ -2934,7 +2933,7 @@ void gen_intermediate_code(CPUAlphaState *env, stru=
-ct TranslationBlock *tb)
-         tcg_gen_insn_start(ctx.pc);
-         num_insns++;
-=20
--        if (unlikely(cpu_breakpoint_test(cs, ctx.pc, BP_ANY))) {
-+        if (unlikely(cpu_breakpoint_test(cpu, ctx.pc, BP_ANY))) {
-             ret =3D gen_excp(&ctx, EXCP_DEBUG, 0);
-             /* The address covered by the breakpoint must be included in
-                [tb->pc, tb->pc + tb->size) in order to for it to be
-@@ -2996,7 +2995,7 @@ void gen_intermediate_code(CPUAlphaState *env, stru=
-ct TranslationBlock *tb)
-         && qemu_log_in_addr_range(pc_start)) {
-         qemu_log_lock();
-         qemu_log("IN: %s\n", lookup_symbol(pc_start));
--        log_target_disas(cs, pc_start, ctx.pc - pc_start, 1);
-+        log_target_disas(cpu, pc_start, ctx.pc - pc_start, 1);
-         qemu_log("\n");
-         qemu_log_unlock();
-     }
-diff --git a/target-arm/translate.c b/target-arm/translate.c
-index 0ad9070b45..3aa766901c 100644
---- a/target-arm/translate.c
-+++ b/target-arm/translate.c
-@@ -11589,10 +11589,10 @@ static bool insn_crosses_page(CPUARMState *env,=
- DisasContext *s)
- }
-=20
- /* generate intermediate code for basic block 'tb'.  */
--void gen_intermediate_code(CPUARMState *env, TranslationBlock *tb)
-+void gen_intermediate_code(CPUState *cpu, TranslationBlock *tb)
- {
--    ARMCPU *cpu =3D arm_env_get_cpu(env);
--    CPUState *cs =3D CPU(cpu);
-+    CPUARMState *env =3D cpu->env_ptr;
-+    ARMCPU *arm_cpu =3D arm_env_get_cpu(env);
-     DisasContext dc1, *dc =3D &dc1;
-     target_ulong pc_start;
-     target_ulong next_page_start;
-@@ -11606,7 +11606,7 @@ void gen_intermediate_code(CPUARMState *env, Tran=
-slationBlock *tb)
-      * the A32/T32 complexity to do with conditional execution/IT blocks=
-/etc.
-      */
-     if (ARM_TBFLAG_AARCH64_STATE(tb->flags)) {
--        gen_intermediate_code_a64(cpu, tb);
-+        gen_intermediate_code_a64(arm_cpu, tb);
-         return;
-     }
-=20
-@@ -11616,7 +11616,7 @@ void gen_intermediate_code(CPUARMState *env, Tran=
-slationBlock *tb)
-=20
-     dc->is_jmp =3D DISAS_NEXT;
-     dc->pc =3D pc_start;
--    dc->singlestep_enabled =3D cs->singlestep_enabled;
-+    dc->singlestep_enabled =3D cpu->singlestep_enabled;
-     dc->condjmp =3D 0;
-=20
-     dc->aarch64 =3D 0;
-@@ -11641,7 +11641,7 @@ void gen_intermediate_code(CPUARMState *env, Tran=
-slationBlock *tb)
-     dc->vec_len =3D ARM_TBFLAG_VECLEN(tb->flags);
-     dc->vec_stride =3D ARM_TBFLAG_VECSTRIDE(tb->flags);
-     dc->c15_cpar =3D ARM_TBFLAG_XSCALE_CPAR(tb->flags);
--    dc->cp_regs =3D cpu->cp_regs;
-+    dc->cp_regs =3D arm_cpu->cp_regs;
-     dc->features =3D env->features;
-=20
-     /* Single step state. The code-generation logic here is:
-@@ -11749,9 +11749,9 @@ void gen_intermediate_code(CPUARMState *env, Tran=
-slationBlock *tb)
-         }
- #endif
-=20
--        if (unlikely(!QTAILQ_EMPTY(&cs->breakpoints))) {
-+        if (unlikely(!QTAILQ_EMPTY(&cpu->breakpoints))) {
-             CPUBreakpoint *bp;
--            QTAILQ_FOREACH(bp, &cs->breakpoints, entry) {
-+            QTAILQ_FOREACH(bp, &cpu->breakpoints, entry) {
-                 if (bp->pc =3D=3D dc->pc) {
-                     if (bp->flags & BP_CPU) {
-                         gen_set_condexec(dc);
-@@ -11841,7 +11841,7 @@ void gen_intermediate_code(CPUARMState *env, Tran=
-slationBlock *tb)
-             ((dc->pc >=3D next_page_start - 3) && insn_crosses_page(env,=
- dc));
-=20
-     } while (!dc->is_jmp && !tcg_op_buf_full() &&
--             !cs->singlestep_enabled &&
-+             !cpu->singlestep_enabled &&
-              !singlestep &&
-              !dc->ss_active &&
-              !end_of_page &&
-@@ -11851,7 +11851,7 @@ void gen_intermediate_code(CPUARMState *env, Tran=
-slationBlock *tb)
-         if (dc->condjmp) {
-             /* FIXME:  This can theoretically happen with self-modifying
-                code.  */
--            cpu_abort(cs, "IO on conditional branch instruction");
-+            cpu_abort(cpu, "IO on conditional branch instruction");
-         }
-         gen_io_end();
-     }
-@@ -11859,7 +11859,7 @@ void gen_intermediate_code(CPUARMState *env, Tran=
-slationBlock *tb)
-     /* At this stage dc->condjmp will only be set when the skipped
-        instruction was a conditional branch or trap, and the PC has
-        already been written.  */
--    if (unlikely(cs->singlestep_enabled || dc->ss_active)) {
-+    if (unlikely(cpu->singlestep_enabled || dc->ss_active)) {
-         /* Unconditional and "condition passed" instruction codepath. */
-         gen_set_condexec(dc);
-         switch (dc->is_jmp) {
-@@ -11966,7 +11966,7 @@ done_generating:
-         qemu_log_lock();
-         qemu_log("----------------\n");
-         qemu_log("IN: %s\n", lookup_symbol(pc_start));
--        log_target_disas(cs, pc_start, dc->pc - pc_start,
-+        log_target_disas(cpu, pc_start, dc->pc - pc_start,
-                          dc->thumb | (dc->sctlr_b << 1));
-         qemu_log("\n");
-         qemu_log_unlock();
-diff --git a/target-cris/translate.c b/target-cris/translate.c
-index b91042743f..ebcf7863bf 100644
---- a/target-cris/translate.c
-+++ b/target-cris/translate.c
-@@ -3080,10 +3080,9 @@ static unsigned int crisv32_decoder(CPUCRISState *=
-env, DisasContext *dc)
-  */
-=20
- /* generate intermediate code for basic block 'tb'.  */
--void gen_intermediate_code(CPUCRISState *env, struct TranslationBlock *t=
-b)
-+void gen_intermediate_code(CPUState *cpu, struct TranslationBlock *tb)
- {
--    CRISCPU *cpu =3D cris_env_get_cpu(env);
--    CPUState *cs =3D CPU(cpu);
-+    CPUCRISState *env =3D cpu->env_ptr;
-     uint32_t pc_start;
-     unsigned int insn_len;
-     struct DisasContext ctx;
-@@ -3105,13 +3104,13 @@ void gen_intermediate_code(CPUCRISState *env, str=
-uct TranslationBlock *tb)
-      * delayslot, like in real hw.
-      */
-     pc_start =3D tb->pc & ~1;
--    dc->cpu =3D cpu;
-+    dc->cpu =3D cris_env_get_cpu(env);
-     dc->tb =3D tb;
-=20
-     dc->is_jmp =3D DISAS_NEXT;
-     dc->ppc =3D pc_start;
-     dc->pc =3D pc_start;
--    dc->singlestep_enabled =3D cs->singlestep_enabled;
-+    dc->singlestep_enabled =3D cpu->singlestep_enabled;
-     dc->flags_uptodate =3D 1;
-     dc->flagx_known =3D 1;
-     dc->flags_x =3D tb->flags & X_FLAG;
-@@ -3151,7 +3150,7 @@ void gen_intermediate_code(CPUCRISState *env, struc=
-t TranslationBlock *tb)
-                            ? dc->ppc | 1 : dc->pc);
-         num_insns++;
-=20
--        if (unlikely(cpu_breakpoint_test(cs, dc->pc, BP_ANY))) {
-+        if (unlikely(cpu_breakpoint_test(cpu, dc->pc, BP_ANY))) {
-             cris_evaluate_flags(dc);
-             tcg_gen_movi_tl(env_pc, dc->pc);
-             t_gen_raise_exception(EXCP_DEBUG);
-@@ -3225,7 +3224,7 @@ void gen_intermediate_code(CPUCRISState *env, struc=
-t TranslationBlock *tb)
-=20
-         /* If we are rexecuting a branch due to exceptions on
-            delay slots don't break.  */
--        if (!(tb->pc & 1) && cs->singlestep_enabled) {
-+        if (!(tb->pc & 1) && cpu->singlestep_enabled) {
-             break;
-         }
-     } while (!dc->is_jmp && !dc->cpustate_changed
-@@ -3258,7 +3257,7 @@ void gen_intermediate_code(CPUCRISState *env, struc=
-t TranslationBlock *tb)
-=20
-     cris_evaluate_flags(dc);
-=20
--    if (unlikely(cs->singlestep_enabled)) {
-+    if (unlikely(cpu->singlestep_enabled)) {
-         if (dc->is_jmp =3D=3D DISAS_NEXT) {
-             tcg_gen_movi_tl(env_pc, npc);
-         }
-@@ -3293,7 +3292,7 @@ void gen_intermediate_code(CPUCRISState *env, struc=
-t TranslationBlock *tb)
-         qemu_log_lock();
-         qemu_log("--------------\n");
-         qemu_log("IN: %s\n", lookup_symbol(pc_start));
--        log_target_disas(cs, pc_start, dc->pc - pc_start,
-+        log_target_disas(cpu, pc_start, dc->pc - pc_start,
-                          env->pregs[PR_VR]);
-         qemu_log("\nisize=3D%d osize=3D%d\n",
-                  dc->pc - pc_start, tcg_op_buf_count());
-diff --git a/target-i386/translate.c b/target-i386/translate.c
-index 324103c885..61d73e286f 100644
---- a/target-i386/translate.c
-+++ b/target-i386/translate.c
-@@ -8308,10 +8308,9 @@ void tcg_x86_init(void)
- }
-=20
- /* generate intermediate code for basic block 'tb'.  */
--void gen_intermediate_code(CPUX86State *env, TranslationBlock *tb)
-+void gen_intermediate_code(CPUState *cpu, TranslationBlock *tb)
- {
--    X86CPU *cpu =3D x86_env_get_cpu(env);
--    CPUState *cs =3D CPU(cpu);
-+    CPUX86State *env =3D cpu->env_ptr;
-     DisasContext dc1, *dc =3D &dc1;
-     target_ulong pc_ptr;
-     uint32_t flags;
-@@ -8334,7 +8333,7 @@ void gen_intermediate_code(CPUX86State *env, Transl=
-ationBlock *tb)
-     dc->cpl =3D (flags >> HF_CPL_SHIFT) & 3;
-     dc->iopl =3D (flags >> IOPL_SHIFT) & 3;
-     dc->tf =3D (flags >> TF_SHIFT) & 1;
--    dc->singlestep_enabled =3D cs->singlestep_enabled;
-+    dc->singlestep_enabled =3D cpu->singlestep_enabled;
-     dc->cc_op =3D CC_OP_DYNAMIC;
-     dc->cc_op_dirty =3D false;
-     dc->cs_base =3D cs_base;
-@@ -8356,7 +8355,7 @@ void gen_intermediate_code(CPUX86State *env, Transl=
-ationBlock *tb)
-     dc->code64 =3D (flags >> HF_CS64_SHIFT) & 1;
- #endif
-     dc->flags =3D flags;
--    dc->jmp_opt =3D !(dc->tf || cs->singlestep_enabled ||
-+    dc->jmp_opt =3D !(dc->tf || cpu->singlestep_enabled ||
-                     (flags & HF_INHIBIT_IRQ_MASK));
-     /* Do not optimize repz jumps at all in icount mode, because
-        rep movsS instructions are execured with different paths
-@@ -8405,7 +8404,7 @@ void gen_intermediate_code(CPUX86State *env, Transl=
-ationBlock *tb)
-         num_insns++;
-=20
-         /* If RF is set, suppress an internally generated breakpoint.  *=
-/
--        if (unlikely(cpu_breakpoint_test(cs, pc_ptr,
-+        if (unlikely(cpu_breakpoint_test(cpu, pc_ptr,
-                                          tb->flags & HF_RF_MASK
-                                          ? BP_GDB : BP_ANY))) {
-             gen_debug(dc, pc_ptr - dc->cs_base);
-@@ -8481,7 +8480,7 @@ done_generating:
-         else
- #endif
-             disas_flags =3D !dc->code32;
--        log_target_disas(cs, pc_start, pc_ptr - pc_start, disas_flags);
-+        log_target_disas(cpu, pc_start, pc_ptr - pc_start, disas_flags);
-         qemu_log("\n");
-         qemu_log_unlock();
-     }
-diff --git a/target-lm32/translate.c b/target-lm32/translate.c
-index 692882f447..0ac34fc620 100644
---- a/target-lm32/translate.c
-+++ b/target-lm32/translate.c
-@@ -1044,10 +1044,10 @@ static inline void decode(DisasContext *dc, uint3=
-2_t ir)
- }
-=20
- /* generate intermediate code for basic block 'tb'.  */
--void gen_intermediate_code(CPULM32State *env, struct TranslationBlock *t=
-b)
-+void gen_intermediate_code(CPUState *cpu, struct TranslationBlock *tb)
- {
--    LM32CPU *cpu =3D lm32_env_get_cpu(env);
--    CPUState *cs =3D CPU(cpu);
-+    CPULM32State *env =3D cpu->env_ptr;
-+    LM32CPU *lm32_cpu =3D lm32_env_get_cpu(env);
-     struct DisasContext ctx, *dc =3D &ctx;
-     uint32_t pc_start;
-     uint32_t next_page_start;
-@@ -1055,14 +1055,14 @@ void gen_intermediate_code(CPULM32State *env, str=
-uct TranslationBlock *tb)
-     int max_insns;
-=20
-     pc_start =3D tb->pc;
--    dc->features =3D cpu->features;
--    dc->num_breakpoints =3D cpu->num_breakpoints;
--    dc->num_watchpoints =3D cpu->num_watchpoints;
-+    dc->features =3D lm32_cpu->features;
-+    dc->num_breakpoints =3D lm32_cpu->num_breakpoints;
-+    dc->num_watchpoints =3D lm32_cpu->num_watchpoints;
-     dc->tb =3D tb;
-=20
-     dc->is_jmp =3D DISAS_NEXT;
-     dc->pc =3D pc_start;
--    dc->singlestep_enabled =3D cs->singlestep_enabled;
-+    dc->singlestep_enabled =3D cpu->singlestep_enabled;
-=20
-     if (pc_start & 3) {
-         qemu_log_mask(LOG_GUEST_ERROR,
-@@ -1085,7 +1085,7 @@ void gen_intermediate_code(CPULM32State *env, struc=
-t TranslationBlock *tb)
-         tcg_gen_insn_start(dc->pc);
-         num_insns++;
-=20
--        if (unlikely(cpu_breakpoint_test(cs, dc->pc, BP_ANY))) {
-+        if (unlikely(cpu_breakpoint_test(cpu, dc->pc, BP_ANY))) {
-             tcg_gen_movi_tl(cpu_pc, dc->pc);
-             t_gen_raise_exception(dc, EXCP_DEBUG);
-             dc->is_jmp =3D DISAS_UPDATE;
-@@ -1108,7 +1108,7 @@ void gen_intermediate_code(CPULM32State *env, struc=
-t TranslationBlock *tb)
-         dc->pc +=3D 4;
-     } while (!dc->is_jmp
-          && !tcg_op_buf_full()
--         && !cs->singlestep_enabled
-+         && !cpu->singlestep_enabled
-          && !singlestep
-          && (dc->pc < next_page_start)
-          && num_insns < max_insns);
-@@ -1117,7 +1117,7 @@ void gen_intermediate_code(CPULM32State *env, struc=
-t TranslationBlock *tb)
-         gen_io_end();
-     }
-=20
--    if (unlikely(cs->singlestep_enabled)) {
-+    if (unlikely(cpu->singlestep_enabled)) {
-         if (dc->is_jmp =3D=3D DISAS_NEXT) {
-             tcg_gen_movi_tl(cpu_pc, dc->pc);
-         }
-@@ -1150,7 +1150,7 @@ void gen_intermediate_code(CPULM32State *env, struc=
-t TranslationBlock *tb)
-         && qemu_log_in_addr_range(pc_start)) {
-         qemu_log_lock();
-         qemu_log("\n");
--        log_target_disas(cs, pc_start, dc->pc - pc_start, 0);
-+        log_target_disas(cpu, pc_start, dc->pc - pc_start, 0);
-         qemu_log("\nisize=3D%d osize=3D%d\n",
-                  dc->pc - pc_start, tcg_op_buf_count());
-         qemu_log_unlock();
-diff --git a/target-m68k/translate.c b/target-m68k/translate.c
-index d6ed883882..6da6f2b51b 100644
---- a/target-m68k/translate.c
-+++ b/target-m68k/translate.c
-@@ -3454,10 +3454,9 @@ static void disas_m68k_insn(CPUM68KState * env, Di=
-sasContext *s)
- }
-=20
- /* generate intermediate code for basic block 'tb'.  */
--void gen_intermediate_code(CPUM68KState *env, TranslationBlock *tb)
-+void gen_intermediate_code(CPUState *cpu, TranslationBlock *tb)
- {
--    M68kCPU *cpu =3D m68k_env_get_cpu(env);
--    CPUState *cs =3D CPU(cpu);
-+    CPUM68KState *env =3D cpu->env_ptr;
-     DisasContext dc1, *dc =3D &dc1;
-     target_ulong pc_start;
-     int pc_offset;
-@@ -3474,7 +3473,7 @@ void gen_intermediate_code(CPUM68KState *env, Trans=
-lationBlock *tb)
-     dc->pc =3D pc_start;
-     dc->cc_op =3D CC_OP_DYNAMIC;
-     dc->cc_op_synced =3D 1;
--    dc->singlestep_enabled =3D cs->singlestep_enabled;
-+    dc->singlestep_enabled =3D cpu->singlestep_enabled;
-     dc->fpcr =3D env->fpcr;
-     dc->user =3D (env->sr & SR_S) =3D=3D 0;
-     dc->done_mac =3D 0;
-@@ -3494,7 +3493,7 @@ void gen_intermediate_code(CPUM68KState *env, Trans=
-lationBlock *tb)
-         tcg_gen_insn_start(dc->pc, dc->cc_op);
-         num_insns++;
-=20
--        if (unlikely(cpu_breakpoint_test(cs, dc->pc, BP_ANY))) {
-+        if (unlikely(cpu_breakpoint_test(cpu, dc->pc, BP_ANY))) {
-             gen_exception(dc, dc->pc, EXCP_DEBUG);
-             dc->is_jmp =3D DISAS_JUMP;
-             /* The address covered by the breakpoint must be included in
-@@ -3512,14 +3511,14 @@ void gen_intermediate_code(CPUM68KState *env, Tra=
-nslationBlock *tb)
-         dc->insn_pc =3D dc->pc;
- 	disas_m68k_insn(env, dc);
-     } while (!dc->is_jmp && !tcg_op_buf_full() &&
--             !cs->singlestep_enabled &&
-+             !cpu->singlestep_enabled &&
-              !singlestep &&
-              (pc_offset) < (TARGET_PAGE_SIZE - 32) &&
-              num_insns < max_insns);
-=20
-     if (tb->cflags & CF_LAST_IO)
-         gen_io_end();
--    if (unlikely(cs->singlestep_enabled)) {
-+    if (unlikely(cpu->singlestep_enabled)) {
-         /* Make sure the pc is updated, and raise a debug exception.  */
-         if (!dc->is_jmp) {
-             update_cc_op(dc);
-@@ -3552,7 +3551,7 @@ void gen_intermediate_code(CPUM68KState *env, Trans=
-lationBlock *tb)
-         qemu_log_lock();
-         qemu_log("----------------\n");
-         qemu_log("IN: %s\n", lookup_symbol(pc_start));
--        log_target_disas(cs, pc_start, dc->pc - pc_start, 0);
-+        log_target_disas(cpu, pc_start, dc->pc - pc_start, 0);
-         qemu_log("\n");
-         qemu_log_unlock();
-     }
-diff --git a/target-microblaze/translate.c b/target-microblaze/translate.=
-c
-index de2090ac71..5289718643 100644
---- a/target-microblaze/translate.c
-+++ b/target-microblaze/translate.c
-@@ -1594,10 +1594,10 @@ static inline void decode(DisasContext *dc, uint3=
-2_t ir)
- }
-=20
- /* generate intermediate code for basic block 'tb'.  */
--void gen_intermediate_code(CPUMBState *env, struct TranslationBlock *tb)
-+void gen_intermediate_code(CPUState *cpu, struct TranslationBlock *tb)
- {
--    MicroBlazeCPU *cpu =3D mb_env_get_cpu(env);
--    CPUState *cs =3D CPU(cpu);
-+    CPUMBState *env =3D cpu->env_ptr;
-+    MicroBlazeCPU *mb_cpu =3D mb_env_get_cpu(env);
-     uint32_t pc_start;
-     struct DisasContext ctx;
-     struct DisasContext *dc =3D &ctx;
-@@ -1607,7 +1607,7 @@ void gen_intermediate_code(CPUMBState *env, struct =
-TranslationBlock *tb)
-     int max_insns;
-=20
-     pc_start =3D tb->pc;
--    dc->cpu =3D cpu;
-+    dc->cpu =3D mb_cpu;
-     dc->tb =3D tb;
-     org_flags =3D dc->synced_flags =3D dc->tb_flags =3D tb->flags;
-=20
-@@ -1618,13 +1618,13 @@ void gen_intermediate_code(CPUMBState *env, struc=
-t TranslationBlock *tb)
-         dc->jmp =3D JMP_INDIRECT;
-     }
-     dc->pc =3D pc_start;
--    dc->singlestep_enabled =3D cs->singlestep_enabled;
-+    dc->singlestep_enabled =3D cpu->singlestep_enabled;
-     dc->cpustate_changed =3D 0;
-     dc->abort_at_next_insn =3D 0;
-     dc->nr_nops =3D 0;
-=20
-     if (pc_start & 3) {
--        cpu_abort(cs, "Microblaze: unaligned PC=3D%x\n", pc_start);
-+        cpu_abort(cpu, "Microblaze: unaligned PC=3D%x\n", pc_start);
-     }
-=20
-     next_page_start =3D (pc_start & TARGET_PAGE_MASK) + TARGET_PAGE_SIZE=
-;
-@@ -1650,7 +1650,7 @@ void gen_intermediate_code(CPUMBState *env, struct =
-TranslationBlock *tb)
-         }
- #endif
-=20
--        if (unlikely(cpu_breakpoint_test(cs, dc->pc, BP_ANY))) {
-+        if (unlikely(cpu_breakpoint_test(cpu, dc->pc, BP_ANY))) {
-             t_gen_raise_exception(dc, EXCP_DEBUG);
-             dc->is_jmp =3D DISAS_UPDATE;
-             /* The address covered by the breakpoint must be included in
-@@ -1707,7 +1707,7 @@ void gen_intermediate_code(CPUMBState *env, struct =
-TranslationBlock *tb)
-                 break;
-             }
-         }
--        if (cs->singlestep_enabled) {
-+        if (cpu->singlestep_enabled) {
-             break;
-         }
-     } while (!dc->is_jmp && !dc->cpustate_changed
-@@ -1728,7 +1728,7 @@ void gen_intermediate_code(CPUMBState *env, struct =
-TranslationBlock *tb)
-=20
-     if (tb->cflags & CF_LAST_IO)
-         gen_io_end();
--    /* Force an update if the per-tb cpu state has changed.  */
-+    /* Force an update if the per-tb mb_cpu state has changed.  */
-     if (dc->is_jmp =3D=3D DISAS_NEXT
-         && (dc->cpustate_changed || org_flags !=3D dc->tb_flags)) {
-         dc->is_jmp =3D DISAS_UPDATE;
-@@ -1736,7 +1736,7 @@ void gen_intermediate_code(CPUMBState *env, struct =
-TranslationBlock *tb)
-     }
-     t_sync_flags(dc);
-=20
--    if (unlikely(cs->singlestep_enabled)) {
-+    if (unlikely(cpu->singlestep_enabled)) {
-         TCGv_i32 tmp =3D tcg_const_i32(EXCP_DEBUG);
-=20
-         if (dc->is_jmp !=3D DISAS_JUMP) {
-@@ -1773,7 +1773,7 @@ void gen_intermediate_code(CPUMBState *env, struct =
-TranslationBlock *tb)
-         qemu_log_lock();
-         qemu_log("--------------\n");
- #if DISAS_GNU
--        log_target_disas(cs, pc_start, dc->pc - pc_start, 0);
-+        log_target_disas(cpu, pc_start, dc->pc - pc_start, 0);
- #endif
-         qemu_log("\nisize=3D%d osize=3D%d\n",
-                  dc->pc - pc_start, tcg_op_buf_count());
-diff --git a/target-mips/translate.c b/target-mips/translate.c
-index 57b824ff2d..7441ef5446 100644
---- a/target-mips/translate.c
-+++ b/target-mips/translate.c
-@@ -19878,10 +19878,9 @@ static void decode_opc(CPUMIPSState *env, DisasC=
-ontext *ctx)
-     }
- }
-=20
--void gen_intermediate_code(CPUMIPSState *env, struct TranslationBlock *t=
-b)
-+void gen_intermediate_code(CPUState *cpu, struct TranslationBlock *tb)
- {
--    MIPSCPU *cpu =3D mips_env_get_cpu(env);
--    CPUState *cs =3D CPU(cpu);
-+    CPUMIPSState *env =3D cpu->env_ptr;
-     DisasContext ctx;
-     target_ulong pc_start;
-     target_ulong next_page_start;
-@@ -19894,7 +19893,7 @@ void gen_intermediate_code(CPUMIPSState *env, str=
-uct TranslationBlock *tb)
-     next_page_start =3D (pc_start & TARGET_PAGE_MASK) + TARGET_PAGE_SIZE=
-;
-     ctx.pc =3D pc_start;
-     ctx.saved_pc =3D -1;
--    ctx.singlestep_enabled =3D cs->singlestep_enabled;
-+    ctx.singlestep_enabled =3D cpu->singlestep_enabled;
-     ctx.insn_flags =3D env->insn_flags;
-     ctx.CP0_Config1 =3D env->CP0_Config1;
-     ctx.tb =3D tb;
-@@ -19941,7 +19940,7 @@ void gen_intermediate_code(CPUMIPSState *env, str=
-uct TranslationBlock *tb)
-         tcg_gen_insn_start(ctx.pc, ctx.hflags & MIPS_HFLAG_BMASK, ctx.bt=
-arget);
-         num_insns++;
-=20
--        if (unlikely(cpu_breakpoint_test(cs, ctx.pc, BP_ANY))) {
-+        if (unlikely(cpu_breakpoint_test(cpu, ctx.pc, BP_ANY))) {
-             save_cpu_state(&ctx, 1);
-             ctx.bstate =3D BS_BRANCH;
-             gen_helper_raise_exception_debug(cpu_env);
-@@ -19996,7 +19995,7 @@ void gen_intermediate_code(CPUMIPSState *env, str=
-uct TranslationBlock *tb)
-            This is what GDB expects and is consistent with what the
-            hardware does (e.g. if a delay slot instruction faults, the
-            reported PC is the PC of the branch).  */
--        if (cs->singlestep_enabled && (ctx.hflags & MIPS_HFLAG_BMASK) =3D=
-=3D 0) {
-+        if (cpu->singlestep_enabled && (ctx.hflags & MIPS_HFLAG_BMASK) =3D=
-=3D 0) {
-             break;
-         }
-=20
-@@ -20017,7 +20016,7 @@ void gen_intermediate_code(CPUMIPSState *env, str=
-uct TranslationBlock *tb)
-     if (tb->cflags & CF_LAST_IO) {
-         gen_io_end();
-     }
--    if (cs->singlestep_enabled && ctx.bstate !=3D BS_BRANCH) {
-+    if (cpu->singlestep_enabled && ctx.bstate !=3D BS_BRANCH) {
-         save_cpu_state(&ctx, ctx.bstate !=3D BS_EXCP);
-         gen_helper_raise_exception_debug(cpu_env);
-     } else {
-@@ -20049,7 +20048,7 @@ done_generating:
-         && qemu_log_in_addr_range(pc_start)) {
-         qemu_log_lock();
-         qemu_log("IN: %s\n", lookup_symbol(pc_start));
--        log_target_disas(cs, pc_start, ctx.pc - pc_start, 0);
-+        log_target_disas(cpu, pc_start, ctx.pc - pc_start, 0);
-         qemu_log("\n");
-         qemu_log_unlock();
-     }
-diff --git a/target-moxie/translate.c b/target-moxie/translate.c
-index 0660b44c08..176063a1de 100644
---- a/target-moxie/translate.c
-+++ b/target-moxie/translate.c
-@@ -822,10 +822,10 @@ static int decode_opc(MoxieCPU *cpu, DisasContext *=
-ctx)
- }
-=20
- /* generate intermediate code for basic block 'tb'.  */
--void gen_intermediate_code(CPUMoxieState *env, struct TranslationBlock *=
-tb)
-+void gen_intermediate_code(CPUState *cpu, struct TranslationBlock *tb)
- {
--    MoxieCPU *cpu =3D moxie_env_get_cpu(env);
--    CPUState *cs =3D CPU(cpu);
-+    CPUMoxieState *env =3D cpu->env_ptr;
-+    MoxieCPU *moxie_cpu =3D moxie_env_get_cpu(env);
-     DisasContext ctx;
-     target_ulong pc_start;
-     int num_insns, max_insns;
-@@ -851,7 +851,7 @@ void gen_intermediate_code(CPUMoxieState *env, struct=
- TranslationBlock *tb)
-         tcg_gen_insn_start(ctx.pc);
-         num_insns++;
-=20
--        if (unlikely(cpu_breakpoint_test(cs, ctx.pc, BP_ANY))) {
-+        if (unlikely(cpu_breakpoint_test(cpu, ctx.pc, BP_ANY))) {
-             tcg_gen_movi_i32(cpu_pc, ctx.pc);
-             gen_helper_debug(cpu_env);
-             ctx.bstate =3D BS_EXCP;
-@@ -864,12 +864,12 @@ void gen_intermediate_code(CPUMoxieState *env, stru=
-ct TranslationBlock *tb)
-         }
-=20
-         ctx.opcode =3D cpu_lduw_code(env, ctx.pc);
--        ctx.pc +=3D decode_opc(cpu, &ctx);
-+        ctx.pc +=3D decode_opc(moxie_cpu, &ctx);
-=20
-         if (num_insns >=3D max_insns) {
-             break;
-         }
--        if (cs->singlestep_enabled) {
-+        if (cpu->singlestep_enabled) {
-             break;
-         }
-         if ((ctx.pc & (TARGET_PAGE_SIZE - 1)) =3D=3D 0) {
-@@ -877,7 +877,7 @@ void gen_intermediate_code(CPUMoxieState *env, struct=
- TranslationBlock *tb)
-         }
-     } while (ctx.bstate =3D=3D BS_NONE && !tcg_op_buf_full());
-=20
--    if (cs->singlestep_enabled) {
-+    if (cpu->singlestep_enabled) {
-         tcg_gen_movi_tl(cpu_pc, ctx.pc);
-         gen_helper_debug(cpu_env);
-     } else {
-diff --git a/target-openrisc/translate.c b/target-openrisc/translate.c
-index 229361aed1..a509234500 100644
---- a/target-openrisc/translate.c
-+++ b/target-openrisc/translate.c
-@@ -1630,10 +1630,10 @@ static void disas_openrisc_insn(DisasContext *dc,=
- OpenRISCCPU *cpu)
-     }
- }
-=20
--void gen_intermediate_code(CPUOpenRISCState *env, struct TranslationBloc=
-k *tb)
-+void gen_intermediate_code(CPUState *cpu, struct TranslationBlock *tb)
- {
--    OpenRISCCPU *cpu =3D openrisc_env_get_cpu(env);
--    CPUState *cs =3D CPU(cpu);
-+    CPUOpenRISCState *env =3D cpu->env_ptr;
-+    OpenRISCCPU *or_cpu =3D openrisc_env_get_cpu(env);
-     struct DisasContext ctx, *dc =3D &ctx;
-     uint32_t pc_start;
-     uint32_t next_page_start;
-@@ -1646,11 +1646,11 @@ void gen_intermediate_code(CPUOpenRISCState *env,=
- struct TranslationBlock *tb)
-     dc->is_jmp =3D DISAS_NEXT;
-     dc->ppc =3D pc_start;
-     dc->pc =3D pc_start;
--    dc->flags =3D cpu->env.cpucfgr;
--    dc->mem_idx =3D cpu_mmu_index(&cpu->env, false);
-+    dc->flags =3D or_cpu->env.cpucfgr;
-+    dc->mem_idx =3D cpu_mmu_index(&or_cpu->env, false);
-     dc->synced_flags =3D dc->tb_flags =3D tb->flags;
-     dc->delayed_branch =3D !!(dc->tb_flags & D_FLAG);
--    dc->singlestep_enabled =3D cs->singlestep_enabled;
-+    dc->singlestep_enabled =3D cpu->singlestep_enabled;
-=20
-     next_page_start =3D (pc_start & TARGET_PAGE_MASK) + TARGET_PAGE_SIZE=
-;
-     num_insns =3D 0;
-@@ -1669,7 +1669,7 @@ void gen_intermediate_code(CPUOpenRISCState *env, s=
-truct TranslationBlock *tb)
-         tcg_gen_insn_start(dc->pc);
-         num_insns++;
-=20
--        if (unlikely(cpu_breakpoint_test(cs, dc->pc, BP_ANY))) {
-+        if (unlikely(cpu_breakpoint_test(cpu, dc->pc, BP_ANY))) {
-             tcg_gen_movi_tl(cpu_pc, dc->pc);
-             gen_exception(dc, EXCP_DEBUG);
-             dc->is_jmp =3D DISAS_UPDATE;
-@@ -1688,7 +1688,7 @@ void gen_intermediate_code(CPUOpenRISCState *env, s=
-truct TranslationBlock *tb)
-         dc->npc =3D dc->pc + 4;
-         tcg_gen_movi_tl(cpu_ppc, dc->ppc);
-         tcg_gen_movi_tl(cpu_npc, dc->npc);
--        disas_openrisc_insn(dc, cpu);
-+        disas_openrisc_insn(dc, or_cpu);
-         dc->pc =3D dc->npc;
-         /* delay slot */
-         if (dc->delayed_branch) {
-@@ -1706,7 +1706,7 @@ void gen_intermediate_code(CPUOpenRISCState *env, s=
-truct TranslationBlock *tb)
-         }
-     } while (!dc->is_jmp
-              && !tcg_op_buf_full()
--             && !cs->singlestep_enabled
-+             && !cpu->singlestep_enabled
-              && !singlestep
-              && (dc->pc < next_page_start)
-              && num_insns < max_insns);
-@@ -1718,7 +1718,7 @@ void gen_intermediate_code(CPUOpenRISCState *env, s=
-truct TranslationBlock *tb)
-         dc->is_jmp =3D DISAS_UPDATE;
-         tcg_gen_movi_tl(cpu_pc, dc->pc);
-     }
--    if (unlikely(cs->singlestep_enabled)) {
-+    if (unlikely(cpu->singlestep_enabled)) {
-         if (dc->is_jmp =3D=3D DISAS_NEXT) {
-             tcg_gen_movi_tl(cpu_pc, dc->pc);
-         }
-@@ -1753,7 +1753,7 @@ void gen_intermediate_code(CPUOpenRISCState *env, s=
-truct TranslationBlock *tb)
-         qemu_log_lock();
-         qemu_log("----------------\n");
-         qemu_log("IN: %s\n", lookup_symbol(pc_start));
--        log_target_disas(cs, pc_start, dc->pc - pc_start, 0);
-+        log_target_disas(cpu, pc_start, dc->pc - pc_start, 0);
-         qemu_log("\nisize=3D%d osize=3D%d\n",
-                  dc->pc - pc_start, tcg_op_buf_count());
-         qemu_log_unlock();
-diff --git a/target-ppc/translate.c b/target-ppc/translate.c
-index 59e9552d2b..d7c35084df 100644
---- a/target-ppc/translate.c
-+++ b/target-ppc/translate.c
-@@ -6982,10 +6982,9 @@ void ppc_cpu_dump_statistics(CPUState *cs, FILE*f,
- }
-=20
- /***********************************************************************=
-******/
--void gen_intermediate_code(CPUPPCState *env, struct TranslationBlock *tb=
-)
-+void gen_intermediate_code(CPUState *cpu, struct TranslationBlock *tb)
- {
--    PowerPCCPU *cpu =3D ppc_env_get_cpu(env);
--    CPUState *cs =3D CPU(cpu);
-+    CPUPPCState *env =3D cpu->env_ptr;
-     DisasContext ctx, *ctxp =3D &ctx;
-     opc_handler_t **table, *handler;
-     target_ulong pc_start;
-@@ -7045,7 +7044,7 @@ void gen_intermediate_code(CPUPPCState *env, struct=
- TranslationBlock *tb)
-         ctx.singlestep_enabled =3D 0;
-     if ((env->flags & POWERPC_FLAG_BE) && msr_be)
-         ctx.singlestep_enabled |=3D CPU_BRANCH_STEP;
--    if (unlikely(cs->singlestep_enabled)) {
-+    if (unlikely(cpu->singlestep_enabled)) {
-         ctx.singlestep_enabled |=3D GDBSTUB_SINGLE_STEP;
-     }
- #if defined (DO_SINGLE_STEP) && 0
-@@ -7068,7 +7067,7 @@ void gen_intermediate_code(CPUPPCState *env, struct=
- TranslationBlock *tb)
-         tcg_gen_insn_start(ctx.nip);
-         num_insns++;
-=20
--        if (unlikely(cpu_breakpoint_test(cs, ctx.nip, BP_ANY))) {
-+        if (unlikely(cpu_breakpoint_test(cpu, ctx.nip, BP_ANY))) {
-             gen_debug_exception(ctxp);
-             /* The address covered by the breakpoint must be included in
-                [tb->pc, tb->pc + tb->size) in order to for it to be
-@@ -7147,7 +7146,7 @@ void gen_intermediate_code(CPUPPCState *env, struct=
- TranslationBlock *tb)
-                      ctx.exception !=3D POWERPC_EXCP_BRANCH)) {
-             gen_exception_nip(ctxp, POWERPC_EXCP_TRACE, ctx.nip);
-         } else if (unlikely(((ctx.nip & (TARGET_PAGE_SIZE - 1)) =3D=3D 0=
-) ||
--                            (cs->singlestep_enabled) ||
-+                            (cpu->singlestep_enabled) ||
-                             singlestep ||
-                             num_insns >=3D max_insns)) {
-             /* if we reach a page boundary or are single stepping, stop
-@@ -7167,7 +7166,7 @@ void gen_intermediate_code(CPUPPCState *env, struct=
- TranslationBlock *tb)
-     if (ctx.exception =3D=3D POWERPC_EXCP_NONE) {
-         gen_goto_tb(&ctx, 0, ctx.nip);
-     } else if (ctx.exception !=3D POWERPC_EXCP_BRANCH) {
--        if (unlikely(cs->singlestep_enabled)) {
-+        if (unlikely(cpu->singlestep_enabled)) {
-             gen_debug_exception(ctxp);
-         }
-         /* Generate the return instruction */
-@@ -7186,7 +7185,7 @@ void gen_intermediate_code(CPUPPCState *env, struct=
- TranslationBlock *tb)
-         flags |=3D ctx.le_mode << 16;
-         qemu_log_lock();
-         qemu_log("IN: %s\n", lookup_symbol(pc_start));
--        log_target_disas(cs, pc_start, ctx.nip - pc_start, flags);
-+        log_target_disas(cpu, pc_start, ctx.nip - pc_start, flags);
-         qemu_log("\n");
-         qemu_log_unlock();
-     }
-diff --git a/target-s390x/translate.c b/target-s390x/translate.c
-index 02bc7058fd..a3992dae5a 100644
---- a/target-s390x/translate.c
-+++ b/target-s390x/translate.c
-@@ -5326,10 +5326,9 @@ static ExitStatus translate_one(CPUS390XState *env=
-, DisasContext *s)
-     return ret;
- }
-=20
--void gen_intermediate_code(CPUS390XState *env, struct TranslationBlock *=
-tb)
-+void gen_intermediate_code(CPUState *cpu, struct TranslationBlock *tb)
- {
--    S390CPU *cpu =3D s390_env_get_cpu(env);
--    CPUState *cs =3D CPU(cpu);
-+    CPUS390XState *env =3D cpu->env_ptr;
-     DisasContext dc;
-     target_ulong pc_start;
-     uint64_t next_page_start;
-@@ -5347,7 +5346,7 @@ void gen_intermediate_code(CPUS390XState *env, stru=
-ct TranslationBlock *tb)
-     dc.tb =3D tb;
-     dc.pc =3D pc_start;
-     dc.cc_op =3D CC_OP_DYNAMIC;
--    do_debug =3D dc.singlestep_enabled =3D cs->singlestep_enabled;
-+    do_debug =3D dc.singlestep_enabled =3D cpu->singlestep_enabled;
-=20
-     next_page_start =3D (pc_start & TARGET_PAGE_MASK) + TARGET_PAGE_SIZE=
-;
-=20
-@@ -5366,7 +5365,7 @@ void gen_intermediate_code(CPUS390XState *env, stru=
-ct TranslationBlock *tb)
-         tcg_gen_insn_start(dc.pc, dc.cc_op);
-         num_insns++;
-=20
--        if (unlikely(cpu_breakpoint_test(cs, dc.pc, BP_ANY))) {
-+        if (unlikely(cpu_breakpoint_test(cpu, dc.pc, BP_ANY))) {
-             status =3D EXIT_PC_STALE;
-             do_debug =3D true;
-             /* The address covered by the breakpoint must be included in
-@@ -5393,7 +5392,7 @@ void gen_intermediate_code(CPUS390XState *env, stru=
-ct TranslationBlock *tb)
-                 || tcg_op_buf_full()
-                 || num_insns >=3D max_insns
-                 || singlestep
--                || cs->singlestep_enabled)) {
-+                || cpu->singlestep_enabled)) {
-             status =3D EXIT_PC_STALE;
-         }
-     } while (status =3D=3D NO_EXIT);
-@@ -5434,7 +5433,7 @@ void gen_intermediate_code(CPUS390XState *env, stru=
-ct TranslationBlock *tb)
-         && qemu_log_in_addr_range(pc_start)) {
-         qemu_log_lock();
-         qemu_log("IN: %s\n", lookup_symbol(pc_start));
--        log_target_disas(cs, pc_start, dc.pc - pc_start, 1);
-+        log_target_disas(cpu, pc_start, dc.pc - pc_start, 1);
-         qemu_log("\n");
-         qemu_log_unlock();
-     }
-diff --git a/target-sh4/translate.c b/target-sh4/translate.c
-index c89a14733f..0c7485d031 100644
---- a/target-sh4/translate.c
-+++ b/target-sh4/translate.c
-@@ -1827,10 +1827,9 @@ static void decode_opc(DisasContext * ctx)
-         gen_store_flags(ctx->flags);
- }
-=20
--void gen_intermediate_code(CPUSH4State * env, struct TranslationBlock *t=
-b)
-+void gen_intermediate_code(CPUState *cpu, struct TranslationBlock *tb)
- {
--    SuperHCPU *cpu =3D sh_env_get_cpu(env);
--    CPUState *cs =3D CPU(cpu);
-+    CPUSH4State *env =3D cpu->env_ptr;
-     DisasContext ctx;
-     target_ulong pc_start;
-     int num_insns;
-@@ -1845,7 +1844,7 @@ void gen_intermediate_code(CPUSH4State * env, struc=
-t TranslationBlock *tb)
-        so assume it is a dynamic branch.  */
-     ctx.delayed_pc =3D -1; /* use delayed pc from env pointer */
-     ctx.tb =3D tb;
--    ctx.singlestep_enabled =3D cs->singlestep_enabled;
-+    ctx.singlestep_enabled =3D cpu->singlestep_enabled;
-     ctx.features =3D env->features;
-     ctx.has_movcal =3D (ctx.flags & TB_FLAG_PENDING_MOVCA);
-=20
-@@ -1863,7 +1862,7 @@ void gen_intermediate_code(CPUSH4State * env, struc=
-t TranslationBlock *tb)
-         tcg_gen_insn_start(ctx.pc, ctx.flags);
-         num_insns++;
-=20
--        if (unlikely(cpu_breakpoint_test(cs, ctx.pc, BP_ANY))) {
-+        if (unlikely(cpu_breakpoint_test(cpu, ctx.pc, BP_ANY))) {
-             /* We have hit a breakpoint - make sure PC is up-to-date */
-             tcg_gen_movi_i32(cpu_pc, ctx.pc);
-             gen_helper_debug(cpu_env);
-@@ -1885,7 +1884,7 @@ void gen_intermediate_code(CPUSH4State * env, struc=
-t TranslationBlock *tb)
- 	ctx.pc +=3D 2;
- 	if ((ctx.pc & (TARGET_PAGE_SIZE - 1)) =3D=3D 0)
- 	    break;
--        if (cs->singlestep_enabled) {
-+        if (cpu->singlestep_enabled) {
- 	    break;
-         }
-         if (num_insns >=3D max_insns)
-@@ -1895,7 +1894,7 @@ void gen_intermediate_code(CPUSH4State * env, struc=
-t TranslationBlock *tb)
-     }
-     if (tb->cflags & CF_LAST_IO)
-         gen_io_end();
--    if (cs->singlestep_enabled) {
-+    if (cpu->singlestep_enabled) {
-         tcg_gen_movi_i32(cpu_pc, ctx.pc);
-         gen_helper_debug(cpu_env);
-     } else {
-@@ -1929,7 +1928,7 @@ void gen_intermediate_code(CPUSH4State * env, struc=
-t TranslationBlock *tb)
-         && qemu_log_in_addr_range(pc_start)) {
-         qemu_log_lock();
- 	qemu_log("IN:\n");	/* , lookup_symbol(pc_start)); */
--        log_target_disas(cs, pc_start, ctx.pc - pc_start, 0);
-+        log_target_disas(cpu, pc_start, ctx.pc - pc_start, 0);
- 	qemu_log("\n");
-         qemu_log_unlock();
-     }
-diff --git a/target-sparc/translate.c b/target-sparc/translate.c
-index 2205f89837..6febd91caf 100644
---- a/target-sparc/translate.c
-+++ b/target-sparc/translate.c
-@@ -5688,10 +5688,9 @@ static void disas_sparc_insn(DisasContext * dc, un=
-signed int insn)
-     }
- }
-=20
--void gen_intermediate_code(CPUSPARCState * env, TranslationBlock * tb)
-+void gen_intermediate_code(CPUState *cpu, TranslationBlock * tb)
- {
--    SPARCCPU *cpu =3D sparc_env_get_cpu(env);
--    CPUState *cs =3D CPU(cpu);
-+    CPUSPARCState *env =3D cpu->env_ptr;
-     target_ulong pc_start, last_pc;
-     DisasContext dc1, *dc =3D &dc1;
-     int num_insns;
-@@ -5709,7 +5708,7 @@ void gen_intermediate_code(CPUSPARCState * env, Tra=
-nslationBlock * tb)
-     dc->def =3D env->def;
-     dc->fpu_enabled =3D tb_fpu_enabled(tb->flags);
-     dc->address_mask_32bit =3D tb_am_enabled(tb->flags);
--    dc->singlestep =3D (cs->singlestep_enabled || singlestep);
-+    dc->singlestep =3D (cpu->singlestep_enabled || singlestep);
- #ifdef TARGET_SPARC64
-     dc->fprs_dirty =3D 0;
-     dc->asi =3D (tb->flags >> TB_FLAG_ASI_SHIFT) & 0xff;
-@@ -5735,7 +5734,7 @@ void gen_intermediate_code(CPUSPARCState * env, Tra=
-nslationBlock * tb)
-         num_insns++;
-         last_pc =3D dc->pc;
-=20
--        if (unlikely(cpu_breakpoint_test(cs, dc->pc, BP_ANY))) {
-+        if (unlikely(cpu_breakpoint_test(cpu, dc->pc, BP_ANY))) {
-             if (dc->pc !=3D pc_start) {
-                 save_state(dc);
-             }
-@@ -5799,7 +5798,7 @@ void gen_intermediate_code(CPUSPARCState * env, Tra=
-nslationBlock * tb)
-         qemu_log_lock();
-         qemu_log("--------------\n");
-         qemu_log("IN: %s\n", lookup_symbol(pc_start));
--        log_target_disas(cs, pc_start, last_pc + 4 - pc_start, 0);
-+        log_target_disas(cpu, pc_start, last_pc + 4 - pc_start, 0);
-         qemu_log("\n");
-         qemu_log_unlock();
-     }
-diff --git a/target-tilegx/translate.c b/target-tilegx/translate.c
-index 9c734eeba3..4bf7da10e8 100644
---- a/target-tilegx/translate.c
-+++ b/target-tilegx/translate.c
-@@ -2370,12 +2370,11 @@ static void translate_one_bundle(DisasContext *dc=
-, uint64_t bundle)
-     }
- }
-=20
--void gen_intermediate_code(CPUTLGState *env, struct TranslationBlock *tb=
-)
-+void gen_intermediate_code(CPUState *cpu, struct TranslationBlock *tb)
- {
--    TileGXCPU *cpu =3D tilegx_env_get_cpu(env);
-+    CPUTLGState *env =3D cpu->env_ptr;
-     DisasContext ctx;
-     DisasContext *dc =3D &ctx;
--    CPUState *cs =3D CPU(cpu);
-     uint64_t pc_start =3D tb->pc;
-     uint64_t next_page_start =3D (pc_start & TARGET_PAGE_MASK) + TARGET_=
-PAGE_SIZE;
-     int num_insns =3D 0;
-@@ -2397,7 +2396,7 @@ void gen_intermediate_code(CPUTLGState *env, struct=
- TranslationBlock *tb)
-     if (!max_insns) {
-         max_insns =3D CF_COUNT_MASK;
-     }
--    if (cs->singlestep_enabled || singlestep) {
-+    if (cpu->singlestep_enabled || singlestep) {
-         max_insns =3D 1;
-     }
-     if (max_insns > TCG_MAX_INSNS) {
-diff --git a/target-tricore/translate.c b/target-tricore/translate.c
-index 36f734a662..5fb353b8b4 100644
---- a/target-tricore/translate.c
-+++ b/target-tricore/translate.c
-@@ -8733,10 +8733,9 @@ static void decode_opc(CPUTriCoreState *env, Disas=
-Context *ctx, int *is_branch)
-     }
- }
-=20
--void gen_intermediate_code(CPUTriCoreState *env, struct TranslationBlock=
- *tb)
-+void gen_intermediate_code(CPUState *cpu, struct TranslationBlock *tb)
- {
--    TriCoreCPU *cpu =3D tricore_env_get_cpu(env);
--    CPUState *cs =3D CPU(cpu);
-+    CPUTriCoreState *env =3D cpu->env_ptr;
-     DisasContext ctx;
-     target_ulong pc_start;
-     int num_insns, max_insns;
-@@ -8757,7 +8756,7 @@ void gen_intermediate_code(CPUTriCoreState *env, st=
-ruct TranslationBlock *tb)
-     ctx.pc =3D pc_start;
-     ctx.saved_pc =3D -1;
-     ctx.tb =3D tb;
--    ctx.singlestep_enabled =3D cs->singlestep_enabled;
-+    ctx.singlestep_enabled =3D cpu->singlestep_enabled;
-     ctx.bstate =3D BS_NONE;
-     ctx.mem_idx =3D cpu_mmu_index(env, false);
-=20
-@@ -8791,7 +8790,7 @@ void gen_intermediate_code(CPUTriCoreState *env, st=
-ruct TranslationBlock *tb)
-         && qemu_log_in_addr_range(pc_start)) {
-         qemu_log_lock();
-         qemu_log("IN: %s\n", lookup_symbol(pc_start));
--        log_target_disas(cs, pc_start, ctx.pc - pc_start, 0);
-+        log_target_disas(cpu, pc_start, ctx.pc - pc_start, 0);
-         qemu_log("\n");
-         qemu_log_unlock();
-     }
-diff --git a/target-unicore32/translate.c b/target-unicore32/translate.c
-index 514d460408..39eaa76b50 100644
---- a/target-unicore32/translate.c
-+++ b/target-unicore32/translate.c
-@@ -1869,10 +1869,9 @@ static void disas_uc32_insn(CPUUniCore32State *env=
-, DisasContext *s)
- }
-=20
- /* generate intermediate code for basic block 'tb'.  */
--void gen_intermediate_code(CPUUniCore32State *env, TranslationBlock *tb)
-+void gen_intermediate_code(CPUState *cpu, TranslationBlock *tb)
- {
--    UniCore32CPU *cpu =3D uc32_env_get_cpu(env);
--    CPUState *cs =3D CPU(cpu);
-+    CPUUniCore32State *env =3D cpu->env_ptr;
-     DisasContext dc1, *dc =3D &dc1;
-     target_ulong pc_start;
-     uint32_t next_page_start;
-@@ -1888,7 +1887,7 @@ void gen_intermediate_code(CPUUniCore32State *env, =
-TranslationBlock *tb)
-=20
-     dc->is_jmp =3D DISAS_NEXT;
-     dc->pc =3D pc_start;
--    dc->singlestep_enabled =3D cs->singlestep_enabled;
-+    dc->singlestep_enabled =3D cpu->singlestep_enabled;
-     dc->condjmp =3D 0;
-     cpu_F0s =3D tcg_temp_new_i32();
-     cpu_F1s =3D tcg_temp_new_i32();
-@@ -1917,7 +1916,7 @@ void gen_intermediate_code(CPUUniCore32State *env, =
-TranslationBlock *tb)
-         tcg_gen_insn_start(dc->pc);
-         num_insns++;
-=20
--        if (unlikely(cpu_breakpoint_test(cs, dc->pc, BP_ANY))) {
-+        if (unlikely(cpu_breakpoint_test(cpu, dc->pc, BP_ANY))) {
-             gen_set_pc_im(dc->pc);
-             gen_exception(EXCP_DEBUG);
-             dc->is_jmp =3D DISAS_JUMP;
-@@ -1949,7 +1948,7 @@ void gen_intermediate_code(CPUUniCore32State *env, =
-TranslationBlock *tb)
-          * Also stop translation when a page boundary is reached.  This
-          * ensures prefetch aborts occur at the right place.  */
-     } while (!dc->is_jmp && !tcg_op_buf_full() &&
--             !cs->singlestep_enabled &&
-+             !cpu->singlestep_enabled &&
-              !singlestep &&
-              dc->pc < next_page_start &&
-              num_insns < max_insns);
-@@ -1958,7 +1957,7 @@ void gen_intermediate_code(CPUUniCore32State *env, =
-TranslationBlock *tb)
-         if (dc->condjmp) {
-             /* FIXME:  This can theoretically happen with self-modifying
-                code.  */
--            cpu_abort(cs, "IO on conditional branch instruction");
-+            cpu_abort(cpu, "IO on conditional branch instruction");
-         }
-         gen_io_end();
-     }
-@@ -1966,7 +1965,7 @@ void gen_intermediate_code(CPUUniCore32State *env, =
-TranslationBlock *tb)
-     /* At this stage dc->condjmp will only be set when the skipped
-        instruction was a conditional branch or trap, and the PC has
-        already been written.  */
--    if (unlikely(cs->singlestep_enabled)) {
-+    if (unlikely(cpu->singlestep_enabled)) {
-         /* Make sure the pc is updated, and raise a debug exception.  */
-         if (dc->condjmp) {
-             if (dc->is_jmp =3D=3D DISAS_SYSCALL) {
-@@ -2027,7 +2026,7 @@ done_generating:
-         qemu_log_lock();
-         qemu_log("----------------\n");
-         qemu_log("IN: %s\n", lookup_symbol(pc_start));
--        log_target_disas(cs, pc_start, dc->pc - pc_start, 0);
-+        log_target_disas(cpu, pc_start, dc->pc - pc_start, 0);
-         qemu_log("\n");
-         qemu_log_unlock();
-     }
-diff --git a/target-xtensa/translate.c b/target-xtensa/translate.c
-index 0858c296ea..3089c3a77c 100644
---- a/target-xtensa/translate.c
-+++ b/target-xtensa/translate.c
-@@ -3036,10 +3036,9 @@ static void gen_ibreak_check(CPUXtensaState *env, =
-DisasContext *dc)
-     }
- }
-=20
--void gen_intermediate_code(CPUXtensaState *env, TranslationBlock *tb)
-+void gen_intermediate_code(CPUState *cpu, TranslationBlock *tb)
- {
--    XtensaCPU *cpu =3D xtensa_env_get_cpu(env);
--    CPUState *cs =3D CPU(cpu);
-+    CPUXtensaState *env =3D cpu->env_ptr;
-     DisasContext dc;
-     int insn_count =3D 0;
-     int max_insns =3D tb->cflags & CF_COUNT_MASK;
-@@ -3055,7 +3054,7 @@ void gen_intermediate_code(CPUXtensaState *env, Tra=
-nslationBlock *tb)
-     }
-=20
-     dc.config =3D env->config;
--    dc.singlestep_enabled =3D cs->singlestep_enabled;
-+    dc.singlestep_enabled =3D cpu->singlestep_enabled;
-     dc.tb =3D tb;
-     dc.pc =3D pc_start;
-     dc.ring =3D tb->flags & XTENSA_TBFLAG_RING_MASK;
-@@ -3090,7 +3089,7 @@ void gen_intermediate_code(CPUXtensaState *env, Tra=
-nslationBlock *tb)
-=20
-         ++dc.ccount_delta;
-=20
--        if (unlikely(cpu_breakpoint_test(cs, dc.pc, BP_ANY))) {
-+        if (unlikely(cpu_breakpoint_test(cpu, dc.pc, BP_ANY))) {
-             tcg_gen_movi_i32(cpu_pc, dc.pc);
-             gen_exception(&dc, EXCP_DEBUG);
-             dc.is_jmp =3D DISAS_UPDATE;
-@@ -3126,7 +3125,7 @@ void gen_intermediate_code(CPUXtensaState *env, Tra=
-nslationBlock *tb)
-         if (dc.icount) {
-             tcg_gen_mov_i32(cpu_SR[ICOUNT], dc.next_icount);
-         }
--        if (cs->singlestep_enabled) {
-+        if (cpu->singlestep_enabled) {
-             tcg_gen_movi_i32(cpu_pc, dc.pc);
-             gen_exception(&dc, EXCP_DEBUG);
-             break;
-@@ -3158,7 +3157,7 @@ void gen_intermediate_code(CPUXtensaState *env, Tra=
-nslationBlock *tb)
-         qemu_log_lock();
-         qemu_log("----------------\n");
-         qemu_log("IN: %s\n", lookup_symbol(pc_start));
--        log_target_disas(cs, pc_start, dc.pc - pc_start, 0);
-+        log_target_disas(cpu, pc_start, dc.pc - pc_start, 0);
-         qemu_log("\n");
-         qemu_log_unlock();
-     }
-diff --git a/translate-all.c b/translate-all.c
-index 3dd9214904..348047f5f5 100644
---- a/translate-all.c
-+++ b/translate-all.c
-@@ -1308,7 +1308,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
-     tcg_func_start(&tcg_ctx);
-=20
-     tcg_ctx.cpu =3D ENV_GET_CPU(env);
--    gen_intermediate_code(env, tb);
-+    gen_intermediate_code(cpu, tb);
-     tcg_ctx.cpu =3D NULL;
-=20
-     trace_translate_block(tb, tb->pc, tb->tc_ptr);
+SGksCgpZb3VyIHNlcmllcyBmYWlsZWQgYXV0b21hdGljIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5k
+IHRoZSB0ZXN0aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZl
+IGRvY2tlciBpbnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHku
+CgpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1JGQyBQQVRDSCB2NCAwLzZdIHRyYW5zbGF0ZTogW3Rj
+Z10gR2VuZXJpYyB0cmFuc2xhdGlvbiBmcmFtZXdvcmsKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6
+IDE0ODI5Mzk4Nzc1My4zMTY0NS44MTY2NzE3NDk4NTA2NTAwMTM3LnN0Z2l0QGZpbWJ1bHZldHIu
+YnNjLmVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCnNldCAtZQpnaXQg
+c3VibW9kdWxlIHVwZGF0ZSAtLWluaXQgZHRjCiMgTGV0IGRvY2tlciB0ZXN0cyBkdW1wIGVudmly
+b25tZW50IGluZm8KZXhwb3J0IFNIT1dfRU5WPTEKZXhwb3J0IEo9MTYKbWFrZSBkb2NrZXItdGVz
+dC1xdWlja0BjZW50b3M2Cm1ha2UgZG9ja2VyLXRlc3QtbWluZ3dAZmVkb3JhCm1ha2UgZG9ja2Vy
+LXRlc3QtYnVpbGRAbWluLWdsaWIKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNj
+OGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcg
+YnJhbmNoICd0ZXN0JwozNzljMjFmIHRhcmdldDogW3RjZywgYXJtXSBQb3J0IHRvIGdlbmVyaWMg
+dHJhbnNsYXRpb24gZnJhbWV3b3JrCmM5NTViZTUgdGFyZ2V0OiBbdGNnLCBpMzg2XSBQb3J0IHRv
+IGdlbmVyaWMgdHJhbnNsYXRpb24gZnJhbWV3b3JrCjAyYWM0Y2QgdGFyZ2V0OiBbdGNnXSBSZWRl
+ZmluZSBESVNBU18qIG9udG8gdGhlIGdlbmVyaWMgdHJhbnNsYXRpb24gZnJhbWV3b3JrIChESl8q
+KQo5Y2IxYzEyIHRhcmdldDogW3RjZ10gQWRkIGdlbmVyaWMgdHJhbnNsYXRpb24gZnJhbWV3b3Jr
+CmQ5ZDJkNGQgcXVldWU6IEFkZCBtYWNybyBmb3IgaW5jcmVtZW50YWwgdHJhdmVyc2FsCjhkOWY2
+ZWMgUGFzcyBnZW5lcmljIENQVVN0YXRlIHRvIGdlbl9pbnRlcm1lZGlhdGVfY29kZSgpCgo9PT0g
+T1VUUFVUIEJFR0lOID09PQpTdWJtb2R1bGUgJ2R0YycgKGdpdDovL2dpdC5xZW11LXByb2plY3Qu
+b3JnL2R0Yy5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ2R0YycKQ2xvbmluZyBpbnRvICdkdGMn
+Li4uClN1Ym1vZHVsZSBwYXRoICdkdGMnOiBjaGVja2VkIG91dCAnNjVjYzRkMjc0OGEyYzJlNmYy
+N2YxY2YzOWUwN2E1ZGJhYmQ4MGViZicKICBCVUlMRCAgIGNlbnRvczYKbWFrZVsxXTogRW50ZXJp
+bmcgZGlyZWN0b3J5IGAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtamkzbXAxNGkvc3JjJwog
+IEFSQ0hJVkUgcWVtdS50Z3oKICBBUkNISVZFIGR0Yy50Z3oKICBDT1BZICAgIFJVTk5FUgogICAg
+UlVOIHRlc3QtcXVpY2sgaW4gcWVtdTpjZW50b3M2IApQYWNrYWdlcyBpbnN0YWxsZWQ6ClNETC1k
+ZXZlbC0xLjIuMTQtNy5lbDZfNy4xLng4Nl82NApjY2FjaGUtMy4xLjYtMi5lbDYueDg2XzY0CmVw
+ZWwtcmVsZWFzZS02LTgubm9hcmNoCmdjYy00LjQuNy0xNy5lbDYueDg2XzY0CmdpdC0xLjcuMS00
+LmVsNl83LjEueDg2XzY0CmdsaWIyLWRldmVsLTIuMjguOC01LmVsNi54ODZfNjQKbGliZmR0LWRl
+dmVsLTEuNC4wLTEuZWw2Lng4Nl82NAptYWtlLTMuODEtMjMuZWw2Lng4Nl82NApwYWNrYWdlIGcr
+KyBpcyBub3QgaW5zdGFsbGVkCnBpeG1hbi1kZXZlbC0wLjMyLjgtMS5lbDYueDg2XzY0CnRhci0x
+LjIzLTE1LmVsNl84Lng4Nl82NAp6bGliLWRldmVsLTEuMi4zLTI5LmVsNi54ODZfNjQKCkVudmly
+b25tZW50IHZhcmlhYmxlczoKUEFDS0FHRVM9bGliZmR0LWRldmVsIGNjYWNoZSAgICAgdGFyIGdp
+dCBtYWtlIGdjYyBnKysgICAgIHpsaWItZGV2ZWwgZ2xpYjItZGV2ZWwgU0RMLWRldmVsIHBpeG1h
+bi1kZXZlbCAgICAgZXBlbC1yZWxlYXNlCkhPU1ROQU1FPWE0OTQ3NmQzYzFhOApURVJNPXh0ZXJt
+Ck1BS0VGTEFHUz0gLWoxNgpISVNUU0laRT0xMDAwCko9MTYKVVNFUj1yb290CkNDQUNIRV9ESVI9
+L3Zhci90bXAvY2NhY2hlCkVYVFJBX0NPTkZJR1VSRV9PUFRTPQpWPQpTSE9XX0VOVj0xCk1BSUw9
+L3Zhci9zcG9vbC9tYWlsL3Jvb3QKUEFUSD0vdXNyL2xpYi9jY2FjaGU6L3Vzci9saWI2NC9jY2Fj
+aGU6L3Vzci9sb2NhbC9zYmluOi91c3IvbG9jYWwvYmluOi91c3Ivc2JpbjovdXNyL2Jpbjovc2Jp
+bjovYmluClBXRD0vCkxBTkc9ZW5fVVMuVVRGLTgKVEFSR0VUX0xJU1Q9CkhJU1RDT05UUk9MPWln
+bm9yZWR1cHMKU0hMVkw9MQpIT01FPS9yb290ClRFU1RfRElSPS90bXAvcWVtdS10ZXN0CkxPR05B
+TUU9cm9vdApMRVNTT1BFTj18fC91c3IvYmluL2xlc3NwaXBlLnNoICVzCkZFQVRVUkVTPSBkdGMK
+REVCVUc9CkdfQlJPS0VOX0ZJTEVOQU1FUz0xCkNDQUNIRV9IQVNIRElSPQpfPS91c3IvYmluL2Vu
+dgoKQ29uZmlndXJlIG9wdGlvbnM6Ci0tZW5hYmxlLXdlcnJvciAtLXRhcmdldC1saXN0PXg4Nl82
+NC1zb2Z0bW11LGFhcmNoNjQtc29mdG1tdSAtLXByZWZpeD0vdmFyL3RtcC9xZW11LWJ1aWxkL2lu
+c3RhbGwKTm8gQysrIGNvbXBpbGVyIGF2YWlsYWJsZTsgZGlzYWJsaW5nIEMrKyBzcGVjaWZpYyBv
+cHRpb25hbCBjb2RlCkluc3RhbGwgcHJlZml4ICAgIC92YXIvdG1wL3FlbXUtYnVpbGQvaW5zdGFs
+bApCSU9TIGRpcmVjdG9yeSAgICAvdmFyL3RtcC9xZW11LWJ1aWxkL2luc3RhbGwvc2hhcmUvcWVt
+dQpiaW5hcnkgZGlyZWN0b3J5ICAvdmFyL3RtcC9xZW11LWJ1aWxkL2luc3RhbGwvYmluCmxpYnJh
+cnkgZGlyZWN0b3J5IC92YXIvdG1wL3FlbXUtYnVpbGQvaW5zdGFsbC9saWIKbW9kdWxlIGRpcmVj
+dG9yeSAgL3Zhci90bXAvcWVtdS1idWlsZC9pbnN0YWxsL2xpYi9xZW11CmxpYmV4ZWMgZGlyZWN0
+b3J5IC92YXIvdG1wL3FlbXUtYnVpbGQvaW5zdGFsbC9saWJleGVjCmluY2x1ZGUgZGlyZWN0b3J5
+IC92YXIvdG1wL3FlbXUtYnVpbGQvaW5zdGFsbC9pbmNsdWRlCmNvbmZpZyBkaXJlY3RvcnkgIC92
+YXIvdG1wL3FlbXUtYnVpbGQvaW5zdGFsbC9ldGMKbG9jYWwgc3RhdGUgZGlyZWN0b3J5ICAgL3Zh
+ci90bXAvcWVtdS1idWlsZC9pbnN0YWxsL3ZhcgpNYW51YWwgZGlyZWN0b3J5ICAvdmFyL3RtcC9x
+ZW11LWJ1aWxkL2luc3RhbGwvc2hhcmUvbWFuCkVMRiBpbnRlcnAgcHJlZml4IC91c3IvZ25lbXVs
+L3FlbXUtJU0KU291cmNlIHBhdGggICAgICAgL3RtcC9xZW11LXRlc3Qvc3JjCkMgY29tcGlsZXIg
+ICAgICAgIGNjCkhvc3QgQyBjb21waWxlciAgIGNjCkMrKyBjb21waWxlciAgICAgIApPYmplY3Rp
+dmUtQyBjb21waWxlciBjYwpBUkZMQUdTICAgICAgICAgICBydgpDRkxBR1MgICAgICAgICAgICAt
+TzIgLVVfRk9SVElGWV9TT1VSQ0UgLURfRk9SVElGWV9TT1VSQ0U9MiAtZyAKUUVNVV9DRkxBR1Mg
+ICAgICAgLUkvdXNyL2luY2x1ZGUvcGl4bWFuLTEgICAgLXB0aHJlYWQgLUkvdXNyL2luY2x1ZGUv
+Z2xpYi0yLjAgLUkvdXNyL2xpYjY0L2dsaWItMi4wL2luY2x1ZGUgICAtZlBJRSAtRFBJRSAtbTY0
+IC1tY3gxNiAtRF9HTlVfU09VUkNFIC1EX0ZJTEVfT0ZGU0VUX0JJVFM9NjQgLURfTEFSR0VGSUxF
+X1NPVVJDRSAtV3N0cmljdC1wcm90b3R5cGVzIC1XcmVkdW5kYW50LWRlY2xzIC1XYWxsIC1XdW5k
+ZWYgLVd3cml0ZS1zdHJpbmdzIC1XbWlzc2luZy1wcm90b3R5cGVzIC1mbm8tc3RyaWN0LWFsaWFz
+aW5nIC1mbm8tY29tbW9uIC1md3JhcHYgIC1XZW5kaWYtbGFiZWxzIC1XbWlzc2luZy1pbmNsdWRl
+LWRpcnMgLVdlbXB0eS1ib2R5IC1XbmVzdGVkLWV4dGVybnMgLVdmb3JtYXQtc2VjdXJpdHkgLVdm
+b3JtYXQteTJrIC1XaW5pdC1zZWxmIC1XaWdub3JlZC1xdWFsaWZpZXJzIC1Xb2xkLXN0eWxlLWRl
+Y2xhcmF0aW9uIC1Xb2xkLXN0eWxlLWRlZmluaXRpb24gLVd0eXBlLWxpbWl0cyAtZnN0YWNrLXBy
+b3RlY3Rvci1hbGwKTERGTEFHUyAgICAgICAgICAgLVdsLC0td2Fybi1jb21tb24gLVdsLC16LHJl
+bHJvIC1XbCwteixub3cgLXBpZSAtbTY0IC1nIAptYWtlICAgICAgICAgICAgICBtYWtlCmluc3Rh
+bGwgICAgICAgICAgIGluc3RhbGwKcHl0aG9uICAgICAgICAgICAgcHl0aG9uIC1CCnNtYmQgICAg
+ICAgICAgICAgIC91c3Ivc2Jpbi9zbWJkCm1vZHVsZSBzdXBwb3J0ICAgIG5vCmhvc3QgQ1BVICAg
+ICAgICAgIHg4Nl82NApob3N0IGJpZyBlbmRpYW4gICBubwp0YXJnZXQgbGlzdCAgICAgICB4ODZf
+NjQtc29mdG1tdSBhYXJjaDY0LXNvZnRtbXUKdGNnIGRlYnVnIGVuYWJsZWQgbm8KZ3Byb2YgZW5h
+YmxlZCAgICAgbm8Kc3BhcnNlIGVuYWJsZWQgICAgbm8Kc3RyaXAgYmluYXJpZXMgICAgeWVzCnBy
+b2ZpbGVyICAgICAgICAgIG5vCnN0YXRpYyBidWlsZCAgICAgIG5vCnBpeG1hbiAgICAgICAgICAg
+IHN5c3RlbQpTREwgc3VwcG9ydCAgICAgICB5ZXMgKDEuMi4xNCkKR1RLIHN1cHBvcnQgICAgICAg
+bm8gCkdUSyBHTCBzdXBwb3J0ICAgIG5vClZURSBzdXBwb3J0ICAgICAgIG5vIApUTFMgcHJpb3Jp
+dHkgICAgICBOT1JNQUwKR05VVExTIHN1cHBvcnQgICAgbm8KR05VVExTIHJuZCAgICAgICAgbm8K
+bGliZ2NyeXB0ICAgICAgICAgbm8KbGliZ2NyeXB0IGtkZiAgICAgbm8KbmV0dGxlICAgICAgICAg
+ICAgbm8gCm5ldHRsZSBrZGYgICAgICAgIG5vCmxpYnRhc24xICAgICAgICAgIG5vCmN1cnNlcyBz
+dXBwb3J0ICAgIG5vCnZpcmdsIHN1cHBvcnQgICAgIG5vCmN1cmwgc3VwcG9ydCAgICAgIG5vCm1p
+bmd3MzIgc3VwcG9ydCAgIG5vCkF1ZGlvIGRyaXZlcnMgICAgIG9zcwpCbG9jayB3aGl0ZWxpc3Qg
+KHJ3KSAKQmxvY2sgd2hpdGVsaXN0IChybykgClZpcnRGUyBzdXBwb3J0ICAgIG5vClZOQyBzdXBw
+b3J0ICAgICAgIHllcwpWTkMgU0FTTCBzdXBwb3J0ICBubwpWTkMgSlBFRyBzdXBwb3J0ICBubwpW
+TkMgUE5HIHN1cHBvcnQgICBubwp4ZW4gc3VwcG9ydCAgICAgICBubwpicmxhcGkgc3VwcG9ydCAg
+ICBubwpibHVleiAgc3VwcG9ydCAgICBubwpEb2N1bWVudGF0aW9uICAgICBubwpQSUUgICAgICAg
+ICAgICAgICB5ZXMKdmRlIHN1cHBvcnQgICAgICAgbm8KbmV0bWFwIHN1cHBvcnQgICAgbm8KTGlu
+dXggQUlPIHN1cHBvcnQgbm8KQVRUUi9YQVRUUiBzdXBwb3J0IHllcwpJbnN0YWxsIGJsb2JzICAg
+ICB5ZXMKS1ZNIHN1cHBvcnQgICAgICAgeWVzCkNPTE8gc3VwcG9ydCAgICAgIHllcwpSRE1BIHN1
+cHBvcnQgICAgICBubwpUQ0cgaW50ZXJwcmV0ZXIgICBubwpmZHQgc3VwcG9ydCAgICAgICB5ZXMK
+cHJlYWR2IHN1cHBvcnQgICAgeWVzCmZkYXRhc3luYyAgICAgICAgIHllcwptYWR2aXNlICAgICAg
+ICAgICB5ZXMKcG9zaXhfbWFkdmlzZSAgICAgeWVzCmxpYmNhcC1uZyBzdXBwb3J0IG5vCnZob3N0
+LW5ldCBzdXBwb3J0IHllcwp2aG9zdC1zY3NpIHN1cHBvcnQgeWVzCnZob3N0LXZzb2NrIHN1cHBv
+cnQgeWVzClRyYWNlIGJhY2tlbmRzICAgIGxvZwpzcGljZSBzdXBwb3J0ICAgICBubyAKcmJkIHN1
+cHBvcnQgICAgICAgbm8KeGZzY3RsIHN1cHBvcnQgICAgbm8Kc21hcnRjYXJkIHN1cHBvcnQgbm8K
+bGlidXNiICAgICAgICAgICAgbm8KdXNiIG5ldCByZWRpciAgICAgbm8KT3BlbkdMIHN1cHBvcnQg
+ICAgbm8KT3BlbkdMIGRtYWJ1ZnMgICAgbm8KbGliaXNjc2kgc3VwcG9ydCAgbm8KbGlibmZzIHN1
+cHBvcnQgICAgbm8KYnVpbGQgZ3Vlc3QgYWdlbnQgeWVzClFHQSBWU1Mgc3VwcG9ydCAgIG5vClFH
+QSB3MzIgZGlzayBpbmZvIG5vClFHQSBNU0kgc3VwcG9ydCAgIG5vCnNlY2NvbXAgc3VwcG9ydCAg
+IG5vCmNvcm91dGluZSBiYWNrZW5kIHVjb250ZXh0CmNvcm91dGluZSBwb29sICAgIHllcwpkZWJ1
+ZyBzdGFjayB1c2FnZSBubwpHbHVzdGVyRlMgc3VwcG9ydCBubwpBcmNoaXBlbGFnbyBzdXBwb3J0
+IG5vCmdjb3YgICAgICAgICAgICAgIGdjb3YKZ2NvdiBlbmFibGVkICAgICAgbm8KVFBNIHN1cHBv
+cnQgICAgICAgeWVzCmxpYnNzaDIgc3VwcG9ydCAgIG5vClRQTSBwYXNzdGhyb3VnaCAgIHllcwpR
+T00gZGVidWdnaW5nICAgICB5ZXMKbHpvIHN1cHBvcnQgICAgICAgbm8Kc25hcHB5IHN1cHBvcnQg
+ICAgbm8KYnppcDIgc3VwcG9ydCAgICAgbm8KTlVNQSBob3N0IHN1cHBvcnQgbm8KdGNtYWxsb2Mg
+c3VwcG9ydCAgbm8KamVtYWxsb2Mgc3VwcG9ydCAgbm8KYXZ4MiBvcHRpbWl6YXRpb24gbm8KcmVw
+bGljYXRpb24gc3VwcG9ydCB5ZXMKICBHRU4gICAgIHg4Nl82NC1zb2Z0bW11L2NvbmZpZy1kZXZp
+Y2VzLm1hay50bXAKICBHRU4gICAgIGFhcmNoNjQtc29mdG1tdS9jb25maWctZGV2aWNlcy5tYWsu
+dG1wCiAgR0VOICAgICBxZW11LW9wdGlvbnMuZGVmCiAgR0VOICAgICBjb25maWctaG9zdC5oCiAg
+R0VOICAgICBxbXAtY29tbWFuZHMuaAogIEdFTiAgICAgcWFwaS10eXBlcy5oCiAgR0VOICAgICBx
+YXBpLXZpc2l0LmgKICBHRU4gICAgIHFhcGktZXZlbnQuaAogIEdFTiAgICAgcW1wLWludHJvc3Bl
+Y3QuaAogIEdFTiAgICAgbW9kdWxlX2Jsb2NrLmgKICBHRU4gICAgIHRlc3RzL3Rlc3QtcWFwaS10
+eXBlcy5oCiAgR0VOICAgICB0ZXN0cy90ZXN0LXFhcGktdmlzaXQuaAogIEdFTiAgICAgdGVzdHMv
+dGVzdC1xbXAtY29tbWFuZHMuaAogIEdFTiAgICAgdGVzdHMvdGVzdC1xYXBpLWV2ZW50LmgKICBH
+RU4gICAgIHRlc3RzL3Rlc3QtcW1wLWludHJvc3BlY3QuaAogIEdFTiAgICAgdHJhY2UvZ2VuZXJh
+dGVkLXRyYWNlcnMuaAogIEdFTiAgICAgeDg2XzY0LXNvZnRtbXUvY29uZmlnLWRldmljZXMubWFr
+CiAgR0VOICAgICBhYXJjaDY0LXNvZnRtbXUvY29uZmlnLWRldmljZXMubWFrCiAgR0VOICAgICB0
+cmFjZS9nZW5lcmF0ZWQtdGNnLXRyYWNlcnMuaAogIEdFTiAgICAgdHJhY2UvZ2VuZXJhdGVkLWhl
+bHBlcnMtd3JhcHBlcnMuaAogIEdFTiAgICAgdHJhY2UvZ2VuZXJhdGVkLWhlbHBlcnMuaAogIEdF
+TiAgICAgY29uZmlnLWFsbC1kZXZpY2VzLm1hawogIENDICAgICAgdGVzdHMvcWVtdS1pb3Rlc3Rz
+L3NvY2tldF9zY21faGVscGVyLm8KICBHRU4gICAgIHFnYS9xYXBpLWdlbmVyYXRlZC9xZ2EtcWFw
+aS10eXBlcy5oCiAgR0VOICAgICBxZ2EvcWFwaS1nZW5lcmF0ZWQvcWdhLXFhcGktdmlzaXQuaAog
+IEdFTiAgICAgcWdhL3FhcGktZ2VuZXJhdGVkL3FnYS1xbXAtY29tbWFuZHMuaAogIEdFTiAgICAg
+cWdhL3FhcGktZ2VuZXJhdGVkL3FnYS1xYXBpLXR5cGVzLmMKICBHRU4gICAgIHFnYS9xYXBpLWdl
+bmVyYXRlZC9xZ2EtcWFwaS12aXNpdC5jCiAgR0VOICAgICBxZ2EvcWFwaS1nZW5lcmF0ZWQvcWdh
+LXFtcC1tYXJzaGFsLmMKICBHRU4gICAgIHFtcC1pbnRyb3NwZWN0LmMKICBHRU4gICAgIHFhcGkt
+dHlwZXMuYwogIEdFTiAgICAgcWFwaS12aXNpdC5jCiAgR0VOICAgICBxYXBpLWV2ZW50LmMKICBD
+QyAgICAgIHFhcGkvcWFwaS12aXNpdC1jb3JlLm8KICBDQyAgICAgIHFhcGkvcWFwaS1kZWFsbG9j
+LXZpc2l0b3IubwogIENDICAgICAgcWFwaS9xb2JqZWN0LWlucHV0LXZpc2l0b3IubwogIENDICAg
+ICAgcWFwaS9xb2JqZWN0LW91dHB1dC12aXNpdG9yLm8KICBDQyAgICAgIHFhcGkvcW1wLXJlZ2lz
+dHJ5Lm8KICBDQyAgICAgIHFhcGkvcW1wLWRpc3BhdGNoLm8KICBDQyAgICAgIHFhcGkvc3RyaW5n
+LWlucHV0LXZpc2l0b3IubwogIENDICAgICAgcWFwaS9zdHJpbmctb3V0cHV0LXZpc2l0b3Iubwog
+IENDICAgICAgcWFwaS9vcHRzLXZpc2l0b3IubwogIENDICAgICAgcWFwaS9xbXAtZXZlbnQubwog
+IENDICAgICAgcWFwaS9xYXBpLWNsb25lLXZpc2l0b3IubwogIENDICAgICAgcWFwaS9xYXBpLXV0
+aWwubwogIENDICAgICAgcW9iamVjdC9xbnVsbC5vCiAgQ0MgICAgICBxb2JqZWN0L3FpbnQubwog
+IENDICAgICAgcW9iamVjdC9xc3RyaW5nLm8KICBDQyAgICAgIHFvYmplY3QvcWRpY3QubwogIEND
+ICAgICAgcW9iamVjdC9xbGlzdC5vCiAgQ0MgICAgICBxb2JqZWN0L3FmbG9hdC5vCiAgQ0MgICAg
+ICBxb2JqZWN0L3Fib29sLm8KICBDQyAgICAgIHFvYmplY3QvcWpzb24ubwogIENDICAgICAgcW9i
+amVjdC9xb2JqZWN0Lm8KICBDQyAgICAgIHFvYmplY3QvanNvbi1sZXhlci5vCiAgQ0MgICAgICBx
+b2JqZWN0L2pzb24tc3RyZWFtZXIubwogIENDICAgICAgcW9iamVjdC9qc29uLXBhcnNlci5vCiAg
+R0VOICAgICB0cmFjZS9nZW5lcmF0ZWQtdHJhY2Vycy5jCiAgQ0MgICAgICB0cmFjZS9jb250cm9s
+Lm8KICBDQyAgICAgIHRyYWNlL3FtcC5vCiAgQ0MgICAgICB1dGlsL29zZGVwLm8KICBDQyAgICAg
+IHV0aWwvY3V0aWxzLm8KICBDQyAgICAgIHV0aWwvdW5pY29kZS5vCiAgQ0MgICAgICB1dGlsL3Fl
+bXUtdGltZXItY29tbW9uLm8KICBDQyAgICAgIHV0aWwvYnVmZmVyaXN6ZXJvLm8KICBDQyAgICAg
+IHV0aWwvY29tcGF0ZmQubwogIENDICAgICAgdXRpbC9ldmVudF9ub3RpZmllci1wb3NpeC5vCiAg
+Q0MgICAgICB1dGlsL21tYXAtYWxsb2MubwogIENDICAgICAgdXRpbC9vc2xpYi1wb3NpeC5vCiAg
+Q0MgICAgICB1dGlsL3FlbXUtb3BlbnB0eS5vCiAgQ0MgICAgICB1dGlsL3FlbXUtdGhyZWFkLXBv
+c2l4Lm8KICBDQyAgICAgIHV0aWwvbWVtZmQubwogIENDICAgICAgdXRpbC9lbnZsaXN0Lm8KICBD
+QyAgICAgIHV0aWwvcGF0aC5vCiAgQ0MgICAgICB1dGlsL21vZHVsZS5vCiAgQ0MgICAgICB1dGls
+L2JpdG1hcC5vCiAgQ0MgICAgICB1dGlsL2JpdG9wcy5vCiAgQ0MgICAgICB1dGlsL2hiaXRtYXAu
+bwogIENDICAgICAgdXRpbC9maWZvOC5vCiAgQ0MgICAgICB1dGlsL2FjbC5vCiAgQ0MgICAgICB1
+dGlsL2Vycm9yLm8KICBDQyAgICAgIHV0aWwvcWVtdS1lcnJvci5vCiAgQ0MgICAgICB1dGlsL2lk
+Lm8KICBDQyAgICAgIHV0aWwvaW92Lm8KICBDQyAgICAgIHV0aWwvcWVtdS1jb25maWcubwogIEND
+ICAgICAgdXRpbC9xZW11LXNvY2tldHMubwogIENDICAgICAgdXRpbC91cmkubwogIENDICAgICAg
+dXRpbC9ub3RpZnkubwogIENDICAgICAgdXRpbC9xZW11LW9wdGlvbi5vCiAgQ0MgICAgICB1dGls
+L3FlbXUtcHJvZ3Jlc3MubwogIENDICAgICAgdXRpbC9oZXhkdW1wLm8KICBDQyAgICAgIHV0aWwv
+Y3JjMzJjLm8KICBDQyAgICAgIHV0aWwvdXVpZC5vCiAgQ0MgICAgICB1dGlsL3Rocm90dGxlLm8K
+ICBDQyAgICAgIHV0aWwvZ2V0YXV4dmFsLm8KICBDQyAgICAgIHV0aWwvcmVhZGxpbmUubwogIEND
+ICAgICAgdXRpbC9yY3UubwogIENDICAgICAgdXRpbC9xZW11LWNvcm91dGluZS5vCiAgQ0MgICAg
+ICB1dGlsL3FlbXUtY29yb3V0aW5lLWlvLm8KICBDQyAgICAgIHV0aWwvcWVtdS1jb3JvdXRpbmUt
+bG9jay5vCiAgQ0MgICAgICB1dGlsL3FlbXUtY29yb3V0aW5lLXNsZWVwLm8KICBDQyAgICAgIHV0
+aWwvY29yb3V0aW5lLXVjb250ZXh0Lm8KICBDQyAgICAgIHV0aWwvYnVmZmVyLm8KICBDQyAgICAg
+IHV0aWwvdGltZWQtYXZlcmFnZS5vCiAgQ0MgICAgICB1dGlsL2Jhc2U2NC5vCiAgQ0MgICAgICB1
+dGlsL2xvZy5vCiAgQ0MgICAgICB1dGlsL3FkaXN0Lm8KICBDQyAgICAgIHV0aWwvcmFuZ2Uubwog
+IENDICAgICAgdXRpbC9xaHQubwogIENDICAgICAgY3J5cHRvL3Bia2RmLXN0dWIubwogIENDICAg
+ICAgc3R1YnMvYXJjaC1xdWVyeS1jcHUtZGVmLm8KICBDQyAgICAgIHN0dWJzL2FyY2gtcXVlcnkt
+Y3B1LW1vZGVsLWV4cGFuc2lvbi5vCiAgQ0MgICAgICBzdHVicy9hcmNoLXF1ZXJ5LWNwdS1tb2Rl
+bC1jb21wYXJpc29uLm8KICBDQyAgICAgIHN0dWJzL2FyY2gtcXVlcnktY3B1LW1vZGVsLWJhc2Vs
+aW5lLm8KICBDQyAgICAgIHN0dWJzL2JkcnYtbmV4dC1tb25pdG9yLW93bmVkLm8KICBDQyAgICAg
+IHN0dWJzL2Jsay1jb21taXQtYWxsLm8KICBDQyAgICAgIHN0dWJzL2Jsb2NrZGV2LWNsb3NlLWFs
+bC1iZHJ2LXN0YXRlcy5vCiAgQ0MgICAgICBzdHVicy9jbG9jay13YXJwLm8KICBDQyAgICAgIHN0
+dWJzL2NwdS1nZXQtY2xvY2subwogIENDICAgICAgc3R1YnMvY3B1LWdldC1pY291bnQubwogIEND
+ICAgICAgc3R1YnMvZHVtcC5vCiAgQ0MgICAgICBzdHVicy9lcnJvci1wcmludGYubwogIENDICAg
+ICAgc3R1YnMvZmRzZXQtYWRkLWZkLm8KICBDQyAgICAgIHN0dWJzL2Zkc2V0LWZpbmQtZmQubwog
+IENDICAgICAgc3R1YnMvZmRzZXQtZ2V0LWZkLm8KICBDQyAgICAgIHN0dWJzL2Zkc2V0LXJlbW92
+ZS1mZC5vCiAgQ0MgICAgICBzdHVicy9nZGJzdHViLm8KICBDQyAgICAgIHN0dWJzL2dldC1mZC5v
+CiAgQ0MgICAgICBzdHVicy9nZXQtbmV4dC1zZXJpYWwubwogIENDICAgICAgc3R1YnMvZ2V0LXZt
+LW5hbWUubwogIENDICAgICAgc3R1YnMvaW90aHJlYWQubwogIENDICAgICAgc3R1YnMvaW90aHJl
+YWQtbG9jay5vCiAgQ0MgICAgICBzdHVicy9pcy1kYWVtb25pemVkLm8KICBDQyAgICAgIHN0dWJz
+L21hY2hpbmUtaW5pdC1kb25lLm8KICBDQyAgICAgIHN0dWJzL21pZ3ItYmxvY2tlci5vCiAgQ0Mg
+ICAgICBzdHVicy9tb24taXMtcW1wLm8KICBDQyAgICAgIHN0dWJzL21vbml0b3ItaW5pdC5vCiAg
+Q0MgICAgICBzdHVicy9ub3RpZnktZXZlbnQubwogIENDICAgICAgc3R1YnMvcXRlc3QubwogIEND
+ICAgICAgc3R1YnMvcmVwbGF5Lm8KICBDQyAgICAgIHN0dWJzL3JlcGxheS11c2VyLm8KICBDQyAg
+ICAgIHN0dWJzL3Jlc2V0Lm8KICBDQyAgICAgIHN0dWJzL3J1bnN0YXRlLWNoZWNrLm8KICBDQyAg
+ICAgIHN0dWJzL3NldC1mZC1oYW5kbGVyLm8KICBDQyAgICAgIHN0dWJzL3NsaXJwLm8KICBDQyAg
+ICAgIHN0dWJzL3N5c2J1cy5vCiAgQ0MgICAgICBzdHVicy90cmFjZS1jb250cm9sLm8KICBDQyAg
+ICAgIHN0dWJzL3V1aWQubwogIENDICAgICAgc3R1YnMvdm0tc3RvcC5vCiAgQ0MgICAgICBzdHVi
+cy92bXN0YXRlLm8KICBDQyAgICAgIHN0dWJzL2NwdXMubwogIENDICAgICAgc3R1YnMva3ZtLm8K
+ICBDQyAgICAgIHN0dWJzL3FtcF9wY19kaW1tX2RldmljZV9saXN0Lm8KICBDQyAgICAgIHN0dWJz
+L3RhcmdldC1tb25pdG9yLWRlZnMubwogIENDICAgICAgc3R1YnMvdGFyZ2V0LWdldC1tb25pdG9y
+LWRlZi5vCiAgQ0MgICAgICBzdHVicy92aG9zdC5vCiAgQ0MgICAgICBzdHVicy9pb2hhbmRsZXIu
+bwogIENDICAgICAgc3R1YnMvc21iaW9zX3R5cGVfMzgubwogIENDICAgICAgc3R1YnMvaXBtaS5v
+CiAgQ0MgICAgICBzdHVicy9wY19tYWR0X2NwdV9lbnRyeS5vCiAgQ0MgICAgICBzdHVicy9taWdy
+YXRpb24tY29sby5vCiAgQ0MgICAgICBjb250cmliL2l2c2htZW0tY2xpZW50L2l2c2htZW0tY2xp
+ZW50Lm8KICBDQyAgICAgIGNvbnRyaWIvaXZzaG1lbS1jbGllbnQvbWFpbi5vCiAgQ0MgICAgICBj
+b250cmliL2l2c2htZW0tc2VydmVyL2l2c2htZW0tc2VydmVyLm8KICBDQyAgICAgIGNvbnRyaWIv
+aXZzaG1lbS1zZXJ2ZXIvbWFpbi5vCiAgQ0MgICAgICBxZW11LW5iZC5vCiAgQ0MgICAgICBhc3lu
+Yy5vCiAgQ0MgICAgICB0aHJlYWQtcG9vbC5vCiAgQ0MgICAgICBibG9jay5vCiAgQ0MgICAgICBi
+bG9ja2pvYi5vCiAgQ0MgICAgICBtYWluLWxvb3AubwogIENDICAgICAgaW9oYW5kbGVyLm8KICBD
+QyAgICAgIHFlbXUtdGltZXIubwogIENDICAgICAgYWlvLXBvc2l4Lm8KICBDQyAgICAgIHFlbXUt
+aW8tY21kcy5vCiAgQ0MgICAgICByZXBsaWNhdGlvbi5vCiAgQ0MgICAgICBibG9jay9xY293Lm8K
+ICBDQyAgICAgIGJsb2NrL3Jhd19ic2QubwogIENDICAgICAgYmxvY2svdmRpLm8KICBDQyAgICAg
+IGJsb2NrL3ZtZGsubwogIENDICAgICAgYmxvY2svY2xvb3AubwogIENDICAgICAgYmxvY2svYm9j
+aHMubwogIENDICAgICAgYmxvY2svdnBjLm8KICBDQyAgICAgIGJsb2NrL3Z2ZmF0Lm8KICBDQyAg
+ICAgIGJsb2NrL2RtZy5vCiAgQ0MgICAgICBibG9jay9xY293Mi5vCiAgQ0MgICAgICBibG9jay9x
+Y293Mi1yZWZjb3VudC5vCiAgQ0MgICAgICBibG9jay9xY293Mi1jbHVzdGVyLm8KICBDQyAgICAg
+IGJsb2NrL3Fjb3cyLXNuYXBzaG90Lm8KICBDQyAgICAgIGJsb2NrL3Fjb3cyLWNhY2hlLm8KICBD
+QyAgICAgIGJsb2NrL3FlZC5vCiAgQ0MgICAgICBibG9jay9xZWQtZ2VuY2IubwogIENDICAgICAg
+YmxvY2svcWVkLWwyLWNhY2hlLm8KICBDQyAgICAgIGJsb2NrL3FlZC10YWJsZS5vCiAgQ0MgICAg
+ICBibG9jay9xZWQtY2x1c3Rlci5vCiAgQ0MgICAgICBibG9jay9xZWQtY2hlY2subwogIENDICAg
+ICAgYmxvY2svdmhkeC5vCiAgQ0MgICAgICBibG9jay92aGR4LWVuZGlhbi5vCiAgQ0MgICAgICBi
+bG9jay92aGR4LWxvZy5vCiAgQ0MgICAgICBibG9jay9xdW9ydW0ubwogIENDICAgICAgYmxvY2sv
+cGFyYWxsZWxzLm8KICBDQyAgICAgIGJsb2NrL2Jsa2RlYnVnLm8KICBDQyAgICAgIGJsb2NrL2Js
+a3ZlcmlmeS5vCiAgQ0MgICAgICBibG9jay9ibGtyZXBsYXkubwogIENDICAgICAgYmxvY2svYmxv
+Y2stYmFja2VuZC5vCiAgQ0MgICAgICBibG9jay9zbmFwc2hvdC5vCiAgQ0MgICAgICBibG9jay9x
+YXBpLm8KICBDQyAgICAgIGJsb2NrL3Jhdy1wb3NpeC5vCiAgQ0MgICAgICBibG9jay9udWxsLm8K
+ICBDQyAgICAgIGJsb2NrL21pcnJvci5vCiAgQ0MgICAgICBibG9jay9jb21taXQubwogIENDICAg
+ICAgYmxvY2svaW8ubwogIENDICAgICAgYmxvY2svdGhyb3R0bGUtZ3JvdXBzLm8KICBDQyAgICAg
+IGJsb2NrL25iZC5vCiAgQ0MgICAgICBibG9jay9uYmQtY2xpZW50Lm8KICBDQyAgICAgIGJsb2Nr
+L3NoZWVwZG9nLm8KICBDQyAgICAgIGJsb2NrL2FjY291bnRpbmcubwogIENDICAgICAgYmxvY2sv
+ZGlydHktYml0bWFwLm8KICBDQyAgICAgIGJsb2NrL3dyaXRlLXRocmVzaG9sZC5vCiAgQ0MgICAg
+ICBibG9jay9iYWNrdXAubwogIENDICAgICAgYmxvY2svcmVwbGljYXRpb24ubwogIENDICAgICAg
+YmxvY2svY3J5cHRvLm8KICBDQyAgICAgIG5iZC9zZXJ2ZXIubwogIENDICAgICAgbmJkL2NsaWVu
+dC5vCiAgQ0MgICAgICBuYmQvY29tbW9uLm8KICBDQyAgICAgIGNyeXB0by9pbml0Lm8KICBDQyAg
+ICAgIGNyeXB0by9oYXNoLm8KICBDQyAgICAgIGNyeXB0by9oYXNoLWdsaWIubwogIENDICAgICAg
+Y3J5cHRvL2htYWMubwogIENDICAgICAgY3J5cHRvL2Flcy5vCiAgQ0MgICAgICBjcnlwdG8vaG1h
+Yy1nbGliLm8KICBDQyAgICAgIGNyeXB0by9kZXNyZmIubwogIENDICAgICAgY3J5cHRvL3Rsc2Ny
+ZWRzLm8KICBDQyAgICAgIGNyeXB0by9jaXBoZXIubwogIENDICAgICAgY3J5cHRvL3Rsc2NyZWRz
+eDUwOS5vCiAgQ0MgICAgICBjcnlwdG8vdGxzY3JlZHNhbm9uLm8KICBDQyAgICAgIGNyeXB0by90
+bHNzZXNzaW9uLm8KICBDQyAgICAgIGNyeXB0by9zZWNyZXQubwogIENDICAgICAgY3J5cHRvL3Jh
+bmRvbS1wbGF0Zm9ybS5vCiAgQ0MgICAgICBjcnlwdG8vcGJrZGYubwogIENDICAgICAgY3J5cHRv
+L2l2Z2VuLm8KICBDQyAgICAgIGNyeXB0by9pdmdlbi1lc3Npdi5vCiAgQ0MgICAgICBjcnlwdG8v
+aXZnZW4tcGxhaW4ubwogIENDICAgICAgY3J5cHRvL2l2Z2VuLXBsYWluNjQubwogIENDICAgICAg
+Y3J5cHRvL2Fmc3BsaXQubwogIENDICAgICAgY3J5cHRvL3h0cy5vCiAgQ0MgICAgICBjcnlwdG8v
+YmxvY2subwogIENDICAgICAgY3J5cHRvL2Jsb2NrLXFjb3cubwogIENDICAgICAgY3J5cHRvL2Js
+b2NrLWx1a3MubwogIENDICAgICAgaW8vY2hhbm5lbC5vCiAgQ0MgICAgICBpby9jaGFubmVsLWJ1
+ZmZlci5vCiAgQ0MgICAgICBpby9jaGFubmVsLWNvbW1hbmQubwogIENDICAgICAgaW8vY2hhbm5l
+bC1maWxlLm8KICBDQyAgICAgIGlvL2NoYW5uZWwtc29ja2V0Lm8KICBDQyAgICAgIGlvL2NoYW5u
+ZWwtdGxzLm8KICBDQyAgICAgIGlvL2NoYW5uZWwtd2F0Y2gubwogIENDICAgICAgaW8vY2hhbm5l
+bC13ZWJzb2NrLm8KICBDQyAgICAgIGlvL2NoYW5uZWwtdXRpbC5vCiAgQ0MgICAgICBpby90YXNr
+Lm8KICBDQyAgICAgIHFvbS9vYmplY3QubwogIENDICAgICAgcW9tL2NvbnRhaW5lci5vCiAgQ0Mg
+ICAgICBxb20vcW9tLXFvYmplY3QubwogIENDICAgICAgcW9tL29iamVjdF9pbnRlcmZhY2VzLm8K
+ICBHRU4gICAgIHFlbXUtaW1nLWNtZHMuaAogIENDICAgICAgcWVtdS1pby5vCiAgQ0MgICAgICBx
+ZW11LWJyaWRnZS1oZWxwZXIubwogIENDICAgICAgYmxvY2tkZXYubwogIENDICAgICAgYmxvY2tk
+ZXYtbmJkLm8KICBDQyAgICAgIGlvdGhyZWFkLm8KICBDQyAgICAgIHFkZXYtbW9uaXRvci5vCiAg
+Q0MgICAgICBkZXZpY2UtaG90cGx1Zy5vCiAgQ0MgICAgICBvcy1wb3NpeC5vCiAgQ0MgICAgICBx
+ZW11LWNoYXIubwogIENDICAgICAgcGFnZV9jYWNoZS5vCiAgQ0MgICAgICBhY2NlbC5vCiAgQ0Mg
+ICAgICBidC1ob3N0Lm8KICBDQyAgICAgIGJ0LXZoY2kubwogIENDICAgICAgZG1hLWhlbHBlcnMu
+bwogIENDICAgICAgdmwubwogIENDICAgICAgdHBtLm8KICBDQyAgICAgIGRldmljZV90cmVlLm8K
+ICBHRU4gICAgIHFtcC1tYXJzaGFsLmMKICBDQyAgICAgIHFtcC5vCiAgQ0MgICAgICBobXAubwog
+IENDICAgICAgY3B1cy1jb21tb24ubwogIENDICAgICAgYXVkaW8vYXVkaW8ubwogIENDICAgICAg
+YXVkaW8vbm9hdWRpby5vCiAgQ0MgICAgICBhdWRpby93YXZhdWRpby5vCiAgQ0MgICAgICBhdWRp
+by9taXhlbmcubwogIENDICAgICAgYXVkaW8vc2RsYXVkaW8ubwogIENDICAgICAgYXVkaW8vb3Nz
+YXVkaW8ubwogIENDICAgICAgYXVkaW8vd2F2Y2FwdHVyZS5vCiAgQ0MgICAgICBiYWNrZW5kcy9y
+bmcubwogIENDICAgICAgYmFja2VuZHMvcm5nLWVnZC5vCiAgQ0MgICAgICBiYWNrZW5kcy9ybmct
+cmFuZG9tLm8KICBDQyAgICAgIGJhY2tlbmRzL21zbW91c2UubwogIENDICAgICAgYmFja2VuZHMv
+dGVzdGRldi5vCiAgQ0MgICAgICBiYWNrZW5kcy90cG0ubwogIENDICAgICAgYmFja2VuZHMvaG9z
+dG1lbS5vCiAgQ0MgICAgICBiYWNrZW5kcy9ob3N0bWVtLXJhbS5vCiAgQ0MgICAgICBiYWNrZW5k
+cy9ob3N0bWVtLWZpbGUubwogIENDICAgICAgYmFja2VuZHMvY3J5cHRvZGV2Lm8KICBDQyAgICAg
+IGJhY2tlbmRzL2NyeXB0b2Rldi1idWlsdGluLm8KICBDQyAgICAgIGJsb2NrL3N0cmVhbS5vCiAg
+Q0MgICAgICBkaXNhcy9hcm0ubwogIENDICAgICAgZGlzYXMvaTM4Ni5vCiAgQ0MgICAgICBmc2Rl
+di9xZW11LWZzZGV2LWR1bW15Lm8KICBDQyAgICAgIGZzZGV2L3FlbXUtZnNkZXYtb3B0cy5vCiAg
+Q0MgICAgICBody9hY3BpL2NvcmUubwogIENDICAgICAgaHcvYWNwaS9waWl4NC5vCiAgQ0MgICAg
+ICBody9hY3BpL3BjaWhwLm8KICBDQyAgICAgIGh3L2FjcGkvaWNoOS5vCiAgQ0MgICAgICBody9h
+Y3BpL3Rjby5vCiAgQ0MgICAgICBody9hY3BpL2NwdV9ob3RwbHVnLm8KICBDQyAgICAgIGh3L2Fj
+cGkvbWVtb3J5X2hvdHBsdWcubwogIENDICAgICAgaHcvYWNwaS9tZW1vcnlfaG90cGx1Z19hY3Bp
+X3RhYmxlLm8KICBDQyAgICAgIGh3L2FjcGkvY3B1Lm8KICBDQyAgICAgIGh3L2FjcGkvbnZkaW1t
+Lm8KICBDQyAgICAgIGh3L2FjcGkvYWNwaV9pbnRlcmZhY2UubwogIENDICAgICAgaHcvYWNwaS9i
+aW9zLWxpbmtlci1sb2FkZXIubwogIENDICAgICAgaHcvYWNwaS9hbWwtYnVpbGQubwogIENDICAg
+ICAgaHcvYWNwaS9pcG1pLm8KICBDQyAgICAgIGh3L2F1ZGlvL3NiMTYubwogIENDICAgICAgaHcv
+YXVkaW8vYWM5Ny5vCiAgQ0MgICAgICBody9hdWRpby9lczEzNzAubwogIENDICAgICAgaHcvYXVk
+aW8vYWRsaWIubwogIENDICAgICAgaHcvYXVkaW8vZm1vcGwubwogIENDICAgICAgaHcvYXVkaW8v
+Z3VzLm8KICBDQyAgICAgIGh3L2F1ZGlvL2d1c2VtdV9oYWwubwogIENDICAgICAgaHcvYXVkaW8v
+Z3VzZW11X21peGVyLm8KICBDQyAgICAgIGh3L2F1ZGlvL2NzNDIzMWEubwogIENDICAgICAgaHcv
+YXVkaW8vaW50ZWwtaGRhLm8KICBDQyAgICAgIGh3L2F1ZGlvL2hkYS1jb2RlYy5vCiAgQ0MgICAg
+ICBody9hdWRpby9wY3Nway5vCiAgQ0MgICAgICBody9hdWRpby93bTg3NTAubwogIENDICAgICAg
+aHcvYXVkaW8vcGwwNDEubwogIENDICAgICAgaHcvYXVkaW8vbG00NTQ5Lm8KICBDQyAgICAgIGh3
+L2F1ZGlvL21hcnZlbGxfODh3ODYxOC5vCiAgQ0MgICAgICBody9ibG9jay9ibG9jay5vCiAgQ0Mg
+ICAgICBody9ibG9jay9jZHJvbS5vCiAgQ0MgICAgICBody9ibG9jay9oZC1nZW9tZXRyeS5vCiAg
+Q0MgICAgICBody9ibG9jay9mZGMubwogIENDICAgICAgaHcvYmxvY2svbTI1cDgwLm8KICBDQyAg
+ICAgIGh3L2Jsb2NrL25hbmQubwogIENDICAgICAgaHcvYmxvY2svcGZsYXNoX2NmaTAxLm8KICBD
+QyAgICAgIGh3L2Jsb2NrL3BmbGFzaF9jZmkwMi5vCiAgQ0MgICAgICBody9ibG9jay9lY2Mubwog
+IENDICAgICAgaHcvYmxvY2svb25lbmFuZC5vCiAgQ0MgICAgICBody9ibG9jay9udm1lLm8KICBD
+QyAgICAgIGh3L2J0L2NvcmUubwogIENDICAgICAgaHcvYnQvbDJjYXAubwogIENDICAgICAgaHcv
+YnQvc2RwLm8KICBDQyAgICAgIGh3L2J0L2hjaS5vCiAgQ0MgICAgICBody9idC9oaWQubwogIEND
+ICAgICAgaHcvYnQvaGNpLWNzci5vCiAgQ0MgICAgICBody9jaGFyL2lwb2N0YWwyMzIubwogIEND
+ICAgICAgaHcvY2hhci9wYXJhbGxlbC5vCiAgQ0MgICAgICBody9jaGFyL3BsMDExLm8KICBDQyAg
+ICAgIGh3L2NoYXIvc2VyaWFsLm8KICBDQyAgICAgIGh3L2NoYXIvc2VyaWFsLWlzYS5vCiAgQ0Mg
+ICAgICBody9jaGFyL3NlcmlhbC1wY2kubwogIENDICAgICAgaHcvY2hhci92aXJ0aW8tY29uc29s
+ZS5vCiAgQ0MgICAgICBody9jaGFyL2NhZGVuY2VfdWFydC5vCiAgQ0MgICAgICBody9jaGFyL2Rl
+YnVnY29uLm8KICBDQyAgICAgIGh3L2NoYXIvaW14X3NlcmlhbC5vCiAgQ0MgICAgICBody9jb3Jl
+L3FkZXYubwogIENDICAgICAgaHcvY29yZS9xZGV2LXByb3BlcnRpZXMubwogIENDICAgICAgaHcv
+Y29yZS9idXMubwogIENDICAgICAgaHcvY29yZS9mdy1wYXRoLXByb3ZpZGVyLm8KICBDQyAgICAg
+IGh3L2NvcmUvaXJxLm8KICBDQyAgICAgIGh3L2NvcmUvaG90cGx1Zy5vCiAgQ0MgICAgICBody9j
+b3JlL3N5c2J1cy5vCiAgQ0MgICAgICBody9jb3JlL3B0aW1lci5vCiAgQ0MgICAgICBody9jb3Jl
+L21hY2hpbmUubwogIENDICAgICAgaHcvY29yZS9udWxsLW1hY2hpbmUubwogIENDICAgICAgaHcv
+Y29yZS9sb2FkZXIubwogIENDICAgICAgaHcvY29yZS9xZGV2LXByb3BlcnRpZXMtc3lzdGVtLm8K
+ICBDQyAgICAgIGh3L2NvcmUvcmVnaXN0ZXIubwogIENDICAgICAgaHcvY29yZS9vci1pcnEubwog
+IENDICAgICAgaHcvY29yZS9wbGF0Zm9ybS1idXMubwogIENDICAgICAgaHcvZGlzcGxheS9jaXJy
+dXNfdmdhLm8KICBDQyAgICAgIGh3L2Rpc3BsYXkvYWRzNzg0Ni5vCiAgQ0MgICAgICBody9kaXNw
+bGF5L3BsMTEwLm8KICBDQyAgICAgIGh3L2Rpc3BsYXkvc3NkMDMwMy5vCiAgQ0MgICAgICBody9k
+aXNwbGF5L3NzZDAzMjMubwogIENDICAgICAgaHcvZGlzcGxheS92Z2EtcGNpLm8KICBDQyAgICAg
+IGh3L2Rpc3BsYXkvdmdhLWlzYS5vCiAgQ0MgICAgICBody9kaXNwbGF5L2JsaXp6YXJkLm8KICBD
+QyAgICAgIGh3L2Rpc3BsYXkvdm13YXJlX3ZnYS5vCiAgQ0MgICAgICBody9kaXNwbGF5L2V4eW5v
+czQyMTBfZmltZC5vCiAgQ0MgICAgICBody9kaXNwbGF5L2ZyYW1lYnVmZmVyLm8KICBDQyAgICAg
+IGh3L2Rpc3BsYXkvdGM2MzkzeGIubwogIENDICAgICAgaHcvZG1hL3BsMDgwLm8KICBDQyAgICAg
+IGh3L2RtYS9wbDMzMC5vCiAgQ0MgICAgICBody9kbWEvaTgyNTcubwogIENDICAgICAgaHcvZG1h
+L3hsbngtenlucS1kZXZjZmcubwogIENDICAgICAgaHcvZ3Bpby9tYXg3MzEwLm8KICBDQyAgICAg
+IGh3L2dwaW8vcGwwNjEubwogIENDICAgICAgaHcvZ3Bpby96YXVydXMubwogIENDICAgICAgaHcv
+Z3Bpby9ncGlvX2tleS5vCiAgQ0MgICAgICBody9pMmMvY29yZS5vCiAgQ0MgICAgICBody9pMmMv
+c21idXMubwogIENDICAgICAgaHcvaTJjL3NtYnVzX2VlcHJvbS5vCiAgQ0MgICAgICBody9pMmMv
+aTJjLWRkYy5vCiAgQ0MgICAgICBody9pMmMvdmVyc2F0aWxlX2kyYy5vCiAgQ0MgICAgICBody9p
+MmMvc21idXNfaWNoOS5vCiAgQ0MgICAgICBody9pMmMvcG1fc21idXMubwogIENDICAgICAgaHcv
+aTJjL2JpdGJhbmdfaTJjLm8KICBDQyAgICAgIGh3L2kyYy9leHlub3M0MjEwX2kyYy5vCiAgQ0Mg
+ICAgICBody9pMmMvaW14X2kyYy5vCiAgQ0MgICAgICBody9pMmMvYXNwZWVkX2kyYy5vCiAgQ0Mg
+ICAgICBody9pZGUvY29yZS5vCiAgQ0MgICAgICBody9pZGUvYXRhcGkubwogIENDICAgICAgaHcv
+aWRlL3FkZXYubwogIENDICAgICAgaHcvaWRlL3BjaS5vCiAgQ0MgICAgICBody9pZGUvaXNhLm8K
+ICBDQyAgICAgIGh3L2lkZS9waWl4Lm8KICBDQyAgICAgIGh3L2lkZS9taWNyb2RyaXZlLm8KICBD
+QyAgICAgIGh3L2lkZS9haGNpLm8KICBDQyAgICAgIGh3L2lkZS9pY2gubwogIENDICAgICAgaHcv
+aW5wdXQvaGlkLm8KICBDQyAgICAgIGh3L2lucHV0L2xtODMyeC5vCiAgQ0MgICAgICBody9pbnB1
+dC9wY2tiZC5vCiAgQ0MgICAgICBody9pbnB1dC9wbDA1MC5vCiAgQ0MgICAgICBody9pbnB1dC9w
+czIubwogIENDICAgICAgaHcvaW5wdXQvc3RlbGxhcmlzX2lucHV0Lm8KICBDQyAgICAgIGh3L2lu
+cHV0L3RzYzIwMDUubwogIENDICAgICAgaHcvaW5wdXQvdm1tb3VzZS5vCiAgQ0MgICAgICBody9p
+bnB1dC92aXJ0aW8taW5wdXQubwogIENDICAgICAgaHcvaW5wdXQvdmlydGlvLWlucHV0LWhpZC5v
+CiAgQ0MgICAgICBody9pbnB1dC92aXJ0aW8taW5wdXQtaG9zdC5vCiAgQ0MgICAgICBody9pbnRj
+L2k4MjU5X2NvbW1vbi5vCiAgQ0MgICAgICBody9pbnRjL2k4MjU5Lm8KICBDQyAgICAgIGh3L2lu
+dGMvcGwxOTAubwogIENDICAgICAgaHcvaW50Yy9pbXhfYXZpYy5vCiAgQ0MgICAgICBody9pbnRj
+L3JlYWx2aWV3X2dpYy5vCiAgQ0MgICAgICBody9pbnRjL2lvYXBpY19jb21tb24ubwogIENDICAg
+ICAgaHcvaW50Yy9hcm1fZ2ljX2NvbW1vbi5vCiAgQ0MgICAgICBody9pbnRjL2FybV9naWMubwog
+IENDICAgICAgaHcvaW50Yy9hcm1fZ2ljdjJtLm8KICBDQyAgICAgIGh3L2ludGMvYXJtX2dpY3Yz
+X2NvbW1vbi5vCiAgQ0MgICAgICBody9pbnRjL2FybV9naWN2My5vCiAgQ0MgICAgICBody9pbnRj
+L2FybV9naWN2M19kaXN0Lm8KICBDQyAgICAgIGh3L2ludGMvYXJtX2dpY3YzX3JlZGlzdC5vCiAg
+Q0MgICAgICBody9pbnRjL2FybV9naWN2M19pdHNfY29tbW9uLm8KICBDQyAgICAgIGh3L2ludGMv
+aW50Yy5vCiAgQ0MgICAgICBody9pcGFjay9pcGFjay5vCiAgQ0MgICAgICBody9pcGFjay90cGNp
+MjAwLm8KICBDQyAgICAgIGh3L2lwbWkvaXBtaS5vCiAgQ0MgICAgICBody9pcG1pL2lwbWlfYm1j
+X3NpbS5vCiAgQ0MgICAgICBody9pcG1pL2lwbWlfYm1jX2V4dGVybi5vCiAgQ0MgICAgICBody9p
+cG1pL2lzYV9pcG1pX2tjcy5vCiAgQ0MgICAgICBody9pcG1pL2lzYV9pcG1pX2J0Lm8KICBDQyAg
+ICAgIGh3L2lzYS9pc2EtYnVzLm8KICBDQyAgICAgIGh3L2lzYS9hcG0ubwogIENDICAgICAgaHcv
+bWVtL3BjLWRpbW0ubwogIENDICAgICAgaHcvbWVtL252ZGltbS5vCiAgQ0MgICAgICBody9taXNj
+L2FwcGxlc21jLm8KICBDQyAgICAgIGh3L21pc2MvbWF4MTExeC5vCiAgQ0MgICAgICBody9taXNj
+L3RtcDEwNS5vCiAgQ0MgICAgICBody9taXNjL3NnYS5vCiAgQ0MgICAgICBody9taXNjL2RlYnVn
+ZXhpdC5vCiAgQ0MgICAgICBody9taXNjL3BjLXRlc3RkZXYubwogIENDICAgICAgaHcvbWlzYy9w
+Y2ktdGVzdGRldi5vCiAgQ0MgICAgICBody9taXNjL2FybV9sMngwLm8KICBDQyAgICAgIGh3L21p
+c2MvYXJtX2ludGVncmF0b3JfZGVidWcubwogIENDICAgICAgaHcvbWlzYy9hOXNjdS5vCiAgQ0Mg
+ICAgICBody9taXNjL2FybTExc2N1Lm8KICBDQyAgICAgIGh3L25ldC9uZTIwMDAubwogIENDICAg
+ICAgaHcvbmV0L2VlcHJvMTAwLm8KICBDQyAgICAgIGh3L25ldC9wY25ldC1wY2kubwogIENDICAg
+ICAgaHcvbmV0L3BjbmV0Lm8KICBDQyAgICAgIGh3L25ldC9lMTAwMC5vCiAgQ0MgICAgICBody9u
+ZXQvZTEwMDB4X2NvbW1vbi5vCiAgQ0MgICAgICBody9uZXQvbmV0X3R4X3BrdC5vCiAgQ0MgICAg
+ICBody9uZXQvbmV0X3J4X3BrdC5vCiAgQ0MgICAgICBody9uZXQvZTEwMDBlLm8KICBDQyAgICAg
+IGh3L25ldC9lMTAwMGVfY29yZS5vCiAgQ0MgICAgICBody9uZXQvcnRsODEzOS5vCiAgQ0MgICAg
+ICBody9uZXQvdm14bmV0My5vCiAgQ0MgICAgICBody9uZXQvc21jOTFjMTExLm8KICBDQyAgICAg
+IGh3L25ldC9sYW45MTE4Lm8KICBDQyAgICAgIGh3L25ldC9uZTIwMDAtaXNhLm8KICBDQyAgICAg
+IGh3L25ldC94Z21hYy5vCiAgQ0MgICAgICBody9uZXQvYWxsd2lubmVyX2VtYWMubwogIENDICAg
+ICAgaHcvbmV0L2lteF9mZWMubwogIENDICAgICAgaHcvbmV0L2NhZGVuY2VfZ2VtLm8KICBDQyAg
+ICAgIGh3L25ldC9zdGVsbGFyaXNfZW5ldC5vCiAgQ0MgICAgICBody9uZXQvcm9ja2VyL3JvY2tl
+ci5vCiAgQ0MgICAgICBody9uZXQvcm9ja2VyL3JvY2tlcl9mcC5vCiAgQ0MgICAgICBody9uZXQv
+cm9ja2VyL3JvY2tlcl9kZXNjLm8KICBDQyAgICAgIGh3L25ldC9yb2NrZXIvcm9ja2VyX3dvcmxk
+Lm8KICBDQyAgICAgIGh3L25ldC9yb2NrZXIvcm9ja2VyX29mX2RwYS5vCiAgQ0MgICAgICBody9u
+dnJhbS9lZXByb205M3h4Lm8KICBDQyAgICAgIGh3L252cmFtL2Z3X2NmZy5vCiAgQ0MgICAgICBo
+dy9udnJhbS9jaHJwX252cmFtLm8KICBDQyAgICAgIGh3L3BjaS1icmlkZ2UvcGNpX2JyaWRnZV9k
+ZXYubwogIENDICAgICAgaHcvcGNpLWJyaWRnZS9wY2lfZXhwYW5kZXJfYnJpZGdlLm8KICBDQyAg
+ICAgIGh3L3BjaS1icmlkZ2UveGlvMzEzMF91cHN0cmVhbS5vCiAgQ0MgICAgICBody9wY2ktYnJp
+ZGdlL3hpbzMxMzBfZG93bnN0cmVhbS5vCiAgQ0MgICAgICBody9wY2ktYnJpZGdlL2lvaDM0MjAu
+bwogIENDICAgICAgaHcvcGNpLWJyaWRnZS9pODI4MDFiMTEubwogIENDICAgICAgaHcvcGNpLWhv
+c3QvcGFtLm8KICBDQyAgICAgIGh3L3BjaS1ob3N0L3ZlcnNhdGlsZS5vCiAgQ0MgICAgICBody9w
+Y2ktaG9zdC9waWl4Lm8KICBDQyAgICAgIGh3L3BjaS1ob3N0L3EzNS5vCiAgQ0MgICAgICBody9w
+Y2ktaG9zdC9ncGV4Lm8KICBDQyAgICAgIGh3L3BjaS9wY2kubwogIENDICAgICAgaHcvcGNpL3Bj
+aV9icmlkZ2UubwogIENDICAgICAgaHcvcGNpL21zaXgubwogIENDICAgICAgaHcvcGNpL21zaS5v
+CiAgQ0MgICAgICBody9wY2kvc2hwYy5vCiAgQ0MgICAgICBody9wY2kvc2xvdGlkX2NhcC5vCiAg
+Q0MgICAgICBody9wY2kvcGNpX2hvc3QubwogIENDICAgICAgaHcvcGNpL3BjaWVfaG9zdC5vCiAg
+Q0MgICAgICBody9wY2kvcGNpZS5vCiAgQ0MgICAgICBody9wY2kvcGNpZV9hZXIubwogIENDICAg
+ICAgaHcvcGNpL3BjaWVfcG9ydC5vCiAgQ0MgICAgICBody9wY2kvcGNpLXN0dWIubwogIENDICAg
+ICAgaHcvcGNtY2lhL3BjbWNpYS5vCiAgQ0MgICAgICBody9zY3NpL3Njc2ktZGlzay5vCiAgQ0Mg
+ICAgICBody9zY3NpL3Njc2ktZ2VuZXJpYy5vCiAgQ0MgICAgICBody9zY3NpL3Njc2ktYnVzLm8K
+ICBDQyAgICAgIGh3L3Njc2kvbHNpNTNjODk1YS5vCiAgQ0MgICAgICBody9zY3NpL21wdHNhcy5v
+CiAgQ0MgICAgICBody9zY3NpL21wdGNvbmZpZy5vCiAgQ0MgICAgICBody9zY3NpL21wdGVuZGlh
+bi5vCiAgQ0MgICAgICBody9zY3NpL21lZ2FzYXMubwogIENDICAgICAgaHcvc2NzaS92bXdfcHZz
+Y3NpLm8KICBDQyAgICAgIGh3L3Njc2kvZXNwLm8KICBDQyAgICAgIGh3L3Njc2kvZXNwLXBjaS5v
+CiAgQ0MgICAgICBody9zZC9wbDE4MS5vCiAgQ0MgICAgICBody9zZC9zc2ktc2QubwogIENDICAg
+ICAgaHcvc2Qvc2QubwogIENDICAgICAgaHcvc2QvY29yZS5vCiAgQ0MgICAgICBody9zZC9zZGhj
+aS5vCiAgQ0MgICAgICBody9zbWJpb3Mvc21iaW9zLm8KICBDQyAgICAgIGh3L3NtYmlvcy9zbWJp
+b3NfdHlwZV8zOC5vCiAgQ0MgICAgICBody9zc2kvcGwwMjIubwovdG1wL3FlbXUtdGVzdC9zcmMv
+aHcvbnZyYW0vZndfY2ZnLmM6IEluIGZ1bmN0aW9uIOKAmGZ3X2NmZ19kbWFfdHJhbnNmZXLigJk6
+Ci90bXAvcWVtdS10ZXN0L3NyYy9ody9udnJhbS9md19jZmcuYzozMjk6IHdhcm5pbmc6IOKAmHJl
+YWTigJkgbWF5IGJlIHVzZWQgdW5pbml0aWFsaXplZCBpbiB0aGlzIGZ1bmN0aW9uCiAgQ0MgICAg
+ICBody9zc2kvc3NpLm8KICBDQyAgICAgIGh3L3NzaS94aWxpbnhfc3BpcHMubwogIENDICAgICAg
+aHcvc3NpL2FzcGVlZF9zbWMubwogIENDICAgICAgaHcvc3NpL3N0bTMyZjJ4eF9zcGkubwogIEND
+ICAgICAgaHcvdGltZXIvYXJtX3RpbWVyLm8KICBDQyAgICAgIGh3L3RpbWVyL2FybV9tcHRpbWVy
+Lm8KICBDQyAgICAgIGh3L3RpbWVyL2E5Z3RpbWVyLm8KICBDQyAgICAgIGh3L3RpbWVyL2NhZGVu
+Y2VfdHRjLm8KICBDQyAgICAgIGh3L3RpbWVyL2RzMTMzOC5vCiAgQ0MgICAgICBody90aW1lci9o
+cGV0Lm8KICBDQyAgICAgIGh3L3RpbWVyL2k4MjU0X2NvbW1vbi5vCiAgQ0MgICAgICBody90aW1l
+ci9pODI1NC5vCiAgQ0MgICAgICBody90aW1lci9wbDAzMS5vCiAgQ0MgICAgICBody90aW1lci90
+d2w5MjIzMC5vCiAgQ0MgICAgICBody90aW1lci9pbXhfZXBpdC5vCiAgQ0MgICAgICBody90aW1l
+ci9pbXhfZ3B0Lm8KICBDQyAgICAgIGh3L3RpbWVyL3N0bTMyZjJ4eF90aW1lci5vCiAgQ0MgICAg
+ICBody90aW1lci9hc3BlZWRfdGltZXIubwogIENDICAgICAgaHcvdHBtL3RwbV90aXMubwogIEND
+ICAgICAgaHcvdHBtL3RwbV9wYXNzdGhyb3VnaC5vCiAgQ0MgICAgICBody90cG0vdHBtX3V0aWwu
+bwogIENDICAgICAgaHcvdXNiL2NvcmUubwogIENDICAgICAgaHcvdXNiL2NvbWJpbmVkLXBhY2tl
+dC5vCiAgQ0MgICAgICBody91c2IvYnVzLm8KICBDQyAgICAgIGh3L3VzYi9saWJody5vCiAgQ0Mg
+ICAgICBody91c2IvZGVzYy5vCiAgQ0MgICAgICBody91c2IvZGVzYy1tc29zLm8KICBDQyAgICAg
+IGh3L3VzYi9oY2QtdWhjaS5vCiAgQ0MgICAgICBody91c2IvaGNkLW9oY2kubwogIENDICAgICAg
+aHcvdXNiL2hjZC1laGNpLm8KICBDQyAgICAgIGh3L3VzYi9oY2QtZWhjaS1wY2kubwogIENDICAg
+ICAgaHcvdXNiL2hjZC1laGNpLXN5c2J1cy5vCiAgQ0MgICAgICBody91c2IvaGNkLXhoY2kubwog
+IENDICAgICAgaHcvdXNiL2hjZC1tdXNiLm8KICBDQyAgICAgIGh3L3VzYi9kZXYtaGlkLm8KICBD
+QyAgICAgIGh3L3VzYi9kZXYtaHViLm8KICBDQyAgICAgIGh3L3VzYi9kZXYtd2Fjb20ubwogIEND
+ICAgICAgaHcvdXNiL2Rldi1zdG9yYWdlLm8KICBDQyAgICAgIGh3L3VzYi9kZXYtdWFzLm8KICBD
+QyAgICAgIGh3L3VzYi9kZXYtYXVkaW8ubwogIENDICAgICAgaHcvdXNiL2Rldi1zZXJpYWwubwog
+IENDICAgICAgaHcvdXNiL2Rldi1uZXR3b3JrLm8KICBDQyAgICAgIGh3L3VzYi9kZXYtYmx1ZXRv
+b3RoLm8KICBDQyAgICAgIGh3L3VzYi9kZXYtc21hcnRjYXJkLXJlYWRlci5vCiAgQ0MgICAgICBo
+dy91c2IvZGV2LW10cC5vCiAgQ0MgICAgICBody91c2IvaG9zdC1zdHViLm8KICBDQyAgICAgIGh3
+L3ZpcnRpby92aXJ0aW8tcm5nLm8KICBDQyAgICAgIGh3L3ZpcnRpby92aXJ0aW8tcGNpLm8KICBD
+QyAgICAgIGh3L3ZpcnRpby92aXJ0aW8tYnVzLm8KICBDQyAgICAgIGh3L3ZpcnRpby92aXJ0aW8t
+bW1pby5vCiAgQ0MgICAgICBody93YXRjaGRvZy93YXRjaGRvZy5vCiAgQ0MgICAgICBody93YXRj
+aGRvZy93ZHRfaTYzMDBlc2IubwogIENDICAgICAgaHcvd2F0Y2hkb2cvd2R0X2liNzAwLm8KICBD
+QyAgICAgIG1pZ3JhdGlvbi9taWdyYXRpb24ubwogIENDICAgICAgbWlncmF0aW9uL3NvY2tldC5v
+CiAgQ0MgICAgICBtaWdyYXRpb24vZmQubwogIENDICAgICAgbWlncmF0aW9uL2V4ZWMubwogIEND
+ICAgICAgbWlncmF0aW9uL3Rscy5vCiAgQ0MgICAgICBtaWdyYXRpb24vY29sby1jb21tLm8KICBD
+QyAgICAgIG1pZ3JhdGlvbi9jb2xvLm8KICBDQyAgICAgIG1pZ3JhdGlvbi9jb2xvLWZhaWxvdmVy
+Lm8KICBDQyAgICAgIG1pZ3JhdGlvbi92bXN0YXRlLm8KICBDQyAgICAgIG1pZ3JhdGlvbi9xZW11
+LWZpbGUubwogIENDICAgICAgbWlncmF0aW9uL3FlbXUtZmlsZS1jaGFubmVsLm8KICBDQyAgICAg
+IG1pZ3JhdGlvbi94YnpybGUubwogIENDICAgICAgbWlncmF0aW9uL3Bvc3Rjb3B5LXJhbS5vCiAg
+Q0MgICAgICBtaWdyYXRpb24vcWpzb24ubwogIENDICAgICAgbWlncmF0aW9uL2Jsb2NrLm8KICBD
+QyAgICAgIG5ldC9uZXQubwogIENDICAgICAgbmV0L3F1ZXVlLm8KICBDQyAgICAgIG5ldC9jaGVj
+a3N1bS5vCiAgQ0MgICAgICBuZXQvdXRpbC5vCiAgQ0MgICAgICBuZXQvaHViLm8KICBDQyAgICAg
+IG5ldC9zb2NrZXQubwogIENDICAgICAgbmV0L2R1bXAubwogIENDICAgICAgbmV0L2V0aC5vCiAg
+Q0MgICAgICBuZXQvbDJ0cHYzLm8KICBDQyAgICAgIG5ldC90YXAubwogIENDICAgICAgbmV0L3Zo
+b3N0LXVzZXIubwogIENDICAgICAgbmV0L3RhcC1saW51eC5vCiAgQ0MgICAgICBuZXQvc2xpcnAu
+bwogIENDICAgICAgbmV0L2ZpbHRlci5vCiAgQ0MgICAgICBuZXQvZmlsdGVyLWJ1ZmZlci5vCiAg
+Q0MgICAgICBuZXQvZmlsdGVyLW1pcnJvci5vCiAgQ0MgICAgICBuZXQvY29sby1jb21wYXJlLm8K
+ICBDQyAgICAgIG5ldC9jb2xvLm8KICBDQyAgICAgIG5ldC9maWx0ZXItcmV3cml0ZXIubwogIEND
+ICAgICAgcW9tL2NwdS5vCiAgQ0MgICAgICByZXBsYXkvcmVwbGF5Lm8KICBDQyAgICAgIHJlcGxh
+eS9yZXBsYXktaW50ZXJuYWwubwogIENDICAgICAgcmVwbGF5L3JlcGxheS1ldmVudHMubwogIEND
+ICAgICAgcmVwbGF5L3JlcGxheS10aW1lLm8KICBDQyAgICAgIHJlcGxheS9yZXBsYXktaW5wdXQu
+bwogIENDICAgICAgcmVwbGF5L3JlcGxheS1jaGFyLm8KICBDQyAgICAgIHJlcGxheS9yZXBsYXkt
+c25hcHNob3QubwovdG1wL3FlbXUtdGVzdC9zcmMvcmVwbGF5L3JlcGxheS1pbnRlcm5hbC5jOiBJ
+biBmdW5jdGlvbiDigJhyZXBsYXlfcHV0X2FycmF54oCZOgovdG1wL3FlbXUtdGVzdC9zcmMvcmVw
+bGF5L3JlcGxheS1pbnRlcm5hbC5jOjY1OiB3YXJuaW5nOiBpZ25vcmluZyByZXR1cm4gdmFsdWUg
+b2Yg4oCYZndyaXRl4oCZLCBkZWNsYXJlZCB3aXRoIGF0dHJpYnV0ZSB3YXJuX3VudXNlZF9yZXN1
+bHQKICBDQyAgICAgIHNsaXJwL2Nrc3VtLm8KICBDQyAgICAgIHNsaXJwL2lmLm8KICBDQyAgICAg
+IHNsaXJwL2lwX2ljbXAubwogIENDICAgICAgc2xpcnAvaXA2X2ljbXAubwogIENDICAgICAgc2xp
+cnAvaXA2X2lucHV0Lm8KICBDQyAgICAgIHNsaXJwL2lwNl9vdXRwdXQubwogIENDICAgICAgc2xp
+cnAvaXBfaW5wdXQubwogIENDICAgICAgc2xpcnAvaXBfb3V0cHV0Lm8KICBDQyAgICAgIHNsaXJw
+L2Ruc3NlYXJjaC5vCiAgQ0MgICAgICBzbGlycC9kaGNwdjYubwogIENDICAgICAgc2xpcnAvc2xp
+cnAubwogIENDICAgICAgc2xpcnAvbWJ1Zi5vCiAgQ0MgICAgICBzbGlycC9taXNjLm8KICBDQyAg
+ICAgIHNsaXJwL3NidWYubwogIENDICAgICAgc2xpcnAvc29ja2V0Lm8KICBDQyAgICAgIHNsaXJw
+L3RjcF9pbnB1dC5vCiAgQ0MgICAgICBzbGlycC90Y3Bfb3V0cHV0Lm8KICBDQyAgICAgIHNsaXJw
+L3RjcF9zdWJyLm8KICBDQyAgICAgIHNsaXJwL3RjcF90aW1lci5vCiAgQ0MgICAgICBzbGlycC91
+ZHAubwogIENDICAgICAgc2xpcnAvdWRwNi5vCiAgQ0MgICAgICBzbGlycC9ib290cC5vCi90bXAv
+cWVtdS10ZXN0L3NyYy9zbGlycC90Y3BfaW5wdXQuYzogSW4gZnVuY3Rpb24g4oCYdGNwX2lucHV0
+4oCZOgovdG1wL3FlbXUtdGVzdC9zcmMvc2xpcnAvdGNwX2lucHV0LmM6MjE5OiB3YXJuaW5nOiDi
+gJhzYXZlX2lwLmlwX3DigJkgbWF5IGJlIHVzZWQgdW5pbml0aWFsaXplZCBpbiB0aGlzIGZ1bmN0
+aW9uCi90bXAvcWVtdS10ZXN0L3NyYy9zbGlycC90Y3BfaW5wdXQuYzoyMTk6IHdhcm5pbmc6IOKA
+mHNhdmVfaXAuaXBfbGVu4oCZIG1heSBiZSB1c2VkIHVuaW5pdGlhbGl6ZWQgaW4gdGhpcyBmdW5j
+dGlvbgovdG1wL3FlbXUtdGVzdC9zcmMvc2xpcnAvdGNwX2lucHV0LmM6MjE5OiB3YXJuaW5nOiDi
+gJhzYXZlX2lwLmlwX3Rvc+KAmSBtYXkgYmUgdXNlZCB1bmluaXRpYWxpemVkIGluIHRoaXMgZnVu
+Y3Rpb24KL3RtcC9xZW11LXRlc3Qvc3JjL3NsaXJwL3RjcF9pbnB1dC5jOjIxOTogd2FybmluZzog
+4oCYc2F2ZV9pcC5pcF9pZOKAmSBtYXkgYmUgdXNlZCB1bmluaXRpYWxpemVkIGluIHRoaXMgZnVu
+Y3Rpb24KL3RtcC9xZW11LXRlc3Qvc3JjL3NsaXJwL3RjcF9pbnB1dC5jOjIxOTogd2FybmluZzog
+4oCYc2F2ZV9pcC5pcF9vZmbigJkgbWF5IGJlIHVzZWQgdW5pbml0aWFsaXplZCBpbiB0aGlzIGZ1
+bmN0aW9uCi90bXAvcWVtdS10ZXN0L3NyYy9zbGlycC90Y3BfaW5wdXQuYzoyMTk6IHdhcm5pbmc6
+IOKAmHNhdmVfaXAuaXBfdHRs4oCZIG1heSBiZSB1c2VkIHVuaW5pdGlhbGl6ZWQgaW4gdGhpcyBm
+dW5jdGlvbgovdG1wL3FlbXUtdGVzdC9zcmMvc2xpcnAvdGNwX2lucHV0LmM6MjE5OiB3YXJuaW5n
+OiDigJhzYXZlX2lwLmlwX3N1beKAmSBtYXkgYmUgdXNlZCB1bmluaXRpYWxpemVkIGluIHRoaXMg
+ZnVuY3Rpb24KL3RtcC9xZW11LXRlc3Qvc3JjL3NsaXJwL3RjcF9pbnB1dC5jOjIxOTogd2Fybmlu
+Zzog4oCYc2F2ZV9pcC5pcF9zcmMuc19hZGRy4oCZIG1heSBiZSB1c2VkIHVuaW5pdGlhbGl6ZWQg
+aW4gdGhpcyBmdW5jdGlvbgovdG1wL3FlbXUtdGVzdC9zcmMvc2xpcnAvdGNwX2lucHV0LmM6MjE5
+OiB3YXJuaW5nOiDigJhzYXZlX2lwLmlwX2RzdC5zX2FkZHLigJkgbWF5IGJlIHVzZWQgdW5pbml0
+aWFsaXplZCBpbiB0aGlzIGZ1bmN0aW9uCi90bXAvcWVtdS10ZXN0L3NyYy9zbGlycC90Y3BfaW5w
+dXQuYzoyMjA6IHdhcm5pbmc6IOKAmHNhdmVfaXA2LmlwX25o4oCZIG1heSBiZSB1c2VkIHVuaW5p
+dGlhbGl6ZWQgaW4gdGhpcyBmdW5jdGlvbgogIENDICAgICAgc2xpcnAvdGZ0cC5vCiAgQ0MgICAg
+ICBzbGlycC9hcnBfdGFibGUubwogIENDICAgICAgc2xpcnAvbmRwX3RhYmxlLm8KICBDQyAgICAg
+IHVpL2tleW1hcHMubwogIENDICAgICAgdWkvY29uc29sZS5vCiAgQ0MgICAgICB1aS9jdXJzb3Iu
+bwogIENDICAgICAgdWkvcWVtdS1waXhtYW4ubwogIENDICAgICAgdWkvaW5wdXQubwogIENDICAg
+ICAgdWkvaW5wdXQta2V5bWFwLm8KICBDQyAgICAgIHVpL2lucHV0LWxlZ2FjeS5vCiAgQ0MgICAg
+ICB1aS9pbnB1dC1saW51eC5vCiAgQ0MgICAgICB1aS9zZGwubwogIENDICAgICAgdWkvc2RsX3pv
+b20ubwogIENDICAgICAgdWkveF9rZXltYXAubwogIENDICAgICAgdWkvdm5jLm8KICBDQyAgICAg
+IHVpL3ZuYy1lbmMtemxpYi5vCiAgQ0MgICAgICB1aS92bmMtZW5jLWhleHRpbGUubwogIENDICAg
+ICAgdWkvdm5jLWVuYy10aWdodC5vCiAgQ0MgICAgICB1aS92bmMtcGFsZXR0ZS5vCiAgQ0MgICAg
+ICB1aS92bmMtZW5jLXpybGUubwogIENDICAgICAgdWkvdm5jLWF1dGgtdmVuY3J5cHQubwogIEND
+ICAgICAgdWkvdm5jLXdzLm8KICBDQyAgICAgIHVpL3ZuYy1qb2JzLm8KICBMSU5LICAgIHRlc3Rz
+L3FlbXUtaW90ZXN0cy9zb2NrZXRfc2NtX2hlbHBlcgogIENDICAgICAgcWdhL2NvbW1hbmRzLm8K
+ICBDQyAgICAgIHFnYS9ndWVzdC1hZ2VudC1jb21tYW5kLXN0YXRlLm8KICBDQyAgICAgIHFnYS9t
+YWluLm8KICBDQyAgICAgIHFnYS9jb21tYW5kcy1wb3NpeC5vCiAgQ0MgICAgICBxZ2EvY2hhbm5l
+bC1wb3NpeC5vCiAgQ0MgICAgICBxZ2EvcWFwaS1nZW5lcmF0ZWQvcWdhLXFhcGktdHlwZXMubwog
+IENDICAgICAgcWdhL3FhcGktZ2VuZXJhdGVkL3FnYS1xbXAtbWFyc2hhbC5vCiAgQ0MgICAgICBx
+Z2EvcWFwaS1nZW5lcmF0ZWQvcWdhLXFhcGktdmlzaXQubwogIENDICAgICAgcW1wLWludHJvc3Bl
+Y3QubwogIENDICAgICAgcWFwaS10eXBlcy5vCiAgQVMgICAgICBvcHRpb25yb20vbXVsdGlib290
+Lm8KICBBUyAgICAgIG9wdGlvbnJvbS9saW51eGJvb3QubwogIENDICAgICAgb3B0aW9ucm9tL2xp
+bnV4Ym9vdF9kbWEubwpjYzogdW5yZWNvZ25pemVkIG9wdGlvbiAnLW5vLWludGVncmF0ZWQtYXMn
+CmNjOiB1bnJlY29nbml6ZWQgb3B0aW9uICctbm8taW50ZWdyYXRlZC1hcycKICBBUyAgICAgIG9w
+dGlvbnJvbS9rdm12YXBpYy5vCiAgQ0MgICAgICBxYXBpLXZpc2l0Lm8KICBDQyAgICAgIHFhcGkt
+ZXZlbnQubwogIEJVSUxEICAgb3B0aW9ucm9tL211bHRpYm9vdC5pbWcKICBCVUlMRCAgIG9wdGlv
+bnJvbS9saW51eGJvb3QuaW1nCiAgQlVJTEQgICBvcHRpb25yb20vbGludXhib290X2RtYS5pbWcK
+ICBCVUlMRCAgIG9wdGlvbnJvbS9tdWx0aWJvb3QucmF3CiAgQVIgICAgICBsaWJxZW11c3R1Yi5h
+CiAgQlVJTEQgICBvcHRpb25yb20vbGludXhib290LnJhdwogIEJVSUxEICAgb3B0aW9ucm9tL2xp
+bnV4Ym9vdF9kbWEucmF3CiAgQ0MgICAgICBxZW11LWltZy5vCiAgU0lHTiAgICBvcHRpb25yb20v
+bXVsdGlib290LmJpbgogIENDICAgICAgcW1wLW1hcnNoYWwubwogIFNJR04gICAgb3B0aW9ucm9t
+L2xpbnV4Ym9vdC5iaW4KICBCVUlMRCAgIG9wdGlvbnJvbS9rdm12YXBpYy5pbWcKICBTSUdOICAg
+IG9wdGlvbnJvbS9saW51eGJvb3RfZG1hLmJpbgogIENDICAgICAgdHJhY2UvZ2VuZXJhdGVkLXRy
+YWNlcnMubwogIEJVSUxEICAgb3B0aW9ucm9tL2t2bXZhcGljLnJhdwogIFNJR04gICAgb3B0aW9u
+cm9tL2t2bXZhcGljLmJpbgogIEFSICAgICAgbGlicWVtdXV0aWwuYQogIExJTksgICAgcWVtdS1n
+YQogIExJTksgICAgaXZzaG1lbS1jbGllbnQKICBMSU5LICAgIGl2c2htZW0tc2VydmVyCiAgTElO
+SyAgICBxZW11LW5iZAogIExJTksgICAgcWVtdS1pbWcKICBMSU5LICAgIHFlbXUtaW8KICBMSU5L
+ICAgIHFlbXUtYnJpZGdlLWhlbHBlcgogIEdFTiAgICAgeDg2XzY0LXNvZnRtbXUvaG1wLWNvbW1h
+bmRzLmgKICBHRU4gICAgIHg4Nl82NC1zb2Z0bW11L2htcC1jb21tYW5kcy1pbmZvLmgKICBHRU4g
+ICAgIHg4Nl82NC1zb2Z0bW11L2NvbmZpZy10YXJnZXQuaAogIEdFTiAgICAgYWFyY2g2NC1zb2Z0
+bW11L2htcC1jb21tYW5kcy5oCiAgR0VOICAgICBhYXJjaDY0LXNvZnRtbXUvaG1wLWNvbW1hbmRz
+LWluZm8uaAogIEdFTiAgICAgYWFyY2g2NC1zb2Z0bW11L2NvbmZpZy10YXJnZXQuaAogIENDICAg
+ICAgeDg2XzY0LXNvZnRtbXUvZXhlYy5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS90cmFuc2xh
+dGUtYWxsLm8KICBDQyAgICAgIHg4Nl82NC1zb2Z0bW11L2NwdS1leGVjLm8KICBDQyAgICAgIHg4
+Nl82NC1zb2Z0bW11L3RyYW5zbGF0ZS1jb21tb24ubwogIENDICAgICAgeDg2XzY0LXNvZnRtbXUv
+dGNnL3RjZy1vcC5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS9jcHUtZXhlYy1jb21tb24ubwog
+IENDICAgICAgeDg2XzY0LXNvZnRtbXUvdGNnL3RjZy5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1t
+dS90Y2cvb3B0aW1pemUubwogIENDICAgICAgeDg2XzY0LXNvZnRtbXUvdGNnL3RjZy1jb21tb24u
+bwogIENDICAgICAgeDg2XzY0LXNvZnRtbXUvZnB1L3NvZnRmbG9hdC5vCiAgQ0MgICAgICB4ODZf
+NjQtc29mdG1tdS9kaXNhcy5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS90Y2ctcnVudGltZS5v
+CiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS9hcmNoX2luaXQubwogIENDICAgICAgeDg2XzY0LXNv
+ZnRtbXUvY3B1cy5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS9tb25pdG9yLm8KICBDQyAgICAg
+IGFhcmNoNjQtc29mdG1tdS9leGVjLm8KICBDQyAgICAgIHg4Nl82NC1zb2Z0bW11L2dkYnN0dWIu
+bwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L3RyYW5zbGF0ZS1hbGwubwogIENDICAgICAgYWFy
+Y2g2NC1zb2Z0bW11L2NwdS1leGVjLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS90cmFuc2xh
+dGUtY29tbW9uLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9jcHUtZXhlYy1jb21tb24ubwog
+IENDICAgICAgeDg2XzY0LXNvZnRtbXUvYmFsbG9vbi5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRt
+bXUvdGNnL3RjZy5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS9pb3BvcnQubwogIENDICAgICAg
+eDg2XzY0LXNvZnRtbXUvbnVtYS5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvdGNnL3RjZy1v
+cC5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvdGNnL29wdGltaXplLm8KICBDQyAgICAgIGFh
+cmNoNjQtc29mdG1tdS90Y2cvdGNnLWNvbW1vbi5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUv
+ZnB1L3NvZnRmbG9hdC5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvZGlzYXMubwogIENDICAg
+ICAgeDg2XzY0LXNvZnRtbXUvcXRlc3QubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L3RjZy1y
+dW50aW1lLm8KICBHRU4gICAgIGFhcmNoNjQtc29mdG1tdS9nZGJzdHViLXhtbC5jCiAgQ0MgICAg
+ICBhYXJjaDY0LXNvZnRtbXUva3ZtLXN0dWIubwogIENDICAgICAgeDg2XzY0LXNvZnRtbXUvYm9v
+dGRldmljZS5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS9rdm0tYWxsLm8KICBDQyAgICAgIHg4
+Nl82NC1zb2Z0bW11L21lbW9yeS5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS9jcHV0bGIubwog
+IENDICAgICAgeDg2XzY0LXNvZnRtbXUvbWVtb3J5X21hcHBpbmcubwogIENDICAgICAgeDg2XzY0
+LXNvZnRtbXUvZHVtcC5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS9taWdyYXRpb24vcmFtLm8K
+ICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9hcmNoX2luaXQubwogIENDICAgICAgeDg2XzY0LXNv
+ZnRtbXUvbWlncmF0aW9uL3NhdmV2bS5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvY3B1cy5v
+CiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvbW9uaXRvci5vCiAgQ0MgICAgICB4ODZfNjQtc29m
+dG1tdS94ZW4tY29tbW9uLXN0dWIubwogIENDICAgICAgeDg2XzY0LXNvZnRtbXUveGVuLWh2bS1z
+dHViLm8KICBDQyAgICAgIHg4Nl82NC1zb2Z0bW11L2h3L2Jsb2NrL3ZpcnRpby1ibGsubwogIEND
+ICAgICAgeDg2XzY0LXNvZnRtbXUvaHcvYmxvY2svZGF0YXBsYW5lL3ZpcnRpby1ibGsubwogIEND
+ICAgICAgYWFyY2g2NC1zb2Z0bW11L2dkYnN0dWIubwogIENDICAgICAgeDg2XzY0LXNvZnRtbXUv
+aHcvY2hhci92aXJ0aW8tc2VyaWFsLWJ1cy5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS9ody9j
+b3JlL25taS5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvYmFsbG9vbi5vCiAgQ0MgICAgICBh
+YXJjaDY0LXNvZnRtbXUvaW9wb3J0Lm8KICBDQyAgICAgIHg4Nl82NC1zb2Z0bW11L2h3L2NvcmUv
+Z2VuZXJpYy1sb2FkZXIubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L251bWEubwogIENDICAg
+ICAgYWFyY2g2NC1zb2Z0bW11L3F0ZXN0Lm8KICBDQyAgICAgIHg4Nl82NC1zb2Z0bW11L2h3L2Nw
+dS9jb3JlLm8KICBDQyAgICAgIHg4Nl82NC1zb2Z0bW11L2h3L2Rpc3BsYXkvdmdhLm8KICBDQyAg
+ICAgIHg4Nl82NC1zb2Z0bW11L2h3L2Rpc3BsYXkvdmlydGlvLWdwdS5vCiAgQ0MgICAgICBhYXJj
+aDY0LXNvZnRtbXUvYm9vdGRldmljZS5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS9ody9kaXNw
+bGF5L3ZpcnRpby1ncHUtM2QubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L21lbW9yeS5vCiAg
+Q0MgICAgICBhYXJjaDY0LXNvZnRtbXUvY3B1dGxiLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1t
+dS9tZW1vcnlfbWFwcGluZy5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS9ody9kaXNwbGF5L3Zp
+cnRpby1ncHUtcGNpLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9kdW1wLm8KICBDQyAgICAg
+IHg4Nl82NC1zb2Z0bW11L2h3L2Rpc3BsYXkvdmlydGlvLXZnYS5vCiAgQ0MgICAgICB4ODZfNjQt
+c29mdG1tdS9ody9pbnRjL2FwaWMubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L21pZ3JhdGlv
+bi9yYW0ubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L21pZ3JhdGlvbi9zYXZldm0ubwogIEND
+ICAgICAgeDg2XzY0LXNvZnRtbXUvaHcvaW50Yy9hcGljX2NvbW1vbi5vCiAgQ0MgICAgICB4ODZf
+NjQtc29mdG1tdS9ody9pbnRjL2lvYXBpYy5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS9ody9p
+c2EvbHBjX2ljaDkubwogIENDICAgICAgeDg2XzY0LXNvZnRtbXUvaHcvbWlzYy92bXBvcnQubwog
+IENDICAgICAgeDg2XzY0LXNvZnRtbXUvaHcvbWlzYy9pdnNobWVtLm8KICBDQyAgICAgIGFhcmNo
+NjQtc29mdG1tdS94ZW4tY29tbW9uLXN0dWIubwogIENDICAgICAgeDg2XzY0LXNvZnRtbXUvaHcv
+bWlzYy9wdnBhbmljLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS94ZW4taHZtLXN0dWIubwog
+IENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L2FkYy9zdG0zMmYyeHhfYWRjLm8KICBDQyAgICAg
+IGFhcmNoNjQtc29mdG1tdS9ody9ibG9jay92aXJ0aW8tYmxrLm8KICBDQyAgICAgIHg4Nl82NC1z
+b2Z0bW11L2h3L21pc2MvZWR1Lm8KICBDQyAgICAgIHg4Nl82NC1zb2Z0bW11L2h3L21pc2MvaHlw
+ZXJ2X3Rlc3RkZXYubwogIENDICAgICAgeDg2XzY0LXNvZnRtbXUvaHcvbmV0L3ZpcnRpby1uZXQu
+bwogIENDICAgICAgeDg2XzY0LXNvZnRtbXUvaHcvbmV0L3Zob3N0X25ldC5vCiAgQ0MgICAgICBh
+YXJjaDY0LXNvZnRtbXUvaHcvYmxvY2svZGF0YXBsYW5lL3ZpcnRpby1ibGsubwogIENDICAgICAg
+YWFyY2g2NC1zb2Z0bW11L2h3L2NoYXIvZXh5bm9zNDIxMF91YXJ0Lm8KICBDQyAgICAgIGFhcmNo
+NjQtc29mdG1tdS9ody9jaGFyL29tYXBfdWFydC5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUv
+aHcvY2hhci9kaWdpYy11YXJ0Lm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9jaGFyL3N0
+bTMyZjJ4eF91c2FydC5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS9ody9zY3NpL3ZpcnRpby1z
+Y3NpLm8KICBDQyAgICAgIHg4Nl82NC1zb2Z0bW11L2h3L3Njc2kvdmlydGlvLXNjc2ktZGF0YXBs
+YW5lLm8KICBDQyAgICAgIHg4Nl82NC1zb2Z0bW11L2h3L3Njc2kvdmhvc3Qtc2NzaS5vCiAgQ0Mg
+ICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvY2hhci9iY20yODM1X2F1eC5vCiAgQ0MgICAgICB4ODZf
+NjQtc29mdG1tdS9ody90aW1lci9tYzE0NjgxOHJ0Yy5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRt
+bXUvaHcvY2hhci92aXJ0aW8tc2VyaWFsLWJ1cy5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUv
+aHcvY29yZS9ubWkubwogIENDICAgICAgeDg2XzY0LXNvZnRtbXUvaHcvdmZpby9jb21tb24ubwog
+IENDICAgICAgeDg2XzY0LXNvZnRtbXUvaHcvdmZpby9wY2kubwogIENDICAgICAgeDg2XzY0LXNv
+ZnRtbXUvaHcvdmZpby9wY2ktcXVpcmtzLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9j
+b3JlL2dlbmVyaWMtbG9hZGVyLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9jcHUvYXJt
+MTFtcGNvcmUubwogIENDICAgICAgeDg2XzY0LXNvZnRtbXUvaHcvdmZpby9wbGF0Zm9ybS5vCiAg
+Q0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvY3B1L3JlYWx2aWV3X21wY29yZS5vCiAgQ0MgICAg
+ICB4ODZfNjQtc29mdG1tdS9ody92ZmlvL2NhbHhlZGEteGdtYWMubwogIENDICAgICAgYWFyY2g2
+NC1zb2Z0bW11L2h3L2NwdS9hOW1wY29yZS5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS9ody92
+ZmlvL2FtZC14Z2JlLm8KICBDQyAgICAgIHg4Nl82NC1zb2Z0bW11L2h3L3ZmaW8vc3BhcHIubwog
+IENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L2NwdS9hMTVtcGNvcmUubwogIENDICAgICAgYWFy
+Y2g2NC1zb2Z0bW11L2h3L2NwdS9jb3JlLm8KICBDQyAgICAgIHg4Nl82NC1zb2Z0bW11L2h3L3Zp
+cnRpby92aXJ0aW8ubwogIENDICAgICAgeDg2XzY0LXNvZnRtbXUvaHcvdmlydGlvL3ZpcnRpby1i
+YWxsb29uLm8KICBDQyAgICAgIHg4Nl82NC1zb2Z0bW11L2h3L3ZpcnRpby92aG9zdC5vCiAgQ0Mg
+ICAgICB4ODZfNjQtc29mdG1tdS9ody92aXJ0aW8vdmhvc3QtYmFja2VuZC5vCiAgQ0MgICAgICB4
+ODZfNjQtc29mdG1tdS9ody92aXJ0aW8vdmhvc3QtdXNlci5vCiAgQ0MgICAgICB4ODZfNjQtc29m
+dG1tdS9ody92aXJ0aW8vdmhvc3QtdnNvY2subwogIENDICAgICAgeDg2XzY0LXNvZnRtbXUvaHcv
+dmlydGlvL3ZpcnRpby1jcnlwdG8ubwogIENDICAgICAgeDg2XzY0LXNvZnRtbXUvaHcvdmlydGlv
+L3ZpcnRpby1jcnlwdG8tcGNpLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9kaXNwbGF5
+L29tYXBfZHNzLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9kaXNwbGF5L29tYXBfbGNk
+Yy5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvZGlzcGxheS9weGEyeHhfbGNkLm8KICBD
+QyAgICAgIHg4Nl82NC1zb2Z0bW11L2h3L2kzODYvbXVsdGlib290Lm8KICBDQyAgICAgIGFhcmNo
+NjQtc29mdG1tdS9ody9kaXNwbGF5L2JjbTI4MzVfZmIubwogIENDICAgICAgeDg2XzY0LXNvZnRt
+bXUvaHcvaTM4Ni9wYy5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS9ody9pMzg2L3BjX3BpaXgu
+bwogIENDICAgICAgeDg2XzY0LXNvZnRtbXUvaHcvaTM4Ni9wY19xMzUubwogIENDICAgICAgYWFy
+Y2g2NC1zb2Z0bW11L2h3L2Rpc3BsYXkvdmdhLm8KICBDQyAgICAgIHg4Nl82NC1zb2Z0bW11L2h3
+L2kzODYvcGNfc3lzZncubwogIENDICAgICAgeDg2XzY0LXNvZnRtbXUvaHcvaTM4Ni94ODYtaW9t
+bXUubwogIENDICAgICAgeDg2XzY0LXNvZnRtbXUvaHcvaTM4Ni9pbnRlbF9pb21tdS5vCiAgQ0Mg
+ICAgICB4ODZfNjQtc29mdG1tdS9ody9pMzg2L2FtZF9pb21tdS5vCiAgQ0MgICAgICB4ODZfNjQt
+c29mdG1tdS9ody9pMzg2L2t2bXZhcGljLm8KICBDQyAgICAgIHg4Nl82NC1zb2Z0bW11L2h3L2kz
+ODYvYWNwaS1idWlsZC5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvZGlzcGxheS92aXJ0
+aW8tZ3B1Lm8KICBDQyAgICAgIHg4Nl82NC1zb2Z0bW11L2h3L2kzODYvcGNpLWFzc2lnbi1sb2Fk
+LXJvbS5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS9ody9pMzg2L2t2bS9jbG9jay5vCiAgQ0Mg
+ICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvZGlzcGxheS92aXJ0aW8tZ3B1LTNkLm8KICBDQyAgICAg
+IGFhcmNoNjQtc29mdG1tdS9ody9kaXNwbGF5L3ZpcnRpby1ncHUtcGNpLm8KL3RtcC9xZW11LXRl
+c3Qvc3JjL2h3L2kzODYvcGNfcGlpeC5jOiBJbiBmdW5jdGlvbiDigJhpZ2RfcGFzc3Rocm91Z2hf
+aXNhX2JyaWRnZV9jcmVhdGXigJk6Ci90bXAvcWVtdS10ZXN0L3NyYy9ody9pMzg2L3BjX3BpaXgu
+YzoxMDQ2OiB3YXJuaW5nOiDigJhwY2hfcmV2X2lk4oCZIG1heSBiZSB1c2VkIHVuaW5pdGlhbGl6
+ZWQgaW4gdGhpcyBmdW5jdGlvbgogIENDICAgICAgeDg2XzY0LXNvZnRtbXUvaHcvaTM4Ni9rdm0v
+YXBpYy5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvZGlzcGxheS9kcGNkLm8KICBDQyAg
+ICAgIGFhcmNoNjQtc29mdG1tdS9ody9kaXNwbGF5L3hsbnhfZHAubwogIENDICAgICAgYWFyY2g2
+NC1zb2Z0bW11L2h3L2RtYS94bG54X2RwZG1hLm8KICBDQyAgICAgIHg4Nl82NC1zb2Z0bW11L2h3
+L2kzODYva3ZtL2k4MjU5Lm8KICBDQyAgICAgIHg4Nl82NC1zb2Z0bW11L2h3L2kzODYva3ZtL2lv
+YXBpYy5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS9ody9pMzg2L2t2bS9pODI1NC5vCiAgQ0Mg
+ICAgICB4ODZfNjQtc29mdG1tdS9ody9pMzg2L2t2bS9wY2ktYXNzaWduLm8KICBDQyAgICAgIHg4
+Nl82NC1zb2Z0bW11L3RhcmdldC9pMzg2L3RyYW5zbGF0ZS5vCiAgQ0MgICAgICB4ODZfNjQtc29m
+dG1tdS90YXJnZXQvaTM4Ni9oZWxwZXIubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L2Rt
+YS9vbWFwX2RtYS5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS90YXJnZXQvaTM4Ni9jcHUubwog
+IENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L2RtYS9zb2NfZG1hLm8KICBDQyAgICAgIGFhcmNo
+NjQtc29mdG1tdS9ody9kbWEvcHhhMnh4X2RtYS5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS90
+YXJnZXQvaTM4Ni9icHRfaGVscGVyLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9kbWEv
+YmNtMjgzNV9kbWEubwogIENDICAgICAgeDg2XzY0LXNvZnRtbXUvdGFyZ2V0L2kzODYvZXhjcF9o
+ZWxwZXIubwogIENDICAgICAgeDg2XzY0LXNvZnRtbXUvdGFyZ2V0L2kzODYvZnB1X2hlbHBlci5v
+CiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS90YXJnZXQvaTM4Ni9jY19oZWxwZXIubwogIENDICAg
+ICAgYWFyY2g2NC1zb2Z0bW11L2h3L2dwaW8vb21hcF9ncGlvLm8KL3RtcC9xZW11LXRlc3Qvc3Jj
+L2h3L2kzODYvYWNwaS1idWlsZC5jOiBJbiBmdW5jdGlvbiDigJhidWlsZF9hcHBlbmRfcGNpX2J1
+c19kZXZpY2Vz4oCZOgovdG1wL3FlbXUtdGVzdC9zcmMvaHcvaTM4Ni9hY3BpLWJ1aWxkLmM6NTAx
+OiB3YXJuaW5nOiDigJhub3RpZnlfbWV0aG9k4oCZIG1heSBiZSB1c2VkIHVuaW5pdGlhbGl6ZWQg
+aW4gdGhpcyBmdW5jdGlvbgogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L2dwaW8vaW14X2dw
+aW8ubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L2kyYy9vbWFwX2kyYy5vCiAgQ0MgICAg
+ICB4ODZfNjQtc29mdG1tdS90YXJnZXQvaTM4Ni9pbnRfaGVscGVyLm8KICBDQyAgICAgIGFhcmNo
+NjQtc29mdG1tdS9ody9pbnB1dC9weGEyeHhfa2V5cGFkLm8KICBDQyAgICAgIHg4Nl82NC1zb2Z0
+bW11L3RhcmdldC9pMzg2L3N2bV9oZWxwZXIubwogIENDICAgICAgeDg2XzY0LXNvZnRtbXUvdGFy
+Z2V0L2kzODYvc21tX2hlbHBlci5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvaW5wdXQv
+dHNjMjEweC5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS90YXJnZXQvaTM4Ni9taXNjX2hlbHBl
+ci5vCiAgQ0MgICAgICB4ODZfNjQtc29mdG1tdS90YXJnZXQvaTM4Ni9tZW1faGVscGVyLm8KICBD
+QyAgICAgIHg4Nl82NC1zb2Z0bW11L3RhcmdldC9pMzg2L3NlZ19oZWxwZXIubwogIENDICAgICAg
+eDg2XzY0LXNvZnRtbXUvdGFyZ2V0L2kzODYvbXB4X2hlbHBlci5vCiAgQ0MgICAgICB4ODZfNjQt
+c29mdG1tdS90YXJnZXQvaTM4Ni9nZGJzdHViLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9o
+dy9pbnRjL2FybXY3bV9udmljLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9pbnRjL2V4
+eW5vczQyMTBfZ2ljLm8KICBDQyAgICAgIHg4Nl82NC1zb2Z0bW11L3RhcmdldC9pMzg2L21hY2hp
+bmUubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L2ludGMvZXh5bm9zNDIxMF9jb21iaW5l
+ci5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvaW50Yy9vbWFwX2ludGMubwogIENDICAg
+ICAgeDg2XzY0LXNvZnRtbXUvdGFyZ2V0L2kzODYvYXJjaF9tZW1vcnlfbWFwcGluZy5vCiAgQ0Mg
+ICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvaW50Yy9iY20yODM1X2ljLm8KICBDQyAgICAgIGFhcmNo
+NjQtc29mdG1tdS9ody9pbnRjL2JjbTI4MzZfY29udHJvbC5vCiAgQ0MgICAgICBhYXJjaDY0LXNv
+ZnRtbXUvaHcvaW50Yy9hbGx3aW5uZXItYTEwLXBpYy5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRt
+bXUvaHcvaW50Yy9hc3BlZWRfdmljLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9pbnRj
+L2FybV9naWN2M19jcHVpZi5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvbWlzYy9pdnNo
+bWVtLm8KICBDQyAgICAgIHg4Nl82NC1zb2Z0bW11L3RhcmdldC9pMzg2L2FyY2hfZHVtcC5vCiAg
+Q0MgICAgICB4ODZfNjQtc29mdG1tdS90YXJnZXQvaTM4Ni9tb25pdG9yLm8KICBDQyAgICAgIHg4
+Nl82NC1zb2Z0bW11L3RhcmdldC9pMzg2L2t2bS5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUv
+aHcvbWlzYy9hcm1fc3lzY3RsLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9taXNjL2Ni
+dXMubwogIENDICAgICAgeDg2XzY0LXNvZnRtbXUvdGFyZ2V0L2kzODYvaHlwZXJ2Lm8KICBDQyAg
+ICAgIGFhcmNoNjQtc29mdG1tdS9ody9taXNjL2V4eW5vczQyMTBfcG11Lm8KICBDQyAgICAgIGFh
+cmNoNjQtc29mdG1tdS9ody9taXNjL2lteF9jY20ubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11
+L2h3L21pc2MvaW14MzFfY2NtLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9taXNjL2lt
+eDI1X2NjbS5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvbWlzYy9pbXg2X2NjbS5vCiAg
+R0VOICAgICB0cmFjZS9nZW5lcmF0ZWQtaGVscGVycy5jCiAgQ0MgICAgICB4ODZfNjQtc29mdG1t
+dS90cmFjZS9jb250cm9sLXRhcmdldC5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvbWlz
+Yy9pbXg2X3NyYy5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvbWlzYy9tc3RfZnBnYS5v
+CiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvbWlzYy9vbWFwX2Nsay5vCiAgQ0MgICAgICBh
+YXJjaDY0LXNvZnRtbXUvaHcvbWlzYy9vbWFwX2dwbWMubwogIENDICAgICAgYWFyY2g2NC1zb2Z0
+bW11L2h3L21pc2Mvb21hcF9sNC5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvbWlzYy9v
+bWFwX3NkcmMubwogIENDICAgICAgeDg2XzY0LXNvZnRtbXUvdHJhY2UvZ2VuZXJhdGVkLWhlbHBl
+cnMubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L21pc2Mvb21hcF90YXAubwogIENDICAg
+ICAgYWFyY2g2NC1zb2Z0bW11L2h3L21pc2MvYmNtMjgzNV9tYm94Lm8KICBDQyAgICAgIGFhcmNo
+NjQtc29mdG1tdS9ody9taXNjL2JjbTI4MzVfcHJvcGVydHkubwogIENDICAgICAgYWFyY2g2NC1z
+b2Z0bW11L2h3L21pc2MvenlucV9zbGNyLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9t
+aXNjL3p5bnEteGFkYy5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvbWlzYy9zdG0zMmYy
+eHhfc3lzY2ZnLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9taXNjL2VkdS5vCiAgQ0Mg
+ICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvbWlzYy9hdXhidXMubwogIENDICAgICAgYWFyY2g2NC1z
+b2Z0bW11L2h3L21pc2MvYXNwZWVkX3NjdS5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcv
+bWlzYy9hc3BlZWRfc2RtYy5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvbmV0L3ZpcnRp
+by1uZXQubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L25ldC92aG9zdF9uZXQubwogIEND
+ICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L3BjbWNpYS9weGEyeHgubwogIENDICAgICAgYWFyY2g2
+NC1zb2Z0bW11L2h3L3Njc2kvdmlydGlvLXNjc2kubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11
+L2h3L3Njc2kvdmlydGlvLXNjc2ktZGF0YXBsYW5lLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1t
+dS9ody9zY3NpL3Zob3N0LXNjc2kubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L3NkL29t
+YXBfbW1jLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9zZC9weGEyeHhfbW1jaS5vCiAg
+Q0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvc3NpL29tYXBfc3BpLm8KICBDQyAgICAgIGFhcmNo
+NjQtc29mdG1tdS9ody9zc2kvaW14X3NwaS5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcv
+dGltZXIvZXh5bm9zNDIxMF9tY3QubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L3RpbWVy
+L2V4eW5vczQyMTBfcHdtLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody90aW1lci9leHlu
+b3M0MjEwX3J0Yy5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvdGltZXIvb21hcF9ncHRp
+bWVyLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody90aW1lci9vbWFwX3N5bmN0aW1lci5v
+CiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvdGltZXIvcHhhMnh4X3RpbWVyLm8KICBDQyAg
+ICAgIGFhcmNoNjQtc29mdG1tdS9ody90aW1lci9kaWdpYy10aW1lci5vCiAgQ0MgICAgICBhYXJj
+aDY0LXNvZnRtbXUvaHcvdGltZXIvYWxsd2lubmVyLWExMC1waXQubwogIENDICAgICAgYWFyY2g2
+NC1zb2Z0bW11L2h3L3VzYi90dXNiNjAxMC5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcv
+dmZpby9jb21tb24ubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L3ZmaW8vcGNpLm8KICBD
+QyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody92ZmlvL3BjaS1xdWlya3MubwogIENDICAgICAgYWFy
+Y2g2NC1zb2Z0bW11L2h3L3ZmaW8vcGxhdGZvcm0ubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11
+L2h3L3ZmaW8vY2FseGVkYS14Z21hYy5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvdmZp
+by9hbWQteGdiZS5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvdmZpby9zcGFwci5vCiAg
+Q0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvdmlydGlvL3ZpcnRpby5vCiAgQ0MgICAgICBhYXJj
+aDY0LXNvZnRtbXUvaHcvdmlydGlvL3ZpcnRpby1iYWxsb29uLm8KICBDQyAgICAgIGFhcmNoNjQt
+c29mdG1tdS9ody92aXJ0aW8vdmhvc3QubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L3Zp
+cnRpby92aG9zdC1iYWNrZW5kLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody92aXJ0aW8v
+dmhvc3QtdXNlci5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvdmlydGlvL3Zob3N0LXZz
+b2NrLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody92aXJ0aW8vdmlydGlvLWNyeXB0by5v
+CiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvYXJtL2Jvb3QubwogIENDICAgICAgYWFyY2g2
+NC1zb2Z0bW11L2h3L3ZpcnRpby92aXJ0aW8tY3J5cHRvLXBjaS5vCiAgQ0MgICAgICBhYXJjaDY0
+LXNvZnRtbXUvaHcvYXJtL2NvbGxpZS5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvYXJt
+L2V4eW5vczRfYm9hcmRzLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9hcm0vZ3Vtc3Rp
+eC5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvYXJtL2hpZ2hiYW5rLm8KICBDQyAgICAg
+IGFhcmNoNjQtc29mdG1tdS9ody9hcm0vZGlnaWNfYm9hcmRzLm8KICBDQyAgICAgIGFhcmNoNjQt
+c29mdG1tdS9ody9hcm0vaW50ZWdyYXRvcmNwLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9o
+dy9hcm0vbWFpbnN0b25lLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9hcm0vbXVzaWNw
+YWwubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L2FybS9uc2VyaWVzLm8KICBDQyAgICAg
+IGFhcmNoNjQtc29mdG1tdS9ody9hcm0vb21hcF9zeDEubwogIENDICAgICAgYWFyY2g2NC1zb2Z0
+bW11L2h3L2FybS9yZWFsdmlldy5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvYXJtL3Bh
+bG0ubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L2FybS9zcGl0ei5vCiAgQ0MgICAgICBh
+YXJjaDY0LXNvZnRtbXUvaHcvYXJtL3N0ZWxsYXJpcy5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRt
+bXUvaHcvYXJtL3Rvc2EubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L2FybS92ZXJzYXRp
+bGVwYi5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvYXJtL3ZleHByZXNzLm8KICBDQyAg
+ICAgIGFhcmNoNjQtc29mdG1tdS9ody9hcm0vdmlydC5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRt
+bXUvaHcvYXJtL3hpbGlueF96eW5xLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9hcm0v
+ejIubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L2FybS92aXJ0LWFjcGktYnVpbGQubwog
+IENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L2FybS9uZXRkdWlubzIubwogIENDICAgICAgYWFy
+Y2g2NC1zb2Z0bW11L2h3L2FybS9zeXNidXMtZmR0Lm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1t
+dS9ody9hcm0vYXJtdjdtLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9hcm0vZXh5bm9z
+NDIxMC5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvYXJtL3B4YTJ4eC5vCiAgQ0MgICAg
+ICBhYXJjaDY0LXNvZnRtbXUvaHcvYXJtL3B4YTJ4eF9ncGlvLm8KICBDQyAgICAgIGFhcmNoNjQt
+c29mdG1tdS9ody9hcm0vcHhhMnh4X3BpYy5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcv
+YXJtL2RpZ2ljLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9hcm0vb21hcDEubwogIEND
+ICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L2FybS9vbWFwMi5vCiAgQ0MgICAgICBhYXJjaDY0LXNv
+ZnRtbXUvaHcvYXJtL3N0cm9uZ2FybS5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvYXJt
+L2FsbHdpbm5lci1hMTAubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L2FybS9jdWJpZWJv
+YXJkLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9hcm0vYmNtMjgzNV9wZXJpcGhlcmFs
+cy5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvYXJtL2JjbTI4MzYubwogIENDICAgICAg
+YWFyY2g2NC1zb2Z0bW11L2h3L2FybS9yYXNwaS5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUv
+aHcvYXJtL3N0bTMyZjIwNV9zb2MubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L2FybS94
+bG54LXp5bnFtcC5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvYXJtL3hsbngtZXAxMDgu
+bwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L2FybS9mc2wtaW14MjUubwogIENDICAgICAg
+YWFyY2g2NC1zb2Z0bW11L2h3L2FybS9pbXgyNV9wZGsubwogIENDICAgICAgYWFyY2g2NC1zb2Z0
+bW11L2h3L2FybS9mc2wtaW14MzEubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L2FybS9r
+em0ubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L2FybS9mc2wtaW14Ni5vCiAgQ0MgICAg
+ICBhYXJjaDY0LXNvZnRtbXUvaHcvYXJtL3NhYnJlbGl0ZS5vCiAgQ0MgICAgICBhYXJjaDY0LXNv
+ZnRtbXUvaHcvYXJtL2FzcGVlZF9zb2MubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L2Fy
+bS9hc3BlZWQubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L3RhcmdldC9hcm0vYXJtLXNlbWku
+bwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L3RhcmdldC9hcm0vbWFjaGluZS5vCiAgQ0MgICAg
+ICBhYXJjaDY0LXNvZnRtbXUvdGFyZ2V0L2FybS9wc2NpLm8KICBDQyAgICAgIGFhcmNoNjQtc29m
+dG1tdS90YXJnZXQvYXJtL2FyY2hfZHVtcC5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvdGFy
+Z2V0L2FybS9tb25pdG9yLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS90YXJnZXQvYXJtL2t2
+bS1zdHViLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS90YXJnZXQvYXJtL29wX2hlbHBlci5v
+CiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvdGFyZ2V0L2FybS90cmFuc2xhdGUubwogIENDICAg
+ICAgYWFyY2g2NC1zb2Z0bW11L3RhcmdldC9hcm0vaGVscGVyLm8KICBDQyAgICAgIGFhcmNoNjQt
+c29mdG1tdS90YXJnZXQvYXJtL25lb25faGVscGVyLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1t
+dS90YXJnZXQvYXJtL2NwdS5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvdGFyZ2V0L2FybS9p
+d21teHRfaGVscGVyLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS90YXJnZXQvYXJtL2dkYnN0
+dWIubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L3RhcmdldC9hcm0vY3B1NjQubwogIENDICAg
+ICAgYWFyY2g2NC1zb2Z0bW11L3RhcmdldC9hcm0vdHJhbnNsYXRlLWE2NC5vCiAgQ0MgICAgICBh
+YXJjaDY0LXNvZnRtbXUvdGFyZ2V0L2FybS9oZWxwZXItYTY0Lm8KICBDQyAgICAgIGFhcmNoNjQt
+c29mdG1tdS90YXJnZXQvYXJtL2dkYnN0dWI2NC5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUv
+dGFyZ2V0L2FybS9jcnlwdG9faGVscGVyLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS90YXJn
+ZXQvYXJtL2FybS1wb3dlcmN0bC5vCiAgR0VOICAgICB0cmFjZS9nZW5lcmF0ZWQtaGVscGVycy5j
+CiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvdHJhY2UvY29udHJvbC10YXJnZXQubwogIENDICAg
+ICAgYWFyY2g2NC1zb2Z0bW11L2dkYnN0dWIteG1sLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1t
+dS90cmFjZS9nZW5lcmF0ZWQtaGVscGVycy5vCiAgTElOSyAgICB4ODZfNjQtc29mdG1tdS9xZW11
+LXN5c3RlbS14ODZfNjQKL3RtcC9xZW11LXRlc3Qvc3JjL3RhcmdldC9hcm0vdHJhbnNsYXRlLWE2
+NC5jOjExMjE1OiBlcnJvcjogZXhwZWN0ZWQg4oCYO+KAmSwg4oCYLOKAmSBvciDigJgp4oCZIGJl
+Zm9yZSDigJhkY+KAmQovdG1wL3FlbXUtdGVzdC9zcmMvdGFyZ2V0L2FybS90cmFuc2xhdGUtYTY0
+LmM6MTEyNzA6IGVycm9yOiBleHBlY3RlZCDigJg74oCZLCDigJgs4oCZIG9yIOKAmCnigJkgYmVm
+b3JlIOKAmGRj4oCZCi90bXAvcWVtdS10ZXN0L3NyYy90YXJnZXQvYXJtL3RyYW5zbGF0ZS1hNjQu
+YzoxMTI3NTogZXJyb3I6IGV4cGVjdGVkIOKAmDvigJksIOKAmCzigJkgb3Ig4oCYKeKAmSBiZWZv
+cmUg4oCYZGPigJkKL3RtcC9xZW11LXRlc3Qvc3JjL3RhcmdldC9hcm0vdHJhbnNsYXRlLWE2NC5j
+OjExMjgwOiBlcnJvcjogZXhwZWN0ZWQg4oCYO+KAmSwg4oCYLOKAmSBvciDigJgp4oCZIGJlZm9y
+ZSDigJhkY+KAmQovdG1wL3FlbXUtdGVzdC9zcmMvdGFyZ2V0L2FybS90cmFuc2xhdGUtYTY0LmM6
+MTEyODc6IGVycm9yOiBleHBlY3RlZCDigJg74oCZLCDigJgs4oCZIG9yIOKAmCnigJkgYmVmb3Jl
+IOKAmGRj4oCZCi90bXAvcWVtdS10ZXN0L3NyYy90YXJnZXQvYXJtL3RyYW5zbGF0ZS1hNjQuYzox
+MTMwOTogZXJyb3I6IGV4cGVjdGVkIOKAmDvigJksIOKAmCzigJkgb3Ig4oCYKeKAmSBiZWZvcmUg
+4oCYZGPigJkKL3RtcC9xZW11LXRlc3Qvc3JjL3RhcmdldC9hcm0vdHJhbnNsYXRlLWE2NC5jOjEx
+MzMzOiBlcnJvcjogZXhwZWN0ZWQg4oCYO+KAmSwg4oCYLOKAmSBvciDigJgp4oCZIGJlZm9yZSDi
+gJhkY+KAmQovdG1wL3FlbXUtdGVzdC9zcmMvdGFyZ2V0L2FybS90cmFuc2xhdGUtYTY0LmM6MTEz
+NDg6IGVycm9yOiBleHBlY3RlZCDigJg74oCZLCDigJgs4oCZIG9yIOKAmCnigJkgYmVmb3JlIOKA
+mGRj4oCZCm1ha2VbMV06ICoqKiBbdGFyZ2V0L2FybS90cmFuc2xhdGUtYTY0Lm9dIEVycm9yIDEK
+bWFrZVsxXTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KbWFrZTogKioqIFtz
+dWJkaXItYWFyY2g2NC1zb2Z0bW11XSBFcnJvciAyCm1ha2VbMV06ICoqKiBbZG9ja2VyLXJ1bl0g
+RXJyb3IgMgptYWtlWzFdOiBMZWF2aW5nIGRpcmVjdG9yeSBgL3Zhci90bXAvcGF0Y2hldy10ZXN0
+ZXItdG1wLWppM21wMTRpL3NyYycKbWFrZTogKioqIFtkb2NrZXItcnVuLXRlc3QtcXVpY2tAY2Vu
+dG9zNl0gRXJyb3IgMgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0
+aCBjb2RlOiAyCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcg
+W2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNo
+ZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
