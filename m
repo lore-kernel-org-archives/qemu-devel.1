@@ -1,17 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50057)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55295)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cM513-0006WI-2L
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 22:35:02 -0500
+	(envelope-from <bounces@canonical.com>) id 1cM5sL-0003PV-U7
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 23:30:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cM50z-0003h3-Ui
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 22:35:01 -0500
-From: zhanghailiang <zhang.zhanghailiang@huawei.com>
-Date: Wed, 28 Dec 2016 11:34:19 +0800
-Message-ID: <1482896059-12020-1-git-send-email-zhang.zhanghailiang@huawei.com>
+	(envelope-from <bounces@canonical.com>) id 1cM5sI-0003l7-Dv
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 23:30:05 -0500
+Received: from indium.canonical.com ([91.189.90.7]:43253)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cM5sI-0003km-9I
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 23:30:02 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cM5sF-0001MX-8n
+	for <qemu-devel@nongnu.org>; Wed, 28 Dec 2016 04:29:59 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id E90C32EA030
+	for <qemu-devel@nongnu.org>; Wed, 28 Dec 2016 04:29:57 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [Resend PATCH] The QEMU crashes since invoking
- qemu_thread_set_name(), the backtrace is:
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 28 Dec 2016 04:17:26 -0000
+From: Launchpad Bug Tracker <584514@bugs.launchpad.net>
+Reply-To: Bug 584514 <584514@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20100523103436.31931.34662.malonedeb@wampee.canonical.com>
+Message-Id: <20161228041726.17184.70734.malone@loganberry.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 584514] Re: Qemu-KVM 0.12.4 Guest entered Paused
+ State
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,67 +38,58 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, qemu-stable@nongnu.org, arei.gonglei@huawei.com, zhang.zhanghailiang@huawei.com, herongguang.he@huawei.com, Caoxinhua <caoxinhua@huawei.com>
 
-From: Caoxinhua <caoxinhua@huawei.com>
+[Expired for QEMU because there has been no activity for 60 days.]
 
-(gdb) bt
-#0 0x00007f9a68b095d7 in __GI_raise (sig=sig@entry=6) at ../nptl/sysdeps/unix/sysv/linux/raise.c:56
-#1 0x00007f9a68b0acc8 in __GI_abort () at abort.c:90
-#2 0x00007f9a69cda389 in PAT_abort () from /usr/lib64/libuvpuserhotfix.so
-#3 0x00007f9a69cdda0d in patchIllInsHandler () from /usr/lib64/libuvpuserhotfix.so
-#4 <signal handler called>
-#5 pthread_setname_np (th=140298470549248, name=name@entry=0x8cc74a "io-task-worker") at ../nptl/sysdeps/unix/sysv/linux/pthread_setname.c:49
-#6 0x00000000007f5f20 in qemu_thread_set_name (thread=thread@entry=0x7ffd2ac09680, name=name@entry=0x8cc74a "io-task-worker") at util/qemu_thread_posix.c:459
-#7 0x00000000007f679e in qemu_thread_create (thread=thread@entry=0x7ffd2ac09680, name=name@entry=0x8cc74a "io-task-worker",start_routine=start_routine@entry=0x7c1300 <qio_task_thread_worker>, arg=arg@entry=0x7f99b8001720, mode=mode@entry=1) at util/qemu_thread_posix.c:498
-#8 0x00000000007c15b6 in qio_task_run_in_thread (task=task@entry=0x7f99b80033d0, worker=worker@entry=0x7bd920 <qio_channel_socket_connect_worker>, opaque=0x7f99b8003370, destroy=0x7c6220 <qapi_free_SocketAddress>) at io/task.c:133
-#9 0x00000000007bda04 in qio_channel_socket_connect_async (ioc=0x7f99b80014c0, addr=0x37235d0, callback=callback@entry=0x54ad00 <qemu_chr_socket_connected>, opaque=opaque@entry=0x38118b0, destroy=destroy@entry=0x0) at io/channel_socket.c:191
-#10 0x00000000005487f6 in socket_reconnect_timeout (opaque=0x38118b0) at qemu_char.c:4402
-#11 0x00007f9a6a1533b3 in g_timeout_dispatch () from /usr/lib64/libglib-2.0.so.0
-#12 0x00007f9a6a15299a in g_main_context_dispatch () from /usr/lib64/libglib-2.0.so.0
-#13 0x0000000000747386 in glib_pollfds_poll () at main_loop.c:227
-#14 0x0000000000747424 in os_host_main_loop_wait (timeout=404000000) at main_loop.c:272
-#15 0x0000000000747575 in main_loop_wait (nonblocking=nonblocking@entry=0) at main_loop.c:520
-#16 0x0000000000557d31 in main_loop () at vl.c:2170
-#17 0x000000000041c8b7 in main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>) at vl.c:5083
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
 
-That's because the corresponding child thread has been exited before the main thread calling qemu_thread_set_name().
-Let's detach the thread after calling qemu_thread_set_name().
+-- =
 
-Signed-off-by: Caoxinhua <caoxinhua@huawei.com>
----
- util/qemu-thread-posix.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/584514
 
-diff --git a/util/qemu-thread-posix.c b/util/qemu-thread-posix.c
-index d20cdde..d31793d 100644
---- a/util/qemu-thread-posix.c
-+++ b/util/qemu-thread-posix.c
-@@ -481,12 +481,6 @@ void qemu_thread_create(QemuThread *thread, const char *name,
-     if (err) {
-         error_exit(err, __func__);
-     }
--    if (mode == QEMU_THREAD_DETACHED) {
--        err = pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
--        if (err) {
--            error_exit(err, __func__);
--        }
--    }
- 
-     /* Leave signal handling to the iothread.  */
-     sigfillset(&set);
-@@ -499,6 +493,12 @@ void qemu_thread_create(QemuThread *thread, const char *name,
-         qemu_thread_set_name(thread, name);
-     }
- 
-+    if (mode == QEMU_THREAD_DETACHED) {
-+        err = pthread_detach(thread->thread);
-+        if (err) {
-+            error_exit(err, __func__);
-+        }
-+    }
-     pthread_sigmask(SIG_SETMASK, &oldset, NULL);
- 
-     pthread_attr_destroy(&attr);
--- 
-1.8.3.1
+Title:
+  Qemu-KVM 0.12.4 Guest entered Paused State
+
+Status in QEMU:
+  Expired
+
+Bug description:
+  I recently had a 0.12.4 qemu-kvm with a debian lenny guest which
+  occasionally paused.
+
+  There was no memory exhaustion as suggested earlier.
+
+  qemu-kvm send the following output::
+
+  VM internal error. Suberror: 1
+  rax 0000000000000100 rbx ffff880017585bc0 rcx 00007f84c6d5b000 rdx 000000=
+0000000001
+  rsi 0000000000000000 rdi ffff88001d322dec rsp ffff88001e133e88 rbp ffff88=
+001e133e88
+  r8  0000000001f25bc2 r9  0000000000000007 r10 00007f84c6b4d97b r11 000000=
+0000000206
+  r12 ffff88001d322dec r13 ffff88001d322de8 r14 0000000000000001 r15 000000=
+0000000000
+  rip ffffffff81039719 rflags 00010092
+  cs 0010 (00000000/ffffffff p 1 dpl 0 db 0 s 1 type b l 1 g 1 avl 0)
+  ds 0000 (00000000/ffffffff p 0 dpl 0 db 0 s 0 type 0 l 0 g 0 avl 0)
+  es 0000 (00000000/ffffffff p 0 dpl 0 db 0 s 0 type 0 l 0 g 0 avl 0)
+  ss 0018 (00000000/ffffffff p 1 dpl 0 db 1 s 1 type 3 l 0 g 1 avl 0)
+  fs 0000 (7f84c6d53700/ffffffff p 0 dpl 0 db 0 s 0 type 0 l 0 g 0 avl 0)
+  gs 0000 (ffff880001d00000/ffffffff p 0 dpl 0 db 0 s 0 type 0 l 0 g 0 avl =
+0)
+  tr 0040 (ffff880001d13780/00002087 p 1 dpl 0 db 0 s 0 type b l 0 g 0 avl =
+0)
+  ldt 0000 (00000000/ffffffff p 0 dpl 0 db 0 s 0 type 0 l 0 g 0 avl 0)
+  gdt ffff880001d04000/7f
+  idt ffffffff8195e000/fff
+  cr0 80050033 cr2 7f84c6b38ec8 cr3 1db7d000 cr4 6e0 cr8 0 efer 501
+  emulation failure, check dmesg for details
+
+  Unfortunately, I found nothing in syslog or dmesg
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/584514/+subscriptions
