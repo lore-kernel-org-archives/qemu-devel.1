@@ -1,23 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44744)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50057)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cM4HB-0008Et-II
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 21:47:38 -0500
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cM513-0006WI-2L
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 22:35:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cM4H6-0007Iw-IY
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 21:47:37 -0500
-Received: from [59.151.112.132] (port=44416 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cM4H5-0007HY-7y
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 21:47:32 -0500
-References: <20161216003520-mutt-send-email-mst@kernel.org>
-From: Cao jin <caoj.fnst@cn.fujitsu.com>
-Message-ID: <586328DD.3040203@cn.fujitsu.com>
-Date: Wed, 28 Dec 2016 10:52:13 +0800
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cM50z-0003h3-Ui
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 22:35:01 -0500
+From: zhanghailiang <zhang.zhanghailiang@huawei.com>
+Date: Wed, 28 Dec 2016 11:34:19 +0800
+Message-ID: <1482896059-12020-1-git-send-email-zhang.zhanghailiang@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20161216003520-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] vfio/pci: guest error recovery proposal
+Content-Type: text/plain
+Subject: [Qemu-devel] [Resend PATCH] The QEMU crashes since invoking
+ qemu_thread_set_name(), the backtrace is:
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,96 +20,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>
-Cc: linux-kernel@vger.kernel.org, izumi.taku@jp.fujitsu.com, qemu-devel@nongnu.org, kvm@vger.kernel.org
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, qemu-stable@nongnu.org, arei.gonglei@huawei.com, zhang.zhanghailiang@huawei.com, herongguang.he@huawei.com, Caoxinhua <caoxinhua@huawei.com>
 
+From: Caoxinhua <caoxinhua@huawei.com>
 
+(gdb) bt
+#0 0x00007f9a68b095d7 in __GI_raise (sig=sig@entry=6) at ../nptl/sysdeps/unix/sysv/linux/raise.c:56
+#1 0x00007f9a68b0acc8 in __GI_abort () at abort.c:90
+#2 0x00007f9a69cda389 in PAT_abort () from /usr/lib64/libuvpuserhotfix.so
+#3 0x00007f9a69cdda0d in patchIllInsHandler () from /usr/lib64/libuvpuserhotfix.so
+#4 <signal handler called>
+#5 pthread_setname_np (th=140298470549248, name=name@entry=0x8cc74a "io-task-worker") at ../nptl/sysdeps/unix/sysv/linux/pthread_setname.c:49
+#6 0x00000000007f5f20 in qemu_thread_set_name (thread=thread@entry=0x7ffd2ac09680, name=name@entry=0x8cc74a "io-task-worker") at util/qemu_thread_posix.c:459
+#7 0x00000000007f679e in qemu_thread_create (thread=thread@entry=0x7ffd2ac09680, name=name@entry=0x8cc74a "io-task-worker",start_routine=start_routine@entry=0x7c1300 <qio_task_thread_worker>, arg=arg@entry=0x7f99b8001720, mode=mode@entry=1) at util/qemu_thread_posix.c:498
+#8 0x00000000007c15b6 in qio_task_run_in_thread (task=task@entry=0x7f99b80033d0, worker=worker@entry=0x7bd920 <qio_channel_socket_connect_worker>, opaque=0x7f99b8003370, destroy=0x7c6220 <qapi_free_SocketAddress>) at io/task.c:133
+#9 0x00000000007bda04 in qio_channel_socket_connect_async (ioc=0x7f99b80014c0, addr=0x37235d0, callback=callback@entry=0x54ad00 <qemu_chr_socket_connected>, opaque=opaque@entry=0x38118b0, destroy=destroy@entry=0x0) at io/channel_socket.c:191
+#10 0x00000000005487f6 in socket_reconnect_timeout (opaque=0x38118b0) at qemu_char.c:4402
+#11 0x00007f9a6a1533b3 in g_timeout_dispatch () from /usr/lib64/libglib-2.0.so.0
+#12 0x00007f9a6a15299a in g_main_context_dispatch () from /usr/lib64/libglib-2.0.so.0
+#13 0x0000000000747386 in glib_pollfds_poll () at main_loop.c:227
+#14 0x0000000000747424 in os_host_main_loop_wait (timeout=404000000) at main_loop.c:272
+#15 0x0000000000747575 in main_loop_wait (nonblocking=nonblocking@entry=0) at main_loop.c:520
+#16 0x0000000000557d31 in main_loop () at vl.c:2170
+#17 0x000000000041c8b7 in main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>) at vl.c:5083
 
-On 12/16/2016 07:02 AM, Michael S. Tsirkin wrote:
-> 
->>  1) We need to do the right thing for the guest, I don't think we
->>     should be presuming that different reset types are equivalent,
->>     leaving gaps where we expect the guest/host to do a reset and don't
->>     follow through on other reset requests, and we need to notify the
->>     guest immediately for the error.
-> c>  2) We need to do the right thing for the host, that means we should
->>     not give the user the opportunity to leave a device in a state
->>     where we haven't at least performed a bus reset on link error (this
->>     may be our current state and if so we should fix it).
-> 
-> Ok so here is a concrete proposal for improving guest device error
-> recovery (1).  This is not trying to fix current bugs for 2, but
-> also does not lock us into not fixing them.
-> 
-> I'll write up proposal for (2) but I feel we can't properly
-> fix host without fixing (1) first and without breaking compatibility.
-> 
-> Background:
-> 
-> non-fatal errors:
-> 
-> - These errors are due to data link problems.
->   The problem is that a transaction was lost, so driver and device are
->   out of sync. Device reset is in theory enough to recover from these,
->   in practice some drivers might try to do link level reset instead.
-> 
-> 
-> fatal errors:
-> 
-> - These errors are due to physical problems.
->   The problem is that a transaction was lost, so driver and device are
->   out of sync. Link reset might be necessary to recover from these,
->   sometimes device reset might be enough for very simple devices.
->   If a link above the device reports errors, device might have went away,
->   link reset is the only thing that might being it back.
-> 
-> current behaviour:
-> 
-> - vfio will always report that it recovered function from an error.
-> - whether link reset will trigger depends on whether any other
->   function on the same link has a host driver that reports an error.
-> - also, if there's a host driver that can't handle errors,
->   link reset will never trigger
-> 
-> 
-> proposed enhancement:
-> 
-> 1- allow userspace to request reporting non fatal/fatal errors separately
-> 2- report errors on monitor as events as well
-> 3- forward correct error type to guest
-> 4- set link error flag in userspace (this is optional, used for 5 below)
-> 5- if guest requests link reset, and error flag is set,
->   stop vm (I hope we can distinguish this
->   from resets that happen on reboot here.
->   if yes we might not need error flag in 4 above)
-> 
+That's because the corresponding child thread has been exited before the main thread calling qemu_thread_set_name().
+Let's detach the thread after calling qemu_thread_set_name().
 
-Hi,
+Signed-off-by: Caoxinhua <caoxinhua@huawei.com>
+---
+ util/qemu-thread-posix.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-I have a question about vm stop on fatal error.
-Recently, When test my patches, I often saw fatal error(Malformed TLP
-Status) happens, which disturbed my test. So I am wondering: why vm stop
-is a better choice than qdev_unplug? Although we told user "Please
-collect any data possible and then kill the guest", I still don't know
-how to save any possible data. For example, if user is editing document,
-vm_stop caused by a device fatal error will destroy user's effort.
-
+diff --git a/util/qemu-thread-posix.c b/util/qemu-thread-posix.c
+index d20cdde..d31793d 100644
+--- a/util/qemu-thread-posix.c
++++ b/util/qemu-thread-posix.c
+@@ -481,12 +481,6 @@ void qemu_thread_create(QemuThread *thread, const char *name,
+     if (err) {
+         error_exit(err, __func__);
+     }
+-    if (mode == QEMU_THREAD_DETACHED) {
+-        err = pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+-        if (err) {
+-            error_exit(err, __func__);
+-        }
+-    }
+ 
+     /* Leave signal handling to the iothread.  */
+     sigfillset(&set);
+@@ -499,6 +493,12 @@ void qemu_thread_create(QemuThread *thread, const char *name,
+         qemu_thread_set_name(thread, name);
+     }
+ 
++    if (mode == QEMU_THREAD_DETACHED) {
++        err = pthread_detach(thread->thread);
++        if (err) {
++            error_exit(err, __func__);
++        }
++    }
+     pthread_sigmask(SIG_SETMASK, &oldset, NULL);
+ 
+     pthread_attr_destroy(&attr);
 -- 
-Sincerely,
-Cao jin
-> 
-> Results:
-> The advantage of this is that we don't need to manage any state at all.
-> Most drivers will handle non fatal errors by FLR and will recover fine.
-> Drivers that attempt link reset will get vmstop which is not
-> worse than what we have now.
-> 
-> I don't see how this can break any reasonable configuration
-> that is not already broken, but we might want a flag
-> to suppress aer reports to guest and just do vmstop
-> unconditionally.
-> Alternatively, management can pause vm itself when it sees the error.
-> 
-> 
-> Pls remember to Cc qemu list on discussion, not just kvm.
-> 
+1.8.3.1
