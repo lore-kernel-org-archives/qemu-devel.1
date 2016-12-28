@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51173)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54236)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cMHTt-0006YX-Ia
-	for qemu-devel@nongnu.org; Wed, 28 Dec 2016 11:53:38 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cMHfX-0003LI-Ov
+	for qemu-devel@nongnu.org; Wed, 28 Dec 2016 12:05:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cMHTq-0005Hp-HZ
-	for qemu-devel@nongnu.org; Wed, 28 Dec 2016 11:53:37 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44604)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cMHTq-0005Hk-9b
-	for qemu-devel@nongnu.org; Wed, 28 Dec 2016 11:53:34 -0500
-Date: Wed, 28 Dec 2016 14:53:30 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20161228165330.GA23551@thinpad.lan.raisama.net>
-References: <f403045cde4049058c05446d5c04@google.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1cMHfW-000170-Hc
+	for qemu-devel@nongnu.org; Wed, 28 Dec 2016 12:05:39 -0500
+Received: from mail-vk0-x22e.google.com ([2607:f8b0:400c:c05::22e]:34804)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cMHfW-00016v-8P
+	for qemu-devel@nongnu.org; Wed, 28 Dec 2016 12:05:38 -0500
+Received: by mail-vk0-x22e.google.com with SMTP id x186so222852513vkd.1
+	for <qemu-devel@nongnu.org>; Wed, 28 Dec 2016 09:05:37 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f403045cde4049058c05446d5c04@google.com>
-Subject: Re: [Qemu-devel] [PATCH] target/i386: Fix bad patch application to
- translate.c
+In-Reply-To: <098092bd-b92b-4fb8-5061-f77f9f75e392@freebsd.org>
+References: <098092bd-b92b-4fb8-5061-f77f9f75e392@freebsd.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 28 Dec 2016 17:05:16 +0000
+Message-ID: <CAFEAcA8ZuCxeFz83moePn80GFUbh0wGu4+T2wHdTSN=LE6-1CQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] Looking for a linux-user mode test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,99 +28,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Doug Evans <dje@google.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com
+To: Sean Bruno <sbruno@freebsd.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Sat, Dec 24, 2016 at 08:29:33PM +0000, Doug Evans wrote:
-> In commit c52ab08aee6f7d4717fc6b517174043126bd302f,
-> the patch snippet for the "syscall" insn got applied to "iret".
-> 
-> Signed-off-by: Doug Evans <dje@google.com>
+On 28 December 2016 at 15:06, Sean Bruno <sbruno@freebsd.org> wrote:
+> After some recent-ish changes to how user mode executes things/stuff,
+> I'm running into issues with the out of tree bsd-user mode code that
+> FreeBSD has been maintaining.  It looks like the host_signal_handler()
+> is never executed or registered correctly in our code.  I'm curious if
+> the linux-user code can handle this bit of configure script from m4.
+>
+> https://people.freebsd.org/~sbruno/stack.c
 
-Patch was corrupt, I have fixed line wrapping by hand and had to
-use git-am --ignore-whitespace to apply it.
+Hmm. That code does:
+ * set up a SIGSEGV signal handler to run on its own stack
+ * go into an infinite recursion, expecting to run out of
+   stack and trigger a SEGV
+which is a bit of an obscure corner case of signal handling.
 
-I suggest using git-send-email, as e-mail clients often break
-patch contents when copying&pasting.
+We recently fixed a lot of signal handler related bugs in linux-user
+by doing a significant overhaul of that code. If bsd-user is still
+using the old broken approach it's probably still got lots of bugs
+in it. Alternatively, it's possible we changed some of the core
+code in that process and broke bsd-user by mistake.
 
-Fixed patch below, for reference:
+Ideally all of that rework (including the support for properly
+interrupting syscalls without races) should be ported over to
+bsd-user at some point.
 
----
- target/i386/translate.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+> If someone has the time/inclination, can this code be compiled for ARMv6
+> and executed in a linux chroot with the -strace argument applied?  I see
+> the following, which after much debugging seems to indicate that the
+> host_signal_handler() code is never executed as this code is requesting
+> that SIGSEGV be masked to its own handler.
 
-diff --git a/target/i386/translate.c b/target/i386/translate.c
-index 59e11fc..7adfff0 100644
---- a/target/i386/translate.c
-+++ b/target/i386/translate.c
-@@ -6435,10 +6435,7 @@ static target_ulong disas_insn(CPUX86State *env, DisasContext *s,
-                                       tcg_const_i32(s->pc - s->cs_base));
-             set_cc_op(s, CC_OP_EFLAGS);
-         }
--        /* TF handling for the syscall insn is different. The TF bit is checked
--           after the syscall insn completes. This allows #DB to not be
--           generated after one has entered CPL0 if TF is set in FMASK.  */
--        gen_eob_worker(s, false, true);
-+        gen_eob(s);
-         break;
-     case 0xe8: /* call im */
-         {
-@@ -7119,7 +7116,10 @@ static target_ulong disas_insn(CPUX86State *env, DisasContext *s,
-         gen_update_cc_op(s);
-         gen_jmp_im(pc_start - s->cs_base);
-         gen_helper_syscall(cpu_env, tcg_const_i32(s->pc - pc_start));
--        gen_eob(s);
-+        /* TF handling for the syscall insn is different. The TF bit is  checked
-+           after the syscall insn completes. This allows #DB to not be
-+           generated after one has entered CPL0 if TF is set in FMASK.  */
-+        gen_eob_worker(s, false, true);
-         break;
-     case 0x107: /* sysret */
-         if (!s->pe) {
--- 
-2.7.4
+Built for ARMv7 since I don't have an ARMv6 cross compiler
+or system, but it works ok for linux (also, built with -static
+rather than run in a chroot, for convenience):
 
+e104462:xenial:qemu$ ./build/arm-linux/arm-linux-user/qemu-arm -strace
+~/linaro/qemu-misc-tests/stack
+29798 uname(0xf6fff1f0) = 0
+29798 brk(NULL) = 0x0007f000
+29798 brk(0x0007fd00) = 0x0007fd00
+29798 readlink("/proc/self/exe",0xf6ffe328,4096) = 43
+29798 brk(0x000a0d00) = 0x000a0d00
+29798 brk(0x000a1000) = 0x000a1000
+29798 access("/etc/ld.so.nohwcap",F_OK) = -1 errno=2 (No such file or directory)
+29798 sigaltstack(0xf6fff2e0,(nil)) = 0
+29798 rt_sigaction(SIGSEGV,0xf6fff1b0,NULL) = 0
+--- SIGSEGV {si_signo=SIGSEGV, si_code=1, si_addr = 0xf67ffffc} ---
+29798 exit_group(0)
 
-> ---
->  target/i386/translate.c | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
-> 
-> diff --git a/target/i386/translate.c b/target/i386/translate.c
-> index 59e11fc..7e9d073 100644
-> --- a/target/i386/translate.c
-> +++ b/target/i386/translate.c
-> @@ -6435,10 +6435,7 @@ static target_ulong disas_insn(CPUX86State *env,
-> DisasContext *s,
->                                        tcg_const_i32(s->pc - s->cs_base));
->              set_cc_op(s, CC_OP_EFLAGS);
->          }
-> -        /* TF handling for the syscall insn is different. The TF bit is
-> checked
-> -           after the syscall insn completes. This allows #DB to not be
-> -           generated after one has entered CPL0 if TF is set in FMASK.  */
-> -        gen_eob_worker(s, false, true);
-> +        gen_eob(s);
->          break;
->      case 0xe8: /* call im */
->          {
-> @@ -7119,7 +7116,10 @@ static target_ulong disas_insn(CPUX86State *env,
-> DisasContext *s,
->          gen_update_cc_op(s);
->          gen_jmp_im(pc_start - s->cs_base);
->          gen_helper_syscall(cpu_env, tcg_const_i32(s->pc - pc_start));
-> -        gen_eob(s);
-> +        /* TF handling for the syscall insn is different. The TF bit is
-> checked
-> +           after the syscall insn completes. This allows #DB to not be
-> +           generated after one has entered CPL0 if TF is set in FMASK.  */
-> +        gen_eob_worker(s, false, true);
->          break;
->      case 0x107: /* sysret */
->          if (!s->pe) {
-> -- 
-> 2.8.0.rc3.226.g39d4020
-> 
-> 
+(the enhancement to linux-user's strace to print the line on signal
+delivery is also a pretty new change.)
 
--- 
-Eduardo
+> https://people.freebsd.org/~sbruno/qemu-bsd-user-arm.txt
+>
+> Prior to 7e6c57e2957c7d868f74bd0d53b5e861b495e1c7 this DTRT for our
+> ARMv6 targets.
+
+This commit hash doesn't seem to be in QEMU master.
+
+thanks
+-- PMM
