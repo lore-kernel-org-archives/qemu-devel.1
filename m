@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55296)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58957)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cM5sL-0003PW-U4
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 23:30:07 -0500
+	(envelope-from <vilanova@ac.upc.edu>) id 1cMDFi-0003Ne-3z
+	for qemu-devel@nongnu.org; Wed, 28 Dec 2016 07:22:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cM5sI-0003lF-EF
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 23:30:05 -0500
-Received: from indium.canonical.com ([91.189.90.7]:43254)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cM5sI-0003kn-9F
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 23:30:02 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cM5sD-0001MU-Il
-	for <qemu-devel@nongnu.org>; Wed, 28 Dec 2016 04:29:58 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id BC05D2E80CE
-	for <qemu-devel@nongnu.org>; Wed, 28 Dec 2016 04:29:56 +0000 (UTC)
+	(envelope-from <vilanova@ac.upc.edu>) id 1cMDFd-00023E-EX
+	for qemu-devel@nongnu.org; Wed, 28 Dec 2016 07:22:42 -0500
+Received: from roura.ac.upc.edu ([147.83.33.10]:48955 helo=roura.ac.upc.es)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <vilanova@ac.upc.edu>) id 1cMDFd-00022l-2Q
+	for qemu-devel@nongnu.org; Wed, 28 Dec 2016 07:22:37 -0500
+From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
+Date: Wed, 28 Dec 2016 13:22:29 +0100
+Message-Id: <148292774946.380.3638349228328753405.stgit@fimbulvetr.bsc.es>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 28 Dec 2016 04:17:28 -0000
-From: Launchpad Bug Tracker <712337@bugs.launchpad.net>
-Reply-To: Bug 712337 <712337@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20110203094452.31746.13322.malonedeb@wampee.canonical.com>
-Message-Id: <20161228041729.17184.86557.malone@loganberry.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 712337] Re: connecthon basic test5 failed with
- qemu 0.14 on Virtfs path in guest
+Subject: [Qemu-devel] [PATCH v4 0/7] trace: [tcg] Optimize per-vCPU tracing
+ states with separate TB caches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,91 +26,154 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Eric Blake <eblake@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-[Expired for QEMU because there has been no activity for 60 days.]
+Optimizes tracing of events with the 'tcg' and 'vcpu' properties (e.g., m=
+emory
+accesses), making it feasible to statically enable them by default on all=
+ QEMU
+builds.
 
-** Changed in: qemu
-       Status: Incomplete =3D> Expired
+Some quick'n'dirty numbers with 400.perlbench (SPECcpu2006) on the train =
+input
+(medium size - suns.pl) and the guest_mem_before event:
 
--- =
+* vanilla, statically disabled
+real	0m2,259s
+user	0m2,252s
+sys	0m0,004s
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/712337
+* vanilla, statically enabled (overhead: 2.18x)
+real	0m4,921s
+user	0m4,912s
+sys	0m0,008s
 
-Title:
-  connecthon basic test5 failed with qemu 0.14 on Virtfs path in guest
+* multi-tb, statically disabled (overhead: 0.99x) [within noise range]
+real	0m2,228s
+user	0m2,216s
+sys	0m0,008s
 
-Status in QEMU:
-  Expired
+* multi-tb, statically enabled (overhead: 0.99x) [within noise range]
+real	0m2,229s
+user	0m2,224s
+sys	0m0,004s
 
-Bug description:
-  connecthon basic test named test5 is failing with bigfile write failed
-  bad address on .L passthru and .L mapped Virtfs path in guest. with
-  fedora12
 
-  Bug is with latest qemu-0.14.0-rc0
+Right now, events with the 'tcg' property always generate TCG code to tra=
+ce that
+event at guest code execution time, where the event's dynamic state is ch=
+ecked.
 
-  connecthon tarball /root/project_CI/client/tests/connecthon/cthon04.tgz
-  02/03 08:55:09 INFO |kvm_subpro:0880| 11:55:08 ERROR| [stderr] 	./test5: =
-(/root/mount3/test2011-02-0311:55) 'bigfile' write failed : Bad address
-  02/03 08:55:09 INFO |kvm_subpro:0880| 11:55:08 ERROR| Test failed: Comman=
-d <./runtests -N 100 -b -t /root/mount3/test2011-02-0311:55> failed, rc=3D1=
-, Command returned non-zero exit status
-  02/03 08:55:09 INFO |kvm_subpro:0880| * Command: =
+This series adds a performance optimization where TCG code for events wit=
+h the
+'tcg' and 'vcpu' properties is not generated if the event is dynamically
+disabled. This optimization raises two issues:
 
-  02/03 08:55:09 INFO |kvm_subpro:0880|     ./runtests -N 100 -b -t /root/m=
-ount3/test2011-02-0311:55
-  02/03 08:55:09 INFO |kvm_subpro:0880| Exit status: 1
-  02/03 08:55:09 INFO |kvm_subpro:0880| Duration: 0
-  02/03 08:55:09 INFO |kvm_subpro:0880| =
+* An event can be dynamically disabled/enabled after the corresponding TC=
+G code
+  has been generated (i.e., a new TB with the corresponding code should b=
+e
+  used).
 
-  02/03 08:55:09 INFO |kvm_subpro:0880| stdout:
-  02/03 08:55:09 INFO |kvm_subpro:0880| ... Pass 1 ...
-  02/03 08:55:09 INFO |kvm_subpro:0880| =
+* Each vCPU can have a different dynamic state for the same event (i.e., =
+tracing
+  the memory accesses of only one process pinned to a vCPU).
 
-  02/03 08:55:09 INFO |kvm_subpro:0880| Starting BASIC tests: test director=
-y /root/mount3/test2011-02-0311:55 (arg: -t)
-  02/03 08:55:09 INFO |kvm_subpro:0880| =
+To handle both issues, this series integrates the dynamic tracing event s=
+tate
+into the TB hashing function, so that vCPUs tracing different events will=
+ use
+separate TBs. Note that only events with the 'vcpu' property are used for
+hashing (as stored in the bitmap of CPUState->trace_dstate).
 
-  02/03 08:55:09 INFO |kvm_subpro:0880| ./test1: File and directory creatio=
-n test
-  02/03 08:55:09 INFO |kvm_subpro:0880| 	created 155 files 62 directories 5=
- levels deep in 0.6  seconds
-  02/03 08:55:09 INFO |kvm_subpro:0880| 	./test1 ok.
-  02/03 08:55:09 INFO |kvm_subpro:0880| =
+This makes dynamic event state changes on vCPUs very efficient, since the=
+y can
+use TBs produced by other vCPUs while on the same event state combination=
+ (or
+produced by the same vCPU, earlier).
 
-  02/03 08:55:09 INFO |kvm_subpro:0880| ./test2: File and directory removal=
- test
-  02/03 08:55:09 INFO |kvm_subpro:0880| 	removed 155 files 62 directories 5=
- levels deep in 0.4  seconds
-  02/03 08:55:09 INFO |kvm_subpro:0880| 	./test2 ok.
-  02/03 08:55:09 INFO |kvm_subpro:0880| =
+Discarded alternatives:
 
-  02/03 08:55:09 INFO |kvm_subpro:0880| ./test3: lookups across mount point
-  02/03 08:55:09 INFO |kvm_subpro:0880| 	500 getcwd and stat calls in 0.0  =
-seconds
-  02/03 08:55:09 INFO |kvm_subpro:0880| 	./test3 ok.
-  02/03 08:55:09 INFO |kvm_subpro:0880| =
+* Emitting TCG code to check if an event needs tracing, where we should s=
+till
+  move the tracing call code to either a cold path (making tracing perfor=
+mance
+  worse), or leave it inlined (making non-tracing performance worse).
 
-  02/03 08:55:09 INFO |kvm_subpro:0880| ./test4: setattr, getattr, and look=
-up
-  02/03 08:55:09 INFO |kvm_subpro:0880| 	1000 chmods and stats on 10 files =
-in 0.24 seconds
-  02/03 08:55:09 INFO |kvm_subpro:0880| 	./test4 ok.
-  02/03 08:55:09 INFO |kvm_subpro:0880| =
+* Eliding TCG code only when *zero* vCPUs are tracing an event, since ena=
+bling
+  it on a single vCPU will impact the performance of all other vCPUs that=
+ are
+  not tracing that event.
 
-  02/03 08:55:09 INFO |kvm_subpro:0880| ./test5: read and write
-  02/03 08:55:09 INFO |kvm_subpro:0880| basic tests failed
-  02/03 08:55:09 INFO |kvm_subpro:0880| stderr:
-  02/03 08:55:09 INFO |kvm_subpro:0880| 	./test5: (/root/mount3/test2011-02=
--0311:55) 'bigfile' write failed : Bad address
-  02/03 08:55:09 INFO |kvm_subpro:0880| 11:55:08 INFO | Test finished after=
- 1 iterations.
-  02/03 08:55:10 INFO |kvm_subpro:0880| 11:55:09 ERROR| child process failed
-  02/03 08:55:10 INFO |kvm_subpro:0880| 11:55:09 INFO | 		FAIL	connecthon.i=
-tera-pass-dotl-100-test-bt	connecthon.itera-pass-dotl-100-test-bt	timestamp=
-=3D1296752109
+Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+---
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/712337/+subscriptions
+Changes in v4
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Incorporate trace_dstate into the TB hashing function instead of using
+  multiple physical TB caches [suggested by Richard Henderson].
+
+
+Changes in v3
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Rebase on 0737f32daf.
+* Do not use reserved symbol prefixes ("__") [Stefan Hajnoczi].
+* Refactor trace_get_vcpu_event_count() to be inlinable.
+* Optimize cpu_tb_cache_set_requested() (hottest path).
+
+
+Changes in v2
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Fix bitmap copy in cpu_tb_cache_set_apply().
+* Split generated code re-alignment into a separate patch [Daniel P. Berr=
+ange].
+
+
+Llu=C3=ADs Vilanova (7):
+      exec: [tcg] Refactor flush of per-CPU virtual TB cache
+      trace: Make trace_get_vcpu_event_count() inlinable
+      trace: [tcg] Delay changes to dynamic state when translating
+      exec: [tcg] Use different TBs according to the vCPU's dynamic traci=
+ng state
+      trace: [tcg] Do not generate TCG code to trace dinamically-disabled=
+ events
+      trace: [tcg,trivial] Re-align generated code
+      trace: [trivial] Statically enable all guest events
+
+
+ cpu-exec.c                               |   52 ++++++++++++++++++++++++=
++++---
+ cputlb.c                                 |    2 +
+ include/exec/exec-all.h                  |   13 ++++++++
+ include/exec/tb-hash-xx.h                |   10 +++++-
+ include/exec/tb-hash.h                   |    5 ++-
+ include/qom/cpu.h                        |    7 ++++
+ qom/cpu.c                                |    4 ++
+ scripts/tracetool/__init__.py            |    1 +
+ scripts/tracetool/backend/dtrace.py      |    2 +
+ scripts/tracetool/backend/ftrace.py      |   20 ++++++------
+ scripts/tracetool/backend/log.py         |   17 +++++-----
+ scripts/tracetool/backend/simple.py      |    2 +
+ scripts/tracetool/backend/syslog.py      |    6 ++-
+ scripts/tracetool/backend/ust.py         |    2 +
+ scripts/tracetool/format/h.py            |   24 ++++++++++----
+ scripts/tracetool/format/tcg_h.py        |   19 +++++++++--
+ scripts/tracetool/format/tcg_helper_c.py |    3 +-
+ tests/qht-bench.c                        |    2 +
+ trace-events                             |    6 ++-
+ trace/control-internal.h                 |    5 +++
+ trace/control-target.c                   |   14 +++++++-
+ trace/control.c                          |    9 +----
+ trace/control.h                          |    5 ++-
+ translate-all.c                          |   30 +++++++++++++----
+ 24 files changed, 196 insertions(+), 64 deletions(-)
+
+
+To: qemu-devel@nongnu.org
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>
