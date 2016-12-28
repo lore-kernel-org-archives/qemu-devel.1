@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53385)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57929)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wouter@grep.be>) id 1cM1xj-0007bs-J9
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 19:19:24 -0500
+	(envelope-from <arei.gonglei@huawei.com>) id 1cM2iB-0004tP-HT
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 20:07:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wouter@grep.be>) id 1cM1xg-0005SZ-DF
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 19:19:23 -0500
-Received: from [2a01:4f8:140:52e5::2] (port=33218 helo=latin.grep.be)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <wouter@grep.be>) id 1cM1xg-0005QG-79
-	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 19:19:20 -0500
-Date: Wed, 28 Dec 2016 01:18:55 +0100
-From: Wouter Verhelst <w@uter.be>
-Message-ID: <20161228001855.ukrtvzeictke4ex2@grep.be>
-References: <20161214150840.10899-1-alex@alex.org.uk>
-	<31576d46-c0ed-29b9-71a0-5aca1790799a@virtuozzo.com>
-	<6D1B30FC-FD7E-474C-A8E3-FD87E7AA1364@alex.org.uk>
-	<5e9150ed-2127-f2e8-f9db-a514e8f0ddf8@virtuozzo.com>
-	<5E697C22-5FBB-49A2-A018-A6B96E29FE84@alex.org.uk>
-	<94ef3ef2-b76f-fa5d-cbaf-8990ce2b1be8@virtuozzo.com>
-	<0F1DC4AE-5C9E-4AE6-8141-AE6B398EBF73@alex.org.uk>
-	<2812e3e2-983a-42de-a55f-590a87b7fece@virtuozzo.com>
+	(envelope-from <arei.gonglei@huawei.com>) id 1cM2i8-0002aE-CR
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 20:07:23 -0500
+Received: from [45.249.212.188] (port=2433 helo=dggrg02-dlp.huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <arei.gonglei@huawei.com>) id 1cM2i7-0002VM-Nd
+	for qemu-devel@nongnu.org; Tue, 27 Dec 2016 20:07:20 -0500
+From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Date: Wed, 28 Dec 2016 01:03:41 +0000
+Message-ID: <33183CC9F5247A488A2544077AF19020DA16F291@DGGEMA505-MBX.china.huawei.com>
+References: <1482559948-22772-1-git-send-email-arei.gonglei@huawei.com>
+	<CAFEAcA9VcFR1hPbn25mr7Wx5gwfQSV0N0AXPJrOVf-ib5ahQsw@mail.gmail.com>
+In-Reply-To: <CAFEAcA9VcFR1hPbn25mr7Wx5gwfQSV0N0AXPJrOVf-ib5ahQsw@mail.gmail.com>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2812e3e2-983a-42de-a55f-590a87b7fece@virtuozzo.com>
-Subject: Re: [Qemu-devel] [Nbd] [PATCH] Further tidy-up on block status
+Subject: Re: [Qemu-devel] [PULL 0/4] cryptodev patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,28 +28,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: Alex Bligh <alex@alex.org.uk>, "nbd-general@lists.sourceforge.net" <nbd-general@lists.sourceforge.net>, Kevin Wolf <kwolf@redhat.com>, "Denis V . Lunev" <den@openvz.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Stefan stefanha@redhat. com" <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Hi Vladimir,
-
-On Mon, Dec 26, 2016 at 05:52:54PM +0300, Vladimir Sementsov-Ogievskiy wrote:
-> Shouldn't we add some flags to REP_META_CONTEXT, for client to be insure, is
-> returned string a direct context name or some kind of wildcard? Just a flags
-> field, with one flag defined for now: NBD_REP_META_CONTEXT_LEAF and others
-> reserved.
-
-I think it should be up to the metadata context namespace definition to
-define which syntax represents a direct context name and which
-represents a wildcard (if the latter are supported).
-
-A client which doesn't know what a given metadata context implements
-can't reasonably ask for information from that context anyway (since
-then the client wouldn't know what to do with the returned information),
-so it doesn't help much to add a flag here.
-
--- 
-< ron> I mean, the main *practical* problem with C++, is there's like a dozen
-       people in the world who think they really understand all of its rules,
-       and pretty much all of them are just lying to themselves too.
- -- #debian-devel, OFTC, 2016-02-12
+Pg0KPiBGcm9tOiBQZXRlciBNYXlkZWxsIFttYWlsdG86cGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3Jn
+XQ0KPiBTZW50OiBXZWRuZXNkYXksIERlY2VtYmVyIDI4LCAyMDE2IDE6MjkgQU0NCj4gVG86IEdv
+bmdsZWkgKEFyZWkpDQo+IENjOiBRRU1VIERldmVsb3BlcnMNCj4gU3ViamVjdDogUmU6IFtQVUxM
+IDAvNF0gY3J5cHRvZGV2IHBhdGNoZXMNCj4gDQo+IE9uIDI0IERlY2VtYmVyIDIwMTYgYXQgMDY6
+MTIsIEdvbmdsZWkgPGFyZWkuZ29uZ2xlaUBodWF3ZWkuY29tPiB3cm90ZToNCj4gPiBUaGUgZm9s
+bG93aW5nIGNoYW5nZXMgc2luY2UgY29tbWl0DQo+IGE0NzBiMzMyNTliZjgyZWYyMzM2YmZjZDVk
+MDc2NDA1NjJkM2Y2M2I6DQo+ID4NCj4gPiAgIE1lcmdlIHJlbW90ZS10cmFja2luZyBicmFuY2gg
+J3JlbW90ZXMvYm9uemluaS90YWdzL2Zvci11cHN0cmVhbScgaW50bw0KPiBzdGFnaW5nICgyMDE2
+LTEyLTIyIDE5OjIzOjUxICswMDAwKQ0KPiA+DQo+ID4gYXJlIGF2YWlsYWJsZSBpbiB0aGUgZ2l0
+IHJlcG9zaXRvcnkgYXQ6DQo+ID4NCj4gPg0KPiA+ICAgaHR0cHM6Ly9naXRodWIuY29tL2dvbmds
+ZWlhcmVpL3FlbXUuZ2l0IHRhZ3MvY3J5cHRvZGV2LW5leHQtMjAxNjEyMjQNCj4gPg0KPiA+IGZv
+ciB5b3UgdG8gZmV0Y2ggY2hhbmdlcyB1cCB0bw0KPiA0OGFlMzZjMGFkMTZiYjc1N2Q0ZjZlMjQz
+YjhlOTA3MmZjOGU4YzhlOg0KPiA+DQo+ID4gICBjcnlwdG9kZXY6IGFkZCAzZGVzLWVkZSBzdXBw
+b3J0ICgyMDE2LTEyLTI0IDEzOjQ2OjI3ICswODAwKQ0KPiA+DQo+ID4gLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KPiA+IC0g
+YWRkIHh0cyBtb2RlIHN1cHBvcnQNCj4gPiAtIGFkZCAzREVTIGFsZ29yaXRobSBzdXBwb3J0DQo+
+ID4gLSBvdGhlciB0cml2aWFsIGZpeGVzDQo+ID4NCj4gPiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQo+ID4gTG9uZ3Blbmco
+TWlrZSkgKDQpOg0KPiA+ICAgICAgIGNyeXB0b2RldjogZml4IHRoZSBjaGVjayBvZiBhZXMgYWxn
+b3JpdGhtDQo+ID4gICAgICAgY3J5cHRvZGV2OiBhZGQgeHRzKGFlcykgc3VwcG9ydA0KPiA+ICAg
+ICAgIGNyeXB0b2RldjogcmVtb3ZlIHNpbmdsZS1ERVMgc3VwcG9ydCBpbiBjcnlwdG9kZXYNCj4g
+PiAgICAgICBjcnlwdG9kZXY6IGFkZCAzZGVzLWVkZSBzdXBwb3J0DQo+ID4NCj4gPiAgYmFja2Vu
+ZHMvY3J5cHRvZGV2LWJ1aWx0aW4uYyB8IDY1DQo+ICsrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0tLS0tLS0tDQo+ID4gIDEgZmlsZSBjaGFu
+Z2VkLCA1MCBpbnNlcnRpb25zKCspLCAxNSBkZWxldGlvbnMoLSkNCj4gDQo+IEhpLiBUaGlzIHB1
+bGwgcmVxdWVzdCBkb2VzIG5vdCBhcHBlYXIgdG8gYmUgc2lnbmVkIGJ5IHRoZSBHUEcNCj4ga2V5
+IHRoYXQgSSBoYXZlIG9uIHJlY29yZCBmb3IgeW91LCBhbmQgdGhlIGtleSBpdCBpcyBzaWduZWQN
+Cj4gYnkgc2VlbXMgdG8gYmUgb25seSBzZWxmLXNpZ25lZCBhbmQgbm90IHNpZ25lZCBieSBhbnli
+b2R5DQo+IGVsc2UuLi4NCj4gDQpTb3JyeSBhYm91dCB0aGF0LiBBY3R1YWxseSBJIGhhZCBwdXNo
+ZWQgdGhlIGtleSB0byBwdWJsaWMga2V5IHNlcnZlci4NCkkgY2FuIHNlYXJjaCBteSBrZXkgaW4g
+dGhlIHdlYiBzaXRlLCBwbHMgc2VlOg0KDQpodHRwOi8va2V5c2VydmVyLnVidW50dS5jb206MTEz
+NzEvcGtzL2xvb2t1cD9vcD12aW5kZXgmZmluZ2VycHJpbnQ9b24mc2VhcmNoPTB4MkVEN0ZERTkw
+NjNDODY0RA0KDQpIb3cgZG8gSSBkbyBub3c/IFRoYW5rcyENCg0KUmVnYXJkcywNCi1Hb25nbGVp
+DQo=
