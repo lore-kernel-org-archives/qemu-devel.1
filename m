@@ -1,24 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33243)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34198)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1cMG3C-0001Co-Vr
-	for qemu-devel@nongnu.org; Wed, 28 Dec 2016 10:22:00 -0500
+	(envelope-from <bounces@canonical.com>) id 1cMGBz-00037F-Uw
+	for qemu-devel@nongnu.org; Wed, 28 Dec 2016 10:31:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1cMG39-00063R-JI
-	for qemu-devel@nongnu.org; Wed, 28 Dec 2016 10:21:58 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58566)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <drjones@redhat.com>) id 1cMG39-00063N-Db
-	for qemu-devel@nongnu.org; Wed, 28 Dec 2016 10:21:55 -0500
-Date: Wed, 28 Dec 2016 16:21:50 +0100
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20161228152150.qpnf25jsf5ps4yna@kamzik.brq.redhat.com>
-References: <1482824413-25837-1-git-send-email-caoj.fnst@cn.fujitsu.com>
-	<6daeb5be-96d5-b474-9708-5d9041cdd0e2@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1cMGBw-0008S1-KV
+	for qemu-devel@nongnu.org; Wed, 28 Dec 2016 10:31:03 -0500
+Received: from indium.canonical.com ([91.189.90.7]:59362)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cMGBw-0008Rc-EX
+	for qemu-devel@nongnu.org; Wed, 28 Dec 2016 10:31:00 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cMGBt-0005T1-0V
+	for <qemu-devel@nongnu.org>; Wed, 28 Dec 2016 15:30:57 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 2D32C2E80EC
+	for <qemu-devel@nongnu.org>; Wed, 28 Dec 2016 15:30:51 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6daeb5be-96d5-b474-9708-5d9041cdd0e2@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] doc/pcie: correct command line examples
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 28 Dec 2016 15:18:19 -0000
+From: Thomas Huth <1649042@bugs.launchpad.net>
+Reply-To: Bug 1649042 <1649042@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20161211032601.16375.45078.malonedeb@soybean.canonical.com>
+Message-Id: <20161228151819.3309.78918.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1649042] Re: Ubuntu 16.04.1 LightDM Resolution
+ Not Correct
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,63 +37,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>
-Cc: Cao jin <caoj.fnst@cn.fujitsu.com>, qemu-devel@nongnu.org, mst@redhat.com
+To: qemu-devel@nongnu.org
 
-On Wed, Dec 28, 2016 at 03:24:30PM +0200, Marcel Apfelbaum wrote:
-> On 12/27/2016 09:40 AM, Cao jin wrote:
-> > Nit picking: Multi-function PCI Express Root Ports should mean that
-> > 'addr' property is mandatory, and slot is optional because it is default
-> > to 0, and 'chassis' is mandatory for 2nd & 3rd root port because it is
-> > default to 0 too.
-> > 
-> > Bonus: fix a typo(2->3)
-> > Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
-> > ---
-> >  docs/pcie.txt | 12 ++++++------
-> >  1 file changed, 6 insertions(+), 6 deletions(-)
-> > 
-> > diff --git a/docs/pcie.txt b/docs/pcie.txt
-> > index 9fb20aaed9f4..54f05eaa71dc 100644
-> > --- a/docs/pcie.txt
-> > +++ b/docs/pcie.txt
-> > @@ -110,18 +110,18 @@ Plug only PCI Express devices into PCI Express Ports.
-> >            -device ioh3420,id=root_port1,chassis=x,slot=y[,bus=pcie.0][,addr=z]  \
-> >            -device <dev>,bus=root_port1
-> >  2.2.2 Using multi-function PCI Express Root Ports:
-> > -      -device ioh3420,id=root_port1,multifunction=on,chassis=x,slot=y[,bus=pcie.0][,addr=z.0] \
-> > -      -device ioh3420,id=root_port2,chassis=x1,slot=y1[,bus=pcie.0][,addr=z.1] \
-> > -      -device ioh3420,id=root_port3,chassis=x2,slot=y2[,bus=pcie.0][,addr=z.2] \
-> > -2.2.2 Plugging a PCI Express device into a Switch:
-> > +      -device ioh3420,id=root_port1,multifunction=on,chassis=x,addr=z.0[,slot=y][,bus=pcie.0] \
-> > +      -device ioh3420,id=root_port2,chassis=x1,addr=z.1[,slot=y1][,bus=pcie.0] \
-> > +      -device ioh3420,id=root_port3,chassis=x2,addr=z.2[,slot=y2][,bus=pcie.0] \
-> > +2.2.3 Plugging a PCI Express device into a Switch:
-> >        -device ioh3420,id=root_port1,chassis=x,slot=y[,bus=pcie.0][,addr=z]  \
-> >        -device x3130-upstream,id=upstream_port1,bus=root_port1[,addr=x]          \
-> >        -device xio3130-downstream,id=downstream_port1,bus=upstream_port1,chassis=x1,slot=y1[,addr=z1]] \
-> >        -device <dev>,bus=downstream_port1
-> > 
-> >  Notes:
-> > -  - (slot, chassis) pair is mandatory and must be
-> > -     unique for each PCI Express Root Port.
-> > +  - (slot, chassis) pair is mandatory and must be unique for each
-> > +    PCI Express Root Port. slot is default to 0 when doesn't specify it.
+OK, if it works with -vga virtio, I think we should close this bug as
+WONTFIX, since the -vga vmware code is pretty much unmaintained as far
+as I know (if somebody is willing to fix this there, too, feel free to
+open this bug again).
 
-Please rewrite last sentence as
+** Changed in: qemu
+       Status: New =3D> Won't Fix
 
- slot defaults to 0 when not specified.
+-- =
 
-> >    - 'addr' parameter can be 0 for all the examples above.
-> > 
-> > 
-> > 
-> 
-> Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
-> 
-> Thanks,
-> Marcel
-> 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1649042
 
-Thanks,
-drew
+Title:
+  Ubuntu 16.04.1 LightDM Resolution Not Correct
+
+Status in QEMU:
+  Won't Fix
+
+Bug description:
+  My Specs:
+
+  Slackware 14.2 x86_64 > Host
+  Nvidia GPU GTX660M
+  nvidia-driver-352.63
+  QEMU 2.7.0
+
+  Ubuntu 16.04.1 x86_64 > Guest
+  Unity
+  Xorg nouveau - 1:1.0.12-1build2
+
+  These are the startup options for Ubuntu:
+
+  qemu-system-x86_64 -drive format=3Draw,file=3Dubuntu.img \
+  -cpu host \
+  --enable-kvm \
+  -smp 2 \
+  -m 4096 \
+  -vga vmware \
+  -soundhw ac97 \
+  -usbdevice tablet \
+  -rtc base=3Dlocaltime \
+  -usbdevice host:0781:5575
+
+  Unity desktop resolution set for 1440x900.
+
+  I noticed when I come to the login screen to enter my password the
+  LightDM resolution fills my entire desktop.
+
+  I searched online and found this solution;
+
+  cp ~/.config/monitor.xml /var/lib/lightdm/.config
+
+  For now I'm assuming this step should not be needed and the resolution
+  should be correctly detected and set?
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1649042/+subscriptions
