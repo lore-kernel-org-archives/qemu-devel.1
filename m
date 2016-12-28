@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50794)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50813)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1cMEtj-0001k5-UI
-	for qemu-devel@nongnu.org; Wed, 28 Dec 2016 09:08:09 -0500
+	(envelope-from <vilanova@ac.upc.edu>) id 1cMEtr-0001qg-Nr
+	for qemu-devel@nongnu.org; Wed, 28 Dec 2016 09:08:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1cMEti-0003Ue-2i
-	for qemu-devel@nongnu.org; Wed, 28 Dec 2016 09:08:07 -0500
-Received: from roura.ac.upc.es ([147.83.33.10]:35139)
+	(envelope-from <vilanova@ac.upc.edu>) id 1cMEtm-0003V3-RE
+	for qemu-devel@nongnu.org; Wed, 28 Dec 2016 09:08:15 -0500
+Received: from roura.ac.upc.es ([147.83.33.10]:35142)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1cMEth-0003UY-HB
-	for qemu-devel@nongnu.org; Wed, 28 Dec 2016 09:08:06 -0500
+	(envelope-from <vilanova@ac.upc.edu>) id 1cMEtm-0003Uz-Dl
+	for qemu-devel@nongnu.org; Wed, 28 Dec 2016 09:08:10 -0500
 From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
-Date: Wed, 28 Dec 2016 15:08:04 +0100
-Message-Id: <148293408387.28901.10687132341063477318.stgit@fimbulvetr.bsc.es>
+Date: Wed, 28 Dec 2016 15:08:09 +0100
+Message-Id: <148293408924.28901.12563403163158888131.stgit@fimbulvetr.bsc.es>
 In-Reply-To: <148293406236.28901.9490775858242540392.stgit@fimbulvetr.bsc.es>
 References: <148293406236.28901.9490775858242540392.stgit@fimbulvetr.bsc.es>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v5 4/7] exec: [tcg] Use different TBs according
- to the vCPU's dynamic tracing state
+Subject: [Qemu-devel] [PATCH v5 5/7] trace: [tcg] Do not generate TCG code
+ to trace dinamically-disabled events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,349 +28,142 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>
+Cc: Eric Blake <eblake@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Every vCPU now uses a separate set of TBs for each set of dynamic
-tracing event state values. Each set of TBs can be used by any number of
-vCPUs to maximize TB reuse when vCPUs have the same tracing state.
+If an event is dynamically disabled, the TCG code that calls the
+execution-time tracer is not generated.
 
-This feature is later used by tracetool to optimize tracing of guest
-code events.
-
-The maximum number of TB sets is defined as 2^E, where E is the number
-of events that have the 'vcpu' property (their state is stored in
-CPUState->trace_dstate).
-
-For this to work, a change on the dynamic tracing state of a vCPU will
-force it to flush its virtual TB cache (which is only indexed by
-address), and fall back to the physical TB cache (which now contains the
-vCPU's dynamic tracing state as part of the hashing function).
+Removes the overheads of execution-time tracers for dynamically disabled
+events. As a bonus, also avoids checking the event state when the
+execution-time tracer is called from TCG-generated code (since otherwise
+TCG would simply not call it).
 
 Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
 ---
- cpu-exec.c                |   26 +++++++++++++++++++++-----
- include/exec/exec-all.h   |    5 +++++
- include/exec/tb-hash-xx.h |   11 ++++++++++-
- include/exec/tb-hash.h    |    5 +++--
- include/qemu-common.h     |    3 +++
- tests/qht-bench.c         |    2 +-
- trace/control-target.c    |    3 +++
- trace/control.h           |    3 +++
- translate-all.c           |   16 ++++++++++++++--
- 9 files changed, 63 insertions(+), 11 deletions(-)
+ scripts/tracetool/__init__.py            |    1 +
+ scripts/tracetool/format/h.py            |   24 ++++++++++++++++++------
+ scripts/tracetool/format/tcg_h.py        |   19 ++++++++++++++++---
+ scripts/tracetool/format/tcg_helper_c.py |    3 ++-
+ 4 files changed, 37 insertions(+), 10 deletions(-)
 
-diff --git a/cpu-exec.c b/cpu-exec.c
-index 1b7366efb0..a377505b9c 100644
---- a/cpu-exec.c
-+++ b/cpu-exec.c
-@@ -262,6 +262,7 @@ struct tb_desc {
-     CPUArchState *env;
-     tb_page_addr_t phys_page1;
-     uint32_t flags;
-+    TRACE_QHT_VCPU_DSTATE_TYPE trace_vcpu_dstate;
- };
+diff --git a/scripts/tracetool/__init__.py b/scripts/tracetool/__init__.p=
+y
+index 365446fa53..63168ccdf0 100644
+--- a/scripts/tracetool/__init__.py
++++ b/scripts/tracetool/__init__.py
+@@ -264,6 +264,7 @@ class Event(object):
+         return self._FMT.findall(self.fmt)
 =20
- static bool tb_cmp(const void *p, const void *d)
-@@ -273,6 +274,7 @@ static bool tb_cmp(const void *p, const void *d)
-         tb->page_addr[0] =3D=3D desc->phys_page1 &&
-         tb->cs_base =3D=3D desc->cs_base &&
-         tb->flags =3D=3D desc->flags &&
-+        tb->trace_vcpu_dstate =3D=3D desc->trace_vcpu_dstate &&
-         !atomic_read(&tb->invalid)) {
-         /* check next page if needed */
-         if (tb->page_addr[1] =3D=3D -1) {
-@@ -294,7 +296,8 @@ static bool tb_cmp(const void *p, const void *d)
- static TranslationBlock *tb_htable_lookup(CPUState *cpu,
-                                           target_ulong pc,
-                                           target_ulong cs_base,
--                                          uint32_t flags)
-+                                          uint32_t flags,
-+                                          uint32_t trace_vcpu_dstate)
- {
-     tb_page_addr_t phys_pc;
-     struct tb_desc desc;
-@@ -303,10 +306,11 @@ static TranslationBlock *tb_htable_lookup(CPUState =
-*cpu,
-     desc.env =3D (CPUArchState *)cpu->env_ptr;
-     desc.cs_base =3D cs_base;
-     desc.flags =3D flags;
-+    desc.trace_vcpu_dstate =3D trace_vcpu_dstate;
-     desc.pc =3D pc;
-     phys_pc =3D get_page_addr_code(desc.env, pc);
-     desc.phys_page1 =3D phys_pc & TARGET_PAGE_MASK;
--    h =3D tb_hash_func(phys_pc, pc, flags);
-+    h =3D tb_hash_func(phys_pc, pc, flags, trace_vcpu_dstate);
-     return qht_lookup(&tcg_ctx.tb_ctx.htable, tb_cmp, &desc, h);
- }
+     QEMU_TRACE               =3D "trace_%(name)s"
++    QEMU_TRACE_NOCHECK       =3D "_nocheck__" + QEMU_TRACE
+     QEMU_TRACE_TCG           =3D QEMU_TRACE + "_tcg"
+     QEMU_DSTATE              =3D "_TRACE_%(NAME)s_DSTATE"
+     QEMU_EVENT               =3D "_TRACE_%(NAME)s_EVENT"
+diff --git a/scripts/tracetool/format/h.py b/scripts/tracetool/format/h.p=
+y
+index 3682f4e6a8..a78e50ef35 100644
+--- a/scripts/tracetool/format/h.py
++++ b/scripts/tracetool/format/h.py
+@@ -49,6 +49,19 @@ def generate(events, backend, group):
+     backend.generate_begin(events, group)
 =20
-@@ -318,16 +322,24 @@ static inline TranslationBlock *tb_find(CPUState *c=
-pu,
-     TranslationBlock *tb;
-     target_ulong cs_base, pc;
-     uint32_t flags;
-+    unsigned long trace_vcpu_dstate_bitmap;
-+    TRACE_QHT_VCPU_DSTATE_TYPE trace_vcpu_dstate;
-     bool have_tb_lock =3D false;
-=20
-+    bitmap_copy(&trace_vcpu_dstate_bitmap, cpu->trace_dstate,
-+                trace_get_vcpu_event_count());
-+    memcpy(&trace_vcpu_dstate, &trace_vcpu_dstate_bitmap,
-+           sizeof(trace_vcpu_dstate));
+     for e in events:
++        # tracer without checks
++        out('',
++            'static inline void %(api)s(%(args)s)',
++            '{',
++            api=3De.api(e.QEMU_TRACE_NOCHECK),
++            args=3De.args)
 +
-     /* we record a subset of the CPU state. It will
-        always be the same before a given translated block
-        is executed. */
-     cpu_get_tb_cpu_state(env, &pc, &cs_base, &flags);
-     tb =3D atomic_rcu_read(&cpu->tb_jmp_cache[tb_jmp_cache_hash_func(pc)=
-]);
-     if (unlikely(!tb || tb->pc !=3D pc || tb->cs_base !=3D cs_base ||
--                 tb->flags !=3D flags)) {
--        tb =3D tb_htable_lookup(cpu, pc, cs_base, flags);
-+                 tb->flags !=3D flags ||
-+                 tb->trace_vcpu_dstate !=3D trace_vcpu_dstate)) {
-+        tb =3D tb_htable_lookup(cpu, pc, cs_base, flags, trace_vcpu_dsta=
-te);
-         if (!tb) {
-=20
-             /* mmap_lock is needed by tb_gen_code, and mmap_lock must be
-@@ -341,7 +353,7 @@ static inline TranslationBlock *tb_find(CPUState *cpu=
-,
-             /* There's a chance that our desired tb has been translated =
-while
-              * taking the locks so we check again inside the lock.
-              */
--            tb =3D tb_htable_lookup(cpu, pc, cs_base, flags);
-+            tb =3D tb_htable_lookup(cpu, pc, cs_base, flags, trace_vcpu_=
-dstate);
-             if (!tb) {
-                 /* if no translated code available, then translate it no=
-w */
-                 tb =3D tb_gen_code(cpu, pc, cs_base, flags, 0);
-@@ -465,6 +477,7 @@ static inline bool cpu_handle_exception(CPUState *cpu=
-, int *ret)
-         if (unlikely(atomic_read(&cpu->trace_dstate_delayed_req))) {
-             bitmap_copy(cpu->trace_dstate, cpu->trace_dstate_delayed,
-                         trace_get_vcpu_event_count());
-+            tb_flush_jmp_cache_all(cpu);
-         }
-=20
-         return true;
-@@ -660,6 +673,9 @@ int cpu_exec(CPUState *cpu)
-                 if (unlikely(atomic_read(&cpu->trace_dstate_delayed_req)=
-)) {
-                     bitmap_copy(cpu->trace_dstate, cpu->trace_dstate_del=
-ayed,
-                                 trace_get_vcpu_event_count());
-+                    tb_flush_jmp_cache_all(cpu);
-+                    /* avoid chaining TBs with different dstates */
-+                    last_tb =3D NULL;
-                 }
-=20
-                 /* Try to align the host and virtual clocks
-diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
-index 57cd978578..ae74f61ea2 100644
---- a/include/exec/exec-all.h
-+++ b/include/exec/exec-all.h
-@@ -200,6 +200,10 @@ static inline void tlb_flush_by_mmuidx(CPUState *cpu=
-, ...)
- #define USE_DIRECT_JUMP
- #endif
-=20
-+/**
-+ * TranslationBlock:
-+ * @trace_vcpu_dstate: Per-vCPU dynamic tracing state used to generate t=
-his TB.
-+ */
- struct TranslationBlock {
-     target_ulong pc;   /* simulated PC corresponding to this block (EIP =
-+ CS base) */
-     target_ulong cs_base; /* CS base for this block */
-@@ -215,6 +219,7 @@ struct TranslationBlock {
- #define CF_IGNORE_ICOUNT 0x40000 /* Do not generate icount code */
-=20
-     uint16_t invalid;
-+    TRACE_QHT_VCPU_DSTATE_TYPE trace_vcpu_dstate;
-=20
-     void *tc_ptr;    /* pointer to the translated code */
-     uint8_t *tc_search;  /* pointer to search data */
-diff --git a/include/exec/tb-hash-xx.h b/include/exec/tb-hash-xx.h
-index 2c40b5c466..96f7c0539c 100644
---- a/include/exec/tb-hash-xx.h
-+++ b/include/exec/tb-hash-xx.h
-@@ -35,6 +35,7 @@
- #define EXEC_TB_HASH_XX_H
-=20
- #include "qemu/bitops.h"
-+#include "qemu-common.h"
-=20
- #define PRIME32_1   2654435761U
- #define PRIME32_2   2246822519U
-@@ -49,7 +50,8 @@
-  * contiguous in memory.
-  */
- static inline
--uint32_t tb_hash_func5(uint64_t a0, uint64_t b0, uint32_t e)
-+uint32_t tb_hash_func6(uint64_t a0, uint64_t b0, uint32_t e,
-+                       TRACE_QHT_VCPU_DSTATE_TYPE f)
- {
-     uint32_t v1 =3D TB_HASH_XX_SEED + PRIME32_1 + PRIME32_2;
-     uint32_t v2 =3D TB_HASH_XX_SEED + PRIME32_2;
-@@ -83,6 +85,13 @@ uint32_t tb_hash_func5(uint64_t a0, uint64_t b0, uint3=
-2_t e)
-     h32 +=3D e * PRIME32_3;
-     h32  =3D rol32(h32, 17) * PRIME32_4;
-=20
-+    if (sizeof(TRACE_QHT_VCPU_DSTATE_TYPE) =3D=3D sizeof(uint32_t)) {
-+        h32 +=3D f * PRIME32_3;
-+        h32  =3D rol32(h32, 17) * PRIME32_4;
-+    } else {
-+        abort();
-+    }
++        if "disable" not in e.properties:
++            backend.generate(e, group)
 +
-     h32 ^=3D h32 >> 15;
-     h32 *=3D PRIME32_2;
-     h32 ^=3D h32 >> 13;
-diff --git a/include/exec/tb-hash.h b/include/exec/tb-hash.h
-index 2c27490cb8..a042f24c97 100644
---- a/include/exec/tb-hash.h
-+++ b/include/exec/tb-hash.h
-@@ -46,9 +46,10 @@ static inline unsigned int tb_jmp_cache_hash_func(targ=
-et_ulong pc)
- }
-=20
- static inline
--uint32_t tb_hash_func(tb_page_addr_t phys_pc, target_ulong pc, uint32_t =
-flags)
-+uint32_t tb_hash_func(tb_page_addr_t phys_pc, target_ulong pc,
-+                      uint32_t flags, uint32_t trace_vcpu_dstate)
- {
--    return tb_hash_func5(phys_pc, pc, flags);
-+    return tb_hash_func6(phys_pc, pc, flags, trace_vcpu_dstate);
- }
-=20
- #endif
-diff --git a/include/qemu-common.h b/include/qemu-common.h
-index 1430390eb6..aaaa73a6fe 100644
---- a/include/qemu-common.h
-+++ b/include/qemu-common.h
-@@ -151,4 +151,7 @@ void page_size_init(void);
-  * returned. */
- bool dump_in_progress(void);
-=20
-+/* Use a macro to allow safe changes to its size in the future */
-+#define TRACE_QHT_VCPU_DSTATE_TYPE uint32_t
++        out('}')
 +
- #endif
-diff --git a/tests/qht-bench.c b/tests/qht-bench.c
-index 2afa09d859..11c1cec766 100644
---- a/tests/qht-bench.c
-+++ b/tests/qht-bench.c
-@@ -103,7 +103,7 @@ static bool is_equal(const void *obj, const void *use=
-rp)
++        # tracer wrapper with checks (per-vCPU tracing)
+         if "vcpu" in e.properties:
+             trace_cpu =3D next(iter(e.args))[1]
+             cond =3D "trace_event_get_vcpu_state(%(cpu)s,"\
+@@ -63,16 +76,15 @@ def generate(events, backend, group):
+             'static inline void %(api)s(%(args)s)',
+             '{',
+             '    if (%(cond)s) {',
++            '        %(api_nocheck)s(%(names)s);',
++            '    }',
++            '}',
+             api=3De.api(),
++            api_nocheck=3De.api(e.QEMU_TRACE_NOCHECK),
+             args=3De.args,
++            names=3D", ".join(e.args.names()),
+             cond=3Dcond)
 =20
- static inline uint32_t h(unsigned long v)
- {
--    return tb_hash_func5(v, 0, 0);
-+    return tb_hash_func6(v, 0, 0, 0);
- }
+-        if "disable" not in e.properties:
+-            backend.generate(e, group)
+-
+-        out('    }',
+-            '}')
+-
+     backend.generate_end(events, group)
 =20
- /*
-diff --git a/trace/control-target.c b/trace/control-target.c
-index aba8db55de..61e6a4545b 100644
---- a/trace/control-target.c
-+++ b/trace/control-target.c
-@@ -82,7 +82,10 @@ void trace_event_set_vcpu_state_dynamic(CPUState *vcpu=
-,
-             }
-             (*ev->dstate)--;
-         }
-+        /* Make sure next translated/executed TB uses the new dstate */
-         atomic_set(&vcpu->trace_dstate_delayed_req, true);
-+        /* NOTE: checked by all TBs in gen_tb_start() */
-+        atomic_set(&vcpu->tcg_exit_req, 1);
-     }
- }
+     out('#endif /* TRACE_%s_GENERATED_TRACERS_H */' % group.upper())
+diff --git a/scripts/tracetool/format/tcg_h.py b/scripts/tracetool/format=
+/tcg_h.py
+index 5f213f6cba..71b5c09432 100644
+--- a/scripts/tracetool/format/tcg_h.py
++++ b/scripts/tracetool/format/tcg_h.py
+@@ -41,7 +41,7 @@ def generate(events, backend, group):
 =20
-diff --git a/trace/control.h b/trace/control.h
-index 80d326c4d1..cab84a0308 100644
---- a/trace/control.h
-+++ b/trace/control.h
-@@ -165,6 +165,9 @@ void trace_event_set_state_dynamic(TraceEvent *ev, bo=
-ol state);
-  * Set the dynamic tracing state of an event for the given vCPU.
-  *
-  * Pre-condition: trace_event_get_vcpu_state_static(ev) =3D=3D true
-+ *
-+ * Note: Changes for execution-time events with the 'tcg' property will =
-not be
-+ *       propagated until the next TB is executed (iff executing in TCG =
-mode).
-  */
- void trace_event_set_vcpu_state_dynamic(CPUState *vcpu,
-                                         TraceEvent *ev, bool state);
-diff --git a/translate-all.c b/translate-all.c
-index 29ccb9e546..6e1b1d474c 100644
---- a/translate-all.c
-+++ b/translate-all.c
-@@ -54,6 +54,7 @@
- #include "exec/tb-hash.h"
- #include "translate-all.h"
- #include "qemu/bitmap.h"
-+#include "qemu/error-report.h"
- #include "qemu/timer.h"
- #include "exec/log.h"
+     for e in events:
+         # just keep one of them
+-        if "tcg-trans" not in e.properties:
++        if "tcg-exec" not in e.properties:
+             continue
 =20
-@@ -813,6 +814,12 @@ static void tb_htable_init(void)
- {
-     unsigned int mode =3D QHT_MODE_AUTO_RESIZE;
-=20
-+    /* Ensure TB hash function covers the bitmap size */
-+    if (DIV_ROUND_UP(trace_get_vcpu_event_count(), BITS_PER_BYTE) >
-+        sizeof(TRACE_QHT_VCPU_DSTATE_TYPE)) {
-+        error_report("too many 'vcpu' events for the TB hash function");
-+    }
+         out('static inline void %(name_tcg)s(%(args)s)',
+@@ -53,12 +53,25 @@ def generate(events, backend, group):
+             args_trans =3D e.original.event_trans.args
+             args_exec =3D tracetool.vcpu.transform_args(
+                 "tcg_helper_c", e.original.event_exec, "wrapper")
++            if "vcpu" in e.properties:
++                trace_cpu =3D e.args.names()[0]
++                cond =3D "trace_event_get_vcpu_state(%(cpu)s,"\
++                       " TRACE_%(id)s)"\
++                       % dict(
++                           cpu=3Dtrace_cpu,
++                           id=3De.original.event_exec.name.upper())
++            else:
++                cond =3D "true"
 +
-     qht_init(&tcg_ctx.tb_ctx.htable, CODE_GEN_HTABLE_SIZE, mode);
- }
+             out('    %(name_trans)s(%(argnames_trans)s);',
+-                '    gen_helper_%(name_exec)s(%(argnames_exec)s);',
++                '    if (%(cond)s) {',
++                '        gen_helper_%(name_exec)s(%(argnames_exec)s);',
++                '    }',
+                 name_trans=3De.original.event_trans.api(e.QEMU_TRACE),
+                 name_exec=3De.original.event_exec.api(e.QEMU_TRACE),
+                 argnames_trans=3D", ".join(args_trans.names()),
+-                argnames_exec=3D", ".join(args_exec.names()))
++                argnames_exec=3D", ".join(args_exec.names()),
++                cond=3Dcond)
 =20
-@@ -1106,7 +1113,7 @@ void tb_phys_invalidate(TranslationBlock *tb, tb_pa=
-ge_addr_t page_addr)
+         out('}')
 =20
-     /* remove the TB from the hash list */
-     phys_pc =3D tb->page_addr[0] + (tb->pc & ~TARGET_PAGE_MASK);
--    h =3D tb_hash_func(phys_pc, tb->pc, tb->flags);
-+    h =3D tb_hash_func(phys_pc, tb->pc, tb->flags, tb->trace_vcpu_dstate=
-);
-     qht_remove(&tcg_ctx.tb_ctx.htable, tb, h);
+diff --git a/scripts/tracetool/format/tcg_helper_c.py b/scripts/tracetool=
+/format/tcg_helper_c.py
+index cc26e03008..c2a05d756c 100644
+--- a/scripts/tracetool/format/tcg_helper_c.py
++++ b/scripts/tracetool/format/tcg_helper_c.py
+@@ -66,10 +66,11 @@ def generate(events, backend, group):
 =20
-     /* remove the TB from the page list */
-@@ -1251,7 +1258,7 @@ static void tb_link_page(TranslationBlock *tb, tb_p=
-age_addr_t phys_pc,
-     }
-=20
-     /* add in the hash table */
--    h =3D tb_hash_func(phys_pc, tb->pc, tb->flags);
-+    h =3D tb_hash_func(phys_pc, tb->pc, tb->flags, tb->trace_vcpu_dstate=
-);
-     qht_insert(&tcg_ctx.tb_ctx.htable, tb, h);
-=20
- #ifdef DEBUG_TB_CHECK
-@@ -1270,6 +1277,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
-     target_ulong virt_page2;
-     tcg_insn_unit *gen_code_buf;
-     int gen_code_size, search_size;
-+    unsigned long trace_vcpu_dstate_bitmap;
- #ifdef CONFIG_PROFILER
-     int64_t ti;
- #endif
-@@ -1294,6 +1302,10 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
-     tb->cs_base =3D cs_base;
-     tb->flags =3D flags;
-     tb->cflags =3D cflags;
-+    bitmap_copy(&trace_vcpu_dstate_bitmap, cpu->trace_dstate,
-+                trace_get_vcpu_event_count());
-+    memcpy(&tb->trace_vcpu_dstate, &trace_vcpu_dstate_bitmap,
-+           sizeof(tb->trace_vcpu_dstate));
-=20
- #ifdef CONFIG_PROFILER
-     tcg_ctx.tb_count1++; /* includes aborted translations because of
+         out('void %(name_tcg)s(%(args_api)s)',
+             '{',
++            # NOTE: the check was already performed at TCG-generation ti=
+me
+             '    %(name)s(%(args_call)s);',
+             '}',
+             name_tcg=3D"helper_%s_proxy" % e.api(),
+-            name=3De.api(),
++            name=3De.api(e.QEMU_TRACE_NOCHECK),
+             args_api=3De_args_api,
+             args_call=3D", ".join(e_args_call.casted()),
+             )
