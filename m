@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53711)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55525)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1cMXZW-0000HV-4r
-	for qemu-devel@nongnu.org; Thu, 29 Dec 2016 05:04:31 -0500
+	(envelope-from <yi.l.liu@intel.com>) id 1cMXrv-0002xC-FO
+	for qemu-devel@nongnu.org; Thu, 29 Dec 2016 05:23:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1cMXZT-00077D-2g
-	for qemu-devel@nongnu.org; Thu, 29 Dec 2016 05:04:30 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35814)
+	(envelope-from <yi.l.liu@intel.com>) id 1cMXrs-00034R-BY
+	for qemu-devel@nongnu.org; Thu, 29 Dec 2016 05:23:31 -0500
+Received: from mga02.intel.com ([134.134.136.20]:48936)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <drjones@redhat.com>) id 1cMXZS-000772-Td
-	for qemu-devel@nongnu.org; Thu, 29 Dec 2016 05:04:27 -0500
-Date: Thu, 29 Dec 2016 11:04:20 +0100
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20161229100420.i66zeaxc4qbp3p3p@hawk.localdomain>
-References: <20161229080217.16446.50840.malonedeb@wampee.canonical.com>
+	(Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1cMXrs-00034K-12
+	for qemu-devel@nongnu.org; Thu, 29 Dec 2016 05:23:28 -0500
+From: "Liu, Yi L" <yi.l.liu@intel.com>
+Date: Thu, 29 Dec 2016 10:23:21 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C257438FEF97F@shsmsx102.ccr.corp.intel.com>
+References: <A2975661238FB949B60364EF0F2C257438FEF883@shsmsx102.ccr.corp.intel.com>
+	<20161229095533.GA4195@pxdev.xzpeter.org>
+In-Reply-To: <20161229095533.GA4195@pxdev.xzpeter.org>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20161229080217.16446.50840.malonedeb@wampee.canonical.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Bug 1653063] [NEW] qemu-system-arm hangs with
- -icount and -nodefaults
+Subject: Re: [Qemu-devel] [RFC PATCH 11/13] intel_iommu: provide its own
+ replay() callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,37 +29,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Hansni Bu <1653063@bugs.launchpad.net>
-Cc: qemu-devel@nongnu.org, alex.bennee@linaro.org
+To: Peter Xu <peterx@redhat.com>
+Cc: "Tian, Kevin" <kevin.tian@intel.com>, "Lan, Tianyu" <tianyu.lan@intel.com>, "'qemu-devel@nongnu.org'" <qemu-devel@nongnu.org>, "'bd.aviv@gmail.com'" <bd.aviv@gmail.com>
 
-On Thu, Dec 29, 2016 at 08:02:16AM -0000, Hansni Bu wrote:
-> Public bug reported:
-...
-> https://bugs.launchpad.net/bugs/1653063
-...
->   After console prints the message below:
->   "Uncompressing Linux.................................................=
-......................... done, booting the kernel."
->   there's no further action noticed.
->=20
->   If "-icount" is not set, namely run as:
->   qemu-system-arm -M integratorcp -kernel arm-test/zImage.integrator -i=
-nitrd arm-test/arm_root.img -nographic -nodefaults -chardev stdio,mux=3Do=
-n,id=3Dchar0 -serial chardev:char0 --append "console=3DttyAMA0"
->=20
->   or if "-nodefaults" is not set, namely run as:
->   qemu-system-arm -M integratorcp -kernel arm-test/zImage.integrator -i=
-nitrd arm-test/arm_root.img -nographic -icount 1 --append "console=3DttyA=
-MA0"
->=20
->   The Linux boot procedure can finish successfully.
-
-Hi Hansni,
-
-The fact things work when you remove -nodefaults is a sign that with it
-your single cpu may just not be getting scheduled again. Does the patch
-from Alex Benn=E9e here[*] help?
-
-drew
-
-[*] https://lists.gnu.org/archive/html/qemu-devel/2016-11/msg01743.html
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBQZXRlciBYdSBbbWFpbHRvOnBl
+dGVyeEByZWRoYXQuY29tXQ0KPiBTZW50OiBUaHVyc2RheSwgRGVjZW1iZXIgMjksIDIwMTYgNTo1
+NiBQTQ0KPiBUbzogTGl1LCBZaSBMIDx5aS5sLmxpdUBpbnRlbC5jb20+DQo+IENjOiBUaWFuLCBL
+ZXZpbiA8a2V2aW4udGlhbkBpbnRlbC5jb20+OyBMYW4sIFRpYW55dSA8dGlhbnl1LmxhbkBpbnRl
+bC5jb20+OyAncWVtdS0NCj4gZGV2ZWxAbm9uZ251Lm9yZycgPHFlbXUtZGV2ZWxAbm9uZ251Lm9y
+Zz47ICdiZC5hdml2QGdtYWlsLmNvbScNCj4gPGJkLmF2aXZAZ21haWwuY29tPg0KPiBTdWJqZWN0
+OiBSZTogW1FlbXUtZGV2ZWxdIFtSRkMgUEFUQ0ggMTEvMTNdIGludGVsX2lvbW11OiBwcm92aWRl
+IGl0cyBvd24gcmVwbGF5KCkNCj4gY2FsbGJhY2sNCj4gDQo+IE9uIFRodSwgRGVjIDI5LCAyMDE2
+IGF0IDA3OjM4OjIwQU0gKzAwMDAsIExpdSwgWWkgTCB3cm90ZToNCj4gDQo+IFsuLi5dDQo+IA0K
+PiA+ID4gK3N0YXRpYyB2b2lkIHZ0ZF9pb21tdV9yZXBsYXkoTWVtb3J5UmVnaW9uICptciwgSU9N
+TVVOb3RpZmllciAqbikNCj4gPiA+ICt7DQo+ID4gPiArICAgIFZUREFkZHJlc3NTcGFjZSAqdnRk
+X2FzID0gY29udGFpbmVyX29mKG1yLCBWVERBZGRyZXNzU3BhY2UsIGlvbW11KTsNCj4gPiA+ICsg
+ICAgSW50ZWxJT01NVVN0YXRlICpzID0gdnRkX2FzLT5pb21tdV9zdGF0ZTsNCj4gPiA+ICsgICAg
+dWludDhfdCBidXNfbiA9IHBjaV9idXNfbnVtKHZ0ZF9hcy0+YnVzKTsNCj4gPiA+ICsgICAgVlRE
+Q29udGV4dEVudHJ5IGNlOw0KPiA+ID4gKw0KPiA+ID4gKyAgICBpZiAodnRkX2Rldl90b19jb250
+ZXh0X2VudHJ5KHMsIGJ1c19uLCB2dGRfYXMtPmRldmZuLCAmY2UpID09IDApIHsNCj4gPg0KPiA+
+IEhpIFBldGVyLA0KPiA+DQo+ID4gQWdhaW4gSSdkIGxpa2UgdG8gZ2l2ZSBteSBjaGVlcnMgb24g
+dGhpcyBwYXRjaCBzZXQuDQo+IA0KPiBUaGFua3MuDQo+IA0KPiA+DQo+ID4gSGVyZWJ5LCBJIGhh
+dmUgYSBtaW5vciBjb25jZXJuIG9uIHRoaXMgcGFydC4NCj4gPiBUaGUgcmVwbGF5IHdvdWxkIGJl
+IHBlcmZvcm1lZCBpbiB2ZmlvX2xpc3RlbmVyX3JlZ2lvbl9hZGQoKSB3aGVuIGRldmljZSBpcw0K
+PiA+IGFzc2lnbmVkLiBTaW5jZSBndWVzdCBpcyBqdXN0IHN0YXJ0ZWQsIHNvIHRoZXJlIHdpbGwg
+YmUgbm8gdmFsaWQgY29udGV4dCBlbnRyeSBmb3IgdGhlDQo+ID4gYXNzaWduZWQgZGV2aWNlLiBT
+byB0aGVyZSB3aWxsIGJlIG5vIHZ0ZF9wYWdlX3dhbGsuIFRodXMgbm8gY2hhbmdlIHRvIFNMIHBh
+Z2UNCj4gPiB0YWJsZSBpbiBob3N0LiBUaGUgU0wgcGFnZSB0YWJsZSB3b3VsZCBzdGlsbCBiZSBh
+IElPVkEtPkhQQSBtYXBwaW5nLiBJdCdzIHRydWUNCj4gPiB0aGF0IHRoZSBnSU9WQS0+SFBBIG1h
+cHBpbmcgY2FuIGJlIGJ1aWx0IGJ5IHBhZ2UgbWFwL3VubWFwIHdoZW4gZ3Vlc3QNCj4gPiB0cnlp
+bmcgdG8gaXNzdWUgZG1hLiBTbyBpdCBpcyBqdXN0IG9rIHdpdGhvdXQgcmVscGF5IGluIHRoZSBi
+ZWdpbm5pbmcuIEhvdCBwbHVnIHNob3VsZA0KPiA+IGJlIGFsbCB0aGUgc2FtZS4gSSBndWVzcyBp
+dCBpcyB0aGUgZGVzaWduIGhlcmU/DQo+IA0KPiBJIGFtIG5vdCBzdXJlIHdoZXRoZXIgSSBnZXQg
+eW91ciBwb2ludCBoZXJlIC0gSSB0aGluayBpdCdzIGJ5IGRlc2lnbi4NCj4gV2UgZG9uJ3QgcmVh
+bGx5IG5lZWQgcmVwbGF5IGlmIHdlIGFyZSBzdXJlIHRoYXQgdGhlIElPTU1VIGFkZHJlc3MNCj4g
+c3BhY2UgaGFzIHRvdGFsbHkgbm8gbWFwcGluZyAoaS5lLiwgd2hlbiB0aGUgZ3Vlc3QgaW5pdCku
+IFJlcGxheSBpcw0KPiBvbmx5IHVzZWZ1bCB3aGVuIHRoZXJlIGFyZSBleGlzdGluZyBtYXBwaW5n
+cyBpbiB0aGUgSU9NTVUgYWRkcmVzcw0KPiBzcGFjZS4NCnllcywgaWYgd2UgYXJlIHN1cmUgbm8g
+ZXhpc3RpbmcgbWFwcGluZywgaXQgaXMgb2suIFRoZXJlIGlzIGFub3RoZXIgY2FzZSB3aGljaCBt
+YXkNCmNvbXBsYWluIGl0LiBJZiBhIGRldmljZSBpcyBob3RwbHVnIGluLCB0aGVuIHRoZXJlIHNo
+b3VsZCBiZSBleGlzdGluZyBtYXBwaW5nLiBKdXN0DQpsb29rZWQgY29kZSBhZ2Fpbi4gSWYgY29y
+cmVzcG9uZGluZyBjb250ZXh0IGVudHJ5IGlzIG5vdCBwcmVzZW50LCB0aGUNCnZ0ZF9wYWdlX3dh
+bGsgc2hvdWxkIGJlIGJ5cGFzc2VkLg0KDQo+IA0KPiBBbm90aGVyIHRoaW5nIHRvIG1lbnRpb246
+IElNSE8gSU9WQSAtPiBIUEEgbWFwcGluZyBzaG91bGQgYmUgYnVpbHQgYnkNCj4gcGFnZSBtYXAv
+dW5tYXAgd2hlbiBndWVzdCBpc3N1ZXMgSU9UTEIgaW52YWxpZGF0aW9ucywgbm90IERNQSAoZ3Vl
+c3QNCj4gd2lsbCBmaXJzdCBpc3N1ZSBJT1RMQiBpbnZhbGlkYXRpb25zLCBvbmx5IGFmdGVyIHRo
+YXQgdGhlIGlvdmEgYWRkcmVzcw0KPiB3b3VsZCBiZSBhIHZhbGlkIERNQSBhZGRyZXNzKS4NCkV4
+YWN0bHkuIHRoeCBmb3IgdGhlIGNvcnJlY3Rpb24uDQoNCj4gDQo+ID4NCj4gPiBIb3dldmVyLCBp
+dCBtYXkgYmUgaW5jb21wYXRpYmxlIHdpdGggYSBmdXR1cmUgd29yayBpbiB3aGljaCB3ZSBleHBv
+c2UgYW4NCj4gPiB2SU9NTVUgdG8gZ3Vlc3QgYnV0IGd1ZXN0IGRpc2FibGUgSU9WQSB1c2FnZS4g
+SW4gdGhpcyBzY2VuYXJpbywgdGhlIFNMIHBhZ2UNCj4gPiB0YWJsZSBpbiBob3N0IHdvdWxkIGJl
+IGEgR1BBLT5IUEEgaW5zdGVhZCBvZiBhIGdJT1ZBLT5IUEEgbWFwcGluZy4gSXQgd291bGQNCj4g
+PiByZWx5IG9uIG1lbW9yeV9yZXBsYXkgdG8gYnVpbGQgYSBHUEEtPkhQQSBtYXBwaW5nLiBJZiBJ
+J20gY29ycmVjdCwgSSB0aGluayBpdA0KPiA+IHdvdWxkIGJlIGV4cGVjdGVkIHRvIGhhdmUgYSBy
+ZXBsYXkgaW4gdGhlIHRpbWUgZGV2aWNlIGlzIGFzc2lnbmVkLg0KPiANCj4gSWYgeW91IG5lZWQg
+YSBHUEEgLT4gSFBBIG1hcHBpbmcgKEFGQUlDVCB5b3UgbWVhbiB2aXJ0dWFsaXplZCBTVk0gYW5k
+DQo+IHRoZSBzby1jYWxsZWQgZmlyc3QgbGV2ZWwgdHJhbnNsYXRpb24pLCBJTUhPIHRoZSBkZWZh
+dWx0IG1hcHBpbmcNCj4gYmVoYXZpb3Igb2YgdmZpb19saXN0ZW5lcl9yZWdpb25fYWRkKCkgc3Vp
+dGVzIGhlcmUgKHdoZW4NCj4gbWVtb3J5X3JlZ2lvbl9pc19pb21tdShzZWN0aW9uLT5tcikgPT0g
+ZmFsc2UpLCB3aGljaCBtYXBzIHRoZSB3aG9sZQ0KPiBndWVzdCBwaHlzaWNhbCBhZGRyZXNzIHNw
+YWNlLCBqdXN0IGxpa2UgdGhlIGNhc2Ugd2hlbiB3ZSB1c2UgdmZpbw0KPiBkZXZpY2VzIHdpdGhv
+dXQgdklPTU1VLg0KWWVzLCBJIG1lYW4gU1ZNIHZpcnR1YWxpemFpb24uIFRvIHZpcnR1YWxpemUg
+U1ZNLCBhbiB2SU9NTVUgd291bGQgYmUgZXhwb3NlZCB0bw0KZ3Vlc3QuIFNvIG1lbW9yeV9yZWdp
+b25faXNfaW9tbXUoc2VjdGlvbi0+bXIpIHdvdWxkIGJlIHRydWUuIFRoZW4sIHRoZSBvcmlnaW5h
+bA0KbWFwcGluZyB0aGUgd2hvbGUgZ3Vlc3QgcGh5c2ljYWwgYWRkcmVzcyBzcGFjZSB3b3VsZCBu
+b3QgcnVuLiBUaHVzIG5vIEdQQS0+SFBBDQptYXBwaW5nIHdvdWxkIGJlIGJ1aWx0LiBUaGlzIGlz
+IHdoYXQgSSByZWFsbHkgY29uY2VybiBoZXJlLg0KDQpUaGFua3MsDQpZaSBMDQo=
