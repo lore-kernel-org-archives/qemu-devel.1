@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53090)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53711)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cMXV1-0007QI-Bb
-	for qemu-devel@nongnu.org; Thu, 29 Dec 2016 04:59:52 -0500
+	(envelope-from <drjones@redhat.com>) id 1cMXZW-0000HV-4r
+	for qemu-devel@nongnu.org; Thu, 29 Dec 2016 05:04:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cMXUy-00062O-8L
-	for qemu-devel@nongnu.org; Thu, 29 Dec 2016 04:59:51 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56054)
+	(envelope-from <drjones@redhat.com>) id 1cMXZT-00077D-2g
+	for qemu-devel@nongnu.org; Thu, 29 Dec 2016 05:04:30 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35814)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cMXUy-00062K-2c
-	for qemu-devel@nongnu.org; Thu, 29 Dec 2016 04:59:48 -0500
-Date: Thu, 29 Dec 2016 17:59:40 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20161229095940.GB4195@pxdev.xzpeter.org>
-References: <A2975661238FB949B60364EF0F2C257438FEF893@shsmsx102.ccr.corp.intel.com>
+	(Exim 4.71) (envelope-from <drjones@redhat.com>) id 1cMXZS-000772-Td
+	for qemu-devel@nongnu.org; Thu, 29 Dec 2016 05:04:27 -0500
+Date: Thu, 29 Dec 2016 11:04:20 +0100
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20161229100420.i66zeaxc4qbp3p3p@hawk.localdomain>
+References: <20161229080217.16446.50840.malonedeb@wampee.canonical.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <A2975661238FB949B60364EF0F2C257438FEF893@shsmsx102.ccr.corp.intel.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 12/13] intel_iommu: do replay when
- context invalidate
+In-Reply-To: <20161229080217.16446.50840.malonedeb@wampee.canonical.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Bug 1653063] [NEW] qemu-system-arm hangs with
+ -icount and -nodefaults
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,41 +28,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Liu, Yi L" <yi.l.liu@intel.com>
-Cc: "Tian, Kevin" <kevin.tian@intel.com>, "Lan, Tianyu" <tianyu.lan@intel.com>, "'qemu-devel@nongnu.org'" <qemu-devel@nongnu.org>, "'bd.aviv@gmail.com'" <bd.aviv@gmail.com>
+To: Hansni Bu <1653063@bugs.launchpad.net>
+Cc: qemu-devel@nongnu.org, alex.bennee@linaro.org
 
-On Thu, Dec 29, 2016 at 07:38:38AM +0000, Liu, Yi L wrote:
-> > Before this one we only invalidate context cache when we receive context
-> > entry invalidations. However it's possible that the invalidation also
-> > contains a domain switch (only if cache-mode is enabled for vIOMMU). In
-> > that case we need to notify all the registered components about the new
-> > mapping.
-> > 
-> > Signed-off-by: Peter Xu <address@hidden>
-> > ---
-> >  hw/i386/intel_iommu.c | 1 +
-> >  1 file changed, 1 insertion(+)
-> > 
-> > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> > index 2fcd7af..0220e63 100644
-> > --- a/hw/i386/intel_iommu.c
-> > +++ b/hw/i386/intel_iommu.c
-> > @@ -1188,6 +1188,7 @@ static void vtd_context_device_invalidate(IntelIOMMUState 
-> > *s,
-> >                  trace_vtd_inv_desc_cc_device(bus_n, (devfn_it >> 3) & 0x1f,
-> >                                               devfn_it & 3);
-> >                  vtd_as->context_cache_entry.context_cache_gen = 0;
-> > +                memory_region_iommu_replay_all(&vtd_as->iommu);
-> 
-> Hi Peter,
-> 
-> It looks like all the device context invalidation would result in replay even the
-> device is not an assigned device. Is it necessary to do replay for a virtual device?
+On Thu, Dec 29, 2016 at 08:02:16AM -0000, Hansni Bu wrote:
+> Public bug reported:
+...
+> https://bugs.launchpad.net/bugs/1653063
+...
+>   After console prints the message below:
+>   "Uncompressing Linux.................................................=
+......................... done, booting the kernel."
+>   there's no further action noticed.
+>=20
+>   If "-icount" is not set, namely run as:
+>   qemu-system-arm -M integratorcp -kernel arm-test/zImage.integrator -i=
+nitrd arm-test/arm_root.img -nographic -nodefaults -chardev stdio,mux=3Do=
+n,id=3Dchar0 -serial chardev:char0 --append "console=3DttyAMA0"
+>=20
+>   or if "-nodefaults" is not set, namely run as:
+>   qemu-system-arm -M integratorcp -kernel arm-test/zImage.integrator -i=
+nitrd arm-test/arm_root.img -nographic -icount 1 --append "console=3DttyA=
+MA0"
+>=20
+>   The Linux boot procedure can finish successfully.
 
-Normal emulated devices won't register for IOMMU notifier. For these
-devices, MemoryRegion.iommu_notify will be empty. So replay on those
-memory regions should not affect them at all.
+Hi Hansni,
 
-Thanks,
+The fact things work when you remove -nodefaults is a sign that with it
+your single cpu may just not be getting scheduled again. Does the patch
+from Alex Benn=E9e here[*] help?
 
--- peterx
+drew
+
+[*] https://lists.gnu.org/archive/html/qemu-devel/2016-11/msg01743.html
