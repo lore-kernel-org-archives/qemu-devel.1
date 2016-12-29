@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46045)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33165)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangqian@sangfor.com.cn>) id 1cMaFv-0002U9-9c
-	for qemu-devel@nongnu.org; Thu, 29 Dec 2016 07:56:32 -0500
+	(envelope-from <bounces@canonical.com>) id 1cMVht-0008Im-3f
+	for qemu-devel@nongnu.org; Thu, 29 Dec 2016 03:05:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangqian@sangfor.com.cn>) id 1cMaFp-00033H-VS
-	for qemu-devel@nongnu.org; Thu, 29 Dec 2016 07:56:27 -0500
-Received: from m129-177.yeah.net ([123.58.177.129]:2355)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangqian@sangfor.com.cn>) id 1cMaFo-00032G-Vc
-	for qemu-devel@nongnu.org; Thu, 29 Dec 2016 07:56:21 -0500
-Message-ID: <ABkAAQD4AB3QlUFH9YYGDar2.1.1483013998163.Hmail.zhangqian@sangfor.com.cn>
+	(envelope-from <bounces@canonical.com>) id 1cMVho-0007oi-5u
+	for qemu-devel@nongnu.org; Thu, 29 Dec 2016 03:05:01 -0500
+Received: from indium.canonical.com ([91.189.90.7]:60408)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cMVho-0007m2-0S
+	for qemu-devel@nongnu.org; Thu, 29 Dec 2016 03:04:56 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cMVhm-0002NQ-17
+	for <qemu-devel@nongnu.org>; Thu, 29 Dec 2016 08:04:54 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id E1B4A2E80C8
+	for <qemu-devel@nongnu.org>; Thu, 29 Dec 2016 08:04:53 +0000 (UTC)
 MIME-Version: 1.0
-From: Zhang Qian <zhangqian@sangfor.com.cn>
-Date: Thu, 29 Dec 2016 20:19:58 +0800 (GMT+08:00)
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
-Subject: [Qemu-devel] =?utf-8?q?=5BPATCH=5D_scsi-disk=3A_fix_crash_on_VERI?=
- =?utf-8?q?FY_command?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 29 Dec 2016 07:53:22 -0000
+From: Dave Eckhardt <de0u@andrew.cmu.edu>
+Reply-To: Bug 925405 <925405@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20120202110843.18662.48430.malonedeb@wampee.canonical.com>
+Message-Id: <20161229075323.3176.38115.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 925405] Re: VNC server does not work with Mac
+ Screen Sharing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,32 +37,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-RnJvbSBjMmYxNjMxMTMyODIxZDYxZTE5NDJhODcyM2JhNTk2ZjkxZDNlNjcyIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBaaGFuZyBRaWFuIDx6aGFuZ3FpYW5Ac2FuZ2Zvci5jb20uY24+
-CkRhdGU6IFRodSwgMjkgRGVjIDIwMTYgMjA6MDA6MDEgKzA4MDAKU3ViamVjdDogW1BBVENIXSBz
-Y3NpLWRpc2s6IGZpeCBjcmFzaCBvbiBWRVJJRlkgY29tbWFuZCBDb21taXQgMTY2ZGJkYQogInNj
-c2ktZGlzazogZml4IFZFUklGWSBmb3Igc2NzaS1ibG9jayIgYWRkIGEgcHJvY2VzcyBvZiBWRVJJ
-RlkgaW4KIHNjc2lfYmxvY2tfZG1hX2NvbW1hbmQuIEJ1dCwgdGhlIGNtZC5tb2RlIG9mIHJlcSBp
-cyBTQ1NJX1hGRVJfTk9ORSwgdGhlIHJlcQogaXMgaGFuZGxlZCBhcyBhIHJlYWQgb3BlcmF0aW9u
-LiBBIHZlcmlmeSBjb21tYW5kIGlzIG5vdCBhbiBhY3R1YWwgcmVhZCAod2UgZG8KIG5vdCBpbXBs
-ZW1lbnQgY29tcGFyZSBtb2RlKSBhbmQgdGh1cyBkb2VzIG5vdCBoYXZlIGFuIEFJT0NCIGF0dGFj
-aGVkLiBzbywgaXQKIHdpbGwgYmUgY3Jhc2ggaW4gc2NzaV9kbWFfY29tcGxldGUuIENvbW1pdCBl
-Zjg0ODlkICJzY3NpOiBhdm9pZCBhc3NlcnRpb24KIGZhaWx1cmUgb24gVkVSSUZZIGNvbW1hbmQi
-IGlzIGFkZGVkIHRvIHByb2Nlc3MgdmVyaWZ5IGNvbW1hbmQsIHNvIHdlIHRyZWF0CiB2ZXJpZnkg
-Y29tbWFuZCBhcyBhIHdyaXRlIG9wZXJhdGlvbi4KU2lnbmVkLW9mZi1ieTogWmhhbmcgUWlhbiA8
-emhhbmdxaWFuQHNhbmdmb3IuY29tLmNuPgotLS0KIGh3L3Njc2kvc2NzaS1kaXNrLmMgfCA0ICsr
-KysKIDEgZmlsZSBjaGFuZ2VkLCA0IGluc2VydGlvbnMoKykKCgpkaWZmIC0tZ2l0IGEvaHcvc2Nz
-aS9zY3NpLWRpc2suYyBiL2h3L3Njc2kvc2NzaS1kaXNrLmMKaW5kZXggYmRkMWU1Zi4uYWIwNWJm
-OSAxMDA2NDQKLS0tIGEvaHcvc2NzaS9zY3NpLWRpc2suYworKysgYi9ody9zY3NpL3Njc2ktZGlz
-ay5jCkBAIC0yMTcwLDYgKzIxNzAsMTAgQEAgc3RhdGljIGludDMyX3Qgc2NzaV9kaXNrX2RtYV9j
-b21tYW5kKFNDU0lSZXF1ZXN0ICpyZXEsIHVpbnQ4X3QgKmJ1ZikKICAgICAgICAgaWYgKCFjaGVj
-a19sYmFfcmFuZ2Uocywgci0+cmVxLmNtZC5sYmEsIGxlbikpIHsKICAgICAgICAgICAgIGdvdG8g
-aWxsZWdhbF9sYmE7CiAgICAgICAgIH0KKyBpZiAoY29tbWFuZCA9PSBWRVJJRllfMTAgfHwgY29t
-bWFuZCA9PSBWRVJJRllfMTIgfHwKKyAgICAgICAgICAgIGNvbW1hbmQgPT0gVkVSSUZZXzE2KSB7
-CisgICAgICAgICAgICByLT5yZXEuY21kLm1vZGUgPSBTQ1NJX1hGRVJfVE9fREVWOworICAgICAg
-ICB9CiAgICAgICAgIHItPnNlY3RvciA9IHItPnJlcS5jbWQubGJhICogKHMtPnFkZXYuYmxvY2tz
-aXplIC8gNTEyKTsKICAgICAgICAgci0+c2VjdG9yX2NvdW50ID0gbGVuICogKHMtPnFkZXYuYmxv
-Y2tzaXplIC8gNTEyKTsKICAgICAgICAgYnJlYWs7Ci0tIAoKCgoKDQoNCg==
+FWIW, this affects me too.
+
+Ubuntu 14.04
+QEMU emulator version 2.0.0 (Debian 2.0.0+dfsg-2ubuntu1.30), Copyright (c) =
+2003-2008 Fabrice Bellard
+OS X 10.9.5.
+
+The observed behavior is that when I hit "Connect" a spinning circle
+appears nearby but nothing else ever happens.
+
+There are reports online:
+https://www.reddit.com/r/homelab/comments/4jr893/qemu_with_vnc_to_osx_scree=
+n_sharing/
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/925405
+
+Title:
+  VNC server does not work with Mac Screen Sharing
+
+Status in QEMU:
+  New
+Status in Ubuntu:
+  Invalid
+
+Bug description:
+  When connecting to a QEMU instance from a Mac using any VNC settings
+  on the QEMU CLI and any target arch (ARM, Intel, etc.), the connection
+  is attempted but the negotiation never finishes.
+
+  I've verified this when building QEMU from source (1.0 and HEAD) on
+  Ubuntu, Fedora and Debian or when using Ubuntu (Oneiric) and Debian
+  (Lenny) packages.
+
+  It does not matter whether I specify authentication (or anything else)
+  on QEMU's side, the behavior is always the same - I see the connection
+  being established using netstat and tcpdump, but QEMU does not seem to
+  send back any pixmap data after the connection setup.
+
+  Best guess as to why this happens is that the VNC negotiation on QEMU
+  does not like the protocol version and VNC encoding sent by the Mac's
+  built-in VNC client, or that its negotiation logic is subtly broken. I
+  appreciate that it's not meant to be a full VNC server, but it
+  prevents me from using it remotely until a stable Mac build is
+  feasible.
+
+  Background info:
+
+  Mac OS X includes a VNC client called Screen Sharing that you can
+  invoke in two different ways:
+
+  * At a terminal, by typing "open vnc://hostname:tcp_port"
+  * From any URI-enabled field (such as the Safari URI field), where you ca=
+n just type the URI as vnc://hostname:tcp_port
+
+  Please do not confuse the enhanced VNC protocol Apple Remote Desktop
+  uses with Screen Sharing - they are not mutually exclusive, but they
+  are not incompatible either, since what Apple does is to negotiate
+  extra pixmap encoding and authentication options - I use Screen
+  Sharing to access many VNC servers such as vnc4server, tightvncserver,
+  vino, etc. without any issues whatsoever, so the issue I'm reporting
+  is not an issue with Apple's implementation.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/925405/+subscriptions
