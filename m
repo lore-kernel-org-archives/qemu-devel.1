@@ -1,24 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38986)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42781)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1cN40S-0004cD-2B
-	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 15:42:28 -0500
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1cN4KP-0000a4-IU
+	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 16:03:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1cN40P-00018J-0E
-	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 15:42:28 -0500
-Received: from mail-it0-x242.google.com ([2607:f8b0:4001:c0b::242]:34828)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1cN40O-000189-RU
-	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 15:42:24 -0500
-Received: by mail-it0-x242.google.com with SMTP id b123so42614420itb.2
-	for <qemu-devel@nongnu.org>; Fri, 30 Dec 2016 12:42:24 -0800 (PST)
-From: Programmingkid <programmingkidx@gmail.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 30 Dec 2016 15:42:21 -0500
-Message-Id: <0C9DA454-E3DC-4291-806E-9A96557DE833@gmail.com>
-Mime-Version: 1.0 (Apple Message framework v1084)
-Subject: [Qemu-devel] [PATCH] ui/cocoa.m: add toast file support
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1cN4KK-0002Hv-MN
+	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 16:03:05 -0500
+From: Pavel Butsykin <pbutsykin@virtuozzo.com>
+Date: Fri, 30 Dec 2016 17:31:37 +0300
+Message-ID: <20161230143142.18214-14-pbutsykin@virtuozzo.com>
+In-Reply-To: <20161230143142.18214-1-pbutsykin@virtuozzo.com>
+References: <20161230143142.18214-1-pbutsykin@virtuozzo.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v2 13/18] block/pcache: write through
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,32 +21,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel qemu-devel <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, den@openvz.org, eblake@redhat.com, armbru@redhat.com
 
-Add the ability for the user to use .toast files with QEMU. This format =
-works
-just like ISO files.
+Write-through is another way to keep the cache up-to-date. Even if this
+case will be rare, write to the cache is more optimal than drop-cache.
 
-Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
+Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
 ---
- ui/cocoa.m | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/pcache.c | 26 ++++++++++++++++++++++----
+ 1 file changed, 22 insertions(+), 4 deletions(-)
 
-diff --git a/ui/cocoa.m b/ui/cocoa.m
-index 26d4a1c..c81f7b6 100644
---- a/ui/cocoa.m
-+++ b/ui/cocoa.m
-@@ -879,7 +879,7 @@ QemuCocoaView *cocoaView;
-         // set the supported image file types that can be opened
-         supportedImageFileTypes =3D [NSArray arrayWithObjects: @"img", =
-@"iso", @"dmg",
-                                  @"qcow", @"qcow2", @"cloop", @"vmdk", =
-@"cdr",
--                                  nil];
-+                                  @"toast", nil];
-         [self make_about_window];
+diff --git a/block/pcache.c b/block/pcache.c
+index c1cbfa7040..140f90d6d7 100644
+--- a/block/pcache.c
++++ b/block/pcache.c
+@@ -410,8 +410,26 @@ skip_large_request:
+     return bdrv_co_preadv(bs->file, offset, bytes, qiov, flags);
+ }
+ 
+-static void pcache_invalidation(BlockDriverState *bs, uint64_t offset,
+-                                uint64_t bytes)
++static void write_cache_data(PCacheNode *node, uint64_t offset, uint64_t bytes,
++                             QEMUIOVector *qiov)
++{
++    uint64_t qiov_offs = 0, node_offs = 0;
++    uint64_t size;
++    uint64_t copy;
++
++    if (offset < node->common.offset) {
++        qiov_offs = node->common.offset - offset;
++    } else {
++        node_offs = offset - node->common.offset;
++    }
++    size = ranges_overlap_size(offset, bytes, node->common.offset,
++                               node->common.bytes);
++    copy = qemu_iovec_to_buf(qiov, qiov_offs, node->data + node_offs, size);
++    assert(copy == size);
++}
++
++static void pcache_write_through(BlockDriverState *bs, uint64_t offset,
++                                 uint64_t bytes, QEMUIOVector *qiov)
+ {
+     BDRVPCacheState *s = bs->opaque;
+     uint64_t chunk_offset = offset, chunk_bytes = bytes;
+@@ -429,7 +447,7 @@ static void pcache_invalidation(BlockDriverState *bs, uint64_t offset,
+         chunk_bytes = end_offs - chunk_offset;
+ 
+         if (node->status & NODE_STATUS_COMPLETED) {
+-            rbcache_remove(s->cache, &node->common);
++            write_cache_data(node, offset, bytes, qiov);
+         }
+     } while (end_offs > chunk_offset);
+ }
+@@ -442,7 +460,7 @@ static coroutine_fn int pcache_co_pwritev(BlockDriverState *bs, uint64_t offset,
+     if (ret < 0) {
+         return ret;
      }
-     return self;
---=20
-2.7.2
+-    pcache_invalidation(bs, offset, bytes);
++    pcache_write_through(bs, offset, bytes, qiov);
+ 
+     return ret;
+ }
+-- 
+2.11.0
