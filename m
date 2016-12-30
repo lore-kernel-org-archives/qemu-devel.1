@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48322)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48422)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1cN1z2-0006Vl-0x
-	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 13:32:52 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1cN20M-00078y-BD
+	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 13:34:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1cN1yy-0000Pr-3c
-	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 13:32:52 -0500
-Received: from chuckie.co.uk ([82.165.15.123]:35888
-	helo=s16892447.onlinehome-server.info)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1cN1yx-0000PR-TO
-	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 13:32:48 -0500
-References: <20161023063135.21058-1-zxq_yx_007@163.com>
-	<2f476a20.17fe.1593424b176.Coremail.zxq_yx_007@163.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <80cfd7e0-b555-b7c9-686a-296e22e32c6b@ilande.co.uk>
-Date: Fri, 30 Dec 2016 18:32:21 +0000
+	(envelope-from <ehabkost@redhat.com>) id 1cN20J-0000eX-6L
+	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 13:34:14 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51546)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cN20J-0000eD-0Q
+	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 13:34:11 -0500
+Date: Fri, 30 Dec 2016 16:34:07 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20161230183407.GL3441@thinpad.lan.raisama.net>
+References: <1483108391-199542-1-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <2f476a20.17fe.1593424b176.Coremail.zxq_yx_007@163.com>
-Content-Type: text/plain; charset=gbk
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 0/9] QOM'ify work for sparc
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1483108391-199542-1-git-send-email-imammedo@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] pc: fix crash in rtc_set_memory() if
+ initial cpu is marked as hotplugged
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,48 +27,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?6LW15bCP5by6?= <zxq_yx_007@163.com>, qemu-devel <qemu-devel@nongnu.org>
-Cc: pbonzini@redhat.com, atar4qemu@gmail.com, peter.maydell@linaro.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, mst@redhat.com, armbru@redhat.com, afaerber@suse.de
 
-On 25/12/16 04:02, ÕÔÐ¡Ç¿ wrote:
-
-> ping .... 
+On Fri, Dec 30, 2016 at 03:33:11PM +0100, Igor Mammedov wrote:
+> 'hotplugged' propperty is meant to be used on migration side when migrating
+> source with hotplugged devices.
+> However though it not exacly correct usage of 'hotplugged' property
+> it's possible to set generic hotplugged property for CPU using
+>  -cpu foo,hotplugged=on
+> or
+>  -global foo.hotplugged=on
 > 
-> At 2016-10-23 14:31:26, "xiaoqiang zhao" <zxq_yx_007@163.com> wrote:
->> This patch set aims for QOM'ifying code relate with sparc.
->> It is part of my QOM'ify work of qemu code base.
->>
->> xiaoqiang zhao (9):
->>  hw/misc: QOM'ify eccmemctl.c
->>  hw/dma: QOM'ify sparc32_dma.c
->>  hw/dma: QOM'ify sun4m_iommu.c
->>  hw/misc: QOM'ify slavio_misc.c
->>  hw/timer: QOM'ify m48txx_sysbus (pass 1)
->>  hw/timer: QOM'ify m48txx_sysbus (pass 2)
->>  hw/timer: QOM'ify slavio_timer
->>  hw/sparc: QOM'ify sun4m.c
->>  hw/sparc64: QOM'ify sun4u.c
->>
->> hw/dma/sparc32_dma.c    | 25 ++++++++++++--------
->> hw/dma/sun4m_iommu.c    | 12 ++++------
->> hw/misc/eccmemctl.c     | 25 ++++++++++++--------
->> hw/misc/slavio_misc.c   | 43 ++++++++++++++--------------------
->> hw/sparc/sun4m.c        | 54 +++++++++++++++----------------------------
->> hw/sparc64/sun4u.c      | 20 ++++++++--------
->> hw/timer/m48t59.c       | 61 ++++++++++++++++++++++++++++++++++---------------
->> hw/timer/slavio_timer.c | 12 ++++------
->> 8 files changed, 128 insertions(+), 124 deletions(-)
->>
->> -- 
->> 2.9.3
+> in this case qemu crashes with following backtrace:
+> 
+> ...
+> 
+> because pc_cpu_plug() assumes that hotplugged CPU could appear only after
+> rtc/fw_cfg are initialized.
+> Fix crash by replacing assumption with explicit checks of rtc/fw_cfg
+> and updating them only if they were initialized.
+> 
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> Reported-by: Eduardo Habkost <ehabkost@redhat.com>
 
-Thanks for the patch!
+I like how the new code doesn't depend on DeviceState::hotplugged
+at all.
 
-Given that Artyom's sun4v work has been waiting since before freeze, I'd
-like to see that merged first and then this patch rebased on top if
-required.
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 
+But I would like to understand better how the "hotplugged"
+property is really supposed to be used. I am not aware of any
+existing case where the user needs to set "hotplugged" directly
+and it works.
 
-ATB,
+> ---
+>  hw/i386/pc.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index f3d7ad4..7b7e126 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -1810,8 +1810,10 @@ static void pc_cpu_plug(HotplugHandler *hotplug_dev,
+>  
+>      /* increment the number of CPUs */
+>      pcms->boot_cpus++;
+> -    if (dev->hotplugged) {
+> +    if (pcms->rtc) {
+>          rtc_set_cpus_count(pcms->rtc, pcms->boot_cpus);
+> +    }
+> +    if (pcms->fw_cfg) {
+>          fw_cfg_modify_i16(pcms->fw_cfg, FW_CFG_NB_CPUS, pcms->boot_cpus);
+>      }
+>  
+> -- 
+> 2.7.4
+> 
 
-Mark.
+-- 
+Eduardo
