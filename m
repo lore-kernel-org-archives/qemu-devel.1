@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43336)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43351)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1cMz0T-0002KL-0f
-	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 10:22:10 -0500
+	(envelope-from <tcminyard@gmail.com>) id 1cMz0U-0002Mc-0v
+	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 10:22:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1cMz0R-0000GX-Q6
-	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 10:22:09 -0500
-Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:35736)
+	(envelope-from <tcminyard@gmail.com>) id 1cMz0S-0000HV-Tk
+	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 10:22:10 -0500
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:35738)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1cMz0R-0000Fj-Kg
-	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 10:22:07 -0500
-Received: by mail-pg0-x243.google.com with SMTP id i5so22381151pgh.2
-	for <qemu-devel@nongnu.org>; Fri, 30 Dec 2016 07:22:07 -0800 (PST)
+	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1cMz0S-0000H0-Nz
+	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 10:22:08 -0500
+Received: by mail-pg0-x241.google.com with SMTP id i5so22381182pgh.2
+	for <qemu-devel@nongnu.org>; Fri, 30 Dec 2016 07:22:08 -0800 (PST)
 Sender: Corey Minyard <tcminyard@gmail.com>
 From: minyard@acm.org
-Date: Fri, 30 Dec 2016 09:21:47 -0600
-Message-Id: <1483111310-24808-17-git-send-email-minyard@acm.org>
+Date: Fri, 30 Dec 2016 09:21:50 -0600
+Message-Id: <1483111310-24808-20-git-send-email-minyard@acm.org>
 In-Reply-To: <1483111310-24808-1-git-send-email-minyard@acm.org>
 References: <1483111310-24808-1-git-send-email-minyard@acm.org>
-Subject: [Qemu-devel] [PATCH 16/19] isa: Add an irq device.
+Subject: [Qemu-devel] [PATCH 19/19] ipmi_smbus: Add alert capability to the
+ IPMI SSIF code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,120 +32,126 @@ Cc: minyard@acm.org, Corey Minyard <cminyard@mvista.com>
 
 From: Corey Minyard <cminyard@mvista.com>
 
-This uses the new irq interface to allow an ISA irq to be specified
-by name.  This will let other things (like the upcoming smbus alert
-device) to specify ISA irqs by name.
-
-To create an name ISA irq, add:
-  -device isa-irq,irq=<name>,irq=<n>
-where you will use the name to look up the irq on a following device.
+This lets you add "alertname=<name>" to specify an alert device
+to use for letting the host know that the IPMI device has data
+ready.
 
 Signed-off-by: Corey Minyard <cminyard@mvista.com>
 ---
- hw/isa/Makefile.objs |  2 +-
- hw/isa/isa-irq.c     | 84 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 85 insertions(+), 1 deletion(-)
- create mode 100644 hw/isa/isa-irq.c
+ hw/ipmi/smbus_ipmi.c | 45 +++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 43 insertions(+), 2 deletions(-)
 
-diff --git a/hw/isa/Makefile.objs b/hw/isa/Makefile.objs
-index 9164556..338dd08 100644
---- a/hw/isa/Makefile.objs
-+++ b/hw/isa/Makefile.objs
-@@ -1,4 +1,4 @@
--common-obj-y += isa-bus.o
-+common-obj-y += isa-bus.o isa-irq.o
- common-obj-$(CONFIG_APM) += apm.o
- common-obj-$(CONFIG_I82378) += i82378.o
- common-obj-$(CONFIG_PC87312) += pc87312.o
-diff --git a/hw/isa/isa-irq.c b/hw/isa/isa-irq.c
-new file mode 100644
-index 0000000..eee6c0e
---- /dev/null
-+++ b/hw/isa/isa-irq.c
-@@ -0,0 +1,84 @@
-+/*
-+ * QEMU ISA named IRQ
-+ *
-+ * Copyright (c) 2015,2016 Corey Minyard, MontaVista Software, LLC
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+#include "qemu/osdep.h"
-+#include "hw/irqif.h"
-+#include "hw/isa/isa.h"
+diff --git a/hw/ipmi/smbus_ipmi.c b/hw/ipmi/smbus_ipmi.c
+index 4d99b48..5c7b7c2 100644
+--- a/hw/ipmi/smbus_ipmi.c
++++ b/hw/ipmi/smbus_ipmi.c
+@@ -24,6 +24,7 @@
+ #include "qemu/osdep.h"
+ #include "hw/hw.h"
+ #include "hw/i2c/smbus.h"
++#include "hw/i2c/smbus_alert.h"
+ #include "qapi/error.h"
+ #include "qemu/error-report.h"
+ #include "hw/ipmi/ipmi.h"
+@@ -49,6 +50,8 @@ typedef struct SMBusIPMIDevice {
+     uint8_t inmsg[MAX_IPMI_MSG_SIZE];
+     uint32_t inlen;
+ 
++    bool irqs_enabled;
 +
-+/* This is the type the user specifies on the -device command line */
-+#define TYPE_ISA_IRQ           "isa-irq"
-+#define ISA_IRQ(obj) OBJECT_CHECK(ISAIRQDevice, (obj), TYPE_ISA_IRQ)
+     /*
+      * This is a response number that we send with the command to make
+      * sure that the response matches the command.
+@@ -56,11 +59,15 @@ typedef struct SMBusIPMIDevice {
+     uint8_t waiting_rsp;
+ 
+     uint32_t uuid;
 +
-+typedef struct ISAIRQDevice {
-+    ISADevice dev;
-+    int32_t isairq;
-+    qemu_irq irq;
-+} ISAIRQDevice;
++    SMBusAlertEntry alert_entry;
++    SMBusAlertDevice *alertdev;
++    SMBusAlertDeviceClass *alertdevclass;
+ } SMBusIPMIDevice;
+ 
+ static void smbus_ipmi_handle_event(IPMIInterface *ii)
+ {
+-    /* No interrupts, so nothing to do here. */
++    /* Nothing to do here, we don't use events for SMBus. */
+ }
+ 
+ static void smbus_ipmi_handle_rsp(IPMIInterface *ii, uint8_t msg_id,
+@@ -74,16 +81,27 @@ static void smbus_ipmi_handle_rsp(IPMIInterface *ii, uint8_t msg_id,
+         memcpy(sid->outmsg, rsp, rsp_len);
+         sid->outlen = rsp_len;
+         sid->outpos = 0;
 +
-+static qemu_irq *irq_isa_get_irq(IRQInterface *ii)
-+{
-+    ISAIRQDevice *iid = ISA_IRQ(ii);
++        if (sid->alertdev && sid->irqs_enabled) {
++            sid->alertdevclass->alert(sid->alertdev, &sid->alert_entry);
++        }
+     }
+ }
+ 
+ static void smbus_ipmi_set_atn(IPMIInterface *ii, int val, int irq)
+ {
+-    /* This is where PEC would go. */
++    SMBusIPMIDevice *sid = SMBUS_IPMI(ii);
 +
-+    return &iid->irq;
-+}
-+
-+static void irq_isa_realizefn(DeviceState *dev, Error **errp)
-+{
-+    ISADevice *isadev = ISA_DEVICE(dev);
-+    ISAIRQDevice *iid = ISA_IRQ(dev);
-+
-+    isa_init_irq(isadev, &iid->irq, iid->isairq);
-+}
-+
-+static Property irq_isa_properties[] = {
-+    DEFINE_PROP_INT32("irq",   ISAIRQDevice, isairq,  5),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void irq_isa_class_initfn(ObjectClass *oc, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(oc);
-+    IRQInterfaceClass *ii = IRQ_INTERFACE_CLASS(oc);
-+
-+    dc->realize = irq_isa_realizefn;
-+    dc->props = irq_isa_properties;
-+    ii->get_irq = irq_isa_get_irq;
-+}
-+
-+static const TypeInfo irq_isa_info = {
-+    .name          = TYPE_ISA_IRQ,
-+    .parent        = TYPE_ISA_DEVICE,
-+    .instance_size = sizeof(ISAIRQDevice),
-+    .class_init    = irq_isa_class_initfn,
-+    .interfaces = (InterfaceInfo[]) {
-+        { TYPE_IRQ_INTERFACE },
-+        { }
++    if (sid->alertdev && sid->irqs_enabled) {
++        sid->alertdevclass->alert(sid->alertdev, &sid->alert_entry);
 +    }
-+};
+ }
+ 
+ static void smbus_ipmi_set_irq_enable(IPMIInterface *ii, int val)
+ {
++    SMBusIPMIDevice *sid = SMBUS_IPMI(ii);
 +
-+static void irq_register_types(void)
++    sid->irqs_enabled = val;
+ }
+ 
+ static void ipmi_quick_cmd(SMBusDevice *dev, uint8_t read)
+@@ -149,6 +167,12 @@ static const VMStateDescription vmstate_smbus_ipmi = {
+     .minimum_version_id = 1,
+     .fields      = (VMStateField[]) {
+         VMSTATE_UINT8(waiting_rsp, SMBusIPMIDevice),
++        VMSTATE_BOOL(irqs_enabled, SMBusIPMIDevice),
++        VMSTATE_UINT32(outpos, SMBusIPMIDevice),
++        VMSTATE_VBUFFER_UINT32(outmsg, SMBusIPMIDevice, 1, NULL, 0,
++                               outlen),
++        VMSTATE_VBUFFER_UINT32(inmsg, SMBusIPMIDevice, 1, NULL, 0,
++                               inlen),
+         VMSTATE_END_OF_LIST()
+     }
+ };
+@@ -165,14 +189,31 @@ static void smbus_ipmi_realize(DeviceState *dev, Error **errp)
+ 
+     sid->uuid = ipmi_next_uuid();
+ 
++    if (sid->alertdev) {
++        sid->alertdevclass = SMBUS_ALERT_DEVICE_GET_CLASS(sid->alertdev);
++    }
++
++    sid->alert_entry.val = sid->parent.i2c.address << 1;
++
+     sid->bmc->intf = ii;
+ }
+ 
++static void alert_check(Object *obj, const char *name,
++                        Object *val, Error **errp)
 +{
-+    type_register_static(&irq_isa_info);
++    /* Always succeed. */
 +}
 +
-+type_init(irq_register_types)
+ static void smbus_ipmi_init(Object *obj)
+ {
+     SMBusIPMIDevice *sid = SMBUS_IPMI(obj);
+ 
+     ipmi_bmc_find_and_link(OBJECT(obj), (Object **) &sid->bmc);
++
++    object_property_add_link(obj, "alert", TYPE_SMBUS_ALERT_DEVICE,
++                             (Object **) &sid->alertdev, alert_check,
++                             OBJ_PROP_LINK_UNREF_ON_RELEASE,
++                             &error_abort);
+ }
+ 
+ static void smbus_ipmi_get_fwinfo(struct IPMIInterface *ii, IPMIFwInfo *info)
 -- 
 2.7.4
