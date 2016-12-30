@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43399)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43440)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1cMz0X-0002Pf-CV
-	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 10:22:14 -0500
+	(envelope-from <tcminyard@gmail.com>) id 1cMz0a-0002Sx-2q
+	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 10:22:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1cMz0V-0000Il-GJ
-	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 10:22:13 -0500
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:35740)
+	(envelope-from <tcminyard@gmail.com>) id 1cMz0Y-0000K0-HI
+	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 10:22:16 -0500
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:35742)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1cMz0V-0000IV-8z
-	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 10:22:11 -0500
-Received: by mail-pg0-x242.google.com with SMTP id i5so22381290pgh.2
-	for <qemu-devel@nongnu.org>; Fri, 30 Dec 2016 07:22:11 -0800 (PST)
+	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1cMz0Y-0000Jq-A0
+	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 10:22:14 -0500
+Received: by mail-pg0-x242.google.com with SMTP id i5so22381398pgh.2
+	for <qemu-devel@nongnu.org>; Fri, 30 Dec 2016 07:22:14 -0800 (PST)
 Sender: Corey Minyard <tcminyard@gmail.com>
 From: minyard@acm.org
-Date: Fri, 30 Dec 2016 09:21:49 -0600
-Message-Id: <1483111310-24808-19-git-send-email-minyard@acm.org>
+Date: Fri, 30 Dec 2016 09:21:41 -0600
+Message-Id: <1483111310-24808-11-git-send-email-minyard@acm.org>
 In-Reply-To: <1483111310-24808-1-git-send-email-minyard@acm.org>
 References: <1483111310-24808-1-git-send-email-minyard@acm.org>
-Subject: [Qemu-devel] [PATCH 18/19] i2c: Add an SMBus alert device.
+Subject: [Qemu-devel] [PATCH 10/19] ipmi: Add an SMBus IPMI interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,47 +31,56 @@ Cc: minyard@acm.org, Corey Minyard <cminyard@mvista.com>
 
 From: Corey Minyard <cminyard@mvista.com>
 
-This adds a device that conforms to the SMBus alert extension.  This
-allows other I2C devices to register with this device so that when
-they have data ready, it will interrupt the processor and allow the
-processor to read from the alert device to see which i2c device has
-data.
-
-To use this, you must first create a named irq and then create
-this device with:
-  -device smbus-alert,name=<name>,irqname=<irqname>,address=..,bus=..
-where the name is the value that other I2C devices will use to attach
-to this device and the irqname is the name of the named irq that will
-be raised when the data is ready.
-
 Signed-off-by: Corey Minyard <cminyard@mvista.com>
 ---
- hw/i2c/Makefile.objs         |   2 +-
- hw/i2c/smbus_alert.c         | 130 +++++++++++++++++++++++++++++++++++++++++++
- include/hw/i2c/smbus.h       |   1 +
- include/hw/i2c/smbus_alert.h |  65 ++++++++++++++++++++++
- 4 files changed, 197 insertions(+), 1 deletion(-)
- create mode 100644 hw/i2c/smbus_alert.c
- create mode 100644 include/hw/i2c/smbus_alert.h
+ default-configs/i386-softmmu.mak   |   1 +
+ default-configs/x86_64-softmmu.mak |   1 +
+ hw/ipmi/Makefile.objs              |   1 +
+ hw/ipmi/smbus_ipmi.c               | 230 +++++++++++++++++++++++++++++++++++++
+ 4 files changed, 233 insertions(+)
+ create mode 100644 hw/ipmi/smbus_ipmi.c
 
-diff --git a/hw/i2c/Makefile.objs b/hw/i2c/Makefile.objs
-index a081b8e..7ad3d04 100644
---- a/hw/i2c/Makefile.objs
-+++ b/hw/i2c/Makefile.objs
-@@ -1,4 +1,4 @@
--common-obj-y += core.o smbus.o smbus_eeprom.o
-+common-obj-y += core.o smbus.o smbus_eeprom.o smbus_alert.o
- common-obj-$(CONFIG_DDC) += i2c-ddc.o
- common-obj-$(CONFIG_VERSATILE_I2C) += versatile_i2c.o
- common-obj-$(CONFIG_ACPI_X86) += smbus_ich9.o
-diff --git a/hw/i2c/smbus_alert.c b/hw/i2c/smbus_alert.c
+diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
+index 0b51360..803c2aa 100644
+--- a/default-configs/i386-softmmu.mak
++++ b/default-configs/i386-softmmu.mak
+@@ -14,6 +14,7 @@ CONFIG_IPMI_LOCAL=y
+ CONFIG_IPMI_EXTERN=y
+ CONFIG_ISA_IPMI_KCS=y
+ CONFIG_ISA_IPMI_BT=y
++CONFIG_IPMI_SSIF=y
+ CONFIG_SERIAL=y
+ CONFIG_PARALLEL=y
+ CONFIG_I8254=y
+diff --git a/default-configs/x86_64-softmmu.mak b/default-configs/x86_64-softmmu.mak
+index 7f89503..621c83b 100644
+--- a/default-configs/x86_64-softmmu.mak
++++ b/default-configs/x86_64-softmmu.mak
+@@ -14,6 +14,7 @@ CONFIG_IPMI_LOCAL=y
+ CONFIG_IPMI_EXTERN=y
+ CONFIG_ISA_IPMI_KCS=y
+ CONFIG_ISA_IPMI_BT=y
++CONFIG_IPMI_SSIF=y
+ CONFIG_SERIAL=y
+ CONFIG_PARALLEL=y
+ CONFIG_I8254=y
+diff --git a/hw/ipmi/Makefile.objs b/hw/ipmi/Makefile.objs
+index 1b422bb..bb37016 100644
+--- a/hw/ipmi/Makefile.objs
++++ b/hw/ipmi/Makefile.objs
+@@ -3,3 +3,4 @@ common-obj-$(CONFIG_IPMI_LOCAL) += ipmi_bmc_sim.o
+ common-obj-$(CONFIG_IPMI_EXTERN) += ipmi_bmc_extern.o
+ common-obj-$(CONFIG_ISA_IPMI_KCS) += isa_ipmi_kcs.o
+ common-obj-$(CONFIG_ISA_IPMI_BT) += isa_ipmi_bt.o
++common-obj-$(CONFIG_IPMI_SSIF) += smbus_ipmi.o
+diff --git a/hw/ipmi/smbus_ipmi.c b/hw/ipmi/smbus_ipmi.c
 new file mode 100644
-index 0000000..5be83e7
+index 0000000..4d99b48
 --- /dev/null
-+++ b/hw/i2c/smbus_alert.c
-@@ -0,0 +1,130 @@
++++ b/hw/ipmi/smbus_ipmi.c
+@@ -0,0 +1,230 @@
 +/*
-+ * QEMU SMBus alert
++ * QEMU IPMI SMBus (SSIF) emulation
 + *
 + * Copyright (c) 2015,2016 Corey Minyard, MontaVista Software, LLC
 + *
@@ -95,193 +104,210 @@ index 0000000..5be83e7
 + */
 +#include "qemu/osdep.h"
 +#include "hw/hw.h"
-+#include "hw/i2c/smbus_alert.h"
++#include "hw/i2c/smbus.h"
 +#include "qapi/error.h"
 +#include "qemu/error-report.h"
++#include "hw/ipmi/ipmi.h"
 +
-+static void smbus_alert(SMBusAlertDevice *sad, SMBusAlertEntry *alert)
-+{
-+    if (alert->enqueued) {
-+        return;
-+    }
++#define TYPE_SMBUS_IPMI "smbus-ipmi"
++#define SMBUS_IPMI(obj) OBJECT_CHECK(SMBusIPMIDevice, (obj), TYPE_SMBUS_IPMI)
 +
-+    alert->enqueued = true;
-+    QSIMPLEQ_INSERT_TAIL(&sad->alert_queue, alert, link);
-+    qemu_irq_raise(*sad->irq);
-+}
++#define SSIF_IPMI_REQUEST                       2
++#define SSIF_IPMI_MULTI_PART_REQUEST_START      6
++#define SSIF_IPMI_MULTI_PART_REQUEST_MIDDLE     7
++#define SSIF_IPMI_RESPONSE                      3
++#define SSIF_IPMI_MULTI_PART_RESPONSE_MIDDLE    9
 +
-+static uint8_t alert_receive_byte(SMBusDevice *dev)
-+{
-+    SMBusAlertDevice *sad = (SMBusAlertDevice *) dev;
-+    SMBusAlertEntry *alert = QSIMPLEQ_FIRST(&sad->alert_queue);
-+
-+    if (!alert) {
-+        return -1;
-+    }
-+
-+    alert->enqueued = false;
-+    QSIMPLEQ_REMOVE_HEAD(&sad->alert_queue, link);
-+
-+    if (QSIMPLEQ_EMPTY(&sad->alert_queue)) {
-+            qemu_irq_lower(*sad->irq);
-+    }
-+
-+    return alert->val;
-+}
-+
-+static int smbus_alert_event(SMBusDevice *dev, enum i2c_event event)
-+{
-+    SMBusAlertDevice *sad = (SMBusAlertDevice *) dev;
-+
-+    if (event == I2C_START_RECV && QSIMPLEQ_EMPTY(&sad->alert_queue)) {
-+        return -1;
-+    }
-+
-+    return 0;
-+}
-+
-+static void smbus_alert_realize(DeviceState *dev, Error **errp)
-+{
-+    SMBusAlertDevice *sad = SMBUS_ALERT_DEVICE(dev);
-+    IRQInterfaceClass *iic;
-+
-+    if (!sad->irqdev) {
-+        error_setg(errp, "SMBus alert device created without irqid");
-+        return;
-+    }
-+
-+    iic = IRQ_INTERFACE_GET_CLASS(sad->irqdev);
-+
-+    sad->irq = iic->get_irq(sad->irqdev);
-+}
-+
-+static void irq_check(Object *obj, const char *name,
-+                      Object *val, Error **errp)
-+{
-+    /* Always succeed. */
-+}
-+
-+static void smbus_alert_init(Object *obj)
-+{
-+    SMBusAlertDevice *sad = SMBUS_ALERT_DEVICE(obj);
-+
-+    QSIMPLEQ_INIT(&sad->alert_queue);
-+
-+    object_property_add_link(obj, "irqid", TYPE_IRQ_INTERFACE,
-+                             (Object **) &sad->irqdev, irq_check,
-+                             OBJ_PROP_LINK_UNREF_ON_RELEASE,
-+                             &error_abort);
-+}
-+
-+static void smbus_alert_class_init(ObjectClass *oc, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(oc);
-+    SMBusDeviceClass *sc = SMBUS_DEVICE_CLASS(oc);
-+    SMBusAlertDeviceClass *sadc = SMBUS_ALERT_DEVICE_CLASS(oc);
-+
-+    dc->realize = smbus_alert_realize;
-+    sc->receive_byte = alert_receive_byte;
-+    sc->event = smbus_alert_event;
-+    sadc->alert = smbus_alert;
-+}
-+
-+static const TypeInfo smbus_alert_info = {
-+    .name          = TYPE_SMBUS_ALERT_DEVICE,
-+    .parent        = TYPE_SMBUS_DEVICE,
-+    .instance_size = sizeof(SMBusAlertDevice),
-+    .instance_init = smbus_alert_init,
-+    .class_init    = smbus_alert_class_init,
-+    .class_size    = sizeof(SMBusAlertDeviceClass),
-+};
-+
-+static void smbus_alert_register_types(void)
-+{
-+    type_register_static(&smbus_alert_info);
-+}
-+
-+type_init(smbus_alert_register_types)
-diff --git a/include/hw/i2c/smbus.h b/include/hw/i2c/smbus.h
-index fc995eb..b6e149a 100644
---- a/include/hw/i2c/smbus.h
-+++ b/include/hw/i2c/smbus.h
-@@ -26,6 +26,7 @@
-  */
- 
- #include "hw/i2c/i2c.h"
-+#include "qemu/queue.h"
- 
- #define TYPE_SMBUS_DEVICE "smbus-device"
- #define SMBUS_DEVICE(obj) \
-diff --git a/include/hw/i2c/smbus_alert.h b/include/hw/i2c/smbus_alert.h
-new file mode 100644
-index 0000000..0b01be7
---- /dev/null
-+++ b/include/hw/i2c/smbus_alert.h
-@@ -0,0 +1,65 @@
-+/*
-+ * QEMU SMBus alert
-+ *
-+ * Copyright (c) 2015,2016 Corey Minyard, MontaVista Software, LLC
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+
-+#include "hw/irqif.h"
-+#include "qemu/queue.h"
-+#include "hw/i2c/smbus.h"
-+
-+#ifndef HW_I2C_SMBUS_ALERT
-+#define HW_I2C_SMBUS_ALERT
-+
-+typedef struct SMBusAlertEntry {
-+    uint8_t val;
-+
-+    /* Internal use */
-+    bool enqueued;
-+    QSIMPLEQ_ENTRY(SMBusAlertEntry) link;
-+} SMBusAlertEntry;
-+
-+typedef struct SMBusAlertDevice {
++typedef struct SMBusIPMIDevice {
 +    SMBusDevice parent;
 +
-+    IRQInterface *irqdev;
-+    qemu_irq *irq;
++    IPMIBmc *bmc;
 +
-+    QSIMPLEQ_HEAD(, SMBusAlertEntry) alert_queue;
-+} SMBusAlertDevice;
++    uint8_t outmsg[MAX_IPMI_MSG_SIZE];
++    uint32_t outpos;
++    uint32_t outlen;
 +
-+typedef struct SMBusAlertDeviceClass {
-+    SMBusDeviceClass parent;
++    uint8_t inmsg[MAX_IPMI_MSG_SIZE];
++    uint32_t inlen;
 +
-+    void (*alert)(SMBusAlertDevice *sad, SMBusAlertEntry *alert);
-+} SMBusAlertDeviceClass;
++    /*
++     * This is a response number that we send with the command to make
++     * sure that the response matches the command.
++     */
++    uint8_t waiting_rsp;
 +
-+#define TYPE_SMBUS_ALERT_DEVICE "smbus-alert"
-+#define SMBUS_ALERT_DEVICE(obj) OBJECT_CHECK(SMBusAlertDevice, (obj),    \
-+                                             TYPE_SMBUS_ALERT_DEVICE)
-+#define SMBUS_ALERT_DEVICE_CLASS(obj) OBJECT_CLASS_CHECK(SMBusAlertDeviceClass,\
-+                                             (obj),            \
-+                                             TYPE_SMBUS_ALERT_DEVICE)
-+#define SMBUS_ALERT_DEVICE_GET_CLASS(obj) \
-+                OBJECT_GET_CLASS(SMBusAlertDeviceClass,  (obj),            \
-+                                 TYPE_SMBUS_ALERT_DEVICE)
++    uint32_t uuid;
++} SMBusIPMIDevice;
 +
-+#endif /* HW_I2C_SMBUS_ALERT */
++static void smbus_ipmi_handle_event(IPMIInterface *ii)
++{
++    /* No interrupts, so nothing to do here. */
++}
++
++static void smbus_ipmi_handle_rsp(IPMIInterface *ii, uint8_t msg_id,
++                                  unsigned char *rsp, unsigned int rsp_len)
++{
++    SMBusIPMIDevice *sid = SMBUS_IPMI(ii);
++
++    if (sid->waiting_rsp == msg_id) {
++        sid->waiting_rsp++;
++
++        memcpy(sid->outmsg, rsp, rsp_len);
++        sid->outlen = rsp_len;
++        sid->outpos = 0;
++    }
++}
++
++static void smbus_ipmi_set_atn(IPMIInterface *ii, int val, int irq)
++{
++    /* This is where PEC would go. */
++}
++
++static void smbus_ipmi_set_irq_enable(IPMIInterface *ii, int val)
++{
++}
++
++static void ipmi_quick_cmd(SMBusDevice *dev, uint8_t read)
++{
++}
++
++static void ipmi_send_byte(SMBusDevice *dev, uint8_t val)
++{
++}
++
++static uint8_t ipmi_receive_byte(SMBusDevice *dev)
++{
++    SMBusIPMIDevice *sid = SMBUS_IPMI(dev);
++
++    if (sid->outpos >= sid->outlen) {
++        return 0;
++    }
++
++    return sid->outmsg[sid->outpos++];
++}
++
++static void ipmi_write_data(SMBusDevice *dev, uint8_t cmd, uint8_t *buf,
++                            int len)
++{
++    SMBusIPMIDevice *sid = SMBUS_IPMI(dev);
++    IPMIBmcClass *bk = IPMI_BMC_GET_CLASS(sid->bmc);
++
++    if (cmd != SSIF_IPMI_REQUEST) {
++        return;
++    }
++
++    if (len < 3 || len > MAX_IPMI_MSG_SIZE || buf[0] != len - 1) {
++        return;
++    }
++
++    memcpy(sid->inmsg, buf + 1, len - 1);
++    sid->inlen = len;
++
++    sid->outlen = 0;
++    sid->outpos = 0;
++    bk->handle_command(sid->bmc, sid->inmsg, sid->inlen, sizeof(sid->inmsg),
++                       sid->waiting_rsp);
++}
++
++static uint8_t ipmi_read_data(SMBusDevice *dev, uint8_t cmd, int n)
++{
++    SMBusIPMIDevice *sid = SMBUS_IPMI(dev);
++
++    if (cmd != SSIF_IPMI_RESPONSE) {
++        return 0;
++    }
++
++    if (n == 0) {
++        return sid->outlen;
++    }
++
++    return ipmi_receive_byte(dev);
++}
++
++static const VMStateDescription vmstate_smbus_ipmi = {
++    .name = TYPE_SMBUS_IPMI,
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields      = (VMStateField[]) {
++        VMSTATE_UINT8(waiting_rsp, SMBusIPMIDevice),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static void smbus_ipmi_realize(DeviceState *dev, Error **errp)
++{
++    SMBusIPMIDevice *sid = SMBUS_IPMI(dev);
++    IPMIInterface *ii = IPMI_INTERFACE(dev);
++
++    if (!sid->bmc) {
++        error_setg(errp, "IPMI device requires a bmc attribute to be set");
++        return;
++    }
++
++    sid->uuid = ipmi_next_uuid();
++
++    sid->bmc->intf = ii;
++}
++
++static void smbus_ipmi_init(Object *obj)
++{
++    SMBusIPMIDevice *sid = SMBUS_IPMI(obj);
++
++    ipmi_bmc_find_and_link(OBJECT(obj), (Object **) &sid->bmc);
++}
++
++static void smbus_ipmi_get_fwinfo(struct IPMIInterface *ii, IPMIFwInfo *info)
++{
++    SMBusIPMIDevice *sid = SMBUS_IPMI(ii);
++
++    info->interface_name = "smbus";
++    info->interface_type = IPMI_SMBIOS_SSIF;
++    info->ipmi_spec_major_revision = 2;
++    info->ipmi_spec_minor_revision = 0;
++    info->i2c_slave_address = sid->bmc->slave_addr;
++    info->base_address = sid->parent.i2c.address;
++    info->memspace = IPMI_MEMSPACE_SMBUS;
++    info->register_spacing = 1;
++    info->uuid = sid->uuid;
++}
++
++static void smbus_ipmi_class_init(ObjectClass *oc, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(oc);
++    IPMIInterfaceClass *iic = IPMI_INTERFACE_CLASS(oc);
++    SMBusDeviceClass *sc = SMBUS_DEVICE_CLASS(oc);
++
++    sc->quick_cmd = ipmi_quick_cmd;
++    sc->send_byte = ipmi_send_byte;
++    sc->receive_byte = ipmi_receive_byte;
++    sc->write_data = ipmi_write_data;
++    sc->read_data = ipmi_read_data;
++    dc->vmsd = &vmstate_smbus_ipmi;
++    dc->realize = smbus_ipmi_realize;
++    iic->set_atn = smbus_ipmi_set_atn;
++    iic->handle_rsp = smbus_ipmi_handle_rsp;
++    iic->handle_if_event = smbus_ipmi_handle_event;
++    iic->set_irq_enable = smbus_ipmi_set_irq_enable;
++    iic->get_fwinfo = smbus_ipmi_get_fwinfo;
++}
++
++static const TypeInfo smbus_ipmi_info = {
++    .name          = TYPE_SMBUS_IPMI,
++    .parent        = TYPE_SMBUS_DEVICE,
++    .instance_size = sizeof(SMBusIPMIDevice),
++    .instance_init = smbus_ipmi_init,
++    .class_init    = smbus_ipmi_class_init,
++    .interfaces = (InterfaceInfo[]) {
++        { TYPE_IPMI_INTERFACE },
++        { }
++    }
++};
++
++static void smbus_ipmi_register_types(void)
++{
++    type_register_static(&smbus_ipmi_info);
++}
++
++type_init(smbus_ipmi_register_types)
 -- 
 2.7.4
