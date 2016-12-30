@@ -1,24 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33704)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34844)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <linux@roeck-us.net>) id 1cN3Jo-0004kI-B0
-	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 14:58:25 -0500
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1cN3QC-0006UU-5i
+	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 15:05:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <linux@roeck-us.net>) id 1cN3Jk-0005lj-Dl
-	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 14:58:24 -0500
-Received: from bh-25.webhostbox.net ([208.91.199.152]:58869)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <linux@roeck-us.net>) id 1cN3Jk-0005a5-65
-	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 14:58:20 -0500
-References: <bd0ad06c-1dce-03c9-73b0-d8d6e4ca333b@roeck-us.net>
-	<4b04ec32-b647-5047-7830-269cfc217550@ilande.co.uk>
-From: Guenter Roeck <linux@roeck-us.net>
-Message-ID: <3bee832c-1d2a-50a2-a763-c58ab34caf08@roeck-us.net>
-Date: Fri, 30 Dec 2016 11:57:34 -0800
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1cN3Q8-00015A-VG
+	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 15:05:00 -0500
+From: Pavel Butsykin <pbutsykin@virtuozzo.com>
+Date: Fri, 30 Dec 2016 17:31:33 +0300
+Message-ID: <20161230143142.18214-10-pbutsykin@virtuozzo.com>
+In-Reply-To: <20161230143142.18214-1-pbutsykin@virtuozzo.com>
+References: <20161230143142.18214-1-pbutsykin@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <4b04ec32-b647-5047-7830-269cfc217550@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Problems with qemu "modern" virtio on sparc64
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v2 09/18] block/pcache: skip readahead for
+ unallocated clusters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,100 +22,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, "qemu-devel@nongnu.org >> QEMU Developers" <qemu-devel@nongnu.org>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, den@openvz.org, eblake@redhat.com, armbru@redhat.com
 
-On 12/30/2016 10:18 AM, Mark Cave-Ayland wrote:
-> On 25/11/16 18:11, Guenter Roeck wrote:
->
->> Hi,
->>
->> I am using virtio on sparc64 for my Linux kernel runtime tests.
->>
->> Starting with qemu v2.7, I noticed that the kernel either gets stuck or
->> crashes.
->> After adding some debug information to the kernel, I found that the
->> problem happens
->> in vp_reset().
->>
->> Interestingly, when running v4.9-rc6 without modification, the kernel
->> crashes on me.
->> If I add pr_info just before and after the vp_iowrite8() in
->> virtio_pci_modern.c:vp_reset(),
->> the kernel gets stuck in the vp_iowrite8().
->>
->> Here is the relevant part of the crash:
->>
->> [    3.151167] Unable to handle kernel NULL pointer dereference
->> [    3.151809] tsk->{mm,active_mm}->context = 0000000000000000
->> [    3.152430] tsk->{mm,active_mm}->pgd = fffff80000402000
->> [    3.153032]               \|/ ____ \|/
->> [    3.153032]               "@'/ .. \`@"
->> [    3.153032]               /_| \__/ |_\
->> [    3.153032]                  \__U_/
->> [    3.154042] swapper(1): Oops [#1]
->> [    3.154773] CPU: 0 PID: 1 Comm: swapper Not tainted 4.9.0-rc5+ #4
->> [    3.155375] task: fffff8001f0af620 task.stack: fffff8001f0b0000
->> [    3.155958] TSTATE: 0000009980001606 TPC: 00000000006edf44 TNPC:
->> 00000000006edf48 Y: 00000000    Not tainted
->> [    3.156901] TPC: <vp_reset+0x4/0x40>
->>
->> None of the pointers used in vp_reset() is NULL. As mentioned above,
->> adding a pr_info
->> just before vp_iowrite8() makes the crash disappear and the kernel is
->> stuck instead.
->> Here is how it looks like:
->>
->> [    3.104243] Hi there
->> [   26.912509] NMI watchdog: BUG: soft lockup - CPU#0 stuck for 23s!
->> [swapper:1]
->> [   26.913102] Modules linked in:
->> [   26.914061] CPU: 0 PID: 1 Comm: swapper Not tainted 4.9.0-rc5+ #5
->> [   26.914633] task: fffff8001f0af620 task.stack: fffff8001f0b0000
->> [   26.915156] TSTATE: 0000004480001605 TPC: 00000000006edf50 TNPC:
->> 00000000006edf54 Y: 00000412    Not tainted
->> [   26.915954] TPC: <vp_reset+0x10/0x60>
->>
->> Another pr_info() after vp_iowrite8() is never printed, suggesting that
->> the code never
->> gets to that point.
->>
->> The kernel configuration is sparc64_defconfig with the following
->> configuration
->> options enabled.
->>
->> CONFIG_DEVTMPFS=y
->> CONFIG_VIRTIO=y
->> CONFIG_VIRTIO_PCI=y
->> CONFIG_VIRTIO_BLK=y
->> CONFIG_VIRTIO_NET=y
->> CONFIG_VIRTIO_BALLOON=y
->> CONFIG_VIRTIO_CONSOLE=y
->> CONFIG_SCSI_VIRTIO=y
->>
->> Command line is
->>
->> qemu-system-sparc64 -M sun4u -cpu "TI UltraSparc IIi" -m 512 \
->>     -drive file=simple-root-filesystem-sparc.ext3,if=virtio,format=raw \
->>     -kernel arch/sparc/boot/image -no-reboot \
->>     -append "root=/dev/vda init=/sbin/init.sh console=ttyS0" \
->>     -nographic -monitor none
->>
->> Does anyone have an idea what might be wrong ?
->>
->> Thanks,
->> Guenter
->
-> Hi Guenter,
->
-> Have you been able to investigate this issue any further? Does the 2.8
-> release solve the issue for you?
->
+Typically, data for unallocated clusters is filled with zeros, so it makes no
+sense to store it in the cache.
 
-I did not make any progress, and reverted to qemu v2.6.
+Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
+---
+ block/pcache.c | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
 
-Problem is still seen with v2.8 (release); it crashes. The recent virtio
-related patch does not make a difference. v2.7.1 also still crashes.
-Only difference with both versions is the crash traceback.
-
-Guenter
+diff --git a/block/pcache.c b/block/pcache.c
+index 57eebd434a..f30e9e7bfe 100644
+--- a/block/pcache.c
++++ b/block/pcache.c
+@@ -174,6 +174,28 @@ static RBCacheNode *pcache_node_alloc(uint64_t offset, uint64_t bytes,
+     return &node->common;
+ }
+ 
++static bool check_allocated_clusters(BlockDriverState *bs, uint64_t offset,
++                                     uint64_t bytes)
++{
++    int64_t sector_num = offset >> BDRV_SECTOR_BITS;
++    int32_t nb_sectors = bytes >> BDRV_SECTOR_BITS;
++
++    assert((offset & (BDRV_SECTOR_SIZE - 1)) == 0);
++    assert((bytes & (BDRV_SECTOR_SIZE - 1)) == 0);
++
++    do {
++        int num, ret = bdrv_is_allocated(bs, sector_num, nb_sectors, &num);
++        if (ret <= 0) {
++            return false;
++        }
++        sector_num += num;
++        nb_sectors -= num;
++
++    } while (nb_sectors);
++
++    return true;
++}
++
+ #define PCACHE_STEPS_FORWARD 2
+ 
+ static PCacheNode *get_readahead_node(BlockDriverState *bs, RBCache *rbcache,
+@@ -193,6 +215,10 @@ static PCacheNode *get_readahead_node(BlockDriverState *bs, RBCache *rbcache,
+             break;
+         }
+ 
++        if (!check_allocated_clusters(bs, offset, bytes)) {
++            break;
++        }
++
+         node = rbcache_search_and_insert(rbcache, offset, bytes);
+         if (node->status == NODE_STATUS_NEW) {
+             return node;
+-- 
+2.11.0
