@@ -1,19 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34035)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35893)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbutsykin@virtuozzo.com>) id 1cN0cp-00086j-Hh
-	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 12:05:52 -0500
+	(envelope-from <jcd@tribudubois.net>) id 1cN0l1-0004ee-0S
+	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 12:14:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbutsykin@virtuozzo.com>) id 1cN0cm-0005qf-C3
-	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 12:05:51 -0500
-From: Pavel Butsykin <pbutsykin@virtuozzo.com>
-Date: Fri, 30 Dec 2016 17:31:25 +0300
-Message-ID: <20161230143142.18214-2-pbutsykin@virtuozzo.com>
-In-Reply-To: <20161230143142.18214-1-pbutsykin@virtuozzo.com>
-References: <20161230143142.18214-1-pbutsykin@virtuozzo.com>
+	(envelope-from <jcd@tribudubois.net>) id 1cN0kx-0000IT-NU
+	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 12:14:18 -0500
+Received: from relay4-d.mail.gandi.net ([2001:4b98:c:538::196]:42082)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jcd@tribudubois.net>) id 1cN0kx-0000Hy-HW
+	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 12:14:15 -0500
+References: <20161224151113.23955-1-jcd@tribudubois.net>
+	<606aedd3-2f56-fb89-b547-763baf833ed5@gmail.com>
+	<5b3ba089-e218-40ff-3b72-f31ada1e4cfc@tribudubois.net>
+	<a6c26a91-696c-db4b-7311-7cfc7ef9ee74@gmail.com>
+	<ccab130c-3f65-e4b4-8453-b2fd0f1110ae@tribudubois.net>
+	<5f1acd02-018d-0a17-105c-cd42c50a3e91@tribudubois.net>
+	<d320496c-42d0-f8ae-71ea-e81073f2cf9d@gmail.com>
+From: Jean-Christophe DUBOIS <jcd@tribudubois.net>
+Message-ID: <684d34f1-9107-1ed0-1115-f3034bd899f4@tribudubois.net>
+Date: Fri, 30 Dec 2016 18:14:10 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 01/18] block/pcache: empty pcache driver
- filter
+In-Reply-To: <d320496c-42d0-f8ae-71ea-e81073f2cf9d@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] [M25P80] Make sure not to overrun the
+ internal data buffer.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,137 +33,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, den@openvz.org, eblake@redhat.com, armbru@redhat.com
+To: "mar.krzeminski" <mar.krzeminski@gmail.com>, qemu-devel@nongnu.org, peter.maydell@linaro.org
 
-The basic version of pcache driver for easy preparation of a patch set.
+Le 30/12/2016 à 16:39, mar.krzeminski a écrit :
+> I got some time, and reproduced the problem. Here are some logs with 
+> m25p80 debugs:
+> : decode_new_cmd: decoded new command:9f
+> : decode_new_cmd: populated jedec code
+> : decode_new_cmd: decoded new command:0
+> : decode_new_cmd: decoded new command:0 //Getting flash Id in above 4 
+> lines -> OK (but missing CS)
+> Found sst25vf016b compatible flash device
+> : decode_new_cmd: decoded new command:6 //Write enable, command 
+> without payload, so it is ok
+> : decode_new_cmd: decoded new command:1 //Write to status register, 
+> guest sends data
+> INFO: spi0.0: sst25vf016b (2048 Kbytes)
+> INFO: spi0.0: mtd
+>   .name = spi0.0,
+>   .size = 0x200000 (2MiB)
+>   .erasesize = 0x00001000 (4KiB)
+>   .numeraseregions = 0
+> Segmentation fault (core dumped) //Here probably guest try to send 
+> some data
+>
+> The root cause why m25p80 enter strange state is that CS line is not 
+> selected/deselected at all- there is missing debug from m25p80_cs.
+> In spi transfer CS line (here qemu_irq) should be 0 before begin of 
+> every message, and set after end of transmission.
+> In case of simple WREN command you should see something like this:
+> : m25p80_cs: deselect
+> : decode_new_cmd: decoded new command:6
+> : m25p80_cs: select
+>
+> Can you check spi controller model code?
 
-Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
----
- block/Makefile.objs |   1 +
- block/pcache.c      | 102 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 103 insertions(+)
- create mode 100644 block/pcache.c
+I'll double check.
 
-diff --git a/block/Makefile.objs b/block/Makefile.objs
-index 67a036a1df..0a024f4e66 100644
---- a/block/Makefile.objs
-+++ b/block/Makefile.objs
-@@ -4,6 +4,7 @@ block-obj-y += qed.o qed-gencb.o qed-l2-cache.o qed-table.o qed-cluster.o
- block-obj-y += qed-check.o
- block-obj-y += vhdx.o vhdx-endian.o vhdx-log.o
- block-obj-y += quorum.o
-+block-obj-y += pcache.o
- block-obj-y += parallels.o blkdebug.o blkverify.o blkreplay.o
- block-obj-y += block-backend.o snapshot.o qapi.o
- block-obj-$(CONFIG_WIN32) += raw-win32.o win32-aio.o
-diff --git a/block/pcache.c b/block/pcache.c
-new file mode 100644
-index 0000000000..7a67618408
---- /dev/null
-+++ b/block/pcache.c
-@@ -0,0 +1,102 @@
-+/*
-+ * Prefetch cache driver filter
-+ *
-+ * Copyright (C) 2015-2016 Parallels IP Holdings GmbH.
-+ *
-+ * Author: Pavel Butsykin <pbutsykin@virtuozzo.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or
-+ * later.  See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "block/block_int.h"
-+#include "qapi/error.h"
-+#include "qapi/qmp/qstring.h"
-+
-+
-+static QemuOptsList runtime_opts = {
-+    .name = "pcache",
-+    .head = QTAILQ_HEAD_INITIALIZER(runtime_opts.head),
-+    .desc = {
-+        { /* end of list */ }
-+    },
-+};
-+
-+static coroutine_fn int pcache_co_preadv(BlockDriverState *bs, uint64_t offset,
-+                                         uint64_t bytes, QEMUIOVector *qiov,
-+                                         int flags)
-+{
-+    return bdrv_co_preadv(bs->file, offset, bytes, qiov, flags);
-+}
-+
-+static coroutine_fn int pcache_co_pwritev(BlockDriverState *bs, uint64_t offset,
-+                                          uint64_t bytes, QEMUIOVector *qiov,
-+                                          int flags)
-+{
-+    return bdrv_co_pwritev(bs->file, offset, bytes, qiov, flags);
-+}
-+
-+static int pcache_file_open(BlockDriverState *bs, QDict *options, int flags,
-+                            Error **errp)
-+{
-+    QemuOpts *opts;
-+    Error *local_err = NULL;
-+    int ret = 0;
-+
-+    opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
-+    qemu_opts_absorb_qdict(opts, options, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        ret = -EINVAL;
-+        goto fail;
-+    }
-+
-+    assert(bs->file == NULL);
-+    bs->file = bdrv_open_child(NULL, options, "image", bs, &child_format,
-+                               false, &local_err);
-+    if (local_err) {
-+        ret = -EINVAL;
-+        error_propagate(errp, local_err);
-+    }
-+fail:
-+    qemu_opts_del(opts);
-+    return ret;
-+}
-+
-+static void pcache_close(BlockDriverState *bs)
-+{
-+}
-+
-+static int64_t pcache_getlength(BlockDriverState *bs)
-+{
-+    return bdrv_getlength(bs->file->bs);
-+}
-+
-+static bool pcache_recurse_is_first_non_filter(BlockDriverState *bs,
-+                                               BlockDriverState *candidate)
-+{
-+    return bdrv_recurse_is_first_non_filter(bs->file->bs, candidate);
-+}
-+
-+static BlockDriver bdrv_pcache = {
-+    .format_name                        = "pcache",
-+    .instance_size                      = 0,
-+
-+    .bdrv_file_open                     = pcache_file_open,
-+    .bdrv_close                         = pcache_close,
-+    .bdrv_getlength                     = pcache_getlength,
-+
-+    .bdrv_co_preadv                     = pcache_co_preadv,
-+    .bdrv_co_pwritev                    = pcache_co_pwritev,
-+
-+    .is_filter                          = true,
-+    .bdrv_recurse_is_first_non_filter   = pcache_recurse_is_first_non_filter,
-+};
-+
-+static void bdrv_cache_init(void)
-+{
-+    bdrv_register(&bdrv_pcache);
-+}
-+
-+block_init(bdrv_cache_init);
--- 
-2.11.0
+But why is the SPI memory/device even responding if CS is not set ?
+
+>
+> Thanks,
+> Marcin
+>
+>
