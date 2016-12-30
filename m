@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50953)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50986)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cMu8V-0001Dz-3M
-	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 05:10:10 -0500
+	(envelope-from <jasowang@redhat.com>) id 1cMu8Y-0001Ff-Ma
+	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 05:10:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cMu8T-0005ck-2c
-	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 05:10:06 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45588)
+	(envelope-from <jasowang@redhat.com>) id 1cMu8W-0005fy-5l
+	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 05:10:10 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47818)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cMu8S-0005cP-RC
-	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 05:10:05 -0500
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cMu8V-0005eC-Th
+	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 05:10:08 -0500
 From: Jason Wang <jasowang@redhat.com>
-Date: Fri, 30 Dec 2016 18:09:13 +0800
-Message-Id: <1483092559-24488-5-git-send-email-jasowang@redhat.com>
+Date: Fri, 30 Dec 2016 18:09:14 +0800
+Message-Id: <1483092559-24488-6-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1483092559-24488-1-git-send-email-jasowang@redhat.com>
 References: <1483092559-24488-1-git-send-email-jasowang@redhat.com>
-Subject: [Qemu-devel] [PATCH V4 04/10] exec: introduce
- address_space_get_iotlb_entry()
+Subject: [Qemu-devel] [PATCH V4 05/10] intel_iommu: support device iotlb
+ descriptor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,81 +25,231 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: mst@redhat.com, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, peterx@redhat.com, cornelia.huck@de.ibm.com, wexu@redhat.com, vkaplans@redhat.com, Jason Wang <jasowang@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>
+Cc: pbonzini@redhat.com, peterx@redhat.com, cornelia.huck@de.ibm.com, wexu@redhat.com, vkaplans@redhat.com, Jason Wang <jasowang@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-This patch introduces a helper to query the iotlb entry for a
-possible iova. This will be used by later device IOTLB API to enable
-the capability for a dataplane (e.g vhost) to query the IOTLB.
+This patch enables device IOTLB support for intel iommu. The major
+work is to implement QI device IOTLB descriptor processing and notify
+the device through iommu notifier.
 
 Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>
 Cc: Richard Henderson <rth@twiddle.net>
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- exec.c                | 33 +++++++++++++++++++++++++++++++++
- include/exec/memory.h |  5 +++++
- 2 files changed, 38 insertions(+)
+ hw/i386/intel_iommu.c          | 83 +++++++++++++++++++++++++++++++++++++++---
+ hw/i386/intel_iommu_internal.h | 13 ++++++-
+ hw/i386/x86-iommu.c            | 17 +++++++++
+ include/hw/i386/x86-iommu.h    |  1 +
+ 4 files changed, 107 insertions(+), 7 deletions(-)
 
-diff --git a/exec.c b/exec.c
-index 8d4bb0e..47835c1 100644
---- a/exec.c
-+++ b/exec.c
-@@ -449,6 +449,39 @@ address_space_translate_internal(AddressSpaceDispatch *d, hwaddr addr, hwaddr *x
+diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+index 58ab143..bcbe5a7 100644
+--- a/hw/i386/intel_iommu.c
++++ b/hw/i386/intel_iommu.c
+@@ -738,11 +738,18 @@ static int vtd_dev_to_context_entry(IntelIOMMUState *s, uint8_t bus_num,
+                     "context-entry hi 0x%"PRIx64 " lo 0x%"PRIx64,
+                     ce->hi, ce->lo);
+         return -VTD_FR_CONTEXT_ENTRY_INV;
+-    } else if (ce->lo & VTD_CONTEXT_ENTRY_TT) {
+-        VTD_DPRINTF(GENERAL, "error: unsupported Translation Type in "
+-                    "context-entry hi 0x%"PRIx64 " lo 0x%"PRIx64,
+-                    ce->hi, ce->lo);
+-        return -VTD_FR_CONTEXT_ENTRY_INV;
++    } else {
++        switch (ce->lo & VTD_CONTEXT_ENTRY_TT) {
++        case VTD_CONTEXT_TT_MULTI_LEVEL:
++            /* fall through */
++        case VTD_CONTEXT_TT_DEV_IOTLB:
++            break;
++        default:
++            VTD_DPRINTF(GENERAL, "error: unsupported Translation Type in "
++                        "context-entry hi 0x%"PRIx64 " lo 0x%"PRIx64,
++                        ce->hi, ce->lo);
++            return -VTD_FR_CONTEXT_ENTRY_INV;
++        }
+     }
+     return 0;
  }
- 
- /* Called from RCU critical section */
-+IOMMUTLBEntry address_space_get_iotlb_entry(AddressSpace *as, hwaddr addr,
-+                                            bool is_write)
-+{
-+    IOMMUTLBEntry iotlb = {0};
-+    MemoryRegionSection *section;
-+    MemoryRegion *mr;
-+
-+    for (;;) {
-+        AddressSpaceDispatch *d = atomic_rcu_read(&as->dispatch);
-+        section = address_space_lookup_region(d, addr, false);
-+        addr = addr - section->offset_within_address_space
-+               + section->offset_within_region;
-+        mr = section->mr;
-+
-+        if (!mr->iommu_ops) {
-+            break;
-+        }
-+
-+        iotlb = mr->iommu_ops->translate(mr, addr, is_write);
-+        if (!(iotlb.perm & (1 << is_write))) {
-+            iotlb.target_as = NULL;
-+            break;
-+        }
-+
-+        addr = ((iotlb.translated_addr & ~iotlb.addr_mask)
-+                | (addr & iotlb.addr_mask));
-+        as = iotlb.target_as;
-+    }
-+
-+    return iotlb;
+@@ -1438,7 +1445,61 @@ static bool vtd_process_inv_iec_desc(IntelIOMMUState *s,
+     vtd_iec_notify_all(s, !inv_desc->iec.granularity,
+                        inv_desc->iec.index,
+                        inv_desc->iec.index_mask);
++    return true;
 +}
 +
-+/* Called from RCU critical section */
- MemoryRegion *address_space_translate(AddressSpace *as, hwaddr addr,
-                                       hwaddr *xlat, hwaddr *plen,
-                                       bool is_write)
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index 64560f6..358edfb 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -1537,6 +1537,11 @@ void stl_le_phys_cached(MemoryRegionCache *cache, hwaddr addr, uint32_t val);
- void stl_be_phys_cached(MemoryRegionCache *cache, hwaddr addr, uint32_t val);
- void stq_le_phys_cached(MemoryRegionCache *cache, hwaddr addr, uint64_t val);
- void stq_be_phys_cached(MemoryRegionCache *cache, hwaddr addr, uint64_t val);
-+/* address_space_get_iotlb_entry: translate an address into an IOTLB
-+ * entry. Should be called from an RCU critical section.
-+ */
-+IOMMUTLBEntry address_space_get_iotlb_entry(AddressSpace *as, hwaddr addr,
-+                                            bool is_write);
++static bool vtd_process_device_iotlb_desc(IntelIOMMUState *s,
++                                          VTDInvDesc *inv_desc)
++{
++    VTDAddressSpace *vtd_dev_as;
++    IOMMUTLBEntry entry;
++    struct VTDBus *vtd_bus;
++    hwaddr addr;
++    uint64_t sz;
++    uint16_t sid;
++    uint8_t devfn;
++    bool size;
++    uint8_t bus_num;
++
++    addr = VTD_INV_DESC_DEVICE_IOTLB_ADDR(inv_desc->hi);
++    sid = VTD_INV_DESC_DEVICE_IOTLB_SID(inv_desc->lo);
++    devfn = sid & 0xff;
++    bus_num = sid >> 8;
++    size = VTD_INV_DESC_DEVICE_IOTLB_SIZE(inv_desc->hi);
++
++    if ((inv_desc->lo & VTD_INV_DESC_DEVICE_IOTLB_RSVD_LO) ||
++        (inv_desc->hi & VTD_INV_DESC_DEVICE_IOTLB_RSVD_HI)) {
++        VTD_DPRINTF(GENERAL, "error: non-zero reserved field in Device "
++                    "IOTLB Invalidate Descriptor hi 0x%"PRIx64 " lo 0x%"PRIx64,
++                    inv_desc->hi, inv_desc->lo);
++        return false;
++    }
++
++    vtd_bus = vtd_find_as_from_bus_num(s, bus_num);
++    if (!vtd_bus) {
++        goto done;
++    }
++
++    vtd_dev_as = vtd_bus->dev_as[devfn];
++    if (!vtd_dev_as) {
++        goto done;
++    }
++
++    if (size) {
++        sz = 1 << (ctz64(~(addr | (VTD_PAGE_MASK_4K - 1))) + 1);
++        addr &= ~(sz - 1);
++    } else {
++        sz = VTD_PAGE_SIZE;
++    }
  
- /* address_space_translate: translate an address range into an address space
-  * into a MemoryRegion and an address range into that section.  Should be
++    entry.target_as = &vtd_dev_as->as;
++    entry.addr_mask = sz - 1;
++    entry.iova = addr;
++    entry.perm = IOMMU_NONE;
++    entry.translated_addr = 0;
++    memory_region_notify_iommu(entry.target_as->root, entry);
++
++done:
+     return true;
+ }
+ 
+@@ -1490,6 +1551,14 @@ static bool vtd_process_inv_desc(IntelIOMMUState *s)
+         }
+         break;
+ 
++    case VTD_INV_DESC_DEVICE:
++        VTD_DPRINTF(INV, "Device IOTLB Invalidation Descriptor hi 0x%"PRIx64
++                    " lo 0x%"PRIx64, inv_desc.hi, inv_desc.lo);
++        if (!vtd_process_device_iotlb_desc(s, &inv_desc)) {
++            return false;
++        }
++        break;
++
+     default:
+         VTD_DPRINTF(GENERAL, "error: unkonw Invalidation Descriptor type "
+                     "hi 0x%"PRIx64 " lo 0x%"PRIx64 " type %"PRIu8,
+@@ -2395,6 +2464,10 @@ static void vtd_init(IntelIOMMUState *s)
+         assert(s->intr_eim != ON_OFF_AUTO_AUTO);
+     }
+ 
++    if (x86_iommu->dt_supported) {
++        s->ecap |= VTD_ECAP_DT;
++    }
++
+     vtd_reset_context_cache(s);
+     vtd_reset_iotlb(s);
+ 
+diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
+index 11abfa2..356f188 100644
+--- a/hw/i386/intel_iommu_internal.h
++++ b/hw/i386/intel_iommu_internal.h
+@@ -183,6 +183,7 @@
+ /* (offset >> 4) << 8 */
+ #define VTD_ECAP_IRO                (DMAR_IOTLB_REG_OFFSET << 4)
+ #define VTD_ECAP_QI                 (1ULL << 1)
++#define VTD_ECAP_DT                 (1ULL << 2)
+ /* Interrupt Remapping support */
+ #define VTD_ECAP_IR                 (1ULL << 3)
+ #define VTD_ECAP_EIM                (1ULL << 4)
+@@ -326,6 +327,7 @@ typedef union VTDInvDesc VTDInvDesc;
+ #define VTD_INV_DESC_TYPE               0xf
+ #define VTD_INV_DESC_CC                 0x1 /* Context-cache Invalidate Desc */
+ #define VTD_INV_DESC_IOTLB              0x2
++#define VTD_INV_DESC_DEVICE             0x3
+ #define VTD_INV_DESC_IEC                0x4 /* Interrupt Entry Cache
+                                                Invalidate Descriptor */
+ #define VTD_INV_DESC_WAIT               0x5 /* Invalidation Wait Descriptor */
+@@ -361,6 +363,13 @@ typedef union VTDInvDesc VTDInvDesc;
+ #define VTD_INV_DESC_IOTLB_RSVD_LO      0xffffffff0000ff00ULL
+ #define VTD_INV_DESC_IOTLB_RSVD_HI      0xf80ULL
+ 
++/* Mask for Device IOTLB Invalidate Descriptor */
++#define VTD_INV_DESC_DEVICE_IOTLB_ADDR(val) ((val) & 0xfffffffffffff000ULL)
++#define VTD_INV_DESC_DEVICE_IOTLB_SIZE(val) ((val) & 0x1)
++#define VTD_INV_DESC_DEVICE_IOTLB_SID(val) (((val) >> 32) & 0xFFFFULL)
++#define VTD_INV_DESC_DEVICE_IOTLB_RSVD_HI 0xffeULL
++#define VTD_INV_DESC_DEVICE_IOTLB_RSVD_LO 0xffff0000ffe0fff8
++
+ /* Information about page-selective IOTLB invalidate */
+ struct VTDIOTLBPageInvInfo {
+     uint16_t domain_id;
+@@ -399,8 +408,8 @@ typedef struct VTDRootEntry VTDRootEntry;
+ #define VTD_CONTEXT_ENTRY_FPD       (1ULL << 1) /* Fault Processing Disable */
+ #define VTD_CONTEXT_ENTRY_TT        (3ULL << 2) /* Translation Type */
+ #define VTD_CONTEXT_TT_MULTI_LEVEL  0
+-#define VTD_CONTEXT_TT_DEV_IOTLB    1
+-#define VTD_CONTEXT_TT_PASS_THROUGH 2
++#define VTD_CONTEXT_TT_DEV_IOTLB    (1ULL << 2)
++#define VTD_CONTEXT_TT_PASS_THROUGH (2ULL << 2)
+ /* Second Level Page Translation Pointer*/
+ #define VTD_CONTEXT_ENTRY_SLPTPTR   (~0xfffULL)
+ #define VTD_CONTEXT_ENTRY_RSVD_LO   (0xff0ULL | ~VTD_HAW_MASK)
+diff --git a/hw/i386/x86-iommu.c b/hw/i386/x86-iommu.c
+index 2278af7..23dcd3f 100644
+--- a/hw/i386/x86-iommu.c
++++ b/hw/i386/x86-iommu.c
+@@ -106,6 +106,18 @@ static void x86_iommu_intremap_prop_set(Object *o, bool value, Error **errp)
+     s->intr_supported = value;
+ }
+ 
++static bool x86_iommu_device_iotlb_prop_get(Object *o, Error **errp)
++{
++    X86IOMMUState *s = X86_IOMMU_DEVICE(o);
++    return s->dt_supported;
++}
++
++static void x86_iommu_device_iotlb_prop_set(Object *o, bool value, Error **errp)
++{
++    X86IOMMUState *s = X86_IOMMU_DEVICE(o);
++    s->dt_supported = value;
++}
++
+ static void x86_iommu_instance_init(Object *o)
+ {
+     X86IOMMUState *s = X86_IOMMU_DEVICE(o);
+@@ -114,6 +126,11 @@ static void x86_iommu_instance_init(Object *o)
+     s->intr_supported = false;
+     object_property_add_bool(o, "intremap", x86_iommu_intremap_prop_get,
+                              x86_iommu_intremap_prop_set, NULL);
++    s->dt_supported = false;
++    object_property_add_bool(o, "device-iotlb",
++                             x86_iommu_device_iotlb_prop_get,
++                             x86_iommu_device_iotlb_prop_set,
++                             NULL);
+ }
+ 
+ static const TypeInfo x86_iommu_info = {
+diff --git a/include/hw/i386/x86-iommu.h b/include/hw/i386/x86-iommu.h
+index 0c89d98..361c07c 100644
+--- a/include/hw/i386/x86-iommu.h
++++ b/include/hw/i386/x86-iommu.h
+@@ -73,6 +73,7 @@ typedef struct IEC_Notifier IEC_Notifier;
+ struct X86IOMMUState {
+     SysBusDevice busdev;
+     bool intr_supported;        /* Whether vIOMMU supports IR */
++    bool dt_supported;          /* Whether vIOMMU supports DT */
+     IommuType type;             /* IOMMU type - AMD/Intel     */
+     QLIST_HEAD(, IEC_Notifier) iec_notifiers; /* IEC notify list */
+ };
 -- 
 2.7.4
