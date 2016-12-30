@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43248)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43252)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1cMz0O-0002Gm-Rv
-	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 10:22:05 -0500
+	(envelope-from <tcminyard@gmail.com>) id 1cMz0O-0002Go-TQ
+	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 10:22:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1cMz0L-0000Cj-J7
+	(envelope-from <tcminyard@gmail.com>) id 1cMz0N-0000Dc-Nx
 	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 10:22:04 -0500
-Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:33860)
+Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:33437)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1cMz0L-0000CO-CY
-	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 10:22:01 -0500
-Received: by mail-pg0-x241.google.com with SMTP id b1so22369129pgc.1
-	for <qemu-devel@nongnu.org>; Fri, 30 Dec 2016 07:21:59 -0800 (PST)
+	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1cMz0N-0000DR-Iq
+	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 10:22:03 -0500
+Received: by mail-pf0-x244.google.com with SMTP id 127so12188027pfg.0
+	for <qemu-devel@nongnu.org>; Fri, 30 Dec 2016 07:22:03 -0800 (PST)
 Sender: Corey Minyard <tcminyard@gmail.com>
 From: minyard@acm.org
-Date: Fri, 30 Dec 2016 09:21:34 -0600
-Message-Id: <1483111310-24808-4-git-send-email-minyard@acm.org>
+Date: Fri, 30 Dec 2016 09:21:39 -0600
+Message-Id: <1483111310-24808-9-git-send-email-minyard@acm.org>
 In-Reply-To: <1483111310-24808-1-git-send-email-minyard@acm.org>
 References: <1483111310-24808-1-git-send-email-minyard@acm.org>
-Subject: [Qemu-devel] [PATCH 03/19] i2c:pm_smbus: Clean up some style issues
+Subject: [Qemu-devel] [PATCH 08/19] i2c:pm_smbus: Add interrupt handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,146 +31,114 @@ Cc: minyard@acm.org, Corey Minyard <cminyard@mvista.com>
 
 From: Corey Minyard <cminyard@mvista.com>
 
-Fix some spacing issues, remove extraneous comments, add some
-defines instead of hard-coding numbers.
+Add the necessary code so that interrupts actually work from
+the pm_smbus device.
 
 Signed-off-by: Corey Minyard <cminyard@mvista.com>
 ---
- hw/i2c/pm_smbus.c | 58 ++++++++++++++++++++++++++++++++++++-------------------
- 1 file changed, 38 insertions(+), 20 deletions(-)
+ hw/i2c/pm_smbus.c         | 14 +++++++++++++-
+ hw/i2c/smbus_ich9.c       | 17 +++++++++++++++++
+ include/hw/i2c/pm_smbus.h |  2 ++
+ 3 files changed, 32 insertions(+), 1 deletion(-)
 
 diff --git a/hw/i2c/pm_smbus.c b/hw/i2c/pm_smbus.c
-index 6fc3923..92c3aebd 100644
+index 92e3cc5..8838360 100644
 --- a/hw/i2c/pm_smbus.c
 +++ b/hw/i2c/pm_smbus.c
-@@ -23,8 +23,6 @@
- #include "hw/i2c/pm_smbus.h"
- #include "hw/i2c/smbus.h"
+@@ -205,6 +205,12 @@ error:
+     return;
+ }
  
--/* no save/load? */
--
- #define SMBHSTSTS       0x00
- #define SMBHSTCNT       0x02
- #define SMBHSTCMD       0x03
-@@ -33,19 +31,34 @@
- #define SMBHSTDAT1      0x06
- #define SMBBLKDAT       0x07
- 
--#define STS_HOST_BUSY   (1)
--#define STS_INTR        (1<<1)
--#define STS_DEV_ERR     (1<<2)
--#define STS_BUS_ERR     (1<<3)
--#define STS_FAILED      (1<<4)
--#define STS_SMBALERT    (1<<5)
--#define STS_INUSE_STS   (1<<6)
--#define STS_BYTE_DONE   (1<<7)
-+#define STS_HOST_BUSY   (1 << 0)
-+#define STS_INTR        (1 << 1)
-+#define STS_DEV_ERR     (1 << 2)
-+#define STS_BUS_ERR     (1 << 3)
-+#define STS_FAILED      (1 << 4)
-+#define STS_SMBALERT    (1 << 5)
-+#define STS_INUSE_STS   (1 << 6)
-+#define STS_BYTE_DONE   (1 << 7)
- /* Signs of successfully transaction end :
- *  ByteDoneStatus = 1 (STS_BYTE_DONE) and INTR = 1 (STS_INTR )
- */
- 
--//#define DEBUG
-+#define CTL_INTREN      (1 << 0)
-+#define CTL_KILL        (1 << 1)
-+#define CTL_LAST_BYTE   (1 << 5)
-+#define CTL_START       (1 << 6)
-+#define CTL_PEC_EN      (1 << 7)
-+#define CTL_RETURN_MASK 0x1f
++static bool
++smb_irq_value(PMSMBus *s)
++{
++    return ((s->smb_stat & ~STS_HOST_BUSY) != 0) && (s->smb_ctl & CTL_INTREN);
++}
 +
-+#define PROT_QUICK          0
-+#define PROT_BYTE           1
-+#define PROT_BYTE_DATA      2
-+#define PROT_WORD_DATA      3
-+#define PROT_PROC_CALL      4
-+#define PROT_BLOCK_DATA     5
-+#define PROT_I2C_BLOCK_DATA 6
-+
-+/*#define DEBUG*/
- 
- #ifdef DEBUG
- # define SMBUS_DPRINTF(format, ...)     printf(format, ## __VA_ARGS__)
-@@ -68,11 +81,12 @@ static void smb_transaction(PMSMBus *s)
-     if ((s->smb_stat & STS_DEV_ERR) != 0)  {
-         goto error;
+ static void smb_ioport_writeb(void *opaque, hwaddr addr, uint64_t val,
+                               unsigned width)
+ {
+@@ -300,7 +306,9 @@ static void smb_ioport_writeb(void *opaque, hwaddr addr, uint64_t val,
      }
-+
-     switch(prot) {
--    case 0x0:
-+    case PROT_QUICK:
-         ret = smbus_quick_command(bus, addr, read);
-         goto done;
--    case 0x1:
-+    case PROT_BYTE:
-         if (read) {
-             ret = smbus_receive_byte(bus, addr);
-             goto data8;
-@@ -80,7 +94,7 @@ static void smb_transaction(PMSMBus *s)
-             ret = smbus_send_byte(bus, addr, cmd);
-             goto done;
-         }
--    case 0x2:
-+    case PROT_BYTE_DATA:
-         if (read) {
-             ret = smbus_read_byte(bus, addr, cmd);
-             goto data8;
-@@ -89,16 +103,17 @@ static void smb_transaction(PMSMBus *s)
-             goto done;
-         }
-         break;
--    case 0x3:
-+    case PROT_WORD_DATA:
-         if (read) {
-             ret = smbus_read_word(bus, addr, cmd);
-             goto data16;
-         } else {
--            ret = smbus_write_word(bus, addr, cmd, (s->smb_data1 << 8) | s->smb_data0);
-+            ret = smbus_write_word(bus, addr, cmd,
-+                                   (s->smb_data1 << 8) | s->smb_data0);
-             goto done;
-         }
-         break;
--    case 0x5:
-+    case PROT_I2C_BLOCK_DATA:
-         if (read) {
-             ret = smbus_read_block(bus, addr, cmd, s->smb_data);
-             goto data8;
-@@ -149,8 +164,9 @@ static void smb_ioport_writeb(void *opaque, hwaddr addr, uint64_t val,
-         break;
-     case SMBHSTCNT:
-         s->smb_ctl = val;
--        if (val & 0x40)
-+        if (s->smb_ctl & CTL_START) {
-             smb_transaction(s);
-+        }
-         break;
-     case SMBHSTCMD:
-         s->smb_cmd = val;
-@@ -185,7 +201,7 @@ static uint64_t smb_ioport_readb(void *opaque, hwaddr addr, unsigned width)
-         break;
-     case SMBHSTCNT:
-         s->smb_index = 0;
--        val = s->smb_ctl & 0x1f;
-+        val = s->smb_ctl & CTL_RETURN_MASK;
-         break;
-     case SMBHSTCMD:
-         val = s->smb_cmd;
-@@ -208,7 +224,9 @@ static uint64_t smb_ioport_readb(void *opaque, hwaddr addr, unsigned width)
-         val = 0;
-         break;
-     }
--    SMBUS_DPRINTF("SMB readb port=0x%04" HWADDR_PRIx " val=0x%02x\n", addr, val);
-+    SMBUS_DPRINTF("SMB readb port=0x%04" HWADDR_PRIx " val=0x%02x\n",
-+                  addr, val);
+ 
+  out:
+-    return;
++    if (s->set_irq) {
++        s->set_irq(s, smb_irq_value(s));
++    }
+ }
+ 
+ static uint64_t smb_ioport_readb(void *opaque, hwaddr addr, unsigned width)
+@@ -352,6 +360,10 @@ static uint64_t smb_ioport_readb(void *opaque, hwaddr addr, unsigned width)
+     SMBUS_DPRINTF("SMB readb port=0x%04" HWADDR_PRIx " val=0x%02x\n",
+                   addr, val);
+ 
++    if (s->set_irq) {
++        s->set_irq(s, smb_irq_value(s));
++    }
 +
      return val;
  }
+ 
+diff --git a/hw/i2c/smbus_ich9.c b/hw/i2c/smbus_ich9.c
+index 85c7260..5bc34de 100644
+--- a/hw/i2c/smbus_ich9.c
++++ b/hw/i2c/smbus_ich9.c
+@@ -41,6 +41,8 @@
+ typedef struct ICH9SMBState {
+     PCIDevice dev;
+ 
++    bool irq_enabled;
++
+     PMSMBus smb;
+ } ICH9SMBState;
+ 
+@@ -50,6 +52,7 @@ static const VMStateDescription vmstate_ich9_smbus = {
+     .minimum_version_id = 1,
+     .fields = (VMStateField[]) {
+         VMSTATE_PCI_DEVICE(dev, ICH9SMBState),
++        VMSTATE_BOOL(irq_enabled, ICH9SMBState),
+         VMSTATE_STRUCT(smb, ICH9SMBState, 1, pmsmb_vmstate, PMSMBus),
+         VMSTATE_END_OF_LIST()
+     }
+@@ -111,11 +114,25 @@ static void ich9_smb_class_init(ObjectClass *klass, void *data)
+     dc->cannot_instantiate_with_device_add_yet = true;
+ }
+ 
++static void ich9_smb_set_irq(PMSMBus *pmsmb, bool enabled)
++{
++    ICH9SMBState *s = pmsmb->opaque;
++
++    if (enabled == s->irq_enabled) {
++        return;
++    }
++
++    s->irq_enabled = enabled;
++    pci_set_irq(&s->dev, enabled);
++}
++
+ I2CBus *ich9_smb_init(PCIBus *bus, int devfn, uint32_t smb_io_base)
+ {
+     PCIDevice *d =
+         pci_create_simple_multifunction(bus, devfn, true, TYPE_ICH9_SMB_DEVICE);
+     ICH9SMBState *s = ICH9_SMB_DEVICE(d);
++    s->smb.set_irq = ich9_smb_set_irq;
++    s->smb.opaque = s;
+     return s->smb.smbus;
+ }
+ 
+diff --git a/include/hw/i2c/pm_smbus.h b/include/hw/i2c/pm_smbus.h
+index b1e1970..cfe596f 100644
+--- a/include/hw/i2c/pm_smbus.h
++++ b/include/hw/i2c/pm_smbus.h
+@@ -23,6 +23,8 @@ typedef struct PMSMBus {
+ 
+     /* Set by the user. */
+     bool i2c_enable;
++    void (*set_irq)(struct PMSMBus *s, bool enabled);
++    void *opaque;
+ 
+     /* Internally used by pm_smbus. */
  
 -- 
 2.7.4
