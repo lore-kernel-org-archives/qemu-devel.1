@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56268)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34644)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cMxOu-0003lM-MS
-	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 08:39:17 -0500
+	(envelope-from <imammedo@redhat.com>) id 1cMyAt-00031u-9H
+	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 09:28:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cMxOr-0005dT-IT
-	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 08:39:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55808)
+	(envelope-from <imammedo@redhat.com>) id 1cMyAp-00023y-Vr
+	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 09:28:51 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43238)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cMxOr-0005d6-9Z
-	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 08:39:13 -0500
-Date: Fri, 30 Dec 2016 14:38:54 +0100
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cMyAp-00023t-PX
+	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 09:28:47 -0500
+Date: Fri, 30 Dec 2016 15:28:34 +0100
 From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20161230143854.302045f5@Igors-MacBook-Pro.local>
-In-Reply-To: <1482866480-26208-4-git-send-email-ehabkost@redhat.com>
-References: <1482866480-26208-1-git-send-email-ehabkost@redhat.com>
-	<1482866480-26208-4-git-send-email-ehabkost@redhat.com>
+Message-ID: <20161230152834.6d1fa963@Igors-MacBook-Pro.local>
+In-Reply-To: <20161229223815.13705-1-ehabkost@redhat.com>
+References: <20161229223815.13705-1-ehabkost@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 3/4] pc: Add 2.9 machine-types
+Subject: Re: [Qemu-devel] [PATCH] qdev: Make "hotplugged" property read-only
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,106 +27,60 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Marcelo Tosatti <mtosatti@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, Haozhong Zhang <haozhong.zhang@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Michael S.
+	Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>, Andreas =?UTF-8?Q?F=C3=A4rber?= <afaerber@suse.de>
 
-On Tue, 27 Dec 2016 17:21:19 -0200
+On Thu, 29 Dec 2016 20:38:15 -0200
 Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Laszlo Ersek <lersek@redhat.com>
-> Cc: Igor Mammedov <imammedo@redhat.com>
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-
-> ---
->  include/hw/i386/pc.h |  1 +
->  hw/i386/pc_piix.c    | 15 ++++++++++++---
->  hw/i386/pc_q35.c     | 13 +++++++++++--
->  3 files changed, 24 insertions(+), 5 deletions(-)
+> The "hotplugged" property is user visible, but it was never meant
+> to be set by the user. There are probably multiple ways to break
+> or crash device code by overriding the property. One example:
 > 
-> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-> index b22e699..ceeacca 100644
-> --- a/include/hw/i386/pc.h
-> +++ b/include/hw/i386/pc.h
-> @@ -375,6 +375,7 @@ int e820_get_num_entries(void);
->  bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
->  
->  #define PC_COMPAT_2_8 \
-> +    HW_COMPAT_2_8
->  
->  #define PC_COMPAT_2_7 \
->      HW_COMPAT_2_7 \
-> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-> index 5e1adbe..9f102aa 100644
-> --- a/hw/i386/pc_piix.c
-> +++ b/hw/i386/pc_piix.c
-> @@ -437,13 +437,24 @@ static void pc_i440fx_machine_options(MachineClass *m)
->      m->default_display = "std";
+>   $ qemu-system-x86_64 -cpu qemu64,hotplugged=true
+>   Segmentation fault (core dumped)
+> 
+> The DeviceState::hotplugged struct field is set directly by
+> device_initfn(), there's no need to provide a setter for the
+> property.
+this property is meant to be used for individual devices on target side
+of migration.
+Doing above is a rather big hammer with behavioral change of migrated
+instance.
+
+So I'd  fix crash caused by assumption that hotplugged CPU
+guarantied to have rtc&fw_cfg available.
+I'll post a patch with the fix.
+
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> ---
+>  hw/core/qdev.c | 9 +--------
+>  1 file changed, 1 insertion(+), 8 deletions(-)
+> 
+> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+> index 57834423b9..f5989c41cb 100644
+> --- a/hw/core/qdev.c
+> +++ b/hw/core/qdev.c
+> @@ -1013,13 +1013,6 @@ static bool device_get_hotplugged(Object *obj, Error **err)
+>      return dev->hotplugged;
 >  }
 >  
-> -static void pc_i440fx_2_8_machine_options(MachineClass *m)
-> +static void pc_i440fx_2_9_machine_options(MachineClass *m)
+> -static void device_set_hotplugged(Object *obj, bool value, Error **err)
+> -{
+> -    DeviceState *dev = DEVICE(obj);
+> -
+> -    dev->hotplugged = value;
+> -}
+> -
+>  static void device_initfn(Object *obj)
 >  {
->      pc_i440fx_machine_options(m);
->      m->alias = "pc";
->      m->is_default = 1;
->  }
+>      DeviceState *dev = DEVICE(obj);
+> @@ -1039,7 +1032,7 @@ static void device_initfn(Object *obj)
+>      object_property_add_bool(obj, "hotpluggable",
+>                               device_get_hotpluggable, NULL, NULL);
+>      object_property_add_bool(obj, "hotplugged",
+> -                             device_get_hotplugged, device_set_hotplugged,
+> +                             device_get_hotplugged, NULL,
+>                               &error_abort);
 >  
-> +DEFINE_I440FX_MACHINE(v2_9, "pc-i440fx-2.9", NULL,
-> +                      pc_i440fx_2_9_machine_options);
-> +
-> +static void pc_i440fx_2_8_machine_options(MachineClass *m)
-> +{
-> +    pc_i440fx_2_9_machine_options(m);
-> +    m->is_default = 0;
-> +    m->alias = NULL;
-> +    SET_MACHINE_COMPAT(m, PC_COMPAT_2_8);
-> +}
-> +
->  DEFINE_I440FX_MACHINE(v2_8, "pc-i440fx-2.8", NULL,
->                        pc_i440fx_2_8_machine_options);
->  
-> @@ -451,8 +462,6 @@ DEFINE_I440FX_MACHINE(v2_8, "pc-i440fx-2.8", NULL,
->  static void pc_i440fx_2_7_machine_options(MachineClass *m)
->  {
->      pc_i440fx_2_8_machine_options(m);
-> -    m->is_default = 0;
-> -    m->alias = NULL;
->      SET_MACHINE_COMPAT(m, PC_COMPAT_2_7);
->  }
->  
-> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-> index d042fe0..dd792a8 100644
-> --- a/hw/i386/pc_q35.c
-> +++ b/hw/i386/pc_q35.c
-> @@ -301,19 +301,28 @@ static void pc_q35_machine_options(MachineClass *m)
->      m->max_cpus = 288;
->  }
->  
-> -static void pc_q35_2_8_machine_options(MachineClass *m)
-> +static void pc_q35_2_9_machine_options(MachineClass *m)
->  {
->      pc_q35_machine_options(m);
->      m->alias = "q35";
->  }
->  
-> +DEFINE_Q35_MACHINE(v2_9, "pc-q35-2.9", NULL,
-> +                   pc_q35_2_9_machine_options);
-> +
-> +static void pc_q35_2_8_machine_options(MachineClass *m)
-> +{
-> +    pc_q35_2_9_machine_options(m);
-> +    m->alias = NULL;
-> +    SET_MACHINE_COMPAT(m, PC_COMPAT_2_8);
-> +}
-> +
->  DEFINE_Q35_MACHINE(v2_8, "pc-q35-2.8", NULL,
->                     pc_q35_2_8_machine_options);
->  
->  static void pc_q35_2_7_machine_options(MachineClass *m)
->  {
->      pc_q35_2_8_machine_options(m);
-> -    m->alias = NULL;
->      m->max_cpus = 255;
->      SET_MACHINE_COMPAT(m, PC_COMPAT_2_7);
->  }
+>      class = object_get_class(OBJECT(dev));
