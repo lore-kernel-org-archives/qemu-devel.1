@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43316)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43353)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1cMz0R-0002JJ-UQ
-	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 10:22:08 -0500
+	(envelope-from <tcminyard@gmail.com>) id 1cMz0U-0002Mi-2L
+	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 10:22:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1cMz0R-0000Fe-1F
-	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 10:22:07 -0500
-Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:33291)
+	(envelope-from <tcminyard@gmail.com>) id 1cMz0S-0000HM-Fh
+	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 10:22:10 -0500
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:35915)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1cMz0Q-0000F3-RM
-	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 10:22:06 -0500
-Received: by mail-pg0-x241.google.com with SMTP id g1so22376668pgn.0
-	for <qemu-devel@nongnu.org>; Fri, 30 Dec 2016 07:22:06 -0800 (PST)
+	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1cMz0S-0000GV-8W
+	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 10:22:08 -0500
+Received: by mail-pg0-x241.google.com with SMTP id n5so22380839pgh.3
+	for <qemu-devel@nongnu.org>; Fri, 30 Dec 2016 07:22:08 -0800 (PST)
 Sender: Corey Minyard <tcminyard@gmail.com>
 From: minyard@acm.org
-Date: Fri, 30 Dec 2016 09:21:43 -0600
-Message-Id: <1483111310-24808-13-git-send-email-minyard@acm.org>
+Date: Fri, 30 Dec 2016 09:21:37 -0600
+Message-Id: <1483111310-24808-7-git-send-email-minyard@acm.org>
 In-Reply-To: <1483111310-24808-1-git-send-email-minyard@acm.org>
 References: <1483111310-24808-1-git-send-email-minyard@acm.org>
-Subject: [Qemu-devel] [PATCH 12/19] ipmi: Fix SSIF ACPI handling to use the
- right CRS
+Subject: [Qemu-devel] [PATCH 06/19] i2c:pm_smbus: Add block transfer
+ capability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,107 +32,319 @@ Cc: minyard@acm.org, Corey Minyard <cminyard@mvista.com>
 
 From: Corey Minyard <cminyard@mvista.com>
 
+There was no block transfer code in pm_smbus.c, and it is needed
+for some devices.  So add it.
+
+This adds both byte-by-byte block transfers and buffered block
+transfers.
+
 Signed-off-by: Corey Minyard <cminyard@mvista.com>
 ---
- hw/acpi/ipmi.c         | 13 +++++++------
- hw/i386/acpi-build.c   |  2 +-
- include/hw/acpi/ipmi.h |  2 +-
- stubs/ipmi.c           |  2 +-
- 4 files changed, 10 insertions(+), 9 deletions(-)
+ hw/i2c/pm_smbus.c         | 151 ++++++++++++++++++++++++++++++++++++++++++----
+ hw/i2c/smbus_ich9.c       |   8 ++-
+ include/hw/i2c/pm_smbus.h |  20 +++++-
+ 3 files changed, 164 insertions(+), 15 deletions(-)
 
-diff --git a/hw/acpi/ipmi.c b/hw/acpi/ipmi.c
-index 651e2e9..96e48eb 100644
---- a/hw/acpi/ipmi.c
-+++ b/hw/acpi/ipmi.c
-@@ -13,7 +13,7 @@
- #include "hw/acpi/acpi.h"
- #include "hw/acpi/ipmi.h"
+diff --git a/hw/i2c/pm_smbus.c b/hw/i2c/pm_smbus.c
+index e7a8e92..686d411 100644
+--- a/hw/i2c/pm_smbus.c
++++ b/hw/i2c/pm_smbus.c
+@@ -30,6 +30,7 @@
+ #define SMBHSTDAT0      0x05
+ #define SMBHSTDAT1      0x06
+ #define SMBBLKDAT       0x07
++#define SMBAUXCTL       0x0d
  
--static Aml *aml_ipmi_crs(IPMIFwInfo *info)
-+static Aml *aml_ipmi_crs(IPMIFwInfo *info, const char *resource)
- {
-     Aml *crs = aml_resource_template();
+ #define STS_HOST_BUSY   (1 << 0)
+ #define STS_INTR        (1 << 1)
+@@ -58,6 +59,10 @@
+ #define PROT_BLOCK_DATA     5
+ #define PROT_I2C_BLOCK_READ 6
  
-@@ -48,7 +48,8 @@ static Aml *aml_ipmi_crs(IPMIFwInfo *info)
-                             info->register_spacing, info->register_length));
++#define AUX_PEC       (1 << 0)
++#define AUX_BLK       (1 << 1)
++#define AUX_MASK      0x3
++
+ /*#define DEBUG*/
+ 
+ #ifdef DEBUG
+@@ -127,6 +132,51 @@ static void smb_transaction(PMSMBus *s)
+             goto error;
+         }
          break;
-     case IPMI_MEMSPACE_SMBUS:
--        aml_append(crs, aml_return(aml_int(info->base_address)));
-+        aml_append(crs, aml_i2c_serial_bus_device(info->base_address,
-+                                                  resource));
++    case PROT_BLOCK_DATA:
++        if (read) {
++            ret = smbus_read_block(bus, addr, cmd, s->smb_data,
++                                   sizeof(s->smb_data), !s->i2c_enable,
++                                   !s->i2c_enable);
++            if (ret < 0) {
++                goto error;
++            }
++            s->smb_index = 0;
++            s->op_done = false;
++            if (s->smb_auxctl & AUX_BLK) {
++                s->smb_stat |= STS_INTR;
++            } else {
++                s->smb_blkdata = s->smb_data[0];
++                s->smb_stat |= STS_HOST_BUSY | STS_BYTE_DONE;
++            }
++            s->smb_data0 = ret;
++            goto out;
++        } else {
++            if (s->smb_auxctl & AUX_BLK) {
++                if (s->smb_index != s->smb_data0) {
++                    s->smb_index = 0;
++                    goto error;
++                }
++                /* Data is already all written to the queue, just do
++                   the operation. */
++                s->smb_index = 0;
++                ret = smbus_write_block(bus, addr, cmd, s->smb_data,
++                                        s->smb_data0, !s->i2c_enable);
++                if (ret < 0) {
++                    goto error;
++                }
++                s->op_done = true;
++                s->smb_stat |= STS_INTR;
++                s->smb_stat &= ~STS_HOST_BUSY;
++            } else {
++                s->op_done = false;
++                s->smb_stat |= STS_HOST_BUSY | STS_BYTE_DONE;
++                s->smb_data[0] = s->smb_blkdata;
++                s->smb_index = 0;
++                ret = 0;
++            }
++            goto out;
++        }
++        break;
+     default:
+         goto error;
+     }
+@@ -146,13 +196,13 @@ done:
+     if (ret < 0) {
+         goto error;
+     }
+-    s->smb_stat |= STS_BYTE_DONE | STS_INTR;
++    s->smb_stat |= STS_INTR;
++out:
+     return;
+ 
+ error:
+     s->smb_stat |= STS_DEV_ERR;
+     return;
+-
+ }
+ 
+ static void smb_ioport_writeb(void *opaque, hwaddr addr, uint64_t val,
+@@ -164,14 +214,61 @@ static void smb_ioport_writeb(void *opaque, hwaddr addr, uint64_t val,
+                   " val=0x%02" PRIx64 "\n", addr, val);
+     switch(addr) {
+     case SMBHSTSTS:
+-        s->smb_stat = (~(val & 0xff)) & s->smb_stat;
+-        s->smb_index = 0;
++        s->smb_stat &= ~(val & ~STS_HOST_BUSY);
++        if (!s->op_done && !(s->smb_auxctl & AUX_BLK)) {
++            uint8_t read = s->smb_addr & 0x01;
++
++            s->smb_index++;
++            if (!read && s->smb_index == s->smb_data0) {
++                uint8_t prot = (s->smb_ctl >> 2) & 0x07;
++                uint8_t cmd = s->smb_cmd;
++                uint8_t addr = s->smb_addr >> 1;
++                int ret;
++
++                if (prot == PROT_I2C_BLOCK_READ) {
++                    s->smb_stat |= STS_DEV_ERR;
++                    goto out;
++                }
++
++                ret = smbus_write_block(s->smbus, addr, cmd, s->smb_data,
++                                        s->smb_data0, !s->i2c_enable);
++                if (ret < 0) {
++                    s->smb_stat |= STS_DEV_ERR;
++                    goto out;
++                }
++                s->op_done = true;
++                s->smb_stat |= STS_INTR;
++                s->smb_stat &= ~STS_HOST_BUSY;
++            } else if (!read) {
++                s->smb_data[s->smb_index] = s->smb_blkdata;
++                s->smb_stat |= STS_BYTE_DONE;
++            } else if (s->smb_ctl & CTL_LAST_BYTE) {
++                s->op_done = true;
++                s->smb_blkdata = s->smb_data[s->smb_index];
++                s->smb_index = 0;
++                s->smb_stat |= STS_INTR;
++                s->smb_stat &= ~STS_HOST_BUSY;
++            } else {
++                s->smb_blkdata = s->smb_data[s->smb_index];
++                s->smb_stat |= STS_BYTE_DONE;
++            }
++        }
+         break;
+     case SMBHSTCNT:
+-        s->smb_ctl = val;
+-        if (s->smb_ctl & CTL_START) {
++        s->smb_ctl = val & ~CTL_START; /* CTL_START always reads 0 */
++        if (val & CTL_START) {
++            if (!s->op_done) {
++                s->smb_index = 0;
++                s->op_done = true;
++            }
+             smb_transaction(s);
+         }
++        if (s->smb_ctl & CTL_KILL) {
++            s->op_done = true;
++            s->smb_index = 0;
++            s->smb_stat |= STS_FAILED;
++            s->smb_stat &= ~STS_HOST_BUSY;
++        }
+         break;
+     case SMBHSTCMD:
+         s->smb_cmd = val;
+@@ -186,13 +283,24 @@ static void smb_ioport_writeb(void *opaque, hwaddr addr, uint64_t val,
+         s->smb_data1 = val;
+         break;
+     case SMBBLKDAT:
+-        s->smb_data[s->smb_index++] = val;
+-        if (s->smb_index > 31)
++        if (s->smb_index >= PM_SMBUS_MAX_MSG_SIZE) {
+             s->smb_index = 0;
++        }
++        if (s->smb_auxctl & AUX_BLK) {
++            s->smb_data[s->smb_index++] = val;
++        } else {
++            s->smb_blkdata = val;
++        }
++        break;
++    case SMBAUXCTL:
++        s->smb_auxctl = val & AUX_MASK;
          break;
      default:
-         abort();
-@@ -61,7 +62,7 @@ static Aml *aml_ipmi_crs(IPMIFwInfo *info)
-     return crs;
+         break;
+     }
++
++ out:
++    return;
  }
  
--static Aml *aml_ipmi_device(IPMIFwInfo *info)
-+static Aml *aml_ipmi_device(IPMIFwInfo *info, const char *resource)
- {
-     Aml *dev;
-     uint16_t version = ((info->ipmi_spec_major_revision << 8)
-@@ -74,14 +75,14 @@ static Aml *aml_ipmi_device(IPMIFwInfo *info)
-     aml_append(dev, aml_name_decl("_STR", aml_string("ipmi_%s",
-                                                      info->interface_name)));
-     aml_append(dev, aml_name_decl("_UID", aml_int(info->uuid)));
--    aml_append(dev, aml_name_decl("_CRS", aml_ipmi_crs(info)));
-+    aml_append(dev, aml_name_decl("_CRS", aml_ipmi_crs(info, resource)));
-     aml_append(dev, aml_name_decl("_IFT", aml_int(info->interface_type)));
-     aml_append(dev, aml_name_decl("_SRV", aml_int(version)));
- 
-     return dev;
+ static uint64_t smb_ioport_readb(void *opaque, hwaddr addr, unsigned width)
+@@ -205,7 +313,6 @@ static uint64_t smb_ioport_readb(void *opaque, hwaddr addr, unsigned width)
+         val = s->smb_stat;
+         break;
+     case SMBHSTCNT:
+-        s->smb_index = 0;
+         val = s->smb_ctl & CTL_RETURN_MASK;
+         break;
+     case SMBHSTCMD:
+@@ -221,9 +328,22 @@ static uint64_t smb_ioport_readb(void *opaque, hwaddr addr, unsigned width)
+         val = s->smb_data1;
+         break;
+     case SMBBLKDAT:
+-        val = s->smb_data[s->smb_index++];
+-        if (s->smb_index > 31)
++        if (s->smb_index >= PM_SMBUS_MAX_MSG_SIZE) {
+             s->smb_index = 0;
++        }
++        if (s->smb_auxctl & AUX_BLK) {
++            val = s->smb_data[s->smb_index++];
++            if (!s->op_done && s->smb_index == s->smb_data0) {
++                s->op_done = true;
++                s->smb_index = 0;
++                s->smb_stat &= ~STS_HOST_BUSY;
++            }
++        } else {
++            val = s->smb_blkdata;
++        }
++        break;
++    case SMBAUXCTL:
++        val = s->smb_auxctl;
+         break;
+     default:
+         val = 0;
+@@ -235,6 +355,13 @@ static uint64_t smb_ioport_readb(void *opaque, hwaddr addr, unsigned width)
+     return val;
  }
  
--void build_acpi_ipmi_devices(Aml *scope, BusState *bus)
-+void build_acpi_ipmi_devices(Aml *scope, BusState *bus, const char *resource)
- {
++static void pm_smbus_reset(PMSMBus *s)
++{
++    s->op_done = true;
++    s->smb_index = 0;
++    s->smb_stat = 0;
++}
++
+ static const MemoryRegionOps pm_smbus_ops = {
+     .read = smb_ioport_readb,
+     .write = smb_ioport_writeb,
+@@ -245,6 +372,8 @@ static const MemoryRegionOps pm_smbus_ops = {
  
-     BusChild *kid;
-@@ -101,6 +102,6 @@ void build_acpi_ipmi_devices(Aml *scope, BusState *bus)
-         iic = IPMI_INTERFACE_GET_CLASS(obj);
-         memset(&info, 0, sizeof(info));
-         iic->get_fwinfo(ii, &info);
--        aml_append(scope, aml_ipmi_device(&info));
-+        aml_append(scope, aml_ipmi_device(&info, resource));
+ void pm_smbus_init(DeviceState *parent, PMSMBus *smb)
+ {
++    smb->op_done = true;
++    smb->reset = pm_smbus_reset;
+     smb->smbus = i2c_init_bus(parent, "i2c");
+     memory_region_init_io(&smb->io, OBJECT(parent), &pm_smbus_ops, smb,
+                           "pm-smbus", 64);
+diff --git a/hw/i2c/smbus_ich9.c b/hw/i2c/smbus_ich9.c
+index 48fab22..686ed09 100644
+--- a/hw/i2c/smbus_ich9.c
++++ b/hw/i2c/smbus_ich9.c
+@@ -62,12 +62,16 @@ static void ich9_smbus_write_config(PCIDevice *d, uint32_t address,
+     pci_default_write_config(d, address, val, len);
+     if (range_covers_byte(address, len, ICH9_SMB_HOSTC)) {
+         uint8_t hostc = s->dev.config[ICH9_SMB_HOSTC];
+-        if ((hostc & ICH9_SMB_HOSTC_HST_EN) &&
+-            !(hostc & ICH9_SMB_HOSTC_I2C_EN)) {
++        if (hostc & ICH9_SMB_HOSTC_HST_EN) {
+             memory_region_set_enabled(&s->smb.io, true);
+         } else {
+             memory_region_set_enabled(&s->smb.io, false);
+         }
++        s->smb.i2c_enable = (hostc & ICH9_SMB_HOSTC_I2C_EN) != 0;
++        if (hostc & ICH9_SMB_HOSTC_SSRESET) {
++            s->smb.reset(&s->smb);
++            s->dev.config[ICH9_SMB_HOSTC] &= ~ICH9_SMB_HOSTC_SSRESET;
++        }
      }
  }
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 42ecf61..b8a16cf 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -1455,7 +1455,7 @@ static void build_isa_devices_aml(Aml *table)
-     } else if (!obj) {
-         error_report("No ISA bus, unable to define IPMI ACPI data");
-     } else {
--        build_acpi_ipmi_devices(scope, BUS(obj));
-+        build_acpi_ipmi_devices(scope, BUS(obj), "\\_SB.PCI0.ISA");
-     }
  
-     aml_append(table, scope);
-diff --git a/include/hw/acpi/ipmi.h b/include/hw/acpi/ipmi.h
-index ab2bb29..d68bc85 100644
---- a/include/hw/acpi/ipmi.h
-+++ b/include/hw/acpi/ipmi.h
-@@ -17,6 +17,6 @@
-  * bus matches the given bus.  The resource is the ACPI resource that
-  * contains the IPMI device, this is required for the I2C CRS.
-  */
--void build_acpi_ipmi_devices(Aml *table, BusState *bus);
-+void build_acpi_ipmi_devices(Aml *table, BusState *bus, const char *resource);
+diff --git a/include/hw/i2c/pm_smbus.h b/include/hw/i2c/pm_smbus.h
+index 2a837af..99d5489 100644
+--- a/include/hw/i2c/pm_smbus.h
++++ b/include/hw/i2c/pm_smbus.h
+@@ -1,6 +1,8 @@
+ #ifndef PM_SMBUS_H
+ #define PM_SMBUS_H
  
- #endif /* HW_ACPI_IPMI_H */
-diff --git a/stubs/ipmi.c b/stubs/ipmi.c
-index 98b6dce..6c71d6c 100644
---- a/stubs/ipmi.c
-+++ b/stubs/ipmi.c
-@@ -9,6 +9,6 @@
++#define PM_SMBUS_MAX_MSG_SIZE 32
++
+ typedef struct PMSMBus {
+     I2CBus *smbus;
+     MemoryRegion io;
+@@ -11,8 +13,22 @@ typedef struct PMSMBus {
+     uint8_t smb_addr;
+     uint8_t smb_data0;
+     uint8_t smb_data1;
+-    uint8_t smb_data[32];
+-    uint8_t smb_index;
++    uint8_t smb_data[PM_SMBUS_MAX_MSG_SIZE];
++    uint8_t smb_blkdata;
++    uint8_t smb_auxctl;
++    uint32_t smb_index;
++
++    /* Set by pm_smbus.c */
++    void (*reset)(struct PMSMBus *s);
++
++    /* Set by the user. */
++    bool i2c_enable;
++
++    /* Internally used by pm_smbus. */
++
++    /* Set on block transfers after the last byte has been read, so the
++       INTR bit can be set at the right time. */
++    bool op_done;
+ } PMSMBus;
  
- #include "hw/acpi/ipmi.h"
- 
--void build_acpi_ipmi_devices(Aml *table, BusState *bus)
-+void build_acpi_ipmi_devices(Aml *table, BusState *bus, const char *resource)
- {
- }
+ void pm_smbus_init(DeviceState *parent, PMSMBus *smb);
 -- 
 2.7.4
