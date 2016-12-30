@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47571)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55645)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cMrdc-0003jo-WA
-	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 02:30:06 -0500
+	(envelope-from <jasowang@redhat.com>) id 1cMsPg-0001ov-Gc
+	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 03:19:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cMrdZ-00041k-TE
-	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 02:30:05 -0500
-Received: from [59.151.112.132] (port=55593 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cMrdY-0003x7-Ve
-	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 02:30:01 -0500
-References: <CAP8dc_acqeqpio7fVK4XSAxoH8QaGp9L=S1h2OCCWgrj=Q7VCw@mail.gmail.com>
-From: Cao jin <caoj.fnst@cn.fujitsu.com>
-Message-ID: <58660E14.8000605@cn.fujitsu.com>
-Date: Fri, 30 Dec 2016 15:34:44 +0800
+	(envelope-from <jasowang@redhat.com>) id 1cMsPd-00049R-4D
+	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 03:19:44 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57364)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cMsPc-00047N-UJ
+	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 03:19:41 -0500
+References: <1478502595-8484-1-git-send-email-jasowang@redhat.com>
+	<1478502595-8484-3-git-send-email-jasowang@redhat.com>
+	<20161216025345.GA5938@pxdev.xzpeter.org>
+	<33cf0c8c-5ab2-4e11-b08e-abf193a17c94@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <074a96e2-c248-5996-d1e7-6ca7a092254f@redhat.com>
+Date: Fri, 30 Dec 2016 16:19:31 +0800
 MIME-Version: 1.0
-In-Reply-To: <CAP8dc_acqeqpio7fVK4XSAxoH8QaGp9L=S1h2OCCWgrj=Q7VCw@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC]virtio-blk: add disk-name device property
+In-Reply-To: <33cf0c8c-5ab2-4e11-b08e-abf193a17c94@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH V3 02/10] intel_iommu: name vtd address
+ space with devfn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,123 +30,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Junkang Fu <fujunkang@gmail.com>
-Cc: stefanha@redhat.com, qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, mst@redhat.com, qemu-devel@nongnu.org, vkaplans@redhat.com, wexu@redhat.com, cornelia.huck@de.ibm.com, pbonzini@redhat.com, Richard Henderson <rth@twiddle.net>
 
-As I know, this is not a good way to submit a patch. You need to read
-the guideline first: http://wiki.qemu.org/Contribute/SubmitAPatch
 
--- 
-Sincerely,
-Cao jin
 
-On 12/30/2016 10:41 AM, Junkang Fu wrote:
->>From 74e913fc41ea98d1dde692175f1e3fb6729342aa Mon Sep 17 00:00:00 2001
-> From: "junkang.fjk" <junkang.fjk@alibaba-inc.com>
-> Date: Wed, 24 Aug 2016 19:36:53 +0800
-> Subject: [PATCH] virtio-blk: add disk-name device property
-> 
-> Current virtio-blk disk name(ex. /dev/vdb) has nothing to do with the
-> target dev
-> name specified in libvirt xml file. For example, we may get disk name
-> /dev/vdb in
-> VM while target dev specified in libvirt xml is vdc. This may lead to a
-> little trouble
-> to find out the relationship between the disk name in VM and somewhere out
-> of
-> VM, for example in the control board of Public cloud service providers. I
-> suggest
-> if Qemu could add a VIRTIO_BLK_F_DISK_NAME feature, with
-> VIRTIO_BLK_F_DISK_NAME
-> capable Qemu and virtio-blk frontend drivers, disk name in the vm can be
-> specified
-> as follows:
->         -device virtio-blk-pci,disk-name=vdabc
-> 
-> ---
->  hw/block/virtio-blk.c                       | 5 +++++
->  include/hw/virtio/virtio-blk.h              | 1 +
->  include/standard-headers/linux/virtio_blk.h | 6 ++++++
->  3 files changed, 12 insertions(+)
-> 
-> diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-> index 331d766..4039fb9 100644
-> --- a/hw/block/virtio-blk.c
-> +++ b/hw/block/virtio-blk.c
-> @@ -716,6 +716,8 @@ static void virtio_blk_update_config(VirtIODevice
-> *vdev, uint8_t *config)
->      blkcfg.alignment_offset = 0;
->      blkcfg.wce = blk_enable_write_cache(s->blk);
->      virtio_stw_p(vdev, &blkcfg.num_queues, s->conf.num_queues);
-> +    if (s->disk_name)
-> +        strncpy((char *)blkcfg.disk_name, s->disk_name, DISK_NAME_LEN);
->      memcpy(config, &blkcfg, sizeof(struct virtio_blk_config));
->  }
-> @@ -740,6 +742,8 @@ static uint64_t virtio_blk_get_features(VirtIODevice
-> *vdev, uint64_t features,
->      virtio_add_feature(&features, VIRTIO_BLK_F_GEOMETRY);
->      virtio_add_feature(&features, VIRTIO_BLK_F_TOPOLOGY);
->      virtio_add_feature(&features, VIRTIO_BLK_F_BLK_SIZE);
-> +    virtio_add_feature(&features, VIRTIO_BLK_F_DISK_NAME);
-> +
->      if (virtio_has_feature(features, VIRTIO_F_VERSION_1)) {
->          if (s->conf.scsi) {
->              error_setg(errp, "Please set scsi=off for virtio-blk devices
-> in order to use virtio 1.0");
-> @@ -970,6 +974,7 @@ static Property virtio_blk_properties[] = {
->      DEFINE_PROP_BIT("request-merging", VirtIOBlock, conf.request_merging,
-> 0,
->                      true),
->      DEFINE_PROP_UINT16("num-queues", VirtIOBlock, conf.num_queues, 1),
-> +    DEFINE_PROP_STRING("disk-name", VirtIOBlock, disk_name),
->      DEFINE_PROP_END_OF_LIST(),
->  };
-> 
-> diff --git a/include/hw/virtio/virtio-blk.h b/include/hw/virtio/virtio-blk.h
-> index 180bd8d..003e810 100644
-> --- a/include/hw/virtio/virtio-blk.h
-> +++ b/include/hw/virtio/virtio-blk.h
-> @@ -56,6 +56,7 @@ typedef struct VirtIOBlock {
->      bool dataplane_disabled;
->      bool dataplane_started;
->      struct VirtIOBlockDataPlane *dataplane;
-> +    char *disk_name;
->  } VirtIOBlock;
-> 
->  typedef struct VirtIOBlockReq {
-> diff --git a/include/standard-headers/linux/virtio_blk.h
-> b/include/standard-headers/linux/virtio_blk.h
-> index ab16ec5..1f5d89d 100644
-> --- a/include/standard-headers/linux/virtio_blk.h
-> +++ b/include/standard-headers/linux/virtio_blk.h
-> @@ -38,6 +38,7 @@
->  #define VIRTIO_BLK_F_BLK_SIZE  6   /* Block size of disk is available*/
->  #define VIRTIO_BLK_F_TOPOLOGY  10  /* Topology information is available */
->  #define VIRTIO_BLK_F_MQ        12  /* support more than one vq */
-> +#define VIRTIO_BLK_F_DISK_NAME  13      /* specify /dev/xxx name */
-> 
->  /* Legacy feature bits */
->  #ifndef VIRTIO_BLK_NO_LEGACY
-> @@ -51,6 +52,9 @@
-> 
->  #define VIRTIO_BLK_ID_BYTES    20  /* ID string length */
-> 
-> +/* micro defined in kernel genhd.h */
-> +#define DISK_NAME_LEN 32
-> +
->  struct virtio_blk_config {
->     /* The capacity (in 512-byte sectors). */
->     uint64_t capacity;
-> @@ -84,6 +88,8 @@ struct virtio_blk_config {
-> 
->     /* number of vqs, only available when VIRTIO_BLK_F_MQ is set */
->     uint16_t num_queues;
-> +
-> +   uint8_t disk_name[DISK_NAME_LEN];
->  } QEMU_PACKED;
-> 
->  /*
-> --
-> 1.9.4
-> 
-> 
+On 2016=E5=B9=B412=E6=9C=8816=E6=97=A5 11:53, Jason Wang wrote:
+>
+>
+> On 2016=E5=B9=B412=E6=9C=8816=E6=97=A5 10:53, Peter Xu wrote:
+>> On Mon, Nov 07, 2016 at 03:09:47PM +0800, Jason Wang wrote:
+>>> To avoid duplicated name and ease debugging.
+>>>
+>>> Cc: Michael S. Tsirkin <mst@redhat.com>
+>>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>>> Cc: Richard Henderson <rth@twiddle.net>
+>>> Cc: Eduardo Habkost <ehabkost@redhat.com>
+>>> Acked-by: Peter Xu <peterx@redhat.com>
+>>> Signed-off-by: Jason Wang <jasowang@redhat.com>
+>>> ---
+>>>   hw/i386/intel_iommu.c | 4 +++-
+>>>   1 file changed, 3 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+>>> index 1655a65..5272c30 100644
+>>> --- a/hw/i386/intel_iommu.c
+>>> +++ b/hw/i386/intel_iommu.c
+>>> @@ -2323,6 +2323,7 @@ VTDAddressSpace=20
+>>> *vtd_find_add_as(IntelIOMMUState *s, PCIBus *bus, int devfn)
+>>>       uintptr_t key =3D (uintptr_t)bus;
+>>>       VTDBus *vtd_bus =3D g_hash_table_lookup(s->vtd_as_by_busptr, &k=
+ey);
+>>>       VTDAddressSpace *vtd_dev_as;
+>>> +    char name[128];
+>>>         if (!vtd_bus) {
+>>>           /* No corresponding free() */
+>>> @@ -2336,6 +2337,7 @@ VTDAddressSpace=20
+>>> *vtd_find_add_as(IntelIOMMUState *s, PCIBus *bus, int devfn)
+>>>       vtd_dev_as =3D vtd_bus->dev_as[devfn];
+>>>         if (!vtd_dev_as) {
+>>> +        snprintf(name, sizeof(name), "intel_iommu_devfn_%d", devfn);
+>> Better with bus number as well? ;)
+>>
+>> Like: "%02x:%02x.%x" for (bus, dev, fn).
+>>
+>> Thanks,
+>>
+>> -- peterx
+>
+> Yes, will do it in next version.
+>
+> Thanks
+>
+
+Actually, I choose not to bother since bus and fn number needs more=20
+codes to get.
+
+Thanks
