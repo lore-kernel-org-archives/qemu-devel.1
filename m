@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48422)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33704)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cN20M-00078y-BD
-	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 13:34:15 -0500
+	(envelope-from <linux@roeck-us.net>) id 1cN3Jo-0004kI-B0
+	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 14:58:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cN20J-0000eX-6L
-	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 13:34:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51546)
+	(envelope-from <linux@roeck-us.net>) id 1cN3Jk-0005lj-Dl
+	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 14:58:24 -0500
+Received: from bh-25.webhostbox.net ([208.91.199.152]:58869)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cN20J-0000eD-0Q
-	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 13:34:11 -0500
-Date: Fri, 30 Dec 2016 16:34:07 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20161230183407.GL3441@thinpad.lan.raisama.net>
-References: <1483108391-199542-1-git-send-email-imammedo@redhat.com>
+	(Exim 4.71) (envelope-from <linux@roeck-us.net>) id 1cN3Jk-0005a5-65
+	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 14:58:20 -0500
+References: <bd0ad06c-1dce-03c9-73b0-d8d6e4ca333b@roeck-us.net>
+	<4b04ec32-b647-5047-7830-269cfc217550@ilande.co.uk>
+From: Guenter Roeck <linux@roeck-us.net>
+Message-ID: <3bee832c-1d2a-50a2-a763-c58ab34caf08@roeck-us.net>
+Date: Fri, 30 Dec 2016 11:57:34 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1483108391-199542-1-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] pc: fix crash in rtc_set_memory() if
- initial cpu is marked as hotplugged
+In-Reply-To: <4b04ec32-b647-5047-7830-269cfc217550@ilande.co.uk>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Problems with qemu "modern" virtio on sparc64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,63 +27,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, mst@redhat.com, armbru@redhat.com, afaerber@suse.de
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, "qemu-devel@nongnu.org >> QEMU Developers" <qemu-devel@nongnu.org>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
 
-On Fri, Dec 30, 2016 at 03:33:11PM +0100, Igor Mammedov wrote:
-> 'hotplugged' propperty is meant to be used on migration side when migrating
-> source with hotplugged devices.
-> However though it not exacly correct usage of 'hotplugged' property
-> it's possible to set generic hotplugged property for CPU using
->  -cpu foo,hotplugged=on
-> or
->  -global foo.hotplugged=on
-> 
-> in this case qemu crashes with following backtrace:
-> 
-> ...
-> 
-> because pc_cpu_plug() assumes that hotplugged CPU could appear only after
-> rtc/fw_cfg are initialized.
-> Fix crash by replacing assumption with explicit checks of rtc/fw_cfg
-> and updating them only if they were initialized.
-> 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> Reported-by: Eduardo Habkost <ehabkost@redhat.com>
+On 12/30/2016 10:18 AM, Mark Cave-Ayland wrote:
+> On 25/11/16 18:11, Guenter Roeck wrote:
+>
+>> Hi,
+>>
+>> I am using virtio on sparc64 for my Linux kernel runtime tests.
+>>
+>> Starting with qemu v2.7, I noticed that the kernel either gets stuck or
+>> crashes.
+>> After adding some debug information to the kernel, I found that the
+>> problem happens
+>> in vp_reset().
+>>
+>> Interestingly, when running v4.9-rc6 without modification, the kernel
+>> crashes on me.
+>> If I add pr_info just before and after the vp_iowrite8() in
+>> virtio_pci_modern.c:vp_reset(),
+>> the kernel gets stuck in the vp_iowrite8().
+>>
+>> Here is the relevant part of the crash:
+>>
+>> [    3.151167] Unable to handle kernel NULL pointer dereference
+>> [    3.151809] tsk->{mm,active_mm}->context = 0000000000000000
+>> [    3.152430] tsk->{mm,active_mm}->pgd = fffff80000402000
+>> [    3.153032]               \|/ ____ \|/
+>> [    3.153032]               "@'/ .. \`@"
+>> [    3.153032]               /_| \__/ |_\
+>> [    3.153032]                  \__U_/
+>> [    3.154042] swapper(1): Oops [#1]
+>> [    3.154773] CPU: 0 PID: 1 Comm: swapper Not tainted 4.9.0-rc5+ #4
+>> [    3.155375] task: fffff8001f0af620 task.stack: fffff8001f0b0000
+>> [    3.155958] TSTATE: 0000009980001606 TPC: 00000000006edf44 TNPC:
+>> 00000000006edf48 Y: 00000000    Not tainted
+>> [    3.156901] TPC: <vp_reset+0x4/0x40>
+>>
+>> None of the pointers used in vp_reset() is NULL. As mentioned above,
+>> adding a pr_info
+>> just before vp_iowrite8() makes the crash disappear and the kernel is
+>> stuck instead.
+>> Here is how it looks like:
+>>
+>> [    3.104243] Hi there
+>> [   26.912509] NMI watchdog: BUG: soft lockup - CPU#0 stuck for 23s!
+>> [swapper:1]
+>> [   26.913102] Modules linked in:
+>> [   26.914061] CPU: 0 PID: 1 Comm: swapper Not tainted 4.9.0-rc5+ #5
+>> [   26.914633] task: fffff8001f0af620 task.stack: fffff8001f0b0000
+>> [   26.915156] TSTATE: 0000004480001605 TPC: 00000000006edf50 TNPC:
+>> 00000000006edf54 Y: 00000412    Not tainted
+>> [   26.915954] TPC: <vp_reset+0x10/0x60>
+>>
+>> Another pr_info() after vp_iowrite8() is never printed, suggesting that
+>> the code never
+>> gets to that point.
+>>
+>> The kernel configuration is sparc64_defconfig with the following
+>> configuration
+>> options enabled.
+>>
+>> CONFIG_DEVTMPFS=y
+>> CONFIG_VIRTIO=y
+>> CONFIG_VIRTIO_PCI=y
+>> CONFIG_VIRTIO_BLK=y
+>> CONFIG_VIRTIO_NET=y
+>> CONFIG_VIRTIO_BALLOON=y
+>> CONFIG_VIRTIO_CONSOLE=y
+>> CONFIG_SCSI_VIRTIO=y
+>>
+>> Command line is
+>>
+>> qemu-system-sparc64 -M sun4u -cpu "TI UltraSparc IIi" -m 512 \
+>>     -drive file=simple-root-filesystem-sparc.ext3,if=virtio,format=raw \
+>>     -kernel arch/sparc/boot/image -no-reboot \
+>>     -append "root=/dev/vda init=/sbin/init.sh console=ttyS0" \
+>>     -nographic -monitor none
+>>
+>> Does anyone have an idea what might be wrong ?
+>>
+>> Thanks,
+>> Guenter
+>
+> Hi Guenter,
+>
+> Have you been able to investigate this issue any further? Does the 2.8
+> release solve the issue for you?
+>
 
-I like how the new code doesn't depend on DeviceState::hotplugged
-at all.
+I did not make any progress, and reverted to qemu v2.6.
 
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Problem is still seen with v2.8 (release); it crashes. The recent virtio
+related patch does not make a difference. v2.7.1 also still crashes.
+Only difference with both versions is the crash traceback.
 
-But I would like to understand better how the "hotplugged"
-property is really supposed to be used. I am not aware of any
-existing case where the user needs to set "hotplugged" directly
-and it works.
-
-> ---
->  hw/i386/pc.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index f3d7ad4..7b7e126 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -1810,8 +1810,10 @@ static void pc_cpu_plug(HotplugHandler *hotplug_dev,
->  
->      /* increment the number of CPUs */
->      pcms->boot_cpus++;
-> -    if (dev->hotplugged) {
-> +    if (pcms->rtc) {
->          rtc_set_cpus_count(pcms->rtc, pcms->boot_cpus);
-> +    }
-> +    if (pcms->fw_cfg) {
->          fw_cfg_modify_i16(pcms->fw_cfg, FW_CFG_NB_CPUS, pcms->boot_cpus);
->      }
->  
-> -- 
-> 2.7.4
-> 
-
--- 
-Eduardo
+Guenter
