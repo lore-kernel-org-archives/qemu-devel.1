@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43311)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43316)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1cMz0R-0002Ij-Gh
+	(envelope-from <tcminyard@gmail.com>) id 1cMz0R-0002JJ-UQ
 	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 10:22:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1cMz0Q-0000FC-Ew
+	(envelope-from <tcminyard@gmail.com>) id 1cMz0R-0000Fe-1F
 	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 10:22:07 -0500
-Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:33868)
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:33291)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1cMz0Q-0000Eu-8v
+	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1cMz0Q-0000F3-RM
 	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 10:22:06 -0500
-Received: by mail-pg0-x241.google.com with SMTP id b1so22369346pgc.1
+Received: by mail-pg0-x241.google.com with SMTP id g1so22376668pgn.0
 	for <qemu-devel@nongnu.org>; Fri, 30 Dec 2016 07:22:06 -0800 (PST)
 Sender: Corey Minyard <tcminyard@gmail.com>
 From: minyard@acm.org
-Date: Fri, 30 Dec 2016 09:21:35 -0600
-Message-Id: <1483111310-24808-5-git-send-email-minyard@acm.org>
+Date: Fri, 30 Dec 2016 09:21:43 -0600
+Message-Id: <1483111310-24808-13-git-send-email-minyard@acm.org>
 In-Reply-To: <1483111310-24808-1-git-send-email-minyard@acm.org>
 References: <1483111310-24808-1-git-send-email-minyard@acm.org>
-Subject: [Qemu-devel] [PATCH 04/19] i2c:pm_smbus: Fix the semantics of block
- I2C transfers
+Subject: [Qemu-devel] [PATCH 12/19] ipmi: Fix SSIF ACPI handling to use the
+ right CRS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,143 +32,107 @@ Cc: minyard@acm.org, Corey Minyard <cminyard@mvista.com>
 
 From: Corey Minyard <cminyard@mvista.com>
 
-The I2C block transfer commands was not implemented correctly, it
-read a length byte and such like it was an smbus transfer.
-
-So fix the smbus_read_block() and smbus_write_block() functions
-so they can properly handle I2C transfers, and normal SMBus
-transfers (for upcoming changes).  Pass in a transfer size and
-a bool to know whether to use the size byte (like SMBus) or use
-the length given (like I2C).
-
 Signed-off-by: Corey Minyard <cminyard@mvista.com>
 ---
- hw/i2c/pm_smbus.c      | 10 ++++++++--
- hw/i2c/smbus.c         | 37 ++++++++++++++++++++++++-------------
- include/hw/i2c/smbus.h | 17 +++++++++++++++--
- 3 files changed, 47 insertions(+), 17 deletions(-)
+ hw/acpi/ipmi.c         | 13 +++++++------
+ hw/i386/acpi-build.c   |  2 +-
+ include/hw/acpi/ipmi.h |  2 +-
+ stubs/ipmi.c           |  2 +-
+ 4 files changed, 10 insertions(+), 9 deletions(-)
 
-diff --git a/hw/i2c/pm_smbus.c b/hw/i2c/pm_smbus.c
-index 92c3aebd..679edbc 100644
---- a/hw/i2c/pm_smbus.c
-+++ b/hw/i2c/pm_smbus.c
-@@ -115,10 +115,16 @@ static void smb_transaction(PMSMBus *s)
+diff --git a/hw/acpi/ipmi.c b/hw/acpi/ipmi.c
+index 651e2e9..96e48eb 100644
+--- a/hw/acpi/ipmi.c
++++ b/hw/acpi/ipmi.c
+@@ -13,7 +13,7 @@
+ #include "hw/acpi/acpi.h"
+ #include "hw/acpi/ipmi.h"
+ 
+-static Aml *aml_ipmi_crs(IPMIFwInfo *info)
++static Aml *aml_ipmi_crs(IPMIFwInfo *info, const char *resource)
+ {
+     Aml *crs = aml_resource_template();
+ 
+@@ -48,7 +48,8 @@ static Aml *aml_ipmi_crs(IPMIFwInfo *info)
+                             info->register_spacing, info->register_length));
          break;
-     case PROT_I2C_BLOCK_DATA:
-         if (read) {
--            ret = smbus_read_block(bus, addr, cmd, s->smb_data);
-+            int xfersize = s->smb_data0;
-+            if (xfersize > sizeof(s->smb_data)) {
-+                xfersize = sizeof(s->smb_data);
-+            }
-+            ret = smbus_read_block(bus, addr, s->smb_data1, s->smb_data,
-+                                   xfersize, false, true);
-             goto data8;
-         } else {
--            ret = smbus_write_block(bus, addr, cmd, s->smb_data, s->smb_data0);
-+            ret = smbus_write_block(bus, addr, cmd, s->smb_data, s->smb_data0,
-+                                    false);
-             goto done;
-         }
+     case IPMI_MEMSPACE_SMBUS:
+-        aml_append(crs, aml_return(aml_int(info->base_address)));
++        aml_append(crs, aml_i2c_serial_bus_device(info->base_address,
++                                                  resource));
          break;
-diff --git a/hw/i2c/smbus.c b/hw/i2c/smbus.c
-index c631a1c..4cb651e 100644
---- a/hw/i2c/smbus.c
-+++ b/hw/i2c/smbus.c
-@@ -301,33 +301,42 @@ int smbus_write_word(I2CBus *bus, uint8_t addr, uint8_t command, uint16_t data)
-     return 0;
+     default:
+         abort();
+@@ -61,7 +62,7 @@ static Aml *aml_ipmi_crs(IPMIFwInfo *info)
+     return crs;
  }
  
--int smbus_read_block(I2CBus *bus, uint8_t addr, uint8_t command, uint8_t *data)
-+int smbus_read_block(I2CBus *bus, uint8_t addr, uint8_t command, uint8_t *data,
-+                     int len, bool recv_len, bool send_cmd)
+-static Aml *aml_ipmi_device(IPMIFwInfo *info)
++static Aml *aml_ipmi_device(IPMIFwInfo *info, const char *resource)
  {
--    int len;
-+    int rlen;
-     int i;
+     Aml *dev;
+     uint16_t version = ((info->ipmi_spec_major_revision << 8)
+@@ -74,14 +75,14 @@ static Aml *aml_ipmi_device(IPMIFwInfo *info)
+     aml_append(dev, aml_name_decl("_STR", aml_string("ipmi_%s",
+                                                      info->interface_name)));
+     aml_append(dev, aml_name_decl("_UID", aml_int(info->uuid)));
+-    aml_append(dev, aml_name_decl("_CRS", aml_ipmi_crs(info)));
++    aml_append(dev, aml_name_decl("_CRS", aml_ipmi_crs(info, resource)));
+     aml_append(dev, aml_name_decl("_IFT", aml_int(info->interface_type)));
+     aml_append(dev, aml_name_decl("_SRV", aml_int(version)));
  
--    if (i2c_start_transfer(bus, addr, 0)) {
--        return -1;
-+    if (send_cmd) {
-+        if (i2c_start_transfer(bus, addr, 0)) {
-+            return -1;
-+        }
-+        i2c_send(bus, command);
-     }
--    i2c_send(bus, command);
-     if (i2c_start_transfer(bus, addr, 1)) {
--        i2c_end_transfer(bus);
-+        if (send_cmd) {
-+            i2c_end_transfer(bus);
-+        }
-         return -1;
-     }
--    len = i2c_recv(bus);
--    if (len > 32) {
--        len = 0;
-+    if (recv_len) {
-+        rlen = i2c_recv(bus);
-+    } else {
-+        rlen = len;
-     }
--    for (i = 0; i < len; i++) {
-+    if (rlen > len) {
-+        rlen = 0;
-+    }
-+    for (i = 0; i < rlen; i++) {
-         data[i] = i2c_recv(bus);
-     }
-     i2c_nack(bus);
-     i2c_end_transfer(bus);
--    return len;
-+    return rlen;
+     return dev;
  }
  
- int smbus_write_block(I2CBus *bus, uint8_t addr, uint8_t command, uint8_t *data,
--                      int len)
-+                      int len, bool send_len)
+-void build_acpi_ipmi_devices(Aml *scope, BusState *bus)
++void build_acpi_ipmi_devices(Aml *scope, BusState *bus, const char *resource)
  {
-     int i;
  
-@@ -338,7 +347,9 @@ int smbus_write_block(I2CBus *bus, uint8_t addr, uint8_t command, uint8_t *data,
-         return -1;
+     BusChild *kid;
+@@ -101,6 +102,6 @@ void build_acpi_ipmi_devices(Aml *scope, BusState *bus)
+         iic = IPMI_INTERFACE_GET_CLASS(obj);
+         memset(&info, 0, sizeof(info));
+         iic->get_fwinfo(ii, &info);
+-        aml_append(scope, aml_ipmi_device(&info));
++        aml_append(scope, aml_ipmi_device(&info, resource));
      }
-     i2c_send(bus, command);
--    i2c_send(bus, len);
-+    if (send_len) {
-+        i2c_send(bus, len);
-+    }
-     for (i = 0; i < len; i++) {
-         i2c_send(bus, data[i]);
+ }
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 42ecf61..b8a16cf 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -1455,7 +1455,7 @@ static void build_isa_devices_aml(Aml *table)
+     } else if (!obj) {
+         error_report("No ISA bus, unable to define IPMI ACPI data");
+     } else {
+-        build_acpi_ipmi_devices(scope, BUS(obj));
++        build_acpi_ipmi_devices(scope, BUS(obj), "\\_SB.PCI0.ISA");
      }
-diff --git a/include/hw/i2c/smbus.h b/include/hw/i2c/smbus.h
-index 544bbc1..f1b8078 100644
---- a/include/hw/i2c/smbus.h
-+++ b/include/hw/i2c/smbus.h
-@@ -73,9 +73,22 @@ int smbus_read_byte(I2CBus *bus, uint8_t addr, uint8_t command);
- int smbus_write_byte(I2CBus *bus, uint8_t addr, uint8_t command, uint8_t data);
- int smbus_read_word(I2CBus *bus, uint8_t addr, uint8_t command);
- int smbus_write_word(I2CBus *bus, uint8_t addr, uint8_t command, uint16_t data);
--int smbus_read_block(I2CBus *bus, uint8_t addr, uint8_t command, uint8_t *data);
-+
-+/*
-+ * Do a block transfer from an I2C device.  If recv_len is set, then the
-+ * first received byte is a length field and is used to know how much data
-+ * to receive.  Otherwise receive "len" bytes.  If send_cmd is set, send
-+ * the command byte first before receiving the data.
-+ */
-+int smbus_read_block(I2CBus *bus, uint8_t addr, uint8_t command, uint8_t *data,
-+                     int len, bool recv_len, bool send_cmd);
-+
-+/*
-+ * Do a block transfer to an I2C device.  If send_len is set, send the
-+ * "len" value before the data.
-+ */
- int smbus_write_block(I2CBus *bus, uint8_t addr, uint8_t command, uint8_t *data,
--                      int len);
-+                      int len, bool send_len);
  
- void smbus_eeprom_init(I2CBus *smbus, int nb_eeprom,
-                        const uint8_t *eeprom_spd, int size);
+     aml_append(table, scope);
+diff --git a/include/hw/acpi/ipmi.h b/include/hw/acpi/ipmi.h
+index ab2bb29..d68bc85 100644
+--- a/include/hw/acpi/ipmi.h
++++ b/include/hw/acpi/ipmi.h
+@@ -17,6 +17,6 @@
+  * bus matches the given bus.  The resource is the ACPI resource that
+  * contains the IPMI device, this is required for the I2C CRS.
+  */
+-void build_acpi_ipmi_devices(Aml *table, BusState *bus);
++void build_acpi_ipmi_devices(Aml *table, BusState *bus, const char *resource);
+ 
+ #endif /* HW_ACPI_IPMI_H */
+diff --git a/stubs/ipmi.c b/stubs/ipmi.c
+index 98b6dce..6c71d6c 100644
+--- a/stubs/ipmi.c
++++ b/stubs/ipmi.c
+@@ -9,6 +9,6 @@
+ 
+ #include "hw/acpi/ipmi.h"
+ 
+-void build_acpi_ipmi_devices(Aml *table, BusState *bus)
++void build_acpi_ipmi_devices(Aml *table, BusState *bus, const char *resource)
+ {
+ }
 -- 
 2.7.4
