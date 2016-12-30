@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37507)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36198)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yi.l.liu@intel.com>) id 1cMoz4-0000s2-Fr
-	for qemu-devel@nongnu.org; Thu, 29 Dec 2016 23:40:03 -0500
+	(envelope-from <liq3ea@gmail.com>) id 1cMqRQ-0001m3-Kg
+	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 01:13:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yi.l.liu@intel.com>) id 1cMoyz-0000ig-Uu
-	for qemu-devel@nongnu.org; Thu, 29 Dec 2016 23:40:02 -0500
-Received: from mga14.intel.com ([192.55.52.115]:54733)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1cMoyz-0000cV-Ip
-	for qemu-devel@nongnu.org; Thu, 29 Dec 2016 23:39:57 -0500
-From: "Liu, Yi L" <yi.l.liu@intel.com>
-Date: Fri, 30 Dec 2016 04:39:49 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C257438FEFB52@shsmsx102.ccr.corp.intel.com>
-References: <A2975661238FB949B60364EF0F2C257438FEF883@shsmsx102.ccr.corp.intel.com>
-	<20161229095533.GA4195@pxdev.xzpeter.org>
-	<A2975661238FB949B60364EF0F2C257438FEF97F@shsmsx102.ccr.corp.intel.com>
-	<20161230034343.GC4195@pxdev.xzpeter.org>
-In-Reply-To: <20161230034343.GC4195@pxdev.xzpeter.org>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <liq3ea@gmail.com>) id 1cMqRP-00039W-Me
+	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 01:13:24 -0500
+Received: from mail-io0-x242.google.com ([2607:f8b0:4001:c06::242]:34160)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1cMqRP-000393-GU
+	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 01:13:23 -0500
+Received: by mail-io0-x242.google.com with SMTP id n85so21146777ioi.1
+	for <qemu-devel@nongnu.org>; Thu, 29 Dec 2016 22:13:23 -0800 (PST)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [RFC PATCH 11/13] intel_iommu: provide its own
- replay() callback
+In-Reply-To: <1767808401.7524716.1483023445359.JavaMail.zimbra@redhat.com>
+References: <1483003721-65360-1-git-send-email-liq3ea@gmail.com>
+	<1767808401.7524716.1483023445359.JavaMail.zimbra@redhat.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Fri, 30 Dec 2016 14:13:22 +0800
+Message-ID: <CAKXe6SJXJEG7Rs_ZrykQRMd_-uXiEJu+MuM6JSMynjN9yU1WkQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] virtio-gpu: fix memory leak in resource
+ attach backing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,84 +30,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: "Tian, Kevin" <kevin.tian@intel.com>, "Lan, Tianyu" <tianyu.lan@intel.com>, "'qemu-devel@nongnu.org'" <qemu-devel@nongnu.org>, "'bd.aviv@gmail.com'" <bd.aviv@gmail.com>
+To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <mlureau@redhat.com>
+Cc: kraxel@redhat.com, marcandre lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, Li Qiang <liqiang6-s@360.cn>
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBQZXRlciBYdSBbbWFpbHRvOnBl
-dGVyeEByZWRoYXQuY29tXQ0KPiBTZW50OiBGcmlkYXksIERlY2VtYmVyIDMwLCAyMDE2IDExOjQ0
-IEFNDQo+IFRvOiBMaXUsIFlpIEwgPHlpLmwubGl1QGludGVsLmNvbT4NCj4gQ2M6IFRpYW4sIEtl
-dmluIDxrZXZpbi50aWFuQGludGVsLmNvbT47IExhbiwgVGlhbnl1IDx0aWFueXUubGFuQGludGVs
-LmNvbT47ICdxZW11LQ0KPiBkZXZlbEBub25nbnUub3JnJyA8cWVtdS1kZXZlbEBub25nbnUub3Jn
-PjsgJ2JkLmF2aXZAZ21haWwuY29tJw0KPiA8YmQuYXZpdkBnbWFpbC5jb20+DQo+IFN1YmplY3Q6
-IFJlOiBbUWVtdS1kZXZlbF0gW1JGQyBQQVRDSCAxMS8xM10gaW50ZWxfaW9tbXU6IHByb3ZpZGUg
-aXRzIG93biByZXBsYXkoKQ0KPiBjYWxsYmFjaw0KPiANCj4gT24gVGh1LCBEZWMgMjksIDIwMTYg
-YXQgMTA6MjM6MjFBTSArMDAwMCwgTGl1LCBZaSBMIHdyb3RlOg0KPiANCj4gWy4uLl0NCj4gDQo+
-ID4gPiA+DQo+ID4gPiA+IEhlcmVieSwgSSBoYXZlIGEgbWlub3IgY29uY2VybiBvbiB0aGlzIHBh
-cnQuDQo+ID4gPiA+IFRoZSByZXBsYXkgd291bGQgYmUgcGVyZm9ybWVkIGluIHZmaW9fbGlzdGVu
-ZXJfcmVnaW9uX2FkZCgpIHdoZW4gZGV2aWNlIGlzDQo+ID4gPiA+IGFzc2lnbmVkLiBTaW5jZSBn
-dWVzdCBpcyBqdXN0IHN0YXJ0ZWQsIHNvIHRoZXJlIHdpbGwgYmUgbm8gdmFsaWQgY29udGV4dCBl
-bnRyeSBmb3INCj4gdGhlDQo+ID4gPiA+IGFzc2lnbmVkIGRldmljZS4gU28gdGhlcmUgd2lsbCBi
-ZSBubyB2dGRfcGFnZV93YWxrLiBUaHVzIG5vIGNoYW5nZSB0byBTTCBwYWdlDQo+ID4gPiA+IHRh
-YmxlIGluIGhvc3QuIFRoZSBTTCBwYWdlIHRhYmxlIHdvdWxkIHN0aWxsIGJlIGEgSU9WQS0+SFBB
-IG1hcHBpbmcuIEl0J3MgdHJ1ZQ0KPiA+ID4gPiB0aGF0IHRoZSBnSU9WQS0+SFBBIG1hcHBpbmcg
-Y2FuIGJlIGJ1aWx0IGJ5IHBhZ2UgbWFwL3VubWFwIHdoZW4gZ3Vlc3QNCj4gPiA+ID4gdHJ5aW5n
-IHRvIGlzc3VlIGRtYS4gU28gaXQgaXMganVzdCBvayB3aXRob3V0IHJlbHBheSBpbiB0aGUgYmVn
-aW5uaW5nLiBIb3QgcGx1Zw0KPiBzaG91bGQNCj4gPiA+ID4gYmUgYWxsIHRoZSBzYW1lLiBJIGd1
-ZXNzIGl0IGlzIHRoZSBkZXNpZ24gaGVyZT8NCj4gPiA+DQo+ID4gPiBJIGFtIG5vdCBzdXJlIHdo
-ZXRoZXIgSSBnZXQgeW91ciBwb2ludCBoZXJlIC0gSSB0aGluayBpdCdzIGJ5IGRlc2lnbi4NCj4g
-PiA+IFdlIGRvbid0IHJlYWxseSBuZWVkIHJlcGxheSBpZiB3ZSBhcmUgc3VyZSB0aGF0IHRoZSBJ
-T01NVSBhZGRyZXNzDQo+ID4gPiBzcGFjZSBoYXMgdG90YWxseSBubyBtYXBwaW5nIChpLmUuLCB3
-aGVuIHRoZSBndWVzdCBpbml0KS4gUmVwbGF5IGlzDQo+ID4gPiBvbmx5IHVzZWZ1bCB3aGVuIHRo
-ZXJlIGFyZSBleGlzdGluZyBtYXBwaW5ncyBpbiB0aGUgSU9NTVUgYWRkcmVzcw0KPiA+ID4gc3Bh
-Y2UuDQo+ID4geWVzLCBpZiB3ZSBhcmUgc3VyZSBubyBleGlzdGluZyBtYXBwaW5nLCBpdCBpcyBv
-ay4gVGhlcmUgaXMgYW5vdGhlciBjYXNlIHdoaWNoIG1heQ0KPiA+IGNvbXBsYWluIGl0LiBJZiBh
-IGRldmljZSBpcyBob3RwbHVnIGluLCB0aGVuIHRoZXJlIHNob3VsZCBiZSBleGlzdGluZyBtYXBw
-aW5nLiBKdXN0DQo+ID4gbG9va2VkIGNvZGUgYWdhaW4uIElmIGNvcnJlc3BvbmRpbmcgY29udGV4
-dCBlbnRyeSBpcyBub3QgcHJlc2VudCwgdGhlDQo+ID4gdnRkX3BhZ2Vfd2FsayBzaG91bGQgYmUg
-YnlwYXNzZWQuDQo+IA0KPiBZZXMsIGlmIHRoZSBjb250ZXh0IGVudHJ5IGlzIG5vdCBwcmVzZW50
-LCB0aGUgcmVwbGF5IHdpbGwgYmUgYnlwYXNzZWQuDQo+IEFuZCBpZiBpdCBleGlzdHMsIHRoZW4g
-dGhlIHJlcGxheSB3aWxsIHdvcmsgKGFsb25nIHdpdGggdGhlIHBhZ2Ugd2Fsaw0KPiBwcm9jZXNz
-KS4gU2hvdWxkbid0IHRoYXQgdGhlIGJlaGF2aW9yIHdlIHdhbnQ/DQo+IA0KPiBQbGVhc2UgY2xh
-cmlmeSBpZiBJIG1pc3VuZGVyc3Rvb2QgeW91ciBxdWVzdGlvbi4NCkkgd2FzIGp1c3QgYXNzdW1p
-bmcgYSByZXBsYXkgc2hvdWxkIGJlIHBlcmZvcm1lZCB3aGVuIGEgbmV3IGRldmljZSBpcyBwbHVn
-IGluLg0KSG93ZXZlciwgYWNjb3JkaW5nIHRvIHlvdXIgc3RhdGVtZW50cywgaXQgaXMgbm90IHJl
-cXVpcmVkLiBJcyB0aGlzIHRoZSBjb25jbHVzaW9uIGluDQp0aGUgcHJldmlvdXMgZGlzY3Vzc2lv
-bj8NCg0KPiBbLi4uXQ0KPiANCj4gPiA+ID4NCj4gPiA+ID4gSG93ZXZlciwgaXQgbWF5IGJlIGlu
-Y29tcGF0aWJsZSB3aXRoIGEgZnV0dXJlIHdvcmsgaW4gd2hpY2ggd2UgZXhwb3NlIGFuDQo+ID4g
-PiA+IHZJT01NVSB0byBndWVzdCBidXQgZ3Vlc3QgZGlzYWJsZSBJT1ZBIHVzYWdlLiBJbiB0aGlz
-IHNjZW5hcmlvLCB0aGUgU0wgcGFnZQ0KPiA+ID4gPiB0YWJsZSBpbiBob3N0IHdvdWxkIGJlIGEg
-R1BBLT5IUEEgaW5zdGVhZCBvZiBhIGdJT1ZBLT5IUEEgbWFwcGluZy4gSXQgd291bGQNCj4gPiA+
-ID4gcmVseSBvbiBtZW1vcnlfcmVwbGF5IHRvIGJ1aWxkIGEgR1BBLT5IUEEgbWFwcGluZy4gSWYg
-SSdtIGNvcnJlY3QsIEkgdGhpbmsgaXQNCj4gPiA+ID4gd291bGQgYmUgZXhwZWN0ZWQgdG8gaGF2
-ZSBhIHJlcGxheSBpbiB0aGUgdGltZSBkZXZpY2UgaXMgYXNzaWduZWQuDQo+ID4gPg0KPiA+ID4g
-SWYgeW91IG5lZWQgYSBHUEEgLT4gSFBBIG1hcHBpbmcgKEFGQUlDVCB5b3UgbWVhbiB2aXJ0dWFs
-aXplZCBTVk0gYW5kDQo+ID4gPiB0aGUgc28tY2FsbGVkIGZpcnN0IGxldmVsIHRyYW5zbGF0aW9u
-KSwgSU1ITyB0aGUgZGVmYXVsdCBtYXBwaW5nDQo+ID4gPiBiZWhhdmlvciBvZiB2ZmlvX2xpc3Rl
-bmVyX3JlZ2lvbl9hZGQoKSBzdWl0ZXMgaGVyZSAod2hlbg0KPiA+ID4gbWVtb3J5X3JlZ2lvbl9p
-c19pb21tdShzZWN0aW9uLT5tcikgPT0gZmFsc2UpLCB3aGljaCBtYXBzIHRoZSB3aG9sZQ0KPiA+
-ID4gZ3Vlc3QgcGh5c2ljYWwgYWRkcmVzcyBzcGFjZSwganVzdCBsaWtlIHRoZSBjYXNlIHdoZW4g
-d2UgdXNlIHZmaW8NCj4gPiA+IGRldmljZXMgd2l0aG91dCB2SU9NTVUuDQo+ID4gWWVzLCBJIG1l
-YW4gU1ZNIHZpcnR1YWxpemFpb24uIFRvIHZpcnR1YWxpemUgU1ZNLCBhbiB2SU9NTVUgd291bGQg
-YmUgZXhwb3NlZCB0bw0KPiA+IGd1ZXN0LiBTbyBtZW1vcnlfcmVnaW9uX2lzX2lvbW11KHNlY3Rp
-b24tPm1yKSB3b3VsZCBiZSB0cnVlLiBUaGVuLCB0aGUNCj4gb3JpZ2luYWwNCj4gPiBtYXBwaW5n
-IHRoZSB3aG9sZSBndWVzdCBwaHlzaWNhbCBhZGRyZXNzIHNwYWNlIHdvdWxkIG5vdCBydW4uIFRo
-dXMgbm8gR1BBLT5IUEENCj4gPiBtYXBwaW5nIHdvdWxkIGJlIGJ1aWx0LiBUaGlzIGlzIHdoYXQg
-SSByZWFsbHkgY29uY2VybiBoZXJlLg0KPiANCj4gV2hhdCBJIG1lYW50IGFib3ZlIHdhcywgd2Ug
-bWlnaHQgYmUgYWJsZSB0byBsZXZlcmFnZSBleGlzdGluZw0KPiBuby12aW9tbXUgbG9naWMgdG8g
-YnVpbGQgdGhlIFNMUFQgZm9yIHZpcnR1YWxpemVkIFNWTS4gRm9yIGV4YW1wbGUsIHdlDQo+IGNh
-biBzd2l0Y2ggdGhlIGlmIGJsb2NrIGZyb206DQo+IA0KPiAgIGlmIChtZW1vcnlfcmVnaW9uX2lz
-X2lvbW11KHNlY3Rpb24tPm1yKSkNCj4gDQo+IGludG8gc29tZXRoaW5nIHNpbWlsaWFyIGxpa2U6
-DQo+IA0KPiAgIGlmIChtZW1vcnlfcmVnaW9uX2lzX2lvbW11KHNlY3Rpb24tPm1yKSAmJg0KPiAg
-ICAgICAhRklSU1RfTEVWRUxfVFJBTlNMQVRJT05fRU5BQkxFRChzZWN0aW9uLT5tcikpDQo+IA0K
-PiBKdXN0IGEgcXVpY2sgdGhvdWdodCwgbm90IHN1cmUgd2hldGhlciB0aGF0IHdvdWxkIGJlIGFu
-IGFwcGxpY2FibGUNCj4gaWRlYS4gVGhhbmtzLA0KSWYgSSByZW1lbWJlciBjb3JyZWN0bHksIHdp
-dGggdklPTU1VIGV4cG9zZWQsIHNlY3Rpb24tPm1yIGhlcmUgc2hvdWxkDQpub3QgYmUgYSByYW0s
-IHRoZSBsb2dpYyB3b3VsZCBmYWlsIGluIHRoZSBmb2xsb3dpbmcgY29kZS4gSSBhZ3JlZSB3aXRo
-IHlvdQ0KdGhhdCBtYXAgdGhlIHdob2xlIGd1ZXN0IHBoeXNpY2FsIGFkZHJlc3Mgc3BhY2Ugc2hv
-dWxkIHdvcmsgd2l0aCBTVk0NCnZpcnR1YWxpemF0aW9uLiBNYXkgbmVlZCB0byB0aGluayBtb3Jl
-IG9uIGhvdyB0byBtYWtlIGl0IGhhcHBlbi4NCg0KaHcvaTM4Ni9jb21tb24uYywgYSBzbmlwcGV0
-Og0KICAgIC8qIEhlcmUgd2UgYXNzdW1lIHRoYXQgbWVtb3J5X3JlZ2lvbl9pc19yYW0oc2VjdGlv
-bi0+bXIpPT10cnVlICovDQoNCiAgICB2YWRkciA9IG1lbW9yeV9yZWdpb25fZ2V0X3JhbV9wdHIo
-c2VjdGlvbi0+bXIpICsNCiAgICAgICAgICAgIHNlY3Rpb24tPm9mZnNldF93aXRoaW5fcmVnaW9u
-ICsNCiAgICAgICAgICAgIChpb3ZhIC0gc2VjdGlvbi0+b2Zmc2V0X3dpdGhpbl9hZGRyZXNzX3Nw
-YWNlKTsNCg0KVGhhbmtzLA0KWWkgTA0K
+2016-12-29 22:57 GMT+08:00 Marc-Andr=C3=A9 Lureau <mlureau@redhat.com>:
+
+> Hi
+>
+> ----- Original Message -----
+> > In the resource attach backing function, everytime it will
+> > allocate 'res->iov' thus can leading a memory leak. This
+> > patch avoid this.
+> >
+> > Signed-off-by: Li Qiang <liq3ea@gmail.com>
+> > ---
+> >  hw/display/virtio-gpu.c | 5 +++++
+> >  1 file changed, 5 insertions(+)
+> >
+> > diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
+> > index 5f32e1a..045f296 100644
+> > --- a/hw/display/virtio-gpu.c
+> > +++ b/hw/display/virtio-gpu.c
+> > @@ -705,6 +705,11 @@ virtio_gpu_resource_attach_backing(VirtIOGPU *g,
+> >          return;
+> >      }
+> >
+> > +    if (res->iov) {
+> > +        cmd->error =3D VIRTIO_GPU_RESP_ERR_UNSPEC;
+> > +        return;
+> > +    }
+> > +
+>
+> I think I would rather return an error in the library for this case.
+>
+>
+IIUC Do you mean virglrenderer library? There is no related to this library=
+.
+
+Thanks.
+
+
+> >      ret =3D virtio_gpu_create_mapping_iov(&ab, cmd, &res->addrs,
+> &res->iov);
+> >      if (ret !=3D 0) {
+> >          cmd->error =3D VIRTIO_GPU_RESP_ERR_UNSPEC;
+> > --
+> > 1.8.3.1
+> >
+> >
+>
