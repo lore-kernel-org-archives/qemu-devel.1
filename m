@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49220)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49312)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbutsykin@virtuozzo.com>) id 1cMzeJ-0001BV-UL
-	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 11:03:20 -0500
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1cMzf5-0001XH-Jx
+	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 11:04:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbutsykin@virtuozzo.com>) id 1cMzeG-0002W7-AV
-	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 11:03:19 -0500
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1cMzf2-0002dX-A7
+	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 11:04:07 -0500
 From: Pavel Butsykin <pbutsykin@virtuozzo.com>
-Date: Fri, 30 Dec 2016 17:31:41 +0300
-Message-ID: <20161230143142.18214-18-pbutsykin@virtuozzo.com>
+Date: Fri, 30 Dec 2016 17:31:29 +0300
+Message-ID: <20161230143142.18214-6-pbutsykin@virtuozzo.com>
 In-Reply-To: <20161230143142.18214-1-pbutsykin@virtuozzo.com>
 References: <20161230143142.18214-1-pbutsykin@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 17/18] qapi: allow blockdev-add for pcache
+Subject: [Qemu-devel] [PATCH v2 05/18] block/pcache: statistics collection
+ read requests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,72 +25,100 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, den@openvz.org, eblake@redhat.com, armbru@redhat.com
 
+Here the rbcache is used as a repository statistics requests, in fact, data
+requests are not cached, so we have the ability to store a large  number of
+requests. We need statistics requests to determine the sequential requests.
+
 Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
 ---
- qapi/block-core.json | 30 ++++++++++++++++++++++++++++--
- 1 file changed, 28 insertions(+), 2 deletions(-)
+ block/pcache.c | 32 +++++++++++++++++++++++++++++++-
+ 1 file changed, 31 insertions(+), 1 deletion(-)
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 6b42216960..00a6e15db3 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -1719,6 +1719,7 @@
- # @nfs: Since 2.8
- # @replication: Since 2.8
- # @ssh: Since 2.8
-+# @pcache: since 2.9
- #
- # Since: 2.0
- ##
-@@ -1726,8 +1727,8 @@
-   'data': [ 'archipelago', 'blkdebug', 'blkverify', 'bochs', 'cloop',
-             'dmg', 'file', 'ftp', 'ftps', 'gluster', 'host_cdrom',
-             'host_device', 'http', 'https', 'luks', 'nbd', 'nfs', 'null-aio',
--            'null-co', 'parallels', 'qcow', 'qcow2', 'qed', 'quorum', 'raw',
--            'replication', 'ssh', 'vdi', 'vhdx', 'vmdk', 'vpc',
-+            'null-co', 'parallels', 'pcache', 'qcow', 'qcow2', 'qed', 'quorum',
-+            'raw', 'replication', 'ssh', 'vdi', 'vhdx', 'vmdk', 'vpc',
-             'vvfat' ] }
+diff --git a/block/pcache.c b/block/pcache.c
+index 7a67618408..296ae382b0 100644
+--- a/block/pcache.c
++++ b/block/pcache.c
+@@ -13,20 +13,38 @@
+ #include "block/block_int.h"
+ #include "qapi/error.h"
+ #include "qapi/qmp/qstring.h"
++#include "qemu/rbcache.h"
  
- ##
-@@ -1808,6 +1809,30 @@
-   'base': 'BlockdevOptionsGenericFormat',
-   'data': { '*key-secret': 'str' } }
++#define PCACHE_OPT_STATS_SIZE "pcache-stats-size"
  
-+##
-+# @BlockdevOptionsPCache
-+#
-+# Driver specific block device options for pcache.
-+#
-+# @image:                Reference to a block device image for caching.
-+#
-+# @pcache-stats-size:    #optional Total volume of requests for statistics.
-+#
-+# @pcache-max-aio-size:  #optional Maximum size of read request which is handled
-+#                        by pcache.
-+#
-+# @pcache-full-size:     #optional Total cache size.
-+#
-+# @pcache-readahead-size #optional Prefetch cache readahead size.
-+#
-+# Since: 2.9
-+##
-+{ 'struct': 'BlockdevOptionsPCache',
-+  'data': { 'image': 'BlockdevRef',
-+            '*pcache-stats-size': 'int',
-+            '*pcache-max-aio-size': 'int',
-+            '*pcache-full-size': 'int',
-+            '*pcache-readahead-size': 'int' } }
+ static QemuOptsList runtime_opts = {
+     .name = "pcache",
+     .head = QTAILQ_HEAD_INITIALIZER(runtime_opts.head),
+     .desc = {
++        {
++            .name = PCACHE_OPT_STATS_SIZE,
++            .type = QEMU_OPT_SIZE,
++            .help = "Total volume of requests for statistics",
++        },
+         { /* end of list */ }
+     },
+ };
  
- ##
- # @BlockdevOptionsGenericCOWFormat:
-@@ -2402,6 +2427,7 @@
-       'null-aio':   'BlockdevOptionsNull',
-       'null-co':    'BlockdevOptionsNull',
-       'parallels':  'BlockdevOptionsGenericFormat',
-+      'pcache':     'BlockdevOptionsPCache',
-       'qcow2':      'BlockdevOptionsQcow2',
-       'qcow':       'BlockdevOptionsGenericCOWFormat',
-       'qed':        'BlockdevOptionsGenericCOWFormat',
++#define MB_BITS 20
++#define PCACHE_DEFAULT_STATS_SIZE (3 << MB_BITS)
++
++typedef struct BDRVPCacheState {
++    RBCache *req_stats;
++} BDRVPCacheState;
++
+ static coroutine_fn int pcache_co_preadv(BlockDriverState *bs, uint64_t offset,
+                                          uint64_t bytes, QEMUIOVector *qiov,
+                                          int flags)
+ {
++    BDRVPCacheState *s = bs->opaque;
++
++    rbcache_search_and_insert(s->req_stats, offset, bytes);
++
+     return bdrv_co_preadv(bs->file, offset, bytes, qiov, flags);
+ }
+ 
+@@ -37,6 +55,13 @@ static coroutine_fn int pcache_co_pwritev(BlockDriverState *bs, uint64_t offset,
+     return bdrv_co_pwritev(bs->file, offset, bytes, qiov, flags);
+ }
+ 
++static void pcache_state_init(QemuOpts *opts, BDRVPCacheState *s)
++{
++    uint64_t stats_size = qemu_opt_get_size(opts, PCACHE_OPT_STATS_SIZE,
++                                            PCACHE_DEFAULT_STATS_SIZE);
++    s->req_stats = rbcache_create(NULL, NULL, stats_size, RBCACHE_FIFO, s);
++}
++
+ static int pcache_file_open(BlockDriverState *bs, QDict *options, int flags,
+                             Error **errp)
+ {
+@@ -58,7 +83,9 @@ static int pcache_file_open(BlockDriverState *bs, QDict *options, int flags,
+     if (local_err) {
+         ret = -EINVAL;
+         error_propagate(errp, local_err);
++        goto fail;
+     }
++    pcache_state_init(opts, bs->opaque);
+ fail:
+     qemu_opts_del(opts);
+     return ret;
+@@ -66,6 +93,9 @@ fail:
+ 
+ static void pcache_close(BlockDriverState *bs)
+ {
++    BDRVPCacheState *s = bs->opaque;
++
++    rbcache_destroy(s->req_stats);
+ }
+ 
+ static int64_t pcache_getlength(BlockDriverState *bs)
+@@ -81,7 +111,7 @@ static bool pcache_recurse_is_first_non_filter(BlockDriverState *bs,
+ 
+ static BlockDriver bdrv_pcache = {
+     .format_name                        = "pcache",
+-    .instance_size                      = 0,
++    .instance_size                      = sizeof(BDRVPCacheState),
+ 
+     .bdrv_file_open                     = pcache_file_open,
+     .bdrv_close                         = pcache_close,
 -- 
 2.11.0
