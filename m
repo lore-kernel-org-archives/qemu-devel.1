@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39754)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47120)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcin.krzeminski@nokia.com>) id 1cMveM-0006EP-Il
-	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 06:47:07 -0500
+	(envelope-from <fbl@redhat.com>) id 1cMwVA-0005vN-4K
+	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 07:41:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcin.krzeminski@nokia.com>) id 1cMveJ-0007L8-CW
-	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 06:47:06 -0500
-From: "Krzeminski, Marcin (Nokia - PL/Wroclaw)" <marcin.krzeminski@nokia.com>
-Date: Fri, 30 Dec 2016 10:13:17 +0000
-Message-ID: <AM4PR0701MB2130E7AB34BFBB36FCB75E53FE6A0@AM4PR0701MB2130.eurprd07.prod.outlook.com>
-References: <1481894559-13974-1-git-send-email-marcin.krzeminski@nokia.com>
-	<1481894559-13974-2-git-send-email-marcin.krzeminski@nokia.com>,
-	<CAFEAcA-ODRCg1t=6iFBE5oue8X5GSHDXYWV2uy6sFttE8_tG6Q@mail.gmail.com>
-In-Reply-To: <CAFEAcA-ODRCg1t=6iFBE5oue8X5GSHDXYWV2uy6sFttE8_tG6Q@mail.gmail.com>
-Content-Language: pl-PL
-Content-Type: text/plain; charset="iso-8859-2"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <fbl@redhat.com>) id 1cMwV7-00058q-2c
+	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 07:41:40 -0500
+Received: from mail-qk0-f181.google.com ([209.85.220.181]:34963)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <fbl@redhat.com>) id 1cMwV6-00058Z-VX
+	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 07:41:37 -0500
+Received: by mail-qk0-f181.google.com with SMTP id u25so285479273qki.2
+	for <qemu-devel@nongnu.org>; Fri, 30 Dec 2016 04:41:36 -0800 (PST)
+Date: Fri, 30 Dec 2016 10:41:30 -0200
+From: Flavio Leitner <fbl@redhat.com>
+Message-ID: <20161230104130.29ff671b@x240.lan>
 MIME-Version: 1.0
-Subject: [Qemu-devel] Odp.: [RFC 1/3] nvic: Add CPU numebr property
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] vhost-user breaks after 96a3d98.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,49 +26,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, "rfsw-patches@mlist.nokia.com" <rfsw-patches@mlist.nokia.com>, "mar.krzeminski@gmail.com" <mar.krzeminski@gmail.com>
+To: Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
-Hi Peter,
 
-sorry for late response - I missed your email.
+Hi,
 
-> On 16 December 2016 at 13:22,  <marcin.krzeminski@nokia.com> wrote:
->> From: Marcin Krzeminski <marcin.krzeminski@nokia.com>
->>
->> In case of MultiCPU SoC M3 is not always CPU0.
->> This commit add cpu_id property to allow set CPU
->> number for NVIC model. Also address space that this used
->> by NVIC is updated to mach CPU's one.
->>
->> Signed-off-by: Marcin Krzeminski <marcin.krzeminski@nokia.com>
->
-> The right fix for this I think is probably for the NVIC to
-> have an actual pointer to its CPU object, which the armv7m_init
-> code sets up (perhaps with QOM links?) when it creates the CPU
-> and the NVIC. The two really do need to be closely coupled,
-> and the CPU already has a pointer to its NVIC. There's
-> no need for the NVIC to get the CPU pointer by looking it up
-> by CPU ID.
+While I was testing vhost-user using OVS 2.5 and DPDK 2.2.0 in the
+host and testpmd dpdk 2.2.0 in the guest, I found that the commit
+below breaks the environment and no packets gets into the guest.
 
-I was thinking about similar solution (maybe the same as you did in GIC v3)=
-.
-Generally this should be done automatically without any user interact.
->
-> Once I've got the GICv3 virtualization out of the way, the
-> next thing on my todo list is to pick up the NVIC refactoring
-> that Michael Davidsaver posted last year:
->  https://lists.nongnu.org/archive/html/qemu-devel/2015-12/msg00504.html
-> which makes some moves in that direction (though it doesn't
-> init the NVIC's CPU pointer with a link, it just assumes
-> first_cpu).
+dpdk port --> OVS --> vhost-user --> guest --> testpmd
+                         ^--- drops here         ^--- no packets here.
 
-That is good news ;]. I think we can postpone this work until NVIC
-refactoring will be finished.
+commit 96a3d98d2cdbd897ff5ab33427aa4cfb94077665
+Author: Jason Wang <jasowang@redhat.com>
+Date:   Mon Aug 1 16:07:58 2016 +0800
+
+    vhost: don't set vring call if no vector
+    
+    We used to set vring call fd unconditionally even if guest driver does
+    not use MSIX for this vritqueue at all. This will cause lots of
+    unnecessary userspace access and other checks for drivers does not use
+    interrupt at all (e.g virtio-net pmd). So check and clean vring call
+    fd if guest does not use any vector for this virtqueue at
+    all.
+[...]
 
 Thanks,
-Marcin
->
-> thanks
-> -- PMM
->
+-- 
+Flavio
