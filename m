@@ -1,18 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33566)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33950)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbutsykin@virtuozzo.com>) id 1cN0bk-0007Kt-T8
-	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 12:04:47 -0500
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1cN0cP-0007re-NR
+	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 12:05:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbutsykin@virtuozzo.com>) id 1cN0bh-0005CN-GU
-	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 12:04:44 -0500
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1cN0cM-0005eg-HQ
+	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 12:05:25 -0500
 From: Pavel Butsykin <pbutsykin@virtuozzo.com>
-Date: Fri, 30 Dec 2016 17:31:28 +0300
-Message-ID: <20161230143142.18214-5-pbutsykin@virtuozzo.com>
-In-Reply-To: <20161230143142.18214-1-pbutsykin@virtuozzo.com>
-References: <20161230143142.18214-1-pbutsykin@virtuozzo.com>
+Date: Fri, 30 Dec 2016 17:31:24 +0300
+Message-ID: <20161230143142.18214-1-pbutsykin@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 04/18] tests/test-rbcache: add test cases
+Subject: [Qemu-devel] [PATCH v2 00/18] I/O prefetch cache
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,470 +22,164 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, den@openvz.org, eblake@redhat.com, armbru@redhat.com
 
-Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
----
- tests/Makefile.include |   3 +
- tests/test-rbcache.c   | 431 +++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 434 insertions(+)
- create mode 100644 tests/test-rbcache.c
+The prefetch cache aims to improve the performance of sequential read data.
+Of most interest here are the requests of a small size of data for sequential
+read, such requests can be optimized by extending them and moving into 
+the prefetch cache. However, there are 2 issues:
+ - In aggregate only a small portion of requests is sequential, so delays caused
+   by the need to read more volumes of data will lead to an overall decrease
+   in performance.
+ - The presence of redundant data in the cache memory with a large number of
+   random requests.
+This pcache implementation solves the above and other problems prefetching data.
+The pcache algorithm can be summarised by the following main steps.
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 4841d582a1..74bdcd2aac 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -55,6 +55,8 @@ check-unit-y += tests/test-hbitmap$(EXESUF)
- gcov-files-test-hbitmap-y = blockjob.c
- check-unit-y += tests/test-blockjob$(EXESUF)
- check-unit-y += tests/test-blockjob-txn$(EXESUF)
-+gcov-files-test-rbcache-y = util/rbcache.c
-+check-unit-y += tests/test-rbcache$(EXESUF)
- check-unit-y += tests/test-x86-cpuid$(EXESUF)
- # all code tested by test-x86-cpuid is inside topology.h
- gcov-files-test-x86-cpuid-y =
-@@ -498,6 +500,7 @@ tests/test-blockjob-txn$(EXESUF): tests/test-blockjob-txn.o $(test-block-obj-y)
- tests/test-thread-pool$(EXESUF): tests/test-thread-pool.o $(test-block-obj-y)
- tests/test-iov$(EXESUF): tests/test-iov.o $(test-util-obj-y)
- tests/test-hbitmap$(EXESUF): tests/test-hbitmap.o $(test-util-obj-y)
-+tests/test-rbcache$(EXESUF): tests/test-rbcache.o $(test-util-obj-y)
- tests/test-x86-cpuid$(EXESUF): tests/test-x86-cpuid.o
- tests/test-xbzrle$(EXESUF): tests/test-xbzrle.o migration/xbzrle.o page_cache.o $(test-util-obj-y)
- tests/test-cutils$(EXESUF): tests/test-cutils.o util/cutils.o
-diff --git a/tests/test-rbcache.c b/tests/test-rbcache.c
-new file mode 100644
-index 0000000000..40ccd6b225
---- /dev/null
-+++ b/tests/test-rbcache.c
-@@ -0,0 +1,431 @@
-+/*
-+ * QEMU Range-Based Cache core
-+ *
-+ * Copyright (C) 2015-2016 Parallels IP Holdings GmbH.
-+ *
-+ * Author: Pavel Butsykin <pbutsykin@virtuozzo.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or
-+ * later.  See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/rbcache.h"
-+
-+typedef struct TestRBCacheData {
-+    RBCache *cache;
-+} TestRBCacheData;
-+
-+typedef struct TestRBCacheConfig {
-+    uint64_t limit_size;
-+    int eviction_type;
-+    RBNodeAlloc *alloc;
-+    RBNodeFree  *free;
-+    void *opaque;
-+} TestRBCacheConfig;
-+
-+#define KB(_n) ((_n) << 10)
-+#define MB(_n) ((_n) << 20)
-+
-+#define OFFSET1 0
-+#define SIZE1   KB(1)
-+
-+#define OFFSET2 KB(1)
-+#define SIZE2   KB(2)
-+
-+#define OFFSET3 KB(18)
-+#define SIZE3   KB(1)
-+
-+#define OFFSET4 KB(7)
-+#define SIZE4   KB(7)
-+
-+#define OFFSET5 KB(1)
-+#define SIZE5   KB(4)
-+
-+#define OFFSET6 KB(5)
-+#define SIZE6   KB(5)
-+
-+#define OFFSET7 KB(15)
-+#define SIZE7   KB(20)
-+
-+#define OFFSET8 KB(2)
-+#define SIZE8   KB(20)
-+
-+
-+static void test_rbcache_init(TestRBCacheData *data, const void *ctx)
-+{
-+    g_assert_nonnull(data->cache);
-+}
-+
-+static void test_rbcache_insert(TestRBCacheData *data, const void *ctx)
-+{
-+    RBCacheNode *node1 = rbcache_node_alloc(data->cache, OFFSET1, SIZE1);
-+    RBCacheNode *node2 = rbcache_node_alloc(data->cache, OFFSET2, SIZE2);
-+    RBCacheNode *node3 = rbcache_node_alloc(data->cache, OFFSET3, SIZE3);
-+    RBCacheNode *node4 = rbcache_node_alloc(data->cache, OFFSET4, SIZE4);
-+    RBCacheNode *node5 = rbcache_node_alloc(data->cache, OFFSET5, SIZE5);
-+    RBCacheNode *node6 = rbcache_node_alloc(data->cache, OFFSET6, SIZE6);
-+    RBCacheNode *node7 = rbcache_node_alloc(data->cache, OFFSET7, SIZE7);
-+    RBCacheNode *node8 = rbcache_node_alloc(data->cache, OFFSET8, SIZE8);
-+    RBCacheNode *node;
-+
-+    node = rbcache_insert(data->cache, node2);
-+    g_assert_true(node == node2);
-+
-+    node = rbcache_insert(data->cache, node1);
-+    g_assert_true(node == node1);
-+
-+    node = rbcache_insert(data->cache, node3);
-+    g_assert_true(node == node3);
-+
-+    node = rbcache_insert(data->cache, node4);
-+    g_assert_true(node == node4);
-+
-+    node = rbcache_insert(data->cache, node5);
-+    g_assert_true(node == node2);
-+    rbcache_node_free(data->cache, node5);
-+
-+    node = rbcache_insert(data->cache, node6);
-+    g_assert_true(node == node4);
-+    rbcache_node_free(data->cache, node6);
-+
-+    node = rbcache_insert(data->cache, node7);
-+    g_assert_true(node == node3);
-+    rbcache_node_free(data->cache, node7);
-+
-+    node = rbcache_insert(data->cache, node8);
-+    g_assert_true(node == node2);
-+    rbcache_node_free(data->cache, node8);
-+}
-+
-+static void test_rbcache_search(TestRBCacheData *data, const void *ctx)
-+{
-+    RBCacheNode *node;
-+
-+    test_rbcache_insert(data, ctx);
-+
-+    node = rbcache_search(data->cache, OFFSET1, SIZE1);
-+    g_assert_nonnull(node);
-+    g_assert_cmpuint(node->offset, ==, OFFSET1);
-+    g_assert_cmpuint(node->bytes, ==, SIZE1);
-+
-+    node = rbcache_search(data->cache, OFFSET2 + KB(1), SIZE2);
-+    g_assert_nonnull(node);
-+    g_assert_cmpuint(node->offset, ==, OFFSET2);
-+    g_assert_cmpuint(node->bytes, ==, SIZE2);
-+
-+    node = rbcache_search(data->cache, OFFSET8, SIZE8);
-+    g_assert_nonnull(node);
-+    g_assert_cmpuint(node->offset, ==, OFFSET2);
-+    g_assert_cmpuint(node->bytes, ==, SIZE2);
-+
-+    node = rbcache_search(data->cache, OFFSET8 + KB(2), SIZE5);
-+    g_assert_nonnull(node);
-+    g_assert_cmpuint(node->offset, ==, OFFSET4);
-+    g_assert_cmpuint(node->bytes, ==, OFFSET4);
-+
-+    node = rbcache_search(data->cache, OFFSET3 + SIZE3, SIZE3);
-+    g_assert_null(node);
-+}
-+
-+static void test_rbcache_search_and_insert(TestRBCacheData *data,
-+                                           const void *ctx)
-+{
-+    RBCacheNode *node;
-+
-+    node = rbcache_search_and_insert(data->cache, OFFSET2, SIZE2);
-+    g_assert_nonnull(node);
-+    g_assert_cmpuint(node->offset, ==, OFFSET2);
-+    g_assert_cmpuint(node->bytes, ==, SIZE2);
-+
-+    node = rbcache_search_and_insert(data->cache, OFFSET1, SIZE1);
-+    g_assert_nonnull(node);
-+    g_assert_cmpuint(node->offset, ==, OFFSET1);
-+    g_assert_cmpuint(node->bytes, ==, SIZE1);
-+
-+    node = rbcache_search_and_insert(data->cache, OFFSET3, SIZE3);
-+    g_assert_nonnull(node);
-+    g_assert_cmpuint(node->offset, ==, OFFSET3);
-+    g_assert_cmpuint(node->bytes, ==, SIZE3);
-+
-+    node = rbcache_search_and_insert(data->cache, OFFSET4, SIZE4);
-+    g_assert_nonnull(node);
-+    g_assert_cmpuint(node->offset, ==, OFFSET4);
-+    g_assert_cmpuint(node->bytes, ==, SIZE4);
-+
-+    node = rbcache_search_and_insert(data->cache, OFFSET5, SIZE5);
-+    g_assert_nonnull(node);
-+    g_assert_cmpuint(node->offset, ==, OFFSET2);
-+    g_assert_cmpuint(node->bytes, ==, SIZE2);
-+
-+    node = rbcache_search_and_insert(data->cache, OFFSET6, SIZE6);
-+    g_assert_nonnull(node);
-+    g_assert_cmpuint(node->offset, ==, OFFSET4);
-+    g_assert_cmpuint(node->bytes, ==, SIZE4);
-+
-+    node = rbcache_search_and_insert(data->cache, OFFSET7, SIZE7);
-+    g_assert_nonnull(node);
-+    g_assert_cmpuint(node->offset, ==, OFFSET3);
-+    g_assert_cmpuint(node->bytes, ==, SIZE3);
-+
-+    node = rbcache_search_and_insert(data->cache, OFFSET8, SIZE8);
-+    g_assert_nonnull(node);
-+    g_assert_cmpuint(node->offset, ==, OFFSET2);
-+    g_assert_cmpuint(node->bytes, ==, SIZE2);
-+}
-+
-+static void test_rbcache_remove(TestRBCacheData *data, const void *ctx)
-+{
-+    RBCacheNode *node;
-+
-+    test_rbcache_search_and_insert(data, ctx);
-+
-+    node = rbcache_search(data->cache, OFFSET1, SIZE1);
-+    g_assert_nonnull(node);
-+    rbcache_remove(data->cache, node);
-+    node = rbcache_search(data->cache, OFFSET1, SIZE1);
-+    g_assert_null(node);
-+
-+    node = rbcache_search(data->cache, OFFSET3, SIZE3);
-+    g_assert_nonnull(node);
-+    rbcache_remove(data->cache, node);
-+    node = rbcache_search(data->cache, OFFSET3, SIZE3);
-+    g_assert_null(node);
-+
-+    node = rbcache_search(data->cache, OFFSET4, SIZE4);
-+    g_assert_nonnull(node);
-+    rbcache_remove(data->cache, node);
-+    node = rbcache_search(data->cache, OFFSET4, SIZE4);
-+    g_assert_null(node);
-+
-+    node = rbcache_search(data->cache, OFFSET2, SIZE2);
-+    g_assert_nonnull(node);
-+    rbcache_remove(data->cache, node);
-+    node = rbcache_search(data->cache, OFFSET2, SIZE2);
-+    g_assert_null(node);
-+}
-+
-+static void test_rbcache_shrink(TestRBCacheData *data, const void *ctx)
-+{
-+    RBCacheNode *node;
-+
-+    node = rbcache_search_and_insert(data->cache, 0, MB(2));
-+    g_assert_nonnull(node);
-+
-+    node = rbcache_search_and_insert(data->cache, MB(2), MB(3));
-+    g_assert_nonnull(node);
-+
-+    node = rbcache_search(data->cache, 0, MB(2));
-+    g_assert_null(node);
-+
-+    node = rbcache_search(data->cache, MB(2), MB(3));
-+    g_assert_nonnull(node);
-+
-+    node = rbcache_search_and_insert(data->cache, 0, MB(2));
-+    g_assert_nonnull(node);
-+
-+    node = rbcache_search(data->cache, 0, MB(2));
-+    g_assert_nonnull(node);
-+
-+    node = rbcache_search(data->cache, MB(2), MB(3));
-+    g_assert_null(node);
-+}
-+
-+static void test_rbcache_shrink_fifo(TestRBCacheData *data, const void *ctx)
-+{
-+    RBCacheNode *node;
-+
-+    rbcache_search_and_insert(data->cache, 0, MB(1));
-+    rbcache_search_and_insert(data->cache, MB(1), MB(1));
-+    rbcache_search_and_insert(data->cache, MB(2), MB(1));
-+    rbcache_search_and_insert(data->cache, MB(3), MB(1));
-+
-+    node = rbcache_search_and_insert(data->cache, MB(4), MB(1));
-+    g_assert_nonnull(node);
-+    node = rbcache_search(data->cache, 0, MB(1));
-+    g_assert_null(node);
-+    node = rbcache_search(data->cache, MB(3), MB(1));
-+    g_assert_nonnull(node);
-+    node = rbcache_search(data->cache, MB(1), MB(1));
-+    g_assert_nonnull(node);
-+    node = rbcache_search(data->cache, MB(2), MB(1));
-+    g_assert_nonnull(node);
-+    node = rbcache_search(data->cache, MB(4), MB(1));
-+    g_assert_nonnull(node);
-+
-+    node = rbcache_search_and_insert(data->cache, MB(5), MB(1));
-+    g_assert_nonnull(node);
-+    node = rbcache_search(data->cache, 0, MB(1));
-+    g_assert_null(node);
-+    node = rbcache_search(data->cache, MB(1), MB(1));
-+    g_assert_null(node);
-+    node = rbcache_search(data->cache, MB(3), MB(1));
-+    g_assert_nonnull(node);
-+    node = rbcache_search(data->cache, MB(2), MB(1));
-+    g_assert_nonnull(node);
-+    node = rbcache_search(data->cache, MB(4), MB(1));
-+    g_assert_nonnull(node);
-+    node = rbcache_search(data->cache, MB(5), MB(1));
-+    g_assert_nonnull(node);
-+
-+    node = rbcache_search_and_insert(data->cache, MB(6), MB(1));
-+    g_assert_nonnull(node);
-+    node = rbcache_search(data->cache, 0, MB(1));
-+    g_assert_null(node);
-+    node = rbcache_search(data->cache, MB(1), MB(1));
-+    g_assert_null(node);
-+    node = rbcache_search(data->cache, MB(2), MB(1));
-+    g_assert_null(node);
-+    node = rbcache_search(data->cache, MB(3), MB(1));
-+    g_assert_nonnull(node);
-+    node = rbcache_search(data->cache, MB(4), MB(1));
-+    g_assert_nonnull(node);
-+    node = rbcache_search(data->cache, MB(5), MB(1));
-+    g_assert_nonnull(node);
-+    node = rbcache_search(data->cache, MB(6), MB(1));
-+    g_assert_nonnull(node);
-+
-+    node = rbcache_search_and_insert(data->cache, MB(7), MB(1));
-+    g_assert_nonnull(node);
-+    node = rbcache_search(data->cache, 0, MB(1));
-+    g_assert_null(node);
-+    node = rbcache_search(data->cache, MB(1), MB(1));
-+    g_assert_null(node);
-+    node = rbcache_search(data->cache, MB(2), MB(1));
-+    g_assert_null(node);
-+    node = rbcache_search(data->cache, MB(3), MB(1));
-+    g_assert_null(node);
-+    node = rbcache_search(data->cache, MB(4), MB(1));
-+    g_assert_nonnull(node);
-+    node = rbcache_search(data->cache, MB(5), MB(1));
-+    g_assert_nonnull(node);
-+    node = rbcache_search(data->cache, MB(6), MB(1));
-+    g_assert_nonnull(node);
-+    node = rbcache_search(data->cache, MB(7), MB(1));
-+    g_assert_nonnull(node);
-+}
-+
-+static void test_rbcache_shrink_lru(TestRBCacheData *data, const void *ctx)
-+{
-+    RBCacheNode *node;
-+
-+    rbcache_search_and_insert(data->cache, 0, MB(1));
-+    rbcache_search_and_insert(data->cache, MB(1), MB(1));
-+    rbcache_search_and_insert(data->cache, MB(2), MB(1));
-+    rbcache_search_and_insert(data->cache, MB(3), MB(1));
-+
-+    node = rbcache_search_and_insert(data->cache, MB(4), MB(1));
-+    g_assert_nonnull(node);
-+    node = rbcache_search(data->cache, 0, MB(1));
-+    g_assert_null(node);
-+    node = rbcache_search(data->cache, MB(3), MB(1));
-+    g_assert_nonnull(node);
-+    node = rbcache_search(data->cache, MB(1), MB(1));
-+    g_assert_nonnull(node);
-+    node = rbcache_search(data->cache, MB(2), MB(1));
-+    g_assert_nonnull(node);
-+    node = rbcache_search(data->cache, MB(4), MB(1));
-+    g_assert_nonnull(node);
-+
-+    node = rbcache_search_and_insert(data->cache, MB(5), MB(1));
-+    g_assert_nonnull(node);
-+    node = rbcache_search(data->cache, 0, MB(1));
-+    g_assert_null(node);
-+    node = rbcache_search(data->cache, MB(3), MB(1));
-+    g_assert_null(node);
-+    node = rbcache_search(data->cache, MB(1), MB(1));
-+    g_assert_nonnull(node);
-+    node = rbcache_search(data->cache, MB(2), MB(1));
-+    g_assert_nonnull(node);
-+    node = rbcache_search(data->cache, MB(4), MB(1));
-+    g_assert_nonnull(node);
-+    node = rbcache_search(data->cache, MB(5), MB(1));
-+    g_assert_nonnull(node);
-+
-+    node = rbcache_search_and_insert(data->cache, MB(6), MB(1));
-+    g_assert_nonnull(node);
-+    node = rbcache_search(data->cache, 0, MB(1));
-+    g_assert_null(node);
-+    node = rbcache_search(data->cache, MB(3), MB(1));
-+    g_assert_null(node);
-+    node = rbcache_search(data->cache, MB(1), MB(1));
-+    g_assert_null(node);
-+    node = rbcache_search(data->cache, MB(2), MB(1));
-+    g_assert_nonnull(node);
-+    node = rbcache_search(data->cache, MB(4), MB(1));
-+    g_assert_nonnull(node);
-+    node = rbcache_search(data->cache, MB(5), MB(1));
-+    g_assert_nonnull(node);
-+    node = rbcache_search(data->cache, MB(6), MB(1));
-+    g_assert_nonnull(node);
-+
-+    node = rbcache_search_and_insert(data->cache, MB(7), MB(1));
-+    g_assert_nonnull(node);
-+    node = rbcache_search(data->cache, 0, MB(1));
-+    g_assert_null(node);
-+    node = rbcache_search(data->cache, MB(3), MB(1));
-+    g_assert_null(node);
-+    node = rbcache_search(data->cache, MB(1), MB(1));
-+    g_assert_null(node);
-+    node = rbcache_search(data->cache, MB(2), MB(1));
-+    g_assert_null(node);
-+    node = rbcache_search(data->cache, MB(4), MB(1));
-+    g_assert_nonnull(node);
-+    node = rbcache_search(data->cache, MB(5), MB(1));
-+    g_assert_nonnull(node);
-+    node = rbcache_search(data->cache, MB(6), MB(1));
-+    g_assert_nonnull(node);
-+    node = rbcache_search(data->cache, MB(7), MB(1));
-+    g_assert_nonnull(node);
-+}
-+
-+static void test_rbcache_setup(TestRBCacheData *data, const void *ctx)
-+{
-+    const TestRBCacheConfig *config = ctx;
-+
-+    data->cache =
-+        rbcache_create(config->alloc, config->free, config->limit_size,
-+                       config->eviction_type, config->opaque);
-+}
-+
-+static void test_rbcache_teardown(TestRBCacheData *data, const void *ctx)
-+{
-+    rbcache_destroy(data->cache);
-+}
-+
-+static void rbcache_test_add(const char *testpath,
-+                             void (*test_func)(TestRBCacheData *data,
-+                             const void *user_data), void *ctx)
-+{
-+    g_test_add(testpath, TestRBCacheData, ctx, test_rbcache_setup, test_func,
-+               test_rbcache_teardown);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+    TestRBCacheConfig config = {
-+        .limit_size = MB(4),
-+        .eviction_type = RBCACHE_FIFO,
-+    };
-+    TestRBCacheConfig config_lru = {
-+        .limit_size = MB(4),
-+        .eviction_type = RBCACHE_LRU,
-+    };
-+
-+    g_test_init(&argc, &argv, NULL);
-+
-+    rbcache_test_add("/rbcache/init", test_rbcache_init, &config);
-+    rbcache_test_add("/rbcache/insert", test_rbcache_insert, &config);
-+    rbcache_test_add("/rbcache/search", test_rbcache_search, &config);
-+    rbcache_test_add("/rbcache/search_and_insert",
-+                     test_rbcache_search_and_insert, &config);
-+    rbcache_test_add("/rbcache/rbcache_remove", test_rbcache_remove, &config);
-+    rbcache_test_add("/rbcache/shrink", test_rbcache_shrink, &config);
-+    rbcache_test_add("/rbcache/shrink/fifo", test_rbcache_shrink_fifo, &config);
-+    rbcache_test_add("/rbcache/shrink/lru", test_rbcache_shrink_lru,
-+                     &config_lru);
-+
-+    g_test_run();
-+
-+    return 0;
-+}
+1. Monitor I/O requests to identify typical sequences.
+This implementation of prefetch cache works at the storage system level and has 
+information only about the physical block addresses of I/O requests. Statistics 
+are collected only from read requests to a maximum size of 64kb(by default),
+each request that matches the criteria falls into a pool of requests. In order
+to store request statistics used by the rb-tree, it's simple but for
+this issue a quite efficient data structure.
+
+2. Identifying sequential I/O streams.
+For each read request to be carried out attempting to lift the chain sequence 
+from the tree statistics, where this request will be element of a sequential
+chain of requests. The key to search for consecutive requests is the area of bytes 
+preceding the current request. The size of this area should not be too small to 
+avoid false readahead. The sequential stream data requests can be identified
+even when a large number of random requests. For example, if there is access to 
+the blocks 100, 1157, 27520, 4, 101, 312, 1337, 102, in the context of request
+processing 102 will be identified the chain of sequential requests 100, 101. 102
+and then should a decision be made to do readahead. Also a situation may arise
+when multiple applications A, B, C simultaneously perform sequential read of
+data. For each separate application that will be sequential read data 
+A(100, 101, 102), B(300, 301, 302), C(700, 701, 702), but for block devices it 
+may look like a random data reading: 100,300,700,101,301,701,102,302,702. 
+In this case, the sequential streams will also be recognised because location
+requests in the rb-tree will allow to separate the sequential I/O streams.
+
+3. Do the readahead into the cache for recognized sequential data streams.
+After the issue of the detection of pcache case was resolved, need using larger 
+requests to bring data into the cache. In this implementation the pcache used
+readahead instead of the extension request, therefore the request goes as is. 
+There is not any reason to put data in the cache that will never be picked up, 
+but this will always happen in the case of extension requests. In order to store
+areas of cached blocks is also used the rb-tree, it's simple but for this issue
+a quite efficient data structure.
+
+4. Control size of the prefetch cache pool and the requests statistic pool
+For control the border of the pool statistic of requests, the data of requests 
+are placed and replaced according to the FIFO principle, everything is simple.
+For control the boundaries of the memory cache used LRU list, it allows to limit
+the max amount memory that we can allocate for pcache. But the LRU is there
+mainly to prevent displacement of the cache blocks that was read partially. 
+The main way the memory is pushed out immediately after use, as soon as a chunk
+of memory from the cache has been completely read, since the probability of
+repetition of the request is very low. Cases when one and the same portion of
+the cache memory has been read several times are not optimized and do not apply
+to the cases that can optimize the pcache. Thus, using a cache memory of small
+volume, by the optimization of the operations read-ahead and clear memory, we
+can read entire volumes of data, providing a 100% cache hit. Also does not
+decrease the effectiveness of random read requests.
+
+PCache is implemented as a qemu block filter driver, has some configurable
+parameters, such as: total cache size, statistics size, readahead size,
+maximum size of block that can be processed.
+
+For performance evaluation has been used several test cases with different
+sequential and random read data on SSD disk. Here are the results of tests and
+qemu parameters:
+
+qemu parameters: 
+-machine pc,accel=kvm,usb=off,vmport=off -m 1024 -smp 8
+-drive file=/img/harddisk.hdd,if=none,cache=none,id=drive-scsi0-0-0-0,aio=native
+-drive driver=pcache,image=drive-scsi0-0-0-0,if=virtio
+
+*****************************************************************
+* Testcase                        * Results in iops             *
+*                                 *******************************
+*                                 *  clean qemu  *    pcache    *
+*****************************************************************
+* Create/open 16 file(s) of total * 21645 req/s  * 74793 req/s  *
+* size 2048.00 MB named           * 20385 req/s  * 66481 req/s  *
+* /tmp/tmp.tmp, start 4 thread(s) * 20616 req/s  * 69007 req/s  *
+* and do uncached sequential read *              *              *
+* by 4KB blocks                   *              *              *
+*****************************************************************
+* Create/open 16 file(s) of total * 84033 req/s  * 87828 req/s  *
+* size 2048.00 MB named           * 84602 req/s  * 89678 req/s  *
+* /tmp/tmp.tmp, start 4 thread(s) * 83163 req/s  * 96202 req/s  *
+* and do uncached sequential read *              *              *
+* by 4KB blocks with constant     *              *              *
+* queue len 32                    *              *              *
+*****************************************************************
+* Create/open 16 file(s) of total * 14104 req/s  * 14164 req/s  *
+* size 2048.00 MB named           * 14130 req/s  * 14232 req/s  *
+* /tmp/tmp.tmp, start 4 thread(s) * 14183 req/s  * 14080 req/s  *
+* and do uncached random read by  *              *              *
+* 4KB blocks                      *              *              *
+*****************************************************************
+* Create/open 16 file(s) of total * 23480 req/s  * 23483 req/s  *
+* size 2048.00 MB named           * 23070 req/s  * 22432 req/s  *
+* /tmp/tmp.tmp, start 4 thread(s) * 24090 req/s  * 23499 req/s  *
+* and do uncached random read by  *              *              *
+* 4KB blocks with constant queue  *              *              *
+* len 32                          *              *              *
+*****************************************************************
+
+Changes from v1:
+- avoid bdrv_aio_*() interfaces
+- add pcache to the QAPI schema
+- fix remarks and add more comments for rbcache
+- add more scenarios for "/rbcache/insert" test
+- fix rbcache/shrink/* tests
+- pcache: up-to-date cache for removed nodes
+- rewrite "block/pcache: pick up parts of the cache" patch
+- changed the statuses of nodes for a more flexible determination of
+  the node state
+
+Pavel Butsykin (18):
+  block/pcache: empty pcache driver filter
+  util/rbtree: add rbtree from linux kernel
+  util/rbcache: range-based cache core
+  tests/test-rbcache: add test cases
+  block/pcache: statistics collection read requests
+  block/pcache: skip large aio read
+  block/pcache: updating statistics for overlapping requests
+  block/pcache: add AIO readahead
+  block/pcache: skip readahead for unallocated clusters
+  block/pcache: cache invalidation on write requests
+  block/pcache: add reading data from the cache
+  block/pcache: inflight readahead request waiting for read
+  block/pcache: write through
+  block/pcache: up-to-date cache for removed nodes
+  block/pcache: pick up parts of the cache
+  block/pcache: drop used pcache nodes
+  qapi: allow blockdev-add for pcache
+  block/pcache: add tracepoints
+
+ MAINTAINERS                     |  13 +
+ block/Makefile.objs             |   1 +
+ block/pcache.c                  | 764 ++++++++++++++++++++++++++++++++++++++++
+ block/trace-events              |  10 +
+ include/qemu/rbcache.h          | 128 +++++++
+ include/qemu/rbtree.h           | 107 ++++++
+ include/qemu/rbtree_augmented.h | 235 ++++++++++++
+ qapi/block-core.json            |  30 +-
+ tests/Makefile.include          |   3 +
+ tests/test-rbcache.c            | 431 +++++++++++++++++++++++
+ util/Makefile.objs              |   2 +
+ util/rbcache.c                  | 253 +++++++++++++
+ util/rbtree.c                   | 570 ++++++++++++++++++++++++++++++
+ 13 files changed, 2545 insertions(+), 2 deletions(-)
+ create mode 100644 block/pcache.c
+ create mode 100644 include/qemu/rbcache.h
+ create mode 100644 include/qemu/rbtree.h
+ create mode 100644 include/qemu/rbtree_augmented.h
+ create mode 100644 tests/test-rbcache.c
+ create mode 100644 util/rbcache.c
+ create mode 100644 util/rbtree.c
+
 -- 
 2.11.0
