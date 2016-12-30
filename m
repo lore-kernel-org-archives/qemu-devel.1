@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44743)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37507)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cMo6l-00046y-RG
-	for qemu-devel@nongnu.org; Thu, 29 Dec 2016 22:43:56 -0500
+	(envelope-from <yi.l.liu@intel.com>) id 1cMoz4-0000s2-Fr
+	for qemu-devel@nongnu.org; Thu, 29 Dec 2016 23:40:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cMo6i-0007ke-Ol
-	for qemu-devel@nongnu.org; Thu, 29 Dec 2016 22:43:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57984)
+	(envelope-from <yi.l.liu@intel.com>) id 1cMoyz-0000ig-Uu
+	for qemu-devel@nongnu.org; Thu, 29 Dec 2016 23:40:02 -0500
+Received: from mga14.intel.com ([192.55.52.115]:54733)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cMo6i-0007kB-G5
-	for qemu-devel@nongnu.org; Thu, 29 Dec 2016 22:43:52 -0500
-Date: Fri, 30 Dec 2016 11:43:43 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20161230034343.GC4195@pxdev.xzpeter.org>
+	(Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1cMoyz-0000cV-Ip
+	for qemu-devel@nongnu.org; Thu, 29 Dec 2016 23:39:57 -0500
+From: "Liu, Yi L" <yi.l.liu@intel.com>
+Date: Fri, 30 Dec 2016 04:39:49 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C257438FEFB52@shsmsx102.ccr.corp.intel.com>
 References: <A2975661238FB949B60364EF0F2C257438FEF883@shsmsx102.ccr.corp.intel.com>
 	<20161229095533.GA4195@pxdev.xzpeter.org>
 	<A2975661238FB949B60364EF0F2C257438FEF97F@shsmsx102.ccr.corp.intel.com>
+	<20161230034343.GC4195@pxdev.xzpeter.org>
+In-Reply-To: <20161230034343.GC4195@pxdev.xzpeter.org>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <A2975661238FB949B60364EF0F2C257438FEF97F@shsmsx102.ccr.corp.intel.com>
 Subject: Re: [Qemu-devel] [RFC PATCH 11/13] intel_iommu: provide its own
  replay() callback
 List-Id: <qemu-devel.nongnu.org>
@@ -29,71 +31,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Liu, Yi L" <yi.l.liu@intel.com>
+To: Peter Xu <peterx@redhat.com>
 Cc: "Tian, Kevin" <kevin.tian@intel.com>, "Lan, Tianyu" <tianyu.lan@intel.com>, "'qemu-devel@nongnu.org'" <qemu-devel@nongnu.org>, "'bd.aviv@gmail.com'" <bd.aviv@gmail.com>
 
-On Thu, Dec 29, 2016 at 10:23:21AM +0000, Liu, Yi L wrote:
-
-[...]
-
-> > >
-> > > Hereby, I have a minor concern on this part.
-> > > The replay would be performed in vfio_listener_region_add() when device is
-> > > assigned. Since guest is just started, so there will be no valid context entry for the
-> > > assigned device. So there will be no vtd_page_walk. Thus no change to SL page
-> > > table in host. The SL page table would still be a IOVA->HPA mapping. It's true
-> > > that the gIOVA->HPA mapping can be built by page map/unmap when guest
-> > > trying to issue dma. So it is just ok without relpay in the beginning. Hot plug should
-> > > be all the same. I guess it is the design here?
-> > 
-> > I am not sure whether I get your point here - I think it's by design.
-> > We don't really need replay if we are sure that the IOMMU address
-> > space has totally no mapping (i.e., when the guest init). Replay is
-> > only useful when there are existing mappings in the IOMMU address
-> > space.
-> yes, if we are sure no existing mapping, it is ok. There is another case which may
-> complain it. If a device is hotplug in, then there should be existing mapping. Just
-> looked code again. If corresponding context entry is not present, the
-> vtd_page_walk should be bypassed.
-
-Yes, if the context entry is not present, the replay will be bypassed.
-And if it exists, then the replay will work (along with the page walk
-process). Shouldn't that the behavior we want?
-
-Please clarify if I misunderstood your question.
-
-[...]
-
-> > >
-> > > However, it may be incompatible with a future work in which we expose an
-> > > vIOMMU to guest but guest disable IOVA usage. In this scenario, the SL page
-> > > table in host would be a GPA->HPA instead of a gIOVA->HPA mapping. It would
-> > > rely on memory_replay to build a GPA->HPA mapping. If I'm correct, I think it
-> > > would be expected to have a replay in the time device is assigned.
-> > 
-> > If you need a GPA -> HPA mapping (AFAICT you mean virtualized SVM and
-> > the so-called first level translation), IMHO the default mapping
-> > behavior of vfio_listener_region_add() suites here (when
-> > memory_region_is_iommu(section->mr) == false), which maps the whole
-> > guest physical address space, just like the case when we use vfio
-> > devices without vIOMMU.
-> Yes, I mean SVM virtualizaion. To virtualize SVM, an vIOMMU would be exposed to
-> guest. So memory_region_is_iommu(section->mr) would be true. Then, the original
-> mapping the whole guest physical address space would not run. Thus no GPA->HPA
-> mapping would be built. This is what I really concern here.
-
-What I meant above was, we might be able to leverage existing
-no-viommu logic to build the SLPT for virtualized SVM. For example, we
-can switch the if block from:
-
-  if (memory_region_is_iommu(section->mr))
-
-into something similiar like:
-
-  if (memory_region_is_iommu(section->mr) &&
-      !FIRST_LEVEL_TRANSLATION_ENABLED(section->mr))
-
-Just a quick thought, not sure whether that would be an applicable
-idea. Thanks,
-
--- peterx
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBQZXRlciBYdSBbbWFpbHRvOnBl
+dGVyeEByZWRoYXQuY29tXQ0KPiBTZW50OiBGcmlkYXksIERlY2VtYmVyIDMwLCAyMDE2IDExOjQ0
+IEFNDQo+IFRvOiBMaXUsIFlpIEwgPHlpLmwubGl1QGludGVsLmNvbT4NCj4gQ2M6IFRpYW4sIEtl
+dmluIDxrZXZpbi50aWFuQGludGVsLmNvbT47IExhbiwgVGlhbnl1IDx0aWFueXUubGFuQGludGVs
+LmNvbT47ICdxZW11LQ0KPiBkZXZlbEBub25nbnUub3JnJyA8cWVtdS1kZXZlbEBub25nbnUub3Jn
+PjsgJ2JkLmF2aXZAZ21haWwuY29tJw0KPiA8YmQuYXZpdkBnbWFpbC5jb20+DQo+IFN1YmplY3Q6
+IFJlOiBbUWVtdS1kZXZlbF0gW1JGQyBQQVRDSCAxMS8xM10gaW50ZWxfaW9tbXU6IHByb3ZpZGUg
+aXRzIG93biByZXBsYXkoKQ0KPiBjYWxsYmFjaw0KPiANCj4gT24gVGh1LCBEZWMgMjksIDIwMTYg
+YXQgMTA6MjM6MjFBTSArMDAwMCwgTGl1LCBZaSBMIHdyb3RlOg0KPiANCj4gWy4uLl0NCj4gDQo+
+ID4gPiA+DQo+ID4gPiA+IEhlcmVieSwgSSBoYXZlIGEgbWlub3IgY29uY2VybiBvbiB0aGlzIHBh
+cnQuDQo+ID4gPiA+IFRoZSByZXBsYXkgd291bGQgYmUgcGVyZm9ybWVkIGluIHZmaW9fbGlzdGVu
+ZXJfcmVnaW9uX2FkZCgpIHdoZW4gZGV2aWNlIGlzDQo+ID4gPiA+IGFzc2lnbmVkLiBTaW5jZSBn
+dWVzdCBpcyBqdXN0IHN0YXJ0ZWQsIHNvIHRoZXJlIHdpbGwgYmUgbm8gdmFsaWQgY29udGV4dCBl
+bnRyeSBmb3INCj4gdGhlDQo+ID4gPiA+IGFzc2lnbmVkIGRldmljZS4gU28gdGhlcmUgd2lsbCBi
+ZSBubyB2dGRfcGFnZV93YWxrLiBUaHVzIG5vIGNoYW5nZSB0byBTTCBwYWdlDQo+ID4gPiA+IHRh
+YmxlIGluIGhvc3QuIFRoZSBTTCBwYWdlIHRhYmxlIHdvdWxkIHN0aWxsIGJlIGEgSU9WQS0+SFBB
+IG1hcHBpbmcuIEl0J3MgdHJ1ZQ0KPiA+ID4gPiB0aGF0IHRoZSBnSU9WQS0+SFBBIG1hcHBpbmcg
+Y2FuIGJlIGJ1aWx0IGJ5IHBhZ2UgbWFwL3VubWFwIHdoZW4gZ3Vlc3QNCj4gPiA+ID4gdHJ5aW5n
+IHRvIGlzc3VlIGRtYS4gU28gaXQgaXMganVzdCBvayB3aXRob3V0IHJlbHBheSBpbiB0aGUgYmVn
+aW5uaW5nLiBIb3QgcGx1Zw0KPiBzaG91bGQNCj4gPiA+ID4gYmUgYWxsIHRoZSBzYW1lLiBJIGd1
+ZXNzIGl0IGlzIHRoZSBkZXNpZ24gaGVyZT8NCj4gPiA+DQo+ID4gPiBJIGFtIG5vdCBzdXJlIHdo
+ZXRoZXIgSSBnZXQgeW91ciBwb2ludCBoZXJlIC0gSSB0aGluayBpdCdzIGJ5IGRlc2lnbi4NCj4g
+PiA+IFdlIGRvbid0IHJlYWxseSBuZWVkIHJlcGxheSBpZiB3ZSBhcmUgc3VyZSB0aGF0IHRoZSBJ
+T01NVSBhZGRyZXNzDQo+ID4gPiBzcGFjZSBoYXMgdG90YWxseSBubyBtYXBwaW5nIChpLmUuLCB3
+aGVuIHRoZSBndWVzdCBpbml0KS4gUmVwbGF5IGlzDQo+ID4gPiBvbmx5IHVzZWZ1bCB3aGVuIHRo
+ZXJlIGFyZSBleGlzdGluZyBtYXBwaW5ncyBpbiB0aGUgSU9NTVUgYWRkcmVzcw0KPiA+ID4gc3Bh
+Y2UuDQo+ID4geWVzLCBpZiB3ZSBhcmUgc3VyZSBubyBleGlzdGluZyBtYXBwaW5nLCBpdCBpcyBv
+ay4gVGhlcmUgaXMgYW5vdGhlciBjYXNlIHdoaWNoIG1heQ0KPiA+IGNvbXBsYWluIGl0LiBJZiBh
+IGRldmljZSBpcyBob3RwbHVnIGluLCB0aGVuIHRoZXJlIHNob3VsZCBiZSBleGlzdGluZyBtYXBw
+aW5nLiBKdXN0DQo+ID4gbG9va2VkIGNvZGUgYWdhaW4uIElmIGNvcnJlc3BvbmRpbmcgY29udGV4
+dCBlbnRyeSBpcyBub3QgcHJlc2VudCwgdGhlDQo+ID4gdnRkX3BhZ2Vfd2FsayBzaG91bGQgYmUg
+YnlwYXNzZWQuDQo+IA0KPiBZZXMsIGlmIHRoZSBjb250ZXh0IGVudHJ5IGlzIG5vdCBwcmVzZW50
+LCB0aGUgcmVwbGF5IHdpbGwgYmUgYnlwYXNzZWQuDQo+IEFuZCBpZiBpdCBleGlzdHMsIHRoZW4g
+dGhlIHJlcGxheSB3aWxsIHdvcmsgKGFsb25nIHdpdGggdGhlIHBhZ2Ugd2Fsaw0KPiBwcm9jZXNz
+KS4gU2hvdWxkbid0IHRoYXQgdGhlIGJlaGF2aW9yIHdlIHdhbnQ/DQo+IA0KPiBQbGVhc2UgY2xh
+cmlmeSBpZiBJIG1pc3VuZGVyc3Rvb2QgeW91ciBxdWVzdGlvbi4NCkkgd2FzIGp1c3QgYXNzdW1p
+bmcgYSByZXBsYXkgc2hvdWxkIGJlIHBlcmZvcm1lZCB3aGVuIGEgbmV3IGRldmljZSBpcyBwbHVn
+IGluLg0KSG93ZXZlciwgYWNjb3JkaW5nIHRvIHlvdXIgc3RhdGVtZW50cywgaXQgaXMgbm90IHJl
+cXVpcmVkLiBJcyB0aGlzIHRoZSBjb25jbHVzaW9uIGluDQp0aGUgcHJldmlvdXMgZGlzY3Vzc2lv
+bj8NCg0KPiBbLi4uXQ0KPiANCj4gPiA+ID4NCj4gPiA+ID4gSG93ZXZlciwgaXQgbWF5IGJlIGlu
+Y29tcGF0aWJsZSB3aXRoIGEgZnV0dXJlIHdvcmsgaW4gd2hpY2ggd2UgZXhwb3NlIGFuDQo+ID4g
+PiA+IHZJT01NVSB0byBndWVzdCBidXQgZ3Vlc3QgZGlzYWJsZSBJT1ZBIHVzYWdlLiBJbiB0aGlz
+IHNjZW5hcmlvLCB0aGUgU0wgcGFnZQ0KPiA+ID4gPiB0YWJsZSBpbiBob3N0IHdvdWxkIGJlIGEg
+R1BBLT5IUEEgaW5zdGVhZCBvZiBhIGdJT1ZBLT5IUEEgbWFwcGluZy4gSXQgd291bGQNCj4gPiA+
+ID4gcmVseSBvbiBtZW1vcnlfcmVwbGF5IHRvIGJ1aWxkIGEgR1BBLT5IUEEgbWFwcGluZy4gSWYg
+SSdtIGNvcnJlY3QsIEkgdGhpbmsgaXQNCj4gPiA+ID4gd291bGQgYmUgZXhwZWN0ZWQgdG8gaGF2
+ZSBhIHJlcGxheSBpbiB0aGUgdGltZSBkZXZpY2UgaXMgYXNzaWduZWQuDQo+ID4gPg0KPiA+ID4g
+SWYgeW91IG5lZWQgYSBHUEEgLT4gSFBBIG1hcHBpbmcgKEFGQUlDVCB5b3UgbWVhbiB2aXJ0dWFs
+aXplZCBTVk0gYW5kDQo+ID4gPiB0aGUgc28tY2FsbGVkIGZpcnN0IGxldmVsIHRyYW5zbGF0aW9u
+KSwgSU1ITyB0aGUgZGVmYXVsdCBtYXBwaW5nDQo+ID4gPiBiZWhhdmlvciBvZiB2ZmlvX2xpc3Rl
+bmVyX3JlZ2lvbl9hZGQoKSBzdWl0ZXMgaGVyZSAod2hlbg0KPiA+ID4gbWVtb3J5X3JlZ2lvbl9p
+c19pb21tdShzZWN0aW9uLT5tcikgPT0gZmFsc2UpLCB3aGljaCBtYXBzIHRoZSB3aG9sZQ0KPiA+
+ID4gZ3Vlc3QgcGh5c2ljYWwgYWRkcmVzcyBzcGFjZSwganVzdCBsaWtlIHRoZSBjYXNlIHdoZW4g
+d2UgdXNlIHZmaW8NCj4gPiA+IGRldmljZXMgd2l0aG91dCB2SU9NTVUuDQo+ID4gWWVzLCBJIG1l
+YW4gU1ZNIHZpcnR1YWxpemFpb24uIFRvIHZpcnR1YWxpemUgU1ZNLCBhbiB2SU9NTVUgd291bGQg
+YmUgZXhwb3NlZCB0bw0KPiA+IGd1ZXN0LiBTbyBtZW1vcnlfcmVnaW9uX2lzX2lvbW11KHNlY3Rp
+b24tPm1yKSB3b3VsZCBiZSB0cnVlLiBUaGVuLCB0aGUNCj4gb3JpZ2luYWwNCj4gPiBtYXBwaW5n
+IHRoZSB3aG9sZSBndWVzdCBwaHlzaWNhbCBhZGRyZXNzIHNwYWNlIHdvdWxkIG5vdCBydW4uIFRo
+dXMgbm8gR1BBLT5IUEENCj4gPiBtYXBwaW5nIHdvdWxkIGJlIGJ1aWx0LiBUaGlzIGlzIHdoYXQg
+SSByZWFsbHkgY29uY2VybiBoZXJlLg0KPiANCj4gV2hhdCBJIG1lYW50IGFib3ZlIHdhcywgd2Ug
+bWlnaHQgYmUgYWJsZSB0byBsZXZlcmFnZSBleGlzdGluZw0KPiBuby12aW9tbXUgbG9naWMgdG8g
+YnVpbGQgdGhlIFNMUFQgZm9yIHZpcnR1YWxpemVkIFNWTS4gRm9yIGV4YW1wbGUsIHdlDQo+IGNh
+biBzd2l0Y2ggdGhlIGlmIGJsb2NrIGZyb206DQo+IA0KPiAgIGlmIChtZW1vcnlfcmVnaW9uX2lz
+X2lvbW11KHNlY3Rpb24tPm1yKSkNCj4gDQo+IGludG8gc29tZXRoaW5nIHNpbWlsaWFyIGxpa2U6
+DQo+IA0KPiAgIGlmIChtZW1vcnlfcmVnaW9uX2lzX2lvbW11KHNlY3Rpb24tPm1yKSAmJg0KPiAg
+ICAgICAhRklSU1RfTEVWRUxfVFJBTlNMQVRJT05fRU5BQkxFRChzZWN0aW9uLT5tcikpDQo+IA0K
+PiBKdXN0IGEgcXVpY2sgdGhvdWdodCwgbm90IHN1cmUgd2hldGhlciB0aGF0IHdvdWxkIGJlIGFu
+IGFwcGxpY2FibGUNCj4gaWRlYS4gVGhhbmtzLA0KSWYgSSByZW1lbWJlciBjb3JyZWN0bHksIHdp
+dGggdklPTU1VIGV4cG9zZWQsIHNlY3Rpb24tPm1yIGhlcmUgc2hvdWxkDQpub3QgYmUgYSByYW0s
+IHRoZSBsb2dpYyB3b3VsZCBmYWlsIGluIHRoZSBmb2xsb3dpbmcgY29kZS4gSSBhZ3JlZSB3aXRo
+IHlvdQ0KdGhhdCBtYXAgdGhlIHdob2xlIGd1ZXN0IHBoeXNpY2FsIGFkZHJlc3Mgc3BhY2Ugc2hv
+dWxkIHdvcmsgd2l0aCBTVk0NCnZpcnR1YWxpemF0aW9uLiBNYXkgbmVlZCB0byB0aGluayBtb3Jl
+IG9uIGhvdyB0byBtYWtlIGl0IGhhcHBlbi4NCg0KaHcvaTM4Ni9jb21tb24uYywgYSBzbmlwcGV0
+Og0KICAgIC8qIEhlcmUgd2UgYXNzdW1lIHRoYXQgbWVtb3J5X3JlZ2lvbl9pc19yYW0oc2VjdGlv
+bi0+bXIpPT10cnVlICovDQoNCiAgICB2YWRkciA9IG1lbW9yeV9yZWdpb25fZ2V0X3JhbV9wdHIo
+c2VjdGlvbi0+bXIpICsNCiAgICAgICAgICAgIHNlY3Rpb24tPm9mZnNldF93aXRoaW5fcmVnaW9u
+ICsNCiAgICAgICAgICAgIChpb3ZhIC0gc2VjdGlvbi0+b2Zmc2V0X3dpdGhpbl9hZGRyZXNzX3Nw
+YWNlKTsNCg0KVGhhbmtzLA0KWWkgTA0K
