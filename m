@@ -1,23 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43440)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45652)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1cMz0a-0002Sx-2q
-	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 10:22:17 -0500
+	(envelope-from <mar.krzeminski@gmail.com>) id 1cMzHf-0000Sc-1g
+	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 10:39:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tcminyard@gmail.com>) id 1cMz0Y-0000K0-HI
-	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 10:22:16 -0500
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:35742)
+	(envelope-from <mar.krzeminski@gmail.com>) id 1cMzHa-0000Jw-OU
+	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 10:39:55 -0500
+Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:34645)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tcminyard@gmail.com>) id 1cMz0Y-0000Jq-A0
-	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 10:22:14 -0500
-Received: by mail-pg0-x242.google.com with SMTP id i5so22381398pgh.2
-	for <qemu-devel@nongnu.org>; Fri, 30 Dec 2016 07:22:14 -0800 (PST)
-Sender: Corey Minyard <tcminyard@gmail.com>
-From: minyard@acm.org
-Date: Fri, 30 Dec 2016 09:21:41 -0600
-Message-Id: <1483111310-24808-11-git-send-email-minyard@acm.org>
-In-Reply-To: <1483111310-24808-1-git-send-email-minyard@acm.org>
-References: <1483111310-24808-1-git-send-email-minyard@acm.org>
-Subject: [Qemu-devel] [PATCH 10/19] ipmi: Add an SMBus IPMI interface
+	(Exim 4.71) (envelope-from <mar.krzeminski@gmail.com>)
+	id 1cMzHa-0000Jm-Gw
+	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 10:39:50 -0500
+Received: by mail-lf0-x241.google.com with SMTP id d16so22489927lfb.1
+	for <qemu-devel@nongnu.org>; Fri, 30 Dec 2016 07:39:50 -0800 (PST)
+References: <20161224151113.23955-1-jcd@tribudubois.net>
+	<606aedd3-2f56-fb89-b547-763baf833ed5@gmail.com>
+	<5b3ba089-e218-40ff-3b72-f31ada1e4cfc@tribudubois.net>
+	<a6c26a91-696c-db4b-7311-7cfc7ef9ee74@gmail.com>
+	<ccab130c-3f65-e4b4-8453-b2fd0f1110ae@tribudubois.net>
+	<5f1acd02-018d-0a17-105c-cd42c50a3e91@tribudubois.net>
+From: "mar.krzeminski" <mar.krzeminski@gmail.com>
+Message-ID: <d320496c-42d0-f8ae-71ea-e81073f2cf9d@gmail.com>
+Date: Fri, 30 Dec 2016 16:39:47 +0100
+MIME-Version: 1.0
+In-Reply-To: <5f1acd02-018d-0a17-105c-cd42c50a3e91@tribudubois.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] [M25P80] Make sure not to overrun the
+ internal data buffer.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,288 +35,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: minyard@acm.org, Corey Minyard <cminyard@mvista.com>
+To: Jean-Christophe DUBOIS <jcd@tribudubois.net>, qemu-devel@nongnu.org, peter.maydell@linaro.org
 
-From: Corey Minyard <cminyard@mvista.com>
 
-Signed-off-by: Corey Minyard <cminyard@mvista.com>
----
- default-configs/i386-softmmu.mak   |   1 +
- default-configs/x86_64-softmmu.mak |   1 +
- hw/ipmi/Makefile.objs              |   1 +
- hw/ipmi/smbus_ipmi.c               | 230 +++++++++++++++++++++++++++++++++++++
- 4 files changed, 233 insertions(+)
- create mode 100644 hw/ipmi/smbus_ipmi.c
 
-diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
-index 0b51360..803c2aa 100644
---- a/default-configs/i386-softmmu.mak
-+++ b/default-configs/i386-softmmu.mak
-@@ -14,6 +14,7 @@ CONFIG_IPMI_LOCAL=y
- CONFIG_IPMI_EXTERN=y
- CONFIG_ISA_IPMI_KCS=y
- CONFIG_ISA_IPMI_BT=y
-+CONFIG_IPMI_SSIF=y
- CONFIG_SERIAL=y
- CONFIG_PARALLEL=y
- CONFIG_I8254=y
-diff --git a/default-configs/x86_64-softmmu.mak b/default-configs/x86_64-softmmu.mak
-index 7f89503..621c83b 100644
---- a/default-configs/x86_64-softmmu.mak
-+++ b/default-configs/x86_64-softmmu.mak
-@@ -14,6 +14,7 @@ CONFIG_IPMI_LOCAL=y
- CONFIG_IPMI_EXTERN=y
- CONFIG_ISA_IPMI_KCS=y
- CONFIG_ISA_IPMI_BT=y
-+CONFIG_IPMI_SSIF=y
- CONFIG_SERIAL=y
- CONFIG_PARALLEL=y
- CONFIG_I8254=y
-diff --git a/hw/ipmi/Makefile.objs b/hw/ipmi/Makefile.objs
-index 1b422bb..bb37016 100644
---- a/hw/ipmi/Makefile.objs
-+++ b/hw/ipmi/Makefile.objs
-@@ -3,3 +3,4 @@ common-obj-$(CONFIG_IPMI_LOCAL) += ipmi_bmc_sim.o
- common-obj-$(CONFIG_IPMI_EXTERN) += ipmi_bmc_extern.o
- common-obj-$(CONFIG_ISA_IPMI_KCS) += isa_ipmi_kcs.o
- common-obj-$(CONFIG_ISA_IPMI_BT) += isa_ipmi_bt.o
-+common-obj-$(CONFIG_IPMI_SSIF) += smbus_ipmi.o
-diff --git a/hw/ipmi/smbus_ipmi.c b/hw/ipmi/smbus_ipmi.c
-new file mode 100644
-index 0000000..4d99b48
---- /dev/null
-+++ b/hw/ipmi/smbus_ipmi.c
-@@ -0,0 +1,230 @@
-+/*
-+ * QEMU IPMI SMBus (SSIF) emulation
-+ *
-+ * Copyright (c) 2015,2016 Corey Minyard, MontaVista Software, LLC
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+#include "qemu/osdep.h"
-+#include "hw/hw.h"
-+#include "hw/i2c/smbus.h"
-+#include "qapi/error.h"
-+#include "qemu/error-report.h"
-+#include "hw/ipmi/ipmi.h"
-+
-+#define TYPE_SMBUS_IPMI "smbus-ipmi"
-+#define SMBUS_IPMI(obj) OBJECT_CHECK(SMBusIPMIDevice, (obj), TYPE_SMBUS_IPMI)
-+
-+#define SSIF_IPMI_REQUEST                       2
-+#define SSIF_IPMI_MULTI_PART_REQUEST_START      6
-+#define SSIF_IPMI_MULTI_PART_REQUEST_MIDDLE     7
-+#define SSIF_IPMI_RESPONSE                      3
-+#define SSIF_IPMI_MULTI_PART_RESPONSE_MIDDLE    9
-+
-+typedef struct SMBusIPMIDevice {
-+    SMBusDevice parent;
-+
-+    IPMIBmc *bmc;
-+
-+    uint8_t outmsg[MAX_IPMI_MSG_SIZE];
-+    uint32_t outpos;
-+    uint32_t outlen;
-+
-+    uint8_t inmsg[MAX_IPMI_MSG_SIZE];
-+    uint32_t inlen;
-+
-+    /*
-+     * This is a response number that we send with the command to make
-+     * sure that the response matches the command.
-+     */
-+    uint8_t waiting_rsp;
-+
-+    uint32_t uuid;
-+} SMBusIPMIDevice;
-+
-+static void smbus_ipmi_handle_event(IPMIInterface *ii)
-+{
-+    /* No interrupts, so nothing to do here. */
-+}
-+
-+static void smbus_ipmi_handle_rsp(IPMIInterface *ii, uint8_t msg_id,
-+                                  unsigned char *rsp, unsigned int rsp_len)
-+{
-+    SMBusIPMIDevice *sid = SMBUS_IPMI(ii);
-+
-+    if (sid->waiting_rsp == msg_id) {
-+        sid->waiting_rsp++;
-+
-+        memcpy(sid->outmsg, rsp, rsp_len);
-+        sid->outlen = rsp_len;
-+        sid->outpos = 0;
-+    }
-+}
-+
-+static void smbus_ipmi_set_atn(IPMIInterface *ii, int val, int irq)
-+{
-+    /* This is where PEC would go. */
-+}
-+
-+static void smbus_ipmi_set_irq_enable(IPMIInterface *ii, int val)
-+{
-+}
-+
-+static void ipmi_quick_cmd(SMBusDevice *dev, uint8_t read)
-+{
-+}
-+
-+static void ipmi_send_byte(SMBusDevice *dev, uint8_t val)
-+{
-+}
-+
-+static uint8_t ipmi_receive_byte(SMBusDevice *dev)
-+{
-+    SMBusIPMIDevice *sid = SMBUS_IPMI(dev);
-+
-+    if (sid->outpos >= sid->outlen) {
-+        return 0;
-+    }
-+
-+    return sid->outmsg[sid->outpos++];
-+}
-+
-+static void ipmi_write_data(SMBusDevice *dev, uint8_t cmd, uint8_t *buf,
-+                            int len)
-+{
-+    SMBusIPMIDevice *sid = SMBUS_IPMI(dev);
-+    IPMIBmcClass *bk = IPMI_BMC_GET_CLASS(sid->bmc);
-+
-+    if (cmd != SSIF_IPMI_REQUEST) {
-+        return;
-+    }
-+
-+    if (len < 3 || len > MAX_IPMI_MSG_SIZE || buf[0] != len - 1) {
-+        return;
-+    }
-+
-+    memcpy(sid->inmsg, buf + 1, len - 1);
-+    sid->inlen = len;
-+
-+    sid->outlen = 0;
-+    sid->outpos = 0;
-+    bk->handle_command(sid->bmc, sid->inmsg, sid->inlen, sizeof(sid->inmsg),
-+                       sid->waiting_rsp);
-+}
-+
-+static uint8_t ipmi_read_data(SMBusDevice *dev, uint8_t cmd, int n)
-+{
-+    SMBusIPMIDevice *sid = SMBUS_IPMI(dev);
-+
-+    if (cmd != SSIF_IPMI_RESPONSE) {
-+        return 0;
-+    }
-+
-+    if (n == 0) {
-+        return sid->outlen;
-+    }
-+
-+    return ipmi_receive_byte(dev);
-+}
-+
-+static const VMStateDescription vmstate_smbus_ipmi = {
-+    .name = TYPE_SMBUS_IPMI,
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields      = (VMStateField[]) {
-+        VMSTATE_UINT8(waiting_rsp, SMBusIPMIDevice),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static void smbus_ipmi_realize(DeviceState *dev, Error **errp)
-+{
-+    SMBusIPMIDevice *sid = SMBUS_IPMI(dev);
-+    IPMIInterface *ii = IPMI_INTERFACE(dev);
-+
-+    if (!sid->bmc) {
-+        error_setg(errp, "IPMI device requires a bmc attribute to be set");
-+        return;
-+    }
-+
-+    sid->uuid = ipmi_next_uuid();
-+
-+    sid->bmc->intf = ii;
-+}
-+
-+static void smbus_ipmi_init(Object *obj)
-+{
-+    SMBusIPMIDevice *sid = SMBUS_IPMI(obj);
-+
-+    ipmi_bmc_find_and_link(OBJECT(obj), (Object **) &sid->bmc);
-+}
-+
-+static void smbus_ipmi_get_fwinfo(struct IPMIInterface *ii, IPMIFwInfo *info)
-+{
-+    SMBusIPMIDevice *sid = SMBUS_IPMI(ii);
-+
-+    info->interface_name = "smbus";
-+    info->interface_type = IPMI_SMBIOS_SSIF;
-+    info->ipmi_spec_major_revision = 2;
-+    info->ipmi_spec_minor_revision = 0;
-+    info->i2c_slave_address = sid->bmc->slave_addr;
-+    info->base_address = sid->parent.i2c.address;
-+    info->memspace = IPMI_MEMSPACE_SMBUS;
-+    info->register_spacing = 1;
-+    info->uuid = sid->uuid;
-+}
-+
-+static void smbus_ipmi_class_init(ObjectClass *oc, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(oc);
-+    IPMIInterfaceClass *iic = IPMI_INTERFACE_CLASS(oc);
-+    SMBusDeviceClass *sc = SMBUS_DEVICE_CLASS(oc);
-+
-+    sc->quick_cmd = ipmi_quick_cmd;
-+    sc->send_byte = ipmi_send_byte;
-+    sc->receive_byte = ipmi_receive_byte;
-+    sc->write_data = ipmi_write_data;
-+    sc->read_data = ipmi_read_data;
-+    dc->vmsd = &vmstate_smbus_ipmi;
-+    dc->realize = smbus_ipmi_realize;
-+    iic->set_atn = smbus_ipmi_set_atn;
-+    iic->handle_rsp = smbus_ipmi_handle_rsp;
-+    iic->handle_if_event = smbus_ipmi_handle_event;
-+    iic->set_irq_enable = smbus_ipmi_set_irq_enable;
-+    iic->get_fwinfo = smbus_ipmi_get_fwinfo;
-+}
-+
-+static const TypeInfo smbus_ipmi_info = {
-+    .name          = TYPE_SMBUS_IPMI,
-+    .parent        = TYPE_SMBUS_DEVICE,
-+    .instance_size = sizeof(SMBusIPMIDevice),
-+    .instance_init = smbus_ipmi_init,
-+    .class_init    = smbus_ipmi_class_init,
-+    .interfaces = (InterfaceInfo[]) {
-+        { TYPE_IPMI_INTERFACE },
-+        { }
-+    }
-+};
-+
-+static void smbus_ipmi_register_types(void)
-+{
-+    type_register_static(&smbus_ipmi_info);
-+}
-+
-+type_init(smbus_ipmi_register_types)
--- 
-2.7.4
+W dniu 27.12.2016 o 18:08, Jean-Christophe DUBOIS pisze:
+> You can have a more detailed procedure on how to run Xvisor on Qemu 
+> Sabrelite (with Linux guests if you wish) at the following URL.
+>
+> https://github.com/avpatel/xvisor-next/blob/master/docs/arm/imx6-sabrelite.txt 
+>
+>
+> You don't need to start the guest to see the crash. Just boot Xvisor ...
+>
+> JC
+>
+> Le 24/12/2016 à 19:12, Jean-Christophe DUBOIS a écrit :
+>> Le 24/12/2016 à 19:04, mar.krzeminski a écrit :
+>>>
+>>>
+>>> W dniu 24.12.2016 o 18:41, Jean-Christophe DUBOIS pisze:
+>>>> Le 24/12/2016 à 18:18, mar.krzeminski a écrit :
+>>>>> Hello,
+>>>>>
+>>>>> W dniu 24.12.2016 o 16:11, Jean-Christophe Dubois pisze:
+>>>>>> It did happen that the internal data buffer was overrun leading 
+>>>>>> to a Qemu
+>>>>>> crash (in particular while emulating the i.MX6 sabrelite board).
+>>>>>>
+>>>>>> This patch makes sure the data array would not be overrun and 
+>>>>>> allow the
+>>>>>> sabrelite emulation to run without crash.
+>>>>>>
+>>>>>> Signed-off-by: Jean-Christophe Dubois <jcd@tribudubois.net>
+>>>>>> ---
+>>>>>>   hw/block/m25p80.c | 2 +-
+>>>>>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>>>>>
+>>>>>> diff --git a/hw/block/m25p80.c b/hw/block/m25p80.c
+>>>>>> index d29ff4c..a1c4e5d 100644
+>>>>>> --- a/hw/block/m25p80.c
+>>>>>> +++ b/hw/block/m25p80.c
+>>>>>> @@ -1117,7 +1117,7 @@ static uint32_t m25p80_transfer8(SSISlave 
+>>>>>> *ss, uint32_t tx)
+>>>>>>           s->data[s->len] = (uint8_t)tx;
+>>>>>>           s->len++;
+>>>>>>   -        if (s->len == s->needed_bytes) {
+>>>>>> +        if ((s->len >= s->needed_bytes) || (s->len >= 
+>>>>>> sizeof(s->data))) {
+>>>>>>               complete_collecting_data(s);
+>>>>>>           }
+>>>>>>           break;
+>>>>> Do you have exact scenario that caused the problem?
+>>>>
+>>>> When booting Xvisor (http://xhypervisor.org/) on top of Qemu 
+>>>> emulated Sabrelite.
+>>>>
+>>>> During the boot Qemu would segfault while writing to the SPI flash.
+>>> Thanks, I'll try to take I look.
+>>
+>> Once you have built Xvisor for "generic ARMv7" you can run the 
+>> following command.
+>>
+>> qemu-system-arm -M sabrelite -display none -serial null -serial stdio 
+>> -kernel ./build/vmm.bin -initrd ./build/vmm.bin  -dtb 
+>> ./build/arch/arm/board/generic/dts/imx6/sabrelite-a9/one_guest_sabrelite-a9.dtb
+>>
+I got some time, and reproduced the problem. Here are some logs with 
+m25p80 debugs:
+: decode_new_cmd: decoded new command:9f
+: decode_new_cmd: populated jedec code
+: decode_new_cmd: decoded new command:0
+: decode_new_cmd: decoded new command:0 //Getting flash Id in above 4 
+lines -> OK (but missing CS)
+Found sst25vf016b compatible flash device
+: decode_new_cmd: decoded new command:6 //Write enable, command without 
+payload, so it is ok
+: decode_new_cmd: decoded new command:1 //Write to status register, 
+guest sends data
+INFO: spi0.0: sst25vf016b (2048 Kbytes)
+INFO: spi0.0: mtd
+   .name = spi0.0,
+   .size = 0x200000 (2MiB)
+   .erasesize = 0x00001000 (4KiB)
+   .numeraseregions = 0
+Segmentation fault (core dumped) //Here probably guest try to send some data
+
+The root cause why m25p80 enter strange state is that CS line is not 
+selected/deselected at all- there is missing debug from m25p80_cs.
+In spi transfer CS line (here qemu_irq) should be 0 before begin of 
+every message, and set after end of transmission.
+In case of simple WREN command you should see something like this:
+: m25p80_cs: deselect
+: decode_new_cmd: decoded new command:6
+: m25p80_cs: select
+
+Can you check spi controller model code?
+
+Thanks,
+Marcin
+
+>> You can also run Qemu  under valgrind that will pinpoint the problem.
+>>
+>> JC
+>>
+>>>>
+>>>>> Generally it should not happen.
+>>>>
+>>>> The fact is that there is no protection to make sure the data array 
+>>>> is not overrun.
+>>> Yes. IMHO it could be nice to log some error here and reset state 
+>>> machine instead
+>>> of going to next state.
+>>>>
+>>>> May be it should not happen but it did happen in this case ....
+>>> Yeap, but this mean m25p80's state machine goes nuts. Overflow is 
+>>> just a symptom
+>>> that something wrong is going on.
+>>>
+>>> Thanks,
+>>> Marcin
+>>>>
+>>>> JC
+>>>>
+>>>>
+>>>>>
+>>>>> Thanks,
+>>>>> Marcin
+>>>>>
+>>>>>
+>>>>
+>>>>
+>>>
+>>>
+>>
+>>
+>>
+>
+>
