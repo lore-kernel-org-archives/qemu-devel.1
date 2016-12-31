@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54513)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54542)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zxq_yx_007@163.com>) id 1cN8JU-0000wX-3s
-	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 20:18:25 -0500
+	(envelope-from <zxq_yx_007@163.com>) id 1cN8JW-0000xx-1E
+	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 20:18:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zxq_yx_007@163.com>) id 1cN8JT-0008UB-7Y
-	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 20:18:24 -0500
+	(envelope-from <zxq_yx_007@163.com>) id 1cN8JV-0008VP-4F
+	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 20:18:25 -0500
 From: xiaoqiang zhao <zxq_yx_007@163.com>
-Date: Sat, 31 Dec 2016 09:18:07 +0800
-Message-Id: <20161231011808.4037-2-zxq_yx_007@163.com>
+Date: Sat, 31 Dec 2016 09:18:08 +0800
+Message-Id: <20161231011808.4037-3-zxq_yx_007@163.com>
 In-Reply-To: <20161231011808.4037-1-zxq_yx_007@163.com>
 References: <20161231011808.4037-1-zxq_yx_007@163.com>
-Subject: [Qemu-devel] [PATCH 1/2] hw/char: QOM'ify exynos4210_uart.c
+Subject: [Qemu-devel] [PATCH 2/2] hw/char: QOM'ify grlib_apbuart.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,61 +27,68 @@ DeviceClass::realize instead
 
 Signed-off-by: xiaoqiang zhao <zxq_yx_007@163.com>
 ---
- hw/char/exynos4210_uart.c | 16 ++++++++++------
- 1 file changed, 10 insertions(+), 6 deletions(-)
+ hw/char/grlib_apbuart.c | 26 +++++++++++++++-----------
+ 1 file changed, 15 insertions(+), 11 deletions(-)
 
-diff --git a/hw/char/exynos4210_uart.c b/hw/char/exynos4210_uart.c
-index 571c324004..820d1abeb9 100644
---- a/hw/char/exynos4210_uart.c
-+++ b/hw/char/exynos4210_uart.c
-@@ -629,22 +629,26 @@ DeviceState *exynos4210_uart_create(hwaddr addr,
-     return dev;
- }
+diff --git a/hw/char/grlib_apbuart.c b/hw/char/grlib_apbuart.c
+index db686e6a6f..620b801f34 100644
+--- a/hw/char/grlib_apbuart.c
++++ b/hw/char/grlib_apbuart.c
+@@ -239,24 +239,28 @@ static const MemoryRegionOps grlib_apbuart_ops = {
+     .endianness = DEVICE_NATIVE_ENDIAN,
+ };
  
--static int exynos4210_uart_init(SysBusDevice *dev)
-+static void exynos4210_uart_init(Object *obj)
+-static int grlib_apbuart_init(SysBusDevice *dev)
++static void grlib_apbuart_init(Object *obj)
  {
 +    SysBusDevice *dev = SYS_BUS_DEVICE(obj);
-     Exynos4210UartState *s = EXYNOS4210_UART(dev);
+     UART *uart = GRLIB_APB_UART(dev);
  
-     /* memory mapping */
--    memory_region_init_io(&s->iomem, OBJECT(s), &exynos4210_uart_ops, s,
-+    memory_region_init_io(&s->iomem, obj, &exynos4210_uart_ops, s,
-                           "exynos4210.uart", EXYNOS4210_UART_REGS_MEM_SIZE);
-     sysbus_init_mmio(dev, &s->iomem);
- 
-     sysbus_init_irq(dev, &s->irq);
-+}
-+
-+static void exynos4210_uart_realize(DeviceState *dev, Error **errp)
-+{
-+    Exynos4210UartState *s = EXYNOS4210_UART(dev);
- 
-     qemu_chr_fe_set_handlers(&s->chr, exynos4210_uart_can_receive,
-                              exynos4210_uart_receive, exynos4210_uart_event,
-                              s, NULL, true);
+-    qemu_chr_fe_set_handlers(&uart->chr,
+-                             grlib_apbuart_can_receive,
+-                             grlib_apbuart_receive,
+-                             grlib_apbuart_event,
+-                             uart, NULL, true);
 -
+     sysbus_init_irq(dev, &uart->irq);
+ 
+-    memory_region_init_io(&uart->iomem, OBJECT(uart), &grlib_apbuart_ops, uart,
++    memory_region_init_io(&uart->iomem, obj, &grlib_apbuart_ops, uart,
+                           "uart", UART_REG_SIZE);
+ 
+     sysbus_init_mmio(dev, &uart->iomem);
++}
+ 
 -    return 0;
++static void grlib_apbuart_realize(DeviceState *dev, Error **errp)
++{
++    UART *uart = GRLIB_APB_UART(dev);
++
++    qemu_chr_fe_set_handlers(&uart->chr,
++                             grlib_apbuart_can_receive,
++                             grlib_apbuart_receive,
++                             grlib_apbuart_event,
++                             uart, NULL, true);
  }
  
- static Property exynos4210_uart_properties[] = {
-@@ -658,9 +662,8 @@ static Property exynos4210_uart_properties[] = {
- static void exynos4210_uart_class_init(ObjectClass *klass, void *data)
+ static void grlib_apbuart_reset(DeviceState *d)
+@@ -280,9 +284,8 @@ static Property grlib_apbuart_properties[] = {
+ static void grlib_apbuart_class_init(ObjectClass *klass, void *data)
  {
      DeviceClass *dc = DEVICE_CLASS(klass);
 -    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
  
--    k->init = exynos4210_uart_init;
-+    dc->realize = exynos4210_uart_realize;
-     dc->reset = exynos4210_uart_reset;
-     dc->props = exynos4210_uart_properties;
-     dc->vmsd = &vmstate_exynos4210_uart;
-@@ -670,6 +673,7 @@ static const TypeInfo exynos4210_uart_info = {
-     .name          = TYPE_EXYNOS4210_UART,
+-    k->init = grlib_apbuart_init;
++    dc->realize = grlib_apbuart_realize;
+     dc->reset = grlib_apbuart_reset;
+     dc->props = grlib_apbuart_properties;
+ }
+@@ -291,6 +294,7 @@ static const TypeInfo grlib_apbuart_info = {
+     .name          = TYPE_GRLIB_APB_UART,
      .parent        = TYPE_SYS_BUS_DEVICE,
-     .instance_size = sizeof(Exynos4210UartState),
-+    .instance_init = exynos4210_uart_init,
-     .class_init    = exynos4210_uart_class_init,
+     .instance_size = sizeof(UART),
++    .instance_init = grlib_apbuart_init,
+     .class_init    = grlib_apbuart_class_init,
  };
  
 -- 
