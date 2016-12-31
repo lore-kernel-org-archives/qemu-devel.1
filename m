@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44958)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44957)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cNBIs-0002Wd-EK
+	(envelope-from <bounces@canonical.com>) id 1cNBIs-0002Wc-EM
 	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 23:30:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cNBIo-0006I8-Fn
+	(envelope-from <bounces@canonical.com>) id 1cNBIp-0006IM-0i
 	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 23:29:58 -0500
-Received: from indium.canonical.com ([91.189.90.7]:41519)
+Received: from indium.canonical.com ([91.189.90.7]:41536)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cNBIo-0006Hv-9e
+	id 1cNBIo-0006I1-NW
 	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 23:29:54 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cNBIl-0008Of-8j
-	for <qemu-devel@nongnu.org>; Sat, 31 Dec 2016 04:29:51 +0000
+	id 1cNBIm-0008OO-7U
+	for <qemu-devel@nongnu.org>; Sat, 31 Dec 2016 04:29:52 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B506C2E819B
-	for <qemu-devel@nongnu.org>; Sat, 31 Dec 2016 04:29:48 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 808312E80CD
+	for <qemu-devel@nongnu.org>; Sat, 31 Dec 2016 04:29:49 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 31 Dec 2016 04:17:27 -0000
-From: Launchpad Bug Tracker <1270397@bugs.launchpad.net>
-Reply-To: Bug 1270397 <1270397@bugs.launchpad.net>
+Date: Sat, 31 Dec 2016 04:17:26 -0000
+From: Launchpad Bug Tracker <1077514@bugs.launchpad.net>
+Reply-To: Bug 1077514 <1077514@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20140118101809.30943.54673.malonedeb@soybean.canonical.com>
-Message-Id: <20161231041728.5270.1450.malone@loganberry.canonical.com>
+References: <20121110232423.30270.24933.malonedeb@wampee.canonical.com>
+Message-Id: <20161231041726.5270.87778.malone@loganberry.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1270397] Re: Systemd segfaults after live
- migration
+Subject: [Qemu-devel] [Bug 1077514] Re: *** buffer overflow detected ***:
+ qemu-system-x86_64 terminated with nowait enabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,85 +48,178 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1270397
+https://bugs.launchpad.net/bugs/1077514
 
 Title:
-  Systemd segfaults after live migration
+  *** buffer overflow detected ***: qemu-system-x86_64 terminated  with
+  nowait enabled
 
 Status in QEMU:
   Expired
 
 Bug description:
-  After live migrating my virtual machine it panics because of
-  segmentation fault in systemd (see attachment).
+  qemu-system-x86_64 -m 1024 -nographic -cpu coreduo -icount auto -hdachs 9=
+80,16,32 -kernel asa842-vmlinuz -initrd asa842-initrd.gz -append "ide_gener=
+ic.probe_mask=3D0x01 ide_core.chs=3D0.0:980,16,32 auto nousb console=3DttyS=
+0,9600 bigphysarea=3D65536 no-hlt" -net nic -serial telnet::3020,server,now=
+ait
+  failed to initialize KVM: Device or resource busy
+  Back to tcg accelerator.
+  QEMU 1.2.0 monitor - type 'help' for more information
+  (qemu) Warning: vlan 0 is not connected to host network
+  *** buffer overflow detected ***: qemu-system-x86_64 terminated
+  =3D=3D=3D=3D=3D=3D=3D Backtrace: =3D=3D=3D=3D=3D=3D=3D=3D=3D
+  /lib/x86_64-linux-gnu/libc.so.6(__fortify_fail+0x5c)[0x7fd9f04b882c]
+  /lib/x86_64-linux-gnu/libc.so.6(+0x109700)[0x7fd9f04b7700]
+  /lib/x86_64-linux-gnu/libc.so.6(+0x10a7be)[0x7fd9f04b87be]
+  qemu-system-x86_64(+0xf1b5d)[0x7fd9f4bb1b5d]
+  qemu-system-x86_64(+0x18f148)[0x7fd9f4c4f148]
+  qemu-system-x86_64(main+0xfe3)[0x7fd9f4b35353]
+  /lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0xed)[0x7fd9f03cf76d]
+  qemu-system-x86_64(+0x796e9)[0x7fd9f4b396e9]
+  =3D=3D=3D=3D=3D=3D=3D Memory map: =3D=3D=3D=3D=3D=3D=3D=3D
+  40f54000-50f54000 rwxp 00000000 00:00 0 =
 
-  Software used (on archlinux):
-  qemu 1.7.0-1
-  libvirt 1.2.0-1
-  linux 3.12.7-1
+  7fd990000000-7fd990029000 rw-p 00000000 00:00 0 =
 
-  This is configuration of this VM:
-  <domain type=3D'kvm'>
-    <name>vbroker</name>
-    <uuid>455c9c62-10a6-11e3-a7f2-441ea153aac8</uuid>
-    <description>455c9c62-10a6-11e3-a7f2-441ea153aac8</description>
-    <memory unit=3D'KiB'>6291456</memory>
-    <currentMemory unit=3D'KiB'>6291456</currentMemory>
-    <vcpu placement=3D'static'>4</vcpu>
-    <os>
-      <type arch=3D'x86_64' machine=3D'pc-i440fx-1.7'>hvm</type>
-      <boot dev=3D'cdrom'/>
-      <bootmenu enable=3D'no'/>
-    </os>
-    <features>
-      <acpi/>
-      <apic/>
-    </features>
-    <clock offset=3D'utc'/>
-    <on_poweroff>destroy</on_poweroff>
-    <on_reboot>restart</on_reboot>
-    <on_crash>restart</on_crash>
-    <devices>
-      <emulator>/usr/bin/qemu-kvm</emulator>
-      <disk type=3D'file' device=3D'disk'>
-        <driver name=3D'qemu' type=3D'qcow2' cache=3D'none'/>
-        <source file=3D'/var/lib/libvirt/images/archipel/drives/455c9c62-10=
-a6-11e3-a7f2-441ea153aac8/vbroker.qcow2'/>
-        <target dev=3D'vda' bus=3D'virtio'/>
-        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x04' =
-function=3D'0x0'/>
-      </disk>
-      <controller type=3D'usb' index=3D'0'>
-        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x01' =
-function=3D'0x2'/>
-      </controller>
-      <controller type=3D'pci' index=3D'0' model=3D'pci-root'/>
-      <interface type=3D'bridge'>
-        <mac address=3D'de:ad:fb:8e:17:c2'/>
-        <source bridge=3D'br0'/>
-        <model type=3D'virtio'/>
-        <filterref filter=3D'clean-traffic'>
-          <parameter name=3D'IP' value=3D'10.0.0.2'/>
-        </filterref>
-        <bandwidth>
-        </bandwidth>
-        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x03' =
-function=3D'0x0'/>
-      </interface>
-      <input type=3D'tablet' bus=3D'usb'/>
-      <input type=3D'mouse' bus=3D'ps2'/>
-      <graphics type=3D'vnc' port=3D'-1' autoport=3D'yes' keymap=3D'en-us'/>
-      <video>
-        <model type=3D'cirrus' vram=3D'9216' heads=3D'1'/>
-        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x02' =
-function=3D'0x0'/>
-      </video>
-      <memballoon model=3D'virtio'>
-        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' =
-function=3D'0x0'/>
-      </memballoon>
-    </devices>
-  </domain>
+  7fd990029000-7fd994000000 ---p 00000000 00:00 0 =
+
+  7fd995907000-7fd995a34000 rw-p 00000000 00:00 0 =
+
+  7fd995a34000-7fd995a76000 rw-p 00000000 00:00 0 =
+
+  7fd995a76000-7fd995c00000 rw-p 00000000 00:00 0 =
+
+  7fd995c00000-7fd996c00000 rw-p 00000000 00:00 0 =
+
+  7fd996c00000-7fd99842c000 rw-p 00000000 00:00 0 =
+
+  7fd99842d000-7fd99842e000 rw-p 00000000 00:00 0 =
+
+  7fd99842e000-7fd99844e000 rw-p 00000000 00:00 0 =
+
+  7fd99844e000-7fd998450000 rw-p 00000000 00:00 0 =
+
+  7fd998450000-7fd998470000 rw-p 00000000 00:00 0 =
+
+  7fd998470000-7fd998472000 rw-p 00000000 00:00 0 =
+
+  7fd998472000-7fd998492000 rw-p 00000000 00:00 0 =
+
+  7fd998492000-7fd998493000 rw-p 00000000 00:00 0 =
+
+  7fd998493000-7fd998494000 ---p 00000000 00:00 0 =
+
+  7fd998494000-7fd998d95000 rw-p 00000000 00:00 0                          =
+[stack:4808]
+  7fd998dd6000-7fd998e00000 rw-p 00000000 00:00 0 =
+
+  7fd998e00000-7fd9d8e00000 rw-p 00000000 00:00 0 =
+
+  7fd9d8e00000-7fd9d8fd7000 rw-p 00000000 00:00 0 =
+
+  7fd9d8fd7000-7fd9d8fd8000 ---p 00000000 00:00 0 =
+
+  7fd9d8fd8000-7fd9e87d9000 rw-p 00000000 00:00 0                          =
+[stack:4807]
+  7fd9e87d9000-7fd9e87e2000 r-xp 00000000 08:05 1577354                    =
+/lib/x86_64-linux-gnu/libcrypt-2.15.so
+  7fd9e87e2000-7fd9e89e2000 ---p 00009000 08:05 1577354                    =
+/lib/x86_64-linux-gnu/libcrypt-2.15.so
+  7fd9e89e2000-7fd9e89e3000 r--p 00009000 08:05 1577354                    =
+/lib/x86_64-linux-gnu/libcrypt-2.15.so
+  7fd9e89e3000-7fd9e89e4000 rw-p 0000a000 08:05 1577354                    =
+/lib/x86_64-linux-gnu/libcrypt-2.15.so
+  7fd9e89e4000-7fd9e8a12000 rw-p 00000000 00:00 0 =
+
+  7fd9e8a12000-7fd9e8ab7000 r-xp 00000000 08:05 4341908                    =
+/usr/lib/x86_64-linux-gnu/libsqlite3.so.0.8.6
+  7fd9e8ab7000-7fd9e8cb7000 ---p 000a5000 08:05 4341908                    =
+/usr/lib/x86_64-linux-gnu/libsqlite3.so.0.8.6
+  7fd9e8cb7000-7fd9e8cb9000 r--p 000a5000 08:05 4341908                    =
+/usr/lib/x86_64-linux-gnu/libsqlite3.so.0.8.6
+  7fd9e8cb9000-7fd9e8cbb000 rw-p 000a7000 08:05 4341908                    =
+/usr/lib/x86_64-linux-gnu/libsqlite3.so.0.8.6
+  7fd9e8cbb000-7fd9e8cbc000 rw-p 00000000 00:00 0 =
+
+  7fd9e8cbc000-7fd9e8d00000 r-xp 00000000 08:05 4341652                    =
+/usr/lib/x86_64-linux-gnu/libhx509.so.5.0.0
+  7fd9e8d00000-7fd9e8f00000 ---p 00044000 08:05 4341652                    =
+/usr/lib/x86_64-linux-gnu/libhx509.so.5.0.0
+  7fd9e8f00000-7fd9e8f02000 r--p 00044000 08:05 4341652                    =
+/usr/lib/x86_64-linux-gnu/libhx509.so.5.0.0
+  7fd9e8f02000-7fd9e8f04000 rw-p 00046000 08:05 4341652                    =
+/usr/lib/x86_64-linux-gnu/libhx509.so.5.0.0
+  7fd9e8f04000-7fd9e8f11000 r-xp 00000000 08:05 4341646                    =
+/usr/lib/x86_64-linux-gnu/libheimbase.so.1.0.0
+  7fd9e8f11000-7fd9e9110000 ---p 0000d000 08:05 4341646                    =
+/usr/lib/x86_64-linux-gnu/libheimbase.so.1.0.0
+  7fd9e9110000-7fd9e9111000 r--p 0000c000 08:05 4341646                    =
+/usr/lib/x86_64-linux-gnu/libheimbase.so.1.0.0
+  7fd9e9111000-7fd9e9112000 rw-p 0000d000 08:05 4341646                    =
+/usr/lib/x86_64-linux-gnu/libheimbase.so.1.0.0
+  7fd9e9112000-7fd9e913a000 r-xp 00000000 08:05 4341985                    =
+/usr/lib/x86_64-linux-gnu/libwind.so.0.0.0
+  7fd9e913a000-7fd9e9339000 ---p 00028000 08:05 4341985                    =
+/usr/lib/x86_64-linux-gnu/libwind.so.0.0.0
+  7fd9e9339000-7fd9e933a000 r--p 00027000 08:05 4341985                    =
+/usr/lib/x86_64-linux-gnu/libwind.so.0.0.0
+  7fd9e933a000-7fd9e933b000 rw-p 00028000 08:05 4341985                    =
+/usr/lib/x86_64-linux-gnu/libwind.so.0.0.0
+  7fd9e933b000-7fd9e933c000 rw-p 00000000 00:00 0 =
+
+  7fd9e933c000-7fd9e9342000 r-xp 00000000 08:05 4341777                    =
+/usr/lib/x86_64-linux-gnu/libogg.so.0.8.0
+  7fd9e9342000-7fd9e9541000 ---p 00006000 08:05 4341777                    =
+/usr/lib/x86_64-linux-gnu/libogg.so.0.8.0
+  7fd9e9541000-7fd9e9542000 r--p 00005000 08:05 4341777                    =
+/usr/lib/x86_64-linux-gnu/libogg.so.0.8.0
+  7fd9e9542000-7fd9e9543000 rw-p 00006000 08:05 4341777                    =
+/usr/lib/x86_64-linux-gnu/libogg.so.0.8.0
+  7fd9e9543000-7fd9e956e000 r-xp 00000000 08:05 4341974                    =
+/usr/lib/x86_64-linux-gnu/libvorbis.so.0.4.5
+  7fd9e956e000-7fd9e976e000 ---p 0002b000 08:05 4341974                    =
+/usr/lib/x86_64-linux-gnu/libvorbis.so.0.4.5
+  7fd9e976e000-7fd9e976f000 r--p 0002b000 08:05 4341974                    =
+/usr/lib/x86_64-linux-gnu/libvorbis.so.0.4.5
+  7fd9e976f000-7fd9e9770000 rw-p 0002c000 08:05 4341974                    =
+/usr/lib/x86_64-linux-gnu/libvorbis.so.0.4.5
+  7fd9e9770000-7fd9e9a23000 r-xp 00000000 08:05 4341976                    =
+/usr/lib/x86_64-linux-gnu/libvorbisenc.so.2.0.8
+  7fd9e9a23000-7fd9e9c22000 ---p 002b3000 08:05 4341976                    =
+/usr/lib/x86_64-linux-gnu/libvorbisenc.so.2.0.8
+  7fd9e9c22000-7fd9e9c3e000 r--p 002b2000 08:05 4341976                    =
+/usr/lib/x86_64-linux-gnu/libvorbisenc.so.2.0.8
+  7fd9e9c3e000-7fd9e9c3f000 rw-p 002ce000 08:05 4341976                    =
+/usr/lib/x86_64-linux-gnu/libvorbisenc.so.2.0.8
+  7fd9e9c3f000-7fd9e9c89000 r-xp 00000000 08:05 4336879                    =
+/usr/lib/x86_64-linux-gnu/libFLAC.so.8.2.0
+  7fd9e9c89000-7fd9e9e89000 ---p 0004a000 08:05 4336879                    =
+/usr/lib/x86_64-linux-gnu/libFLAC.so.8.2.0
+  7fd9e9e89000-7fd9e9e8a000 r--p 0004a000 08:05 4336879                    =
+/usr/lib/x86_64-linux-gnu/libFLAC.so.8.2.0
+  7fd9e9e8a000-7fd9e9e8b000 rw-p 0004b000 08:05 4336879                    =
+/usr/lib/x86_64-linux-gnu/libFLAC.so.8.2.0
+  7fd9e9e8b000-7fd9e9ea2000 r-xp 00000000 08:05 1577610                    =
+/lib/x86_64-linux-gnu/libnsl-2.15.so
+  7fd9e9ea2000-7fd9ea0a1000 ---p 00017000 08:05 1577610                    =
+/lib/x86_64-linux-gnu/libnsl-2.15.so
+  7fd9ea0a1000-7fd9ea0a2000 r--p 00016000 08:05 1577610                    =
+/lib/x86_64-linux-gnu/libnsl-2.15.so
+  7fd9ea0a2000-7fd9ea0a3000 rw-p 00017000 08:05 1577610                    =
+/lib/x86_64-linux-gnu/libnsl-2.15.so
+  7fd9ea0a3000-7fd9ea0a6000 rw-p 00000000 00:00 0 =
+
+  7fd9ea0a6000-7fd9ea0a8000 r-xp 00000000 08:05 1579638                    =
+/lib/x86_64-linux-gnu/libkeyutils.so.1.4
+  7fd9ea0a8000-7fd9ea2a8000 ---p 00002000 08:05 1579638                    =
+/lib/x86_64-linux-gnu/libkeyutils.so.1.4
+  7fd9ea2a8000-7fd9ea2a9000 r--p 00002000 08:05 1579638                    =
+/lib/x86_64-linux-gnu/libkeyutils.so.1.4
+  7fd9ea2a9000-7fd9ea2aa000 rw-p 00003000 08:05 1579638                    =
+/lib/x86_64-linux-gnu/libkeyutils.so.1.4Afbrudt (SIGABRT) (core dumped)
+
+  this only happens with "nowait" enabled.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1270397/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1077514/+subscriptions
