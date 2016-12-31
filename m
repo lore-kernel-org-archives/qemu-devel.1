@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54774)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54776)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zxq_yx_007@163.com>) id 1cN8K5-0001QF-Ik
+	(envelope-from <zxq_yx_007@163.com>) id 1cN8K5-0001QH-JB
 	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 20:19:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zxq_yx_007@163.com>) id 1cN8K3-0000L0-7z
+	(envelope-from <zxq_yx_007@163.com>) id 1cN8K3-0000Ku-5D
 	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 20:19:01 -0500
-Received: from m12-14.163.com ([220.181.12.14]:45625)
+Received: from m12-14.163.com ([220.181.12.14]:45614)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zxq_yx_007@163.com>) id 1cN8K2-0000KA-LV
+	(envelope-from <zxq_yx_007@163.com>) id 1cN8K2-0000K8-Is
 	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 20:18:59 -0500
 From: xiaoqiang zhao <zxq_yx_007@163.com>
-Date: Sat, 31 Dec 2016 09:18:46 +0800
-Message-Id: <20161231011847.4153-5-zxq_yx_007@163.com>
+Date: Sat, 31 Dec 2016 09:18:45 +0800
+Message-Id: <20161231011847.4153-4-zxq_yx_007@163.com>
 In-Reply-To: <20161231011847.4153-1-zxq_yx_007@163.com>
 References: <20161231011847.4153-1-zxq_yx_007@163.com>
-Subject: [Qemu-devel] [PATCH 4/5] hw/net: QOM'ify milkymist-minimac2.c
+Subject: [Qemu-devel] [PATCH 3/5] hw/sd: QOM'ify milkymist-memcard.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,84 +26,83 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: michael@walle.cc
 
-* Split the old SysBus init into an instance_init and a
-  DeviceClass::realize function
-* Drop the old SysBus init function and use instance_init
+split the old SysBus init function into an instance_init
+and Device realize function
 
 Signed-off-by: xiaoqiang zhao <zxq_yx_007@163.com>
 ---
- hw/net/milkymist-minimac2.c | 21 ++++++++++++---------
- 1 file changed, 12 insertions(+), 9 deletions(-)
+ hw/sd/milkymist-memcard.c | 25 +++++++++++++++----------
+ 1 file changed, 15 insertions(+), 10 deletions(-)
 
-diff --git a/hw/net/milkymist-minimac2.c b/hw/net/milkymist-minimac2.c
-index c3a12e1197..81d10d64bb 100644
---- a/hw/net/milkymist-minimac2.c
-+++ b/hw/net/milkymist-minimac2.c
-@@ -452,21 +452,21 @@ static NetClientInfo net_milkymist_minimac2_info = {
-     .receive = minimac2_rx,
- };
+diff --git a/hw/sd/milkymist-memcard.c b/hw/sd/milkymist-memcard.c
+index 1f2f0ed44a..c5abcfe51f 100644
+--- a/hw/sd/milkymist-memcard.c
++++ b/hw/sd/milkymist-memcard.c
+@@ -30,6 +30,7 @@
+ #include "sysemu/block-backend.h"
+ #include "sysemu/blockdev.h"
+ #include "hw/sd/sd.h"
++#include "qapi/error.h"
  
--static int milkymist_minimac2_init(SysBusDevice *sbd)
-+static void milkymist_minimac2_init(Object *obj)
- {
--    DeviceState *dev = DEVICE(sbd);
--    MilkymistMinimac2State *s = MILKYMIST_MINIMAC2(dev);
-+    MilkymistMinimac2State *s = MILKYMIST_MINIMAC2(obj);
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-     size_t buffers_size = TARGET_PAGE_ALIGN(3 * MINIMAC2_BUFFER_SIZE);
+ enum {
+     ENABLE_CMD_TX   = (1<<0),
+@@ -250,7 +251,17 @@ static void milkymist_memcard_reset(DeviceState *d)
+     }
+ }
  
-     sysbus_init_irq(sbd, &s->rx_irq);
-     sysbus_init_irq(sbd, &s->tx_irq);
- 
--    memory_region_init_io(&s->regs_region, OBJECT(dev), &minimac2_ops, s,
-+    memory_region_init_io(&s->regs_region, obj, &minimac2_ops, s,
-                           "milkymist-minimac2", R_MAX * 4);
-     sysbus_init_mmio(sbd, &s->regs_region);
- 
-     /* register buffers memory */
--    memory_region_init_ram(&s->buffers, OBJECT(dev), "milkymist-minimac2.buffers",
-+    memory_region_init_ram(&s->buffers, obj, "milkymist-minimac2.buffers",
-                            buffers_size, &error_fatal);
-     vmstate_register_ram_global(&s->buffers);
-     s->rx0_buf = memory_region_get_ram_ptr(&s->buffers);
-@@ -474,13 +474,16 @@ static int milkymist_minimac2_init(SysBusDevice *sbd)
-     s->tx_buf = s->rx1_buf + MINIMAC2_BUFFER_SIZE;
- 
-     sysbus_init_mmio(sbd, &s->buffers);
+-static int milkymist_memcard_init(SysBusDevice *dev)
++static void milkymist_memcard_init(Object *obj)
++{
++    MilkymistMemcardState *s = MILKYMIST_MEMCARD(obj);
++    SysBusDevice *dev = SYS_BUS_DEVICE(obj);
++
++    memory_region_init_io(&s->regs_region, obj, &memcard_mmio_ops, s,
++            "milkymist-memcard", R_MAX * 4);
++    sysbus_init_mmio(dev, &s->regs_region);
 +}
 +
-+static void milkymist_minimac2_realize(DeviceState *dev, Error **errp)
-+{
-+    MilkymistMinimac2State *s = MILKYMIST_MINIMAC2(dev);
++static void milkymist_memcard_realize(DeviceState *dev, Error **errp)
+ {
+     MilkymistMemcardState *s = MILKYMIST_MEMCARD(dev);
+     DriveInfo *dinfo;
+@@ -261,16 +272,10 @@ static int milkymist_memcard_init(SysBusDevice *dev)
+     blk = dinfo ? blk_by_legacy_dinfo(dinfo) : NULL;
+     s->card = sd_init(blk, false);
+     if (s->card == NULL) {
+-        return -1;
++        error_setg(errp, "sd_init failed");
+     }
  
-     qemu_macaddr_default_if_unset(&s->conf.macaddr);
-     s->nic = qemu_new_nic(&net_milkymist_minimac2_info, &s->conf,
-                           object_get_typename(OBJECT(dev)), dev->id, s);
-     qemu_format_nic_info_str(qemu_get_queue(s->nic), s->conf.macaddr.a);
+     s->enabled = blk && blk_is_inserted(blk);
+-
+-    memory_region_init_io(&s->regs_region, OBJECT(s), &memcard_mmio_ops, s,
+-            "milkymist-memcard", R_MAX * 4);
+-    sysbus_init_mmio(dev, &s->regs_region);
 -
 -    return 0;
  }
  
- static const VMStateDescription vmstate_milkymist_minimac2_mdio = {
-@@ -521,18 +524,18 @@ static Property milkymist_minimac2_properties[] = {
- static void milkymist_minimac2_class_init(ObjectClass *klass, void *data)
+ static const VMStateDescription vmstate_milkymist_memcard = {
+@@ -293,19 +298,19 @@ static const VMStateDescription vmstate_milkymist_memcard = {
+ static void milkymist_memcard_class_init(ObjectClass *klass, void *data)
  {
      DeviceClass *dc = DEVICE_CLASS(klass);
 -    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
  
--    k->init = milkymist_minimac2_init;
-     dc->reset = milkymist_minimac2_reset;
-     dc->vmsd = &vmstate_milkymist_minimac2;
-     dc->props = milkymist_minimac2_properties;
-+    dc->realize = milkymist_minimac2_realize;
+-    k->init = milkymist_memcard_init;
+     dc->reset = milkymist_memcard_reset;
+     dc->vmsd = &vmstate_milkymist_memcard;
+     /* Reason: init() method uses drive_get_next() */
+     dc->cannot_instantiate_with_device_add_yet = true;
++    dc->realize = milkymist_memcard_realize;
  }
  
- static const TypeInfo milkymist_minimac2_info = {
-     .name          = TYPE_MILKYMIST_MINIMAC2,
+ static const TypeInfo milkymist_memcard_info = {
+     .name          = TYPE_MILKYMIST_MEMCARD,
      .parent        = TYPE_SYS_BUS_DEVICE,
-     .instance_size = sizeof(MilkymistMinimac2State),
-+    .instance_init = milkymist_minimac2_init,
-     .class_init    = milkymist_minimac2_class_init,
+     .instance_size = sizeof(MilkymistMemcardState),
++    .instance_init = milkymist_memcard_init,
+     .class_init    = milkymist_memcard_class_init,
  };
  
 -- 
