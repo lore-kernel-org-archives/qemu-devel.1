@@ -1,34 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44957)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44959)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cNBIs-0002Wc-EM
+	(envelope-from <bounces@canonical.com>) id 1cNBIs-0002We-Ez
 	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 23:30:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cNBIp-0006IM-0i
+	(envelope-from <bounces@canonical.com>) id 1cNBIp-0006IS-Dy
 	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 23:29:58 -0500
-Received: from indium.canonical.com ([91.189.90.7]:41536)
+Received: from indium.canonical.com ([91.189.90.7]:41552)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cNBIo-0006I1-NW
-	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 23:29:54 -0500
+	id 1cNBIp-0006IH-58
+	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 23:29:55 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cNBIm-0008OO-7U
-	for <qemu-devel@nongnu.org>; Sat, 31 Dec 2016 04:29:52 +0000
+	id 1cNBIn-0008OQ-2S
+	for <qemu-devel@nongnu.org>; Sat, 31 Dec 2016 04:29:53 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 808312E80CD
-	for <qemu-devel@nongnu.org>; Sat, 31 Dec 2016 04:29:49 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 47F752E80DD
+	for <qemu-devel@nongnu.org>; Sat, 31 Dec 2016 04:29:50 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 31 Dec 2016 04:17:26 -0000
-From: Launchpad Bug Tracker <1077514@bugs.launchpad.net>
-Reply-To: Bug 1077514 <1077514@bugs.launchpad.net>
+Date: Sat, 31 Dec 2016 04:17:23 -0000
+From: Launchpad Bug Tracker <1047999@bugs.launchpad.net>
+Reply-To: Bug 1047999 <1047999@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20121110232423.30270.24933.malonedeb@wampee.canonical.com>
-Message-Id: <20161231041726.5270.87778.malone@loganberry.canonical.com>
+References: <20120908204412.13799.65838.malonedeb@soybean.canonical.com>
+Message-Id: <20161231041723.5270.63151.malone@loganberry.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1077514] Re: *** buffer overflow detected ***:
- qemu-system-x86_64 terminated with nowait enabled
+Subject: [Qemu-devel] [Bug 1047999] Re: error building process in sdlaudio.o
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,178 +47,193 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1077514
+https://bugs.launchpad.net/bugs/1047999
 
 Title:
-  *** buffer overflow detected ***: qemu-system-x86_64 terminated  with
-  nowait enabled
+  error building process in sdlaudio.o
 
 Status in QEMU:
   Expired
 
 Bug description:
-  qemu-system-x86_64 -m 1024 -nographic -cpu coreduo -icount auto -hdachs 9=
-80,16,32 -kernel asa842-vmlinuz -initrd asa842-initrd.gz -append "ide_gener=
-ic.probe_mask=3D0x01 ide_core.chs=3D0.0:980,16,32 auto nousb console=3DttyS=
-0,9600 bigphysarea=3D65536 no-hlt" -net nic -serial telnet::3020,server,now=
-ait
-  failed to initialize KVM: Device or resource busy
-  Back to tcg accelerator.
-  QEMU 1.2.0 monitor - type 'help' for more information
-  (qemu) Warning: vlan 0 is not connected to host network
-  *** buffer overflow detected ***: qemu-system-x86_64 terminated
-  =3D=3D=3D=3D=3D=3D=3D Backtrace: =3D=3D=3D=3D=3D=3D=3D=3D=3D
-  /lib/x86_64-linux-gnu/libc.so.6(__fortify_fail+0x5c)[0x7fd9f04b882c]
-  /lib/x86_64-linux-gnu/libc.so.6(+0x109700)[0x7fd9f04b7700]
-  /lib/x86_64-linux-gnu/libc.so.6(+0x10a7be)[0x7fd9f04b87be]
-  qemu-system-x86_64(+0xf1b5d)[0x7fd9f4bb1b5d]
-  qemu-system-x86_64(+0x18f148)[0x7fd9f4c4f148]
-  qemu-system-x86_64(main+0xfe3)[0x7fd9f4b35353]
-  /lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0xed)[0x7fd9f03cf76d]
-  qemu-system-x86_64(+0x796e9)[0x7fd9f4b396e9]
-  =3D=3D=3D=3D=3D=3D=3D Memory map: =3D=3D=3D=3D=3D=3D=3D=3D
-  40f54000-50f54000 rwxp 00000000 00:00 0 =
+  ./configure --enable-sdl --enable-virtfs --enable-vnc --enable-cocoa
+  --enable-mixemu --enable-brlapi --enable-vnc-tls --enable-vnc-sasl
+  --enable-vnc-jpeg --enable-vnc-png --enable-curses --enable-curl
+  --enable-bluez --enable-tcg-interpreter --enable-nptl --enable-system
+  --enable-user --enable-linux-user --enable-guest-base --enable-pie
+  --enable-uuid --enable-vde --enable-attr --enable-docs --enable-vhost-
+  net --enable-smartcard --enable-guest-agent --enable-seccomp --audio-
+  drv-list=3D"alsa oss sdl esd pa" --audio-card-list=3D"ac97 es1370 sb16
+  cs4231a adlib gus hda" --prefix=3D/opt/qemu
 
-  7fd990000000-7fd990029000 rw-p 00000000 00:00 0 =
+  CC    audio/sdlaudio.o
+  audio/sdlaudio.c:24:17: warning: SDL.h: File not found
+  audio/sdlaudio.c:25:24: warning: SDL_thread.h: File not found
+  audio/sdlaudio.c:55: error: expected specifier-qualifier-list before =E2=
+=80=98SDL_mutex=E2=80=99
+  audio/sdlaudio.c: In function =E2=80=98sdl_logerr=E2=80=99:
+  audio/sdlaudio.c:69: warning: implicit declaration of function =E2=80=98S=
+DL_GetError=E2=80=99
+  audio/sdlaudio.c:69: warning: nested extern declaration of =E2=80=98SDL_G=
+etError=E2=80=99
+  audio/sdlaudio.c:69: warning: format =E2=80=98%s=E2=80=99 expects type =
+=E2=80=98char *=E2=80=99, but argument 3 has type =E2=80=98int=E2=80=99
+  audio/sdlaudio.c: In function =E2=80=98sdl_lock=E2=80=99:
+  audio/sdlaudio.c:74: warning: implicit declaration of function =E2=80=98S=
+DL_LockMutex=E2=80=99
+  audio/sdlaudio.c:74: warning: nested extern declaration of =E2=80=98SDL_L=
+ockMutex=E2=80=99
+  audio/sdlaudio.c:74: error: =E2=80=98SDLAudioState=E2=80=99 has no member=
+ named =E2=80=98mutex=E2=80=99
+  audio/sdlaudio.c: In function =E2=80=98sdl_unlock=E2=80=99:
+  audio/sdlaudio.c:83: warning: implicit declaration of function =E2=80=98S=
+DL_UnlockMutex=E2=80=99
+  audio/sdlaudio.c:83: warning: nested extern declaration of =E2=80=98SDL_U=
+nlockMutex=E2=80=99
+  audio/sdlaudio.c:83: error: =E2=80=98SDLAudioState=E2=80=99 has no member=
+ named =E2=80=98mutex=E2=80=99
+  audio/sdlaudio.c: In function =E2=80=98sdl_post=E2=80=99:
+  audio/sdlaudio.c:92: warning: implicit declaration of function =E2=80=98S=
+DL_SemPost=E2=80=99
+  audio/sdlaudio.c:92: warning: nested extern declaration of =E2=80=98SDL_S=
+emPost=E2=80=99
+  audio/sdlaudio.c:92: error: =E2=80=98SDLAudioState=E2=80=99 has no member=
+ named =E2=80=98sem=E2=80=99
+  audio/sdlaudio.c: In function =E2=80=98sdl_wait=E2=80=99:
+  audio/sdlaudio.c:101: warning: implicit declaration of function =E2=80=98=
+SDL_SemWait=E2=80=99
+  audio/sdlaudio.c:101: warning: nested extern declaration of =E2=80=98SDL_=
+SemWait=E2=80=99
+  audio/sdlaudio.c:101: error: =E2=80=98SDLAudioState=E2=80=99 has no membe=
+r named =E2=80=98sem=E2=80=99
+  audio/sdlaudio.c: In function =E2=80=98aud_to_sdlfmt=E2=80=99:
+  audio/sdlaudio.c:121: error: =E2=80=98AUDIO_S8=E2=80=99 undeclared (first=
+ use in this function)
+  audio/sdlaudio.c:121: error: (Each undeclared identifier is reported only=
+ once
+  audio/sdlaudio.c:121: error: for each function it appears in.)
+  audio/sdlaudio.c:124: error: =E2=80=98AUDIO_U8=E2=80=99 undeclared (first=
+ use in this function)
+  audio/sdlaudio.c:127: error: =E2=80=98AUDIO_S16LSB=E2=80=99 undeclared (f=
+irst use in this function)
+  audio/sdlaudio.c:130: error: =E2=80=98AUDIO_U16LSB=E2=80=99 undeclared (f=
+irst use in this function)
+  audio/sdlaudio.c: In function =E2=80=98sdl_to_audfmt=E2=80=99:
+  audio/sdlaudio.c:144: error: =E2=80=98AUDIO_S8=E2=80=99 undeclared (first=
+ use in this function)
+  audio/sdlaudio.c:149: error: =E2=80=98AUDIO_U8=E2=80=99 undeclared (first=
+ use in this function)
+  audio/sdlaudio.c:154: error: =E2=80=98AUDIO_S16LSB=E2=80=99 undeclared (f=
+irst use in this function)
+  audio/sdlaudio.c:159: error: =E2=80=98AUDIO_U16LSB=E2=80=99 undeclared (f=
+irst use in this function)
+  audio/sdlaudio.c:164: error: =E2=80=98AUDIO_S16MSB=E2=80=99 undeclared (f=
+irst use in this function)
+  audio/sdlaudio.c:169: error: =E2=80=98AUDIO_U16MSB=E2=80=99 undeclared (f=
+irst use in this function)
+  audio/sdlaudio.c: At top level:
+  audio/sdlaudio.c:182: error: expected =E2=80=98)=E2=80=99 before =E2=80=
+=98*=E2=80=99 token
+  audio/sdlaudio.c: In function =E2=80=98sdl_close=E2=80=99:
+  audio/sdlaudio.c:222: error: =E2=80=98SDLAudioState=E2=80=99 has no membe=
+r named =E2=80=98initialized=E2=80=99
+  audio/sdlaudio.c:226: warning: implicit declaration of function =E2=80=98=
+SDL_PauseAudio=E2=80=99
+  audio/sdlaudio.c:226: warning: nested extern declaration of =E2=80=98SDL_=
+PauseAudio=E2=80=99
+  audio/sdlaudio.c:227: warning: implicit declaration of function =E2=80=98=
+SDL_CloseAudio=E2=80=99
+  audio/sdlaudio.c:227: warning: nested extern declaration of =E2=80=98SDL_=
+CloseAudio=E2=80=99
+  audio/sdlaudio.c:228: error: =E2=80=98SDLAudioState=E2=80=99 has no membe=
+r named =E2=80=98initialized=E2=80=99
+  audio/sdlaudio.c: At top level:
+  audio/sdlaudio.c:232: error: expected declaration specifiers or =E2=80=98=
+...=E2=80=99 before =E2=80=98Uint8=E2=80=99
+  audio/sdlaudio.c: In function =E2=80=98sdl_callback=E2=80=99:
+  audio/sdlaudio.c:274: error: =E2=80=98buf=E2=80=99 undeclared (first use =
+in this function)
+  audio/sdlaudio.c: In function =E2=80=98sdl_init_out=E2=80=99:
+  audio/sdlaudio.c:339: error: =E2=80=98SDL_AudioSpec=E2=80=99 undeclared (=
+first use in this function)
+  audio/sdlaudio.c:339: error: expected =E2=80=98;=E2=80=99 before =E2=80=
+=98req=E2=80=99
+  audio/sdlaudio.c:345: error: =E2=80=98req=E2=80=99 undeclared (first use =
+in this function)
+  audio/sdlaudio.c:352: warning: implicit declaration of function =E2=80=98=
+sdl_open=E2=80=99
+  audio/sdlaudio.c:352: warning: nested extern declaration of =E2=80=98sdl_=
+open=E2=80=99
+  audio/sdlaudio.c:352: error: =E2=80=98obt=E2=80=99 undeclared (first use =
+in this function)
+  audio/sdlaudio.c:370: error: =E2=80=98SDLAudioState=E2=80=99 has no membe=
+r named =E2=80=98initialized=E2=80=99
+  audio/sdlaudio.c: In function =E2=80=98sdl_audio_init=E2=80=99:
+  audio/sdlaudio.c:396: warning: implicit declaration of function =E2=80=98=
+SDL_InitSubSystem=E2=80=99
+  audio/sdlaudio.c:396: warning: nested extern declaration of =E2=80=98SDL_=
+InitSubSystem=E2=80=99
+  audio/sdlaudio.c:396: error: =E2=80=98SDL_INIT_AUDIO=E2=80=99 undeclared =
+(first use in this function)
+  audio/sdlaudio.c:401: error: =E2=80=98SDLAudioState=E2=80=99 has no membe=
+r named =E2=80=98mutex=E2=80=99
+  audio/sdlaudio.c:401: warning: implicit declaration of function =E2=80=98=
+SDL_CreateMutex=E2=80=99
+  audio/sdlaudio.c:401: warning: nested extern declaration of =E2=80=98SDL_=
+CreateMutex=E2=80=99
+  audio/sdlaudio.c:402: error: =E2=80=98SDLAudioState=E2=80=99 has no membe=
+r named =E2=80=98mutex=E2=80=99
+  audio/sdlaudio.c:404: warning: implicit declaration of function =E2=80=98=
+SDL_QuitSubSystem=E2=80=99
+  audio/sdlaudio.c:404: warning: nested extern declaration of =E2=80=98SDL_=
+QuitSubSystem=E2=80=99
+  audio/sdlaudio.c:408: error: =E2=80=98SDLAudioState=E2=80=99 has no membe=
+r named =E2=80=98sem=E2=80=99
+  audio/sdlaudio.c:408: warning: implicit declaration of function =E2=80=98=
+SDL_CreateSemaphore=E2=80=99
+  audio/sdlaudio.c:408: warning: nested extern declaration of =E2=80=98SDL_=
+CreateSemaphore=E2=80=99
+  audio/sdlaudio.c:409: error: =E2=80=98SDLAudioState=E2=80=99 has no membe=
+r named =E2=80=98sem=E2=80=99
+  audio/sdlaudio.c:411: warning: implicit declaration of function =E2=80=98=
+SDL_DestroyMutex=E2=80=99
+  audio/sdlaudio.c:411: warning: nested extern declaration of =E2=80=98SDL_=
+DestroyMutex=E2=80=99
+  audio/sdlaudio.c:411: error: =E2=80=98SDLAudioState=E2=80=99 has no membe=
+r named =E2=80=98mutex=E2=80=99
+  audio/sdlaudio.c: In function =E2=80=98sdl_audio_fini=E2=80=99:
+  audio/sdlaudio.c:423: warning: implicit declaration of function =E2=80=98=
+SDL_DestroySemaphore=E2=80=99
+  audio/sdlaudio.c:423: warning: nested extern declaration of =E2=80=98SDL_=
+DestroySemaphore=E2=80=99
+  audio/sdlaudio.c:423: error: =E2=80=98SDLAudioState=E2=80=99 has no membe=
+r named =E2=80=98sem=E2=80=99
+  audio/sdlaudio.c:424: error: =E2=80=98SDLAudioState=E2=80=99 has no membe=
+r named =E2=80=98mutex=E2=80=99
+  audio/sdlaudio.c:425: error: =E2=80=98SDL_INIT_AUDIO=E2=80=99 undeclared =
+(first use in this function)
+  make: *** [audio/sdlaudio.o] Error 1
 
-  7fd990029000-7fd994000000 ---p 00000000 00:00 0 =
+  System:
+  Linux insanelive 3.5.3-iatom-bfq #3 SMP Sat Sep 1 20:30:22 MSK 2012 i686 =
+GNU/Linux
+  Debian 6.0.5 Squeeze
 
-  7fd995907000-7fd995a34000 rw-p 00000000 00:00 0 =
+  SDL headers present:
+  ls -m /usr/include/SDL  =
 
-  7fd995a34000-7fd995a76000 rw-p 00000000 00:00 0 =
+  "begin_code.h", "close_code.h", "SDL_active.h", "SDL_audio.h", "SDL_byteo=
+rder.h", "SDL_cdrom.h", "SDL_config.h",
+  "SDL_cpuinfo.h", "SDL_endian.h", "SDL_error.h", "SDL_events.h", "SDL_gete=
+nv.h", "SDL.h", "SDL_joystick.h", "SDL_keyboard.h",
+  "SDL_keysym.h", "SDL_loadso.h", "SDL_main.h", "SDL_mouse.h", "SDL_mutex.h=
+", "SDL_name.h", "SDL_opengl.h", "SDL_platform.h",
+  "SDL_quit.h", "SDL_rwops.h", "SDL_stdinc.h", "SDL_syswm.h", "SDL_thread.h=
+", "SDL_timer.h", "SDL_types.h", "SDL_version.h",
+  "SDL_video.h"
 
-  7fd995a76000-7fd995c00000 rw-p 00000000 00:00 0 =
-
-  7fd995c00000-7fd996c00000 rw-p 00000000 00:00 0 =
-
-  7fd996c00000-7fd99842c000 rw-p 00000000 00:00 0 =
-
-  7fd99842d000-7fd99842e000 rw-p 00000000 00:00 0 =
-
-  7fd99842e000-7fd99844e000 rw-p 00000000 00:00 0 =
-
-  7fd99844e000-7fd998450000 rw-p 00000000 00:00 0 =
-
-  7fd998450000-7fd998470000 rw-p 00000000 00:00 0 =
-
-  7fd998470000-7fd998472000 rw-p 00000000 00:00 0 =
-
-  7fd998472000-7fd998492000 rw-p 00000000 00:00 0 =
-
-  7fd998492000-7fd998493000 rw-p 00000000 00:00 0 =
-
-  7fd998493000-7fd998494000 ---p 00000000 00:00 0 =
-
-  7fd998494000-7fd998d95000 rw-p 00000000 00:00 0                          =
-[stack:4808]
-  7fd998dd6000-7fd998e00000 rw-p 00000000 00:00 0 =
-
-  7fd998e00000-7fd9d8e00000 rw-p 00000000 00:00 0 =
-
-  7fd9d8e00000-7fd9d8fd7000 rw-p 00000000 00:00 0 =
-
-  7fd9d8fd7000-7fd9d8fd8000 ---p 00000000 00:00 0 =
-
-  7fd9d8fd8000-7fd9e87d9000 rw-p 00000000 00:00 0                          =
-[stack:4807]
-  7fd9e87d9000-7fd9e87e2000 r-xp 00000000 08:05 1577354                    =
-/lib/x86_64-linux-gnu/libcrypt-2.15.so
-  7fd9e87e2000-7fd9e89e2000 ---p 00009000 08:05 1577354                    =
-/lib/x86_64-linux-gnu/libcrypt-2.15.so
-  7fd9e89e2000-7fd9e89e3000 r--p 00009000 08:05 1577354                    =
-/lib/x86_64-linux-gnu/libcrypt-2.15.so
-  7fd9e89e3000-7fd9e89e4000 rw-p 0000a000 08:05 1577354                    =
-/lib/x86_64-linux-gnu/libcrypt-2.15.so
-  7fd9e89e4000-7fd9e8a12000 rw-p 00000000 00:00 0 =
-
-  7fd9e8a12000-7fd9e8ab7000 r-xp 00000000 08:05 4341908                    =
-/usr/lib/x86_64-linux-gnu/libsqlite3.so.0.8.6
-  7fd9e8ab7000-7fd9e8cb7000 ---p 000a5000 08:05 4341908                    =
-/usr/lib/x86_64-linux-gnu/libsqlite3.so.0.8.6
-  7fd9e8cb7000-7fd9e8cb9000 r--p 000a5000 08:05 4341908                    =
-/usr/lib/x86_64-linux-gnu/libsqlite3.so.0.8.6
-  7fd9e8cb9000-7fd9e8cbb000 rw-p 000a7000 08:05 4341908                    =
-/usr/lib/x86_64-linux-gnu/libsqlite3.so.0.8.6
-  7fd9e8cbb000-7fd9e8cbc000 rw-p 00000000 00:00 0 =
-
-  7fd9e8cbc000-7fd9e8d00000 r-xp 00000000 08:05 4341652                    =
-/usr/lib/x86_64-linux-gnu/libhx509.so.5.0.0
-  7fd9e8d00000-7fd9e8f00000 ---p 00044000 08:05 4341652                    =
-/usr/lib/x86_64-linux-gnu/libhx509.so.5.0.0
-  7fd9e8f00000-7fd9e8f02000 r--p 00044000 08:05 4341652                    =
-/usr/lib/x86_64-linux-gnu/libhx509.so.5.0.0
-  7fd9e8f02000-7fd9e8f04000 rw-p 00046000 08:05 4341652                    =
-/usr/lib/x86_64-linux-gnu/libhx509.so.5.0.0
-  7fd9e8f04000-7fd9e8f11000 r-xp 00000000 08:05 4341646                    =
-/usr/lib/x86_64-linux-gnu/libheimbase.so.1.0.0
-  7fd9e8f11000-7fd9e9110000 ---p 0000d000 08:05 4341646                    =
-/usr/lib/x86_64-linux-gnu/libheimbase.so.1.0.0
-  7fd9e9110000-7fd9e9111000 r--p 0000c000 08:05 4341646                    =
-/usr/lib/x86_64-linux-gnu/libheimbase.so.1.0.0
-  7fd9e9111000-7fd9e9112000 rw-p 0000d000 08:05 4341646                    =
-/usr/lib/x86_64-linux-gnu/libheimbase.so.1.0.0
-  7fd9e9112000-7fd9e913a000 r-xp 00000000 08:05 4341985                    =
-/usr/lib/x86_64-linux-gnu/libwind.so.0.0.0
-  7fd9e913a000-7fd9e9339000 ---p 00028000 08:05 4341985                    =
-/usr/lib/x86_64-linux-gnu/libwind.so.0.0.0
-  7fd9e9339000-7fd9e933a000 r--p 00027000 08:05 4341985                    =
-/usr/lib/x86_64-linux-gnu/libwind.so.0.0.0
-  7fd9e933a000-7fd9e933b000 rw-p 00028000 08:05 4341985                    =
-/usr/lib/x86_64-linux-gnu/libwind.so.0.0.0
-  7fd9e933b000-7fd9e933c000 rw-p 00000000 00:00 0 =
-
-  7fd9e933c000-7fd9e9342000 r-xp 00000000 08:05 4341777                    =
-/usr/lib/x86_64-linux-gnu/libogg.so.0.8.0
-  7fd9e9342000-7fd9e9541000 ---p 00006000 08:05 4341777                    =
-/usr/lib/x86_64-linux-gnu/libogg.so.0.8.0
-  7fd9e9541000-7fd9e9542000 r--p 00005000 08:05 4341777                    =
-/usr/lib/x86_64-linux-gnu/libogg.so.0.8.0
-  7fd9e9542000-7fd9e9543000 rw-p 00006000 08:05 4341777                    =
-/usr/lib/x86_64-linux-gnu/libogg.so.0.8.0
-  7fd9e9543000-7fd9e956e000 r-xp 00000000 08:05 4341974                    =
-/usr/lib/x86_64-linux-gnu/libvorbis.so.0.4.5
-  7fd9e956e000-7fd9e976e000 ---p 0002b000 08:05 4341974                    =
-/usr/lib/x86_64-linux-gnu/libvorbis.so.0.4.5
-  7fd9e976e000-7fd9e976f000 r--p 0002b000 08:05 4341974                    =
-/usr/lib/x86_64-linux-gnu/libvorbis.so.0.4.5
-  7fd9e976f000-7fd9e9770000 rw-p 0002c000 08:05 4341974                    =
-/usr/lib/x86_64-linux-gnu/libvorbis.so.0.4.5
-  7fd9e9770000-7fd9e9a23000 r-xp 00000000 08:05 4341976                    =
-/usr/lib/x86_64-linux-gnu/libvorbisenc.so.2.0.8
-  7fd9e9a23000-7fd9e9c22000 ---p 002b3000 08:05 4341976                    =
-/usr/lib/x86_64-linux-gnu/libvorbisenc.so.2.0.8
-  7fd9e9c22000-7fd9e9c3e000 r--p 002b2000 08:05 4341976                    =
-/usr/lib/x86_64-linux-gnu/libvorbisenc.so.2.0.8
-  7fd9e9c3e000-7fd9e9c3f000 rw-p 002ce000 08:05 4341976                    =
-/usr/lib/x86_64-linux-gnu/libvorbisenc.so.2.0.8
-  7fd9e9c3f000-7fd9e9c89000 r-xp 00000000 08:05 4336879                    =
-/usr/lib/x86_64-linux-gnu/libFLAC.so.8.2.0
-  7fd9e9c89000-7fd9e9e89000 ---p 0004a000 08:05 4336879                    =
-/usr/lib/x86_64-linux-gnu/libFLAC.so.8.2.0
-  7fd9e9e89000-7fd9e9e8a000 r--p 0004a000 08:05 4336879                    =
-/usr/lib/x86_64-linux-gnu/libFLAC.so.8.2.0
-  7fd9e9e8a000-7fd9e9e8b000 rw-p 0004b000 08:05 4336879                    =
-/usr/lib/x86_64-linux-gnu/libFLAC.so.8.2.0
-  7fd9e9e8b000-7fd9e9ea2000 r-xp 00000000 08:05 1577610                    =
-/lib/x86_64-linux-gnu/libnsl-2.15.so
-  7fd9e9ea2000-7fd9ea0a1000 ---p 00017000 08:05 1577610                    =
-/lib/x86_64-linux-gnu/libnsl-2.15.so
-  7fd9ea0a1000-7fd9ea0a2000 r--p 00016000 08:05 1577610                    =
-/lib/x86_64-linux-gnu/libnsl-2.15.so
-  7fd9ea0a2000-7fd9ea0a3000 rw-p 00017000 08:05 1577610                    =
-/lib/x86_64-linux-gnu/libnsl-2.15.so
-  7fd9ea0a3000-7fd9ea0a6000 rw-p 00000000 00:00 0 =
-
-  7fd9ea0a6000-7fd9ea0a8000 r-xp 00000000 08:05 1579638                    =
-/lib/x86_64-linux-gnu/libkeyutils.so.1.4
-  7fd9ea0a8000-7fd9ea2a8000 ---p 00002000 08:05 1579638                    =
-/lib/x86_64-linux-gnu/libkeyutils.so.1.4
-  7fd9ea2a8000-7fd9ea2a9000 r--p 00002000 08:05 1579638                    =
-/lib/x86_64-linux-gnu/libkeyutils.so.1.4
-  7fd9ea2a9000-7fd9ea2aa000 rw-p 00003000 08:05 1579638                    =
-/lib/x86_64-linux-gnu/libkeyutils.so.1.4Afbrudt (SIGABRT) (core dumped)
-
-  this only happens with "nowait" enabled.
+  problem is solved by a direct setting of the location of the each
+  header files in the source file
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1077514/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1047999/+subscriptions
