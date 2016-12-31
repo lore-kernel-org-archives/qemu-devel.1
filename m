@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44959)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41212)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cNBIs-0002We-Ez
-	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 23:30:00 -0500
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cNFeT-0005wc-1G
+	for qemu-devel@nongnu.org; Sat, 31 Dec 2016 04:08:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cNBIp-0006IS-Dy
-	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 23:29:58 -0500
-Received: from indium.canonical.com ([91.189.90.7]:41552)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cNBIp-0006IH-58
-	for qemu-devel@nongnu.org; Fri, 30 Dec 2016 23:29:55 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cNBIn-0008OQ-2S
-	for <qemu-devel@nongnu.org>; Sat, 31 Dec 2016 04:29:53 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 47F752E80DD
-	for <qemu-devel@nongnu.org>; Sat, 31 Dec 2016 04:29:50 +0000 (UTC)
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cNFeN-00071R-SC
+	for qemu-devel@nongnu.org; Sat, 31 Dec 2016 04:08:32 -0500
+Received: from [59.151.112.132] (port=14080 helo=heian.cn.fujitsu.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cNFeN-0006sZ-51
+	for qemu-devel@nongnu.org; Sat, 31 Dec 2016 04:08:27 -0500
+From: Cao jin <caoj.fnst@cn.fujitsu.com>
+Date: Sat, 31 Dec 2016 17:13:04 +0800
+Message-ID: <1483175588-17006-1-git-send-email-caoj.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 31 Dec 2016 04:17:23 -0000
-From: Launchpad Bug Tracker <1047999@bugs.launchpad.net>
-Reply-To: Bug 1047999 <1047999@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20120908204412.13799.65838.malonedeb@soybean.canonical.com>
-Message-Id: <20161231041723.5270.63151.malone@loganberry.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1047999] Re: error building process in sdlaudio.o
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH RFC v11 0/4] vfio-pci: pass non-fatal error to
+ guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,203 +25,57 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: alex.williamson@redhat.com, mst@redhat.com, izumi.taku@jp.fujitsu.com
 
-[Expired for QEMU because there has been no activity for 60 days.]
+As previous discussion suggest, we could take a step back to handle non-fatal
+error first, this will make this patchset much more thinner, because we could
+drop all the configuration restriction related patches.
 
-** Changed in: qemu
-       Status: Incomplete =3D> Expired
+FYI: patch 1 has been cherry picked into another series, and wait to be merged
+first, so this patchset can't compile in your host.
 
--- =
+v11 changelog:
+1. drop a bunch of code which check the configuration.
+2. modify patch 3 to handle non-fatal error only, fatal error still
+   results in vm stop.
+   Doesn't modify as suggestion "add another eventfd do distinguish fatal &
+   non-fatal error", because 1st, user has the ability to distinguish them
+   just from the uncorrectable error status; 2nd, for back compatible, e.g.
+   an old user handle both error, rely on the current error eventfd.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1047999
+Test:
+Test it with intel 82576 NIC, which has 2 functions, function 1 has cable
+connected to gateway, function 0 has no link. Test in 4 scenario.
+1. just assign function 1 to one vm, function 0 has no user
+2. assign 2 function to one vm, totally comply previous configuraton restrction
+3. assign 2 function to one vm, under different virtual bus
+4, assign functions to 2 different vm
 
-Title:
-  error building process in sdlaudio.o
+The test steps are the same as v10: assign ip to function 1, add route info,
+and ping the gateway. The results meet expectation. But the unsteady hardware
+often emit fatal error, still don't know why. And igb driver in guest seems
+has bug: ping gateway for a while, even if I don't do anything, it will show
+"Destination Host Unreachable" after many successful ping. But obviously,
+neither of these has relationship with this patchset.
 
-Status in QEMU:
-  Expired
 
-Bug description:
-  ./configure --enable-sdl --enable-virtfs --enable-vnc --enable-cocoa
-  --enable-mixemu --enable-brlapi --enable-vnc-tls --enable-vnc-sasl
-  --enable-vnc-jpeg --enable-vnc-png --enable-curses --enable-curl
-  --enable-bluez --enable-tcg-interpreter --enable-nptl --enable-system
-  --enable-user --enable-linux-user --enable-guest-base --enable-pie
-  --enable-uuid --enable-vde --enable-attr --enable-docs --enable-vhost-
-  net --enable-smartcard --enable-guest-agent --enable-seccomp --audio-
-  drv-list=3D"alsa oss sdl esd pa" --audio-card-list=3D"ac97 es1370 sb16
-  cs4231a adlib gus hda" --prefix=3D/opt/qemu
+Chen Fan (3):
+  vfio: new function to init aer cap for vfio device
+  vfio-pci: pass the aer error to guest
+  vfio: add 'aer' property to expose aercap
 
-  CC    audio/sdlaudio.o
-  audio/sdlaudio.c:24:17: warning: SDL.h: File not found
-  audio/sdlaudio.c:25:24: warning: SDL_thread.h: File not found
-  audio/sdlaudio.c:55: error: expected specifier-qualifier-list before =E2=
-=80=98SDL_mutex=E2=80=99
-  audio/sdlaudio.c: In function =E2=80=98sdl_logerr=E2=80=99:
-  audio/sdlaudio.c:69: warning: implicit declaration of function =E2=80=98S=
-DL_GetError=E2=80=99
-  audio/sdlaudio.c:69: warning: nested extern declaration of =E2=80=98SDL_G=
-etError=E2=80=99
-  audio/sdlaudio.c:69: warning: format =E2=80=98%s=E2=80=99 expects type =
-=E2=80=98char *=E2=80=99, but argument 3 has type =E2=80=98int=E2=80=99
-  audio/sdlaudio.c: In function =E2=80=98sdl_lock=E2=80=99:
-  audio/sdlaudio.c:74: warning: implicit declaration of function =E2=80=98S=
-DL_LockMutex=E2=80=99
-  audio/sdlaudio.c:74: warning: nested extern declaration of =E2=80=98SDL_L=
-ockMutex=E2=80=99
-  audio/sdlaudio.c:74: error: =E2=80=98SDLAudioState=E2=80=99 has no member=
- named =E2=80=98mutex=E2=80=99
-  audio/sdlaudio.c: In function =E2=80=98sdl_unlock=E2=80=99:
-  audio/sdlaudio.c:83: warning: implicit declaration of function =E2=80=98S=
-DL_UnlockMutex=E2=80=99
-  audio/sdlaudio.c:83: warning: nested extern declaration of =E2=80=98SDL_U=
-nlockMutex=E2=80=99
-  audio/sdlaudio.c:83: error: =E2=80=98SDLAudioState=E2=80=99 has no member=
- named =E2=80=98mutex=E2=80=99
-  audio/sdlaudio.c: In function =E2=80=98sdl_post=E2=80=99:
-  audio/sdlaudio.c:92: warning: implicit declaration of function =E2=80=98S=
-DL_SemPost=E2=80=99
-  audio/sdlaudio.c:92: warning: nested extern declaration of =E2=80=98SDL_S=
-emPost=E2=80=99
-  audio/sdlaudio.c:92: error: =E2=80=98SDLAudioState=E2=80=99 has no member=
- named =E2=80=98sem=E2=80=99
-  audio/sdlaudio.c: In function =E2=80=98sdl_wait=E2=80=99:
-  audio/sdlaudio.c:101: warning: implicit declaration of function =E2=80=98=
-SDL_SemWait=E2=80=99
-  audio/sdlaudio.c:101: warning: nested extern declaration of =E2=80=98SDL_=
-SemWait=E2=80=99
-  audio/sdlaudio.c:101: error: =E2=80=98SDLAudioState=E2=80=99 has no membe=
-r named =E2=80=98sem=E2=80=99
-  audio/sdlaudio.c: In function =E2=80=98aud_to_sdlfmt=E2=80=99:
-  audio/sdlaudio.c:121: error: =E2=80=98AUDIO_S8=E2=80=99 undeclared (first=
- use in this function)
-  audio/sdlaudio.c:121: error: (Each undeclared identifier is reported only=
- once
-  audio/sdlaudio.c:121: error: for each function it appears in.)
-  audio/sdlaudio.c:124: error: =E2=80=98AUDIO_U8=E2=80=99 undeclared (first=
- use in this function)
-  audio/sdlaudio.c:127: error: =E2=80=98AUDIO_S16LSB=E2=80=99 undeclared (f=
-irst use in this function)
-  audio/sdlaudio.c:130: error: =E2=80=98AUDIO_U16LSB=E2=80=99 undeclared (f=
-irst use in this function)
-  audio/sdlaudio.c: In function =E2=80=98sdl_to_audfmt=E2=80=99:
-  audio/sdlaudio.c:144: error: =E2=80=98AUDIO_S8=E2=80=99 undeclared (first=
- use in this function)
-  audio/sdlaudio.c:149: error: =E2=80=98AUDIO_U8=E2=80=99 undeclared (first=
- use in this function)
-  audio/sdlaudio.c:154: error: =E2=80=98AUDIO_S16LSB=E2=80=99 undeclared (f=
-irst use in this function)
-  audio/sdlaudio.c:159: error: =E2=80=98AUDIO_U16LSB=E2=80=99 undeclared (f=
-irst use in this function)
-  audio/sdlaudio.c:164: error: =E2=80=98AUDIO_S16MSB=E2=80=99 undeclared (f=
-irst use in this function)
-  audio/sdlaudio.c:169: error: =E2=80=98AUDIO_U16MSB=E2=80=99 undeclared (f=
-irst use in this function)
-  audio/sdlaudio.c: At top level:
-  audio/sdlaudio.c:182: error: expected =E2=80=98)=E2=80=99 before =E2=80=
-=98*=E2=80=99 token
-  audio/sdlaudio.c: In function =E2=80=98sdl_close=E2=80=99:
-  audio/sdlaudio.c:222: error: =E2=80=98SDLAudioState=E2=80=99 has no membe=
-r named =E2=80=98initialized=E2=80=99
-  audio/sdlaudio.c:226: warning: implicit declaration of function =E2=80=98=
-SDL_PauseAudio=E2=80=99
-  audio/sdlaudio.c:226: warning: nested extern declaration of =E2=80=98SDL_=
-PauseAudio=E2=80=99
-  audio/sdlaudio.c:227: warning: implicit declaration of function =E2=80=98=
-SDL_CloseAudio=E2=80=99
-  audio/sdlaudio.c:227: warning: nested extern declaration of =E2=80=98SDL_=
-CloseAudio=E2=80=99
-  audio/sdlaudio.c:228: error: =E2=80=98SDLAudioState=E2=80=99 has no membe=
-r named =E2=80=98initialized=E2=80=99
-  audio/sdlaudio.c: At top level:
-  audio/sdlaudio.c:232: error: expected declaration specifiers or =E2=80=98=
-...=E2=80=99 before =E2=80=98Uint8=E2=80=99
-  audio/sdlaudio.c: In function =E2=80=98sdl_callback=E2=80=99:
-  audio/sdlaudio.c:274: error: =E2=80=98buf=E2=80=99 undeclared (first use =
-in this function)
-  audio/sdlaudio.c: In function =E2=80=98sdl_init_out=E2=80=99:
-  audio/sdlaudio.c:339: error: =E2=80=98SDL_AudioSpec=E2=80=99 undeclared (=
-first use in this function)
-  audio/sdlaudio.c:339: error: expected =E2=80=98;=E2=80=99 before =E2=80=
-=98req=E2=80=99
-  audio/sdlaudio.c:345: error: =E2=80=98req=E2=80=99 undeclared (first use =
-in this function)
-  audio/sdlaudio.c:352: warning: implicit declaration of function =E2=80=98=
-sdl_open=E2=80=99
-  audio/sdlaudio.c:352: warning: nested extern declaration of =E2=80=98sdl_=
-open=E2=80=99
-  audio/sdlaudio.c:352: error: =E2=80=98obt=E2=80=99 undeclared (first use =
-in this function)
-  audio/sdlaudio.c:370: error: =E2=80=98SDLAudioState=E2=80=99 has no membe=
-r named =E2=80=98initialized=E2=80=99
-  audio/sdlaudio.c: In function =E2=80=98sdl_audio_init=E2=80=99:
-  audio/sdlaudio.c:396: warning: implicit declaration of function =E2=80=98=
-SDL_InitSubSystem=E2=80=99
-  audio/sdlaudio.c:396: warning: nested extern declaration of =E2=80=98SDL_=
-InitSubSystem=E2=80=99
-  audio/sdlaudio.c:396: error: =E2=80=98SDL_INIT_AUDIO=E2=80=99 undeclared =
-(first use in this function)
-  audio/sdlaudio.c:401: error: =E2=80=98SDLAudioState=E2=80=99 has no membe=
-r named =E2=80=98mutex=E2=80=99
-  audio/sdlaudio.c:401: warning: implicit declaration of function =E2=80=98=
-SDL_CreateMutex=E2=80=99
-  audio/sdlaudio.c:401: warning: nested extern declaration of =E2=80=98SDL_=
-CreateMutex=E2=80=99
-  audio/sdlaudio.c:402: error: =E2=80=98SDLAudioState=E2=80=99 has no membe=
-r named =E2=80=98mutex=E2=80=99
-  audio/sdlaudio.c:404: warning: implicit declaration of function =E2=80=98=
-SDL_QuitSubSystem=E2=80=99
-  audio/sdlaudio.c:404: warning: nested extern declaration of =E2=80=98SDL_=
-QuitSubSystem=E2=80=99
-  audio/sdlaudio.c:408: error: =E2=80=98SDLAudioState=E2=80=99 has no membe=
-r named =E2=80=98sem=E2=80=99
-  audio/sdlaudio.c:408: warning: implicit declaration of function =E2=80=98=
-SDL_CreateSemaphore=E2=80=99
-  audio/sdlaudio.c:408: warning: nested extern declaration of =E2=80=98SDL_=
-CreateSemaphore=E2=80=99
-  audio/sdlaudio.c:409: error: =E2=80=98SDLAudioState=E2=80=99 has no membe=
-r named =E2=80=98sem=E2=80=99
-  audio/sdlaudio.c:411: warning: implicit declaration of function =E2=80=98=
-SDL_DestroyMutex=E2=80=99
-  audio/sdlaudio.c:411: warning: nested extern declaration of =E2=80=98SDL_=
-DestroyMutex=E2=80=99
-  audio/sdlaudio.c:411: error: =E2=80=98SDLAudioState=E2=80=99 has no membe=
-r named =E2=80=98mutex=E2=80=99
-  audio/sdlaudio.c: In function =E2=80=98sdl_audio_fini=E2=80=99:
-  audio/sdlaudio.c:423: warning: implicit declaration of function =E2=80=98=
-SDL_DestroySemaphore=E2=80=99
-  audio/sdlaudio.c:423: warning: nested extern declaration of =E2=80=98SDL_=
-DestroySemaphore=E2=80=99
-  audio/sdlaudio.c:423: error: =E2=80=98SDLAudioState=E2=80=99 has no membe=
-r named =E2=80=98sem=E2=80=99
-  audio/sdlaudio.c:424: error: =E2=80=98SDLAudioState=E2=80=99 has no membe=
-r named =E2=80=98mutex=E2=80=99
-  audio/sdlaudio.c:425: error: =E2=80=98SDL_INIT_AUDIO=E2=80=99 undeclared =
-(first use in this function)
-  make: *** [audio/sdlaudio.o] Error 1
+Dou Liyang (1):
+  pcie_aer: support configurable AER capa version
 
-  System:
-  Linux insanelive 3.5.3-iatom-bfq #3 SMP Sat Sep 1 20:30:22 MSK 2012 i686 =
-GNU/Linux
-  Debian 6.0.5 Squeeze
+ hw/net/e1000e.c                    |   3 +-
+ hw/pci-bridge/ioh3420.c            |   2 +-
+ hw/pci-bridge/xio3130_downstream.c |   2 +-
+ hw/pci-bridge/xio3130_upstream.c   |   2 +-
+ hw/pci/pcie_aer.c                  |   5 +-
+ hw/vfio/pci.c                      | 139 +++++++++++++++++++++++++++++++++----
+ hw/vfio/pci.h                      |   3 +
+ include/hw/pci/pcie_aer.h          |   3 +-
+ 8 files changed, 139 insertions(+), 20 deletions(-)
 
-  SDL headers present:
-  ls -m /usr/include/SDL  =
-
-  "begin_code.h", "close_code.h", "SDL_active.h", "SDL_audio.h", "SDL_byteo=
-rder.h", "SDL_cdrom.h", "SDL_config.h",
-  "SDL_cpuinfo.h", "SDL_endian.h", "SDL_error.h", "SDL_events.h", "SDL_gete=
-nv.h", "SDL.h", "SDL_joystick.h", "SDL_keyboard.h",
-  "SDL_keysym.h", "SDL_loadso.h", "SDL_main.h", "SDL_mouse.h", "SDL_mutex.h=
-", "SDL_name.h", "SDL_opengl.h", "SDL_platform.h",
-  "SDL_quit.h", "SDL_rwops.h", "SDL_stdinc.h", "SDL_syswm.h", "SDL_thread.h=
-", "SDL_timer.h", "SDL_types.h", "SDL_version.h",
-  "SDL_video.h"
-
-  problem is solved by a direct setting of the location of the each
-  header files in the source file
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1047999/+subscriptions
+-- 
+1.8.3.1
