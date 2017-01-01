@@ -1,18 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55273)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60888)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hpoussin@reactos.org>) id 1cNccz-0003QP-3H
-	for qemu-devel@nongnu.org; Sun, 01 Jan 2017 04:40:34 -0500
+	(envelope-from <bounces@canonical.com>) id 1cNdTX-0006fA-3e
+	for qemu-devel@nongnu.org; Sun, 01 Jan 2017 05:34:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hpoussin@reactos.org>) id 1cNccv-0004JO-Ge
-	for qemu-devel@nongnu.org; Sun, 01 Jan 2017 04:40:32 -0500
-From: =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>
-Date: Sun,  1 Jan 2017 10:39:45 +0100
-Message-Id: <1483263585-8101-1-git-send-email-hpoussin@reactos.org>
+	(envelope-from <bounces@canonical.com>) id 1cNdTR-0002QZ-U4
+	for qemu-devel@nongnu.org; Sun, 01 Jan 2017 05:34:51 -0500
+Received: from indium.canonical.com ([91.189.90.7]:48859)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cNdTR-0002PZ-OS
+	for qemu-devel@nongnu.org; Sun, 01 Jan 2017 05:34:45 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cNdTQ-0004C9-0h
+	for <qemu-devel@nongnu.org>; Sun, 01 Jan 2017 10:34:44 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id F0D6D2E80C9
+	for <qemu-devel@nongnu.org>; Sun,  1 Jan 2017 10:34:43 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] ui/gtk: fix crash at startup when no console
- is available
+Date: Sun, 01 Jan 2017 10:23:48 -0000
+From: Thomas Huth <925405@bugs.launchpad.net>
+Reply-To: Bug 925405 <925405@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20120202110843.18662.48430.malonedeb@wampee.canonical.com>
+Message-Id: <20170101102348.2743.69955.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 925405] Re: VNC server does not work with Mac
+ Screen Sharing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,50 +38,65 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Stefan Weil <sw@weilnetz.de>, "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, qemu-stable@nongnu.org, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>
 
-This patch fixes a segfault at QEMU startup, introduced in a08156321ab9a7=
-d2fed9ee77dbfeea2a61ffd153.
-gd_vc_find_current() return NULL, which is dereferenced without checking =
-it.
+QEMU 2.0 is not maintained by the QEMU project anymore. Can you please
+try again with the latest release of QEMU (v2.8)? ... otherwise you
+should report this to the bug tracker of your distro instead.
 
-While at it, disable the whole 'View' menu if no console exists.
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
-Reproducer: qemu-system-i386 -M none -nodefaults
+-- =
 
-Signed-off-by: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
----
- ui/gtk.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/925405
 
-diff --git a/ui/gtk.c b/ui/gtk.c
-index a216216..406de4f 100644
---- a/ui/gtk.c
-+++ b/ui/gtk.c
-@@ -2171,6 +2171,8 @@ static gboolean gtkinit;
-=20
- void gtk_display_init(DisplayState *ds, bool full_screen, bool grab_on_h=
-over)
- {
-+    VirtualConsole *vc;
-+
-     GtkDisplayState *s =3D g_malloc0(sizeof(*s));
-     char *filename;
-     GdkDisplay *window_display;
-@@ -2249,9 +2251,11 @@ void gtk_display_init(DisplayState *ds, bool full_=
-screen, bool grab_on_hover)
-     }
- #endif
-=20
-+    vc =3D gd_vc_find_current(s);
-+    gtk_widget_set_sensitive(s->view_menu, vc !=3D NULL);
- #ifdef CONFIG_VTE
-     gtk_widget_set_sensitive(s->copy_item,
--                             gd_vc_find_current(s)->type =3D=3D GD_VC_VT=
-E);
-+                             vc && vc->type =3D=3D GD_VC_VTE);
- #endif
-=20
-     if (full_screen) {
---=20
-2.1.4
+Title:
+  VNC server does not work with Mac Screen Sharing
+
+Status in QEMU:
+  Incomplete
+Status in Ubuntu:
+  Invalid
+
+Bug description:
+  When connecting to a QEMU instance from a Mac using any VNC settings
+  on the QEMU CLI and any target arch (ARM, Intel, etc.), the connection
+  is attempted but the negotiation never finishes.
+
+  I've verified this when building QEMU from source (1.0 and HEAD) on
+  Ubuntu, Fedora and Debian or when using Ubuntu (Oneiric) and Debian
+  (Lenny) packages.
+
+  It does not matter whether I specify authentication (or anything else)
+  on QEMU's side, the behavior is always the same - I see the connection
+  being established using netstat and tcpdump, but QEMU does not seem to
+  send back any pixmap data after the connection setup.
+
+  Best guess as to why this happens is that the VNC negotiation on QEMU
+  does not like the protocol version and VNC encoding sent by the Mac's
+  built-in VNC client, or that its negotiation logic is subtly broken. I
+  appreciate that it's not meant to be a full VNC server, but it
+  prevents me from using it remotely until a stable Mac build is
+  feasible.
+
+  Background info:
+
+  Mac OS X includes a VNC client called Screen Sharing that you can
+  invoke in two different ways:
+
+  * At a terminal, by typing "open vnc://hostname:tcp_port"
+  * From any URI-enabled field (such as the Safari URI field), where you ca=
+n just type the URI as vnc://hostname:tcp_port
+
+  Please do not confuse the enhanced VNC protocol Apple Remote Desktop
+  uses with Screen Sharing - they are not mutually exclusive, but they
+  are not incompatible either, since what Apple does is to negotiate
+  extra pixmap encoding and authentication options - I use Screen
+  Sharing to access many VNC servers such as vnc4server, tightvncserver,
+  vino, etc. without any issues whatsoever, so the issue I'm reporting
+  is not an issue with Apple's implementation.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/925405/+subscriptions
