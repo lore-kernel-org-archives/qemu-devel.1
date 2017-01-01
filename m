@@ -1,34 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60888)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60916)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cNdTX-0006fA-3e
-	for qemu-devel@nongnu.org; Sun, 01 Jan 2017 05:34:52 -0500
+	(envelope-from <peterx@redhat.com>) id 1cNdTe-0006gl-DQ
+	for qemu-devel@nongnu.org; Sun, 01 Jan 2017 05:35:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cNdTR-0002QZ-U4
-	for qemu-devel@nongnu.org; Sun, 01 Jan 2017 05:34:51 -0500
-Received: from indium.canonical.com ([91.189.90.7]:48859)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cNdTR-0002PZ-OS
-	for qemu-devel@nongnu.org; Sun, 01 Jan 2017 05:34:45 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cNdTQ-0004C9-0h
-	for <qemu-devel@nongnu.org>; Sun, 01 Jan 2017 10:34:44 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id F0D6D2E80C9
-	for <qemu-devel@nongnu.org>; Sun,  1 Jan 2017 10:34:43 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sun, 01 Jan 2017 10:23:48 -0000
-From: Thomas Huth <925405@bugs.launchpad.net>
-Reply-To: Bug 925405 <925405@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20120202110843.18662.48430.malonedeb@wampee.canonical.com>
-Message-Id: <20170101102348.2743.69955.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 925405] Re: VNC server does not work with Mac
- Screen Sharing
+	(envelope-from <peterx@redhat.com>) id 1cNdTZ-0002Wr-Fw
+	for qemu-devel@nongnu.org; Sun, 01 Jan 2017 05:34:58 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37442)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cNdTZ-0002Vw-9h
+	for qemu-devel@nongnu.org; Sun, 01 Jan 2017 05:34:53 -0500
+From: Peter Xu <peterx@redhat.com>
+Date: Sun,  1 Jan 2017 18:34:44 +0800
+Message-Id: <1483266886-25050-1-git-send-email-peterx@redhat.com>
+Subject: [Qemu-devel] [kvm-unit-tests PATCH 0/2] run_tests: support
+ concurrent test execution
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,66 +22,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, kvm@vger.kernel.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Andrew Jones <drjones@redhat.com>, peterx@redhat.com, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
 
-QEMU 2.0 is not maintained by the QEMU project anymore. Can you please
-try again with the latest release of QEMU (v2.8)? ... otherwise you
-should report this to the bug tracker of your distro instead.
+run_tests.sh is getting slower. Maybe it's time to let it run faster.
+An obvious issue is that, we were running the tests sequentially in
+the past.
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+This series provides another new "-j" parameter. "-j 8" means we run
+the tests on 8 task queues. That'll fasten the script a lot. A very
+quick test of mine shows 3x speed boost with 8 task queues.
 
--- =
+Most of the changes are in scripts/tash.bash of patch 2, which
+implemented the main logic for task managements. Please see commit
+message for more information.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/925405
+I did a quick "make standalone" test to make sure this series won't
+break it. However I am not sure whether it'll break other thing that I
+don't know...
 
-Title:
-  VNC server does not work with Mac Screen Sharing
+Please kindly review, thanks.
 
-Status in QEMU:
-  Incomplete
-Status in Ubuntu:
-  Invalid
+Peter Xu (2):
+  run_tests: provide RUNTIME_log_file
+  run_tests: allow run tests in parallel
 
-Bug description:
-  When connecting to a QEMU instance from a Mac using any VNC settings
-  on the QEMU CLI and any target arch (ARM, Intel, etc.), the connection
-  is attempted but the negotiation never finishes.
+ run_tests.sh            |  30 +++++++---
+ scripts/functions.bash  |  25 +++++++-
+ scripts/global.bash     |  14 +++++
+ scripts/mkstandalone.sh |   1 +
+ scripts/task.bash       | 156 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 217 insertions(+), 9 deletions(-)
+ create mode 100644 scripts/global.bash
+ create mode 100644 scripts/task.bash
 
-  I've verified this when building QEMU from source (1.0 and HEAD) on
-  Ubuntu, Fedora and Debian or when using Ubuntu (Oneiric) and Debian
-  (Lenny) packages.
-
-  It does not matter whether I specify authentication (or anything else)
-  on QEMU's side, the behavior is always the same - I see the connection
-  being established using netstat and tcpdump, but QEMU does not seem to
-  send back any pixmap data after the connection setup.
-
-  Best guess as to why this happens is that the VNC negotiation on QEMU
-  does not like the protocol version and VNC encoding sent by the Mac's
-  built-in VNC client, or that its negotiation logic is subtly broken. I
-  appreciate that it's not meant to be a full VNC server, but it
-  prevents me from using it remotely until a stable Mac build is
-  feasible.
-
-  Background info:
-
-  Mac OS X includes a VNC client called Screen Sharing that you can
-  invoke in two different ways:
-
-  * At a terminal, by typing "open vnc://hostname:tcp_port"
-  * From any URI-enabled field (such as the Safari URI field), where you ca=
-n just type the URI as vnc://hostname:tcp_port
-
-  Please do not confuse the enhanced VNC protocol Apple Remote Desktop
-  uses with Screen Sharing - they are not mutually exclusive, but they
-  are not incompatible either, since what Apple does is to negotiate
-  extra pixmap encoding and authentication options - I use Screen
-  Sharing to access many VNC servers such as vnc4server, tightvncserver,
-  vino, etc. without any issues whatsoever, so the issue I'm reporting
-  is not an issue with Apple's implementation.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/925405/+subscriptions
+-- 
+2.7.4
