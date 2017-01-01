@@ -1,33 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51592)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55273)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cNRTD-00053x-8d
-	for qemu-devel@nongnu.org; Sat, 31 Dec 2016 16:45:44 -0500
+	(envelope-from <hpoussin@reactos.org>) id 1cNccz-0003QP-3H
+	for qemu-devel@nongnu.org; Sun, 01 Jan 2017 04:40:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cNRTA-0003H7-1K
-	for qemu-devel@nongnu.org; Sat, 31 Dec 2016 16:45:43 -0500
-Received: from indium.canonical.com ([91.189.90.7]:41641)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cNRT9-0003Gq-RO
-	for qemu-devel@nongnu.org; Sat, 31 Dec 2016 16:45:39 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cNRT7-0006UW-Ss
-	for <qemu-devel@nongnu.org>; Sat, 31 Dec 2016 21:45:38 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C21ED2E80C8
-	for <qemu-devel@nongnu.org>; Sat, 31 Dec 2016 21:45:37 +0000 (UTC)
+	(envelope-from <hpoussin@reactos.org>) id 1cNccv-0004JO-Ge
+	for qemu-devel@nongnu.org; Sun, 01 Jan 2017 04:40:32 -0500
+From: =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>
+Date: Sun,  1 Jan 2017 10:39:45 +0100
+Message-Id: <1483263585-8101-1-git-send-email-hpoussin@reactos.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 31 Dec 2016 21:38:44 -0000
-From: Razzloss <razzloss@gmail.com>
-Reply-To: Bug 1653384 <1653384@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <20161231213844.1229.87554.malonedeb@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1653384] [NEW] Assertion failed with USB pass
- through with XHCI controller
+Subject: [Qemu-devel] [PATCH] ui/gtk: fix crash at startup when no console
+ is available
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,188 +22,50 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Stefan Weil <sw@weilnetz.de>, "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, qemu-stable@nongnu.org, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>
 
-Public bug reported:
+This patch fixes a segfault at QEMU startup, introduced in a08156321ab9a7=
+d2fed9ee77dbfeea2a61ffd153.
+gd_vc_find_current() return NULL, which is dereferenced without checking =
+it.
 
-Starting qemu 2.8.0 with XHCI controller and host device passed through
-results in an assertion failure:
+While at it, disable the whole 'View' menu if no console exists.
 
-qemu-system-x86_64: hw/usb/core.c:623: usb_packet_cleanup: Assertion
-`!usb_packet_is_inflight(p)' failed.
+Reproducer: qemu-system-i386 -M none -nodefaults
 
-Can be reproduced with the following command (passing through a Lenovo
-keyboard):
+Signed-off-by: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
+---
+ ui/gtk.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-qemu-system-x86_64 -usb  -device nec-usb-xhci,id=3Dusb -device usb-
-host,vendorid=3D0x04b3,productid=3D0x3025,id=3Dhostdev0,bus=3Dusb.0,port=3D1
-
-If nec-usb-xhci is changed to usb-ehci, qemu tries to boot without
-assertion failures.
-
-
-Can be reproduced with the latest master (commit dbe2b65) and v2.8.0.
-
-Bisected the issue to following commit:
-first bad commit: [94b037f2a451b3dc855f9f2c346e5049a361bd55] xhci: use link=
-ed list for transfers
-
-
-Backtrace from commit dbe2b65:
-
-#0  0x00007f2eb4657227 in __GI_raise (sig=3Dsig@entry=3D6) at ../sysdeps/un=
-ix/sysv/linux/raise.c:55
-        resultvar =3D 0
-        pid =3D 3453
-        selftid =3D 3453
-#1  0x00007f2eb465867a in __GI_abort () at abort.c:89
-        save_stage =3D 2
-        act =3D {__sigaction_handler =3D {sa_handler =3D 0x4, sa_sigaction =
-=3D 0x4}, sa_mask =3D {__val =3D {140734740550528, 93876690035339, =
-
-              140734740550624, 48833659808, 0, 0, 0, 21474836480, 140734740=
-550792, 139838573009553, 140734740550560, 139838573043008, =
-
-              139838573024160, 93876666665872, 139838702616576, 13983857302=
-4160}}, sa_flags =3D 1528954938, =
-
-          sa_restorer =3D 0x55615b2202c0 <__PRETTY_FUNCTION__.38612>}
-        sigs =3D {__val =3D {32, 0 <repeats 15 times>}}
-#2  0x00007f2eb46502cd in __assert_fail_base (fmt=3D0x7f2eb47893a0 "%s%s%s:=
-%u: %s%sAssertion `%s' failed.\n%n", =
-
-    assertion=3Dassertion@entry=3D0x55615b22003a "!usb_packet_is_inflight(p=
-)", file=3Dfile@entry=3D0x55615b21fdf0 "hw/usb/core.c", line=3Dline@entry=
-=3D619, =
-
-    function=3Dfunction@entry=3D0x55615b2202c0 <__PRETTY_FUNCTION__.38612> =
-"usb_packet_cleanup") at assert.c:92
-        str =3D 0x55615cfdf510 ""
-        total =3D 4096
-#3  0x00007f2eb4650382 in __GI___assert_fail (assertion=3D0x55615b22003a "!=
-usb_packet_is_inflight(p)", file=3D0x55615b21fdf0 "hw/usb/core.c", =
-
-    line=3D619, function=3D0x55615b2202c0 <__PRETTY_FUNCTION__.38612> "usb_=
-packet_cleanup") at assert.c:101
-No locals.
-#4  0x000055615afc385e in usb_packet_cleanup ()
-No symbol table info available.
-#5  0x000055615afda555 in xhci_ep_free_xfer ()
-No symbol table info available.
-#6  0x000055615afdc156 in xhci_kick_epctx ()
-No symbol table info available.
-#7  0x000055615afda099 in xhci_ep_kick_timer ()
-No symbol table info available.
-#8  0x000055615b08ceee in timerlist_run_timers ()
-No symbol table info available.
-#9  0x000055615b08cf36 in qemu_clock_run_timers ()
-No symbol table info available.
-#10 0x000055615b08d2df in qemu_clock_run_all_timers ()
-No symbol table info available.
-#11 0x000055615b08be40 in main_loop_wait ()
-No symbol table info available.
-#12 0x000055615ae3870f in main_loop ()
-No symbol table info available.
-#13 0x000055615ae4027b in main ()
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1653384
-
-Title:
-  Assertion failed with USB pass through with XHCI controller
-
-Status in QEMU:
-  New
-
-Bug description:
-  Starting qemu 2.8.0 with XHCI controller and host device passed
-  through results in an assertion failure:
-
-  qemu-system-x86_64: hw/usb/core.c:623: usb_packet_cleanup: Assertion
-  `!usb_packet_is_inflight(p)' failed.
-
-  Can be reproduced with the following command (passing through a Lenovo
-  keyboard):
-
-  qemu-system-x86_64 -usb  -device nec-usb-xhci,id=3Dusb -device usb-
-  host,vendorid=3D0x04b3,productid=3D0x3025,id=3Dhostdev0,bus=3Dusb.0,port=
-=3D1
-
-  If nec-usb-xhci is changed to usb-ehci, qemu tries to boot without
-  assertion failures.
-
-  =
-
-  Can be reproduced with the latest master (commit dbe2b65) and v2.8.0.
-
-  Bisected the issue to following commit:
-  first bad commit: [94b037f2a451b3dc855f9f2c346e5049a361bd55] xhci: use li=
-nked list for transfers
-
-  =
-
-  Backtrace from commit dbe2b65:
-
-  #0  0x00007f2eb4657227 in __GI_raise (sig=3Dsig@entry=3D6) at ../sysdeps/=
-unix/sysv/linux/raise.c:55
-          resultvar =3D 0
-          pid =3D 3453
-          selftid =3D 3453
-  #1  0x00007f2eb465867a in __GI_abort () at abort.c:89
-          save_stage =3D 2
-          act =3D {__sigaction_handler =3D {sa_handler =3D 0x4, sa_sigactio=
-n =3D 0x4}, sa_mask =3D {__val =3D {140734740550528, 93876690035339, =
-
-                140734740550624, 48833659808, 0, 0, 0, 21474836480, 1407347=
-40550792, 139838573009553, 140734740550560, 139838573043008, =
-
-                139838573024160, 93876666665872, 139838702616576, 139838573=
-024160}}, sa_flags =3D 1528954938, =
-
-            sa_restorer =3D 0x55615b2202c0 <__PRETTY_FUNCTION__.38612>}
-          sigs =3D {__val =3D {32, 0 <repeats 15 times>}}
-  #2  0x00007f2eb46502cd in __assert_fail_base (fmt=3D0x7f2eb47893a0 "%s%s%=
-s:%u: %s%sAssertion `%s' failed.\n%n", =
-
-      assertion=3Dassertion@entry=3D0x55615b22003a "!usb_packet_is_inflight=
-(p)", file=3Dfile@entry=3D0x55615b21fdf0 "hw/usb/core.c", line=3Dline@entry=
-=3D619, =
-
-      function=3Dfunction@entry=3D0x55615b2202c0 <__PRETTY_FUNCTION__.38612=
-> "usb_packet_cleanup") at assert.c:92
-          str =3D 0x55615cfdf510 ""
-          total =3D 4096
-  #3  0x00007f2eb4650382 in __GI___assert_fail (assertion=3D0x55615b22003a =
-"!usb_packet_is_inflight(p)", file=3D0x55615b21fdf0 "hw/usb/core.c", =
-
-      line=3D619, function=3D0x55615b2202c0 <__PRETTY_FUNCTION__.38612> "us=
-b_packet_cleanup") at assert.c:101
-  No locals.
-  #4  0x000055615afc385e in usb_packet_cleanup ()
-  No symbol table info available.
-  #5  0x000055615afda555 in xhci_ep_free_xfer ()
-  No symbol table info available.
-  #6  0x000055615afdc156 in xhci_kick_epctx ()
-  No symbol table info available.
-  #7  0x000055615afda099 in xhci_ep_kick_timer ()
-  No symbol table info available.
-  #8  0x000055615b08ceee in timerlist_run_timers ()
-  No symbol table info available.
-  #9  0x000055615b08cf36 in qemu_clock_run_timers ()
-  No symbol table info available.
-  #10 0x000055615b08d2df in qemu_clock_run_all_timers ()
-  No symbol table info available.
-  #11 0x000055615b08be40 in main_loop_wait ()
-  No symbol table info available.
-  #12 0x000055615ae3870f in main_loop ()
-  No symbol table info available.
-  #13 0x000055615ae4027b in main ()
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1653384/+subscriptions
+diff --git a/ui/gtk.c b/ui/gtk.c
+index a216216..406de4f 100644
+--- a/ui/gtk.c
++++ b/ui/gtk.c
+@@ -2171,6 +2171,8 @@ static gboolean gtkinit;
+=20
+ void gtk_display_init(DisplayState *ds, bool full_screen, bool grab_on_h=
+over)
+ {
++    VirtualConsole *vc;
++
+     GtkDisplayState *s =3D g_malloc0(sizeof(*s));
+     char *filename;
+     GdkDisplay *window_display;
+@@ -2249,9 +2251,11 @@ void gtk_display_init(DisplayState *ds, bool full_=
+screen, bool grab_on_hover)
+     }
+ #endif
+=20
++    vc =3D gd_vc_find_current(s);
++    gtk_widget_set_sensitive(s->view_menu, vc !=3D NULL);
+ #ifdef CONFIG_VTE
+     gtk_widget_set_sensitive(s->copy_item,
+-                             gd_vc_find_current(s)->type =3D=3D GD_VC_VT=
+E);
++                             vc && vc->type =3D=3D GD_VC_VTE);
+ #endif
+=20
+     if (full_screen) {
+--=20
+2.1.4
