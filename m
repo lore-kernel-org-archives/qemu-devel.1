@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33152)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33178)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1cO8o4-0001bX-Ff
-	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 15:02:11 -0500
+	(envelope-from <drjones@redhat.com>) id 1cO8o7-0001en-LQ
+	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 15:02:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1cO8o3-0003q6-Cj
-	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 15:02:08 -0500
+	(envelope-from <drjones@redhat.com>) id 1cO8o5-0003qz-0e
+	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 15:02:11 -0500
 From: Andrew Jones <drjones@redhat.com>
-Date: Mon,  2 Jan 2017 21:01:40 +0100
-Message-Id: <20170102200153.28864-4-drjones@redhat.com>
+Date: Mon,  2 Jan 2017 21:01:41 +0100
+Message-Id: <20170102200153.28864-5-drjones@redhat.com>
 In-Reply-To: <20170102200153.28864-1-drjones@redhat.com>
 References: <20170102200153.28864-1-drjones@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 03/16] hw/arm/virt-acpi-build: gtdt: improve
+Subject: [Qemu-devel] [PATCH v2 04/16] hw/arm/virt-acpi-build: fadt: improve
  flag naming
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -23,68 +23,43 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-arm@nongnu.org
 Cc: imammedo@redhat.com, peter.maydell@linaro.org, zhaoshenglong@huawei.com, shannon.zhao@linaro.org, mst@redhat.com, ehabkost@redhat.com
 
-Also remove all unused flags.
-
 Signed-off-by: Andrew Jones <drjones@redhat.com>
 ---
- hw/arm/virt-acpi-build.c    | 10 +++++-----
- include/hw/acpi/acpi-defs.h | 17 ++---------------
- 2 files changed, 7 insertions(+), 20 deletions(-)
+ hw/arm/virt-acpi-build.c    | 4 ++--
+ include/hw/acpi/acpi-defs.h | 6 ++----
+ 2 files changed, 4 insertions(+), 6 deletions(-)
 
 diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index 0ed406cdd89c..b6b64296f119 100644
+index b6b64296f119..a6c6180f4bce 100644
 --- a/hw/arm/virt-acpi-build.c
 +++ b/hw/arm/virt-acpi-build.c
-@@ -543,17 +543,17 @@ build_gtdt(GArray *table_data, BIOSLinker *linker)
-     gtdt = acpi_data_push(table_data, sizeof *gtdt);
-     /* The interrupt values are the same with the device tree when adding 16 */
-     gtdt->secure_el1_interrupt = cpu_to_le32(ARCH_TIMER_S_EL1_IRQ + 16);
--    gtdt->secure_el1_flags = cpu_to_le32(ACPI_EDGE_SENSITIVE);
-+    gtdt->secure_el1_flags = cpu_to_le32(ACPI_GTDT_INTERRUPT_MODE_EDGE);
+@@ -642,8 +642,8 @@ build_fadt(GArray *table_data, BIOSLinker *linker, unsigned dsdt_tbl_offset)
  
-     gtdt->non_secure_el1_interrupt = cpu_to_le32(ARCH_TIMER_NS_EL1_IRQ + 16);
--    gtdt->non_secure_el1_flags = cpu_to_le32(ACPI_EDGE_SENSITIVE |
--                                             ACPI_GTDT_ALWAYS_ON);
-+    gtdt->non_secure_el1_flags = cpu_to_le32(ACPI_GTDT_INTERRUPT_MODE_EDGE |
-+                                             ACPI_GTDT_CAP_ALWAYS_ON);
+     /* Hardware Reduced = 1 and use PSCI 0.2+ and with HVC */
+     fadt->flags = cpu_to_le32(1 << ACPI_FADT_F_HW_REDUCED_ACPI);
+-    fadt->arm_boot_flags = cpu_to_le16((1 << ACPI_FADT_ARM_USE_PSCI_G_0_2) |
+-                                       (1 << ACPI_FADT_ARM_PSCI_USE_HVC));
++    fadt->arm_boot_flags = cpu_to_le16(ACPI_FADT_ARM_PSCI_COMPLIANT |
++                                       ACPI_FADT_ARM_PSCI_USE_HVC);
  
-     gtdt->virtual_timer_interrupt = cpu_to_le32(ARCH_TIMER_VIRT_IRQ + 16);
--    gtdt->virtual_timer_flags = cpu_to_le32(ACPI_EDGE_SENSITIVE);
-+    gtdt->virtual_timer_flags = cpu_to_le32(ACPI_GTDT_INTERRUPT_MODE_EDGE);
- 
-     gtdt->non_secure_el2_interrupt = cpu_to_le32(ARCH_TIMER_NS_EL2_IRQ + 16);
--    gtdt->non_secure_el2_flags = cpu_to_le32(ACPI_EDGE_SENSITIVE);
-+    gtdt->non_secure_el2_flags = cpu_to_le32(ACPI_GTDT_INTERRUPT_MODE_EDGE);
- 
-     build_header(linker, table_data,
-                  (void *)(table_data->data + gtdt_start), "GTDT",
+     /* ACPI v5.1 (fadt->revision.fadt->minor_revision) */
+     fadt->minor_revision = 0x1;
 diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
-index 510f23c93183..8fe0996e15fb 100644
+index 8fe0996e15fb..d15b7e5cd39a 100644
 --- a/include/hw/acpi/acpi-defs.h
 +++ b/include/hw/acpi/acpi-defs.h
-@@ -430,21 +430,8 @@ typedef struct AcpiMadtGenericTranslator AcpiMadtGenericTranslator;
- /*
-  * Generic Timer Description Table (GTDT)
-  */
--
--#define ACPI_GTDT_INTERRUPT_MODE        (1 << 0)
--#define ACPI_GTDT_INTERRUPT_POLARITY    (1 << 1)
--#define ACPI_GTDT_ALWAYS_ON             (1 << 2)
--
--/* Triggering */
--
--#define ACPI_LEVEL_SENSITIVE            ((uint8_t) 0x00)
--#define ACPI_EDGE_SENSITIVE             ((uint8_t) 0x01)
--
--/* Polarity */
--
--#define ACPI_ACTIVE_HIGH                ((uint8_t) 0x00)
--#define ACPI_ACTIVE_LOW                 ((uint8_t) 0x01)
--#define ACPI_ACTIVE_BOTH                ((uint8_t) 0x02)
-+#define ACPI_GTDT_INTERRUPT_MODE_EDGE     (1 << 0)
-+#define ACPI_GTDT_CAP_ALWAYS_ON           (1 << 2)
+@@ -191,10 +191,8 @@ struct AcpiFadtDescriptorRev5_1 {
  
- struct AcpiGenericTimerTable {
-     ACPI_TABLE_HEADER_DEF
+ typedef struct AcpiFadtDescriptorRev5_1 AcpiFadtDescriptorRev5_1;
+ 
+-enum {
+-    ACPI_FADT_ARM_USE_PSCI_G_0_2 = 0,
+-    ACPI_FADT_ARM_PSCI_USE_HVC = 1,
+-};
++#define ACPI_FADT_ARM_PSCI_COMPLIANT  (1 << 0)
++#define ACPI_FADT_ARM_PSCI_USE_HVC    (1 << 1)
+ 
+ /*
+  * Serial Port Console Redirection Table (SPCR), Rev. 1.02
 -- 
 2.9.3
