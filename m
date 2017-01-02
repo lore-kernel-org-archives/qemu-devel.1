@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45287)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50178)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cNzoc-0000WY-QG
-	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 05:26:09 -0500
+	(envelope-from <laurent@vivier.eu>) id 1cO0G8-0004y8-O3
+	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 05:54:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cNzoY-0004jr-UK
-	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 05:26:06 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56510)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cNzoY-0004jR-Of
-	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 05:26:02 -0500
-Received: from int-mx11.intmail.prod.int.phx2.redhat.com
-	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E3E4F13A5D
-	for <qemu-devel@nongnu.org>; Mon,  2 Jan 2017 10:26:02 +0000 (UTC)
-References: <20161212224325.20790-1-marcandre.lureau@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <4315c23d-0c4b-4341-90aa-54d186eaa251@redhat.com>
-Date: Mon, 2 Jan 2017 11:26:00 +0100
+	(envelope-from <laurent@vivier.eu>) id 1cO0G4-0006Yj-Lc
+	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 05:54:32 -0500
+References: <b0619e40-daca-9b28-2c78-1e2709d9f0ad@tuxfamily.org>
+	<80f9cbae-8548-4d5e-2543-1d95020eddb1@vivier.eu>
+	<20161227145805.5a19af6b@thl530>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <2a409041-eac6-07bd-00ed-0d3e74733045@vivier.eu>
+Date: Mon, 2 Jan 2017 11:54:22 +0100
 MIME-Version: 1.0
-In-Reply-To: <20161212224325.20790-1-marcandre.lureau@redhat.com>
+In-Reply-To: <20161227145805.5a19af6b@thl530>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 00/54] WIP: chardev: qom-ify
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] m68k: Remove dummy machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,19 +24,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+To: Thomas Huth <huth@tuxfamily.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>
 
+Le 27/12/2016 à 14:58, Thomas Huth a écrit :
+> Am Tue, 27 Dec 2016 12:52:30 +0100
+> schrieb Laurent Vivier <laurent@vivier.eu>:
+> 
+>> Le 20/12/2016 à 15:32, Thomas Huth a écrit :
+>>> You can get an empty machine with "-M none" nowadays, so the
+>>> m68k dummy board (introduced in 2007) seems to be pretty
+>>> redundant since the "none" machine has been added in 2012.
+>>>
+>>> Signed-off-by: Thomas Huth <huth@tuxfamily.org>
+>>> ---
+>>>  MAINTAINERS           |  4 ---
+>>>  hw/m68k/Makefile.objs |  2 --
+>>>  hw/m68k/dummy_m68k.c  | 84
+>>> --------------------------------------------------- 3 files
+>>> changed, 90 deletions(-) delete mode 100644 hw/m68k/dummy_m68k.c
+>>>
+>>> diff --git a/MAINTAINERS b/MAINTAINERS
+>>> index 4a60579..88ee8cd 100644
+>>> --- a/MAINTAINERS
+>>> +++ b/MAINTAINERS
+>>> @@ -552,10 +552,6 @@ S: Orphan
+>>>  F: hw/m68k/an5206.c
+>>>  F: hw/m68k/mcf5206.c
+>>>  
+>>> -dummy_m68k
+>>> -S: Orphan
+>>> -F: hw/m68k/dummy_m68k.c
+>>> -
+>>>  mcf5208
+>>>  S: Orphan
+>>>  F: hw/m68k/mcf5208.c
+>>> diff --git a/hw/m68k/Makefile.objs b/hw/m68k/Makefile.objs
+>>> index c4352e7..d1f089c 100644
+>>> --- a/hw/m68k/Makefile.objs
+>>> +++ b/hw/m68k/Makefile.objs
+>>> @@ -1,4 +1,2 @@
+>>>  obj-y += an5206.o mcf5208.o
+>>> -obj-y += dummy_m68k.o
+>>> -
+>>>  obj-y += mcf5206.o mcf_intc.o
+>>> diff --git a/hw/m68k/dummy_m68k.c b/hw/m68k/dummy_m68k.c
+>>> deleted file mode 100644
+>>> index 0b11d20..0000000
+>>> --- a/hw/m68k/dummy_m68k.c
+>>> +++ /dev/null
+>>> @@ -1,84 +0,0 @@
+>>> -/*
+>>> - * Dummy board with just RAM and CPU for use as an ISS.
+>>> - *
+>>> - * Copyright (c) 2007 CodeSourcery.
+>>> - *
+>>> - * This code is licensed under the GPL
+>>> - */
+>>> -
+>>> -#include "qemu/osdep.h"
+>>> -#include "qemu-common.h"
+>>> -#include "cpu.h"
+>>> -#include "hw/hw.h"
+>>> -#include "hw/boards.h"
+>>> -#include "hw/loader.h"
+>>> -#include "elf.h"
+>>> -#include "exec/address-spaces.h"
+>>> -
+>>> -#define KERNEL_LOAD_ADDR 0x10000
+>>> -
+>>> -/* Board init.  */
+>>> -
+>>> -static void dummy_m68k_init(MachineState *machine)
+>>> -{
+>>> -    ram_addr_t ram_size = machine->ram_size;
+>>> -    const char *cpu_model = machine->cpu_model;
+>>> -    const char *kernel_filename = machine->kernel_filename;
+>>> -    M68kCPU *cpu;
+>>> -    CPUM68KState *env;
+>>> -    MemoryRegion *address_space_mem =  get_system_memory();
+>>> -    MemoryRegion *ram = g_new(MemoryRegion, 1);
+>>> -    int kernel_size;
+>>> -    uint64_t elf_entry;
+>>> -    hwaddr entry;
+>>> -
+>>> -    if (!cpu_model)
+>>> -        cpu_model = "cfv4e";
+>>> -    cpu = cpu_m68k_init(cpu_model);
+>>> -    if (!cpu) {
+>>> -        fprintf(stderr, "Unable to find m68k CPU definition\n");
+>>> -        exit(1);
+>>> -    }
+>>> -    env = &cpu->env;
+>>> -
+>>> -    /* Initialize CPU registers.  */
+>>> -    env->vbr = 0;
+>>> -
+>>> -    /* RAM at address zero */
+>>> -    memory_region_allocate_system_memory(ram, NULL,
+>>> "dummy_m68k.ram",
+>>> -                                         ram_size);
+>>> -    memory_region_add_subregion(address_space_mem, 0, ram);
+>>> -
+>>> -    /* Load kernel.  */
+>>> -    if (kernel_filename) {
+>>> -        kernel_size = load_elf(kernel_filename, NULL, NULL,
+>>> &elf_entry,
+>>> -                               NULL, NULL, 1, EM_68K, 0, 0);
+>>> -        entry = elf_entry;
+>>> -        if (kernel_size < 0) {
+>>> -            kernel_size = load_uimage(kernel_filename, &entry,
+>>> NULL, NULL,
+>>> -                                      NULL, NULL);
+>>> -        }
+>>> -        if (kernel_size < 0) {
+>>> -            kernel_size = load_image_targphys(kernel_filename,
+>>> -                                              KERNEL_LOAD_ADDR,
+>>> -                                              ram_size -
+>>> KERNEL_LOAD_ADDR);
+>>> -            entry = KERNEL_LOAD_ADDR;
+>>> -        }
+>>> -        if (kernel_size < 0) {
+>>> -            fprintf(stderr, "qemu: could not load kernel '%s'\n",
+>>> -                    kernel_filename);
+>>> -            exit(1);
+>>> -        }
+>>> -    } else {
+>>> -        entry = 0;
+>>> -    }
+>>> -    env->pc = entry;
+>>> -}
+>>> -
+>>> -static void dummy_m68k_machine_init(MachineClass *mc)
+>>> -{
+>>> -    mc->desc = "Dummy board";
+>>> -    mc->init = dummy_m68k_init;
+>>> -}
+>>> -
+>>> -DEFINE_MACHINE("dummy", dummy_m68k_machine_init)
+>>>
+>>
+>> I'm not sure the "none" machine can replace the "dummy" machine as the
+>> "dummy" machine can load a kernel whereas it seems the "none" one
+>> can't.
+> 
+> Oh, that's true ... I did not notice it 'cause there was no error
+> message when I tried to start the "none" machine with "-kernel". But
+> looking at the code in hw/core/null-machine.c, it really seems that
+> there is nothing in here :-( So never mind, please forget about this
+> patch. (but now I wonder whether the "none" machine could be improved to
+> provide the features of the "dummy" machine, too?)
 
+The "none" machine is defined to be be filled with QMP commands, perhaps
+the generic-loader object can replace the "-kernel" parameters?
 
-On 12/12/2016 23:42, Marc-Andr=C3=A9 Lureau wrote:
->=20
-> Note: this series has been tested with Linux and cross-building with
-> mingw. It mostly breaks on other platforms,
-
-What breaks exactly?
-
-Paolo
-
-> help welcome for
-> testing. I'd also like to write more chardev backend tests to ensure
-> no regression (test-char.c is quite limited for now)
+Laurent
