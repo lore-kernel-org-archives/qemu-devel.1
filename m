@@ -1,28 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33944)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34724)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cNy10-0000kA-Ba
-	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 03:30:47 -0500
+	(envelope-from <bounces@canonical.com>) id 1cNy4s-0001xg-L0
+	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 03:34:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cNy0v-0003Ve-9t
-	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 03:30:46 -0500
-Received: from mail-wj0-x241.google.com ([2a00:1450:400c:c01::241]:33261)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1cNy0u-0003Uf-VU
-	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 03:30:41 -0500
-Received: by mail-wj0-x241.google.com with SMTP id kp2so67678703wjc.0
-	for <qemu-devel@nongnu.org>; Mon, 02 Jan 2017 00:30:40 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <1482869621-24808-1-git-send-email-nutarojj@ornl.gov>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <fe8b67b8-d430-a334-cd65-3528b6a9e74f@redhat.com>
-Date: Mon, 2 Jan 2017 09:30:38 +0100
+	(envelope-from <bounces@canonical.com>) id 1cNy4o-0004NA-KR
+	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 03:34:46 -0500
+Received: from indium.canonical.com ([91.189.90.7]:53614)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cNy4o-0004KJ-Dm
+	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 03:34:42 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cNy4l-00053O-NW
+	for <qemu-devel@nongnu.org>; Mon, 02 Jan 2017 08:34:39 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 993E72E80C3
+	for <qemu-devel@nongnu.org>; Mon,  2 Jan 2017 08:34:39 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <1482869621-24808-1-git-send-email-nutarojj@ornl.gov>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v4] qqq: module for synchronizing with a
- simulation clock
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 02 Jan 2017 08:22:13 -0000
+From: Paolo Bonzini <bonzini@gnu.org>
+Reply-To: Bug 1523246 <1523246@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20151206150708.14182.82430.malonedeb@wampee.canonical.com>
+Message-Id: <20170102082215.3340.77828.launchpad@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1523246] Re: Cannot TRIM with VirtIO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,59 +36,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "James J. Nutaro" <nutarojj@ornl.gov>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
+** Changed in: qemu
+       Status: New =3D> Confirmed
 
+** Changed in: qemu
+   Importance: Undecided =3D> Wishlist
 
-On 27/12/2016 21:13, James J. Nutaro wrote:
-> +(1) Create two pairs of pipes with the Linux pipe function.
-> +    The code segment that does this might look like
-> +
-> +       int pipefd1[2];
-> +       int pipefd2[2];
-> +       pipe(pipefd1);
-> +       pipe(pipefd2);
-> +
-> +(2) Fork QEMU with the appropriate command line arguments.
-> +    The -qqq part of the argument will look something like
-> +
-> +       -qqq write=pipefd1[1],read=pipefd2[0]
+** Summary changed:
 
-If you need a pair of pipes, you might as well use a Unix socket or even
-a generic chardev.  This would give something like
+- Cannot TRIM with VirtIO
++ VirtIO does not support TRIM
 
-	-chardev socket,path=extclock.socket \
-	-icount 1,extclock=chardev
+** Summary changed:
 
-> +The synchronization protocol is very simple. To start, the
-> +external simulator writes an integer to its write pipe with
-> +the amount of time in microseconds that QEMU is allowed to
-> +advance. The code segment that does this might look like:
-> +
-> +    int ta = 1000; // Advance by 1 millisecond
-> +    write(pipefd2[1],&ta,sizeof(int));
+- VirtIO does not support TRIM
++ Virtio-blk does not support TRIM
 
-This makes the protocol depend on system endianness.  Please make it
-endian independent.
+-- =
 
-Regarding the implementation, note that the "frozen clock" is already
-implemented by cpu_disable_ticks() and cpu_enable_ticks(), so it would
-be (much) better if you can reuse that.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1523246
 
-These are not small details, granted, but the concept looks interesting.
- I'm sorry I didn't notice the first 3 versions.  I look forward to
-review the next iteration of the patch!
+Title:
+  Virtio-blk does not support TRIM
 
-Paolo
+Status in QEMU:
+  Confirmed
 
-> +The external simulator can then advance its clock by this
-> +same amount. During this time, QEMU and the external simulator
-> +will be executing in parallel. When the external simulator
-> +completes its time advance, it waits for QEMU by reading from
-> +its read pipe. The value read will be the actual number of
-> +virtual microseconds by which QEMU has advanced its virtual clock.
-> +This will be greater than or equal to the requested advance.
-> +The code that does this might look like:
-> +
-> +   read(pipefd1[0],&ta,sizeof(int));
-> +
+Bug description:
+  When model=3Dvirtio is used, TRIM is not supported.
+
+  # mount -o discard /dev/vda4 /mnt
+  # mount | tail -1
+  /dev/vda4 on /mnt type fuseblk (rw,nosuid,nodev,relatime,user_id=3D0,grou=
+p_id=3D0,allow_other,blksize=3D4096)
+  # fstrim /mnt/
+  fstrim: /mnt/: the discard operation is not supported
+
+  Booting without model=3Dvirtio allows using TRIM (in Windows as well).
+
+  Full QEMU line:
+
+  qemu-system-x86_64 -enable-kvm -cpu host -bios
+  /usr/share/ovmf/ovmf_x64.bin -smp 2 -m 7G -vga qxl -usbdevice tablet
+  -net nic,model=3Dvirtio -net user -drive discard=3Dunmap,detect-
+  zeroes=3Dunmap,cache=3Dnone,file=3Dvms/win10.hd.img.vmdk,format=3Dvmdk,if=
+=3Dvirtio
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1523246/+subscriptions
