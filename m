@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38962)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38946)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1cO4cJ-0003fV-0z
+	(envelope-from <mlureau@redhat.com>) id 1cO4cH-0003fQ-9V
 	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 10:33:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1cO4cF-0004Uq-R6
-	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 10:33:43 -0500
-Received: from mx3-phx2.redhat.com ([209.132.183.24]:44576)
+	(envelope-from <mlureau@redhat.com>) id 1cO4cE-0004UB-3d
+	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 10:33:41 -0500
+Received: from mx5-phx2.redhat.com ([209.132.183.37]:46086)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1cO4cF-0004UR-Ge
-	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 10:33:39 -0500
-Date: Mon, 2 Jan 2017 10:33:39 -0500 (EST)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1cO4cD-0004Tc-Qo
+	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 10:33:38 -0500
+Date: Mon, 2 Jan 2017 10:33:36 -0500 (EST)
 From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <mlureau@redhat.com>
-Message-ID: <305153287.20363.1483371219240.JavaMail.zimbra@redhat.com>
-In-Reply-To: <aeb7472e-69f4-b73e-7db2-bf88559b3116@redhat.com>
+Message-ID: <1526483008.20362.1483371216010.JavaMail.zimbra@redhat.com>
+In-Reply-To: <b172e4df-b0f5-299e-85f2-c24bbd8deab7@redhat.com>
 References: <20161212224325.20790-1-marcandre.lureau@redhat.com>
-	<20161212224325.20790-5-marcandre.lureau@redhat.com>
-	<aeb7472e-69f4-b73e-7db2-bf88559b3116@redhat.com>
+	<20161212224325.20790-4-marcandre.lureau@redhat.com>
+	<b172e4df-b0f5-299e-85f2-c24bbd8deab7@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 04/54] char: move callbacks in CharDriver
+Subject: Re: [Qemu-devel] [PATCH 03/54] char: use a static array for backends
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,235 +31,200 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Eric Blake <eblake@redhat.com>
 Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, pbonzini@redhat.com
 
-hi
+Hi
 
 ----- Original Message -----
 > On 12/12/2016 04:42 PM, Marc-Andr=C3=A9 Lureau wrote:
-> > This makes the code more declarative, and avoids to duplicate the
+> > Number and kinds of backends is known at compile-time, use a fixed-size=
+d
+> > static array to simplify iterations & lookups.
+> >=20
+> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> > ---
+> >  qemu-char.c           | 101
+> >  ++++++++++++++++++++++++++++----------------------
+> >  include/sysemu/char.h |   1 +
+> >  2 files changed, 58 insertions(+), 44 deletions(-)
+> >=20
 >=20
-> s/to duplicate/duplicating/
+> > @@ -4121,9 +4121,14 @@ CharDriverState *qemu_chr_new_from_opts(QemuOpts
+> > *opts,
+> > =20
+> >      if (is_help_option(qemu_opt_get(opts, "backend"))) {
+> >          fprintf(stderr, "Available chardev backend types:\n");
+> > -        for (i =3D backends; i; i =3D i->next) {
+> > -            cd =3D i->data;
+> > -            fprintf(stderr, "%s\n", ChardevBackendKind_lookup[cd->kind=
+]);
+> > +        for (i =3D 0; i < ARRAY_SIZE(backends); i++) {
+> > +            cd =3D backends[i];
+> > +            if (cd) {
+> > +                fprintf(stderr, "%s\n",
+> > ChardevBackendKind_lookup[cd->kind]);
+> > +                if (cd->alias) {
+> > +                    fprintf(stderr, "%s\n", cd->alias);
+> > +                }
+> > +            }
+>=20
+> Where did cd->alias come from?
+> /me reads rest of patch
+> Oh, you added it in the .h file. All the more reason to use patch
+> ordering to list .h changes first, but may also be worth a mention in
+> the commit message that you add an alias field to cover the cases where
+> we previously registered a driver twice under two names.
 
 ok
 
 >=20
-> > information on all instances.
 > >=20
-> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > ---
-> >  backends/baum.c       |  13 +-
-> >  backends/msmouse.c    |  13 +-
-> >  backends/testdev.c    |  10 +-
-> >  gdbstub.c             |   7 +-
-> >  hw/bt/hci-csr.c       |   8 +-
-> >  qemu-char.c           | 427
-> >  +++++++++++++++++++++++++++++++-------------------
-> >  spice-qemu-char.c     |  36 +++--
-> >  ui/console.c          |  26 +--
-> >  ui/gtk.c              |  11 +-
-> >  include/sysemu/char.h |  46 +++---
+> > -        cd =3D i->data;
+> > +    cd =3D NULL;
+> > +    for (i =3D 0; i < ARRAY_SIZE(backends); i++) {
+> > +        const char *name =3D qemu_opt_get(opts, "backend");
+> > +        cd =3D backends[i];
 >=20
-> Again, seeing the .h changes first makes a huge difference on code
-> review.  I'm manually reformatting:
+> Please hoist the computation of 'name' outside of the loop...
 >=20
-> >  10 files changed, 370 insertions(+), 227 deletions(-)
+> > -        if (strcmp(ChardevBackendKind_lookup[cd->kind],
+> > -                   qemu_opt_get(opts, "backend")) =3D=3D 0) {
+> > +        if (!cd) {
+> > +            continue;
+> > +        }
+> > +        if (g_str_equal(ChardevBackendKind_lookup[cd->kind], name) ||
+> > +            (cd->alias && g_str_equal(cd->alias, name))) {
 >=20
-> > diff --git a/include/sysemu/char.h b/include/sysemu/char.h
-> > index c8750ede21..09e40ef9b8 100644
-> > --- a/include/sysemu/char.h
-> > +++ b/include/sysemu/char.h
-> > @@ -85,24 +85,11 @@ typedef struct CharBackend {
-> >      int fe_open;
-> >  } CharBackend;
-> >
-> > +typedef struct CharDriver CharDriver;
-> > +
-> >  struct CharDriverState {
-> > +    const CharDriver *driver;
-> >      QemuMutex chr_write_lock;
-> > -    int (*chr_write)(struct CharDriverState *s, const uint8_t *buf,
-> int len);
+> Doesn't g_str_equal(NULL, "str") do the right thing without crashing?
+> Therefore, no need to check if cd->alias is non-NULL.
+
+No it doesnt, but g_strcmp0 does, let's switch to it.
+
 >=20
-> So all the callbacks are moved into the CharDriver struct...
+> >              break;
+> >          }
+> >      }
+> > -    if (i =3D=3D NULL) {
+> > +    if (cd =3D=3D NULL) {
+> >          error_setg(errp, "chardev: backend \"%s\" not found",
+> >                     qemu_opt_get(opts, "backend"));
 >=20
-> > @@ -125,7 +112,8 @@ struct CharDriverState {
-> >   *
-> >   * Returns: a newly allocated CharDriverState, or NULL on error.
-> >   */
-> > -CharDriverState *qemu_chr_alloc(ChardevCommon *backend, Error **errp);
-> > +CharDriverState *qemu_chr_alloc(const CharDriver *driver,
-> > +                                ChardevCommon *backend, Error **errp);
+> ...and then reuse 'name' here as well, rather than making multiple
+> repeated calls to qemu_opt_get().
+
+ok
+
 >=20
-> ...and all the entry points are now passed that struct as a new parameter=
-.
->=20
-> >
-> >  /**
-> >   * @qemu_chr_new_from_opts:
-> > @@ -473,15 +461,33 @@ void qemu_chr_set_feature(CharDriverState *chr,
-> >                            CharDriverFeature feature);
-> >  QemuOpts *qemu_chr_parse_compat(const char *label, const char *filenam=
-e);
-> >
-> > -typedef struct CharDriver {
-> > +struct CharDriver {
->=20
-> ...the struct already existed, but is now more useful.
->=20
-> Looks worthwhile. I suspect the rest of the patch is mechanical.
->=20
-> > @@ -688,7 +686,10 @@ static void register_types(void)
+> >  ChardevBackendInfoList *qmp_query_chardev_backends(Error **errp)
 > >  {
-> >      static const CharDriver driver =3D {
-> >          .kind =3D CHARDEV_BACKEND_KIND_BRAILLE,
-> > -        .parse =3D NULL, .create =3D chr_baum_init
-> > +        .parse =3D NULL, .create =3D chr_baum_init,
->=20
-> And now you see why I asked for trailing commas in 2/54 :)
->=20
-> > +        .chr_write =3D baum_write,
-> > +        .chr_accept_input =3D baum_accept_input,
-> > +        .chr_free =3D baum_free,
-> >      };
+> >      ChardevBackendInfoList *backend_list =3D NULL;
+> > -    CharDriver *c =3D NULL;
+> > -    GSList *i =3D NULL;
+> > +    const CharDriver *c;
+> > +    int i;
 > > =20
->=20
-> > +++ b/gdbstub.c
-> > @@ -1730,6 +1730,10 @@ int gdbserver_start(const char *device)
-> >      CharDriverState *chr =3D NULL;
-> >      CharDriverState *mon_chr;
-> >      ChardevCommon common =3D { 0 };
-> > +    static const CharDriver driver =3D {
-> > +        .kind =3D -1,
-> > +        .chr_write =3D gdb_monitor_write
->=20
-> Trailing comma.
->=20
-> Interesting that this is a new use of CharDriver with an out-of-range
-> .kind. But I think your code in 3/54 was careful to explicitly handle a
-> .kind that does not map to one of the public types, so that you are able
-> to use this as an internal-only driver.
-
-and kind is removed is later patches "char: remove class kind field"
-
->=20
->=20
+> > -    for (i =3D backends; i; i =3D i->next) {
+> > -        ChardevBackendInfoList *info =3D g_malloc0(sizeof(*info));
+> > -        c =3D i->data;
+> > -        info->value =3D g_malloc0(sizeof(*info->value));
+> > -        info->value->name =3D g_strdup(ChardevBackendKind_lookup[c->ki=
+nd]);
+> > +    for (i =3D 0; i < ARRAY_SIZE(backends); i++) {
+> > +        c =3D backends[i];
+> > +        if (!c) {
+> > +            continue;
+> > +        }
 > > =20
-> > +static const CharDriver null_driver =3D {
-> > +    .kind =3D CHARDEV_BACKEND_KIND_NULL, .create =3D qemu_chr_open_nul=
-l,
->=20
-> One initializer per line is fine.
->=20
-> > +    .chr_write =3D null_chr_write
-> > +};
+> > -        info->next =3D backend_list;
+> > -        backend_list =3D info;
+> > +        backend_list =3D qmp_prepend_backend(backend_list, c,
 > > +
+> > ChardevBackendKind_lookup[c->kind]);
+> > +        if (c->alias) {
+> > +            backend_list =3D qmp_prepend_backend(backend_list, c, c->a=
+lias);
 >=20
-> >=20
-> > @@ -864,14 +880,6 @@ static CharDriverState *qemu_chr_open_mux(const ch=
-ar
-> > *id,
-> > =20
-> >      chr->opaque =3D d;
-> >      d->focus =3D -1;
-> > -    chr->chr_free =3D mux_chr_free;
-> > -    chr->chr_write =3D mux_chr_write;
-> > -    chr->chr_accept_input =3D mux_chr_accept_input;
-> > -    /* Frontend guest-open / -close notification is not support with m=
-uxes
-> > */
-> > -    chr->chr_set_fe_open =3D NULL;
-> > -    if (drv->chr_add_watch) {
-> > -        chr->chr_add_watch =3D mux_chr_add_watch;
-> > -    }
->=20
-> Here, the callback was only conditionally registered...
->=20
-> > +static const CharDriver mux_driver =3D {
-> > +    .kind =3D CHARDEV_BACKEND_KIND_MUX,
-> > +    .parse =3D qemu_chr_parse_mux, .create =3D qemu_chr_open_mux,
-> > +    .chr_free =3D mux_chr_free,
-> > +    .chr_write =3D mux_chr_write,
-> > +    .chr_accept_input =3D mux_chr_accept_input,
-> > +    .chr_add_watch =3D mux_chr_add_watch,
-> > +};
->=20
-> ...but here, it is always registered.  Is that an unintentional semantic
-> change?
+> The help text now lists aliases immediately after the canonical name,
+> while the QMP command now prepends aliases prior to the canonical name.
+> It doesn't affect correctness, but should you try to make the two lists
+> appear in the same order?  (Presumably by prepending the alias first,
+> not second.)
 >=20
 
-mux_chr_add_watch() also checks if the underlying driver has chr_add_watch(=
-). qemu_chr_fe_add_watch() returns 0 in both cases then.
+I don't think it matters. Furthermore, this code is temporary, the "char: g=
+et rid of CharDriver" patch will use the same function qmp_query_chardev_ba=
+ckends() to build the list with object_class_get_list() order.
 
-
->=20
-> > +#ifdef HAVE_CHARDEV_SERIAL
-> > +static const CharDriver serial_driver =3D {
-> > +    .alias =3D "tty", .kind =3D CHARDEV_BACKEND_KIND_SERIAL,
-> > +    .parse =3D qemu_chr_parse_serial, .create =3D qmp_chardev_open_ser=
-ial,
-> > +#ifdef _WIN32
-> > +    .chr_write =3D win_chr_write,
-> > +    .chr_free =3D win_chr_free,
-> > +#else
-> > +    .chr_add_watch =3D fd_chr_add_watch,
-> > +    .chr_write =3D fd_chr_write,
-> > +    .chr_update_read_handler =3D fd_chr_update_read_handler,
-> > +    .chr_ioctl =3D tty_serial_ioctl,
-> > +    .chr_free =3D qemu_chr_free_tty,
-> > +#endif
-> > +};
-> > +#endif
->=20
->=20
-> > @@ -4910,49 +5037,33 @@ void qemu_chr_cleanup(void)
-> > =20
-> >  static void register_types(void)
-> >  {
-> > -    int i;
-> > -    static const CharDriver drivers[] =3D {
-> > -        { .kind =3D CHARDEV_BACKEND_KIND_NULL, .parse =3D NULL,
-> > -          .create =3D qemu_chr_open_null },
-> > -        { .kind =3D CHARDEV_BACKEND_KIND_SOCKET,
-> > -          .parse =3D qemu_chr_parse_socket, .create =3D
-> > qmp_chardev_open_socket },
-> > -        { .kind =3D CHARDEV_BACKEND_KIND_UDP, .parse =3D qemu_chr_pars=
-e_udp,
-> > -          .create =3D qmp_chardev_open_udp },
-> > -        { .kind =3D CHARDEV_BACKEND_KIND_RINGBUF,
-> > -          .parse =3D qemu_chr_parse_ringbuf, .create =3D qemu_chr_open=
-_ringbuf
-> > },
-> > -        { .kind =3D CHARDEV_BACKEND_KIND_FILE,
-> > -          .parse =3D qemu_chr_parse_file_out, .create =3D
-> > qmp_chardev_open_file },
-> > -        { .kind =3D CHARDEV_BACKEND_KIND_STDIO,
-> > -          .parse =3D qemu_chr_parse_stdio, .create =3D qemu_chr_open_s=
+> > @@ -4907,16 +4925,11 @@ static void register_types(void)
+> >          { .kind =3D CHARDEV_BACKEND_KIND_STDIO,
+> >            .parse =3D qemu_chr_parse_stdio, .create =3D qemu_chr_open_s=
 tdio },
-> > -#if defined HAVE_CHARDEV_SERIAL
-> > -        { .kind =3D CHARDEV_BACKEND_KIND_SERIAL, .alias =3D "tty",
+> >  #if defined HAVE_CHARDEV_SERIAL
+> > -        { .kind =3D CHARDEV_BACKEND_KIND_SERIAL,
 > > -          .parse =3D qemu_chr_parse_serial, .create =3D
 > > qmp_chardev_open_serial },
+> > -        { .kind =3D CHARDEV_BACKEND_KIND_SERIAL,
+> > +        { .kind =3D CHARDEV_BACKEND_KIND_SERIAL, .alias =3D "tty",
+> >            .parse =3D qemu_chr_parse_serial, .create =3D
+> >            qmp_chardev_open_serial },
 >=20
-> It feels like some code motion between 3/54 and 4/54 (you are moving
-> where the CharDriver is declared); is it worth tweaking the series to
-> avoid the code motion by declaring the structs in the right place to
-> begin with?  Not necessarily a show-stopper to the series, though.
+> Wait. How did patch 2/54 work? Or did you temporarily break the 'tty'
+> alias in that patch, and then fix it here?  All the more reason that my
 
-I did place it where it felt right at the time I did the change. I don't th=
-ink we need to care much because all this is going away in the series. No s=
-trong feeling though
+No, it shouldn't break. There were 2 CharDrivers in case of alias chardev. =
+It uses the "kind" field only to lookup the corresponding name.
 
+> review of 2/54 complaining about getting rid of the cd->name field
+> should be a separate patch; now I'm convinced of it.  But in that patch,
+> I suggested the order:
 >=20
-> > +    static const CharDriver *drivers[] =3D {
-> > +        &null_driver,
-> > +        &socket_driver,
-> > +        &udp_driver,
-> > +        &ringbuf_driver,
-> > +        &file_driver,
-> > +        &stdio_driver,
-> > +#ifdef HAVE_CHARDEV_SERIAL
-> > +        &serial_driver,
+> remove cd->name field as redundant with enum array lookup
+> convert to struct without cd->name
+>=20
+> Whereas with this patch in the mix, the steps should probably be:
+>=20
+> convert to struct that still has cd->name
+> add cd->alias to have multiple names
+> remove cd->name field as redundant with enum array lookup
+>=20
+
+Thus I don't see much point in changing the order.
+
 > >  #endif
+> >  #ifdef HAVE_CHARDEV_PARPORT
+> > -        { .kind =3D CHARDEV_BACKEND_KIND_PARALLEL,
+> > -          .parse =3D qemu_chr_parse_parallel,
+> > -          .create =3D qmp_chardev_open_parallel },
+> > -        { .kind =3D CHARDEV_BACKEND_KIND_PARALLEL,
+> > +        { .kind =3D CHARDEV_BACKEND_KIND_PARALLEL, .alias =3D "parport=
+",
+> >            .parse =3D qemu_chr_parse_parallel,
+> >            .create =3D qmp_chardev_open_parallel },
 >=20
-> Overall impression is that I still like where this is headed.
+> Again, another breakage in 2/54.
 
-thanks
+neither
+
+>=20
+> >  #endif
+> > diff --git a/include/sysemu/char.h b/include/sysemu/char.h
+> > index 144514c962..c8750ede21 100644
+> > --- a/include/sysemu/char.h
+> > +++ b/include/sysemu/char.h
+> > @@ -474,6 +474,7 @@ void qemu_chr_set_feature(CharDriverState *chr,
+> >  QemuOpts *qemu_chr_parse_compat(const char *label, const char *filenam=
+e);
+> > =20
+> >  typedef struct CharDriver {
+> > +    const char *alias;
+> >      ChardevBackendKind kind;
+> >      void (*parse)(QemuOpts *opts, ChardevBackend *backend, Error **err=
+p);
+> >      CharDriverState *(*create)(const char *id,
+> >=20
+>=20
+> Overall, I like the direction this is headed in.
+>=20
+> --
+> Eric Blake   eblake redhat com    +1-919-301-3266
+> Libvirt virtualization library http://libvirt.org
+>=20
+>=20
