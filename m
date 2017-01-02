@@ -1,25 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41632)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43558)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cO9hN-0006PN-W2
-	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 15:59:19 -0500
+	(envelope-from <jcd@tribudubois.net>) id 1cO9sy-0002By-GH
+	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 16:11:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cO9hF-0000a7-Fa
-	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 15:59:13 -0500
-Resent-Message-Id: <E1cO9hF-0000a7-Fa@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21446)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1cO9hF-0000Zz-9J
-	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 15:59:09 -0500
-In-Reply-To: <20170102205521.4101-1-jcd@tribudubois.net>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <148339074019.142.527852821853191602@790289a7ca88>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 2 Jan 2017 12:59:00 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH] [i.MX] fix CS handling during SPI access.
+	(envelope-from <jcd@tribudubois.net>) id 1cO9sv-00056U-9x
+	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 16:11:16 -0500
+Received: from relay4-d.mail.gandi.net ([2001:4b98:c:538::196]:33738)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jcd@tribudubois.net>) id 1cO9sv-00053z-3z
+	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 16:11:13 -0500
+From: Jean-Christophe Dubois <jcd@tribudubois.net>
+Date: Mon,  2 Jan 2017 22:11:04 +0100
+Message-Id: <20170102211104.4753-1-jcd@tribudubois.net>
+Subject: [Qemu-devel] [PATCH v2] [i.MX] fix CS handling during SPI access.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,36 +21,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jcd@tribudubois.net
-Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, mar.krzeminski@gmail.com
+To: qemu-devel@nongnu.org, peter.maydell@linaro.org, mar.krzeminski@gmail.com
+Cc: Jean-Christophe Dubois <jcd@tribudubois.net>
 
-SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQQVRDSF0gW2kuTVhdIGZpeCBDUyBoYW5kbGluZyBkdXJpbmcgU1BJIGFjY2Vzcy4K
-TWVzc2FnZS1pZDogMjAxNzAxMDIyMDU1MjEuNDEwMS0xLWpjZEB0cmlidWR1Ym9pcy5uZXQKVHlw
-ZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJh
-c2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9
-MAoKIyBVc2VmdWwgZ2l0IG9wdGlvbnMKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGlt
-aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0
-IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBk
-bwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZv
-cm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9z
-Y3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEK
-ICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09
-IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3
-ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3Fl
-bXUKICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8yMDE3MDEwMjIwNTUyMS40MTAxLTEtamNk
-QHRyaWJ1ZHVib2lzLm5ldCAtPiBwYXRjaGV3LzIwMTcwMTAyMjA1NTIxLjQxMDEtMS1qY2RAdHJp
-YnVkdWJvaXMubmV0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKM2QyNWE4NyBmaXgg
-Q1MgaGFuZGxpbmcgZHVyaW5nIFNQSSBhY2Nlc3MuCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVj
-a2luZyBQQVRDSCAxLzE6IGZpeCBDUyBoYW5kbGluZyBkdXJpbmcgU1BJIGFjY2Vzcy4uLi4KRVJS
-T1I6IHN1c3BlY3QgY29kZSBpbmRlbnQgZm9yIGNvbmRpdGlvbmFsIHN0YXRlbWVudHMgKDQsIDcp
-CiM4NjogRklMRTogaHcvc3NpL2lteF9zcGkuYzoyNjE6CisgICAgZm9yIChpID0gMDsgaSA8IDQ7
-IGkrKykgeworICAgICAgIHFlbXVfc2V0X2lycShzLT5jc19saW5lc1tpXSwgMSk7Cgp0b3RhbDog
-MSBlcnJvcnMsIDAgd2FybmluZ3MsIDc2IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0
-eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUg
-ZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQ
-QVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4
-aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkg
-UGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sg
-dG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+The i.MX SPI device was not de-asserting the CS line at the end of
+memory access.
+
+This triggered a SIGSEGV in Qemu when the sabrelite emulator was acessing
+a SPI flash memory.
+
+Whit this path the CS signal is correctly asserted and deasserted arround
+memory access.
+
+This was tested by:
+* booting linux on Sabrelite Qemu emulator.
+* booting xvisor on Sabrelite Qemu emultor.
+
+Signed-off-by: Jean-Christophe Dubois <jcd@tribudubois.net>
+---
+
+Changes since v1:
+* Fix coding style issue.
+
+ hw/ssi/imx_spi.c | 33 ++++++++++++++++++++++-----------
+ 1 file changed, 22 insertions(+), 11 deletions(-)
+
+diff --git a/hw/ssi/imx_spi.c b/hw/ssi/imx_spi.c
+index e4e395f..c2d293c 100644
+--- a/hw/ssi/imx_spi.c
++++ b/hw/ssi/imx_spi.c
+@@ -152,13 +152,20 @@ static bool imx_spi_is_multiple_master_burst(IMXSPIState *s)
+ 
+ static void imx_spi_flush_txfifo(IMXSPIState *s)
+ {
+-    uint32_t tx;
+-    uint32_t rx;
++    uint32_t i;
+ 
+     DPRINTF("Begin: TX Fifo Size = %d, RX Fifo Size = %d\n",
+             fifo32_num_used(&s->tx_fifo), fifo32_num_used(&s->rx_fifo));
+ 
++    /* Activate the requested CS line */
++    for (i = 0; i < 4; i++) {
++        qemu_set_irq(s->cs_lines[i],
++                     i == imx_spi_selected_channel(s) ? 0 : 1);
++    }
++
+     while (!fifo32_is_empty(&s->tx_fifo)) {
++        uint32_t tx;
++        uint32_t rx = 0;
+         int tx_burst = 0;
+         int index = 0;
+ 
+@@ -178,8 +185,6 @@ static void imx_spi_flush_txfifo(IMXSPIState *s)
+ 
+         tx_burst = MIN(s->burst_length, 32);
+ 
+-        rx = 0;
+-
+         while (tx_burst) {
+             uint8_t byte = tx & 0xff;
+ 
+@@ -221,6 +226,13 @@ static void imx_spi_flush_txfifo(IMXSPIState *s)
+         s->regs[ECSPI_STATREG] |= ECSPI_STATREG_TC;
+     }
+ 
++    /* Deselect all SS lines if transfert if completed */
++    if (s->regs[ECSPI_STATREG] & ECSPI_STATREG_TC) {
++        for (i = 0; i < 4; i++) {
++            qemu_set_irq(s->cs_lines[i], 1);
++        }
++    }
++
+     /* TODO: We should also use TDR and RDR bits */
+ 
+     DPRINTF("End: TX Fifo Size = %d, RX Fifo Size = %d\n",
+@@ -230,6 +242,7 @@ static void imx_spi_flush_txfifo(IMXSPIState *s)
+ static void imx_spi_reset(DeviceState *dev)
+ {
+     IMXSPIState *s = IMX_SPI(dev);
++    uint32_t i;
+ 
+     DPRINTF("\n");
+ 
+@@ -243,6 +256,11 @@ static void imx_spi_reset(DeviceState *dev)
+     imx_spi_update_irq(s);
+ 
+     s->burst_length = 0;
++
++    /* Disable all CS lines */
++    for (i = 0; i < 4; i++) {
++        qemu_set_irq(s->cs_lines[i], 1);
++    }
+ }
+ 
+ static uint64_t imx_spi_read(void *opaque, hwaddr offset, unsigned size)
+@@ -359,15 +377,8 @@ static void imx_spi_write(void *opaque, hwaddr offset, uint64_t value,
+         }
+ 
+         if (imx_spi_channel_is_master(s)) {
+-            int i;
+-
+             /* We are in master mode */
+ 
+-            for (i = 0; i < 4; i++) {
+-                qemu_set_irq(s->cs_lines[i],
+-                             i == imx_spi_selected_channel(s) ? 0 : 1);
+-            }
+-
+             if ((value & change_mask & ECSPI_CONREG_SMC) &&
+                 !fifo32_is_empty(&s->tx_fifo)) {
+                 /* SMC bit is set and TX FIFO has some slots filled in */
+-- 
+2.9.3
