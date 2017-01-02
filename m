@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48940)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51096)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1cO7aL-0001GK-V9
-	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 13:43:55 -0500
+	(envelope-from <revol@free.fr>) id 1cO7oA-0004lc-CO
+	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 13:58:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1cO7aI-0005uC-Tg
-	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 13:43:54 -0500
-Received: from mail-yw0-x244.google.com ([2607:f8b0:4002:c05::244]:36001)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bobby.prani@gmail.com>)
-	id 1cO7aI-0005sf-PR
-	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 13:43:50 -0500
-Received: by mail-yw0-x244.google.com with SMTP id r204so36288055ywb.3
-	for <qemu-devel@nongnu.org>; Mon, 02 Jan 2017 10:43:49 -0800 (PST)
-From: Pranith Kumar <bobby.prani@gmail.com>
-Date: Mon,  2 Jan 2017 13:42:58 -0500
-Message-Id: <20170102184258.2442-1-bobby.prani@gmail.com>
+	(envelope-from <revol@free.fr>) id 1cO7o5-0001UT-Fq
+	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 13:58:10 -0500
+Received: from smtp5-g21.free.fr ([212.27.42.5]:42903)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <revol@free.fr>) id 1cO7o5-0001SI-8I
+	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 13:58:05 -0500
+References: <20120202110843.18662.48430.malonedeb@wampee.canonical.com>
+	<20170101165508.1274.40921.malone@soybean.canonical.com>
+From: =?UTF-8?Q?Fran=c3=a7ois_Revol?= <revol@free.fr>
+Message-ID: <499be784-ba76-25b9-e2c8-6500812d3e25@free.fr>
+Date: Mon, 2 Jan 2017 19:57:57 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] mttcg: Add missing tb_lock/unlock() in
- cpu_exec_step()
+In-Reply-To: <20170101165508.1274.40921.malone@soybean.canonical.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Bug 925405] Re: VNC server does not work with Mac
+ Screen Sharing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,41 +28,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, "open list:Overall" <qemu-devel@nongnu.org>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Bug 925405 <925405@bugs.launchpad.net>, qemu-devel@nongnu.org
 
-The recent patch enabling lock assertions uncovered the missing lock
-acquisition in cpu_exec_step(). This patch adds them.
+On 01/01/2017 17:55, Rui Carmo wrote:
+> Hey there. Will git tip from September do? At that time I built QEMU on
+> Ubuntu 16.04.1, pointed my Mac (10.10) at it again and had the same
+> experience (had to use a third-party client)
+>
+> Considering I opened this four years ago, I'm kind of surprised it's
+> still a talking topic. Was kind of expecting more people to report it,
+> but then again Launchpad is a bit off the beaten path these days and
+> most people just sigh and fetch a third party client.
+>
+> It's just that it seems like a trivial thing to fix overall, so I
+> thought it worthwhile to chime in - Happy New Year!
+>
 
-CC: Richard Henderson <rth@twiddle.net>
-CC: Alex Bennée <alex.bennee@linaro.org>
-Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
----
- cpu-exec.c | 4 ++++
- 1 file changed, 4 insertions(+)
 
-diff --git a/cpu-exec.c b/cpu-exec.c
-index aa8318d864..ef328087be 100644
---- a/cpu-exec.c
-+++ b/cpu-exec.c
-@@ -234,14 +234,18 @@ static void cpu_exec_step(CPUState *cpu)
-     uint32_t flags;
- 
-     cpu_get_tb_cpu_state(env, &pc, &cs_base, &flags);
-+    tb_lock();
-     tb = tb_gen_code(cpu, pc, cs_base, flags,
-                      1 | CF_NOCACHE | CF_IGNORE_ICOUNT);
-     tb->orig_tb = NULL;
-+    tb_unlock();
-     /* execute the generated code */
-     trace_exec_tb_nocache(tb, pc);
-     cpu_tb_exec(cpu, tb);
-+    tb_lock();
-     tb_phys_invalidate(tb, -1);
-     tb_free(tb);
-+    tb_unlock();
- }
- 
- void cpu_exec_step_atomic(CPUState *cpu)
--- 
-2.11.0
+For what it's worth, it's a bug in Apple's client which despite them=20
+claiming to "use the industry standard VNC" (whatever that means)=20
+clearly violates the VNC specs by replying with a boggus protocol=20
+version number.
+
+I told them 5 years ago but it's not like they care about respecting=20
+standards...
+
+Fran=E7ois.
