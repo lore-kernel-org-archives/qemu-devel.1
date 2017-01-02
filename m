@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57952)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58386)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cO61z-0003sd-IO
-	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 12:04:20 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cO65c-0005FV-Nj
+	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 12:08:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cO61w-0001U0-FT
-	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 12:04:19 -0500
-References: <1483108391-199542-1-git-send-email-imammedo@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1cO65X-0003MZ-PJ
+	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 12:08:04 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35350)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cO65X-0003MG-JB
+	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 12:07:59 -0500
+References: <1483266886-25050-1-git-send-email-peterx@redhat.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <9e9ae9a3-0ca3-2472-9149-7b0115825933@redhat.com>
-Date: Mon, 2 Jan 2017 18:04:12 +0100
+Message-ID: <38d74124-eb01-c381-8dd9-2a6334c71fa3@redhat.com>
+Date: Mon, 2 Jan 2017 18:07:56 +0100
 MIME-Version: 1.0
-In-Reply-To: <1483108391-199542-1-git-send-email-imammedo@redhat.com>
+In-Reply-To: <1483266886-25050-1-git-send-email-peterx@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] pc: fix crash in rtc_set_memory() if
- initial cpu is marked as hotplugged
+Subject: Re: [Qemu-devel] [kvm-unit-tests PATCH 0/2] run_tests: support
+ concurrent test execution
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,53 +27,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-Cc: mst@redhat.com, armbru@redhat.com, afaerber@suse.de, ehabkost@redhat.com, qemu-stable <qemu-stable@nongnu.org>
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org
+Cc: Andrew Jones <drjones@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
 
 
 
-On 30/12/2016 15:33, Igor Mammedov wrote:
-> 'hotplugged' propperty is meant to be used on migration side when migrating
-> source with hotplugged devices.
-> However though it not exacly correct usage of 'hotplugged' property
-> it's possible to set generic hotplugged property for CPU using
->  -cpu foo,hotplugged=on
-> or
->  -global foo.hotplugged=on
+On 01/01/2017 11:34, Peter Xu wrote:
+> run_tests.sh is getting slower. Maybe it's time to let it run faster.
+> An obvious issue is that, we were running the tests sequentially in
+> the past.
 > 
-> in this case qemu crashes with following backtrace:
+> This series provides another new "-j" parameter. "-j 8" means we run
+> the tests on 8 task queues. That'll fasten the script a lot. A very
+> quick test of mine shows 3x speed boost with 8 task queues.
 > 
-> ...
+> Most of the changes are in scripts/tash.bash of patch 2, which
+> implemented the main logic for task managements. Please see commit
+> message for more information.
 > 
-> because pc_cpu_plug() assumes that hotplugged CPU could appear only after
-> rtc/fw_cfg are initialized.
-> Fix crash by replacing assumption with explicit checks of rtc/fw_cfg
-> and updating them only if they were initialized.
-> 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> Reported-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
->  hw/i386/pc.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index f3d7ad4..7b7e126 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -1810,8 +1810,10 @@ static void pc_cpu_plug(HotplugHandler *hotplug_dev,
->  
->      /* increment the number of CPUs */
->      pcms->boot_cpus++;
-> -    if (dev->hotplugged) {
-> +    if (pcms->rtc) {
->          rtc_set_cpus_count(pcms->rtc, pcms->boot_cpus);
-> +    }
-> +    if (pcms->fw_cfg) {
->          fw_cfg_modify_i16(pcms->fw_cfg, FW_CFG_NB_CPUS, pcms->boot_cpus);
->      }
->  
-> 
+> I did a quick "make standalone" test to make sure this series won't
+> break it. However I am not sure whether it'll break other thing that I
+> don't know...
 
-Looks good - adding qemu-stable too.
+Would it work if run_tests.sh wrote a Makefile for all the tests (with
+phony targets only), and then simply ran "make -f Makefile.tmp -jN"?
+
+Thanks,
 
 Paolo
