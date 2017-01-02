@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43558)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43570)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcd@tribudubois.net>) id 1cO9sy-0002By-GH
-	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 16:11:17 -0500
+	(envelope-from <jcd@tribudubois.net>) id 1cO9t3-0002DJ-R6
+	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 16:11:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcd@tribudubois.net>) id 1cO9sv-00056U-9x
-	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 16:11:16 -0500
-Received: from relay4-d.mail.gandi.net ([2001:4b98:c:538::196]:33738)
+	(envelope-from <jcd@tribudubois.net>) id 1cO9t0-0005Cq-LV
+	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 16:11:21 -0500
+Received: from relay6-d.mail.gandi.net ([2001:4b98:c:538::198]:48851)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jcd@tribudubois.net>) id 1cO9sv-00053z-3z
-	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 16:11:13 -0500
+	(Exim 4.71) (envelope-from <jcd@tribudubois.net>) id 1cO9t0-0005Bn-FE
+	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 16:11:18 -0500
 From: Jean-Christophe Dubois <jcd@tribudubois.net>
-Date: Mon,  2 Jan 2017 22:11:04 +0100
-Message-Id: <20170102211104.4753-1-jcd@tribudubois.net>
-Subject: [Qemu-devel] [PATCH v2] [i.MX] fix CS handling during SPI access.
+Date: Mon,  2 Jan 2017 22:11:10 +0100
+Message-Id: <20170102211110.4801-1-jcd@tribudubois.net>
+Subject: [Qemu-devel] [PATCH v2] [i.MX] Remove MSGDATA register support.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,18 +24,11 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, peter.maydell@linaro.org, mar.krzeminski@gmail.com
 Cc: Jean-Christophe Dubois <jcd@tribudubois.net>
 
-The i.MX SPI device was not de-asserting the CS line at the end of
-memory access.
+>From the documentation it is not clear what this SPI register is about.
 
-This triggered a SIGSEGV in Qemu when the sabrelite emulator was acessing
-a SPI flash memory.
+Moreover, neither linux driver nor xvisor driver are using this SPI register.
 
-Whit this path the CS signal is correctly asserted and deasserted arround
-memory access.
-
-This was tested by:
-* booting linux on Sabrelite Qemu emulator.
-* booting xvisor on Sabrelite Qemu emultor.
+For now we just remove it and issue a log on register write access.
 
 Signed-off-by: Jean-Christophe Dubois <jcd@tribudubois.net>
 ---
@@ -43,94 +36,37 @@ Signed-off-by: Jean-Christophe Dubois <jcd@tribudubois.net>
 Changes since v1:
 * Fix coding style issue.
 
- hw/ssi/imx_spi.c | 33 ++++++++++++++++++++++-----------
- 1 file changed, 22 insertions(+), 11 deletions(-)
+ hw/ssi/imx_spi.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
 diff --git a/hw/ssi/imx_spi.c b/hw/ssi/imx_spi.c
-index e4e395f..c2d293c 100644
+index c2d293c..3a0400e 100644
 --- a/hw/ssi/imx_spi.c
 +++ b/hw/ssi/imx_spi.c
-@@ -152,13 +152,20 @@ static bool imx_spi_is_multiple_master_burst(IMXSPIState *s)
- 
- static void imx_spi_flush_txfifo(IMXSPIState *s)
- {
--    uint32_t tx;
--    uint32_t rx;
-+    uint32_t i;
- 
-     DPRINTF("Begin: TX Fifo Size = %d, RX Fifo Size = %d\n",
-             fifo32_num_used(&s->tx_fifo), fifo32_num_used(&s->rx_fifo));
- 
-+    /* Activate the requested CS line */
-+    for (i = 0; i < 4; i++) {
-+        qemu_set_irq(s->cs_lines[i],
-+                     i == imx_spi_selected_channel(s) ? 0 : 1);
-+    }
-+
-     while (!fifo32_is_empty(&s->tx_fifo)) {
-+        uint32_t tx;
-+        uint32_t rx = 0;
-         int tx_burst = 0;
-         int index = 0;
- 
-@@ -178,8 +185,6 @@ static void imx_spi_flush_txfifo(IMXSPIState *s)
- 
-         tx_burst = MIN(s->burst_length, 32);
- 
--        rx = 0;
--
-         while (tx_burst) {
-             uint8_t byte = tx & 0xff;
- 
-@@ -221,6 +226,13 @@ static void imx_spi_flush_txfifo(IMXSPIState *s)
-         s->regs[ECSPI_STATREG] |= ECSPI_STATREG_TC;
-     }
- 
-+    /* Deselect all SS lines if transfert if completed */
-+    if (s->regs[ECSPI_STATREG] & ECSPI_STATREG_TC) {
-+        for (i = 0; i < 4; i++) {
-+            qemu_set_irq(s->cs_lines[i], 1);
-+        }
-+    }
-+
-     /* TODO: We should also use TDR and RDR bits */
- 
-     DPRINTF("End: TX Fifo Size = %d, RX Fifo Size = %d\n",
-@@ -230,6 +242,7 @@ static void imx_spi_flush_txfifo(IMXSPIState *s)
- static void imx_spi_reset(DeviceState *dev)
- {
-     IMXSPIState *s = IMX_SPI(dev);
-+    uint32_t i;
- 
-     DPRINTF("\n");
- 
-@@ -243,6 +256,11 @@ static void imx_spi_reset(DeviceState *dev)
-     imx_spi_update_irq(s);
- 
-     s->burst_length = 0;
-+
-+    /* Disable all CS lines */
-+    for (i = 0; i < 4; i++) {
-+        qemu_set_irq(s->cs_lines[i], 1);
-+    }
- }
- 
- static uint64_t imx_spi_read(void *opaque, hwaddr offset, unsigned size)
-@@ -359,15 +377,8 @@ static void imx_spi_write(void *opaque, hwaddr offset, uint64_t value,
+@@ -338,9 +338,6 @@ static void imx_spi_write(void *opaque, hwaddr offset, uint64_t value,
+                       TYPE_IMX_SPI, __func__);
+         break;
+     case ECSPI_TXDATA:
+-    case ECSPI_MSGDATA:
+-        /* Is there any difference between TXDATA and MSGDATA ? */
+-        /* I'll have to look in the linux driver */
+         if (!imx_spi_is_enabled(s)) {
+             /* Ignore writes if device is disabled */
+             break;
+@@ -391,6 +388,14 @@ static void imx_spi_write(void *opaque, hwaddr offset, uint64_t value,
          }
  
-         if (imx_spi_channel_is_master(s)) {
--            int i;
--
-             /* We are in master mode */
+         break;
++    case ECSPI_MSGDATA:
++        /* it is not clear from the spec what MSGDATA is for */
++        /* Anyway it is not used by Linux driver */
++        /* So for now we just ignore it */
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "[%s]%s: Trying to write to MSGDATA, ignoring\n",
++                      TYPE_IMX_SPI, __func__);
++        break;
+     default:
+         s->regs[index] = value;
  
--            for (i = 0; i < 4; i++) {
--                qemu_set_irq(s->cs_lines[i],
--                             i == imx_spi_selected_channel(s) ? 0 : 1);
--            }
--
-             if ((value & change_mask & ECSPI_CONREG_SMC) &&
-                 !fifo32_is_empty(&s->tx_fifo)) {
-                 /* SMC bit is set and TX FIFO has some slots filled in */
 -- 
 2.9.3
