@@ -1,18 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44084)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48283)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cNp81-00070d-Gj
-	for qemu-devel@nongnu.org; Sun, 01 Jan 2017 18:01:26 -0500
+	(envelope-from <harrynjit@gmail.com>) id 1cNvIe-000241-Qb
+	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 00:36:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cNp7y-0002Qz-GA
-	for qemu-devel@nongnu.org; Sun, 01 Jan 2017 18:01:25 -0500
-Received: from mout.kundenserver.de ([217.72.192.73]:57950)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cNp7y-0002Pa-5p
-	for qemu-devel@nongnu.org; Sun, 01 Jan 2017 18:01:22 -0500
-From: Laurent Vivier <laurent@vivier.eu>
-Date: Mon,  2 Jan 2017 00:00:35 +0100
-Message-Id: <1483311635-27905-1-git-send-email-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH] dp8393x: fix dp8393x_receive
+	(envelope-from <harrynjit@gmail.com>) id 1cNvIe-0000fi-0h
+	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 00:36:48 -0500
+Received: from mail-qk0-x22c.google.com ([2607:f8b0:400d:c09::22c]:34224)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <harrynjit@gmail.com>) id 1cNvId-0000en-SX
+	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 00:36:47 -0500
+Received: by mail-qk0-x22c.google.com with SMTP id h201so203944005qke.1
+	for <qemu-devel@nongnu.org>; Sun, 01 Jan 2017 21:36:46 -0800 (PST)
+MIME-Version: 1.0
+From: Weiwei Jia <harrynjit@gmail.com>
+Date: Mon, 2 Jan 2017 00:36:45 -0500
+Message-ID: <CA+scX6n=pgc1_rd5Zf_T2mZMSWSZn2Ez85mdaci9VtoaqfbN4Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: [Qemu-devel] Throughput confusion with data plane
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,43 +25,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Jason Wang <jasowang@redhat.com>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, Aurelien Jarno <aurelien@aurel32.net>, Laurent Vivier <laurent@vivier.eu>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel@nongnu.org
 
-address_space_rw() access size must be multiplied by width.
-dp8393x_receive() must return the number of bytes read, not the length
-of the last memory access.
+Hi,
 
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- hw/net/dp8393x.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+I run one I/O thread (sequential read 4 KB each time and read 8 GB in
+total) in host OS, the throughput is around 420 MB/s. However, when I
+run this I/O thread in one VM (no other VM is created and data-plane
+is enabled) with dedicated hardware, the throughput will be around 350
+MB/s. The VM's experiment setting is as follows.
 
-diff --git a/hw/net/dp8393x.c b/hw/net/dp8393x.c
-index 17f0338..3506bca 100644
---- a/hw/net/dp8393x.c
-+++ b/hw/net/dp8393x.c
-@@ -766,10 +766,11 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
-         /* EOL detected */
-         s->regs[SONIC_ISR] |= SONIC_ISR_RDE;
-     } else {
-+        size = sizeof(uint16_t) * width;
-         data[0 * width] = 0; /* in_use */
-         address_space_rw(&s->as,
-             ((s->regs[SONIC_URDA] << 16) | s->regs[SONIC_CRDA]) + sizeof(uint16_t) * 6 * width,
--            MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, sizeof(uint16_t), 1);
-+            MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 1);
-         s->regs[SONIC_CRDA] = s->regs[SONIC_LLFA];
-         s->regs[SONIC_ISR] |= SONIC_ISR_PKTRX;
-         s->regs[SONIC_RSC] = (s->regs[SONIC_RSC] & 0xff00) | (((s->regs[SONIC_RSC] & 0x00ff) + 1) & 0x00ff);
-@@ -783,7 +784,7 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
-     /* Done */
-     dp8393x_update_irq(s);
- 
--    return size;
-+    return rx_len;
- }
- 
- static void dp8393x_reset(DeviceState *dev)
--- 
-2.7.4
+In the VM, there are 15 vCPUs (vCPU0 - vCPU14); each vCPU is pinned to
+corresponding dedicated pCPU (for example, vCPU 0 is pinned to pCPU0
+... vCPU 14 is pinned to pCPU 14); "Idle=poll" is added in the VM's
+boot grub so that the vCPU will not be idle; in the VM, all the
+interrupts are pinned to vCPU0 to guarantee these interrupts can be
+responded on time; the I/O thread is executed on one of the vCPU
+except vCPU0.
+
+In the host OS, there are 16 pCPUs (pCPU0 - pCPU15); pCPU 0 - pCPU 14
+are used for vCPU0 - vCPU 14 in the VM dedicatedly; pCPU 15 is used by
+QEMU IOthread (data-plane) to handle I/O read requests from VM
+dedicatedly.
+
+Kernel version: 3.16.39
+QEMU version: 2.4.1
+
+
+I don't know why there is 70 MB/s difference between host OS and guest
+OS as above experiment. Does anyone have same experiences? Any
+comments? Thank you in advance.
+
+BTW, I have checked several times about my hardware configuration and
+I think the throughput difference as above should be related to QEMU.
+Maybe, I miss any configuration about QEMU.
+
+
+Best,
+Weiwei Jia
