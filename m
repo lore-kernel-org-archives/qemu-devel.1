@@ -1,25 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37039)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41233)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rkrcmar@redhat.com>) id 1cO9BD-0003QF-My
-	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 15:26:04 -0500
+	(envelope-from <jcd@tribudubois.net>) id 1cO9du-000444-Te
+	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 15:55:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rkrcmar@redhat.com>) id 1cO9BA-0004l0-Il
-	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 15:26:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33792)
+	(envelope-from <jcd@tribudubois.net>) id 1cO9dq-0008HM-UM
+	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 15:55:42 -0500
+Received: from relay3-d.mail.gandi.net ([217.70.183.195]:33228)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rkrcmar@redhat.com>) id 1cO9BA-0004kc-CO
-	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 15:26:00 -0500
-Date: Mon, 2 Jan 2017 21:25:56 +0100
-From: Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Message-ID: <20170102202555.GF2395@potion>
-References: <1483266886-25050-1-git-send-email-peterx@redhat.com>
-	<38d74124-eb01-c381-8dd9-2a6334c71fa3@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <38d74124-eb01-c381-8dd9-2a6334c71fa3@redhat.com>
-Subject: Re: [Qemu-devel] [kvm-unit-tests PATCH 0/2] run_tests: support
- concurrent test execution
+	(Exim 4.71) (envelope-from <jcd@tribudubois.net>) id 1cO9dq-0008Gs-Mz
+	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 15:55:38 -0500
+From: Jean-Christophe Dubois <jcd@tribudubois.net>
+Date: Mon,  2 Jan 2017 21:55:21 +0100
+Message-Id: <20170102205521.4101-1-jcd@tribudubois.net>
+Subject: [Qemu-devel] [PATCH] [i.MX] fix CS handling during SPI access.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,40 +21,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org, Andrew Jones <drjones@redhat.com>
+To: qemu-devel@nongnu.org, peter.maydell@linaro.org, mar.krzeminski@gmail.com
+Cc: Jean-Christophe Dubois <jcd@tribudubois.net>
 
-2017-01-02 18:07+0100, Paolo Bonzini:
-> On 01/01/2017 11:34, Peter Xu wrote:
->> run_tests.sh is getting slower. Maybe it's time to let it run faster.
->> An obvious issue is that, we were running the tests sequentially in
->> the past.
->> 
->> This series provides another new "-j" parameter. "-j 8" means we run
->> the tests on 8 task queues. That'll fasten the script a lot. A very
->> quick test of mine shows 3x speed boost with 8 task queues.
->> 
->> Most of the changes are in scripts/tash.bash of patch 2, which
->> implemented the main logic for task managements. Please see commit
->> message for more information.
->> 
->> I did a quick "make standalone" test to make sure this series won't
->> break it. However I am not sure whether it'll break other thing that I
->> don't know...
-> 
-> Would it work if run_tests.sh wrote a Makefile for all the tests (with
-> phony targets only), and then simply ran "make -f Makefile.tmp -jN"?
+The i.MX SPI device was not de-asserting the CS line at the end of
+memory access.
 
-We would need to change for_each_unittest to print the command line
-instead of running it and add a executable wrapper for run() from
-scripts/runtime.bash to have something to pass those arguments to.
-After that, we could generate a Makefile.
+This triggered a SIGSEGV in Qemu when the sabrelite emulator was acessing
+a SPI flash memory.
 
-I think we can do the queue with ~3 lines of bash and the Makefile would
-complicate it more.
+Whit this path the CS signal is correctly asserted and deasserted arround
+memory access.
 
-Btw. I just leaned that xargs provides a simpler, but sufficient,
-queueing functionality, e.g.
+This was tested by:
+* booting linux on Sabrelite Qemu emulator.
+* booting xvisor on Sabrelite Qemu emultor.
 
-  echo "echo a\0 (sleep 1; echo b)\0 echo c\0 sleep 1\0 echo d" |
-    xargs -0 -L 1 -P 2 sh -c
+Signed-off-by: Jean-Christophe Dubois <jcd@tribudubois.net>
+---
+ hw/ssi/imx_spi.c | 33 ++++++++++++++++++++++-----------
+ 1 file changed, 22 insertions(+), 11 deletions(-)
+
+diff --git a/hw/ssi/imx_spi.c b/hw/ssi/imx_spi.c
+index e4e395f..c2d293c 100644
+--- a/hw/ssi/imx_spi.c
++++ b/hw/ssi/imx_spi.c
+@@ -152,13 +152,20 @@ static bool imx_spi_is_multiple_master_burst(IMXSPIState *s)
+ 
+ static void imx_spi_flush_txfifo(IMXSPIState *s)
+ {
+-    uint32_t tx;
+-    uint32_t rx;
++    uint32_t i;
+ 
+     DPRINTF("Begin: TX Fifo Size = %d, RX Fifo Size = %d\n",
+             fifo32_num_used(&s->tx_fifo), fifo32_num_used(&s->rx_fifo));
+ 
++    /* Activate the requested CS line */
++    for (i = 0; i < 4; i++) {
++        qemu_set_irq(s->cs_lines[i],
++                     i == imx_spi_selected_channel(s) ? 0 : 1);
++    }
++
+     while (!fifo32_is_empty(&s->tx_fifo)) {
++        uint32_t tx;
++        uint32_t rx = 0;
+         int tx_burst = 0;
+         int index = 0;
+ 
+@@ -178,8 +185,6 @@ static void imx_spi_flush_txfifo(IMXSPIState *s)
+ 
+         tx_burst = MIN(s->burst_length, 32);
+ 
+-        rx = 0;
+-
+         while (tx_burst) {
+             uint8_t byte = tx & 0xff;
+ 
+@@ -221,6 +226,13 @@ static void imx_spi_flush_txfifo(IMXSPIState *s)
+         s->regs[ECSPI_STATREG] |= ECSPI_STATREG_TC;
+     }
+ 
++    /* Deselect all SS lines if transfert if completed */
++    if (s->regs[ECSPI_STATREG] & ECSPI_STATREG_TC) {
++        for (i = 0; i < 4; i++) {
++            qemu_set_irq(s->cs_lines[i], 1);
++        }
++    }
++
+     /* TODO: We should also use TDR and RDR bits */
+ 
+     DPRINTF("End: TX Fifo Size = %d, RX Fifo Size = %d\n",
+@@ -230,6 +242,7 @@ static void imx_spi_flush_txfifo(IMXSPIState *s)
+ static void imx_spi_reset(DeviceState *dev)
+ {
+     IMXSPIState *s = IMX_SPI(dev);
++    uint32_t i;
+ 
+     DPRINTF("\n");
+ 
+@@ -243,6 +256,11 @@ static void imx_spi_reset(DeviceState *dev)
+     imx_spi_update_irq(s);
+ 
+     s->burst_length = 0;
++
++    /* Disable all CS lines */
++    for (i = 0; i < 4; i++) {
++       qemu_set_irq(s->cs_lines[i], 1);
++    }
+ }
+ 
+ static uint64_t imx_spi_read(void *opaque, hwaddr offset, unsigned size)
+@@ -359,15 +377,8 @@ static void imx_spi_write(void *opaque, hwaddr offset, uint64_t value,
+         }
+ 
+         if (imx_spi_channel_is_master(s)) {
+-            int i;
+-
+             /* We are in master mode */
+ 
+-            for (i = 0; i < 4; i++) {
+-                qemu_set_irq(s->cs_lines[i],
+-                             i == imx_spi_selected_channel(s) ? 0 : 1);
+-            }
+-
+             if ((value & change_mask & ECSPI_CONREG_SMC) &&
+                 !fifo32_is_empty(&s->tx_fifo)) {
+                 /* SMC bit is set and TX FIFO has some slots filled in */
+-- 
+2.9.3
