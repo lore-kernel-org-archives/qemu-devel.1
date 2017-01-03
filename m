@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57486)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57624)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cOMFF-0002bk-Gt
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 05:23:06 -0500
+	(envelope-from <agordeev@redhat.com>) id 1cOMGw-0003bx-FM
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 05:24:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cOMFB-0002Qe-9g
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 05:23:05 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46608)
+	(envelope-from <agordeev@redhat.com>) id 1cOMGr-00030E-Gm
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 05:24:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41200)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cOMFB-0002QW-2w
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 05:23:01 -0500
-References: <1483311635-27905-1-git-send-email-laurent@vivier.eu>
-	<8ab579b1-22ab-25d9-24af-1dd8f8849edc@redhat.com>
-	<3bd1cc56-6c52-9757-4652-2a49dfa5ec2c@vivier.eu>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <8a07a016-d573-9c90-5f87-0bb041b66707@redhat.com>
-Date: Tue, 3 Jan 2017 18:22:49 +0800
+	(Exim 4.71) (envelope-from <agordeev@redhat.com>) id 1cOMGr-0002ze-80
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 05:24:45 -0500
+Date: Tue, 3 Jan 2017 11:33:27 +0100
+From: Alexander Gordeev <agordeev@redhat.com>
+Message-ID: <20170103103326.GA4280@agordeev.lab.eng.brq.redhat.com>
+References: <1481512100-10380-1-git-send-email-peterx@redhat.com>
+	<1481512100-10380-13-git-send-email-peterx@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <3bd1cc56-6c52-9757-4652-2a49dfa5ec2c@vivier.eu>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] dp8393x: fix dp8393x_receive
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1481512100-10380-13-git-send-email-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [kvm-unit-tests PATCH v8 12/14] x86: intel-iommu:
+ add dmar test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,62 +28,318 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Aurelien Jarno <aurelien@aurel32.net>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, drjones@redhat.com, jan.kiszka@web.de, rkrcmar@redhat.com, pbonzini@redhat.com
 
+On Mon, Dec 12, 2016 at 11:08:18AM +0800, Peter Xu wrote:
+> DMAR test is based on QEMU edu device. A 4B DMA memory copy is carried
+> out as the simplest DMAR test.
 
+Hi Peter,
 
-On 2017=E5=B9=B401=E6=9C=8803=E6=97=A5 15:26, Laurent Vivier wrote:
-> Le 03/01/2017 =C3=A0 04:37, Jason Wang a =C3=A9crit :
->>
->> On 2017=E5=B9=B401=E6=9C=8802=E6=97=A5 07:00, Laurent Vivier wrote:
->>> address_space_rw() access size must be multiplied by width.
->>> dp8393x_receive() must return the number of bytes read, not the lengt=
-h
->>> of the last memory access.
->>>
->>> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
->>> ---
->>>    hw/net/dp8393x.c | 5 +++--
->>>    1 file changed, 3 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/hw/net/dp8393x.c b/hw/net/dp8393x.c
->>> index 17f0338..3506bca 100644
->>> --- a/hw/net/dp8393x.c
->>> +++ b/hw/net/dp8393x.c
->>> @@ -766,10 +766,11 @@ static ssize_t dp8393x_receive(NetClientState
->>> *nc, const uint8_t * buf,
->>>            /* EOL detected */
->>>            s->regs[SONIC_ISR] |=3D SONIC_ISR_RDE;
->>>        } else {
->>> +        size =3D sizeof(uint16_t) * width;
->>>            data[0 * width] =3D 0; /* in_use */
->>>            address_space_rw(&s->as,
->>>                ((s->regs[SONIC_URDA] << 16) | s->regs[SONIC_CRDA]) +
->>> sizeof(uint16_t) * 6 * width,
->>> -            MEMTXATTRS_UNSPECIFIED, (uint8_t *)data,
->>> sizeof(uint16_t), 1);
->>> +            MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 1);
->> I think patch makes different only when width is 2. But if we just wan=
-t
->> to tag in_use flag, sizeof(uint16_t) should be sufficient?
-> In fact, I'm using this device to implement Quadra 800 macsonic
-> emulation, and in this case all registers are byteswapped according the
-> size of width (32bit in my case, see kernel sources,
-> drivers/net/ethernet/natsemi/sonic.h and macsonic.c), so debugging the
-> kernel I've seen used part of the register is never cleared.
+Sorry for missing to provide feedback on your series.
+I did just a cursory review, but did not notice few issue below.
 
-Looking at git history this seems a revert of=20
-409b52bfe199d8106dadf7c5ff3d88d2228e89b5 ("net/dp8393x: correctly reset=20
-in_use field") which claims to fix an issue in NetBSD 5.1. According to=20
-the spec (is this correct=20
-http://www.ti.com/lit/ds/symlink/dp83936avul-33.pdf?) upper 16 bits were=20
-not used in 32bit mode, so I'm not sure this is correct.
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  lib/pci.h             |   5 ++
+>  lib/x86/intel-iommu.c | 133 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>  lib/x86/intel-iommu.h |   4 ++
+>  x86/Makefile.common   |   1 +
+>  x86/intel-iommu.c     |  51 +++++++++++++++++++
+>  5 files changed, 194 insertions(+)
+> 
+> diff --git a/lib/pci.h b/lib/pci.h
+> index d3052ef..26968b1 100644
+> --- a/lib/pci.h
+> +++ b/lib/pci.h
+> @@ -18,6 +18,9 @@ enum {
+>  #define PCI_BAR_NUM                     6
+>  #define PCI_DEVFN_MAX                   256
+>  
+> +#define PCI_BDF_GET_DEVFN(x)            ((x) & 0xff)
+> +#define PCI_BDF_GET_BUS(x)              (((x) >> 8) & 0xff)
+> +
+>  struct pci_dev {
+>  	uint16_t bdf;
+>  	phys_addr_t resource[PCI_BAR_NUM];
+> @@ -28,6 +31,8 @@ extern void pci_scan_bars(struct pci_dev *dev);
+>  extern void pci_cmd_set_clr(struct pci_dev *dev, uint16_t set, uint16_t clr);
+>  extern void pci_enable_defaults(struct pci_dev *dev);
+>  
+> +typedef phys_addr_t iova_t;
+> +
+>  extern bool pci_probe(void);
+>  extern void pci_print(void);
+>  extern bool pci_dev_exists(pcidevaddr_t dev);
+> diff --git a/lib/x86/intel-iommu.c b/lib/x86/intel-iommu.c
+> index 1887998..86b1805 100644
+> --- a/lib/x86/intel-iommu.c
+> +++ b/lib/x86/intel-iommu.c
+> @@ -11,6 +11,42 @@
+>   */
+>  
+>  #include "intel-iommu.h"
+> +#include "libcflat.h"
+> +
+> +/*
+> + * VT-d in QEMU currently only support 39 bits address width, which is
+> + * 3-level translation.
+> + */
+> +#define VTD_PAGE_LEVEL      3
+> +#define VTD_CE_AW_39BIT     0x1
+> +
+> +typedef uint64_t vtd_pte_t;
+> +
+> +struct vtd_root_entry {
+> +	/* Quad 1 */
+> +	uint64_t present:1;
+> +	uint64_t __reserved:11;
+> +	uint64_t context_table_p:52;
+> +	/* Quad 2 */
+> +	uint64_t __reserved_2;
+> +} __attribute__ ((packed));
+> +typedef struct vtd_root_entry vtd_re_t;
+> +
+> +struct vtd_context_entry {
+> +	/* Quad 1 */
+> +	uint64_t present:1;
+> +	uint64_t disable_fault_report:1;
+> +	uint64_t trans_type:2;
+> +	uint64_t __reserved:8;
+> +	uint64_t slptptr:52;
+> +	/* Quad 2 */
+> +	uint64_t addr_width:3;
+> +	uint64_t __ignore:4;
+> +	uint64_t __reserved_2:1;
+> +	uint64_t domain_id:16;
+> +	uint64_t __reserved_3:40;
+> +} __attribute__ ((packed));
+> +typedef struct vtd_context_entry vtd_ce_t;
+>  
+>  #define VTD_RTA_MASK  (PAGE_MASK)
+>  #define VTD_IRTA_MASK (PAGE_MASK)
+> @@ -83,6 +119,103 @@ static void vtd_setup_ir_table(void)
+>  	printf("IR table address: 0x%016lx\n", vtd_ir_table());
+>  }
+>  
+> +static void vtd_install_pte(vtd_pte_t *root, iova_t iova,
+> +			    phys_addr_t pa, int level_target)
+> +{
+> +	int level;
+> +	unsigned int offset;
+> +	void *page;
+> +
+> +	for (level = VTD_PAGE_LEVEL; level > level_target; level--) {
+> +		offset = PGDIR_OFFSET(iova, level);
+> +		if (!(root[offset] & VTD_PTE_RW)) {
+> +			page = alloc_page();
+> +			memset(page, 0, PAGE_SIZE);
+> +			root[offset] = virt_to_phys(page) | VTD_PTE_RW;
+> +		}
+> +		root = (uint64_t *)(phys_to_virt(root[offset] &
+> +						 VTD_PTE_ADDR));
+> +	}
+> +
+> +	offset = PGDIR_OFFSET(iova, level);
+> +	root[offset] = pa | VTD_PTE_RW;
+> +	if (level != 1) {
+> +		/* This is huge page */
+> +		root[offset] |= VTD_PTE_HUGE;
+> +	}
+> +}
+> +
+> +#define  VTD_PHYS_TO_VIRT(x) \
+> +	((void *)(((uint64_t)phys_to_virt(x)) >> VTD_PAGE_SHIFT))
 
-Hope Herv=C3=A9 or Aurelien can review this patch.
+I would say this macro is rather superfluous.
 
-Thanks
+> +/**
+> + * vtd_map_range: setup IO address mapping for specific memory range
+> + *
+> + * @sid: source ID of the device to setup
+> + * @iova: start IO virtual address
+> + * @pa: start physical address
+> + * @size: size of the mapping area
+> + */
+> +void vtd_map_range(uint16_t sid, iova_t iova, phys_addr_t pa, size_t size)
+> +{
+> +	uint8_t bus_n, devfn;
+> +	void *slptptr;
+> +	vtd_ce_t *ce;
+> +	vtd_re_t *re = phys_to_virt(vtd_root_table());
+> +
+> +	assert(IS_ALIGNED(iova, SZ_4K));
+> +	assert(IS_ALIGNED(pa, SZ_4K));
+> +	assert(IS_ALIGNED(size, SZ_4K));
+> +
+> +	bus_n = PCI_BDF_GET_BUS(sid);
+> +	devfn = PCI_BDF_GET_DEVFN(sid);
+> +
+> +	/* Point to the correct root entry */
+> +	re += bus_n;
+> +
+> +	if (!re->present) {
+> +		ce = alloc_page();
+> +		memset(ce, 0, PAGE_SIZE);
+> +		memset(re, 0, sizeof(*re));
+> +		re->context_table_p = virt_to_phys(ce) >> VTD_PAGE_SHIFT;
+> +		re->present = 1;
+> +		printf("allocated vt-d root entry for PCI bus %d\n",
+> +		       bus_n);
+> +	} else
+> +		ce = VTD_PHYS_TO_VIRT(re->context_table_p);
 
-> Thanks,
-> Laurent
->
+Seems, it should be instead something like:
+
+		ce = phys_to_virt(re->context_table_p << VTD_PAGE_SHIFT);
+
+> +
+> +	/* Point to the correct context entry */
+> +	ce += devfn;
+> +
+> +	if (!ce->present) {
+> +		slptptr = alloc_page();
+> +		memset(slptptr, 0, PAGE_SIZE);
+> +		memset(ce, 0, sizeof(*ce));
+> +		/* To make it simple, domain ID is the same as SID */
+> +		ce->domain_id = sid;
+> +		/* We only test 39 bits width case (3-level paging) */
+> +		ce->addr_width = VTD_CE_AW_39BIT;
+> +		ce->slptptr = virt_to_phys(slptptr) >> VTD_PAGE_SHIFT;
+> +		ce->trans_type = VTD_CONTEXT_TT_MULTI_LEVEL;
+> +		ce->present = 1;
+> +		/* No error reporting yet */
+> +		ce->disable_fault_report = 1;
+> +		printf("allocated vt-d context entry for devfn 0x%x\n",
+> +		       devfn);
+> +	} else
+> +		slptptr = VTD_PHYS_TO_VIRT(ce->slptptr);
+
+		slptptr = phys_to_virt(ce->slptptr << VTD_PAGE_SHIFT);
+
+> +	while (size) {
+> +		/* TODO: currently we only map 4K pages (level = 1) */
+> +		printf("map 4K page IOVA 0x%lx to 0x%lx (sid=0x%04x)\n",
+> +		       iova, pa, sid);
+> +		vtd_install_pte(slptptr, iova, pa, 1);
+> +		size -= VTD_PAGE_SIZE;
+> +		iova += VTD_PAGE_SIZE;
+> +		pa += VTD_PAGE_SIZE;
+> +	}
+> +}
+> +
+>  void vtd_init(void)
+>  {
+>  	setup_vm();
+> diff --git a/lib/x86/intel-iommu.h b/lib/x86/intel-iommu.h
+> index 92cc85f..50f67f1 100644
+> --- a/lib/x86/intel-iommu.h
+> +++ b/lib/x86/intel-iommu.h
+> @@ -20,9 +20,12 @@
+>  #include "isr.h"
+>  #include "smp.h"
+>  #include "desc.h"
+> +#include "pci.h"
+>  #include "asm/io.h"
+>  
+>  #define Q35_HOST_BRIDGE_IOMMU_ADDR  0xfed90000ULL
+> +#define VTD_PAGE_SHIFT              PAGE_SHIFT
+> +#define VTD_PAGE_SIZE               PAGE_SIZE
+>  
+>  /*
+>   * Intel IOMMU register specification
+> @@ -137,5 +140,6 @@ static inline uint64_t vtd_readq(unsigned int reg)
+>  }
+>  
+>  void vtd_init(void);
+> +void vtd_map_range(uint16_t sid, phys_addr_t iova, phys_addr_t pa, size_t size);
+>  
+>  #endif
+> diff --git a/x86/Makefile.common b/x86/Makefile.common
+> index 356d879..1dad18b 100644
+> --- a/x86/Makefile.common
+> +++ b/x86/Makefile.common
+> @@ -3,6 +3,7 @@
+>  all: test_cases
+>  
+>  cflatobjs += lib/pci.o
+> +cflatobjs += lib/pci-edu.o
+>  cflatobjs += lib/x86/io.o
+>  cflatobjs += lib/x86/smp.o
+>  cflatobjs += lib/x86/vm.o
+> diff --git a/x86/intel-iommu.c b/x86/intel-iommu.c
+> index f247913..21fd57f 100644
+> --- a/x86/intel-iommu.c
+> +++ b/x86/intel-iommu.c
+> @@ -11,9 +11,50 @@
+>   */
+>  
+>  #include "intel-iommu.h"
+> +#include "pci-edu.h"
+> +
+> +#define VTD_TEST_DMAR_4B ("DMAR 4B memcpy test")
+> +
+> +void vtd_test_dmar(struct pci_edu_dev *dev)
+> +{
+> +	void *page = alloc_page();
+> +
+> +#define DMA_TEST_WORD (0x12345678)
+> +	/* Modify the first 4 bytes of the page */
+> +	*(uint32_t *)page = DMA_TEST_WORD;
+> +
+> +	/*
+> +	 * Map the newly allocated page into IOVA address 0 (size 4K)
+> +	 * of the device address space. Root entry and context entry
+> +	 * will be automatically created when needed.
+> +	 */
+> +	vtd_map_range(dev->pci_dev.bdf, 0, virt_to_phys(page), PAGE_SIZE);
+> +
+> +	/*
+> +	 * DMA the first 4 bytes of the page to EDU device buffer
+> +	 * offset 0.
+> +	 */
+> +	edu_dma(dev, 0, 4, 0, false);
+> +
+> +	/*
+> +	 * DMA the first 4 bytes of EDU device buffer into the page
+> +	 * with offset 4 (so it'll be using 4-7 bytes).
+> +	 */
+> +	edu_dma(dev, 4, 4, 0, true);
+> +
+> +	/*
+> +	 * Check data match between 0-3 bytes and 4-7 bytes of the
+> +	 * page.
+> +	 */
+> +	report(VTD_TEST_DMAR_4B, *((uint32_t *)page + 1) == DMA_TEST_WORD);
+> +
+> +	free_page(page);
+> +}
+>  
+>  int main(int argc, char *argv[])
+>  {
+> +	struct pci_edu_dev dev;
+> +
+>  	vtd_init();
+>  
+>  	report("fault status check", vtd_readl(DMAR_FSTS_REG) == 0);
+> @@ -22,6 +63,16 @@ int main(int argc, char *argv[])
+>  	report("IR table setup", vtd_readl(DMAR_GSTS_REG) & VTD_GCMD_IR_TABLE);
+>  	report("DMAR enablement", vtd_readl(DMAR_GSTS_REG) & VTD_GCMD_DMAR);
+>  	report("IR enablement", vtd_readl(DMAR_GSTS_REG) & VTD_GCMD_IR);
+> +	report("DMAR support 39 bits address width",
+> +	       vtd_readq(DMAR_CAP_REG) & VTD_CAP_SAGAW);
+> +	report("DMAR support huge pages", vtd_readq(DMAR_CAP_REG) & VTD_CAP_SLLPS);
+> +
+> +	if (!edu_init(&dev)) {
+> +		printf("Please specify \"-device edu\" to do "
+> +		       "further IOMMU tests.\n");
+> +		report_skip(VTD_TEST_DMAR_4B);
+> +	} else
+> +		vtd_test_dmar(&dev);
+>  
+>  	return report_summary();
+>  }
+> -- 
+> 2.7.4
+> 
