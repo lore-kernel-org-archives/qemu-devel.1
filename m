@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49675)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59527)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cOV2Q-0001no-VR
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 14:46:27 -0500
+	(envelope-from <jcd@tribudubois.net>) id 1cOVmv-00061e-E4
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 15:34:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cOV2N-0007e1-UP
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 14:46:27 -0500
-References: <20170103182801.9638-1-berrange@redhat.com>
-	<20170103182801.9638-2-berrange@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <9acc22d2-0dbc-df6e-89dd-45d1ac54b5f3@redhat.com>
-Date: Tue, 3 Jan 2017 13:46:15 -0600
+	(envelope-from <jcd@tribudubois.net>) id 1cOVms-0001iu-CQ
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 15:34:29 -0500
+Received: from relay5-d.mail.gandi.net ([217.70.183.197]:36980)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jcd@tribudubois.net>) id 1cOVms-0001hq-68
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 15:34:26 -0500
+References: <20161224151113.23955-1-jcd@tribudubois.net>
+	<606aedd3-2f56-fb89-b547-763baf833ed5@gmail.com>
+	<5b3ba089-e218-40ff-3b72-f31ada1e4cfc@tribudubois.net>
+	<a6c26a91-696c-db4b-7311-7cfc7ef9ee74@gmail.com>
+	<ccab130c-3f65-e4b4-8453-b2fd0f1110ae@tribudubois.net>
+	<5f1acd02-018d-0a17-105c-cd42c50a3e91@tribudubois.net>
+	<d320496c-42d0-f8ae-71ea-e81073f2cf9d@gmail.com>
+	<684d34f1-9107-1ed0-1115-f3034bd899f4@tribudubois.net>
+	<a25f717f-28b6-959a-92c3-a7233dcf7fe2@gmail.com>
+	<3f17d9af-a43f-82cb-c477-e2036ab7492a@tribudubois.net>
+	<11ce9101-b01a-9d6a-4f0e-b459b5f49f0c@gmail.com>
+From: Jean-Christophe DUBOIS <jcd@tribudubois.net>
+Message-ID: <309100ce-3734-c9df-0130-0485494ec394@tribudubois.net>
+Date: Tue, 3 Jan 2017 21:34:20 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170103182801.9638-2-berrange@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="67eGvUG74dB7jPMTcDdcwLKWEtRlGN9un"
-Subject: Re: [Qemu-devel] [PATCH v1 01/15] block: expose crypto option names
- / defs to other drivers
+In-Reply-To: <11ce9101-b01a-9d6a-4f0e-b459b5f49f0c@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] [M25P80] Make sure not to overrun the
+ internal data buffer.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,63 +37,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: "mar.krzeminski" <mar.krzeminski@gmail.com>, qemu-devel@nongnu.org, peter.maydell@linaro.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---67eGvUG74dB7jPMTcDdcwLKWEtRlGN9un
-From: Eric Blake <eblake@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
-Message-ID: <9acc22d2-0dbc-df6e-89dd-45d1ac54b5f3@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v1 01/15] block: expose crypto option names /
- defs to other drivers
-References: <20170103182801.9638-1-berrange@redhat.com>
- <20170103182801.9638-2-berrange@redhat.com>
-In-Reply-To: <20170103182801.9638-2-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Le 03/01/2017 à 18:08, mar.krzeminski a écrit :
+>
+>> You may still want to harden the m25p80 code to make sure it doesn't 
+>> overrun its internal buffer.
+>
+> Yeap, for me it is a bug.
+> I understand you will not finish this patch, won't you ?:)
 
-On 01/03/2017 12:27 PM, Daniel P. Berrange wrote:
-> The block/crypto.c defines a set of QemuOpts that provide
-> parameters for encryption. This will also be needed by
-> the qcow/qcow2 integration, so expose the relevant pieces
-> in a new block/crypto.h header.
->=20
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
->  block/crypto.c | 61 +++++++--------------------------------
->  block/crypto.h | 91 ++++++++++++++++++++++++++++++++++++++++++++++++++=
-++++++++
->  2 files changed, 102 insertions(+), 50 deletions(-)
->  create mode 100644 block/crypto.h
->=20
+I could give it a shot.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---67eGvUG74dB7jPMTcDdcwLKWEtRlGN9un
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYa/+HAAoJEKeha0olJ0Nq5e0H/RSoYVk4me3VqIbNUge0IYDr
-fxgEYmzFGU0pSWZSandc2unQQj6ZU5ZUFY+qTOzarj0HpKjA1d7dDqMaDObwvyl1
-tepv1KyZ/Lzjx6Guh4RsHCZgj8oSxUzojpoK/vCjP5pR5jogZI4Z55hjE9m6w8Rw
-6arXv2vg0Y4KoVSNh+UFYToTTHK7/QAlFpSOs/dVP/+8aGeKRcx8Jg5wySSpcPfi
-XaQKs4e82TL5TYu9071CC99lGO6Xullil0pqFK2vneP4GF6Bo9L3i6xTFexWAO/6
-P/l0fGwuH0uqK9eo1ulLWHaj6XJ7iRe4Amp1UB2Kj5AphrPYYRSB13YQv0Nuyo8=
-=fop3
------END PGP SIGNATURE-----
-
---67eGvUG74dB7jPMTcDdcwLKWEtRlGN9un--
+JC
