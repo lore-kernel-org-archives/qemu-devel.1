@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57458)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57954)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cOSZx-0001GT-M2
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 12:08:54 -0500
+	(envelope-from <eblake@redhat.com>) id 1cOSc3-0002xn-Hw
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 12:11:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cOSZu-00060V-CI
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 12:08:53 -0500
-References: <20170103160556.9895-1-berrange@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1cOSc2-0006hj-K2
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 12:11:03 -0500
+References: <20170103170459.27662-1-berrange@redhat.com>
+	<20170103170459.27662-2-berrange@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <cfa039b5-d1df-079e-5a6e-f92e13870a2d@redhat.com>
-Date: Tue, 3 Jan 2017 11:08:39 -0600
+Message-ID: <7cbbf068-d865-05f9-2537-cad957e4f9b4@redhat.com>
+Date: Tue, 3 Jan 2017 11:10:55 -0600
 MIME-Version: 1.0
-In-Reply-To: <20170103160556.9895-1-berrange@redhat.com>
+In-Reply-To: <20170103170459.27662-2-berrange@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="E4sHKGxjQBrmcP7RvgK4xkCBmJw2lFtpu"
-Subject: Re: [Qemu-devel] [PATCH v2] iotests: record separate timings per
- format, protocol pair
+	boundary="UM8g048xqL79rAuWsHEcq12ErxO8sgcr2"
+Subject: Re: [Qemu-devel] [PATCH v2 1/5] iotests: skip 159 & 170 with luks
+ format
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,40 +26,36 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---E4sHKGxjQBrmcP7RvgK4xkCBmJw2lFtpu
+--UM8g048xqL79rAuWsHEcq12ErxO8sgcr2
 From: Eric Blake <eblake@redhat.com>
 To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>,
- qemu-block@nongnu.org
-Message-ID: <cfa039b5-d1df-079e-5a6e-f92e13870a2d@redhat.com>
-Subject: Re: [PATCH v2] iotests: record separate timings per format,protocol
- pair
-References: <20170103160556.9895-1-berrange@redhat.com>
-In-Reply-To: <20170103160556.9895-1-berrange@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
+Message-ID: <7cbbf068-d865-05f9-2537-cad957e4f9b4@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/5] iotests: skip 159 & 170 with luks
+ format
+References: <20170103170459.27662-1-berrange@redhat.com>
+ <20170103170459.27662-2-berrange@redhat.com>
+In-Reply-To: <20170103170459.27662-2-berrange@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 01/03/2017 10:05 AM, Daniel P. Berrange wrote:
-> The 'check' program records timings for each test that
-> is run. These timings are only valid, however, for a
-> particular format/protocol combination. So if frequently
-> running 'check' with a variety of different formats or
-> protocols, the times printed can be very misleading.
+On 01/03/2017 11:04 AM, Daniel P. Berrange wrote:
+> While the qemu-img dd command does accept --image-opts
+> this is not sufficient to make it work with the LUKS
+> image yet. This is because bdrv_create() still always
+> requires the non-image-opts syntax.
 >=20
-> Instead of having a single 'check.time' file, maintain
-> multiple 'check.time-$IMGPROTO-$IMGFMT' files.
+> Thus we must skip 159/170 with luks for now
 >=20
 > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 > ---
-> Changed in v2:
->=20
->  - Use a separate file per format/protocol, instead of
->    throwing away data each time format/protocol changes
->    between runs (Eric)
->=20
+>  tests/qemu-iotests/159 | 2 +-
+>  tests/qemu-iotests/170 | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
@@ -67,7 +64,7 @@ Eric Blake   eblake redhat com    +1-919-301-3266
 Libvirt virtualization library http://libvirt.org
 
 
---E4sHKGxjQBrmcP7RvgK4xkCBmJw2lFtpu
+--UM8g048xqL79rAuWsHEcq12ErxO8sgcr2
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -77,13 +74,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJYa9qXAAoJEKeha0olJ0Nq6VoH+QFi3Fw+AhZ8mD4hcQ1j/Lxn
-BIhagUmlD+40VYM5h/8bQrRZ51r778PciRgv6P5Bb5BbMa0QBPJQa3cU5vdC2dUh
-q6k1tmePgbTud2dOqLg7Dah7e9Kb4dn7+VlM9kDNmfqzxqIrVk5pj3JqEn9Ry70I
-I6qiEly3ogVJpjq1JLzyV5+KpTB6zPJoc/NpvTf5Wx/XPJOFCkNWzew9XfB1erqB
-mDbK9CdSz5m3/nO8mYJLB6Sv1TYXmLIwgzcB50NtqDhf+Z/bN+S3xodG3kBzIIWI
-I+rWAqfr/briDmULTls82HHbHJvvUDtni7eAs4xhUtJwFwG7Zpr+QPAGsqMcc20=
-=cfjR
+iQEcBAEBCAAGBQJYa9sfAAoJEKeha0olJ0NqIsEH/3u5PXm04ZL5g5XMOaJ+baQ2
+dthQ5im2CgUxb+0tznEUdjcxF2FoR4TnbPZ/FbeO3z5lK70TPBePIZZ72uTgiPoA
+FI09olXuw31XTRSv3Vlyf0MV6gPrhf9HLR3/f3bPvCXjY9rDIzqG3mMueUzoVcsu
+WAGqnDK4eX+Ye04DV1Ru92njD+7uEhEM7YVXJEyxJ/Y2zle/BcB9V5ZFGy2X0i65
+eD6tP21r2vOfxgtQnusp31tjARmi8DfswCQi3/JsnavtfyJcbW9qFqGmW9lBm4wH
+KbNuPiSC72eVEbKzj/rOy4/PJjJYN74iqnEsX2FOL53iaXKdTv+I2yHh4U4dcdk=
+=g/UW
 -----END PGP SIGNATURE-----
 
---E4sHKGxjQBrmcP7RvgK4xkCBmJw2lFtpu--
+--UM8g048xqL79rAuWsHEcq12ErxO8sgcr2--
