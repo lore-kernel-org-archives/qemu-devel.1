@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57279)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58440)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cOF66-0000uY-D4
-	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 21:45:11 -0500
+	(envelope-from <peterx@redhat.com>) id 1cOFBp-0002N6-6n
+	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 21:51:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cOF63-0005FE-7T
-	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 21:45:10 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51468)
+	(envelope-from <peterx@redhat.com>) id 1cOFBm-0006lU-48
+	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 21:51:05 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58714)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cOF62-0005EM-Uv
-	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 21:45:07 -0500
-Date: Tue, 3 Jan 2017 10:45:01 +0800
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cOFBl-0006kp-UE
+	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 21:51:02 -0500
+Date: Tue, 3 Jan 2017 10:50:56 +0800
 From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170103024501.GA22664@pxdev.xzpeter.org>
+Message-ID: <20170103025056.GB22664@pxdev.xzpeter.org>
 References: <1483266886-25050-1-git-send-email-peterx@redhat.com>
-	<1483266886-25050-3-git-send-email-peterx@redhat.com>
-	<20170102201824.GA2892@potion>
+	<38d74124-eb01-c381-8dd9-2a6334c71fa3@redhat.com>
+	<20170102202555.GF2395@potion>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170102201824.GA2892@potion>
+In-Reply-To: <20170102202555.GF2395@potion>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [kvm-unit-tests PATCH 2/2] run_tests: allow run
- tests in parallel
+Subject: Re: [Qemu-devel] [kvm-unit-tests PATCH 0/2] run_tests: support
+ concurrent test execution
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,92 +31,57 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, Andrew Jones <drjones@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org, Andrew Jones <drjones@redhat.com>
 
-On Mon, Jan 02, 2017 at 09:18:24PM +0100, Radim Kr=C4=8Dm=C3=A1=C5=99 wro=
+On Mon, Jan 02, 2017 at 09:25:56PM +0100, Radim Kr=C4=8Dm=C3=A1=C5=99 wro=
 te:
-> 2017-01-01 18:34+0800, Peter Xu:
-> > run_task.sh is getting slow. This patch is trying to make it faster b=
-y
-> > running the tests concurrently.
+> 2017-01-02 18:07+0100, Paolo Bonzini:
+> > On 01/01/2017 11:34, Peter Xu wrote:
+> >> run_tests.sh is getting slower. Maybe it's time to let it run faster=
+.
+> >> An obvious issue is that, we were running the tests sequentially in
+> >> the past.
+> >>=20
+> >> This series provides another new "-j" parameter. "-j 8" means we run
+> >> the tests on 8 task queues. That'll fasten the script a lot. A very
+> >> quick test of mine shows 3x speed boost with 8 task queues.
+> >>=20
+> >> Most of the changes are in scripts/tash.bash of patch 2, which
+> >> implemented the main logic for task managements. Please see commit
+> >> message for more information.
+> >>=20
+> >> I did a quick "make standalone" test to make sure this series won't
+> >> break it. However I am not sure whether it'll break other thing that=
+ I
+> >> don't know...
 > >=20
-> > First of all, we provide a new parameter "-j" for the run_tests.sh,
-> > which can be used to specify how many run queues we want for the test=
-s.
-> > When "-j" is not provided, we'll keep the old behavior.
-> >=20
-> > When the tests are running concurrently, we will use seperate log fil=
-e
-> > for each test case (currently located in logs/ dir, with name
-> > test.TESTNAME.log), to avoid test logs messing up with each other.
-> >=20
-> > A quick test on my laptop (x86 with 4 cores and 2 threads, so 8
-> > processors) shows 3x improvement on overall test time:
-> >=20
-> >    |-----------------+-----------|
-> >    | command         | time used |
-> >    |-----------------+-----------|
-> >    | run_test.sh     | 75s       |
-> >    | run_test.sh -j8 | 27s       |
-> >    |-----------------+-----------|
-> >=20
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> > diff --git a/scripts/functions.bash b/scripts/functions.bash
-> > @@ -1,7 +1,18 @@
-> > +source scripts/global.bash
-> > +source scripts/task.bash
-> > +
-> >  function run_task()
-> >  {
-> > -	RUNTIME_log_file=3D$ut_default_log_file
-> > -	"$@"
-> > +	local testname=3D"$2"
-> > +
-> > +	if ut_in_parallel; then
-> > +		RUNTIME_log_file=3D"${ut_log_dir}/test.${testname}.log"
+> > Would it work if run_tests.sh wrote a Makefile for all the tests (wit=
+h
+> > phony targets only), and then simply ran "make -f Makefile.tmp -jN"?
 >=20
-> No need for the "test." prefix.
+> We would need to change for_each_unittest to print the command line
+> instead of running it and add a executable wrapper for run() from
+> scripts/runtime.bash to have something to pass those arguments to.
+> After that, we could generate a Makefile.
 >=20
-> I would do this change regardless of ut_in_parallel.  Having output of
-> all tests in one file just wasted time when most usecases were to find =
-a
-> specific failed test.
+> I think we can do the queue with ~3 lines of bash and the Makefile woul=
+d
+> complicate it more.
 >=20
-> > +		# run in background
-> > +		task_enqueue "$@"
+> Btw. I just leaned that xargs provides a simpler, but sufficient,
+> queueing functionality, e.g.
 >=20
-> Couldn't the queue be much simpler ...
->=20
-> > +	else
-> > +		RUNTIME_log_file=3D$ut_default_log_file
-> > +		"$@"
-> > +	fi
-> >  }
-> > =20
-> >  function for_each_unittest()
-> > @@ -51,5 +62,10 @@ function for_each_unittest()
-> >  		fi
-> >  	done
->=20
-> ... like this:
->=20
->   while [ "`jobs | wc -l`" -gt $ut_run_queues ]; do
->     wait
+>   echo "echo a\0 (sleep 1; echo b)\0 echo c\0 sleep 1\0 echo d" |
+>     xargs -0 -L 1 -P 2 sh -c
 
-I suppose you mean "wait -n" here? And also a "if" should suffice
-here, though a "while" won't hurt as well.
+Good to know this. :)
 
->   done
->   run_task "$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch=
-" "$check" "$accel" "$timeout" &
+Looks like above example didn't work, I changed it a bit:
 
-I think this might work, however it has assumption that these $cmd
-tasks are the only jobs that is running in the background.
+  echo -e "echo a\0 sleep 1 && echo b\0 echo c\0 sleep 1 && echo d" | xar=
+gs -0 -L 1 -P 2 sh -c
 
-I didn't notice the "-n" parameter for "wait", otherwise I won't
-bother using SIGUSR1 at all. :)
-
-Thanks,
+But I would still prefer not using it - I'll prefer "readability" over
+"less lines of codes" in this case.
 
 -- peterx
