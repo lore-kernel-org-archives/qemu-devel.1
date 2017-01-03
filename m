@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48343)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48377)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cOTpM-0004Nl-7C
+	(envelope-from <berrange@redhat.com>) id 1cOTpP-0004QV-DG
 	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 13:28:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cOTpI-0001Dh-2B
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 13:28:52 -0500
+	(envelope-from <berrange@redhat.com>) id 1cOTpN-0001F1-SJ
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 13:28:55 -0500
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Tue,  3 Jan 2017 18:27:57 +0000
-Message-Id: <20170103182801.9638-12-berrange@redhat.com>
+Date: Tue,  3 Jan 2017 18:28:01 +0000
+Message-Id: <20170103182801.9638-16-berrange@redhat.com>
 In-Reply-To: <20170103182801.9638-1-berrange@redhat.com>
 References: <20170103182801.9638-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 11/15] qcow2: convert QCow2 to use
- QCryptoBlock for encryption
+Subject: [Qemu-devel] [PATCH v1 15/15] block: remove all encryption handling
+ APIs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,1067 +23,308 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, "Daniel P. Berrange" <berrange@redhat.com>
 
-This converts the qcow2 driver to make use of the QCryptoBlock
-APIs for encrypting image content, using the legacyy QCow2 AES
-scheme.
-
-With this change it is now required to use the QCryptoSecret
-object for providing passwords, instead of the current block
-password APIs / interactive prompting.
-
-  $QEMU \
-    -object secret,id=sec0,filename=/home/berrange/encrypted.pw \
-    -drive file=/home/berrange/encrypted.qcow2,aes-key-secret=sec0
+Now that all encryption keys must be provided upfront via
+the QCryptoSecret API and associated block driver properties
+there is no need for any explicit encryption handling APIs
+in the block layer. Encryption can be handled transparently
+within the block driver. We only retain an API for querying
+whether an image is encrypted or not, since that is a
+potentially useful piece of metadata to report to the user.
 
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- block/qcow2-cluster.c      |  47 +----------
- block/qcow2.c              | 190 +++++++++++++++++++++++++++++----------------
- block/qcow2.h              |   5 +-
- qapi/block-core.json       |   7 +-
- tests/qemu-iotests/049     |   2 +-
- tests/qemu-iotests/049.out |   4 +-
- tests/qemu-iotests/082.out |  27 +++++++
- tests/qemu-iotests/087     |  28 ++++++-
- tests/qemu-iotests/087.out |   6 +-
- tests/qemu-iotests/134     |  18 +++--
- tests/qemu-iotests/134.out |  10 +--
- tests/qemu-iotests/158     |  19 +++--
- tests/qemu-iotests/158.out |  14 +---
- 13 files changed, 219 insertions(+), 158 deletions(-)
+ block.c                   | 77 +----------------------------------------------
+ block/crypto.c            |  1 -
+ block/qapi.c              |  2 +-
+ block/qcow.c              |  1 -
+ block/qcow2.c             |  1 -
+ blockdev.c                | 37 ++---------------------
+ include/block/block.h     |  3 --
+ include/block/block_int.h |  1 -
+ include/qapi/error.h      |  1 -
+ qapi/common.json          |  5 +--
+ 10 files changed, 5 insertions(+), 124 deletions(-)
 
-diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-index 907e869..a2103dc 100644
---- a/block/qcow2-cluster.c
-+++ b/block/qcow2-cluster.c
-@@ -345,47 +345,6 @@ static int count_contiguous_clusters_by_type(int nb_clusters,
-     return i;
+diff --git a/block.c b/block.c
+index 39ddea3..27cca49 100644
+--- a/block.c
++++ b/block.c
+@@ -1865,15 +1865,7 @@ static BlockDriverState *bdrv_open_inherit(const char *filename,
+         goto close_and_fail;
+     }
+ 
+-    if (!bdrv_key_required(bs)) {
+-        bdrv_parent_cb_change_media(bs, true);
+-    } else if (!runstate_check(RUN_STATE_PRELAUNCH)
+-               && !runstate_check(RUN_STATE_INMIGRATE)
+-               && !runstate_check(RUN_STATE_PAUSED)) { /* HACK */
+-        error_setg(errp,
+-                   "Guest must be stopped for opening of encrypted image");
+-        goto close_and_fail;
+-    }
++    bdrv_parent_cb_change_media(bs, true);
+ 
+     QDECREF(options);
+ 
+@@ -2354,7 +2346,6 @@ static void bdrv_close(BlockDriverState *bs)
+         bs->backing_format[0] = '\0';
+         bs->total_sectors = 0;
+         bs->encrypted = false;
+-        bs->valid_key = false;
+         bs->sg = false;
+         QDECREF(bs->options);
+         QDECREF(bs->explicit_options);
+@@ -2723,72 +2714,6 @@ bool bdrv_is_encrypted(BlockDriverState *bs)
+     return bs->encrypted;
  }
  
--/* The crypt function is compatible with the linux cryptoloop
--   algorithm for < 4 GB images. */
--int qcow2_encrypt_sectors(BDRVQcow2State *s, int64_t sector_num,
--                          uint8_t *buf, int nb_sectors, bool enc,
--                          Error **errp)
+-bool bdrv_key_required(BlockDriverState *bs)
 -{
--    union {
--        uint64_t ll[2];
--        uint8_t b[16];
--    } ivec;
--    int i;
--    int ret;
+-    BdrvChild *backing = bs->backing;
 -
--    for(i = 0; i < nb_sectors; i++) {
--        ivec.ll[0] = cpu_to_le64(sector_num);
--        ivec.ll[1] = 0;
--        if (qcrypto_cipher_setiv(s->cipher,
--                                 ivec.b, G_N_ELEMENTS(ivec.b),
--                                 errp) < 0) {
--            return -1;
--        }
--        if (enc) {
--            ret = qcrypto_cipher_encrypt(s->cipher,
--                                         buf, buf,
--                                         512,
--                                         errp);
--        } else {
--            ret = qcrypto_cipher_decrypt(s->cipher,
--                                         buf, buf,
--                                         512,
--                                         errp);
--        }
--        if (ret < 0) {
--            return -1;
--        }
--        sector_num++;
--        buf += 512;
+-    if (backing && backing->bs->encrypted && !backing->bs->valid_key) {
+-        return true;
 -    }
--    return 0;
+-    return (bs->encrypted && !bs->valid_key);
 -}
 -
- static int coroutine_fn do_perform_cow(BlockDriverState *bs,
-                                        uint64_t src_cluster_offset,
-                                        uint64_t cluster_offset,
-@@ -426,11 +385,11 @@ static int coroutine_fn do_perform_cow(BlockDriverState *bs,
-         Error *err = NULL;
-         int64_t sector = (src_cluster_offset + offset_in_cluster)
-                          >> BDRV_SECTOR_BITS;
--        assert(s->cipher);
-         assert((offset_in_cluster & ~BDRV_SECTOR_MASK) == 0);
-         assert((bytes & ~BDRV_SECTOR_MASK) == 0);
--        if (qcow2_encrypt_sectors(s, sector, iov.iov_base,
--                                  bytes >> BDRV_SECTOR_BITS, true, &err) < 0) {
-+        assert(s->crypto);
-+        if (qcrypto_block_encrypt(s->crypto, sector, iov.iov_base,
-+                                  bytes, &err) < 0) {
-             ret = -EIO;
-             error_free(err);
-             goto out;
+-int bdrv_set_key(BlockDriverState *bs, const char *key)
+-{
+-    int ret;
+-    if (bs->backing && bs->backing->bs->encrypted) {
+-        ret = bdrv_set_key(bs->backing->bs, key);
+-        if (ret < 0)
+-            return ret;
+-        if (!bs->encrypted)
+-            return 0;
+-    }
+-    if (!bs->encrypted) {
+-        return -EINVAL;
+-    } else if (!bs->drv || !bs->drv->bdrv_set_key) {
+-        return -ENOMEDIUM;
+-    }
+-    ret = bs->drv->bdrv_set_key(bs, key);
+-    if (ret < 0) {
+-        bs->valid_key = false;
+-    } else if (!bs->valid_key) {
+-        /* call the change callback now, we skipped it on open */
+-        bs->valid_key = true;
+-        bdrv_parent_cb_change_media(bs, true);
+-    }
+-    return ret;
+-}
+-
+-/*
+- * Provide an encryption key for @bs.
+- * If @key is non-null:
+- *     If @bs is not encrypted, fail.
+- *     Else if the key is invalid, fail.
+- *     Else set @bs's key to @key, replacing the existing key, if any.
+- * If @key is null:
+- *     If @bs is encrypted and still lacks a key, fail.
+- *     Else do nothing.
+- * On failure, store an error object through @errp if non-null.
+- */
+-void bdrv_add_key(BlockDriverState *bs, const char *key, Error **errp)
+-{
+-    if (key) {
+-        if (!bdrv_is_encrypted(bs)) {
+-            error_setg(errp, "Node '%s' is not encrypted",
+-                      bdrv_get_device_or_node_name(bs));
+-        } else if (bdrv_set_key(bs, key) < 0) {
+-            error_setg(errp, QERR_INVALID_PASSWORD);
+-        }
+-    } else {
+-        if (bdrv_key_required(bs)) {
+-            error_set(errp, ERROR_CLASS_DEVICE_ENCRYPTED,
+-                      "'%s' (%s) is encrypted",
+-                      bdrv_get_device_or_node_name(bs),
+-                      bdrv_get_encrypted_filename(bs));
+-        }
+-    }
+-}
+-
+ const char *bdrv_get_format_name(BlockDriverState *bs)
+ {
+     return bs->drv ? bs->drv->format_name : NULL;
+diff --git a/block/crypto.c b/block/crypto.c
+index 915ba70..2c4279c 100644
+--- a/block/crypto.c
++++ b/block/crypto.c
+@@ -380,7 +380,6 @@ static int block_crypto_open_generic(QCryptoBlockFormat format,
+     }
+ 
+     bs->encrypted = true;
+-    bs->valid_key = true;
+ 
+     ret = 0;
+  cleanup:
+diff --git a/block/qapi.c b/block/qapi.c
+index a62e862..68cab56 100644
+--- a/block/qapi.c
++++ b/block/qapi.c
+@@ -45,7 +45,7 @@ BlockDeviceInfo *bdrv_block_device_info(BlockBackend *blk,
+     info->ro                     = bs->read_only;
+     info->drv                    = g_strdup(bs->drv->format_name);
+     info->encrypted              = bs->encrypted;
+-    info->encryption_key_missing = bdrv_key_required(bs);
++    info->encryption_key_missing = false;
+ 
+     info->cache = g_new(BlockdevCacheInfo, 1);
+     *info->cache = (BlockdevCacheInfo) {
+diff --git a/block/qcow.c b/block/qcow.c
+index 6232ad8..397ab85 100644
+--- a/block/qcow.c
++++ b/block/qcow.c
+@@ -209,7 +209,6 @@ static int qcow_open(BlockDriverState *bs, QDict *options, int flags,
+             goto fail;
+         }
+         bs->encrypted = true;
+-        bs->valid_key = true;
+     }
+     s->cluster_bits = header.cluster_bits;
+     s->cluster_size = 1 << s->cluster_bits;
 diff --git a/block/qcow2.c b/block/qcow2.c
-index 3c14c86..5c9e196 100644
+index b354914..25442f4 100644
 --- a/block/qcow2.c
 +++ b/block/qcow2.c
-@@ -37,6 +37,9 @@
- #include "qemu/option_int.h"
- #include "qemu/cutils.h"
- #include "qemu/bswap.h"
-+#include "qapi/opts-visitor.h"
-+#include "qapi-visit.h"
-+#include "block/crypto.h"
- 
- /*
-   Differences with QCOW:
-@@ -461,6 +464,7 @@ static QemuOptsList qcow2_runtime_opts = {
-             .type = QEMU_OPT_NUMBER,
-             .help = "Clean unused cache entries after this time (in seconds)",
-         },
-+        BLOCK_CRYPTO_OPT_DEF_QCOW_KEY_SECRET("aes-"),
-         { /* end of list */ }
-     },
- };
-@@ -578,6 +582,7 @@ static void read_cache_sizes(BlockDriverState *bs, QemuOpts *opts,
-     }
- }
- 
-+
- typedef struct Qcow2ReopenState {
-     Qcow2Cache *l2_table_cache;
-     Qcow2Cache *refcount_block_cache;
-@@ -585,6 +590,7 @@ typedef struct Qcow2ReopenState {
-     int overlap_check;
-     bool discard_passthrough[QCOW2_DISCARD_MAX];
-     uint64_t cache_clean_interval;
-+    QCryptoBlockOpenOptions *crypto_opts; /* Disk encryption runtime options */
- } Qcow2ReopenState;
- 
- static int qcow2_update_options_prepare(BlockDriverState *bs,
-@@ -751,6 +757,23 @@ static int qcow2_update_options_prepare(BlockDriverState *bs,
-     r->discard_passthrough[QCOW2_DISCARD_OTHER] =
-         qemu_opt_get_bool(opts, QCOW2_OPT_DISCARD_OTHER, false);
- 
-+    switch (s->crypt_method_header) {
-+    case QCOW_CRYPT_NONE:
-+        break;
-+
-+    case QCOW_CRYPT_AES:
-+        r->crypto_opts = block_crypto_open_opts_init(
-+            Q_CRYPTO_BLOCK_FORMAT_QCOW, opts, "aes-", errp);
-+        break;
-+
-+    default:
-+        g_assert_not_reached();
-+    }
-+    if (s->crypt_method_header && !r->crypto_opts) {
-+        ret = -EINVAL;
-+        goto fail;
-+    }
-+
-     ret = 0;
- fail:
-     qemu_opts_del(opts);
-@@ -785,6 +808,9 @@ static void qcow2_update_options_commit(BlockDriverState *bs,
-         s->cache_clean_interval = r->cache_clean_interval;
-         cache_clean_timer_init(bs, bdrv_get_aio_context(bs));
-     }
-+
-+    qapi_free_QCryptoBlockOpenOptions(s->crypto_opts);
-+    s->crypto_opts = r->crypto_opts;
- }
- 
- static void qcow2_update_options_abort(BlockDriverState *bs,
-@@ -796,6 +822,7 @@ static void qcow2_update_options_abort(BlockDriverState *bs,
-     if (r->refcount_block_cache) {
-         qcow2_cache_destroy(bs, r->refcount_block_cache);
-     }
-+    qapi_free_QCryptoBlockOpenOptions(r->crypto_opts);
- }
- 
- static int qcow2_update_options(BlockDriverState *bs, QDict *options,
-@@ -967,12 +994,6 @@ static int qcow2_open(BlockDriverState *bs, QDict *options, int flags,
-         ret = -EINVAL;
-         goto fail;
-     }
--    if (!qcrypto_cipher_supports(QCRYPTO_CIPHER_ALG_AES_128,
--                                 QCRYPTO_CIPHER_MODE_CBC)) {
--        error_setg(errp, "AES cipher not available");
--        ret = -EINVAL;
--        goto fail;
--    }
-     s->crypt_method_header = header.crypt_method;
-     if (s->crypt_method_header) {
-         if (bdrv_uses_whitelist() &&
-@@ -990,6 +1011,7 @@ static int qcow2_open(BlockDriverState *bs, QDict *options, int flags,
+@@ -1118,7 +1118,6 @@ static int qcow2_open(BlockDriverState *bs, QDict *options, int flags,
          }
  
          bs->encrypted = true;
-+        bs->valid_key = true;
+-        bs->valid_key = true;
      }
  
      s->l2_bits = s->cluster_bits - 3; /* L2 is always one cluster */
-@@ -1122,6 +1144,24 @@ static int qcow2_open(BlockDriverState *bs, QDict *options, int flags,
+diff --git a/blockdev.c b/blockdev.c
+index 245e1e1..dfeba0c 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -587,10 +587,6 @@ static BlockBackend *blockdev_init(const char *file, QDict *bs_opts,
+ 
+         bs->detect_zeroes = detect_zeroes;
+ 
+-        if (bdrv_key_required(bs)) {
+-            autostart = 0;
+-        }
+-
+         block_acct_init(blk_get_stats(blk), account_invalid, account_failed);
+ 
+         if (!parse_stats_intervals(blk_get_stats(blk), interval_list, errp)) {
+@@ -2244,24 +2240,8 @@ void qmp_block_passwd(bool has_device, const char *device,
+                       bool has_node_name, const char *node_name,
+                       const char *password, Error **errp)
+ {
+-    Error *local_err = NULL;
+-    BlockDriverState *bs;
+-    AioContext *aio_context;
+-
+-    bs = bdrv_lookup_bs(has_device ? device : NULL,
+-                        has_node_name ? node_name : NULL,
+-                        &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
+-        return;
+-    }
+-
+-    aio_context = bdrv_get_aio_context(bs);
+-    aio_context_acquire(aio_context);
+-
+-    bdrv_add_key(bs, password, errp);
+-
+-    aio_context_release(aio_context);
++    error_setg_errno(errp, -ENOSYS,
++                     "Setting block passwords directly is no longer supported");
+ }
+ 
+ /*
+@@ -2556,12 +2536,6 @@ void qmp_blockdev_change_medium(bool has_device, const char *device,
          goto fail;
      }
  
-+    if (s->crypt_method_header == QCOW_CRYPT_AES) {
-+        unsigned int cflags = 0;
-+        if (flags & BDRV_O_NO_IO) {
-+            cflags |= QCRYPTO_BLOCK_OPEN_NO_IO;
-+        }
-+        /* XXX how do we pass the same crypto opts down to the
-+         * backing file by default, so we don't have to manually
-+         * provide the same key-secret property against the full
-+         * backing chain
-+         */
-+        s->crypto = qcrypto_block_open(s->crypto_opts, NULL, NULL,
-+                                       cflags, errp);
-+        if (!s->crypto) {
-+            ret = -EINVAL;
-+            goto fail;
-+        }
-+    }
-+
-     /* read the backing file name */
-     if (header.backing_file_offset != 0) {
-         len = header.backing_file_size;
-@@ -1217,41 +1257,6 @@ static void qcow2_refresh_limits(BlockDriverState *bs, Error **errp)
-     bs->bl.pdiscard_alignment = s->cluster_size;
- }
- 
--static int qcow2_set_key(BlockDriverState *bs, const char *key)
--{
--    BDRVQcow2State *s = bs->opaque;
--    uint8_t keybuf[16];
--    int len, i;
--    Error *err = NULL;
--
--    memset(keybuf, 0, 16);
--    len = strlen(key);
--    if (len > 16)
--        len = 16;
--    /* XXX: we could compress the chars to 7 bits to increase
--       entropy */
--    for(i = 0;i < len;i++) {
--        keybuf[i] = key[i];
+-    bdrv_add_key(medium_bs, NULL, &err);
+-    if (err) {
+-        error_propagate(errp, err);
+-        goto fail;
 -    }
--    assert(bs->encrypted);
 -
--    qcrypto_cipher_free(s->cipher);
--    s->cipher = qcrypto_cipher_new(
--        QCRYPTO_CIPHER_ALG_AES_128,
--        QCRYPTO_CIPHER_MODE_CBC,
--        keybuf, G_N_ELEMENTS(keybuf),
--        &err);
--
--    if (!s->cipher) {
--        /* XXX would be nice if errors in this method could
--         * be properly propagate to the caller. Would need
--         * the bdrv_set_key() API signature to be fixed. */
--        error_free(err);
--        return -1;
+     rc = do_open_tray(has_device ? device : NULL,
+                       has_id ? id : NULL,
+                       false, &err);
+@@ -3832,13 +3806,6 @@ void qmp_blockdev_add(BlockdevOptions *options, Error **errp)
+ 
+     QTAILQ_INSERT_TAIL(&monitor_bdrv_states, bs, monitor_list);
+ 
+-    if (bs && bdrv_key_required(bs)) {
+-        QTAILQ_REMOVE(&monitor_bdrv_states, bs, monitor_list);
+-        bdrv_unref(bs);
+-        error_setg(errp, "blockdev-add doesn't support encrypted devices");
+-        goto fail;
 -    }
--    return 0;
--}
 -
- static int qcow2_reopen_prepare(BDRVReopenState *state,
-                                 BlockReopenQueue *queue, Error **errp)
- {
-@@ -1367,7 +1372,7 @@ static int64_t coroutine_fn qcow2_co_get_block_status(BlockDriverState *bs,
-     *pnum = bytes >> BDRV_SECTOR_BITS;
- 
-     if (cluster_offset != 0 && ret != QCOW2_CLUSTER_COMPRESSED &&
--        !s->cipher) {
-+        !s->crypto) {
-         index_in_cluster = sector_num & (s->cluster_sectors - 1);
-         cluster_offset |= (index_in_cluster << BDRV_SECTOR_BITS);
-         *file = bs->file->bs;
-@@ -1424,7 +1429,7 @@ static coroutine_fn int qcow2_co_preadv(BlockDriverState *bs, uint64_t offset,
- 
-         /* prepare next request */
-         cur_bytes = MIN(bytes, INT_MAX);
--        if (s->cipher) {
-+        if (s->crypto) {
-             cur_bytes = MIN(cur_bytes,
-                             QCOW_MAX_CRYPT_CLUSTERS * s->cluster_size);
-         }
-@@ -1493,7 +1498,7 @@ static coroutine_fn int qcow2_co_preadv(BlockDriverState *bs, uint64_t offset,
-             }
- 
-             if (bs->encrypted) {
--                assert(s->cipher);
-+                assert(s->crypto);
- 
-                 /*
-                  * For encrypted images, read everything into a temporary
-@@ -1525,14 +1530,15 @@ static coroutine_fn int qcow2_co_preadv(BlockDriverState *bs, uint64_t offset,
-                 goto fail;
-             }
-             if (bs->encrypted) {
--                assert(s->cipher);
-+                assert(s->crypto);
-                 assert((offset & (BDRV_SECTOR_SIZE - 1)) == 0);
-                 assert((cur_bytes & (BDRV_SECTOR_SIZE - 1)) == 0);
-                 Error *err = NULL;
--                if (qcow2_encrypt_sectors(s, offset >> BDRV_SECTOR_BITS,
-+                if (qcrypto_block_decrypt(s->crypto,
-+                                          offset >> BDRV_SECTOR_BITS,
-                                           cluster_data,
--                                          cur_bytes >> BDRV_SECTOR_BITS,
--                                          false, &err) < 0) {
-+                                          cur_bytes,
-+                                          &err) < 0) {
-                     error_free(err);
-                     ret = -EIO;
-                     goto fail;
-@@ -1610,7 +1616,7 @@ static coroutine_fn int qcow2_co_pwritev(BlockDriverState *bs, uint64_t offset,
- 
-         if (bs->encrypted) {
-             Error *err = NULL;
--            assert(s->cipher);
-+            assert(s->crypto);
-             if (!cluster_data) {
-                 cluster_data = qemu_try_blockalign(bs->file->bs,
-                                                    QCOW_MAX_CRYPT_CLUSTERS
-@@ -1625,10 +1631,9 @@ static coroutine_fn int qcow2_co_pwritev(BlockDriverState *bs, uint64_t offset,
-                    QCOW_MAX_CRYPT_CLUSTERS * s->cluster_size);
-             qemu_iovec_to_buf(&hd_qiov, 0, cluster_data, hd_qiov.size);
- 
--            if (qcow2_encrypt_sectors(s, offset >> BDRV_SECTOR_BITS,
-+            if (qcrypto_block_encrypt(s->crypto, offset >> BDRV_SECTOR_BITS,
-                                       cluster_data,
--                                      cur_bytes >>BDRV_SECTOR_BITS,
--                                      true, &err) < 0) {
-+                                      cur_bytes, &err) < 0) {
-                 error_free(err);
-                 ret = -EIO;
-                 goto fail;
-@@ -1747,8 +1752,8 @@ static void qcow2_close(BlockDriverState *bs)
-     qcow2_cache_destroy(bs, s->l2_table_cache);
-     qcow2_cache_destroy(bs, s->refcount_block_cache);
- 
--    qcrypto_cipher_free(s->cipher);
--    s->cipher = NULL;
-+    qcrypto_block_free(s->crypto);
-+    s->crypto = NULL;
- 
-     g_free(s->unknown_header_fields);
-     cleanup_unknown_header_ext(bs);
-@@ -1766,7 +1771,7 @@ static void qcow2_invalidate_cache(BlockDriverState *bs, Error **errp)
- {
-     BDRVQcow2State *s = bs->opaque;
-     int flags = s->flags;
--    QCryptoCipher *cipher = NULL;
-+    QCryptoBlock *crypto = NULL;
-     QDict *options;
-     Error *local_err = NULL;
-     int ret;
-@@ -1776,8 +1781,8 @@ static void qcow2_invalidate_cache(BlockDriverState *bs, Error **errp)
-      * that means we don't have to worry about reopening them here.
-      */
- 
--    cipher = s->cipher;
--    s->cipher = NULL;
-+    crypto = s->crypto;
-+    s->crypto = NULL;
- 
-     qcow2_close(bs);
- 
-@@ -1798,7 +1803,7 @@ static void qcow2_invalidate_cache(BlockDriverState *bs, Error **errp)
-         return;
-     }
- 
--    s->cipher = cipher;
-+    s->crypto = crypto;
+ fail:
+     visit_free(v);
  }
+diff --git a/include/block/block.h b/include/block/block.h
+index 49bb0b2..c56be99 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -412,9 +412,6 @@ BlockDriverState *bdrv_next(BdrvNextIterator *it);
  
- static size_t header_ext_add(char *buf, uint32_t magic, const void *s,
-@@ -2022,6 +2027,44 @@ static int qcow2_change_backing_file(BlockDriverState *bs,
-     return qcow2_update_header(bs);
- }
+ BlockDriverState *bdrv_next_monitor_owned(BlockDriverState *bs);
+ bool bdrv_is_encrypted(BlockDriverState *bs);
+-bool bdrv_key_required(BlockDriverState *bs);
+-int bdrv_set_key(BlockDriverState *bs, const char *key);
+-void bdrv_add_key(BlockDriverState *bs, const char *key, Error **errp);
+ void bdrv_iterate_format(void (*it)(void *opaque, const char *name),
+                          void *opaque);
+ const char *bdrv_get_node_name(const BlockDriverState *bs);
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 83a423c..75717b1 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -435,7 +435,6 @@ struct BlockDriverState {
+     int open_flags; /* flags used to open the file, re-used for re-open */
+     bool read_only; /* if true, the media is read only */
+     bool encrypted; /* if true, the media is encrypted */
+-    bool valid_key; /* if true, a valid encryption key has been set */
+     bool sg;        /* if true, the device is a /dev/sg* */
+     bool probed;    /* if true, format was probed rather than specified */
  
-+
-+static int qcow2_change_encryption(BlockDriverState *bs, QemuOpts *opts,
-+                                   Error **errp)
-+{
-+    BDRVQcow2State *s = bs->opaque;
-+    QCryptoBlockCreateOptions *cryptoopts = NULL;
-+    QCryptoBlock *crypto = NULL;
-+    int ret = -EINVAL;
-+
-+    cryptoopts = block_crypto_create_opts_init(
-+        Q_CRYPTO_BLOCK_FORMAT_QCOW, opts, "aes-", errp);
-+    if (!cryptoopts) {
-+        ret = -EINVAL;
-+        goto out;
-+    }
-+    s->crypt_method_header = QCOW_CRYPT_AES;
-+
-+    crypto = qcrypto_block_create(cryptoopts,
-+                                  NULL, NULL,
-+                                  bs, errp);
-+    if (!crypto) {
-+        ret = -EINVAL;
-+        goto out;
-+    }
-+
-+    ret = qcow2_update_header(bs);
-+    if (ret < 0) {
-+        error_setg_errno(errp, -ret, "Could not write encryption header");
-+        goto out;
-+    }
-+
-+ out:
-+    qcrypto_block_free(crypto);
-+    qapi_free_QCryptoBlockCreateOptions(cryptoopts);
-+    return ret;
-+}
-+
-+
- static int preallocate(BlockDriverState *bs)
- {
-     uint64_t bytes;
-@@ -2214,11 +2257,8 @@ static int qcow2_create2(const char *filename, int64_t total_size,
-         .header_length              = cpu_to_be32(sizeof(*header)),
-     };
- 
--    if (flags & BLOCK_FLAG_ENCRYPT) {
--        header->crypt_method = cpu_to_be32(QCOW_CRYPT_AES);
--    } else {
--        header->crypt_method = cpu_to_be32(QCOW_CRYPT_NONE);
--    }
-+    /* We'll update this to correct value later */
-+    header->crypt_method = cpu_to_be32(QCOW_CRYPT_NONE);
- 
-     if (flags & BLOCK_FLAG_LAZY_REFCOUNTS) {
-         header->compatible_features |=
-@@ -2296,6 +2336,14 @@ static int qcow2_create2(const char *filename, int64_t total_size,
-         }
-     }
- 
-+    /* Want encryption? There you go. */
-+    if (flags & BLOCK_FLAG_ENCRYPT) {
-+        ret = qcow2_change_encryption(blk_bs(blk), opts, errp);
-+        if (ret < 0) {
-+            goto out;
-+        }
-+    }
-+
-     /* And if we're supposed to preallocate metadata, do that now */
-     if (prealloc != PREALLOC_MODE_OFF) {
-         BDRVQcow2State *s = blk_bs(blk)->opaque;
-@@ -2311,11 +2359,17 @@ static int qcow2_create2(const char *filename, int64_t total_size,
-     blk_unref(blk);
-     blk = NULL;
- 
--    /* Reopen the image without BDRV_O_NO_FLUSH to flush it before returning */
-+    /* Reopen the image without BDRV_O_NO_FLUSH to flush it before returning.
-+     * Using BDRV_O_NO_IO, since encryption is now setup we don't want to
-+     * have to setup decryption context. We're not doing any I/O on the top
-+     * level BlockDriverState, only lower layers, where BDRV_O_NO_IO does
-+     * not have effect.
-+     */
-     options = qdict_new();
-     qdict_put(options, "driver", qstring_from_str("qcow2"));
-     blk = blk_new_open(filename, NULL, options,
--                       BDRV_O_RDWR | BDRV_O_NO_BACKING, &local_err);
-+                       BDRV_O_RDWR | BDRV_O_NO_BACKING | BDRV_O_NO_IO,
-+                       &local_err);
-     if (blk == NULL) {
-         error_propagate(errp, local_err);
-         ret = -EIO;
-@@ -3134,9 +3188,9 @@ static int qcow2_amend_options(BlockDriverState *bs, QemuOpts *opts,
-             backing_format = qemu_opt_get(opts, BLOCK_OPT_BACKING_FMT);
-         } else if (!strcmp(desc->name, BLOCK_OPT_ENCRYPT)) {
-             encrypt = qemu_opt_get_bool(opts, BLOCK_OPT_ENCRYPT,
--                                        !!s->cipher);
-+                                        !!s->crypto);
- 
--            if (encrypt != !!s->cipher) {
-+            if (encrypt != !!s->crypto) {
-                 error_report("Changing the encryption flag is not supported");
-                 return -ENOTSUP;
-             }
-@@ -3372,6 +3426,7 @@ static QemuOptsList qcow2_create_opts = {
-             .help = "Width of a reference count entry in bits",
-             .def_value_str = "16"
-         },
-+        BLOCK_CRYPTO_OPT_DEF_QCOW_KEY_SECRET("aes-"),
-         { /* end of list */ }
-     }
- };
-@@ -3389,7 +3444,6 @@ BlockDriver bdrv_qcow2 = {
-     .bdrv_create        = qcow2_create,
-     .bdrv_has_zero_init = bdrv_has_zero_init_1,
-     .bdrv_co_get_block_status = qcow2_co_get_block_status,
--    .bdrv_set_key       = qcow2_set_key,
- 
-     .bdrv_co_preadv         = qcow2_co_preadv,
-     .bdrv_co_pwritev        = qcow2_co_pwritev,
-diff --git a/block/qcow2.h b/block/qcow2.h
-index 033d8c0..f4cb171 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -25,7 +25,7 @@
- #ifndef BLOCK_QCOW2_H
- #define BLOCK_QCOW2_H
- 
--#include "crypto/cipher.h"
-+#include "crypto/block.h"
- #include "qemu/coroutine.h"
- 
- //#define DEBUG_ALLOC
-@@ -256,7 +256,8 @@ typedef struct BDRVQcow2State {
- 
-     CoMutex lock;
- 
--    QCryptoCipher *cipher; /* current cipher, NULL if no key yet */
-+    QCryptoBlockOpenOptions *crypto_opts; /* Disk encryption runtime options */
-+    QCryptoBlock *crypto; /* Disk encryption format driver */
-     uint32_t crypt_method_header;
-     uint64_t snapshots_offset;
-     int snapshots_size;
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index c2b70e8..2ca5674 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -1935,6 +1935,9 @@
- # @cache-clean-interval:  #optional clean unused entries in the L2 and refcount
- #                         caches. The interval is in seconds. The default value
- #                         is 0 and it disables this feature (since 2.5)
-+# @aes-key-secret:        #optional the ID of a QCryptoSecret object providing
-+#                         the AES decryption key (since 2.9) Mandatory except
-+#                         when doing a metadata-only probe of the image.
+diff --git a/include/qapi/error.h b/include/qapi/error.h
+index 0576659..a083d95 100644
+--- a/include/qapi/error.h
++++ b/include/qapi/error.h
+@@ -125,7 +125,6 @@
+ typedef enum ErrorClass {
+     ERROR_CLASS_GENERIC_ERROR = QAPI_ERROR_CLASS_GENERICERROR,
+     ERROR_CLASS_COMMAND_NOT_FOUND = QAPI_ERROR_CLASS_COMMANDNOTFOUND,
+-    ERROR_CLASS_DEVICE_ENCRYPTED = QAPI_ERROR_CLASS_DEVICEENCRYPTED,
+     ERROR_CLASS_DEVICE_NOT_ACTIVE = QAPI_ERROR_CLASS_DEVICENOTACTIVE,
+     ERROR_CLASS_DEVICE_NOT_FOUND = QAPI_ERROR_CLASS_DEVICENOTFOUND,
+     ERROR_CLASS_KVM_MISSING_CAP = QAPI_ERROR_CLASS_KVMMISSINGCAP,
+diff --git a/qapi/common.json b/qapi/common.json
+index 624a861..d4b5fb1 100644
+--- a/qapi/common.json
++++ b/qapi/common.json
+@@ -12,9 +12,6 @@
  #
- # Since: 1.7
+ # @CommandNotFound: the requested command has not been found
+ #
+-# @DeviceEncrypted: the requested operation can't be fulfilled because the
+-#                   selected device is encrypted
+-#
+ # @DeviceNotActive: a device has failed to be become active
+ #
+ # @DeviceNotFound: the requested device has not been found
+@@ -26,7 +23,7 @@
  ##
-@@ -1948,8 +1951,8 @@
-             '*cache-size': 'int',
-             '*l2-cache-size': 'int',
-             '*refcount-cache-size': 'int',
--            '*cache-clean-interval': 'int' } }
--
-+            '*cache-clean-interval': 'int',
-+            '*aes-key-secret': 'str' } }
+ { 'enum': 'QapiErrorClass',
+   # Keep this in sync with ErrorClass in error.h
+-  'data': [ 'GenericError', 'CommandNotFound', 'DeviceEncrypted',
++  'data': [ 'GenericError', 'CommandNotFound',
+             'DeviceNotActive', 'DeviceNotFound', 'KVMMissingCap' ] }
  
  ##
- # @BlockdevOptionsArchipelago:
-diff --git a/tests/qemu-iotests/049 b/tests/qemu-iotests/049
-index fff0760..7da4ac8 100755
---- a/tests/qemu-iotests/049
-+++ b/tests/qemu-iotests/049
-@@ -106,7 +106,7 @@ test_qemu_img create -f $IMGFMT -o preallocation=1234 "$TEST_IMG" 64M
- echo "== Check encryption option =="
- echo
- test_qemu_img create -f $IMGFMT -o encryption=off "$TEST_IMG" 64M
--test_qemu_img create -f $IMGFMT -o encryption=on "$TEST_IMG" 64M
-+test_qemu_img create -f $IMGFMT --object secret,id=sec0,data=123456 -o encryption=on,qcow-key-secret=sec0 "$TEST_IMG" 64M
- 
- echo "== Check lazy_refcounts option (only with v3) =="
- echo
-diff --git a/tests/qemu-iotests/049.out b/tests/qemu-iotests/049.out
-index 4673b67..2615200 100644
---- a/tests/qemu-iotests/049.out
-+++ b/tests/qemu-iotests/049.out
-@@ -186,8 +186,8 @@ Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 encryption=off cluster_si
- qemu-img create -f qcow2 -o encryption=off TEST_DIR/t.qcow2 64M
- Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
- 
--qemu-img create -f qcow2 -o encryption=on TEST_DIR/t.qcow2 64M
--Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 encryption=on cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+qemu-img create -f qcow2 --object secret,id=sec0,data=123456 -o encryption=on,aes-key-secret=sec0 TEST_DIR/t.qcow2 64M
-+Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 encryption=on cluster_size=65536 lazy_refcounts=off refcount_bits=16 aes-key-secret=sec0
- 
- == Check lazy_refcounts option (only with v3) ==
- 
-diff --git a/tests/qemu-iotests/082.out b/tests/qemu-iotests/082.out
-index a952330..f8dee34 100644
---- a/tests/qemu-iotests/082.out
-+++ b/tests/qemu-iotests/082.out
-@@ -53,6 +53,7 @@ cluster_size     qcow2 cluster size
- preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
- lazy_refcounts   Postpone refcount updates
- refcount_bits    Width of a reference count entry in bits
-+aes-key-secret   ID of the secret that provides the AES encryption key
- nocow            Turn off copy-on-write (valid only on btrfs)
- 
- Testing: create -f qcow2 -o ? TEST_DIR/t.qcow2 128M
-@@ -66,6 +67,7 @@ cluster_size     qcow2 cluster size
- preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
- lazy_refcounts   Postpone refcount updates
- refcount_bits    Width of a reference count entry in bits
-+aes-key-secret   ID of the secret that provides the AES encryption key
- nocow            Turn off copy-on-write (valid only on btrfs)
- 
- Testing: create -f qcow2 -o cluster_size=4k,help TEST_DIR/t.qcow2 128M
-@@ -79,6 +81,7 @@ cluster_size     qcow2 cluster size
- preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
- lazy_refcounts   Postpone refcount updates
- refcount_bits    Width of a reference count entry in bits
-+aes-key-secret   ID of the secret that provides the AES encryption key
- nocow            Turn off copy-on-write (valid only on btrfs)
- 
- Testing: create -f qcow2 -o cluster_size=4k,? TEST_DIR/t.qcow2 128M
-@@ -92,6 +95,7 @@ cluster_size     qcow2 cluster size
- preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
- lazy_refcounts   Postpone refcount updates
- refcount_bits    Width of a reference count entry in bits
-+aes-key-secret   ID of the secret that provides the AES encryption key
- nocow            Turn off copy-on-write (valid only on btrfs)
- 
- Testing: create -f qcow2 -o help,cluster_size=4k TEST_DIR/t.qcow2 128M
-@@ -105,6 +109,7 @@ cluster_size     qcow2 cluster size
- preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
- lazy_refcounts   Postpone refcount updates
- refcount_bits    Width of a reference count entry in bits
-+aes-key-secret   ID of the secret that provides the AES encryption key
- nocow            Turn off copy-on-write (valid only on btrfs)
- 
- Testing: create -f qcow2 -o ?,cluster_size=4k TEST_DIR/t.qcow2 128M
-@@ -118,6 +123,7 @@ cluster_size     qcow2 cluster size
- preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
- lazy_refcounts   Postpone refcount updates
- refcount_bits    Width of a reference count entry in bits
-+aes-key-secret   ID of the secret that provides the AES encryption key
- nocow            Turn off copy-on-write (valid only on btrfs)
- 
- Testing: create -f qcow2 -o cluster_size=4k -o help TEST_DIR/t.qcow2 128M
-@@ -131,6 +137,7 @@ cluster_size     qcow2 cluster size
- preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
- lazy_refcounts   Postpone refcount updates
- refcount_bits    Width of a reference count entry in bits
-+aes-key-secret   ID of the secret that provides the AES encryption key
- nocow            Turn off copy-on-write (valid only on btrfs)
- 
- Testing: create -f qcow2 -o cluster_size=4k -o ? TEST_DIR/t.qcow2 128M
-@@ -144,6 +151,7 @@ cluster_size     qcow2 cluster size
- preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
- lazy_refcounts   Postpone refcount updates
- refcount_bits    Width of a reference count entry in bits
-+aes-key-secret   ID of the secret that provides the AES encryption key
- nocow            Turn off copy-on-write (valid only on btrfs)
- 
- Testing: create -f qcow2 -o backing_file=TEST_DIR/t.qcow2,,help TEST_DIR/t.qcow2 128M
-@@ -172,6 +180,7 @@ cluster_size     qcow2 cluster size
- preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
- lazy_refcounts   Postpone refcount updates
- refcount_bits    Width of a reference count entry in bits
-+aes-key-secret   ID of the secret that provides the AES encryption key
- 
- Testing: create -o help
- Supported options:
-@@ -234,6 +243,7 @@ cluster_size     qcow2 cluster size
- preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
- lazy_refcounts   Postpone refcount updates
- refcount_bits    Width of a reference count entry in bits
-+aes-key-secret   ID of the secret that provides the AES encryption key
- nocow            Turn off copy-on-write (valid only on btrfs)
- 
- Testing: convert -O qcow2 -o ? TEST_DIR/t.qcow2 TEST_DIR/t.qcow2.base
-@@ -247,6 +257,7 @@ cluster_size     qcow2 cluster size
- preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
- lazy_refcounts   Postpone refcount updates
- refcount_bits    Width of a reference count entry in bits
-+aes-key-secret   ID of the secret that provides the AES encryption key
- nocow            Turn off copy-on-write (valid only on btrfs)
- 
- Testing: convert -O qcow2 -o cluster_size=4k,help TEST_DIR/t.qcow2 TEST_DIR/t.qcow2.base
-@@ -260,6 +271,7 @@ cluster_size     qcow2 cluster size
- preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
- lazy_refcounts   Postpone refcount updates
- refcount_bits    Width of a reference count entry in bits
-+aes-key-secret   ID of the secret that provides the AES encryption key
- nocow            Turn off copy-on-write (valid only on btrfs)
- 
- Testing: convert -O qcow2 -o cluster_size=4k,? TEST_DIR/t.qcow2 TEST_DIR/t.qcow2.base
-@@ -273,6 +285,7 @@ cluster_size     qcow2 cluster size
- preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
- lazy_refcounts   Postpone refcount updates
- refcount_bits    Width of a reference count entry in bits
-+aes-key-secret   ID of the secret that provides the AES encryption key
- nocow            Turn off copy-on-write (valid only on btrfs)
- 
- Testing: convert -O qcow2 -o help,cluster_size=4k TEST_DIR/t.qcow2 TEST_DIR/t.qcow2.base
-@@ -286,6 +299,7 @@ cluster_size     qcow2 cluster size
- preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
- lazy_refcounts   Postpone refcount updates
- refcount_bits    Width of a reference count entry in bits
-+aes-key-secret   ID of the secret that provides the AES encryption key
- nocow            Turn off copy-on-write (valid only on btrfs)
- 
- Testing: convert -O qcow2 -o ?,cluster_size=4k TEST_DIR/t.qcow2 TEST_DIR/t.qcow2.base
-@@ -299,6 +313,7 @@ cluster_size     qcow2 cluster size
- preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
- lazy_refcounts   Postpone refcount updates
- refcount_bits    Width of a reference count entry in bits
-+aes-key-secret   ID of the secret that provides the AES encryption key
- nocow            Turn off copy-on-write (valid only on btrfs)
- 
- Testing: convert -O qcow2 -o cluster_size=4k -o help TEST_DIR/t.qcow2 TEST_DIR/t.qcow2.base
-@@ -312,6 +327,7 @@ cluster_size     qcow2 cluster size
- preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
- lazy_refcounts   Postpone refcount updates
- refcount_bits    Width of a reference count entry in bits
-+aes-key-secret   ID of the secret that provides the AES encryption key
- nocow            Turn off copy-on-write (valid only on btrfs)
- 
- Testing: convert -O qcow2 -o cluster_size=4k -o ? TEST_DIR/t.qcow2 TEST_DIR/t.qcow2.base
-@@ -325,6 +341,7 @@ cluster_size     qcow2 cluster size
- preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
- lazy_refcounts   Postpone refcount updates
- refcount_bits    Width of a reference count entry in bits
-+aes-key-secret   ID of the secret that provides the AES encryption key
- nocow            Turn off copy-on-write (valid only on btrfs)
- 
- Testing: convert -O qcow2 -o backing_file=TEST_DIR/t.qcow2,,help TEST_DIR/t.qcow2 TEST_DIR/t.qcow2.base
-@@ -353,6 +370,7 @@ cluster_size     qcow2 cluster size
- preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
- lazy_refcounts   Postpone refcount updates
- refcount_bits    Width of a reference count entry in bits
-+aes-key-secret   ID of the secret that provides the AES encryption key
- 
- Testing: convert -o help
- Supported options:
-@@ -412,6 +430,7 @@ cluster_size     qcow2 cluster size
- preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
- lazy_refcounts   Postpone refcount updates
- refcount_bits    Width of a reference count entry in bits
-+aes-key-secret   ID of the secret that provides the AES encryption key
- nocow            Turn off copy-on-write (valid only on btrfs)
- 
- Testing: amend -f qcow2 -o ? TEST_DIR/t.qcow2
-@@ -425,6 +444,7 @@ cluster_size     qcow2 cluster size
- preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
- lazy_refcounts   Postpone refcount updates
- refcount_bits    Width of a reference count entry in bits
-+aes-key-secret   ID of the secret that provides the AES encryption key
- nocow            Turn off copy-on-write (valid only on btrfs)
- 
- Testing: amend -f qcow2 -o cluster_size=4k,help TEST_DIR/t.qcow2
-@@ -438,6 +458,7 @@ cluster_size     qcow2 cluster size
- preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
- lazy_refcounts   Postpone refcount updates
- refcount_bits    Width of a reference count entry in bits
-+aes-key-secret   ID of the secret that provides the AES encryption key
- nocow            Turn off copy-on-write (valid only on btrfs)
- 
- Testing: amend -f qcow2 -o cluster_size=4k,? TEST_DIR/t.qcow2
-@@ -451,6 +472,7 @@ cluster_size     qcow2 cluster size
- preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
- lazy_refcounts   Postpone refcount updates
- refcount_bits    Width of a reference count entry in bits
-+aes-key-secret   ID of the secret that provides the AES encryption key
- nocow            Turn off copy-on-write (valid only on btrfs)
- 
- Testing: amend -f qcow2 -o help,cluster_size=4k TEST_DIR/t.qcow2
-@@ -464,6 +486,7 @@ cluster_size     qcow2 cluster size
- preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
- lazy_refcounts   Postpone refcount updates
- refcount_bits    Width of a reference count entry in bits
-+aes-key-secret   ID of the secret that provides the AES encryption key
- nocow            Turn off copy-on-write (valid only on btrfs)
- 
- Testing: amend -f qcow2 -o ?,cluster_size=4k TEST_DIR/t.qcow2
-@@ -477,6 +500,7 @@ cluster_size     qcow2 cluster size
- preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
- lazy_refcounts   Postpone refcount updates
- refcount_bits    Width of a reference count entry in bits
-+aes-key-secret   ID of the secret that provides the AES encryption key
- nocow            Turn off copy-on-write (valid only on btrfs)
- 
- Testing: amend -f qcow2 -o cluster_size=4k -o help TEST_DIR/t.qcow2
-@@ -490,6 +514,7 @@ cluster_size     qcow2 cluster size
- preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
- lazy_refcounts   Postpone refcount updates
- refcount_bits    Width of a reference count entry in bits
-+aes-key-secret   ID of the secret that provides the AES encryption key
- nocow            Turn off copy-on-write (valid only on btrfs)
- 
- Testing: amend -f qcow2 -o cluster_size=4k -o ? TEST_DIR/t.qcow2
-@@ -503,6 +528,7 @@ cluster_size     qcow2 cluster size
- preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
- lazy_refcounts   Postpone refcount updates
- refcount_bits    Width of a reference count entry in bits
-+aes-key-secret   ID of the secret that provides the AES encryption key
- nocow            Turn off copy-on-write (valid only on btrfs)
- 
- Testing: amend -f qcow2 -o backing_file=TEST_DIR/t.qcow2,,help TEST_DIR/t.qcow2
-@@ -533,6 +559,7 @@ cluster_size     qcow2 cluster size
- preallocation    Preallocation mode (allowed values: off, metadata, falloc, full)
- lazy_refcounts   Postpone refcount updates
- refcount_bits    Width of a reference count entry in bits
-+aes-key-secret   ID of the secret that provides the AES encryption key
- 
- Testing: convert -o help
- Supported options:
-diff --git a/tests/qemu-iotests/087 b/tests/qemu-iotests/087
-index 9de57dd..fe30383 100755
---- a/tests/qemu-iotests/087
-+++ b/tests/qemu-iotests/087
-@@ -124,9 +124,18 @@ echo
- echo === Encrypted image ===
- echo
- 
--_make_test_img -o encryption=on $size
-+_make_test_img --object secret,id=sec0,data=123456 -o encryption=on,qcow-key-secret=sec0 $size
- run_qemu -S <<EOF
- { "execute": "qmp_capabilities" }
-+{ "execute": "object-add",
-+  "arguments": {
-+      "qom-type": "secret",
-+      "id": "sec0",
-+      "props": {
-+          "data": "123456"
-+      }
-+  }
-+}
- { "execute": "blockdev-add",
-   "arguments": {
-       "driver": "$IMGFMT",
-@@ -134,7 +143,8 @@ run_qemu -S <<EOF
-       "file": {
-           "driver": "file",
-           "filename": "$TEST_IMG"
--      }
-+      },
-+      "qcow-key-secret": "sec0"
-     }
-   }
- { "execute": "quit" }
-@@ -142,6 +152,15 @@ EOF
- 
- run_qemu <<EOF
- { "execute": "qmp_capabilities" }
-+{ "execute": "object-add",
-+  "arguments": {
-+      "qom-type": "secret",
-+      "id": "sec0",
-+      "props": {
-+          "data": "123456"
-+      }
-+  }
-+}
- { "execute": "blockdev-add",
-   "arguments": {
-       "driver": "$IMGFMT",
-@@ -149,7 +168,8 @@ run_qemu <<EOF
-       "file": {
-           "driver": "file",
-           "filename": "$TEST_IMG"
--      }
-+      },
-+      "qcow-key-secret": "sec0"
-     }
-   }
- { "execute": "quit" }
-@@ -159,7 +179,7 @@ echo
- echo === Missing driver ===
- echo
- 
--_make_test_img -o encryption=on $size
-+_make_test_img --object secret,id=sec0,data=123456 -o encryption=on,qcow-key-secret=sec0 $size
- run_qemu -S <<EOF
- { "execute": "qmp_capabilities" }
- { "execute": "blockdev-add",
-diff --git a/tests/qemu-iotests/087.out b/tests/qemu-iotests/087.out
-index dc6baf9..02c9e42 100644
---- a/tests/qemu-iotests/087.out
-+++ b/tests/qemu-iotests/087.out
-@@ -34,10 +34,11 @@ QMP_VERSION
- 
- === Encrypted image ===
- 
--Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 encryption=on
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 encryption=on aes-key-secret=sec0
- Testing: -S
- QMP_VERSION
- {"return": {}}
-+{"return": {}}
- {"error": {"class": "GenericError", "desc": "Use of AES-CBC encrypted IMGFMT images is no longer supported in system emulators"}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN"}
-@@ -45,6 +46,7 @@ QMP_VERSION
- Testing:
- QMP_VERSION
- {"return": {}}
-+{"return": {}}
- {"error": {"class": "GenericError", "desc": "Use of AES-CBC encrypted IMGFMT images is no longer supported in system emulators"}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN"}
-@@ -52,7 +54,7 @@ QMP_VERSION
- 
- === Missing driver ===
- 
--Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 encryption=on
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 encryption=on aes-key-secret=sec0
- Testing: -S
- QMP_VERSION
- {"return": {}}
-diff --git a/tests/qemu-iotests/134 b/tests/qemu-iotests/134
-index af618b8..c2458d8 100755
---- a/tests/qemu-iotests/134
-+++ b/tests/qemu-iotests/134
-@@ -43,23 +43,31 @@ _supported_os Linux
- 
- 
- size=128M
--IMGOPTS="encryption=on" _make_test_img $size
-+
-+SECRET="secret,id=sec0,data=astrochicken"
-+SECRETALT="secret,id=sec0,data=platypus"
-+
-+_make_test_img --object $SECRET -o "encryption=on,qcow-key-secret=sec0" $size
-+
-+IMGSPEC="driver=$IMGFMT,file.filename=$TEST_IMG,qcow-key-secret=sec0"
-+
-+QEMU_IO_OPTIONS=$QEMU_IO_OPTIONS_NO_FMT
- 
- echo
- echo "== reading whole image =="
--echo "astrochicken" | $QEMU_IO -c "read 0 $size" "$TEST_IMG" | _filter_qemu_io | _filter_testdir
-+$QEMU_IO --object $SECRET -c "read 0 $size" --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
- 
- echo
- echo "== rewriting whole image =="
--echo "astrochicken" | $QEMU_IO -c "write -P 0xa 0 $size" "$TEST_IMG" | _filter_qemu_io | _filter_testdir
-+$QEMU_IO --object $SECRET -c "write -P 0xa 0 $size" --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
- 
- echo
- echo "== verify pattern =="
--echo "astrochicken" | $QEMU_IO -c "read -P 0xa 0 $size" "$TEST_IMG" | _filter_qemu_io | _filter_testdir
-+$QEMU_IO --object $SECRET -c "read -P 0xa 0 $size"  --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
- 
- echo
- echo "== verify pattern failure with wrong password =="
--echo "platypus" | $QEMU_IO -c "read -P 0xa 0 $size" "$TEST_IMG" | _filter_qemu_io | _filter_testdir
-+$QEMU_IO --object $SECRETALT -c "read -P 0xa 0 $size" --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
- 
- 
- # success, all done
-diff --git a/tests/qemu-iotests/134.out b/tests/qemu-iotests/134.out
-index 6493704..60b7052 100644
---- a/tests/qemu-iotests/134.out
-+++ b/tests/qemu-iotests/134.out
-@@ -1,27 +1,19 @@
- QA output created by 134
--Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 encryption=on
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 encryption=on aes-key-secret=sec0
- 
- == reading whole image ==
--Disk image 'TEST_DIR/t.qcow2' is encrypted.
--password:
- read 134217728/134217728 bytes at offset 0
- 128 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- 
- == rewriting whole image ==
--Disk image 'TEST_DIR/t.qcow2' is encrypted.
--password:
- wrote 134217728/134217728 bytes at offset 0
- 128 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- 
- == verify pattern ==
--Disk image 'TEST_DIR/t.qcow2' is encrypted.
--password:
- read 134217728/134217728 bytes at offset 0
- 128 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- 
- == verify pattern failure with wrong password ==
--Disk image 'TEST_DIR/t.qcow2' is encrypted.
--password:
- Pattern verification failed at offset 0, 134217728 bytes
- read 134217728/134217728 bytes at offset 0
- 128 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-diff --git a/tests/qemu-iotests/158 b/tests/qemu-iotests/158
-index a6cdd6d..2d1c015 100755
---- a/tests/qemu-iotests/158
-+++ b/tests/qemu-iotests/158
-@@ -44,34 +44,39 @@ _supported_os Linux
- 
- size=128M
- TEST_IMG_BASE=$TEST_IMG.base
-+SECRET="secret,id=sec0,data=astrochicken"
- 
- TEST_IMG_SAVE=$TEST_IMG
- TEST_IMG=$TEST_IMG_BASE
- echo "== create base =="
--IMGOPTS="encryption=on" _make_test_img $size
-+_make_test_img --object $SECRET -o "encryption=on,qcow-key-secret=sec0" $size
- TEST_IMG=$TEST_IMG_SAVE
- 
-+IMGSPECBASE="driver=$IMGFMT,file.filename=$TEST_IMG_BASE,qcow-key-secret=sec0"
-+IMGSPEC="driver=$IMGFMT,file.filename=$TEST_IMG,backing.driver=$IMGFMT,backing.file.filename=$TEST_IMG_BASE,backing.qcow-key-secret=sec0,qcow-key-secret=sec0"
-+QEMU_IO_OPTIONS=$QEMU_IO_OPTIONS_NO_FMT
-+
- echo
- echo "== writing whole image =="
--echo "astrochicken" | $QEMU_IO -c "write -P 0xa 0 $size" "$TEST_IMG_BASE" | _filter_qemu_io | _filter_testdir
-+$QEMU_IO --object $SECRET -c "write -P 0xa 0 $size" --image-opts $IMGSPECBASE | _filter_qemu_io | _filter_testdir
- 
- echo
- echo "== verify pattern =="
--echo "astrochicken" | $QEMU_IO -c "read -P 0xa 0 $size" "$TEST_IMG_BASE" | _filter_qemu_io | _filter_testdir
-+$QEMU_IO --object $SECRET -c "read -P 0xa 0 $size" --image-opts $IMGSPECBASE | _filter_qemu_io | _filter_testdir
- 
- echo "== create overlay =="
--IMGOPTS="encryption=on" _make_test_img -b "$TEST_IMG_BASE" $size
-+_make_test_img --object $SECRET -o "encryption=on,qcow-key-secret=sec0" -b "$TEST_IMG_BASE" $size
- 
- echo
- echo "== writing part of a cluster =="
--echo "astrochicken" | $QEMU_IO -c "write -P 0xe 0 1024" "$TEST_IMG" | _filter_qemu_io | _filter_testdir
-+$QEMU_IO --object $SECRET -c "write -P 0xe 0 1024" --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
- 
- echo
- echo "== verify pattern =="
--echo "astrochicken" | $QEMU_IO -c "read -P 0xe 0 1024" "$TEST_IMG" | _filter_qemu_io | _filter_testdir
-+$QEMU_IO --object $SECRET -c "read -P 0xe 0 1024" --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
- echo
- echo "== verify pattern =="
--echo "astrochicken" | $QEMU_IO -c "read -P 0xa 1024 64512" "$TEST_IMG" | _filter_qemu_io | _filter_testdir
-+$QEMU_IO --object $SECRET -c "read -P 0xa 1024 64512" --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
- 
- 
- # success, all done
-diff --git a/tests/qemu-iotests/158.out b/tests/qemu-iotests/158.out
-index b3f37e2..9b203b2 100644
---- a/tests/qemu-iotests/158.out
-+++ b/tests/qemu-iotests/158.out
-@@ -1,36 +1,26 @@
- QA output created by 158
- == create base ==
--Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=134217728 encryption=on
-+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=134217728 encryption=on aes-key-secret=sec0
- 
- == writing whole image ==
--Disk image 'TEST_DIR/t.qcow2.base' is encrypted.
--password:
- wrote 134217728/134217728 bytes at offset 0
- 128 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- 
- == verify pattern ==
--Disk image 'TEST_DIR/t.qcow2.base' is encrypted.
--password:
- read 134217728/134217728 bytes at offset 0
- 128 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- == create overlay ==
--Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 backing_file=TEST_DIR/t.IMGFMT.base encryption=on
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728 backing_file=TEST_DIR/t.IMGFMT.base encryption=on aes-key-secret=sec0
- 
- == writing part of a cluster ==
--Disk image 'TEST_DIR/t.qcow2' is encrypted.
--password:
- wrote 1024/1024 bytes at offset 0
- 1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- 
- == verify pattern ==
--Disk image 'TEST_DIR/t.qcow2' is encrypted.
--password:
- read 1024/1024 bytes at offset 0
- 1 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- 
- == verify pattern ==
--Disk image 'TEST_DIR/t.qcow2' is encrypted.
--password:
- read 64512/64512 bytes at offset 1024
- 63 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- *** done
 -- 
 2.9.3
