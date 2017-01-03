@@ -1,30 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41059)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52422)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1cOWVf-0000nt-0f
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 16:20:44 -0500
+	(envelope-from <mst@redhat.com>) id 1cOXKZ-0004ex-GR
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 17:13:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1cOWVb-0004xI-2k
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 16:20:43 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55692)
+	(envelope-from <mst@redhat.com>) id 1cOXKV-0000VC-GP
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 17:13:19 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46104)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1cOWVa-0004vf-QG
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 16:20:38 -0500
-Date: Tue, 3 Jan 2017 14:20:35 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20170103142035.7c946abf@t450s.home>
-In-Reply-To: <f37cf386-8fe4-ded8-0341-dc765882cf72@redhat.com>
-References: <1482400096-23078-1-git-send-email-peterx@redhat.com>
-	<b2b1424c-1bd0-00ea-8d14-f935b8901629@redhat.com>
-	<20161222110412.GB26435@pxdev.xzpeter.org>
-	<6798718b-3949-032f-0e5f-fa6b2e2d83fb@redhat.com>
-	<20161223032601.GC26435@pxdev.xzpeter.org>
-	<f37cf386-8fe4-ded8-0341-dc765882cf72@redhat.com>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cOXKV-0000Uy-AT
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 17:13:15 -0500
+Received: from int-mx14.intmail.prod.int.phx2.redhat.com
+	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7DD8D68B2
+	for <qemu-devel@nongnu.org>; Tue,  3 Jan 2017 22:13:14 +0000 (UTC)
+Date: Wed, 4 Jan 2017 00:13:12 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170104001239-mutt-send-email-mst@kernel.org>
+References: <20161230104130.29ff671b@x240.lan>
+	<4eda1813-d732-5dfc-e6ff-29ac95fe22d8@redhat.com>
+	<8aae955f-44ff-134e-818f-31b0bd510ba1@redhat.com>
+	<20170103153312.083ef692@x240.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170103153312.083ef692@x240.lan>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3] intel_iommu: allow dynamic switch of
- IOMMU region
+Subject: Re: [Qemu-devel] vhost-user breaks after 96a3d98.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,67 +36,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, bd.aviv@gmail.com, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
+To: Flavio Leitner <fbl@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
 
-On Mon, 26 Dec 2016 10:45:55 +0800
-Jason Wang <jasowang@redhat.com> wrote:
-
-> On 2016=E5=B9=B412=E6=9C=8823=E6=97=A5 11:26, Peter Xu wrote:
-> > On Thu, Dec 22, 2016 at 07:34:10PM +0800, Jason Wang wrote: =20
-> >>
-> >> On 2016=E5=B9=B412=E6=9C=8822=E6=97=A5 19:04, Peter Xu wrote: =20
-> >>> On Thu, Dec 22, 2016 at 05:52:58PM +0800, Jason Wang wrote: =20
-> >>>> On 2016=E5=B9=B412=E6=9C=8822=E6=97=A5 17:48, Peter Xu wrote: =20
-> >>>>>   /* Handle Translation Enable/Disable */
-> >>>>>   static void vtd_handle_gcmd_te(IntelIOMMUState *s, bool en)
-> >>>>>   {
-> >>>>> +    if (s->dmar_enabled =3D=3D en) {
-> >>>>> +        return;
-> >>>>> +    }
-> >>>>> +
-> >>>>>       VTD_DPRINTF(CSR, "Translation Enable %s", (en ? "on" : "off")=
-);
-> >>>>>       if (en) {
-> >>>>> @@ -1196,6 +1237,8 @@ static void vtd_handle_gcmd_te(IntelIOMMUStat=
-e *s, bool en)
-> >>>>>           /* Ok - report back to driver */
-> >>>>>           vtd_set_clear_mask_long(s, DMAR_GSTS_REG, VTD_GSTS_TES, 0=
-);
-> >>>>>       }
-> >>>>> +
-> >>>>> +    vtd_switch_address_space_all(s, en);
-> >>>>>   } =20
-> >>>> We may need something like notifier here to tell e.g vhost to stop d=
-evice
-> >>>> IOTLB. (Since it's likely this series were applied after device IOTLB
-> >>>> patches) =20
-> >>> Yes, I missed vhost case.
-> >>>
-> >>> To notify vhost, IMO we should be able to use memory listeners just
-> >>> like how vfio devices do (please refer to vfio_memory_listener). =20
-> >> Just for switching? This seems an overkill since we don't depends on i=
-t for
-> >> all other things. Guest should setup correct mappings by explicitly no=
-tify
-> >> device IOTLB. A quick glance at ATS spec, for enabling and disabling, =
-looks
-> >> like it was done through enable bit of ASTctl instead of here.
-> >>
-> >> So we are probably ok here :) =20
-> > So we need a more general way to notify ATS about this, right? (e.g.,
-> > for future devices that support ATS as well, not only vhost) =20
+On Tue, Jan 03, 2017 at 03:33:12PM -0200, Flavio Leitner wrote:
+> On Tue, 3 Jan 2017 18:28:18 +0800
+> Jason Wang <jasowang@redhat.com> wrote:
 >=20
-> Yes, if we want to make ATS visible to guest. But looks like it needs=20
-> more e.g VFIO support for device IOTLB invalidation.
+> > On 2017=E5=B9=B401=E6=9C=8803=E6=97=A5 11:09, Jason Wang wrote:
+> > >
+> > >
+> > > On 2016=E5=B9=B412=E6=9C=8830=E6=97=A5 20:41, Flavio Leitner wrote:=
+ =20
+> > >> Hi,
+> > >>
+> > >> While I was testing vhost-user using OVS 2.5 and DPDK 2.2.0 in the
+> > >> host and testpmd dpdk 2.2.0 in the guest, I found that the commit
+> > >> below breaks the environment and no packets gets into the guest.
+> > >>
+> > >> dpdk port --> OVS --> vhost-user --> guest --> testpmd
+> > >>                           ^--- drops here         ^--- no packets =
+here.
+> > >>
+> > >> commit 96a3d98d2cdbd897ff5ab33427aa4cfb94077665
+> > >> Author: Jason Wang <jasowang@redhat.com>
+> > >> Date:   Mon Aug 1 16:07:58 2016 +0800
+> > >>
+> > >>      vhost: don't set vring call if no vector
+> > >>           We used to set vring call fd unconditionally even if gue=
+st=20
+> > >> driver does
+> > >>      not use MSIX for this vritqueue at all. This will cause lots =
+of
+> > >>      unnecessary userspace access and other checks for drivers doe=
+s=20
+> > >> not use
+> > >>      interrupt at all (e.g virtio-net pmd). So check and clean vri=
+ng=20
+> > >> call
+> > >>      fd if guest does not use any vector for this virtqueue at
+> > >>      all.
+> > >> [...]
+> > >>
+> > >> Thanks, =20
+> > >
+> > > Hi Flavio:
+> > >
+> > > Thanks for reporting this issue, could this be a bug of vhost-user?=
+ (I=20
+> > > believe virito-net pmd does not use interrupt for rx/tx at all)
+> > >
+> > > Anyway, will try to reproduce it.
+> > > =20
+> >=20
+> > Could not reproduce this issue on similar setups (the only difference=
+ is=20
+> > I don't create dpdk port) with dpdk 16.11 and ovs.git HEAD. Suspect a=
+n=20
+> > issue dpdk. Will try OVS 2.5 + DPDK 2.2.0.
+>=20
+> Yeah, that's the combo I am testing and seeing the issue.  I found the
+> commit after bisecting qemu and then confirmed by testing up to the
+> previous commit (works okay) and then the commit above (fails).
+>=20
+> I still have my test environment available, so I would be able to test
+> any patch you might have.
+>=20
+> Thanks,
+> --=20
+> Flavio
 
-ATS is already visible for vfio-pci devices, it will be enabled if the
-host IOMMU supports ATS.  If the host IOMMU does not support ATS,
-enabling it on the device by the guest will generate unsupported
-requests.  This is yet another case, along with address width, where
-it's potentially really complicated and not amenable to hotplug to have
-a guest IOMMU.  AFAICT, there's nothing to be added to vfio for device
-iotlb invalidations, this occurs automatically between the host IOMMU
-and device when a DMA unmap occurs.  Thanks,
+Could you pls try to test dpdk git head and bisect that to find
+what fixes the issue?
 
-Alex
+--=20
+MST
