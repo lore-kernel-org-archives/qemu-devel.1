@@ -1,19 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32783)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32801)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cOJXp-0002kg-96
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 02:30:06 -0500
+	(envelope-from <peterx@redhat.com>) id 1cOJXt-0002o6-AF
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 02:30:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cOJXl-0008B6-0I
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 02:30:05 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54576)
+	(envelope-from <peterx@redhat.com>) id 1cOJXs-0008Gs-Cu
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 02:30:09 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:39796)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cOJXk-0008At-Nv
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 02:30:00 -0500
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cOJXs-0008Fd-6t
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 02:30:08 -0500
 From: Peter Xu <peterx@redhat.com>
-Date: Tue,  3 Jan 2017 15:29:37 +0800
-Message-Id: <1483428594-28880-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH RFC v2 00/17] VT-d: vfio enablement and misc
- enhances
+Date: Tue,  3 Jan 2017 15:29:39 +0800
+Message-Id: <1483428594-28880-3-git-send-email-peterx@redhat.com>
+In-Reply-To: <1483428594-28880-1-git-send-email-peterx@redhat.com>
+References: <1483428594-28880-1-git-send-email-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH RFC v2 02/17] memory: handle alias for iommu
+ notifier
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,149 +27,42 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, peterx@redhat.com, alex.williamson@redhat.com, bd.aviv@gmail.com
 
-(I renamed the title for this RFC v2, since starting from this version
- the series will be based on master, also I picked up some more fixes
- for vt-d into this series)
+From: Jason Wang <jasowang@redhat.com>
 
-v2:
-- change comment for "end" parameter in vtd_page_walk() [Tianyu]
-- change comment for "a iova" to "an iova" [Yi]
-- fix fault printed val for GPA address in vtd_page_walk_level (debug
-  only)
-- rebased to master (rather than Aviv's v6 series) and merged Aviv's
-  series v6: picked patch 1 (as patch 1 in this series), dropped patch
-  2, re-wrote patch 3 (as patch 17 of this series).
-- picked up two more bugfix patches from Jason's DMAR series
-- picked up the following patch as well:
-  "[PATCH v3] intel_iommu: allow dynamic switch of IOMMU region"
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Jason Wang <jasowang@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+ memory.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-This RFC series is a re-work for Aviv B.D.'s vfio enablement series
-with vt-d:
-
-  https://lists.gnu.org/archive/html/qemu-devel/2016-11/msg01452.html
-
-Aviv has done a great job there, and what we still lack there are
-mostly the following:
-
-(1) VFIO got duplicated IOTLB notifications due to splitted VT-d IOMMU
-    memory region.
-
-(2) VT-d still haven't provide a correct replay() mechanism (e.g.,
-    when IOMMU domain switches, things will broke).
-
-This series should have solved the above two issues.
-
-Online repo:
-
-  https://github.com/xzpeter/qemu/tree/vtd-vfio-enablement-v2
-
-I would be glad to hear about any review comments for above patches.
-
-=========
-Test Done
-=========
-
-Build test passed for x86_64/arm/ppc64.
-
-Simply tested with x86_64, assigning two PCI devices to a single VM,
-boot the VM using:
-
-bin=x86_64-softmmu/qemu-system-x86_64
-$bin -M q35,accel=kvm,kernel-irqchip=split -m 1G \
-     -device intel-iommu,intremap=on,eim=off,cache-mode=on \
-     -netdev user,id=net0,hostfwd=tcp::5555-:22 \
-     -device virtio-net-pci,netdev=net0 \
-     -device vfio-pci,host=03:00.0 \
-     -device vfio-pci,host=02:00.0 \
-     -trace events=".trace.vfio" \
-     /var/lib/libvirt/images/vm1.qcow2
-
-pxdev:bin [vtd-vfio-enablement]# cat .trace.vfio
-vtd_page_walk*
-vtd_replay*
-vtd_inv_desc*
-
-Then, in the guest, run the following tool:
-
-  https://github.com/xzpeter/clibs/blob/master/gpl/userspace/vfio-bind-group/vfio-bind-group.c
-
-With parameter:
-
-  ./vfio-bind-group 00:03.0 00:04.0
-
-Check host side trace log, I can see pages are replayed and mapped in
-00:04.0 device address space, like:
-
-...
-vtd_replay_ce_valid replay valid context device 00:04.00 hi 0x401 lo 0x38fe1001
-vtd_page_walk Page walk for ce (0x401, 0x38fe1001) iova range 0x0 - 0x8000000000
-vtd_page_walk_level Page walk (base=0x38fe1000, level=3) iova range 0x0 - 0x8000000000
-vtd_page_walk_level Page walk (base=0x35d31000, level=2) iova range 0x0 - 0x40000000
-vtd_page_walk_level Page walk (base=0x34979000, level=1) iova range 0x0 - 0x200000
-vtd_page_walk_one Page walk detected map level 0x1 iova 0x0 -> gpa 0x22dc3000 mask 0xfff perm 3
-vtd_page_walk_one Page walk detected map level 0x1 iova 0x1000 -> gpa 0x22e25000 mask 0xfff perm 3
-vtd_page_walk_one Page walk detected map level 0x1 iova 0x2000 -> gpa 0x22e12000 mask 0xfff perm 3
-vtd_page_walk_one Page walk detected map level 0x1 iova 0x3000 -> gpa 0x22e2d000 mask 0xfff perm 3
-vtd_page_walk_one Page walk detected map level 0x1 iova 0x4000 -> gpa 0x12a49000 mask 0xfff perm 3
-vtd_page_walk_one Page walk detected map level 0x1 iova 0x5000 -> gpa 0x129bb000 mask 0xfff perm 3
-vtd_page_walk_one Page walk detected map level 0x1 iova 0x6000 -> gpa 0x128db000 mask 0xfff perm 3
-vtd_page_walk_one Page walk detected map level 0x1 iova 0x7000 -> gpa 0x12a80000 mask 0xfff perm 3
-vtd_page_walk_one Page walk detected map level 0x1 iova 0x8000 -> gpa 0x12a7e000 mask 0xfff perm 3
-vtd_page_walk_one Page walk detected map level 0x1 iova 0x9000 -> gpa 0x12b22000 mask 0xfff perm 3
-vtd_page_walk_one Page walk detected map level 0x1 iova 0xa000 -> gpa 0x12b41000 mask 0xfff perm 3
-...
-
-=========
-Todo List
-=========
-
-- error reporting for the assigned devices (as Tianyu has mentioned)
-
-- per-domain address-space: A better solution in the future may be -
-  we maintain one address space per IOMMU domain in the guest (so
-  multiple devices can share a same address space if they are sharing
-  the same IOMMU domains in the guest), rather than one address space
-  per device (which is current implementation of vt-d). However that's
-  a step further than this series, and let's see whether we can first
-  provide a workable version of device assignment with vt-d
-  protection.
-
-- more to come...
-
-Thanks,
-
-Aviv Ben-David (1):
-  IOMMU: add option to enable VTD_CAP_CM to vIOMMU capility exposoed to
-    guest
-
-Jason Wang (3):
-  memory: handle alias for iommu notifier
-  memory: handle alias in memory_region_is_iommu()
-  intel_iommu: allocate new key when creating new address space
-
-Peter Xu (13):
-  intel_iommu: simplify irq region translation
-  intel_iommu: renaming gpa to iova where proper
-  intel_iommu: fix trace for inv desc handling
-  intel_iommu: fix trace for addr translation
-  intel_iommu: vtd_slpt_level_shift check level
-  memory: add section range info for IOMMU notifier
-  memory: provide iommu_replay_all()
-  memory: introduce memory_region_notify_one()
-  memory: add MemoryRegionIOMMUOps.replay() callback
-  intel_iommu: provide its own replay() callback
-  intel_iommu: do replay when context invalidate
-  intel_iommu: allow dynamic switch of IOMMU region
-  intel_iommu: enable vfio devices
-
- hw/i386/intel_iommu.c          | 597 +++++++++++++++++++++++++++++++----------
- hw/i386/intel_iommu_internal.h |   1 +
- hw/i386/trace-events           |  28 ++
- hw/vfio/common.c               |   7 +-
- include/exec/memory.h          |  33 +++
- include/hw/i386/intel_iommu.h  |  12 +
- memory.c                       |  51 +++-
- 7 files changed, 572 insertions(+), 157 deletions(-)
-
+diff --git a/memory.c b/memory.c
+index 33110e9..2bfc37f 100644
+--- a/memory.c
++++ b/memory.c
+@@ -1603,6 +1603,11 @@ static void memory_region_update_iommu_notify_flags(MemoryRegion *mr)
+ void memory_region_register_iommu_notifier(MemoryRegion *mr,
+                                            IOMMUNotifier *n)
+ {
++    if (mr->alias) {
++        memory_region_register_iommu_notifier(mr->alias, n);
++        return;
++    }
++
+     /* We need to register for at least one bitfield */
+     assert(n->notifier_flags != IOMMU_NOTIFIER_NONE);
+     QLIST_INSERT_HEAD(&mr->iommu_notify, n, node);
+@@ -1643,6 +1648,10 @@ void memory_region_iommu_replay(MemoryRegion *mr, IOMMUNotifier *n,
+ void memory_region_unregister_iommu_notifier(MemoryRegion *mr,
+                                              IOMMUNotifier *n)
+ {
++    if (mr->alias) {
++        memory_region_unregister_iommu_notifier(mr->alias, n);
++        return;
++    }
+     QLIST_REMOVE(n, node);
+     memory_region_update_iommu_notify_flags(mr);
+ }
 -- 
 2.7.4
