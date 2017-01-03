@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58426)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39140)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cOUS1-00047I-7Y
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 14:08:50 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cOUcc-0005Lh-DP
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 14:19:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cOUS0-00036B-9z
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 14:08:49 -0500
-References: <20170103170459.27662-1-berrange@redhat.com>
-	<20170103170459.27662-5-berrange@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <57cafab8-cd9a-33c9-862d-8b34e811991b@redhat.com>
-Date: Tue, 3 Jan 2017 13:08:41 -0600
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cOUcZ-00089v-A0
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 14:19:46 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46916)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1cOUcZ-00087f-4U
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 14:19:43 -0500
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Tue,  3 Jan 2017 20:19:33 +0100
+Message-Id: <20170103191933.19416-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170103170459.27662-5-berrange@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="eTTADtRGLRwhTtfNweAV0bebMjvRna8dH"
-Subject: Re: [Qemu-devel] [PATCH v2 4/5] iotests: add more LUKS hash
- combination tests
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] win32: use glib gpoll if glib >= 2.50
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,60 +25,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: sw@weilnetz.de, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---eTTADtRGLRwhTtfNweAV0bebMjvRna8dH
-From: Eric Blake <eblake@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
-Message-ID: <57cafab8-cd9a-33c9-862d-8b34e811991b@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 4/5] iotests: add more LUKS hash
- combination tests
-References: <20170103170459.27662-1-berrange@redhat.com>
- <20170103170459.27662-5-berrange@redhat.com>
-In-Reply-To: <20170103170459.27662-5-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+A fix has been committed in upstream glib commit
+210a9796f78eb90f76f1bd6a304e9fea05e97617.
+(See also related bug https://bugzilla.gnome.org/show_bug.cgi?id=3D764415=
+)
 
-On 01/03/2017 11:04 AM, Daniel P. Berrange wrote:
-> Add tests for sha224, sha512, sha384 and ripemd160 hash
-> algorithms.
->=20
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
->  tests/qemu-iotests/149     |  10 +-
->  tests/qemu-iotests/149.out | 482 +++++++++++++++++++++++++++++++++++++=
-+++++++-
->  2 files changed, 484 insertions(+), 8 deletions(-)
->=20
+It is desirable to use the glib version instead of qemu copy, since it
+provides more debugging facilities (G_MAIN_POLL_DEBUG etc), and
+hopefully has a better maintainance. Hopefully, we can drop the qemu
+copy in a few years.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ include/glib-compat.h | 2 +-
+ util/oslib-win32.c    | 2 ++
+ 2 files changed, 3 insertions(+), 1 deletion(-)
 
+diff --git a/include/glib-compat.h b/include/glib-compat.h
+index acf254d2a0..0cd24ffbe9 100644
+--- a/include/glib-compat.h
++++ b/include/glib-compat.h
+@@ -39,7 +39,7 @@ static inline gint64 qemu_g_get_monotonic_time(void)
+ #define g_get_monotonic_time() qemu_g_get_monotonic_time()
+ #endif
+=20
+-#ifdef _WIN32
++#if defined(_WIN32) && !GLIB_CHECK_VERSION(2, 50, 0)
+ /*
+  * g_poll has a problem on Windows when using
+  * timeouts < 10ms, so use wrapper.
+diff --git a/util/oslib-win32.c b/util/oslib-win32.c
+index d09863cc9d..0b1890fd33 100644
+--- a/util/oslib-win32.c
++++ b/util/oslib-win32.c
+@@ -327,6 +327,7 @@ char *qemu_get_exec_dir(void)
+     return g_strdup(exec_dir);
+ }
+=20
++#if !GLIB_CHECK_VERSION(2, 50, 0)
+ /*
+  * The original implementation of g_poll from glib has a problem on Wind=
+ows
+  * when using timeouts < 10 ms.
+@@ -530,6 +531,7 @@ gint g_poll(GPollFD *fds, guint nfds, gint timeout)
+=20
+     return retval;
+ }
++#endif
+=20
+ int getpagesize(void)
+ {
 --=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---eTTADtRGLRwhTtfNweAV0bebMjvRna8dH
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYa/a5AAoJEKeha0olJ0NqN8MH/AtquewNc5R8JvOkXxKCCJEY
-8GUJ/ZrKUouCO63etEF9CJJLWTFBh2AQfet8S6ayGbgxhjrIRFvklV2C+6ljtbMu
-3DlM1bTChIffPV5IJ/fA6vwwT0m/FDPmwwCn8PWDM+JjbIecqKe8ifwtwpG+cKeY
-p0WzMKm4qtLclH7aVY1IB1pP7Y+LhQP2V7ni7NqgnKG2H+kx/NIEn3BOKgDF76Je
-uGTthuC+pMuKbIMZm4nf95dGKXbdHIAGcdEI8Iw6G7VYYgMx36BwMPC/H8glZPsi
-uFYuoYLYdZT3bhu/TS0RtYurKkVqdFBzFGaOMiViESZm2aVfngvLuKjlgxpXgMQ=
-=o3bq
------END PGP SIGNATURE-----
-
---eTTADtRGLRwhTtfNweAV0bebMjvRna8dH--
+2.11.0
