@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52722)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55645)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cOQgT-0001Lo-3n
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 10:07:30 -0500
+	(envelope-from <eblake@redhat.com>) id 1cOQtS-0004fo-Bc
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 10:20:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cOQgP-0007zP-SB
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 10:07:29 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45570)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cOQgP-0007zB-In
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 10:07:25 -0500
-Date: Tue, 3 Jan 2017 16:07:20 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170103160720.61629e86@nial.brq.redhat.com>
-In-Reply-To: <20170103142223.GB3315@thinpad.lan.raisama.net>
-References: <20161229223815.13705-1-ehabkost@redhat.com>
-	<20161230152834.6d1fa963@Igors-MacBook-Pro.local>
-	<20161230182308.GK3441@thinpad.lan.raisama.net>
-	<20170103140252.1a2df147@nial.brq.redhat.com>
-	<20170103142223.GB3315@thinpad.lan.raisama.net>
+	(envelope-from <eblake@redhat.com>) id 1cOQtO-0004d9-W8
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 10:20:54 -0500
+References: <1482166064-18121-1-git-send-email-joserz@linux.vnet.ibm.com>
+	<1482166064-18121-2-git-send-email-joserz@linux.vnet.ibm.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <8cb9e1d4-3dca-8a32-9f0d-2173bea52771@redhat.com>
+Date: Tue, 3 Jan 2017 09:20:37 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] qdev: Make "hotplugged" property read-only
+In-Reply-To: <1482166064-18121-2-git-send-email-joserz@linux.vnet.ibm.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="bGlgLg0nISaNQNi6wkdjui3Hg2seq7uJo"
+Subject: Re: [Qemu-devel] [PATCH v4 1/6] target-ppc: Implement unsigned
+ quadword left/right shift and unit tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,184 +25,192 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Andreas =?UTF-8?B?RsOkcmJlcg==?= <afaerber@suse.de>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Eric Blake <eblake@redhat.com>, Peter Krempa <pkrempa@redhat.com>
+To: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>, qemu-ppc@nongnu.org
+Cc: bharata@linux.vnet.ibm.com, qemu-devel@nongnu.org, nikunj@linux.vnet.ibm.com, david@gibson.dropbear.id.au
 
-On Tue, 3 Jan 2017 12:22:23 -0200
-Eduardo Habkost <ehabkost@redhat.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--bGlgLg0nISaNQNi6wkdjui3Hg2seq7uJo
+From: Eric Blake <eblake@redhat.com>
+To: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>, qemu-ppc@nongnu.org
+Cc: bharata@linux.vnet.ibm.com, qemu-devel@nongnu.org,
+ nikunj@linux.vnet.ibm.com, david@gibson.dropbear.id.au
+Message-ID: <8cb9e1d4-3dca-8a32-9f0d-2173bea52771@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 1/6] target-ppc: Implement unsigned
+ quadword left/right shift and unit tests
+References: <1482166064-18121-1-git-send-email-joserz@linux.vnet.ibm.com>
+ <1482166064-18121-2-git-send-email-joserz@linux.vnet.ibm.com>
+In-Reply-To: <1482166064-18121-2-git-send-email-joserz@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> On Tue, Jan 03, 2017 at 02:02:52PM +0100, Igor Mammedov wrote:
-> > On Fri, 30 Dec 2016 16:23:08 -0200
-> > Eduardo Habkost <ehabkost@redhat.com> wrote:
-> >   
-> > > On Fri, Dec 30, 2016 at 03:28:34PM +0100, Igor Mammedov wrote:  
-> > > > On Thu, 29 Dec 2016 20:38:15 -0200
-> > > > Eduardo Habkost <ehabkost@redhat.com> wrote:
-> > > >     
-> > > > > The "hotplugged" property is user visible, but it was never meant
-> > > > > to be set by the user. There are probably multiple ways to break
-> > > > > or crash device code by overriding the property. One example:
-> > > > > 
-> > > > >   $ qemu-system-x86_64 -cpu qemu64,hotplugged=true
-> > > > >   Segmentation fault (core dumped)
-> > > > > 
-> > > > > The DeviceState::hotplugged struct field is set directly by
-> > > > > device_initfn(), there's no need to provide a setter for the
-> > > > > property.    
-> > > > this property is meant to be used for individual devices on target side
-> > > > of migration.    
-> > > 
-> > > I didn't know that. Is this documented somewhere?
-> > > Is it actually used by any existing software?  
-> > not that I know of. But users should be fixed if they are not using it.  
-> 
-> I see. The problem is that the mechanism is undocumented,
-> untested, and seems very likely to trigger bugs in device code.
-> 
-> >   
-> > > > Doing above is a rather big hammer with behavioral change of migrated
-> > > > instance.    
-> > > 
-> > > If the property is really supposed to be set directly by users,
-> > > then I agree. But I would like to understand how exactly it is
-> > > supposed to work, so we can fix those issues properly.
-> > > 
-> > > Do you have any existing example where setting "hotplugged=true"
-> > > on the command-line is necessary and where it really works?
-> > >   
-> > > > 
-> > > > So I'd  fix crash caused by assumption that hotplugged CPU
-> > > > guarantied to have rtc&fw_cfg available.
-> > > > I'll post a patch with the fix.    
-> > > 
-> > > Most of the cases where I see DeviceState::hotplugged being used
-> > > are related to generation of hotplug events[1] or completing
-> > > steps that are normally done by machine init code[2][3], and I am
-> > > not sure this should be the case when we're just migrating
-> > > hotplugged devices. Are all those cases broken, and they should
-> > > be checking the qdev_hotplug global variable instead?  
-> > skipping hotplugged for x86 CPUs and pc-dimms on target side shouldn't
-> > affect functionality as current ACPI code doesn't depends on it
-> > and it's safe to drop hotplug events for already plugged devices
-> > as machine init/done code would do the rest of initialization
-> > in this case.
-> > 
-> > However if hotplugged property is not set on target then
-> > mgmt would loose information that device has been hotplugged
-> > when it would query qemu. For example:
-> > info memory-devices 
-> > Memory device [dimm]: ""
-> >   addr: 0x100000000
-> >   slot: 1
-> >   node: 0
-> >   size: 1073741824
-> >   memdev: /objects/mem2
-> >   hotplugged: false
-> >   hotpluggable: true  <=== would become false
-> > 
-> > 
-> > Also beside of simplistic use of hotplugged by x86 cpus/pc-dimm,
-> > 'git grep hotplugged' shows that it's used by
-> > pci, spapr and other devices and I'm not sure that
-> > changing hotplugged from true to false is safe thing to do.  
-> 
-> Yes. But for the same reason I am not sure that setting
-> hotplugged=on on command-line devices is a safe thing to do.
-> 
-> So, we have two problems we want to avoid:
-> A) Not changing hotplugged from true to false on migration;
-> B) Not breaking devices when using
->    "-device ...,hotplugged=true" on the command-line.
-> 
-> Problem (A) already exists, as far as I can see, but we never got
-> any bug reports related to it.
-> 
-> The fix for (A) you propose is to set "hotplugged=true" on the
-> command-line. This triggered (B) on the CPU code, but your patch
-> fixed it.
-> 
-> The fix I proposed for (B) (this patch) prevents your fix for (A)
-> from being implemented. This is a problem.
-> 
-> Your patch to fix (B) in the CPU code looks good, but I am
-> worried about other possible instances of (B).
-> 
-> So, I propose we do this:
-> 
-> 1) Drop this patch, by now;
-agreed
+On 12/19/2016 10:47 AM, Jose Ricardo Ziviani wrote:
+> This commit implements functions to right and left shifts and the
+> unittest for them. Such functions is needed due to instructions
+> that requires them.
+>=20
+> Today, there is already a right shift implementation in int128.h
+> but it's designed for signed numbers.
+>=20
+> Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
+> ---
 
-> 2) Document properly what management software is supposed
->    to do to fix (A), and test if the proposed solution doesn't
-Do you have in mind where to document it?
-I'll add to loop libvirt folks.
+> +static const test_data test_ltable[] =3D {
+> +    { 1223ULL, 0, 1223ULL,   0, 0, false },
+> +    { 1ULL,    0, 2ULL,   0, 1, false },
+> +    { 1ULL,    0, 4ULL,   0, 2, false },
+> +    { 1ULL,    0, 16ULL,  0, 4, false },
+> +    { 1ULL,    0, 256ULL, 0, 8, false },
+> +    { 1ULL,    0, 65536ULL, 0, 16, false },
+> +    { 1ULL,    0, 2147483648ULL, 0, 31, false },
+> +    { 1ULL,    0, 35184372088832ULL, 0, 45, false },
+> +    { 1ULL,    0, 1152921504606846976ULL, 0, 60, false },
+> +    { 1ULL,    0, 0, 1ULL, 64, false },
+> +    { 1ULL,    0, 0, 65536ULL, 80, false },
+> +    { 1ULL,    0, 0, 9223372036854775808ULL, 127, false },
 
->    break anything (I think we will find other device code to
->    crash or misbehave if using "-device ...,hotplugged=true");
-As for tests, I'm not sure I'll be able to cover all usecases,
-but I can take care of x86 cpus and pc/nv-dimms.
+I concur with the request to write these tests in hex.
 
--device path  is unlikely to trigger bugs as it's executed rather late
-when machine init code is completed and basically tested by real device
-hotplug path.
-Your example of x86 cpu crash is unexpected usage of
-  -global foo.hotplugged=on
-which is applied early in machine init time to all devices of given type
-which looks wrong to me.
-I'd propose to prevent using -global for essentially per-instance property.
+> +    { 0ULL,    1, 0, 0, 64, true },
+> +    { 0x8888888888888888ULL, 0x9999999999999999ULL,
+> +        0x8000000000000000ULL, 0x9888888888888888ULL, 60, true },
+> +    { 0x8888888888888888ULL, 0x9999999999999999ULL,
+> +        0, 0x8888888888888888ULL, 64, true },
+> +    { 0x8ULL, 0, 0, 0x8ULL, 64, false },
+> +    { 0x8ULL, 0, 0, 0x8000000000000000ULL, 124, false },
+> +    { 0x1ULL, 0, 0, 0x4000000000000000ULL, 126, false },
+> +    { 0x1ULL, 0, 0, 0x8000000000000000ULL, 127, false },
+> +    { 0x1ULL, 0, 0x1ULL, 0, 128, true },
 
-> 3) If we don't do (2) in the next QEMU release, I will resubmit
->    this patch to remove the unused/undocumented/untested feature.
-Applying this patch looks wrong to me regardless of (2) for already
-mentioned reasons.
-We should at least document property usage and ask libvirt to use it
-if it's not using it yet.
+Do we really want this to be well-defined behavior?  Or would it be
+better to require shift to be in the bounded range [0,127] and assert()
+that it is always in range?  At least your testsuite ensures that if we
+want it to be well-defined, we won't go breaking it.
 
-> 
-> > 
-> >   
-> > > Examples:
-> > > 
-> > > [1] acpi_cpu_plug_cb(), acpi_pcihp_device_plug_cb(),
-> > >     nvdimm_acpi_plug_cb();
-> > > [2] cpu_common_realizefn() calls cpu_synchronize_post_init() and
-> > >     cpu_resume() if dev->hotplug is set.
-> > > [3] pc_cpu_plug()
-> > >   
-> > > >     
-> > > > > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> > > > > ---
-> > > > >  hw/core/qdev.c | 9 +--------
-> > > > >  1 file changed, 1 insertion(+), 8 deletions(-)
-> > > > > 
-> > > > > diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> > > > > index 57834423b9..f5989c41cb 100644
-> > > > > --- a/hw/core/qdev.c
-> > > > > +++ b/hw/core/qdev.c
-> > > > > @@ -1013,13 +1013,6 @@ static bool device_get_hotplugged(Object *obj, Error **err)
-> > > > >      return dev->hotplugged;
-> > > > >  }
-> > > > >  
-> > > > > -static void device_set_hotplugged(Object *obj, bool value, Error **err)
-> > > > > -{
-> > > > > -    DeviceState *dev = DEVICE(obj);
-> > > > > -
-> > > > > -    dev->hotplugged = value;
-> > > > > -}
-> > > > > -
-> > > > >  static void device_initfn(Object *obj)
-> > > > >  {
-> > > > >      DeviceState *dev = DEVICE(obj);
-> > > > > @@ -1039,7 +1032,7 @@ static void device_initfn(Object *obj)
-> > > > >      object_property_add_bool(obj, "hotpluggable",
-> > > > >                               device_get_hotpluggable, NULL, NULL);
-> > > > >      object_property_add_bool(obj, "hotplugged",
-> > > > > -                             device_get_hotplugged, device_set_hotplugged,
-> > > > > +                             device_get_hotplugged, NULL,
-> > > > >                               &error_abort);
-> > > > >  
-> > > > >      class = object_get_class(OBJECT(dev));    
-> > > >     
-> > >   
-> >   
-> 
+> +    { 0, 0, 0ULL, 0, 200, false },
+
+If you are going to support shifts larger than 127, your testsuite
+should include a shift of a non-zero number.  Also, if you are going to
+implicitly truncate the shift value into range, then accepting a signed
+shift might be nicer (as there are cases where it is easier to code a
+shift by -1 than it is a shift by 127).
+
+> +++ b/util/host-utils.c
+> @@ -26,6 +26,7 @@
+>  #include "qemu/osdep.h"
+>  #include "qemu/host-utils.h"
+> =20
+> +#ifndef CONFIG_INT128
+>  /* Long integer helpers */
+>  static inline void mul64(uint64_t *plow, uint64_t *phigh,
+>                           uint64_t a, uint64_t b)
+> @@ -158,4 +159,47 @@ int divs128(int64_t *plow, int64_t *phigh, int64_t=
+ divisor)
+> =20
+>      return overflow;
+>  }
+> +#endif
+
+How is the addition of this #ifndef related to the rest of the patch?  I
+almost wonder if it needs two patches (one to compile the file
+regardless of 128-bit support, the other to add new 128-bit shifts); if
+not, mentioning it in the commit message doesn't hurt.
+
+> =20
+> +void urshift(uint64_t *plow, uint64_t *phigh, uint32_t shift)
+
+Comments on the function contract would be much appreciated (for
+example, what range must shift belong to, and the fact that the shift is
+modifying the value in-place, and that the result is always zero-extended=
+).
+
+> +{
+> +    shift &=3D 127;
+
+This says you allow any shift value (whether negative or beyond 127);
+either the testsuite must cover this, or you should tighten the contract
+and assert that the callers pass a value in range.
+
+> +    uint64_t h =3D *phigh >> (shift & 63);
+> +    if (shift =3D=3D 0) {
+> +        return;
+
+Depending on the compiler, this may waste the work of computing h; maybe
+you can float this conditional first.
+
+> +    } else if (shift >=3D 64) {
+> +        *plow =3D h;
+> +        *phigh =3D 0;
+> +    } else {
+> +        *plow =3D (*plow >> (shift & 63)) | (*phigh << (64 - (shift & =
+63)));
+> +        *phigh =3D h;
+> +    }
+
+At any rate, the math looks correct.
+
+> +}
+> +
+> +void ulshift(uint64_t *plow, uint64_t *phigh, uint32_t shift, bool *ov=
+erflow)
+
+Again, doc comments are useful, including what overflow represents, and
+a repeat of the question on whether a signed shift amount makes sense if
+you intend to allow silent truncation of the shift value.
+
+> +{
+> +    uint64_t low =3D *plow;
+> +    uint64_t high =3D *phigh;
+> +
+> +    if (shift > 127 && (low | high)) {
+> +        *overflow =3D true;
+> +    }
+> +    shift &=3D 127;
+> +
+> +    if (shift =3D=3D 0) {
+> +        return;
+> +    }
+> +
+> +    urshift(&low, &high, 128 - shift);
+> +    if (low > 0 || high > 0) {
+
+Can't this be written 'if (low | high)' as above?
+
+> +        *overflow =3D true;
+> +    }
+> +
+> +    if (shift >=3D 64) {
+> +        *phigh =3D *plow << (shift & 63);
+> +        *plow =3D 0;
+> +    } else {
+> +        *phigh =3D (*plow >> (64 - (shift & 63))) | (*phigh << (shift =
+& 63));
+> +        *plow =3D *plow << shift;
+> +    }
+> +}
+>=20
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--bGlgLg0nISaNQNi6wkdjui3Hg2seq7uJo
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYa8FFAAoJEKeha0olJ0Nq8CgH/1HPDlWC1zegZ/zjjOIQcY32
+rNs1UGiuaPKPWd6y9u+jf6SYNpN5OoZkNmOoP22dUjlX/g7Dbfz9ayxuJzQbpPAc
+rcvZyYiGQKqpY602Ql9mHP2DsxD2zj5x8dbNkfqEy8Rete+bCp3p9lk81upwi9U2
+QJIn2BCofsjBodGWtp/PZERaudLCx3uHD2SOq6iueEF9jueUtS+N4iPzX/Am4OWN
+388Rg61LKo7tsxEx1TtBdC0f90coTZAOLVF21jJlNgGWjUN5wxD8ix+0jolsKYH3
+fKWLjYkfN5/O8tN+MPQRB/SYOSZbZMRev8OVFj/bN23NgS4D9aB8ajIzjEkEEy4=
+=Bh8T
+-----END PGP SIGNATURE-----
+
+--bGlgLg0nISaNQNi6wkdjui3Hg2seq7uJo--
