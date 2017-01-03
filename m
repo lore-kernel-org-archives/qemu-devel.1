@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43265)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43544)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangqian@sangfor.com.cn>) id 1cOKno-0002Ur-SZ
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 03:50:42 -0500
+	(envelope-from <kraxel@redhat.com>) id 1cOKpg-0003pU-28
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 03:52:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangqian@sangfor.com.cn>) id 1cOKnk-0008Il-Q6
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 03:50:40 -0500
-Received: from m128-177.yeah.net ([123.58.177.128]:19714)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangqian@sangfor.com.cn>) id 1cOKnk-0008II-4u
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 03:50:36 -0500
-Message-ID: <ANQAnwAIAL-QXsc3JFgQSapS.3.1483431170238.Hmail.zhangqian@sangfor.com.cn>
-In-Reply-To: <78c57713-dbdb-3680-a35c-cc888e22e6ca@redhat.com>
-MIME-Version: 1.0
-From: Zhang Qian <zhangqian@sangfor.com.cn>
-Date: Tue, 3 Jan 2017 16:12:50 +0800 (GMT+08:00)
+	(envelope-from <kraxel@redhat.com>) id 1cOKpc-0000OC-Vv
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 03:52:36 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58792)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cOKpc-0000O4-Pk
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 03:52:32 -0500
+Message-ID: <1483433548.24493.0.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Tue, 03 Jan 2017 09:52:28 +0100
+In-Reply-To: <CAJSP0QUnXB4+2x9v4TN_73U9M5A=-jf6G0sZ3=Yw5M+8H_BbeA@mail.gmail.com>
+References: <CAJSP0QUnXB4+2x9v4TN_73U9M5A=-jf6G0sZ3=Yw5M+8H_BbeA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel]
- =?utf-8?q?=5BPATCH=5D_scsi-disk=3A_fix_crash_on_VER?=
- =?utf-8?q?IFY_command?=
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Subject: Re: [Qemu-devel] Virtual Secure Boot (QEMU/OVMF) talk now available
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,62 +26,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
-QXQgMjAxNy0wMS0wMiAxNzozNDowMCwgUGFvbG8gQm9uemluaSA8cGJvbnppbmlAcmVkaGF0LmNv
-bT4gd3JvdGU6Cj4KPgo+T24gMjkvMTIvMjAxNiAxMzoxOSwgWmhhbmcgUWlhbiB3cm90ZToKPj4g
-RnJvbSBjMmYxNjMxMTMyODIxZDYxZTE5NDJhODcyM2JhNTk2ZjkxZDNlNjcyIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQo+PiBGcm9tOiBaaGFuZyBRaWFuIDx6aGFuZ3FpYW5Ac2FuZ2Zvci5jb20u
-Y24+Cj4+IERhdGU6IFRodSwgMjkgRGVjIDIwMTYgMjA6MDA6MDEgKzA4MDAKPj4gU3ViamVjdDog
-W1BBVENIXSBzY3NpLWRpc2s6IGZpeCBjcmFzaCBvbiBWRVJJRlkgY29tbWFuZCBDb21taXQgMTY2
-ZGJkYQo+PiAgInNjc2ktZGlzazogZml4IFZFUklGWSBmb3Igc2NzaS1ibG9jayIgYWRkIGEgcHJv
-Y2VzcyBvZiBWRVJJRlkgaW4KPj4gIHNjc2lfYmxvY2tfZG1hX2NvbW1hbmQuIEJ1dCwgdGhlIGNt
-ZC5tb2RlIG9mIHJlcSBpcyBTQ1NJX1hGRVJfTk9ORSwgdGhlIHJlcQo+PiAgaXMgaGFuZGxlZCBh
-cyBhIHJlYWQgb3BlcmF0aW9uLiBBIHZlcmlmeSBjb21tYW5kIGlzIG5vdCBhbiBhY3R1YWwgcmVh
-ZCAod2UgZG8KPj4gIG5vdCBpbXBsZW1lbnQgY29tcGFyZSBtb2RlKSBhbmQgdGh1cyBkb2VzIG5v
-dCBoYXZlIGFuIEFJT0NCIGF0dGFjaGVkLiBzbywgaXQKPj4gIHdpbGwgYmUgY3Jhc2ggaW4gc2Nz
-aV9kbWFfY29tcGxldGUuIENvbW1pdCBlZjg0ODlkICJzY3NpOiBhdm9pZCBhc3NlcnRpb24KPj4g
-IGZhaWx1cmUgb24gVkVSSUZZIGNvbW1hbmQiIGlzIGFkZGVkIHRvIHByb2Nlc3MgdmVyaWZ5IGNv
-bW1hbmQsIHNvIHdlIHRyZWF0Cj4+ICB2ZXJpZnkgY29tbWFuZCBhcyBhIHdyaXRlIG9wZXJhdGlv
-bi4KPj4gU2lnbmVkLW9mZi1ieTogWmhhbmcgUWlhbiA8emhhbmdxaWFuQHNhbmdmb3IuY29tLmNu
-Pgo+Cj5JIGFtIG5vdCBzdXJlIHdoYXQgdGhlIGlzc3VlIGlzLCBhbmQgeW91ciBjb21taXQgbWVz
-c2FnZSBkb2Vzbid0IGV4cGxhaW4KPml0LiAgVGhlcmUgYXJlIGEgZmV3IHVuY2xlYXIgYXNwZWN0
-czoKPgo+MSkgdGhlIG1vZGUgaXMgc2V0IGluIHNjc2lfY21kX3hmZXJfbW9kZS4gIEZvciBWRVJJ
-RlksIGl0IGlzIG9ubHkKPlNDU0lfWEZFUl9OT05FIGlmIHRoZSB0cmFuc2ZlcnJlZCBkYXRhIGlz
-IGVtcHR5LCBvdGhlcndpc2UgaXQgaXMKPlNDU0lfWEZFUl9UT19ERVYuICBGb3IgQllUQ0hLPTB4
-MDEsIHNjc2lfcmVxX3hmZXIgc2V0cyBjbWQtPnhmZXIKPmNvcnJlY3RseSB0byBudW1iZXItb2Yt
-YmxvY2tzICogYmxvY2stc2l6ZS4KPgp5ZXMsIHlvdSBhcmUgcmlnaHQuIApUaGUgc2NlbmFyaW9z
-IG9mIHByb2JsZW0gaXMgYSBzY3NpLWRpc2sgb2JqZWN0IHJlY2VpdmVzIFZFUklGWSBjb21tYW5k
-IHdpdGggQllUQ0hLIGJpdCBiZWluZyB6ZXJvLApzY3NpX2Jsb2NrX2lzX3Bhc3N0aHJvdWdoIHJl
-dHVybnMgZmFsc2UgYW5kIGZpbmFsbHkgc2NzaS1ibG9jayB1c2VzIHNjc2lfZGlza19kbWFfY29t
-bWFuZCBmb3IgClZFUklGWS4gIFNvIHRoZSBtb2RlIGlzIHNldCB0byBTQ1NJX1hGRVJfTk9ORS4g
-CkluIHNjc2lfcmVxX2NvbnRpbnVlLCAgc2NzaV9yZWFkX2RhdGEgZnVuY3Rpb24gaXMgY2FsbGVk
-LgoKCj4yKSBZb3VyIG1lc3NhZ2UgZG9lcyBub3Qgc2F5IGlmIHlvdSdyZSB1c2luZyBzY3NpLWJs
-b2NrIG9yCj5zY3NpLWRpc2svc2NzaS1oZC4gT25seSBzY3NpLWJsb2NrIHVzZXMgc2NzaV9kaXNr
-X2RtYV9jb21tYW5kIGZvcgo+VkVSSUZZLCBhbmQgaXQgZG9lcyBoYXZlIGFuIEFJT0NCIChjcmVh
-dGVkIGJ5IHNjc2lfYmxvY2tfZG1hX3dyaXRldikuCj5JZiB5b3Ugd2VyZSB1c2luZyB2aXJ0aW8t
-c2NzaSwgdGhlbiBhIHdyb25nIHJlcXVlc3QgZnJvbSB0aGUgZ3Vlc3QgbWlnaHQKPmhhdmUgQllU
-Q0hLPTB4MDEgYW5kIFNDU0lfWEZFUl9OT05FIChzZWUgdmlydGlvX3Njc2lfcGFyc2VfY2RiKS4K
-Pkhvd2V2ZXIsIHRoaXMgZG9lcyBub3QgYWZmZWN0IHdoZXRoZXIgdGhlIHJlcXVlc3QgaGFzIGFu
-IEFJT0NCIGF0dGFjaGVkLgo+Cj4Kc2NzaV9ibG9ja19kbWFfd3JpdGV2IGlzIG5vdCBjYWxsZWQs
-IGJlY2F1c2Ugc2NzaV93cml0ZV9kYXRhIGlzIG5vdCBjYWxsZWQucWVtdSBwcmludCBlcnJvciBt
-ZXNzYWdlIO+8mgpxZW11LTIuOC4wOiBody9zY3NpL3Njc2ktZGlzay5jOjI5MDogc2NzaV9kbWFf
-Y29tcGxldGU6IEFzc2VydGlvbiBgci0+cmVxLmFpb2NiICE9ICgodm9pZCAqKTApJyBmYWlsZWQu
-CgoKSSB1c2UgYSBzY3NpLWJsb2NrIGRldmljZS4gSW4gZ3Vlc3Qgb3PvvIwgSSBqdXN0IGV4ZWN1
-dGVkIGEgY29tbWFuZCDigJxzZ192ZXJpZnkgL2Rldi9zZGHigJ0uCgoKc28sIHRoZSBjdXJyZW50
-IHNjZW5lIGlzIG5vdCB3aGF0IHlvdSB3YW50LgoKCj5QbGVhc2UgZXhwbGFpbiB0aGUgaXNzdWUg
-YmV0dGVyIGFuZCwgaWYgaXQgaXMgZm9yIHNjc2ktZGlzayBvciBzY3NpLWhkLCA+cGxlYXNlIHBy
-b3ZpZGUgYSB0ZXN0Y2FzZSBpbiB0ZXN0cy92aXJ0aW8tc2NzaS10ZXN0cy5jLiA+ID5UaGFua3Ms
-ID4gPlBhb2xvID4gPj4gLS0tID4+IGh3L3Njc2kvc2NzaS1kaXNrLmMgfCA0ICsrKysgPj4gMSBm
-aWxlIGNoYW5nZWQsIDQgaW5zZXJ0aW9ucygrKSA+PiA+PiA+PiBkaWZmIC0tZ2l0IGEvaHcvc2Nz
-aS9zY3NpLWRpc2suYyBiL2h3L3Njc2kvc2NzaS1kaXNrLmMgPj4gaW5kZXggYmRkMWU1Zi4uYWIw
-NWJmOSAxMDA2NDQgPj4gLS0tIGEvaHcvc2NzaS9zY3NpLWRpc2suYyA+PiArKysgYi9ody9zY3Np
-L3Njc2ktZGlzay5jID4+IEBAIC0yMTcwLDYgKzIxNzAsMTAgQEAgc3RhdGljIGludDMyX3Qgc2Nz
-aV9kaXNrX2RtYV9jb21tYW5kKFNDU0lSZXF1ZXN0ICpyZXEsIHVpbnQ4X3QgKmJ1ZikgPj4gaWYg
-KCFjaGVja19sYmFfcmFuZ2Uocywgci0+cmVxLmNtZC5sYmEsIGxlbikpIHsgPj4gZ290byBpbGxl
-Z2FsX2xiYTsgPj4gfSA+PiArIGlmIChjb21tYW5kID09IFZFUklGWV8xMCB8fCBjb21tYW5kID09
-IFZFUklGWV8xMiB8fCA+PiArIGNvbW1hbmQgPT0gVkVSSUZZXzE2KSB7ID4+ICsgci0+cmVxLmNt
-ZC5tb2RlID0gU0NTSV9YRkVSX1RPX0RFVjsgPj4gKyB9ID4+IHItPnNlY3RvciA9IHItPnJlcS5j
-bWQubGJhICogKHMtPnFkZXYuYmxvY2tzaXplIC8gNTEyKTsgPj4gci0+c2VjdG9yX2NvdW50ID0g
-bGVuICogKHMtPnFkZXYuYmxvY2tzaXplIC8gNTEyKTsgPj4gYnJlYWs7ID4+CgoNCg0K
+On Fr, 2016-12-30 at 22:49 +0000, Stefan Hajnoczi wrote:
+> Gerd Hoffmann's talk on secure boot at 33c3 is now available:
+>=20
+> https://media.ccc.de/v/33c3-8142-virtual_secure_boot
+>=20
+> Useful for anyone who wants to understand the OVMF secure boot feature
+> that is supported by QEMU/KVM.
+
+Slides are here: https://www.kraxel.org/slides/virtual-secure-boot/
+
+cheers,
+  Gerd
