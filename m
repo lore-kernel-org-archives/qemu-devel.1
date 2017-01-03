@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56279)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58093)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cOOcm-00036G-2O
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 07:55:33 -0500
+	(envelope-from <imammedo@redhat.com>) id 1cOOk1-0006Yl-G1
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 08:03:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cOOci-0002Fk-B9
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 07:55:32 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38710)
+	(envelope-from <imammedo@redhat.com>) id 1cOOjx-000460-IQ
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 08:03:01 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44700)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cOOci-0002FY-5C
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 07:55:28 -0500
-Date: Tue, 3 Jan 2017 12:55:22 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170103125522.GA518@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20161201094117.16407-1-berrange@redhat.com>
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cOOjx-00045m-95
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 08:02:57 -0500
+Date: Tue, 3 Jan 2017 14:02:52 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170103140252.1a2df147@nial.brq.redhat.com>
+In-Reply-To: <20161230182308.GK3441@thinpad.lan.raisama.net>
+References: <20161229223815.13705-1-ehabkost@redhat.com>
+	<20161230152834.6d1fa963@Igors-MacBook-Pro.local>
+	<20161230182308.GK3441@thinpad.lan.raisama.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20161201094117.16407-1-berrange@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] ui: use evdev keymap when running under
- wayland
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] qdev: Make "hotplugged" property read-only
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,73 +28,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Michael S.
+	Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>, Andreas =?UTF-8?B?RsOkcmJlcg==?= <afaerber@suse.de>
 
-CC'ing Gerd as the ui/ maintainer
+On Fri, 30 Dec 2016 16:23:08 -0200
+Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-On Thu, Dec 01, 2016 at 09:41:17AM +0000, Daniel P. Berrange wrote:
-> Wayland always uses evdev as its input source, so QEMU
-> can use the existing evdev keymap data
+> On Fri, Dec 30, 2016 at 03:28:34PM +0100, Igor Mammedov wrote:
+> > On Thu, 29 Dec 2016 20:38:15 -0200
+> > Eduardo Habkost <ehabkost@redhat.com> wrote:
+> >   
+> > > The "hotplugged" property is user visible, but it was never meant
+> > > to be set by the user. There are probably multiple ways to break
+> > > or crash device code by overriding the property. One example:
+> > > 
+> > >   $ qemu-system-x86_64 -cpu qemu64,hotplugged=true
+> > >   Segmentation fault (core dumped)
+> > > 
+> > > The DeviceState::hotplugged struct field is set directly by
+> > > device_initfn(), there's no need to provide a setter for the
+> > > property.  
+> > this property is meant to be used for individual devices on target side
+> > of migration.  
 > 
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
-> 
-> Changed in v2
-> 
->  - Actually add all changed files to commit - gtk.h :-)
-> 
->  include/ui/gtk.h | 4 ++++
->  ui/gtk.c         | 7 +++++++
->  2 files changed, 11 insertions(+)
-> 
-> diff --git a/include/ui/gtk.h b/include/ui/gtk.h
-> index 42ca0fe..b3b5005 100644
-> --- a/include/ui/gtk.h
-> +++ b/include/ui/gtk.h
-> @@ -18,6 +18,10 @@
->  #include <X11/XKBlib.h>
->  #endif
->  
-> +#ifdef GDK_WINDOWING_WAYLAND
-> +#include <gdk/gdkwayland.h>
-> +#endif
-> +
->  #if defined(CONFIG_OPENGL)
->  #include "ui/egl-helpers.h"
->  #include "ui/egl-context.h"
-> diff --git a/ui/gtk.c b/ui/gtk.c
-> index e816428..81dba57 100644
-> --- a/ui/gtk.c
-> +++ b/ui/gtk.c
-> @@ -90,6 +90,9 @@
->  #ifndef GDK_IS_X11_DISPLAY
->  #define GDK_IS_X11_DISPLAY(dpy) (dpy == dpy)
->  #endif
-> +#ifndef GDK_IS_WAYLAND_DISPLAY
-> +#define GDK_IS_WAYLAND_DISPLAY(dpy) (dpy == dpy)
-> +#endif
->  #ifndef GDK_IS_WIN32_DISPLAY
->  #define GDK_IS_WIN32_DISPLAY(dpy) (dpy == dpy)
->  #endif
-> @@ -1054,6 +1057,10 @@ static int gd_map_keycode(GtkDisplayState *s, GdkDisplay *dpy, int gdk_keycode)
->              qemu_keycode = translate_xfree86_keycode(gdk_keycode - 97);
->          }
->  #endif
-> +#ifdef GDK_WINDOWING_WAYLAND
-> +    } else if (GDK_IS_WAYLAND_DISPLAY(dpy) && gdk_keycode < 158) {
-> +        qemu_keycode = translate_evdev_keycode(gdk_keycode - 97);
-> +#endif
->      } else if (gdk_keycode == 208) { /* Hiragana_Katakana */
->          qemu_keycode = 0x70;
->      } else if (gdk_keycode == 211) { /* backslash */
-> -- 
-> 2.9.3
-> 
+> I didn't know that. Is this documented somewhere?
+> Is it actually used by any existing software?
+not that I know of. But users should be fixed if they are not using it.
 
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+> > Doing above is a rather big hammer with behavioral change of migrated
+> > instance.  
+> 
+> If the property is really supposed to be set directly by users,
+> then I agree. But I would like to understand how exactly it is
+> supposed to work, so we can fix those issues properly.
+> 
+> Do you have any existing example where setting "hotplugged=true"
+> on the command-line is necessary and where it really works?
+> 
+> > 
+> > So I'd  fix crash caused by assumption that hotplugged CPU
+> > guarantied to have rtc&fw_cfg available.
+> > I'll post a patch with the fix.  
+> 
+> Most of the cases where I see DeviceState::hotplugged being used
+> are related to generation of hotplug events[1] or completing
+> steps that are normally done by machine init code[2][3], and I am
+> not sure this should be the case when we're just migrating
+> hotplugged devices. Are all those cases broken, and they should
+> be checking the qdev_hotplug global variable instead?
+skipping hotplugged for x86 CPUs and pc-dimms on target side shouldn't
+affect functionality as current ACPI code doesn't depends on it
+and it's safe to drop hotplug events for already plugged devices
+as machine init/done code would do the rest of initialization
+in this case.
+
+However if hotplugged property is not set on target then
+mgmt would loose information that device has been hotplugged
+when it would query qemu. For example:
+info memory-devices 
+Memory device [dimm]: ""
+  addr: 0x100000000
+  slot: 1
+  node: 0
+  size: 1073741824
+  memdev: /objects/mem2
+  hotplugged: false
+  hotpluggable: true  <=== would become false
+
+
+Also beside of simplistic use of hotplugged by x86 cpus/pc-dimm,
+'git grep hotplugged' shows that it's used by
+pci, spapr and other devices and I'm not sure that
+changing hotplugged from true to false is safe thing to do.
+
+
+> Examples:
+> 
+> [1] acpi_cpu_plug_cb(), acpi_pcihp_device_plug_cb(),
+>     nvdimm_acpi_plug_cb();
+> [2] cpu_common_realizefn() calls cpu_synchronize_post_init() and
+>     cpu_resume() if dev->hotplug is set.
+> [3] pc_cpu_plug()
+> 
+> >   
+> > > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> > > ---
+> > >  hw/core/qdev.c | 9 +--------
+> > >  1 file changed, 1 insertion(+), 8 deletions(-)
+> > > 
+> > > diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+> > > index 57834423b9..f5989c41cb 100644
+> > > --- a/hw/core/qdev.c
+> > > +++ b/hw/core/qdev.c
+> > > @@ -1013,13 +1013,6 @@ static bool device_get_hotplugged(Object *obj, Error **err)
+> > >      return dev->hotplugged;
+> > >  }
+> > >  
+> > > -static void device_set_hotplugged(Object *obj, bool value, Error **err)
+> > > -{
+> > > -    DeviceState *dev = DEVICE(obj);
+> > > -
+> > > -    dev->hotplugged = value;
+> > > -}
+> > > -
+> > >  static void device_initfn(Object *obj)
+> > >  {
+> > >      DeviceState *dev = DEVICE(obj);
+> > > @@ -1039,7 +1032,7 @@ static void device_initfn(Object *obj)
+> > >      object_property_add_bool(obj, "hotpluggable",
+> > >                               device_get_hotpluggable, NULL, NULL);
+> > >      object_property_add_bool(obj, "hotplugged",
+> > > -                             device_get_hotplugged, device_set_hotplugged,
+> > > +                             device_get_hotplugged, NULL,
+> > >                               &error_abort);
+> > >  
+> > >      class = object_get_class(OBJECT(dev));  
+> >   
+> 
