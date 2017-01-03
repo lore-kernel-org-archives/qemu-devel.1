@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48057)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48081)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cOTov-0003xX-Mv
+	(envelope-from <berrange@redhat.com>) id 1cOTow-0003yV-Lg
 	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 13:28:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cOTou-00016W-PK
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 13:28:25 -0500
+	(envelope-from <berrange@redhat.com>) id 1cOTov-00016w-Jl
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 13:28:26 -0500
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Tue,  3 Jan 2017 18:27:49 +0000
-Message-Id: <20170103182801.9638-4-berrange@redhat.com>
+Date: Tue,  3 Jan 2017 18:27:50 +0000
+Message-Id: <20170103182801.9638-5-berrange@redhat.com>
 In-Reply-To: <20170103182801.9638-1-berrange@redhat.com>
 References: <20170103182801.9638-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 03/15] qcow: document another weakness of
- qcow AES encryption
+Subject: [Qemu-devel] [PATCH v1 04/15] qcow: require image size to be > 1
+ for new images
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,34 +23,31 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, "Daniel P. Berrange" <berrange@redhat.com>
 
-Document that use of guest virtual sector numbers as the basis for
-the initialization vectors is a potential weakness, when combined
-with internal snapshots or multiple images using the same passphrase.
+The qcow driver refuses to open images which are less than
+2 bytes in size, but will happily create such images. Add
+a check in the create path to avoid this discrepancy.
 
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- qemu-img.texi | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ block/qcow.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/qemu-img.texi b/qemu-img.texi
-index 174aae3..8efcf89 100644
---- a/qemu-img.texi
-+++ b/qemu-img.texi
-@@ -554,6 +554,15 @@ change the passphrase to protect data in any qcow images. The files must
- be cloned, using a different encryption passphrase in the new file. The
- original file must then be securely erased using a program like shred,
- though even this is ineffective with many modern storage technologies.
-+@item Initialization vectors used to encrypt sectors are based on the
-+guest virtual sector number, instead of the host physical sector. When
-+a disk image has multiple internal snapshots this means that data in
-+multiple physical sectors is encrypted with the same initialization
-+vector. With the CBC mode, this opens the possibility of watermarking
-+attacks if the attack can collect multiple sectors encrypted with the
-+same IV and some predictable data. Having multiple qcow2 images with
-+the same passphrase also exposes this weakness since the passphrase
-+is directly used as the key.
- @end itemize
- 
- Use of qcow / qcow2 encryption is thus strongly discouraged. Users are
+diff --git a/block/qcow.c b/block/qcow.c
+index 7540f43..8133fda 100644
+--- a/block/qcow.c
++++ b/block/qcow.c
+@@ -799,6 +799,12 @@ static int qcow_create(const char *filename, QemuOpts *opts, Error **errp)
+     /* Read out options */
+     total_size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
+                           BDRV_SECTOR_SIZE);
++    if (total_size <= 1) {
++        error_setg(errp, "Image size is too small (must be at least 2 bytes)");
++        ret = -EINVAL;
++        goto cleanup;
++    }
++
+     backing_file = qemu_opt_get_del(opts, BLOCK_OPT_BACKING_FILE);
+     if (qemu_opt_get_bool_del(opts, BLOCK_OPT_ENCRYPT, false)) {
+         flags |= BLOCK_FLAG_ENCRYPT;
 -- 
 2.9.3
