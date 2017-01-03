@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57624)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58503)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <agordeev@redhat.com>) id 1cOMGw-0003bx-FM
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 05:24:52 -0500
+	(envelope-from <jasowang@redhat.com>) id 1cOMKU-0005Rd-5g
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 05:28:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <agordeev@redhat.com>) id 1cOMGr-00030E-Gm
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 05:24:50 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41200)
+	(envelope-from <jasowang@redhat.com>) id 1cOMKQ-0003rj-7f
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 05:28:30 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42356)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <agordeev@redhat.com>) id 1cOMGr-0002ze-80
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 05:24:45 -0500
-Date: Tue, 3 Jan 2017 11:33:27 +0100
-From: Alexander Gordeev <agordeev@redhat.com>
-Message-ID: <20170103103326.GA4280@agordeev.lab.eng.brq.redhat.com>
-References: <1481512100-10380-1-git-send-email-peterx@redhat.com>
-	<1481512100-10380-13-git-send-email-peterx@redhat.com>
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cOMKQ-0003rY-1G
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 05:28:26 -0500
+Received: from int-mx10.intmail.prod.int.phx2.redhat.com
+	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2776B83F45
+	for <qemu-devel@nongnu.org>; Tue,  3 Jan 2017 10:28:26 +0000 (UTC)
+References: <20161230104130.29ff671b@x240.lan>
+	<4eda1813-d732-5dfc-e6ff-29ac95fe22d8@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <8aae955f-44ff-134e-818f-31b0bd510ba1@redhat.com>
+Date: Tue, 3 Jan 2017 18:28:18 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1481512100-10380-13-git-send-email-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [kvm-unit-tests PATCH v8 12/14] x86: intel-iommu:
- add dmar test
+In-Reply-To: <4eda1813-d732-5dfc-e6ff-29ac95fe22d8@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] vhost-user breaks after 96a3d98.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,318 +33,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, drjones@redhat.com, jan.kiszka@web.de, rkrcmar@redhat.com, pbonzini@redhat.com
+To: Flavio Leitner <fbl@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
-On Mon, Dec 12, 2016 at 11:08:18AM +0800, Peter Xu wrote:
-> DMAR test is based on QEMU edu device. A 4B DMA memory copy is carried
-> out as the simplest DMAR test.
 
-Hi Peter,
 
-Sorry for missing to provide feedback on your series.
-I did just a cursory review, but did not notice few issue below.
+On 2017=E5=B9=B401=E6=9C=8803=E6=97=A5 11:09, Jason Wang wrote:
+>
+>
+> On 2016=E5=B9=B412=E6=9C=8830=E6=97=A5 20:41, Flavio Leitner wrote:
+>> Hi,
+>>
+>> While I was testing vhost-user using OVS 2.5 and DPDK 2.2.0 in the
+>> host and testpmd dpdk 2.2.0 in the guest, I found that the commit
+>> below breaks the environment and no packets gets into the guest.
+>>
+>> dpdk port --> OVS --> vhost-user --> guest --> testpmd
+>>                           ^--- drops here         ^--- no packets here=
+.
+>>
+>> commit 96a3d98d2cdbd897ff5ab33427aa4cfb94077665
+>> Author: Jason Wang <jasowang@redhat.com>
+>> Date:   Mon Aug 1 16:07:58 2016 +0800
+>>
+>>      vhost: don't set vring call if no vector
+>>           We used to set vring call fd unconditionally even if guest=20
+>> driver does
+>>      not use MSIX for this vritqueue at all. This will cause lots of
+>>      unnecessary userspace access and other checks for drivers does=20
+>> not use
+>>      interrupt at all (e.g virtio-net pmd). So check and clean vring=20
+>> call
+>>      fd if guest does not use any vector for this virtqueue at
+>>      all.
+>> [...]
+>>
+>> Thanks,
+>
+> Hi Flavio:
+>
+> Thanks for reporting this issue, could this be a bug of vhost-user? (I=20
+> believe virito-net pmd does not use interrupt for rx/tx at all)
+>
+> Anyway, will try to reproduce it.
+>
 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  lib/pci.h             |   5 ++
->  lib/x86/intel-iommu.c | 133 ++++++++++++++++++++++++++++++++++++++++++++++++++
->  lib/x86/intel-iommu.h |   4 ++
->  x86/Makefile.common   |   1 +
->  x86/intel-iommu.c     |  51 +++++++++++++++++++
->  5 files changed, 194 insertions(+)
-> 
-> diff --git a/lib/pci.h b/lib/pci.h
-> index d3052ef..26968b1 100644
-> --- a/lib/pci.h
-> +++ b/lib/pci.h
-> @@ -18,6 +18,9 @@ enum {
->  #define PCI_BAR_NUM                     6
->  #define PCI_DEVFN_MAX                   256
->  
-> +#define PCI_BDF_GET_DEVFN(x)            ((x) & 0xff)
-> +#define PCI_BDF_GET_BUS(x)              (((x) >> 8) & 0xff)
-> +
->  struct pci_dev {
->  	uint16_t bdf;
->  	phys_addr_t resource[PCI_BAR_NUM];
-> @@ -28,6 +31,8 @@ extern void pci_scan_bars(struct pci_dev *dev);
->  extern void pci_cmd_set_clr(struct pci_dev *dev, uint16_t set, uint16_t clr);
->  extern void pci_enable_defaults(struct pci_dev *dev);
->  
-> +typedef phys_addr_t iova_t;
-> +
->  extern bool pci_probe(void);
->  extern void pci_print(void);
->  extern bool pci_dev_exists(pcidevaddr_t dev);
-> diff --git a/lib/x86/intel-iommu.c b/lib/x86/intel-iommu.c
-> index 1887998..86b1805 100644
-> --- a/lib/x86/intel-iommu.c
-> +++ b/lib/x86/intel-iommu.c
-> @@ -11,6 +11,42 @@
->   */
->  
->  #include "intel-iommu.h"
-> +#include "libcflat.h"
-> +
-> +/*
-> + * VT-d in QEMU currently only support 39 bits address width, which is
-> + * 3-level translation.
-> + */
-> +#define VTD_PAGE_LEVEL      3
-> +#define VTD_CE_AW_39BIT     0x1
-> +
-> +typedef uint64_t vtd_pte_t;
-> +
-> +struct vtd_root_entry {
-> +	/* Quad 1 */
-> +	uint64_t present:1;
-> +	uint64_t __reserved:11;
-> +	uint64_t context_table_p:52;
-> +	/* Quad 2 */
-> +	uint64_t __reserved_2;
-> +} __attribute__ ((packed));
-> +typedef struct vtd_root_entry vtd_re_t;
-> +
-> +struct vtd_context_entry {
-> +	/* Quad 1 */
-> +	uint64_t present:1;
-> +	uint64_t disable_fault_report:1;
-> +	uint64_t trans_type:2;
-> +	uint64_t __reserved:8;
-> +	uint64_t slptptr:52;
-> +	/* Quad 2 */
-> +	uint64_t addr_width:3;
-> +	uint64_t __ignore:4;
-> +	uint64_t __reserved_2:1;
-> +	uint64_t domain_id:16;
-> +	uint64_t __reserved_3:40;
-> +} __attribute__ ((packed));
-> +typedef struct vtd_context_entry vtd_ce_t;
->  
->  #define VTD_RTA_MASK  (PAGE_MASK)
->  #define VTD_IRTA_MASK (PAGE_MASK)
-> @@ -83,6 +119,103 @@ static void vtd_setup_ir_table(void)
->  	printf("IR table address: 0x%016lx\n", vtd_ir_table());
->  }
->  
-> +static void vtd_install_pte(vtd_pte_t *root, iova_t iova,
-> +			    phys_addr_t pa, int level_target)
-> +{
-> +	int level;
-> +	unsigned int offset;
-> +	void *page;
-> +
-> +	for (level = VTD_PAGE_LEVEL; level > level_target; level--) {
-> +		offset = PGDIR_OFFSET(iova, level);
-> +		if (!(root[offset] & VTD_PTE_RW)) {
-> +			page = alloc_page();
-> +			memset(page, 0, PAGE_SIZE);
-> +			root[offset] = virt_to_phys(page) | VTD_PTE_RW;
-> +		}
-> +		root = (uint64_t *)(phys_to_virt(root[offset] &
-> +						 VTD_PTE_ADDR));
-> +	}
-> +
-> +	offset = PGDIR_OFFSET(iova, level);
-> +	root[offset] = pa | VTD_PTE_RW;
-> +	if (level != 1) {
-> +		/* This is huge page */
-> +		root[offset] |= VTD_PTE_HUGE;
-> +	}
-> +}
-> +
-> +#define  VTD_PHYS_TO_VIRT(x) \
-> +	((void *)(((uint64_t)phys_to_virt(x)) >> VTD_PAGE_SHIFT))
+Could not reproduce this issue on similar setups (the only difference is=20
+I don't create dpdk port) with dpdk 16.11 and ovs.git HEAD. Suspect an=20
+issue dpdk. Will try OVS 2.5 + DPDK 2.2.0.
 
-I would say this macro is rather superfluous.
-
-> +/**
-> + * vtd_map_range: setup IO address mapping for specific memory range
-> + *
-> + * @sid: source ID of the device to setup
-> + * @iova: start IO virtual address
-> + * @pa: start physical address
-> + * @size: size of the mapping area
-> + */
-> +void vtd_map_range(uint16_t sid, iova_t iova, phys_addr_t pa, size_t size)
-> +{
-> +	uint8_t bus_n, devfn;
-> +	void *slptptr;
-> +	vtd_ce_t *ce;
-> +	vtd_re_t *re = phys_to_virt(vtd_root_table());
-> +
-> +	assert(IS_ALIGNED(iova, SZ_4K));
-> +	assert(IS_ALIGNED(pa, SZ_4K));
-> +	assert(IS_ALIGNED(size, SZ_4K));
-> +
-> +	bus_n = PCI_BDF_GET_BUS(sid);
-> +	devfn = PCI_BDF_GET_DEVFN(sid);
-> +
-> +	/* Point to the correct root entry */
-> +	re += bus_n;
-> +
-> +	if (!re->present) {
-> +		ce = alloc_page();
-> +		memset(ce, 0, PAGE_SIZE);
-> +		memset(re, 0, sizeof(*re));
-> +		re->context_table_p = virt_to_phys(ce) >> VTD_PAGE_SHIFT;
-> +		re->present = 1;
-> +		printf("allocated vt-d root entry for PCI bus %d\n",
-> +		       bus_n);
-> +	} else
-> +		ce = VTD_PHYS_TO_VIRT(re->context_table_p);
-
-Seems, it should be instead something like:
-
-		ce = phys_to_virt(re->context_table_p << VTD_PAGE_SHIFT);
-
-> +
-> +	/* Point to the correct context entry */
-> +	ce += devfn;
-> +
-> +	if (!ce->present) {
-> +		slptptr = alloc_page();
-> +		memset(slptptr, 0, PAGE_SIZE);
-> +		memset(ce, 0, sizeof(*ce));
-> +		/* To make it simple, domain ID is the same as SID */
-> +		ce->domain_id = sid;
-> +		/* We only test 39 bits width case (3-level paging) */
-> +		ce->addr_width = VTD_CE_AW_39BIT;
-> +		ce->slptptr = virt_to_phys(slptptr) >> VTD_PAGE_SHIFT;
-> +		ce->trans_type = VTD_CONTEXT_TT_MULTI_LEVEL;
-> +		ce->present = 1;
-> +		/* No error reporting yet */
-> +		ce->disable_fault_report = 1;
-> +		printf("allocated vt-d context entry for devfn 0x%x\n",
-> +		       devfn);
-> +	} else
-> +		slptptr = VTD_PHYS_TO_VIRT(ce->slptptr);
-
-		slptptr = phys_to_virt(ce->slptptr << VTD_PAGE_SHIFT);
-
-> +	while (size) {
-> +		/* TODO: currently we only map 4K pages (level = 1) */
-> +		printf("map 4K page IOVA 0x%lx to 0x%lx (sid=0x%04x)\n",
-> +		       iova, pa, sid);
-> +		vtd_install_pte(slptptr, iova, pa, 1);
-> +		size -= VTD_PAGE_SIZE;
-> +		iova += VTD_PAGE_SIZE;
-> +		pa += VTD_PAGE_SIZE;
-> +	}
-> +}
-> +
->  void vtd_init(void)
->  {
->  	setup_vm();
-> diff --git a/lib/x86/intel-iommu.h b/lib/x86/intel-iommu.h
-> index 92cc85f..50f67f1 100644
-> --- a/lib/x86/intel-iommu.h
-> +++ b/lib/x86/intel-iommu.h
-> @@ -20,9 +20,12 @@
->  #include "isr.h"
->  #include "smp.h"
->  #include "desc.h"
-> +#include "pci.h"
->  #include "asm/io.h"
->  
->  #define Q35_HOST_BRIDGE_IOMMU_ADDR  0xfed90000ULL
-> +#define VTD_PAGE_SHIFT              PAGE_SHIFT
-> +#define VTD_PAGE_SIZE               PAGE_SIZE
->  
->  /*
->   * Intel IOMMU register specification
-> @@ -137,5 +140,6 @@ static inline uint64_t vtd_readq(unsigned int reg)
->  }
->  
->  void vtd_init(void);
-> +void vtd_map_range(uint16_t sid, phys_addr_t iova, phys_addr_t pa, size_t size);
->  
->  #endif
-> diff --git a/x86/Makefile.common b/x86/Makefile.common
-> index 356d879..1dad18b 100644
-> --- a/x86/Makefile.common
-> +++ b/x86/Makefile.common
-> @@ -3,6 +3,7 @@
->  all: test_cases
->  
->  cflatobjs += lib/pci.o
-> +cflatobjs += lib/pci-edu.o
->  cflatobjs += lib/x86/io.o
->  cflatobjs += lib/x86/smp.o
->  cflatobjs += lib/x86/vm.o
-> diff --git a/x86/intel-iommu.c b/x86/intel-iommu.c
-> index f247913..21fd57f 100644
-> --- a/x86/intel-iommu.c
-> +++ b/x86/intel-iommu.c
-> @@ -11,9 +11,50 @@
->   */
->  
->  #include "intel-iommu.h"
-> +#include "pci-edu.h"
-> +
-> +#define VTD_TEST_DMAR_4B ("DMAR 4B memcpy test")
-> +
-> +void vtd_test_dmar(struct pci_edu_dev *dev)
-> +{
-> +	void *page = alloc_page();
-> +
-> +#define DMA_TEST_WORD (0x12345678)
-> +	/* Modify the first 4 bytes of the page */
-> +	*(uint32_t *)page = DMA_TEST_WORD;
-> +
-> +	/*
-> +	 * Map the newly allocated page into IOVA address 0 (size 4K)
-> +	 * of the device address space. Root entry and context entry
-> +	 * will be automatically created when needed.
-> +	 */
-> +	vtd_map_range(dev->pci_dev.bdf, 0, virt_to_phys(page), PAGE_SIZE);
-> +
-> +	/*
-> +	 * DMA the first 4 bytes of the page to EDU device buffer
-> +	 * offset 0.
-> +	 */
-> +	edu_dma(dev, 0, 4, 0, false);
-> +
-> +	/*
-> +	 * DMA the first 4 bytes of EDU device buffer into the page
-> +	 * with offset 4 (so it'll be using 4-7 bytes).
-> +	 */
-> +	edu_dma(dev, 4, 4, 0, true);
-> +
-> +	/*
-> +	 * Check data match between 0-3 bytes and 4-7 bytes of the
-> +	 * page.
-> +	 */
-> +	report(VTD_TEST_DMAR_4B, *((uint32_t *)page + 1) == DMA_TEST_WORD);
-> +
-> +	free_page(page);
-> +}
->  
->  int main(int argc, char *argv[])
->  {
-> +	struct pci_edu_dev dev;
-> +
->  	vtd_init();
->  
->  	report("fault status check", vtd_readl(DMAR_FSTS_REG) == 0);
-> @@ -22,6 +63,16 @@ int main(int argc, char *argv[])
->  	report("IR table setup", vtd_readl(DMAR_GSTS_REG) & VTD_GCMD_IR_TABLE);
->  	report("DMAR enablement", vtd_readl(DMAR_GSTS_REG) & VTD_GCMD_DMAR);
->  	report("IR enablement", vtd_readl(DMAR_GSTS_REG) & VTD_GCMD_IR);
-> +	report("DMAR support 39 bits address width",
-> +	       vtd_readq(DMAR_CAP_REG) & VTD_CAP_SAGAW);
-> +	report("DMAR support huge pages", vtd_readq(DMAR_CAP_REG) & VTD_CAP_SLLPS);
-> +
-> +	if (!edu_init(&dev)) {
-> +		printf("Please specify \"-device edu\" to do "
-> +		       "further IOMMU tests.\n");
-> +		report_skip(VTD_TEST_DMAR_4B);
-> +	} else
-> +		vtd_test_dmar(&dev);
->  
->  	return report_summary();
->  }
-> -- 
-> 2.7.4
-> 
+Thanks
