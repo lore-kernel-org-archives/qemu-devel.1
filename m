@@ -1,15 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41444)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41465)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cORbI-0001eE-LC
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 11:06:15 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cORbQ-0001hd-AH
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 11:06:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cORbH-0000dd-7H
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 11:06:12 -0500
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Tue,  3 Jan 2017 16:05:56 +0000
-Message-Id: <20170103160556.9895-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] iotests: record separate timings per format,
- protocol pair
+	(envelope-from <pbonzini@redhat.com>) id 1cORbM-0000eC-Va
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 11:06:20 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47120)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cORbM-0000e5-PW
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 11:06:16 -0500
+References: <a6803686-9435-0276-0118-10961dc97e04@redhat.com>
+	<20170103155347.GF14707@stefanha-x1.localdomain>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <68e906ee-5604-644c-78cd-d39f0d164406@redhat.com>
+Date: Tue, 3 Jan 2017 17:06:13 +0100
+MIME-Version: 1.0
+In-Reply-To: <20170103155347.GF14707@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Proposal for 2.9 release schedule
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,104 +27,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, "Daniel P. Berrange" <berrange@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel <qemu-devel@nongnu.org>
 
-The 'check' program records timings for each test that
-is run. These timings are only valid, however, for a
-particular format/protocol combination. So if frequently
-running 'check' with a variety of different formats or
-protocols, the times printed can be very misleading.
 
-Instead of having a single 'check.time' file, maintain
-multiple 'check.time-$IMGPROTO-$IMGFMT' files.
 
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
----
-Changed in v2:
+On 03/01/2017 16:53, Stefan Hajnoczi wrote:
+> On Fri, Dec 23, 2016 at 03:15:58PM +0100, Paolo Bonzini wrote:
+>> Considering that Easter is on April 16th, we'd probably want to have t=
+he
+>> release before that date even in case of a slip.
+>>
+>> On the other hand, the Christmas / New Year break here means that we'l=
+l
+>> have to make the development time 1-2 week shorter in practice.
+>>
+>> 2016-02-21     2.9 soft freeze
+>> 2016-03-07     hard freeze / rc0
+>> 2016-03-28     rc3 (+3 weeks)
+>> 2016-04-04     rc4 or release
+>> 2016-04-11     release (if rc4)
+>>
+>> One possibility is to make soft freeze happen a few days later.
+>> Peter/Stefan, how did the experiment go with the new rules for soft
+>> freeze?  Is it worth repeating it for 2.9 and would it make sense to
+>> shorten soft freeze given the new rules?
+>=20
+> I would shorten the soft freeze by 1 week.
+>=20
+> Overall the 2.8 release went smoothly.  We got unlucky right at the end
+> with a release blocker but otherwise it was fine.
 
- - Use a separate file per format/protocol, instead of
-   throwing away data each time format/protocol changes
-   between runs (Eric)
+Then what about soft freeze on 2016-02-28?
 
- tests/qemu-iotests/.gitignore |  2 +-
- tests/qemu-iotests/Makefile   |  2 +-
- tests/qemu-iotests/check      | 12 +++++++-----
- 3 files changed, 9 insertions(+), 7 deletions(-)
+Thanks,
 
-diff --git a/tests/qemu-iotests/.gitignore b/tests/qemu-iotests/.gitignore
-index 0711cbd..da62054 100644
---- a/tests/qemu-iotests/.gitignore
-+++ b/tests/qemu-iotests/.gitignore
-@@ -1,5 +1,5 @@
- check.log
--check.time
-+check.time*
- common.env
- *.out.bad
- *.notrun
-diff --git a/tests/qemu-iotests/Makefile b/tests/qemu-iotests/Makefile
-index 2fb527c..27380e6 100644
---- a/tests/qemu-iotests/Makefile
-+++ b/tests/qemu-iotests/Makefile
-@@ -1,5 +1,5 @@
- 
--CLEANFILES= *.out.bad *.notrun check.log check.time
-+CLEANFILES= *.out.bad *.notrun check.log check.time*
- 
- # no default target
- default:
-diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
-index 4cba215..4b1c674 100755
---- a/tests/qemu-iotests/check
-+++ b/tests/qemu-iotests/check
-@@ -129,6 +129,8 @@ fi
- #    exit 1
- #fi
- 
-+TIMESTAMP_FILE=check.time-$IMGPROTO-$IMGFMT
-+
- tmp="${TEST_DIR}"/$$
- 
- _wallclock()
-@@ -155,9 +157,9 @@ _wrapup()
-         :
-     elif $needwrap
-     then
--        if [ -f check.time -a -f $tmp.time ]
-+        if [ -f $TIMESTAMP_FILE -a -f $tmp.time ]
-         then
--            cat check.time $tmp.time \
-+            cat $TIMESTAMP_FILE $tmp.time \
-             | $AWK_PROG '
-         { t[$1] = $2 }
- END        { if (NR > 0) {
-@@ -165,7 +167,7 @@ END        { if (NR > 0) {
-           }
-         }' \
-             | sort -n >$tmp.out
--            mv $tmp.out check.time
-+            mv $tmp.out $TIMESTAMP_FILE
-         fi
- 
-         if [ -f $tmp.expunged ]
-@@ -223,7 +225,7 @@ echo "preamble" > "${TEST_DIR}"/check.sts
- # don't leave old full output behind on a clean run
- rm -f check.full
- 
--[ -f check.time ] || touch check.time
-+[ -f $TIMESTAMP_FILE ] || touch $TIMESTAMP_FILE
- 
- FULL_IMGFMT_DETAILS=`_full_imgfmt_details`
- FULL_IMGPROTO_DETAILS=`_full_imgproto_details`
-@@ -277,7 +279,7 @@ do
-         # really going to try and run this one
-         #
-         rm -f $seq.out.bad
--        lasttime=`sed -n -e "/^$seq /s/.* //p" <check.time`
-+        lasttime=`sed -n -e "/^$seq /s/.* //p" <$TIMESTAMP_FILE`
-         if [ "X$lasttime" != X ]; then
-                 echo -n " ${lasttime}s ..."
-         else
--- 
-2.9.3
+Paolo
