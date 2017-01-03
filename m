@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42283)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55331)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1cOD3g-0002yh-5u
-	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 19:34:34 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cOEqN-0006RM-Aj
+	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 21:28:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1cOD3e-0001PQ-DJ
-	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 19:34:32 -0500
-Received: from szxga01-in.huawei.com ([58.251.152.64]:59601)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1cOD3c-0001Ky-2Q
-	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 19:34:30 -0500
-From: "Longpeng(Mike)" <longpeng2@huawei.com>
-Date: Tue, 3 Jan 2017 08:33:11 +0800
-Message-ID: <1483403591-2564-7-git-send-email-longpeng2@huawei.com>
-In-Reply-To: <1483403591-2564-1-git-send-email-longpeng2@huawei.com>
-References: <1483403591-2564-1-git-send-email-longpeng2@huawei.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1cOEqK-0001bl-3M
+	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 21:28:55 -0500
+Date: Tue, 3 Jan 2017 13:26:44 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170103022644.GL12761@umbus.fritz.box>
+References: <20161222011312.12778-1-aik@ozlabs.ru>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 6/6] crypto: add AEAD algorithms testcases
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="/ZYM6PqDyfNytx60"
+Content-Disposition: inline
+In-Reply-To: <20161222011312.12778-1-aik@ozlabs.ru>
+Subject: Re: [Qemu-devel] [PATCH qemu] target-ppc: kvm: make use of
+ KVM_CREATE_SPAPR_TCE_64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,400 +24,223 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: berrange@redhat.com
-Cc: wu.wubin@huawei.com, jianjay.zhou@huawei.com, arei.gonglei@huawei.com, qemu-devel@nongnu.org, "Longpeng(Mike)" <longpeng2@huawei.com>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-This patch add some AEAD algorithms testcases
 
-Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
----
- tests/Makefile.include   |   2 +
- tests/test-crypto-aead.c | 357 +++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 359 insertions(+)
- create mode 100644 tests/test-crypto-aead.c
+--/ZYM6PqDyfNytx60
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 4841d58..686ba30 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -93,6 +93,7 @@ gcov-files-test-write-threshold-y = block/write-threshold.c
- check-unit-y += tests/test-crypto-hash$(EXESUF)
- check-unit-y += tests/test-crypto-hmac$(EXESUF)
- check-unit-y += tests/test-crypto-cipher$(EXESUF)
-+check-unit-y += tests/test-crypto-aead$(EXESUF)
- check-unit-y += tests/test-crypto-secret$(EXESUF)
- check-unit-$(CONFIG_GNUTLS) += tests/test-crypto-tlscredsx509$(EXESUF)
- check-unit-$(CONFIG_GNUTLS) += tests/test-crypto-tlssession$(EXESUF)
-@@ -574,6 +575,7 @@ tests/test-bitops$(EXESUF): tests/test-bitops.o $(test-util-obj-y)
- tests/test-crypto-hash$(EXESUF): tests/test-crypto-hash.o $(test-crypto-obj-y)
- tests/test-crypto-hmac$(EXESUF): tests/test-crypto-hmac.o $(test-crypto-obj-y)
- tests/test-crypto-cipher$(EXESUF): tests/test-crypto-cipher.o $(test-crypto-obj-y)
-+tests/test-crypto-aead$(EXESUF): tests/test-crypto-aead.o $(test-crypto-obj-y)
- tests/test-crypto-secret$(EXESUF): tests/test-crypto-secret.o $(test-crypto-obj-y)
- tests/test-crypto-xts$(EXESUF): tests/test-crypto-xts.o $(test-crypto-obj-y)
- 
-diff --git a/tests/test-crypto-aead.c b/tests/test-crypto-aead.c
-new file mode 100644
-index 0000000..c757be3
---- /dev/null
-+++ b/tests/test-crypto-aead.c
-@@ -0,0 +1,357 @@
-+/*
-+ * QEMU Crypto aead algorithms testcase
-+ *
-+ * Copyright (c) 2016 HUAWEI TECHNOLOGIES CO., LTD.
-+ *
-+ * Authors:
-+ *    Longpeng(Mike) <longpeng2@huawei.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or
-+ * (at your option) any later version.  See the COPYING file in the
-+ * top-level directory.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "crypto/init.h"
-+#include "crypto/aead.h"
-+#include "qapi/error.h"
-+
-+typedef struct QCryptoAeadTestData QCryptoAeadTestData;
-+struct QCryptoAeadTestData {
-+    const char *path;
-+    QCryptoCipherAlgorithm alg;
-+    QCryptoCipherMode mode;
-+    const char *hex_key;
-+    const char *hex_nonce;
-+    const char *hex_aad;
-+    const char *hex_plain;
-+    const char *hex_cipher;
-+    const char *hex_tag;
-+};
-+
-+static QCryptoAeadTestData test_data[] = {
-+    {
-+        /* Borrowed from libgcrypt */
-+        .path = "/crypto/aead/gcm-aes-128",
-+        .alg = QCRYPTO_CIPHER_ALG_AES_128,
-+        .mode = QCRYPTO_CIPHER_MODE_GCM,
-+        .hex_key = "0000000000000000"
-+                   "0000000000000000",
-+        .hex_nonce = "0000000000000000"
-+                     "00000000",
-+        .hex_aad = "",
-+        .hex_plain = "0000000000000000"
-+                     "0000000000000000",
-+        .hex_cipher = "0388dace60b6a392"
-+                      "f328c2b971b2fe78",
-+        .hex_tag = "ab6e47d42cec13bd"
-+                   "f53a67b21257bddf",
-+    },
-+    {
-+        /* Borrowed from libgcrypt */
-+        .path = "/crypto/aead/gcm-aes-192",
-+        .alg = QCRYPTO_CIPHER_ALG_AES_192,
-+        .mode = QCRYPTO_CIPHER_MODE_GCM,
-+        .hex_key = "feffe9928665731c"
-+                   "6d6a8f9467308308"
-+                   "feffe9928665731c",
-+        .hex_nonce = "9313225df88406e5"
-+                     "55909c5aff5269aa"
-+                     "6a7a9538534f7da1"
-+                     "e4c303d2a318a728"
-+                     "c3c0c95156809539"
-+                     "fcf0e2429a6b5254"
-+                     "16aedbf5a0de6a57"
-+                     "a637b39b",
-+        .hex_aad = "feedfacedeadbeef"
-+                   "feedfacedeadbeef"
-+                   "abaddad2",
-+        .hex_plain = "d9313225f88406e5"
-+                     "a55909c5aff5269a"
-+                     "86a7a9531534f7da"
-+                     "2e4c303d8a318a72"
-+                     "1c3c0c9595680953"
-+                     "2fcf0e2449a6b525"
-+                     "b16aedf5aa0de657"
-+                     "ba637b39",
-+        .hex_cipher = "d27e88681ce3243c"
-+                      "4830165a8fdcf9ff"
-+                      "1de9a1d8e6b447ef"
-+                      "6ef7b79828666e45"
-+                      "81e79012af34ddd9"
-+                      "e2f037589b292db3"
-+                      "e67c036745fa22e7"
-+                      "e9b7373b",
-+        .hex_tag = "dcf566ff291c25bb"
-+                   "b8568fc3d376a6d9",
-+    },
-+    {
-+        /* Borrowed from libgcrypt */
-+        .path = "/crypto/aead/gcm-aes-256",
-+        .alg = QCRYPTO_CIPHER_ALG_AES_256,
-+        .mode = QCRYPTO_CIPHER_MODE_GCM,
-+        .hex_key = "feffe9928665731c"
-+                   "6d6a8f9467308308"
-+                   "feffe9928665731c"
-+                   "6d6a8f9467308308",
-+        .hex_nonce = "9313225df88406e5"
-+                     "55909c5aff5269aa"
-+                     "6a7a9538534f7da1"
-+                     "e4c303d2a318a728"
-+                     "c3c0c95156809539"
-+                     "fcf0e2429a6b5254"
-+                     "16aedbf5a0de6a57"
-+                     "a637b39b",
-+        .hex_aad = "feedfacedeadbeef"
-+                   "feedfacedeadbeef"
-+                   "abaddad2",
-+        .hex_plain = "d9313225f88406e5"
-+                     "a55909c5aff5269a"
-+                     "86a7a9531534f7da"
-+                     "2e4c303d8a318a72"
-+                     "1c3c0c9595680953"
-+                     "2fcf0e2449a6b525"
-+                     "b16aedf5aa0de657"
-+                     "ba637b39",
-+        .hex_cipher = "5a8def2f0c9e53f1"
-+                      "f75d7853659e2a20"
-+                      "eeb2b22aafde6419"
-+                      "a058ab4f6f746bf4"
-+                      "0fc0c3b780f24445"
-+                      "2da3ebf1c5d82cde"
-+                      "a2418997200ef82e"
-+                      "44ae7e3f",
-+        .hex_tag = "a44a8266ee1c8eb0"
-+                   "c8b5d4cf5ae9f19a",
-+    },
-+    {
-+        /* Borrowed from libgcrypt */
-+        .path = "/crypto/aead/ccm-aes-128",
-+        .alg = QCRYPTO_CIPHER_ALG_AES_128,
-+        .mode = QCRYPTO_CIPHER_MODE_CCM,
-+        .hex_key = "c0c1c2c3c4c5c6c7"
-+                   "c8c9cacbcccdcecf",
-+        .hex_nonce = "00000003020100a0"
-+                     "a1a2a3a4a5",
-+        .hex_aad = "0001020304050607",
-+        .hex_plain = "08090a0b0c0d0e0f"
-+                     "1011121314151617"
-+                     "18191a1b1c1d1e",
-+        .hex_cipher = "588c979a61c663d2"
-+                      "f066d0c2c0f98980"
-+                      "6d5f6b61dac384",
-+        .hex_tag = "17e8d12cfdf926e0",
-+    },
-+    {
-+        .path = "/crypto/aead/ccm-aes-192",
-+        .alg = QCRYPTO_CIPHER_ALG_AES_192,
-+        .mode = QCRYPTO_CIPHER_MODE_CCM,
-+        .hex_key = "56df5c8f263f0e42"
-+                   "ef7ad3cefc846062"
-+                   "cab440af5fc9c901",
-+        .hex_nonce = "03d63c8c8684b6cd"
-+                     "ef092e94",
-+        .hex_aad = "0265783ce9213091"
-+                   "b1b9da769a786d95"
-+                   "f28832a3f250cb4c"
-+                   "e300736984698779",
-+        .hex_plain = "9fd2024b5249313c"
-+                     "43693a2d8e70ad7e"
-+                     "e0e54609808913b2"
-+                     "8c8bd93f86fbb56b",
-+        .hex_cipher = "00161ecf83e37c91"
-+                      "ce8bdb138370e37a"
-+                      "d638efed5e3a8aed"
-+                      "1841db9f8654251d",
-+        .hex_tag = "18219f9396f03723"
-+                   "c185f9781ec0a6ad",
-+    },
-+    {
-+        /* Borrowed from nettle*/
-+        .path = "/crypto/aead/ccm-aes-256",
-+        .alg = QCRYPTO_CIPHER_ALG_AES_256,
-+        .mode = QCRYPTO_CIPHER_MODE_CCM,
-+        .hex_key = "4041424344454647"
-+                   "48494a4b4c4d4e4f"
-+                   "5051525354555657"
-+                   "58595a5b5c5d5e5f",
-+        .hex_nonce = "1011121314151617"
-+                     "18191a1b",
-+        .hex_aad = "0001020304050607"
-+                   "08090a0b0c0d0e0f"
-+                   "10111213",
-+        .hex_plain = "2021222324252627"
-+                     "28292a2b2c2d2e2f"
-+                     "3031323334353637",
-+        .hex_cipher = "04f883aeb3bd0730"
-+                      "eaf50bb6de4fa221"
-+                      "2034e4e41b0e75e5",
-+        .hex_tag = "9bba3f3a107f3239"
-+                   "bd63902923f80371",
-+    },
-+};
-+
-+static inline int unhex(char c)
-+{
-+    if (c >= 'a' && c <= 'f') {
-+        return 10 + (c - 'a');
-+    }
-+    if (c >= 'A' && c <= 'F') {
-+        return 10 + (c - 'A');
-+    }
-+    return c - '0';
-+}
-+
-+static inline char hex(int i)
-+{
-+    if (i < 10) {
-+        return '0' + i;
-+    }
-+    return 'a' + (i - 10);
-+}
-+
-+static size_t unhex_string(const char *hexstr,
-+                           uint8_t **data)
-+{
-+    size_t len;
-+    size_t i;
-+
-+    if (!hexstr) {
-+        *data = NULL;
-+        return 0;
-+    }
-+
-+    len = strlen(hexstr);
-+    *data = g_new0(uint8_t, len / 2);
-+
-+    for (i = 0; i < len; i += 2) {
-+        (*data)[i / 2] = (unhex(hexstr[i]) << 4)
-+                          | unhex(hexstr[i + 1]);
-+    }
-+    return len / 2;
-+}
-+
-+static char *hex_string(const uint8_t *bytes,
-+                        size_t len)
-+{
-+    char *hexstr = g_new0(char, len * 2 + 1);
-+    size_t i;
-+
-+    for (i = 0; i < len; i++) {
-+        hexstr[i * 2] = hex((bytes[i] >> 4) & 0xf);
-+        hexstr[i * 2 + 1] = hex(bytes[i] & 0xf);
-+    }
-+    hexstr[len * 2] = '\0';
-+
-+    return hexstr;
-+}
-+
-+static void _test_aead(const QCryptoAeadTestData *data,
-+                       bool encrypt)
-+{
-+    QCryptoAead *aead;
-+
-+    uint8_t *key = NULL, *nonce = NULL;
-+    uint8_t *aad = NULL, *in = NULL;
-+    size_t key_len = 0, nonce_len = 0, aad_len = 0;
-+    size_t in_len = 0, tag_len = 0;
-+    uint8_t *hex_tmp = NULL;
-+    uint8_t *out = NULL;
-+    uint8_t out_len = 0;
-+    Error *err = NULL;
-+    int ret;
-+
-+    key_len = unhex_string(data->hex_key, &key);
-+    nonce_len = unhex_string(data->hex_nonce, &nonce);
-+    aad_len = unhex_string(data->hex_aad, &aad);
-+    if (encrypt) {
-+        in_len = unhex_string(data->hex_plain, &in);
-+    } else {
-+        in_len = unhex_string(data->hex_cipher, &in);
-+    }
-+
-+    tag_len = strlen(data->hex_tag) / 2;
-+    out_len = in_len + tag_len;
-+    out = g_new0(uint8_t, out_len);
-+
-+    aead = qcrypto_aead_new(data->alg, data->mode,
-+                            key, key_len, &err);
-+    g_assert(aead != NULL);
-+
-+    ret = qcrypto_aead_set_nonce(aead, nonce, nonce_len,
-+                                 aad_len, in_len, tag_len,
-+                                 &err);
-+    g_assert(ret == 0);
-+
-+    ret = qcrypto_aead_authenticate(aead, aad, aad_len,
-+                                    &err);
-+    g_assert(ret == 0);
-+
-+    if (encrypt) {
-+        ret = qcrypto_aead_encrypt(aead, in, in_len,
-+                                   out, in_len, &err);
-+        g_assert(ret == 0);
-+
-+        hex_tmp = (uint8_t *)hex_string(out, in_len);
-+        g_assert_cmpstr((char *)hex_tmp, ==,
-+                        (char *)data->hex_cipher);
-+        g_free(hex_tmp);
-+    } else {
-+        ret = qcrypto_aead_decrypt(aead, in, in_len,
-+                                   out, in_len, &err);
-+        g_assert(ret == 0);
-+
-+        hex_tmp = (uint8_t *)hex_string(out, in_len);
-+        g_assert_cmpstr((char *)hex_tmp, ==,
-+                        (char *)data->hex_plain);
-+        g_free(hex_tmp);
-+    }
-+
-+    ret = qcrypto_aead_get_tag(aead, out + in_len,
-+                               tag_len, &err);
-+    g_assert(ret == 0);
-+
-+    hex_tmp = (uint8_t *)hex_string(out + in_len,
-+                                    tag_len);
-+    g_assert_cmpstr((char *)hex_tmp, ==,
-+                    (char *)data->hex_tag);
-+    g_free(hex_tmp);
-+
-+    g_free(out);
-+    g_free(in);
-+    g_free(aad);
-+    g_free(nonce);
-+    g_free(key);
-+    qcrypto_aead_free(aead);
-+}
-+
-+static void test_aead(const void *opaque)
-+{
-+    const QCryptoAeadTestData *data = opaque;
-+
-+    /* test encrypt */
-+    _test_aead(data, 1);
-+
-+    /* test decrypt */
-+    _test_aead(data, 0);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+    size_t i;
-+
-+    g_test_init(&argc, &argv, NULL);
-+
-+    g_assert(qcrypto_init(NULL) == 0);
-+
-+    for (i = 0; i < G_N_ELEMENTS(test_data); i++) {
-+        if (qcrypto_aead_supports(test_data[i].alg,
-+                                  test_data[i].mode)) {
-+            g_test_add_data_func(test_data[i].path,
-+                                 &test_data[i], test_aead);
-+        }
-+    }
-+
-+    return g_test_run();
-+}
--- 
-2.9.3
+On Thu, Dec 22, 2016 at 12:13:12PM +1100, Alexey Kardashevskiy wrote:
+> KVM_CAP_SPAPR_TCE capability allows creating TCE tables in KVM which
+> allows having in-kernel acceleration for H_PUT_TCE_xxx hypercalls.
+> However it only supports 32bit DMA windows at zero bus offset.
+>=20
+> There is a new KVM_CAP_SPAPR_TCE_64 capability which supports 64bit
+> window size, variable page size and bus offset.
+>=20
+> This makes use of the new capability. The kernel headers are already
+> updated as the kernel support went in to v4.6.
+>=20
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> ---
+>  target-ppc/kvm_ppc.h | 12 +++++++-----
+>  hw/ppc/spapr_iommu.c |  8 +++++---
+>  target-ppc/kvm.c     | 48 +++++++++++++++++++++++++++++++++++++---------=
+--
+>  3 files changed, 49 insertions(+), 19 deletions(-)
+>=20
+> diff --git a/target-ppc/kvm_ppc.h b/target-ppc/kvm_ppc.h
+> index bd1d78bfbe..14320c2378 100644
+> --- a/target-ppc/kvm_ppc.h
+> +++ b/target-ppc/kvm_ppc.h
+> @@ -36,8 +36,9 @@ int kvmppc_booke_watchdog_enable(PowerPCCPU *cpu);
+>  #ifndef CONFIG_USER_ONLY
+>  off_t kvmppc_alloc_rma(void **rma);
+>  bool kvmppc_spapr_use_multitce(void);
+> -void *kvmppc_create_spapr_tce(uint32_t liobn, uint32_t window_size, int =
+*pfd,
+> -                              bool need_vfio);
+> +void *kvmppc_create_spapr_tce(uint32_t liobn, uint32_t page_shift,
+> +                              uint64_t bus_offset, uint32_t nb_table,
+> +                              int *pfd, bool need_vfio);
+>  int kvmppc_remove_spapr_tce(void *table, int pfd, uint32_t window_size);
+>  int kvmppc_reset_htab(int shift_hint);
+>  uint64_t kvmppc_rma_size(uint64_t current_size, unsigned int hash_shift);
+> @@ -168,9 +169,10 @@ static inline bool kvmppc_spapr_use_multitce(void)
+>      return false;
+>  }
+> =20
+> -static inline void *kvmppc_create_spapr_tce(uint32_t liobn,
+> -                                            uint32_t window_size, int *f=
+d,
+> -                                            bool need_vfio)
+> +static inline void *kvmppc_create_spapr_tce(uint32_t liobn, uint32_t pag=
+e_shift,
+> +                                            uint64_t bus_offset,
+> +                                            uint32_t nb_table,
+> +                                            int *pfd, bool need_vfio)
+>  {
+>      return NULL;
+>  }
+> diff --git a/hw/ppc/spapr_iommu.c b/hw/ppc/spapr_iommu.c
+> index ae30bbe30f..29c80bb3c8 100644
+> --- a/hw/ppc/spapr_iommu.c
+> +++ b/hw/ppc/spapr_iommu.c
+> @@ -79,15 +79,16 @@ static IOMMUAccessFlags spapr_tce_iommu_access_flags(=
+uint64_t tce)
+> =20
+>  static uint64_t *spapr_tce_alloc_table(uint32_t liobn,
+>                                         uint32_t page_shift,
+> +                                       uint64_t bus_offset,
+>                                         uint32_t nb_table,
+>                                         int *fd,
+>                                         bool need_vfio)
+>  {
+>      uint64_t *table =3D NULL;
+> -    uint64_t window_size =3D (uint64_t)nb_table << page_shift;
+> =20
+> -    if (kvm_enabled() && !(window_size >> 32)) {
+> -        table =3D kvmppc_create_spapr_tce(liobn, window_size, fd, need_v=
+fio);
+> +    if (kvm_enabled()) {
+
+This is broken.  Previously, if we had a >4GiB window, we'd fall back
+to managing it in userspace, which would work, albeit slowly.  Now, if
+you have an older kernel which doesn't support KVM_CAP_SPAPR_TCE_64 it
+will attempt to allocate it in the kernel, and fail completely.
+
+> +        table =3D kvmppc_create_spapr_tce(liobn, page_shift, bus_offset,=
+ nb_table,
+> +                                        fd, need_vfio);
+>      }
+> =20
+>      if (!table) {
+> @@ -342,6 +343,7 @@ void spapr_tce_table_enable(sPAPRTCETable *tcet,
+>      tcet->nb_table =3D nb_table;
+>      tcet->table =3D spapr_tce_alloc_table(tcet->liobn,
+>                                          tcet->page_shift,
+> +                                        tcet->bus_offset,
+>                                          tcet->nb_table,
+>                                          &tcet->fd,
+>                                          tcet->need_vfio);
+> diff --git a/target-ppc/kvm.c b/target-ppc/kvm.c
+> index 9c4834c4fc..6e91a4d8bb 100644
+> --- a/target-ppc/kvm.c
+> +++ b/target-ppc/kvm.c
+> @@ -71,6 +71,7 @@ static int cap_booke_sregs;
+>  static int cap_ppc_smt;
+>  static int cap_ppc_rma;
+>  static int cap_spapr_tce;
+> +static int cap_spapr_tce_64;
+>  static int cap_spapr_multitce;
+>  static int cap_spapr_vfio;
+>  static int cap_hior;
+> @@ -123,6 +124,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+>      cap_ppc_smt =3D kvm_check_extension(s, KVM_CAP_PPC_SMT);
+>      cap_ppc_rma =3D kvm_check_extension(s, KVM_CAP_PPC_RMA);
+>      cap_spapr_tce =3D kvm_check_extension(s, KVM_CAP_SPAPR_TCE);
+> +    cap_spapr_tce_64 =3D kvm_check_extension(s, KVM_CAP_SPAPR_TCE_64);
+>      cap_spapr_multitce =3D kvm_check_extension(s, KVM_CAP_SPAPR_MULTITCE=
+);
+>      cap_spapr_vfio =3D false;
+>      cap_one_reg =3D kvm_check_extension(s, KVM_CAP_ONE_REG);
+> @@ -2201,13 +2203,10 @@ bool kvmppc_spapr_use_multitce(void)
+>      return cap_spapr_multitce;
+>  }
+> =20
+> -void *kvmppc_create_spapr_tce(uint32_t liobn, uint32_t window_size, int =
+*pfd,
+> -                              bool need_vfio)
+> +void *kvmppc_create_spapr_tce(uint32_t liobn, uint32_t page_shift,
+> +                              uint64_t bus_offset, uint32_t nb_table,
+> +                              int *pfd, bool need_vfio)
+>  {
+> -    struct kvm_create_spapr_tce args =3D {
+> -        .liobn =3D liobn,
+> -        .window_size =3D window_size,
+> -    };
+>      long len;
+>      int fd;
+>      void *table;
+> @@ -2220,14 +2219,41 @@ void *kvmppc_create_spapr_tce(uint32_t liobn, uin=
+t32_t window_size, int *pfd,
+>          return NULL;
+>      }
+> =20
+> -    fd =3D kvm_vm_ioctl(kvm_state, KVM_CREATE_SPAPR_TCE, &args);
+> -    if (fd < 0) {
+> -        fprintf(stderr, "KVM: Failed to create TCE table for liobn 0x%x\=
+n",
+> -                liobn);
+> +    if (cap_spapr_tce_64) {
+> +        struct kvm_create_spapr_tce_64 args =3D {
+> +            .liobn =3D liobn,
+> +            .page_shift =3D page_shift,
+> +            .offset =3D bus_offset >> page_shift,
+> +            .size =3D nb_table,
+> +            .flags =3D 0
+> +        };
+> +        fd =3D kvm_vm_ioctl(kvm_state, KVM_CREATE_SPAPR_TCE_64, &args);
+> +        if (fd < 0) {
+> +            fprintf(stderr,
+> +                    "KVM: Failed to create TCE64 table for liobn 0x%x\n",
+> +                    liobn);
+> +            return NULL;
+> +        }
+> +    } else if (cap_spapr_tce) {
+> +        uint64_t window_size =3D (uint64_t) nb_table << page_shift;
+> +        struct kvm_create_spapr_tce args =3D {
+> +            .liobn =3D liobn,
+> +            .window_size =3D window_size,
+> +        };
+> +        if ((window_size !=3D args.window_size) || bus_offset) {
+> +            return NULL;
+> +        }
+> +        fd =3D kvm_vm_ioctl(kvm_state, KVM_CREATE_SPAPR_TCE, &args);
+> +        if (fd < 0) {
+> +            fprintf(stderr, "KVM: Failed to create TCE table for liobn 0=
+x%x\n",
+> +                    liobn);
+> +            return NULL;
+> +        }
+> +    } else {
+>          return NULL;
+>      }
+> =20
+> -    len =3D (window_size / SPAPR_TCE_PAGE_SIZE) * sizeof(uint64_t);
+> +    len =3D nb_table * sizeof(uint64_t);
+>      /* FIXME: round this up to page size */
+> =20
+>      table =3D mmap(NULL, len, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--/ZYM6PqDyfNytx60
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJYawvhAAoJEGw4ysog2bOS6+AQAJWH+ydyBnUS0DJnVT4L1tbq
+ypnFLsdbkIVa2ALcL7UAaDlniUwtgE+UAv5XUfpv27iYE6zGSJuOrtCWDJ4AbT6w
+yPTdlyf8XBUvlc0vgpTIvQ6at3qrzTLoWk9ki/ADTi2RTEw6yG28uv47nbY5/7+M
+/pTe956aMackhdM3AERqItHNBOlT0/yus6IOgycYSPg6vZmPMSrEqoiItXQ8qiY3
+1i1xcVIqyP5BFOFaXcS9Rmk/HhkqLPD3xwTsC2VwIqGrU5JGsbT/zwRgaqd3t+KK
+UmSXjN7muc5FaKLwMYnQUYHu7lgf3BG4AojcYYvU1Zbhr2YzGsKz1+FGXPReeHK5
+eBaAXzoKlaWIHM2UwbPkRIhghYlUiffoOjU9IhwqPEdSSjzDAHqKmNzpiLI4SwO+
+whNBhq8jI8x0ApwQmQA8f69aZSG8WGz2xDua0FrPiVRpY1Y29r+7A9GTICah1vm5
+4QCoYFK7gu6fzdAOyi5+enpNrrnwkgF08ARTn96jid3hLQcAyIYdaqhJX45h/598
+Ckg/+LILKpcZSUwI8PKz0gIktlFmhW2FxNHyQDEP2Ugmw444bdRIS88TXjMfYjZK
+KPnkeZpsPgB4jRelNAxK/6n5c2p77as5Kj8t0hZr4orNpDeOv3wDQ9tz3iMs+uQK
+HU9/dtd3a+q6txJTjQw0
+=puyn
+-----END PGP SIGNATURE-----
+
+--/ZYM6PqDyfNytx60--
