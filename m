@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42232)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42243)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1cOD3c-0002wX-4H
-	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 19:34:29 -0500
+	(envelope-from <longpeng2@huawei.com>) id 1cOD3c-0002wZ-Qo
+	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 19:34:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1cOD3Y-0001Ku-VQ
+	(envelope-from <longpeng2@huawei.com>) id 1cOD3Z-0001L2-H5
 	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 19:34:28 -0500
-Received: from szxga03-in.huawei.com ([119.145.14.66]:6867)
+Received: from szxga01-in.huawei.com ([58.251.152.64]:59571)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1cOD3Y-0001JU-8a
-	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 19:34:24 -0500
+	(envelope-from <longpeng2@huawei.com>) id 1cOD3Y-0001JW-Dl
+	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 19:34:25 -0500
 From: "Longpeng(Mike)" <longpeng2@huawei.com>
-Date: Tue, 3 Jan 2017 08:33:06 +0800
-Message-ID: <1483403591-2564-2-git-send-email-longpeng2@huawei.com>
+Date: Tue, 3 Jan 2017 08:33:08 +0800
+Message-ID: <1483403591-2564-4-git-send-email-longpeng2@huawei.com>
 In-Reply-To: <1483403591-2564-1-git-send-email-longpeng2@huawei.com>
 References: <1483403591-2564-1-git-send-email-longpeng2@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 1/6] configure: add CONFIG_GCRYPT/NETTLE_AEAD
- item
+Subject: [Qemu-devel] [PATCH 3/6] crypto: implement nettle-backed AEAD
+ algorithms
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,94 +29,237 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: berrange@redhat.com
 Cc: wu.wubin@huawei.com, jianjay.zhou@huawei.com, arei.gonglei@huawei.com, qemu-devel@nongnu.org, "Longpeng(Mike)" <longpeng2@huawei.com>
 
-This item will be used for gcrypt/nettle backed AEAD algorithms.
-
-It's hardly to decide which version of gcrypt/nettle started
-supporting AEAD algorithms, but it's easily for us to making
-a test in configure to know whether current gcrypt/nettle
-support AEAD.
+This patch add nettle-backed AEAD algorithms
 
 Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
 ---
- configure | 36 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 36 insertions(+)
+ crypto/aead-nettle.c | 174 ++++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 167 insertions(+), 7 deletions(-)
 
-diff --git a/configure b/configure
-index 218df87..14f558c 100755
---- a/configure
-+++ b/configure
-@@ -309,8 +309,10 @@ tls_priority="NORMAL"
- gnutls=""
- gnutls_rnd=""
- nettle=""
-+nettle_aead="no"
- nettle_kdf="no"
- gcrypt=""
-+gcrypt_aead="no"
- gcrypt_hmac="no"
- gcrypt_kdf="no"
- vte=""
-@@ -2429,6 +2431,19 @@ EOF
-         if compile_prog "$gcrypt_cflags" "$gcrypt_libs" ; then
-             gcrypt_hmac=yes
-         fi
+diff --git a/crypto/aead-nettle.c b/crypto/aead-nettle.c
+index cfb9d33..7a2296d 100644
+--- a/crypto/aead-nettle.c
++++ b/crypto/aead-nettle.c
+@@ -19,17 +19,124 @@
+ #include <nettle/ccm.h>
+ #include <nettle/gcm.h>
+ 
++typedef void (*qcrypto_nettle_aead_setkey)(void *ctx,
++              const uint8_t *key);
 +
-+        cat > $TMPC << EOF
-+#include <gcrypt.h>
-+int main(void) {
-+  gcry_cipher_hd_t handle;
-+  gcry_cipher_open(&handle, 0, 0, 0);
-+  gcry_cipher_authenticate(handle, NULL, 0);
-+  return 0;
-+}
-+EOF
-+        if compile_prog "$gcrypt_cflags" "$gcrypt_libs" ; then
-+            gcrypt_aead=yes
-+        fi
-     else
-         if test "$gcrypt" = "yes"; then
-             feature_not_found "gcrypt" "Install gcrypt devel"
-@@ -2460,6 +2475,21 @@ EOF
-         if compile_prog "$nettle_cflags" "$nettle_libs" ; then
-             nettle_kdf=yes
-         fi
++typedef void (*qcrypto_nettle_aead_setiv)(void *ctx,
++              size_t length, const uint8_t *iv);
 +
-+        cat > $TMPC << EOF
-+#include <stddef.h>
-+#include <nettle/aes.h>
-+#include <nettle/ccm.h>
-+#include <nettle/gcm.h>
-+int main(void) {
-+     ccm_aes128_encrypt(NULL, 0, NULL, NULL);
-+     gcm_aes128_encrypt(NULL, 0, NULL, NULL);
-+     return 0;
++typedef void (*qcrypto_nettle_aead_setnonce)(void *ctx,
++              size_t length, const uint8_t *nonce,
++              size_t authlen, size_t msglen, size_t taglen);
++
++typedef void (*qcrypto_nettle_aead_update)(void *ctx,
++              size_t length, const uint8_t *data);
++
++typedef void (*qcrypto_nettle_aead_encrypt)(void *ctx,
++              size_t length, uint8_t *dst, const uint8_t *src);
++
++typedef void (*qcrypto_nettle_aead_decrypt)(void *ctx,
++              size_t length, uint8_t *dst, const uint8_t *src);
++
++typedef void (*qcrypto_nettle_aead_digest)(void *ctx,
++              size_t length, uint8_t *digest);
++
++#define NETTLE_AEAD_SET_CCM_FN(alg) { \
++    .setkey = (qcrypto_nettle_aead_setkey)ccm_##alg##_set_key, \
++    .u_op.setnonce = (qcrypto_nettle_aead_setnonce)ccm_##alg##_set_nonce, \
++    .update = (qcrypto_nettle_aead_update)ccm_##alg##_update, \
++    .encrypt = (qcrypto_nettle_aead_encrypt)ccm_##alg##_encrypt, \
++    .decrypt = (qcrypto_nettle_aead_decrypt)ccm_##alg##_decrypt, \
++    .digest = (qcrypto_nettle_aead_digest)ccm_##alg##_digest, \
 +}
-+EOF
-+        if compile_prog "$nettle_cflags" "$nettle_libs" ; then
-+            nettle_aead=yes
-+        fi
-     else
-         if test "$nettle" = "yes"; then
-             feature_not_found "nettle" "Install nettle devel"
-@@ -5399,6 +5429,9 @@ if test "$gnutls_rnd" = "yes" ; then
- fi
- if test "$gcrypt" = "yes" ; then
-   echo "CONFIG_GCRYPT=y" >> $config_host_mak
-+  if test "$gcrypt_aead" = "yes" ; then
-+    echo "CONFIG_GCRYPT_AEAD=y" >> $config_host_mak
-+  fi
-   if test "$gcrypt_hmac" = "yes" ; then
-     echo "CONFIG_GCRYPT_HMAC=y" >> $config_host_mak
-   fi
-@@ -5409,6 +5442,9 @@ fi
- if test "$nettle" = "yes" ; then
-   echo "CONFIG_NETTLE=y" >> $config_host_mak
-   echo "CONFIG_NETTLE_VERSION_MAJOR=${nettle_version%%.*}" >> $config_host_mak
-+  if test "$nettle_aead" = "yes" ; then
-+    echo "CONFIG_NETTLE_AEAD=y" >> $config_host_mak
-+  fi
-   if test "$nettle_kdf" = "yes" ; then
-     echo "CONFIG_NETTLE_KDF=y" >> $config_host_mak
-   fi
++
++#define NETTLE_AEAD_SET_GCM_FN(alg) { \
++    .setkey = (qcrypto_nettle_aead_setkey)gcm_##alg##_set_key, \
++    .u_op.setiv = (qcrypto_nettle_aead_setiv)gcm_##alg##_set_iv, \
++    .update = (qcrypto_nettle_aead_update)gcm_##alg##_update, \
++    .encrypt = (qcrypto_nettle_aead_encrypt)gcm_##alg##_encrypt, \
++    .decrypt = (qcrypto_nettle_aead_decrypt)gcm_##alg##_decrypt, \
++    .digest = (qcrypto_nettle_aead_digest)gcm_##alg##_digest, \
++}
++
++static struct qcrypto_nettle_aead_alg {
++    qcrypto_nettle_aead_setkey setkey;
++    union {
++        qcrypto_nettle_aead_setnonce setnonce;
++        qcrypto_nettle_aead_setiv setiv;
++    } u_op;
++    qcrypto_nettle_aead_update update;
++    qcrypto_nettle_aead_encrypt encrypt;
++    qcrypto_nettle_aead_decrypt decrypt;
++    qcrypto_nettle_aead_digest digest;
++} qcrypto_aead_alg_map[][QCRYPTO_AEAD_ALG__MAX] = {
++    {
++        [QCRYPTO_CIPHER_ALG_AES_128] = NETTLE_AEAD_SET_CCM_FN(aes128),
++        [QCRYPTO_CIPHER_ALG_AES_192] = NETTLE_AEAD_SET_CCM_FN(aes192),
++        [QCRYPTO_CIPHER_ALG_AES_256] = NETTLE_AEAD_SET_CCM_FN(aes256),
++    },
++    {
++        [QCRYPTO_CIPHER_ALG_AES_128] = NETTLE_AEAD_SET_GCM_FN(aes128),
++        [QCRYPTO_CIPHER_ALG_AES_192] = NETTLE_AEAD_SET_GCM_FN(aes192),
++        [QCRYPTO_CIPHER_ALG_AES_256] = NETTLE_AEAD_SET_GCM_FN(aes256),
++    }
++};
++
++typedef struct QCryptoAeadNettle QCryptoAeadNettle;
++struct QCryptoAeadNettle {
++    union qcrypto_nettle_aead_ctx {
++        struct ccm_aes128_ctx c_aes128_ctx;
++        struct ccm_aes192_ctx c_aes192_ctx;
++        struct ccm_aes256_ctx c_aes256_ctx;
++        struct gcm_aes128_ctx g_aes128_ctx;
++        struct gcm_aes192_ctx g_aes192_ctx;
++        struct gcm_aes256_ctx g_aes256_ctx;
++    } u;
++};
++
+ QCryptoAead *qcrypto_aead_new(QCryptoCipherAlgorithm alg,
+                               QCryptoCipherMode mode,
+                               const uint8_t *key, size_t nkey,
+                               Error **errp)
+ {
+-    return NULL;
++    QCryptoAead *aead;
++    QCryptoAeadNettle *ctx;
++
++    if (!qcrypto_aead_supports(alg, mode)) {
++        return NULL;
++    }
++
++    if (nkey != qcrypto_aead_get_key_len(alg)) {
++        error_setg(errp, "Cipher key length %zu is invalid",
++                   nkey);
++        return NULL;
++    }
++
++    aead = g_new0(QCryptoAead, 1);
++    aead->alg = alg;
++    aead->mode = mode;
++
++    ctx = g_new0(QCryptoAeadNettle, 1);
++
++    qcrypto_aead_alg_map[mode][alg].setkey(&ctx->u, key);
++
++    aead->opaque = ctx;
++
++    return aead;
+ }
+ 
+ void qcrypto_aead_free(QCryptoAead *aead)
+ {
+-    return;
++    QCryptoAeadNettle *ctx;
++
++    if (!aead) {
++        return;
++    }
++
++    ctx = aead->opaque;
++
++    g_free(ctx);
++    g_free(aead);
+ }
+ 
+ int qcrypto_aead_set_nonce(QCryptoAead *aead,
+@@ -38,14 +145,43 @@ int qcrypto_aead_set_nonce(QCryptoAead *aead,
+                            size_t tag_len,
+                            Error **errp)
+ {
+-    return -1;
++    QCryptoAeadNettle *ctx;
++    struct qcrypto_nettle_aead_alg *aead_ops;
++
++    ctx = (QCryptoAeadNettle *)aead->opaque;
++
++    switch (aead->mode) {
++    case QCRYPTO_CIPHER_MODE_CCM:
++        aead_ops = &qcrypto_aead_alg_map[aead->mode][aead->alg];
++        aead_ops->u_op.setnonce(&ctx->u, nonce_len, nonce, aad_len,
++                      in_len, tag_len);
++        break;
++    case QCRYPTO_CIPHER_MODE_GCM:
++        aead_ops = &qcrypto_aead_alg_map[aead->mode][aead->alg];
++        aead_ops->u_op.setiv(&ctx->u, nonce_len, nonce);
++        break;
++    default:
++        error_setg(errp, "Unsupported AEAD mode: %d",
++                   aead->mode);
++        return -1;
++    }
++
++    return 0;
+ }
+ 
+ int qcrypto_aead_authenticate(QCryptoAead *aead,
+                               const uint8_t *aad, size_t aad_len,
+                               Error **errp)
+ {
+-    return -1;
++    QCryptoAeadNettle *ctx;
++    struct qcrypto_nettle_aead_alg *aead_ops;
++
++    ctx = (QCryptoAeadNettle *)aead->opaque;
++    aead_ops = &qcrypto_aead_alg_map[aead->mode][aead->alg];
++
++    aead_ops->update(&ctx->u, aad_len, aad);
++
++    return 0;
+ }
+ 
+ int qcrypto_aead_encrypt(QCryptoAead *aead,
+@@ -53,7 +189,15 @@ int qcrypto_aead_encrypt(QCryptoAead *aead,
+                          uint8_t *out, size_t out_len,
+                          Error **errp)
+ {
+-    return -1;
++    QCryptoAeadNettle *ctx;
++    struct qcrypto_nettle_aead_alg *aead_ops;
++
++    ctx = (QCryptoAeadNettle *)aead->opaque;
++    aead_ops = &qcrypto_aead_alg_map[aead->mode][aead->alg];
++
++    aead_ops->encrypt(&ctx->u, in_len, out, in);
++
++    return 0;
+ }
+ 
+ int qcrypto_aead_decrypt(QCryptoAead *aead,
+@@ -61,12 +205,28 @@ int qcrypto_aead_decrypt(QCryptoAead *aead,
+                          uint8_t *out, size_t out_len,
+                          Error **errp)
+ {
+-    return -1;
++    QCryptoAeadNettle *ctx;
++    struct qcrypto_nettle_aead_alg *aead_ops;
++
++    ctx = (QCryptoAeadNettle *)aead->opaque;
++    aead_ops = &qcrypto_aead_alg_map[aead->mode][aead->alg];
++
++    aead_ops->decrypt(&ctx->u, in_len, out, in);
++
++    return 0;
+ }
+ 
+ int qcrypto_aead_get_tag(QCryptoAead *aead,
+                          uint8_t *tag, size_t tag_len,
+                          Error **errp)
+ {
+-    return -1;
++    QCryptoAeadNettle *ctx;
++    struct qcrypto_nettle_aead_alg *aead_ops;
++
++    ctx = (QCryptoAeadNettle *)aead->opaque;
++    aead_ops = &qcrypto_aead_alg_map[aead->mode][aead->alg];
++
++    aead_ops->digest(&ctx->u, tag_len, tag);
++
++    return 0;
+ }
 -- 
 2.9.3
