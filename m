@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52422)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59641)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cOXKZ-0004ex-GR
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 17:13:20 -0500
+	(envelope-from <hpoussin@reactos.org>) id 1cOXiA-0008MX-7K
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 17:37:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cOXKV-0000VC-GP
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 17:13:19 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46104)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cOXKV-0000Uy-AT
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 17:13:15 -0500
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7DD8D68B2
-	for <qemu-devel@nongnu.org>; Tue,  3 Jan 2017 22:13:14 +0000 (UTC)
-Date: Wed, 4 Jan 2017 00:13:12 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170104001239-mutt-send-email-mst@kernel.org>
-References: <20161230104130.29ff671b@x240.lan>
-	<4eda1813-d732-5dfc-e6ff-29ac95fe22d8@redhat.com>
-	<8aae955f-44ff-134e-818f-31b0bd510ba1@redhat.com>
-	<20170103153312.083ef692@x240.lan>
+	(envelope-from <hpoussin@reactos.org>) id 1cOXi7-0001Xm-2E
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 17:37:42 -0500
+From: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
+References: <1483049536-21548-1-git-send-email-hpoussin@reactos.org>
+	<1483049536-21548-3-git-send-email-hpoussin@reactos.org>
+	<20170102230212.GF12761@umbus.fritz.box>
+Message-ID: <38325f34-9511-bb4e-2224-097bd9a88d7e@reactos.org>
+Date: Tue, 3 Jan 2017 23:37:20 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170103153312.083ef692@x240.lan>
+In-Reply-To: <20170102230212.GF12761@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] vhost-user breaks after 96a3d98.
+Subject: Re: [Qemu-devel] [PATCH 2/6] vga: increase priority of 0xa0000
+ memory region
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,78 +25,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Flavio Leitner <fbl@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Thomas Huth <thuth@redhat.com>, Giancarlo Teodori <gteodori@gmail.com>
 
-On Tue, Jan 03, 2017 at 03:33:12PM -0200, Flavio Leitner wrote:
-> On Tue, 3 Jan 2017 18:28:18 +0800
-> Jason Wang <jasowang@redhat.com> wrote:
->=20
-> > On 2017=E5=B9=B401=E6=9C=8803=E6=97=A5 11:09, Jason Wang wrote:
-> > >
-> > >
-> > > On 2016=E5=B9=B412=E6=9C=8830=E6=97=A5 20:41, Flavio Leitner wrote:=
- =20
-> > >> Hi,
-> > >>
-> > >> While I was testing vhost-user using OVS 2.5 and DPDK 2.2.0 in the
-> > >> host and testpmd dpdk 2.2.0 in the guest, I found that the commit
-> > >> below breaks the environment and no packets gets into the guest.
-> > >>
-> > >> dpdk port --> OVS --> vhost-user --> guest --> testpmd
-> > >>                           ^--- drops here         ^--- no packets =
-here.
-> > >>
-> > >> commit 96a3d98d2cdbd897ff5ab33427aa4cfb94077665
-> > >> Author: Jason Wang <jasowang@redhat.com>
-> > >> Date:   Mon Aug 1 16:07:58 2016 +0800
-> > >>
-> > >>      vhost: don't set vring call if no vector
-> > >>           We used to set vring call fd unconditionally even if gue=
-st=20
-> > >> driver does
-> > >>      not use MSIX for this vritqueue at all. This will cause lots =
-of
-> > >>      unnecessary userspace access and other checks for drivers doe=
-s=20
-> > >> not use
-> > >>      interrupt at all (e.g virtio-net pmd). So check and clean vri=
-ng=20
-> > >> call
-> > >>      fd if guest does not use any vector for this virtqueue at
-> > >>      all.
-> > >> [...]
-> > >>
-> > >> Thanks, =20
-> > >
-> > > Hi Flavio:
-> > >
-> > > Thanks for reporting this issue, could this be a bug of vhost-user?=
- (I=20
-> > > believe virito-net pmd does not use interrupt for rx/tx at all)
-> > >
-> > > Anyway, will try to reproduce it.
-> > > =20
-> >=20
-> > Could not reproduce this issue on similar setups (the only difference=
- is=20
-> > I don't create dpdk port) with dpdk 16.11 and ovs.git HEAD. Suspect a=
-n=20
-> > issue dpdk. Will try OVS 2.5 + DPDK 2.2.0.
->=20
-> Yeah, that's the combo I am testing and seeing the issue.  I found the
-> commit after bisecting qemu and then confirmed by testing up to the
-> previous commit (works okay) and then the commit above (fails).
->=20
-> I still have my test environment available, so I would be able to test
-> any patch you might have.
->=20
-> Thanks,
-> --=20
-> Flavio
+Le 03/01/2017 =E0 00:02, David Gibson a =E9crit :
+> On Thu, Dec 29, 2016 at 11:12:12PM +0100, Herv=E9 Poussineau wrote:
+>> VGA device registers vram as BAR 0. If this BAR is activated as a very=
+ low address which
+>> crosses 0xa0000-0xbffff, low memory region is not accessible anymore.
+>>
+>> This fixes display on PReP machine if we enable PCI mapping at
+>> address 0.
+>
+> This commit message needs more information.  What exactly is the VGA
+> BAR colliding with?  Why does the other thing have higher priority?
+> Why is it safe for the VGA BAR to override the other thing?  Why is
+> this safe on all platforms?
 
-Could you pls try to test dpdk git head and bisect that to find
-what fixes the issue?
+VGA has (basically) two memory regions:
+- the legacy one, from 0xa0000 to 0xbffff
+- a memory region describing the whole VRAM, configurable with PCI BAR 0.
 
---=20
-MST
+In QEMU, mapping PCI at address 0 is not permitted (MachineClass->pci_all=
+ow_0_address is false by default),
+except on arm/virt and ppc/spapr. So, this is usually not a problem as al=
+l PCI BARs (including video PCI BAR 0) are not mapped at
+address 0, and so both memory regions can't collide.
+
+When trying Linux on ppc/40p (introduced later in this patchset), I saw t=
+hat Linux assigns
+PCI BAR addresses in the order of PCI devices detection, and VGA PCI BAR =
+0 ends up at address 0.
+However, Linux assumes that 0xa0000-0xbffff is still available to drive t=
+he VGA card in text mode.
+Without changing the region priority, VGA output is garbled (as writes di=
+rectly go to VGA memory).
+When increasing the region priority, VGA output is restored (as writes go=
+ to legacy address space).
+
+arm/virt by default doesn't have a PCI VGA card.
+ppc/spapr may probably have the same problem as ppc/40p. However, as VGA =
+PCI BAR 0 and VGA legacy space
+both have a priority of 1, it may probably have a problem. I only need to=
+ convince Linux to use address 0 for VGA PCI BAR.
+
+Herv=E9
+
+>
+>> Signed-off-by: Herv=E9 Poussineau <hpoussin@reactos.org>
+>> ---
+>>  hw/display/vga.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/hw/display/vga.c b/hw/display/vga.c
+>> index 2a88b3c..c573f35 100644
+>> --- a/hw/display/vga.c
+>> +++ b/hw/display/vga.c
+>> @@ -2265,7 +2265,7 @@ void vga_init(VGACommonState *s, Object *obj, Me=
+moryRegion *address_space,
+>>      memory_region_add_subregion_overlap(address_space,
+>>                                          0x000a0000,
+>>                                          vga_io_memory,
+>> -                                        1);
+>> +                                        2);
+>>      memory_region_set_coalescing(vga_io_memory);
+>>      if (init_vga_ports) {
+>>          portio_list_init(&s->vga_port_list, obj, vga_ports, s, "vga")=
+;
+>
