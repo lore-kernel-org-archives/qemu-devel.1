@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59482)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59539)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mar.krzeminski@gmail.com>) id 1cOSjL-0000Xx-Rm
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 12:18:37 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cOSjd-0000lj-1s
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 12:18:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mar.krzeminski@gmail.com>) id 1cOSjG-00004r-Ts
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 12:18:35 -0500
-Received: from mail-wj0-x244.google.com ([2a00:1450:400c:c01::244]:33190)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mar.krzeminski@gmail.com>)
-	id 1cOSjG-0008WO-N0
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 12:18:30 -0500
-Received: by mail-wj0-x244.google.com with SMTP id kp2so72611310wjc.0
-	for <qemu-devel@nongnu.org>; Tue, 03 Jan 2017 09:18:30 -0800 (PST)
-References: <20170102211104.4753-1-jcd@tribudubois.net>
-From: "mar.krzeminski" <mar.krzeminski@gmail.com>
-Message-ID: <0dbadac5-5e70-df78-ce0f-6aceaba8da14@gmail.com>
-Date: Tue, 3 Jan 2017 18:18:27 +0100
+	(envelope-from <pbonzini@redhat.com>) id 1cOSjY-00008S-5b
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 12:18:53 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54958)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cOSjX-000082-VP
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 12:18:48 -0500
+References: <AOAA8gA7ALBQysnC4XRVtKo3.3.1483437512378.Hmail.zhangqian@sangfor.com.cn>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <6a92db0b-1fb6-289a-25b0-d0e23f855c7b@redhat.com>
+Date: Tue, 3 Jan 2017 18:18:44 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170102211104.4753-1-jcd@tribudubois.net>
-Content-Type: text/plain; charset=iso-8859-2; format=flowed
+In-Reply-To: <AOAA8gA7ALBQysnC4XRVtKo3.3.1483437512378.Hmail.zhangqian@sangfor.com.cn>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] [i.MX] fix CS handling during SPI
- access.
+Subject: Re: [Qemu-devel] [PATCH] scsi-disk: fix crash on VERIFY command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,129 +26,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jean-Christophe Dubois <jcd@tribudubois.net>, qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: Zhang Qian <zhangqian@sangfor.com.cn>
+Cc: qemu-devel@nongnu.org
 
-Hello JC,
 
-W dniu 02.01.2017 o 22:11, Jean-Christophe Dubois pisze:
-> The i.MX SPI device was not de-asserting the CS line at the end of
-> memory access.
->
-> This triggered a SIGSEGV in Qemu when the sabrelite emulator was acessing
-> a SPI flash memory.
->
-> Whit this path the CS signal is correctly asserted and deasserted arround
-> memory access.
-This code assume, that iMX SPI does not support devices which
-are active when CS signal is asserted. I have not read datasheet,
-but if iMX SPI can support such devices I think it could be better to
-implement such functionality in model - even if currently in Qemu you 
-will not use it.
-If you will stick in deasserted CS line as active, please see comments 
-below.
->
-> This was tested by:
-> * booting linux on Sabrelite Qemu emulator.
-> * booting xvisor on Sabrelite Qemu emultor.
->
-> Signed-off-by: Jean-Christophe Dubois <jcd@tribudubois.net>
-> ---
->
-> Changes since v1:
-> * Fix coding style issue.
->
->   hw/ssi/imx_spi.c | 33 ++++++++++++++++++++++-----------
->   1 file changed, 22 insertions(+), 11 deletions(-)
->
-> diff --git a/hw/ssi/imx_spi.c b/hw/ssi/imx_spi.c
-> index e4e395f..c2d293c 100644
-> --- a/hw/ssi/imx_spi.c
-> +++ b/hw/ssi/imx_spi.c
-> @@ -152,13 +152,20 @@ static bool imx_spi_is_multiple_master_burst(IMXSPIState *s)
->   
->   static void imx_spi_flush_txfifo(IMXSPIState *s)
->   {
-> -    uint32_t tx;
-> -    uint32_t rx;
-> +    uint32_t i;
->   
->       DPRINTF("Begin: TX Fifo Size = %d, RX Fifo Size = %d\n",
->               fifo32_num_used(&s->tx_fifo), fifo32_num_used(&s->rx_fifo));
->   
-> +    /* Activate the requested CS line */
-> +    for (i = 0; i < 4; i++) {
-> +        qemu_set_irq(s->cs_lines[i],
-> +                     i == imx_spi_selected_channel(s) ? 0 : 1);
-> +    }
-Since you are setting to 1 all cs lines in reset, this loop could be
-removed, and only selected cs line could be de-asserted.
-> +
->       while (!fifo32_is_empty(&s->tx_fifo)) {
-> +        uint32_t tx;
-> +        uint32_t rx = 0;
->           int tx_burst = 0;
->           int index = 0;
->   
-> @@ -178,8 +185,6 @@ static void imx_spi_flush_txfifo(IMXSPIState *s)
->   
->           tx_burst = MIN(s->burst_length, 32);
->   
-> -        rx = 0;
-> -
->           while (tx_burst) {
->               uint8_t byte = tx & 0xff;
->   
-> @@ -221,6 +226,13 @@ static void imx_spi_flush_txfifo(IMXSPIState *s)
->           s->regs[ECSPI_STATREG] |= ECSPI_STATREG_TC;
->       }
->   
-> +    /* Deselect all SS lines if transfert if completed */
-> +    if (s->regs[ECSPI_STATREG] & ECSPI_STATREG_TC) {
-> +        for (i = 0; i < 4; i++) {
-> +            qemu_set_irq(s->cs_lines[i], 1);
-> +        }
-> +    }
-> +
-Same as above.
 
-Thanks,
-Marcin
->       /* TODO: We should also use TDR and RDR bits */
->   
->       DPRINTF("End: TX Fifo Size = %d, RX Fifo Size = %d\n",
-> @@ -230,6 +242,7 @@ static void imx_spi_flush_txfifo(IMXSPIState *s)
->   static void imx_spi_reset(DeviceState *dev)
->   {
->       IMXSPIState *s = IMX_SPI(dev);
-> +    uint32_t i;
->   
->       DPRINTF("\n");
->   
-> @@ -243,6 +256,11 @@ static void imx_spi_reset(DeviceState *dev)
->       imx_spi_update_irq(s);
->   
->       s->burst_length = 0;
-> +
-> +    /* Disable all CS lines */
-> +    for (i = 0; i < 4; i++) {
-> +        qemu_set_irq(s->cs_lines[i], 1);
-> +    }
->   }
->   
->   static uint64_t imx_spi_read(void *opaque, hwaddr offset, unsigned size)
-> @@ -359,15 +377,8 @@ static void imx_spi_write(void *opaque, hwaddr offset, uint64_t value,
->           }
->   
->           if (imx_spi_channel_is_master(s)) {
-> -            int i;
-> -
->               /* We are in master mode */
->   
-> -            for (i = 0; i < 4; i++) {
-> -                qemu_set_irq(s->cs_lines[i],
-> -                             i == imx_spi_selected_channel(s) ? 0 : 1);
-> -            }
-> -
->               if ((value & change_mask & ECSPI_CONREG_SMC) &&
->                   !fifo32_is_empty(&s->tx_fifo)) {
->                   /* SMC bit is set and TX FIFO has some slots filled in */
+On 03/01/2017 10:58, Zhang Qian wrote:
+> 
+> At 2017-01-03 17:38:49, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>
+>>
+>>On 03/01/2017 09:12, Zhang Qian wrote:
+>>> yes, you are right.
+>>> The scenarios of problem is
+>>> a scsi-disk object receives VERIFY command with BYTCHK bit being zero,
+>>> scsi_block_is_passthrough returns false and finally scsi-block uses
+>>> scsi_disk_dma_command for
+>>> VERIFY. So the mode is set to SCSI_XFER_NONE.
+>>> In scsi_req_continue, scsi_read_data function is called.
+>>
+>>Uhm, is the fix simply
+>>
+>>diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
+>>index bdd1e5f..c080888 100644
+>>--- a/hw/scsi/scsi-disk.c
+>>+++ b/hw/scsi/scsi-disk.c
+>>@@ -2701,7 +2701,7 @@ static bool scsi_block_is_passthrough(SCSIDiskState *s, uint8_t *buf)
+>>          * for the number of logical blocks specified in the length
+>>          * field).  For other modes, do not use scatter/gather operation.
+>>          */
+>>-        if ((buf[1] & 6) != 2) {
+>>+        if ((buf[1] & 6) == 2) {
+>>             return false;
+>>         }
+>>         break;
+>>
+>>then?
+> I verified your patch, it is ok.
+> 
+> but why not use (buf[1] & 2) == 2 ?
+
+Isn't BYTCHK bits 1 and 2?
+
+Paolo
