@@ -1,20 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39885)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41444)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cORUv-0006TJ-TE
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 10:59:38 -0500
+	(envelope-from <berrange@redhat.com>) id 1cORbI-0001eE-LC
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 11:06:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cORUv-0007KB-8V
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 10:59:38 -0500
-Date: Tue, 3 Jan 2017 15:59:29 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170103155929.GG14707@stefanha-x1.localdomain>
-References: <CAKJ7aR7kDde_KrCMojwdU1kaSvK+zw_wM49__EcA+=kO+fT+Hw@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="V32M1hWVjliPHW+c"
-Content-Disposition: inline
-In-Reply-To: <CAKJ7aR7kDde_KrCMojwdU1kaSvK+zw_wM49__EcA+=kO+fT+Hw@mail.gmail.com>
-Subject: Re: [Qemu-devel] Qemu NVME ubuntu 16.04 setup problems
+	(envelope-from <berrange@redhat.com>) id 1cORbH-0000dd-7H
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 11:06:12 -0500
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Date: Tue,  3 Jan 2017 16:05:56 +0000
+Message-Id: <20170103160556.9895-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] iotests: record separate timings per format,
+ protocol pair
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,36 +18,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gadre Nayan <gadrenayan@gmail.com>
-Cc: qemu-discuss@nongnu.org, qemu-devel@nongnu.org, linux-nvme@lists.infradead.org
+To: qemu-devel@nongnu.org
+Cc: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, "Daniel P. Berrange" <berrange@redhat.com>
 
+The 'check' program records timings for each test that
+is run. These timings are only valid, however, for a
+particular format/protocol combination. So if frequently
+running 'check' with a variety of different formats or
+protocols, the times printed can be very misleading.
 
---V32M1hWVjliPHW+c
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Instead of having a single 'check.time' file, maintain
+multiple 'check.time-$IMGPROTO-$IMGFMT' files.
 
-On Mon, Dec 26, 2016 at 01:59:13PM +0530, Gadre Nayan wrote:
-> I am trying to test SPDK on a Virtual Machine with NVME support. I do not
-> have NVME cards on the Host hence wanted to simulate the Hardware, I have
-> install nvmeqemu (https://github.com/nvmeqemu/nvmeqemu) for that purpose.
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+---
+Changed in v2:
 
-That repo hasn't been updated since 2012.  NVMe support has been
-available in upstream QEMU since 2013.
+ - Use a separate file per format/protocol, instead of
+   throwing away data each time format/protocol changes
+   between runs (Eric)
 
-Please try using a modern QEMU.
+ tests/qemu-iotests/.gitignore |  2 +-
+ tests/qemu-iotests/Makefile   |  2 +-
+ tests/qemu-iotests/check      | 12 +++++++-----
+ 3 files changed, 9 insertions(+), 7 deletions(-)
 
---V32M1hWVjliPHW+c
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJYa8phAAoJEJykq7OBq3PIynwH/2CKtM6n5ixoVdPDeekhzjmX
-eAJX6MyzPFA/46JKPcraMIOroTjoPlnruleVyNjo0tfAvYJZMxCdZkEyoCpz2ARP
-GtetnsEBqNXrMvPpJt+pUEv3c88mF7ypVyDdnOKPKywHri1g+MFffeextG15UN9J
-zs+RI0TGDYicCN9CMBo3Yja9p+0ycXH15OiC5O1WiJJgOvX8G0c9xKgd5/A3qYtG
-PkjunybxJPUs0j+Ed60f4pu9gUaCB3OjYW84QV9SpTy6bNgDfAPalySNKLRTCemF
-qcB9rkEAcRjlw2uo+8fens/07DOkeMIaFzdN/m9PLdzlN1JBITRLmQZ7UkZgj2c=
-=9+e3
------END PGP SIGNATURE-----
-
---V32M1hWVjliPHW+c--
+diff --git a/tests/qemu-iotests/.gitignore b/tests/qemu-iotests/.gitignore
+index 0711cbd..da62054 100644
+--- a/tests/qemu-iotests/.gitignore
++++ b/tests/qemu-iotests/.gitignore
+@@ -1,5 +1,5 @@
+ check.log
+-check.time
++check.time*
+ common.env
+ *.out.bad
+ *.notrun
+diff --git a/tests/qemu-iotests/Makefile b/tests/qemu-iotests/Makefile
+index 2fb527c..27380e6 100644
+--- a/tests/qemu-iotests/Makefile
++++ b/tests/qemu-iotests/Makefile
+@@ -1,5 +1,5 @@
+ 
+-CLEANFILES= *.out.bad *.notrun check.log check.time
++CLEANFILES= *.out.bad *.notrun check.log check.time*
+ 
+ # no default target
+ default:
+diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
+index 4cba215..4b1c674 100755
+--- a/tests/qemu-iotests/check
++++ b/tests/qemu-iotests/check
+@@ -129,6 +129,8 @@ fi
+ #    exit 1
+ #fi
+ 
++TIMESTAMP_FILE=check.time-$IMGPROTO-$IMGFMT
++
+ tmp="${TEST_DIR}"/$$
+ 
+ _wallclock()
+@@ -155,9 +157,9 @@ _wrapup()
+         :
+     elif $needwrap
+     then
+-        if [ -f check.time -a -f $tmp.time ]
++        if [ -f $TIMESTAMP_FILE -a -f $tmp.time ]
+         then
+-            cat check.time $tmp.time \
++            cat $TIMESTAMP_FILE $tmp.time \
+             | $AWK_PROG '
+         { t[$1] = $2 }
+ END        { if (NR > 0) {
+@@ -165,7 +167,7 @@ END        { if (NR > 0) {
+           }
+         }' \
+             | sort -n >$tmp.out
+-            mv $tmp.out check.time
++            mv $tmp.out $TIMESTAMP_FILE
+         fi
+ 
+         if [ -f $tmp.expunged ]
+@@ -223,7 +225,7 @@ echo "preamble" > "${TEST_DIR}"/check.sts
+ # don't leave old full output behind on a clean run
+ rm -f check.full
+ 
+-[ -f check.time ] || touch check.time
++[ -f $TIMESTAMP_FILE ] || touch $TIMESTAMP_FILE
+ 
+ FULL_IMGFMT_DETAILS=`_full_imgfmt_details`
+ FULL_IMGPROTO_DETAILS=`_full_imgproto_details`
+@@ -277,7 +279,7 @@ do
+         # really going to try and run this one
+         #
+         rm -f $seq.out.bad
+-        lasttime=`sed -n -e "/^$seq /s/.* //p" <check.time`
++        lasttime=`sed -n -e "/^$seq /s/.* //p" <$TIMESTAMP_FILE`
+         if [ "X$lasttime" != X ]; then
+                 echo -n " ${lasttime}s ..."
+         else
+-- 
+2.9.3
