@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49272)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49675)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1cOV0C-0000cc-U9
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 14:44:09 -0500
+	(envelope-from <eblake@redhat.com>) id 1cOV2Q-0001no-VR
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 14:46:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1cOV09-0006uE-RQ
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 14:44:08 -0500
-Received: from [2a03:4000:1::4e2f:c7ac:d] (port=44655 helo=mail.weilnetz.de)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1cOV09-0006u3-Kz
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 14:44:05 -0500
-References: <20170103191933.19416-1-marcandre.lureau@redhat.com>
-From: Stefan Weil <sw@weilnetz.de>
-Message-ID: <bd3b52ff-39c8-fcf4-ab47-15fcde35d19c@weilnetz.de>
-Date: Tue, 3 Jan 2017 20:44:01 +0100
+	(envelope-from <eblake@redhat.com>) id 1cOV2N-0007e1-UP
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 14:46:27 -0500
+References: <20170103182801.9638-1-berrange@redhat.com>
+	<20170103182801.9638-2-berrange@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <9acc22d2-0dbc-df6e-89dd-45d1ac54b5f3@redhat.com>
+Date: Tue, 3 Jan 2017 13:46:15 -0600
 MIME-Version: 1.0
-In-Reply-To: <20170103191933.19416-1-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] win32: use glib gpoll if glib >= 2.50
+In-Reply-To: <20170103182801.9638-2-berrange@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="67eGvUG74dB7jPMTcDdcwLKWEtRlGN9un"
+Subject: Re: [Qemu-devel] [PATCH v1 01/15] block: expose crypto option names
+ / defs to other drivers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,62 +25,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, QEMU Trivial <qemu-trivial@nongnu.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On 01/03/17 20:19, Marc-Andr=C3=A9 Lureau wrote:
-> A fix has been committed in upstream glib commit
-> 210a9796f78eb90f76f1bd6a304e9fea05e97617.
-> (See also related bug https://bugzilla.gnome.org/show_bug.cgi?id=3D7644=
-15)
->
-> It is desirable to use the glib version instead of qemu copy, since it
-> provides more debugging facilities (G_MAIN_POLL_DEBUG etc), and
-> hopefully has a better maintainance. Hopefully, we can drop the qemu
-> copy in a few years.
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--67eGvUG74dB7jPMTcDdcwLKWEtRlGN9un
+From: Eric Blake <eblake@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
+Message-ID: <9acc22d2-0dbc-df6e-89dd-45d1ac54b5f3@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v1 01/15] block: expose crypto option names /
+ defs to other drivers
+References: <20170103182801.9638-1-berrange@redhat.com>
+ <20170103182801.9638-2-berrange@redhat.com>
+In-Reply-To: <20170103182801.9638-2-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 01/03/2017 12:27 PM, Daniel P. Berrange wrote:
+> The block/crypto.c defines a set of QemuOpts that provide
+> parameters for encryption. This will also be needed by
+> the qcow/qcow2 integration, so expose the relevant pieces
+> in a new block/crypto.h header.
+>=20
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 > ---
->  include/glib-compat.h | 2 +-
->  util/oslib-win32.c    | 2 ++
->  2 files changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/include/glib-compat.h b/include/glib-compat.h
-> index acf254d2a0..0cd24ffbe9 100644
-> --- a/include/glib-compat.h
-> +++ b/include/glib-compat.h
-> @@ -39,7 +39,7 @@ static inline gint64 qemu_g_get_monotonic_time(void)
->  #define g_get_monotonic_time() qemu_g_get_monotonic_time()
->  #endif
->
-> -#ifdef _WIN32
-> +#if defined(_WIN32) && !GLIB_CHECK_VERSION(2, 50, 0)
->  /*
->   * g_poll has a problem on Windows when using
->   * timeouts < 10ms, so use wrapper.
-> diff --git a/util/oslib-win32.c b/util/oslib-win32.c
-> index d09863cc9d..0b1890fd33 100644
-> --- a/util/oslib-win32.c
-> +++ b/util/oslib-win32.c
-> @@ -327,6 +327,7 @@ char *qemu_get_exec_dir(void)
->      return g_strdup(exec_dir);
->  }
->
-> +#if !GLIB_CHECK_VERSION(2, 50, 0)
->  /*
->   * The original implementation of g_poll from glib has a problem on Wi=
-ndows
->   * when using timeouts < 10 ms.
-> @@ -530,6 +531,7 @@ gint g_poll(GPollFD *fds, guint nfds, gint timeout)
->
->      return retval;
->  }
-> +#endif
->
->  int getpagesize(void)
->  {
->
+>  block/crypto.c | 61 +++++++--------------------------------
+>  block/crypto.h | 91 ++++++++++++++++++++++++++++++++++++++++++++++++++=
+++++++++
+>  2 files changed, 102 insertions(+), 50 deletions(-)
+>  create mode 100644 block/crypto.h
+>=20
 
-Thanks for this patch.
-I think it can be applied via qemu-trivial (cc'ed).
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Reviewed-by: Stefan Weil <sw@weilnetz.de>
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--67eGvUG74dB7jPMTcDdcwLKWEtRlGN9un
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYa/+HAAoJEKeha0olJ0Nq5e0H/RSoYVk4me3VqIbNUge0IYDr
+fxgEYmzFGU0pSWZSandc2unQQj6ZU5ZUFY+qTOzarj0HpKjA1d7dDqMaDObwvyl1
+tepv1KyZ/Lzjx6Guh4RsHCZgj8oSxUzojpoK/vCjP5pR5jogZI4Z55hjE9m6w8Rw
+6arXv2vg0Y4KoVSNh+UFYToTTHK7/QAlFpSOs/dVP/+8aGeKRcx8Jg5wySSpcPfi
+XaQKs4e82TL5TYu9071CC99lGO6Xullil0pqFK2vneP4GF6Bo9L3i6xTFexWAO/6
+P/l0fGwuH0uqK9eo1ulLWHaj6XJ7iRe4Amp1UB2Kj5AphrPYYRSB13YQv0Nuyo8=
+=fop3
+-----END PGP SIGNATURE-----
+
+--67eGvUG74dB7jPMTcDdcwLKWEtRlGN9un--
