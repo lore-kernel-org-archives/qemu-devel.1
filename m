@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58214)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58263)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cOUR5-0003VU-IH
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 14:07:53 -0500
+	(envelope-from <eblake@redhat.com>) id 1cOURM-0003hC-6Y
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 14:08:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cOUR4-0002vh-Eb
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 14:07:51 -0500
+	(envelope-from <eblake@redhat.com>) id 1cOURL-0002yG-BG
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 14:08:08 -0500
 References: <20170103170459.27662-1-berrange@redhat.com>
 	<20170103170459.27662-4-berrange@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <cf532f94-88b9-5b07-f0bc-9452be411e39@redhat.com>
-Date: Tue, 3 Jan 2017 13:07:43 -0600
+Message-ID: <ebc5de5c-bb52-1fb5-510f-1561abf211a2@redhat.com>
+Date: Tue, 3 Jan 2017 13:08:00 -0600
 MIME-Version: 1.0
 In-Reply-To: <20170103170459.27662-4-berrange@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="dU9ves155HXviThFqaSjqLP5xOlhVJLEI"
+	boundary="qBaDxGBEUSF0flVJ4IDUhsOH17PDkAE3r"
 Subject: Re: [Qemu-devel] [PATCH v2 3/5] iotests: reduce PBKDF iterations
  when testing LUKS
 List-Id: <qemu-devel.nongnu.org>
@@ -29,12 +29,12 @@ To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---dU9ves155HXviThFqaSjqLP5xOlhVJLEI
+--qBaDxGBEUSF0flVJ4IDUhsOH17PDkAE3r
 From: Eric Blake <eblake@redhat.com>
 To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
 Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
  Max Reitz <mreitz@redhat.com>
-Message-ID: <cf532f94-88b9-5b07-f0bc-9452be411e39@redhat.com>
+Message-ID: <ebc5de5c-bb52-1fb5-510f-1561abf211a2@redhat.com>
 Subject: Re: [Qemu-devel] [PATCH v2 3/5] iotests: reduce PBKDF iterations when
  testing LUKS
 References: <20170103170459.27662-1-berrange@redhat.com>
@@ -55,37 +55,15 @@ On 01/03/2017 11:04 AM, Daniel P. Berrange wrote:
 > security does not matter in I/O tests.
 >=20
 > Previsouly a full 'check -luks' would take
->=20
->   $ time ./check -luks
->   Passed all 22 tests
->=20
->   real  23m9.988s
->   user  21m46.223s
->   sys   0m22.841s
->=20
-> Now it takes
->=20
->   $ time ./check -luks
->   Passed all 22 tests
->=20
->   real  4m39.235s
->   user  3m29.590s
->   sys   0m24.234s
->=20
-> Still slow compared to qcow2/raw, but much improved
-> none the less.
->=20
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+s/Previsouly/Previously/
 
 --=20
 Eric Blake   eblake redhat com    +1-919-301-3266
 Libvirt virtualization library http://libvirt.org
 
 
---dU9ves155HXviThFqaSjqLP5xOlhVJLEI
+--qBaDxGBEUSF0flVJ4IDUhsOH17PDkAE3r
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -95,13 +73,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJYa/Z/AAoJEKeha0olJ0NqUbQH/Ra37KpXJG4JJpqoSXIpyF5l
-AaxOpOy2AwhOZ8GpUP0h87twdNPRYNPbAV3MtLS5nd/7lel+NLVTy2DdrvuyZ9Sh
-qSytTiL8I8CLaBdNbr3LhRatewFPv6GGfr4Wk6/iMkN2Qg3mNEKJZDR6opgLzdoK
-PHBIJg93irF02hJoKKlzaygxq5aQMCyp+oCK0GnINC1CFO9w1dCw94nuYBRXh2db
-IsRSgocq7RYBV7y+fpUrhrgDK+CJ5+E+R1PA6P1dDPkDYNLSrgrEgBetbA4WwGpt
-ehfby/X4qwUx1BsVnFew9rIkqGSIAkyzCO56JDVhVI3YBs1JjIVrL5GQtdPR4k8=
-=pP9/
+iQEcBAEBCAAGBQJYa/aQAAoJEKeha0olJ0Nq0DIH/0h2nD4II7gyhqxi4bEfws/n
+C/nCaTudG6+Lv73KvjJir70VDcdlrijHuSWqE2QmXtWykXSjwbcYFWLbx9+lKUE0
+EGDI4nnW2Y/0ZITqDuzKUVCMx/qfKf0E14Ae2d63QFxctjvNJ814+XpqELpJQt71
+mT/Oep1C5PxQo/cj7zm4DvQnfW9wU8yQyqc8B5wHiTZWsyjku4/7kOv6lHEMIz87
+g+DHtY59pz31b743U2ipmTxut/D4Jicnt4HNjz9Th3zP6oyE4BMNTsLRJOGtoN8+
+b2F+OFZ6kQxOkNUEkh/qT1593QfSPeP4GoARumowlZrleJUaVaozZSMjrfn0r5E=
+=fWar
 -----END PGP SIGNATURE-----
 
---dU9ves155HXviThFqaSjqLP5xOlhVJLEI--
+--qBaDxGBEUSF0flVJ4IDUhsOH17PDkAE3r--
