@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32974)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32977)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cOJYN-0003GW-Ek
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 02:30:40 -0500
+	(envelope-from <peterx@redhat.com>) id 1cOJYN-0003Gw-Pc
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 02:30:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cOJYI-0008Q4-FY
+	(envelope-from <peterx@redhat.com>) id 1cOJYM-0008Qz-Bq
 	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 02:30:39 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53920)
+Received: from mx1.redhat.com ([209.132.183.28]:53948)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cOJYI-0008Pp-9S
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 02:30:34 -0500
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cOJYL-0008Qp-UZ
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 02:30:38 -0500
 From: Peter Xu <peterx@redhat.com>
-Date: Tue,  3 Jan 2017 15:29:46 +0800
-Message-Id: <1483428594-28880-10-git-send-email-peterx@redhat.com>
+Date: Tue,  3 Jan 2017 15:29:47 +0800
+Message-Id: <1483428594-28880-11-git-send-email-peterx@redhat.com>
 In-Reply-To: <1483428594-28880-1-git-send-email-peterx@redhat.com>
 References: <1483428594-28880-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH RFC v2 09/17] intel_iommu: vtd_slpt_level_shift
- check level
+Subject: [Qemu-devel] [PATCH RFC v2 10/17] memory: add section range info
+ for IOMMU notifier
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,24 +27,77 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, peterx@redhat.com, alex.williamson@redhat.com, bd.aviv@gmail.com
 
-This helps in debugging incorrect level passed in.
+In this patch, IOMMUNotifier.{start|end} are introduced to store section
+information for a specific notifier. When notification occurs, we not
+only check the notification type (MAP|UNMAP), but also check whether the
+notified iova is in the range of specific IOMMU notifier, and skip those
+notifiers if not in the listened range.
 
+When removing an region, we need to make sure we removed the correct
+VFIOGuestIOMMU by checking the IOMMUNotifier.start address as well.
+
+Suggested-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- hw/i386/intel_iommu.c | 1 +
- 1 file changed, 1 insertion(+)
+ hw/vfio/common.c      | 7 ++++++-
+ include/exec/memory.h | 3 +++
+ memory.c              | 4 +++-
+ 3 files changed, 12 insertions(+), 2 deletions(-)
 
-diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index f1118dd..abb9d2e 100644
---- a/hw/i386/intel_iommu.c
-+++ b/hw/i386/intel_iommu.c
-@@ -168,6 +168,7 @@ static gboolean vtd_hash_remove_by_domain(gpointer key, gpointer value,
- /* The shift of an addr for a certain level of paging structure */
- static inline uint32_t vtd_slpt_level_shift(uint32_t level)
- {
-+    assert(level != 0);
-     return VTD_PAGE_SHIFT_4K + (level - 1) * VTD_SL_LEVEL_BITS;
- }
+diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+index 801578b..6f648da 100644
+--- a/hw/vfio/common.c
++++ b/hw/vfio/common.c
+@@ -455,6 +455,10 @@ static void vfio_listener_region_add(MemoryListener *listener,
+         giommu->container = container;
+         giommu->n.notify = vfio_iommu_map_notify;
+         giommu->n.notifier_flags = IOMMU_NOTIFIER_ALL;
++        giommu->n.start = section->offset_within_region;
++        llend = int128_add(int128_make64(giommu->n.start), section->size);
++        llend = int128_sub(llend, int128_one());
++        giommu->n.end = int128_get64(llend);
+         QLIST_INSERT_HEAD(&container->giommu_list, giommu, giommu_next);
  
+         memory_region_register_iommu_notifier(giommu->iommu, &giommu->n);
+@@ -525,7 +529,8 @@ static void vfio_listener_region_del(MemoryListener *listener,
+         VFIOGuestIOMMU *giommu;
+ 
+         QLIST_FOREACH(giommu, &container->giommu_list, giommu_next) {
+-            if (giommu->iommu == section->mr) {
++            if (giommu->iommu == section->mr &&
++                giommu->n.start == section->offset_within_region) {
+                 memory_region_unregister_iommu_notifier(giommu->iommu,
+                                                         &giommu->n);
+                 QLIST_REMOVE(giommu, giommu_next);
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index 958f4b2..cecfed1 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -84,6 +84,9 @@ typedef enum {
+ struct IOMMUNotifier {
+     void (*notify)(struct IOMMUNotifier *notifier, IOMMUTLBEntry *data);
+     IOMMUNotifierFlag notifier_flags;
++    /* Notify for address space range start <= addr <= end */
++    hwaddr start;
++    hwaddr end;
+     QLIST_ENTRY(IOMMUNotifier) node;
+ };
+ typedef struct IOMMUNotifier IOMMUNotifier;
+diff --git a/memory.c b/memory.c
+index 2bfc37f..e88bb54 100644
+--- a/memory.c
++++ b/memory.c
+@@ -1671,7 +1671,9 @@ void memory_region_notify_iommu(MemoryRegion *mr,
+     }
+ 
+     QLIST_FOREACH(iommu_notifier, &mr->iommu_notify, node) {
+-        if (iommu_notifier->notifier_flags & request_flags) {
++        if (iommu_notifier->notifier_flags & request_flags &&
++            iommu_notifier->start <= entry.iova &&
++            iommu_notifier->end >= entry.iova) {
+             iommu_notifier->notify(iommu_notifier, &entry);
+         }
+     }
 -- 
 2.7.4
