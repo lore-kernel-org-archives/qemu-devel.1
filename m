@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39140)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39956)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cOUcc-0005Lh-DP
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 14:19:47 -0500
+	(envelope-from <eblake@redhat.com>) id 1cOUdM-00061q-D3
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 14:20:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cOUcZ-00089v-A0
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 14:19:46 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46916)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1cOUcZ-00087f-4U
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 14:19:43 -0500
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue,  3 Jan 2017 20:19:33 +0100
-Message-Id: <20170103191933.19416-1-marcandre.lureau@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1cOUdL-0000Dr-9c
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 14:20:32 -0500
+References: <20170103170459.27662-1-berrange@redhat.com>
+	<20170103170459.27662-6-berrange@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <ed60223f-5468-6ebf-ee44-e8e262759256@redhat.com>
+Date: Tue, 3 Jan 2017 13:20:24 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] win32: use glib gpoll if glib >= 2.50
+In-Reply-To: <20170103170459.27662-6-berrange@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="vqHwXq48gVtScnEBsTTSDVHMD0mtmgJAh"
+Subject: Re: [Qemu-devel] [PATCH v2 5/5] iotests: chown LUKS device before
+ qemu-io launches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,58 +25,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: sw@weilnetz.de, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-A fix has been committed in upstream glib commit
-210a9796f78eb90f76f1bd6a304e9fea05e97617.
-(See also related bug https://bugzilla.gnome.org/show_bug.cgi?id=3D764415=
-)
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--vqHwXq48gVtScnEBsTTSDVHMD0mtmgJAh
+From: Eric Blake <eblake@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
+Message-ID: <ed60223f-5468-6ebf-ee44-e8e262759256@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 5/5] iotests: chown LUKS device before
+ qemu-io launches
+References: <20170103170459.27662-1-berrange@redhat.com>
+ <20170103170459.27662-6-berrange@redhat.com>
+In-Reply-To: <20170103170459.27662-6-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-It is desirable to use the glib version instead of qemu copy, since it
-provides more debugging facilities (G_MAIN_POLL_DEBUG etc), and
-hopefully has a better maintainance. Hopefully, we can drop the qemu
-copy in a few years.
+On 01/03/2017 11:04 AM, Daniel P. Berrange wrote:
+> On some distros, whenever you close a block device file
+> descriptor there is a udev rule that resets the file
+> permissions. This can race with the test script when
+> we run qemu-io multiple times against the same block
+> device. Occassionally the second qemu-io invokation
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- include/glib-compat.h | 2 +-
- util/oslib-win32.c    | 2 ++
- 2 files changed, 3 insertions(+), 1 deletion(-)
+s/Occassionally/Occasionally/
+s/invokation/invocation/
 
-diff --git a/include/glib-compat.h b/include/glib-compat.h
-index acf254d2a0..0cd24ffbe9 100644
---- a/include/glib-compat.h
-+++ b/include/glib-compat.h
-@@ -39,7 +39,7 @@ static inline gint64 qemu_g_get_monotonic_time(void)
- #define g_get_monotonic_time() qemu_g_get_monotonic_time()
- #endif
-=20
--#ifdef _WIN32
-+#if defined(_WIN32) && !GLIB_CHECK_VERSION(2, 50, 0)
- /*
-  * g_poll has a problem on Windows when using
-  * timeouts < 10ms, so use wrapper.
-diff --git a/util/oslib-win32.c b/util/oslib-win32.c
-index d09863cc9d..0b1890fd33 100644
---- a/util/oslib-win32.c
-+++ b/util/oslib-win32.c
-@@ -327,6 +327,7 @@ char *qemu_get_exec_dir(void)
-     return g_strdup(exec_dir);
- }
-=20
-+#if !GLIB_CHECK_VERSION(2, 50, 0)
- /*
-  * The original implementation of g_poll from glib has a problem on Wind=
-ows
-  * when using timeouts < 10 ms.
-@@ -530,6 +531,7 @@ gint g_poll(GPollFD *fds, guint nfds, gint timeout)
-=20
-     return retval;
- }
-+#endif
-=20
- int getpagesize(void)
- {
+> will find udev has reset the permissions causing failure.
+>=20
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>  tests/qemu-iotests/149     |  13 +-
+>  tests/qemu-iotests/149.out | 344 ++++++++++++++++++++++---------------=
+--------
+>  2 files changed, 178 insertions(+), 179 deletions(-)
+>=20
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
 --=20
-2.11.0
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--vqHwXq48gVtScnEBsTTSDVHMD0mtmgJAh
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYa/l4AAoJEKeha0olJ0NqbQsH/ikcPmkn+OzO88jCMO3w/ZL3
+94wv8DNfbUNqoRowhhpm8jrFNxaEjst/YdGjxUHJizgczk0c2AEARijj/Ajk3wqm
+g9DIWJqrOP/OtkArTEhqIR6tenQc8OyQMybkAypJbXt/PKEIwgrPJUCwZ+JG32J5
+UO3eYybsjglgM0xXsxjmPolIPJOQxLVP2wll/t7g/rLwoS+jF9oAycZVHdOngv57
+yTEgvWP+FiaHvmioaqFSiOQg2mT1eynqFlYI/jfc2vyvtXmpYnu63SmTg3x0IA1k
+kp0qRtMS8mbUH0ng3Nw7gjizIwvlTM9kkQtwS3ys7bwmW+fTCQcCMQBUl1nhbYs=
+=kdXy
+-----END PGP SIGNATURE-----
+
+--vqHwXq48gVtScnEBsTTSDVHMD0mtmgJAh--
