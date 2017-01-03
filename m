@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33129)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35803)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cOJYo-0003et-6p
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 02:31:07 -0500
+	(envelope-from <no-reply@patchew.org>) id 1cOJuT-0003wU-7z
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 02:53:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cOJYm-0000GF-Ji
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 02:31:06 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53354)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cOJYm-0000G3-BJ
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 02:31:04 -0500
-From: Peter Xu <peterx@redhat.com>
-Date: Tue,  3 Jan 2017 15:29:54 +0800
-Message-Id: <1483428594-28880-18-git-send-email-peterx@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1cOJuP-0005JR-AL
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 02:53:29 -0500
+Resent-Message-Id: <E1cOJuP-0005JR-AL@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21441)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1cOJuP-0005JJ-3n
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 02:53:25 -0500
 In-Reply-To: <1483428594-28880-1-git-send-email-peterx@redhat.com>
-References: <1483428594-28880-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH RFC v2 17/17] intel_iommu: enable vfio devices
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <148342996682.142.17647686240143914317@790289a7ca88>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 2 Jan 2017 23:52:47 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH RFC v2 00/17] VT-d: vfio enablement and
+ misc enhances
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,184 +29,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, peterx@redhat.com, alex.williamson@redhat.com, bd.aviv@gmail.com
+To: peterx@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, alex.williamson@redhat.com, bd.aviv@gmail.com
 
-This patch is based on Aviv Ben-David (<bd.aviv@gmail.com>)'s patch
-upstream:
-
-  "IOMMU: enable intel_iommu map and unmap notifiers"
-  https://lists.gnu.org/archive/html/qemu-devel/2016-11/msg01453.html
-
-However I removed/fixed some content, and added my own codes.
-
-Instead of translate() every page for iotlb invalidations (which is
-slower), we walk the pages when needed and notify in a hook function.
-
-This patch enables vfio devices for VT-d emulation.
-
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- hw/i386/intel_iommu.c         | 68 +++++++++++++++++++++++++++++++++++++------
- include/hw/i386/intel_iommu.h |  8 +++++
- 2 files changed, 67 insertions(+), 9 deletions(-)
-
-diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index e66b823..fa50230 100644
---- a/hw/i386/intel_iommu.c
-+++ b/hw/i386/intel_iommu.c
-@@ -839,7 +839,8 @@ next:
-  * @private: private data for the hook function
-  */
- static int vtd_page_walk(VTDContextEntry *ce, uint64_t start, uint64_t end,
--                         vtd_page_walk_hook hook_fn, void *private)
-+                         vtd_page_walk_hook hook_fn, void *private,
-+                         bool notify_unmap)
- {
-     dma_addr_t addr = vtd_get_slpt_base_from_context(ce);
-     uint32_t level = vtd_get_level_from_context_entry(ce);
-@@ -858,7 +859,7 @@ static int vtd_page_walk(VTDContextEntry *ce, uint64_t start, uint64_t end,
-     trace_vtd_page_walk(ce->hi, ce->lo, start, end);
- 
-     return vtd_page_walk_level(addr, start, end, hook_fn, private,
--                               level, true, true, NULL, false);
-+                               level, true, true, NULL, notify_unmap);
- }
- 
- /* Map a device to its corresponding domain (context-entry) */
-@@ -1202,6 +1203,34 @@ static void vtd_iotlb_domain_invalidate(IntelIOMMUState *s, uint16_t domain_id)
-                                 &domain_id);
- }
- 
-+static int vtd_page_invalidate_notify_hook(IOMMUTLBEntry *entry,
-+                                           void *private)
-+{
-+    memory_region_notify_iommu((MemoryRegion *)private, *entry);
-+    return 0;
-+}
-+
-+static void vtd_iotlb_page_invalidate_notify(IntelIOMMUState *s,
-+                                           uint16_t domain_id, hwaddr addr,
-+                                           uint8_t am)
-+{
-+    IntelIOMMUNotifierNode *node;
-+    VTDContextEntry ce;
-+    int ret;
-+
-+    QLIST_FOREACH(node, &(s->notifiers_list), next) {
-+        VTDAddressSpace *vtd_as = node->vtd_as;
-+        ret = vtd_dev_to_context_entry(s, pci_bus_num(vtd_as->bus),
-+                                       vtd_as->devfn, &ce);
-+        if (!ret && domain_id == VTD_CONTEXT_ENTRY_DID(ce.hi)) {
-+            vtd_page_walk(&ce, addr, addr + (1 << am) * VTD_PAGE_SIZE,
-+                          vtd_page_invalidate_notify_hook,
-+                          (void *)&vtd_as->iommu, true);
-+        }
-+    }
-+}
-+
-+
- static void vtd_iotlb_page_invalidate(IntelIOMMUState *s, uint16_t domain_id,
-                                       hwaddr addr, uint8_t am)
- {
-@@ -1212,6 +1241,7 @@ static void vtd_iotlb_page_invalidate(IntelIOMMUState *s, uint16_t domain_id,
-     info.addr = addr;
-     info.mask = ~((1 << am) - 1);
-     g_hash_table_foreach_remove(s->iotlb, vtd_hash_remove_by_page, &info);
-+    vtd_iotlb_page_invalidate_notify(s, domain_id, addr, am);
- }
- 
- /* Flush IOTLB
-@@ -2172,15 +2202,34 @@ static void vtd_iommu_notify_flag_changed(MemoryRegion *iommu,
-                                           IOMMUNotifierFlag new)
- {
-     VTDAddressSpace *vtd_as = container_of(iommu, VTDAddressSpace, iommu);
-+    IntelIOMMUState *s = vtd_as->iommu_state;
-+    IntelIOMMUNotifierNode *node = NULL;
-+    IntelIOMMUNotifierNode *next_node = NULL;
- 
--    if (new & IOMMU_NOTIFIER_MAP) {
--        error_report("Device at bus %s addr %02x.%d requires iommu "
--                     "notifier which is currently not supported by "
--                     "intel-iommu emulation",
--                     vtd_as->bus->qbus.name, PCI_SLOT(vtd_as->devfn),
--                     PCI_FUNC(vtd_as->devfn));
-+    if (!s->cache_mode_enabled && new & IOMMU_NOTIFIER_MAP) {
-+        error_report("We need to set cache_mode=1 for intel-iommu to enable "
-+                     "device assignment with IOMMU protection.");
-         exit(1);
-     }
-+
-+    /* Add new ndoe if no mapping was exising before this call */
-+    if (old == IOMMU_NOTIFIER_NONE) {
-+        node = g_malloc0(sizeof(*node));
-+        node->vtd_as = vtd_as;
-+        QLIST_INSERT_HEAD(&s->notifiers_list, node, next);
-+        return;
-+    }
-+
-+    /* update notifier node with new flags */
-+    QLIST_FOREACH_SAFE(node, &s->notifiers_list, next, next_node) {
-+        if (node->vtd_as == vtd_as) {
-+            if (new == IOMMU_NOTIFIER_NONE) {
-+                QLIST_REMOVE(node, next);
-+                g_free(node);
-+            }
-+            return;
-+        }
-+    }
- }
- 
- static const VMStateDescription vtd_vmstate = {
-@@ -2595,7 +2644,7 @@ static void vtd_iommu_replay(MemoryRegion *mr, IOMMUNotifier *n)
-          */
-         trace_vtd_replay_ce_valid(bus_n, PCI_SLOT(vtd_as->devfn),
-                                   PCI_FUNC(vtd_as->devfn), ce.hi, ce.lo);
--        vtd_page_walk(&ce, 0, ~0, vtd_replay_hook, (void *)n);
-+        vtd_page_walk(&ce, 0, ~0, vtd_replay_hook, (void *)n, false);
-     } else {
-         trace_vtd_replay_ce_invalid(bus_n, PCI_SLOT(vtd_as->devfn),
-                                     PCI_FUNC(vtd_as->devfn));
-@@ -2773,6 +2822,7 @@ static void vtd_realize(DeviceState *dev, Error **errp)
-         return;
-     }
- 
-+    QLIST_INIT(&s->notifiers_list);
-     memset(s->vtd_as_by_bus_num, 0, sizeof(s->vtd_as_by_bus_num));
-     memory_region_init_io(&s->csrmem, OBJECT(s), &vtd_mem_ops, s,
-                           "intel_iommu", DMAR_REG_SIZE);
-diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
-index 9c3f6c0..832cfc9 100644
---- a/include/hw/i386/intel_iommu.h
-+++ b/include/hw/i386/intel_iommu.h
-@@ -63,6 +63,7 @@ typedef union VTD_IR_TableEntry VTD_IR_TableEntry;
- typedef union VTD_IR_MSIAddress VTD_IR_MSIAddress;
- typedef struct VTDIrq VTDIrq;
- typedef struct VTD_MSIMessage VTD_MSIMessage;
-+typedef struct IntelIOMMUNotifierNode IntelIOMMUNotifierNode;
- 
- /* Context-Entry */
- struct VTDContextEntry {
-@@ -249,6 +250,11 @@ struct VTD_MSIMessage {
- /* When IR is enabled, all MSI/MSI-X data bits should be zero */
- #define VTD_IR_MSI_DATA          (0)
- 
-+struct IntelIOMMUNotifierNode {
-+    VTDAddressSpace *vtd_as;
-+    QLIST_ENTRY(IntelIOMMUNotifierNode) next;
-+};
-+
- /* The iommu (DMAR) device state struct */
- struct IntelIOMMUState {
-     X86IOMMUState x86_iommu;
-@@ -286,6 +292,8 @@ struct IntelIOMMUState {
-     MemoryRegionIOMMUOps iommu_ops;
-     GHashTable *vtd_as_by_busptr;   /* VTDBus objects indexed by PCIBus* reference */
-     VTDBus *vtd_as_by_bus_num[VTD_PCI_BUS_MAX]; /* VTDBus objects indexed by bus number */
-+    /* list of registered notifiers */
-+    QLIST_HEAD(, IntelIOMMUNotifierNode) notifiers_list;
- 
-     /* interrupt remapping */
-     bool intr_enabled;              /* Whether guest enabled IR */
--- 
-2.7.4
+SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
+ZGV2ZWxdIFtQQVRDSCBSRkMgdjIgMDAvMTddIFZULWQ6IHZmaW8gZW5hYmxlbWVudCBhbmQgbWlz
+YyBlbmhhbmNlcwpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMTQ4MzQyODU5NC0yODg4MC0xLWdp
+dC1zZW5kLWVtYWlsLXBldGVyeEByZWRoYXQuY29tCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09
+CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJB
+U0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKIyBVc2VmdWwgZ2l0IG9wdGlvbnMKZ2l0IGNvbmZpZyAt
+LWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVz
+IFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLiki
+CmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFs
+OiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRj
+IC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0
+aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpk
+b25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNm
+NWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5j
+b20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8xNDgz
+NDI4NTk0LTI4ODgwLTEtZ2l0LXNlbmQtZW1haWwtcGV0ZXJ4QHJlZGhhdC5jb20gLT4gcGF0Y2hl
+dy8xNDgzNDI4NTk0LTI4ODgwLTEtZ2l0LXNlbmQtZW1haWwtcGV0ZXJ4QHJlZGhhdC5jb20KU3dp
+dGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo2OTg2M2I2IGludGVsX2lvbW11OiBlbmFibGUg
+dmZpbyBkZXZpY2VzCjFhNDY0YmQgaW50ZWxfaW9tbXU6IGFsbG93IGR5bmFtaWMgc3dpdGNoIG9m
+IElPTU1VIHJlZ2lvbgphZDdhZWVmIGludGVsX2lvbW11OiBkbyByZXBsYXkgd2hlbiBjb250ZXh0
+IGludmFsaWRhdGUKZGQ0M2ExNyBpbnRlbF9pb21tdTogcHJvdmlkZSBpdHMgb3duIHJlcGxheSgp
+IGNhbGxiYWNrCjFmYmE0ODggbWVtb3J5OiBhZGQgTWVtb3J5UmVnaW9uSU9NTVVPcHMucmVwbGF5
+KCkgY2FsbGJhY2sKZTQwODA4MiBtZW1vcnk6IGludHJvZHVjZSBtZW1vcnlfcmVnaW9uX25vdGlm
+eV9vbmUoKQphODljNThiIG1lbW9yeTogcHJvdmlkZSBpb21tdV9yZXBsYXlfYWxsKCkKM2M2Yzk3
+MiBtZW1vcnk6IGFkZCBzZWN0aW9uIHJhbmdlIGluZm8gZm9yIElPTU1VIG5vdGlmaWVyCjY4OGVm
+ODIgaW50ZWxfaW9tbXU6IHZ0ZF9zbHB0X2xldmVsX3NoaWZ0IGNoZWNrIGxldmVsCmQxOGE0MjUg
+aW50ZWxfaW9tbXU6IGZpeCB0cmFjZSBmb3IgYWRkciB0cmFuc2xhdGlvbgowNDA1NmMwIGludGVs
+X2lvbW11OiBmaXggdHJhY2UgZm9yIGludiBkZXNjIGhhbmRsaW5nCjY5MmYzOTggaW50ZWxfaW9t
+bXU6IHJlbmFtaW5nIGdwYSB0byBpb3ZhIHdoZXJlIHByb3BlcgplYzg0NTZmIGludGVsX2lvbW11
+OiBzaW1wbGlmeSBpcnEgcmVnaW9uIHRyYW5zbGF0aW9uCjFlY2QzNzcgaW50ZWxfaW9tbXU6IGFs
+bG9jYXRlIG5ldyBrZXkgd2hlbiBjcmVhdGluZyBuZXcgYWRkcmVzcyBzcGFjZQo0ZDUwOWJlIG1l
+bW9yeTogaGFuZGxlIGFsaWFzIGluIG1lbW9yeV9yZWdpb25faXNfaW9tbXUoKQowNmQxODNkIG1l
+bW9yeTogaGFuZGxlIGFsaWFzIGZvciBpb21tdSBub3RpZmllcgowOTA1ODM0IElPTU1VOiBhZGQg
+b3B0aW9uIHRvIGVuYWJsZSBWVERfQ0FQX0NNIHRvIHZJT01NVSBjYXBpbGl0eSBleHBvc29lZCB0
+byBndWVzdAoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xNzogSU9NTVU6
+IGFkZCBvcHRpb24gdG8gZW5hYmxlIFZURF9DQVBfQ00gdG8gdklPTU1VIGNhcGlsaXR5IGV4cG9z
+b2VkIHRvIGd1ZXN0Li4uCkNoZWNraW5nIFBBVENIIDIvMTc6IG1lbW9yeTogaGFuZGxlIGFsaWFz
+IGZvciBpb21tdSBub3RpZmllci4uLgpDaGVja2luZyBQQVRDSCAzLzE3OiBtZW1vcnk6IGhhbmRs
+ZSBhbGlhcyBpbiBtZW1vcnlfcmVnaW9uX2lzX2lvbW11KCkuLi4KQ2hlY2tpbmcgUEFUQ0ggNC8x
+NzogaW50ZWxfaW9tbXU6IGFsbG9jYXRlIG5ldyBrZXkgd2hlbiBjcmVhdGluZyBuZXcgYWRkcmVz
+cyBzcGFjZS4uLgpDaGVja2luZyBQQVRDSCA1LzE3OiBpbnRlbF9pb21tdTogc2ltcGxpZnkgaXJx
+IHJlZ2lvbiB0cmFuc2xhdGlvbi4uLgpDaGVja2luZyBQQVRDSCA2LzE3OiBpbnRlbF9pb21tdTog
+cmVuYW1pbmcgZ3BhIHRvIGlvdmEgd2hlcmUgcHJvcGVyLi4uCkNoZWNraW5nIFBBVENIIDcvMTc6
+IGludGVsX2lvbW11OiBmaXggdHJhY2UgZm9yIGludiBkZXNjIGhhbmRsaW5nLi4uCkNoZWNraW5n
+IFBBVENIIDgvMTc6IGludGVsX2lvbW11OiBmaXggdHJhY2UgZm9yIGFkZHIgdHJhbnNsYXRpb24u
+Li4KQ2hlY2tpbmcgUEFUQ0ggOS8xNzogaW50ZWxfaW9tbXU6IHZ0ZF9zbHB0X2xldmVsX3NoaWZ0
+IGNoZWNrIGxldmVsLi4uCkNoZWNraW5nIFBBVENIIDEwLzE3OiBtZW1vcnk6IGFkZCBzZWN0aW9u
+IHJhbmdlIGluZm8gZm9yIElPTU1VIG5vdGlmaWVyLi4uCkNoZWNraW5nIFBBVENIIDExLzE3OiBt
+ZW1vcnk6IHByb3ZpZGUgaW9tbXVfcmVwbGF5X2FsbCgpLi4uCkNoZWNraW5nIFBBVENIIDEyLzE3
+OiBtZW1vcnk6IGludHJvZHVjZSBtZW1vcnlfcmVnaW9uX25vdGlmeV9vbmUoKS4uLgpDaGVja2lu
+ZyBQQVRDSCAxMy8xNzogbWVtb3J5OiBhZGQgTWVtb3J5UmVnaW9uSU9NTVVPcHMucmVwbGF5KCkg
+Y2FsbGJhY2suLi4KQ2hlY2tpbmcgUEFUQ0ggMTQvMTc6IGludGVsX2lvbW11OiBwcm92aWRlIGl0
+cyBvd24gcmVwbGF5KCkgY2FsbGJhY2suLi4KRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFs
+dWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRoZXNpcwojMzAzOiBGSUxFOiBpbmNsdWRl
+L2V4ZWMvbWVtb3J5Lmg6NjI6CisjZGVmaW5lIElPTU1VX0FDQ0VTU19GTEFHKHIsIHcpICgocikg
+PyBJT01NVV9STyA6IDApIHwgKCh3KSA/IElPTU1VX1dPIDogMCkKCnRvdGFsOiAxIGVycm9ycywg
+MCB3YXJuaW5ncywgMjY2IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2Js
+ZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9z
+aXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBN
+QUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDE1LzE3OiBpbnRlbF9pb21tdTogZG8gcmVwbGF5
+IHdoZW4gY29udGV4dCBpbnZhbGlkYXRlLi4uCkNoZWNraW5nIFBBVENIIDE2LzE3OiBpbnRlbF9p
+b21tdTogYWxsb3cgZHluYW1pYyBzd2l0Y2ggb2YgSU9NTVUgcmVnaW9uLi4uCkNoZWNraW5nIFBB
+VENIIDE3LzE3OiBpbnRlbF9pb21tdTogZW5hYmxlIHZmaW8gZGV2aWNlcy4uLgo9PT0gT1VUUFVU
+IEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdl
+bmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQ
+bGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
