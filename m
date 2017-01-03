@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47926)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48099)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cOLR6-0003KR-Mt
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 04:31:17 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cOLSe-0004Cz-5J
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 04:32:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cOLR2-0008Bu-Rk
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 04:31:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33768)
+	(envelope-from <pbonzini@redhat.com>) id 1cOLSb-0008Kn-2q
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 04:32:52 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57828)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cOLR2-0008Bi-Ld
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 04:31:12 -0500
-References: <1483266886-25050-1-git-send-email-peterx@redhat.com>
-	<38d74124-eb01-c381-8dd9-2a6334c71fa3@redhat.com>
-	<20170103030326.GC22664@pxdev.xzpeter.org>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cOLSa-0008Kj-TE
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 04:32:49 -0500
+References: <1482358659-4288-1-git-send-email-felipe@nutanix.com>
+	<1482358659-4288-3-git-send-email-felipe@nutanix.com>
+	<71ac8a1a-e527-0f99-120d-ad8386eecc8f@redhat.com>
+	<32782693-D91F-4920-82B5-FBE7AC22B739@nutanix.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c6a8bdb5-537b-2239-bd64-62172a992f06@redhat.com>
-Date: Tue, 3 Jan 2017 10:31:08 +0100
+Message-ID: <cb1de694-c254-266e-016e-4bae883a5207@redhat.com>
+Date: Tue, 3 Jan 2017 10:32:43 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170103030326.GC22664@pxdev.xzpeter.org>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <32782693-D91F-4920-82B5-FBE7AC22B739@nutanix.com>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [kvm-unit-tests PATCH 0/2] run_tests: support
- concurrent test execution
+Subject: Re: [Qemu-devel] [PATCH v3 2/3] vus: Introduce vhost-user-scsi host
+ device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,18 +30,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, Andrew Jones <drjones@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+To: Felipe Franciosi <felipe@nutanix.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Marc-Andre Lureau <marcandre.lureau@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
 
 
-On 03/01/2017 04:03, Peter Xu wrote:
->> Would it work if run_tests.sh wrote a Makefile for all the tests (with
->> phony targets only), and then simply ran "make -f Makefile.tmp -jN"?
-> Would this be a little bit tricky? This version 1 is kind-of overkill
-> (hundreds of lines of codes), I can make it much shorter if you like
-> in v2 according to Radim's suggestion.
+On 02/01/2017 19:07, Felipe Franciosi wrote:
+> 
+>> On 2 Jan 2017, at 10:25, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>
+>>
+>>
+>> On 21/12/2016 23:17, Felipe Franciosi wrote:
+>>> To use it, one must configure Qemu with --enable-vhost-user-scsi and
+>>> start Qemu with a command line equivalent to:
+>>>
+>>> qemu-system-x86_64 \
+>>>       -chardev socket,id=vus0,path=/tmp/vus.sock \
+>>>       -device vhost-user-scsi-pci,chardev=vus0,bus=pci.0,addr=...
+>>>
+>>> A separate commit presents a sample application linked with libiscsi to
+>>> provide a backend for vhost-user-scsi.
+>>
+>> Please place CONFIG_VHOST_USER_SCSI=$(CONFIG_POSIX) symbol in
+>> default-configs/ (so that it is enabled by default on non-Windows hosts)
+>> instead of having the configure option.  Otherwise, the patches look good!
+> 
+> Thanks, will do that and send a v4.
+> 
+> Do you want any entries on MAINTAINERS for this code or are you happy to take care of it under hw/scsi/* ?
 
-Yes, that's a nice suggestion!
+It's okay to have it under hw/scsi/*.
 
 Paolo
