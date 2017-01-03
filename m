@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34909)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35901)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hpoussin@reactos.org>) id 1cOXvq-0002RJ-0J
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 17:51:52 -0500
+	(envelope-from <hpoussin@reactos.org>) id 1cOXzO-0003tz-Bm
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 17:55:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hpoussin@reactos.org>) id 1cOXvk-0006bo-Rt
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 17:51:49 -0500
+	(envelope-from <hpoussin@reactos.org>) id 1cOXzH-0007if-Rb
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 17:55:28 -0500
 References: <1483049536-21548-1-git-send-email-hpoussin@reactos.org>
-	<1483049536-21548-5-git-send-email-hpoussin@reactos.org>
-	<20170102230341.GG12761@umbus.fritz.box>
+	<1483049536-21548-6-git-send-email-hpoussin@reactos.org>
+	<20170103045705.GQ12761@umbus.fritz.box>
 From: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
-Message-ID: <0ba286d9-d9c3-3717-969e-d65e64bbe8c2@reactos.org>
-Date: Tue, 3 Jan 2017 23:51:27 +0100
+Message-ID: <0e3da19e-d070-f901-f9e5-f68d552cef72@reactos.org>
+Date: Tue, 3 Jan 2017 23:55:10 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170102230341.GG12761@umbus.fritz.box>
+In-Reply-To: <20170103045705.GQ12761@umbus.fritz.box>
 Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 4/6] prep: QOM'ify System I/O
+Subject: Re: [Qemu-devel] [PATCH 5/6] prep: add IBM RS/6000 7020 (40p)
+ memory controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,407 +28,329 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Gibson <david@gibson.dropbear.id.au>
 Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Thomas Huth <thuth@redhat.com>, Giancarlo Teodori <gteodori@gmail.com>
 
-Le 03/01/2017 =E0 00:03, David Gibson a =E9crit :
-> On Thu, Dec 29, 2016 at 11:12:14PM +0100, Herv=E9 Poussineau wrote:
->> Part of the functionality is copied from hw/ppc/prep.c.
->> Also add support for board identification/equipment registers.
->
-> Needs more detail in the commit message.  What is system I/O?  what is
-> it for?
-
-System I/O is a PPC PReP device which allows access to motherboard device=
-s, living in the 0x800-0x8ff memory range.
-It is described in "PowerPC Reference platform Specification", available =
-at
-ftp://ftp.software.ibm.com/rs6000/technology/spec/ (files srp1*) in secti=
-on 6.1.5: "I/O Device Mapping"
-
->
-> The 1-line summary is also misleading; "QOM'ify" suggests you are
-> changing an existing device to use QOM conventions, but no existing
-> device is removed here.  Is this actually something new, or is it a
-> duplicate QOMified version of something else?  If so, what?
-
-It is a partial duplicate of System I/O device available in hw/ppc/prep.c=
- .
-The new one I'm adding doesn't have all the Motorola-specific registers, =
-and follows a known specification.
-
-The existing one should be deprecated and removed with the 'prep' machine=
-.
-
-Herv=E9
-
->>
+Le 03/01/2017 =E0 05:57, David Gibson a =E9crit :
+> On Thu, Dec 29, 2016 at 11:12:15PM +0100, Herv=E9 Poussineau wrote:
 >> Signed-off-by: Herv=E9 Poussineau <hpoussin@reactos.org>
 >> ---
->>  hw/ppc/Makefile.objs   |   1 +
->>  hw/ppc/prep_systemio.c | 302 ++++++++++++++++++++++++++++++++++++++++=
+>>  default-configs/ppc-softmmu.mak |   1 +
+>>  hw/ppc/Makefile.objs            |   1 +
+>>  hw/ppc/rs6000_mc.c              | 232 +++++++++++++++++++++++++++++++=
 +++++++++
->>  hw/ppc/trace-events    |   4 +
->>  3 files changed, 307 insertions(+)
->>  create mode 100644 hw/ppc/prep_systemio.c
+>>  hw/ppc/trace-events             |   7 ++
+>>  4 files changed, 241 insertions(+)
+>>  create mode 100644 hw/ppc/rs6000_mc.c
 >>
+>> diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-sof=
+tmmu.mak
+>> index d4d0f9b..e567658 100644
+>> --- a/default-configs/ppc-softmmu.mak
+>> +++ b/default-configs/ppc-softmmu.mak
+>> @@ -47,3 +47,4 @@ CONFIG_LIBDECNUMBER=3Dy
+>>  # For PReP
+>>  CONFIG_MC146818RTC=3Dy
+>>  CONFIG_ISA_TESTDEV=3Dy
+>> +CONFIG_RS6000_MC=3Dy
 >> diff --git a/hw/ppc/Makefile.objs b/hw/ppc/Makefile.objs
->> index 8025129..db72297 100644
+>> index db72297..0012934 100644
 >> --- a/hw/ppc/Makefile.objs
 >> +++ b/hw/ppc/Makefile.objs
->> @@ -16,6 +16,7 @@ obj-y +=3D ppc405_boards.o ppc4xx_devs.o ppc405_uc.o=
- ppc440_bamboo.o
->>  obj-y +=3D ppc4xx_pci.o
+>> @@ -17,6 +17,7 @@ obj-y +=3D ppc4xx_pci.o
 >>  # PReP
 >>  obj-$(CONFIG_PREP) +=3D prep.o
->> +obj-$(CONFIG_PREP) +=3D prep_systemio.o
+>>  obj-$(CONFIG_PREP) +=3D prep_systemio.o
+>> +obj-${CONFIG_RS6000_MC} +=3D rs6000_mc.o
 >>  # OldWorld PowerMac
 >>  obj-$(CONFIG_MAC) +=3D mac_oldworld.o
 >>  # NewWorld PowerMac
->> diff --git a/hw/ppc/prep_systemio.c b/hw/ppc/prep_systemio.c
+>> diff --git a/hw/ppc/rs6000_mc.c b/hw/ppc/rs6000_mc.c
 >> new file mode 100644
->> index 0000000..449056c
+>> index 0000000..c684421
 >> --- /dev/null
->> +++ b/hw/ppc/prep_systemio.c
->> @@ -0,0 +1,302 @@
+>> +++ b/hw/ppc/rs6000_mc.c
+>> @@ -0,0 +1,232 @@
 >> +/*
->> + * QEMU PReP System I/O emulation
+>> + * QEMU RS/6000 memory controller
 >> + *
->> + * Copyright (c) 2016 Herve Poussineau
+>> + * Copyright (c) 2016 Herv=E9 Poussineau
 >> + *
->> + * Permission is hereby granted, free of charge, to any person obtain=
-ing a copy
->> + * of this software and associated documentation files (the "Software=
-"), to deal
->> + * in the Software without restriction, including without limitation =
-the rights
->> + * to use, copy, modify, merge, publish, distribute, sublicense, and/=
-or sell
->> + * copies of the Software, and to permit persons to whom the Software=
- is
->> + * furnished to do so, subject to the following conditions:
+>> + * This program is free software: you can redistribute it and/or modi=
+fy
+>> + * it under the terms of the GNU General Public License as published =
+by
+>> + * the Free Software Foundation, either version 2 of the License, or
+>> + * (at your option) version 3 or any later version.
 >> + *
->> + * The above copyright notice and this permission notice shall be inc=
-luded in
->> + * all copies or substantial portions of the Software.
+>> + * This program is distributed in the hope that it will be useful,
+>> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+>> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+>> + * GNU General Public License for more details.
 >> + *
->> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EX=
-PRESS OR
->> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTAB=
-ILITY,
->> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT =
-SHALL
->> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES =
-OR OTHER
->> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, AR=
-ISING FROM,
->> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEAL=
-INGS IN
->> + * THE SOFTWARE.
+>> + * You should have received a copy of the GNU General Public License
+>> + * along with this program.  If not, see <http://www.gnu.org/licenses=
+/>.
 >> + */
 >> +
 >> +#include "qemu/osdep.h"
 >> +#include "hw/isa/isa.h"
 >> +#include "exec/address-spaces.h"
->> +#include "qemu/error-report.h" /* for error_report() */
->> +#include "sysemu/sysemu.h" /* for vm_stop() */
->> +#include "cpu.h"
+>> +#include "hw/boards.h"
+>> +#include "qapi/error.h"
 >> +#include "trace.h"
 >> +
->> +#define TYPE_PREP_SYSTEMIO "prep-systemio"
->> +#define PREP_SYSTEMIO(obj) \
->> +    OBJECT_CHECK(PrepSystemIoState, (obj), TYPE_PREP_SYSTEMIO)
+>> +#define TYPE_RS6000MC "rs6000-mc"
+>> +#define RS6000MC_DEVICE(obj) \
+>> +    OBJECT_CHECK(RS6000MCState, (obj), TYPE_RS6000MC)
 >> +
->> +/* Bit as defined in PowerPC Reference Plaform v1.1, sect. 6.1.5, p. =
-132 */
->> +#define PREP_BIT(n) (1 << (7 - (n)))
->> +
->> +typedef struct PrepSystemIoState {
+>> +typedef struct RS6000MCState {
 >> +    ISADevice parent_obj;
->> +    MemoryRegion ppc_parity_mem;
->> +
->> +    qemu_irq non_contiguous_io_map_irq;
->> +    uint8_t sreset; /* 0x0092 */
->> +    uint8_t equipment; /* 0x080c */
->> +    uint8_t system_control; /* 0x081c */
->> +    uint8_t iomap_type; /* 0x0850 */
->> +    uint8_t ibm_planar_id; /* 0x0852 */
->> +    qemu_irq softreset_irq;
+>> +    /* see US patent 5,684,979 for details (expired 2001-11-04) */
+>> +    uint32_t ram_size;
+>> +    bool autoconfigure;
+>> +    MemoryRegion simm[6];
+>> +    unsigned int simm_size[6];
+>> +    uint32_t end_address[8];
+>> +    uint8_t port0820_index;
 >> +    PortioList portio;
->> +} PrepSystemIoState;
+>> +} RS6000MCState;
 >> +
->> +/* PORT 0092 -- Special Port 92 (Read/Write) */
+>> +/* P0RT 0803 -- SIMM ID Register (32/8 MB) (Read Only) */
 >> +
->> +enum {
->> +    PORT0092_SOFTRESET  =3D PREP_BIT(7),
->> +    PORT0092_LE_MODE    =3D PREP_BIT(6),
->> +};
->> +
->> +static void prep_port0092_write(void *opaque, uint32_t addr, uint32_t=
- val)
+>> +static uint32_t rs6000mc_port0803_read(void *opaque, uint32_t addr)
 >> +{
->> +    PrepSystemIoState *s =3D opaque;
->> +
->> +    trace_prep_systemio_write(addr, val);
->> +
->> +    if ((val & PORT0092_SOFTRESET) !=3D 0) {
->> +        qemu_irq_raise(s->softreset_irq);
->> +        s->sreset =3D 1;
->> +    } else {
->> +        qemu_irq_lower(s->softreset_irq);
->> +        s->sreset =3D 0;
->> +    }
->> +
->> +    if ((val & PORT0092_LE_MODE) !=3D 0) {
->> +        /* XXX Not supported yet */
->> +        error_report("little-endian mode not supported");
->> +        vm_stop(RUN_STATE_PAUSED);
->> +    } else {
->> +        /* Nothing to do */
->> +    }
->> +}
->> +
->> +static uint32_t prep_port0092_read(void *opaque, uint32_t addr)
->> +{
->> +    PrepSystemIoState *s =3D opaque;
->> +    /* XXX LE mode unsupported */
->> +    trace_prep_systemio_read(addr, 0);
->> +    return s->sreset;
->> +}
->> +
->> +/* PORT 0808 -- Hardfile Light Register (Write Only) */
->> +
->> +enum {
->> +    PORT0808_HARDFILE_LIGHT_ON  =3D PREP_BIT(7),
->> +};
->> +
->> +static void prep_port0808_write(void *opaque, uint32_t addr, uint32_t=
- val)
->> +{
->> +    trace_prep_systemio_write(addr, val);
->> +}
->> +
->> +/* PORT 0810 -- Password Protect 1 Register (Write Only) */
->> +
->> +/* reset by port 0x4D in the SIO */
->> +static void prep_port0810_write(void *opaque, uint32_t addr, uint32_t=
- val)
->> +{
->> +    trace_prep_systemio_write(addr, val);
->> +}
->> +
->> +/* PORT 0812 -- Password Protect 2 Register (Write Only) */
->> +
->> +/* reset by port 0x4D in the SIO */
->> +static void prep_port0812_write(void *opaque, uint32_t addr, uint32_t=
- val)
->> +{
->> +    trace_prep_systemio_write(addr, val);
->> +}
->> +
->> +/* PORT 0814 -- L2 Invalidate Register (Write Only) */
->> +
->> +static void prep_port0814_write(void *opaque, uint32_t addr, uint32_t=
- val)
->> +{
->> +    trace_prep_systemio_write(addr, val);
->> +}
->> +
->> +/* PORT 0818 -- Reserved for Keylock (Read Only) */
->> +
->> +enum {
->> +    PORT0818_KEYLOCK_SIGNAL_HIGH    =3D PREP_BIT(7),
->> +};
->> +
->> +static uint32_t prep_port0818_read(void *opaque, uint32_t addr)
->> +{
+>> +    RS6000MCState *s =3D opaque;
 >> +    uint32_t val =3D 0;
->> +    trace_prep_systemio_read(addr, val);
+>> +    int socket;
+>> +
+>> +    /* (1 << socket) indicates 32 MB SIMM at given socket */
+>> +    for (socket =3D 0; socket < 6; socket++) {
+>> +        if (s->simm_size[socket] =3D=3D 32) {
+>> +            val |=3D (1 << socket);
+>> +        }
+>> +    }
+>> +
+>> +    trace_rs6000mc_id_read(addr, val);
 >> +    return val;
 >> +}
 >> +
->> +/* PORT 080C -- Equipment */
+>> +/* PORT 0804 -- SIMM Presence Register (Read Only) */
+>> +
+>> +static uint32_t rs6000mc_port0804_read(void *opaque, uint32_t addr)
+>> +{
+>> +    RS6000MCState *s =3D opaque;
+>> +    uint32_t val =3D 0xff;
+>> +    int socket;
+>> +
+>> +    /* (1 << socket) indicates SIMM absence at given socket */
+>> +    for (socket =3D 0; socket < 6; socket++) {
+>> +        if (s->simm_size[socket]) {
+>> +            val &=3D ~(1 << socket);
+>> +        }
+>> +    }
+>> +    s->port0820_index =3D 0;
+>> +
+>> +    trace_rs6000mc_presence_read(addr, val);
+>> +    return val;
+>> +}
+>> +
+>> +/* Memory Controller Size Programming Register */
+>> +
+>> +static uint32_t rs6000mc_port0820_read(void *opaque, uint32_t addr)
+>> +{
+>> +    RS6000MCState *s =3D opaque;
+>> +    uint32_t val =3D s->end_address[s->port0820_index] & 0x1f;
+>> +    s->port0820_index =3D (s->port0820_index + 1) & 7;
+>> +    trace_rs6000mc_size_read(addr, val);
+>> +    return val;
+>> +}
+>> +
+>> +static void rs6000mc_port0820_write(void *opaque, uint32_t addr, uint=
+32_t val)
+>> +{
+>> +    RS6000MCState *s =3D opaque;
+>> +    uint8_t socket =3D val >> 5;
+>> +    uint32_t end_address =3D val & 0x1f;
+>> +
+>> +    trace_rs6000mc_size_write(addr, val);
+>> +    s->end_address[socket] =3D end_address;
+>> +    if (socket > 0 && socket < 7) {
+>> +        if (s->simm_size[socket - 1]) {
+>> +            uint32_t size;
+>> +            uint32_t start_address =3D 0;
+>> +            if (socket > 1) {
+>> +                start_address =3D s->end_address[socket - 1];
+>> +            }
+>> +
+>> +            size =3D end_address - start_address;
+>> +            memory_region_set_enabled(&s->simm[socket - 1], size !=3D=
+ 0);
+>> +            memory_region_set_address(&s->simm[socket - 1],
+>> +                                      start_address * 8 * 1024 * 1024=
+);
+>> +        }
+>> +    }
+>> +}
+>> +
+>> +/* Read Memory Parity Error */
 >> +
 >> +enum {
->> +    PORT080C_SCSIFUSE               =3D PREP_BIT(1),
->> +    PORT080C_L2_COPYBACK            =3D PREP_BIT(4),
->> +    PORT080C_L2_256                 =3D PREP_BIT(5),
->> +    PORT080C_UPGRADE_CPU            =3D PREP_BIT(6),
->> +    PORT080C_L2                     =3D PREP_BIT(7),
+>> +    PORT0841_NO_ERROR_DETECTED =3D 0x01,
 >> +};
 >> +
->> +static uint32_t prep_port080c_read(void *opaque, uint32_t addr)
+>> +static uint32_t rs6000mc_port0841_read(void *opaque, uint32_t addr)
 >> +{
->> +    PrepSystemIoState *s =3D opaque;
->> +    trace_prep_systemio_read(addr, s->equipment);
->> +    return s->equipment;
+>> +    uint32_t val =3D PORT0841_NO_ERROR_DETECTED;
+>> +    trace_rs6000mc_parity_read(addr, val);
+>> +    return val;
 >> +}
 >> +
->> +/* PORT 081C -- System Control Register (Read/Write) */
->> +
->> +enum {
->> +    PORT081C_FLOPPY_MOTOR_INHIBIT   =3D PREP_BIT(3),
->> +    PORT081C_MASK_TEA               =3D PREP_BIT(2),
->> +    PORT081C_L2_UPDATE_INHIBIT      =3D PREP_BIT(1),
->> +    PORT081C_L2_CACHEMISS_INHIBIT   =3D PREP_BIT(0),
->> +};
->> +
->> +static void prep_port081c_write(void *opaque, uint32_t addr, uint32_t=
- val)
->> +{
->> +    PrepSystemIoState *s =3D opaque;
->> +    trace_prep_systemio_write(addr, val);
->> +    s->system_control =3D val;
->> +}
->> +
->> +static uint32_t prep_port081c_read(void *opaque, uint32_t addr)
->> +{
->> +    PrepSystemIoState *s =3D opaque;
->> +    trace_prep_systemio_read(addr, s->system_control);
->> +    return s->system_control;
->> +}
->> +
->> +/* System Board Identification */
->> +
->> +static uint32_t prep_port0852_read(void *opaque, uint32_t addr)
->> +{
->> +    PrepSystemIoState *s =3D opaque;
->> +    trace_prep_systemio_read(addr, s->ibm_planar_id);
->> +    return s->ibm_planar_id;
->> +}
->> +
->> +/* PORT 0850 -- I/O Map Type Register (Read/Write) */
->> +
->> +enum {
->> +    PORT0850_IOMAP_NONCONTIGUOUS    =3D PREP_BIT(7),
->> +};
->> +
->> +static uint32_t prep_port0850_read(void *opaque, uint32_t addr)
->> +{
->> +    PrepSystemIoState *s =3D opaque;
->> +    trace_prep_systemio_read(addr, s->iomap_type);
->> +    return s->iomap_type;
->> +}
->> +
->> +static void prep_port0850_write(void *opaque, uint32_t addr, uint32_t=
- val)
->> +{
->> +    PrepSystemIoState *s =3D opaque;
->> +
->> +    trace_prep_systemio_write(addr, val);
->> +    qemu_set_irq(s->non_contiguous_io_map_irq,
->> +                 val & PORT0850_IOMAP_NONCONTIGUOUS ? 1 : 0);
->> +    s->iomap_type =3D val;
->> +}
->> +
->> +static const MemoryRegionPortio ppc_io800_port_list[] =3D {
->> +    { 0x092, 1, 1, .read =3D prep_port0092_read,
->> +                   .write =3D prep_port0092_write, },
->> +    { 0x808, 1, 1, .write =3D prep_port0808_write, },
->> +    { 0x80c, 1, 1, .read =3D prep_port080c_read, },
->> +    { 0x810, 1, 1, .write =3D prep_port0810_write, },
->> +    { 0x812, 1, 1, .write =3D prep_port0812_write, },
->> +    { 0x814, 1, 1, .write =3D prep_port0814_write, },
->> +    { 0x818, 1, 1, .read =3D prep_port0818_read },
->> +    { 0x81c, 1, 1, .read =3D prep_port081c_read,
->> +                   .write =3D prep_port081c_write, },
->> +    { 0x850, 1, 1, .read =3D prep_port0850_read,
->> +                   .write =3D prep_port0850_write, },
->> +    { 0x852, 1, 1, .read =3D prep_port0852_read, },
+>> +static const MemoryRegionPortio rs6000mc_port_list[] =3D {
+>> +    { 0x803, 1, 1, .read =3D rs6000mc_port0803_read },
+>> +    { 0x804, 1, 1, .read =3D rs6000mc_port0804_read },
+>> +    { 0x820, 1, 1, .read =3D rs6000mc_port0820_read,
+>> +                   .write =3D rs6000mc_port0820_write, },
+>> +    { 0x841, 1, 1, .read =3D rs6000mc_port0841_read },
 >> +    PORTIO_END_OF_LIST()
 >> +};
 >> +
->> +static uint64_t ppc_parity_error_readl(void *opaque, hwaddr addr,
->> +                                       unsigned int size)
+>> +static void rs6000mc_realize(DeviceState *dev, Error **errp)
 >> +{
->> +    uint32_t val =3D 0;
->> +    trace_prep_systemio_read((unsigned int)addr, val);
->> +    return val;
+>> +    RS6000MCState *s =3D RS6000MC_DEVICE(dev);
+>> +    int socket =3D 0;
+>> +    unsigned int ram_size =3D s->ram_size / (1024 * 1024);
+>> +
+>> +    while (socket < 6) {
+>> +        if (ram_size >=3D 64) {
+>> +            s->simm_size[socket] =3D 32;
+>> +            s->simm_size[socket + 1] =3D 32;
+>> +            ram_size -=3D 64;
+>> +        } else if (ram_size >=3D 16) {
+>> +            s->simm_size[socket] =3D 8;
+>> +            s->simm_size[socket + 1] =3D 8;
+>> +            ram_size -=3D 16;
+>> +        } else {
+>> +            /* Not enough memory */
+>> +            break;
+>> +        }
+>> +        socket +=3D 2;
+>> +    }
+>
+> Surely this needs some warning if you try to set ram-size greater than
+> the hardware can support (192MiB, IIUC).
+
+10 lines later, if you were unable to map the whole requested RAM, you'll=
+ get an error.
+ >> +    if (ram_size) {
+ >> +        /* unable to push all requested RAM in SIMMs */
+ >> +        error_setg(errp, "RAM size incompatible with this board. "
+ >> +                   "Try again with something else, like %d MB",
+ >> +                   s->ram_size / 1024 / 1024 - ram_size);
+ >> +        return;
+ >> +    }
+
+Is it enough?
+
+
+>
+>> +    for (socket =3D 0; socket < 6; socket++) {
+>> +        if (s->simm_size[socket]) {
+>> +            char name[] =3D "simm.?";
+>> +            name[5] =3D socket + '0';
+>> +            memory_region_allocate_system_memory(&s->simm[socket], OB=
+JECT(dev),
+>> +                                                 name, s->simm_size[s=
+ocket]
+>> +                                                 * 1024 * 1024);
+>> +            memory_region_add_subregion_overlap(get_system_memory(), =
+0,
+>> +                                                &s->simm[socket], soc=
+ket);
+>> +        }
+>> +    }
+>> +    if (ram_size) {
+>> +        /* unable to push all requested RAM in SIMMs */
+>> +        error_setg(errp, "RAM size incompatible with this board. "
+>> +                   "Try again with something else, like %d MB",
+>> +                   s->ram_size / 1024 / 1024 - ram_size);
+>> +        return;
+>> +    }
+>> +
+>> +    if (s->autoconfigure) {
+>> +        uint32_t start_address =3D 0;
+>> +        for (socket =3D 0; socket < 6; socket++) {
+>> +            if (s->simm_size[socket]) {
+>> +                memory_region_set_enabled(&s->simm[socket], true);
+>> +                memory_region_set_address(&s->simm[socket], start_add=
+ress);
+>> +                start_address +=3D memory_region_size(&s->simm[socket=
+]);
+>> +            }
+>> +        }
+>> +    }
+>> +
+>> +    isa_register_portio_list(ISA_DEVICE(dev), &s->portio, 0x0,
+>> +                             rs6000mc_port_list, s, "rs6000mc");
 >> +}
 >> +
->> +static const MemoryRegionOps ppc_parity_error_ops =3D {
->> +    .read =3D ppc_parity_error_readl,
->> +    .valid =3D {
->> +        .min_access_size =3D 4,
->> +        .max_access_size =3D 4,
->> +    },
->> +};
->> +
->> +static void prep_systemio_realize(DeviceState *dev, Error **errp)
->> +{
->> +    ISADevice *isa =3D ISA_DEVICE(dev);
->> +    PrepSystemIoState *s =3D PREP_SYSTEMIO(dev);
->> +    PowerPCCPU *cpu;
->> +
->> +    qdev_init_gpio_out(dev, &s->non_contiguous_io_map_irq, 1);
->> +    s->iomap_type =3D 0; /* contiguous mode XXX 0x1? */
->> +    cpu =3D POWERPC_CPU(first_cpu);
->> +    s->softreset_irq =3D cpu->env.irq_inputs[PPC6xx_INPUT_HRESET];
->> +
->> +    isa_register_portio_list(isa, &s->portio, 0x0, ppc_io800_port_lis=
-t, s,
->> +                             "systemio800");
->> +
->> +    memory_region_init_io(&s->ppc_parity_mem, OBJECT(dev),
->> +                          &ppc_parity_error_ops, s, "ppc-parity", 0x4=
-);
->> +    memory_region_add_subregion(get_system_memory(), 0xbfffeff0,
->> +                                &s->ppc_parity_mem);
->> +}
->> +
->> +static const VMStateDescription vmstate_prep_systemio =3D {
->> +    .name =3D "prep_systemio",
+>> +static const VMStateDescription vmstate_rs6000mc =3D {
+>> +    .name =3D "rs6000-mc",
 >> +    .version_id =3D 1,
 >> +    .minimum_version_id =3D 1,
 >> +    .fields =3D (VMStateField[]) {
->> +        VMSTATE_UINT8(system_control, PrepSystemIoState),
->> +        VMSTATE_UINT8(iomap_type, PrepSystemIoState),
+>> +        VMSTATE_UINT8(port0820_index, RS6000MCState),
 >> +        VMSTATE_END_OF_LIST()
 >> +    },
 >> +};
 >> +
->> +static Property prep_systemio_properties[] =3D {
->> +    DEFINE_PROP_UINT8("ibm-planar-id", PrepSystemIoState, ibm_planar_=
-id, 0),
->> +    DEFINE_PROP_UINT8("equipment", PrepSystemIoState, equipment, 0),
+>> +static Property rs6000mc_properties[] =3D {
+>> +    DEFINE_PROP_UINT32("ram-size", RS6000MCState, ram_size, 0),
+>> +    DEFINE_PROP_BOOL("auto-configure", RS6000MCState, autoconfigure, =
+true),
 >> +    DEFINE_PROP_END_OF_LIST()
 >> +};
 >> +
->> +static void prep_systemio_class_initfn(ObjectClass *klass, void *data=
-)
+>> +static void rs6000mc_class_initfn(ObjectClass *klass, void *data)
 >> +{
 >> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
 >> +
->> +    dc->realize =3D prep_systemio_realize;
->> +    dc->vmsd =3D &vmstate_prep_systemio;
->> +    dc->props =3D prep_systemio_properties;
+>> +    dc->realize =3D rs6000mc_realize;
+>> +    dc->vmsd =3D &vmstate_rs6000mc;
+>> +    dc->props =3D rs6000mc_properties;
 >> +}
 >> +
->> +static TypeInfo prep_systemio800_info =3D {
->> +    .name          =3D TYPE_PREP_SYSTEMIO,
+>> +static const TypeInfo rs6000mc_info =3D {
+>> +    .name          =3D TYPE_RS6000MC,
 >> +    .parent        =3D TYPE_ISA_DEVICE,
->> +    .instance_size =3D sizeof(PrepSystemIoState),
->> +    .class_init    =3D prep_systemio_class_initfn,
+>> +    .instance_size =3D sizeof(RS6000MCState),
+>> +    .class_init    =3D rs6000mc_class_initfn,
 >> +};
 >> +
->> +static void prep_systemio_register_types(void)
+>> +static void rs6000mc_types(void)
 >> +{
->> +    type_register_static(&prep_systemio800_info);
+>> +    type_register_static(&rs6000mc_info);
 >> +}
 >> +
->> +type_init(prep_systemio_register_types)
+>> +type_init(rs6000mc_types)
 >> diff --git a/hw/ppc/trace-events b/hw/ppc/trace-events
->> index 2297ead..2ba6166 100644
+>> index 2ba6166..42b8ec0 100644
 >> --- a/hw/ppc/trace-events
 >> +++ b/hw/ppc/trace-events
->> @@ -74,3 +74,7 @@ ppc_tb_adjust(uint64_t offs1, uint64_t offs2, int64_=
-t diff, int64_t seconds) "ad
->>  # hw/ppc/prep.c
->>  prep_io_800_writeb(uint32_t addr, uint32_t val) "0x%08" PRIx32 " =3D>=
- 0x%02" PRIx32
->>  prep_io_800_readb(uint32_t addr, uint32_t retval) "0x%08" PRIx32 " <=3D=
- 0x%02" PRIx32
->> +
->> +# hw/ppc/prep_systemio.c
->> +prep_systemio_read(uint32_t addr, uint32_t val) "read addr=3D%x val=3D=
+>> @@ -78,3 +78,10 @@ prep_io_800_readb(uint32_t addr, uint32_t retval) "=
+0x%08" PRIx32 " <=3D 0x%02" PRI
+>>  # hw/ppc/prep_systemio.c
+>>  prep_systemio_read(uint32_t addr, uint32_t val) "read addr=3D%x val=3D=
 %x"
->> +prep_systemio_write(uint32_t addr, uint32_t val) "write addr=3D%x val=
+>>  prep_systemio_write(uint32_t addr, uint32_t val) "write addr=3D%x val=
+=3D%x"
+>> +
+>> +# hw/ppc/rs6000_mc.c
+>> +rs6000mc_id_read(uint32_t addr, uint32_t val) "read addr=3D%x val=3D%=
+x"
+>> +rs6000mc_presence_read(uint32_t addr, uint32_t val) "read addr=3D%x v=
+al=3D%x"
+>> +rs6000mc_size_read(uint32_t addr, uint32_t val) "read addr=3D%x val=3D=
+%x"
+>> +rs6000mc_size_write(uint32_t addr, uint32_t val) "write addr=3D%x val=
+=3D%x"
+>> +rs6000mc_parity_read(uint32_t addr, uint32_t val) "read addr=3D%x val=
 =3D%x"
 >
