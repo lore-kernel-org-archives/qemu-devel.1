@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54218)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54399)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cOSL2-0007IM-4w
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 11:53:28 -0500
+	(envelope-from <imammedo@redhat.com>) id 1cOSMF-0007ty-8n
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 11:54:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cOSKz-000426-3m
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 11:53:28 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43906)
+	(envelope-from <imammedo@redhat.com>) id 1cOSMC-0004LN-7I
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 11:54:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36456)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cOSKy-000422-U1
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 11:53:25 -0500
-Date: Tue, 3 Jan 2017 17:53:27 +0100
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cOSMC-0004LI-1c
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 11:54:40 -0500
+Date: Tue, 3 Jan 2017 17:54:44 +0100
 From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170103175327.61778555@Igors-MacBook-Pro.local>
-In-Reply-To: <e27ac12b-9e41-f145-ca05-385d4edd2738@redhat.com>
-References: <20161229223815.13705-1-ehabkost@redhat.com>
-	<20161230152834.6d1fa963@Igors-MacBook-Pro.local>
-	<20161230182308.GK3441@thinpad.lan.raisama.net>
-	<20170103140252.1a2df147@nial.brq.redhat.com>
-	<20170103142223.GB3315@thinpad.lan.raisama.net>
-	<e27ac12b-9e41-f145-ca05-385d4edd2738@redhat.com>
+Message-ID: <20170103175444.38b824fc@Igors-MacBook-Pro.local>
+In-Reply-To: <dc14b54f-db61-c14c-7963-51d9b322a2a1@suse.de>
+References: <1483371890-289981-1-git-send-email-imammedo@redhat.com>
+	<1483371890-289981-2-git-send-email-imammedo@redhat.com>
+	<1c69ec6e-e8e9-d544-f2c5-52ace0acf2bb@redhat.com>
+	<dc14b54f-db61-c14c-7963-51d9b322a2a1@suse.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] qdev: Make "hotplugged" property read-only
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/3] cleanup: remove not used header
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,28 +29,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, "Michael
-	S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>, Andreas =?UTF-8?Q?F=C3=A4rber?= <afaerber@suse.de>
+To: Andreas =?UTF-8?Q?F=C3=A4rber?= <afaerber@suse.de>
+Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, ehabkost@redhat.com, armbru@redhat.com, dgilbert@redhat.com
 
-On Tue, 3 Jan 2017 17:10:15 +0100
-Paolo Bonzini <pbonzini@redhat.com> wrote:
+On Tue, 3 Jan 2017 16:26:16 +0100
+Andreas F=C3=A4rber <afaerber@suse.de> wrote:
 
-> 
-> 
-> On 03/01/2017 15:22, Eduardo Habkost wrote:
-> >> I didn't know that. Is this documented somewhere?
-> >> Is it actually used by any existing software?
-> > not that I know of. But users should be fixed if they are not using it.
-> > 
-> > I see. The problem is that the mechanism is undocumented,
-> > untested, and seems very likely to trigger bugs in device code.
-> 
-> I agree.  Why can't hotplugged be migrated?
-It's probably not migrated because of it's not runtime/guest modified
-state so we don't have to migrate it as it's know in advance.
+> Am 03.01.2017 um 16:25 schrieb Eric Blake:
+> > On 01/02/2017 09:44 AM, Igor Mammedov wrote:
+> >=20
+> > perhaps s/not used/unused/ in the subject
+>=20
+> ... and qom: instead of cleanup: if this gets re-spun.
+sure
 
-For now it should set manually on CLI (-device) with the rest of
-hotplugged device properties.
-
-> Paolo
+>=20
+> Andreas
+>=20
+> >=20
+> > Reviewed-by: Eric Blake <eblake@redhat.com>
+> >=20
+> >> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> >> ---
+> >>  qom/object_interfaces.c | 1 -
+> >>  1 file changed, 1 deletion(-)
+> >>
+> >> diff --git a/qom/object_interfaces.c b/qom/object_interfaces.c
+> >> index ded4d84..4b880d0 100644
+> >> --- a/qom/object_interfaces.c
+> >> +++ b/qom/object_interfaces.c
+> >> @@ -3,7 +3,6 @@
+> >>  #include "qom/object_interfaces.h"
+> >>  #include "qemu/module.h"
+> >>  #include "qapi-visit.h"
+> >> -#include "qapi/qobject-output-visitor.h"
+> >>  #include "qapi/opts-visitor.h"
+> >> =20
+> >>  void user_creatable_complete(Object *obj, Error **errp)
+> >>
+> >=20
+>=20
+>=20
