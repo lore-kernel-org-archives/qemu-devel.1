@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48099)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48838)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cOLSe-0004Cz-5J
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 04:32:53 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cOLYW-0006IT-6v
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 04:38:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cOLSb-0008Kn-2q
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 04:32:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57828)
+	(envelope-from <pbonzini@redhat.com>) id 1cOLYT-0000qP-5D
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 04:38:56 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34674)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cOLSa-0008Kj-TE
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 04:32:49 -0500
-References: <1482358659-4288-1-git-send-email-felipe@nutanix.com>
-	<1482358659-4288-3-git-send-email-felipe@nutanix.com>
-	<71ac8a1a-e527-0f99-120d-ad8386eecc8f@redhat.com>
-	<32782693-D91F-4920-82B5-FBE7AC22B739@nutanix.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cOLYS-0000qI-Vz
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 04:38:53 -0500
+References: <ANQAnwAIAL-QXsc3JFgQSapS.3.1483431170238.Hmail.zhangqian@sangfor.com.cn>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <cb1de694-c254-266e-016e-4bae883a5207@redhat.com>
-Date: Tue, 3 Jan 2017 10:32:43 +0100
+Message-ID: <601a7b61-d7b8-57b2-af41-c7c6d89bcef1@redhat.com>
+Date: Tue, 3 Jan 2017 10:38:49 +0100
 MIME-Version: 1.0
-In-Reply-To: <32782693-D91F-4920-82B5-FBE7AC22B739@nutanix.com>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <ANQAnwAIAL-QXsc3JFgQSapS.3.1483431170238.Hmail.zhangqian@sangfor.com.cn>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 2/3] vus: Introduce vhost-user-scsi host
- device
+Subject: Re: [Qemu-devel] [PATCH] scsi-disk: fix crash on VERIFY command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,36 +26,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Felipe Franciosi <felipe@nutanix.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Marc-Andre Lureau <marcandre.lureau@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Zhang Qian <zhangqian@sangfor.com.cn>
+Cc: qemu-devel@nongnu.org
 
 
 
-On 02/01/2017 19:07, Felipe Franciosi wrote:
-> 
->> On 2 Jan 2017, at 10:25, Paolo Bonzini <pbonzini@redhat.com> wrote:
->>
->>
->>
->> On 21/12/2016 23:17, Felipe Franciosi wrote:
->>> To use it, one must configure Qemu with --enable-vhost-user-scsi and
->>> start Qemu with a command line equivalent to:
->>>
->>> qemu-system-x86_64 \
->>>       -chardev socket,id=vus0,path=/tmp/vus.sock \
->>>       -device vhost-user-scsi-pci,chardev=vus0,bus=pci.0,addr=...
->>>
->>> A separate commit presents a sample application linked with libiscsi to
->>> provide a backend for vhost-user-scsi.
->>
->> Please place CONFIG_VHOST_USER_SCSI=$(CONFIG_POSIX) symbol in
->> default-configs/ (so that it is enabled by default on non-Windows hosts)
->> instead of having the configure option.  Otherwise, the patches look good!
-> 
-> Thanks, will do that and send a v4.
-> 
-> Do you want any entries on MAINTAINERS for this code or are you happy to take care of it under hw/scsi/* ?
+On 03/01/2017 09:12, Zhang Qian wrote:
+> yes, you are right.
+> The scenarios of problem is
+> a scsi-disk object receives VERIFY command with BYTCHK bit being zero,
+> scsi_block_is_passthrough returns false and finally scsi-block uses
+> scsi_disk_dma_command for
+> VERIFY. So the mode is set to SCSI_XFER_NONE.
+> In scsi_req_continue, scsi_read_data function is called.
 
-It's okay to have it under hw/scsi/*.
+Uhm, is the fix simply
+
+diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
+index bdd1e5f..c080888 100644
+--- a/hw/scsi/scsi-disk.c
++++ b/hw/scsi/scsi-disk.c
+@@ -2701,7 +2701,7 @@ static bool scsi_block_is_passthrough(SCSIDiskState *s, uint8_t *buf)
+          * for the number of logical blocks specified in the length
+          * field).  For other modes, do not use scatter/gather operation.
+          */
+-        if ((buf[1] & 6) != 2) {
++        if ((buf[1] & 6) == 2) {
+             return false;
+         }
+         break;
+
+then?
+
+Thanks,
 
 Paolo
