@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44110)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52386)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cOHFm-0007Z4-QA
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 00:03:20 -0500
+	(envelope-from <peterx@redhat.com>) id 1cOINt-0000BA-L1
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 01:15:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cOHFj-00073E-Kh
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 00:03:18 -0500
-Date: Tue, 3 Jan 2017 15:57:05 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170103045705.GQ12761@umbus.fritz.box>
-References: <1483049536-21548-1-git-send-email-hpoussin@reactos.org>
-	<1483049536-21548-6-git-send-email-hpoussin@reactos.org>
+	(envelope-from <peterx@redhat.com>) id 1cOINp-0003u3-Lm
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 01:15:45 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54726)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cOINp-0003ts-DA
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 01:15:41 -0500
+Date: Tue, 3 Jan 2017 14:15:30 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170103061530.GG22664@pxdev.xzpeter.org>
+References: <1466495274-5011-1-git-send-email-peterx@redhat.com>
+	<1466495274-5011-17-git-send-email-peterx@redhat.com>
+	<576E3BEA.5010400@web.de>
+	<20160625131854.GA16629@pxdev.xzpeter.org>
+	<576EA0D0.3070602@web.de>
+	<20160626014847.GB16629@pxdev.xzpeter.org>
+	<576FD856.1020806@web.de>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="ItYuPQ2o89VkWXjV"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1483049536-21548-6-git-send-email-hpoussin@reactos.org>
-Subject: Re: [Qemu-devel] [PATCH 5/6] prep: add IBM RS/6000 7020 (40p)
- memory controller
+In-Reply-To: <576FD856.1020806@web.de>
+Subject: Re: [Qemu-devel] [PATCH v10 16/26] intel_iommu: add support for
+ split irqchip
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,341 +33,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>
-Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Thomas Huth <thuth@redhat.com>, Giancarlo Teodori <gteodori@gmail.com>
+To: Jan Kiszka <jan.kiszka@web.de>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, imammedo@redhat.com, rth@twiddle.net, ehabkost@redhat.com, jasowang@redhat.com, marcel@redhat.com, mst@redhat.com, rkrcmar@redhat.com, alex.williamson@redhat.com, wexu@redhat.com, davidkiarie4@gmail.com, Valentine Sinitsyn <valentine.sinitsyn@gmail.com>
 
+On Sun, Jun 26, 2016 at 03:27:50PM +0200, Jan Kiszka wrote:
+> On 2016-06-26 03:48, Peter Xu wrote:
+> > On Sat, Jun 25, 2016 at 05:18:40PM +0200, Jan Kiszka wrote:
+> >> On 2016-06-25 15:18, Peter Xu wrote:
+> >>> On Sat, Jun 25, 2016 at 10:08:10AM +0200, Jan Kiszka wrote:
+> > 
+> > [...]
+> > 
+> >>> I have a thought on how to implement the "sink" you have mentioned:
+> >>>
+> >>> First of all, in KVM, we provide a new KVM_IRQ_ROUTING_* type, maybe
+> >>> called:
+> >>>
+> >>>   KVM_IRQ_ROUTING_EVENTFD
+> >>
+> >> Not really, because all sources are either using eventfds, which you can
+> >> also terminate in user space (already done for vhost and vfio in certain
+> >> scenarios - IIRC) or originate there anyway (IOAPIC).
+> > 
+> > But how should we handle the cases when the interrupt path are all in
+> > kernel?
+> 
+> There are none which we can't redirect (only full in-kernel irqchip
+> would have, but that's unsupported anyway).
+> 
+> > 
+> > For vhost, data should be transfered all inside kernel when split
+> > irqchip and irqfd are used: when vhost got data, it triggers irqfd to
+> > deliver the interrupt to KVM. Along the way, we should all in kernel.
+> > 
+> > For vfio, we have vfio_msihandler() who handles the hardware IRQ and
+> > then triggers irqfd as well to KVM. Again, it seems all in kernel
+> > space, no chance to stop that as well.
+> > 
+> > Please correct me if I was wrong.
+> 
+> Look at what vhost is doing e.g.: when a virtqueue is masked, it
+> installs an event notifier that records incoming events in a pending
+> state field. When it's unmasked, the corresponding KVM irqfd is installed.
 
---ItYuPQ2o89VkWXjV
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hmm I think it's time I pick up this topic up again... :)
 
-On Thu, Dec 29, 2016 at 11:12:15PM +0100, Herv=E9 Poussineau wrote:
-> Signed-off-by: Herv=E9 Poussineau <hpoussin@reactos.org>
-> ---
->  default-configs/ppc-softmmu.mak |   1 +
->  hw/ppc/Makefile.objs            |   1 +
->  hw/ppc/rs6000_mc.c              | 232 ++++++++++++++++++++++++++++++++++=
-++++++
->  hw/ppc/trace-events             |   7 ++
->  4 files changed, 241 insertions(+)
->  create mode 100644 hw/ppc/rs6000_mc.c
->=20
-> diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmm=
-u.mak
-> index d4d0f9b..e567658 100644
-> --- a/default-configs/ppc-softmmu.mak
-> +++ b/default-configs/ppc-softmmu.mak
-> @@ -47,3 +47,4 @@ CONFIG_LIBDECNUMBER=3Dy
->  # For PReP
->  CONFIG_MC146818RTC=3Dy
->  CONFIG_ISA_TESTDEV=3Dy
-> +CONFIG_RS6000_MC=3Dy
-> diff --git a/hw/ppc/Makefile.objs b/hw/ppc/Makefile.objs
-> index db72297..0012934 100644
-> --- a/hw/ppc/Makefile.objs
-> +++ b/hw/ppc/Makefile.objs
-> @@ -17,6 +17,7 @@ obj-y +=3D ppc4xx_pci.o
->  # PReP
->  obj-$(CONFIG_PREP) +=3D prep.o
->  obj-$(CONFIG_PREP) +=3D prep_systemio.o
-> +obj-${CONFIG_RS6000_MC} +=3D rs6000_mc.o
->  # OldWorld PowerMac
->  obj-$(CONFIG_MAC) +=3D mac_oldworld.o
->  # NewWorld PowerMac
-> diff --git a/hw/ppc/rs6000_mc.c b/hw/ppc/rs6000_mc.c
-> new file mode 100644
-> index 0000000..c684421
-> --- /dev/null
-> +++ b/hw/ppc/rs6000_mc.c
-> @@ -0,0 +1,232 @@
-> +/*
-> + * QEMU RS/6000 memory controller
-> + *
-> + * Copyright (c) 2016 Herv=E9 Poussineau
-> + *
-> + * This program is free software: you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License as published by
-> + * the Free Software Foundation, either version 2 of the License, or
-> + * (at your option) version 3 or any later version.
-> + *
-> + * This program is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + * GNU General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU General Public License
-> + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "hw/isa/isa.h"
-> +#include "exec/address-spaces.h"
-> +#include "hw/boards.h"
-> +#include "qapi/error.h"
-> +#include "trace.h"
-> +
-> +#define TYPE_RS6000MC "rs6000-mc"
-> +#define RS6000MC_DEVICE(obj) \
-> +    OBJECT_CHECK(RS6000MCState, (obj), TYPE_RS6000MC)
-> +
-> +typedef struct RS6000MCState {
-> +    ISADevice parent_obj;
-> +    /* see US patent 5,684,979 for details (expired 2001-11-04) */
-> +    uint32_t ram_size;
-> +    bool autoconfigure;
-> +    MemoryRegion simm[6];
-> +    unsigned int simm_size[6];
-> +    uint32_t end_address[8];
-> +    uint8_t port0820_index;
-> +    PortioList portio;
-> +} RS6000MCState;
-> +
-> +/* P0RT 0803 -- SIMM ID Register (32/8 MB) (Read Only) */
-> +
-> +static uint32_t rs6000mc_port0803_read(void *opaque, uint32_t addr)
-> +{
-> +    RS6000MCState *s =3D opaque;
-> +    uint32_t val =3D 0;
-> +    int socket;
-> +
-> +    /* (1 << socket) indicates 32 MB SIMM at given socket */
-> +    for (socket =3D 0; socket < 6; socket++) {
-> +        if (s->simm_size[socket] =3D=3D 32) {
-> +            val |=3D (1 << socket);
-> +        }
-> +    }
-> +
-> +    trace_rs6000mc_id_read(addr, val);
-> +    return val;
-> +}
-> +
-> +/* PORT 0804 -- SIMM Presence Register (Read Only) */
-> +
-> +static uint32_t rs6000mc_port0804_read(void *opaque, uint32_t addr)
-> +{
-> +    RS6000MCState *s =3D opaque;
-> +    uint32_t val =3D 0xff;
-> +    int socket;
-> +
-> +    /* (1 << socket) indicates SIMM absence at given socket */
-> +    for (socket =3D 0; socket < 6; socket++) {
-> +        if (s->simm_size[socket]) {
-> +            val &=3D ~(1 << socket);
-> +        }
-> +    }
-> +    s->port0820_index =3D 0;
-> +
-> +    trace_rs6000mc_presence_read(addr, val);
-> +    return val;
-> +}
-> +
-> +/* Memory Controller Size Programming Register */
-> +
-> +static uint32_t rs6000mc_port0820_read(void *opaque, uint32_t addr)
-> +{
-> +    RS6000MCState *s =3D opaque;
-> +    uint32_t val =3D s->end_address[s->port0820_index] & 0x1f;
-> +    s->port0820_index =3D (s->port0820_index + 1) & 7;
-> +    trace_rs6000mc_size_read(addr, val);
-> +    return val;
-> +}
-> +
-> +static void rs6000mc_port0820_write(void *opaque, uint32_t addr, uint32_=
-t val)
-> +{
-> +    RS6000MCState *s =3D opaque;
-> +    uint8_t socket =3D val >> 5;
-> +    uint32_t end_address =3D val & 0x1f;
-> +
-> +    trace_rs6000mc_size_write(addr, val);
-> +    s->end_address[socket] =3D end_address;
-> +    if (socket > 0 && socket < 7) {
-> +        if (s->simm_size[socket - 1]) {
-> +            uint32_t size;
-> +            uint32_t start_address =3D 0;
-> +            if (socket > 1) {
-> +                start_address =3D s->end_address[socket - 1];
-> +            }
-> +
-> +            size =3D end_address - start_address;
-> +            memory_region_set_enabled(&s->simm[socket - 1], size !=3D 0);
-> +            memory_region_set_address(&s->simm[socket - 1],
-> +                                      start_address * 8 * 1024 * 1024);
-> +        }
-> +    }
-> +}
-> +
-> +/* Read Memory Parity Error */
-> +
-> +enum {
-> +    PORT0841_NO_ERROR_DETECTED =3D 0x01,
-> +};
-> +
-> +static uint32_t rs6000mc_port0841_read(void *opaque, uint32_t addr)
-> +{
-> +    uint32_t val =3D PORT0841_NO_ERROR_DETECTED;
-> +    trace_rs6000mc_parity_read(addr, val);
-> +    return val;
-> +}
-> +
-> +static const MemoryRegionPortio rs6000mc_port_list[] =3D {
-> +    { 0x803, 1, 1, .read =3D rs6000mc_port0803_read },
-> +    { 0x804, 1, 1, .read =3D rs6000mc_port0804_read },
-> +    { 0x820, 1, 1, .read =3D rs6000mc_port0820_read,
-> +                   .write =3D rs6000mc_port0820_write, },
-> +    { 0x841, 1, 1, .read =3D rs6000mc_port0841_read },
-> +    PORTIO_END_OF_LIST()
-> +};
-> +
-> +static void rs6000mc_realize(DeviceState *dev, Error **errp)
-> +{
-> +    RS6000MCState *s =3D RS6000MC_DEVICE(dev);
-> +    int socket =3D 0;
-> +    unsigned int ram_size =3D s->ram_size / (1024 * 1024);
-> +
-> +    while (socket < 6) {
-> +        if (ram_size >=3D 64) {
-> +            s->simm_size[socket] =3D 32;
-> +            s->simm_size[socket + 1] =3D 32;
-> +            ram_size -=3D 64;
-> +        } else if (ram_size >=3D 16) {
-> +            s->simm_size[socket] =3D 8;
-> +            s->simm_size[socket + 1] =3D 8;
-> +            ram_size -=3D 16;
-> +        } else {
-> +            /* Not enough memory */
-> +            break;
-> +        }
-> +        socket +=3D 2;
-> +    }
+Since it's been half a year from the last post of this thread (I
+believe this thread is the so-called "cold data" and should be stored
+on tapes already... and sorry fot the long delay), I'd like to do a
+quick summary on this: interrupt remap still cannot work well when we
+install fault interrupts - when that happens, we should inject VT-d
+fault, rather than keeping silence.
 
-Surely this needs some warning if you try to set ram-size greater than
-the hardware can support (192MiB, IIUC).
+The suggestion from Jan above should be a good solution that only need
+to touch qemu part - that's the most benefit AFAIU. However, OTOH IMO
+we need to modify all the kvm irqfd users with this fix (pci-assign,
+ioapic, ivshmem, vfio-pci, virtio) - we need to have all these devices
+init with an "fault sink" eventfd, then when we detected specific
+irqfd install error, we install the "fault sink". What's worse, if we
+add new devices with irqfd support, we need to implement the same
+error handling logic as well. Am I understanding it correctly? If so,
+isn't that awkward?
 
-> +    for (socket =3D 0; socket < 6; socket++) {
-> +        if (s->simm_size[socket]) {
-> +            char name[] =3D "simm.?";
-> +            name[5] =3D socket + '0';
-> +            memory_region_allocate_system_memory(&s->simm[socket], OBJEC=
-T(dev),
-> +                                                 name, s->simm_size[sock=
-et]
-> +                                                 * 1024 * 1024);
-> +            memory_region_add_subregion_overlap(get_system_memory(), 0,
-> +                                                &s->simm[socket], socket=
-);
-> +        }
-> +    }
-> +    if (ram_size) {
-> +        /* unable to push all requested RAM in SIMMs */
-> +        error_setg(errp, "RAM size incompatible with this board. "
-> +                   "Try again with something else, like %d MB",
-> +                   s->ram_size / 1024 / 1024 - ram_size);
-> +        return;
-> +    }
-> +
-> +    if (s->autoconfigure) {
-> +        uint32_t start_address =3D 0;
-> +        for (socket =3D 0; socket < 6; socket++) {
-> +            if (s->simm_size[socket]) {
-> +                memory_region_set_enabled(&s->simm[socket], true);
-> +                memory_region_set_address(&s->simm[socket], start_addres=
-s);
-> +                start_address +=3D memory_region_size(&s->simm[socket]);
-> +            }
-> +        }
-> +    }
-> +
-> +    isa_register_portio_list(ISA_DEVICE(dev), &s->portio, 0x0,
-> +                             rs6000mc_port_list, s, "rs6000mc");
-> +}
-> +
-> +static const VMStateDescription vmstate_rs6000mc =3D {
-> +    .name =3D "rs6000-mc",
-> +    .version_id =3D 1,
-> +    .minimum_version_id =3D 1,
-> +    .fields =3D (VMStateField[]) {
-> +        VMSTATE_UINT8(port0820_index, RS6000MCState),
-> +        VMSTATE_END_OF_LIST()
-> +    },
-> +};
-> +
-> +static Property rs6000mc_properties[] =3D {
-> +    DEFINE_PROP_UINT32("ram-size", RS6000MCState, ram_size, 0),
-> +    DEFINE_PROP_BOOL("auto-configure", RS6000MCState, autoconfigure, tru=
-e),
-> +    DEFINE_PROP_END_OF_LIST()
-> +};
-> +
-> +static void rs6000mc_class_initfn(ObjectClass *klass, void *data)
-> +{
-> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
-> +
-> +    dc->realize =3D rs6000mc_realize;
-> +    dc->vmsd =3D &vmstate_rs6000mc;
-> +    dc->props =3D rs6000mc_properties;
-> +}
-> +
-> +static const TypeInfo rs6000mc_info =3D {
-> +    .name          =3D TYPE_RS6000MC,
-> +    .parent        =3D TYPE_ISA_DEVICE,
-> +    .instance_size =3D sizeof(RS6000MCState),
-> +    .class_init    =3D rs6000mc_class_initfn,
-> +};
-> +
-> +static void rs6000mc_types(void)
-> +{
-> +    type_register_static(&rs6000mc_info);
-> +}
-> +
-> +type_init(rs6000mc_types)
-> diff --git a/hw/ppc/trace-events b/hw/ppc/trace-events
-> index 2ba6166..42b8ec0 100644
-> --- a/hw/ppc/trace-events
-> +++ b/hw/ppc/trace-events
-> @@ -78,3 +78,10 @@ prep_io_800_readb(uint32_t addr, uint32_t retval) "0x%=
-08" PRIx32 " <=3D 0x%02" PRI
->  # hw/ppc/prep_systemio.c
->  prep_systemio_read(uint32_t addr, uint32_t val) "read addr=3D%x val=3D%x"
->  prep_systemio_write(uint32_t addr, uint32_t val) "write addr=3D%x val=3D=
-%x"
-> +
-> +# hw/ppc/rs6000_mc.c
-> +rs6000mc_id_read(uint32_t addr, uint32_t val) "read addr=3D%x val=3D%x"
-> +rs6000mc_presence_read(uint32_t addr, uint32_t val) "read addr=3D%x val=
-=3D%x"
-> +rs6000mc_size_read(uint32_t addr, uint32_t val) "read addr=3D%x val=3D%x"
-> +rs6000mc_size_write(uint32_t addr, uint32_t val) "write addr=3D%x val=3D=
-%x"
-> +rs6000mc_parity_read(uint32_t addr, uint32_t val) "read addr=3D%x val=3D=
-%x"
+Now I am re-thinking about my KVM_IRQ_ROUTING_EVENTFD proposal to do
+it - in that case, we should not need to worry about the users of kvm
+irqfd, and the error handling is done automatically even with new
+irqfd users coming in. The disadvantage is of course we need to touch
+both qemu and kvm, also we need to touch KVM API for it (though I
+think it'll only need very small change in KVM). And not sure whether
+that would worth it.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Or, any better way to do it?
 
---ItYuPQ2o89VkWXjV
-Content-Type: application/pgp-signature; name="signature.asc"
+Hope I didn't miss anything. Comments are welcomed!
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
+Regards,
 
-iQIcBAEBCAAGBQJYay8fAAoJEGw4ysog2bOSgdcP/3KttRo0R8y0DZ5Bryo0xS0I
-erZPZmSOh9Xf4s35j9518o3VgFrrZ5ZJMdcX6cNXoRDig1uK6GnuLAkeVlvOyal4
-uPnEQQ3tc05u26orM53VxefcOvEFEsWuE24rFKRHvJtivzaxN1bnLM41isnWVqsz
-fPsoYJAKpuky5PSJnTyrQFykFYtmNs6TNVDgnEF4UTUHKxETXFrVRjdV+XFR9L+u
-O8SG1f9nb7/Wd4WafVG0ut9/7ZA6Xc6pRz6zzNWHGSGwJGBE97/61A8qKIVlmLW1
-L2xgCCE0BfGpd39EkvGV/NKw7uLZlNbX9vwLNJZfNaRkCuaOxD14xHWxWbhpTr/B
-7BEMeYaQ5I2Da5gSSAKjJkekD3jslBGzQRdwE2vAfodCUFeODSFoh1K7J1D4bWbH
-4RzMa1N+68h2NbO8tudgwKCIfeKc+Y0i7UXzARatsx99l7gJ+uI+xnukEYRe+4ua
-2LpghTNAwJswK8Q5CywBCcWUPI7in2HCDP7wvubm9l1CZ5UY09lTnD0aPFMZnXnU
-oMg5ErftTxpA3qeO6sib1d6mGKZr2JZ53dvhgfuftFLYTvyx5XaNfrOcxO2iH/Tf
-f8/Aokt0qNWAnepr3XK7ZRvDmmKTE7rrvu5adaN/CBoRBgSgGTYnlcaJjK6Fk6tX
-ayKIC/X9hjSzmeK6Hftg
-=wLv8
------END PGP SIGNATURE-----
-
---ItYuPQ2o89VkWXjV--
+-- peterx
