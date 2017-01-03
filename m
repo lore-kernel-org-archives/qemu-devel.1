@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33012)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33052)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cOJYR-0003K1-9l
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 02:30:44 -0500
+	(envelope-from <peterx@redhat.com>) id 1cOJYY-0003R0-F9
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 02:30:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cOJYQ-0008S3-0C
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 02:30:43 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39128)
+	(envelope-from <peterx@redhat.com>) id 1cOJYX-0008Tw-1U
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 02:30:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44108)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cOJYP-0008Rq-QA
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 02:30:41 -0500
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cOJYW-0008Tm-SB
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 02:30:48 -0500
 From: Peter Xu <peterx@redhat.com>
-Date: Tue,  3 Jan 2017 15:29:48 +0800
-Message-Id: <1483428594-28880-12-git-send-email-peterx@redhat.com>
+Date: Tue,  3 Jan 2017 15:29:50 +0800
+Message-Id: <1483428594-28880-14-git-send-email-peterx@redhat.com>
 In-Reply-To: <1483428594-28880-1-git-send-email-peterx@redhat.com>
 References: <1483428594-28880-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH RFC v2 11/17] memory: provide iommu_replay_all()
+Subject: [Qemu-devel] [PATCH RFC v2 13/17] memory: add
+ MemoryRegionIOMMUOps.replay() callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,54 +27,47 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: tianyu.lan@intel.com, kevin.tian@intel.com, mst@redhat.com, jan.kiszka@siemens.com, jasowang@redhat.com, peterx@redhat.com, alex.williamson@redhat.com, bd.aviv@gmail.com
 
-This is an "global" version of exising memory_region_iommu_replay() - we
-announce the translations to all the registered notifiers, instead of a
-specific one.
+Originally we have one memory_region_iommu_replay() function, which is
+the default behavior to replay the translations of the whole IOMMU
+region. However, on some platform like x86, we may want our own replay
+logic for IOMMU regions. This patch add one more hook for IOMMUOps for
+the callback, and it'll override the default if set.
 
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- include/exec/memory.h | 8 ++++++++
- memory.c              | 9 +++++++++
- 2 files changed, 17 insertions(+)
+ include/exec/memory.h | 2 ++
+ memory.c              | 6 ++++++
+ 2 files changed, 8 insertions(+)
 
 diff --git a/include/exec/memory.h b/include/exec/memory.h
-index cecfed1..d8363a0 100644
+index afe150c..a26763f 100644
 --- a/include/exec/memory.h
 +++ b/include/exec/memory.h
-@@ -694,6 +694,14 @@ void memory_region_iommu_replay(MemoryRegion *mr, IOMMUNotifier *n,
-                                 bool is_write);
+@@ -181,6 +181,8 @@ struct MemoryRegionIOMMUOps {
+     void (*notify_flag_changed)(MemoryRegion *iommu,
+                                 IOMMUNotifierFlag old_flags,
+                                 IOMMUNotifierFlag new_flags);
++    /* Set this up to provide customized IOMMU replay function */
++    void (*replay)(MemoryRegion *iommu, IOMMUNotifier *notifier);
+ };
  
- /**
-+ * memory_region_iommu_replay_all: replay existing IOMMU translations
-+ * to all the notifiers registered.
-+ *
-+ * @mr: the memory region to observe
-+ */
-+void memory_region_iommu_replay_all(MemoryRegion *mr);
-+
-+/**
-  * memory_region_unregister_iommu_notifier: unregister a notifier for
-  * changes to IOMMU translation entries.
-  *
+ typedef struct CoalescedMemoryRange CoalescedMemoryRange;
 diff --git a/memory.c b/memory.c
-index e88bb54..df62bd1 100644
+index 6e4c872..609ac67 100644
 --- a/memory.c
 +++ b/memory.c
-@@ -1645,6 +1645,15 @@ void memory_region_iommu_replay(MemoryRegion *mr, IOMMUNotifier *n,
-     }
- }
+@@ -1629,6 +1629,12 @@ void memory_region_iommu_replay(MemoryRegion *mr, IOMMUNotifier *n,
+     hwaddr addr, granularity;
+     IOMMUTLBEntry iotlb;
  
-+void memory_region_iommu_replay_all(MemoryRegion *mr)
-+{
-+    IOMMUNotifier *notifier;
-+
-+    QLIST_FOREACH(notifier, &mr->iommu_notify, node) {
-+        memory_region_iommu_replay(mr, notifier, false);
++    /* If the IOMMU has its own replay callback, override */
++    if (mr->iommu_ops->replay) {
++        mr->iommu_ops->replay(mr, n);
++        return;
 +    }
-+}
 +
- void memory_region_unregister_iommu_notifier(MemoryRegion *mr,
-                                              IOMMUNotifier *n)
- {
+     granularity = memory_region_iommu_get_min_page_size(mr);
+ 
+     for (addr = 0; addr < memory_region_size(mr); addr += granularity) {
 -- 
 2.7.4
