@@ -1,29 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60704)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33459)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cOFU0-0005ld-2m
-	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 22:09:53 -0500
+	(envelope-from <bounces@canonical.com>) id 1cOFeb-0007jk-4R
+	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 22:20:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cOFTv-0001vh-4w
-	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 22:09:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50152)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cOFTu-0001va-VC
-	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 22:09:47 -0500
-Received: from int-mx11.intmail.prod.int.phx2.redhat.com
-	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4B94D81F01
-	for <qemu-devel@nongnu.org>; Tue,  3 Jan 2017 03:09:46 +0000 (UTC)
-References: <20161230104130.29ff671b@x240.lan>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <4eda1813-d732-5dfc-e6ff-29ac95fe22d8@redhat.com>
-Date: Tue, 3 Jan 2017 11:09:40 +0800
+	(envelope-from <bounces@canonical.com>) id 1cOFeW-0004n3-78
+	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 22:20:49 -0500
+Received: from indium.canonical.com ([91.189.90.7]:54618)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cOFeV-0004mk-I0
+	for qemu-devel@nongnu.org; Mon, 02 Jan 2017 22:20:43 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cOFeU-0003Pc-Cy
+	for <qemu-devel@nongnu.org>; Tue, 03 Jan 2017 03:20:42 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 541A82E80C0
+	for <qemu-devel@nongnu.org>; Tue,  3 Jan 2017 03:20:42 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20161230104130.29ff671b@x240.lan>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] vhost-user breaks after 96a3d98.
+Date: Tue, 03 Jan 2017 03:13:32 -0000
+From: Nathan Rennie-Waldock <1653577@bugs.launchpad.net>
+Reply-To: Bug 1653577 <1653577@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <20170103031332.1493.46452.malonedeb@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1653577] [NEW] Ability to set umask for 9pfs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,43 +35,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Flavio Leitner <fbl@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
+Public bug reported:
 
+We should be able to specify the umask for 9pfs so that files created by
+the guest can be accessed by other users on the host. Currently they're
+only accessible by the user running qemu (and of course, root).
 
-On 2016=E5=B9=B412=E6=9C=8830=E6=97=A5 20:41, Flavio Leitner wrote:
-> Hi,
->
-> While I was testing vhost-user using OVS 2.5 and DPDK 2.2.0 in the
-> host and testpmd dpdk 2.2.0 in the guest, I found that the commit
-> below breaks the environment and no packets gets into the guest.
->
-> dpdk port --> OVS --> vhost-user --> guest --> testpmd
->                           ^--- drops here         ^--- no packets here.
->
-> commit 96a3d98d2cdbd897ff5ab33427aa4cfb94077665
-> Author: Jason Wang <jasowang@redhat.com>
-> Date:   Mon Aug 1 16:07:58 2016 +0800
->
->      vhost: don't set vring call if no vector
->     =20
->      We used to set vring call fd unconditionally even if guest driver =
-does
->      not use MSIX for this vritqueue at all. This will cause lots of
->      unnecessary userspace access and other checks for drivers does not=
- use
->      interrupt at all (e.g virtio-net pmd). So check and clean vring ca=
-ll
->      fd if guest does not use any vector for this virtqueue at
->      all.
-> [...]
->
-> Thanks,
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
-Hi Flavio:
+-- =
 
-Thanks for reporting this issue, could this be a bug of vhost-user? (I=20
-believe virito-net pmd does not use interrupt for rx/tx at all)
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1653577
 
-Anyway, will try to reproduce it.
+Title:
+  Ability to set umask for 9pfs
+
+Status in QEMU:
+  New
+
+Bug description:
+  We should be able to specify the umask for 9pfs so that files created
+  by the guest can be accessed by other users on the host. Currently
+  they're only accessible by the user running qemu (and of course,
+  root).
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1653577/+subscriptions
