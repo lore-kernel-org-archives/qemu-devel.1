@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37949)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44292)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cOmUo-0005gv-V6
-	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 09:24:55 -0500
+	(envelope-from <stefanha@redhat.com>) id 1cOmuH-0004hc-LH
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 09:51:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cOmUj-0007o8-U9
-	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 09:24:54 -0500
-Received: from indium.canonical.com ([91.189.90.7]:39490)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cOmUj-0007nz-Nj
-	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 09:24:49 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cOmUi-0000Tk-KT
-	for <qemu-devel@nongnu.org>; Wed, 04 Jan 2017 14:24:48 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 95C022E80C3
-	for <qemu-devel@nongnu.org>; Wed,  4 Jan 2017 14:24:48 +0000 (UTC)
+	(envelope-from <stefanha@redhat.com>) id 1cOmuE-0002kA-DB
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 09:51:13 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46302)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cOmuE-0002jz-7G
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 09:51:10 -0500
+Date: Wed, 4 Jan 2017 14:44:58 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170104144458.GC8194@stefanha-x1.localdomain>
+References: <CAP8dc_acqeqpio7fVK4XSAxoH8QaGp9L=S1h2OCCWgrj=Q7VCw@mail.gmail.com>
+	<e57c4b44-ac0c-a937-e088-1f4e086080d8@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 04 Jan 2017 14:08:35 -0000
-From: Daniel Berrange <1455912@bugs.launchpad.net>
-Reply-To: Bug 1455912 <1455912@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20150517130746.26692.51704.malonedeb@gac.canonical.com>
-Message-Id: <20170104140835.14375.24209.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1455912] Re: vnc websocket option not properly
- parsed when running on commandline
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="uXxzq0nDebZQVNAZ"
+Content-Disposition: inline
+In-Reply-To: <e57c4b44-ac0c-a937-e088-1f4e086080d8@redhat.com>
+Subject: Re: [Qemu-devel] [RFC]virtio-blk: add disk-name device property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,56 +28,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-
-This is an accidental regression caused by
-
-      commit 4db14629c38611061fc19ec6927405923de84f08
-      Author: Gerd Hoffmann <kraxel@redhat.com>
-      Date:   Tue Sep 16 12:33:03 2014 +0200
-    =
-
-        vnc: switch to QemuOpts, allow multiple servers
+To: Eric Blake <eblake@redhat.com>
+Cc: Junkang Fu <fujunkang@gmail.com>, qemu-devel@nongnu.org
 
 
-** Changed in: qemu
-     Assignee: (unassigned) =3D> Daniel Berrange (berrange)
+--uXxzq0nDebZQVNAZ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-** Changed in: qemu
-       Status: New =3D> Confirmed
+On Tue, Jan 03, 2017 at 10:53:06AM -0600, Eric Blake wrote:
+> On 12/29/2016 08:41 PM, Junkang Fu wrote:
+> >>From 74e913fc41ea98d1dde692175f1e3fb6729342aa Mon Sep 17 00:00:00 2001
+> > From: "junkang.fjk" <junkang.fjk@alibaba-inc.com>
+> > Date: Wed, 24 Aug 2016 19:36:53 +0800
+> > Subject: [PATCH] virtio-blk: add disk-name device property
+> >=20
+> > Current virtio-blk disk name(ex. /dev/vdb) has nothing to do with the
+> > target dev
+> > name specified in libvirt xml file. For example, we may get disk name
+> > /dev/vdb in
+> > VM while target dev specified in libvirt xml is vdc.
+>=20
+> It's not really libvirt's fault.  The libvirt XML names are for
+> convenience, but nothing on the host side requires the guest to pick the
+> same naming scheme as the host.
+>=20
+> I guess your proposal is to enhance the virtio spec such that clients
+> that are new enough to honor the new addition to the virtio spec will
+> change their name-picking algorithm to use the name provided by the
+> host, rather than their current approach of picking whatever name they
+> feel like, and then enhance libvirt to pass the XML name on down to the
+> guest?  It might work, but as others have pointed out, it will require a
+> virtio spec change first.
 
--- =
+This change is unnecessary.  The -device virtio-blk-pci,serial=3D property
+already exists for this purpose.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1455912
+Stefan
 
-Title:
-  vnc websocket option not properly parsed when running on commandline
+--uXxzq0nDebZQVNAZ
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Status in QEMU:
-  Confirmed
+-----BEGIN PGP SIGNATURE-----
 
-Bug description:
-  All of my vms are started with a simple script on the command line.  =
+iQEcBAEBAgAGBQJYbQpqAAoJEJykq7OBq3PIcVUH/2V3UdKKwLZBBvA+UI3Zbetl
+uCQlChA7NWjvf7c8+I8fd3h0kvxo/Bk4XYwZ8fmdK2aK56perh7Rv9fablORcW3O
+57VaoBdLJRGxWIGkepDxJObryFJvwBOVRsPEfavBYXSaNlIKn7j/41vQRXFPrINl
+4+MRp2aDKqSxtTUQ6oP8WVvr8+TmOEJFOSniIAB4cN392C1q7p3Pfjr+kfPK0Lk8
+PGfAJ6LuLm3ORwZ412WRXX4vz3LV0lTomv8PN9+vxlEpUFaOb2Rgr30BbUV/CjdK
+igmDDG/uoPoHI/opUixb4hJKMOvDl86hFUoZNFehR8xsuHMaRt+/D4YQ6yjenaI=
+=7/Hx
+-----END PGP SIGNATURE-----
 
-  Starting with Qemu 2.3.0, the option "-vnc host:port,websocket" is no lon=
-ger working.
-
-  Previously if I said listen on Tor:17,websocket it would function
-  correctly.  Now it's kicking an error:
-
-  =
-
-  qemu-system-x86_64: -vnc tor:17,websocket: Failed to start VNC server on =
-`(null)': address resolution failed for tor:on: Servname not supported for =
-ai_socktype
-
-  The error leads me to believe it's not parsing the command line
-  options for the "vnc" option correctly.  If I leave off ",websocket"
-  it works correctly.  I've even tried, replacing the hostname with an
-  IP address, and using the alternate form " -display
-  vnc=3Dtor:17,webscoket". It reports the same error.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1455912/+subscriptions
+--uXxzq0nDebZQVNAZ--
