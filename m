@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42899)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53852)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrew@aj.id.au>) id 1cOevi-0002wA-Cd
-	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 01:20:11 -0500
+	(envelope-from <th.huth@gmail.com>) id 1cOfS4-0007Q2-Fw
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 01:53:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrew@aj.id.au>) id 1cOevh-0000TR-Ey
-	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 01:20:10 -0500
-Message-ID: <1483510797.22609.9.camel@aj.id.au>
-From: Andrew Jeffery <andrew@aj.id.au>
-Date: Wed, 04 Jan 2017 16:49:57 +1030
-In-Reply-To: <20161215054812.12602-9-alastair@au1.ibm.com>
-References: <20161215054812.12602-1-alastair@au1.ibm.com>
-	<20161215054812.12602-9-alastair@au1.ibm.com>
-Content-Type: multipart/signed; micalg="pgp-sha512";
-	protocol="application/pgp-signature"; boundary="=-86RTWx9dJYaTAZdERKGw"
-Mime-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v4 8/8] arm: Add an RX8900 RTC to the
- ASpeed board
+	(envelope-from <th.huth@gmail.com>) id 1cOfRz-0001tM-L2
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 01:53:36 -0500
+Received: from mail-wj0-f196.google.com ([209.85.210.196]:33293)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <th.huth@gmail.com>) id 1cOfRz-0001t5-EP
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 01:53:31 -0500
+Received: by mail-wj0-f196.google.com with SMTP id kp2so74318174wjc.0
+	for <qemu-devel@nongnu.org>; Tue, 03 Jan 2017 22:53:31 -0800 (PST)
+References: <5dd3d27a-e630-4e92-43fa-13c131e9f880@freebsd.org>
+	<5540064c-613c-c0df-ae69-d41d45b4501d@freebsd.org>
+From: Thomas Huth <huth@tuxfamily.org>
+Message-ID: <ad4e7809-93e9-b5fa-a6a2-763fa8f1c97a@tuxfamily.org>
+Date: Wed, 4 Jan 2017 07:53:28 +0100
+MIME-Version: 1.0
+In-Reply-To: <5540064c-613c-c0df-ae69-d41d45b4501d@freebsd.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] New Year's starting over ... bsd-user
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,97 +29,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alastair D'Silva <alastair@au1.ibm.com>, qemu-arm@nongnu.org
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, Joel Stanley <joel@jms.id.au>, Alastair D'Silva <alastair@d-silva.org>, Chris Smart <chris@distroguy.com>
+To: Sean Bruno <sbruno@freebsd.org>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>, Fabien Chouteau <chouteau@adacore.com>
 
+On 03.01.2017 18:11, Sean Bruno wrote:
+> 
+> 
+> On 01/03/17 09:18, Sean Bruno wrote:
+>>
+>> I'm pondering where to start with getting FreeBSD's bsd-user code into
+>> shape so it could actually be reviewed and accepted now that its sort of
+>> working again (signal handling fixed finally).
+>>
+>> I almost feel like the existing code should be purged, except that it
+>> gives a good history (and this seems lazy to me).
+>>
+>> As a first pass, I guess, I'd like to at least make i386 user run on
+>> x86_64.  What would you folks like to see in a first pass?
+>>
+>> sean
+>>
+>> ref: https://github.com/seanbruno/qemu-bsd-user/tree/bsd-user
+>>
+> 
+> Primitive example of what I think I should base my patchset on.  Its
+> invasive and large.
+> 
+> https://github.com/seanbruno/qemu-bsd-user/tree/merge1
+> 
+> That branch, is all the bsd-user changes that are pending in one large
+> "splat".  It excludes the new architectures (arm, aarch64, mips, mips64)
+> that we are actively using.  i386-bsd-user when compiled statically on
+> x86_64 will run a static (rescue) sh ... so, I think that's good.
+> x86_64 running on x86_64 just blows up.
+> 
+> As for sparc/sparc64 ... I'm tempted to delete them as nobody in freebsd
+> is actively maintaining them nor do we have any expectation that they
+> will work someday.
 
---=-86RTWx9dJYaTAZdERKGw
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
+It's broken ... nobody maintains it ... and we've got too many
+unmaintained bit-rotten files in the QEMU tree, so IMHO just go ahead
+and send a patch to remove the bsud-user sparc support. If anybody ever
+needs it again, they can revert the commit or simply submit a patch with
+the fixed code.
 
-T24gVGh1LCAyMDE2LTEyLTE1IGF0IDE2OjQ4ICsxMTAwLCBBbGFzdGFpciBEJ1NpbHZhIHdyb3Rl
-Ogo+ID4gRnJvbTogQWxhc3RhaXIgRCdTaWx2YSA8YWxhc3RhaXJAZC1zaWx2YS5vcmc+Cj4gCj4g
-Q29ubmVjdCBhbiBSWDg5MDAgUlRDIHRvIGkyYzEyIG9mIHRoZSBBU1QyNTAwIFNPQyBhdCBhZGRy
-ZXNzIDB4MzIKPiAKPiA+IFNpZ25lZC1vZmYtYnk6IEFsYXN0YWlyIEQnU2lsdmEgPGFsYXN0YWly
-QGQtc2lsdmEub3JnPgo+IFNpZ25lZC1vZmYtYnk6IENocmlzIFNtYXJ0IDxjaHJpc0BkaXN0cm9n
-dXkuY29tPgoKUmV2aWV3ZWQtYnk6IEFuZHJldyBKZWZmZXJ5IDxhbmRyZXdAYWouaWQuYXU+Cgo+
-IC0tLQo+IMKgaHcvYXJtL2FzcGVlZC5jIHwgMjkgKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysKPiDCoDEgZmlsZSBjaGFuZ2VkLCAyOSBpbnNlcnRpb25zKCspCj4gCj4gZGlmZiAtLWdpdCBh
-L2h3L2FybS9hc3BlZWQuYyBiL2h3L2FybS9hc3BlZWQuYwo+IGluZGV4IDQwYzEzODMuLmVmNjNm
-ZDAgMTAwNjQ0Cj4gLS0tIGEvaHcvYXJtL2FzcGVlZC5jCj4gKysrIGIvaHcvYXJtL2FzcGVlZC5j
-Cj4gQEAgLTI2LDYgKzI2LDEyIEBAIHN0YXRpYyBzdHJ1Y3QgYXJtX2Jvb3RfaW5mbyBhc3BlZWRf
-Ym9hcmRfYmluZm8gPSB7Cj4gwqDCoMKgwqDCoC5uYl9jcHVzID0gMSwKPiDCoH07Cj4gwqAKPiAr
-dHlwZWRlZiBzdHJ1Y3QgQXNwZWVkSTJDRGV2aWNlIHsKPiArwqDCoMKgwqBjb25zdCBjaGFyICp0
-eXBlOwo+ICvCoMKgwqDCoHVpbnQ4X3QgYWRkcmVzczsKPiArwqDCoMKgwqBpbnQgYnVzOwo+ICt9
-IEFzcGVlZEkyQ0RldmljZTsKPiArCj4gwqB0eXBlZGVmIHN0cnVjdCBBc3BlZWRCb2FyZFN0YXRl
-IHsKPiDCoMKgwqDCoMKgQXNwZWVkU29DU3RhdGUgc29jOwo+IMKgwqDCoMKgwqBNZW1vcnlSZWdp
-b24gcmFtOwo+IEBAIC0zNyw2ICs0Myw3IEBAIHR5cGVkZWYgc3RydWN0IEFzcGVlZEJvYXJkQ29u
-ZmlnIHsKPiDCoMKgwqDCoMKgY29uc3QgY2hhciAqZm1jX21vZGVsOwo+IMKgwqDCoMKgwqBjb25z
-dCBjaGFyICpzcGlfbW9kZWw7Cj4gwqDCoMKgwqDCoHVpbnQzMl90IG51bV9jczsKPiArwqDCoMKg
-wqBjb25zdCBBc3BlZWRJMkNEZXZpY2UgKmkyY19kZXZpY2VzOwo+IMKgfSBBc3BlZWRCb2FyZENv
-bmZpZzsKPiDCoAo+IMKgZW51bSB7Cj4gQEAgLTgwLDYgKzg3LDExIEBAIGVudW0gewo+IMKgwqDC
-oMKgwqDCoMKgwqDCoFNDVV9BU1QyNTAwX0hXX1NUUkFQX0FDUElfRU5BQkxFIHzCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBcCj4gwqDC
-oMKgwqDCoMKgwqDCoMKgU0NVX0hXX1NUUkFQX1NQSV9NT0RFKFNDVV9IV19TVFJBUF9TUElfTUFT
-VEVSKSkKPiDCoAo+ICsKPiArc3RhdGljIGNvbnN0IEFzcGVlZEkyQ0RldmljZSBhc3QyNTAwX2ky
-Y19kZXZpY2VzW10gPSB7Cj4gK8KgwqDCoMKgwqDCoMKgwqB7InJ4ODkwMCIsIDB4MzIsIDExfQo+
-ICt9Owo+ICsKPiDCoHN0YXRpYyBjb25zdCBBc3BlZWRCb2FyZENvbmZpZyBhc3BlZWRfYm9hcmRz
-W10gPSB7Cj4gwqDCoMKgwqDCoFtQQUxNRVRUT19CTUNdID0gewo+IMKgwqDCoMKgwqDCoMKgwqDC
-oC5zb2NfbmFtZcKgwqA9ICJhc3QyNDAwLWExIiwKPiBAQCAtOTQsNiArMTA2LDcgQEAgc3RhdGlj
-IGNvbnN0IEFzcGVlZEJvYXJkQ29uZmlnIGFzcGVlZF9ib2FyZHNbXSA9IHsKPiDCoMKgwqDCoMKg
-wqDCoMKgwqAuZm1jX21vZGVsID0gIm4yNXEyNTZhIiwKPiDCoMKgwqDCoMKgwqDCoMKgwqAuc3Bp
-X21vZGVsID0gIm14MjVsMjU2MzVlIiwKPiDCoMKgwqDCoMKgwqDCoMKgwqAubnVtX2NzwqDCoMKg
-wqA9IDEsCj4gK8KgwqDCoMKgwqDCoMKgwqAuaTJjX2RldmljZXMgPSBhc3QyNTAwX2kyY19kZXZp
-Y2VzLAo+IMKgwqDCoMKgwqB9LAo+IMKgwqDCoMKgwqBbUk9NVUxVU19CTUNdwqDCoD0gewo+IMKg
-wqDCoMKgwqDCoMKgwqDCoC5zb2NfbmFtZcKgwqA9ICJhc3QyNTAwLWExIiwKPiBAQCAtMTA0LDYg
-KzExNyw3IEBAIHN0YXRpYyBjb25zdCBBc3BlZWRCb2FyZENvbmZpZyBhc3BlZWRfYm9hcmRzW10g
-PSB7Cj4gwqDCoMKgwqDCoH0sCj4gwqB9Owo+IMKgCj4gKwo+IMKgc3RhdGljIHZvaWQgYXNwZWVk
-X2JvYXJkX2luaXRfZmxhc2hlcyhBc3BlZWRTTUNTdGF0ZSAqcywgY29uc3QgY2hhciAqZmxhc2h0
-eXBlLAo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoEVycm9yICoqZXJycCkKPiDCoHsKPiBAQCAtMTMw
-LDYgKzE0NCwxOSBAQCBzdGF0aWMgdm9pZCBhc3BlZWRfYm9hcmRfaW5pdF9mbGFzaGVzKEFzcGVl
-ZFNNQ1N0YXRlICpzLCBjb25zdCBjaGFyICpmbGFzaHR5cGUsCj4gwqDCoMKgwqDCoH0KPiDCoH0K
-PiDCoAo+ICtzdGF0aWMgdm9pZCBhc3BlZWRfaTJjX2luaXQoQXNwZWVkQm9hcmRTdGF0ZSAqYm1j
-LAo+ICvCoMKgwqDCoMKgwqDCoMKgY29uc3QgQXNwZWVkQm9hcmRDb25maWcgKmNmZykKPiArewo+
-ICvCoMKgwqDCoEFzcGVlZFNvQ1N0YXRlICpzb2MgPSAmYm1jLT5zb2M7Cj4gK8KgwqDCoMKgY29u
-c3QgQXNwZWVkSTJDRGV2aWNlICpkZXY7Cj4gKwo+ICvCoMKgwqDCoGZvciAoZGV2ID0gY2ZnLT5p
-MmNfZGV2aWNlczsgZGV2ICE9IE5VTEwgJiYgZGV2LT50eXBlICE9IE5VTEw7IGRldisrKSB7Cj4g
-K8KgwqDCoMKgwqDCoMKgwqBJMkNCdXMgKmkyY19idXMgPSBhc3BlZWRfaTJjX2dldF9idXMoKERl
-dmljZVN0YXRlICopJnNvYy0+aTJjLAo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqBkZXYtPmJ1cyk7Cj4gK8KgwqDCoMKgwqDCoMKgwqAodm9pZClpMmNfY3JlYXRlX3NsYXZlKGky
-Y19idXMsIGRldi0+dHlwZSwgZGV2LT5hZGRyZXNzKTsKPiArwqDCoMKgwqB9Cj4gK30KPiArCj4g
-wqBzdGF0aWMgdm9pZCBhc3BlZWRfYm9hcmRfaW5pdChNYWNoaW5lU3RhdGUgKm1hY2hpbmUsCj4g
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqBjb25zdCBBc3BlZWRCb2FyZENvbmZpZyAqY2ZnKQo+IMKgewo+IEBAIC0xNzQsNiArMjAx
-LDggQEAgc3RhdGljIHZvaWQgYXNwZWVkX2JvYXJkX2luaXQoTWFjaGluZVN0YXRlICptYWNoaW5l
-LAo+IMKgwqDCoMKgwqBhc3BlZWRfYm9hcmRfYmluZm8ucmFtX3NpemUgPSByYW1fc2l6ZTsKPiDC
-oMKgwqDCoMKgYXNwZWVkX2JvYXJkX2JpbmZvLmxvYWRlcl9zdGFydCA9IHNjLT5pbmZvLT5zZHJh
-bV9iYXNlOwo+IMKgCj4gK8KgwqDCoMKgYXNwZWVkX2kyY19pbml0KGJtYywgY2ZnKTsKPiArCj4g
-wqDCoMKgwqDCoGFybV9sb2FkX2tlcm5lbChBUk1fQ1BVKGZpcnN0X2NwdSksICZhc3BlZWRfYm9h
-cmRfYmluZm8pOwo+IMKgfQo+IMKg
-
-
---=-86RTWx9dJYaTAZdERKGw
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-Content-Transfer-Encoding: 7bit
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAABCgAGBQJYbJQNAAoJEJ0dnzgO5LT51HAQAIOQAgPpeC1IheTB3gfa8BKb
-uEqQrIUfKmWC/uIW3ZXPPnfFZLGC4fnp6v/N06aGlEhDL+w30c2pOsBoQMNv143K
-dZIeuaEkmXhNN0Y0/pLtZ9gJarhDKh8AsISrkRoxhgsBw5iNgmPylZaABP72lE6g
-zlGYBqfjC3VBY54cV6HfQm6ffLK3iNlsWpSVLAFrH5lkcKByH/eXUvVydm5yF2xa
-uYzn+vuB82wzzmD+2s2wqXkI1hWulWxpzOcEufo+xtowdjMjCUFV+SYEGtWy2bkg
-V0n+Xe0vNRnBpc32eEeQKphgbnbCjOL6TXiyCu0oRhQ98gmNwrg8Vj+D4p6+Z5Ty
-D18zowHKlKctSpX/sDfBhc5qX3mRZ/35HkEQXGWv7m2Zd2v5T77ZPDZvqubBrzIc
-ss955rhnkR5JBY1jAHJhD70bhUNmjNwNitpkgqSp0c7qrQnL3EvHDHcrobevVG5T
-/axWbrbkkXAWaFR+/0QrAXtoc3aElFV+qmL7tdVV/ocqoCTiO+qy60B3vr6ybzBJ
-P0M6gW4fFFfBcEV8roijmMrkzTfmEXANFnqUZyfPcQm/OeuhUjSeJsVl+EwvWMA9
-zyckIiPIEEphw6biLHjJ1/uGSJ78syW4mYrFYZIh/wLH53p60CJNks4O7yu0D3ea
-nKv66cUMjdI2HWocYijK
-=DppF
------END PGP SIGNATURE-----
-
---=-86RTWx9dJYaTAZdERKGw--
+ Thomas
