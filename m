@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45678)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46575)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cOtS2-0004M2-Jt
-	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 16:50:31 -0500
+	(envelope-from <jcd@tribudubois.net>) id 1cOtWL-0006Pl-Jz
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 16:54:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cOtS0-0001jY-IQ
-	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 16:50:30 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45712)
+	(envelope-from <jcd@tribudubois.net>) id 1cOtWI-00045X-EZ
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 16:54:57 -0500
+Received: from relay2-d.mail.gandi.net ([2001:4b98:c:538::194]:39558)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cOtS0-0001jL-9s
-	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 16:50:28 -0500
-References: <20161212224325.20790-1-marcandre.lureau@redhat.com>
-	<4315c23d-0c4b-4341-90aa-54d186eaa251@redhat.com>
-	<CAJ+F1C+qoZrmMgsiEC+=xNVVaJFV+fUxk8ZmjSQTxnDXpKb6Dg@mail.gmail.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <a614dd79-959f-705f-7957-e0fc4c9b9a8a@redhat.com>
-Date: Wed, 4 Jan 2017 15:50:24 -0600
+	(Exim 4.71) (envelope-from <jcd@tribudubois.net>) id 1cOtWI-00044f-5N
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 16:54:54 -0500
+References: <20170103203502.25907-1-jcd@tribudubois.net>
+	<66b3383c-65bc-f993-d25e-9871489039de@gmail.com>
+From: Jean-Christophe DUBOIS <jcd@tribudubois.net>
+Message-ID: <ae9f5406-0296-1beb-98cb-12c9d47b2d91@tribudubois.net>
+Date: Wed, 4 Jan 2017 22:54:49 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAJ+F1C+qoZrmMgsiEC+=xNVVaJFV+fUxk8ZmjSQTxnDXpKb6Dg@mail.gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="wBQ3ct65baWeCICvkwvweDkomiAoDs3gC"
-Subject: Re: [Qemu-devel] [PATCH 00/54] WIP: chardev: qom-ify
+In-Reply-To: <66b3383c-65bc-f993-d25e-9871489039de@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3] [i.MX] fix CS handling during SPI
+ access.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,82 +28,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+To: "mar.krzeminski" <mar.krzeminski@gmail.com>, qemu-devel@nongnu.org, peter.maydell@linaro.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---wBQ3ct65baWeCICvkwvweDkomiAoDs3gC
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <a614dd79-959f-705f-7957-e0fc4c9b9a8a@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 00/54] WIP: chardev: qom-ify
-References: <20161212224325.20790-1-marcandre.lureau@redhat.com>
- <4315c23d-0c4b-4341-90aa-54d186eaa251@redhat.com>
- <CAJ+F1C+qoZrmMgsiEC+=xNVVaJFV+fUxk8ZmjSQTxnDXpKb6Dg@mail.gmail.com>
-In-Reply-To: <CAJ+F1C+qoZrmMgsiEC+=xNVVaJFV+fUxk8ZmjSQTxnDXpKb6Dg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 01/04/2017 03:20 PM, Marc-Andr=C3=A9 Lureau wrote:
-> Hi
->=20
-> On Mon, Jan 2, 2017 at 11:27 AM Paolo Bonzini <pbonzini@redhat.com> wro=
-te:
->=20
+Le 04/01/2017 à 21:56, mar.krzeminski a écrit :
+>
+>
+> W dniu 03.01.2017 o 21:35, Jean-Christophe Dubois pisze:
+>> The i.MX SPI device was not de-asserting the CS line at the end of
+>> memory access.
 >>
+>> This triggered a SIGSEGV in Qemu when the sabrelite emulator was 
+>> acessing
+>> a SPI flash memory.
 >>
->> On 12/12/2016 23:42, Marc-Andr=C3=A9 Lureau wrote:
->>>
->>> Note: this series has been tested with Linux and cross-building with
->>> mingw. It mostly breaks on other platforms,
+>> Whit this path the CS signal is correctly asserted and deasserted 
+>> arround
+>> memory access.
 >>
->> What breaks exactly?
+>> Assertion level is now based on SPI device configuration.
 >>
+>> This was tested by:
+>> * booting linux on Sabrelite Qemu emulator.
+>> * booting xvisor on Sabrelite Qemu emultor.
 >>
-> Not much that I know. I was afraid it would break on BSD (in particular=
- the
-> move to own file and last patch), so I tested on FreeBSD. The last vers=
-ion
-> of the series works on win32, linux and freebsd. It can be found on
-> https://github.com/elmarco/qemu/commits/chrfe It's slightly over 80 pat=
-ches
-> now, and needs some win32 fixes I sent earlier (subprocess tests, and
-> main-loop busy loop fix)
->=20
-> Since Erik started reviewing the series, I suggest to resend the first =
-part
-> until "qom-ify" patch. Erik, feel free to review the remaining part of =
-the
-> WIP series, but more changes happened after iirc. What do you think?
+>> Signed-off-by: Jean-Christophe Dubois <jcd@tribudubois.net>
+>> ---
+>>
+>> Changes since v1:
+>> * Fix coding style issue.
+>>
+>> Changes since v2:
+>> * get SS line polarity from config reg.
+>>
+>>   hw/ssi/imx_spi.c         | 42 
+>> ++++++++++++++++++++++++++++++------------
+>>   include/hw/ssi/imx_spi.h |  2 ++
+>>   2 files changed, 32 insertions(+), 12 deletions(-)
+>>
+>> diff --git a/hw/ssi/imx_spi.c b/hw/ssi/imx_spi.c
+>> index e4e395f..3cbf279 100644
+>> --- a/hw/ssi/imx_spi.c
+>> +++ b/hw/ssi/imx_spi.c
+>> @@ -141,6 +141,18 @@ static bool 
+>> imx_spi_channel_is_master(IMXSPIState *s)
+>>       return (mode & (1 << imx_spi_selected_channel(s))) ? true : false;
+>>   }
+>>   +static uint8_t imx_spi_channel_pol(IMXSPIState *s, uint8_t channel)
+>> +{
+> channel variable is unused. Should be instead of 
+> imx_spi_selected_channel() call?
 
-It's Eric (but you're not the first, and probably not the last).  The
-qom-ify patch is 15/54, right? Okay, I'll complete my review up to that
-point, and then you can split the series into two: a v2 through qom-ify
-(which should probably be ready to go, or only very little to change),
-and the second half which is still the WIP.
+You are right. It should be used (instead of imx_spi_selected_channel(s) 
+below). I'll fix it.
 
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+>> +    uint8_t pol = EXTRACT(s->regs[ECSPI_CONFIGREG], 
+>> ECSPI_CONFIGREG_SS_POL);
+>> +
+>> +    return pol & (1 << ) ? 1 : 0;
+>> +}
+>> +
+>> +static uint8_t imx_spi_current_channel_pol(IMXSPIState *s)
+>> +{
+>> +    return imx_spi_channel_pol(s, imx_spi_selected_channel(s));
+>> +}
+>> +
+>>   static bool imx_spi_is_multiple_master_burst(IMXSPIState *s)
+>>   {
+>>       uint8_t wave = EXTRACT(s->regs[ECSPI_CONFIGREG], 
+>> ECSPI_CONFIGREG_SS_CTL);
+>> @@ -152,13 +164,16 @@ static bool 
+>> imx_spi_is_multiple_master_burst(IMXSPIState *s)
+>>     static void imx_spi_flush_txfifo(IMXSPIState *s)
+>>   {
+>> -    uint32_t tx;
+>> -    uint32_t rx;
+>> -
+>>       DPRINTF("Begin: TX Fifo Size = %d, RX Fifo Size = %d\n",
+>>               fifo32_num_used(&s->tx_fifo), 
+>> fifo32_num_used(&s->rx_fifo));
+>>   +    /* Activate the requested CS line */
+>> +    qemu_set_irq(s->cs_lines[imx_spi_selected_channel(s)],
+>> +                 imx_spi_current_channel_pol(s));
+>> +
+>>       while (!fifo32_is_empty(&s->tx_fifo)) {
+>> +        uint32_t tx;
+>> +        uint32_t rx = 0;
+>>           int tx_burst = 0;
+>>           int index = 0;
+>>   @@ -178,8 +193,6 @@ static void imx_spi_flush_txfifo(IMXSPIState *s)
+>>             tx_burst = MIN(s->burst_length, 32);
+>>   -        rx = 0;
+>> -
+>>           while (tx_burst) {
+>>               uint8_t byte = tx & 0xff;
+>>   @@ -221,6 +234,12 @@ static void imx_spi_flush_txfifo(IMXSPIState *s)
+>>           s->regs[ECSPI_STATREG] |= ECSPI_STATREG_TC;
+>>       }
+>>   +    /* Deselect all SS lines if transfert if completed */
+>> +    if (s->regs[ECSPI_STATREG] & ECSPI_STATREG_TC) {
+>> + qemu_set_irq(s->cs_lines[imx_spi_selected_channel(s)],
+>> +                     !imx_spi_current_channel_pol(s));
+>> +    }
+>> +
+>>       /* TODO: We should also use TDR and RDR bits */
+>>         DPRINTF("End: TX Fifo Size = %d, RX Fifo Size = %d\n",
+>> @@ -230,6 +249,7 @@ static void imx_spi_flush_txfifo(IMXSPIState *s)
+>>   static void imx_spi_reset(DeviceState *dev)
+>>   {
+>>       IMXSPIState *s = IMX_SPI(dev);
+>> +    uint32_t i;
+>>         DPRINTF("\n");
+>>   @@ -243,6 +263,11 @@ static void imx_spi_reset(DeviceState *dev)
+>>       imx_spi_update_irq(s);
+>>         s->burst_length = 0;
+>> +
+>> +    /* Disable all CS lines */
+>> +    for (i = 0; i < 4; i++) {
+>> +        qemu_set_irq(s->cs_lines[i], !imx_spi_channel_pol(s, i));
+>> +    }
+> Please make sure that in HW ECSPI_CONFIGREG_SS_POL bits are 0's after 
+> reset/power up (defaults).
 
+There is already a memset to 0 of all regs (including CONFIGREG) in the 
+reset function.
 
---wBQ3ct65baWeCICvkwvweDkomiAoDs3gC
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+>
+> Otherwise Acked-by: Marcin Krzemiński <mar.krzeminski@gmail.com>
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+Thanks
 
-iQEcBAEBCAAGBQJYbW4gAAoJEKeha0olJ0NqqkEIAJ1KTf3WffIBWXLOQujc0Meg
-ksyUQmrluwoNvQXmPsjJk+mu5DhqDrPFHooU73ZRzKNXhzrpBZne7k4dE41x6e1h
-+QuVNwlf+i25VrkKumKRtyJZgqwGkPARh+W6mBWdMrNU80ejStA4OPgNuxFc7YLK
-/UiF9B7+eOceEcv+tM7ZnRcEbJENP/OQM+WuKqlNGROJpy+6shQTFzFh0lsxLXY1
-S0z/k31Kyg8ehFKafE3j2oNhhfefRdjk09cXLrYzVwbJJcCrwyO3EGchqBzQ5lJo
-GfdIgepPY762khzN4dzBurLNeayjNjRREHrGx+Y/P947IWM7xkOo3N+/9mRwwLM=
-=N4+h
------END PGP SIGNATURE-----
+JC
 
---wBQ3ct65baWeCICvkwvweDkomiAoDs3gC--
+>
+> Thanks,
+> Marcin
+>>   }
+>>     static uint64_t imx_spi_read(void *opaque, hwaddr offset, 
+>> unsigned size)
+>> @@ -359,15 +384,8 @@ static void imx_spi_write(void *opaque, hwaddr 
+>> offset, uint64_t value,
+>>           }
+>>             if (imx_spi_channel_is_master(s)) {
+>> -            int i;
+>> -
+>>               /* We are in master mode */
+>>   -            for (i = 0; i < 4; i++) {
+>> -                qemu_set_irq(s->cs_lines[i],
+>> -                             i == imx_spi_selected_channel(s) ? 0 : 1);
+>> -            }
+>> -
+>>               if ((value & change_mask & ECSPI_CONREG_SMC) &&
+>>                   !fifo32_is_empty(&s->tx_fifo)) {
+>>                   /* SMC bit is set and TX FIFO has some slots filled 
+>> in */
+>> diff --git a/include/hw/ssi/imx_spi.h b/include/hw/ssi/imx_spi.h
+>> index 7103953..b9b9819 100644
+>> --- a/include/hw/ssi/imx_spi.h
+>> +++ b/include/hw/ssi/imx_spi.h
+>> @@ -46,6 +46,8 @@
+>>   /* ECSPI_CONFIGREG */
+>>   #define ECSPI_CONFIGREG_SS_CTL_SHIFT 8
+>>   #define ECSPI_CONFIGREG_SS_CTL_LENGTH 4
+>> +#define ECSPI_CONFIGREG_SS_POL_SHIFT 12
+>> +#define ECSPI_CONFIGREG_SS_POL_LENGTH 4
+>>     /* ECSPI_INTREG */
+>>   #define ECSPI_INTREG_TEEN (1 << 0)
+>
+>
+>
