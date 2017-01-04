@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33036)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38777)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cOkEC-0006yT-UF
-	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 06:59:38 -0500
+	(envelope-from <ashijeetacharya@gmail.com>) id 1cOkk8-0006UL-0e
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 07:32:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cOkE8-0007y1-Tn
-	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 06:59:37 -0500
-References: <1483493521-9604-1-git-send-email-zhang.zhanghailiang@huawei.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <eb38a50f-515a-d3ee-0857-5fbc4cecbb0a@redhat.com>
-Date: Wed, 4 Jan 2017 12:59:29 +0100
-MIME-Version: 1.0
-In-Reply-To: <1483493521-9604-1-git-send-email-zhang.zhanghailiang@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] qemu-thread: fix qemu_thread_set_name()
- race in qemu_thread_create()
+	(envelope-from <ashijeetacharya@gmail.com>) id 1cOkk4-0002Ki-Sa
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 07:32:35 -0500
+Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:36166)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ashijeetacharya@gmail.com>)
+	id 1cOkk4-0002Ke-MV
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 07:32:32 -0500
+Received: by mail-pf0-x244.google.com with SMTP id b22so696620pfd.3
+	for <qemu-devel@nongnu.org>; Wed, 04 Jan 2017 04:32:32 -0800 (PST)
+From: Ashijeet Acharya <ashijeetacharya@gmail.com>
+Date: Wed,  4 Jan 2017 18:02:25 +0530
+Message-Id: <1483533149-12807-1-git-send-email-ashijeetacharya@gmail.com>
+Subject: [Qemu-devel] [PATCH v3 0/4] Introduce a new --only-migratable option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,80 +24,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: zhanghailiang <zhang.zhanghailiang@huawei.com>, qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, stefanha@gmail.com, arei.gonglei@huawei.com, Caoxinhua <caoxinhua@huawei.com>
+To: dgilbert@redhat.com
+Cc: jsnow@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, kwolf@redhat.com, armbru@redhat.com, quintela@redhat.com, mst@redhat.com, marcandre.lureau@redhat.com, groug@kaod.org, aneesh.kumar@linux.vnet.ibm.com, peter.maydell@linaro.org, qemu-devel@nongnu.org, Ashijeet Acharya <ashijeetacharya@gmail.com>
 
-On 04/01/2017 02:32, zhanghailiang wrote:
-> From: Caoxinhua <caoxinhua@huawei.com>
-> 
-> QEMU will crash with the follow backtrace if the new created thread exited before
-> we call qemu_thread_set_name() for it.
-> 
->   (gdb) bt
->   #0 0x00007f9a68b095d7 in __GI_raise (sig=sig@entry=6) at ../nptl/sysdeps/unix/sysv/linux/raise.c:56
->   #1 0x00007f9a68b0acc8 in __GI_abort () at abort.c:90
->   #2 0x00007f9a69cda389 in PAT_abort () from /usr/lib64/libuvpuserhotfix.so
->   #3 0x00007f9a69cdda0d in patchIllInsHandler () from /usr/lib64/libuvpuserhotfix.so
->   #4 <signal handler called>
->   #5 pthread_setname_np (th=140298470549248, name=name@entry=0x8cc74a "io-task-worker") at ../nptl/sysdeps/unix/sysv/linux/pthread_setname.c:49
->   #6 0x00000000007f5f20 in qemu_thread_set_name (thread=thread@entry=0x7ffd2ac09680, name=name@entry=0x8cc74a "io-task-worker") at util/qemu_thread_posix.c:459
->   #7 0x00000000007f679e in qemu_thread_create (thread=thread@entry=0x7ffd2ac09680, name=name@entry=0x8cc74a "io-task-worker",start_routine=start_routine@entry=0x7c1300 <qio_task_thread_worker>, arg=arg@entry=0x7f99b8001720, mode=mode@entry=1) at util/qemu_thread_posix.c:498
->   #8 0x00000000007c15b6 in qio_task_run_in_thread (task=task@entry=0x7f99b80033d0, worker=worker@entry=0x7bd920 <qio_channel_socket_connect_worker>, opaque=0x7f99b8003370, destroy=0x7c6220 <qapi_free_SocketAddress>) at io/task.c:133
->   #9 0x00000000007bda04 in qio_channel_socket_connect_async (ioc=0x7f99b80014c0, addr=0x37235d0, callback=callback@entry=0x54ad00 <qemu_chr_socket_connected>, opaque=opaque@entry=0x38118b0, destroy=destroy@entry=0x0) at io/channel_socket.c:191
->   #10 0x00000000005487f6 in socket_reconnect_timeout (opaque=0x38118b0) at qemu_char.c:4402
->   #11 0x00007f9a6a1533b3 in g_timeout_dispatch () from /usr/lib64/libglib-2.0.so.0
->   #12 0x00007f9a6a15299a in g_main_context_dispatch () from /usr/lib64/libglib-2.0.so.0
->   #13 0x0000000000747386 in glib_pollfds_poll () at main_loop.c:227
->   #14 0x0000000000747424 in os_host_main_loop_wait (timeout=404000000) at main_loop.c:272
->   #15 0x0000000000747575 in main_loop_wait (nonblocking=nonblocking@entry=0) at main_loop.c:520
->   #16 0x0000000000557d31 in main_loop () at vl.c:2170
->   #17 0x000000000041c8b7 in main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>) at vl.c:5083
-> 
-> Let's detach the new thread after calling qemu_thread_set_name().
-> 
-> Signed-off-by: Caoxinhua <caoxinhua@huawei.com>
+Previously posted series patches:
+http://lists.nongnu.org/archive/html/qemu-devel/2016-12/msg02391.html
+http://lists.nongnu.org/archive/html/qemu-devel/2016-12/msg02062.html
 
-Please reply with your own Signed-off-by too, not just Xinhua's.
+This series adds a new command line option "--only-migratable" which will only
+allow addition of those devices to a QEMU instance which are migratable and do
+not abruptly fail QEMU after migration.
 
-Thanks,
+Patch 1 adds the new option "-only-migratable".
 
-Paolo
+Patch 2 adds compatibility for various "device adding" options for both via
+command line and hotplug methods.
 
-> ---
-> v2:
->  Fix missing title
-> ---
->  util/qemu-thread-posix.c | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
-> 
-> diff --git a/util/qemu-thread-posix.c b/util/qemu-thread-posix.c
-> index d20cdde..d31793d 100644
-> --- a/util/qemu-thread-posix.c
-> +++ b/util/qemu-thread-posix.c
-> @@ -481,12 +481,6 @@ void qemu_thread_create(QemuThread *thread, const char *name,
->      if (err) {
->          error_exit(err, __func__);
->      }
-> -    if (mode == QEMU_THREAD_DETACHED) {
-> -        err = pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-> -        if (err) {
-> -            error_exit(err, __func__);
-> -        }
-> -    }
->  
->      /* Leave signal handling to the iothread.  */
->      sigfillset(&set);
-> @@ -499,6 +493,12 @@ void qemu_thread_create(QemuThread *thread, const char *name,
->          qemu_thread_set_name(thread, name);
->      }
->  
-> +    if (mode == QEMU_THREAD_DETACHED) {
-> +        err = pthread_detach(thread->thread);
-> +        if (err) {
-> +            error_exit(err, __func__);
-> +        }
-> +    }
->      pthread_sigmask(SIG_SETMASK, &oldset, NULL);
->  
->      pthread_attr_destroy(&attr);
-> 
+Patch 3 helps to fail the migration blocker if the migration is already in
+progress and thus cannot be blocked.
+Note: This patch was originally written by John Snow and I have only made few
+changes.
+
+Patch 4 handles the special case of devices which become unmigratable 
+dynamically
+by making call to "migrate_add_blocker". Here we fail the particular action of
+the
+device which results in an unmigratable VM.
+Eg: 9pfs fails to mount the filesystem.
+
+Note: I have not been able to test and compile the ARM drivers for KVM. They
+are:
+hw/intc/arm_gic_kvm.c
+hw/intc/arm_gicv3_its_kvm.c
+hw/intc/arm_gicv3_kvm.c
+
+Changes in v3:
+- set s->root_fid after migrate_add_blocker
+- free migration_blocker inside v9fs_attach()
+- change back ret<0 to just ret
+- free local_err
+
+Changes in v2:
+- change the documentation for the new option
+- add a NULL check for ObjectClass
+- break patch 3 into patch 3 and 4
+- use error_append_hint
+- return -EACCES for only-migratable
+- fix the error messages
+
+Ashijeet Acharya (4):
+  migration: Add a new option to enable only-migratable
+  migration: Allow "device add" options to only add migratable devices
+  migration: disallow migrate_add_blocker during migration
+  migration: Fail migration blocker for --only-migratble
+
+ block/qcow.c                  |  9 ++++++++-
+ block/vdi.c                   |  9 ++++++++-
+ block/vhdx.c                  | 18 ++++++++++++------
+ block/vmdk.c                  | 10 +++++++++-
+ block/vpc.c                   | 13 ++++++++++---
+ block/vvfat.c                 | 22 ++++++++++++++--------
+ hw/9pfs/9p.c                  | 26 +++++++++++++++++++++-----
+ hw/display/virtio-gpu.c       | 34 +++++++++++++++++++++-------------
+ hw/intc/arm_gic_kvm.c         | 19 +++++++++++++------
+ hw/intc/arm_gicv3_its_kvm.c   | 21 ++++++++++++++-------
+ hw/intc/arm_gicv3_kvm.c       | 22 +++++++++++++++-------
+ hw/misc/ivshmem.c             | 17 +++++++++++++----
+ hw/scsi/vhost-scsi.c          | 27 +++++++++++++++++++++------
+ hw/usb/bus.c                  | 18 ++++++++++++++++++
+ hw/virtio/vhost.c             | 10 +++++++++-
+ include/migration/migration.h |  9 ++++++++-
+ migration/migration.c         | 42 ++++++++++++++++++++++++++++++++++++++++--
+ qdev-monitor.c                |  9 +++++++++
+ qemu-options.hx               |  9 +++++++++
+ stubs/migr-blocker.c          |  3 ++-
+ target-i386/kvm.c             | 19 ++++++++++++++++---
+ vl.c                          |  4 ++++
+ 22 files changed, 294 insertions(+), 76 deletions(-)
+
+-- 
+2.6.2
