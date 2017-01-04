@@ -1,38 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32888)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33090)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aderumier@oxygem.tv>) id 1cOrKY-0007VI-F6
-	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 14:34:39 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cOrLO-0007x8-TC
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 14:35:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aderumier@oxygem.tv>) id 1cOrKV-0004UK-D1
-	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 14:34:38 -0500
-Received: from mailpro.odiso.net ([89.248.211.110]:50990)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <aderumier@oxygem.tv>) id 1cOrKV-0004TY-6r
-	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 14:34:35 -0500
-Received: from localhost (localhost [127.0.0.1])
-	by mailpro.odiso.net (Postfix) with ESMTP id EA73211D7A21
-	for <qemu-devel@nongnu.org>; Wed,  4 Jan 2017 20:34:03 +0100 (CET)
-Received: from mailpro.odiso.net ([127.0.0.1])
-	by localhost (mailpro.odiso.net [127.0.0.1]) (amavisd-new, port 10032)
-	with ESMTP id yvJkhZqccft9 for <qemu-devel@nongnu.org>;
-	Wed,  4 Jan 2017 20:34:03 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
-	by mailpro.odiso.net (Postfix) with ESMTP id D1C9E11D7A35
-	for <qemu-devel@nongnu.org>; Wed,  4 Jan 2017 20:34:03 +0100 (CET)
-Received: from mailpro.odiso.net ([127.0.0.1])
-	by localhost (mailpro.odiso.net [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id SD7L9RXrKKRl for <qemu-devel@nongnu.org>;
-	Wed,  4 Jan 2017 20:34:03 +0100 (CET)
-Received: from mailpro.odiso.net (mailpro.odiso.net [10.1.31.111])
-	by mailpro.odiso.net (Postfix) with ESMTP id BF8E511D7A34
-	for <qemu-devel@nongnu.org>; Wed,  4 Jan 2017 20:34:03 +0100 (CET)
-Date: Wed, 4 Jan 2017 20:34:03 +0100 (CET)
-From: Alexandre DERUMIER <aderumier@odiso.com>
-Message-ID: <356610769.5581597.1483558443751.JavaMail.zimbra@oxygem.tv>
+	(envelope-from <rth7680@gmail.com>) id 1cOrLL-0004uy-Qp
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 14:35:30 -0500
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:34616)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cOrLL-0004ud-N4
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 14:35:27 -0500
+Received: by mail-qt0-x241.google.com with SMTP id j29so4112671qtc.1
+	for <qemu-devel@nongnu.org>; Wed, 04 Jan 2017 11:35:26 -0800 (PST)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <1482946636-3743-1-git-send-email-laurent@vivier.eu>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <5307cfdf-ced1-a2b3-4ebf-bedbe51a3e55@twiddle.net>
+Date: Wed, 4 Jan 2017 11:35:15 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1482946636-3743-1-git-send-email-laurent@vivier.eu>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] drive_mirror to nbd with tls ?
+Subject: Re: [Qemu-devel] [PATCH] linux-user: always start with
+ parallel_cpus set to true
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,22 +30,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel <qemu-devel@nongnu.org>
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, "Emilio G . Cota" <cota@braap.org>, Riku Voipio <riku.voipio@iki.fi>, John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
 
-Hi,
+On 12/28/2016 09:37 AM, Laurent Vivier wrote:
+> the use case is
+>
+>     mmap(...);
+>     fork();
 
-I'm currently trying to implemented drive_mirror to nbd with tls.
+While true, we can notice that mmap contains MAP_SHARED, and trigger it then. 
+Similarly for shmat.
 
-It's working fine without tls,  but with tls enabled on target,
 
-I don't known how to pass tls-creds to drive_mirror nbd uri ?  
-
-I don't see any option in nbd uri schema.
-
-Currently, I have this error "TLS negotiation required before option 3" with calling drive_mirror to nbd.
-
-Any idea ?
-
-Regards,
-
-Alexandre Derumier
+r~
