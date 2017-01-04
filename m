@@ -1,22 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56041)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60295)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cOcvA-0000GC-MJ
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 23:11:29 -0500
+	(envelope-from <bounces@canonical.com>) id 1cOd8z-0002jf-Ge
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 23:25:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cOcv7-00022y-G6
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 23:11:28 -0500
-Date: Wed, 4 Jan 2017 14:28:12 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170104032811.GY12761@umbus.fritz.box>
-References: <20161231011831.4097-1-zxq_yx_007@163.com>
-	<20170102222831.GB12761@umbus.fritz.box>
-	<A1654386-0C53-4C64-BE97-A6804E1AA4F3@163.com>
+	(envelope-from <bounces@canonical.com>) id 1cOd8u-0002DF-HT
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 23:25:45 -0500
+Received: from indium.canonical.com ([91.189.90.7]:55936)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cOd8u-0002CZ-8F
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 23:25:40 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cOd8t-0000Nt-12
+	for <qemu-devel@nongnu.org>; Wed, 04 Jan 2017 04:25:39 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id E63172E803B
+	for <qemu-devel@nongnu.org>; Wed,  4 Jan 2017 04:25:38 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="5T9d2Bf7JajBsgKp"
-Content-Disposition: inline
-In-Reply-To: <A1654386-0C53-4C64-BE97-A6804E1AA4F3@163.com>
-Subject: Re: [Qemu-devel] [PATCH 0/4] QOM'ify work for ppc
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 04 Jan 2017 04:18:02 -0000
+From: Launchpad Bug Tracker <1639225@bugs.launchpad.net>
+Reply-To: Bug 1639225 <1639225@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20161104124922.14508.87645.malonedeb@chaenomeles.canonical.com>
+Message-Id: <20170104041803.27545.15263.malone@loganberry.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1639225] Re: qcow2 - filesize 8.1Petabyte
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,88 +36,211 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?B?6LW15bCP5by6?= <zxq_yx_007@163.com>
-Cc: peter.maydell@linaro.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, agraf@suse.de
+To: qemu-devel@nongnu.org
 
+[Expired for QEMU because there has been no activity for 60 days.]
 
---5T9d2Bf7JajBsgKp
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
 
-On Tue, Jan 03, 2017 at 10:02:21PM +0800, =E8=B5=B5=E5=B0=8F=E5=BC=BA wrote:
-> Hi=EF=BC=8Cdavid=EF=BC=9A
->=20
->    To my understanding=EF=BC=8Cwhat must be put in the realize function  =
-is
->    code which depends on property values. What's the benefit of
->    moving memory region initialization into realize function?  I can
->    not figure out, can you make some explanations?
+-- =
 
-If nothing else it's better in realize() for consistency with other
-devices.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1639225
 
-I'm not familiar enough with the details to be sure, but I also think
-it's not safe in instance_init.  Once memory regions are registered,
-the device can potentially interact with other devices in the virtual
-machine.  realize() is sequenced to expect that, instance_init is not.
+Title:
+  qcow2 - filesize 8.1Petabyte
 
->     Thanks for your review.
->=20
-> Best wishes =EF=BC=81
->=20
-> > =E5=9C=A8 2017=E5=B9=B41=E6=9C=883=E6=97=A5=EF=BC=8C06:28=EF=BC=8CDavid=
- Gibson <david@gibson.dropbear.id.au> =E5=86=99=E9=81=93=EF=BC=9A
-> >=20
-> >> On Sat, Dec 31, 2016 at 09:18:27AM +0800, xiaoqiang zhao wrote:
-> >> This is some QOM'ify work relate with ppc.
-> >> See each commit message for details.
-> >>=20
-> >> xiaoqiang zhao (4):
-> >>  hw/gpio: QOM'ify mpc8xxx.c
-> >>  hw/ppc: QOM'ify e500.c
-> >>  hw/ppc: QOM'ify ppce500_spin.c
-> >>  hw/ppc: QOM'ify spapr_vio.c
-> >>=20
-> >> hw/gpio/mpc8xxx.c     | 20 +++++++++++---------
-> >> hw/ppc/e500.c         | 17 ++++-------------
-> >> hw/ppc/ppce500_spin.c | 18 ++++++++----------
-> >> hw/ppc/spapr_vio.c    |  2 --
-> >> 4 files changed, 23 insertions(+), 34 deletions(-)
-> >=20
-> > Patches 1-3 all have the same problem - they move memory region
-> > initialization and similar to an instance_init function.  This is not
-> > how things are generally done in the qdev model.  Instead that phase
-> > of initialization should be done from a dc->realize() function.
-> >=20
->=20
->=20
+Status in QEMU:
+  Expired
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Bug description:
+  =
 
---5T9d2Bf7JajBsgKp
-Content-Type: application/pgp-signature; name="signature.asc"
+  problem :
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
+  Filesystem                                     Size  Used Avail Use%
+  Mounted on
 
-iQIcBAEBCAAGBQJYbGvJAAoJEGw4ysog2bOS3sIQAISEFuqbNeTsIAAl19P2to4T
-h25sDztwDRuEWHWKrzAxBgNCdZ7TR3NVqpMoomBqI6LCxJ6iXUee3Usyp8MIKcO9
-nLGI3A6uEhhLokDHES8TPjeqjV5U7G7QykPR8+N4FhwmxoL0OVyYduMOI/gg6w/a
-4ssANFP8C/Mv22ofAh2ecPxoMWCMu8q/6QmmT+IO7Blg4U7GPa3rWOyGa+r66EmI
-Ke8U+zvq4HMtfqfX3QR3nOfXJpD0PlqdC37KZWwXEUJqJzNE++crIyEKFQN3V0KW
-kGFkMAGERpZNBj5FmuGMtWUeCQNByBBC9sX12EheuO6TGMKmXLysnungg6G57kyV
-+yr8qP941eYZhJb26o9s1tzOoQ9JM2hEVg4MjLpwvoKtXdH7FuQTAA+vAObrKy/k
-migwOVIJCBR3Q9P+XgG/W0C2srmyAW/jCyvQPrNTvu9o2CaDnyPVuNspNwedFVZn
-HzeYkit/c9pcyQGY0n7VA7wTMVn12ZP8OaGFm+/8Y3THaqHKh5ChgXKdJ4u2DrmK
-3ANh0dL5G5Ra0DvkRZfLmo4J5BQTUJMbg8hQkdHXE77ZfriLQw9rTLGOWVk65p8o
-eycCaC8fNIivOV+IJ06flcGko20Bz8BPZw+WAuKSvOFwZ+A8dYxZS3aaE/lWomTR
-WZcYkEFOxyjPmLt1FejC
-=d4NG
------END PGP SIGNATURE-----
+  /dev/sdd1                                      120G   63G   57G  53%
+  /storage/kvmstorage4ssd
 
---5T9d2Bf7JajBsgKp--
+  # pwd
+  /storage/kvmstorage4ssd/images
+
+  # qemu-img info vsys19_ssd1.qcow2 =
+
+  image: vsys19_ssd1.qcow2
+  file format: qcow2
+  virtual size: 20G (21474836480 bytes)
+  disk size: 11G
+  cluster_size: 65536
+  Format specific information:
+      compat: 1.1
+      lazy refcounts: true
+      refcount bits: 16
+      corrupt: true
+  # ls -lah vsys19_*
+  -rw------- 1 root root 8.1P Nov  4 13:16 vsys19_ssd1.qcow2
+
+  # ls -la vsys19_*
+  -rw------- 1 root root 9007203702079488 Nov  4 13:16 vsys19_ssd1.qcow2
+
+  # qemu-img check vsys19_ssd1.qcow2 =
+
+  qemu-img: Check failed: File too large
+
+  # xfs_repair /dev/sdd1
+  Phase 1 - find and verify superblock...
+  Phase 2 - using internal log
+          - zero log...
+          - scan filesystem freespace and inode maps...
+          - found root inode chunk
+  Phase 3 - for each AG...
+          - scan and clear agi unlinked lists...
+          - process known inodes and perform inode discovery...
+          - agno =3D 0
+          - agno =3D 1
+          - agno =3D 2
+          - agno =3D 3
+          - process newly discovered inodes...
+  Phase 4 - check for duplicate blocks...
+          - setting up duplicate extent list...
+          - check for inodes claiming duplicate blocks...
+          - agno =3D 0
+          - agno =3D 1
+          - agno =3D 2
+          - agno =3D 3
+  Phase 5 - rebuild AG headers and trees...
+          - reset superblock...
+  Phase 6 - check inode connectivity...
+          - resetting contents of realtime bitmap and summary inodes
+          - traversing filesystem ...
+          - traversal finished ...
+          - moving disconnected inodes to lost+found ...
+  Phase 7 - verify and correct link counts...
+  done
+
+  =
+
+  # pwd
+  /storage/kvmstorage4ssd/images
+
+      <disk type=3D'file' device=3D'disk'>
+        <driver name=3D'qemu' type=3D'qcow2'/>
+        <source file=3D'/storage/kvmstorage4ssd/images/vsys19_ssd1.qcow2'/>
+        <target dev=3D'vdn' bus=3D'virtio'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x0f' =
+function=3D'0x0'/>
+      </disk>
+
+  =
+
+  guest OS:
+
+  =
+
+  # uname -a
+  Linux vsys19 3.16.0-4-amd64 #1 SMP Debian 3.16.7-ckt11-1 (2015-05-24) x86=
+_64 GNU/Linux
+  cat /etc/debian_version =
+
+  stretch/sid
+
+  Nov  4 01:23:26 vsys19 kernel: [7654313.024844] end_request: I/O error, d=
+ev vdk, sector 8691272
+  Nov  4 01:23:26 vsys19 kernel: [7654313.025328] EXT4-fs warning (device d=
+m-1): ext4_end_bio:317: I/O error -5 writing to inode 262305 (offset 0 size=
+ 4202496 s
+  tarting block 1085897)
+  Nov  4 01:23:26 vsys19 kernel: [7654313.025334] Buffer I/O error on devic=
+e dm-1, logical block 1085897
+  Nov  4 01:23:26 vsys19 kernel: [7654313.025488] Buffer I/O error on devic=
+e dm-1, logical block 1085898
+  Nov  4 01:23:26 vsys19 kernel: [7654313.025632] Buffer I/O error on devic=
+e dm-1, logical block 1085899
+  Nov  4 01:23:26 vsys19 kernel: [7654313.025776] Buffer I/O error on devic=
+e dm-1, logical block 1085900
+  Nov  4 01:23:26 vsys19 kernel: [7654313.025920] Buffer I/O error on devic=
+e dm-1, logical block 1085901
+  Nov  4 01:23:26 vsys19 kernel: [7654313.026064] Buffer I/O error on devic=
+e dm-1, logical block 1085902
+  Nov  4 01:23:26 vsys19 kernel: [7654313.026207] Buffer I/O error on devic=
+e dm-1, logical block 1085903
+  Nov  4 01:23:26 vsys19 kernel: [7654313.026350] Buffer I/O error on devic=
+e dm-1, logical block 1085904
+  Nov  4 01:23:26 vsys19 kernel: [7654313.026500] Buffer I/O error on devic=
+e dm-1, logical block 1085905
+  Nov  4 01:23:26 vsys19 kernel: [7654313.028837] Buffer I/O error on devic=
+e dm-1, logical block 1085906
+  Nov  4 01:23:26 vsys19 kernel: [7654313.031122] end_request: I/O error, d=
+ev vdk, sector 8692280
+  Nov  4 01:23:26 vsys19 kernel: [7654313.031325] EXT4-fs warning (device d=
+m-1): ext4_end_bio:317: I/O error -5 writing to inode 262305 (offset 0 size=
+ 4202496 starting block 1086023)
+  Nov  4 01:23:26 vsys19 kernel: [7654313.031388] end_request: I/O error, d=
+ev vdk, sector 8693288
+  Nov  4 01:23:26 vsys19 kernel: [7654313.031527] EXT4-fs warning (device d=
+m-1): ext4_end_bio:317: I/O error -5 writing to inode 262305 (offset 0 size=
+ 4202496 starting block 1086149)
+  Nov  4 01:23:26 vsys19 kernel: [7654313.031598] end_request: I/O error, d=
+ev vdk, sector 8694296
+  Nov  4 01:23:26 vsys19 kernel: [7654313.031736] EXT4-fs warning (device d=
+m-1): ext4_end_bio:317: I/O error -5 writing to inode 262305 (offset 0 size=
+ 4202496 starting block 1086275)
+  Nov  4 01:23:26 vsys19 kernel: [7654313.031798] end_request: I/O error, d=
+ev vdk, sector 8695304
+  Nov  4 01:23:26 vsys19 kernel: [7654313.031933] EXT4-fs warning (device d=
+m-1): ext4_end_bio:317: I/O error -5 writing to inode 262305 (offset 0 size=
+ 4202496 starting block 1086401)
+
+  KVM host :
+  # cat /etc/debian_version =
+
+  stretch/sid
+
+  Debian
+
+  =
+
+  # uname -a
+  Linux asus1 4.5.5-custom #1 SMP Sun May 22 21:14:57 CEST 2016 x86_64 GNU/=
+Linux
+
+  # dpkg -l | grep -i qemu
+  ii  ipxe-qemu                             1.0.0+git-20150424.a25a16d-1   =
+ all          PXE boot firmware - ROM images for qemu
+  ii  qemu                                  1:2.5+dfsg-5+b1                =
+ amd64        fast processor emulator
+  ii  qemu-kvm                              1:2.5+dfsg-5+b1                =
+ amd64        QEMU Full virtualization on x86 hardware
+  ii  qemu-slof                             20151103+dfsg-2                =
+ all          Slimline Open Firmware -- QEMU PowerPC version
+  ii  qemu-system                           1:2.5+dfsg-5+b1                =
+ amd64        QEMU full system emulation binaries
+  ii  qemu-system-arm                       1:2.5+dfsg-5+b1                =
+ amd64        QEMU full system emulation binaries (arm)
+  ii  qemu-system-common                    1:2.5+dfsg-5+b1                =
+ amd64        QEMU full system emulation binaries (common files)
+  ii  qemu-system-mips                      1:2.5+dfsg-5+b1                =
+ amd64        QEMU full system emulation binaries (mips)
+  ii  qemu-system-misc                      1:2.5+dfsg-5+b1                =
+ amd64        QEMU full system emulation binaries (miscelaneous)
+  ii  qemu-system-ppc                       1:2.5+dfsg-5+b1                =
+ amd64        QEMU full system emulation binaries (ppc)
+  ii  qemu-system-sparc                     1:2.5+dfsg-5+b1                =
+ amd64        QEMU full system emulation binaries (sparc)
+  ii  qemu-system-x86                       1:2.5+dfsg-5+b1                =
+ amd64        QEMU full system emulation binaries (x86)
+  ii  qemu-user                             1:2.5+dfsg-5+b1                =
+ amd64        QEMU user mode emulation binaries
+  ii  qemu-user-binfmt                      1:2.5+dfsg-5+b1                =
+ amd64        QEMU user mode binfmt registration for qemu-user
+  ii  qemu-utils                            1:2.5+dfsg-5+b1                =
+ amd64        QEMU utilities
+  ii  qemubuilder                           0.80                           =
+ amd64        pbuilder using QEMU as backend
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1639225/+subscriptions
