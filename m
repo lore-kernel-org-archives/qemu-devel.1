@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50184)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50714)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cOlYA-0008BO-U3
-	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 08:24:20 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cOlaK-0000vE-DT
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 08:26:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cOlY7-0005Ax-R3
-	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 08:24:18 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40822)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cOlY7-0005Al-LD
-	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 08:24:15 -0500
-Date: Wed, 4 Jan 2017 15:24:12 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170104152329-mutt-send-email-mst@kernel.org>
-References: <586cb5ab.f31d9d0a.38ac3.acf2@mx.google.com>
-	<7a63340c-2fd8-f5ec-c39c-8958b9582752@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7a63340c-2fd8-f5ec-c39c-8958b9582752@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] serial: fix memory leak in serial exit
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cOlaI-0006Z9-1w
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 08:26:32 -0500
+Received: from mail-wj0-x244.google.com ([2a00:1450:400c:c01::244]:34729)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1cOlaH-0006Xm-St
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 08:26:30 -0500
+Received: by mail-wj0-x244.google.com with SMTP id qs7so37910009wjc.1
+	for <qemu-devel@nongnu.org>; Wed, 04 Jan 2017 05:26:29 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Wed,  4 Jan 2017 14:26:16 +0100
+Message-Id: <20170104132625.28059-2-pbonzini@redhat.com>
+In-Reply-To: <20170104132625.28059-1-pbonzini@redhat.com>
+References: <20170104132625.28059-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH 01/10] aio: rename bh_lock to list_lock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,54 +27,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Li Qiang <liq3ea@gmail.com>, qemu-devel@nongnu.org, Li Qiang <liqiang6-s@360.cn>
+To: qemu-devel@nongnu.org
+Cc: stefanha@redhat.com, famz@redhat.com
 
-On Wed, Jan 04, 2017 at 12:43:35PM +0100, Paolo Bonzini wrote:
-> 
-> 
-> On 04/01/2017 09:43, Li Qiang wrote:
-> > From: Li Qiang <liqiang6-s@360.cn>
-> > 
-> > The serial_exit_core function doesn't free some resources.
-> > This can lead memory leak when hotplug and unplug. This
-> > patch avoid this.
-> > 
-> > Signed-off-by: Li Qiang <liqiang6-s@360.cn>
-> > ---
-> >  hw/char/serial.c | 10 ++++++++++
-> >  1 file changed, 10 insertions(+)
-> > 
-> > diff --git a/hw/char/serial.c b/hw/char/serial.c
-> > index ffbacd8..67b18ed 100644
-> > --- a/hw/char/serial.c
-> > +++ b/hw/char/serial.c
-> > @@ -906,6 +906,16 @@ void serial_realize_core(SerialState *s, Error **errp)
-> >  void serial_exit_core(SerialState *s)
-> >  {
-> >      qemu_chr_fe_deinit(&s->chr);
-> > +
-> > +    timer_del(s->modem_status_poll);
-> > +    timer_free(s->modem_status_poll);
-> > +
-> > +    timer_del(s->fifo_timeout_timer);
-> > +    timer_free(s->fifo_timeout_timer);
-> > +
-> > +    fifo8_destroy(&s->recv_fifo);
-> > +    fifo8_destroy(&s->xmit_fifo);
-> > +
-> >      qemu_unregister_reset(serial_reset, s);
-> >  }
-> >  
-> > 
-> 
-> Thanks, looks good.
-> 
-> Paolo
+This will be used for AioHandlers too.  There is going to be little
+or no contention, so it is better to reuse the same lock.
 
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ async.c             | 20 ++++++++++----------
+ include/block/aio.h |  2 +-
+ 2 files changed, 11 insertions(+), 11 deletions(-)
 
-Paolo, so are you merging this?
-
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
+diff --git a/async.c b/async.c
+index 2960171..69292fa 100644
+--- a/async.c
++++ b/async.c
+@@ -53,14 +53,14 @@ void aio_bh_schedule_oneshot(AioContext *ctx, QEMUBHFunc *cb, void *opaque)
+         .cb = cb,
+         .opaque = opaque,
+     };
+-    qemu_mutex_lock(&ctx->bh_lock);
++    qemu_mutex_lock(&ctx->list_lock);
+     bh->next = ctx->first_bh;
+     bh->scheduled = 1;
+     bh->deleted = 1;
+     /* Make sure that the members are ready before putting bh into list */
+     smp_wmb();
+     ctx->first_bh = bh;
+-    qemu_mutex_unlock(&ctx->bh_lock);
++    qemu_mutex_unlock(&ctx->list_lock);
+     aio_notify(ctx);
+ }
+ 
+@@ -73,12 +73,12 @@ QEMUBH *aio_bh_new(AioContext *ctx, QEMUBHFunc *cb, void *opaque)
+         .cb = cb,
+         .opaque = opaque,
+     };
+-    qemu_mutex_lock(&ctx->bh_lock);
++    qemu_mutex_lock(&ctx->list_lock);
+     bh->next = ctx->first_bh;
+     /* Make sure that the members are ready before putting bh into list */
+     smp_wmb();
+     ctx->first_bh = bh;
+-    qemu_mutex_unlock(&ctx->bh_lock);
++    qemu_mutex_unlock(&ctx->list_lock);
+     return bh;
+ }
+ 
+@@ -120,7 +120,7 @@ int aio_bh_poll(AioContext *ctx)
+ 
+     /* remove deleted bhs */
+     if (!ctx->walking_bh) {
+-        qemu_mutex_lock(&ctx->bh_lock);
++        qemu_mutex_lock(&ctx->list_lock);
+         bhp = &ctx->first_bh;
+         while (*bhp) {
+             bh = *bhp;
+@@ -131,7 +131,7 @@ int aio_bh_poll(AioContext *ctx)
+                 bhp = &bh->next;
+             }
+         }
+-        qemu_mutex_unlock(&ctx->bh_lock);
++        qemu_mutex_unlock(&ctx->list_lock);
+     }
+ 
+     return ret;
+@@ -270,7 +270,7 @@ aio_ctx_finalize(GSource     *source)
+     }
+ #endif
+ 
+-    qemu_mutex_lock(&ctx->bh_lock);
++    qemu_mutex_lock(&ctx->list_lock);
+     while (ctx->first_bh) {
+         QEMUBH *next = ctx->first_bh->next;
+ 
+@@ -280,12 +280,12 @@ aio_ctx_finalize(GSource     *source)
+         g_free(ctx->first_bh);
+         ctx->first_bh = next;
+     }
+-    qemu_mutex_unlock(&ctx->bh_lock);
++    qemu_mutex_unlock(&ctx->list_lock);
+ 
+     aio_set_event_notifier(ctx, &ctx->notifier, false, NULL, NULL);
+     event_notifier_cleanup(&ctx->notifier);
+     qemu_rec_mutex_destroy(&ctx->lock);
+-    qemu_mutex_destroy(&ctx->bh_lock);
++    qemu_mutex_destroy(&ctx->list_lock);
+     timerlistgroup_deinit(&ctx->tlg);
+ }
+ 
+@@ -381,7 +381,7 @@ AioContext *aio_context_new(Error **errp)
+     ctx->linux_aio = NULL;
+ #endif
+     ctx->thread_pool = NULL;
+-    qemu_mutex_init(&ctx->bh_lock);
++    qemu_mutex_init(&ctx->list_lock);
+     qemu_rec_mutex_init(&ctx->lock);
+     timerlistgroup_init(&ctx->tlg, aio_timerlist_notify, ctx);
+ 
+diff --git a/include/block/aio.h b/include/block/aio.h
+index e4a4912..87d025d 100644
+--- a/include/block/aio.h
++++ b/include/block/aio.h
+@@ -91,7 +91,7 @@ struct AioContext {
+     uint32_t notify_me;
+ 
+     /* lock to protect between bh's adders and deleter */
+-    QemuMutex bh_lock;
++    QemuMutex list_lock;
+ 
+     /* Anchor of the list of Bottom Halves belonging to the context */
+     struct QEMUBH *first_bh;
 -- 
-MST
+2.9.3
