@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40236)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43158)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cOktD-0003Ep-9K
-	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 07:42:02 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cOl3K-0005z4-PC
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 07:52:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cOkt9-000609-OZ
-	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 07:41:59 -0500
-Resent-Message-Id: <E1cOkt9-000609-OZ@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21344)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1cOkt9-0005zl-Hg
-	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 07:41:55 -0500
-In-Reply-To: <1483533149-12807-1-git-send-email-ashijeetacharya@gmail.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <148353368948.142.2831714928005493592@790289a7ca88>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 4 Jan 2017 04:41:30 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v3 0/4] Introduce a new --only-migratable
- option
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cOl3H-0001OS-L9
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 07:52:26 -0500
+Received: from mail-wj0-x243.google.com ([2a00:1450:400c:c01::243]:35047)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1cOl3H-0001OI-E0
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 07:52:23 -0500
+Received: by mail-wj0-x243.google.com with SMTP id hb5so42264829wjc.2
+	for <qemu-devel@nongnu.org>; Wed, 04 Jan 2017 04:52:21 -0800 (PST)
+Received: from donizetti.lan (94-39-158-71.adsl-ull.clienti.tiscali.it.
+	[94.39.158.71]) by smtp.gmail.com with ESMTPSA id
+	js10sm98250126wjb.19.2017.01.04.04.52.18 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Wed, 04 Jan 2017 04:52:18 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Wed,  4 Jan 2017 13:52:18 +0100
+Message-Id: <20170104125218.26583-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH] hxtool: emit Texinfo headings as @subsection
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,51 +30,189 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: ashijeetacharya@gmail.com
-Cc: famz@redhat.com, dgilbert@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, quintela@redhat.com, qemu-devel@nongnu.org, mst@redhat.com, armbru@redhat.com, groug@kaod.org, aneesh.kumar@linux.vnet.ibm.com, marcandre.lureau@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, jsnow@redhat.com
+To: qemu-devel@nongnu.org
 
-SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQQVRDSCB2MyAwLzRdIEludHJvZHVjZSBhIG5ldyAtLW9ubHktbWlncmF0YWJsZSBv
-cHRpb24KVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDE0ODM1MzMxNDktMTI4MDctMS1naXQtc2Vu
-ZC1lbWFpbC1hc2hpamVldGFjaGFyeWFAZ21haWwuY29tCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4g
-PT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUg
-JEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKIyBVc2VmdWwgZ2l0IG9wdGlvbnMKZ2l0IGNvbmZp
-ZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5h
-bWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0Uu
-LikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRv
-dGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93
-ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAt
-OyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEp
-KQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNj
-OGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1
-Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8x
-NDgzNTMzMTQ5LTEyODA3LTEtZ2l0LXNlbmQtZW1haWwtYXNoaWplZXRhY2hhcnlhQGdtYWlsLmNv
-bSAtPiBwYXRjaGV3LzE0ODM1MzMxNDktMTI4MDctMS1naXQtc2VuZC1lbWFpbC1hc2hpamVldGFj
-aGFyeWFAZ21haWwuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMjY1ZmE1YSBt
-aWdyYXRpb246IEZhaWwgbWlncmF0aW9uIGJsb2NrZXIgZm9yIC0tb25seS1taWdyYXRibGUKZDk4
-ZDk1NiBtaWdyYXRpb246IGRpc2FsbG93IG1pZ3JhdGVfYWRkX2Jsb2NrZXIgZHVyaW5nIG1pZ3Jh
-dGlvbgo4NTgxNzkyIG1pZ3JhdGlvbjogQWxsb3cgImRldmljZSBhZGQiIG9wdGlvbnMgdG8gb25s
-eSBhZGQgbWlncmF0YWJsZSBkZXZpY2VzCjBjOTc3YWIgbWlncmF0aW9uOiBBZGQgYSBuZXcgb3B0
-aW9uIHRvIGVuYWJsZSBvbmx5LW1pZ3JhdGFibGUKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNr
-aW5nIFBBVENIIDEvNDogbWlncmF0aW9uOiBBZGQgYSBuZXcgb3B0aW9uIHRvIGVuYWJsZSBvbmx5
-LW1pZ3JhdGFibGUuLi4KRVJST1I6IGRvIG5vdCBpbml0aWFsaXNlIGdsb2JhbHMgdG8gMCBvciBO
-VUxMCiM1NjogRklMRTogdmwuYzoxODM6CitpbnQgb25seV9taWdyYXRhYmxlID0gMDsgLyogdHVy
-biBpdCBvZmYgdW5sZXNzIHVzZXIgc3RhdGVzIG90aGVyd2lzZSAqLwoKdG90YWw6IDEgZXJyb3Jz
-LCAwIHdhcm5pbmdzLCA0MCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9i
-bGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBv
-c2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4g
-TUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAyLzQ6IG1pZ3JhdGlvbjogQWxsb3cgImRldmlj
-ZSBhZGQiIG9wdGlvbnMgdG8gb25seSBhZGQgbWlncmF0YWJsZSBkZXZpY2VzLi4uCkNoZWNraW5n
-IFBBVENIIDMvNDogbWlncmF0aW9uOiBkaXNhbGxvdyBtaWdyYXRlX2FkZF9ibG9ja2VyIGR1cmlu
-ZyBtaWdyYXRpb24uLi4KRVJST1I6IGRvIG5vdCB1c2UgQzk5IC8vIGNvbW1lbnRzCiMxNTk6IEZJ
-TEU6IGJsb2NrL3Z2ZmF0LmM6MTIwNToKKyAgICAvLyAgICBhc3NlcnQoaXNfY29uc2lzdGVudChz
-KSk7Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDQ5MiBsaW5lcyBjaGVja2VkCgpZb3Vy
-IHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVz
-ZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5l
-ciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA0LzQ6IG1p
-Z3JhdGlvbjogRmFpbCBtaWdyYXRpb24gYmxvY2tlciBmb3IgLS1vbmx5LW1pZ3JhdGJsZS4uLgo9
-PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0t
-CkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3
-Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxp
-c3RzLm9yZw==
+Remove the colon, and add it in qemu-options-wrapper.h instead.
+The introduction of @subsection also found a case where the table
+was not closed and reopened around a heading, so fix it.
+
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ qemu-options-wrapper.h |  2 +-
+ qemu-options.hx        | 31 +++++++++++++++++++------------
+ scripts/hxtool         | 11 +++++++++--
+ 3 files changed, 29 insertions(+), 15 deletions(-)
+
+diff --git a/qemu-options-wrapper.h b/qemu-options-wrapper.h
+index 13bfea0..4d7aeb1 100644
+--- a/qemu-options-wrapper.h
++++ b/qemu-options-wrapper.h
+@@ -14,7 +14,7 @@
+ 
+ #define ARCHHEADING(text, arch_mask) \
+     if ((arch_mask) & arch_type)    \
+-        puts(stringify(text));
++        puts(stringify(text) ":");
+ 
+ #define DEFHEADING(text) ARCHHEADING(text, QEMU_ARCH_ALL)
+ 
+diff --git a/qemu-options.hx b/qemu-options.hx
+index c534a2f..b62d2d7 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -6,7 +6,7 @@ HXCOMM construct option structures, enums and help message for specified
+ HXCOMM architectures.
+ HXCOMM HXCOMM can be used for comments, discarded from both texi and C
+ 
+-DEFHEADING(Standard options:)
++DEFHEADING(Standard options)
+ STEXI
+ @table @option
+ ETEXI
+@@ -468,7 +468,7 @@ STEXI
+ ETEXI
+ DEFHEADING()
+ 
+-DEFHEADING(Block device options:)
++DEFHEADING(Block device options)
+ STEXI
+ @table @option
+ ETEXI
+@@ -856,7 +856,7 @@ STEXI
+ ETEXI
+ DEFHEADING()
+ 
+-DEFHEADING(USB options:)
++DEFHEADING(USB options)
+ STEXI
+ @table @option
+ ETEXI
+@@ -920,7 +920,7 @@ STEXI
+ ETEXI
+ DEFHEADING()
+ 
+-DEFHEADING(Display options:)
++DEFHEADING(Display options)
+ STEXI
+ @table @option
+ ETEXI
+@@ -1449,7 +1449,7 @@ STEXI
+ ETEXI
+ ARCHHEADING(, QEMU_ARCH_I386)
+ 
+-ARCHHEADING(i386 target only:, QEMU_ARCH_I386)
++ARCHHEADING(i386 target only, QEMU_ARCH_I386)
+ STEXI
+ @table @option
+ ETEXI
+@@ -1565,7 +1565,7 @@ STEXI
+ ETEXI
+ DEFHEADING()
+ 
+-DEFHEADING(Network options:)
++DEFHEADING(Network options)
+ STEXI
+ @table @option
+ ETEXI
+@@ -2146,7 +2146,7 @@ STEXI
+ ETEXI
+ DEFHEADING()
+ 
+-DEFHEADING(Character device options:)
++DEFHEADING(Character device options)
+ STEXI
+ 
+ The general form of a character device option is:
+@@ -2481,7 +2481,7 @@ STEXI
+ ETEXI
+ DEFHEADING()
+ 
+-DEFHEADING(Device URL Syntax:)
++DEFHEADING(Device URL Syntax)
+ STEXI
+ 
+ In addition to using normal file images for the emulated storage devices,
+@@ -2711,7 +2711,7 @@ STEXI
+ @end table
+ ETEXI
+ 
+-DEFHEADING(Bluetooth(R) options:)
++DEFHEADING(Bluetooth(R) options)
+ STEXI
+ @table @option
+ ETEXI
+@@ -2787,7 +2787,7 @@ ETEXI
+ DEFHEADING()
+ 
+ #ifdef CONFIG_TPM
+-DEFHEADING(TPM device options:)
++DEFHEADING(TPM device options)
+ 
+ DEF("tpmdev", HAS_ARG, QEMU_OPTION_tpmdev, \
+     "-tpmdev passthrough,id=id[,path=path][,cancel-path=path]\n"
+@@ -2861,7 +2861,7 @@ DEFHEADING()
+ 
+ #endif
+ 
+-DEFHEADING(Linux/Multiboot boot specific:)
++DEFHEADING(Linux/Multiboot boot specific)
+ STEXI
+ 
+ When using these options, you can use a given Linux or Multiboot
+@@ -2917,7 +2917,7 @@ STEXI
+ ETEXI
+ DEFHEADING()
+ 
+-DEFHEADING(Debug/Expert options:)
++DEFHEADING(Debug/Expert options)
+ STEXI
+ @table @option
+ ETEXI
+@@ -3775,7 +3775,14 @@ Dump json-encoded vmstate information for current machine type to file
+ in @var{file}
+ ETEXI
+ 
++STEXI
++@end table
++ETEXI
++DEFHEADING()
+ DEFHEADING(Generic object creation)
++STEXI
++@table @option
++ETEXI
+ 
+ DEF("object", HAS_ARG, QEMU_OPTION_object,
+     "-object TYPENAME[,PROP1=VALUE1,...]\n"
+diff --git a/scripts/hxtool b/scripts/hxtool
+index 04f7d7b..5468cd7 100644
+--- a/scripts/hxtool
++++ b/scripts/hxtool
+@@ -16,6 +16,13 @@ hxtoh()
+     done
+ }
+ 
++print_texi_heading()
++{
++    if test "$*" != ""; then
++        printf "@subsection %s\n" "$*"
++    fi
++}
++
+ hxtotexi()
+ {
+     flag=0
+@@ -45,10 +52,10 @@ hxtotexi()
+             fi
+             ;;
+             DEFHEADING*)
+-            printf '%s\n' "$(expr "$str" : "DEFHEADING(\(.*\))")"
++            print_texi_heading "$(expr "$str" : "DEFHEADING(\(.*\))")"
+             ;;
+             ARCHHEADING*)
+-            printf '%s\n' "$(expr "$str" : "ARCHHEADING(\(.*\),.*)")"
++            print_texi_heading "$(expr "$str" : "ARCHHEADING(\(.*\),.*)")"
+             ;;
+             *)
+             test $flag -eq 1 && printf '%s\n' "$str"
+-- 
+2.9.3
