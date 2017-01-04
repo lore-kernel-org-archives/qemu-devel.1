@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52488)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52500)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cOli8-0007nL-Px
-	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 08:34:37 -0500
+	(envelope-from <stefanha@redhat.com>) id 1cOliA-0007pb-Un
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 08:34:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cOli7-0000o8-Vz
-	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 08:34:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45462)
+	(envelope-from <stefanha@redhat.com>) id 1cOliA-0000oz-2B
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 08:34:39 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45328)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cOli7-0000ni-QT
-	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 08:34:35 -0500
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cOli9-0000oh-TC
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 08:34:38 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Wed,  4 Jan 2017 13:34:08 +0000
-Message-Id: <20170104133414.6524-9-stefanha@redhat.com>
+Date: Wed,  4 Jan 2017 13:34:09 +0000
+Message-Id: <20170104133414.6524-10-stefanha@redhat.com>
 In-Reply-To: <20170104133414.6524-1-stefanha@redhat.com>
 References: <20170104133414.6524-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PULL 08/14] virtio-blk: suppress virtqueue kick
+Subject: [Qemu-devel] [PULL 09/14] virtio-scsi: suppress virtqueue kick
  during processing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -32,41 +32,63 @@ it.  This reduces the number of vmexits during periods of heavy I/O.
 
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-id: 20161201192652.9509-8-stefanha@redhat.com
+Message-id: 20161201192652.9509-9-stefanha@redhat.com
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- hw/block/virtio-blk.c | 18 ++++++++++++------
- 1 file changed, 12 insertions(+), 6 deletions(-)
+ hw/scsi/virtio-scsi.c | 36 +++++++++++++++++++++---------------
+ 1 file changed, 21 insertions(+), 15 deletions(-)
 
-diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-index 0c5fd27..50bb0cb 100644
---- a/hw/block/virtio-blk.c
-+++ b/hw/block/virtio-blk.c
-@@ -588,13 +588,19 @@ void virtio_blk_handle_vq(VirtIOBlock *s, VirtQueue *vq)
+diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
+index 34bba35..204e14f 100644
+--- a/hw/scsi/virtio-scsi.c
++++ b/hw/scsi/virtio-scsi.c
+@@ -592,26 +592,32 @@ static void virtio_scsi_handle_cmd_req_submit(VirtIOSCSI *s, VirtIOSCSIReq *req)
+ void virtio_scsi_handle_cmd_vq(VirtIOSCSI *s, VirtQueue *vq)
+ {
+     VirtIOSCSIReq *req, *next;
+-    int ret;
++    int ret = 0;
  
-     blk_io_plug(s->blk);
+     QTAILQ_HEAD(, VirtIOSCSIReq) reqs = QTAILQ_HEAD_INITIALIZER(reqs);
  
--    while ((req = virtio_blk_get_request(s, vq))) {
--        if (virtio_blk_handle_request(req, &mrb)) {
--            virtqueue_detach_element(req->vq, &req->elem, 0);
--            virtio_blk_free_request(req);
--            break;
+-    while ((req = virtio_scsi_pop_req(s, vq))) {
+-        ret = virtio_scsi_handle_cmd_req_prepare(s, req);
+-        if (!ret) {
+-            QTAILQ_INSERT_TAIL(&reqs, req, next);
+-        } else if (ret == -EINVAL) {
+-            /* The device is broken and shouldn't process any request */
+-            while (!QTAILQ_EMPTY(&reqs)) {
+-                req = QTAILQ_FIRST(&reqs);
+-                QTAILQ_REMOVE(&reqs, req, next);
+-                blk_io_unplug(req->sreq->dev->conf.blk);
+-                scsi_req_unref(req->sreq);
+-                virtqueue_detach_element(req->vq, &req->elem, 0);
+-                virtio_scsi_free_req(req);
 +    do {
 +        virtio_queue_set_notification(vq, 0);
 +
-+        while ((req = virtio_blk_get_request(s, vq))) {
-+            if (virtio_blk_handle_request(req, &mrb)) {
-+                virtqueue_detach_element(req->vq, &req->elem, 0);
-+                virtio_blk_free_request(req);
-+                break;
-+            }
++        while ((req = virtio_scsi_pop_req(s, vq))) {
++            ret = virtio_scsi_handle_cmd_req_prepare(s, req);
++            if (!ret) {
++                QTAILQ_INSERT_TAIL(&reqs, req, next);
++            } else if (ret == -EINVAL) {
++                /* The device is broken and shouldn't process any request */
++                while (!QTAILQ_EMPTY(&reqs)) {
++                    req = QTAILQ_FIRST(&reqs);
++                    QTAILQ_REMOVE(&reqs, req, next);
++                    blk_io_unplug(req->sreq->dev->conf.blk);
++                    scsi_req_unref(req->sreq);
++                    virtqueue_detach_element(req->vq, &req->elem, 0);
++                    virtio_scsi_free_req(req);
++                }
+             }
          }
 -    }
 +
 +        virtio_queue_set_notification(vq, 1);
-+    } while (!virtio_queue_empty(vq));
++    } while (ret != -EINVAL && !virtio_queue_empty(vq));
  
-     if (mrb.num_reqs) {
-         virtio_blk_submit_multireq(s->blk, &mrb);
+     QTAILQ_FOREACH_SAFE(req, &reqs, next, next) {
+         virtio_scsi_handle_cmd_req_submit(s, req);
 -- 
 2.9.3
