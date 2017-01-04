@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49672)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55260)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cOqTS-0002uG-Q9
-	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 13:39:48 -0500
+	(envelope-from <sbruno@freebsd.org>) id 1cOqnk-0008MQ-D5
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 14:00:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cOqTP-0007dd-NQ
-	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 13:39:46 -0500
-Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:37231)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cOqTP-0007d8-G6
-	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 13:39:43 -0500
-Received: by mail-wm0-x236.google.com with SMTP id t79so464070908wmt.0
-	for <qemu-devel@nongnu.org>; Wed, 04 Jan 2017 10:39:43 -0800 (PST)
-References: <1482946636-3743-1-git-send-email-laurent@vivier.eu>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <1482946636-3743-1-git-send-email-laurent@vivier.eu>
-Date: Wed, 04 Jan 2017 18:39:40 +0000
-Message-ID: <874m1e655f.fsf@linaro.org>
+	(envelope-from <sbruno@freebsd.org>) id 1cOqnh-0007vV-BZ
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 14:00:44 -0500
+Received: from ignoranthack.me ([199.102.79.106]:56362
+	helo=mail.ignoranthack.me)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sbruno@freebsd.org>) id 1cOqnh-0007v4-2U
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 14:00:41 -0500
+References: <5dd3d27a-e630-4e92-43fa-13c131e9f880@freebsd.org>
+	<8760lu65gs.fsf@linaro.org>
+From: Sean Bruno <sbruno@freebsd.org>
+Message-ID: <6035f282-ef78-3ccb-1e75-2d00b9fe0d3c@freebsd.org>
+Date: Wed, 4 Jan 2017 12:00:34 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] linux-user: always start with
- parallel_cpus set to true
+In-Reply-To: <8760lu65gs.fsf@linaro.org>
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature";
+	boundary="k2GBQ4cuOfShB40XPooRVmeko9ST9KbQD"
+Subject: Re: [Qemu-devel] New Year's starting over ... bsd-user
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,87 +29,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: qemu-devel@nongnu.org, "Emilio G . Cota" <cota@braap.org>, Riku Voipio <riku.voipio@iki.fi>, John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>, Richard Henderson <rth@twiddle.net>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--k2GBQ4cuOfShB40XPooRVmeko9ST9KbQD
+From: Sean Bruno <sbruno@freebsd.org>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
+Message-ID: <6035f282-ef78-3ccb-1e75-2d00b9fe0d3c@freebsd.org>
+Subject: Re: [Qemu-devel] New Year's starting over ... bsd-user
+References: <5dd3d27a-e630-4e92-43fa-13c131e9f880@freebsd.org>
+ <8760lu65gs.fsf@linaro.org>
+In-Reply-To: <8760lu65gs.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
 
-Laurent Vivier <laurent@vivier.eu> writes:
 
-> We always need real atomics, as we can have shared memory between
-> processes.
->
-> A good test case is the example from futex(2), futex_demo.c:
->
-> the use case is
->
->     mmap(...);
->     fork();
->
->     Parent and Child:
->
->     while(...)
->         __sync_bool_compare_and_swap(...)
->         ...
->         futex(...)
->
-> In this case we need real atomics in __sync_bool_compare_and_swap(),
-> but as parallel_cpus is set to 0, we don't have.
->
-> We also revert "b67cb68 linux-user: enable parallel code generation on clone"
-> as parallel_cpus in unconditionally set now.
->
-> Of course, this doesn't fix atomics that are emulated using
-> cpu_loop_exit_atomic() as we can't stop virtual CPUs from another
-> processes.
+On 01/04/17 11:32, Alex Benn=C3=A9e wrote:
+>=20
+> Sean Bruno <sbruno@freebsd.org> writes:
+>=20
+>> I'm pondering where to start with getting FreeBSD's bsd-user code into=
 
-This seems a bit of a hit for something that might never get called.
-Could we not move b67cb68 out of the thread fork leg and do it for any
-fork? After all the tb_flush will ensure that all code by both parent
-and child will be using full atomics at that point?
+>> shape so it could actually be reviewed and accepted now that its sort =
+of
+>> working again (signal handling fixed finally).
+>=20
+> Also don't forget the parallel_cpus changes which were made for enhance=
+d
+> atomic support. There was also work in fixing up exclusive_start/end
+> which is used for safe work like tb_flush.
 
->
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-> ---
->  linux-user/syscall.c | 8 --------
->  translate-all.c      | 4 ++++
->  2 files changed, 4 insertions(+), 8 deletions(-)
->
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index 7b77503..db697c0 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -6164,14 +6164,6 @@ static int do_fork(CPUArchState *env, unsigned int flags, abi_ulong newsp,
->          sigfillset(&sigmask);
->          sigprocmask(SIG_BLOCK, &sigmask, &info.sigmask);
->
-> -        /* If this is our first additional thread, we need to ensure we
-> -         * generate code for parallel execution and flush old translations.
-> -         */
-> -        if (!parallel_cpus) {
-> -            parallel_cpus = true;
-> -            tb_flush(cpu);
-> -        }
-> -
->          ret = pthread_create(&info.thread, &attr, clone_func, &info);
->          /* TODO: Free new CPU state if thread creation failed.  */
->
-> diff --git a/translate-all.c b/translate-all.c
-> index 3dd9214..0b0bb09 100644
-> --- a/translate-all.c
-> +++ b/translate-all.c
-> @@ -142,7 +142,11 @@ static void *l1_map[V_L1_MAX_SIZE];
->
->  /* code generation context */
->  TCGContext tcg_ctx;
-> +#ifdef CONFIG_USER_ONLY
-> +bool parallel_cpus = true;
-> +#else
->  bool parallel_cpus;
-> +#endif
->
->  /* translation block context */
->  #ifdef CONFIG_USER_ONLY
+Yeah, I ran head first into that wall last month.  :-)
+
+We should be ok at this point as I've merged to master and am keeping up
+now.
+
+>=20
+>> I almost feel like the existing code should be purged, except that it
+>> gives a good history (and this seems lazy to me).
+>>
+>> As a first pass, I guess, I'd like to at least make i386 user run on
+>> x86_64.  What would you folks like to see in a first pass?
+>=20
+> One thing that bugs me about linux-user is the amount of copy&paste
+> repetition that goes on for the main run loop. Perhaps with a clean-up
+> of the unused BSD architectures we could explore how a re-factored
+> run loop could look with a view to moving to common run-loop code acros=
+s
+> both?
+
+The bsd-user code does not have that nearly as much.  Hardware
+architectures have been moved to seperate dirs and o/s support has been
+broken up into seperate dirs.  This has made maintenance and testing
+much easier, but not easy enough to get the code into your folk's tree.  =
+:-)
+
+>=20
+> Apart from syscall mapping and backend calls to the BSD ABI what
+> differences are there between the two user-mode implementations?
+>=20
+
+Not a substantial amount, IMO.  The setup and tear down are a bit
+different, signal handling is a bit different, and as you mention
+syscall mapping/backend calls are different.
+
+>>
+>> sean
+>>
+>> ref: https://github.com/seanbruno/qemu-bsd-user/tree/bsd-user
+>=20
+>=20
+> --
+> Alex Benn=C3=A9e
+>=20
 
 
---
-Alex Bennée
+--k2GBQ4cuOfShB40XPooRVmeko9ST9KbQD
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQGTBAEBCgB9FiEEuq1GMucSHejSCZfdEgHvyh5yfmQFAlhtRlNfFIAAAAAALgAo
+aXNzdWVyLWZwckBub3RhdGlvbnMub3BlbnBncC5maWZ0aGhvcnNlbWFuLm5ldEJB
+QUQ0NjMyRTcxMjFERThEMjA5OTdERDEyMDFFRkNBMUU3MjdFNjQACgkQEgHvyh5y
+fmQaFQf+OiURj3uVfawi/JZGy/urCLFC+FwpqGHeNlRbVvuHNDyZdGgQl6jj8ZRS
+kMpQ5OZn0ajQILitkdGtfRo0We1+9aBm4CQ//tisZGtqbCxgPyfbHdmeHDXFneny
+1Y2GvN4QP3Oy375B3BGN0YGSJIC76pUadEBW3doH/cMQjRJ4HZ80VS4rJGGQ0GPX
+45w9DBnEHcCpUfJTI8n+GbNLBqNJrLFVLPZ9bH4PwwzSpdo8KCTlgRazMJ7cr7d+
+85bnHq/h/Pu25/yNqerR2sx7FsjJ5nshoc/XGbxSCZzwMqwmOBXzQ51pkWd8STRv
+1LVXt/Tb9oVLf6nWelsqv37EKKrtxA==
+=2kNZ
+-----END PGP SIGNATURE-----
+
+--k2GBQ4cuOfShB40XPooRVmeko9ST9KbQD--
