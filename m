@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33650)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33662)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nathan@nathanrossi.com>) id 1cOo0N-0005s0-PI
-	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 11:01:36 -0500
+	(envelope-from <programmingkidx@gmail.com>) id 1cOo0P-0005tw-MV
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 11:01:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nathan@nathanrossi.com>) id 1cOo0H-0008WT-RS
-	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 11:01:35 -0500
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:33671)
+	(envelope-from <programmingkidx@gmail.com>) id 1cOo0L-00005U-TF
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 11:01:37 -0500
+Received: from mail-it0-x241.google.com ([2607:f8b0:4001:c0b::241]:34732)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <nathan@nathanrossi.com>)
-	id 1cOo0H-0008WM-NR
-	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 11:01:29 -0500
-Received: by mail-qt0-x241.google.com with SMTP id w39so1138558qtw.0
-	for <qemu-devel@nongnu.org>; Wed, 04 Jan 2017 08:01:29 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <20170104152731.GF10541@redhat.com>
-References: <20170104145652.30442-1-nathan@nathanrossi.com>
-	<20170104152731.GF10541@redhat.com>
-From: Nathan Rossi <nathan@nathanrossi.com>
-Date: Thu, 5 Jan 2017 02:01:28 +1000
-Message-ID: <CA+aJhH3eimB=2+bu6UgkDprgL6fWueFTke8Ja2fSaVB8OODmPQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH] configure: For libgcrypt if pkg-config is
- available use it
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1cOo0L-00005J-PA
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 11:01:33 -0500
+Received: by mail-it0-x241.google.com with SMTP id q186so2534477itb.1
+	for <qemu-devel@nongnu.org>; Wed, 04 Jan 2017 08:01:33 -0800 (PST)
+Mime-Version: 1.0 (Apple Message framework v1084)
+Content-Type: text/plain; charset=us-ascii
+From: Programmingkid <programmingkidx@gmail.com>
+In-Reply-To: <20170104155116.GG10541@redhat.com>
+Date: Wed, 4 Jan 2017 11:01:30 -0500
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <FC181425-036D-4203-9C89-4E69D866F59F@gmail.com>
+References: <376FE1EF-577A-4BE3-B398-99ACB7F280F4@gmail.com>
+	<1483433944.24493.3.camel@redhat.com>
+	<D2287F42-8073-421D-9920-3048D63B41E3@gmail.com>
+	<1483519059.5670.42.camel@redhat.com>
+	<20170104155116.GG10541@redhat.com>
+Subject: Re: [Qemu-devel] Speed menu for GTK interfaace
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,48 +34,105 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Alistair Francis <alistair.francis@xilinx.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel qemu-devel <qemu-devel@nongnu.org>
 
-On 5 January 2017 at 01:27, Daniel P. Berrange <berrange@redhat.com> wrote:
-> On Thu, Jan 05, 2017 at 12:56:52AM +1000, Nathan Rossi wrote:
->> If libgcrypt info is available with pkg-config use it over using the
->> libgcrypt-config. pkg-config is preferred due to is compatibility with
->> cross-compilation (where you cannot execute the targets version of
->> libgcrypt-config).
->
-> It can be made to work, but you need to modify $PATH to ensure it finds
-> the build target libgcrypt-config first.
->
-> eg on Fedora you'd do this with mingw32
->
->    PATH=/usr/i686-w64-mingw32/sys-root/mingw/bin:$PATH ./configure ...
->
->> This change makes configure check for libgcrypt in pkg-config first,
->> then falling back to use libgcrypt-config if available. This follows a
->> similar process to how libsdl is handled.
->
-> AFAIK, no version of libgcrypt has ever shipped a pkg-config file. Their
-> maintainers have explicitly rejected patches adding that, ironically
-> because they claim pkg-config doesn't handle cross-compilation and
-> libgcrypt-config does :-)
->
-> https://lists.gnupg.org/pipermail/gcrypt-devel/2007-February/001109.html
-> https://lists.gnupg.org/pipermail/gcrypt-devel/2015-September/003569.html
->
 
-Sorry for the noise. Turns out Yocto/OE patches support in to
-libgcrypt for pkg-config, I did not realize (too many different things
-in play :| ).
+On Jan 4, 2017, at 10:51 AM, Daniel P. Berrange wrote:
 
-Regards,
-Nathan
-
->
-> So overall, I don't think this patch is needed/desirable for QEMU.
->
+> On Wed, Jan 04, 2017 at 09:37:39AM +0100, Gerd Hoffmann wrote:
+>>  Hi,
+>>=20
+>>> It is quite simple, there would be a 100% to a 1% menu item. It =
+would look like
+>>> this:
+>>>=20
+>>> Speed
+>>> -------
+>>> 100%
+>>> 90%
+>>> 80%
+>>> 70%
+>>> 60%
+>>> 50%
+>>> 40%
+>>> 30%
+>>> 20%
+>>> 10%
+>>> 1%
+>>>=20
+>>>=20
+>>> Each menu item would call cpu_throttle_set(). The value sent to this =
+function would
+>>> be determined like this:
+>>> speed =3D -1 * menu_number + 100;
+>>=20
+>> ok, that is the info I was looking for.
+>>=20
+>>> speed would be sent to the cpu_throttle_set() function. This =
+function would reduce
+>>> the CPU usage of QEMU on the host.=20
+>>>=20
+>>> Why would someone want to slow down QEMU?
+>>> - The user is using a laptop and don't want it to heat up.
+>>=20
+>> Sort-of makes sense, to keep the laptop quiet.
+>>=20
+>>> - The user wants to slow down a video game that is a little too =
+challenging.
+>>=20
+>> Sure this would work?  Throttling isn't a smooth slowdown, the cpu
+>> continues to run at full speed and is forced to pause now and then.
+>>=20
+>>> - The user wants to save energy.
+>>=20
+>> Pointless.  Laptop may run longer, but your job needs more time to
+>> complete too.  And constant vcpu start/stop isn't good to save power,
+>> the cpus can't enter deep sleep states then because of the frequent
+>> wakeups.
+>>=20
+>>> - The user wants to conduct some kind of stress test on a program =
+and see how
+>>> it handles under low cpu resources.=20
+>>=20
+>> Makes sense too.
+>>=20
+>> We already have "pause" in gtk, adding a "throttle" item next to it
+>> looks reasonable to me.  I don't think it is that useful to have 10%
+>> steps in there, you probably never throttle 10% in practice.  It's
+>> probably more useful to have something like "throttle -> off / 50% /
+>> 90% / 95% / 99%".
+>=20
+> This feels like going down the slippery slope to turn the GTK frontend
+> into a full mgmt UI, which is something we've said we don't want todo
+> inside QEMU UI frontends. IMHO this kind of feature is best left to
+> external mgmt layers, like  virt-manager/GNOME Boxes/etc. It is =
+already
+> possible to timebox VMs CPU execution using cgroups quotas via =
+libvirt.
+>=20
 > Regards,
 > Daniel
-> --
-> |: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-> |: http://libvirt.org              -o-             http://virt-manager.org :|
-> |: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+> --=20
+> |: http://berrange.com      -o-    =
+http://www.flickr.com/photos/dberrange/ :|
+> |: http://libvirt.org              -o-             =
+http://virt-manager.org :|
+> |: http://entangle-photo.org       -o-    =
+http://search.cpan.org/~danberr/ :|
+
+Are you saying that so we can use your Virt-manager? The thing is having =
+more
+options is a good thing. If one solution doesn't work, another solution =
+might.
+We don't live in a world with only one Linux distribution. We live in a =
+world
+with many Linux distributions. We have the power of choice. There =
+currently
+isn't a single QEMU front-end that runs on all three operating systems. =
+Yes the
+Linux people do have Virt-manager, but what about the Windows and =
+Macintosh
+people. They are not so fortunate. Enhancing the GTK front-end does not
+hurt any of the Virt-manager users at all. This change is just for the =
+people
+who prefer the GTK front-end.
