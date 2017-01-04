@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37239)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38274)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1cOsr6-0001jD-U8
-	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 16:12:22 -0500
+	(envelope-from <eblake@redhat.com>) id 1cOsue-0004cj-49
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 16:16:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1cOsr5-0005UL-QB
-	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 16:12:20 -0500
+	(envelope-from <eblake@redhat.com>) id 1cOsua-0006Tt-Uw
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 16:16:00 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38660)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cOsua-0006Th-LT
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 16:15:56 -0500
+References: <20161212224325.20790-1-marcandre.lureau@redhat.com>
+	<20161212224325.20790-9-marcandre.lureau@redhat.com>
+	<4f5926bd-557f-de20-025b-d640a6aefa17@redhat.com>
+	<CAJ+F1C+EtPLpyLvpEA1Ex6jZnih2uCMTeXbQuXeivTwO9BafhQ@mail.gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <a9449592-86db-ca48-9e3e-d6ab2c42a93f@redhat.com>
+Date: Wed, 4 Jan 2017 15:15:50 -0600
 MIME-Version: 1.0
-In-Reply-To: <1ab62b16-8c59-ccd6-9011-43e4571a75fb@redhat.com>
-References: <1482268300-10082-1-git-send-email-andrew.smirnov@gmail.com>
-	<1ab62b16-8c59-ccd6-9011-43e4571a75fb@redhat.com>
-From: Andrey Smirnov <andrew.smirnov@gmail.com>
-Date: Wed, 4 Jan 2017 13:12:14 -0800
-Message-ID: <CAHQ1cqF1ugeH0rt38MWV7Zusg2rb3Tdi6r1CmefHoon6CMWUcw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] fsl_etsec: Fix Tx BD ring wrapping handling
+In-Reply-To: <CAJ+F1C+EtPLpyLvpEA1Ex6jZnih2uCMTeXbQuXeivTwO9BafhQ@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="JvxXmDb02rbhA9CuqvphFdo8WUX6DdGTh"
+Subject: Re: [Qemu-devel] [PATCH 08/54] char: allocate CharDriverState as a
+ single object
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,99 +31,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: "open list:PReP" <qemu-ppc@nongnu.org>, Scott Wood <scottwood@freescale.com>, Alexander Graf <agraf@suse.de>, QEMU Developers <qemu-devel@nongnu.org>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com
 
-On Sun, Dec 25, 2016 at 8:12 PM, Jason Wang <jasowang@redhat.com> wrote:
->
->
-> On 2016=E5=B9=B412=E6=9C=8821=E6=97=A5 05:11, Andrey Smirnov wrote:
->>
->> Current code that handles Tx buffer desciprtor ring scanning employs the
->> following algorithm:
->>
->>         1. Restore current buffer descriptor pointer from TBPTRn
->>
->>         2. Process current descriptor
->>
->>         3. If current descriptor has BD_WRAP flag set set current
->>            descriptor pointer to start of the descriptor ring
->>
->>         4. If current descriptor points to start of the ring exit the
->>            loop, otherwise increment current descriptor pointer and go
->>            to #2
->>
->>         5. Store current descriptor in TBPTRn
->>
->> As it can be seen the way the code is implemented results in buffer
->> descriptor ring being scanned starting at offset/descriptor #0. While
->> covering proverbial "99%" of the cases, this algorithm becomes
->> problematic for a number of edge cases.
->>
->> Consider the following scenario: guest OS driver initializes descriptor
->> ring to N individual descriptors and starts sending data out. Depending
->> on the volume of traffic and probably guest OS driver implementation it
->> is possible that an edge case where a packet, spread across 2
->> descriptors is placed in descriptors N - 1 and 0 in that order(it is
->> easy to imagine similar examples involving more than 2 descriptors).
->>
->> What happens then is aforementioned algorithm starts at descriptor 0,
->> sees a descriptor marked as BD_LAST, which it happily sends out as a
->> separate packet(very much malformed at this point) then the iteration
->> continues and the first part of the original packet is tacked to the
->> next transmission which ends up being bogus as well.
->>
->> This behvaiour can be pretty reliably observed when scp'ing data from a
->> guest OS via TAP interface for files larger than 160K (every time for
->> 700K+).
->>
->> This patch changes the scanning algorithm to do the following:
->>
->>         1. Restore "current" and "start" buffer descriptor pointer from
->>            TBPTRn
->>
->>         2. If "current" descriptor has BD_WRAP flag set "next"
->>            descriptor pointer to start of the descriptor ring otherwise
->>            set "next" to descriptor right after "current"
->>
->>         3. Process current descriptor
->>
->>         4. If current descriptore has BD_LAST(end of a packet) set save
->>            "next" descriptor pointer in TBPTRn
->>
->>         5. Set "current" descriptor pointer to "next"
->>
->>         6. If "current" descriptor points to "start" (from #1) exit the
->> loop
->>            loop, otherwise go to #2
->
->
-> Hi, I'm not familiar with this card but this seems could be simply addres=
-sed
-> by exiting the loop when bd_flags !=3D BD_TX_READY instead of bd_addr !=
-=3D
-> ring_base (which seems buggy for heavy load)?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--JvxXmDb02rbhA9CuqvphFdo8WUX6DdGTh
+From: Eric Blake <eblake@redhat.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>,
+ qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com
+Message-ID: <a9449592-86db-ca48-9e3e-d6ab2c42a93f@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 08/54] char: allocate CharDriverState as a
+ single object
+References: <20161212224325.20790-1-marcandre.lureau@redhat.com>
+ <20161212224325.20790-9-marcandre.lureau@redhat.com>
+ <4f5926bd-557f-de20-025b-d640a6aefa17@redhat.com>
+ <CAJ+F1C+EtPLpyLvpEA1Ex6jZnih2uCMTeXbQuXeivTwO9BafhQ@mail.gmail.com>
+In-Reply-To: <CAJ+F1C+EtPLpyLvpEA1Ex6jZnih2uCMTeXbQuXeivTwO9BafhQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-This would change the emulated behavior, since original implementation
-would scan the entirety of buffer descriptor ring and process every
-entry with "READY" bit set regardless if those descriptors were placed
-right after each other or had gaps.
+On 01/04/2017 03:09 PM, Marc-Andr=C3=A9 Lureau wrote:
+> Hi
+>=20
+> On Wed, Jan 4, 2017 at 9:26 PM Eric Blake <eblake@redhat.com> wrote:
+>=20
+>> On 12/12/2016 04:42 PM, Marc-Andr=C3=A9 Lureau wrote:
+>>> Use a single allocation for CharDriverState, this avoids extra
+>>> allocations & pointers, and is a step towards more object-oriented
+>>> CharDriver.
+>>>
+>>> Gtk console is a bit peculiar, gd_vc_chr_set_echo
+>>
+>> Truncated paragraph?
+>>
+>=20
+> yes, fixed
+>=20
 
-That being said, I don't have any reason to believe that
-aforementioned peculiarity is correct behavior that actual HW would
-exhibit. I can't seem to find any detailed description of what goes
-under the hood in RM except for this:
+>>> @@ -270,7 +270,7 @@ static int baum_deferred_init(BaumDriverState *ba=
+um)
+>>>  /* The serial port can receive more of our data */
+>>>  static void baum_accept_input(struct CharDriverState *chr)
+>>>  {
+>>> -    BaumDriverState *baum =3D chr->opaque;
+>>> +    BaumDriverState *baum =3D (BaumDriverState *)chr;
+>>
+>> It might be a little nicer to use:
+>>
+>> BaumDriverState *baum =3D container_of(chr, BaumDriverState, parent);
+>>
+>>
+> The follow-up of the series converts it to the more appropriate
+>  BaumChardev *baum =3D BAUM_CHARDEV(obj);
+>=20
+> So considering that this is temporary commit, do I have to change that?=
 
-"... The TBPTR register is internally written by the eTSEC=E2=80=99s DMA
-controller during transmission. The pointer increments by eight
-(bytes) each time a descriptor is closed successfully by the eTSEC..."
 
-And reading that seems to suggest, that what you are proposing,
-besides being simpler solution, might also be the correct way to
-emulate this aspect of eTSEC's DMA engine behavior.
+Ah, nice. So BAUM_CHARDEV(obj) will be a nice wrapper around
+container_of(). I can live with it being temporary (although a note in
+the commit message can't hurt).
 
-Let me experiment and see if encounter any problems with this
-approach. I'll post updated version of the patch if it works out.
+>=20
+> to avoid a cast and work even if the members are rearranged within the
+>> structure. You can even write a one-line helper function to hide the
+>> cast behind a more legible semantic (for example, see to_qov() in
+>> qobject-output-visitor.c).
 
-Thanks,
-Andrey Smirnov
+My example of to_qov() is matched by your BAUM_CHARDEV() macro.
+
+>> My biggest gripe is the number of casts that could be container_of()
+>> instead; but otherwise it looks like a sane conversion.
+>>
+>>
+> thanks, the goal is to get rid of them, but not in this commit :) See
+> "chardev: qom-ify".
+
+That's what I get for only reviewing the series one patch at a time. I'm
+fine with temporary and partial hacks, but calling them out as such
+makes review easier if we know it's going to improve later.
+
+Since I think you've answered my questions, then with an improved commit
+message, v2 can add:
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--JvxXmDb02rbhA9CuqvphFdo8WUX6DdGTh
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYbWYGAAoJEKeha0olJ0NqQBYIAJFSR+2LuChSvoBnXxSLnyEE
+622tQRymtsj/3UDUNnAKlZ38ZBZfnQ3iDFOwF77tJd9fhUCnt4jQEUUAihehKg0/
+jiEzqKGQ5SX4H6UAhyXybwGZLtu7AN8OG3KVEE16SsQog5G7l4QOBQuh6N4PUovF
+gZ33BSXbNzXWfwGcvNyYl7/GatqWLUIgOPZewn9bAMec1ku+nYOqRnS3uAZelhBz
+yYmsTLUVqIuieoiiwah1uD1ZKgR0/GFC7QKofNlb7E0H8IowBou5UC4qVS35nvz/
++8tgHJ9jN0oR2jjHHtxx9UVIFBScu7weLbwRmaITC/4jPfR8bJRxkINwt8y4myM=
+=esjF
+-----END PGP SIGNATURE-----
+
+--JvxXmDb02rbhA9CuqvphFdo8WUX6DdGTh--
