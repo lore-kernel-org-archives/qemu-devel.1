@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39479)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40040)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cOii9-0001Ud-8c
-	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 05:22:26 -0500
+	(envelope-from <berrange@redhat.com>) id 1cOilW-0002m7-Kx
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 05:25:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cOii5-0001ph-HT
-	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 05:22:25 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48514)
+	(envelope-from <berrange@redhat.com>) id 1cOilS-0003fB-VF
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 05:25:54 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59802)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cOii5-0001of-BX
-	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 05:22:21 -0500
-Date: Wed, 4 Jan 2017 10:22:14 +0000
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cOilS-0003ez-MR
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 05:25:50 -0500
+Date: Wed, 4 Jan 2017 10:25:40 +0000
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170104102214.GB10541@redhat.com>
+Message-ID: <20170104102540.GC10541@redhat.com>
 Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170103191933.19416-1-marcandre.lureau@redhat.com>
+References: <586c7aad.0834c80a.d7aff.122e@mx.google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170103191933.19416-1-marcandre.lureau@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] win32: use glib gpoll if glib >= 2.50
+In-Reply-To: <586c7aad.0834c80a.d7aff.122e@mx.google.com>
+Subject: Re: [Qemu-devel] [PATCH] Crypto: fix leak in ivgen essiv init
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,44 +27,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, sw@weilnetz.de
+To: Li Qiang <liq3ea@gmail.com>
+Cc: qemu-devel@nongnu.org, liqiang6-s@360.cn
 
-On Tue, Jan 03, 2017 at 08:19:33PM +0100, Marc-Andr=C3=A9 Lureau wrote:
-> A fix has been committed in upstream glib commit
-> 210a9796f78eb90f76f1bd6a304e9fea05e97617.
-> (See also related bug https://bugzilla.gnome.org/show_bug.cgi?id=3D7644=
-15)
-
-The bug is a little misleading because the comments indicate that
-patch was going to be merged to master after 2.50 branched. The
-git commit hash though shows it merged before branching
-
-$ git describe 210a9796f78eb90f76f1bd6a304e9fea05e97617
-2.48.0-41-g210a979
-
-so the >=3D 2.50 check is good.
-
-> It is desirable to use the glib version instead of qemu copy, since it
-> provides more debugging facilities (G_MAIN_POLL_DEBUG etc), and
-> hopefully has a better maintainance. Hopefully, we can drop the qemu
-> copy in a few years.
->=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+On Tue, Jan 03, 2017 at 08:31:34PM -0800, Li Qiang wrote:
+> From: Li Qiang <liqiang6-s@360.cn>
+> 
+> On error path, the 'salt' doesn't been freed thus leading
+> a memory leak. This patch avoid this.
+> 
+> Signed-off-by: Li Qiang <liqiang6-s@360.cn>
 > ---
->  include/glib-compat.h | 2 +-
->  util/oslib-win32.c    | 2 ++
->  2 files changed, 3 insertions(+), 1 deletion(-)
+>  crypto/ivgen-essiv.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/crypto/ivgen-essiv.c b/crypto/ivgen-essiv.c
+> index 634de63..cba20bd 100644
+> --- a/crypto/ivgen-essiv.c
+> +++ b/crypto/ivgen-essiv.c
+> @@ -48,6 +48,7 @@ static int qcrypto_ivgen_essiv_init(QCryptoIVGen *ivgen,
+>                             &salt, &nhash,
+>                             errp) < 0) {
+>          g_free(essiv);
+> +        g_free(salt);
+>          return -1;
+>      }
 
-Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
-
+Looks good, thanks, added to the crypto-next queue.
 
 Regards,
 Daniel
---=20
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange=
-/ :|
-|: http://libvirt.org              -o-             http://virt-manager.or=
-g :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr=
-/ :|
+-- 
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
