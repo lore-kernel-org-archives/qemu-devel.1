@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52561)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52558)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cOliK-0007yV-C4
-	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 08:34:49 -0500
+	(envelope-from <stefanha@redhat.com>) id 1cOliK-0007yR-Am
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 08:34:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cOliE-0000qq-Lc
+	(envelope-from <stefanha@redhat.com>) id 1cOliJ-0000tN-0I
 	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 08:34:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45688)
+Received: from mx1.redhat.com ([209.132.183.28]:59446)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cOliE-0000qQ-Cq
-	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 08:34:42 -0500
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cOliI-0000sh-Nd
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 08:34:46 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Wed,  4 Jan 2017 13:34:11 +0000
-Message-Id: <20170104133414.6524-12-stefanha@redhat.com>
+Date: Wed,  4 Jan 2017 13:34:13 +0000
+Message-Id: <20170104133414.6524-14-stefanha@redhat.com>
 In-Reply-To: <20170104133414.6524-1-stefanha@redhat.com>
 References: <20170104133414.6524-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PULL 11/14] aio: add .io_poll_begin/end() callbacks
+Subject: [Qemu-devel] [PULL 13/14] aio: self-tune polling time
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,273 +26,233 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-The begin and end callbacks can be used to prepare for the polling loop
-and clean up when polling stops.  Note that they may only be called once
-for multiple aio_poll() calls if polling continues to succeed.  Once
-polling fails the end callback is invoked before aio_poll() resumes file
-descriptor monitoring.
+This patch is based on the algorithm for the kvm.ko halt_poll_ns
+parameter in Linux.  The initial polling time is zero.
+
+If the event loop is woken up within the maximum polling time it means
+polling could be effective, so grow polling time.
+
+If the event loop is woken up beyond the maximum polling time it means
+polling is not effective, so shrink polling time.
+
+If the event loop makes progress within the current polling time then
+the sweet spot has been reached.
+
+This algorithm adjusts the polling time so it can adapt to variations in
+workloads.  The goal is to reach the sweet spot while also recognizing
+when polling would hurt more than help.
+
+Two new trace events, poll_grow and poll_shrink, are added for observing
+polling time adjustment.
 
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-id: 20161201192652.9509-11-stefanha@redhat.com
+Message-id: 20161201192652.9509-13-stefanha@redhat.com
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- include/block/aio.h |  20 ++++++++++
- aio-posix.c         | 105 ++++++++++++++++++++++++++++++++++++++++++++--------
- aio-win32.c         |  15 ++++++++
- 3 files changed, 125 insertions(+), 15 deletions(-)
+ include/block/aio.h | 10 +++++++--
+ aio-posix.c         | 58 +++++++++++++++++++++++++++++++++++++++++++++++++----
+ aio-win32.c         |  3 ++-
+ async.c             |  3 +++
+ iothread.c          |  4 ++--
+ trace-events        |  2 ++
+ 6 files changed, 71 insertions(+), 9 deletions(-)
 
 diff --git a/include/block/aio.h b/include/block/aio.h
-index 349143f..3817d17 100644
+index 3817d17..4dca54d 100644
 --- a/include/block/aio.h
 +++ b/include/block/aio.h
-@@ -137,6 +137,9 @@ struct AioContext {
-     /* Maximum polling time in nanoseconds */
-     int64_t poll_max_ns;
+@@ -134,8 +134,11 @@ struct AioContext {
+     /* Number of AioHandlers without .io_poll() */
+     int poll_disable_cnt;
  
-+    /* Are we in polling mode or monitoring file descriptors? */
-+    bool poll_started;
-+
-     /* epoll(7) state used when built with CONFIG_EPOLL */
-     int epollfd;
-     bool epoll_enabled;
-@@ -339,6 +342,14 @@ void aio_set_fd_handler(AioContext *ctx,
-                         AioPollFn *io_poll,
-                         void *opaque);
+-    /* Maximum polling time in nanoseconds */
+-    int64_t poll_max_ns;
++    /* Polling mode parameters */
++    int64_t poll_ns;        /* current polling time in nanoseconds */
++    int64_t poll_max_ns;    /* maximum polling time in nanoseconds */
++    int64_t poll_grow;      /* polling time growth factor */
++    int64_t poll_shrink;    /* polling time shrink factor */
  
-+/* Set polling begin/end callbacks for a file descriptor that has already been
-+ * registered with aio_set_fd_handler.  Do nothing if the file descriptor is
-+ * not registered.
-+ */
-+void aio_set_fd_poll(AioContext *ctx, int fd,
-+                     IOHandler *io_poll_begin,
-+                     IOHandler *io_poll_end);
-+
- /* Register an event notifier and associated callbacks.  Behaves very similarly
-  * to event_notifier_set_handler.  Unlike event_notifier_set_handler, these callbacks
-  * will be invoked when using aio_poll().
-@@ -352,6 +363,15 @@ void aio_set_event_notifier(AioContext *ctx,
-                             EventNotifierHandler *io_read,
-                             AioPollFn *io_poll);
- 
-+/* Set polling begin/end callbacks for an event notifier that has already been
-+ * registered with aio_set_event_notifier.  Do nothing if the event notifier is
-+ * not registered.
-+ */
-+void aio_set_event_notifier_poll(AioContext *ctx,
-+                                 EventNotifier *notifier,
-+                                 EventNotifierHandler *io_poll_begin,
-+                                 EventNotifierHandler *io_poll_end);
-+
- /* Return a GSource that lets the main loop poll the file descriptors attached
-  * to this AioContext.
+     /* Are we in polling mode or monitoring file descriptors? */
+     bool poll_started;
+@@ -511,10 +514,13 @@ void aio_context_setup(AioContext *ctx);
+  * aio_context_set_poll_params:
+  * @ctx: the aio context
+  * @max_ns: how long to busy poll for, in nanoseconds
++ * @grow: polling time growth factor
++ * @shrink: polling time shrink factor
+  *
+  * Poll mode can be disabled by setting poll_max_ns to 0.
   */
+ void aio_context_set_poll_params(AioContext *ctx, int64_t max_ns,
++                                 int64_t grow, int64_t shrink,
+                                  Error **errp);
+ 
+ #endif
 diff --git a/aio-posix.c b/aio-posix.c
-index c6adddb..5216d82 100644
+index 5216d82..1585571 100644
 --- a/aio-posix.c
 +++ b/aio-posix.c
-@@ -30,6 +30,8 @@ struct AioHandler
-     IOHandler *io_read;
-     IOHandler *io_write;
-     AioPollFn *io_poll;
-+    IOHandler *io_poll_begin;
-+    IOHandler *io_poll_end;
-     int deleted;
-     void *opaque;
-     bool is_external;
-@@ -270,6 +272,20 @@ void aio_set_fd_handler(AioContext *ctx,
-     }
- }
- 
-+void aio_set_fd_poll(AioContext *ctx, int fd,
-+                     IOHandler *io_poll_begin,
-+                     IOHandler *io_poll_end)
-+{
-+    AioHandler *node = find_aio_handler(ctx, fd);
-+
-+    if (!node) {
-+        return;
-+    }
-+
-+    node->io_poll_begin = io_poll_begin;
-+    node->io_poll_end = io_poll_end;
-+}
-+
- void aio_set_event_notifier(AioContext *ctx,
-                             EventNotifier *notifier,
-                             bool is_external,
-@@ -280,8 +296,53 @@ void aio_set_event_notifier(AioContext *ctx,
-                        (IOHandler *)io_read, NULL, io_poll, notifier);
- }
- 
-+void aio_set_event_notifier_poll(AioContext *ctx,
-+                                 EventNotifier *notifier,
-+                                 EventNotifierHandler *io_poll_begin,
-+                                 EventNotifierHandler *io_poll_end)
-+{
-+    aio_set_fd_poll(ctx, event_notifier_get_fd(notifier),
-+                    (IOHandler *)io_poll_begin,
-+                    (IOHandler *)io_poll_end);
-+}
-+
-+static void poll_set_started(AioContext *ctx, bool started)
-+{
-+    AioHandler *node;
-+
-+    if (started == ctx->poll_started) {
-+        return;
-+    }
-+
-+    ctx->poll_started = started;
-+
-+    ctx->walking_handlers++;
-+    QLIST_FOREACH(node, &ctx->aio_handlers, node) {
-+        IOHandler *fn;
-+
-+        if (node->deleted) {
-+            continue;
-+        }
-+
-+        if (started) {
-+            fn = node->io_poll_begin;
-+        } else {
-+            fn = node->io_poll_end;
-+        }
-+
-+        if (fn) {
-+            fn(node->opaque);
-+        }
-+    }
-+    ctx->walking_handlers--;
-+}
-+
-+
- bool aio_prepare(AioContext *ctx)
- {
-+    /* Poll mode cannot be used with glib's event loop, disable it. */
-+    poll_set_started(ctx, false);
-+
-     return false;
- }
- 
-@@ -422,6 +483,23 @@ static void add_pollfd(AioHandler *node)
-     npfd++;
- }
- 
-+static bool run_poll_handlers_once(AioContext *ctx)
-+{
-+    bool progress = false;
-+    AioHandler *node;
-+
-+    QLIST_FOREACH(node, &ctx->aio_handlers, node) {
-+        if (!node->deleted && node->io_poll &&
-+                node->io_poll(node->opaque)) {
-+            progress = true;
-+        }
-+
-+        /* Caller handles freeing deleted nodes.  Don't do it here. */
-+    }
-+
-+    return progress;
-+}
-+
- /* run_poll_handlers:
-  * @ctx: the AioContext
-  * @max_ns: maximum time to poll for, in nanoseconds
-@@ -437,7 +515,7 @@ static void add_pollfd(AioHandler *node)
-  */
- static bool run_poll_handlers(AioContext *ctx, int64_t max_ns)
- {
--    bool progress = false;
-+    bool progress;
-     int64_t end_time;
- 
-     assert(ctx->notify_me);
-@@ -449,16 +527,7 @@ static bool run_poll_handlers(AioContext *ctx, int64_t max_ns)
-     end_time = qemu_clock_get_ns(QEMU_CLOCK_REALTIME) + max_ns;
- 
-     do {
--        AioHandler *node;
--
--        QLIST_FOREACH(node, &ctx->aio_handlers, node) {
--            if (!node->deleted && node->io_poll &&
--                node->io_poll(node->opaque)) {
--                progress = true;
--            }
--
--            /* Caller handles freeing deleted nodes.  Don't do it here. */
--        }
-+        progress = run_poll_handlers_once(ctx);
-     } while (!progress && qemu_clock_get_ns(QEMU_CLOCK_REALTIME) < end_time);
- 
-     trace_run_poll_handlers_end(ctx, progress);
-@@ -468,10 +537,9 @@ static bool run_poll_handlers(AioContext *ctx, int64_t max_ns)
- 
- /* try_poll_mode:
-  * @ctx: the AioContext
-- * @blocking: polling is only attempted when blocking is true
-+ * @blocking: busy polling is only attempted when blocking is true
-  *
-- * If blocking is true then ctx->notify_me must be non-zero so this function
-- * can detect aio_notify().
-+ * ctx->notify_me must be non-zero so this function can detect aio_notify().
-  *
-  * Note that the caller must have incremented ctx->walking_handlers.
-  *
-@@ -485,13 +553,20 @@ static bool try_poll_mode(AioContext *ctx, bool blocking)
-                              (uint64_t)ctx->poll_max_ns);
+@@ -550,7 +550,7 @@ static bool try_poll_mode(AioContext *ctx, bool blocking)
+     if (blocking && ctx->poll_max_ns && ctx->poll_disable_cnt == 0) {
+         /* See qemu_soonest_timeout() uint64_t hack */
+         int64_t max_ns = MIN((uint64_t)aio_compute_timeout(ctx),
+-                             (uint64_t)ctx->poll_max_ns);
++                             (uint64_t)ctx->poll_ns);
  
          if (max_ns) {
-+            poll_set_started(ctx, true);
+             poll_set_started(ctx, true);
+@@ -576,6 +576,7 @@ bool aio_poll(AioContext *ctx, bool blocking)
+     int ret = 0;
+     bool progress;
+     int64_t timeout;
++    int64_t start = 0;
+ 
+     aio_context_acquire(ctx);
+     progress = false;
+@@ -593,6 +594,10 @@ bool aio_poll(AioContext *ctx, bool blocking)
+ 
+     ctx->walking_handlers++;
+ 
++    if (ctx->poll_max_ns) {
++        start = qemu_clock_get_ns(QEMU_CLOCK_REALTIME);
++    }
 +
-             if (run_poll_handlers(ctx, max_ns)) {
-                 return true;
-             }
-         }
+     if (try_poll_mode(ctx, blocking)) {
+         progress = true;
+     } else {
+@@ -635,6 +640,47 @@ bool aio_poll(AioContext *ctx, bool blocking)
+         atomic_sub(&ctx->notify_me, 2);
      }
  
--    return false;
-+    poll_set_started(ctx, false);
++    /* Adjust polling time */
++    if (ctx->poll_max_ns) {
++        int64_t block_ns = qemu_clock_get_ns(QEMU_CLOCK_REALTIME) - start;
 +
-+    /* Even if we don't run busy polling, try polling once in case it can make
-+     * progress and the caller will be able to avoid ppoll(2)/epoll_wait(2).
-+     */
-+    return run_poll_handlers_once(ctx);
++        if (block_ns <= ctx->poll_ns) {
++            /* This is the sweet spot, no adjustment needed */
++        } else if (block_ns > ctx->poll_max_ns) {
++            /* We'd have to poll for too long, poll less */
++            int64_t old = ctx->poll_ns;
++
++            if (ctx->poll_shrink) {
++                ctx->poll_ns /= ctx->poll_shrink;
++            } else {
++                ctx->poll_ns = 0;
++            }
++
++            trace_poll_shrink(ctx, old, ctx->poll_ns);
++        } else if (ctx->poll_ns < ctx->poll_max_ns &&
++                   block_ns < ctx->poll_max_ns) {
++            /* There is room to grow, poll longer */
++            int64_t old = ctx->poll_ns;
++            int64_t grow = ctx->poll_grow;
++
++            if (grow == 0) {
++                grow = 2;
++            }
++
++            if (ctx->poll_ns) {
++                ctx->poll_ns *= grow;
++            } else {
++                ctx->poll_ns = 4000; /* start polling at 4 microseconds */
++            }
++
++            if (ctx->poll_ns > ctx->poll_max_ns) {
++                ctx->poll_ns = ctx->poll_max_ns;
++            }
++
++            trace_poll_grow(ctx, old, ctx->poll_ns);
++        }
++    }
++
+     aio_notify_accept(ctx);
+ 
+     /* if we have any readable fds, dispatch event */
+@@ -678,12 +724,16 @@ void aio_context_setup(AioContext *ctx)
+ #endif
  }
  
- bool aio_poll(AioContext *ctx, bool blocking)
+-void aio_context_set_poll_params(AioContext *ctx, int64_t max_ns, Error **errp)
++void aio_context_set_poll_params(AioContext *ctx, int64_t max_ns,
++                                 int64_t grow, int64_t shrink, Error **errp)
+ {
+-    /* No thread synchronization here, it doesn't matter if an incorrect poll
+-     * timeout is used once.
++    /* No thread synchronization here, it doesn't matter if an incorrect value
++     * is used once.
+      */
+     ctx->poll_max_ns = max_ns;
++    ctx->poll_ns = 0;
++    ctx->poll_grow = grow;
++    ctx->poll_shrink = shrink;
+ 
+     aio_notify(ctx);
+ }
 diff --git a/aio-win32.c b/aio-win32.c
-index 0a6e91b..d0e40a8 100644
+index d0e40a8..d19dc42 100644
 --- a/aio-win32.c
 +++ b/aio-win32.c
-@@ -102,6 +102,13 @@ void aio_set_fd_handler(AioContext *ctx,
-     aio_notify(ctx);
- }
- 
-+void aio_set_fd_poll(AioContext *ctx, int fd,
-+                     IOHandler *io_poll_begin,
-+                     IOHandler *io_poll_end)
-+{
-+    /* Not implemented */
-+}
-+
- void aio_set_event_notifier(AioContext *ctx,
-                             EventNotifier *e,
-                             bool is_external,
-@@ -153,6 +160,14 @@ void aio_set_event_notifier(AioContext *ctx,
-     aio_notify(ctx);
- }
- 
-+void aio_set_event_notifier_poll(AioContext *ctx,
-+                                 EventNotifier *notifier,
-+                                 EventNotifierHandler *io_poll_begin,
-+                                 EventNotifierHandler *io_poll_end)
-+{
-+    /* Not implemented */
-+}
-+
- bool aio_prepare(AioContext *ctx)
+@@ -395,7 +395,8 @@ void aio_context_setup(AioContext *ctx)
  {
-     static struct timeval tv0;
+ }
+ 
+-void aio_context_set_poll_params(AioContext *ctx, int64_t max_ns, Error **errp)
++void aio_context_set_poll_params(AioContext *ctx, int64_t max_ns,
++                                 int64_t grow, int64_t shrink, Error **errp)
+ {
+     error_setg(errp, "AioContext polling is not implemented on Windows");
+ }
+diff --git a/async.c b/async.c
+index 29abf40..2960171 100644
+--- a/async.c
++++ b/async.c
+@@ -385,7 +385,10 @@ AioContext *aio_context_new(Error **errp)
+     qemu_rec_mutex_init(&ctx->lock);
+     timerlistgroup_init(&ctx->tlg, aio_timerlist_notify, ctx);
+ 
++    ctx->poll_ns = 0;
+     ctx->poll_max_ns = 0;
++    ctx->poll_grow = 0;
++    ctx->poll_shrink = 0;
+ 
+     return ctx;
+ fail:
+diff --git a/iothread.c b/iothread.c
+index 8dfd10d..28598b5 100644
+--- a/iothread.c
++++ b/iothread.c
+@@ -98,7 +98,7 @@ static void iothread_complete(UserCreatable *obj, Error **errp)
+         return;
+     }
+ 
+-    aio_context_set_poll_params(iothread->ctx, iothread->poll_max_ns,
++    aio_context_set_poll_params(iothread->ctx, iothread->poll_max_ns, 0, 0,
+                                 &local_error);
+     if (local_error) {
+         error_propagate(errp, local_error);
+@@ -158,7 +158,7 @@ static void iothread_set_poll_max_ns(Object *obj, Visitor *v,
+     iothread->poll_max_ns = value;
+ 
+     if (iothread->ctx) {
+-        aio_context_set_poll_params(iothread->ctx, value, &local_err);
++        aio_context_set_poll_params(iothread->ctx, value, 0, 0, &local_err);
+     }
+ 
+ out:
+diff --git a/trace-events b/trace-events
+index 7fe3a1b..1181486 100644
+--- a/trace-events
++++ b/trace-events
+@@ -28,6 +28,8 @@
+ # aio-posix.c
+ run_poll_handlers_begin(void *ctx, int64_t max_ns) "ctx %p max_ns %"PRId64
+ run_poll_handlers_end(void *ctx, bool progress) "ctx %p progress %d"
++poll_shrink(void *ctx, int64_t old, int64_t new) "ctx %p old %"PRId64" new %"PRId64
++poll_grow(void *ctx, int64_t old, int64_t new) "ctx %p old %"PRId64" new %"PRId64
+ 
+ # thread-pool.c
+ thread_pool_submit(void *pool, void *req, void *opaque) "pool %p req %p opaque %p"
 -- 
 2.9.3
