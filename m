@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46980)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47132)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cOZKJ-0001jb-TP
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 19:21:13 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cOZKh-0001wJ-VH
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 19:21:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cOZKG-0005yC-0h
-	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 19:21:11 -0500
-Date: Wed, 4 Jan 2017 10:39:37 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1cOZKg-00069K-Qd
+	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 19:21:35 -0500
+Date: Wed, 4 Jan 2017 11:05:28 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170103233937.GT12761@umbus.fritz.box>
+Message-ID: <20170104000528.GV12761@umbus.fritz.box>
 References: <1483049536-21548-1-git-send-email-hpoussin@reactos.org>
-	<1483049536-21548-6-git-send-email-hpoussin@reactos.org>
-	<20170103045705.GQ12761@umbus.fritz.box>
-	<0e3da19e-d070-f901-f9e5-f68d552cef72@reactos.org>
+	<1483049536-21548-3-git-send-email-hpoussin@reactos.org>
+	<20170102230212.GF12761@umbus.fritz.box>
+	<38325f34-9511-bb4e-2224-097bd9a88d7e@reactos.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="nNx5P6V1TPcCvZS+"
+	protocol="application/pgp-signature"; boundary="D/26AIznG/rf8cgR"
 Content-Disposition: inline
-In-Reply-To: <0e3da19e-d070-f901-f9e5-f68d552cef72@reactos.org>
-Subject: Re: [Qemu-devel] [PATCH 5/6] prep: add IBM RS/6000 7020 (40p)
- memory controller
+In-Reply-To: <38325f34-9511-bb4e-2224-097bd9a88d7e@reactos.org>
+Subject: Re: [Qemu-devel] [PATCH 2/6] vga: increase priority of 0xa0000
+ memory region
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,341 +31,102 @@ To: =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>
 Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Thomas Huth <thuth@redhat.com>, Giancarlo Teodori <gteodori@gmail.com>
 
 
---nNx5P6V1TPcCvZS+
+--D/26AIznG/rf8cgR
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jan 03, 2017 at 11:55:10PM +0100, Herv=E9 Poussineau wrote:
-> Le 03/01/2017 =E0 05:57, David Gibson a =E9crit :
-> > On Thu, Dec 29, 2016 at 11:12:15PM +0100, Herv=E9 Poussineau wrote:
+On Tue, Jan 03, 2017 at 11:37:20PM +0100, Herv=E9 Poussineau wrote:
+> Le 03/01/2017 =E0 00:02, David Gibson a =E9crit :
+> > On Thu, Dec 29, 2016 at 11:12:12PM +0100, Herv=E9 Poussineau wrote:
+> > > VGA device registers vram as BAR 0. If this BAR is activated as a ver=
+y low address which
+> > > crosses 0xa0000-0xbffff, low memory region is not accessible anymore.
+> > >=20
+> > > This fixes display on PReP machine if we enable PCI mapping at
+> > > address 0.
+> >=20
+> > This commit message needs more information.  What exactly is the VGA
+> > BAR colliding with?  Why does the other thing have higher priority?
+> > Why is it safe for the VGA BAR to override the other thing?  Why is
+> > this safe on all platforms?
+>=20
+> VGA has (basically) two memory regions:
+> - the legacy one, from 0xa0000 to 0xbffff
+> - a memory region describing the whole VRAM, configurable with PCI BAR 0.
+
+Yes, that I know.  Note that both the fixed 0xa0000 and the BAR value
+are offsets with *PCI* memory space, which may not be the same as
+addresses in system memory space.  PCI memory space is identity mapped
+into system address space on x86, IIRC, but it's not on spapr.  AFAICT
+it's not identity mapped on PReP either (see raven_pcihost_initfn()).
+So the VGA legacy window will actually be at 0xc00a0000 and BAR0 at
+(0xc0000000 + BAR value) in the _system_ address space if I'm reading
+the PReP PCI bridge code correctly.
+
+> In QEMU, mapping PCI at address 0 is not permitted (MachineClass->pci_all=
+ow_0_address is false by default),
+
+I believe this is because of the identity map of PCI memory space on
+x86 (well, PC, strictly speaking).  Because that's not the case on
+PReP, it should probably set allow_0_address =3D true.
+
+> except on arm/virt and ppc/spapr. So, this is usually not a problem as al=
+l PCI BARs (including video PCI BAR 0) are not mapped at
+> address 0, and so both memory regions can't collide.
+>=20
+> When trying Linux on ppc/40p (introduced later in this patchset), I saw t=
+hat Linux assigns
+> PCI BAR addresses in the order of PCI devices detection, and VGA PCI BAR =
+0 ends up at address 0.
+
+Hmm.  You're saying that Linux is assigning BAR 0 so that it collides
+with the legacy memory region?  That sounds like a Linux bug.
+Or.. does Linux always assign BARs on PReP, or only if the firmware
+doesn't?  Maybe the guest firmware needs to assign the BARs properly
+to avoid this collision.
+
+> However, Linux assumes that 0xa0000-0xbffff is still available to drive t=
+he VGA card in text mode.
+> Without changing the region priority, VGA output is garbled (as writes di=
+rectly go to VGA memory).
+> When increasing the region priority, VGA output is restored (as writes go=
+ to legacy address space).
+
+Right.  But by increasing the priority, you're effectively making a
+hole in BAR0.  That sounds like it will cause chaos if after boot you
+load a "real" VGA driver which tries to use the full video RAM through
+BAR0 instead of via the legacy area.
+
+> arm/virt by default doesn't have a PCI VGA card.
+> ppc/spapr may probably have the same problem as ppc/40p. However, as VGA =
+PCI BAR 0 and VGA legacy space
+> both have a priority of 1, it may probably have a problem. I only need to=
+ convince Linux to use address 0 for VGA PCI BAR.
+>=20
+> Herv=E9
+>=20
+> >=20
 > > > Signed-off-by: Herv=E9 Poussineau <hpoussin@reactos.org>
 > > > ---
-> > >  default-configs/ppc-softmmu.mak |   1 +
-> > >  hw/ppc/Makefile.objs            |   1 +
-> > >  hw/ppc/rs6000_mc.c              | 232 ++++++++++++++++++++++++++++++=
-++++++++++
-> > >  hw/ppc/trace-events             |   7 ++
-> > >  4 files changed, 241 insertions(+)
-> > >  create mode 100644 hw/ppc/rs6000_mc.c
+> > >  hw/display/vga.c | 2 +-
+> > >  1 file changed, 1 insertion(+), 1 deletion(-)
 > > >=20
-> > > diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-so=
-ftmmu.mak
-> > > index d4d0f9b..e567658 100644
-> > > --- a/default-configs/ppc-softmmu.mak
-> > > +++ b/default-configs/ppc-softmmu.mak
-> > > @@ -47,3 +47,4 @@ CONFIG_LIBDECNUMBER=3Dy
-> > >  # For PReP
-> > >  CONFIG_MC146818RTC=3Dy
-> > >  CONFIG_ISA_TESTDEV=3Dy
-> > > +CONFIG_RS6000_MC=3Dy
-> > > diff --git a/hw/ppc/Makefile.objs b/hw/ppc/Makefile.objs
-> > > index db72297..0012934 100644
-> > > --- a/hw/ppc/Makefile.objs
-> > > +++ b/hw/ppc/Makefile.objs
-> > > @@ -17,6 +17,7 @@ obj-y +=3D ppc4xx_pci.o
-> > >  # PReP
-> > >  obj-$(CONFIG_PREP) +=3D prep.o
-> > >  obj-$(CONFIG_PREP) +=3D prep_systemio.o
-> > > +obj-${CONFIG_RS6000_MC} +=3D rs6000_mc.o
-> > >  # OldWorld PowerMac
-> > >  obj-$(CONFIG_MAC) +=3D mac_oldworld.o
-> > >  # NewWorld PowerMac
-> > > diff --git a/hw/ppc/rs6000_mc.c b/hw/ppc/rs6000_mc.c
-> > > new file mode 100644
-> > > index 0000000..c684421
-> > > --- /dev/null
-> > > +++ b/hw/ppc/rs6000_mc.c
-> > > @@ -0,0 +1,232 @@
-> > > +/*
-> > > + * QEMU RS/6000 memory controller
-> > > + *
-> > > + * Copyright (c) 2016 Herv=E9 Poussineau
-> > > + *
-> > > + * This program is free software: you can redistribute it and/or mod=
-ify
-> > > + * it under the terms of the GNU General Public License as published=
- by
-> > > + * the Free Software Foundation, either version 2 of the License, or
-> > > + * (at your option) version 3 or any later version.
-> > > + *
-> > > + * This program is distributed in the hope that it will be useful,
-> > > + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> > > + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> > > + * GNU General Public License for more details.
-> > > + *
-> > > + * You should have received a copy of the GNU General Public License
-> > > + * along with this program.  If not, see <http://www.gnu.org/license=
-s/>.
-> > > + */
-> > > +
-> > > +#include "qemu/osdep.h"
-> > > +#include "hw/isa/isa.h"
-> > > +#include "exec/address-spaces.h"
-> > > +#include "hw/boards.h"
-> > > +#include "qapi/error.h"
-> > > +#include "trace.h"
-> > > +
-> > > +#define TYPE_RS6000MC "rs6000-mc"
-> > > +#define RS6000MC_DEVICE(obj) \
-> > > +    OBJECT_CHECK(RS6000MCState, (obj), TYPE_RS6000MC)
-> > > +
-> > > +typedef struct RS6000MCState {
-> > > +    ISADevice parent_obj;
-> > > +    /* see US patent 5,684,979 for details (expired 2001-11-04) */
-> > > +    uint32_t ram_size;
-> > > +    bool autoconfigure;
-> > > +    MemoryRegion simm[6];
-> > > +    unsigned int simm_size[6];
-> > > +    uint32_t end_address[8];
-> > > +    uint8_t port0820_index;
-> > > +    PortioList portio;
-> > > +} RS6000MCState;
-> > > +
-> > > +/* P0RT 0803 -- SIMM ID Register (32/8 MB) (Read Only) */
-> > > +
-> > > +static uint32_t rs6000mc_port0803_read(void *opaque, uint32_t addr)
-> > > +{
-> > > +    RS6000MCState *s =3D opaque;
-> > > +    uint32_t val =3D 0;
-> > > +    int socket;
-> > > +
-> > > +    /* (1 << socket) indicates 32 MB SIMM at given socket */
-> > > +    for (socket =3D 0; socket < 6; socket++) {
-> > > +        if (s->simm_size[socket] =3D=3D 32) {
-> > > +            val |=3D (1 << socket);
-> > > +        }
-> > > +    }
-> > > +
-> > > +    trace_rs6000mc_id_read(addr, val);
-> > > +    return val;
-> > > +}
-> > > +
-> > > +/* PORT 0804 -- SIMM Presence Register (Read Only) */
-> > > +
-> > > +static uint32_t rs6000mc_port0804_read(void *opaque, uint32_t addr)
-> > > +{
-> > > +    RS6000MCState *s =3D opaque;
-> > > +    uint32_t val =3D 0xff;
-> > > +    int socket;
-> > > +
-> > > +    /* (1 << socket) indicates SIMM absence at given socket */
-> > > +    for (socket =3D 0; socket < 6; socket++) {
-> > > +        if (s->simm_size[socket]) {
-> > > +            val &=3D ~(1 << socket);
-> > > +        }
-> > > +    }
-> > > +    s->port0820_index =3D 0;
-> > > +
-> > > +    trace_rs6000mc_presence_read(addr, val);
-> > > +    return val;
-> > > +}
-> > > +
-> > > +/* Memory Controller Size Programming Register */
-> > > +
-> > > +static uint32_t rs6000mc_port0820_read(void *opaque, uint32_t addr)
-> > > +{
-> > > +    RS6000MCState *s =3D opaque;
-> > > +    uint32_t val =3D s->end_address[s->port0820_index] & 0x1f;
-> > > +    s->port0820_index =3D (s->port0820_index + 1) & 7;
-> > > +    trace_rs6000mc_size_read(addr, val);
-> > > +    return val;
-> > > +}
-> > > +
-> > > +static void rs6000mc_port0820_write(void *opaque, uint32_t addr, uin=
-t32_t val)
-> > > +{
-> > > +    RS6000MCState *s =3D opaque;
-> > > +    uint8_t socket =3D val >> 5;
-> > > +    uint32_t end_address =3D val & 0x1f;
-> > > +
-> > > +    trace_rs6000mc_size_write(addr, val);
-> > > +    s->end_address[socket] =3D end_address;
-> > > +    if (socket > 0 && socket < 7) {
-> > > +        if (s->simm_size[socket - 1]) {
-> > > +            uint32_t size;
-> > > +            uint32_t start_address =3D 0;
-> > > +            if (socket > 1) {
-> > > +                start_address =3D s->end_address[socket - 1];
-> > > +            }
-> > > +
-> > > +            size =3D end_address - start_address;
-> > > +            memory_region_set_enabled(&s->simm[socket - 1], size !=
-=3D 0);
-> > > +            memory_region_set_address(&s->simm[socket - 1],
-> > > +                                      start_address * 8 * 1024 * 102=
-4);
-> > > +        }
-> > > +    }
-> > > +}
-> > > +
-> > > +/* Read Memory Parity Error */
-> > > +
-> > > +enum {
-> > > +    PORT0841_NO_ERROR_DETECTED =3D 0x01,
-> > > +};
-> > > +
-> > > +static uint32_t rs6000mc_port0841_read(void *opaque, uint32_t addr)
-> > > +{
-> > > +    uint32_t val =3D PORT0841_NO_ERROR_DETECTED;
-> > > +    trace_rs6000mc_parity_read(addr, val);
-> > > +    return val;
-> > > +}
-> > > +
-> > > +static const MemoryRegionPortio rs6000mc_port_list[] =3D {
-> > > +    { 0x803, 1, 1, .read =3D rs6000mc_port0803_read },
-> > > +    { 0x804, 1, 1, .read =3D rs6000mc_port0804_read },
-> > > +    { 0x820, 1, 1, .read =3D rs6000mc_port0820_read,
-> > > +                   .write =3D rs6000mc_port0820_write, },
-> > > +    { 0x841, 1, 1, .read =3D rs6000mc_port0841_read },
-> > > +    PORTIO_END_OF_LIST()
-> > > +};
-> > > +
-> > > +static void rs6000mc_realize(DeviceState *dev, Error **errp)
-> > > +{
-> > > +    RS6000MCState *s =3D RS6000MC_DEVICE(dev);
-> > > +    int socket =3D 0;
-> > > +    unsigned int ram_size =3D s->ram_size / (1024 * 1024);
-> > > +
-> > > +    while (socket < 6) {
-> > > +        if (ram_size >=3D 64) {
-> > > +            s->simm_size[socket] =3D 32;
-> > > +            s->simm_size[socket + 1] =3D 32;
-> > > +            ram_size -=3D 64;
-> > > +        } else if (ram_size >=3D 16) {
-> > > +            s->simm_size[socket] =3D 8;
-> > > +            s->simm_size[socket + 1] =3D 8;
-> > > +            ram_size -=3D 16;
-> > > +        } else {
-> > > +            /* Not enough memory */
-> > > +            break;
-> > > +        }
-> > > +        socket +=3D 2;
-> > > +    }
-> >=20
-> > Surely this needs some warning if you try to set ram-size greater than
-> > the hardware can support (192MiB, IIUC).
->=20
-> 10 lines later, if you were unable to map the whole requested RAM, you'll=
- get an error.
-
-Sorry, missed that.
-
-> >> +    if (ram_size) {
-> >> +        /* unable to push all requested RAM in SIMMs */
-> >> +        error_setg(errp, "RAM size incompatible with this board. "
-> >> +                   "Try again with something else, like %d MB",
-> >> +                   s->ram_size / 1024 / 1024 - ram_size);
-> >> +        return;
-> >> +    }
->=20
-> Is it enough?
-
-
-Yes, that should be fine.
-
-> > > +    for (socket =3D 0; socket < 6; socket++) {
-> > > +        if (s->simm_size[socket]) {
-> > > +            char name[] =3D "simm.?";
-> > > +            name[5] =3D socket + '0';
-> > > +            memory_region_allocate_system_memory(&s->simm[socket], O=
-BJECT(dev),
-> > > +                                                 name, s->simm_size[=
-socket]
-> > > +                                                 * 1024 * 1024);
-> > > +            memory_region_add_subregion_overlap(get_system_memory(),=
- 0,
-> > > +                                                &s->simm[socket], so=
-cket);
-> > > +        }
-> > > +    }
-> > > +    if (ram_size) {
-> > > +        /* unable to push all requested RAM in SIMMs */
-> > > +        error_setg(errp, "RAM size incompatible with this board. "
-> > > +                   "Try again with something else, like %d MB",
-> > > +                   s->ram_size / 1024 / 1024 - ram_size);
-> > > +        return;
-> > > +    }
-> > > +
-> > > +    if (s->autoconfigure) {
-> > > +        uint32_t start_address =3D 0;
-> > > +        for (socket =3D 0; socket < 6; socket++) {
-> > > +            if (s->simm_size[socket]) {
-> > > +                memory_region_set_enabled(&s->simm[socket], true);
-> > > +                memory_region_set_address(&s->simm[socket], start_ad=
-dress);
-> > > +                start_address +=3D memory_region_size(&s->simm[socke=
-t]);
-> > > +            }
-> > > +        }
-> > > +    }
-> > > +
-> > > +    isa_register_portio_list(ISA_DEVICE(dev), &s->portio, 0x0,
-> > > +                             rs6000mc_port_list, s, "rs6000mc");
-> > > +}
-> > > +
-> > > +static const VMStateDescription vmstate_rs6000mc =3D {
-> > > +    .name =3D "rs6000-mc",
-> > > +    .version_id =3D 1,
-> > > +    .minimum_version_id =3D 1,
-> > > +    .fields =3D (VMStateField[]) {
-> > > +        VMSTATE_UINT8(port0820_index, RS6000MCState),
-> > > +        VMSTATE_END_OF_LIST()
-> > > +    },
-> > > +};
-> > > +
-> > > +static Property rs6000mc_properties[] =3D {
-> > > +    DEFINE_PROP_UINT32("ram-size", RS6000MCState, ram_size, 0),
-> > > +    DEFINE_PROP_BOOL("auto-configure", RS6000MCState, autoconfigure,=
- true),
-> > > +    DEFINE_PROP_END_OF_LIST()
-> > > +};
-> > > +
-> > > +static void rs6000mc_class_initfn(ObjectClass *klass, void *data)
-> > > +{
-> > > +    DeviceClass *dc =3D DEVICE_CLASS(klass);
-> > > +
-> > > +    dc->realize =3D rs6000mc_realize;
-> > > +    dc->vmsd =3D &vmstate_rs6000mc;
-> > > +    dc->props =3D rs6000mc_properties;
-> > > +}
-> > > +
-> > > +static const TypeInfo rs6000mc_info =3D {
-> > > +    .name          =3D TYPE_RS6000MC,
-> > > +    .parent        =3D TYPE_ISA_DEVICE,
-> > > +    .instance_size =3D sizeof(RS6000MCState),
-> > > +    .class_init    =3D rs6000mc_class_initfn,
-> > > +};
-> > > +
-> > > +static void rs6000mc_types(void)
-> > > +{
-> > > +    type_register_static(&rs6000mc_info);
-> > > +}
-> > > +
-> > > +type_init(rs6000mc_types)
-> > > diff --git a/hw/ppc/trace-events b/hw/ppc/trace-events
-> > > index 2ba6166..42b8ec0 100644
-> > > --- a/hw/ppc/trace-events
-> > > +++ b/hw/ppc/trace-events
-> > > @@ -78,3 +78,10 @@ prep_io_800_readb(uint32_t addr, uint32_t retval) =
-"0x%08" PRIx32 " <=3D 0x%02" PRI
-> > >  # hw/ppc/prep_systemio.c
-> > >  prep_systemio_read(uint32_t addr, uint32_t val) "read addr=3D%x val=
-=3D%x"
-> > >  prep_systemio_write(uint32_t addr, uint32_t val) "write addr=3D%x va=
-l=3D%x"
-> > > +
-> > > +# hw/ppc/rs6000_mc.c
-> > > +rs6000mc_id_read(uint32_t addr, uint32_t val) "read addr=3D%x val=3D=
-%x"
-> > > +rs6000mc_presence_read(uint32_t addr, uint32_t val) "read addr=3D%x =
-val=3D%x"
-> > > +rs6000mc_size_read(uint32_t addr, uint32_t val) "read addr=3D%x val=
-=3D%x"
-> > > +rs6000mc_size_write(uint32_t addr, uint32_t val) "write addr=3D%x va=
-l=3D%x"
-> > > +rs6000mc_parity_read(uint32_t addr, uint32_t val) "read addr=3D%x va=
-l=3D%x"
+> > > diff --git a/hw/display/vga.c b/hw/display/vga.c
+> > > index 2a88b3c..c573f35 100644
+> > > --- a/hw/display/vga.c
+> > > +++ b/hw/display/vga.c
+> > > @@ -2265,7 +2265,7 @@ void vga_init(VGACommonState *s, Object *obj, M=
+emoryRegion *address_space,
+> > >      memory_region_add_subregion_overlap(address_space,
+> > >                                          0x000a0000,
+> > >                                          vga_io_memory,
+> > > -                                        1);
+> > > +                                        2);
+> > >      memory_region_set_coalescing(vga_io_memory);
+> > >      if (init_vga_ports) {
+> > >          portio_list_init(&s->vga_port_list, obj, vga_ports, s, "vga"=
+);
 > >=20
 >=20
 
@@ -375,25 +136,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---nNx5P6V1TPcCvZS+
+--D/26AIznG/rf8cgR
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJYbDY2AAoJEGw4ysog2bOSmHcP/j4jESi2jSNUb0ROQUluiaT7
-MXGL2jZzNhD7Vbjs9fka0dTJItEB3FjeT62cide48iCawQmNh5TvZsTn5EiOAL8o
-fWHQraYurfO8EVlJLoi2FtaRT7IUZEi2u8SGW6mxjCyd6t5tmaCINuwEMliNL+0f
-c2n9pp6j7VOwZY8aXly8VRYyMP+Lvr0SYhxtugC94ksxQ6rep8K74cRid9iPRVJZ
-R2oyEcvIf+pajtf57/O4BgN5J3B4EI3bp41SfRZ0Bu0EFrKaon1o+/HA1yU0Gse4
-vR4PTpjvo6zdKxmT3REgGIYq7qYuc0kcTmuvGzDUhscyneKDzLEldrvZq09ejYnT
-Xnu4+FfuomGB2nwtRKSR0Hh+U5DA/HREidyzoIRUq/FQej/lp6okj6IFNxbJMJWr
-qIvhr0koiZeZEj5trFOA4siGoQMtdf57QvXQU1a7sl/eQueG6nWr/k3duR/inZid
-jfOk6nfJy/hJoo6q37JEJ8pgnnxVzSiwSuBa8Qpo4UP0LcsclAZyr6vVEMIcxY4f
-Wnp36eRtbOzVkoxIq0Qq8yKbJFFL3OZQiqaF1/b5glDC0ON+M5UW5Wb7a90GChds
-emc8vKxRaXQQrqDB4U57rtTqQl9fJydpaeRyIAyM2XdlzPBVCPCO7xQsafBzHqy2
-Nc3q3u3pD6ybZeBfJ+3J
-=2NQE
+iQIcBAEBCAAGBQJYbDxGAAoJEGw4ysog2bOSENgP/RLJJLh8Cp1m0gy9X2E2dy6I
+LWZpl53LmNdGT4CVBy6Q5rvkul9Ca5DdjCzs2vd99kVjAuE0G8GAdttAttUl4APt
+yejSY3WxeYuYnViiqQIeTvLJoK9w39sGa0FXPTqnSyGZgwq4glbURkBY4o5Iom+R
++hUjnRVMvsR6Qa3WtyOeCs2WBLPWfR6QMCnMJwOWYX3rUaukohVKuPjWIf4Y+Qpp
+6u572yKs17Xzk3PdzjyWFZ4X3agkC9dv7kvxgdi4EXDhXU0ynuOrhS7u6t+BpzBv
+n2JE6av3rOBcMnOzZJ1TMjQxggsY9x9L8NQWmGCFrjsi6TyV2je8wT1mgGI+vJj5
+cGZglcNsVJ7MC1b18FJczTF5Slaq7YLX2Rw0U/QMTisx+Un2I6i3jCd4WD+E32Wd
+6n+EyT5RTBWKxppXl0C9YQixxJjLl2kdmtPZMh//Tt0Eie2rk99BAkDm2OZJ4MUE
+pdHsPjQHdaBknMVGeIS6FHGqboLQkuYV6Ug2CGVuj9cRSfNjy4jPj41m8S59Xz86
+3eTwzRNMlVeWmFhwPaAkIV1IHvm+McpT0/nPxBgTtAlQJ3OxGqTIqWJ/i5GzcUmu
+lZ9rmWl8DPgChpnuosJIQRXIEzUhJiV9vRq265Kk6oZ+01byjv5MJp/kQYxuLmub
+ghPqhjYCySEClGCrIhEg
+=h5vN
 -----END PGP SIGNATURE-----
 
---nNx5P6V1TPcCvZS+--
+--D/26AIznG/rf8cgR--
