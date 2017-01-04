@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33722)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33727)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cOdDy-0004S1-6D
+	(envelope-from <bounces@canonical.com>) id 1cOdDy-0004S5-6m
 	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 23:30:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cOdDw-0004tL-Dm
+	(envelope-from <bounces@canonical.com>) id 1cOdDw-0004tq-Ob
 	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 23:30:54 -0500
-Received: from indium.canonical.com ([91.189.90.7]:60587)
+Received: from indium.canonical.com ([91.189.90.7]:60608)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cOdDw-0004sD-7q
+	id 1cOdDw-0004sg-IP
 	for qemu-devel@nongnu.org; Tue, 03 Jan 2017 23:30:52 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cOdDu-0002S0-Kt
-	for <qemu-devel@nongnu.org>; Wed, 04 Jan 2017 04:30:50 +0000
+	id 1cOdDv-0002TA-4b
+	for <qemu-devel@nongnu.org>; Wed, 04 Jan 2017 04:30:51 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 1AA7B2E80D2
+	by loganberry.canonical.com (Postfix) with ESMTP id BABFC2E80DA
 	for <qemu-devel@nongnu.org>; Wed,  4 Jan 2017 04:30:50 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 04 Jan 2017 04:17:40 -0000
-From: Launchpad Bug Tracker <612297@bugs.launchpad.net>
-Reply-To: Bug 612297 <612297@bugs.launchpad.net>
+Date: Wed, 04 Jan 2017 04:18:03 -0000
+From: Launchpad Bug Tracker <590552@bugs.launchpad.net>
+Reply-To: Bug 590552 <590552@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20100801164711.20463.98993.malonedeb@soybean.canonical.com>
-Message-Id: <20170104041741.27545.3997.malone@loganberry.canonical.com>
+References: <20100606230821.4593.45646.malonedeb@soybean.canonical.com>
+Message-Id: <20170104041803.27545.18572.malone@loganberry.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 612297] Re: qemu-kvm fails to detect mouse while
- Windows 95 setup
+Subject: [Qemu-devel] [Bug 590552] Re: New default network card doesn't work
+ with tap networking
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,33 +48,37 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/612297
+https://bugs.launchpad.net/bugs/590552
 
 Title:
-  qemu-kvm fails to detect mouse while Windows 95 setup
+  New default network card doesn't work with tap networking
 
 Status in QEMU:
   Expired
 
 Bug description:
-  CPU: AMD Phenom II X4 945
-  KVM-Version: qemu-kvm-0.12.4+dfsg (Debian package)
-  Kernel: linux-2.6.26.8-rt16
-  arch: x86_64
-  Guest: Windows 95 B
+  Unfortunately, I can provide very little information.
 
-  I'm trying to install Windows 95 B on qemu-kvm with this options:
+  Hope this will be useful anyway.
 
-  kvm /var/mmn/vm/Win95/Win95.img -name "Windows 95" -M pc-0.12 -m 512M
-  -rtc base=3Dlocaltime -k de -soundhw sb16 -vga cirrus -net
-  user,hostname=3Dw95vm -net nic,model=3Dne2k_pci -boot a -fda
-  /var/mmn/vm/floppy/win95B_Drive-D-boot.img -cdrom
-  /var/mmn/vm/CD/win95-setup.iso -no-acpi -no-kvm -usb
+  I've upgraded qemu using debian apt to lastest unstable (QEMU PC
+  emulator version 0.12.4 (Debian 0.12.4+dfsg-2), Copyright (c)
+  2003-2008 Fabrice Bellard): looks like at some point the default
+  network card for -net nic option was switched to intel gigabit instead
+  of the good old ne2k_pci.
 
-  I've also tried some other option, but always the same: no ps/2 mouse
-  detection. And usb mouse is not supported by Windows 95 B while setup
-  process. This is only possible later by installing the extension
-  usbsupp.exe after the system setup.
+  I was using -net tap -net nic options and my network stopped working.
+  When not working,
+  - tcpdump on the host shows me taht all packets are sent and received fin=
+e from guest
+  - tcpdump on guest shows that packets from host are NOT received
+
+  obviously, both host tap interface and guest eth0 interfaces, routing
+  tables, dns, firewall, etc... are well configured.
+
+  Having banged my head for a while, I finally stopped the host and
+  started it again using -net nic,model=3Dne2k_pci option, then my network
+  magically started working again.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/612297/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/590552/+subscriptions
