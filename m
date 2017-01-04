@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52451)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52449)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cOjdN-0001lo-4S
+	(envelope-from <kraxel@redhat.com>) id 1cOjdN-0001lm-3z
 	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 06:21:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cOjdJ-0001uP-Qf
+	(envelope-from <kraxel@redhat.com>) id 1cOjdJ-0001u3-N7
 	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 06:21:33 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39820)
+Received: from mx1.redhat.com ([209.132.183.28]:41972)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cOjdJ-0001tE-HG
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cOjdJ-0001t9-Dq
 	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 06:21:29 -0500
+Received: from int-mx10.intmail.prod.int.phx2.redhat.com
+	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A811F4F639
+	for <qemu-devel@nongnu.org>; Wed,  4 Jan 2017 11:21:29 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Wed,  4 Jan 2017 12:21:17 +0100
-Message-Id: <1483528883-1753-6-git-send-email-kraxel@redhat.com>
+Date: Wed,  4 Jan 2017 12:21:21 +0100
+Message-Id: <1483528883-1753-10-git-send-email-kraxel@redhat.com>
 In-Reply-To: <1483528883-1753-1-git-send-email-kraxel@redhat.com>
 References: <1483528883-1753-1-git-send-email-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 05/11] console: move window ID code from baum to
- sdl
+Subject: [Qemu-devel] [PULL 09/11] ui: drop unused MOUSE_EVENT_WHEEL{UP,
+ DN} defines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,122 +31,35 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-From: Samuel Thibault <samuel.thibault@ens-lyon.org>
+Also update comment to make clear this
+is for legacy mouse emulation only.
 
-This moves the SDL bits for window ID from the baum driver to SDL, as
-well as fixing the build for non-X11.
-
-Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Message-id: 20161221003806.22412-3-samuel.thibault@ens-lyon.org
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Message-id: 1480409632-6163-1-git-send-email-kraxel@redhat.com
 ---
- backends/baum.c | 31 ++++++++-----------------------
- ui/sdl.c        | 25 +++++++++++++++++++++++++
- 2 files changed, 33 insertions(+), 23 deletions(-)
+ include/ui/console.h | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-diff --git a/backends/baum.c b/backends/baum.c
-index b92369d..b045ef4 100644
---- a/backends/baum.c
-+++ b/backends/baum.c
-@@ -27,12 +27,10 @@
- #include "sysemu/char.h"
- #include "qemu/timer.h"
- #include "hw/usb.h"
-+#include "ui/console.h"
- #include <brlapi.h>
- #include <brlapi_constants.h>
- #include <brlapi_keycodes.h>
--#ifdef CONFIG_SDL
--#include <SDL_syswm.h>
--#endif
+diff --git a/include/ui/console.h b/include/ui/console.h
+index ee8c407..753ae93 100644
+--- a/include/ui/console.h
++++ b/include/ui/console.h
+@@ -13,13 +13,10 @@
+ # include <epoxy/gl.h>
+ #endif
  
- #if 0
- #define DPRINTF(fmt, ...) \
-@@ -227,12 +225,8 @@ static const uint8_t nabcc_translation[2][256] = {
- /* The guest OS has started discussing with us, finish initializing BrlAPI */
- static int baum_deferred_init(BaumDriverState *baum)
- {
--#if defined(CONFIG_SDL)
--#if SDL_COMPILEDVERSION < SDL_VERSIONNUM(2, 0, 0)
--    SDL_SysWMinfo info;
--#endif
--#endif
--    int tty;
-+    int tty = BRLAPI_TTY_DEFAULT;
-+    QemuConsole *con;
+-/* keyboard/mouse support */
+-
++/* mouse buttons, used by legacy handlers (qemu_add_mouse_event_handler) */
+ #define MOUSE_EVENT_LBUTTON 0x01
+ #define MOUSE_EVENT_RBUTTON 0x02
+ #define MOUSE_EVENT_MBUTTON 0x04
+-#define MOUSE_EVENT_WHEELUP 0x08
+-#define MOUSE_EVENT_WHEELDN 0x10
  
-     if (baum->deferred_init) {
-         return 1;
-@@ -243,21 +237,12 @@ static int baum_deferred_init(BaumDriverState *baum)
-         return 0;
-     }
- 
--#if defined(CONFIG_SDL)
--#if SDL_COMPILEDVERSION < SDL_VERSIONNUM(2, 0, 0)
--    memset(&info, 0, sizeof(info));
--    SDL_VERSION(&info.version);
--    if (SDL_GetWMInfo(&info)) {
--        tty = info.info.x11.wmwindow;
--    } else {
--#endif
--#endif
--        tty = BRLAPI_TTY_DEFAULT;
--#if defined(CONFIG_SDL)
--#if SDL_COMPILEDVERSION < SDL_VERSIONNUM(2, 0, 0)
-+    con = qemu_console_lookup_by_index(0);
-+    if (con && qemu_console_is_graphic(con)) {
-+        tty = qemu_console_get_window_id(con);
-+        if (tty == -1)
-+            tty = BRLAPI_TTY_DEFAULT;
-     }
--#endif
--#endif
- 
-     if (brlapi__enterTtyMode(baum->brlapi, tty, NULL) == -1) {
-         brlapi_perror("baum: brlapi__enterTtyMode");
-diff --git a/ui/sdl.c b/ui/sdl.c
-index d8cf5bc..19e8a84 100644
---- a/ui/sdl.c
-+++ b/ui/sdl.c
-@@ -947,6 +947,7 @@ void sdl_display_init(DisplayState *ds, int full_screen, int no_frame)
-     int flags;
-     uint8_t data = 0;
-     const SDL_VideoInfo *vi;
-+    SDL_SysWMinfo info;
-     char *filename;
- 
- #if defined(__APPLE__)
-@@ -1023,5 +1024,29 @@ void sdl_display_init(DisplayState *ds, int full_screen, int no_frame)
-     sdl_cursor_hidden = SDL_CreateCursor(&data, &data, 8, 1, 0, 0);
-     sdl_cursor_normal = SDL_GetCursor();
- 
-+    memset(&info, 0, sizeof(info));
-+    SDL_VERSION(&info.version);
-+    if (SDL_GetWMInfo(&info)) {
-+        int i;
-+        for (i = 0; ; i++) {
-+            /* All consoles share the same window */
-+            QemuConsole *con = qemu_console_lookup_by_index(i);
-+            if (con) {
-+#if defined(SDL_VIDEO_DRIVER_X11)
-+                qemu_console_set_window_id(con, info.info.x11.wmwindow);
-+#elif defined(SDL_VIDEO_DRIVER_NANOX) || \
-+      defined(SDL_VIDEO_DRIVER_WINDIB) || defined(SDL_VIDEO_DRIVER_DDRAW) || \
-+      defined(SDL_VIDEO_DRIVER_GAPI) || \
-+      defined(SDL_VIDEO_DRIVER_RISCOS)
-+                qemu_console_set_window_id(con, (int) (uintptr_t) info.window);
-+#else
-+                qemu_console_set_window_id(con, info.data);
-+#endif
-+            } else {
-+                break;
-+            }
-+        }
-+    }
-+
-     atexit(sdl_cleanup);
- }
+ /* identical to the ps/2 keyboard bits */
+ #define QEMU_SCROLL_LOCK_LED (1 << 0)
 -- 
 1.8.3.1
