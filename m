@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58209)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60979)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cOsQh-0006QZ-2G
-	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 15:45:04 -0500
+	(envelope-from <kraxel@redhat.com>) id 1cOsad-0001CC-BS
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 15:55:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cOsQg-0003Zx-87
-	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 15:45:03 -0500
-References: <586CB62C.6080504@huawei.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <c7c4fd91-1374-7371-1ff9-533a8e916f2a@redhat.com>
-Date: Wed, 4 Jan 2017 14:44:53 -0600
-MIME-Version: 1.0
-In-Reply-To: <586CB62C.6080504@huawei.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="nV93M8lNRrRFfDtiVIsWPNAFBBwL5kMUH"
-Subject: Re: [Qemu-devel] NBD handshake may block qemu main thread when
- socket delays or has packet loss
+	(envelope-from <kraxel@redhat.com>) id 1cOsaa-0007qy-91
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 15:55:19 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42362)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cOsaa-0007pt-3B
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 15:55:16 -0500
+Message-ID: <1483563313.8627.6.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Wed, 04 Jan 2017 21:55:13 +0100
+In-Reply-To: <20170104155116.GG10541@redhat.com>
+References: <376FE1EF-577A-4BE3-B398-99ACB7F280F4@gmail.com>
+	<1483433944.24493.3.camel@redhat.com>
+	<D2287F42-8073-421D-9920-3048D63B41E3@gmail.com>
+	<1483519059.5670.42.camel@redhat.com>
+	<20170104155116.GG10541@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Subject: Re: [Qemu-devel] Speed menu for GTK interfaace
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,69 +30,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Fangyi (C)" <eric.fangyi@huawei.com>, kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com
-Cc: wu.wubin@huawei.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, subo7@huawei.com, lina.lulina@huawei.com, "jiangxiaoqing (C)" <sochin.jiang@huawei.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Programmingkid <programmingkidx@gmail.com>, qemu-devel qemu-devel <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---nV93M8lNRrRFfDtiVIsWPNAFBBwL5kMUH
-From: Eric Blake <eblake@redhat.com>
-To: "Fangyi (C)" <eric.fangyi@huawei.com>, kwolf@redhat.com,
- mreitz@redhat.com, pbonzini@redhat.com
-Cc: wu.wubin@huawei.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
- subo7@huawei.com, lina.lulina@huawei.com,
- "jiangxiaoqing (C)" <sochin.jiang@huawei.com>,
- Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c7c4fd91-1374-7371-1ff9-533a8e916f2a@redhat.com>
-Subject: Re: NBD handshake may block qemu main thread when socket delays or
- has packet loss
-References: <586CB62C.6080504@huawei.com>
-In-Reply-To: <586CB62C.6080504@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+  Hi,
 
-On 01/04/2017 02:45 AM, Fangyi (C) wrote:
->     As we all know, socket is in blocking mode when nbd is negotiating
-> with the other end. If the network is poor because of delay or packet
-> loss, socket read or write will return very slowly. The mainloop events=
-
-> won't be handled in time util nbd handshake ends.
-
-I wonder if Paolo's work to improve NBD coroutine usage after handshakes
-can be leveraged here?
-
-https://lists.gnu.org/archive/html/qemu-devel/2016-12/msg03224.html
-
+> > We already have "pause" in gtk, adding a "throttle" item next to it
+> > looks reasonable to me.  I don't think it is that useful to have 10%
+> > steps in there, you probably never throttle 10% in practice.  It's
+> > probably more useful to have something like "throttle -> off / 50% /
+> > 90% / 95% / 99%".
 >=20
->     Any advices to solve the problem?
+> This feels like going down the slippery slope to turn the GTK frontend
+> into a full mgmt UI, which is something we've said we don't want todo
+> inside QEMU UI frontends. IMHO this kind of feature is best left to
+> external mgmt layers, like  virt-manager/GNOME Boxes/etc. It is already
+> possible to timebox VMs CPU execution using cgroups quotas via libvirt.
 
-At any rate, it sounds like someone will have to patch NBD code to use
-coroutines instead of blocking for the handshake portion (and that's
-true in general - ANY operation that can block should probably be
-refactored into aio or coroutines so that the main loop can remain
-responsive).
+Well, except that libvirt doesn't support gtk.  And gtk is what you get
+by default when using qemu ad-hoc, without libvirt.  Adding features to
+gtk which make sense in that context still looks useful to me.
 
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+Alternatively we could add qmp+hmp commands for cpu throttling, that way
+libvirt can support the feature and with gtk it can be used too, via
+monitor tab, even in case we don't create new menu items for it.
 
-
---nV93M8lNRrRFfDtiVIsWPNAFBBwL5kMUH
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYbV7FAAoJEKeha0olJ0Nq0WUH/2FUy6FXY0ETD5PKR/Oz63Or
-fldfdFNUdfw8mgthnQlSOL3IrJR/hjgf9wgplmf5AHMRS6d254D6KPkZZ6DFh00h
-603zlHPQ1qWMmd1ZtV1nx8vFlcrQCO67Srmek/MF2OK/PeETYZPzokkI4XEIF3Ah
-e9hlo2quHnXnYCkBP9WHXb0Hxtfpt8USg44JO5ZGJUa8b0zDixvGyZQFSWIKIOA9
-dnd0vbblv8ycNG5g8FVQacfQYYw1+qdJOO5k6trMqZcy+YslQpricBuMtX3CcGCb
-uWO7j2vRRpq2POQ+3EFn81ZIR/TQqjMKzuHvndgDbOh2euvBIc09y/Ggfclp44M=
-=JjJT
------END PGP SIGNATURE-----
-
---nV93M8lNRrRFfDtiVIsWPNAFBBwL5kMUH--
+cheers,
+  Gerd
