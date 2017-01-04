@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45732)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46088)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1cOojL-00049T-EN
-	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 11:48:08 -0500
+	(envelope-from <eblake@redhat.com>) id 1cOokO-0004bd-I2
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 11:49:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1cOojK-0002uS-HB
-	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 11:48:03 -0500
-Date: Wed, 4 Jan 2017 11:47:52 -0500
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20170104164752.GC30425@localhost.localdomain>
-References: <20161129113245.32724-1-pbonzini@redhat.com>
-	<3f948687-3169-c304-3ef8-31347f08857f@redhat.com>
-	<20170104040728.GA30425@localhost.localdomain>
-	<d4ad8370-cbcb-e4fd-b89d-5d7cb63569e6@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1cOokJ-0003Al-95
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 11:49:08 -0500
+References: <20170104145624.2849-1-pbonzini@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <37786c56-11a5-3fa8-9eea-ecc61ffda5d0@redhat.com>
+Date: Wed, 4 Jan 2017 10:49:00 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d4ad8370-cbcb-e4fd-b89d-5d7cb63569e6@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.9 v3 0/5] Sheepdog cleanups
+In-Reply-To: <20170104145624.2849-1-pbonzini@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="vOBrfASNDvVBRDe94lPplg7xAQa7UFWiL"
+Subject: Re: [Qemu-devel] [PATCH] qemu-img: remove dead check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,58 +23,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>, Liu Yuan <namei.unix@gmail.com>, qemu-block@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org
 
-On Wed, Jan 04, 2017 at 12:42:53PM +0100, Paolo Bonzini wrote:
-> 
-> 
-> On 04/01/2017 05:07, Jeff Cody wrote:
-> > On Wed, Dec 21, 2016 at 03:07:07PM +0100, Paolo Bonzini wrote:
-> >>
-> >>
-> >> On 29/11/2016 12:32, Paolo Bonzini wrote:
-> >>> Cleaning up the code and removing duplication makes it simpler to
-> >>> later adapt it for the multiqueue work.
-> >>>
-> >>> Tested against sheepdog 1.0.  I also tested taking snapshots and reverting
-> >>> to older snapshots, but the latter only worked with "dog vdi rollback".
-> >>> Neither loadvm nor qemu-img worked for me.
-> >>>
-> >>> Paolo
-> >>>
-> >>>         v1->v2: placate patchew
-> >>>         v2->v3: rebase
-> >>>
-> >>> Paolo Bonzini (5):
-> >>>   sheepdog: remove unused cancellation support
-> >>>   sheepdog: reorganize coroutine flow
-> >>>   sheepdog: do not use BlockAIOCB
-> >>>   sheepdog: simplify inflight_aio_head management
-> >>>   sheepdog: reorganize check for overlapping requests
-> >>>
-> >>>  block/sheepdog.c | 289 ++++++++++++++++---------------------------------------
-> >>>  1 file changed, 83 insertions(+), 206 deletions(-)
-> >>>
-> >>
-> >> 2.8 is now out, so ping.
-> >>
-> > 
-> > I don't have a functional sheepdog setup at the moment; have you tested
-> > these patches, or should I set up a test rig for them? (I am guessing I
-> > should do the latter; either way, I'll pull the patches in once I or someone
-> > else has tested them).
-> 
-> Yes, I have tested them.  Fedora's sheepdog package is fubar right now.
-> I've built an updated one and asked for ownership but haven't had any
-> answer yet.
-> 
-> Paolo
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--vOBrfASNDvVBRDe94lPplg7xAQa7UFWiL
+From: Eric Blake <eblake@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org
+Message-ID: <37786c56-11a5-3fa8-9eea-ecc61ffda5d0@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] qemu-img: remove dead check
+References: <20170104145624.2849-1-pbonzini@redhat.com>
+In-Reply-To: <20170104145624.2849-1-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Great, thanks.
+On 01/04/2017 08:56 AM, Paolo Bonzini wrote:
+> options must be non-NULL here, because it has been checked before.
+> Reported by Coverity.
+>=20
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  qemu-img.c | 12 +++++-------
+>  1 file changed, 5 insertions(+), 7 deletions(-)
 
-Applied to my block branch:
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-git://github.com/codyprime/qemu-kvm-jtc.git block
+(not shown in the diff, but several lines earlier, is:
 
--Jeff
+    if (!options) {
+        error_exit("Must specify options (-o)");
+    }
+)
+
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--vOBrfASNDvVBRDe94lPplg7xAQa7UFWiL
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYbSd8AAoJEKeha0olJ0NqaoMH/A27Tpkm7oBb/SnJQ/1BYzZy
+GBOTaV6kWPVkA/fWsbge+Uxcx9/88r9tVfzkFGvXvbeoyIi4VA+uKvsZ9vxLZEM/
+ri7AhZOXkbHm3QaiGPszF47lD7rnmc4WXZvMHjRVreI2tXDJN+DHwL1RybdjHMvh
+JNyjWfuzZeCJktYiAPQA51Y3Bnleu4+5K5xLoBasYLo4lMaBKuaKUqXvuVQrfkyv
+7d2nPfTGbq90YSdockhOml05ilWOvMnh+fIA6oaiZSEkVYd3li6cSSj9AAZ84M7P
+yReTBrC6c8M8ToRVv6RhLlhhToWboMyfjh+ALVeN/iy3iHNZawo1odiGz5XFxYA=
+=1mH+
+-----END PGP SIGNATURE-----
+
+--vOBrfASNDvVBRDe94lPplg7xAQa7UFWiL--
