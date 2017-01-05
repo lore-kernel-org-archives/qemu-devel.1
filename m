@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43642)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44012)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cP8hU-0006xh-RR
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 09:07:29 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cP8iy-0007jt-5Z
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 09:09:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cP8hS-0000RX-0l
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 09:07:28 -0500
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:35174)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1cP8hR-0000QS-RY
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 09:07:25 -0500
-Received: by mail-wm0-x243.google.com with SMTP id l2so71262403wml.2
-	for <qemu-devel@nongnu.org>; Thu, 05 Jan 2017 06:07:24 -0800 (PST)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cP8iw-00015A-Vl
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 09:09:00 -0500
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <20170105135957.12003-1-marcandre.lureau@redhat.com>
+References: <20161129113334.605-1-pbonzini@redhat.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c425d3c5-aaaf-646d-4222-f3ff276fbd19@redhat.com>
-Date: Thu, 5 Jan 2017 15:07:22 +0100
+Message-ID: <7bd41b3e-f9e3-b508-219c-f79d47fe1b56@redhat.com>
+Date: Thu, 5 Jan 2017 15:08:52 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170105135957.12003-1-marcandre.lureau@redhat.com>
+In-Reply-To: <20161129113334.605-1-pbonzini@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] error: report hints on stderr when no
- monitor
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.9] block: get rid of
+ bdrv_io_unplugged_begin/end
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,39 +24,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: armbru@redhat.com
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>
 
 
 
-On 05/01/2017 14:59, Marc-André Lureau wrote:
-> Report the error hint when running from the command line and reaching an
-> error, ex:
+On 29/11/2016 12:33, Paolo Bonzini wrote:
+> bdrv_io_plug and bdrv_io_unplug are only called (via their
+> BlockBackend equivalents) after starting asynchronous I/O.
+> bdrv_drain is not going to be called while they are running,
+> because---even if a coroutine runs for some reason---it will
+> only drain in the next iteration of the event loop through
+> bdrv_co_yield_to_drain.
 > 
-> $ qemu-system-x86_64 -m 1Z
-> qemu-system-x86_64: -m 1Z: Parameter 'size' expects a size
-> You may use k, M, G or T suffixes for kilobytes, megabytes, gigabytes and terabytes.
+> So this mechanism is unnecessary, get rid of it.
 > 
-> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->  monitor.c | 2 ++
->  1 file changed, 2 insertions(+)
+>  block/io.c                | 41 ++---------------------------------------
+>  include/block/block.h     |  2 --
+>  include/block/block_int.h |  3 +--
+>  3 files changed, 3 insertions(+), 43 deletions(-)
 > 
-> diff --git a/monitor.c b/monitor.c
-> index a82f547488..e5cc11b5a5 100644
-> --- a/monitor.c
-> +++ b/monitor.c
-> @@ -3973,6 +3973,8 @@ void error_vprintf_unless_qmp(const char *fmt, va_list ap)
->  {
->      if (cur_mon && !monitor_cur_is_qmp()) {
->          monitor_vprintf(cur_mon, fmt, ap);
-> +    } else if (!cur_mon) {
-> +        vfprintf(stderr, fmt, ap);
+> diff --git a/block/io.c b/block/io.c
+> index 4f00562..c42b34a 100644
+> --- a/block/io.c
+> +++ b/block/io.c
+> @@ -228,9 +228,7 @@ void bdrv_drained_begin(BlockDriverState *bs)
+>          bdrv_parent_drained_begin(bs);
 >      }
+>  
+> -    bdrv_io_unplugged_begin(bs);
+>      bdrv_drain_recurse(bs);
+> -    bdrv_io_unplugged_end(bs);
 >  }
 >  
+>  void bdrv_drained_end(BlockDriverState *bs)
+> @@ -302,7 +300,6 @@ void bdrv_drain_all_begin(void)
+>  
+>          aio_context_acquire(aio_context);
+>          bdrv_parent_drained_begin(bs);
+> -        bdrv_io_unplugged_begin(bs);
+>          aio_disable_external(aio_context);
+>          aio_context_release(aio_context);
+>  
+> @@ -347,7 +344,6 @@ void bdrv_drain_all_end(void)
+>  
+>          aio_context_acquire(aio_context);
+>          aio_enable_external(aio_context);
+> -        bdrv_io_unplugged_end(bs);
+>          bdrv_parent_drained_end(bs);
+>          aio_context_release(aio_context);
+>      }
+> @@ -2650,7 +2646,7 @@ void bdrv_io_plug(BlockDriverState *bs)
+>          bdrv_io_plug(child->bs);
+>      }
+>  
+> -    if (bs->io_plugged++ == 0 && bs->io_plug_disabled == 0) {
+> +    if (bs->io_plugged++ == 0) {
+>          BlockDriver *drv = bs->drv;
+>          if (drv && drv->bdrv_io_plug) {
+>              drv->bdrv_io_plug(bs);
+> @@ -2663,7 +2659,7 @@ void bdrv_io_unplug(BlockDriverState *bs)
+>      BdrvChild *child;
+>  
+>      assert(bs->io_plugged);
+> -    if (--bs->io_plugged == 0 && bs->io_plug_disabled == 0) {
+> +    if (--bs->io_plugged == 0) {
+>          BlockDriver *drv = bs->drv;
+>          if (drv && drv->bdrv_io_unplug) {
+>              drv->bdrv_io_unplug(bs);
+> @@ -2674,36 +2670,3 @@ void bdrv_io_unplug(BlockDriverState *bs)
+>          bdrv_io_unplug(child->bs);
+>      }
+>  }
+> -
+> -void bdrv_io_unplugged_begin(BlockDriverState *bs)
+> -{
+> -    BdrvChild *child;
+> -
+> -    if (bs->io_plug_disabled++ == 0 && bs->io_plugged > 0) {
+> -        BlockDriver *drv = bs->drv;
+> -        if (drv && drv->bdrv_io_unplug) {
+> -            drv->bdrv_io_unplug(bs);
+> -        }
+> -    }
+> -
+> -    QLIST_FOREACH(child, &bs->children, next) {
+> -        bdrv_io_unplugged_begin(child->bs);
+> -    }
+> -}
+> -
+> -void bdrv_io_unplugged_end(BlockDriverState *bs)
+> -{
+> -    BdrvChild *child;
+> -
+> -    assert(bs->io_plug_disabled);
+> -    QLIST_FOREACH(child, &bs->children, next) {
+> -        bdrv_io_unplugged_end(child->bs);
+> -    }
+> -
+> -    if (--bs->io_plug_disabled == 0 && bs->io_plugged > 0) {
+> -        BlockDriver *drv = bs->drv;
+> -        if (drv && drv->bdrv_io_plug) {
+> -            drv->bdrv_io_plug(bs);
+> -        }
+> -    }
+> -}
+> diff --git a/include/block/block.h b/include/block/block.h
+> index 49bb0b2..8b0dcda 100644
+> --- a/include/block/block.h
+> +++ b/include/block/block.h
+> @@ -526,8 +526,6 @@ int bdrv_probe_geometry(BlockDriverState *bs, HDGeometry *geo);
+>  
+>  void bdrv_io_plug(BlockDriverState *bs);
+>  void bdrv_io_unplug(BlockDriverState *bs);
+> -void bdrv_io_unplugged_begin(BlockDriverState *bs);
+> -void bdrv_io_unplugged_end(BlockDriverState *bs);
+>  
+>  /**
+>   * bdrv_drained_begin:
+> diff --git a/include/block/block_int.h b/include/block/block_int.h
+> index 83a423c..15aa718 100644
+> --- a/include/block/block_int.h
+> +++ b/include/block/block_int.h
+> @@ -526,9 +526,8 @@ struct BlockDriverState {
+>      uint64_t write_threshold_offset;
+>      NotifierWithReturn write_threshold_notifier;
+>  
+> -    /* counters for nested bdrv_io_plug and bdrv_io_unplugged_begin */
+> +    /* counter for nested bdrv_io_plug */
+>      unsigned io_plugged;
+> -    unsigned io_plug_disabled;
+>  
+>      int quiesce_counter;
+>  };
 > 
 
-Good idea!
+Ping?
 
 Paolo
