@@ -1,26 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50315)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54640)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cP9Fs-0005rh-Uk
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 09:43:02 -0500
+	(envelope-from <nutarojj@ornl.gov>) id 1cP9eQ-0002Ok-3o
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 10:08:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cP9Fr-0004XW-Ua
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 09:43:01 -0500
-Received: from mail-ua0-x22b.google.com ([2607:f8b0:400c:c08::22b]:36105)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cP9Fr-0004XO-Q3
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 09:42:59 -0500
-Received: by mail-ua0-x22b.google.com with SMTP id 88so374389492uaq.3
-	for <qemu-devel@nongnu.org>; Thu, 05 Jan 2017 06:42:59 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <20170102124424.1031-1-kirkseraph@gmail.com>
-References: <20170102124424.1031-1-kirkseraph@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 5 Jan 2017 14:42:38 +0000
-Message-ID: <CAFEAcA-9aYRHcn1dAD0xuR9H8sJ__HOK9ayWmsK7H-Cr2rj4SQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [RESEND PATCH] target-arm/abi32: check for
- segfault in do_kernel_trap
+	(envelope-from <nutarojj@ornl.gov>) id 1cP9eM-0005Ax-PK
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 10:08:22 -0500
+Received: from mta02.ornl.gov ([128.219.177.136]:55847)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <nutarojj@ornl.gov>) id 1cP9eM-0005Am-DL
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 10:08:18 -0500
+From: "James J. Nutaro" <nutarojj@ornl.gov>
+Date: Thu,  5 Jan 2017 10:07:48 -0500
+Message-Id: <1483628868-10496-1-git-send-email-nutarojj@ornl.gov>
+Subject: [Qemu-devel] [PATCH v6] qqq: module for synchronizing with a
+ simulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,95 +22,489 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Seraphime Kirkovski <kirkseraph@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>, qemu-arm <qemu-arm@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: nutarojj@ornl.gov, pbonzini@redhat.com
 
-On 2 January 2017 at 12:44, Seraphime Kirkovski <kirkseraph@gmail.com> wrote:
-> Currently, the cmpxchg implementation tests whether the destination address
-> is readable:
->   - if it is, we read the value and continue with the comparison
->   - if isn't, i.e. access to addr would segfault, we assume that src != dest
->     rather than queuing a SIGSEGV.
->
-> The same problem exists in the case where src == dest: the code doesn't
-> check whether put_user_u32 succeeds.
->
-> This fixes both problems by sending a SIGSEGV when the destination address
-> is inaccessible.
->
-> Signed-off-by: Seraphime Kirkovski <kirkseraph@gmail.com>
-> ---
->  linux-user/main.c | 24 +++++++++++++++++++-----
->  1 file changed, 19 insertions(+), 5 deletions(-)
->
-> diff --git a/linux-user/main.c b/linux-user/main.c
-> index 75b199f..376b0c3 100644
-> --- a/linux-user/main.c
-> +++ b/linux-user/main.c
-> @@ -503,6 +503,7 @@ do_kernel_trap(CPUARMState *env)
->      uint32_t addr;
->      uint32_t cpsr;
->      uint32_t val;
-> +    target_siginfo_t info;
->
->      switch (env->regs[15]) {
->      case 0xffff0fa0: /* __kernel_memory_barrier */
-> @@ -516,13 +517,16 @@ do_kernel_trap(CPUARMState *env)
->          start_exclusive();
->          cpsr = cpsr_read(env);
->          addr = env->regs[2];
-> -        /* FIXME: This should SEGV if the access fails.  */
-> -        if (get_user_u32(val, addr))
-> -            val = ~env->regs[0];
-> +        if (get_user_u32(val, addr)) {
-> +            env->exception.vaddress = addr;
-> +            goto segv;
-> +        }
->          if (val == env->regs[0]) {
->              val = env->regs[1];
-> -            /* FIXME: Check for segfaults.  */
-> -            put_user_u32(val, addr);
-> +            if (put_user_u32(val, addr)) {
-> +                env->exception.vaddress = addr;
-> +                goto segv;
-> +            }
->              env->regs[0] = 0;
->              cpsr |= CPSR_C;
->          } else {
-> @@ -551,6 +555,16 @@ do_kernel_trap(CPUARMState *env)
->      env->regs[15] = addr;
->
->      return 0;
-> +
-> +segv:
-> +    end_exclusive();
-> +    info.si_signo = TARGET_SIGSEGV;
-> +    info.si_errno = 0;
-> +    /* XXX: check env->error_code */
-> +    info.si_code = TARGET_SEGV_MAPERR;
-> +    info._sifields._sigfault._addr = env->exception.vaddress;
-> +    queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
-> +    return 0;
+This patch adds an interface for pacing the execution of QEMU to match an external
+simulation clock. Its aim is to permit QEMU to be used as a module within a
+larger simulation system.
 
-If you compare what happens with this segv code with
-what happens for the segvs detected inside
-arm_kernel_cmpxchg64_helper(), there's a difference.
-With this code we will queue the signal and then return,
-skipping the code which updates env->regs[15] and env->thumb.
-The existing codepath for cmpxchg64 doesn't skip that code.
-The effect is that for cmpxchg64 the SEGV signal handler
-will see a PC pointing at the call into the kernel commpage,
-whereas for this code it will see the PC actually in the
-kernel commpage.
+Signed-off-by: James J. Nutaro <nutarojj@ornl.gov>
+---
+ Makefile.target          |   3 +
+ cpus.c                   |   8 +++
+ docs/simulation-sync.txt |  57 +++++++++++++++
+ include/sysemu/cpus.h    |   1 +
+ kvm-all.c                |  10 +++
+ qemu-options.hx          |  16 +++++
+ qqq.c                    | 177 +++++++++++++++++++++++++++++++++++++++++++++++
+ qqq.h                    |  37 ++++++++++
+ vl.c                     |  29 ++++++++
+ 9 files changed, 338 insertions(+)
+ create mode 100644 docs/simulation-sync.txt
+ create mode 100644 qqq.c
+ create mode 100644 qqq.h
 
-I'm not sure which of these options is the best choice,
-but I do think we should be consistent.
-
->  }
->
->  void cpu_loop(CPUARMState *env)
-> --
-> 2.10.2
-
-thanks
--- PMM
+diff --git a/Makefile.target b/Makefile.target
+index 8ae82cb..0a08fd3 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -145,6 +145,9 @@ obj-y += dump.o
+ obj-y += migration/ram.o migration/savevm.o
+ LIBS := $(libs_softmmu) $(LIBS)
+ 
++# qqq support
++obj-y += qqq.o
++
+ # xen support
+ obj-$(CONFIG_XEN) += xen-common.o
+ obj-$(CONFIG_XEN_I386) += xen-hvm.o xen-mapcache.o
+diff --git a/cpus.c b/cpus.c
+index 5213351..8a98d7f 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -1688,3 +1688,11 @@ void dump_drift_info(FILE *f, fprintf_function cpu_fprintf)
+         cpu_fprintf(f, "Max guest advance   NA\n");
+     }
+ }
++
++void kick_all_vcpus(void)
++{
++    CPUState *cpu;
++    CPU_FOREACH(cpu) {
++        qemu_cpu_kick(cpu);
++    }
++}
+diff --git a/docs/simulation-sync.txt b/docs/simulation-sync.txt
+new file mode 100644
+index 0000000..91138b0
+--- /dev/null
++++ b/docs/simulation-sync.txt
+@@ -0,0 +1,57 @@
++= Synchronizing the virtual clock with an external source =
++
++QEMU has a protocol for synchronizing its virtual clock
++with the clock of a simulator in which QEMU is embedded
++as a component. This options is enabled with the -qqq
++argument, and it should generally be accompanied by the
++following additional command line arguments:
++
++-icount 1,sleep=off -rtc clock=vm
++
++The -qqq argument is used to supply file descriptors
++for a Unix socket, which is used for synchronization.
++The procedure for launching QEMU in is synchronization
++mode has three steps:
++
++(1) Create a socket pair with the Linux socketpair function.
++    The code segment that does this might look like
++
++       int socks[2];
++       socketpair(AF_UNIX,SOCK_STREAM,0,socks);
++
++(2) Fork QEMU with the appropriate command line arguments.
++    The -qqq part of the argument will look something like
++
++       -qqq sock=socks[1]
++
++(3) After forking QEMU, close sock[1] and retain the
++    sock[0] for communicating with QEMU.
++
++The synchronization protocol is very simple. To start, the
++external simulator writes an integer to its socket with
++the amount of time in microseconds that QEMU is allowed to
++advance. The code segment that does this might look like:
++
++    uint32_t ta = htonl(1000); // Advance by 1 millisecond
++    write(sock[0],&ta,sizeof(uint32_t));
++
++The external simulator can then advance its clock by this
++same amount. During this time, QEMU and the external simulator
++will be executing in parallel. When the external simulator
++completes its time advance, it waits for QEMU by reading from
++its socket. The value read will be the actual number of
++virtual microseconds by which QEMU has advanced its virtual clock.
++This will be greater than or equal to the requested advance.
++The code that does this might look like:
++
++   uint32_t ta;
++   read(fd,&ta,sizeof(uint32_t));
++   ta = ntohl(ta);
++
++These steps are repeated until either (1) the external simulator
++closes its socket thereby causing QEMU to terminate or (2) QEMU
++stops executing (e.g., if the emulated computer is shutdown) and
++causes a read or write error on the simulator's socket.
++
++You can find an example of a simulator using this protocol in
++the adevs simulation package at http://sourceforge.net/projects/adevs/
+diff --git a/include/sysemu/cpus.h b/include/sysemu/cpus.h
+index 3728a1e..bdf22c9 100644
+--- a/include/sysemu/cpus.h
++++ b/include/sysemu/cpus.h
+@@ -2,6 +2,7 @@
+ #define QEMU_CPUS_H
+ 
+ /* cpus.c */
++void kick_all_vcpus(void);
+ bool qemu_in_vcpu_thread(void);
+ void qemu_init_cpu_loop(void);
+ void resume_all_vcpus(void);
+diff --git a/kvm-all.c b/kvm-all.c
+index 330219e..b66b07f 100644
+--- a/kvm-all.c
++++ b/kvm-all.c
+@@ -18,6 +18,7 @@
+ 
+ #include <linux/kvm.h>
+ 
++#include "qqq.h"
+ #include "qemu-common.h"
+ #include "qemu/atomic.h"
+ #include "qemu/option.h"
+@@ -1926,6 +1927,15 @@ int kvm_cpu_exec(CPUState *cpu)
+             qemu_cpu_kick_self();
+         }
+ 
++        if (qqq_enabled()) {
++            /* Pause here while qqq is synchronizing with a simulation clock.
++             * We do not want to execute instructions past the synchronization
++             * deadline, but its ok to update the states of other equipment
++             * like timers, i/o devices, etc.
++             */
++            qqq_sync();
++        }
++
+         run_ret = kvm_vcpu_ioctl(cpu, KVM_RUN, 0);
+ 
+         attrs = kvm_arch_post_run(cpu, run);
+diff --git a/qemu-options.hx b/qemu-options.hx
+index c534a2f..46f12e0 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -3389,6 +3389,22 @@ many timer interrupts were not processed by the Windows guest and will
+ re-inject them.
+ ETEXI
+ 
++DEF("qqq", HAS_ARG, QEMU_OPTION_qqq, \
++    "-qqq sock=fd\n" \
++    "                enable synchronization of the virtual clock \n" \
++    "                with an external simulation clock\n", QEMU_ARCH_ALL)
++STEXI
++@item -qqq sock=@var{fd0}
++@findex -qqq
++Qemu will use the supplied socket to synchronize its virtual clock with
++an external simulation clock. Qemu will wait until a time slice size in
++microseconds is supplied on the socket. Then it will execute for at
++least that number of virtual microseconds before writing the actual
++virtual time that has elapsed in microseconds to the socket. This
++cycle will repeat until a zero time advance is requested, which
++will cause qemu to exit.
++ETEXI
++
+ DEF("icount", HAS_ARG, QEMU_OPTION_icount, \
+     "-icount [shift=N|auto][,align=on|off][,sleep=on|off,rr=record|replay,rrfile=<filename>]\n" \
+     "                enable virtual instruction counter with 2^N clock ticks per\n" \
+diff --git a/qqq.c b/qqq.c
+new file mode 100644
+index 0000000..b186c37
+--- /dev/null
++++ b/qqq.c
+@@ -0,0 +1,177 @@
++#include "qemu/osdep.h"
++#include "qemu/timer.h"
++#include "qemu/main-loop.h"
++#include "sysemu/cpus.h"
++#include "sysemu/kvm.h"
++#include "qqq.h"
++/* This is a Linux only feature */
++
++#ifndef _WIN32
++
++#include <arpa/inet.h>
++#include <stdint.h>
++#include <unistd.h>
++#include <assert.h>
++
++static bool enabled = false, syncing = true;
++static unsigned elapsed; /* initialized to zero */
++static int time_advance = -1;
++static int fd = -1;
++static int64_t t;
++static QEMUTimer *sync_timer;
++static QemuMutex qqq_mutex;
++static QemuCond qqq_cond;
++
++bool qqq_enabled(void)
++{
++    return enabled;
++}
++
++void qqq_sync(void)
++{
++    /* kvm-all.c will call this function before running
++     * instructions with kvm. Because syncing will be
++     * true while qqq is waiting for a new time advance
++     * from the simulation, no instructions will execute
++     * while the machine is supposed to be suspended in
++     * simulation time.
++     */
++    qemu_mutex_lock(&qqq_mutex);
++    while (syncing) {
++        qemu_cond_wait(&qqq_cond, &qqq_mutex);
++    }
++    qemu_mutex_unlock(&qqq_mutex);
++}
++
++static void cleanup_and_exit(void)
++{
++    /* Close the socket and quit */
++    close(fd);
++    exit(0);
++}
++
++static void start_emulator(void)
++{
++    if (kvm_enabled()) {
++        /* Setting syncing to false tells kvm-all that
++         * it can execute guest instructions.
++         */
++        qemu_mutex_lock(&qqq_mutex);
++        syncing = false;
++        qemu_mutex_unlock(&qqq_mutex);
++        qemu_cond_signal(&qqq_cond);
++        /* Restart the emulator clock */
++        cpu_enable_ticks();
++    }
++}
++
++static void stop_emulator(void)
++{
++    if (kvm_enabled()) {
++        /* Tell the emulator that it is not allowed to
++         * execute guest instructions.
++         */
++        qemu_mutex_lock(&qqq_mutex);
++        syncing = true;
++        qemu_mutex_unlock(&qqq_mutex);
++        /* Kick KVM off of the CPU and stop the emulator clock. */
++        cpu_disable_ticks();
++        kick_all_vcpus();
++    }
++}
++
++static void write_mem_value(unsigned val)
++{
++    uint32_t msg = htonl(val);
++    if (write(fd, &msg, sizeof(uint32_t)) != sizeof(uint32_t)) {
++        /* If the socket is no good, then assume this is an
++         * indication that we should exit.
++         */
++        cleanup_and_exit();
++    }
++}
++
++static unsigned read_mem_value(void)
++{
++    uint32_t msg;
++    if (read(fd, &msg, sizeof(uint32_t)) != sizeof(uint32_t)) {
++        /* If the socket is no good, then assume this is an
++         * indication that we should exit.
++         */
++        cleanup_and_exit();
++    }
++    return ntohl(msg);
++}
++
++static void schedule_next_event(void)
++{
++    /* If we got the time advance in fd_read, then don't do it
++     * again here. */
++    if (time_advance < 0) {
++        /* Otherwise read the value from the socket */
++        time_advance = read_mem_value();
++    }
++    assert(t == 0 ||
++        abs(t - qemu_clock_get_us(QEMU_CLOCK_VIRTUAL)) <= time_advance);
++    /* Schedule the next synchronization point */
++    timer_mod(sync_timer, t + time_advance);
++    /* Note that we need to read the time advance again on the next pass */
++    time_advance = -1;
++    /* Start advancing cpu ticks and the wall clock */
++    start_emulator();
++}
++
++static void sync_func(void *data)
++{
++    /* Stop advancing cpu ticks and the wall clock */
++    stop_emulator();
++    /* Report the actual elapsed time to the external simulator. */
++    int64_t tnow = qemu_clock_get_us(QEMU_CLOCK_VIRTUAL);
++    elapsed = tnow - t;
++    write_mem_value(elapsed);
++    /* Update our time of last event */
++    t = tnow;
++    /* Schedule the next event */
++    schedule_next_event();
++}
++
++static void fd_read(void *opaque)
++{
++    /* Read the time advance if its becomes available
++     * before our timer expires */
++    time_advance = read_mem_value();
++}
++
++void setup_qqq(QemuOpts *opts)
++{
++    /* The module has been enabled */
++    enabled = true;
++    if (kvm_enabled()) {
++        qemu_mutex_init(&qqq_mutex);
++        qemu_cond_init(&qqq_cond);
++    }
++    /* Stop the clock while the simulation is initialized */
++    stop_emulator();
++    /* Initialize the simulation clock */
++    t = 0;
++    /* Get the communication socket */
++    fd = qemu_opt_get_number(opts, "sock", 0);
++    /* Start the timer to ensure time warps advance the clock */
++    sync_timer = timer_new_us(QEMU_CLOCK_VIRTUAL, sync_func, NULL);
++    /* Get the time advance that is requested by the simulation */
++    schedule_next_event();
++    /* Register the file descriptor with qemu. This should ensure
++     * the emulator doesn't pause for lack of I/O and thereby
++     * cause the attached simulator to pause with it. */
++    qemu_set_fd_handler(fd, fd_read, NULL, NULL);
++}
++
++#else
++
++void setup_qqq(QemuOpts *opts)
++{
++    fprintf(stderr, "-qqq is not supported on Windows, exiting\n");
++    exit(0);
++}
++
++#endif
+diff --git a/qqq.h b/qqq.h
+new file mode 100644
+index 0000000..e106d3c
+--- /dev/null
++++ b/qqq.h
+@@ -0,0 +1,37 @@
++/*
++ * This work is licensed under the terms of the GNU GPL
++ * version 2. Seethe COPYING file in the top-level directory.
++ *
++ * A module for pacing the rate of advance of the computer
++ * clock in reference to an external simulation clock. The
++ * basic approach used here is adapted from QBox from Green
++ * Socs. The mode of operation is as follows:
++ *
++ * The simulator uses pipes to exchange time advance data.
++ * The external simulator starts the exchange by forking a
++ * QEMU process and passing is descriptors for a read and
++ * write pipe. Then the external simulator writes an integer
++ * (native endian) to the pipe to indicate the number of
++ * microseconds that QEMU should advance. QEMU advances its
++ * virtual clock by this amount and writes to its write pipe
++ * the actual number of microseconds that have advanced.
++ * This process continues until a pipe on either side is
++ * closed, which will either cause QEMU to exit (if the
++ * external simulator closes a pipe) or raise SIGPIPE in the
++ * external simulator (if QEMU closes a pipe).
++ *
++ * Authors:
++ *   James Nutaro <nutaro@gmail.com>
++ *
++ */
++#ifndef QQQ_H
++#define QQQ_H
++
++#include "qemu/osdep.h"
++#include "qemu-options.h"
++
++void qqq_sync(void);
++bool qqq_enabled(void);
++void setup_qqq(QemuOpts *opts);
++
++#endif
+diff --git a/vl.c b/vl.c
+index d77dd86..21331fe 100644
+--- a/vl.c
++++ b/vl.c
+@@ -124,6 +124,8 @@ int main(int argc, char **argv)
+ #include "qapi/qmp/qerror.h"
+ #include "sysemu/iothread.h"
+ 
++#include "qqq.h"
++
+ #define MAX_VIRTIO_CONSOLES 1
+ #define MAX_SCLP_CONSOLES 1
+ 
+@@ -234,6 +236,20 @@ static struct {
+     { .driver = "virtio-vga",           .flag = &default_vga       },
+ };
+ 
++static QemuOptsList qemu_qqq_opts = {
++    .name = "qqq",
++    .implied_opt_name = "",
++    .merge_lists = true,
++    .head = QTAILQ_HEAD_INITIALIZER(qemu_qqq_opts.head),
++    .desc = {
++        {
++            .name = "sock",
++            .type = QEMU_OPT_NUMBER,
++        },
++        { /* end of list */ }
++    },
++};
++
+ static QemuOptsList qemu_rtc_opts = {
+     .name = "rtc",
+     .head = QTAILQ_HEAD_INITIALIZER(qemu_rtc_opts.head),
+@@ -3005,6 +3021,7 @@ int main(int argc, char **argv, char **envp)
+     DisplayState *ds;
+     int cyls, heads, secs, translation;
+     QemuOpts *hda_opts = NULL, *opts, *machine_opts, *icount_opts = NULL;
++    QemuOpts *qqq_opts = NULL;
+     QemuOptsList *olist;
+     int optind;
+     const char *optarg;
+@@ -3044,6 +3061,7 @@ int main(int argc, char **argv, char **envp)
+     module_call_init(MODULE_INIT_QOM);
+     module_call_init(MODULE_INIT_QAPI);
+ 
++    qemu_add_opts(&qemu_qqq_opts);
+     qemu_add_opts(&qemu_drive_opts);
+     qemu_add_drive_opts(&qemu_legacy_drive_opts);
+     qemu_add_drive_opts(&qemu_common_drive_opts);
+@@ -3908,6 +3926,13 @@ int main(int argc, char **argv, char **envp)
+                     exit(1);
+                 }
+                 break;
++            case QEMU_OPTION_qqq:
++                qqq_opts = qemu_opts_parse_noisily(qemu_find_opts("qqq"),
++                                                      optarg, true);
++                if (!qqq_opts) {
++                    exit(1);
++                }
++                break;
+             case QEMU_OPTION_incoming:
+                 if (!incoming) {
+                     runstate_set(RUN_STATE_INMIGRATE);
+@@ -4416,6 +4441,10 @@ int main(int argc, char **argv, char **envp)
+     /* spice needs the timers to be initialized by this point */
+     qemu_spice_init();
+ 
++    if (qqq_opts) {
++        setup_qqq(qqq_opts);
++    }
++
+     cpu_ticks_init();
+     if (icount_opts) {
+         if (kvm_enabled() || xen_enabled()) {
+-- 
+2.7.4
