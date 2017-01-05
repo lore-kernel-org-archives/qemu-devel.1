@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40249)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40546)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fujunkang@gmail.com>) id 1cP2a5-0004zO-BA
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 02:35:27 -0500
+	(envelope-from <fujunkang@gmail.com>) id 1cP2as-0005Wx-NT
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 02:36:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fujunkang@gmail.com>) id 1cP2a3-0007Om-NL
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 02:35:25 -0500
-Received: from mail-wj0-x244.google.com ([2a00:1450:400c:c01::244]:35721)
+	(envelope-from <fujunkang@gmail.com>) id 1cP2aq-0007nS-V8
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 02:36:14 -0500
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:33506)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <fujunkang@gmail.com>) id 1cP2a3-0007OW-Do
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 02:35:23 -0500
-Received: by mail-wj0-x244.google.com with SMTP id hb5so44947535wjc.2
-	for <qemu-devel@nongnu.org>; Wed, 04 Jan 2017 23:35:23 -0800 (PST)
+	(Exim 4.71) (envelope-from <fujunkang@gmail.com>) id 1cP2aq-0007mt-LQ
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 02:36:12 -0500
+Received: by mail-wm0-x241.google.com with SMTP id u144so95051685wmu.0
+	for <qemu-devel@nongnu.org>; Wed, 04 Jan 2017 23:36:12 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20170103162950.GI14707@stefanha-x1.localdomain>
+In-Reply-To: <58660E14.8000605@cn.fujitsu.com>
 References: <CAP8dc_acqeqpio7fVK4XSAxoH8QaGp9L=S1h2OCCWgrj=Q7VCw@mail.gmail.com>
-	<20170103162950.GI14707@stefanha-x1.localdomain>
+	<58660E14.8000605@cn.fujitsu.com>
 From: Junkang Fu <fujunkang@gmail.com>
-Date: Thu, 5 Jan 2017 15:35:21 +0800
-Message-ID: <CAP8dc_a54HBkCMbVT=EOJyM8acWzVBhyNjY_72zpxvnH7mws6Q@mail.gmail.com>
+Date: Thu, 5 Jan 2017 15:36:11 +0800
+Message-ID: <CAP8dc_ZH+2uMkBkmm5f4SbOOu2R8NkWgJpandOcwrDgm0EB5wQ@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Subject: Re: [Qemu-devel] [RFC]virtio-blk: add disk-name device property
 List-Id: <qemu-devel.nongnu.org>
@@ -28,16 +28,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
+To: Cao jin <caoj.fnst@cn.fujitsu.com>
 Cc: stefanha@redhat.com, qemu-devel@nongnu.org
 
-Thank you. -device virtio-blk-pci,serial=vdabc will solve my problem to
-some extent.
+Thank you for pointing out this, i'll resend the patch if my suggestion is
+acceptted.
 
-2017-01-04 0:29 GMT+08:00 Stefan Hajnoczi <stefanha@gmail.com>:
+2016-12-30 15:34 GMT+08:00 Cao jin <caoj.fnst@cn.fujitsu.com>:
 
-> On Fri, Dec 30, 2016 at 10:41:35AM +0800, Junkang Fu wrote:
-> > From 74e913fc41ea98d1dde692175f1e3fb6729342aa Mon Sep 17 00:00:00 2001
+> As I know, this is not a good way to submit a patch. You need to read
+> the guideline first: http://wiki.qemu.org/Contribute/SubmitAPatch
+>
+> --
+> Sincerely,
+> Cao jin
+>
+> On 12/30/2016 10:41 AM, Junkang Fu wrote:
+> >>From 74e913fc41ea98d1dde692175f1e3fb6729342aa Mon Sep 17 00:00:00 2001
 > > From: "junkang.fjk" <junkang.fjk@alibaba-inc.com>
 > > Date: Wed, 24 Aug 2016 19:36:53 +0800
 > > Subject: [PATCH] virtio-blk: add disk-name device property
@@ -59,10 +66,7 @@ some extent.
 > > specified
 > > as follows:
 > >         -device virtio-blk-pci,disk-name=vdabc
->
-> Did you try -device virtio-blk-pci,serial=vdabc and
-> /dev/disk/by-id/virtio-vdabc inside a Linux guest?
->
+> >
 > > ---
 > >  hw/block/virtio-blk.c                       | 5 +++++
 > >  include/hw/virtio/virtio-blk.h              | 1 +
@@ -127,13 +131,6 @@ some extent.
 > */
 > >  #define VIRTIO_BLK_F_MQ        12  /* support more than one vq */
 > > +#define VIRTIO_BLK_F_DISK_NAME  13      /* specify /dev/xxx name */
->
-> These bits are defined in the VIRTIO specification.  In addition to
-> modifying QEMU and guest drivers you would also need to send a patch to
-> the VIRTIO Technical Committee to update the specification:
-> https://docs.oasis-open.org/virtio/virtio/v1.0/cs04/
-> virtio-v1.0-cs04.html#x1-2050003
->
 > >
 > >  /* Legacy feature bits */
 > >  #ifndef VIRTIO_BLK_NO_LEGACY
@@ -158,6 +155,10 @@ some extent.
 > >  /*
 > > --
 > > 1.9.4
+> >
+> >
+>
+>
 >
 >
 >
