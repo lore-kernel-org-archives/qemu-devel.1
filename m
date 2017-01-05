@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51722)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52640)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cP52W-0002Kq-Ee
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 05:12:57 -0500
+	(envelope-from <liang.z.li@intel.com>) id 1cP55H-0004JT-Gv
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 05:15:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cP52S-0003EL-KL
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 05:12:56 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37272)
+	(envelope-from <liang.z.li@intel.com>) id 1cP55C-0004Fc-GX
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 05:15:47 -0500
+Received: from mga09.intel.com ([134.134.136.24]:37853)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cP52S-0003EF-Es
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 05:12:52 -0500
-Date: Thu, 5 Jan 2017 10:12:46 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170105101246.GC3292@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <CAMxP3BTmayVS5VHYm6iXgZFetiv8YAPnyd_1-6p_q33gDLTrEQ@mail.gmail.com>
+	(Exim 4.71) (envelope-from <liang.z.li@intel.com>)
+	id 1cP55C-0004Ei-3W
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 05:15:42 -0500
+From: "Li, Liang Z" <liang.z.li@intel.com>
+Date: Thu, 5 Jan 2017 10:15:37 +0000
+Message-ID: <F2CBF3009FA73547804AE4C663CAB28E3C34C20B@shsmsx102.ccr.corp.intel.com>
+References: <1463570440-29685-1-git-send-email-jitendra.kolhe@hpe.com>
+	<F2CBF3009FA73547804AE4C663CAB28E3C34811E@shsmsx102.ccr.corp.intel.com>
+	<ebc6d79a-833d-5413-8617-b3252bc45a07@redhat.com>
+	<F2CBF3009FA73547804AE4C663CAB28E3C34BC76@shsmsx102.ccr.corp.intel.com>
+	<a21b2517-08ec-653a-2e1e-9b8c325d3267@redhat.com>
+In-Reply-To: <a21b2517-08ec-653a-2e1e-9b8c325d3267@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAMxP3BTmayVS5VHYm6iXgZFetiv8YAPnyd_1-6p_q33gDLTrEQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] Live migration + cpu/mem hotplug
+Subject: Re: [Qemu-devel] [PATCH v3 0/4] migration: skip scanning and
+ migrating ram pages released by virtio-balloon driver.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,55 +33,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bob Chen <a175818323@gmail.com>
-Cc: qemu-devel@nongnu.org
+To: David Hildenbrand <david@redhat.com>, Jitendra Kolhe <jitendra.kolhe@hpe.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "crosthwaite.peter@gmail.com" <crosthwaite.peter@gmail.com>, "ehabkost@redhat.com" <ehabkost@redhat.com>, "quintela@redhat.com" <quintela@redhat.com>, "simhan@hpe.com" <simhan@hpe.com>, "JBottomley@Odin.com" <JBottomley@Odin.com>, "armbru@redhat.com" <armbru@redhat.com>, "lcapitulino@redhat.com" <lcapitulino@redhat.com>, "renganathan.meenakshisundaram@hpe.com" <renganathan.meenakshisundaram@hpe.com>, "borntraeger@de.ibm.com" <borntraeger@de.ibm.com>, "mst@redhat.com" <mst@redhat.com>, "mohan_parthasarathy@hpe.com" <mohan_parthasarathy@hpe.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "amit.shah@redhat.com" <amit.shah@redhat.com>, "den@openvz.org" <den@openvz.org>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>
 
-On Thu, Jan 05, 2017 at 04:27:26PM +0800, Bob Chen wrote:
-> Hi,
-> 
-> According to the docs, the destination Qemu must have the exactly same
-> parameters as the source one. So if the source has just finished cpu or
-> memory hotplug, what would the dest's parameters be like?
-> 
-> Does DIMM device, or logically QOM object, have to be reflected on the new
-> command-line parameters?
+> >> If we want to actually host enforce (disallow) access to inflated
+> >> pages, having
+> >
+> > Is that a new feature?
+>=20
+> Still in the design phase. Andrea Arcangeli briefly mentioned in in his r=
+eply to
+> v5 of your patch series
+>=20
+> "We also plan to use userfaultfd to make the balloon driver host enforced
+> (will work fine on hugetlbfs 2M and tmpfs too) but that's going to be inv=
+isible
+> to the ABI so it's not strictly relevant for this discussion."
+>=20
 
-Yes, if you have hotplugged any type of device since the VM was started,
-the QEMU command line args on the target host must include all the original
-args from the source QEMU, and also any args reflect to reflect the
-hotplugged devices too.
+Looking forward to see more details. Is there any thread about the design?
 
-A further complication is that on the target, you must also make sure you
-fully specify *all* device address information (PCI slots, SCSI luns, etc
-etc), because the addresses QEMU assigns to a device after hotplug may
-not be the same as the addresses QEMU assigns to a device whne coldplug.
+Thanks!
 
-eg if you boot a guest with 1 NIC + 1 disk, and then hotplug a 2nd NIC
-you might get
+Liang
 
-   1st NIC  == PCI slot 2
-   1st disk == PCI slot 3
-   2nd NIC  == PCI slot 4
-
-if however, you started QEMU with 2 NICs and 1 disk straight away QEMU
-might assign addresses in the order
-
-   1st NIC  == PCI slot 2
-   2nd NIC  == PCI slot 3
-   1st disk == PCI slot 4
-
-this would totally kill a guest OS during live migration as the slots
-for devices its using would change.
-
-So as a general rule when launching QEMU on a target host for migrating,
-you must be explicit about all device addresses and not rely on QEMU to
-auto-assign addresses. This is quite alot of work to get right, but if
-you're using libvirt it'll do pretty much all this automatically for
-you.
-
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+> >
+> >> such a bitmap in QEMU is required. Getting them from the guest
+> >> doesn't make sense in that context anymore.
+> >
+> > Even a bitmap is required, we should avoid to send it in the stop & cop=
+y
+> stage.
+>=20
+> yes, I agree.
+>=20
+> Thanks!
