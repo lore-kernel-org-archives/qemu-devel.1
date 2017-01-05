@@ -1,24 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58866)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59386)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cP9x1-0002iC-Gx
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 10:27:36 -0500
+	(envelope-from <lvivier@redhat.com>) id 1cP9zI-0003uP-Ag
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 10:29:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cP9wy-0004Jx-5O
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 10:27:35 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:61204)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cP9wx-0004Jl-Uv
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 10:27:32 -0500
-References: <1483628868-10496-1-git-send-email-nutarojj@ornl.gov>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <0f3d6652-e633-c02e-7234-0d5b885d31ea@redhat.com>
-Date: Thu, 5 Jan 2017 16:27:29 +0100
-MIME-Version: 1.0
-In-Reply-To: <1483628868-10496-1-git-send-email-nutarojj@ornl.gov>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6] qqq: module for synchronizing with a
- simulation
+	(envelope-from <lvivier@redhat.com>) id 1cP9zG-0004lu-IZ
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 10:29:56 -0500
+From: Laurent Vivier <lvivier@redhat.com>
+Date: Thu,  5 Jan 2017 16:29:44 +0100
+Message-Id: <1483630188-32021-2-git-send-email-lvivier@redhat.com>
+In-Reply-To: <1483630188-32021-1-git-send-email-lvivier@redhat.com>
+References: <1483630188-32021-1-git-send-email-lvivier@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 1/5] qtest: add netfilter tests for ppc64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,24 +19,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "James J. Nutaro" <nutarojj@ornl.gov>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: David Gibson <david@gibson.dropbear.id.au>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>
 
+Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+Tested-by: Greg Kurz <groug@kaod.org>
+---
+ tests/Makefile.include | 3 +++
+ 1 file changed, 3 insertions(+)
 
-
-On 05/01/2017 16:07, James J. Nutaro wrote:
-> This patch adds an interface for pacing the execution of QEMU to match an external
-> simulation clock. Its aim is to permit QEMU to be used as a module within a
-> larger simulation system.
-> 
-> Signed-off-by: James J. Nutaro <nutarojj@ornl.gov>
-
-What's the difference between v5 and v6?
-
-> +(2) Fork QEMU with the appropriate command line arguments.
-> +    The -qqq part of the argument will look something like
-> +
-> +       -qqq sock=socks[1]
-
-No need for -qqq, just make it "-icount extclock=FD".
-
-Paolo
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 4841d58..8d6ac7a 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -284,6 +284,9 @@ gcov-files-ppc64-y += hw/usb/hcd-uhci.c
+ check-qtest-ppc64-y += tests/usb-hcd-xhci-test$(EXESUF)
+ gcov-files-ppc64-y += hw/usb/hcd-xhci.c
+ check-qtest-ppc64-y += $(check-qtest-virtio-y)
++check-qtest-ppc64-y += tests/test-netfilter$(EXESUF)
++check-qtest-ppc64-y += tests/test-filter-mirror$(EXESUF)
++check-qtest-ppc64-y += tests/test-filter-redirector$(EXESUF)
+ 
+ check-qtest-sh4-y = tests/endianness-test$(EXESUF)
+ 
+-- 
+2.7.4
