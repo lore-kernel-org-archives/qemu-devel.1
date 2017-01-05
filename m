@@ -1,30 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41737)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41829)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rkrcmar@redhat.com>) id 1cPEha-0002Wz-IK
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 15:31:59 -0500
+	(envelope-from <eblake@redhat.com>) id 1cPEiP-0002tD-Io
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 15:32:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rkrcmar@redhat.com>) id 1cPEhX-0002M6-Gf
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 15:31:58 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40078)
+	(envelope-from <eblake@redhat.com>) id 1cPEiO-0002cP-Nh
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 15:32:49 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38436)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rkrcmar@redhat.com>) id 1cPEhX-0002Ly-Bu
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 15:31:55 -0500
-Date: Thu, 5 Jan 2017 21:31:51 +0100
-From: Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Message-ID: <20170105203150.GE29430@potion>
-References: <1483266886-25050-1-git-send-email-peterx@redhat.com>
-	<1483266886-25050-3-git-send-email-peterx@redhat.com>
-	<20170102201824.GA2892@potion>
-	<20170103024501.GA22664@pxdev.xzpeter.org>
-	<20170104145541.GI2395@potion>
-	<20170105023539.GM22664@pxdev.xzpeter.org>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cPEiO-0002cH-H0
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 15:32:48 -0500
+Received: from int-mx14.intmail.prod.int.phx2.redhat.com
+	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9725261B91
+	for <qemu-devel@nongnu.org>; Thu,  5 Jan 2017 20:32:48 +0000 (UTC)
+References: <20170105160321.21786-1-berrange@redhat.com>
+	<20170105160321.21786-5-berrange@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <24cdd629-d593-fad5-8154-c4f44b559ad2@redhat.com>
+Date: Thu, 5 Jan 2017 14:32:46 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170105023539.GM22664@pxdev.xzpeter.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [kvm-unit-tests PATCH 2/2] run_tests: allow run
- tests in parallel
+In-Reply-To: <20170105160321.21786-5-berrange@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="9TUlNtm8QfpiJeGmu3bpJMcUrP4HrP3lE"
+Subject: Re: [Qemu-devel] [PATCH 4/8] io: add ability to associate an opaque
+ "result" with with a task
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,48 +35,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, Andrew Jones <drjones@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
 
-2017-01-05 10:35+0800, Peter Xu:
-> On Wed, Jan 04, 2017 at 03:55:42PM +0100, Radim Kr=C4=8Dm=C3=A1=C5=99 w=
-rote:
->> > I didn't notice the "-n" parameter for "wait", otherwise I won't
->> > bother using SIGUSR1 at all. :)
->>=20
->> (Btw. why couldn't you use SIGCHLD?)
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--9TUlNtm8QfpiJeGmu3bpJMcUrP4HrP3lE
+From: Eric Blake <eblake@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <24cdd629-d593-fad5-8154-c4f44b559ad2@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 4/8] io: add ability to associate an opaque
+ "result" with with a task
+References: <20170105160321.21786-1-berrange@redhat.com>
+ <20170105160321.21786-5-berrange@redhat.com>
+In-Reply-To: <20170105160321.21786-5-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 01/05/2017 10:03 AM, Daniel P. Berrange wrote:
+> Currently there is no data associated with a successful
+> task completion. This adds an opaque pointer to the task
+> to store an arbitrary result.
 >=20
-> My understanding:
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>  include/io/task.h | 27 +++++++++++++++++++++++++++
+>  io/task.c         | 20 ++++++++++++++++++++
+>  2 files changed, 47 insertions(+)
 >=20
-> SIGCHLD is used by internal bash. For every command we write (like a
-> "ls" in the script), we should have forked another process to load the
-> "/bin/ls" binary, and when this command (in this case "ls") finishes,
-> it'll send one SIGCHLD to the main process. This should happen for
-> each non-builtin bash commands, and bash program is managing these
-> SIGCHLDs internally by default. So, we should not be able to trap
-> SIGCHLD in bash.
->=20
-> There is one way to trap it, only if we provide:
->=20
->   set -m
->=20
-> to turn off the job controls of bash.
 
-I think that "-m" enables job control, but I didn't know it can be
-disabled.  I don't understand what bash does with +m -- bg/fg/&/^Z work
-just as one would expect of job control, but not SIGCHLD.
+I suppose a different approach would have been changing QIOTaskFunc() to
+have a void* return, but that would be more invasive.  Grabbing the
+result separately from the task completing is a bit weird, but looks
+like it will work.
 
->                                       However if with that, we'll
-> trigger the SIGCHLD handler for *every* task we run, even for the
-> normal commands like "ls". I suppose that's not what we want (we want
-> to only trap those background $QEMU processes). That's why I used
-> SIGUSR1 instead of SIGCHLD.
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-I see, it is a more robust, but signals can race, so we couldn't depend
-on their count anyway.  And wow, we really get SIGCHLD for foreground
-processes ... it wouldn't matter because the loop only uses builtins,
-but it is stupid.  (I confess I don't usually use POSIX shells.)
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
-> Of course, after I know "wait -n", it becomes clumsy. :-)
 
-"clumsy" is still a praise for bash code. :)
+--9TUlNtm8QfpiJeGmu3bpJMcUrP4HrP3lE
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYbq1uAAoJEKeha0olJ0NqQ9wH/3UP+yd4BEvIf7nUk+HsPVP8
+3yZ9RvRj2pJtvV3bLoAEt+7ee+J1073Rwf6oPa1Zn05oDnUVmDwJFrihj24K15I9
+8bG12gvQqG6H5gOkh3u8HT7GV5zsH43H45baODbU2Z7Q41hlaVQCcWNCh9n8ON4B
+CAumyf3GPsTvkFzj9LjuTXA5Np9+ctrtKbR7ubUeyLZoI1HuERvzLfcz1EZJcydS
+xxFJrYREPFCVxwlB50SbHnHCVcUC6uV/aa6KNDBKBbOhgcz/ojLxOD0lI/LEf3pa
+VCY4WcvObl3yvOc3GxOkm0Ndrcwihy8plmKP33oylBP79ZqKQ+9R99E7Sd9rIHU=
+=N1Du
+-----END PGP SIGNATURE-----
+
+--9TUlNtm8QfpiJeGmu3bpJMcUrP4HrP3lE--
