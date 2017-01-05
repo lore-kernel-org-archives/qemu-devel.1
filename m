@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39884)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39885)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jinguojie@loongson.cn>) id 1cP0Ec-0001yJ-04
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 00:05:06 -0500
+	(envelope-from <jinguojie@loongson.cn>) id 1cP0Ec-0001yK-04
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 00:05:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jinguojie@loongson.cn>) id 1cP0EY-0005an-TT
+	(envelope-from <jinguojie@loongson.cn>) id 1cP0EY-0005ay-Tw
 	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 00:05:06 -0500
-Received: from [114.242.206.163] (port=60204 helo=mail.loongson.cn)
+Received: from [114.242.206.163] (port=60207 helo=mail.loongson.cn)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jinguojie@loongson.cn>) id 1cP0EY-0005WB-29
+	(envelope-from <jinguojie@loongson.cn>) id 1cP0EY-0005WD-2L
 	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 00:05:02 -0500
 From: Jin Guojie <jinguojie@loongson.cn>
-Date: Thu,  5 Jan 2017 12:57:52 +0800
-Message-Id: <1483592275-4496-8-git-send-email-jinguojie@loongson.cn>
+Date: Thu,  5 Jan 2017 12:57:49 +0800
+Message-Id: <1483592275-4496-5-git-send-email-jinguojie@loongson.cn>
 In-Reply-To: <1483592275-4496-1-git-send-email-jinguojie@loongson.cn>
 References: <1483592275-4496-1-git-send-email-jinguojie@loongson.cn>
-Subject: [Qemu-devel] [PATCH v6 RESEND 07/10] tcg-mips: Adjust prologue for
- mips64
+Subject: [Qemu-devel] [PATCH v6 RESEND 04/10] tcg-mips: Add bswap32u and
+ bswap64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,7 +27,12 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Aurelien Jarno <aurelien@aurel32.net>, James Hogan <james.hogan@imgtec.com>, YunQiang Su <wzssyqa@gmail.com>, Richard Henderson <rth@twiddle.net>, Jin Guojie <jinguojie@loongson.cn>
 
-Take stack frame parameters out from the function body.
+Without the mips32r2 instructions to perform swapping, bswap is quite large,
+dominating the size of each reverse-endian qemu_ld/qemu_st operation.
+
+Create two subroutines in the prologue block.  The subroutines require extra
+reserved registers (TCG_TMP[2, 3]).  Using these within qemu_ld means that
+we need not place additional restrictions on the qemu_ld outputs.
 
 Tested-by: Aurelien Jarno <aurelien@aurel32.net>
 Tested-by: James Hogan <james.hogan@imgtec.com>
@@ -35,97 +40,149 @@ Tested-by: YunQiang Su <wzssyqa@gmail.com>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 Signed-off-by: Jin Guojie <jinguojie@loongson.cn>
 ---
- tcg/mips/tcg-target.inc.c | 54 ++++++++++++++++++++++-------------------------
- 1 file changed, 25 insertions(+), 29 deletions(-)
+ tcg/mips/tcg-target.inc.c | 102 ++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 99 insertions(+), 3 deletions(-)
 
 diff --git a/tcg/mips/tcg-target.inc.c b/tcg/mips/tcg-target.inc.c
-index 5cc8df3..9e24662 100644
+index 2d91d0c..ec139cd 100644
 --- a/tcg/mips/tcg-target.inc.c
 +++ b/tcg/mips/tcg-target.inc.c
-@@ -734,16 +734,6 @@ static inline bool tcg_out_sti(TCGContext *s, TCGType type, TCGArg val,
-     return false;
- }
+@@ -125,6 +125,8 @@ static const TCGReg tcg_target_call_oarg_regs[2] = {
  
--static inline void tcg_out_addi(TCGContext *s, TCGReg reg, TCGArg val)
--{
--    if (val == (int16_t)val) {
--        tcg_out_opc_imm(s, OPC_ADDIU, reg, reg, val);
--    } else {
--        tcg_out_movi(s, TCG_TYPE_PTR, TCG_TMP0, val);
--        tcg_out_opc_reg(s, OPC_ADDU, reg, reg, TCG_TMP0);
--    }
--}
--
- static void tcg_out_addsub2(TCGContext *s, TCGReg rl, TCGReg rh, TCGReg al,
-                             TCGReg ah, TCGArg bl, TCGArg bh, bool cbl,
-                             bool cbh, bool is_sub)
-@@ -2270,42 +2260,48 @@ static tcg_insn_unit *align_code_ptr(TCGContext *s)
-     return s->code_ptr;
- }
+ static tcg_insn_unit *tb_ret_addr;
+ static tcg_insn_unit *bswap32_addr;
++static tcg_insn_unit *bswap32u_addr;
++static tcg_insn_unit *bswap64_addr;
  
-+/* Stack frame parameters.  */
-+#define REG_SIZE   (TCG_TARGET_REG_BITS / 8)
-+#define SAVE_SIZE  ((int)ARRAY_SIZE(tcg_target_callee_save_regs) * REG_SIZE)
-+#define TEMP_SIZE  (CPU_TEMP_BUF_NLONGS * (int)sizeof(long))
-+
-+#define FRAME_SIZE ((TCG_STATIC_CALL_ARGS_SIZE + TEMP_SIZE + SAVE_SIZE \
-+                     + TCG_TARGET_STACK_ALIGN - 1) \
-+                    & -TCG_TARGET_STACK_ALIGN)
-+#define SAVE_OFS   (TCG_STATIC_CALL_ARGS_SIZE + TEMP_SIZE)
-+
-+/* We're expecting to be able to use an immediate for frame allocation.  */
-+QEMU_BUILD_BUG_ON(FRAME_SIZE > 0x7fff);
-+
- /* Generate global QEMU prologue and epilogue code */
- static void tcg_target_qemu_prologue(TCGContext *s)
+ static inline uint32_t reloc_pc16_val(tcg_insn_unit *pc, tcg_insn_unit *target)
  {
--    int i, frame_size;
-+    int i;
- 
--    /* reserve some stack space, also for TCG temps. */
--    frame_size = ARRAY_SIZE(tcg_target_callee_save_regs) * 4
--                 + TCG_STATIC_CALL_ARGS_SIZE
--                 + CPU_TEMP_BUF_NLONGS * sizeof(long);
--    frame_size = (frame_size + TCG_TARGET_STACK_ALIGN - 1) &
--                 ~(TCG_TARGET_STACK_ALIGN - 1);
--    tcg_set_frame(s, TCG_REG_SP, ARRAY_SIZE(tcg_target_callee_save_regs) * 4
--                  + TCG_STATIC_CALL_ARGS_SIZE,
--                  CPU_TEMP_BUF_NLONGS * sizeof(long));
-+    tcg_set_frame(s, TCG_REG_SP, TCG_STATIC_CALL_ARGS_SIZE, TEMP_SIZE);
- 
-     /* TB prologue */
--    tcg_out_addi(s, TCG_REG_SP, -frame_size);
--    for(i = 0 ; i < ARRAY_SIZE(tcg_target_callee_save_regs) ; i++) {
--        tcg_out_st(s, TCG_TYPE_I32, tcg_target_callee_save_regs[i],
--                   TCG_REG_SP, TCG_STATIC_CALL_ARGS_SIZE + i * 4);
-+    tcg_out_opc_imm(s, ALIAS_PADDI, TCG_REG_SP, TCG_REG_SP, -FRAME_SIZE);
-+    for (i = 0; i < ARRAY_SIZE(tcg_target_callee_save_regs); i++) {
-+        tcg_out_st(s, TCG_TYPE_REG, tcg_target_callee_save_regs[i],
-+                   TCG_REG_SP, SAVE_OFS + i * REG_SIZE);
+@@ -622,7 +624,10 @@ static void tcg_out_bswap32u(TCGContext *s, TCGReg ret, TCGReg arg)
+         tcg_out_opc_reg(s, OPC_DSHD, ret, 0, ret);
+         tcg_out_dsrl(s, ret, ret, 32);
+     } else {
+-        abort();
++        tcg_out_bswap_subr(s, bswap32u_addr);
++        /* delay slot -- never omit the insn, like tcg_out_mov might.  */
++        tcg_out_opc_reg(s, OPC_OR, TCG_TMP0, arg, TCG_REG_ZERO);
++        tcg_out_mov(s, TCG_TYPE_I32, ret, TCG_TMP3);
      }
+ }
  
-     /* Call generated code */
-     tcg_out_opc_reg(s, OPC_JR, 0, tcg_target_call_iarg_regs[1], 0);
-+    /* delay slot */
-     tcg_out_mov(s, TCG_TYPE_PTR, TCG_AREG0, tcg_target_call_iarg_regs[0]);
--    tb_ret_addr = s->code_ptr;
- 
-     /* TB epilogue */
--    for(i = 0 ; i < ARRAY_SIZE(tcg_target_callee_save_regs) ; i++) {
--        tcg_out_ld(s, TCG_TYPE_I32, tcg_target_callee_save_regs[i],
--                   TCG_REG_SP, TCG_STATIC_CALL_ARGS_SIZE + i * 4);
-+    tb_ret_addr = s->code_ptr;
-+    for (i = 0; i < ARRAY_SIZE(tcg_target_callee_save_regs); i++) {
-+        tcg_out_ld(s, TCG_TYPE_REG, tcg_target_callee_save_regs[i],
-+                   TCG_REG_SP, SAVE_OFS + i * REG_SIZE);
+@@ -632,7 +637,10 @@ static void tcg_out_bswap64(TCGContext *s, TCGReg ret, TCGReg arg)
+         tcg_out_opc_reg(s, OPC_DSBH, ret, 0, arg);
+         tcg_out_opc_reg(s, OPC_DSHD, ret, 0, ret);
+     } else {
+-        abort();
++        tcg_out_bswap_subr(s, bswap64_addr);
++        /* delay slot -- never omit the insn, like tcg_out_mov might.  */
++        tcg_out_opc_reg(s, OPC_OR, TCG_TMP0, arg, TCG_REG_ZERO);
++        tcg_out_mov(s, TCG_TYPE_I32, ret, TCG_TMP3);
      }
+ }
  
-     tcg_out_opc_reg(s, OPC_JR, 0, TCG_REG_RA, 0);
-     /* delay slot */
--    tcg_out_addi(s, TCG_REG_SP, frame_size);
-+    tcg_out_opc_imm(s, ALIAS_PADDI, TCG_REG_SP, TCG_REG_SP, FRAME_SIZE);
- 
-     if (use_mips32r2_instructions) {
+@@ -2279,7 +2287,7 @@ static void tcg_target_qemu_prologue(TCGContext *s)
          return;
+     }
+ 
+-    /* Bswap subroutine: Input in TCG_TMP0, output in TCG_TMP3;
++    /* Bswap subroutines: Input in TCG_TMP0, output in TCG_TMP3;
+        clobbers TCG_TMP1, TCG_TMP2.  */
+ 
+     /*
+@@ -2305,6 +2313,94 @@ static void tcg_target_qemu_prologue(TCGContext *s)
+     tcg_out_opc_reg(s, OPC_JR, 0, TCG_REG_RA, 0);
+     /* t3 = dcba -- delay slot */
+     tcg_out_opc_reg(s, OPC_OR, TCG_TMP3, TCG_TMP3, TCG_TMP1);
++
++    if (TCG_TARGET_REG_BITS == 32) {
++        return;
++    }
++
++    /*
++     * bswap32u -- unsigned 32-bit swap.  a0 = ....abcd.
++     */
++    bswap32u_addr = align_code_ptr(s);
++    /* t1 = (0000)000d */
++    tcg_out_opc_imm(s, OPC_ANDI, TCG_TMP1, TCG_TMP0, 0xff);
++    /* t3 = 000a */
++    tcg_out_opc_sa(s, OPC_SRL, TCG_TMP3, TCG_TMP0, 24);
++    /* t1 = (0000)d000 */
++    tcg_out_dsll(s, TCG_TMP1, TCG_TMP1, 24);
++    /* t2 = 00c0 */
++    tcg_out_opc_imm(s, OPC_ANDI, TCG_TMP2, TCG_TMP0, 0xff00);
++    /* t3 = d00a */
++    tcg_out_opc_reg(s, OPC_OR, TCG_TMP3, TCG_TMP3, TCG_TMP1);
++    /* t1 = 0abc */
++    tcg_out_opc_sa(s, OPC_SRL, TCG_TMP1, TCG_TMP0, 8);
++    /* t2 = 0c00 */
++    tcg_out_opc_sa(s, OPC_SLL, TCG_TMP2, TCG_TMP2, 8);
++    /* t1 = 00b0 */
++    tcg_out_opc_imm(s, OPC_ANDI, TCG_TMP1, TCG_TMP1, 0xff00);
++    /* t3 = dc0a */
++    tcg_out_opc_reg(s, OPC_OR, TCG_TMP3, TCG_TMP3, TCG_TMP2);
++    tcg_out_opc_reg(s, OPC_JR, 0, TCG_REG_RA, 0);
++    /* t3 = dcba -- delay slot */
++    tcg_out_opc_reg(s, OPC_OR, TCG_TMP3, TCG_TMP3, TCG_TMP1);
++
++    /*
++     * bswap64 -- 64-bit swap.  a0 = abcdefgh
++     */
++    bswap64_addr = align_code_ptr(s);
++    /* t3 = h0000000 */
++    tcg_out_dsll(s, TCG_TMP3, TCG_TMP0, 56);
++    /* t1 = 0000000a */
++    tcg_out_dsrl(s, TCG_TMP1, TCG_TMP0, 56);
++
++    /* t2 = 000000g0 */
++    tcg_out_opc_imm(s, OPC_ANDI, TCG_TMP2, TCG_TMP0, 0xff00);
++    /* t3 = h000000a */
++    tcg_out_opc_reg(s, OPC_OR, TCG_TMP3, TCG_TMP3, TCG_TMP1);
++    /* t1 = 00000abc */
++    tcg_out_dsrl(s, TCG_TMP1, TCG_TMP0, 40);
++    /* t2 = 0g000000 */
++    tcg_out_dsll(s, TCG_TMP2, TCG_TMP2, 40);
++    /* t1 = 000000b0 */
++    tcg_out_opc_imm(s, OPC_ANDI, TCG_TMP1, TCG_TMP1, 0xff00);
++
++    /* t3 = hg00000a */
++    tcg_out_opc_reg(s, OPC_OR, TCG_TMP3, TCG_TMP3, TCG_TMP2);
++    /* t2 = 0000abcd */
++    tcg_out_dsrl(s, TCG_TMP2, TCG_TMP0, 32);
++    /* t3 = hg0000ba */
++    tcg_out_opc_reg(s, OPC_OR, TCG_TMP3, TCG_TMP3, TCG_TMP1);
++
++    /* t1 = 000000c0 */
++    tcg_out_opc_imm(s, OPC_ANDI, TCG_TMP1, TCG_TMP2, 0xff00);
++    /* t2 = 0000000d */
++    tcg_out_opc_imm(s, OPC_ANDI, TCG_TMP2, TCG_TMP2, 0x00ff);
++    /* t1 = 00000c00 */
++    tcg_out_dsll(s, TCG_TMP1, TCG_TMP1, 8);
++    /* t2 = 0000d000 */
++    tcg_out_dsll(s, TCG_TMP2, TCG_TMP2, 24);
++
++    /* t3 = hg000cba */
++    tcg_out_opc_reg(s, OPC_OR, TCG_TMP3, TCG_TMP3, TCG_TMP1);
++    /* t1 = 00abcdef */
++    tcg_out_dsrl(s, TCG_TMP1, TCG_TMP0, 16);
++    /* t3 = hg00dcba */
++    tcg_out_opc_reg(s, OPC_OR, TCG_TMP3, TCG_TMP3, TCG_TMP2);
++
++    /* t2 = 0000000f */
++    tcg_out_opc_imm(s, OPC_ANDI, TCG_TMP2, TCG_TMP1, 0x00ff);
++    /* t1 = 000000e0 */
++    tcg_out_opc_imm(s, OPC_ANDI, TCG_TMP1, TCG_TMP1, 0xff00);
++    /* t2 = 00f00000 */
++    tcg_out_dsll(s, TCG_TMP2, TCG_TMP2, 40);
++    /* t1 = 000e0000 */
++    tcg_out_dsll(s, TCG_TMP1, TCG_TMP1, 24);
++
++    /* t3 = hgf0dcba */
++    tcg_out_opc_reg(s, OPC_OR, TCG_TMP3, TCG_TMP3, TCG_TMP2);
++    tcg_out_opc_reg(s, OPC_JR, 0, TCG_REG_RA, 0);
++    /* t3 = hgfedcba -- delay slot */
++    tcg_out_opc_reg(s, OPC_OR, TCG_TMP3, TCG_TMP3, TCG_TMP1);
+ }
+ 
+ static void tcg_target_init(TCGContext *s)
 -- 
 2.1.0
