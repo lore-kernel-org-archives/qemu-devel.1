@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43591)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43730)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pisa@cmp.felk.cvut.cz>) id 1cPHFo-0001vE-Mw
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 18:15:30 -0500
+	(envelope-from <pisa@cmp.felk.cvut.cz>) id 1cPHGF-0002AX-VL
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 18:15:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pisa@cmp.felk.cvut.cz>) id 1cPHFl-0007Vd-6t
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 18:15:28 -0500
-Received: from smtp7.web4u.cz ([81.91.87.87]:57148 helo=mx-8.mail.web4u.cz)
+	(envelope-from <pisa@cmp.felk.cvut.cz>) id 1cPHGC-0007aE-O5
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 18:15:55 -0500
+Received: from smtp7.web4u.cz ([81.91.87.87]:57164 helo=mx-8.mail.web4u.cz)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pisa@cmp.felk.cvut.cz>)
-	id 1cPHFk-0007VC-Rq
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 18:15:25 -0500
+	id 1cPHGC-0007a7-Ct
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 18:15:52 -0500
 From: pisa@cmp.felk.cvut.cz
-Date: Fri,  6 Jan 2017 00:11:24 +0100
-Message-Id: <d99bd94c7447c2f534add7350153bde31594503b.1483655893.git.pisa@cmp.felk.cvut.cz>
+Date: Fri,  6 Jan 2017 00:11:25 +0100
+Message-Id: <7a1cae936ad26433c385c2ea4136e0e5a8f3187d.1483655893.git.pisa@cmp.felk.cvut.cz>
 In-Reply-To: <cover.1483655893.git.pisa@cmp.felk.cvut.cz>
 References: <cover.1483655893.git.pisa@cmp.felk.cvut.cz>
 In-Reply-To: <cover.1483655893.git.pisa@cmp.felk.cvut.cz>
 References: <cover.1483655893.git.pisa@cmp.felk.cvut.cz>
-Subject: [Qemu-devel] [PATCH 2/6] CAN bus Kvaser PCI CAN-S (single SJA1000
+Subject: [Qemu-devel] [PATCH 3/6] CAN bus PCM-3680I PCI (dual SJA1000
  channel) emulation added.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -28,43 +28,38 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Konrad Frederic <fred.konrad@greensocs.com>, Deniz Eren <deniz.eren@icloud.com>, Oliver Hartkopp <socketcan@hartkopp.net>, Pavel Pisa <pisa@cmp.felk.cvut.cz>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Konrad Frederic <fred.konrad@greensocs.com>, Deniz Eren <deniz.eren@icloud.com>, Oliver Hartkopp <socketcan@hartkopp.net>
 
-From: Pavel Pisa <pisa@cmp.felk.cvut.cz>
+From: Deniz Eren <deniz.eren@icloud.com>
 
-Signed-off-by: Pavel Pisa <pisa@cmp.felk.cvut.cz>
 ---
- hw/can/Makefile.objs    |   1 +
- hw/can/can_kvaser_pci.c | 364 ++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 365 insertions(+)
- create mode 100644 hw/can/can_kvaser_pci.c
+ hw/can/Makefile.objs     |   1 +
+ hw/can/can_pcm3680_pci.c | 315 +++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 316 insertions(+)
+ create mode 100644 hw/can/can_pcm3680_pci.c
 
 diff --git a/hw/can/Makefile.objs b/hw/can/Makefile.objs
-index 98ff1e3..560bb1b 100644
+index 560bb1b..d654ca3 100644
 --- a/hw/can/Makefile.objs
 +++ b/hw/can/Makefile.objs
-@@ -3,3 +3,4 @@
- common-obj-$(CONFIG_CAN_SJA1000) += can_core.o
+@@ -4,3 +4,4 @@ common-obj-$(CONFIG_CAN_SJA1000) += can_core.o
  common-obj-$(CONFIG_CAN_SJA1000) += can_sja1000.o
  common-obj-$(CONFIG_CAN_PCI) += can_pci.o
-+common-obj-$(CONFIG_CAN_PCI) += can_kvaser_pci.o
-diff --git a/hw/can/can_kvaser_pci.c b/hw/can/can_kvaser_pci.c
+ common-obj-$(CONFIG_CAN_PCI) += can_kvaser_pci.o
++common-obj-$(CONFIG_CAN_PCI) += can_pcm3680_pci.o
+diff --git a/hw/can/can_pcm3680_pci.c b/hw/can/can_pcm3680_pci.c
 new file mode 100644
-index 0000000..e62c192
+index 0000000..6e5c9f2
 --- /dev/null
-+++ b/hw/can/can_kvaser_pci.c
-@@ -0,0 +1,364 @@
++++ b/hw/can/can_pcm3680_pci.c
+@@ -0,0 +1,315 @@
 +/*
-+ * Kvaser PCI CAN device (SJA1000 based) emulation
++ * PCM-3680i PCI CAN device (SJA1000 based) emulation
 + *
-+ * Copyright (c) 2013-2014 Jin Yang
-+ * Copyright (c) 2014 Pavel Pisa
++ * Copyright (c) 2016 Deniz Eren (deniz.eren@icloud.com)
 + *
-+ * Partially based on educational PCIexpress APOHW hardware
-+ * emulator used fro class A0B36APO at CTU FEE course by
-+ *    Rostislav Lisovy and Pavel Pisa
-+ *
-+ * Initial development supported by Google GSoC 2013 from RTEMS project slot
++ * Based on Kvaser PCI CAN device (SJA1000 based) emulation implemented by
++ * Jin Yang and Pavel Pisa
 + *
 + * Permission is hereby granted, free of charge, to any person obtaining a copy
 + * of this software and associated documentation files (the "Software"), to deal
@@ -97,172 +92,108 @@ index 0000000..e62c192
 +
 +#include "can_sja1000.h"
 +
-+#define TYPE_CAN_PCI_DEV "kvaser_pci"
++#define TYPE_CAN_PCI_DEV "pcm3680_pci"
 +
-+#define KVASER_PCI_DEV(obj) \
-+    OBJECT_CHECK(KvaserPCIState, (obj), TYPE_CAN_PCI_DEV)
++#define PCM3680i_PCI_DEV(obj) \
++    OBJECT_CHECK(Pcm3680iPCIState, (obj), TYPE_CAN_PCI_DEV)
 +
-+#ifndef KVASER_PCI_VENDOR_ID1
-+#define KVASER_PCI_VENDOR_ID1     0x10e8    /* the PCI device and vendor IDs */
++#ifndef PCM3680i_PCI_VENDOR_ID1
++#define PCM3680i_PCI_VENDOR_ID1     0x13fe    /* the PCI device and vendor IDs */
 +#endif
 +
-+#ifndef KVASER_PCI_DEVICE_ID1
-+#define KVASER_PCI_DEVICE_ID1     0x8406
++#ifndef PCM3680i_PCI_DEVICE_ID1
++#define PCM3680i_PCI_DEVICE_ID1     0xc002
 +#endif
 +
-+#define KVASER_PCI_S5920_RANGE    0x80
-+#define KVASER_PCI_SJA_RANGE      0x80
-+#define KVASER_PCI_XILINX_RANGE   0x8
++#define PCM3680i_PCI_SJA_RANGE     0x200
 +
-+#define KVASER_PCI_BYTES_PER_SJA  0x20
++#define PCM3680i_PCI_BYTES_PER_SJA 0x20
 +
-+#define S5920_OMB                 0x0C
-+#define S5920_IMB                 0x1C
-+#define S5920_MBEF                0x34
-+#define S5920_INTCSR              0x38
-+#define S5920_RCR                 0x3C
-+#define S5920_PTCR                0x60
-+
-+#define S5920_INTCSR_ADDON_INTENABLE_M        0x2000
-+#define S5920_INTCSR_INTERRUPT_ASSERTED_M     0x800000
-+
-+#define KVASER_PCI_XILINX_VERINT  7   /* Lower nibble simulate interrupts,
-+                                         high nibble version number. */
-+
-+typedef struct KvaserPCIState {
++typedef struct Pcm3680iPCIState {
 +    /*< private >*/
 +    PCIDevice       dev;
 +    /*< public >*/
-+    MemoryRegion    s5920_io;
-+    MemoryRegion    sja_io;
-+    MemoryRegion    xilinx_io;
++    MemoryRegion    sja_io[2];
 +
-+    CanSJA1000State sja_state;
-+    qemu_irq        irq;
-+
-+    uint32_t        s5920_intcsr;
-+    uint32_t        s5920_irqstate;
++    CanSJA1000State sja_state[2];
 +
 +    char            *model; /* The model that support, only SJA1000 now. */
-+    char            *canbus;
-+    char            *host;
-+} KvaserPCIState;
++    char            *canbus[2];
++    char            *host[2];
++} Pcm3680iPCIState;
 +
-+static void kvaser_pci_irq_raise(void *opaque)
++static void pcm3680i_pci_irq_raise(void *opaque)
 +{
-+    KvaserPCIState *d = (KvaserPCIState *)opaque;
-+    d->s5920_irqstate = 1;
-+
-+    if (d->s5920_intcsr & S5920_INTCSR_ADDON_INTENABLE_M)
-+        qemu_irq_raise(d->irq);
 +}
 +
-+static void kvaser_pci_irq_lower(void *opaque)
++static void pcm3680i_pci_irq_lower(void *opaque)
 +{
-+    KvaserPCIState *d = (KvaserPCIState *)opaque;
-+    d->s5920_irqstate = 0;
-+    qemu_irq_lower(d->irq);
 +}
 +
 +static void
-+kvaser_pci_reset(void *opaque)
++pcm3680i_pci_reset(void *opaque)
 +{
-+    KvaserPCIState *d = (KvaserPCIState *)opaque;
-+    CanSJA1000State *s = &d->sja_state;
++    Pcm3680iPCIState *d = (Pcm3680iPCIState *)opaque;
++    CanSJA1000State *s1 = &d->sja_state[0];
++    CanSJA1000State *s2 = &d->sja_state[1];
 +
-+    can_sja_hardware_reset(s);
++    can_sja_hardware_reset(s1);
++    can_sja_hardware_reset(s2);
 +}
 +
-+static uint64_t kvaser_pci_s5920_io_read(void *opaque, hwaddr addr, unsigned size)
++static uint64_t pcm3680i_pci_sja1_io_read(void *opaque, hwaddr addr, unsigned size)
 +{
-+    KvaserPCIState *d = opaque;
-+    uint64_t val;
++    Pcm3680iPCIState *d = opaque;
++    CanSJA1000State *s = &d->sja_state[0];
 +
-+    switch (addr) {
-+    case S5920_INTCSR:
-+        val = d->s5920_intcsr;
-+        val &= ~S5920_INTCSR_INTERRUPT_ASSERTED_M;
-+        if (d->s5920_irqstate) {
-+            val |= S5920_INTCSR_INTERRUPT_ASSERTED_M;
-+        }
-+        return val;
-+    }
-+    return 0;
-+}
-+
-+static void kvaser_pci_s5920_io_write(void *opaque, hwaddr addr, uint64_t data,
-+                             unsigned size)
-+{
-+    KvaserPCIState *d = opaque;
-+
-+    switch (addr) {
-+    case S5920_INTCSR:
-+        if (~d->s5920_intcsr & data & S5920_INTCSR_ADDON_INTENABLE_M) {
-+            if (d->s5920_irqstate) {
-+                qemu_irq_raise(d->irq);
-+            }
-+        }
-+        d->s5920_intcsr = data;
-+        break;
-+    }
-+}
-+
-+static uint64_t kvaser_pci_sja_io_read(void *opaque, hwaddr addr, unsigned size)
-+{
-+    KvaserPCIState *d = opaque;
-+    CanSJA1000State *s = &d->sja_state;
-+
-+    if (addr >= KVASER_PCI_BYTES_PER_SJA) {
++    if (addr >= PCM3680i_PCI_BYTES_PER_SJA) {
 +        return 0;
 +    }
 +
 +    return can_sja_mem_read(s, addr, size);
 +}
 +
-+static void kvaser_pci_sja_io_write(void *opaque, hwaddr addr, uint64_t data,
++static void pcm3680i_pci_sja1_io_write(void *opaque, hwaddr addr, uint64_t data,
 +                             unsigned size)
 +{
-+    KvaserPCIState *d = opaque;
-+    CanSJA1000State *s = &d->sja_state;
++    Pcm3680iPCIState *d = opaque;
++    CanSJA1000State *s = &d->sja_state[0];
 +
-+    if (addr >= KVASER_PCI_BYTES_PER_SJA) {
++    if (addr >= PCM3680i_PCI_BYTES_PER_SJA) {
 +        return;
 +    }
 +
 +    can_sja_mem_write(s, addr, data, size);
 +}
 +
-+static uint64_t kvaser_pci_xilinx_io_read(void *opaque, hwaddr addr, unsigned size)
++static uint64_t pcm3680i_pci_sja2_io_read(void *opaque, hwaddr addr, unsigned size)
 +{
-+    /*KvaserPCIState *d = opaque;*/
++    Pcm3680iPCIState *d = opaque;
++    CanSJA1000State *s = &d->sja_state[1];
 +
-+    switch (addr) {
-+    case KVASER_PCI_XILINX_VERINT:
-+        return (13 << 4) | 0;
++    if (addr >= PCM3680i_PCI_BYTES_PER_SJA) {
++        return 0;
 +    }
 +
-+    return 0;
++    return can_sja_mem_read(s, addr, size);
 +}
 +
-+static void kvaser_pci_xilinx_io_write(void *opaque, hwaddr addr, uint64_t data,
++static void pcm3680i_pci_sja2_io_write(void *opaque, hwaddr addr, uint64_t data,
 +                             unsigned size)
 +{
-+    /*KvaserPCIState *d = opaque;*/
++    Pcm3680iPCIState *d = opaque;
++    CanSJA1000State *s = &d->sja_state[1];
++
++    if (addr >= PCM3680i_PCI_BYTES_PER_SJA) {
++        return;
++    }
++
++    can_sja_mem_write(s, addr, data, size);
 +}
 +
-+static const MemoryRegionOps kvaser_pci_s5920_io_ops = {
-+    .read = kvaser_pci_s5920_io_read,
-+    .write = kvaser_pci_s5920_io_write,
-+    .endianness = DEVICE_LITTLE_ENDIAN,
-+    .impl = {
-+        .min_access_size = 4,
-+        .max_access_size = 4,
-+    },
-+};
-+
-+static const MemoryRegionOps kvaser_pci_sja_io_ops = {
-+    .read = kvaser_pci_sja_io_read,
-+    .write = kvaser_pci_sja_io_write,
++static const MemoryRegionOps pcm3680i_pci_sja1_io_ops = {
++    .read = pcm3680i_pci_sja1_io_read,
++    .write = pcm3680i_pci_sja1_io_write,
 +    .endianness = DEVICE_LITTLE_ENDIAN,
 +    .impl = {
 +        .min_access_size = 1,
@@ -270,9 +201,9 @@ index 0000000..e62c192
 +    },
 +};
 +
-+static const MemoryRegionOps kvaser_pci_xilinx_io_ops = {
-+    .read = kvaser_pci_xilinx_io_read,
-+    .write = kvaser_pci_xilinx_io_write,
++static const MemoryRegionOps pcm3680i_pci_sja2_io_ops = {
++    .read = pcm3680i_pci_sja2_io_read,
++    .write = pcm3680i_pci_sja2_io_write,
 +    .endianness = DEVICE_LITTLE_ENDIAN,
 +    .impl = {
 +        .min_access_size = 1,
@@ -280,12 +211,14 @@ index 0000000..e62c192
 +    },
 +};
 +
-+static int kvaser_pci_init(PCIDevice *pci_dev)
++static int pcm3680i_pci_init(PCIDevice *pci_dev)
 +{
-+    KvaserPCIState *d = KVASER_PCI_DEV(pci_dev);
-+    CanSJA1000State *s = &d->sja_state;
++    Pcm3680iPCIState *d = PCM3680i_PCI_DEV(pci_dev);
++    CanSJA1000State *s1 = &d->sja_state[0];
++    CanSJA1000State *s2 = &d->sja_state[1];
 +    uint8_t *pci_conf;
-+    CanBusState *can_bus;
++    CanBusState *can_bus1;
++    CanBusState *can_bus2;
 +
 +    if (d->model) {
 +        if (strncmp(d->model, "pcican-s", 256)) { /* for security reason */
@@ -295,16 +228,28 @@ index 0000000..e62c192
 +        }
 +    }
 +
-+    can_bus = can_bus_find_by_name(d->canbus, true);
-+    if (can_bus == NULL) {
-+        error_report("Cannot create can find/allocate CAN bus\n");
++    can_bus1 = can_bus_find_by_name(d->canbus[0], true);
++    if (can_bus1 == NULL) {
++        error_report("Cannot create can find/allocate CAN bus #1\n");
 +        exit(1);
-+
 +    }
 +
-+    if (d->host != NULL) {
-+        if (can_bus_connect_to_host_device(can_bus, d->host) < 0) {
-+            error_report("Cannot connect CAN bus to host device \"%s\"\n", d->host);
++    can_bus2 = can_bus_find_by_name(d->canbus[1], true);
++    if (can_bus2 == NULL) {
++        error_report("Cannot create can find/allocate CAN bus #2\n");
++        exit(1);
++    }
++
++    if (d->host[0] != NULL) {
++        if (can_bus_connect_to_host_device(can_bus1, d->host[0]) < 0) {
++            error_report("Cannot connect CAN bus to host #1 device \"%s\"\n", d->host[0]);
++            exit(1);
++        }
++    }
++
++    if (d->host[1] != NULL) {
++        if (can_bus_connect_to_host_device(can_bus2, d->host[1]) < 0) {
++            error_report("Cannot connect CAN bus to host #2 device \"%s\"\n", d->host[1]);
 +            exit(1);
 +        }
 +    }
@@ -312,111 +257,116 @@ index 0000000..e62c192
 +    pci_conf = pci_dev->config;
 +    pci_conf[PCI_INTERRUPT_PIN] = 0x01; /* interrupt pin A */
 +
-+    d->irq = pci_allocate_irq(&d->dev);
++    can_sja_init(s1, pcm3680i_pci_irq_raise, pcm3680i_pci_irq_lower, d);
++    can_sja_init(s2, pcm3680i_pci_irq_raise, pcm3680i_pci_irq_lower, d);
 +
-+    can_sja_init(s, kvaser_pci_irq_raise, kvaser_pci_irq_lower, d);
++    qemu_register_reset(pcm3680i_pci_reset, d);
 +
-+    qemu_register_reset(kvaser_pci_reset, d);
-+
-+    if (can_sja_connect_to_bus(s, can_bus) < 0) {
++    if (can_sja_connect_to_bus(s1, can_bus1) < 0) {
 +        error_report("can_sja_connect_to_bus failed\n");
 +        exit(1);
 +    }
 +
-+    memory_region_init_io(&d->s5920_io, OBJECT(d), &kvaser_pci_s5920_io_ops, d,
-+                          "kvaser_pci-s5920", KVASER_PCI_S5920_RANGE);
-+    memory_region_init_io(&d->sja_io, OBJECT(d), &kvaser_pci_sja_io_ops, d,
-+                          "kvaser_pci-sja", KVASER_PCI_SJA_RANGE);
-+    memory_region_init_io(&d->xilinx_io, OBJECT(d), &kvaser_pci_xilinx_io_ops, d,
-+                          "kvaser_pci-xilinx", KVASER_PCI_XILINX_RANGE);
++    if (can_sja_connect_to_bus(s2, can_bus2) < 0) {
++        error_report("can_sja_connect_to_bus failed\n");
++        exit(1);
++    }
 +
-+    pci_register_bar(&d->dev, /*BAR*/ 0, PCI_BASE_ADDRESS_SPACE_IO, &d->s5920_io);
-+    pci_register_bar(&d->dev, /*BAR*/ 1, PCI_BASE_ADDRESS_SPACE_IO, &d->sja_io);
-+    pci_register_bar(&d->dev, /*BAR*/ 2, PCI_BASE_ADDRESS_SPACE_IO, &d->xilinx_io);
++    memory_region_init_io(&d->sja_io[0], OBJECT(d), &pcm3680i_pci_sja1_io_ops, d,
++                          "pcm3680i_pci-sja1", PCM3680i_PCI_SJA_RANGE/2);
++    memory_region_init_io(&d->sja_io[1], OBJECT(d), &pcm3680i_pci_sja2_io_ops, d,
++                          "pcm3680i_pci-sja2", PCM3680i_PCI_SJA_RANGE/2);
++
++    pci_register_bar(&d->dev, /*BAR*/ 0, PCI_BASE_ADDRESS_SPACE_IO, &d->sja_io[0]);
++    pci_register_bar(&d->dev, /*BAR*/ 1, PCI_BASE_ADDRESS_SPACE_IO, &d->sja_io[1]);
 +
 +    return 0;
 +}
 +
-+static void kvaser_pci_exit(PCIDevice *pci_dev)
++static void pcm3680i_pci_exit(PCIDevice *pci_dev)
 +{
-+    KvaserPCIState *d = KVASER_PCI_DEV(pci_dev);
-+    CanSJA1000State *s = &d->sja_state;
++    Pcm3680iPCIState *d = PCM3680i_PCI_DEV(pci_dev);
++    CanSJA1000State *s1 = &d->sja_state[0];
++    CanSJA1000State *s2 = &d->sja_state[1];
 +
-+    can_sja_disconnect(s);
++    can_sja_disconnect(s1);
++    can_sja_disconnect(s2);
 +
-+    qemu_unregister_reset(kvaser_pci_reset, d);
++    qemu_unregister_reset(pcm3680i_pci_reset, d);
 +
 +    /*
 +     * regions d->s5920_io, d->sja_io and d->xilinx_io
 +     * are destroyed by QOM now
 +     */
-+    /* memory_region_destroy(&d->s5920_io); */
-+    /* memory_region_destroy(&d->sja_io); */
-+    /* memory_region_destroy(&d->xilinx_io); */
++    /* memory_region_destroy(&d->sja_io[0]); */
++    /* memory_region_destroy(&d->sja_io[1]); */
 +
-+    can_sja_exit(s);
-+
-+    qemu_free_irq(d->irq);
++    can_sja_exit(s1);
++    can_sja_exit(s2);
 +}
 +
-+static const VMStateDescription vmstate_kvaser_pci = {
-+    .name = "kvaser_pci",
++static const VMStateDescription vmstate_pcm3680i_pci = {
++    .name = "pcm3680i_pci",
 +    .version_id = 1,
 +    .minimum_version_id = 1,
 +    .minimum_version_id_old = 1,
 +    .fields = (VMStateField[]) {
-+        VMSTATE_PCI_DEVICE(dev, KvaserPCIState),
-+        VMSTATE_STRUCT(sja_state, KvaserPCIState, 0, vmstate_can_sja, CanSJA1000State),
-+        /*char *model,*/
-+        VMSTATE_UINT32(s5920_intcsr, KvaserPCIState),
-+        VMSTATE_UINT32(s5920_irqstate, KvaserPCIState),
++        VMSTATE_PCI_DEVICE(dev, Pcm3680iPCIState),
++        VMSTATE_STRUCT(sja_state[0], Pcm3680iPCIState, 0, vmstate_can_sja, CanSJA1000State),
++        VMSTATE_STRUCT(sja_state[1], Pcm3680iPCIState, 0, vmstate_can_sja, CanSJA1000State),
 +        VMSTATE_END_OF_LIST()
 +    }
 +};
 +
-+static void qdev_kvaser_pci_reset(DeviceState *dev)
++static void qdev_pcm3680i_pci_reset(DeviceState *dev)
 +{
-+    KvaserPCIState *d = KVASER_PCI_DEV(dev);
-+    kvaser_pci_reset(d);
++    Pcm3680iPCIState *d = PCM3680i_PCI_DEV(dev);
++    pcm3680i_pci_reset(d);
 +}
 +
-+static Property kvaser_pci_properties[] = {
-+    DEFINE_PROP_STRING("canbus",   KvaserPCIState, canbus),
-+    DEFINE_PROP_STRING("host",  KvaserPCIState, host),
-+    DEFINE_PROP_STRING("model", KvaserPCIState, model),
++static Property pcm3680i_pci_properties[] = {
++    DEFINE_PROP_STRING("canbus1",   Pcm3680iPCIState, canbus[0]),
++    DEFINE_PROP_STRING("canbus2",   Pcm3680iPCIState, canbus[1]),
++    DEFINE_PROP_STRING("host1",  Pcm3680iPCIState, host[0]),
++    DEFINE_PROP_STRING("host2",  Pcm3680iPCIState, host[1]),
++    DEFINE_PROP_STRING("model", Pcm3680iPCIState, model),
 +    DEFINE_PROP_END_OF_LIST(),
 +};
 +
-+static void kvaser_pci_class_init(ObjectClass *klass, void *data)
++static void pcm3680i_pci_class_init(ObjectClass *klass, void *data)
 +{
 +    DeviceClass *dc = DEVICE_CLASS(klass);
 +    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
 +
-+    k->init = kvaser_pci_init;
-+    k->exit = kvaser_pci_exit;
-+    k->vendor_id = KVASER_PCI_VENDOR_ID1;
-+    k->device_id = KVASER_PCI_DEVICE_ID1;
++    k->init = pcm3680i_pci_init;
++    k->exit = pcm3680i_pci_exit;
++    k->vendor_id = PCM3680i_PCI_VENDOR_ID1;
++    k->device_id = PCM3680i_PCI_DEVICE_ID1;
 +    k->revision = 0x00;
-+    k->class_id = 0x00ff00;
-+    dc->desc = "Kvaser PCICANx";
-+    dc->props = kvaser_pci_properties;
-+    dc->vmsd = &vmstate_kvaser_pci;
++    k->class_id = 0x000c09;
++    k->subsystem_vendor_id = 0x13fe;
++    k->subsystem_id = 0xc002;
++//  k->is_bridge = 0;
++//  k->is_express = 0;
++    dc->desc = "Pcm3680i PCICANx";
++    dc->props = pcm3680i_pci_properties;
++    dc->vmsd = &vmstate_pcm3680i_pci;
 +    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
-+    dc->reset = qdev_kvaser_pci_reset;
++    dc->reset = qdev_pcm3680i_pci_reset;
 +}
 +
-+static const TypeInfo kvaser_pci_info = {
++static const TypeInfo pcm3680i_pci_info = {
 +    .name          = TYPE_CAN_PCI_DEV,
 +    .parent        = TYPE_PCI_DEVICE,
-+    .instance_size = sizeof(KvaserPCIState),
-+    .class_init    = kvaser_pci_class_init,
++    .instance_size = sizeof(Pcm3680iPCIState),
++    .class_init    = pcm3680i_pci_class_init,
 +};
 +
-+static void kvaser_pci_register_types(void)
++static void pcm3680i_pci_register_types(void)
 +{
-+    type_register_static(&kvaser_pci_info);
++    type_register_static(&pcm3680i_pci_info);
 +}
 +
-+type_init(kvaser_pci_register_types)
++type_init(pcm3680i_pci_register_types)
 -- 
 1.9.1
