@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44539)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44546)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cPHLt-0006u2-Mf
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 18:21:48 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cPHLv-0006us-DB
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 18:21:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cPHLr-0001Jq-Lb
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 18:21:45 -0500
-Date: Fri, 6 Jan 2017 10:14:44 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1cPHLr-0001Jd-C4
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 18:21:47 -0500
+Date: Fri, 6 Jan 2017 10:21:30 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170105231444.GI13763@umbus.fritz.box>
+Message-ID: <20170105232130.GK13763@umbus.fritz.box>
 References: <1483653417-17439-1-git-send-email-hpoussin@reactos.org>
-	<1483653417-17439-3-git-send-email-hpoussin@reactos.org>
+	<1483653417-17439-5-git-send-email-hpoussin@reactos.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="sl5MdczEF/OU2Miu"
+	protocol="application/pgp-signature"; boundary="2WS97oupGEGbYNpW"
 Content-Disposition: inline
-In-Reply-To: <1483653417-17439-3-git-send-email-hpoussin@reactos.org>
-Subject: Re: [Qemu-devel] [PATCH v2 2/4] prep: add PReP System I/O
+In-Reply-To: <1483653417-17439-5-git-send-email-hpoussin@reactos.org>
+Subject: Re: [Qemu-devel] [PATCH v2 4/4] prep: add IBM RS/6000 7020 (40p)
+ machine emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,413 +29,324 @@ To: =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>
 Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Thomas Huth <thuth@redhat.com>, Giancarlo Teodori <gteodori@gmail.com>
 
 
---sl5MdczEF/OU2Miu
+--2WS97oupGEGbYNpW
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jan 05, 2017 at 10:56:55PM +0100, Herv=E9 Poussineau wrote:
-> This device is a partial duplicate of System I/O device available in hw/p=
-pc/prep.c
-> This new one doesn't have all the Motorola-specific registers.
-> The old one should be deprecated and removed with the 'prep' machine.
->=20
-> Partial documentation available at
-> ftp://ftp.software.ibm.com/rs6000/technology/spec/srp1_1.exe
-> section 6.1.5 (I/O Device Mapping)
+On Thu, Jan 05, 2017 at 10:56:57PM +0100, Herv=E9 Poussineau wrote:
+> Machine supports both Open Hack'Ware and OpenBIOS.
+> Open Hack'Ware is the default because OpenBIOS is currently unable to boot
+> PReP boot partitions or PReP kernels.
 >=20
 > Signed-off-by: Herv=E9 Poussineau <hpoussin@reactos.org>
-
-With one exception noted below,
-
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-
 > ---
->  hw/ppc/Makefile.objs   |   1 +
->  hw/ppc/prep_systemio.c | 309 +++++++++++++++++++++++++++++++++++++++++++=
+>  default-configs/ppc-softmmu.mak |   1 +
+>  hw/ppc/prep.c                   | 227 ++++++++++++++++++++++++++++++++++=
 ++++++
->  hw/ppc/trace-events    |   4 +
->  3 files changed, 314 insertions(+)
->  create mode 100644 hw/ppc/prep_systemio.c
+>  2 files changed, 228 insertions(+)
 >=20
-> diff --git a/hw/ppc/Makefile.objs b/hw/ppc/Makefile.objs
-> index 8025129..db72297 100644
-> --- a/hw/ppc/Makefile.objs
-> +++ b/hw/ppc/Makefile.objs
-> @@ -16,6 +16,7 @@ obj-y +=3D ppc405_boards.o ppc4xx_devs.o ppc405_uc.o pp=
-c440_bamboo.o
->  obj-y +=3D ppc4xx_pci.o
->  # PReP
->  obj-$(CONFIG_PREP) +=3D prep.o
-> +obj-$(CONFIG_PREP) +=3D prep_systemio.o
->  # OldWorld PowerMac
->  obj-$(CONFIG_MAC) +=3D mac_oldworld.o
->  # NewWorld PowerMac
-> diff --git a/hw/ppc/prep_systemio.c b/hw/ppc/prep_systemio.c
-> new file mode 100644
-> index 0000000..fa05cb0
-> --- /dev/null
-> +++ b/hw/ppc/prep_systemio.c
-> @@ -0,0 +1,309 @@
-> +/*
-> + * QEMU PReP System I/O emulation
-> + *
+> diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmm=
+u.mak
+> index e567658..7dd004e 100644
+> --- a/default-configs/ppc-softmmu.mak
+> +++ b/default-configs/ppc-softmmu.mak
+> @@ -18,6 +18,7 @@ CONFIG_I82378=3Dy
+>  CONFIG_PC87312=3Dy
+>  CONFIG_MACIO=3Dy
+>  CONFIG_PCSPK=3Dy
+> +CONFIG_CS4231A=3Dy
+>  CONFIG_CUDA=3Dy
+>  CONFIG_ADB=3Dy
+>  CONFIG_MAC_NVRAM=3Dy
+> diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
+> index 9fb89d3..ec252de 100644
+> --- a/hw/ppc/prep.c
+> +++ b/hw/ppc/prep.c
+> @@ -2,6 +2,7 @@
+>   * QEMU PPC PREP hardware System Emulator
+>   *
+>   * Copyright (c) 2003-2007 Jocelyn Mayer
 > + * Copyright (c) 2017 Herv=E9 Poussineau
-> + *
-> + * Permission is hereby granted, free of charge, to any person obtaining=
+>   *
+>   * Permission is hereby granted, free of charge, to any person obtaining=
  a copy
-> + * of this software and associated documentation files (the "Software"),=
+>   * of this software and associated documentation files (the "Software"),=
  to deal
-> + * in the Software without restriction, including without limitation the=
- rights
-> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or =
-sell
-> + * copies of the Software, and to permit persons to whom the Software is
-> + * furnished to do so, subject to the following conditions:
-> + *
-> + * The above copyright notice and this permission notice shall be includ=
-ed in
-> + * all copies or substantial portions of the Software.
-> + *
-> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRE=
-SS OR
-> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILI=
-TY,
-> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHA=
-LL
-> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR =
-OTHER
-> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI=
-NG FROM,
-> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
-S IN
-> + * THE SOFTWARE.
-> + */
+> @@ -43,6 +44,7 @@
+>  #include "hw/isa/pc87312.h"
+>  #include "sysemu/block-backend.h"
+>  #include "sysemu/arch_init.h"
+> +#include "sysemu/kvm.h"
+>  #include "sysemu/qtest.h"
+>  #include "exec/address-spaces.h"
+>  #include "trace.h"
+> @@ -54,6 +56,8 @@
+> =20
+>  #define MAX_IDE_BUS 2
+> =20
+> +#define CFG_ADDR 0xf0000510
 > +
-> +#include "qemu/osdep.h"
-> +#include "hw/isa/isa.h"
-> +#include "exec/address-spaces.h"
-> +#include "qemu/error-report.h" /* for error_report() */
-> +#include "sysemu/sysemu.h" /* for vm_stop() */
-> +#include "cpu.h"
-> +#include "trace.h"
-> +
-> +#define TYPE_PREP_SYSTEMIO "prep-systemio"
-> +#define PREP_SYSTEMIO(obj) \
-> +    OBJECT_CHECK(PrepSystemIoState, (obj), TYPE_PREP_SYSTEMIO)
-> +
-> +/* Bit as defined in PowerPC Reference Plaform v1.1, sect. 6.1.5, p. 132=
- */
-> +#define PREP_BIT(n) (1 << (7 - (n)))
-> +
-> +typedef struct PrepSystemIoState {
-> +    ISADevice parent_obj;
-> +    MemoryRegion ppc_parity_mem;
-> +
-> +    qemu_irq non_contiguous_io_map_irq;
-> +    uint8_t sreset; /* 0x0092 */
-> +    uint8_t equipment; /* 0x080c */
-> +    uint8_t system_control; /* 0x081c */
-> +    uint8_t iomap_type; /* 0x0850 */
-> +    uint8_t ibm_planar_id; /* 0x0852 */
-> +    qemu_irq softreset_irq;
-> +    PortioList portio;
-> +} PrepSystemIoState;
-> +
-> +/* PORT 0092 -- Special Port 92 (Read/Write) */
-> +
-> +enum {
-> +    PORT0092_SOFTRESET  =3D PREP_BIT(7),
-> +    PORT0092_LE_MODE    =3D PREP_BIT(6),
-> +};
-> +
-> +static void prep_port0092_write(void *opaque, uint32_t addr, uint32_t va=
-l)
+>  #define BIOS_SIZE (1024 * 1024)
+>  #define BIOS_FILENAME "ppc_rom.bin"
+>  #define KERNEL_LOAD_ADDR 0x01000000
+> @@ -316,6 +320,12 @@ static uint32_t PREP_io_800_readb (void *opaque, uin=
+t32_t addr)
+> =20
+>  #define NVRAM_SIZE        0x2000
+> =20
+> +static void fw_cfg_boot_set(void *opaque, const char *boot_device,
+> +                            Error **errp)
 > +{
-> +    PrepSystemIoState *s =3D opaque;
+> +    fw_cfg_modify_i16(opaque, FW_CFG_BOOT_DEVICE, boot_device[0]);
+> +}
 > +
-> +    trace_prep_systemio_write(addr, val);
+>  static void ppc_prep_reset(void *opaque)
+>  {
+>      PowerPCCPU *cpu =3D opaque;
+> @@ -677,4 +687,221 @@ static void prep_machine_init(MachineClass *mc)
+>      mc->default_boot_order =3D "cad";
+>  }
+> =20
+> +static int prep_set_cmos_checksum(DeviceState *dev, void *opaque)
+> +{
+> +    uint16_t checksum =3D *(uint16_t *)opaque;
+> +    ISADevice *rtc;
 > +
-> +    s->sreset =3D val & PORT0092_SOFTRESET;
-> +    qemu_set_irq(s->softreset_irq, s->sreset);
-> +
-> +    if ((val & PORT0092_LE_MODE) !=3D 0) {
-> +        /* XXX Not supported yet */
-> +        error_report("little-endian mode not supported");
-> +        vm_stop(RUN_STATE_PAUSED);
-> +    } else {
-> +        /* Nothing to do */
+> +    if (object_dynamic_cast(OBJECT(dev), "mc146818rtc")) {
+> +        rtc =3D ISA_DEVICE(dev);
+> +        rtc_set_memory(rtc, 0x2e, checksum & 0xff);
+> +        rtc_set_memory(rtc, 0x3e, checksum & 0xff);
+> +        rtc_set_memory(rtc, 0x2f, checksum >> 8);
+> +        rtc_set_memory(rtc, 0x3f, checksum >> 8);
 > +    }
+> +    return 0;
 > +}
 > +
-> +static uint32_t prep_port0092_read(void *opaque, uint32_t addr)
+> +static void ibm_40p_init(MachineState *machine)
 > +{
-> +    PrepSystemIoState *s =3D opaque;
-> +    uint8_t ret =3D 0;
-> +
-> +    /* XXX LE mode unsupported */
-> +    if (s->sreset) {
-> +        ret |=3D PORT0092_SOFTRESET;
-> +    }
-
-So, I asked you to change this to make read and write match logically,
-but now you've changed both sides so they still don't match.
-
-Now that write sets s->sreset directly to (masked) val, read should
-just return it plain as well.
-
-Basically it needs to be clear whether s->sreset represents the
-register value itself, or is just a boolean flag.  In the previous
-version, write treated it like a boolean and read treated it like a
-register value.  Now write treats it like a register value and read
-treats it like a boolean.  Pick one.
-
-> +    trace_prep_systemio_read(addr, ret);
-> +    return ret;
-> +}
-> +
-> +/* PORT 0808 -- Hardfile Light Register (Write Only) */
-> +
-> +enum {
-> +    PORT0808_HARDFILE_LIGHT_ON  =3D PREP_BIT(7),
-> +};
-> +
-> +static void prep_port0808_write(void *opaque, uint32_t addr, uint32_t va=
-l)
-> +{
-> +    trace_prep_systemio_write(addr, val);
-> +}
-> +
-> +/* PORT 0810 -- Password Protect 1 Register (Write Only) */
-> +
-> +/* reset by port 0x4D in the SIO */
-> +static void prep_port0810_write(void *opaque, uint32_t addr, uint32_t va=
-l)
-> +{
-> +    trace_prep_systemio_write(addr, val);
-> +}
-> +
-> +/* PORT 0812 -- Password Protect 2 Register (Write Only) */
-> +
-> +/* reset by port 0x4D in the SIO */
-> +static void prep_port0812_write(void *opaque, uint32_t addr, uint32_t va=
-l)
-> +{
-> +    trace_prep_systemio_write(addr, val);
-> +}
-> +
-> +/* PORT 0814 -- L2 Invalidate Register (Write Only) */
-> +
-> +static void prep_port0814_write(void *opaque, uint32_t addr, uint32_t va=
-l)
-> +{
-> +    trace_prep_systemio_write(addr, val);
-> +}
-> +
-> +/* PORT 0818 -- Reserved for Keylock (Read Only) */
-> +
-> +enum {
-> +    PORT0818_KEYLOCK_SIGNAL_HIGH    =3D PREP_BIT(7),
-> +};
-> +
-> +static uint32_t prep_port0818_read(void *opaque, uint32_t addr)
-> +{
-> +    uint32_t val =3D 0;
-> +    trace_prep_systemio_read(addr, val);
-> +    return val;
-> +}
-> +
-> +/* PORT 080C -- Equipment */
-> +
-> +enum {
-> +    PORT080C_SCSIFUSE               =3D PREP_BIT(1),
-> +    PORT080C_L2_COPYBACK            =3D PREP_BIT(4),
-> +    PORT080C_L2_256                 =3D PREP_BIT(5),
-> +    PORT080C_UPGRADE_CPU            =3D PREP_BIT(6),
-> +    PORT080C_L2                     =3D PREP_BIT(7),
-> +};
-> +
-> +static uint32_t prep_port080c_read(void *opaque, uint32_t addr)
-> +{
-> +    PrepSystemIoState *s =3D opaque;
-> +    trace_prep_systemio_read(addr, s->equipment);
-> +    return s->equipment;
-> +}
-> +
-> +/* PORT 081C -- System Control Register (Read/Write) */
-> +
-> +enum {
-> +    PORT081C_FLOPPY_MOTOR_INHIBIT   =3D PREP_BIT(3),
-> +    PORT081C_MASK_TEA               =3D PREP_BIT(2),
-> +    PORT081C_L2_UPDATE_INHIBIT      =3D PREP_BIT(1),
-> +    PORT081C_L2_CACHEMISS_INHIBIT   =3D PREP_BIT(0),
-> +};
-> +
-> +static void prep_port081c_write(void *opaque, uint32_t addr, uint32_t va=
-l)
-> +{
-> +    static const uint8_t mask =3D PORT081C_FLOPPY_MOTOR_INHIBIT |
-> +                                PORT081C_MASK_TEA |
-> +                                PORT081C_L2_UPDATE_INHIBIT |
-> +                                PORT081C_L2_CACHEMISS_INHIBIT;
-> +    PrepSystemIoState *s =3D opaque;
-> +    trace_prep_systemio_write(addr, val);
-> +    s->system_control =3D val & mask;
-> +}
-> +
-> +static uint32_t prep_port081c_read(void *opaque, uint32_t addr)
-> +{
-> +    PrepSystemIoState *s =3D opaque;
-> +    trace_prep_systemio_read(addr, s->system_control);
-> +    return s->system_control;
-> +}
-> +
-> +/* System Board Identification */
-> +
-> +static uint32_t prep_port0852_read(void *opaque, uint32_t addr)
-> +{
-> +    PrepSystemIoState *s =3D opaque;
-> +    trace_prep_systemio_read(addr, s->ibm_planar_id);
-> +    return s->ibm_planar_id;
-> +}
-> +
-> +/* PORT 0850 -- I/O Map Type Register (Read/Write) */
-> +
-> +enum {
-> +    PORT0850_IOMAP_NONCONTIGUOUS    =3D PREP_BIT(7),
-> +};
-> +
-> +static uint32_t prep_port0850_read(void *opaque, uint32_t addr)
-> +{
-> +    PrepSystemIoState *s =3D opaque;
-> +    trace_prep_systemio_read(addr, s->iomap_type);
-> +    return s->iomap_type;
-> +}
-> +
-> +static void prep_port0850_write(void *opaque, uint32_t addr, uint32_t va=
-l)
-> +{
-> +    PrepSystemIoState *s =3D opaque;
-> +
-> +    trace_prep_systemio_write(addr, val);
-> +    qemu_set_irq(s->non_contiguous_io_map_irq,
-> +                 val & PORT0850_IOMAP_NONCONTIGUOUS);
-> +    s->iomap_type =3D val & PORT0850_IOMAP_NONCONTIGUOUS;
-> +}
-> +
-> +static const MemoryRegionPortio ppc_io800_port_list[] =3D {
-> +    { 0x092, 1, 1, .read =3D prep_port0092_read,
-> +                   .write =3D prep_port0092_write, },
-> +    { 0x808, 1, 1, .write =3D prep_port0808_write, },
-> +    { 0x80c, 1, 1, .read =3D prep_port080c_read, },
-> +    { 0x810, 1, 1, .write =3D prep_port0810_write, },
-> +    { 0x812, 1, 1, .write =3D prep_port0812_write, },
-> +    { 0x814, 1, 1, .write =3D prep_port0814_write, },
-> +    { 0x818, 1, 1, .read =3D prep_port0818_read },
-> +    { 0x81c, 1, 1, .read =3D prep_port081c_read,
-> +                   .write =3D prep_port081c_write, },
-> +    { 0x850, 1, 1, .read =3D prep_port0850_read,
-> +                   .write =3D prep_port0850_write, },
-> +    { 0x852, 1, 1, .read =3D prep_port0852_read, },
-> +    PORTIO_END_OF_LIST()
-> +};
-> +
-> +static uint64_t ppc_parity_error_readl(void *opaque, hwaddr addr,
-> +                                       unsigned int size)
-> +{
-> +    uint32_t val =3D 0;
-> +    trace_prep_systemio_read((unsigned int)addr, val);
-> +    return val;
-> +}
-> +
-> +static const MemoryRegionOps ppc_parity_error_ops =3D {
-> +    .read =3D ppc_parity_error_readl,
-> +    .valid =3D {
-> +        .min_access_size =3D 4,
-> +        .max_access_size =3D 4,
-> +    },
-> +};
-> +
-> +static void prep_systemio_realize(DeviceState *dev, Error **errp)
-> +{
-> +    ISADevice *isa =3D ISA_DEVICE(dev);
-> +    PrepSystemIoState *s =3D PREP_SYSTEMIO(dev);
+> +    CPUPPCState *env =3D NULL;
+> +    uint16_t cmos_checksum;
 > +    PowerPCCPU *cpu;
+> +    DeviceState *dev;
+> +    SysBusDevice *pcihost;
+> +    Nvram *m48t59 =3D NULL;
+> +    PCIBus *pci_bus;
+> +    ISABus *isa_bus;
+> +    void *fw_cfg;
+> +    int i;
+> +    uint32_t kernel_base =3D 0, initrd_base =3D 0;
+> +    long kernel_size =3D 0, initrd_size =3D 0;
+> +    char boot_device;
 > +
-> +    qdev_init_gpio_out(dev, &s->non_contiguous_io_map_irq, 1);
-> +    s->iomap_type =3D PORT0850_IOMAP_NONCONTIGUOUS;
-> +    qemu_set_irq(s->non_contiguous_io_map_irq,
-> +                 s->iomap_type & PORT0850_IOMAP_NONCONTIGUOUS);
-> +    cpu =3D POWERPC_CPU(first_cpu);
-> +    s->softreset_irq =3D cpu->env.irq_inputs[PPC6xx_INPUT_HRESET];
+> +    /* init CPU */
+> +    if (!machine->cpu_model) {
+> +        machine->cpu_model =3D "604";
+> +    }
+> +    cpu =3D cpu_ppc_init(machine->cpu_model);
+> +    if (cpu =3D=3D NULL) {
+> +        fprintf(stderr, "Unable to find PowerPC CPU definition\n");
+
+Please use error_report() rather than direct fprintf().
+
+> +        exit(1);
+> +    }
+> +    env =3D &cpu->env;
 > +
-> +    isa_register_portio_list(isa, &s->portio, 0x0, ppc_io800_port_list, =
-s,
-> +                             "systemio800");
+> +    if (env->flags & POWERPC_FLAG_RTC_CLK) {
+> +        /* POWER / PowerPC 601 RTC clock frequency is 7.8125 MHz */
+> +        cpu_ppc_tb_init(env, 7812500UL);
+> +    } else {
+> +        /* Set time-base frequency to 100 Mhz */
+> +        cpu_ppc_tb_init(env, 100UL * 1000UL * 1000UL);
+> +    }
+> +    qemu_register_reset(ppc_prep_reset, cpu);
+> +    if (PPC_INPUT(env) !=3D PPC_FLAGS_INPUT_6xx) {
+> +        hw_error("Only 6xx bus is supported on PREP machine\n");
+
+This is essentially a configuration error (selecting an unsuitable cpu
+for the platform.  So it should be an error_report() + exit() rather
+than hw_error().  I'd also suggest moving up to immediately after the
+cpu initialization.
+
+> +    }
 > +
-> +    memory_region_init_io(&s->ppc_parity_mem, OBJECT(dev),
-> +                          &ppc_parity_error_ops, s, "ppc-parity", 0x4);
-> +    memory_region_add_subregion(get_system_memory(), 0xbfffeff0,
-> +                                &s->ppc_parity_mem);
+> +    /* PCI host */
+> +    dev =3D qdev_create(NULL, "raven-pcihost");
+> +    if (!bios_name) {
+> +        bios_name =3D BIOS_FILENAME;
+> +    }
+> +    qdev_prop_set_string(dev, "bios-name", bios_name);
+> +    qdev_prop_set_uint32(dev, "elf-machine", PPC_ELF_MACHINE);
+> +    pcihost =3D SYS_BUS_DEVICE(dev);
+> +    object_property_add_child(qdev_get_machine(), "raven", OBJECT(dev), =
+NULL);
+> +    qdev_init_nofail(dev);
+> +    pci_bus =3D PCI_BUS(qdev_get_child_bus(dev, "pci.0"));
+> +    if (pci_bus =3D=3D NULL) {
+> +        fprintf(stderr, "Couldn't create PCI host controller.\n");
+> +        exit(1);
+> +    }
+> +
+> +    /* PCI -> ISA bridge */
+> +    dev =3D DEVICE(pci_create_simple(pci_bus, PCI_DEVFN(11, 0), "i82378"=
+));
+> +    qdev_connect_gpio_out(dev, 0,
+> +                          cpu->env.irq_inputs[PPC6xx_INPUT_INT]);
+> +    sysbus_connect_irq(pcihost, 0, qdev_get_gpio_in(dev, 15));
+> +    sysbus_connect_irq(pcihost, 1, qdev_get_gpio_in(dev, 13));
+> +    sysbus_connect_irq(pcihost, 2, qdev_get_gpio_in(dev, 15));
+> +    sysbus_connect_irq(pcihost, 3, qdev_get_gpio_in(dev, 13));
+> +    isa_bus =3D ISA_BUS(qdev_get_child_bus(dev, "isa.0"));
+> +
+> +    /* Memory controller */
+> +    dev =3D DEVICE(isa_create(isa_bus, "rs6000-mc"));
+> +    qdev_prop_set_uint32(dev, "ram-size", machine->ram_size);
+> +    qdev_init_nofail(dev);
+> +
+> +    /* initialize CMOS checksums */
+> +    cmos_checksum =3D 0x6aa9;
+> +    qbus_walk_children(BUS(isa_bus), prep_set_cmos_checksum, NULL, NULL,=
+ NULL,
+> +                       &cmos_checksum);
+> +
+> +    /* initialize audio subsystem */
+> +    audio_init();
+> +
+> +    /* add some more devices */
+> +    if (defaults_enabled()) {
+> +        isa_create_simple(isa_bus, "i8042");
+> +        m48t59 =3D NVRAM(isa_create_simple(isa_bus, "isa-m48t59"));
+> +
+> +        dev =3D DEVICE(isa_create(isa_bus, "cs4231a"));
+> +        qdev_prop_set_uint32(dev, "iobase", 0x830);
+> +        qdev_prop_set_uint32(dev, "irq", 10);
+> +        qdev_init_nofail(dev);
+> +
+> +        dev =3D DEVICE(isa_create(isa_bus, "pc87312"));
+> +        qdev_prop_set_uint32(dev, "config", 12);
+> +        qdev_init_nofail(dev);
+> +
+> +        dev =3D DEVICE(isa_create(isa_bus, "prep-systemio"));
+> +        qdev_prop_set_uint32(dev, "ibm-planar-id", 0xfc);
+> +        qdev_prop_set_uint32(dev, "equipment", 0xc0);
+> +        qdev_init_nofail(dev);
+> +
+> +        pci_create_simple(pci_bus, PCI_DEVFN(1, 0), "lsi53c810");
+> +
+> +        /* XXX: s3-trio at PCI_DEVFN(2, 0) */
+> +        pci_vga_init(pci_bus);
+> +
+> +        for (i =3D 0; i < nb_nics; i++) {
+> +            pci_nic_init_nofail(&nd_table[i], pci_bus, "pcnet",
+> +                                i =3D=3D 0 ? "3" : NULL);
+> +        }
+> +    }
+> +
+> +    /* Prepare firmware configuration for OpenBIOS */
+> +    fw_cfg =3D fw_cfg_init_mem(CFG_ADDR, CFG_ADDR + 2);
+> +
+> +    if (machine->kernel_filename) {
+> +        /* load kernel */
+> +        kernel_base =3D KERNEL_LOAD_ADDR;
+> +        kernel_size =3D load_image_targphys(machine->kernel_filename,
+> +                                          kernel_base,
+> +                                          machine->ram_size - kernel_bas=
+e);
+> +        if (kernel_size < 0) {
+> +            error_report("could not load kernel '%s'",
+> +                          machine->kernel_filename);
+> +            exit(1);
+> +        }
+> +        fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ADDR, kernel_base);
+> +        fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_SIZE, kernel_size);
+> +        /* load initrd */
+> +        if (machine->initrd_filename) {
+> +            initrd_base =3D INITRD_LOAD_ADDR;
+> +            initrd_size =3D load_image_targphys(machine->initrd_filename,
+> +                                              initrd_base,
+> +                                              machine->ram_size - initrd=
+_base);
+> +            if (initrd_size < 0) {
+> +                error_report("could not load initial ram disk '%s'",
+> +                             machine->initrd_filename);
+> +                exit(1);
+> +            }
+> +            fw_cfg_add_i32(fw_cfg, FW_CFG_INITRD_ADDR, initrd_base);
+> +            fw_cfg_add_i32(fw_cfg, FW_CFG_INITRD_SIZE, initrd_size);
+> +        }
+> +        if (machine->kernel_cmdline && *machine->kernel_cmdline) {
+> +            fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_CMDLINE, CMDLINE_ADDR);
+> +            pstrcpy_targphys("cmdline", CMDLINE_ADDR, TARGET_PAGE_SIZE,
+> +                             machine->kernel_cmdline);
+> +            fw_cfg_add_string(fw_cfg, FW_CFG_CMDLINE_DATA,
+> +                              machine->kernel_cmdline);
+> +            fw_cfg_add_i32(fw_cfg, FW_CFG_CMDLINE_SIZE,
+> +                           strlen(machine->kernel_cmdline) + 1);
+> +        }
+> +        boot_device =3D 'm';
+> +    } else {
+> +        boot_device =3D machine->boot_order[0];
+> +    }
+> +
+> +    fw_cfg_add_i16(fw_cfg, FW_CFG_MAX_CPUS, (uint16_t)max_cpus);
+> +    fw_cfg_add_i64(fw_cfg, FW_CFG_RAM_SIZE, (uint64_t)machine->ram_size);
+> +    fw_cfg_add_i16(fw_cfg, FW_CFG_MACHINE_ID, ARCH_PREP);
+> +
+> +    fw_cfg_add_i16(fw_cfg, FW_CFG_PPC_WIDTH, graphic_width);
+> +    fw_cfg_add_i16(fw_cfg, FW_CFG_PPC_HEIGHT, graphic_height);
+> +    fw_cfg_add_i16(fw_cfg, FW_CFG_PPC_DEPTH, graphic_depth);
+> +
+> +    fw_cfg_add_i32(fw_cfg, FW_CFG_PPC_IS_KVM, kvm_enabled());
+> +    if (kvm_enabled()) {
+> +#ifdef CONFIG_KVM
+> +        uint8_t *hypercall;
+> +
+> +        fw_cfg_add_i32(fw_cfg, FW_CFG_PPC_TBFREQ, kvmppc_get_tbfreq());
+> +        hypercall =3D g_malloc(16);
+> +        kvmppc_get_hypercall(env, hypercall, 16);
+> +        fw_cfg_add_bytes(fw_cfg, FW_CFG_PPC_KVM_HC, hypercall, 16);
+> +        fw_cfg_add_i32(fw_cfg, FW_CFG_PPC_KVM_PID, getpid());
+> +#endif
+> +    } else {
+> +        fw_cfg_add_i32(fw_cfg, FW_CFG_PPC_TBFREQ, NANOSECONDS_PER_SECOND=
+);
+> +    }
+> +    fw_cfg_add_i16(fw_cfg, FW_CFG_BOOT_DEVICE, boot_device);
+> +    qemu_register_boot_set(fw_cfg_boot_set, fw_cfg);
+> +
+> +    /* Prepare firmware configuration for Open Hack'Ware */
+> +    if (m48t59) {
+> +        PPC_NVRAM_set_params(m48t59, NVRAM_SIZE, "PREP", ram_size,
+> +                             boot_device,
+> +                             kernel_base, kernel_size,
+> +                             machine->kernel_cmdline,
+> +                             initrd_base, initrd_size,
+> +                             /* XXX: need an option to load a NVRAM imag=
+e */
+> +                             0,
+> +                             graphic_width, graphic_height, graphic_dept=
+h);
+
+Doesn't this mean the system can't possibly boot without the m48t59?
+In which case shouldn't it be created even with -nodefaults?
+
+> +    }
 > +}
 > +
-> +static const VMStateDescription vmstate_prep_systemio =3D {
-> +    .name =3D "prep_systemio",
-> +    .version_id =3D 1,
-> +    .minimum_version_id =3D 1,
-> +    .fields =3D (VMStateField[]) {
-> +        VMSTATE_UINT8(sreset, PrepSystemIoState),
-> +        VMSTATE_UINT8(system_control, PrepSystemIoState),
-> +        VMSTATE_UINT8(iomap_type, PrepSystemIoState),
-> +        VMSTATE_END_OF_LIST()
-> +    },
-> +};
-> +
-> +static Property prep_systemio_properties[] =3D {
-> +    DEFINE_PROP_UINT8("ibm-planar-id", PrepSystemIoState, ibm_planar_id,=
- 0),
-> +    DEFINE_PROP_UINT8("equipment", PrepSystemIoState, equipment, 0),
-> +    DEFINE_PROP_END_OF_LIST()
-> +};
-> +
-> +static void prep_systemio_class_initfn(ObjectClass *klass, void *data)
+> +static void ibm_40p_machine_init(MachineClass *mc)
 > +{
-> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
-> +
-> +    dc->realize =3D prep_systemio_realize;
-> +    dc->vmsd =3D &vmstate_prep_systemio;
-> +    dc->props =3D prep_systemio_properties;
+> +    mc->desc =3D "IBM RS/6000 7020 (40p)",
+> +    mc->init =3D ibm_40p_init;
+> +    mc->max_cpus =3D 1;
+> +    mc->pci_allow_0_address =3D true;
+> +    mc->default_ram_size =3D 128 * M_BYTE;
+> +    mc->block_default_type =3D IF_SCSI;
+> +    mc->default_boot_order =3D "c";
 > +}
 > +
-> +static TypeInfo prep_systemio800_info =3D {
-> +    .name          =3D TYPE_PREP_SYSTEMIO,
-> +    .parent        =3D TYPE_ISA_DEVICE,
-> +    .instance_size =3D sizeof(PrepSystemIoState),
-> +    .class_init    =3D prep_systemio_class_initfn,
-> +};
-> +
-> +static void prep_systemio_register_types(void)
-> +{
-> +    type_register_static(&prep_systemio800_info);
-> +}
-> +
-> +type_init(prep_systemio_register_types)
-> diff --git a/hw/ppc/trace-events b/hw/ppc/trace-events
-> index 2297ead..2ba6166 100644
-> --- a/hw/ppc/trace-events
-> +++ b/hw/ppc/trace-events
-> @@ -74,3 +74,7 @@ ppc_tb_adjust(uint64_t offs1, uint64_t offs2, int64_t d=
-iff, int64_t seconds) "ad
->  # hw/ppc/prep.c
->  prep_io_800_writeb(uint32_t addr, uint32_t val) "0x%08" PRIx32 " =3D> 0x=
-%02" PRIx32
->  prep_io_800_readb(uint32_t addr, uint32_t retval) "0x%08" PRIx32 " <=3D =
-0x%02" PRIx32
-> +
-> +# hw/ppc/prep_systemio.c
-> +prep_systemio_read(uint32_t addr, uint32_t val) "read addr=3D%x val=3D%x"
-> +prep_systemio_write(uint32_t addr, uint32_t val) "write addr=3D%x val=3D=
-%x"
+> +DEFINE_MACHINE("40p", ibm_40p_machine_init)
+>  DEFINE_MACHINE("prep", prep_machine_init)
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -442,25 +354,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---sl5MdczEF/OU2Miu
+--2WS97oupGEGbYNpW
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJYbtNiAAoJEGw4ysog2bOS+coP/2nwolEnMI52GPdDRjmN2FQA
-92EzMW1EJPkAeMa+keQd5RkLOjMxDWM+qXJvqKNW+DM6ul/cHBwSiR5jvAVv/UpS
-wzOeb6xLTMFXKok01sbMysIcCjF95AcuT5olDDa4VyNJ+Ub4kEuhvNkcBr6llyBF
-ZoMeeO180zL5jUdPvNSV/qspqmd7nMiqDvzziaordmcvS/SIL9W8ptPNSmPlNQMF
-jekSG+ZnnL1Rmz/DgOD/W9OrMFaqwTgJ6p3OwDGclBJ8i/Lb/1QCGoFHy+br4ZLL
-E4nd4/OfLCUtldd6CfkLpyXJrRVndxNWP3udDNSlKXVHS7ro5TP+ew/y7pBOfofk
-B4J9wfsWjXdjodyfr7cymGzl+/3hVxYNutyjW3ZjjmVdLSHzIcOT54zuOkWyPzfx
-6W5+GxV1d+TFpanufduWpEYD70sO3zL+h+H41GRSkhRZgZvwp6SRWknmZoGS22v9
-AGSjySOT92dwFd0MgbN1kblfzV7BHq127LyNsrTOphQIAgmjsemzX+uuj7w9zvWK
-H4EuSO0b8XQY7pWA6yYNNXMo7PvKKp0imr6IGBrIme4s/2U47IqWmlLOx36tjN6K
-/HZrvu7wtVfJuauWTVLTpu1K0yXIG/kQNPqt/kDBu3gaLbPGA5fbFT2HdgLl3prz
-vKL6LuAb1nWnEkX4ekfp
-=f6JL
+iQIcBAEBCAAGBQJYbtT6AAoJEGw4ysog2bOSDHgQAJ49wiQwHV115NNGF39IrRV1
+mE6SBNKnhSX9wuNsNM1EK4Ry+qLFFFkrpU0XKoaRtCcaoZPKil+x5BEtkajMBZ0p
+cC8I7P+sBcChGuzaRn2MgI1SUclZHT8h6EerEavP4hn3h+vpO/heO/NOoSxiNm8z
+LzvG5VKUOlOH9qz593r+miYUGnV7NlgyjetTj79y9UwnJK1pPrNVXMdiuubOaHhd
+1vJ76CbJQWmnwSTAU/zOCHT2ryFed0WuDT8jK62JFW9fBsdIigdsCDWgNutWrg1j
+vMj/lmIe2AfOJ0tyZbcAe/xo6Kdj+LUqGoBQK3+hPjFQlafBct0vZljzeo1VrkIA
+ehXBq5jEodqoYqddWIlipT4iF+mVlDue6SyKls20ZEDJVGf+brGlaAqZULN5sFju
+Yaiuyh66LF90SV9pCsIF782VlxF1//OZDbapXXbKbPZOHGIdhYKp1F+7g+/gKeqP
+5ZTvNdrY3CtUS8QBDjRY/7PAY88ceB7RPMm2dd3WePMeobJGn//3slkoomYUapOf
+fba9kU1SpataOYNKg4BGhqFQMq4ajbGhLuS3T8DedXxYDDJ1JKbQ52+/E3RR14c1
+MmhKdpMGagtUzQ4aCLKUg1AWO+NYsX54yX0mAebLnuc0fdPDEiFLEwXIrAbbifqM
+lDPbrR9YDDuGd0rTTE0m
+=hMKW
 -----END PGP SIGNATURE-----
 
---sl5MdczEF/OU2Miu--
+--2WS97oupGEGbYNpW--
