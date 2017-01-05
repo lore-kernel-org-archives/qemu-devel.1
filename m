@@ -1,35 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35631)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35667)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alastair@au1.ibm.com>) id 1cOzmG-0001g7-M3
-	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 23:35:50 -0500
+	(envelope-from <alastair@au1.ibm.com>) id 1cOzmH-0001gY-K5
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 23:35:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alastair@au1.ibm.com>) id 1cOzmD-0001Oe-Dh
-	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 23:35:48 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54448
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <alastair@au1.ibm.com>) id 1cOzmF-0001RS-Nb
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 23:35:49 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48855)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <alastair@au1.ibm.com>)
-	id 1cOzmD-0001O2-7C
-	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 23:35:45 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	id 1cOzmF-0001Qf-EM
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 23:35:47 -0500
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	v054Xjxg018880
-	for <qemu-devel@nongnu.org>; Wed, 4 Jan 2017 23:35:44 -0500
-Received: from e23smtp03.au.ibm.com (e23smtp03.au.ibm.com [202.81.31.145])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 27sdu5b50m-1
+	v054XnCL043711
+	for <qemu-devel@nongnu.org>; Wed, 4 Jan 2017 23:35:46 -0500
+Received: from e23smtp04.au.ibm.com (e23smtp04.au.ibm.com [202.81.31.146])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 27s6qcjjub-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 04 Jan 2017 23:35:43 -0500
+	for <qemu-devel@nongnu.org>; Wed, 04 Jan 2017 23:35:46 -0500
 Received: from localhost
-	by e23smtp03.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e23smtp04.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <alastair@au1.ibm.com>;
-	Thu, 5 Jan 2017 14:35:40 +1000
+	Thu, 5 Jan 2017 14:35:43 +1000
 From: "Alastair D'Silva" <alastair@au1.ibm.com>
-Date: Thu,  5 Jan 2017 15:34:26 +1100
+Date: Thu,  5 Jan 2017 15:34:30 +1100
 In-Reply-To: <20170105043430.3176-1-alastair@au1.ibm.com>
 References: <20170105043430.3176-1-alastair@au1.ibm.com>
-Message-Id: <20170105043430.3176-4-alastair@au1.ibm.com>
-Subject: [Qemu-devel] [PATCH v5 3/7] qtest: Support setting named GPIOs
+Message-Id: <20170105043430.3176-8-alastair@au1.ibm.com>
+Subject: [Qemu-devel] [PATCH v5 7/7] arm: Add an RX8900 RTC to the ASpeed
+ board
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,144 +39,99 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, Andrew Jeffery <andrew@aj.id.au>, Joel Stanley <joel@jms.id.au>, Alastair D'Silva <alastair@d-silva.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, Andrew Jeffery <andrew@aj.id.au>, Joel Stanley <joel@jms.id.au>, Alastair D'Silva <alastair@d-silva.org>, Chris Smart <chris@distroguy.com>
 
 From: Alastair D'Silva <alastair@d-silva.org>
 
-Some devices change their behaviour based on the state of their input GPIO
-lines.
-
-This patch allows testing of the variable behaviour by providing facilities
-for the test to set the state of these GPIO lines.
+Connect an RX8900 RTC to i2c12 of the AST2500 SOC at address 0x32
 
 Signed-off-by: Alastair D'Silva <alastair@d-silva.org>
+Signed-off-by: Chris Smart <chris@distroguy.com>
 ---
- qtest.c          | 42 ++++++++++++++++++++++++++++++++++++++++++
- tests/libqtest.c |  7 +++++++
- tests/libqtest.h | 29 +++++++++++++++++++++++++++++
- 3 files changed, 78 insertions(+)
+ hw/arm/aspeed.c | 29 +++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
 
-diff --git a/qtest.c b/qtest.c
-index ad7e215..a947892 100644
---- a/qtest.c
-+++ b/qtest.c
-@@ -165,6 +165,11 @@ static bool qtest_opened;
-  * where NUM is an IRQ number.  For the PC, interrupts can be intercepted
-  * simply with "irq_intercept_in ioapic" (note that IRQ0 comes out with
-  * NUM=0 even though it is remapped to GSI 2).
-+ *
-+ *  > irq_set NAME NUM LEVEL
-+ *  < OK
-+ *
-+ *  Set the named input IRQ to the level (0/1)
-  */
+diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
+index 40c1383..ef63fd0 100644
+--- a/hw/arm/aspeed.c
++++ b/hw/arm/aspeed.c
+@@ -26,6 +26,12 @@ static struct arm_boot_info aspeed_board_binfo = {
+     .nb_cpus = 1,
+ };
  
- static int hex2nib(char ch)
-@@ -344,6 +349,43 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
-         qtest_send_prefix(chr);
-         qtest_send(chr, "OK\n");
++typedef struct AspeedI2CDevice {
++    const char *type;
++    uint8_t address;
++    int bus;
++} AspeedI2CDevice;
++
+ typedef struct AspeedBoardState {
+     AspeedSoCState soc;
+     MemoryRegion ram;
+@@ -37,6 +43,7 @@ typedef struct AspeedBoardConfig {
+     const char *fmc_model;
+     const char *spi_model;
+     uint32_t num_cs;
++    const AspeedI2CDevice *i2c_devices;
+ } AspeedBoardConfig;
  
-+    } else if (strcmp(words[0], "irq_set") == 0) {
-+        DeviceState *dev;
-+        NamedGPIOList *ngl;
-+        int level;
-+        qemu_irq irq = NULL;
-+        int irq_num;
+ enum {
+@@ -80,6 +87,11 @@ enum {
+         SCU_AST2500_HW_STRAP_ACPI_ENABLE |                              \
+         SCU_HW_STRAP_SPI_MODE(SCU_HW_STRAP_SPI_MASTER))
+ 
 +
-+        g_assert(words[1]); /* device */
-+        g_assert(words[2]); /* gpio list */
-+        g_assert(words[3]); /* gpio line in list */
-+        g_assert(words[4]); /* level */
-+        dev = DEVICE(object_resolve_path(words[1], NULL));
-+        if (!dev) {
-+            qtest_send_prefix(chr);
-+            qtest_send(chr, "FAIL Unknown device\n");
-+            return;
-+        }
++static const AspeedI2CDevice ast2500_i2c_devices[] = {
++        {"rx8900", 0x32, 11}
++};
 +
-+        irq_num = atoi(words[3]);
-+        level = atoi(words[4]);
+ static const AspeedBoardConfig aspeed_boards[] = {
+     [PALMETTO_BMC] = {
+         .soc_name  = "ast2400-a1",
+@@ -94,6 +106,7 @@ static const AspeedBoardConfig aspeed_boards[] = {
+         .fmc_model = "n25q256a",
+         .spi_model = "mx25l25635e",
+         .num_cs    = 1,
++        .i2c_devices = ast2500_i2c_devices,
+     },
+     [ROMULUS_BMC]  = {
+         .soc_name  = "ast2500-a1",
+@@ -104,6 +117,7 @@ static const AspeedBoardConfig aspeed_boards[] = {
+     },
+ };
+ 
 +
-+        QLIST_FOREACH(ngl, &dev->gpios, node) {
-+            if (strcmp(words[2], ngl->name) == 0 && ngl->num_in > irq_num) {
-+                irq = ngl->in[irq_num];
-+            }
-+        }
-+
-+        if (irq == NULL) {
-+            qtest_send_prefix(chr);
-+            qtest_send(chr, "FAIL Unknown IRQ\n");
-+            return;
-+        }
-+
-+        qemu_set_irq(irq, level);
-+
-+        qtest_send_prefix(chr);
-+        qtest_send(chr, "OK\n");
-     } else if (strcmp(words[0], "outb") == 0 ||
-                strcmp(words[0], "outw") == 0 ||
-                strcmp(words[0], "outl") == 0) {
-diff --git a/tests/libqtest.c b/tests/libqtest.c
-index a433c3b..a7cdd3b 100644
---- a/tests/libqtest.c
-+++ b/tests/libqtest.c
-@@ -988,3 +988,10 @@ bool qtest_big_endian(QTestState *s)
+ static void aspeed_board_init_flashes(AspeedSMCState *s, const char *flashtype,
+                                       Error **errp)
  {
-     return s->big_endian;
- }
-+
-+void qtest_irq_set(QTestState *s, const char *id, const char *gpiolist, int n,
-+        bool level)
-+{
-+    qtest_sendf(s, "irq_set %s %s %d %d\n", id, gpiolist, n, level);
-+    qtest_rsp(s, 0);
-+}
-diff --git a/tests/libqtest.h b/tests/libqtest.h
-index 99b14b1..3063bc9 100644
---- a/tests/libqtest.h
-+++ b/tests/libqtest.h
-@@ -190,6 +190,20 @@ void qtest_irq_attach(QTestState *s, const char *name, int irq,
-         void *opaque);
- 
- /**
-+ * qtest_irq_set:
-+ * Set an interrupt level
-+ * @s: #QTestState instance to operate on.
-+ * @id: the device to inject interrupts for
-+ * @gpiolist: the GPIO list containing the IRQ
-+ * @n: the GPIO within the list
-+ * @level: the IRQ level
-+ *
-+ * Set an interrupt to a nominated level
-+ */
-+void qtest_irq_set(QTestState *s, const char *id, const char *gpiolist, int n,
-+        bool level);
-+
-+/**
-  * qtest_outb:
-  * @s: #QTestState instance to operate on.
-  * @addr: I/O port to write to.
-@@ -656,6 +670,21 @@ static inline void irq_attach(const char *name, int irq,
+@@ -130,6 +144,19 @@ static void aspeed_board_init_flashes(AspeedSMCState *s, const char *flashtype,
+     }
  }
  
- /**
-+ * qtest_irq_set
-+ * Set an interrupt level
-+ * @id: the device to inject interrupts for
-+ * @gpiolist: the GPIO list containing the line to seh
-+ * @n: the line to set within the list
-+ * @level: the IRQ level
-+ */
-+static inline void irq_set(const char *id, const char *gpiolist, int n,
-+        bool level)
++static void aspeed_i2c_init(AspeedBoardState *bmc,
++        const AspeedBoardConfig *cfg)
 +{
-+    qtest_irq_set(global_qtest, id, gpiolist, n, level);
++    AspeedSoCState *soc = &bmc->soc;
++    const AspeedI2CDevice *dev;
++
++    for (dev = cfg->i2c_devices; dev != NULL && dev->type != NULL; dev++) {
++        I2CBus *i2c_bus = aspeed_i2c_get_bus((DeviceState *)&soc->i2c,
++                                             dev->bus);
++        (void)i2c_create_slave(i2c_bus, dev->type, dev->address);
++    }
 +}
 +
+ static void aspeed_board_init(MachineState *machine,
+                               const AspeedBoardConfig *cfg)
+ {
+@@ -174,6 +201,8 @@ static void aspeed_board_init(MachineState *machine,
+     aspeed_board_binfo.ram_size = ram_size;
+     aspeed_board_binfo.loader_start = sc->info->sdram_base;
+ 
++    aspeed_i2c_init(bmc, cfg);
 +
-+/**
-  * outb:
-  * @addr: I/O port to write to.
-  * @value: Value being written.
+     arm_load_kernel(ARM_CPU(first_cpu), &aspeed_board_binfo);
+ }
+ 
 -- 
 2.9.3
