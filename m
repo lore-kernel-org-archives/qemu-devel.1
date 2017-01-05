@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41397)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41737)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cPEez-0001UH-1F
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 15:29:18 -0500
+	(envelope-from <rkrcmar@redhat.com>) id 1cPEha-0002Wz-IK
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 15:31:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cPEev-0001bZ-V0
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 15:29:17 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47312)
+	(envelope-from <rkrcmar@redhat.com>) id 1cPEhX-0002M6-Gf
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 15:31:58 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40078)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cPEev-0001bO-OK
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 15:29:13 -0500
-Received: from int-mx11.intmail.prod.int.phx2.redhat.com
-	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 12DC419D22F
-	for <qemu-devel@nongnu.org>; Thu,  5 Jan 2017 20:29:13 +0000 (UTC)
-References: <20170105160321.21786-1-berrange@redhat.com>
-	<20170105160321.21786-4-berrange@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <fc15666a-b40e-01ec-ce5c-ddf9bc373990@redhat.com>
-Date: Thu, 5 Jan 2017 14:29:10 -0600
+	(Exim 4.71) (envelope-from <rkrcmar@redhat.com>) id 1cPEhX-0002Ly-Bu
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 15:31:55 -0500
+Date: Thu, 5 Jan 2017 21:31:51 +0100
+From: Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Message-ID: <20170105203150.GE29430@potion>
+References: <1483266886-25050-1-git-send-email-peterx@redhat.com>
+	<1483266886-25050-3-git-send-email-peterx@redhat.com>
+	<20170102201824.GA2892@potion>
+	<20170103024501.GA22664@pxdev.xzpeter.org>
+	<20170104145541.GI2395@potion>
+	<20170105023539.GM22664@pxdev.xzpeter.org>
 MIME-Version: 1.0
-In-Reply-To: <20170105160321.21786-4-berrange@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="flf1qR6SCcHmaF8oUaGqLLiIAD4UDlpBe"
-Subject: Re: [Qemu-devel] [PATCH 3/8] io: fix typo in docs for QIOTask
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170105023539.GM22664@pxdev.xzpeter.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [kvm-unit-tests PATCH 2/2] run_tests: allow run
+ tests in parallel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,55 +33,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, Andrew Jones <drjones@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---flf1qR6SCcHmaF8oUaGqLLiIAD4UDlpBe
-From: Eric Blake <eblake@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <fc15666a-b40e-01ec-ce5c-ddf9bc373990@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 3/8] io: fix typo in docs for QIOTask
-References: <20170105160321.21786-1-berrange@redhat.com>
- <20170105160321.21786-4-berrange@redhat.com>
-In-Reply-To: <20170105160321.21786-4-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 01/05/2017 10:03 AM, Daniel P. Berrange wrote:
-> The GDestroyNotify parameter is already a pointer, so does
-> not need a '*' suffix on the type.
+2017-01-05 10:35+0800, Peter Xu:
+> On Wed, Jan 04, 2017 at 03:55:42PM +0100, Radim Kr=C4=8Dm=C3=A1=C5=99 w=
+rote:
+>> > I didn't notice the "-n" parameter for "wait", otherwise I won't
+>> > bother using SIGUSR1 at all. :)
+>>=20
+>> (Btw. why couldn't you use SIGCHLD?)
 >=20
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
->  include/io/task.h | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+> My understanding:
 >=20
-> diff --git a/include/io/task.h b/include/io/task.h
+> SIGCHLD is used by internal bash. For every command we write (like a
+> "ls" in the script), we should have forked another process to load the
+> "/bin/ls" binary, and when this command (in this case "ls") finishes,
+> it'll send one SIGCHLD to the main process. This should happen for
+> each non-builtin bash commands, and bash program is managing these
+> SIGCHLDs internally by default. So, we should not be able to trap
+> SIGCHLD in bash.
+>=20
+> There is one way to trap it, only if we provide:
+>=20
+>   set -m
+>=20
+> to turn off the job controls of bash.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+I think that "-m" enables job control, but I didn't know it can be
+disabled.  I don't understand what bash does with +m -- bg/fg/&/^Z work
+just as one would expect of job control, but not SIGCHLD.
 
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+>                                       However if with that, we'll
+> trigger the SIGCHLD handler for *every* task we run, even for the
+> normal commands like "ls". I suppose that's not what we want (we want
+> to only trap those background $QEMU processes). That's why I used
+> SIGUSR1 instead of SIGCHLD.
 
+I see, it is a more robust, but signals can race, so we couldn't depend
+on their count anyway.  And wow, we really get SIGCHLD for foreground
+processes ... it wouldn't matter because the loop only uses builtins,
+but it is stupid.  (I confess I don't usually use POSIX shells.)
 
---flf1qR6SCcHmaF8oUaGqLLiIAD4UDlpBe
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+> Of course, after I know "wait -n", it becomes clumsy. :-)
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYbqyWAAoJEKeha0olJ0Nq5pUIAJPKjp+jhxHMAeyxBaPVkh5w
-rPOgmmt4tw4TFvsyZOXsfjE5but2RhEemb4wBA/ia+ZU3dXpRVEVrBy/q4IEnkHu
-QpSe9SaM2qtNvrn31YMWfsZOWJUpnfC2FPUUOb+cA4pMchB38UdsgumIzaOalsBU
-ry/Pf5PDqPbsRmte4BN2mmSGPp/XsPkms0DUuZ9/SqPyQusxliJBA8Ud3rtXiQ39
-qDZu5SSzZXQSlSKVZBQipskO0x5PUgtp+gW8YV0fhG9qt/gkmhRhjNDIiUT7f21+
-xAUc0OPPShEQhjWFofBl4OvknMNEQxlMOODiQTlxXQwVKnrAO3FEr4Lo6+SIO7Q=
-=cxcI
------END PGP SIGNATURE-----
-
---flf1qR6SCcHmaF8oUaGqLLiIAD4UDlpBe--
+"clumsy" is still a praise for bash code. :)
