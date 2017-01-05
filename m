@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39899)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40153)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1cP2YF-0003wa-MU
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 02:33:32 -0500
+	(envelope-from <fujunkang@gmail.com>) id 1cP2Zb-0004bQ-AB
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 02:34:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1cP2YB-00062k-PU
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 02:33:31 -0500
-Received: from mga05.intel.com ([192.55.52.43]:7925)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1cP2YB-00061c-Fl
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 02:33:27 -0500
-Message-ID: <586DF6FE.8070704@intel.com>
-Date: Thu, 05 Jan 2017 15:34:22 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(envelope-from <fujunkang@gmail.com>) id 1cP2ZZ-0006nM-QB
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 02:34:55 -0500
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:36392)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <fujunkang@gmail.com>) id 1cP2ZZ-0006mu-KP
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 02:34:53 -0500
+Received: by mail-wm0-x241.google.com with SMTP id m203so95005845wma.3
+	for <qemu-devel@nongnu.org>; Wed, 04 Jan 2017 23:34:52 -0800 (PST)
 MIME-Version: 1.0
-References: <1482127152-84732-1-git-send-email-wei.w.wang@intel.com>
-	<CAJ+F1CKWSznG3hxj0=F1UAJD+ZOZg=q+Oio1YnbsRyz6vy51FQ@mail.gmail.com>
-In-Reply-To: <CAJ+F1CKWSznG3hxj0=F1UAJD+ZOZg=q+Oio1YnbsRyz6vy51FQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RESEND Patch v1 00/37] Implementation of
- vhost-pci for inter-vm commucation
+In-Reply-To: <e57c4b44-ac0c-a937-e088-1f4e086080d8@redhat.com>
+References: <CAP8dc_acqeqpio7fVK4XSAxoH8QaGp9L=S1h2OCCWgrj=Q7VCw@mail.gmail.com>
+	<e57c4b44-ac0c-a937-e088-1f4e086080d8@redhat.com>
+From: Junkang Fu <fujunkang@gmail.com>
+Date: Thu, 5 Jan 2017 15:34:50 +0800
+Message-ID: <CAP8dc_bGQup_bF49p8XUncdoNy2E7qbVCutRLG9Afaf_-gALAg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [RFC]virtio-blk: add disk-name device property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,54 +28,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Cc: mst@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org
+To: Eric Blake <eblake@redhat.com>
+Cc: stefanha@redhat.com, qemu-devel@nongnu.org
 
-Hi Marc-André
+You got it, that's exactly what I mean.Thank you for your advise.
 
-On 12/20/2016 12:43 AM, Marc-André Lureau wrote:
-> On Mon, Dec 19, 2016 at 7:00 AM Wei Wang <wei.w.wang@intel.com 
-> <mailto:wei.w.wang@intel.com>> wrote:
+2017-01-04 0:53 GMT+08:00 Eric Blake <eblake@redhat.com>:
+
+> On 12/29/2016 08:41 PM, Junkang Fu wrote:
+> >>From 74e913fc41ea98d1dde692175f1e3fb6729342aa Mon Sep 17 00:00:00 2001
+> > From: "junkang.fjk" <junkang.fjk@alibaba-inc.com>
+> > Date: Wed, 24 Aug 2016 19:36:53 +0800
+> > Subject: [PATCH] virtio-blk: add disk-name device property
+> >
+> > Current virtio-blk disk name(ex. /dev/vdb) has nothing to do with the
+> > target dev
+> > name specified in libvirt xml file. For example, we may get disk name
+> > /dev/vdb in
+> > VM while target dev specified in libvirt xml is vdc.
 >
->     This patch series implements vhost-pci, which is a point-to-point
->     based inter-vm
->     communication solution. The QEMU side implementation includes the
->     vhost-user
->     extension, vhost-pci device emulation and management. The current
->     device part
->     implementation is based on virtio 1.0, but it can be easily
->     upgraded to support
->     the upcoming virtio 1.1.
+> It's not really libvirt's fault.  The libvirt XML names are for
+> convenience, but nothing on the host side requires the guest to pick the
+> same naming scheme as the host.
 >
->     The current QEMU implementation supports the polling mode driver
->     on both sides
->     to receive packets. More features, such as interrupt support, live
->     migration
->     support, protected memory accesses will be added later.
+> I guess your proposal is to enhance the virtio spec such that clients
+> that are new enough to honor the new addition to the virtio spec will
+> change their name-picking algorithm to use the name provided by the
+> host, rather than their current approach of picking whatever name they
+> feel like, and then enhance libvirt to pass the XML name on down to the
+> guest?  It might work, but as others have pointed out, it will require a
+> virtio spec change first.
+>
+> --
+> Eric Blake   eblake redhat com    +1-919-301-3266
+> Libvirt virtualization library http://libvirt.org
 >
 >
->
-> I highly appreciate the effort you put in splitting the patch series 
-> and commenting each, although some are probably superfluous. Before 
-> going into details, I suppose you have kernel side bits too. I'd 
-> suggest before sending individual patches for review, that you send a 
-> RFC with links to the various git trees and instructions to test the 
-> proposed device. This would really help things and potentially bring 
-> more people for testing and comments (think about libvirt side etc). 
-> Even better would be to have some tests (with qtest).
-
-The code is ready to try. I plan to clean up the driver to upstream when 
-the QEMU device part is finalized.
-
-The QEMU code is available at: git clone 
-https://github.com/wei-w-wang/vhost-pci-device
-The driver: git clone https://github.com/wei-w-wang/vhost-pci-driver
-
-I have a README.md under vhost-pci-device/ , which introduces the steps 
-to try the implementation.
-I will rename the variables/fields that you mentioned in the v2 version. 
-Thanks.
-
-
-Best,
-Wei
