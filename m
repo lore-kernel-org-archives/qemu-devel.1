@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60900)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33446)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zxq_yx_007@163.com>) id 1cOwJB-0004wr-MV
-	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 19:53:35 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cOwMc-00083z-FT
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 19:57:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zxq_yx_007@163.com>) id 1cOwJA-0000QP-ET
-	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 19:53:33 -0500
-Content-Type: text/plain;
-	charset=gb2312
-Mime-Version: 1.0 (1.0)
-From: =?GB2312?B?1dTQoce/?= <zxq_yx_007@163.com>
-In-Reply-To: <20170105002007.GA13763@umbus.fritz.box>
-Date: Thu, 5 Jan 2017 08:53:07 +0800
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <404AAC02-2CF3-4F5D-9A1B-2AEA2ADB462E@163.com>
-References: <20161231011831.4097-1-zxq_yx_007@163.com>
-	<20170102222831.GB12761@umbus.fritz.box>
-	<A1654386-0C53-4C64-BE97-A6804E1AA4F3@163.com>
-	<20170104032811.GY12761@umbus.fritz.box>
-	<CAFEAcA91zZTPzXGfRSGSQM9kK5cG4Ci-hm7Q4Jd5odfxT+OHHw@mail.gmail.com>
-	<20170105002007.GA13763@umbus.fritz.box>
-Subject: Re: [Qemu-devel] [PATCH 0/4] QOM'ify work for ppc
+	(envelope-from <dgibson@ozlabs.org>) id 1cOwMZ-0001hu-47
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 19:57:06 -0500
+Date: Thu, 5 Jan 2017 11:41:16 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170105004116.GB13763@umbus.fritz.box>
+References: <1483049536-21548-1-git-send-email-hpoussin@reactos.org>
+	<1483049536-21548-5-git-send-email-hpoussin@reactos.org>
+	<20170103044529.GP12761@umbus.fritz.box>
+	<be8ddafc-de53-325b-9acf-4c31214a6dc9@reactos.org>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="WhfpMioaduB5tiZL"
+Content-Disposition: inline
+In-Reply-To: <be8ddafc-de53-325b-9acf-4c31214a6dc9@reactos.org>
+Subject: Re: [Qemu-devel] [PATCH 4/6] prep: QOM'ify System I/O
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,78 +26,469 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Peter Maydell <peter.maydell@linaro.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>
+To: =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>
+Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Thomas Huth <thuth@redhat.com>, Giancarlo Teodori <gteodori@gmail.com>
 
-Ok=A3=A1
 
-Just one more comment=A3=BA
-After check the code flow, It's clear that the initialized memory region mus=
-t be add to address space by calling memory_region_add_subregion in platform=
- code before it can be accessed.
+--WhfpMioaduB5tiZL
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Best wishes =A3=A1
+On Wed, Jan 04, 2017 at 10:17:10PM +0100, Herv=E9 Poussineau wrote:
+> Le 03/01/2017 =E0 05:45, David Gibson a =E9crit :
+> > On Thu, Dec 29, 2016 at 11:12:14PM +0100, Herv=E9 Poussineau wrote:
+> > > Part of the functionality is copied from hw/ppc/prep.c.
+> > > Also add support for board identification/equipment registers.
+> > >=20
+> > > Signed-off-by: Herv=E9 Poussineau <hpoussin@reactos.org>
+> > > ---
+> > >  hw/ppc/Makefile.objs   |   1 +
+> > >  hw/ppc/prep_systemio.c | 302 +++++++++++++++++++++++++++++++++++++++=
+++++++++++
+> > >  hw/ppc/trace-events    |   4 +
+> > >  3 files changed, 307 insertions(+)
+> > >  create mode 100644 hw/ppc/prep_systemio.c
+> > >=20
+> > > diff --git a/hw/ppc/Makefile.objs b/hw/ppc/Makefile.objs
+> > > index 8025129..db72297 100644
+> > > --- a/hw/ppc/Makefile.objs
+> > > +++ b/hw/ppc/Makefile.objs
+> > > @@ -16,6 +16,7 @@ obj-y +=3D ppc405_boards.o ppc4xx_devs.o ppc405_uc.=
+o ppc440_bamboo.o
+> > >  obj-y +=3D ppc4xx_pci.o
+> > >  # PReP
+> > >  obj-$(CONFIG_PREP) +=3D prep.o
+> > > +obj-$(CONFIG_PREP) +=3D prep_systemio.o
+> > >  # OldWorld PowerMac
+> > >  obj-$(CONFIG_MAC) +=3D mac_oldworld.o
+> > >  # NewWorld PowerMac
+> > > diff --git a/hw/ppc/prep_systemio.c b/hw/ppc/prep_systemio.c
+> > > new file mode 100644
+> > > index 0000000..449056c
+> > > --- /dev/null
+> > > +++ b/hw/ppc/prep_systemio.c
+> > > @@ -0,0 +1,302 @@
+> > > +/*
+> > > + * QEMU PReP System I/O emulation
+> > > + *
+> > > + * Copyright (c) 2016 Herve Poussineau
+> > > + *
+> > > + * Permission is hereby granted, free of charge, to any person obtai=
+ning a copy
+> > > + * of this software and associated documentation files (the "Softwar=
+e"), to deal
+> > > + * in the Software without restriction, including without limitation=
+ the rights
+> > > + * to use, copy, modify, merge, publish, distribute, sublicense, and=
+/or sell
+> > > + * copies of the Software, and to permit persons to whom the Softwar=
+e is
+> > > + * furnished to do so, subject to the following conditions:
+> > > + *
+> > > + * The above copyright notice and this permission notice shall be in=
+cluded in
+> > > + * all copies or substantial portions of the Software.
+> > > + *
+> > > + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, E=
+XPRESS OR
+> > > + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTA=
+BILITY,
+> > > + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT=
+ SHALL
+> > > + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES=
+ OR OTHER
+> > > + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, A=
+RISING FROM,
+> > > + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEA=
+LINGS IN
+> > > + * THE SOFTWARE.
+> > > + */
+> > > +
+> > > +#include "qemu/osdep.h"
+> > > +#include "hw/isa/isa.h"
+> > > +#include "exec/address-spaces.h"
+> > > +#include "qemu/error-report.h" /* for error_report() */
+> > > +#include "sysemu/sysemu.h" /* for vm_stop() */
+> > > +#include "cpu.h"
+> > > +#include "trace.h"
+> > > +
+> > > +#define TYPE_PREP_SYSTEMIO "prep-systemio"
+> > > +#define PREP_SYSTEMIO(obj) \
+> > > +    OBJECT_CHECK(PrepSystemIoState, (obj), TYPE_PREP_SYSTEMIO)
+> > > +
+> > > +/* Bit as defined in PowerPC Reference Plaform v1.1, sect. 6.1.5, p.=
+ 132 */
+> > > +#define PREP_BIT(n) (1 << (7 - (n)))
+> > > +
+> > > +typedef struct PrepSystemIoState {
+> > > +    ISADevice parent_obj;
+> > > +    MemoryRegion ppc_parity_mem;
+> > > +
+> > > +    qemu_irq non_contiguous_io_map_irq;
+> > > +    uint8_t sreset; /* 0x0092 */
+> > > +    uint8_t equipment; /* 0x080c */
+> > > +    uint8_t system_control; /* 0x081c */
+> > > +    uint8_t iomap_type; /* 0x0850 */
+> > > +    uint8_t ibm_planar_id; /* 0x0852 */
+> > > +    qemu_irq softreset_irq;
+> > > +    PortioList portio;
+> > > +} PrepSystemIoState;
+> > > +
+> > > +/* PORT 0092 -- Special Port 92 (Read/Write) */
+> > > +
+> > > +enum {
+> > > +    PORT0092_SOFTRESET  =3D PREP_BIT(7),
+> > > +    PORT0092_LE_MODE    =3D PREP_BIT(6),
+> > > +};
+> > > +
+> > > +static void prep_port0092_write(void *opaque, uint32_t addr, uint32_=
+t val)
+> > > +{
+> > > +    PrepSystemIoState *s =3D opaque;
+> > > +
+> > > +    trace_prep_systemio_write(addr, val);
+> > > +
+> > > +    if ((val & PORT0092_SOFTRESET) !=3D 0) {
+> > > +        qemu_irq_raise(s->softreset_irq);
+> > > +        s->sreset =3D 1;
+> > > +    } else {
+> > > +        qemu_irq_lower(s->softreset_irq);
+> > > +        s->sreset =3D 0;
+> >=20
+> > You could just use
+> > 	s->sreset =3D val & PORT0092_SOFTRESET;
+> > 	qemu_set_irq(irq, s->sreset);
+> > here, rather than the if.
+>=20
+> OK
+>=20
+> >=20
+> > > +    }
+> > > +
+> > > +    if ((val & PORT0092_LE_MODE) !=3D 0) {
+> > > +        /* XXX Not supported yet */
+> > > +        error_report("little-endian mode not supported");
+> > > +        vm_stop(RUN_STATE_PAUSED);
+> > > +    } else {
+> > > +        /* Nothing to do */
+> > > +    }
+> > > +}
+> > > +
+> > > +static uint32_t prep_port0092_read(void *opaque, uint32_t addr)
+> > > +{
+> > > +    PrepSystemIoState *s =3D opaque;
+> > > +    /* XXX LE mode unsupported */
+> > > +    trace_prep_systemio_read(addr, 0);
+> > > +    return s->sreset;
+> >=20
+> > This doesn't seem to quite logically match the write side.  On the
+> > write side you convert the PORT0092_SOFTRESET bit into an explicit
+> > 0/1, here you return the raw 0/1.  It ends up being the same thing
+> > because PORT0092_SOFTRESET =3D=3D 0x01, but that's not terribly obvious.
+>=20
+> OK, will change that.
+>=20
+> >=20
+> > > +}
+> > > +
+> > > +/* PORT 0808 -- Hardfile Light Register (Write Only) */
+> > > +
+> > > +enum {
+> > > +    PORT0808_HARDFILE_LIGHT_ON  =3D PREP_BIT(7),
+> > > +};
+> > > +
+> > > +static void prep_port0808_write(void *opaque, uint32_t addr, uint32_=
+t val)
+> > > +{
+> > > +    trace_prep_systemio_write(addr, val);
+> > > +}
+> > > +
+> > > +/* PORT 0810 -- Password Protect 1 Register (Write Only) */
+> > > +
+> > > +/* reset by port 0x4D in the SIO */
+> > > +static void prep_port0810_write(void *opaque, uint32_t addr, uint32_=
+t val)
+> > > +{
+> > > +    trace_prep_systemio_write(addr, val);
+> > > +}
+> > > +
+> > > +/* PORT 0812 -- Password Protect 2 Register (Write Only) */
+> > > +
+> > > +/* reset by port 0x4D in the SIO */
+> > > +static void prep_port0812_write(void *opaque, uint32_t addr, uint32_=
+t val)
+> > > +{
+> > > +    trace_prep_systemio_write(addr, val);
+> > > +}
+> > > +
+> > > +/* PORT 0814 -- L2 Invalidate Register (Write Only) */
+> > > +
+> > > +static void prep_port0814_write(void *opaque, uint32_t addr, uint32_=
+t val)
+> > > +{
+> > > +    trace_prep_systemio_write(addr, val);
+> > > +}
+> > > +
+> > > +/* PORT 0818 -- Reserved for Keylock (Read Only) */
+> > > +
+> > > +enum {
+> > > +    PORT0818_KEYLOCK_SIGNAL_HIGH    =3D PREP_BIT(7),
+> > > +};
+> > > +
+> > > +static uint32_t prep_port0818_read(void *opaque, uint32_t addr)
+> > > +{
+> > > +    uint32_t val =3D 0;
+> > > +    trace_prep_systemio_read(addr, val);
+> > > +    return val;
+> > > +}
+> > > +
+> > > +/* PORT 080C -- Equipment */
+> > > +
+> > > +enum {
+> > > +    PORT080C_SCSIFUSE               =3D PREP_BIT(1),
+> > > +    PORT080C_L2_COPYBACK            =3D PREP_BIT(4),
+> > > +    PORT080C_L2_256                 =3D PREP_BIT(5),
+> > > +    PORT080C_UPGRADE_CPU            =3D PREP_BIT(6),
+> > > +    PORT080C_L2                     =3D PREP_BIT(7),
+> > > +};
+> > > +
+> > > +static uint32_t prep_port080c_read(void *opaque, uint32_t addr)
+> > > +{
+> > > +    PrepSystemIoState *s =3D opaque;
+> > > +    trace_prep_systemio_read(addr, s->equipment);
+> > > +    return s->equipment;
+> > > +}
+> > > +
+> > > +/* PORT 081C -- System Control Register (Read/Write) */
+> > > +
+> > > +enum {
+> > > +    PORT081C_FLOPPY_MOTOR_INHIBIT   =3D PREP_BIT(3),
+> > > +    PORT081C_MASK_TEA               =3D PREP_BIT(2),
+> > > +    PORT081C_L2_UPDATE_INHIBIT      =3D PREP_BIT(1),
+> > > +    PORT081C_L2_CACHEMISS_INHIBIT   =3D PREP_BIT(0),
+> > > +};
+> > > +
+> > > +static void prep_port081c_write(void *opaque, uint32_t addr, uint32_=
+t val)
+> > > +{
+> > > +    PrepSystemIoState *s =3D opaque;
+> > > +    trace_prep_systemio_write(addr, val);
+> > > +    s->system_control =3D val;
+> >=20
+> > Should this value be masked to restrict it to the valid bits?
+>=20
+> Some bits are reserved according to specification, and must be
+> written as 0.
 
-> =D4=DA 2017=C4=EA1=D4=C25=C8=D5=A3=AC08:20=A3=ACDavid Gibson <david@gibson=
-.dropbear.id.au> =D0=B4=B5=C0=A3=BA
->=20
->> On Wed, Jan 04, 2017 at 05:04:02PM +0000, Peter Maydell wrote:
->>> On 4 January 2017 at 03:28, David Gibson <david@gibson.dropbear.id.au> w=
-rote:
->>>> On Tue, Jan 03, 2017 at 10:02:21PM +0800, =D5=D4=D0=A1=C7=BF wrote:
->>>> Hi=A3=ACdavid=A3=BA
->>>>=20
->>>>   To my understanding=A3=ACwhat must be put in the realize function  is=
+Right, so I assumed.
 
->>>>   code which depends on property values. What's the benefit of
->>>>   moving memory region initialization into realize function?  I can
->>>>   not figure out, can you make some explanations?
->>>=20
->>> If nothing else it's better in realize() for consistency with other
->>> devices.
->>=20
->> I'm not sure we're terribly consistent at all, really. My understanding
->> was about the same as =D5=D4=D0=A1=C7=BF -- put stuff in init unless it h=
-as to
->> go in realize because it depends on properties or might fail or
->> has permanent effects on the simulation.
->> Lots of existing devices do memory_region_init* calls in
->> their init functions.
->> We should probably write down our preferences somewhere, perhaps
->> http://wiki.qemu.org/Documentation/QOMConventions
->>=20
->>> I'm not familiar enough with the details to be sure, but I also think
->>> it's not safe in instance_init.  Once memory regions are registered,
->>> the device can potentially interact with other devices in the virtual
->>> machine.  realize() is sequenced to expect that, instance_init is not.
->>=20
->> Hmm, that doesn't sound right to me. The other devices will only
->> interact with the memory regions when the calling code has
->> finished doing the create/realize/map memory regions sequence --
->> an MR on its own doesn't do anything unless somebody maps it into
->> an address space.
->=20
-> Huh.  Ok, I guess I was wrong.
->=20
-> Alright, =D5=D4=D0=A1=C7=BF, feel free to repost addressing just the other=
+> I think we can still take them unconditionally.
 
-> comments and I'll merge.
+Hrm.. allowing reserved bits to be set and retrieved is usually a bad
+idea.  Do you have a particular reason to allow this?
+
+> Note that we do nothing with the value, except giving it back in prep_por=
+t081c_read()
 >=20
-> --=20
-> David Gibson            | I'll have my music baroque, and my code
-> david AT gibson.dropbear.id.au    | minimalist, thank you.  NOT _the_ _oth=
-er_
->                | _way_ _around_!
-> http://www.ozlabs.org/~dgibson
-> =A1=BE=C0=B4=D7=D4=CD=F8=D2=D7=D3=CA=CF=E4=B5=C4=B3=AC=B4=F3=B8=BD=BC=FE=A1=
-=BF
-> =D3=CA=BC=FE=B4=F8=D3=D0=B8=BD=BC=FE=D4=A4=C0=C0=C1=B4=BD=D3=A3=AC=C8=F4=C4=
-=FA=D7=AA=B7=A2=BB=F2=BB=D8=B8=B4=B4=CB=D3=CA=BC=FE=CA=B1=B2=BB=CF=A3=CD=FB=B6=
-=D4=B7=BD=D4=A4=C0=C0=B8=BD=BC=FE=A3=AC=BD=A8=D2=E9=C4=FA=CA=D6=B6=AF=C9=BE=B3=
-=FD=C1=B4=BD=D3=A1=A3
+> >=20
+> > > +}
+> > > +
+> > > +static uint32_t prep_port081c_read(void *opaque, uint32_t addr)
+> > > +{
+> > > +    PrepSystemIoState *s =3D opaque;
+> > > +    trace_prep_systemio_read(addr, s->system_control);
+> > > +    return s->system_control;
+> > > +}
+> > > +
+> > > +/* System Board Identification */
+> > > +
+> > > +static uint32_t prep_port0852_read(void *opaque, uint32_t addr)
+> > > +{
+> > > +    PrepSystemIoState *s =3D opaque;
+> > > +    trace_prep_systemio_read(addr, s->ibm_planar_id);
+> > > +    return s->ibm_planar_id;
+> > > +}
+> > > +
+> > > +/* PORT 0850 -- I/O Map Type Register (Read/Write) */
+> > > +
+> > > +enum {
+> > > +    PORT0850_IOMAP_NONCONTIGUOUS    =3D PREP_BIT(7),
+> > > +};
+> > > +
+> > > +static uint32_t prep_port0850_read(void *opaque, uint32_t addr)
+> > > +{
+> > > +    PrepSystemIoState *s =3D opaque;
+> > > +    trace_prep_systemio_read(addr, s->iomap_type);
+> > > +    return s->iomap_type;
+> > > +}
+> > > +
+> > > +static void prep_port0850_write(void *opaque, uint32_t addr, uint32_=
+t val)
+> > > +{
+> > > +    PrepSystemIoState *s =3D opaque;
+> > > +
+> > > +    trace_prep_systemio_write(addr, val);
+> > > +    qemu_set_irq(s->non_contiguous_io_map_irq,
+> > > +                 val & PORT0850_IOMAP_NONCONTIGUOUS ? 1 : 0);
+> > > +    s->iomap_type =3D val;
+> >=20
+> > Again, should this be masked?
 >=20
-> signature.asc
-> =CF=C2=D4=D8: http://u.163.com/t0/EPKVtbajXUHs
+> Again some reserved bits. Let's take them unconditionally.
 >=20
-> =D4=A4=C0=C0: http://u.163.com/t0/VUdsq6tC
+> >=20
+> > > +}
+> > > +
+> > > +static const MemoryRegionPortio ppc_io800_port_list[] =3D {
+> > > +    { 0x092, 1, 1, .read =3D prep_port0092_read,
+> > > +                   .write =3D prep_port0092_write, },
+> > > +    { 0x808, 1, 1, .write =3D prep_port0808_write, },
+> > > +    { 0x80c, 1, 1, .read =3D prep_port080c_read, },
+> > > +    { 0x810, 1, 1, .write =3D prep_port0810_write, },
+> > > +    { 0x812, 1, 1, .write =3D prep_port0812_write, },
+> > > +    { 0x814, 1, 1, .write =3D prep_port0814_write, },
+> > > +    { 0x818, 1, 1, .read =3D prep_port0818_read },
+> > > +    { 0x81c, 1, 1, .read =3D prep_port081c_read,
+> > > +                   .write =3D prep_port081c_write, },
+> > > +    { 0x850, 1, 1, .read =3D prep_port0850_read,
+> > > +                   .write =3D prep_port0850_write, },
+> > > +    { 0x852, 1, 1, .read =3D prep_port0852_read, },
+> > > +    PORTIO_END_OF_LIST()
+> > > +};
+> > > +
+> > > +static uint64_t ppc_parity_error_readl(void *opaque, hwaddr addr,
+> > > +                                       unsigned int size)
+> > > +{
+> > > +    uint32_t val =3D 0;
+> > > +    trace_prep_systemio_read((unsigned int)addr, val);
+> > > +    return val;
+> > > +}
+> > > +
+> > > +static const MemoryRegionOps ppc_parity_error_ops =3D {
+> > > +    .read =3D ppc_parity_error_readl,
+> > > +    .valid =3D {
+> > > +        .min_access_size =3D 4,
+> > > +        .max_access_size =3D 4,
+> > > +    },
+> > > +};
+> > > +
+> > > +static void prep_systemio_realize(DeviceState *dev, Error **errp)
+> > > +{
+> > > +    ISADevice *isa =3D ISA_DEVICE(dev);
+> > > +    PrepSystemIoState *s =3D PREP_SYSTEMIO(dev);
+> > > +    PowerPCCPU *cpu;
+> > > +
+> > > +    qdev_init_gpio_out(dev, &s->non_contiguous_io_map_irq, 1);
+> > > +    s->iomap_type =3D 0; /* contiguous mode XXX 0x1? */
+> > > +    cpu =3D POWERPC_CPU(first_cpu);
+> > > +    s->softreset_irq =3D cpu->env.irq_inputs[PPC6xx_INPUT_HRESET];
+> > > +
+> > > +    isa_register_portio_list(isa, &s->portio, 0x0, ppc_io800_port_li=
+st, s,
+> > > +                             "systemio800");
+> > > +
+> > > +    memory_region_init_io(&s->ppc_parity_mem, OBJECT(dev),
+> > > +                          &ppc_parity_error_ops, s, "ppc-parity", 0x=
+4);
+> > > +    memory_region_add_subregion(get_system_memory(), 0xbfffeff0,
+> > > +                                &s->ppc_parity_mem);
+> > > +}
+> > > +
+> > > +static const VMStateDescription vmstate_prep_systemio =3D {
+> > > +    .name =3D "prep_systemio",
+> > > +    .version_id =3D 1,
+> > > +    .minimum_version_id =3D 1,
+> > > +    .fields =3D (VMStateField[]) {
+> > > +        VMSTATE_UINT8(system_control, PrepSystemIoState),
+> > > +        VMSTATE_UINT8(iomap_type, PrepSystemIoState),
+> > > +        VMSTATE_END_OF_LIST()
+> >=20
+> > I'm not sure how useful this will be given how much other stuff in
+> > PReP won't migrate properly.
 >=20
+> PReP is mostly a PC with a PowerPC CPU, so most devices are already migra=
+tion-safe.
+>=20
+> >=20
+> > > +    },
+> > > +};
+> > > +
+> > > +static Property prep_systemio_properties[] =3D {
+> > > +    DEFINE_PROP_UINT8("ibm-planar-id", PrepSystemIoState, ibm_planar=
+_id, 0),
+> > > +    DEFINE_PROP_UINT8("equipment", PrepSystemIoState, equipment, 0),
+> > > +    DEFINE_PROP_END_OF_LIST()
+> > > +};
+> > > +
+> > > +static void prep_systemio_class_initfn(ObjectClass *klass, void *dat=
+a)
+> > > +{
+> > > +    DeviceClass *dc =3D DEVICE_CLASS(klass);
+> > > +
+> > > +    dc->realize =3D prep_systemio_realize;
+> > > +    dc->vmsd =3D &vmstate_prep_systemio;
+> > > +    dc->props =3D prep_systemio_properties;
+> > > +}
+> > > +
+> > > +static TypeInfo prep_systemio800_info =3D {
+> > > +    .name          =3D TYPE_PREP_SYSTEMIO,
+> > > +    .parent        =3D TYPE_ISA_DEVICE,
+> > > +    .instance_size =3D sizeof(PrepSystemIoState),
+> > > +    .class_init    =3D prep_systemio_class_initfn,
+> > > +};
+> > > +
+> > > +static void prep_systemio_register_types(void)
+> > > +{
+> > > +    type_register_static(&prep_systemio800_info);
+> > > +}
+> > > +
+> > > +type_init(prep_systemio_register_types)
+> > > diff --git a/hw/ppc/trace-events b/hw/ppc/trace-events
+> > > index 2297ead..2ba6166 100644
+> > > --- a/hw/ppc/trace-events
+> > > +++ b/hw/ppc/trace-events
+> > > @@ -74,3 +74,7 @@ ppc_tb_adjust(uint64_t offs1, uint64_t offs2, int64=
+_t diff, int64_t seconds) "ad
+> > >  # hw/ppc/prep.c
+> > >  prep_io_800_writeb(uint32_t addr, uint32_t val) "0x%08" PRIx32 " =3D=
+> 0x%02" PRIx32
+> > >  prep_io_800_readb(uint32_t addr, uint32_t retval) "0x%08" PRIx32 " <=
+=3D 0x%02" PRIx32
+> > > +
+> > > +# hw/ppc/prep_systemio.c
+> > > +prep_systemio_read(uint32_t addr, uint32_t val) "read addr=3D%x val=
+=3D%x"
+> > > +prep_systemio_write(uint32_t addr, uint32_t val) "write addr=3D%x va=
+l=3D%x"
+> >=20
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--WhfpMioaduB5tiZL
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJYbZYqAAoJEGw4ysog2bOSTTcP/RUnaa4q6PJISom3fY+lGnzS
+ul2nCiWKnpkp7cX7hiwptj7uEXv4hxgwKPAfzU3bS6mJzwEMZRqwlAi0BnJX32Dt
+vr1sz8OWyxGqExKYTr9bdsDxM+nEcgJN7jb7pJVDBa1MBUSrZsp34lMwT1Ron35W
+VY8j1ZfXmTb0zMVHy9TLZNuXAbuypq7f8QaOxKWcx9+CAuje4VsNm6cRreH7pBEr
+pC21lvIGYHfjfGpPCeG/90Kb3ndV5Kdlt8Rk1GKRHSzX7iZtXKV1iJz1k2UsT2yH
+qz5MggrmA/hAQT1wZAjErGA5KQoTKNJkZuFD3i+Ye+79YMLsrOASBED+T8tAuy6M
+cNfvGDIcNzNouub4DWiGaFVwOtwe4zgmBGWRMZK9D5rIQ5+/1NabQYsH/r9nNk92
+XGkAX6RcSrUhN0I+yJWV61j6BgPoFFu/txJ/hdbBhWv+ZG7vsknFCC6rSZdT3qEA
+sTQBPcGB8BMPvEmrQBtEey0SfW0ywerffFtQDRoRt4mCXvxKjATV3PWz+ezems1g
+UDBsFwEjKZ1W83jEncioJ1jaBzmh3dq1cze8119y83DV9wavL/96R5SYNSJSK4Hm
+kGuXXrX90A+pT9g528uX403dBaKWBzkydgkTJwO4HWP1VrR+LmSDcOksm3/jwt7O
+pr9hlUtMaz0DCItCWz8p
+=sgTZ
+-----END PGP SIGNATURE-----
+
+--WhfpMioaduB5tiZL--
