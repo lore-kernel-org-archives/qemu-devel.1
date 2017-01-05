@@ -1,28 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33878)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34301)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rkrcmar@redhat.com>) id 1cPDxK-0003Kf-Ol
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 14:44:11 -0500
+	(envelope-from <david.engraf@sysgo.com>) id 1cPDzM-0004T5-Pf
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 14:46:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rkrcmar@redhat.com>) id 1cPDxH-00045n-Lr
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 14:44:10 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43202)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rkrcmar@redhat.com>) id 1cPDxH-00045T-Ck
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 14:44:07 -0500
-Date: Thu, 5 Jan 2017 20:44:02 +0100
-From: Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
-Message-ID: <20170105194401.GD29430@potion>
-References: <1483438205-31110-1-git-send-email-peterx@redhat.com>
-	<1483438205-31110-3-git-send-email-peterx@redhat.com>
-	<20170104150938.GA9029@potion>
-	<20170105030746.GN22664@pxdev.xzpeter.org>
+	(envelope-from <david.engraf@sysgo.com>) id 1cPDzL-0004mY-E8
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 14:46:16 -0500
+References: <d15e8de4-f7d8-1c28-7e5e-31d0aa10819d@sysgo.com>
+	<CAFEAcA8pXJ3g5e7rw6_FAhnbZfLOOoX-gaavyzKug0y=gDCuQQ@mail.gmail.com>
+From: David Engraf <david.engraf@sysgo.com>
+Message-ID: <23f1afdd-e9cb-95de-19b9-59a81941e374@sysgo.com>
+Date: Thu, 5 Jan 2017 20:46:05 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170105030746.GN22664@pxdev.xzpeter.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [kvm-unit-tests PATCH v2 2/2] run_tests: allow run
- tests in parallel
+In-Reply-To: <CAFEAcA8pXJ3g5e7rw6_FAhnbZfLOOoX-gaavyzKug0y=gDCuQQ@mail.gmail.com>
+Content-Type: multipart/mixed; boundary="------------FBD59632452ACC9FB9791A3D"
+Subject: Re: [Qemu-devel] [PATCH] vexpress fix flash device-width
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,107 +22,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, Andrew Jones <drjones@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-2017-01-05 11:07+0800, Peter Xu:
-> On Wed, Jan 04, 2017 at 04:09:39PM +0100, Radim Kr=C4=8Dm=C3=A1=C5=99 w=
-rote:
->> 2017-01-03 18:10+0800, Peter Xu:
->> > run_task.sh is getting slow. This patch is trying to make it faster =
-by
->> > running the tests concurrently.
->> >=20
->> > We provide a new parameter "-j" for the run_tests.sh, which can be u=
-sed
->> > to specify how many run queues we want for the tests. Default queue
->> > length is 1, which is the old behavior.
->> >=20
->> > Quick test on my laptop (4 cores, 2 threads each) shows 3x speed boo=
-st:
->> >=20
->> >    |-----------------+-----------|
->> >    | command         | time used |
->> >    |-----------------+-----------|
->> >    | run_test.sh     | 75s       |
->> >    | run_test.sh -j8 | 27s       |
->> >    |-----------------+-----------|
->> >=20
->> > Suggested-by: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@redhat.com>
->> > Signed-off-by: Peter Xu <peterx@redhat.com>
->> > ---
->> >  run_tests.sh           | 12 ++++++++++--
->> >  scripts/functions.bash | 15 ++++++++++++++-
->> >  scripts/global.bash    | 11 +++++++++++
->> >  3 files changed, 35 insertions(+), 3 deletions(-)
->>=20
->> I like this diffstat a lot more, thanks :)
->>=20
->> The script doesn't handle ^C well now (at least), which can be worked
->> around with
->>=20
->>   trap exit SIGINT
->>=20
->> but it would be nice to know if receiving signals in `wait` can't be
->> fixed.
->=20
-> When I send SIGINT to "run_tests.sh -j8", I see process hang dead. Not
-> sure whether you see the same thing:
->=20
-> #0  0x00007f7af2e1559a in waitpid () from /lib64/libc.so.6
-> #1  0x00005613edf8953e in waitchld.isra ()
-> #2  0x00005613edf8aae5 in wait_for ()
-> #3  0x00005613edf8b682 in wait_for_any_job ()
-> #4  0x00005613edfc7e64 in wait_builtin ()
-> #5  0x00005613edf616ea in execute_builtin.isra ()
-> #6  0x00005613edf623ee in execute_simple_command ()
-> #7  0x00005613edf79e77 in execute_command_internal ()
-> #8  0x00005613edf7b972 in execute_command ()
-> #9  0x00005613edf62aca in execute_while_or_until ()
-> #10 0x00005613edf7a156 in execute_command_internal ()
-> #11 0x00005613edf79d88 in execute_command_internal ()
-> ...
+This is a multi-part message in MIME format.
+--------------FBD59632452ACC9FB9791A3D
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-I do.  And sometimes, I also caught it in a signal handler:
+Am 05.01.2017 um 19:32 schrieb Peter Maydell:
+> On 22 December 2016 at 14:02, David Engraf <david.engraf@sysgo.com> wrote:
+>> The current implementation uses width = 4 and device-width = 2 for the flash
+>> configuration. When using u-boot or Linux, the flash is detected as 32 x 16
+>> bit, thus the sector size is doubled to 512 KB. When u-boot sends a sector
+>> erase, only the first 256 KB are erased because the QEMU flash
+>> implementation uses the configured sector size of 256 KB and ignores the
+>> width and device-width ratio.
+>>
+>> This patch will change device-width to 4, thus the width and device-width
+>> are equal and u-boot detects the flash as 32 x 32 bit with the correct
+>> sector size of 256 KB.
+>
+> Thanks for this patch. However I'm not sure it is correct, because
+> I think the real hardware does have 2x16 devices here. On real vexpress
+> TC2 if you boot Linux it detects the flash as:
+> "8000000.flash: Found 2 x16 devices at 0x0 in 32-bit bank.
+> Manufacturer ID 0x000089 Chip ID 0x008919"
+>
+> So while we presumably have a QEMU bug if this isn't behaving
+> like the hardware, I don't think that changing the device-width to
+> 4 is the right fix for it. Maybe:
+>  * our erase implementation is broken?
+>  * one of the other parameters we use to create the flash
+>    is wrong?
+>  * the calculation of the erase block information that we put in
+>    the flash cfi_table[] is wrong?
+>
+> (Does u-boot hard-code the erase block sizes, or does
+> it read them from the CFI data? QEMU's flash doesn't have the
+> hardware's two-eraseblock-regions setup where part of the disk is
+> 256K erase-blocks and part is 64K blocks, but if u-boot doesn't
+> hardcode that it should be able to read the data from QEMU's
+> flash implementation.)
 
-  #0  0x00007f7461bcd637 in kill () at ../sysdeps/unix/syscall-template.S=
-:84
-  #1  0x00000000004476b9 in wait_sigint_handler (sig=3D<optimized out>) a=
-t jobs.c:2504
-  #2  <signal handler called>
-  #3  0x00007f7461c674ca in __GI___waitpid (pid=3Dpid@entry=3D-1, stat_lo=
-c=3Dstat_loc@entry=3D0x7ffdb49dfbd8,=20
-      options=3Doptions@entry=3D0) at ../sysdeps/unix/sysv/linux/waitpid.=
-c:29
-  #4  0x0000000000449cfb in waitchld (block=3Dblock@entry=3D1, wpid=3D-1)=
- at jobs.c:3474
-  #5  0x000000000044b2eb in wait_for (pid=3Dpid@entry=3D-1) at jobs.c:271=
-8
-  #6  0x000000000044becd in wait_for_any_job () at jobs.c:3015
-  #7  0x000000000048c38b in wait_builtin (list=3D0x0) at ./wait.def:154
-  ...
+u-boot and Linux are using the same way to detect the sector erase size:
 
->=20
-> If I change the "wait -n" into "wait" (this will work, but of course
-> slower since we'll wait for all subprocesses end before we start
-> another one), problem disappears.
+size_ratio = info->portwidth / info->chipwidth;
 
-Yeah, and just `wait` doesn't work with -j1 ... using `jobs -r` gets rid
-of it.
+In our case we have a width of 4 and a device-width of 2. Thus the per 
+device sector erase size is doubled from 256K to 512K. This calculation 
+is correct because an erase command is send to both chips, each erasing 
+256K.
 
->                                   Not sure whether that means a "wait
-> -n" bug.
+So there are two ways to fix this, depending how the QEMU property 
+"sector-length" should be interpreted. If the parameter specifies the 
+per device sector length, we have to fix the length in the erase 
+command. The other way would be to expect "sector-length" as the overall 
+sector size, which makes more sense in my eyes. Thus in our case this 
+value is halved and the result is stored in the CFI table. BTW this is 
+equal to blocks_per_device which is already calculated by the overall 
+number of blocks divided by num_devices.
 
-Most likely a bash bug:
- - doesn't happen if you SIGINT before the first job has finished
- - doesn't happen with normal wait
+I did a quick test with the attached patch and it was working in Linux. 
+Please have a look at the attached patch, if this is what you expect, I 
+will send a new mail with the correct description.
 
-> Anyway, IMHO squashing you suggestion of "trap exit SIGINT" at the
-> entry of for_each_unittest() is an acceptable solution - it works in
-> all cases.
+> Also, for patches to QEMU we need you to provide a
+> Signed-off-by: line to say that you're happy to contribute the
+> patch to QEMU. More detail about what this means here:
+> http://wiki.qemu.org/Contribute/SubmitAPatch#Patch_emails_must_include_a_Signed-off-by:_line
+> (the other details of patch formatting are mostly nice-to-haves,
+> but the s-o-by line is a hard requirement.)
 
-Seems like the best solution at this time ...
-We actually want to "exit 130", as it would when using normal wait does,
-and maybe it could be improved a bit by adding a wait:
+Sorry, forgot this.
 
-  trap 'wait; exit 130' SIGINT
+Thanks
+- David
+
+
+--------------FBD59632452ACC9FB9791A3D
+Content-Type: text/x-patch;
+ name="fix_pflash_sector_len.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename="fix_pflash_sector_len.patch"
+
+diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
+index 5f0ee9d..8bb61e4 100644
+--- a/hw/block/pflash_cfi01.c
++++ b/hw/block/pflash_cfi01.c
+@@ -703,7 +703,7 @@ static void pflash_cfi01_realize(DeviceState *dev, Error **errp)
+     pflash_t *pfl = CFI_PFLASH01(dev);
+     uint64_t total_len;
+     int ret;
+-    uint64_t blocks_per_device, device_len;
++    uint64_t blocks_per_device, sector_len_per_device, device_len;
+     int num_devices;
+     Error *local_err = NULL;
+ 
+@@ -727,7 +727,8 @@ static void pflash_cfi01_realize(DeviceState *dev, Error **errp)
+      */
+     num_devices = pfl->device_width ? (pfl->bank_width / pfl->device_width) : 1;
+     blocks_per_device = pfl->nb_blocs / num_devices;
+-    device_len = pfl->sector_len * blocks_per_device;
++    sector_len_per_device = pfl->sector_len / num_devices;
++    device_len = sector_len_per_device * blocks_per_device;
+ 
+     /* XXX: to be fixed */
+ #if 0
+@@ -839,8 +840,8 @@ static void pflash_cfi01_realize(DeviceState *dev, Error **errp)
+     /* Erase block region 1 */
+     pfl->cfi_table[0x2D] = blocks_per_device - 1;
+     pfl->cfi_table[0x2E] = (blocks_per_device - 1) >> 8;
+-    pfl->cfi_table[0x2F] = pfl->sector_len >> 8;
+-    pfl->cfi_table[0x30] = pfl->sector_len >> 16;
++    pfl->cfi_table[0x2F] = sector_len_per_device >> 8;
++    pfl->cfi_table[0x30] = sector_len_per_device >> 16;
+ 
+     /* Extended */
+     pfl->cfi_table[0x31] = 'P';
+
+--------------FBD59632452ACC9FB9791A3D--
