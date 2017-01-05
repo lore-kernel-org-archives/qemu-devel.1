@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34089)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39899)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jitendra.kolhe@hpe.com>) id 1cP2NK-0001SV-OF
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 02:22:16 -0500
+	(envelope-from <wei.w.wang@intel.com>) id 1cP2YF-0003wa-MU
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 02:33:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jitendra.kolhe@hpe.com>) id 1cP2NF-00007L-O0
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 02:22:14 -0500
-Received: from g4t3427.houston.hpe.com ([15.241.140.73]:8571)
+	(envelope-from <wei.w.wang@intel.com>) id 1cP2YB-00062k-PU
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 02:33:31 -0500
+Received: from mga05.intel.com ([192.55.52.43]:7925)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jitendra.kolhe@hpe.com>)
-	id 1cP2NF-00006w-In
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 02:22:09 -0500
-From: Jitendra Kolhe <jitendra.kolhe@hpe.com>
-Date: Thu,  5 Jan 2017 12:54:02 +0530
-Message-Id: <1483601042-6435-1-git-send-email-jitendra.kolhe@hpe.com>
-Subject: [Qemu-devel] [PATCH RFC] mem-prealloc: Reduce large guest start-up
- and migration time.
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1cP2YB-00061c-Fl
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 02:33:27 -0500
+Message-ID: <586DF6FE.8070704@intel.com>
+Date: Thu, 05 Jan 2017 15:34:22 +0800
+From: Wei Wang <wei.w.wang@intel.com>
+MIME-Version: 1.0
+References: <1482127152-84732-1-git-send-email-wei.w.wang@intel.com>
+	<CAJ+F1CKWSznG3hxj0=F1UAJD+ZOZg=q+Oio1YnbsRyz6vy51FQ@mail.gmail.com>
+In-Reply-To: <CAJ+F1CKWSznG3hxj0=F1UAJD+ZOZg=q+Oio1YnbsRyz6vy51FQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RESEND Patch v1 00/37] Implementation of
+ vhost-pci for inter-vm commucation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,137 +29,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, peter.maydell@linaro.org, armbru@redhat.com, kwolf@redhat.com, eblake@redhat.com, mohan_parthasarathy@hpe.com, renganathan.meenakshisundaram@hpe.com, jitendra.kolhe@hpe.com
+To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Cc: mst@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org
 
-Using "-mem-prealloc" option for a very large guest leads to huge guest
-start-up and migration time. This is because with "-mem-prealloc" option
-qemu tries to map every guest page (create address translations), and
-make sure the pages are available during runtime. virsh/libvirt by
-default, seems to use "-mem-prealloc" option in case the guest is
-configured to use huge pages. The patch tries to map all guest pages
-simultaneously by spawning multiple threads. Given the problem is more
-prominent for large guests, the patch limits the changes to the guests
-of at-least 64GB of memory size. Currently limiting the change to QEMU
-library functions on POSIX compliant host only, as we are not sure if
-the problem exists on win32. Below are some stats with "-mem-prealloc"
-option for guest configured to use huge pages.
+Hi Marc-André
 
-------------------------------------------------------------------------
-Idle Guest      | Start-up time | Migration time
-------------------------------------------------------------------------
-Guest stats with 2M HugePage usage - single threaded (existing code)
-------------------------------------------------------------------------
-64 Core - 4TB   | 54m11.796s    | 75m43.843s
-64 Core - 1TB   | 8m56.576s     | 14m29.049s
-64 Core - 256GB | 2m11.245s     | 3m26.598s
-------------------------------------------------------------------------
-Guest stats with 2M HugePage usage - map guest pages using 8 threads
-------------------------------------------------------------------------
-64 Core - 4TB   | 5m1.027s      | 34m10.565s
-64 Core - 1TB   | 1m10.366s     | 8m28.188s
-64 Core - 256GB | 0m19.040s     | 2m10.148s
------------------------------------------------------------------------
-Guest stats with 2M HugePage usage - map guest pages using 16 threads
------------------------------------------------------------------------
-64 Core - 4TB   | 1m58.970s     | 31m43.400s
-64 Core - 1TB   | 0m39.885s     | 7m55.289s
-64 Core - 256GB | 0m11.960s     | 2m0.135s
------------------------------------------------------------------------
+On 12/20/2016 12:43 AM, Marc-André Lureau wrote:
+> On Mon, Dec 19, 2016 at 7:00 AM Wei Wang <wei.w.wang@intel.com 
+> <mailto:wei.w.wang@intel.com>> wrote:
+>
+>     This patch series implements vhost-pci, which is a point-to-point
+>     based inter-vm
+>     communication solution. The QEMU side implementation includes the
+>     vhost-user
+>     extension, vhost-pci device emulation and management. The current
+>     device part
+>     implementation is based on virtio 1.0, but it can be easily
+>     upgraded to support
+>     the upcoming virtio 1.1.
+>
+>     The current QEMU implementation supports the polling mode driver
+>     on both sides
+>     to receive packets. More features, such as interrupt support, live
+>     migration
+>     support, protected memory accesses will be added later.
+>
+>
+>
+> I highly appreciate the effort you put in splitting the patch series 
+> and commenting each, although some are probably superfluous. Before 
+> going into details, I suppose you have kernel side bits too. I'd 
+> suggest before sending individual patches for review, that you send a 
+> RFC with links to the various git trees and instructions to test the 
+> proposed device. This would really help things and potentially bring 
+> more people for testing and comments (think about libvirt side etc). 
+> Even better would be to have some tests (with qtest).
 
-Signed-off-by: Jitendra Kolhe <jitendra.kolhe@hpe.com>
----
- util/oslib-posix.c | 64 +++++++++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 61 insertions(+), 3 deletions(-)
+The code is ready to try. I plan to clean up the driver to upstream when 
+the QEMU device part is finalized.
 
-diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-index f631464..a8bd7c2 100644
---- a/util/oslib-posix.c
-+++ b/util/oslib-posix.c
-@@ -55,6 +55,13 @@
- #include "qemu/error-report.h"
- #endif
- 
-+#define PAGE_TOUCH_THREAD_COUNT 8
-+typedef struct {
-+    char *addr;
-+    uint64_t numpages;
-+    uint64_t hpagesize;
-+} PageRange;
-+
- int qemu_get_thread_id(void)
- {
- #if defined(__linux__)
-@@ -323,6 +330,52 @@ static void sigbus_handler(int signal)
-     siglongjmp(sigjump, 1);
- }
- 
-+static void *do_touch_pages(void *arg)
-+{
-+    PageRange *range = (PageRange *)arg;
-+    char *start_addr = range->addr;
-+    uint64_t numpages = range->numpages;
-+    uint64_t hpagesize = range->hpagesize;
-+    uint64_t i = 0;
-+
-+    for (i = 0; i < numpages; i++) {
-+        memset(start_addr + (hpagesize * i), 0, 1);
-+    }
-+    qemu_thread_exit(NULL);
-+
-+    return NULL;
-+}
-+
-+static int touch_all_pages(char *area, size_t hpagesize, size_t numpages)
-+{
-+    QemuThread page_threads[PAGE_TOUCH_THREAD_COUNT];
-+    PageRange page_range[PAGE_TOUCH_THREAD_COUNT];
-+    uint64_t    numpage_per_thread, size_per_thread;
-+    int         i = 0, tcount = 0;
-+
-+    numpage_per_thread = (numpages / PAGE_TOUCH_THREAD_COUNT);
-+    size_per_thread = (hpagesize * numpage_per_thread);
-+    for (i = 0; i < (PAGE_TOUCH_THREAD_COUNT - 1); i++) {
-+        page_range[i].addr = area;
-+        page_range[i].numpages = numpage_per_thread;
-+        page_range[i].hpagesize = hpagesize;
-+
-+        qemu_thread_create(page_threads + i, "touch_pages",
-+                           do_touch_pages, (page_range + i),
-+                           QEMU_THREAD_JOINABLE);
-+        tcount++;
-+        area += size_per_thread;
-+        numpages -= numpage_per_thread;
-+    }
-+    for (i = 0; i < numpages; i++) {
-+        memset(area + (hpagesize * i), 0, 1);
-+    }
-+    for (i = 0; i < tcount; i++) {
-+        qemu_thread_join(page_threads + i);
-+    }
-+    return 0;
-+}
-+
- void os_mem_prealloc(int fd, char *area, size_t memory, Error **errp)
- {
-     int ret;
-@@ -353,9 +406,14 @@ void os_mem_prealloc(int fd, char *area, size_t memory, Error **errp)
-         size_t hpagesize = qemu_fd_getpagesize(fd);
-         size_t numpages = DIV_ROUND_UP(memory, hpagesize);
- 
--        /* MAP_POPULATE silently ignores failures */
--        for (i = 0; i < numpages; i++) {
--            memset(area + (hpagesize * i), 0, 1);
-+        /* touch pages simultaneously for memory >= 64G */
-+        if (memory < (1ULL << 36)) {
-+            /* MAP_POPULATE silently ignores failures */
-+            for (i = 0; i < numpages; i++) {
-+                memset(area + (hpagesize * i), 0, 1);
-+            }
-+        } else {
-+            touch_all_pages(area, hpagesize, numpages);
-         }
-     }
- 
--- 
-1.8.3.1
+The QEMU code is available at: git clone 
+https://github.com/wei-w-wang/vhost-pci-device
+The driver: git clone https://github.com/wei-w-wang/vhost-pci-driver
+
+I have a README.md under vhost-pci-device/ , which introduces the steps 
+to try the implementation.
+I will rename the variables/fields that you mentioned in the v2 version. 
+Thanks.
+
+
+Best,
+Wei
