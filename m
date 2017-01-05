@@ -1,23 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51373)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58407)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cP1Fl-0003af-9P
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 01:10:22 -0500
+	(envelope-from <ben@skyportsystems.com>) id 1cP235-00050o-Ba
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 02:01:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cP1Fj-0000jL-VC
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 01:10:21 -0500
-Received: from [59.151.112.132] (port=31958 helo=heian.cn.fujitsu.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cP1Fh-0000h3-Tw
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 01:10:19 -0500
-From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Date: Thu, 5 Jan 2017 14:08:51 +0800
-Message-ID: <1483596532-14552-2-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-In-Reply-To: <1483596532-14552-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-References: <1483596532-14552-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH V6 1/2] Add a new qmp command to start/stop
- replication
+	(envelope-from <ben@skyportsystems.com>) id 1cP234-0007QR-JQ
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 02:01:19 -0500
+Received: from mail-pf0-x22a.google.com ([2607:f8b0:400e:c00::22a]:34419)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ben@skyportsystems.com>)
+	id 1cP234-0007Ni-C6
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 02:01:18 -0500
+Received: by mail-pf0-x22a.google.com with SMTP id 127so6591550pfg.1
+	for <qemu-devel@nongnu.org>; Wed, 04 Jan 2017 23:01:16 -0800 (PST)
+Received: from ?IPv6:2602:30a:2c75:8260:7c8b:3302:cda0:5d57?
+	([2602:30a:2c75:8260:7c8b:3302:cda0:5d57])
+	by smtp.gmail.com with ESMTPSA id
+	q12sm151158939pfj.18.2017.01.04.23.01.14 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Wed, 04 Jan 2017 23:01:14 -0800 (PST)
+From: Ben Warren <ben@skyportsystems.com>
+Content-Type: multipart/signed;
+	boundary="Apple-Mail=_AC372959-1923-4B20-9162-51BADC212697";
+	protocol="application/pkcs7-signature"; micalg=sha1
+Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
+Message-Id: <D7CA83B6-39C6-4D0D-88E4-954874ADC3E0@skyportsystems.com>
+Date: Wed, 4 Jan 2017 23:01:13 -0800
+Subject: [Qemu-devel] uncached memory access in qtest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,122 +34,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu devel <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>, Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Bian Naimeng <biannm@cn.fujitsu.com>, "eddie . dong" <eddie.dong@intel.com>, Wen Congyang <wencongyang@gmail.com>
+To: qemu-devel@nongnu.org
 
-We can call this qmp command to start/stop replication outside of qemu.
-Like Xen colo need this function.
 
-Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Signed-off-by: Wen Congyang <wencongyang@gmail.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
+--Apple-Mail=_AC372959-1923-4B20-9162-51BADC212697
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=utf-8
 
----
- docs/qmp-commands.txt | 18 ++++++++++++++++++
- migration/colo.c      | 23 +++++++++++++++++++++++
- qapi-schema.json      | 19 +++++++++++++++++++
- 3 files changed, 60 insertions(+)
+Hi,
 
-diff --git a/docs/qmp-commands.txt b/docs/qmp-commands.txt
-index abf210a..d182147 100644
---- a/docs/qmp-commands.txt
-+++ b/docs/qmp-commands.txt
-@@ -432,6 +432,24 @@ Example:
-      "arguments": { "enable": true } }
- <- { "return": {} }
- 
-+xen-set-replication
-+-------------------
-+
-+Enable or disable replication.
-+
-+Arguments:
-+
-+- "enable": Enable it or disable it.
-+- "primary": True for primary or false for secondary.
-+- "failover": Enable failover when stopping replication, but cannot be
-+              specified if 'enable' is true (optional, default false).
-+
-+Example:
-+
-+-> { "execute": "xen-set-replication",
-+     "arguments": {"enable": true, "primary": false} }
-+<- { "return": {} }
-+
- migrate
- -------
- 
-diff --git a/migration/colo.c b/migration/colo.c
-index 93c85c5..6fc2ade 100644
---- a/migration/colo.c
-+++ b/migration/colo.c
-@@ -19,6 +19,8 @@
- #include "qemu/error-report.h"
- #include "qapi/error.h"
- #include "migration/failover.h"
-+#include "replication.h"
-+#include "qmp-commands.h"
- 
- #define COLO_BUFFER_BASE_SIZE (4 * 1024 * 1024)
- 
-@@ -104,6 +106,27 @@ void colo_do_failover(MigrationState *s)
-     }
- }
- 
-+void qmp_xen_set_replication(bool enable, bool primary,
-+                             bool has_failover, bool failover,
-+                             Error **errp)
-+{
-+    ReplicationMode mode = primary ?
-+                           REPLICATION_MODE_PRIMARY :
-+                           REPLICATION_MODE_SECONDARY;
-+
-+    if (has_failover && enable) {
-+        error_setg(errp, "Parameter 'failover' is only for"
-+                   " stopping replication");
-+        return;
-+    }
-+
-+    if (enable) {
-+        replication_start_all(mode, errp);
-+    } else {
-+        replication_stop_all(failover, failover ? NULL : errp);
-+    }
-+}
-+
- static void colo_send_message(QEMUFile *f, COLOMessage msg,
-                               Error **errp)
- {
-diff --git a/qapi-schema.json b/qapi-schema.json
-index f3e9bfc..78802f4 100644
---- a/qapi-schema.json
-+++ b/qapi-schema.json
-@@ -4676,6 +4676,25 @@
- { 'command': 'xen-load-devices-state', 'data': {'filename': 'str'} }
- 
- ##
-+# @xen-set-replication
-+#
-+# Enable or disable replication.
-+#
-+# @enable: true to enable, false to disable.
-+#
-+# @primary: true for primary or false for secondary.
-+#
-+# @failover: #optional true to do failover, false to stop. but cannot be
-+#            specified if 'enable' is true. default value is false.
-+#
-+# Returns: nothing.
-+#
-+# Since: 2.9
-+##
-+{ 'command': 'xen-set-replication',
-+  'data': { 'enable': 'bool', 'primary': 'bool', '*failover' : 'bool' } }
-+
-+##
- # @GICCapability:
- #
- # The struct describes capability for a specific GIC (Generic
--- 
-2.7.4
+I=E2=80=99m trying to write a unit test to access a fw_cfg device via =
+ACPI memory.  When I access the memory from qtest using the readx() =
+functions, I get the right values.  If I change the contents on the host =
+side, though, then access from the guest, the contents are unchanged.  =
+If I register a read callback via fw_cfg_add_file_callback(), I see the =
+callback only called once, so it seems to me that the guest memory is =
+being cached.  Is there an easy way to flush or invalidate the cache, or =
+map a region uncached in the qtest framework?  Or maybe do something =
+from the host side?
+
+thanks,
+Ben=
+
+--Apple-Mail=_AC372959-1923-4B20-9162-51BADC212697
+Content-Disposition: attachment;
+	filename=smime.p7s
+Content-Type: application/pkcs7-signature;
+	name=smime.p7s
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExCzAJBgUrDgMCGgUAMIAGCSqGSIb3DQEHAQAAoIIJ+zCCBK8w
+ggOXoAMCAQICEQDgI8sVEoNTia1hbnpUZ2shMA0GCSqGSIb3DQEBCwUAMG8xCzAJBgNVBAYTAlNF
+MRQwEgYDVQQKEwtBZGRUcnVzdCBBQjEmMCQGA1UECxMdQWRkVHJ1c3QgRXh0ZXJuYWwgVFRQIE5l
+dHdvcmsxIjAgBgNVBAMTGUFkZFRydXN0IEV4dGVybmFsIENBIFJvb3QwHhcNMTQxMjIyMDAwMDAw
+WhcNMjAwNTMwMTA0ODM4WjCBmzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hl
+c3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQxQTA/BgNV
+BAMTOENPTU9ETyBTSEEtMjU2IENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWls
+IENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAibEN2npTGU5wUh28VqYGJre4SeCW
+51Gr8fBaE0kVo7SMG2C8elFCp3mMpCLfF2FOkdV2IwoU00oCf7YdCYBupQQ92bq7Fv6hh6kuQ1JD
+FnyvMlDIpk9a6QjYz5MlnHuI6DBk5qT4VoD9KiQUMxeZrETlaYujRgZLwjPU6UCfBrCxrJNAubUI
+kzqcKlOjENs9IGE8VQOO2U52JQIhKfqjfHF2T+7hX4Hp+1SA28N7NVK3hN4iPSwwLTF/Wb1SN7Az
+aS1D6/rWpfGXd2dRjNnuJ+u8pQc4doykqTj/34z1A6xJvsr3c5k6DzKrnJU6Ez0ORjpXdGFQvsZA
+P8vk4p+iIQIDAQABo4IBFzCCARMwHwYDVR0jBBgwFoAUrb2YejS0Jvf6xCZU7wO94CTLVBowHQYD
+VR0OBBYEFJJha4LhoqCqT+xn8cKj97SAAMHsMA4GA1UdDwEB/wQEAwIBhjASBgNVHRMBAf8ECDAG
+AQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDARBgNVHSAECjAIMAYGBFUdIAAw
+RAYDVR0fBD0wOzA5oDegNYYzaHR0cDovL2NybC51c2VydHJ1c3QuY29tL0FkZFRydXN0RXh0ZXJu
+YWxDQVJvb3QuY3JsMDUGCCsGAQUFBwEBBCkwJzAlBggrBgEFBQcwAYYZaHR0cDovL29jc3AudXNl
+cnRydXN0LmNvbTANBgkqhkiG9w0BAQsFAAOCAQEAGypurFXBOquIxdjtzVXzqmthK8AJECOZD8Vm
+am+x9bS1d14PAmEA330F/hKzpICAAPz7HVtqcgIKQbwFusFY1SbC6tVNhPv+gpjPWBvjImOcUvi7
+BTarfVil3qs7Y+Xa1XPv7OD7e+Kj//BCI5zKto1NPuRLGAOyqC3U2LtCS5BphRDbpjc06HvgARCl
+nMo6x59PiDRuimXQGoq7qdzKyjbR9PzCZCk1r9axp3ER0gNDsY8+muyeMlP0dpLKhjQHuSzK5hxK
+2JkNwYbikJL7WkJqIyEQ6WXH9dW7fuqMhSACYurROgcsWcWZM/I4ieW26RZ6H3kU9koQGib6fIr7
+mzCCBUQwggQsoAMCAQICEQCWOeMVlifzA+PvGfHjMeybMA0GCSqGSIb3DQEBCwUAMIGbMQswCQYD
+VQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRow
+GAYDVQQKExFDT01PRE8gQ0EgTGltaXRlZDFBMD8GA1UEAxM4Q09NT0RPIFNIQS0yNTYgQ2xpZW50
+IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0EwHhcNMTYwNTE5MDAwMDAwWhcNMTcw
+NTE5MjM1OTU5WjAnMSUwIwYJKoZIhvcNAQkBFhZiZW5Ac2t5cG9ydHN5c3RlbXMuY29tMIIBIjAN
+BgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAryjnKj/3VRzbNXiWAp7RAZSzUCOzDG6WJ2ybuDWP
+A7uDl48iX2v3ulbcZq8G0sL1nwGvBdSrmd5X3Qzirx0ti0Qe0mlAd22PEOL/xR5ChLDhNI6i43cM
+R1qM1JNtuC5Dz8h2TfYbF/VuKkA1YVuXNguSP8Z1DQXptE1m3yS0gk9LLdDkqq7Vi/zfSmD1NYHN
+gEGvtux/3lMp8pHgQiZo8PxKH2Y4zem0AiWtZ9fKZqYWRIhECJ+etvpGvh4dNIj8vdo/ig3uSwLv
+ePX7rFz3C5WHOyKjl4VGHNOA5IRZjabp4bdAEIiMPU7lfWt0o4nCRtM/G/6FvFinR6PIHSma1wID
+AQABo4IB9DCCAfAwHwYDVR0jBBgwFoAUkmFrguGioKpP7GfxwqP3tIAAwewwHQYDVR0OBBYEFJv6
+uT+NCtbUQ0MHZLryEY65oKgbMA4GA1UdDwEB/wQEAwIFoDAMBgNVHRMBAf8EAjAAMCAGA1UdJQQZ
+MBcGCCsGAQUFBwMEBgsrBgEEAbIxAQMFAjARBglghkgBhvhCAQEEBAMCBSAwRgYDVR0gBD8wPTA7
+BgwrBgEEAbIxAQIBAQEwKzApBggrBgEFBQcCARYdaHR0cHM6Ly9zZWN1cmUuY29tb2RvLm5ldC9D
+UFMwXQYDVR0fBFYwVDBSoFCgToZMaHR0cDovL2NybC5jb21vZG9jYS5jb20vQ09NT0RPU0hBMjU2
+Q2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNybDCBkAYIKwYBBQUHAQEEgYMw
+gYAwWAYIKwYBBQUHMAKGTGh0dHA6Ly9jcnQuY29tb2RvY2EuY29tL0NPTU9ET1NIQTI1NkNsaWVu
+dEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcnQwJAYIKwYBBQUHMAGGGGh0dHA6Ly9v
+Y3NwLmNvbW9kb2NhLmNvbTAhBgNVHREEGjAYgRZiZW5Ac2t5cG9ydHN5c3RlbXMuY29tMA0GCSqG
+SIb3DQEBCwUAA4IBAQAwVeCMNqTr20+cqsHnSK2AtzxKZyVG9y51wB88lPnRGHe2m+qKGdPgAh/7
+iDzEEXsy4sDwHVHVq4kLHW9lX7CvRTxCtmOAtsty5ePhJjh3CX+nsK2HKpi043E6azad6L64DNVN
+dMZFwUrUu8dYjOp48TPpIhW13Sbu2t/SOZK4G8EZAaZPX8Dg34tyHRUvM/B/eaJuUgdM5qY2IU+F
+7U2K4hBHkhJMJgQ7TyVe8GhdBMaztY4GHqhWP5cCgZBdC9QII8E5jqX7//FbBRB0zVHRVeBZO32H
+TvapSOG8ZYd0n5l5j3rBQnLfHWsnQ07rL2+w8W9BBPSZBbciPuwOe3ksMYIDxjCCA8ICAQEwgbEw
+gZsxCzAJBgNVBAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1Nh
+bGZvcmQxGjAYBgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMUEwPwYDVQQDEzhDT01PRE8gU0hBLTI1
+NiBDbGllbnQgQXV0aGVudGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAJY54xWWJ/MD4+8Z
+8eMx7JswCQYFKw4DAhoFAKCCAekwGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0B
+CQUxDxcNMTcwMTA1MDcwMTEzWjAjBgkqhkiG9w0BCQQxFgQUm+U6+pJgW5D/OzVtRvuWVoHBESsw
+gcIGCSsGAQQBgjcQBDGBtDCBsTCBmzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFu
+Y2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQxQTA/
+BgNVBAMTOENPTU9ETyBTSEEtMjU2IENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVt
+YWlsIENBAhEAljnjFZYn8wPj7xnx4zHsmzCBxAYLKoZIhvcNAQkQAgsxgbSggbEwgZsxCzAJBgNV
+BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
+BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMUEwPwYDVQQDEzhDT01PRE8gU0hBLTI1NiBDbGllbnQg
+QXV0aGVudGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAJY54xWWJ/MD4+8Z8eMx7JswDQYJ
+KoZIhvcNAQEBBQAEggEAoSeKm+JSgQJPOkwIEQgvA2o6U2u7lk3Uxg7J8g5OaEn5nOn29EP7MXKo
+tmVcPqi/5NofH/GmaULX0fxfQeN+3wDZQlABk5VUFbBpzgkbqaV/xKdYakDI30OqgIpUHy6W3Pr+
+dPtrzG37GYZw7pe0IoOwr3fVoYN4UF2nfqru/YpSEBKxTaLTERNpSEFyGlIyYHacv0/N20BboaTa
+jxWgn+wXhSTgnDSg9/A4u+bFMKKPuUS5PONUC4FW4Uqlm5EN/8X8uhPFpJi7XHY7WD/d4EC9PANE
+EbizLIIwpXoCNx4SzSd5FY8XzpQIPlUd7BSj/6QTKZuQf0eaI9JsIIe6igAAAAAAAA==
+--Apple-Mail=_AC372959-1923-4B20-9162-51BADC212697--
