@@ -1,35 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42603)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43764)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cP6C9-0000hK-1v
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 06:26:57 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cP6J3-0006T4-H9
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 06:34:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cP6C5-0006VB-3r
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 06:26:57 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57752
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
-	id 1cP6C4-0006Ue-Tm
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 06:26:53 -0500
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	v05BO1XX052672
-	for <qemu-devel@nongnu.org>; Thu, 5 Jan 2017 06:26:52 -0500
-Received: from e28smtp05.in.ibm.com (e28smtp05.in.ibm.com [125.16.236.5])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 27skxvbwa6-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 05 Jan 2017 06:26:52 -0500
-Received: from localhost
-	by e28smtp05.in.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
-	Thu, 5 Jan 2017 16:56:48 +0530
-From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-Date: Thu,  5 Jan 2017 16:56:18 +0530
-In-Reply-To: <1483615579-17618-1-git-send-email-nikunj@linux.vnet.ibm.com>
-References: <1483615579-17618-1-git-send-email-nikunj@linux.vnet.ibm.com>
-Message-Id: <1483615579-17618-14-git-send-email-nikunj@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 13/14] target-ppc: Add xsxsigdp instruction
+	(envelope-from <peter.maydell@linaro.org>) id 1cP6J2-0000KN-Kf
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 06:34:05 -0500
+Received: from mail-ua0-x235.google.com ([2607:f8b0:400c:c08::235]:34646)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cP6J2-0000KF-FU
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 06:34:04 -0500
+Received: by mail-ua0-x235.google.com with SMTP id 34so335945164uac.1
+	for <qemu-devel@nongnu.org>; Thu, 05 Jan 2017 03:34:04 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <5dd3d27a-e630-4e92-43fa-13c131e9f880@freebsd.org>
+References: <5dd3d27a-e630-4e92-43fa-13c131e9f880@freebsd.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 5 Jan 2017 11:33:43 +0000
+Message-ID: <CAFEAcA-dOaMYMSSUN_jrRUPRxLVQBZJX4MzZoM6KOz+o3YYBMQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] New Year's starting over ... bsd-user
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,68 +28,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net
-Cc: qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com, nikunj@linux.vnet.ibm.com
+To: Sean Bruno <sbruno@freebsd.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-xsxsigdp: VSX Scalar Extract Significand Dual Precision
+On 3 January 2017 at 16:18, Sean Bruno <sbruno@freebsd.org> wrote:
+> I'm pondering where to start with getting FreeBSD's bsd-user code into
+> shape so it could actually be reviewed and accepted now that its sort of
+> working again (signal handling fixed finally).
+>
+> I almost feel like the existing code should be purged, except that it
+> gives a good history (and this seems lazy to me).
+>
+> As a first pass, I guess, I'd like to at least make i386 user run on
+> x86_64.  What would you folks like to see in a first pass?
 
-Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
----
- target-ppc/translate/vsx-impl.inc.c | 29 +++++++++++++++++++++++++++++
- target-ppc/translate/vsx-ops.inc.c  |  1 +
- 2 files changed, 30 insertions(+)
+So, here's my thoughts on this. I think our goals here are
+ * get the out-of-tree code into the tree, over time
+ * help you get to a point where you're maintaining and fixing
+   the FreeBSD code with us upstream, rather than deploying
+   downstream patches
 
-diff --git a/target-ppc/translate/vsx-impl.inc.c b/target-ppc/translate/vsx-impl.inc.c
-index 514a273..1fea8dc 100644
---- a/target-ppc/translate/vsx-impl.inc.c
-+++ b/target-ppc/translate/vsx-impl.inc.c
-@@ -1242,6 +1242,35 @@ static void gen_xsxexpqp(DisasContext *ctx)
-     tcg_gen_andi_i64(xth, xth, 0x7FFF);
-     tcg_gen_movi_i64(xtl, 0);
- }
-+
-+static void gen_xsxsigdp(DisasContext *ctx)
-+{
-+    TCGv rt = cpu_gpr[rD(ctx->opcode)];
-+    TCGv_i64 t0, zr, nan, exp;
-+
-+    if (unlikely(!ctx->vsx_enabled)) {
-+        gen_exception(ctx, POWERPC_EXCP_VSXU);
-+        return;
-+    }
-+    exp = tcg_temp_new_i64();
-+    t0 = tcg_temp_new_i64();
-+    zr = tcg_const_i64(0);
-+    nan = tcg_const_i64(2047);
-+
-+    tcg_gen_shri_i64(exp, cpu_vsrh(xB(ctx->opcode)), 52);
-+    tcg_gen_andi_i64(exp, exp, 0x7FF);
-+    tcg_gen_movi_i64(t0, 0x0010000000000000);
-+    tcg_gen_movcond_i64(TCG_COND_EQ, t0, exp, zr, zr, t0);
-+    tcg_gen_movcond_i64(TCG_COND_EQ, t0, exp, nan, zr, t0);
-+    tcg_gen_andi_i64(rt, cpu_vsrh(xB(ctx->opcode)), 0x000FFFFFFFFFFFFF);
-+    tcg_gen_or_i64(rt, rt, t0);
-+
-+    tcg_temp_free_i64(t0);
-+    tcg_temp_free_i64(exp);
-+    tcg_temp_free_i64(zr);
-+    tcg_temp_free_i64(nan);
-+}
-+
- #endif
- 
- #undef GEN_XX2FORM
-diff --git a/target-ppc/translate/vsx-ops.inc.c b/target-ppc/translate/vsx-ops.inc.c
-index 2ea8ce4..c7791f8 100644
---- a/target-ppc/translate/vsx-ops.inc.c
-+++ b/target-ppc/translate/vsx-ops.inc.c
-@@ -118,6 +118,7 @@ GEN_VSX_XFORM_300_EO(xscvqpdp, 0x04, 0x1A, 0x14, 0x0),
- #ifdef TARGET_PPC64
- GEN_XX2FORM_EO(xsxexpdp, 0x16, 0x15, 0x00, PPC2_ISA300),
- GEN_VSX_XFORM_300_EO(xsxexpqp, 0x04, 0x19, 0x02, 0x00000001),
-+GEN_XX2FORM_EO(xsxsigdp, 0x16, 0x15, 0x01, PPC2_ISA300),
- #endif
- 
- GEN_XX2FORM(xvabsdp, 0x12, 0x1D, PPC2_VSX),
--- 
-2.7.4
+and the primary obstacle is this big pile of non-upstreamed
+code. From my end I don't think it really matters too much
+what order we try to tackle things in, as long as the chunks
+that arrive for upstream review are not too large and seem at
+least vaguely coherent. If i386-on-x86_64 seems like you can
+extract it sensibly then I think it's as good a place to start
+as anything else (though of course it's of pretty much zero
+practical utility :-)).
+
+Whether you want to keep the sparc support or delete it is
+I think up to you as the maintainer -- if it's broken and
+nobody cares about it I think we can happily delete it.
+On the other hand if you want to fix it up and keep it around
+then that's fine too.
+
+At some point it would be good to get the BSDs into the set of
+things we test when merging code, so we don't regress them.
+That would ideally require hardware we can access though (the only
+real-hw setup in the gcc compile farm is an ancient NetBSD
+5.1 install). I guess instructions-for-BSD-novices on how to
+setup a VM on a Linux box would do in a pinch.
+
+(We should also try to avoid breaking bsd-user on the other
+BSDs in the course of fixing up FreeBSD -- do you know how
+many of the other BSD hosts work right now?)
+
+thanks
+-- PMM
