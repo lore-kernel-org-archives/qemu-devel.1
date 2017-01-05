@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49828)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51305)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cP3SF-0001m7-9N
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 03:31:24 -0500
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cP3Y8-00046k-Pw
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 03:37:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cP3SE-0005LL-AV
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 03:31:23 -0500
+	(envelope-from <zhang.zhanghailiang@huawei.com>) id 1cP3Y5-000059-Lb
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 03:37:28 -0500
 References: <1483493521-9604-1-git-send-email-zhang.zhanghailiang@huawei.com>
-	<20170104103227.GD10541@redhat.com>
+	<eb38a50f-515a-d3ee-0857-5fbc4cecbb0a@redhat.com>
 From: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
-Message-ID: <586E0426.6040701@huawei.com>
-Date: Thu, 5 Jan 2017 16:30:30 +0800
+Message-ID: <586E05A5.3010309@huawei.com>
+Date: Thu, 5 Jan 2017 16:36:53 +0800
 MIME-Version: 1.0
-In-Reply-To: <20170104103227.GD10541@redhat.com>
+In-Reply-To: <eb38a50f-515a-d3ee-0857-5fbc4cecbb0a@redhat.com>
 Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PATCH v2] qemu-thread: fix qemu_thread_set_name()
@@ -24,11 +24,11 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: xuquan8@huawei.com, qemu-devel@nongnu.org, stefanha@gmail.com, qemu-stable@nongnu.org, Caoxinhua <caoxinhua@huawei.com>, arei.gonglei@huawei.com, pbonzini@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: xuquan8@huawei.com, qemu-stable@nongnu.org, stefanha@gmail.com, arei.gonglei@huawei.com, Caoxinhua <caoxinhua@huawei.com>
 
-On 2017/1/4 18:32, Daniel P. Berrange wrote:
-> On Wed, Jan 04, 2017 at 09:32:01AM +0800, zhanghailiang wrote:
+On 2017/1/4 19:59, Paolo Bonzini wrote:
+> On 04/01/2017 02:32, zhanghailiang wrote:
 >> From: Caoxinhua <caoxinhua@huawei.com>
 >>
 >> QEMU will crash with the follow backtrace if the new created thread exited before
@@ -57,6 +57,19 @@ On 2017/1/4 18:32, Daniel P. Berrange wrote:
 >> Let's detach the new thread after calling qemu_thread_set_name().
 >>
 >> Signed-off-by: Caoxinhua <caoxinhua@huawei.com>
+>
+> Please reply with your own Signed-off-by too, not just Xinhua's.
+>
+
+Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+
+OK, thanks, would you please help merge this patch ?
+
+
+> Thanks,
+>
+> Paolo
+>
 >> ---
 >> v2:
 >>   Fix missing title
@@ -78,30 +91,23 @@ On 2017/1/4 18:32, Daniel P. Berrange wrote:
 >> -            error_exit(err, __func__);
 >> -        }
 >> -    }
->>   
+>>
 >>       /* Leave signal handling to the iothread.  */
 >>       sigfillset(&set);
 >> @@ -499,6 +493,12 @@ void qemu_thread_create(QemuThread *thread, const char *name,
 >>           qemu_thread_set_name(thread, name);
 >>       }
->>   
+>>
 >> +    if (mode == QEMU_THREAD_DETACHED) {
 >> +        err = pthread_detach(thread->thread);
 >> +        if (err) {
 >> +            error_exit(err, __func__);
 >> +        }
 >> +    }
-> Is it permitted to be calling pthread_detach(), if there is a chance that
-> the thread has already exited ? It seems reasonable, since a non-detached
-
-Yes, there is no problem  if we call pthread_detach() after the related thread has exited,
-we have tested it.
-
-Thanks,
-Hailiang
-
-> thread shouldl remain in a zombie state waiting to be join'd, but the man
-> page is unclear on behaviour.
+>>       pthread_sigmask(SIG_SETMASK, &oldset, NULL);
+>>
+>>       pthread_attr_destroy(&attr);
+>>
 >
-> Regards,
-> Daniel
+> .
+>
