@@ -1,34 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42560)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42535)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cP6C5-0000dR-19
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 06:26:53 -0500
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cP6C2-0000Xf-M1
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 06:26:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cP6C1-0006TY-3Q
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 06:26:53 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52941)
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cP6By-0006S0-Pk
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 06:26:50 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54063
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
-	id 1cP6C0-0006Sn-Pa
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 06:26:49 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	v05BO3hZ016741
-	for <qemu-devel@nongnu.org>; Thu, 5 Jan 2017 06:26:47 -0500
-Received: from e28smtp01.in.ibm.com (e28smtp01.in.ibm.com [125.16.236.1])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 27sk0kem3w-1
+	id 1cP6By-0006RU-JA
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 06:26:46 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
+	v05BO1Ns094532
+	for <qemu-devel@nongnu.org>; Thu, 5 Jan 2017 06:26:46 -0500
+Received: from e28smtp08.in.ibm.com (e28smtp08.in.ibm.com [125.16.236.8])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 27sk0hxvn8-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 05 Jan 2017 06:26:47 -0500
+	for <qemu-devel@nongnu.org>; Thu, 05 Jan 2017 06:26:45 -0500
 Received: from localhost
-	by e28smtp01.in.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e28smtp08.in.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
-	Thu, 5 Jan 2017 16:56:44 +0530
+	Thu, 5 Jan 2017 16:56:42 +0530
 From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-Date: Thu,  5 Jan 2017 16:56:16 +0530
+Date: Thu,  5 Jan 2017 16:56:15 +0530
 In-Reply-To: <1483615579-17618-1-git-send-email-nikunj@linux.vnet.ibm.com>
 References: <1483615579-17618-1-git-send-email-nikunj@linux.vnet.ibm.com>
-Message-Id: <1483615579-17618-12-git-send-email-nikunj@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 11/14] target-ppc: Add xsxexpdp instruction
+Message-Id: <1483615579-17618-11-git-send-email-nikunj@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 10/14] target-ppc: Add xscvqpdp instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,52 +41,94 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net
 Cc: qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com, nikunj@linux.vnet.ibm.com
 
-xsxexpdp: VSX Scalar Extract Exponent Dual Precision
+From: Bharata B Rao <bharata@linux.vnet.ibm.com>
 
+xscvqpdp:  VSX Scalar round & Convert Quad-Precision format to
+           Double-Precision format
+
+Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
 Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 ---
- target-ppc/translate/vsx-impl.inc.c | 13 +++++++++++++
- target-ppc/translate/vsx-ops.inc.c  |  4 ++++
- 2 files changed, 17 insertions(+)
+ target-ppc/fpu_helper.c             | 28 ++++++++++++++++++++++++++++
+ target-ppc/helper.h                 |  1 +
+ target-ppc/translate/vsx-impl.inc.c |  1 +
+ target-ppc/translate/vsx-ops.inc.c  |  1 +
+ 4 files changed, 31 insertions(+)
 
+diff --git a/target-ppc/fpu_helper.c b/target-ppc/fpu_helper.c
+index 224876b..dfd3515 100644
+--- a/target-ppc/fpu_helper.c
++++ b/target-ppc/fpu_helper.c
+@@ -2743,6 +2743,34 @@ void helper_##op(CPUPPCState *env, uint32_t opcode)                \
+ VSX_CVT_FP_TO_FP_HP(xscvdphp, float64, float16, VsrD(0), VsrH(3))
+ VSX_CVT_FP_TO_FP_HP(xscvhpdp, float16, float64, VsrH(3), VsrD(0))
+ 
++/*
++ * xscvqpdp isn't using VSX_CVT_FP_TO_FP() because xscvqpdpo will be
++ * added to this later.
++ */
++void helper_xscvqpdp(CPUPPCState *env, uint32_t opcode)
++{
++    ppc_vsr_t xt, xb;
++
++    getVSR(xB(opcode), &xb, env);
++    getVSR(xT(opcode), &xt, env);
++
++    if (unlikely(Rc(opcode) != 0)) {
++        /* TODO: Support xscvqpdpo after round-to-odd is implemented */
++        abort();
++    }
++
++    xt.VsrD(0) = float128_to_float64(xb.f128, &env->fp_status);
++    if (unlikely(float128_is_signaling_nan(xb.f128,
++                                           &env->fp_status))) {
++        float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 0);
++        xt.VsrD(0) = float64_snan_to_qnan(xt.VsrD(0));
++    }
++    helper_compute_fprf_float64(env, xt.VsrD(0));
++
++    putVSR(xT(opcode), &xt, env);
++    float_check_status(env);
++}
++
+ uint64_t helper_xscvdpspn(CPUPPCState *env, uint64_t xb)
+ {
+     float_status tstat = env->fp_status;
+diff --git a/target-ppc/helper.h b/target-ppc/helper.h
+index 3b5d0ad..f28bf62 100644
+--- a/target-ppc/helper.h
++++ b/target-ppc/helper.h
+@@ -433,6 +433,7 @@ DEF_HELPER_2(xscvdphp, void, env, i32)
+ DEF_HELPER_2(xscvdpqp, void, env, i32)
+ DEF_HELPER_2(xscvdpsp, void, env, i32)
+ DEF_HELPER_2(xscvdpspn, i64, env, i64)
++DEF_HELPER_2(xscvqpdp, void, env, i32)
+ DEF_HELPER_2(xscvhpdp, void, env, i32)
+ DEF_HELPER_2(xscvspdp, void, env, i32)
+ DEF_HELPER_2(xscvspdpn, i64, env, i64)
 diff --git a/target-ppc/translate/vsx-impl.inc.c b/target-ppc/translate/vsx-impl.inc.c
-index d9cdaf1..b8ff31e 100644
+index 358ff4c..d9cdaf1 100644
 --- a/target-ppc/translate/vsx-impl.inc.c
 +++ b/target-ppc/translate/vsx-impl.inc.c
-@@ -1216,6 +1216,19 @@ static void gen_##name(DisasContext *ctx)                       \
- VSX_EXTRACT_INSERT(xxextractuw)
- VSX_EXTRACT_INSERT(xxinsertw)
- 
-+#ifdef TARGET_PPC64
-+static void gen_xsxexpdp(DisasContext *ctx)
-+{
-+    TCGv rt = cpu_gpr[rD(ctx->opcode)];
-+    if (unlikely(!ctx->vsx_enabled)) {
-+        gen_exception(ctx, POWERPC_EXCP_VSXU);
-+        return;
-+    }
-+    tcg_gen_shri_i64(rt, cpu_vsrh(xB(ctx->opcode)), 52);
-+    tcg_gen_andi_i64(rt, rt, 0x7FF);
-+}
-+#endif
-+
- #undef GEN_XX2FORM
- #undef GEN_XX3FORM
- #undef GEN_XX2IFORM
+@@ -810,6 +810,7 @@ GEN_VSX_HELPER_2(xscvdphp, 0x16, 0x15, 0x11, PPC2_ISA300)
+ GEN_VSX_HELPER_2(xscvdpsp, 0x12, 0x10, 0, PPC2_VSX)
+ GEN_VSX_HELPER_2(xscvdpqp, 0x04, 0x1A, 0x16, PPC2_ISA300)
+ GEN_VSX_HELPER_XT_XB_ENV(xscvdpspn, 0x16, 0x10, 0, PPC2_VSX207)
++GEN_VSX_HELPER_2(xscvqpdp, 0x04, 0x1A, 0x14, PPC2_ISA300)
+ GEN_VSX_HELPER_2(xscvhpdp, 0x16, 0x15, 0x10, PPC2_ISA300)
+ GEN_VSX_HELPER_2(xscvspdp, 0x12, 0x14, 0, PPC2_VSX)
+ GEN_VSX_HELPER_XT_XB_ENV(xscvspdpn, 0x16, 0x14, 0, PPC2_VSX207)
 diff --git a/target-ppc/translate/vsx-ops.inc.c b/target-ppc/translate/vsx-ops.inc.c
-index cc5b268..2243a1f 100644
+index fcf9597..cc5b268 100644
 --- a/target-ppc/translate/vsx-ops.inc.c
 +++ b/target-ppc/translate/vsx-ops.inc.c
-@@ -115,6 +115,10 @@ GEN_VSX_XFORM_300(xscpsgnqp, 0x04, 0x03, 0x00000001),
+@@ -113,6 +113,7 @@ GEN_VSX_XFORM_300_EO(xsnabsqp, 0x04, 0x19, 0x08, 0x00000001),
+ GEN_VSX_XFORM_300_EO(xsnegqp, 0x04, 0x19, 0x10, 0x00000001),
+ GEN_VSX_XFORM_300(xscpsgnqp, 0x04, 0x03, 0x00000001),
  GEN_VSX_XFORM_300_EO(xscvdpqp, 0x04, 0x1A, 0x16, 0x00000001),
- GEN_VSX_XFORM_300_EO(xscvqpdp, 0x04, 0x1A, 0x14, 0x0),
++GEN_VSX_XFORM_300_EO(xscvqpdp, 0x04, 0x1A, 0x14, 0x0),
  
-+#ifdef TARGET_PPC64
-+GEN_XX2FORM_EO(xsxexpdp, 0x16, 0x15, 0x00, PPC2_ISA300),
-+#endif
-+
  GEN_XX2FORM(xvabsdp, 0x12, 0x1D, PPC2_VSX),
  GEN_XX2FORM(xvnabsdp, 0x12, 0x1E, PPC2_VSX),
- GEN_XX2FORM(xvnegdp, 0x12, 0x1F, PPC2_VSX),
 -- 
 2.7.4
