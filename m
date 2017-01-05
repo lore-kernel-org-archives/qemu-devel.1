@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59500)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59519)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1cP9zN-0003xj-L6
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 10:30:06 -0500
+	(envelope-from <lvivier@redhat.com>) id 1cP9zS-00041k-E5
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 10:30:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1cP9zM-0004ph-OR
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 10:30:01 -0500
+	(envelope-from <lvivier@redhat.com>) id 1cP9zP-0004rT-9Y
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 10:30:06 -0500
 From: Laurent Vivier <lvivier@redhat.com>
-Date: Thu,  5 Jan 2017 16:29:47 +0100
-Message-Id: <1483630188-32021-5-git-send-email-lvivier@redhat.com>
+Date: Thu,  5 Jan 2017 16:29:48 +0100
+Message-Id: <1483630188-32021-6-git-send-email-lvivier@redhat.com>
 In-Reply-To: <1483630188-32021-1-git-send-email-lvivier@redhat.com>
 References: <1483630188-32021-1-git-send-email-lvivier@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 4/5] qtest: convert ivshmem-test to use
- libqos
+Subject: [Qemu-devel] [PATCH v2 5/5] qtest: add ivshmem-test for ppc64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,117 +22,102 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: David Gibson <david@gibson.dropbear.id.au>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>
 
-This will allow to use it with ppc64.
+The test has been converted to use libqos, we can
+now use it on ppc64. We also make the test fail on
+all other architectures.
+As libqos on ppc64 is not able to manage hotplug
+and IRQ/MSI, we disable this part in the test on ppc64.
 
 Signed-off-by: Laurent Vivier <lvivier@redhat.com>
 ---
- tests/ivshmem-test.c | 31 +++++++++++++++++--------------
- 1 file changed, 17 insertions(+), 14 deletions(-)
+ tests/Makefile.include |  3 ++-
+ tests/ivshmem-test.c   | 17 +++++++++++++----
+ 2 files changed, 15 insertions(+), 5 deletions(-)
 
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 05cf535..1b11fb9 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -288,6 +288,7 @@ check-qtest-ppc64-y += tests/test-netfilter$(EXESUF)
+ check-qtest-ppc64-y += tests/test-filter-mirror$(EXESUF)
+ check-qtest-ppc64-y += tests/test-filter-redirector$(EXESUF)
+ check-qtest-ppc64-y += tests/display-vga-test$(EXESUF)
++check-qtest-ppc64-y += tests/ivshmem-test$(EXESUF)
+ 
+ check-qtest-sh4-y = tests/endianness-test$(EXESUF)
+ 
+@@ -692,7 +693,7 @@ tests/test-netfilter$(EXESUF): tests/test-netfilter.o $(qtest-obj-y)
+ tests/test-filter-mirror$(EXESUF): tests/test-filter-mirror.o $(qtest-obj-y)
+ tests/test-filter-redirector$(EXESUF): tests/test-filter-redirector.o $(qtest-obj-y)
+ tests/test-x86-cpuid-compat$(EXESUF): tests/test-x86-cpuid-compat.o $(qtest-obj-y)
+-tests/ivshmem-test$(EXESUF): tests/ivshmem-test.o contrib/ivshmem-server/ivshmem-server.o $(libqos-pc-obj-y)
++tests/ivshmem-test$(EXESUF): tests/ivshmem-test.o contrib/ivshmem-server/ivshmem-server.o $(libqos-pc-obj-y) $(libqos-spapr-obj-y)
+ tests/vhost-user-bridge$(EXESUF): tests/vhost-user-bridge.o
+ tests/test-uuid$(EXESUF): tests/test-uuid.o $(test-util-obj-y)
+ tests/test-arm-mptimer$(EXESUF): tests/test-arm-mptimer.o
 diff --git a/tests/ivshmem-test.c b/tests/ivshmem-test.c
-index 04a5c5d..8095d72 100644
+index 8095d72..3776342 100644
 --- a/tests/ivshmem-test.c
 +++ b/tests/ivshmem-test.c
-@@ -11,7 +11,7 @@
- #include "qemu/osdep.h"
+@@ -12,6 +12,7 @@
  #include <glib/gstdio.h>
  #include "contrib/ivshmem-server/ivshmem-server.h"
--#include "libqos/pci-pc.h"
-+#include "libqos/libqos-pc.h"
+ #include "libqos/libqos-pc.h"
++#include "libqos/libqos-spapr.h"
  #include "libqtest.h"
  #include "qemu-common.h"
  
-@@ -40,9 +40,8 @@ static QPCIDevice *get_device(QPCIBus *pcibus)
- }
+@@ -124,8 +125,10 @@ static void setup_vm_cmd(IVState *s, const char *cmd, bool msix)
  
- typedef struct _IVState {
--    QTestState *qtest;
-+    QOSState *qs;
-     QPCIBar reg_bar, mem_bar;
--    QPCIBus *pcibus;
-     QPCIDevice *dev;
- } IVState;
+     if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
+         s->qs = qtest_pc_boot(cmd);
++    } else if (strcmp(arch, "ppc64") == 0) {
++        s->qs = qtest_spapr_boot(cmd);
+     } else {
+-        g_printerr("ivshmem-test tests are only available on x86\n");
++        g_printerr("ivshmem-test tests are only available on x86 or ppc64\n");
+         exit(EXIT_FAILURE);
+     }
+     s->dev = get_device(s->qs->pcibus);
+@@ -415,6 +418,7 @@ static void test_ivshmem_server_irq(void)
  
-@@ -74,7 +73,7 @@ static inline unsigned in_reg(IVState *s, enum Reg reg)
-     QTestState *qtest = global_qtest;
-     unsigned res;
- 
--    global_qtest = s->qtest;
-+    global_qtest = s->qs->qts;
-     res = qpci_io_readl(s->dev, s->reg_bar, reg);
-     g_test_message("*%s -> %x\n", name, res);
-     global_qtest = qtest;
-@@ -87,7 +86,7 @@ static inline void out_reg(IVState *s, enum Reg reg, unsigned v)
-     const char *name = reg2str(reg);
-     QTestState *qtest = global_qtest;
- 
--    global_qtest = s->qtest;
-+    global_qtest = s->qs->qts;
-     g_test_message("%x -> *%s\n", v, name);
-     qpci_io_writel(s->dev, s->reg_bar, reg, v);
-     global_qtest = qtest;
-@@ -97,7 +96,7 @@ static inline void read_mem(IVState *s, uint64_t off, void *buf, size_t len)
+ static void test_ivshmem_hotplug(void)
  {
-     QTestState *qtest = global_qtest;
- 
--    global_qtest = s->qtest;
-+    global_qtest = s->qs->qts;
-     qpci_memread(s->dev, s->mem_bar, off, buf, len);
-     global_qtest = qtest;
- }
-@@ -107,7 +106,7 @@ static inline void write_mem(IVState *s, uint64_t off,
- {
-     QTestState *qtest = global_qtest;
- 
--    global_qtest = s->qtest;
-+    global_qtest = s->qs->qts;
-     qpci_memwrite(s->dev, s->mem_bar, off, buf, len);
-     global_qtest = qtest;
- }
-@@ -115,17 +114,21 @@ static inline void write_mem(IVState *s, uint64_t off,
- static void cleanup_vm(IVState *s)
- {
-     g_free(s->dev);
--    qpci_free_pc(s->pcibus);
--    qtest_quit(s->qtest);
-+    qtest_shutdown(s->qs);
- }
- 
- static void setup_vm_cmd(IVState *s, const char *cmd, bool msix)
- {
-     uint64_t barsize;
 +    const char *arch = qtest_get_arch();
+     gchar *opts;
  
--    s->qtest = qtest_start(cmd);
--    s->pcibus = qpci_init_pc(NULL);
--    s->dev = get_device(s->pcibus);
-+    if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
-+        s->qs = qtest_pc_boot(cmd);
-+    } else {
-+        g_printerr("ivshmem-test tests are only available on x86\n");
-+        exit(EXIT_FAILURE);
+     qtest_start("");
+@@ -422,7 +426,9 @@ static void test_ivshmem_hotplug(void)
+     opts = g_strdup_printf("'shm': '%s', 'size': '1M'", tmpshm);
+ 
+     qpci_plug_device_test("ivshmem", "iv1", PCI_SLOT_HP, opts);
+-    qpci_unplug_acpi_device_test("iv1", PCI_SLOT_HP);
++    if (strcmp(arch, "ppc64") != 0) {
++        qpci_unplug_acpi_device_test("iv1", PCI_SLOT_HP);
 +    }
-+    s->dev = get_device(s->qs->pcibus);
  
-     s->reg_bar = qpci_iomap(s->dev, 0, &barsize);
-     g_assert_cmpuint(barsize, ==, 256);
-@@ -347,7 +350,7 @@ static void test_ivshmem_server(bool msi)
-     g_assert_cmpint(vm1, !=, vm2);
+     qtest_end();
+     g_free(opts);
+@@ -494,6 +500,7 @@ static gchar *mktempshm(int size, int *fd)
+ int main(int argc, char **argv)
+ {
+     int ret, fd;
++    const char *arch = qtest_get_arch();
+     gchar dir[] = "/tmp/ivshmem-test.XXXXXX";
  
-     /* check number of MSI-X vectors */
--    global_qtest = s1->qtest;
-+    global_qtest = s1->qs->qts;
-     if (msi) {
-         ret = qpci_msix_table_size(s1->dev);
-         g_assert_cmpuint(ret, ==, nvectors);
-@@ -370,7 +373,7 @@ static void test_ivshmem_server(bool msi)
-     g_assert_cmpuint(ret, !=, 0);
+ #if !GLIB_CHECK_VERSION(2, 31, 0)
+@@ -524,8 +531,10 @@ int main(int argc, char **argv)
+     qtest_add_func("/ivshmem/memdev", test_ivshmem_memdev);
+     if (g_test_slow()) {
+         qtest_add_func("/ivshmem/pair", test_ivshmem_pair);
+-        qtest_add_func("/ivshmem/server-msi", test_ivshmem_server_msi);
+-        qtest_add_func("/ivshmem/server-irq", test_ivshmem_server_irq);
++        if (strcmp(arch, "ppc64") != 0) {
++            qtest_add_func("/ivshmem/server-msi", test_ivshmem_server_msi);
++            qtest_add_func("/ivshmem/server-irq", test_ivshmem_server_irq);
++        }
+     }
  
-     /* ping vm1 -> vm2 on vector 1 */
--    global_qtest = s2->qtest;
-+    global_qtest = s2->qs->qts;
-     if (msi) {
-         ret = qpci_msix_pending(s2->dev, 1);
-         g_assert_cmpuint(ret, ==, 0);
+     ret = g_test_run();
 -- 
 2.7.4
