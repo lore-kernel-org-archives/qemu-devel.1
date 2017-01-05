@@ -1,29 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38919)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46424)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cOwys-0002Ts-9p
-	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 20:36:40 -0500
+	(envelope-from <peterx@redhat.com>) id 1cOxg7-0001ap-Hl
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 21:21:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cOwyp-0006gx-4x
-	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 20:36:38 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41578)
+	(envelope-from <peterx@redhat.com>) id 1cOxg2-0003F2-Gj
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 21:21:19 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48736)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cOwyo-0006gt-S8
-	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 20:36:35 -0500
-Date: Wed, 4 Jan 2017 23:36:31 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170105013631.GO3315@thinpad.lan.raisama.net>
-References: <1482866480-26208-1-git-send-email-ehabkost@redhat.com>
-	<1482866480-26208-5-git-send-email-ehabkost@redhat.com>
-	<20170104115656.GB14961@amt.cnet>
-	<20170104133916.GG3315@thinpad.lan.raisama.net>
-	<20170104195917.GM3315@thinpad.lan.raisama.net>
-	<20170104222623.GA21789@amt.cnet>
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cOxg2-0003Df-7q
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 21:21:14 -0500
+Date: Thu, 5 Jan 2017 10:21:03 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170105022103.GK22664@pxdev.xzpeter.org>
+References: <1466495274-5011-1-git-send-email-peterx@redhat.com>
+	<1466495274-5011-17-git-send-email-peterx@redhat.com>
+	<576E3BEA.5010400@web.de>
+	<20160625131854.GA16629@pxdev.xzpeter.org>
+	<576EA0D0.3070602@web.de>
+	<20160626014847.GB16629@pxdev.xzpeter.org>
+	<576FD856.1020806@web.de>
+	<20170103061530.GG22664@pxdev.xzpeter.org>
+	<872d969f-0eab-d3d8-32ef-469d6fb88ac8@web.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170104222623.GA21789@amt.cnet>
-Subject: Re: [Qemu-devel] TSC frequency configuration & invtsc migration
- (was Re: [PATCH 4/4] kvm: Allow migration with invtsc)
+In-Reply-To: <872d969f-0eab-d3d8-32ef-469d6fb88ac8@web.de>
+Subject: Re: [Qemu-devel] [PATCH v10 16/26] intel_iommu: add support for
+ split irqchip
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,191 +35,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcelo Tosatti <mtosatti@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, Haozhong Zhang <haozhong.zhang@intel.com>, libvir-list@redhat.com
+To: Jan Kiszka <jan.kiszka@web.de>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, imammedo@redhat.com, rth@twiddle.net, ehabkost@redhat.com, jasowang@redhat.com, marcel@redhat.com, mst@redhat.com, rkrcmar@redhat.com, alex.williamson@redhat.com, wexu@redhat.com, davidkiarie4@gmail.com, Valentine Sinitsyn <valentine.sinitsyn@gmail.com>
 
-On Wed, Jan 04, 2017 at 08:26:27PM -0200, Marcelo Tosatti wrote:
-> On Wed, Jan 04, 2017 at 05:59:17PM -0200, Eduardo Habkost wrote:
-> > On Wed, Jan 04, 2017 at 11:39:16AM -0200, Eduardo Habkost wrote:
-> > > On Wed, Jan 04, 2017 at 09:56:56AM -0200, Marcelo Tosatti wrote:
-> > > > On Tue, Dec 27, 2016 at 05:21:20PM -0200, Eduardo Habkost wrote:
-> > > > > Instead of blocking migration on the source when invtsc is
-> > > > > enabled, rely on the migration destination to ensure there's no
-> > > > > TSC frequency mismatch.
-> > > > > 
-> > > > > We can't allow migration unconditionally because we don't know if
-> > > > > the destination is a QEMU version that is really going to ensure
-> > > > > there's no TSC frequency mismatch. To ensure we are migrating to
-> > > > > a destination that won't ignore SET_TSC_KHZ errors, allow invtsc
-> > > > > migration only on pc-*-2.9 and newer.
-> > > > > 
-> > > > > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> > [...]
-> > > > > @@ -2655,12 +2656,14 @@ int kvm_arch_put_registers(CPUState *cpu, int level)
-> > > > >      }
-> > > > >  
-> > > > >      if (level == KVM_PUT_FULL_STATE) {
-> > > > > -        /* We don't check for kvm_arch_set_tsc_khz() errors here,
-> > > > > -         * because TSC frequency mismatch shouldn't abort migration,
-> > > > > -         * unless the user explicitly asked for a more strict TSC
-> > > > > -         * setting (e.g. using an explicit "tsc-freq" option).
-> > > > > +        /* Migration TSC frequency mismatch is fatal only if we are
-> > > > > +         * actually reporting Invariant TSC to the guest.
-> > > > >           */
-> > > > > -        kvm_arch_set_tsc_khz(cpu);
-> > > > > +        ret = kvm_arch_set_tsc_khz(cpu);
-> > > > > +        if ((x86_cpu->env.features[FEAT_8000_0007_EDX] & CPUID_APM_INVTSC) &&
-> > > > > +            ret < 0) {
-> > > > > +            return ret;
-> > > > > +        }
-> > > > >      }
-> > > > 
-> > > > Will the guest continue in the source in this case?
-> > > > 
-> > > > I think this is past the point where migration has been declared
-> > > > successful. 
-> > > > 
-> > > > Otherwise looks good.
-> > > 
-> > > Good point. I will make additional tests and see if there's some
-> > > other place where the kvm_arch_set_tsc_khz() call can be moved
-> > > to.
+On Wed, Jan 04, 2017 at 11:33:36AM +0100, Jan Kiszka wrote:
+> On 2017-01-03 07:15, Peter Xu wrote:
+> > On Sun, Jun 26, 2016 at 03:27:50PM +0200, Jan Kiszka wrote:
+> >> On 2016-06-26 03:48, Peter Xu wrote:
+> >>> On Sat, Jun 25, 2016 at 05:18:40PM +0200, Jan Kiszka wrote:
+> >>>> On 2016-06-25 15:18, Peter Xu wrote:
+> >>>>> On Sat, Jun 25, 2016 at 10:08:10AM +0200, Jan Kiszka wrote:
+> >>>
+> >>> [...]
+> >>>
+> >>>>> I have a thought on how to implement the "sink" you have mentioned:
+> >>>>>
+> >>>>> First of all, in KVM, we provide a new KVM_IRQ_ROUTING_* type, maybe
+> >>>>> called:
+> >>>>>
+> >>>>>   KVM_IRQ_ROUTING_EVENTFD
+> >>>>
+> >>>> Not really, because all sources are either using eventfds, which you can
+> >>>> also terminate in user space (already done for vhost and vfio in certain
+> >>>> scenarios - IIRC) or originate there anyway (IOAPIC).
+> >>>
+> >>> But how should we handle the cases when the interrupt path are all in
+> >>> kernel?
+> >>
+> >> There are none which we can't redirect (only full in-kernel irqchip
+> >> would have, but that's unsupported anyway).
+> >>
+> >>>
+> >>> For vhost, data should be transfered all inside kernel when split
+> >>> irqchip and irqfd are used: when vhost got data, it triggers irqfd to
+> >>> deliver the interrupt to KVM. Along the way, we should all in kernel.
+> >>>
+> >>> For vfio, we have vfio_msihandler() who handles the hardware IRQ and
+> >>> then triggers irqfd as well to KVM. Again, it seems all in kernel
+> >>> space, no chance to stop that as well.
+> >>>
+> >>> Please correct me if I was wrong.
+> >>
+> >> Look at what vhost is doing e.g.: when a virtqueue is masked, it
+> >> installs an event notifier that records incoming events in a pending
+> >> state field. When it's unmasked, the corresponding KVM irqfd is installed.
 > > 
-> > So, if we solve this and do something on (for example) post_load,
-> > we still have a problem: device state is migrated after RAM. This
-> > means QEMU will check for TSC scaling and abort migration very
-> > late.
+> > Hmm I think it's time I pick up this topic up again... :)
 > > 
-> > We could solve that by manually registering a SaveVMHandler that
-> > will send the TSC frequency on save_live_setup, so migration is
-> > aborted earlier.
+> > Since it's been half a year from the last post of this thread (I
+> > believe this thread is the so-called "cold data" and should be stored
+> > on tapes already... and sorry fot the long delay), I'd like to do a
+> > quick summary on this: interrupt remap still cannot work well when we
+> > install fault interrupts - when that happens, we should inject VT-d
+> > fault, rather than keeping silence.
 > > 
-> > But: this sounds like just a complex hack to work around the real
-> > problems:
+> > The suggestion from Jan above should be a good solution that only need
+> > to touch qemu part - that's the most benefit AFAIU. However, OTOH IMO
+> > we need to modify all the kvm irqfd users with this fix (pci-assign,
+> > ioapic, ivshmem, vfio-pci, virtio) - we need to have all these devices
+> > init with an "fault sink" eventfd, then when we detected specific
+> > irqfd install error, we install the "fault sink". What's worse, if we
+> > add new devices with irqfd support, we need to implement the same
+> > error handling logic as well. Am I understanding it correctly? If so,
+> > isn't that awkward?
 > > 
-> > 1) TSC frequency is guest-visible, and anything that affects
-> >    guest ABI should depend on the VM configuration, not on host
-> >    capabilities;
+> > Now I am re-thinking about my KVM_IRQ_ROUTING_EVENTFD proposal to do
+> > it - in that case, we should not need to worry about the users of kvm
+> > irqfd, and the error handling is done automatically even with new
+> > irqfd users coming in. The disadvantage is of course we need to touch
+> > both qemu and kvm, also we need to touch KVM API for it (though I
+> > think it'll only need very small change in KVM). And not sure whether
+> > that would worth it.
+> > 
+> > Or, any better way to do it?
+> > 
+> > Hope I didn't miss anything. Comments are welcomed!
+> > 
 > 
-> Well not really: the TSC frequency where the guest starts 
-> is the frequency the guest software expects.
-> So it does depend on host capabilities.
+> I don't have the details in mind again, but I suppose the only
+> alternative to fixing a QEMU boilerplate code issue with new KVM kernel
+> interface is abstracting the common patterns in QEMU that all the irqfd
+> users share and solve solve that topic once. Might turn out, though,
+> that the exiting kernel interface prevents this...
 
-Could you explain where this expectation comes from? I can see
-multiple cases where choosing the TSC frequency where the VM
-starts is not the best option.
+Hmm, (after a quick glance) I was just afraid that I might need to
+touch lots of codes in QEMU even to provide such a common layer for
+this single fault tolerance feature.
 
-I am considering two possible scenarios below. You probably have
-another scenario in mind, so it would be useful if you could
-describe it so we can consider possible solutions.
+Then let me think it over again... Thanks Jan!
 
-
-Scenario 1:
-
-You have two hosts: A and B, both with TSC scaling. They have
-different frequencies. The VM can be started on either one of
-them, and can be migrated to either one depending on the policy
-of management software.
-
-Maybe B is a backup host, the VM is expected to run most times on
-host A, and we want to use the TSC frequency from host A every
-time. Maybe it's the opposite and we want to use the frequency of
-B. Maybe we want to use the lowest frequency of both, maybe the
-highest one. We (QEMU developers) can recommend policy to libvirt
-developers, but a given QEMU process doesn't have information to
-decide what's best.
-
-
-Scenario 2:
-
-Host A has TSC scaling, host B doesn't have TSC scaling. We want
-to be able to start the VM on host A, and migrate to B. In this
-case, the only possible solution is to use B's frequency when
-starting the VM. The QEMU process doesn't have enough information
-to make that decision.
-
-
-> 
-> > 2) Setting TSC frequency depending on the host will make
-> >    migratability unpredictable for management software: the same
-> >    VM config could be migratable to host A when started on host
-> >    B, but not migratable to host A when started on host C.
-> 
-> Well, just check the frequency.
-
-What do you mean by "just check the frequency"? What exactly
-should management software do?
-
-Whatever management software do, if you just use the source host
-frequency you can get into a situation where you can start a VM
-on host A and migrate it to B, but can't start the VM on host B
-and migrate it to A. This would be confusing for users, and
-probably break assumptions of existing management software.
-
-> 
-> > I suggest we allow migration with invtsc if and only if
-> > tsc-frequency is set explicitly by management software. In other
-> > words, apply only patches 1/4 and 2/4 from this series. After
-> > that, we will need libvirt support for configuring tsc-frequency.
-> 
-> I don't like that for the following reasons:
-> 
-> * It moves low level complexity from QEMU/KVM to libvirt 
->    (libvirt has to call KVM_GET_TSC_KHZ from a vcpu thread).
-
-It doesn't. It could ask QEMU for that information (the new
-query-cpu-model-expansion QMP command would allow that).
-
-Or, alternatively, it could just let the user choose the
-frequency. It's probably acceptable for many use cases where
-invtsc+migration is important.
-
-> * It makes it difficult to run QEMU manually (i use QEMU
->    manually all the time).
-
-I believe the set of people that: 1) need invtsc; 2) need
-migration to work; and 3) run QEMU manually will be able to add
-"tsc-frequency=XXX" to the command-line easily. :)
-
-> * It requires patching libvirt.
-> 
-> In my experience things work better when the functionality is
-> not split across libvirt/qemu.
-
-In my experience things break when management software is the
-only component able to make a decision but we don't provide
-mechanisms to let management software make that decision.
-
-The TSC frequency affects migratability to hosts. Choose the
-wrong frequency, and you might not be able to migrate. Only
-management software knows to which hosts the VM could be migrated
-in the future, and which TSC frequency would allow that.
-
-> 
-> Can't this be fixed in QEMU? Just check that destination host supports
-> TSC scaling before migration (or that KVM_GET_TSC_KHZ return value
-> matches on source and destination).
-> 
-
-This solves only one use case: where you want to expose the
-starting host TSC frequency to the guest. It doesn't cover any
-scenario where the TSC frequency of the starting host isn't the
-best one. (See the two scenarios I described above)
-
-You seem to have a specific use case in mind. If you describe it,
-we could decide if it's worth the extra migration code complexity
-to deal with invtsc migration without explicit tsc-frequency. By
-now, I am not convinced yet.
-
-Maybe your use case just needs a explicit "invtsc-migration=on"
-command-line flag without a mechanism to abort migration on
-mismatch? I can't tell.
-
-Note that even if we follow your suggestion and implement an
-alternative version of patch 4/4 to cover your use case, I will
-strongly recommend libvirt developers to support configuring TSC
-frequency if they want to support invtsc + migration without
-surprising/unpredictable restrictions on migratability.
-
--- 
-Eduardo
+-- peterx
