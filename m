@@ -1,16 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59519)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33783)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1cP9zS-00041k-E5
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 10:30:07 -0500
+	(envelope-from <eblake@redhat.com>) id 1cPA8N-00039H-AX
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 10:39:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1cP9zP-0004rT-9Y
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 10:30:06 -0500
-From: Laurent Vivier <lvivier@redhat.com>
-Date: Thu,  5 Jan 2017 16:29:48 +0100
-Message-Id: <1483630188-32021-6-git-send-email-lvivier@redhat.com>
-In-Reply-To: <1483630188-32021-1-git-send-email-lvivier@redhat.com>
-References: <1483630188-32021-1-git-send-email-lvivier@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 5/5] qtest: add ivshmem-test for ppc64
+	(envelope-from <eblake@redhat.com>) id 1cPA8M-0007KD-Dd
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 10:39:19 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43634)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cPA8M-0007Jk-4d
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 10:39:18 -0500
+Received: from int-mx10.intmail.prod.int.phx2.redhat.com
+	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2F33BF5DDB
+	for <qemu-devel@nongnu.org>; Thu,  5 Jan 2017 15:39:18 +0000 (UTC)
+References: <20170105135957.12003-1-marcandre.lureau@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <f6bf01a0-3890-5155-7581-633673824027@redhat.com>
+Date: Thu, 5 Jan 2017 09:39:15 -0600
+MIME-Version: 1.0
+In-Reply-To: <20170105135957.12003-1-marcandre.lureau@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="SNmJfRiev8X5vfaGmIoGNphANTcbb8RQP"
+Subject: Re: [Qemu-devel] [PATCH] error: report hints on stderr when no
+ monitor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,105 +34,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: David Gibson <david@gibson.dropbear.id.au>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: armbru@redhat.com
 
-The test has been converted to use libqos, we can
-now use it on ppc64. We also make the test fail on
-all other architectures.
-As libqos on ppc64 is not able to manage hotplug
-and IRQ/MSI, we disable this part in the test on ppc64.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--SNmJfRiev8X5vfaGmIoGNphANTcbb8RQP
+From: Eric Blake <eblake@redhat.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ qemu-devel@nongnu.org
+Cc: armbru@redhat.com
+Message-ID: <f6bf01a0-3890-5155-7581-633673824027@redhat.com>
+Subject: Re: [PATCH] error: report hints on stderr when no monitor
+References: <20170105135957.12003-1-marcandre.lureau@redhat.com>
+In-Reply-To: <20170105135957.12003-1-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
----
- tests/Makefile.include |  3 ++-
- tests/ivshmem-test.c   | 17 +++++++++++++----
- 2 files changed, 15 insertions(+), 5 deletions(-)
+On 01/05/2017 07:59 AM, Marc-Andr=C3=A9 Lureau wrote:
+> Report the error hint when running from the command line and reaching a=
+n
+> error, ex:
+>=20
+> $ qemu-system-x86_64 -m 1Z
+> qemu-system-x86_64: -m 1Z: Parameter 'size' expects a size
+> You may use k, M, G or T suffixes for kilobytes, megabytes, gigabytes a=
+nd terabytes.
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 05cf535..1b11fb9 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -288,6 +288,7 @@ check-qtest-ppc64-y += tests/test-netfilter$(EXESUF)
- check-qtest-ppc64-y += tests/test-filter-mirror$(EXESUF)
- check-qtest-ppc64-y += tests/test-filter-redirector$(EXESUF)
- check-qtest-ppc64-y += tests/display-vga-test$(EXESUF)
-+check-qtest-ppc64-y += tests/ivshmem-test$(EXESUF)
- 
- check-qtest-sh4-y = tests/endianness-test$(EXESUF)
- 
-@@ -692,7 +693,7 @@ tests/test-netfilter$(EXESUF): tests/test-netfilter.o $(qtest-obj-y)
- tests/test-filter-mirror$(EXESUF): tests/test-filter-mirror.o $(qtest-obj-y)
- tests/test-filter-redirector$(EXESUF): tests/test-filter-redirector.o $(qtest-obj-y)
- tests/test-x86-cpuid-compat$(EXESUF): tests/test-x86-cpuid-compat.o $(qtest-obj-y)
--tests/ivshmem-test$(EXESUF): tests/ivshmem-test.o contrib/ivshmem-server/ivshmem-server.o $(libqos-pc-obj-y)
-+tests/ivshmem-test$(EXESUF): tests/ivshmem-test.o contrib/ivshmem-server/ivshmem-server.o $(libqos-pc-obj-y) $(libqos-spapr-obj-y)
- tests/vhost-user-bridge$(EXESUF): tests/vhost-user-bridge.o
- tests/test-uuid$(EXESUF): tests/test-uuid.o $(test-util-obj-y)
- tests/test-arm-mptimer$(EXESUF): tests/test-arm-mptimer.o
-diff --git a/tests/ivshmem-test.c b/tests/ivshmem-test.c
-index 8095d72..3776342 100644
---- a/tests/ivshmem-test.c
-+++ b/tests/ivshmem-test.c
-@@ -12,6 +12,7 @@
- #include <glib/gstdio.h>
- #include "contrib/ivshmem-server/ivshmem-server.h"
- #include "libqos/libqos-pc.h"
-+#include "libqos/libqos-spapr.h"
- #include "libqtest.h"
- #include "qemu-common.h"
- 
-@@ -124,8 +125,10 @@ static void setup_vm_cmd(IVState *s, const char *cmd, bool msix)
- 
-     if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
-         s->qs = qtest_pc_boot(cmd);
-+    } else if (strcmp(arch, "ppc64") == 0) {
-+        s->qs = qtest_spapr_boot(cmd);
-     } else {
--        g_printerr("ivshmem-test tests are only available on x86\n");
-+        g_printerr("ivshmem-test tests are only available on x86 or ppc64\n");
-         exit(EXIT_FAILURE);
-     }
-     s->dev = get_device(s->qs->pcibus);
-@@ -415,6 +418,7 @@ static void test_ivshmem_server_irq(void)
- 
- static void test_ivshmem_hotplug(void)
- {
-+    const char *arch = qtest_get_arch();
-     gchar *opts;
- 
-     qtest_start("");
-@@ -422,7 +426,9 @@ static void test_ivshmem_hotplug(void)
-     opts = g_strdup_printf("'shm': '%s', 'size': '1M'", tmpshm);
- 
-     qpci_plug_device_test("ivshmem", "iv1", PCI_SLOT_HP, opts);
--    qpci_unplug_acpi_device_test("iv1", PCI_SLOT_HP);
-+    if (strcmp(arch, "ppc64") != 0) {
-+        qpci_unplug_acpi_device_test("iv1", PCI_SLOT_HP);
-+    }
- 
-     qtest_end();
-     g_free(opts);
-@@ -494,6 +500,7 @@ static gchar *mktempshm(int size, int *fd)
- int main(int argc, char **argv)
- {
-     int ret, fd;
-+    const char *arch = qtest_get_arch();
-     gchar dir[] = "/tmp/ivshmem-test.XXXXXX";
- 
- #if !GLIB_CHECK_VERSION(2, 31, 0)
-@@ -524,8 +531,10 @@ int main(int argc, char **argv)
-     qtest_add_func("/ivshmem/memdev", test_ivshmem_memdev);
-     if (g_test_slow()) {
-         qtest_add_func("/ivshmem/pair", test_ivshmem_pair);
--        qtest_add_func("/ivshmem/server-msi", test_ivshmem_server_msi);
--        qtest_add_func("/ivshmem/server-irq", test_ivshmem_server_irq);
-+        if (strcmp(arch, "ppc64") != 0) {
-+            qtest_add_func("/ivshmem/server-msi", test_ivshmem_server_msi);
-+            qtest_add_func("/ivshmem/server-irq", test_ivshmem_server_irq);
-+        }
-     }
- 
-     ret = g_test_run();
--- 
-2.7.4
+[unrelated, but this reminds me: qemu-io allows '1m' and '1M' as
+synonyms, but our command line parser is picky and requires the spelling
+'1M'.  I wouldn't mind if we unified those two parsers, and make size
+parsing case-insensitive everywhere]
+
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  monitor.c | 2 ++
+>  1 file changed, 2 insertions(+)
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+>=20
+> diff --git a/monitor.c b/monitor.c
+> index a82f547488..e5cc11b5a5 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -3973,6 +3973,8 @@ void error_vprintf_unless_qmp(const char *fmt, va=
+_list ap)
+>  {
+>      if (cur_mon && !monitor_cur_is_qmp()) {
+>          monitor_vprintf(cur_mon, fmt, ap);
+> +    } else if (!cur_mon) {
+> +        vfprintf(stderr, fmt, ap);
+>      }
+>  }
+> =20
+>=20
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--SNmJfRiev8X5vfaGmIoGNphANTcbb8RQP
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYbmijAAoJEKeha0olJ0NqDcMH/R6twMV8ISzuF+rA7E/1guvu
+Og16hsXig9QnmPsR8/AOGORWb4FtPjq+i+dBlw7camsYOIPDptzT4UeDxzqfHPac
+sqel+HB8Amw9l3HaxyocUA6nTRKNgLWWTvx8MKDZXkVK61JTf8Iwos/Un/OyIpwc
+sj7hsObh2E3d4j2JUIXIWLRG4ws3Eki/d0JYMegOqJyYLIwkTKFybmQ14B/d3Ec/
+g1iB+XkVwUtXUlLU//uUC/bD04HK0Y0zuZtELnTH/NOI5SFeOtNu51Et94vHrRCJ
+4GQaH4kCRF3bi0HLq2auctqMA1PNt0DyttsLxpp4mM+pO6aFpk/XjCfrl8YXwJ0=
+=8xxL
+-----END PGP SIGNATURE-----
+
+--SNmJfRiev8X5vfaGmIoGNphANTcbb8RQP--
