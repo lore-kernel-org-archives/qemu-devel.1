@@ -1,27 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42554)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46996)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1cP2kt-0000PP-9o
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 02:46:36 -0500
+	(envelope-from <kraxel@redhat.com>) id 1cP39m-0005rU-Rg
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 03:12:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1cP2kq-0003Ji-7e
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 02:46:35 -0500
-Received: from mga04.intel.com ([192.55.52.120]:7313)
+	(envelope-from <kraxel@redhat.com>) id 1cP39i-0005jD-So
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 03:12:18 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:32786)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1cP2kp-0003II-Uz
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 02:46:32 -0500
-Message-ID: <586DFA0F.4030308@intel.com>
-Date: Thu, 05 Jan 2017 15:47:27 +0800
-From: Wei Wang <wei.w.wang@intel.com>
-MIME-Version: 1.0
-References: <1482127152-84732-1-git-send-email-wei.w.wang@intel.com>
-	<CAJ+F1CKWSznG3hxj0=F1UAJD+ZOZg=q+Oio1YnbsRyz6vy51FQ@mail.gmail.com>
-	<586DF6FE.8070704@intel.com>
-In-Reply-To: <586DF6FE.8070704@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [RESEND Patch v1 00/37]
- Implementation of vhost-pci for inter-vm commucation
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cP39i-0005iy-Na
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 03:12:14 -0500
+Message-ID: <1483603931.3966.12.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Thu, 05 Jan 2017 09:12:11 +0100
+In-Reply-To: <87y3yqil7s.fsf@mail.parknet.co.jp>
+References: <87inqavlzj.fsf@mail.parknet.co.jp>
+	<feca54b3-9c38-4ce7-4edc-b1f9f88fb7a1@reactos.org>
+	<87fuletg61.fsf@mail.parknet.co.jp>
+	<f8044f23-52ef-89f8-5ca7-b27de2989cc7@reactos.org>
+	<8737h9xidn.fsf@mail.parknet.co.jp>
+	<87mvfhw3i0.fsf_-_@mail.parknet.co.jp>
+	<1483519820.5670.45.camel@redhat.com>
+	<46bcf40d-7c47-733b-44e3-b5a38527524e@reactos.org>
+	<87y3yqil7s.fsf@mail.parknet.co.jp>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v3] ps2: Fix lost scancodes by recent
+ changes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,56 +35,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Cc: mst@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org
+To: OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
+Cc: =?ISO-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>, qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>
 
-On 01/05/2017 03:34 PM, Wei Wang wrote:
-> Hi Marc-André
->
-> On 12/20/2016 12:43 AM, Marc-André Lureau wrote:
->> On Mon, Dec 19, 2016 at 7:00 AM Wei Wang <wei.w.wang@intel.com 
->> <mailto:wei.w.wang@intel.com>> wrote:
->>
->>     This patch series implements vhost-pci, which is a point-to-point
->>     based inter-vm
->>     communication solution. The QEMU side implementation includes the
->>     vhost-user
->>     extension, vhost-pci device emulation and management. The current
->>     device part
->>     implementation is based on virtio 1.0, but it can be easily
->>     upgraded to support
->>     the upcoming virtio 1.1.
->>
->>     The current QEMU implementation supports the polling mode driver
->>     on both sides
->>     to receive packets. More features, such as interrupt support, live
->>     migration
->>     support, protected memory accesses will be added later.
->>
->>
->>
->> I highly appreciate the effort you put in splitting the patch series 
->> and commenting each, although some are probably superfluous. Before 
->> going into details, I suppose you have kernel side bits too. I'd 
->> suggest before sending individual patches for review, that you send a 
->> RFC with links to the various git trees and instructions to test the 
->> proposed device. This would really help things and potentially bring 
->> more people for testing and comments (think about libvirt side etc). 
->> Even better would be to have some tests (with qtest).
->
-> The code is ready to try. I plan to clean up the driver to upstream 
-> when the QEMU device part is finalized.
->
-> The QEMU code is available at: git clone 
-> https://github.com/wei-w-wang/vhost-pci-device
-> The driver: git clone https://github.com/wei-w-wang/vhost-pci-driver
->
-> I have a README.md under vhost-pci-device/ , which introduces the 
-> steps to try the implementation.
-> I will rename the variables/fields that you mentioned in the v2 
-> version. Thanks.
+On Do, 2017-01-05 at 06:11 +0900, OGAWA Hirofumi wrote:
+> Herv=C3=A9 Poussineau <hpoussin@reactos.org> writes:
+>=20
+> > Le 04/01/2017 =C3=A0 09:50, Gerd Hoffmann a =C3=A9crit :
+> >> On Mi, 2016-12-28 at 04:55 +0900, OGAWA Hirofumi wrote:
+> >>> With "ps2: use QEMU qcodes instead of scancodes", key handling was
+> >>> changed to qcode base. But all scancodes are not converted to new one=
+.
+> >>>
+> >>> This adds some missing qcodes/scancodes what I found in using.
+> >>
+> >> Added to ui queue.
+> >
+> > Hi Gerd,
+> >
+> > Your pull request (patch 01/11) contains v2 of this patch (which is inc=
+omplete).
+> > I've only reviewed v3, which is complete.
+>=20
+> Yes, please use v3. Here is copy&paste, FWIW.
 
-README.md is under vhost-pci-driver/
+Please don't send new versions of patches as reply.  That confuses
+various patch management tools, they are considered being part of the
+discussion then.  This is how the reviewed-by tag ended up being
+attributed to the wrong patch version.
 
-Best,
-Wei
+Have a look at http://patchew.org/QEMU/ for example, the patches sent as
+reply don't show up there, so they are not tested automatically.
+
+thanks,
+  Gerd
