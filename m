@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50288)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50377)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cPB7G-0006JR-Ui
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 11:42:16 -0500
+	(envelope-from <sbruno@freebsd.org>) id 1cPB7h-0006ea-PK
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 11:42:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cPB7D-0006H7-5v
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 11:42:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43074)
+	(envelope-from <sbruno@freebsd.org>) id 1cPB7d-0006Om-Pb
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 11:42:41 -0500
+Received: from ignoranthack.me ([199.102.79.106]:52657
+	helo=mail.ignoranthack.me)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cPB7D-0006GS-05
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 11:42:11 -0500
-Received: from int-mx11.intmail.prod.int.phx2.redhat.com
-	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DB72F3DFCC
-	for <qemu-devel@nongnu.org>; Thu,  5 Jan 2017 16:42:10 +0000 (UTC)
-Date: Thu, 5 Jan 2017 16:42:05 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170105164205.GS3292@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170105160321.21786-1-berrange@redhat.com>
-	<20170105160321.21786-2-berrange@redhat.com>
-	<3ff1cf4e-67c3-b182-1c3c-2e6dce546e85@redhat.com>
+	(Exim 4.71) (envelope-from <sbruno@freebsd.org>) id 1cPB7d-0006O2-Jf
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 11:42:37 -0500
+References: <5dd3d27a-e630-4e92-43fa-13c131e9f880@freebsd.org>
+	<e90abf9b-f474-2adc-1b2d-5d1df7fb1505@freebsd.org>
+	<CAFEAcA9ayxt_fNRd1eRkJVFMa4tEx=nPwAF0L6p23Z1f_XQOYQ@mail.gmail.com>
+From: Sean Bruno <sbruno@freebsd.org>
+Message-ID: <e0c0a50a-4a5b-cb62-e729-ac95f3ea6206@freebsd.org>
+Date: Thu, 5 Jan 2017 09:42:35 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <3ff1cf4e-67c3-b182-1c3c-2e6dce546e85@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/8] sockets: add ability to disable DNS
- resolution for InetSocketAddress
+In-Reply-To: <CAFEAcA9ayxt_fNRd1eRkJVFMa4tEx=nPwAF0L6p23Z1f_XQOYQ@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature";
+	boundary="U8L70dgSoTawbA4F8ScLqM8arufg6RHw7"
+Subject: Re: [Qemu-devel] New Year's starting over ... bsd-user
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,70 +30,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Thu, Jan 05, 2017 at 10:22:43AM -0600, Eric Blake wrote:
-> On 01/05/2017 10:03 AM, Daniel P. Berrange wrote:
-> > Add a 'numeric' flag to the InetSocketAddress struct to allow the
-> > caller to indicate that DNS should be skipped for the host/port
-> > fields. This is useful if the caller knows the address is already
-> > numeric and wants to guarantee no (potentially blocking) DNS
-> > lookups are attempted.
-> > 
-> > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> > ---
-> >  qapi-schema.json    | 5 +++++
-> >  util/qemu-sockets.c | 3 +++
-> >  2 files changed, 8 insertions(+)
-> > 
-> > diff --git a/qapi-schema.json b/qapi-schema.json
-> > index a0d3b5d..d605c1e 100644
-> > --- a/qapi-schema.json
-> > +++ b/qapi-schema.json
-> > @@ -3070,6 +3070,10 @@
-> >  #
-> >  # @port: port part of the address, or lowest port if @to is present
-> >  #
-> > +# @numeric: #optional true if the host/port are guaranteed to be numeric,
-> > +#           false if name resolution should be attempted. Defaults to false.
-> > +#           Since 2.8
-> 
-> 2.9, actually.  I'm also not sure if Marc-Andre's work requires ()
-> brackets around the since designation on a per-member listing.
-> 
-> > @@ -3084,6 +3088,7 @@
-> >    'data': {
-> >      'host': 'str',
-> >      'port': 'str',
-> > +    'numeric':  'bool',
-> 
-> In order to be optional, it must be spelled '*numeric'.
-
-Sigh, yes.
-
-> >      '*to': 'uint16',
-> >      '*ipv4': 'bool',
-> >      '*ipv6': 'bool' } }
-> 
-> Thinking out loud: Do we even need a 'numeric' field?  If we could
-> create an alternate type that distinguishes between a 'str' (name, DNS
-> resolution required) and an 'int' (numeric, skip DNS), then we don't
-> need a field.  Except that an 'int' for IPv4 addresses is awkward, and
-> an 'int' for IPv6 addresses in insufficient - so even when the address
-> is numeric, you STILL have to pass it in as 'str'.  Okay, experiment
-> failed, your interface seems like the correct thing to do.
-
-Basically think of this 'numeric' flag as being the same as
-the AI_NUMERIC flag to getaddrinfo. You're still using the
-string format as input so that you can reuse existing code
-for converting from user friendly string format to raw
-byte format.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--U8L70dgSoTawbA4F8ScLqM8arufg6RHw7
+From: Sean Bruno <sbruno@freebsd.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
+Message-ID: <e0c0a50a-4a5b-cb62-e729-ac95f3ea6206@freebsd.org>
+Subject: Re: [Qemu-devel] New Year's starting over ... bsd-user
+References: <5dd3d27a-e630-4e92-43fa-13c131e9f880@freebsd.org>
+ <e90abf9b-f474-2adc-1b2d-5d1df7fb1505@freebsd.org>
+ <CAFEAcA9ayxt_fNRd1eRkJVFMa4tEx=nPwAF0L6p23Z1f_XQOYQ@mail.gmail.com>
+In-Reply-To: <CAFEAcA9ayxt_fNRd1eRkJVFMa4tEx=nPwAF0L6p23Z1f_XQOYQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
 
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+
+On 01/05/17 09:11, Peter Maydell wrote:
+> On 5 January 2017 at 16:03, Sean Bruno <sbruno@freebsd.org> wrote:
+>> Ok, this is probably too big for a single patch.  I'll see if its
+>> reasonable to break this up across *some* kind of logic boundary.
+>=20
+> Yeah, that's pretty huge. My rough rule of thumb: prefer
+> each patch to be <500 lines, prefer <20 patches in a patchset.
+>=20
+> thanks
+> -- PMM
+>=20
+
+Ok, let's try a small one patch change for the first pass while I work
+on a larger patch series.
+
+sean
+
+
+--U8L70dgSoTawbA4F8ScLqM8arufg6RHw7
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQGTBAEBCgB9FiEEuq1GMucSHejSCZfdEgHvyh5yfmQFAlhud3tfFIAAAAAALgAo
+aXNzdWVyLWZwckBub3RhdGlvbnMub3BlbnBncC5maWZ0aGhvcnNlbWFuLm5ldEJB
+QUQ0NjMyRTcxMjFERThEMjA5OTdERDEyMDFFRkNBMUU3MjdFNjQACgkQEgHvyh5y
+fmRTywf+P0VVHYqG1Q2jAVLCdM9YmHsYxTgywU5sZkDBe+YPKTa1EgOzCCMpwt8C
+PJEUjYt3rpHwfSfjaQPrhTLhMmT0c/BOVvFJ847mCZuBvUykzK/rw/P8eO62BWOW
++aP4k6nMJezS+Ddukp7Rb02j9xJhOMBLdLt7lWt029PAzuS9No60infgLcP6U+t5
+m9b+UIEtX2zQIxWQXagFxs+wkb1jo0/tK2ilKI0+EgesGGX9ADvrh3baZ5oE45si
+6gaFuj0IzIRfpOdO/6NtWQWggH9tBZH5YiO+cKYBfk/Efihqxql2FOcOyvDUpb59
+x+pRPsnoPmadjU/UeFaxNDCaFE49iQ==
+=lpHD
+-----END PGP SIGNATURE-----
+
+--U8L70dgSoTawbA4F8ScLqM8arufg6RHw7--
