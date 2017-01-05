@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33783)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35095)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cPA8N-00039H-AX
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 10:39:20 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cPABu-0005wi-8c
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 10:42:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cPA8M-0007KD-Dd
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 10:39:19 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43634)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cPA8M-0007Jk-4d
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 10:39:18 -0500
-Received: from int-mx10.intmail.prod.int.phx2.redhat.com
-	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2F33BF5DDB
-	for <qemu-devel@nongnu.org>; Thu,  5 Jan 2017 15:39:18 +0000 (UTC)
-References: <20170105135957.12003-1-marcandre.lureau@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <f6bf01a0-3890-5155-7581-633673824027@redhat.com>
-Date: Thu, 5 Jan 2017 09:39:15 -0600
+	(envelope-from <peter.maydell@linaro.org>) id 1cPABt-0001By-5d
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 10:42:58 -0500
+Received: from mail-vk0-x230.google.com ([2607:f8b0:400c:c05::230]:32899)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cPABs-0001Bl-Vs
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 10:42:57 -0500
+Received: by mail-vk0-x230.google.com with SMTP id 137so302312809vkl.0
+	for <qemu-devel@nongnu.org>; Thu, 05 Jan 2017 07:42:56 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20170105135957.12003-1-marcandre.lureau@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="SNmJfRiev8X5vfaGmIoGNphANTcbb8RQP"
-Subject: Re: [Qemu-devel] [PATCH] error: report hints on stderr when no
- monitor
+In-Reply-To: <1482269164-14642-1-git-send-email-minyard@acm.org>
+References: <CAFEAcA84Ab393fUB=UKDqtJYpZhHUEsZp6wEV3PpdjqCAfvuew@mail.gmail.com>
+	<1482269164-14642-1-git-send-email-minyard@acm.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 5 Jan 2017 15:42:35 +0000
+Message-ID: <CAFEAcA_dYWidb9Td=1Of76pK+jieYxCSSze3o5GCFgfzcyZg6Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH] i2c: Allow I2C devices to NAK start events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,84 +29,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: armbru@redhat.com
+To: Corey Minyard <minyard@acm.org>
+Cc: Alastair D'Silva <alastair@au1.ibm.com>, Fabio Urquiza <flus@cesar.org.br>, QEMU Developers <qemu-devel@nongnu.org>, Corey Minyard <cminyard@mvista.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---SNmJfRiev8X5vfaGmIoGNphANTcbb8RQP
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- qemu-devel@nongnu.org
-Cc: armbru@redhat.com
-Message-ID: <f6bf01a0-3890-5155-7581-633673824027@redhat.com>
-Subject: Re: [PATCH] error: report hints on stderr when no monitor
-References: <20170105135957.12003-1-marcandre.lureau@redhat.com>
-In-Reply-To: <20170105135957.12003-1-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 20 December 2016 at 21:26,  <minyard@acm.org> wrote:
+> From: Corey Minyard <cminyard@mvista.com>
+>
+> Add a return value to the event handler.  Some I2C devices will
+> NAK if they have no data, so allow them to do this.  This required
+> the following changes:
+>
+> Go through all the event handlers and change them to return int
+> and return 0.
+>
+> Modify i2c_start_transfer to terminate the transaction on a NAK.
+>
+> Modify smbus handing to not assert if a NAK occurs on a second
+> operation, and terminate the transaction and return -1 instead.
+>
+> Add some information on semantics to I2CSlaveClass.
+>
+> Signed-off-by: Corey Minyard <cminyard@mvista.com>
 
-On 01/05/2017 07:59 AM, Marc-Andr=C3=A9 Lureau wrote:
-> Report the error hint when running from the command line and reaching a=
-n
-> error, ex:
->=20
-> $ qemu-system-x86_64 -m 1Z
-> qemu-system-x86_64: -m 1Z: Parameter 'size' expects a size
-> You may use k, M, G or T suffixes for kilobytes, megabytes, gigabytes a=
-nd terabytes.
+Thanks; added to target-arm.next.
 
-[unrelated, but this reminds me: qemu-io allows '1m' and '1M' as
-synonyms, but our command line parser is picky and requires the spelling
-'1M'.  I wouldn't mind if we unified those two parsers, and make size
-parsing case-insensitive everywhere]
-
->=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  monitor.c | 2 ++
->  1 file changed, 2 insertions(+)
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
->=20
-> diff --git a/monitor.c b/monitor.c
-> index a82f547488..e5cc11b5a5 100644
-> --- a/monitor.c
-> +++ b/monitor.c
-> @@ -3973,6 +3973,8 @@ void error_vprintf_unless_qmp(const char *fmt, va=
-_list ap)
->  {
->      if (cur_mon && !monitor_cur_is_qmp()) {
->          monitor_vprintf(cur_mon, fmt, ap);
-> +    } else if (!cur_mon) {
-> +        vfprintf(stderr, fmt, ap);
->      }
->  }
-> =20
->=20
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---SNmJfRiev8X5vfaGmIoGNphANTcbb8RQP
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYbmijAAoJEKeha0olJ0NqDcMH/R6twMV8ISzuF+rA7E/1guvu
-Og16hsXig9QnmPsR8/AOGORWb4FtPjq+i+dBlw7camsYOIPDptzT4UeDxzqfHPac
-sqel+HB8Amw9l3HaxyocUA6nTRKNgLWWTvx8MKDZXkVK61JTf8Iwos/Un/OyIpwc
-sj7hsObh2E3d4j2JUIXIWLRG4ws3Eki/d0JYMegOqJyYLIwkTKFybmQ14B/d3Ec/
-g1iB+XkVwUtXUlLU//uUC/bD04HK0Y0zuZtELnTH/NOI5SFeOtNu51Et94vHrRCJ
-4GQaH4kCRF3bi0HLq2auctqMA1PNt0DyttsLxpp4mM+pO6aFpk/XjCfrl8YXwJ0=
-=8xxL
------END PGP SIGNATURE-----
-
---SNmJfRiev8X5vfaGmIoGNphANTcbb8RQP--
+-- PMM
