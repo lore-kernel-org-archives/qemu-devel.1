@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58674)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59232)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cPBdX-0001jj-EC
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 12:15:36 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cPBfV-0003dp-JW
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 12:17:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cPBdU-0002AL-9u
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 12:15:35 -0500
-Received: from indium.canonical.com ([91.189.90.7]:38794)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cPBdU-0002AB-49
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 12:15:32 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cPBdS-0007ZT-6O
-	for <qemu-devel@nongnu.org>; Thu, 05 Jan 2017 17:15:30 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 2D4B02E80C8
-	for <qemu-devel@nongnu.org>; Thu,  5 Jan 2017 17:15:30 +0000 (UTC)
+	(envelope-from <peter.maydell@linaro.org>) id 1cPBfU-0002fn-Gn
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 12:17:37 -0500
+Received: from mail-vk0-x236.google.com ([2607:f8b0:400c:c05::236]:35784)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cPBfU-0002fO-AS
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 12:17:36 -0500
+Received: by mail-vk0-x236.google.com with SMTP id y197so154797741vky.2
+	for <qemu-devel@nongnu.org>; Thu, 05 Jan 2017 09:17:34 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 05 Jan 2017 16:56:15 -0000
-From: Daniel Berrange <1455912@bugs.launchpad.net>
-Reply-To: Bug 1455912 <1455912@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20150517130746.26692.51704.malonedeb@gac.canonical.com>
-Message-Id: <20170105165615.20524.24506.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1455912] Re: vnc websocket option not properly
- parsed when running on commandline
+In-Reply-To: <b7f0904f00d135f9b2760b8881dbc9ead23cedbf.1481121503.git.julian@codesourcery.com>
+References: <cover.1481121503.git.julian@codesourcery.com>
+	<b7f0904f00d135f9b2760b8881dbc9ead23cedbf.1481121503.git.julian@codesourcery.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 5 Jan 2017 17:17:13 +0000
+Message-ID: <CAFEAcA-EQ-e39uv1rnTUb5SwDZzPrHUfhydY5hzc8CrP4NhX_w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v2 1/6] Add cfgend parameter for ARM CPU
+ selection.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,45 +30,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Julian Brown <julian@codesourcery.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-https://lists.gnu.org/archive/html/qemu-devel/2017-01/msg00583.html
+On 7 December 2016 at 14:48, Julian Brown <julian@codesourcery.com> wrote:
+> The new "cfgend" parameter can be given after the CPU name,
+> e.g. "-cpu=arm926,cfgend=yes", and is used to control the reset value
+> of the SCTLR register in an architecture-version appropriate way (in a
+> similar way to the CFGEND input on physical cores).  Using the option for
+> CPUs implementing the ARMv7+ architecture will enable the SCTLR_EE bit,
+> and for previous versions it will enable the SCTLR_B bit.
+>
+> Signed-off-by: Julian Brown <julian@codesourcery.com>
+> ---
+>  target-arm/cpu.c | 28 +++++++++++++++++++++++++---
+>  target-arm/cpu.h |  7 +++++++
+>  2 files changed, 32 insertions(+), 3 deletions(-)
+>
+> diff --git a/target-arm/cpu.c b/target-arm/cpu.c
+> index 2eb4098..512964e 100644
+> --- a/target-arm/cpu.c
+> +++ b/target-arm/cpu.c
+> @@ -33,6 +33,7 @@
+>  #include "sysemu/sysemu.h"
+>  #include "sysemu/kvm.h"
+>  #include "kvm_arm.h"
+> +#include "exec/cpu-common.h"
+>
+>  static void arm_cpu_set_pc(CPUState *cs, vaddr value)
+>  {
+> @@ -497,6 +498,9 @@ static Property arm_cpu_rvbar_property =
+>  static Property arm_cpu_has_el3_property =
+>              DEFINE_PROP_BOOL("has_el3", ARMCPU, has_el3, true);
+>
+> +static Property arm_cpu_cfgend_property =
+> +            DEFINE_PROP_BOOL("cfgend", ARMCPU, cfgend, false);
+> +
+>  /* use property name "pmu" to match other archs and virt tools */
+>  static Property arm_cpu_has_pmu_property =
+>              DEFINE_PROP_BOOL("pmu", ARMCPU, has_pmu, true);
+> @@ -559,6 +563,18 @@ static void arm_cpu_post_init(Object *obj)
+>          }
+>      }
+>
+> +    qdev_property_add_static(DEVICE(obj), &arm_cpu_cfgend_property,
+> +                             &error_abort);
+> +
+> +    qdev_prop_set_globals(DEVICE(obj));
+> +
+> +    if (object_property_get_bool(obj, "cfgend", NULL)) {
+> +        if (arm_feature(&cpu->env, ARM_FEATURE_V7)) {
+> +            cpu->reset_sctlr |= SCTLR_EE;
+> +        } else {
+> +            cpu->reset_sctlr |= SCTLR_B;
+> +        }
+> +    }
 
-** Changed in: qemu
-       Status: Confirmed =3D> In Progress
+Can we just implement this property the same way we do all
+our existing ones, ie just call qdev_property_add_static()
+here, and then look at the property value in arm_cpu_realizefn() ?
+I'm not clear what the call to qdev_prop_set_globals() is
+needed for.
 
--- =
+>  }
+>
+>  static void arm_cpu_finalizefn(Object *obj)
+> @@ -758,6 +774,7 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+>  static ObjectClass *arm_cpu_class_by_name(const char *cpu_model)
+>  {
+>      ObjectClass *oc;
+> +    CPUClass *cc;
+>      char *typename;
+>      char **cpuname;
+>
+> @@ -765,15 +782,20 @@ static ObjectClass *arm_cpu_class_by_name(const char *cpu_model)
+>          return NULL;
+>      }
+>
+> -    cpuname = g_strsplit(cpu_model, ",", 1);
+> +    cpuname = g_strsplit(cpu_model, ",", 2);
+>      typename = g_strdup_printf("%s-" TYPE_ARM_CPU, cpuname[0]);
+>      oc = object_class_by_name(typename);
+> -    g_strfreev(cpuname);
+> -    g_free(typename);
+>      if (!oc || !object_class_dynamic_cast(oc, TYPE_ARM_CPU) ||
+>          object_class_is_abstract(oc)) {
+> +        g_strfreev(cpuname);
+> +        g_free(typename);
+>          return NULL;
+>      }
+> +
+> +    cc = CPU_CLASS(oc);
+> +    cc->parse_features(typename, cpuname[1], &error_fatal);
+> +    g_strfreev(cpuname);
+> +
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1455912
+I'm also not clear why this needs to change -- the existing code works
+for all of our current properties.
 
-Title:
-  vnc websocket option not properly parsed when running on commandline
+>      return oc;
+>  }
+>
+> diff --git a/target-arm/cpu.h b/target-arm/cpu.h
+> index ca5c849..becbfce 100644
+> --- a/target-arm/cpu.h
+> +++ b/target-arm/cpu.h
+> @@ -657,6 +657,13 @@ struct ARMCPU {
+>      uint32_t dcz_blocksize;
+>      uint64_t rvbar;
+>
+> +    /* Whether the cfgend input is high (i.e. this CPU should reset into
+> +     * big-endian mode).  This setting isn't used directly: instead it modifies
+> +     * the reset_sctlr value to have SCTLR_B or SCTLR_EE set, depending on the
+> +     * architecture version.
+> +     */
+> +    bool cfgend;
+> +
+>      ARMELChangeHook *el_change_hook;
+>      void *el_change_hook_opaque;
+>  };
 
-Status in QEMU:
-  In Progress
-
-Bug description:
-  All of my vms are started with a simple script on the command line.  =
-
-  Starting with Qemu 2.3.0, the option "-vnc host:port,websocket" is no lon=
-ger working.
-
-  Previously if I said listen on Tor:17,websocket it would function
-  correctly.  Now it's kicking an error:
-
-  =
-
-  qemu-system-x86_64: -vnc tor:17,websocket: Failed to start VNC server on =
-`(null)': address resolution failed for tor:on: Servname not supported for =
-ai_socktype
-
-  The error leads me to believe it's not parsing the command line
-  options for the "vnc" option correctly.  If I leave off ",websocket"
-  it works correctly.  I've even tried, replacing the hostname with an
-  IP address, and using the alternate form " -display
-  vnc=3Dtor:17,webscoket". It reports the same error.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1455912/+subscriptions
+thanks
+-- PMM
