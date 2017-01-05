@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34482)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34483)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cPGVo-0008A3-Md
+	(envelope-from <dgibson@ozlabs.org>) id 1cPGVo-0008A5-Ml
 	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 17:27:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cPGVl-0000gD-Gm
+	(envelope-from <dgibson@ozlabs.org>) id 1cPGVl-0000gL-SD
 	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 17:27:56 -0500
-Date: Fri, 6 Jan 2017 09:21:22 +1100
+Date: Fri, 6 Jan 2017 09:27:07 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170105222122.GG13763@umbus.fritz.box>
-References: <1483630188-32021-1-git-send-email-lvivier@redhat.com>
+Message-ID: <20170105222707.GH13763@umbus.fritz.box>
+References: <1483615579-17618-1-git-send-email-nikunj@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="APlYHCtpeOhspHkB"
+	protocol="application/pgp-signature"; boundary="it/zdz3K1bH9Y8/E"
 Content-Disposition: inline
-In-Reply-To: <1483630188-32021-1-git-send-email-lvivier@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/5] qtest: enable several tests for
- ppc64
+In-Reply-To: <1483615579-17618-1-git-send-email-nikunj@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 00/14] POWER9 TCG enablements - part10
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,46 +23,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, Thomas Huth <thuth@redhat.com>
+To: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+Cc: qemu-ppc@nongnu.org, rth@twiddle.net, qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com
 
 
---APlYHCtpeOhspHkB
+--it/zdz3K1bH9Y8/E
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jan 05, 2017 at 04:29:43PM +0100, Laurent Vivier wrote:
-> This series enables some tests existing for i386 and which
-> can also work on ppc64.
+On Thu, Jan 05, 2017 at 04:56:05PM +0530, Nikunj A Dadhania wrote:
+> This series contains 11 new instructions for POWER9 ISA3.0
+>      VSX Vector Insert/Extract Word
+>      VSX Scalar Extract Exponent/Significand
+>      VSX Scalar Convert
+>      VSX Scalar Add QP
+>      Various float related improvements
 >=20
-> VGA tests and netfilter tests are trivial, but ivshmem test
-> needs to enable the SPAPR PCI framework. We also fix a bug
-> in qpci_map() for SPAPR, where the PCI base is not correctly
-> set in the CPU address space.
+> Bharata B Rao (8):
+>   target-ppc: Use float64 arg in helper_compute_fprf()
+>   target-ppc: Replace isden by float64_is_zero_or_denormal
+>   target-ppc: Rename helper_compute_fprf to helper_compute_fprf_float64
+>   target-ppc: Add xsaddqp instructions
+>   target-ppc: Add xscvdphp, xscvhpdp
+>   target-ppc: Use correct precision for FPRF setting
+>   target-ppc: Add xscvdpqp instruction
+>   target-ppc: Add xscvqpdp instruction
+>=20
+> Nikunj A Dadhania (6):
+>   target-ppc: Add xxextractuw instruction
+>   target-ppc: Add xxinsertw instruction
+>   target-ppc: Add xsxexpdp instruction
+>   target-ppc: Add xsxexpqp instruction
+>   target-ppc: Add xsxsigdp instruction
+>   target-ppc: Add xsxsigqp instructions
+>=20
+>  include/fpu/softfloat.h             |  20 +++
+>  target-ppc/fpu_helper.c             | 241 +++++++++++++++++++++++++-----=
+------
+>  target-ppc/helper.h                 |   9 +-
+>  target-ppc/int_helper.c             |  51 ++++++++
+>  target-ppc/internal.h               |   6 +
+>  target-ppc/translate/fp-impl.inc.c  |  20 +--
+>  target-ppc/translate/vsx-impl.inc.c | 122 ++++++++++++++++++
+>  target-ppc/translate/vsx-ops.inc.c  |  18 +++
+>  8 files changed, 405 insertions(+), 82 deletions(-)
 
-Applied to ppc-for-2.9 (replacing the earlier version that was in
-there).
+These all need rebasing - the path is target/ppc now, rather than
+target-ppc.
 
->=20
-> v2:
-> - extract ivshmem conversion to libqos and
->   update log message
->=20
-> Laurent Vivier (5):
->   qtest: add netfilter tests for ppc64
->   qtest: add display-vga-test to ppc64
->   libqos: fix spapr qpci_map()
->   qtest: convert ivshmem-test to use libqos
->   qtest: add ivshmem-test for ppc64
->=20
->  tests/Makefile.include   |  7 ++++++-
->  tests/display-vga-test.c |  7 ++++++-
->  tests/ivshmem-test.c     | 46 +++++++++++++++++++++++++++++-------------=
-----
->  tests/libqos/pci-spapr.c |  4 ++--
->  4 files changed, 43 insertions(+), 21 deletions(-)
->=20
+1/14 and 10..14/14 look otherwise ok, the reset have comments (or
+depend on patches which have comments).
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -71,25 +81,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---APlYHCtpeOhspHkB
+--it/zdz3K1bH9Y8/E
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJYbsbgAAoJEGw4ysog2bOSK8UQAI3cUh0GZog5d6uk+QTnTbe9
-ai4pPNf298+8EimKXK67URTF66jm2gyoJHfsA6C8Hn5URwSiUkfGJObhhxr0p9Io
-bO6P1DC6cAPAoV9WWymRVQXQ70Q8DeokEkWb2spZS7gcYn88yJWO9Uk2vL/+ogP/
-s4GH+vAbExNkujBG/RUD9l+xvAlOueIUHQaNov1+sIIvxgzCfOkjqdHuR60Zw9+O
-Z/8uFPR0qaJb1fdVJv+t+TZLY8/KaHpxIn0rsUi7aFF4HWSlYTXys0kjmch6H9eM
-bTfQ/a7o4/jSZ58uxCxmP0lM5e9NP1+1EGGTZItB6v5T117bsgK9cLqlweC81GTi
-nDhOrVjL6H7iJCgmCkZ5b2YwDXEp3+hpdNPEewO4gEvb9AIkib1kHW7c18lNBXow
-aLVTW6dzzB4mpcZfKuPgS4pZupkAIh7khe0+tiCCzv3UcTHgETrR35XesOKskTyT
-uIxactqvHG/sipLLe2geWxzXXrPEiMSfAo6y/FlozKcT/b2J6CjMpXYVYrc+ZVqs
-G+fP5IFY5q8YO2OQ0PbAHqSJOrdLxe4+4NXqYyKSHRyW7sEVU0NVqakcbWiBtk+t
-WlSeFbqqQAQAWI2ZoX2rv3lkN1VPKeIHYcSIYDK+wVgCMa2YWyVplWbj53DjpFoE
-ed2pbxPc4RgOjCRRQX4q
-=YQkV
+iQIcBAEBCAAGBQJYbsg7AAoJEGw4ysog2bOSfCwQAIG8yzAEuPrRCG49mOHFef+7
+8uuqWuBk3Xyd6C8bA1DBg7jaMMXutHWzd/z4KzIrsc+5DFApwN5J0iqi8/payuHJ
+mbAwE8vx2HAODTjJZkT/cgXNfZncn+oTuW1zFJQmHHyy+wSrY2NQ7CgOLkuzkjNG
+NxFHfC+OkLncDitmArlV+Wjc4LsBTi4ucPyAbrOTrU67ie3O+t61djm99j4uEqhc
+Q7uPlZGhRl+NE4gJRtavhIpnErV5VUHjBWM1yChOMDz+6ye3bJXlv27CqEXFzf8O
+cNhlHNPBIdTvWAvhbwT4LHehm8ODzDX8mbOhcOqlSm27y0B+1Xq+SorZo2BbYyqp
+QfkVF2fzyZ4khAJEPKSJZuJb/edQLn1LUXPweokR4W/UDdgowXDyxidZWpF23+Nd
+yKptfKQIzarMZpbG79zYZeCB1HeXqaXnM0P5p/6evN9VB+YTcq/D4xPBqP01sBx3
+aAdm2ue6/O4I5W5GX8Ak2NPmZNtfRGtm2yu95y8zrnniy+1nVbBiYb03I8nHAm8k
+9Xrc6xTEn7txZqlpQKVP9hF+K2PogvXh3k5VYfax7xxGXtE9/zGYFTyGoLTzPT/y
+Rdkd6qaDt8Hy+/SV6Il1WWM76876J8mWENGGzBrYj6uz+zTRFiIa5DGjIOxtOY5q
+F5l2fDMVd70R/+X7QLC6
+=Hkcb
 -----END PGP SIGNATURE-----
 
---APlYHCtpeOhspHkB--
+--it/zdz3K1bH9Y8/E--
