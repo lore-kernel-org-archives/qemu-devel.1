@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58407)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59127)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ben@skyportsystems.com>) id 1cP235-00050o-Ba
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 02:01:20 -0500
+	(envelope-from <jitendra.kolhe@hpe.com>) id 1cP26H-0006PE-K8
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 02:04:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ben@skyportsystems.com>) id 1cP234-0007QR-JQ
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 02:01:19 -0500
-Received: from mail-pf0-x22a.google.com ([2607:f8b0:400e:c00::22a]:34419)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ben@skyportsystems.com>)
-	id 1cP234-0007Ni-C6
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 02:01:18 -0500
-Received: by mail-pf0-x22a.google.com with SMTP id 127so6591550pfg.1
-	for <qemu-devel@nongnu.org>; Wed, 04 Jan 2017 23:01:16 -0800 (PST)
-Received: from ?IPv6:2602:30a:2c75:8260:7c8b:3302:cda0:5d57?
-	([2602:30a:2c75:8260:7c8b:3302:cda0:5d57])
-	by smtp.gmail.com with ESMTPSA id
-	q12sm151158939pfj.18.2017.01.04.23.01.14 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Wed, 04 Jan 2017 23:01:14 -0800 (PST)
-From: Ben Warren <ben@skyportsystems.com>
-Content-Type: multipart/signed;
-	boundary="Apple-Mail=_AC372959-1923-4B20-9162-51BADC212697";
-	protocol="application/pkcs7-signature"; micalg=sha1
-Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
-Message-Id: <D7CA83B6-39C6-4D0D-88E4-954874ADC3E0@skyportsystems.com>
-Date: Wed, 4 Jan 2017 23:01:13 -0800
-Subject: [Qemu-devel] uncached memory access in qtest
+	(envelope-from <jitendra.kolhe@hpe.com>) id 1cP26E-0000Jb-DP
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 02:04:37 -0500
+Received: from g9t5009.houston.hpe.com ([15.241.48.73]:51411)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jitendra.kolhe@hpe.com>)
+	id 1cP26E-0000IP-6w
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 02:04:34 -0500
+References: <1463570440-29685-1-git-send-email-jitendra.kolhe@hpe.com>
+	<F2CBF3009FA73547804AE4C663CAB28E3C34811E@shsmsx102.ccr.corp.intel.com>
+	<ebc6d79a-833d-5413-8617-b3252bc45a07@redhat.com>
+	<F2CBF3009FA73547804AE4C663CAB28E3C34BC76@shsmsx102.ccr.corp.intel.com>
+From: Jitendra Kolhe <jitendra.kolhe@hpe.com>
+Message-ID: <89e9f19f-1249-d45a-af19-39e7db248737@hpe.com>
+Date: Thu, 5 Jan 2017 12:34:17 +0530
+MIME-Version: 1.0
+In-Reply-To: <F2CBF3009FA73547804AE4C663CAB28E3C34BC76@shsmsx102.ccr.corp.intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 0/4] migration: skip scanning and
+ migrating ram pages released by virtio-balloon driver.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,97 +31,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Li, Liang Z" <liang.z.li@intel.com>, David Hildenbrand <david@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "crosthwaite.peter@gmail.com" <crosthwaite.peter@gmail.com>, "ehabkost@redhat.com" <ehabkost@redhat.com>, "quintela@redhat.com" <quintela@redhat.com>, "simhan@hpe.com" <simhan@hpe.com>, "JBottomley@Odin.com" <JBottomley@Odin.com>, "armbru@redhat.com" <armbru@redhat.com>, "lcapitulino@redhat.com" <lcapitulino@redhat.com>, "renganathan.meenakshisundaram@hpe.com" <renganathan.meenakshisundaram@hpe.com>, "borntraeger@de.ibm.com" <borntraeger@de.ibm.com>, "mst@redhat.com" <mst@redhat.com>, "mohan_parthasarathy@hpe.com" <mohan_parthasarathy@hpe.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "amit.shah@redhat.com" <amit.shah@redhat.com>, "den@openvz.org" <den@openvz.org>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>
 
+On 1/5/2017 7:03 AM, Li, Liang Z wrote:
+>> Am 23.12.2016 um 03:50 schrieb Li, Liang Z:
+>>>> While measuring live migration performance for qemu/kvm guest, it wa=
+s
+>>>> observed that the qemu doesn=E2=80=99t maintain any intelligence for=
+ the
+>>>> guest ram pages released by the guest balloon driver and treat such
+>>>> pages as any other normal guest ram pages. This has direct impact on
+>>>> overall migration time for the guest which has released (ballooned o=
+ut)
+>> memory to the host.
+>>>>
+>>>> In case of large systems, where we can configure large guests with
+>>>> 1TB and with considerable amount of memory released by balloon drive=
+r
+>>>> to the host, the migration time gets worse.
+>>>>
+>>>> The solution proposed below is local to qemu (and does not require
+>>>> any modification to Linux kernel or any guest driver). We have
+>>>> verified the fix for large guests =3D1TB on HPE Superdome X (which c=
+an
+>>>> support up to 240 cores and 12TB of memory).
+>>>>
+>>>> During live migration, as part of first iteration in
+>>>> ram_save_iterate() -> ram_find_and_save_block () will try to migrate
+>>>> ram pages even if they are released by vitrio-balloon driver (balloo=
+n
+>>>> inflate). Although these pages which are returned to the host by
+>>>> virtio-balloon driver are zero pages, the migration algorithm will
+>>>> still end up scanning the entire page
+>>>> ram_find_and_save_block() ->
+>>>> ram_save_page()/ram_save_compressed_page() ->
+>>>> save_zero_page() -> is_zero_range(). We also end-up sending header
+>>>> information over network for these pages during migration. This adds
+>>>> to the total migration time.
+>>>>
+>>>> The solution creates a balloon bitmap ramblock as a part of
+>>>> virtio-balloon device initialization. The bits in the balloon bitmap
+>>>> represent a guest ram page of size 1UL << VIRTIO_BALLOON_PFN_SHIFT
+>> or
+>>>> 4K. If TARGET_PAGE_BITS <=3D VIRTIO_BALLOON_PFN_SHIFT, ram_addr
+>> offset
+>>>> for the dirty page which is used by dirty page bitmap during
+>>>> migration is checked against the balloon bitmap as is, if the bit is
+>>>> set in the balloon bitmap, the corresponding ram page will be
+>>>> excluded from scanning and sending header information during
+>>>> migration. In case TARGET_PAGE_BITS > VIRTIO_BALLOON_PFN_SHIFT
+>> for a
+>>>> given dirty page ram_addr, all sub-pages of 1UL <<
+>>>> VIRTIO_BALLOON_PFN_SHIFT size should be ballooned out to avoid zero
+>> page scan and sending header information.
+>>>>
+>>>> The bitmap represents entire guest ram memory till max configured
+>> memory.
+>>>> Guest ram pages claimed by the virtio-balloon driver will be
+>>>> represented by 1 in the bitmap. Since the bitmap is maintained as a
+>>>> ramblock, it=E2=80=99s migrated to target as part migration=E2=80=99=
+s ram iterative
+>>>> and ram complete phase. So that substituent migrations from the targ=
+et
+>> can continue to use optimization.
+>>>>
+>>>> A new migration capability called skip-balloon is introduced. The
+>>>> user can disable the capability in cases where user does not expect
+>>>> much benefit or in case the migration is from an older version.
+>>>>
+>>>> During live migration setup the optimization can be set to disabled =
+state if .
+>>>> no virtio-balloon device is initialized.
+>>>> . skip-balloon migration capability is disabled.
+>>>> . If the guest virtio-balloon driver has not set
+>>>> VIRTIO_BALLOON_F_MUST_TELL_HOST
+>>>>   flag. Which means the guest may start using a ram pages freed by
+>>>> guest balloon
+>>>>   driver, even before the host/qemu is aware of it. In such case, th=
+e
+>>>>   optimization is disabled so that the ram pages that are being used=
+ by the
+>>>>   guest will continue to be scanned and migrated.
+>>>>
+>>>> Balloon bitmap ramblock size is set to zero if the optimization is
+>>>> disabled, to avoid overhead of migrating the bitmap. If the bitmap i=
+s
+>>>> not migrated to the target, the destination starts with a fresh
+>>>> bitmap and tracks the ballooning operation thereafter.
+>>>>
+>>>
+>>> I have a better way to get rid of the bitmap.
+>>> We should not maintain the inflating pages in the bitmap, instead, we
+>>> can get them from the guest if it's needed, just like what we did for
+>>> the guest's unused pages. Then we can combine the inflating page info
+>>> with the unused page info together, and skip them during live migrati=
+on.
+>>>
+>>
+>> If we want to actually host enforce (disallow) access to inflated page=
+s, having
+>=20
+> Is that a new feature?
+>=20
+>> such a bitmap in QEMU is required. Getting them from the guest doesn't
+>> make sense in that context anymore.
+>=20
+> Even a bitmap is required, we should avoid to send it in the stop & cop=
+y stage.
+>=20
 
---Apple-Mail=_AC372959-1923-4B20-9162-51BADC212697
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;
-	charset=utf-8
+How about using both ways? If the guest is capable to share ballooned out=
+ page
+information using unused page framework use it. If the guest is not capab=
+le we
+maintain a bitmap in qemu. This way we can use advantage of both approach=
+es.=20
+1. In case the guest is capable - we avoid bitmap send in stop and copy s=
+tage.
+2. In case the guest is not capable - host can still disallow migration o=
+f ballooned=20
+out pages.
+But since this approach may add a bit of code churn, we recommend to go w=
+ith maintaining=20
+the bitmap in qemu at first phase (existing implementation) and then enha=
+nce it later=20
+to use unused page approach (to query guest) based on the guest capabilit=
+y.=20
 
-Hi,
+Thanks,
+- Jitendra
 
-I=E2=80=99m trying to write a unit test to access a fw_cfg device via =
-ACPI memory.  When I access the memory from qtest using the readx() =
-functions, I get the right values.  If I change the contents on the host =
-side, though, then access from the guest, the contents are unchanged.  =
-If I register a read callback via fw_cfg_add_file_callback(), I see the =
-callback only called once, so it seems to me that the guest memory is =
-being cached.  Is there an easy way to flush or invalidate the cache, or =
-map a region uncached in the qtest framework?  Or maybe do something =
-from the host side?
-
-thanks,
-Ben=
-
---Apple-Mail=_AC372959-1923-4B20-9162-51BADC212697
-Content-Disposition: attachment;
-	filename=smime.p7s
-Content-Type: application/pkcs7-signature;
-	name=smime.p7s
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExCzAJBgUrDgMCGgUAMIAGCSqGSIb3DQEHAQAAoIIJ+zCCBK8w
-ggOXoAMCAQICEQDgI8sVEoNTia1hbnpUZ2shMA0GCSqGSIb3DQEBCwUAMG8xCzAJBgNVBAYTAlNF
-MRQwEgYDVQQKEwtBZGRUcnVzdCBBQjEmMCQGA1UECxMdQWRkVHJ1c3QgRXh0ZXJuYWwgVFRQIE5l
-dHdvcmsxIjAgBgNVBAMTGUFkZFRydXN0IEV4dGVybmFsIENBIFJvb3QwHhcNMTQxMjIyMDAwMDAw
-WhcNMjAwNTMwMTA0ODM4WjCBmzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hl
-c3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQxQTA/BgNV
-BAMTOENPTU9ETyBTSEEtMjU2IENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWls
-IENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAibEN2npTGU5wUh28VqYGJre4SeCW
-51Gr8fBaE0kVo7SMG2C8elFCp3mMpCLfF2FOkdV2IwoU00oCf7YdCYBupQQ92bq7Fv6hh6kuQ1JD
-FnyvMlDIpk9a6QjYz5MlnHuI6DBk5qT4VoD9KiQUMxeZrETlaYujRgZLwjPU6UCfBrCxrJNAubUI
-kzqcKlOjENs9IGE8VQOO2U52JQIhKfqjfHF2T+7hX4Hp+1SA28N7NVK3hN4iPSwwLTF/Wb1SN7Az
-aS1D6/rWpfGXd2dRjNnuJ+u8pQc4doykqTj/34z1A6xJvsr3c5k6DzKrnJU6Ez0ORjpXdGFQvsZA
-P8vk4p+iIQIDAQABo4IBFzCCARMwHwYDVR0jBBgwFoAUrb2YejS0Jvf6xCZU7wO94CTLVBowHQYD
-VR0OBBYEFJJha4LhoqCqT+xn8cKj97SAAMHsMA4GA1UdDwEB/wQEAwIBhjASBgNVHRMBAf8ECDAG
-AQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDARBgNVHSAECjAIMAYGBFUdIAAw
-RAYDVR0fBD0wOzA5oDegNYYzaHR0cDovL2NybC51c2VydHJ1c3QuY29tL0FkZFRydXN0RXh0ZXJu
-YWxDQVJvb3QuY3JsMDUGCCsGAQUFBwEBBCkwJzAlBggrBgEFBQcwAYYZaHR0cDovL29jc3AudXNl
-cnRydXN0LmNvbTANBgkqhkiG9w0BAQsFAAOCAQEAGypurFXBOquIxdjtzVXzqmthK8AJECOZD8Vm
-am+x9bS1d14PAmEA330F/hKzpICAAPz7HVtqcgIKQbwFusFY1SbC6tVNhPv+gpjPWBvjImOcUvi7
-BTarfVil3qs7Y+Xa1XPv7OD7e+Kj//BCI5zKto1NPuRLGAOyqC3U2LtCS5BphRDbpjc06HvgARCl
-nMo6x59PiDRuimXQGoq7qdzKyjbR9PzCZCk1r9axp3ER0gNDsY8+muyeMlP0dpLKhjQHuSzK5hxK
-2JkNwYbikJL7WkJqIyEQ6WXH9dW7fuqMhSACYurROgcsWcWZM/I4ieW26RZ6H3kU9koQGib6fIr7
-mzCCBUQwggQsoAMCAQICEQCWOeMVlifzA+PvGfHjMeybMA0GCSqGSIb3DQEBCwUAMIGbMQswCQYD
-VQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRow
-GAYDVQQKExFDT01PRE8gQ0EgTGltaXRlZDFBMD8GA1UEAxM4Q09NT0RPIFNIQS0yNTYgQ2xpZW50
-IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0EwHhcNMTYwNTE5MDAwMDAwWhcNMTcw
-NTE5MjM1OTU5WjAnMSUwIwYJKoZIhvcNAQkBFhZiZW5Ac2t5cG9ydHN5c3RlbXMuY29tMIIBIjAN
-BgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAryjnKj/3VRzbNXiWAp7RAZSzUCOzDG6WJ2ybuDWP
-A7uDl48iX2v3ulbcZq8G0sL1nwGvBdSrmd5X3Qzirx0ti0Qe0mlAd22PEOL/xR5ChLDhNI6i43cM
-R1qM1JNtuC5Dz8h2TfYbF/VuKkA1YVuXNguSP8Z1DQXptE1m3yS0gk9LLdDkqq7Vi/zfSmD1NYHN
-gEGvtux/3lMp8pHgQiZo8PxKH2Y4zem0AiWtZ9fKZqYWRIhECJ+etvpGvh4dNIj8vdo/ig3uSwLv
-ePX7rFz3C5WHOyKjl4VGHNOA5IRZjabp4bdAEIiMPU7lfWt0o4nCRtM/G/6FvFinR6PIHSma1wID
-AQABo4IB9DCCAfAwHwYDVR0jBBgwFoAUkmFrguGioKpP7GfxwqP3tIAAwewwHQYDVR0OBBYEFJv6
-uT+NCtbUQ0MHZLryEY65oKgbMA4GA1UdDwEB/wQEAwIFoDAMBgNVHRMBAf8EAjAAMCAGA1UdJQQZ
-MBcGCCsGAQUFBwMEBgsrBgEEAbIxAQMFAjARBglghkgBhvhCAQEEBAMCBSAwRgYDVR0gBD8wPTA7
-BgwrBgEEAbIxAQIBAQEwKzApBggrBgEFBQcCARYdaHR0cHM6Ly9zZWN1cmUuY29tb2RvLm5ldC9D
-UFMwXQYDVR0fBFYwVDBSoFCgToZMaHR0cDovL2NybC5jb21vZG9jYS5jb20vQ09NT0RPU0hBMjU2
-Q2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNybDCBkAYIKwYBBQUHAQEEgYMw
-gYAwWAYIKwYBBQUHMAKGTGh0dHA6Ly9jcnQuY29tb2RvY2EuY29tL0NPTU9ET1NIQTI1NkNsaWVu
-dEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcnQwJAYIKwYBBQUHMAGGGGh0dHA6Ly9v
-Y3NwLmNvbW9kb2NhLmNvbTAhBgNVHREEGjAYgRZiZW5Ac2t5cG9ydHN5c3RlbXMuY29tMA0GCSqG
-SIb3DQEBCwUAA4IBAQAwVeCMNqTr20+cqsHnSK2AtzxKZyVG9y51wB88lPnRGHe2m+qKGdPgAh/7
-iDzEEXsy4sDwHVHVq4kLHW9lX7CvRTxCtmOAtsty5ePhJjh3CX+nsK2HKpi043E6azad6L64DNVN
-dMZFwUrUu8dYjOp48TPpIhW13Sbu2t/SOZK4G8EZAaZPX8Dg34tyHRUvM/B/eaJuUgdM5qY2IU+F
-7U2K4hBHkhJMJgQ7TyVe8GhdBMaztY4GHqhWP5cCgZBdC9QII8E5jqX7//FbBRB0zVHRVeBZO32H
-TvapSOG8ZYd0n5l5j3rBQnLfHWsnQ07rL2+w8W9BBPSZBbciPuwOe3ksMYIDxjCCA8ICAQEwgbEw
-gZsxCzAJBgNVBAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1Nh
-bGZvcmQxGjAYBgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMUEwPwYDVQQDEzhDT01PRE8gU0hBLTI1
-NiBDbGllbnQgQXV0aGVudGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAJY54xWWJ/MD4+8Z
-8eMx7JswCQYFKw4DAhoFAKCCAekwGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0B
-CQUxDxcNMTcwMTA1MDcwMTEzWjAjBgkqhkiG9w0BCQQxFgQUm+U6+pJgW5D/OzVtRvuWVoHBESsw
-gcIGCSsGAQQBgjcQBDGBtDCBsTCBmzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFu
-Y2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQxQTA/
-BgNVBAMTOENPTU9ETyBTSEEtMjU2IENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVt
-YWlsIENBAhEAljnjFZYn8wPj7xnx4zHsmzCBxAYLKoZIhvcNAQkQAgsxgbSggbEwgZsxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMUEwPwYDVQQDEzhDT01PRE8gU0hBLTI1NiBDbGllbnQg
-QXV0aGVudGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAJY54xWWJ/MD4+8Z8eMx7JswDQYJ
-KoZIhvcNAQEBBQAEggEAoSeKm+JSgQJPOkwIEQgvA2o6U2u7lk3Uxg7J8g5OaEn5nOn29EP7MXKo
-tmVcPqi/5NofH/GmaULX0fxfQeN+3wDZQlABk5VUFbBpzgkbqaV/xKdYakDI30OqgIpUHy6W3Pr+
-dPtrzG37GYZw7pe0IoOwr3fVoYN4UF2nfqru/YpSEBKxTaLTERNpSEFyGlIyYHacv0/N20BboaTa
-jxWgn+wXhSTgnDSg9/A4u+bFMKKPuUS5PONUC4FW4Uqlm5EN/8X8uhPFpJi7XHY7WD/d4EC9PANE
-EbizLIIwpXoCNx4SzSd5FY8XzpQIPlUd7BSj/6QTKZuQf0eaI9JsIIe6igAAAAAAAA==
---Apple-Mail=_AC372959-1923-4B20-9162-51BADC212697--
+> Thanks!
+> Liang
+>>
+>> Thanks,
+>> David
+>>
