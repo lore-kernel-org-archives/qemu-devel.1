@@ -1,35 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42366)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42474)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cP6Bx-0000RA-MF
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 06:26:48 -0500
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cP6C0-0000Ty-L8
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 06:26:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cP6Bt-0006Oq-Mp
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 06:26:45 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54117
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cP6Bw-0006Pv-Nf
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 06:26:48 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57547
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
-	id 1cP6Bt-0006Oi-I4
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 06:26:41 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	id 1cP6Bw-0006Pj-GZ
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 06:26:44 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
 	by mx0b-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	v05BO1Ie091618
-	for <qemu-devel@nongnu.org>; Thu, 5 Jan 2017 06:26:41 -0500
+	v05BO2ur052721
+	for <qemu-devel@nongnu.org>; Thu, 5 Jan 2017 06:26:44 -0500
 Received: from e28smtp07.in.ibm.com (e28smtp07.in.ibm.com [125.16.236.7])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 27skwvux25-1
+	by mx0b-001b2d01.pphosted.com with ESMTP id 27skxvbw4r-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 05 Jan 2017 06:26:40 -0500
+	for <qemu-devel@nongnu.org>; Thu, 05 Jan 2017 06:26:43 -0500
 Received: from localhost
 	by e28smtp07.in.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
-	Thu, 5 Jan 2017 16:56:36 +0530
+	Thu, 5 Jan 2017 16:56:39 +0530
 From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-Date: Thu,  5 Jan 2017 16:56:06 +0530
+Date: Thu,  5 Jan 2017 16:56:08 +0530
 In-Reply-To: <1483615579-17618-1-git-send-email-nikunj@linux.vnet.ibm.com>
 References: <1483615579-17618-1-git-send-email-nikunj@linux.vnet.ibm.com>
-Message-Id: <1483615579-17618-2-git-send-email-nikunj@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 01/14] target-ppc: Add xxextractuw instruction
+Message-Id: <1483615579-17618-4-git-send-email-nikunj@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 03/14] target-ppc: Use float64 arg in
+ helper_compute_fprf()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,128 +42,68 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net
 Cc: qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com, nikunj@linux.vnet.ibm.com
 
-xxextractuw: VSX Vector Extract Unsigned Word
+From: Bharata B Rao <bharata@linux.vnet.ibm.com>
 
+Use float64 argument instead of unit64_t in helper_compute_fprf()
+This allows code in helper_compute_fprf() to be reused later to
+work with float128 argument too.
+
+Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
 Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 ---
- target-ppc/helper.h                 |  1 +
- target-ppc/int_helper.c             | 26 ++++++++++++++++++++++++++
- target-ppc/translate/vsx-impl.inc.c | 30 ++++++++++++++++++++++++++++++
- target-ppc/translate/vsx-ops.inc.c  |  5 +++++
- 4 files changed, 62 insertions(+)
+ target-ppc/fpu_helper.c | 16 +++++++---------
+ 1 file changed, 7 insertions(+), 9 deletions(-)
 
-diff --git a/target-ppc/helper.h b/target-ppc/helper.h
-index 4707db4..8b30420 100644
---- a/target-ppc/helper.h
-+++ b/target-ppc/helper.h
-@@ -540,6 +540,7 @@ DEF_HELPER_2(xvrspip, void, env, i32)
- DEF_HELPER_2(xvrspiz, void, env, i32)
- DEF_HELPER_2(xxperm, void, env, i32)
- DEF_HELPER_2(xxpermr, void, env, i32)
-+DEF_HELPER_4(xxextractuw, void, env, tl, tl, i32)
- 
- DEF_HELPER_2(efscfsi, i32, env, i32)
- DEF_HELPER_2(efscfui, i32, env, i32)
-diff --git a/target-ppc/int_helper.c b/target-ppc/int_helper.c
-index 2bb628f..63ba0e3 100644
---- a/target-ppc/int_helper.c
-+++ b/target-ppc/int_helper.c
-@@ -2033,6 +2033,32 @@ VEXTRACT(uw, u32)
- VEXTRACT(d, u64)
- #undef VEXTRACT
- 
-+void helper_xxextractuw(CPUPPCState *env, target_ulong xtn,
-+                        target_ulong xbn, uint32_t index)
-+{
-+    ppc_vsr_t xt, xb;
-+    size_t es = sizeof(uint32_t);
-+    uint32_t ext_index;
-+    int i;
-+
-+    getVSR(xbn, &xb, env);
-+    memset(&xt, 0, sizeof(xt));
-+
-+#if defined(HOST_WORDS_BIGENDIAN)
-+    ext_index = index;
-+    for (i = 0; i < es; i++, ext_index++) {
-+        xt.u8[8 - es + i] = xb.u8[ext_index % 16];
-+    }
-+#else
-+    ext_index = 15 - index;
-+    for (i = es - 1; i >= 0; i--, ext_index--) {
-+        xt.u8[8 + i] = xb.u8[ext_index % 16];
-+    }
-+#endif
-+
-+    putVSR(xtn, &xt, env);
-+}
-+
- #define VEXT_SIGNED(name, element, mask, cast, recast)              \
- void helper_##name(ppc_avr_t *r, ppc_avr_t *b)                      \
- {                                                                   \
-diff --git a/target-ppc/translate/vsx-impl.inc.c b/target-ppc/translate/vsx-impl.inc.c
-index 2a17c35..7977f24 100644
---- a/target-ppc/translate/vsx-impl.inc.c
-+++ b/target-ppc/translate/vsx-impl.inc.c
-@@ -1180,6 +1180,36 @@ static void gen_xxsldwi(DisasContext *ctx)
-     tcg_temp_free_i64(xtl);
+diff --git a/target-ppc/fpu_helper.c b/target-ppc/fpu_helper.c
+index 1ccd5e6..4da991a 100644
+--- a/target-ppc/fpu_helper.c
++++ b/target-ppc/fpu_helper.c
+@@ -66,23 +66,21 @@ static inline int ppc_float64_get_unbiased_exp(float64 f)
+     return ((f >> 52) & 0x7FF) - 1023;
  }
  
-+#define VSX_EXTRACT(name)                                       \
-+static void gen_##name(DisasContext *ctx)                       \
-+{                                                               \
-+    TCGv xt, xb;                                                \
-+    TCGv_i32 t0 = tcg_temp_new_i32();                           \
-+    uint8_t uimm = UIMM4(ctx->opcode);                          \
-+                                                                \
-+    if (unlikely(!ctx->vsx_enabled)) {                          \
-+        gen_exception(ctx, POWERPC_EXCP_VSXU);                  \
-+        return;                                                 \
-+    }                                                           \
-+    xt = tcg_const_tl(xT(ctx->opcode));                         \
-+    xb = tcg_const_tl(xB(ctx->opcode));                         \
-+    /* uimm > 15 out of bound and for                           \
-+     * uimm > 12 handle as per hardware in helper               \
-+     */                                                         \
-+    if (uimm > 15) {                                            \
-+        tcg_gen_movi_i64(cpu_vsrh(xT(ctx->opcode)), 0);         \
-+        tcg_gen_movi_i64(cpu_vsrl(xT(ctx->opcode)), 0);         \
-+        return;                                                 \
-+    }                                                           \
-+    tcg_gen_movi_i32(t0, uimm);                                 \
-+    gen_helper_##name(cpu_env, xt, xb, t0);                     \
-+    tcg_temp_free(xb);                                          \
-+    tcg_temp_free(xt);                                          \
-+    tcg_temp_free_i32(t0);                                      \
-+}
-+
-+VSX_EXTRACT(xxextractuw)
-+
- #undef GEN_XX2FORM
- #undef GEN_XX3FORM
- #undef GEN_XX2IFORM
-diff --git a/target-ppc/translate/vsx-ops.inc.c b/target-ppc/translate/vsx-ops.inc.c
-index 46b95e3..473d925 100644
---- a/target-ppc/translate/vsx-ops.inc.c
-+++ b/target-ppc/translate/vsx-ops.inc.c
-@@ -49,6 +49,10 @@ GEN_HANDLER2_E(name, #name, 0x3C, opc2 | 1, opc3, 0, PPC_NONE, fl2)
- GEN_HANDLER2_E(name, #name, 0x3C, opc2 | 0, opc3, 0, PPC_NONE, fl2), \
- GEN_HANDLER2_E(name, #name, 0x3C, opc2 | 1, opc3, 0, PPC_NONE, fl2)
+-void helper_compute_fprf(CPUPPCState *env, uint64_t arg)
++void helper_compute_fprf(CPUPPCState *env, float64 arg)
+ {
+-    CPU_DoubleU farg;
+     int isneg;
+     int fprf;
  
-+#define GEN_XX2FORM_EXT(name, opc2, opc3, fl2)                          \
-+GEN_HANDLER2_E(name, #name, 0x3C, opc2 | 0, opc3, 0x00100000, PPC_NONE, fl2), \
-+GEN_HANDLER2_E(name, #name, 0x3C, opc2 | 1, opc3, 0x00100000, PPC_NONE, fl2)
-+
- #define GEN_XX2FORM_EO(name, opc2, opc3, opc4, fl2)                          \
- GEN_HANDLER2_E_2(name, #name, 0x3C, opc2 | 0, opc3, opc4, 0, PPC_NONE, fl2), \
- GEN_HANDLER2_E_2(name, #name, 0x3C, opc2 | 1, opc3, opc4, 0, PPC_NONE, fl2)
-@@ -280,6 +284,7 @@ GEN_XX3FORM(xxpermr, 0x08, 0x07, PPC2_ISA300),
- GEN_XX2FORM(xxspltw, 0x08, 0x0A, PPC2_VSX),
- GEN_XX1FORM(xxspltib, 0x08, 0x0B, PPC2_ISA300),
- GEN_XX3FORM_DM(xxsldwi, 0x08, 0x00),
-+GEN_XX2FORM_EXT(xxextractuw, 0x0A, 0x0A, PPC2_ISA300),
- 
- #define GEN_XXSEL_ROW(opc3) \
- GEN_HANDLER2_E(xxsel, "xxsel", 0x3C, 0x18, opc3, 0, PPC_NONE, PPC2_VSX), \
+-    farg.ll = arg;
+-    isneg = float64_is_neg(farg.d);
+-    if (unlikely(float64_is_any_nan(farg.d))) {
+-        if (float64_is_signaling_nan(farg.d, &env->fp_status)) {
++    isneg = float64_is_neg(arg);
++    if (unlikely(float64_is_any_nan(arg))) {
++        if (float64_is_signaling_nan(arg, &env->fp_status)) {
+             /* Signaling NaN: flags are undefined */
+             fprf = 0x00;
+         } else {
+             /* Quiet NaN */
+             fprf = 0x11;
+         }
+-    } else if (unlikely(float64_is_infinity(farg.d))) {
++    } else if (unlikely(float64_is_infinity(arg))) {
+         /* +/- infinity */
+         if (isneg) {
+             fprf = 0x09;
+@@ -90,7 +88,7 @@ void helper_compute_fprf(CPUPPCState *env, uint64_t arg)
+             fprf = 0x05;
+         }
+     } else {
+-        if (float64_is_zero(farg.d)) {
++        if (float64_is_zero(arg)) {
+             /* +/- zero */
+             if (isneg) {
+                 fprf = 0x12;
+@@ -98,7 +96,7 @@ void helper_compute_fprf(CPUPPCState *env, uint64_t arg)
+                 fprf = 0x02;
+             }
+         } else {
+-            if (isden(farg.d)) {
++            if (isden(arg)) {
+                 /* Denormalized numbers */
+                 fprf = 0x10;
+             } else {
 -- 
 2.7.4
