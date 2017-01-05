@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53741)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53830)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cPBIg-0007Z1-Vg
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 11:54:04 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cPBIj-0007bm-Td
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 11:54:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cPBIf-0002rE-NS
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 11:54:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58936)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cPBIj-0002t4-51
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 11:54:06 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38846)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1cPBIf-0002r2-Fn
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 11:54:01 -0500
-Received: from int-mx13.intmail.prod.int.phx2.redhat.com
-	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
+	id 1cPBIi-0002sa-VX
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 11:54:05 -0500
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com
+	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8C2CC7F76D
-	for <qemu-devel@nongnu.org>; Thu,  5 Jan 2017 16:54:01 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1942D61BAA
+	for <qemu-devel@nongnu.org>; Thu,  5 Jan 2017 16:54:05 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Thu,  5 Jan 2017 17:53:25 +0100
-Message-Id: <20170105165329.17227-17-marcandre.lureau@redhat.com>
+Date: Thu,  5 Jan 2017 17:53:27 +0100
+Message-Id: <20170105165329.17227-19-marcandre.lureau@redhat.com>
 In-Reply-To: <20170105165329.17227-1-marcandre.lureau@redhat.com>
 References: <20170105165329.17227-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 16/20] char: use error_report()
+Subject: [Qemu-devel] [PATCH 18/20] baum: use a common prefix for chr
+ callbacks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,95 +37,66 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, eblake@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Prefer error_report() over fprintf(stderr..)
-
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- qemu-char.c | 27 +++++++++++++++------------
- 1 file changed, 15 insertions(+), 12 deletions(-)
+ backends/baum.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/qemu-char.c b/qemu-char.c
-index 6ac52ce48d..284dd2f979 100644
---- a/qemu-char.c
-+++ b/qemu-char.c
-@@ -451,8 +451,8 @@ int qemu_chr_fe_get_msgfd(CharBackend *be)
-     int fd;
-     int res =3D (qemu_chr_fe_get_msgfds(be, &fd, 1) =3D=3D 1) ? fd : -1;
-     if (s && qemu_chr_replay(s)) {
--        fprintf(stderr,
--                "Replay: get msgfd is not supported for serial devices y=
-et\n");
-+        error_report("Replay: get msgfd is not supported "
-+                     "for serial devices yet");
-         exit(1);
-     }
-     return res;
-@@ -1675,8 +1675,8 @@ static Chardev *qemu_chr_open_pty(const CharDriver =
-*driver,
-     ret->pty =3D g_strdup(pty_name);
-     ret->has_pty =3D true;
+diff --git a/backends/baum.c b/backends/baum.c
+index 23d3c4aeaa..8842936417 100644
+--- a/backends/baum.c
++++ b/backends/baum.c
+@@ -253,7 +253,7 @@ static int baum_deferred_init(BaumChardev *baum)
+ }
 =20
--    fprintf(stderr, "char device redirected to %s (label %s)\n",
--            pty_name, id);
-+    error_report("char device redirected to %s (label %s)",
-+                 pty_name, id);
+ /* The serial port can receive more of our data */
+-static void baum_accept_input(struct Chardev *chr)
++static void baum_chr_accept_input(struct Chardev *chr)
+ {
+     BaumChardev *baum =3D (BaumChardev *)chr;
+     int room, first;
+@@ -470,7 +470,7 @@ static int baum_eat_packet(BaumChardev *baum, const u=
+int8_t *buf, int len)
+ }
 =20
-     s =3D (PtyChardev *)chr;
-     s->ioc =3D QIO_CHANNEL(qio_channel_file_new_fd(master_fd));
-@@ -3379,8 +3379,8 @@ static int tcp_chr_wait_connected(Chardev *chr, Err=
-or **errp)
-      * in TLS and telnet cases, only wait for an accepted socket */
-     while (!s->ioc) {
-         if (s->is_listen) {
--            fprintf(stderr, "QEMU waiting for connection on: %s\n",
--                    chr->filename);
-+            error_report("QEMU waiting for connection on: %s",
-+                         chr->filename);
-             qio_channel_set_blocking(QIO_CHANNEL(s->listen_ioc), true, N=
-ULL);
-             tcp_chr_accept(QIO_CHANNEL(s->listen_ioc), G_IO_IN, chr);
-             qio_channel_set_blocking(QIO_CHANNEL(s->listen_ioc), false, =
-NULL);
-@@ -4139,17 +4139,20 @@ Chardev *qemu_chr_new_from_opts(QemuOpts *opts,
+ /* The other end is writing some data.  Store it and try to interpret */
+-static int baum_write(Chardev *chr, const uint8_t *buf, int len)
++static int baum_chr_write(Chardev *chr, const uint8_t *buf, int len)
+ {
+     BaumChardev *baum =3D (BaumChardev *)chr;
+     int tocopy, cur, eaten, orig_len =3D len;
+@@ -613,7 +613,7 @@ static void baum_chr_read(void *opaque)
      }
+ }
 =20
-     if (is_help_option(qemu_opt_get(opts, "backend"))) {
--        fprintf(stderr, "Available chardev backend types:\n");
-+        GString *str =3D g_string_new("");
-         for (i =3D 0; i < ARRAY_SIZE(backends); i++) {
-             cd =3D backends[i];
-             if (cd) {
--                fprintf(stderr, "%s\n", ChardevBackendKind_lookup[cd->ki=
-nd]);
-+                g_string_append_printf(str, "\n%s", ChardevBackendKind_l=
-ookup[cd->kind]);
-                 if (cd->alias) {
--                    fprintf(stderr, "%s\n", cd->alias);
-+                    g_string_append_printf(str, "\n%s", cd->alias);
-                 }
-             }
-         }
--        exit(!is_help_option(qemu_opt_get(opts, "backend")));
-+
-+        error_report("Available chardev backend types: %s", str->str);
-+        g_string_free(str, true);
-+        exit(0);
-     }
+-static void baum_free(struct Chardev *chr)
++static void baum_chr_free(struct Chardev *chr)
+ {
+     BaumChardev *baum =3D (BaumChardev *)chr;
 =20
-     if (id =3D=3D NULL) {
-@@ -4262,8 +4265,8 @@ Chardev *qemu_chr_new(const char *label, const char=
- *filename)
-             qemu_chr_set_feature(chr, QEMU_CHAR_FEATURE_REPLAY);
-         }
-         if (qemu_chr_replay(chr) && chr->driver->chr_ioctl) {
--            fprintf(stderr,
--                    "Replay: ioctl is not supported for serial devices y=
-et\n");
-+            error_report("Replay: ioctl is not supported "
-+                         "for serial devices yet");
-         }
-         replay_register_char_driver(chr);
+@@ -624,7 +624,7 @@ static void baum_free(struct Chardev *chr)
      }
+ }
+=20
+-static Chardev *chr_baum_init(const CharDriver *driver,
++static Chardev *baum_chr_init(const CharDriver *driver,
+                               const char *id,
+                               ChardevBackend *backend,
+                               ChardevReturn *ret,
+@@ -670,10 +670,10 @@ static void register_types(void)
+     static const CharDriver driver =3D {
+         .instance_size =3D sizeof(BaumChardev),
+         .kind =3D CHARDEV_BACKEND_KIND_BRAILLE,
+-        .create =3D chr_baum_init,
+-        .chr_write =3D baum_write,
+-        .chr_accept_input =3D baum_accept_input,
+-        .chr_free =3D baum_free,
++        .create =3D baum_chr_init,
++        .chr_write =3D baum_chr_write,
++        .chr_accept_input =3D baum_chr_accept_input,
++        .chr_free =3D baum_chr_free,
+     };
+=20
+     register_char_driver(&driver);
 --=20
 2.11.0
