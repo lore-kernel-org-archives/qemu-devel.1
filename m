@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42470)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42560)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cP6C0-0000Tv-HJ
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 06:26:52 -0500
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cP6C5-0000dR-19
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 06:26:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cP6Bz-0006SH-7F
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 06:26:48 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47787)
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cP6C1-0006TY-3Q
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 06:26:53 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52941)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
-	id 1cP6By-0006RS-UG
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 06:26:47 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	id 1cP6C0-0006Sn-Pa
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 06:26:49 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	v05BO3pY088809
-	for <qemu-devel@nongnu.org>; Thu, 5 Jan 2017 06:26:46 -0500
+	v05BO3hZ016741
+	for <qemu-devel@nongnu.org>; Thu, 5 Jan 2017 06:26:47 -0500
 Received: from e28smtp01.in.ibm.com (e28smtp01.in.ibm.com [125.16.236.1])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 27sjbyru00-1
+	by mx0a-001b2d01.pphosted.com with ESMTP id 27sk0kem3w-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 05 Jan 2017 06:26:45 -0500
+	for <qemu-devel@nongnu.org>; Thu, 05 Jan 2017 06:26:47 -0500
 Received: from localhost
 	by e28smtp01.in.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
-	Thu, 5 Jan 2017 16:56:41 +0530
+	Thu, 5 Jan 2017 16:56:44 +0530
 From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-Date: Thu,  5 Jan 2017 16:56:14 +0530
+Date: Thu,  5 Jan 2017 16:56:16 +0530
 In-Reply-To: <1483615579-17618-1-git-send-email-nikunj@linux.vnet.ibm.com>
 References: <1483615579-17618-1-git-send-email-nikunj@linux.vnet.ibm.com>
-Message-Id: <1483615579-17618-10-git-send-email-nikunj@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 09/14] target-ppc: Add xscvdpqp instruction
+Message-Id: <1483615579-17618-12-git-send-email-nikunj@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 11/14] target-ppc: Add xsxexpdp instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,83 +40,52 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net
 Cc: qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com, nikunj@linux.vnet.ibm.com
 
-From: Bharata B Rao <bharata@linux.vnet.ibm.com>
+xsxexpdp: VSX Scalar Extract Exponent Dual Precision
 
-xscvdpqp: VSX Scalar Convert Double-Precision format to
-          Quad-Precision format
-
-Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
 Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 ---
- target-ppc/fpu_helper.c             | 10 ++++++++++
- target-ppc/helper.h                 |  1 +
- target-ppc/translate/vsx-impl.inc.c |  1 +
- target-ppc/translate/vsx-ops.inc.c  |  1 +
- 4 files changed, 13 insertions(+)
+ target-ppc/translate/vsx-impl.inc.c | 13 +++++++++++++
+ target-ppc/translate/vsx-ops.inc.c  |  4 ++++
+ 2 files changed, 17 insertions(+)
 
-diff --git a/target-ppc/fpu_helper.c b/target-ppc/fpu_helper.c
-index 05b2926..224876b 100644
---- a/target-ppc/fpu_helper.c
-+++ b/target-ppc/fpu_helper.c
-@@ -22,6 +22,15 @@
- #include "exec/exec-all.h"
- #include "internal.h"
- 
-+static inline float128 float128_snan_to_qnan(float128 x)
-+{
-+    float128 r;
-+
-+    r.high = x.high | 0x0000800000000000;
-+    r.low = x.low;
-+    return r;
-+}
-+
- #define float64_snan_to_qnan(x) ((x) | 0x0008000000000000ULL)
- #define float32_snan_to_qnan(x) ((x) | 0x00400000)
- #define float16_snan_to_qnan(x) ((x) | 0x0200)
-@@ -2701,6 +2710,7 @@ VSX_CVT_FP_TO_FP(xscvdpsp, 1, float64, float32, VsrD(0), VsrW(0), 1)
- VSX_CVT_FP_TO_FP(xscvspdp, 1, float32, float64, VsrW(0), VsrD(0), 1)
- VSX_CVT_FP_TO_FP(xvcvdpsp, 2, float64, float32, VsrD(i), VsrW(2*i), 0)
- VSX_CVT_FP_TO_FP(xvcvspdp, 2, float32, float64, VsrW(2*i), VsrD(i), 0)
-+VSX_CVT_FP_TO_FP(xscvdpqp, 1, float64, float128, VsrD(0), f128, 1)
- 
- /* VSX_CVT_FP_TO_FP_HP - VSX floating point/floating point conversion
-  *                       involving one half precision value
-diff --git a/target-ppc/helper.h b/target-ppc/helper.h
-index 889fe55..3b5d0ad 100644
---- a/target-ppc/helper.h
-+++ b/target-ppc/helper.h
-@@ -430,6 +430,7 @@ DEF_HELPER_2(xscmpuqp, void, env, i32)
- DEF_HELPER_2(xsmaxdp, void, env, i32)
- DEF_HELPER_2(xsmindp, void, env, i32)
- DEF_HELPER_2(xscvdphp, void, env, i32)
-+DEF_HELPER_2(xscvdpqp, void, env, i32)
- DEF_HELPER_2(xscvdpsp, void, env, i32)
- DEF_HELPER_2(xscvdpspn, i64, env, i64)
- DEF_HELPER_2(xscvhpdp, void, env, i32)
 diff --git a/target-ppc/translate/vsx-impl.inc.c b/target-ppc/translate/vsx-impl.inc.c
-index 16242f2..358ff4c 100644
+index d9cdaf1..b8ff31e 100644
 --- a/target-ppc/translate/vsx-impl.inc.c
 +++ b/target-ppc/translate/vsx-impl.inc.c
-@@ -808,6 +808,7 @@ GEN_VSX_HELPER_2(xsmaxdp, 0x00, 0x14, 0, PPC2_VSX)
- GEN_VSX_HELPER_2(xsmindp, 0x00, 0x15, 0, PPC2_VSX)
- GEN_VSX_HELPER_2(xscvdphp, 0x16, 0x15, 0x11, PPC2_ISA300)
- GEN_VSX_HELPER_2(xscvdpsp, 0x12, 0x10, 0, PPC2_VSX)
-+GEN_VSX_HELPER_2(xscvdpqp, 0x04, 0x1A, 0x16, PPC2_ISA300)
- GEN_VSX_HELPER_XT_XB_ENV(xscvdpspn, 0x16, 0x10, 0, PPC2_VSX207)
- GEN_VSX_HELPER_2(xscvhpdp, 0x16, 0x15, 0x10, PPC2_ISA300)
- GEN_VSX_HELPER_2(xscvspdp, 0x12, 0x14, 0, PPC2_VSX)
+@@ -1216,6 +1216,19 @@ static void gen_##name(DisasContext *ctx)                       \
+ VSX_EXTRACT_INSERT(xxextractuw)
+ VSX_EXTRACT_INSERT(xxinsertw)
+ 
++#ifdef TARGET_PPC64
++static void gen_xsxexpdp(DisasContext *ctx)
++{
++    TCGv rt = cpu_gpr[rD(ctx->opcode)];
++    if (unlikely(!ctx->vsx_enabled)) {
++        gen_exception(ctx, POWERPC_EXCP_VSXU);
++        return;
++    }
++    tcg_gen_shri_i64(rt, cpu_vsrh(xB(ctx->opcode)), 52);
++    tcg_gen_andi_i64(rt, rt, 0x7FF);
++}
++#endif
++
+ #undef GEN_XX2FORM
+ #undef GEN_XX3FORM
+ #undef GEN_XX2IFORM
 diff --git a/target-ppc/translate/vsx-ops.inc.c b/target-ppc/translate/vsx-ops.inc.c
-index 0704d7a..fcf9597 100644
+index cc5b268..2243a1f 100644
 --- a/target-ppc/translate/vsx-ops.inc.c
 +++ b/target-ppc/translate/vsx-ops.inc.c
-@@ -112,6 +112,7 @@ GEN_VSX_XFORM_300_EO(xsabsqp, 0x04, 0x19, 0x00, 0x00000001),
- GEN_VSX_XFORM_300_EO(xsnabsqp, 0x04, 0x19, 0x08, 0x00000001),
- GEN_VSX_XFORM_300_EO(xsnegqp, 0x04, 0x19, 0x10, 0x00000001),
- GEN_VSX_XFORM_300(xscpsgnqp, 0x04, 0x03, 0x00000001),
-+GEN_VSX_XFORM_300_EO(xscvdpqp, 0x04, 0x1A, 0x16, 0x00000001),
+@@ -115,6 +115,10 @@ GEN_VSX_XFORM_300(xscpsgnqp, 0x04, 0x03, 0x00000001),
+ GEN_VSX_XFORM_300_EO(xscvdpqp, 0x04, 0x1A, 0x16, 0x00000001),
+ GEN_VSX_XFORM_300_EO(xscvqpdp, 0x04, 0x1A, 0x14, 0x0),
  
++#ifdef TARGET_PPC64
++GEN_XX2FORM_EO(xsxexpdp, 0x16, 0x15, 0x00, PPC2_ISA300),
++#endif
++
  GEN_XX2FORM(xvabsdp, 0x12, 0x1D, PPC2_VSX),
  GEN_XX2FORM(xvnabsdp, 0x12, 0x1E, PPC2_VSX),
+ GEN_XX2FORM(xvnegdp, 0x12, 0x1F, PPC2_VSX),
 -- 
 2.7.4
