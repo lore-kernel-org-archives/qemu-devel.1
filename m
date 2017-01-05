@@ -1,19 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34301)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35313)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david.engraf@sysgo.com>) id 1cPDzM-0004T5-Pf
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 14:46:18 -0500
+	(envelope-from <andrew.smirnov@gmail.com>) id 1cPE7A-0006tg-JE
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 14:54:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david.engraf@sysgo.com>) id 1cPDzL-0004mY-E8
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 14:46:16 -0500
-References: <d15e8de4-f7d8-1c28-7e5e-31d0aa10819d@sysgo.com>
-	<CAFEAcA8pXJ3g5e7rw6_FAhnbZfLOOoX-gaavyzKug0y=gDCuQQ@mail.gmail.com>
-From: David Engraf <david.engraf@sysgo.com>
-Message-ID: <23f1afdd-e9cb-95de-19b9-59a81941e374@sysgo.com>
-Date: Thu, 5 Jan 2017 20:46:05 +0100
+	(envelope-from <andrew.smirnov@gmail.com>) id 1cPE79-0006yL-FX
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 14:54:20 -0500
+From: Andrey Smirnov <andrew.smirnov@gmail.com>
+Date: Thu,  5 Jan 2017 11:53:49 -0800
+Message-Id: <20170105195349.28031-1-andrew.smirnov@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8pXJ3g5e7rw6_FAhnbZfLOOoX-gaavyzKug0y=gDCuQQ@mail.gmail.com>
-Content-Type: multipart/mixed; boundary="------------FBD59632452ACC9FB9791A3D"
-Subject: Re: [Qemu-devel] [PATCH] vexpress fix flash device-width
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v2] fsl_etsec: Fix Tx BD ring wrapping handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,124 +20,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-ppc@nongnu.org
+Cc: Andrey Smirnov <andrew.smirnov@gmail.com>, Alexander Graf <agraf@suse.de>, Scott Wood <scottwood@freescale.com>, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
 
-This is a multi-part message in MIME format.
---------------FBD59632452ACC9FB9791A3D
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Current code that handles Tx buffer desciprtor ring scanning employs the
+following algorithm:
 
-Am 05.01.2017 um 19:32 schrieb Peter Maydell:
-> On 22 December 2016 at 14:02, David Engraf <david.engraf@sysgo.com> wrote:
->> The current implementation uses width = 4 and device-width = 2 for the flash
->> configuration. When using u-boot or Linux, the flash is detected as 32 x 16
->> bit, thus the sector size is doubled to 512 KB. When u-boot sends a sector
->> erase, only the first 256 KB are erased because the QEMU flash
->> implementation uses the configured sector size of 256 KB and ignores the
->> width and device-width ratio.
->>
->> This patch will change device-width to 4, thus the width and device-width
->> are equal and u-boot detects the flash as 32 x 32 bit with the correct
->> sector size of 256 KB.
->
-> Thanks for this patch. However I'm not sure it is correct, because
-> I think the real hardware does have 2x16 devices here. On real vexpress
-> TC2 if you boot Linux it detects the flash as:
-> "8000000.flash: Found 2 x16 devices at 0x0 in 32-bit bank.
-> Manufacturer ID 0x000089 Chip ID 0x008919"
->
-> So while we presumably have a QEMU bug if this isn't behaving
-> like the hardware, I don't think that changing the device-width to
-> 4 is the right fix for it. Maybe:
->  * our erase implementation is broken?
->  * one of the other parameters we use to create the flash
->    is wrong?
->  * the calculation of the erase block information that we put in
->    the flash cfi_table[] is wrong?
->
-> (Does u-boot hard-code the erase block sizes, or does
-> it read them from the CFI data? QEMU's flash doesn't have the
-> hardware's two-eraseblock-regions setup where part of the disk is
-> 256K erase-blocks and part is 64K blocks, but if u-boot doesn't
-> hardcode that it should be able to read the data from QEMU's
-> flash implementation.)
+	1. Restore current buffer descriptor pointer from TBPTRn
 
-u-boot and Linux are using the same way to detect the sector erase size:
+	2. Process current descriptor
 
-size_ratio = info->portwidth / info->chipwidth;
+	3. If current descriptor has BD_WRAP flag set set current
+	   descriptor pointer to start of the descriptor ring
 
-In our case we have a width of 4 and a device-width of 2. Thus the per 
-device sector erase size is doubled from 256K to 512K. This calculation 
-is correct because an erase command is send to both chips, each erasing 
-256K.
+	4. If current descriptor points to start of the ring exit the
+	   loop, otherwise increment current descriptor pointer and go
+	   to #2
 
-So there are two ways to fix this, depending how the QEMU property 
-"sector-length" should be interpreted. If the parameter specifies the 
-per device sector length, we have to fix the length in the erase 
-command. The other way would be to expect "sector-length" as the overall 
-sector size, which makes more sense in my eyes. Thus in our case this 
-value is halved and the result is stored in the CFI table. BTW this is 
-equal to blocks_per_device which is already calculated by the overall 
-number of blocks divided by num_devices.
+	5. Store current descriptor in TBPTRn
 
-I did a quick test with the attached patch and it was working in Linux. 
-Please have a look at the attached patch, if this is what you expect, I 
-will send a new mail with the correct description.
+The way the code is implemented results in buffer descriptor ring being
+scanned starting at offset/descriptor #0. While covering 99% of the
+cases, this algorithm becomes problematic for a number of edge cases.
 
-> Also, for patches to QEMU we need you to provide a
-> Signed-off-by: line to say that you're happy to contribute the
-> patch to QEMU. More detail about what this means here:
-> http://wiki.qemu.org/Contribute/SubmitAPatch#Patch_emails_must_include_a_Signed-off-by:_line
-> (the other details of patch formatting are mostly nice-to-haves,
-> but the s-o-by line is a hard requirement.)
+Consider the following scenario: guest OS driver initializes descriptor
+ring to N individual descriptors and starts sending data out. Depending
+on the volume of traffic and probably guest OS driver implementation it
+is possible that an edge case where a packet, spread across 2
+descriptors is placed in descriptors N - 1 and 0 in that order(it is
+easy to imagine similar examples involving more than 2 descriptors).
 
-Sorry, forgot this.
+What happens then is aforementioned algorithm starts at descriptor 0,
+sees a descriptor marked as BD_LAST, which it happily sends out as a
+separate packet(very much malformed at this point) then the iteration
+continues and the first part of the original packet is tacked to the
+next transmission which ends up being bogus as well.
 
-Thanks
-- David
+This behvaiour can be pretty reliably observed when scp'ing data from a
+guest OS via TAP interface for files larger than 160K (every time for
+700K+).
 
+This patch changes the scanning algorithm to do the following:
 
---------------FBD59632452ACC9FB9791A3D
-Content-Type: text/x-patch;
- name="fix_pflash_sector_len.patch"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
- filename="fix_pflash_sector_len.patch"
+	1. Restore "current" buffer descriptor pointer from
+	   TBPTRn
 
-diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
-index 5f0ee9d..8bb61e4 100644
---- a/hw/block/pflash_cfi01.c
-+++ b/hw/block/pflash_cfi01.c
-@@ -703,7 +703,7 @@ static void pflash_cfi01_realize(DeviceState *dev, Error **errp)
-     pflash_t *pfl = CFI_PFLASH01(dev);
-     uint64_t total_len;
-     int ret;
--    uint64_t blocks_per_device, device_len;
-+    uint64_t blocks_per_device, sector_len_per_device, device_len;
-     int num_devices;
-     Error *local_err = NULL;
+	2. If "current" descriptor does not have BD_TX_READY set, goto #6
+
+	3. Process current descriptor
+
+	4. If "current" descriptor has BD_WRAP flag set "current"
+	   descriptor pointer to start of the descriptor ring otherwise
+	   set increment "current" by the size of one descriptor
+
+	5. Goto #1
+
+	6. Save "current" buffer descriptor in TBPTRn
+
+This way we preserve the information about which descriptor was
+processed last and always start where we left off avoiding the original
+problem. On top of that, judging by the following excerpt from
+MPC8548ERM (p. 14-48):
+
+"... When the end of the TxBD ring is reached, eTSEC initializes TBPTRn
+to the value in the corresponding TBASEn. The TBPTR register is
+internally written by the eTSEC’s DMA controller during
+transmission. The pointer increments by eight (bytes) each time a
+descriptor is closed successfully by the eTSEC..."
+
+revised algorithm might also a more correct way of emulating this aspect
+of eTSEC peripheral.
+
+Cc: Alexander Graf <agraf@suse.de>
+Cc: Scott Wood <scottwood@freescale.com>
+Cc: Jason Wang <jasowang@redhat.com>
+Cc: qemu-devel@nongnu.org
+Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+---
+
+Changes since v2:
+
+	- Simplified new algorithm as per Jason Wang's suggestion
+
+ hw/net/fsl_etsec/rings.c | 18 ++++++++----------
+ 1 file changed, 8 insertions(+), 10 deletions(-)
+
+diff --git a/hw/net/fsl_etsec/rings.c b/hw/net/fsl_etsec/rings.c
+index 54c0127..d764b1c 100644
+--- a/hw/net/fsl_etsec/rings.c
++++ b/hw/net/fsl_etsec/rings.c
+@@ -358,12 +358,12 @@ void etsec_walk_tx_ring(eTSEC *etsec, int ring_nbr)
+         /* Save flags before BD update */
+         bd_flags = bd.flags;
  
-@@ -727,7 +727,8 @@ static void pflash_cfi01_realize(DeviceState *dev, Error **errp)
-      */
-     num_devices = pfl->device_width ? (pfl->bank_width / pfl->device_width) : 1;
-     blocks_per_device = pfl->nb_blocs / num_devices;
--    device_len = pfl->sector_len * blocks_per_device;
-+    sector_len_per_device = pfl->sector_len / num_devices;
-+    device_len = sector_len_per_device * blocks_per_device;
+-        if (bd_flags & BD_TX_READY) {
+-            process_tx_bd(etsec, &bd);
++        if (!(bd_flags & BD_TX_READY))
++            break;
  
-     /* XXX: to be fixed */
- #if 0
-@@ -839,8 +840,8 @@ static void pflash_cfi01_realize(DeviceState *dev, Error **errp)
-     /* Erase block region 1 */
-     pfl->cfi_table[0x2D] = blocks_per_device - 1;
-     pfl->cfi_table[0x2E] = (blocks_per_device - 1) >> 8;
--    pfl->cfi_table[0x2F] = pfl->sector_len >> 8;
--    pfl->cfi_table[0x30] = pfl->sector_len >> 16;
-+    pfl->cfi_table[0x2F] = sector_len_per_device >> 8;
-+    pfl->cfi_table[0x30] = sector_len_per_device >> 16;
+-            /* Write back BD after update */
+-            write_buffer_descriptor(etsec, bd_addr, &bd);
+-        }
++        process_tx_bd(etsec, &bd);
++        /* Write back BD after update */
++        write_buffer_descriptor(etsec, bd_addr, &bd);
  
-     /* Extended */
-     pfl->cfi_table[0x31] = 'P';
-
---------------FBD59632452ACC9FB9791A3D--
+         /* Wrap or next BD */
+         if (bd_flags & BD_WRAP) {
+@@ -371,12 +371,10 @@ void etsec_walk_tx_ring(eTSEC *etsec, int ring_nbr)
+         } else {
+             bd_addr += sizeof(eTSEC_rxtx_bd);
+         }
++    } while (TRUE);
+ 
+-    } while (bd_addr != ring_base);
+-
+-    bd_addr = ring_base;
+-
+-    /* Save the Buffer Descriptor Pointers to current bd */
++    /* Save the Buffer Descriptor Pointers to last bd that was not
++     * succesfully closed */
+     etsec->regs[TBPTR0 + ring_nbr].value = bd_addr;
+ 
+     /* Set transmit halt THLTx */
+-- 
+2.9.3
