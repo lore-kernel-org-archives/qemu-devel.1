@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34288)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34287)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cPGVM-0007oR-BG
+	(envelope-from <dgibson@ozlabs.org>) id 1cPGVM-0007oQ-B9
 	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 17:27:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cPGVJ-0000ai-8X
+	(envelope-from <dgibson@ozlabs.org>) id 1cPGVJ-0000an-9n
 	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 17:27:28 -0500
-Date: Fri, 6 Jan 2017 09:01:17 +1100
+Date: Fri, 6 Jan 2017 09:03:06 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170105220117.GE13763@umbus.fritz.box>
+Message-ID: <20170105220306.GF13763@umbus.fritz.box>
 References: <1483615579-17618-1-git-send-email-nikunj@linux.vnet.ibm.com>
-	<1483615579-17618-4-git-send-email-nikunj@linux.vnet.ibm.com>
+	<1483615579-17618-5-git-send-email-nikunj@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="8vCeF2GUdMpe9ZbK"
+	protocol="application/pgp-signature"; boundary="gneEPciiIl/aKvOT"
 Content-Disposition: inline
-In-Reply-To: <1483615579-17618-4-git-send-email-nikunj@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 03/14] target-ppc: Use float64 arg in
- helper_compute_fprf()
+In-Reply-To: <1483615579-17618-5-git-send-email-nikunj@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 04/14] target-ppc: Replace isden by
+ float64_is_zero_or_denormal
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,77 +29,53 @@ To: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 Cc: qemu-ppc@nongnu.org, rth@twiddle.net, qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com
 
 
---8vCeF2GUdMpe9ZbK
+--gneEPciiIl/aKvOT
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jan 05, 2017 at 04:56:08PM +0530, Nikunj A Dadhania wrote:
+On Thu, Jan 05, 2017 at 04:56:09PM +0530, Nikunj A Dadhania wrote:
 > From: Bharata B Rao <bharata@linux.vnet.ibm.com>
 >=20
-> Use float64 argument instead of unit64_t in helper_compute_fprf()
-> This allows code in helper_compute_fprf() to be reused later to
-> work with float128 argument too.
+> Replace isden() by float64_is_zero_or_denormal() so that code in
+> helper_compute_fprf() can be reused to work with float128 argument.
 >=20
 > Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
 > Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 
-Uh.. how can this possibly be correct, without updating the callers of
-helper_compute_fprf()?
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 
 > ---
->  target-ppc/fpu_helper.c | 16 +++++++---------
->  1 file changed, 7 insertions(+), 9 deletions(-)
+>  target-ppc/fpu_helper.c | 11 +----------
+>  1 file changed, 1 insertion(+), 10 deletions(-)
 >=20
 > diff --git a/target-ppc/fpu_helper.c b/target-ppc/fpu_helper.c
-> index 1ccd5e6..4da991a 100644
+> index 4da991a..5a7aa75 100644
 > --- a/target-ppc/fpu_helper.c
 > +++ b/target-ppc/fpu_helper.c
-> @@ -66,23 +66,21 @@ static inline int ppc_float64_get_unbiased_exp(float6=
-4 f)
->      return ((f >> 52) & 0x7FF) - 1023;
+> @@ -47,15 +47,6 @@ uint32_t helper_float64_to_float32(CPUPPCState *env, u=
+int64_t arg)
+>      return f.l;
 >  }
 > =20
-> -void helper_compute_fprf(CPUPPCState *env, uint64_t arg)
-> +void helper_compute_fprf(CPUPPCState *env, float64 arg)
+> -static inline int isden(float64 d)
+> -{
+> -    CPU_DoubleU u;
+> -
+> -    u.d =3D d;
+> -
+> -    return ((u.ll >> 52) & 0x7FF) =3D=3D 0;
+> -}
+> -
+>  static inline int ppc_float32_get_unbiased_exp(float32 f)
 >  {
-> -    CPU_DoubleU farg;
->      int isneg;
->      int fprf;
-> =20
-> -    farg.ll =3D arg;
-> -    isneg =3D float64_is_neg(farg.d);
-> -    if (unlikely(float64_is_any_nan(farg.d))) {
-> -        if (float64_is_signaling_nan(farg.d, &env->fp_status)) {
-> +    isneg =3D float64_is_neg(arg);
-> +    if (unlikely(float64_is_any_nan(arg))) {
-> +        if (float64_is_signaling_nan(arg, &env->fp_status)) {
->              /* Signaling NaN: flags are undefined */
->              fprf =3D 0x00;
->          } else {
->              /* Quiet NaN */
->              fprf =3D 0x11;
->          }
-> -    } else if (unlikely(float64_is_infinity(farg.d))) {
-> +    } else if (unlikely(float64_is_infinity(arg))) {
->          /* +/- infinity */
->          if (isneg) {
->              fprf =3D 0x09;
-> @@ -90,7 +88,7 @@ void helper_compute_fprf(CPUPPCState *env, uint64_t arg)
->              fprf =3D 0x05;
->          }
->      } else {
-> -        if (float64_is_zero(farg.d)) {
-> +        if (float64_is_zero(arg)) {
->              /* +/- zero */
->              if (isneg) {
->                  fprf =3D 0x12;
-> @@ -98,7 +96,7 @@ void helper_compute_fprf(CPUPPCState *env, uint64_t arg)
+>      return ((f >> 23) & 0xFF) - 127;
+> @@ -96,7 +87,7 @@ void helper_compute_fprf(CPUPPCState *env, float64 arg)
 >                  fprf =3D 0x02;
 >              }
 >          } else {
-> -            if (isden(farg.d)) {
-> +            if (isden(arg)) {
+> -            if (isden(arg)) {
+> +            if (float64_is_zero_or_denormal(arg)) {
 >                  /* Denormalized numbers */
 >                  fprf =3D 0x10;
 >              } else {
@@ -110,25 +86,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---8vCeF2GUdMpe9ZbK
+--gneEPciiIl/aKvOT
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJYbsItAAoJEGw4ysog2bOSAmQP/2PhR2n7tCMIjgREt95HMddr
-sTEtMPYO+VgpBWPBB7D9b5dbCciSu7DsLq1GwHm/FKnksN1t2OEq8mhq53xkpvzQ
-bL3PV1EVUktmHojHh+xTOQ10kAVGqx0MoyVyN6liM3ieTIs2y2BJw6j2WW1/VF0Y
-LDBThphIf69ICt9hCk3fMsmeMXF59PoaerXDvR8hP3urmL6DVk427WhCkv3A2+8G
-a8itpfQWSyuEqKpVA+C9p3sPXBKf6vxZ8n9zuZFs6i4l2jgIje1xUFfc4djbnpuV
-6kD6SLiLsF3zP/e6Hg+117Q3RPgt2hMO1tBu+uRVpTeepPvSkVxBvAHJtpi216vB
-iUmYuWBqBKu4p0JvY/nsj/4fyhueSq8MbJnqfI3IZZmINUTQBmyWz7+KPU2OasqP
-Jo4C2nHymuPP200EWyUlsupvzhzp/ME9XdIuwucJSJ1RkVc9BbHZpexyYh0Xu4JR
-e2nk/uFD3s8u7uNQitUGPyJZ5iwptrt1S8PwBWQevSgzEFyC+8M1mmmfp77fvNps
-bNStvnJkj3QdQS9imZirigdGDLDKhG0DxZiJceSwXDfaq2JdYhHYkJM9ogolGFW6
-L3HO3fQlCsYSrd4odzygwSxjW/HpPSFJxJrRNmz6eRBIamtTTYQJThriPsFMdJ/Z
-5obnyJP6DgbJKIYaRWY6
-=EALb
+iQIcBAEBCAAGBQJYbsKaAAoJEGw4ysog2bOShNwQAJyQXVn1ij/Ct+W2eySHdlsq
+e0tPymsE58aixO05cdAHH9ucJyzFZsN32nUjtjfG+Of16SzpsYJcJ5RK1JbFBspa
+b9LPeUqs0PAqOdtM/p9DFPq4/5J1y5nparhWm8LTOefI49Lgk1U6Tqh+G2k8NND8
+5i17IO/7LE3hnpa+47KuZ5e2xZ3bG6Re5nPaHyDpM7Mx9fLkGyOzS2lh/0PtUbr8
+CaxGtxeFQNjcQOjSMtErqgG5rnYXTxXs+HMuh6tg1P8SVpOTMP15mnboGt+WXkXO
+xkinHQyiRiHL9sTCAbdWdZZDBnc76GUTKV4iw97AY1uwQOYec8kxSC6DfcB+OUfd
+eD9QC4d+bQNgLumd3iy2mW3vMHksu3MdX76PEEYrRicK9oZkk/S8lnzAkMZsiKYZ
+Pgq73iicpxKXHCfn4jaYAZUvLc0tUFghcdlbbJVpwwPPvZ99lZWGx6MafjXDH8Cr
+dQFo6NSVBTgXUMjvSQ2LMLMscTX83HjsDdfy9WvZWElOu/1phJUYgbX/UmRLe6CB
+dnpfFYD3ybHKyoiVYsumLEUDbfEQdmZgq2Py2NF+zEmS2Lc4aOMHfZaubnZwHCmG
++WuYwd2X1Btlgh1Yr+0PrOzRZfFKwhxgO1xtoH7VQx6Jp67efMsEb0A722cu8kRD
+NKek1E9myC7QtxKcLDDg
+=UXpp
 -----END PGP SIGNATURE-----
 
---8vCeF2GUdMpe9ZbK--
+--gneEPciiIl/aKvOT--
