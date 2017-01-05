@@ -1,32 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46996)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49061)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cP39m-0005rU-Rg
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 03:12:19 -0500
+	(envelope-from <a175818323@gmail.com>) id 1cP3OV-0000Xi-8e
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 03:27:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cP39i-0005jD-So
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 03:12:18 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:32786)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cP39i-0005iy-Na
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 03:12:14 -0500
-Message-ID: <1483603931.3966.12.camel@redhat.com>
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu, 05 Jan 2017 09:12:11 +0100
-In-Reply-To: <87y3yqil7s.fsf@mail.parknet.co.jp>
-References: <87inqavlzj.fsf@mail.parknet.co.jp>
-	<feca54b3-9c38-4ce7-4edc-b1f9f88fb7a1@reactos.org>
-	<87fuletg61.fsf@mail.parknet.co.jp>
-	<f8044f23-52ef-89f8-5ca7-b27de2989cc7@reactos.org>
-	<8737h9xidn.fsf@mail.parknet.co.jp>
-	<87mvfhw3i0.fsf_-_@mail.parknet.co.jp>
-	<1483519820.5670.45.camel@redhat.com>
-	<46bcf40d-7c47-733b-44e3-b5a38527524e@reactos.org>
-	<87y3yqil7s.fsf@mail.parknet.co.jp>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3] ps2: Fix lost scancodes by recent
- changes
+	(envelope-from <a175818323@gmail.com>) id 1cP3OU-0003ni-Gv
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 03:27:31 -0500
+Received: from mail-lf0-x22b.google.com ([2a00:1450:4010:c07::22b]:33016)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <a175818323@gmail.com>)
+	id 1cP3OU-0003mg-A8
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 03:27:30 -0500
+Received: by mail-lf0-x22b.google.com with SMTP id k86so30666930lfi.0
+	for <qemu-devel@nongnu.org>; Thu, 05 Jan 2017 00:27:28 -0800 (PST)
+MIME-Version: 1.0
+From: Bob Chen <a175818323@gmail.com>
+Date: Thu, 5 Jan 2017 16:27:26 +0800
+Message-ID: <CAMxP3BTmayVS5VHYm6iXgZFetiv8YAPnyd_1-6p_q33gDLTrEQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: [Qemu-devel] Live migration + cpu/mem hotplug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,37 +26,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>
-Cc: =?ISO-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>, qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Do, 2017-01-05 at 06:11 +0900, OGAWA Hirofumi wrote:
-> Herv=C3=A9 Poussineau <hpoussin@reactos.org> writes:
->=20
-> > Le 04/01/2017 =C3=A0 09:50, Gerd Hoffmann a =C3=A9crit :
-> >> On Mi, 2016-12-28 at 04:55 +0900, OGAWA Hirofumi wrote:
-> >>> With "ps2: use QEMU qcodes instead of scancodes", key handling was
-> >>> changed to qcode base. But all scancodes are not converted to new one=
-.
-> >>>
-> >>> This adds some missing qcodes/scancodes what I found in using.
-> >>
-> >> Added to ui queue.
-> >
-> > Hi Gerd,
-> >
-> > Your pull request (patch 01/11) contains v2 of this patch (which is inc=
-omplete).
-> > I've only reviewed v3, which is complete.
->=20
-> Yes, please use v3. Here is copy&paste, FWIW.
+Hi,
 
-Please don't send new versions of patches as reply.  That confuses
-various patch management tools, they are considered being part of the
-discussion then.  This is how the reviewed-by tag ended up being
-attributed to the wrong patch version.
+According to the docs, the destination Qemu must have the exactly same
+parameters as the source one. So if the source has just finished cpu or
+memory hotplug, what would the dest's parameters be like?
 
-Have a look at http://patchew.org/QEMU/ for example, the patches sent as
-reply don't show up there, so they are not tested automatically.
+Does DIMM device, or logically QOM object, have to be reflected on the new
+command-line parameters?
 
-thanks,
-  Gerd
+
+
+Regards, Bob
