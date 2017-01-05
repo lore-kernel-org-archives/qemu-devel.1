@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44012)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50315)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cP8iy-0007jt-5Z
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 09:09:01 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cP9Fs-0005rh-Uk
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 09:43:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cP8iw-00015A-Vl
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 09:09:00 -0500
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <20161129113334.605-1-pbonzini@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <7bd41b3e-f9e3-b508-219c-f79d47fe1b56@redhat.com>
-Date: Thu, 5 Jan 2017 15:08:52 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1cP9Fr-0004XW-Ua
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 09:43:01 -0500
+Received: from mail-ua0-x22b.google.com ([2607:f8b0:400c:c08::22b]:36105)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cP9Fr-0004XO-Q3
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 09:42:59 -0500
+Received: by mail-ua0-x22b.google.com with SMTP id 88so374389492uaq.3
+	for <qemu-devel@nongnu.org>; Thu, 05 Jan 2017 06:42:59 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20161129113334.605-1-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH for-2.9] block: get rid of
- bdrv_io_unplugged_begin/end
+In-Reply-To: <20170102124424.1031-1-kirkseraph@gmail.com>
+References: <20170102124424.1031-1-kirkseraph@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 5 Jan 2017 14:42:38 +0000
+Message-ID: <CAFEAcA-9aYRHcn1dAD0xuR9H8sJ__HOK9ayWmsK7H-Cr2rj4SQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [RESEND PATCH] target-arm/abi32: check for
+ segfault in do_kernel_trap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,143 +29,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>
+To: Seraphime Kirkovski <kirkseraph@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>, qemu-arm <qemu-arm@nongnu.org>
 
-
-
-On 29/11/2016 12:33, Paolo Bonzini wrote:
-> bdrv_io_plug and bdrv_io_unplug are only called (via their
-> BlockBackend equivalents) after starting asynchronous I/O.
-> bdrv_drain is not going to be called while they are running,
-> because---even if a coroutine runs for some reason---it will
-> only drain in the next iteration of the event loop through
-> bdrv_co_yield_to_drain.
-> 
-> So this mechanism is unnecessary, get rid of it.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+On 2 January 2017 at 12:44, Seraphime Kirkovski <kirkseraph@gmail.com> wrote:
+> Currently, the cmpxchg implementation tests whether the destination address
+> is readable:
+>   - if it is, we read the value and continue with the comparison
+>   - if isn't, i.e. access to addr would segfault, we assume that src != dest
+>     rather than queuing a SIGSEGV.
+>
+> The same problem exists in the case where src == dest: the code doesn't
+> check whether put_user_u32 succeeds.
+>
+> This fixes both problems by sending a SIGSEGV when the destination address
+> is inaccessible.
+>
+> Signed-off-by: Seraphime Kirkovski <kirkseraph@gmail.com>
 > ---
->  block/io.c                | 41 ++---------------------------------------
->  include/block/block.h     |  2 --
->  include/block/block_int.h |  3 +--
->  3 files changed, 3 insertions(+), 43 deletions(-)
-> 
-> diff --git a/block/io.c b/block/io.c
-> index 4f00562..c42b34a 100644
-> --- a/block/io.c
-> +++ b/block/io.c
-> @@ -228,9 +228,7 @@ void bdrv_drained_begin(BlockDriverState *bs)
->          bdrv_parent_drained_begin(bs);
->      }
->  
-> -    bdrv_io_unplugged_begin(bs);
->      bdrv_drain_recurse(bs);
-> -    bdrv_io_unplugged_end(bs);
->  }
->  
->  void bdrv_drained_end(BlockDriverState *bs)
-> @@ -302,7 +300,6 @@ void bdrv_drain_all_begin(void)
->  
->          aio_context_acquire(aio_context);
->          bdrv_parent_drained_begin(bs);
-> -        bdrv_io_unplugged_begin(bs);
->          aio_disable_external(aio_context);
->          aio_context_release(aio_context);
->  
-> @@ -347,7 +344,6 @@ void bdrv_drain_all_end(void)
->  
->          aio_context_acquire(aio_context);
->          aio_enable_external(aio_context);
-> -        bdrv_io_unplugged_end(bs);
->          bdrv_parent_drained_end(bs);
->          aio_context_release(aio_context);
->      }
-> @@ -2650,7 +2646,7 @@ void bdrv_io_plug(BlockDriverState *bs)
->          bdrv_io_plug(child->bs);
->      }
->  
-> -    if (bs->io_plugged++ == 0 && bs->io_plug_disabled == 0) {
-> +    if (bs->io_plugged++ == 0) {
->          BlockDriver *drv = bs->drv;
->          if (drv && drv->bdrv_io_plug) {
->              drv->bdrv_io_plug(bs);
-> @@ -2663,7 +2659,7 @@ void bdrv_io_unplug(BlockDriverState *bs)
->      BdrvChild *child;
->  
->      assert(bs->io_plugged);
-> -    if (--bs->io_plugged == 0 && bs->io_plug_disabled == 0) {
-> +    if (--bs->io_plugged == 0) {
->          BlockDriver *drv = bs->drv;
->          if (drv && drv->bdrv_io_unplug) {
->              drv->bdrv_io_unplug(bs);
-> @@ -2674,36 +2670,3 @@ void bdrv_io_unplug(BlockDriverState *bs)
->          bdrv_io_unplug(child->bs);
->      }
->  }
-> -
-> -void bdrv_io_unplugged_begin(BlockDriverState *bs)
-> -{
-> -    BdrvChild *child;
-> -
-> -    if (bs->io_plug_disabled++ == 0 && bs->io_plugged > 0) {
-> -        BlockDriver *drv = bs->drv;
-> -        if (drv && drv->bdrv_io_unplug) {
-> -            drv->bdrv_io_unplug(bs);
-> -        }
-> -    }
-> -
-> -    QLIST_FOREACH(child, &bs->children, next) {
-> -        bdrv_io_unplugged_begin(child->bs);
-> -    }
-> -}
-> -
-> -void bdrv_io_unplugged_end(BlockDriverState *bs)
-> -{
-> -    BdrvChild *child;
-> -
-> -    assert(bs->io_plug_disabled);
-> -    QLIST_FOREACH(child, &bs->children, next) {
-> -        bdrv_io_unplugged_end(child->bs);
-> -    }
-> -
-> -    if (--bs->io_plug_disabled == 0 && bs->io_plugged > 0) {
-> -        BlockDriver *drv = bs->drv;
-> -        if (drv && drv->bdrv_io_plug) {
-> -            drv->bdrv_io_plug(bs);
-> -        }
-> -    }
-> -}
-> diff --git a/include/block/block.h b/include/block/block.h
-> index 49bb0b2..8b0dcda 100644
-> --- a/include/block/block.h
-> +++ b/include/block/block.h
-> @@ -526,8 +526,6 @@ int bdrv_probe_geometry(BlockDriverState *bs, HDGeometry *geo);
->  
->  void bdrv_io_plug(BlockDriverState *bs);
->  void bdrv_io_unplug(BlockDriverState *bs);
-> -void bdrv_io_unplugged_begin(BlockDriverState *bs);
-> -void bdrv_io_unplugged_end(BlockDriverState *bs);
->  
->  /**
->   * bdrv_drained_begin:
-> diff --git a/include/block/block_int.h b/include/block/block_int.h
-> index 83a423c..15aa718 100644
-> --- a/include/block/block_int.h
-> +++ b/include/block/block_int.h
-> @@ -526,9 +526,8 @@ struct BlockDriverState {
->      uint64_t write_threshold_offset;
->      NotifierWithReturn write_threshold_notifier;
->  
-> -    /* counters for nested bdrv_io_plug and bdrv_io_unplugged_begin */
-> +    /* counter for nested bdrv_io_plug */
->      unsigned io_plugged;
-> -    unsigned io_plug_disabled;
->  
->      int quiesce_counter;
->  };
-> 
+>  linux-user/main.c | 24 +++++++++++++++++++-----
+>  1 file changed, 19 insertions(+), 5 deletions(-)
+>
+> diff --git a/linux-user/main.c b/linux-user/main.c
+> index 75b199f..376b0c3 100644
+> --- a/linux-user/main.c
+> +++ b/linux-user/main.c
+> @@ -503,6 +503,7 @@ do_kernel_trap(CPUARMState *env)
+>      uint32_t addr;
+>      uint32_t cpsr;
+>      uint32_t val;
+> +    target_siginfo_t info;
+>
+>      switch (env->regs[15]) {
+>      case 0xffff0fa0: /* __kernel_memory_barrier */
+> @@ -516,13 +517,16 @@ do_kernel_trap(CPUARMState *env)
+>          start_exclusive();
+>          cpsr = cpsr_read(env);
+>          addr = env->regs[2];
+> -        /* FIXME: This should SEGV if the access fails.  */
+> -        if (get_user_u32(val, addr))
+> -            val = ~env->regs[0];
+> +        if (get_user_u32(val, addr)) {
+> +            env->exception.vaddress = addr;
+> +            goto segv;
+> +        }
+>          if (val == env->regs[0]) {
+>              val = env->regs[1];
+> -            /* FIXME: Check for segfaults.  */
+> -            put_user_u32(val, addr);
+> +            if (put_user_u32(val, addr)) {
+> +                env->exception.vaddress = addr;
+> +                goto segv;
+> +            }
+>              env->regs[0] = 0;
+>              cpsr |= CPSR_C;
+>          } else {
+> @@ -551,6 +555,16 @@ do_kernel_trap(CPUARMState *env)
+>      env->regs[15] = addr;
+>
+>      return 0;
+> +
+> +segv:
+> +    end_exclusive();
+> +    info.si_signo = TARGET_SIGSEGV;
+> +    info.si_errno = 0;
+> +    /* XXX: check env->error_code */
+> +    info.si_code = TARGET_SEGV_MAPERR;
+> +    info._sifields._sigfault._addr = env->exception.vaddress;
+> +    queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
+> +    return 0;
 
-Ping?
+If you compare what happens with this segv code with
+what happens for the segvs detected inside
+arm_kernel_cmpxchg64_helper(), there's a difference.
+With this code we will queue the signal and then return,
+skipping the code which updates env->regs[15] and env->thumb.
+The existing codepath for cmpxchg64 doesn't skip that code.
+The effect is that for cmpxchg64 the SEGV signal handler
+will see a PC pointing at the call into the kernel commpage,
+whereas for this code it will see the PC actually in the
+kernel commpage.
 
-Paolo
+I'm not sure which of these options is the best choice,
+but I do think we should be consistent.
+
+>  }
+>
+>  void cpu_loop(CPUARMState *env)
+> --
+> 2.10.2
+
+thanks
+-- PMM
