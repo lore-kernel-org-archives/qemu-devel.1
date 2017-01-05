@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59127)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34089)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jitendra.kolhe@hpe.com>) id 1cP26H-0006PE-K8
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 02:04:38 -0500
+	(envelope-from <jitendra.kolhe@hpe.com>) id 1cP2NK-0001SV-OF
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 02:22:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jitendra.kolhe@hpe.com>) id 1cP26E-0000Jb-DP
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 02:04:37 -0500
-Received: from g9t5009.houston.hpe.com ([15.241.48.73]:51411)
+	(envelope-from <jitendra.kolhe@hpe.com>) id 1cP2NF-00007L-O0
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 02:22:14 -0500
+Received: from g4t3427.houston.hpe.com ([15.241.140.73]:8571)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <jitendra.kolhe@hpe.com>)
-	id 1cP26E-0000IP-6w
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 02:04:34 -0500
-References: <1463570440-29685-1-git-send-email-jitendra.kolhe@hpe.com>
-	<F2CBF3009FA73547804AE4C663CAB28E3C34811E@shsmsx102.ccr.corp.intel.com>
-	<ebc6d79a-833d-5413-8617-b3252bc45a07@redhat.com>
-	<F2CBF3009FA73547804AE4C663CAB28E3C34BC76@shsmsx102.ccr.corp.intel.com>
+	id 1cP2NF-00006w-In
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 02:22:09 -0500
 From: Jitendra Kolhe <jitendra.kolhe@hpe.com>
-Message-ID: <89e9f19f-1249-d45a-af19-39e7db248737@hpe.com>
-Date: Thu, 5 Jan 2017 12:34:17 +0530
-MIME-Version: 1.0
-In-Reply-To: <F2CBF3009FA73547804AE4C663CAB28E3C34BC76@shsmsx102.ccr.corp.intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 0/4] migration: skip scanning and
- migrating ram pages released by virtio-balloon driver.
+Date: Thu,  5 Jan 2017 12:54:02 +0530
+Message-Id: <1483601042-6435-1-git-send-email-jitendra.kolhe@hpe.com>
+Subject: [Qemu-devel] [PATCH RFC] mem-prealloc: Reduce large guest start-up
+ and migration time.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,140 +23,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Li, Liang Z" <liang.z.li@intel.com>, David Hildenbrand <david@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "crosthwaite.peter@gmail.com" <crosthwaite.peter@gmail.com>, "ehabkost@redhat.com" <ehabkost@redhat.com>, "quintela@redhat.com" <quintela@redhat.com>, "simhan@hpe.com" <simhan@hpe.com>, "JBottomley@Odin.com" <JBottomley@Odin.com>, "armbru@redhat.com" <armbru@redhat.com>, "lcapitulino@redhat.com" <lcapitulino@redhat.com>, "renganathan.meenakshisundaram@hpe.com" <renganathan.meenakshisundaram@hpe.com>, "borntraeger@de.ibm.com" <borntraeger@de.ibm.com>, "mst@redhat.com" <mst@redhat.com>, "mohan_parthasarathy@hpe.com" <mohan_parthasarathy@hpe.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "amit.shah@redhat.com" <amit.shah@redhat.com>, "den@openvz.org" <den@openvz.org>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, peter.maydell@linaro.org, armbru@redhat.com, kwolf@redhat.com, eblake@redhat.com, mohan_parthasarathy@hpe.com, renganathan.meenakshisundaram@hpe.com, jitendra.kolhe@hpe.com
 
-On 1/5/2017 7:03 AM, Li, Liang Z wrote:
->> Am 23.12.2016 um 03:50 schrieb Li, Liang Z:
->>>> While measuring live migration performance for qemu/kvm guest, it wa=
-s
->>>> observed that the qemu doesn=E2=80=99t maintain any intelligence for=
- the
->>>> guest ram pages released by the guest balloon driver and treat such
->>>> pages as any other normal guest ram pages. This has direct impact on
->>>> overall migration time for the guest which has released (ballooned o=
-ut)
->> memory to the host.
->>>>
->>>> In case of large systems, where we can configure large guests with
->>>> 1TB and with considerable amount of memory released by balloon drive=
-r
->>>> to the host, the migration time gets worse.
->>>>
->>>> The solution proposed below is local to qemu (and does not require
->>>> any modification to Linux kernel or any guest driver). We have
->>>> verified the fix for large guests =3D1TB on HPE Superdome X (which c=
-an
->>>> support up to 240 cores and 12TB of memory).
->>>>
->>>> During live migration, as part of first iteration in
->>>> ram_save_iterate() -> ram_find_and_save_block () will try to migrate
->>>> ram pages even if they are released by vitrio-balloon driver (balloo=
-n
->>>> inflate). Although these pages which are returned to the host by
->>>> virtio-balloon driver are zero pages, the migration algorithm will
->>>> still end up scanning the entire page
->>>> ram_find_and_save_block() ->
->>>> ram_save_page()/ram_save_compressed_page() ->
->>>> save_zero_page() -> is_zero_range(). We also end-up sending header
->>>> information over network for these pages during migration. This adds
->>>> to the total migration time.
->>>>
->>>> The solution creates a balloon bitmap ramblock as a part of
->>>> virtio-balloon device initialization. The bits in the balloon bitmap
->>>> represent a guest ram page of size 1UL << VIRTIO_BALLOON_PFN_SHIFT
->> or
->>>> 4K. If TARGET_PAGE_BITS <=3D VIRTIO_BALLOON_PFN_SHIFT, ram_addr
->> offset
->>>> for the dirty page which is used by dirty page bitmap during
->>>> migration is checked against the balloon bitmap as is, if the bit is
->>>> set in the balloon bitmap, the corresponding ram page will be
->>>> excluded from scanning and sending header information during
->>>> migration. In case TARGET_PAGE_BITS > VIRTIO_BALLOON_PFN_SHIFT
->> for a
->>>> given dirty page ram_addr, all sub-pages of 1UL <<
->>>> VIRTIO_BALLOON_PFN_SHIFT size should be ballooned out to avoid zero
->> page scan and sending header information.
->>>>
->>>> The bitmap represents entire guest ram memory till max configured
->> memory.
->>>> Guest ram pages claimed by the virtio-balloon driver will be
->>>> represented by 1 in the bitmap. Since the bitmap is maintained as a
->>>> ramblock, it=E2=80=99s migrated to target as part migration=E2=80=99=
-s ram iterative
->>>> and ram complete phase. So that substituent migrations from the targ=
-et
->> can continue to use optimization.
->>>>
->>>> A new migration capability called skip-balloon is introduced. The
->>>> user can disable the capability in cases where user does not expect
->>>> much benefit or in case the migration is from an older version.
->>>>
->>>> During live migration setup the optimization can be set to disabled =
-state if .
->>>> no virtio-balloon device is initialized.
->>>> . skip-balloon migration capability is disabled.
->>>> . If the guest virtio-balloon driver has not set
->>>> VIRTIO_BALLOON_F_MUST_TELL_HOST
->>>>   flag. Which means the guest may start using a ram pages freed by
->>>> guest balloon
->>>>   driver, even before the host/qemu is aware of it. In such case, th=
-e
->>>>   optimization is disabled so that the ram pages that are being used=
- by the
->>>>   guest will continue to be scanned and migrated.
->>>>
->>>> Balloon bitmap ramblock size is set to zero if the optimization is
->>>> disabled, to avoid overhead of migrating the bitmap. If the bitmap i=
-s
->>>> not migrated to the target, the destination starts with a fresh
->>>> bitmap and tracks the ballooning operation thereafter.
->>>>
->>>
->>> I have a better way to get rid of the bitmap.
->>> We should not maintain the inflating pages in the bitmap, instead, we
->>> can get them from the guest if it's needed, just like what we did for
->>> the guest's unused pages. Then we can combine the inflating page info
->>> with the unused page info together, and skip them during live migrati=
-on.
->>>
->>
->> If we want to actually host enforce (disallow) access to inflated page=
-s, having
->=20
-> Is that a new feature?
->=20
->> such a bitmap in QEMU is required. Getting them from the guest doesn't
->> make sense in that context anymore.
->=20
-> Even a bitmap is required, we should avoid to send it in the stop & cop=
-y stage.
->=20
+Using "-mem-prealloc" option for a very large guest leads to huge guest
+start-up and migration time. This is because with "-mem-prealloc" option
+qemu tries to map every guest page (create address translations), and
+make sure the pages are available during runtime. virsh/libvirt by
+default, seems to use "-mem-prealloc" option in case the guest is
+configured to use huge pages. The patch tries to map all guest pages
+simultaneously by spawning multiple threads. Given the problem is more
+prominent for large guests, the patch limits the changes to the guests
+of at-least 64GB of memory size. Currently limiting the change to QEMU
+library functions on POSIX compliant host only, as we are not sure if
+the problem exists on win32. Below are some stats with "-mem-prealloc"
+option for guest configured to use huge pages.
 
-How about using both ways? If the guest is capable to share ballooned out=
- page
-information using unused page framework use it. If the guest is not capab=
-le we
-maintain a bitmap in qemu. This way we can use advantage of both approach=
-es.=20
-1. In case the guest is capable - we avoid bitmap send in stop and copy s=
-tage.
-2. In case the guest is not capable - host can still disallow migration o=
-f ballooned=20
-out pages.
-But since this approach may add a bit of code churn, we recommend to go w=
-ith maintaining=20
-the bitmap in qemu at first phase (existing implementation) and then enha=
-nce it later=20
-to use unused page approach (to query guest) based on the guest capabilit=
-y.=20
+------------------------------------------------------------------------
+Idle Guest      | Start-up time | Migration time
+------------------------------------------------------------------------
+Guest stats with 2M HugePage usage - single threaded (existing code)
+------------------------------------------------------------------------
+64 Core - 4TB   | 54m11.796s    | 75m43.843s
+64 Core - 1TB   | 8m56.576s     | 14m29.049s
+64 Core - 256GB | 2m11.245s     | 3m26.598s
+------------------------------------------------------------------------
+Guest stats with 2M HugePage usage - map guest pages using 8 threads
+------------------------------------------------------------------------
+64 Core - 4TB   | 5m1.027s      | 34m10.565s
+64 Core - 1TB   | 1m10.366s     | 8m28.188s
+64 Core - 256GB | 0m19.040s     | 2m10.148s
+-----------------------------------------------------------------------
+Guest stats with 2M HugePage usage - map guest pages using 16 threads
+-----------------------------------------------------------------------
+64 Core - 4TB   | 1m58.970s     | 31m43.400s
+64 Core - 1TB   | 0m39.885s     | 7m55.289s
+64 Core - 256GB | 0m11.960s     | 2m0.135s
+-----------------------------------------------------------------------
 
-Thanks,
-- Jitendra
+Signed-off-by: Jitendra Kolhe <jitendra.kolhe@hpe.com>
+---
+ util/oslib-posix.c | 64 +++++++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 61 insertions(+), 3 deletions(-)
 
-> Thanks!
-> Liang
->>
->> Thanks,
->> David
->>
+diff --git a/util/oslib-posix.c b/util/oslib-posix.c
+index f631464..a8bd7c2 100644
+--- a/util/oslib-posix.c
++++ b/util/oslib-posix.c
+@@ -55,6 +55,13 @@
+ #include "qemu/error-report.h"
+ #endif
+ 
++#define PAGE_TOUCH_THREAD_COUNT 8
++typedef struct {
++    char *addr;
++    uint64_t numpages;
++    uint64_t hpagesize;
++} PageRange;
++
+ int qemu_get_thread_id(void)
+ {
+ #if defined(__linux__)
+@@ -323,6 +330,52 @@ static void sigbus_handler(int signal)
+     siglongjmp(sigjump, 1);
+ }
+ 
++static void *do_touch_pages(void *arg)
++{
++    PageRange *range = (PageRange *)arg;
++    char *start_addr = range->addr;
++    uint64_t numpages = range->numpages;
++    uint64_t hpagesize = range->hpagesize;
++    uint64_t i = 0;
++
++    for (i = 0; i < numpages; i++) {
++        memset(start_addr + (hpagesize * i), 0, 1);
++    }
++    qemu_thread_exit(NULL);
++
++    return NULL;
++}
++
++static int touch_all_pages(char *area, size_t hpagesize, size_t numpages)
++{
++    QemuThread page_threads[PAGE_TOUCH_THREAD_COUNT];
++    PageRange page_range[PAGE_TOUCH_THREAD_COUNT];
++    uint64_t    numpage_per_thread, size_per_thread;
++    int         i = 0, tcount = 0;
++
++    numpage_per_thread = (numpages / PAGE_TOUCH_THREAD_COUNT);
++    size_per_thread = (hpagesize * numpage_per_thread);
++    for (i = 0; i < (PAGE_TOUCH_THREAD_COUNT - 1); i++) {
++        page_range[i].addr = area;
++        page_range[i].numpages = numpage_per_thread;
++        page_range[i].hpagesize = hpagesize;
++
++        qemu_thread_create(page_threads + i, "touch_pages",
++                           do_touch_pages, (page_range + i),
++                           QEMU_THREAD_JOINABLE);
++        tcount++;
++        area += size_per_thread;
++        numpages -= numpage_per_thread;
++    }
++    for (i = 0; i < numpages; i++) {
++        memset(area + (hpagesize * i), 0, 1);
++    }
++    for (i = 0; i < tcount; i++) {
++        qemu_thread_join(page_threads + i);
++    }
++    return 0;
++}
++
+ void os_mem_prealloc(int fd, char *area, size_t memory, Error **errp)
+ {
+     int ret;
+@@ -353,9 +406,14 @@ void os_mem_prealloc(int fd, char *area, size_t memory, Error **errp)
+         size_t hpagesize = qemu_fd_getpagesize(fd);
+         size_t numpages = DIV_ROUND_UP(memory, hpagesize);
+ 
+-        /* MAP_POPULATE silently ignores failures */
+-        for (i = 0; i < numpages; i++) {
+-            memset(area + (hpagesize * i), 0, 1);
++        /* touch pages simultaneously for memory >= 64G */
++        if (memory < (1ULL << 36)) {
++            /* MAP_POPULATE silently ignores failures */
++            for (i = 0; i < numpages; i++) {
++                memset(area + (hpagesize * i), 0, 1);
++            }
++        } else {
++            touch_all_pages(area, hpagesize, numpages);
+         }
+     }
+ 
+-- 
+1.8.3.1
