@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36052)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37492)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kevin.tian@intel.com>) id 1cOznL-0002Wl-GI
-	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 23:36:56 -0500
+	(envelope-from <bounces@canonical.com>) id 1cOzvq-0002Hy-OS
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 23:45:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kevin.tian@intel.com>) id 1cOznI-00027p-40
-	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 23:36:55 -0500
-Received: from mga01.intel.com ([192.55.52.88]:37047)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kevin.tian@intel.com>)
-	id 1cOznH-00026m-Nj
-	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 23:36:52 -0500
-From: "Tian, Kevin" <kevin.tian@intel.com>
-Date: Thu, 5 Jan 2017 04:36:45 +0000
-Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D190BF8192@SHSMSX101.ccr.corp.intel.com>
-References: <1482400096-23078-1-git-send-email-peterx@redhat.com>
-	<b2b1424c-1bd0-00ea-8d14-f935b8901629@redhat.com>
-	<20161222110412.GB26435@pxdev.xzpeter.org>
-	<6798718b-3949-032f-0e5f-fa6b2e2d83fb@redhat.com>
-	<20161223032601.GC26435@pxdev.xzpeter.org>
-	<f37cf386-8fe4-ded8-0341-dc765882cf72@redhat.com>
-	<20170103142035.7c946abf@t450s.home>
-In-Reply-To: <20170103142035.7c946abf@t450s.home>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <bounces@canonical.com>) id 1cOzvn-0006IR-FH
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 23:45:42 -0500
+Received: from indium.canonical.com ([91.189.90.7]:34654)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cOzvn-0006Gu-0R
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 23:45:39 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cOzvl-0008F7-NO
+	for <qemu-devel@nongnu.org>; Thu, 05 Jan 2017 04:45:37 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 9FE052E80C0
+	for <qemu-devel@nongnu.org>; Thu,  5 Jan 2017 04:45:37 +0000 (UTC)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3] intel_iommu: allow dynamic switch of
- IOMMU region
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 05 Jan 2017 04:37:42 -0000
+From: Paul Goyette <1654137@bugs.launchpad.net>
+Reply-To: Bug 1654137 <1654137@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <20170105043743.14700.719.malonedeb@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1654137] [NEW] Ctrl-A b not working in 2.8.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,71 +35,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>, Jason Wang <jasowang@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>, "Lan, Tianyu" <tianyu.lan@intel.com>, "mst@redhat.com" <mst@redhat.com>, "jan.kiszka@siemens.com" <jan.kiszka@siemens.com>, "bd.aviv@gmail.com" <bd.aviv@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org
 
-PiBGcm9tOiBBbGV4IFdpbGxpYW1zb24gW21haWx0bzphbGV4LndpbGxpYW1zb25AcmVkaGF0LmNv
-bV0NCj4gU2VudDogV2VkbmVzZGF5LCBKYW51YXJ5IDA0LCAyMDE3IDU6MjEgQU0NCj4gDQo+IE9u
-IE1vbiwgMjYgRGVjIDIwMTYgMTA6NDU6NTUgKzA4MDANCj4gSmFzb24gV2FuZyA8amFzb3dhbmdA
-cmVkaGF0LmNvbT4gd3JvdGU6DQo+IA0KPiA+IE9uIDIwMTblubQxMuaciDIz5pelIDExOjI2LCBQ
-ZXRlciBYdSB3cm90ZToNCj4gPiA+IE9uIFRodSwgRGVjIDIyLCAyMDE2IGF0IDA3OjM0OjEwUE0g
-KzA4MDAsIEphc29uIFdhbmcgd3JvdGU6DQo+ID4gPj4NCj4gPiA+PiBPbiAyMDE25bm0MTLmnIgy
-MuaXpSAxOTowNCwgUGV0ZXIgWHUgd3JvdGU6DQo+ID4gPj4+IE9uIFRodSwgRGVjIDIyLCAyMDE2
-IGF0IDA1OjUyOjU4UE0gKzA4MDAsIEphc29uIFdhbmcgd3JvdGU6DQo+ID4gPj4+PiBPbiAyMDE2
-5bm0MTLmnIgyMuaXpSAxNzo0OCwgUGV0ZXIgWHUgd3JvdGU6DQo+ID4gPj4+Pj4gICAvKiBIYW5k
-bGUgVHJhbnNsYXRpb24gRW5hYmxlL0Rpc2FibGUgKi8NCj4gPiA+Pj4+PiAgIHN0YXRpYyB2b2lk
-IHZ0ZF9oYW5kbGVfZ2NtZF90ZShJbnRlbElPTU1VU3RhdGUgKnMsIGJvb2wgZW4pDQo+ID4gPj4+
-Pj4gICB7DQo+ID4gPj4+Pj4gKyAgICBpZiAocy0+ZG1hcl9lbmFibGVkID09IGVuKSB7DQo+ID4g
-Pj4+Pj4gKyAgICAgICAgcmV0dXJuOw0KPiA+ID4+Pj4+ICsgICAgfQ0KPiA+ID4+Pj4+ICsNCj4g
-PiA+Pj4+PiAgICAgICBWVERfRFBSSU5URihDU1IsICJUcmFuc2xhdGlvbiBFbmFibGUgJXMiLCAo
-ZW4gPyAib24iIDogIm9mZiIpKTsNCj4gPiA+Pj4+PiAgICAgICBpZiAoZW4pIHsNCj4gPiA+Pj4+
-PiBAQCAtMTE5Niw2ICsxMjM3LDggQEAgc3RhdGljIHZvaWQgdnRkX2hhbmRsZV9nY21kX3RlKElu
-dGVsSU9NTVVTdGF0ZSAqcywNCj4gYm9vbCBlbikNCj4gPiA+Pj4+PiAgICAgICAgICAgLyogT2sg
-LSByZXBvcnQgYmFjayB0byBkcml2ZXIgKi8NCj4gPiA+Pj4+PiAgICAgICAgICAgdnRkX3NldF9j
-bGVhcl9tYXNrX2xvbmcocywgRE1BUl9HU1RTX1JFRywgVlREX0dTVFNfVEVTLCAwKTsNCj4gPiA+
-Pj4+PiAgICAgICB9DQo+ID4gPj4+Pj4gKw0KPiA+ID4+Pj4+ICsgICAgdnRkX3N3aXRjaF9hZGRy
-ZXNzX3NwYWNlX2FsbChzLCBlbik7DQo+ID4gPj4+Pj4gICB9DQo+ID4gPj4+PiBXZSBtYXkgbmVl
-ZCBzb21ldGhpbmcgbGlrZSBub3RpZmllciBoZXJlIHRvIHRlbGwgZS5nIHZob3N0IHRvIHN0b3Ag
-ZGV2aWNlDQo+ID4gPj4+PiBJT1RMQi4gKFNpbmNlIGl0J3MgbGlrZWx5IHRoaXMgc2VyaWVzIHdl
-cmUgYXBwbGllZCBhZnRlciBkZXZpY2UgSU9UTEINCj4gPiA+Pj4+IHBhdGNoZXMpDQo+ID4gPj4+
-IFllcywgSSBtaXNzZWQgdmhvc3QgY2FzZS4NCj4gPiA+Pj4NCj4gPiA+Pj4gVG8gbm90aWZ5IHZo
-b3N0LCBJTU8gd2Ugc2hvdWxkIGJlIGFibGUgdG8gdXNlIG1lbW9yeSBsaXN0ZW5lcnMganVzdA0K
-PiA+ID4+PiBsaWtlIGhvdyB2ZmlvIGRldmljZXMgZG8gKHBsZWFzZSByZWZlciB0byB2ZmlvX21l
-bW9yeV9saXN0ZW5lcikuDQo+ID4gPj4gSnVzdCBmb3Igc3dpdGNoaW5nPyBUaGlzIHNlZW1zIGFu
-IG92ZXJraWxsIHNpbmNlIHdlIGRvbid0IGRlcGVuZHMgb24gaXQgZm9yDQo+ID4gPj4gYWxsIG90
-aGVyIHRoaW5ncy4gR3Vlc3Qgc2hvdWxkIHNldHVwIGNvcnJlY3QgbWFwcGluZ3MgYnkgZXhwbGlj
-aXRseSBub3RpZnkNCj4gPiA+PiBkZXZpY2UgSU9UTEIuIEEgcXVpY2sgZ2xhbmNlIGF0IEFUUyBz
-cGVjLCBmb3IgZW5hYmxpbmcgYW5kIGRpc2FibGluZywgbG9va3MNCj4gPiA+PiBsaWtlIGl0IHdh
-cyBkb25lIHRocm91Z2ggZW5hYmxlIGJpdCBvZiBBU1RjdGwgaW5zdGVhZCBvZiBoZXJlLg0KPiA+
-ID4+DQo+ID4gPj4gU28gd2UgYXJlIHByb2JhYmx5IG9rIGhlcmUgOikNCj4gPiA+IFNvIHdlIG5l
-ZWQgYSBtb3JlIGdlbmVyYWwgd2F5IHRvIG5vdGlmeSBBVFMgYWJvdXQgdGhpcywgcmlnaHQ/IChl
-LmcuLA0KPiA+ID4gZm9yIGZ1dHVyZSBkZXZpY2VzIHRoYXQgc3VwcG9ydCBBVFMgYXMgd2VsbCwg
-bm90IG9ubHkgdmhvc3QpDQo+ID4NCj4gPiBZZXMsIGlmIHdlIHdhbnQgdG8gbWFrZSBBVFMgdmlz
-aWJsZSB0byBndWVzdC4gQnV0IGxvb2tzIGxpa2UgaXQgbmVlZHMNCj4gPiBtb3JlIGUuZyBWRklP
-IHN1cHBvcnQgZm9yIGRldmljZSBJT1RMQiBpbnZhbGlkYXRpb24uDQo+IA0KPiBBVFMgaXMgYWxy
-ZWFkeSB2aXNpYmxlIGZvciB2ZmlvLXBjaSBkZXZpY2VzLCBpdCB3aWxsIGJlIGVuYWJsZWQgaWYg
-dGhlDQo+IGhvc3QgSU9NTVUgc3VwcG9ydHMgQVRTLiAgSWYgdGhlIGhvc3QgSU9NTVUgZG9lcyBu
-b3Qgc3VwcG9ydCBBVFMsDQo+IGVuYWJsaW5nIGl0IG9uIHRoZSBkZXZpY2UgYnkgdGhlIGd1ZXN0
-IHdpbGwgZ2VuZXJhdGUgdW5zdXBwb3J0ZWQNCj4gcmVxdWVzdHMuICBUaGlzIGlzIHlldCBhbm90
-aGVyIGNhc2UsIGFsb25nIHdpdGggYWRkcmVzcyB3aWR0aCwgd2hlcmUNCj4gaXQncyBwb3RlbnRp
-YWxseSByZWFsbHkgY29tcGxpY2F0ZWQgYW5kIG5vdCBhbWVuYWJsZSB0byBob3RwbHVnIHRvIGhh
-dmUNCj4gYSBndWVzdCBJT01NVS4gIEFGQUlDVCwgdGhlcmUncyBub3RoaW5nIHRvIGJlIGFkZGVk
-IHRvIHZmaW8gZm9yIGRldmljZQ0KPiBpb3RsYiBpbnZhbGlkYXRpb25zLCB0aGlzIG9jY3VycyBh
-dXRvbWF0aWNhbGx5IGJldHdlZW4gdGhlIGhvc3QgSU9NTVUNCj4gYW5kIGRldmljZSB3aGVuIGEg
-RE1BIHVubWFwIG9jY3Vycy4gIFRoYW5rcywNCj4gDQoNClRydWUgZm9yIGN1cnJlbnQgdXNhZ2Ug
-LSB1c2Ugb25seSAybmQgbGV2ZWwgdHJhbnNsYXRpb24gZm9yIERNQSBwcm90ZWN0aW9uDQpwdXJw
-b3NlIChJT1ZBLT5QQSkuIFRoZXJlIGlzIGEgcG90ZW50aWFsIHJlcXVpcmVtZW50IG9mIGhhbmRs
-aW5nIGlvdGxiDQppbnZhbGlkYXRpb24gdGhyb3VnaCBWRklPIGluIGZ1dHVyZSB0aG91Z2ggLSB3
-aGVuIGVuYWJsaW5nIHNoYXJlZCB2aXJ0dWFsDQpNZW1vcnkgKFNWTSkgY2FwYWJpbGl0eSBpbiBW
-TSB3aGVyZSBwaHlzaWNhbCBJT01NVSB3aWxsIGJlIGNvbmZpZ3VyZWQNCmluIGEgbmVzdGVkIHRy
-YW5zbGF0aW9uIG1vZGUsIHdpdGggMXN0IGxldmVsIHRyYW5zbGF0aW9uIGZvciBHVkEtPkdQQSBh
-bmQNCnRoZSAybmQgbGV2ZWwgdHJhbnNsYXRpb24gZm9yIEdQQS0+SFBBLiBJdCdzIGRlc2lnbmVk
-IGluIGEgd2F5IHRoYXQgZ3Vlc3QgDQoxc3QgbGV2ZWwgdHJhbnNsYXRpb24gdGFibGUgaXMgZGly
-ZWN0bHkgbGlua2VkIHRvIGNvbnRleHQgZW50cnkgKGFsbCB0aGUgYWRkcmVzc2VzIA0KaW4gdGhh
-dCB0YWJsZSBhcmUgaW50ZXJwcmV0ZWQgYXMgR1BBKSwgdy9vIG5lZWQgb2Ygc2hhZG93aW5nIGxp
-a2UgZm9yIDJuZA0KbGV2ZWwuIEluIHN1Y2ggY2FzZSBhbnkgSU9UTEIgaW52YWxpZGF0aW9uIHJl
-bGF0ZWQgdG8gMXN0IGxldmVsIHRyYW5zbGF0aW9uIA0KbmVlZCBiZSBmb3J3YXJkZWQgZnJvbSBR
-ZW11IHZJT01NVSB0byBob3N0IElPTU1VIGRyaXZlciwgdGhyb3VnaCBWRklPLg0KDQpOb3QgYW4g
-aW1tZWRpYXRlIHdvcnJ5IChub3QgZm9yIHRoaXMgcGF0Y2gpIGJ1dCBhIHRoaW5nIHdlIHdpbGwg
-bmVlZCB0aGluayANCmxhdGVyIHdoZW4gYWRkaW5nIFNWTSBzdXBwb3J0LiANCg0KVGhhbmtzDQpL
-ZXZpbg0K
+Public bug reported:
+
+With a recent update from 2.7.0 to 2.8.0 I have discovered that I can no
+longer send a "break" to the VM.  Ctrl-A b is simply ignored.  Other
+Ctrl-A sequences seem to work correctly.
+
+This is on a NetBSD amd64 system, version 7.99.53, and qemu was
+installed on this system from source.
+
+Reverting to the previous install restores "break" capability.
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1654137
+
+Title:
+  Ctrl-A b not working in 2.8.0
+
+Status in QEMU:
+  New
+
+Bug description:
+  With a recent update from 2.7.0 to 2.8.0 I have discovered that I can
+  no longer send a "break" to the VM.  Ctrl-A b is simply ignored.
+  Other Ctrl-A sequences seem to work correctly.
+
+  This is on a NetBSD amd64 system, version 7.99.53, and qemu was
+  installed on this system from source.
+
+  Reverting to the previous install restores "break" capability.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1654137/+subscriptions
