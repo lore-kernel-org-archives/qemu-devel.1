@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43764)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44542)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pisa@cmp.felk.cvut.cz>) id 1cPHGI-0002BW-Mc
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 18:16:00 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cPHLv-0006um-8e
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 18:21:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pisa@cmp.felk.cvut.cz>) id 1cPHGH-0007be-1G
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 18:15:58 -0500
-Received: from smtp7.web4u.cz ([81.91.87.87]:57198 helo=mx-8.mail.web4u.cz)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pisa@cmp.felk.cvut.cz>)
-	id 1cPHGG-0007bG-M6
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 18:15:56 -0500
-From: pisa@cmp.felk.cvut.cz
-Date: Fri,  6 Jan 2017 00:11:28 +0100
-Message-Id: <5c34c5c7143076b342065ec32bfcbfd958e36b13.1483655894.git.pisa@cmp.felk.cvut.cz>
-In-Reply-To: <cover.1483655893.git.pisa@cmp.felk.cvut.cz>
-References: <cover.1483655893.git.pisa@cmp.felk.cvut.cz>
-In-Reply-To: <cover.1483655893.git.pisa@cmp.felk.cvut.cz>
-References: <cover.1483655893.git.pisa@cmp.felk.cvut.cz>
-Subject: [Qemu-devel] [PATCH 6/6] CAN bus MIOe-3680 PCI (dual SJA1000
- channel) emulation added.
+	(envelope-from <dgibson@ozlabs.org>) id 1cPHLr-0001Ji-CD
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 18:21:47 -0500
+Date: Fri, 6 Jan 2017 10:15:33 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170105231533.GJ13763@umbus.fritz.box>
+References: <1483653417-17439-1-git-send-email-hpoussin@reactos.org>
+	<1483653417-17439-4-git-send-email-hpoussin@reactos.org>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="n8884J15jRwcBTvu"
+Content-Disposition: inline
+In-Reply-To: <1483653417-17439-4-git-send-email-hpoussin@reactos.org>
+Subject: Re: [Qemu-devel] [PATCH v2 3/4] prep: add IBM RS/6000 7020 (40p)
+ memory controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,356 +25,341 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Konrad Frederic <fred.konrad@greensocs.com>, Deniz Eren <deniz.eren@icloud.com>, Oliver Hartkopp <socketcan@hartkopp.net>
+To: =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>
+Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Thomas Huth <thuth@redhat.com>, Giancarlo Teodori <gteodori@gmail.com>
 
-From: Deniz Eren <deniz.eren@icloud.com>
 
----
- hw/can/Makefile.objs      |   1 +
- hw/can/can_mioe3680_pci.c | 325 ++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 326 insertions(+)
- create mode 100644 hw/can/can_mioe3680_pci.c
+--n8884J15jRwcBTvu
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/hw/can/Makefile.objs b/hw/can/Makefile.objs
-index d654ca3..36930bc 100644
---- a/hw/can/Makefile.objs
-+++ b/hw/can/Makefile.objs
-@@ -5,3 +5,4 @@ common-obj-$(CONFIG_CAN_SJA1000) += can_sja1000.o
- common-obj-$(CONFIG_CAN_PCI) += can_pci.o
- common-obj-$(CONFIG_CAN_PCI) += can_kvaser_pci.o
- common-obj-$(CONFIG_CAN_PCI) += can_pcm3680_pci.o
-+common-obj-$(CONFIG_CAN_PCI) += can_mioe3680_pci.o
-diff --git a/hw/can/can_mioe3680_pci.c b/hw/can/can_mioe3680_pci.c
-new file mode 100644
-index 0000000..afcea53
---- /dev/null
-+++ b/hw/can/can_mioe3680_pci.c
-@@ -0,0 +1,325 @@
-+/*
-+ * MIOe-3680 PCI CAN device (SJA1000 based) emulation
-+ *
-+ * Copyright (c) 2016 Deniz Eren (deniz.eren@icloud.com)
-+ *
-+ * Based on Kvaser PCI CAN device (SJA1000 based) emulation implemented by
-+ * Jin Yang and Pavel Pisa
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/event_notifier.h"
-+#include "qemu/thread.h"
-+#include "qemu/sockets.h"
-+#include "qemu/error-report.h"
-+#include "sysemu/char.h"
-+#include "hw/hw.h"
-+#include "hw/pci/pci.h"
-+#include "can/can_emu.h"
-+
-+#include "can_sja1000.h"
-+
-+#define TYPE_CAN_PCI_DEV "mioe3680_pci"
-+
-+#define MIOe3680_PCI_DEV(obj) \
-+    OBJECT_CHECK(Mioe3680PCIState, (obj), TYPE_CAN_PCI_DEV)
-+
-+#ifndef MIOe3680_PCI_VENDOR_ID1
-+#define MIOe3680_PCI_VENDOR_ID1     0x13fe    /* the PCI device and vendor IDs */
-+#endif
-+
-+#ifndef MIOe3680_PCI_DEVICE_ID1
-+#define MIOe3680_PCI_DEVICE_ID1     0xc302
-+#endif
-+
-+#define MIOe3680_PCI_SJA_RANGE     0x800
-+
-+#define MIOe3680_PCI_BYTES_PER_SJA 0x80
-+
-+typedef struct Mioe3680PCIState {
-+    /*< private >*/
-+    PCIDevice       dev;
-+    /*< public >*/
-+    MemoryRegion    sja_io[2];
-+
-+    CanSJA1000State sja_state[2];
-+    qemu_irq        irq;
-+
-+    char            *model; /* The model that support, only SJA1000 now. */
-+    char            *canbus[2];
-+    char            *host[2];
-+} Mioe3680PCIState;
-+
-+static void mioe3680_pci_irq_raise(void *opaque)
-+{
-+    Mioe3680PCIState *d = (Mioe3680PCIState *)opaque;
-+
-+    qemu_irq_raise(d->irq);
-+}
-+
-+static void mioe3680_pci_irq_lower(void *opaque)
-+{
-+    Mioe3680PCIState *d = (Mioe3680PCIState *)opaque;
-+
-+    qemu_irq_lower(d->irq);
-+}
-+
-+static void
-+mioe3680_pci_reset(void *opaque)
-+{
-+    Mioe3680PCIState *d = (Mioe3680PCIState *)opaque;
-+    CanSJA1000State *s1 = &d->sja_state[0];
-+    CanSJA1000State *s2 = &d->sja_state[1];
-+
-+    can_sja_hardware_reset(s1);
-+    can_sja_hardware_reset(s2);
-+}
-+
-+static uint64_t mioe3680_pci_sja1_io_read(void *opaque, hwaddr addr, unsigned size)
-+{
-+    Mioe3680PCIState *d = opaque;
-+    CanSJA1000State *s = &d->sja_state[0];
-+
-+    if (addr >= MIOe3680_PCI_BYTES_PER_SJA) {
-+        return 0;
-+    }
-+
-+    return can_sja_mem_read(s, addr >> 2, size);
-+}
-+
-+static void mioe3680_pci_sja1_io_write(void *opaque, hwaddr addr, uint64_t data,
-+                             unsigned size)
-+{
-+    Mioe3680PCIState *d = opaque;
-+    CanSJA1000State *s = &d->sja_state[0];
-+
-+    if (addr >= MIOe3680_PCI_BYTES_PER_SJA) {
-+        return;
-+    }
-+
-+    can_sja_mem_write(s, addr >> 2, data, size);
-+}
-+
-+static uint64_t mioe3680_pci_sja2_io_read(void *opaque, hwaddr addr, unsigned size)
-+{
-+    Mioe3680PCIState *d = opaque;
-+    CanSJA1000State *s = &d->sja_state[1];
-+
-+    if (addr >= MIOe3680_PCI_BYTES_PER_SJA) {
-+        return 0;
-+    }
-+
-+    return can_sja_mem_read(s, addr >> 2, size);
-+}
-+
-+static void mioe3680_pci_sja2_io_write(void *opaque, hwaddr addr, uint64_t data,
-+                             unsigned size)
-+{
-+    Mioe3680PCIState *d = opaque;
-+    CanSJA1000State *s = &d->sja_state[1];
-+
-+    if (addr >= MIOe3680_PCI_BYTES_PER_SJA) {
-+        return;
-+    }
-+
-+    can_sja_mem_write(s, addr >> 2, data, size);
-+}
-+
-+static const MemoryRegionOps mioe3680_pci_sja1_io_ops = {
-+    .read = mioe3680_pci_sja1_io_read,
-+    .write = mioe3680_pci_sja1_io_write,
-+    .endianness = DEVICE_LITTLE_ENDIAN,
-+    .impl = {
-+        .min_access_size = 1,
-+        .max_access_size = 1,
-+    },
-+};
-+
-+static const MemoryRegionOps mioe3680_pci_sja2_io_ops = {
-+    .read = mioe3680_pci_sja2_io_read,
-+    .write = mioe3680_pci_sja2_io_write,
-+    .endianness = DEVICE_LITTLE_ENDIAN,
-+    .impl = {
-+        .min_access_size = 1,
-+        .max_access_size = 1,
-+    },
-+};
-+
-+static int mioe3680_pci_init(PCIDevice *pci_dev)
-+{
-+    Mioe3680PCIState *d = MIOe3680_PCI_DEV(pci_dev);
-+    CanSJA1000State *s1 = &d->sja_state[0];
-+    CanSJA1000State *s2 = &d->sja_state[1];
-+    uint8_t *pci_conf;
-+    CanBusState *can_bus1;
-+    CanBusState *can_bus2;
-+
-+    if (d->model) {
-+        if (strncmp(d->model, "pcican-s", 256)) { /* for security reason */
-+            error_report("Can't create CAN device, "
-+                         "the model %s is not supported now.\n", d->model);
-+            exit(1);
-+        }
-+    }
-+
-+    can_bus1 = can_bus_find_by_name(d->canbus[0], true);
-+    if (can_bus1 == NULL) {
-+        error_report("Cannot create can find/allocate CAN bus #1\n");
-+        exit(1);
-+    }
-+
-+    can_bus2 = can_bus_find_by_name(d->canbus[1], true);
-+    if (can_bus2 == NULL) {
-+        error_report("Cannot create can find/allocate CAN bus #2\n");
-+        exit(1);
-+    }
-+
-+    if (d->host[0] != NULL) {
-+        if (can_bus_connect_to_host_device(can_bus1, d->host[0]) < 0) {
-+            error_report("Cannot connect CAN bus to host #1 device \"%s\"\n", d->host[0]);
-+            exit(1);
-+        }
-+    }
-+
-+    if (d->host[1] != NULL) {
-+        if (can_bus_connect_to_host_device(can_bus2, d->host[1]) < 0) {
-+            error_report("Cannot connect CAN bus to host #2 device \"%s\"\n", d->host[1]);
-+            exit(1);
-+        }
-+    }
-+
-+    pci_conf = pci_dev->config;
-+    pci_conf[PCI_INTERRUPT_PIN] = 0x01; /* interrupt pin A */
-+
-+    d->irq = pci_allocate_irq(&d->dev);
-+
-+    can_sja_init(s1, mioe3680_pci_irq_raise, mioe3680_pci_irq_lower, d);
-+    can_sja_init(s2, mioe3680_pci_irq_raise, mioe3680_pci_irq_lower, d);
-+
-+    qemu_register_reset(mioe3680_pci_reset, d);
-+
-+    if (can_sja_connect_to_bus(s1, can_bus1) < 0) {
-+        error_report("can_sja_connect_to_bus failed\n");
-+        exit(1);
-+    }
-+
-+    if (can_sja_connect_to_bus(s2, can_bus2) < 0) {
-+        error_report("can_sja_connect_to_bus failed\n");
-+        exit(1);
-+    }
-+
-+    memory_region_init_io(&d->sja_io[0], OBJECT(d), &mioe3680_pci_sja1_io_ops, d,
-+                          "mioe3680_pci-sja1", MIOe3680_PCI_SJA_RANGE/2);
-+    memory_region_init_io(&d->sja_io[1], OBJECT(d), &mioe3680_pci_sja2_io_ops, d,
-+                          "mioe3680_pci-sja2", MIOe3680_PCI_SJA_RANGE/2);
-+
-+    pci_register_bar(&d->dev, /*BAR*/ 0, PCI_BASE_ADDRESS_SPACE_IO, &d->sja_io[0]);
-+    pci_register_bar(&d->dev, /*BAR*/ 1, PCI_BASE_ADDRESS_SPACE_IO, &d->sja_io[1]);
-+
-+    return 0;
-+}
-+
-+static void mioe3680_pci_exit(PCIDevice *pci_dev)
-+{
-+    Mioe3680PCIState *d = MIOe3680_PCI_DEV(pci_dev);
-+    CanSJA1000State *s1 = &d->sja_state[0];
-+    CanSJA1000State *s2 = &d->sja_state[1];
-+
-+    can_sja_disconnect(s1);
-+    can_sja_disconnect(s2);
-+
-+    qemu_unregister_reset(mioe3680_pci_reset, d);
-+
-+    /*
-+     * region d->sja_io is destroyed by QOM now
-+     */
-+    /* memory_region_destroy(&d->sja_io[0]); */
-+    /* memory_region_destroy(&d->sja_io[1]); */
-+
-+    can_sja_exit(s1);
-+    can_sja_exit(s2);
-+
-+    qemu_free_irq(d->irq);
-+}
-+
-+static const VMStateDescription vmstate_mioe3680_pci = {
-+    .name = "mioe3680_pci",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .minimum_version_id_old = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_PCI_DEVICE(dev, Mioe3680PCIState),
-+        VMSTATE_STRUCT(sja_state[0], Mioe3680PCIState, 0, vmstate_can_sja, CanSJA1000State),
-+        VMSTATE_STRUCT(sja_state[1], Mioe3680PCIState, 0, vmstate_can_sja, CanSJA1000State),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static void qdev_mioe3680_pci_reset(DeviceState *dev)
-+{
-+    Mioe3680PCIState *d = MIOe3680_PCI_DEV(dev);
-+    mioe3680_pci_reset(d);
-+}
-+
-+static Property mioe3680_pci_properties[] = {
-+    DEFINE_PROP_STRING("canbus1",   Mioe3680PCIState, canbus[0]),
-+    DEFINE_PROP_STRING("canbus2",   Mioe3680PCIState, canbus[1]),
-+    DEFINE_PROP_STRING("host1",  Mioe3680PCIState, host[0]),
-+    DEFINE_PROP_STRING("host2",  Mioe3680PCIState, host[1]),
-+    DEFINE_PROP_STRING("model", Mioe3680PCIState, model),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void mioe3680_pci_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
-+
-+    k->init = mioe3680_pci_init;
-+    k->exit = mioe3680_pci_exit;
-+    k->vendor_id = MIOe3680_PCI_VENDOR_ID1;
-+    k->device_id = MIOe3680_PCI_DEVICE_ID1;
-+    k->revision = 0x00;
-+    k->class_id = 0x000c09;
-+    k->subsystem_vendor_id = MIOe3680_PCI_VENDOR_ID1;
-+    k->subsystem_id = MIOe3680_PCI_DEVICE_ID1;
-+//  k->is_bridge = 0;
-+//  k->is_express = 0;
-+    dc->desc = "Mioe3680 PCICANx";
-+    dc->props = mioe3680_pci_properties;
-+    dc->vmsd = &vmstate_mioe3680_pci;
-+    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
-+    dc->reset = qdev_mioe3680_pci_reset;
-+}
-+
-+static const TypeInfo mioe3680_pci_info = {
-+    .name          = TYPE_CAN_PCI_DEV,
-+    .parent        = TYPE_PCI_DEVICE,
-+    .instance_size = sizeof(Mioe3680PCIState),
-+    .class_init    = mioe3680_pci_class_init,
-+};
-+
-+static void mioe3680_pci_register_types(void)
-+{
-+    type_register_static(&mioe3680_pci_info);
-+}
-+
-+type_init(mioe3680_pci_register_types)
--- 
-1.9.1
+On Thu, Jan 05, 2017 at 10:56:56PM +0100, Herv=E9 Poussineau wrote:
+> Signed-off-by: Herv=E9 Poussineau <hpoussin@reactos.org>
+
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+
+> ---
+>  default-configs/ppc-softmmu.mak |   1 +
+>  hw/ppc/Makefile.objs            |   1 +
+>  hw/ppc/rs6000_mc.c              | 232 ++++++++++++++++++++++++++++++++++=
+++++++
+>  hw/ppc/trace-events             |   7 ++
+>  4 files changed, 241 insertions(+)
+>  create mode 100644 hw/ppc/rs6000_mc.c
+>=20
+> diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmm=
+u.mak
+> index d4d0f9b..e567658 100644
+> --- a/default-configs/ppc-softmmu.mak
+> +++ b/default-configs/ppc-softmmu.mak
+> @@ -47,3 +47,4 @@ CONFIG_LIBDECNUMBER=3Dy
+>  # For PReP
+>  CONFIG_MC146818RTC=3Dy
+>  CONFIG_ISA_TESTDEV=3Dy
+> +CONFIG_RS6000_MC=3Dy
+> diff --git a/hw/ppc/Makefile.objs b/hw/ppc/Makefile.objs
+> index db72297..0012934 100644
+> --- a/hw/ppc/Makefile.objs
+> +++ b/hw/ppc/Makefile.objs
+> @@ -17,6 +17,7 @@ obj-y +=3D ppc4xx_pci.o
+>  # PReP
+>  obj-$(CONFIG_PREP) +=3D prep.o
+>  obj-$(CONFIG_PREP) +=3D prep_systemio.o
+> +obj-${CONFIG_RS6000_MC} +=3D rs6000_mc.o
+>  # OldWorld PowerMac
+>  obj-$(CONFIG_MAC) +=3D mac_oldworld.o
+>  # NewWorld PowerMac
+> diff --git a/hw/ppc/rs6000_mc.c b/hw/ppc/rs6000_mc.c
+> new file mode 100644
+> index 0000000..b613565
+> --- /dev/null
+> +++ b/hw/ppc/rs6000_mc.c
+> @@ -0,0 +1,232 @@
+> +/*
+> + * QEMU RS/6000 memory controller
+> + *
+> + * Copyright (c) 2017 Herv=E9 Poussineau
+> + *
+> + * This program is free software: you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License as published by
+> + * the Free Software Foundation, either version 2 of the License, or
+> + * (at your option) version 3 or any later version.
+> + *
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + * GNU General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU General Public License
+> + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "hw/isa/isa.h"
+> +#include "exec/address-spaces.h"
+> +#include "hw/boards.h"
+> +#include "qapi/error.h"
+> +#include "trace.h"
+> +
+> +#define TYPE_RS6000MC "rs6000-mc"
+> +#define RS6000MC_DEVICE(obj) \
+> +    OBJECT_CHECK(RS6000MCState, (obj), TYPE_RS6000MC)
+> +
+> +typedef struct RS6000MCState {
+> +    ISADevice parent_obj;
+> +    /* see US patent 5,684,979 for details (expired 2001-11-04) */
+> +    uint32_t ram_size;
+> +    bool autoconfigure;
+> +    MemoryRegion simm[6];
+> +    unsigned int simm_size[6];
+> +    uint32_t end_address[8];
+> +    uint8_t port0820_index;
+> +    PortioList portio;
+> +} RS6000MCState;
+> +
+> +/* P0RT 0803 -- SIMM ID Register (32/8 MB) (Read Only) */
+> +
+> +static uint32_t rs6000mc_port0803_read(void *opaque, uint32_t addr)
+> +{
+> +    RS6000MCState *s =3D opaque;
+> +    uint32_t val =3D 0;
+> +    int socket;
+> +
+> +    /* (1 << socket) indicates 32 MB SIMM at given socket */
+> +    for (socket =3D 0; socket < 6; socket++) {
+> +        if (s->simm_size[socket] =3D=3D 32) {
+> +            val |=3D (1 << socket);
+> +        }
+> +    }
+> +
+> +    trace_rs6000mc_id_read(addr, val);
+> +    return val;
+> +}
+> +
+> +/* PORT 0804 -- SIMM Presence Register (Read Only) */
+> +
+> +static uint32_t rs6000mc_port0804_read(void *opaque, uint32_t addr)
+> +{
+> +    RS6000MCState *s =3D opaque;
+> +    uint32_t val =3D 0xff;
+> +    int socket;
+> +
+> +    /* (1 << socket) indicates SIMM absence at given socket */
+> +    for (socket =3D 0; socket < 6; socket++) {
+> +        if (s->simm_size[socket]) {
+> +            val &=3D ~(1 << socket);
+> +        }
+> +    }
+> +    s->port0820_index =3D 0;
+> +
+> +    trace_rs6000mc_presence_read(addr, val);
+> +    return val;
+> +}
+> +
+> +/* Memory Controller Size Programming Register */
+> +
+> +static uint32_t rs6000mc_port0820_read(void *opaque, uint32_t addr)
+> +{
+> +    RS6000MCState *s =3D opaque;
+> +    uint32_t val =3D s->end_address[s->port0820_index] & 0x1f;
+> +    s->port0820_index =3D (s->port0820_index + 1) & 7;
+> +    trace_rs6000mc_size_read(addr, val);
+> +    return val;
+> +}
+> +
+> +static void rs6000mc_port0820_write(void *opaque, uint32_t addr, uint32_=
+t val)
+> +{
+> +    RS6000MCState *s =3D opaque;
+> +    uint8_t socket =3D val >> 5;
+> +    uint32_t end_address =3D val & 0x1f;
+> +
+> +    trace_rs6000mc_size_write(addr, val);
+> +    s->end_address[socket] =3D end_address;
+> +    if (socket > 0 && socket < 7) {
+> +        if (s->simm_size[socket - 1]) {
+> +            uint32_t size;
+> +            uint32_t start_address =3D 0;
+> +            if (socket > 1) {
+> +                start_address =3D s->end_address[socket - 1];
+> +            }
+> +
+> +            size =3D end_address - start_address;
+> +            memory_region_set_enabled(&s->simm[socket - 1], size !=3D 0);
+> +            memory_region_set_address(&s->simm[socket - 1],
+> +                                      start_address * 8 * 1024 * 1024);
+> +        }
+> +    }
+> +}
+> +
+> +/* Read Memory Parity Error */
+> +
+> +enum {
+> +    PORT0841_NO_ERROR_DETECTED =3D 0x01,
+> +};
+> +
+> +static uint32_t rs6000mc_port0841_read(void *opaque, uint32_t addr)
+> +{
+> +    uint32_t val =3D PORT0841_NO_ERROR_DETECTED;
+> +    trace_rs6000mc_parity_read(addr, val);
+> +    return val;
+> +}
+> +
+> +static const MemoryRegionPortio rs6000mc_port_list[] =3D {
+> +    { 0x803, 1, 1, .read =3D rs6000mc_port0803_read },
+> +    { 0x804, 1, 1, .read =3D rs6000mc_port0804_read },
+> +    { 0x820, 1, 1, .read =3D rs6000mc_port0820_read,
+> +                   .write =3D rs6000mc_port0820_write, },
+> +    { 0x841, 1, 1, .read =3D rs6000mc_port0841_read },
+> +    PORTIO_END_OF_LIST()
+> +};
+> +
+> +static void rs6000mc_realize(DeviceState *dev, Error **errp)
+> +{
+> +    RS6000MCState *s =3D RS6000MC_DEVICE(dev);
+> +    int socket =3D 0;
+> +    unsigned int ram_size =3D s->ram_size / (1024 * 1024);
+> +
+> +    while (socket < 6) {
+> +        if (ram_size >=3D 64) {
+> +            s->simm_size[socket] =3D 32;
+> +            s->simm_size[socket + 1] =3D 32;
+> +            ram_size -=3D 64;
+> +        } else if (ram_size >=3D 16) {
+> +            s->simm_size[socket] =3D 8;
+> +            s->simm_size[socket + 1] =3D 8;
+> +            ram_size -=3D 16;
+> +        } else {
+> +            /* Not enough memory */
+> +            break;
+> +        }
+> +        socket +=3D 2;
+> +    }
+> +
+> +    for (socket =3D 0; socket < 6; socket++) {
+> +        if (s->simm_size[socket]) {
+> +            char name[] =3D "simm.?";
+> +            name[5] =3D socket + '0';
+> +            memory_region_allocate_system_memory(&s->simm[socket], OBJEC=
+T(dev),
+> +                                                 name, s->simm_size[sock=
+et]
+> +                                                 * 1024 * 1024);
+> +            memory_region_add_subregion_overlap(get_system_memory(), 0,
+> +                                                &s->simm[socket], socket=
+);
+> +        }
+> +    }
+> +    if (ram_size) {
+> +        /* unable to push all requested RAM in SIMMs */
+> +        error_setg(errp, "RAM size incompatible with this board. "
+> +                   "Try again with something else, like %d MB",
+> +                   s->ram_size / 1024 / 1024 - ram_size);
+> +        return;
+> +    }
+> +
+> +    if (s->autoconfigure) {
+> +        uint32_t start_address =3D 0;
+> +        for (socket =3D 0; socket < 6; socket++) {
+> +            if (s->simm_size[socket]) {
+> +                memory_region_set_enabled(&s->simm[socket], true);
+> +                memory_region_set_address(&s->simm[socket], start_addres=
+s);
+> +                start_address +=3D memory_region_size(&s->simm[socket]);
+> +            }
+> +        }
+> +    }
+> +
+> +    isa_register_portio_list(ISA_DEVICE(dev), &s->portio, 0x0,
+> +                             rs6000mc_port_list, s, "rs6000mc");
+> +}
+> +
+> +static const VMStateDescription vmstate_rs6000mc =3D {
+> +    .name =3D "rs6000-mc",
+> +    .version_id =3D 1,
+> +    .minimum_version_id =3D 1,
+> +    .fields =3D (VMStateField[]) {
+> +        VMSTATE_UINT8(port0820_index, RS6000MCState),
+> +        VMSTATE_END_OF_LIST()
+> +    },
+> +};
+> +
+> +static Property rs6000mc_properties[] =3D {
+> +    DEFINE_PROP_UINT32("ram-size", RS6000MCState, ram_size, 0),
+> +    DEFINE_PROP_BOOL("auto-configure", RS6000MCState, autoconfigure, tru=
+e),
+> +    DEFINE_PROP_END_OF_LIST()
+> +};
+> +
+> +static void rs6000mc_class_initfn(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
+> +
+> +    dc->realize =3D rs6000mc_realize;
+> +    dc->vmsd =3D &vmstate_rs6000mc;
+> +    dc->props =3D rs6000mc_properties;
+> +}
+> +
+> +static const TypeInfo rs6000mc_info =3D {
+> +    .name          =3D TYPE_RS6000MC,
+> +    .parent        =3D TYPE_ISA_DEVICE,
+> +    .instance_size =3D sizeof(RS6000MCState),
+> +    .class_init    =3D rs6000mc_class_initfn,
+> +};
+> +
+> +static void rs6000mc_types(void)
+> +{
+> +    type_register_static(&rs6000mc_info);
+> +}
+> +
+> +type_init(rs6000mc_types)
+> diff --git a/hw/ppc/trace-events b/hw/ppc/trace-events
+> index 2ba6166..42b8ec0 100644
+> --- a/hw/ppc/trace-events
+> +++ b/hw/ppc/trace-events
+> @@ -78,3 +78,10 @@ prep_io_800_readb(uint32_t addr, uint32_t retval) "0x%=
+08" PRIx32 " <=3D 0x%02" PRI
+>  # hw/ppc/prep_systemio.c
+>  prep_systemio_read(uint32_t addr, uint32_t val) "read addr=3D%x val=3D%x"
+>  prep_systemio_write(uint32_t addr, uint32_t val) "write addr=3D%x val=3D=
+%x"
+> +
+> +# hw/ppc/rs6000_mc.c
+> +rs6000mc_id_read(uint32_t addr, uint32_t val) "read addr=3D%x val=3D%x"
+> +rs6000mc_presence_read(uint32_t addr, uint32_t val) "read addr=3D%x val=
+=3D%x"
+> +rs6000mc_size_read(uint32_t addr, uint32_t val) "read addr=3D%x val=3D%x"
+> +rs6000mc_size_write(uint32_t addr, uint32_t val) "write addr=3D%x val=3D=
+%x"
+> +rs6000mc_parity_read(uint32_t addr, uint32_t val) "read addr=3D%x val=3D=
+%x"
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--n8884J15jRwcBTvu
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJYbtOVAAoJEGw4ysog2bOSev4P/jkOqYsqgqvYSUBpWyrXzXlt
+nFHpTZU1+A7UbVdf2ZRimj0E1+bD4qMvSPC6Zh23W8tAoJG+QkeMt5H+JZVWLbb7
+o+NshgL9nNVeqiJXXpl64jnjl3Ic0bOaNhw+WWtwJ34hGjY2ABknndnTJLOsvDaM
+21nPed8InMeQEvNX32Hea6daIpIasCfgtfjlWSD2WvOxm8jV7NiILR4KPcWziFUj
+SvsbLzqyUn71F8jIh0FhV42lUkJjtjoQ50qdRY1VC/oqZtUkube94AtwIUSNQaJL
+Jd/cPb1phHCaw8D8qw8X+H4nGii2zh/alrfqXG374FabMW+KfRCmxYDO1E3GWD8x
+uf+Bs9bh/nQ+o5+mixZCxFYpP0m9HPOMI+h/EGWUTnqDhPOYT0GUb2RJwMT4w8yo
+8iYae7QVxOfOJPPLm3NqMC38nr+DbFfcAqwBBVsykQ4D1Pp4RWAa8XteZnUe56Vt
+bWV58Gvn/q/12WrsrRKKLilHbTXsCFUXT49GHzq2vuYwgGV4cRtlwEdJgNdWdJdy
+fjv6bbGwc4uq8BSWA6+NJKOLyPazX4FExW56RVu221aELYmoYEdw/Z3a2XVQssad
+7RuFtjAI6uNBvThKYOWDZXE+PvBrL+8dd7g1f2esDFpg1PpUHYAQcbYw43fxaTaL
+n6Rjmo/rACl5UAn/LpVq
+=qfsq
+-----END PGP SIGNATURE-----
+
+--n8884J15jRwcBTvu--
