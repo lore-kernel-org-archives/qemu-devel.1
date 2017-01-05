@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55165)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35482)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cP9ga-0003hR-Cj
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 10:10:37 -0500
+	(envelope-from <bounces@canonical.com>) id 1cP837-0002Eq-8U
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 08:25:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cP9gZ-0005h6-HN
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 10:10:36 -0500
-Received: from mail-ua0-x229.google.com ([2607:f8b0:400c:c08::229]:33886)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cP9gZ-0005h0-AC
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 10:10:35 -0500
-Received: by mail-ua0-x229.google.com with SMTP id 34so340885292uac.1
-	for <qemu-devel@nongnu.org>; Thu, 05 Jan 2017 07:10:35 -0800 (PST)
+	(envelope-from <bounces@canonical.com>) id 1cP831-0001Gj-Ur
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 08:25:45 -0500
+Received: from indium.canonical.com ([91.189.90.7]:50961)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cP831-0001GY-JQ
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 08:25:39 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cP82z-0007Io-RN
+	for <qemu-devel@nongnu.org>; Thu, 05 Jan 2017 13:25:37 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id C30EE2E80C6
+	for <qemu-devel@nongnu.org>; Thu,  5 Jan 2017 13:25:37 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20161225082559.2095-1-zxq_yx_007@163.com>
-References: <20161225082559.2095-1-zxq_yx_007@163.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 5 Jan 2017 15:10:14 +0000
-Message-ID: <CAFEAcA8Tkxye4Qy3Oi5nPjgcJF_Jv9vOdHjiytP_DdFdEfk=bw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hw/display: QOM'ify g364fb.c
+Date: Thu, 05 Jan 2017 13:20:04 -0000
+From: Masato Yoshida <masato@yoshi.dnsalias.com>
+Reply-To: Bug 1654271 <1654271@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <20170105132004.20028.66892.malonedeb@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1654271] [NEW] host machine freezes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,85 +35,460 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: xiaoqiang zhao <zxq_yx_007@163.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-On 25 December 2016 at 08:25, xiaoqiang zhao <zxq_yx_007@163.com> wrote:
-> Drop the old Sysbus init and use instance_init and
-> DeviceClass::realize instead
->
-> Signed-off-by: xiaoqiang zhao <zxq_yx_007@163.com>
-> ---
->  hw/display/g364fb.c | 16 +++++++++++-----
->  1 file changed, 11 insertions(+), 5 deletions(-)
->
-> diff --git a/hw/display/g364fb.c b/hw/display/g364fb.c
-> index 70ef2c7453..7a0fe48dd5 100644
-> --- a/hw/display/g364fb.c
-> +++ b/hw/display/g364fb.c
-> @@ -504,18 +504,24 @@ typedef struct {
->      G364State g364;
->  } G364SysBusState;
->
-> -static int g364fb_sysbus_init(SysBusDevice *sbd)
-> +static void g364fb_sysbus_init(Object *obj)
+Public bug reported:
 
-This isn't a sysbus init function any more, so we should
-rename it. Since the existing g364fb_init() is only
-called from one place, we should just inline its
-contents into the right places, and have one function
-364fb_init for the instance_init and g364fb_realize
-for the realize function.
+When trying to install Radeon crimson relive 16.12.1, each host machine fre=
+ezes at the machine environment check stage.
+Even if you launch the installer in an environment where GPU is not install=
+ed, each host machine freezes in the same way.
+When Gusest's CPU is changed from 4 to 1, the environment check is complete=
+d normally.
+Even if FMA and AVX 2 are invalidated by CPU setting, environment check wil=
+l be completed normally.
+Since 1 CPU does not freeze, I thought that it would be better to fix the C=
+PU, but I will still freeze.
+Is it impossible to enable the function of AVX 2 (FMA?) In the virtual mach=
+ine on KVM?
 
->  {
-> +    SysBusDevice *sbd =3D SYS_BUS_DEVICE(obj);
->      DeviceState *dev =3D DEVICE(sbd);
->      G364SysBusState *sbs =3D G364(dev);
->      G364State *s =3D &sbs->g364;
->
-> -    g364fb_init(dev, s);
->      sysbus_init_irq(sbd, &s->irq);
->      sysbus_init_mmio(sbd, &s->mem_ctrl);
->      sysbus_init_mmio(sbd, &s->mem_vram);
+HOST
+  Motherboard =EF=BC=9A Asrock Z97 extream6
+  CPU          : Core i7-4790
+  Memory       : 24GB
+  OS           : Ubuntu 16.04(kernel 4.7.2-040702)
+  qemu         : 2.5+dfsg-5ubuntu10.6
+  libvirt      : 1.3.1-1ubuntu10.5
+  ovmf         : 0~20160408.ffea0a2c-2
 
-This means we call sysbus_init_mmio() on the MemoryRegion*s
-before we have initialized them. That seems like a bad idea.
+Guest
+=E3=80=80BIOS   : UEFI
+  OS     : Windows10 Pro Build 14986
+  Memory : 8GB
+  GPU    : Radeon HD7770
 
-> +}
->
-> -    return 0;
-> +static void g364fb_sysbus_realize(DeviceState *dev, Error **errp)
-> +{
-> +    G364SysBusState *sbs =3D G364(dev);
-> +    G364State *s =3D &sbs->g364;
-> +
-> +    g364fb_init(dev, s);
->  }
->
->  static void g364fb_sysbus_reset(DeviceState *d)
-> @@ -534,9 +540,8 @@ static Property g364fb_sysbus_properties[] =3D {
->  static void g364fb_sysbus_class_init(ObjectClass *klass, void *data)
->  {
->      DeviceClass *dc =3D DEVICE_CLASS(klass);
-> -    SysBusDeviceClass *k =3D SYS_BUS_DEVICE_CLASS(klass);
->
-> -    k->init =3D g364fb_sysbus_init;
-> +    dc->realize =3D g364fb_sysbus_realize;
->      set_bit(DEVICE_CATEGORY_DISPLAY, dc->categories);
->      dc->desc =3D "G364 framebuffer";
->      dc->reset =3D g364fb_sysbus_reset;
-> @@ -548,6 +553,7 @@ static const TypeInfo g364fb_sysbus_info =3D {
->      .name          =3D TYPE_G364,
->      .parent        =3D TYPE_SYS_BUS_DEVICE,
->      .instance_size =3D sizeof(G364SysBusState),
-> +    .instance_init =3D g364fb_sysbus_init,
->      .class_init    =3D g364fb_sysbus_class_init,
->  };
+-----------------------------------------------------------
+<domain type=3D'kvm'>
+  <name>WinPC01</name>
+  <uuid>4f784d78-4d5e-416a-bb43-82ecd2cad409</uuid>
+  <memory unit=3D'KiB'>8388608</memory>
+  <currentMemory unit=3D'KiB'>8388608</currentMemory>
+  <vcpu placement=3D'static'>4</vcpu>
+  <os>
+    <type arch=3D'x86_64' machine=3D'pc-i440fx-2.5'>hvm</type>
+    <loader readonly=3D'yes' type=3D'pflash'>/usr/share/OVMF/OVMF_CODE.fd</=
+loader>
+    <nvram>/var/lib/libvirt/qemu/nvram/WinPC01_VARS.fd</nvram>
+    <bootmenu enable=3D'yes'/>
+  </os>
+  <features>
+    <acpi/>
+    <apic/>
+    <pae/>
+    <hap/>
+    <hyperv>
+      <relaxed state=3D'on'/>
+      <vapic state=3D'on'/>
+      <spinlocks state=3D'on' retries=3D'8191'/>
+    </hyperv>
+    <kvm>
+      <hidden state=3D'on'/>
+    </kvm>
+  </features>
+  <cpu mode=3D'custom' match=3D'exact'>
+    <model fallback=3D'allow'>Haswell</model>
+    <vendor>Intel</vendor>
+    <topology sockets=3D'1' cores=3D'4' threads=3D'1'/>
+  </cpu>
+  <clock offset=3D'localtime'>
+    <timer name=3D'rtc' tickpolicy=3D'catchup'/>
+    <timer name=3D'pit' tickpolicy=3D'delay'/>
+    <timer name=3D'hpet' present=3D'no'/>
+    <timer name=3D'hypervclock' present=3D'yes'/>
+  </clock>
+  <on_poweroff>destroy</on_poweroff>
+  <on_reboot>restart</on_reboot>
+  <on_crash>restart</on_crash>
+  <pm>
+    <suspend-to-mem enabled=3D'no'/>
+    <suspend-to-disk enabled=3D'no'/>
+  </pm>
+  <devices>
+    <emulator>/usr/bin/kvm-spice</emulator>
+    <disk type=3D'block' device=3D'disk'>
+      <driver name=3D'qemu' type=3D'raw' cache=3D'none' io=3D'native' disca=
+rd=3D'unmap'/>
+      <source dev=3D'/dev/mapper/vg_yoshi--kvm01_ssd-lv_WinPC01'/>
+      <target dev=3D'sda' bus=3D'scsi'/>
+      <boot order=3D'1'/>
+      <address type=3D'drive' controller=3D'0' bus=3D'0' target=3D'0' unit=
+=3D'0'/>
+    </disk>
+    <disk type=3D'block' device=3D'disk'>
+      <driver name=3D'qemu' type=3D'raw' cache=3D'none' io=3D'native'/>
+      <source dev=3D'/dev/mapper/vg_yoshi--kvm01_hdd-lv_WinPC01_Data'/>
+      <target dev=3D'sdb' bus=3D'scsi'/>
+      <address type=3D'drive' controller=3D'0' bus=3D'0' target=3D'0' unit=
+=3D'1'/>
+    </disk>
+    <disk type=3D'file' device=3D'cdrom'>
+      <driver name=3D'qemu' type=3D'raw'/>
+      <target dev=3D'hdb' bus=3D'ide'/>
+      <readonly/>
+      <address type=3D'drive' controller=3D'0' bus=3D'0' target=3D'0' unit=
+=3D'1'/>
+    </disk>
+    <controller type=3D'usb' index=3D'0' model=3D'ich9-ehci1'>
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' fu=
+nction=3D'0x7'/>
+    </controller>
+    <controller type=3D'usb' index=3D'0' model=3D'ich9-uhci1'>
+      <master startport=3D'0'/>
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' fu=
+nction=3D'0x0' multifunction=3D'on'/>
+    </controller>
+    <controller type=3D'usb' index=3D'0' model=3D'ich9-uhci2'>
+      <master startport=3D'2'/>
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' fu=
+nction=3D'0x1'/>
+    </controller>
+    <controller type=3D'usb' index=3D'0' model=3D'ich9-uhci3'>
+      <master startport=3D'4'/>
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' fu=
+nction=3D'0x2'/>
+    </controller>
+    <controller type=3D'pci' index=3D'0' model=3D'pci-root'/>
+    <controller type=3D'ide' index=3D'0'>
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x01' fu=
+nction=3D'0x1'/>
+    </controller>
+    <controller type=3D'virtio-serial' index=3D'0'>
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x06' fu=
+nction=3D'0x0'/>
+    </controller>
+    <controller type=3D'sata' index=3D'0'>
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x0c' fu=
+nction=3D'0x0'/>
+    </controller>
+    <controller type=3D'scsi' index=3D'0' model=3D'virtio-scsi'>
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x0f' fu=
+nction=3D'0x0'/>
+    </controller>
+    <interface type=3D'bridge'>
+      <mac address=3D'52:54:00:0e:ca:c5'/>
+      <source bridge=3D'br0'/>
+      <model type=3D'virtio'/>
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x03' fu=
+nction=3D'0x0'/>
+    </interface>
+    <interface type=3D'bridge'>
+      <mac address=3D'52:54:00:7e:4e:dd'/>
+      <source bridge=3D'br1'/>
+      <model type=3D'virtio'/>
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x04' fu=
+nction=3D'0x0'/>
+    </interface>
+    <channel type=3D'spicevmc'>
+      <target type=3D'virtio' name=3D'com.redhat.spice.0'/>
+      <address type=3D'virtio-serial' controller=3D'0' bus=3D'0' port=3D'1'=
+/>
+    </channel>
+    <input type=3D'tablet' bus=3D'usb'/>
+    <input type=3D'mouse' bus=3D'ps2'/>
+    <input type=3D'keyboard' bus=3D'ps2'/>
+    <graphics type=3D'spice' port=3D'5900' autoport=3D'no' listen=3D'0.0.0.=
+0' keymap=3D'ja'>
+      <listen type=3D'address' address=3D'0.0.0.0'/>
+    </graphics>
+    <video>
+      <model type=3D'qxl' ram=3D'65536' vram=3D'65536' vgamem=3D'16384' hea=
+ds=3D'1'/>
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x02' fu=
+nction=3D'0x0'/>
+    </video>
+    <hostdev mode=3D'subsystem' type=3D'pci' managed=3D'yes'>
+      <source>
+        <address domain=3D'0x0000' bus=3D'0x01' slot=3D'0x00' function=3D'0=
+x0'/>
+      </source>
+      <rom bar=3D'off'/>
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x08' fu=
+nction=3D'0x0' multifunction=3D'on'/>
+    </hostdev>
+    <hostdev mode=3D'subsystem' type=3D'pci' managed=3D'yes'>
+      <source>
+        <address domain=3D'0x0000' bus=3D'0x01' slot=3D'0x00' function=3D'0=
+x1'/>
+      </source>
+      <rom bar=3D'off'/>
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x09' fu=
+nction=3D'0x0'/>
+    </hostdev>
+    <hostdev mode=3D'subsystem' type=3D'pci' managed=3D'yes'>
+      <source>
+        <address domain=3D'0x0000' bus=3D'0x00' slot=3D'0x14' function=3D'0=
+x0'/>
+      </source>
+      <rom bar=3D'off'/>
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x0a' fu=
+nction=3D'0x0'/>
+    </hostdev>
+    <hostdev mode=3D'subsystem' type=3D'pci' managed=3D'yes'>
+      <source>
+        <address domain=3D'0x0000' bus=3D'0x00' slot=3D'0x1d' function=3D'0=
+x0'/>
+      </source>
+      <rom bar=3D'off'/>
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x0b' fu=
+nction=3D'0x0'/>
+    </hostdev>
+    <memballoon model=3D'virtio'>
+      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x07' fu=
+nction=3D'0x0'/>
+    </memballoon>
+  </devices>
+</domain>
+-----------------------------------------------------------
 
-This device is used in the MIPS Jazz machine.
-Can you cc the MIPS maintainers and also Herv=C3=A9 Poussineau
-(the Jazz maintainer) on the next version of this patch,
-please?
+If you put the following designation in the CPU tag, it will not freeze.
+-----------------------------------------------------------
+    <feature policy=3D'disable' name=3D'fma'/>
+    <feature policy=3D'disable' name=3D'avx2'/>
+-----------------------------------------------------------
 
-thanks
--- PMM
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1654271
+
+Title:
+  host machine freezes
+
+Status in QEMU:
+  New
+
+Bug description:
+  When trying to install Radeon crimson relive 16.12.1, each host machine f=
+reezes at the machine environment check stage.
+  Even if you launch the installer in an environment where GPU is not insta=
+lled, each host machine freezes in the same way.
+  When Gusest's CPU is changed from 4 to 1, the environment check is comple=
+ted normally.
+  Even if FMA and AVX 2 are invalidated by CPU setting, environment check w=
+ill be completed normally.
+  Since 1 CPU does not freeze, I thought that it would be better to fix the=
+ CPU, but I will still freeze.
+  Is it impossible to enable the function of AVX 2 (FMA?) In the virtual ma=
+chine on KVM?
+
+  HOST
+    Motherboard =EF=BC=9A Asrock Z97 extream6
+    CPU          : Core i7-4790
+    Memory       : 24GB
+    OS           : Ubuntu 16.04(kernel 4.7.2-040702)
+    qemu         : 2.5+dfsg-5ubuntu10.6
+    libvirt      : 1.3.1-1ubuntu10.5
+    ovmf         : 0~20160408.ffea0a2c-2
+
+  Guest
+  =E3=80=80BIOS   : UEFI
+    OS     : Windows10 Pro Build 14986
+    Memory : 8GB
+    GPU    : Radeon HD7770
+
+  -----------------------------------------------------------
+  <domain type=3D'kvm'>
+    <name>WinPC01</name>
+    <uuid>4f784d78-4d5e-416a-bb43-82ecd2cad409</uuid>
+    <memory unit=3D'KiB'>8388608</memory>
+    <currentMemory unit=3D'KiB'>8388608</currentMemory>
+    <vcpu placement=3D'static'>4</vcpu>
+    <os>
+      <type arch=3D'x86_64' machine=3D'pc-i440fx-2.5'>hvm</type>
+      <loader readonly=3D'yes' type=3D'pflash'>/usr/share/OVMF/OVMF_CODE.fd=
+</loader>
+      <nvram>/var/lib/libvirt/qemu/nvram/WinPC01_VARS.fd</nvram>
+      <bootmenu enable=3D'yes'/>
+    </os>
+    <features>
+      <acpi/>
+      <apic/>
+      <pae/>
+      <hap/>
+      <hyperv>
+        <relaxed state=3D'on'/>
+        <vapic state=3D'on'/>
+        <spinlocks state=3D'on' retries=3D'8191'/>
+      </hyperv>
+      <kvm>
+        <hidden state=3D'on'/>
+      </kvm>
+    </features>
+    <cpu mode=3D'custom' match=3D'exact'>
+      <model fallback=3D'allow'>Haswell</model>
+      <vendor>Intel</vendor>
+      <topology sockets=3D'1' cores=3D'4' threads=3D'1'/>
+    </cpu>
+    <clock offset=3D'localtime'>
+      <timer name=3D'rtc' tickpolicy=3D'catchup'/>
+      <timer name=3D'pit' tickpolicy=3D'delay'/>
+      <timer name=3D'hpet' present=3D'no'/>
+      <timer name=3D'hypervclock' present=3D'yes'/>
+    </clock>
+    <on_poweroff>destroy</on_poweroff>
+    <on_reboot>restart</on_reboot>
+    <on_crash>restart</on_crash>
+    <pm>
+      <suspend-to-mem enabled=3D'no'/>
+      <suspend-to-disk enabled=3D'no'/>
+    </pm>
+    <devices>
+      <emulator>/usr/bin/kvm-spice</emulator>
+      <disk type=3D'block' device=3D'disk'>
+        <driver name=3D'qemu' type=3D'raw' cache=3D'none' io=3D'native' dis=
+card=3D'unmap'/>
+        <source dev=3D'/dev/mapper/vg_yoshi--kvm01_ssd-lv_WinPC01'/>
+        <target dev=3D'sda' bus=3D'scsi'/>
+        <boot order=3D'1'/>
+        <address type=3D'drive' controller=3D'0' bus=3D'0' target=3D'0' uni=
+t=3D'0'/>
+      </disk>
+      <disk type=3D'block' device=3D'disk'>
+        <driver name=3D'qemu' type=3D'raw' cache=3D'none' io=3D'native'/>
+        <source dev=3D'/dev/mapper/vg_yoshi--kvm01_hdd-lv_WinPC01_Data'/>
+        <target dev=3D'sdb' bus=3D'scsi'/>
+        <address type=3D'drive' controller=3D'0' bus=3D'0' target=3D'0' uni=
+t=3D'1'/>
+      </disk>
+      <disk type=3D'file' device=3D'cdrom'>
+        <driver name=3D'qemu' type=3D'raw'/>
+        <target dev=3D'hdb' bus=3D'ide'/>
+        <readonly/>
+        <address type=3D'drive' controller=3D'0' bus=3D'0' target=3D'0' uni=
+t=3D'1'/>
+      </disk>
+      <controller type=3D'usb' index=3D'0' model=3D'ich9-ehci1'>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' =
+function=3D'0x7'/>
+      </controller>
+      <controller type=3D'usb' index=3D'0' model=3D'ich9-uhci1'>
+        <master startport=3D'0'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' =
+function=3D'0x0' multifunction=3D'on'/>
+      </controller>
+      <controller type=3D'usb' index=3D'0' model=3D'ich9-uhci2'>
+        <master startport=3D'2'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' =
+function=3D'0x1'/>
+      </controller>
+      <controller type=3D'usb' index=3D'0' model=3D'ich9-uhci3'>
+        <master startport=3D'4'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x05' =
+function=3D'0x2'/>
+      </controller>
+      <controller type=3D'pci' index=3D'0' model=3D'pci-root'/>
+      <controller type=3D'ide' index=3D'0'>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x01' =
+function=3D'0x1'/>
+      </controller>
+      <controller type=3D'virtio-serial' index=3D'0'>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x06' =
+function=3D'0x0'/>
+      </controller>
+      <controller type=3D'sata' index=3D'0'>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x0c' =
+function=3D'0x0'/>
+      </controller>
+      <controller type=3D'scsi' index=3D'0' model=3D'virtio-scsi'>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x0f' =
+function=3D'0x0'/>
+      </controller>
+      <interface type=3D'bridge'>
+        <mac address=3D'52:54:00:0e:ca:c5'/>
+        <source bridge=3D'br0'/>
+        <model type=3D'virtio'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x03' =
+function=3D'0x0'/>
+      </interface>
+      <interface type=3D'bridge'>
+        <mac address=3D'52:54:00:7e:4e:dd'/>
+        <source bridge=3D'br1'/>
+        <model type=3D'virtio'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x04' =
+function=3D'0x0'/>
+      </interface>
+      <channel type=3D'spicevmc'>
+        <target type=3D'virtio' name=3D'com.redhat.spice.0'/>
+        <address type=3D'virtio-serial' controller=3D'0' bus=3D'0' port=3D'=
+1'/>
+      </channel>
+      <input type=3D'tablet' bus=3D'usb'/>
+      <input type=3D'mouse' bus=3D'ps2'/>
+      <input type=3D'keyboard' bus=3D'ps2'/>
+      <graphics type=3D'spice' port=3D'5900' autoport=3D'no' listen=3D'0.0.=
+0.0' keymap=3D'ja'>
+        <listen type=3D'address' address=3D'0.0.0.0'/>
+      </graphics>
+      <video>
+        <model type=3D'qxl' ram=3D'65536' vram=3D'65536' vgamem=3D'16384' h=
+eads=3D'1'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x02' =
+function=3D'0x0'/>
+      </video>
+      <hostdev mode=3D'subsystem' type=3D'pci' managed=3D'yes'>
+        <source>
+          <address domain=3D'0x0000' bus=3D'0x01' slot=3D'0x00' function=3D=
+'0x0'/>
+        </source>
+        <rom bar=3D'off'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x08' =
+function=3D'0x0' multifunction=3D'on'/>
+      </hostdev>
+      <hostdev mode=3D'subsystem' type=3D'pci' managed=3D'yes'>
+        <source>
+          <address domain=3D'0x0000' bus=3D'0x01' slot=3D'0x00' function=3D=
+'0x1'/>
+        </source>
+        <rom bar=3D'off'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x09' =
+function=3D'0x0'/>
+      </hostdev>
+      <hostdev mode=3D'subsystem' type=3D'pci' managed=3D'yes'>
+        <source>
+          <address domain=3D'0x0000' bus=3D'0x00' slot=3D'0x14' function=3D=
+'0x0'/>
+        </source>
+        <rom bar=3D'off'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x0a' =
+function=3D'0x0'/>
+      </hostdev>
+      <hostdev mode=3D'subsystem' type=3D'pci' managed=3D'yes'>
+        <source>
+          <address domain=3D'0x0000' bus=3D'0x00' slot=3D'0x1d' function=3D=
+'0x0'/>
+        </source>
+        <rom bar=3D'off'/>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x0b' =
+function=3D'0x0'/>
+      </hostdev>
+      <memballoon model=3D'virtio'>
+        <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x07' =
+function=3D'0x0'/>
+      </memballoon>
+    </devices>
+  </domain>
+  -----------------------------------------------------------
+
+  If you put the following designation in the CPU tag, it will not freeze.
+  -----------------------------------------------------------
+      <feature policy=3D'disable' name=3D'fma'/>
+      <feature policy=3D'disable' name=3D'avx2'/>
+  -----------------------------------------------------------
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1654271/+subscriptions
