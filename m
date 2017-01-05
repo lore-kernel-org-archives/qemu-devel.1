@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38589)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38919)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liang.z.li@intel.com>) id 1cOww7-0001Ev-H5
-	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 20:33:48 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1cOwys-0002Ts-9p
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 20:36:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liang.z.li@intel.com>) id 1cOww4-0005Tx-CQ
-	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 20:33:47 -0500
-Received: from mga07.intel.com ([134.134.136.100]:31096)
+	(envelope-from <ehabkost@redhat.com>) id 1cOwyp-0006gx-4x
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 20:36:38 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41578)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <liang.z.li@intel.com>)
-	id 1cOww4-0005Tg-1h
-	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 20:33:44 -0500
-From: "Li, Liang Z" <liang.z.li@intel.com>
-Date: Thu, 5 Jan 2017 01:33:39 +0000
-Message-ID: <F2CBF3009FA73547804AE4C663CAB28E3C34BC76@shsmsx102.ccr.corp.intel.com>
-References: <1463570440-29685-1-git-send-email-jitendra.kolhe@hpe.com>
-	<F2CBF3009FA73547804AE4C663CAB28E3C34811E@shsmsx102.ccr.corp.intel.com>
-	<ebc6d79a-833d-5413-8617-b3252bc45a07@redhat.com>
-In-Reply-To: <ebc6d79a-833d-5413-8617-b3252bc45a07@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cOwyo-0006gt-S8
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 20:36:35 -0500
+Date: Wed, 4 Jan 2017 23:36:31 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170105013631.GO3315@thinpad.lan.raisama.net>
+References: <1482866480-26208-1-git-send-email-ehabkost@redhat.com>
+	<1482866480-26208-5-git-send-email-ehabkost@redhat.com>
+	<20170104115656.GB14961@amt.cnet>
+	<20170104133916.GG3315@thinpad.lan.raisama.net>
+	<20170104195917.GM3315@thinpad.lan.raisama.net>
+	<20170104222623.GA21789@amt.cnet>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 0/4] migration: skip scanning and
- migrating ram pages released by virtio-balloon driver.
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170104222623.GA21789@amt.cnet>
+Subject: Re: [Qemu-devel] TSC frequency configuration & invtsc migration
+ (was Re: [PATCH 4/4] kvm: Allow migration with invtsc)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,89 +32,191 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, Jitendra Kolhe <jitendra.kolhe@hpe.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "crosthwaite.peter@gmail.com" <crosthwaite.peter@gmail.com>, "ehabkost@redhat.com" <ehabkost@redhat.com>, "quintela@redhat.com" <quintela@redhat.com>, "simhan@hpe.com" <simhan@hpe.com>, "JBottomley@Odin.com" <JBottomley@Odin.com>, "armbru@redhat.com" <armbru@redhat.com>, "lcapitulino@redhat.com" <lcapitulino@redhat.com>, "renganathan.meenakshisundaram@hpe.com" <renganathan.meenakshisundaram@hpe.com>, "borntraeger@de.ibm.com" <borntraeger@de.ibm.com>, "mst@redhat.com" <mst@redhat.com>, "mohan_parthasarathy@hpe.com" <mohan_parthasarathy@hpe.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "amit.shah@redhat.com" <amit.shah@redhat.com>, "den@openvz.org" <den@openvz.org>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>
+To: Marcelo Tosatti <mtosatti@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, Haozhong Zhang <haozhong.zhang@intel.com>, libvir-list@redhat.com
 
-PiBBbSAyMy4xMi4yMDE2IHVtIDAzOjUwIHNjaHJpZWIgTGksIExpYW5nIFo6DQo+ID4+IFdoaWxl
-IG1lYXN1cmluZyBsaXZlIG1pZ3JhdGlvbiBwZXJmb3JtYW5jZSBmb3IgcWVtdS9rdm0gZ3Vlc3Qs
-IGl0IHdhcw0KPiA+PiBvYnNlcnZlZCB0aGF0IHRoZSBxZW11IGRvZXNu4oCZdCBtYWludGFpbiBh
-bnkgaW50ZWxsaWdlbmNlIGZvciB0aGUNCj4gPj4gZ3Vlc3QgcmFtIHBhZ2VzIHJlbGVhc2VkIGJ5
-IHRoZSBndWVzdCBiYWxsb29uIGRyaXZlciBhbmQgdHJlYXQgc3VjaA0KPiA+PiBwYWdlcyBhcyBh
-bnkgb3RoZXIgbm9ybWFsIGd1ZXN0IHJhbSBwYWdlcy4gVGhpcyBoYXMgZGlyZWN0IGltcGFjdCBv
-bg0KPiA+PiBvdmVyYWxsIG1pZ3JhdGlvbiB0aW1lIGZvciB0aGUgZ3Vlc3Qgd2hpY2ggaGFzIHJl
-bGVhc2VkIChiYWxsb29uZWQgb3V0KQ0KPiBtZW1vcnkgdG8gdGhlIGhvc3QuDQo+ID4+DQo+ID4+
-IEluIGNhc2Ugb2YgbGFyZ2Ugc3lzdGVtcywgd2hlcmUgd2UgY2FuIGNvbmZpZ3VyZSBsYXJnZSBn
-dWVzdHMgd2l0aA0KPiA+PiAxVEIgYW5kIHdpdGggY29uc2lkZXJhYmxlIGFtb3VudCBvZiBtZW1v
-cnkgcmVsZWFzZWQgYnkgYmFsbG9vbiBkcml2ZXINCj4gPj4gdG8gdGhlIGhvc3QsIHRoZSBtaWdy
-YXRpb24gdGltZSBnZXRzIHdvcnNlLg0KPiA+Pg0KPiA+PiBUaGUgc29sdXRpb24gcHJvcG9zZWQg
-YmVsb3cgaXMgbG9jYWwgdG8gcWVtdSAoYW5kIGRvZXMgbm90IHJlcXVpcmUNCj4gPj4gYW55IG1v
-ZGlmaWNhdGlvbiB0byBMaW51eCBrZXJuZWwgb3IgYW55IGd1ZXN0IGRyaXZlcikuIFdlIGhhdmUN
-Cj4gPj4gdmVyaWZpZWQgdGhlIGZpeCBmb3IgbGFyZ2UgZ3Vlc3RzID0xVEIgb24gSFBFIFN1cGVy
-ZG9tZSBYICh3aGljaCBjYW4NCj4gPj4gc3VwcG9ydCB1cCB0byAyNDAgY29yZXMgYW5kIDEyVEIg
-b2YgbWVtb3J5KS4NCj4gPj4NCj4gPj4gRHVyaW5nIGxpdmUgbWlncmF0aW9uLCBhcyBwYXJ0IG9m
-IGZpcnN0IGl0ZXJhdGlvbiBpbg0KPiA+PiByYW1fc2F2ZV9pdGVyYXRlKCkgLT4gcmFtX2ZpbmRf
-YW5kX3NhdmVfYmxvY2sgKCkgd2lsbCB0cnkgdG8gbWlncmF0ZQ0KPiA+PiByYW0gcGFnZXMgZXZl
-biBpZiB0aGV5IGFyZSByZWxlYXNlZCBieSB2aXRyaW8tYmFsbG9vbiBkcml2ZXIgKGJhbGxvb24N
-Cj4gPj4gaW5mbGF0ZSkuIEFsdGhvdWdoIHRoZXNlIHBhZ2VzIHdoaWNoIGFyZSByZXR1cm5lZCB0
-byB0aGUgaG9zdCBieQ0KPiA+PiB2aXJ0aW8tYmFsbG9vbiBkcml2ZXIgYXJlIHplcm8gcGFnZXMs
-IHRoZSBtaWdyYXRpb24gYWxnb3JpdGhtIHdpbGwNCj4gPj4gc3RpbGwgZW5kIHVwIHNjYW5uaW5n
-IHRoZSBlbnRpcmUgcGFnZQ0KPiA+PiByYW1fZmluZF9hbmRfc2F2ZV9ibG9jaygpIC0+DQo+ID4+
-IHJhbV9zYXZlX3BhZ2UoKS9yYW1fc2F2ZV9jb21wcmVzc2VkX3BhZ2UoKSAtPg0KPiA+PiBzYXZl
-X3plcm9fcGFnZSgpIC0+IGlzX3plcm9fcmFuZ2UoKS4gV2UgYWxzbyBlbmQtdXAgc2VuZGluZyBo
-ZWFkZXINCj4gPj4gaW5mb3JtYXRpb24gb3ZlciBuZXR3b3JrIGZvciB0aGVzZSBwYWdlcyBkdXJp
-bmcgbWlncmF0aW9uLiBUaGlzIGFkZHMNCj4gPj4gdG8gdGhlIHRvdGFsIG1pZ3JhdGlvbiB0aW1l
-Lg0KPiA+Pg0KPiA+PiBUaGUgc29sdXRpb24gY3JlYXRlcyBhIGJhbGxvb24gYml0bWFwIHJhbWJs
-b2NrIGFzIGEgcGFydCBvZg0KPiA+PiB2aXJ0aW8tYmFsbG9vbiBkZXZpY2UgaW5pdGlhbGl6YXRp
-b24uIFRoZSBiaXRzIGluIHRoZSBiYWxsb29uIGJpdG1hcA0KPiA+PiByZXByZXNlbnQgYSBndWVz
-dCByYW0gcGFnZSBvZiBzaXplIDFVTCA8PCBWSVJUSU9fQkFMTE9PTl9QRk5fU0hJRlQNCj4gb3IN
-Cj4gPj4gNEsuIElmIFRBUkdFVF9QQUdFX0JJVFMgPD0gVklSVElPX0JBTExPT05fUEZOX1NISUZU
-LCByYW1fYWRkcg0KPiBvZmZzZXQNCj4gPj4gZm9yIHRoZSBkaXJ0eSBwYWdlIHdoaWNoIGlzIHVz
-ZWQgYnkgZGlydHkgcGFnZSBiaXRtYXAgZHVyaW5nDQo+ID4+IG1pZ3JhdGlvbiBpcyBjaGVja2Vk
-IGFnYWluc3QgdGhlIGJhbGxvb24gYml0bWFwIGFzIGlzLCBpZiB0aGUgYml0IGlzDQo+ID4+IHNl
-dCBpbiB0aGUgYmFsbG9vbiBiaXRtYXAsIHRoZSBjb3JyZXNwb25kaW5nIHJhbSBwYWdlIHdpbGwg
-YmUNCj4gPj4gZXhjbHVkZWQgZnJvbSBzY2FubmluZyBhbmQgc2VuZGluZyBoZWFkZXIgaW5mb3Jt
-YXRpb24gZHVyaW5nDQo+ID4+IG1pZ3JhdGlvbi4gSW4gY2FzZSBUQVJHRVRfUEFHRV9CSVRTID4g
-VklSVElPX0JBTExPT05fUEZOX1NISUZUDQo+IGZvciBhDQo+ID4+IGdpdmVuIGRpcnR5IHBhZ2Ug
-cmFtX2FkZHIsIGFsbCBzdWItcGFnZXMgb2YgMVVMIDw8DQo+ID4+IFZJUlRJT19CQUxMT09OX1BG
-Tl9TSElGVCBzaXplIHNob3VsZCBiZSBiYWxsb29uZWQgb3V0IHRvIGF2b2lkIHplcm8NCj4gcGFn
-ZSBzY2FuIGFuZCBzZW5kaW5nIGhlYWRlciBpbmZvcm1hdGlvbi4NCj4gPj4NCj4gPj4gVGhlIGJp
-dG1hcCByZXByZXNlbnRzIGVudGlyZSBndWVzdCByYW0gbWVtb3J5IHRpbGwgbWF4IGNvbmZpZ3Vy
-ZWQNCj4gbWVtb3J5Lg0KPiA+PiBHdWVzdCByYW0gcGFnZXMgY2xhaW1lZCBieSB0aGUgdmlydGlv
-LWJhbGxvb24gZHJpdmVyIHdpbGwgYmUNCj4gPj4gcmVwcmVzZW50ZWQgYnkgMSBpbiB0aGUgYml0
-bWFwLiBTaW5jZSB0aGUgYml0bWFwIGlzIG1haW50YWluZWQgYXMgYQ0KPiA+PiByYW1ibG9jaywg
-aXTigJlzIG1pZ3JhdGVkIHRvIHRhcmdldCBhcyBwYXJ0IG1pZ3JhdGlvbuKAmXMgcmFtIGl0ZXJh
-dGl2ZQ0KPiA+PiBhbmQgcmFtIGNvbXBsZXRlIHBoYXNlLiBTbyB0aGF0IHN1YnN0aXR1ZW50IG1p
-Z3JhdGlvbnMgZnJvbSB0aGUgdGFyZ2V0DQo+IGNhbiBjb250aW51ZSB0byB1c2Ugb3B0aW1pemF0
-aW9uLg0KPiA+Pg0KPiA+PiBBIG5ldyBtaWdyYXRpb24gY2FwYWJpbGl0eSBjYWxsZWQgc2tpcC1i
-YWxsb29uIGlzIGludHJvZHVjZWQuIFRoZQ0KPiA+PiB1c2VyIGNhbiBkaXNhYmxlIHRoZSBjYXBh
-YmlsaXR5IGluIGNhc2VzIHdoZXJlIHVzZXIgZG9lcyBub3QgZXhwZWN0DQo+ID4+IG11Y2ggYmVu
-ZWZpdCBvciBpbiBjYXNlIHRoZSBtaWdyYXRpb24gaXMgZnJvbSBhbiBvbGRlciB2ZXJzaW9uLg0K
-PiA+Pg0KPiA+PiBEdXJpbmcgbGl2ZSBtaWdyYXRpb24gc2V0dXAgdGhlIG9wdGltaXphdGlvbiBj
-YW4gYmUgc2V0IHRvIGRpc2FibGVkIHN0YXRlIGlmIC4NCj4gPj4gbm8gdmlydGlvLWJhbGxvb24g
-ZGV2aWNlIGlzIGluaXRpYWxpemVkLg0KPiA+PiAuIHNraXAtYmFsbG9vbiBtaWdyYXRpb24gY2Fw
-YWJpbGl0eSBpcyBkaXNhYmxlZC4NCj4gPj4gLiBJZiB0aGUgZ3Vlc3QgdmlydGlvLWJhbGxvb24g
-ZHJpdmVyIGhhcyBub3Qgc2V0DQo+ID4+IFZJUlRJT19CQUxMT09OX0ZfTVVTVF9URUxMX0hPU1QN
-Cj4gPj4gICBmbGFnLiBXaGljaCBtZWFucyB0aGUgZ3Vlc3QgbWF5IHN0YXJ0IHVzaW5nIGEgcmFt
-IHBhZ2VzIGZyZWVkIGJ5DQo+ID4+IGd1ZXN0IGJhbGxvb24NCj4gPj4gICBkcml2ZXIsIGV2ZW4g
-YmVmb3JlIHRoZSBob3N0L3FlbXUgaXMgYXdhcmUgb2YgaXQuIEluIHN1Y2ggY2FzZSwgdGhlDQo+
-ID4+ICAgb3B0aW1pemF0aW9uIGlzIGRpc2FibGVkIHNvIHRoYXQgdGhlIHJhbSBwYWdlcyB0aGF0
-IGFyZSBiZWluZyB1c2VkIGJ5IHRoZQ0KPiA+PiAgIGd1ZXN0IHdpbGwgY29udGludWUgdG8gYmUg
-c2Nhbm5lZCBhbmQgbWlncmF0ZWQuDQo+ID4+DQo+ID4+IEJhbGxvb24gYml0bWFwIHJhbWJsb2Nr
-IHNpemUgaXMgc2V0IHRvIHplcm8gaWYgdGhlIG9wdGltaXphdGlvbiBpcw0KPiA+PiBkaXNhYmxl
-ZCwgdG8gYXZvaWQgb3ZlcmhlYWQgb2YgbWlncmF0aW5nIHRoZSBiaXRtYXAuIElmIHRoZSBiaXRt
-YXAgaXMNCj4gPj4gbm90IG1pZ3JhdGVkIHRvIHRoZSB0YXJnZXQsIHRoZSBkZXN0aW5hdGlvbiBz
-dGFydHMgd2l0aCBhIGZyZXNoDQo+ID4+IGJpdG1hcCBhbmQgdHJhY2tzIHRoZSBiYWxsb29uaW5n
-IG9wZXJhdGlvbiB0aGVyZWFmdGVyLg0KPiA+Pg0KPiA+DQo+ID4gSSBoYXZlIGEgYmV0dGVyIHdh
-eSB0byBnZXQgcmlkIG9mIHRoZSBiaXRtYXAuDQo+ID4gV2Ugc2hvdWxkIG5vdCBtYWludGFpbiB0
-aGUgaW5mbGF0aW5nIHBhZ2VzIGluIHRoZSBiaXRtYXAsIGluc3RlYWQsIHdlDQo+ID4gY2FuIGdl
-dCB0aGVtIGZyb20gdGhlIGd1ZXN0IGlmIGl0J3MgbmVlZGVkLCBqdXN0IGxpa2Ugd2hhdCB3ZSBk
-aWQgZm9yDQo+ID4gdGhlIGd1ZXN0J3MgdW51c2VkIHBhZ2VzLiBUaGVuIHdlIGNhbiBjb21iaW5l
-IHRoZSBpbmZsYXRpbmcgcGFnZSBpbmZvDQo+ID4gd2l0aCB0aGUgdW51c2VkIHBhZ2UgaW5mbyB0
-b2dldGhlciwgYW5kIHNraXAgdGhlbSBkdXJpbmcgbGl2ZSBtaWdyYXRpb24uDQo+ID4NCj4gDQo+
-IElmIHdlIHdhbnQgdG8gYWN0dWFsbHkgaG9zdCBlbmZvcmNlIChkaXNhbGxvdykgYWNjZXNzIHRv
-IGluZmxhdGVkIHBhZ2VzLCBoYXZpbmcNCg0KSXMgdGhhdCBhIG5ldyBmZWF0dXJlPw0KDQo+IHN1
-Y2ggYSBiaXRtYXAgaW4gUUVNVSBpcyByZXF1aXJlZC4gR2V0dGluZyB0aGVtIGZyb20gdGhlIGd1
-ZXN0IGRvZXNuJ3QNCj4gbWFrZSBzZW5zZSBpbiB0aGF0IGNvbnRleHQgYW55bW9yZS4NCg0KRXZl
-biBhIGJpdG1hcCBpcyByZXF1aXJlZCwgd2Ugc2hvdWxkIGF2b2lkIHRvIHNlbmQgaXQgaW4gdGhl
-IHN0b3AgJiBjb3B5IHN0YWdlLg0KDQpUaGFua3MhDQpMaWFuZw0KPiANCj4gVGhhbmtzLA0KPiBE
-YXZpZA0KPiANCg==
+On Wed, Jan 04, 2017 at 08:26:27PM -0200, Marcelo Tosatti wrote:
+> On Wed, Jan 04, 2017 at 05:59:17PM -0200, Eduardo Habkost wrote:
+> > On Wed, Jan 04, 2017 at 11:39:16AM -0200, Eduardo Habkost wrote:
+> > > On Wed, Jan 04, 2017 at 09:56:56AM -0200, Marcelo Tosatti wrote:
+> > > > On Tue, Dec 27, 2016 at 05:21:20PM -0200, Eduardo Habkost wrote:
+> > > > > Instead of blocking migration on the source when invtsc is
+> > > > > enabled, rely on the migration destination to ensure there's no
+> > > > > TSC frequency mismatch.
+> > > > > 
+> > > > > We can't allow migration unconditionally because we don't know if
+> > > > > the destination is a QEMU version that is really going to ensure
+> > > > > there's no TSC frequency mismatch. To ensure we are migrating to
+> > > > > a destination that won't ignore SET_TSC_KHZ errors, allow invtsc
+> > > > > migration only on pc-*-2.9 and newer.
+> > > > > 
+> > > > > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> > [...]
+> > > > > @@ -2655,12 +2656,14 @@ int kvm_arch_put_registers(CPUState *cpu, int level)
+> > > > >      }
+> > > > >  
+> > > > >      if (level == KVM_PUT_FULL_STATE) {
+> > > > > -        /* We don't check for kvm_arch_set_tsc_khz() errors here,
+> > > > > -         * because TSC frequency mismatch shouldn't abort migration,
+> > > > > -         * unless the user explicitly asked for a more strict TSC
+> > > > > -         * setting (e.g. using an explicit "tsc-freq" option).
+> > > > > +        /* Migration TSC frequency mismatch is fatal only if we are
+> > > > > +         * actually reporting Invariant TSC to the guest.
+> > > > >           */
+> > > > > -        kvm_arch_set_tsc_khz(cpu);
+> > > > > +        ret = kvm_arch_set_tsc_khz(cpu);
+> > > > > +        if ((x86_cpu->env.features[FEAT_8000_0007_EDX] & CPUID_APM_INVTSC) &&
+> > > > > +            ret < 0) {
+> > > > > +            return ret;
+> > > > > +        }
+> > > > >      }
+> > > > 
+> > > > Will the guest continue in the source in this case?
+> > > > 
+> > > > I think this is past the point where migration has been declared
+> > > > successful. 
+> > > > 
+> > > > Otherwise looks good.
+> > > 
+> > > Good point. I will make additional tests and see if there's some
+> > > other place where the kvm_arch_set_tsc_khz() call can be moved
+> > > to.
+> > 
+> > So, if we solve this and do something on (for example) post_load,
+> > we still have a problem: device state is migrated after RAM. This
+> > means QEMU will check for TSC scaling and abort migration very
+> > late.
+> > 
+> > We could solve that by manually registering a SaveVMHandler that
+> > will send the TSC frequency on save_live_setup, so migration is
+> > aborted earlier.
+> > 
+> > But: this sounds like just a complex hack to work around the real
+> > problems:
+> > 
+> > 1) TSC frequency is guest-visible, and anything that affects
+> >    guest ABI should depend on the VM configuration, not on host
+> >    capabilities;
+> 
+> Well not really: the TSC frequency where the guest starts 
+> is the frequency the guest software expects.
+> So it does depend on host capabilities.
+
+Could you explain where this expectation comes from? I can see
+multiple cases where choosing the TSC frequency where the VM
+starts is not the best option.
+
+I am considering two possible scenarios below. You probably have
+another scenario in mind, so it would be useful if you could
+describe it so we can consider possible solutions.
+
+
+Scenario 1:
+
+You have two hosts: A and B, both with TSC scaling. They have
+different frequencies. The VM can be started on either one of
+them, and can be migrated to either one depending on the policy
+of management software.
+
+Maybe B is a backup host, the VM is expected to run most times on
+host A, and we want to use the TSC frequency from host A every
+time. Maybe it's the opposite and we want to use the frequency of
+B. Maybe we want to use the lowest frequency of both, maybe the
+highest one. We (QEMU developers) can recommend policy to libvirt
+developers, but a given QEMU process doesn't have information to
+decide what's best.
+
+
+Scenario 2:
+
+Host A has TSC scaling, host B doesn't have TSC scaling. We want
+to be able to start the VM on host A, and migrate to B. In this
+case, the only possible solution is to use B's frequency when
+starting the VM. The QEMU process doesn't have enough information
+to make that decision.
+
+
+> 
+> > 2) Setting TSC frequency depending on the host will make
+> >    migratability unpredictable for management software: the same
+> >    VM config could be migratable to host A when started on host
+> >    B, but not migratable to host A when started on host C.
+> 
+> Well, just check the frequency.
+
+What do you mean by "just check the frequency"? What exactly
+should management software do?
+
+Whatever management software do, if you just use the source host
+frequency you can get into a situation where you can start a VM
+on host A and migrate it to B, but can't start the VM on host B
+and migrate it to A. This would be confusing for users, and
+probably break assumptions of existing management software.
+
+> 
+> > I suggest we allow migration with invtsc if and only if
+> > tsc-frequency is set explicitly by management software. In other
+> > words, apply only patches 1/4 and 2/4 from this series. After
+> > that, we will need libvirt support for configuring tsc-frequency.
+> 
+> I don't like that for the following reasons:
+> 
+> * It moves low level complexity from QEMU/KVM to libvirt 
+>    (libvirt has to call KVM_GET_TSC_KHZ from a vcpu thread).
+
+It doesn't. It could ask QEMU for that information (the new
+query-cpu-model-expansion QMP command would allow that).
+
+Or, alternatively, it could just let the user choose the
+frequency. It's probably acceptable for many use cases where
+invtsc+migration is important.
+
+> * It makes it difficult to run QEMU manually (i use QEMU
+>    manually all the time).
+
+I believe the set of people that: 1) need invtsc; 2) need
+migration to work; and 3) run QEMU manually will be able to add
+"tsc-frequency=XXX" to the command-line easily. :)
+
+> * It requires patching libvirt.
+> 
+> In my experience things work better when the functionality is
+> not split across libvirt/qemu.
+
+In my experience things break when management software is the
+only component able to make a decision but we don't provide
+mechanisms to let management software make that decision.
+
+The TSC frequency affects migratability to hosts. Choose the
+wrong frequency, and you might not be able to migrate. Only
+management software knows to which hosts the VM could be migrated
+in the future, and which TSC frequency would allow that.
+
+> 
+> Can't this be fixed in QEMU? Just check that destination host supports
+> TSC scaling before migration (or that KVM_GET_TSC_KHZ return value
+> matches on source and destination).
+> 
+
+This solves only one use case: where you want to expose the
+starting host TSC frequency to the guest. It doesn't cover any
+scenario where the TSC frequency of the starting host isn't the
+best one. (See the two scenarios I described above)
+
+You seem to have a specific use case in mind. If you describe it,
+we could decide if it's worth the extra migration code complexity
+to deal with invtsc migration without explicit tsc-frequency. By
+now, I am not convinced yet.
+
+Maybe your use case just needs a explicit "invtsc-migration=on"
+command-line flag without a mechanism to abort migration on
+mismatch? I can't tell.
+
+Note that even if we follow your suggestion and implement an
+alternative version of patch 4/4 to cover your use case, I will
+strongly recommend libvirt developers to support configuring TSC
+frequency if they want to support invtsc + migration without
+surprising/unpredictable restrictions on migratability.
+
+-- 
+Eduardo
