@@ -1,41 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54940)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55427)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <joserz@linux.vnet.ibm.com>) id 1cPFrM-0006fB-JO
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 16:46:10 -0500
+	(envelope-from <eblake@redhat.com>) id 1cPFtD-0008O9-Lw
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 16:48:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <joserz@linux.vnet.ibm.com>) id 1cPFrJ-00047x-E5
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 16:46:08 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36193
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <joserz@linux.vnet.ibm.com>)
-	id 1cPFrJ-00047N-7W
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 16:46:05 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	v05Lj5ia063040
-	for <qemu-devel@nongnu.org>; Thu, 5 Jan 2017 16:46:03 -0500
-Received: from e24smtp01.br.ibm.com (e24smtp01.br.ibm.com [32.104.18.85])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 27st07jqqt-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 05 Jan 2017 16:46:03 -0500
-Received: from localhost
-	by e24smtp01.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <joserz@linux.vnet.ibm.com>;
-	Thu, 5 Jan 2017 19:46:01 -0200
-Date: Thu, 5 Jan 2017 19:45:52 -0200
-From: joserz@linux.vnet.ibm.com
-References: <1482166064-18121-1-git-send-email-joserz@linux.vnet.ibm.com>
-	<1482166064-18121-2-git-send-email-joserz@linux.vnet.ibm.com>
-	<8cb9e1d4-3dca-8a32-9f0d-2173bea52771@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1cPFtA-0004ZV-F4
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 16:48:03 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34044)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cPFtA-0004ZR-5B
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 16:48:00 -0500
+Received: from int-mx14.intmail.prod.int.phx2.redhat.com
+	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C81118EB3B
+	for <qemu-devel@nongnu.org>; Thu,  5 Jan 2017 21:47:59 +0000 (UTC)
+References: <20170105160321.21786-1-berrange@redhat.com>
+	<20170105160321.21786-7-berrange@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <51fbdc69-0704-19bd-28b9-fc2310ee2e44@redhat.com>
+Date: Thu, 5 Jan 2017 15:47:57 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <8cb9e1d4-3dca-8a32-9f0d-2173bea52771@redhat.com>
-Message-Id: <20170105214552.GA15064@pacoca>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v4 1/6] target-ppc: Implement
- unsigned quadword left/right shift and unit tests
+In-Reply-To: <20170105160321.21786-7-berrange@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="rs0DQBrqTQEnSLSC0CrGP8QkKxDKOS59V"
+Subject: Re: [Qemu-devel] [PATCH 6/8] io: change the QIOTask callback
+ signature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,199 +35,249 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
 
-Hello Eric,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--rs0DQBrqTQEnSLSC0CrGP8QkKxDKOS59V
+From: Eric Blake <eblake@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <51fbdc69-0704-19bd-28b9-fc2310ee2e44@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 6/8] io: change the QIOTask callback
+ signature
+References: <20170105160321.21786-1-berrange@redhat.com>
+ <20170105160321.21786-7-berrange@redhat.com>
+In-Reply-To: <20170105160321.21786-7-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Thank you very much for your review. Please, read my responses and
-questions below.
+On 01/05/2017 10:03 AM, Daniel P. Berrange wrote:
+> Currently the QIOTaskFunc signature takes an Object * for
+> the source, and an Error * for any error. We also need to
+> be able to provide a result pointer. Rather than continue
+> to add parameters to QIOTaskFunc, remove the existing
+> ones and simply pass the QIOTask object instead. This
+> has methods to access all the other data items required
+> in the callback impl.
 
-Happy 2017.
+Hmmm. If you're going to change the callback signature after all, then
+is it worth considering having the callback return void* instead of the
+clunky way of passing the result pointer around, with existing callers
+updated to return NULL if they have nothing better to do?  Accessing the
+error pointer through the QIOTask object seems okay, it's just the
+return type that feels clunky.
 
-On Tue, Jan 03, 2017 at 09:20:37AM -0600, Eric Blake wrote:
-> On 12/19/2016 10:47 AM, Jose Ricardo Ziviani wrote:
-> > This commit implements functions to right and left shifts and the
-> > unittest for them. Such functions is needed due to instructions
-> > that requires them.
-> > 
-> > Today, there is already a right shift implementation in int128.h
-> > but it's designed for signed numbers.
-> > 
-> > Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
-> > ---
-> 
-> > +static const test_data test_ltable[] = {
-> > +    { 1223ULL, 0, 1223ULL,   0, 0, false },
-> > +    { 1ULL,    0, 2ULL,   0, 1, false },
-> > +    { 1ULL,    0, 4ULL,   0, 2, false },
-> > +    { 1ULL,    0, 16ULL,  0, 4, false },
-> > +    { 1ULL,    0, 256ULL, 0, 8, false },
-> > +    { 1ULL,    0, 65536ULL, 0, 16, false },
-> > +    { 1ULL,    0, 2147483648ULL, 0, 31, false },
-> > +    { 1ULL,    0, 35184372088832ULL, 0, 45, false },
-> > +    { 1ULL,    0, 1152921504606846976ULL, 0, 60, false },
-> > +    { 1ULL,    0, 0, 1ULL, 64, false },
-> > +    { 1ULL,    0, 0, 65536ULL, 80, false },
-> > +    { 1ULL,    0, 0, 9223372036854775808ULL, 127, false },
-> 
-> I concur with the request to write these tests in hex.
+But that's bike-shedding, so I'll review as written.
 
-OK
+>=20
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>  include/io/task.h              | 73 ++++++++++++++++++++++++----------=
+--------
+>  io/channel-tls.c               | 14 ++++----
+>  io/channel-websock.c           |  8 ++---
+>  io/task.c                      | 18 +++--------
+>  io/trace-events                |  1 -
+>  migration/socket.c             | 11 ++++---
+>  migration/tls.c                | 19 +++++------
+>  nbd/common.c                   |  8 ++---
+>  nbd/nbd-internal.h             |  3 +-
+>  qemu-char.c                    | 18 ++++++-----
+>  tests/test-io-channel-socket.c |  5 ++-
+>  tests/test-io-channel-tls.c    |  5 ++-
+>  tests/test-io-task.c           | 18 +++++------
+>  ui/vnc-auth-vencrypt.c         |  7 ++--
+>  ui/vnc-ws.c                    | 14 ++++----
+>  15 files changed, 110 insertions(+), 112 deletions(-)
+>=20
+> diff --git a/include/io/task.h b/include/io/task.h
+> index 244c1a1..7b5bc43 100644
+> --- a/include/io/task.h
+> +++ b/include/io/task.h
+> @@ -26,8 +26,7 @@
+> =20
+>  typedef struct QIOTask QIOTask;
+> =20
+> -typedef void (*QIOTaskFunc)(Object *source,
+> -                            Error *err,
+> +typedef void (*QIOTaskFunc)(QIOTask *task,
+>                              gpointer opaque);
+> =20
 
-> 
-> > +    { 0ULL,    1, 0, 0, 64, true },
-> > +    { 0x8888888888888888ULL, 0x9999999999999999ULL,
-> > +        0x8000000000000000ULL, 0x9888888888888888ULL, 60, true },
-> > +    { 0x8888888888888888ULL, 0x9999999999999999ULL,
-> > +        0, 0x8888888888888888ULL, 64, true },
-> > +    { 0x8ULL, 0, 0, 0x8ULL, 64, false },
-> > +    { 0x8ULL, 0, 0, 0x8000000000000000ULL, 124, false },
-> > +    { 0x1ULL, 0, 0, 0x4000000000000000ULL, 126, false },
-> > +    { 0x1ULL, 0, 0, 0x8000000000000000ULL, 127, false },
-> > +    { 0x1ULL, 0, 0x1ULL, 0, 128, true },
-> 
-> Do we really want this to be well-defined behavior?  Or would it be
-> better to require shift to be in the bounded range [0,127] and assert()
-> that it is always in range?  At least your testsuite ensures that if we
-> want it to be well-defined, we won't go breaking it.
+>   *
+> - * Now, lets say the implementation of this method wants to set
+> - * a timer to run once a second checking for completion of some
+> - * activity. It would do something like
+> + * When the operation completes, the 'func' callback will be
+> + * invoked, allowing the calling code to determine the result
+> + * of the operation. An example QIOTaskFunc impl may look
 
-I prefer to write more testcases and let the functions as is, making the
-caller responsible to complain about the shift if necessary.
+Worth spelling out 'implementation' in the docs?
 
-> 
-> > +    { 0, 0, 0ULL, 0, 200, false },
-> 
-> If you are going to support shifts larger than 127, your testsuite
-> should include a shift of a non-zero number.  Also, if you are going to
-> implicitly truncate the shift value into range, then accepting a signed
-> shift might be nicer (as there are cases where it is easier to code a
-> shift by -1 than it is a shift by 127).
+> + * like
+>   *
+>   * <example>
+> - *   <title>Task callback function implementation</title>
+> + *   <title>Task callback implementation</title>
+> + *   <programlisting>
+> + *  static void myobject_operation_notify(QIOTask *task,
+> + *                                        gpointer opaque)
+> + *  {
+> + *      Error *err =3D NULL;
+> + *      if (qio_task_propagate_error(task, &err)) {
+> + *          ...deal with the failure...
+> + *          error_free(err);
+> + *      } else {
+> + *          QMyObject *src =3D QMY_OBJECT(qio_task_get_source(task));
+> + *          ...deal with the completion...
+> + *      }
+> + *  }
+> + *   </programlisting>
+> + * </example>
+> + *
+> + * Now, lets say the implementation of the method using the
+> + * task wants to set a timer to run once a second checking
+> + * for completion of some  activity. It would do something
 
-Correct me if I'm wrong: Actually the caller can use the function like:
+Why two spaces after 'some'?
 
-urshift(low, high, (uint32_t)-1);
+> + * like
+> + *
+> + * <example>
+> + *   <title>Task function implementation</title>
+>   *   <programlisting>
+>   *    void myobject_operation(QMyObject *obj,
+>   *                            QIOTaskFunc *func,
+> @@ -102,8 +125,8 @@ typedef int (*QIOTaskWorker)(QIOTask *task,
+>   *
+>   *      ...check something important...
+>   *       if (err) {
+> - *           qio_task_abort(task, err);
+> - *           error_free(task);
+> + *           qio_task_set_error(task, err);
+> + *           qio_task_complete(task);
 
-And I'll get "shift == UINT_MAX", which truncates to 127 after "&= 127".
-I don't need to use a signed integer necessarily, right?
+Interesting - by storing the error object directly in the task, you no
+longer have to special-case task abort vs. complete (rather, the
+notifier checks whether the task completed successfully or in error).
 
-> 
-> > +++ b/util/host-utils.c
-> > @@ -26,6 +26,7 @@
-> >  #include "qemu/osdep.h"
-> >  #include "qemu/host-utils.h"
-> >  
-> > +#ifndef CONFIG_INT128
-> >  /* Long integer helpers */
-> >  static inline void mul64(uint64_t *plow, uint64_t *phigh,
-> >                           uint64_t a, uint64_t b)
-> > @@ -158,4 +159,47 @@ int divs128(int64_t *plow, int64_t *phigh, int64_t divisor)
-> >  
-> >      return overflow;
-> >  }
-> > +#endif
-> 
-> How is the addition of this #ifndef related to the rest of the patch?  I
-> almost wonder if it needs two patches (one to compile the file
-> regardless of 128-bit support, the other to add new 128-bit shifts); if
-> not, mentioning it in the commit message doesn't hurt.
-> 
+>   *           return FALSE;
+>   *       } else if (...work is completed ...) {
+>   *           qio_task_complete(task);
+> @@ -115,6 +138,10 @@ typedef int (*QIOTaskWorker)(QIOTask *task,
+>   *   </programlisting>
+>   * </example>
+>   *
+> + * The 'qio_task_complete' call in this method will trigger
+> + * the callback func 'myobject_operation_notify' shown
+> + * earlier to deal with the results.
+> + *
+>   * Once this function returns false, object_unref will be called
+>   * automatically on the task causing it to be released and the
+>   * ref on QMyObject dropped too.
+> @@ -187,8 +214,8 @@ typedef int (*QIOTaskWorker)(QIOTask *task,
+>   * 'err' attribute in the task object to determine if
+>   * the operation was successful or not.
+>   *
+> - * The returned task will be released when one of
+> - * qio_task_abort() or qio_task_complete() are invoked.
+> + * The returned task will be released when qio_task_complete()
+> + * is invoked.
+>   *
+>   * Returns: the task struct
+>   */
+> @@ -204,10 +231,8 @@ QIOTask *qio_task_new(Object *source,
+>   * @opaque: opaque data to pass to @worker
+>   * @destroy: function to free @opaque
+>   *
+> - * Run a task in a background thread. If @worker
+> - * returns 0 it will call qio_task_complete() in
+> - * the main event thread context. If @worker
+> - * returns -1 it will call qio_task_abort() in
+> + * Run a task in a background thread. When @worker
+> + * returns it will call qio_task_complete() in
+>   * the main event thread context.
+>   */
+>  void qio_task_run_in_thread(QIOTask *task,
+> @@ -219,25 +244,11 @@ void qio_task_run_in_thread(QIOTask *task,
+>   * qio_task_complete:
+>   * @task: the task struct
+>   *
+> - * Mark the operation as successfully completed
+> - * and free the memory for @task.
+> + * Invoke the completion callback for @task and
+> + * then free its memory.
+>   */
+>  void qio_task_complete(QIOTask *task);
+> =20
+> -/**
+> - * qio_task_abort:
+> - * @task: the task struct
+> - * @err: the error to record for the operation
+> - *
+> - * Mark the operation as failed, with @err providing
+> - * details about the failure. The @err may be freed
+> - * afer the function returns, as the notification
 
-Right, I put this thing in a new patch. It's clearer indeed.
+And you're eliminating a typo :)
 
-> >  
-> > +void urshift(uint64_t *plow, uint64_t *phigh, uint32_t shift)
-> 
-> Comments on the function contract would be much appreciated (for
-> example, what range must shift belong to, and the fact that the shift is
-> modifying the value in-place, and that the result is always zero-extended).
+> - * callback is invoked synchronously. The @task will
+> - * be freed when this call completes.
+> - */
+> -void qio_task_abort(QIOTask *task,
+> -                    Error *err);
+> -
+> =20
+>  /**
+>   * qio_task_set_error:
+> diff --git a/io/channel-tls.c b/io/channel-tls.c
+> index cf3bcca..f25ab0a 100644
+> --- a/io/channel-tls.c
 
-OK
+> +++ b/tests/test-io-channel-socket.c
+> @@ -156,12 +156,11 @@ struct TestIOChannelData {
+>  };
+> =20
+> =20
+> -static void test_io_channel_complete(Object *src,
+> -                                     Error *err,
+> +static void test_io_channel_complete(QIOTask *task,
+>                                       gpointer opaque)
+>  {
+>      struct TestIOChannelData *data =3D opaque;
+> -    data->err =3D err !=3D NULL;
+> +    data->err =3D qio_task_propagate_error(task, NULL);
 
-> 
-> > +{
-> > +    shift &= 127;
-> 
-> This says you allow any shift value (whether negative or beyond 127);
-> either the testsuite must cover this, or you should tighten the contract
-> and assert that the callers pass a value in range.
+Cool way to ignore and free task->err while still tracking if it had
+captured an error.  I had to go re-read patch 5/8 to make sure this did
+the right thing.
 
-I prefer to let this function flexible and let the caller decides
-whether to assert it or not before calling these functions. But I'm
-totally open to assert it if you prefer.
+I'm still not sure if there is a better signature to be using, but as
+written, your conversion to your choice of signature looks correct
+(modulo nits I pointed out above), so you can add:
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-I'm writing the testcase to cover it.
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
-> 
-> > +    uint64_t h = *phigh >> (shift & 63);
-> > +    if (shift == 0) {
-> > +        return;
-> 
-> Depending on the compiler, this may waste the work of computing h; maybe
-> you can float this conditional first.
 
-OK
+--rs0DQBrqTQEnSLSC0CrGP8QkKxDKOS59V
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-> 
-> > +    } else if (shift >= 64) {
-> > +        *plow = h;
-> > +        *phigh = 0;
-> > +    } else {
-> > +        *plow = (*plow >> (shift & 63)) | (*phigh << (64 - (shift & 63)));
-> > +        *phigh = h;
-> > +    }
-> 
-> At any rate, the math looks correct.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-\o/ :D
+iQEcBAEBCAAGBQJYbr8NAAoJEKeha0olJ0Nqzl8H/iISsCy5eiA0Nh1wiksX7AcB
+zLexQEtwZs7XXqDTdMudgreZYLYGgZIlLb0cL4wZD7xJCy0yzinza5iQboVeCkDU
+9015u2fqdN+9e4PZw+B8jinx3GIQhMJKAWclSMIPSf6J4fai5NKQrbF0Bp+Pt86/
+S50CocMXSABvLt7V42ZDCmd5Ct1UfxdhL2omwvmVbo1/QqaAZTrYIIIKmif34xYm
+MN1yx+D5hlZiVPUnkv8LcytC65LdZL8J0Ldtukg+caduIPPTnqs2RTZ8M7JNi7pi
+npmuwfeo5cc9Qj8dpwemQmTryMfpcw54V1b66uvA7ju+ZnXNgi1NQXdU9clZnm4=
+=0sh1
+-----END PGP SIGNATURE-----
 
-> 
-> > +}
-> > +
-> > +void ulshift(uint64_t *plow, uint64_t *phigh, uint32_t shift, bool *overflow)
-> 
-> Again, doc comments are useful, including what overflow represents, and
-> a repeat of the question on whether a signed shift amount makes sense if
-> you intend to allow silent truncation of the shift value.
-
-OK. About the signed shift I wrote the question above.
-
-> 
-> > +{
-> > +    uint64_t low = *plow;
-> > +    uint64_t high = *phigh;
-> > +
-> > +    if (shift > 127 && (low | high)) {
-> > +        *overflow = true;
-> > +    }
-> > +    shift &= 127;
-> > +
-> > +    if (shift == 0) {
-> > +        return;
-> > +    }
-> > +
-> > +    urshift(&low, &high, 128 - shift);
-> > +    if (low > 0 || high > 0) {
-> 
-> Can't this be written 'if (low | high)' as above?
-
-Oh yeah
-
-> 
-> > +        *overflow = true;
-> > +    }
-> > +
-> > +    if (shift >= 64) {
-> > +        *phigh = *plow << (shift & 63);
-> > +        *plow = 0;
-> > +    } else {
-> > +        *phigh = (*plow >> (64 - (shift & 63))) | (*phigh << (shift & 63));
-> > +        *plow = *plow << shift;
-> > +    }
-> > +}
-> > 
-> 
-> -- 
-> Eric Blake   eblake redhat com    +1-919-301-3266
-> Libvirt virtualization library http://libvirt.org
-> 
+--rs0DQBrqTQEnSLSC0CrGP8QkKxDKOS59V--
