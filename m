@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39888)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39918)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jinguojie@loongson.cn>) id 1cP0Ec-0001yM-0u
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 00:05:07 -0500
+	(envelope-from <jinguojie@loongson.cn>) id 1cP0Ed-0001yV-6z
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 00:05:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jinguojie@loongson.cn>) id 1cP0EY-0005as-Tp
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 00:05:06 -0500
-Received: from [114.242.206.163] (port=60205 helo=mail.loongson.cn)
+	(envelope-from <jinguojie@loongson.cn>) id 1cP0Ec-0005fO-9v
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 00:05:07 -0500
+Received: from [114.242.206.163] (port=60211 helo=mail.loongson.cn)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jinguojie@loongson.cn>) id 1cP0EY-0005WC-2J
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 00:05:02 -0500
+	(envelope-from <jinguojie@loongson.cn>) id 1cP0Eb-0005ci-Er
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 00:05:06 -0500
 From: Jin Guojie <jinguojie@loongson.cn>
-Date: Thu,  5 Jan 2017 12:57:45 +0800
-Message-Id: <1483592275-4496-1-git-send-email-jinguojie@loongson.cn>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v6 RESEND 00/10] tcg mips64 and mips r6
- improvements
+Date: Thu,  5 Jan 2017 12:57:54 +0800
+Message-Id: <1483592275-4496-10-git-send-email-jinguojie@loongson.cn>
+In-Reply-To: <1483592275-4496-1-git-send-email-jinguojie@loongson.cn>
+References: <1483592275-4496-1-git-send-email-jinguojie@loongson.cn>
+Subject: [Qemu-devel] [PATCH v6 RESEND 09/10] tcg-mips: Adjust calling
+ conventions for mips64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,105 +27,107 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Aurelien Jarno <aurelien@aurel32.net>, James Hogan <james.hogan@imgtec.com>, YunQiang Su <wzssyqa@gmail.com>, Richard Henderson <rth@twiddle.net>, Jin Guojie <jinguojie@loongson.cn>
 
-Resend for review.  All modifications have been made according to 
-Henderson's review comments, and all tests passed.
-
-Changes in v6:
-  * Update against master(v2.8.0-rc3)
-  * Fix two bugs according to Richard Henderson's review comments
-    (1) mask: extend TARGET_PAGE_MASK to the proper type
-    (2) zero-extend the guest address, not the address loaded from CMP_OFF
-  * MIPS R6: tested successfully on a qemu mipsel64r6 host (emulating I6400)
-    - Debian amd64 with qemu-system-x86_64
-
-Changes in v5:
-  * Update against master(v2.8.0-rc2)
-  * Fix a bug: 64-bit big-endian guests hang on mips64 little-endian
-      hosts, and vice versa. This bug was first introduced in v2 patch,
-      due to obvious misuse of ret/arg registers in tcg_out_bswap64().
-
-        tcg_out_opc_reg(s, OPC_DSBH, ret, 0, arg);
-      - tcg_out_opc_reg(s, OPC_DSHD, ret, 0, arg);
-      + tcg_out_opc_reg(s, OPC_DSHD, ret, 0, ret);
-
-  * Fix a style problem: checkpatch.pl forbids 'extern' to be used in .c.
-
-      ERROR: externs should be avoided in .c files
-      #28: FILE: tcg/mips/tcg-target.inc.c:39:
-      +extern int link_error(void);
-
-      Simply comment the type identifier to pass the check.
-
-  * Tested successfully on following machines:
-  
-    | HOST        | qemu-system | Debian ISO  |
-    |-----------------------------------------|
-    | mips 32 le  |    i386     |    i386     |
-    | mips 32 le  |    x86_64   |    i386     |
-    | mips 32 le  |    x86_64   |    amd64    |
-    | mips 64 le  |    i386     |    i386     |
-    | mips 64 le  |    x86_64   |    i386     |
-    | mips 64 le  |    x86_64   |    amd64    |
-    | mips 64 le  |  mips 64 be |  mips 64 be |
-    |-----------------------------------------|
-    | mips 32 be  |    i386     |     i386    |
-    | mips 32 be  |    x86_64   |     i386    |
-    | mips 32 be  |    x86_64   |     amd64   |
-    | mips 64 be  |    i386     |     i386    |
-    | mips 64 be  |    x86_64   |     i386    |
-    | mips 64 be  |    x86_64   |     amd64   |
-    | mips n32 be |    386      |     i386    |
-    | mips n32 be |    x86_64   |     i386    |
-    | mips n32 be |    x86_64   |     amd64   |
-
-    (No plan to test MIPS R6 in this patch.)
-
-  Summary of changes from v4:
-
-  | tcg-mips: Support 64-bit opcodes       | Fix tcg_out_bswap64() |
-  | tcg-mips: Adjust qemu_ld/st for mips64 | Fix a style problem   |
-
-
-Changes in v4:
-  * tcg_out_qemu_ld_slow_path: always sign-extend 32-bit loads.
-    Provide a better solution than patch11 in v3.
-    Fix the blocking bug when emulating i386 kernel on mips64el.
-  * Redefine LO_OFF/HI_OFF as v2.
-    On mips64 host, they are defined as link_error, to ensure that
-    all paths that lead to the use of the symbol are eliminated by
-    the compiler.
-
-Changes in v3:
-  * Update against master(v2.8.0-rc1)
-  * Tested on Loongson as mips32r2(el) and mips64r2(el) hosts.
-    Loongson only implements little-endian mips32/mips64 ISA.
-  * Fully work for 32-bit and 64-bit guests.
-    Fix two bugs：segmentation fault on mips64el with 32-bit guests,
-                  blocking when emulating i386 kernel on mips64el.
-  * Fix some minor style problems.
-  * PATCH v2 12~16 are not examined due to the lack of R6 machine. 
-
 Tested-by: Aurelien Jarno <aurelien@aurel32.net>
 Tested-by: James Hogan <james.hogan@imgtec.com>
 Tested-by: YunQiang Su <wzssyqa@gmail.com>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 Signed-off-by: Jin Guojie <jinguojie@loongson.cn>
+---
+ tcg/mips/tcg-target.h     | 19 +++++++++++++++----
+ tcg/mips/tcg-target.inc.c | 21 +++++++++++++++------
+ 2 files changed, 30 insertions(+), 10 deletions(-)
 
-Jin Guojie (10):
-  tcg-mips: Move bswap code to a subroutine
-  tcg-mips: Add mips64 opcodes
-  tcg-mips: Support 64-bit opcodes
-  tcg-mips: Add bswap32u and bswap64
-  tcg-mips: Adjust move functions for mips64
-  tcg-mips: Adjust load/store functions for mips64
-  tcg-mips: Adjust prologue for mips64
-  tcg-mips: Add tcg unwind info
-  tcg-mips: Adjust calling conventions for mips64
-  tcg-mips: Adjust qemu_ld/st for mips64
-
- tcg/mips/tcg-target.h     |   60 ++-
- tcg/mips/tcg-target.inc.c | 1170 +++++++++++++++++++++++++++++++++++----------
- 2 files changed, 977 insertions(+), 253 deletions(-)
-
+diff --git a/tcg/mips/tcg-target.h b/tcg/mips/tcg-target.h
+index 4b7d3ae..d352c97 100644
+--- a/tcg/mips/tcg-target.h
++++ b/tcg/mips/tcg-target.h
+@@ -27,7 +27,14 @@
+ #ifndef MIPS_TCG_TARGET_H
+ #define MIPS_TCG_TARGET_H
+ 
+-#define TCG_TARGET_REG_BITS 32
++#if _MIPS_SIM == _ABIO32
++# define TCG_TARGET_REG_BITS 32
++#elif _MIPS_SIM == _ABIN32 || _MIPS_SIM == _ABI64
++# define TCG_TARGET_REG_BITS 64
++#else
++# error "Unknown ABI"
++#endif
++
+ #define TCG_TARGET_INSN_UNIT_SIZE 4
+ #define TCG_TARGET_TLB_DISPLACEMENT_BITS 16
+ #define TCG_TARGET_NB_REGS 32
+@@ -71,9 +78,13 @@ typedef enum {
+ } TCGReg;
+ 
+ /* used for function call generation */
+-#define TCG_TARGET_STACK_ALIGN 8
+-#define TCG_TARGET_CALL_STACK_OFFSET 16
+-#define TCG_TARGET_CALL_ALIGN_ARGS 1
++#define TCG_TARGET_STACK_ALIGN        16
++#if _MIPS_SIM == _ABIO32
++# define TCG_TARGET_CALL_STACK_OFFSET 16
++#else
++# define TCG_TARGET_CALL_STACK_OFFSET 0
++#endif
++#define TCG_TARGET_CALL_ALIGN_ARGS    1
+ 
+ /* MOVN/MOVZ instructions detection */
+ #if (defined(__mips_isa_rev) && (__mips_isa_rev >= 1)) || \
+diff --git a/tcg/mips/tcg-target.inc.c b/tcg/mips/tcg-target.inc.c
+index b7e2586..7282a4a 100644
+--- a/tcg/mips/tcg-target.inc.c
++++ b/tcg/mips/tcg-target.inc.c
+@@ -91,10 +91,6 @@ static const int tcg_target_reg_alloc_order[] = {
+     TCG_REG_S8,
+ 
+     /* Call clobbered registers.  */
+-    TCG_REG_T0,
+-    TCG_REG_T1,
+-    TCG_REG_T2,
+-    TCG_REG_T3,
+     TCG_REG_T4,
+     TCG_REG_T5,
+     TCG_REG_T6,
+@@ -105,17 +101,27 @@ static const int tcg_target_reg_alloc_order[] = {
+     TCG_REG_V0,
+ 
+     /* Argument registers, opposite order of allocation.  */
++    TCG_REG_T3,
++    TCG_REG_T2,
++    TCG_REG_T1,
++    TCG_REG_T0,
+     TCG_REG_A3,
+     TCG_REG_A2,
+     TCG_REG_A1,
+     TCG_REG_A0,
+ };
+ 
+-static const TCGReg tcg_target_call_iarg_regs[4] = {
++static const TCGReg tcg_target_call_iarg_regs[] = {
+     TCG_REG_A0,
+     TCG_REG_A1,
+     TCG_REG_A2,
+-    TCG_REG_A3
++    TCG_REG_A3,
++#if _MIPS_SIM == _ABIN32 || _MIPS_SIM == _ABI64
++    TCG_REG_T0,
++    TCG_REG_T1,
++    TCG_REG_T2,
++    TCG_REG_T3,
++#endif
+ };
+ 
+ static const TCGReg tcg_target_call_oarg_regs[2] = {
+@@ -2427,6 +2433,9 @@ static void tcg_target_init(TCGContext *s)
+ {
+     tcg_target_detect_isa();
+     tcg_regset_set(tcg_target_available_regs[TCG_TYPE_I32], 0xffffffff);
++    if (TCG_TARGET_REG_BITS == 64) {
++        tcg_regset_set(tcg_target_available_regs[TCG_TYPE_I64], 0xffffffff);
++    }
+     tcg_regset_set(tcg_target_call_clobber_regs,
+                    (1 << TCG_REG_V0) |
+                    (1 << TCG_REG_V1) |
 -- 
 2.1.0
