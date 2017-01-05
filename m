@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43764)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46186)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cP6J3-0006T4-H9
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 06:34:06 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cP6WG-00018F-Cn
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 06:47:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cP6J2-0000KN-Kf
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 06:34:05 -0500
-Received: from mail-ua0-x235.google.com ([2607:f8b0:400c:c08::235]:34646)
+	(envelope-from <peter.maydell@linaro.org>) id 1cP6WF-0005rg-GE
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 06:47:44 -0500
+Received: from mail-ua0-x22e.google.com ([2607:f8b0:400c:c08::22e]:35513)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cP6J2-0000KF-FU
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 06:34:04 -0500
-Received: by mail-ua0-x235.google.com with SMTP id 34so335945164uac.1
-	for <qemu-devel@nongnu.org>; Thu, 05 Jan 2017 03:34:04 -0800 (PST)
+	id 1cP6WF-0005rY-CA
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 06:47:43 -0500
+Received: by mail-ua0-x22e.google.com with SMTP id y9so45328365uae.2
+	for <qemu-devel@nongnu.org>; Thu, 05 Jan 2017 03:47:43 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <5dd3d27a-e630-4e92-43fa-13c131e9f880@freebsd.org>
-References: <5dd3d27a-e630-4e92-43fa-13c131e9f880@freebsd.org>
+In-Reply-To: <20161227231156.22745-1-Sergio.G.DelReal@gmail.com>
+References: <20161227231156.22745-1-Sergio.G.DelReal@gmail.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 5 Jan 2017 11:33:43 +0000
-Message-ID: <CAFEAcA-dOaMYMSSUN_jrRUPRxLVQBZJX4MzZoM6KOz+o3YYBMQ@mail.gmail.com>
+Date: Thu, 5 Jan 2017 11:47:22 +0000
+Message-ID: <CAFEAcA_JSkB5FiJTn_amM90vYdPVi=puaVVbfNScAf3p7nL9Cw@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] New Year's starting over ... bsd-user
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] hw/dma: Fix dead code in pl080.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,51 +29,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sean Bruno <sbruno@freebsd.org>
+To: =?UTF-8?Q?Sergio_Andr=C3=A9s_G=C3=B3mez_Del_Real?= <sergio.g.delreal@gmail.com>
 Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 3 January 2017 at 16:18, Sean Bruno <sbruno@freebsd.org> wrote:
-> I'm pondering where to start with getting FreeBSD's bsd-user code into
-> shape so it could actually be reviewed and accepted now that its sort of
-> working again (signal handling fixed finally).
+On 27 December 2016 at 23:11, Sergio Andr=C3=A9s G=C3=B3mez Del Real
+<sergio.g.delreal@gmail.com> wrote:
+> The patch fixes dead code in pl080_read() and pl080_write() as reported
+> in bug #1637974. According to ARM's official Technical Reference Manual,
+> offsets handled by the switch statement are 0x100, 0x104, 0x108, 0x10C
+> and 0x110, so the solution suggested by the guy who reported the bug is
+> right.
 >
-> I almost feel like the existing code should be purged, except that it
-> gives a good history (and this seems lazy to me).
+> Signed-off-by: Sergio Andr=C3=A9s G=C3=B3mez Del Real <Sergio.G.DelReal@g=
+mail.com>
+> ---
+>  hw/dma/pl080.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 >
-> As a first pass, I guess, I'd like to at least make i386 user run on
-> x86_64.  What would you folks like to see in a first pass?
+> diff --git a/hw/dma/pl080.c b/hw/dma/pl080.c
+> index 7724c93..3b0c20b 100644
+> --- a/hw/dma/pl080.c
+> +++ b/hw/dma/pl080.c
+> @@ -255,7 +255,7 @@ static uint64_t pl080_read(void *opaque, hwaddr offse=
+t,
+>          i =3D (offset & 0xe0) >> 5;
+>          if (i >=3D s->nchannels)
+>              goto bad_offset;
+> -        switch (offset >> 2) {
+> +        switch ((offset - 0x100) >> 2) {
+>          case 0: /* SrcAddr */
+>              return s->chan[i].src;
+>          case 1: /* DestAddr */
+> @@ -316,7 +316,7 @@ static void pl080_write(void *opaque, hwaddr offset,
+>          i =3D (offset & 0xe0) >> 5;
+>          if (i >=3D s->nchannels)
+>              goto bad_offset;
+> -        switch (offset >> 2) {
+> +        switch ((offset - 0x100) >> 2) {
+>          case 0: /* SrcAddr */
+>              s->chan[i].src =3D value;
+>              break;
+> --
+> 2.10.2
 
-So, here's my thoughts on this. I think our goals here are
- * get the out-of-tree code into the tree, over time
- * help you get to a point where you're maintaining and fixing
-   the FreeBSD code with us upstream, rather than deploying
-   downstream patches
+Looking at the TRM, I don't think this fix is correct. The switches
+are intended to handle all of the DMACC* DMA channel registers:
 
-and the primary obstacle is this big pile of non-upstreamed
-code. From my end I don't think it really matters too much
-what order we try to tackle things in, as long as the chunks
-that arrive for upstream review are not too large and seem at
-least vaguely coherent. If i386-on-x86_64 seems like you can
-extract it sensibly then I think it's as good a place to start
-as anything else (though of course it's of pretty much zero
-practical utility :-)).
+0x100 DMACC0SrcAddr
+0x104 DMACC0DestAddr
+0x108 DMACC0LLI
+0x10C DMACC0Control
+0x110 DMACC0Configuration
+0x120 DMACC1SrcAddr
+0x124 DMACC1DestAddr
+etc
+up to
+0x1F0 DMACC7Configuration
 
-Whether you want to keep the sparc support or delete it is
-I think up to you as the maintainer -- if it's broken and
-nobody cares about it I think we can happily delete it.
-On the other hand if you want to fix it up and keep it around
-then that's fine too.
+and what the switch is trying to do is figure out which of
+SrcAddr/DestAddr/LLI/Control/Configuration we're looking at
+(it then uses the correctly calculated 'i' index to pick the
+right index into the s->chan[] array for DMACC0 vs DMACC1 etc).
 
-At some point it would be good to get the BSDs into the set of
-things we test when merging code, so we don't regress them.
-That would ideally require hardware we can access though (the only
-real-hw setup in the gcc compile farm is an ancient NetBSD
-5.1 install). I guess instructions-for-BSD-novices on how to
-setup a VM on a Linux box would do in a pinch.
-
-(We should also try to avoid breaking bsd-user on the other
-BSDs in the course of fixing up FreeBSD -- do you know how
-many of the other BSD hosts work right now?)
+So the correct thing to switch on here is
+(offset & 0x1f) >> 2.
 
 thanks
 -- PMM
