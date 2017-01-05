@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40881)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40914)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cPAZY-0000pE-Af
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 11:07:29 -0500
+	(envelope-from <berrange@redhat.com>) id 1cPAZd-0000tZ-1V
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 11:07:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cPAZV-0001Ds-4o
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 11:07:24 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57414)
+	(envelope-from <berrange@redhat.com>) id 1cPAZZ-0001F3-3d
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 11:07:29 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33754)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cPAZU-0001DU-T6
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 11:07:21 -0500
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cPAZY-0001Ek-U4
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 11:07:25 -0500
 Received: from int-mx11.intmail.prod.int.phx2.redhat.com
 	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 25B9721733
-	for <qemu-devel@nongnu.org>; Thu,  5 Jan 2017 16:07:21 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2FB4B8050D
+	for <qemu-devel@nongnu.org>; Thu,  5 Jan 2017 16:07:25 +0000 (UTC)
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Thu,  5 Jan 2017 16:06:58 +0000
-Message-Id: <20170105160701.22118-6-berrange@redhat.com>
+Date: Thu,  5 Jan 2017 16:07:00 +0000
+Message-Id: <20170105160701.22118-8-berrange@redhat.com>
 In-Reply-To: <20170105160701.22118-1-berrange@redhat.com>
 References: <20170105160701.22118-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH 5/8] ui: extract code to connect/listen from
- vnc_display_open
+Subject: [Qemu-devel] [PATCH 7/8] util: add qemu_opt_get_all() to get
+ repeated opts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,160 +33,63 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Gerd Hoffmann <kraxel@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-The code which takes a SocketAddress and connects/listens on the
-network is going to get more complicated to deal with multiple
-listeners. Pull it out into a separate method to avoid making the
-vnc_display_open method even more complex.
+The QemuOpts parser accepts repeated option names, storing
+all the provided values. qemu_opt_get() then just returns
+the last value. There is no way to get the other values
+without using a callback function to iterate over all
+option names. Add a qemu_opt_get_all() method to return
+a string list of all values.
 
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- ui/vnc.c | 122 +++++++++++++++++++++++++++++++++++++++++----------------------
- 1 file changed, 80 insertions(+), 42 deletions(-)
+ include/qemu/option.h |  1 +
+ util/qemu-option.c    | 22 ++++++++++++++++++++++
+ 2 files changed, 23 insertions(+)
 
-diff --git a/ui/vnc.c b/ui/vnc.c
-index 8d3f9c1..94135c8 100644
---- a/ui/vnc.c
-+++ b/ui/vnc.c
-@@ -3691,6 +3691,84 @@ static int vnc_display_get_addresses(QemuOpts *opts,
-     return -1;
+diff --git a/include/qemu/option.h b/include/qemu/option.h
+index 1f9e3f9..689e0a8 100644
+--- a/include/qemu/option.h
++++ b/include/qemu/option.h
+@@ -65,6 +65,7 @@ struct QemuOptsList {
+ };
+ 
+ const char *qemu_opt_get(QemuOpts *opts, const char *name);
++size_t qemu_opt_get_all(QemuOpts *opts, const char *name, char ***vals);
+ char *qemu_opt_get_del(QemuOpts *opts, const char *name);
+ /**
+  * qemu_opt_has_help_opt:
+diff --git a/util/qemu-option.c b/util/qemu-option.c
+index 3467dc2..0418d71 100644
+--- a/util/qemu-option.c
++++ b/util/qemu-option.c
+@@ -332,6 +332,28 @@ const char *qemu_opt_get(QemuOpts *opts, const char *name)
+     return opt ? opt->str : NULL;
  }
  
-+static int vnc_display_connect(VncDisplay *vd,
-+                               SocketAddress *saddr,
-+                               SocketAddress *wsaddr,
-+                               Error **errp)
++size_t qemu_opt_get_all(QemuOpts *opts, const char *name, char ***vals)
 +{
-+    /* connect to viewer */
-+    QIOChannelSocket *sioc = NULL;
-+    if (wsaddr) {
-+        error_setg(errp, "Cannot use websockets in reverse mode");
-+        return -1;
++    QemuOpt *opt;
++    size_t nvals = 0;
++
++    *vals = NULL;
++
++    QTAILQ_FOREACH(opt, &opts->head, next) {
++        if (!g_str_equal(opt->name, name)) {
++            continue;
++        }
++
++        *vals = g_renew(char *, *vals, nvals + 1);
++        (*vals)[nvals++] = g_strdup(opt->str);
 +    }
-+    vd->is_unix = saddr->type == SOCKET_ADDRESS_KIND_UNIX;
-+    sioc = qio_channel_socket_new();
-+    qio_channel_set_name(QIO_CHANNEL(sioc), "vnc-reverse");
-+    if (qio_channel_socket_connect_sync(sioc, saddr, errp) < 0) {
-+        return -1;
++    if (nvals) {
++        *vals = g_renew(char *, *vals, nvals + 1);
++        (*vals)[nvals] = NULL;
 +    }
-+    vnc_connect(vd, sioc, false, false);
-+    object_unref(OBJECT(sioc));
-+    return 0;
++    return nvals;
 +}
 +
-+
-+static int vnc_display_listen_addr(VncDisplay *vd,
-+                                   SocketAddress *addr,
-+                                   const char *name,
-+                                   QIOChannelSocket ***lsock,
-+                                   guint **lsock_tag,
-+                                   size_t *nlsock,
-+                                   Error **errp)
-+{
-+    *nlsock = 1;
-+    *lsock = g_new0(QIOChannelSocket *, 1);
-+    *lsock_tag = g_new0(guint, 1);
-+
-+    (*lsock)[0] = qio_channel_socket_new();
-+    qio_channel_set_name(QIO_CHANNEL((*lsock)[0]), name);
-+    if (qio_channel_socket_listen_sync((*lsock)[0], addr, errp) < 0) {
-+        return -1;
-+    }
-+
-+    (*lsock_tag)[0] = qio_channel_add_watch(
-+        QIO_CHANNEL((*lsock)[0]),
-+        G_IO_IN, vnc_listen_io, vd, NULL);
-+
-+    return 0;
-+}
-+
-+
-+static int vnc_display_listen(VncDisplay *vd,
-+                              SocketAddress *saddr,
-+                              SocketAddress *wsaddr,
-+                              Error **errp)
-+{
-+    vd->is_unix = saddr->type == SOCKET_ADDRESS_KIND_UNIX;
-+
-+    if (vnc_display_listen_addr(vd, saddr,
-+                                "vnc-listen",
-+                                &vd->lsock,
-+                                &vd->lsock_tag,
-+                                &vd->nlsock,
-+                                errp) < 0) {
-+        return -1;
-+    }
-+    if (wsaddr &&
-+        vnc_display_listen_addr(vd, wsaddr,
-+                                "vnc-ws-listen",
-+                                &vd->lwebsock,
-+                                &vd->lwebsock_tag,
-+                                &vd->nlwebsock,
-+                                errp) < 0) {
-+        return -1;
-+    }
-+
-+    return 0;
-+}
-+
-+
- void vnc_display_open(const char *id, Error **errp)
- {
-     VncDisplay *vd = vnc_display_find(id);
-@@ -3909,53 +3987,13 @@ void vnc_display_open(const char *id, Error **errp)
-     }
- 
-     if (reverse) {
--        /* connect to viewer */
--        QIOChannelSocket *sioc = NULL;
--        if (wsaddr) {
--            error_setg(errp, "Cannot use websockets in reverse mode");
--            goto fail;
--        }
--        vd->is_unix = saddr->type == SOCKET_ADDRESS_KIND_UNIX;
--        sioc = qio_channel_socket_new();
--        qio_channel_set_name(QIO_CHANNEL(sioc), "vnc-reverse");
--        if (qio_channel_socket_connect_sync(sioc, saddr, errp) < 0) {
-+        if (vnc_display_connect(vd, saddr, wsaddr, errp) < 0) {
-             goto fail;
-         }
--        vnc_connect(vd, sioc, false, false);
--        object_unref(OBJECT(sioc));
-     } else {
--        vd->nlsock = 1;
--        vd->lsock = g_new0(QIOChannelSocket *, 1);
--        vd->lsock_tag = g_new0(guint, 1);
--
--        vd->lsock[0] = qio_channel_socket_new();
--        qio_channel_set_name(QIO_CHANNEL(vd->lsock[0]), "vnc-listen");
--        if (qio_channel_socket_listen_sync(vd->lsock[0], saddr, errp) < 0) {
-+        if (vnc_display_listen(vd, saddr, wsaddr, errp) < 0) {
-             goto fail;
-         }
--        vd->is_unix = saddr->type == SOCKET_ADDRESS_KIND_UNIX;
--
--        if (wsaddr) {
--            vd->nlwebsock = 1;
--            vd->lwebsock = g_new0(QIOChannelSocket *, 1);
--            vd->lwebsock_tag = g_new0(guint, 1);
--
--            vd->lwebsock[0] = qio_channel_socket_new();
--            qio_channel_set_name(QIO_CHANNEL(vd->lwebsock[0]), "vnc-ws-listen");
--            if (qio_channel_socket_listen_sync(vd->lwebsock[0],
--                                               wsaddr, errp) < 0) {
--                goto fail;
--            }
--        }
--
--        vd->lsock_tag[0] = qio_channel_add_watch(
--            QIO_CHANNEL(vd->lsock[0]),
--            G_IO_IN, vnc_listen_io, vd, NULL);
--        if (wsaddr) {
--            vd->lwebsock_tag[0] = qio_channel_add_watch(
--                QIO_CHANNEL(vd->lwebsock[0]),
--                G_IO_IN, vnc_listen_io, vd, NULL);
--        }
-     }
- 
-     if (qemu_opt_get(opts, "to")) {
+ /* Get a known option (or its default) and remove it from the list
+  * all in one action. Return a malloced string of the option value.
+  * Result must be freed by caller with g_free().
 -- 
 2.9.3
