@@ -1,32 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42299)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42333)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cP6Bu-0000LG-4P
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 06:26:42 -0500
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cP6Bw-0000QS-NR
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 06:26:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cP6Bq-0006Nk-40
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 06:26:42 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47506)
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cP6Bs-0006OV-OX
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 06:26:44 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53894
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
-	id 1cP6Bp-0006NO-Ql
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 06:26:38 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	v05BO3dE088854
-	for <qemu-devel@nongnu.org>; Thu, 5 Jan 2017 06:26:35 -0500
-Received: from e28smtp01.in.ibm.com (e28smtp01.in.ibm.com [125.16.236.1])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 27sjbyrtqp-1
+	id 1cP6Bs-0006OP-JF
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 06:26:40 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
+	v05BO15l094510
+	for <qemu-devel@nongnu.org>; Thu, 5 Jan 2017 06:26:40 -0500
+Received: from e28smtp08.in.ibm.com (e28smtp08.in.ibm.com [125.16.236.8])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 27sk0hxvgh-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 05 Jan 2017 06:26:35 -0500
+	for <qemu-devel@nongnu.org>; Thu, 05 Jan 2017 06:26:39 -0500
 Received: from localhost
-	by e28smtp01.in.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e28smtp08.in.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
-	Thu, 5 Jan 2017 16:56:31 +0530
+	Thu, 5 Jan 2017 16:56:36 +0530
 From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-Date: Thu,  5 Jan 2017 16:56:05 +0530
-Message-Id: <1483615579-17618-1-git-send-email-nikunj@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 00/14] POWER9 TCG enablements - part10
+Date: Thu,  5 Jan 2017 16:56:07 +0530
+In-Reply-To: <1483615579-17618-1-git-send-email-nikunj@linux.vnet.ibm.com>
+References: <1483615579-17618-1-git-send-email-nikunj@linux.vnet.ibm.com>
+Message-Id: <1483615579-17618-3-git-send-email-nikunj@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 02/14] target-ppc: Add xxinsertw instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,40 +41,98 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, rth@twiddle.net
 Cc: qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com, nikunj@linux.vnet.ibm.com
 
-This series contains 11 new instructions for POWER9 ISA3.0
-     VSX Vector Insert/Extract Word
-     VSX Scalar Extract Exponent/Significand
-     VSX Scalar Convert
-     VSX Scalar Add QP
-     Various float related improvements
+xxinsertw: VSX Vector Insert Word
 
-Bharata B Rao (8):
-  target-ppc: Use float64 arg in helper_compute_fprf()
-  target-ppc: Replace isden by float64_is_zero_or_denormal
-  target-ppc: Rename helper_compute_fprf to helper_compute_fprf_float64
-  target-ppc: Add xsaddqp instructions
-  target-ppc: Add xscvdphp, xscvhpdp
-  target-ppc: Use correct precision for FPRF setting
-  target-ppc: Add xscvdpqp instruction
-  target-ppc: Add xscvqpdp instruction
+Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+---
+ target-ppc/helper.h                 |  1 +
+ target-ppc/int_helper.c             | 25 +++++++++++++++++++++++++
+ target-ppc/translate/vsx-impl.inc.c |  5 +++--
+ target-ppc/translate/vsx-ops.inc.c  |  1 +
+ 4 files changed, 30 insertions(+), 2 deletions(-)
 
-Nikunj A Dadhania (6):
-  target-ppc: Add xxextractuw instruction
-  target-ppc: Add xxinsertw instruction
-  target-ppc: Add xsxexpdp instruction
-  target-ppc: Add xsxexpqp instruction
-  target-ppc: Add xsxsigdp instruction
-  target-ppc: Add xsxsigqp instructions
-
- include/fpu/softfloat.h             |  20 +++
- target-ppc/fpu_helper.c             | 241 +++++++++++++++++++++++++-----------
- target-ppc/helper.h                 |   9 +-
- target-ppc/int_helper.c             |  51 ++++++++
- target-ppc/internal.h               |   6 +
- target-ppc/translate/fp-impl.inc.c  |  20 +--
- target-ppc/translate/vsx-impl.inc.c | 122 ++++++++++++++++++
- target-ppc/translate/vsx-ops.inc.c  |  18 +++
- 8 files changed, 405 insertions(+), 82 deletions(-)
-
+diff --git a/target-ppc/helper.h b/target-ppc/helper.h
+index 8b30420..6c5b194 100644
+--- a/target-ppc/helper.h
++++ b/target-ppc/helper.h
+@@ -541,6 +541,7 @@ DEF_HELPER_2(xvrspiz, void, env, i32)
+ DEF_HELPER_2(xxperm, void, env, i32)
+ DEF_HELPER_2(xxpermr, void, env, i32)
+ DEF_HELPER_4(xxextractuw, void, env, tl, tl, i32)
++DEF_HELPER_4(xxinsertw, void, env, tl, tl, i32)
+ 
+ DEF_HELPER_2(efscfsi, i32, env, i32)
+ DEF_HELPER_2(efscfui, i32, env, i32)
+diff --git a/target-ppc/int_helper.c b/target-ppc/int_helper.c
+index 63ba0e3..24e5964 100644
+--- a/target-ppc/int_helper.c
++++ b/target-ppc/int_helper.c
+@@ -2059,6 +2059,31 @@ void helper_xxextractuw(CPUPPCState *env, target_ulong xtn,
+     putVSR(xtn, &xt, env);
+ }
+ 
++void helper_xxinsertw(CPUPPCState *env, target_ulong xtn,
++                      target_ulong xbn, uint32_t index)
++{
++    ppc_vsr_t xt, xb;
++    size_t es = sizeof(uint32_t);
++    int ins_index, i = 0;
++
++    getVSR(xbn, &xb, env);
++    getVSR(xtn, &xt, env);
++
++#if defined(HOST_WORDS_BIGENDIAN)
++    ins_index = index;
++    for (i = 0; i < es && ins_index < 16; i++, ins_index++) {
++        xt.u8[ins_index] = xb.u8[8 - es + i];
++    }
++#else
++    ins_index = 15 - index;
++    for (i = es - 1; i >= 0 && ins_index >= 0; i--, ins_index--) {
++        xt.u8[ins_index] = xb.u8[8 + i];
++    }
++#endif
++
++    putVSR(xtn, &xt, env);
++}
++
+ #define VEXT_SIGNED(name, element, mask, cast, recast)              \
+ void helper_##name(ppc_avr_t *r, ppc_avr_t *b)                      \
+ {                                                                   \
+diff --git a/target-ppc/translate/vsx-impl.inc.c b/target-ppc/translate/vsx-impl.inc.c
+index 7977f24..c9ba0f5 100644
+--- a/target-ppc/translate/vsx-impl.inc.c
++++ b/target-ppc/translate/vsx-impl.inc.c
+@@ -1180,7 +1180,7 @@ static void gen_xxsldwi(DisasContext *ctx)
+     tcg_temp_free_i64(xtl);
+ }
+ 
+-#define VSX_EXTRACT(name)                                       \
++#define VSX_EXTRACT_INSERT(name)                                \
+ static void gen_##name(DisasContext *ctx)                       \
+ {                                                               \
+     TCGv xt, xb;                                                \
+@@ -1208,7 +1208,8 @@ static void gen_##name(DisasContext *ctx)                       \
+     tcg_temp_free_i32(t0);                                      \
+ }
+ 
+-VSX_EXTRACT(xxextractuw)
++VSX_EXTRACT_INSERT(xxextractuw)
++VSX_EXTRACT_INSERT(xxinsertw)
+ 
+ #undef GEN_XX2FORM
+ #undef GEN_XX3FORM
+diff --git a/target-ppc/translate/vsx-ops.inc.c b/target-ppc/translate/vsx-ops.inc.c
+index 473d925..096d358 100644
+--- a/target-ppc/translate/vsx-ops.inc.c
++++ b/target-ppc/translate/vsx-ops.inc.c
+@@ -285,6 +285,7 @@ GEN_XX2FORM(xxspltw, 0x08, 0x0A, PPC2_VSX),
+ GEN_XX1FORM(xxspltib, 0x08, 0x0B, PPC2_ISA300),
+ GEN_XX3FORM_DM(xxsldwi, 0x08, 0x00),
+ GEN_XX2FORM_EXT(xxextractuw, 0x0A, 0x0A, PPC2_ISA300),
++GEN_XX2FORM_EXT(xxinsertw, 0x0A, 0x0B, PPC2_ISA300),
+ 
+ #define GEN_XXSEL_ROW(opc3) \
+ GEN_HANDLER2_E(xxsel, "xxsel", 0x3C, 0x18, opc3, 0, PPC_NONE, PPC2_VSX), \
 -- 
 2.7.4
