@@ -1,32 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37492)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37673)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cOzvq-0002Hy-OS
-	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 23:45:43 -0500
+	(envelope-from <no-reply@patchew.org>) id 1cOzwp-0002vV-4l
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 23:46:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cOzvn-0006IR-FH
-	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 23:45:42 -0500
-Received: from indium.canonical.com ([91.189.90.7]:34654)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cOzvn-0006Gu-0R
-	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 23:45:39 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cOzvl-0008F7-NO
-	for <qemu-devel@nongnu.org>; Thu, 05 Jan 2017 04:45:37 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 9FE052E80C0
-	for <qemu-devel@nongnu.org>; Thu,  5 Jan 2017 04:45:37 +0000 (UTC)
+	(envelope-from <no-reply@patchew.org>) id 1cOzwn-0006uw-Tr
+	for qemu-devel@nongnu.org; Wed, 04 Jan 2017 23:46:43 -0500
+Resent-Message-Id: <E1cOzwn-0006uw-Tr@eggs.gnu.org>
+In-Reply-To: <20170105043430.3176-1-alastair@au1.ibm.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <148359157802.163.13107420866879330880@790289a7ca88>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 05 Jan 2017 04:37:42 -0000
-From: Paul Goyette <1654137@bugs.launchpad.net>
-Reply-To: Bug 1654137 <1654137@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <20170105043743.14700.719.malonedeb@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1654137] [NEW] Ctrl-A b not working in 2.8.0
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 4 Jan 2017 20:46:18 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v5 0/7] Add support for the Epson RX8900
+ RTC to the aspeed board
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,44 +24,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: alastair@au1.ibm.com
+Cc: famz@redhat.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org, andrew@aj.id.au, peter.maydell@linaro.org, alastair@d-silva.org, clg@kaod.org, joel@jms.id.au
 
-Public bug reported:
-
-With a recent update from 2.7.0 to 2.8.0 I have discovered that I can no
-longer send a "break" to the VM.  Ctrl-A b is simply ignored.  Other
-Ctrl-A sequences seem to work correctly.
-
-This is on a NetBSD amd64 system, version 7.99.53, and qemu was
-installed on this system from source.
-
-Reverting to the previous install restores "break" capability.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1654137
-
-Title:
-  Ctrl-A b not working in 2.8.0
-
-Status in QEMU:
-  New
-
-Bug description:
-  With a recent update from 2.7.0 to 2.8.0 I have discovered that I can
-  no longer send a "break" to the VM.  Ctrl-A b is simply ignored.
-  Other Ctrl-A sequences seem to work correctly.
-
-  This is on a NetBSD amd64 system, version 7.99.53, and qemu was
-  installed on this system from source.
-
-  Reverting to the previous install restores "break" capability.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1654137/+subscriptions
+SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
+YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjUgMC83XSBBZGQgc3VwcG9ydCBmb3IgdGhlIEVw
+c29uIFJYODkwMCBSVEMgdG8gdGhlIGFzcGVlZCBib2FyZApNZXNzYWdlLWlkOiAyMDE3MDEwNTA0
+MzQzMC4zMTc2LTEtYWxhc3RhaXJAYXUxLmlibS5jb20KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9
+PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAk
+QkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgojIFVzZWZ1bCBnaXQgb3B0aW9ucwpnaXQgY29uZmln
+IC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFt
+ZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4u
+KSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90
+YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cg
+JGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07
+IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkp
+CmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4
+Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHVi
+LmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIw
+MTcwMTA1MDQzNDMwLjMxNzYtMS1hbGFzdGFpckBhdTEuaWJtLmNvbSAtPiBwYXRjaGV3LzIwMTcw
+MTA1MDQzNDMwLjMxNzYtMS1hbGFzdGFpckBhdTEuaWJtLmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBi
+cmFuY2ggJ3Rlc3QnCmFmYTIzOWIgYXJtOiBBZGQgYW4gUlg4OTAwIFJUQyB0byB0aGUgQVNwZWVk
+IGJvYXJkCjE1OWI5ZWMgdGVzdHM6IFRlc3QgYWxsIGltcGxlbWVudGVkIFJYODkwMCBmdW5jdGlv
+bmFsaXR5CjZmMjk3NTQgaHcvdGltZXI6IEFkZCBFcHNvbiBSWDg5MDAgUlRDIHN1cHBvcnQKZTQy
+YWRjNCBxdGVzdDogRml4IHdoaXRlc3BhY2UKMmM2NDNlMyBxdGVzdDogU3VwcG9ydCBzZXR0aW5n
+IG5hbWVkIEdQSU9zCmYzMjUxNjIgcXRlc3Q6IFN1cHBvcnQgbmFtZWQgaW50ZXJydXB0cwo4NzBl
+MTU5IGFybTogVW5pcXVlbHkgbmFtZSBpbXgyNSBJMkMgYnVzZXMuCgo9PT0gT1VUUFVUIEJFR0lO
+ID09PQpDaGVja2luZyBQQVRDSCAxLzc6IGFybTogVW5pcXVlbHkgbmFtZSBpbXgyNSBJMkMgYnVz
+ZXMuLi4uCkNoZWNraW5nIFBBVENIIDIvNzogcXRlc3Q6IFN1cHBvcnQgbmFtZWQgaW50ZXJydXB0
+cy4uLgpDaGVja2luZyBQQVRDSCAzLzc6IHF0ZXN0OiBTdXBwb3J0IHNldHRpbmcgbmFtZWQgR1BJ
+T3MuLi4KQ2hlY2tpbmcgUEFUQ0ggNC83OiBxdGVzdDogRml4IHdoaXRlc3BhY2UuLi4KQ2hlY2tp
+bmcgUEFUQ0ggNS83OiBody90aW1lcjogQWRkIEVwc29uIFJYODkwMCBSVEMgc3VwcG9ydC4uLgpD
+aGVja2luZyBQQVRDSCA2Lzc6IHRlc3RzOiBUZXN0IGFsbCBpbXBsZW1lbnRlZCBSWDg5MDAgZnVu
+Y3Rpb25hbGl0eS4uLgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICc8JyAoY3R4
+Old4QikKIzM0NzogRklMRTogdGVzdHMvcng4OTAwLXRlc3QuYzozMTM6CisgICAgd2hpbGUgKGdl
+dHRpbWVvZmRheSgmbm93LCBOVUxMKSwgdGltZXJjbXAoJm5vdywgJmVuZCwgPCkpIHsKICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgp0
+b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDg5NCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNo
+IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
+cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
+CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA3Lzc6IGFybTogQWRk
+IGFuIFJYODkwMCBSVEMgdG8gdGhlIEFTcGVlZCBib2FyZC4uLgo9PT0gT1VUUFVUIEVORCA9PT0K
+ClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBh
+dXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2Vu
+ZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
