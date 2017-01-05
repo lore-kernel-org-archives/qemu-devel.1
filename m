@@ -1,24 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57866)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59733)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cPG4X-0005qA-2M
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 16:59:46 -0500
+	(envelope-from <eblake@redhat.com>) id 1cPGEM-0003eY-0v
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 17:09:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cPG4S-0008B7-5x
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 16:59:45 -0500
-References: <1482166064-18121-1-git-send-email-joserz@linux.vnet.ibm.com>
-	<1482166064-18121-2-git-send-email-joserz@linux.vnet.ibm.com>
-	<8cb9e1d4-3dca-8a32-9f0d-2173bea52771@redhat.com>
-	<20170105214552.GA15064@pacoca>
+	(envelope-from <eblake@redhat.com>) id 1cPGEI-0002vN-18
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 17:09:54 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52402)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cPGEH-0002v8-OV
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 17:09:49 -0500
+Received: from int-mx10.intmail.prod.int.phx2.redhat.com
+	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id F305461BA0
+	for <qemu-devel@nongnu.org>; Thu,  5 Jan 2017 22:09:49 +0000 (UTC)
+References: <20170105160321.21786-1-berrange@redhat.com>
+	<20170105160321.21786-8-berrange@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <e2b8f962-3a62-8577-c02a-1a2f7b7c080c@redhat.com>
-Date: Thu, 5 Jan 2017 15:59:36 -0600
+Message-ID: <857b8995-d924-e6a5-b453-e2fed1394b84@redhat.com>
+Date: Thu, 5 Jan 2017 16:09:47 -0600
 MIME-Version: 1.0
-In-Reply-To: <20170105214552.GA15064@pacoca>
+In-Reply-To: <20170105160321.21786-8-berrange@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="B4XxGkitTFmRVXA154fKnukieo5EXS1Rj"
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v4 1/6] target-ppc: Implement
- unsigned quadword left/right shift and unit tests
+	boundary="rVbdWrvfAGu1bONGGL79E6PPKSWh4Dw1x"
+Subject: Re: [Qemu-devel] [PATCH 7/8] io: remove Error parameter from
+ QIOTask thread worker
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,94 +35,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: joserz@linux.vnet.ibm.com
-Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---B4XxGkitTFmRVXA154fKnukieo5EXS1Rj
+--rVbdWrvfAGu1bONGGL79E6PPKSWh4Dw1x
 From: Eric Blake <eblake@redhat.com>
-To: joserz@linux.vnet.ibm.com
-Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, qemu-devel@nongnu.org,
- bharata@linux.vnet.ibm.com
-Message-ID: <e2b8f962-3a62-8577-c02a-1a2f7b7c080c@redhat.com>
-Subject: Re: [Qemu-ppc] [Qemu-devel] [PATCH v4 1/6] target-ppc: Implement
- unsigned quadword left/right shift and unit tests
-References: <1482166064-18121-1-git-send-email-joserz@linux.vnet.ibm.com>
- <1482166064-18121-2-git-send-email-joserz@linux.vnet.ibm.com>
- <8cb9e1d4-3dca-8a32-9f0d-2173bea52771@redhat.com>
- <20170105214552.GA15064@pacoca>
-In-Reply-To: <20170105214552.GA15064@pacoca>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <857b8995-d924-e6a5-b453-e2fed1394b84@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 7/8] io: remove Error parameter from QIOTask
+ thread worker
+References: <20170105160321.21786-1-berrange@redhat.com>
+ <20170105160321.21786-8-berrange@redhat.com>
+In-Reply-To: <20170105160321.21786-8-berrange@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 01/05/2017 03:45 PM, joserz@linux.vnet.ibm.com wrote:
-
->>
->>> +    { 0, 0, 0ULL, 0, 200, false },
->>
->> If you are going to support shifts larger than 127, your testsuite
->> should include a shift of a non-zero number.  Also, if you are going t=
-o
->> implicitly truncate the shift value into range, then accepting a signe=
-d
->> shift might be nicer (as there are cases where it is easier to code a
->> shift by -1 than it is a shift by 127).
+On 01/05/2017 10:03 AM, Daniel P. Berrange wrote:
+> Now that task objects have a directly associated error,
+> there's no need for an an Error **errp parameter to
+> the QIOTask thread worker function. It already has a
+> QIOTask object, so can directly set the error on it.
 >=20
-> Correct me if I'm wrong: Actually the caller can use the function like:=
-
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>  include/io/task.h    | 19 +++++++++----------
+>  io/channel-socket.c  | 47 ++++++++++++++++++++++----------------------=
+---
+>  io/task.c            | 10 +---------
+>  tests/test-io-task.c | 12 +++++-------
+>  4 files changed, 37 insertions(+), 51 deletions(-)
 >=20
-> urshift(low, high, (uint32_t)-1);
->=20
-> And I'll get "shift =3D=3D UINT_MAX", which truncates to 127 after "&=3D=
- 127".
-> I don't need to use a signed integer necessarily, right?
+> diff --git a/include/io/task.h b/include/io/task.h
+> index 7b5bc43..dca57dc 100644
+> --- a/include/io/task.h
+> +++ b/include/io/task.h
+> @@ -29,9 +29,8 @@ typedef struct QIOTask QIOTask;
+>  typedef void (*QIOTaskFunc)(QIOTask *task,
+>                              gpointer opaque);
+> =20
+> -typedef int (*QIOTaskWorker)(QIOTask *task,
+> -                             Error **errp,
+> -                             gpointer opaque);
+> +typedef void (*QIOTaskWorker)(QIOTask *task,
+> +                              gpointer opaque);
 
-It's not necessary to make the number signed, and in fact, thanks to C
-implicit promotion rules and qemu's guarantee that we only compile on
-hardware with twos-complement signed numbers, urshift(low, high, -1)
-works the same whether the shift parameter is typed as signed or
-unsigned (without needing an explicit cast).
+Hmm, so you're getting rid of the return type here, because the QIOTask
+now holds everything. I'm still not sure whether a void* return would be
+easier, but I'm not going to reject your patch because of my bikeshedding=
+=2E
 
-It's just that making it signed instead of unsigned makes it slightly
-easier to read code by interpreting shifting by -1 as "shift all but the
-last bit out" (shifting by -2 is "shift all but the last two bits out",
-etc.), where there is no ambiguity what was meant on shift values down
-to -127.  In contrast, shifting by UINT_MAX is ambiguous to read without
-further consulting the documentation (is it "shift modulo bit width" or
-"shift to infinity so that I'm left with 0"?).  Or put another way,
-making the shift amount signed makes it OBVIOUS that you are implicitly
-masking the shift amount to the maximum width shift (making it perhaps a
-bit easier to see that shifting by 128 is a no-op, rather than a synonym
-for making the result 0), while leaving the shift amount unsigned almost
-argues that you want to assert that the shift amount is in range.
+> =20
+>  /**
+>   * QIOTask:
+> @@ -163,18 +162,18 @@ typedef int (*QIOTaskWorker)(QIOTask *task,
+>   * socket listen using QIOTask would require:
+>   *
+>   * <example>
+> - *    static int myobject_listen_worker(QIOTask *task,
+> - *                                      Error **errp,
+> - *                                      gpointer opaque)
+> + *    static void myobject_listen_worker(QIOTask *task,
+> + *                                       gpointer opaque)
+>   *    {
+>   *       QMyObject obj =3D QMY_OBJECT(qio_task_get_source(task));
+>   *       SocketAddress *addr =3D opaque;
+> + *       Error *err =3D NULL;
+>   *
+> - *       obj->fd =3D socket_listen(addr, errp);
+> - *       if (obj->fd < 0) {
+> - *          return -1;
+> + *       obj->fd =3D socket_listen(addr, &err);
+> + *
+> + *       if (err) {
+> + *           qio_task_set_error(task, err);
 
+I argued earlier that you can call this unconditionally, dropping the
+'if (err)'.  Both here in the doc example...
 
->>> +{
->>> +    shift &=3D 127;
->>
->> This says you allow any shift value (whether negative or beyond 127);
->> either the testsuite must cover this, or you should tighten the contra=
-ct
->> and assert that the callers pass a value in range.
->=20
-> I prefer to let this function flexible and let the caller decides
-> whether to assert it or not before calling these functions. But I'm
-> totally open to assert it if you prefer.
->=20
-> I'm writing the testcase to cover it.
+> +++ b/io/channel-socket.c
+> @@ -156,19 +156,18 @@ int qio_channel_socket_connect_sync(QIOChannelSoc=
+ket *ioc,
+>  }
+> =20
+> =20
+> -static int qio_channel_socket_connect_worker(QIOTask *task,
+> -                                             Error **errp,
+> -                                             gpointer opaque)
+> +static void qio_channel_socket_connect_worker(QIOTask *task,
+> +                                              gpointer opaque)
+>  {
+>      QIOChannelSocket *ioc =3D QIO_CHANNEL_SOCKET(qio_task_get_source(t=
+ask));
+>      SocketAddress *addr =3D opaque;
+> -    int ret;
+> +    Error *err =3D NULL;
+> =20
+> -    ret =3D qio_channel_socket_connect_sync(ioc,
+> -                                          addr,
+> -                                          errp);
+> +    qio_channel_socket_connect_sync(ioc, addr, &err);
+> =20
+> -    return ret;
+> +    if (err) {
+> +        qio_task_set_error(task, err);
 
-At any rate, I'm fine with your decision to state that it is up to the
-caller to range-check if truncation was not intended, and that the
-worker function implicitly truncates rather than noisily asserting a
-range - as long as the v5 patch also includes the documentation and
-testsuite coverage of this behavior.
+=2E..and in the actual code.  But I guess leaving it in doesn't hurt much=
+,
+either.
+
+> @@ -107,10 +102,7 @@ static gpointer qio_task_thread_worker(gpointer op=
+aque)
+>      struct QIOTaskThreadData *data =3D opaque;
+> =20
+>      trace_qio_task_thread_run(data->task);
+> -    data->ret =3D data->worker(data->task, &data->err, data->opaque);
+> -    if (data->ret < 0 && data->err =3D=3D NULL) {
+> -        error_setg(&data->err, "Task worker failed but did not set an =
+error");
+> -    }
+> +    data->worker(data->task, data->opaque);
+
+I like that your choice of making the error part of the QIOTask
+simplifies the workers.
+
+Up to you whether to simplify the conditionals.
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
 --=20
 Eric Blake   eblake redhat com    +1-919-301-3266
 Libvirt virtualization library http://libvirt.org
 
 
---B4XxGkitTFmRVXA154fKnukieo5EXS1Rj
+--rVbdWrvfAGu1bONGGL79E6PPKSWh4Dw1x
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -124,13 +176,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJYbsHIAAoJEKeha0olJ0NqZ5cH/ja0mF4RWypZXtjyjJNAYpxj
-ErWbeJvcBeGgtJOZCcU5Xnedc15CqMsAMlNAKajZ1mIhV6znqhAo9bFw/mMF+bNA
-7cfhf+wLemy18sUi7NI4fum1E9S+4oJVkjkeEoEMJuHLhaIv0iWl6OyzgLhO2KV1
-3K6Bmp5eEguvpArrMArxhixBxiQO/fBHlYagzf85Pgqa+5DMwsNKqBOUUO8Nwj0S
-enT9LY2VDCX4YdF0wlSb84M360ofSlfeNwzMpU+LUX1iaRCgsv9Op9FkqTC44WCZ
-xDSZX3sVlZHDJjJBt5C6aWYY92/aw8PemDMuL8kFinZS8CWAU+33DYDmcd9LMi4=
-=Q1aL
+iQEcBAEBCAAGBQJYbsQrAAoJEKeha0olJ0NqxDAH/2ETqp1yHBPpGKVbUgW1nN2P
+/otavL8xvyH+ZNgNKFS5nxCjTjHSHgQZ+OwwN8Zem7YYvgIoVwh+r0nmFrDueWU9
+Ms5GhvzZSSNRK9btE1JzHxgnrVmUFdae+f8cXDJH3dnPgKOdW7oM6Xg0jSRSNtZZ
+/i/43T2Z0T/3nfc7xwUnLYH2rmBtdTtw6Iw3sz3jTHMwCNf0X/Wpi4Qhvn/k+mxE
+yIEfPBUlLNbJHvxR7PgDXa9084R1x3QzIytzITS82QLyrJiu4GJhf/lO5CrS290W
+pQ2vtTndDIWlsPvX+oVVvQEMvC934cRG1ANEKsfzwNiTdcSnXtokrW5n2Y7OCAA=
+=3YNf
 -----END PGP SIGNATURE-----
 
---B4XxGkitTFmRVXA154fKnukieo5EXS1Rj--
+--rVbdWrvfAGu1bONGGL79E6PPKSWh4Dw1x--
