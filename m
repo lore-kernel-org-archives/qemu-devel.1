@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40387)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40579)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1cPYHd-0005AV-Sq
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 12:26:30 -0500
+	(envelope-from <no-reply@patchew.org>) id 1cPYIF-0005wF-Uu
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 12:27:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1cPYHZ-0004FE-S2
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 12:26:29 -0500
-Received: from roura.ac.upc.edu ([147.83.33.10]:36957 helo=roura.ac.upc.es)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1cPYHZ-0004F5-F3
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 12:26:25 -0500
-From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
-References: <20170106155543.12827-1-berrange@redhat.com>
-	<20170106155543.12827-47-berrange@redhat.com>
-Date: Fri, 06 Jan 2017 18:26:20 +0100
-In-Reply-To: <20170106155543.12827-47-berrange@redhat.com> (Daniel
-	P. Berrange's message of "Fri, 6 Jan 2017 15:55:42 +0000")
-Message-ID: <87wpe814n7.fsf@ac.upc.edu>
+	(envelope-from <no-reply@patchew.org>) id 1cPYIF-0004Pj-12
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 12:27:07 -0500
+Resent-Message-Id: <E1cPYIF-0004Pj-12@eggs.gnu.org>
+In-Reply-To: <20170106162116.12859-1-kirkseraph@gmail.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <148372361252.199.14478591434551054669@790289a7ca88>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 46/47] trace: update docs to reflect new
- code generation approach
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 6 Jan 2017 09:26:53 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCHv2] target-arm/abi32: check for segfault in
+ do_kernel_trap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,41 +24,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: kirkseraph@gmail.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, qemu-arm@nongnu.org
 
-Daniel P Berrange writes:
-
-> Describe use of per-subdir trace events files and how it impacts
-> code generation.
-
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
->  docs/tracing.txt | 61 +++++++++++++++++++++++++++++++++++++++++++++++---------
->  1 file changed, 52 insertions(+), 9 deletions(-)
-
-> diff --git a/docs/tracing.txt b/docs/tracing.txt
-> index f351998a..3262a61 100644
-> --- a/docs/tracing.txt
-> +++ b/docs/tracing.txt
-> @@ -27,18 +27,51 @@ for debugging, profiling, and observing execution.
- 
->  == Trace events ==
- 
-> +=== Sub-directory setup ===
-> +
->  Each directory in the source tree can declare a set of static trace events
-> -in a "trace-events" file. Each trace event declaration names the event, its
-> -arguments, and the format string which can be used for pretty-printing:
-> +in a "trace-events" file. The first (non-comment) statement in the file
-> +must be "@id_offset(NN)" where NN is an integer that is unique among all
-> +"trace-events" files in the QEMU source tree. The IDs can be arbitrarily
-> +chosen, but for extra fun the current "trace-events" files use values from
-> +the "powerful number" integer sequence :-)
-
-I think that the description of @id_offset is a leftover from a previous version
-of the series.
-
-
-Cheers,
-  Lluis
+SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
+ZGV2ZWxdIFtQQVRDSHYyXSB0YXJnZXQtYXJtL2FiaTMyOiBjaGVjayBmb3Igc2VnZmF1bHQgaW4g
+ZG9fa2VybmVsX3RyYXAKTWVzc2FnZS1pZDogMjAxNzAxMDYxNjIxMTYuMTI4NTktMS1raXJrc2Vy
+YXBoQGdtYWlsLmNvbQpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEv
+YmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4u
+IHwgd2MgLWwpCmZhaWxlZD0wCgojIFVzZWZ1bCBnaXQgb3B0aW9ucwpnaXQgY29uZmlnIC0tbG9j
+YWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1
+ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9y
+IGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQo
+Z2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1m
+b3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4K
+ICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUK
+CmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTlj
+MjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9w
+YXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMTcwMTA2
+MTYyMTE2LjEyODU5LTEta2lya3NlcmFwaEBnbWFpbC5jb20gLT4gcGF0Y2hldy8yMDE3MDEwNjE2
+MjExNi4xMjg1OS0xLWtpcmtzZXJhcGhAZ21haWwuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5j
+aCAndGVzdCcKOGVhMzA2MiB0YXJnZXQtYXJtL2FiaTMyOiBjaGVjayBmb3Igc2VnZmF1bHQgaW4g
+ZG9fa2VybmVsX3RyYXAKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTog
+dGFyZ2V0LWFybS9hYmkzMjogY2hlY2sgZm9yIHNlZ2ZhdWx0IGluIGRvX2tlcm5lbF90cmFwLi4u
+CkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0
+ZW1lbnQKIzU2OiBGSUxFOiBsaW51eC11c2VyL21haW4uYzo1MTc6CisgICAgaWYgKGdldF91c2Vy
+X3UzMih2YWwsIGFkZHIpKQpbLi4uXQoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZv
+ciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojNjA6IEZJTEU6IGxpbnV4LXVzZXIvbWFpbi5j
+OjUyMToKKyAgICAgICAgaWYgKHB1dF91c2VyX3UzMih2YWwsIGFkZHIpKQpbLi4uXQoKdG90YWw6
+IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCA5NSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBz
+dHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJl
+IGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNL
+UEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBl
+eGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5
+IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNr
+IHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
