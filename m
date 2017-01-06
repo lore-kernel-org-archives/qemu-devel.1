@@ -1,14 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37726)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37727)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cPMiA-0006mQ-9L
+	(envelope-from <dgibson@ozlabs.org>) id 1cPMiA-0006mR-9J
 	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 00:05:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cPMi7-0002mz-42
+	(envelope-from <dgibson@ozlabs.org>) id 1cPMi7-0002n4-3v
 	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 00:05:06 -0500
+Date: Fri, 6 Jan 2017 15:49:56 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri,  6 Jan 2017 16:04:51 +1100
-Message-Id: <20170106050451.11793-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [RFC] pxb: Restrict to x86
+Message-ID: <20170106044956.GM13763@umbus.fritz.box>
+References: <20170106002628.10343-1-zxq_yx_007@163.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="SEFvVLxbW/dEDtN8"
+Content-Disposition: inline
+In-Reply-To: <20170106002628.10343-1-zxq_yx_007@163.com>
+Subject: Re: [Qemu-devel] [PATCH v2 0/4] QOM'ify work for ppc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,56 +23,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: marcel@redhat.com, mst@redhat.com, ehabkost@redhat.com
-Cc: thuth@redhat.com, lvivier@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: xiaoqiang zhao <zxq_yx_007@163.com>
+Cc: qemu-devel@nongnu.org, agraf@suse.de, peter.maydell@linaro.org, qemu-ppc@nongnu.org
 
-The PCI Expander Bridge (PXB) device is essentially a hack to allow
-different PCIe devices to be assigned to different NUMA nodes on x86.  Each
-PXB is sort-of a separate PCI host bridge, except that its config space
-is shared with the config space of the main PCI host bridge, rather than
-being independent.
 
-This is only necessary if the platform doesn't (easily) allow truly
-independent PCI host bridges.  AFAIK that's just x86.
+--SEFvVLxbW/dEDtN8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-This patch makes it possible to configure PXB out of the build, and adjusts
-the default configs so it's only included on x86 targets.
+On Fri, Jan 06, 2017 at 08:26:24AM +0800, xiaoqiang zhao wrote:
+> This is some QOM'ify work relate with ppc.
+> See each commit message for details.
+>=20
+> changes in v2:
+>   remove empty function 'spapr_vio_bridge_init'
 
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- default-configs/i386-softmmu.mak   | 1 +
- default-configs/x86_64-softmmu.mak | 1 +
- hw/pci-bridge/Makefile.objs        | 2 +-
- 3 files changed, 3 insertions(+), 1 deletion(-)
+Applied to ppc-for-2.9, thanks.
 
-diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
-index 0b51360..6c52d26 100644
---- a/default-configs/i386-softmmu.mak
-+++ b/default-configs/i386-softmmu.mak
-@@ -56,3 +56,4 @@ CONFIG_IOH3420=y
- CONFIG_I82801B11=y
- CONFIG_SMBIOS=y
- CONFIG_HYPERV_TESTDEV=$(CONFIG_KVM)
-+CONFIG_PXB=y
-diff --git a/default-configs/x86_64-softmmu.mak b/default-configs/x86_64-softmmu.mak
-index 7f89503..2d0341c 100644
---- a/default-configs/x86_64-softmmu.mak
-+++ b/default-configs/x86_64-softmmu.mak
-@@ -56,3 +56,4 @@ CONFIG_IOH3420=y
- CONFIG_I82801B11=y
- CONFIG_SMBIOS=y
- CONFIG_HYPERV_TESTDEV=$(CONFIG_KVM)
-+CONFIG_PXB=y
-diff --git a/hw/pci-bridge/Makefile.objs b/hw/pci-bridge/Makefile.objs
-index f2adfe3..5612bd7 100644
---- a/hw/pci-bridge/Makefile.objs
-+++ b/hw/pci-bridge/Makefile.objs
-@@ -1,5 +1,5 @@
- common-obj-y += pci_bridge_dev.o
--common-obj-y += pci_expander_bridge.o
-+common-obj-$(CONFIG_PXB) += pci_expander_bridge.o
- common-obj-$(CONFIG_XIO3130) += xio3130_upstream.o xio3130_downstream.o
- common-obj-$(CONFIG_IOH3420) += ioh3420.o
- common-obj-$(CONFIG_I82801B11) += i82801b11.o
--- 
-2.9.3
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--SEFvVLxbW/dEDtN8
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJYbyHyAAoJEGw4ysog2bOSzO4QALUdnGSQOUV6jhZoYAEwt0fs
+/UaJMuzlwUm2g5jIy4M7pSC9zdjeicE56eArAwka+QIJ/CGvz6G5R/t0erB6ldQH
+r31Ef1qpgHk2cRTDYpk6ZyHq6PntltyPhr20xckNTJbBiSLV+eQCtd5viZ5ze80k
+VBf7vKTooqomBHvIuqrolDBf2OT1i6Ty+5GMD/+5PeIySCyQVL5DjJxkHzWNhBGT
+MpRzl0MqkrRMtTYJKr/jmtCVSDI6UX3pB4ZUt0JC1PRQn+jJJPRYuthn2EkfKnk9
+mpU0sNlrJorQQ3sTUCpMrZJaM/JJkffLHmASY9uA8Kykg5WIEHw0nNBOsMTH1Ryo
+tNQjhROTKIU1LRJAihJCv/p/Qwe4q5Qxj8kMuOP14L8uDIfC182VPKosUJ+WigUv
+fA1aAA2gBUzsKDMyuTQr4KadS5e2eGFxTZLPFKQ3ItCZYNkPbaEAuaekrIOoAVII
+HbWUzGlhKQe9AEdYtBjYcHhkPrXASh9xjvY+DzUFJ5WfotfzPRAjYAkhgex+tupb
+Dtg04SPuol1cXhWZpxgltO89NeaO7Kh9pFfeBY5Nk/keUiPR25tO8l6Yxiae0TDV
+F/+pCzCErP70TfYqajsy5uUL7NPNiNq60R0OMBuMWyHsUggsDi/Pt1EoA9y9Yidp
+sS4L8SDjmlDLFfk1v2Uf
+=mQY4
+-----END PGP SIGNATURE-----
+
+--SEFvVLxbW/dEDtN8--
