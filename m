@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33553)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34882)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cPZcF-00068L-5r
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 13:51:52 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cPZjc-0004Uf-0I
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 13:59:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cPZcB-0007lB-OB
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 13:51:51 -0500
-Resent-Message-Id: <E1cPZcB-0007lB-OB@eggs.gnu.org>
-Received: from sender163-mail.zoho.com ([74.201.84.163]:21314)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1cPZcB-0007ko-Fo
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 13:51:47 -0500
-In-Reply-To: <20170106182823.1960-1-dgilbert@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <148372870194.199.4494478269203412425@790289a7ca88>
+	(envelope-from <dgilbert@redhat.com>) id 1cPZjX-0002N8-Qb
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 13:59:28 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40062)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cPZjX-0002LV-L2
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 13:59:23 -0500
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com
+	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9F2818050D
+	for <qemu-devel@nongnu.org>; Fri,  6 Jan 2017 18:59:23 +0000 (UTC)
+Date: Fri, 6 Jan 2017 18:59:19 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170106185918.GA32535@work-vm>
+References: <20170106182823.1960-1-dgilbert@redhat.com>
+	<148372870194.199.4494478269203412425@790289a7ca88>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 6 Jan 2017 10:51:43 -0800 (PST)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <148372870194.199.4494478269203412425@790289a7ca88>
 Subject: Re: [Qemu-devel] [PATCH 00/15] Postcopy: Hugepage support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -28,64 +33,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: dgilbert@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, quintela@redhat.com, amit.shah@redhat.com, aarcange@redhat.com
+To: qemu-devel@nongnu.org
+Cc: quintela@redhat.com, amit.shah@redhat.com, aarcange@redhat.com
 
-SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTcwMTA2MTgyODIzLjE5NjAtMS1kZ2lsYmVydEByZWRoYXQuY29tClN1Ympl
-Y3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMDAvMTVdIFBvc3Rjb3B5OiBIdWdlcGFnZSBzdXBwb3J0
-Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRv
-dGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKIyBVc2Vm
-dWwgZ2l0IG9wdGlvbnMKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQg
-Y29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZv
-cm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNo
-byAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAk
-YykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2No
-ZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBl
-Y2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NS
-SVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3
-MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25l
-dyB0YWddICAgICAgICAgcGF0Y2hldy8yMDE3MDEwNjE4MjgyMy4xOTYwLTEtZGdpbGJlcnRAcmVk
-aGF0LmNvbSAtPiBwYXRjaGV3LzIwMTcwMTA2MTgyODIzLjE5NjAtMS1kZ2lsYmVydEByZWRoYXQu
-Y29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKODI4YjFhMyBwb3N0Y29weTogQWRk
-IGRvYyBhYm91dCBodWdlcGFnZXMgYW5kIHBvc3Rjb3B5CmFlNjBkZWUgcG9zdGNvcHk6IENoZWNr
-IGZvciB1c2VyZmF1bHQraHVnZXBhZ2UgZmVhdHVyZQo5NjAxZDBlIHBvc3Rjb3B5OiBVcGRhdGUg
-dXNlcmZhdWx0ZmQuaCBoZWFkZXIKM2ExMWJiYSBwb3N0Y29weTogQWxsb3cgaHVnZXBhZ2VzCmQx
-ZGZlNjcgcG9zdGNvcHk6IFNlbmQgd2hvbGUgaHVnZSBwYWdlcwo0ZmU4ZDk4IHBvc3Rjb3B5OiBN
-YXNrIGZhdWx0IGFkZHJlc3NlcyB0byBodWdlIHBhZ2UgYm91bmRhcnkKMDIyNmY5MCBwb3N0Y29w
-eTogTG9hZCBodWdlIHBhZ2VzIGluIG9uZSBnbwpmOTRiZWUwIHBvc3Rjb3B5OiBVc2UgdGVtcG9y
-YXJ5IGZvciBwbGFjaW5nIHplcm8gaHVnZSBwYWdlcwo4YWEwMTU1IHBvc3Rjb3B5OiBQbHVtYiBw
-YWdlc2l6ZSBkb3duIGludG8gcGxhY2UgaGVscGVycwpjZTNhZWE2IHBvc3Rjb3B5OiBSZWNvcmQg
-bGFyZ2VzdCBwYWdlIHNpemUKZTYxOWNiOSBwb3N0Y29weTogZW5oYW5jZSByYW1fZGlzY2FyZF9y
-YW5nZSBmb3IgaHVnZXBhZ2VzCjUyNzJmZTAgRm9sZCBwb3N0Y29weV9yYW1fZGlzY2FyZF9yYW5n
-ZSBpbnRvIHJhbV9kaXNjYXJkX3JhbmdlCjhlZThiYmMgcG9zdGNvcHk6IENodW5rIGRpc2NhcmRz
-IGZvciBodWdlcGFnZXMKOWNlOTg3MyBwb3N0Y29weTogVHJhbnNtaXQgcmFtIHNpemUgc3VtbWFy
-eSB3b3JkCjEwMmFkN2MgcG9zdGNvcHk6IFRyYW5zbWl0IGFuZCBjb21wYXJlIGluZGl2aWR1YWwg
-cGFnZSBzaXplcwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xNTogcG9z
-dGNvcHk6IFRyYW5zbWl0IGFuZCBjb21wYXJlIGluZGl2aWR1YWwgcGFnZSBzaXplcy4uLgpDaGVj
-a2luZyBQQVRDSCAyLzE1OiBwb3N0Y29weTogVHJhbnNtaXQgcmFtIHNpemUgc3VtbWFyeSB3b3Jk
-Li4uCkNoZWNraW5nIFBBVENIIDMvMTU6IHBvc3Rjb3B5OiBDaHVuayBkaXNjYXJkcyBmb3IgaHVn
-ZXBhZ2VzLi4uCkNoZWNraW5nIFBBVENIIDQvMTU6IEZvbGQgcG9zdGNvcHlfcmFtX2Rpc2NhcmRf
-cmFuZ2UgaW50byByYW1fZGlzY2FyZF9yYW5nZS4uLgpDaGVja2luZyBQQVRDSCA1LzE1OiBwb3N0
-Y29weTogZW5oYW5jZSByYW1fZGlzY2FyZF9yYW5nZSBmb3IgaHVnZXBhZ2VzLi4uCkNoZWNraW5n
-IFBBVENIIDYvMTU6IHBvc3Rjb3B5OiBSZWNvcmQgbGFyZ2VzdCBwYWdlIHNpemUuLi4KQ2hlY2tp
-bmcgUEFUQ0ggNy8xNTogcG9zdGNvcHk6IFBsdW1iIHBhZ2VzaXplIGRvd24gaW50byBwbGFjZSBo
-ZWxwZXJzLi4uCkNoZWNraW5nIFBBVENIIDgvMTU6IHBvc3Rjb3B5OiBVc2UgdGVtcG9yYXJ5IGZv
-ciBwbGFjaW5nIHplcm8gaHVnZSBwYWdlcy4uLgpDaGVja2luZyBQQVRDSCA5LzE1OiBwb3N0Y29w
-eTogTG9hZCBodWdlIHBhZ2VzIGluIG9uZSBnby4uLgpDaGVja2luZyBQQVRDSCAxMC8xNTogcG9z
-dGNvcHk6IE1hc2sgZmF1bHQgYWRkcmVzc2VzIHRvIGh1Z2UgcGFnZSBib3VuZGFyeS4uLgpDaGVj
-a2luZyBQQVRDSCAxMS8xNTogcG9zdGNvcHk6IFNlbmQgd2hvbGUgaHVnZSBwYWdlcy4uLgpDaGVj
-a2luZyBQQVRDSCAxMi8xNTogcG9zdGNvcHk6IEFsbG93IGh1Z2VwYWdlcy4uLgpDaGVja2luZyBQ
-QVRDSCAxMy8xNTogcG9zdGNvcHk6IFVwZGF0ZSB1c2VyZmF1bHRmZC5oIGhlYWRlci4uLgpDaGVj
-a2luZyBQQVRDSCAxNC8xNTogcG9zdGNvcHk6IENoZWNrIGZvciB1c2VyZmF1bHQraHVnZXBhZ2Ug
-ZmVhdHVyZS4uLgpFUlJPUjogdHJhaWxpbmcgd2hpdGVzcGFjZQojMjE6IEZJTEU6IG1pZ3JhdGlv
-bi9wb3N0Y29weS1yYW0uYzo4NToKKyAgICAgICAgYm9vbCBoYXZlX2hwID0gZmFsc2U7ICQKCnRv
-dGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMTcgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBo
-YXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3Jz
-CmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpD
-SEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMTUvMTU6IHBvc3Rjb3B5
-OiBBZGQgZG9jIGFib3V0IGh1Z2VwYWdlcyBhbmQgcG9zdGNvcHkuLi4KPT09IE9VVFBVVCBFTkQg
-PT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0
-ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNl
-IHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+* no-reply@patchew.org (no-reply@patchew.org) wrote:
+> Hi,
+> Checking PATCH 14/15: postcopy: Check for userfault+hugepage feature...
+> ERROR: trailing whitespace
+> #21: FILE: migration/postcopy-ram.c:85:
+> +        bool have_hp = false; $
+
+I noticed that one but explicitly left it; the code really reads much
+more cleanly to me with it explicitly set.
+
+Dave
+
+> total: 1 errors, 0 warnings, 17 lines checked
+> 
+> Your patch has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+> 
+> Checking PATCH 15/15: postcopy: Add doc about hugepages and postcopy...
+> === OUTPUT END ===
+> 
+> Test command exited with code: 1
+> 
+> 
+> ---
+> Email generated automatically by Patchew [http://patchew.org/].
+> Please send your feedback to patchew-devel@freelists.org
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
