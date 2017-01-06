@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54985)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54986)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zxq_yx_007@163.com>) id 1cPINU-0007Cx-Gr
+	(envelope-from <zxq_yx_007@163.com>) id 1cPINU-0007Cy-Gs
 	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 19:27:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zxq_yx_007@163.com>) id 1cPINR-0000sL-Eh
+	(envelope-from <zxq_yx_007@163.com>) id 1cPINR-0000sR-F2
 	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 19:27:28 -0500
 From: xiaoqiang zhao <zxq_yx_007@163.com>
-Date: Fri,  6 Jan 2017 08:26:25 +0800
-Message-Id: <20170106002628.10343-2-zxq_yx_007@163.com>
+Date: Fri,  6 Jan 2017 08:26:27 +0800
+Message-Id: <20170106002628.10343-4-zxq_yx_007@163.com>
 In-Reply-To: <20170106002628.10343-1-zxq_yx_007@163.com>
 References: <20170106002628.10343-1-zxq_yx_007@163.com>
-Subject: [Qemu-devel] [PATCH v2 1/4] hw/gpio: QOM'ify mpc8xxx.c
+Subject: [Qemu-devel] [PATCH v2 3/4] hw/ppc: QOM'ify ppce500_spin.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,70 +22,64 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: david@gibson.dropbear.id.au, agraf@suse.de, peter.maydell@linaro.org, qemu-ppc@nongnu.org
 
-* Drop the old SysBus init function and use instance_init
-* Change mpc8xxx_gpio_reset to a DeviceClass::reset function
+Drop the old SysBus init function and use instance_init
 
 Signed-off-by: xiaoqiang zhao <zxq_yx_007@163.com>
 ---
- hw/gpio/mpc8xxx.c | 20 +++++++++++---------
- 1 file changed, 11 insertions(+), 9 deletions(-)
+ hw/ppc/ppce500_spin.c | 18 ++++++++----------
+ 1 file changed, 8 insertions(+), 10 deletions(-)
 
-diff --git a/hw/gpio/mpc8xxx.c b/hw/gpio/mpc8xxx.c
-index d149719469..e12edb4933 100644
---- a/hw/gpio/mpc8xxx.c
-+++ b/hw/gpio/mpc8xxx.c
-@@ -143,8 +143,10 @@ static void mpc8xxx_gpio_write(void *opaque, hwaddr offset,
-     mpc8xxx_gpio_update(s);
- }
+diff --git a/hw/ppc/ppce500_spin.c b/hw/ppc/ppce500_spin.c
+index cf958a9e00..958536f6c6 100644
+--- a/hw/ppc/ppce500_spin.c
++++ b/hw/ppc/ppce500_spin.c
+@@ -54,9 +54,9 @@ typedef struct SpinState {
+     SpinInfo spin[MAX_CPUS];
+ } SpinState;
  
--static void mpc8xxx_gpio_reset(MPC8XXXGPIOState *s)
-+static void mpc8xxx_gpio_reset(DeviceState *dev)
+-static void spin_reset(void *opaque)
++static void spin_reset(DeviceState *dev)
  {
-+    MPC8XXXGPIOState *s = MPC8XXX_GPIO(dev);
-+
-     s->dir = 0;
-     s->odr = 0;
-     s->dat = 0;
-@@ -180,33 +182,33 @@ static const MemoryRegionOps mpc8xxx_gpio_ops = {
+-    SpinState *s = opaque;
++    SpinState *s = E500_SPIN(dev);
+     int i;
+ 
+     for (i = 0; i < MAX_CPUS; i++) {
+@@ -174,30 +174,28 @@ static const MemoryRegionOps spin_rw_ops = {
      .endianness = DEVICE_BIG_ENDIAN,
  };
  
--static int mpc8xxx_gpio_initfn(SysBusDevice *sbd)
-+static void mpc8xxx_gpio_initfn(Object *obj)
+-static int ppce500_spin_initfn(SysBusDevice *dev)
++static void ppce500_spin_initfn(Object *obj)
  {
--    DeviceState *dev = DEVICE(sbd);
--    MPC8XXXGPIOState *s = MPC8XXX_GPIO(dev);
-+    DeviceState *dev = DEVICE(obj);
-+    MPC8XXXGPIOState *s = MPC8XXX_GPIO(obj);
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
++    SysBusDevice *dev = SYS_BUS_DEVICE(obj);
+     SpinState *s = E500_SPIN(dev);
  
--    memory_region_init_io(&s->iomem, OBJECT(s), &mpc8xxx_gpio_ops, s, "mpc8xxx_gpio", 0x1000);
-+    memory_region_init_io(&s->iomem, obj, &mpc8xxx_gpio_ops,
-+                          s, "mpc8xxx_gpio", 0x1000);
-     sysbus_init_mmio(sbd, &s->iomem);
-     sysbus_init_irq(sbd, &s->irq);
-     qdev_init_gpio_in(dev, mpc8xxx_gpio_set_irq, 32);
-     qdev_init_gpio_out(dev, s->out, 32);
--    mpc8xxx_gpio_reset(s);
+-    memory_region_init_io(&s->iomem, OBJECT(s), &spin_rw_ops, s,
++    memory_region_init_io(&s->iomem, obj, &spin_rw_ops, s,
+                           "e500 spin pv device", sizeof(SpinInfo) * MAX_CPUS);
+     sysbus_init_mmio(dev, &s->iomem);
+-
+-    qemu_register_reset(spin_reset, s);
+-
 -    return 0;
  }
  
- static void mpc8xxx_gpio_class_init(ObjectClass *klass, void *data)
+ static void ppce500_spin_class_init(ObjectClass *klass, void *data)
  {
-     DeviceClass *dc = DEVICE_CLASS(klass);
 -    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
++    DeviceClass *dc = DEVICE_CLASS(klass);
  
--    k->init = mpc8xxx_gpio_initfn;
-     dc->vmsd = &vmstate_mpc8xxx_gpio;
-+    dc->reset = mpc8xxx_gpio_reset;
+-    k->init = ppce500_spin_initfn;
++    dc->reset = spin_reset;
  }
  
- static const TypeInfo mpc8xxx_gpio_info = {
-     .name          = TYPE_MPC8XXX_GPIO,
+ static const TypeInfo ppce500_spin_info = {
+     .name          = TYPE_E500_SPIN,
      .parent        = TYPE_SYS_BUS_DEVICE,
-     .instance_size = sizeof(MPC8XXXGPIOState),
-+    .instance_init = mpc8xxx_gpio_initfn,
-     .class_init    = mpc8xxx_gpio_class_init,
+     .instance_size = sizeof(SpinState),
++    .instance_init = ppce500_spin_initfn,
+     .class_init    = ppce500_spin_class_init,
  };
  
 -- 
