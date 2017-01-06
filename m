@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56909)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56954)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cPZFf-0002wH-3q
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 13:28:32 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cPZFi-0002xE-3j
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 13:28:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cPZFd-000404-DK
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 13:28:31 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43170)
+	(envelope-from <dgilbert@redhat.com>) id 1cPZFh-00046C-9w
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 13:28:34 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56676)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cPZFd-0003ym-2y
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 13:28:29 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cPZFh-00044c-34
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 13:28:33 -0500
 Received: from int-mx09.intmail.prod.int.phx2.redhat.com
 	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1176AC049D5B
-	for <qemu-devel@nongnu.org>; Fri,  6 Jan 2017 18:28:29 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id EF600804EB
+	for <qemu-devel@nongnu.org>; Fri,  6 Jan 2017 18:28:32 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Fri,  6 Jan 2017 18:28:10 +0000
-Message-Id: <20170106182823.1960-3-dgilbert@redhat.com>
+Date: Fri,  6 Jan 2017 18:28:13 +0000
+Message-Id: <20170106182823.1960-6-dgilbert@redhat.com>
 In-Reply-To: <20170106182823.1960-1-dgilbert@redhat.com>
 References: <20170106182823.1960-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH 02/15] postcopy: Transmit ram size summary word
+Subject: [Qemu-devel] [PATCH 05/15] postcopy: enhance ram_discard_range for
+ hugepages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,123 +35,70 @@ Cc: aarcange@redhat.com
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Replace the host page-size in the 'advise' command by a pagesize
-summary bitmap; if the VM is just using normal RAM then
-this will be exactly the same as before, however if they're using
-huge pages they'll be different, and thus:
-   a) Migration from/to old qemu's that don't understand huge pages
-      will fail early.
-   b) Migrations with different size RAMBlocks will also fail early.
-
-The previous block size check during RAM block transmission will also
-catch these cases, but this catches a good summary and should be
-clearer on a version mismatch.
+Unfortunately madvise DONTNEED doesn't work on hugepagetlb
+so use fallocate(FALLOC_FL_PUNCH_HOLE)
+qemu_fd_getpagesize only sets the page based off a file
+if the file is from hugetlbfs.
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- include/migration/migration.h |  1 +
- migration/ram.c               | 17 +++++++++++++++++
- migration/savevm.c            | 32 +++++++++++++++++++++-----------
- 3 files changed, 39 insertions(+), 11 deletions(-)
+ migration/ram.c | 24 ++++++++++++++++++++----
+ 1 file changed, 20 insertions(+), 4 deletions(-)
 
-diff --git a/include/migration/migration.h b/include/migration/migration.h
-index c309d23..0188bcf 100644
---- a/include/migration/migration.h
-+++ b/include/migration/migration.h
-@@ -355,6 +355,7 @@ void global_state_store_running(void);
- void flush_page_queue(MigrationState *ms);
- int ram_save_queue_pages(MigrationState *ms, const char *rbname,
-                          ram_addr_t start, ram_addr_t len);
-+uint64_t ram_pagesize_summary(void);
- 
- PostcopyState postcopy_state_get(void);
- /* Set the state and return the old state */
 diff --git a/migration/ram.c b/migration/ram.c
-index 39998f5..40fe888 100644
+index fe32836..7afabcd 100644
 --- a/migration/ram.c
 +++ b/migration/ram.c
-@@ -608,6 +608,23 @@ static void migration_bitmap_sync_init(void)
-     iterations_prev = 0;
- }
+@@ -45,6 +45,10 @@
+ #include "qemu/rcu_queue.h"
+ #include "migration/colo.h"
  
-+/* Returns a summary bitmap of the page sizes of all RAMBlocks;
-+ * for VMs with just normal pages this is equivalent to the
-+ * host page size.  If it's got some huge pages then it's the OR
-+ * of all the different page sizes.
-+ */
-+uint64_t ram_pagesize_summary(void)
-+{
-+    RAMBlock *block;
-+    uint64_t summary = 0;
++#if defined(CONFIG_FALLOCATE_PUNCH_HOLE)
++#include <linux/falloc.h>
++#endif
 +
-+    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-+        summary |= block->page_size;
-+    }
+ #ifdef DEBUG_MIGRATION_RAM
+ #define DPRINTF(fmt, ...) \
+     do { fprintf(stdout, "migration_ram: " fmt, ## __VA_ARGS__); } while (0)
+@@ -1866,7 +1870,7 @@ int ram_discard_range(MigrationIncomingState *mis,
+ 
+     uint8_t *host_startaddr = rb->host + start;
+ 
+-    if ((uintptr_t)host_startaddr & (qemu_host_page_size - 1)) {
++    if ((uintptr_t)host_startaddr & (rb->page_size - 1)) {
+         error_report("ram_discard_range: Unaligned start address: %p",
+                      host_startaddr);
+         goto err;
+@@ -1874,15 +1878,27 @@ int ram_discard_range(MigrationIncomingState *mis,
+ 
+     if ((start + length) <= rb->used_length) {
+         uint8_t *host_endaddr = host_startaddr + length;
+-        if ((uintptr_t)host_endaddr & (qemu_host_page_size - 1)) {
++        if ((uintptr_t)host_endaddr & (rb->page_size - 1)) {
+             error_report("ram_discard_range: Unaligned end address: %p",
+                          host_endaddr);
+             goto err;
+         }
+-        errno = ENOTSUP;
++        errno = ENOTSUP; /* If we are missing MADVISE etc */
 +
-+    return summary;
-+}
-+
- static void migration_bitmap_sync(void)
- {
-     RAMBlock *block;
-diff --git a/migration/savevm.c b/migration/savevm.c
-index 0363372..aaae044 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -828,7 +828,7 @@ int qemu_savevm_send_packaged(QEMUFile *f, const uint8_t *buf, size_t len)
- void qemu_savevm_send_postcopy_advise(QEMUFile *f)
- {
-     uint64_t tmp[2];
--    tmp[0] = cpu_to_be64(getpagesize());
-+    tmp[0] = cpu_to_be64(ram_pagesize_summary());
-     tmp[1] = cpu_to_be64(1ul << qemu_target_page_bits());
- 
-     trace_qemu_savevm_send_postcopy_advise();
-@@ -1305,7 +1305,7 @@ static int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis);
- static int loadvm_postcopy_handle_advise(MigrationIncomingState *mis)
- {
-     PostcopyState ps = postcopy_state_set(POSTCOPY_INCOMING_ADVISE);
--    uint64_t remote_hps, remote_tps;
-+    uint64_t remote_pagesize_summary, local_pagesize_summary, remote_tps;
- 
-     trace_loadvm_postcopy_handle_advise();
-     if (ps != POSTCOPY_INCOMING_NONE) {
-@@ -1317,17 +1317,27 @@ static int loadvm_postcopy_handle_advise(MigrationIncomingState *mis)
-         return -1;
-     }
- 
--    remote_hps = qemu_get_be64(mis->from_src_file);
--    if (remote_hps != getpagesize())  {
-+    remote_pagesize_summary = qemu_get_be64(mis->from_src_file);
-+    local_pagesize_summary = ram_pagesize_summary();
-+
-+    if (remote_pagesize_summary != local_pagesize_summary)  {
-         /*
--         * Some combinations of mismatch are probably possible but it gets
--         * a bit more complicated.  In particular we need to place whole
--         * host pages on the dest at once, and we need to ensure that we
--         * handle dirtying to make sure we never end up sending part of
--         * a hostpage on it's own.
-+         * This detects two potential causes of mismatch:
-+         *   a) A mismatch in host page sizes
-+         *      Some combinations of mismatch are probably possible but it gets
-+         *      a bit more complicated.  In particular we need to place whole
-+         *      host pages on the dest at once, and we need to ensure that we
-+         *      handle dirtying to make sure we never end up sending part of
-+         *      a hostpage on it's own.
-+         *   b) The use of different huge page sizes on source/destination
-+         *      a more fine grain test is performed during RAM block migration
-+         *      but this test here causes a nice early clear failure, and
-+         *      also fails when passed to an older qemu that doesn't
-+         *      do huge pages.
-          */
--        error_report("Postcopy needs matching host page sizes (s=%d d=%d)",
--                     (int)remote_hps, getpagesize());
-+        error_report("Postcopy needs matching RAM page sizes (s=%" PRIx64
-+                                                             " d=%" PRIx64 ")",
-+                     remote_pagesize_summary, local_pagesize_summary);
-         return -1;
-     }
- 
++        if (rb->page_size == qemu_host_page_size) {
+ #if defined(CONFIG_MADVISE)
+-        ret = qemu_madvise(host_startaddr, length, QEMU_MADV_DONTNEED);
++            ret = qemu_madvise(host_startaddr, length, QEMU_MADV_DONTNEED);
+ #endif
++        } else {
++            /* Huge page case  - unfortunately it can't do DONTNEED, but
++             * it can do the equivalent by FALLOC_FL_PUNCH_HOLE in the
++             * huge page file.
++             */
++#ifdef CONFIG_FALLOCATE_PUNCH_HOLE
++            ret = fallocate(rb->fd, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE,
++                            start, length);
++#endif
++        }
+         if (ret) {
+             error_report("ram_discard_range: Failed to discard  range "
+                          "%s:%" PRIx64 " +%zx (%d)",
 -- 
 2.9.3
