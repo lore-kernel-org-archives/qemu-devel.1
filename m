@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54986)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54991)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zxq_yx_007@163.com>) id 1cPINU-0007Cy-Gs
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 19:27:29 -0500
+	(envelope-from <zxq_yx_007@163.com>) id 1cPINU-0007D1-Hc
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 19:27:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zxq_yx_007@163.com>) id 1cPINR-0000sR-F2
+	(envelope-from <zxq_yx_007@163.com>) id 1cPINR-0000sG-F3
 	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 19:27:28 -0500
 From: xiaoqiang zhao <zxq_yx_007@163.com>
-Date: Fri,  6 Jan 2017 08:26:27 +0800
-Message-Id: <20170106002628.10343-4-zxq_yx_007@163.com>
+Date: Fri,  6 Jan 2017 08:26:26 +0800
+Message-Id: <20170106002628.10343-3-zxq_yx_007@163.com>
 In-Reply-To: <20170106002628.10343-1-zxq_yx_007@163.com>
 References: <20170106002628.10343-1-zxq_yx_007@163.com>
-Subject: [Qemu-devel] [PATCH v2 3/4] hw/ppc: QOM'ify ppce500_spin.c
+Subject: [Qemu-devel] [PATCH v2 2/4] hw/ppc: QOM'ify e500.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,61 +26,44 @@ Drop the old SysBus init function and use instance_init
 
 Signed-off-by: xiaoqiang zhao <zxq_yx_007@163.com>
 ---
- hw/ppc/ppce500_spin.c | 18 ++++++++----------
- 1 file changed, 8 insertions(+), 10 deletions(-)
+ hw/ppc/e500.c | 17 ++++-------------
+ 1 file changed, 4 insertions(+), 13 deletions(-)
 
-diff --git a/hw/ppc/ppce500_spin.c b/hw/ppc/ppce500_spin.c
-index cf958a9e00..958536f6c6 100644
---- a/hw/ppc/ppce500_spin.c
-+++ b/hw/ppc/ppce500_spin.c
-@@ -54,9 +54,9 @@ typedef struct SpinState {
-     SpinInfo spin[MAX_CPUS];
- } SpinState;
+diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
+index cf8b122afe..792bd79d39 100644
+--- a/hw/ppc/e500.c
++++ b/hw/ppc/e500.c
+@@ -1049,27 +1049,18 @@ void ppce500_init(MachineState *machine, PPCE500Params *params)
+     boot_info->dt_size = dt_size;
+ }
  
--static void spin_reset(void *opaque)
-+static void spin_reset(DeviceState *dev)
+-static int e500_ccsr_initfn(SysBusDevice *dev)
++static void e500_ccsr_initfn(Object *obj)
  {
--    SpinState *s = opaque;
-+    SpinState *s = E500_SPIN(dev);
-     int i;
- 
-     for (i = 0; i < MAX_CPUS; i++) {
-@@ -174,30 +174,28 @@ static const MemoryRegionOps spin_rw_ops = {
-     .endianness = DEVICE_BIG_ENDIAN,
- };
- 
--static int ppce500_spin_initfn(SysBusDevice *dev)
-+static void ppce500_spin_initfn(Object *obj)
- {
-+    SysBusDevice *dev = SYS_BUS_DEVICE(obj);
-     SpinState *s = E500_SPIN(dev);
- 
--    memory_region_init_io(&s->iomem, OBJECT(s), &spin_rw_ops, s,
-+    memory_region_init_io(&s->iomem, obj, &spin_rw_ops, s,
-                           "e500 spin pv device", sizeof(SpinInfo) * MAX_CPUS);
-     sysbus_init_mmio(dev, &s->iomem);
+-    PPCE500CCSRState *ccsr;
 -
--    qemu_register_reset(spin_reset, s);
--
+-    ccsr = CCSR(dev);
+-    memory_region_init(&ccsr->ccsr_space, OBJECT(ccsr), "e500-ccsr",
++    PPCE500CCSRState *ccsr = CCSR(obj);
++    memory_region_init(&ccsr->ccsr_space, obj, "e500-ccsr",
+                        MPC8544_CCSRBAR_SIZE);
 -    return 0;
- }
- 
- static void ppce500_spin_class_init(ObjectClass *klass, void *data)
- {
+-}
+-
+-static void e500_ccsr_class_init(ObjectClass *klass, void *data)
+-{
 -    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
-+    DeviceClass *dc = DEVICE_CLASS(klass);
- 
--    k->init = ppce500_spin_initfn;
-+    dc->reset = spin_reset;
+-    k->init = e500_ccsr_initfn;
  }
  
- static const TypeInfo ppce500_spin_info = {
-     .name          = TYPE_E500_SPIN,
+ static const TypeInfo e500_ccsr_info = {
+     .name          = TYPE_CCSR,
      .parent        = TYPE_SYS_BUS_DEVICE,
-     .instance_size = sizeof(SpinState),
-+    .instance_init = ppce500_spin_initfn,
-     .class_init    = ppce500_spin_class_init,
+     .instance_size = sizeof(PPCE500CCSRState),
+-    .class_init    = e500_ccsr_class_init,
++    .instance_init = e500_ccsr_initfn,
  };
  
+ static void e500_register_types(void)
 -- 
 2.11.0
