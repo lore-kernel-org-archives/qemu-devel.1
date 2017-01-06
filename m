@@ -1,21 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54086)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58979)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1cPNz2-0000C1-GQ
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 01:26:37 -0500
+	(envelope-from <jasowang@redhat.com>) id 1cPOb9-0003wh-Ux
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 02:06:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1cPNyx-0005MD-GL
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 01:26:36 -0500
-Reply-To: marcel@redhat.com
-References: <20170106050451.11793-1-david@gibson.dropbear.id.au>
-	<53dcb2da-fa15-63b0-5849-325b6edcac83@redhat.com>
-From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-ID: <4ac9d2ba-6887-7207-b17e-d06109ccaba2@gmail.com>
-Date: Fri, 6 Jan 2017 08:26:25 +0200
+	(envelope-from <jasowang@redhat.com>) id 1cPOb6-0000Om-ON
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 02:05:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46586)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cPOb6-0000Nw-GN
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 02:05:56 -0500
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com
+	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7599261B9C
+	for <qemu-devel@nongnu.org>; Fri,  6 Jan 2017 07:05:56 +0000 (UTC)
+References: <1483675573-12636-1-git-send-email-peterx@redhat.com>
+	<1483675573-12636-3-git-send-email-peterx@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <f62ec203-a644-9102-f5e6-4f41cca60d80@redhat.com>
+Date: Fri, 6 Jan 2017 15:05:47 +0800
 MIME-Version: 1.0
-In-Reply-To: <53dcb2da-fa15-63b0-5849-325b6edcac83@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC] pxb: Restrict to x86
+In-Reply-To: <1483675573-12636-3-git-send-email-peterx@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 2/2] intel_iommu: allow migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,82 +33,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, mst@redhat.com, ehabkost@redhat.com
-Cc: lvivier@redhat.com, thuth@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, mst@redhat.com, Juan Quintela <quintela@redhat.com>, Amit Shah <amit.shah@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-On 01/06/2017 08:13 AM, Marcel Apfelbaum wrote:
-> On 01/06/2017 07:04 AM, David Gibson wrote:
->> The PCI Expander Bridge (PXB) device is essentially a hack to allow
->> different PCIe devices to be assigned to different NUMA nodes on x86.  Each
->> PXB is sort-of a separate PCI host bridge, except that its config space
->> is shared with the config space of the main PCI host bridge, rather than
->> being independent.
->>
->
-> Hi David,
->
->> This is only necessary if the platform doesn't (easily) allow truly
->> independent PCI host bridges.  AFAIK that's just x86.
->>
->
-> Indeed, it is possible to support independent PCI host bridges on x86 by
-> using a separate MMCONFIG space for each one and enable separate PCI domains.
-> We simply didn't need this until now, but maybe will be implemented it in the future.
->
->> This patch makes it possible to configure PXB out of the build, and adjusts
->> the default configs so it's only included on x86 targets.
->>
->
-> Makes sense
 
-Actually ACPI based ARM guests may be able to use the PXB as well,
-let's wait for their opinion.
 
-Thanks,
-Marcel
+On 2017=E5=B9=B401=E6=9C=8806=E6=97=A5 12:06, Peter Xu wrote:
+> IOMMU needs to be migrated before all the PCI devices (in case there ar=
+e
+> devices that will request for address translation). So marking it with =
+a
+> priority higher than the default (which PCI devices and other belong).
+> Migration framework handled the rest.
+>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>   hw/i386/intel_iommu.c       | 22 +++++++++++++++++++++-
+>   include/migration/vmstate.h |  1 +
+>   2 files changed, 22 insertions(+), 1 deletion(-)
+>
+> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> index 5f3e351..119217b 100644
+> --- a/hw/i386/intel_iommu.c
+> +++ b/hw/i386/intel_iommu.c
+> @@ -1996,7 +1996,27 @@ static void vtd_iommu_notify_flag_changed(Memory=
+Region *iommu,
+>  =20
+>   static const VMStateDescription vtd_vmstate =3D {
+>       .name =3D "iommu-intel",
+> -    .unmigratable =3D 1,
+> +    .version_id =3D 1,
+> +    .minimum_version_id =3D 1,
+> +    .priority =3D MIG_PRI_IOMMU,
+> +    .fields =3D (VMStateField[]) {
+> +        VMSTATE_UINT64(root, IntelIOMMUState),
+> +        VMSTATE_UINT64(intr_root, IntelIOMMUState),
+> +        VMSTATE_UINT64(iq, IntelIOMMUState),
+> +        VMSTATE_UINT32(intr_size, IntelIOMMUState),
+> +        VMSTATE_UINT16(iq_head, IntelIOMMUState),
+> +        VMSTATE_UINT16(iq_tail, IntelIOMMUState),
+> +        VMSTATE_UINT16(iq_size, IntelIOMMUState),
+> +        VMSTATE_UINT16(next_frcd_reg, IntelIOMMUState),
+> +        VMSTATE_UINT8_ARRAY(csr, IntelIOMMUState, DMAR_REG_SIZE),
 
->
-> Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
->
-> Thanks,
-> Marcel
->
->> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
->> ---
->>  default-configs/i386-softmmu.mak   | 1 +
->>  default-configs/x86_64-softmmu.mak | 1 +
->>  hw/pci-bridge/Makefile.objs        | 2 +-
->>  3 files changed, 3 insertions(+), 1 deletion(-)
->>
->> diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
->> index 0b51360..6c52d26 100644
->> --- a/default-configs/i386-softmmu.mak
->> +++ b/default-configs/i386-softmmu.mak
->> @@ -56,3 +56,4 @@ CONFIG_IOH3420=y
->>  CONFIG_I82801B11=y
->>  CONFIG_SMBIOS=y
->>  CONFIG_HYPERV_TESTDEV=$(CONFIG_KVM)
->> +CONFIG_PXB=y
->> diff --git a/default-configs/x86_64-softmmu.mak b/default-configs/x86_64-softmmu.mak
->> index 7f89503..2d0341c 100644
->> --- a/default-configs/x86_64-softmmu.mak
->> +++ b/default-configs/x86_64-softmmu.mak
->> @@ -56,3 +56,4 @@ CONFIG_IOH3420=y
->>  CONFIG_I82801B11=y
->>  CONFIG_SMBIOS=y
->>  CONFIG_HYPERV_TESTDEV=$(CONFIG_KVM)
->> +CONFIG_PXB=y
->> diff --git a/hw/pci-bridge/Makefile.objs b/hw/pci-bridge/Makefile.objs
->> index f2adfe3..5612bd7 100644
->> --- a/hw/pci-bridge/Makefile.objs
->> +++ b/hw/pci-bridge/Makefile.objs
->> @@ -1,5 +1,5 @@
->>  common-obj-y += pci_bridge_dev.o
->> -common-obj-y += pci_expander_bridge.o
->> +common-obj-$(CONFIG_PXB) += pci_expander_bridge.o
->>  common-obj-$(CONFIG_XIO3130) += xio3130_upstream.o xio3130_downstream.o
->>  common-obj-$(CONFIG_IOH3420) += ioh3420.o
->>  common-obj-$(CONFIG_I82801B11) += i82801b11.o
->>
->
->
+Do we need migrate wmask, w1cmask, womask too?
+
+> +        VMSTATE_UINT8(iq_last_desc_type, IntelIOMMUState),
+> +        VMSTATE_BOOL(root_extended, IntelIOMMUState),
+> +        VMSTATE_BOOL(dmar_enabled, IntelIOMMUState),
+> +        VMSTATE_BOOL(qi_enabled, IntelIOMMUState),
+> +        VMSTATE_BOOL(intr_enabled, IntelIOMMUState),
+> +        VMSTATE_BOOL(intr_eime, IntelIOMMUState),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+>   };
+>  =20
+>   static const MemoryRegionOps vtd_mem_ops =3D {
+> diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
+> index 1a22887..2125829 100644
+> --- a/include/migration/vmstate.h
+> +++ b/include/migration/vmstate.h
+> @@ -188,6 +188,7 @@ enum VMStateFlags {
+>  =20
+>   typedef enum {
+>       MIG_PRI_DEFAULT =3D 0,
+> +    MIG_PRI_IOMMU,              /* Must happen before PCI devices */
+>       MIG_PRI_MAX,
+>   } MigrationPriority;
+>  =20
+
+I think we should reset iotlb and context cache in post_load() too.
+
+Thanks
