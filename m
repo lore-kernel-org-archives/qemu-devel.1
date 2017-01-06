@@ -1,42 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36700)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37726)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bharata@linux.vnet.ibm.com>) id 1cPMbM-0004Hx-8i
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 23:58:05 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cPMiA-0006mQ-9L
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 00:05:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bharata@linux.vnet.ibm.com>) id 1cPMbJ-0000jn-6S
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 23:58:04 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51098
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bharata@linux.vnet.ibm.com>)
-	id 1cPMbJ-0000jh-1n
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 23:58:01 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	v064riYf020506
-	for <qemu-devel@nongnu.org>; Thu, 5 Jan 2017 23:57:59 -0500
-Received: from e23smtp07.au.ibm.com (e23smtp07.au.ibm.com [202.81.31.140])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 27t0y07p57-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 05 Jan 2017 23:57:59 -0500
-Received: from localhost
-	by e23smtp07.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bharata@linux.vnet.ibm.com>;
-	Fri, 6 Jan 2017 14:57:56 +1000
-Date: Fri, 6 Jan 2017 10:27:46 +0530
-From: Bharata B Rao <bharata@linux.vnet.ibm.com>
-Reply-To: bharata@linux.vnet.ibm.com
-References: <1483615579-17618-1-git-send-email-nikunj@linux.vnet.ibm.com>
-	<1483615579-17618-4-git-send-email-nikunj@linux.vnet.ibm.com>
-	<20170105220117.GE13763@umbus.fritz.box>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170105220117.GE13763@umbus.fritz.box>
-Message-Id: <20170106045746.GC12420@in.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 03/14] target-ppc: Use float64 arg in
- helper_compute_fprf()
+	(envelope-from <dgibson@ozlabs.org>) id 1cPMi7-0002mz-42
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 00:05:06 -0500
+From: David Gibson <david@gibson.dropbear.id.au>
+Date: Fri,  6 Jan 2017 16:04:51 +1100
+Message-Id: <20170106050451.11793-1-david@gibson.dropbear.id.au>
+Subject: [Qemu-devel] [RFC] pxb: Restrict to x86
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,38 +17,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, rth@twiddle.net, qemu-devel@nongnu.org
+To: marcel@redhat.com, mst@redhat.com, ehabkost@redhat.com
+Cc: thuth@redhat.com, lvivier@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-On Fri, Jan 06, 2017 at 09:01:17AM +1100, David Gibson wrote:
-> On Thu, Jan 05, 2017 at 04:56:08PM +0530, Nikunj A Dadhania wrote:
-> > From: Bharata B Rao <bharata@linux.vnet.ibm.com>
-> > 
-> > Use float64 argument instead of unit64_t in helper_compute_fprf()
-> > This allows code in helper_compute_fprf() to be reused later to
-> > work with float128 argument too.
-> > 
-> > Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
-> > Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-> 
-> Uh.. how can this possibly be correct, without updating the callers of
-> helper_compute_fprf()?
+The PCI Expander Bridge (PXB) device is essentially a hack to allow
+different PCIe devices to be assigned to different NUMA nodes on x86.  Each
+PXB is sort-of a separate PCI host bridge, except that its config space
+is shared with the config space of the main PCI host bridge, rather than
+being independent.
 
-It works currently because uint64_t argument that is passed by the
-callers is interpreted as float64 arg (via farg.d).
+This is only necessary if the platform doesn't (easily) allow truly
+independent PCI host bridges.  AFAIK that's just x86.
 
-Let me see if there is a cleaner way of doing this. Casting the
-callers with right floatXX type seems to be the easiest way.
-The requirement here is to ensure that
+This patch makes it possible to configure PXB out of the build, and adjusts
+the default configs so it's only included on x86 targets.
 
-helper_compute_fprf_float16(CPUPPCState *env, float16 arg)
-helper_compute_fprf_float32(CPUPPCState *env, float32 arg)
-helper_compute_fprf_float64(CPUPPCState *env, float64 arg)
-helper_compute_fprf_float128(CPUPPCState *env, float128 arg)
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ default-configs/i386-softmmu.mak   | 1 +
+ default-configs/x86_64-softmmu.mak | 1 +
+ hw/pci-bridge/Makefile.objs        | 2 +-
+ 3 files changed, 3 insertions(+), 1 deletion(-)
 
-get autogenerated with right floatXX argument so that it can directly
-be used with required routines (like floatXX_is_any_nan etc) w/o
-needing the CPU_DoubleU or other intermediate forms.
-
-Regards,
-Bharata.
+diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
+index 0b51360..6c52d26 100644
+--- a/default-configs/i386-softmmu.mak
++++ b/default-configs/i386-softmmu.mak
+@@ -56,3 +56,4 @@ CONFIG_IOH3420=y
+ CONFIG_I82801B11=y
+ CONFIG_SMBIOS=y
+ CONFIG_HYPERV_TESTDEV=$(CONFIG_KVM)
++CONFIG_PXB=y
+diff --git a/default-configs/x86_64-softmmu.mak b/default-configs/x86_64-softmmu.mak
+index 7f89503..2d0341c 100644
+--- a/default-configs/x86_64-softmmu.mak
++++ b/default-configs/x86_64-softmmu.mak
+@@ -56,3 +56,4 @@ CONFIG_IOH3420=y
+ CONFIG_I82801B11=y
+ CONFIG_SMBIOS=y
+ CONFIG_HYPERV_TESTDEV=$(CONFIG_KVM)
++CONFIG_PXB=y
+diff --git a/hw/pci-bridge/Makefile.objs b/hw/pci-bridge/Makefile.objs
+index f2adfe3..5612bd7 100644
+--- a/hw/pci-bridge/Makefile.objs
++++ b/hw/pci-bridge/Makefile.objs
+@@ -1,5 +1,5 @@
+ common-obj-y += pci_bridge_dev.o
+-common-obj-y += pci_expander_bridge.o
++common-obj-$(CONFIG_PXB) += pci_expander_bridge.o
+ common-obj-$(CONFIG_XIO3130) += xio3130_upstream.o xio3130_downstream.o
+ common-obj-$(CONFIG_IOH3420) += ioh3420.o
+ common-obj-$(CONFIG_I82801B11) += i82801b11.o
+-- 
+2.9.3
