@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51551)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34826)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cPQjo-0004VS-7A
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 04:23:06 -0500
+	(envelope-from <pisa@cmp.felk.cvut.cz>) id 1cPRVp-0000Pk-GQ
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 05:12:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cPQjj-0001Zn-Mi
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 04:23:04 -0500
-Resent-Message-Id: <E1cPQjj-0001Zn-Mi@eggs.gnu.org>
-Received: from sender163-mail.zoho.com ([74.201.84.163]:21321)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1cPQjj-0001Y7-Ew
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 04:22:59 -0500
-In-Reply-To: <1483692945-9866-1-git-send-email-kraxel@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <148369457369.172.16985851890979437494@790289a7ca88>
+	(envelope-from <pisa@cmp.felk.cvut.cz>) id 1cPRVm-0002oO-8H
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 05:12:41 -0500
+Received: from relay.felk.cvut.cz ([2001:718:2:1611:0:1:0:70]:64063)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <pisa@cmp.felk.cvut.cz>) id 1cPRVl-0002mR-Ox
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 05:12:38 -0500
+From: Pavel Pisa <pisa@cmp.felk.cvut.cz>
+Date: Fri, 6 Jan 2017 10:38:17 +0100
+References: <148365854761.172.17519978648303772799@790289a7ca88>
+In-Reply-To: <148365854761.172.17519978648303772799@790289a7ca88>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 6 Jan 2017 01:22:54 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH 00/17] add serial wacom tablet emulation
- (gsoc 2016)
+Content-Type: Text/Plain;
+  charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+Message-Id: <201701061038.18013.pisa@cmp.felk.cvut.cz>
+Subject: Re: [Qemu-devel] [PATCH 0/6] CAN bus support for QEMU (SJA1000 PCI
+ so far)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,190 +29,312 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kraxel@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, avg.tolik@gmail.com
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com, stefanha@gmail.com, deniz.eren@icloud.com, socketcan@hartkopp.net, fred.konrad@greensocs.com
 
-SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQQVRDSCAwMC8xN10gYWRkIHNlcmlhbCB3YWNvbSB0YWJsZXQgZW11bGF0aW9uIChn
-c29jIDIwMTYpClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAxNDgzNjkyOTQ1LTk4NjYtMS1naXQt
-c2VuZC1lbWFpbC1rcmF4ZWxAcmVkaGF0LmNvbQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQoj
-IS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNF
-Li4gfCB3YyAtbCkKZmFpbGVkPTAKCiMgVXNlZnVsIGdpdCBvcHRpb25zCmdpdCBjb25maWcgLS1s
-b2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBU
-cnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpm
-b3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDog
-JChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAt
-LWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhl
-bgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9u
-ZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVh
-OWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29t
-L3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMTQ4MzY5
-Mjk0NS05ODY2LTEtZ2l0LXNlbmQtZW1haWwta3JheGVsQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8x
-NDgzNjkyOTQ1LTk4NjYtMS1naXQtc2VuZC1lbWFpbC1rcmF4ZWxAcmVkaGF0LmNvbQpTd2l0Y2hl
-ZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmFiNzFmZTIgd2N0YWJsZXQ6IGltcGxlbWVudCBTVCBh
-bmQgU1AgY29tbWFuZHMKY2ZhYTM4MiB3Y3RhYmxldDogdXBkYXRlIGZpbGUgY29tbWVudAowYmM1
-NDRlIHdjdGFibGV0OiBzd2l0Y2ggdG8gbmV3IGlucHV0IGludGVyZmFjZQplZTc1YzFiIHdjdGFi
-bGV0OiBtaXNjIGNsZWFudXBzCjM3OGJhODIgd2N0YWJsZXQ6IGRyb3AgRFBSSU5URiwgYWRkIHRy
-YWNlIGV2ZW50cyBpbnN0ZWFkCmYzMTY0NTcgd2N0YWJsZXQ6IGRyb3AgdGltZXIsIGhvb2sgaW50
-byBjaHItPmFjY2VwdF9pbnB1dCBpbnN0ZWFkCjA2OTQwZTggd2N0YWJsZXQ6IHJldmFtcCBjb21t
-YW5kIHBhcnNlci4KMzc1NGZjMCB3Y3RhYmxldDogbW92ZSBpbml0L2RldGVjdCBzZXF1ZW5jZQo0
-MGQyYWJmIHdjdGFibGV0OiBhZGQgd2N0YWJsZXRfc2hpZnRfaW5wdXQKNzk2ZDY0OSB3Y3RhYmxl
-dDogZHJvcCBkZWJ1ZyBjb2RlIGZyb20gd2N0YWJsZXRfaGFuZGxlcgpjZWFlYTRmIHdjdGFibGV0
-OiBvcGVyYXRlIG9uIGxpbmUgc3BlZWQgOTYwMAowNTUwNTZiIHdjdGFibGV0OiB0cmFjayBsaW5l
-IHNwZWVkLCByZXNldCBvbiBzcGVlZCBjaGFuZ2VzCjU2MDM0ZGMgd2N0YWJsZXQ6IHN0cmlwIGxl
-YWRpbmcgXHIgKyBcbiBmcm9tIGJ1ZmZlcgo3YjU5NTkzIHdjdGFibGV0OiBkcm9wIHdjdGFibGV0
-X2NvbW1hbmRzX25hbWVzCmVhNjExNzEgd2N0YWJsZXQ6IHNhdmUgYWxsIGNoYXJzIGluIHRoZSBx
-dWVyeSBidWZmZXIKOGIzMTEzYiB3Y3RhYmxldDogYWRkIHdjdGFibGV0X3F1ZXVlX291dHB1dCBo
-ZWxwZXIKZGU5MmEwZiBBZGQgd2N0YWJsZXQgZGV2aWNlCgo9PT0gT1VUUFVUIEJFR0lOID09PQpD
-aGVja2luZyBQQVRDSCAxLzE3OiBBZGQgd2N0YWJsZXQgZGV2aWNlLi4uCkVSUk9SOiBkbyBub3Qg
-dXNlIEM5OSAvLyBjb21tZW50cwojOTA6IEZJTEU6IGJhY2tlbmRzL3djdGFibGV0LmM6NjE6Cisv
-LyBBdmFsaWFibGUgY29tbWFuZHMKCkVSUk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50cwoj
-OTI6IEZJTEU6IGJhY2tlbmRzL3djdGFibGV0LmM6NjM6CisgICAgezB4MGEsIDB4NTMsIDB4NTAs
-IDB4MGEsIDB9LCAgICAgICAgICAgICAgICAvLyBcblNQXG4KCkVSUk9SOiBkbyBub3QgdXNlIEM5
-OSAvLyBjb21tZW50cwojOTM6IEZJTEU6IGJhY2tlbmRzL3djdGFibGV0LmM6NjQ6CisgICAgezB4
-N2UsIDB4MjMsIDB9LCAgICAgICAgICAgICAgICAgICAgICAgICAgICAvLyB+IwoKRVJST1I6IGRv
-IG5vdCB1c2UgQzk5IC8vIGNvbW1lbnRzCiM5NDogRklMRTogYmFja2VuZHMvd2N0YWJsZXQuYzo2
-NToKKyAgICB7MHgwYSwgMHg1NCwgMHg0NSwgMHgwYSwgMH0sICAgICAgICAgICAgICAgIC8vIFxu
-VEVcbgoKRVJST1I6IGRvIG5vdCB1c2UgQzk5IC8vIGNvbW1lbnRzCiM5NTogRklMRTogYmFja2Vu
-ZHMvd2N0YWJsZXQuYzo2NjoKKyAgICB7MHg1MiwgMHg0NSwgMHgwYSwgMH0sICAgICAgICAgICAg
-ICAgICAgICAgIC8vIFJFXG4KCkVSUk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50cwojOTY6
-IEZJTEU6IGJhY2tlbmRzL3djdGFibGV0LmM6Njc6CisgICAgezB4NDEsIDB4NTMsIDB4MzEsIDB4
-MGEsIDB9LCAgICAgICAgICAgICAgICAvLyBBUzFcbgoKRVJST1I6IGRvIG5vdCB1c2UgQzk5IC8v
-IGNvbW1lbnRzCiM5NzogRklMRTogYmFja2VuZHMvd2N0YWJsZXQuYzo2ODoKKyAgICB7MHg0OSwg
-MHg0MywgMHgzMSwgMHgwYSwgMH0sICAgICAgICAgICAgICAgIC8vIElDMVxuCgpFUlJPUjogZG8g
-bm90IHVzZSBDOTkgLy8gY29tbWVudHMKIzk4OiBGSUxFOiBiYWNrZW5kcy93Y3RhYmxldC5jOjY5
-OgorICAgIHsweDRmLCAweDQzLCAweDMxLCAweDBhLCAwfSwgICAgICAgICAgICAgICAgLy8gT0Mx
-XG4KCkVSUk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50cwojOTk6IEZJTEU6IGJhY2tlbmRz
-L3djdGFibGV0LmM6NzA6CisgICAgezB4NDksIDB4NTQsIDB4ODgsIDB4ODgsIDB9LCAgICAgICAg
-ICAgICAgICAvLyBJVDNccgoKRVJST1I6IGRvIG5vdCB1c2UgQzk5IC8vIGNvbW1lbnRzCiMxMDA6
-IEZJTEU6IGJhY2tlbmRzL3djdGFibGV0LmM6NzE6CisgICAgezB4NTMsIDB4NTUsIDB4ODgsIDB4
-ODgsIDB9LCAgICAgICAgICAgICAgICAvLyBTVTNcbgoKRVJST1I6IGRvIG5vdCB1c2UgQzk5IC8v
-IGNvbW1lbnRzCiMxMDE6IEZJTEU6IGJhY2tlbmRzL3djdGFibGV0LmM6NzI6CisgICAgezB4NTAs
-IDB4NDgsIDB4MzEsIDB4MGEsIDB9LCAgICAgICAgICAgICAgICAvLyBQSDFcbgoKRVJST1I6IGRv
-IG5vdCB1c2UgQzk5IC8vIGNvbW1lbnRzCiMxMDI6IEZJTEU6IGJhY2tlbmRzL3djdGFibGV0LmM6
-NzM6CisgICAgezB4MGQsIDB4NTMsIDB4NTQsIDB4MGQsIDB9LCAgICAgICAgICAgICAgICAvLyBc
-clNUXG4KCkVSUk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50cwojMTAzOiBGSUxFOiBiYWNr
-ZW5kcy93Y3RhYmxldC5jOjc0OgorICAgIHsweDBkLCAweDUzLCAweDUwLCAweDBkLCAwfSwgICAg
-ICAgICAgICAgICAgLy8gXHJTUFxyCgpFUlJPUjogZG8gbm90IHVzZSBDOTkgLy8gY29tbWVudHMK
-IzEwNDogRklMRTogYmFja2VuZHMvd2N0YWJsZXQuYzo3NToKKyAgICB7MHg1NCwgMHg0NSwgMHgw
-ZCwgMH0sICAgICAgICAgICAgICAgICAgICAgIC8vIFRFXHIKCkVSUk9SOiBkbyBub3QgdXNlIEM5
-OSAvLyBjb21tZW50cwojMTA1OiBGSUxFOiBiYWNrZW5kcy93Y3RhYmxldC5jOjc2OgorICAgIHsw
-eDUzLCAweDUwLCAweDg4LCAwfSwgICAgICAgICAgICAgICAgICAgICAgLy8gU1BcbgoKRVJST1I6
-IGRvIG5vdCB1c2UgQzk5IC8vIGNvbW1lbnRzCiMxMDY6IEZJTEU6IGJhY2tlbmRzL3djdGFibGV0
-LmM6Nzc6CisgICAgezB4MjMsIDB4NDEsIDB4NGMsIDB4MzEsIDB4MGQsIDB9LCAgICAgICAgICAv
-LyAjQUwxXHIKCkVSUk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50cwojMTA3OiBGSUxFOiBi
-YWNrZW5kcy93Y3RhYmxldC5jOjc4OgorICAgIHsweDUzLCAweDU0LCAweDg4LCAwfSwgICAgICAg
-ICAgICAgICAgICAgICAgLy8gU1RcbgoKRVJST1I6IGRvIG5vdCB1c2UgQzk5IC8vIGNvbW1lbnRz
-CiMxMDg6IEZJTEU6IGJhY2tlbmRzL3djdGFibGV0LmM6Nzk6CisgICAgezB4MGQsIDB4NTQsIDB4
-NTMsIDB4ODgsIDB4ZCwgMH0sICAgICAgICAgICAvLyBcclRTJlxyCgpFUlJPUjogZG8gbm90IHVz
-ZSBDOTkgLy8gY29tbWVudHMKIzEwOTogRklMRTogYmFja2VuZHMvd2N0YWJsZXQuYzo4MDoKKyAg
-ICB7MHgwZCwgMHgwYSwgMHg1MywgMHg1MCwgMHgwZCwgMHgwYSwgMH0sICAgIC8vIFxyXG5TUFxy
-XG4KCkVSUk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50cwojMTEwOiBGSUxFOiBiYWNrZW5k
-cy93Y3RhYmxldC5jOjgxOgorICAgIHsweDdlLCAweDIzLCAweDBkLCAwfSAgICAgICAgICAgICAg
-ICAgICAgICAgLy8gfiNccgoKRVJST1I6IGRvIG5vdCB1c2UgQzk5IC8vIGNvbW1lbnRzCiMxMTM6
-IEZJTEU6IGJhY2tlbmRzL3djdGFibGV0LmM6ODQ6CisvLyBDaGFyIHN0cmluZ3Mgd2l0aCBhdmFs
-aWFibGUgY29tbWFuZHMKCkVSUk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50cwojMTM2OiBG
-SUxFOiBiYWNrZW5kcy93Y3RhYmxldC5jOjEwNzoKKy8vIE1vZGVsIHN0cmluZyBhbmQgY29uZmln
-IHN0cmluZwoKRVJST1I6IGRvIG5vdCBpbml0aWFsaXNlIGdsb2JhbHMgdG8gMCBvciBOVUxMCiMx
-NTI6IEZJTEU6IGJhY2tlbmRzL3djdGFibGV0LmM6MTIzOgoraW50IGNvdW50ID0gMDsKCkVSUk9S
-OiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50cwojMTU2OiBGSUxFOiBiYWNrZW5kcy93Y3RhYmxl
-dC5jOjEyNzoKKy8vIFRoaXMgc3RydWN0dXJlIGlzIHVzZWQgdG8gc2F2ZSBwcml2YXRlIGluZm8g
-Zm9yIFdhY29tIFRhYmxldC4KCkVSUk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50cwojMjAz
-OiBGSUxFOiBiYWNrZW5kcy93Y3RhYmxldC5jOjE3NDoKKyAgICAvLyB1aW50OF90IGNvZGVzWzhd
-ID0geyAweGEwLCAweDBlLCAweDA2LCAweDAwLCAweDEzLCAweDNiLCAweDAwIH07CgpFUlJPUjog
-ZG8gbm90IHVzZSBDOTkgLy8gY29tbWVudHMKIzIwNDogRklMRTogYmFja2VuZHMvd2N0YWJsZXQu
-YzoxNzU6CisgICAgLy8gdWludDhfdCBjb2Rlc1s4XSA9IHsgMHhlMCwgMHgwNSwgMHg2YSwgMHgw
-MCwgMHgwNiwgMHg2NCwgMHg0MCB9OwoKRVJST1I6IGRvIG5vdCB1c2UgQzk5IC8vIGNvbW1lbnRz
-CiMyMDU6IEZJTEU6IGJhY2tlbmRzL3djdGFibGV0LmM6MTc2OgorICAgIC8vIHVpbnQ4X3QgY29k
-ZXNbOF0gPSB7IDB4YTAsIDB4MWMsIDB4MjksIDB4MDAsIDB4MTksIDB4MWMsIDB4MDAgfTsKCkVS
-Uk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50cwojMjMzOiBGSUxFOiBiYWNrZW5kcy93Y3Rh
-YmxldC5jOjIwNDoKKyAgICBpbnQgbGVuLCBjYW5Xcml0ZTsgLy8gLCBpOwoKRVJST1I6IGRvIG5v
-dCB1c2UgQzk5IC8vIGNvbW1lbnRzCiMyNDI6IEZJTEU6IGJhY2tlbmRzL3djdGFibGV0LmM6MjEz
-OgorICAgICAgICAvLyBEUFJJTlRGKCItLS0tLS0tLSBXcml0ZSAlMmQ6ICIsIGNhbldyaXRlKTsK
-CkVSUk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50cwojMjQzOiBGSUxFOiBiYWNrZW5kcy93
-Y3RhYmxldC5jOjIxNDoKKyAgICAgICAgLy8gZm9yIChpID0gMDsgaSA8IGxlbjsgaSsrKSB7CgpF
-UlJPUjogZG8gbm90IHVzZSBDOTkgLy8gY29tbWVudHMKIzI0NDogRklMRTogYmFja2VuZHMvd2N0
-YWJsZXQuYzoyMTU6CisgICAgICAgIC8vICAgICBEUFJJTlRGKCIgJTAyeCIsIHRhYmxldC0+b3V0
-YnVmW2ldKTsKCkVSUk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50cwojMjQ1OiBGSUxFOiBi
-YWNrZW5kcy93Y3RhYmxldC5jOjIxNjoKKyAgICAgICAgLy8gfQoKRVJST1I6IGRvIG5vdCB1c2Ug
-Qzk5IC8vIGNvbW1lbnRzCiMyNDY6IEZJTEU6IGJhY2tlbmRzL3djdGFibGV0LmM6MjE3OgorICAg
-ICAgICAvLyBEUFJJTlRGKCJcbiIpOwoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmV0d2VlbiBm
-dW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lzICcoJwojMjU5OiBGSUxFOiBiYWNrZW5k
-cy93Y3RhYmxldC5jOjIzMDoKK3N0YXRpYyBpbnQgd2N0YWJsZXRfY2hyX3dyaXRlIChzdHJ1Y3Qg
-Q2hhckRyaXZlclN0YXRlICpzLAoKRVJST1I6IGRvIG5vdCB1c2UgQzk5IC8vIGNvbW1lbnRzCiMy
-NzI6IEZJTEU6IGJhY2tlbmRzL3djdGFibGV0LmM6MjQzOgorICAgIC8vIERQUklOVEYoIlJlY2Vp
-dmU6ICUuMnhcbiIsIGMpOwoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMyODI6IEZJ
-TEU6IGJhY2tlbmRzL3djdGFibGV0LmM6MjUzOgorICAgICAgICAgICAgbWVtY3B5KHRhYmxldC0+
-b3V0YnVmICsgdGFibGV0LT5vdXRsZW4sIFdDX01PREVMX1NUUklORywgV0NfTU9ERUxfU1RSSU5H
-X0xFTkdUSCk7CgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzI4NzogRklMRTogYmFj
-a2VuZHMvd2N0YWJsZXQuYzoyNTg6CisgICAgICAgICAgICBtZW1jcHkodGFibGV0LT5vdXRidWYg
-KyB0YWJsZXQtPm91dGxlbiwgV0NfQ09ORklHX1NUUklORywgV0NfQ09ORklHX1NUUklOR19MRU5H
-VEgpOwoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMyOTI6IEZJTEU6IGJhY2tlbmRz
-L3djdGFibGV0LmM6MjYzOgorICAgICAgICAgICAgbWVtY3B5KHRhYmxldC0+b3V0YnVmICsgdGFi
-bGV0LT5vdXRsZW4sIFdDX0ZVTExfQ09ORklHX1NUUklORywgV0NfRlVMTF9DT05GSUdfU1RSSU5H
-X0xFTkdUSCk7CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMzA4OiBGSUxFOiBi
-YWNrZW5kcy93Y3RhYmxldC5jOjI3OToKKyAgICAgICAgICAgIGNvZGVzWzJdID0gKCAoICggV0Nf
-SDQoaW5wdXQpICYgMHg3ICkgXiAweDUpIDw8IDQgKSB8IChXQ19MNChpbnB1dCkgXiAweDcpOwoK
-RVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYWZ0ZXIgdGhhdCBvcGVuIHBhcmVudGhlc2lzICcoJwoj
-MzA4OiBGSUxFOiBiYWNrZW5kcy93Y3RhYmxldC5jOjI3OToKKyAgICAgICAgICAgIGNvZGVzWzJd
-ID0gKCAoICggV0NfSDQoaW5wdXQpICYgMHg3ICkgXiAweDUpIDw8IDQgKSB8IChXQ19MNChpbnB1
-dCkgXiAweDcpOwoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmVmb3JlIHRoYXQgY2xvc2UgcGFy
-ZW50aGVzaXMgJyknCiMzMDg6IEZJTEU6IGJhY2tlbmRzL3djdGFibGV0LmM6Mjc5OgorICAgICAg
-ICAgICAgY29kZXNbMl0gPSAoICggKCBXQ19INChpbnB1dCkgJiAweDcgKSBeIDB4NSkgPDwgNCAp
-IHwgKFdDX0w0KGlucHV0KSBeIDB4Nyk7CgpFUlJPUjogZG8gbm90IHVzZSBDOTkgLy8gY29tbWVu
-dHMKIzMxNDogRklMRTogYmFja2VuZHMvd2N0YWJsZXQuYzoyODU6CisgICAgICAgIC8vIERQUklO
-VEYoIi0tLS0tLS0tIENvbW1hbmQ6ICVzXG4iLCB3Y3RhYmxldF9jb21tYW5kc19uYW1lc1tjb21t
-XSk7CgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBiZXR3ZWVuIGZ1bmN0aW9uIG5hbWUgYW5kIG9w
-ZW4gcGFyZW50aGVzaXMgJygnCiMzMjQ6IEZJTEU6IGJhY2tlbmRzL3djdGFibGV0LmM6Mjk1Ogor
-ICAgIGdfZnJlZSAoY2hyLT5vcGFxdWUpOwoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmV0d2Vl
-biBmdW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lzICcoJwojMzI1OiBGSUxFOiBiYWNr
-ZW5kcy93Y3RhYmxldC5jOjI5NjoKKyAgICBnX2ZyZWUgKGNocik7Cgp0b3RhbDogNDMgZXJyb3Jz
-LCAxIHdhcm5pbmdzLCAzNzcgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJv
-YmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBw
-b3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGlu
-IE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMi8xNzogd2N0YWJsZXQ6IGFkZCB3Y3RhYmxl
-dF9xdWV1ZV9vdXRwdXQgaGVscGVyLi4uCkNoZWNraW5nIFBBVENIIDMvMTc6IHdjdGFibGV0OiBz
-YXZlIGFsbCBjaGFycyBpbiB0aGUgcXVlcnkgYnVmZmVyLi4uCldBUk5JTkc6IGxpbmUgb3ZlciA4
-MCBjaGFyYWN0ZXJzCiMzMjogRklMRTogYmFja2VuZHMvd2N0YWJsZXQuYzoyNDM6CisgICAgZm9y
-IChpID0gMDsgaSA8IGxlbiAmJiB0YWJsZXQtPnF1ZXJ5X2luZGV4IDwgc2l6ZW9mKHRhYmxldC0+
-cXVlcnkpIC0gMTsgaSsrKSB7Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDMzIGxpbmVz
-IGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAg
-SWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRv
-IHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcg
-UEFUQ0ggNC8xNzogd2N0YWJsZXQ6IGRyb3Agd2N0YWJsZXRfY29tbWFuZHNfbmFtZXMuLi4KQ2hl
-Y2tpbmcgUEFUQ0ggNS8xNzogd2N0YWJsZXQ6IHN0cmlwIGxlYWRpbmcgXHIgKyBcbiBmcm9tIGJ1
-ZmZlci4uLgpFUlJPUjogZG8gbm90IHVzZSBDOTkgLy8gY29tbWVudHMKIzIwOiBGSUxFOiBiYWNr
-ZW5kcy93Y3RhYmxldC5jOjYzOgorICAgIHsweDUzLCAweDUwLCAweDBhLCAwfSwgICAgICAgICAg
-ICAgICAgICAgICAgLy8gU1BcbgoKRVJST1I6IGRvIG5vdCB1c2UgQzk5IC8vIGNvbW1lbnRzCiMy
-MzogRklMRTogYmFja2VuZHMvd2N0YWJsZXQuYzo2NToKKyAgICB7MHg1NCwgMHg0NSwgMHgwYSwg
-MH0sICAgICAgICAgICAgICAgICAgICAgIC8vIFRFXG4KCkVSUk9SOiBkbyBub3QgdXNlIEM5OSAv
-LyBjb21tZW50cwojMzM6IEZJTEU6IGJhY2tlbmRzL3djdGFibGV0LmM6NzM6CisgICAgezB4NTMs
-IDB4NTQsIDB4MGQsIDB9LCAgICAgICAgICAgICAgICAgICAgICAvLyBTVFxuCgpFUlJPUjogZG8g
-bm90IHVzZSBDOTkgLy8gY29tbWVudHMKIzM0OiBGSUxFOiBiYWNrZW5kcy93Y3RhYmxldC5jOjc0
-OgorICAgIHsweDUzLCAweDUwLCAweDBkLCAwfSwgICAgICAgICAgICAgICAgICAgICAgLy8gU1Bc
-cgoKRVJST1I6IGRvIG5vdCB1c2UgQzk5IC8vIGNvbW1lbnRzCiM0MTogRklMRTogYmFja2VuZHMv
-d2N0YWJsZXQuYzo3OToKKyAgICB7MHg1NCwgMHg1MywgMHg4OCwgMHhkLCAwfSwgICAgICAgICAg
-ICAgICAgIC8vIFRTJlxyCgpFUlJPUjogZG8gbm90IHVzZSBDOTkgLy8gY29tbWVudHMKIzQyOiBG
-SUxFOiBiYWNrZW5kcy93Y3RhYmxldC5jOjgwOgorICAgIHsweDUzLCAweDUwLCAweDBkLCAweDBh
-LCAwfSwgICAgICAgICAgICAgICAgLy8gU1BcclxuCgp0b3RhbDogNiBlcnJvcnMsIDAgd2Fybmlu
-Z3MsIDQ3IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
-c2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJl
-cG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVS
-Uy4KCkNoZWNraW5nIFBBVENIIDYvMTc6IHdjdGFibGV0OiB0cmFjayBsaW5lIHNwZWVkLCByZXNl
-dCBvbiBzcGVlZCBjaGFuZ2VzLi4uCkNoZWNraW5nIFBBVENIIDcvMTc6IHdjdGFibGV0OiBvcGVy
-YXRlIG9uIGxpbmUgc3BlZWQgOTYwMC4uLgpDaGVja2luZyBQQVRDSCA4LzE3OiB3Y3RhYmxldDog
-ZHJvcCBkZWJ1ZyBjb2RlIGZyb20gd2N0YWJsZXRfaGFuZGxlci4uLgpDaGVja2luZyBQQVRDSCA5
-LzE3OiB3Y3RhYmxldDogYWRkIHdjdGFibGV0X3NoaWZ0X2lucHV0Li4uCkNoZWNraW5nIFBBVENI
-IDEwLzE3OiB3Y3RhYmxldDogbW92ZSBpbml0L2RldGVjdCBzZXF1ZW5jZS4uLgpDaGVja2luZyBQ
-QVRDSCAxMS8xNzogd2N0YWJsZXQ6IHJldmFtcCBjb21tYW5kIHBhcnNlci4uLi4KQ2hlY2tpbmcg
-UEFUQ0ggMTIvMTc6IHdjdGFibGV0OiBkcm9wIHRpbWVyLCBob29rIGludG8gY2hyLT5hY2NlcHRf
-aW5wdXQgaW5zdGVhZC4uLgpDaGVja2luZyBQQVRDSCAxMy8xNzogd2N0YWJsZXQ6IGRyb3AgRFBS
-SU5URiwgYWRkIHRyYWNlIGV2ZW50cyBpbnN0ZWFkLi4uCkNoZWNraW5nIFBBVENIIDE0LzE3OiB3
-Y3RhYmxldDogbWlzYyBjbGVhbnVwcy4uLgpDaGVja2luZyBQQVRDSCAxNS8xNzogd2N0YWJsZXQ6
-IHN3aXRjaCB0byBuZXcgaW5wdXQgaW50ZXJmYWNlLi4uCkNoZWNraW5nIFBBVENIIDE2LzE3OiB3
-Y3RhYmxldDogdXBkYXRlIGZpbGUgY29tbWVudC4uLgpDaGVja2luZyBQQVRDSCAxNy8xNzogd2N0
-YWJsZXQ6IGltcGxlbWVudCBTVCBhbmQgU1AgY29tbWFuZHMuLi4KPT09IE9VVFBVVCBFTkQgPT09
-CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQg
-YXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNl
-bmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+Hello all,
+
+On Friday 06 of January 2017 00:22:28 no-reply@patchew.org wrote:
+> Hi,
+>
+> Your series seems to have some coding style problems. See output below for
+> more information:
+>
+> Message-id: cover.1483655893.git.pisa@cmp.felk.cvut.cz
+> Subject: [Qemu-devel] [PATCH 0/6] CAN bus support for QEMU (SJA1000 PCI so
+> far) Type: series
+
+I have gone through patch style problems and reduced number
+of problems.
+
+Actual complete list attached to the end of the e-mail.
+
+I would like to discuss/get feedback/suggestions for some
+of reported problems
+
+> WARNING: architecture specific defines should be avoided
+> #117: FILE: hw/can/can_core.c:34:
+> +#ifdef __linux__
+>
+> WARNING: architecture specific defines should be avoided
+> #236: FILE: hw/can/can_core.c:153:
+> +#ifdef __linux__
+>
+> WARNING: architecture specific defines should be avoided
+> #1869: FILE: include/can/can_emu.h:45:
+> +#if defined(__GNUC__) || defined(__linux__)
+
+these parts are specific for connection to host system
+SocketCAN support. Code is written such way that
+the base infrastructure has no dependence on the host
+system and providing multiple transports for other systems
+or UDP/TCP should not be a problem. So I think that
+limiting of these parts to Linux only is not a problem.
+It is possible to move these to separate file in
+the future, but can require to add some more functions
+to the external interface so keeping in the core
+is easier for now. __GNUC__ define is used to allow alignment
+of data even on non-Linux system to match SocketCAN standard
+but internally there is no dependence on that so for example
+on WIndows with other C compiler it is not required
+
+#if defined(__GNUC__) || defined(__linux__)
+    #define QEMU_CAN_FRAME_DATA_ALIGN __attribute__((aligned(8)))
+#else
+    #define QEMU_CAN_FRAME_DATA_ALIGN
+#endif
+
+> ERROR: do not use C99 // comments
+> #724: FILE: hw/can/can_sja1000.c:34:
+> +// #define DEBUG_FILTER
+>
+> ERROR: do not use C99 // comments
+> #1684: FILE: hw/can/can_sja1000.h:39:
+> +//#define DEBUG_CAN
+
+The DEBUG* defines can be helpful for development and it
+seems that use of C99 // comments to disable these
+is widely used practice in the QEMU
+
+> ERROR: externs should be avoided in .c files
+> #305: FILE: hw/can/can_core.c:222:
+> +int can_bus_host_set_filters(CanBusClientState *,
+
+This function is not used at the actual version and I am
+not sure if it should get to the external API.
+But it documents use of filters with SocketCAN
+so that is why my weak preference is to keep it.
+
+> WARNING: line over 80 characters
+> #1199: FILE: hw/can/can_sja1000.c:509:
+> +                s->statusB &= ~(3 << 2); /* Clear transmission complete status, */
+
+How strict is a requirement for 80 characters in qemu?
+If the slight overflow is caused by comment then I feel
+better to keep comment descriptive than to short it and
+moving comment above statement can lead to longer
+functions bodies and worse reability, at least for me.
+But if strict 80 chars are preferred I try that.
+
+> WARNING: line over 80 characters
+> #306: FILE: hw/can/can_core.c:223:
+> +                             const struct qemu_can_filter *filters, size_t filters_cnt);
+>
+> WARNING: line over 80 characters
+> #296: FILE: hw/can/can_core.c:213:
+> +    CanBusHostConnectState *c = container_of(client, CanBusHostConnectState, bus_client);
+
+Then there are function declarations and some code which
+looks for me much worse readable when wrapped.
+The length is caused mainly by attempt to provide
+descriptive identifiers/types names. I personally
+prefer uniqueness of the identifiers and descriptive
+names above length. I have correct cases where width
+is above 90 chars but left some warnings uncorrected.
+
+Thanks for feedback in advance,
+
+Pavel
+
+
+Actual complete run of the series through scripts/checkpatch.pl
+
+
+WARNING: architecture specific defines should be avoided
+#117: FILE: hw/can/can_core.c:34:
++#ifdef __linux__
+
+WARNING: architecture specific defines should be avoided
+#236: FILE: hw/can/can_core.c:153:
++#ifdef __linux__
+
+WARNING: line over 80 characters
+#258: FILE: hw/can/can_core.c:175:
++    CanBusHostConnectState *c = container_of(client, CanBusHostConnectState, bus_client);
+
+WARNING: line over 80 characters
+#270: FILE: hw/can/can_core.c:187:
++    CanBusHostConnectState *c = container_of(client, CanBusHostConnectState, bus_client);
+
+WARNING: line over 80 characters
+#296: FILE: hw/can/can_core.c:213:
++    CanBusHostConnectState *c = container_of(client, CanBusHostConnectState, bus_client);
+
+ERROR: externs should be avoided in .c files
+#305: FILE: hw/can/can_core.c:222:
++int can_bus_host_set_filters(CanBusClientState *,
+
+WARNING: line over 80 characters
+#306: FILE: hw/can/can_core.c:223:
++                             const struct qemu_can_filter *filters, size_t filters_cnt);
+
+WARNING: line over 80 characters
+#309: FILE: hw/can/can_core.c:226:
++                             const struct qemu_can_filter *filters, size_t filters_cnt)
+
+WARNING: line over 80 characters
+#311: FILE: hw/can/can_core.c:228:
++    CanBusHostConnectState *c = container_of(client, CanBusHostConnectState, bus_client);
+
+WARNING: line over 80 characters
+#635: FILE: hw/can/can_pci.c:192:
++        VMSTATE_STRUCT(sja_state, CanPCIState, 0, vmstate_can_sja, CanSJA1000State),
+
+ERROR: do not use C99 // comments
+#724: FILE: hw/can/can_sja1000.c:34:
++// #define DEBUG_FILTER
+
+WARNING: line over 80 characters
+#919: FILE: hw/can/can_sja1000.c:229:
++        buff[++count] = (frame->can_id << 05) & 0xe0; /* ID.02~ID.00,x,x,x,x,x */
+
+WARNING: line over 80 characters
+#1096: FILE: hw/can/can_sja1000.c:406:
++                s->statusP &= ~(3 << 2); /* Clear transmission complete status, */
+
+WARNING: line over 80 characters
+#1199: FILE: hw/can/can_sja1000.c:509:
++                s->statusB &= ~(3 << 2); /* Clear transmission complete status, */
+
+WARNING: line over 80 characters
+#1221: FILE: hw/can/can_sja1000.c:531:
++                    printf(" %02X", s->rx_buff[(s->rxbuf_start + i) % SJA_RCV_BUF_LEN]);
+
+WARNING: line over 80 characters
+#1315: FILE: hw/can/can_sja1000.c:625:
++        case 8: /* Output control register, hardware related, not support now. */
+
+WARNING: line over 80 characters
+#1346: FILE: hw/can/can_sja1000.c:656:
++                temp = s->rx_buff[(s->rxbuf_start + addr - 16) % SJA_RCV_BUF_LEN];
+
+ERROR: do not use C99 // comments
+#1684: FILE: hw/can/can_sja1000.h:39:
++//#define DEBUG_CAN
+
+WARNING: line over 80 characters
+#1702: FILE: hw/can/can_sja1000.h:57:
++    uint8_t         interrupt_en;  /* PeliCAN, addr 4, Interrupt Enable register */
+
+WARNING: line over 80 characters
+#1703: FILE: hw/can/can_sja1000.h:58:
++    uint8_t         rxmsg_cnt;     /* PeliCAN, addr 29, RX message counter. DS-p49 */
+
+WARNING: line over 80 characters
+#1704: FILE: hw/can/can_sja1000.h:59:
++    uint8_t         rxbuf_start;   /* PeliCAN, addr 30, RX buffer start address, DS-p49 */
+
+WARNING: line over 80 characters
+#1705: FILE: hw/can/can_sja1000.h:60:
++    uint8_t         clock;         /* PeliCAN, addr 31, Clock Divider register, DS-p55 */
+
+WARNING: line over 80 characters
+#1719: FILE: hw/can/can_sja1000.h:74:
++    uint8_t         code;          /* BasicCAN, addr 4, Acceptance code register */
+
+WARNING: line over 80 characters
+#1720: FILE: hw/can/can_sja1000.h:75:
++    uint8_t         mask;          /* BasicCAN, addr 5, Acceptance mask register */
+
+WARNING: line over 80 characters
+#1765: FILE: hw/can/can_sja1000.h:120:
++/* ID bytes (11 bits in 0 and 1 or 16 bits in 0,1 and 13 bits in 2,3 (extended)) */
+
+WARNING: architecture specific defines should be avoided
+#1869: FILE: include/can/can_emu.h:45:
++#if defined(__GNUC__) || defined(__linux__)
+
+total: 3 errors, 23 warnings, 1870 lines checked
+
+/home/pi/patches/qemu/out/0001-CAN-bus-simple-SJA1000-PCI-card-emulation-for-QEMU.patch has style problems, please review.  If any of these errors
+are false positives report them to the maintainer, see
+CHECKPATCH in MAINTAINERS.
+WARNING: line over 80 characters
+#152: FILE: hw/can/can_kvaser_pci.c:121:
++static uint64_t kvaser_pci_s5920_io_read(void *opaque, hwaddr addr, unsigned size)
+
+WARNING: line over 80 characters
+#211: FILE: hw/can/can_kvaser_pci.c:180:
++static uint64_t kvaser_pci_xilinx_io_read(void *opaque, hwaddr addr, unsigned size)
+
+WARNING: line over 80 characters
+#310: FILE: hw/can/can_kvaser_pci.c:279:
++    pci_register_bar(&d->dev, /*BAR*/ 0, PCI_BASE_ADDRESS_SPACE_IO, &d->s5920_io);
+
+WARNING: line over 80 characters
+#312: FILE: hw/can/can_kvaser_pci.c:281:
++    pci_register_bar(&d->dev, /*BAR*/ 2, PCI_BASE_ADDRESS_SPACE_IO, &d->xilinx_io);
+
+WARNING: line over 80 characters
+#346: FILE: hw/can/can_kvaser_pci.c:315:
++        VMSTATE_STRUCT(sja_state, KvaserPCIState, 0, vmstate_can_sja, CanSJA1000State),
+
+total: 0 errors, 5 warnings, 370 lines checked
+
+/home/pi/patches/qemu/out/0002-CAN-bus-Kvaser-PCI-CAN-S-single-SJA1000-channel-emul.patch has style problems, please review.  If any of these errors
+are false positives report them to the maintainer, see
+CHECKPATCH in MAINTAINERS.
+WARNING: line over 80 characters
+#77: FILE: hw/can/can_pcm3680_pci.c:46:
++#define PCM3680i_PCI_VENDOR_ID1     0x13fe    /* the PCI device and vendor IDs */
+
+WARNING: line over 80 characters
+#120: FILE: hw/can/can_pcm3680_pci.c:89:
++static uint64_t pcm3680i_pci_sja1_io_read(void *opaque, hwaddr addr, unsigned size)
+
+WARNING: line over 80 characters
+#145: FILE: hw/can/can_pcm3680_pci.c:114:
++static uint64_t pcm3680i_pci_sja2_io_read(void *opaque, hwaddr addr, unsigned size)
+
+WARNING: line over 80 characters
+#258: FILE: hw/can/can_pcm3680_pci.c:227:
++    pci_register_bar(&d->dev, /*BAR*/ 0, PCI_BASE_ADDRESS_SPACE_IO, &d->sja_io[0]);
+
+WARNING: line over 80 characters
+#259: FILE: hw/can/can_pcm3680_pci.c:228:
++    pci_register_bar(&d->dev, /*BAR*/ 1, PCI_BASE_ADDRESS_SPACE_IO, &d->sja_io[1]);
+
+total: 0 errors, 5 warnings, 321 lines checked
+
+/home/pi/patches/qemu/out/0003-CAN-bus-PCM-3680I-PCI-dual-SJA1000-channel-emulation.patch has style problems, please review.  If any of these errors
+are false positives report them to the maintainer, see
+CHECKPATCH in MAINTAINERS.
+total: 0 errors, 0 warnings, 39 lines checked
+
+/home/pi/patches/qemu/out/0004-Fixed-IRQ-problem-for-CAN-device-can_pcm3680_pci.patch has no obvious style problems and is ready for submission.
+total: 0 errors, 0 warnings, 19 lines checked
+
+/home/pi/patches/qemu/out/0005-Minor-clean-up-of-can_pcm3680_pci.patch has no obvious style problems and is ready for submission.
+WARNING: line over 80 characters
+#77: FILE: hw/can/can_mioe3680_pci.c:46:
++#define MIOe3680_PCI_VENDOR_ID1     0x13fe    /* the PCI device and vendor IDs */
+
+WARNING: line over 80 characters
+#127: FILE: hw/can/can_mioe3680_pci.c:96:
++static uint64_t mioe3680_pci_sja1_io_read(void *opaque, hwaddr addr, unsigned size)
+
+WARNING: line over 80 characters
+#152: FILE: hw/can/can_mioe3680_pci.c:121:
++static uint64_t mioe3680_pci_sja2_io_read(void *opaque, hwaddr addr, unsigned size)
+
+WARNING: line over 80 characters
+#228: FILE: hw/can/can_mioe3680_pci.c:197:
++            error_report("Cannot connect CAN bus to host #1 device \"%s\"", d->host[0]);
+
+WARNING: line over 80 characters
+#235: FILE: hw/can/can_mioe3680_pci.c:204:
++            error_report("Cannot connect CAN bus to host #2 device \"%s\"", d->host[1]);
+
+WARNING: line over 80 characters
+#265: FILE: hw/can/can_mioe3680_pci.c:234:
++    pci_register_bar(&d->dev, /*BAR*/ 0, PCI_BASE_ADDRESS_SPACE_IO, &d->sja_io[0]);
+
+WARNING: line over 80 characters
+#266: FILE: hw/can/can_mioe3680_pci.c:235:
++    pci_register_bar(&d->dev, /*BAR*/ 1, PCI_BASE_ADDRESS_SPACE_IO, &d->sja_io[1]);
+
+total: 0 errors, 7 warnings, 329 lines checked
+
+/home/pi/patches/qemu/out/0006-CAN-bus-MIOe-3680-PCI-dual-SJA1000-channel-emulation.patch has style problems, please review.  If any of these errors
+are false positives report them to the maintainer, see
+CHECKPATCH in MAINTAINERS.
