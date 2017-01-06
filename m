@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37661)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38955)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cPY5V-0002lv-IC
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 12:13:58 -0500
+	(envelope-from <berrange@redhat.com>) id 1cPY9o-0006tJ-8O
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 12:18:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cPY5U-0007dy-QJ
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 12:13:57 -0500
-Received: from mail-ua0-x22e.google.com ([2607:f8b0:400c:c08::22e]:33284)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cPY5U-0007dc-Mp
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 12:13:56 -0500
-Received: by mail-ua0-x22e.google.com with SMTP id i68so307246648uad.0
-	for <qemu-devel@nongnu.org>; Fri, 06 Jan 2017 09:13:56 -0800 (PST)
+	(envelope-from <berrange@redhat.com>) id 1cPY9k-0000ks-6d
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 12:18:23 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59080)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cPY9k-0000km-0T
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 12:18:20 -0500
+Received: from int-mx13.intmail.prod.int.phx2.redhat.com
+	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 027868124B
+	for <qemu-devel@nongnu.org>; Fri,  6 Jan 2017 17:18:19 +0000 (UTC)
+Date: Fri, 6 Jan 2017 17:18:13 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170106171813.GV31112@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170106155543.12827-1-berrange@redhat.com>
+	<20170106155543.12827-41-berrange@redhat.com>
+	<87r34g2k03.fsf@ac.upc.edu>
 MIME-Version: 1.0
-In-Reply-To: <20170102200153.28864-17-drjones@redhat.com>
-References: <20170102200153.28864-1-drjones@redhat.com>
-	<20170102200153.28864-17-drjones@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 6 Jan 2017 17:13:35 +0000
-Message-ID: <CAFEAcA-Wen-TR4NwCgo-xYEka4wu+K9g5vr+ZA3440pkzanWrQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v2 16/16] hw/arm/virt-acpi-build: madt: add
- vgic maint irq
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <87r34g2k03.fsf@ac.upc.edu>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 40/47] trace: switch target/s390x/
+ directory to modular trace.h file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,37 +37,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jones <drjones@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Igor Mammedov <imammedo@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, Shannon Zhao <shannon.zhao@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 2 January 2017 at 20:01, Andrew Jones <drjones@redhat.com> wrote:
-> When virtualization is enabled and we have a v3 gic, then we add
-> the vgic maintenance interrupt to the DT. This patch is the ACPI
-> equivalent.
->
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
-> ---
->  hw/arm/virt-acpi-build.c | 3 +++
->  1 file changed, 3 insertions(+)
->
-> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> index 7c00ee683f44..971ee4885c43 100644
-> --- a/hw/arm/virt-acpi-build.c
-> +++ b/hw/arm/virt-acpi-build.c
-> @@ -607,6 +607,9 @@ build_madt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
->          if (arm_feature(&armcpu->env, ARM_FEATURE_PMU)) {
->              gicc->performance_interrupt = cpu_to_le32(PPI(VIRTUAL_PMU_IRQ));
->          }
-> +        if (vms->virt && vms->gic_version == 3) {
-> +            gicc->vgic_interrupt = cpu_to_le32(PPI(ARCH_GICV3_MAINT_IRQ));
-> +        }
->      }
->
->      if (vms->gic_version == 3) {
+On Fri, Jan 06, 2017 at 06:09:16PM +0100, Llu=C3=ADs Vilanova wrote:
+> Daniel P Berrange writes:
+>=20
+> > Switch files in the target/s390x/ directory to include the
+> > target/s390x/trace.h file instead of the global trace.h
+> > file.
+>=20
+> > The make rules for gen-features.{h,c} need to be moved
+> > out into the top level Makefile.objs, otherwise make
+> > complains about the rules being defined multiple times
+> > due to target/s390x/Makefile.objs being included
+> > multiple times when expanding different subdir object
+> > lists.
+>=20
+> If the problem is re-definition, you can instead add a guard around the=
+ rules in
+> target/s390x/Makefile.objs. This avoids defining the rules multiple tim=
+es but
+> still keeps the target-specific rules in the target-specific makefile.
 
-I'm going to squash this change into my "target-arm: Enable EL2 feature bit
-on A53 and A57" patch, since it's a trivial diff and that's the patch
-which has the "put this into the DTB" change in it.
+What kind of guard to you mean ? What's happening is that the top
+level Makefile.target is including target/s390x/Makefile.objs
+multiple times to expand multiple vars. I don't see a way to
+distinguish which include we're being called from.
 
-thanks
--- PMM
+Regards,
+Daniel
+--=20
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange=
+/ :|
+|: http://libvirt.org              -o-             http://virt-manager.or=
+g :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr=
+/ :|
