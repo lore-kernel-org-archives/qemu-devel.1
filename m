@@ -1,31 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49188)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51766)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vpalatin@google.com>) id 1cPVCW-0005AZ-BH
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 09:09:01 -0500
+	(envelope-from <bounces@canonical.com>) id 1cPVJG-0007uv-5c
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 09:15:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vpalatin@google.com>) id 1cPVCV-0006yj-C0
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 09:09:00 -0500
-Received: from mail-io0-x231.google.com ([2607:f8b0:4001:c06::231]:36729)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <vpalatin@google.com>) id 1cPVCV-0006yL-6J
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 09:08:59 -0500
-Received: by mail-io0-x231.google.com with SMTP id p127so57153949iop.3
-	for <qemu-devel@nongnu.org>; Fri, 06 Jan 2017 06:08:57 -0800 (PST)
+	(envelope-from <bounces@canonical.com>) id 1cPVJD-00024m-11
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 09:15:58 -0500
+Received: from indium.canonical.com ([91.189.90.7]:60939)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cPVJC-00023z-RV
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 09:15:54 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cPVJB-0003xp-BY
+	for <qemu-devel@nongnu.org>; Fri, 06 Jan 2017 14:15:53 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id E8CCD2E819C
+	for <qemu-devel@nongnu.org>; Fri,  6 Jan 2017 14:15:48 +0000 (UTC)
 MIME-Version: 1.0
-Sender: vpalatin@google.com
-In-Reply-To: <61d18d9c-32f1-983f-c237-3c28d31e2f23@redhat.com>
-References: <cover.1482164622.git.vpalatin@chromium.org>
-	<85250fb0450b5b95232b39c82ab310a0632fd23f.1482164622.git.vpalatin@chromium.org>
-	<fda5a694-d02f-269e-e155-1822276d74f6@redhat.com>
-	<CAP_ceTxAn3tH-P8JjThXXeF7iYv5xFoVOzmjp5h8sHYsYzWTDQ@mail.gmail.com>
-	<df2938db-dde1-633c-899d-646d62ec4780@redhat.com>
-	<61d18d9c-32f1-983f-c237-3c28d31e2f23@redhat.com>
-From: Vincent Palatin <vpalatin@chromium.org>
-Date: Fri, 6 Jan 2017 15:08:27 +0100
-Message-ID: <CAP_ceTx+SXzZeg1BrF9ibAEm6MvBma+aMseMzLMcrQV_JjeOXg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v5 3/4] Plumb the HAXM-based hardware
- acceleration support
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 06 Jan 2017 13:57:23 -0000
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Reply-To: Bug 1399943 <1399943@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20141206152602.26252.40483.malonedeb@gac.canonical.com>
+Message-Id: <20170106135723.27309.84850.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1399943] Re: qemu-system-sparc loses serial
+ console data on EAGAIN
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,80 +37,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Yu Ning <yu.ning@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Stefan Weil <sw@weilnetz.de>, Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-On Thu, Jan 5, 2017 at 10:38 PM, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
->
-> On 05/01/2017 15:01, Paolo Bonzini wrote:
->>
->>
->> On 05/01/2017 14:50, Vincent Palatin wrote:
->>> Sorry I missed it.
->>> I move it to qemu_cpu_kick() as asked in the Darwin patch.
->>>
->>>> Apart from the above change, can you check if there are some less
->>>> heavyeight methods to force an exit?  I can think of QueueUserAPC with
->>>> an empty pfnAPC here, and SleepEx(0, TRUE) in qemu_hax_cpu_thread_fn
->>>> before qemu_wait_io_event_common.
->>>
->>> Actually I don't know a good test case to verify such a change, any advice ?
->
-> In fact there is a race anyway:
+Fix confirmed in QEMU 2.8 release.
 
-Thanks for the detailed examples and thoughts.
-The timing/benchmarking code might actually need some kind of per-vcpu
-time storage, but that's a detail.
-I have experimented with it and so far, I have mainly generated random
-numbers ...
-I have yet to find a use-case where the current code (with
-SuspendThread/ResumeThread) yields a better latency than just nothing
-instead :(
+** Changed in: qemu
+       Status: New =3D> Fix Released
 
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1399943
 
->
->         if (cpu->exit_request) {
->             ret = 1;
->             break;
->         }
->                                         cpu->exit_request
->                                         SuspendThread
->                                         ResumeThread
->         hax_vcpu_interrupt(env);
->         qemu_mutex_unlock_iothread();
->         hax_ret = hax_vcpu_run(vcpu);
->
-> and the same race is true for QueueUserAPC.  It's rare enough that I
-> guess we can accept the patches with just a FIXME comment, but...  Yu
-> Ning, can you tell us what user_event_pending is for? :)  My hunch is
-> that we should call hax_raise_event after setting cpu->exit_request, like
->
->         hax_raise_event();
->         /* write user_event_pending before exit_request */
->         smp_wmb();
->         cpu->exit_request = 1;
->         SuspendThread/ResumeThread
->                 (or QueueUserAPC)
->
-> and in the hax thread:
->
->         if (cpu->exit_request) {
->             cpu->hax_vcpu->tunnel->user_event_pending = 0;
->             ret = 1;
->             break;
->         }
->
->         hax_vcpu_interrupt(env);
->         qemu_mutex_unlock_iothread();
->
->         /* read exit_request before user_event_pending */
->         smp_rmb();
->         hax_ret = hax_vcpu_run(vcpu);
->
-> but I would like some more official documentation than my own reverse
-> engineering of the brain of whoever wrote the interface (I have not
-> looked at the HAXM driver binary).
->
-> Paolo
+Title:
+  qemu-system-sparc loses serial console data on EAGAIN
+
+Status in QEMU:
+  Fix Released
+
+Bug description:
+  When running a guest OS with a serial console under =
+
+  "qemu-system-sparc -nographic", parts of the serial console output
+  are sometimes lost.
+
+  This happens when a write() to standard output by qemu returns EAGAIN,
+  as may be the case when the guest is generating console output faster
+  than the tty (or pty/pipe/socket, etc.) connected to qemu's standard
+  output accepts it. The bug affects all releases of qemu since 1.5,
+  which was the first version to set stdout to O_NONBLOCK mode. Version
+  1.4.2 and earlier work correctly.
+
+  To reproduce the bug, you will need a guest OS configured with a
+  serial console, and a host with a slow tty.  The attached shell script
+  "sparc-test.sh" does this by using Aboriginal Linux as the serial
+  console guest, and a pty controlled by a Python script and the
+  "pexpect" Python module as the slow tty. A "seq" command is sent
+  to the guest to generate 100,000 lines of output containing sequential
+  integers, and the output is checked for gaps. The script limits the
+  tty output rate by occasionally sleeping for 1/10 of a second.
+
+  This bug was originally reported against qemu-system-i386 as =
+
+  bug #1335444, and has since been fixed in qemu-system-i386,
+  but remains in qemu-system-sparc as of today's git sources =
+
+  (d00e6cddc220de993573dfb5fd160ac72ccd49ab).  I am opening
+  this separate bug for the sparc case because I was asked
+  to do so by Paolo Bonzini in #1335444.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1399943/+subscriptions
