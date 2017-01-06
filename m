@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54151)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54567)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cPZ1F-00036j-5G
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 13:13:38 -0500
+	(envelope-from <eblake@redhat.com>) id 1cPZ3I-0004Ea-Fi
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 13:15:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cPZ1A-0006HC-6S
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 13:13:37 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47834)
+	(envelope-from <eblake@redhat.com>) id 1cPZ3D-0006u4-Q3
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 13:15:44 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38210)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cPZ19-0006H6-U4
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 13:13:32 -0500
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cPZ3D-0006tn-DB
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 13:15:39 -0500
 Received: from int-mx10.intmail.prod.int.phx2.redhat.com
 	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E8E097F7B7
-	for <qemu-devel@nongnu.org>; Fri,  6 Jan 2017 18:13:31 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 96DC3C03BD5B
+	for <qemu-devel@nongnu.org>; Fri,  6 Jan 2017 18:15:39 +0000 (UTC)
 References: <20170106155543.12827-1-berrange@redhat.com>
-	<20170106155543.12827-47-berrange@redhat.com>
+	<20170106155543.12827-48-berrange@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <a59e9bba-9db9-64f4-1175-ea0132812f1c@redhat.com>
-Date: Fri, 6 Jan 2017 12:13:29 -0600
+Message-ID: <de89a193-348a-d946-c8a3-b4db95b5719b@redhat.com>
+Date: Fri, 6 Jan 2017 12:15:37 -0600
 MIME-Version: 1.0
-In-Reply-To: <20170106155543.12827-47-berrange@redhat.com>
+In-Reply-To: <20170106155543.12827-48-berrange@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="j247n0GXlUDmeIUrWiwXqcsHd7nEeI3wI"
-Subject: Re: [Qemu-devel] [PATCH v2 46/47] trace: update docs to reflect new
- code generation approach
+	boundary="Dl3CRnqhL3pHfCLkFn4D67j4lQTe35Odm"
+Subject: Re: [Qemu-devel] [PATCH v2 47/47] trace: improve error reporting
+ when parsing simpletrace header
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,105 +39,44 @@ To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
 Cc: Stefan Hajnoczi <stefanha@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---j247n0GXlUDmeIUrWiwXqcsHd7nEeI3wI
+--Dl3CRnqhL3pHfCLkFn4D67j4lQTe35Odm
 From: Eric Blake <eblake@redhat.com>
 To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
 Cc: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <a59e9bba-9db9-64f4-1175-ea0132812f1c@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 46/47] trace: update docs to reflect new
- code generation approach
+Message-ID: <de89a193-348a-d946-c8a3-b4db95b5719b@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 47/47] trace: improve error reporting when
+ parsing simpletrace header
 References: <20170106155543.12827-1-berrange@redhat.com>
- <20170106155543.12827-47-berrange@redhat.com>
-In-Reply-To: <20170106155543.12827-47-berrange@redhat.com>
+ <20170106155543.12827-48-berrange@redhat.com>
+In-Reply-To: <20170106155543.12827-48-berrange@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 01/06/2017 09:55 AM, Daniel P. Berrange wrote:
-> Describe use of per-subdir trace events files and how it impacts
-> code generation.
+> When loading a simpletrace binary file we just report
+> "Not a valid trace file!" which is not very helpful. Report
+> exactly which field we found to be invalid.
 >=20
 > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 > ---
->  docs/tracing.txt | 61 +++++++++++++++++++++++++++++++++++++++++++++++-=
---------
->  1 file changed, 52 insertions(+), 9 deletions(-)
+>  scripts/simpletrace.py | 10 +++++++---
+>  1 file changed, 7 insertions(+), 3 deletions(-)
 >=20
-> diff --git a/docs/tracing.txt b/docs/tracing.txt
-> index f351998a..3262a61 100644
-> --- a/docs/tracing.txt
-> +++ b/docs/tracing.txt
-> @@ -27,18 +27,51 @@ for debugging, profiling, and observing execution.
-> =20
->  =3D=3D Trace events =3D=3D
-> =20
-> +=3D=3D=3D Sub-directory setup =3D=3D=3D
-> +
->  Each directory in the source tree can declare a set of static trace ev=
-ents
-> -in a "trace-events" file. Each trace event declaration names the event=
-, its
-> -arguments, and the format string which can be used for pretty-printing=
-:
-> +in a "trace-events" file. The first (non-comment) statement in the fil=
-e
-> +must be "@id_offset(NN)" where NN is an integer that is unique among a=
-ll
-> +"trace-events" files in the QEMU source tree. The IDs can be arbitrari=
-ly
-> +chosen, but for extra fun the current "trace-events" files use values =
-from
-> +the "powerful number" integer sequence :-)
 
-Is this true? I don't see an @id_offset() comment in any of your earlier
-patches, or in the unpatched tree.
+Could be applied independently, so:
 
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-> +In the sub-directory the following files will be automatically generat=
-ed
-> +
-> + - trace.c - the trace event state declarations
-> + - trace.h - the trace event enums and probe functions
-> + - trace-dtrace.h - DTrace speci
-
-s/speci/specification/ ?
-
-> + - trace-dtrace.dtrace - DTrace event probe helper declaration
-> + - trace-dtrace.o - binary DTrace provider (generated by dtrace)
-> + - trace-ust.h - UST event probe helper declarations
-> +
-> +Source files in the sub-directory should only #include the 'trace.h'
-> +file and use the full sub-directory path. eg io/channel-buffer.c
-> +would do
-> =20
-> -All "trace-events" files must be listed in the "trace-event-y" make va=
-riable
-> -in the top level Makefile.objs. During build the individual files are =
-combined
-> -to create a "trace-events-all" file, which is processed by the "tracet=
-ool"
-> -script during build to generate code for the trace events. The
-> -"trace-events-all" file is also installed into "/usr/share/qemu".
-> +  #include "io/trace.h"
-> +
-> +While it is permited to include a trace.h file from outside a source
-
-s/permited/permitted/
-
-> +files' own sub-directory, this is discouraged in general. It is strong=
-ly
-> +preferred that all events be declared directly in the sub-directory th=
-at
-> +uses them.
-> +
-> +=3D=3D=3D Using trace events =3D=3D=3D
-> =20
+I'll leave a review of the Makefile magic in 1/47 to someone more
+comfortable with it, but if that gets approved, you are right that most
+of this series is pretty boring and mechanical.
 
 --=20
 Eric Blake   eblake redhat com    +1-919-301-3266
 Libvirt virtualization library http://libvirt.org
 
 
---j247n0GXlUDmeIUrWiwXqcsHd7nEeI3wI
+--Dl3CRnqhL3pHfCLkFn4D67j4lQTe35Odm
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -147,13 +86,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJYb95JAAoJEKeha0olJ0Nq3HkIAJLxpAwKwZx9HZoScIAnyAWQ
-1ABXhp0W+fFPuoeaQi06MmDsD+hU2pQTXG3PL0tZwhMfOi7ouSwf+QIM6Ho35xKP
-+9tV9n97MksvJBQq3bFx0wtpJZu/cLIJSROU1hB1IB0ArKfzH4UY5eVH7eAZTCYV
-fSuKf7brZ5cFndN+rGgRL5pxU+tUDkLdpd1pH3abE5JP2JRhdZIMCUP4c3+VvGdu
-0yns8n7984O0dwVvpJuKy5gmt5B9CVYRhxFHU5Pdx3xfb1kCa2jrLSCRJfsHn9Cv
-pO1LeW6wmiErGHzJJ09NACM9DDG/mcg0vxHrDAxNz7G4JoH1ZFFMbbS3oC9EeJM=
-=NG4z
+iQEcBAEBCAAGBQJYb97JAAoJEKeha0olJ0Nq1OkH/RAP7yAVG2gz1POZICP7tYfc
+V6PKShlCLb7xqxnc0z8hl8ub5HBI4EjYvmqnrg4a+OcezR5mXTM5r9AJyCSfLUgG
+QTruLDx3PlG5p53Xmu+ji2LYdhMnhdsFUm7ZsF1RsBFqtPF/NBZHMkqCWMJjlXfS
+P+EKal/uHwUlcPrD22RlR1kDLdKjbl5rmL8niJ9WVnE1tlwGgnx1zlb4c1G863Hw
+nToPYgnfwdcwvgBwYf0LIrKuQ4F2ea+6wGvazRIZGU6qn7ZDBQw4ZT5QVOs8NYK1
+p64yqij7CzvMcqfArRrFduF7e9szstw/Cbe1maYbYiWOJJKZGD9j/uhOomdGAhQ=
+=/jYH
 -----END PGP SIGNATURE-----
 
---j247n0GXlUDmeIUrWiwXqcsHd7nEeI3wI--
+--Dl3CRnqhL3pHfCLkFn4D67j4lQTe35Odm--
