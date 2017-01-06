@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55538)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57634)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1cPbVm-00004v-Qs
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 15:53:19 -0500
+	(envelope-from <linux@roeck-us.net>) id 1cPbhy-0003N6-PV
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 16:05:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1cPbVj-0002qX-Kf
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 15:53:18 -0500
-Received: from roura.ac.upc.es ([147.83.33.10]:34182)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1cPbVj-0002qF-7M
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 15:53:15 -0500
-From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
-References: <20170106155543.12827-1-berrange@redhat.com>
-	<20170106155543.12827-2-berrange@redhat.com>
-	<878tqo2jgs.fsf@ac.upc.edu> <20170106172558.GX31112@redhat.com>
-Date: Fri, 06 Jan 2017 21:53:11 +0100
-In-Reply-To: <20170106172558.GX31112@redhat.com> (Daniel P. Berrange's message
-	of "Fri, 6 Jan 2017 17:25:58 +0000")
-Message-ID: <87y3ynzz9k.fsf@ac.upc.edu>
+	(envelope-from <linux@roeck-us.net>) id 1cPbht-00089w-S6
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 16:05:54 -0500
+Received: from bh-25.webhostbox.net ([208.91.199.152]:39369)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <linux@roeck-us.net>) id 1cPbht-00089N-Jm
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 16:05:49 -0500
+Date: Fri, 6 Jan 2017 13:05:46 -0800
+From: Guenter Roeck <linux@roeck-us.net>
+Message-ID: <20170106210546.GA27764@roeck-us.net>
+References: <bd0ad06c-1dce-03c9-73b0-d8d6e4ca333b@roeck-us.net>
+	<4b04ec32-b647-5047-7830-269cfc217550@ilande.co.uk>
+	<3bee832c-1d2a-50a2-a763-c58ab34caf08@roeck-us.net>
+	<3a90611b-a7c4-31c4-b373-3a16ddae5f4c@ilande.co.uk>
+	<20170106183436.GA19862@roeck-us.net>
+	<ea13ef16-ff0d-024f-2fa3-5cc11fa5f777@ilande.co.uk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 01/47] trace: introduce some Makefile
- rules for module code gen
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ea13ef16-ff0d-024f-2fa3-5cc11fa5f777@ilande.co.uk>
+Subject: Re: [Qemu-devel] Problems with qemu "modern" virtio on sparc64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,128 +31,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: "qemu-devel@nongnu.org >> QEMU Developers" <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
 
-Daniel P Berrange writes:
-
-> On Fri, Jan 06, 2017 at 06:20:51PM +0100, Llu=C3=ADs Vilanova wrote:
->> Daniel P Berrange writes:
->>=20
->> > Introduce rules that are able to generate trace.[ch] files
->> > in every subdirectory which has a trace-events file.
->>=20
->> > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
->> > ---
->> >  .gitignore                               |  6 +++
->> >  Makefile                                 | 65 +++++++++++++++++++++++=
-++++-----
->> >  Makefile.objs                            |  5 +++
->> >  Makefile.target                          |  7 +++-
->> >  scripts/tracetool/backend/dtrace.py      |  7 +++-
->> >  scripts/tracetool/backend/ust.py         |  7 +++-
->> >  scripts/tracetool/format/ust_events_c.py |  2 +-
->> >  scripts/tracetool/format/ust_events_h.py |  7 +++-
->> >  tests/Makefile.include                   |  2 +-
->> >  trace/Makefile.objs                      | 23 ++++++++---
->> >  10 files changed, 109 insertions(+), 22 deletions(-)
->>=20
->> > diff --git a/.gitignore b/.gitignore
->> > index e43c304..fe6add3 100644
->> > --- a/.gitignore
->> > +++ b/.gitignore
->> > @@ -111,3 +111,9 @@ tags
->> >  TAGS
->> >  docker-src.*
->> >  *~
->> > +trace.h
->> > +trace.c
->> > +trace-events-common
->> > +trace-ust.h
->> > +trace-dtrace.h
->> > +trace-dtrace.dtrace
->> > diff --git a/Makefile b/Makefile
->> > index 214cbad..181802b 100644
->> > --- a/Makefile
->> > +++ b/Makefile
->> > @@ -70,11 +70,53 @@ GENERATED_SOURCES +=3D trace/generated-helpers.c
->>=20
->> >  ifeq ($(findstring ust,$(TRACE_BACKENDS)),ust)
->> >  GENERATED_HEADERS +=3D trace/generated-ust-provider.h
->> > +GENERATED_HEADERS +=3D trace/generated-ust-provider-all.h
->> >  GENERATED_SOURCES +=3D trace/generated-ust.c
->> >  endif
->>=20
->> >  GENERATED_HEADERS +=3D module_block.h
->>=20
->> > +GENERATED_HEADERS +=3D $(trace-events-subdirs:%=3D%/trace.h)
->> > +GENERATED_SOURCES +=3D $(trace-events-subdirs:%=3D%/trace.c)
->> > +GENERATED_DTRACE =3D
->> > +ifdef CONFIG_TRACE_DTRACE
->> > +GENERATED_HEADERS +=3D $(trace-events-subdirs:%=3D%/trace-dtrace.h)
->> > +GENERATED_DTRACE +=3D $(trace-events-subdirs:%=3D%/trace-dtrace.dtrac=
-e)
->> > +endif
->> > +ifdef CONFIG_TRACE_UST
->> > +GENERATED_HEADERS +=3D $(trace-events-subdirs:%=3D%/trace-ust.h)
->> > +endif
->> > +
->> > +%/trace.h: $(SRC_PATH)/%/trace-events $(tracetool-y)
->> > +	$(call quiet-command,$(TRACETOOL) \
->> > +		--format=3Dh \
->> > +		--backends=3D$(TRACE_BACKENDS) \
->> > +		$< > $@,"GEN","$@")
->> > +
->> > +%/trace.c: $(SRC_PATH)/%/trace-events $(tracetool-y)
->> > +	$(call quiet-command,$(TRACETOOL) \
->> > +		--format=3Dc \
->> > +		--backends=3D$(TRACE_BACKENDS) \
->> > +		$< > $@,"GEN","$@")
->> > +
->> > +%/trace-ust.h: $(SRC_PATH)/%/trace-events $(tracetool-y)
->> > +	$(call quiet-command,$(TRACETOOL) \
->> > +		--format=3Dust-events-h \
->> > +		--backends=3D$(TRACE_BACKENDS) \
->> > +		$< > $@,"GEN","$@")
->>=20
->> There's a discrepancy between generation in trace/Makefile.objs, where t=
-imestamp
->> files are used to filter out internal changes in tracetool, and here.
-
-> I took the view that the timestamp comparisons are an uneccessary
-> complexity - we don't do that for other places where we generate
-> code from scripts.
-
-AFAIR, the idea was to avoid re-building all QEMU when any of the tracetool
-script files change without affecting all the generated files.
-
-
->> > diff --git a/scripts/tracetool/backend/dtrace.py b/scripts/tracetool/b=
-ackend/dtrace.py
->> > index 79505c6..1319990 100644
->> > --- a/scripts/tracetool/backend/dtrace.py
->> > +++ b/scripts/tracetool/backend/dtrace.py
->> > @@ -36,7 +36,12 @@ def binary():
->>=20
->>=20
->> >  def generate_h_begin(events, group):
->> > -    out('#include "trace/generated-tracers-dtrace.h"',
->> > +    if group =3D=3D "common":
->> > +        include =3D "trace/generated-tracers-dtrace.h"
->> > +    else:
->> > +        include =3D "trace-dtrace.h"
->> > +
->> > +    out('#include "%s"' % include,
->> >          '')
->>=20
->> Why is the top-level events file treated as a special case?
-
-> This is temporary until the end of the series when the special
-> cases go away
-
-Yes, I saw you removed this special-casing (except in one case) in a later
-patch. Sorry about that.
-
+On Fri, Jan 06, 2017 at 07:42:19PM +0000, Mark Cave-Ayland wrote:
+> On 06/01/17 18:34, Guenter Roeck wrote:
+> 
+> > On Fri, Jan 06, 2017 at 05:04:58PM +0000, Mark Cave-Ayland wrote:
+> >> On 30/12/16 19:57, Guenter Roeck wrote:
+> >>
+> >> Disabling "modern" mode enables boot to proceed as normal:
+> >>
+> >> $ ./qemu-system-sparc64 \
+> >> -drive
+> >> file=debian-9.0-sparc64-NETINST1.iso,if=none,index=0,id=cd,media=cdrom \
+> >> -device virtio-blk-pci,disable-modern=on,drive=cd \
+> >> -nographic \
+> >> -bios openbios-builtin.elf.nostrip \
+> >> -m 256
+> >>
+> > ...
+> >>
+> >> Guenter, can you try a similar command line and confirm whether it fixes
+> >> the issue for you under QEMU 2.7 and 2.8? I have no idea as to why the
+> >> difference in legacy/non-legacy codepaths should crash the kernel though.
+> >>
+> > Unfortunately, my qemu command line wizard capabilities are somewhat lacking.
+> > I had tried that before, but just could not figure out how to change my command
+> > line to include "disable-modern=on". If you have an idea, please let me know.
+> > Here it is:
+> > 
+> > ${QEMU} -M ${mach} -cpu "${cpu}" -m 512 \
+> > 	        -drive file=${rootfs},if=virtio \
+> > 		-net nic,model=virtio \
+> > 		-kernel arch/sparc/boot/image -no-reboot \
+> > 		-append "root=/dev/vda init=/sbin/init.sh console=ttyS0" \
+> > 		-nographic 
+> 
+> If you apply the same principles from my example above to your command
+> line then you should end up with something like:
+> 
+> ${QEMU} -M ${mach} -cpu "${cpu}" -m 512 \
+>         -drive file=${rootfs},if=none,id=hd \
+> 	-device virtio-blk-pci,disable-modern=on,drive=hd \
+> 	-net nic,model=virtio \
+> 	-kernel arch/sparc/boot/image -no-reboot \
+> 	-append "root=/dev/vda init=/sbin/init.sh console=ttyS0" \
+> 	-nographic
+> 
+That works, but only if I drop "-net nic,model=virtio". Otherwise I get
+the same crash again. Any idea how to set the network configuration
+the same way ?
 
 Thanks,
-  Lluis
+Guenter
