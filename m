@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53346)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53871)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cPTD8-0000zH-Ks
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 07:01:31 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cPTFM-0002nk-Qg
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 07:03:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cPTD7-00036o-KC
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 07:01:30 -0500
-Received: from mail-ua0-x22a.google.com ([2607:f8b0:400c:c08::22a]:34925)
+	(envelope-from <peter.maydell@linaro.org>) id 1cPTFL-0003ow-UI
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 07:03:48 -0500
+Received: from mail-ua0-x229.google.com ([2607:f8b0:400c:c08::229]:32926)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cPTD7-00036c-Hb
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 07:01:29 -0500
-Received: by mail-ua0-x22a.google.com with SMTP id y9so73847707uae.2
-	for <qemu-devel@nongnu.org>; Fri, 06 Jan 2017 04:01:29 -0800 (PST)
+	id 1cPTFL-0003oZ-Qr
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 07:03:47 -0500
+Received: by mail-ua0-x229.google.com with SMTP id i68so300070146uad.0
+	for <qemu-devel@nongnu.org>; Fri, 06 Jan 2017 04:03:47 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <b9c61e0c893b6215531ea210e566c9057d28c792.1482265908.git.alistair.francis@xilinx.com>
+In-Reply-To: <5b9a682feb30a4c22b068d698d65063c299d24cf.1482265908.git.alistair.francis@xilinx.com>
 References: <cover.1482265908.git.alistair.francis@xilinx.com>
-	<b9c61e0c893b6215531ea210e566c9057d28c792.1482265908.git.alistair.francis@xilinx.com>
+	<5b9a682feb30a4c22b068d698d65063c299d24cf.1482265908.git.alistair.francis@xilinx.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 6 Jan 2017 12:01:08 +0000
-Message-ID: <CAFEAcA-p0MYiiDO-h88fKkueNDzx28wH2Ef6bPFV+MZ65GH_bg@mail.gmail.com>
+Date: Fri, 6 Jan 2017 12:03:25 +0000
+Message-ID: <CAFEAcA-oiVXMCfEJOgybD8b_OcL2qwsVxNKazAzXka=DuFj_Vg@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v3 2/3] arm_generic_timer: Add support for
- the ReadBase memory map
+Subject: Re: [Qemu-devel] [PATCH v3 3/3] xlnx-zynqmp: Connect the ARM
+ Generic Timer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,76 +35,80 @@ Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, =?U
 
 On 20 December 2016 at 22:42, Alistair Francis
 <alistair.francis@xilinx.com> wrote:
-> Add support for the read only regions in the ReadBase memory map.
->
 > Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
 > ---
 >
->  hw/timer/arm_generic_timer.c         | 27 +++++++++++++++++++++++++++
->  include/hw/timer/arm_generic_timer.h | 12 ++++++++++++
->  2 files changed, 39 insertions(+)
+>  hw/arm/xlnx-zynqmp.c         | 14 ++++++++++++++
+>  include/hw/arm/xlnx-zynqmp.h |  2 ++
+>  2 files changed, 16 insertions(+)
 >
-> diff --git a/hw/timer/arm_generic_timer.c b/hw/timer/arm_generic_timer.c
-> index da434a7..5392657 100644
-> --- a/hw/timer/arm_generic_timer.c
-> +++ b/hw/timer/arm_generic_timer.c
-> @@ -100,6 +100,17 @@ static RegisterAccessInfo arm_gen_timer_regs_info[] = {
->      /* We don't model the CounterID registers either */
->  };
+> diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
+> index 0d86ba3..f3891ae 100644
+> --- a/hw/arm/xlnx-zynqmp.c
+> +++ b/hw/arm/xlnx-zynqmp.c
+> @@ -38,6 +38,8 @@
+>  #define SATA_ADDR           0xFD0C0000
+>  #define SATA_NUM_PORTS      2
 >
-> +static RegisterAccessInfo arm_gen_timer_read_regs_info[] = {
-> +    {   .name = "CNTCV_READ_LOWER",
-> +        .addr = A_CNTCV_READ_LOWER, .ro = 0xFFFF,
-> +        .post_read = counter_low_value_postr,
-> +    },{ .name = "CNTCV_READ_UPPER",
-> +        .addr = A_CNTCV_READ_UPPER, .ro = 0xFFFF,
-> +        .post_read = counter_high_value_postr,
+> +#define ARM_GEN_TIMER_ADDR  0xFF260000
+> +
+>  #define DP_ADDR             0xfd4a0000
+>  #define DP_IRQ              113
+>
+> @@ -172,6 +174,10 @@ static void xlnx_zynqmp_init(Object *obj)
+>          qdev_set_parent_bus(DEVICE(&s->spi[i]), sysbus_get_default());
+>      }
+>
+> +    object_initialize(&s->arm_gen_timer, sizeof(s->arm_gen_timer),
+> +                      TYPE_ARM_GEN_TIMER);
+> +    qdev_set_parent_bus(DEVICE(&s->arm_gen_timer), sysbus_get_default());
+> +
+>      object_initialize(&s->dp, sizeof(s->dp), TYPE_XLNX_DP);
+>      qdev_set_parent_bus(DEVICE(&s->dp), sysbus_get_default());
+>
+> @@ -405,6 +411,14 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+>          g_free(bus_name);
+>      }
+>
+> +    object_property_set_bool(OBJECT(&s->arm_gen_timer), true, "realized", &err);
+> +    if (err) {
+> +        error_propagate(errp, err);
+> +        return;
 > +    }
+> +    sysbus_mmio_map(SYS_BUS_DEVICE(&s->arm_gen_timer), 0, ARM_GEN_TIMER_ADDR);
+> +    sysbus_mmio_map(SYS_BUS_DEVICE(&s->arm_gen_timer), 1, ARM_GEN_TIMER_ADDR - 0x10000);
 
-Needs to support 64-bit reads too.
+Having a #define for a base address and then also using
+thing - 0x10000 is a bit odd. I'd use two #defines, I think.
+(Also avoids the overlong line.)
 
-> +    /* We don't model the CounterID registers */
+If we take the "board responsible for only mapping the secure-only
+regs into the secure address space" approach this code will need to
+change accordingly.
 
-(same query about ID regs as in patch 1)
-
-> +};
 > +
->  static void arm_gen_timer_reset(DeviceState *dev)
->  {
->      ARMGenTimer *s = ARM_GEN_TIMER(dev);
-> @@ -166,6 +177,7 @@ static void arm_gen_timer_init(Object *obj)
->      SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
->      RegisterInfoArray *reg_array;
+>      object_property_set_bool(OBJECT(&s->dp), true, "realized", &err);
+>      if (err) {
+>          error_propagate(errp, err);
+> diff --git a/include/hw/arm/xlnx-zynqmp.h b/include/hw/arm/xlnx-zynqmp.h
+> index c2931bf..8deabb4 100644
+> --- a/include/hw/arm/xlnx-zynqmp.h
+> +++ b/include/hw/arm/xlnx-zynqmp.h
+> @@ -26,6 +26,7 @@
+>  #include "hw/ide/ahci.h"
+>  #include "hw/sd/sdhci.h"
+>  #include "hw/ssi/xilinx_spips.h"
+> +#include "hw/timer/arm_generic_timer.h"
+>  #include "hw/dma/xlnx_dpdma.h"
+>  #include "hw/display/xlnx_dp.h"
 >
-> +    /* Create the ControlBase memory region */
->      memory_region_init_io(&s->iomem, obj, &arm_gen_timer_ops, s,
->                            TYPE_ARM_GEN_TIMER, R_ARM_GEN_TIMER_MAX * 4);
->      reg_array =
-> @@ -179,6 +191,21 @@ static void arm_gen_timer_init(Object *obj)
->                                  A_CNTCR,
->                                  &reg_array->mem);
->      sysbus_init_mmio(sbd, &s->iomem);
-> +
-> +    /* Create the ReadBase memory region */
-> +    memory_region_init_io(&s->iomem_read, obj, &arm_gen_timer_ops, s,
-> +                          TYPE_ARM_GEN_TIMER "-read", R_ARM_GEN_TIMER_READ_MAX * 4);
-
-checkpatch.pl complains that this line needs wrapping.
-
-> +    reg_array =
-> +        register_init_block32(DEVICE(obj), arm_gen_timer_read_regs_info,
-> +                              ARRAY_SIZE(arm_gen_timer_read_regs_info),
-> +                              s->regs_read_info, s->regs_read,
-> +                              &arm_gen_timer_ops,
-> +                              ARM_GEN_TIMER_ERR_DEBUG,
-> +                              R_ARM_GEN_TIMER_READ_MAX * 4);
-> +    memory_region_add_subregion(&s->iomem_read,
-> +                                R_CNTCV_READ_LOWER,
-> +                                &reg_array->mem);
-> +    sysbus_init_mmio(sbd, &s->iomem_read);
->  }
-
-Otherwise this looks good.
+> @@ -83,6 +84,7 @@ typedef struct XlnxZynqMPState {
+>      SysbusAHCIState sata;
+>      SDHCIState sdhci[XLNX_ZYNQMP_NUM_SDHCI];
+>      XilinxSPIPS spi[XLNX_ZYNQMP_NUM_SPIS];
+> +    ARMGenTimer arm_gen_timer;
+>      XlnxDPState dp;
+>      XlnxDPDMAState dpdma;
 
 thanks
 -- PMM
