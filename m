@@ -1,14 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54987)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54985)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zxq_yx_007@163.com>) id 1cPINU-0007Cz-Gs
+	(envelope-from <zxq_yx_007@163.com>) id 1cPINU-0007Cx-Gr
 	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 19:27:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zxq_yx_007@163.com>) id 1cPINR-0000s6-EF
+	(envelope-from <zxq_yx_007@163.com>) id 1cPINR-0000sL-Eh
 	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 19:27:28 -0500
 From: xiaoqiang zhao <zxq_yx_007@163.com>
-Date: Fri,  6 Jan 2017 08:26:24 +0800
-Message-Id: <20170106002628.10343-1-zxq_yx_007@163.com>
-Subject: [Qemu-devel] [PATCH v2 0/4] QOM'ify work for ppc
+Date: Fri,  6 Jan 2017 08:26:25 +0800
+Message-Id: <20170106002628.10343-2-zxq_yx_007@163.com>
+In-Reply-To: <20170106002628.10343-1-zxq_yx_007@163.com>
+References: <20170106002628.10343-1-zxq_yx_007@163.com>
+Subject: [Qemu-devel] [PATCH v2 1/4] hw/gpio: QOM'ify mpc8xxx.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,23 +22,71 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: david@gibson.dropbear.id.au, agraf@suse.de, peter.maydell@linaro.org, qemu-ppc@nongnu.org
 
-This is some QOM'ify work relate with ppc.
-See each commit message for details.
+* Drop the old SysBus init function and use instance_init
+* Change mpc8xxx_gpio_reset to a DeviceClass::reset function
 
-changes in v2:
-  remove empty function 'spapr_vio_bridge_init'
+Signed-off-by: xiaoqiang zhao <zxq_yx_007@163.com>
+---
+ hw/gpio/mpc8xxx.c | 20 +++++++++++---------
+ 1 file changed, 11 insertions(+), 9 deletions(-)
 
-xiaoqiang zhao (4):
-  hw/gpio: QOM'ify mpc8xxx.c
-  hw/ppc: QOM'ify e500.c
-  hw/ppc: QOM'ify ppce500_spin.c
-  hw/ppc: QOM'ify spapr_vio.c
-
- hw/gpio/mpc8xxx.c     | 20 +++++++++++---------
- hw/ppc/e500.c         | 17 ++++-------------
- hw/ppc/ppce500_spin.c | 18 ++++++++----------
- hw/ppc/spapr_vio.c    | 10 ----------
- 4 files changed, 23 insertions(+), 42 deletions(-)
-
+diff --git a/hw/gpio/mpc8xxx.c b/hw/gpio/mpc8xxx.c
+index d149719469..e12edb4933 100644
+--- a/hw/gpio/mpc8xxx.c
++++ b/hw/gpio/mpc8xxx.c
+@@ -143,8 +143,10 @@ static void mpc8xxx_gpio_write(void *opaque, hwaddr offset,
+     mpc8xxx_gpio_update(s);
+ }
+ 
+-static void mpc8xxx_gpio_reset(MPC8XXXGPIOState *s)
++static void mpc8xxx_gpio_reset(DeviceState *dev)
+ {
++    MPC8XXXGPIOState *s = MPC8XXX_GPIO(dev);
++
+     s->dir = 0;
+     s->odr = 0;
+     s->dat = 0;
+@@ -180,33 +182,33 @@ static const MemoryRegionOps mpc8xxx_gpio_ops = {
+     .endianness = DEVICE_BIG_ENDIAN,
+ };
+ 
+-static int mpc8xxx_gpio_initfn(SysBusDevice *sbd)
++static void mpc8xxx_gpio_initfn(Object *obj)
+ {
+-    DeviceState *dev = DEVICE(sbd);
+-    MPC8XXXGPIOState *s = MPC8XXX_GPIO(dev);
++    DeviceState *dev = DEVICE(obj);
++    MPC8XXXGPIOState *s = MPC8XXX_GPIO(obj);
++    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
+ 
+-    memory_region_init_io(&s->iomem, OBJECT(s), &mpc8xxx_gpio_ops, s, "mpc8xxx_gpio", 0x1000);
++    memory_region_init_io(&s->iomem, obj, &mpc8xxx_gpio_ops,
++                          s, "mpc8xxx_gpio", 0x1000);
+     sysbus_init_mmio(sbd, &s->iomem);
+     sysbus_init_irq(sbd, &s->irq);
+     qdev_init_gpio_in(dev, mpc8xxx_gpio_set_irq, 32);
+     qdev_init_gpio_out(dev, s->out, 32);
+-    mpc8xxx_gpio_reset(s);
+-    return 0;
+ }
+ 
+ static void mpc8xxx_gpio_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
+-    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
+ 
+-    k->init = mpc8xxx_gpio_initfn;
+     dc->vmsd = &vmstate_mpc8xxx_gpio;
++    dc->reset = mpc8xxx_gpio_reset;
+ }
+ 
+ static const TypeInfo mpc8xxx_gpio_info = {
+     .name          = TYPE_MPC8XXX_GPIO,
+     .parent        = TYPE_SYS_BUS_DEVICE,
+     .instance_size = sizeof(MPC8XXXGPIOState),
++    .instance_init = mpc8xxx_gpio_initfn,
+     .class_init    = mpc8xxx_gpio_class_init,
+ };
+ 
 -- 
 2.11.0
