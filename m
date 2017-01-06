@@ -1,32 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56441)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56555)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cPXT9-00073V-7t
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 11:34:20 -0500
+	(envelope-from <programmingkidx@gmail.com>) id 1cPXTi-0007VX-IR
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 11:34:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cPXT4-0006wS-BX
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 11:34:19 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43656)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cPXT4-0006vk-2r
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 11:34:14 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 22866C056793
-	for <qemu-devel@nongnu.org>; Fri,  6 Jan 2017 16:34:14 +0000 (UTC)
-References: <20170105160701.22118-1-berrange@redhat.com>
-	<20170105160701.22118-9-berrange@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <7fb1d736-aef5-ef03-ca11-7caf1b8a6e9d@redhat.com>
-Date: Fri, 6 Jan 2017 10:34:11 -0600
-MIME-Version: 1.0
-In-Reply-To: <20170105160701.22118-9-berrange@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="kEKuNRHxES2cs8UtNfhJ4PlkTqsJlxCpj"
-Subject: Re: [Qemu-devel] [PATCH 8/8] ui: add ability to specify multiple
- VNC listen addresses
+	(envelope-from <programmingkidx@gmail.com>) id 1cPXTd-0007Jm-Le
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 11:34:54 -0500
+Received: from mail-it0-x242.google.com ([2607:f8b0:4001:c0b::242]:34915)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1cPXTd-0007IW-Gy
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 11:34:49 -0500
+Received: by mail-it0-x242.google.com with SMTP id b123so2564688itb.2
+	for <qemu-devel@nongnu.org>; Fri, 06 Jan 2017 08:34:49 -0800 (PST)
+Mime-Version: 1.0 (Apple Message framework v1084)
+Content-Type: text/plain; charset=us-ascii
+From: Programmingkid <programmingkidx@gmail.com>
+In-Reply-To: <CAFEAcA_pNp39dUxG4ZLGJgsApEpKXB_cf9vmUpH1Gva=pnH1yg@mail.gmail.com>
+Date: Fri, 6 Jan 2017 11:34:46 -0500
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <EA07C5F8-452B-4180-9C78-E8A96CB58FA1@gmail.com>
+References: <84C57F4C-C8F8-4FB3-804A-FC3DE0AB6408@gmail.com>
+	<CAFEAcA_hY+x3c0BUmURubq6qS-e1bDSUm0fE87=G8acrf-tcuA@mail.gmail.com>
+	<37C57425-158F-4544-89EF-CC8053476EB6@gmail.com>
+	<CAFEAcA_pNp39dUxG4ZLGJgsApEpKXB_cf9vmUpH1Gva=pnH1yg@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v2] ui/cocoa.m: fix sending mouse event to
+ guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,153 +33,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel qemu-devel <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---kEKuNRHxES2cs8UtNfhJ4PlkTqsJlxCpj
-From: Eric Blake <eblake@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <7fb1d736-aef5-ef03-ca11-7caf1b8a6e9d@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 8/8] ui: add ability to specify multiple VNC
- listen addresses
-References: <20170105160701.22118-1-berrange@redhat.com>
- <20170105160701.22118-9-berrange@redhat.com>
-In-Reply-To: <20170105160701.22118-9-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
 
-On 01/05/2017 10:07 AM, Daniel P. Berrange wrote:
-> This change allows the listen address and websocket address
-> options for -vnc to be repeated. This causes the VNC server
-> to listen on multiple addresses. e.g.
+On Jan 6, 2017, at 11:19 AM, Peter Maydell wrote:
+
+> On 6 January 2017 at 15:44, Programmingkid <programmingkidx@gmail.com> =
+wrote:
+>>=20
+>> On Jan 6, 2017, at 8:48 AM, Peter Maydell wrote:
+>>=20
+>>> On 1 January 2017 at 21:31, Programmingkid =
+<programmingkidx@gmail.com> wrote:
+>>>> The mouse down event should not be sent to the guest if the mouse =
+down event
+>>>> causes QEMU to move the foreground from the background. This patch =
+prevents
+>>>> these activation clicks from going to the guest.
 >=20
->  $ $QEMU -vnc vnc=3Dlocalhost:1,vnc=3Dunix:/tmp/vnc,\
->               websocket=3D127.0.0.1:8080,websocket=3D[::]:8081
+>>>>    if (mouse_event) {
+>>>>        /* Don't send button events to the guest unless we've got a
+>>>> -         * mouse grab or window focus. If we have neither then =
+this event
+>>>> -         * is the user clicking on the background window to =
+activate and
+>>>> -         * bring us to the front, which will be done by the =
+sendEvent
+>>>> -         * call below. We definitely don't want to pass that click =
+through
+>>>> -         * to the guest.
+>>>> +         * mouse grab, window focus, or in fullscreen mode. If we =
+have neither
+>>>> +         * then this event is the user clicking on the background =
+window to
+>>>> +         * activate and bring us to the front, which will be done =
+by the
+>>>> +         * sendEvent call below. We definitely don't want to pass =
+that click
+>>>> +         * through to the guest.
+>>>>         */
+>>>> -        if ((isMouseGrabbed || [[self window] isKeyWindow]) &&
+>>>> +        if (isMouseGrabbed && ([[self window] isKeyWindow] || =
+isFullscreen) &&
+>>>>            (last_buttons !=3D buttons)) {
+>>>>            static uint32_t bmap[INPUT_BUTTON__MAX] =3D {
+>>>>                [INPUT_BUTTON_LEFT]       =3D MOUSE_EVENT_LBUTTON,
+>>>=20
+>>> Comment doesn't match code. The comment says "mouse grab, full =
+screen
+>>> or focus", but the code is doing "mouse grab and (full screen or =
+focus)".
+>>>=20
+>>> Which is correct?
+>>=20
+>>=20
+>> This sounds more accurate:
+>>=20
+>> (mouse grab and main window is the front window) or QEMU is in =
+fullscreen.
 >=20
-> results in listening on
->=20
-> 127.0.0.1:5901, 127.0.0.1:8080, ::1:5901, :::8081 & /tmp/vnc
->=20
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
->  ui/vnc.c | 191 +++++++++++++++++++++++++++++++++++++++++++------------=
---------
->  1 file changed, 130 insertions(+), 61 deletions(-)
->=20
+> That's not what your code does either.
 
-> +    for (i =3D 0; i < nsaddrstr; i++) {
-> +        int rv;
-> +        rv =3D vnc_display_get_address(saddrstr[i], false, 0, to,
-> +                                     has_ipv4, has_ipv6,
-> +                                     ipv4, ipv6,
-> +                                     &saddr, errp);
-> +        if (rv < 0) {
-> +            goto cleanup;
-> +        }
-> +        /* Historical compat - if only a single listen address was
-> +         * provided, then the display num can be used to set the
-> +         * default websocket port
-> +         */
-> +        if (nsaddrstr =3D=3D 1) {
-> +            displaynum =3D rv;
-> +        }
-> +        *retsaddr =3D g_renew(SocketAddress *, *retsaddr, *retnsaddr +=
- 1);
-> +        (*retsaddr)[(*retnsaddr)++] =3D saddr;
+Yes, you are right. Didn't see the parentheses. This is what it does:
+mouse is grabbed and either QEMU window is front window or QEMU is in =
+fullscreen.
 
-Again, do we care if the user supplies LOTS of vnc addresses and
-witnesses O(n^2) initialization cost?
+The click that causes QEMU to grab the mouse should not be sent to the =
+guest because the
+host mouse could be on one part of the screen, and the guest mouse could =
+be in another
+part of the screen the user isn't aware of yet.
 
->      }
-> -    if (wsaddrstr) {
-> -        if (vnc_display_get_address(wsaddrstr, true, displaynum, to,
-> +    for (i =3D 0; i < nwsaddrstr; i++) {
-> +        if (vnc_display_get_address(wsaddrstr[i], true, displaynum, to=
-,
->                                      has_ipv4, has_ipv6,
+> What is the actual situation which we currently get wrong and need
+> to get right?
 
-> +
-> +        *retwsaddr =3D g_renew(SocketAddress *, *retwsaddr, *retnwsadd=
-r + 1);
-> +        (*retwsaddr)[(*retnwsaddr)++] =3D wsaddr;
+When the user clicks on QEMU's window to bring QEMU to the front, that =
+activation
+click should not be sent to the guest. I have had a lot of problems =
+without this
+patch. When the activation click was wrongly sent to the guest, I'm had =
+stuff=20
+happen like volumes unmount because the guest mouse cursor was over an =
+eject button.
 
-Same for websocket addresses.
+> Your commit message says "if the event causes QEMU
+> to move to the foreground", but my expectation was that if we
+> weren't in the foreground then we would not have the mouse grabbed,
+> and in any case your patch adds a check on isFullscreen but your
+> commit message doesn't say anything about full-screen or not being
+> relevant to the problem.
 
->  static int vnc_display_connect(VncDisplay *vd,
-> -                               SocketAddress *saddr,
-> -                               SocketAddress *wsaddr,
-> +                               SocketAddress **saddr,
-> +                               size_t nsaddr,
-> +                               SocketAddress **wsaddr,
-> +                               size_t nwsaddr,
->                                 Error **errp)
->  {
->      /* connect to viewer */
->      QIOChannelSocket *sioc =3D NULL;
-> -    if (wsaddr) {
-> +    if (nwsaddr !=3D 0) {
->          error_setg(errp, "Cannot use websockets in reverse mode");
->          return -1;
->      }
-> -    vd->is_unix =3D saddr->type =3D=3D SOCKET_ADDRESS_KIND_UNIX;
-> +    if (nsaddr !=3D 1) {
-> +        error_setg(errp, "Expected a single address in reverse mo");
-
-s/mo/mode/
-
-
->  static int vnc_display_listen(VncDisplay *vd,
-
-> -    if (wsaddr &&
-> -        vnc_display_listen_addr(vd, wsaddr,
-> -                                "vnc-ws-listen",
-> -                                &vd->lwebsock,
-> -                                &vd->lwebsock_tag,
-> -                                &vd->nlwebsock,
-> -                                errp) < 0) {
-> -        return -1;
-> +    for (i =3D 0; i < nwsaddr; i++) {
-> +        if (vnc_display_listen_addr(vd, wsaddr[i],
-> +                                    "vnc-ws-listen",
-> +                                    &vd->lwebsock,
-> +                                    &vd->lwebsock_tag,
-> +                                    &vd->nlwebsock,
-> +                                    errp) < 0) {
-
-And while your earlier arguments that resolving a single name into
-multiple websocket IP addrs is not going to notice an O(n^2) growth
-pattern, now we are calling that growth pattern over N websocket names
-where N is user-controlled.  But this time I don't have a good bound on
-how many IP addrs nlwebsock will grow to. So maybe we do want to
-consider geometric allocation growth (requires tracking and passing an
-allocated size alongside the currently-used size).
-
-But overall I think you're enhancement makes sense.
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---kEKuNRHxES2cs8UtNfhJ4PlkTqsJlxCpj
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYb8cDAAoJEKeha0olJ0Nq3FoIAItG2TnrTdaQqra0WXbALz1M
-8r+MMO2NbETCIFfEKw2SiPUAT75C6cmuhKJYZ1tYWLJlHDmv63oGkUMcV2R/6hjX
-DnrqmbhtbhXZFXkprqXr5ZBkndkQGuYE/Bv1yrxqiZoK/QIBoqN+zagdGN2dENZE
-qGqjHyFV08jyLydAvNwXgiWl+b4kqZoJiZFmxHXiDNrGhNVsxbDG7Bql1IZVYLsn
-DRxDU1d5qCy88ka+kHQ9X1HL61BlOmUxLWUEALB2bodokGNZKMLWO7A/AefzwC51
-EndfQ0F9FVkApMzCJ+fD6kzz57d0BrV6LSPFUY1NG79hSPIkVg/M6uE6zXChjvs=
-=2mQN
------END PGP SIGNATURE-----
-
---kEKuNRHxES2cs8UtNfhJ4PlkTqsJlxCpj--
+I know the code works correctly, it is just the commit message that =
+needs tweaking.
