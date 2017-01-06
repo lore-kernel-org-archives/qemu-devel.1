@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45712)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49188)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1cPUwA-0000qu-D1
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 08:52:07 -0500
+	(envelope-from <vpalatin@google.com>) id 1cPVCW-0005AZ-BH
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 09:09:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1cPUw7-0007rt-Ad
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 08:52:06 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33214)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <drjones@redhat.com>) id 1cPUw7-0007rO-1l
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 08:52:03 -0500
-Date: Fri, 6 Jan 2017 14:51:58 +0100
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20170106135158.ml3t7nxgpoi4zedp@kamzik.brq.redhat.com>
-References: <1483673581-7843-1-git-send-email-peterx@redhat.com>
-	<1483673581-7843-2-git-send-email-peterx@redhat.com>
+	(envelope-from <vpalatin@google.com>) id 1cPVCV-0006yj-C0
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 09:09:00 -0500
+Received: from mail-io0-x231.google.com ([2607:f8b0:4001:c06::231]:36729)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <vpalatin@google.com>) id 1cPVCV-0006yL-6J
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 09:08:59 -0500
+Received: by mail-io0-x231.google.com with SMTP id p127so57153949iop.3
+	for <qemu-devel@nongnu.org>; Fri, 06 Jan 2017 06:08:57 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1483673581-7843-2-git-send-email-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [kvm-unit-tests PATCH v3 1/2] run_tests: put logs
- into per-test file
+Sender: vpalatin@google.com
+In-Reply-To: <61d18d9c-32f1-983f-c237-3c28d31e2f23@redhat.com>
+References: <cover.1482164622.git.vpalatin@chromium.org>
+	<85250fb0450b5b95232b39c82ab310a0632fd23f.1482164622.git.vpalatin@chromium.org>
+	<fda5a694-d02f-269e-e155-1822276d74f6@redhat.com>
+	<CAP_ceTxAn3tH-P8JjThXXeF7iYv5xFoVOzmjp5h8sHYsYzWTDQ@mail.gmail.com>
+	<df2938db-dde1-633c-899d-646d62ec4780@redhat.com>
+	<61d18d9c-32f1-983f-c237-3c28d31e2f23@redhat.com>
+From: Vincent Palatin <vpalatin@chromium.org>
+Date: Fri, 6 Jan 2017 15:08:27 +0100
+Message-ID: <CAP_ceTx+SXzZeg1BrF9ibAEm6MvBma+aMseMzLMcrQV_JjeOXg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v5 3/4] Plumb the HAXM-based hardware
+ acceleration support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,139 +34,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Yu Ning <yu.ning@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Stefan Weil <sw@weilnetz.de>, Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
 
-On Fri, Jan 06, 2017 at 11:33:00AM +0800, Peter Xu wrote:
-> We were using test.log before to keep all the test logs. This patch
-> creates one log file per test case under logs/ directory with name
-> "TESTNAME.log".
-> 
-> A new file global.bash is added to store global informations.
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  Makefile               |  4 ++--
->  run_tests.sh           | 14 ++++++++------
->  scripts/functions.bash | 11 +++++++++--
->  scripts/global.bash    |  2 ++
->  4 files changed, 21 insertions(+), 10 deletions(-)
->  create mode 100644 scripts/global.bash
-> 
-> diff --git a/Makefile b/Makefile
-> index a32333b..f632c6c 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -94,9 +94,9 @@ libfdt_clean:
->  	$(LIBFDT_objdir)/.*.d
->  
->  distclean: clean libfdt_clean
-> -	$(RM) lib/asm config.mak $(TEST_DIR)-run test.log msr.out cscope.* \
-> +	$(RM) lib/asm config.mak $(TEST_DIR)-run msr.out cscope.* \
->  	      build-head
-> -	$(RM) -r tests
-> +	$(RM) -r tests logs
+On Thu, Jan 5, 2017 at 10:38 PM, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+>
+> On 05/01/2017 15:01, Paolo Bonzini wrote:
+>>
+>>
+>> On 05/01/2017 14:50, Vincent Palatin wrote:
+>>> Sorry I missed it.
+>>> I move it to qemu_cpu_kick() as asked in the Darwin patch.
+>>>
+>>>> Apart from the above change, can you check if there are some less
+>>>> heavyeight methods to force an exit?  I can think of QueueUserAPC with
+>>>> an empty pfnAPC here, and SleepEx(0, TRUE) in qemu_hax_cpu_thread_fn
+>>>> before qemu_wait_io_event_common.
+>>>
+>>> Actually I don't know a good test case to verify such a change, any advice ?
+>
+> In fact there is a race anyway:
 
-We need .gitignore changes for this.
+Thanks for the detailed examples and thoughts.
+The timing/benchmarking code might actually need some kind of per-vcpu
+time storage, but that's a detail.
+I have experimented with it and so far, I have mainly generated random
+numbers ...
+I have yet to find a use-case where the current code (with
+SuspendThread/ResumeThread) yields a better latency than just nothing
+instead :(
 
->  
->  cscope: cscope_dirs = lib lib/libfdt lib/linux $(TEST_DIR) $(ARCH_LIBDIRS) lib/asm-generic
->  cscope:
-> diff --git a/run_tests.sh b/run_tests.sh
-> index 254129d..e1bb3a6 100755
-> --- a/run_tests.sh
-> +++ b/run_tests.sh
-> @@ -7,6 +7,7 @@ if [ ! -f config.mak ]; then
->      exit 1
->  fi
->  source config.mak
-> +source scripts/global.bash
->  source scripts/functions.bash
 
-Rather than add a new file, can't we just rename functions.bash to
-something less function specific (common.bash?) and then add the
-globals to that?
 
->  
->  function usage()
-> @@ -46,17 +47,18 @@ while getopts "g:hv" opt; do
->      esac
->  done
->  
-> -RUNTIME_log_stderr () { cat >> test.log; }
-> +# RUNTIME_log_file will be configured later
-> +RUNTIME_log_stderr () { cat >> $RUNTIME_log_file; }
->  RUNTIME_log_stdout () {
->      if [ "$PRETTY_PRINT_STACKS" = "yes" ]; then
-> -        ./scripts/pretty_print_stacks.py $1 >> test.log
-> +        ./scripts/pretty_print_stacks.py $1 >> $RUNTIME_log_file
->      else
-> -        cat >> test.log
-> +        cat >> $RUNTIME_log_file
->      fi
->  }
->  
-> -
->  config=$TEST_DIR/unittests.cfg
-> -rm -f test.log
-> -printf "BUILD_HEAD=$(cat build-head)\n\n" > test.log
-> +rm -rf $ut_log_dir
-
-Instead of the 'rm', let's do
- 'mv $ut_log_dir $ut_log_dir.old || { echo [...]; exit 2; }'
-as I never liked that test.log was silently overwritten.
-
-> +mkdir $ut_log_dir
-> +printf "BUILD_HEAD=$(cat build-head)\n\n" > $ut_log_summary
-
-I'm not sure we need the ut_ prefix on these variables. If we
-do think we need to start prefixing variables, then I'd prefer
-not to abbreviate, i.e. 'unittest_'
-
->  for_each_unittest $config run
-> diff --git a/scripts/functions.bash b/scripts/functions.bash
-> index ee9143c..d1d2e1c 100644
-> --- a/scripts/functions.bash
-> +++ b/scripts/functions.bash
-> @@ -1,3 +1,10 @@
-> +function run_task()
-> +{
-> +	local testname="$2"
-> +
-> +	RUNTIME_log_file="${ut_log_dir}/${testname}.log"
-> +	"$@"
-> +}
->  
->  function for_each_unittest()
->  {
-> @@ -17,7 +24,7 @@ function for_each_unittest()
->  
->  	while read -u $fd line; do
->  		if [[ "$line" =~ ^\[(.*)\]$ ]]; then
-> -			"$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
-> +			run_task "$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
->  			testname=${BASH_REMATCH[1]}
->  			smp=1
->  			kernel=""
-> @@ -45,6 +52,6 @@ function for_each_unittest()
->  			timeout=${BASH_REMATCH[1]}
->  		fi
->  	done
-> -	"$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
-> +	run_task "$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
->  	exec {fd}<&-
->  }
-> diff --git a/scripts/global.bash b/scripts/global.bash
-> new file mode 100644
-> index 0000000..77b0b29
-> --- /dev/null
-> +++ b/scripts/global.bash
-> @@ -0,0 +1,2 @@
-> +: ${ut_log_dir:=logs}
-> +: ${ut_log_summary:=${ut_log_dir}/SUMMARY}
-
-Do we even need these variables? When/why would someone override these
-defaults?
-
-Thanks,
-drew
+>
+>         if (cpu->exit_request) {
+>             ret = 1;
+>             break;
+>         }
+>                                         cpu->exit_request
+>                                         SuspendThread
+>                                         ResumeThread
+>         hax_vcpu_interrupt(env);
+>         qemu_mutex_unlock_iothread();
+>         hax_ret = hax_vcpu_run(vcpu);
+>
+> and the same race is true for QueueUserAPC.  It's rare enough that I
+> guess we can accept the patches with just a FIXME comment, but...  Yu
+> Ning, can you tell us what user_event_pending is for? :)  My hunch is
+> that we should call hax_raise_event after setting cpu->exit_request, like
+>
+>         hax_raise_event();
+>         /* write user_event_pending before exit_request */
+>         smp_wmb();
+>         cpu->exit_request = 1;
+>         SuspendThread/ResumeThread
+>                 (or QueueUserAPC)
+>
+> and in the hax thread:
+>
+>         if (cpu->exit_request) {
+>             cpu->hax_vcpu->tunnel->user_event_pending = 0;
+>             ret = 1;
+>             break;
+>         }
+>
+>         hax_vcpu_interrupt(env);
+>         qemu_mutex_unlock_iothread();
+>
+>         /* read exit_request before user_event_pending */
+>         smp_rmb();
+>         hax_ret = hax_vcpu_run(vcpu);
+>
+> but I would like some more official documentation than my own reverse
+> engineering of the brain of whoever wrote the interface (I have not
+> looked at the HAXM driver binary).
+>
+> Paolo
