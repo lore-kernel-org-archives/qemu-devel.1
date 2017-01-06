@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55587)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56906)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcd@tribudubois.net>) id 1cPZ9S-0007uD-HM
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 13:22:07 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cPZFe-0002wG-Sb
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 13:28:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcd@tribudubois.net>) id 1cPZ9N-000107-Hf
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 13:22:06 -0500
-Received: from relay6-d.mail.gandi.net ([217.70.183.198]:56940)
+	(envelope-from <dgilbert@redhat.com>) id 1cPZFb-0003yC-Vo
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 13:28:30 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60486)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jcd@tribudubois.net>) id 1cPZ9N-0000zl-AY
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 13:22:01 -0500
-References: <20170102211110.4801-1-jcd@tribudubois.net>
-	<CAFEAcA_qPjjZijzL5L29tw6JQ+82od3wB959oPK-r=US65Bb9w@mail.gmail.com>
-From: Jean-Christophe DUBOIS <jcd@tribudubois.net>
-Message-ID: <8a0e0b95-a05f-6020-2603-7bf0fc0f7075@tribudubois.net>
-Date: Fri, 6 Jan 2017 19:21:57 +0100
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_qPjjZijzL5L29tw6JQ+82od3wB959oPK-r=US65Bb9w@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2] [i.MX] Remove MSGDATA register support.
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cPZFb-0003wX-OA
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 13:28:27 -0500
+Received: from int-mx09.intmail.prod.int.phx2.redhat.com
+	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B95768124B
+	for <qemu-devel@nongnu.org>; Fri,  6 Jan 2017 18:28:27 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Date: Fri,  6 Jan 2017 18:28:09 +0000
+Message-Id: <20170106182823.1960-2-dgilbert@redhat.com>
+In-Reply-To: <20170106182823.1960-1-dgilbert@redhat.com>
+References: <20170106182823.1960-1-dgilbert@redhat.com>
+Subject: [Qemu-devel] [PATCH 01/15] postcopy: Transmit and compare
+ individual page sizes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,23 +30,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Marcin_Krzemi=c5=84ski?= <mar.krzeminski@gmail.com>
+To: qemu-devel@nongnu.org, quintela@redhat.com, amit.shah@redhat.com
+Cc: aarcange@redhat.com
 
-Le 06/01/2017 à 16:11, Peter Maydell a écrit :
->> +    case ECSPI_MSGDATA:
->> +        /* it is not clear from the spec what MSGDATA is for */
->> +        /* Anyway it is not used by Linux driver */
->> +        /* So for now we just ignore it */
->> +        qemu_log_mask(LOG_GUEST_ERROR,
->> +                      "[%s]%s: Trying to write to MSGDATA, ignoring\n",
->> +                      TYPE_IMX_SPI, __func__);
->> +        break;
-> This should be LOG_UNIMP, not LOG_GUEST_ERROR.
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-OK
+When using postcopy with hugepages, we require the source
+and destination page sizes for any RAMBlock to match.
 
->
-> thanks
-> -- PMM
->
+Transmit them as part of the RAM information header and
+fail if there's a difference.
+
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ migration/ram.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/migration/ram.c b/migration/ram.c
+index a1c8089..39998f5 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -1970,6 +1970,9 @@ static int ram_save_setup(QEMUFile *f, void *opaque)
+         qemu_put_byte(f, strlen(block->idstr));
+         qemu_put_buffer(f, (uint8_t *)block->idstr, strlen(block->idstr));
+         qemu_put_be64(f, block->used_length);
++        if (migrate_postcopy_ram() && block->page_size != qemu_host_page_size) {
++            qemu_put_be64(f, block->page_size);
++        }
+     }
+ 
+     rcu_read_unlock();
+@@ -2536,6 +2539,18 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+                             error_report_err(local_err);
+                         }
+                     }
++                    /* For postcopy we need to check hugepage sizes match */
++                    if (migrate_postcopy_ram() &&
++                        block->page_size != qemu_host_page_size) {
++                        uint64_t remote_page_size = qemu_get_be64(f);
++                        if (remote_page_size != block->page_size) {
++                            error_report("Mismatched RAM page size %s "
++                                         "(local) %" PRId64 "!= %" PRId64,
++                                         id, block->page_size,
++                                         remote_page_size);
++                            ret = -EINVAL;
++                        }
++                    }
+                     ram_control_load_hook(f, RAM_CONTROL_BLOCK_REG,
+                                           block->idstr);
+                 } else {
+-- 
+2.9.3
