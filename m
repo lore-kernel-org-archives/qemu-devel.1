@@ -1,10 +1,10 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53708)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55124)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cPLIY-00034d-5R
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 22:34:35 -0500
+	(envelope-from <jasowang@redhat.com>) id 1cPLVK-0002HA-9m
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 22:47:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cPLIU-0007eb-84
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 22:34:34 -0500
+	(envelope-from <jasowang@redhat.com>) id 1cPLVH-0004Lm-7R
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 22:47:46 -0500
 References: <1480575357-25056-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
 	<a1593129-ddb9-8e74-5865-b1e8400c991d@redhat.com>
 	<8b90a1da-a129-f2cb-4545-355348387925@cn.fujitsu.com>
@@ -14,13 +14,14 @@ References: <1480575357-25056-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
 	<20161207133049.GA32099@stefanha-x1.localdomain>
 	<fc30a10e-10d5-6b53-d098-f00780cdbe16@cn.fujitsu.com>
 	<5dd2f20f-07dd-5120-13bf-ea5700880ecf@cn.fujitsu.com>
-From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Message-ID: <2c9fbac0-0169-b7fb-ce0b-ce3408834531@cn.fujitsu.com>
-Date: Fri, 6 Jan 2017 11:33:41 +0800
+	<2c9fbac0-0169-b7fb-ce0b-ce3408834531@cn.fujitsu.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <0b08c3a0-f519-c308-6fe7-99ba152611f2@redhat.com>
+Date: Fri, 6 Jan 2017 11:47:35 +0800
 MIME-Version: 1.0
-In-Reply-To: <5dd2f20f-07dd-5120-13bf-ea5700880ecf@cn.fujitsu.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <2c9fbac0-0169-b7fb-ce0b-ce3408834531@cn.fujitsu.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH for-2.9] docs: Fix
  description of the sentence
 List-Id: <qemu-devel.nongnu.org>
@@ -31,63 +32,12 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
+To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
 Cc: Laurent Vivier <lvivier@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>, Stefan Hajnoczi <stefanha@gmail.com>, qemu devel <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>, Stefan Weil <sw@weilnetz.de>
 
-Ping....
 
 
-On 12/26/2016 03:26 PM, Zhang Chen wrote:
-> Hi~~ Jason.
->
-> Can you pick up this patch?
->
-> Thanks
->
-> Zhang Chen
->
->
-> On 12/08/2016 09:32 AM, Zhang Chen wrote:
->>
->>
->> On 12/07/2016 09:30 PM, Stefan Hajnoczi wrote:
->>> On Wed, Dec 07, 2016 at 10:01:49AM +0100, Laurent Vivier wrote:
->>>> Le 07/12/2016 à 09:58, Zhang Chen a écrit :
->>>>>
->>>>> On 12/02/2016 03:57 PM, Laurent Vivier wrote:
->>>>>> On 02/12/2016 03:59, Zhang Chen wrote:
->>>>>>> On 12/01/2016 10:57 PM, Eric Blake wrote:
->>>>>>>> On 12/01/2016 12:55 AM, Zhang Chen wrote:
->>>>>>>>> Say it in another way to make it easier to understand.
->>>>>>>>>
->>>>>>>>> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
->>>>>>>>> Signed-off-by: Eric Blake <eblake@redhat.com>
->>>>>>>> I guess that's because I suggested the replacement text to use, 
->>>>>>>> even
->>>>>>>> though I didn't write the patch.
->>>>>>> Yes, In that case, should I change the signed-off-by to acked-by or
->>>>>>> remove it?
->>>>>> You can use "Suggested-by:"
->>>>>>
->>>>>> https://www.kernel.org/doc/Documentation/SubmittingPatches
->>>>>>
->>>>>> Laurent
->>>>>>
->>>>> Should I fix it? or can you pick up this directly for 2.8?
->>>> I don't think it is needed.
->>>> Perhaps Stefan H can take it directly in his staging tree?
->>> Too late for that now.  This should be merged through Jason Wang (net
->>> maintainer) like any other colo-proxy patch.
->>>
->>
->> OK~ I change the subject to "for-2.9" and cc Jason.
->>
->> Thanks
->> Zhang Chen
->>
->>
->
+On 2017=E5=B9=B401=E6=9C=8806=E6=97=A5 11:33, Zhang Chen wrote:
+> Ping....
 
--- 
-Thanks
-Zhang Chen
+Applied to -net. Thanks
