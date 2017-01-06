@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55324)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55819)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cPTM4-0007N9-SI
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 07:10:46 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cPTQ5-0000yH-HX
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 07:14:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cPTM3-0006IK-O1
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 07:10:44 -0500
-Received: from mail-vk0-x230.google.com ([2607:f8b0:400c:c05::230]:34036)
+	(envelope-from <peter.maydell@linaro.org>) id 1cPTQ4-0007lL-Gz
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 07:14:53 -0500
+Received: from mail-ua0-x231.google.com ([2607:f8b0:400c:c08::231]:33580)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cPTM3-0006Hg-Ie
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 07:10:43 -0500
-Received: by mail-vk0-x230.google.com with SMTP id x186so312882109vkd.1
-	for <qemu-devel@nongnu.org>; Fri, 06 Jan 2017 04:10:43 -0800 (PST)
+	id 1cPTQ4-0007lD-9k
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 07:14:52 -0500
+Received: by mail-ua0-x231.google.com with SMTP id i68so300284541uad.0
+	for <qemu-devel@nongnu.org>; Fri, 06 Jan 2017 04:14:52 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1483633930-7103-1-git-send-email-amit.shah@redhat.com>
-References: <1483633930-7103-1-git-send-email-amit.shah@redhat.com>
+In-Reply-To: <1476792973-18508-1-git-send-email-peter.maydell@linaro.org>
+References: <1476792973-18508-1-git-send-email-peter.maydell@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 6 Jan 2017 12:10:22 +0000
-Message-ID: <CAFEAcA8nZmDsQvfX+=W3jDJU0rUThsn93fFNYgzxhEyWTx_kHQ@mail.gmail.com>
+Date: Fri, 6 Jan 2017 12:14:31 +0000
+Message-ID: <CAFEAcA-ycRY_BEJTy7Q+juWsUhv9HUeOj-GdYRFNdEGTwfJ_Xg@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL 0/4] migration: QTAILQ migration
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH] target-arm: Implement new HLT
+ trap for semihosting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,74 +29,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Amit Shah <amit.shah@redhat.com>
-Cc: Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu list <qemu-devel@nongnu.org>, Jianjun Duan <duanj@linux.vnet.ibm.com>
+To: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: "patches@linaro.org" <patches@linaro.org>
 
-On 5 January 2017 at 16:32, Amit Shah <amit.shah@redhat.com> wrote:
-> The following changes since commit dbe2b65566e76d3c3a0c3358285c0336ac61e757:
+On 18 October 2016 at 13:16, Peter Maydell <peter.maydell@linaro.org> wrote:
+> Version 2.0 of the semihosting specification introduces new trap
+> instructions for AArch32: HLT 0xF000 for A32 and HLT 0x3C for T32.
+> Implement these (in the same way we implement the existing HLT
+> semihosting trap for A64).
 >
->   Merge remote-tracking branch 'remotes/vivier/tags/m68k-for-2.9-pull-request' into staging (2016-12-28 17:11:11 +0000)
+> The old traps via SVC and BKPT are unaffected.
 >
-> are available in the git repository at:
->
->   https://git.kernel.org/pub/scm/virt/qemu/amit/migration.git tags/migration-for-2.9-1
->
-> for you to fetch changes up to 8d0c57697abcc57166e918064d9a7f6c7316d01b:
->
->   migration: add error_report (2017-01-04 19:21:26 +0530)
->
-> ----------------------------------------------------------------
-> Migration: migrate QTAILQ infrastructure for vmstate
->
-> ----------------------------------------------------------------
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+> The public doc for the new spec is not quite done yet, but I
+> wanted to get support for the new trap insns into QEMU 2.8
+> (they're the only thing where a semihosting user can't probe
+> to see whether the new-in-2.0 feature they want is present).
 
-Hi. I'm afraid this fails 'make check' for ppc64be:
+Just for the record, the public doc is now up:
 
-TEST: tests/virtio-9p-test... (pid=62775)
-  /i386/virtio/9p/pci/nop:                                             OK
-  /i386/virtio/9p/pci/config:                                          OK
-  /i386/virtio/9p/pci/fs/version/basic:                                OK
-  /i386/virtio/9p/pci/fs/attach/basic:                                 **
-ERROR:/home/pm215/qemu/tests/libqtest.c:339:qtest_rsp: assertion
-failed (words[0] == "OK"): ("ERR" == "OK
-")
-**
-ERROR:/home/pm215/qemu/qtest.c:281:qtest_process_command: assertion
-failed: (command)
-FAIL
-GTester: last random seed: R02S8d2247e6c947755edd81860ea8a2b9c9
-(pid=62788)
-  /i386/virtio/9p/pci/fs/walk/basic:                                   **
-ERROR:/home/pm215/qemu/tests/libqtest.c:339:qtest_rsp: assertion
-failed (words[0] == "OK"): ("ERR" == "OK
-")
-**
-ERROR:/home/pm215/qemu/qtest.c:281:qtest_process_command: assertion
-failed: (command)
-FAIL
-GTester: last random seed: R02Sc5c6e6cda2c905d23a2e10a43aae0a39
-(pid=62792)
-  /i386/virtio/9p/pci/fs/walk/no_slash:                                **
-ERROR:/home/pm215/qemu/tests/libqtest.c:339:qtest_rsp: assertion
-failed (words[0] == "OK"): ("ERR" == "OK
-")
-**
-ERROR:/home/pm215/qemu/qtest.c:281:qtest_process_command: assertion
-failed: (command)
-FAIL
-GTester: last random seed: R02S1d66c364588fa2597428d8ebd81a1c87
-(pid=62796)
-  /i386/virtio/9p/pci/fs/walk/dotdot_from_root:                        **
-ERROR:/home/pm215/qemu/tests/libqtest.c:339:qtest_rsp: assertion
-failed (words[0] == "OK"): ("ERR" == "OK
-")
-**
-ERROR:/home/pm215/qemu/qtest.c:281:qtest_process_command: assertion
-failed: (command)
-FAIL
-GTester: last random seed: R02S8e89f14358da9979cf495fe61d427eb0
-(pid=62800)
-FAIL: tests/virtio-9p-test
+https://developer.arm.com/docs/100863/latest/
 
 thanks
 -- PMM
