@@ -1,38 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38613)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41150)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cPMqR-0001Xc-1J
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 00:13:40 -0500
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cPN8A-0005Ce-7r
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 00:31:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cPMqN-0005Fz-Sn
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 00:13:38 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60269
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cPN87-0001jh-4X
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 00:31:58 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38419
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
-	id 1cPMqN-0005Fm-N8
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 00:13:35 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	id 1cPN87-0001ja-0K
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 00:31:55 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
 	by mx0b-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	v0659DSO107324
-	for <qemu-devel@nongnu.org>; Fri, 6 Jan 2017 00:13:35 -0500
-Received: from e28smtp04.in.ibm.com (e28smtp04.in.ibm.com [125.16.236.4])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 27t1hv720k-1
+	v065TAIE073969
+	for <qemu-devel@nongnu.org>; Fri, 6 Jan 2017 00:31:54 -0500
+Received: from e28smtp07.in.ibm.com (e28smtp07.in.ibm.com [125.16.236.7])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 27skxwk8nd-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 06 Jan 2017 00:13:34 -0500
+	for <qemu-devel@nongnu.org>; Fri, 06 Jan 2017 00:31:53 -0500
 Received: from localhost
-	by e28smtp04.in.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e28smtp07.in.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
-	Fri, 6 Jan 2017 10:43:31 +0530
+	Fri, 6 Jan 2017 11:01:50 +0530
 From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-In-Reply-To: <20170105222707.GH13763@umbus.fritz.box>
+In-Reply-To: <20170105220117.GE13763@umbus.fritz.box>
 References: <1483615579-17618-1-git-send-email-nikunj@linux.vnet.ibm.com>
-	<20170105222707.GH13763@umbus.fritz.box>
-Date: Fri, 06 Jan 2017 10:42:38 +0530
+	<1483615579-17618-4-git-send-email-nikunj@linux.vnet.ibm.com>
+	<20170105220117.GE13763@umbus.fritz.box>
+Date: Fri, 06 Jan 2017 11:01:40 +0530
 MIME-Version: 1.0
 Content-Type: text/plain
-Message-Id: <87pok0n54p.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-Subject: Re: [Qemu-devel] [PATCH 00/14] POWER9 TCG enablements - part10
+Message-Id: <87mvf4n48z.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+Subject: Re: [Qemu-devel] [PATCH 03/14] target-ppc: Use float64 arg in
+ helper_compute_fprf()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -47,46 +49,61 @@ Cc: qemu-ppc@nongnu.org, rth@twiddle.net, qemu-devel@nongnu.org, bharata@linux.v
 David Gibson <david@gibson.dropbear.id.au> writes:
 
 > [ Unknown signature status ]
-> On Thu, Jan 05, 2017 at 04:56:05PM +0530, Nikunj A Dadhania wrote:
->> This series contains 11 new instructions for POWER9 ISA3.0
->>      VSX Vector Insert/Extract Word
->>      VSX Scalar Extract Exponent/Significand
->>      VSX Scalar Convert
->>      VSX Scalar Add QP
->>      Various float related improvements
+> On Thu, Jan 05, 2017 at 04:56:08PM +0530, Nikunj A Dadhania wrote:
+>> From: Bharata B Rao <bharata@linux.vnet.ibm.com>
 >> 
->> Bharata B Rao (8):
->>   target-ppc: Use float64 arg in helper_compute_fprf()
->>   target-ppc: Replace isden by float64_is_zero_or_denormal
->>   target-ppc: Rename helper_compute_fprf to helper_compute_fprf_float64
->>   target-ppc: Add xsaddqp instructions
->>   target-ppc: Add xscvdphp, xscvhpdp
->>   target-ppc: Use correct precision for FPRF setting
->>   target-ppc: Add xscvdpqp instruction
->>   target-ppc: Add xscvqpdp instruction
+>> Use float64 argument instead of unit64_t in helper_compute_fprf()
+>> This allows code in helper_compute_fprf() to be reused later to
+>> work with float128 argument too.
 >> 
->> Nikunj A Dadhania (6):
->>   target-ppc: Add xxextractuw instruction
->>   target-ppc: Add xxinsertw instruction
->>   target-ppc: Add xsxexpdp instruction
->>   target-ppc: Add xsxexpqp instruction
->>   target-ppc: Add xsxsigdp instruction
->>   target-ppc: Add xsxsigqp instructions
->> 
->>  include/fpu/softfloat.h             |  20 +++
->>  target-ppc/fpu_helper.c             | 241 +++++++++++++++++++++++++-----------
->>  target-ppc/helper.h                 |   9 +-
->>  target-ppc/int_helper.c             |  51 ++++++++
->>  target-ppc/internal.h               |   6 +
->>  target-ppc/translate/fp-impl.inc.c  |  20 +--
->>  target-ppc/translate/vsx-impl.inc.c | 122 ++++++++++++++++++
->>  target-ppc/translate/vsx-ops.inc.c  |  18 +++
->>  8 files changed, 405 insertions(+), 82 deletions(-)
+>> Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
+>> Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 >
-> These all need rebasing - the path is target/ppc now, rather than
-> target-ppc.
+> Uh.. how can this possibly be correct, without updating the callers of
+> helper_compute_fprf()?
 
-Ah, I missed this change completely. Will update and resend.
+Before the patch
+
+   1791 #define VSX_ADD_SUB(name, op, nels, tp, fld, sfprf, r2sp)                    \
+   1792 void helper_##name(CPUPPCState *env, uint32_t opcode)                        \
+   1793 {                                                                            \
+
+[SNIP]
+
+   1816                                                                              \
+   1817         if (r2sp) {                                                          \
+   1818             xt.fld = helper_frsp(env, xt.fld);                               \
+   1819         }                                                                    \
+   1820                                                                              \
+   1821         if (sfprf) {                                                         \
+   1822             helper_compute_fprf(env, xt.fld);                                \
+
+[SNIP]
+
+   1829 VSX_ADD_SUB(xsadddp, add, 1, float64, VsrD(0), 1, 0)
+   1830 VSX_ADD_SUB(xsaddsp, add, 1, float64, VsrD(0), 1, 1)
+   1831 VSX_ADD_SUB(xvadddp, add, 2, float64, VsrD(i), 0, 0)
+   1832 VSX_ADD_SUB(xvaddsp, add, 4, float32, VsrW(i), 0, 0)
+   1833 VSX_ADD_SUB(xssubdp, sub, 1, float64, VsrD(0), 1, 0)
+
+
+So we use xt.fld, which in turn will be xt.float64/xt.float32 etc. I
+have seen all the other path, should be fine.
+target/ppc/fpu_helper.c:1877:            helper_compute_fprf(env, xt.fld);                                \
+target/ppc/fpu_helper.c:1931:            helper_compute_fprf(env, xt.fld);                                 \
+target/ppc/fpu_helper.c:1972:            helper_compute_fprf(env, xt.fld);                                 \
+target/ppc/fpu_helper.c:2021:            helper_compute_fprf(env, xt.fld);                                \
+target/ppc/fpu_helper.c:2071:            helper_compute_fprf(env, xt.fld);                                \
+target/ppc/fpu_helper.c:2271:            helper_compute_fprf(env, xt_out.fld);                             \
+target/ppc/fpu_helper.c:2661:            helper_compute_fprf(env, ttp##_to_float64(xt.tfld,     \
+target/ppc/fpu_helper.c:2772:            helper_compute_fprf(env, xt.tfld);                          \
+target/ppc/fpu_helper.c:2828:            helper_compute_fprf(env, xt.fld);                          \
+
+
+Except the below one, the register that we pass comes as i64 via the
+helper:
+
+target/ppc/helper.h:64:DEF_HELPER_2(compute_fprf, void, env, i64)
 
 Regards
 Nikunj
