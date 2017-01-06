@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47501)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47535)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cPWt6-0005FN-Po
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 10:57:05 -0500
+	(envelope-from <berrange@redhat.com>) id 1cPWt9-0005Iz-Vy
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 10:57:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cPWt6-0005V3-2e
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 10:57:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36612)
+	(envelope-from <berrange@redhat.com>) id 1cPWt8-0005WN-S0
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 10:57:08 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56210)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cPWt5-0005Un-T0
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 10:57:03 -0500
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cPWt8-0005Vz-Jy
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 10:57:06 -0500
 Received: from int-mx11.intmail.prod.int.phx2.redhat.com
 	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 024DE8F02B
-	for <qemu-devel@nongnu.org>; Fri,  6 Jan 2017 15:57:04 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id A8C66C04B942
+	for <qemu-devel@nongnu.org>; Fri,  6 Jan 2017 15:57:06 +0000 (UTC)
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Fri,  6 Jan 2017 15:55:40 +0000
-Message-Id: <20170106155543.12827-45-berrange@redhat.com>
+Date: Fri,  6 Jan 2017 15:55:42 +0000
+Message-Id: <20170106155543.12827-47-berrange@redhat.com>
 In-Reply-To: <20170106155543.12827-1-berrange@redhat.com>
 References: <20170106155543.12827-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 44/47] trace: switch qapi/ directory to
- modular trace.h file
+Subject: [Qemu-devel] [PATCH v2 46/47] trace: update docs to reflect new
+ code generation approach
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,52 +33,102 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Stefan Hajnoczi <stefanha@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-Switch files in the qapi/ directory to include the
-qapi/trace.h file instead of the global trace.h
-file.
+Describe use of per-subdir trace events files and how it impacts
+code generation.
 
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- Makefile.objs          | 2 +-
- qapi/Makefile.objs     | 2 ++
- qapi/qapi-visit-core.c | 2 +-
- 3 files changed, 4 insertions(+), 2 deletions(-)
+ docs/tracing.txt | 61 +++++++++++++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 52 insertions(+), 9 deletions(-)
 
-diff --git a/Makefile.objs b/Makefile.objs
-index abdc0a8..e8cbaa2 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -162,7 +162,7 @@ trace-events-subdirs += target/s390x
- trace-events-subdirs += target/ppc
- trace-events-subdirs += qom
- trace-events-subdirs += linux-user
--trace-events-y += qapi/trace-events
-+trace-events-subdirs += qapi
+diff --git a/docs/tracing.txt b/docs/tracing.txt
+index f351998a..3262a61 100644
+--- a/docs/tracing.txt
++++ b/docs/tracing.txt
+@@ -27,18 +27,51 @@ for debugging, profiling, and observing execution.
  
- trace-events-files = $(trace-events-y) $(trace-events-subdirs:%=%/trace-events)
+ == Trace events ==
  
-diff --git a/qapi/Makefile.objs b/qapi/Makefile.objs
-index 33906ff..3c85604 100644
---- a/qapi/Makefile.objs
-+++ b/qapi/Makefile.objs
-@@ -4,3 +4,5 @@ util-obj-y += string-input-visitor.o string-output-visitor.o
- util-obj-y += opts-visitor.o qapi-clone-visitor.o
- util-obj-y += qmp-event.o
- util-obj-y += qapi-util.o
-+trace-obj-y += trace.o
-+trace-obj-$(CONFIG_TRACE_DTRACE) += trace-dtrace.o
-diff --git a/qapi/qapi-visit-core.c b/qapi/qapi-visit-core.c
-index 63bd97b..052d4e1 100644
---- a/qapi/qapi-visit-core.c
-+++ b/qapi/qapi-visit-core.c
-@@ -19,7 +19,7 @@
- #include "qapi/qmp/qerror.h"
- #include "qapi/visitor.h"
- #include "qapi/visitor-impl.h"
--#include "trace.h"
-+#include "qapi/trace.h"
++=== Sub-directory setup ===
++
+ Each directory in the source tree can declare a set of static trace events
+-in a "trace-events" file. Each trace event declaration names the event, its
+-arguments, and the format string which can be used for pretty-printing:
++in a "trace-events" file. The first (non-comment) statement in the file
++must be "@id_offset(NN)" where NN is an integer that is unique among all
++"trace-events" files in the QEMU source tree. The IDs can be arbitrarily
++chosen, but for extra fun the current "trace-events" files use values from
++the "powerful number" integer sequence :-)
  
- void visit_complete(Visitor *v, void *opaque)
- {
+-    qemu_vmalloc(size_t size, void *ptr) "size %zu ptr %p"
+-    qemu_vfree(void *ptr) "ptr %p"
++Any subdirectory which contains a "trace-events" file must be listed in the
++"trace-events-subdirs" make variable in the top level Makefile.objs. During
++build, the "trace-events" file in each listed subdirectory will be processed
++by the "tracetool" script to generate code for the trace events.
++
++The individual "trace-events" files are merged together into a "trace-events-all"
++file, which is also installed into "/usr/share/qemu" with the name "trace-events".
++This merge file is to be used by the "simpletrace.py" script to later analyse
++traces in the simpletrace data format.
++
++The Makefile.objs in the subdirectory should have two lines added
++
++  trace-obj-y += trace.o
++  trace-obj-$(CONFIG_TRACE_DTRACE) += trace-dtrace.o
++
++In the sub-directory the following files will be automatically generated
++
++ - trace.c - the trace event state declarations
++ - trace.h - the trace event enums and probe functions
++ - trace-dtrace.h - DTrace speci
++ - trace-dtrace.dtrace - DTrace event probe helper declaration
++ - trace-dtrace.o - binary DTrace provider (generated by dtrace)
++ - trace-ust.h - UST event probe helper declarations
++
++Source files in the sub-directory should only #include the 'trace.h'
++file and use the full sub-directory path. eg io/channel-buffer.c
++would do
+ 
+-All "trace-events" files must be listed in the "trace-event-y" make variable
+-in the top level Makefile.objs. During build the individual files are combined
+-to create a "trace-events-all" file, which is processed by the "tracetool"
+-script during build to generate code for the trace events. The
+-"trace-events-all" file is also installed into "/usr/share/qemu".
++  #include "io/trace.h"
++
++While it is permited to include a trace.h file from outside a source
++files' own sub-directory, this is discouraged in general. It is strongly
++preferred that all events be declared directly in the sub-directory that
++uses them.
++
++=== Using trace events ===
+ 
+ Trace events are invoked directly from source code like this:
+ 
+@@ -83,6 +116,13 @@ Format strings should reflect the types defined in the trace event.  Take
+ special care to use PRId64 and PRIu64 for int64_t and uint64_t types,
+ respectively.  This ensures portability between 32- and 64-bit platforms.
+ 
++Each event declaration will start with the event name, then its arguments,
++finally a format string for pretty-printing. For example:
++
++    qemu_vmalloc(size_t size, void *ptr) "size %zu ptr %p"
++    qemu_vfree(void *ptr) "ptr %p"
++
++
+ === Hints for adding new trace events ===
+ 
+ 1. Trace state changes in the code.  Interesting points in the code usually
+@@ -372,6 +412,9 @@ information. If used together with the "tcg" property, it adds a second
+ "TCGv_env" argument that must point to the per-target global TCG register that
+ points to the vCPU when guest code is executed (usually the "cpu_env" variable).
+ 
++All "vcpu" events *must* be declared in the top level "trace-events" file. It
++is not permitted to have them declared in sub-directories.
++
+ The following example events:
+ 
+     foo(uint32_t a) "a=%x"
 -- 
 2.9.3
