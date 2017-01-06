@@ -1,29 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55124)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57306)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cPLVK-0002HA-9m
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 22:47:47 -0500
+	(envelope-from <peterx@redhat.com>) id 1cPLm5-0006kQ-0U
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 23:05:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cPLVH-0004Lm-7R
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 22:47:46 -0500
-References: <1480575357-25056-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<a1593129-ddb9-8e74-5865-b1e8400c991d@redhat.com>
-	<8b90a1da-a129-f2cb-4545-355348387925@cn.fujitsu.com>
-	<063dfa33-2015-e566-c623-d59578c20fcd@redhat.com>
-	<13aed710-c5d1-b1de-5922-52e3e53029f9@cn.fujitsu.com>
-	<956d6c43-0904-e094-1adb-bb7c584967d0@vivier.eu>
-	<20161207133049.GA32099@stefanha-x1.localdomain>
-	<fc30a10e-10d5-6b53-d098-f00780cdbe16@cn.fujitsu.com>
-	<5dd2f20f-07dd-5120-13bf-ea5700880ecf@cn.fujitsu.com>
-	<2c9fbac0-0169-b7fb-ce0b-ce3408834531@cn.fujitsu.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <0b08c3a0-f519-c308-6fe7-99ba152611f2@redhat.com>
-Date: Fri, 6 Jan 2017 11:47:35 +0800
+	(envelope-from <peterx@redhat.com>) id 1cPLm1-00018u-UL
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 23:05:05 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40826)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cPLm1-00018k-Pl
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 23:05:01 -0500
+Received: from int-mx13.intmail.prod.int.phx2.redhat.com
+	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BF8EA61B9C
+	for <qemu-devel@nongnu.org>; Fri,  6 Jan 2017 04:05:01 +0000 (UTC)
+Date: Fri, 6 Jan 2017 12:04:54 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170106040454.GC4135@pxdev.xzpeter.org>
+References: <1483672082-5512-1-git-send-email-peterx@redhat.com>
+	<1483672082-5512-3-git-send-email-peterx@redhat.com>
+	<c297a765-a4e4-a6d3-de49-14ddb4af4149@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <2c9fbac0-0169-b7fb-ce0b-ce3408834531@cn.fujitsu.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <c297a765-a4e4-a6d3-de49-14ddb4af4149@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH for-2.9] docs: Fix
- description of the sentence
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] intel_iommu: allow migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,12 +35,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Cc: Laurent Vivier <lvivier@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>, Stefan Hajnoczi <stefanha@gmail.com>, qemu devel <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>, Stefan Weil <sw@weilnetz.de>
+To: Jason Wang <jasowang@redhat.com>
+Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>, mst@redhat.com, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Amit Shah <amit.shah@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
+On Fri, Jan 06, 2017 at 11:42:30AM +0800, Jason Wang wrote:
+>=20
+>=20
+> On 2017=E5=B9=B401=E6=9C=8806=E6=97=A5 11:08, Peter Xu wrote:
+> >IOMMU needs to be migrated before all the PCI devices (in case there a=
+re
+> >devices that will request for address translation). So marking it with=
+ a
+> >priority higher than the default (which PCI devices and other belong).
+> >Migration framework handled the rest.
+> >
+> >Signed-off-by: Peter Xu <peterx@redhat.com>
+> >---
+> >  hw/i386/intel_iommu.c       | 21 ++++++++++++++++++++-
+> >  include/migration/vmstate.h |  1 +
+> >  2 files changed, 21 insertions(+), 1 deletion(-)
+> >
+> >diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> >index 5f3e351..ea9e526 100644
+> >--- a/hw/i386/intel_iommu.c
+> >+++ b/hw/i386/intel_iommu.c
+> >@@ -1996,7 +1996,26 @@ static void vtd_iommu_notify_flag_changed(Memor=
+yRegion *iommu,
+> >  static const VMStateDescription vtd_vmstate =3D {
+> >      .name =3D "iommu-intel",
+> >-    .unmigratable =3D 1,
+> >+    .version_id =3D 1,
+> >+    .minimum_version_id =3D 1,
+> >+    .priority =3D MIG_PRI_IOMMU,
+> >+    .fields =3D (VMStateField[]) {
+> >+        VMSTATE_UINT64(root, IntelIOMMUState),
+> >+        VMSTATE_UINT64(intr_root, IntelIOMMUState),
+> >+        VMSTATE_UINT64(iq, IntelIOMMUState),
+> >+        VMSTATE_UINT32(intr_size, IntelIOMMUState),
+> >+        VMSTATE_UINT16(iq_head, IntelIOMMUState),
+> >+        VMSTATE_UINT16(iq_tail, IntelIOMMUState),
+> >+        VMSTATE_UINT16(iq_size, IntelIOMMUState),
+> >+        VMSTATE_UINT16(next_frcd_reg, IntelIOMMUState),
+> >+        VMSTATE_UINT8(iq_last_desc_type, IntelIOMMUState),
+> >+        VMSTATE_BOOL(root_extended, IntelIOMMUState),
+> >+        VMSTATE_BOOL(dmar_enabled, IntelIOMMUState),
+> >+        VMSTATE_BOOL(qi_enabled, IntelIOMMUState),
+> >+        VMSTATE_BOOL(intr_enabled, IntelIOMMUState),
+> >+        VMSTATE_BOOL(intr_eime, IntelIOMMUState),
+> >+        VMSTATE_END_OF_LIST()
+> >+    }
+> >  };
+>=20
+> Looks like register values were missed (e.g csr[]) ?
 
+Oops, I missed the most important thing. :)
 
-On 2017=E5=B9=B401=E6=9C=8806=E6=97=A5 11:33, Zhang Chen wrote:
-> Ping....
+And obviously it even escaped from smoke test... Thanks Jason. Will
+repost.
 
-Applied to -net. Thanks
+-- peterx
