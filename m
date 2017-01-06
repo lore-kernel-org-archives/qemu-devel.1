@@ -1,28 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52138)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52314)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cPXFN-0001Yi-U5
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 11:20:06 -0500
+	(envelope-from <kirkseraph@gmail.com>) id 1cPXGp-0002oV-S2
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 11:21:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cPXFN-0000G6-12
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 11:20:05 -0500
-Received: from mail-ua0-x22d.google.com ([2607:f8b0:400c:c08::22d]:33743)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cPXFM-0000Fu-Sd
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 11:20:04 -0500
-Received: by mail-ua0-x22d.google.com with SMTP id i68so305870083uad.0
-	for <qemu-devel@nongnu.org>; Fri, 06 Jan 2017 08:20:04 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <37C57425-158F-4544-89EF-CC8053476EB6@gmail.com>
-References: <84C57F4C-C8F8-4FB3-804A-FC3DE0AB6408@gmail.com>
-	<CAFEAcA_hY+x3c0BUmURubq6qS-e1bDSUm0fE87=G8acrf-tcuA@mail.gmail.com>
-	<37C57425-158F-4544-89EF-CC8053476EB6@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 6 Jan 2017 16:19:43 +0000
-Message-ID: <CAFEAcA_pNp39dUxG4ZLGJgsApEpKXB_cf9vmUpH1Gva=pnH1yg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v2] ui/cocoa.m: fix sending mouse event to
- guest
+	(envelope-from <kirkseraph@gmail.com>) id 1cPXGm-0001JN-Mv
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 11:21:35 -0500
+From: Seraphime Kirkovski <kirkseraph@gmail.com>
+Date: Fri,  6 Jan 2017 17:21:16 +0100
+Message-Id: <20170106162116.12859-1-kirkseraph@gmail.com>
+Subject: [Qemu-devel] [PATCHv2] target-arm/abi32: check for segfault in
+ do_kernel_trap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,56 +18,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Programmingkid <programmingkidx@gmail.com>
-Cc: qemu-devel qemu-devel <qemu-devel@nongnu.org>
+To: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, Seraphime Kirkovski <kirkseraph@gmail.com>
 
-On 6 January 2017 at 15:44, Programmingkid <programmingkidx@gmail.com> wrote:
->
-> On Jan 6, 2017, at 8:48 AM, Peter Maydell wrote:
->
->> On 1 January 2017 at 21:31, Programmingkid <programmingkidx@gmail.com> wrote:
->>> The mouse down event should not be sent to the guest if the mouse down event
->>> causes QEMU to move the foreground from the background. This patch prevents
->>> these activation clicks from going to the guest.
+Currently, the cmpxchg implementation tests whether the destination address
+is readable:
+  - if it is, we read the value and continue with the comparison
+  - if isn't, i.e. access to addr would segfault, we assume that src != dest
+    rather than queuing a SIGSEGV.
 
->>>     if (mouse_event) {
->>>         /* Don't send button events to the guest unless we've got a
->>> -         * mouse grab or window focus. If we have neither then this event
->>> -         * is the user clicking on the background window to activate and
->>> -         * bring us to the front, which will be done by the sendEvent
->>> -         * call below. We definitely don't want to pass that click through
->>> -         * to the guest.
->>> +         * mouse grab, window focus, or in fullscreen mode. If we have neither
->>> +         * then this event is the user clicking on the background window to
->>> +         * activate and bring us to the front, which will be done by the
->>> +         * sendEvent call below. We definitely don't want to pass that click
->>> +         * through to the guest.
->>>          */
->>> -        if ((isMouseGrabbed || [[self window] isKeyWindow]) &&
->>> +        if (isMouseGrabbed && ([[self window] isKeyWindow] || isFullscreen) &&
->>>             (last_buttons != buttons)) {
->>>             static uint32_t bmap[INPUT_BUTTON__MAX] = {
->>>                 [INPUT_BUTTON_LEFT]       = MOUSE_EVENT_LBUTTON,
->>
->> Comment doesn't match code. The comment says "mouse grab, full screen
->> or focus", but the code is doing "mouse grab and (full screen or focus)".
->>
->> Which is correct?
->
->
-> This sounds more accurate:
->
-> (mouse grab and main window is the front window) or QEMU is in fullscreen.
+The same problem exists in the case where src == dest: the code doesn't
+check whether put_user_u32 succeeds.
 
-That's not what your code does either.
+This fixes both problems by sending a SIGSEGV when the destination address
+is inaccessible.
 
-What is the actual situation which we currently get wrong and need
-to get right? Your commit message says "if the event causes QEMU
-to move to the foreground", but my expectation was that if we
-weren't in the foreground then we would not have the mouse grabbed,
-and in any case your patch adds a check on isFullscreen but your
-commit message doesn't say anything about full-screen or not being
-relevant to the problem.
+Signed-off-by: Seraphime Kirkovski <kirkseraph@gmail.com>
+---
 
-thanks
--- PMM
+This accounts for Peter Maydell's remarks.
+The refactoring here extracts the cmpxchg code from do_kernel_trap in its own
+function.
+
+ linux-user/main.c | 72 ++++++++++++++++++++++++++++++++++++-------------------
+ 1 file changed, 47 insertions(+), 25 deletions(-)
+
+diff --git a/linux-user/main.c b/linux-user/main.c
+index c1d5eb4d6f..ed38ebe0c1 100644
+--- a/linux-user/main.c
++++ b/linux-user/main.c
+@@ -441,7 +441,7 @@ static void arm_kernel_cmpxchg64_helper(CPUARMState *env)
+     uint32_t addr, cpsr;
+     target_siginfo_t info;
+ 
+-    /* Based on the 32 bit code in do_kernel_trap */
++    /* Based on the 32 bit code in arm_kernel_cmpxchg_helper */
+ 
+     /* XXX: This only works between threads, not between processes.
+        It's probably possible to implement this with native host
+@@ -496,41 +496,63 @@ segv:
+     queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
+ }
+ 
++/*
++ * 32bit cmpxchg kernel user helper.
++ * See the note above arm_kernel_cmpxchg64_helper.
++ */
++static void arm_kernel_cmpxchg_helper(CPUARMState *env)
++{
++    uint32_t addr;
++    uint32_t cpsr;
++    uint32_t val;
++    target_siginfo_t info;
++
++    /* XXX: This only works between threads, not between processes.
++       It's probably possible to implement this with native host
++       operations. However things like ldrex/strex are much harder so
++       there's not much point trying.  */
++    start_exclusive();
++    cpsr = cpsr_read(env);
++    addr = env->regs[2];
++    if (get_user_u32(val, addr))
++        goto segv;
++    if (val == env->regs[0]) {
++        val = env->regs[1];
++        if (put_user_u32(val, addr))
++            goto segv;
++        env->regs[0] = 0;
++        cpsr |= CPSR_C;
++    } else {
++        env->regs[0] = -1;
++        cpsr &= ~CPSR_C;
++    }
++    cpsr_write(env, cpsr, CPSR_C, CPSRWriteByInstr);
++    end_exclusive();
++    return;
++
++segv:
++    end_exclusive();
++    env->exception.vaddress = addr;
++    info.si_signo = TARGET_SIGSEGV;
++    info.si_errno = 0;
++    /* XXX: check env->error_code */
++    info.si_code = TARGET_SEGV_MAPERR;
++    info._sifields._sigfault._addr = env->exception.vaddress;
++    queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++}
++
+ /* Handle a jump to the kernel code page.  */
+ static int
+ do_kernel_trap(CPUARMState *env)
+ {
+     uint32_t addr;
+-    uint32_t cpsr;
+-    uint32_t val;
+ 
+     switch (env->regs[15]) {
+     case 0xffff0fa0: /* __kernel_memory_barrier */
+         /* ??? No-op. Will need to do better for SMP.  */
+         break;
+     case 0xffff0fc0: /* __kernel_cmpxchg */
+-         /* XXX: This only works between threads, not between processes.
+-            It's probably possible to implement this with native host
+-            operations. However things like ldrex/strex are much harder so
+-            there's not much point trying.  */
+-        start_exclusive();
+-        cpsr = cpsr_read(env);
+-        addr = env->regs[2];
+-        /* FIXME: This should SEGV if the access fails.  */
+-        if (get_user_u32(val, addr))
+-            val = ~env->regs[0];
+-        if (val == env->regs[0]) {
+-            val = env->regs[1];
+-            /* FIXME: Check for segfaults.  */
+-            put_user_u32(val, addr);
+-            env->regs[0] = 0;
+-            cpsr |= CPSR_C;
+-        } else {
+-            env->regs[0] = -1;
+-            cpsr &= ~CPSR_C;
+-        }
+-        cpsr_write(env, cpsr, CPSR_C, CPSRWriteByInstr);
+-        end_exclusive();
++        arm_kernel_cmpxchg_helper(env);
+         break;
+     case 0xffff0fe0: /* __kernel_get_tls */
+         env->regs[0] = cpu_get_tls(env);
+-- 
+2.11.0
