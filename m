@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52419)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56441)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cPXHe-0003YX-8S
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 11:22:30 -0500
+	(envelope-from <eblake@redhat.com>) id 1cPXT9-00073V-7t
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 11:34:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cPXHb-0001ZH-3L
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 11:22:26 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38092)
+	(envelope-from <eblake@redhat.com>) id 1cPXT4-0006wS-BX
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 11:34:19 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43656)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cPXHa-0001Yy-RD
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 11:22:23 -0500
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cPXT4-0006vk-2r
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 11:34:14 -0500
 Received: from int-mx09.intmail.prod.int.phx2.redhat.com
 	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DFA1CC056793
-	for <qemu-devel@nongnu.org>; Fri,  6 Jan 2017 16:22:22 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 22866C056793
+	for <qemu-devel@nongnu.org>; Fri,  6 Jan 2017 16:34:14 +0000 (UTC)
 References: <20170105160701.22118-1-berrange@redhat.com>
-	<20170105160701.22118-8-berrange@redhat.com>
+	<20170105160701.22118-9-berrange@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <b9dbb0df-1bdf-5aa1-aea9-cd6751e24a4e@redhat.com>
-Date: Fri, 6 Jan 2017 10:22:19 -0600
+Message-ID: <7fb1d736-aef5-ef03-ca11-7caf1b8a6e9d@redhat.com>
+Date: Fri, 6 Jan 2017 10:34:11 -0600
 MIME-Version: 1.0
-In-Reply-To: <20170105160701.22118-8-berrange@redhat.com>
+In-Reply-To: <20170105160701.22118-9-berrange@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="3iiWnHbgUoe8iasjNlqsHo4P3NSIeHmp2"
-Subject: Re: [Qemu-devel] [PATCH 7/8] util: add qemu_opt_get_all() to get
- repeated opts
+	boundary="kEKuNRHxES2cs8UtNfhJ4PlkTqsJlxCpj"
+Subject: Re: [Qemu-devel] [PATCH 8/8] ui: add ability to specify multiple
+ VNC listen addresses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,107 +39,133 @@ To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
 Cc: Gerd Hoffmann <kraxel@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---3iiWnHbgUoe8iasjNlqsHo4P3NSIeHmp2
+--kEKuNRHxES2cs8UtNfhJ4PlkTqsJlxCpj
 From: Eric Blake <eblake@redhat.com>
 To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
 Cc: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <b9dbb0df-1bdf-5aa1-aea9-cd6751e24a4e@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 7/8] util: add qemu_opt_get_all() to get
- repeated opts
+Message-ID: <7fb1d736-aef5-ef03-ca11-7caf1b8a6e9d@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 8/8] ui: add ability to specify multiple VNC
+ listen addresses
 References: <20170105160701.22118-1-berrange@redhat.com>
- <20170105160701.22118-8-berrange@redhat.com>
-In-Reply-To: <20170105160701.22118-8-berrange@redhat.com>
+ <20170105160701.22118-9-berrange@redhat.com>
+In-Reply-To: <20170105160701.22118-9-berrange@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 01/05/2017 10:07 AM, Daniel P. Berrange wrote:
-> The QemuOpts parser accepts repeated option names, storing
-> all the provided values. qemu_opt_get() then just returns
-> the last value. There is no way to get the other values
-> without using a callback function to iterate over all
-> option names. Add a qemu_opt_get_all() method to return
-> a string list of all values.
+> This change allows the listen address and websocket address
+> options for -vnc to be repeated. This causes the VNC server
+> to listen on multiple addresses. e.g.
+>=20
+>  $ $QEMU -vnc vnc=3Dlocalhost:1,vnc=3Dunix:/tmp/vnc,\
+>               websocket=3D127.0.0.1:8080,websocket=3D[::]:8081
+>=20
+> results in listening on
+>=20
+> 127.0.0.1:5901, 127.0.0.1:8080, ::1:5901, :::8081 & /tmp/vnc
 >=20
 > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 > ---
->  include/qemu/option.h |  1 +
->  util/qemu-option.c    | 22 ++++++++++++++++++++++
->  2 files changed, 23 insertions(+)
+>  ui/vnc.c | 191 +++++++++++++++++++++++++++++++++++++++++++------------=
+--------
+>  1 file changed, 130 insertions(+), 61 deletions(-)
 >=20
-> diff --git a/include/qemu/option.h b/include/qemu/option.h
-> index 1f9e3f9..689e0a8 100644
-> --- a/include/qemu/option.h
-> +++ b/include/qemu/option.h
-> @@ -65,6 +65,7 @@ struct QemuOptsList {
->  };
-> =20
->  const char *qemu_opt_get(QemuOpts *opts, const char *name);
-> +size_t qemu_opt_get_all(QemuOpts *opts, const char *name, char ***vals=
-);
->  char *qemu_opt_get_del(QemuOpts *opts, const char *name);
->  /**
->   * qemu_opt_has_help_opt:
-> diff --git a/util/qemu-option.c b/util/qemu-option.c
-> index 3467dc2..0418d71 100644
-> --- a/util/qemu-option.c
-> +++ b/util/qemu-option.c
-> @@ -332,6 +332,28 @@ const char *qemu_opt_get(QemuOpts *opts, const cha=
-r *name)
->      return opt ? opt->str : NULL;
->  }
-> =20
-> +size_t qemu_opt_get_all(QemuOpts *opts, const char *name, char ***vals=
-)
 
-Documentation would be nice, including that the caller must free two
-levels of results.
-
-> +{
-> +    QemuOpt *opt;
-> +    size_t nvals =3D 0;
-> +
-> +    *vals =3D NULL;
-> +
-> +    QTAILQ_FOREACH(opt, &opts->head, next) {
-> +        if (!g_str_equal(opt->name, name)) {
-> +            continue;
+> +    for (i =3D 0; i < nsaddrstr; i++) {
+> +        int rv;
+> +        rv =3D vnc_display_get_address(saddrstr[i], false, 0, to,
+> +                                     has_ipv4, has_ipv6,
+> +                                     ipv4, ipv6,
+> +                                     &saddr, errp);
+> +        if (rv < 0) {
+> +            goto cleanup;
 > +        }
+> +        /* Historical compat - if only a single listen address was
+> +         * provided, then the display num can be used to set the
+> +         * default websocket port
+> +         */
+> +        if (nsaddrstr =3D=3D 1) {
+> +            displaynum =3D rv;
+> +        }
+> +        *retsaddr =3D g_renew(SocketAddress *, *retsaddr, *retnsaddr +=
+ 1);
+> +        (*retsaddr)[(*retnsaddr)++] =3D saddr;
+
+Again, do we care if the user supplies LOTS of vnc addresses and
+witnesses O(n^2) initialization cost?
+
+>      }
+> -    if (wsaddrstr) {
+> -        if (vnc_display_get_address(wsaddrstr, true, displaynum, to,
+> +    for (i =3D 0; i < nwsaddrstr; i++) {
+> +        if (vnc_display_get_address(wsaddrstr[i], true, displaynum, to=
+,
+>                                      has_ipv4, has_ipv6,
+
 > +
-> +        *vals =3D g_renew(char *, *vals, nvals + 1);
-> +        (*vals)[nvals++] =3D g_strdup(opt->str);
+> +        *retwsaddr =3D g_renew(SocketAddress *, *retwsaddr, *retnwsadd=
+r + 1);
+> +        (*retwsaddr)[(*retnwsaddr)++] =3D wsaddr;
 
-This one is noticeably O(n^2) if the user supplies LOTS of repeated
-options on the command line.  Should we be smarter about the allocation,
-since unlike DNS resolution, we don't have quite as much assurance that
-the user won't be doing that?  You do have an upper bound that this
-won't call g_renew() any more than the number of opts present in the
-command-line argument that you could use for O(1) instead of O(n) list
-allocations (the O(n^2) is caused by O(n) allocations coupled with O(n)
-copying between allocations), but I don't know if we have easy access to
-that value, nor if it is wasteful to over-allocate when the more common
-case is that most of the opts are not equal to name.
+Same for websocket addresses.
 
-> +    }
-> +    if (nvals) {
-> +        *vals =3D g_renew(char *, *vals, nvals + 1);
-> +        (*vals)[nvals] =3D NULL;
-> +    }
-> +    return nvals;
-> +}
-> +
->  /* Get a known option (or its default) and remove it from the list
->   * all in one action. Return a malloced string of the option value.
->   * Result must be freed by caller with g_free().
->=20
+>  static int vnc_display_connect(VncDisplay *vd,
+> -                               SocketAddress *saddr,
+> -                               SocketAddress *wsaddr,
+> +                               SocketAddress **saddr,
+> +                               size_t nsaddr,
+> +                               SocketAddress **wsaddr,
+> +                               size_t nwsaddr,
+>                                 Error **errp)
+>  {
+>      /* connect to viewer */
+>      QIOChannelSocket *sioc =3D NULL;
+> -    if (wsaddr) {
+> +    if (nwsaddr !=3D 0) {
+>          error_setg(errp, "Cannot use websockets in reverse mode");
+>          return -1;
+>      }
+> -    vd->is_unix =3D saddr->type =3D=3D SOCKET_ADDRESS_KIND_UNIX;
+> +    if (nsaddr !=3D 1) {
+> +        error_setg(errp, "Expected a single address in reverse mo");
 
-The idea makes sense, though.
+s/mo/mode/
+
+
+>  static int vnc_display_listen(VncDisplay *vd,
+
+> -    if (wsaddr &&
+> -        vnc_display_listen_addr(vd, wsaddr,
+> -                                "vnc-ws-listen",
+> -                                &vd->lwebsock,
+> -                                &vd->lwebsock_tag,
+> -                                &vd->nlwebsock,
+> -                                errp) < 0) {
+> -        return -1;
+> +    for (i =3D 0; i < nwsaddr; i++) {
+> +        if (vnc_display_listen_addr(vd, wsaddr[i],
+> +                                    "vnc-ws-listen",
+> +                                    &vd->lwebsock,
+> +                                    &vd->lwebsock_tag,
+> +                                    &vd->nlwebsock,
+> +                                    errp) < 0) {
+
+And while your earlier arguments that resolving a single name into
+multiple websocket IP addrs is not going to notice an O(n^2) growth
+pattern, now we are calling that growth pattern over N websocket names
+where N is user-controlled.  But this time I don't have a good bound on
+how many IP addrs nlwebsock will grow to. So maybe we do want to
+consider geometric allocation growth (requires tracking and passing an
+allocated size alongside the currently-used size).
+
+But overall I think you're enhancement makes sense.
 
 --=20
 Eric Blake   eblake redhat com    +1-919-301-3266
 Libvirt virtualization library http://libvirt.org
 
 
---3iiWnHbgUoe8iasjNlqsHo4P3NSIeHmp2
+--kEKuNRHxES2cs8UtNfhJ4PlkTqsJlxCpj
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -149,13 +175,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJYb8Q7AAoJEKeha0olJ0NqYmQIAJJesWs+y51/zfSbf1UW2BHl
-VTS9g99PEb4nzDuemkqIAoE6Uzf/lpo1/GA2L2irML+2YbAjmPCEb9LXbOhOOqsF
-gfdFzBYwWQV83zTy3WM+jLrZL8w0Up+tSYvkSHQ7tVwBHvhpcCYgqBNZUcM6ny2e
-LiDd+P15RinbU4TzWquazQxKYuFwDL2oL5IrlczoGYTVqJZfZLd2mxkoArEP5APu
-Sl2bIT2v+Q7bLOJXgSCsJ5UldIHbcB/fG53L9ysrJw2nEbvR7lNnMTrUlDxQ6Red
-OFT8dyjBLOxs6xMmIEiLwZj5yNBBc9ah8Aan/AhZOR/x1dqDTwLglOS34JMB+HA=
-=woUw
+iQEcBAEBCAAGBQJYb8cDAAoJEKeha0olJ0Nq3FoIAItG2TnrTdaQqra0WXbALz1M
+8r+MMO2NbETCIFfEKw2SiPUAT75C6cmuhKJYZ1tYWLJlHDmv63oGkUMcV2R/6hjX
+DnrqmbhtbhXZFXkprqXr5ZBkndkQGuYE/Bv1yrxqiZoK/QIBoqN+zagdGN2dENZE
+qGqjHyFV08jyLydAvNwXgiWl+b4kqZoJiZFmxHXiDNrGhNVsxbDG7Bql1IZVYLsn
+DRxDU1d5qCy88ka+kHQ9X1HL61BlOmUxLWUEALB2bodokGNZKMLWO7A/AefzwC51
+EndfQ0F9FVkApMzCJ+fD6kzz57d0BrV6LSPFUY1NG79hSPIkVg/M6uE6zXChjvs=
+=2mQN
 -----END PGP SIGNATURE-----
 
---3iiWnHbgUoe8iasjNlqsHo4P3NSIeHmp2--
+--kEKuNRHxES2cs8UtNfhJ4PlkTqsJlxCpj--
