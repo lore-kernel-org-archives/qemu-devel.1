@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53871)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54205)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cPTFM-0002nk-Qg
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 07:03:49 -0500
+	(envelope-from <berrange@redhat.com>) id 1cPTHS-0004Gc-Ep
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 07:05:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cPTFL-0003ow-UI
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 07:03:48 -0500
-Received: from mail-ua0-x229.google.com ([2607:f8b0:400c:c08::229]:32926)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cPTFL-0003oZ-Qr
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 07:03:47 -0500
-Received: by mail-ua0-x229.google.com with SMTP id i68so300070146uad.0
-	for <qemu-devel@nongnu.org>; Fri, 06 Jan 2017 04:03:47 -0800 (PST)
+	(envelope-from <berrange@redhat.com>) id 1cPTHP-00056L-9n
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 07:05:58 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53958)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cPTHP-00056E-4D
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 07:05:55 -0500
+Received: from int-mx13.intmail.prod.int.phx2.redhat.com
+	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1249F64E2
+	for <qemu-devel@nongnu.org>; Fri,  6 Jan 2017 12:05:55 +0000 (UTC)
+Date: Fri, 6 Jan 2017 12:05:49 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170106120549.GJ31112@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170105160321.21786-1-berrange@redhat.com>
+	<20170105160321.21786-7-berrange@redhat.com>
+	<51fbdc69-0704-19bd-28b9-fc2310ee2e44@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <5b9a682feb30a4c22b068d698d65063c299d24cf.1482265908.git.alistair.francis@xilinx.com>
-References: <cover.1482265908.git.alistair.francis@xilinx.com>
-	<5b9a682feb30a4c22b068d698d65063c299d24cf.1482265908.git.alistair.francis@xilinx.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 6 Jan 2017 12:03:25 +0000
-Message-ID: <CAFEAcA-oiVXMCfEJOgybD8b_OcL2qwsVxNKazAzXka=DuFj_Vg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v3 3/3] xlnx-zynqmp: Connect the ARM
- Generic Timer
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <51fbdc69-0704-19bd-28b9-fc2310ee2e44@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 6/8] io: change the QIOTask callback
+ signature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,85 +36,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, =?UTF-8?B?S09OUkFEIEZyw6lkw6lyaWM=?= <fred.konrad@greensocs.com>, Alistair Francis <alistair23@gmail.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On 20 December 2016 at 22:42, Alistair Francis
-<alistair.francis@xilinx.com> wrote:
-> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-> ---
->
->  hw/arm/xlnx-zynqmp.c         | 14 ++++++++++++++
->  include/hw/arm/xlnx-zynqmp.h |  2 ++
->  2 files changed, 16 insertions(+)
->
-> diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
-> index 0d86ba3..f3891ae 100644
-> --- a/hw/arm/xlnx-zynqmp.c
-> +++ b/hw/arm/xlnx-zynqmp.c
-> @@ -38,6 +38,8 @@
->  #define SATA_ADDR           0xFD0C0000
->  #define SATA_NUM_PORTS      2
->
-> +#define ARM_GEN_TIMER_ADDR  0xFF260000
-> +
->  #define DP_ADDR             0xfd4a0000
->  #define DP_IRQ              113
->
-> @@ -172,6 +174,10 @@ static void xlnx_zynqmp_init(Object *obj)
->          qdev_set_parent_bus(DEVICE(&s->spi[i]), sysbus_get_default());
->      }
->
-> +    object_initialize(&s->arm_gen_timer, sizeof(s->arm_gen_timer),
-> +                      TYPE_ARM_GEN_TIMER);
-> +    qdev_set_parent_bus(DEVICE(&s->arm_gen_timer), sysbus_get_default());
-> +
->      object_initialize(&s->dp, sizeof(s->dp), TYPE_XLNX_DP);
->      qdev_set_parent_bus(DEVICE(&s->dp), sysbus_get_default());
->
-> @@ -405,6 +411,14 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
->          g_free(bus_name);
->      }
->
-> +    object_property_set_bool(OBJECT(&s->arm_gen_timer), true, "realized", &err);
-> +    if (err) {
-> +        error_propagate(errp, err);
-> +        return;
-> +    }
-> +    sysbus_mmio_map(SYS_BUS_DEVICE(&s->arm_gen_timer), 0, ARM_GEN_TIMER_ADDR);
-> +    sysbus_mmio_map(SYS_BUS_DEVICE(&s->arm_gen_timer), 1, ARM_GEN_TIMER_ADDR - 0x10000);
+On Thu, Jan 05, 2017 at 03:47:57PM -0600, Eric Blake wrote:
+> On 01/05/2017 10:03 AM, Daniel P. Berrange wrote:
+> > Currently the QIOTaskFunc signature takes an Object * for
+> > the source, and an Error * for any error. We also need to
+> > be able to provide a result pointer. Rather than continue
+> > to add parameters to QIOTaskFunc, remove the existing
+> > ones and simply pass the QIOTask object instead. This
+> > has methods to access all the other data items required
+> > in the callback impl.
+> 
+> Hmmm. If you're going to change the callback signature after all, then
+> is it worth considering having the callback return void* instead of the
+> clunky way of passing the result pointer around, with existing callers
+> updated to return NULL if they have nothing better to do?  Accessing the
+> error pointer through the QIOTask object seems okay, it's just the
+> return type that feels clunky.
+> 
+> But that's bike-shedding, so I'll review as written.
 
-Having a #define for a base address and then also using
-thing - 0x10000 is a bit odd. I'd use two #defines, I think.
-(Also avoids the overlong line.)
+Per my comments in previous patch, the approach taken here was chosen
+to align with GLib's GTask/GAsyncResult design more closely.
 
-If we take the "board responsible for only mapping the secure-only
-regs into the secure address space" approach this code will need to
-change accordingly.
 
-> +
->      object_property_set_bool(OBJECT(&s->dp), true, "realized", &err);
->      if (err) {
->          error_propagate(errp, err);
-> diff --git a/include/hw/arm/xlnx-zynqmp.h b/include/hw/arm/xlnx-zynqmp.h
-> index c2931bf..8deabb4 100644
-> --- a/include/hw/arm/xlnx-zynqmp.h
-> +++ b/include/hw/arm/xlnx-zynqmp.h
-> @@ -26,6 +26,7 @@
->  #include "hw/ide/ahci.h"
->  #include "hw/sd/sdhci.h"
->  #include "hw/ssi/xilinx_spips.h"
-> +#include "hw/timer/arm_generic_timer.h"
->  #include "hw/dma/xlnx_dpdma.h"
->  #include "hw/display/xlnx_dp.h"
->
-> @@ -83,6 +84,7 @@ typedef struct XlnxZynqMPState {
->      SysbusAHCIState sata;
->      SDHCIState sdhci[XLNX_ZYNQMP_NUM_SDHCI];
->      XilinxSPIPS spi[XLNX_ZYNQMP_NUM_SPIS];
-> +    ARMGenTimer arm_gen_timer;
->      XlnxDPState dp;
->      XlnxDPDMAState dpdma;
-
-thanks
--- PMM
+Regards,
+Daniel
+-- 
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
