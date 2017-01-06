@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43065)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44163)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cPUjk-0003Lm-9X
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 08:39:17 -0500
+	(envelope-from <bounces@canonical.com>) id 1cPUpx-0005M8-Mr
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 08:45:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cPUjh-0002nx-61
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 08:39:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52230)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cPUjg-0002nl-UJ
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 08:39:13 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BAB754E4E6
-	for <qemu-devel@nongnu.org>; Fri,  6 Jan 2017 13:39:12 +0000 (UTC)
-References: <20170105160701.22118-1-berrange@redhat.com>
-	<20170105160701.22118-2-berrange@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <d78c2c83-795a-0b65-a478-bc899ac32320@redhat.com>
-Date: Fri, 6 Jan 2017 07:39:10 -0600
+	(envelope-from <bounces@canonical.com>) id 1cPUpu-0005ed-GK
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 08:45:41 -0500
+Received: from indium.canonical.com ([91.189.90.7]:48623)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cPUpu-0005eI-AA
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 08:45:38 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cPUps-0000N0-Py
+	for <qemu-devel@nongnu.org>; Fri, 06 Jan 2017 13:45:36 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id B2A952E80C3
+	for <qemu-devel@nongnu.org>; Fri,  6 Jan 2017 13:45:36 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20170105160701.22118-2-berrange@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="GUHAoJvlhoAlJkvWgTNToFxQWPi1S9cCd"
-Subject: Re: [Qemu-devel] [PATCH 1/8] ui: fix regression handling bare
- 'websocket' option to -vnc
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 06 Jan 2017 13:39:59 -0000
+From: Andreas Gustafsson <gson@gson.org>
+Reply-To: Bug 1654137 <1654137@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170105043743.14700.719.malonedeb@wampee.canonical.com>
+Message-Id: <20170106133959.14243.54408.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1654137] Re: Ctrl-A b not working in 2.8.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,74 +36,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---GUHAoJvlhoAlJkvWgTNToFxQWPi1S9cCd
-From: Eric Blake <eblake@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <d78c2c83-795a-0b65-a478-bc899ac32320@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/8] ui: fix regression handling bare
- 'websocket' option to -vnc
-References: <20170105160701.22118-1-berrange@redhat.com>
- <20170105160701.22118-2-berrange@redhat.com>
-In-Reply-To: <20170105160701.22118-2-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+I am also seeing this problem.  In case it was not clear from Paul's
+original report, it affects guests using a serial console.
 
-On 01/05/2017 10:06 AM, Daniel P. Berrange wrote:
-> The -vnc argument is documented as accepting two syntaxes for
-> the 'websocket' option, either a bare option name, or a port
-> number. If using the bare option name, it is supposed to apply
-> the display number as an offset to base port 5700. e.g.
->=20
->   -vnc localhost:3,websocket
->=20
-> should listen on port 5703, however, this was broken in 2.3.0 since
->=20
->   commit 4db14629c38611061fc19ec6927405923de84f08
->   Author: Gerd Hoffmann <kraxel@redhat.com>
->   Date:   Tue Sep 16 12:33:03 2014 +0200
->=20
->     vnc: switch to QemuOpts, allow multiple servers
->=20
-> instead qemu tries to listen on port "on" which gets looked up in
-> /etc/services and fails.
->=20
-> Fixes bug: #1455912
->=20
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
->  ui/vnc.c | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
->=20
+Also, it is not specific to NetBSD.  I can reproduce it using a Linux
+guest on a Linux host, by running the following on a Debian 8 system:
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+  wget http://landley.net/aboriginal/downloads/old/binaries/1.4.5/system-im=
+age-i686.tar.gz
+  tar xfz system-image-i686.tar.gz =
 
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+  cd system-image-i686
+  sh run-emulator.sh =
 
 
---GUHAoJvlhoAlJkvWgTNToFxQWPi1S9cCd
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+and typing Control-A b m once the guest has started.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+Using qemu 2.1.2, this successfully causes the guest to print a memory
+usage summary.  Using current qemu sources from git
+(dbe2b65566e76d3c3a0c3358285c0336ac61e757), nothing happens.
 
-iQEcBAEBCAAGBQJYb53+AAoJEKeha0olJ0NqP7MH/3nOdZUIb5kGK6OkjlFZgK//
-ogd/RPuLDe/FzvFV2ZxmefN1jPfpXQ8Tc1xKWS0vNaBvSmxhGad0a3BaeC6Vu2ha
-5+aUUiC9iQ3B76XMgFiA5VTJGX7FP3pfRMcCqCbB1pzzaE4QrEMkxXmCbF+87PEc
-mLR/ehCzLVPhMJFmVD6T5a4Ba8xVBAZo+qb0ZvOyCIG9Woe9mOu2k8WsrRTdCFSd
-sEX19k++ven1vFEJpfH1HnlUmWbLNE3UNzn6LIALYZFrggtv8QcYytnwCnxHrcJb
-L47jF618ZDPcqlzbczaU2bCfYe8xwPsMSI1B3AvvzovdIFbAnyBXzGHC8qDsb8E=
-=BGnj
------END PGP SIGNATURE-----
+-- =
 
---GUHAoJvlhoAlJkvWgTNToFxQWPi1S9cCd--
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1654137
+
+Title:
+  Ctrl-A b not working in 2.8.0
+
+Status in QEMU:
+  New
+
+Bug description:
+  With a recent update from 2.7.0 to 2.8.0 I have discovered that I can
+  no longer send a "break" to the VM.  Ctrl-A b is simply ignored.
+  Other Ctrl-A sequences seem to work correctly.
+
+  This is on a NetBSD amd64 system, version 7.99.53, and qemu was
+  installed on this system from source.
+
+  Reverting to the previous install restores "break" capability.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1654137/+subscriptions
