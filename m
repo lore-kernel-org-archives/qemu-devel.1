@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42510)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44415)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1cPYPZ-0003Wg-4D
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 12:34:42 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cPYZw-0002Mi-UX
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 12:45:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1cPYPY-0007Jj-9w
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 12:34:41 -0500
-Message-ID: <1483724069.4199.80.camel@redhat.com>
-From: Andrea Bolognani <abologna@redhat.com>
-Date: Fri, 06 Jan 2017 18:34:29 +0100
-In-Reply-To: <20170105054618.GA12106@umbus.fritz.box>
-References: <20170105054618.GA12106@umbus.fritz.box>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Proposal PCI/PCIe device placement on PAPR guests
+	(envelope-from <pm215@archaic.org.uk>) id 1cPYZw-0002kn-9i
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 12:45:25 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:47977)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1cPYZw-0002fu-0V
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 12:45:24 -0500
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri,  6 Jan 2017 17:45:14 +0000
+Message-Id: <1483724714-5469-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH] lm32: milkymist-tmu2: fix another integer
+ overflow
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,52 +23,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: thuth@redhat.com, lvivier@redhat.com, benh@kernel.crashing.org, marcel@redhat.com, aik@ozlabs.ru, groug@kaod.org, ehabkost@redhat.com, mdroth@linux.vnet.ibm.com, libvir-list@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, laine@redhat.com
+To: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+Cc: patches@linaro.org, Michael Walle <michael@walle.cc>
 
-[Added Laine to CC, fixed qemu-devel address]
+Don't truncate the multiplication and do a 64 bit one instead
+because the result is stored in a 64 bit variable.
 
-On Thu, 2017-01-05 at 16:46 +1100, David Gibson wrote:
-[...]
->=C2=A0=C2=A0=C2=A0* To allow for hotplugged devices, libvirt should also=
- add a number
->=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0of additional, empty vPHBs (the PAPR spec =
-allows for hotplug of
->=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0PHBs, but this is not yet implemented in q=
-emu).
+This fixes a similar coverity warning to commit 237a8650d640,
+in a similar way, and is the other half of the fix for
+coverity CID 1167561.
 
-"A number" here will have to mean "one", same number of
-empty PCIe Root Ports libvirt will add to a newly-defined
-q35 guest.
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ hw/display/milkymist-tmu2.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
->=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0When hotplugging
->=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0a new device (or PE) libvirt should locate=
- a vPHB which doesn't
->=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0currently contain anything.
-
-This will need to be a PHB-specific behavior, because at the
-moment libvirt will happily pick one of the empty slots in
-an existing PHB.
-
->=C2=A0=C2=A0=C2=A0* libvirt should only (automatically) add PHBs - never=
- root ports or
->=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0other PCI to PCI bridges
->=C2=A0
-> In order to handle migration, the vPHBs will need to be represented in
-> the domain XML, which will also allow the user to override this
-> topology if they want.
-
-We'll have to decide how to represent them in the XML, but
-that's basically your average bikeshedding.
-
-
-Overall, the plan seems entirely reasonable to me.
-
-It's pretty clear at this point that pseries guest are
-different enough in their handling of PCI that none of
-the address allocation algorithms currently implemented
-in libvirt could be quite adapted to work with it, so
-a custom one is in order.
-
---=C2=A0
-Andrea Bolognani / Red Hat / Virtualization
+diff --git a/hw/display/milkymist-tmu2.c b/hw/display/milkymist-tmu2.c
+index 5c666f9..920374b 100644
+--- a/hw/display/milkymist-tmu2.c
++++ b/hw/display/milkymist-tmu2.c
+@@ -257,7 +257,7 @@ static void tmu2_start(MilkymistTMU2State *s)
+     glColor4f(m, m, m, (float)(s->regs[R_ALPHA] + 1) / 64.0f);
+ 
+     /* Read the QEMU dest. framebuffer into the OpenGL framebuffer */
+-    fb_len = 2 * s->regs[R_DSTHRES] * s->regs[R_DSTVRES];
++    fb_len = 2ULL * s->regs[R_DSTHRES] * s->regs[R_DSTVRES];
+     fb = cpu_physical_memory_map(s->regs[R_DSTFBUF], &fb_len, 0);
+     if (fb == NULL) {
+         glDeleteTextures(1, &texture);
+-- 
+2.7.4
