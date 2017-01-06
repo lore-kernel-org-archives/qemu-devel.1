@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48375)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49075)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sbruno@freebsd.org>) id 1cPWxQ-0000o8-SJ
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 11:01:33 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cPX13-0004gQ-ST
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 11:05:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sbruno@freebsd.org>) id 1cPWxM-0007ir-1Q
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 11:01:32 -0500
-Received: from ignoranthack.me ([199.102.79.106]:52717
-	helo=mail.ignoranthack.me)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sbruno@freebsd.org>) id 1cPWxL-0007ia-SM
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 11:01:27 -0500
-References: <a50ea1f9-4167-cc3f-f81c-61bd6a1853b7@freebsd.org>
-	<d362b1ba-0c36-bc68-44e5-b3e55f3853e9@redhat.com>
-From: Sean Bruno <sbruno@freebsd.org>
-Message-ID: <97e4fa7a-2a66-e530-84d1-0c11fa11c305@freebsd.org>
-Date: Fri, 6 Jan 2017 09:01:23 -0700
+	(envelope-from <peter.maydell@linaro.org>) id 1cPX12-00014u-Lh
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 11:05:17 -0500
+Received: from mail-ua0-x230.google.com ([2607:f8b0:400c:c08::230]:33534)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cPX12-00014N-7p
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 11:05:16 -0500
+Received: by mail-ua0-x230.google.com with SMTP id i68so305485561uad.0
+	for <qemu-devel@nongnu.org>; Fri, 06 Jan 2017 08:05:16 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <d362b1ba-0c36-bc68-44e5-b3e55f3853e9@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature";
-	boundary="af24IneJ7SDUc1qJB20OWmqW1CjXRtuRT"
-Subject: Re: [Qemu-devel] [scripts] default shell/perl locations
+In-Reply-To: <1482559948-22772-1-git-send-email-arei.gonglei@huawei.com>
+References: <1482559948-22772-1-git-send-email-arei.gonglei@huawei.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 6 Jan 2017 16:04:53 +0000
+Message-ID: <CAFEAcA9jHTsOt3p6mE_Q9o8LDdsc6=wj2Rzy7fooTWf4AY2g8Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PULL 0/4] cryptodev patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,71 +28,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+To: Gonglei <arei.gonglei@huawei.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---af24IneJ7SDUc1qJB20OWmqW1CjXRtuRT
-From: Sean Bruno <sbruno@freebsd.org>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <97e4fa7a-2a66-e530-84d1-0c11fa11c305@freebsd.org>
-Subject: Re: [Qemu-devel] [scripts] default shell/perl locations
-References: <a50ea1f9-4167-cc3f-f81c-61bd6a1853b7@freebsd.org>
- <d362b1ba-0c36-bc68-44e5-b3e55f3853e9@redhat.com>
-In-Reply-To: <d362b1ba-0c36-bc68-44e5-b3e55f3853e9@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 24 December 2016 at 06:12, Gonglei <arei.gonglei@huawei.com> wrote:
+> The following changes since commit a470b33259bf82ef2336bfcd5d07640562d3f63b:
+>
+>   Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2016-12-22 19:23:51 +0000)
+>
+> are available in the git repository at:
+>
+>
+>   https://github.com/gongleiarei/qemu.git tags/cryptodev-next-20161224
+>
+> for you to fetch changes up to 48ae36c0ad16bb757d4f6e243b8e9072fc8e8c8e:
+>
+>   cryptodev: add 3des-ede support (2016-12-24 13:46:27 +0800)
+>
+> ----------------------------------------------------------------
+> - add xts mode support
+> - add 3DES algorithm support
+> - other trivial fixes
+>
+> ----------------------------------------------------------------
+> Longpeng(Mike) (4):
+>       cryptodev: fix the check of aes algorithm
+>       cryptodev: add xts(aes) support
+>       cryptodev: remove single-DES support in cryptodev
+>       cryptodev: add 3des-ede support
+>
+>  backends/cryptodev-builtin.c | 65 ++++++++++++++++++++++++++++++++++++++++++++++++++---------------
+>  1 file changed, 50 insertions(+), 15 deletions(-)
 
+Applied to master, thanks.
 
-
-On 01/06/17 01:14, Paolo Bonzini wrote:
->=20
->=20
-> On 05/01/2017 23:41, Sean Bruno wrote:
->> I don't suppose it would be possible to have configure check/change th=
-e
->> interpreter path for scripts so that operating systems that don't have=
-
->> /usr/bin/perl for example, would work out of the box?
->=20
-> We can use
->=20
-> #!/bin/sh
-> eval 'exec perl -x -wS $0 ${1+"$@"}'
->     if 0;
->=20
-> if that works for you.
->=20
-> Paolo
->=20
->=20
-
-that would be far superior, thank you.
-
-This at least lets folks with /usr/local/bin/perl in their path, find
-and run scripts.
-
-sean
-
-
---af24IneJ7SDUc1qJB20OWmqW1CjXRtuRT
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQGTBAEBCgB9FiEEuq1GMucSHejSCZfdEgHvyh5yfmQFAlhvv1NfFIAAAAAALgAo
-aXNzdWVyLWZwckBub3RhdGlvbnMub3BlbnBncC5maWZ0aGhvcnNlbWFuLm5ldEJB
-QUQ0NjMyRTcxMjFERThEMjA5OTdERDEyMDFFRkNBMUU3MjdFNjQACgkQEgHvyh5y
-fmTD1gf9HOwTivTrqwZiUGxM0rKfebHeEXQ2iD0mjqdxLmjC2wkde8iOHDXUJWNv
-t4qiMInoG9Z4+gVnSABGiQ2bE2LW8YM6lyfoj/HI3x25C1XDEECRPb1b7Uh9h0fe
-93R0XluzEULtwsDutWRCRDUKcUCR5fdvXM+PZsr5Bh/34oEX/TxYXaiBsVgEYHga
-txTpyYqEtXz2nVCFAGFrteHE32hR3E1HqcdRht5Ip0gHMPgOmpCRW+vKz3Mbs8QC
-i3I6aIdTayRpdBD+kEpPDpO8puVlubGBKEQR1zQucL7W+KpPDIiCCO6IZ3sJj4uT
-fHkzeRhxvYcmhnjLcLqCY/pBw0pr9A==
-=kUPq
------END PGP SIGNATURE-----
-
---af24IneJ7SDUc1qJB20OWmqW1CjXRtuRT--
+-- PMM
