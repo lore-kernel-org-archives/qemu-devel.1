@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53514)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53708)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cPLHK-00027w-C2
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 22:33:22 -0500
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cPLIY-00034d-5R
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 22:34:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cPLHJ-00075t-8H
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 22:33:18 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48976)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cPLHI-00075f-W6
-	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 22:33:17 -0500
-From: Peter Xu <peterx@redhat.com>
-Date: Fri,  6 Jan 2017 11:33:01 +0800
-Message-Id: <1483673581-7843-3-git-send-email-peterx@redhat.com>
-In-Reply-To: <1483673581-7843-1-git-send-email-peterx@redhat.com>
-References: <1483673581-7843-1-git-send-email-peterx@redhat.com>
+	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1cPLIU-0007eb-84
+	for qemu-devel@nongnu.org; Thu, 05 Jan 2017 22:34:34 -0500
+References: <1480575357-25056-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<a1593129-ddb9-8e74-5865-b1e8400c991d@redhat.com>
+	<8b90a1da-a129-f2cb-4545-355348387925@cn.fujitsu.com>
+	<063dfa33-2015-e566-c623-d59578c20fcd@redhat.com>
+	<13aed710-c5d1-b1de-5922-52e3e53029f9@cn.fujitsu.com>
+	<956d6c43-0904-e094-1adb-bb7c584967d0@vivier.eu>
+	<20161207133049.GA32099@stefanha-x1.localdomain>
+	<fc30a10e-10d5-6b53-d098-f00780cdbe16@cn.fujitsu.com>
+	<5dd2f20f-07dd-5120-13bf-ea5700880ecf@cn.fujitsu.com>
+From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+Message-ID: <2c9fbac0-0169-b7fb-ce0b-ce3408834531@cn.fujitsu.com>
+Date: Fri, 6 Jan 2017 11:33:41 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [kvm-unit-tests PATCH v3 2/2] run_tests: allow run
- tests in parallel
+In-Reply-To: <5dd2f20f-07dd-5120-13bf-ea5700880ecf@cn.fujitsu.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH for-2.9] docs: Fix
+ description of the sentence
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,134 +31,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, kvm@vger.kernel.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Andrew Jones <drjones@redhat.com>, peterx@redhat.com, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>, Stefan Hajnoczi <stefanha@gmail.com>, qemu devel <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>, Stefan Weil <sw@weilnetz.de>
 
-run_task.sh is getting slow. This patch is trying to make it faster by
-running the tests concurrently.
+Ping....
 
-We provide a new parameter "-j" for the run_tests.sh, which can be used
-to specify how many run queues we want for the tests. Default queue
-length is 1, which is the old behavior.
 
-Quick test on my laptop (4 cores, 2 threads each) shows 3x speed boost:
+On 12/26/2016 03:26 PM, Zhang Chen wrote:
+> Hi~~ Jason.
+>
+> Can you pick up this patch?
+>
+> Thanks
+>
+> Zhang Chen
+>
+>
+> On 12/08/2016 09:32 AM, Zhang Chen wrote:
+>>
+>>
+>> On 12/07/2016 09:30 PM, Stefan Hajnoczi wrote:
+>>> On Wed, Dec 07, 2016 at 10:01:49AM +0100, Laurent Vivier wrote:
+>>>> Le 07/12/2016 à 09:58, Zhang Chen a écrit :
+>>>>>
+>>>>> On 12/02/2016 03:57 PM, Laurent Vivier wrote:
+>>>>>> On 02/12/2016 03:59, Zhang Chen wrote:
+>>>>>>> On 12/01/2016 10:57 PM, Eric Blake wrote:
+>>>>>>>> On 12/01/2016 12:55 AM, Zhang Chen wrote:
+>>>>>>>>> Say it in another way to make it easier to understand.
+>>>>>>>>>
+>>>>>>>>> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+>>>>>>>>> Signed-off-by: Eric Blake <eblake@redhat.com>
+>>>>>>>> I guess that's because I suggested the replacement text to use, 
+>>>>>>>> even
+>>>>>>>> though I didn't write the patch.
+>>>>>>> Yes, In that case, should I change the signed-off-by to acked-by or
+>>>>>>> remove it?
+>>>>>> You can use "Suggested-by:"
+>>>>>>
+>>>>>> https://www.kernel.org/doc/Documentation/SubmittingPatches
+>>>>>>
+>>>>>> Laurent
+>>>>>>
+>>>>> Should I fix it? or can you pick up this directly for 2.8?
+>>>> I don't think it is needed.
+>>>> Perhaps Stefan H can take it directly in his staging tree?
+>>> Too late for that now.  This should be merged through Jason Wang (net
+>>> maintainer) like any other colo-proxy patch.
+>>>
+>>
+>> OK~ I change the subject to "for-2.9" and cc Jason.
+>>
+>> Thanks
+>> Zhang Chen
+>>
+>>
+>
 
-   |-----------------+-----------|
-   | command         | time used |
-   |-----------------+-----------|
-   | run_test.sh     | 75s       |
-   | run_test.sh -j8 | 27s       |
-   |-----------------+-----------|
-
-Suggested-by: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@redhat.com>
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- run_tests.sh           | 12 ++++++++++--
- scripts/functions.bash | 17 ++++++++++++++++-
- scripts/global.bash    | 11 +++++++++++
- 3 files changed, 37 insertions(+), 3 deletions(-)
-
-diff --git a/run_tests.sh b/run_tests.sh
-index e1bb3a6..a4fc895 100755
---- a/run_tests.sh
-+++ b/run_tests.sh
-@@ -14,10 +14,11 @@ function usage()
- {
- cat <<EOF
-=20
--Usage: $0 [-g group] [-h] [-v]
-+Usage: $0 [-g group] [-h] [-v] [-j N]
-=20
-     -g: Only execute tests in the given group
-     -h: Output this help text
-+    -j: Execute tests in parallel
-     -v: Enables verbose mode
-=20
- Set the environment variable QEMU=3D/path/to/qemu-system-ARCH to
-@@ -29,7 +30,7 @@ EOF
- RUNTIME_arch_run=3D"./$TEST_DIR/run"
- source scripts/runtime.bash
-=20
--while getopts "g:hv" opt; do
-+while getopts "g:hj:v" opt; do
-     case $opt in
-         g)
-             only_group=3D$OPTARG
-@@ -38,6 +39,13 @@ while getopts "g:hv" opt; do
-             usage
-             exit
-             ;;
-+        j)
-+            ut_run_queues=3D$OPTARG
-+            if ! is_number "$ut_run_queues"; then
-+                echo "Invalid -j option: $ut_run_queues"
-+                exit 1
-+            fi
-+            ;;
-         v)
-             verbose=3D"yes"
-             ;;
-diff --git a/scripts/functions.bash b/scripts/functions.bash
-index d1d2e1c..c6281f4 100644
---- a/scripts/functions.bash
-+++ b/scripts/functions.bash
-@@ -1,9 +1,18 @@
-+source scripts/global.bash
-+
- function run_task()
- {
- 	local testname=3D"$2"
-=20
-+	while [[ "$(jobs | wc -l)" =3D=3D $ut_run_queues ]]; do
-+		# wait for any background test to finish
-+		wait -n
-+	done
-+
- 	RUNTIME_log_file=3D"${ut_log_dir}/${testname}.log"
--	"$@"
-+
-+	# start the testcase in the background
-+	"$@" &
- }
-=20
- function for_each_unittest()
-@@ -20,6 +29,8 @@ function for_each_unittest()
- 	local accel
- 	local timeout
-=20
-+	trap "wait; exit 130" SIGINT
-+
- 	exec {fd}<"$unittests"
-=20
- 	while read -u $fd line; do
-@@ -53,5 +64,9 @@ function for_each_unittest()
- 		fi
- 	done
- 	run_task "$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" =
-"$check" "$accel" "$timeout"
-+
-+	# wait all task finish
-+	wait
-+
- 	exec {fd}<&-
- }
-diff --git a/scripts/global.bash b/scripts/global.bash
-index 77b0b29..52095bd 100644
---- a/scripts/global.bash
-+++ b/scripts/global.bash
-@@ -1,2 +1,13 @@
- : ${ut_log_dir:=3Dlogs}
- : ${ut_log_summary:=3D${ut_log_dir}/SUMMARY}
-+: ${ut_run_queues:=3D1}
-+
-+function ut_in_parallel()
-+{
-+    [[ $ut_run_queues !=3D 1 ]]
-+}
-+
-+function is_number()
-+{
-+    [[ "$1" =3D~ ^[0-9]+$ ]]
-+}
---=20
-2.7.4
+-- 
+Thanks
+Zhang Chen
