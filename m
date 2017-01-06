@@ -1,26 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42445)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42510)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cPYPI-0003LC-GL
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 12:34:25 -0500
+	(envelope-from <abologna@redhat.com>) id 1cPYPZ-0003Wg-4D
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 12:34:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cPYPH-0007Fx-Ml
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 12:34:24 -0500
-Received: from mail-ua0-x231.google.com ([2607:f8b0:400c:c08::231]:33181)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cPYPH-0007Fg-Hy
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 12:34:23 -0500
-Received: by mail-ua0-x231.google.com with SMTP id i68so307740239uad.0
-	for <qemu-devel@nongnu.org>; Fri, 06 Jan 2017 09:34:21 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <20170106162116.12859-1-kirkseraph@gmail.com>
-References: <20170106162116.12859-1-kirkseraph@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 6 Jan 2017 17:34:00 +0000
-Message-ID: <CAFEAcA_S-83pQVS-LJMWDzVu0Zk3+kpYZ2uZahkpDaeNAgaHCA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCHv2] target-arm/abi32: check for segfault in
- do_kernel_trap
+	(envelope-from <abologna@redhat.com>) id 1cPYPY-0007Jj-9w
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 12:34:41 -0500
+Message-ID: <1483724069.4199.80.camel@redhat.com>
+From: Andrea Bolognani <abologna@redhat.com>
+Date: Fri, 06 Jan 2017 18:34:29 +0100
+In-Reply-To: <20170105054618.GA12106@umbus.fritz.box>
+References: <20170105054618.GA12106@umbus.fritz.box>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Proposal PCI/PCIe device placement on PAPR guests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,33 +22,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Seraphime Kirkovski <kirkseraph@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: thuth@redhat.com, lvivier@redhat.com, benh@kernel.crashing.org, marcel@redhat.com, aik@ozlabs.ru, groug@kaod.org, ehabkost@redhat.com, mdroth@linux.vnet.ibm.com, libvir-list@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, laine@redhat.com
 
-On 6 January 2017 at 16:21, Seraphime Kirkovski <kirkseraph@gmail.com> wrote:
-> Currently, the cmpxchg implementation tests whether the destination address
-> is readable:
->   - if it is, we read the value and continue with the comparison
->   - if isn't, i.e. access to addr would segfault, we assume that src != dest
->     rather than queuing a SIGSEGV.
->
-> The same problem exists in the case where src == dest: the code doesn't
-> check whether put_user_u32 succeeds.
->
-> This fixes both problems by sending a SIGSEGV when the destination address
-> is inaccessible.
->
-> Signed-off-by: Seraphime Kirkovski <kirkseraph@gmail.com>
-> ---
->
-> This accounts for Peter Maydell's remarks.
-> The refactoring here extracts the cmpxchg code from do_kernel_trap in its own
-> function.
+[Added Laine to CC, fixed qemu-devel address]
 
-As the patchew robot notes, our coding style wants braces on all
-if() statements, even one-line ones. Other than that,
+On Thu, 2017-01-05 at 16:46 +1100, David Gibson wrote:
+[...]
+>=C2=A0=C2=A0=C2=A0* To allow for hotplugged devices, libvirt should also=
+ add a number
+>=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0of additional, empty vPHBs (the PAPR spec =
+allows for hotplug of
+>=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0PHBs, but this is not yet implemented in q=
+emu).
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+"A number" here will have to mean "one", same number of
+empty PCIe Root Ports libvirt will add to a newly-defined
+q35 guest.
 
-thanks
--- PMM
+>=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0When hotplugging
+>=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0a new device (or PE) libvirt should locate=
+ a vPHB which doesn't
+>=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0currently contain anything.
+
+This will need to be a PHB-specific behavior, because at the
+moment libvirt will happily pick one of the empty slots in
+an existing PHB.
+
+>=C2=A0=C2=A0=C2=A0* libvirt should only (automatically) add PHBs - never=
+ root ports or
+>=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0other PCI to PCI bridges
+>=C2=A0
+> In order to handle migration, the vPHBs will need to be represented in
+> the domain XML, which will also allow the user to override this
+> topology if they want.
+
+We'll have to decide how to represent them in the XML, but
+that's basically your average bikeshedding.
+
+
+Overall, the plan seems entirely reasonable to me.
+
+It's pretty clear at this point that pseries guest are
+different enough in their handling of PCI that none of
+the address allocation algorithms currently implemented
+in libvirt could be quite adapted to work with it, so
+a custom one is in order.
+
+--=C2=A0
+Andrea Bolognani / Red Hat / Virtualization
