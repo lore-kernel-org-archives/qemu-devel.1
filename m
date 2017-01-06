@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44383)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45086)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1cPWgd-0008QE-AN
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 10:44:12 -0500
+	(envelope-from <eblake@redhat.com>) id 1cPWjp-0001QO-AQ
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 10:47:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1cPWga-0007Sn-80
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 10:44:11 -0500
-Received: from mail-it0-x244.google.com ([2607:f8b0:4001:c0b::244]:34379)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
-	id 1cPWga-0007RQ-2x
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 10:44:08 -0500
-Received: by mail-it0-x244.google.com with SMTP id q186so2425460itb.1
-	for <qemu-devel@nongnu.org>; Fri, 06 Jan 2017 07:44:06 -0800 (PST)
-Mime-Version: 1.0 (Apple Message framework v1084)
-Content-Type: text/plain; charset=us-ascii
-From: Programmingkid <programmingkidx@gmail.com>
-In-Reply-To: <CAFEAcA_hY+x3c0BUmURubq6qS-e1bDSUm0fE87=G8acrf-tcuA@mail.gmail.com>
-Date: Fri, 6 Jan 2017 10:44:03 -0500
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <37C57425-158F-4544-89EF-CC8053476EB6@gmail.com>
-References: <84C57F4C-C8F8-4FB3-804A-FC3DE0AB6408@gmail.com>
-	<CAFEAcA_hY+x3c0BUmURubq6qS-e1bDSUm0fE87=G8acrf-tcuA@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v2] ui/cocoa.m: fix sending mouse event to
- guest
+	(envelope-from <eblake@redhat.com>) id 1cPWjo-0000k3-88
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 10:47:29 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37182)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cPWjn-0000io-Up
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 10:47:28 -0500
+Received: from int-mx10.intmail.prod.int.phx2.redhat.com
+	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id EE47A7FD41
+	for <qemu-devel@nongnu.org>; Fri,  6 Jan 2017 15:47:27 +0000 (UTC)
+References: <20170105160701.22118-1-berrange@redhat.com>
+	<20170105160701.22118-5-berrange@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <5fa7e668-053a-e07a-e04a-f836fd8ca6a5@redhat.com>
+Date: Fri, 6 Jan 2017 09:47:25 -0600
+MIME-Version: 1.0
+In-Reply-To: <20170105160701.22118-5-berrange@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="L3saHAvfR8S9rnIsnPggK47kh65xLr4q3"
+Subject: Re: [Qemu-devel] [PATCH 4/8] ui: refactor code for populating
+ SocketAddress from vnc_display_open
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,76 +35,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel qemu-devel <qemu-devel@nongnu.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--L3saHAvfR8S9rnIsnPggK47kh65xLr4q3
+From: Eric Blake <eblake@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <5fa7e668-053a-e07a-e04a-f836fd8ca6a5@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 4/8] ui: refactor code for populating
+ SocketAddress from vnc_display_open
+References: <20170105160701.22118-1-berrange@redhat.com>
+ <20170105160701.22118-5-berrange@redhat.com>
+In-Reply-To: <20170105160701.22118-5-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Jan 6, 2017, at 8:48 AM, Peter Maydell wrote:
-
-> On 1 January 2017 at 21:31, Programmingkid <programmingkidx@gmail.com> =
-wrote:
->> The mouse down event should not be sent to the guest if the mouse =
-down event
->> causes QEMU to move the foreground from the background. This patch =
-prevents
->> these activation clicks from going to the guest.
->>=20
->> Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
->> ---
->> v2 changes:
->> Fix a bug that caused fullscreen mode not to receive mouse events.
->>=20
->> ui/cocoa.m | 12 ++++++------
->> 1 file changed, 6 insertions(+), 6 deletions(-)
->>=20
->> diff --git a/ui/cocoa.m b/ui/cocoa.m
->> index 26d4a1c..ae3f5a1 100644
->> --- a/ui/cocoa.m
->> +++ b/ui/cocoa.m
->> @@ -695,13 +695,13 @@ QemuCocoaView *cocoaView;
->>=20
->>     if (mouse_event) {
->>         /* Don't send button events to the guest unless we've got a
->> -         * mouse grab or window focus. If we have neither then this =
-event
->> -         * is the user clicking on the background window to activate =
-and
->> -         * bring us to the front, which will be done by the =
-sendEvent
->> -         * call below. We definitely don't want to pass that click =
-through
->> -         * to the guest.
->> +         * mouse grab, window focus, or in fullscreen mode. If we =
-have neither
->> +         * then this event is the user clicking on the background =
-window to
->> +         * activate and bring us to the front, which will be done by =
-the
->> +         * sendEvent call below. We definitely don't want to pass =
-that click
->> +         * through to the guest.
->>          */
->> -        if ((isMouseGrabbed || [[self window] isKeyWindow]) &&
->> +        if (isMouseGrabbed && ([[self window] isKeyWindow] || =
-isFullscreen) &&
->>             (last_buttons !=3D buttons)) {
->>             static uint32_t bmap[INPUT_BUTTON__MAX] =3D {
->>                 [INPUT_BUTTON_LEFT]       =3D MOUSE_EVENT_LBUTTON,
+On 01/05/2017 10:06 AM, Daniel P. Berrange wrote:
+> The code which interprets the CLI args to populate the SocketAddress
+> objects for plain & websockets VNC is quite complex already and will
+> need further enhancements shortly. Refactor it into separate methods
+> to avoid vnc_display_open getting even larger. As a side effect of
+> the refactoring, it is now possible to specify a listen address for
+> the websocket server explicitly. e.g,
 >=20
-> Comment doesn't match code. The comment says "mouse grab, full screen
-> or focus", but the code is doing "mouse grab and (full screen or =
-focus)".
+>   -vnc localhost:5900,websockets=3D0.0.0.0:8080
 >=20
-> Which is correct?
+> will listen on localhost for the plain VNC server, but expose the
+> websockets VNC server on the public interface. This refactoring
+> also removes the restriction that prevents enabling websockets
+> when the plain VNC server is listening on a UNIX socket.
+>=20
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>  qemu-options.hx |  12 ++-
+>  ui/vnc.c        | 282 ++++++++++++++++++++++++++++++++++++------------=
+--------
+>  2 files changed, 189 insertions(+), 105 deletions(-)
+>=20
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index c534a2f..7470def 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -1297,10 +1297,14 @@ is a TCP port number, not a display number.
+>  @item websocket
+> =20
+>  Opens an additional TCP listening port dedicated to VNC Websocket conn=
+ections.
+> -By definition the Websocket port is 5700+@var{display}. If @var{host} =
+is
+> -specified connections will only be allowed from this host.
+> -As an alternative the Websocket port could be specified by using
+> -@code{websocket}=3D@var{port}.
+> +If a bare @var{websocket} option is given, the Websocket port is
+> +5700+@var{display}. An alternative port can be specified with the
+> +syntax @code{websocket}=3D@var{port}.
+> +
+> +If @var{host} is specified connections will only be allowed from this =
+host.
+> +It is possible to control the websocket listen address independantly u=
+sing
+
+s/independantly/independently,/
+
+> +the syntax @code{websocket}=3D@var{host}:@var{port}.
+> +
+>  If no TLS credentials are provided, the websocket connection runs in
+>  unencrypted mode. If TLS credentials are provided, the websocket conne=
+ction
+>  requires encrypted client connections.
+> diff --git a/ui/vnc.c b/ui/vnc.c
+> index b37aab4..8d3f9c1 100644
+> --- a/ui/vnc.c
+> +++ b/ui/vnc.c
+> @@ -3519,6 +3519,178 @@ vnc_display_create_creds(bool x509,
+>  }
+> =20
+> =20
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
 
-This sounds more accurate:
+--L3saHAvfR8S9rnIsnPggK47kh65xLr4q3
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-(mouse grab and main window is the front window) or QEMU is in =
-fullscreen.=20
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-If the comment is the only thing that is the problem, please feel free =
-to
-edit it before committing.=20
+iQEcBAEBCAAGBQJYb7wNAAoJEKeha0olJ0Nq90oH/At+mYY6zbhyiwcUGfmX0wpT
+JH0IeVjboVayf8InTYITlO2WT1MKWDXchsdQmxGDdZugXiJRiJo+mgcK54+wxvYN
+Vz3x3KGD4xPH+kQNgCGkhUsUiP77izmLWqIWq6FVF7rP6n75mqFsaEaS+NQpqv8h
+dp9n2p/AxkYxlSkCHXGGAAzvObWd6oizVWYS9My8UNBDVjUSkx8cgnVCn7bzO4hX
+kQUHNDPJt2k9skCWxS3rafLKtxzDbP2LwOdKP06HwX1kq7cR4jNf6meinphy1FRw
+JPDTGoZX7OTMjktXsixcCJHUu8PVdAz13iTWBmVXVCPwwZk+1lKdBVOYMK2W6qQ=
+=nJX1
+-----END PGP SIGNATURE-----
 
-Thank you
+--L3saHAvfR8S9rnIsnPggK47kh65xLr4q3--
