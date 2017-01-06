@@ -1,32 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50825)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51189)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cPX9k-0004xM-JJ
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 11:14:17 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cPXBe-0006eH-By
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 11:16:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cPX9h-0005qr-4f
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 11:14:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33868)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cPX9g-0005qW-SL
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 11:14:13 -0500
-Received: from int-mx10.intmail.prod.int.phx2.redhat.com
-	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E622BC0567A1
-	for <qemu-devel@nongnu.org>; Fri,  6 Jan 2017 16:14:12 +0000 (UTC)
-References: <20170105160701.22118-1-berrange@redhat.com>
-	<20170105160701.22118-7-berrange@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <83869235-00b3-3417-79ff-28bd2df5df8f@redhat.com>
-Date: Fri, 6 Jan 2017 10:14:10 -0600
+	(envelope-from <peter.maydell@linaro.org>) id 1cPXBd-0006l2-49
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 11:16:14 -0500
+Received: from mail-ua0-x236.google.com ([2607:f8b0:400c:c08::236]:34582)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cPXBc-0006kE-Ul
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 11:16:13 -0500
+Received: by mail-ua0-x236.google.com with SMTP id 34so370316094uac.1
+	for <qemu-devel@nongnu.org>; Fri, 06 Jan 2017 08:16:12 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20170105160701.22118-7-berrange@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="T89K37DrQhlCcaJcuXEpgHUlqcsJ1DXh1"
-Subject: Re: [Qemu-devel] [PATCH 6/8] ui: let VNC server listen on all
- resolved IP addresses
+In-Reply-To: <CAMo8BfJCa63pARSvbQKytpAUFpZdACALpT+xaQV4UOEOnavJgg@mail.gmail.com>
+References: <20170105225210.GA5235@octofox.metropolis>
+	<CAFEAcA-mQPT=pSNTfLqrvuBNX9QYggiMwyoHitV1c5LCVZv-2Q@mail.gmail.com>
+	<CAMo8BfJCa63pARSvbQKytpAUFpZdACALpT+xaQV4UOEOnavJgg@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 6 Jan 2017 16:15:51 +0000
+Message-ID: <CAFEAcA-DEBi1nxwAasCUd3c6kcC6CmEXwRSFg+22N+GJ_YKe=g@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] qemu-softmmu aborted with "Bad ram pointer"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,107 +30,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+To: Max Filippov <jcmvbkbc@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---T89K37DrQhlCcaJcuXEpgHUlqcsJ1DXh1
-From: Eric Blake <eblake@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <83869235-00b3-3417-79ff-28bd2df5df8f@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 6/8] ui: let VNC server listen on all
- resolved IP addresses
-References: <20170105160701.22118-1-berrange@redhat.com>
- <20170105160701.22118-7-berrange@redhat.com>
-In-Reply-To: <20170105160701.22118-7-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 6 January 2017 at 15:24, Max Filippov <jcmvbkbc@gmail.com> wrote:
+> On Fri, Jan 6, 2017 at 2:23 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
+>> On 5 January 2017 at 22:52, Max Filippov <jcmvbkbc@gmail.com> wrote:
+>>> Hello,
+>>>
+>>> debugging XIP kernel running directly from CFI FLASH I've got to a point
+>>> where QEMU aborts with the message "Bad ram pointer 0xbb4".
+>>>
+>>> It turns out that that happens when QEMU tries to translate code from FLASH
+>>> immediately after the kernel has written to the FLASH address range:
+>>> writing to FLASH address range turns off romd_mode of its memory region:
+>>
+>> This sounds like
+>> https://lists.nongnu.org/archive/html/qemu-devel/2016-08/msg03273.html
+>
+> Right. Strange that I haven't found it...
+>
+>> It's a bug that we fail with this unhelpful message and abort,
+>> but the fix to the bug would only cause us to print the more
+>> useful "can't execute from a device" instead. You can't
+>> execute from a ROM that's not in ROMD mode, I'm afraid.
+>
+> Yes, aborting is my main concern.
+> Shouldn't we do something like the following?
+>
+> diff --git a/exec.c b/exec.c
+> index 8d4bb0e..d3f1818 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -381,7 +381,8 @@ static MemoryRegionSection
+> *phys_page_find(PhysPageEntry lp, hwaddr addr,
+>
+>  bool memory_region_is_unassigned(MemoryRegion *mr)
+>  {
+> -    return mr != &io_mem_rom && mr != &io_mem_notdirty && !mr->rom_device
+> +    return mr != &io_mem_rom && mr != &io_mem_notdirty
+> +        && !(mr->rom_device && mr->romd_mode)
+>          && mr != &io_mem_watch;
+>  }
 
-On 01/05/2017 10:06 AM, Daniel P. Berrange wrote:
-> Remove the limitation that the VNC server can only listen on
-> a single resolved IP address. This uses the new DNS resolver
-> API to resolve a SocketAddress struct into an array of
-> SocketAddress structs containing raw IP addresses. The VNC
-> server will then attempt to listen on all resolve IP addresses.
+I think the problem here is that we're trying to put too
+many things into the same get_page_addr_code() condition.
+There are two cases here:
+ (1) we tried to execute from a memory address where there
+     is genuinely no assigned device: we should invoke the
+     CPU's do_unassigned_access hook, which will probably
+     cause an exception
+ (2) we tried to execute from a memory address where there
+     is something there, but it's a device (or in this
+     case a ROM not in ROMD mode): real hardware would make
+     some attempt at executing whatever rubbish the device
+     returned, but we will report_bad_exec() and exit.
 
-s/resolve/resolved/
+But we use the same "if (memory_region_is_unassigned())"
+conditional for both things. The function name suggests
+it checks for case (1) but the actual code is checking
+for case (2) (but forgetting rom-not-in-romd), and the
+calling code is using it for both (1) and (2) simultaneously...
 
-> An error will be returned if it was not possible to listen on
-> all of the IP addresses.
+I think the unassigned-access code is a bit conceptually
+broken and in need of a redesign, which is one reason
+I've never tried to implement the hook for ARM...
 
-s/all/any/ ?  That is, we fail only if we don't get at least one working
-listener, or do we fail if even one listener fails while the other work?
-
->=20
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
->  ui/vnc.c | 52 +++++++++++++++++++++++++++++++++++++++++++---------
->  1 file changed, 43 insertions(+), 9 deletions(-)
->=20
-
-> -    (*lsock_tag)[0] =3D qio_channel_add_watch(
-> -        QIO_CHANNEL((*lsock)[0]),
-> -        G_IO_IN, vnc_listen_io, vd, NULL);
-> +    for (i =3D 0; i < nrawaddrs; i++) {
-> +        QIOChannelSocket *sioc =3D qio_channel_socket_new();
-> +
-> +        qio_channel_set_name(QIO_CHANNEL(sioc), name);
-> +        if (qio_channel_socket_listen_sync(
-> +                sioc, rawaddrs[i], listenerr =3D=3D NULL ? &listenerr =
-: NULL) < 0) {
-> +            continue;
-> +        }
-> +        (*nlsock)++;
-> +        *lsock =3D g_renew(QIOChannelSocket *, *lsock, *nlsock);
-> +        *lsock_tag =3D g_renew(guint, *lsock_tag, *nlsock);
-> +
-> +        (*lsock)[*nlsock - 1] =3D sioc;
-> +        (*lsock_tag)[*nlsock - 1] =3D 0;
-> +    }
-> +
-> +    for (i =3D 0; i < nrawaddrs; i++) {
-> +        qapi_free_SocketAddress(rawaddrs[i]);
-> +    }
-> +    g_free(rawaddrs);
-> +
-> +    if (listenerr) {
-> +        if (*nlsock =3D=3D 0) {
-> +            error_propagate(errp, listenerr);
-> +            return -1;
-> +        } else {
-> +            error_free(listenerr);
-> +        }
-> +    }
-
-Answering my question - you fail only if ALL resolved addresses fail. If
-at least one succeeds, the overall function succeeds.
-
-With the commit message improved,
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---T89K37DrQhlCcaJcuXEpgHUlqcsJ1DXh1
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYb8JSAAoJEKeha0olJ0Nqe1EH/iVrw6bpdr00AmWWMV4ZY8N3
-CNLKBTsbvYiDiq4x9Q4e1UmyPdzB0ifaM3vK6Vh5p7CWiMt6Gwspz5obi8IJg2BG
-C6tToKjsXmQLGMzlPf2av0/f5CqenLjxOP6hh9IUi7QinLMonCEv2ZcXE4g7vCKU
-Brx6P4L5CQz01zlKmwYRCAaShGtk/Nc7QnMpXxSn8PBOsYeAUwCNJIbDBkYst4Ni
-RZdvdVNSWIqOYjWwwefZ/9SPqFBUsnO0FxDC0uzi+ZgKvu65/AO/4CHBOxZYt0Z7
-CIH4/71KEgWNjH1GuLIkVl9YTRzVmciO1vU25WWYot+FNFqxCY7dgUeWpcVGcvs=
-=1jZH
------END PGP SIGNATURE-----
-
---T89K37DrQhlCcaJcuXEpgHUlqcsJ1DXh1--
+thanks
+-- PMM
