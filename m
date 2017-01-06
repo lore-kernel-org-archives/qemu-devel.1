@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57031)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57032)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cPZFo-00037p-QX
+	(envelope-from <dgilbert@redhat.com>) id 1cPZFo-00037w-RR
 	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 13:28:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cPZFm-0004BV-4h
+	(envelope-from <dgilbert@redhat.com>) id 1cPZFn-0004C2-EN
 	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 13:28:40 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59388)
+Received: from mx1.redhat.com ([209.132.183.28]:52548)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cPZFl-0004BI-UJ
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 13:28:38 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cPZFn-0004Bj-81
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 13:28:39 -0500
 Received: from int-mx09.intmail.prod.int.phx2.redhat.com
 	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 19F1561B8E
-	for <qemu-devel@nongnu.org>; Fri,  6 Jan 2017 18:28:38 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 68D4A2E8354
+	for <qemu-devel@nongnu.org>; Fri,  6 Jan 2017 18:28:39 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Fri,  6 Jan 2017 18:28:17 +0000
-Message-Id: <20170106182823.1960-10-dgilbert@redhat.com>
+Date: Fri,  6 Jan 2017 18:28:18 +0000
+Message-Id: <20170106182823.1960-11-dgilbert@redhat.com>
 In-Reply-To: <20170106182823.1960-1-dgilbert@redhat.com>
 References: <20170106182823.1960-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH 09/15] postcopy: Load huge pages in one go
+Subject: [Qemu-devel] [PATCH 10/15] postcopy: Mask fault addresses to huge
+ page boundary
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,62 +35,64 @@ Cc: aarcange@redhat.com
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-The existing postcopy RAM load loop already ensures that it
-glues together whole host-pages from the target page size chunks sent
-over the wire.  Modify the definition of host page that it uses
-to be the RAM block page size and thus be huge pages where appropriate.
+Currently the fault address received by userfault is rounded to
+the host page boundary and a host page is requested from the source.
+Use the current RAMBlock page size instead of the general host page
+size so that for RAMBlocks backed by huge pages we request the whole
+huge page.
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- migration/ram.c | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
+ include/exec/memory.h    | 1 -
+ migration/postcopy-ram.c | 7 +++----
+ 2 files changed, 3 insertions(+), 5 deletions(-)
 
-diff --git a/migration/ram.c b/migration/ram.c
-index ebcf740..9c9e8a2 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -2395,7 +2395,7 @@ static int ram_load_postcopy(QEMUFile *f)
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index 64560f6..b9e877c 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -1610,7 +1610,6 @@ MemTxResult address_space_read_continue(AddressSpace *as, hwaddr addr,
+ MemTxResult address_space_read_full(AddressSpace *as, hwaddr addr,
+                                     MemTxAttrs attrs, uint8_t *buf, int len);
+ void *qemu_map_ram_ptr(RAMBlock *ram_block, ram_addr_t addr);
+-
+ static inline bool memory_access_is_direct(MemoryRegion *mr, bool is_write)
  {
-     int flags = 0, ret = 0;
-     bool place_needed = false;
--    bool matching_page_sizes = qemu_host_page_size == TARGET_PAGE_SIZE;
-+    bool matching_page_sizes = false;
-     MigrationIncomingState *mis = migration_incoming_get_current();
-     /* Temporary page that is later 'placed' */
-     void *postcopy_host_page = postcopy_get_tmp_page(mis);
-@@ -2425,8 +2425,11 @@ static int ram_load_postcopy(QEMUFile *f)
-                 ret = -EINVAL;
-                 break;
-             }
-+            matching_page_sizes = block->page_size == TARGET_PAGE_SIZE;
-             /*
--             * Postcopy requires that we place whole host pages atomically.
-+             * Postcopy requires that we place whole host pages atomically;
-+             * these may be huge pages for RAMBlocks that are backed by
-+             * hugetlbfs.
-              * To make it atomic, the data is read into a temporary page
-              * that's moved into place later.
-              * The migration protocol uses,  possibly smaller, target-pages
-@@ -2434,9 +2437,9 @@ static int ram_load_postcopy(QEMUFile *f)
-              * of a host page in order.
-              */
-             page_buffer = postcopy_host_page +
--                          ((uintptr_t)host & ~qemu_host_page_mask);
-+                          ((uintptr_t)host & (block->page_size - 1));
-             /* If all TP are zero then we can optimise the place */
--            if (!((uintptr_t)host & ~qemu_host_page_mask)) {
-+            if (!((uintptr_t)host & (block->page_size - 1))) {
-                 all_zero = true;
-             } else {
-                 /* not the 1st TP within the HP */
-@@ -2454,7 +2457,7 @@ static int ram_load_postcopy(QEMUFile *f)
-              * page
-              */
-             place_needed = (((uintptr_t)host + TARGET_PAGE_SIZE) &
--                                     ~qemu_host_page_mask) == 0;
-+                                     (block->page_size - 1)) == 0;
-             place_source = postcopy_host_page;
+     if (is_write) {
+diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+index 4c736d2..03cbd6e 100644
+--- a/migration/postcopy-ram.c
++++ b/migration/postcopy-ram.c
+@@ -403,7 +403,6 @@ static void *postcopy_ram_fault_thread(void *opaque)
+     MigrationIncomingState *mis = opaque;
+     struct uffd_msg msg;
+     int ret;
+-    size_t hostpagesize = getpagesize();
+     RAMBlock *rb = NULL;
+     RAMBlock *last_rb = NULL; /* last RAMBlock we sent part of */
+ 
+@@ -470,7 +469,7 @@ static void *postcopy_ram_fault_thread(void *opaque)
+             break;
          }
-         last_host = host;
+ 
+-        rb_offset &= ~(hostpagesize - 1);
++        rb_offset &= ~(qemu_ram_pagesize(rb) - 1);
+         trace_postcopy_ram_fault_thread_request(msg.arg.pagefault.address,
+                                                 qemu_ram_get_idstr(rb),
+                                                 rb_offset);
+@@ -482,11 +481,11 @@ static void *postcopy_ram_fault_thread(void *opaque)
+         if (rb != last_rb) {
+             last_rb = rb;
+             migrate_send_rp_req_pages(mis, qemu_ram_get_idstr(rb),
+-                                     rb_offset, hostpagesize);
++                                     rb_offset, qemu_ram_pagesize(rb));
+         } else {
+             /* Save some space */
+             migrate_send_rp_req_pages(mis, NULL,
+-                                     rb_offset, hostpagesize);
++                                     rb_offset, qemu_ram_pagesize(rb));
+         }
+     }
+     trace_postcopy_ram_fault_thread_exit();
 -- 
 2.9.3
