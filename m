@@ -1,19 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40579)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42445)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cPYIF-0005wF-Uu
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 12:27:08 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cPYPI-0003LC-GL
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 12:34:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cPYIF-0004Pj-12
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 12:27:07 -0500
-Resent-Message-Id: <E1cPYIF-0004Pj-12@eggs.gnu.org>
-In-Reply-To: <20170106162116.12859-1-kirkseraph@gmail.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <148372361252.199.14478591434551054669@790289a7ca88>
+	(envelope-from <peter.maydell@linaro.org>) id 1cPYPH-0007Fx-Ml
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 12:34:24 -0500
+Received: from mail-ua0-x231.google.com ([2607:f8b0:400c:c08::231]:33181)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cPYPH-0007Fg-Hy
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 12:34:23 -0500
+Received: by mail-ua0-x231.google.com with SMTP id i68so307740239uad.0
+	for <qemu-devel@nongnu.org>; Fri, 06 Jan 2017 09:34:21 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 6 Jan 2017 09:26:53 -0800 (PST)
+In-Reply-To: <20170106162116.12859-1-kirkseraph@gmail.com>
+References: <20170106162116.12859-1-kirkseraph@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 6 Jan 2017 17:34:00 +0000
+Message-ID: <CAFEAcA_S-83pQVS-LJMWDzVu0Zk3+kpYZ2uZahkpDaeNAgaHCA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Subject: Re: [Qemu-devel] [PATCHv2] target-arm/abi32: check for segfault in
  do_kernel_trap
 List-Id: <qemu-devel.nongnu.org>
@@ -24,39 +29,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kirkseraph@gmail.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, qemu-arm@nongnu.org
+To: Seraphime Kirkovski <kirkseraph@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>
 
-SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQQVRDSHYyXSB0YXJnZXQtYXJtL2FiaTMyOiBjaGVjayBmb3Igc2VnZmF1bHQgaW4g
-ZG9fa2VybmVsX3RyYXAKTWVzc2FnZS1pZDogMjAxNzAxMDYxNjIxMTYuMTI4NTktMS1raXJrc2Vy
-YXBoQGdtYWlsLmNvbQpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEv
-YmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4u
-IHwgd2MgLWwpCmZhaWxlZD0wCgojIFVzZWZ1bCBnaXQgb3B0aW9ucwpnaXQgY29uZmlnIC0tbG9j
-YWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1
-ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9y
-IGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQo
-Z2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1m
-b3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4K
-ICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUK
-CmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTlj
-MjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9w
-YXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMTcwMTA2
-MTYyMTE2LjEyODU5LTEta2lya3NlcmFwaEBnbWFpbC5jb20gLT4gcGF0Y2hldy8yMDE3MDEwNjE2
-MjExNi4xMjg1OS0xLWtpcmtzZXJhcGhAZ21haWwuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5j
-aCAndGVzdCcKOGVhMzA2MiB0YXJnZXQtYXJtL2FiaTMyOiBjaGVjayBmb3Igc2VnZmF1bHQgaW4g
-ZG9fa2VybmVsX3RyYXAKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTog
-dGFyZ2V0LWFybS9hYmkzMjogY2hlY2sgZm9yIHNlZ2ZhdWx0IGluIGRvX2tlcm5lbF90cmFwLi4u
-CkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0
-ZW1lbnQKIzU2OiBGSUxFOiBsaW51eC11c2VyL21haW4uYzo1MTc6CisgICAgaWYgKGdldF91c2Vy
-X3UzMih2YWwsIGFkZHIpKQpbLi4uXQoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZv
-ciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojNjA6IEZJTEU6IGxpbnV4LXVzZXIvbWFpbi5j
-OjUyMToKKyAgICAgICAgaWYgKHB1dF91c2VyX3UzMih2YWwsIGFkZHIpKQpbLi4uXQoKdG90YWw6
-IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCA5NSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBz
-dHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJl
-IGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNL
-UEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBl
-eGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5
-IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNr
-IHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+On 6 January 2017 at 16:21, Seraphime Kirkovski <kirkseraph@gmail.com> wrote:
+> Currently, the cmpxchg implementation tests whether the destination address
+> is readable:
+>   - if it is, we read the value and continue with the comparison
+>   - if isn't, i.e. access to addr would segfault, we assume that src != dest
+>     rather than queuing a SIGSEGV.
+>
+> The same problem exists in the case where src == dest: the code doesn't
+> check whether put_user_u32 succeeds.
+>
+> This fixes both problems by sending a SIGSEGV when the destination address
+> is inaccessible.
+>
+> Signed-off-by: Seraphime Kirkovski <kirkseraph@gmail.com>
+> ---
+>
+> This accounts for Peter Maydell's remarks.
+> The refactoring here extracts the cmpxchg code from do_kernel_trap in its own
+> function.
+
+As the patchew robot notes, our coding style wants braces on all
+if() statements, even one-line ones. Other than that,
+
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+
+thanks
+-- PMM
