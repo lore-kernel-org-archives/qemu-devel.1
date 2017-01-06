@@ -1,36 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52251)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52280)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cPNoa-0006wb-Vr
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 01:15:52 -0500
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cPNof-0006yN-3d
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 01:15:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cPNoX-0002sq-QX
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 01:15:48 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50988
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cPNoc-0002ty-3h
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 01:15:53 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33483)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
-	id 1cPNoX-0002sM-Jp
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 01:15:45 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	v066Du4q082763
-	for <qemu-devel@nongnu.org>; Fri, 6 Jan 2017 01:15:45 -0500
+	id 1cPNob-0002th-PC
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 01:15:50 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
+	v066DwEx085530
+	for <qemu-devel@nongnu.org>; Fri, 6 Jan 2017 01:15:48 -0500
 Received: from e23smtp09.au.ibm.com (e23smtp09.au.ibm.com [202.81.31.142])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 27t1hv8mwt-1
+	by mx0a-001b2d01.pphosted.com with ESMTP id 27sydqdh85-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 06 Jan 2017 01:15:44 -0500
+	for <qemu-devel@nongnu.org>; Fri, 06 Jan 2017 01:15:48 -0500
 Received: from localhost
 	by e23smtp09.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
-	Fri, 6 Jan 2017 16:15:42 +1000
+	Fri, 6 Jan 2017 16:15:46 +1000
 From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-Date: Fri,  6 Jan 2017 11:44:46 +0530
+Date: Fri,  6 Jan 2017 11:44:47 +0530
 In-Reply-To: <1483683296-32568-1-git-send-email-nikunj@linux.vnet.ibm.com>
 References: <1483683296-32568-1-git-send-email-nikunj@linux.vnet.ibm.com>
-Message-Id: <1483683296-32568-5-git-send-email-nikunj@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v1 04/14] target-ppc: Replace isden by
- float64_is_zero_or_denormal
+Message-Id: <1483683296-32568-6-git-send-email-nikunj@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v1 05/14] target-ppc: Rename
+ helper_compute_fprf to helper_compute_fprf_float64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,44 +43,328 @@ Cc: qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com, nikunj@linux.vnet.ibm.com
 
 From: Bharata B Rao <bharata@linux.vnet.ibm.com>
 
-Replace isden() by float64_is_zero_or_denormal() so that code in
-helper_compute_fprf() can be reused to work with float128 argument.
+Since helper_compute_fprf() works on float64 argument, rename it
+to helper_compute_fprf_float64(). Also use a macro to generate
+helper_compute_fprf_float64() so that float128 version of the same
+helper can be introduced easily later.
 
 Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
 Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/fpu_helper.c | 11 +----------
- 1 file changed, 1 insertion(+), 10 deletions(-)
+ target/ppc/fpu_helper.c            | 121 +++++++++++++++++++------------------
+ target/ppc/helper.h                |   2 +-
+ target/ppc/translate/fp-impl.inc.c |  20 +++---
+ 3 files changed, 73 insertions(+), 70 deletions(-)
 
 diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
-index 4da991a..5a7aa75 100644
+index 5a7aa75..913d54e 100644
 --- a/target/ppc/fpu_helper.c
 +++ b/target/ppc/fpu_helper.c
-@@ -47,15 +47,6 @@ uint32_t helper_float64_to_float32(CPUPPCState *env, uint64_t arg)
-     return f.l;
+@@ -57,54 +57,57 @@ static inline int ppc_float64_get_unbiased_exp(float64 f)
+     return ((f >> 52) & 0x7FF) - 1023;
  }
  
--static inline int isden(float64 d)
+-void helper_compute_fprf(CPUPPCState *env, float64 arg)
 -{
--    CPU_DoubleU u;
+-    int isneg;
+-    int fprf;
 -
--    u.d = d;
--
--    return ((u.ll >> 52) & 0x7FF) == 0;
+-    isneg = float64_is_neg(arg);
+-    if (unlikely(float64_is_any_nan(arg))) {
+-        if (float64_is_signaling_nan(arg, &env->fp_status)) {
+-            /* Signaling NaN: flags are undefined */
+-            fprf = 0x00;
+-        } else {
+-            /* Quiet NaN */
+-            fprf = 0x11;
+-        }
+-    } else if (unlikely(float64_is_infinity(arg))) {
+-        /* +/- infinity */
+-        if (isneg) {
+-            fprf = 0x09;
+-        } else {
+-            fprf = 0x05;
+-        }
+-    } else {
+-        if (float64_is_zero(arg)) {
+-            /* +/- zero */
+-            if (isneg) {
+-                fprf = 0x12;
+-            } else {
+-                fprf = 0x02;
+-            }
+-        } else {
+-            if (float64_is_zero_or_denormal(arg)) {
+-                /* Denormalized numbers */
+-                fprf = 0x10;
+-            } else {
+-                /* Normalized numbers */
+-                fprf = 0x00;
+-            }
+-            if (isneg) {
+-                fprf |= 0x08;
+-            } else {
+-                fprf |= 0x04;
+-            }
+-        }
+-    }
+-    /* We update FPSCR_FPRF */
+-    env->fpscr &= ~(0x1F << FPSCR_FPRF);
+-    env->fpscr |= fprf << FPSCR_FPRF;
 -}
--
- static inline int ppc_float32_get_unbiased_exp(float32 f)
++#define COMPUTE_FPRF(tp)                                       \
++void helper_compute_fprf_##tp(CPUPPCState *env, tp arg)        \
++{                                                              \
++    int isneg;                                                 \
++    int fprf;                                                  \
++                                                               \
++    isneg = tp##_is_neg(arg);                                  \
++    if (unlikely(tp##_is_any_nan(arg))) {                      \
++        if (tp##_is_signaling_nan(arg, &env->fp_status)) {     \
++            /* Signaling NaN: flags are undefined */           \
++            fprf = 0x00;                                       \
++        } else {                                               \
++            /* Quiet NaN */                                    \
++            fprf = 0x11;                                       \
++        }                                                      \
++    } else if (unlikely(tp##_is_infinity(arg))) {              \
++        /* +/- infinity */                                     \
++        if (isneg) {                                           \
++            fprf = 0x09;                                       \
++        } else {                                               \
++            fprf = 0x05;                                       \
++        }                                                      \
++    } else {                                                   \
++        if (tp##_is_zero(arg)) {                               \
++            /* +/- zero */                                     \
++            if (isneg) {                                       \
++                fprf = 0x12;                                   \
++            } else {                                           \
++                fprf = 0x02;                                   \
++            }                                                  \
++        } else {                                               \
++            if (tp##_is_zero_or_denormal(arg)) {               \
++                /* Denormalized numbers */                     \
++                fprf = 0x10;                                   \
++            } else {                                           \
++                /* Normalized numbers */                       \
++                fprf = 0x00;                                   \
++            }                                                  \
++            if (isneg) {                                       \
++                fprf |= 0x08;                                  \
++            } else {                                           \
++                fprf |= 0x04;                                  \
++            }                                                  \
++        }                                                      \
++    }                                                          \
++    /* We update FPSCR_FPRF */                                 \
++    env->fpscr &= ~(0x1F << FPSCR_FPRF);                       \
++    env->fpscr |= fprf << FPSCR_FPRF;                          \
++}
++
++COMPUTE_FPRF(float64)
+ 
+ /* Floating-point invalid operations exception */
+ static inline __attribute__((__always_inline__))
+@@ -1808,7 +1811,7 @@ void helper_##name(CPUPPCState *env, uint32_t opcode)                        \
+         }                                                                    \
+                                                                              \
+         if (sfprf) {                                                         \
+-            helper_compute_fprf(env, xt.fld);                                \
++            helper_compute_fprf_float64(env, xt.fld);                        \
+         }                                                                    \
+     }                                                                        \
+     putVSR(xT(opcode), &xt, env);                                            \
+@@ -1863,7 +1866,7 @@ void helper_##op(CPUPPCState *env, uint32_t opcode)                          \
+         }                                                                    \
+                                                                              \
+         if (sfprf) {                                                         \
+-            helper_compute_fprf(env, xt.fld);                                \
++            helper_compute_fprf_float64(env, xt.fld);                        \
+         }                                                                    \
+     }                                                                        \
+                                                                              \
+@@ -1917,7 +1920,7 @@ void helper_##op(CPUPPCState *env, uint32_t opcode)                           \
+         }                                                                     \
+                                                                               \
+         if (sfprf) {                                                          \
+-            helper_compute_fprf(env, xt.fld);                                 \
++            helper_compute_fprf_float64(env, xt.fld);                         \
+         }                                                                     \
+     }                                                                         \
+                                                                               \
+@@ -1958,7 +1961,7 @@ void helper_##op(CPUPPCState *env, uint32_t opcode)                           \
+         }                                                                     \
+                                                                               \
+         if (sfprf) {                                                          \
+-            helper_compute_fprf(env, xt.fld);                                 \
++            helper_compute_fprf_float64(env, xt.fld);                         \
+         }                                                                     \
+     }                                                                         \
+                                                                               \
+@@ -2007,7 +2010,7 @@ void helper_##op(CPUPPCState *env, uint32_t opcode)                          \
+         }                                                                    \
+                                                                              \
+         if (sfprf) {                                                         \
+-            helper_compute_fprf(env, xt.fld);                                \
++            helper_compute_fprf_float64(env, xt.fld);                        \
+         }                                                                    \
+     }                                                                        \
+                                                                              \
+@@ -2057,7 +2060,7 @@ void helper_##op(CPUPPCState *env, uint32_t opcode)                          \
+         }                                                                    \
+                                                                              \
+         if (sfprf) {                                                         \
+-            helper_compute_fprf(env, xt.fld);                                \
++            helper_compute_fprf_float64(env, xt.fld);                        \
+         }                                                                    \
+     }                                                                        \
+                                                                              \
+@@ -2257,7 +2260,7 @@ void helper_##op(CPUPPCState *env, uint32_t opcode)                           \
+         }                                                                     \
+                                                                               \
+         if (sfprf) {                                                          \
+-            helper_compute_fprf(env, xt_out.fld);                             \
++            helper_compute_fprf_float64(env, xt_out.fld);                     \
+         }                                                                     \
+     }                                                                         \
+     putVSR(xT(opcode), &xt_out, env);                                         \
+@@ -2647,7 +2650,7 @@ void helper_##op(CPUPPCState *env, uint32_t opcode)                \
+             xt.tfld = ttp##_snan_to_qnan(xt.tfld);                 \
+         }                                                          \
+         if (sfprf) {                                               \
+-            helper_compute_fprf(env, ttp##_to_float64(xt.tfld,     \
++            helper_compute_fprf_float64(env, ttp##_to_float64(xt.tfld, \
+                                 &env->fp_status));                 \
+         }                                                          \
+     }                                                              \
+@@ -2758,7 +2761,7 @@ void helper_##op(CPUPPCState *env, uint32_t opcode)                     \
+             xt.tfld = helper_frsp(env, xt.tfld);                        \
+         }                                                               \
+         if (sfprf) {                                                    \
+-            helper_compute_fprf(env, xt.tfld);                          \
++            helper_compute_fprf_float64(env, xt.tfld);                  \
+         }                                                               \
+     }                                                                   \
+                                                                         \
+@@ -2814,7 +2817,7 @@ void helper_##op(CPUPPCState *env, uint32_t opcode)                    \
+             xt.fld = tp##_round_to_int(xb.fld, &env->fp_status);       \
+         }                                                              \
+         if (sfprf) {                                                   \
+-            helper_compute_fprf(env, xt.fld);                          \
++            helper_compute_fprf_float64(env, xt.fld);                  \
+         }                                                              \
+     }                                                                  \
+                                                                        \
+@@ -2854,7 +2857,7 @@ uint64_t helper_xsrsp(CPUPPCState *env, uint64_t xb)
+ 
+     uint64_t xt = helper_frsp(env, xb);
+ 
+-    helper_compute_fprf(env, xt);
++    helper_compute_fprf_float64(env, xt);
+     float_check_status(env);
+     return xt;
+ }
+diff --git a/target/ppc/helper.h b/target/ppc/helper.h
+index 6c5b194..04e688d 100644
+--- a/target/ppc/helper.h
++++ b/target/ppc/helper.h
+@@ -61,7 +61,7 @@ DEF_HELPER_FLAGS_2(brinc, TCG_CALL_NO_RWG_SE, tl, tl, tl)
+ 
+ DEF_HELPER_1(float_check_status, void, env)
+ DEF_HELPER_1(reset_fpstatus, void, env)
+-DEF_HELPER_2(compute_fprf, void, env, i64)
++DEF_HELPER_2(compute_fprf_float64, void, env, i64)
+ DEF_HELPER_3(store_fpscr, void, env, i64, i32)
+ DEF_HELPER_2(fpscr_clrbit, void, env, i32)
+ DEF_HELPER_2(fpscr_setbit, void, env, i32)
+diff --git a/target/ppc/translate/fp-impl.inc.c b/target/ppc/translate/fp-impl.inc.c
+index 872af7b..2fbd4d4 100644
+--- a/target/ppc/translate/fp-impl.inc.c
++++ b/target/ppc/translate/fp-impl.inc.c
+@@ -9,9 +9,9 @@ static inline void gen_reset_fpstatus(void)
+     gen_helper_reset_fpstatus(cpu_env);
+ }
+ 
+-static inline void gen_compute_fprf(TCGv_i64 arg)
++static inline void gen_compute_fprf_float64(TCGv_i64 arg)
  {
-     return ((f >> 23) & 0xFF) - 127;
-@@ -96,7 +87,7 @@ void helper_compute_fprf(CPUPPCState *env, float64 arg)
-                 fprf = 0x02;
-             }
-         } else {
--            if (isden(arg)) {
-+            if (float64_is_zero_or_denormal(arg)) {
-                 /* Denormalized numbers */
-                 fprf = 0x10;
-             } else {
+-    gen_helper_compute_fprf(cpu_env, arg);
++    gen_helper_compute_fprf_float64(cpu_env, arg);
+     gen_helper_float_check_status(cpu_env);
+ }
+ 
+@@ -47,7 +47,7 @@ static void gen_f##name(DisasContext *ctx)                                    \
+                         cpu_fpr[rD(ctx->opcode)]);                            \
+     }                                                                         \
+     if (set_fprf) {                                                           \
+-        gen_compute_fprf(cpu_fpr[rD(ctx->opcode)]);                           \
++        gen_compute_fprf_float64(cpu_fpr[rD(ctx->opcode)]);                   \
+     }                                                                         \
+     if (unlikely(Rc(ctx->opcode) != 0)) {                                     \
+         gen_set_cr1_from_fpscr(ctx);                                          \
+@@ -74,7 +74,7 @@ static void gen_f##name(DisasContext *ctx)                                    \
+                         cpu_fpr[rD(ctx->opcode)]);                            \
+     }                                                                         \
+     if (set_fprf) {                                                           \
+-        gen_compute_fprf(cpu_fpr[rD(ctx->opcode)]);                           \
++        gen_compute_fprf_float64(cpu_fpr[rD(ctx->opcode)]);                   \
+     }                                                                         \
+     if (unlikely(Rc(ctx->opcode) != 0)) {                                     \
+         gen_set_cr1_from_fpscr(ctx);                                          \
+@@ -100,7 +100,7 @@ static void gen_f##name(DisasContext *ctx)                                    \
+                         cpu_fpr[rD(ctx->opcode)]);                            \
+     }                                                                         \
+     if (set_fprf) {                                                           \
+-        gen_compute_fprf(cpu_fpr[rD(ctx->opcode)]);                           \
++        gen_compute_fprf_float64(cpu_fpr[rD(ctx->opcode)]);                   \
+     }                                                                         \
+     if (unlikely(Rc(ctx->opcode) != 0)) {                                     \
+         gen_set_cr1_from_fpscr(ctx);                                          \
+@@ -121,7 +121,7 @@ static void gen_f##name(DisasContext *ctx)                                    \
+     gen_helper_f##name(cpu_fpr[rD(ctx->opcode)], cpu_env,                     \
+                        cpu_fpr[rB(ctx->opcode)]);                             \
+     if (set_fprf) {                                                           \
+-        gen_compute_fprf(cpu_fpr[rD(ctx->opcode)]);                           \
++        gen_compute_fprf_float64(cpu_fpr[rD(ctx->opcode)]);                   \
+     }                                                                         \
+     if (unlikely(Rc(ctx->opcode) != 0)) {                                     \
+         gen_set_cr1_from_fpscr(ctx);                                          \
+@@ -139,7 +139,7 @@ static void gen_f##name(DisasContext *ctx)                                    \
+     gen_helper_f##name(cpu_fpr[rD(ctx->opcode)], cpu_env,                     \
+                        cpu_fpr[rB(ctx->opcode)]);                             \
+     if (set_fprf) {                                                           \
+-        gen_compute_fprf(cpu_fpr[rD(ctx->opcode)]);                           \
++        gen_compute_fprf_float64(cpu_fpr[rD(ctx->opcode)]);                   \
+     }                                                                         \
+     if (unlikely(Rc(ctx->opcode) != 0)) {                                     \
+         gen_set_cr1_from_fpscr(ctx);                                          \
+@@ -174,7 +174,7 @@ static void gen_frsqrtes(DisasContext *ctx)
+                        cpu_fpr[rB(ctx->opcode)]);
+     gen_helper_frsp(cpu_fpr[rD(ctx->opcode)], cpu_env,
+                     cpu_fpr[rD(ctx->opcode)]);
+-    gen_compute_fprf(cpu_fpr[rD(ctx->opcode)]);
++    gen_compute_fprf_float64(cpu_fpr[rD(ctx->opcode)]);
+     if (unlikely(Rc(ctx->opcode) != 0)) {
+         gen_set_cr1_from_fpscr(ctx);
+     }
+@@ -196,7 +196,7 @@ static void gen_fsqrt(DisasContext *ctx)
+     gen_reset_fpstatus();
+     gen_helper_fsqrt(cpu_fpr[rD(ctx->opcode)], cpu_env,
+                      cpu_fpr[rB(ctx->opcode)]);
+-    gen_compute_fprf(cpu_fpr[rD(ctx->opcode)]);
++    gen_compute_fprf_float64(cpu_fpr[rD(ctx->opcode)]);
+     if (unlikely(Rc(ctx->opcode) != 0)) {
+         gen_set_cr1_from_fpscr(ctx);
+     }
+@@ -213,7 +213,7 @@ static void gen_fsqrts(DisasContext *ctx)
+                      cpu_fpr[rB(ctx->opcode)]);
+     gen_helper_frsp(cpu_fpr[rD(ctx->opcode)], cpu_env,
+                     cpu_fpr[rD(ctx->opcode)]);
+-    gen_compute_fprf(cpu_fpr[rD(ctx->opcode)]);
++    gen_compute_fprf_float64(cpu_fpr[rD(ctx->opcode)]);
+     if (unlikely(Rc(ctx->opcode) != 0)) {
+         gen_set_cr1_from_fpscr(ctx);
+     }
 -- 
 2.7.4
