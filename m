@@ -1,34 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51766)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57431)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cPVJG-0007uv-5c
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 09:15:59 -0500
+	(envelope-from <kirkseraph@gmail.com>) id 1cPVcI-000753-4f
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 09:35:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cPVJD-00024m-11
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 09:15:58 -0500
-Received: from indium.canonical.com ([91.189.90.7]:60939)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cPVJC-00023z-RV
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 09:15:54 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cPVJB-0003xp-BY
-	for <qemu-devel@nongnu.org>; Fri, 06 Jan 2017 14:15:53 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id E8CCD2E819C
-	for <qemu-devel@nongnu.org>; Fri,  6 Jan 2017 14:15:48 +0000 (UTC)
+	(envelope-from <kirkseraph@gmail.com>) id 1cPVcD-000607-Fj
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 09:35:38 -0500
+Date: Fri, 6 Jan 2017 15:35:27 +0100
+From: Seraphime Kirkovski <kirkseraph@gmail.com>
+Message-ID: <20170106143527.sdto622nm6hflp5b@roojbos.sk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 06 Jan 2017 13:57:23 -0000
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Reply-To: Bug 1399943 <1399943@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20141206152602.26252.40483.malonedeb@gac.canonical.com>
-Message-Id: <20170106135723.27309.84850.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1399943] Re: qemu-system-sparc loses serial
- console data on EAGAIN
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Subject: Re: [Qemu-devel] [RESEND PATCH] target-arm/abi32: check for
+ segfault in do_kernel_trap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,55 +21,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>, qemu-arm <qemu-arm@nongnu.org>
 
-Fix confirmed in QEMU 2.8 release.
+<riku.voipio@iki.fi>,qemu-arm <qemu-arm@nongnu.org>
+Bcc:
+Subject: Re: [Qemu-devel] [RESEND PATCH] target-arm/abi32: check for 
+segfault in do_kernel_trap
+Reply-To: In-Reply-To: 
+<CAFEAcA-9aYRHcn1dAD0xuR9H8sJ__HOK9ayWmsK7H-Cr2rj4SQ@mail.gmail.com>
 
-** Changed in: qemu
-       Status: New =3D> Fix Released
+Hi Peter,
+thanks for the feedback.
 
--- =
+On Thu, Jan 05, 2017 at 02:42:38PM +0000, Peter Maydell wrote:
+> If you compare what happens with this segv code with
+> what happens for the segvs detected inside
+> arm_kernel_cmpxchg64_helper(), there's a difference.
+> With this code we will queue the signal and then return,
+> skipping the code which updates env->regs[15] and env->thumb.
+> The existing codepath for cmpxchg64 doesn't skip that code.
+> The effect is that for cmpxchg64 the SEGV signal handler
+> will see a PC pointing at the call into the kernel commpage,
+> whereas for this code it will see the PC actually in the
+> kernel commpage.
+> 
+> I'm not sure which of these options is the best choice,
+> but I do think we should be consistent.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1399943
+I think it would be safer to keep the current behaviour.
 
-Title:
-  qemu-system-sparc loses serial console data on EAGAIN
+In terms of implementation, I find it would be better to extract the 
+__kernel_cmpxchg code in a separate function. On the one hand, this 
+would avoid code duplication or strange gotos and make do_kernel_trap
+more readable. On the other hand, this would clutter a bit git history.
+If it is acceptable, I will send a patch with those changes. If not, 
+will try to find a cleaner solution without creating new functions.
 
-Status in QEMU:
-  Fix Released
-
-Bug description:
-  When running a guest OS with a serial console under =
-
-  "qemu-system-sparc -nographic", parts of the serial console output
-  are sometimes lost.
-
-  This happens when a write() to standard output by qemu returns EAGAIN,
-  as may be the case when the guest is generating console output faster
-  than the tty (or pty/pipe/socket, etc.) connected to qemu's standard
-  output accepts it. The bug affects all releases of qemu since 1.5,
-  which was the first version to set stdout to O_NONBLOCK mode. Version
-  1.4.2 and earlier work correctly.
-
-  To reproduce the bug, you will need a guest OS configured with a
-  serial console, and a host with a slow tty.  The attached shell script
-  "sparc-test.sh" does this by using Aboriginal Linux as the serial
-  console guest, and a pty controlled by a Python script and the
-  "pexpect" Python module as the slow tty. A "seq" command is sent
-  to the guest to generate 100,000 lines of output containing sequential
-  integers, and the output is checked for gaps. The script limits the
-  tty output rate by occasionally sleeping for 1/10 of a second.
-
-  This bug was originally reported against qemu-system-i386 as =
-
-  bug #1335444, and has since been fixed in qemu-system-i386,
-  but remains in qemu-system-sparc as of today's git sources =
-
-  (d00e6cddc220de993573dfb5fd160ac72ccd49ab).  I am opening
-  this separate bug for the sparc case because I was asked
-  to do so by Paolo Bonzini in #1335444.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1399943/+subscriptions
+Cheers,
+Seraphime Kirkovski
