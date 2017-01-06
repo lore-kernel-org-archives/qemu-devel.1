@@ -1,20 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41737)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41963)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cPaOZ-0008Qg-F5
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 14:41:48 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1cPaPI-00014Z-Q5
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 14:42:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cPaOW-0003GI-Pa
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 14:41:47 -0500
-Date: Fri, 6 Jan 2017 21:41:41 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170106214052-mutt-send-email-mst@kernel.org>
-References: <20170106050451.11793-1-david@gibson.dropbear.id.au>
-	<53dcb2da-fa15-63b0-5849-325b6edcac83@redhat.com>
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1cPaPG-0003X2-8s
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 14:42:32 -0500
+Received: from chuckie.co.uk ([82.165.15.123]:52402
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1cPaPG-0003W9-1b
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 14:42:30 -0500
+References: <bd0ad06c-1dce-03c9-73b0-d8d6e4ca333b@roeck-us.net>
+	<4b04ec32-b647-5047-7830-269cfc217550@ilande.co.uk>
+	<3bee832c-1d2a-50a2-a763-c58ab34caf08@roeck-us.net>
+	<3a90611b-a7c4-31c4-b373-3a16ddae5f4c@ilande.co.uk>
+	<20170106183436.GA19862@roeck-us.net>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <ea13ef16-ff0d-024f-2fa3-5cc11fa5f777@ilande.co.uk>
+Date: Fri, 6 Jan 2017 19:42:19 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <53dcb2da-fa15-63b0-5849-325b6edcac83@redhat.com>
-Subject: Re: [Qemu-devel] [RFC] pxb: Restrict to x86
+In-Reply-To: <20170106183436.GA19862@roeck-us.net>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Problems with qemu "modern" virtio on sparc64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,75 +32,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, ehabkost@redhat.com, thuth@redhat.com, lvivier@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Guenter Roeck <linux@roeck-us.net>
+Cc: "qemu-devel@nongnu.org >> QEMU Developers" <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
 
-On Fri, Jan 06, 2017 at 08:13:11AM +0200, Marcel Apfelbaum wrote:
-> On 01/06/2017 07:04 AM, David Gibson wrote:
-> > The PCI Expander Bridge (PXB) device is essentially a hack to allow
-> > different PCIe devices to be assigned to different NUMA nodes on x86.  Each
-> > PXB is sort-of a separate PCI host bridge, except that its config space
-> > is shared with the config space of the main PCI host bridge, rather than
-> > being independent.
-> > 
-> 
-> Hi David,
-> 
-> > This is only necessary if the platform doesn't (easily) allow truly
-> > independent PCI host bridges.  AFAIK that's just x86.
-> > 
-> 
-> Indeed, it is possible to support independent PCI host bridges on x86 by
-> using a separate MMCONFIG space for each one and enable separate PCI domains.
-> We simply didn't need this until now, but maybe will be implemented it in the future.
+On 06/01/17 18:34, Guenter Roeck wrote:
 
-In fact I would say that's the cleanest way to do this on q35.
+> On Fri, Jan 06, 2017 at 05:04:58PM +0000, Mark Cave-Ayland wrote:
+>> On 30/12/16 19:57, Guenter Roeck wrote:
+>>
+>> Disabling "modern" mode enables boot to proceed as normal:
+>>
+>> $ ./qemu-system-sparc64 \
+>> -drive
+>> file=debian-9.0-sparc64-NETINST1.iso,if=none,index=0,id=cd,media=cdrom \
+>> -device virtio-blk-pci,disable-modern=on,drive=cd \
+>> -nographic \
+>> -bios openbios-builtin.elf.nostrip \
+>> -m 256
+>>
+> ...
+>>
+>> Guenter, can you try a similar command line and confirm whether it fixes
+>> the issue for you under QEMU 2.7 and 2.8? I have no idea as to why the
+>> difference in legacy/non-legacy codepaths should crash the kernel though.
+>>
+> Unfortunately, my qemu command line wizard capabilities are somewhat lacking.
+> I had tried that before, but just could not figure out how to change my command
+> line to include "disable-modern=on". If you have an idea, please let me know.
+> Here it is:
+> 
+> ${QEMU} -M ${mach} -cpu "${cpu}" -m 512 \
+> 	        -drive file=${rootfs},if=virtio \
+> 		-net nic,model=virtio \
+> 		-kernel arch/sparc/boot/image -no-reboot \
+> 		-append "root=/dev/vda init=/sbin/init.sh console=ttyS0" \
+> 		-nographic 
 
-> > This patch makes it possible to configure PXB out of the build, and adjusts
-> > the default configs so it's only included on x86 targets.
-> > 
-> 
-> Makes sense
-> 
-> Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
-> 
-> Thanks,
-> Marcel
-> 
-> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > ---
-> >  default-configs/i386-softmmu.mak   | 1 +
-> >  default-configs/x86_64-softmmu.mak | 1 +
-> >  hw/pci-bridge/Makefile.objs        | 2 +-
-> >  3 files changed, 3 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
-> > index 0b51360..6c52d26 100644
-> > --- a/default-configs/i386-softmmu.mak
-> > +++ b/default-configs/i386-softmmu.mak
-> > @@ -56,3 +56,4 @@ CONFIG_IOH3420=y
-> >  CONFIG_I82801B11=y
-> >  CONFIG_SMBIOS=y
-> >  CONFIG_HYPERV_TESTDEV=$(CONFIG_KVM)
-> > +CONFIG_PXB=y
-> > diff --git a/default-configs/x86_64-softmmu.mak b/default-configs/x86_64-softmmu.mak
-> > index 7f89503..2d0341c 100644
-> > --- a/default-configs/x86_64-softmmu.mak
-> > +++ b/default-configs/x86_64-softmmu.mak
-> > @@ -56,3 +56,4 @@ CONFIG_IOH3420=y
-> >  CONFIG_I82801B11=y
-> >  CONFIG_SMBIOS=y
-> >  CONFIG_HYPERV_TESTDEV=$(CONFIG_KVM)
-> > +CONFIG_PXB=y
-> > diff --git a/hw/pci-bridge/Makefile.objs b/hw/pci-bridge/Makefile.objs
-> > index f2adfe3..5612bd7 100644
-> > --- a/hw/pci-bridge/Makefile.objs
-> > +++ b/hw/pci-bridge/Makefile.objs
-> > @@ -1,5 +1,5 @@
-> >  common-obj-y += pci_bridge_dev.o
-> > -common-obj-y += pci_expander_bridge.o
-> > +common-obj-$(CONFIG_PXB) += pci_expander_bridge.o
-> >  common-obj-$(CONFIG_XIO3130) += xio3130_upstream.o xio3130_downstream.o
-> >  common-obj-$(CONFIG_IOH3420) += ioh3420.o
-> >  common-obj-$(CONFIG_I82801B11) += i82801b11.o
-> > 
+If you apply the same principles from my example above to your command
+line then you should end up with something like:
+
+${QEMU} -M ${mach} -cpu "${cpu}" -m 512 \
+        -drive file=${rootfs},if=none,id=hd \
+	-device virtio-blk-pci,disable-modern=on,drive=hd \
+	-net nic,model=virtio \
+	-kernel arch/sparc/boot/image -no-reboot \
+	-append "root=/dev/vda init=/sbin/init.sh console=ttyS0" \
+	-nographic
+
+
+ATB,
+
+Mark.
