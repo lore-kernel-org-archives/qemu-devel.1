@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33080)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33106)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mar.krzeminski@gmail.com>) id 1cPZaT-0004dl-Hn
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 13:50:02 -0500
+	(envelope-from <mar.krzeminski@gmail.com>) id 1cPZaU-0004fn-O6
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 13:50:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mar.krzeminski@gmail.com>) id 1cPZaR-0006cN-Tw
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 13:50:01 -0500
+	(envelope-from <mar.krzeminski@gmail.com>) id 1cPZaT-0006d6-UA
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 13:50:02 -0500
 From: Marcin Krzeminski <mar.krzeminski@gmail.com>
-Date: Fri,  6 Jan 2017 19:49:46 +0100
-Message-Id: <20170106184948.3422-2-mar.krzeminski@gmail.com>
+Date: Fri,  6 Jan 2017 19:49:48 +0100
+Message-Id: <20170106184948.3422-4-mar.krzeminski@gmail.com>
 In-Reply-To: <20170106184948.3422-1-mar.krzeminski@gmail.com>
 References: <20170106184948.3422-1-mar.krzeminski@gmail.com>
-Subject: [Qemu-devel] [PATCH v2 1/3] block: m25p80: Add Quad Page Program
- 4byte
+Subject: [Qemu-devel] [PATCH v2 3/3] block: m25p80: Improve 1GiB Micron
+ flash definition
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,51 +23,32 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, edgar.iglesias@xilinx.com
 Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, clg@kaod.org
 
-Some flash chips have additional page program opcode that
-takes only 4 byte address. This commit adds support
-for such command in Qemu.
+n25q00 and mt25q01 devices share the same JEDEC ID. The difference
+between those two devices is number of dies and one bit in extended
+JEDEC bytes. This commit adds proper entry for both devices by
+introduction the number of dies and and new 25q00 entries.
 
 Signed-off-by: Marcin Krzeminski <mar.krzeminski@gmail.com>
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 ---
- hw/block/m25p80.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ hw/block/m25p80.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/hw/block/m25p80.c b/hw/block/m25p80.c
-index e3c1166..6dff81b 100644
+index b065ddc..15ec0fd 100644
 --- a/hw/block/m25p80.c
 +++ b/hw/block/m25p80.c
-@@ -326,6 +326,7 @@ typedef enum {
-     PP4_4 = 0x3e,
-     DPP = 0xa2,
-     QPP = 0x32,
-+    QPP_4 = 0x34,
+@@ -242,8 +242,10 @@ static const FlashPartInfo known_devices[] = {
+     { INFO("n25q128",     0x20ba18,      0,  64 << 10, 256, 0) },
+     { INFO("n25q256a",    0x20ba19,      0,  64 << 10, 512, ER_4K) },
+     { INFO("n25q512a",    0x20ba20,      0,  64 << 10, 1024, ER_4K) },
+-    { INFO("mt25ql01g",   0x20ba21,      0,  64 << 10, 2048, ER_4K) },
+-    { INFO("mt25qu01g",   0x20bb21,      0,  64 << 10, 2048, ER_4K) },
++    { INFO_STACKED("n25q00",    0x20ba21, 0x1000, 64 << 10, 2048, ER_4K, 4) },
++    { INFO_STACKED("n25q00a",   0x20bb21, 0x1000, 64 << 10, 2048, ER_4K, 4) },
++    { INFO_STACKED("mt25ql01g", 0x20ba21, 0x1040, 64 << 10, 2048, ER_4K, 2) },
++    { INFO_STACKED("mt25qu01g", 0x20bb21, 0x1040, 64 << 10, 2048, ER_4K, 2) },
  
-     ERASE_4K = 0x20,
-     ERASE4_4K = 0x21,
-@@ -574,6 +575,7 @@ static inline int get_addr_length(Flash *s)
-    switch (s->cmd_in_progress) {
-    case PP4:
-    case PP4_4:
-+   case QPP_4:
-    case READ4:
-    case QIOR4:
-    case ERASE4_4K:
-@@ -607,6 +609,7 @@ static void complete_collecting_data(Flash *s)
-     switch (s->cmd_in_progress) {
-     case DPP:
-     case QPP:
-+    case QPP_4:
-     case PP:
-     case PP4:
-     case PP4_4:
-@@ -874,6 +877,7 @@ static void decode_new_cmd(Flash *s, uint32_t value)
-     case READ4:
-     case DPP:
-     case QPP:
-+    case QPP_4:
-     case PP:
-     case PP4:
-     case PP4_4:
+     /* Spansion -- single (large) sector size only, at least
+      * for the chips listed here (without boot sectors).
 -- 
 2.9.3
