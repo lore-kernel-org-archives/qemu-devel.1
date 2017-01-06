@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38955)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39458)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cPY9o-0006tJ-8O
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 12:18:25 -0500
+	(envelope-from <vilanova@ac.upc.edu>) id 1cPYCL-0000HN-9t
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 12:21:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cPY9k-0000ks-6d
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 12:18:23 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59080)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cPY9k-0000km-0T
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 12:18:20 -0500
-Received: from int-mx13.intmail.prod.int.phx2.redhat.com
-	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 027868124B
-	for <qemu-devel@nongnu.org>; Fri,  6 Jan 2017 17:18:19 +0000 (UTC)
-Date: Fri, 6 Jan 2017 17:18:13 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170106171813.GV31112@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+	(envelope-from <vilanova@ac.upc.edu>) id 1cPYCG-0001t7-8z
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 12:21:01 -0500
+Received: from roura.ac.upc.edu ([147.83.33.10]:40757 helo=roura.ac.upc.es)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <vilanova@ac.upc.edu>) id 1cPYCF-0001ss-SS
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 12:20:56 -0500
+From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
 References: <20170106155543.12827-1-berrange@redhat.com>
-	<20170106155543.12827-41-berrange@redhat.com>
-	<87r34g2k03.fsf@ac.upc.edu>
+	<20170106155543.12827-2-berrange@redhat.com>
+Date: Fri, 06 Jan 2017 18:20:51 +0100
+In-Reply-To: <20170106155543.12827-2-berrange@redhat.com> (Daniel
+	P. Berrange's message of "Fri, 6 Jan 2017 15:54:57 +0000")
+Message-ID: <878tqo2jgs.fsf@ac.upc.edu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <87r34g2k03.fsf@ac.upc.edu>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 40/47] trace: switch target/s390x/
- directory to modular trace.h file
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 01/47] trace: introduce some Makefile
+ rules for module code gen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,39 +28,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Fri, Jan 06, 2017 at 06:09:16PM +0100, Llu=C3=ADs Vilanova wrote:
-> Daniel P Berrange writes:
->=20
-> > Switch files in the target/s390x/ directory to include the
-> > target/s390x/trace.h file instead of the global trace.h
-> > file.
->=20
-> > The make rules for gen-features.{h,c} need to be moved
-> > out into the top level Makefile.objs, otherwise make
-> > complains about the rules being defined multiple times
-> > due to target/s390x/Makefile.objs being included
-> > multiple times when expanding different subdir object
-> > lists.
->=20
-> If the problem is re-definition, you can instead add a guard around the=
- rules in
-> target/s390x/Makefile.objs. This avoids defining the rules multiple tim=
-es but
-> still keeps the target-specific rules in the target-specific makefile.
+Daniel P Berrange writes:
 
-What kind of guard to you mean ? What's happening is that the top
-level Makefile.target is including target/s390x/Makefile.objs
-multiple times to expand multiple vars. I don't see a way to
-distinguish which include we're being called from.
+> Introduce rules that are able to generate trace.[ch] files
+> in every subdirectory which has a trace-events file.
 
-Regards,
-Daniel
---=20
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange=
-/ :|
-|: http://libvirt.org              -o-             http://virt-manager.or=
-g :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr=
-/ :|
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>  .gitignore                               |  6 +++
+>  Makefile                                 | 65 +++++++++++++++++++++++++++-----
+>  Makefile.objs                            |  5 +++
+>  Makefile.target                          |  7 +++-
+>  scripts/tracetool/backend/dtrace.py      |  7 +++-
+>  scripts/tracetool/backend/ust.py         |  7 +++-
+>  scripts/tracetool/format/ust_events_c.py |  2 +-
+>  scripts/tracetool/format/ust_events_h.py |  7 +++-
+>  tests/Makefile.include                   |  2 +-
+>  trace/Makefile.objs                      | 23 ++++++++---
+>  10 files changed, 109 insertions(+), 22 deletions(-)
+
+> diff --git a/.gitignore b/.gitignore
+> index e43c304..fe6add3 100644
+> --- a/.gitignore
+> +++ b/.gitignore
+> @@ -111,3 +111,9 @@ tags
+>  TAGS
+>  docker-src.*
+>  *~
+> +trace.h
+> +trace.c
+> +trace-events-common
+> +trace-ust.h
+> +trace-dtrace.h
+> +trace-dtrace.dtrace
+> diff --git a/Makefile b/Makefile
+> index 214cbad..181802b 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -70,11 +70,53 @@ GENERATED_SOURCES += trace/generated-helpers.c
+ 
+>  ifeq ($(findstring ust,$(TRACE_BACKENDS)),ust)
+>  GENERATED_HEADERS += trace/generated-ust-provider.h
+> +GENERATED_HEADERS += trace/generated-ust-provider-all.h
+>  GENERATED_SOURCES += trace/generated-ust.c
+>  endif
+ 
+>  GENERATED_HEADERS += module_block.h
+ 
+> +GENERATED_HEADERS += $(trace-events-subdirs:%=%/trace.h)
+> +GENERATED_SOURCES += $(trace-events-subdirs:%=%/trace.c)
+> +GENERATED_DTRACE =
+> +ifdef CONFIG_TRACE_DTRACE
+> +GENERATED_HEADERS += $(trace-events-subdirs:%=%/trace-dtrace.h)
+> +GENERATED_DTRACE += $(trace-events-subdirs:%=%/trace-dtrace.dtrace)
+> +endif
+> +ifdef CONFIG_TRACE_UST
+> +GENERATED_HEADERS += $(trace-events-subdirs:%=%/trace-ust.h)
+> +endif
+> +
+> +%/trace.h: $(SRC_PATH)/%/trace-events $(tracetool-y)
+> +	$(call quiet-command,$(TRACETOOL) \
+> +		--format=h \
+> +		--backends=$(TRACE_BACKENDS) \
+> +		$< > $@,"GEN","$@")
+> +
+> +%/trace.c: $(SRC_PATH)/%/trace-events $(tracetool-y)
+> +	$(call quiet-command,$(TRACETOOL) \
+> +		--format=c \
+> +		--backends=$(TRACE_BACKENDS) \
+> +		$< > $@,"GEN","$@")
+> +
+> +%/trace-ust.h: $(SRC_PATH)/%/trace-events $(tracetool-y)
+> +	$(call quiet-command,$(TRACETOOL) \
+> +		--format=ust-events-h \
+> +		--backends=$(TRACE_BACKENDS) \
+> +		$< > $@,"GEN","$@")
+
+There's a discrepancy between generation in trace/Makefile.objs, where timestamp
+files are used to filter out internal changes in tracetool, and here.
+
+
+[...]
+> diff --git a/scripts/tracetool/backend/dtrace.py b/scripts/tracetool/backend/dtrace.py
+> index 79505c6..1319990 100644
+> --- a/scripts/tracetool/backend/dtrace.py
+> +++ b/scripts/tracetool/backend/dtrace.py
+> @@ -36,7 +36,12 @@ def binary():
+ 
+ 
+>  def generate_h_begin(events, group):
+> -    out('#include "trace/generated-tracers-dtrace.h"',
+> +    if group == "common":
+> +        include = "trace/generated-tracers-dtrace.h"
+> +    else:
+> +        include = "trace-dtrace.h"
+> +
+> +    out('#include "%s"' % include,
+>          '')
+
+Why is the top-level events file treated as a special case?
+
+
+[...]
+
+
+Cheers,
+  Lluis
