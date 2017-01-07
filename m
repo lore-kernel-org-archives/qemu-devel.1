@@ -1,30 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56309)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34721)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <linux@roeck-us.net>) id 1cPdqv-0002Pd-Ge
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 18:23:18 -0500
+	(envelope-from <bounces@canonical.com>) id 1cPidw-0002HC-1E
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 23:30:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <linux@roeck-us.net>) id 1cPdqq-0007b0-J8
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 18:23:17 -0500
-Received: from bh-25.webhostbox.net ([208.91.199.152]:37066)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <linux@roeck-us.net>) id 1cPdqq-0007Yo-9D
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 18:23:12 -0500
-Date: Fri, 6 Jan 2017 15:23:07 -0800
-From: Guenter Roeck <linux@roeck-us.net>
-Message-ID: <20170106232307.GA13292@roeck-us.net>
-References: <bd0ad06c-1dce-03c9-73b0-d8d6e4ca333b@roeck-us.net>
-	<4b04ec32-b647-5047-7830-269cfc217550@ilande.co.uk>
-	<3bee832c-1d2a-50a2-a763-c58ab34caf08@roeck-us.net>
-	<3a90611b-a7c4-31c4-b373-3a16ddae5f4c@ilande.co.uk>
-	<20170106183436.GA19862@roeck-us.net>
-	<ea13ef16-ff0d-024f-2fa3-5cc11fa5f777@ilande.co.uk>
-	<20170106210546.GA27764@roeck-us.net>
-	<20170106234743-mutt-send-email-mst@kernel.org>
+	(envelope-from <bounces@canonical.com>) id 1cPids-0000oP-UW
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 23:30:12 -0500
+Received: from indium.canonical.com ([91.189.90.7]:34514)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cPids-0000mt-Ot
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 23:30:08 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cPidq-00008K-6t
+	for <qemu-devel@nongnu.org>; Sat, 07 Jan 2017 04:30:06 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 2A6552E80BF
+	for <qemu-devel@nongnu.org>; Sat,  7 Jan 2017 04:30:06 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170106234743-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] Problems with qemu "modern" virtio on sparc64
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 07 Jan 2017 04:17:29 -0000
+From: Launchpad Bug Tracker <1500935@bugs.launchpad.net>
+Reply-To: Bug 1500935 <1500935@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20150929154008.23320.1415.malonedeb@gac.canonical.com>
+Message-Id: <20170107041730.790.76321.malone@loganberry.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1500935] Re: Qemu / KVM always wants to be on top
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,68 +36,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, "qemu-devel@nongnu.org >> QEMU Developers" <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-On Fri, Jan 06, 2017 at 11:48:37PM +0200, Michael S. Tsirkin wrote:
-> On Fri, Jan 06, 2017 at 01:05:46PM -0800, Guenter Roeck wrote:
-> > On Fri, Jan 06, 2017 at 07:42:19PM +0000, Mark Cave-Ayland wrote:
-> > > On 06/01/17 18:34, Guenter Roeck wrote:
-> > > 
-> > > > On Fri, Jan 06, 2017 at 05:04:58PM +0000, Mark Cave-Ayland wrote:
-> > > >> On 30/12/16 19:57, Guenter Roeck wrote:
-> > > >>
-> > > >> Disabling "modern" mode enables boot to proceed as normal:
-> > > >>
-> > > >> $ ./qemu-system-sparc64 \
-> > > >> -drive
-> > > >> file=debian-9.0-sparc64-NETINST1.iso,if=none,index=0,id=cd,media=cdrom \
-> > > >> -device virtio-blk-pci,disable-modern=on,drive=cd \
-> > > >> -nographic \
-> > > >> -bios openbios-builtin.elf.nostrip \
-> > > >> -m 256
-> > > >>
-> > > > ...
-> > > >>
-> > > >> Guenter, can you try a similar command line and confirm whether it fixes
-> > > >> the issue for you under QEMU 2.7 and 2.8? I have no idea as to why the
-> > > >> difference in legacy/non-legacy codepaths should crash the kernel though.
-> > > >>
-> > > > Unfortunately, my qemu command line wizard capabilities are somewhat lacking.
-> > > > I had tried that before, but just could not figure out how to change my command
-> > > > line to include "disable-modern=on". If you have an idea, please let me know.
-> > > > Here it is:
-> > > > 
-> > > > ${QEMU} -M ${mach} -cpu "${cpu}" -m 512 \
-> > > > 	        -drive file=${rootfs},if=virtio \
-> > > > 		-net nic,model=virtio \
-> > > > 		-kernel arch/sparc/boot/image -no-reboot \
-> > > > 		-append "root=/dev/vda init=/sbin/init.sh console=ttyS0" \
-> > > > 		-nographic 
-> > > 
-> > > If you apply the same principles from my example above to your command
-> > > line then you should end up with something like:
-> > > 
-> > > ${QEMU} -M ${mach} -cpu "${cpu}" -m 512 \
-> > >         -drive file=${rootfs},if=none,id=hd \
-> > > 	-device virtio-blk-pci,disable-modern=on,drive=hd \
-> > > 	-net nic,model=virtio \
-> > > 	-kernel arch/sparc/boot/image -no-reboot \
-> > > 	-append "root=/dev/vda init=/sbin/init.sh console=ttyS0" \
-> > > 	-nographic
-> > > 
-> > That works, but only if I drop "-net nic,model=virtio". Otherwise I get
-> > the same crash again. Any idea how to set the network configuration
-> > the same way ?
-> > 
-> > Thanks,
-> > Guenter
-> 
-> Replace it with -device virtio-net-pci.
-> 
+[Expired for QEMU because there has been no activity for 60 days.]
 
-Excellent, that works. Setting either entry to "disable-modern=off" crashes
-as observed earlier.
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
 
-Thanks,
-Guenter
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1500935
+
+Title:
+  Qemu / KVM always wants to be on top
+
+Status in QEMU:
+  Expired
+
+Bug description:
+  Whenever I pass with the mouse over the KVM (qemu) window, it automatical=
+ly raises on top, obscuring other windows on the same desktop, which is rat=
+her intrusive...
+  No other application does this.
+
+  > dpkg -l qemu-kvm
+  Desired=3DUnknown/Install/Remove/Purge/Hold
+  | Status=3DNot/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Tr=
+ig-pend
+  |/ Err?=3D(none)/Reinst-required (Status,Err: uppercase=3Dbad)
+  ||/ Name           Version      Architecture Description
+  +++-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D-=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D-=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+  ii  qemu-kvm       2.0.0+dfsg-2 amd64        QEMU Full virtualization
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1500935/+subscriptions
