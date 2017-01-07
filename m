@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34747)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34751)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cPie8-0002MB-MC
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 23:30:25 -0500
+	(envelope-from <bounces@canonical.com>) id 1cPie8-0002MF-NZ
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 23:30:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cPie7-000126-BW
+	(envelope-from <bounces@canonical.com>) id 1cPie5-00010I-Hz
 	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 23:30:24 -0500
-Received: from indium.canonical.com ([91.189.90.7]:34833)
+Received: from indium.canonical.com ([91.189.90.7]:34786)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cPie7-00011G-6P
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 23:30:23 -0500
+	id 1cPie5-0000zf-9R
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 23:30:21 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cPie6-0000SP-6J
-	for <qemu-devel@nongnu.org>; Sat, 07 Jan 2017 04:30:22 +0000
+	id 1cPie3-0000Sh-SG
+	for <qemu-devel@nongnu.org>; Sat, 07 Jan 2017 04:30:19 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 10C3F2E80CA
-	for <qemu-devel@nongnu.org>; Sat,  7 Jan 2017 04:30:22 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 72D0D2E80CB
+	for <qemu-devel@nongnu.org>; Sat,  7 Jan 2017 04:30:19 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 07 Jan 2017 04:17:48 -0000
-From: Launchpad Bug Tracker <521202@bugs.launchpad.net>
-Reply-To: Bug 521202 <521202@bugs.launchpad.net>
+Date: Sat, 07 Jan 2017 04:17:50 -0000
+From: Launchpad Bug Tracker <673009@bugs.launchpad.net>
+Reply-To: Bug 673009 <673009@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20100212225021.24686.96808.malonedeb@palladium.canonical.com>
-Message-Id: <20170107041748.790.32782.malone@loganberry.canonical.com>
+References: <20101109131703.19884.51712.malonedeb@potassium.ubuntu.com>
+Message-Id: <20170107041750.790.50191.malone@loganberry.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 521202] Re: Windows XP x64 / 2008 Server x64
- broken on 32-bit hosts with QEMU > 0.9.0
+Subject: [Qemu-devel] [Bug 673009] Re: Latest git crashes in if_start with
+ netBSD guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,38 +48,249 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/521202
+https://bugs.launchpad.net/bugs/673009
 
 Title:
-  Windows XP x64 / 2008 Server x64 broken on 32-bit hosts with QEMU >
-  0.9.0
+  Latest git crashes in if_start with netBSD guest
 
 Status in QEMU:
   Expired
 
 Bug description:
-  QEMU >0.9.0 fails to install/run 64-bit Windows XP guests on 32-bit
-  hosts. This is mentioned here: http://qemu-
-  forum.ipi.fi/viewtopic.php?f=3D5&t=3D4625 . As explained there, 0.9.0
-  manages to install and run XP64 fine, if somewhat slowly. The host is
-  an actual 32-bit CPU (Athlon XP), although I've tested it and
-  confirmed the bug to occur on a Core2 Duo CPU running in 32-bit mode
-  with KVM disabled. It's impossible to test with KVM enabled, as this
-  causes Windows to detect a 32-bit CPU and refuse to run.
+  The latest version in git (cfd07e7abb1ef39373cd4ce312b015d61b9eea8d)
+  crashes when running a NetBSD guest
 
-  When installing, the installer hangs at the "Setup is starting
-  Windows" step. An attempt at running a converted VBox image reveals
-  the problem lies somewhere in the ACPI -- in safe mode, the boot
-  sequence gets to loading ACPI tables, then hangs indefinitely.
-  Interestingly enough, the emulator itself runs fine, you can interact
-  with the monitor etc., but the virtual CPU appears to stop; there's a
-  marked point in "log cpu" output after which nothing comes. Disabling
-  ACPI predictably does nothing to help, as in this case Windows refuses
-  to run.
+  Host OS: Debian Linux/x86_64 5.0
+  C Compiler: 4.4.5
+  Guest OS:NetBSD/i386 5.0.2
+  Command Line: =
 
-  I've tested with several versions, and 0.9.1 is the first one to
-  break. The bug is still present in 0.11 and 0.12 as packaged by
-  Ubuntu.
+  Build Configure: ./configure --enable-linux-aio --enable-io-thread --enab=
+le-kvm
+  GIT commit: d33ea50a958b2e050d2b28e5f17e3b55e91c6d74
+
+  *** glibc detected *** /home/njh/src/qemu/i386-softmmu/qemu: free(): inva=
+lid pointer: 0x00000000025bd290 ***
+  =3D=3D=3D=3D=3D=3D=3D Backtrace: =3D=3D=3D=3D=3D=3D=3D=3D=3D
+  /lib/libc.so.6(+0x71ad6)[0x7f15dfe0bad6]
+  /home/njh/src/qemu/i386-softmmu/qemu[0x492ff3]
+  /home/njh/src/qemu/i386-softmmu/qemu[0x494082]
+  /home/njh/src/qemu/i386-softmmu/qemu[0x49b38e]
+  /home/njh/src/qemu/i386-softmmu/qemu[0x49710a]
+  /home/njh/src/qemu/i386-softmmu/qemu[0x4947c7]
+  /home/njh/src/qemu/i386-softmmu/qemu[0x5181cc]
+  /home/njh/src/qemu/i386-softmmu/qemu[0x518c67]
+  /lib/libc.so.6(__libc_start_main+0xfd)[0x7f15dfdb8c4d]
+  /home/njh/src/qemu/i386-softmmu/qemu[0x407699]
+  =3D=3D=3D=3D=3D=3D=3D Memory map: =3D=3D=3D=3D=3D=3D=3D=3D
+  00400000-006a1000 r-xp 00000000 08:03 406539                             =
+/home/njh/src/qemu/i386-softmmu/qemu
+  008a0000-008c4000 rw-p 002a0000 08:03 406539                             =
+/home/njh/src/qemu/i386-softmmu/qemu
+  008c4000-010ae000 rw-p 00000000 00:00 0 =
+
+  010ae000-010af000 rwxp 00000000 00:00 0 =
+
+  010af000-010c7000 rw-p 00000000 00:00 0 =
+
+  023a8000-024ab000 rw-p 00000000 00:00 0 =
+
+  024ab000-024bb000 rw-p 00000000 00:00 0 =
+
+  024bb000-025d5000 rw-p 00000000 00:00 0 =
+
+  40a6f000-42a6f000 rwxp 00000000 00:00 0 =
+
+  7f15d292b000-7f15d2941000 r-xp 00000000 08:03 131218                     =
+/lib/libgcc_s.so.1
+  7f15d2941000-7f15d2b40000 ---p 00016000 08:03 131218                     =
+/lib/libgcc_s.so.1
+  7f15d2b40000-7f15d2b41000 rw-p 00015000 08:03 131218                     =
+/lib/libgcc_s.so.1
+  7f15d2b41000-7f15d2b46000 r-xp 00000000 08:03 43471                      =
+/usr/lib/libXfixes.so.3.1.0
+  7f15d2b46000-7f15d2d45000 ---p 00005000 08:03 43471                      =
+/usr/lib/libXfixes.so.3.1.0
+  7f15d2d45000-7f15d2d46000 rw-p 00004000 08:03 43471                      =
+/usr/lib/libXfixes.so.3.1.0
+  7f15d2d46000-7f15d2d4f000 r-xp 00000000 08:03 45831                      =
+/usr/lib/libXcursor.so.1.0.2
+  7f15d2d4f000-7f15d2f4f000 ---p 00009000 08:03 45831                      =
+/usr/lib/libXcursor.so.1.0.2
+  7f15d2f4f000-7f15d2f50000 rw-p 00009000 08:03 45831                      =
+/usr/lib/libXcursor.so.1.0.2
+  7f15d2f50000-7f15d2f9d000 rw-p 00000000 00:00 0 =
+
+  7f15d3025000-7f15d319a000 r--p 00000000 08:03 298138                     =
+/usr/lib/locale/locale-archive
+  7f15d319a000-7f15d31a2000 r-xp 00000000 08:03 41266                      =
+/usr/lib/libXrandr.so.2.2.0
+  7f15d31a2000-7f15d33a1000 ---p 00008000 08:03 41266                      =
+/usr/lib/libXrandr.so.2.2.0
+  7f15d33a1000-7f15d33a2000 rw-p 00007000 08:03 41266                      =
+/usr/lib/libXrandr.so.2.2.0
+  7f15d33a2000-7f15d33ab000 r-xp 00000000 08:03 74608                      =
+/usr/lib/libXrender.so.1.3.0
+  7f15d33ab000-7f15d35ab000 ---p 00009000 08:03 74608                      =
+/usr/lib/libXrender.so.1.3.0
+  7f15d35ab000-7f15d35ac000 rw-p 00009000 08:03 74608                      =
+/usr/lib/libXrender.so.1.3.0
+  7f15d35ac000-7f15d35bd000 r-xp 00000000 08:03 29479                      =
+/usr/lib/libXext.so.6.4.0
+  7f15d35bd000-7f15d37bd000 ---p 00011000 08:03 29479                      =
+/usr/lib/libXext.so.6.4.0
+  7f15d37bd000-7f15d37be000 rw-p 00011000 08:03 29479                      =
+/usr/lib/libXext.so.6.4.0
+  7f15d37d2000-7f15d37d3000 ---p 00000000 00:00 0 =
+
+  7f15d37d3000-7f15d3c36000 rw-p 00000000 00:00 0 =
+
+  7f15d3c49000-7f15d3d63000 rw-s 00000000 00:04 2195492                    =
+/SYSV00000000 (deleted)
+  7f15d3d63000-7f15d3d64000 rw-p 00000000 00:00 0 =
+
+  7f15d3d64000-7f15d4564000 rw-p 00000000 00:00 0 =
+
+  7f15d4564000-7f15d4566000 rw-p 00000000 00:00 0 =
+
+  7f15d4566000-7f15dc566000 rw-p 00000000 00:00 0 =
+
+  7f15dc566000-7f15dc567000 rw-p 00000000 00:00 0 =
+
+  7f15dc567000-7f15dc568000 ---p 00000000 00:00 0 =
+
+  7f15dc568000-7f15de76a000 rw-p 00000000 00:00 0 =
+
+  7f15de76a000-7f15de76f000 r-xp 00000000 08:03 47085                      =
+/usr/lib/libXdmcp.so.6.0.0
+  7f15de76f000-7f15de96e000 ---p 00005000 08:03 47085                      =
+/usr/lib/libXdmcp.so.6.0.0
+  7f15de96e000-7f15de96f000 rw-p 00004000 08:03 47085                      =
+/usr/lib/libXdmcp.so.6.0.0
+  7f15de96f000-7f15de971000 r-xp 00000000 08:03 68458                      =
+/usr/lib/libXau.so.6.0.0
+  7f15de971000-7f15deb71000 ---p 00002000 08:03 68458                      =
+/usr/lib/libXau.so.6.0.0
+  7f15deb71000-7f15deb72000 rw-p 00002000 08:03 68458                      =
+/usr/lib/libXau.so.6.0.0
+  7f15deb72000-7f15deb91000 r-xp 00000000 08:03 134345                     =
+/lib/libx86.so.1
+  7f15deb91000-7f15ded91000 ---p 0001f000 08:03 134345                     =
+/lib/libx86.so.1
+  7f15ded91000-7f15ded93000 rw-p 0001f000 08:03 134345                     =
+/lib/libx86.so.1
+  7f15ded93000-7f15ded94000 rw-p 00000000 00:00 0 =
+
+  7f15ded94000-7f15dedb0000 r-xp 00000000 08:03 13392                      =
+/usr/lib/libxcb.so.1.1.0
+  7f15dedb0000-7f15defaf000 ---p 0001c000 08:03 13392                      =
+/usr/lib/libxcb.so.1.1.0
+  7f15defaf000-7f15defb0000 rw-p 0001b000 08:03 13392                      =
+/usr/lib/libxcb.so.1.1.0
+  7f15defb0000-7f15deffd000 r-xp 00000000 08:03 2979                       =
+/usr/lib/libvga.so.1.4.3
+  7f15deffd000-7f15df1fc000 ---p 0004d000 08:03 2979                       =
+/usr/lib/libvga.so.1.4.3
+  7f15df1fc000-7f15df205000 rw-p 0004c000 08:03 2979                       =
+/usr/lib/libvga.so.1.4.3
+  7f15df205000-7f15df20e000 rw-p 00000000 00:00 0 =
+
+  7f15df20e000-7f15df224000 r-xp 00000000 08:03 12136                      =
+/usr/lib/libdirect-1.2.so.9.0.1
+  7f15df224000-7f15df423000 ---p 00016000 08:03 12136                      =
+/usr/lib/libdirect-1.2.so.9.0.1
+  7f15df423000-7f15df425000 rw-p 00015000 08:03 12136                      =
+/usr/lib/libdirect-1.2.so.9.0.1
+  7f15df425000-7f15df42e000 r-xp 00000000 08:03 11944                      =
+/usr/lib/libfusion-1.2.so.9.0.1
+  7f15df42e000-7f15df62e000 ---p 00009000 08:03 11944                      =
+/usr/lib/libfusion-1.2.so.9.0.1
+  7f15df62e000-7f15df62f000 rw-p 00009000 08:03 11944                      =
+/usr/lib/libfusion-1.2.so.9.0.1
+  7f15df62f000-7f15df6ae000 r-xp 00000000 08:03 11998                      =
+/usr/lib/libdirectfb-1.2.so.9.0.1
+  7f15df6ae000-7f15df8ad000 ---p 0007f000 08:03 11998                      =
+/usr/lib/libdirectfb-1.2.so.9.0.1
+  7f15df8ad000-7f15df8b1000 rw-p 0007e000 08:03 11998                      =
+/usr/lib/libdirectfb-1.2.so.9.0.1
+  7f15df8b1000-7f15df98f000 r-xp 00000000 08:03 92358                      =
+/usr/lib/libasound.so.2.0.0
+  7f15df98f000-7f15dfb8e000 ---p 000de000 08:03 92358                      =
+/usr/lib/libasound.so.2.0.0
+  7f15dfb8e000-7f15dfb96000 rw-p 000dd000 08:03 92358                      =
+/usr/lib/libasound.so.2.0.0
+  7f15dfb96000-7f15dfb98000 r-xp 00000000 08:03 163705                     =
+/lib/libdl-2.11.2.so
+  7f15dfb98000-7f15dfd98000 ---p 00002000 08:03 163705                     =
+/lib/libdl-2.11.2.so
+
+  GDB output:
+
+  Thread 3 (Thread 3756):
+  #0  __lll_lock_wait () at ../nptl/sysdeps/unix/sysv/linux/x86_64/lowlevel=
+lock.S:136
+  #1  0x00007f15e182a0e9 in _L_lock_953 () from /lib/libpthread.so.0
+  #2  0x00007f15e1829f0b in __pthread_mutex_lock (mutex=3D0x10690c0) at pth=
+read_mutex_lock.c:61
+  #3  0x00000000004914f9 in qemu_mutex_lock (mutex=3D0x10690c0) at qemu-thr=
+ead.c:50
+  #4  0x0000000000408c4c in qemu_mutex_lock_iothread () at /home/njh/src/qe=
+mu/cpus.c:737
+  #5  0x000000000041af8e in kvm_cpu_exec (env=3D0x23e3c40) at /home/njh/src=
+/qemu/kvm-all.c:878
+  #6  0x00000000004a7885 in cpu_x86_exec (env1=3D<value optimized out>) at =
+/home/njh/src/qemu/cpu-exec.c:338
+  #7  0x00000000004086e8 in qemu_cpu_exec (env=3D0x23e3c40) at /home/njh/sr=
+c/qemu/cpus.c:896
+  #8  0x00000000004099e4 in kvm_cpu_thread_fn (arg=3D<value optimized out>)=
+ at /home/njh/src/qemu/cpus.c:613
+  #9  0x00007f15e18278ba in start_thread (arg=3D<value optimized out>) at p=
+thread_create.c:300
+  #10 0x00007f15dfe6902d in clone () at ../sysdeps/unix/sysv/linux/x86_64/c=
+lone.S:112
+  #11 0x0000000000000000 in ?? ()
+
+  Thread 2 (Thread 3757):
+  #0  pthread_cond_timedwait@@GLIBC_2.3.2 () at ../nptl/sysdeps/unix/sysv/l=
+inux/x86_64/pthread_cond_timedwait.S:211
+  #1  0x000000000042ca0b in cond_timedwait (unused=3D<value optimized out>)=
+ at posix-aio-compat.c:104
+  #2  aio_thread (unused=3D<value optimized out>) at posix-aio-compat.c:325
+  #3  0x00007f15e18278ba in start_thread (arg=3D<value optimized out>) at p=
+thread_create.c:300
+  #4  0x00007f15dfe6902d in clone () at ../sysdeps/unix/sysv/linux/x86_64/c=
+lone.S:112
+  #5  0x0000000000000000 in ?? ()
+  Current language:  auto
+  The current source language is "auto; currently asm".
+
+  Thread 1 (Thread 3755):
+  #0  0x00007f15dfdcc165 in *__GI_raise (sig=3D<value optimized out>) at ..=
+/nptl/sysdeps/unix/sysv/linux/raise.c:64
+  #1  0x00007f15dfdcef70 in *__GI_abort () at abort.c:92
+  #2  0x00007f15dfe0227b in __libc_message (do_abort=3D<value optimized out=
+>, fmt=3D<value optimized out>) at ../sysdeps/unix/sysv/linux/libc_fatal.c:=
+189
+  #3  0x00007f15dfe0bad6 in malloc_printerr (action=3D3, str=3D0x7f15dfebfb=
+75 "free(): invalid pointer", ptr=3D<value optimized out>) at malloc.c:6267
+  #4  0x0000000000492ff3 in if_start (slirp=3D0x23aa400) at slirp/if.c:205
+  #5  0x0000000000494082 in ip_output (so=3D<value optimized out>, m0=3D0x2=
+5d3ff0) at slirp/ip_output.c:160
+  #6  0x000000000049b38e in udp_output (so=3D0xeab, m=3D0xeab, addr=3D<valu=
+e optimized out>) at slirp/udp.c:299
+  #7  0x000000000049710a in sorecvfrom (so=3D0x2529380) at slirp/socket.c:5=
+27
+  #8  0x00000000004947c7 in slirp_select_poll (readfds=3D0x7fff99a79390, wr=
+itefds=3D<value optimized out>, xfds=3D0x7fff99a79290, select_error=3D<valu=
+e optimized out>)
+      at slirp/slirp.c:542
+  #9  0x00000000005181cc in main_loop_wait (nonblocking=3D<value optimized =
+out>) at /home/njh/src/qemu/vl.c:1266
+  #10 0x0000000000518c67 in main_loop (argc=3D<value optimized out>, argv=
+=3D<value optimized out>, envp=3D<value optimized out>) at /home/njh/src/qe=
+mu/vl.c:1309
+  #11 main (argc=3D<value optimized out>, argv=3D<value optimized out>, env=
+p=3D<value optimized out>) at /home/njh/src/qemu/vl.c:2999
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/521202/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/673009/+subscriptions
