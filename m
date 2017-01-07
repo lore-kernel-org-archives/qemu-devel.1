@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34770)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34781)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cPieB-0002Np-2H
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 23:30:28 -0500
+	(envelope-from <bounces@canonical.com>) id 1cPieC-0002Om-22
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 23:30:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cPieA-00015e-24
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 23:30:27 -0500
-Received: from indium.canonical.com ([91.189.90.7]:34896)
+	(envelope-from <bounces@canonical.com>) id 1cPieB-00017m-6d
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 23:30:28 -0500
+Received: from indium.canonical.com ([91.189.90.7]:34926)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cPie9-00014O-Sl
-	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 23:30:26 -0500
+	id 1cPieB-00016Y-0k
+	for qemu-devel@nongnu.org; Fri, 06 Jan 2017 23:30:27 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cPie8-0000jf-V7
-	for <qemu-devel@nongnu.org>; Sat, 07 Jan 2017 04:30:24 +0000
+	id 1cPieA-0000jf-0Y
+	for <qemu-devel@nongnu.org>; Sat, 07 Jan 2017 04:30:26 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id E93F52E8019
-	for <qemu-devel@nongnu.org>; Sat,  7 Jan 2017 04:30:24 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id DB1552E80CA
+	for <qemu-devel@nongnu.org>; Sat,  7 Jan 2017 04:30:25 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 07 Jan 2017 04:17:47 -0000
-From: Launchpad Bug Tracker <485258@bugs.launchpad.net>
-Reply-To: Bug 485258 <485258@bugs.launchpad.net>
+Date: Sat, 07 Jan 2017 04:17:46 -0000
+From: Launchpad Bug Tracker <485250@bugs.launchpad.net>
+Reply-To: Bug 485250 <485250@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20091119104216.9545.34446.malonedeb@potassium.ubuntu.com>
-Message-Id: <20170107041747.790.28461.malone@loganberry.canonical.com>
+References: <20091119103034.30387.95497.malonedeb@wampee.canonical.com>
+Message-Id: <20170107041746.790.18459.malone@loganberry.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 485258] Re: 64-bit win2003r2 with sp2 64-bit with
- network type rtl8139 generates blue screen after running network test
+Subject: [Qemu-devel] [Bug 485250] Re: nic e1000 network interface does not
+ work with 32-bit windows 2003r2 with sp2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,41 +48,34 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/485258
+https://bugs.launchpad.net/bugs/485250
 
 Title:
-  64-bit win2003r2 with sp2 64-bit with network type rtl8139 generates
-  blue screen after running network test
+  nic e1000 network interface does not work with 32-bit windows 2003r2
+  with  sp2
 
 Status in QEMU:
   Expired
 
 Bug description:
-  64-bit win2003r2 with sp2 64-bit with network type rtl8139 generates
-  blue screen after running network test
+  nic e1000 network interface does not work with win2k3r2 32bit
 
-  Steps to recreate:
-  1) install qemu frm git clone git://git.savannah.nongnu.org/qemu.git
+  e1000 driver in win2k3r2 32bit seems to be broken. The interface is able =
+to
+  receive ip from the dhcp server, but not able to ping it from any linux g=
+uest or
+  host, but was able to ping it from windows guest.
 
-  2)Download Soap Stone Benchmark(http://soap-stone.sourceforge.net/)
-  and IBM java 1.4 for windows
+  Running network test, netperf, between the windows guest fails with the m=
+essage =
 
-  3)use  win2k3r2sp2 64-bit as the server and win2k3r2sp2 32-bit as
-  client (this bug does not occur when win2k3r2sp2 64-bit is the client)
+  "netperf: receive_response: no response received. errno 104 counter 0"
 
-  4) Running the test will reset the  network interface on the
-  server(win2k3r2sp264bit).
-
-  5)Then shutdown the server(win2k3r2sp2 64bit), which will generate a
-  blue screen.
-
-  =
-
-  Qemu cmd line used:
-  /usr/local/bin/qemu-system-x86_e 'vm1'  -drive file=3Dwin2003r2-64.raw,bo=
-ot=3Don -net nic,vlan=3D0,macaddr=3D20:20:20:00:00:01,model=3Drtl8139  -net=
- tap,vlan=3D0,script=3D/home/yogi/qemu-ifup  -m 10240   -usbdevice tablet -=
-vnc :0 -enable-kvm
+  cmdline used:
+  /usr/local/bin/qemu-system-x86_64 -drive file=3Dwin2003r2sp2-32.raw,boot=
+=3Don -net nic,vlan=3D0,macaddr=3D20:20:20:00:00:04,model=3De1000  -net tap=
+,vlan=3D0,script=3D/home/yogi/qemu-ifup  -m 2048 -enable-kvm  -usbdevice ta=
+blet -vnc :1
 
   uname -a
   Linux bc1cn9 2.6.30.9-96.fc11.x86_64 #1 SMP Wed Nov 4 00:02:04 EST 2009 x=
@@ -90,10 +83,8 @@ vnc :0 -enable-kvm
 
   Distro: fedora 11
 
-  I have attached the generated Blue Screen..
-
   Thx
   yogi
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/485258/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/485250/+subscriptions
