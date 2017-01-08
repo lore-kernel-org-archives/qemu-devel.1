@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33103)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33104)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cQ9RH-00065v-2y
+	(envelope-from <bounces@canonical.com>) id 1cQ9RH-00065w-35
 	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 04:06:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cQ9RE-0007hV-AX
+	(envelope-from <bounces@canonical.com>) id 1cQ9RE-0007hc-Az
 	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 04:06:55 -0500
-Received: from indium.canonical.com ([91.189.90.7]:32771)
+Received: from indium.canonical.com ([91.189.90.7]:60997)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cQ9RE-0007g6-4p
+	id 1cQ9RE-0007fy-4V
 	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 04:06:52 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cQ9RD-0005yO-7f
+	id 1cQ9RD-0005ym-58
 	for <qemu-devel@nongnu.org>; Sun, 08 Jan 2017 09:06:51 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 0D8072E80DB
-	for <qemu-devel@nongnu.org>; Sun,  8 Jan 2017 09:06:50 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 95EA72E80D0
+	for <qemu-devel@nongnu.org>; Sun,  8 Jan 2017 09:06:49 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 08 Jan 2017 08:53:29 -0000
+Date: Sun, 08 Jan 2017 08:52:40 -0000
 From: Thomas Huth <884401@bugs.launchpad.net>
 Reply-To: Bug 884401 <884401@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20111031200405.19472.43985.malonedeb@soybean.canonical.com>
-Message-Id: <20170108085329.26738.24043.malone@chaenomeles.canonical.com>
+Message-Id: <20170108085240.21353.21490.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 884401] Re: PCI Passthrough for Digium TCE400P
  Codec Card Not working
@@ -39,7 +39,11 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Oh, I meant "comment from Alex", not "comment to Alex", sorry!
+According to the comment to Alex, this should have been fixed in newer
+versions, so setting status to "Fix Released" now.
+
+** Changed in: qemu
+       Status: New =3D> Fix Released
 
 -- =
 
