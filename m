@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60603)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32788)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cQ9KU-0002Rg-Lb
-	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 03:59:56 -0500
+	(envelope-from <dmitry@daynix.com>) id 1cQ9No-0004pT-3z
+	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 04:03:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cQ9KO-0005Jf-4r
-	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 03:59:54 -0500
-Received: from indium.canonical.com ([91.189.90.7]:60851)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cQ9KN-0005IM-UG
-	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 03:59:48 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cQ9KM-0003kN-LQ
-	for <qemu-devel@nongnu.org>; Sun, 08 Jan 2017 08:59:46 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 971A22E80AF
-	for <qemu-devel@nongnu.org>; Sun,  8 Jan 2017 08:59:46 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sun, 08 Jan 2017 08:50:09 -0000
-From: Thomas Huth <864490@bugs.launchpad.net>
-Reply-To: Bug 864490 <864490@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20111002073554.24942.56669.malonedeb@soybean.canonical.com>
-Message-Id: <20170108085009.13899.10035.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 864490] Re: Windows 2008 x64 (SBS Server) freezes
- randomly when using more than 1 CPU core
+	(envelope-from <dmitry@daynix.com>) id 1cQ9Nl-0006S9-1D
+	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 04:03:20 -0500
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:35476)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <dmitry@daynix.com>) id 1cQ9Nk-0006Rj-MU
+	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 04:03:16 -0500
+Received: by mail-wm0-x243.google.com with SMTP id l2so14796089wml.2
+	for <qemu-devel@nongnu.org>; Sun, 08 Jan 2017 01:03:14 -0800 (PST)
+From: Dmitry Fleytman <dmitry@daynix.com>
+Message-Id: <F68AE366-F432-43FA-BBD8-6B4EF72BDC14@daynix.com>
+Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
+Date: Sun, 8 Jan 2017 11:03:12 +0200
+In-Reply-To: <1483690133-25104-1-git-send-email-lprosek@redhat.com>
+References: <1483690133-25104-1-git-send-email-lprosek@redhat.com>
+Content-Type: text/plain;
+	charset=us-ascii
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] net: optimize checksum computation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,46 +29,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Ladi Prosek <lprosek@redhat.com>
+Cc: qemu-devel@nongnu.org, jasowang@redhat.com
 
-Since nobody replied here within the last years: I think you should
-rather report problems with XEN / Proxmox to the XEN or Proxmox
-bugtracker instead.
 
-** Changed in: qemu
-       Status: New =3D> Invalid
+> On 6 Jan 2017, at 10:08 AM, Ladi Prosek <lprosek@redhat.com> wrote:
+> 
+> Very simple loop optimization with a significant performance impact.
+> 
+> Microbenchmark results, modern x86-64:
+> 
+> buffer size | speed up
+> ------------+---------
+> 1500        | 1.7x
+> 64          | 1.5x
+> 8           | 1.15x
+> 
+> Microbenchmark results, POWER7:
+> 
+> buffer size | speed up
+> ------------+---------
+> 1500        | 5x
+> 64          | 3.3x
+> 8           | 1.13x
+> 
+> There is a lot of room for further improvement at the expense of
+> code complexity - aligned multibyte reads, LE/BE considerations,
+> architecture-specific optimizations, etc. This patch still keeps
+> things simple and readable.
 
--- =
+Reviewed-by: Dmitry Fleytman <dmitry@daynix.com>
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/864490
-
-Title:
-  Windows 2008 x64 (SBS Server) freezes randomly when using more than 1
-  CPU core
-
-Status in QEMU:
-  Invalid
-
-Bug description:
-  This issue has been giving headache to us since a long time.
-  Difficult to reproduce as it happens randomly.
-  We had this issue when we ran Windows 2008 x64 or Windows SBS Server gues=
-ts in either XEN 3.3 or Proxmox environments.
-  When only one CPU core is assigned to the guest, everything is fine. If 2=
- or more cores are assigned, the guest stops responding after several hours=
- - and in the host machine one of the cores is using 100%. The only thing t=
-hat helps is resetting the guest.
-
-  I am ready to provide logs/crashdumps if needed, because we want to
-  help resolve this issue. I saw some posts on the web of people having
-  the same problems - for some of the workaround was to fix some BIOS
-  settings, but we did not have success with those (e.g. disabling C1E
-  Support and Intel C-State )
-
-  Server is running on Intel=C2=AE Core=E2=84=A2 i7-920 Quad-Core, 24 Gig R=
-AM.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/864490/+subscriptions
+> 
+> Signed-off-by: Ladi Prosek <lprosek@redhat.com>
+> ---
+> net/checksum.c | 21 +++++++++++++--------
+> 1 file changed, 13 insertions(+), 8 deletions(-)
+> 
+> diff --git a/net/checksum.c b/net/checksum.c
+> index 23323b0..4da72a6 100644
+> --- a/net/checksum.c
+> +++ b/net/checksum.c
+> @@ -22,17 +22,22 @@
+> 
+> uint32_t net_checksum_add_cont(int len, uint8_t *buf, int seq)
+> {
+> -    uint32_t sum = 0;
+> +    uint32_t sum1 = 0, sum2 = 0;
+>     int i;
+> 
+> -    for (i = seq; i < seq + len; i++) {
+> -        if (i & 1) {
+> -            sum += (uint32_t)buf[i - seq];
+> -        } else {
+> -            sum += (uint32_t)buf[i - seq] << 8;
+> -        }
+> +    for (i = 0; i < len - 1; i += 2) {
+> +        sum1 += (uint32_t)buf[i];
+> +        sum2 += (uint32_t)buf[i + 1];
+> +    }
+> +    if (i < len) {
+> +        sum1 += (uint32_t)buf[i];
+> +    }
+> +
+> +    if (seq & 1) {
+> +        return sum1 + (sum2 << 8);
+> +    } else {
+> +        return sum2 + (sum1 << 8);
+>     }
+> -    return sum;
+> }
+> 
+> uint16_t net_checksum_finish(uint32_t sum)
+> -- 
+> 2.7.4
+> 
