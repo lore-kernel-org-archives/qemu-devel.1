@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38441)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54320)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cQHhn-00035s-2o
-	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 12:56:35 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1cQJKu-0005NM-6Q
+	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 14:41:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cQHhl-0003vL-V2
-	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 12:56:31 -0500
-Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:35864)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cQHhl-0003vA-PC
-	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 12:56:29 -0500
-Received: by mail-pg0-x244.google.com with SMTP id 75so11154944pgf.3
-	for <qemu-devel@nongnu.org>; Sun, 08 Jan 2017 09:56:29 -0800 (PST)
-Sender: Richard Henderson <rth7680@gmail.com>
-From: Richard Henderson <rth@twiddle.net>
-Date: Sun,  8 Jan 2017 09:56:18 -0800
-Message-Id: <20170108175620.6605-10-rth@twiddle.net>
-In-Reply-To: <20170108175620.6605-1-rth@twiddle.net>
-References: <20170108175620.6605-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PULL 09/11] tcg-mips: Adjust calling conventions for
- mips64
+	(envelope-from <ehabkost@redhat.com>) id 1cQJKt-0008Oa-0m
+	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 14:41:00 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49592)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cQJKs-0008OQ-RI
+	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 14:40:58 -0500
+Received: from int-mx09.intmail.prod.int.phx2.redhat.com
+	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id ED654C057EC9
+	for <qemu-devel@nongnu.org>; Sun,  8 Jan 2017 19:40:58 +0000 (UTC)
+From: Eduardo Habkost <ehabkost@redhat.com>
+Date: Sun,  8 Jan 2017 17:40:38 -0200
+Message-Id: <20170108194041.10908-3-ehabkost@redhat.com>
+In-Reply-To: <20170108194041.10908-1-ehabkost@redhat.com>
+References: <20170108194041.10908-1-ehabkost@redhat.com>
+Subject: [Qemu-devel] [PATCH 2/5] i386: host_vendor_fms() helper function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,112 +30,77 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, Jin Guojie <jinguojie@loongson.cn>
+Cc: libvir-list@redhat.com
 
-From: Jin Guojie <jinguojie@loongson.cn>
+Helper function for code that needs to check the host CPU
+vendor/family/model/stepping values.
 
-Tested-by: Aurelien Jarno <aurelien@aurel32.net>
-Tested-by: James Hogan <james.hogan@imgtec.com>
-Tested-by: YunQiang Su <wzssyqa@gmail.com>
-Signed-off-by: Richard Henderson <rth@twiddle.net>
-Signed-off-by: Jin Guojie <jinguojie@loongson.cn>
-Message-Id: <1483592275-4496-10-git-send-email-jinguojie@loongson.cn>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- tcg/mips/tcg-target.h     | 19 +++++++++++++++----
- tcg/mips/tcg-target.inc.c | 21 +++++++++++++++------
- 2 files changed, 30 insertions(+), 10 deletions(-)
+ target/i386/cpu.h |  1 +
+ target/i386/cpu.c | 28 ++++++++++++++++++++--------
+ 2 files changed, 21 insertions(+), 8 deletions(-)
 
-diff --git a/tcg/mips/tcg-target.h b/tcg/mips/tcg-target.h
-index 4b7d3ae..d352c97 100644
---- a/tcg/mips/tcg-target.h
-+++ b/tcg/mips/tcg-target.h
-@@ -27,7 +27,14 @@
- #ifndef MIPS_TCG_TARGET_H
- #define MIPS_TCG_TARGET_H
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index a7f2f6099d..0f4a9d412b 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -1423,6 +1423,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+ void cpu_clear_apic_feature(CPUX86State *env);
+ void host_cpuid(uint32_t function, uint32_t count,
+                 uint32_t *eax, uint32_t *ebx, uint32_t *ecx, uint32_t *edx);
++void host_vendor_fms(char vendor[static (CPUID_VENDOR_SZ + 1)], int *family, int *model, int *stepping);
  
--#define TCG_TARGET_REG_BITS 32
-+#if _MIPS_SIM == _ABIO32
-+# define TCG_TARGET_REG_BITS 32
-+#elif _MIPS_SIM == _ABIN32 || _MIPS_SIM == _ABI64
-+# define TCG_TARGET_REG_BITS 64
-+#else
-+# error "Unknown ABI"
-+#endif
+ /* helper.c */
+ int x86_cpu_handle_mmu_fault(CPUState *cpu, vaddr addr,
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 25b802bb06..9dbb2d98da 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -682,6 +682,25 @@ void host_cpuid(uint32_t function, uint32_t count,
+         *edx = vec[3];
+ }
+ 
++void host_vendor_fms(char vendor[static (CPUID_VENDOR_SZ + 1)], int *family, int *model, int *stepping)
++{
++    uint32_t eax, ebx, ecx, edx;
 +
- #define TCG_TARGET_INSN_UNIT_SIZE 4
- #define TCG_TARGET_TLB_DISPLACEMENT_BITS 16
- #define TCG_TARGET_NB_REGS 32
-@@ -71,9 +78,13 @@ typedef enum {
- } TCGReg;
- 
- /* used for function call generation */
--#define TCG_TARGET_STACK_ALIGN 8
--#define TCG_TARGET_CALL_STACK_OFFSET 16
--#define TCG_TARGET_CALL_ALIGN_ARGS 1
-+#define TCG_TARGET_STACK_ALIGN        16
-+#if _MIPS_SIM == _ABIO32
-+# define TCG_TARGET_CALL_STACK_OFFSET 16
-+#else
-+# define TCG_TARGET_CALL_STACK_OFFSET 0
-+#endif
-+#define TCG_TARGET_CALL_ALIGN_ARGS    1
- 
- /* MOVN/MOVZ instructions detection */
- #if (defined(__mips_isa_rev) && (__mips_isa_rev >= 1)) || \
-diff --git a/tcg/mips/tcg-target.inc.c b/tcg/mips/tcg-target.inc.c
-index b7e2586..7282a4a 100644
---- a/tcg/mips/tcg-target.inc.c
-+++ b/tcg/mips/tcg-target.inc.c
-@@ -91,10 +91,6 @@ static const int tcg_target_reg_alloc_order[] = {
-     TCG_REG_S8,
- 
-     /* Call clobbered registers.  */
--    TCG_REG_T0,
--    TCG_REG_T1,
--    TCG_REG_T2,
--    TCG_REG_T3,
-     TCG_REG_T4,
-     TCG_REG_T5,
-     TCG_REG_T6,
-@@ -105,17 +101,27 @@ static const int tcg_target_reg_alloc_order[] = {
-     TCG_REG_V0,
- 
-     /* Argument registers, opposite order of allocation.  */
-+    TCG_REG_T3,
-+    TCG_REG_T2,
-+    TCG_REG_T1,
-+    TCG_REG_T0,
-     TCG_REG_A3,
-     TCG_REG_A2,
-     TCG_REG_A1,
-     TCG_REG_A0,
- };
- 
--static const TCGReg tcg_target_call_iarg_regs[4] = {
-+static const TCGReg tcg_target_call_iarg_regs[] = {
-     TCG_REG_A0,
-     TCG_REG_A1,
-     TCG_REG_A2,
--    TCG_REG_A3
-+    TCG_REG_A3,
-+#if _MIPS_SIM == _ABIN32 || _MIPS_SIM == _ABI64
-+    TCG_REG_T0,
-+    TCG_REG_T1,
-+    TCG_REG_T2,
-+    TCG_REG_T3,
-+#endif
- };
- 
- static const TCGReg tcg_target_call_oarg_regs[2] = {
-@@ -2427,6 +2433,9 @@ static void tcg_target_init(TCGContext *s)
- {
-     tcg_target_detect_isa();
-     tcg_regset_set(tcg_target_available_regs[TCG_TYPE_I32], 0xffffffff);
-+    if (TCG_TARGET_REG_BITS == 64) {
-+        tcg_regset_set(tcg_target_available_regs[TCG_TYPE_I64], 0xffffffff);
++    host_cpuid(0x0, 0, &eax, &ebx, &ecx, &edx);
++    x86_cpu_vendor_words2str(vendor, ebx, edx, ecx);
++
++    host_cpuid(0x1, 0, &eax, &ebx, &ecx, &edx);
++    if (family) {
++        *family = ((eax >> 8) & 0x0F) + ((eax >> 20) & 0xFF);
 +    }
-     tcg_regset_set(tcg_target_call_clobber_regs,
-                    (1 << TCG_REG_V0) |
-                    (1 << TCG_REG_V1) |
++    if (model) {
++        *model = ((eax >> 4) & 0x0F) | ((eax & 0xF0000) >> 12);
++    }
++    if (stepping) {
++        *stepping = eax & 0x0F;
++    }
++}
++
+ /* CPU class name definitions: */
+ 
+ #define X86_CPU_TYPE_SUFFIX "-" TYPE_X86_CPU
+@@ -1574,17 +1593,10 @@ static void host_x86_cpu_class_init(ObjectClass *oc, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(oc);
+     X86CPUClass *xcc = X86_CPU_CLASS(oc);
+-    uint32_t eax = 0, ebx = 0, ecx = 0, edx = 0;
+ 
+     xcc->kvm_required = true;
+ 
+-    host_cpuid(0x0, 0, &eax, &ebx, &ecx, &edx);
+-    x86_cpu_vendor_words2str(host_cpudef.vendor, ebx, edx, ecx);
+-
+-    host_cpuid(0x1, 0, &eax, &ebx, &ecx, &edx);
+-    host_cpudef.family = ((eax >> 8) & 0x0F) + ((eax >> 20) & 0xFF);
+-    host_cpudef.model = ((eax >> 4) & 0x0F) | ((eax & 0xF0000) >> 12);
+-    host_cpudef.stepping = eax & 0x0F;
++    host_vendor_fms(host_cpudef.vendor, &host_cpudef.family, &host_cpudef.model, &host_cpudef.stepping);
+ 
+     cpu_x86_fill_model_id(host_cpudef.model_id);
+ 
 -- 
-2.9.3
+2.11.0.259.g40922b1
