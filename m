@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32831)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32858)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cQOyr-0002qi-0g
-	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 20:42:38 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cQOyt-0002qw-FK
+	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 20:42:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cQOyp-0000pq-H0
-	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 20:42:37 -0500
-Date: Mon, 9 Jan 2017 12:42:18 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1cQOyp-0000pu-HL
+	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 20:42:39 -0500
+Date: Mon, 9 Jan 2017 10:48:24 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170109014218.GD12515@umbus.fritz.box>
-References: <1483802623-5507-1-git-send-email-hpoussin@reactos.org>
+Message-ID: <20170108234824.GC12515@umbus.fritz.box>
+References: <20170106050451.11793-1-david@gibson.dropbear.id.au>
+	<53dcb2da-fa15-63b0-5849-325b6edcac83@redhat.com>
+	<20170106214052-mutt-send-email-mst@kernel.org>
+	<9cc108a2-4e56-e5ed-9ba4-4e0e0faac072@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="qGV0fN9tzfkG3CxV"
+	protocol="application/pgp-signature"; boundary="KDt/GgjP6HVcx58l"
 Content-Disposition: inline
-In-Reply-To: <1483802623-5507-1-git-send-email-hpoussin@reactos.org>
-Subject: Re: [Qemu-devel] [PATCH v3 0/4] ppc: add a IBM 40p machine (RS/6000, PReP)
+In-Reply-To: <9cc108a2-4e56-e5ed-9ba4-4e0e0faac072@redhat.com>
+Subject: Re: [Qemu-devel] [RFC] pxb: Restrict to x86
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,72 +26,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>
-Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Thomas Huth <thuth@redhat.com>, Giancarlo Teodori <gteodori@gmail.com>
+To: Marcel Apfelbaum <marcel@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, ehabkost@redhat.com, thuth@redhat.com, lvivier@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
---qGV0fN9tzfkG3CxV
-Content-Type: text/plain; charset=iso-8859-1
+--KDt/GgjP6HVcx58l
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Jan 07, 2017 at 04:23:39PM +0100, Herv=E9 Poussineau wrote:
-> Hi,
+On Sun, Jan 08, 2017 at 10:17:12AM +0200, Marcel Apfelbaum wrote:
+> On 01/06/2017 09:41 PM, Michael S. Tsirkin wrote:
+> > On Fri, Jan 06, 2017 at 08:13:11AM +0200, Marcel Apfelbaum wrote:
+> > > On 01/06/2017 07:04 AM, David Gibson wrote:
+> > > > The PCI Expander Bridge (PXB) device is essentially a hack to allow
+> > > > different PCIe devices to be assigned to different NUMA nodes on x8=
+6.  Each
+> > > > PXB is sort-of a separate PCI host bridge, except that its config s=
+pace
+> > > > is shared with the config space of the main PCI host bridge, rather=
+ than
+> > > > being independent.
+> > > >=20
+> > >=20
+> > > Hi David,
+> > >=20
+> > > > This is only necessary if the platform doesn't (easily) allow truly
+> > > > independent PCI host bridges.  AFAIK that's just x86.
+> > > >=20
+> > >=20
+> > > Indeed, it is possible to support independent PCI host bridges on x86=
+ by
+> > > using a separate MMCONFIG space for each one and enable separate PCI =
+domains.
+> > > We simply didn't need this until now, but maybe will be implemented i=
+t in the future.
+> >=20
+> > In fact I would say that's the cleanest way to do this on q35.
 >=20
-> This patchset adds the emulation of the IBM RS/6000 7020 (40p). The real =
-machine is
-> able to run AIX (up to 4.3.3), Windows NT (up to 4.0 SP1), the beta of OS=
-/2 PowerPC,
-> Solaris, Linux, NetBSD/PReP ...
->=20
-> I've tested current emulation with Open Hack'Ware, OpenBIOS and official =
-firmware.
->=20
-> Linux kernel starts, and freezes during boot (seems like a problem with t=
-he SCSI adapter).
-> Windows NT starts up to the point where it wants to change endianness.
-> Other OSes have not been tested.
->=20
-> This machine is a superset of the 'prep' one, because we know exactly wha=
-t is/should
-> emulated, and that operating system list running on it is quite wide.
-> I hope that 'prep' machine can be deprecated soon and then later removed.
->=20
-> Patch 1 is a cleanup, and can probably be committed first.
-> Patches 2 to 4  are the real implementation of the IBM 40p.
+> Message received :)
 
-Applied to ppc-for-2.9, with a slight config tweak to 3/4 to avoid
-breaking make check on ppc64.
+Just so I'm clear, these last two comments are essentially suggesting
+a follow up cleanup on x86, rather than suggesting a different
+approach for non-PC platforms, yes?
 
->=20
-> Changes since v2:
-> - patch 2: fix mismatch between read and write functions for port 92
-> - patch 4: use error_report instead of fprintf/hw_error
->=20
-> Changes since v1:
-> - removed patches related to display adapter:
->   Let's wait for an emulation of the real display adapter (an S3 Trio), a=
-s current
->   VGA adapter already mostly works with Open Hack'Ware and OpenBIOS
-> - various changes due to David Gibson's remarks
->=20
-> Herv=E9 Poussineau (4):
->   prep: do not use global variable to access nvram
->   prep: add PReP System I/O
->   prep: add IBM RS/6000 7020 (40p) memory controller
->   prep: add IBM RS/6000 7020 (40p) machine emulation
->=20
->  default-configs/ppc-softmmu.mak |   2 +
->  hw/ppc/Makefile.objs            |   2 +
->  hw/ppc/prep.c                   | 233 +++++++++++++++++++++++++++++-
->  hw/ppc/prep_systemio.c          | 303 ++++++++++++++++++++++++++++++++++=
-++++++
->  hw/ppc/rs6000_mc.c              | 232 ++++++++++++++++++++++++++++++
->  hw/ppc/trace-events             |  11 ++
->  6 files changed, 781 insertions(+), 2 deletions(-)
->  create mode 100644 hw/ppc/prep_systemio.c
->  create mode 100644 hw/ppc/rs6000_mc.c
->=20
+If there are no objections to my original patch do you want to take it
+through your tree Michael, or should I take it through mine?
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -96,25 +79,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---qGV0fN9tzfkG3CxV
+--KDt/GgjP6HVcx58l
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJYcup4AAoJEGw4ysog2bOSsowP/2S2aMShKTov+1EsLJuYFeM/
-MgVweW2/1GHw0kTbyC7w5+gnSNi984bby0OiIGnyXsTRsyH4Si62oQNpTC2jXh1d
-uzxV/rIDQEswft/UJvOaQsbatdj0ew2H58dQi5XMqdXy6KfzySjuYniOjLogYtw4
-Oc4WBZH+BBJP9oIJugI6bVlMIdOj8zZt7RH2xi7dWEe0ObZfxDelVSbpqlbxN3hK
-BLZKWFclJMG/2uwJ94cRHMF/n6mXSmR7CrDrtvVxmN1wKeRCS+QfWjzqFKaVTtzz
-1hW5t/SlClqXjABOoE81mal8FPOkejUxpPVgIn3jfdMNbcbXxi0/pTZBZLADe7TZ
-7vcLjKvv4DyeJ0vSnLBS3AyhtgWYyHXKtebXcHp2JeeCmidGzn9IVNVD1Bt4jYO4
-ylA5cZq5rQRBCctkiHM1uW47sLkDbGY+sUxO/RhbaJesyIod75gmIbJvPuNmTKI7
-Z9twcUZdAGvtz1xPpy4BfnxvpQm9jLhKHT7/3juvMvUq5jKoU58x0ug+zg5QPfSm
-L3yN+V8KlyuOgZNStqkN7306peHOHUxbHLMeaXMDDDHTIG5RWzILd+VlxN6yxz5E
-e1YAb53goiuIU/bZr0HbX8AlQq+/ohWC+Tnh3Ewyn/zX0MMuu1bjwLFwfZ2vbit6
-ATwf/ayZ4ZzeQKGj9vHX
-=cO5K
+iQIcBAEBCAAGBQJYcs/HAAoJEGw4ysog2bOSiFQP/RJ83WAqWM2yU1f+r9UzLGse
+O/QvnbIryQyjyYx5QlUSz4zxi6sTOJ564GNKZYRlV2VVYZQ5vpq6pWuTSU1AtmcB
+tah5LoSIuFmmTpiNClGRedk7x9HgKV/fcY6Zw++XtKJaoITfjfZTO8KJ+NoXSzVX
+EpadjyKzCZPiAAYp6/3BYX2ndiNKTaBcB6erNknR2w595H1VfFJFholyfAlO6XeX
+Wi1vdR1YKa8kVwPnCRnGrw2XVB/8Xe1JK1/H7n9JBNDifdI4f/Dw5RmFJIBTr7l3
+rilEBMRdhtHUubdQoNWUHXDS9DEfPNVbTt0hTyBW9e9XDYlo4RWqPNaAWinQId5f
+DjUtbfSipZjbr5id486xllWj/zqPmmpDLJFNrDybODIaRk3mGO4n+PUXHquHcqEo
+nqk6bOdPSvVY6eeRzKVKY5C43s9DXNZRiy0hj/xwgnUf7w4p436jhTvZ4gt8oPZm
+ddGd/eVTuEWaCOoVO5VD+AUodDNi7mpzTMT0r3l8npCiEN/zpFEKVrM9EXJbV8XA
+dJysLA/BXtczKds6ImdiUgbDfareZ5ZwWY5DHnxbS86bTBeyhTu4MEhayy0vq5ua
+gfvRP2c3fZIYEyLU4kF1zJIKhHRt32XuRg+ehr52jNqoxnzr4KtlNytv29VJKlFV
+xiYMSYRHQAvbs7fe6iPk
+=PnfC
 -----END PGP SIGNATURE-----
 
---qGV0fN9tzfkG3CxV--
+--KDt/GgjP6HVcx58l--
