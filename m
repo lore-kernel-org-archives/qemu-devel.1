@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35157)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35849)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cQHHE-0003MQ-9e
-	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 12:29:05 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1cQHKl-0005A1-Gy
+	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 12:32:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cQHHB-0003PT-3Y
-	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 12:29:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60080)
+	(envelope-from <ehabkost@redhat.com>) id 1cQHKk-0005PL-4X
+	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 12:32:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38836)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cQHHA-0003OX-SW
-	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 12:29:01 -0500
-Date: Sun, 8 Jan 2017 15:28:55 -0200
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cQHKj-0005OJ-Rt
+	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 12:32:42 -0500
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170108172855.GX3315@thinpad.lan.raisama.net>
-References: <20170108171330.11129-1-ehabkost@redhat.com>
-	<148389598764.199.18070153688871991941@790289a7ca88>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <148389598764.199.18070153688871991941@790289a7ca88>
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] Allow migration with invtsc if TSC
- frequency is explicitly set
+Date: Sun,  8 Jan 2017 15:32:33 -0200
+Message-Id: <20170108173234.25721-2-ehabkost@redhat.com>
+In-Reply-To: <20170108173234.25721-1-ehabkost@redhat.com>
+References: <20170108173234.25721-1-ehabkost@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 1/2] kvm: Simplify invtsc check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,23 +23,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: no-reply@patchew.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, haozhong.zhang@intel.com, kvm@vger.kernel.org, mst@redhat.com, libvir-list@redhat.com, mtosatti@redhat.com, imammedo@redhat.com, pbonzini@redhat.com, jdenemar@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Marcelo Tosatti <mtosatti@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, Haozhong Zhang <haozhong.zhang@intel.com>
 
-On Sun, Jan 08, 2017 at 09:19:49AM -0800, no-reply@patchew.org wrote:
-> Hi,
-> 
-> Your series failed automatic build test. Please find the testing commands and
-> their output below. If you have docker installed, you can probably reproduce it
-> locally.
-> 
-> Type: series
-> Message-id: 20170108171330.11129-1-ehabkost@redhat.com
-> Subject: [Qemu-devel] [PATCH v2 0/2] Allow migration with invtsc if TSC frequency is explicitly set
+Instead of searching the table we have just built, we can check
+the env->features field directly.
 
-Ouch. I simply removed patches 3/4 and 4/4 from the series, and
-didn't notice there was a mistake in patch 1/2 corrected by patch
-4/4 in v1. I will fix it and send v3, sorry for the noise.
+Reviewed-by: Marcelo Tosatti <mtosatti@redhat.com>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+ target/i386/kvm.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 10a9cd8f7f..a26290fdc1 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -962,8 +962,8 @@ int kvm_arch_init_vcpu(CPUState *cs)
+         has_msr_mcg_ext_ctl = has_msr_feature_control = true;
+     }
+ 
+-    c = cpuid_find_entry(&cpuid_data.cpuid, 0x80000007, 0);
+-    if (c && (c->edx & 1<<8) && invtsc_mig_blocker == NULL) {
++    if ((env->features[FEAT_8000_0007_EDX] & CPUID_APM_INVTSC) &&
++        invtsc_mig_blocker == NULL) {
+         /* for migration */
+         error_setg(&invtsc_mig_blocker,
+                    "State blocked by non-migratable CPU device"
 -- 
-Eduardo
+2.11.0.259.g40922b1
