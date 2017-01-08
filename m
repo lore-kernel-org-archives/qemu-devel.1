@@ -1,21 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57071)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58963)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1cQ8fK-0008VB-29
-	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 03:17:23 -0500
+	(envelope-from <mar.krzeminski@gmail.com>) id 1cQ90N-0004YU-Cu
+	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 03:39:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1cQ8fG-00042J-V0
-	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 03:17:22 -0500
-References: <20170106050451.11793-1-david@gibson.dropbear.id.au>
-	<53dcb2da-fa15-63b0-5849-325b6edcac83@redhat.com>
-	<20170106214052-mutt-send-email-mst@kernel.org>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <9cc108a2-4e56-e5ed-9ba4-4e0e0faac072@redhat.com>
-Date: Sun, 8 Jan 2017 10:17:12 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170106214052-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC] pxb: Restrict to x86
+	(envelope-from <mar.krzeminski@gmail.com>) id 1cQ90L-0000No-93
+	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 03:39:07 -0500
+From: Marcin Krzeminski <mar.krzeminski@gmail.com>
+Date: Sun,  8 Jan 2017 09:38:52 +0100
+Message-Id: <20170108083854.5006-2-mar.krzeminski@gmail.com>
+In-Reply-To: <20170108083854.5006-1-mar.krzeminski@gmail.com>
+References: <20170108083854.5006-1-mar.krzeminski@gmail.com>
+Subject: [Qemu-devel] [PATCH v3 1/3] block: m25p80: Add Quad Page Program
+ 4byte
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,41 +20,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, ehabkost@redhat.com, thuth@redhat.com, lvivier@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, edgar.iglesias@xilinx.com
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, clg@kaod.org, mar.krzeminski@gmail.com
 
-On 01/06/2017 09:41 PM, Michael S. Tsirkin wrote:
-> On Fri, Jan 06, 2017 at 08:13:11AM +0200, Marcel Apfelbaum wrote:
->> On 01/06/2017 07:04 AM, David Gibson wrote:
->>> The PCI Expander Bridge (PXB) device is essentially a hack to allow
->>> different PCIe devices to be assigned to different NUMA nodes on x86.  Each
->>> PXB is sort-of a separate PCI host bridge, except that its config space
->>> is shared with the config space of the main PCI host bridge, rather than
->>> being independent.
->>>
->>
->> Hi David,
->>
->>> This is only necessary if the platform doesn't (easily) allow truly
->>> independent PCI host bridges.  AFAIK that's just x86.
->>>
->>
->> Indeed, it is possible to support independent PCI host bridges on x86 by
->> using a separate MMCONFIG space for each one and enable separate PCI domains.
->> We simply didn't need this until now, but maybe will be implemented it in the future.
->
-> In fact I would say that's the cleanest way to do this on q35.
->
+Some flash chips have additional page program opcode that
+takes only 4 byte address. This commit adds support
+for such command in Qemu.
 
-Message received :)
+Signed-off-by: Marcin Krzeminski <mar.krzeminski@gmail.com>
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+---
+ hw/block/m25p80.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-Thanks,
-Marcel
-
-
->>> This patch makes it possible to configure PXB out of the build, and adjusts
->>> the default configs so it's only included on x86 targets.
->>>
->>
-
-[...]
+diff --git a/hw/block/m25p80.c b/hw/block/m25p80.c
+index e3c1166..6dff81b 100644
+--- a/hw/block/m25p80.c
++++ b/hw/block/m25p80.c
+@@ -326,6 +326,7 @@ typedef enum {
+     PP4_4 = 0x3e,
+     DPP = 0xa2,
+     QPP = 0x32,
++    QPP_4 = 0x34,
+ 
+     ERASE_4K = 0x20,
+     ERASE4_4K = 0x21,
+@@ -574,6 +575,7 @@ static inline int get_addr_length(Flash *s)
+    switch (s->cmd_in_progress) {
+    case PP4:
+    case PP4_4:
++   case QPP_4:
+    case READ4:
+    case QIOR4:
+    case ERASE4_4K:
+@@ -607,6 +609,7 @@ static void complete_collecting_data(Flash *s)
+     switch (s->cmd_in_progress) {
+     case DPP:
+     case QPP:
++    case QPP_4:
+     case PP:
+     case PP4:
+     case PP4_4:
+@@ -874,6 +877,7 @@ static void decode_new_cmd(Flash *s, uint32_t value)
+     case READ4:
+     case DPP:
+     case QPP:
++    case QPP_4:
+     case PP:
+     case PP4:
+     case PP4_4:
+-- 
+2.9.3
