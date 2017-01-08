@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33102)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33103)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cQ9RH-00065u-2z
+	(envelope-from <bounces@canonical.com>) id 1cQ9RH-00065v-2y
 	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 04:06:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cQ9RD-0007gW-Ta
+	(envelope-from <bounces@canonical.com>) id 1cQ9RE-0007hV-AX
 	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 04:06:55 -0500
-Received: from indium.canonical.com ([91.189.90.7]:60984)
+Received: from indium.canonical.com ([91.189.90.7]:32771)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cQ9RD-0007fU-OA
-	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 04:06:51 -0500
+	id 1cQ9RE-0007g6-4p
+	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 04:06:52 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cQ9RC-0005yP-TP
-	for <qemu-devel@nongnu.org>; Sun, 08 Jan 2017 09:06:50 +0000
+	id 1cQ9RD-0005yO-7f
+	for <qemu-devel@nongnu.org>; Sun, 08 Jan 2017 09:06:51 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id A2AE02E80C3
-	for <qemu-devel@nongnu.org>; Sun,  8 Jan 2017 09:06:48 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 0D8072E80DB
+	for <qemu-devel@nongnu.org>; Sun,  8 Jan 2017 09:06:50 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 08 Jan 2017 08:54:52 -0000
-From: Thomas Huth <887883@bugs.launchpad.net>
-Reply-To: Bug 887883 <887883@bugs.launchpad.net>
+Date: Sun, 08 Jan 2017 08:53:29 -0000
+From: Thomas Huth <884401@bugs.launchpad.net>
+Reply-To: Bug 884401 <884401@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20111109053151.5724.96789.malonedeb@wampee.canonical.com>
-Message-Id: <20170108085452.27373.30589.malone@chaenomeles.canonical.com>
+References: <20111031200405.19472.43985.malonedeb@soybean.canonical.com>
+Message-Id: <20170108085329.26738.24043.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 887883] Re: Coverity scan revealed defects
+Subject: [Qemu-devel] [Bug 884401] Re: PCI Passthrough for Digium TCE400P
+ Codec Card Not working
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,58 +39,83 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-AFAIK a lot of issues reported by coverity have been addressed in the
-recent versions of QEMU ... is there still anything left here that needs
-special attention?
-
-** Changed in: qemu
-       Status: New =3D> Incomplete
+Oh, I meant "comment from Alex", not "comment to Alex", sorry!
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/887883
+https://bugs.launchpad.net/bugs/884401
 
 Title:
-  Coverity scan revealed defects
+  PCI Passthrough for Digium TCE400P Codec Card Not working
 
 Status in QEMU:
-  Incomplete
+  Fix Released
 
 Bug description:
-  Coverity scan detected some issues such as  RESOURCE_LEAK and
-  REVERSE_INULL etc on qemu-1.0rc1:
+  trying to use a Digium TCE400P Codec card on a Virtual instance using
+  the following information:
 
-  Analysis summary report:
-  ------------------------
-  Files analyzed                 : 830
-  Total LoC input to cov-analyze : 576549
-  Functions analyzed             : 20721
-  Paths analyzed                 : 858376
-  New defects found              : 428 Total
-                                     2 ARRAY_VS_SINGLETON
-                                     9 CHECKED_RETURN
-                                    19 CONSTANT_EXPRESSION_RESULT
-                                    60 DEADCODE
-                                    43 FORWARD_NULL
-                                    14 INFINITE_LOOP
-                                    36 MISSING_BREAK
-                                     3 MISSING_LOCK
-                                    47 NEGATIVE_RETURNS
-                                     1 NO_EFFECT
-                                    11 NULL_RETURNS
-                                    51 OVERRUN_STATIC
-                                     1 RESOURCE_LEAK
-                                    79 REVERSE_INULL
-                                    20 SIGN_EXTENSION
-                                     7 SIZEOF_MISMATCH
-                                    15 UNINIT
-                                     5 UNREACHABLE
-                                     2 UNUSED_VALUE
-                                     3 USE_AFTER_FREE
+  lspci <enter>
 
-  For details, please see attachment.
+  02:08.0 Ethernet controller: Digium, Inc. Wildcard TCE400P transcoder
+  base card (rev 11)
+
+  lspci -n <enter>
+
+  02:08.0 0200: d161:8004 (rev 11)
+
+  virsh nodedev-list | grep pci
+
+  pci_0000_02_08_0
+
+  printf %x 02
+  2
+
+  printf %x 08
+  8
+
+  printf %x 0
+  0
+
+  bus=3D'0x02'
+  slot=3D'0x08'
+  function=3D'0x0'
+
+  # virsh edit vmanager
+  <hostdev mode=3D'subsystem' type=3D'pci' managed=3D'yes'>
+    <source>
+        <address domain=3D'0x0000' bus=3D'0x02' slot=3D'0x08' function=3D'0=
+x0'/>
+    </source>
+  </hostdev>
+
+  I have SELINUX disabled at this time.
+
+  virsh start vmanager I get the following error message:
+
+  [root@twins qemu]# virsh start vmanager
+  error: Failed to start domain vmanager
+  error: internal error Process exited while reading console log output: ch=
+ar device redirected to /dev/pts/2
+  Unable to assign device: PCI region 1 at address 0xdf1fe000 has size 0x40=
+0,  which is not a multiple of 4K
+  qemu-kvm: -device pci-assign,host=3D02:08.0,id=3Dhostdev0,configfd=3D23,b=
+us=3Dpci.0,addr=3D0x6: Device 'pci-assign' could not be initialized
+
+
+  Version Numbers:
+
+  [root@twins qemu]# yum list | grep qemu
+  gpxe-roms-qemu.noarch                  0.9.7-6.3.el6_0.1                @=
+updates
+  qemu-img.x86_64                        2:0.12.1.2-2.113.el6_0.8         @=
+updates
+  qemu-kvm.x86_64                        2:0.12.1.2-2.113.el6_0.8         @=
+updates
+  qemu-kvm-tools.x86_64                  2:0.12.1.2-2.113.el6_0.8         u=
+pdates
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/887883/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/884401/+subscriptions
