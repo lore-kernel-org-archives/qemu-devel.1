@@ -1,24 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32807)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35066)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cQ4eS-00059b-Q5
-	for qemu-devel@nongnu.org; Sat, 07 Jan 2017 23:00:13 -0500
+	(envelope-from <bounces@canonical.com>) id 1cQ57X-000143-0i
+	for qemu-devel@nongnu.org; Sat, 07 Jan 2017 23:30:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cQ4eP-00063t-Mx
-	for qemu-devel@nongnu.org; Sat, 07 Jan 2017 23:00:12 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60520)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cQ4eP-000626-HW
-	for qemu-devel@nongnu.org; Sat, 07 Jan 2017 23:00:09 -0500
-Date: Sun, 8 Jan 2017 06:00:06 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170108055940-mutt-send-email-mst@kernel.org>
-References: <CALoWxX_-+dBexpVzy2MKVN10b94vaZC50y+vxbZtqXi+S_Urmg@mail.gmail.com>
+	(envelope-from <bounces@canonical.com>) id 1cQ57U-00044l-Cr
+	for qemu-devel@nongnu.org; Sat, 07 Jan 2017 23:30:15 -0500
+Received: from indium.canonical.com ([91.189.90.7]:47091)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cQ57U-00044Y-6j
+	for qemu-devel@nongnu.org; Sat, 07 Jan 2017 23:30:12 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cQ57T-0004rt-CP
+	for <qemu-devel@nongnu.org>; Sun, 08 Jan 2017 04:30:11 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 4E9152E80AE
+	for <qemu-devel@nongnu.org>; Sun,  8 Jan 2017 04:30:11 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CALoWxX_-+dBexpVzy2MKVN10b94vaZC50y+vxbZtqXi+S_Urmg@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] hw/pci: use-after-free in
- pci_nic_init_nofail when nic device fails to initialize
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 08 Jan 2017 04:17:23 -0000
+From: Launchpad Bug Tracker <878019@bugs.launchpad.net>
+Reply-To: Bug 878019 <878019@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20111019092638.19752.17248.malonedeb@gac.canonical.com>
+Message-Id: <20170108041724.16754.50474.malone@loganberry.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 878019] Re: 0.15.1 black screen and 100% cpu on
+ start
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,66 +37,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Kompel <barbos@gmail.com>
-Cc: qemu-devel@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Jason Wang <jasowang@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Fri, Jan 06, 2017 at 03:48:27PM -0800, Alex Kompel wrote:
-> object_property_set_bool(OBJECT(dev), true, "realized", &err) in
-> pci_nic_init_nofail may release the object if device fails to
-> initialize which leads to use-after-free in error handling block.
-> qdev_init_nofail does the same thing while holding the reference.
-> 
-> (gdb) run -net nic
-> qemu-system-x86_64: failed to find romfile "efi-e1000.rom"
-> 
-> Program received signal SIGSEGV, Segmentation fault.
-> object_unparent (obj=0x7fffe96a0010) at qom/object.c:440
-> 440     in qom/object.c
-> (gdb) bt
-> #0  object_unparent (obj=0x7fffe96a0010) at qom/object.c:440
-> #1  0x000055555598c30d in pci_nic_init_nofail (nd=0x55555616b460
-> <nd_table>, rootbus=0x5555567ed990, default_model=<optimized out>,
-> default_devaddr=<optimized out>) at hw/pci/pci.c:1812
-> #2  0x00005555557ff52c in pc_nic_init (isa_bus=0x55555733c610,
-> pci_bus=0x5555567ed990) at hw/i386/pc.c:1634
-> #3  0x00005555558021ad in pc_init1 (machine=0x55555661ee10,
-> pci_type=0x555555c1a523 "i440FX", host_type=0x555555ba564e
-> "i440FX-pcihost") at hw/i386/pc_piix.c:241
-> #4  0x00005555557519cb in main (argc=<optimized out>, argv=<optimized
-> out>, envp=<optimized out>) at vl.c:4481
-> 
-> Signed-off-by: Alex Kompel <barbos@gmail.com>
+[Expired for QEMU because there has been no activity for 60 days.]
 
-More a nic thing than pci really ...
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
 
-Jason, could you pls merge this?
+-- =
 
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/878019
 
+Title:
+  0.15.1 black screen and 100% cpu on start
 
-> ---
->  hw/pci/pci.c | 8 +-------
->  1 file changed, 1 insertion(+), 7 deletions(-)
-> 
-> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-> index 24fae16..2fd1b9e 100644
-> --- a/hw/pci/pci.c
-> +++ b/hw/pci/pci.c
-> @@ -1805,13 +1805,7 @@ PCIDevice *pci_nic_init_nofail(NICInfo *nd,
-> PCIBus *rootbus,
->      pci_dev = pci_create(bus, devfn, pci_nic_names[i]);
->      dev = &pci_dev->qdev;
->      qdev_set_nic_properties(dev, nd);
-> -
-> -    object_property_set_bool(OBJECT(dev), true, "realized", &err);
-> -    if (err) {
-> -        error_report_err(err);
-> -        object_unparent(OBJECT(dev));
-> -        exit(1);
-> -    }
-> +    qdev_init_nofail(dev);
-> 
->      return pci_dev;
->  }
-> --
-> 2.8.3
+Status in QEMU:
+  Expired
+
+Bug description:
+  Trying the freshly compiled 0.15.1 (command line: "qemu"), the window
+  stays black, it uses 100% cpu, and can't be killed with ctrl-c, has to
+  be killed with killall -9.
+
+  Strace shows it's waiting on a futex forever?
+
+  Build config:
+  ./configure --prefix=3D/usr/local --interp-prefix=3D/usr/local/share/qemu=
+ \
+  --enable-mixemu --disable-brlapi --enable-io-thread --audio-drv-list=3D"o=
+ss alsa sdl" \
+  --disable-opengl
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/878019/+subscriptions
