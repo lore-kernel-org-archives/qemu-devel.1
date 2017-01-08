@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54363)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55605)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cQJKx-0005PB-Vm
-	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 14:41:05 -0500
+	(envelope-from <no-reply@patchew.org>) id 1cQJRA-0002e2-Rz
+	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 14:47:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cQJKw-0008Ps-T1
-	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 14:41:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56704)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cQJKw-0008Pd-Ki
-	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 14:41:02 -0500
-Received: from int-mx13.intmail.prod.int.phx2.redhat.com
-	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C1CA04E4CB
-	for <qemu-devel@nongnu.org>; Sun,  8 Jan 2017 19:41:02 +0000 (UTC)
-From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Sun,  8 Jan 2017 17:40:40 -0200
-Message-Id: <20170108194041.10908-5-ehabkost@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1cQJR7-00026Z-MG
+	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 14:47:28 -0500
+Resent-Message-Id: <E1cQJR7-00026Z-MG@eggs.gnu.org>
+Received: from sender163-mail.zoho.com ([74.201.84.163]:21335)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1cQJR7-00025Q-Cf
+	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 14:47:25 -0500
 In-Reply-To: <20170108194041.10908-1-ehabkost@redhat.com>
-References: <20170108194041.10908-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PATCH 4/5] pc: Add 2.9 machine-types
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <148390484023.199.4100601245593596436@790289a7ca88>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sun, 8 Jan 2017 11:47:21 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH 0/5] Use non-blacklisted
+ family/model/stepping for Haswell CPU model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,109 +29,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: libvir-list@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: ehabkost@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, fweimer@redhat.com, libvir-list@redhat.com, dgilbert@redhat.com, carlos@redhat.com, pbonzini@redhat.com, jdenemar@redhat.com, triegel@redhat.com
 
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Laszlo Ersek <lersek@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
-Changes v1 -> v2:
-* Added extra backslash to PC_COMPAT_2_8 definition
-  * Suggested-by: Laszlo Ersek <lersek@redhat.com>
----
- include/hw/i386/pc.h |  2 ++
- hw/i386/pc_piix.c    | 15 ++++++++++++---
- hw/i386/pc_q35.c     | 13 +++++++++++--
- 3 files changed, 25 insertions(+), 5 deletions(-)
-
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index b22e699c46..230e9e70c5 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -375,6 +375,8 @@ int e820_get_num_entries(void);
- bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
- 
- #define PC_COMPAT_2_8 \
-+    HW_COMPAT_2_8 \
-+
- 
- #define PC_COMPAT_2_7 \
-     HW_COMPAT_2_7 \
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 5e1adbe53c..9f102aa388 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -437,13 +437,24 @@ static void pc_i440fx_machine_options(MachineClass *m)
-     m->default_display = "std";
- }
- 
--static void pc_i440fx_2_8_machine_options(MachineClass *m)
-+static void pc_i440fx_2_9_machine_options(MachineClass *m)
- {
-     pc_i440fx_machine_options(m);
-     m->alias = "pc";
-     m->is_default = 1;
- }
- 
-+DEFINE_I440FX_MACHINE(v2_9, "pc-i440fx-2.9", NULL,
-+                      pc_i440fx_2_9_machine_options);
-+
-+static void pc_i440fx_2_8_machine_options(MachineClass *m)
-+{
-+    pc_i440fx_2_9_machine_options(m);
-+    m->is_default = 0;
-+    m->alias = NULL;
-+    SET_MACHINE_COMPAT(m, PC_COMPAT_2_8);
-+}
-+
- DEFINE_I440FX_MACHINE(v2_8, "pc-i440fx-2.8", NULL,
-                       pc_i440fx_2_8_machine_options);
- 
-@@ -451,8 +462,6 @@ DEFINE_I440FX_MACHINE(v2_8, "pc-i440fx-2.8", NULL,
- static void pc_i440fx_2_7_machine_options(MachineClass *m)
- {
-     pc_i440fx_2_8_machine_options(m);
--    m->is_default = 0;
--    m->alias = NULL;
-     SET_MACHINE_COMPAT(m, PC_COMPAT_2_7);
- }
- 
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index d042fe0843..dd792a8547 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -301,19 +301,28 @@ static void pc_q35_machine_options(MachineClass *m)
-     m->max_cpus = 288;
- }
- 
--static void pc_q35_2_8_machine_options(MachineClass *m)
-+static void pc_q35_2_9_machine_options(MachineClass *m)
- {
-     pc_q35_machine_options(m);
-     m->alias = "q35";
- }
- 
-+DEFINE_Q35_MACHINE(v2_9, "pc-q35-2.9", NULL,
-+                   pc_q35_2_9_machine_options);
-+
-+static void pc_q35_2_8_machine_options(MachineClass *m)
-+{
-+    pc_q35_2_9_machine_options(m);
-+    m->alias = NULL;
-+    SET_MACHINE_COMPAT(m, PC_COMPAT_2_8);
-+}
-+
- DEFINE_Q35_MACHINE(v2_8, "pc-q35-2.8", NULL,
-                    pc_q35_2_8_machine_options);
- 
- static void pc_q35_2_7_machine_options(MachineClass *m)
- {
-     pc_q35_2_8_machine_options(m);
--    m->alias = NULL;
-     m->max_cpus = 255;
-     SET_MACHINE_COMPAT(m, PC_COMPAT_2_7);
- }
--- 
-2.11.0.259.g40922b1
+SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
+NzAxMDgxOTQwNDEuMTA5MDgtMS1laGFia29zdEByZWRoYXQuY29tClN1YmplY3Q6IFtRZW11LWRl
+dmVsXSBbUEFUQ0ggMC81XSBVc2Ugbm9uLWJsYWNrbGlzdGVkIGZhbWlseS9tb2RlbC9zdGVwcGlu
+ZyBmb3IgSGFzd2VsbCBDUFUgbW9kZWwKVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVH
+SU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxp
+bmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKIyBVc2VmdWwgZ2l0IG9wdGlvbnMKZ2l0IGNv
+bmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5y
+ZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJB
+U0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4v
+JHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBz
+aG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFj
+ayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChu
+KzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5n
+IDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dp
+dGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgcGF0Y2hl
+dy8yMDE3MDEwODE5NDA0MS4xMDkwOC0xLWVoYWJrb3N0QHJlZGhhdC5jb20gLT4gcGF0Y2hldy8y
+MDE3MDEwODE5NDA0MS4xMDkwOC0xLWVoYWJrb3N0QHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBu
+ZXcgYnJhbmNoICd0ZXN0JwpkMTc5Yjg1IGkzODY6IENoYW5nZSBzdGVwcGluZyBvZiBIYXN3ZWxs
+IHRvIG5vbi1ibGFja2xpc3RlZCB2YWx1ZQpkMWUyYTFjIHBjOiBBZGQgMi45IG1hY2hpbmUtdHlw
+ZXMKZmQ2NzYxMiBpMzg2L2t2bTogQmxhY2tsaXN0IFRTWCBvbiBrbm93biBicm9rZW4gaG9zdHMK
+MjYzOTk5NiBpMzg2OiBob3N0X3ZlbmRvcl9mbXMoKSBoZWxwZXIgZnVuY3Rpb24KMDZjMmZiMCBp
+Mzg2OiBBZGQgZXhwbGljaXQgYXJyYXkgc2l6ZSB0byB4ODZfY3B1X3ZlbmRvcl93b3JkczJzdHIo
+KQoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS81OiBpMzg2OiBBZGQgZXhw
+bGljaXQgYXJyYXkgc2l6ZSB0byB4ODZfY3B1X3ZlbmRvcl93b3JkczJzdHIoKS4uLgpFUlJPUjog
+bGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzI3OiBGSUxFOiB0YXJnZXQvaTM4Ni9jcHUuYzoxNzI6
+CitzdGF0aWMgdm9pZCB4ODZfY3B1X3ZlbmRvcl93b3JkczJzdHIoY2hhciBkc3Rbc3RhdGljIChD
+UFVJRF9WRU5ET1JfU1ogKyAxKV0sIHVpbnQzMl90IHZlbmRvcjEsCgpFUlJPUjogc3BhY2UgcHJv
+aGliaXRlZCBiZXR3ZWVuIGZ1bmN0aW9uIG5hbWUgYW5kIG9wZW4gcGFyZW50aGVzaXMgJygnCiMy
+NzogRklMRTogdGFyZ2V0L2kzODYvY3B1LmM6MTcyOgorc3RhdGljIHZvaWQgeDg2X2NwdV92ZW5k
+b3Jfd29yZHMyc3RyKGNoYXIgZHN0W3N0YXRpYyAoQ1BVSURfVkVORE9SX1NaICsgMSldLCB1aW50
+MzJfdCB2ZW5kb3IxLAoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCA4IGxpbmVzIGNoZWNr
+ZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
+IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
+YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENI
+IDIvNTogaTM4NjogaG9zdF92ZW5kb3JfZm1zKCkgaGVscGVyIGZ1bmN0aW9uLi4uCkVSUk9SOiBs
+aW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMjA6IEZJTEU6IHRhcmdldC9pMzg2L2NwdS5jOjY4NToK
+K3ZvaWQgaG9zdF92ZW5kb3JfZm1zKGNoYXIgdmVuZG9yW3N0YXRpYyAoQ1BVSURfVkVORE9SX1Na
+ICsgMSldLCBpbnQgKmZhbWlseSwgaW50ICptb2RlbCwgaW50ICpzdGVwcGluZykKCkVSUk9SOiBz
+cGFjZSBwcm9oaWJpdGVkIGJldHdlZW4gZnVuY3Rpb24gbmFtZSBhbmQgb3BlbiBwYXJlbnRoZXNp
+cyAnKCcKIzIwOiBGSUxFOiB0YXJnZXQvaTM4Ni9jcHUuYzo2ODU6Cit2b2lkIGhvc3RfdmVuZG9y
+X2ZtcyhjaGFyIHZlbmRvcltzdGF0aWMgKENQVUlEX1ZFTkRPUl9TWiArIDEpXSwgaW50ICpmYW1p
+bHksIGludCAqbW9kZWwsIGludCAqc3RlcHBpbmcpCgpFUlJPUjogc3RvcmFnZSBjbGFzcyBzaG91
+bGQgYmUgYXQgdGhlIGJlZ2lubmluZyBvZiB0aGUgZGVjbGFyYXRpb24KIzIwOiBGSUxFOiB0YXJn
+ZXQvaTM4Ni9jcHUuYzo2ODU6Cit2b2lkIGhvc3RfdmVuZG9yX2ZtcyhjaGFyIHZlbmRvcltzdGF0
+aWMgKENQVUlEX1ZFTkRPUl9TWiArIDEpXSwgaW50ICpmYW1pbHksIGludCAqbW9kZWwsIGludCAq
+c3RlcHBpbmcpCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzU3OiBGSUxFOiB0YXJn
+ZXQvaTM4Ni9jcHUuYzoxNTk5OgorICAgIGhvc3RfdmVuZG9yX2Ztcyhob3N0X2NwdWRlZi52ZW5k
+b3IsICZob3N0X2NwdWRlZi5mYW1pbHksICZob3N0X2NwdWRlZi5tb2RlbCwgJmhvc3RfY3B1ZGVm
+LnN0ZXBwaW5nKTsKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojNjk6IEZJTEU6IHRh
+cmdldC9pMzg2L2NwdS5oOjE0MjY6Cit2b2lkIGhvc3RfdmVuZG9yX2ZtcyhjaGFyIHZlbmRvcltz
+dGF0aWMgKENQVUlEX1ZFTkRPUl9TWiArIDEpXSwgaW50ICpmYW1pbHksIGludCAqbW9kZWwsIGlu
+dCAqc3RlcHBpbmcpOwoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmV0d2VlbiBmdW5jdGlvbiBu
+YW1lIGFuZCBvcGVuIHBhcmVudGhlc2lzICcoJwojNjk6IEZJTEU6IHRhcmdldC9pMzg2L2NwdS5o
+OjE0MjY6Cit2b2lkIGhvc3RfdmVuZG9yX2ZtcyhjaGFyIHZlbmRvcltzdGF0aWMgKENQVUlEX1ZF
+TkRPUl9TWiArIDEpXSwgaW50ICpmYW1pbHksIGludCAqbW9kZWwsIGludCAqc3RlcHBpbmcpOwoK
+RVJST1I6IHN0b3JhZ2UgY2xhc3Mgc2hvdWxkIGJlIGF0IHRoZSBiZWdpbm5pbmcgb2YgdGhlIGRl
+Y2xhcmF0aW9uCiM2OTogRklMRTogdGFyZ2V0L2kzODYvY3B1Lmg6MTQyNjoKK3ZvaWQgaG9zdF92
+ZW5kb3JfZm1zKGNoYXIgdmVuZG9yW3N0YXRpYyAoQ1BVSURfVkVORE9SX1NaICsgMSldLCBpbnQg
+KmZhbWlseSwgaW50ICptb2RlbCwgaW50ICpzdGVwcGluZyk7Cgp0b3RhbDogNyBlcnJvcnMsIDAg
+d2FybmluZ3MsIDUwIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1z
+LCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRp
+dmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlO
+VEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDMvNTogaTM4Ni9rdm06IEJsYWNrbGlzdCBUU1ggb24g
+a25vd24gYnJva2VuIGhvc3RzLi4uCkNoZWNraW5nIFBBVENIIDQvNTogcGM6IEFkZCAyLjkgbWFj
+aGluZS10eXBlcy4uLgpDaGVja2luZyBQQVRDSCA1LzU6IGkzODY6IENoYW5nZSBzdGVwcGluZyBv
+ZiBIYXN3ZWxsIHRvIG5vbi1ibGFja2xpc3RlZCB2YWx1ZS4uLgo9PT0gT1VUUFVUIEVORCA9PT0K
+ClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBh
+dXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2Vu
+ZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
