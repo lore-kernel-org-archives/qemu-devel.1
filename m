@@ -1,38 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55690)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55728)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1cQXpB-0003kO-FG
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:09:15 -0500
+	(envelope-from <stefanha@redhat.com>) id 1cQXpF-0003lN-5T
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:09:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1cQXp6-0002bU-F0
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:09:13 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41996
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1cQXp6-0002ae-94
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:09:08 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	v09B8nit035901
-	for <qemu-devel@nongnu.org>; Mon, 9 Jan 2017 06:09:05 -0500
-Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 27v5t894ur-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 09 Jan 2017 06:09:05 -0500
-Received: from localhost
-	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Mon, 9 Jan 2017 06:09:05 -0500
-References: <20170109100123.5080-1-jinguojie@loongson.cn>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Mon, 9 Jan 2017 12:09:01 +0100
+	(envelope-from <stefanha@redhat.com>) id 1cQXpD-0002eo-K7
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:09:17 -0500
+Date: Mon, 9 Jan 2017 11:04:27 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170109110427.GC30228@stefanha-x1.localdomain>
+References: <1482503344-6424-1-git-send-email-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <20170109100123.5080-1-jinguojie@loongson.cn>
-Content-Type: text/plain; charset=windows-1252
-Message-Id: <4006d7cd-5a37-7ff9-59f3-c09717795a70@de.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 0/1] Change default CFLAGS to -O3
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="uh9ZiVrAOUUm9fzH"
+Content-Disposition: inline
+In-Reply-To: <1482503344-6424-1-git-send-email-vsementsov@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH 00/21] new backup architecture
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,70 +23,187 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jin Guojie <jinguojie@loongson.cn>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+To: jsnow@redhat.com, jcody@redhat.com
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, famz@redhat.com, den@openvz.org, pbonzini@redhat.com, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-On 01/09/2017 11:01 AM, Jin Guojie wrote:
-> * in configure, the default optimization level is changed to O3.
-> * Tested successfully on following machines:
+
+--uh9ZiVrAOUUm9fzH
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, Dec 23, 2016 at 05:28:43PM +0300, Vladimir Sementsov-Ogievskiy wrot=
+e:
+
+Jeff or John: are you reviewing this?
+
+> This is a new architecture for backup. It solves some current problems:
+> 1. intersecting requests: for now at request start we wait for all inters=
+ecting requests, which means that
+>     a. we may wait even for unrelated to our request clusters
+>     b. not full async: if we are going to copy clusters 1,2,3,4, when 2 a=
+nd 4 are in flight, why should we wait for 2 and 4 to be fully copied? Why =
+not to start 1 and 3 in parallel with 2 and 4?
 >=20
->   | Host machine | Host OS  | qemu-system | Debian ISO  |
->   |-----------------------------------------------------|
->   |   x86 64     | Fedora25 |    i386     |    i386     |
->   | mips 64 le   | Fedora25 |    i386     |    i386     |
+> 2. notifier request is internally synchronous: if notifier starts copying=
+ clusters 1,2,3,4, they will be copied one by one in synchronous loop.
 >=20
-> Signed-off-by: Jin Guojie <jinguojie@loongson.cn>
+> 3. notifier wait full copying of corresponding clusters (when actually it=
+ may wait only for _read_ operations to be finished)
 >=20
-> Jin Guojie (1):
->   Change default CFLAGS to -O3
+> In short, what is done:
+> 1. full async scheme
+> 4. no intersecting requests
+> 3. notifiers can wait only for read, not for write
+> 4. notifiers wait only for corresponding clusters
+> 5. time limit for notifiers
+> 5. skip unallocated clusters for full mode
+> 6. use HBitmap as main backup bitmap and just init it from dirty bitmap f=
+or incremental case
+> 7. retrying: do not reread on write fail
 >=20
->  configure | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+> # Intro
+>=20
+> Instead of sync-copying + async-notifiers as in old backup, or aio reques=
+ts like in mirror, this scheme just start 24 workers - separate coroutines,=
+ each of them copying clusters synchronously. Copying is only done by one c=
+luster, there are no large requests.
+> The only difference for clusters, awaited by write notifiers, is larger p=
+riority. So, notifiers do not start io requests, they just mark some cluste=
+rs as awaited and yield. Then, when some worker completes read of last clus=
+ter, awaited by this notifier it will enter it.
+>=20
+> # Some data structures
+>=20
+> Instead of done_bitmap - copy_bitmap, like in mirror.
+> HBitmap copy_bitmap
+>     Exactly, what should be copied:
+>     0 - may mean one of three things:
+>         - this cluster should not be copied at all
+>         - this cluster is in flight
+>         - this cluster is already copied
+>     1 - means that cluster should be copied, but not touched yet (no asyn=
+c io exists for it)
+>=20
+> New bitmap: notif_wait_bitmap - not HBitmap, just Bitmap.
+>     Exactly, in flight clusters, waiting for read operation:
+>     0 - may mean one of three things:
+>         - this cluster should not be copied at all
+>         - this cluster is in flight and it is _already_ read to memory
+>         - this cluster is already copied
+>     1 - means that cluster is in flight, but read operation have not fini=
+shed
+>         yet
+>     The only exception is none-mode: in this case 1 means in flight: in i=
+o read or write. This is needed for image fleecing.
+>=20
+> Cluster states (copy_bitmap, notif_wait_bitmap)
+>=20
+> 0, 0 - Ignored (should not be copied at all) or In flight (read done) or =
+Copied
+> 0, 1 - In flight, read operation not finished (or write op. - for none-mo=
+de)
+> 1, 0 - Should be copied, but not touched yet
+> 1, 1 - Impossible state
+>=20
+> NotifierRequest - request from notifier, it changes sequence of cluster c=
+opying by workers.
+> NotifierRequest {
+>     int64_t start;
+>     int64_t end;
+>     int nb_wait; // nb clusters (in specified range) that should be copie=
+d but not already read, i.e. clusters awaited by this notifier
+>     Coroutine *notif; // corresponding notifier coroutine
+> }
+>=20
+> notifier_reqs - list of notifier requests
+>=20
+> # More info
+>=20
+> At backup start copy_bitmap is inited to sync_bitmap for incremental back=
+up. For top/full backup it is inited to all ones, but in parallel with work=
+ers main coroutine skips not allocated clusters.
+>=20
+> Worker coroutines are copying clusters, preferable awaited by notifiers (=
+for which NotifierRequest exists in the list). Function get_work helps them.
+> Workers will copy clusters, awaited by notifiers even if block-job is pau=
+sed - it is the same behaviour  as in old architecture.
+>=20
+> Old backup fails guest-write if notifier fails to backup corresponding cl=
+usters. In the new scheme there is a little difference: notifier just wait =
+for 5s and if backup can't copy all corresponding clusters in this time - g=
+uest-write fails.
+> Error scenarios was considered on list, the final solution was to provide=
+ user a possibility to chose what should be failed: backup or guest-write. =
+I'll add this later.
+>=20
+> Worker can exit (no more clusters to copy or fatal error) or pause (error=
+ or user pause or throttling). When last worker goes to pause it rings up m=
+ain block-job coroutine, which will handle user pause or errors. We need to=
+ handle errors in main coroutine because of nature of block_job_error_actio=
+n, which may yield.
+>=20
+> There also is a bonus: new io-retrying scheme: if there is an error on re=
+ad or write, worker just yield in the retrying loop and if it will be resum=
+ed (with job->error_exit =3D false) it will continue from the same place, s=
+o if we have failed write after successful read we will not reread.
+>=20
+> Vladimir Sementsov-Ogievskiy (21):
+>   backup: move from done_bitmap to copy_bitmap
+>   backup: init copy_bitmap from sync_bitmap for incremental
+>   backup: improve non-dirty bits progress processing
+>   backup: use copy_bitmap in incremental backup
+>   hbitmap: improve dirty iter
+>   backup: rewrite top mode cluster skipping
+>   backup: refactor: merge top/full/incremental backup code
+>   backup: skip unallocated clusters for full mode
+>   backup: separate copy function
+>   backup: refactor backup_copy_cluster()
+>   backup: move r/w error handling code to r/w functions
+>   iotests: add supported_cache_modes to main function
+>   coroutine: add qemu_coroutine_add_next
+>   block: add trace point on bdrv_close_all
+>   bitmap: add bitmap_count_between() function
+>   hbitmap: add hbitmap_count_between() function
+>   backup: make all reads not serializing
+>   backup: new async architecture
+>   backup: refactor backup_do_cow
+>   backup: move bitmap handling from backup_do_cow to get_work
+>   backup: refactor: remove backup_do_cow()
+>=20
+>  block.c                       |   1 +
+>  block/backup.c                | 871 +++++++++++++++++++++++++++++++-----=
+------
+>  block/trace-events            |  34 +-
+>  blockjob.c                    |  29 +-
+>  include/block/blockjob.h      |  15 +-
+>  include/qemu/bitmap.h         |   4 +
+>  include/qemu/coroutine.h      |   2 +
+>  include/qemu/hbitmap.h        |  26 +-
+>  tests/qemu-iotests/055        |   4 +-
+>  tests/qemu-iotests/129        |   6 +-
+>  tests/qemu-iotests/iotests.py |   7 +-
+>  util/bitmap.c                 |  27 ++
+>  util/hbitmap.c                |  32 +-
+>  util/qemu-coroutine.c         |   7 +
+>  14 files changed, 805 insertions(+), 260 deletions(-)
+>=20
+> --=20
+> 1.8.3.1
 >=20
 
-There are some compilers that trigger some maybe Warnings with -O3
-e.g.
+--uh9ZiVrAOUUm9fzH
+Content-Type: application/pgp-signature; name="signature.asc"
 
-      CC      block/vmdk.o
-    /home/cborntra/REPOS/qemu/block/vmdk.c: In function =91vmdk_open_vmdk=
-4=92:
-    /home/cborntra/REPOS/qemu/block/vmdk.c:718:24: error: =91extent=92 ma=
-y be
-    used uninitialized in this function [-Werror=3Dmaybe-uninitialized]
-         extent->has_marker =3D le32_to_cpu(header.flags) & VMDK4_FLAG_MA=
-RKER;
-                            ^
-    /home/cborntra/REPOS/qemu/block/vmdk.c: In function =91vmdk_open_spar=
-se=92:
-    /home/cborntra/REPOS/qemu/block/vmdk.c:530:9: error: =91extent=92 may=
- be
-    used uninitialized in this function [-Werror=3Dmaybe-uninitialized]
-         ret =3D vmdk_init_tables(bs, extent, errp);
-             ^
-    /home/cborntra/REPOS/qemu/block/vmdk.c:509:17: note: =91extent=92 was
-    declared here
-         VmdkExtent *extent;
-                     ^
-    /home/cborntra/REPOS/qemu/block/vmdk.c: In function
-    =91vmdk_open_desc_file.isra.12=92:
-    /home/cborntra/REPOS/qemu/block/vmdk.c:873:39: error: =91extent=92 ma=
-y be
-    used uninitialized in this function [-Werror=3Dmaybe-uninitialized]
-                 extent->flat_start_offset =3D flat_offset << 9;
-                                           ^
-    /home/cborntra/REPOS/qemu/block/vmdk.c:803:17: note: =91extent=92 was
-    declared here
-         VmdkExtent *extent;
-                     ^
-    cc1: all warnings being treated as errors
-    /home/cborntra/REPOS/qemu/rules.mak:60: recipe for target 'block/vmdk=
-.o'
-    failed
+-----BEGIN PGP SIGNATURE-----
 
+iQEcBAEBAgAGBQJYc247AAoJEJykq7OBq3PIX1cH/1tPw84WNlrg51wmrKPURfRO
+UTEhj9t0T6OrbB8iExWX3MqXY+3hpWg5zAe/hhemJq1pVhK39S9fjk5eQ67gclBY
+xIHo9x1kcGWJ99FP4zBR7il3x5h8oHM/8jh0yxrjHoLwKruHFvY78itkp9QgScQw
+A8L8xVvYyKPjZC6vVE772NjXkokJ3LfNCbZ3whQfVrYDVADdWnm5lp0UJfKbqzvH
+iGsI75kjGlOu8a8BYaCrDB/QSkyOjzy1o6piA7DUyksKr8YZzgg/BHOwX6oqtx5T
+Ew369k9yTWVDTz8e8KAtbGSEEAGIYhPfkljtsebsSRSg8AR2YegiELZoJHXIK4k=
+=EpOK
+-----END PGP SIGNATURE-----
 
-I have started fixing those some time ago but had no time yet finishing t=
-hat.
-Totally messy patches (in terms of patch description) at
-https://github.com/borntraeger/qemu/commits/o3
-
-Christian
+--uh9ZiVrAOUUm9fzH--
