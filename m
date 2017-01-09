@@ -1,23 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42865)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53044)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rami.rosen@intel.com>) id 1cQIDH-00020V-LZ
-	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 13:29:04 -0500
+	(envelope-from <famz@redhat.com>) id 1cQOFr-0003Sj-ON
+	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 19:56:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rami.rosen@intel.com>) id 1cQIDE-000474-HA
-	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 13:29:03 -0500
-Received: from mga09.intel.com ([134.134.136.24]:23833)
+	(envelope-from <famz@redhat.com>) id 1cQOFn-0004J5-76
+	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 19:56:07 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59932)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rami.rosen@intel.com>)
-	id 1cQIDE-00046R-7l
-	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 13:29:00 -0500
-From: Rami Rosen <rami.rosen@intel.com>
-Date: Sun,  8 Jan 2017 20:28:43 +0200
-Message-Id: <1483900123-7103-1-git-send-email-rami.rosen@intel.com>
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1cQOFn-0004In-1j
+	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 19:56:03 -0500
+Received: from int-mx13.intmail.prod.int.phx2.redhat.com
+	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A024E4E4DE
+	for <qemu-devel@nongnu.org>; Mon,  9 Jan 2017 00:56:02 +0000 (UTC)
+Date: Mon, 9 Jan 2017 08:55:57 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170109005557.GB9148@lemon.Home>
+References: <20170106182823.1960-1-dgilbert@redhat.com>
+	<148372870194.199.4494478269203412425@790289a7ca88>
+	<20170106185918.GA32535@work-vm>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] ui: fix format specifier in
- vnc_client_io_error() to avoid break in build.
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170106185918.GA32535@work-vm>
+Subject: Re: [Qemu-devel] [PATCH 00/15] Postcopy: Hugepage support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,41 +34,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Rami Rosen <rami.rosen@intel.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, amit.shah@redhat.com, aarcange@redhat.com, quintela@redhat.com
 
-When building qemu after setting _VNC_DEBUG to 1 (see ui/vnc.h),
-we get the following error and the build breaks:
-...
-ui/vnc.c: In function ‘vnc_client_io_error’:
-ui/vnc.c:1262:13: error: format ‘%d’ expects argument of type ‘int’, but argument 3 has type ‘ssize_t’ [-Werror=format=]
-             VNC_DEBUG("Closing down client sock: ret %d (%s)\n",
-             ^
-cc1: all warnings being treated as errors
-make: *** [ui/vnc.o] Error 1
-...
+On Fri, 01/06 18:59, Dr. David Alan Gilbert wrote:
+> * no-reply@patchew.org (no-reply@patchew.org) wrote:
+> > Hi,
+> > Checking PATCH 14/15: postcopy: Check for userfault+hugepage feature...
+> > ERROR: trailing whitespace
+> > #21: FILE: migration/postcopy-ram.c:85:
+> > +        bool have_hp = false; $
+> 
+> I noticed that one but explicitly left it; the code really reads much
+> more cleanly to me with it explicitly set.
 
-This patch solves this issue by fixing the print format specifier
-in vnc_client_io_error() to be %ld, which corresponds to the type
-of the "ret" variable.
+It's not complaining about the variable being initialized, but rather the ending
+whitespace before EOL.
 
-Signed-off-by: Rami Rosen <rami.rosen@intel.com>
----
- ui/vnc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/ui/vnc.c b/ui/vnc.c
-index 2c28a59..4b0a89c 100644
---- a/ui/vnc.c
-+++ b/ui/vnc.c
-@@ -1259,7 +1259,7 @@ ssize_t vnc_client_io_error(VncState *vs, ssize_t ret, Error **errp)
-         if (ret == 0) {
-             VNC_DEBUG("Closing down client sock: EOF\n");
-         } else if (ret != QIO_CHANNEL_ERR_BLOCK) {
--            VNC_DEBUG("Closing down client sock: ret %d (%s)\n",
-+            VNC_DEBUG("Closing down client sock: ret %ld (%s)\n",
-                       ret, errp ? error_get_pretty(*errp) : "Unknown");
-         }
- 
--- 
-1.9.1
+Fam
