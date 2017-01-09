@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34745)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35835)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cQaKn-00034X-8p
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 08:50:02 -0500
+	(envelope-from <kraxel@redhat.com>) id 1cQaQK-0008DV-IN
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 08:55:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cQaKm-0004l4-4b
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 08:50:01 -0500
-Received: from mail-vk0-x22a.google.com ([2607:f8b0:400c:c05::22a]:33753)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cQaKl-0004ky-W3
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 08:50:00 -0500
-Received: by mail-vk0-x22a.google.com with SMTP id 137so342049595vkl.0
-	for <qemu-devel@nongnu.org>; Mon, 09 Jan 2017 05:49:59 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <1483967385-12891-1-git-send-email-kraxel@redhat.com>
-References: <1483967385-12891-1-git-send-email-kraxel@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 9 Jan 2017 13:49:38 +0000
-Message-ID: <CAFEAcA_npQNeiSosYGEX2N4OofNaYk_nuti9rhYk12HByVPfFQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL v2 00/11] ui patch queue
+	(envelope-from <kraxel@redhat.com>) id 1cQaQJ-00073r-FI
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 08:55:44 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38880)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cQaQJ-00073Q-7z
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 08:55:43 -0500
+Received: from int-mx13.intmail.prod.int.phx2.redhat.com
+	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3466D44811
+	for <qemu-devel@nongnu.org>; Mon,  9 Jan 2017 13:55:43 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Mon,  9 Jan 2017 14:55:38 +0100
+Message-Id: <1483970138-20360-1-git-send-email-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH] virtio-gpu: tag as not hotpluggable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,53 +27,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-On 9 January 2017 at 13:09, Gerd Hoffmann <kraxel@redhat.com> wrote:
->   Hi,
->
-> Here comes the ui patch queue with a bunch of small changes and fixes
-> all over the place: gtk, vnc, curses, sdl, keyboard.
->
-> v2 changes:  Replace the ps2 fix (v3 instead of v2 of the patch).
->
-> please pull,
->   Gerd
->
-> The following changes since commit dbe2b65566e76d3c3a0c3358285c0336ac61e757:
->
->   Merge remote-tracking branch 'remotes/vivier/tags/m68k-for-2.9-pull-request' into staging (2016-12-28 17:11:11 +0000)
->
-> are available in the git repository at:
->
->
->   git://git.kraxel.org/qemu tags/pull-ui-20170109-1
->
-> for you to fetch changes up to f46c4259f489d2e7742890ddfaa862bde3731e3e:
->
->   ps2: Fix lost scancodes by recent changes (2017-01-06 10:36:49 +0100)
->
-> ----------------------------------------------------------------
-> gtk,vnc: misc bugfixes.
-> kbd: add jp keys, fix ps2 regressions.
-> sdl: export window id for baum, remove sdl hooks from baum.
-> egl: egl-helpers.c license change.
+qemu can't hotplug display devices.
 
-Hi. I'm afraid this fails to build on OSX:
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ hw/display/virtio-gpu.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-/Users/pm215/src/qemu-for-merges/ui/cocoa.m:688:21: error: use of
-undeclared identifier 'MOUSE_EVENT_WHEELUP'
-                    MOUSE_EVENT_WHEELUP : MOUSE_EVENT_WHEELDN;
-                    ^
-/Users/pm215/src/qemu-for-merges/ui/cocoa.m:710:45: error: use of
-undeclared identifier 'MOUSE_EVENT_WHEELUP'
-                [INPUT_BUTTON_WHEEL_UP]   = MOUSE_EVENT_WHEELUP,
-                                            ^
-/Users/pm215/src/qemu-for-merges/ui/cocoa.m:711:45: error: use of
-undeclared identifier 'MOUSE_EVENT_WHEELDN'
-                [INPUT_BUTTON_WHEEL_DOWN] = MOUSE_EVENT_WHEELDN,
-                                            ^
-
-thanks
--- PMM
+diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
+index ca88cf4..f410a3e 100644
+--- a/hw/display/virtio-gpu.c
++++ b/hw/display/virtio-gpu.c
+@@ -1282,6 +1282,7 @@ static void virtio_gpu_class_init(ObjectClass *klass, void *data)
+ 
+     dc->props = virtio_gpu_properties;
+     dc->vmsd = &vmstate_virtio_gpu;
++    dc->hotpluggable = false;
+ }
+ 
+ static const TypeInfo virtio_gpu_info = {
+-- 
+1.8.3.1
