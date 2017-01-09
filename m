@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45501)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45514)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cQcmA-0001aX-TJ
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 11:26:28 -0500
+	(envelope-from <clg@kaod.org>) id 1cQcmM-0001sS-Dy
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 11:26:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cQcm6-0004Sm-Tn
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 11:26:26 -0500
-Received: from 2.mo178.mail-out.ovh.net ([46.105.39.61]:60168)
+	(envelope-from <clg@kaod.org>) id 1cQcmI-0004VL-Di
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 11:26:38 -0500
+Received: from 7.mo178.mail-out.ovh.net ([46.105.58.91]:60269)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cQcm6-0004SW-Mw
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 11:26:22 -0500
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cQcmI-0004V2-7M
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 11:26:34 -0500
 Received: from player714.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 9B032C63F
-	for <qemu-devel@nongnu.org>; Mon,  9 Jan 2017 17:26:21 +0100 (CET)
+	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 4E013D336
+	for <qemu-devel@nongnu.org>; Mon,  9 Jan 2017 17:26:31 +0100 (CET)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Mon,  9 Jan 2017 17:24:45 +0100
-Message-Id: <1483979087-32663-10-git-send-email-clg@kaod.org>
+Date: Mon,  9 Jan 2017 17:24:46 +0100
+Message-Id: <1483979087-32663-11-git-send-email-clg@kaod.org>
 In-Reply-To: <1483979087-32663-1-git-send-email-clg@kaod.org>
 References: <1483979087-32663-1-git-send-email-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 09/11] aspeed/smc: extend tests for Command
- mode
+Subject: [Qemu-devel] [PATCH v2 10/11] aspeed: use first FMC flash as a boot
+ ROM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,166 +33,95 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Crosthwaite <crosthwaite.peter@gmail.com>
 Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Marcin Krzeminski <marcin.krzeminski@nokia.com>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-The Aspeed SMC controllers have a mode (Command mode) in which
-accesses to the flash content are no different than doing MMIOs. The
-controller generates all the necessary commands to load (or store)
-data in memory.
+Create a ROM region, using the default size of the mapping window for
+the CE0 FMC flash module, and fill it with the flash content.
 
-So add a couple of tests doing direct reads and writes on the AHB bus.
+This is a little hacky but until we can boot from a MMIO region, it
+seems difficult to do anything else.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Reviewed-by: Joel Stanley <joel@jms.id.au>
 Reviewed-by: Andrew Jeffery <andrew@aj.id.au>
 ---
- tests/m25p80-test.c | 102 ++++++++++++++++++++++++++++++++++++++++++++++=
-++++++
- 1 file changed, 102 insertions(+)
+ hw/arm/aspeed.c | 41 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 41 insertions(+)
 
- Changes since v1:
-
- - added preliminary configuration of the controller and the flash
-   before starting the test.=20
- - added a flash reset=20
-
-diff --git a/tests/m25p80-test.c b/tests/m25p80-test.c
-index 8dd550deb95e..244aa33dd941 100644
---- a/tests/m25p80-test.c
-+++ b/tests/m25p80-test.c
-@@ -36,6 +36,9 @@
- #define   CRTL_EXTENDED0       0  /* 32 bit addressing for SPI */
- #define R_CTRL0             0x10
- #define   CTRL_CE_STOP_ACTIVE  (1 << 2)
-+#define   CTRL_READMODE        0x0
-+#define   CTRL_FREADMODE       0x1
-+#define   CTRL_WRITEMODE       0x2
- #define   CTRL_USERMODE        0x3
+diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
+index 40c13838fb2d..a92c2f1c362b 100644
+--- a/hw/arm/aspeed.c
++++ b/hw/arm/aspeed.c
+@@ -20,6 +20,8 @@
+ #include "qemu/log.h"
+ #include "sysemu/block-backend.h"
+ #include "sysemu/blockdev.h"
++#include "hw/loader.h"
++#include "qemu/error-report.h"
 =20
- #define ASPEED_FMC_BASE    0x1E620000
-@@ -86,6 +89,22 @@ static void spi_conf_remove(uint32_t value)
-     writel(ASPEED_FMC_BASE + R_CONF, conf);
- }
+ static struct arm_boot_info aspeed_board_binfo =3D {
+     .board_id =3D -1, /* device-tree-only board */
+@@ -104,6 +106,28 @@ static const AspeedBoardConfig aspeed_boards[] =3D {
+     },
+ };
 =20
-+static void spi_ce_ctrl(uint32_t value)
-+{
-+    uint32_t conf =3D readl(ASPEED_FMC_BASE + R_CE_CTRL);
++#define FIRMWARE_ADDR 0x0
 +
-+    conf |=3D value;
-+    writel(ASPEED_FMC_BASE + R_CE_CTRL, conf);
++static void write_boot_rom(DriveInfo *dinfo, hwaddr addr, size_t rom_siz=
+e,
++                           Error **errp)
++{
++    BlockBackend *blk =3D blk_by_legacy_dinfo(dinfo);
++    uint8_t *storage;
++
++    if (rom_size > blk_getlength(blk)) {
++        rom_size =3D blk_getlength(blk);
++    }
++
++    storage =3D g_new0(uint8_t, rom_size);
++    if (blk_pread(blk, 0, storage, rom_size) < 0) {
++        error_setg(errp, "failed to read the initial flash content");
++        return;
++    }
++
++    rom_add_blob_fixed("aspeed.boot_rom", storage, rom_size, addr);
++    g_free(storage);
 +}
 +
-+static void spi_ctrl_setmode(uint8_t mode, uint8_t cmd)
-+{
-+    uint32_t ctrl =3D readl(ASPEED_FMC_BASE + R_CTRL0);
-+    ctrl &=3D ~(CTRL_USERMODE | 0xff << 16);
-+    ctrl |=3D mode | (cmd << 16);
-+    writel(ASPEED_FMC_BASE + R_CTRL0, ctrl);
-+}
-+
- static void spi_ctrl_start_user(void)
+ static void aspeed_board_init_flashes(AspeedSMCState *s, const char *fla=
+shtype,
+                                       Error **errp)
  {
-     uint32_t ctrl =3D readl(ASPEED_FMC_BASE + R_CTRL0);
-@@ -152,6 +171,18 @@ static void read_page(uint32_t addr, uint32_t *page)
-     spi_ctrl_stop_user();
- }
-=20
-+static void read_page_mem(uint32_t addr, uint32_t *page)
-+{
-+    int i;
-+
-+    /* move out USER mode to use direct reads from the AHB bus */
-+    spi_ctrl_setmode(CTRL_READMODE, READ);
-+
-+    for (i =3D 0; i < PAGE_SIZE / 4; i++) {
-+        page[i] =3D make_be32(readl(ASPEED_FLASH_BASE + addr + i * 4));
-+    }
-+}
-+
- static void test_erase_sector(void)
+@@ -135,6 +159,7 @@ static void aspeed_board_init(MachineState *machine,
  {
-     uint32_t some_page_addr =3D 0x600 * PAGE_SIZE;
-@@ -248,6 +279,75 @@ static void test_write_page(void)
-     flash_reset();
- }
+     AspeedBoardState *bmc;
+     AspeedSoCClass *sc;
++    DriveInfo *drive0 =3D drive_get(IF_MTD, 0, 0);
 =20
-+static void test_read_page_mem(void)
-+{
-+    uint32_t my_page_addr =3D 0x14000 * PAGE_SIZE; /* beyond 16MB */
-+    uint32_t some_page_addr =3D 0x15000 * PAGE_SIZE;
-+    uint32_t page[PAGE_SIZE / 4];
-+    int i;
+     bmc =3D g_new0(AspeedBoardState, 1);
+     object_initialize(&bmc->soc, (sizeof(bmc->soc)), cfg->soc_name);
+@@ -168,6 +193,22 @@ static void aspeed_board_init(MachineState *machine,
+     aspeed_board_init_flashes(&bmc->soc.fmc, cfg->fmc_model, &error_abor=
+t);
+     aspeed_board_init_flashes(&bmc->soc.spi[0], cfg->spi_model, &error_a=
+bort);
+=20
++    /* Install first FMC flash content as a boot rom. */
++    if (drive0) {
++        AspeedSMCFlash *fl =3D &bmc->soc.fmc.flashes[0];
++        MemoryRegion *boot_rom =3D g_new(MemoryRegion, 1);
 +
-+    /* Enable 4BYTE mode for controller. This is should be strapped by
-+     * HW for CE0 anyhow.
-+     */
-+    spi_ce_ctrl(1 << CRTL_EXTENDED0);
-+
-+    /* Enable 4BYTE mode for flash. */
-+    spi_conf(CONF_ENABLE_W0);
-+    spi_ctrl_start_user();
-+    writeb(ASPEED_FLASH_BASE, EN_4BYTE_ADDR);
-+    spi_ctrl_stop_user();
-+    spi_conf_remove(CONF_ENABLE_W0);
-+
-+    /* Check what was written */
-+    read_page_mem(my_page_addr, page);
-+    for (i =3D 0; i < PAGE_SIZE / 4; i++) {
-+        g_assert_cmphex(page[i], =3D=3D, my_page_addr + i * 4);
++        /*
++         * create a ROM region using the default mapping window size of
++         * the flash module.
++         */
++        memory_region_init_rom(boot_rom, OBJECT(bmc), "aspeed.boot_rom",
++                               fl->size, &error_abort);
++        memory_region_add_subregion(get_system_memory(), FIRMWARE_ADDR,
++                                    boot_rom);
++        write_boot_rom(drive0, FIRMWARE_ADDR, fl->size, &error_abort);
 +    }
 +
-+    /* Check some other page. It should be full of 0xff */
-+    read_page_mem(some_page_addr, page);
-+    for (i =3D 0; i < PAGE_SIZE / 4; i++) {
-+        g_assert_cmphex(page[i], =3D=3D, 0xffffffff);
-+    }
-+
-+    flash_reset();
-+}
-+
-+static void test_write_page_mem(void)
-+{
-+    uint32_t my_page_addr =3D 0x15000 * PAGE_SIZE;
-+    uint32_t page[PAGE_SIZE / 4];
-+    int i;
-+
-+    /* Enable 4BYTE mode for controller. This is should be strapped by
-+     * HW for CE0 anyhow.
-+     */
-+    spi_ce_ctrl(1 << CRTL_EXTENDED0);
-+
-+    /* Enable 4BYTE mode for flash. */
-+    spi_conf(CONF_ENABLE_W0);
-+    spi_ctrl_start_user();
-+    writeb(ASPEED_FLASH_BASE, EN_4BYTE_ADDR);
-+    writeb(ASPEED_FLASH_BASE, WREN);
-+    spi_ctrl_stop_user();
-+
-+    /* move out USER mode to use direct writes to the AHB bus */
-+    spi_ctrl_setmode(CTRL_WRITEMODE, PP);
-+
-+    for (i =3D 0; i < PAGE_SIZE / 4; i++) {
-+        writel(ASPEED_FLASH_BASE + my_page_addr + i * 4,
-+               make_be32(my_page_addr + i * 4));
-+    }
-+
-+    /* Check what was written */
-+    read_page_mem(my_page_addr, page);
-+    for (i =3D 0; i < PAGE_SIZE / 4; i++) {
-+        g_assert_cmphex(page[i], =3D=3D, my_page_addr + i * 4);
-+    }
-+
-+    flash_reset();
-+}
-+
- static char tmp_path[] =3D "/tmp/qtest.m25p80.XXXXXX";
-=20
- int main(int argc, char **argv)
-@@ -273,6 +373,8 @@ int main(int argc, char **argv)
-     qtest_add_func("/m25p80/erase_sector", test_erase_sector);
-     qtest_add_func("/m25p80/erase_all",  test_erase_all);
-     qtest_add_func("/m25p80/write_page", test_write_page);
-+    qtest_add_func("/m25p80/read_page_mem", test_read_page_mem);
-+    qtest_add_func("/m25p80/write_page_mem", test_write_page_mem);
-=20
-     ret =3D g_test_run();
-=20
+     aspeed_board_binfo.kernel_filename =3D machine->kernel_filename;
+     aspeed_board_binfo.initrd_filename =3D machine->initrd_filename;
+     aspeed_board_binfo.kernel_cmdline =3D machine->kernel_cmdline;
 --=20
 2.7.4
