@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47920)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51633)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cQevO-00087X-40
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 13:44:07 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cQfD8-0004Vb-Kk
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 14:02:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cQevM-0003HW-OW
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 13:44:06 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48112)
+	(envelope-from <rth7680@gmail.com>) id 1cQfD7-00024e-O8
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 14:02:26 -0500
+Received: from mail-io0-x242.google.com ([2607:f8b0:4001:c06::242]:35127)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1cQevM-0003Gh-Cr
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 13:44:04 -0500
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon,  9 Jan 2017 18:43:57 +0000
-Message-Id: <1483987437-12084-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH] hw/net/dp8393x: Avoid unintentional sign
- extensions on addresses
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cQfD7-00023x-JW
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 14:02:25 -0500
+Received: by mail-io0-x242.google.com with SMTP id m98so7885918iod.2
+	for <qemu-devel@nongnu.org>; Mon, 09 Jan 2017 11:02:22 -0800 (PST)
+Sender: Richard Henderson <rth7680@gmail.com>
+From: Richard Henderson <rth@twiddle.net>
+Date: Mon,  9 Jan 2017 11:02:17 -0800
+Message-Id: <20170109190217.16301-1-rth@twiddle.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL v2 00/11] tcg host mips64 support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,257 +28,36 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: patches@linaro.org, Jason Wang <jasowang@redhat.com>, Laurent Vivier <laurent@vivier.eu>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: peter.maydell@linaro.org
 
-The dp8393x has several 32-bit values which are formed by concatenating
-two 16 bit device register values. Attempting to do these inline
-with ((s->reg[HI] << 16) | s->reg[LO]) can result in an unintended
-sign extension because "x << 16" is of type 'int' even though s->reg
-is unsigned, and so if the expression is used in a context where
-it is cast to uint64_t the value is incorrectly sign-extended.
-Fix this by using accessor functions with a uint32_t return type;
-this also makes the code a bit easier to read.
+[Bah.  This time with actual request-pull info.]
 
-This should fix Coverity issues 1307765, 1307766, 1307767, 1307768.
+This is v6 of Jin Guojie's patch set, as tested by Aurelien Jarno,
+James Hogan, and Yun Qiang Su.  Plus one more patch from me to fix
+a trival Werror in mips specific code with gcc 5.3.
 
-(To avoid having a ctda read function only used in a DPRINTF,
-we move the DPRINTF down slightly so it can use the ttda function.)
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
-Disclaimer: only compile tested as this device only exists on
-the MIPS magnum/pica61 boards and I don't have an image for them.
+r~
 
- hw/net/dp8393x.c | 95 ++++++++++++++++++++++++++++++++++++++++----------------
- 1 file changed, 68 insertions(+), 27 deletions(-)
 
-diff --git a/hw/net/dp8393x.c b/hw/net/dp8393x.c
-index 17f0338..efa33ad 100644
---- a/hw/net/dp8393x.c
-+++ b/hw/net/dp8393x.c
-@@ -174,6 +174,52 @@ typedef struct dp8393xState {
-     AddressSpace as;
- } dp8393xState;
- 
-+/* Accessor functions for values which are formed by
-+ * concatenating two 16 bit device registers. By putting these
-+ * in their own functions with a uint32_t return type we avoid the
-+ * pitfall of implicit sign extension where ((x << 16) | y) is a
-+ * signed 32 bit integer that might get sign-extended to a 64 bit integer.
-+ */
-+static uint32_t dp8393x_cdp(dp8393xState *s)
-+{
-+    return (s->regs[SONIC_URRA] << 16) | s->regs[SONIC_CDP];
-+}
-+
-+static uint32_t dp8393x_crba(dp8393xState *s)
-+{
-+    return (s->regs[SONIC_CRBA1] << 16) | s->regs[SONIC_CRBA0];
-+}
-+
-+static uint32_t dp8393x_crda(dp8393xState *s)
-+{
-+    return (s->regs[SONIC_URDA] << 16) | s->regs[SONIC_CRDA];
-+}
-+
-+static uint32_t dp8393x_rbwc(dp8393xState *s)
-+{
-+    return (s->regs[SONIC_RBWC1] << 16) | s->regs[SONIC_RBWC0];
-+}
-+
-+static uint32_t dp8393x_rrp(dp8393xState *s)
-+{
-+    return (s->regs[SONIC_URRA] << 16) | s->regs[SONIC_RRP];
-+}
-+
-+static uint32_t dp8393x_tsa(dp8393xState *s)
-+{
-+    return (s->regs[SONIC_TSA1] << 16) | s->regs[SONIC_TSA0];
-+}
-+
-+static uint32_t dp8393x_ttda(dp8393xState *s)
-+{
-+    return (s->regs[SONIC_UTDA] << 16) | s->regs[SONIC_TTDA];
-+}
-+
-+static uint32_t dp8393x_wt(dp8393xState *s)
-+{
-+    return s->regs[SONIC_WT1] << 16 | s->regs[SONIC_WT0];
-+}
-+
- static void dp8393x_update_irq(dp8393xState *s)
- {
-     int level = (s->regs[SONIC_IMR] & s->regs[SONIC_ISR]) ? 1 : 0;
-@@ -203,8 +249,7 @@ static void dp8393x_do_load_cam(dp8393xState *s)
- 
-     while (s->regs[SONIC_CDC] & 0x1f) {
-         /* Fill current entry */
--        address_space_rw(&s->as,
--            (s->regs[SONIC_URRA] << 16) | s->regs[SONIC_CDP],
-+        address_space_rw(&s->as, dp8393x_cdp(s),
-             MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
-         s->cam[index][0] = data[1 * width] & 0xff;
-         s->cam[index][1] = data[1 * width] >> 8;
-@@ -222,8 +267,7 @@ static void dp8393x_do_load_cam(dp8393xState *s)
-     }
- 
-     /* Read CAM enable */
--    address_space_rw(&s->as,
--        (s->regs[SONIC_URRA] << 16) | s->regs[SONIC_CDP],
-+    address_space_rw(&s->as, dp8393x_cdp(s),
-         MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
-     s->regs[SONIC_CE] = data[0 * width];
-     DPRINTF("load cam done. cam enable mask 0x%04x\n", s->regs[SONIC_CE]);
-@@ -242,8 +286,7 @@ static void dp8393x_do_read_rra(dp8393xState *s)
-     /* Read memory */
-     width = (s->regs[SONIC_DCR] & SONIC_DCR_DW) ? 2 : 1;
-     size = sizeof(uint16_t) * 4 * width;
--    address_space_rw(&s->as,
--        (s->regs[SONIC_URRA] << 16) | s->regs[SONIC_RRP],
-+    address_space_rw(&s->as, dp8393x_rrp(s),
-         MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
- 
-     /* Update SONIC registers */
-@@ -292,7 +335,7 @@ static void dp8393x_set_next_tick(dp8393xState *s)
-         return;
-     }
- 
--    ticks = s->regs[SONIC_WT1] << 16 | s->regs[SONIC_WT0];
-+    ticks = dp8393x_wt(s);
-     s->wt_last_update = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-     delay = NANOSECONDS_PER_SECOND * ticks / 5000000;
-     timer_mod(s->watchdog, s->wt_last_update + delay);
-@@ -309,7 +352,7 @@ static void dp8393x_update_wt_regs(dp8393xState *s)
-     }
- 
-     elapsed = s->wt_last_update - qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
--    val = s->regs[SONIC_WT1] << 16 | s->regs[SONIC_WT0];
-+    val = dp8393x_wt(s);
-     val -= elapsed / 5000000;
-     s->regs[SONIC_WT1] = (val >> 16) & 0xffff;
-     s->regs[SONIC_WT0] = (val >> 0)  & 0xffff;
-@@ -356,12 +399,11 @@ static void dp8393x_do_transmit_packets(dp8393xState *s)
- 
-     while (1) {
-         /* Read memory */
--        DPRINTF("Transmit packet at %08x\n",
--                (s->regs[SONIC_UTDA] << 16) | s->regs[SONIC_CTDA]);
-         size = sizeof(uint16_t) * 6 * width;
-         s->regs[SONIC_TTDA] = s->regs[SONIC_CTDA];
-+        DPRINTF("Transmit packet at %08x\n", dp8393x_ttda(s));
-         address_space_rw(&s->as,
--            ((s->regs[SONIC_UTDA] << 16) | s->regs[SONIC_TTDA]) + sizeof(uint16_t) * width,
-+            dp8393x_ttda(s) + sizeof(uint16_t) * width,
-             MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
-         tx_len = 0;
- 
-@@ -386,8 +428,7 @@ static void dp8393x_do_transmit_packets(dp8393xState *s)
-             if (tx_len + len > sizeof(s->tx_buffer)) {
-                 len = sizeof(s->tx_buffer) - tx_len;
-             }
--            address_space_rw(&s->as,
--                (s->regs[SONIC_TSA1] << 16) | s->regs[SONIC_TSA0],
-+            address_space_rw(&s->as, dp8393x_tsa(s),
-                 MEMTXATTRS_UNSPECIFIED, &s->tx_buffer[tx_len], len, 0);
-             tx_len += len;
- 
-@@ -396,7 +437,7 @@ static void dp8393x_do_transmit_packets(dp8393xState *s)
-                 /* Read next fragment details */
-                 size = sizeof(uint16_t) * 3 * width;
-                 address_space_rw(&s->as,
--                    ((s->regs[SONIC_UTDA] << 16) | s->regs[SONIC_TTDA]) + sizeof(uint16_t) * (4 + 3 * i) * width,
-+                    dp8393x_ttda(s) + sizeof(uint16_t) * (4 + 3 * i) * width,
-                     MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
-                 s->regs[SONIC_TSA0] = data[0 * width];
-                 s->regs[SONIC_TSA1] = data[1 * width];
-@@ -430,14 +471,16 @@ static void dp8393x_do_transmit_packets(dp8393xState *s)
-         data[0 * width] = s->regs[SONIC_TCR] & 0x0fff; /* status */
-         size = sizeof(uint16_t) * width;
-         address_space_rw(&s->as,
--            (s->regs[SONIC_UTDA] << 16) | s->regs[SONIC_TTDA],
-+            dp8393x_ttda(s),
-             MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 1);
- 
-         if (!(s->regs[SONIC_CR] & SONIC_CR_HTX)) {
-             /* Read footer of packet */
-             size = sizeof(uint16_t) * width;
-             address_space_rw(&s->as,
--                ((s->regs[SONIC_UTDA] << 16) | s->regs[SONIC_TTDA]) + sizeof(uint16_t) * (4 + 3 * s->regs[SONIC_TFC]) * width,
-+                dp8393x_ttda(s) +
-+                             sizeof(uint16_t) *
-+                             (4 + 3 * s->regs[SONIC_TFC]) * width,
-                 MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
-             s->regs[SONIC_CTDA] = data[0 * width] & ~0x1;
-             if (data[0 * width] & 0x1) {
-@@ -700,7 +743,7 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
-     if (s->regs[SONIC_LLFA] & 0x1) {
-         /* Are we still in resource exhaustion? */
-         size = sizeof(uint16_t) * 1 * width;
--        address = ((s->regs[SONIC_URDA] << 16) | s->regs[SONIC_CRDA]) + sizeof(uint16_t) * 5 * width;
-+        address = dp8393x_crda(s) + sizeof(uint16_t) * 5 * width;
-         address_space_rw(&s->as, address, MEMTXATTRS_UNSPECIFIED,
-                          (uint8_t *)data, size, 0);
-         if (data[0 * width] & 0x1) {
-@@ -719,8 +762,8 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
-     checksum = cpu_to_le32(crc32(0, buf, rx_len));
- 
-     /* Put packet into RBA */
--    DPRINTF("Receive packet at %08x\n", (s->regs[SONIC_CRBA1] << 16) | s->regs[SONIC_CRBA0]);
--    address = (s->regs[SONIC_CRBA1] << 16) | s->regs[SONIC_CRBA0];
-+    DPRINTF("Receive packet at %08x\n", dp8393x_crba(s));
-+    address = dp8393x_crba(s);
-     address_space_rw(&s->as, address,
-         MEMTXATTRS_UNSPECIFIED, (uint8_t *)buf, rx_len, 1);
-     address += rx_len;
-@@ -729,13 +772,13 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
-     rx_len += 4;
-     s->regs[SONIC_CRBA1] = address >> 16;
-     s->regs[SONIC_CRBA0] = address & 0xffff;
--    available = (s->regs[SONIC_RBWC1] << 16) | s->regs[SONIC_RBWC0];
-+    available = dp8393x_rbwc(s);
-     available -= rx_len / 2;
-     s->regs[SONIC_RBWC1] = available >> 16;
-     s->regs[SONIC_RBWC0] = available & 0xffff;
- 
-     /* Update status */
--    if (((s->regs[SONIC_RBWC1] << 16) | s->regs[SONIC_RBWC0]) < s->regs[SONIC_EOBC]) {
-+    if (dp8393x_rbwc(s) < s->regs[SONIC_EOBC]) {
-         s->regs[SONIC_RCR] |= SONIC_RCR_LPKT;
-     }
-     s->regs[SONIC_RCR] |= packet_type;
-@@ -746,20 +789,19 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
-     }
- 
-     /* Write status to memory */
--    DPRINTF("Write status at %08x\n", (s->regs[SONIC_URDA] << 16) | s->regs[SONIC_CRDA]);
-+    DPRINTF("Write status at %08x\n", dp8393x_crda(s));
-     data[0 * width] = s->regs[SONIC_RCR]; /* status */
-     data[1 * width] = rx_len; /* byte count */
-     data[2 * width] = s->regs[SONIC_TRBA0]; /* pkt_ptr0 */
-     data[3 * width] = s->regs[SONIC_TRBA1]; /* pkt_ptr1 */
-     data[4 * width] = s->regs[SONIC_RSC]; /* seq_no */
-     size = sizeof(uint16_t) * 5 * width;
--    address_space_rw(&s->as, (s->regs[SONIC_URDA] << 16) | s->regs[SONIC_CRDA],
-+    address_space_rw(&s->as, dp8393x_crda(s),
-         MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 1);
- 
-     /* Move to next descriptor */
-     size = sizeof(uint16_t) * width;
--    address_space_rw(&s->as,
--        ((s->regs[SONIC_URDA] << 16) | s->regs[SONIC_CRDA]) + sizeof(uint16_t) * 5 * width,
-+    address_space_rw(&s->as, dp8393x_crda(s) + sizeof(uint16_t) * 5 * width,
-         MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
-     s->regs[SONIC_LLFA] = data[0 * width];
-     if (s->regs[SONIC_LLFA] & 0x1) {
-@@ -767,8 +809,7 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
-         s->regs[SONIC_ISR] |= SONIC_ISR_RDE;
-     } else {
-         data[0 * width] = 0; /* in_use */
--        address_space_rw(&s->as,
--            ((s->regs[SONIC_URDA] << 16) | s->regs[SONIC_CRDA]) + sizeof(uint16_t) * 6 * width,
-+        address_space_rw(&s->as, dp8393x_crda(s) + sizeof(uint16_t) * 6 * width,
-             MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, sizeof(uint16_t), 1);
-         s->regs[SONIC_CRDA] = s->regs[SONIC_LLFA];
-         s->regs[SONIC_ISR] |= SONIC_ISR_PKTRX;
--- 
-2.7.4
+The following changes since commit f0d703314ecb0415d51425727ed73ad2c6e3238a:
+
+  tcg-mips: Adjust qemu_ld/st for mips64 (2017-01-06 10:09:10 -0800)
+
+are available in the git repository at:
+
+  git://github.com/rth7680/qemu.git tags/pull-tcg-20170108
+
+for you to fetch changes up to f68808c7494b38764e1895a9852b994638b86536:
+
+  translate-all: Avoid -Werror=switch-bool (2017-01-08 09:48:34 -0800)
+
+----------------------------------------------------------------
+TCG host support for mips64
+
+----------------------------------------------------------------
+Richard Henderson (1):
+      translate-all: Avoid -Werror=switch-bool
+
+ translate-all.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
