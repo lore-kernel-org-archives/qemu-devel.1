@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56184)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56421)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ashijeetacharya@gmail.com>) id 1cQdLe-0000ox-UJ
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 12:03:08 -0500
+	(envelope-from <nutarojj@ornl.gov>) id 1cQdMy-0002AC-AE
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 12:04:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ashijeetacharya@gmail.com>) id 1cQdLd-0005XO-58
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 12:03:06 -0500
-Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:35793)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ashijeetacharya@gmail.com>)
-	id 1cQdLc-0005XA-Sc
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 12:03:05 -0500
-Received: by mail-pf0-x242.google.com with SMTP id f144so5976384pfa.2
-	for <qemu-devel@nongnu.org>; Mon, 09 Jan 2017 09:03:04 -0800 (PST)
-From: Ashijeet Acharya <ashijeetacharya@gmail.com>
-Date: Mon,  9 Jan 2017 22:32:48 +0530
-Message-Id: <1483981368-9965-5-git-send-email-ashijeetacharya@gmail.com>
-In-Reply-To: <1483981368-9965-1-git-send-email-ashijeetacharya@gmail.com>
-References: <1483981368-9965-1-git-send-email-ashijeetacharya@gmail.com>
-Subject: [Qemu-devel] [PATCH v4 4/4] migration: Fail migration blocker for
- --only-migratble
+	(envelope-from <nutarojj@ornl.gov>) id 1cQdMu-00062V-5J
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 12:04:28 -0500
+Received: from mta01.ornl.gov ([128.219.177.137]:55196)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <nutarojj@ornl.gov>) id 1cQdMt-00060n-S9
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 12:04:24 -0500
+From: "Nutaro, James J." <nutarojj@ornl.gov>
+Date: Mon, 9 Jan 2017 17:04:19 +0000
+Message-ID: <283fd6b709734ccdbeb6d217f8b32043@EXCHCS32.ornl.gov>
+References: <1483628868-10496-1-git-send-email-nutarojj@ornl.gov>
+	<0f3d6652-e633-c02e-7234-0d5b885d31ea@redhat.com>
+In-Reply-To: <0f3d6652-e633-c02e-7234-0d5b885d31ea@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v6] qqq: module for synchronizing with a
+ simulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,332 +29,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: dgilbert@redhat.com
-Cc: jsnow@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, kwolf@redhat.com, armbru@redhat.com, quintela@redhat.com, mst@redhat.com, marcandre.lureau@redhat.com, groug@kaod.org, aneesh.kumar@linux.vnet.ibm.com, peter.maydell@linaro.org, qemu-devel@nongnu.org, Ashijeet Acharya <ashijeetacharya@gmail.com>
+To: 'Paolo Bonzini' <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-migrate_add_blocker should rightly fail if the '--only-migratable'
-option was specified and the device in use should not be able to
-perform the action which results in an unmigratable VM.
-
-Make migrate_add_blocker return -EACCES in this case.
-
-Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
----
- block/qcow.c                |  5 ++++-
- block/vdi.c                 |  5 ++++-
- block/vhdx.c                |  6 ++++--
- block/vmdk.c                |  5 ++++-
- block/vpc.c                 |  5 ++++-
- block/vvfat.c               |  6 ++++--
- hw/display/virtio-gpu.c     |  9 +++++++--
- hw/intc/arm_gic_kvm.c       |  7 +++++--
- hw/intc/arm_gicv3_its_kvm.c |  5 ++++-
- hw/intc/arm_gicv3_kvm.c     |  5 ++++-
- hw/misc/ivshmem.c           | 10 ++++++++--
- hw/scsi/vhost-scsi.c        |  8 +++++---
- hw/virtio/vhost.c           |  6 ++++--
- migration/migration.c       |  7 +++++++
- target-i386/kvm.c           |  5 ++++-
- 15 files changed, 72 insertions(+), 22 deletions(-)
-
-diff --git a/block/qcow.c b/block/qcow.c
-index 11526a1..bdc6446 100644
---- a/block/qcow.c
-+++ b/block/qcow.c
-@@ -254,7 +254,10 @@ static int qcow_open(BlockDriverState *bs, QDict *options, int flags,
-                bdrv_get_device_or_node_name(bs));
-     ret = migrate_add_blocker(s->migration_blocker, errp);
-     if (ret < 0) {
--        error_free(s->migration_blocker);
-+        if (ret == -EACCES) {
-+            error_append_hint(errp, "Cannot use a node with qcow format as "
-+                              "it does not support live migration");
-+        }
-         goto fail;
-     }
- 
-diff --git a/block/vdi.c b/block/vdi.c
-index 2b56f52..0b011ea 100644
---- a/block/vdi.c
-+++ b/block/vdi.c
-@@ -473,7 +473,10 @@ static int vdi_open(BlockDriverState *bs, QDict *options, int flags,
-                bdrv_get_device_or_node_name(bs));
-     ret = migrate_add_blocker(s->migration_blocker, errp);
-     if (ret < 0) {
--        error_free(s->migration_blocker);
-+        if (ret == -EACCES) {
-+            error_append_hint(errp, "Cannot use a node with vdi format as "
-+                              "it does not support live migration");
-+        }
-         goto fail_free_bmap;
-     }
- 
-diff --git a/block/vhdx.c b/block/vhdx.c
-index d81941b..b8d53ec 100644
---- a/block/vhdx.c
-+++ b/block/vhdx.c
-@@ -997,10 +997,12 @@ static int vhdx_open(BlockDriverState *bs, QDict *options, int flags,
-                bdrv_get_device_or_node_name(bs));
-     ret = migrate_add_blocker(s->migration_blocker, errp);
-     if (ret < 0) {
--        error_free(s->migration_blocker);
-+        if (ret == -EACCES) {
-+            error_append_hint(errp, "Cannot use a node with vhdx format as "
-+                              "it does not support live migration");
-+        }
-         goto fail;
-     }
--
-     if (flags & BDRV_O_RDWR) {
-         ret = vhdx_update_headers(bs, s, false, NULL);
-         if (ret < 0) {
-diff --git a/block/vmdk.c b/block/vmdk.c
-index 4a45a83..defe400 100644
---- a/block/vmdk.c
-+++ b/block/vmdk.c
-@@ -978,7 +978,10 @@ static int vmdk_open(BlockDriverState *bs, QDict *options, int flags,
-                bdrv_get_device_or_node_name(bs));
-     ret = migrate_add_blocker(s->migration_blocker, errp);
-     if (ret < 0) {
--        error_free(s->migration_blocker);
-+        if (ret == -EACCES) {
-+            error_append_hint(errp, "Cannot use a node with vmdk format as "
-+                              "it does not support live migration");
-+        }
-         goto fail;
-     }
- 
-diff --git a/block/vpc.c b/block/vpc.c
-index 299a8c8..5e58d77 100644
---- a/block/vpc.c
-+++ b/block/vpc.c
-@@ -428,7 +428,10 @@ static int vpc_open(BlockDriverState *bs, QDict *options, int flags,
-                bdrv_get_device_or_node_name(bs));
-     ret = migrate_add_blocker(s->migration_blocker, errp);
-     if (ret < 0) {
--        error_free(s->migration_blocker);
-+        if (ret == -EACCES) {
-+            error_append_hint(errp, "Cannot use a node with vpc format as "
-+                              "it does not support live migration");
-+        }
-         goto fail;
-     }
- 
-diff --git a/block/vvfat.c b/block/vvfat.c
-index 3de3320..5a6e038 100644
---- a/block/vvfat.c
-+++ b/block/vvfat.c
-@@ -1193,7 +1193,10 @@ static int vvfat_open(BlockDriverState *bs, QDict *options, int flags,
-                    bdrv_get_device_or_node_name(bs));
-         ret = migrate_add_blocker(s->migration_blocker, errp);
-         if (ret < 0) {
--            error_free(s->migration_blocker);
-+            if (ret == -EACCES) {
-+                error_append_hint(errp, "Cannot use a node with vvfat format "
-+                                  "as it does not support live migration");
-+            }
-             goto fail;
-         }
-     }
-@@ -1202,7 +1205,6 @@ static int vvfat_open(BlockDriverState *bs, QDict *options, int flags,
-         init_mbr(s, cyls, heads, secs);
-     }
- 
--    //    assert(is_consistent(s));
-     qemu_co_mutex_init(&s->lock);
- 
-     ret = 0;
-diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
-index 6e60b8c..fad95bf 100644
---- a/hw/display/virtio-gpu.c
-+++ b/hw/display/virtio-gpu.c
-@@ -1102,6 +1102,7 @@ static void virtio_gpu_device_realize(DeviceState *qdev, Error **errp)
-     VirtIOGPU *g = VIRTIO_GPU(qdev);
-     bool have_virgl;
-     int i;
-+    int ret;
- 
-     if (g->conf.max_outputs > VIRTIO_GPU_MAX_SCANOUTS) {
-         error_setg(errp, "invalid max_outputs > %d", VIRTIO_GPU_MAX_SCANOUTS);
-@@ -1120,8 +1121,12 @@ static void virtio_gpu_device_realize(DeviceState *qdev, Error **errp)
- 
-     if (virtio_gpu_virgl_enabled(g->conf)) {
-         error_setg(&g->migration_blocker, "virgl is not yet migratable");
--        if (migrate_add_blocker(g->migration_blocker, errp) < 0) {
--            error_free(g->migration_blocker);
-+        ret = migrate_add_blocker(g->migration_blocker, errp);
-+        if (ret < 0) {
-+            if (ret == -EACCES) {
-+                error_append_hint(errp, "Cannot use virgl as it does not "
-+                                  "support live migration yet");
-+            }
-             return;
-         }
-     }
-diff --git a/hw/intc/arm_gic_kvm.c b/hw/intc/arm_gic_kvm.c
-index 3614daa..2097808 100644
---- a/hw/intc/arm_gic_kvm.c
-+++ b/hw/intc/arm_gic_kvm.c
-@@ -514,8 +514,11 @@ static void kvm_arm_gic_realize(DeviceState *dev, Error **errp)
-         error_setg(&s->migration_blocker, "This operating system kernel does "
-                                           "not support vGICv2 migration");
-         ret = migrate_add_blocker(s->migration_blocker, errp);
--        if (ret < 0) {
--            error_free(s->migration_blocker);
-+        if (ret < 0 ) {
-+            if (ret == -EACCES) {
-+                error_append_hint(errp, "Failed to realize vGICv2 as its"
-+                                  " migrataion is not implemented yet");
-+            }
-             return;
-         }
-     }
-diff --git a/hw/intc/arm_gicv3_its_kvm.c b/hw/intc/arm_gicv3_its_kvm.c
-index 950a02f..3474642 100644
---- a/hw/intc/arm_gicv3_its_kvm.c
-+++ b/hw/intc/arm_gicv3_its_kvm.c
-@@ -70,7 +70,10 @@ static void kvm_arm_its_realize(DeviceState *dev, Error **errp)
-     error_setg(&s->migration_blocker, "vITS migration is not implemented");
-     ret = migrate_add_blocker(s->migration_blocker, errp);
-     if (ret < 0) {
--        error_free(s->migration_blocker);
-+        if (ret == -EACCES) {
-+            error_append_hint(errp, "Failed to realize vITS as its migration "
-+                              "is not implemented yet");
-+        }
-         return;
-     }
- 
-diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
-index 06f6f30..be7b97c 100644
---- a/hw/intc/arm_gicv3_kvm.c
-+++ b/hw/intc/arm_gicv3_kvm.c
-@@ -118,7 +118,10 @@ static void kvm_arm_gicv3_realize(DeviceState *dev, Error **errp)
-     error_setg(&s->migration_blocker, "vGICv3 migration is not implemented");
-     ret = migrate_add_blocker(s->migration_blocker, errp);
-     if (ret < 0) {
--        error_free(s->migration_blocker);
-+        if (ret == -EACCES) {
-+            error_append_hint(errp, "Failed to realize vGICv3 as its migration"
-+                              "is not implemented yet");
-+        }
-         return;
-     }
- 
-diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
-index 585cc5b..14ed60d 100644
---- a/hw/misc/ivshmem.c
-+++ b/hw/misc/ivshmem.c
-@@ -837,6 +837,7 @@ static void ivshmem_common_realize(PCIDevice *dev, Error **errp)
- {
-     IVShmemState *s = IVSHMEM_COMMON(dev);
-     Error *err = NULL;
-+    int ret;
-     uint8_t *pci_conf;
-     uint8_t attr = PCI_BASE_ADDRESS_SPACE_MEMORY |
-         PCI_BASE_ADDRESS_MEM_PREFETCH;
-@@ -910,8 +911,13 @@ static void ivshmem_common_realize(PCIDevice *dev, Error **errp)
-     if (!ivshmem_is_master(s)) {
-         error_setg(&s->migration_blocker,
-                    "Migration is disabled when using feature 'peer mode' in device 'ivshmem'");
--        if (migrate_add_blocker(s->migration_blocker, errp) < 0) {
--            error_free(s->migration_blocker);
-+        ret = migrate_add_blocker(s->migration_blocker, errp);
-+        if (ret < 0) {
-+            if (ret == -EACCES) {
-+                error_append_hint(errp, "Cannot use the 'peer mode' feature "
-+                                  "in device 'ivshmem' as it does not "
-+                                  "support live migration");
-+            }
-             return;
-         }
-     }
-diff --git a/hw/scsi/vhost-scsi.c b/hw/scsi/vhost-scsi.c
-index ff503d0..bb731b2 100644
---- a/hw/scsi/vhost-scsi.c
-+++ b/hw/scsi/vhost-scsi.c
-@@ -245,7 +245,11 @@ static void vhost_scsi_realize(DeviceState *dev, Error **errp)
-                "vhost-scsi does not support migration");
-     ret = migrate_add_blocker(s->migration_blocker, errp);
-     if (ret < 0) {
--        goto free_blocker;
-+        if (ret == -EACCES) {
-+            error_append_hint(errp, "Cannot use vhost-scsi as it does not "
-+                              "support live migration");
-+        }
-+        goto close_fd;
-     }
- 
-     s->dev.nvqs = VHOST_SCSI_VQ_NUM_FIXED + vs->conf.num_queues;
-@@ -272,8 +276,6 @@ static void vhost_scsi_realize(DeviceState *dev, Error **errp)
-  free_vqs:
-     migrate_del_blocker(s->migration_blocker);
-     g_free(s->dev.vqs);
-- free_blocker:
--    error_free(s->migration_blocker);
-  close_fd:
-     close(vhostfd);
-     return;
-diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index 416fada..6d2375a 100644
---- a/hw/virtio/vhost.c
-+++ b/hw/virtio/vhost.c
-@@ -1160,8 +1160,10 @@ int vhost_dev_init(struct vhost_dev *hdev, void *opaque,
-         Error *local_err;
-         r = migrate_add_blocker(hdev->migration_blocker, &local_err);
-         if (r < 0) {
--            error_report_err(local_err);
--            error_free(hdev->migration_blocker);
-+            if (r == -EACCES) {
-+                error_append_hint(&local_err, "Cannot use vhost drivers as "
-+                                  "it does not support live migration");
-+            }
-             goto fail_busyloop;
-         }
-     }
-diff --git a/migration/migration.c b/migration/migration.c
-index 713e012..ab34328 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -1115,9 +1115,16 @@ int migrate_add_blocker(Error *reason, Error **errp)
- {
-     if (migration_is_idle(NULL)) {
-         migration_blockers = g_slist_prepend(migration_blockers, reason);
-+        error_free(reason);
-         return 0;
-     }
- 
-+    if (only_migratable) {
-+        error_setg(errp, "Failed to add migration blocker: --only-migratable "
-+                   "was specified");
-+        return -EACCES;
-+    }
-+
-     error_setg(errp, "Cannot block a migration already in-progress");
-     return -EBUSY;
- }
-diff --git a/target-i386/kvm.c b/target-i386/kvm.c
-index 6031a1c..f2c35d8 100644
---- a/target-i386/kvm.c
-+++ b/target-i386/kvm.c
-@@ -963,6 +963,10 @@ int kvm_arch_init_vcpu(CPUState *cs)
-                    " (invtsc flag)");
-         r = migrate_add_blocker(invtsc_mig_blocker, NULL);
-         if (r < 0) {
-+            if (r == -EACCES) {
-+                error_report("kvm: non-migratable CPU device but"
-+                        " --only-migratable was specified");
-+            }
-             error_report("kvm: migrate_add_blocker failed");
-             goto efail;
-         }
-@@ -1009,7 +1013,6 @@ int kvm_arch_init_vcpu(CPUState *cs)
-  fail:
-     migrate_del_blocker(invtsc_mig_blocker);
-  efail:
--    error_free(invtsc_mig_blocker);
-     return r;
- }
- 
--- 
-2.6.2
+VGhhbmtzIGFnYWluIFBhb2xvLiBXaGVuIEkgY2hhbmdlIHRoZSBjb21tYW5kIGxpbmUgc3dpdGNo
+ZXMsIGlzIGl0IGJlc3QgdG8gc3VibWl0IGEgd2hvbGUgbmV3IHZlcnNpb24gb2YgdGhlIHBhdGNo
+PyBPciBpcyB0aGVyZSBhbm90aGVyIG1ldGhvZCBmb3IgbWFuYWdpbmcgcGF0Y2ggcmV2aXNpb25z
+Pw0KDQpUaGFua3MsDQoNCkppbQ0KDQotLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KRnJvbTog
+UGFvbG8gQm9uemluaSBbbWFpbHRvOnBib256aW5pQHJlZGhhdC5jb21dIA0KU2VudDogVGh1cnNk
+YXksIEphbnVhcnkgMDUsIDIwMTcgMTA6MjcgQU0NClRvOiBOdXRhcm8sIEphbWVzIEouOyBxZW11
+LWRldmVsQG5vbmdudS5vcmcNClN1YmplY3Q6IFJlOiBbUEFUQ0ggdjZdIHFxcTogbW9kdWxlIGZv
+ciBzeW5jaHJvbml6aW5nIHdpdGggYSBzaW11bGF0aW9uDQoNCg0KDQpPbiAwNS8wMS8yMDE3IDE2
+OjA3LCBKYW1lcyBKLiBOdXRhcm8gd3JvdGU6DQo+IFRoaXMgcGF0Y2ggYWRkcyBhbiBpbnRlcmZh
+Y2UgZm9yIHBhY2luZyB0aGUgZXhlY3V0aW9uIG9mIFFFTVUgdG8gbWF0Y2ggYW4gZXh0ZXJuYWwN
+Cj4gc2ltdWxhdGlvbiBjbG9jay4gSXRzIGFpbSBpcyB0byBwZXJtaXQgUUVNVSB0byBiZSB1c2Vk
+IGFzIGEgbW9kdWxlIHdpdGhpbiBhDQo+IGxhcmdlciBzaW11bGF0aW9uIHN5c3RlbS4NCj4gDQo+
+IFNpZ25lZC1vZmYtYnk6IEphbWVzIEouIE51dGFybyA8bnV0YXJvampAb3JubC5nb3Y+DQoNCldo
+YXQncyB0aGUgZGlmZmVyZW5jZSBiZXR3ZWVuIHY1IGFuZCB2Nj8NCg0KPiArKDIpIEZvcmsgUUVN
+VSB3aXRoIHRoZSBhcHByb3ByaWF0ZSBjb21tYW5kIGxpbmUgYXJndW1lbnRzLg0KPiArICAgIFRo
+ZSAtcXFxIHBhcnQgb2YgdGhlIGFyZ3VtZW50IHdpbGwgbG9vayBzb21ldGhpbmcgbGlrZQ0KPiAr
+DQo+ICsgICAgICAgLXFxcSBzb2NrPXNvY2tzWzFdDQoNCk5vIG5lZWQgZm9yIC1xcXEsIGp1c3Qg
+bWFrZSBpdCAiLWljb3VudCBleHRjbG9jaz1GRCIuDQoNClBhb2xvDQoNCg==
