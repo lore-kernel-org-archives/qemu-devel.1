@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45484)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45501)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cQcm3-0001Sb-5Z
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 11:26:20 -0500
+	(envelope-from <clg@kaod.org>) id 1cQcmA-0001aX-TJ
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 11:26:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cQclz-0004Pr-5n
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 11:26:19 -0500
-Received: from 1.mo178.mail-out.ovh.net ([178.33.251.53]:37819)
+	(envelope-from <clg@kaod.org>) id 1cQcm6-0004Sm-Tn
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 11:26:26 -0500
+Received: from 2.mo178.mail-out.ovh.net ([46.105.39.61]:60168)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cQcly-0004PO-Rh
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 11:26:15 -0500
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cQcm6-0004SW-Mw
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 11:26:22 -0500
 Received: from player714.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 7BAE8C9DC
-	for <qemu-devel@nongnu.org>; Mon,  9 Jan 2017 17:26:13 +0100 (CET)
+	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 9B032C63F
+	for <qemu-devel@nongnu.org>; Mon,  9 Jan 2017 17:26:21 +0100 (CET)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Mon,  9 Jan 2017 17:24:44 +0100
-Message-Id: <1483979087-32663-9-git-send-email-clg@kaod.org>
+Date: Mon,  9 Jan 2017 17:24:45 +0100
+Message-Id: <1483979087-32663-10-git-send-email-clg@kaod.org>
 In-Reply-To: <1483979087-32663-1-git-send-email-clg@kaod.org>
 References: <1483979087-32663-1-git-send-email-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 08/11] aspeed/smc: reset flash after each
- test
+Subject: [Qemu-devel] [PATCH v2 09/11] aspeed/smc: extend tests for Command
+ mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,104 +33,166 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Crosthwaite <crosthwaite.peter@gmail.com>
 Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Marcin Krzeminski <marcin.krzeminski@nokia.com>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-Let's make sure when each test is run that the flash object is in an
-initial state and did not keep configuration from the previous tests.
+The Aspeed SMC controllers have a mode (Command mode) in which
+accesses to the flash content are no different than doing MMIOs. The
+controller generates all the necessary commands to load (or store)
+data in memory.
+
+So add a couple of tests doing direct reads and writes on the AHB bus.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Reviewed-by: Andrew Jeffery <andrew@aj.id.au>
 ---
- tests/m25p80-test.c | 31 +++++++++++++++++++++++++++++++
- 1 file changed, 31 insertions(+)
+ tests/m25p80-test.c | 102 ++++++++++++++++++++++++++++++++++++++++++++++=
+++++++
+ 1 file changed, 102 insertions(+)
+
+ Changes since v1:
+
+ - added preliminary configuration of the controller and the flash
+   before starting the test.=20
+ - added a flash reset=20
 
 diff --git a/tests/m25p80-test.c b/tests/m25p80-test.c
-index cb7ec81f1a6d..8dd550deb95e 100644
+index 8dd550deb95e..244aa33dd941 100644
 --- a/tests/m25p80-test.c
 +++ b/tests/m25p80-test.c
-@@ -50,6 +50,8 @@ enum {
-     READ =3D 0x03,
-     PP =3D 0x02,
-     WREN =3D 0x6,
-+    RESET_ENABLE =3D 0x66,
-+    RESET_MEMORY =3D 0x99,
-     EN_4BYTE_ADDR =3D 0xB7,
-     ERASE_SECTOR =3D 0xd8,
- };
-@@ -76,6 +78,14 @@ static void spi_conf(uint32_t value)
+@@ -36,6 +36,9 @@
+ #define   CRTL_EXTENDED0       0  /* 32 bit addressing for SPI */
+ #define R_CTRL0             0x10
+ #define   CTRL_CE_STOP_ACTIVE  (1 << 2)
++#define   CTRL_READMODE        0x0
++#define   CTRL_FREADMODE       0x1
++#define   CTRL_WRITEMODE       0x2
+ #define   CTRL_USERMODE        0x3
+=20
+ #define ASPEED_FMC_BASE    0x1E620000
+@@ -86,6 +89,22 @@ static void spi_conf_remove(uint32_t value)
      writel(ASPEED_FMC_BASE + R_CONF, conf);
  }
 =20
-+static void spi_conf_remove(uint32_t value)
++static void spi_ce_ctrl(uint32_t value)
 +{
-+    uint32_t conf =3D readl(ASPEED_FMC_BASE + R_CONF);
++    uint32_t conf =3D readl(ASPEED_FMC_BASE + R_CE_CTRL);
 +
-+    conf &=3D ~value;
-+    writel(ASPEED_FMC_BASE + R_CONF, conf);
++    conf |=3D value;
++    writel(ASPEED_FMC_BASE + R_CE_CTRL, conf);
++}
++
++static void spi_ctrl_setmode(uint8_t mode, uint8_t cmd)
++{
++    uint32_t ctrl =3D readl(ASPEED_FMC_BASE + R_CTRL0);
++    ctrl &=3D ~(CTRL_USERMODE | 0xff << 16);
++    ctrl |=3D mode | (cmd << 16);
++    writel(ASPEED_FMC_BASE + R_CTRL0, ctrl);
 +}
 +
  static void spi_ctrl_start_user(void)
  {
      uint32_t ctrl =3D readl(ASPEED_FMC_BASE + R_CTRL0);
-@@ -95,6 +105,18 @@ static void spi_ctrl_stop_user(void)
-     writel(ASPEED_FMC_BASE + R_CTRL0, ctrl);
+@@ -152,6 +171,18 @@ static void read_page(uint32_t addr, uint32_t *page)
+     spi_ctrl_stop_user();
  }
 =20
-+static void flash_reset(void)
++static void read_page_mem(uint32_t addr, uint32_t *page)
 +{
-+    spi_conf(CONF_ENABLE_W0);
++    int i;
 +
-+    spi_ctrl_start_user();
-+    writeb(ASPEED_FLASH_BASE, RESET_ENABLE);
-+    writeb(ASPEED_FLASH_BASE, RESET_MEMORY);
-+    spi_ctrl_stop_user();
++    /* move out USER mode to use direct reads from the AHB bus */
++    spi_ctrl_setmode(CTRL_READMODE, READ);
 +
-+    spi_conf_remove(CONF_ENABLE_W0);
++    for (i =3D 0; i < PAGE_SIZE / 4; i++) {
++        page[i] =3D make_be32(readl(ASPEED_FLASH_BASE + addr + i * 4));
++    }
 +}
 +
- static void test_read_jedec(void)
+ static void test_erase_sector(void)
  {
-     uint32_t jedec =3D 0x0;
-@@ -108,6 +130,8 @@ static void test_read_jedec(void)
-     jedec |=3D readb(ASPEED_FLASH_BASE);
-     spi_ctrl_stop_user();
-=20
-+    flash_reset();
-+
-     g_assert_cmphex(jedec, =3D=3D, FLASH_JEDEC);
+     uint32_t some_page_addr =3D 0x600 * PAGE_SIZE;
+@@ -248,6 +279,75 @@ static void test_write_page(void)
+     flash_reset();
  }
 =20
-@@ -155,6 +179,8 @@ static void test_erase_sector(void)
-     for (i =3D 0; i < PAGE_SIZE / 4; i++) {
-         g_assert_cmphex(page[i], =3D=3D, 0xffffffff);
-     }
++static void test_read_page_mem(void)
++{
++    uint32_t my_page_addr =3D 0x14000 * PAGE_SIZE; /* beyond 16MB */
++    uint32_t some_page_addr =3D 0x15000 * PAGE_SIZE;
++    uint32_t page[PAGE_SIZE / 4];
++    int i;
++
++    /* Enable 4BYTE mode for controller. This is should be strapped by
++     * HW for CE0 anyhow.
++     */
++    spi_ce_ctrl(1 << CRTL_EXTENDED0);
++
++    /* Enable 4BYTE mode for flash. */
++    spi_conf(CONF_ENABLE_W0);
++    spi_ctrl_start_user();
++    writeb(ASPEED_FLASH_BASE, EN_4BYTE_ADDR);
++    spi_ctrl_stop_user();
++    spi_conf_remove(CONF_ENABLE_W0);
++
++    /* Check what was written */
++    read_page_mem(my_page_addr, page);
++    for (i =3D 0; i < PAGE_SIZE / 4; i++) {
++        g_assert_cmphex(page[i], =3D=3D, my_page_addr + i * 4);
++    }
++
++    /* Check some other page. It should be full of 0xff */
++    read_page_mem(some_page_addr, page);
++    for (i =3D 0; i < PAGE_SIZE / 4; i++) {
++        g_assert_cmphex(page[i], =3D=3D, 0xffffffff);
++    }
 +
 +    flash_reset();
- }
-=20
- static void test_erase_all(void)
-@@ -182,6 +208,8 @@ static void test_erase_all(void)
-     for (i =3D 0; i < PAGE_SIZE / 4; i++) {
-         g_assert_cmphex(page[i], =3D=3D, 0xffffffff);
-     }
++}
 +
-+    flash_reset();
- }
-=20
- static void test_write_page(void)
-@@ -195,6 +223,7 @@ static void test_write_page(void)
-=20
-     spi_ctrl_start_user();
-     writeb(ASPEED_FLASH_BASE, EN_4BYTE_ADDR);
++static void test_write_page_mem(void)
++{
++    uint32_t my_page_addr =3D 0x15000 * PAGE_SIZE;
++    uint32_t page[PAGE_SIZE / 4];
++    int i;
++
++    /* Enable 4BYTE mode for controller. This is should be strapped by
++     * HW for CE0 anyhow.
++     */
++    spi_ce_ctrl(1 << CRTL_EXTENDED0);
++
++    /* Enable 4BYTE mode for flash. */
++    spi_conf(CONF_ENABLE_W0);
++    spi_ctrl_start_user();
++    writeb(ASPEED_FLASH_BASE, EN_4BYTE_ADDR);
 +    writeb(ASPEED_FLASH_BASE, WREN);
-     writeb(ASPEED_FLASH_BASE, PP);
-     writel(ASPEED_FLASH_BASE, make_be32(my_page_addr));
-=20
-@@ -215,6 +244,8 @@ static void test_write_page(void)
-     for (i =3D 0; i < PAGE_SIZE / 4; i++) {
-         g_assert_cmphex(page[i], =3D=3D, 0xffffffff);
-     }
++    spi_ctrl_stop_user();
++
++    /* move out USER mode to use direct writes to the AHB bus */
++    spi_ctrl_setmode(CTRL_WRITEMODE, PP);
++
++    for (i =3D 0; i < PAGE_SIZE / 4; i++) {
++        writel(ASPEED_FLASH_BASE + my_page_addr + i * 4,
++               make_be32(my_page_addr + i * 4));
++    }
++
++    /* Check what was written */
++    read_page_mem(my_page_addr, page);
++    for (i =3D 0; i < PAGE_SIZE / 4; i++) {
++        g_assert_cmphex(page[i], =3D=3D, my_page_addr + i * 4);
++    }
 +
 +    flash_reset();
- }
-=20
++}
++
  static char tmp_path[] =3D "/tmp/qtest.m25p80.XXXXXX";
+=20
+ int main(int argc, char **argv)
+@@ -273,6 +373,8 @@ int main(int argc, char **argv)
+     qtest_add_func("/m25p80/erase_sector", test_erase_sector);
+     qtest_add_func("/m25p80/erase_all",  test_erase_all);
+     qtest_add_func("/m25p80/write_page", test_write_page);
++    qtest_add_func("/m25p80/read_page_mem", test_read_page_mem);
++    qtest_add_func("/m25p80/write_page_mem", test_write_page_mem);
+=20
+     ret =3D g_test_run();
+=20
 --=20
 2.7.4
