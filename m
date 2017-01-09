@@ -1,23 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36384)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38781)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cQhl0-0004DL-Fj
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 16:45:35 -0500
+	(envelope-from <bounces@canonical.com>) id 1cQhtj-00011i-3l
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 16:54:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cQhkw-0003F3-A9
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 16:45:34 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60252)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cQhkw-0003Ew-2l
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 16:45:30 -0500
-Date: Mon, 9 Jan 2017 23:45:27 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170109234446-mutt-send-email-mst@kernel.org>
-References: <1479108340-3453-1-git-send-email-caoj.fnst@cn.fujitsu.com>
+	(envelope-from <bounces@canonical.com>) id 1cQhtg-00069Z-0i
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 16:54:35 -0500
+Received: from indium.canonical.com ([91.189.90.7]:49017)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cQhtf-00069Q-R7
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 16:54:31 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cQhtd-0002Ko-Su
+	for <qemu-devel@nongnu.org>; Mon, 09 Jan 2017 21:54:29 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id C7F902E80C6
+	for <qemu-devel@nongnu.org>; Mon,  9 Jan 2017 21:54:29 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1479108340-3453-1-git-send-email-caoj.fnst@cn.fujitsu.com>
-Subject: Re: [Qemu-devel] [PATCH v7 00/10] Convert msix_init() to error
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 09 Jan 2017 21:40:46 -0000
+From: Ansgar Hegerfeld <1449687@bugs.launchpad.net>
+Reply-To: Bug 1449687 <1449687@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20150428180718.24323.78355.malonedeb@wampee.canonical.com>
+Message-Id: <20170109214046.21242.85556.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1449687] Re: block migration of qcow2 VMs copies
+ all empty space
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,64 +37,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cao jin <caoj.fnst@cn.fujitsu.com>
-Cc: qemu-devel@nongnu.org, Jiri Pirko <jiri@resnulli.us>, Gerd Hoffmann <kraxel@redhat.com>, Dmitry Fleytman <dmitry@daynix.com>, Jason Wang <jasowang@redhat.com>, Hannes Reinecke <hare@suse.de>, Paolo Bonzini <pbonzini@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Markus Armbruster <armbru@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Mon, Nov 14, 2016 at 03:25:30PM +0800, Cao jin wrote:
-> v7 changelog:
-> 1. fix the segfaut bug in patch 2. So drop the all the R-b of it,
->    please take a look, there is detailed description in the patch.
-> 2. add the R-b from Hannes Reinecke
-> 
-> Test:
-> 1. make check: pass
-> 2. After applied all the patch, command line test for all the
->    affected devices, just make sure device realize process is ok,
->    no crash, but no further use of device.
+There is a patch available: https://lists.gnu.org/archive/html/qemu-
+devel/2016-11/msg03742.html (and those which are mentioned in the
+responses)
 
-Consider the megasas device for example, don't you
-need to test that the change actually does what
-it's intended to do?
+** Changed in: qemu
+       Status: New =3D> Confirmed
 
+** Tags added: sparse
 
-> CC: Jiri Pirko <jiri@resnulli.us>
-> CC: Gerd Hoffmann <kraxel@redhat.com>
-> CC: Dmitry Fleytman <dmitry@daynix.com>
-> CC: Jason Wang <jasowang@redhat.com>
-> CC: Michael S. Tsirkin <mst@redhat.com>
-> CC: Hannes Reinecke <hare@suse.de>
-> CC: Paolo Bonzini <pbonzini@redhat.com>
-> CC: Alex Williamson <alex.williamson@redhat.com>
-> CC: Markus Armbruster <armbru@redhat.com>
-> CC: Marcel Apfelbaum <marcel@redhat.com>
-> 
-> Cao jin (10):
->   msix: Follow CODING_STYLE
->   hcd-xhci: check & correct param before using it
->   pci: Convert msix_init() to Error and fix callers to check it
->   megasas: change behaviour of msix switch
->   hcd-xhci: change behaviour of msix switch
->   megasas: remove unnecessary megasas_use_msix()
->   megasas: undo the overwrites of msi user configuration
->   vmxnet3: fix reference leak issue
->   vmxnet3: remove unnecessary internal msix flag
->   msi_init: convert assert to return -errno
-> 
->  hw/block/nvme.c        |  5 +++-
->  hw/misc/ivshmem.c      |  8 +++---
->  hw/net/e1000e.c        |  6 ++++-
->  hw/net/rocker/rocker.c |  7 ++++-
->  hw/net/vmxnet3.c       | 46 +++++++++++++++------------------
->  hw/pci/msi.c           |  9 ++++---
->  hw/pci/msix.c          | 42 +++++++++++++++++++++++++-----
->  hw/scsi/megasas.c      | 49 ++++++++++++++++++++---------------
->  hw/usb/hcd-xhci.c      | 69 ++++++++++++++++++++++++++++++--------------------
->  hw/vfio/pci.c          |  8 ++++--
->  hw/virtio/virtio-pci.c | 11 ++++----
->  include/hw/pci/msix.h  |  5 ++--
->  12 files changed, 164 insertions(+), 101 deletions(-)
-> 
-> -- 
-> 2.1.0
-> 
-> 
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1449687
+
+Title:
+  block migration of qcow2 VMs copies all empty space
+
+Status in QEMU:
+  Confirmed
+
+Bug description:
+  I'm running openstack 2012.1 'icehouse' which, ultimately, calls down
+  into qemu-system-x86 2.0.0+dfsg-2ubuntu1.10.
+
+  I primed the process by copying all necessary base images onto the
+  destination host.  Nonetheless, post-migration instances are much
+  larger than the original image; the copy duplicated all the empty
+  space that ought to have remained copy-on-write.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1449687/+subscriptions
