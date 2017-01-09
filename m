@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37245)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37283)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cQcGH-00008V-Iu
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 10:53:30 -0500
+	(envelope-from <stefanha@redhat.com>) id 1cQcGK-0000AH-1V
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 10:53:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cQcGF-0006b7-GW
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 10:53:29 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34856)
+	(envelope-from <stefanha@redhat.com>) id 1cQcGI-0006cW-Lz
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 10:53:32 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45186)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cQcGF-0006af-AG
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 10:53:27 -0500
-Date: Mon, 9 Jan 2017 13:43:10 +0000
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cQcGI-0006c6-Dh
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 10:53:30 -0500
+Date: Mon, 9 Jan 2017 15:44:39 +0000
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170109134310.GE30228@stefanha-x1.localdomain>
-References: <58733617.3050503@huawei.com>
+Message-ID: <20170109154439.GF30228@stefanha-x1.localdomain>
+References: <148278447806.8988.12706825771606357198.stgit@fimbulvetr.bsc.es>
+	<148278449426.8988.2219094135462471980.stgit@fimbulvetr.bsc.es>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="8vCeF2GUdMpe9ZbK"
+	protocol="application/pgp-signature"; boundary="gneEPciiIl/aKvOT"
 Content-Disposition: inline
-In-Reply-To: <58733617.3050503@huawei.com>
-Subject: Re: [Qemu-devel] Question about add AF_ALG backend for virtio-crypto
+In-Reply-To: <148278449426.8988.2219094135462471980.stgit@fimbulvetr.bsc.es>
+Subject: Re: [Qemu-devel] [PATCH v4 3/6] hypertrace: [*-user] Add QEMU-side
+ proxy to "guest_hypertrace" event
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,44 +29,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Longpeng (Mike)" <longpeng2@huawei.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, QEMU-DEV <qemu-devel@nongnu.org>, "Wubin (H)" <wu.wubin@huawei.com>, "Zhoujian (jay, Euler)" <jianjay.zhou@huawei.com>, Gonglei <arei.gonglei@huawei.com>
+To: =?iso-8859-1?Q?Llu=EDs?= Vilanova <vilanova@ac.upc.edu>
+Cc: qemu-devel@nongnu.org, Daniel P Berrange <berrange@redhat.com>, Luiz Capitulino <lcapitulino@redhat.com>, Eric Blake <eblake@redhat.com>, Riku Voipio <riku.voipio@iki.fi>
 
 
---8vCeF2GUdMpe9ZbK
-Content-Type: text/plain; charset=us-ascii
+--gneEPciiIl/aKvOT
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jan 09, 2017 at 03:04:55PM +0800, Longpeng (Mike) wrote:
-> I'm one of Gonglei's virtio-crypto project members, and we plan to add a =
-AF_ALG
-> backend for virtio-crypto(there's only builtin-backend currently).
->=20
-> I found that Catalin, Paolo and Stefan had discussed about this in 2015
-> (http://www.spinics.net/lists/kvm/msg115457.html), but it seems that Cata=
-lin
-> didn't do it, so I'm confuse about wether it is need to add a AF_ALG back=
-end.
->=20
-> Do you have any suggestion? Thanks :)
+On Mon, Dec 26, 2016 at 09:34:54PM +0100, Llu=EDs Vilanova wrote:
+> @@ -847,6 +855,10 @@ int main(int argc, char **argv)
+>          } else if (!strcmp(r, "trace")) {
+>              g_free(trace_file);
+>              trace_file =3D trace_opt_parse(optarg);
+> +        } else if (!strcmp(r, "hypertrace")) {
+> +            g_free(hypertrace_file);
 
-I have no objections to an AF_ALG backend in QEMU.
+This variable hasn't been declared yet.  Perhaps it's in a later patch.
+Please reorder things to avoid the compilation error.
 
-Stefan
+Or was this supposed to be hypertrace_base?
 
---8vCeF2GUdMpe9ZbK
+> +void hypertrace_init_config(struct hypertrace_config *config,
+> +                            unsigned int max_clients)
+> +{
+> +    config->max_clients =3D max_clients;
+> +    config->client_args =3D CONFIG_HYPERTRACE_ARGS;
+> +    config->client_data_size =3D config->client_args * sizeof(uint64_t);
+> +    config->control_size =3D QEMU_ALIGN_UP(
+> +        config->max_clients * sizeof(uint64_t), TARGET_PAGE_SIZE);
+
+This needs to be host page size aligned, too.  Otherwise protect will
+affect bytes beyond the end of the control region.
+
+> +static void init_channel(const char *base, const char *suffix, size_t si=
+ze,
+> +                         char **path, int *fd, uint64_t **addr)
+> +{
+> +    *path =3D g_malloc(strlen(base) + strlen(suffix) + 1);
+> +    sprintf(*path, "%s%s", base, suffix);
+> +
+> +    *fd =3D open(*path, O_CREAT | O_EXCL | O_RDWR, S_IRUSR | S_IWUSR);
+> +    if (*fd =3D=3D -1) {
+> +        error_report("error: open(%s): %s", *path, strerror(errno));
+> +        abort();
+> +    }
+
+open() can fail for reasons outside QEMU's control.  This isn't an
+internal error.  Please exit cleanly instead of using abort(3).
+
+> +void hypertrace_init(const char *base, unsigned int max_clients)
+> +{
+> +    struct sigaction sigint;
+> +    struct hypertrace_config *pconfig;
+> +
+> +    if (base =3D=3D NULL) {
+> +        return;
+> +    }
+> +
+> +    memset(&sigint, 0, sizeof(sigint));
+> +    sigint.sa_sigaction =3D fini_handler;
+> +    sigint.sa_flags =3D SA_SIGINFO | SA_RESTART;
+> +    if (sigaction(SIGINT, &sigint, NULL) !=3D 0) {
+> +        error_report("error: sigaction(SIGINT): %s", strerror(errno));
+> +        abort();
+> +    }
+> +    if (sigaction(SIGABRT, &sigint, NULL) !=3D 0) {
+> +        error_report("error: sigaction(SIGABRT): %s", strerror(errno));
+> +        abort();
+> +    }
+
+I don't know whether it's okay to set up signal handlers in user mode.
+
+Will this break guest code SIGINT/SIGABRT handling?
+
+> +bool hypertrace_guest_mmap_check(int fd, unsigned long len,
+> +                                 unsigned long offset)
+> +{
+> +    struct stat s;
+> +    if (fstat(fd, &s) < 0) {
+> +        return true;
+
+Should this be return false?
+
+> +    }
+> +
+> +    if (s.st_dev !=3D control_fd_stat.st_dev ||
+> +        s.st_ino !=3D control_fd_stat.st_ino) {
+> +        return true;
+
+Here too.
+
+> +static void segv_handler(int signum, siginfo_t *siginfo, void *sigctxt)
+> +{
+> +    CPUState *vcpu =3D current_cpu;
+> +    void *control_0 =3D vcpu->hypertrace_control;
+> +    void *control_1 =3D vcpu->hypertrace_control + config.control_size /=
+ 2;
+> +    void *control_2 =3D control_1 + config.control_size / 2;
+> +
+> +    if (control_0 <=3D siginfo->si_addr && siginfo->si_addr < control_1)=
+ {
+> +
+> +        /* 1st fault (guest will write cmd) */
+> +        assert(((unsigned long)siginfo->si_addr % sizeof(uint64_t)) =3D=
+=3D 0);
+
+Please use uintptr_t instead of unsigned long.  It's more portable
+because it doesn't assume sizeof(void*) =3D=3D sizeof(unsigned long).  On
+Windows the 64-bit data model is LLP64, not LP64:
+https://en.wikipedia.org/wiki/64-bit_computing#64-bit_data_models
+
+> +        swap_control(control_0, control_1);
+> +
+> +    } else if (control_1 <=3D siginfo->si_addr && siginfo->si_addr < con=
+trol_2) {
+> +        size_t client =3D (siginfo->si_addr - control_1) / sizeof(uint64=
+_t);
+> +        uint64_t vcontrol =3D ((uint64_t *)control_0)[client];
+> +        uint64_t *data_ptr =3D &qemu_data[client * config.client_data_si=
+ze];
+
+Is byte swapping required?
+
+> +
+> +        /* 2nd fault (invoke) */
+> +        assert(((unsigned long)siginfo->si_addr % sizeof(uint64_t)) =3D=
+=3D 0);
+> +        hypertrace_emit(current_cpu, vcontrol, data_ptr);
+> +        swap_control(control_1, control_0);
+
+I don't understand how this scheme works for multi-threaded programs.
+If two threads are both writing at the same time can we miss events due
+to swap_control() changing mprotect?
+
+> +
+> +    } else {
+> +        /* proxy to next handler */
+> +        if (segv_next.sa_sigaction !=3D NULL) {
+> +            segv_next.sa_sigaction(signum, siginfo, sigctxt);
+> +        } else if (segv_next.sa_handler !=3D NULL) {
+> +            segv_next.sa_handler(signum);
+> +        }
+
+Is there a case when no signal handler was installed (i.e. default
+action)?
+
+--gneEPciiIl/aKvOT
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJYc5NuAAoJEJykq7OBq3PIPHMH/3EkkFUskTXm9ZZnfhIuK+e7
-usxK1Uk2O/QSCZA2G+pzIGyzj5FBQkK1mQp7plqzOZ9XwOPskQEGa/RBIyFZhIJ5
-qyZs4Oyg4VbaYjekcQfik7Yy2jdgW/UL7Ka2XNAmTwjxdxp9Oa40D0YB4I5riDzj
-1GxAHGyorvEuShGxqz/Ad+liGr7f2M/3tHP2kmO8EzNc+mpYSsI47epU6vnJ7t9d
-ioxzptB6u+5K6eV+z7M+zVuAsvZ3py4qU6idN0466dqizvm8Xf+kvhcakx8IbRdD
-dskFUsfYi8kLwhnrO1+7LyWf4aOIT7/T+s0KsWuEp/Uu75YTzgSmSmSsp6AMyrY=
-=TmG0
+iQEcBAEBAgAGBQJYc6/nAAoJEJykq7OBq3PIdlEH/ipW1Hea/kFvdceyNSmOK0ee
+FyrI3As82aAPQzXs2vb1hhhHTAqYghQDijqs7XJQiLDm0n21m5QpHSmtni/SCEM8
+lB/t6WZlbEGPwLWb2tu2q6bmlnNgeoTEYbem4w+3vMdc4VYQcxD6K19RkJl3S2ZH
+d7/J7qyXV4C4/6jCNetqhwgwg6K6OnCLWNM6kRpPU01XD+9YGkSWSdXAaDMRVmjt
+Hf6CIIQ5ZwQKdiIHx0Va6D3lBHZje6IBUIOHob6uttjR2zgAZc9MaKkqL8iTo1dh
+koW/uTZOf2wVi2Z+uyhAmPipls6Dhi2rQdKYtBjTdolqJ03/qMpte1awCIyupeU=
+=uguf
 -----END PGP SIGNATURE-----
 
---8vCeF2GUdMpe9ZbK--
+--gneEPciiIl/aKvOT--
