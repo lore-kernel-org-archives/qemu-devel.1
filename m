@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37403)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37291)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cQYWX-0002Uf-H7
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:54:02 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cQYWU-0002RR-El
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:53:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cQYWW-0004AR-BP
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:54:01 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cQYWT-00047W-3I
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:53:58 -0500
 Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:47992)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1cQYWW-00043I-4I
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:54:00 -0500
+	id 1cQYWS-00043I-TL
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:53:57 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.84_2)
-	(envelope-from <pm215@archaic.org.uk>) id 1cQYWK-0001O4-Qv
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 11:53:48 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1cQYWO-0001R0-8l
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 11:53:52 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon,  9 Jan 2017 11:53:30 +0000
-Message-Id: <1483962824-29185-8-git-send-email-peter.maydell@linaro.org>
+Date: Mon,  9 Jan 2017 11:53:38 +0000
+Message-Id: <1483962824-29185-16-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1483962824-29185-1-git-send-email-peter.maydell@linaro.org>
 References: <1483962824-29185-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 07/21] hw/arm/virt-acpi-build: name GIC CPU
- Interface Structure appropriately
+Subject: [Qemu-devel] [PULL 15/21] hw/arm/virt: pass VirtMachineState
+ instead of VirtGuestInfo
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,93 +32,75 @@ To: qemu-devel@nongnu.org
 
 From: Andrew Jones <drjones@redhat.com>
 
-Also move the enabled flag definition from mach-virt code to
-acpi common.
+Only two functions take VirtGuestInfo parameters. Now that guest-info
+is part of VirtMachineState, and VirtMachineState is defined in the
+virt header, pass that instead.
 
 Signed-off-by: Andrew Jones <drjones@redhat.com>
-Message-id: 20170102200153.28864-3-drjones@redhat.com
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
+Message-id: 20170102200153.28864-11-drjones@redhat.com
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/hw/acpi/acpi-defs.h      | 9 ++++++---
- include/hw/arm/virt-acpi-build.h | 2 --
- hw/arm/virt-acpi-build.c         | 8 ++++----
- 3 files changed, 10 insertions(+), 9 deletions(-)
+ include/hw/arm/virt.h    | 2 +-
+ hw/arm/virt-acpi-build.c | 3 ++-
+ hw/arm/virt.c            | 8 ++++----
+ 3 files changed, 7 insertions(+), 6 deletions(-)
 
-diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
-index 154f3b8..510f23c 100644
---- a/include/hw/acpi/acpi-defs.h
-+++ b/include/hw/acpi/acpi-defs.h
-@@ -290,7 +290,7 @@ typedef struct AcpiMultipleApicTable AcpiMultipleApicTable;
- #define ACPI_APIC_XRUPT_SOURCE       8
- #define ACPI_APIC_LOCAL_X2APIC       9
- #define ACPI_APIC_LOCAL_X2APIC_NMI      10
--#define ACPI_APIC_GENERIC_INTERRUPT     11
-+#define ACPI_APIC_GENERIC_CPU_INTERFACE 11
- #define ACPI_APIC_GENERIC_DISTRIBUTOR   12
- #define ACPI_APIC_GENERIC_MSI_FRAME     13
- #define ACPI_APIC_GENERIC_REDISTRIBUTOR 14
-@@ -361,7 +361,7 @@ struct AcpiMadtLocalX2ApicNmi {
- } QEMU_PACKED;
- typedef struct AcpiMadtLocalX2ApicNmi AcpiMadtLocalX2ApicNmi;
+diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+index 91dbd69..b1eed52 100644
+--- a/include/hw/arm/virt.h
++++ b/include/hw/arm/virt.h
+@@ -122,6 +122,6 @@ typedef struct {
+ #define VIRT_MACHINE_CLASS(klass) \
+     OBJECT_CLASS_CHECK(VirtMachineClass, klass, TYPE_VIRT_MACHINE)
  
--struct AcpiMadtGenericInterrupt {
-+struct AcpiMadtGenericCpuInterface {
-     ACPI_SUB_HEADER_DEF
-     uint16_t reserved;
-     uint32_t cpu_interface_number;
-@@ -378,7 +378,10 @@ struct AcpiMadtGenericInterrupt {
-     uint64_t arm_mpidr;
- } QEMU_PACKED;
+-void virt_acpi_setup(VirtGuestInfo *guest_info);
++void virt_acpi_setup(VirtMachineState *vms);
  
--typedef struct AcpiMadtGenericInterrupt AcpiMadtGenericInterrupt;
-+typedef struct AcpiMadtGenericCpuInterface AcpiMadtGenericCpuInterface;
-+
-+/* GICC CPU Interface Flags */
-+#define ACPI_MADT_GICC_ENABLED 1
- 
- struct AcpiMadtGenericDistributor {
-     ACPI_SUB_HEADER_DEF
-diff --git a/include/hw/arm/virt-acpi-build.h b/include/hw/arm/virt-acpi-build.h
-index f5ec749..2bcd222 100644
---- a/include/hw/arm/virt-acpi-build.h
-+++ b/include/hw/arm/virt-acpi-build.h
-@@ -24,8 +24,6 @@
- #include "hw/arm/virt.h"
- #include "qemu/notify.h"
- 
--#define ACPI_GICC_ENABLED 1
--
- typedef struct VirtGuestInfo {
-     int smp_cpus;
-     FWCfgState *fw_cfg;
+ #endif /* QEMU_ARM_VIRT_H */
 diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index 0e255b7..5071a0b 100644
+index 4fd52da..ac507d6 100644
 --- a/hw/arm/virt-acpi-build.c
 +++ b/hw/arm/virt-acpi-build.c
-@@ -581,11 +581,11 @@ build_madt(GArray *table_data, BIOSLinker *linker, VirtGuestInfo *guest_info)
-     gicd->version = guest_info->gic_version;
+@@ -823,8 +823,9 @@ static const VMStateDescription vmstate_virt_acpi_build = {
+     },
+ };
  
-     for (i = 0; i < guest_info->smp_cpus; i++) {
--        AcpiMadtGenericInterrupt *gicc = acpi_data_push(table_data,
--                                                     sizeof *gicc);
-+        AcpiMadtGenericCpuInterface *gicc = acpi_data_push(table_data,
-+                                                           sizeof(*gicc));
-         ARMCPU *armcpu = ARM_CPU(qemu_get_cpu(i));
+-void virt_acpi_setup(VirtGuestInfo *guest_info)
++void virt_acpi_setup(VirtMachineState *vms)
+ {
++    VirtGuestInfo *guest_info = &vms->acpi_guest_info;
+     AcpiBuildTables tables;
+     AcpiBuildState *build_state;
  
--        gicc->type = ACPI_APIC_GENERIC_INTERRUPT;
-+        gicc->type = ACPI_APIC_GENERIC_CPU_INTERFACE;
-         gicc->length = sizeof(*gicc);
-         if (guest_info->gic_version == 2) {
-             gicc->base_address = cpu_to_le64(memmap[VIRT_GIC_CPU].base);
-@@ -593,7 +593,7 @@ build_madt(GArray *table_data, BIOSLinker *linker, VirtGuestInfo *guest_info)
-         gicc->cpu_interface_number = cpu_to_le32(i);
-         gicc->arm_mpidr = cpu_to_le64(armcpu->mp_affinity);
-         gicc->uid = cpu_to_le32(i);
--        gicc->flags = cpu_to_le32(ACPI_GICC_ENABLED);
-+        gicc->flags = cpu_to_le32(ACPI_MADT_GICC_ENABLED);
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 8556ff2..2201517 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -1131,9 +1131,9 @@ static void *machvirt_dtb(const struct arm_boot_info *binfo, int *fdt_size)
+     return board->fdt;
+ }
  
-         if (arm_feature(&armcpu->env, ARM_FEATURE_PMU)) {
-             gicc->performance_interrupt = cpu_to_le32(PPI(VIRTUAL_PMU_IRQ));
+-static void virt_build_smbios(VirtGuestInfo *guest_info)
++static void virt_build_smbios(VirtMachineState *vms)
+ {
+-    FWCfgState *fw_cfg = guest_info->fw_cfg;
++    FWCfgState *fw_cfg = vms->acpi_guest_info.fw_cfg;
+     uint8_t *smbios_tables, *smbios_anchor;
+     size_t smbios_tables_len, smbios_anchor_len;
+     const char *product = "QEMU Virtual Machine";
+@@ -1166,8 +1166,8 @@ void virt_machine_done(Notifier *notifier, void *data)
+     VirtMachineState *vms = container_of(notifier, VirtMachineState,
+                                          machine_done);
+ 
+-    virt_acpi_setup(&vms->acpi_guest_info);
+-    virt_build_smbios(&vms->acpi_guest_info);
++    virt_acpi_setup(vms);
++    virt_build_smbios(vms);
+ }
+ 
+ static void machvirt_init(MachineState *machine)
 -- 
 2.7.4
