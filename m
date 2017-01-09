@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40316)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40331)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cQcS8-0007vg-OT
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 11:05:45 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cQcS9-0007wW-8R
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 11:05:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cQcS7-0003n4-2R
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 11:05:44 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cQcS8-0003no-3z
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 11:05:45 -0500
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon,  9 Jan 2017 16:05:13 +0000
-Message-Id: <1483977924-14522-8-git-send-email-peter.maydell@linaro.org>
+Date: Mon,  9 Jan 2017 16:05:12 +0000
+Message-Id: <1483977924-14522-7-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1483977924-14522-1-git-send-email-peter.maydell@linaro.org>
 References: <1483977924-14522-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 07/18] hw/intc/gicv3: Add data fields for
- virtualization support
+Subject: [Qemu-devel] [PATCH v2 06/18] hw/intc/gicv3: Add defines for ICH
+ system register fields
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,131 +23,104 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org, Andrew Jones <drjones@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Alistair Francis <alistair.francis@xilinx.com>
 
-As the first step in adding support for the virtualization
-extensions to the GICv3 emulation:
- * add the necessary data fields to the state structures
- * add the fields to the migration state, as a subsection
-   which is only present if virtualization is enabled
-
-The use of a subsection means we retain migration
-compatibility as EL2 is not enabled on any CPUs currently.
+Add defines to gicv3_internal.h for fields in the ICH_*
+system registers which form the GIC virtualization control
+interface.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/hw/intc/arm_gicv3_common.h | 18 ++++++++++++++++++
- hw/intc/arm_gicv3_common.c         | 25 +++++++++++++++++++++++++
- hw/intc/arm_gicv3_cpuif.c          | 13 +++++++++++++
- 3 files changed, 56 insertions(+)
+ hw/intc/gicv3_internal.h | 79 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 79 insertions(+)
 
-diff --git a/include/hw/intc/arm_gicv3_common.h b/include/hw/intc/arm_gicv3_common.h
-index beb2c77..665d3f8 100644
---- a/include/hw/intc/arm_gicv3_common.h
-+++ b/include/hw/intc/arm_gicv3_common.h
-@@ -38,6 +38,9 @@
- /* Number of SGI target-list bits */
- #define GICV3_TARGETLIST_BITS 16
+diff --git a/hw/intc/gicv3_internal.h b/hw/intc/gicv3_internal.h
+index 8f3567e..aeb801d 100644
+--- a/hw/intc/gicv3_internal.h
++++ b/hw/intc/gicv3_internal.h
+@@ -159,6 +159,85 @@
+ #define ICC_CTLR_EL3_A3V (1U << 15)
+ #define ICC_CTLR_EL3_NDS (1U << 17)
  
-+/* Maximum number of list registers (architectural limit) */
-+#define GICV3_LR_MAX 16
++#define ICH_VMCR_EL2_VENG0_SHIFT 0
++#define ICH_VMCR_EL2_VENG0 (1U << ICH_VMCR_EL2_VENG0_SHIFT)
++#define ICH_VMCR_EL2_VENG1_SHIFT 1
++#define ICH_VMCR_EL2_VENG1 (1U << ICH_VMCR_EL2_VENG1_SHIFT)
++#define ICH_VMCR_EL2_VACKCTL (1U << 2)
++#define ICH_VMCR_EL2_VFIQEN (1U << 3)
++#define ICH_VMCR_EL2_VCBPR_SHIFT 4
++#define ICH_VMCR_EL2_VCBPR (1U << ICH_VMCR_EL2_VCBPR_SHIFT)
++#define ICH_VMCR_EL2_VEOIM_SHIFT 9
++#define ICH_VMCR_EL2_VEOIM (1U << ICH_VMCR_EL2_VEOIM_SHIFT)
++#define ICH_VMCR_EL2_VBPR1_SHIFT 18
++#define ICH_VMCR_EL2_VBPR1_LENGTH 3
++#define ICH_VMCR_EL2_VBPR1_MASK (0x7U << ICH_VMCR_EL2_VBPR1_SHIFT)
++#define ICH_VMCR_EL2_VBPR0_SHIFT 21
++#define ICH_VMCR_EL2_VBPR0_LENGTH 3
++#define ICH_VMCR_EL2_VBPR0_MASK (0x7U << ICH_VMCR_EL2_VBPR0_SHIFT)
++#define ICH_VMCR_EL2_VPMR_SHIFT 24
++#define ICH_VMCR_EL2_VPMR_LENGTH 8
++#define ICH_VMCR_EL2_VPMR_MASK (0xffU << ICH_VMCR_EL2_VPMR_SHIFT)
 +
- /* Minimum BPR for Secure, or when security not enabled */
- #define GIC_MIN_BPR 0
- /* Minimum BPR for Nonsecure when security is enabled */
-@@ -175,6 +178,21 @@ struct GICv3CPUState {
-     uint64_t icc_igrpen[3];
-     uint64_t icc_ctlr_el3;
- 
-+    /* Virtualization control interface */
-+    uint64_t ich_apr[3][4]; /* ich_apr[GICV3_G1][x] never used */
-+    uint64_t ich_hcr_el2;
-+    uint64_t ich_lr_el2[GICV3_LR_MAX];
-+    uint64_t ich_vmcr_el2;
++#define ICH_HCR_EL2_EN (1U << 0)
++#define ICH_HCR_EL2_UIE (1U << 1)
++#define ICH_HCR_EL2_LRENPIE (1U << 2)
++#define ICH_HCR_EL2_NPIE (1U << 3)
++#define ICH_HCR_EL2_VGRP0EIE (1U << 4)
++#define ICH_HCR_EL2_VGRP0DIE (1U << 5)
++#define ICH_HCR_EL2_VGRP1EIE (1U << 6)
++#define ICH_HCR_EL2_VGRP1DIE (1U << 7)
++#define ICH_HCR_EL2_TC (1U << 10)
++#define ICH_HCR_EL2_TALL0 (1U << 11)
++#define ICH_HCR_EL2_TALL1 (1U << 12)
++#define ICH_HCR_EL2_TSEI (1U << 13)
++#define ICH_HCR_EL2_TDIR (1U << 14)
++#define ICH_HCR_EL2_EOICOUNT_SHIFT 27
++#define ICH_HCR_EL2_EOICOUNT_LENGTH 5
++#define ICH_HCR_EL2_EOICOUNT_MASK (0x1fU << ICH_HCR_EL2_EOICOUNT_SHIFT)
 +
-+    /* Properties of the CPU interface. These are initialized from
-+     * the settings in the CPU proper.
-+     * If the number of implemented list registers is 0 then the
-+     * virtualization support is not implemented.
-+     */
-+    int num_list_regs;
-+    int vpribits; /* number of virtual priority bits */
-+    int vprebits; /* number of virtual preemption bits */
++#define ICH_LR_EL2_VINTID_SHIFT 0
++#define ICH_LR_EL2_VINTID_LENGTH 32
++#define ICH_LR_EL2_VINTID_MASK (0xffffffffULL << ICH_LR_EL2_VINTID_SHIFT)
++#define ICH_LR_EL2_PINTID_SHIFT 32
++#define ICH_LR_EL2_PINTID_LENGTH 10
++#define ICH_LR_EL2_PINTID_MASK (0x3ffULL << ICH_LR_EL2_PINTID_SHIFT)
++/* Note that EOI shares with the top bit of the pINTID field */
++#define ICH_LR_EL2_EOI (1ULL << 41)
++#define ICH_LR_EL2_PRIORITY_SHIFT 48
++#define ICH_LR_EL2_PRIORITY_LENGTH 8
++#define ICH_LR_EL2_PRIORITY_MASK (0xffULL << ICH_LR_EL2_PRIORITY_SHIFT)
++#define ICH_LR_EL2_GROUP (1ULL << 60)
++#define ICH_LR_EL2_HW (1ULL << 61)
++#define ICH_LR_EL2_STATE_SHIFT 62
++#define ICH_LR_EL2_STATE_LENGTH 2
++#define ICH_LR_EL2_STATE_MASK (3ULL << ICH_LR_EL2_STATE_SHIFT)
++/* values for the state field: */
++#define ICH_LR_EL2_STATE_INVALID 0
++#define ICH_LR_EL2_STATE_PENDING 1
++#define ICH_LR_EL2_STATE_ACTIVE 2
++#define ICH_LR_EL2_STATE_ACTIVE_PENDING 3
++#define ICH_LR_EL2_STATE_PENDING_BIT (1ULL << ICH_LR_EL2_STATE_SHIFT)
++#define ICH_LR_EL2_STATE_ACTIVE_BIT (2ULL << ICH_LR_EL2_STATE_SHIFT)
 +
-     /* Current highest priority pending interrupt for this CPU.
-      * This is cached information that can be recalculated from the
-      * real state above; it doesn't need to be migrated.
-diff --git a/hw/intc/arm_gicv3_common.c b/hw/intc/arm_gicv3_common.c
-index 0ee67a4..16b9b0f 100644
---- a/hw/intc/arm_gicv3_common.c
-+++ b/hw/intc/arm_gicv3_common.c
-@@ -49,6 +49,27 @@ static int gicv3_post_load(void *opaque, int version_id)
-     return 0;
- }
- 
-+static bool virt_state_needed(void *opaque)
-+{
-+    GICv3CPUState *cs = opaque;
++#define ICH_MISR_EL2_EOI (1U << 0)
++#define ICH_MISR_EL2_U (1U << 1)
++#define ICH_MISR_EL2_LRENP (1U << 2)
++#define ICH_MISR_EL2_NP (1U << 3)
++#define ICH_MISR_EL2_VGRP0E (1U << 4)
++#define ICH_MISR_EL2_VGRP0D (1U << 5)
++#define ICH_MISR_EL2_VGRP1E (1U << 6)
++#define ICH_MISR_EL2_VGRP1D (1U << 7)
 +
-+    return cs->num_list_regs != 0;
-+}
++#define ICH_VTR_EL2_LISTREGS_SHIFT 0
++#define ICH_VTR_EL2_TDS (1U << 19)
++#define ICH_VTR_EL2_NV4 (1U << 20)
++#define ICH_VTR_EL2_A3V (1U << 21)
++#define ICH_VTR_EL2_SEIS (1U << 22)
++#define ICH_VTR_EL2_IDBITS_SHIFT 23
++#define ICH_VTR_EL2_PREBITS_SHIFT 26
++#define ICH_VTR_EL2_PRIBITS_SHIFT 29
 +
-+static const VMStateDescription vmstate_gicv3_cpu_virt = {
-+    .name = "arm_gicv3_cpu/virt",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = virt_state_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT64_2DARRAY(ich_apr, GICv3CPUState, 3, 4),
-+        VMSTATE_UINT64(ich_hcr_el2, GICv3CPUState),
-+        VMSTATE_UINT64_ARRAY(ich_lr_el2, GICv3CPUState, GICV3_LR_MAX),
-+        VMSTATE_UINT64(ich_vmcr_el2, GICv3CPUState),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- static const VMStateDescription vmstate_gicv3_cpu = {
-     .name = "arm_gicv3_cpu",
-     .version_id = 1,
-@@ -75,6 +96,10 @@ static const VMStateDescription vmstate_gicv3_cpu = {
-         VMSTATE_UINT64_ARRAY(icc_igrpen, GICv3CPUState, 3),
-         VMSTATE_UINT64(icc_ctlr_el3, GICv3CPUState),
-         VMSTATE_END_OF_LIST()
-+    },
-+    .subsections = (const VMStateDescription * []) {
-+        &vmstate_gicv3_cpu_virt,
-+        NULL
-     }
- };
- 
-diff --git a/hw/intc/arm_gicv3_cpuif.c b/hw/intc/arm_gicv3_cpuif.c
-index 35e8eb3..d2f859c 100644
---- a/hw/intc/arm_gicv3_cpuif.c
-+++ b/hw/intc/arm_gicv3_cpuif.c
-@@ -36,6 +36,12 @@ static bool gicv3_use_ns_bank(CPUARMState *env)
-     return !arm_is_secure_below_el3(env);
- }
- 
-+/* The minimum BPR for the virtual interface is a configurable property */
-+static inline int icv_min_vbpr(GICv3CPUState *cs)
-+{
-+    return 7 - cs->vprebits;
-+}
-+
- static int icc_highest_active_prio(GICv3CPUState *cs)
- {
-     /* Calculate the current running priority based on the set bits
-@@ -1081,6 +1087,13 @@ static void icc_reset(CPUARMState *env, const ARMCPRegInfo *ri)
-     cs->icc_ctlr_el3 = ICC_CTLR_EL3_NDS | ICC_CTLR_EL3_A3V |
-         (1 << ICC_CTLR_EL3_IDBITS_SHIFT) |
-         (7 << ICC_CTLR_EL3_PRIBITS_SHIFT);
-+
-+    memset(cs->ich_apr, 0, sizeof(cs->ich_apr));
-+    cs->ich_hcr_el2 = 0;
-+    memset(cs->ich_lr_el2, 0, sizeof(cs->ich_lr_el2));
-+    cs->ich_vmcr_el2 = ICH_VMCR_EL2_VFIQEN |
-+        (icv_min_vbpr(cs) << ICH_VMCR_EL2_VBPR1_SHIFT) |
-+        (icv_min_vbpr(cs) << ICH_VMCR_EL2_VBPR0_SHIFT);
- }
- 
- static const ARMCPRegInfo gicv3_cpuif_reginfo[] = {
+ /* Special interrupt IDs */
+ #define INTID_SECURE 1020
+ #define INTID_NONSECURE 1021
 -- 
 2.7.4
