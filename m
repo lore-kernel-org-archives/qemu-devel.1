@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45423)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46293)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cQazr-0000CT-LA
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 09:32:28 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cQb25-0001p0-Eu
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 09:34:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cQazq-0002Oz-Or
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 09:32:27 -0500
-References: <1483969476-7172-1-git-send-email-kwolf@redhat.com>
-	<1483969476-7172-15-git-send-email-kwolf@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <2a5b7944-69a3-044a-f065-844c368ec5b4@redhat.com>
-Date: Mon, 9 Jan 2017 08:32:17 -0600
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cQb23-00032M-VB
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 09:34:45 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48380)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1cQb23-00031x-Py
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 09:34:43 -0500
+Received: from int-mx10.intmail.prod.int.phx2.redhat.com
+	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E963061B86
+	for <qemu-devel@nongnu.org>; Mon,  9 Jan 2017 14:34:43 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Mon,  9 Jan 2017 15:34:19 +0100
+Message-Id: <20170109143437.30554-4-marcandre.lureau@redhat.com>
+In-Reply-To: <20170109143437.30554-1-marcandre.lureau@redhat.com>
+References: <20170109143437.30554-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1483969476-7172-15-git-send-email-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="crV1GoeAc5qm0c4KEIa8f7Nxmr2a6GkuI"
-Subject: Re: [Qemu-devel] [PULL 14/14] block: Rename raw-{posix,
- win32} to file-*.c
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v7 03/21] qapi: make TODOs named-sections
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,75 +33,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: eblake@redhat.com, armbru@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---crV1GoeAc5qm0c4KEIa8f7Nxmr2a6GkuI
-From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org
-Message-ID: <2a5b7944-69a3-044a-f065-844c368ec5b4@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 14/14] block: Rename raw-{posix, win32} to
- file-*.c
-References: <1483969476-7172-1-git-send-email-kwolf@redhat.com>
- <1483969476-7172-15-git-send-email-kwolf@redhat.com>
-In-Reply-To: <1483969476-7172-15-git-send-email-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Have the TODO in the TAG: format, so they will stand out in the
+generated documentation.
 
-On 01/09/2017 07:44 AM, Kevin Wolf wrote:
-> From: Eric Blake <eblake@redhat.com>
->=20
-> These files deal with the file protocol, not the raw format (the
-> file protocol is often used with other formats, and the raw
-> format is not forced to use the file protocol).  Rename things
-> to make it a bit easier to follow.
->=20
-> Suggested-by: Daniel P. Berrange <berrange@redhat.com>
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> Reviewed-by: John Snow <jsnow@redhat.com>
-> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  MAINTAINERS               |    4 +-
->  block/Makefile.objs       |    4 +-
->  block/file-posix.c        | 2616 +++++++++++++++++++++++++++++++++++++=
-++++++++
->  block/file-win32.c        |  781 ++++++++++++++
->  block/gluster.c           |    4 +-
->  block/raw-posix.c         | 2616 -------------------------------------=
---------
->  block/raw-win32.c         |  781 --------------
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ qapi-schema.json     | 4 ++--
+ qapi/introspect.json | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-Did you forget to configure rename detection?
-
-It doesn't impact the validity of the pull request, but sure makes for a
-larger hit on the inbox.
-
+diff --git a/qapi-schema.json b/qapi-schema.json
+index 2990efa95d..5733487fc4 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -2314,7 +2314,7 @@
+ #                     "mac": "52:54:00:12:34:56" } }
+ # <- { "return": {} }
+ #
+-# TODO This command effectively bypasses QAPI completely due to its
++# TODO: This command effectively bypasses QAPI completely due to its
+ # "additional arguments" business.  It shouldn't have been added to
+ # the schema in this form.  It should be qapified properly, or
+ # replaced by a properly qapified command.
+@@ -2515,7 +2515,7 @@
+ #
+ # Additional arguments depend on the type.
+ #
+-# TODO This command effectively bypasses QAPI completely due to its
++# TODO: This command effectively bypasses QAPI completely due to its
+ # "additional arguments" business.  It shouldn't have been added to
+ # the schema in this form.  It should be qapified properly, or
+ # replaced by a properly qapified command.
+diff --git a/qapi/introspect.json b/qapi/introspect.json
+index fd4dc84196..464097a235 100644
+--- a/qapi/introspect.json
++++ b/qapi/introspect.json
+@@ -258,7 +258,7 @@
+ #
+ # @ret-type: the name of the command's result type.
+ #
+-# TODO @success-response (currently irrelevant, because it's QGA, not QM=
+P)
++# TODO: @success-response (currently irrelevant, because it's QGA, not Q=
+MP)
+ #
+ # Since: 2.5
+ ##
 --=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---crV1GoeAc5qm0c4KEIa8f7Nxmr2a6GkuI
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYc57xAAoJEKeha0olJ0Nq1RwIAI+LOxQil382D910BSUWp/Yu
-UXnqv2zGDuks35eQ/i2nJL6+Ac39DA4Jd55d0qZiEEbB55kk4sW+zADQnRKBhjOb
-u0E5BNovSN2estxszEvtyaQ+VUpeguHa2jUYYbMpUYIjmSQIRJLb8c+Ge52voghP
-Z1TDescQx41YYAK1V8B7xzB7sTOKup5Jebepb2j+5VZwf0M2BHxdcZ2j/vkMIj9L
-mean7AyeseoSDK9Xls16heyVxyV+0+ghrlUTsjIf8QCXaM+tOmj360Ti3q1s3udM
-iNLs1ciFNz4r3FGotlHm4ekPiX2jXR+7ZQYLj9H8OuSDrqn311e09NhNmmIV4ug=
-=qS4m
------END PGP SIGNATURE-----
-
---crV1GoeAc5qm0c4KEIa8f7Nxmr2a6GkuI--
+2.11.0
