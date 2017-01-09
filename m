@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37907)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38031)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cQYYf-0004SM-77
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:56:14 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cQYZC-00053I-11
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:56:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cQYYc-0005Pa-7D
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:56:13 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59946)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cQYYc-0005PL-0r
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:56:10 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1C9F84E4DE
-	for <qemu-devel@nongnu.org>; Mon,  9 Jan 2017 11:56:10 +0000 (UTC)
-Received: from donizetti.redhat.com (ovpn-116-124.ams2.redhat.com
-	[10.36.116.124])
-	by int-mx09.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
-	id v09Bu8xI005988
-	for <qemu-devel@nongnu.org>; Mon, 9 Jan 2017 06:56:09 -0500
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon,  9 Jan 2017 12:56:08 +0100
-Message-Id: <20170109115608.18150-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH] megasas: fix guest-triggered memory leak
+	(envelope-from <peter.maydell@linaro.org>) id 1cQYZB-0005Ye-34
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:56:46 -0500
+Received: from mail-ua0-x22c.google.com ([2607:f8b0:400c:c08::22c]:33419)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cQYZA-0005YT-LH
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:56:45 -0500
+Received: by mail-ua0-x22c.google.com with SMTP id i68so355398895uad.0
+	for <qemu-devel@nongnu.org>; Mon, 09 Jan 2017 03:56:44 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <20170107122047.26300-1-jcd@tribudubois.net>
+References: <20170107122047.26300-1-jcd@tribudubois.net>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 9 Jan 2017 11:56:23 +0000
+Message-ID: <CAFEAcA9fRh=MteBdYAxrgGWADovA4tTa4gNmOsfVbCnYggnRVw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v3] [i.MX] Remove MSGDATA register support.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,63 +28,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Jean-Christophe Dubois <jcd@tribudubois.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Marcin_Krzemi=C5=84ski?= <mar.krzeminski@gmail.com>
 
-If the guest sets the sglist size to a value >=2GB, megasas_handle_dcmd
-will return MFI_STAT_MEMORY_NOT_AVAILABLE without freeing the memory.
-Avoid this by returning only the status from map_dcmd, and loading
-cmd->iov_size in the caller.
+On 7 January 2017 at 12:20, Jean-Christophe Dubois <jcd@tribudubois.net> wrote:
+> From the documentation it is not clear what this SPI register is about.
+>
+> Moreover, neither linux driver nor xvisor driver are using this SPI register.
+>
+> For now we just remove it and issue a log on register write access.
 
-Reported-by: Li Qiang <liqiang6-s@360.cn>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- hw/scsi/megasas.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+By the way, could you make sure you use standard commit subject
+line forms like
+ hw/spi/imx_spi.c: Remove ...
 
-diff --git a/hw/scsi/megasas.c b/hw/scsi/megasas.c
-index 67fc1e7..6233865 100644
---- a/hw/scsi/megasas.c
-+++ b/hw/scsi/megasas.c
-@@ -683,14 +683,14 @@ static int megasas_map_dcmd(MegasasState *s, MegasasCmd *cmd)
-         trace_megasas_dcmd_invalid_sge(cmd->index,
-                                        cmd->frame->header.sge_count);
-         cmd->iov_size = 0;
--        return -1;
-+        return -EINVAL;
-     }
-     iov_pa = megasas_sgl_get_addr(cmd, &cmd->frame->dcmd.sgl);
-     iov_size = megasas_sgl_get_len(cmd, &cmd->frame->dcmd.sgl);
-     pci_dma_sglist_init(&cmd->qsg, PCI_DEVICE(s), 1);
-     qemu_sglist_add(&cmd->qsg, iov_pa, iov_size);
-     cmd->iov_size = iov_size;
--    return cmd->iov_size;
-+    return 0;
- }
- 
- static void megasas_finish_dcmd(MegasasCmd *cmd, uint32_t iov_size)
-@@ -1559,19 +1559,20 @@ static const struct dcmd_cmd_tbl_t {
- 
- static int megasas_handle_dcmd(MegasasState *s, MegasasCmd *cmd)
- {
--    int opcode, len;
-+    int opcode;
-     int retval = 0;
-+    size_t len;
-     const struct dcmd_cmd_tbl_t *cmdptr = dcmd_cmd_tbl;
- 
-     opcode = le32_to_cpu(cmd->frame->dcmd.opcode);
-     trace_megasas_handle_dcmd(cmd->index, opcode);
--    len = megasas_map_dcmd(s, cmd);
--    if (len < 0) {
-+    if (megasas_map_dcmd(s, cmd) < 0) {
-         return MFI_STAT_MEMORY_NOT_AVAILABLE;
-     }
-     while (cmdptr->opcode != -1 && cmdptr->opcode != opcode) {
-         cmdptr++;
-     }
-+    len = cmd->iov_size;
-     if (cmdptr->opcode == -1) {
-         trace_megasas_dcmd_unhandled(cmd->index, opcode, len);
-         retval = megasas_dcmd_dummy(s, cmd);
--- 
-2.9.3
+If you put [i.MX] in square brackets like that then patch application
+tools remove it (on the assumption that it's a meta-tag like [PATCH])
+and the commit summary in git ends up just "Remove MSGDATA register support"
+with no indication of what bit of the code it is dealing with.
+
+(I fixed up these two patches manually when I put them into target-arm.)
+
+thanks
+-- PMM
