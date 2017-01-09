@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34962)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35120)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cQdk2-0003Km-DJ
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 12:28:19 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cQdkm-0003iA-4w
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 12:29:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cQdjz-0007X3-7W
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 12:28:18 -0500
-Resent-Message-Id: <E1cQdjz-0007X3-7W@eggs.gnu.org>
-Received: from sender163-mail.zoho.com ([74.201.84.163]:21303)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1cQdjy-0007WM-VB
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 12:28:15 -0500
-In-Reply-To: <1483981368-9965-1-git-send-email-ashijeetacharya@gmail.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <148398287513.205.3642557260866625067@790289a7ca88>
+	(envelope-from <peter.maydell@linaro.org>) id 1cQdkl-0007i2-By
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 12:29:04 -0500
+Received: from mail-ua0-x231.google.com ([2607:f8b0:400c:c08::231]:35229)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cQdkk-0007hu-Uc
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 12:29:03 -0500
+Received: by mail-ua0-x231.google.com with SMTP id y9so137185983uae.2
+	for <qemu-devel@nongnu.org>; Mon, 09 Jan 2017 09:29:02 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 9 Jan 2017 09:27:57 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v4 0/4] Introduce a new --only-migratable
- option
+In-Reply-To: <20170109184252-mutt-send-email-mst@kernel.org>
+References: <1481922841-4324-1-git-send-email-mst@redhat.com>
+	<148192392306.37.10111381964118487672@790289a7ca88>
+	<20170109184252-mutt-send-email-mst@kernel.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 9 Jan 2017 17:28:41 +0000
+Message-ID: <CAFEAcA-Puj_RJCnyAsGp7gTQZW2+3PECjf8zOiym0gVyfGWB0A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PULL for-2.9 0/9] virtio, vhost, pc: fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,56 +30,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: ashijeetacharya@gmail.com
-Cc: famz@redhat.com, dgilbert@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, quintela@redhat.com, qemu-devel@nongnu.org, mst@redhat.com, armbru@redhat.com, groug@kaod.org, aneesh.kumar@linux.vnet.ibm.com, marcandre.lureau@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, jsnow@redhat.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1
-YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjQgMC80XSBJbnRyb2R1Y2UgYSBuZXcgLS1vbmx5
-LW1pZ3JhdGFibGUgb3B0aW9uCk1lc3NhZ2UtaWQ6IDE0ODM5ODEzNjgtOTk2NS0xLWdpdC1zZW5k
-LWVtYWlsLWFzaGlqZWV0YWNoYXJ5YUBnbWFpbC5jb20KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9
-PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAk
-QkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgojIFVzZWZ1bCBnaXQgb3B0aW9ucwpnaXQgY29uZmln
-IC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFt
-ZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4u
-KSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90
-YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cg
-JGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07
-IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkp
-CmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4
-Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHVi
-LmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzE0
-ODM5ODEzNjgtOTk2NS0xLWdpdC1zZW5kLWVtYWlsLWFzaGlqZWV0YWNoYXJ5YUBnbWFpbC5jb20g
-LT4gcGF0Y2hldy8xNDgzOTgxMzY4LTk5NjUtMS1naXQtc2VuZC1lbWFpbC1hc2hpamVldGFjaGFy
-eWFAZ21haWwuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKNzU3Zjk3MiBtaWdy
-YXRpb246IEZhaWwgbWlncmF0aW9uIGJsb2NrZXIgZm9yIC0tb25seS1taWdyYXRibGUKZGQ1ZTA1
-MiBtaWdyYXRpb246IGRpc2FsbG93IG1pZ3JhdGVfYWRkX2Jsb2NrZXIgZHVyaW5nIG1pZ3JhdGlv
-bgpiYjcwZWE3IG1pZ3JhdGlvbjogQWxsb3cgImRldmljZSBhZGQiIG9wdGlvbnMgdG8gb25seSBh
-ZGQgbWlncmF0YWJsZSBkZXZpY2VzCjg4YjUzMTIgbWlncmF0aW9uOiBBZGQgYSBuZXcgb3B0aW9u
-IHRvIGVuYWJsZSBvbmx5LW1pZ3JhdGFibGUKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5n
-IFBBVENIIDEvNDogbWlncmF0aW9uOiBBZGQgYSBuZXcgb3B0aW9uIHRvIGVuYWJsZSBvbmx5LW1p
-Z3JhdGFibGUuLi4KRVJST1I6IGRvIG5vdCBpbml0aWFsaXNlIGdsb2JhbHMgdG8gMCBvciBOVUxM
-CiM1NjogRklMRTogdmwuYzoxODM6CitpbnQgb25seV9taWdyYXRhYmxlID0gMDsgLyogdHVybiBp
-dCBvZmYgdW5sZXNzIHVzZXIgc3RhdGVzIG90aGVyd2lzZSAqLwoKdG90YWw6IDEgZXJyb3JzLCAw
-IHdhcm5pbmdzLCA0MCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVt
-cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
-aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
-TlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAyLzQ6IG1pZ3JhdGlvbjogQWxsb3cgImRldmljZSBh
-ZGQiIG9wdGlvbnMgdG8gb25seSBhZGQgbWlncmF0YWJsZSBkZXZpY2VzLi4uCkNoZWNraW5nIFBB
-VENIIDMvNDogbWlncmF0aW9uOiBkaXNhbGxvdyBtaWdyYXRlX2FkZF9ibG9ja2VyIGR1cmluZyBt
-aWdyYXRpb24uLi4KRVJST1I6IGRvIG5vdCB1c2UgQzk5IC8vIGNvbW1lbnRzCiMxNTk6IEZJTEU6
-IGJsb2NrL3Z2ZmF0LmM6MTIwNToKKyAgICAvLyAgICBhc3NlcnQoaXNfY29uc2lzdGVudChzKSk7
-Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDQ5MCBsaW5lcyBjaGVja2VkCgpZb3VyIHBh
-dGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
-cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
-c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA0LzQ6IG1pZ3Jh
-dGlvbjogRmFpbCBtaWdyYXRpb24gYmxvY2tlciBmb3IgLS1vbmx5LW1pZ3JhdGJsZS4uLgpFUlJP
-Ujogc3BhY2UgcHJvaGliaXRlZCBiZWZvcmUgdGhhdCBjbG9zZSBwYXJlbnRoZXNpcyAnKScKIzE1
-OTogRklMRTogaHcvaW50Yy9hcm1fZ2ljX2t2bS5jOjUxNzoKKyAgICAgICAgaWYgKHJldCA8IDAg
-KSB7Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDIxOSBsaW5lcyBjaGVja2VkCgpZb3Vy
-IHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVz
-ZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5l
-ciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRl
-c3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRv
-bWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5
-b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+On 9 January 2017 at 16:48, Michael S. Tsirkin <mst@redhat.com> wrote:
+> The strange thing here is that this actually seems to apply patches
+> from list instead of getting the tag from the tree.
+
+That's because it's really supposed to be working on patches sent
+to the list -- it only checks pull requests because it can't
+tell them apart from patches, I think.
+
+thanks
+-- PMM
