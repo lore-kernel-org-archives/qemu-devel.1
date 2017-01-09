@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33433)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33503)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cQaFr-0006mv-SS
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 08:45:00 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cQaFx-0006vc-C2
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 08:45:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cQaFq-00031J-Kc
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 08:44:55 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cQaFw-00033K-9S
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 08:45:01 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon,  9 Jan 2017 14:44:29 +0100
-Message-Id: <1483969476-7172-8-git-send-email-kwolf@redhat.com>
+Date: Mon,  9 Jan 2017 14:44:31 +0100
+Message-Id: <1483969476-7172-10-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1483969476-7172-1-git-send-email-kwolf@redhat.com>
 References: <1483969476-7172-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 07/14] quorum: Avoid bdrv_aio_writev() for
- rewrites
+Subject: [Qemu-devel] [PULL 09/14] quorum: Inline quorum_fifo_aio_cb()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,100 +22,77 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-Replacing it with bdrv_co_pwritev() prepares us for byte granularity
-requests and gets us rid of the last bdrv_aio_*() user in quorum.
+Inlining the function removes some boilerplace code and replaces
+recursion by a simple loop, so the code becomes somewhat easier to
+understand.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Alberto Garcia <berto@igalia.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- block/quorum.c | 46 +++++++++++++++++++++++++++++++---------------
- 1 file changed, 31 insertions(+), 15 deletions(-)
+ block/quorum.c | 42 +++++++++++++-----------------------------
+ 1 file changed, 13 insertions(+), 29 deletions(-)
 
 diff --git a/block/quorum.c b/block/quorum.c
-index 2c280bb..690fd36 100644
+index 4bba9fd..e244389 100644
 --- a/block/quorum.c
 +++ b/block/quorum.c
-@@ -221,15 +221,6 @@ static bool quorum_has_too_much_io_failed(QuorumAIOCB *acb)
-     return false;
+@@ -250,30 +250,6 @@ static void quorum_report_bad_acb(QuorumChildRequest *sacb, int ret)
+     quorum_report_bad(type, acb->offset, acb->bytes, sacb->bs->node_name, ret);
  }
  
--static void quorum_rewrite_aio_cb(void *opaque, int ret)
+-static int quorum_fifo_aio_cb(void *opaque, int ret)
 -{
--    QuorumAIOCB *acb = opaque;
+-    QuorumChildRequest *sacb = opaque;
+-    QuorumAIOCB *acb = sacb->parent;
+-    BDRVQuorumState *s = acb->bs->opaque;
 -
--    /* one less rewrite to do */
--    acb->rewrite_count--;
--    qemu_coroutine_enter_if_inactive(acb->co);
+-    assert(acb->is_read && s->read_pattern == QUORUM_READ_PATTERN_FIFO);
+-
+-    if (ret < 0) {
+-        quorum_report_bad_acb(sacb, ret);
+-
+-        /* We try to read next child in FIFO order if we fail to read */
+-        if (acb->children_read < s->num_children) {
+-            return read_fifo_child(acb);
+-        }
+-    }
+-
+-    acb->vote_ret = ret;
+-
+-    /* FIXME: rewrite failed children if acb->children_read > 1? */
+-
+-    return ret;
 -}
 -
- static int read_fifo_child(QuorumAIOCB *acb);
- 
- static void quorum_copy_qiov(QEMUIOVector *dest, QEMUIOVector *source)
-@@ -296,7 +287,27 @@ static void quorum_report_bad_versions(BDRVQuorumState *s,
-     }
- }
- 
--static bool quorum_rewrite_bad_versions(BDRVQuorumState *s, QuorumAIOCB *acb,
-+static void quorum_rewrite_entry(void *opaque)
-+{
-+    QuorumCo *co = opaque;
-+    QuorumAIOCB *acb = co->acb;
-+    BDRVQuorumState *s = acb->bs->opaque;
-+
-+    /* Ignore any errors, it's just a correction attempt for already
-+     * corrupted data. */
-+    bdrv_co_pwritev(s->children[co->idx],
-+                    acb->sector_num * BDRV_SECTOR_SIZE,
-+                    acb->nb_sectors * BDRV_SECTOR_SIZE,
-+                    acb->qiov, 0);
-+
-+    /* Wake up the caller after the last rewrite */
-+    acb->rewrite_count--;
-+    if (!acb->rewrite_count) {
-+        qemu_coroutine_enter_if_inactive(acb->co);
-+    }
-+}
-+
-+static bool quorum_rewrite_bad_versions(QuorumAIOCB *acb,
-                                         QuorumVoteValue *value)
+ static void quorum_report_bad_versions(BDRVQuorumState *s,
+                                        QuorumAIOCB *acb,
+                                        QuorumVoteValue *value)
+@@ -679,12 +655,20 @@ static int read_quorum_children(QuorumAIOCB *acb)
+ static int read_fifo_child(QuorumAIOCB *acb)
  {
-     QuorumVoteVersion *version;
-@@ -315,7 +326,7 @@ static bool quorum_rewrite_bad_versions(BDRVQuorumState *s, QuorumAIOCB *acb,
-         }
-     }
- 
--    /* quorum_rewrite_aio_cb will count down this to zero */
-+    /* quorum_rewrite_entry will count down this to zero */
-     acb->rewrite_count = count;
- 
-     /* now fire the correcting rewrites */
-@@ -324,9 +335,14 @@ static bool quorum_rewrite_bad_versions(BDRVQuorumState *s, QuorumAIOCB *acb,
-             continue;
-         }
-         QLIST_FOREACH(item, &version->items, next) {
--            bdrv_aio_writev(s->children[item->index], acb->sector_num,
--                            acb->qiov, acb->nb_sectors, quorum_rewrite_aio_cb,
--                            acb);
-+            Coroutine *co;
-+            QuorumCo data = {
-+                .acb = acb,
-+                .idx = item->index,
-+            };
+     BDRVQuorumState *s = acb->bs->opaque;
+-    int n = acb->children_read++;
+-    int ret;
++    int n, ret;
 +
-+            co = qemu_coroutine_create(quorum_rewrite_entry, &data);
-+            qemu_coroutine_enter(co);
-         }
-     }
++    /* We try to read the next child in FIFO order if we failed to read */
++    do {
++        n = acb->children_read++;
++        acb->qcrs[n].bs = s->children[n]->bs;
++        ret = bdrv_co_preadv(s->children[n], acb->offset, acb->bytes,
++                             acb->qiov, 0);
++        if (ret < 0) {
++            quorum_report_bad_acb(&acb->qcrs[n], ret);
++        }
++    } while (ret < 0 && acb->children_read < s->num_children);
  
-@@ -579,7 +595,7 @@ static void quorum_vote(QuorumAIOCB *acb)
+-    acb->qcrs[n].bs = s->children[n]->bs;
+-    ret = bdrv_co_preadv(s->children[n], acb->offset, acb->bytes, acb->qiov, 0);
+-    ret = quorum_fifo_aio_cb(&acb->qcrs[n], ret);
++    /* FIXME: rewrite failed children if acb->children_read > 1? */
  
-     /* corruption correction is enabled */
-     if (s->rewrite_corrupted) {
--        quorum_rewrite_bad_versions(s, acb, &winner->value);
-+        quorum_rewrite_bad_versions(acb, &winner->value);
-     }
- 
- free_exit:
+     return ret;
+ }
 -- 
 1.8.3.1
