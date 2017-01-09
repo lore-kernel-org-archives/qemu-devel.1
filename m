@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50908)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51686)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1cQd7y-0004uC-Sp
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 11:49:00 -0500
+	(envelope-from <ilg@livius.net>) id 1cQdA6-0006YU-V6
+	for Qemu-devel@nongnu.org; Mon, 09 Jan 2017 11:51:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1cQd7x-0007SU-Qb
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 11:48:58 -0500
-Received: from mail-yw0-x234.google.com ([2607:f8b0:4002:c05::234]:34127)
+	(envelope-from <ilg@livius.net>) id 1cQdA3-0000IZ-0m
+	for Qemu-devel@nongnu.org; Mon, 09 Jan 2017 11:51:11 -0500
+Received: from mail-wj0-x22e.google.com ([2a00:1450:400c:c01::22e]:33281)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1cQd7x-0007SJ-KI
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 11:48:57 -0500
-Received: by mail-yw0-x234.google.com with SMTP id w75so31949608ywg.1
-	for <qemu-devel@nongnu.org>; Mon, 09 Jan 2017 08:48:57 -0800 (PST)
-MIME-Version: 1.0
-References: <20170105043743.14700.719.malonedeb@wampee.canonical.com>
-	<20170106133959.14243.54408.malone@soybean.canonical.com>
-	<CAJ+F1CKPMn=P3HOroDnr50owUPBSSLqgGAfbi33RvjVHNL4cAw@mail.gmail.com>
-In-Reply-To: <CAJ+F1CKPMn=P3HOroDnr50owUPBSSLqgGAfbi33RvjVHNL4cAw@mail.gmail.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Mon, 09 Jan 2017 16:48:45 +0000
-Message-ID: <CAJ+F1CL7__0K6q5J59RgV7DynDYWSRCp+wXqeVGBMLrSij50aA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+	(Exim 4.71) (envelope-from <ilg@livius.net>) id 1cQdA2-0000Hu-QI
+	for Qemu-devel@nongnu.org; Mon, 09 Jan 2017 11:51:06 -0500
+Received: by mail-wj0-x22e.google.com with SMTP id kq3so22707030wjc.0
+	for <Qemu-devel@nongnu.org>; Mon, 09 Jan 2017 08:51:05 -0800 (PST)
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.2 \(3259\))
+From: Liviu Ionescu <ilg@livius.net>
+In-Reply-To: <CAFEAcA_CDpXqAAJNdSQpk4MKOorDXqUi_AwsevrHk=pnbrS0NQ@mail.gmail.com>
+Date: Mon, 9 Jan 2017 18:51:01 +0200
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Bug 1654137] Re: Ctrl-A b not working in 2.8.0
+Message-Id: <277E72EB-288A-498F-9208-99EBF09218A6@livius.net>
+References: <6205DF8A-7643-432F-88FF-12B1E9DEF5D8@livius.net>
+	<CAFEAcA_CDpXqAAJNdSQpk4MKOorDXqUi_AwsevrHk=pnbrS0NQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] CMSIS SVD based peripheral definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,75 +29,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bug 1654137 <1654137@bugs.launchpad.net>, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developer <Qemu-devel@nongnu.org>
 
-Hi
 
-On Mon, Jan 9, 2017 at 4:39 PM Marc-Andr=C3=A9 Lureau <marcandre.lureau@gma=
-il.com>
+> On 9 Jan 2017, at 18:16, Peter Maydell <peter.maydell@linaro.org> =
 wrote:
+>=20
+> On 28 December 2016 at 18:49, Liviu Ionescu <ilg@livius.net> wrote:
+>> The latest release of GNU ARM Eclipse QEMU (2.8.0-20161227) =
+introduced
+>> a new technology for implementing peripherals, based on standard
+>> CMSIS SVD definitions
+>> (http://www.keil.com/pack/doc/CMSIS/SVD/html/index.html).
+>>=20
+>> The SVD files are large XML files produced by the silicon vendors,
+>> and generally are considered the final hardware reference for
+>> the Cortex-M devices, so they are expected to provide the most
+>> accurate peripheral emulation.
+>=20
+> This certainly seems like a good idea in principle, if there's
+> enough information in the SVD files to reliably create a
+> complete board model.
 
-> Hi
->
-> On Fri, Jan 6, 2017 at 2:46 PM Andreas Gustafsson <gson@gson.org> wrote:
->
-> I am also seeing this problem.  In case it was not clear from Paul's
-> original report, it affects guests using a serial console.
->
-> Also, it is not specific to NetBSD.  I can reproduce it using a Linux
-> guest on a Linux host, by running the following on a Debian 8 system:
->
->   wget
-> http://landley.net/aboriginal/downloads/old/binaries/1.4.5/system-image-i=
-686.tar.gz
->   tar xfz system-image-i686.tar.gz
->   cd system-image-i686
->   sh run-emulator.sh
->
-> and typing Control-A b m once the guest has started.
->
-> Using qemu 2.1.2, this successfully causes the guest to print a memory
-> usage summary.  Using current qemu sources from git
-> (dbe2b65566e76d3c3a0c3358285c0336ac61e757), nothing happens.
->
-> --
-> You received this bug notification because you are a member of qemu-
-> devel-ml, which is subscribed to QEMU.
-> https://bugs.launchpad.net/bugs/1654137
->
-> Title:
->   Ctrl-A b not working in 2.8.0
->
-> Status in QEMU:
->   New
->
-> Bug description:
->   With a recent update from 2.7.0 to 2.8.0 I have discovered that I can
->   no longer send a "break" to the VM.  Ctrl-A b is simply ignored.
->   Other Ctrl-A sequences seem to work correctly.
->
->
-> It could be related to the chardev changes in 2.8, I am bisecting and
-> looking at it.
->
->
-it's a regression from commit a4afa548fc6dd9842ed866, I will send a fix
-asap.
+the general answer is that this information should be there.
+
+in practice, it mostly is. however, the SVD specs are quite lax and each =
+vendor understands them slightly differently.
+
+to compensate for these differences, my workflow added an extra step of =
+patching the original content. the patch files are minimal compared to =
+the original files, and the effort to create them is perfectly =
+acceptable.
+
+> The obvious issue that comes to mind
+> is licensing, though -- what licenses are the SVD files under,
+> and would those be compatible with QEMU's GPLv2 ?
+
+that's a common question with cmsis files. I could not find any specific =
+license applying to svd files, so, since these files are provided as =
+part of the arm cmsis packs, I would consider the generic license, =
+which, starting with the latest cmsis release, was changed to Apache.
+
+anyway, in my opinion, after experimenting both with classical (switch =
+based) implementations and table based (peripheral/register/bitfield) =
+implementations, if I would have to deal with a device which does not =
+have the vendor SVD files, I would probably prefer to write the JSON =
+file by hand and allow the automated tools to handle the rest.
+
+actually I'll have to do this when I'll rewrite the Cortex-M system =
+peripherals, not included in the vendor provided SVDs.
 
 
-> thanks
->
->
->   This is on a NetBSD amd64 system, version 7.99.53, and qemu was
->   installed on this system from source.
->
->   Reverting to the previous install restores "break" capability.
->
-> To manage notifications about this bug go to:
-> https://bugs.launchpad.net/qemu/+bug/1654137/+subscriptions
->
-> --
-> Marc-Andr=C3=A9 Lureau
->
---=20
-Marc-Andr=C3=A9 Lureau
+regards,
+
+Liviu
