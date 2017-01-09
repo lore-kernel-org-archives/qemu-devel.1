@@ -1,24 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51612)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53746)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1cQVxI-0001sq-CT
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 04:09:29 -0500
+	(envelope-from <bounces@canonical.com>) id 1cQW8e-0004Fi-EB
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 04:21:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1cQVxF-000721-7G
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 04:09:28 -0500
-Received: from [45.249.212.187] (port=2518 helo=dggrg01-dlp.huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1cQVxE-0006nA-DS
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 04:09:25 -0500
-From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Date: Mon, 9 Jan 2017 09:08:50 +0000
-Message-ID: <33183CC9F5247A488A2544077AF19020DA180CB2@DGGEMA505-MBX.china.huawei.com>
-References: <20161219060336.10176-1-hangaohuai@huawei.com>
-In-Reply-To: <20161219060336.10176-1-hangaohuai@huawei.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <bounces@canonical.com>) id 1cQW8Z-0003tx-Hw
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 04:21:12 -0500
+Received: from indium.canonical.com ([91.189.90.7]:40157)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cQW8Z-0003te-BA
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 04:21:07 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cQW8W-0001sb-IT
+	for <qemu-devel@nongnu.org>; Mon, 09 Jan 2017 09:21:04 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id C0C542E80C9
+	for <qemu-devel@nongnu.org>; Mon,  9 Jan 2017 09:21:02 +0000 (UTC)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v4] bugfix: vm halt when in reset looping
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 09 Jan 2017 09:03:22 -0000
+From: Thomas Huth <526653@bugs.launchpad.net>
+Reply-To: Bug 526653 <526653@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20100223201642.21324.1038.malonedeb@soybean.canonical.com>
+Message-Id: <20170109090323.19993.40796.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 526653] Re: Breakpoint on Memory address fails
+ with KVM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,67 +37,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Hangaohuai <hangaohuai@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "mst@redhat.com" <mst@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
 
->
-> From: Hangaohuai
-> Sent: Monday, December 19, 2016 2:04 PM
-> To: qemu-devel@nongnu.org
-> Cc: mst@redhat.com; pbonzini@redhat.com; Gonglei (Arei); Hangaohuai
-> Subject: [PATCH v4] bugfix: vm halt when in reset looping
->=20
-> reset mc146818rtc device when RESET event happens.
->=20
-> Fix the problem:
->   1. Guest boot the second cpu, set CMOS_RESET_CODE 0x0a to protect
-> selfboot;
->   2. VM being reset by others, hmp_system_reset;
->   3. seabios resume check the CMOS_RESET_CODE, if 0x0a, jump to the BDA
->      resume execution by jump via 40h:0067h;
->   4. Guest halt;
->=20
-> Signed-off-by: hangaohuai <hangaohuai@huawei.com>
-> ---
->  hw/timer/mc146818rtc.c | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
->=20
+Triaging old bug tickets ... can you still reproduce this issue with the
+latest version of QEMU (currently version 2.8)?
 
-Reviewed-by: Gonglei <arei.gonglei@huawei.com>
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
-Paolo, could you pls pick up this patch?
+-- =
 
-Thanks,
--Gonglei
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/526653
 
-> diff --git a/hw/timer/mc146818rtc.c b/hw/timer/mc146818rtc.c
-> index da209d0..637f872 100644
-> --- a/hw/timer/mc146818rtc.c
-> +++ b/hw/timer/mc146818rtc.c
-> @@ -946,11 +946,23 @@ static Property mc146818rtc_properties[] =3D {
->      DEFINE_PROP_END_OF_LIST(),
->  };
->=20
-> +static void rtc_resetdev(DeviceState *d)
-> +{
-> +    RTCState *s =3D MC146818_RTC(d);
-> +
-> +    /* Reason: VM do suspend self will set 0xfe
-> +     * Reset any values other than 0xfe(Guest suspend case) */
-> +    if (s->cmos_data[0x0f] !=3D 0xfe) {
-> +        s->cmos_data[0x0f] =3D 0x00;
-> +    }
-> +}
-> +
->  static void rtc_class_initfn(ObjectClass *klass, void *data)
->  {
->      DeviceClass *dc =3D DEVICE_CLASS(klass);
->=20
->      dc->realize =3D rtc_realizefn;
-> +    dc->reset =3D rtc_resetdev;
->      dc->vmsd =3D &vmstate_rtc;
->      dc->props =3D mc146818rtc_properties;
->      /* Reason: needs to be wired up by rtc_init() */
-> --
-> 1.8.3.1
->=20
+Title:
+  Breakpoint on Memory address fails with KVM
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  Using QEMU version 0.12.50 under ubuntu Karmic x64
+
+  To reproduce the error using a floppy with a bootloder:
+  qemu-system-x86_64 -s -S -fda floppy.img -boot a -enable-kvm
+
+  connect with gdb:
+  (gdb) set arch i8086
+  The target architecture is assumed to be i8086
+  (gdb) target remote localhost:1234
+  Remote debugging using localhost:1234
+  0x0000fff0 in ?? ()
+  (gdb) break *0x7c00
+  Breakpoint 1 at 0x7c00
+  (gdb) continue
+  Continuing.
+
+  The breakpoint is not hit.
+
+  If you close qemu and start it without kvm support:
+
+  qemu-system-x86_64 -s -S -fda floppy.img -boot a
+
+  (gdb) set arch i8086
+  The target architecture is assumed to be i8086
+  (gdb) target remote localhost:1234
+  Remote debugging using localhost:1234
+  0x0000fff0 in ?? ()
+  (gdb) break *0x7c00
+  Breakpoint 1 at 0x7c00
+  (gdb) continue
+  Continuing.
+
+  Breakpoint 1, 0x00007c00 in ?? ()
+  (gdb) =
+
+
+  The breakpoint is hit.  If you wait until after the bootloader has
+  been loaded into memory, you can properly set breakpoints with or
+  without kvm enabled.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/526653/+subscriptions
