@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50245)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50314)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cQXT7-0003cz-3V
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 05:46:26 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cQXTW-0003mH-6E
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 05:46:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cQXT3-0008R0-SP
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 05:46:25 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:13842)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cQXT3-0008QY-Mo
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 05:46:21 -0500
-Date: Mon, 9 Jan 2017 10:41:43 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170109104143.GB30228@stefanha-x1.localdomain>
-References: <a6803686-9435-0276-0118-10961dc97e04@redhat.com>
-	<20170103155347.GF14707@stefanha-x1.localdomain>
-	<68e906ee-5604-644c-78cd-d39f0d164406@redhat.com>
-	<20170104145133.GD8194@stefanha-x1.localdomain>
-	<CAFEAcA_+33bEyPab4pzAF8pR8W+XixyaUrM+1dyWH4hyDUWuqw@mail.gmail.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1cQXTU-00008h-Tt
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 05:46:50 -0500
+Received: from mail-ua0-x22a.google.com ([2607:f8b0:400c:c08::22a]:33218)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cQXTU-00008X-PW
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 05:46:48 -0500
+Received: by mail-ua0-x22a.google.com with SMTP id i68so354155818uad.0
+	for <qemu-devel@nongnu.org>; Mon, 09 Jan 2017 02:46:48 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="WhfpMioaduB5tiZL"
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA_+33bEyPab4pzAF8pR8W+XixyaUrM+1dyWH4hyDUWuqw@mail.gmail.com>
-Subject: Re: [Qemu-devel] Proposal for 2.9 release schedule
+In-Reply-To: <20170104220624.26557-1-jcd@tribudubois.net>
+References: <20170104220624.26557-1-jcd@tribudubois.net>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 9 Jan 2017 10:46:27 +0000
+Message-ID: <CAFEAcA8dwhoSZTWS9JJ6-vSUs1Asw8ymktmD+oOqx0DNpCV2XQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4] [i.MX] fix CS handling during SPI
+ access.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,68 +30,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel <qemu-devel@nongnu.org>
+To: Jean-Christophe Dubois <jcd@tribudubois.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Marcin_Krzemi=C5=84ski?= <mar.krzeminski@gmail.com>
 
+On 4 January 2017 at 22:06, Jean-Christophe Dubois <jcd@tribudubois.net> wr=
+ote:
+> The i.MX SPI device was not de-asserting the CS line at the end of
+> memory access.
+>
+> This triggered a SIGSEGV in Qemu when the sabrelite emulator was acessing
+> a SPI flash memory.
+>
+> Whith this path the CS signal is correctly asserted and deasserted arroun=
+d
+> memory access.
+>
+> Assertion level is now based on SPI device configuration.
+>
+> This was tested by:
+> * booting linux on Sabrelite Qemu emulator.
+> * booting xvisor on Sabrelite Qemu emultor.
+>
+> Signed-off-by: Jean-Christophe Dubois <jcd@tribudubois.net>
+> Acked-by: Marcin Krzemi=C5=84ski <mar.krzeminski@gmail.com>
 
---WhfpMioaduB5tiZL
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+>  static void imx_spi_reset(DeviceState *dev)
+>  {
+>      IMXSPIState *s =3D IMX_SPI(dev);
+> +    uint32_t i;
+>
+>      DPRINTF("\n");
+>
+> @@ -243,6 +263,11 @@ static void imx_spi_reset(DeviceState *dev)
+>      imx_spi_update_irq(s);
+>
+>      s->burst_length =3D 0;
+> +
+> +    /* Disable all CS lines */
+> +    for (i =3D 0; i < 4; i++) {
+> +        qemu_set_irq(s->cs_lines[i], !imx_spi_channel_pol(s, i));
+> +    }
 
-On Fri, Jan 06, 2017 at 03:12:28PM +0000, Peter Maydell wrote:
-> On 4 January 2017 at 14:51, Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> > On Tue, Jan 03, 2017 at 05:06:13PM +0100, Paolo Bonzini wrote:
-> >> On 03/01/2017 16:53, Stefan Hajnoczi wrote:
-> >> > On Fri, Dec 23, 2016 at 03:15:58PM +0100, Paolo Bonzini wrote:
-> >> >> Considering that Easter is on April 16th, we'd probably want to hav=
-e the
-> >> >> release before that date even in case of a slip.
-> >> >>
-> >> >> On the other hand, the Christmas / New Year break here means that w=
-e'll
-> >> >> have to make the development time 1-2 week shorter in practice.
-> >> >>
-> >> >> 2016-02-21     2.9 soft freeze
-> >> >> 2016-03-07     hard freeze / rc0
-> >> >> 2016-03-28     rc3 (+3 weeks)
-> >> >> 2016-04-04     rc4 or release
-> >> >> 2016-04-11     release (if rc4)
-> >> >>
-> >> >> One possibility is to make soft freeze happen a few days later.
-> >> >> Peter/Stefan, how did the experiment go with the new rules for soft
-> >> >> freeze?  Is it worth repeating it for 2.9 and would it make sense to
-> >> >> shorten soft freeze given the new rules?
-> >> >
-> >> > I would shorten the soft freeze by 1 week.
-> >> >
-> >> > Overall the 2.8 release went smoothly.  We got unlucky right at the =
-end
-> >> > with a release blocker but otherwise it was fine.
-> >>
-> >> Then what about soft freeze on 2016-02-28?
-> >
-> > Sounds good to me.  Peter?
->=20
-> Are we retaining the "make sure you have your pull requests on the list
-> by the softfreeze date" rule this time around?
+Calling qemu_set_irq() in a device reset function is a bit
+tricky, because in a full system reset the device at the other
+end might have already reset or might not, and calling into
+its handler function for the irq line change might provoke
+an unwanted change of its state. We don't really have a coherent
+model here but for the moment we just try to avoid calling
+set_irq in a reset method.
 
-I hope so.  It helps keep the freeze time bounded.
-
-Stefan
-
---WhfpMioaduB5tiZL
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJYc2jnAAoJEJykq7OBq3PIwr0H/iLqqDsfp9JJd5WwgIggInRz
-3P7N2VVfELCDxBI010N17HcEAS1ZU+iqfiiHaV1u/J57jGAjrr/ReLr3e3YBH9e4
-6W976sPEMdijkGtIiSyiAfFut054/yZwkV60EiBUNOgrvyBFR2o1H4wnBMVcL+z7
-ZPtV9nFXU/Wa7r5LzfDK6ru4zobcCLR9krh1eY1JmKXUuQXzbbCHVJisT0zs11xq
-chzW7m3HfFccSkyny24J7boV1tYM4MpPbytOtSnZ9dK6zqz9lnzO+UfyMJRUoHG6
-csFDP1teOQdHZ6rtZ63jXRrqb0RD7wZIYCW2s6AfoJdxS+TODJgxOtjaGVkwMW0=
-=nnJR
------END PGP SIGNATURE-----
-
---WhfpMioaduB5tiZL--
+thanks
+-- PMM
