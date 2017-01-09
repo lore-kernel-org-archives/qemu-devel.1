@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37303)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37359)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cQYWU-0002Rn-TC
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:54:00 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cQYWW-0002TP-BW
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:54:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cQYWS-00047B-Pt
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:53:58 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cQYWV-00049O-6k
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:54:00 -0500
 Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:47993)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1cQYWS-00045M-FS
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:53:56 -0500
+	id 1cQYWU-00045M-W5
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:53:59 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.84_2)
-	(envelope-from <pm215@archaic.org.uk>) id 1cQYWO-0001RN-Mr
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 11:53:52 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1cQYWM-0001P9-3S
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 11:53:50 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon,  9 Jan 2017 11:53:39 +0000
-Message-Id: <1483962824-29185-17-git-send-email-peter.maydell@linaro.org>
+Date: Mon,  9 Jan 2017 11:53:33 +0000
+Message-Id: <1483962824-29185-11-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1483962824-29185-1-git-send-email-peter.maydell@linaro.org>
 References: <1483962824-29185-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 16/21] hw/arm/virt-acpi-build: remove redundant
- members from VirtGuestInfo
+Subject: [Qemu-devel] [PULL 10/21] hw/arm/virt: parameter passing cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,298 +31,98 @@ To: qemu-devel@nongnu.org
 
 From: Andrew Jones <drjones@redhat.com>
 
-Now that we pass VirtMachineState, and guest-info is just part of
-that state, we can remove all the redundant members and access
-the VirtMachineState directly.
+Some simple cleanups made possible by "hw/arm/virt: Merge
+VirtBoardInfo and VirtMachineState"
 
 Signed-off-by: Andrew Jones <drjones@redhat.com>
 Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 Acked-by: Michael S. Tsirkin <mst@redhat.com>
-Message-id: 20170102200153.28864-12-drjones@redhat.com
+Message-id: 20170102200153.28864-6-drjones@redhat.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/hw/arm/virt.h    |  6 ----
- hw/arm/virt-acpi-build.c | 72 +++++++++++++++++++++++++-----------------------
- hw/arm/virt.c            |  6 ----
- 3 files changed, 37 insertions(+), 47 deletions(-)
+ hw/arm/virt.c | 19 +++++++++----------
+ 1 file changed, 9 insertions(+), 10 deletions(-)
 
-diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-index b1eed52..d200542 100644
---- a/include/hw/arm/virt.h
-+++ b/include/hw/arm/virt.h
-@@ -78,13 +78,7 @@ typedef struct MemMapEntry {
- } MemMapEntry;
- 
- typedef struct VirtGuestInfo {
--    int smp_cpus;
-     FWCfgState *fw_cfg;
--    const MemMapEntry *memmap;
--    const int *irqmap;
--    bool use_highmem;
--    int gic_version;
--    bool no_its;
- } VirtGuestInfo;
- 
- typedef struct {
-diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index ac507d6..a3848a9 100644
---- a/hw/arm/virt-acpi-build.c
-+++ b/hw/arm/virt-acpi-build.c
-@@ -384,7 +384,7 @@ build_rsdp(GArray *rsdp_table, BIOSLinker *linker, unsigned rsdt_tbl_offset)
- }
- 
- static void
--build_iort(GArray *table_data, BIOSLinker *linker, VirtGuestInfo *guest_info)
-+build_iort(GArray *table_data, BIOSLinker *linker)
- {
-     int iort_start = table_data->len;
-     AcpiIortIdMapping *idmap;
-@@ -439,11 +439,11 @@ build_iort(GArray *table_data, BIOSLinker *linker, VirtGuestInfo *guest_info)
- }
- 
- static void
--build_spcr(GArray *table_data, BIOSLinker *linker, VirtGuestInfo *guest_info)
-+build_spcr(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
- {
-     AcpiSerialPortConsoleRedirection *spcr;
--    const MemMapEntry *uart_memmap = &guest_info->memmap[VIRT_UART];
--    int irq = guest_info->irqmap[VIRT_UART] + ARM_SPI_BASE;
-+    const MemMapEntry *uart_memmap = &vms->memmap[VIRT_UART];
-+    int irq = vms->irqmap[VIRT_UART] + ARM_SPI_BASE;
- 
-     spcr = acpi_data_push(table_data, sizeof(*spcr));
- 
-@@ -472,16 +472,16 @@ build_spcr(GArray *table_data, BIOSLinker *linker, VirtGuestInfo *guest_info)
- }
- 
- static void
--build_srat(GArray *table_data, BIOSLinker *linker, VirtGuestInfo *guest_info)
-+build_srat(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
- {
-     AcpiSystemResourceAffinityTable *srat;
-     AcpiSratProcessorGiccAffinity *core;
-     AcpiSratMemoryAffinity *numamem;
-     int i, j, srat_start;
-     uint64_t mem_base;
--    uint32_t *cpu_node = g_malloc0(guest_info->smp_cpus * sizeof(uint32_t));
-+    uint32_t *cpu_node = g_malloc0(vms->smp_cpus * sizeof(uint32_t));
- 
--    for (i = 0; i < guest_info->smp_cpus; i++) {
-+    for (i = 0; i < vms->smp_cpus; i++) {
-         j = numa_get_node_for_cpu(i);
-         if (j < nb_numa_nodes) {
-                 cpu_node[i] = j;
-@@ -492,7 +492,7 @@ build_srat(GArray *table_data, BIOSLinker *linker, VirtGuestInfo *guest_info)
-     srat = acpi_data_push(table_data, sizeof(*srat));
-     srat->reserved1 = cpu_to_le32(1);
- 
--    for (i = 0; i < guest_info->smp_cpus; ++i) {
-+    for (i = 0; i < vms->smp_cpus; ++i) {
-         core = acpi_data_push(table_data, sizeof(*core));
-         core->type = ACPI_SRAT_PROCESSOR_GICC;
-         core->length = sizeof(*core);
-@@ -502,7 +502,7 @@ build_srat(GArray *table_data, BIOSLinker *linker, VirtGuestInfo *guest_info)
-     }
-     g_free(cpu_node);
- 
--    mem_base = guest_info->memmap[VIRT_MEM].base;
-+    mem_base = vms->memmap[VIRT_MEM].base;
-     for (i = 0; i < nb_numa_nodes; ++i) {
-         numamem = acpi_data_push(table_data, sizeof(*numamem));
-         build_srat_memory(numamem, mem_base, numa_info[i].node_mem, i,
-@@ -515,10 +515,10 @@ build_srat(GArray *table_data, BIOSLinker *linker, VirtGuestInfo *guest_info)
- }
- 
- static void
--build_mcfg(GArray *table_data, BIOSLinker *linker, VirtGuestInfo *guest_info)
-+build_mcfg(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
- {
-     AcpiTableMcfg *mcfg;
--    const MemMapEntry *memmap = guest_info->memmap;
-+    const MemMapEntry *memmap = vms->memmap;
-     int len = sizeof(*mcfg) + sizeof(mcfg->allocation[0]);
- 
-     mcfg = acpi_data_push(table_data, len);
-@@ -562,11 +562,12 @@ build_gtdt(GArray *table_data, BIOSLinker *linker)
- 
- /* MADT */
- static void
--build_madt(GArray *table_data, BIOSLinker *linker, VirtGuestInfo *guest_info)
-+build_madt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
- {
-+    VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
-     int madt_start = table_data->len;
--    const MemMapEntry *memmap = guest_info->memmap;
--    const int *irqmap = guest_info->irqmap;
-+    const MemMapEntry *memmap = vms->memmap;
-+    const int *irqmap = vms->irqmap;
-     AcpiMultipleApicTable *madt;
-     AcpiMadtGenericDistributor *gicd;
-     AcpiMadtGenericMsiFrame *gic_msi;
-@@ -578,16 +579,16 @@ build_madt(GArray *table_data, BIOSLinker *linker, VirtGuestInfo *guest_info)
-     gicd->type = ACPI_APIC_GENERIC_DISTRIBUTOR;
-     gicd->length = sizeof(*gicd);
-     gicd->base_address = cpu_to_le64(memmap[VIRT_GIC_DIST].base);
--    gicd->version = guest_info->gic_version;
-+    gicd->version = vms->gic_version;
- 
--    for (i = 0; i < guest_info->smp_cpus; i++) {
-+    for (i = 0; i < vms->smp_cpus; i++) {
-         AcpiMadtGenericCpuInterface *gicc = acpi_data_push(table_data,
-                                                            sizeof(*gicc));
-         ARMCPU *armcpu = ARM_CPU(qemu_get_cpu(i));
- 
-         gicc->type = ACPI_APIC_GENERIC_CPU_INTERFACE;
-         gicc->length = sizeof(*gicc);
--        if (guest_info->gic_version == 2) {
-+        if (vms->gic_version == 2) {
-             gicc->base_address = cpu_to_le64(memmap[VIRT_GIC_CPU].base);
-         }
-         gicc->cpu_interface_number = cpu_to_le32(i);
-@@ -600,7 +601,7 @@ build_madt(GArray *table_data, BIOSLinker *linker, VirtGuestInfo *guest_info)
-         }
-     }
- 
--    if (guest_info->gic_version == 3) {
-+    if (vms->gic_version == 3) {
-         AcpiMadtGenericTranslator *gic_its;
-         AcpiMadtGenericRedistributor *gicr = acpi_data_push(table_data,
-                                                          sizeof *gicr);
-@@ -610,7 +611,7 @@ build_madt(GArray *table_data, BIOSLinker *linker, VirtGuestInfo *guest_info)
-         gicr->base_address = cpu_to_le64(memmap[VIRT_GIC_REDIST].base);
-         gicr->range_length = cpu_to_le32(memmap[VIRT_GIC_REDIST].size);
- 
--        if (its_class_name() && !guest_info->no_its) {
-+        if (its_class_name() && !vmc->no_its) {
-             gic_its = acpi_data_push(table_data, sizeof *gic_its);
-             gic_its->type = ACPI_APIC_GENERIC_TRANSLATOR;
-             gic_its->length = sizeof(*gic_its);
-@@ -659,11 +660,11 @@ build_fadt(GArray *table_data, BIOSLinker *linker, unsigned dsdt_tbl_offset)
- 
- /* DSDT */
- static void
--build_dsdt(GArray *table_data, BIOSLinker *linker, VirtGuestInfo *guest_info)
-+build_dsdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
- {
-     Aml *scope, *dsdt;
--    const MemMapEntry *memmap = guest_info->memmap;
--    const int *irqmap = guest_info->irqmap;
-+    const MemMapEntry *memmap = vms->memmap;
-+    const int *irqmap = vms->irqmap;
- 
-     dsdt = init_aml_allocator();
-     /* Reserve space for header */
-@@ -675,7 +676,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker, VirtGuestInfo *guest_info)
-      * the RTC ACPI device at all when using UEFI.
-      */
-     scope = aml_scope("\\_SB");
--    acpi_dsdt_add_cpus(scope, guest_info->smp_cpus);
-+    acpi_dsdt_add_cpus(scope, vms->smp_cpus);
-     acpi_dsdt_add_uart(scope, &memmap[VIRT_UART],
-                        (irqmap[VIRT_UART] + ARM_SPI_BASE));
-     acpi_dsdt_add_flash(scope, &memmap[VIRT_FLASH]);
-@@ -683,7 +684,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker, VirtGuestInfo *guest_info)
-     acpi_dsdt_add_virtio(scope, &memmap[VIRT_MMIO],
-                     (irqmap[VIRT_MMIO] + ARM_SPI_BASE), NUM_VIRTIO_TRANSPORTS);
-     acpi_dsdt_add_pci(scope, memmap, (irqmap[VIRT_PCIE] + ARM_SPI_BASE),
--                      guest_info->use_highmem);
-+                      vms->highmem);
-     acpi_dsdt_add_gpio(scope, &memmap[VIRT_GPIO],
-                        (irqmap[VIRT_GPIO] + ARM_SPI_BASE));
-     acpi_dsdt_add_power_button(scope);
-@@ -710,8 +711,9 @@ struct AcpiBuildState {
- } AcpiBuildState;
- 
- static
--void virt_acpi_build(VirtGuestInfo *guest_info, AcpiBuildTables *tables)
-+void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
- {
-+    VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
-     GArray *table_offsets;
-     unsigned dsdt, rsdt;
-     GArray *tables_blob = tables->table_data;
-@@ -725,32 +727,32 @@ void virt_acpi_build(VirtGuestInfo *guest_info, AcpiBuildTables *tables)
- 
-     /* DSDT is pointed to by FADT */
-     dsdt = tables_blob->len;
--    build_dsdt(tables_blob, tables->linker, guest_info);
-+    build_dsdt(tables_blob, tables->linker, vms);
- 
-     /* FADT MADT GTDT MCFG SPCR pointed to by RSDT */
-     acpi_add_table(table_offsets, tables_blob);
-     build_fadt(tables_blob, tables->linker, dsdt);
- 
-     acpi_add_table(table_offsets, tables_blob);
--    build_madt(tables_blob, tables->linker, guest_info);
-+    build_madt(tables_blob, tables->linker, vms);
- 
-     acpi_add_table(table_offsets, tables_blob);
-     build_gtdt(tables_blob, tables->linker);
- 
-     acpi_add_table(table_offsets, tables_blob);
--    build_mcfg(tables_blob, tables->linker, guest_info);
-+    build_mcfg(tables_blob, tables->linker, vms);
- 
-     acpi_add_table(table_offsets, tables_blob);
--    build_spcr(tables_blob, tables->linker, guest_info);
-+    build_spcr(tables_blob, tables->linker, vms);
- 
-     if (nb_numa_nodes > 0) {
-         acpi_add_table(table_offsets, tables_blob);
--        build_srat(tables_blob, tables->linker, guest_info);
-+        build_srat(tables_blob, tables->linker, vms);
-     }
- 
--    if (its_class_name() && !guest_info->no_its) {
-+    if (its_class_name() && !vmc->no_its) {
-         acpi_add_table(table_offsets, tables_blob);
--        build_iort(tables_blob, tables->linker, guest_info);
-+        build_iort(tables_blob, tables->linker);
-     }
- 
-     /* RSDT is pointed to by RSDP */
-@@ -789,13 +791,13 @@ static void virt_acpi_build_update(void *build_opaque)
- 
-     acpi_build_tables_init(&tables);
- 
--    virt_acpi_build(build_state->guest_info, &tables);
-+    virt_acpi_build(container_of(build_state->guest_info,
-+                                 VirtMachineState, acpi_guest_info), &tables);
- 
-     acpi_ram_update(build_state->table_mr, tables.table_data);
-     acpi_ram_update(build_state->rsdp_mr, tables.rsdp);
-     acpi_ram_update(build_state->linker_mr, tables.linker->cmd_blob);
- 
--
-     acpi_build_tables_cleanup(&tables, true);
- }
- 
-@@ -843,7 +845,7 @@ void virt_acpi_setup(VirtMachineState *vms)
-     build_state->guest_info = guest_info;
- 
-     acpi_build_tables_init(&tables);
--    virt_acpi_build(build_state->guest_info, &tables);
-+    virt_acpi_build(vms, &tables);
- 
-     /* Now expose it all to Guest */
-     build_state->table_mr = acpi_add_rom_blob(build_state, tables.table_data,
 diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 2201517..6832b8b 100644
+index 2ca9527..a39fbd2 100644
 --- a/hw/arm/virt.c
 +++ b/hw/arm/virt.c
-@@ -1372,13 +1372,7 @@ static void machvirt_init(MachineState *machine)
-     create_fw_cfg(vms, &address_space_memory);
-     rom_set_fw(fw_cfg_find());
+@@ -553,10 +553,10 @@ static void create_v2m(VirtMachineState *vms, qemu_irq *pic)
+     fdt_add_v2m_gic_node(vms);
+ }
  
--    guest_info->smp_cpus = smp_cpus;
-     guest_info->fw_cfg = fw_cfg_find();
--    guest_info->memmap = vms->memmap;
--    guest_info->irqmap = vms->irqmap;
--    guest_info->use_highmem = vms->highmem;
--    guest_info->gic_version = vms->gic_version;
--    guest_info->no_its = vmc->no_its;
-     vms->machine_done.notify = virt_machine_done;
-     qemu_add_machine_init_done_notifier(&vms->machine_done);
+-static void create_gic(VirtMachineState *vms, qemu_irq *pic, int type,
+-                       bool secure, bool no_its)
++static void create_gic(VirtMachineState *vms, qemu_irq *pic, int type)
+ {
+     /* We create a standalone GIC */
++    VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
+     DeviceState *gicdev;
+     SysBusDevice *gicbusdev;
+     const char *gictype;
+@@ -572,7 +572,7 @@ static void create_gic(VirtMachineState *vms, qemu_irq *pic, int type,
+      */
+     qdev_prop_set_uint32(gicdev, "num-irq", NUM_IRQS + 32);
+     if (!kvm_irqchip_in_kernel()) {
+-        qdev_prop_set_bit(gicdev, "has-security-extensions", secure);
++        qdev_prop_set_bit(gicdev, "has-security-extensions", vms->secure);
+     }
+     qdev_init_nofail(gicdev);
+     gicbusdev = SYS_BUS_DEVICE(gicdev);
+@@ -618,7 +618,7 @@ static void create_gic(VirtMachineState *vms, qemu_irq *pic, int type,
+ 
+     fdt_add_gic_node(vms, type);
+ 
+-    if (type == 3 && !no_its) {
++    if (type == 3 && !vmc->no_its) {
+         create_its(vms, gicdev);
+     } else if (type == 2) {
+         create_v2m(vms, pic);
+@@ -980,8 +980,7 @@ static void create_pcie_irq_map(const VirtMachineState *vms,
+                            0x7           /* PCI irq */);
+ }
+ 
+-static void create_pcie(const VirtMachineState *vms, qemu_irq *pic,
+-                        bool use_highmem)
++static void create_pcie(const VirtMachineState *vms, qemu_irq *pic)
+ {
+     hwaddr base_mmio = vms->memmap[VIRT_PCIE_MMIO].base;
+     hwaddr size_mmio = vms->memmap[VIRT_PCIE_MMIO].size;
+@@ -1024,7 +1023,7 @@ static void create_pcie(const VirtMachineState *vms, qemu_irq *pic,
+                              mmio_reg, base_mmio, size_mmio);
+     memory_region_add_subregion(get_system_memory(), base_mmio, mmio_alias);
+ 
+-    if (use_highmem) {
++    if (vms->highmem) {
+         /* Map high MMIO space */
+         MemoryRegion *high_mmio_alias = g_new0(MemoryRegion, 1);
+ 
+@@ -1073,7 +1072,7 @@ static void create_pcie(const VirtMachineState *vms, qemu_irq *pic,
+     qemu_fdt_setprop_sized_cells(vms->fdt, nodename, "reg",
+                                  2, base_ecam, 2, size_ecam);
+ 
+-    if (use_highmem) {
++    if (vms->highmem) {
+         qemu_fdt_setprop_sized_cells(vms->fdt, nodename, "ranges",
+                                      1, FDT_PCI_RANGE_IOPORT, 2, 0,
+                                      2, base_pio, 2, size_pio,
+@@ -1384,7 +1383,7 @@ static void machvirt_init(MachineState *machine)
+ 
+     create_flash(vms, sysmem, secure_sysmem ? secure_sysmem : sysmem);
+ 
+-    create_gic(vms, pic, gic_version, vms->secure, vmc->no_its);
++    create_gic(vms, pic, gic_version);
+ 
+     fdt_add_pmu_nodes(vms, gic_version);
+ 
+@@ -1397,7 +1396,7 @@ static void machvirt_init(MachineState *machine)
+ 
+     create_rtc(vms, pic);
+ 
+-    create_pcie(vms, pic, vms->highmem);
++    create_pcie(vms, pic);
+ 
+     create_gpio(vms, pic);
  
 -- 
 2.7.4
