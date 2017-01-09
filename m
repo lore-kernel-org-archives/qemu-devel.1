@@ -1,25 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58021)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59129)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cQXyQ-0008OD-3e
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:18:47 -0500
+	(envelope-from <rka@sysgo.com>) id 1cQY3p-0002Kz-DW
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:24:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cQXyM-0006xx-F9
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:18:46 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33174)
+	(envelope-from <rka@sysgo.com>) id 1cQY3l-0000ns-GJ
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:24:21 -0500
+Received: from mail.sysgo.com ([176.9.12.79]:43934)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cQXyM-0006xB-9a
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:18:42 -0500
-Date: Mon, 9 Jan 2017 11:18:35 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170109111835.GE29989@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170109100123.5080-1-jinguojie@loongson.cn>
-	<20170109100123.5080-2-jinguojie@loongson.cn>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170109100123.5080-2-jinguojie@loongson.cn>
-Subject: Re: [Qemu-devel] [PATCH 1/1] Change default CFLAGS to -O3
+	(Exim 4.71) (envelope-from <rka@sysgo.com>) id 1cQY3l-0000na-9B
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:24:17 -0500
+From: Roman Kapl <rka@sysgo.com>
+Date: Mon,  9 Jan 2017 12:23:38 +0100
+Message-Id: <20170109112338.5629-1-rka@sysgo.com>
+Subject: [Qemu-devel] [PATCH] ppc: Prevent inifnite loop in decrementer
+ auto-reload.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,39 +22,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jin Guojie <jinguojie@loongson.cn>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Roman Kapl <rka@sysgo.com>
 
-On Mon, Jan 09, 2017 at 06:01:23PM +0800, Jin Guojie wrote:
-> For better performance.
+If the DECAR register is set to 0, QEMU tries to reload the decrementer with
+zero in an inifinite loop. According to PPC documentation, the decrementer is
+triggered on 1->0 transition, so avoid reloading the decrementer if if is
+already zero.
 
-The commit message needs to have actual data on what the
-measured performance improvements are really.
+The problem does not manifest under Linux, but it is valid to set DECAR to zero
+(and may make sense as part of decrementer initialization when interrupts are
+disabled).
 
-> 
-> Signed-off-by: Jin Guojie <jinguojie@loongson.cn>
-> ---
->  configure | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/configure b/configure
-> index 218df87..8ebc286 100755
-> --- a/configure
-> +++ b/configure
-> @@ -4753,9 +4753,9 @@ if test "$gcov" = "yes" ; then
->    CFLAGS="-fprofile-arcs -ftest-coverage -g $CFLAGS"
->    LDFLAGS="-fprofile-arcs -ftest-coverage $LDFLAGS"
->  elif test "$fortify_source" = "yes" ; then
-> -  CFLAGS="-O2 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2 $CFLAGS"
-> +  CFLAGS="-O3 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2 $CFLAGS"
->  elif test "$debug" = "no"; then
-> -  CFLAGS="-O2 $CFLAGS"
-> +  CFLAGS="-O3 $CFLAGS"
->  fi
+Signed-off-by: Roman Kapl <rka@sysgo.com>
+---
+ hw/ppc/ppc_booke.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-Regards,
-Daniel
+diff --git a/hw/ppc/ppc_booke.c b/hw/ppc/ppc_booke.c
+index ab8d026..f8d5c28 100644
+--- a/hw/ppc/ppc_booke.c
++++ b/hw/ppc/ppc_booke.c
+@@ -198,8 +198,12 @@ static void booke_decr_cb(void *opaque)
+     booke_update_irq(cpu);
+ 
+     if (env->spr[SPR_BOOKE_TCR] & TCR_ARE) {
+-        /* Auto Reload */
+-        cpu_ppc_store_decr(env, env->spr[SPR_BOOKE_DECAR]);
++        /* Do not reload 0, it is already there. It would just trigger
++         * the timer again and lead to infinite loop */
++        if(env->spr[SPR_BOOKE_DECAR] != 0) {
++            /* Auto Reload */
++            cpu_ppc_store_decr(env, env->spr[SPR_BOOKE_DECAR]);
++        }
+     }
+ }
+ 
 -- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+2.10.1
