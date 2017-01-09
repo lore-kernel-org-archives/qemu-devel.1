@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40697)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40758)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cQcTL-0000wl-5y
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 11:07:03 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cQcTe-0001E6-OF
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 11:07:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cQcTK-0004EG-79
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 11:06:59 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cQcTc-0004OS-TN
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 11:07:18 -0500
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon,  9 Jan 2017 16:05:22 +0000
-Message-Id: <1483977924-14522-17-git-send-email-peter.maydell@linaro.org>
+Date: Mon,  9 Jan 2017 16:05:19 +0000
+Message-Id: <1483977924-14522-14-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1483977924-14522-1-git-send-email-peter.maydell@linaro.org>
 References: <1483977924-14522-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 16/18] target/arm/psci.c: If EL2 implemented,
- start CPUs in EL2
+Subject: [Qemu-devel] [PATCH v2 13/18] hw/intc/arm_gicv3: Implement EL2
+ traps for CPU i/f regs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,59 +23,175 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org, Andrew Jones <drjones@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Alistair Francis <alistair.francis@xilinx.com>
 
-The PSCI spec states that a CPU_ON call should cause the new
-CPU to be started in the highest implemented Non-secure
-exception level. We were incorrectly starting it at the
-exception level of the caller, which happens to be correct
-if EL2 is not implemented. Implement the correct logic
-as described in the PSCI 1.0 spec section 6.4:
- * if EL2 exists and SCR_EL3.HCE is set: start in EL2
- * otherwise start in EL1
+Implement the architecturally required traps from NS EL1
+to EL2 for the CPU interface registers. These fall into
+several different groups:
+ * group-0-only registers all trap if ICH_HRC_EL2.TALL0 is set
+   (exactly the registers covered by gicv3_fiq_access())
+ * group-1-only registers all trap if ICH_HRC_EL2.TALL1 is set
+   (exactly the registers covered by gicv3_irq_access())
+ * DIR traps if ICH_HCR_EL2.TC or ICH_HCR_EL2.TDIR are set
+ * PMR, RPR, CTLR trap if ICH_HCR_EL2.TC is set
+ * SGI0R, SGI1R, ASGI1R trap if ICH_HCR_EL2.TC is set or
+   if HCR_EL2.IMO or HCR_EL2.FMO are set
+
+We split DIR and the SGI registers out into their own access
+functions, leaving the existing gicv3_irqfiq_access() just
+handling PMR, RPR and CTLR.
+
+This commit doesn't implement support for trapping on
+HSTR_EL2.T12 for the 32-bit registers, as we don't implement
+any of those per-coprocessor trap bits currently and
+probably will want to do those in some more centralized way.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/psci.c | 25 ++++++++++++++++++-------
- 1 file changed, 18 insertions(+), 7 deletions(-)
+ hw/intc/arm_gicv3_cpuif.c | 70 ++++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 60 insertions(+), 10 deletions(-)
 
-diff --git a/target/arm/psci.c b/target/arm/psci.c
-index 14316eb..64bf82e 100644
---- a/target/arm/psci.c
-+++ b/target/arm/psci.c
-@@ -148,17 +148,28 @@ void arm_handle_psci_call(ARMCPU *cpu)
-     case QEMU_PSCI_0_1_FN_CPU_ON:
-     case QEMU_PSCI_0_2_FN_CPU_ON:
-     case QEMU_PSCI_0_2_FN64_CPU_ON:
-+    {
-+        /* The PSCI spec mandates that newly brought up CPUs start
-+         * in the highest exception level which exists and is enabled
-+         * on the calling CPU. Since the QEMU PSCI implementation is
-+         * acting as a "fake EL3" or "fake EL2" firmware, this for us
-+         * means that we want to start at the highest NS exception level
-+         * that we are providing to the guest.
-+         * The execution mode should be that which is currently in use
-+         * by the same exception level on the calling CPU.
-+         * The CPU should be started with the context_id value
-+         * in x0 (if AArch64) or r0 (if AArch32).
-+         */
-+        int target_el = arm_feature(env, ARM_FEATURE_EL2) ? 2 : 1;
-+        bool target_aarch64 = arm_el_is_aa64(env, target_el);
+diff --git a/hw/intc/arm_gicv3_cpuif.c b/hw/intc/arm_gicv3_cpuif.c
+index e05f6b3..a9ee7fd 100644
+--- a/hw/intc/arm_gicv3_cpuif.c
++++ b/hw/intc/arm_gicv3_cpuif.c
+@@ -1833,9 +1833,17 @@ static CPAccessResult gicv3_irqfiq_access(CPUARMState *env,
+                                           const ARMCPRegInfo *ri, bool isread)
+ {
+     CPAccessResult r = CP_ACCESS_OK;
++    GICv3CPUState *cs = icc_cs_from_env(env);
++    int el = arm_current_el(env);
 +
-         mpidr = param[1];
-         entry = param[2];
-         context_id = param[3];
--        /*
--         * The PSCI spec mandates that newly brought up CPUs enter the
--         * exception level of the caller in the same execution mode as
--         * the caller, with context_id in x0/r0, respectively.
--         */
--        ret = arm_set_cpu_on(mpidr, entry, context_id, arm_current_el(env),
--                             is_a64(env));
-+        ret = arm_set_cpu_on(mpidr, entry, context_id,
-+                             target_el, target_aarch64);
-         break;
++    if ((cs->ich_hcr_el2 & ICH_HCR_EL2_TC) &&
++        el == 1 && !arm_is_secure_below_el3(env)) {
++        /* Takes priority over a possible EL3 trap */
++        return CP_ACCESS_TRAP_EL2;
 +    }
-     case QEMU_PSCI_0_1_FN_CPU_OFF:
-     case QEMU_PSCI_0_2_FN_CPU_OFF:
-         goto cpu_off;
+ 
+     if ((env->cp15.scr_el3 & (SCR_FIQ | SCR_IRQ)) == (SCR_FIQ | SCR_IRQ)) {
+-        switch (arm_current_el(env)) {
++        switch (el) {
+         case 1:
+             if (arm_is_secure_below_el3(env) ||
+                 ((env->cp15.hcr_el2 & (HCR_IMO | HCR_FMO)) == 0)) {
+@@ -1861,13 +1869,47 @@ static CPAccessResult gicv3_irqfiq_access(CPUARMState *env,
+     return r;
+ }
+ 
++static CPAccessResult gicv3_dir_access(CPUARMState *env,
++                                       const ARMCPRegInfo *ri, bool isread)
++{
++    GICv3CPUState *cs = icc_cs_from_env(env);
++
++    if ((cs->ich_hcr_el2 & ICH_HCR_EL2_TDIR) &&
++        arm_current_el(env) == 1 && !arm_is_secure_below_el3(env)) {
++        /* Takes priority over a possible EL3 trap */
++        return CP_ACCESS_TRAP_EL2;
++    }
++
++    return gicv3_irqfiq_access(env, ri, isread);
++}
++
++static CPAccessResult gicv3_sgi_access(CPUARMState *env,
++                                       const ARMCPRegInfo *ri, bool isread)
++{
++    if ((env->cp15.hcr_el2 & (HCR_IMO | HCR_FMO)) &&
++        arm_current_el(env) == 1 && !arm_is_secure_below_el3(env)) {
++        /* Takes priority over a possible EL3 trap */
++        return CP_ACCESS_TRAP_EL2;
++    }
++
++    return gicv3_irqfiq_access(env, ri, isread);
++}
++
+ static CPAccessResult gicv3_fiq_access(CPUARMState *env,
+                                        const ARMCPRegInfo *ri, bool isread)
+ {
+     CPAccessResult r = CP_ACCESS_OK;
++    GICv3CPUState *cs = icc_cs_from_env(env);
++    int el = arm_current_el(env);
++
++    if ((cs->ich_hcr_el2 & ICH_HCR_EL2_TALL0) &&
++        el == 1 && !arm_is_secure_below_el3(env)) {
++        /* Takes priority over a possible EL3 trap */
++        return CP_ACCESS_TRAP_EL2;
++    }
+ 
+     if (env->cp15.scr_el3 & SCR_FIQ) {
+-        switch (arm_current_el(env)) {
++        switch (el) {
+         case 1:
+             if (arm_is_secure_below_el3(env) ||
+                 ((env->cp15.hcr_el2 & HCR_FMO) == 0)) {
+@@ -1897,9 +1939,17 @@ static CPAccessResult gicv3_irq_access(CPUARMState *env,
+                                        const ARMCPRegInfo *ri, bool isread)
+ {
+     CPAccessResult r = CP_ACCESS_OK;
++    GICv3CPUState *cs = icc_cs_from_env(env);
++    int el = arm_current_el(env);
++
++    if ((cs->ich_hcr_el2 & ICH_HCR_EL2_TALL1) &&
++        el == 1 && !arm_is_secure_below_el3(env)) {
++        /* Takes priority over a possible EL3 trap */
++        return CP_ACCESS_TRAP_EL2;
++    }
+ 
+     if (env->cp15.scr_el3 & SCR_IRQ) {
+-        switch (arm_current_el(env)) {
++        switch (el) {
+         case 1:
+             if (arm_is_secure_below_el3(env) ||
+                 ((env->cp15.hcr_el2 & HCR_IMO) == 0)) {
+@@ -2055,7 +2105,7 @@ static const ARMCPRegInfo gicv3_cpuif_reginfo[] = {
+     { .name = "ICC_DIR_EL1", .state = ARM_CP_STATE_BOTH,
+       .opc0 = 3, .opc1 = 0, .crn = 12, .crm = 11, .opc2 = 1,
+       .type = ARM_CP_IO | ARM_CP_NO_RAW,
+-      .access = PL1_W, .accessfn = gicv3_irqfiq_access,
++      .access = PL1_W, .accessfn = gicv3_dir_access,
+       .writefn = icc_dir_write,
+     },
+     { .name = "ICC_RPR_EL1", .state = ARM_CP_STATE_BOTH,
+@@ -2067,37 +2117,37 @@ static const ARMCPRegInfo gicv3_cpuif_reginfo[] = {
+     { .name = "ICC_SGI1R_EL1", .state = ARM_CP_STATE_AA64,
+       .opc0 = 3, .opc1 = 0, .crn = 12, .crm = 11, .opc2 = 5,
+       .type = ARM_CP_IO | ARM_CP_NO_RAW,
+-      .access = PL1_W, .accessfn = gicv3_irqfiq_access,
++      .access = PL1_W, .accessfn = gicv3_sgi_access,
+       .writefn = icc_sgi1r_write,
+     },
+     { .name = "ICC_SGI1R",
+       .cp = 15, .opc1 = 0, .crm = 12,
+       .type = ARM_CP_64BIT | ARM_CP_IO | ARM_CP_NO_RAW,
+-      .access = PL1_W, .accessfn = gicv3_irqfiq_access,
++      .access = PL1_W, .accessfn = gicv3_sgi_access,
+       .writefn = icc_sgi1r_write,
+     },
+     { .name = "ICC_ASGI1R_EL1", .state = ARM_CP_STATE_AA64,
+       .opc0 = 3, .opc1 = 0, .crn = 12, .crm = 11, .opc2 = 6,
+       .type = ARM_CP_IO | ARM_CP_NO_RAW,
+-      .access = PL1_W, .accessfn = gicv3_irqfiq_access,
++      .access = PL1_W, .accessfn = gicv3_sgi_access,
+       .writefn = icc_asgi1r_write,
+     },
+     { .name = "ICC_ASGI1R",
+       .cp = 15, .opc1 = 1, .crm = 12,
+       .type = ARM_CP_64BIT | ARM_CP_IO | ARM_CP_NO_RAW,
+-      .access = PL1_W, .accessfn = gicv3_irqfiq_access,
++      .access = PL1_W, .accessfn = gicv3_sgi_access,
+       .writefn = icc_asgi1r_write,
+     },
+     { .name = "ICC_SGI0R_EL1", .state = ARM_CP_STATE_AA64,
+       .opc0 = 3, .opc1 = 0, .crn = 12, .crm = 11, .opc2 = 7,
+       .type = ARM_CP_IO | ARM_CP_NO_RAW,
+-      .access = PL1_W, .accessfn = gicv3_irqfiq_access,
++      .access = PL1_W, .accessfn = gicv3_sgi_access,
+       .writefn = icc_sgi0r_write,
+     },
+     { .name = "ICC_SGI0R",
+       .cp = 15, .opc1 = 2, .crm = 12,
+       .type = ARM_CP_64BIT | ARM_CP_IO | ARM_CP_NO_RAW,
+-      .access = PL1_W, .accessfn = gicv3_irqfiq_access,
++      .access = PL1_W, .accessfn = gicv3_sgi_access,
+       .writefn = icc_sgi0r_write,
+     },
+     { .name = "ICC_IAR1_EL1", .state = ARM_CP_STATE_BOTH,
 -- 
 2.7.4
