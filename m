@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44437)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51699)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cQSZy-0008WV-QD
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 00:33:12 -0500
+	(envelope-from <yu.ning@linux.intel.com>) id 1cQTHG-0005rK-Mc
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 01:17:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1cQSZv-0005im-MW
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 00:33:10 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40798)
+	(envelope-from <yu.ning@linux.intel.com>) id 1cQTHC-0005CA-Pa
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 01:17:54 -0500
+Received: from mga05.intel.com ([192.55.52.43]:4487)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cQSZv-0005ib-EC
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 00:33:07 -0500
-References: <CALoWxX_-+dBexpVzy2MKVN10b94vaZC50y+vxbZtqXi+S_Urmg@mail.gmail.com>
-	<0bfb55a2-08a0-2264-c2cd-ce566d08b0f4@redhat.com>
-	<CALoWxX8OM3SurQWzGAgVfUzjydHm9OkFZGytstuBk0n0R=KgaA@mail.gmail.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <0b8bca46-836b-9062-bad4-d115e1eb704b@redhat.com>
-Date: Mon, 9 Jan 2017 13:32:58 +0800
+	(Exim 4.71) (envelope-from <yu.ning@linux.intel.com>)
+	id 1cQTHC-0005Bl-C4
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 01:17:50 -0500
+References: <cover.1482164622.git.vpalatin@chromium.org>
+	<85250fb0450b5b95232b39c82ab310a0632fd23f.1482164622.git.vpalatin@chromium.org>
+	<fda5a694-d02f-269e-e155-1822276d74f6@redhat.com>
+	<CAP_ceTxAn3tH-P8JjThXXeF7iYv5xFoVOzmjp5h8sHYsYzWTDQ@mail.gmail.com>
+	<df2938db-dde1-633c-899d-646d62ec4780@redhat.com>
+	<61d18d9c-32f1-983f-c237-3c28d31e2f23@redhat.com>
+From: Yu Ning <yu.ning@linux.intel.com>
+Message-ID: <7e2bab8d-fcb4-c861-c1b5-f85c5df674b6@linux.intel.com>
+Date: Mon, 9 Jan 2017 14:17:43 +0800
 MIME-Version: 1.0
-In-Reply-To: <CALoWxX8OM3SurQWzGAgVfUzjydHm9OkFZGytstuBk0n0R=KgaA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] hw/pci: use-after-free in
- pci_nic_init_nofail when nic device fails to initialize
+In-Reply-To: <61d18d9c-32f1-983f-c237-3c28d31e2f23@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 3/4] Plumb the HAXM-based hardware
+ acceleration support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,87 +33,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Kompel <barbos@gmail.com>
-Cc: qemu-devel@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Vincent Palatin <vpalatin@chromium.org>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Stefan Weil <sw@weilnetz.de>, Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
 
 
 
-On 2017=E5=B9=B401=E6=9C=8809=E6=97=A5 13:26, Alex Kompel wrote:
-> Looks like this line got wrapped: "@@ -1805,13 +1805,7 @@ PCIDevice
-> *pci_nic_init_nofail(NICInfo *nd, PCIBus *rootbus,"
-> Sorry about that. Could you unwrap it or use the attached text file?
+On 1/6/2017 5:38, Paolo Bonzini wrote:
 >
-> Thanks,
-> -Alex
+> On 05/01/2017 15:01, Paolo Bonzini wrote:
+>>
+>> In fact there is a race anyway:
+>>
+>>          if (cpu->exit_request) {
+>>              ret = 1;
+>>              break;
+>>          }
+>> 					cpu->exit_request
+>> 					SuspendThread
+>> 					ResumeThread
+>>          hax_vcpu_interrupt(env);
+>>          qemu_mutex_unlock_iothread();
+>>          hax_ret = hax_vcpu_run(vcpu);
+>>
+>> and the same race is true for QueueUserAPC.  It's rare enough that I
+>> guess we can accept the patches with just a FIXME comment, but...  Yu
+>> Ning, can you tell us what user_event_pending is for? :)  My hunch is
+>> that we should call hax_raise_event after setting cpu->exit_request, like
+>>
+>> 	hax_raise_event();
+>> 	/* write user_event_pending before exit_request */
+>> 	smp_wmb();
+>> 	cpu->exit_request = 1;
+>> 	SuspendThread/ResumeThread
+>> 		(or QueueUserAPC)
+>>
+>> and in the hax thread:
+>>
+>>          if (cpu->exit_request) {
+>> 	    cpu->hax_vcpu->tunnel->user_event_pending = 0;
+>>              ret = 1;
+>>              break;
+>>          }
+>>
+>>          hax_vcpu_interrupt(env);
+>>          qemu_mutex_unlock_iothread();
+>>
+>> 	/* read exit_request before user_event_pending */
+>> 	smp_rmb();
+>>          hax_ret = hax_vcpu_run(vcpu);
+>>
+>> but I would like some more official documentation than my own reverse
+>> engineering of the brain of whoever wrote the interface (I have not
+>> looked at the HAXM driver binary).
 
-Ok, applied. But please use git format-patch and git send-email for=20
-future submission of patches.
+Unfortunately, user_event_pending was introduced in 2011 without proper 
+documentation, so I guess even the original author might not have an 
+answer now (even if I could find him).  I need more time to analyze the 
+HAXM driver code to understand what it's about.  Please feel free to add 
+a FIXME for now.
 
-Thanks
-
->
-> On Sun, Jan 8, 2017 at 8:06 PM, Jason Wang <jasowang@redhat.com> wrote:
->>
->> On 2017=E5=B9=B401=E6=9C=8807=E6=97=A5 07:48, Alex Kompel wrote:
->>> object_property_set_bool(OBJECT(dev), true, "realized", &err) in
->>> pci_nic_init_nofail may release the object if device fails to
->>> initialize which leads to use-after-free in error handling block.
->>> qdev_init_nofail does the same thing while holding the reference.
->>>
->>> (gdb) run -net nic
->>> qemu-system-x86_64: failed to find romfile "efi-e1000.rom"
->>>
->>> Program received signal SIGSEGV, Segmentation fault.
->>> object_unparent (obj=3D0x7fffe96a0010) at qom/object.c:440
->>> 440     in qom/object.c
->>> (gdb) bt
->>> #0  object_unparent (obj=3D0x7fffe96a0010) at qom/object.c:440
->>> #1  0x000055555598c30d in pci_nic_init_nofail (nd=3D0x55555616b460
->>> <nd_table>, rootbus=3D0x5555567ed990, default_model=3D<optimized out>=
-,
->>> default_devaddr=3D<optimized out>) at hw/pci/pci.c:1812
->>> #2  0x00005555557ff52c in pc_nic_init (isa_bus=3D0x55555733c610,
->>> pci_bus=3D0x5555567ed990) at hw/i386/pc.c:1634
->>> #3  0x00005555558021ad in pc_init1 (machine=3D0x55555661ee10,
->>> pci_type=3D0x555555c1a523 "i440FX", host_type=3D0x555555ba564e
->>> "i440FX-pcihost") at hw/i386/pc_piix.c:241
->>> #4  0x00005555557519cb in main (argc=3D<optimized out>, argv=3D<optim=
-ized
->>> out>, envp=3D<optimized out>) at vl.c:4481
->>>
->>> Signed-off-by: Alex Kompel <barbos@gmail.com>
->>> ---
->>>    hw/pci/pci.c | 8 +-------
->>>    1 file changed, 1 insertion(+), 7 deletions(-)
->>>
->>> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
->>> index 24fae16..2fd1b9e 100644
->>> --- a/hw/pci/pci.c
->>> +++ b/hw/pci/pci.c
->>> @@ -1805,13 +1805,7 @@ PCIDevice *pci_nic_init_nofail(NICInfo *nd,
->>> PCIBus *rootbus,
->>
->> Hello, looks like the patch were corrupted possibly by your email clie=
-nt.
->> Please check, we usually send patch through git send-email.
->>
->> Thanks
->>
->>
->>>        pci_dev =3D pci_create(bus, devfn, pci_nic_names[i]);
->>>        dev =3D &pci_dev->qdev;
->>>        qdev_set_nic_properties(dev, nd);
->>> -
->>> -    object_property_set_bool(OBJECT(dev), true, "realized", &err);
->>> -    if (err) {
->>> -        error_report_err(err);
->>> -        object_unparent(OBJECT(dev));
->>> -        exit(1);
->>> -    }
->>> +    qdev_init_nofail(dev);
->>>
->>>        return pci_dev;
->>>    }
->>> --
->>> 2.8.3
->>>
+But one thing I've noticed is that the Darwin driver does not test or 
+reset this flag properly - it will remain 1 after the first 
+hax_raise_event() call.  So removing user_event_pending from the QEMU 
+side should not affect Mac.
