@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47429)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49088)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cQVZx-0000X4-PJ
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 03:45:26 -0500
+	(envelope-from <peterx@redhat.com>) id 1cQVkI-0003Cm-0F
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 03:56:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cQVZs-0005oU-TT
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 03:45:21 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47796)
+	(envelope-from <peterx@redhat.com>) id 1cQVkH-0001nP-57
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 03:56:02 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44818)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cQVZs-0005nw-O9
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 03:45:16 -0500
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cQVkH-0001mS-0J
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 03:56:01 -0500
 Received: from int-mx09.intmail.prod.int.phx2.redhat.com
 	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BA7194E4D0
-	for <qemu-devel@nongnu.org>; Mon,  9 Jan 2017 08:45:16 +0000 (UTC)
-Date: Mon, 9 Jan 2017 16:45:12 +0800
+	by mx1.redhat.com (Postfix) with ESMTPS id 178CBC04B31F
+	for <qemu-devel@nongnu.org>; Mon,  9 Jan 2017 08:56:01 +0000 (UTC)
 From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170109084512.GH4135@pxdev.xzpeter.org>
-References: <1483675573-12636-1-git-send-email-peterx@redhat.com>
-	<20170106132738.GD2461@work-vm>
-	<20170109021845.GE4135@pxdev.xzpeter.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170109021845.GE4135@pxdev.xzpeter.org>
-Subject: Re: [Qemu-devel] [PATCH v3 0/2] VT-d migration support
+Date: Mon,  9 Jan 2017 16:55:52 +0800
+Message-Id: <1483952153-7221-3-git-send-email-peterx@redhat.com>
+In-Reply-To: <1483952153-7221-1-git-send-email-peterx@redhat.com>
+References: <1483952153-7221-1-git-send-email-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH 2/3] x86: ioapic: dump version for "info ioapic"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,40 +29,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, mst@redhat.com, Juan Quintela <quintela@redhat.com>, Jason Wang <jasowang@redhat.com>, Amit Shah <amit.shah@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, peterx@redhat.com
 
-On Mon, Jan 09, 2017 at 10:18:45AM +0800, Peter Xu wrote:
-> On Fri, Jan 06, 2017 at 01:27:38PM +0000, Dr. David Alan Gilbert wrote:
-> 
-> [...]
-> 
-> > > (P.S. I found that split irqchip cannot work well with migration. Is
-> > >  this an known issue?)
-> > 
-> > How did it fail?
-> 
-> The keyboard hangs after migration.
-> 
-> Command line for reference:
-> 
-> $qemu -M q35,kernel-irqchip=split -enable-kvm \
->       -netdev user,id=net0 \
->       -device e1000,netdev=net0 \
->       -m 512M -monitor stdio \
->       $incoming /var/lib/libvirt/images/vm1.qcow2
-> 
-> Here $incoming is "" for init vm, and "-incoming tcp:0:6666" for the
-> dest side. Not sure whether this is reproducable issue. Looks like
-> some EOI ack is missing.
-> 
-> Host: 4.10.0-rc1+ (I should also tried 4.6.4-301.fc24)
-> Qemu: latest master
-> 
-> Looking into it.
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+ hw/intc/ioapic_common.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-The problem is that we didn't setup the first 24 gsi routing entries
-(which is used by the userspace ioapic) in kernel after the migration.
-Will post a fix for it later.
-
--- peterx
+diff --git a/hw/intc/ioapic_common.c b/hw/intc/ioapic_common.c
+index 1b7ec5e..97c4f9c 100644
+--- a/hw/intc/ioapic_common.c
++++ b/hw/intc/ioapic_common.c
+@@ -58,7 +58,8 @@ void ioapic_print_redtbl(Monitor *mon, IOAPICCommonState *s)
+     uint32_t remote_irr = 0;
+     int i;
+ 
+-    monitor_printf(mon, "ioapic id=0x%02x sel=0x%02x", s->id, s->ioregsel);
++    monitor_printf(mon, "ioapic ver=0x%x id=0x%02x sel=0x%02x",
++                   s->version, s->id, s->ioregsel);
+     if (s->ioregsel) {
+         monitor_printf(mon, " (redir[%u])\n",
+                        (s->ioregsel - IOAPIC_REG_REDTBL_BASE) >> 1);
+-- 
+2.7.4
