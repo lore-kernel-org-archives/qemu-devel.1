@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33594)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33514)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cQaG7-0007Hb-RA
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 08:45:15 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cQaFx-0006xI-St
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 08:45:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cQaG2-00037X-RM
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 08:45:11 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cQaFw-00033E-8q
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 08:45:01 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon,  9 Jan 2017 14:44:35 +0100
-Message-Id: <1483969476-7172-14-git-send-email-kwolf@redhat.com>
+Date: Mon,  9 Jan 2017 14:44:30 +0100
+Message-Id: <1483969476-7172-9-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1483969476-7172-1-git-send-email-kwolf@redhat.com>
 References: <1483969476-7172-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 13/14] block: Rename raw_bsd to raw-format.c
+Subject: [Qemu-devel] [PULL 08/14] quorum: Implement
+ .bdrv_co_preadv/pwritev()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,1063 +23,228 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-From: Eric Blake <eblake@redhat.com>
+This enables byte granularity requests on quorum nodes.
 
-Given that we have raw-win32.c and raw-posix.c, my initial guess at
-raw_bsd.c was that it was for dealing with raw files using code
-specific to the BSD operating system (beyond what raw-posix could
-do).  Not so - this name was chosen back in commit e1c66c6 to
-distinguish that it was a BSD licensed file, in contrast to the
-then-existing raw.c with an unclear and potentially unusable
-license.  But since it has been more than three years since the
-rewrite, it's time to pick a more useful name for this file to
-avoid this type of confusion to future contributors that don't know
-the backstory, as none of our other files are named solely by the
-license they use.
+Note that the QMP events emitted by the driver are an external API that
+we were careless enough to define as sector based. The offset and length
+of requests reported in events are rounded therefore.
 
-In reality, this file deals with the raw format, which is useful
-with any number of protocols, while raw-{win32,posix} deal with
-the file protocol (and in turn, that protocol is not limited to
-use with the raw format).  So rename raw_bsd to raw-format.c.  We
-could have also used the shorter name raw.c, except that collides
-with the earlier use of that filename for a different license,
-and it's better to be safe than risk license pollution.
-
-The next patch will also rename raw-win32.c and raw-posix.c to
-further distinguish the difference in roles.
-
-It doesn't hurt that this gets rid of an underscore in the filename,
-thereby making tab-completion on 'ra<TAB>' easier (now I don't have
-to type the shift key, which slows things down :)
-
-Suggested-by: Daniel P. Berrange <berrange@redhat.com>
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 ---
- MAINTAINERS         |   2 +-
- block/Makefile.objs |   2 +-
- block/raw-format.c  | 490 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- block/raw_bsd.c     | 490 ----------------------------------------------------
- 4 files changed, 492 insertions(+), 492 deletions(-)
- create mode 100644 block/raw-format.c
- delete mode 100644 block/raw_bsd.c
+ block/quorum.c | 81 +++++++++++++++++++++++++++-------------------------------
+ 1 file changed, 38 insertions(+), 43 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 585cd5a..044a324 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1722,7 +1722,7 @@ F: block/linux-aio.c
- F: include/block/raw-aio.h
- F: block/raw-posix.c
- F: block/raw-win32.c
--F: block/raw_bsd.c
-+F: block/raw-format.c
- F: block/win32-aio.c
+diff --git a/block/quorum.c b/block/quorum.c
+index 690fd36..4bba9fd 100644
+--- a/block/quorum.c
++++ b/block/quorum.c
+@@ -114,8 +114,8 @@ struct QuorumAIOCB {
+     Coroutine *co;
  
- qcow2
-diff --git a/block/Makefile.objs b/block/Makefile.objs
-index 67a036a..bde742f 100644
---- a/block/Makefile.objs
-+++ b/block/Makefile.objs
-@@ -1,4 +1,4 @@
--block-obj-y += raw_bsd.o qcow.o vdi.o vmdk.o cloop.o bochs.o vpc.o vvfat.o dmg.o
-+block-obj-y += raw-format.o qcow.o vdi.o vmdk.o cloop.o bochs.o vpc.o vvfat.o dmg.o
- block-obj-y += qcow2.o qcow2-refcount.o qcow2-cluster.o qcow2-snapshot.o qcow2-cache.o
- block-obj-y += qed.o qed-gencb.o qed-l2-cache.o qed-table.o qed-cluster.o
- block-obj-y += qed-check.o
-diff --git a/block/raw-format.c b/block/raw-format.c
-new file mode 100644
-index 0000000..8404a82
---- /dev/null
-+++ b/block/raw-format.c
-@@ -0,0 +1,490 @@
-+/* BlockDriver implementation for "raw" format driver
-+ *
-+ * Copyright (C) 2010-2016 Red Hat, Inc.
-+ * Copyright (C) 2010, Blue Swirl <blauwirbel@gmail.com>
-+ * Copyright (C) 2009, Anthony Liguori <aliguori@us.ibm.com>
-+ *
-+ * Author:
-+ *   Laszlo Ersek <lersek@redhat.com>
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to
-+ * deal in the Software without restriction, including without limitation the
-+ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
-+ * sell copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
-+ * IN THE SOFTWARE.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "block/block_int.h"
-+#include "qapi/error.h"
-+#include "qemu/option.h"
-+
-+typedef struct BDRVRawState {
+     /* Request metadata */
+-    uint64_t sector_num;
+-    int nb_sectors;
 +    uint64_t offset;
-+    uint64_t size;
-+    bool has_size;
-+} BDRVRawState;
-+
-+static QemuOptsList raw_runtime_opts = {
-+    .name = "raw",
-+    .head = QTAILQ_HEAD_INITIALIZER(raw_runtime_opts.head),
-+    .desc = {
-+        {
-+            .name = "offset",
-+            .type = QEMU_OPT_SIZE,
-+            .help = "offset in the disk where the image starts",
-+        },
-+        {
-+            .name = "size",
-+            .type = QEMU_OPT_SIZE,
-+            .help = "virtual disk size",
-+        },
-+        { /* end of list */ }
-+    },
-+};
-+
-+static QemuOptsList raw_create_opts = {
-+    .name = "raw-create-opts",
-+    .head = QTAILQ_HEAD_INITIALIZER(raw_create_opts.head),
-+    .desc = {
-+        {
-+            .name = BLOCK_OPT_SIZE,
-+            .type = QEMU_OPT_SIZE,
-+            .help = "Virtual disk size"
-+        },
-+        { /* end of list */ }
-+    }
-+};
-+
-+static int raw_read_options(QDict *options, BlockDriverState *bs,
-+    BDRVRawState *s, Error **errp)
-+{
-+    Error *local_err = NULL;
-+    QemuOpts *opts = NULL;
-+    int64_t real_size = 0;
-+    int ret;
-+
-+    real_size = bdrv_getlength(bs->file->bs);
-+    if (real_size < 0) {
-+        error_setg_errno(errp, -real_size, "Could not get image size");
-+        return real_size;
-+    }
-+
-+    opts = qemu_opts_create(&raw_runtime_opts, NULL, 0, &error_abort);
-+    qemu_opts_absorb_qdict(opts, options, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        ret = -EINVAL;
-+        goto end;
-+    }
-+
-+    s->offset = qemu_opt_get_size(opts, "offset", 0);
-+    if (s->offset > real_size) {
-+        error_setg(errp, "Offset (%" PRIu64 ") cannot be greater than "
-+            "size of the containing file (%" PRId64 ")",
-+            s->offset, real_size);
-+        ret = -EINVAL;
-+        goto end;
-+    }
-+
-+    if (qemu_opt_find(opts, "size") != NULL) {
-+        s->size = qemu_opt_get_size(opts, "size", 0);
-+        s->has_size = true;
-+    } else {
-+        s->has_size = false;
-+        s->size = real_size - s->offset;
-+    }
-+
-+    /* Check size and offset */
-+    if ((real_size - s->offset) < s->size) {
-+        error_setg(errp, "The sum of offset (%" PRIu64 ") and size "
-+            "(%" PRIu64 ") has to be smaller or equal to the "
-+            " actual size of the containing file (%" PRId64 ")",
-+            s->offset, s->size, real_size);
-+        ret = -EINVAL;
-+        goto end;
-+    }
-+
-+    /* Make sure size is multiple of BDRV_SECTOR_SIZE to prevent rounding
-+     * up and leaking out of the specified area. */
-+    if (s->has_size && !QEMU_IS_ALIGNED(s->size, BDRV_SECTOR_SIZE)) {
-+        error_setg(errp, "Specified size is not multiple of %llu",
-+            BDRV_SECTOR_SIZE);
-+        ret = -EINVAL;
-+        goto end;
-+    }
-+
-+    ret = 0;
-+
-+end:
-+
-+    qemu_opts_del(opts);
-+
-+    return ret;
-+}
-+
-+static int raw_reopen_prepare(BDRVReopenState *reopen_state,
-+                              BlockReopenQueue *queue, Error **errp)
-+{
-+    assert(reopen_state != NULL);
-+    assert(reopen_state->bs != NULL);
-+
-+    reopen_state->opaque = g_new0(BDRVRawState, 1);
-+
-+    return raw_read_options(
-+        reopen_state->options,
-+        reopen_state->bs,
-+        reopen_state->opaque,
-+        errp);
-+}
-+
-+static void raw_reopen_commit(BDRVReopenState *state)
-+{
-+    BDRVRawState *new_s = state->opaque;
-+    BDRVRawState *s = state->bs->opaque;
-+
-+    memcpy(s, new_s, sizeof(BDRVRawState));
-+
-+    g_free(state->opaque);
-+    state->opaque = NULL;
-+}
-+
-+static void raw_reopen_abort(BDRVReopenState *state)
-+{
-+    g_free(state->opaque);
-+    state->opaque = NULL;
-+}
-+
-+static int coroutine_fn raw_co_preadv(BlockDriverState *bs, uint64_t offset,
-+                                      uint64_t bytes, QEMUIOVector *qiov,
-+                                      int flags)
-+{
-+    BDRVRawState *s = bs->opaque;
-+
-+    if (offset > UINT64_MAX - s->offset) {
-+        return -EINVAL;
-+    }
-+    offset += s->offset;
-+
-+    BLKDBG_EVENT(bs->file, BLKDBG_READ_AIO);
-+    return bdrv_co_preadv(bs->file, offset, bytes, qiov, flags);
-+}
-+
-+static int coroutine_fn raw_co_pwritev(BlockDriverState *bs, uint64_t offset,
-+                                       uint64_t bytes, QEMUIOVector *qiov,
-+                                       int flags)
-+{
-+    BDRVRawState *s = bs->opaque;
-+    void *buf = NULL;
-+    BlockDriver *drv;
-+    QEMUIOVector local_qiov;
-+    int ret;
-+
-+    if (s->has_size && (offset > s->size || bytes > (s->size - offset))) {
-+        /* There's not enough space for the data. Don't write anything and just
-+         * fail to prevent leaking out of the size specified in options. */
-+        return -ENOSPC;
-+    }
-+
-+    if (offset > UINT64_MAX - s->offset) {
-+        ret = -EINVAL;
-+        goto fail;
-+    }
-+
-+    if (bs->probed && offset < BLOCK_PROBE_BUF_SIZE && bytes) {
-+        /* Handling partial writes would be a pain - so we just
-+         * require that guests have 512-byte request alignment if
-+         * probing occurred */
-+        QEMU_BUILD_BUG_ON(BLOCK_PROBE_BUF_SIZE != 512);
-+        QEMU_BUILD_BUG_ON(BDRV_SECTOR_SIZE != 512);
-+        assert(offset == 0 && bytes >= BLOCK_PROBE_BUF_SIZE);
-+
-+        buf = qemu_try_blockalign(bs->file->bs, 512);
-+        if (!buf) {
-+            ret = -ENOMEM;
-+            goto fail;
-+        }
-+
-+        ret = qemu_iovec_to_buf(qiov, 0, buf, 512);
-+        if (ret != 512) {
-+            ret = -EINVAL;
-+            goto fail;
-+        }
-+
-+        drv = bdrv_probe_all(buf, 512, NULL);
-+        if (drv != bs->drv) {
-+            ret = -EPERM;
-+            goto fail;
-+        }
-+
-+        /* Use the checked buffer, a malicious guest might be overwriting its
-+         * original buffer in the background. */
-+        qemu_iovec_init(&local_qiov, qiov->niov + 1);
-+        qemu_iovec_add(&local_qiov, buf, 512);
-+        qemu_iovec_concat(&local_qiov, qiov, 512, qiov->size - 512);
-+        qiov = &local_qiov;
-+    }
-+
-+    offset += s->offset;
-+
-+    BLKDBG_EVENT(bs->file, BLKDBG_WRITE_AIO);
-+    ret = bdrv_co_pwritev(bs->file, offset, bytes, qiov, flags);
-+
-+fail:
-+    if (qiov == &local_qiov) {
-+        qemu_iovec_destroy(&local_qiov);
-+    }
-+    qemu_vfree(buf);
-+    return ret;
-+}
-+
-+static int64_t coroutine_fn raw_co_get_block_status(BlockDriverState *bs,
-+                                            int64_t sector_num,
-+                                            int nb_sectors, int *pnum,
-+                                            BlockDriverState **file)
-+{
-+    BDRVRawState *s = bs->opaque;
-+    *pnum = nb_sectors;
-+    *file = bs->file->bs;
-+    sector_num += s->offset / BDRV_SECTOR_SIZE;
-+    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID | BDRV_BLOCK_DATA |
-+           (sector_num << BDRV_SECTOR_BITS);
-+}
-+
-+static int coroutine_fn raw_co_pwrite_zeroes(BlockDriverState *bs,
-+                                             int64_t offset, int count,
-+                                             BdrvRequestFlags flags)
-+{
-+    BDRVRawState *s = bs->opaque;
-+    if (offset > UINT64_MAX - s->offset) {
-+        return -EINVAL;
-+    }
-+    offset += s->offset;
-+    return bdrv_co_pwrite_zeroes(bs->file, offset, count, flags);
-+}
-+
-+static int coroutine_fn raw_co_pdiscard(BlockDriverState *bs,
-+                                        int64_t offset, int count)
-+{
-+    BDRVRawState *s = bs->opaque;
-+    if (offset > UINT64_MAX - s->offset) {
-+        return -EINVAL;
-+    }
-+    offset += s->offset;
-+    return bdrv_co_pdiscard(bs->file->bs, offset, count);
-+}
-+
-+static int64_t raw_getlength(BlockDriverState *bs)
-+{
-+    int64_t len;
-+    BDRVRawState *s = bs->opaque;
-+
-+    /* Update size. It should not change unless the file was externally
-+     * modified. */
-+    len = bdrv_getlength(bs->file->bs);
-+    if (len < 0) {
-+        return len;
-+    }
-+
-+    if (len < s->offset) {
-+        s->size = 0;
-+    } else {
-+        if (s->has_size) {
-+            /* Try to honour the size */
-+            s->size = MIN(s->size, len - s->offset);
-+        } else {
-+            s->size = len - s->offset;
-+        }
-+    }
-+
-+    return s->size;
-+}
-+
-+static int raw_get_info(BlockDriverState *bs, BlockDriverInfo *bdi)
-+{
-+    return bdrv_get_info(bs->file->bs, bdi);
-+}
-+
-+static void raw_refresh_limits(BlockDriverState *bs, Error **errp)
-+{
-+    if (bs->probed) {
-+        /* To make it easier to protect the first sector, any probed
-+         * image is restricted to read-modify-write on sub-sector
-+         * operations. */
-+        bs->bl.request_alignment = BDRV_SECTOR_SIZE;
-+    }
-+}
-+
-+static int raw_truncate(BlockDriverState *bs, int64_t offset)
-+{
-+    BDRVRawState *s = bs->opaque;
-+
-+    if (s->has_size) {
-+        return -ENOTSUP;
-+    }
-+
-+    if (INT64_MAX - offset < s->offset) {
-+        return -EINVAL;
-+    }
-+
-+    s->size = offset;
-+    offset += s->offset;
-+    return bdrv_truncate(bs->file->bs, offset);
-+}
-+
-+static int raw_media_changed(BlockDriverState *bs)
-+{
-+    return bdrv_media_changed(bs->file->bs);
-+}
-+
-+static void raw_eject(BlockDriverState *bs, bool eject_flag)
-+{
-+    bdrv_eject(bs->file->bs, eject_flag);
-+}
-+
-+static void raw_lock_medium(BlockDriverState *bs, bool locked)
-+{
-+    bdrv_lock_medium(bs->file->bs, locked);
-+}
-+
-+static int raw_co_ioctl(BlockDriverState *bs, unsigned long int req, void *buf)
-+{
-+    BDRVRawState *s = bs->opaque;
-+    if (s->offset || s->has_size) {
-+        return -ENOTSUP;
-+    }
-+    return bdrv_co_ioctl(bs->file->bs, req, buf);
-+}
-+
-+static int raw_has_zero_init(BlockDriverState *bs)
-+{
-+    return bdrv_has_zero_init(bs->file->bs);
-+}
-+
-+static int raw_create(const char *filename, QemuOpts *opts, Error **errp)
-+{
-+    return bdrv_create_file(filename, opts, errp);
-+}
-+
-+static int raw_open(BlockDriverState *bs, QDict *options, int flags,
-+                    Error **errp)
-+{
-+    BDRVRawState *s = bs->opaque;
-+    int ret;
-+
-+    bs->sg = bs->file->bs->sg;
-+    bs->supported_write_flags = BDRV_REQ_FUA &
-+        bs->file->bs->supported_write_flags;
-+    bs->supported_zero_flags = (BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP) &
-+        bs->file->bs->supported_zero_flags;
-+
-+    if (bs->probed && !bdrv_is_read_only(bs)) {
-+        fprintf(stderr,
-+                "WARNING: Image format was not specified for '%s' and probing "
-+                "guessed raw.\n"
-+                "         Automatically detecting the format is dangerous for "
-+                "raw images, write operations on block 0 will be restricted.\n"
-+                "         Specify the 'raw' format explicitly to remove the "
-+                "restrictions.\n",
-+                bs->file->bs->filename);
-+    }
-+
-+    ret = raw_read_options(options, bs, s, errp);
-+    if (ret < 0) {
-+        return ret;
-+    }
-+
-+    if (bs->sg && (s->offset || s->has_size)) {
-+        error_setg(errp, "Cannot use offset/size with SCSI generic devices");
-+        return -EINVAL;
-+    }
-+
-+    return 0;
-+}
-+
-+static void raw_close(BlockDriverState *bs)
-+{
-+}
-+
-+static int raw_probe(const uint8_t *buf, int buf_size, const char *filename)
-+{
-+    /* smallest possible positive score so that raw is used if and only if no
-+     * other block driver works
-+     */
-+    return 1;
-+}
-+
-+static int raw_probe_blocksizes(BlockDriverState *bs, BlockSizes *bsz)
-+{
-+    BDRVRawState *s = bs->opaque;
-+    int ret;
-+
-+    ret = bdrv_probe_blocksizes(bs->file->bs, bsz);
-+    if (ret < 0) {
-+        return ret;
-+    }
-+
-+    if (!QEMU_IS_ALIGNED(s->offset, MAX(bsz->log, bsz->phys))) {
-+        return -ENOTSUP;
-+    }
-+
-+    return 0;
-+}
-+
-+static int raw_probe_geometry(BlockDriverState *bs, HDGeometry *geo)
-+{
-+    BDRVRawState *s = bs->opaque;
-+    if (s->offset || s->has_size) {
-+        return -ENOTSUP;
-+    }
-+    return bdrv_probe_geometry(bs->file->bs, geo);
-+}
-+
-+BlockDriver bdrv_raw = {
-+    .format_name          = "raw",
-+    .instance_size        = sizeof(BDRVRawState),
-+    .bdrv_probe           = &raw_probe,
-+    .bdrv_reopen_prepare  = &raw_reopen_prepare,
-+    .bdrv_reopen_commit   = &raw_reopen_commit,
-+    .bdrv_reopen_abort    = &raw_reopen_abort,
-+    .bdrv_open            = &raw_open,
-+    .bdrv_close           = &raw_close,
-+    .bdrv_create          = &raw_create,
-+    .bdrv_co_preadv       = &raw_co_preadv,
-+    .bdrv_co_pwritev      = &raw_co_pwritev,
-+    .bdrv_co_pwrite_zeroes = &raw_co_pwrite_zeroes,
-+    .bdrv_co_pdiscard     = &raw_co_pdiscard,
-+    .bdrv_co_get_block_status = &raw_co_get_block_status,
-+    .bdrv_truncate        = &raw_truncate,
-+    .bdrv_getlength       = &raw_getlength,
-+    .has_variable_length  = true,
-+    .bdrv_get_info        = &raw_get_info,
-+    .bdrv_refresh_limits  = &raw_refresh_limits,
-+    .bdrv_probe_blocksizes = &raw_probe_blocksizes,
-+    .bdrv_probe_geometry  = &raw_probe_geometry,
-+    .bdrv_media_changed   = &raw_media_changed,
-+    .bdrv_eject           = &raw_eject,
-+    .bdrv_lock_medium     = &raw_lock_medium,
-+    .bdrv_co_ioctl        = &raw_co_ioctl,
-+    .create_opts          = &raw_create_opts,
-+    .bdrv_has_zero_init   = &raw_has_zero_init
-+};
-+
-+static void bdrv_raw_init(void)
-+{
-+    bdrv_register(&bdrv_raw);
-+}
-+
-+block_init(bdrv_raw_init);
-diff --git a/block/raw_bsd.c b/block/raw_bsd.c
-deleted file mode 100644
-index 8a5b9b0..0000000
---- a/block/raw_bsd.c
-+++ /dev/null
-@@ -1,490 +0,0 @@
--/* BlockDriver implementation for "raw"
-- *
-- * Copyright (C) 2010-2016 Red Hat, Inc.
-- * Copyright (C) 2010, Blue Swirl <blauwirbel@gmail.com>
-- * Copyright (C) 2009, Anthony Liguori <aliguori@us.ibm.com>
-- *
-- * Author:
-- *   Laszlo Ersek <lersek@redhat.com>
-- *
-- * Permission is hereby granted, free of charge, to any person obtaining a copy
-- * of this software and associated documentation files (the "Software"), to
-- * deal in the Software without restriction, including without limitation the
-- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
-- * sell copies of the Software, and to permit persons to whom the Software is
-- * furnished to do so, subject to the following conditions:
-- *
-- * The above copyright notice and this permission notice shall be included in
-- * all copies or substantial portions of the Software.
-- *
-- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
-- * IN THE SOFTWARE.
-- */
--
--#include "qemu/osdep.h"
--#include "block/block_int.h"
--#include "qapi/error.h"
--#include "qemu/option.h"
--
--typedef struct BDRVRawState {
--    uint64_t offset;
--    uint64_t size;
--    bool has_size;
--} BDRVRawState;
--
--static QemuOptsList raw_runtime_opts = {
--    .name = "raw",
--    .head = QTAILQ_HEAD_INITIALIZER(raw_runtime_opts.head),
--    .desc = {
--        {
--            .name = "offset",
--            .type = QEMU_OPT_SIZE,
--            .help = "offset in the disk where the image starts",
--        },
--        {
--            .name = "size",
--            .type = QEMU_OPT_SIZE,
--            .help = "virtual disk size",
--        },
--        { /* end of list */ }
--    },
--};
--
--static QemuOptsList raw_create_opts = {
--    .name = "raw-create-opts",
--    .head = QTAILQ_HEAD_INITIALIZER(raw_create_opts.head),
--    .desc = {
--        {
--            .name = BLOCK_OPT_SIZE,
--            .type = QEMU_OPT_SIZE,
--            .help = "Virtual disk size"
--        },
--        { /* end of list */ }
--    }
--};
--
--static int raw_read_options(QDict *options, BlockDriverState *bs,
--    BDRVRawState *s, Error **errp)
--{
--    Error *local_err = NULL;
--    QemuOpts *opts = NULL;
--    int64_t real_size = 0;
--    int ret;
--
--    real_size = bdrv_getlength(bs->file->bs);
--    if (real_size < 0) {
--        error_setg_errno(errp, -real_size, "Could not get image size");
--        return real_size;
--    }
--
--    opts = qemu_opts_create(&raw_runtime_opts, NULL, 0, &error_abort);
--    qemu_opts_absorb_qdict(opts, options, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
--        ret = -EINVAL;
--        goto end;
--    }
--
--    s->offset = qemu_opt_get_size(opts, "offset", 0);
--    if (s->offset > real_size) {
--        error_setg(errp, "Offset (%" PRIu64 ") cannot be greater than "
--            "size of the containing file (%" PRId64 ")",
--            s->offset, real_size);
--        ret = -EINVAL;
--        goto end;
--    }
--
--    if (qemu_opt_find(opts, "size") != NULL) {
--        s->size = qemu_opt_get_size(opts, "size", 0);
--        s->has_size = true;
--    } else {
--        s->has_size = false;
--        s->size = real_size - s->offset;
--    }
--
--    /* Check size and offset */
--    if ((real_size - s->offset) < s->size) {
--        error_setg(errp, "The sum of offset (%" PRIu64 ") and size "
--            "(%" PRIu64 ") has to be smaller or equal to the "
--            " actual size of the containing file (%" PRId64 ")",
--            s->offset, s->size, real_size);
--        ret = -EINVAL;
--        goto end;
--    }
--
--    /* Make sure size is multiple of BDRV_SECTOR_SIZE to prevent rounding
--     * up and leaking out of the specified area. */
--    if (s->has_size && !QEMU_IS_ALIGNED(s->size, BDRV_SECTOR_SIZE)) {
--        error_setg(errp, "Specified size is not multiple of %llu",
--            BDRV_SECTOR_SIZE);
--        ret = -EINVAL;
--        goto end;
--    }
--
--    ret = 0;
--
--end:
--
--    qemu_opts_del(opts);
--
--    return ret;
--}
--
--static int raw_reopen_prepare(BDRVReopenState *reopen_state,
--                              BlockReopenQueue *queue, Error **errp)
--{
--    assert(reopen_state != NULL);
--    assert(reopen_state->bs != NULL);
--
--    reopen_state->opaque = g_new0(BDRVRawState, 1);
--
--    return raw_read_options(
--        reopen_state->options,
--        reopen_state->bs,
--        reopen_state->opaque,
--        errp);
--}
--
--static void raw_reopen_commit(BDRVReopenState *state)
--{
--    BDRVRawState *new_s = state->opaque;
--    BDRVRawState *s = state->bs->opaque;
--
--    memcpy(s, new_s, sizeof(BDRVRawState));
--
--    g_free(state->opaque);
--    state->opaque = NULL;
--}
--
--static void raw_reopen_abort(BDRVReopenState *state)
--{
--    g_free(state->opaque);
--    state->opaque = NULL;
--}
--
--static int coroutine_fn raw_co_preadv(BlockDriverState *bs, uint64_t offset,
--                                      uint64_t bytes, QEMUIOVector *qiov,
--                                      int flags)
--{
--    BDRVRawState *s = bs->opaque;
--
--    if (offset > UINT64_MAX - s->offset) {
--        return -EINVAL;
--    }
--    offset += s->offset;
--
--    BLKDBG_EVENT(bs->file, BLKDBG_READ_AIO);
--    return bdrv_co_preadv(bs->file, offset, bytes, qiov, flags);
--}
--
--static int coroutine_fn raw_co_pwritev(BlockDriverState *bs, uint64_t offset,
--                                       uint64_t bytes, QEMUIOVector *qiov,
--                                       int flags)
--{
--    BDRVRawState *s = bs->opaque;
--    void *buf = NULL;
--    BlockDriver *drv;
--    QEMUIOVector local_qiov;
--    int ret;
--
--    if (s->has_size && (offset > s->size || bytes > (s->size - offset))) {
--        /* There's not enough space for the data. Don't write anything and just
--         * fail to prevent leaking out of the size specified in options. */
--        return -ENOSPC;
--    }
--
--    if (offset > UINT64_MAX - s->offset) {
--        ret = -EINVAL;
--        goto fail;
--    }
--
--    if (bs->probed && offset < BLOCK_PROBE_BUF_SIZE && bytes) {
--        /* Handling partial writes would be a pain - so we just
--         * require that guests have 512-byte request alignment if
--         * probing occurred */
--        QEMU_BUILD_BUG_ON(BLOCK_PROBE_BUF_SIZE != 512);
--        QEMU_BUILD_BUG_ON(BDRV_SECTOR_SIZE != 512);
--        assert(offset == 0 && bytes >= BLOCK_PROBE_BUF_SIZE);
--
--        buf = qemu_try_blockalign(bs->file->bs, 512);
--        if (!buf) {
--            ret = -ENOMEM;
--            goto fail;
--        }
--
--        ret = qemu_iovec_to_buf(qiov, 0, buf, 512);
--        if (ret != 512) {
--            ret = -EINVAL;
--            goto fail;
--        }
--
--        drv = bdrv_probe_all(buf, 512, NULL);
--        if (drv != bs->drv) {
--            ret = -EPERM;
--            goto fail;
--        }
--
--        /* Use the checked buffer, a malicious guest might be overwriting its
--         * original buffer in the background. */
--        qemu_iovec_init(&local_qiov, qiov->niov + 1);
--        qemu_iovec_add(&local_qiov, buf, 512);
--        qemu_iovec_concat(&local_qiov, qiov, 512, qiov->size - 512);
--        qiov = &local_qiov;
--    }
--
--    offset += s->offset;
--
--    BLKDBG_EVENT(bs->file, BLKDBG_WRITE_AIO);
--    ret = bdrv_co_pwritev(bs->file, offset, bytes, qiov, flags);
--
--fail:
--    if (qiov == &local_qiov) {
--        qemu_iovec_destroy(&local_qiov);
--    }
--    qemu_vfree(buf);
--    return ret;
--}
--
--static int64_t coroutine_fn raw_co_get_block_status(BlockDriverState *bs,
--                                            int64_t sector_num,
--                                            int nb_sectors, int *pnum,
--                                            BlockDriverState **file)
--{
--    BDRVRawState *s = bs->opaque;
--    *pnum = nb_sectors;
--    *file = bs->file->bs;
--    sector_num += s->offset / BDRV_SECTOR_SIZE;
--    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID | BDRV_BLOCK_DATA |
--           (sector_num << BDRV_SECTOR_BITS);
--}
--
--static int coroutine_fn raw_co_pwrite_zeroes(BlockDriverState *bs,
--                                             int64_t offset, int count,
--                                             BdrvRequestFlags flags)
--{
--    BDRVRawState *s = bs->opaque;
--    if (offset > UINT64_MAX - s->offset) {
--        return -EINVAL;
--    }
--    offset += s->offset;
--    return bdrv_co_pwrite_zeroes(bs->file, offset, count, flags);
--}
--
--static int coroutine_fn raw_co_pdiscard(BlockDriverState *bs,
--                                        int64_t offset, int count)
--{
--    BDRVRawState *s = bs->opaque;
--    if (offset > UINT64_MAX - s->offset) {
--        return -EINVAL;
--    }
--    offset += s->offset;
--    return bdrv_co_pdiscard(bs->file->bs, offset, count);
--}
--
--static int64_t raw_getlength(BlockDriverState *bs)
--{
--    int64_t len;
--    BDRVRawState *s = bs->opaque;
--
--    /* Update size. It should not change unless the file was externally
--     * modified. */
--    len = bdrv_getlength(bs->file->bs);
--    if (len < 0) {
--        return len;
--    }
--
--    if (len < s->offset) {
--        s->size = 0;
--    } else {
--        if (s->has_size) {
--            /* Try to honour the size */
--            s->size = MIN(s->size, len - s->offset);
--        } else {
--            s->size = len - s->offset;
--        }
--    }
--
--    return s->size;
--}
--
--static int raw_get_info(BlockDriverState *bs, BlockDriverInfo *bdi)
--{
--    return bdrv_get_info(bs->file->bs, bdi);
--}
--
--static void raw_refresh_limits(BlockDriverState *bs, Error **errp)
--{
--    if (bs->probed) {
--        /* To make it easier to protect the first sector, any probed
--         * image is restricted to read-modify-write on sub-sector
--         * operations. */
--        bs->bl.request_alignment = BDRV_SECTOR_SIZE;
--    }
--}
--
--static int raw_truncate(BlockDriverState *bs, int64_t offset)
--{
--    BDRVRawState *s = bs->opaque;
--
--    if (s->has_size) {
--        return -ENOTSUP;
--    }
--
--    if (INT64_MAX - offset < s->offset) {
--        return -EINVAL;
--    }
--
--    s->size = offset;
--    offset += s->offset;
--    return bdrv_truncate(bs->file->bs, offset);
--}
--
--static int raw_media_changed(BlockDriverState *bs)
--{
--    return bdrv_media_changed(bs->file->bs);
--}
--
--static void raw_eject(BlockDriverState *bs, bool eject_flag)
--{
--    bdrv_eject(bs->file->bs, eject_flag);
--}
--
--static void raw_lock_medium(BlockDriverState *bs, bool locked)
--{
--    bdrv_lock_medium(bs->file->bs, locked);
--}
--
--static int raw_co_ioctl(BlockDriverState *bs, unsigned long int req, void *buf)
--{
--    BDRVRawState *s = bs->opaque;
--    if (s->offset || s->has_size) {
--        return -ENOTSUP;
--    }
--    return bdrv_co_ioctl(bs->file->bs, req, buf);
--}
--
--static int raw_has_zero_init(BlockDriverState *bs)
--{
--    return bdrv_has_zero_init(bs->file->bs);
--}
--
--static int raw_create(const char *filename, QemuOpts *opts, Error **errp)
--{
--    return bdrv_create_file(filename, opts, errp);
--}
--
--static int raw_open(BlockDriverState *bs, QDict *options, int flags,
--                    Error **errp)
--{
--    BDRVRawState *s = bs->opaque;
--    int ret;
--
--    bs->sg = bs->file->bs->sg;
--    bs->supported_write_flags = BDRV_REQ_FUA &
--        bs->file->bs->supported_write_flags;
--    bs->supported_zero_flags = (BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP) &
--        bs->file->bs->supported_zero_flags;
--
--    if (bs->probed && !bdrv_is_read_only(bs)) {
--        fprintf(stderr,
--                "WARNING: Image format was not specified for '%s' and probing "
--                "guessed raw.\n"
--                "         Automatically detecting the format is dangerous for "
--                "raw images, write operations on block 0 will be restricted.\n"
--                "         Specify the 'raw' format explicitly to remove the "
--                "restrictions.\n",
--                bs->file->bs->filename);
--    }
--
--    ret = raw_read_options(options, bs, s, errp);
--    if (ret < 0) {
--        return ret;
--    }
--
--    if (bs->sg && (s->offset || s->has_size)) {
--        error_setg(errp, "Cannot use offset/size with SCSI generic devices");
--        return -EINVAL;
--    }
--
--    return 0;
--}
--
--static void raw_close(BlockDriverState *bs)
--{
--}
--
--static int raw_probe(const uint8_t *buf, int buf_size, const char *filename)
--{
--    /* smallest possible positive score so that raw is used if and only if no
--     * other block driver works
--     */
--    return 1;
--}
--
--static int raw_probe_blocksizes(BlockDriverState *bs, BlockSizes *bsz)
--{
--    BDRVRawState *s = bs->opaque;
--    int ret;
--
--    ret = bdrv_probe_blocksizes(bs->file->bs, bsz);
--    if (ret < 0) {
--        return ret;
--    }
--
--    if (!QEMU_IS_ALIGNED(s->offset, MAX(bsz->log, bsz->phys))) {
--        return -ENOTSUP;
--    }
--
--    return 0;
--}
--
--static int raw_probe_geometry(BlockDriverState *bs, HDGeometry *geo)
--{
--    BDRVRawState *s = bs->opaque;
--    if (s->offset || s->has_size) {
--        return -ENOTSUP;
--    }
--    return bdrv_probe_geometry(bs->file->bs, geo);
--}
--
--BlockDriver bdrv_raw = {
--    .format_name          = "raw",
--    .instance_size        = sizeof(BDRVRawState),
--    .bdrv_probe           = &raw_probe,
--    .bdrv_reopen_prepare  = &raw_reopen_prepare,
--    .bdrv_reopen_commit   = &raw_reopen_commit,
--    .bdrv_reopen_abort    = &raw_reopen_abort,
--    .bdrv_open            = &raw_open,
--    .bdrv_close           = &raw_close,
--    .bdrv_create          = &raw_create,
--    .bdrv_co_preadv       = &raw_co_preadv,
--    .bdrv_co_pwritev      = &raw_co_pwritev,
--    .bdrv_co_pwrite_zeroes = &raw_co_pwrite_zeroes,
--    .bdrv_co_pdiscard     = &raw_co_pdiscard,
--    .bdrv_co_get_block_status = &raw_co_get_block_status,
--    .bdrv_truncate        = &raw_truncate,
--    .bdrv_getlength       = &raw_getlength,
--    .has_variable_length  = true,
--    .bdrv_get_info        = &raw_get_info,
--    .bdrv_refresh_limits  = &raw_refresh_limits,
--    .bdrv_probe_blocksizes = &raw_probe_blocksizes,
--    .bdrv_probe_geometry  = &raw_probe_geometry,
--    .bdrv_media_changed   = &raw_media_changed,
--    .bdrv_eject           = &raw_eject,
--    .bdrv_lock_medium     = &raw_lock_medium,
--    .bdrv_co_ioctl        = &raw_co_ioctl,
--    .create_opts          = &raw_create_opts,
--    .bdrv_has_zero_init   = &raw_has_zero_init
--};
--
--static void bdrv_raw_init(void)
--{
--    bdrv_register(&bdrv_raw);
--}
--
--block_init(bdrv_raw_init);
++    uint64_t bytes;
+ 
+     QEMUIOVector *qiov;         /* calling IOV */
+ 
+@@ -157,8 +157,8 @@ static bool quorum_64bits_compare(QuorumVoteValue *a, QuorumVoteValue *b)
+ 
+ static QuorumAIOCB *quorum_aio_get(BlockDriverState *bs,
+                                    QEMUIOVector *qiov,
+-                                   uint64_t sector_num,
+-                                   int nb_sectors)
++                                   uint64_t offset,
++                                   uint64_t bytes)
+ {
+     BDRVQuorumState *s = bs->opaque;
+     QuorumAIOCB *acb = g_new(QuorumAIOCB, 1);
+@@ -166,8 +166,8 @@ static QuorumAIOCB *quorum_aio_get(BlockDriverState *bs,
+ 
+     acb->co = qemu_coroutine_self();
+     acb->bs = bs;
+-    acb->sector_num = sector_num;
+-    acb->nb_sectors = nb_sectors;
++    acb->offset = offset;
++    acb->bytes = bytes;
+     acb->qiov = qiov;
+     acb->qcrs = g_new0(QuorumChildRequest, s->num_children);
+     acb->count = 0;
+@@ -187,23 +187,30 @@ static QuorumAIOCB *quorum_aio_get(BlockDriverState *bs,
+     return acb;
+ }
+ 
+-static void quorum_report_bad(QuorumOpType type, uint64_t sector_num,
+-                              int nb_sectors, char *node_name, int ret)
++static void quorum_report_bad(QuorumOpType type, uint64_t offset,
++                              uint64_t bytes, char *node_name, int ret)
+ {
+     const char *msg = NULL;
++    int64_t start_sector = offset / BDRV_SECTOR_SIZE;
++    int64_t end_sector = DIV_ROUND_UP(offset + bytes, BDRV_SECTOR_SIZE);
++
+     if (ret < 0) {
+         msg = strerror(-ret);
+     }
+ 
+-    qapi_event_send_quorum_report_bad(type, !!msg, msg, node_name,
+-                                      sector_num, nb_sectors, &error_abort);
++    qapi_event_send_quorum_report_bad(type, !!msg, msg, node_name, start_sector,
++                                      end_sector - start_sector, &error_abort);
+ }
+ 
+ static void quorum_report_failure(QuorumAIOCB *acb)
+ {
+     const char *reference = bdrv_get_device_or_node_name(acb->bs);
+-    qapi_event_send_quorum_failure(reference, acb->sector_num,
+-                                   acb->nb_sectors, &error_abort);
++    int64_t start_sector = acb->offset / BDRV_SECTOR_SIZE;
++    int64_t end_sector = DIV_ROUND_UP(acb->offset + acb->bytes,
++                                      BDRV_SECTOR_SIZE);
++
++    qapi_event_send_quorum_failure(reference, start_sector,
++                                   end_sector - start_sector, &error_abort);
+ }
+ 
+ static int quorum_vote_error(QuorumAIOCB *acb);
+@@ -240,8 +247,7 @@ static void quorum_report_bad_acb(QuorumChildRequest *sacb, int ret)
+ {
+     QuorumAIOCB *acb = sacb->parent;
+     QuorumOpType type = acb->is_read ? QUORUM_OP_TYPE_READ : QUORUM_OP_TYPE_WRITE;
+-    quorum_report_bad(type, acb->sector_num, acb->nb_sectors,
+-                      sacb->bs->node_name, ret);
++    quorum_report_bad(type, acb->offset, acb->bytes, sacb->bs->node_name, ret);
+ }
+ 
+ static int quorum_fifo_aio_cb(void *opaque, int ret)
+@@ -280,8 +286,7 @@ static void quorum_report_bad_versions(BDRVQuorumState *s,
+             continue;
+         }
+         QLIST_FOREACH(item, &version->items, next) {
+-            quorum_report_bad(QUORUM_OP_TYPE_READ, acb->sector_num,
+-                              acb->nb_sectors,
++            quorum_report_bad(QUORUM_OP_TYPE_READ, acb->offset, acb->bytes,
+                               s->children[item->index]->bs->node_name, 0);
+         }
+     }
+@@ -295,9 +300,7 @@ static void quorum_rewrite_entry(void *opaque)
+ 
+     /* Ignore any errors, it's just a correction attempt for already
+      * corrupted data. */
+-    bdrv_co_pwritev(s->children[co->idx],
+-                    acb->sector_num * BDRV_SECTOR_SIZE,
+-                    acb->nb_sectors * BDRV_SECTOR_SIZE,
++    bdrv_co_pwritev(s->children[co->idx], acb->offset, acb->bytes,
+                     acb->qiov, 0);
+ 
+     /* Wake up the caller after the last rewrite */
+@@ -462,8 +465,8 @@ static void GCC_FMT_ATTR(2, 3) quorum_err(QuorumAIOCB *acb,
+     va_list ap;
+ 
+     va_start(ap, fmt);
+-    fprintf(stderr, "quorum: sector_num=%" PRId64 " nb_sectors=%d ",
+-            acb->sector_num, acb->nb_sectors);
++    fprintf(stderr, "quorum: offset=%" PRIu64 " bytes=%" PRIu64 " ",
++            acb->offset, acb->bytes);
+     vfprintf(stderr, fmt, ap);
+     fprintf(stderr, "\n");
+     va_end(ap);
+@@ -481,9 +484,8 @@ static bool quorum_compare(QuorumAIOCB *acb,
+     if (s->is_blkverify) {
+         offset = qemu_iovec_compare(a, b);
+         if (offset != -1) {
+-            quorum_err(acb, "contents mismatch in sector %" PRId64,
+-                       acb->sector_num +
+-                       (uint64_t)(offset / BDRV_SECTOR_SIZE));
++            quorum_err(acb, "contents mismatch at offset %" PRIu64,
++                       acb->offset + offset);
+         }
+         return true;
+     }
+@@ -612,9 +614,7 @@ static void read_quorum_children_entry(void *opaque)
+     QuorumChildRequest *sacb = &acb->qcrs[i];
+ 
+     sacb->bs = s->children[i]->bs;
+-    sacb->ret = bdrv_co_preadv(s->children[i],
+-                               acb->sector_num * BDRV_SECTOR_SIZE,
+-                               acb->nb_sectors * BDRV_SECTOR_SIZE,
++    sacb->ret = bdrv_co_preadv(s->children[i], acb->offset, acb->bytes,
+                                &acb->qcrs[i].qiov, 0);
+ 
+     if (sacb->ret == 0) {
+@@ -683,19 +683,17 @@ static int read_fifo_child(QuorumAIOCB *acb)
+     int ret;
+ 
+     acb->qcrs[n].bs = s->children[n]->bs;
+-    ret = bdrv_co_preadv(s->children[n], acb->sector_num * BDRV_SECTOR_SIZE,
+-                         acb->nb_sectors * BDRV_SECTOR_SIZE, acb->qiov, 0);
++    ret = bdrv_co_preadv(s->children[n], acb->offset, acb->bytes, acb->qiov, 0);
+     ret = quorum_fifo_aio_cb(&acb->qcrs[n], ret);
+ 
+     return ret;
+ }
+ 
+-static int quorum_co_readv(BlockDriverState *bs,
+-                           int64_t sector_num, int nb_sectors,
+-                           QEMUIOVector *qiov)
++static int quorum_co_preadv(BlockDriverState *bs, uint64_t offset,
++                            uint64_t bytes, QEMUIOVector *qiov, int flags)
+ {
+     BDRVQuorumState *s = bs->opaque;
+-    QuorumAIOCB *acb = quorum_aio_get(bs, qiov, sector_num, nb_sectors);
++    QuorumAIOCB *acb = quorum_aio_get(bs, qiov, offset, bytes);
+     int ret;
+ 
+     acb->is_read = true;
+@@ -720,9 +718,7 @@ static void write_quorum_entry(void *opaque)
+     QuorumChildRequest *sacb = &acb->qcrs[i];
+ 
+     sacb->bs = s->children[i]->bs;
+-    sacb->ret = bdrv_co_pwritev(s->children[i],
+-                                acb->sector_num * BDRV_SECTOR_SIZE,
+-                                acb->nb_sectors * BDRV_SECTOR_SIZE,
++    sacb->ret = bdrv_co_pwritev(s->children[i], acb->offset, acb->bytes,
+                                 acb->qiov, 0);
+     if (sacb->ret == 0) {
+         acb->success_count++;
+@@ -739,12 +735,11 @@ static void write_quorum_entry(void *opaque)
+     }
+ }
+ 
+-static int quorum_co_writev(BlockDriverState *bs,
+-                            int64_t sector_num, int nb_sectors,
+-                            QEMUIOVector *qiov)
++static int quorum_co_pwritev(BlockDriverState *bs, uint64_t offset,
++                             uint64_t bytes, QEMUIOVector *qiov, int flags)
+ {
+     BDRVQuorumState *s = bs->opaque;
+-    QuorumAIOCB *acb = quorum_aio_get(bs, qiov, sector_num, nb_sectors);
++    QuorumAIOCB *acb = quorum_aio_get(bs, qiov, offset, bytes);
+     int i, ret;
+ 
+     for (i = 0; i < s->num_children; i++) {
+@@ -811,7 +806,7 @@ static coroutine_fn int quorum_co_flush(BlockDriverState *bs)
+         result = bdrv_co_flush(s->children[i]->bs);
+         if (result) {
+             quorum_report_bad(QUORUM_OP_TYPE_FLUSH, 0,
+-                              bdrv_nb_sectors(s->children[i]->bs),
++                              bdrv_getlength(s->children[i]->bs),
+                               s->children[i]->bs->node_name, result);
+             result_value.l = result;
+             quorum_count_vote(&error_votes, &result_value, i);
+@@ -1144,8 +1139,8 @@ static BlockDriver bdrv_quorum = {
+ 
+     .bdrv_getlength                     = quorum_getlength,
+ 
+-    .bdrv_co_readv                      = quorum_co_readv,
+-    .bdrv_co_writev                     = quorum_co_writev,
++    .bdrv_co_preadv                     = quorum_co_preadv,
++    .bdrv_co_pwritev                    = quorum_co_pwritev,
+ 
+     .bdrv_add_child                     = quorum_add_child,
+     .bdrv_del_child                     = quorum_del_child,
 -- 
 1.8.3.1
