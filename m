@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55486)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55849)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cQxc9-0007nB-JG
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 09:41:30 -0500
+	(envelope-from <stefanha@redhat.com>) id 1cQxdy-0001DG-Gp
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 09:43:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cQxc6-0005iB-7M
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 09:41:29 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34176)
+	(envelope-from <stefanha@redhat.com>) id 1cQxdv-00062y-Ei
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 09:43:22 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:35390)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cQxc6-0005i1-0y
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 09:41:26 -0500
-References: <148405872846.9522.17126828396099315346.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-	<148405873540.9522.2224634666374633695.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-	<b227e7dc-ba0b-7da7-8fdb-dece1cbe51d4@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <1436b9db-dea9-cfa4-65f8-bd1455394e6f@redhat.com>
-Date: Tue, 10 Jan 2017 08:41:23 -0600
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cQxdv-00062e-8B
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 09:43:19 -0500
+Date: Mon, 9 Jan 2017 16:38:54 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170109163854.GK30228@stefanha-x1.localdomain>
+References: <148278746972.1404.10574428039766667311.stgit@fimbulvetr.bsc.es>
 MIME-Version: 1.0
-In-Reply-To: <b227e7dc-ba0b-7da7-8fdb-dece1cbe51d4@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="DlkgaeasKogtJIF41Rq8lo2CL800itUoS"
-Subject: Re: [Qemu-devel] [PATCH 1/7] 9pfs: restrict open to regular files
- and directories
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="2WS97oupGEGbYNpW"
+Content-Disposition: inline
+In-Reply-To: <148278746972.1404.10574428039766667311.stgit@fimbulvetr.bsc.es>
+Subject: Re: [Qemu-devel] [PATCH 0/3] trace: Fix event tracing during vCPU
+ hot-unplug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,52 +28,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-Cc: "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>
+To: =?iso-8859-1?Q?Llu=EDs?= Vilanova <vilanova@ac.upc.edu>
+Cc: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---DlkgaeasKogtJIF41Rq8lo2CL800itUoS
-From: Eric Blake <eblake@redhat.com>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-Cc: "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>
-Message-ID: <1436b9db-dea9-cfa4-65f8-bd1455394e6f@redhat.com>
-Subject: Re: [PATCH 1/7] 9pfs: restrict open to regular files and directories
-References: <148405872846.9522.17126828396099315346.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
- <148405873540.9522.2224634666374633695.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
- <b227e7dc-ba0b-7da7-8fdb-dece1cbe51d4@redhat.com>
-In-Reply-To: <b227e7dc-ba0b-7da7-8fdb-dece1cbe51d4@redhat.com>
-Content-Type: text/plain; charset=utf-8
+
+--2WS97oupGEGbYNpW
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 01/10/2017 08:38 AM, Eric Blake wrote:
-> I think you need to rework this patch to open() first, then validate
-> (closing the fd if necessary); the open can be done with O_NONBLOCK to
-> avoid hanging on a pipe.
+On Mon, Dec 26, 2016 at 10:24:29PM +0100, Llu=EDs Vilanova wrote:
+> The vCPU list needs to be locked to avoid memory corruption with concurre=
+nt
+> hot-(un)plugs, and per-vCPU events need to be disabled during vCPU hot-un=
+plug.
+>=20
+> Also adds event "guest_cpu_exit" to track vCPU hot-unplugging.
+>=20
+> Signed-off-by: Llu=EDs Vilanova <vilanova@ac.upc.edu>
+> ---
+>=20
+>=20
+> Llu=EDs Vilanova (3):
+>       trace: Lock vCPU list when initializing dynamic tracing state
+>       trace: Fix dynamic event state on vCPU hot-unplug
+>       trace: Add event "guest_cpu_exit"
+>=20
+>=20
+>  qom/cpu.c              |    2 ++
+>  trace-events           |    6 ++++++
+>  trace/control-target.c |   11 ++++++++++-
+>  trace/control.c        |   19 +++++++++++++++++++
+>  trace/control.h        |    8 ++++++++
+>  5 files changed, 45 insertions(+), 1 deletion(-)
+>=20
+>=20
+> To: qemu-devel@nongnu.org
+> Cc: Stefan Hajnoczi <stefanha@redhat.com>
 
-And O_NOCTTY to avoid becoming the controlling process of a terminal.
+Thanks, applied to my tracing tree:
+https://github.com/stefanha/qemu/commits/tracing
 
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+Stefan
 
-
---DlkgaeasKogtJIF41Rq8lo2CL800itUoS
+--2WS97oupGEGbYNpW
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJYdPKTAAoJEKeha0olJ0Nqf6EH+wV6l0QXE4nPapIGGD4B7m8n
-QoSXau1hbEZge/538MUEYuU1r2xnoUnmnwdEUH86UG/8siWJAE2r1vPmDIn0XRbw
-0jV72+5cR3t8mb+p3KcbUKWDDRE9NwnNa33qN8/teBUkdYrrE+l6k21BTXVD3+/P
-awt1qRkxTaC4MfNxDJvL0BcI3u9RBpNuK3GWZ18UCe4C5jTFxQWI4245PwInEksu
-hq2tfyVuqJWdhLZ9bZOjwc/KFkaW4dbOtZZTHQKWL5WTE6Qhw1uEnGJr/LRJ2yQh
-bP7Yox4t8bgO0MiylRDq+3tQPeWZVXNy8BCLFYq/bksNGKK1OAN0tWig2rVZ+hw=
-=qIGK
+iQEcBAEBAgAGBQJYc7yeAAoJEJykq7OBq3PIjKMIAJdq0osMNLfwauuffuHDnXAf
+k5vLt5Mwget6ajcCaJAGVySg2OVyvCY8I3Q8Gjbp3wEPoOFFMvwk+lFpyeq6+Tc8
+tHngVvorNXFKV1EBTlrhrNdQz4ClK9jGshZq6cfjtO36l0KdLrUBVFtL5v45QJJm
+D1uDZOtNKGNMrnlCB59aTRHDfKjMXDMYQvEjKqC///P1x2RUT8EcQxqRHR34cKb7
+yIVJFbx9Ap8vRnbvGb5Tpwcu60BYnm0I4WzJa37lTJpBvQ3jVpIgFwoYGELK8t/C
+MPRIaR6m97+/gJTVhQ3npCKFr5zpMJmsZLy5+0PPbZxzQRkoQrt1n5rZbKxR+Fk=
+=wYL/
 -----END PGP SIGNATURE-----
 
---DlkgaeasKogtJIF41Rq8lo2CL800itUoS--
+--2WS97oupGEGbYNpW--
