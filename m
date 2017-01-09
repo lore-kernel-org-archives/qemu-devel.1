@@ -1,17 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33308)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33313)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cQaFn-0006h5-JK
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 08:44:52 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cQaFn-0006h9-KM
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 08:44:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cQaFm-0002yL-F5
+	(envelope-from <kwolf@redhat.com>) id 1cQaFm-0002yS-GV
 	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 08:44:51 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon,  9 Jan 2017 14:44:25 +0100
-Message-Id: <1483969476-7172-4-git-send-email-kwolf@redhat.com>
-In-Reply-To: <1483969476-7172-1-git-send-email-kwolf@redhat.com>
-References: <1483969476-7172-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 03/14] quorum: Remove s from quorum_aio_get()
- arguments
+Date: Mon,  9 Jan 2017 14:44:22 +0100
+Message-Id: <1483969476-7172-1-git-send-email-kwolf@redhat.com>
+Subject: [Qemu-devel] [PULL 00/14] Block layer patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,59 +20,60 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-There is no point in passing the value of bs->opaque in order to
-overwrite it with itself.
+The following changes since commit ffe22bf51065dd33022cf91f77a821d1f11c250d:
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Alberto Garcia <berto@igalia.com>
----
- block/quorum.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+  Merge remote-tracking branch 'remotes/gonglei/tags/cryptodev-next-20161224' into staging (2017-01-06 15:18:09 +0000)
 
-diff --git a/block/quorum.c b/block/quorum.c
-index d122299..dfa9fd3 100644
---- a/block/quorum.c
-+++ b/block/quorum.c
-@@ -171,18 +171,17 @@ static bool quorum_64bits_compare(QuorumVoteValue *a, QuorumVoteValue *b)
-     return a->l == b->l;
- }
- 
--static QuorumAIOCB *quorum_aio_get(BDRVQuorumState *s,
--                                   BlockDriverState *bs,
-+static QuorumAIOCB *quorum_aio_get(BlockDriverState *bs,
-                                    QEMUIOVector *qiov,
-                                    uint64_t sector_num,
-                                    int nb_sectors,
-                                    BlockCompletionFunc *cb,
-                                    void *opaque)
- {
-+    BDRVQuorumState *s = bs->opaque;
-     QuorumAIOCB *acb = qemu_aio_get(&quorum_aiocb_info, bs, cb, opaque);
-     int i;
- 
--    acb->common.bs->opaque = s;
-     acb->sector_num = sector_num;
-     acb->nb_sectors = nb_sectors;
-     acb->qiov = qiov;
-@@ -691,7 +690,7 @@ static BlockAIOCB *quorum_aio_readv(BlockDriverState *bs,
-                                     void *opaque)
- {
-     BDRVQuorumState *s = bs->opaque;
--    QuorumAIOCB *acb = quorum_aio_get(s, bs, qiov, sector_num,
-+    QuorumAIOCB *acb = quorum_aio_get(bs, qiov, sector_num,
-                                       nb_sectors, cb, opaque);
-     acb->is_read = true;
-     acb->children_read = 0;
-@@ -711,7 +710,7 @@ static BlockAIOCB *quorum_aio_writev(BlockDriverState *bs,
-                                      void *opaque)
- {
-     BDRVQuorumState *s = bs->opaque;
--    QuorumAIOCB *acb = quorum_aio_get(s, bs, qiov, sector_num, nb_sectors,
-+    QuorumAIOCB *acb = quorum_aio_get(bs, qiov, sector_num, nb_sectors,
-                                       cb, opaque);
-     int i;
- 
--- 
-1.8.3.1
+are available in the git repository at:
+
+
+  git://repo.or.cz/qemu/kevin.git tags/for-upstream
+
+for you to fetch changes up to c1bb86cd8ae67c14f79422b6e544d1e2bf40eeb2:
+
+  block: Rename raw-{posix,win32} to file-*.c (2017-01-09 13:30:53 +0100)
+
+----------------------------------------------------------------
+Block layer patches
+
+----------------------------------------------------------------
+Eric Blake (2):
+      block: Rename raw_bsd to raw-format.c
+      block: Rename raw-{posix,win32} to file-*.c
+
+Kevin Wolf (11):
+      coroutine: Introduce qemu_coroutine_enter_if_inactive()
+      quorum: Remove s from quorum_aio_get() arguments
+      quorum: Implement .bdrv_co_readv/writev
+      quorum: Do cleanup in caller coroutine
+      quorum: Inline quorum_aio_cb()
+      quorum: Avoid bdrv_aio_writev() for rewrites
+      quorum: Implement .bdrv_co_preadv/pwritev()
+      quorum: Inline quorum_fifo_aio_cb()
+      quorum: Clean up quorum_aio_get()
+      blkdebug: Implement bdrv_co_preadv/pwritev/flush
+      blkverify: Implement bdrv_co_preadv/pwritev/flush
+
+Paolo Bonzini (1):
+      qemu-img: fix in-flight count for qemu-img bench
+
+ MAINTAINERS                         |   6 +-
+ block/Makefile.objs                 |   6 +-
+ block/blkdebug.c                    |  86 ++++----
+ block/blkverify.c                   | 201 +++++++++---------
+ block/{raw-posix.c => file-posix.c} |   0
+ block/{raw-win32.c => file-win32.c} |   0
+ block/gluster.c                     |   4 +-
+ block/quorum.c                      | 410 +++++++++++++++++++-----------------
+ block/{raw_bsd.c => raw-format.c}   |   2 +-
+ block/trace-events                  |   4 +-
+ configure                           |   2 +-
+ include/block/block_int.h           |   2 +-
+ include/qemu/coroutine.h            |   6 +
+ qemu-img.c                          |  17 +-
+ tests/qemu-iotests/071.out          |   8 +-
+ util/qemu-coroutine.c               |   7 +
+ 16 files changed, 392 insertions(+), 369 deletions(-)
+ rename block/{raw-posix.c => file-posix.c} (100%)
+ rename block/{raw-win32.c => file-win32.c} (100%)
+ rename block/{raw_bsd.c => raw-format.c} (99%)
