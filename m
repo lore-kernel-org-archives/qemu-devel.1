@@ -1,30 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51699)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56792)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yu.ning@linux.intel.com>) id 1cQTHG-0005rK-Mc
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 01:17:55 -0500
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cQToe-0001nQ-SC
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 01:52:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yu.ning@linux.intel.com>) id 1cQTHC-0005CA-Pa
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 01:17:54 -0500
-Received: from mga05.intel.com ([192.55.52.43]:4487)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <yu.ning@linux.intel.com>)
-	id 1cQTHC-0005Bl-C4
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 01:17:50 -0500
-References: <cover.1482164622.git.vpalatin@chromium.org>
-	<85250fb0450b5b95232b39c82ab310a0632fd23f.1482164622.git.vpalatin@chromium.org>
-	<fda5a694-d02f-269e-e155-1822276d74f6@redhat.com>
-	<CAP_ceTxAn3tH-P8JjThXXeF7iYv5xFoVOzmjp5h8sHYsYzWTDQ@mail.gmail.com>
-	<df2938db-dde1-633c-899d-646d62ec4780@redhat.com>
-	<61d18d9c-32f1-983f-c237-3c28d31e2f23@redhat.com>
-From: Yu Ning <yu.ning@linux.intel.com>
-Message-ID: <7e2bab8d-fcb4-c861-c1b5-f85c5df674b6@linux.intel.com>
-Date: Mon, 9 Jan 2017 14:17:43 +0800
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cQTob-0002Ti-S2
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 01:52:24 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34359
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
+	id 1cQTob-0002TJ-NN
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 01:52:21 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
+	v096mUTb060186
+	for <qemu-devel@nongnu.org>; Mon, 9 Jan 2017 01:52:20 -0500
+Received: from e28smtp09.in.ibm.com (e28smtp09.in.ibm.com [125.16.236.9])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 27v55y12tb-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 09 Jan 2017 01:52:19 -0500
+Received: from localhost
+	by e28smtp09.in.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
+	Mon, 9 Jan 2017 12:22:16 +0530
+From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+In-Reply-To: <20170109024909.GE12515@umbus.fritz.box>
+References: <1483683296-32568-1-git-send-email-nikunj@linux.vnet.ibm.com>
+	<20170109024909.GE12515@umbus.fritz.box>
+Date: Mon, 09 Jan 2017 12:21:58 +0530
 MIME-Version: 1.0
-In-Reply-To: <61d18d9c-32f1-983f-c237-3c28d31e2f23@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 3/4] Plumb the HAXM-based hardware
- acceleration support
+Content-Type: text/plain
+Message-Id: <874m18rai9.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+Subject: Re: [Qemu-devel] [PATCH v1 00/14] POWER9 TCG enablements - part10
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,66 +41,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Vincent Palatin <vpalatin@chromium.org>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Stefan Weil <sw@weilnetz.de>, Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, rth@twiddle.net, qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com
 
+David Gibson <david@gibson.dropbear.id.au> writes:
 
-
-On 1/6/2017 5:38, Paolo Bonzini wrote:
+> [ Unknown signature status ]
+> On Fri, Jan 06, 2017 at 11:44:42AM +0530, Nikunj A Dadhania wrote:
+>> This series contains 11 new instructions for POWER9 ISA3.0
+>>      VSX Vector Insert/Extract Word
+>>      VSX Scalar Extract Exponent/Significand
+>>      VSX Scalar Convert
+>>      VSX Scalar Add QP
+>>      Various float related improvements
 >
-> On 05/01/2017 15:01, Paolo Bonzini wrote:
->>
->> In fact there is a race anyway:
->>
->>          if (cpu->exit_request) {
->>              ret = 1;
->>              break;
->>          }
->> 					cpu->exit_request
->> 					SuspendThread
->> 					ResumeThread
->>          hax_vcpu_interrupt(env);
->>          qemu_mutex_unlock_iothread();
->>          hax_ret = hax_vcpu_run(vcpu);
->>
->> and the same race is true for QueueUserAPC.  It's rare enough that I
->> guess we can accept the patches with just a FIXME comment, but...  Yu
->> Ning, can you tell us what user_event_pending is for? :)  My hunch is
->> that we should call hax_raise_event after setting cpu->exit_request, like
->>
->> 	hax_raise_event();
->> 	/* write user_event_pending before exit_request */
->> 	smp_wmb();
->> 	cpu->exit_request = 1;
->> 	SuspendThread/ResumeThread
->> 		(or QueueUserAPC)
->>
->> and in the hax thread:
->>
->>          if (cpu->exit_request) {
->> 	    cpu->hax_vcpu->tunnel->user_event_pending = 0;
->>              ret = 1;
->>              break;
->>          }
->>
->>          hax_vcpu_interrupt(env);
->>          qemu_mutex_unlock_iothread();
->>
->> 	/* read exit_request before user_event_pending */
->> 	smp_rmb();
->>          hax_ret = hax_vcpu_run(vcpu);
->>
->> but I would like some more official documentation than my own reverse
->> engineering of the brain of whoever wrote the interface (I have not
->> looked at the HAXM driver binary).
+> Applied to ppc-for-2.9, thanks.
 
-Unfortunately, user_event_pending was introduced in 2011 without proper 
-documentation, so I guess even the original author might not have an 
-answer now (even if I could find him).  I need more time to analyze the 
-HAXM driver code to understand what it's about.  Please feel free to add 
-a FIXME for now.
+Found issue in register numbering in 3 instructions.
+xsaddqp
+xscvdpqp
+xscvqpdp
 
-But one thing I've noticed is that the Darwin driver does not test or 
-reset this flag properly - it will remain 1 after the first 
-hax_raise_event() call.  So removing user_event_pending from the QEMU 
-side should not affect Mac.
+Please drop following:
+
+  target-ppc: Add xsaddqp instructions
+  target-ppc: Add xscvdpqp instruction
+  target-ppc: Add xscvqpdp instruction
+
+I will resend them.
+
+Regards
+Nikunj
