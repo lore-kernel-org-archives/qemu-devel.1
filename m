@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52774)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56120)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vpalatin@google.com>) id 1cQdDR-0000rI-Ac
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 11:54:38 -0500
+	(envelope-from <ashijeetacharya@gmail.com>) id 1cQdLJ-0000QE-QT
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 12:02:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vpalatin@google.com>) id 1cQdDQ-0001ar-Hm
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 11:54:37 -0500
-Received: from mail-io0-x22f.google.com ([2607:f8b0:4001:c06::22f]:33656)
+	(envelope-from <ashijeetacharya@gmail.com>) id 1cQdLH-0005SU-7n
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 12:02:45 -0500
+Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:32862)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <vpalatin@google.com>) id 1cQdDQ-0001Zx-Cp
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 11:54:36 -0500
-Received: by mail-io0-x22f.google.com with SMTP id v96so84559741ioi.0
-	for <qemu-devel@nongnu.org>; Mon, 09 Jan 2017 08:54:34 -0800 (PST)
-MIME-Version: 1.0
-Sender: vpalatin@google.com
-In-Reply-To: <459d4c70-aaa7-0d4d-e6c2-5a439243e481@redhat.com>
-References: <cover.1482164622.git.vpalatin@chromium.org>
-	<85250fb0450b5b95232b39c82ab310a0632fd23f.1482164622.git.vpalatin@chromium.org>
-	<fda5a694-d02f-269e-e155-1822276d74f6@redhat.com>
-	<CAP_ceTxAn3tH-P8JjThXXeF7iYv5xFoVOzmjp5h8sHYsYzWTDQ@mail.gmail.com>
-	<df2938db-dde1-633c-899d-646d62ec4780@redhat.com>
-	<61d18d9c-32f1-983f-c237-3c28d31e2f23@redhat.com>
-	<CAP_ceTx+SXzZeg1BrF9ibAEm6MvBma+aMseMzLMcrQV_JjeOXg@mail.gmail.com>
-	<459d4c70-aaa7-0d4d-e6c2-5a439243e481@redhat.com>
-From: Vincent Palatin <vpalatin@chromium.org>
-Date: Mon, 9 Jan 2017 17:54:13 +0100
-Message-ID: <CAP_ceTw7bh0S-GMxXrE1xPxZOYp_XLhGUi4c7DcQ8Azc0S7Tcg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v5 3/4] Plumb the HAXM-based hardware
- acceleration support
+	(Exim 4.71) (envelope-from <ashijeetacharya@gmail.com>)
+	id 1cQdLH-0005SK-1T
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 12:02:43 -0500
+Received: by mail-pf0-x243.google.com with SMTP id 127so24925866pfg.0
+	for <qemu-devel@nongnu.org>; Mon, 09 Jan 2017 09:02:42 -0800 (PST)
+From: Ashijeet Acharya <ashijeetacharya@gmail.com>
+Date: Mon,  9 Jan 2017 22:32:44 +0530
+Message-Id: <1483981368-9965-1-git-send-email-ashijeetacharya@gmail.com>
+Subject: [Qemu-devel] [PATCH v4 0/4] Introduce a new --only-migratable option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,43 +24,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Yu Ning <yu.ning@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Stefan Weil <sw@weilnetz.de>, Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
+To: dgilbert@redhat.com
+Cc: jsnow@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, kwolf@redhat.com, armbru@redhat.com, quintela@redhat.com, mst@redhat.com, marcandre.lureau@redhat.com, groug@kaod.org, aneesh.kumar@linux.vnet.ibm.com, peter.maydell@linaro.org, qemu-devel@nongnu.org, Ashijeet Acharya <ashijeetacharya@gmail.com>
 
-On Mon, Jan 9, 2017 at 2:03 PM, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
->
-> On 06/01/2017 15:08, Vincent Palatin wrote:
->>>>>> Apart from the above change, can you check if there are some less
->>>>>> heavyeight methods to force an exit?  I can think of QueueUserAPC with
->>>>>> an empty pfnAPC here, and SleepEx(0, TRUE) in qemu_hax_cpu_thread_fn
->>>>>> before qemu_wait_io_event_common.
->>>>> Actually I don't know a good test case to verify such a change, any advice ?
->>> In fact there is a race anyway:
->> Thanks for the detailed examples and thoughts.
->> The timing/benchmarking code might actually need some kind of per-vcpu
->> time storage, but that's a detail.
->> I have experimented with it and so far, I have mainly generated random
->> numbers ...
->> I have yet to find a use-case where the current code (with
->> SuspendThread/ResumeThread) yields a better latency than just nothing
->> instead :(
->
-> :)  Does QueueUserAPC generate better latency?
+Previously posted series patches:
+http://lists.nongnu.org/archive/html/qemu-devel/2017-01/msg00320.html
+http://lists.nongnu.org/archive/html/qemu-devel/2016-12/msg02391.html
+http://lists.nongnu.org/archive/html/qemu-devel/2016-12/msg02062.html
 
+This series adds a new command line option "--only-migratable" which will only
+allow addition of those devices to a QEMU instance which are migratable and do
+not abruptly fail QEMU after migration.
 
-The same kind of random numbers so far.
+Patch 1 adds the new option "-only-migratable".
 
-By the way I have added  the THREAD_SET_CONTEXT  flag to the
-OpenThread call in qemu_thread_get_handle() function, as I was getting
-ACCESS_DENIED on the QueueUserApc call. Probably not terribly harmful.
-I will publish the v6 series with this and continue my benchmarking quest.
+Patch 2 adds compatibility for various "device adding" options for both via
+command line and hotplug methods.
 
->
-> Windows delivers the scheduler tick to the first physical CPU.  Try
-> pinning QEMU away from the first CPU.
+Patch 3 helps to fail the migration blocker if the migration is already in
+progress and thus cannot be blocked.
+Note: This patch was originally written by John Snow and I have only made few
+changes.
 
-Ok interesting, I will give it a try.
+Patch 4 handles the special case of devices which become unmigratable
+dynamically
+by making call to "migrate_add_blocker". Here we fail the particular action of
+the
+device which results in an unmigratable VM.
+Eg: 9pfs fails to mount the filesystem.
+
+Note: I have not been able to test and compile the ARM drivers for KVM. They
+are:
+hw/intc/arm_gic_kvm.c
+hw/intc/arm_gicv3_its_kvm.c
+hw/intc/arm_gicv3_kvm.c
+
+Changes in v4:
+- drop diff in 9pfs for patch 4/4
+- call clunk_fid() after freeing migration_blocker
+- drop ret and use err directly
+
+Changes in v3:
+- set s->root_fid after migrate_add_blocker
+- free migration_blocker inside v9fs_attach()
+- change back ret<0 to just ret
+- free local_err
+
+Changes in v2:
+- change the documentation for the new option
+- add a NULL check for ObjectClass
+- break patch 3 into patch 3 and 4
+- use error_append_hint
+- return -EACCES for only-migratable
+- fix the error messages
+
+Ashijeet Acharya (4):
+  migration: Add a new option to enable only-migratable
+  migration: Allow "device add" options to only add migratable devices
+  migration: disallow migrate_add_blocker during migration
+  migration: Fail migration blocker for --only-migratble
+
+ block/qcow.c                  |  9 ++++++++-
+ block/vdi.c                   |  9 ++++++++-
+ block/vhdx.c                  | 18 ++++++++++++------
+ block/vmdk.c                  | 10 +++++++++-
+ block/vpc.c                   | 13 ++++++++++---
+ block/vvfat.c                 | 22 ++++++++++++++--------
+ hw/9pfs/9p.c                  | 18 +++++++++++++-----
+ hw/display/virtio-gpu.c       | 34 +++++++++++++++++++++-------------
+ hw/intc/arm_gic_kvm.c         | 19 +++++++++++++------
+ hw/intc/arm_gicv3_its_kvm.c   | 21 ++++++++++++++-------
+ hw/intc/arm_gicv3_kvm.c       | 22 +++++++++++++++-------
+ hw/misc/ivshmem.c             | 17 +++++++++++++----
+ hw/scsi/vhost-scsi.c          | 27 +++++++++++++++++++++------
+ hw/usb/bus.c                  | 18 ++++++++++++++++++
+ hw/virtio/vhost.c             | 10 +++++++++-
+ include/migration/migration.h |  9 ++++++++-
+ migration/migration.c         | 42 ++++++++++++++++++++++++++++++++++++++++--
+ qdev-monitor.c                |  9 +++++++++
+ qemu-options.hx               |  9 +++++++++
+ stubs/migr-blocker.c          |  3 ++-
+ target-i386/kvm.c             | 19 ++++++++++++++++---
+ vl.c                          |  4 ++++
+ 22 files changed, 286 insertions(+), 76 deletions(-)
 
 -- 
-Vincent
+2.6.2
