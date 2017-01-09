@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37189)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37299)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cQYWR-0002QH-2J
+	(envelope-from <pm215@archaic.org.uk>) id 1cQYWU-0002Rf-Nt
 	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:54:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cQYWP-00045C-RE
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:53:55 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:47992)
+	(envelope-from <pm215@archaic.org.uk>) id 1cQYWT-00047y-JD
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:53:58 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:47993)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1cQYWP-00043I-K1
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:53:53 -0500
+	id 1cQYWT-00045M-Bn
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:53:57 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.84_2)
-	(envelope-from <pm215@archaic.org.uk>) id 1cQYWH-0001Le-ON
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 11:53:45 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1cQYWN-0001Qd-Qj
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 11:53:51 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon,  9 Jan 2017 11:53:23 +0000
-Message-Id: <1483962824-29185-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 00/21] target-arm queue
+Date: Mon,  9 Jan 2017 11:53:37 +0000
+Message-Id: <1483962824-29185-15-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <1483962824-29185-1-git-send-email-peter.maydell@linaro.org>
+References: <1483962824-29185-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PULL 14/21] hw/arm/virt: move VirtMachineState/Class
+ to virt.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,88 +30,153 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-target-arm queue: nothing hugely exciting here, the
-bulk is Andrew's virt-acpi-build refactorings.
+From: Andrew Jones <drjones@redhat.com>
 
-thanks
--- PMM
+In preparation to share more Virt machine state than just guest-info
+with other mach-virt source files, move the State and Class structures
+to virt.h
 
-The following changes since commit ffe22bf51065dd33022cf91f77a821d1f11c250d:
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
+Message-id: 20170102200153.28864-10-drjones@redhat.com
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ include/hw/arm/virt.h | 37 +++++++++++++++++++++++++++++++++++++
+ hw/arm/virt.c         | 51 +++++++--------------------------------------------
+ 2 files changed, 44 insertions(+), 44 deletions(-)
 
-  Merge remote-tracking branch 'remotes/gonglei/tags/cryptodev-next-20161224' into staging (2017-01-06 15:18:09 +0000)
-
-are available in the git repository at:
-
-  git://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20170109
-
-for you to fetch changes up to 556899fc1965d82f5c4a3ba6a0be3b1193e2c4b2:
-
-  hw/ssi/imx_spi.c: Remove MSGDATA register support (2017-01-09 11:50:23 +0000)
-
-----------------------------------------------------------------
-target-arm queue:
- * i2c: Allow I2C devices to NAK start events
- * hw/char: QOM'ify exynos4210_uart.c
- * clean up and refactor virt-acpi-build.c
- * virt-acpi-build: Don't incorrectly claim architectural timer
-   to be edge-triggered
- * m25p80: Don't let rogue SPI controllers cause buffer overruns
- * imx_spi: Remove broken MSGDATA register support
-
-----------------------------------------------------------------
-Andrew Jones (14):
-      hw/arm/virt-acpi-build: add all missing cpu_to_le's
-      hw/arm/virt-acpi-build: name GIC CPU Interface Structure appropriately
-      hw/arm/virt-acpi-build: gtdt: improve flag naming
-      hw/arm/virt-acpi-build: fadt: improve flag naming
-      hw/arm/virt: parameter passing cleanups
-      hw/arm/virt: use VirtMachineState.gic_version
-      hw/arm/virt: eliminate struct VirtGuestInfoState
-      hw/arm/virt: remove include/hw/arm/virt-acpi-build.h
-      hw/arm/virt: move VirtMachineState/Class to virt.h
-      hw/arm/virt: pass VirtMachineState instead of VirtGuestInfo
-      hw/arm/virt-acpi-build: remove redundant members from VirtGuestInfo
-      hw/arm/virt-acpi-build: don't save VirtGuestInfo on AcpiBuildState
-      hw/arm/virt: remove VirtGuestInfo
-      hw/arm/virt-acpi-build: Don't incorrectly claim architectural timer to be edge-triggered
-
-Corey Minyard (1):
-      i2c: Allow I2C devices to NAK start events
-
-Jean-Christophe Dubois (2):
-      m25p80: don't let rogue SPI controllers cause buffer overruns
-      hw/ssi/imx_spi.c: Remove MSGDATA register support
-
-Peter Maydell (3):
-      hw/arm/virt: Merge VirtBoardInfo and VirtMachineState
-      hw/arm/virt: Rename 'vbi' variables to 'vms'
-      hw/arm/virt: Don't incorrectly claim architectural timer to be edge-triggered
-
-xiaoqiang zhao (1):
-      hw/char: QOM'ify exynos4210_uart.c
-
- include/hw/acpi/acpi-defs.h      |  33 +-
- include/hw/arm/virt-acpi-build.h |  47 ---
- include/hw/arm/virt.h            |  41 ++-
- include/hw/i2c/i2c.h             |  16 +-
- hw/arm/pxa2xx.c                  |   4 +-
- hw/arm/tosa.c                    |   4 +-
- hw/arm/virt-acpi-build.c         | 134 ++++----
- hw/arm/virt.c                    | 691 ++++++++++++++++++---------------------
- hw/arm/z2.c                      |   4 +-
- hw/audio/wm8750.c                |   4 +-
- hw/block/m25p80.c                |  29 +-
- hw/char/exynos4210_uart.c        |  16 +-
- hw/display/ssd0303.c             |   4 +-
- hw/gpio/max7310.c                |   4 +-
- hw/i2c/core.c                    |  31 +-
- hw/i2c/i2c-ddc.c                 |   4 +-
- hw/i2c/smbus.c                   |  13 +-
- hw/input/lm832x.c                |   4 +-
- hw/misc/tmp105.c                 |   3 +-
- hw/ssi/imx_spi.c                 |  11 +-
- hw/timer/ds1338.c                |   4 +-
- hw/timer/twl92230.c              |   4 +-
- MAINTAINERS                      |   2 -
- 23 files changed, 572 insertions(+), 535 deletions(-)
- delete mode 100644 include/hw/arm/virt-acpi-build.h
+diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+index 69f7847..91dbd69 100644
+--- a/include/hw/arm/virt.h
++++ b/include/hw/arm/virt.h
+@@ -33,6 +33,8 @@
+ #include "qemu-common.h"
+ #include "exec/hwaddr.h"
+ #include "qemu/notify.h"
++#include "hw/boards.h"
++#include "hw/arm/arm.h"
+ 
+ #define NUM_GICV2M_SPIS       64
+ #define NUM_VIRTIO_TRANSPORTS 32
+@@ -85,6 +87,41 @@ typedef struct VirtGuestInfo {
+     bool no_its;
+ } VirtGuestInfo;
+ 
++typedef struct {
++    MachineClass parent;
++    bool disallow_affinity_adjustment;
++    bool no_its;
++    bool no_pmu;
++    bool claim_edge_triggered_timers;
++} VirtMachineClass;
++
++typedef struct {
++    MachineState parent;
++    VirtGuestInfo acpi_guest_info;
++    Notifier machine_done;
++    bool secure;
++    bool highmem;
++    int32_t gic_version;
++    struct arm_boot_info bootinfo;
++    const MemMapEntry *memmap;
++    const int *irqmap;
++    int smp_cpus;
++    void *fdt;
++    int fdt_size;
++    uint32_t clock_phandle;
++    uint32_t gic_phandle;
++    uint32_t msi_phandle;
++    bool using_psci;
++} VirtMachineState;
++
++#define TYPE_VIRT_MACHINE   MACHINE_TYPE_NAME("virt")
++#define VIRT_MACHINE(obj) \
++    OBJECT_CHECK(VirtMachineState, (obj), TYPE_VIRT_MACHINE)
++#define VIRT_MACHINE_GET_CLASS(obj) \
++    OBJECT_GET_CLASS(VirtMachineClass, obj, TYPE_VIRT_MACHINE)
++#define VIRT_MACHINE_CLASS(klass) \
++    OBJECT_CLASS_CHECK(VirtMachineClass, klass, TYPE_VIRT_MACHINE)
++
+ void virt_acpi_setup(VirtGuestInfo *guest_info);
+ 
+ #endif /* QEMU_ARM_VIRT_H */
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 1b88b50..8556ff2 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -41,7 +41,6 @@
+ #include "sysemu/numa.h"
+ #include "sysemu/sysemu.h"
+ #include "sysemu/kvm.h"
+-#include "hw/boards.h"
+ #include "hw/compat.h"
+ #include "hw/loader.h"
+ #include "exec/address-spaces.h"
+@@ -58,49 +57,6 @@
+ #include "qapi/visitor.h"
+ #include "standard-headers/linux/input.h"
+ 
+-/* Number of external interrupt lines to configure the GIC with */
+-#define NUM_IRQS 256
+-
+-#define PLATFORM_BUS_NUM_IRQS 64
+-
+-static ARMPlatformBusSystemParams platform_bus_params;
+-
+-typedef struct {
+-    MachineClass parent;
+-    bool disallow_affinity_adjustment;
+-    bool no_its;
+-    bool no_pmu;
+-    bool claim_edge_triggered_timers;
+-} VirtMachineClass;
+-
+-typedef struct {
+-    MachineState parent;
+-    VirtGuestInfo acpi_guest_info;
+-    Notifier machine_done;
+-    bool secure;
+-    bool highmem;
+-    int32_t gic_version;
+-    struct arm_boot_info bootinfo;
+-    const MemMapEntry *memmap;
+-    const int *irqmap;
+-    int smp_cpus;
+-    void *fdt;
+-    int fdt_size;
+-    uint32_t clock_phandle;
+-    uint32_t gic_phandle;
+-    uint32_t msi_phandle;
+-    bool using_psci;
+-} VirtMachineState;
+-
+-#define TYPE_VIRT_MACHINE   MACHINE_TYPE_NAME("virt")
+-#define VIRT_MACHINE(obj) \
+-    OBJECT_CHECK(VirtMachineState, (obj), TYPE_VIRT_MACHINE)
+-#define VIRT_MACHINE_GET_CLASS(obj) \
+-    OBJECT_GET_CLASS(VirtMachineClass, obj, TYPE_VIRT_MACHINE)
+-#define VIRT_MACHINE_CLASS(klass) \
+-    OBJECT_CLASS_CHECK(VirtMachineClass, klass, TYPE_VIRT_MACHINE)
+-
+-
+ #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
+     static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
+                                                     void *data) \
+@@ -130,6 +86,13 @@ typedef struct {
+     DEFINE_VIRT_MACHINE_LATEST(major, minor, false)
+ 
+ 
++/* Number of external interrupt lines to configure the GIC with */
++#define NUM_IRQS 256
++
++#define PLATFORM_BUS_NUM_IRQS 64
++
++static ARMPlatformBusSystemParams platform_bus_params;
++
+ /* RAM limit in GB. Since VIRT_MEM starts at the 1GB mark, this means
+  * RAM can go up to the 256GB mark, leaving 256GB of the physical
+  * address space unallocated and free for future use between 256G and 512G.
+-- 
+2.7.4
