@@ -1,19 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60137)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33308)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cQa9v-0005EX-W6
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 08:38:49 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cQaFn-0006h5-JK
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 08:44:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cQa9v-0000vA-30
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 08:38:48 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:47996)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1cQa9u-0000ui-S8
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 08:38:47 -0500
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon,  9 Jan 2017 13:38:41 +0000
-Message-Id: <1483969123-14839-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 0/2] virtio-gpu: fix issues with VM load code
+	(envelope-from <kwolf@redhat.com>) id 1cQaFm-0002yL-F5
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 08:44:51 -0500
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Mon,  9 Jan 2017 14:44:25 +0100
+Message-Id: <1483969476-7172-4-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1483969476-7172-1-git-send-email-kwolf@redhat.com>
+References: <1483969476-7172-1-git-send-email-kwolf@redhat.com>
+Subject: [Qemu-devel] [PULL 03/14] quorum: Remove s from quorum_aio_get()
+ arguments
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,34 +20,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: patches@linaro.org, Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-These patches fix a couple of issues with the VM load code
-which I noticed while investigating a coverity warning.
+There is no point in passing the value of bs->opaque in order to
+overwrite it with itself.
 
-The first patch fixes a problem with the accounting for
-host pixmap memory usage -- we didn't recalculate the
-current usage following a VM migration, but instead
-started again at zero, which means that if you keep
-bumping the VM from host to host you can sidestep the
-host_maxmem limit.
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
+---
+ block/quorum.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
-The second patch fixes the coverity warning (that if we
-fail in the "creating resources" loop in the load function
-we will leak memory and so on). The leak isn't very
-serious, because if we fail the inbound migration then
-the whole QEMU process is pretty useless for anything,
-but it's easy enough to fix "correctly", ie so that a
-subsequent system reset will put the device back into
-a sane state.
-
-Peter Maydell (2):
-  virtio-gpu: Recalculate VirtIOGPU::hostmem on VM load
-  virtio-gpu: Fix memory leak in virtio_gpu_load()
-
- hw/display/virtio-gpu.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
-
+diff --git a/block/quorum.c b/block/quorum.c
+index d122299..dfa9fd3 100644
+--- a/block/quorum.c
++++ b/block/quorum.c
+@@ -171,18 +171,17 @@ static bool quorum_64bits_compare(QuorumVoteValue *a, QuorumVoteValue *b)
+     return a->l == b->l;
+ }
+ 
+-static QuorumAIOCB *quorum_aio_get(BDRVQuorumState *s,
+-                                   BlockDriverState *bs,
++static QuorumAIOCB *quorum_aio_get(BlockDriverState *bs,
+                                    QEMUIOVector *qiov,
+                                    uint64_t sector_num,
+                                    int nb_sectors,
+                                    BlockCompletionFunc *cb,
+                                    void *opaque)
+ {
++    BDRVQuorumState *s = bs->opaque;
+     QuorumAIOCB *acb = qemu_aio_get(&quorum_aiocb_info, bs, cb, opaque);
+     int i;
+ 
+-    acb->common.bs->opaque = s;
+     acb->sector_num = sector_num;
+     acb->nb_sectors = nb_sectors;
+     acb->qiov = qiov;
+@@ -691,7 +690,7 @@ static BlockAIOCB *quorum_aio_readv(BlockDriverState *bs,
+                                     void *opaque)
+ {
+     BDRVQuorumState *s = bs->opaque;
+-    QuorumAIOCB *acb = quorum_aio_get(s, bs, qiov, sector_num,
++    QuorumAIOCB *acb = quorum_aio_get(bs, qiov, sector_num,
+                                       nb_sectors, cb, opaque);
+     acb->is_read = true;
+     acb->children_read = 0;
+@@ -711,7 +710,7 @@ static BlockAIOCB *quorum_aio_writev(BlockDriverState *bs,
+                                      void *opaque)
+ {
+     BDRVQuorumState *s = bs->opaque;
+-    QuorumAIOCB *acb = quorum_aio_get(s, bs, qiov, sector_num, nb_sectors,
++    QuorumAIOCB *acb = quorum_aio_get(bs, qiov, sector_num, nb_sectors,
+                                       cb, opaque);
+     int i;
+ 
 -- 
-2.7.4
+1.8.3.1
