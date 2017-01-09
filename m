@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40943)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40965)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cQgKE-0005Mg-EI
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 15:13:51 -0500
+	(envelope-from <edgar.iglesias@gmail.com>) id 1cQgKQ-0005WK-8n
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 15:14:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cQgKD-0001Kb-FW
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 15:13:50 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55852)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cQgKD-0001KT-8u
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 15:13:49 -0500
-Received: from int-mx13.intmail.prod.int.phx2.redhat.com
-	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7F60E4E047
-	for <qemu-devel@nongnu.org>; Mon,  9 Jan 2017 20:13:49 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Mon,  9 Jan 2017 20:13:40 +0000
-Message-Id: <20170109201340.16593-4-dgilbert@redhat.com>
-In-Reply-To: <20170109201340.16593-1-dgilbert@redhat.com>
-References: <20170109201340.16593-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH 3/3] vmstate registration: check return values
+	(envelope-from <edgar.iglesias@gmail.com>) id 1cQgKN-0001LG-1v
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 15:14:02 -0500
+Date: Mon, 9 Jan 2017 21:13:54 +0100
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Message-ID: <20170109201354.GV9606@toto>
+References: <1483988759-14606-1-git-send-email-peter.maydell@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1483988759-14606-1-git-send-email-peter.maydell@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH] disas/cris.c: Fix Coverity warning about
+ unchecked NULL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,37 +23,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, mst@redhat.com, pbonzini@redhat.com, quintela@redhat.com, amit.shah@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, patches@linaro.org
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+On Mon, Jan 09, 2017 at 07:05:59PM +0000, Peter Maydell wrote:
+> Coverity (CID 1005689) warns that we don't check that
+> spec_reg_info() returned non-NULL before dereferencing.
+> Add the check, though as the comment notes this is
+> a can't-really-happen case because the earlier constraint
+> matching should have ruled out the "unknown reg" case.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-Check qdev's call to vmstate_register_with_alias_id; that gets
-most of the common uses; there's hundreds of calls via vmstate_register
-which could get fixed over time.
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- hw/core/qdev.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-index ea97b15..df633d0 100644
---- a/hw/core/qdev.c
-+++ b/hw/core/qdev.c
-@@ -933,10 +933,12 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
-         }
- 
-         if (qdev_get_vmsd(dev)) {
--            vmstate_register_with_alias_id(dev, -1, qdev_get_vmsd(dev), dev,
-+            if (vmstate_register_with_alias_id(dev, -1, qdev_get_vmsd(dev), dev,
-                                            dev->instance_id_alias,
-                                            dev->alias_required_for_version,
--                                           NULL);
-+                                           &local_err) < 0) {
-+                goto post_realize_fail;
-+            }
-         }
- 
-         QLIST_FOREACH(bus, &dev->child_bus, sibling) {
--- 
-2.9.3
+> ---
+>  disas/cris.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/disas/cris.c b/disas/cris.c
+> index 08161d1..8a1daf9 100644
+> --- a/disas/cris.c
+> +++ b/disas/cris.c
+> @@ -2490,7 +2490,7 @@ print_with_operands (const struct cris_opcode *opcodep,
+>  	const struct cris_spec_reg *sregp
+>  	  = spec_reg_info ((insn >> 12) & 15, disdata->distype);
+>  
+> -	if (sregp->name == NULL)
+> +	if (sregp == NULL || sregp->name == NULL)
+>  	  /* Should have been caught as a non-match earlier.  */
+>  	  *tp++ = '?';
+>  	else
+> -- 
+> 2.7.4
+> 
