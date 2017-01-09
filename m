@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33309)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33379)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cQaFn-0006h7-Jq
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 08:44:52 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cQaFp-0006jn-Ou
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 08:44:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1cQaFm-0002yX-HY
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 08:44:51 -0500
+	(envelope-from <kwolf@redhat.com>) id 1cQaFo-0002zc-Ct
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 08:44:53 -0500
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon,  9 Jan 2017 14:44:24 +0100
-Message-Id: <1483969476-7172-3-git-send-email-kwolf@redhat.com>
+Date: Mon,  9 Jan 2017 14:44:27 +0100
+Message-Id: <1483969476-7172-6-git-send-email-kwolf@redhat.com>
 In-Reply-To: <1483969476-7172-1-git-send-email-kwolf@redhat.com>
 References: <1483969476-7172-1-git-send-email-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 02/14] coroutine: Introduce
- qemu_coroutine_enter_if_inactive()
+Subject: [Qemu-devel] [PULL 05/14] quorum: Do cleanup in caller coroutine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,53 +22,78 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-In the context of asynchronous work, if we have a worker coroutine that
-didn't yield, the parent coroutine cannot be reentered because it hasn't
-yielded yet. In this case we don't even have to reenter the parent
-because it will see that the work is already done and won't even yield.
+Instead of calling quorum_aio_finalize() deeply nested in what used
+to be an AIO callback, do it in the same functions that allocated the
+AIOCB.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Alberto Garcia <berto@igalia.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- include/qemu/coroutine.h | 6 ++++++
- util/qemu-coroutine.c    | 7 +++++++
- 2 files changed, 13 insertions(+)
+ block/quorum.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
 
-diff --git a/include/qemu/coroutine.h b/include/qemu/coroutine.h
-index e6a60d5..12584ed 100644
---- a/include/qemu/coroutine.h
-+++ b/include/qemu/coroutine.h
-@@ -71,6 +71,12 @@ Coroutine *qemu_coroutine_create(CoroutineEntry *entry, void *opaque);
- void qemu_coroutine_enter(Coroutine *coroutine);
+diff --git a/block/quorum.c b/block/quorum.c
+index 6a7bd91..e044010 100644
+--- a/block/quorum.c
++++ b/block/quorum.c
+@@ -144,9 +144,8 @@ static bool quorum_vote(QuorumAIOCB *acb);
  
- /**
-+ * Transfer control to a coroutine if it's not active (i.e. part of the call
-+ * stack of the running coroutine). Otherwise, do nothing.
-+ */
-+void qemu_coroutine_enter_if_inactive(Coroutine *co);
+ static void quorum_aio_finalize(QuorumAIOCB *acb)
+ {
+-    acb->has_completed = true;
+     g_free(acb->qcrs);
+-    qemu_coroutine_enter_if_inactive(acb->co);
++    g_free(acb);
+ }
+ 
+ static bool quorum_sha256_compare(QuorumVoteValue *a, QuorumVoteValue *b)
+@@ -238,7 +237,8 @@ static void quorum_rewrite_aio_cb(void *opaque, int ret)
+         return;
+     }
+ 
+-    quorum_aio_finalize(acb);
++    acb->has_completed = true;
++    qemu_coroutine_enter_if_inactive(acb->co);
+ }
+ 
+ static int read_fifo_child(QuorumAIOCB *acb);
+@@ -284,7 +284,7 @@ static int quorum_fifo_aio_cb(void *opaque, int ret)
+     acb->vote_ret = ret;
+ 
+     /* FIXME: rewrite failed children if acb->children_read > 1? */
+-    quorum_aio_finalize(acb);
 +
-+/**
-  * Transfer control back to a coroutine's caller
-  *
-  * This function does not return until the coroutine is re-entered using
-diff --git a/util/qemu-coroutine.c b/util/qemu-coroutine.c
-index 737bffa..a5d2f6c 100644
---- a/util/qemu-coroutine.c
-+++ b/util/qemu-coroutine.c
-@@ -131,6 +131,13 @@ void qemu_coroutine_enter(Coroutine *co)
+     return ret;
+ }
+ 
+@@ -322,7 +322,8 @@ static void quorum_aio_cb(void *opaque, int ret)
+ 
+     /* if no rewrite is done the code will finish right away */
+     if (!rewrite) {
+-        quorum_aio_finalize(acb);
++        acb->has_completed = true;
++        qemu_coroutine_enter_if_inactive(acb->co);
      }
  }
  
-+void qemu_coroutine_enter_if_inactive(Coroutine *co)
-+{
-+    if (!qemu_coroutine_entered(co)) {
-+        qemu_coroutine_enter(co);
-+    }
-+}
+@@ -715,7 +716,8 @@ static int quorum_co_readv(BlockDriverState *bs,
+     } else {
+         ret = read_fifo_child(acb);
+     }
+-    g_free(acb);
++    quorum_aio_finalize(acb);
 +
- void coroutine_fn qemu_coroutine_yield(void)
- {
-     Coroutine *self = qemu_coroutine_self();
+     return ret;
+ }
+ 
+@@ -757,6 +759,7 @@ static int quorum_co_writev(BlockDriverState *bs,
+     }
+ 
+     ret = acb->vote_ret;
++    quorum_aio_finalize(acb);
+ 
+     return ret;
+ }
 -- 
 1.8.3.1
