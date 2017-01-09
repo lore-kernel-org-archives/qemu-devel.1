@@ -1,38 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56792)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58540)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cQToe-0001nQ-SC
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 01:52:25 -0500
+	(envelope-from <longpeng2@huawei.com>) id 1cQU1g-00045i-UA
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 02:05:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cQTob-0002Ti-S2
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 01:52:24 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34359
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
-	id 1cQTob-0002TJ-NN
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 01:52:21 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	v096mUTb060186
-	for <qemu-devel@nongnu.org>; Mon, 9 Jan 2017 01:52:20 -0500
-Received: from e28smtp09.in.ibm.com (e28smtp09.in.ibm.com [125.16.236.9])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 27v55y12tb-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 09 Jan 2017 01:52:19 -0500
-Received: from localhost
-	by e28smtp09.in.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
-	Mon, 9 Jan 2017 12:22:16 +0530
-From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-In-Reply-To: <20170109024909.GE12515@umbus.fritz.box>
-References: <1483683296-32568-1-git-send-email-nikunj@linux.vnet.ibm.com>
-	<20170109024909.GE12515@umbus.fritz.box>
-Date: Mon, 09 Jan 2017 12:21:58 +0530
+	(envelope-from <longpeng2@huawei.com>) id 1cQU1c-0000V1-8Q
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 02:05:52 -0500
+Received: from szxga02-in.huawei.com ([119.145.14.65]:7454)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <longpeng2@huawei.com>) id 1cQU1b-00008X-TQ
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 02:05:48 -0500
+Message-ID: <58733617.3050503@huawei.com>
+Date: Mon, 9 Jan 2017 15:04:55 +0800
+From: "Longpeng (Mike)" <longpeng2@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Message-Id: <874m18rai9.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-Subject: Re: [Qemu-devel] [PATCH v1 00/14] POWER9 TCG enablements - part10
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] Question about add AF_ALG backend for virtio-crypto
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,34 +24,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, rth@twiddle.net, qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com
+To: "Daniel P. Berrange" <berrange@redhat.com>, stefanha@redhat.com, Paolo
+	Bonzini <pbonzini@redhat.com>
+Cc: QEMU-DEV <qemu-devel@nongnu.org>, "Wubin (H)" <wu.wubin@huawei.com>, "Zhoujian (jay, Euler)" <jianjay.zhou@huawei.com>, Gonglei <arei.gonglei@huawei.com>, longpeng2@huawei.com
 
-David Gibson <david@gibson.dropbear.id.au> writes:
+Hi guys,
 
-> [ Unknown signature status ]
-> On Fri, Jan 06, 2017 at 11:44:42AM +0530, Nikunj A Dadhania wrote:
->> This series contains 11 new instructions for POWER9 ISA3.0
->>      VSX Vector Insert/Extract Word
->>      VSX Scalar Extract Exponent/Significand
->>      VSX Scalar Convert
->>      VSX Scalar Add QP
->>      Various float related improvements
->
-> Applied to ppc-for-2.9, thanks.
+I'm one of Gonglei's virtio-crypto project members, and we plan to add a AF_ALG
+backend for virtio-crypto(there's only builtin-backend currently).
 
-Found issue in register numbering in 3 instructions.
-xsaddqp
-xscvdpqp
-xscvqpdp
+I found that Catalin, Paolo and Stefan had discussed about this in 2015
+(http://www.spinics.net/lists/kvm/msg115457.html), but it seems that Catalin
+didn't do it, so I'm confuse about wether it is need to add a AF_ALG backend.
 
-Please drop following:
+Do you have any suggestion? Thanks :)
 
-  target-ppc: Add xsaddqp instructions
-  target-ppc: Add xscvdpqp instruction
-  target-ppc: Add xscvqpdp instruction
-
-I will resend them.
-
-Regards
-Nikunj
+-- 
+Regards,
+Longpeng(Mike)
