@@ -1,33 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52584)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52854)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cQiy2-00085v-4I
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 18:03:07 -0500
+	(envelope-from <mst@redhat.com>) id 1cQiz5-00008V-JN
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 18:04:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cQiy1-00077O-9R
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 18:03:06 -0500
-Received: from mail-ua0-x22a.google.com ([2607:f8b0:400c:c08::22a]:34800)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cQiy1-00077F-58
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 18:03:05 -0500
-Received: by mail-ua0-x22a.google.com with SMTP id 35so40802824uak.1
-	for <qemu-devel@nongnu.org>; Mon, 09 Jan 2017 15:03:05 -0800 (PST)
+	(envelope-from <mst@redhat.com>) id 1cQiz2-0007J1-FX
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 18:04:11 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38204)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cQiz2-0007Ir-7C
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 18:04:08 -0500
+Date: Tue, 10 Jan 2017 01:04:06 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170110005600-mutt-send-email-mst@kernel.org>
+References: <1483175736-17137-1-git-send-email-caoj.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-In-Reply-To: <f3c873b5-1ccb-0cd4-e9fd-2f41fbdf0cca@tribudubois.net>
-References: <20170104220624.26557-1-jcd@tribudubois.net>
-	<CAFEAcA8dwhoSZTWS9JJ6-vSUs1Asw8ymktmD+oOqx0DNpCV2XQ@mail.gmail.com>
-	<1be7123c-acee-7d16-8a10-c8965d5805ff@gmail.com>
-	<CAFEAcA9cUEGL=rSrq2cstParBYHMWdkDy_acu7mTW754+G_Y6Q@mail.gmail.com>
-	<fb9b6b0a-62b5-2421-2826-d3f853b5d5b3@tribudubois.net>
-	<f6ddf63f-78b8-935b-9075-838a0ca0aa7d@tribudubois.net>
-	<CAFEAcA_3saBFbSX+e7P9X9n1wXV2=FjCMXML31MDq2xf+HdJmQ@mail.gmail.com>
-	<f3c873b5-1ccb-0cd4-e9fd-2f41fbdf0cca@tribudubois.net>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 9 Jan 2017 23:02:43 +0000
-Message-ID: <CAFEAcA-v8RJNLSjT4ALoBNUhZQSxHPupd5rg6t44ui5h4h8BuA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v4] [i.MX] fix CS handling during SPI
- access.
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1483175736-17137-1-git-send-email-caoj.fnst@cn.fujitsu.com>
+Subject: Re: [Qemu-devel] [PATCH v2] vfio/pci: Support error recovery
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,20 +26,170 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jean-Christophe DUBOIS <jcd@tribudubois.net>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "mar.krzeminski" <mar.krzeminski@gmail.com>
+To: Cao jin <caoj.fnst@cn.fujitsu.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, izumi.taku@jp.fujitsu.com, alex.williamson@redhat.com
 
-On 9 January 2017 at 22:27, Jean-Christophe DUBOIS <jcd@tribudubois.net> wrote:
-> I might be wrong but I think they are coming out of reset with
-> their CS line set to low (so they are selected by default)
-> because this is the default level at reset.
+On Sat, Dec 31, 2016 at 05:15:36PM +0800, Cao jin wrote:
+> Support serious device error recovery
 
-If that's true then you're in difficulties, because
-there's no guarantee about device reset order. So
-even if your SPI controller calls qemu_set_irq in
-its reset function, if the devices on the other
-end happen to have their reset called after the
-controller then they'll still reset into selected...
+serious?
 
-thanks
--- PMM
+> 
+> Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
+> ---
+>  drivers/vfio/pci/vfio_pci.c         | 70 +++++++++++++++++++++++++++++++++++--
+>  drivers/vfio/pci/vfio_pci_private.h |  2 ++
+>  2 files changed, 70 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+> index 712a849..752af20 100644
+> --- a/drivers/vfio/pci/vfio_pci.c
+> +++ b/drivers/vfio/pci/vfio_pci.c
+> @@ -534,6 +534,15 @@ static long vfio_pci_ioctl(void *device_data,
+>  {
+>  	struct vfio_pci_device *vdev = device_data;
+>  	unsigned long minsz;
+> +	int ret;
+> +
+> +	if (vdev->aer_recovering && (cmd == VFIO_DEVICE_SET_IRQS ||
+> +	    cmd == VFIO_DEVICE_RESET || cmd == VFIO_DEVICE_PCI_HOT_RESET)) {
+> +		ret = wait_for_completion_interruptible(
+> +			&vdev->aer_completion);
+
+don't split it like that.
+
+> +		if (ret)
+> +			return ret;
+> +	}
+>  
+>  	if (cmd == VFIO_DEVICE_GET_INFO) {
+>  		struct vfio_device_info info;
+> @@ -953,6 +962,15 @@ static ssize_t vfio_pci_rw(void *device_data, char __user *buf,
+>  {
+>  	unsigned int index = VFIO_PCI_OFFSET_TO_INDEX(*ppos);
+>  	struct vfio_pci_device *vdev = device_data;
+> +	int ret;
+> +
+> +	/* block all kinds of access during host recovery */
+> +	if (vdev->aer_recovering) {
+> +		ret = wait_for_completion_interruptible(
+> +			&vdev->aer_completion);
+> +		if (ret)
+> +			return ret;
+> +	}
+>  
+>  	if (index >= VFIO_PCI_NUM_REGIONS + vdev->num_regions)
+>  		return -EINVAL;
+> @@ -1117,6 +1135,7 @@ static int vfio_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+>  	vdev->irq_type = VFIO_PCI_NUM_IRQS;
+>  	mutex_init(&vdev->igate);
+>  	spin_lock_init(&vdev->irqlock);
+> +	init_completion(&vdev->aer_completion);
+>  
+>  	ret = vfio_add_group_dev(&pdev->dev, &vfio_pci_ops, vdev);
+>  	if (ret) {
+> @@ -1176,6 +1195,9 @@ static pci_ers_result_t vfio_pci_aer_err_detected(struct pci_dev *pdev,
+>  {
+>  	struct vfio_pci_device *vdev;
+>  	struct vfio_device *device;
+> +	u32 uncor_status;
+> +	unsigned int aer_cap_offset;
+> +	int ret;
+>  
+>  	device = vfio_device_get_from_dev(&pdev->dev);
+>  	if (device == NULL)
+> @@ -1187,10 +1209,29 @@ static pci_ers_result_t vfio_pci_aer_err_detected(struct pci_dev *pdev,
+>  		return PCI_ERS_RESULT_DISCONNECT;
+>  	}
+>  
+> +	/*
+> +	 * get device's uncorrectable error status as soon as possible,
+
+should be "Get".
+
+> +	 * and signal it to user space. The later we read it, the possibility
+> +	 * the register value is mangled grows.
+> +	 */
+> +	aer_cap_offset = pci_find_ext_capability(vdev->pdev, PCI_EXT_CAP_ID_ERR);
+> +	ret = pci_read_config_dword(vdev->pdev, aer_cap_offset +
+> +                                    PCI_ERR_UNCOR_STATUS, &uncor_status);
+> +        if (ret)
+> +                return PCI_ERS_RESULT_DISCONNECT;
+> +
+> +	pr_info("device %d got AER detect notification. uncorrectable error status = 0x%x\n", pdev->devfn, uncor_status);//to be removed
+
+Pls drop this.
+
+>  	mutex_lock(&vdev->igate);
+>  
+> -	if (vdev->err_trigger)
+> -		eventfd_signal(vdev->err_trigger, 1);
+> +	vdev->aer_recovering = true;
+> +	reinit_completion(&vdev->aer_completion);
+> +
+> +	if (vdev->err_trigger && uncor_status) {
+> +		pr_info("device %d signal uncor status 0x%x to user",
+> +			pdev->devfn, uncor_status);
+> +		/* signal uncorrectable error status to user space */
+> +		eventfd_signal(vdev->err_trigger, uncor_status);
+> +        }
+>  
+>  	mutex_unlock(&vdev->igate);
+>  
+> @@ -1199,8 +1240,33 @@ static pci_ers_result_t vfio_pci_aer_err_detected(struct pci_dev *pdev,
+>  	return PCI_ERS_RESULT_CAN_RECOVER;
+>  }
+>  
+> +static void vfio_pci_aer_resume(struct pci_dev *pdev)
+> +{
+> +	struct vfio_pci_device *vdev;
+> +	struct vfio_device *device;
+> +
+> +	device = vfio_device_get_from_dev(&pdev->dev);
+> +	if (device == NULL)
+> +		return;
+> +
+> +	vdev = vfio_device_data(device);
+> +	if (vdev == NULL) {
+> +		vfio_device_put(device);
+> +		return;
+> +	}
+> +
+> +	mutex_lock(&vdev->igate);
+> +	vdev->aer_recovering = false;
+> +	mutex_unlock(&vdev->igate);
+> +
+> +	complete_all(&vdev->aer_completion);
+> +
+> +	vfio_device_put(device);
+> +}
+> +
+>  static const struct pci_error_handlers vfio_err_handlers = {
+>  	.error_detected = vfio_pci_aer_err_detected,
+> +	.resume         = vfio_pci_aer_resume,
+>  };
+>  
+>  static struct pci_driver vfio_pci_driver = {
+> diff --git a/drivers/vfio/pci/vfio_pci_private.h b/drivers/vfio/pci/vfio_pci_private.h
+> index 8a7d546..ba8471f 100644
+> --- a/drivers/vfio/pci/vfio_pci_private.h
+> +++ b/drivers/vfio/pci/vfio_pci_private.h
+> @@ -83,6 +83,8 @@ struct vfio_pci_device {
+>  	bool			bardirty;
+>  	bool			has_vga;
+>  	bool			needs_reset;
+> +	bool			aer_recovering;
+> +	struct completion	aer_completion;
+>  	struct pci_saved_state	*pci_saved_state;
+>  	int			refcnt;
+>  	struct eventfd_ctx	*err_trigger;
+> -- 
+> 1.8.3.1
+> 
+> 
+
+How about some explanation about what is going on here?  All these
+changes seem racy since any number of errors can trigger at any time.
+
+-- 
+MST
