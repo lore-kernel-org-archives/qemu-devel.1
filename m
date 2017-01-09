@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53069)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53367)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cQfJm-0000G4-HA
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 14:09:19 -0500
+	(envelope-from <no-reply@patchew.org>) id 1cQfLI-00018F-H7
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 14:10:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cQfJl-0004be-HI
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 14:09:18 -0500
-Received: from mail-ua0-x22d.google.com ([2607:f8b0:400c:c08::22d]:33357)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cQfJl-0004bU-DI
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 14:09:17 -0500
-Received: by mail-ua0-x22d.google.com with SMTP id i68so365816092uad.0
-	for <qemu-devel@nongnu.org>; Mon, 09 Jan 2017 11:09:17 -0800 (PST)
+	(envelope-from <no-reply@patchew.org>) id 1cQfLE-0005Lg-FW
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 14:10:52 -0500
+Resent-Message-Id: <E1cQfLE-0005Lg-FW@eggs.gnu.org>
+In-Reply-To: <1483988759-14606-1-git-send-email-peter.maydell@linaro.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <148398903105.208.13573655327114962163@790289a7ca88>
 MIME-Version: 1.0
-In-Reply-To: <20170109190217.16301-1-rth@twiddle.net>
-References: <20170109190217.16301-1-rth@twiddle.net>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 9 Jan 2017 19:08:56 +0000
-Message-ID: <CAFEAcA-O6HDYeVcTX4=ntso56Bs4o+w1RAO1Z_-KFrHZo3DRpA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL v2 00/11] tcg host mips64 support
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 9 Jan 2017 11:10:32 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH] disas/cris.c: Fix Coverity warning about
+ unchecked NULL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,52 +24,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: peter.maydell@linaro.org
+Cc: famz@redhat.com, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, edgar.iglesias@gmail.com, patches@linaro.org
 
-On 9 January 2017 at 19:02, Richard Henderson <rth@twiddle.net> wrote:
-> [Bah.  This time with actual request-pull info.]
->
-> This is v6 of Jin Guojie's patch set, as tested by Aurelien Jarno,
-> James Hogan, and Yun Qiang Su.  Plus one more patch from me to fix
-> a trival Werror in mips specific code with gcc 5.3.
->
->
-> r~
->
->
-> The following changes since commit f0d703314ecb0415d51425727ed73ad2c6e3238a:
->
->   tcg-mips: Adjust qemu_ld/st for mips64 (2017-01-06 10:09:10 -0800)
->
-> are available in the git repository at:
->
->   git://github.com/rth7680/qemu.git tags/pull-tcg-20170108
->
-> for you to fetch changes up to f68808c7494b38764e1895a9852b994638b86536:
->
->   translate-all: Avoid -Werror=switch-bool (2017-01-08 09:48:34 -0800)
->
-> ----------------------------------------------------------------
-> TCG host support for mips64
->
-> ----------------------------------------------------------------
-> Richard Henderson (1):
->       translate-all: Avoid -Werror=switch-bool
->
->  translate-all.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-
-Your pullreq has more stuff in it than the above diffstat and
-patchlist say :-)
-
-tcg/mips/tcg-target.h     | 60 ++-
-tcg/mips/tcg-target.inc.c | 1170
-++++++++++++++++++++++++++++++++++++++++-----------
-translate-all.c           | 2 +-
- 3 files changed, 978 insertions(+), 254 deletions(-)
-
-I'm processing it anyway.
-
-thanks
--- PMM
+SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
+ZGV2ZWxdIFtQQVRDSF0gZGlzYXMvY3Jpcy5jOiBGaXggQ292ZXJpdHkgd2FybmluZyBhYm91dCB1
+bmNoZWNrZWQgTlVMTApUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMTQ4Mzk4ODc1OS0xNDYwNi0x
+LWdpdC1zZW5kLWVtYWlsLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZwoKPT09IFRFU1QgU0NSSVBU
+IEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1v
+bmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCiMgVXNlZnVsIGdpdCBvcHRpb25zCmdp
+dCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
+ZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNl
+ICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENI
+ICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBn
+aXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFp
+bGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49
+JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRh
+dGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6
+Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgIHBh
+dGNoZXcvMTQ4Mzk4ODc1OS0xNDYwNi0xLWdpdC1zZW5kLWVtYWlsLXBldGVyLm1heWRlbGxAbGlu
+YXJvLm9yZyAtPiBwYXRjaGV3LzE0ODM5ODg3NTktMTQ2MDYtMS1naXQtc2VuZC1lbWFpbC1wZXRl
+ci5tYXlkZWxsQGxpbmFyby5vcmcKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo2M2Nm
+YTI2IGRpc2FzL2NyaXMuYzogRml4IENvdmVyaXR5IHdhcm5pbmcgYWJvdXQgdW5jaGVja2VkIE5V
+TEwKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTogZGlzYXMvY3Jpcy5j
+OiBGaXggQ292ZXJpdHkgd2FybmluZyBhYm91dCB1bmNoZWNrZWQgTlVMTC4uLgpFUlJPUjogY29k
+ZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMyNDogRklMRTogZGlzYXMvY3Jpcy5jOjI0
+OTM6CiteSWlmIChzcmVncCA9PSBOVUxMIHx8IHNyZWdwLT5uYW1lID09IE5VTEwpJAoKRVJST1I6
+IHN1c3BlY3QgY29kZSBpbmRlbnQgZm9yIGNvbmRpdGlvbmFsIHN0YXRlbWVudHMgKDgsIDEwKQoj
+MjQ6IEZJTEU6IGRpc2FzL2NyaXMuYzoyNDkzOgorCWlmIChzcmVncCA9PSBOVUxMIHx8IHNyZWdw
+LT5uYW1lID09IE5VTEwpCiAJICAvKiBTaG91bGQgaGF2ZSBiZWVuIGNhdWdodCBhcyBhIG5vbi1t
+YXRjaCBlYXJsaWVyLiAgKi8KCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxs
+IGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzI0OiBGSUxFOiBkaXNhcy9jcmlzLmM6MjQ5MzoKKwlp
+ZiAoc3JlZ3AgPT0gTlVMTCB8fCBzcmVncC0+bmFtZSA9PSBOVUxMKQpbLi4uXQoKdG90YWw6IDMg
+ZXJyb3JzLCAwIHdhcm5pbmdzLCA4IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxl
+IHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFs
+c2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRD
+SCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRl
+ZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0
+Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8g
+cGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
