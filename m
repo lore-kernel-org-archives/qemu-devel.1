@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33464)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33471)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cQRb3-0004t2-4r
-	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 23:30:14 -0500
+	(envelope-from <bounces@canonical.com>) id 1cQRb3-0004ta-Qs
+	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 23:30:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cQRb1-0001rh-Lh
+	(envelope-from <bounces@canonical.com>) id 1cQRb2-0001sz-Mf
 	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 23:30:13 -0500
-Received: from indium.canonical.com ([91.189.90.7]:37262)
+Received: from indium.canonical.com ([91.189.90.7]:37278)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cQRb1-0001r9-Fm
-	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 23:30:11 -0500
+	id 1cQRb2-0001sN-Gr
+	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 23:30:12 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cQRb0-0007x1-JZ
-	for <qemu-devel@nongnu.org>; Mon, 09 Jan 2017 04:30:10 +0000
+	id 1cQRb1-0007x6-N9
+	for <qemu-devel@nongnu.org>; Mon, 09 Jan 2017 04:30:11 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 8BD1C2E80C4
-	for <qemu-devel@nongnu.org>; Mon,  9 Jan 2017 04:30:10 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id AD4272E8030
+	for <qemu-devel@nongnu.org>; Mon,  9 Jan 2017 04:30:11 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 09 Jan 2017 04:17:30 -0000
-From: Launchpad Bug Tracker <680758@bugs.launchpad.net>
-Reply-To: Bug 680758 <680758@bugs.launchpad.net>
+Date: Mon, 09 Jan 2017 04:17:47 -0000
+From: Launchpad Bug Tracker <597351@bugs.launchpad.net>
+Reply-To: Bug 597351 <597351@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20101124034709.25625.14961.malonedeb@gandwana.canonical.com>
-Message-Id: <20170109041730.18789.14727.malone@loganberry.canonical.com>
+References: <20100622164530.31796.85287.malonedeb@soybean.canonical.com>
+Message-Id: <20170109041747.18789.12894.malone@loganberry.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 680758] Re: balloon only resizes by 2M
+Subject: [Qemu-devel] [Bug 597351] Re: Slow UDP performance with virtio
+ device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -47,52 +48,44 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/680758
+https://bugs.launchpad.net/bugs/597351
 
 Title:
-  balloon only resizes by 2M
+  Slow UDP performance with virtio device
 
 Status in QEMU:
   Expired
 
 Bug description:
-  when in monitor and running balloon 512 from a 1024M VM, the vm
-  dropped the size to 1020 (this value changes), then every subsequent
-  request to balloon 512 will drop it by another 2M.  The system was
-  running at above 60% RAM free when these requests were made.  also
-  requesting to up the ram results in no change above 1024 (I'm guessing
-  this is intentional, but was unable to find any documentation)
+  I'm working on an app that is very sensitive to round-trip latency
+  between the guest and host, and qemu/kvm seems to be significantly
+  slower than it needs to be.
 
-  Versions:
+  The attached program is a ping/pong over UDP.  Call it with a single
+  argument to start a listener/echo server on that port.  With three
+  arguments it becomes a counted "pinger" that will exit after a
+  specified number of round trips for performance measurements.  For
+  example:
 
-  qemu-kvm 0.13.0
-  qemu-kvm.git b377474e589e5a1fe2abc7b13fafa8bad802637a
+    $ gcc -o udp-pong udp-pong.c
+    $ ./udp-pong 12345 &                       # start a listener on port 1=
+2345
+    $ time ./udp-pong 127.0.0.1 12345 1000000  # time a million round trips
 
-  Qemu Command Line:
+  When run on the loopback device on a single machine (true on the host
+  or within a guest), I get about 100k/s.
 
-  ./x86_64-softmmu/qemu-system-x86_64 -drive
-  file=3D/var/machines/seven.base,if=3Dvirtio -net
-  nic,model=3Dvirtio,macaddr=3D02:00:00:00:00:01 -net tap,script=3D/etc/qemu
-  /qemu-ifup,downscript=3D/etc/qemu/qemu-ifdown -vga std -usb -usbdevice
-  tablet -rtc base=3Dlocaltime,clock=3Dhost -watchdog i6300esb -balloon
-  virtio -m 1024 -no-quit -smp 2 -monitor stdio
+  When run across a port forward using "user" networking on qemu (or
+  kvm, the performance is the same) and the default rtl8139 driver (both
+  the host and guest are Ubuntu Lucid), I get about 10k/s.  This seems
+  very slow, but perhaps unavoidably so?
 
-  Monitor Session:
+  When run in the same configuration using the "virtio" driver, I get
+  only 2k/s.  This is almost certainly a bug in the virtio driver, given
+  that it's a paravirtualized device that is 5x slower than the "slow"
+  hardware emulation.
 
-  QEMU 0.13.50 monitor - type 'help' for more information
-  (qemu) info balloon
-  balloon: actual=3D1024
-  (qemu) balloon 1536
-  (qemu) info balloon
-  balloon: actual=3D1024
-  (qemu) balloon 512
-  (qemu) info balloon
-  balloon: actual=3D1020
-  (qemu) info balloon
-  balloon: actual=3D1020
-  (qemu) balloon 512
-  (qemu) info balloon
-  balloon: actual=3D1018
+  I get no meaningful change in performance between kvm/qemu.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/680758/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/597351/+subscriptions
