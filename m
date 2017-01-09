@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54466)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54490)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cQZhw-0004yY-GW
+	(envelope-from <kraxel@redhat.com>) id 1cQZhx-0004z5-3y
 	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 08:09:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cQZht-0008RI-H2
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 08:09:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34020)
+	(envelope-from <kraxel@redhat.com>) id 1cQZhv-0008Sk-OO
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 08:09:53 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52310)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cQZht-0008Qr-BN
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 08:09:49 -0500
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cQZhv-0008S1-Jm
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 08:09:51 -0500
+Received: from int-mx10.intmail.prod.int.phx2.redhat.com
+	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D52A8C0567A1
+	for <qemu-devel@nongnu.org>; Mon,  9 Jan 2017 13:09:51 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon,  9 Jan 2017 14:09:35 +0100
-Message-Id: <1483967385-12891-2-git-send-email-kraxel@redhat.com>
+Date: Mon,  9 Jan 2017 14:09:42 +0100
+Message-Id: <1483967385-12891-9-git-send-email-kraxel@redhat.com>
 In-Reply-To: <1483967385-12891-1-git-send-email-kraxel@redhat.com>
 References: <1483967385-12891-1-git-send-email-kraxel@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 01/11] ui/gtk: fix crash at startup when no
- console is available
+Subject: [Qemu-devel] [PULL v2 08/11] ui: drop unused MOUSE_EVENT_WHEEL{UP,
+ DN} defines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,55 +31,35 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-From: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
+Also update comment to make clear this
+is for legacy mouse emulation only.
 
-This patch fixes a segfault at QEMU startup, introduced in a08156321ab9a7=
-d2fed9ee77dbfeea2a61ffd153.
-gd_vc_find_current() return NULL, which is dereferenced without checking =
-it.
-
-While at it, disable the whole 'View' menu if no console exists.
-
-Reproducer: qemu-system-i386 -M none -nodefaults
-
-Signed-off-by: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Message-id: 1483263585-8101-1-git-send-email-hpoussin@reactos.org
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Message-id: 1480409632-6163-1-git-send-email-kraxel@redhat.com
 ---
- ui/gtk.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ include/ui/console.h | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-diff --git a/ui/gtk.c b/ui/gtk.c
-index a216216..406de4f 100644
---- a/ui/gtk.c
-+++ b/ui/gtk.c
-@@ -2171,6 +2171,8 @@ static gboolean gtkinit;
-=20
- void gtk_display_init(DisplayState *ds, bool full_screen, bool grab_on_h=
-over)
- {
-+    VirtualConsole *vc;
-+
-     GtkDisplayState *s =3D g_malloc0(sizeof(*s));
-     char *filename;
-     GdkDisplay *window_display;
-@@ -2249,9 +2251,11 @@ void gtk_display_init(DisplayState *ds, bool full_=
-screen, bool grab_on_hover)
-     }
+diff --git a/include/ui/console.h b/include/ui/console.h
+index ee8c407..753ae93 100644
+--- a/include/ui/console.h
++++ b/include/ui/console.h
+@@ -13,13 +13,10 @@
+ # include <epoxy/gl.h>
  #endif
-=20
-+    vc =3D gd_vc_find_current(s);
-+    gtk_widget_set_sensitive(s->view_menu, vc !=3D NULL);
- #ifdef CONFIG_VTE
-     gtk_widget_set_sensitive(s->copy_item,
--                             gd_vc_find_current(s)->type =3D=3D GD_VC_VT=
-E);
-+                             vc && vc->type =3D=3D GD_VC_VTE);
- #endif
-=20
-     if (full_screen) {
---=20
+ 
+-/* keyboard/mouse support */
+-
++/* mouse buttons, used by legacy handlers (qemu_add_mouse_event_handler) */
+ #define MOUSE_EVENT_LBUTTON 0x01
+ #define MOUSE_EVENT_RBUTTON 0x02
+ #define MOUSE_EVENT_MBUTTON 0x04
+-#define MOUSE_EVENT_WHEELUP 0x08
+-#define MOUSE_EVENT_WHEELDN 0x10
+ 
+ /* identical to the ps/2 keyboard bits */
+ #define QEMU_SCROLL_LOCK_LED (1 << 0)
+-- 
 1.8.3.1
