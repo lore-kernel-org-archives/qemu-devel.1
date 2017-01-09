@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37291)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37428)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cQYWU-0002RR-El
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:53:59 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cQYWY-0002W0-HT
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:54:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cQYWT-00047W-3I
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:53:58 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cQYWX-0004Bo-3t
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:54:02 -0500
 Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:47992)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1cQYWS-00043I-TL
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:53:57 -0500
+	id 1cQYWW-00043I-Ta
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:54:01 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.84_2)
-	(envelope-from <pm215@archaic.org.uk>) id 1cQYWO-0001R0-8l
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 11:53:52 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1cQYWJ-0001NK-VN
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 11:53:47 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon,  9 Jan 2017 11:53:38 +0000
-Message-Id: <1483962824-29185-16-git-send-email-peter.maydell@linaro.org>
+Date: Mon,  9 Jan 2017 11:53:28 +0000
+Message-Id: <1483962824-29185-6-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1483962824-29185-1-git-send-email-peter.maydell@linaro.org>
 References: <1483962824-29185-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 15/21] hw/arm/virt: pass VirtMachineState
- instead of VirtGuestInfo
+Subject: [Qemu-devel] [PULL 05/21] hw/arm/virt: Don't incorrectly claim
+ architectural timer to be edge-triggered
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,77 +30,88 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Andrew Jones <drjones@redhat.com>
+The architectural timers in ARM CPUs all have level triggered interrupts
+(unless you're using KVM on a host kernel before 4.4, which misimplemented
+them as edge-triggered).
 
-Only two functions take VirtGuestInfo parameters. Now that guest-info
-is part of VirtMachineState, and VirtMachineState is defined in the
-virt header, pass that instead.
+We were incorrectly describing them in the device tree as edge triggered.
+This can cause problems for guest kernels in 4.8 before rc6:
+ * pre-4.8 kernels ignore the values in the DT
+ * 4.8 before rc6 write the DT values to the GIC config registers
+ * newer than rc6 ignore the DT and insist that the timer interrupts
+   are level triggered regardless
 
-Signed-off-by: Andrew Jones <drjones@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
-Message-id: 20170102200153.28864-11-drjones@redhat.com
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Fix the DT so we're describing reality. For backwards-compatibility
+purposes, only do this for the virt-2.9 machine onward.
+
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 ---
- include/hw/arm/virt.h    | 2 +-
- hw/arm/virt-acpi-build.c | 3 ++-
- hw/arm/virt.c            | 8 ++++----
- 3 files changed, 7 insertions(+), 6 deletions(-)
+ hw/arm/virt.c | 34 ++++++++++++++++++++++++++++++----
+ 1 file changed, 30 insertions(+), 4 deletions(-)
 
-diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-index 91dbd69..b1eed52 100644
---- a/include/hw/arm/virt.h
-+++ b/include/hw/arm/virt.h
-@@ -122,6 +122,6 @@ typedef struct {
- #define VIRT_MACHINE_CLASS(klass) \
-     OBJECT_CLASS_CHECK(VirtMachineClass, klass, TYPE_VIRT_MACHINE)
- 
--void virt_acpi_setup(VirtGuestInfo *guest_info);
-+void virt_acpi_setup(VirtMachineState *vms);
- 
- #endif /* QEMU_ARM_VIRT_H */
-diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index 4fd52da..ac507d6 100644
---- a/hw/arm/virt-acpi-build.c
-+++ b/hw/arm/virt-acpi-build.c
-@@ -823,8 +823,9 @@ static const VMStateDescription vmstate_virt_acpi_build = {
-     },
- };
- 
--void virt_acpi_setup(VirtGuestInfo *guest_info)
-+void virt_acpi_setup(VirtMachineState *vms)
- {
-+    VirtGuestInfo *guest_info = &vms->acpi_guest_info;
-     AcpiBuildTables tables;
-     AcpiBuildState *build_state;
- 
 diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 8556ff2..2201517 100644
+index 54498ea..2ca9527 100644
 --- a/hw/arm/virt.c
 +++ b/hw/arm/virt.c
-@@ -1131,9 +1131,9 @@ static void *machvirt_dtb(const struct arm_boot_info *binfo, int *fdt_size)
-     return board->fdt;
- }
+@@ -71,6 +71,7 @@ typedef struct {
+     bool disallow_affinity_adjustment;
+     bool no_its;
+     bool no_pmu;
++    bool claim_edge_triggered_timers;
+ } VirtMachineClass;
  
--static void virt_build_smbios(VirtGuestInfo *guest_info)
-+static void virt_build_smbios(VirtMachineState *vms)
+ typedef struct {
+@@ -309,12 +310,31 @@ static void fdt_add_psci_node(const VirtMachineState *vms)
+ 
+ static void fdt_add_timer_nodes(const VirtMachineState *vms, int gictype)
  {
--    FWCfgState *fw_cfg = guest_info->fw_cfg;
-+    FWCfgState *fw_cfg = vms->acpi_guest_info.fw_cfg;
-     uint8_t *smbios_tables, *smbios_anchor;
-     size_t smbios_tables_len, smbios_anchor_len;
-     const char *product = "QEMU Virtual Machine";
-@@ -1166,8 +1166,8 @@ void virt_machine_done(Notifier *notifier, void *data)
-     VirtMachineState *vms = container_of(notifier, VirtMachineState,
-                                          machine_done);
+-    /* Note that on A15 h/w these interrupts are level-triggered,
+-     * but for the GIC implementation provided by both QEMU and KVM
+-     * they are edge-triggered.
++    /* On real hardware these interrupts are level-triggered.
++     * On KVM they were edge-triggered before host kernel version 4.4,
++     * and level-triggered afterwards.
++     * On emulated QEMU they are level-triggered.
++     *
++     * Getting the DTB info about them wrong is awkward for some
++     * guest kernels:
++     *  pre-4.8 ignore the DT and leave the interrupt configured
++     *   with whatever the GIC reset value (or the bootloader) left it at
++     *  4.8 before rc6 honour the incorrect data by programming it back
++     *   into the GIC, causing problems
++     *  4.8rc6 and later ignore the DT and always write "level triggered"
++     *   into the GIC
++     *
++     * For backwards-compatibility, virt-2.8 and earlier will continue
++     * to say these are edge-triggered, but later machines will report
++     * the correct information.
+      */
+     ARMCPU *armcpu;
+-    uint32_t irqflags = GIC_FDT_IRQ_FLAGS_EDGE_LO_HI;
++    VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
++    uint32_t irqflags = GIC_FDT_IRQ_FLAGS_LEVEL_HI;
++
++    if (vmc->claim_edge_triggered_timers) {
++        irqflags = GIC_FDT_IRQ_FLAGS_EDGE_LO_HI;
++    }
  
--    virt_acpi_setup(&vms->acpi_guest_info);
--    virt_build_smbios(&vms->acpi_guest_info);
-+    virt_acpi_setup(vms);
-+    virt_build_smbios(vms);
+     if (gictype == 2) {
+         irqflags = deposit32(irqflags, GIC_FDT_IRQ_PPI_CPU_START,
+@@ -1556,8 +1576,14 @@ static void virt_2_8_instance_init(Object *obj)
+ 
+ static void virt_machine_2_8_options(MachineClass *mc)
+ {
++    VirtMachineClass *vmc = VIRT_MACHINE_CLASS(OBJECT_CLASS(mc));
++
+     virt_machine_2_9_options(mc);
+     SET_MACHINE_COMPAT(mc, VIRT_COMPAT_2_8);
++    /* For 2.8 and earlier we falsely claimed in the DT that
++     * our timers were edge-triggered, not level-triggered.
++     */
++    vmc->claim_edge_triggered_timers = true;
  }
+ DEFINE_VIRT_MACHINE(2, 8)
  
- static void machvirt_init(MachineState *machine)
 -- 
 2.7.4
