@@ -1,15 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56655)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58162)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cQdNu-0002vz-Il
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 12:05:27 -0500
+	(envelope-from <imammedo@redhat.com>) id 1cQdSd-0007Iv-Oy
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 12:10:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cQdNt-0006Zr-Lo
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 12:05:26 -0500
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon,  9 Jan 2017 17:05:21 +0000
-Message-Id: <1483981521-6789-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH] hw/i386/kvmvapic: Remove dead code in
- patch_hypercalls()
+	(envelope-from <imammedo@redhat.com>) id 1cQdSZ-0000Cv-H9
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 12:10:19 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51628)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cQdSZ-0000CQ-B3
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 12:10:15 -0500
+Date: Mon, 9 Jan 2017 18:10:10 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170109181010.7f0def81@nial.brq.redhat.com>
+In-Reply-To: <20170103123736.28058223@nial.brq.redhat.com>
+References: <4D4A9683-A287-48CD-9D76-41850225B34C@binghamton.edu>
+	<20170103123736.28058223@nial.brq.redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] QEMU online/offline cpu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,53 +27,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
-Cc: patches@linaro.org, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>
+To: Ozgur O Kilic <okilic1@binghamton.edu>
+Cc: Peter Krempa <pkrempa@redhat.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org, David Gibson <david@gibson.dropbear.id.au>
 
-The patch_hypercalls() function sets up a 'patches'
-variable and checks it at the end of the function, but
-never modifies it in the middle. Remove this dead code,
-which seems to have been present since the function was
-added in commit e5ad936b0fd7 in 2012.
+On Tue, 3 Jan 2017 12:37:36 +0100
+Igor Mammedov <imammedo@redhat.com> wrote:
 
-(Spotted by Coverity: CID 1005581.)
+[...]
+> Wiki page http://wiki.qemu.org/Features/CPUHotplug is rather outdated,
+> I'll update it to reflect currently implemented hotplug interfaces/targets.
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
-Perhaps this was unintentionally retained debug code?
-It's not clear to me why the ROM should be required to
-have exactly zero or two hypercalls in it. In any case
-we've been fine without checking the patch count for
-five years :-)
+David,
 
-CC'd Jan as original code author just in case he remembers.
----
- hw/i386/kvmvapic.c | 6 ------
- 1 file changed, 6 deletions(-)
+I've updated above CPUHotplug wiki page to match current state of QEMU.
+Could you take a look at it and maybe update from SPAPR perspective.
 
-diff --git a/hw/i386/kvmvapic.c b/hw/i386/kvmvapic.c
-index b30d1b9..418dba1 100644
---- a/hw/i386/kvmvapic.c
-+++ b/hw/i386/kvmvapic.c
-@@ -534,7 +534,6 @@ static int patch_hypercalls(VAPICROMState *s)
-     uint8_t alternates[2];
-     const uint8_t *pattern;
-     const uint8_t *patch;
--    int patches = 0;
-     off_t pos;
-     uint8_t *rom;
- 
-@@ -565,11 +564,6 @@ static int patch_hypercalls(VAPICROMState *s)
-     }
- 
-     g_free(rom);
--
--    if (patches != 0 && patches != 2) {
--        return -1;
--    }
--
-     return 0;
- }
- 
--- 
-2.7.4
+PS:
+Feel free to fix whatever if you find a better wording/mistake.
