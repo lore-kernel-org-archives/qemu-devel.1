@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57982)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34030)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcd@tribudubois.net>) id 1cQhMR-0002gW-6R
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 16:20:12 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cQhbP-0006u8-38
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 16:35:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcd@tribudubois.net>) id 1cQhMI-0004NB-EJ
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 16:20:11 -0500
-Received: from relay5-d.mail.gandi.net ([2001:4b98:c:538::197]:36695)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jcd@tribudubois.net>) id 1cQhMI-0004Mb-86
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 16:20:02 -0500
-References: <20170104220624.26557-1-jcd@tribudubois.net>
-	<CAFEAcA8dwhoSZTWS9JJ6-vSUs1Asw8ymktmD+oOqx0DNpCV2XQ@mail.gmail.com>
-	<1be7123c-acee-7d16-8a10-c8965d5805ff@gmail.com>
-	<CAFEAcA9cUEGL=rSrq2cstParBYHMWdkDy_acu7mTW754+G_Y6Q@mail.gmail.com>
-	<fb9b6b0a-62b5-2421-2826-d3f853b5d5b3@tribudubois.net>
-From: Jean-Christophe DUBOIS <jcd@tribudubois.net>
-Message-ID: <f6ddf63f-78b8-935b-9075-838a0ca0aa7d@tribudubois.net>
-Date: Mon, 9 Jan 2017 22:19:56 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1cQhbN-0000XR-Kc
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 16:35:38 -0500
+Received: from mail-ua0-x232.google.com ([2607:f8b0:400c:c08::232]:34956)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cQhbN-0000Vs-BI
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 16:35:37 -0500
+Received: by mail-ua0-x232.google.com with SMTP id y9so142865833uae.2
+	for <qemu-devel@nongnu.org>; Mon, 09 Jan 2017 13:35:37 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <fb9b6b0a-62b5-2421-2826-d3f853b5d5b3@tribudubois.net>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v4] [i.MX] fix CS handling during SPI
- access.
+In-Reply-To: <148398903105.208.13573655327114962163@790289a7ca88>
+References: <1483988759-14606-1-git-send-email-peter.maydell@linaro.org>
+	<148398903105.208.13573655327114962163@790289a7ca88>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 9 Jan 2017 21:35:16 +0000
+Message-ID: <CAFEAcA-S6txZ79_N1PTzAGb0dQSV9zpQ-kKyjnYDyyZzsv_4Ug@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH] disas/cris.c: Fix Coverity warning about
+ unchecked NULL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,55 +30,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, "mar.krzeminski" <mar.krzeminski@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Fam Zheng <famz@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, "patches@linaro.org" <patches@linaro.org>
 
-Hum, ... I think I have a problem.
-
-With the default register value (that I get a reset) the CS line is 
-deselected when the CS is high.
-
-So at reset I would need to set my 4 CS lines to high in order to be 
-able to drive them low later.
-
-So during the "reset" I need to set my 4 CS line to 1 but according to 
-you feedback I should not do it with qemu_set_irq()...
-
-Is there another way than qemu_set_irq() to do set my lines to high level ?
-
-Regards.
-
-JC
-
-Le 09/01/2017 à 21:05, Jean-Christophe DUBOIS a écrit :
-> Le 09/01/2017 à 20:06, Peter Maydell a écrit :
->> On 9 January 2017 at 19:04, mar.krzeminski <mar.krzeminski@gmail.com> 
->> wrote:
->>>
->>> W dniu 09.01.2017 o 11:46, Peter Maydell pisze:
->>>> Calling qemu_set_irq() in a device reset function is a bit
->>>> tricky, because in a full system reset the device at the other
->>>> end might have already reset or might not, and calling into
->>>> its handler function for the irq line change might provoke
->>>> an unwanted change of its state. We don't really have a coherent
->>>> model here but for the moment we just try to avoid calling
->>>> set_irq in a reset method.
->>> JC, if you remove qemu_set_irq() call from reset, at least m25p80 
->>> behavior
->>> should not change since m25p80 reset handler will reset it's whole 
->>> internal
->>> state.
->> I noticed the reset function is also called from within the
->> register emulation too, so it's maybe not quite that simple...
-> OK, I'll fix it.
+On 9 January 2017 at 19:10,  <no-reply@patchew.org> wrote:
+> Checking PATCH 1/1: disas/cris.c: Fix Coverity warning about unchecked NULL...
+> ERROR: code indent should never use tabs
+> #24: FILE: disas/cris.c:2493:
+> +^Iif (sregp == NULL || sregp->name == NULL)$
 >
-> JC
+> ERROR: suspect code indent for conditional statements (8, 10)
+> #24: FILE: disas/cris.c:2493:
+> +       if (sregp == NULL || sregp->name == NULL)
+>           /* Should have been caught as a non-match earlier.  */
 >
->>
->> thanks
->> -- PMM
->>
->>
+> ERROR: braces {} are necessary for all arms of this statement
+> #24: FILE: disas/cris.c:2493:
+> +       if (sregp == NULL || sregp->name == NULL)
+> [...]
 >
->
->
+> total: 3 errors, 0 warnings, 8 lines checked
+
+This is because the whole file is GNU coding standards
+style, being a binutils import. Better to stick with it rather
+than rework, I think.
+
+thanks
+-- PMM
