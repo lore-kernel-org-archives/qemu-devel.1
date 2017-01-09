@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38906)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40911)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcd@tribudubois.net>) id 1cQgBz-0002aR-5N
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 15:05:20 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cQgKB-0005Lq-Ft
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 15:13:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcd@tribudubois.net>) id 1cQgBv-00079X-Vz
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 15:05:19 -0500
-Received: from relay2-d.mail.gandi.net ([2001:4b98:c:538::194]:47833)
+	(envelope-from <dgilbert@redhat.com>) id 1cQgKA-0001Jq-CQ
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 15:13:47 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59140)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jcd@tribudubois.net>) id 1cQgBv-00079L-PL
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 15:05:15 -0500
-References: <20170104220624.26557-1-jcd@tribudubois.net>
-	<CAFEAcA8dwhoSZTWS9JJ6-vSUs1Asw8ymktmD+oOqx0DNpCV2XQ@mail.gmail.com>
-	<1be7123c-acee-7d16-8a10-c8965d5805ff@gmail.com>
-	<CAFEAcA9cUEGL=rSrq2cstParBYHMWdkDy_acu7mTW754+G_Y6Q@mail.gmail.com>
-From: Jean-Christophe DUBOIS <jcd@tribudubois.net>
-Message-ID: <fb9b6b0a-62b5-2421-2826-d3f853b5d5b3@tribudubois.net>
-Date: Mon, 9 Jan 2017 21:05:10 +0100
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9cUEGL=rSrq2cstParBYHMWdkDy_acu7mTW754+G_Y6Q@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v4] [i.MX] fix CS handling during SPI
- access.
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cQgKA-0001Jk-3X
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 15:13:46 -0500
+Received: from int-mx13.intmail.prod.int.phx2.redhat.com
+	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1BE6B7F7AE
+	for <qemu-devel@nongnu.org>; Mon,  9 Jan 2017 20:13:46 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Date: Mon,  9 Jan 2017 20:13:38 +0000
+Message-Id: <20170109201340.16593-2-dgilbert@redhat.com>
+In-Reply-To: <20170109201340.16593-1-dgilbert@redhat.com>
+References: <20170109201340.16593-1-dgilbert@redhat.com>
+Subject: [Qemu-devel] [PATCH 1/3] vmstate_register_with_alias_id: Take an
+ Error **
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,31 +30,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, "mar.krzeminski" <mar.krzeminski@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org, mst@redhat.com, pbonzini@redhat.com, quintela@redhat.com, amit.shah@redhat.com
 
-Le 09/01/2017 à 20:06, Peter Maydell a écrit :
-> On 9 January 2017 at 19:04, mar.krzeminski <mar.krzeminski@gmail.com> wrote:
->>
->> W dniu 09.01.2017 o 11:46, Peter Maydell pisze:
->>> Calling qemu_set_irq() in a device reset function is a bit
->>> tricky, because in a full system reset the device at the other
->>> end might have already reset or might not, and calling into
->>> its handler function for the irq line change might provoke
->>> an unwanted change of its state. We don't really have a coherent
->>> model here but for the moment we just try to avoid calling
->>> set_irq in a reset method.
->> JC, if you remove qemu_set_irq() call from reset, at least m25p80 behavior
->> should not change since m25p80 reset handler will reset it's whole internal
->> state.
-> I noticed the reset function is also called from within the
-> register emulation too, so it's maybe not quite that simple...
-OK, I'll fix it.
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-JC
+I'll be adding an error to it in a subsequent patch.
 
->
-> thanks
-> -- PMM
->
->
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ hw/core/qdev.c              | 3 ++-
+ hw/intc/apic_common.c       | 2 +-
+ include/migration/vmstate.h | 5 +++--
+ migration/savevm.c          | 3 ++-
+ stubs/vmstate.c             | 3 ++-
+ 5 files changed, 10 insertions(+), 6 deletions(-)
+
+diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+index 5783442..ea97b15 100644
+--- a/hw/core/qdev.c
++++ b/hw/core/qdev.c
+@@ -935,7 +935,8 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
+         if (qdev_get_vmsd(dev)) {
+             vmstate_register_with_alias_id(dev, -1, qdev_get_vmsd(dev), dev,
+                                            dev->instance_id_alias,
+-                                           dev->alias_required_for_version);
++                                           dev->alias_required_for_version,
++                                           NULL);
+         }
+ 
+         QLIST_FOREACH(bus, &dev->child_bus, sibling) {
+diff --git a/hw/intc/apic_common.c b/hw/intc/apic_common.c
+index d78c885..9b40af1 100644
+--- a/hw/intc/apic_common.c
++++ b/hw/intc/apic_common.c
+@@ -328,7 +328,7 @@ static void apic_common_realize(DeviceState *dev, Error **errp)
+         instance_id = -1;
+     }
+     vmstate_register_with_alias_id(NULL, instance_id, &vmstate_apic_common,
+-                                   s, -1, 0);
++                                   s, -1, 0, NULL);
+ }
+ 
+ static void apic_common_unrealize(DeviceState *dev, Error **errp)
+diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
+index 1638ee5..73f3182 100644
+--- a/include/migration/vmstate.h
++++ b/include/migration/vmstate.h
+@@ -952,14 +952,15 @@ bool vmstate_save_needed(const VMStateDescription *vmsd, void *opaque);
+ int vmstate_register_with_alias_id(DeviceState *dev, int instance_id,
+                                    const VMStateDescription *vmsd,
+                                    void *base, int alias_id,
+-                                   int required_for_version);
++                                   int required_for_version,
++                                   Error **errp);
+ 
+ static inline int vmstate_register(DeviceState *dev, int instance_id,
+                                    const VMStateDescription *vmsd,
+                                    void *opaque)
+ {
+     return vmstate_register_with_alias_id(dev, instance_id, vmsd,
+-                                          opaque, -1, 0);
++                                          opaque, -1, 0, NULL);
+ }
+ 
+ void vmstate_unregister(DeviceState *dev, const VMStateDescription *vmsd,
+diff --git a/migration/savevm.c b/migration/savevm.c
+index 0363372..ae3ab2c 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -626,7 +626,8 @@ void unregister_savevm(DeviceState *dev, const char *idstr, void *opaque)
+ int vmstate_register_with_alias_id(DeviceState *dev, int instance_id,
+                                    const VMStateDescription *vmsd,
+                                    void *opaque, int alias_id,
+-                                   int required_for_version)
++                                   int required_for_version,
++                                   Error **errp)
+ {
+     SaveStateEntry *se;
+ 
+diff --git a/stubs/vmstate.c b/stubs/vmstate.c
+index 6590627..bbe158f 100644
+--- a/stubs/vmstate.c
++++ b/stubs/vmstate.c
+@@ -8,7 +8,8 @@ int vmstate_register_with_alias_id(DeviceState *dev,
+                                    int instance_id,
+                                    const VMStateDescription *vmsd,
+                                    void *base, int alias_id,
+-                                   int required_for_version)
++                                   int required_for_version,
++                                   Error **errp)
+ {
+     return 0;
+ }
+-- 
+2.9.3
