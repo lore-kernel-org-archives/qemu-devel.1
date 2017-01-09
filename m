@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40455)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40492)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cQcSF-00084s-N5
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 11:05:58 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cQcSK-00089R-Aa
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 11:06:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cQcSE-0003rM-I4
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 11:05:51 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cQcSC-0003qZ-Fx
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 11:05:56 -0500
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon,  9 Jan 2017 16:05:18 +0000
-Message-Id: <1483977924-14522-13-git-send-email-peter.maydell@linaro.org>
+Date: Mon,  9 Jan 2017 16:05:08 +0000
+Message-Id: <1483977924-14522-3-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1483977924-14522-1-git-send-email-peter.maydell@linaro.org>
 References: <1483977924-14522-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 12/18] hw/intc/arm_gicv3: Implement
- gicv3_cpuif_virt_update()
+Subject: [Qemu-devel] [PATCH v2 02/18] hw/intc/arm_gic: Add external IRQ
+ lines for VIRQ and VFIQ
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,107 +23,51 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org, Andrew Jones <drjones@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Alistair Francis <alistair.francis@xilinx.com>
 
-Implement the function which signals virtual interrupts to the
-CPU as appropriate following CPU interface state changes.
+Augment the GIC's QOM device interface by adding two
+new sets of sysbus IRQ lines, to signal VIRQ and VFIQ to
+each CPU.
+
+We never use these, but it's helpful to keep the v2-and-earlier
+GIC's external interface in line with that of the GICv3 to
+avoid board code having to add extra code conditional on which
+version of the GIC is in use.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 ---
- include/hw/intc/arm_gicv3_common.h |  1 +
- hw/intc/arm_gicv3_cpuif.c          | 49 ++++++++++++++++++++++++++++++++++++++
- hw/intc/trace-events               |  2 ++
- 3 files changed, 52 insertions(+)
+ include/hw/intc/arm_gic_common.h | 2 ++
+ hw/intc/arm_gic_common.c         | 6 ++++++
+ 2 files changed, 8 insertions(+)
 
-diff --git a/include/hw/intc/arm_gicv3_common.h b/include/hw/intc/arm_gicv3_common.h
-index 665d3f8..4156051 100644
---- a/include/hw/intc/arm_gicv3_common.h
-+++ b/include/hw/intc/arm_gicv3_common.h
-@@ -150,6 +150,7 @@ struct GICv3CPUState {
-     qemu_irq parent_fiq;
-     qemu_irq parent_virq;
-     qemu_irq parent_vfiq;
-+    qemu_irq maintenance_irq;
+diff --git a/include/hw/intc/arm_gic_common.h b/include/hw/intc/arm_gic_common.h
+index f4c349a..af3ca18 100644
+--- a/include/hw/intc/arm_gic_common.h
++++ b/include/hw/intc/arm_gic_common.h
+@@ -55,6 +55,8 @@ typedef struct GICState {
  
-     /* Redistributor */
-     uint32_t level;                  /* Current IRQ level */
-diff --git a/hw/intc/arm_gicv3_cpuif.c b/hw/intc/arm_gicv3_cpuif.c
-index f3845a6..e05f6b3 100644
---- a/hw/intc/arm_gicv3_cpuif.c
-+++ b/hw/intc/arm_gicv3_cpuif.c
-@@ -352,6 +352,53 @@ static uint32_t maintenance_interrupt_state(GICv3CPUState *cs)
- 
- static void gicv3_cpuif_virt_update(GICv3CPUState *cs)
- {
-+    /* Tell the CPU about any pending virtual interrupts or
-+     * maintenance interrupts, following a change to the state
-+     * of the CPU interface relevant to virtual interrupts.
-+     *
-+     * CAUTION: this function will call qemu_set_irq() on the
-+     * CPU maintenance IRQ line, which is typically wired up
-+     * to the GIC as a per-CPU interrupt. This means that it
-+     * will recursively call back into the GIC code via
-+     * gicv3_redist_set_irq() and thus into the CPU interface code's
-+     * gicv3_cpuif_update(). It is therefore important that this
-+     * function is only called as the final action of a CPU interface
-+     * register write implementation, after all the GIC state
-+     * fields have been updated. gicv3_cpuif_update() also must
-+     * not cause this function to be called, but that happens
-+     * naturally as a result of there being no architectural
-+     * linkage between the physical and virtual GIC logic.
-+     */
-+    int idx;
-+    int irqlevel = 0;
-+    int fiqlevel = 0;
-+    int maintlevel = 0;
-+
-+    idx = hppvi_index(cs);
-+    trace_gicv3_cpuif_virt_update(gicv3_redist_affid(cs), idx);
-+    if (idx >= 0) {
-+        uint64_t lr = cs->ich_lr_el2[idx];
-+
-+        if (icv_hppi_can_preempt(cs, lr)) {
-+            /* Virtual interrupts are simple: G0 are always FIQ, and G1 IRQ */
-+            if (lr & ICH_LR_EL2_GROUP) {
-+                irqlevel = 1;
-+            } else {
-+                fiqlevel = 1;
-+            }
-+        }
+     qemu_irq parent_irq[GIC_NCPU];
+     qemu_irq parent_fiq[GIC_NCPU];
++    qemu_irq parent_virq[GIC_NCPU];
++    qemu_irq parent_vfiq[GIC_NCPU];
+     /* GICD_CTLR; for a GIC with the security extensions the NS banked version
+      * of this register is just an alias of bit 1 of the S banked version.
+      */
+diff --git a/hw/intc/arm_gic_common.c b/hw/intc/arm_gic_common.c
+index 0a1f56a..4a8df44 100644
+--- a/hw/intc/arm_gic_common.c
++++ b/hw/intc/arm_gic_common.c
+@@ -110,6 +110,12 @@ void gic_init_irqs_and_mmio(GICState *s, qemu_irq_handler handler,
+     for (i = 0; i < s->num_cpu; i++) {
+         sysbus_init_irq(sbd, &s->parent_fiq[i]);
+     }
++    for (i = 0; i < s->num_cpu; i++) {
++        sysbus_init_irq(sbd, &s->parent_virq[i]);
 +    }
-+
-+    if (cs->ich_hcr_el2 & ICH_HCR_EL2_EN) {
-+        maintlevel = maintenance_interrupt_state(cs);
++    for (i = 0; i < s->num_cpu; i++) {
++        sysbus_init_irq(sbd, &s->parent_vfiq[i]);
 +    }
-+
-+    trace_gicv3_cpuif_virt_set_irqs(gicv3_redist_affid(cs), fiqlevel,
-+                                    irqlevel, maintlevel);
-+
-+    qemu_set_irq(cs->parent_vfiq, fiqlevel);
-+    qemu_set_irq(cs->parent_virq, irqlevel);
-+    qemu_set_irq(cs->maintenance_irq, maintlevel);
- }
  
- static uint64_t icv_ap_read(CPUARMState *env, const ARMCPRegInfo *ri)
-@@ -2480,6 +2527,8 @@ void gicv3_init_cpuif(GICv3State *s)
-             && cpu->gic_num_lrs) {
-             int j;
- 
-+            cs->maintenance_irq = cpu->gicv3_maintenance_interrupt;
-+
-             cs->num_list_regs = cpu->gic_num_lrs;
-             cs->vpribits = cpu->gic_vpribits;
-             cs->vprebits = cpu->gic_vprebits;
-diff --git a/hw/intc/trace-events b/hw/intc/trace-events
-index 1dcc830..6116df5 100644
---- a/hw/intc/trace-events
-+++ b/hw/intc/trace-events
-@@ -138,6 +138,8 @@ gicv3_icv_hppir_read(int grp, uint32_t cpu, uint64_t val) "GICv3 ICV_HPPIR%d rea
- gicv3_icv_dir_write(uint32_t cpu, uint64_t val) "GICv3 ICV_DIR write cpu %x value 0x%" PRIx64
- gicv3_icv_iar_read(int grp, uint32_t cpu, uint64_t val) "GICv3 ICV_IAR%d read cpu %x value 0x%" PRIx64
- gicv3_icv_eoir_write(int grp, uint32_t cpu, uint64_t val) "GICv3 ICV_EOIR%d write cpu %x value 0x%" PRIx64
-+gicv3_cpuif_virt_update(uint32_t cpuid, int idx) "GICv3 CPU i/f %x virt HPPI update LR index %d"
-+gicv3_cpuif_virt_set_irqs(uint32_t cpuid, int fiqlevel, int irqlevel, int maintlevel) "GICv3 CPU i/f %x virt HPPI update: setting FIQ %d IRQ %d maintenance-irq %d"
- 
- # hw/intc/arm_gicv3_dist.c
- gicv3_dist_read(uint64_t offset, uint64_t data, unsigned size, bool secure) "GICv3 distributor read: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u secure %d"
+     /* Distributor */
+     memory_region_init_io(&s->iomem, OBJECT(s), ops, s, "gic_dist", 0x1000);
 -- 
 2.7.4
