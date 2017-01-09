@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51633)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52123)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cQfD8-0004Vb-Kk
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 14:02:27 -0500
+	(envelope-from <mar.krzeminski@gmail.com>) id 1cQfFd-0005YB-HS
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 14:05:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cQfD7-00024e-O8
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 14:02:26 -0500
-Received: from mail-io0-x242.google.com ([2607:f8b0:4001:c06::242]:35127)
+	(envelope-from <mar.krzeminski@gmail.com>) id 1cQfFa-0002qt-TW
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 14:05:01 -0500
+Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:35345)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cQfD7-00023x-JW
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 14:02:25 -0500
-Received: by mail-io0-x242.google.com with SMTP id m98so7885918iod.2
-	for <qemu-devel@nongnu.org>; Mon, 09 Jan 2017 11:02:22 -0800 (PST)
-Sender: Richard Henderson <rth7680@gmail.com>
-From: Richard Henderson <rth@twiddle.net>
-Date: Mon,  9 Jan 2017 11:02:17 -0800
-Message-Id: <20170109190217.16301-1-rth@twiddle.net>
+	(Exim 4.71) (envelope-from <mar.krzeminski@gmail.com>)
+	id 1cQfFa-0002pS-Lx
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 14:04:58 -0500
+Received: by mail-lf0-x243.google.com with SMTP id v186so6475182lfa.2
+	for <qemu-devel@nongnu.org>; Mon, 09 Jan 2017 11:04:58 -0800 (PST)
+References: <20170104220624.26557-1-jcd@tribudubois.net>
+	<CAFEAcA8dwhoSZTWS9JJ6-vSUs1Asw8ymktmD+oOqx0DNpCV2XQ@mail.gmail.com>
+From: "mar.krzeminski" <mar.krzeminski@gmail.com>
+Message-ID: <1be7123c-acee-7d16-8a10-c8965d5805ff@gmail.com>
+Date: Mon, 9 Jan 2017 20:04:55 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <CAFEAcA8dwhoSZTWS9JJ6-vSUs1Asw8ymktmD+oOqx0DNpCV2XQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v2 00/11] tcg host mips64 support
+Subject: Re: [Qemu-devel] [PATCH v4] [i.MX] fix CS handling during SPI
+ access.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,37 +31,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
-
-[Bah.  This time with actual request-pull info.]
-
-This is v6 of Jin Guojie's patch set, as tested by Aurelien Jarno,
-James Hogan, and Yun Qiang Su.  Plus one more patch from me to fix
-a trival Werror in mips specific code with gcc 5.3.
+To: Peter Maydell <peter.maydell@linaro.org>, Jean-Christophe Dubois <jcd@tribudubois.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
 
-r~
 
+W dniu 09.01.2017 o 11:46, Peter Maydell pisze:
+> On 4 January 2017 at 22:06, Jean-Christophe Dubois <jcd@tribudubois.net> wrote:
+>> The i.MX SPI device was not de-asserting the CS line at the end of
+>> memory access.
+>>
+>> This triggered a SIGSEGV in Qemu when the sabrelite emulator was acessing
+>> a SPI flash memory.
+>>
+>> Whith this path the CS signal is correctly asserted and deasserted arround
+>> memory access.
+>>
+>> Assertion level is now based on SPI device configuration.
+>>
+>> This was tested by:
+>> * booting linux on Sabrelite Qemu emulator.
+>> * booting xvisor on Sabrelite Qemu emultor.
+>>
+>> Signed-off-by: Jean-Christophe Dubois <jcd@tribudubois.net>
+>> Acked-by: Marcin Krzemiński <mar.krzeminski@gmail.com>
+>>   static void imx_spi_reset(DeviceState *dev)
+>>   {
+>>       IMXSPIState *s = IMX_SPI(dev);
+>> +    uint32_t i;
+>>
+>>       DPRINTF("\n");
+>>
+>> @@ -243,6 +263,11 @@ static void imx_spi_reset(DeviceState *dev)
+>>       imx_spi_update_irq(s);
+>>
+>>       s->burst_length = 0;
+>> +
+>> +    /* Disable all CS lines */
+>> +    for (i = 0; i < 4; i++) {
+>> +        qemu_set_irq(s->cs_lines[i], !imx_spi_channel_pol(s, i));
+>> +    }
+> Calling qemu_set_irq() in a device reset function is a bit
+> tricky, because in a full system reset the device at the other
+> end might have already reset or might not, and calling into
+> its handler function for the irq line change might provoke
+> an unwanted change of its state. We don't really have a coherent
+> model here but for the moment we just try to avoid calling
+> set_irq in a reset method.
+JC, if you remove qemu_set_irq() call from reset, at least m25p80 behavior
+should not change since m25p80 reset handler will reset it's whole 
+internal state.
 
-The following changes since commit f0d703314ecb0415d51425727ed73ad2c6e3238a:
-
-  tcg-mips: Adjust qemu_ld/st for mips64 (2017-01-06 10:09:10 -0800)
-
-are available in the git repository at:
-
-  git://github.com/rth7680/qemu.git tags/pull-tcg-20170108
-
-for you to fetch changes up to f68808c7494b38764e1895a9852b994638b86536:
-
-  translate-all: Avoid -Werror=switch-bool (2017-01-08 09:48:34 -0800)
-
-----------------------------------------------------------------
-TCG host support for mips64
-
-----------------------------------------------------------------
-Richard Henderson (1):
-      translate-all: Avoid -Werror=switch-bool
-
- translate-all.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Thanks,
+Marcin
+>
+> thanks
+> -- PMM
+>
