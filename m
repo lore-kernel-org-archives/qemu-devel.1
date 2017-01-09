@@ -1,45 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45407)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47920)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1cQeiM-0004zA-Hg
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 13:30:40 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cQevO-00087X-40
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 13:44:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1cQeiH-0006nV-FV
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 13:30:38 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34638
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1cQeiH-0006n1-8Z
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 13:30:33 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	v09IStEa001426
-	for <qemu-devel@nongnu.org>; Mon, 9 Jan 2017 13:30:31 -0500
-Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 27vde5efpq-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 09 Jan 2017 13:30:31 -0500
-Received: from localhost
-	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Mon, 9 Jan 2017 18:30:29 -0000
-References: <1469611466-31574-1-git-send-email-silbe@linux.vnet.ibm.com>
-	<57991CC1.40003@redhat.com> <87twfaysit.fsf@dusky.pond.sub.org>
-	<5799E26B.7090408@linux.vnet.ibm.com> <579A1D33.6010500@redhat.com>
-	<579A24BE.2060707@linux.vnet.ibm.com> <579A733C.5050306@redhat.com>
-	<579B5C49.1040707@linux.vnet.ibm.com>
-	<8b7d3287-90c4-6a07-894c-e9c32fd4567f@redhat.com>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Mon, 9 Jan 2017 19:27:17 +0100
-MIME-Version: 1.0
-In-Reply-To: <8b7d3287-90c4-6a07-894c-e9c32fd4567f@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature";
-	boundary="lvFsk9mL00xWLKPccr6bL4drlLQgc7SPV"
-Message-Id: <e1305993-ac60-d965-16cd-281919825ff6@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] error: error_setg_errno(): errno gets
- preserved
+	(envelope-from <pm215@archaic.org.uk>) id 1cQevM-0003HW-OW
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 13:44:06 -0500
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48112)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1cQevM-0003Gh-Cr
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 13:44:04 -0500
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon,  9 Jan 2017 18:43:57 +0000
+Message-Id: <1483987437-12084-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH] hw/net/dp8393x: Avoid unintentional sign
+ extensions on addresses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,206 +23,258 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, Max Reitz <mreitz@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, Sascha Silbe <silbe@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, Jason Wang <jasowang@redhat.com>, Laurent Vivier <laurent@vivier.eu>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---lvFsk9mL00xWLKPccr6bL4drlLQgc7SPV
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-To: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
- Michael Roth <mdroth@linux.vnet.ibm.com>, Max Reitz <mreitz@redhat.com>,
- Cornelia Huck <cornelia.huck@de.ibm.com>,
- Sascha Silbe <silbe@linux.vnet.ibm.com>
-Message-ID: <e1305993-ac60-d965-16cd-281919825ff6@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] error: error_setg_errno(): errno gets
- preserved
-References: <1469611466-31574-1-git-send-email-silbe@linux.vnet.ibm.com>
- <57991CC1.40003@redhat.com> <87twfaysit.fsf@dusky.pond.sub.org>
- <5799E26B.7090408@linux.vnet.ibm.com> <579A1D33.6010500@redhat.com>
- <579A24BE.2060707@linux.vnet.ibm.com> <579A733C.5050306@redhat.com>
- <579B5C49.1040707@linux.vnet.ibm.com>
- <8b7d3287-90c4-6a07-894c-e9c32fd4567f@redhat.com>
-In-Reply-To: <8b7d3287-90c4-6a07-894c-e9c32fd4567f@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+The dp8393x has several 32-bit values which are formed by concatenating
+two 16 bit device register values. Attempting to do these inline
+with ((s->reg[HI] << 16) | s->reg[LO]) can result in an unintended
+sign extension because "x << 16" is of type 'int' even though s->reg
+is unsigned, and so if the expression is used in a context where
+it is cast to uint64_t the value is incorrectly sign-extended.
+Fix this by using accessor functions with a uint32_t return type;
+this also makes the code a bit easier to read.
 
+This should fix Coverity issues 1307765, 1307766, 1307767, 1307768.
 
+(To avoid having a ctda read function only used in a DPRINTF,
+we move the DPRINTF down slightly so it can use the ttda function.)
 
-On 01/09/2017 03:50 PM, Eric Blake wrote:
-> On 07/29/2016 08:38 AM, Halil Pasic wrote:
->>
->>
->> On 07/28/2016 11:03 PM, Eric Blake wrote:
->>> On 07/28/2016 09:29 AM, Halil Pasic wrote:
->>>
->>>>> You mean va_start, not start_va.  And actually, C11 is clear that e=
-rrno
->>>>> is unspecified after library functions (but not macros) that don't
->>>>> explicitly state otherwise.  Since va_start() is a macro and not a
->>>>> library function, that means va_start does NOT have carte blanche
->>>>> permission to modify errno.  For more reading on the topic:
->>>>
->>>> I also considered this function/macro thing but in the end I am not
->>>> aware of anything in C11 what would prohibit va_start to modify errn=
-o --
->>>> correct me if I'm wrong. With that it boils down to 'may' and relyin=
-g on
->>>> 'does not' means you are not covered by the standard C11 (but may
->>>> be covered by something else -- in which case this should be documen=
-ted
->>>> in HACKING).
->>>>
->>>>>
->>>>> http://austingroupbugs.net/view.php?id=3D384
->>>>>
->>>>
->>>> This got rejected, or? Means that there is no willingness to introdu=
-ce
->>>> this guarantee at POSIX level?
->>>> =20
->>>
->>> That particular bug report was rejected because the POSIX folks decid=
-ed
->>> that the C11 wording was clear enough that va_start() was already
->>> guaranteed to not mess with errno, so no additionally wording was nee=
-ded
->>> in POSIX.
->>>
->>
->> Sadly, I still do not get it. I have re-read the relevant parts of N15=
-70
->> and even had a conversation with the in house compiler team. The
->> compiler guy's opinion was also that there is no guarantee provided by=
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+Disclaimer: only compile tested as this device only exists on
+the MIPS magnum/pica61 boards and I don't have an image for them.
 
->> C11. In http://austingroupbugs.net/view.php?id=3D384 you stated in the=
+ hw/net/dp8393x.c | 95 ++++++++++++++++++++++++++++++++++++++++----------------
+ 1 file changed, 68 insertions(+), 27 deletions(-)
 
->> description that the code example provided there is not conforming.
->=20
-> The description was the initial claim, before I had consulted with the
-> rest of the Austin Group.  Yes, my initial claim was that POSIX needed
-> tightening to guarantee something not provided by C.
->=20
->> Your
->> last reply I read like you were wrong with that statement.
->=20
-> Correct - after consultation with the full Austin Group, my initial
-> claim was invalidated, and the reason it was invalidated was that the
-> C99 standard only permits arbitrary changes to errno after function
-> calls, and that the C99 definition of a function call does NOT include
-> macro expansions.  Therefore, POSIX does not need tightening, because
-> the guarantee I wanted is already present; the initial description in
-> that bug report is well-defined, rather than my claim of undefined.
-> Any compliant C implementation, and therefore all POSIX-compliant
-> implementations, already leave errno unchanged after any use of the
-> varags macros.  (The current version of POSIX is still stuck on C99,
-> although the Austin Group is just barely starting work to incorporate
-> C11 for the next version of POSIX.)
->=20
->> I still do
->> not understand why were you wrong there. In fact, I could argue that y=
-ou
->> were right, but I'm afraid the argument would be somewhat lengthy and
->> confusing, and I'm already feeling bad about taking so much of your ti=
-me
->> with this. Since I'm  admittedly quite inexperienced in this field I
->> decided to just accept your the conclusion you and the POSIX guys
->> reached -- without fully understanding it.
->=20
-> The C99 standard is annoying in that it does not use the usual RFC
-> wording, so where C99 uses "may", many other standards (including POSIX=
-)
-> use "shall" or even "shall only".  So the fact that C99 states that "Th=
-e
-> value of errno may be set to nonzero by a library function call" is a
-> requirement that C can permit arbitrary modification of errno ONLY afte=
-r
-> a function call, and not for any other reason (including after a macro
-
-Thanks for the clarification. As a non-native speaker I find that usage
-of "may" highly non-intuitive. Especially since in chapter 4.
-"Conformance" (from n1124) does define how "shall" and "shall not" but
-there is nothing on "may".
-
-This way of saying macros expand to stuff that does not touch errno is
-IMHO quite unfriendly (if this was really the intention - I think it is
-quite likely that it was), and IMHO a more straight forward formulation
-would benefit the standard.
-
-> expansion if that macro does not expand to a documented function call).=
-
-
-It's clear that macro expansion itself does not modify program state, so
-the question is to what is a library macro allowed to expand to.
-
-> va_start() is usually not implemented as a function call, and even if i=
-t
-> is, it is not a publicly documented function call.
-
-IMHO whether it is implemented as a function (call) or a macro is irrelev=
-ant
-here. Apparently library functions may be additionally implemented as a m=
-acro,
-and library macros may be implemented as functions (7.2 "The assert macro=
-
-shall  be  implemented  as  a  macro,  not  as  an  actual  function").
-
-Library macros can expand to stuff calling documented library functions
-(7.2.1.1 "It then calls the abort function."), but this is also
-irrelevant if we interpret that "may" as you explained.=20
-
-
->=20
-> But you are certainly welcome to add further comments to the Austin
-> Group bug, if you think anything was misinterpreted - in the end, the
-> intent IS that va_* are safe to use without arbitrary changes to errno,=
-
-> and it is now just a matter of whether that intent is already met by C
-> wording or whether POSIX indeed needs to add an additional requirement.=
-
->=20
-
-Thank you very much for making your point clear. I take away: "The value
-of errno may be set to nonzero by a library function call" also
-means/implies 'use of any library entity, which was not specified as a
-library function, shall not set errno to nonzero'.  This really helps me
-a lot because it answers the question which part of the standard
-prohibits the va_* macros from clobbering errno.
-
-I see this primarily as a C ISO standard problem, so I'm reluctant to
-necro-bump that bug in order to start a discussion about how the C
-standard is to be interpreted.  I'm going to ask some friends if it is
-only me who finds it difficult to read that sentence as you propose.
-
-
-Best Regards,
-Halil
-
-
-=20
-
-
---lvFsk9mL00xWLKPccr6bL4drlLQgc7SPV
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.14 (GNU/Linux)
-
-iQIcBAEBAgAGBQJYc9bAAAoJEA0vhuyXGx0AQeAP/RnbzASguqiMBwZI04pffxZp
-fulphtJv7Qel78IIHUHLBluY85BJqNWjJqgmXIkkEjYPZvfmmI6mkvZi6gSgicP5
-li23AkBPYT6WQJX1FqUi/hHPSSRUuZJgSDPGarzRsYH0wbvcjf5Kcyr4CPJfBGJx
-RdOWk4hZw/odBE+KGU5gMHBySRhQ4s0oeBSmiNbEUnhzDtXo8+VB16SA0G03eTt7
-Kxud0VXBTxGFRuNZYPWBamv4d8imw/Aesqc6uI2+h4Ccgg+pChl6os3S+tAH3PLD
-eC9tlz3TmEf0EOp7IeAi4W4AWLlV2V/9PWBg0WG0GyT9cxpbRevDXT1uerzUpt6f
-RDohB4O4sUbX7N0odwfVdBtrNomAgnHBCsnGI5JMxKwNo6q7LLpBdYubXS2r4WsP
-itxei/LM4rl18cG4OlIGLJvnn2zpzlye8y7sLSuu1yC3JE3cROboGwixunaa+LMv
-4FAE2nBlFXFeY4B+SaJ6EKQzoUkYjjlHBY4tzX10v2kchydDsVpG1Cn9MGtlzyf1
-uKx3sU8SryAeTP2Ko3JY2eBG+LRvS2AXLG/BJzVbqjtzDqaqJGll9JaDW9Dc31mn
-xZ/4ByBo3fp4wkTPDuIf/jkBRAsmqPuO85LY8sB7begTKermmos83bKAEP9iyIQs
-SXuW+Q1Ji8yLiGMkngpy
-=EmJA
------END PGP SIGNATURE-----
-
---lvFsk9mL00xWLKPccr6bL4drlLQgc7SPV--
+diff --git a/hw/net/dp8393x.c b/hw/net/dp8393x.c
+index 17f0338..efa33ad 100644
+--- a/hw/net/dp8393x.c
++++ b/hw/net/dp8393x.c
+@@ -174,6 +174,52 @@ typedef struct dp8393xState {
+     AddressSpace as;
+ } dp8393xState;
+ 
++/* Accessor functions for values which are formed by
++ * concatenating two 16 bit device registers. By putting these
++ * in their own functions with a uint32_t return type we avoid the
++ * pitfall of implicit sign extension where ((x << 16) | y) is a
++ * signed 32 bit integer that might get sign-extended to a 64 bit integer.
++ */
++static uint32_t dp8393x_cdp(dp8393xState *s)
++{
++    return (s->regs[SONIC_URRA] << 16) | s->regs[SONIC_CDP];
++}
++
++static uint32_t dp8393x_crba(dp8393xState *s)
++{
++    return (s->regs[SONIC_CRBA1] << 16) | s->regs[SONIC_CRBA0];
++}
++
++static uint32_t dp8393x_crda(dp8393xState *s)
++{
++    return (s->regs[SONIC_URDA] << 16) | s->regs[SONIC_CRDA];
++}
++
++static uint32_t dp8393x_rbwc(dp8393xState *s)
++{
++    return (s->regs[SONIC_RBWC1] << 16) | s->regs[SONIC_RBWC0];
++}
++
++static uint32_t dp8393x_rrp(dp8393xState *s)
++{
++    return (s->regs[SONIC_URRA] << 16) | s->regs[SONIC_RRP];
++}
++
++static uint32_t dp8393x_tsa(dp8393xState *s)
++{
++    return (s->regs[SONIC_TSA1] << 16) | s->regs[SONIC_TSA0];
++}
++
++static uint32_t dp8393x_ttda(dp8393xState *s)
++{
++    return (s->regs[SONIC_UTDA] << 16) | s->regs[SONIC_TTDA];
++}
++
++static uint32_t dp8393x_wt(dp8393xState *s)
++{
++    return s->regs[SONIC_WT1] << 16 | s->regs[SONIC_WT0];
++}
++
+ static void dp8393x_update_irq(dp8393xState *s)
+ {
+     int level = (s->regs[SONIC_IMR] & s->regs[SONIC_ISR]) ? 1 : 0;
+@@ -203,8 +249,7 @@ static void dp8393x_do_load_cam(dp8393xState *s)
+ 
+     while (s->regs[SONIC_CDC] & 0x1f) {
+         /* Fill current entry */
+-        address_space_rw(&s->as,
+-            (s->regs[SONIC_URRA] << 16) | s->regs[SONIC_CDP],
++        address_space_rw(&s->as, dp8393x_cdp(s),
+             MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
+         s->cam[index][0] = data[1 * width] & 0xff;
+         s->cam[index][1] = data[1 * width] >> 8;
+@@ -222,8 +267,7 @@ static void dp8393x_do_load_cam(dp8393xState *s)
+     }
+ 
+     /* Read CAM enable */
+-    address_space_rw(&s->as,
+-        (s->regs[SONIC_URRA] << 16) | s->regs[SONIC_CDP],
++    address_space_rw(&s->as, dp8393x_cdp(s),
+         MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
+     s->regs[SONIC_CE] = data[0 * width];
+     DPRINTF("load cam done. cam enable mask 0x%04x\n", s->regs[SONIC_CE]);
+@@ -242,8 +286,7 @@ static void dp8393x_do_read_rra(dp8393xState *s)
+     /* Read memory */
+     width = (s->regs[SONIC_DCR] & SONIC_DCR_DW) ? 2 : 1;
+     size = sizeof(uint16_t) * 4 * width;
+-    address_space_rw(&s->as,
+-        (s->regs[SONIC_URRA] << 16) | s->regs[SONIC_RRP],
++    address_space_rw(&s->as, dp8393x_rrp(s),
+         MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
+ 
+     /* Update SONIC registers */
+@@ -292,7 +335,7 @@ static void dp8393x_set_next_tick(dp8393xState *s)
+         return;
+     }
+ 
+-    ticks = s->regs[SONIC_WT1] << 16 | s->regs[SONIC_WT0];
++    ticks = dp8393x_wt(s);
+     s->wt_last_update = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+     delay = NANOSECONDS_PER_SECOND * ticks / 5000000;
+     timer_mod(s->watchdog, s->wt_last_update + delay);
+@@ -309,7 +352,7 @@ static void dp8393x_update_wt_regs(dp8393xState *s)
+     }
+ 
+     elapsed = s->wt_last_update - qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+-    val = s->regs[SONIC_WT1] << 16 | s->regs[SONIC_WT0];
++    val = dp8393x_wt(s);
+     val -= elapsed / 5000000;
+     s->regs[SONIC_WT1] = (val >> 16) & 0xffff;
+     s->regs[SONIC_WT0] = (val >> 0)  & 0xffff;
+@@ -356,12 +399,11 @@ static void dp8393x_do_transmit_packets(dp8393xState *s)
+ 
+     while (1) {
+         /* Read memory */
+-        DPRINTF("Transmit packet at %08x\n",
+-                (s->regs[SONIC_UTDA] << 16) | s->regs[SONIC_CTDA]);
+         size = sizeof(uint16_t) * 6 * width;
+         s->regs[SONIC_TTDA] = s->regs[SONIC_CTDA];
++        DPRINTF("Transmit packet at %08x\n", dp8393x_ttda(s));
+         address_space_rw(&s->as,
+-            ((s->regs[SONIC_UTDA] << 16) | s->regs[SONIC_TTDA]) + sizeof(uint16_t) * width,
++            dp8393x_ttda(s) + sizeof(uint16_t) * width,
+             MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
+         tx_len = 0;
+ 
+@@ -386,8 +428,7 @@ static void dp8393x_do_transmit_packets(dp8393xState *s)
+             if (tx_len + len > sizeof(s->tx_buffer)) {
+                 len = sizeof(s->tx_buffer) - tx_len;
+             }
+-            address_space_rw(&s->as,
+-                (s->regs[SONIC_TSA1] << 16) | s->regs[SONIC_TSA0],
++            address_space_rw(&s->as, dp8393x_tsa(s),
+                 MEMTXATTRS_UNSPECIFIED, &s->tx_buffer[tx_len], len, 0);
+             tx_len += len;
+ 
+@@ -396,7 +437,7 @@ static void dp8393x_do_transmit_packets(dp8393xState *s)
+                 /* Read next fragment details */
+                 size = sizeof(uint16_t) * 3 * width;
+                 address_space_rw(&s->as,
+-                    ((s->regs[SONIC_UTDA] << 16) | s->regs[SONIC_TTDA]) + sizeof(uint16_t) * (4 + 3 * i) * width,
++                    dp8393x_ttda(s) + sizeof(uint16_t) * (4 + 3 * i) * width,
+                     MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
+                 s->regs[SONIC_TSA0] = data[0 * width];
+                 s->regs[SONIC_TSA1] = data[1 * width];
+@@ -430,14 +471,16 @@ static void dp8393x_do_transmit_packets(dp8393xState *s)
+         data[0 * width] = s->regs[SONIC_TCR] & 0x0fff; /* status */
+         size = sizeof(uint16_t) * width;
+         address_space_rw(&s->as,
+-            (s->regs[SONIC_UTDA] << 16) | s->regs[SONIC_TTDA],
++            dp8393x_ttda(s),
+             MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 1);
+ 
+         if (!(s->regs[SONIC_CR] & SONIC_CR_HTX)) {
+             /* Read footer of packet */
+             size = sizeof(uint16_t) * width;
+             address_space_rw(&s->as,
+-                ((s->regs[SONIC_UTDA] << 16) | s->regs[SONIC_TTDA]) + sizeof(uint16_t) * (4 + 3 * s->regs[SONIC_TFC]) * width,
++                dp8393x_ttda(s) +
++                             sizeof(uint16_t) *
++                             (4 + 3 * s->regs[SONIC_TFC]) * width,
+                 MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
+             s->regs[SONIC_CTDA] = data[0 * width] & ~0x1;
+             if (data[0 * width] & 0x1) {
+@@ -700,7 +743,7 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
+     if (s->regs[SONIC_LLFA] & 0x1) {
+         /* Are we still in resource exhaustion? */
+         size = sizeof(uint16_t) * 1 * width;
+-        address = ((s->regs[SONIC_URDA] << 16) | s->regs[SONIC_CRDA]) + sizeof(uint16_t) * 5 * width;
++        address = dp8393x_crda(s) + sizeof(uint16_t) * 5 * width;
+         address_space_rw(&s->as, address, MEMTXATTRS_UNSPECIFIED,
+                          (uint8_t *)data, size, 0);
+         if (data[0 * width] & 0x1) {
+@@ -719,8 +762,8 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
+     checksum = cpu_to_le32(crc32(0, buf, rx_len));
+ 
+     /* Put packet into RBA */
+-    DPRINTF("Receive packet at %08x\n", (s->regs[SONIC_CRBA1] << 16) | s->regs[SONIC_CRBA0]);
+-    address = (s->regs[SONIC_CRBA1] << 16) | s->regs[SONIC_CRBA0];
++    DPRINTF("Receive packet at %08x\n", dp8393x_crba(s));
++    address = dp8393x_crba(s);
+     address_space_rw(&s->as, address,
+         MEMTXATTRS_UNSPECIFIED, (uint8_t *)buf, rx_len, 1);
+     address += rx_len;
+@@ -729,13 +772,13 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
+     rx_len += 4;
+     s->regs[SONIC_CRBA1] = address >> 16;
+     s->regs[SONIC_CRBA0] = address & 0xffff;
+-    available = (s->regs[SONIC_RBWC1] << 16) | s->regs[SONIC_RBWC0];
++    available = dp8393x_rbwc(s);
+     available -= rx_len / 2;
+     s->regs[SONIC_RBWC1] = available >> 16;
+     s->regs[SONIC_RBWC0] = available & 0xffff;
+ 
+     /* Update status */
+-    if (((s->regs[SONIC_RBWC1] << 16) | s->regs[SONIC_RBWC0]) < s->regs[SONIC_EOBC]) {
++    if (dp8393x_rbwc(s) < s->regs[SONIC_EOBC]) {
+         s->regs[SONIC_RCR] |= SONIC_RCR_LPKT;
+     }
+     s->regs[SONIC_RCR] |= packet_type;
+@@ -746,20 +789,19 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
+     }
+ 
+     /* Write status to memory */
+-    DPRINTF("Write status at %08x\n", (s->regs[SONIC_URDA] << 16) | s->regs[SONIC_CRDA]);
++    DPRINTF("Write status at %08x\n", dp8393x_crda(s));
+     data[0 * width] = s->regs[SONIC_RCR]; /* status */
+     data[1 * width] = rx_len; /* byte count */
+     data[2 * width] = s->regs[SONIC_TRBA0]; /* pkt_ptr0 */
+     data[3 * width] = s->regs[SONIC_TRBA1]; /* pkt_ptr1 */
+     data[4 * width] = s->regs[SONIC_RSC]; /* seq_no */
+     size = sizeof(uint16_t) * 5 * width;
+-    address_space_rw(&s->as, (s->regs[SONIC_URDA] << 16) | s->regs[SONIC_CRDA],
++    address_space_rw(&s->as, dp8393x_crda(s),
+         MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 1);
+ 
+     /* Move to next descriptor */
+     size = sizeof(uint16_t) * width;
+-    address_space_rw(&s->as,
+-        ((s->regs[SONIC_URDA] << 16) | s->regs[SONIC_CRDA]) + sizeof(uint16_t) * 5 * width,
++    address_space_rw(&s->as, dp8393x_crda(s) + sizeof(uint16_t) * 5 * width,
+         MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
+     s->regs[SONIC_LLFA] = data[0 * width];
+     if (s->regs[SONIC_LLFA] & 0x1) {
+@@ -767,8 +809,7 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
+         s->regs[SONIC_ISR] |= SONIC_ISR_RDE;
+     } else {
+         data[0 * width] = 0; /* in_use */
+-        address_space_rw(&s->as,
+-            ((s->regs[SONIC_URDA] << 16) | s->regs[SONIC_CRDA]) + sizeof(uint16_t) * 6 * width,
++        address_space_rw(&s->as, dp8393x_crda(s) + sizeof(uint16_t) * 6 * width,
+             MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, sizeof(uint16_t), 1);
+         s->regs[SONIC_CRDA] = s->regs[SONIC_LLFA];
+         s->regs[SONIC_ISR] |= SONIC_ISR_PKTRX;
+-- 
+2.7.4
