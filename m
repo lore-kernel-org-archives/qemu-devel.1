@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54098)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55603)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cQQkJ-0008Vf-VS
-	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 22:35:45 -0500
+	(envelope-from <peterx@redhat.com>) id 1cQQvx-0002af-VL
+	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 22:47:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cQQkI-00082y-GR
-	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 22:35:43 -0500
-Date: Mon, 9 Jan 2017 13:54:14 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170109025414.GG12515@umbus.fritz.box>
-References: <20170106050451.11793-1-david@gibson.dropbear.id.au>
-	<53dcb2da-fa15-63b0-5849-325b6edcac83@redhat.com>
-	<20170106214052-mutt-send-email-mst@kernel.org>
-	<9cc108a2-4e56-e5ed-9ba4-4e0e0faac072@redhat.com>
-	<20170108234824.GC12515@umbus.fritz.box>
-	<20170109035746-mutt-send-email-mst@kernel.org>
+	(envelope-from <peterx@redhat.com>) id 1cQQvt-00058S-AL
+	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 22:47:46 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60758)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cQQvt-00058J-1Z
+	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 22:47:41 -0500
+Date: Mon, 9 Jan 2017 11:47:31 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170109034731.GG4135@pxdev.xzpeter.org>
+References: <1483673581-7843-1-git-send-email-peterx@redhat.com>
+	<1483673581-7843-3-git-send-email-peterx@redhat.com>
+	<20170106144041.3ruyijfgwlpqpfei@kamzik.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="cyV/sMl4KAhiehtf"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170109035746-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [RFC] pxb: Restrict to x86
+In-Reply-To: <20170106144041.3ruyijfgwlpqpfei@kamzik.brq.redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [kvm-unit-tests PATCH v3 2/2] run_tests: allow run
+ tests in parallel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,92 +30,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Marcel Apfelbaum <marcel@redhat.com>, ehabkost@redhat.com, thuth@redhat.com, lvivier@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Andrew Jones <drjones@redhat.com>
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
 
-
---cyV/sMl4KAhiehtf
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Mon, Jan 09, 2017 at 03:58:03AM +0200, Michael S. Tsirkin wrote:
-> On Mon, Jan 09, 2017 at 10:48:24AM +1100, David Gibson wrote:
-> > On Sun, Jan 08, 2017 at 10:17:12AM +0200, Marcel Apfelbaum wrote:
-> > > On 01/06/2017 09:41 PM, Michael S. Tsirkin wrote:
-> > > > On Fri, Jan 06, 2017 at 08:13:11AM +0200, Marcel Apfelbaum wrote:
-> > > > > On 01/06/2017 07:04 AM, David Gibson wrote:
-> > > > > > The PCI Expander Bridge (PXB) device is essentially a hack to a=
-llow
-> > > > > > different PCIe devices to be assigned to different NUMA nodes o=
-n x86.  Each
-> > > > > > PXB is sort-of a separate PCI host bridge, except that its conf=
-ig space
-> > > > > > is shared with the config space of the main PCI host bridge, ra=
-ther than
-> > > > > > being independent.
-> > > > > >=20
-> > > > >=20
-> > > > > Hi David,
-> > > > >=20
-> > > > > > This is only necessary if the platform doesn't (easily) allow t=
-ruly
-> > > > > > independent PCI host bridges.  AFAIK that's just x86.
-> > > > > >=20
-> > > > >=20
-> > > > > Indeed, it is possible to support independent PCI host bridges on=
- x86 by
-> > > > > using a separate MMCONFIG space for each one and enable separate =
-PCI domains.
-> > > > > We simply didn't need this until now, but maybe will be implement=
-ed it in the future.
-> > > >=20
-> > > > In fact I would say that's the cleanest way to do this on q35.
-> > >=20
-> > > Message received :)
+On Fri, Jan 06, 2017 at 03:40:41PM +0100, Andrew Jones wrote:
+> On Fri, Jan 06, 2017 at 11:33:01AM +0800, Peter Xu wrote:
+> > run_task.sh is getting slow. This patch is trying to make it faster b=
+y
+> > running the tests concurrently.
 > >=20
-> > Just so I'm clear, these last two comments are essentially suggesting
-> > a follow up cleanup on x86, rather than suggesting a different
-> > approach for non-PC platforms, yes?
+> > We provide a new parameter "-j" for the run_tests.sh, which can be us=
+ed
+> > to specify how many run queues we want for the tests. Default queue
+> > length is 1, which is the old behavior.
 > >=20
-> > If there are no objections to my original patch do you want to take it
-> > through your tree Michael, or should I take it through mine?
+> > Quick test on my laptop (4 cores, 2 threads each) shows 3x speed boos=
+t:
 > >=20
+> >    |-----------------+-----------|
+> >    | command         | time used |
+> >    |-----------------+-----------|
+> >    | run_test.sh     | 75s       |
+> >    | run_test.sh -j8 | 27s       |
+> >    |-----------------+-----------|
+> >=20
+> > Suggested-by: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@redhat.com>
 >=20
+> Radim suggested how to implement this, but not the idea of implementing
+> it. The suggested-by tag is for ideas, not the code, and the idea (whic=
+h
+> is a good one) was yours, not Radim's. So the above tag should be remov=
+ed.
+> It's hard to credit Radim for his help here. Adding a signed-off-by to
+> indicate co-authorship is probably the best you can do. Of course he's
+> the maintainer and will add that when he merges anyway though...
+
+I see, thanks for the clarification. Then let me remove this line.
+
 >=20
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > ---
+> >  run_tests.sh           | 12 ++++++++++--
+> >  scripts/functions.bash | 17 ++++++++++++++++-
+> >  scripts/global.bash    | 11 +++++++++++
+> >  3 files changed, 37 insertions(+), 3 deletions(-)
+> >=20
+> > diff --git a/run_tests.sh b/run_tests.sh
+> > index e1bb3a6..a4fc895 100755
+> > --- a/run_tests.sh
+> > +++ b/run_tests.sh
+> > @@ -14,10 +14,11 @@ function usage()
+> >  {
+> >  cat <<EOF
+> > =20
+> > -Usage: $0 [-g group] [-h] [-v]
+> > +Usage: $0 [-g group] [-h] [-v] [-j N]
 >=20
-> Go ahead and take it through  yours pls.
+> s/N/num_run_queues/
+
+Sure.
+
+[...]
+
+> > @@ -38,6 +39,13 @@ while getopts "g:hv" opt; do
+> >              usage
+> >              exit
+> >              ;;
+> > +        j)
+> > +            ut_run_queues=3D$OPTARG
+> > +            if ! is_number "$ut_run_queues"; then
+> > +                echo "Invalid -j option: $ut_run_queues"
+> > +                exit 1
+> > +            fi
 >=20
-> Acked-by: Michael S. Tsirkin <mst@redhat.com>
+> Instead of adding is_number() and just checking for numeric
+> input, I'd check the input is > 0. A string input resolves
+> as zero when treated as a number, so it'll fail too.
 
-Done, thanks.
+Wasn't familiar with shell arithmetic before. Your suggestion is much
+simpler, thanks.
 
+>=20
+> > +            ;;
+> >          v)
+> >              verbose=3D"yes"
+> >              ;;
+> > diff --git a/scripts/functions.bash b/scripts/functions.bash
+> > index d1d2e1c..c6281f4 100644
+> > --- a/scripts/functions.bash
+> > +++ b/scripts/functions.bash
+> > @@ -1,9 +1,18 @@
+> > +source scripts/global.bash
+> > +
+> >  function run_task()
+> >  {
+> >  	local testname=3D"$2"
+> > =20
+> > +	while [[ "$(jobs | wc -l)" =3D=3D $ut_run_queues ]]; do
+>=20
+> Bash arithmetic expressions should use (( ... )) instead
+> of [[ ... ]]
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Will do.
 
---cyV/sMl4KAhiehtf
-Content-Type: application/pgp-signature; name="signature.asc"
+[...]
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
+> > diff --git a/scripts/global.bash b/scripts/global.bash
+> > index 77b0b29..52095bd 100644
+> > --- a/scripts/global.bash
+> > +++ b/scripts/global.bash
+> > @@ -1,2 +1,13 @@
+> >  : ${ut_log_dir:=3Dlogs}
+> >  : ${ut_log_summary:=3D${ut_log_dir}/SUMMARY}
+> > +: ${ut_run_queues:=3D1}
+> > +
+> > +function ut_in_parallel()
+> > +{
+> > +    [[ $ut_run_queues !=3D 1 ]]
+> > +}
+>=20
+> I don't see any users of ut_in_parallel. Anyway I'd drop it
+> and open code the condition, with ((...)), when needed.
 
-iQIcBAEBCAAGBQJYcvtWAAoJEGw4ysog2bOSbRgQAMZwRDklXDxBO3gGwRsezTX/
-gsk5wXkGmXTMRClgeo7jNjBYzASLmKk+B1KcZIyyVck8z1rrqPZq362GfXa3Qvkd
-RjNVKoxgSFwYA07g4kWI5yQ8YzXR1H59UR0Z2sE6cdx/x1m5XgeERyIAWeJFgQzT
-7K+ddP4tlCDLSEFXWcL1NTcRcVrDNqbrvBrOY6UCks126VxfYZWJ4ykOvpiERb9O
-EWTRjugpWRZbHXZj1MQejWKm5n5dK8C7z6MRmsl517aDN+lJItkPKncjh062J36S
-7xKcdCY2h7GG0obyszug5sXJNccsVs9GjDvTAZZN8DfEoIissfJ4gjOjBRbNjrBO
-QzFzR10Al0y99aY/F6HMAMhmWQJtDMOEsaDpneLtruwlspd6CVwZU3lsbDHTsqXE
-Kr4Q4oUpVxDZR5I4R+ltWMXkGaYVZ8znJocYhWAXPy/dXtDMn/K99Fw9CIMXqnco
-JTADxQWjQUSEH9E5eiYsLw8sUQBZbR9Qc2GzQ+iCmLj1C4JDUxUfOYnZrFJWP1Sz
-eeql5REMj+nuXSeGPyfNav2viPOtIcDYQNlqKkV1BdPOgXTYlCDOaTIE/1pvq6ai
-tgdpV2D1Req+dwsnx6cZEv/GcTFv1xM/Psn5/FcsCAoBtTr+JElfErpX+eA+hXBf
-5QYUk7UJ9IzEhDgCAQyw
-=XN2t
------END PGP SIGNATURE-----
+Yes, it should be removed.
 
---cyV/sMl4KAhiehtf--
+Thanks!
+
+-- peterx
