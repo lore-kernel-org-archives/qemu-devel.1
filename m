@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49066)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49104)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cQVkG-0003Cl-V9
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 03:56:02 -0500
+	(envelope-from <peterx@redhat.com>) id 1cQVkJ-0003D2-Qu
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 03:56:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cQVkD-0001ip-TJ
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 03:56:01 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33282)
+	(envelope-from <peterx@redhat.com>) id 1cQVkI-0001oY-Ts
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 03:56:03 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51570)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cQVkD-0001h9-O0
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 03:55:57 -0500
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cQVkI-0001np-OB
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 03:56:02 -0500
 Received: from int-mx09.intmail.prod.int.phx2.redhat.com
 	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9029483F47
-	for <qemu-devel@nongnu.org>; Mon,  9 Jan 2017 08:55:57 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id CF11361B86
+	for <qemu-devel@nongnu.org>; Mon,  9 Jan 2017 08:56:02 +0000 (UTC)
 From: Peter Xu <peterx@redhat.com>
-Date: Mon,  9 Jan 2017 16:55:50 +0800
-Message-Id: <1483952153-7221-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH 0/3] x86: ioapic: fix fail migrate when
+Date: Mon,  9 Jan 2017 16:55:53 +0800
+Message-Id: <1483952153-7221-4-git-send-email-peterx@redhat.com>
+In-Reply-To: <1483952153-7221-1-git-send-email-peterx@redhat.com>
+References: <1483952153-7221-1-git-send-email-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH 3/3] x86: ioapic: fix fail migration when
  irqchip=split
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -31,33 +33,26 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, peterx@redhat.com
 
-Split irqchip works based on the fact that we kept the first 24 gsi
-routing entries inside KVM for userspace ioapic's use. When system
-boot, we'll reserve these MSI routing entries before hand. However,
-after migration, we forgot to re-configure it up in the destination
-side. The result is, we'll get invalid gsi routing entries after
-migration (all empty), and we get interrupts with vector=0, then
-strange things happen, like keyboard hang.
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+ hw/intc/ioapic.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-The solution is simple - we update them after migration, which is a
-one line fix in patch 3.
-
-The first two patches are things I used for debugging this issue.
-Though it might not be directly related, I still think it's something
-good to have in case we encounter similar interrupt issues in the
-future.
-
-Please review, thanks,
-
-Peter Xu (3):
-  x86: ioapic: add traces for ioapic
-  x86: ioapic: dump version for "info ioapic"
-  x86: ioapic: fix fail migration when irqchip=split
-
- hw/intc/ioapic.c        | 22 ++++++++++++++++++++--
- hw/intc/ioapic_common.c |  3 ++-
- hw/intc/trace-events    |  7 +++++++
- 3 files changed, 29 insertions(+), 3 deletions(-)
-
+diff --git a/hw/intc/ioapic.c b/hw/intc/ioapic.c
+index d1254f8..9047b89 100644
+--- a/hw/intc/ioapic.c
++++ b/hw/intc/ioapic.c
+@@ -439,6 +439,11 @@ static void ioapic_class_init(ObjectClass *klass, void *data)
+     DeviceClass *dc = DEVICE_CLASS(klass);
+ 
+     k->realize = ioapic_realize;
++    /*
++     * If APIC is in kernel, we need to update the kernel cache after
++     * migration, otherwise first 24 gsi routes will be invalid.
++     */
++    k->post_load = ioapic_update_kvm_routes;
+     dc->reset = ioapic_reset_common;
+     dc->props = ioapic_properties;
+ }
 -- 
 2.7.4
