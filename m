@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50472)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52584)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cQiqI-0003pj-1P
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 17:55:07 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cQiy2-00085v-4I
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 18:03:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cQiqE-0004Zb-UV
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 17:55:06 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49120)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cQiqE-0004Yw-Ly
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 17:55:02 -0500
-Date: Tue, 10 Jan 2017 00:55:00 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170110005437-mutt-send-email-mst@kernel.org>
-References: <1483175588-17006-1-git-send-email-caoj.fnst@cn.fujitsu.com>
-	<1483175588-17006-4-git-send-email-caoj.fnst@cn.fujitsu.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1cQiy1-00077O-9R
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 18:03:06 -0500
+Received: from mail-ua0-x22a.google.com ([2607:f8b0:400c:c08::22a]:34800)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cQiy1-00077F-58
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 18:03:05 -0500
+Received: by mail-ua0-x22a.google.com with SMTP id 35so40802824uak.1
+	for <qemu-devel@nongnu.org>; Mon, 09 Jan 2017 15:03:05 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1483175588-17006-4-git-send-email-caoj.fnst@cn.fujitsu.com>
-Subject: Re: [Qemu-devel] [PATCH RFC v11 3/4] vfio-pci: pass the aer error
- to guest
+In-Reply-To: <f3c873b5-1ccb-0cd4-e9fd-2f41fbdf0cca@tribudubois.net>
+References: <20170104220624.26557-1-jcd@tribudubois.net>
+	<CAFEAcA8dwhoSZTWS9JJ6-vSUs1Asw8ymktmD+oOqx0DNpCV2XQ@mail.gmail.com>
+	<1be7123c-acee-7d16-8a10-c8965d5805ff@gmail.com>
+	<CAFEAcA9cUEGL=rSrq2cstParBYHMWdkDy_acu7mTW754+G_Y6Q@mail.gmail.com>
+	<fb9b6b0a-62b5-2421-2826-d3f853b5d5b3@tribudubois.net>
+	<f6ddf63f-78b8-935b-9075-838a0ca0aa7d@tribudubois.net>
+	<CAFEAcA_3saBFbSX+e7P9X9n1wXV2=FjCMXML31MDq2xf+HdJmQ@mail.gmail.com>
+	<f3c873b5-1ccb-0cd4-e9fd-2f41fbdf0cca@tribudubois.net>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 9 Jan 2017 23:02:43 +0000
+Message-ID: <CAFEAcA-v8RJNLSjT4ALoBNUhZQSxHPupd5rg6t44ui5h4h8BuA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v4] [i.MX] fix CS handling during SPI
+ access.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,103 +36,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cao jin <caoj.fnst@cn.fujitsu.com>
-Cc: qemu-devel@nongnu.org, alex.williamson@redhat.com, izumi.taku@jp.fujitsu.com, Chen Fan <chen.fan.fnst@cn.fujitsu.com>, Dou Liyang <douly.fnst@cn.fujitsu.com>
+To: Jean-Christophe DUBOIS <jcd@tribudubois.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "mar.krzeminski" <mar.krzeminski@gmail.com>
 
-On Sat, Dec 31, 2016 at 05:13:07PM +0800, Cao jin wrote:
-> From: Chen Fan <chen.fan.fnst@cn.fujitsu.com>
-> 
-> When physical device has uncorrectable error hanppened, the vfio_pci
-> driver will signal the uncorrectable error status register value to
-> corresponding QEMU's vfio-pci device via the eventfd registered by this
-> device, then, the vfio-pci's error eventfd handler will be invoked in
-> event loop.
-> 
-> Construct and pass the aer message to root port, root port will trigger an
-> interrupt to signal guest, then, the guest driver will do the recovery.
-> 
-> Note: Now only support non-fatal error's recovery, fatal error will
-> still result in vm stop.
-> 
-> Signed-off-by: Chen Fan <chen.fan.fnst@cn.fujitsu.com>
-> Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
-> Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
-> ---
->  hw/vfio/pci.c | 50 ++++++++++++++++++++++++++++++++++++++++++--------
->  1 file changed, 42 insertions(+), 8 deletions(-)
-> 
-> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> index 76a8ac3..9861f72 100644
-> --- a/hw/vfio/pci.c
-> +++ b/hw/vfio/pci.c
-> @@ -2470,21 +2470,55 @@ static void vfio_put_device(VFIOPCIDevice *vdev)
->  static void vfio_err_notifier_handler(void *opaque)
->  {
->      VFIOPCIDevice *vdev = opaque;
-> +    PCIDevice *dev = &vdev->pdev;
-> +    PCIEAERMsg msg = {
-> +        .severity = 0,
-> +        .source_id = (pci_bus_num(dev->bus) << 8) | dev->devfn,
-> +    };
-> +    int len;
-> +    uint64_t uncor_status;
-> +
-> +    /* Read uncorrectable error status from driver */
-> +    len = read(vdev->err_notifier.rfd, &uncor_status, sizeof(uncor_status));
-> +    if (len != sizeof(uncor_status)) {
-> +        error_report("vfio-pci: uncor error status reading returns"
-> +                     " invalid number of bytes: %d", len);
-> +        return; //Or goto stop?
+On 9 January 2017 at 22:27, Jean-Christophe DUBOIS <jcd@tribudubois.net> wrote:
+> I might be wrong but I think they are coming out of reset with
+> their CS line set to low (so they are selected by default)
+> because this is the default level at reset.
 
-I would definitely suggest this to make sure we don't regress.
+If that's true then you're in difficulties, because
+there's no guarantee about device reset order. So
+even if your SPI controller calls qemu_set_irq in
+its reset function, if the devices on the other
+end happen to have their reset called after the
+controller then they'll still reset into selected...
 
-> +    }
-> +
-> +    if (!(vdev->features & VFIO_FEATURE_ENABLE_AER)) {
-> +        goto stop;
-> +    }
-> +
-> +    /* Populate the aer msg and send it to root port */
-> +    if (dev->exp.aer_cap) {
-> +        uint8_t *aer_cap = dev->config + dev->exp.aer_cap;
-> +        bool isfatal = uncor_status &
-> +                       pci_get_long(aer_cap + PCI_ERR_UNCOR_SEVER);
-> +
-> +	if (isfatal) {
-> +	    goto stop;
-> +	}
-> +
-> +        msg.severity = isfatal ? PCI_ERR_ROOT_CMD_FATAL_EN :
-> +                                 PCI_ERR_ROOT_CMD_NONFATAL_EN;
->  
-> -    if (!event_notifier_test_and_clear(&vdev->err_notifier)) {
-> +        error_report("vfio-pci device %d sending AER to root port. uncor"
-> +                     " status = 0x%"PRIx64, dev->devfn, uncor_status);
-> +        pcie_aer_msg(dev, &msg);
->          return;
->      }
->  
-> +stop:
->      /*
-> -     * TBD. Retrieve the error details and decide what action
-> -     * needs to be taken. One of the actions could be to pass
-> -     * the error to the guest and have the guest driver recover
-> -     * from the error. This requires that PCIe capabilities be
-> -     * exposed to the guest. For now, we just terminate the
-> -     * guest to contain the error.
-> +     * Terminate the guest in case of
-> +     * 1. AER capability is not exposed to guest.
-> +     * 2. AER capability is exposed, but error is fatal, only non-fatal
-> +     * error is handled now.
->       */
->  
-> -    error_report("%s(%s) Unrecoverable error detected. Please collect any data possible and then kill the guest", __func__, vdev->vbasedev.name);
-> +    error_report("%s(%s) fatal error detected. Please collect any data"
-> +            " possible and then kill the guest", __func__, vdev->vbasedev.name);
->  
->      vm_stop(RUN_STATE_INTERNAL_ERROR);
->  }
-> -- 
-> 1.8.3.1
-> 
-> 
+thanks
+-- PMM
