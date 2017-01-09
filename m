@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42062)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42300)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cQajy-0007z9-Ck
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 09:16:03 -0500
+	(envelope-from <imammedo@redhat.com>) id 1cQala-0000cL-Iy
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 09:17:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cQajv-00069P-9H
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 09:16:02 -0500
-Received: from indium.canonical.com ([91.189.90.7]:47352)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cQajv-00069G-3K
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 09:15:59 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cQajt-0003q7-JC
-	for <qemu-devel@nongnu.org>; Mon, 09 Jan 2017 14:15:57 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 474472E80C4
-	for <qemu-devel@nongnu.org>; Mon,  9 Jan 2017 14:15:57 +0000 (UTC)
+	(envelope-from <imammedo@redhat.com>) id 1cQalX-0006es-FF
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 09:17:42 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43790)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cQalX-0006eK-6i
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 09:17:39 -0500
+Date: Mon, 9 Jan 2017 15:17:33 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170109151733.34510569@nial.brq.redhat.com>
+In-Reply-To: <bd7470b8-42e1-c681-f5c5-0d3808e0a9b6@redhat.com>
+References: <1483371890-289981-1-git-send-email-imammedo@redhat.com>
+	<1483371890-289981-4-git-send-email-imammedo@redhat.com>
+	<bd7470b8-42e1-c681-f5c5-0d3808e0a9b6@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 09 Jan 2017 13:57:45 -0000
-From: Thomas Huth <775604@bugs.launchpad.net>
-Reply-To: Bug 775604 <775604@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20110502140912.31190.97664.malonedeb@chaenomeles.canonical.com>
-Message-Id: <20170109135746.14023.66041.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 775604] Re: Could not open SDL display when
- running XP as guest
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 3/3] fix qmp/hmp query-memdev not
+ repporting IDs of memory backends
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,40 +29,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, afaerber@suse.de, ehabkost@redhat.com, dgilbert@redhat.com, armbru@redhat.com, pbonzini@redhat.com
 
-Triaging old bug tickets... QEMU 0.14 is completely outdated nowadays.
-Can you still reproduce this behavior with the latest version of QEMU?
+On Tue, 3 Jan 2017 09:34:40 -0600
+Eric Blake <eblake@redhat.com> wrote:
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+> On 01/02/2017 09:44 AM, Igor Mammedov wrote:
+> 
+> s/repporting/reporting/ in the subject
+> 
+> > Do it by adding 'id' property to hostmem backends and fetch it
+> > in query-memdev from object directly.
+> > 
+> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > ---  
+> 
+> > +++ b/qom/object_interfaces.c
+> > @@ -4,6 +4,7 @@
+> >  #include "qemu/module.h"
+> >  #include "qapi-visit.h"
+> >  #include "qapi/opts-visitor.h"
+> > +#include "qapi/qmp/qstring.h"
+> >  
+> >  void user_creatable_complete(Object *obj, Error **errp)
+> >  {
+> > @@ -35,7 +36,7 @@ bool user_creatable_can_be_deleted(UserCreatable *uc, Error **errp)
+> >  }
+> >  
+> >  Object *user_creatable_add_type(const char *type, const char *id,
+> > -                                const QDict *qdict,
+> > +                                QDict *qdict,
+> >                                  Visitor *v, Error **errp)
+> >  {
+> >      Object *obj;
+> > @@ -62,6 +63,9 @@ Object *user_creatable_add_type(const char *type, const char *id,
+> >  
+> >      assert(qdict);
+> >      obj = object_new(type);
+> > +    if (object_property_find(obj, "id", NULL)) {
+> > +        qdict_put(qdict, "id", qstring_from_str(id));
+> > +    }  
+> 
+> Wait. Isn't this going to inject an 'id' dict member to every use of
+> user_creatable_add_type()?  But not all QAPI structs contain an id
+> member.  Which means that you are now explicitly relying on the visitor
+> to silently ignore garbage in the dictionary, rather than our desired
+> goal of only validating if the dictionary exactly matches what the QAPI
+> says it will match.
+> 
+> I'm not sure if I like this hack, or if there is a better way to do
+> things when using a strict (rather than relaxed) input visitor.
+a bit less ugly variant but with the same basic idea would look like:
+--------------
+Subject: [PATCH] fix qmp/hmp query-memdev not reporting IDs of memory backends   
+                                                                                 
+Considering 'id' is mandatory for user_creatable objects/backends                
+and user_creatable_add_type() always has it as an argument                       
+regardless of where from it is called CLI/monitor or QMP,                        
+Fix issue by adding 'id' property to hostmem backends and                        
+set it in user_creatable_add_type() for every object that                        
+implements 'id' property. Then later at query-memdev time                        
+get 'id' from object directly.                                                   
+                                                                                 
+Signed-off-by: Igor Mammedov <imammedo@redhat.com> 
 
--- =
+[...]
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/775604
-
-Title:
-  Could not open SDL display when running XP as guest
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  When running XP as guest on Linux 2.6.38 x86_64 (Arch Linux) in full
-  screen qemu will crash. Dropping to 1400x900 or below does not have a
-  problem nor does windowed mode.
-
-  1. Running:
-  qemu-system-x86_64 -vga std -full-screen Virtual_Machines/Windows_XP/Wind=
-ows_XP.img
-
-  Produces error:
-  Could not open SDL display (1920x1200x0): No video mode large enough for =
-1920x1200
-
-  qemu-kvm version 0.14.0-1
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/775604/+subscriptions
+diff --git a/qom/object_interfaces.c b/qom/object_interfaces.c
+index 9b4155a..03a95c3 100644
+--- a/qom/object_interfaces.c
++++ b/qom/object_interfaces.c
+@@ -62,6 +62,12 @@ Object *user_creatable_add_type(const char *type, const char *id,
+ 
+     assert(qdict);
+     obj = object_new(type);
++    if (object_property_find(obj, "id", NULL)) {
++        object_property_set_str(obj, id, "id", &local_err);
++        if (local_err) {
++            goto out;
++        }
++    }
+     visit_start_struct(v, NULL, NULL, 0, &local_err);
+     if (local_err) {
+         goto out;
