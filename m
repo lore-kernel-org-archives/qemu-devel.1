@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45514)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45560)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cQcmM-0001sS-Dy
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 11:26:39 -0500
+	(envelope-from <clg@kaod.org>) id 1cQcmT-00025O-P0
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 11:26:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1cQcmI-0004VL-Di
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 11:26:38 -0500
-Received: from 7.mo178.mail-out.ovh.net ([46.105.58.91]:60269)
+	(envelope-from <clg@kaod.org>) id 1cQcmP-0004X9-P5
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 11:26:45 -0500
+Received: from 1.mo178.mail-out.ovh.net ([178.33.251.53]:40118)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cQcmI-0004V2-7M
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 11:26:34 -0500
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1cQcmP-0004Ws-Jm
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 11:26:41 -0500
 Received: from player714.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 4E013D336
-	for <qemu-devel@nongnu.org>; Mon,  9 Jan 2017 17:26:31 +0100 (CET)
+	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 4E697AD77
+	for <qemu-devel@nongnu.org>; Mon,  9 Jan 2017 17:26:40 +0100 (CET)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Mon,  9 Jan 2017 17:24:46 +0100
-Message-Id: <1483979087-32663-11-git-send-email-clg@kaod.org>
+Date: Mon,  9 Jan 2017 17:24:47 +0100
+Message-Id: <1483979087-32663-12-git-send-email-clg@kaod.org>
 In-Reply-To: <1483979087-32663-1-git-send-email-clg@kaod.org>
 References: <1483979087-32663-1-git-send-email-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 10/11] aspeed: use first FMC flash as a boot
- ROM
+Subject: [Qemu-devel] [PATCH v2 11/11] aspeed/smc: handle dummy bytes when
+ doing fast reads in command mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,95 +33,82 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Crosthwaite <crosthwaite.peter@gmail.com>
 Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Marcin Krzeminski <marcin.krzeminski@nokia.com>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-Create a ROM region, using the default size of the mapping window for
-the CE0 FMC flash module, and fill it with the flash content.
-
-This is a little hacky but until we can boot from a MMIO region, it
-seems difficult to do anything else.
+When doing fast read, a certain amount of dummy bytes should be sent
+before the read. This number is configurable in the controler CE0
+Control Register and needs to be modeled using fake transfers the
+flash module.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: Joel Stanley <joel@jms.id.au>
 Reviewed-by: Andrew Jeffery <andrew@aj.id.au>
 ---
- hw/arm/aspeed.c | 41 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 41 insertions(+)
+ hw/ssi/aspeed_smc.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
-diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
-index 40c13838fb2d..a92c2f1c362b 100644
---- a/hw/arm/aspeed.c
-+++ b/hw/arm/aspeed.c
-@@ -20,6 +20,8 @@
- #include "qemu/log.h"
- #include "sysemu/block-backend.h"
- #include "sysemu/blockdev.h"
-+#include "hw/loader.h"
-+#include "qemu/error-report.h"
+ Changes since v1:
+
+ - splitted user mode from command mode support.
+
+diff --git a/hw/ssi/aspeed_smc.c b/hw/ssi/aspeed_smc.c
+index 28d563a5800f..7a76d3344df2 100644
+--- a/hw/ssi/aspeed_smc.c
++++ b/hw/ssi/aspeed_smc.c
+@@ -69,7 +69,9 @@
+ #define R_CTRL0           (0x10 / 4)
+ #define   CTRL_CMD_SHIFT           16
+ #define   CTRL_CMD_MASK            0xff
++#define   CTRL_DUMMY_HIGH_SHIFT    14
+ #define   CTRL_AST2400_SPI_4BYTE   (1 << 13)
++#define   CTRL_DUMMY_LOW_SHIFT     6 /* 2 bits [7:6] */
+ #define   CTRL_CE_STOP_ACTIVE      (1 << 2)
+ #define   CTRL_CMD_MODE_MASK       0x3
+ #define     CTRL_READMODE          0x0
+@@ -141,6 +143,7 @@
 =20
- static struct arm_boot_info aspeed_board_binfo =3D {
-     .board_id =3D -1, /* device-tree-only board */
-@@ -104,6 +106,28 @@ static const AspeedBoardConfig aspeed_boards[] =3D {
-     },
- };
+ /* Flash opcodes. */
+ #define SPI_OP_READ       0x03    /* Read data bytes (low frequency) */
++#define SPI_OP_READ_FAST  0x0b    /* Read data bytes (high frequency) */
 =20
-+#define FIRMWARE_ADDR 0x0
-+
-+static void write_boot_rom(DriveInfo *dinfo, hwaddr addr, size_t rom_siz=
-e,
-+                           Error **errp)
+ /*
+  * Default segments mapping addresses and size for each slave per
+@@ -490,10 +493,21 @@ static uint32_t aspeed_smc_check_segment_addr(const=
+ AspeedSMCFlash *fl,
+     return addr;
+ }
+=20
++static int aspeed_smc_flash_dummies(const AspeedSMCFlash *fl)
 +{
-+    BlockBackend *blk =3D blk_by_legacy_dinfo(dinfo);
-+    uint8_t *storage;
++    const AspeedSMCState *s =3D fl->controller;
++    uint32_t r_ctrl0 =3D s->regs[s->r_ctrl0 + fl->id];
++    uint32_t dummy_high =3D (r_ctrl0 >> CTRL_DUMMY_HIGH_SHIFT) & 0x1;
++    uint32_t dummy_low =3D (r_ctrl0 >> CTRL_DUMMY_LOW_SHIFT) & 0x3;
 +
-+    if (rom_size > blk_getlength(blk)) {
-+        rom_size =3D blk_getlength(blk);
-+    }
-+
-+    storage =3D g_new0(uint8_t, rom_size);
-+    if (blk_pread(blk, 0, storage, rom_size) < 0) {
-+        error_setg(errp, "failed to read the initial flash content");
-+        return;
-+    }
-+
-+    rom_add_blob_fixed("aspeed.boot_rom", storage, rom_size, addr);
-+    g_free(storage);
++    return ((dummy_high << 2) | dummy_low) * 8;
 +}
 +
- static void aspeed_board_init_flashes(AspeedSMCState *s, const char *fla=
-shtype,
-                                       Error **errp)
+ static void aspeed_smc_flash_send_addr(AspeedSMCFlash *fl, uint32_t addr=
+)
  {
-@@ -135,6 +159,7 @@ static void aspeed_board_init(MachineState *machine,
- {
-     AspeedBoardState *bmc;
-     AspeedSoCClass *sc;
-+    DriveInfo *drive0 =3D drive_get(IF_MTD, 0, 0);
+     const AspeedSMCState *s =3D fl->controller;
+     uint8_t cmd =3D aspeed_smc_flash_cmd(fl);
++    int i;
 =20
-     bmc =3D g_new0(AspeedBoardState, 1);
-     object_initialize(&bmc->soc, (sizeof(bmc->soc)), cfg->soc_name);
-@@ -168,6 +193,22 @@ static void aspeed_board_init(MachineState *machine,
-     aspeed_board_init_flashes(&bmc->soc.fmc, cfg->fmc_model, &error_abor=
-t);
-     aspeed_board_init_flashes(&bmc->soc.spi[0], cfg->spi_model, &error_a=
-bort);
-=20
-+    /* Install first FMC flash content as a boot rom. */
-+    if (drive0) {
-+        AspeedSMCFlash *fl =3D &bmc->soc.fmc.flashes[0];
-+        MemoryRegion *boot_rom =3D g_new(MemoryRegion, 1);
+     /* Flash access can not exceed CS segment */
+     addr =3D aspeed_smc_check_segment_addr(fl, addr);
+@@ -506,6 +520,13 @@ static void aspeed_smc_flash_send_addr(AspeedSMCFlas=
+h *fl, uint32_t addr)
+     ssi_transfer(s->spi, (addr >> 16) & 0xff);
+     ssi_transfer(s->spi, (addr >> 8) & 0xff);
+     ssi_transfer(s->spi, (addr & 0xff));
 +
-+        /*
-+         * create a ROM region using the default mapping window size of
-+         * the flash module.
-+         */
-+        memory_region_init_rom(boot_rom, OBJECT(bmc), "aspeed.boot_rom",
-+                               fl->size, &error_abort);
-+        memory_region_add_subregion(get_system_memory(), FIRMWARE_ADDR,
-+                                    boot_rom);
-+        write_boot_rom(drive0, FIRMWARE_ADDR, fl->size, &error_abort);
++    /* Handle dummies in case of fast read */
++    if (cmd =3D=3D SPI_OP_READ_FAST) {
++        for (i =3D 0; i < aspeed_smc_flash_dummies(fl); i++) {
++            ssi_transfer(fl->controller->spi, 0xFF);
++        }
 +    }
-+
-     aspeed_board_binfo.kernel_filename =3D machine->kernel_filename;
-     aspeed_board_binfo.initrd_filename =3D machine->initrd_filename;
-     aspeed_board_binfo.kernel_cmdline =3D machine->kernel_cmdline;
+ }
+=20
+ static uint64_t aspeed_smc_flash_read(void *opaque, hwaddr addr, unsigne=
+d size)
 --=20
 2.7.4
