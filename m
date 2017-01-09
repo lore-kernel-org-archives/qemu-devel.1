@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37490)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37907)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cQYWd-0002bR-TR
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:54:09 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cQYYf-0004SM-77
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:56:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cQYWY-0004D4-Pw
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:54:07 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:47993)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1cQYWY-00045M-Ix
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:54:02 -0500
-Received: from pm215 by orth.archaic.org.uk with local (Exim 4.84_2)
-	(envelope-from <pm215@archaic.org.uk>) id 1cQYWI-0001MD-KE
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 11:53:46 +0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon,  9 Jan 2017 11:53:25 +0000
-Message-Id: <1483962824-29185-3-git-send-email-peter.maydell@linaro.org>
-In-Reply-To: <1483962824-29185-1-git-send-email-peter.maydell@linaro.org>
-References: <1483962824-29185-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 02/21] hw/char: QOM'ify exynos4210_uart.c
+	(envelope-from <pbonzini@redhat.com>) id 1cQYYc-0005Pa-7D
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:56:13 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:59946)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cQYYc-0005PL-0r
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:56:10 -0500
+Received: from int-mx09.intmail.prod.int.phx2.redhat.com
+	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1C9F84E4DE
+	for <qemu-devel@nongnu.org>; Mon,  9 Jan 2017 11:56:10 +0000 (UTC)
+Received: from donizetti.redhat.com (ovpn-116-124.ams2.redhat.com
+	[10.36.116.124])
+	by int-mx09.intmail.prod.int.phx2.redhat.com (8.14.4/8.14.4) with ESMTP
+	id v09Bu8xI005988
+	for <qemu-devel@nongnu.org>; Mon, 9 Jan 2017 06:56:09 -0500
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Mon,  9 Jan 2017 12:56:08 +0100
+Message-Id: <20170109115608.18150-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH] megasas: fix guest-triggered memory leak
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,71 +34,61 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: xiaoqiang zhao <zxq_yx_007@163.com>
+If the guest sets the sglist size to a value >=2GB, megasas_handle_dcmd
+will return MFI_STAT_MEMORY_NOT_AVAILABLE without freeing the memory.
+Avoid this by returning only the status from map_dcmd, and loading
+cmd->iov_size in the caller.
 
-Drop the old Sysbus init and use instance_init and
-DeviceClass::realize instead
-
-Signed-off-by: xiaoqiang zhao <zxq_yx_007@163.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reported-by: Li Qiang <liqiang6-s@360.cn>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/char/exynos4210_uart.c | 16 ++++++++++------
- 1 file changed, 10 insertions(+), 6 deletions(-)
+ hw/scsi/megasas.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
-diff --git a/hw/char/exynos4210_uart.c b/hw/char/exynos4210_uart.c
-index 571c324..820d1ab 100644
---- a/hw/char/exynos4210_uart.c
-+++ b/hw/char/exynos4210_uart.c
-@@ -629,22 +629,26 @@ DeviceState *exynos4210_uart_create(hwaddr addr,
-     return dev;
+diff --git a/hw/scsi/megasas.c b/hw/scsi/megasas.c
+index 67fc1e7..6233865 100644
+--- a/hw/scsi/megasas.c
++++ b/hw/scsi/megasas.c
+@@ -683,14 +683,14 @@ static int megasas_map_dcmd(MegasasState *s, MegasasCmd *cmd)
+         trace_megasas_dcmd_invalid_sge(cmd->index,
+                                        cmd->frame->header.sge_count);
+         cmd->iov_size = 0;
+-        return -1;
++        return -EINVAL;
+     }
+     iov_pa = megasas_sgl_get_addr(cmd, &cmd->frame->dcmd.sgl);
+     iov_size = megasas_sgl_get_len(cmd, &cmd->frame->dcmd.sgl);
+     pci_dma_sglist_init(&cmd->qsg, PCI_DEVICE(s), 1);
+     qemu_sglist_add(&cmd->qsg, iov_pa, iov_size);
+     cmd->iov_size = iov_size;
+-    return cmd->iov_size;
++    return 0;
  }
  
--static int exynos4210_uart_init(SysBusDevice *dev)
-+static void exynos4210_uart_init(Object *obj)
+ static void megasas_finish_dcmd(MegasasCmd *cmd, uint32_t iov_size)
+@@ -1559,19 +1559,20 @@ static const struct dcmd_cmd_tbl_t {
+ 
+ static int megasas_handle_dcmd(MegasasState *s, MegasasCmd *cmd)
  {
-+    SysBusDevice *dev = SYS_BUS_DEVICE(obj);
-     Exynos4210UartState *s = EXYNOS4210_UART(dev);
+-    int opcode, len;
++    int opcode;
+     int retval = 0;
++    size_t len;
+     const struct dcmd_cmd_tbl_t *cmdptr = dcmd_cmd_tbl;
  
-     /* memory mapping */
--    memory_region_init_io(&s->iomem, OBJECT(s), &exynos4210_uart_ops, s,
-+    memory_region_init_io(&s->iomem, obj, &exynos4210_uart_ops, s,
-                           "exynos4210.uart", EXYNOS4210_UART_REGS_MEM_SIZE);
-     sysbus_init_mmio(dev, &s->iomem);
- 
-     sysbus_init_irq(dev, &s->irq);
-+}
-+
-+static void exynos4210_uart_realize(DeviceState *dev, Error **errp)
-+{
-+    Exynos4210UartState *s = EXYNOS4210_UART(dev);
- 
-     qemu_chr_fe_set_handlers(&s->chr, exynos4210_uart_can_receive,
-                              exynos4210_uart_receive, exynos4210_uart_event,
-                              s, NULL, true);
--
--    return 0;
- }
- 
- static Property exynos4210_uart_properties[] = {
-@@ -658,9 +662,8 @@ static Property exynos4210_uart_properties[] = {
- static void exynos4210_uart_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(klass);
--    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
- 
--    k->init = exynos4210_uart_init;
-+    dc->realize = exynos4210_uart_realize;
-     dc->reset = exynos4210_uart_reset;
-     dc->props = exynos4210_uart_properties;
-     dc->vmsd = &vmstate_exynos4210_uart;
-@@ -670,6 +673,7 @@ static const TypeInfo exynos4210_uart_info = {
-     .name          = TYPE_EXYNOS4210_UART,
-     .parent        = TYPE_SYS_BUS_DEVICE,
-     .instance_size = sizeof(Exynos4210UartState),
-+    .instance_init = exynos4210_uart_init,
-     .class_init    = exynos4210_uart_class_init,
- };
- 
+     opcode = le32_to_cpu(cmd->frame->dcmd.opcode);
+     trace_megasas_handle_dcmd(cmd->index, opcode);
+-    len = megasas_map_dcmd(s, cmd);
+-    if (len < 0) {
++    if (megasas_map_dcmd(s, cmd) < 0) {
+         return MFI_STAT_MEMORY_NOT_AVAILABLE;
+     }
+     while (cmdptr->opcode != -1 && cmdptr->opcode != opcode) {
+         cmdptr++;
+     }
++    len = cmd->iov_size;
+     if (cmdptr->opcode == -1) {
+         trace_megasas_dcmd_unhandled(cmd->index, opcode, len);
+         retval = megasas_dcmd_dummy(s, cmd);
 -- 
-2.7.4
+2.9.3
