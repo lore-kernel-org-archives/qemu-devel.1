@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33437)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36256)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cQfqN-0004Gg-4J
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 14:42:59 -0500
+	(envelope-from <sbruno@freebsd.org>) id 1cQg1v-0007Av-HU
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 14:54:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cQfqJ-0008T7-Eg
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 14:42:59 -0500
-Received: from mail-vk0-x229.google.com ([2607:f8b0:400c:c05::229]:32884)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cQfqJ-0008Sx-1F
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 14:42:55 -0500
-Received: by mail-vk0-x229.google.com with SMTP id 137so347296019vkl.0
-	for <qemu-devel@nongnu.org>; Mon, 09 Jan 2017 11:42:54 -0800 (PST)
+	(envelope-from <sbruno@freebsd.org>) id 1cQg1r-00040X-M5
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 14:54:55 -0500
+Received: from ignoranthack.me ([199.102.79.106]:64428
+	helo=mail.ignoranthack.me)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sbruno@freebsd.org>) id 1cQg1r-00040Q-Cs
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 14:54:51 -0500
+Received: from [192.168.0.6] (67-0-248-244.albq.qwest.net [67.0.248.244])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	(Authenticated sender: sbruno@ignoranthack.me)
+	by mail.ignoranthack.me (Postfix) with ESMTPSA id D895B1928BA
+	for <qemu-devel@nongnu.org>; Mon,  9 Jan 2017 19:54:48 +0000 (UTC)
+References: <20170105164105.23859-1-sbruno@freebsd.org>
+	<CAFEAcA9Rc5AQMv8iNMjo3rQjLGbbsGe+x0hodWgH4DFK8QDCtA@mail.gmail.com>
+From: Sean Bruno <sbruno@freebsd.org>
+Message-ID: <05be906b-51e9-1f2d-9a02-10b4c8577e7a@freebsd.org>
+Date: Mon, 9 Jan 2017 12:54:45 -0700
 MIME-Version: 1.0
-In-Reply-To: <20161222152300.32395-22-pbonzini@redhat.com>
-References: <20161222152300.32395-1-pbonzini@redhat.com>
-	<20161222152300.32395-22-pbonzini@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 9 Jan 2017 19:42:33 +0000
-Message-ID: <CAFEAcA_G4Cgwimce6kMzWkB2zHLbTMwWH8ZcEP2kRu8853Lu_Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PULL 21/25] scsi-disk: fix VERIFY for scsi-block
+In-Reply-To: <CAFEAcA9Rc5AQMv8iNMjo3rQjLGbbsGe+x0hodWgH4DFK8QDCtA@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature";
+	boundary="qQkcFHQXGeR6K394lUOGKhOMmhchtbt5P"
+Subject: Re: [Qemu-devel] [PATCH] Update FreeBSD syscall numbers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,44 +35,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-On 22 December 2016 at 15:22, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> When a scsi-disk object receives VERIFY command with BYTCHK bit being zero,
-> scsi_block_is_passthrough returns false and finally makes req being proceeded
-> by scsi_block_dma_command. Because scsi_block_dma_command has removed process
-> of VERIFY, QEMU will abort in this function.
->
-> Reported-by: Junlian Bell <zhongjun@sangfor.com.cn>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  hw/scsi/scsi-disk.c | 9 ++++++++-
->  1 file changed, 8 insertions(+), 1 deletion(-)
->
-> diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-> index a963191..bdd1e5f 100644
-> --- a/hw/scsi/scsi-disk.c
-> +++ b/hw/scsi/scsi-disk.c
-> @@ -2157,6 +2157,13 @@ static int32_t scsi_disk_dma_command(SCSIRequest *req, uint8_t *buf)
->          DPRINTF("Write %s(sector %" PRId64 ", count %u)\n",
->                  (command & 0xe) == 0xe ? "And Verify " : "",
->                  r->req.cmd.lba, len);
-> +    case VERIFY_10:
-> +    case VERIFY_12:
-> +    case VERIFY_16:
-> +        /* We get here only for BYTCHK == 0x01 and only for scsi-block.
-> +         * As far as DMA is concerned, we can treat it the same as a write;
-> +         * scsi_block_do_sgio will send VERIFY commands.
-> +         */
->          if (r->req.cmd.buf[1] & 0xe0) {
->              goto illegal_request;
->          }
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--qQkcFHQXGeR6K394lUOGKhOMmhchtbt5P
+From: Sean Bruno <sbruno@freebsd.org>
+To: qemu-devel@nongnu.org
+Message-ID: <05be906b-51e9-1f2d-9a02-10b4c8577e7a@freebsd.org>
+Subject: Re: [Qemu-devel] [PATCH] Update FreeBSD syscall numbers
+References: <20170105164105.23859-1-sbruno@freebsd.org>
+ <CAFEAcA9Rc5AQMv8iNMjo3rQjLGbbsGe+x0hodWgH4DFK8QDCtA@mail.gmail.com>
+In-Reply-To: <CAFEAcA9Rc5AQMv8iNMjo3rQjLGbbsGe+x0hodWgH4DFK8QDCtA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Coverity now complains about the fallthrough into the case statements
-added here. I assume from the patch that the fallthrough is deliberate,
-in which case a /* fall through */ comment would assist future
-readers...
 
-thanks
--- PMM
+
+On 01/09/17 07:00, Peter Maydell wrote:
+> On 5 January 2017 at 16:41, Sean Bruno <sbruno@freebsd.org> wrote:
+>> Signed-off-by: Sean Bruno <sbruno@freebsd.org>
+>> Signed-off-by: Stacy Son <sson@freebsd.org>
+>> ---
+>>  bsd-user/freebsd/syscall_nr.h | 929 ++++++++++++++++++++++-----------=
+---------
+>>  1 file changed, 484 insertions(+), 445 deletions(-)
+>>
+>> diff --git a/bsd-user/freebsd/syscall_nr.h b/bsd-user/freebsd/syscall_=
+nr.h
+>> index d849024792..fc31880af0 100644
+>> --- a/bsd-user/freebsd/syscall_nr.h
+>> +++ b/bsd-user/freebsd/syscall_nr.h
+>> @@ -1,450 +1,489 @@
+>>  /*
+>> + * This file was generated from /usr/include/sys/syscall.h
+>> + */
+>> +
+>> +/*
+>>   * System call numbers.
+>>   *
+>> - * created from FreeBSD: releng/9.1/sys/kern/syscalls.master 229723
+>> - * 2012-01-06 19:29:16Z jhb
+>> + * DO NOT EDIT-- this file is automatically generated.
+>> + * $FreeBSD: head/sys/sys/syscall.h 272824 2014-10-09 15:19:35Z marce=
+l $
+>> + * created from FreeBSD: head/sys/kern/syscalls.master 272823 2014-10=
+-09 15:16:52Z marcel
+>>   */
+>=20
+> If this is automatically generated, then ideally we should have
+> the script that generates it in scripts/...
+> (and we could fix the script to follow our coding style in using
+> spaces rather than tabs :-))
+>=20
+> thanks
+> -- PMM
+>=20
+>=20
+
+Yeah, I immediately went to run that locally so I could clean this up
+and comply with coding style ... then I ran into path assumptions in the
+scripts, but its on my list this week. :-)
+
+sean
+
+
+--qQkcFHQXGeR6K394lUOGKhOMmhchtbt5P
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQGTBAEBCgB9FiEEuq1GMucSHejSCZfdEgHvyh5yfmQFAlhz6oVfFIAAAAAALgAo
+aXNzdWVyLWZwckBub3RhdGlvbnMub3BlbnBncC5maWZ0aGhvcnNlbWFuLm5ldEJB
+QUQ0NjMyRTcxMjFERThEMjA5OTdERDEyMDFFRkNBMUU3MjdFNjQACgkQEgHvyh5y
+fmS+lAf9Gdag5+KlZV1jxgWtN/l3M/zMF2LJxZMCbAyjF4vJS7Xl6bGpd/igAvlS
+fuo+Ej5XfLlmYEDWdvF0O+wrRauf2JAh+JqGP3Q8evsPggQZTQZg81Enu6xi6Odt
+oGfxo3Nm6X3RSQooY6M6LDFpvc54z9EaRB57elMWMRy/ns6DJ+Q9znNp+aUXPc6I
+j63IIdTkHVxmsBcaBW6xOrvcRV69KQcuKqJbzKD9B+E2XPn1ohPFDqbjCXM0CRdR
+GCZQPjzdsqixCaP9+dZB9GrPyhlw3RHcOpVuStj5Ql4R3Wzw65ATpei0D+XlDMtA
+AbwmZfMV3aubq8BeFlejkc2emorQ9w==
+=Z7U9
+-----END PGP SIGNATURE-----
+
+--qQkcFHQXGeR6K394lUOGKhOMmhchtbt5P--
