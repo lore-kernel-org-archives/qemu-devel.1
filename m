@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38117)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40021)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cQYZa-0005Yd-GU
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:57:11 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cQYk2-0006ST-DH
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 07:07:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cQYZX-0005dd-FC
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:57:10 -0500
-Received: from mail-wj0-x22f.google.com ([2a00:1450:400c:c01::22f]:35096)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cQYZX-0005d7-93
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:57:07 -0500
-Received: by mail-wj0-x22f.google.com with SMTP id i20so63839553wjn.2
-	for <qemu-devel@nongnu.org>; Mon, 09 Jan 2017 03:57:05 -0800 (PST)
-References: <20161214171244.26813-1-alex.bennee@linaro.org>
-	<903503264.6427014.1482145774126.JavaMail.zimbra@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <903503264.6427014.1482145774126.JavaMail.zimbra@redhat.com>
-Date: Mon, 09 Jan 2017 11:57:02 +0000
-Message-ID: <87wpe4mooh.fsf@linaro.org>
+	(envelope-from <pbonzini@redhat.com>) id 1cQYjz-0001CR-8K
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 07:07:58 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48302)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cQYjz-0001By-31
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 07:07:55 -0500
+References: <20161219060336.10176-1-hangaohuai@huawei.com>
+	<33183CC9F5247A488A2544077AF19020DA180CB2@DGGEMA505-MBX.china.huawei.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <fdf51620-656e-9da2-d2d7-40685e7c5d62@redhat.com>
+Date: Mon, 9 Jan 2017 13:07:51 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC/POC PATCH 0/4] Building TCG tests with
- emdebian cross compilers
+In-Reply-To: <33183CC9F5247A488A2544077AF19020DA180CB2@DGGEMA505-MBX.china.huawei.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4] bugfix: vm halt when in reset looping
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,98 +27,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <mlureau@redhat.com>
-Cc: bobby prani <bobby.prani@gmail.com>, marcandre lureau <marcandre.lureau@redhat.com>, peter maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+To: "Gonglei (Arei)" <arei.gonglei@huawei.com>, Hangaohuai <hangaohuai@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "mst@redhat.com" <mst@redhat.com>
 
 
-Marc-André Lureau <mlureau@redhat.com> writes:
 
-> Hi
->
-> ----- Original Message -----
->> Hi Pranith,
+On 09/01/2017 10:08, Gonglei (Arei) wrote:
 >>
->> Here is a proof-of-concept series for you to consider rolling into the TCG
->> tests
->> cleanup. It uses the existing docker make machinery to build a Debian
->> image which has arm, arm64 and ppc64el cross compilers in it. Now if
->> you run:
+>> From: Hangaohuai
+>> Sent: Monday, December 19, 2016 2:04 PM
+>> To: qemu-devel@nongnu.org
+>> Cc: mst@redhat.com; pbonzini@redhat.com; Gonglei (Arei); Hangaohuai
+>> Subject: [PATCH v4] bugfix: vm halt when in reset looping
 >>
->>   make arm-tcg-tests
+>> reset mc146818rtc device when RESET event happens.
 >>
->> It will do the requisite build of the docker image and then use that
->> to build the TCG tests in the appropriate build directory.
+>> Fix the problem:
+>>   1. Guest boot the second cpu, set CMOS_RESET_CODE 0x0a to protect
+>> selfboot;
+>>   2. VM being reset by others, hmp_system_reset;
+>>   3. seabios resume check the CMOS_RESET_CODE, if 0x0a, jump to the BDA
+>>      resume execution by jump via 40h:0067h;
+>>   4. Guest halt;
 >>
->> These apply on top of your existing series. There is also a quick hack
->> to disable the running of the tests by default. I think we need two
->> stages, maybe a build-FOO-tcg-tests and run-FOO-tcg-tests.
+>> Signed-off-by: hangaohuai <hangaohuai@huawei.com>
+>> ---
+>>  hw/timer/mc146818rtc.c | 12 ++++++++++++
+>>  1 file changed, 12 insertions(+)
 >>
->> What do you think?
->
-> I like the idea, as long as you can also run the tcg tests without
-> docker.
+> 
+> Reviewed-by: Gonglei <arei.gonglei@huawei.com>
+> 
+> Paolo, could you pls pick up this patch?
 
-Yes, the idea is the build deposits the test binaries in host systems
-$QEMU_SRC/$arch-linux-user/tests (preferably statically linked) where
-the test machinery can then pick them up and run them.
+Yes, it's queued.  Maybe this week--sorry for the delay.
 
-> How many of the qemu archs debian cross tools support? last
-> time I looked there was annoying limitations, but I can't remember the
-> details.
+Paolo
 
-I think currently the emdebian compilers are arm, ppc and mips.
-
-> crosstool-ng has perhaps more potential, especially if devs would
-> share their config/samples (we could then have a cross-distro
-> packaging with flatpack?)
-
-Or simply a plain container which can hold pre-builts for the rarer
-compilers?
-
-There are a couple of problems I'm trying to solve.
-
-The first is having a standard way to cross-build stuff so we can least
-have a reference mechanism that is available to all devs. While we all
-probably have random compilers sitting on our systems it would be nice
-to have one method we could give new devs to say "this will build you
-some foreign test binaries".
-
-The second problem is as soon as you move away from simple libc
-dependencies you start having to deal with development header
-pre-requisites and that can get messy on your main system even with
-multi-lib setups. A docker container can be created with all the
-$FOO-arch dependencies for QEMU quite easily without breaking your main
-machine. You simply need to run a "apt-get build-dep -a $ARCH qemu"
-before the configure/build step.
-
-It would be nice to come up with a solution to the proliferation of
-containers though. The debootstrap container build script is generic but
-currently we don't expose all the architecture variants in the make
-system. We leave the user to build the containers they need and manually
-call them for the build.
-
->
->> Alex Bennée (4):
->>   tests/docker: add basic user mapping support
->>   new tests/docker/dockerfiles/debian-multiarch-cross.docker
->>   tests/tcg: don't run tests by default
->>   tests/tcg/Makefile: use docker target for arm-tcg-tests
+> Thanks,
+> -Gonglei
+> 
+>> diff --git a/hw/timer/mc146818rtc.c b/hw/timer/mc146818rtc.c
+>> index da209d0..637f872 100644
+>> --- a/hw/timer/mc146818rtc.c
+>> +++ b/hw/timer/mc146818rtc.c
+>> @@ -946,11 +946,23 @@ static Property mc146818rtc_properties[] = {
+>>      DEFINE_PROP_END_OF_LIST(),
+>>  };
 >>
->>  tests/docker/docker.py                             | 19 +++++++++++
->>  tests/docker/dockerfiles/debian-bootstrap.docker   |  3 ++
->>  .../dockerfiles/debian-multiarch-cross.docker      | 39
->>  ++++++++++++++++++++++
->>  tests/tcg/Makefile.include                         | 20 +++++++++--
->>  tests/tcg/arm/Makefile                             |  2 +-
->>  tests/tcg/misc/Makefile                            |  4 +--
->>  6 files changed, 81 insertions(+), 6 deletions(-)
->>  create mode 100644 tests/docker/dockerfiles/debian-multiarch-cross.docker
+>> +static void rtc_resetdev(DeviceState *d)
+>> +{
+>> +    RTCState *s = MC146818_RTC(d);
+>> +
+>> +    /* Reason: VM do suspend self will set 0xfe
+>> +     * Reset any values other than 0xfe(Guest suspend case) */
+>> +    if (s->cmos_data[0x0f] != 0xfe) {
+>> +        s->cmos_data[0x0f] = 0x00;
+>> +    }
+>> +}
+>> +
+>>  static void rtc_class_initfn(ObjectClass *klass, void *data)
+>>  {
+>>      DeviceClass *dc = DEVICE_CLASS(klass);
 >>
+>>      dc->realize = rtc_realizefn;
+>> +    dc->reset = rtc_resetdev;
+>>      dc->vmsd = &vmstate_rtc;
+>>      dc->props = mc146818rtc_properties;
+>>      /* Reason: needs to be wired up by rtc_init() */
 >> --
->> 2.11.0
+>> 1.8.3.1
 >>
->>
-
-
---
-Alex Bennée
+> 
