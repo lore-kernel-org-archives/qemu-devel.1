@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37283)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38223)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cQcGK-0000AH-1V
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 10:53:33 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cQcKb-0003Wq-BF
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 10:57:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cQcGI-0006cW-Lz
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 10:53:32 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45186)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cQcGI-0006c6-Dh
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 10:53:30 -0500
-Date: Mon, 9 Jan 2017 15:44:39 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170109154439.GF30228@stefanha-x1.localdomain>
-References: <148278447806.8988.12706825771606357198.stgit@fimbulvetr.bsc.es>
-	<148278449426.8988.2219094135462471980.stgit@fimbulvetr.bsc.es>
+	(envelope-from <peter.maydell@linaro.org>) id 1cQcKa-0008Nv-Ah
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 10:57:57 -0500
+Received: from mail-vk0-x22b.google.com ([2607:f8b0:400c:c05::22b]:33319)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cQcKa-0008Nk-4Y
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 10:57:56 -0500
+Received: by mail-vk0-x22b.google.com with SMTP id 137so343971125vkl.0
+	for <qemu-devel@nongnu.org>; Mon, 09 Jan 2017 07:57:55 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="gneEPciiIl/aKvOT"
-Content-Disposition: inline
-In-Reply-To: <148278449426.8988.2219094135462471980.stgit@fimbulvetr.bsc.es>
-Subject: Re: [Qemu-devel] [PATCH v4 3/6] hypertrace: [*-user] Add QEMU-side
- proxy to "guest_hypertrace" event
+In-Reply-To: <CAKmqyKNy=NeOPJs7C+3LgyCGMoy6W9gAhz5M5BgJ7t9YwTLA4g@mail.gmail.com>
+References: <1481625384-15077-1-git-send-email-peter.maydell@linaro.org>
+	<CAKmqyKNy=NeOPJs7C+3LgyCGMoy6W9gAhz5M5BgJ7t9YwTLA4g@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 9 Jan 2017 15:57:35 +0000
+Message-ID: <CAFEAcA9S+tsneJsi1Q+andFK=w_W3=ApXJNXJkbFThfPRL_30Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH 00/23] arm: Add virtualization to GICv3,
+ and enable EL2 on 64-bit CPUs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,165 +30,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Llu=EDs?= Vilanova <vilanova@ac.upc.edu>
-Cc: qemu-devel@nongnu.org, Daniel P Berrange <berrange@redhat.com>, Luiz Capitulino <lcapitulino@redhat.com>, Eric Blake <eblake@redhat.com>, Riku Voipio <riku.voipio@iki.fi>
+To: Alistair Francis <alistair23@gmail.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Andrew Jones <drjones@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, Patch Tracking <patches@linaro.org>
 
+On 19 December 2016 at 22:20, Alistair Francis <alistair23@gmail.com> wrote:
+> If I manually enable EL2 and EL3 for the Xilinx EP108 board I can
+> replicate a full hardware flow from ATF -> u-boot -> Linux.
+>
+> Unfortunately Linux doesn't get too far as I get the error below. This
+> is further then it was getting before though, so I'm still including
+> this:
+>
+> Tested-by: Alistair Francis <alistair.francis@xilinx.com>
+>
+> [       24547.770] Detected VIPT I-cache on CPU1
+> [       24667.370] CPU features: SANITY CHECK: Unexpected variation in
+> SYS_CNTFRQ_EL0. Boot CPU: 0x00000005f5e100, CPU1: 0x00000003b9aca0
+> [       24769.210] Unsupported CPU feature variation.
 
---gneEPciiIl/aKvOT
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I'm not sure what's going on here -- in a full-EL3 setup then
+we should be using the ATF PSCI implementation and it's the
+firmware's job to ensure that SYS_CNTFRQ_EL0 is the same on
+the booted up CPU (by pulling it out of the memory mapped system
+timer, usually). On reset the CPUs will all have the same
+CNTFRQ_EL0 value so unless EL3 firmware is writing dodgy values
+to it they shouldn't end up out of sync. Might also be worth
+checking we're not accidentally trying to use QEMU's PSCI
+implementation.
 
-On Mon, Dec 26, 2016 at 09:34:54PM +0100, Llu=EDs Vilanova wrote:
-> @@ -847,6 +855,10 @@ int main(int argc, char **argv)
->          } else if (!strcmp(r, "trace")) {
->              g_free(trace_file);
->              trace_file =3D trace_opt_parse(optarg);
-> +        } else if (!strcmp(r, "hypertrace")) {
-> +            g_free(hypertrace_file);
+I suspect this will be easier for you to investigate than me --
+is this related to the system timer implementation you sent
+patches for?
 
-This variable hasn't been declared yet.  Perhaps it's in a later patch.
-Please reorder things to avoid the compilation error.
-
-Or was this supposed to be hypertrace_base?
-
-> +void hypertrace_init_config(struct hypertrace_config *config,
-> +                            unsigned int max_clients)
-> +{
-> +    config->max_clients =3D max_clients;
-> +    config->client_args =3D CONFIG_HYPERTRACE_ARGS;
-> +    config->client_data_size =3D config->client_args * sizeof(uint64_t);
-> +    config->control_size =3D QEMU_ALIGN_UP(
-> +        config->max_clients * sizeof(uint64_t), TARGET_PAGE_SIZE);
-
-This needs to be host page size aligned, too.  Otherwise protect will
-affect bytes beyond the end of the control region.
-
-> +static void init_channel(const char *base, const char *suffix, size_t si=
-ze,
-> +                         char **path, int *fd, uint64_t **addr)
-> +{
-> +    *path =3D g_malloc(strlen(base) + strlen(suffix) + 1);
-> +    sprintf(*path, "%s%s", base, suffix);
-> +
-> +    *fd =3D open(*path, O_CREAT | O_EXCL | O_RDWR, S_IRUSR | S_IWUSR);
-> +    if (*fd =3D=3D -1) {
-> +        error_report("error: open(%s): %s", *path, strerror(errno));
-> +        abort();
-> +    }
-
-open() can fail for reasons outside QEMU's control.  This isn't an
-internal error.  Please exit cleanly instead of using abort(3).
-
-> +void hypertrace_init(const char *base, unsigned int max_clients)
-> +{
-> +    struct sigaction sigint;
-> +    struct hypertrace_config *pconfig;
-> +
-> +    if (base =3D=3D NULL) {
-> +        return;
-> +    }
-> +
-> +    memset(&sigint, 0, sizeof(sigint));
-> +    sigint.sa_sigaction =3D fini_handler;
-> +    sigint.sa_flags =3D SA_SIGINFO | SA_RESTART;
-> +    if (sigaction(SIGINT, &sigint, NULL) !=3D 0) {
-> +        error_report("error: sigaction(SIGINT): %s", strerror(errno));
-> +        abort();
-> +    }
-> +    if (sigaction(SIGABRT, &sigint, NULL) !=3D 0) {
-> +        error_report("error: sigaction(SIGABRT): %s", strerror(errno));
-> +        abort();
-> +    }
-
-I don't know whether it's okay to set up signal handlers in user mode.
-
-Will this break guest code SIGINT/SIGABRT handling?
-
-> +bool hypertrace_guest_mmap_check(int fd, unsigned long len,
-> +                                 unsigned long offset)
-> +{
-> +    struct stat s;
-> +    if (fstat(fd, &s) < 0) {
-> +        return true;
-
-Should this be return false?
-
-> +    }
-> +
-> +    if (s.st_dev !=3D control_fd_stat.st_dev ||
-> +        s.st_ino !=3D control_fd_stat.st_ino) {
-> +        return true;
-
-Here too.
-
-> +static void segv_handler(int signum, siginfo_t *siginfo, void *sigctxt)
-> +{
-> +    CPUState *vcpu =3D current_cpu;
-> +    void *control_0 =3D vcpu->hypertrace_control;
-> +    void *control_1 =3D vcpu->hypertrace_control + config.control_size /=
- 2;
-> +    void *control_2 =3D control_1 + config.control_size / 2;
-> +
-> +    if (control_0 <=3D siginfo->si_addr && siginfo->si_addr < control_1)=
- {
-> +
-> +        /* 1st fault (guest will write cmd) */
-> +        assert(((unsigned long)siginfo->si_addr % sizeof(uint64_t)) =3D=
-=3D 0);
-
-Please use uintptr_t instead of unsigned long.  It's more portable
-because it doesn't assume sizeof(void*) =3D=3D sizeof(unsigned long).  On
-Windows the 64-bit data model is LLP64, not LP64:
-https://en.wikipedia.org/wiki/64-bit_computing#64-bit_data_models
-
-> +        swap_control(control_0, control_1);
-> +
-> +    } else if (control_1 <=3D siginfo->si_addr && siginfo->si_addr < con=
-trol_2) {
-> +        size_t client =3D (siginfo->si_addr - control_1) / sizeof(uint64=
-_t);
-> +        uint64_t vcontrol =3D ((uint64_t *)control_0)[client];
-> +        uint64_t *data_ptr =3D &qemu_data[client * config.client_data_si=
-ze];
-
-Is byte swapping required?
-
-> +
-> +        /* 2nd fault (invoke) */
-> +        assert(((unsigned long)siginfo->si_addr % sizeof(uint64_t)) =3D=
-=3D 0);
-> +        hypertrace_emit(current_cpu, vcontrol, data_ptr);
-> +        swap_control(control_1, control_0);
-
-I don't understand how this scheme works for multi-threaded programs.
-If two threads are both writing at the same time can we miss events due
-to swap_control() changing mprotect?
-
-> +
-> +    } else {
-> +        /* proxy to next handler */
-> +        if (segv_next.sa_sigaction !=3D NULL) {
-> +            segv_next.sa_sigaction(signum, siginfo, sigctxt);
-> +        } else if (segv_next.sa_handler !=3D NULL) {
-> +            segv_next.sa_handler(signum);
-> +        }
-
-Is there a case when no signal handler was installed (i.e. default
-action)?
-
---gneEPciiIl/aKvOT
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJYc6/nAAoJEJykq7OBq3PIdlEH/ipW1Hea/kFvdceyNSmOK0ee
-FyrI3As82aAPQzXs2vb1hhhHTAqYghQDijqs7XJQiLDm0n21m5QpHSmtni/SCEM8
-lB/t6WZlbEGPwLWb2tu2q6bmlnNgeoTEYbem4w+3vMdc4VYQcxD6K19RkJl3S2ZH
-d7/J7qyXV4C4/6jCNetqhwgwg6K6OnCLWNM6kRpPU01XD+9YGkSWSdXAaDMRVmjt
-Hf6CIIQ5ZwQKdiIHx0Va6D3lBHZje6IBUIOHob6uttjR2zgAZc9MaKkqL8iTo1dh
-koW/uTZOf2wVi2Z+uyhAmPipls6Dhi2rQdKYtBjTdolqJ03/qMpte1awCIyupeU=
-=uguf
------END PGP SIGNATURE-----
-
---gneEPciiIl/aKvOT--
+thanks
+-- PMM
