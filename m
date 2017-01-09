@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54022)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54206)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rka@sysgo.com>) id 1cQZg9-0003us-88
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 08:08:02 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1cQZh7-0004PR-48
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 08:09:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rka@sysgo.com>) id 1cQZg6-0007o1-0c
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 08:08:01 -0500
-Received: from mail.sysgo.com ([176.9.12.79]:46550)
+	(envelope-from <dgilbert@redhat.com>) id 1cQZh3-0008AN-Pn
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 08:09:00 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37994)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rka@sysgo.com>) id 1cQZg5-0007ng-PT
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 08:07:57 -0500
-From: Roman Kapl <rka@sysgo.com>
-Date: Mon,  9 Jan 2017 14:07:49 +0100
-Message-Id: <20170109130749.9795-1-rka@sysgo.com>
-In-Reply-To: <148396120962.205.623546213408864755@790289a7ca88>
-References: <148396120962.205.623546213408864755@790289a7ca88>
-Subject: [Qemu-devel] [PATCH v2] ppc: Prevent inifnite loop in decrementer
- auto-reload.
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cQZh3-0008A7-Jc
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 08:08:57 -0500
+Date: Mon, 9 Jan 2017 13:08:53 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170109130852.GE2541@work-vm>
+References: <38337537-d2f4-6933-f4fe-2092247a199d@cardoe.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <38337537-d2f4-6933-f4fe-2092247a199d@cardoe.com>
+Subject: Re: [Qemu-devel] assert hit on master with q35 machine type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,41 +26,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Roman Kapl <rka@sysgo.com>
+To: stefanha@redhat.com, Doug Goldstein <cardoe@cardoe.com>
+Cc: qemu-devel@nongnu.org
 
-If the DECAR register is set to 0, QEMU tries to reload the decrementer with
-zero in an inifinite loop. According to PPC documentation, the decrementer is
-triggered on 1->0 transition, so avoid reloading the decrementer if if is
-already zero.
+copying in Stefan since it's his commit.
 
-The problem does not manifest under Linux, but it is valid to set DECAR to zero
-(and may make sense as part of decrementer initialization when interrupts are
-disabled).
+* Doug Goldstein (cardoe@cardoe.com) wrote:
+> I'm currently hitting an assert on master. I've bisected the change down
+> to aff8fd18f1786fc5af259a9bc0077727222f51ca but obviously that's a false
+> positive because that adds the assert for the condition. So obviously
+> the issue was introduced prior to this. As another data point the issue
+> only occurs with q35 machines and will only happen with pc-q35-2.7 and
+> pc-q35-2.8 (and obviously the aliased q35). If I use pc-q35-2.6 it does
+> not hit.
+> 
+> The message is: qemu-system-x86_64:
+> /home/doug/work/qemu/hw/virtio/virtio.c:214:
+> virtio_queue_set_notification: Assertion `vq->notification_disabled > 0'
+> failed.
+> 
+> But that clearly just shows its the assert that was added in that
+> commit. To create the machine I use the following command line:
+> 
+> ./work/qemu/x86_64-softmmu/qemu-system-x86_64 -enable-kvm -M pc-q35-2.8
+> -device intel-iommu -cpu host -m 2048 -smp 2 -drive
+> if=pflash,format=raw,file=/tmp/tmp.Sno2BP3saP -global
+> isa-debugcon.iobase=0x402 -debugcon file:/tmp/tmp.KCrwM98Mus -monitor
+> stdio -chardev socket,host=127.0.0.1,port=4455,id=S0,server,nowait
+> -device isa-serial,chardev=S0 -device piix3-usb-uhci -device usb-tablet
+> -netdev id=net0,type=tap -device virtio-net-pci,netdev=net0 -boot
+> order=n -device qxl-vga -gdb tcp::1234
+> 
+> It happens almost right away. Let me know how I can help track this down
+> further.
+> 
+> Thanks.
+> -- 
+> Doug Goldstein
+> 
 
-Signed-off-by: Roman Kapl <rka@sysgo.com>
----
- hw/ppc/ppc_booke.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/hw/ppc/ppc_booke.c b/hw/ppc/ppc_booke.c
-index ab8d026..60baffa 100644
---- a/hw/ppc/ppc_booke.c
-+++ b/hw/ppc/ppc_booke.c
-@@ -198,8 +198,12 @@ static void booke_decr_cb(void *opaque)
-     booke_update_irq(cpu);
- 
-     if (env->spr[SPR_BOOKE_TCR] & TCR_ARE) {
--        /* Auto Reload */
--        cpu_ppc_store_decr(env, env->spr[SPR_BOOKE_DECAR]);
-+        /* Do not reload 0, it is already there. It would just trigger
-+         * the timer again and lead to infinite loop */
-+        if (env->spr[SPR_BOOKE_DECAR] != 0) {
-+            /* Auto Reload */
-+            cpu_ppc_store_decr(env, env->spr[SPR_BOOKE_DECAR]);
-+        }
-     }
- }
- 
--- 
-2.10.1
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
