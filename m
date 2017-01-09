@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46342)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46389)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cQb27-0001qR-7s
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 09:34:51 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cQb29-0001qk-VK
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 09:34:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cQb26-00034L-E0
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 09:34:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54812)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cQb29-000369-0c
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 09:34:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45012)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1cQb26-00033F-95
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 09:34:46 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+	id 1cQb28-00035H-R0
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 09:34:48 -0500
+Received: from int-mx13.intmail.prod.int.phx2.redhat.com
+	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 79874A794
-	for <qemu-devel@nongnu.org>; Mon,  9 Jan 2017 14:34:46 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0166983F47
+	for <qemu-devel@nongnu.org>; Mon,  9 Jan 2017 14:34:49 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Mon,  9 Jan 2017 15:34:21 +0100
-Message-Id: <20170109143437.30554-6-marcandre.lureau@redhat.com>
+Date: Mon,  9 Jan 2017 15:34:23 +0100
+Message-Id: <20170109143437.30554-8-marcandre.lureau@redhat.com>
 In-Reply-To: <20170109143437.30554-1-marcandre.lureau@redhat.com>
 References: <20170109143437.30554-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v7 05/21] qapi: improve TransactionAction doc
+Subject: [Qemu-devel] [PATCH v7 07/21] qapi: avoid interleaving sections and
+ parameters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,63 +37,80 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: eblake@redhat.com, armbru@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-TransactionAction is a flat union, document 'type' versions
-exhaustively, and sort the members.
+Follow documentation guideline, body, parameters then additional
+sections.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
 ---
- qapi-schema.json | 31 ++++++++++++++++---------------
- 1 file changed, 16 insertions(+), 15 deletions(-)
+ qapi-schema.json     | 10 +++++-----
+ qapi/event.json      |  4 ++--
+ qapi/introspect.json |  3 +--
+ 3 files changed, 8 insertions(+), 9 deletions(-)
 
 diff --git a/qapi-schema.json b/qapi-schema.json
-index 85efdfccd8..ac6352fcf9 100644
+index ac6352fcf9..10a3506528 100644
 --- a/qapi-schema.json
 +++ b/qapi-schema.json
-@@ -1795,28 +1795,29 @@
- # @TransactionAction:
+@@ -4729,17 +4729,17 @@
+ # it should be passed by management with device_add command when
+ # a CPU is being hotplugged.
  #
- # A discriminated record of operations that can be performed with
--# @transaction.
-+# @transaction. Action @type can be:
++# @node-id: #optional NUMA node ID the CPU belongs to
++# @socket-id: #optional socket number within node/board the CPU belongs =
+to
++# @core-id: #optional core number within socket the CPU belongs to
++# @thread-id: #optional thread number within core the CPU belongs to
++#
+ # Note: currently there are 4 properties that could be present
+ # but management should be prepared to pass through other
+ # properties with device_add command to allow for future
+ # interface extension. This also requires the filed names to be kept in
+ # sync with the properties passed to -device/device_add.
  #
--# Since: 1.1
-+# - @abort: since 1.6
-+# - @block-dirty-bitmap-add: since 2.5
-+# - @block-dirty-bitmap-clear: since 2.5
-+# - @blockdev-backup: since 2.3
-+# - @blockdev-snapshot: since 2.5
-+# - @blockdev-snapshot-internal-sync: since 1.7
-+# - @blockdev-snapshot-sync: since 1.1
-+# - @drive-backup: since 1.6
- #
--# drive-backup since 1.6
--# abort since 1.6
--# blockdev-snapshot-internal-sync since 1.7
--# blockdev-backup since 2.3
--# blockdev-snapshot since 2.5
--# block-dirty-bitmap-add since 2.5
--# block-dirty-bitmap-clear since 2.5
-+# Since: 1.1
+-# @node-id: #optional NUMA node ID the CPU belongs to
+-# @socket-id: #optional socket number within node/board the CPU belongs =
+to
+-# @core-id: #optional core number within socket the CPU belongs to
+-# @thread-id: #optional thread number within core the CPU belongs to
+-#
+ # Since: 2.7
  ##
- { 'union': 'TransactionAction',
-   'data': {
--       'blockdev-snapshot': 'BlockdevSnapshot',
--       'blockdev-snapshot-sync': 'BlockdevSnapshotSync',
--       'drive-backup': 'DriveBackup',
--       'blockdev-backup': 'BlockdevBackup',
-        'abort': 'Abort',
--       'blockdev-snapshot-internal-sync': 'BlockdevSnapshotInternal',
-        'block-dirty-bitmap-add': 'BlockDirtyBitmapAdd',
--       'block-dirty-bitmap-clear': 'BlockDirtyBitmap'
-+       'block-dirty-bitmap-clear': 'BlockDirtyBitmap',
-+       'blockdev-backup': 'BlockdevBackup',
-+       'blockdev-snapshot': 'BlockdevSnapshot',
-+       'blockdev-snapshot-internal-sync': 'BlockdevSnapshotInternal',
-+       'blockdev-snapshot-sync': 'BlockdevSnapshotSync',
-+       'drive-backup': 'DriveBackup'
-    } }
-=20
+ { 'struct': 'CpuInstanceProperties',
+diff --git a/qapi/event.json b/qapi/event.json
+index 37bf34ed6d..c7689b211d 100644
+--- a/qapi/event.json
++++ b/qapi/event.json
+@@ -272,9 +272,9 @@
+ #
+ # Emitted when guest executes ACPI _OST method.
+ #
+-# Since: 2.1
+-#
+ # @info: ACPIOSTInfo type as described in qapi-schema.json
++#
++# Since: 2.1
  ##
+ { 'event': 'ACPI_DEVICE_OST',
+      'data': { 'info': 'ACPIOSTInfo' } }
+diff --git a/qapi/introspect.json b/qapi/introspect.json
+index 464097a235..f6adc439bb 100644
+--- a/qapi/introspect.json
++++ b/qapi/introspect.json
+@@ -78,14 +78,13 @@
+ # @SchemaInfo:
+ #
+ # @name: the entity's name, inherited from @base.
++#        The SchemaInfo is always referenced by this name.
+ #        Commands and events have the name defined in the QAPI schema.
+ #        Unlike command and event names, type names are not part of
+ #        the wire ABI.  Consequently, type names are meaningless
+ #        strings here, although they are still guaranteed unique
+ #        regardless of @meta-type.
+ #
+-# All references to other SchemaInfo are by name.
+-#
+ # @meta-type: the entity's meta type, inherited from @base.
+ #
+ # Additional members depend on the value of @meta-type.
 --=20
 2.11.0
