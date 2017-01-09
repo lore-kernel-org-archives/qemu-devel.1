@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53367)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33437)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cQfLI-00018F-H7
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 14:10:53 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cQfqN-0004Gg-4J
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 14:42:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cQfLE-0005Lg-FW
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 14:10:52 -0500
-Resent-Message-Id: <E1cQfLE-0005Lg-FW@eggs.gnu.org>
-In-Reply-To: <1483988759-14606-1-git-send-email-peter.maydell@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <148398903105.208.13573655327114962163@790289a7ca88>
+	(envelope-from <peter.maydell@linaro.org>) id 1cQfqJ-0008T7-Eg
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 14:42:59 -0500
+Received: from mail-vk0-x229.google.com ([2607:f8b0:400c:c05::229]:32884)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cQfqJ-0008Sx-1F
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 14:42:55 -0500
+Received: by mail-vk0-x229.google.com with SMTP id 137so347296019vkl.0
+	for <qemu-devel@nongnu.org>; Mon, 09 Jan 2017 11:42:54 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 9 Jan 2017 11:10:32 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH] disas/cris.c: Fix Coverity warning about
- unchecked NULL
+In-Reply-To: <20161222152300.32395-22-pbonzini@redhat.com>
+References: <20161222152300.32395-1-pbonzini@redhat.com>
+	<20161222152300.32395-22-pbonzini@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 9 Jan 2017 19:42:33 +0000
+Message-ID: <CAFEAcA_G4Cgwimce6kMzWkB2zHLbTMwWH8ZcEP2kRu8853Lu_Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PULL 21/25] scsi-disk: fix VERIFY for scsi-block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,43 +29,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, edgar.iglesias@gmail.com, patches@linaro.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQQVRDSF0gZGlzYXMvY3Jpcy5jOiBGaXggQ292ZXJpdHkgd2FybmluZyBhYm91dCB1
-bmNoZWNrZWQgTlVMTApUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMTQ4Mzk4ODc1OS0xNDYwNi0x
-LWdpdC1zZW5kLWVtYWlsLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZwoKPT09IFRFU1QgU0NSSVBU
-IEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1v
-bmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCiMgVXNlZnVsIGdpdCBvcHRpb25zCmdp
-dCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
-ZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNl
-ICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENI
-ICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBn
-aXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFp
-bGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49
-JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRh
-dGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6
-Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgIHBh
-dGNoZXcvMTQ4Mzk4ODc1OS0xNDYwNi0xLWdpdC1zZW5kLWVtYWlsLXBldGVyLm1heWRlbGxAbGlu
-YXJvLm9yZyAtPiBwYXRjaGV3LzE0ODM5ODg3NTktMTQ2MDYtMS1naXQtc2VuZC1lbWFpbC1wZXRl
-ci5tYXlkZWxsQGxpbmFyby5vcmcKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo2M2Nm
-YTI2IGRpc2FzL2NyaXMuYzogRml4IENvdmVyaXR5IHdhcm5pbmcgYWJvdXQgdW5jaGVja2VkIE5V
-TEwKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTogZGlzYXMvY3Jpcy5j
-OiBGaXggQ292ZXJpdHkgd2FybmluZyBhYm91dCB1bmNoZWNrZWQgTlVMTC4uLgpFUlJPUjogY29k
-ZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMyNDogRklMRTogZGlzYXMvY3Jpcy5jOjI0
-OTM6CiteSWlmIChzcmVncCA9PSBOVUxMIHx8IHNyZWdwLT5uYW1lID09IE5VTEwpJAoKRVJST1I6
-IHN1c3BlY3QgY29kZSBpbmRlbnQgZm9yIGNvbmRpdGlvbmFsIHN0YXRlbWVudHMgKDgsIDEwKQoj
-MjQ6IEZJTEU6IGRpc2FzL2NyaXMuYzoyNDkzOgorCWlmIChzcmVncCA9PSBOVUxMIHx8IHNyZWdw
-LT5uYW1lID09IE5VTEwpCiAJICAvKiBTaG91bGQgaGF2ZSBiZWVuIGNhdWdodCBhcyBhIG5vbi1t
-YXRjaCBlYXJsaWVyLiAgKi8KCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxs
-IGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzI0OiBGSUxFOiBkaXNhcy9jcmlzLmM6MjQ5MzoKKwlp
-ZiAoc3JlZ3AgPT0gTlVMTCB8fCBzcmVncC0+bmFtZSA9PSBOVUxMKQpbLi4uXQoKdG90YWw6IDMg
-ZXJyb3JzLCAwIHdhcm5pbmdzLCA4IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxl
-IHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFs
-c2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRD
-SCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRl
-ZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0
-Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8g
-cGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+On 22 December 2016 at 15:22, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> When a scsi-disk object receives VERIFY command with BYTCHK bit being zero,
+> scsi_block_is_passthrough returns false and finally makes req being proceeded
+> by scsi_block_dma_command. Because scsi_block_dma_command has removed process
+> of VERIFY, QEMU will abort in this function.
+>
+> Reported-by: Junlian Bell <zhongjun@sangfor.com.cn>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  hw/scsi/scsi-disk.c | 9 ++++++++-
+>  1 file changed, 8 insertions(+), 1 deletion(-)
+>
+> diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
+> index a963191..bdd1e5f 100644
+> --- a/hw/scsi/scsi-disk.c
+> +++ b/hw/scsi/scsi-disk.c
+> @@ -2157,6 +2157,13 @@ static int32_t scsi_disk_dma_command(SCSIRequest *req, uint8_t *buf)
+>          DPRINTF("Write %s(sector %" PRId64 ", count %u)\n",
+>                  (command & 0xe) == 0xe ? "And Verify " : "",
+>                  r->req.cmd.lba, len);
+> +    case VERIFY_10:
+> +    case VERIFY_12:
+> +    case VERIFY_16:
+> +        /* We get here only for BYTCHK == 0x01 and only for scsi-block.
+> +         * As far as DMA is concerned, we can treat it the same as a write;
+> +         * scsi_block_do_sgio will send VERIFY commands.
+> +         */
+>          if (r->req.cmd.buf[1] & 0xe0) {
+>              goto illegal_request;
+>          }
+
+Coverity now complains about the fallthrough into the case statements
+added here. I assume from the patch that the fallthrough is deliberate,
+in which case a /* fall through */ comment would assist future
+readers...
+
+thanks
+-- PMM
