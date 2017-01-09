@@ -1,38 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51120)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53220)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cQbOq-000682-Qk
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 09:58:17 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cQbVe-0002k9-Mo
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 10:05:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cQbOn-00022H-OL
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 09:58:16 -0500
-Received: from mail-wj0-x243.google.com ([2a00:1450:400c:c01::243]:34485)
+	(envelope-from <alex.bennee@linaro.org>) id 1cQbVb-0004lU-H5
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 10:05:18 -0500
+Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:38801)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1cQbOn-00022C-Hk
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 09:58:13 -0500
-Received: by mail-wj0-x243.google.com with SMTP id qs7so47250611wjc.1
-	for <qemu-devel@nongnu.org>; Mon, 09 Jan 2017 06:58:13 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <1482866480-26208-1-git-send-email-ehabkost@redhat.com>
-	<1482866480-26208-5-git-send-email-ehabkost@redhat.com>
-	<20170104115656.GB14961@amt.cnet>
-	<20170104133916.GG3315@thinpad.lan.raisama.net>
-	<20170104195917.GM3315@thinpad.lan.raisama.net>
-	<20170104222623.GA21789@amt.cnet>
-	<20170105013631.GO3315@thinpad.lan.raisama.net>
-	<20170105104830.GB6299@amt.cnet>
-	<20170105121950.GP3315@thinpad.lan.raisama.net>
-	<20170106103126.GA1575@amt.cnet>
-	<20170108202851.GZ3315@thinpad.lan.raisama.net>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d9ff1970-7d2d-6a49-b93e-27fe2817f412@redhat.com>
-Date: Mon, 9 Jan 2017 15:58:11 +0100
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cQbVb-0004l1-31
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 10:05:15 -0500
+Received: by mail-wm0-x22a.google.com with SMTP id k184so123534177wme.1
+	for <qemu-devel@nongnu.org>; Mon, 09 Jan 2017 07:05:14 -0800 (PST)
+References: <20161215123656.27985-1-alex.bennee@linaro.org>
+	<20161215123656.27985-2-alex.bennee@linaro.org>
+	<20161218204624.GA3808@thinpad.lan.raisama.net>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20161218204624.GA3808@thinpad.lan.raisama.net>
+Date: Mon, 09 Jan 2017 15:05:11 +0000
+Message-ID: <87tw98mfyw.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20170108202851.GZ3315@thinpad.lan.raisama.net>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Exporting kvm_max_guest_tsc_khz to userspace (was
- Re: [PATCH 4/4] kvm: Allow migration with invtsc)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] qom/cpu: move tlb_flush to
+ cpu_common_reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,24 +32,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, Haozhong Zhang <haozhong.zhang@intel.com>, libvir-list@redhat.com
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: rth@twiddle.net, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Michael Walle <michael@walle.cc>, Laurent Vivier <laurent@vivier.eu>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>, Anthony Green <green@moxielogic.com>, Jia Liu <proljc@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, "open list:ARM" <qemu-arm@nongnu.org>, "open list:PowerPC" <qemu-ppc@nongnu.org>
 
 
+Eduardo Habkost <ehabkost@redhat.com> writes:
 
-On 08/01/2017 21:28, Eduardo Habkost wrote:
->> Well just export KVM_GET_TSC_KHZ in a QMP command right? Its pretty
->> easy.
+> On Thu, Dec 15, 2016 at 12:36:55PM +0000, Alex Bennée wrote:
+>> It is a common thing amongst the various cpu reset functions want to
+>> flush the SoftMMU's TLB entries. This is done either by calling
+>> tlb_flush directly or by way of a general memset of the CPU
+>> structure (sometimes both).
 >>
->> Let me know if you need any help coding or testing.
-> I just found out that KVM doesn't provide something that QEMU and
-> libvirt need: the value of kvm_max_guest_tsc_khz. Without it, we
-> have no way to know if a given VM is really migratable to a host.
-> 
-> Could we add a KVM_CAP_MAX_TSC_KHZ capability for that?
+>> This moves the tlb_flush call to the common reset function and
+>> additionally ensures it is only done for the CONFIG_SOFTMMU case and
+>> when tcg is enabled.
+>>
+>> In some target cases we add an empty end_of_reset_fields structure to the
+>> target vCPU structure so have a clear end point for any memset which
+>> is resetting value in the structure before CPU_COMMON (where the TLB
+>> structures are).
+>>
+>> While this is a nice clean-up in general it is also a precursor for
+>> changes coming to cputlb for MTTCG where the clearing of entries
+>> can't be done arbitrarily across vCPUs. Currently the cpu_reset
+>> function is usually called from the context of another vCPU as the
+>> architectural power up sequence is run. By using the cputlb API
+>> functions we can ensure the right behaviour in the future.
+>>
+>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+>> Reviewed-by: Richard Henderson <rth@twiddle.net>
+>> ---
+>>  qom/cpu.c                   | 10 ++++++++--
+>>  target-arm/cpu.c            |  5 ++---
+>>  target-arm/cpu.h            |  5 ++++-
+>>  target-cris/cpu.c           |  3 +--
+>>  target-cris/cpu.h           |  9 ++++++---
+>>  target-i386/cpu.c           |  2 --
+>>  target-i386/cpu.h           |  6 ++++--
+>>  target-lm32/cpu.c           |  3 +--
+>>  target-lm32/cpu.h           |  3 +++
+>>  target-m68k/cpu.c           |  3 +--
+>>  target-m68k/cpu.h           |  3 +++
+>>  target-microblaze/cpu.c     |  3 +--
+>>  target-microblaze/cpu.h     |  3 +++
+>>  target-mips/cpu.c           |  3 +--
+>>  target-mips/cpu.h           |  3 +++
+>>  target-moxie/cpu.c          |  4 +---
+>>  target-moxie/cpu.h          |  3 +++
+>>  target-openrisc/cpu.c       |  9 +--------
+>>  target-openrisc/cpu.h       |  3 +++
+>>  target-ppc/translate_init.c |  3 ---
+>>  target-s390x/cpu.c          |  7 ++-----
+>>  target-s390x/cpu.h          |  5 +++--
+>>  target-sh4/cpu.c            |  3 +--
+>>  target-sh4/cpu.h            |  3 +++
+>>  target-sparc/cpu.c          |  3 +--
+>>  target-sparc/cpu.h          |  3 +++
+>>  target-tilegx/cpu.c         |  3 +--
+>>  target-tilegx/cpu.h         |  3 +++
+>>  target-tricore/cpu.c        |  2 --
+>>  29 files changed, 66 insertions(+), 52 deletions(-)
+>>
+>> diff --git a/qom/cpu.c b/qom/cpu.c
+>> index 03d9190f8c..61ee0cb88c 100644
+>> --- a/qom/cpu.c
+>> +++ b/qom/cpu.c
+>> @@ -270,8 +270,14 @@ static void cpu_common_reset(CPUState *cpu)
+>>      cpu->exception_index = -1;
+>>      cpu->crash_occurred = false;
+>>
+>> -    for (i = 0; i < TB_JMP_CACHE_SIZE; ++i) {
+>> -        atomic_set(&cpu->tb_jmp_cache[i], NULL);
+>> +    if (tcg_enabled()) {
+>> +        for (i = 0; i < TB_JMP_CACHE_SIZE; ++i) {
+>> +            atomic_set(&cpu->tb_jmp_cache[i], NULL);
+>> +        }
+>> +
+>> +#ifdef CONFIG_SOFTMMU
+>> +        tlb_flush(cpu, 0);
+>> +#endif
+>
+> The patch is changing 3 things at the same time:
+>
+> 1) Moving the tb_jmp_cache reset inside if (tcg_enabled())
 
-The ratio is really quite high, 256x the host frequency for AMD and
-65536x for Intel.  Anything below 2^32 Hz (above that, there would
-probably be other failures) is safe.
+The tb_jump_cache only ever contains TranslationBlocks which are TCG
+only. Any access outside of TCG would be confusing stuff.
 
-Paolo
+> 2) Moving the tlb_flush() call to cpu_common_reset()
+
+This is the main purpose of the patch.
+
+> 3) Moving the tlb_flush() call inside if (tcg_enabled())
+>
+> Are we 100% sure there's no non-TCG looking looking at tlb_*
+> fields or calling tlb_*() functions anywhere? Isn't it better to
+> add the tcg_enabled() check in a separate patch?
+
+The tlb_* functions are NOP in-lines for linux-user mode. Otherwise the
+table is only accessed by generated SoftMMU code and the associated
+helpers. AFAICT the KVM migration code uses the memory sub-system to
+track the dirty state of pages so shouldn't be looking at those fields.
+
+I seemed sensible to clean it up all in one patch, however I could split
+it into two:
+
+  1) move tlb_flush (with CONFIG_SOFTMMU) to qom/cpu.c
+  2) wrap whole thing in tcg_enabled()
+
+Would that be OK?
+
+--
+Alex Bennée
