@@ -1,21 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35589)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36933)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mar.krzeminski@gmail.com>) id 1cQYNb-0008Ct-DL
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:44:48 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cQYVO-0001tv-IW
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:52:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mar.krzeminski@gmail.com>) id 1cQYNa-0000xV-5Z
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:44:47 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cQYVL-0003rD-GJ
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:52:50 -0500
+References: <20170109110921.4931-1-rka@sysgo.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <271cfbcc-5230-99d4-ba0b-501ca6183314@redhat.com>
+Date: Mon, 9 Jan 2017 12:52:43 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170109111004.GH14990@toto>
-References: <20170108083854.5006-1-mar.krzeminski@gmail.com>
-	<20170108083854.5006-3-mar.krzeminski@gmail.com>
-	<20170109111004.GH14990@toto>
-From: =?UTF-8?Q?Marcin_Krzemi=C5=84ski?= <mar.krzeminski@gmail.com>
-Date: Mon, 9 Jan 2017 12:44:43 +0100
-Message-ID: <CABc_YGBqDSO+fysXjnUBdeLBJsNC2pO6sNpf3L_juPfjfCXUeQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v3 2/3] block: m25p80: Introduce die erase
- command
+In-Reply-To: <20170109110921.4931-1-rka@sysgo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] exec: Add missing rcu_read_unlock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,131 +22,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
+To: Roman Kapl <rka@sysgo.com>, qemu-devel@nongnu.org, qemu-stable <qemu-stable@nongnu.org>
 
-2017-01-09 12:10 GMT+01:00 Edgar E. Iglesias <edgar.iglesias@xilinx.com>:
-> On Sun, Jan 08, 2017 at 09:38:53AM +0100, Marcin Krzeminski wrote:
->> Modern big flash nor devices consist from more than one die.
->> Some of them do not support chip erase and instead have die
->> erase command that can erase one die only. This commit adds
->> possibility to define number of dies in the chip and adds
->> support for die erase command. Nor flash model is not strict
->> thus option to disable chip eras was not added.
->                                  ^^
->                               erase
->
-> The commit message could be improved but codewise this looks
-> good to me:
 
-Beside fixing the typo, some more information/changes should I add?
 
-Thanks,
-Marcin
->
-> Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
->
->
->>
->> Signed-off-by: Marcin Krzeminski <mar.krzeminski@gmail.com>
->> ---
->>  hw/block/m25p80.c | 41 ++++++++++++++++++++++++++++++++++++++++-
->>  1 file changed, 40 insertions(+), 1 deletion(-)
->>
->> diff --git a/hw/block/m25p80.c b/hw/block/m25p80.c
->> index 6dff81b..a9b025b 100644
->> --- a/hw/block/m25p80.c
->> +++ b/hw/block/m25p80.c
->> @@ -73,6 +73,12 @@ typedef struct FlashPartInfo {
->>      uint32_t n_sectors;
->>      uint32_t page_size;
->>      uint16_t flags;
->> +    /*
->> +     * Big sized spi nor are often stacked devices, thus sometime
->> +     * replace chip erase with die erase.
->> +     * This field inform how many die is in the chip.
->> +     */
->> +    uint8_t die_cnt;
->>  } FlashPartInfo;
->>
->>  /* adapted from linux */
->> @@ -90,7 +96,8 @@ typedef struct FlashPartInfo {
->>      .sector_size = (_sector_size),\
->>      .n_sectors = (_n_sectors),\
->>      .page_size = 256,\
->> -    .flags = (_flags),
->> +    .flags = (_flags),\
->> +    .die_cnt = 0
->>
->>  #define INFO6(_part_name, _jedec_id, _ext_id, _sector_size, _n_sectors, _flags)\
->>      .part_name = _part_name,\
->> @@ -107,6 +114,24 @@ typedef struct FlashPartInfo {
->>      .n_sectors = (_n_sectors),\
->>      .page_size = 256,\
->>      .flags = (_flags),\
->> +    .die_cnt = 0
->> +
->> +#define INFO_STACKED(_part_name, _jedec_id, _ext_id, _sector_size, _n_sectors,\
->> +                    _flags, _die_cnt)\
->> +    .part_name = _part_name,\
->> +    .id = {\
->> +        ((_jedec_id) >> 16) & 0xff,\
->> +        ((_jedec_id) >> 8) & 0xff,\
->> +        (_jedec_id) & 0xff,\
->> +        ((_ext_id) >> 8) & 0xff,\
->> +        (_ext_id) & 0xff,\
->> +          },\
->> +    .id_len = (!(_jedec_id) ? 0 : (3 + ((_ext_id) ? 2 : 0))),\
->> +    .sector_size = (_sector_size),\
->> +    .n_sectors = (_n_sectors),\
->> +    .page_size = 256,\
->> +    .flags = (_flags),\
->> +    .die_cnt = _die_cnt
->>
->>  #define JEDEC_NUMONYX 0x20
->>  #define JEDEC_WINBOND 0xEF
->> @@ -359,6 +384,8 @@ typedef enum {
->>
->>      REVCR = 0x65,
->>      WEVCR = 0x61,
->> +
->> +    DIE_ERASE = 0xC4,
->>  } FlashCMD;
->>
->>  typedef enum {
->> @@ -514,6 +541,16 @@ static void flash_erase(Flash *s, int offset, FlashCMD cmd)
->>      case BULK_ERASE:
->>          len = s->size;
->>          break;
->> +    case DIE_ERASE:
->> +        if (s->pi->die_cnt) {
->> +            len = s->size / s->pi->die_cnt;
->> +            offset = offset & (~(len - 1));
->> +        } else {
->> +            qemu_log_mask(LOG_GUEST_ERROR, "M25P80: die erase is not supported"
->> +                          " by device\n");
->> +            return;
->> +        }
->> +        break;
->>      default:
->>          abort();
->>      }
->> @@ -635,6 +672,7 @@ static void complete_collecting_data(Flash *s)
->>      case ERASE4_32K:
->>      case ERASE_SECTOR:
->>      case ERASE4_SECTOR:
->> +    case DIE_ERASE:
->>          flash_erase(s, s->cur_addr, s->cmd_in_progress);
->>          break;
->>      case WRSR:
->> @@ -881,6 +919,7 @@ static void decode_new_cmd(Flash *s, uint32_t value)
->>      case PP:
->>      case PP4:
->>      case PP4_4:
->> +    case DIE_ERASE:
->>          s->needed_bytes = get_addr_length(s);
->>          s->pos = 0;
->>          s->len = 0;
->> --
->> 2.9.3
->>
+On 09/01/2017 12:09, Roman Kapl wrote:
+> rcu_read_unlock was not called if the address_space_access_valid result is
+> negative.
+> 
+> This caused (at least) a problem when qemu on PPC/E500+TAP failed to terminate
+> properly and instead got stuck in a deadlock.
+> 
+> Signed-off-by: Roman Kapl <rka@sysgo.com>
+> ---
+>  exec.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/exec.c b/exec.c
+> index 8d4bb0e..6895db5 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -2927,6 +2927,7 @@ bool address_space_access_valid(AddressSpace *as, hwaddr addr, int len, bool is_
+>          if (!memory_access_is_direct(mr, is_write)) {
+>              l = memory_access_size(mr, l, addr);
+>              if (!memory_region_access_valid(mr, xlat, l, is_write)) {
+> +                rcu_read_unlock();
+>                  return false;
+>              }
+>          }
+> 
+
+Thanks, queued!
+
+Cc: qemu-stable <qemu-stable@nongnu.org>
+
+Paolo
