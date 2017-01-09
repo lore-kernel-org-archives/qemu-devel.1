@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37202)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37232)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cQYWR-0002Qg-UV
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:53:57 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cQYWS-0002Qp-Rg
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:53:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cQYWQ-00045Y-Kr
+	(envelope-from <pm215@archaic.org.uk>) id 1cQYWR-00045z-GY
 	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:53:56 -0500
 Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:47992)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1cQYWQ-00043I-DA
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:53:54 -0500
+	id 1cQYWR-00043I-8W
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 06:53:55 -0500
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.84_2)
-	(envelope-from <pm215@archaic.org.uk>) id 1cQYWP-0001S7-HR
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 11:53:53 +0000
+	(envelope-from <pm215@archaic.org.uk>) id 1cQYWQ-0001Sk-Dd
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 11:53:54 +0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon,  9 Jan 2017 11:53:41 +0000
-Message-Id: <1483962824-29185-19-git-send-email-peter.maydell@linaro.org>
+Date: Mon,  9 Jan 2017 11:53:43 +0000
+Message-Id: <1483962824-29185-21-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1483962824-29185-1-git-send-email-peter.maydell@linaro.org>
 References: <1483962824-29185-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 18/21] hw/arm/virt: remove VirtGuestInfo
+Subject: [Qemu-devel] [PULL 20/21] m25p80: don't let rogue SPI controllers
+ cause buffer overruns
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,143 +30,100 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Andrew Jones <drjones@redhat.com>
+From: Jean-Christophe Dubois <jcd@tribudubois.net>
 
-by moving VirtGuestInfo.fw_cfg to VirtMachineState. This is the
-mach-virt equivalent of "pc: Move PcGuestInfo.fw_cfg to
-PCMachineState" and "pc: Eliminate PcGuestInfo struct" combined.
+In normal operation we should never attempt to put more
+data into the data[] array than it can hold. However if the
+SPI controller connected to us misbehaves then it can send
+us a sequence of commands that attempt this. Since the
+controller might be in the guest (if the hardware does SPI
+via bit-banging), catch the possible overrun conditions and
+reset the flash internal state, logging them as guest errors.
 
-Signed-off-by: Andrew Jones <drjones@redhat.com>
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
-Message-id: 20170102200153.28864-14-drjones@redhat.com
+Signed-off-by: Jean-Christophe Dubois <jcd@tribudubois.net>
+Message-id: 20170107111631.24444-1-jcd@tribudubois.net
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+[PMM: rewrote commit message to be more exact about when
+ this can happen]
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/hw/arm/virt.h    |  6 +-----
- hw/arm/virt-acpi-build.c |  7 +++----
- hw/arm/virt.c            | 16 +++++++---------
- 3 files changed, 11 insertions(+), 18 deletions(-)
+ hw/block/m25p80.c | 29 +++++++++++++++++++++++++++--
+ 1 file changed, 27 insertions(+), 2 deletions(-)
 
-diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-index d200542..eb1c63d 100644
---- a/include/hw/arm/virt.h
-+++ b/include/hw/arm/virt.h
-@@ -77,10 +77,6 @@ typedef struct MemMapEntry {
-     hwaddr size;
- } MemMapEntry;
+diff --git a/hw/block/m25p80.c b/hw/block/m25p80.c
+index e3c1166..4c5f8c3 100644
+--- a/hw/block/m25p80.c
++++ b/hw/block/m25p80.c
+@@ -28,6 +28,7 @@
+ #include "hw/ssi/ssi.h"
+ #include "qemu/bitops.h"
+ #include "qemu/log.h"
++#include "qemu/error-report.h"
+ #include "qapi/error.h"
  
--typedef struct VirtGuestInfo {
--    FWCfgState *fw_cfg;
--} VirtGuestInfo;
--
- typedef struct {
-     MachineClass parent;
-     bool disallow_affinity_adjustment;
-@@ -91,8 +87,8 @@ typedef struct {
+ #ifndef M25P80_ERR_DEBUG
+@@ -377,6 +378,8 @@ typedef enum {
+     MAN_GENERIC,
+ } Manufacturer;
  
- typedef struct {
-     MachineState parent;
--    VirtGuestInfo acpi_guest_info;
-     Notifier machine_done;
-+    FWCfgState *fw_cfg;
-     bool secure;
-     bool highmem;
-     int32_t gic_version;
-diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index 3791b81..44b5234 100644
---- a/hw/arm/virt-acpi-build.c
-+++ b/hw/arm/virt-acpi-build.c
-@@ -825,11 +825,10 @@ static const VMStateDescription vmstate_virt_acpi_build = {
++#define M25P80_INTERNAL_DATA_BUFFER_SZ 16
++
+ typedef struct Flash {
+     SSISlave parent_obj;
  
- void virt_acpi_setup(VirtMachineState *vms)
- {
--    VirtGuestInfo *guest_info = &vms->acpi_guest_info;
-     AcpiBuildTables tables;
-     AcpiBuildState *build_state;
+@@ -387,7 +390,7 @@ typedef struct Flash {
+     int page_size;
  
--    if (!guest_info->fw_cfg) {
-+    if (!vms->fw_cfg) {
-         trace_virt_acpi_setup();
-         return;
-     }
-@@ -854,8 +853,8 @@ void virt_acpi_setup(VirtMachineState *vms)
-         acpi_add_rom_blob(build_state, tables.linker->cmd_blob,
-                           "etc/table-loader", 0);
+     uint8_t state;
+-    uint8_t data[16];
++    uint8_t data[M25P80_INTERNAL_DATA_BUFFER_SZ];
+     uint32_t len;
+     uint32_t pos;
+     uint8_t needed_bytes;
+@@ -1115,6 +1118,17 @@ static uint32_t m25p80_transfer8(SSISlave *ss, uint32_t tx)
  
--    fw_cfg_add_file(guest_info->fw_cfg, ACPI_BUILD_TPMLOG_FILE,
--                    tables.tcpalog->data, acpi_data_len(tables.tcpalog));
-+    fw_cfg_add_file(vms->fw_cfg, ACPI_BUILD_TPMLOG_FILE, tables.tcpalog->data,
-+                    acpi_data_len(tables.tcpalog));
+     case STATE_COLLECTING_DATA:
+     case STATE_COLLECTING_VAR_LEN_DATA:
++
++        if (s->len >= M25P80_INTERNAL_DATA_BUFFER_SZ) {
++            qemu_log_mask(LOG_GUEST_ERROR,
++                          "M25P80: Write overrun internal data buffer. "
++                          "SPI controller (QEMU emulator or guest driver) "
++                          "is misbehaving\n");
++            s->len = s->pos = 0;
++            s->state = STATE_IDLE;
++            break;
++        }
++
+         s->data[s->len] = (uint8_t)tx;
+         s->len++;
  
-     build_state->rsdp_mr = acpi_add_rom_blob(build_state, tables.rsdp,
-                                               ACPI_BUILD_RSDP_FILE, 0);
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 6832b8b..7a03f84 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -889,7 +889,7 @@ static void create_flash(const VirtMachineState *vms,
-     }
- }
+@@ -1124,6 +1138,17 @@ static uint32_t m25p80_transfer8(SSISlave *ss, uint32_t tx)
+         break;
  
--static void create_fw_cfg(const VirtMachineState *vms, AddressSpace *as)
-+static FWCfgState *create_fw_cfg(const VirtMachineState *vms, AddressSpace *as)
- {
-     hwaddr base = vms->memmap[VIRT_FW_CFG].base;
-     hwaddr size = vms->memmap[VIRT_FW_CFG].size;
-@@ -906,6 +906,7 @@ static void create_fw_cfg(const VirtMachineState *vms, AddressSpace *as)
-     qemu_fdt_setprop_sized_cells(vms->fdt, nodename, "reg",
-                                  2, base, 2, size);
-     g_free(nodename);
-+    return fw_cfg;
- }
- 
- static void create_pcie_irq_map(const VirtMachineState *vms,
-@@ -1133,12 +1134,11 @@ static void *machvirt_dtb(const struct arm_boot_info *binfo, int *fdt_size)
- 
- static void virt_build_smbios(VirtMachineState *vms)
- {
--    FWCfgState *fw_cfg = vms->acpi_guest_info.fw_cfg;
-     uint8_t *smbios_tables, *smbios_anchor;
-     size_t smbios_tables_len, smbios_anchor_len;
-     const char *product = "QEMU Virtual Machine";
- 
--    if (!fw_cfg) {
-+    if (!vms->fw_cfg) {
-         return;
-     }
- 
-@@ -1153,9 +1153,9 @@ static void virt_build_smbios(VirtMachineState *vms)
-                       &smbios_anchor, &smbios_anchor_len);
- 
-     if (smbios_anchor) {
--        fw_cfg_add_file(fw_cfg, "etc/smbios/smbios-tables",
-+        fw_cfg_add_file(vms->fw_cfg, "etc/smbios/smbios-tables",
-                         smbios_tables, smbios_tables_len);
--        fw_cfg_add_file(fw_cfg, "etc/smbios/smbios-anchor",
-+        fw_cfg_add_file(vms->fw_cfg, "etc/smbios/smbios-anchor",
-                         smbios_anchor, smbios_anchor_len);
-     }
- }
-@@ -1180,7 +1180,6 @@ static void machvirt_init(MachineState *machine)
-     int n, virt_max_cpus;
-     MemoryRegion *ram = g_new(MemoryRegion, 1);
-     const char *cpu_model = machine->cpu_model;
--    VirtGuestInfo *guest_info = &vms->acpi_guest_info;
-     char **cpustr;
-     ObjectClass *oc;
-     const char *typename;
-@@ -1369,10 +1368,9 @@ static void machvirt_init(MachineState *machine)
-      */
-     create_virtio_devices(vms, pic);
- 
--    create_fw_cfg(vms, &address_space_memory);
--    rom_set_fw(fw_cfg_find());
-+    vms->fw_cfg = create_fw_cfg(vms, &address_space_memory);
-+    rom_set_fw(vms->fw_cfg);
- 
--    guest_info->fw_cfg = fw_cfg_find();
-     vms->machine_done.notify = virt_machine_done;
-     qemu_add_machine_init_done_notifier(&vms->machine_done);
- 
+     case STATE_READING_DATA:
++
++        if (s->pos >= M25P80_INTERNAL_DATA_BUFFER_SZ) {
++            qemu_log_mask(LOG_GUEST_ERROR,
++                          "M25P80: Read overrun internal data buffer. "
++                          "SPI controller (QEMU emulator or guest driver) "
++                          "is misbehaving\n");
++            s->len = s->pos = 0;
++            s->state = STATE_IDLE;
++            break;
++        }
++
+         r = s->data[s->pos];
+         s->pos++;
+         if (s->pos == s->len) {
+@@ -1196,7 +1221,7 @@ static const VMStateDescription vmstate_m25p80 = {
+     .pre_save = m25p80_pre_save,
+     .fields = (VMStateField[]) {
+         VMSTATE_UINT8(state, Flash),
+-        VMSTATE_UINT8_ARRAY(data, Flash, 16),
++        VMSTATE_UINT8_ARRAY(data, Flash, M25P80_INTERNAL_DATA_BUFFER_SZ),
+         VMSTATE_UINT32(len, Flash),
+         VMSTATE_UINT32(pos, Flash),
+         VMSTATE_UINT8(needed_bytes, Flash),
 -- 
 2.7.4
