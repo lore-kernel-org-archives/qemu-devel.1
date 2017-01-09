@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40239)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40316)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cQcS6-0007sd-7L
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 11:05:43 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cQcS8-0007vg-OT
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 11:05:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cQcS5-0003lV-1D
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 11:05:42 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cQcS7-0003n4-2R
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 11:05:44 -0500
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon,  9 Jan 2017 16:05:23 +0000
-Message-Id: <1483977924-14522-18-git-send-email-peter.maydell@linaro.org>
+Date: Mon,  9 Jan 2017 16:05:13 +0000
+Message-Id: <1483977924-14522-8-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1483977924-14522-1-git-send-email-peter.maydell@linaro.org>
 References: <1483977924-14522-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 17/18] target-arm: Enable EL2 feature bit on
- A53 and A57
+Subject: [Qemu-devel] [PATCH v2 07/18] hw/intc/gicv3: Add data fields for
+ virtualization support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,126 +23,131 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org, Andrew Jones <drjones@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Alistair Francis <alistair.francis@xilinx.com>
 
-Enable the ARM_FEATURE_EL2 bit on Cortex-A52 and
-Cortex-A57, since this is all now sufficiently implemented
-to work with the GICv3. We provide the usual CPU property
-to disable it for backwards compatibility with the older
-virt boards.
+As the first step in adding support for the virtualization
+extensions to the GICv3 emulation:
+ * add the necessary data fields to the state structures
+ * add the fields to the migration state, as a subsection
+   which is only present if virtualization is enabled
 
-In this commit, we disable the EL2 feature on the
-virt and ZynpMP boards, so there is no overall effect.
-Another commit will expose a board-level property to
-allow the user to enable EL2.
+The use of a subsection means we retain migration
+compatibility as EL2 is not enabled on any CPUs currently.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Andrew Jones <drjones@redhat.com>
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 ---
- target/arm/cpu.h     |  2 ++
- hw/arm/virt.c        |  4 ++++
- hw/arm/xlnx-zynqmp.c |  2 ++
- target/arm/cpu.c     | 12 ++++++++++++
- target/arm/cpu64.c   |  2 ++
- 5 files changed, 22 insertions(+)
+ include/hw/intc/arm_gicv3_common.h | 18 ++++++++++++++++++
+ hw/intc/arm_gicv3_common.c         | 25 +++++++++++++++++++++++++
+ hw/intc/arm_gicv3_cpuif.c          | 13 +++++++++++++
+ 3 files changed, 56 insertions(+)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 28c5d8f..c5b835f 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -574,6 +574,8 @@ struct ARMCPU {
-     bool start_powered_off;
-     /* CPU currently in PSCI powered-off state */
-     bool powered_off;
-+    /* CPU has virtualization extension */
-+    bool has_el2;
-     /* CPU has security extension */
-     bool has_el3;
-     /* CPU has PMU (Performance Monitor Unit) */
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 1fdc791..46f19cd 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -1329,6 +1329,10 @@ static void machvirt_init(MachineState *machine)
-             object_property_set_bool(cpuobj, false, "has_el3", NULL);
-         }
+diff --git a/include/hw/intc/arm_gicv3_common.h b/include/hw/intc/arm_gicv3_common.h
+index beb2c77..665d3f8 100644
+--- a/include/hw/intc/arm_gicv3_common.h
++++ b/include/hw/intc/arm_gicv3_common.h
+@@ -38,6 +38,9 @@
+ /* Number of SGI target-list bits */
+ #define GICV3_TARGETLIST_BITS 16
  
-+        if (object_property_find(cpuobj, "has_el2", NULL)) {
-+            object_property_set_bool(cpuobj, false, "has_el2", NULL);
-+        }
++/* Maximum number of list registers (architectural limit) */
++#define GICV3_LR_MAX 16
 +
-         if (vms->psci_conduit != QEMU_PSCI_CONDUIT_DISABLED) {
-             object_property_set_int(cpuobj, vms->psci_conduit,
-                                     "psci-conduit", NULL);
-diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
-index 0d86ba3..bc4e66b 100644
---- a/hw/arm/xlnx-zynqmp.c
-+++ b/hw/arm/xlnx-zynqmp.c
-@@ -258,6 +258,8 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+ /* Minimum BPR for Secure, or when security not enabled */
+ #define GIC_MIN_BPR 0
+ /* Minimum BPR for Nonsecure when security is enabled */
+@@ -175,6 +178,21 @@ struct GICv3CPUState {
+     uint64_t icc_igrpen[3];
+     uint64_t icc_ctlr_el3;
  
-         object_property_set_bool(OBJECT(&s->apu_cpu[i]),
-                                  s->secure, "has_el3", NULL);
-+        object_property_set_bool(OBJECT(&s->apu_cpu[i]),
-+                                 false, "has_el2", NULL);
-         object_property_set_int(OBJECT(&s->apu_cpu[i]), GIC_BASE_ADDR,
-                                 "reset-cbar", &error_abort);
-         object_property_set_bool(OBJECT(&s->apu_cpu[i]), true, "realized",
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index 8932086..2c9073d 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -497,6 +497,9 @@ static Property arm_cpu_reset_hivecs_property =
- static Property arm_cpu_rvbar_property =
-             DEFINE_PROP_UINT64("rvbar", ARMCPU, rvbar, 0);
- 
-+static Property arm_cpu_has_el2_property =
-+            DEFINE_PROP_BOOL("has_el2", ARMCPU, has_el2, true);
++    /* Virtualization control interface */
++    uint64_t ich_apr[3][4]; /* ich_apr[GICV3_G1][x] never used */
++    uint64_t ich_hcr_el2;
++    uint64_t ich_lr_el2[GICV3_LR_MAX];
++    uint64_t ich_vmcr_el2;
 +
- static Property arm_cpu_has_el3_property =
-             DEFINE_PROP_BOOL("has_el3", ARMCPU, has_el3, true);
++    /* Properties of the CPU interface. These are initialized from
++     * the settings in the CPU proper.
++     * If the number of implemented list registers is 0 then the
++     * virtualization support is not implemented.
++     */
++    int num_list_regs;
++    int vpribits; /* number of virtual priority bits */
++    int vprebits; /* number of virtual preemption bits */
++
+     /* Current highest priority pending interrupt for this CPU.
+      * This is cached information that can be recalculated from the
+      * real state above; it doesn't need to be migrated.
+diff --git a/hw/intc/arm_gicv3_common.c b/hw/intc/arm_gicv3_common.c
+index 0ee67a4..16b9b0f 100644
+--- a/hw/intc/arm_gicv3_common.c
++++ b/hw/intc/arm_gicv3_common.c
+@@ -49,6 +49,27 @@ static int gicv3_post_load(void *opaque, int version_id)
+     return 0;
+ }
  
-@@ -547,6 +550,11 @@ static void arm_cpu_post_init(Object *obj)
- #endif
-     }
- 
-+    if (arm_feature(&cpu->env, ARM_FEATURE_EL2)) {
-+        qdev_property_add_static(DEVICE(obj), &arm_cpu_has_el2_property,
-+                                 &error_abort);
++static bool virt_state_needed(void *opaque)
++{
++    GICv3CPUState *cs = opaque;
++
++    return cs->num_list_regs != 0;
++}
++
++static const VMStateDescription vmstate_gicv3_cpu_virt = {
++    .name = "arm_gicv3_cpu/virt",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .needed = virt_state_needed,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT64_2DARRAY(ich_apr, GICv3CPUState, 3, 4),
++        VMSTATE_UINT64(ich_hcr_el2, GICv3CPUState),
++        VMSTATE_UINT64_ARRAY(ich_lr_el2, GICv3CPUState, GICV3_LR_MAX),
++        VMSTATE_UINT64(ich_vmcr_el2, GICv3CPUState),
++        VMSTATE_END_OF_LIST()
 +    }
++};
 +
-     if (arm_feature(&cpu->env, ARM_FEATURE_PMU)) {
-         qdev_property_add_static(DEVICE(obj), &arm_cpu_has_pmu_property,
-                                  &error_abort);
-@@ -695,6 +703,10 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
-         cpu->id_aa64pfr0 &= ~0xf000;
+ static const VMStateDescription vmstate_gicv3_cpu = {
+     .name = "arm_gicv3_cpu",
+     .version_id = 1,
+@@ -75,6 +96,10 @@ static const VMStateDescription vmstate_gicv3_cpu = {
+         VMSTATE_UINT64_ARRAY(icc_igrpen, GICv3CPUState, 3),
+         VMSTATE_UINT64(icc_ctlr_el3, GICv3CPUState),
+         VMSTATE_END_OF_LIST()
++    },
++    .subsections = (const VMStateDescription * []) {
++        &vmstate_gicv3_cpu_virt,
++        NULL
      }
+ };
  
-+    if (!cpu->has_el2) {
-+        unset_feature(env, ARM_FEATURE_EL2);
-+    }
+diff --git a/hw/intc/arm_gicv3_cpuif.c b/hw/intc/arm_gicv3_cpuif.c
+index 35e8eb3..d2f859c 100644
+--- a/hw/intc/arm_gicv3_cpuif.c
++++ b/hw/intc/arm_gicv3_cpuif.c
+@@ -36,6 +36,12 @@ static bool gicv3_use_ns_bank(CPUARMState *env)
+     return !arm_is_secure_below_el3(env);
+ }
+ 
++/* The minimum BPR for the virtual interface is a configurable property */
++static inline int icv_min_vbpr(GICv3CPUState *cs)
++{
++    return 7 - cs->vprebits;
++}
 +
-     if (!cpu->has_pmu || !kvm_enabled()) {
-         cpu->has_pmu = false;
-         unset_feature(env, ARM_FEATURE_PMU);
-diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-index 73c7f31..670c07a 100644
---- a/target/arm/cpu64.c
-+++ b/target/arm/cpu64.c
-@@ -110,6 +110,7 @@ static void aarch64_a57_initfn(Object *obj)
-     set_feature(&cpu->env, ARM_FEATURE_V8_SHA256);
-     set_feature(&cpu->env, ARM_FEATURE_V8_PMULL);
-     set_feature(&cpu->env, ARM_FEATURE_CRC);
-+    set_feature(&cpu->env, ARM_FEATURE_EL2);
-     set_feature(&cpu->env, ARM_FEATURE_EL3);
-     set_feature(&cpu->env, ARM_FEATURE_PMU);
-     cpu->kvm_target = QEMU_KVM_ARM_TARGET_CORTEX_A57;
-@@ -169,6 +170,7 @@ static void aarch64_a53_initfn(Object *obj)
-     set_feature(&cpu->env, ARM_FEATURE_V8_SHA256);
-     set_feature(&cpu->env, ARM_FEATURE_V8_PMULL);
-     set_feature(&cpu->env, ARM_FEATURE_CRC);
-+    set_feature(&cpu->env, ARM_FEATURE_EL2);
-     set_feature(&cpu->env, ARM_FEATURE_EL3);
-     set_feature(&cpu->env, ARM_FEATURE_PMU);
-     cpu->kvm_target = QEMU_KVM_ARM_TARGET_CORTEX_A53;
+ static int icc_highest_active_prio(GICv3CPUState *cs)
+ {
+     /* Calculate the current running priority based on the set bits
+@@ -1081,6 +1087,13 @@ static void icc_reset(CPUARMState *env, const ARMCPRegInfo *ri)
+     cs->icc_ctlr_el3 = ICC_CTLR_EL3_NDS | ICC_CTLR_EL3_A3V |
+         (1 << ICC_CTLR_EL3_IDBITS_SHIFT) |
+         (7 << ICC_CTLR_EL3_PRIBITS_SHIFT);
++
++    memset(cs->ich_apr, 0, sizeof(cs->ich_apr));
++    cs->ich_hcr_el2 = 0;
++    memset(cs->ich_lr_el2, 0, sizeof(cs->ich_lr_el2));
++    cs->ich_vmcr_el2 = ICH_VMCR_EL2_VFIQEN |
++        (icv_min_vbpr(cs) << ICH_VMCR_EL2_VBPR1_SHIFT) |
++        (icv_min_vbpr(cs) << ICH_VMCR_EL2_VBPR0_SHIFT);
+ }
+ 
+ static const ARMCPRegInfo gicv3_cpuif_reginfo[] = {
 -- 
 2.7.4
