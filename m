@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40958)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44437)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1cQSGG-0005Qq-Np
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 00:12:50 -0500
+	(envelope-from <jasowang@redhat.com>) id 1cQSZy-0008WV-QD
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 00:33:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1cQSGC-0007TL-MU
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 00:12:48 -0500
-Received: from mga09.intel.com ([134.134.136.24]:21949)
+	(envelope-from <jasowang@redhat.com>) id 1cQSZv-0005im-MW
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 00:33:10 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40798)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1cQSGC-0007Rz-DQ
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 00:12:44 -0500
-Message-ID: <58731C03.3040002@intel.com>
-Date: Mon, 09 Jan 2017 13:13:39 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cQSZv-0005ib-EC
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 00:33:07 -0500
+References: <CALoWxX_-+dBexpVzy2MKVN10b94vaZC50y+vxbZtqXi+S_Urmg@mail.gmail.com>
+	<0bfb55a2-08a0-2264-c2cd-ce566d08b0f4@redhat.com>
+	<CALoWxX8OM3SurQWzGAgVfUzjydHm9OkFZGytstuBk0n0R=KgaA@mail.gmail.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <0b8bca46-836b-9062-bad4-d115e1eb704b@redhat.com>
+Date: Mon, 9 Jan 2017 13:32:58 +0800
 MIME-Version: 1.0
-References: <1482127152-84732-1-git-send-email-wei.w.wang@intel.com>
-	<CAJ+F1CKWSznG3hxj0=F1UAJD+ZOZg=q+Oio1YnbsRyz6vy51FQ@mail.gmail.com>
-	<5858B472.9000007@intel.com>
-In-Reply-To: <5858B472.9000007@intel.com>
+In-Reply-To: <CALoWxX8OM3SurQWzGAgVfUzjydHm9OkFZGytstuBk0n0R=KgaA@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RESEND Patch v1 00/37] Implementation of
- vhost-pci for inter-vm commucation
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] hw/pci: use-after-free in
+ pci_nic_init_nofail when nic device fails to initialize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,95 +29,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Cc: mst@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org
+To: Alex Kompel <barbos@gmail.com>
+Cc: qemu-devel@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-Hi Marc-André,
 
-Do you have any comments on the responses? Thanks.
 
-On 12/20/2016 12:32 PM, Wei Wang wrote:
-> Hi Marc-André, thanks for the comments.
+On 2017=E5=B9=B401=E6=9C=8809=E6=97=A5 13:26, Alex Kompel wrote:
+> Looks like this line got wrapped: "@@ -1805,13 +1805,7 @@ PCIDevice
+> *pci_nic_init_nofail(NICInfo *nd, PCIBus *rootbus,"
+> Sorry about that. Could you unwrap it or use the attached text file?
 >
-> On 12/20/2016 12:43 AM, Marc-André Lureau wrote:
->> Hi Wei,
->>
->> On Mon, Dec 19, 2016 at 7:00 AM Wei Wang <wei.w.wang@intel.com 
->> <mailto:wei.w.wang@intel.com>> wrote:
->>
->>     This patch series implements vhost-pci, which is a point-to-point
->>     based inter-vm
->>     communication solution. The QEMU side implementation includes the
->>     vhost-user
->>     extension, vhost-pci device emulation and management. The current
->>     device part
->>     implementation is based on virtio 1.0, but it can be easily
->>     upgraded to support
->>     the upcoming virtio 1.1.
->>
->>     The current QEMU implementation supports the polling mode driver
->>     on both sides
->>     to receive packets. More features, such as interrupt support, live
->>     migration
->>     support, protected memory accesses will be added later.
->>
->>
->>
->> I highly appreciate the effort you put in splitting the patch series 
->> and commenting each, although some are probably superfluous.
+> Thanks,
+> -Alex
+
+Ok, applied. But please use git format-patch and git send-email for=20
+future submission of patches.
+
+Thanks
+
 >
-> I will see if I can combine some of the unnecessary splits in the next 
-> version.
->
->> High level question, why do you need to create device dynamically? I 
->> would rather have the following qemu setup:
+> On Sun, Jan 8, 2017 at 8:06 PM, Jason Wang <jasowang@redhat.com> wrote:
 >>
->> -chardev socket,id=chr,path=.. -device vhost-pci-net,chardev=chr
+>> On 2017=E5=B9=B401=E6=9C=8807=E6=97=A5 07:48, Alex Kompel wrote:
+>>> object_property_set_bool(OBJECT(dev), true, "realized", &err) in
+>>> pci_nic_init_nofail may release the object if device fails to
+>>> initialize which leads to use-after-free in error handling block.
+>>> qdev_init_nofail does the same thing while holding the reference.
+>>>
+>>> (gdb) run -net nic
+>>> qemu-system-x86_64: failed to find romfile "efi-e1000.rom"
+>>>
+>>> Program received signal SIGSEGV, Segmentation fault.
+>>> object_unparent (obj=3D0x7fffe96a0010) at qom/object.c:440
+>>> 440     in qom/object.c
+>>> (gdb) bt
+>>> #0  object_unparent (obj=3D0x7fffe96a0010) at qom/object.c:440
+>>> #1  0x000055555598c30d in pci_nic_init_nofail (nd=3D0x55555616b460
+>>> <nd_table>, rootbus=3D0x5555567ed990, default_model=3D<optimized out>=
+,
+>>> default_devaddr=3D<optimized out>) at hw/pci/pci.c:1812
+>>> #2  0x00005555557ff52c in pc_nic_init (isa_bus=3D0x55555733c610,
+>>> pci_bus=3D0x5555567ed990) at hw/i386/pc.c:1634
+>>> #3  0x00005555558021ad in pc_init1 (machine=3D0x55555661ee10,
+>>> pci_type=3D0x555555c1a523 "i440FX", host_type=3D0x555555ba564e
+>>> "i440FX-pcihost") at hw/i386/pc_piix.c:241
+>>> #4  0x00005555557519cb in main (argc=3D<optimized out>, argv=3D<optim=
+ized
+>>> out>, envp=3D<optimized out>) at vl.c:4481
+>>>
+>>> Signed-off-by: Alex Kompel <barbos@gmail.com>
+>>> ---
+>>>    hw/pci/pci.c | 8 +-------
+>>>    1 file changed, 1 insertion(+), 7 deletions(-)
+>>>
+>>> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+>>> index 24fae16..2fd1b9e 100644
+>>> --- a/hw/pci/pci.c
+>>> +++ b/hw/pci/pci.c
+>>> @@ -1805,13 +1805,7 @@ PCIDevice *pci_nic_init_nofail(NICInfo *nd,
+>>> PCIBus *rootbus,
 >>
->> This would also avoid some global state (vp_slave etc)
->
-> With the above commands, the slave QEMU will create and plug in the 
-> vhost-pci-net device at the QEMU booting time. I think this won't 
-> work, because at the slave QEMU booting time, the master, in most 
-> cases, hasn't connected to the slave to transmit the info (e.g. memory 
-> info) that's required for the device setup - for example, the device 
-> bar can't be constructed without the memory info passed from the 
-> master, and if the device is created and plugged in the VM without a 
-> bar at the beginning, I think we don't have another chance to add a 
-> bar on the fly when the device is already driven in the guest. That's 
-> the reason that I get a global vp_slave to manage (dynamically 
-> create/destroy a device when requested by the master) the vhost-pci 
-> device.
->
+>> Hello, looks like the patch were corrupted possibly by your email clie=
+nt.
+>> Please check, we usually send patch through git send-email.
 >>
->> Regarding the protocol changes to support slave request: I tried to 
->> explained that before, apprently I didn't manage to. It is not enough 
->> to support bidirectionnal communications to simply add chardev 
->> frontend handlers. Until now, qemu's code expects an immediate reply 
->> after a request. With your protocol change, it must now also consider 
->> that the slave may send a request before the master request reaches 
->> the slave handler. So all req/reply write()/read() must now handle in 
->> between requests from slave to be race-free (master can read back a 
->> request when it expects a reply). That's not really trivial change, 
->> that's why I proposed to have a secondary channel for slave->master 
->> communications in the past. Not only would this be easier to 
->> implement, but the protocol documentation would also be simpler, the 
->> cost is simply 1 additional unix socket (that I proposed to setup and 
->> pass with ancilliary data on the main channel).
->
-> I don't disagree with the second channel method. That implementation 
-> hasn't been in the upstream QEMU yet, are you planning to get it in 
-> first, so that we can upstream vhost-pci based on that?
->
->>
->>     RESEND change: Fixed some coding style issue
+>> Thanks
 >>
 >>
->> there are some spelling to be fixed, and perhaps some 
->> variables/fields to rename  (asyn -> async, crq -> ctrlq?) That can 
->> be addressed in a detailed review.
->
-> Sure, I will fix them.
->
-Best,
-Wei
+>>>        pci_dev =3D pci_create(bus, devfn, pci_nic_names[i]);
+>>>        dev =3D &pci_dev->qdev;
+>>>        qdev_set_nic_properties(dev, nd);
+>>> -
+>>> -    object_property_set_bool(OBJECT(dev), true, "realized", &err);
+>>> -    if (err) {
+>>> -        error_report_err(err);
+>>> -        object_unparent(OBJECT(dev));
+>>> -        exit(1);
+>>> -    }
+>>> +    qdev_init_nofail(dev);
+>>>
+>>>        return pci_dev;
+>>>    }
+>>> --
+>>> 2.8.3
+>>>
