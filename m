@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36343)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37088)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1cQPU7-0005xh-CD
-	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 21:14:56 -0500
+	(envelope-from <peterx@redhat.com>) id 1cQPY1-0007nt-3D
+	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 21:18:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1cQPU4-0002iO-8V
-	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 21:14:55 -0500
-Received: from [45.249.212.187] (port=2511 helo=dggrg01-dlp.huawei.com)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1cQPU3-0002hG-FO
-	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 21:14:52 -0500
-From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Date: Mon, 9 Jan 2017 02:09:45 +0000
-Message-ID: <33183CC9F5247A488A2544077AF19020DA1803F7@DGGEMA505-MBX.china.huawei.com>
-References: <1482377823-20184-1-git-send-email-arei.gonglei@huawei.com>
-In-Reply-To: <1482377823-20184-1-git-send-email-arei.gonglei@huawei.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <peterx@redhat.com>) id 1cQPXx-0004XQ-VH
+	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 21:18:57 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55060)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cQPXx-0004WB-PG
+	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 21:18:53 -0500
+Received: from int-mx14.intmail.prod.int.phx2.redhat.com
+	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 392633D955
+	for <qemu-devel@nongnu.org>; Mon,  9 Jan 2017 02:18:53 +0000 (UTC)
+Date: Mon, 9 Jan 2017 10:18:45 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170109021845.GE4135@pxdev.xzpeter.org>
+References: <1483675573-12636-1-git-send-email-peterx@redhat.com>
+	<20170106132738.GD2461@work-vm>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] virtio-crypto: use the correct length for
- cipher operation
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170106132738.GD2461@work-vm>
+Subject: Re: [Qemu-devel] [PATCH v3 0/2] VT-d migration support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,55 +33,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Gonglei (Arei)" <arei.gonglei@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "mst@redhat.com" <mst@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, mst@redhat.com, Juan Quintela <quintela@redhat.com>, Jason Wang <jasowang@redhat.com>, Amit Shah <amit.shah@redhat.com>
 
-Hi Michael,
+On Fri, Jan 06, 2017 at 01:27:38PM +0000, Dr. David Alan Gilbert wrote:
 
-Ping...
+[...]
 
+> > (P.S. I found that split irqchip cannot work well with migration. Is
+> >  this an known issue?)
+> 
+> How did it fail?
 
+The keyboard hangs after migration.
 
-Regards,
--Gonglei
+Command line for reference:
 
+$qemu -M q35,kernel-irqchip=split -enable-kvm \
+      -netdev user,id=net0 \
+      -device e1000,netdev=net0 \
+      -m 512M -monitor stdio \
+      $incoming /var/lib/libvirt/images/vm1.qcow2
 
-> -----Original Message-----
-> From: Gonglei (Arei)
-> Sent: Thursday, December 22, 2016 11:37 AM
-> To: qemu-devel@nongnu.org
-> Cc: mst@redhat.com; Gonglei (Arei)
-> Subject: [PATCH] virtio-crypto: use the correct length for cipher operati=
-on
->=20
-> In some modes of cipher algorithms, the length of destination data
-> maybe larger then source data, such as ciphertext stealing (CTS).
->=20
-> For symmetric algorithms, the length of ciphertext is definitly
-> equal to the plaintext for each crypto operation. So we should
-> use the src_len instead of dst_len avoid to pass the incorrect
-> cryptographical results to the frontend driver.
->=20
-> Signed-off-by: Gonglei <arei.gonglei@huawei.com>
-> ---
->  hw/virtio/virtio-crypto.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/hw/virtio/virtio-crypto.c b/hw/virtio/virtio-crypto.c
-> index 4f11fee..978bb98 100644
-> --- a/hw/virtio/virtio-crypto.c
-> +++ b/hw/virtio/virtio-crypto.c
-> @@ -355,7 +355,7 @@ virtio_crypto_sym_input_data_helper(VirtIODevice
-> *vdev,
->          return;
->      }
->=20
-> -    len =3D sym_op_info->dst_len;
-> +    len =3D sym_op_info->src_len;
->      /* Save the cipher result */
->      s =3D iov_from_buf(req->in_iov, req->in_num, 0, sym_op_info->dst, le=
-n);
->      if (s !=3D len) {
-> --
-> 1.8.3.1
->=20
+Here $incoming is "" for init vm, and "-incoming tcp:0:6666" for the
+dest side. Not sure whether this is reproducable issue. Looks like
+some EOI ack is missing.
+
+Host: 4.10.0-rc1+ (I should also tried 4.6.4-301.fc24)
+Qemu: latest master
+
+Looking into it.
+
+-- peterx
