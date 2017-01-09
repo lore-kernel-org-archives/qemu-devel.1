@@ -1,35 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44336)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45423)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cQaua-0004Yw-CJ
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 09:27:05 -0500
+	(envelope-from <eblake@redhat.com>) id 1cQazr-0000CT-LA
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 09:32:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1cQauV-0001BY-5Z
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 09:26:59 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:48436
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
-	id 1cQauU-0001BG-VN
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 09:26:55 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	v09ENjV6112968
-	for <qemu-devel@nongnu.org>; Mon, 9 Jan 2017 09:26:54 -0500
-Received: from e23smtp09.au.ibm.com (e23smtp09.au.ibm.com [202.81.31.142])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 27vbe1aj9e-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 09 Jan 2017 09:26:54 -0500
-Received: from localhost
-	by e23smtp09.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
-	Tue, 10 Jan 2017 00:26:51 +1000
-From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-Date: Mon,  9 Jan 2017 19:56:15 +0530
-In-Reply-To: <1483971975-5612-1-git-send-email-nikunj@linux.vnet.ibm.com>
-References: <1483971975-5612-1-git-send-email-nikunj@linux.vnet.ibm.com>
-Message-Id: <1483971975-5612-4-git-send-email-nikunj@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v2 3/3] target-ppc: Add xscvqpdp instruction
+	(envelope-from <eblake@redhat.com>) id 1cQazq-0002Oz-Or
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 09:32:27 -0500
+References: <1483969476-7172-1-git-send-email-kwolf@redhat.com>
+	<1483969476-7172-15-git-send-email-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <2a5b7944-69a3-044a-f065-844c368ec5b4@redhat.com>
+Date: Mon, 9 Jan 2017 08:32:17 -0600
+MIME-Version: 1.0
+In-Reply-To: <1483969476-7172-15-git-send-email-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="crV1GoeAc5qm0c4KEIa8f7Nxmr2a6GkuI"
+Subject: Re: [Qemu-devel] [PULL 14/14] block: Rename raw-{posix,
+ win32} to file-*.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,97 +25,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
-Cc: qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com, nikunj@linux.vnet.ibm.com
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org
 
-From: Bharata B Rao <bharata@linux.vnet.ibm.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--crV1GoeAc5qm0c4KEIa8f7Nxmr2a6GkuI
+From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org
+Message-ID: <2a5b7944-69a3-044a-f065-844c368ec5b4@redhat.com>
+Subject: Re: [Qemu-devel] [PULL 14/14] block: Rename raw-{posix, win32} to
+ file-*.c
+References: <1483969476-7172-1-git-send-email-kwolf@redhat.com>
+ <1483969476-7172-15-git-send-email-kwolf@redhat.com>
+In-Reply-To: <1483969476-7172-15-git-send-email-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-xscvqpdp:  VSX Scalar round & Convert Quad-Precision format to
-           Double-Precision format
+On 01/09/2017 07:44 AM, Kevin Wolf wrote:
+> From: Eric Blake <eblake@redhat.com>
+>=20
+> These files deal with the file protocol, not the raw format (the
+> file protocol is often used with other formats, and the raw
+> format is not forced to use the file protocol).  Rename things
+> to make it a bit easier to follow.
+>=20
+> Suggested-by: Daniel P. Berrange <berrange@redhat.com>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> Reviewed-by: John Snow <jsnow@redhat.com>
+> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  MAINTAINERS               |    4 +-
+>  block/Makefile.objs       |    4 +-
+>  block/file-posix.c        | 2616 +++++++++++++++++++++++++++++++++++++=
+++++++++
+>  block/file-win32.c        |  781 ++++++++++++++
+>  block/gluster.c           |    4 +-
+>  block/raw-posix.c         | 2616 -------------------------------------=
+--------
+>  block/raw-win32.c         |  781 --------------
 
-Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
-Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
----
- target/ppc/fpu_helper.c             | 28 ++++++++++++++++++++++++++++
- target/ppc/helper.h                 |  1 +
- target/ppc/translate/vsx-impl.inc.c |  1 +
- target/ppc/translate/vsx-ops.inc.c  |  1 +
- 4 files changed, 31 insertions(+)
+Did you forget to configure rename detection?
 
-diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
-index 16397ef..8c8e3c5 100644
---- a/target/ppc/fpu_helper.c
-+++ b/target/ppc/fpu_helper.c
-@@ -2778,6 +2778,34 @@ void helper_##op(CPUPPCState *env, uint32_t opcode)                \
- VSX_CVT_FP_TO_FP_HP(xscvdphp, float64, float16, VsrD(0), VsrH(3))
- VSX_CVT_FP_TO_FP_HP(xscvhpdp, float16, float64, VsrH(3), VsrD(0))
- 
-+/*
-+ * xscvqpdp isn't using VSX_CVT_FP_TO_FP() because xscvqpdpo will be
-+ * added to this later.
-+ */
-+void helper_xscvqpdp(CPUPPCState *env, uint32_t opcode)
-+{
-+    ppc_vsr_t xt, xb;
-+
-+    getVSR(rB(opcode) + 32, &xb, env);
-+    getVSR(rD(opcode) + 32, &xt, env);
-+
-+    if (unlikely(Rc(opcode) != 0)) {
-+        /* TODO: Support xscvqpdpo after round-to-odd is implemented */
-+        abort();
-+    }
-+
-+    xt.VsrD(0) = float128_to_float64(xb.f128, &env->fp_status);
-+    if (unlikely(float128_is_signaling_nan(xb.f128,
-+                                           &env->fp_status))) {
-+        float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 0);
-+        xt.VsrD(0) = float64_snan_to_qnan(xt.VsrD(0));
-+    }
-+    helper_compute_fprf_float64(env, xt.VsrD(0));
-+
-+    putVSR(rD(opcode) + 32, &xt, env);
-+    float_check_status(env);
-+}
-+
- uint64_t helper_xscvdpspn(CPUPPCState *env, uint64_t xb)
- {
-     float_status tstat = env->fp_status;
-diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-index 3b5d0ad..f28bf62 100644
---- a/target/ppc/helper.h
-+++ b/target/ppc/helper.h
-@@ -433,6 +433,7 @@ DEF_HELPER_2(xscvdphp, void, env, i32)
- DEF_HELPER_2(xscvdpqp, void, env, i32)
- DEF_HELPER_2(xscvdpsp, void, env, i32)
- DEF_HELPER_2(xscvdpspn, i64, env, i64)
-+DEF_HELPER_2(xscvqpdp, void, env, i32)
- DEF_HELPER_2(xscvhpdp, void, env, i32)
- DEF_HELPER_2(xscvspdp, void, env, i32)
- DEF_HELPER_2(xscvspdpn, i64, env, i64)
-diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/vsx-impl.inc.c
-index 01b5621..2d9fe50 100644
---- a/target/ppc/translate/vsx-impl.inc.c
-+++ b/target/ppc/translate/vsx-impl.inc.c
-@@ -810,6 +810,7 @@ GEN_VSX_HELPER_2(xscvdphp, 0x16, 0x15, 0x11, PPC2_ISA300)
- GEN_VSX_HELPER_2(xscvdpsp, 0x12, 0x10, 0, PPC2_VSX)
- GEN_VSX_HELPER_2(xscvdpqp, 0x04, 0x1A, 0x16, PPC2_ISA300)
- GEN_VSX_HELPER_XT_XB_ENV(xscvdpspn, 0x16, 0x10, 0, PPC2_VSX207)
-+GEN_VSX_HELPER_2(xscvqpdp, 0x04, 0x1A, 0x14, PPC2_ISA300)
- GEN_VSX_HELPER_2(xscvhpdp, 0x16, 0x15, 0x10, PPC2_ISA300)
- GEN_VSX_HELPER_2(xscvspdp, 0x12, 0x14, 0, PPC2_VSX)
- GEN_VSX_HELPER_XT_XB_ENV(xscvspdpn, 0x16, 0x14, 0, PPC2_VSX207)
-diff --git a/target/ppc/translate/vsx-ops.inc.c b/target/ppc/translate/vsx-ops.inc.c
-index e75ecd1..aeeaff2 100644
---- a/target/ppc/translate/vsx-ops.inc.c
-+++ b/target/ppc/translate/vsx-ops.inc.c
-@@ -113,6 +113,7 @@ GEN_VSX_XFORM_300_EO(xsnabsqp, 0x04, 0x19, 0x08, 0x00000001),
- GEN_VSX_XFORM_300_EO(xsnegqp, 0x04, 0x19, 0x10, 0x00000001),
- GEN_VSX_XFORM_300(xscpsgnqp, 0x04, 0x03, 0x00000001),
- GEN_VSX_XFORM_300_EO(xscvdpqp, 0x04, 0x1A, 0x16, 0x00000001),
-+GEN_VSX_XFORM_300_EO(xscvqpdp, 0x04, 0x1A, 0x14, 0x0),
- 
- #ifdef TARGET_PPC64
- GEN_XX2FORM_EO(xsxexpdp, 0x16, 0x15, 0x00, PPC2_ISA300),
--- 
-2.7.4
+It doesn't impact the validity of the pull request, but sure makes for a
+larger hit on the inbox.
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--crV1GoeAc5qm0c4KEIa8f7Nxmr2a6GkuI
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYc57xAAoJEKeha0olJ0Nq1RwIAI+LOxQil382D910BSUWp/Yu
+UXnqv2zGDuks35eQ/i2nJL6+Ac39DA4Jd55d0qZiEEbB55kk4sW+zADQnRKBhjOb
+u0E5BNovSN2estxszEvtyaQ+VUpeguHa2jUYYbMpUYIjmSQIRJLb8c+Ge52voghP
+Z1TDescQx41YYAK1V8B7xzB7sTOKup5Jebepb2j+5VZwf0M2BHxdcZ2j/vkMIj9L
+mean7AyeseoSDK9Xls16heyVxyV+0+ghrlUTsjIf8QCXaM+tOmj360Ti3q1s3udM
+iNLs1ciFNz4r3FGotlHm4ekPiX2jXR+7ZQYLj9H8OuSDrqn311e09NhNmmIV4ug=
+=qS4m
+-----END PGP SIGNATURE-----
+
+--crV1GoeAc5qm0c4KEIa8f7Nxmr2a6GkuI--
