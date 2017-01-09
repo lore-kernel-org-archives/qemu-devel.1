@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35332)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35664)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1cQPNL-0001em-In
-	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 21:07:56 -0500
+	(envelope-from <arei.gonglei@huawei.com>) id 1cQPQ2-0003lr-Sp
+	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 21:10:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1cQPNI-0000ui-F8
-	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 21:07:55 -0500
-Received: from [45.249.212.188] (port=2436 helo=dggrg02-dlp.huawei.com)
+	(envelope-from <arei.gonglei@huawei.com>) id 1cQPQ0-0001g0-G7
+	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 21:10:42 -0500
+Received: from [45.249.212.187] (port=2506 helo=dggrg01-dlp.huawei.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1cQPNI-0000uB-2B
-	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 21:07:52 -0500
+	(envelope-from <arei.gonglei@huawei.com>) id 1cQPPz-0001ci-J3
+	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 21:10:40 -0500
 From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Date: Mon, 9 Jan 2017 02:07:36 +0000
-Message-ID: <33183CC9F5247A488A2544077AF19020DA1803DD@DGGEMA505-MBX.china.huawei.com>
-References: <1482376362-13804-1-git-send-email-arei.gonglei@huawei.com>
-In-Reply-To: <1482376362-13804-1-git-send-email-arei.gonglei@huawei.com>
+Date: Mon, 9 Jan 2017 02:10:13 +0000
+Message-ID: <33183CC9F5247A488A2544077AF19020DA180404@DGGEMA505-MBX.china.huawei.com>
+References: <1483426203-16196-1-git-send-email-arei.gonglei@huawei.com>
+In-Reply-To: <1483426203-16196-1-git-send-email-arei.gonglei@huawei.com>
 Content-Language: zh-CN
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH RESEND 0/5] hotplugging support for both
- cryptdoev and virtio crypto device
+Subject: Re: [Qemu-devel] [PATCH] virtio-crypto: fix possible integer and
+ heap overflow
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,7 +29,7 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: "Gonglei (Arei)" <arei.gonglei@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "mst@redhat.com" <mst@redhat.com>
+Cc: "mst@redhat.com" <mst@redhat.com>, "liqiang6-s@360.cn" <liqiang6-s@360.cn>, "qemu-stable@nongnu.org" <qemu-stable@nongnu.org>
 
 Hi Michael,
 
@@ -43,37 +43,49 @@ Regards,
 
 > -----Original Message-----
 > From: Gonglei (Arei)
-> Sent: Thursday, December 22, 2016 11:13 AM
+> Sent: Tuesday, January 03, 2017 2:50 PM
 > To: qemu-devel@nongnu.org
-> Cc: mst@redhat.com; Gonglei (Arei)
-> Subject: [PATCH RESEND 0/5] hotplugging support for both cryptdoev and vi=
-rtio
-> crypto device
+> Cc: mst@redhat.com; liqiang6-s@360.cn; Gonglei (Arei);
+> qemu-stable@nongnu.org
+> Subject: [PATCH] virtio-crypto: fix possible integer and heap overflow
 >=20
-> The patch set make the cryptodev object can be hot plugging
-> in safety, and which are preparing works for virtio-crypto
-> device hotplugging.
+> Because the 'size_t' type is 4 bytes in 32-bit platform, which
+> is the same with 'int'. It's easy to make 'max_len' to zero when
+> integer overflow and then cause heap overflow if 'max_len' is zero.
 >=20
-> Patch 5 opens the hotplugging capability for virtio crypto
-> device.
+> Using uint_64 instead of size_t to avoid the integer overflow.
 >=20
-> Gonglei (5):
->   cryptodev: introduce a new is_used property
->   cryptodev: wrap the ready flag
->   virtio-crypto-pci: add check for cryptodev object
->   virtio-crypto: avoid one cryptodev device is used by multiple virtio
->     crypto devices
->   virtio-crypto-pci: tag virtio-crypto device hot pluggable
+> Cc: qemu-stable@nongnu.org
+> Reported-by: Li Qiang <liqiang6-s@360.cn>
+> Signed-off-by: Gonglei <arei.gonglei@huawei.com>
+> Tested-by: Li Qiang <liqiang6-s@360.cn>
+> ---
+>  hw/virtio/virtio-crypto.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 >=20
->  backends/cryptodev-builtin.c  |  4 ++++
->  backends/cryptodev.c          | 34
-> ++++++++++++++++++++++++++++++----
->  hw/virtio/virtio-crypto-pci.c |  6 +++++-
->  hw/virtio/virtio-crypto.c     | 22 +++++++++++++++++++---
->  include/sysemu/cryptodev.h    | 42
-> ++++++++++++++++++++++++++++++++++++++++++
->  5 files changed, 100 insertions(+), 8 deletions(-)
+> diff --git a/hw/virtio/virtio-crypto.c b/hw/virtio/virtio-crypto.c
+> index 978bb98..fc30bc3 100644
+> --- a/hw/virtio/virtio-crypto.c
+> +++ b/hw/virtio/virtio-crypto.c
+> @@ -416,7 +416,7 @@ virtio_crypto_sym_op_helper(VirtIODevice *vdev,
+>      uint32_t hash_start_src_offset =3D 0, len_to_hash =3D 0;
+>      uint32_t cipher_start_src_offset =3D 0, len_to_cipher =3D 0;
 >=20
+> -    size_t max_len, curr_size =3D 0;
+> +    uint64_t max_len, curr_size =3D 0;
+>      size_t s;
+>=20
+>      /* Plain cipher */
+> @@ -441,7 +441,7 @@ virtio_crypto_sym_op_helper(VirtIODevice *vdev,
+>          return NULL;
+>      }
+>=20
+> -    max_len =3D iv_len + aad_len + src_len + dst_len + hash_result_len;
+> +    max_len =3D (uint64_t)iv_len + aad_len + src_len + dst_len +
+> hash_result_len;
+>      if (unlikely(max_len > vcrypto->conf.max_size)) {
+>          virtio_error(vdev, "virtio-crypto too big length");
+>          return NULL;
 > --
 > 1.8.3.1
 >=20
