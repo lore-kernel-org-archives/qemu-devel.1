@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57541)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57847)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cQRCn-00067S-Ib
-	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 23:05:12 -0500
+	(envelope-from <jasowang@redhat.com>) id 1cQRE8-00074i-F2
+	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 23:06:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cQRCm-0002XW-Bl
-	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 23:05:09 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34636)
+	(envelope-from <jasowang@redhat.com>) id 1cQRE7-0002ul-93
+	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 23:06:32 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:38976)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cQRCm-0002X9-4a
-	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 23:05:08 -0500
-From: Peter Xu <peterx@redhat.com>
-Date: Mon,  9 Jan 2017 12:04:54 +0800
-Message-Id: <1483934694-32425-3-git-send-email-peterx@redhat.com>
-In-Reply-To: <1483934694-32425-1-git-send-email-peterx@redhat.com>
-References: <1483934694-32425-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [kvm-unit-tests PATCH v4 2/2] run_tests: allow run
- tests in parallel
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1cQRE7-0002uS-2x
+	for qemu-devel@nongnu.org; Sun, 08 Jan 2017 23:06:31 -0500
+References: <CALoWxX_-+dBexpVzy2MKVN10b94vaZC50y+vxbZtqXi+S_Urmg@mail.gmail.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <0bfb55a2-08a0-2264-c2cd-ce566d08b0f4@redhat.com>
+Date: Mon, 9 Jan 2017 12:06:22 +0800
+MIME-Version: 1.0
+In-Reply-To: <CALoWxX_-+dBexpVzy2MKVN10b94vaZC50y+vxbZtqXi+S_Urmg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] hw/pci: use-after-free in
+ pci_nic_init_nofail when nic device fails to initialize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,114 +27,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, kvm@vger.kernel.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Andrew Jones <drjones@redhat.com>, peterx@redhat.com, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
+To: Alex Kompel <barbos@gmail.com>, qemu-devel@nongnu.org
+Cc: Marcel Apfelbaum <marcel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-run_task.sh is getting slow. This patch is trying to make it faster by
-running the tests concurrently.
 
-We provide a new parameter "-j" for the run_tests.sh, which can be used
-to specify how many run queues we want for the tests. Default queue
-length is 1, which is the old behavior.
 
-Quick test on my laptop (4 cores, 2 threads each) shows 3x speed boost:
+On 2017=E5=B9=B401=E6=9C=8807=E6=97=A5 07:48, Alex Kompel wrote:
+> object_property_set_bool(OBJECT(dev), true, "realized", &err) in
+> pci_nic_init_nofail may release the object if device fails to
+> initialize which leads to use-after-free in error handling block.
+> qdev_init_nofail does the same thing while holding the reference.
+>
+> (gdb) run -net nic
+> qemu-system-x86_64: failed to find romfile "efi-e1000.rom"
+>
+> Program received signal SIGSEGV, Segmentation fault.
+> object_unparent (obj=3D0x7fffe96a0010) at qom/object.c:440
+> 440     in qom/object.c
+> (gdb) bt
+> #0  object_unparent (obj=3D0x7fffe96a0010) at qom/object.c:440
+> #1  0x000055555598c30d in pci_nic_init_nofail (nd=3D0x55555616b460
+> <nd_table>, rootbus=3D0x5555567ed990, default_model=3D<optimized out>,
+> default_devaddr=3D<optimized out>) at hw/pci/pci.c:1812
+> #2  0x00005555557ff52c in pc_nic_init (isa_bus=3D0x55555733c610,
+> pci_bus=3D0x5555567ed990) at hw/i386/pc.c:1634
+> #3  0x00005555558021ad in pc_init1 (machine=3D0x55555661ee10,
+> pci_type=3D0x555555c1a523 "i440FX", host_type=3D0x555555ba564e
+> "i440FX-pcihost") at hw/i386/pc_piix.c:241
+> #4  0x00005555557519cb in main (argc=3D<optimized out>, argv=3D<optimiz=
+ed
+> out>, envp=3D<optimized out>) at vl.c:4481
+>
+> Signed-off-by: Alex Kompel <barbos@gmail.com>
+> ---
+>   hw/pci/pci.c | 8 +-------
+>   1 file changed, 1 insertion(+), 7 deletions(-)
+>
+> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+> index 24fae16..2fd1b9e 100644
+> --- a/hw/pci/pci.c
+> +++ b/hw/pci/pci.c
+> @@ -1805,13 +1805,7 @@ PCIDevice *pci_nic_init_nofail(NICInfo *nd,
+> PCIBus *rootbus,
 
-   |-----------------+-----------|
-   | command         | time used |
-   |-----------------+-----------|
-   | run_test.sh     | 75s       |
-   | run_test.sh -j8 | 27s       |
-   |-----------------+-----------|
+Hello, looks like the patch were corrupted possibly by your email=20
+client. Please check, we usually send patch through git send-email.
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- run_tests.sh        | 12 ++++++++++--
- scripts/common.bash | 16 +++++++++++++++-
- 2 files changed, 25 insertions(+), 3 deletions(-)
+Thanks
 
-diff --git a/run_tests.sh b/run_tests.sh
-index 1e36d66..795cf73 100755
---- a/run_tests.sh
-+++ b/run_tests.sh
-@@ -13,10 +13,11 @@ function usage()
- {
- cat <<EOF
- 
--Usage: $0 [-g group] [-h] [-v]
-+Usage: $0 [-g group] [-h] [-v] [-j num_run_queues]
- 
-     -g: Only execute tests in the given group
-     -h: Output this help text
-+    -j: Execute tests in parallel
-     -v: Enables verbose mode
- 
- Set the environment variable QEMU=/path/to/qemu-system-ARCH to
-@@ -28,7 +29,7 @@ EOF
- RUNTIME_arch_run="./$TEST_DIR/run"
- source scripts/runtime.bash
- 
--while getopts "g:hv" opt; do
-+while getopts "g:hj:v" opt; do
-     case $opt in
-         g)
-             only_group=$OPTARG
-@@ -37,6 +38,13 @@ while getopts "g:hv" opt; do
-             usage
-             exit
-             ;;
-+        j)
-+            unittest_run_queues=$OPTARG
-+            if ! (( "$unittest_run_queues" > 0 )); then
-+                echo "Invalid -j option: $unittest_run_queues"
-+                exit 1
-+            fi
-+            ;;
-         v)
-             verbose="yes"
-             ;;
-diff --git a/scripts/common.bash b/scripts/common.bash
-index 2dd7360..83aebf8 100644
---- a/scripts/common.bash
-+++ b/scripts/common.bash
-@@ -1,11 +1,19 @@
- : ${unittest_log_dir:=logs}
-+: ${unittest_run_queues:=1}
- 
- function run_task()
- {
- 	local testname="$2"
- 
-+	while (( "$(jobs | wc -l)" == $unittest_run_queues )); do
-+		# wait for any background test to finish
-+		wait -n
-+	done
-+
- 	RUNTIME_log_file="${unittest_log_dir}/${testname}.log"
--	"$@"
-+
-+	# start the testcase in the background
-+	"$@" &
- }
- 
- function for_each_unittest()
-@@ -22,6 +30,8 @@ function for_each_unittest()
- 	local accel
- 	local timeout
- 
-+	trap "wait; exit 130" SIGINT
-+
- 	exec {fd}<"$unittests"
- 
- 	while read -u $fd line; do
-@@ -55,5 +65,9 @@ function for_each_unittest()
- 		fi
- 	done
- 	run_task "$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
-+
-+	# wait all task finish
-+	wait
-+
- 	exec {fd}<&-
- }
--- 
-2.7.4
+>       pci_dev =3D pci_create(bus, devfn, pci_nic_names[i]);
+>       dev =3D &pci_dev->qdev;
+>       qdev_set_nic_properties(dev, nd);
+> -
+> -    object_property_set_bool(OBJECT(dev), true, "realized", &err);
+> -    if (err) {
+> -        error_report_err(err);
+> -        object_unparent(OBJECT(dev));
+> -        exit(1);
+> -    }
+> +    qdev_init_nofail(dev);
+>
+>       return pci_dev;
+>   }
+> --
+> 2.8.3
+>
