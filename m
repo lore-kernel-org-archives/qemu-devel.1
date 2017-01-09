@@ -1,32 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36256)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38906)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sbruno@freebsd.org>) id 1cQg1v-0007Av-HU
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 14:54:56 -0500
+	(envelope-from <jcd@tribudubois.net>) id 1cQgBz-0002aR-5N
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 15:05:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sbruno@freebsd.org>) id 1cQg1r-00040X-M5
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 14:54:55 -0500
-Received: from ignoranthack.me ([199.102.79.106]:64428
-	helo=mail.ignoranthack.me)
+	(envelope-from <jcd@tribudubois.net>) id 1cQgBv-00079X-Vz
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 15:05:19 -0500
+Received: from relay2-d.mail.gandi.net ([2001:4b98:c:538::194]:47833)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sbruno@freebsd.org>) id 1cQg1r-00040Q-Cs
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 14:54:51 -0500
-Received: from [192.168.0.6] (67-0-248-244.albq.qwest.net [67.0.248.244])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	(Authenticated sender: sbruno@ignoranthack.me)
-	by mail.ignoranthack.me (Postfix) with ESMTPSA id D895B1928BA
-	for <qemu-devel@nongnu.org>; Mon,  9 Jan 2017 19:54:48 +0000 (UTC)
-References: <20170105164105.23859-1-sbruno@freebsd.org>
-	<CAFEAcA9Rc5AQMv8iNMjo3rQjLGbbsGe+x0hodWgH4DFK8QDCtA@mail.gmail.com>
-From: Sean Bruno <sbruno@freebsd.org>
-Message-ID: <05be906b-51e9-1f2d-9a02-10b4c8577e7a@freebsd.org>
-Date: Mon, 9 Jan 2017 12:54:45 -0700
+	(Exim 4.71) (envelope-from <jcd@tribudubois.net>) id 1cQgBv-00079L-PL
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 15:05:15 -0500
+References: <20170104220624.26557-1-jcd@tribudubois.net>
+	<CAFEAcA8dwhoSZTWS9JJ6-vSUs1Asw8ymktmD+oOqx0DNpCV2XQ@mail.gmail.com>
+	<1be7123c-acee-7d16-8a10-c8965d5805ff@gmail.com>
+	<CAFEAcA9cUEGL=rSrq2cstParBYHMWdkDy_acu7mTW754+G_Y6Q@mail.gmail.com>
+From: Jean-Christophe DUBOIS <jcd@tribudubois.net>
+Message-ID: <fb9b6b0a-62b5-2421-2826-d3f853b5d5b3@tribudubois.net>
+Date: Mon, 9 Jan 2017 21:05:10 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9Rc5AQMv8iNMjo3rQjLGbbsGe+x0hodWgH4DFK8QDCtA@mail.gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature";
-	boundary="qQkcFHQXGeR6K394lUOGKhOMmhchtbt5P"
-Subject: Re: [Qemu-devel] [PATCH] Update FreeBSD syscall numbers
+In-Reply-To: <CAFEAcA9cUEGL=rSrq2cstParBYHMWdkDy_acu7mTW754+G_Y6Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v4] [i.MX] fix CS handling during SPI
+ access.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,87 +30,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, "mar.krzeminski" <mar.krzeminski@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---qQkcFHQXGeR6K394lUOGKhOMmhchtbt5P
-From: Sean Bruno <sbruno@freebsd.org>
-To: qemu-devel@nongnu.org
-Message-ID: <05be906b-51e9-1f2d-9a02-10b4c8577e7a@freebsd.org>
-Subject: Re: [Qemu-devel] [PATCH] Update FreeBSD syscall numbers
-References: <20170105164105.23859-1-sbruno@freebsd.org>
- <CAFEAcA9Rc5AQMv8iNMjo3rQjLGbbsGe+x0hodWgH4DFK8QDCtA@mail.gmail.com>
-In-Reply-To: <CAFEAcA9Rc5AQMv8iNMjo3rQjLGbbsGe+x0hodWgH4DFK8QDCtA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-
-
-On 01/09/17 07:00, Peter Maydell wrote:
-> On 5 January 2017 at 16:41, Sean Bruno <sbruno@freebsd.org> wrote:
->> Signed-off-by: Sean Bruno <sbruno@freebsd.org>
->> Signed-off-by: Stacy Son <sson@freebsd.org>
->> ---
->>  bsd-user/freebsd/syscall_nr.h | 929 ++++++++++++++++++++++-----------=
----------
->>  1 file changed, 484 insertions(+), 445 deletions(-)
+Le 09/01/2017 à 20:06, Peter Maydell a écrit :
+> On 9 January 2017 at 19:04, mar.krzeminski <mar.krzeminski@gmail.com> wrote:
 >>
->> diff --git a/bsd-user/freebsd/syscall_nr.h b/bsd-user/freebsd/syscall_=
-nr.h
->> index d849024792..fc31880af0 100644
->> --- a/bsd-user/freebsd/syscall_nr.h
->> +++ b/bsd-user/freebsd/syscall_nr.h
->> @@ -1,450 +1,489 @@
->>  /*
->> + * This file was generated from /usr/include/sys/syscall.h
->> + */
->> +
->> +/*
->>   * System call numbers.
->>   *
->> - * created from FreeBSD: releng/9.1/sys/kern/syscalls.master 229723
->> - * 2012-01-06 19:29:16Z jhb
->> + * DO NOT EDIT-- this file is automatically generated.
->> + * $FreeBSD: head/sys/sys/syscall.h 272824 2014-10-09 15:19:35Z marce=
-l $
->> + * created from FreeBSD: head/sys/kern/syscalls.master 272823 2014-10=
--09 15:16:52Z marcel
->>   */
->=20
-> If this is automatically generated, then ideally we should have
-> the script that generates it in scripts/...
-> (and we could fix the script to follow our coding style in using
-> spaces rather than tabs :-))
->=20
+>> W dniu 09.01.2017 o 11:46, Peter Maydell pisze:
+>>> Calling qemu_set_irq() in a device reset function is a bit
+>>> tricky, because in a full system reset the device at the other
+>>> end might have already reset or might not, and calling into
+>>> its handler function for the irq line change might provoke
+>>> an unwanted change of its state. We don't really have a coherent
+>>> model here but for the moment we just try to avoid calling
+>>> set_irq in a reset method.
+>> JC, if you remove qemu_set_irq() call from reset, at least m25p80 behavior
+>> should not change since m25p80 reset handler will reset it's whole internal
+>> state.
+> I noticed the reset function is also called from within the
+> register emulation too, so it's maybe not quite that simple...
+OK, I'll fix it.
+
+JC
+
+>
 > thanks
 > -- PMM
->=20
->=20
-
-Yeah, I immediately went to run that locally so I could clean this up
-and comply with coding style ... then I ran into path assumptions in the
-scripts, but its on my list this week. :-)
-
-sean
-
-
---qQkcFHQXGeR6K394lUOGKhOMmhchtbt5P
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQGTBAEBCgB9FiEEuq1GMucSHejSCZfdEgHvyh5yfmQFAlhz6oVfFIAAAAAALgAo
-aXNzdWVyLWZwckBub3RhdGlvbnMub3BlbnBncC5maWZ0aGhvcnNlbWFuLm5ldEJB
-QUQ0NjMyRTcxMjFERThEMjA5OTdERDEyMDFFRkNBMUU3MjdFNjQACgkQEgHvyh5y
-fmS+lAf9Gdag5+KlZV1jxgWtN/l3M/zMF2LJxZMCbAyjF4vJS7Xl6bGpd/igAvlS
-fuo+Ej5XfLlmYEDWdvF0O+wrRauf2JAh+JqGP3Q8evsPggQZTQZg81Enu6xi6Odt
-oGfxo3Nm6X3RSQooY6M6LDFpvc54z9EaRB57elMWMRy/ns6DJ+Q9znNp+aUXPc6I
-j63IIdTkHVxmsBcaBW6xOrvcRV69KQcuKqJbzKD9B+E2XPn1ohPFDqbjCXM0CRdR
-GCZQPjzdsqixCaP9+dZB9GrPyhlw3RHcOpVuStj5Ql4R3Wzw65ATpei0D+XlDMtA
-AbwmZfMV3aubq8BeFlejkc2emorQ9w==
-=Z7U9
------END PGP SIGNATURE-----
-
---qQkcFHQXGeR6K394lUOGKhOMmhchtbt5P--
+>
+>
