@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40592)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41091)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cQspd-00084e-9d
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 04:35:06 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1cQsqi-0000DS-6Q
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 04:36:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cQspa-0002BO-4X
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 04:35:05 -0500
-Received: from indium.canonical.com ([91.189.90.7]:59916)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cQspZ-0002A5-VA
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 04:35:02 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cQspY-0005nA-EQ
-	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 09:35:00 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 2CD7E2E80CF
-	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 09:35:00 +0000 (UTC)
+	(envelope-from <pbonzini@redhat.com>) id 1cQsqe-000319-DC
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 04:36:11 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43892)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cQsqe-00030q-7H
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 04:36:08 -0500
+References: <20161222152300.32395-1-pbonzini@redhat.com>
+	<20161222152300.32395-22-pbonzini@redhat.com>
+	<CAFEAcA_G4Cgwimce6kMzWkB2zHLbTMwWH8ZcEP2kRu8853Lu_Q@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <e3e12905-6679-e575-0921-5404faef6b53@redhat.com>
+Date: Tue, 10 Jan 2017 10:36:05 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <CAFEAcA_G4Cgwimce6kMzWkB2zHLbTMwWH8ZcEP2kRu8853Lu_Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 10 Jan 2017 09:17:42 -0000
-From: Thomas Huth <676934@bugs.launchpad.net>
-Reply-To: Bug 676934 <676934@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20101118110340.18016.73281.malonedeb@palladium.canonical.com>
-Message-Id: <20170110091743.20288.93855.launchpad@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 676934] Re: Ability to use -net socket with unix
- sockets
+Subject: Re: [Qemu-devel] [PULL 21/25] scsi-disk: fix VERIFY for scsi-block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,32 +28,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-** Changed in: qemu
-   Importance: Undecided =3D> Wishlist
 
--- =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/676934
+On 09/01/2017 20:42, Peter Maydell wrote:
+>> +    case VERIFY_10:
+>> +    case VERIFY_12:
+>> +    case VERIFY_16:
+>> +        /* We get here only for BYTCHK =3D=3D 0x01 and only for scsi-=
+block.
+>> +         * As far as DMA is concerned, we can treat it the same as a =
+write;
+>> +         * scsi_block_do_sgio will send VERIFY commands.
+>> +         */
+>>          if (r->req.cmd.buf[1] & 0xe0) {
+>>              goto illegal_request;
+>>          }
+> Coverity now complains about the fallthrough into the case statements
+> added here. I assume from the patch that the fallthrough is deliberate,
+> in which case a /* fall through */ comment would assist future
+> readers...
 
-Title:
-  Ability to use -net socket with unix sockets
+Indeed---I thought I had waived that already in the scan dashboard.
 
-Status in QEMU:
-  New
-
-Bug description:
-  It would be a nice feature (simplifying access control for example) to
-  be able to do something like:
-
-  qemu -net socket,listen=3Dunix:/tmp/qemunet
-  qemu -net socket,connect=3Dunix:/tmp/qemunet
-
-  For now one has to use TCP connections even for guests running on the
-  same host, which involves setting up iptables to restrict access.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/676934/+subscriptions
+Paolo
