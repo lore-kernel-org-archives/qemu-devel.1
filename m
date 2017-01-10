@@ -1,18 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57913)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58468)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gerg@uclinux.org>) id 1cQvnT-0003Gd-Vf
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 07:45:05 -0500
+	(envelope-from <no-reply@patchew.org>) id 1cQvqJ-0004mX-Bb
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 07:48:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gerg@uclinux.org>) id 1cQvnQ-0001Q3-0u
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 07:45:04 -0500
-Received: from icp-osb-irony-out9.external.iinet.net.au ([203.59.1.226]:60808)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gerg@uclinux.org>) id 1cQvnP-0001LS-22
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 07:44:59 -0500
-From: Greg Ungerer <gerg@uclinux.org>
-Date: Tue, 10 Jan 2017 22:44:33 +1000
-Message-Id: <1484052273-23815-1-git-send-email-gerg@uclinux.org>
-Subject: [Qemu-devel] [PATCH] hw/net: implement MIB counters in mcf_fec
+	(envelope-from <no-reply@patchew.org>) id 1cQvqF-00028o-Ec
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 07:47:59 -0500
+Resent-Message-Id: <E1cQvqF-00028o-Ec@eggs.gnu.org>
+Received: from sender163-mail.zoho.com ([74.201.84.163]:21431)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1cQvqF-00028f-6Q
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 07:47:55 -0500
+In-Reply-To: <1484052273-23815-1-git-send-email-gerg@uclinux.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <148405246416.208.15774370249510916631@790289a7ca88>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 10 Jan 2017 04:47:45 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH] hw/net: implement MIB counters in mcf_fec
  driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -22,211 +29,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Greg Ungerer <gerg@uclinux.org>
+To: gerg@uclinux.org
+Cc: famz@redhat.com, qemu-devel@nongnu.org
 
-The FEC ethernet hardware module used on ColdFire SoC parts contains a
-block of RAM used to maintain hardware counters. This block is accessible
-via the usual FEC register address space. There is currently no support
-for this in the QEMU mcf_fec driver.
-
-Add support for storing a MIB RAM block, and provide register level
-access to it. Also implement a basic set of stats collection functions
-to populate MIB data fields.
-
-This support tested running a Linux target and using the net-tools
-"ethtool -S" option. As of linux-4.9 the kernels FEC driver makes
-accesses to the MIB counters during its initialization (which it never
-did before), and so this version of Linux will now fail with the QEMU
-error:
-
-    qemu: hardware error: mcf_fec_read: Bad address 0x200
-
-This MIB counter support fixes this problem.
-
-Singed-off-by: Greg Ungerer <gerg@uclinux.org>
----
- hw/net/mcf_fec.c | 113 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 113 insertions(+)
-
-diff --git a/hw/net/mcf_fec.c b/hw/net/mcf_fec.c
-index 4025eb3..7a9e4f1 100644
---- a/hw/net/mcf_fec.c
-+++ b/hw/net/mcf_fec.c
-@@ -25,6 +25,7 @@ do { printf("mcf_fec: " fmt , ## __VA_ARGS__); } while (0)
- 
- #define FEC_MAX_DESC 1024
- #define FEC_MAX_FRAME_SIZE 2032
-+#define FEC_MIB_SIZE 64
- 
- typedef struct {
-     MemoryRegion *sysmem;
-@@ -48,6 +49,7 @@ typedef struct {
-     uint32_t erdsr;
-     uint32_t etdsr;
-     uint32_t emrbr;
-+    uint32_t mib[FEC_MIB_SIZE];
- } mcf_fec_state;
- 
- #define FEC_INT_HB   0x80000000
-@@ -109,6 +111,63 @@ typedef struct {
- #define FEC_BD_OV   0x0002
- #define FEC_BD_TR   0x0001
- 
-+#define MIB_RMON_T_DROP         0
-+#define MIB_RMON_T_PACKETS      1
-+#define MIB_RMON_T_BC_PKT       2
-+#define MIB_RMON_T_MC_PKT       3
-+#define MIB_RMON_T_CRC_ALIGN    4
-+#define MIB_RMON_T_UNDERSIZE    5
-+#define MIB_RMON_T_OVERSIZE     6
-+#define MIB_RMON_T_FRAG         7
-+#define MIB_RMON_T_JAB          8
-+#define MIB_RMON_T_COL          9
-+#define MIB_RMON_T_P64          10
-+#define MIB_RMON_T_P65TO127     11
-+#define MIB_RMON_T_P128TO255    12
-+#define MIB_RMON_T_P256TO511    13
-+#define MIB_RMON_T_P512TO1023   14
-+#define MIB_RMON_T_P1024TO2047  15
-+#define MIB_RMON_T_P_GTE2048    16
-+#define MIB_RMON_T_OCTETS       17
-+#define MIB_IEEE_T_DROP         18
-+#define MIB_IEEE_T_FRAME_OK     19
-+#define MIB_IEEE_T_1COL         20
-+#define MIB_IEEE_T_MCOL         21
-+#define MIB_IEEE_T_DEF          22
-+#define MIB_IEEE_T_LCOL         23
-+#define MIB_IEEE_T_EXCOL        24
-+#define MIB_IEEE_T_MACERR       25
-+#define MIB_IEEE_T_CSERR        26
-+#define MIB_IEEE_T_SQE          27
-+#define MIB_IEEE_T_FDXFC        28
-+#define MIB_IEEE_T_OCTETS_OK    29
-+
-+#define MIB_RMON_R_DROP         32
-+#define MIB_RMON_R_PACKETS      33
-+#define MIB_RMON_R_BC_PKT       34
-+#define MIB_RMON_R_MC_PKT       35
-+#define MIB_RMON_R_CRC_ALIGN    36
-+#define MIB_RMON_R_UNDERSIZE    37
-+#define MIB_RMON_R_OVERSIZE     38
-+#define MIB_RMON_R_FRAG         39
-+#define MIB_RMON_R_JAB          40
-+#define MIB_RMON_R_RESVD_0      41
-+#define MIB_RMON_R_P64          42
-+#define MIB_RMON_R_P65TO127     43
-+#define MIB_RMON_R_P128TO255    44
-+#define MIB_RMON_R_P256TO511    45
-+#define MIB_RMON_R_P512TO1023   46
-+#define MIB_RMON_R_P1024TO2047  47
-+#define MIB_RMON_R_P_GTE2048    48
-+#define MIB_RMON_R_OCTETS       49
-+#define MIB_IEEE_R_DROP         50
-+#define MIB_IEEE_R_FRAME_OK     51
-+#define MIB_IEEE_R_CRC          52
-+#define MIB_IEEE_R_ALIGN        53
-+#define MIB_IEEE_R_MACERR       54
-+#define MIB_IEEE_R_FDXFC        55
-+#define MIB_IEEE_R_OCTETS_OK    56
-+
- static void mcf_fec_read_bd(mcf_fec_bd *bd, uint32_t addr)
- {
-     cpu_physical_memory_read(addr, bd, sizeof(*bd));
-@@ -145,6 +204,30 @@ static void mcf_fec_update(mcf_fec_state *s)
-     s->irq_state = active;
- }
- 
-+static void mcf_fec_tx_stats(mcf_fec_state *s, int size)
-+{
-+    s->mib[MIB_RMON_T_PACKETS]++;
-+    s->mib[MIB_RMON_T_OCTETS] += size;
-+    if (size < 64)
-+        s->mib[MIB_RMON_T_FRAG]++;
-+    else if (size == 64)
-+        s->mib[MIB_RMON_T_P64]++;
-+    else if (size < 128)
-+        s->mib[MIB_RMON_T_P65TO127]++;
-+    else if (size < 256)
-+        s->mib[MIB_RMON_T_P128TO255]++;
-+    else if (size < 512)
-+        s->mib[MIB_RMON_T_P256TO511]++;
-+    else if (size < 1024)
-+        s->mib[MIB_RMON_T_P512TO1023]++;
-+    else if (size < 2048)
-+        s->mib[MIB_RMON_T_P1024TO2047]++;
-+    else
-+        s->mib[MIB_RMON_T_P_GTE2048]++;
-+    s->mib[MIB_IEEE_T_FRAME_OK]++;
-+    s->mib[MIB_IEEE_T_OCTETS_OK] += size;
-+}
-+
- static void mcf_fec_do_tx(mcf_fec_state *s)
- {
-     uint32_t addr;
-@@ -178,6 +261,7 @@ static void mcf_fec_do_tx(mcf_fec_state *s)
-             /* Last buffer in frame.  */
-             DPRINTF("Sending packet\n");
-             qemu_send_packet(qemu_get_queue(s->nic), frame, frame_size);
-+            mcf_fec_tx_stats(s, frame_size);
-             ptr = frame;
-             frame_size = 0;
-             s->eir |= FEC_INT_TXF;
-@@ -298,6 +382,7 @@ static uint64_t mcf_fec_read(void *opaque, hwaddr addr,
-     case 0x180: return s->erdsr;
-     case 0x184: return s->etdsr;
-     case 0x188: return s->emrbr;
-+    case 0x200 ... 0x2e0: return s->mib[(addr & 0x1ff) / 4];
-     default:
-         hw_error("mcf_fec_read: Bad address 0x%x\n", (int)addr);
-         return 0;
-@@ -395,12 +480,39 @@ static void mcf_fec_write(void *opaque, hwaddr addr,
-     case 0x188:
-         s->emrbr = value > 0 ? value & 0x7F0 : 0x7F0;
-         break;
-+    case 0x200 ... 0x2e0:
-+        s->mib[(addr & 0x1ff) / 4] = value;
-+        break;
-     default:
-         hw_error("mcf_fec_write Bad address 0x%x\n", (int)addr);
-     }
-     mcf_fec_update(s);
- }
- 
-+static void mcf_fec_rx_stats(mcf_fec_state *s, int size)
-+{
-+    s->mib[MIB_RMON_R_PACKETS]++;
-+    s->mib[MIB_RMON_R_OCTETS] += size;
-+    if (size < 64)
-+        s->mib[MIB_RMON_R_FRAG]++;
-+    else if (size == 64)
-+        s->mib[MIB_RMON_R_P64]++;
-+    else if (size < 128)
-+        s->mib[MIB_RMON_R_P65TO127]++;
-+    else if (size < 256)
-+        s->mib[MIB_RMON_R_P128TO255]++;
-+    else if (size < 512)
-+        s->mib[MIB_RMON_R_P256TO511]++;
-+    else if (size < 1024)
-+        s->mib[MIB_RMON_R_P512TO1023]++;
-+    else if (size < 2048)
-+        s->mib[MIB_RMON_R_P1024TO2047]++;
-+    else
-+        s->mib[MIB_RMON_R_P_GTE2048]++;
-+    s->mib[MIB_IEEE_R_FRAME_OK]++;
-+    s->mib[MIB_IEEE_R_OCTETS_OK] += size;
-+}
-+
- static int mcf_fec_have_receive_space(mcf_fec_state *s, size_t want)
- {
-     mcf_fec_bd bd;
-@@ -496,6 +608,7 @@ static ssize_t mcf_fec_receive(NetClientState *nc, const uint8_t *buf, size_t si
-         }
-     }
-     s->rx_descriptor = addr;
-+    mcf_fec_rx_stats(s, retsize);
-     mcf_fec_enable_rx(s);
-     mcf_fec_update(s);
-     return retsize;
--- 
-1.9.1
+SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDE0ODQwNTIyNzMtMjM4MTUtMS1naXQtc2VuZC1lbWFpbC1nZXJnQHVjbGludXgu
+b3JnClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0hdIGh3L25ldDogaW1wbGVtZW50IE1JQiBj
+b3VudGVycyBpbiBtY2ZfZmVjIGRyaXZlcgoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9i
+aW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4g
+fCB3YyAtbCkKZmFpbGVkPTAKCiMgVXNlZnVsIGdpdCBvcHRpb25zCmdpdCBjb25maWcgLS1sb2Nh
+bCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVl
+Cgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3Ig
+YyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChn
+aXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZv
+cm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgog
+ICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoK
+ZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMy
+MWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3Bh
+dGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMTQ4NDA1MjI3
+My0yMzgxNS0xLWdpdC1zZW5kLWVtYWlsLWdlcmdAdWNsaW51eC5vcmcgLT4gcGF0Y2hldy8xNDg0
+MDUyMjczLTIzODE1LTEtZ2l0LXNlbmQtZW1haWwtZ2VyZ0B1Y2xpbnV4Lm9yZwpTd2l0Y2hlZCB0
+byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjhiNTk0YzEgaHcvbmV0OiBpbXBsZW1lbnQgTUlCIGNvdW50
+ZXJzIGluIG1jZl9mZWMgZHJpdmVyCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRD
+SCAxLzE6IGh3L25ldDogaW1wbGVtZW50IE1JQiBjb3VudGVycyBpbiBtY2ZfZmVjIGRyaXZlci4u
+LgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3Rh
+dGVtZW50CiMxMjA6IEZJTEU6IGh3L25ldC9tY2ZfZmVjLmM6MjExOgorICAgIGlmIChzaXplIDwg
+NjQpClsuLi5dCisgICAgZWxzZSBpZiAoc2l6ZSA9PSA2NCkKWy4uLl0KKyAgICBlbHNlIGlmIChz
+aXplIDwgMTI4KQpbLi4uXQorICAgIGVsc2UgaWYgKHNpemUgPCAyNTYpClsuLi5dCisgICAgZWxz
+ZSBpZiAoc2l6ZSA8IDUxMikKWy4uLl0KKyAgICBlbHNlIGlmIChzaXplIDwgMTAyNCkKWy4uLl0K
+KyAgICBlbHNlIGlmIChzaXplIDwgMjA0OCkKWy4uLl0KKyAgICBlbHNlClsuLi5dCgpFUlJPUjog
+YnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiMx
+MjI6IEZJTEU6IGh3L25ldC9tY2ZfZmVjLmM6MjEzOgorICAgIGVsc2UgaWYgKHNpemUgPT0gNjQp
+ClsuLi5dCisgICAgZWxzZSBpZiAoc2l6ZSA8IDEyOCkKWy4uLl0KKyAgICBlbHNlIGlmIChzaXpl
+IDwgMjU2KQpbLi4uXQorICAgIGVsc2UgaWYgKHNpemUgPCA1MTIpClsuLi5dCisgICAgZWxzZSBp
+ZiAoc2l6ZSA8IDEwMjQpClsuLi5dCisgICAgZWxzZSBpZiAoc2l6ZSA8IDIwNDgpClsuLi5dCisg
+ICAgZWxzZQpbLi4uXQoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJt
+cyBvZiB0aGlzIHN0YXRlbWVudAojMTI0OiBGSUxFOiBody9uZXQvbWNmX2ZlYy5jOjIxNToKKyAg
+ICBlbHNlIGlmIChzaXplIDwgMTI4KQpbLi4uXQorICAgIGVsc2UgaWYgKHNpemUgPCAyNTYpClsu
+Li5dCisgICAgZWxzZSBpZiAoc2l6ZSA8IDUxMikKWy4uLl0KKyAgICBlbHNlIGlmIChzaXplIDwg
+MTAyNCkKWy4uLl0KKyAgICBlbHNlIGlmIChzaXplIDwgMjA0OCkKWy4uLl0KKyAgICBlbHNlClsu
+Li5dCgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMg
+c3RhdGVtZW50CiMxMjY6IEZJTEU6IGh3L25ldC9tY2ZfZmVjLmM6MjE3OgorICAgIGVsc2UgaWYg
+KHNpemUgPCAyNTYpClsuLi5dCisgICAgZWxzZSBpZiAoc2l6ZSA8IDUxMikKWy4uLl0KKyAgICBl
+bHNlIGlmIChzaXplIDwgMTAyNCkKWy4uLl0KKyAgICBlbHNlIGlmIChzaXplIDwgMjA0OCkKWy4u
+Ll0KKyAgICBlbHNlClsuLi5dCgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFs
+bCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiMxMjg6IEZJTEU6IGh3L25ldC9tY2ZfZmVjLmM6MjE5
+OgorICAgIGVsc2UgaWYgKHNpemUgPCA1MTIpClsuLi5dCisgICAgZWxzZSBpZiAoc2l6ZSA8IDEw
+MjQpClsuLi5dCisgICAgZWxzZSBpZiAoc2l6ZSA8IDIwNDgpClsuLi5dCisgICAgZWxzZQpbLi4u
+XQoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0
+YXRlbWVudAojMTMwOiBGSUxFOiBody9uZXQvbWNmX2ZlYy5jOjIyMToKKyAgICBlbHNlIGlmIChz
+aXplIDwgMTAyNCkKWy4uLl0KKyAgICBlbHNlIGlmIChzaXplIDwgMjA0OCkKWy4uLl0KKyAgICBl
+bHNlClsuLi5dCgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9m
+IHRoaXMgc3RhdGVtZW50CiMxMzI6IEZJTEU6IGh3L25ldC9tY2ZfZmVjLmM6MjIzOgorICAgIGVs
+c2UgaWYgKHNpemUgPCAyMDQ4KQpbLi4uXQorICAgIGVsc2UKWy4uLl0KCkVSUk9SOiBicmFjZXMg
+e30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzE3NjogRklM
+RTogaHcvbmV0L21jZl9mZWMuYzo0OTY6CisgICAgaWYgKHNpemUgPCA2NCkKWy4uLl0KKyAgICBl
+bHNlIGlmIChzaXplID09IDY0KQpbLi4uXQorICAgIGVsc2UgaWYgKHNpemUgPCAxMjgpClsuLi5d
+CisgICAgZWxzZSBpZiAoc2l6ZSA8IDI1NikKWy4uLl0KKyAgICBlbHNlIGlmIChzaXplIDwgNTEy
+KQpbLi4uXQorICAgIGVsc2UgaWYgKHNpemUgPCAxMDI0KQpbLi4uXQorICAgIGVsc2UgaWYgKHNp
+emUgPCAyMDQ4KQpbLi4uXQorICAgIGVsc2UKWy4uLl0KCkVSUk9SOiBicmFjZXMge30gYXJlIG5l
+Y2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzE3ODogRklMRTogaHcvbmV0
+L21jZl9mZWMuYzo0OTg6CisgICAgZWxzZSBpZiAoc2l6ZSA9PSA2NCkKWy4uLl0KKyAgICBlbHNl
+IGlmIChzaXplIDwgMTI4KQpbLi4uXQorICAgIGVsc2UgaWYgKHNpemUgPCAyNTYpClsuLi5dCisg
+ICAgZWxzZSBpZiAoc2l6ZSA8IDUxMikKWy4uLl0KKyAgICBlbHNlIGlmIChzaXplIDwgMTAyNCkK
+Wy4uLl0KKyAgICBlbHNlIGlmIChzaXplIDwgMjA0OCkKWy4uLl0KKyAgICBlbHNlClsuLi5dCgpF
+UlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVt
+ZW50CiMxODA6IEZJTEU6IGh3L25ldC9tY2ZfZmVjLmM6NTAwOgorICAgIGVsc2UgaWYgKHNpemUg
+PCAxMjgpClsuLi5dCisgICAgZWxzZSBpZiAoc2l6ZSA8IDI1NikKWy4uLl0KKyAgICBlbHNlIGlm
+IChzaXplIDwgNTEyKQpbLi4uXQorICAgIGVsc2UgaWYgKHNpemUgPCAxMDI0KQpbLi4uXQorICAg
+IGVsc2UgaWYgKHNpemUgPCAyMDQ4KQpbLi4uXQorICAgIGVsc2UKWy4uLl0KCkVSUk9SOiBicmFj
+ZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzE4Mjog
+RklMRTogaHcvbmV0L21jZl9mZWMuYzo1MDI6CisgICAgZWxzZSBpZiAoc2l6ZSA8IDI1NikKWy4u
+Ll0KKyAgICBlbHNlIGlmIChzaXplIDwgNTEyKQpbLi4uXQorICAgIGVsc2UgaWYgKHNpemUgPCAx
+MDI0KQpbLi4uXQorICAgIGVsc2UgaWYgKHNpemUgPCAyMDQ4KQpbLi4uXQorICAgIGVsc2UKWy4u
+Ll0KCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBz
+dGF0ZW1lbnQKIzE4NDogRklMRTogaHcvbmV0L21jZl9mZWMuYzo1MDQ6CisgICAgZWxzZSBpZiAo
+c2l6ZSA8IDUxMikKWy4uLl0KKyAgICBlbHNlIGlmIChzaXplIDwgMTAyNCkKWy4uLl0KKyAgICBl
+bHNlIGlmIChzaXplIDwgMjA0OCkKWy4uLl0KKyAgICBlbHNlClsuLi5dCgpFUlJPUjogYnJhY2Vz
+IHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiMxODY6IEZJ
+TEU6IGh3L25ldC9tY2ZfZmVjLmM6NTA2OgorICAgIGVsc2UgaWYgKHNpemUgPCAxMDI0KQpbLi4u
+XQorICAgIGVsc2UgaWYgKHNpemUgPCAyMDQ4KQpbLi4uXQorICAgIGVsc2UKWy4uLl0KCkVSUk9S
+OiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQK
+IzE4ODogRklMRTogaHcvbmV0L21jZl9mZWMuYzo1MDg6CisgICAgZWxzZSBpZiAoc2l6ZSA8IDIw
+NDgpClsuLi5dCisgICAgZWxzZQpbLi4uXQoKRVJST1I6IE1pc3NpbmcgU2lnbmVkLW9mZi1ieTog
+bGluZShzKQoKdG90YWw6IDE1IGVycm9ycywgMCB3YXJuaW5ncywgMTY3IGxpbmVzIGNoZWNrZWQK
+CllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9m
+IHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWlu
+dGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09
+PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVk
+IGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBz
+ZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
