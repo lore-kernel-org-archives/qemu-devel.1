@@ -1,31 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38659)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39307)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cQms6-00078v-BE
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 22:13:15 -0500
+	(envelope-from <mst@redhat.com>) id 1cQmtR-00080Z-Ld
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 22:14:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cQms1-0002To-De
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 22:13:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49794)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cQms1-0002Td-7f
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 22:13:09 -0500
-Received: from int-mx11.intmail.prod.int.phx2.redhat.com
-	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2ACF94E4C6
-	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 03:13:09 +0000 (UTC)
-Date: Tue, 10 Jan 2017 05:13:07 +0200
+	(envelope-from <mst@redhat.com>) id 1cQmtN-0002xs-MH
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 22:14:37 -0500
+Date: Tue, 10 Jan 2017 05:14:30 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170110051006-mutt-send-email-mst@kernel.org>
-References: <1483559838-8797-1-git-send-email-marcel@redhat.com>
-	<1483559838-8797-2-git-send-email-marcel@redhat.com>
+Message-ID: <20170110051358-mutt-send-email-mst@kernel.org>
+References: <1483049536-21548-1-git-send-email-hpoussin@reactos.org>
+	<1483049536-21548-2-git-send-email-hpoussin@reactos.org>
+	<20170102230125.GE12761@umbus.fritz.box>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <1483559838-8797-2-git-send-email-marcel@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/4] hw/pcie: fix Extended Configuration
- Space for devices with no Extended Capabilities
+In-Reply-To: <20170102230125.GE12761@umbus.fritz.box>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/6] pci: add pci_vga_type(),
+ giving the device name of the chosen VGA device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,42 +26,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>
-Cc: qemu-devel@nongnu.org, yvugenfi@redhat.com
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Thomas Huth <thuth@redhat.com>, Giancarlo Teodori <gteodori@gmail.com>, Marcel Apfelbaum <marcel@redhat.com>
 
-On Wed, Jan 04, 2017 at 09:57:15PM +0200, Marcel Apfelbaum wrote:
-> Absence of any Extended Capabilities is required to be
-> indicated by an Extended Capability header with a Capability ID of
-> 0000h, a Capability Version of 0h, and a Next Capability Offset of 000h.
-> 
-> Instead of inserting a 'NULL' capability is simpler to mark the start
-> of the Extended Configuration Space as read-only to achieve the same
-> behaviour.
-> 
-> Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
+On Tue, Jan 03, 2017 at 10:01:25AM +1100, David Gibson wrote:
+> On Thu, Dec 29, 2016 at 11:12:11PM +0100, Herv=E9 Poussineau wrote:
+> > This is in fact a split of pci_vga_init() function in two parts.
+> >=20
+> > Signed-off-by: Herv=E9 Poussineau <hpoussin@reactos.org>
+>=20
+> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+>=20
+> I think it needs Michael or someone to merge it though.
 
-Kind of hacky and only theoretical - I don't think any guest writes
-there - but ok. However I think
-1. we should init config to 0 too
-2. this needs a compat flag
+Do we have to keep poking at pci_vga_type?
+I'd rather people just used -device for everything.
 
-> ---
->  hw/pci/pcie.c | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
-> index 99cfb45..62c1def 100644
-> --- a/hw/pci/pcie.c
-> +++ b/hw/pci/pcie.c
-> @@ -109,6 +109,9 @@ int pcie_cap_init(PCIDevice *dev, uint8_t offset, uint8_t type, uint8_t port)
->                   PCI_EXP_DEVCAP2_EFF | PCI_EXP_DEVCAP2_EETLPP);
->  
->      pci_set_word(dev->wmask + pos + PCI_EXP_DEVCTL2, PCI_EXP_DEVCTL2_EETLPPB);
-> +
-> +    /* read-only to behave like a 'NULL' Extended Capability Header */
-> +    pci_set_long(dev->wmask + PCI_CONFIG_SPACE_SIZE, 0);
->      return pos;
->  }
->  
-> -- 
-> 2.5.5
+> > ---
+> >  hw/pci/pci.c         | 22 ++++++++++++++++------
+> >  include/hw/pci/pci.h |  1 +
+> >  2 files changed, 17 insertions(+), 6 deletions(-)
+> >=20
+> > diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+> > index 24fae16..0d5a862 100644
+> > --- a/hw/pci/pci.c
+> > +++ b/hw/pci/pci.c
+> > @@ -1816,19 +1816,19 @@ PCIDevice *pci_nic_init_nofail(NICInfo *nd, P=
+CIBus *rootbus,
+> >      return pci_dev;
+> >  }
+> > =20
+> > -PCIDevice *pci_vga_init(PCIBus *bus)
+> > +const char *pci_vga_type(void)
+> >  {
+> >      switch (vga_interface_type) {
+> >      case VGA_CIRRUS:
+> > -        return pci_create_simple(bus, -1, "cirrus-vga");
+> > +        return "cirrus-vga";
+> >      case VGA_QXL:
+> > -        return pci_create_simple(bus, -1, "qxl-vga");
+> > +        return "qxl-vga";
+> >      case VGA_STD:
+> > -        return pci_create_simple(bus, -1, "VGA");
+> > +        return "VGA";
+> >      case VGA_VMWARE:
+> > -        return pci_create_simple(bus, -1, "vmware-svga");
+> > +        return "vmware-svga";
+> >      case VGA_VIRTIO:
+> > -        return pci_create_simple(bus, -1, "virtio-vga");
+> > +        return "virtio-vga";
+> >      case VGA_NONE:
+> >      default: /* Other non-PCI types. Checking for unsupported types =
+is already
+> >                  done in vl.c. */
+> > @@ -1836,6 +1836,16 @@ PCIDevice *pci_vga_init(PCIBus *bus)
+> >      }
+> >  }
+> > =20
+> > +PCIDevice *pci_vga_init(PCIBus *bus)
+> > +{
+> > +    const char *vga_type =3D pci_vga_type();
+> > +    if (vga_type) {
+> > +        return pci_create_simple(bus, -1, vga_type);
+> > +    } else {
+> > +        return NULL;
+> > +    }
+> > +}
+> > +
+> >  /* Whether a given bus number is in range of the secondary
+> >   * bus of the given bridge device. */
+> >  static bool pci_secondary_bus_in_range(PCIDevice *dev, int bus_num)
+> > diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+> > index 772692f..aa8d014 100644
+> > --- a/include/hw/pci/pci.h
+> > +++ b/include/hw/pci/pci.h
+> > @@ -420,6 +420,7 @@ PCIDevice *pci_nic_init_nofail(NICInfo *nd, PCIBu=
+s *rootbus,
+> >                                 const char *default_model,
+> >                                 const char *default_devaddr);
+> > =20
+> > +const char *pci_vga_type(void);
+> >  PCIDevice *pci_vga_init(PCIBus *bus);
+> > =20
+> >  int pci_bus_num(PCIBus *s);
+>=20
+> --=20
+> David Gibson			| I'll have my music baroque, and my code
+> david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _oth=
+er_
+> 				| _way_ _around_!
+> http://www.ozlabs.org/~dgibson
