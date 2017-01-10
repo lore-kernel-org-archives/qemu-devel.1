@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33450)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33466)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <SRS0=AJsY=YY=redhat.com=mst@kernel.org>)
-	id 1cQp9v-0007KK-Of
+	id 1cQp9x-0007L5-J3
 	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 00:39:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <SRS0=AJsY=YY=redhat.com=mst@kernel.org>)
-	id 1cQp9u-0005Uw-B9
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 00:39:47 -0500
-Received: from mail.kernel.org ([198.145.29.136]:47744)
+	id 1cQp9w-0005WF-HW
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 00:39:49 -0500
+Received: from mail.kernel.org ([198.145.29.136]:47790)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <SRS0=AJsY=YY=redhat.com=mst@kernel.org>)
-	id 1cQp9u-0005TS-1m
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 00:39:46 -0500
-Date: Tue, 10 Jan 2017 07:39:41 +0200
+	id 1cQp9w-0005Va-7A
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 00:39:48 -0500
+Date: Tue, 10 Jan 2017 07:39:43 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1484026704-28027-9-git-send-email-mst@redhat.com>
+Message-ID: <1484026704-28027-10-git-send-email-mst@redhat.com>
 References: <1484026704-28027-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1484026704-28027-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 08/41] intel_iommu: support device iotlb
- descriptor
+Subject: [Qemu-devel] [PULL 09/41] virtio-pci: address space translation
+ service (ATS) support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,236 +31,130 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Peter Xu <peterx@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>
 
 From: Jason Wang <jasowang@redhat.com>
 
-This patch enables device IOTLB support for intel iommu. The major
-work is to implement QI device IOTLB descriptor processing and notify
-the device through iommu notifier.
+This patches enable the Address Translation Service support for virtio
+pci devices. This is needed for a guest visible Device IOTLB
+implementation and will be required by vhost device IOTLB API
+implementation for intel IOMMU.
 
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
 Cc: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
 ---
- hw/i386/intel_iommu_internal.h | 13 ++++++-
- include/hw/i386/x86-iommu.h    |  1 +
- hw/i386/intel_iommu.c          | 83 +++++++++++++++++++++++++++++++++++++++---
- hw/i386/x86-iommu.c            | 17 +++++++++
- 4 files changed, 107 insertions(+), 7 deletions(-)
+ hw/virtio/virtio-pci.h                    |  4 ++++
+ include/hw/pci/pcie.h                     |  4 ++++
+ include/standard-headers/linux/pci_regs.h |  1 +
+ hw/pci/pcie.c                             | 15 +++++++++++++++
+ hw/virtio/virtio-pci.c                    |  7 +++++++
+ 5 files changed, 31 insertions(+)
 
-diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
-index 11abfa2..356f188 100644
---- a/hw/i386/intel_iommu_internal.h
-+++ b/hw/i386/intel_iommu_internal.h
-@@ -183,6 +183,7 @@
- /* (offset >> 4) << 8 */
- #define VTD_ECAP_IRO                (DMAR_IOTLB_REG_OFFSET << 4)
- #define VTD_ECAP_QI                 (1ULL << 1)
-+#define VTD_ECAP_DT                 (1ULL << 2)
- /* Interrupt Remapping support */
- #define VTD_ECAP_IR                 (1ULL << 3)
- #define VTD_ECAP_EIM                (1ULL << 4)
-@@ -326,6 +327,7 @@ typedef union VTDInvDesc VTDInvDesc;
- #define VTD_INV_DESC_TYPE               0xf
- #define VTD_INV_DESC_CC                 0x1 /* Context-cache Invalidate Desc */
- #define VTD_INV_DESC_IOTLB              0x2
-+#define VTD_INV_DESC_DEVICE             0x3
- #define VTD_INV_DESC_IEC                0x4 /* Interrupt Entry Cache
-                                                Invalidate Descriptor */
- #define VTD_INV_DESC_WAIT               0x5 /* Invalidation Wait Descriptor */
-@@ -361,6 +363,13 @@ typedef union VTDInvDesc VTDInvDesc;
- #define VTD_INV_DESC_IOTLB_RSVD_LO      0xffffffff0000ff00ULL
- #define VTD_INV_DESC_IOTLB_RSVD_HI      0xf80ULL
- 
-+/* Mask for Device IOTLB Invalidate Descriptor */
-+#define VTD_INV_DESC_DEVICE_IOTLB_ADDR(val) ((val) & 0xfffffffffffff000ULL)
-+#define VTD_INV_DESC_DEVICE_IOTLB_SIZE(val) ((val) & 0x1)
-+#define VTD_INV_DESC_DEVICE_IOTLB_SID(val) (((val) >> 32) & 0xFFFFULL)
-+#define VTD_INV_DESC_DEVICE_IOTLB_RSVD_HI 0xffeULL
-+#define VTD_INV_DESC_DEVICE_IOTLB_RSVD_LO 0xffff0000ffe0fff8
-+
- /* Information about page-selective IOTLB invalidate */
- struct VTDIOTLBPageInvInfo {
-     uint16_t domain_id;
-@@ -399,8 +408,8 @@ typedef struct VTDRootEntry VTDRootEntry;
- #define VTD_CONTEXT_ENTRY_FPD       (1ULL << 1) /* Fault Processing Disable */
- #define VTD_CONTEXT_ENTRY_TT        (3ULL << 2) /* Translation Type */
- #define VTD_CONTEXT_TT_MULTI_LEVEL  0
--#define VTD_CONTEXT_TT_DEV_IOTLB    1
--#define VTD_CONTEXT_TT_PASS_THROUGH 2
-+#define VTD_CONTEXT_TT_DEV_IOTLB    (1ULL << 2)
-+#define VTD_CONTEXT_TT_PASS_THROUGH (2ULL << 2)
- /* Second Level Page Translation Pointer*/
- #define VTD_CONTEXT_ENTRY_SLPTPTR   (~0xfffULL)
- #define VTD_CONTEXT_ENTRY_RSVD_LO   (0xff0ULL | ~VTD_HAW_MASK)
-diff --git a/include/hw/i386/x86-iommu.h b/include/hw/i386/x86-iommu.h
-index 0c89d98..361c07c 100644
---- a/include/hw/i386/x86-iommu.h
-+++ b/include/hw/i386/x86-iommu.h
-@@ -73,6 +73,7 @@ typedef struct IEC_Notifier IEC_Notifier;
- struct X86IOMMUState {
-     SysBusDevice busdev;
-     bool intr_supported;        /* Whether vIOMMU supports IR */
-+    bool dt_supported;          /* Whether vIOMMU supports DT */
-     IommuType type;             /* IOMMU type - AMD/Intel     */
-     QLIST_HEAD(, IEC_Notifier) iec_notifiers; /* IEC notify list */
+diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h
+index 5e07886..d00064c 100644
+--- a/hw/virtio/virtio-pci.h
++++ b/hw/virtio/virtio-pci.h
+@@ -72,6 +72,7 @@ enum {
+     VIRTIO_PCI_FLAG_MODERN_PIO_NOTIFY_BIT,
+     VIRTIO_PCI_FLAG_DISABLE_PCIE_BIT,
+     VIRTIO_PCI_FLAG_PAGE_PER_VQ_BIT,
++    VIRTIO_PCI_FLAG_ATS_BIT,
  };
-diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index e39b764..ec62239 100644
---- a/hw/i386/intel_iommu.c
-+++ b/hw/i386/intel_iommu.c
-@@ -738,11 +738,18 @@ static int vtd_dev_to_context_entry(IntelIOMMUState *s, uint8_t bus_num,
-                     "context-entry hi 0x%"PRIx64 " lo 0x%"PRIx64,
-                     ce->hi, ce->lo);
-         return -VTD_FR_CONTEXT_ENTRY_INV;
--    } else if (ce->lo & VTD_CONTEXT_ENTRY_TT) {
--        VTD_DPRINTF(GENERAL, "error: unsupported Translation Type in "
--                    "context-entry hi 0x%"PRIx64 " lo 0x%"PRIx64,
--                    ce->hi, ce->lo);
--        return -VTD_FR_CONTEXT_ENTRY_INV;
-+    } else {
-+        switch (ce->lo & VTD_CONTEXT_ENTRY_TT) {
-+        case VTD_CONTEXT_TT_MULTI_LEVEL:
-+            /* fall through */
-+        case VTD_CONTEXT_TT_DEV_IOTLB:
-+            break;
-+        default:
-+            VTD_DPRINTF(GENERAL, "error: unsupported Translation Type in "
-+                        "context-entry hi 0x%"PRIx64 " lo 0x%"PRIx64,
-+                        ce->hi, ce->lo);
-+            return -VTD_FR_CONTEXT_ENTRY_INV;
+ 
+ /* Need to activate work-arounds for buggy guests at vmstate load. */
+@@ -96,6 +97,9 @@ enum {
+ #define VIRTIO_PCI_FLAG_PAGE_PER_VQ \
+     (1 << VIRTIO_PCI_FLAG_PAGE_PER_VQ_BIT)
+ 
++/* address space translation service */
++#define VIRTIO_PCI_FLAG_ATS (1 << VIRTIO_PCI_FLAG_ATS_BIT)
++
+ typedef struct {
+     MSIMessage msg;
+     int virq;
+diff --git a/include/hw/pci/pcie.h b/include/hw/pci/pcie.h
+index 056d25e..b08451d 100644
+--- a/include/hw/pci/pcie.h
++++ b/include/hw/pci/pcie.h
+@@ -74,6 +74,9 @@ struct PCIExpressDevice {
+     /* AER */
+     uint16_t aer_cap;
+     PCIEAERLog aer_log;
++
++    /* Offset of ATS capability in config space */
++    uint16_t ats_cap;
+ };
+ 
+ #define COMPAT_PROP_PCP "power_controller_present"
+@@ -120,6 +123,7 @@ void pcie_add_capability(PCIDevice *dev,
+ 
+ void pcie_ari_init(PCIDevice *dev, uint16_t offset, uint16_t nextfn);
+ void pcie_dev_ser_num_init(PCIDevice *dev, uint16_t offset, uint64_t ser_num);
++void pcie_ats_init(PCIDevice *dev, uint16_t offset);
+ 
+ extern const VMStateDescription vmstate_pcie_device;
+ 
+diff --git a/include/standard-headers/linux/pci_regs.h b/include/standard-headers/linux/pci_regs.h
+index e5a2e68..be5b066 100644
+--- a/include/standard-headers/linux/pci_regs.h
++++ b/include/standard-headers/linux/pci_regs.h
+@@ -678,6 +678,7 @@
+ #define PCI_EXT_CAP_ID_MAX	PCI_EXT_CAP_ID_PTM
+ 
+ #define PCI_EXT_CAP_DSN_SIZEOF	12
++#define PCI_EXT_CAP_ATS_SIZEOF	8
+ #define PCI_EXT_CAP_MCAST_ENDPOINT_SIZEOF 40
+ 
+ /* Advanced Error Reporting */
+diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
+index 99cfb45..adeda04 100644
+--- a/hw/pci/pcie.c
++++ b/hw/pci/pcie.c
+@@ -717,3 +717,18 @@ void pcie_dev_ser_num_init(PCIDevice *dev, uint16_t offset, uint64_t ser_num)
+                         PCI_EXT_CAP_DSN_SIZEOF);
+     pci_set_quad(dev->config + offset + pci_dsn_cap, ser_num);
+ }
++
++void pcie_ats_init(PCIDevice *dev, uint16_t offset)
++{
++    pcie_add_capability(dev, PCI_EXT_CAP_ID_ATS, 0x1,
++                        offset, PCI_EXT_CAP_ATS_SIZEOF);
++
++    dev->exp.ats_cap = offset;
++
++    /* Invalidate Queue Depth 0, Page Aligned Request 0 */
++    pci_set_word(dev->config + offset + PCI_ATS_CAP, 0);
++    /* STU 0, Disabled by default */
++    pci_set_word(dev->config + offset + PCI_ATS_CTRL, 0);
++
++    pci_set_word(dev->wmask + dev->exp.ats_cap + PCI_ATS_CTRL, 0x800f);
++}
+diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+index 213d57e..854b8f2 100644
+--- a/hw/virtio/virtio-pci.c
++++ b/hw/virtio/virtio-pci.c
+@@ -1815,6 +1815,11 @@ static void virtio_pci_realize(PCIDevice *pci_dev, Error **errp)
+          * PCI Power Management Interface Specification.
+          */
+         pci_set_word(pci_dev->config + pos + PCI_PM_PMC, 0x3);
++
++        if (proxy->flags & VIRTIO_PCI_FLAG_ATS) {
++            pcie_ats_init(pci_dev, 256);
 +        }
-     }
-     return 0;
- }
-@@ -1438,7 +1445,61 @@ static bool vtd_process_inv_iec_desc(IntelIOMMUState *s,
-     vtd_iec_notify_all(s, !inv_desc->iec.granularity,
-                        inv_desc->iec.index,
-                        inv_desc->iec.index_mask);
-+    return true;
-+}
 +
-+static bool vtd_process_device_iotlb_desc(IntelIOMMUState *s,
-+                                          VTDInvDesc *inv_desc)
-+{
-+    VTDAddressSpace *vtd_dev_as;
-+    IOMMUTLBEntry entry;
-+    struct VTDBus *vtd_bus;
-+    hwaddr addr;
-+    uint64_t sz;
-+    uint16_t sid;
-+    uint8_t devfn;
-+    bool size;
-+    uint8_t bus_num;
-+
-+    addr = VTD_INV_DESC_DEVICE_IOTLB_ADDR(inv_desc->hi);
-+    sid = VTD_INV_DESC_DEVICE_IOTLB_SID(inv_desc->lo);
-+    devfn = sid & 0xff;
-+    bus_num = sid >> 8;
-+    size = VTD_INV_DESC_DEVICE_IOTLB_SIZE(inv_desc->hi);
-+
-+    if ((inv_desc->lo & VTD_INV_DESC_DEVICE_IOTLB_RSVD_LO) ||
-+        (inv_desc->hi & VTD_INV_DESC_DEVICE_IOTLB_RSVD_HI)) {
-+        VTD_DPRINTF(GENERAL, "error: non-zero reserved field in Device "
-+                    "IOTLB Invalidate Descriptor hi 0x%"PRIx64 " lo 0x%"PRIx64,
-+                    inv_desc->hi, inv_desc->lo);
-+        return false;
-+    }
-+
-+    vtd_bus = vtd_find_as_from_bus_num(s, bus_num);
-+    if (!vtd_bus) {
-+        goto done;
-+    }
-+
-+    vtd_dev_as = vtd_bus->dev_as[devfn];
-+    if (!vtd_dev_as) {
-+        goto done;
-+    }
-+
-+    if (size) {
-+        sz = 1 << (ctz64(~(addr | (VTD_PAGE_MASK_4K - 1))) + 1);
-+        addr &= ~(sz - 1);
-+    } else {
-+        sz = VTD_PAGE_SIZE;
-+    }
+     } else {
+         /*
+          * make future invocations of pci_is_express() return false
+@@ -1868,6 +1873,8 @@ static Property virtio_pci_properties[] = {
+                     VIRTIO_PCI_FLAG_PAGE_PER_VQ_BIT, false),
+     DEFINE_PROP_BOOL("x-ignore-backend-features", VirtIOPCIProxy,
+                      ignore_backend_features, false),
++    DEFINE_PROP_BIT("ats", VirtIOPCIProxy, flags,
++                    VIRTIO_PCI_FLAG_ATS_BIT, false),
+     DEFINE_PROP_END_OF_LIST(),
+ };
  
-+    entry.target_as = &vtd_dev_as->as;
-+    entry.addr_mask = sz - 1;
-+    entry.iova = addr;
-+    entry.perm = IOMMU_NONE;
-+    entry.translated_addr = 0;
-+    memory_region_notify_iommu(entry.target_as->root, entry);
-+
-+done:
-     return true;
- }
- 
-@@ -1490,6 +1551,14 @@ static bool vtd_process_inv_desc(IntelIOMMUState *s)
-         }
-         break;
- 
-+    case VTD_INV_DESC_DEVICE:
-+        VTD_DPRINTF(INV, "Device IOTLB Invalidation Descriptor hi 0x%"PRIx64
-+                    " lo 0x%"PRIx64, inv_desc.hi, inv_desc.lo);
-+        if (!vtd_process_device_iotlb_desc(s, &inv_desc)) {
-+            return false;
-+        }
-+        break;
-+
-     default:
-         VTD_DPRINTF(GENERAL, "error: unkonw Invalidation Descriptor type "
-                     "hi 0x%"PRIx64 " lo 0x%"PRIx64 " type %"PRIu8,
-@@ -2415,6 +2484,10 @@ static void vtd_init(IntelIOMMUState *s)
-         assert(s->intr_eim != ON_OFF_AUTO_AUTO);
-     }
- 
-+    if (x86_iommu->dt_supported) {
-+        s->ecap |= VTD_ECAP_DT;
-+    }
-+
-     vtd_reset_context_cache(s);
-     vtd_reset_iotlb(s);
- 
-diff --git a/hw/i386/x86-iommu.c b/hw/i386/x86-iommu.c
-index 2278af7..23dcd3f 100644
---- a/hw/i386/x86-iommu.c
-+++ b/hw/i386/x86-iommu.c
-@@ -106,6 +106,18 @@ static void x86_iommu_intremap_prop_set(Object *o, bool value, Error **errp)
-     s->intr_supported = value;
- }
- 
-+static bool x86_iommu_device_iotlb_prop_get(Object *o, Error **errp)
-+{
-+    X86IOMMUState *s = X86_IOMMU_DEVICE(o);
-+    return s->dt_supported;
-+}
-+
-+static void x86_iommu_device_iotlb_prop_set(Object *o, bool value, Error **errp)
-+{
-+    X86IOMMUState *s = X86_IOMMU_DEVICE(o);
-+    s->dt_supported = value;
-+}
-+
- static void x86_iommu_instance_init(Object *o)
- {
-     X86IOMMUState *s = X86_IOMMU_DEVICE(o);
-@@ -114,6 +126,11 @@ static void x86_iommu_instance_init(Object *o)
-     s->intr_supported = false;
-     object_property_add_bool(o, "intremap", x86_iommu_intremap_prop_get,
-                              x86_iommu_intremap_prop_set, NULL);
-+    s->dt_supported = false;
-+    object_property_add_bool(o, "device-iotlb",
-+                             x86_iommu_device_iotlb_prop_get,
-+                             x86_iommu_device_iotlb_prop_set,
-+                             NULL);
- }
- 
- static const TypeInfo x86_iommu_info = {
 -- 
 MST
