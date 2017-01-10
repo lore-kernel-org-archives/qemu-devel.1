@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60080)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60096)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cQvvX-0007cx-2q
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 07:53:23 -0500
+	(envelope-from <imammedo@redhat.com>) id 1cQvvY-0007d2-0G
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 07:53:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cQvvU-0003tz-TB
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 07:53:23 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54918)
+	(envelope-from <imammedo@redhat.com>) id 1cQvvW-0003uL-Qa
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 07:53:24 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46242)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cQvvU-0003tl-NJ
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 07:53:20 -0500
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cQvvW-0003uE-Hb
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 07:53:22 -0500
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Tue, 10 Jan 2017 13:53:13 +0100
-Message-Id: <1484052795-158195-2-git-send-email-imammedo@redhat.com>
+Date: Tue, 10 Jan 2017 13:53:14 +0100
+Message-Id: <1484052795-158195-3-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1484052795-158195-1-git-send-email-imammedo@redhat.com>
 References: <1484052795-158195-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 1/3] qom: remove unused header
+Subject: [Qemu-devel] [PATCH v2 2/3] reuse user_creatable_add_opts() instead
+ of user_creatable_add() in monitor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,23 +27,164 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: ehabkost@redhat.com, armbru@redhat.com, dgilbert@redhat.com, eblake@redhat.com, afaerber@suse.de, pbonzini@redhat.com
 
+Simplify code by dropping ~57LOC by merging user_creatable_add()
+into user_creatable_add_opts() and using the later from monitor.
+Along with it allocate opts_visitor_new() once in user_creatable_add_opts().
+
+As result we have one less API func and a more readable/simple
+user_creatable_add_opts() vs user_creatable_add().
+
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- qom/object_interfaces.c | 1 -
- 1 file changed, 1 deletion(-)
+ include/qom/object_interfaces.h | 17 ----------
+ hmp.c                           |  5 +--
+ qom/object_interfaces.c         | 71 ++++++++++-------------------------------
+ 3 files changed, 18 insertions(+), 75 deletions(-)
 
+diff --git a/include/qom/object_interfaces.h b/include/qom/object_interfaces.h
+index 8b17f4d..fdd7603 100644
+--- a/include/qom/object_interfaces.h
++++ b/include/qom/object_interfaces.h
+@@ -76,23 +76,6 @@ void user_creatable_complete(Object *obj, Error **errp);
+ bool user_creatable_can_be_deleted(UserCreatable *uc, Error **errp);
+ 
+ /**
+- * user_creatable_add:
+- * @qdict: the object definition
+- * @v: the visitor
+- * @errp: if an error occurs, a pointer to an area to store the error
+- *
+- * Create an instance of the user creatable object whose type
+- * is defined in @qdict by the 'qom-type' field, placing it
+- * in the object composition tree with name provided by the
+- * 'id' field. The remaining fields in @qdict are used to
+- * initialize the object properties.
+- *
+- * Returns: the newly created object or NULL on error
+- */
+-Object *user_creatable_add(const QDict *qdict,
+-                           Visitor *v, Error **errp);
+-
+-/**
+  * user_creatable_add_type:
+  * @type: the object type name
+  * @id: the unique ID for the object
+diff --git a/hmp.c b/hmp.c
+index b869617..e7bead5 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -1808,7 +1808,6 @@ void hmp_object_add(Monitor *mon, const QDict *qdict)
+ {
+     Error *err = NULL;
+     QemuOpts *opts;
+-    Visitor *v;
+     Object *obj = NULL;
+ 
+     opts = qemu_opts_from_qdict(qemu_find_opts("object"), qdict, &err);
+@@ -1817,9 +1816,7 @@ void hmp_object_add(Monitor *mon, const QDict *qdict)
+         return;
+     }
+ 
+-    v = opts_visitor_new(opts);
+-    obj = user_creatable_add(qdict, v, &err);
+-    visit_free(v);
++    obj = user_creatable_add_opts(opts, &err);
+     qemu_opts_del(opts);
+ 
+     if (err) {
 diff --git a/qom/object_interfaces.c b/qom/object_interfaces.c
-index ded4d84..4b880d0 100644
+index 4b880d0..9b4155a 100644
 --- a/qom/object_interfaces.c
 +++ b/qom/object_interfaces.c
-@@ -3,7 +3,6 @@
- #include "qom/object_interfaces.h"
- #include "qemu/module.h"
- #include "qapi-visit.h"
--#include "qapi/qobject-output-visitor.h"
- #include "qapi/opts-visitor.h"
+@@ -34,57 +34,6 @@ bool user_creatable_can_be_deleted(UserCreatable *uc, Error **errp)
+     }
+ }
  
- void user_creatable_complete(Object *obj, Error **errp)
+-
+-Object *user_creatable_add(const QDict *qdict,
+-                           Visitor *v, Error **errp)
+-{
+-    char *type = NULL;
+-    char *id = NULL;
+-    Object *obj = NULL;
+-    Error *local_err = NULL;
+-    QDict *pdict;
+-
+-    pdict = qdict_clone_shallow(qdict);
+-
+-    visit_start_struct(v, NULL, NULL, 0, &local_err);
+-    if (local_err) {
+-        goto out;
+-    }
+-
+-    qdict_del(pdict, "qom-type");
+-    visit_type_str(v, "qom-type", &type, &local_err);
+-    if (local_err) {
+-        goto out_visit;
+-    }
+-
+-    qdict_del(pdict, "id");
+-    visit_type_str(v, "id", &id, &local_err);
+-    if (local_err) {
+-        goto out_visit;
+-    }
+-    visit_check_struct(v, &local_err);
+-    if (local_err) {
+-        goto out_visit;
+-    }
+-
+-    obj = user_creatable_add_type(type, id, pdict, v, &local_err);
+-
+-out_visit:
+-    visit_end_struct(v, NULL);
+-
+-out:
+-    QDECREF(pdict);
+-    g_free(id);
+-    g_free(type);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
+-        object_unref(obj);
+-        return NULL;
+-    }
+-    return obj;
+-}
+-
+-
+ Object *user_creatable_add_type(const char *type, const char *id,
+                                 const QDict *qdict,
+                                 Visitor *v, Error **errp)
+@@ -157,13 +106,27 @@ Object *user_creatable_add_opts(QemuOpts *opts, Error **errp)
+ {
+     Visitor *v;
+     QDict *pdict;
+-    Object *obj = NULL;
++    Object *obj;
++    const char *id = qemu_opts_id(opts);
++    const char *type = qemu_opt_get(opts, "qom-type");
++
++    if (!type) {
++        error_setg(errp, QERR_MISSING_PARAMETER, "qom-type");
++        return NULL;
++    }
++    if (!id) {
++        error_setg(errp, QERR_MISSING_PARAMETER, "id");
++        return NULL;
++    }
+ 
+-    v = opts_visitor_new(opts);
+     pdict = qemu_opts_to_qdict(opts, NULL);
++    qdict_del(pdict, "qom-type");
++    qdict_del(pdict, "id");
+ 
+-    obj = user_creatable_add(pdict, v, errp);
++    v = opts_visitor_new(opts);
++    obj = user_creatable_add_type(type, id, pdict, v, errp);
+     visit_free(v);
++
+     QDECREF(pdict);
+     return obj;
+ }
 -- 
 2.7.4
