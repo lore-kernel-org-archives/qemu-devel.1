@@ -1,23 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44500)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <jgj@qq.com>)
-	id 1cQwo6-0003Yy-7v
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 08:49:47 -0500
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51882)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <eblake@redhat.com>) id 1cQxMW-0003A0-Ny
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 09:25:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jgj@qq.com>) id 1cQwo3-0004Kx-4B
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 08:49:46 -0500
-Received: from smtpproxy19.qq.com ([184.105.206.84]:35493)
+	(envelope-from <eblake@redhat.com>) id 1cQxMS-0000iC-P3
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 09:25:20 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52605)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jgj@qq.com>) id 1cQwo2-0004I7-OS
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 08:49:43 -0500
-From: "=?utf-8?B?SmluIEd1b2ppZQ==?=" <jinguojie@loongson.cn>
-Sender: jinguojie@loongson.cn
-Mime-Version: 1.0
-Date: Tue, 10 Jan 2017 21:49:36 +0800
-Message-ID: <tencent_5F52DB766DE53996203DE3E6@qq.com>
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel] [PATCH 0/1] Change default CFLAGS to -O3
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cQxMS-0000ha-Il
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 09:25:16 -0500
+Received: from int-mx13.intmail.prod.int.phx2.redhat.com
+	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BA8FC64DBE
+	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 14:25:15 +0000 (UTC)
+References: <20170109153914.27424-1-berrange@redhat.com>
+	<20170109153914.27424-2-berrange@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <2d48aff8-924b-26b9-4a47-a13ea3648bd2@redhat.com>
+Date: Tue, 10 Jan 2017 08:25:13 -0600
+MIME-Version: 1.0
+In-Reply-To: <20170109153914.27424-2-berrange@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Kl9bEVKPeA3jR0mxrI2xUjnG2OeX94eUm"
+Subject: Re: [Qemu-devel] [PATCH v2 1/8] sockets: add ability to disable DNS
+ resolution for InetSocketAddress
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,59 +35,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?B?UGV0ZXIgTWF5ZGVsbA==?= <peter.maydell@linaro.org>
-Cc: =?utf-8?B?cWVtdS1kZXZlbA==?= <qemu-devel@nongnu.org>, =?utf-8?B?UGFvbG8gQm9uemluaQ==?= <pbonzini@redhat.com>, =?utf-8?B?RGFuaWVsIFAuIEJlcnJhbmdl?= <berrange@redhat.com>, =?utf-8?B?Q2hyaXN0aWFuIEJvcm50cmFlZ2Vy?= <borntraeger@de.ibm.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
 
-VGhhbmtzIGFsbCBmb3IgeW91ciByZXZpZXcgY29tbWVudHMuDQpUbyBtZWFzdXJlIHRoZSBh
-Y3R1YWwgcGVyZm9ybWFuY2UgZGlmZmVyZW5jZSBiZXR3ZWVuIE8yIGFuZCBPMywNCkkgZGlk
-IHRoZSBmb2xsb3dpbmcgdGVzdHM6DQoNCkVudmlyb25tZW50czoNCiogSGFyZHdhcmU6IEFN
-RCBBdGhsb24gSUkgWDIgMjcwIFByb2Nlc3NvciwgMy40IEdIeg0KKiBIb3N0IE9TOiBGZWRv
-cmEyNSBYODZfNjQNCiogcWVtdTogMi44LjANCiogZ2NjOiA2LjIuMQ0KKiBHdWVzdCBPUzog
-bGludXgtMC4yLmltZw0KICAoZG93bmxvYWRlZCBmcm9tIGh0dHA6Ly93aWtpLnFlbXUub3Jn
-L1Rlc3RpbmcvU3lzdGVtX0ltYWdlcykNCiogQmVuY2htYXJrOiBuYmVuY2ggd2l0aGluIGxp
-bnV4LTAuMi5pbWcNCg0KUmVzdWx0czoNCiAgRWFjaCB0ZXN0IGhhcyBiZWVuIHJ1biBhdCBs
-ZWFzdCAzIHRpbWVzIHRvIG1pbmltaXplIHRoZSBkZXZpYXRpb24uDQogIEhpZ2hlciBzY29y
-ZSBpcyBiZXR0ZXIuDQoNCnwgICAgICAgICAgICAgICAgICAgICAgICAgICAgfCAgIE8yICAg
-fCAgIE8zICAgfA0KLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tDQp8IHFlbXUtc3lzdGVtLWkzODYoc3RyaXBwZWQpIHwgOC4xIE1CIHwgOC45IE1C
-IHwgDQp8IG5iZW5jaChOVU1FUklDIFNPUlQpICAgICAgIHwgMjU0LjcyIHwgMjYwLjQ4IHwN
-CnwgICAgICAgICAgICAgICAgICAgICAgICAgICAgfCAyNTkuMiAgfCAyNTkuNTIgfA0KfCAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICB8IDI2MS4wNCx8IDI1OS42OCB8DQoNCkNvbmNs
-dXNpb246DQogIENvbXBhcmVkIHdpdGggTzIsIE8zIGJyaW5ncyBubyBvYnZpb3VzIHBlcmZv
-cm1hbmNlIGFkdmFudGFnZS4NCiAgSXQncyBoaWdobHkgcG9zc2libGUgdGhhdCB0aGUgYmVu
-Y2htYXJrIHNjb3JlIGlzIG1haW5seSBkZXRlcm1pbmVkDQogIGJ5IHRoZSBxdWFsaXR5IG9m
-IHRjZywgbm90IHRoZSBob3N0IGNvbXBpbGVyLg0KDQpSZWxhdGVkIHdvcms6DQooMSkgVGhl
-IHNhbWUgdGVzdCBpcyBkb25lIG9uIGEgTG9vbmdzb24gM0EyMDAwLg0KICBJdCdzIGEgbWlw
-czY0ZWwtY29tcGF0aWJsZSBDUFUsIHdpdGggNCBjb3JlcyBydW5uaW5nIGF0IDEuNSBHSHou
-DQogIFRoZSByZXN1bHQgYW5kIGNvbmNsdXNpb24gYXJlIGFsbW9zdCB0aGUgc2FtZSB3aXRo
-IFg4Ni4NCigyKSBBbm90aGVyIHNjZW5lIG9mIE9TIGJvb3RpbmcgaXMgdGFrZW4gaW50byBj
-b25zaWRlcmF0aW9uLg0KICBJIGNvbXBhcmUgdGhlIGJvb3RpbmcgdGltZSBvZiBsaW51eC0w
-LjIuaW1nIHVuZGVyIE8yIGFuZCBPMy4NCiAgT25jZSBhZ2FpbiwgSSBjYW5ub3Qgc2VlIGFu
-IG9ic2VydmFibGUgZGlmZmVyZW5jZS4NCg0KQmFzZWQgb24gdGhlc2UgZGF0YSBJIGFkbWl0
-IG15IHBhdGNoIGhhcyBubyBiZW5pZml0IGZvciBwZXJmb3JtYW5jZS4NCg0KSmluIEd1b2pp
-ZQ0KDQogLS0tLS0tLS0tLS0tLS0tLS0tIE9yaWdpbmFsIC0tLS0tLS0tLS0tLS0tLS0tLQ0K
-RnJvbTogICJQZXRlciBNYXlkZWxsIjs8cGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnPjsNClNl
-bmQgdGltZTogTW9uZGF5LCBKYW4gOSwgMjAxNyA2OjMzIFBNDQpUbzogIkppbiBHdW9qaWUi
-PGppbmd1b2ppZUBsb29uZ3Nvbi5jbj47IA0KQ2M6ICJRRU1VIERldmVsb3BlcnMiPHFlbXUt
-ZGV2ZWxAbm9uZ251Lm9yZz47ICJQYW9sbyBCb256aW5pIjxwYm9uemluaUByZWRoYXQuY29t
-PjsgDQpTdWJqZWN0OiAgUmU6IFtRZW11LWRldmVsXSBbUEFUQ0ggMC8xXSBDaGFuZ2UgZGVm
-YXVsdCBDRkxBR1MgdG8gLU8zDQoNCg0KDQpPbiA5IEphbnVhcnkgMjAxNyBhdCAxMDowMSwg
-SmluIEd1b2ppZSA8amluZ3VvamllQGxvb25nc29uLmNuPiB3cm90ZToNCj4gKiBpbiBjb25m
-aWd1cmUsIHRoZSBkZWZhdWx0IG9wdGltaXphdGlvbiBsZXZlbCBpcyBjaGFuZ2VkIHRvIE8z
-Lg0KPiAqIFRlc3RlZCBzdWNjZXNzZnVsbHkgb24gZm9sbG93aW5nIG1hY2hpbmVzOg0KPg0K
-PiAgIHwgSG9zdCBtYWNoaW5lIHwgSG9zdCBPUyAgfCBxZW11LXN5c3RlbSB8IERlYmlhbiBJ
-U08gIHwNCj4gICB8LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS18DQo+ICAgfCAgIHg4NiA2NCAgICAgfCBGZWRvcmEyNSB8ICAgIGkzODYg
-ICAgIHwgICAgaTM4NiAgICAgfA0KPiAgIHwgbWlwcyA2NCBsZSAgIHwgRmVkb3JhMjUgfCAg
-ICBpMzg2ICAgICB8ICAgIGkzODYgICAgIHwNCj4NCj4gU2lnbmVkLW9mZi1ieTogSmluIEd1
-b2ppZSA8amluZ3VvamllQGxvb25nc29uLmNuPg0KPg0KPiBKaW4gR3VvamllICgxKToNCj4g
-ICBDaGFuZ2UgZGVmYXVsdCBDRkxBR1MgdG8gLU8zDQo+DQo+ICBjb25maWd1cmUgfCA0ICsr
-LS0NCj4gIDEgZmlsZSBjaGFuZ2VkLCAyIGluc2VydGlvbnMoKyksIDIgZGVsZXRpb25zKC0p
-DQoNCi4uLnNvIHdoYXQgYXJlIHRoZSBtZWFzdXJlZCBwZXJmb3JtYW5jZSBpbXByb3ZlbWVu
-dHMgZnJvbQ0KdGhpcyBjaGFuZ2U/IEFzIEkgdW5kZXJzdGFuZCBpdCAtTzMgaXMgd2hlcmUg
-dGhlICJ0cmFkZSBvZmYNCmNvZGUgc2l6ZSBmb3Igc3BlZWQiIG9wdGltaXNhdGlvbnMga2lj
-ayBpbiwgc28gd2UgbmVlZA0KdG8gYmVuY2htYXJrIHRvIGJlIHN1cmUgdGhhdCB0aGUgaW5j
-cmVhc2VkIGljYWNoZSB1c2FnZQ0KZG9lc24ndCBvdXR3ZWlnaCBhbnkgc3BlZWQgZ2FpbnMu
-IC1PMyBpcyBub3QgZ3VhcmFudGVlZA0KdG8gYmUgc3RyaWN0bHkgYmV0dGVyIHRoYW4gLU8y
-ICh3aGljaCBpcyB3aHkgZm9yIGluc3RhbmNlDQpEZWJpYW4gYW5kIEdlbnRvbyByZWNvbW1l
-bmQgLU8yIGFzIHRoZWlyIGRlZmF1bHQpLg0KDQp0aGFua3MNCi0tIFBNTQ==
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Kl9bEVKPeA3jR0mxrI2xUjnG2OeX94eUm
+From: Eric Blake <eblake@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <2d48aff8-924b-26b9-4a47-a13ea3648bd2@redhat.com>
+Subject: Re: [PATCH v2 1/8] sockets: add ability to disable DNS resolution for
+ InetSocketAddress
+References: <20170109153914.27424-1-berrange@redhat.com>
+ <20170109153914.27424-2-berrange@redhat.com>
+In-Reply-To: <20170109153914.27424-2-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 01/09/2017 09:39 AM, Daniel P. Berrange wrote:
+> Add a 'numeric' flag to the InetSocketAddress struct to allow the
+> caller to indicate that DNS should be skipped for the host/port
+> fields. This is useful if the caller knows the address is already
+> numeric and wants to guarantee no (potentially blocking) DNS
+> lookups are attempted.
+>=20
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>  qapi-schema.json    | 5 +++++
+>  util/qemu-sockets.c | 3 +++
+>  2 files changed, 8 insertions(+)
+>=20
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--Kl9bEVKPeA3jR0mxrI2xUjnG2OeX94eUm
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYdO7JAAoJEKeha0olJ0NqMmEH/2VJ+Z+o8g/gEJEamBtiQQBE
+Y9Dk/U4DXTZ5gnB3OZ0FNjRQcRMjcaS8oecojMmkfa6EJT2wujMoHCcHfvEXkP+E
+EIa/r28mcnxk1rHq8dLo97BYOBYw4aDjO3AUmTg4dYHyUQA613voPABZZzLjT0+e
+n5y8s2Yy9nHm8hpqZwrZYH8VsuHwacbQ8JibwU7M857qpTeoCgdgvVDq4VaTbWJy
+Wko+aXTObwIEPgZlJj5E5b2pL9eZ/0cGABX/L9ObPweXnBRg7af32q+TiVYfQVQg
++gCwP3MHSNDpHGdUwnp9FC6Qvfs6n+9DVVDHfwazaLpeb45TcJStIbH7RTAkWaE=
+=ZCh2
+-----END PGP SIGNATURE-----
+
+--Kl9bEVKPeA3jR0mxrI2xUjnG2OeX94eUm--
