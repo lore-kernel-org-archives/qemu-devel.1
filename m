@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33446)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34469)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cQuC2-0006gI-9Z
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 06:02:19 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cQuG7-0001dM-74
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 06:06:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cQuBy-0004Xr-BZ
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 06:02:18 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38244)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cQuG4-00062v-1m
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 06:06:31 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55636)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cQuBy-0004XQ-32
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 06:02:14 -0500
-Date: Tue, 10 Jan 2017 11:02:07 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170110110207.GD2423@work-vm>
-References: <1483981368-9965-1-git-send-email-ashijeetacharya@gmail.com>
-	<1483981368-9965-2-git-send-email-ashijeetacharya@gmail.com>
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1cQuG3-000624-Ra
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 06:06:27 -0500
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Tue, 10 Jan 2017 12:06:21 +0100
+Message-Id: <20170110110621.15287-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1483981368-9965-2-git-send-email-ashijeetacharya@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v4 1/4] migration: Add a new option to
- enable only-migratable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] char: fix ctrl-a b not working
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,88 +25,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ashijeet Acharya <ashijeetacharya@gmail.com>
-Cc: jsnow@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, kwolf@redhat.com, armbru@redhat.com, quintela@redhat.com, mst@redhat.com, marcandre.lureau@redhat.com, groug@kaod.org, aneesh.kumar@linux.vnet.ibm.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, gson@gson.org, 1654137@bugs.launchpad.net, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-* Ashijeet Acharya (ashijeetacharya@gmail.com) wrote:
-> Add a new option "--only-migratable" in qemu which will allow to add
-> only those devices which will not fail qemu after migration. Devices
-> set with the flag 'unmigratable' cannot be added when this option will
-> be used.
-> 
-> Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
-> ---
->  include/migration/migration.h | 3 +++
->  qemu-options.hx               | 9 +++++++++
->  vl.c                          | 4 ++++
->  3 files changed, 16 insertions(+)
-> 
-> diff --git a/include/migration/migration.h b/include/migration/migration.h
-> index c309d23..40b3697 100644
-> --- a/include/migration/migration.h
-> +++ b/include/migration/migration.h
-> @@ -38,6 +38,9 @@
->  #define QEMU_VM_COMMAND              0x08
->  #define QEMU_VM_SECTION_FOOTER       0x7e
->  
-> +/* for vl.c */
-> +extern int only_migratable;
-> +
->  struct MigrationParams {
->      bool blk;
->      bool shared;
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index c534a2f..1e16ae8 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -3574,6 +3574,15 @@ be used to change settings (such as migration parameters) prior to issuing
->  the migrate_incoming to allow the migration to begin.
->  ETEXI
->  
-> +DEF("only-migratable", 0, QEMU_OPTION_only_migratable, \
-> +    "-only-migratable     allow only migratable devices\n", QEMU_ARCH_ALL)
-> +STEXI
-> +@item -only-migratable
-> +@findex -only-migratable
-> +Only allow migratable devices. Devices will not be allowed to enter an
-> +unmigratable state.
-> +ETEXI
-> +
->  DEF("nodefaults", 0, QEMU_OPTION_nodefaults, \
->      "-nodefaults     don't create default devices\n", QEMU_ARCH_ALL)
->  STEXI
-> diff --git a/vl.c b/vl.c
-> index d77dd86..82bffb9 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -180,6 +180,7 @@ bool boot_strict;
->  uint8_t *boot_splash_filedata;
->  size_t boot_splash_filedata_size;
->  uint8_t qemu_extra_params_fw[2];
-> +int only_migratable = 0; /* turn it off unless user states otherwise */
+CharDriverState.be should be updated to point to the current
+associated backend.
 
-QEMU coding style is to omit the =0 for globals.
+Fix the regression introduced in the "mux" chardev from commit
+a4afa548fc6dd9842ed86639b4d37d4d1c4ad480.
 
-Other than that,
+https://bugs.launchpad.net/bugs/1654137
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ qemu-char.c | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
 
-Dave
-
->  int icount_align_option;
->  
-> @@ -3914,6 +3915,9 @@ int main(int argc, char **argv, char **envp)
->                  }
->                  incoming = optarg;
->                  break;
-> +            case QEMU_OPTION_only_migratable:
-> +                only_migratable = 1;
-> +                break;
->              case QEMU_OPTION_nodefaults:
->                  has_defaults = 0;
->                  break;
-> -- 
-> 2.6.2
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+diff --git a/qemu-char.c b/qemu-char.c
+index 2c9940cea4..676944a765 100644
+--- a/qemu-char.c
++++ b/qemu-char.c
+@@ -499,7 +499,7 @@ void qemu_chr_fe_printf(CharBackend *be, const char *=
+fmt, ...)
+=20
+ static void remove_fd_in_watch(CharDriverState *chr);
+ static void mux_chr_set_handlers(CharDriverState *chr, GMainContext *con=
+text);
+-static void mux_set_focus(MuxDriver *d, int focus);
++static void mux_set_focus(CharDriverState *chr, int focus);
+=20
+ static int null_chr_write(CharDriverState *chr, const uint8_t *buf, int =
+len)
+ {
+@@ -666,7 +666,7 @@ static int mux_proc_byte(CharDriverState *chr, MuxDri=
+ver *d, int ch)
+         case 'c':
+             assert(d->mux_cnt > 0); /* handler registered with first fe =
+*/
+             /* Switch to the next registered device */
+-            mux_set_focus(d, (d->focus + 1) % d->mux_cnt);
++            mux_set_focus(chr, (d->focus + 1) % d->mux_cnt);
+             break;
+         case 't':
+             d->timestamps =3D !d->timestamps;
+@@ -826,8 +826,10 @@ static void mux_chr_set_handlers(CharDriverState *ch=
+r, GMainContext *context)
+                              context, true);
+ }
+=20
+-static void mux_set_focus(MuxDriver *d, int focus)
++static void mux_set_focus(CharDriverState *chr, int focus)
+ {
++    MuxDriver *d =3D chr->opaque;
++
+     assert(focus >=3D 0);
+     assert(focus < d->mux_cnt);
+=20
+@@ -836,6 +838,7 @@ static void mux_set_focus(MuxDriver *d, int focus)
+     }
+=20
+     d->focus =3D focus;
++    chr->be =3D d->backends[focus];
+     mux_chr_send_event(d, d->focus, CHR_EVENT_MUX_IN);
+ }
+=20
+@@ -935,7 +938,9 @@ void qemu_chr_fe_deinit(CharBackend *b)
+=20
+     if (b->chr) {
+         qemu_chr_fe_set_handlers(b, NULL, NULL, NULL, NULL, NULL, true);
+-        b->chr->be =3D NULL;
++        if (b->chr->be =3D=3D b) {
++            b->chr->be =3D NULL;
++        }
+         if (b->chr->is_mux) {
+             MuxDriver *d =3D b->chr->opaque;
+             d->backends[b->tag] =3D NULL;
+@@ -999,7 +1004,7 @@ void qemu_chr_fe_take_focus(CharBackend *b)
+     }
+=20
+     if (b->chr->is_mux) {
+-        mux_set_focus(b->chr->opaque, b->tag);
++        mux_set_focus(b->chr, b->tag);
+     }
+ }
+=20
+--=20
+2.11.0
