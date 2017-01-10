@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34799)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35844)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rami.rosen@intel.com>) id 1cQsai-0006nW-4E
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 04:19:41 -0500
+	(envelope-from <laurent@vivier.eu>) id 1cQseM-0001Te-B1
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 04:23:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rami.rosen@intel.com>) id 1cQsae-0004EG-4Z
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 04:19:40 -0500
-Received: from mga14.intel.com ([192.55.52.115]:56724)
+	(envelope-from <laurent@vivier.eu>) id 1cQseI-0005ie-Ax
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 04:23:26 -0500
+Received: from mout.kundenserver.de ([212.227.126.130]:54886)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rami.rosen@intel.com>)
-	id 1cQsad-0004Bj-9A
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 04:19:36 -0500
-From: Rami Rosen <rami.rosen@intel.com>
-Date: Tue, 10 Jan 2017 11:19:25 +0200
-Message-Id: <1484039965-25907-1-git-send-email-rami.rosen@intel.com>
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cQseI-0005hq-01
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 04:23:22 -0500
+References: <1483987437-12084-1-git-send-email-peter.maydell@linaro.org>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <2451c5eb-4214-6cfd-31ae-bb5247decd8a@vivier.eu>
+Date: Tue, 10 Jan 2017 10:23:00 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <1483987437-12084-1-git-send-email-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2] ui: fix format specfier in vnc to avoid
- break in build.
+Subject: Re: [Qemu-devel] [PATCH] hw/net/dp8393x: Avoid unintentional sign
+ extensions on addresses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,44 +27,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: eblake@redhat.com, Rami Rosen <rami.rosen@intel.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: patches@linaro.org, Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Aurelien Jarno <aurelien@aurel32.net>
 
-When building qemu after setting _VNC_DEBUG to 1 (see ui/vnc.h),
-we get the following error and the build breaks:
-...
-ui/vnc.c: In function ‘vnc_client_io_error’:
-ui/vnc.c:1262:13: error: format ‘%d’ expects argument of type ‘int’, but
-             VNC_DEBUG("Closing down client sock: ret %d (%s)\n",
-             ^
-cc1: all warnings being treated as errors
-make: *** [ui/vnc.o] Error 1
-...
+Le 09/01/2017 à 19:43, Peter Maydell a écrit :
+> The dp8393x has several 32-bit values which are formed by concatenating
+> two 16 bit device register values. Attempting to do these inline
+> with ((s->reg[HI] << 16) | s->reg[LO]) can result in an unintended
+> sign extension because "x << 16" is of type 'int' even though s->reg
+> is unsigned, and so if the expression is used in a context where
+> it is cast to uint64_t the value is incorrectly sign-extended.
+> Fix this by using accessor functions with a uint32_t return type;
+> this also makes the code a bit easier to read.
+> 
+> This should fix Coverity issues 1307765, 1307766, 1307767, 1307768.
+> 
+> (To avoid having a ctda read function only used in a DPRINTF,
+> we move the DPRINTF down slightly so it can use the ttda function.)
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-This patch solves this issue by fixing the print format specifier
-in vnc_client_io_error() to be %zd, which corresponds to the type
-of the "ret" variable.
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 
-Signed-off-by: Rami Rosen <rami.rosen@intel.com>
----
-changes v2:
-- use %zd instead of %ld for the format sepcifier.
+FWIW, I've tested a port of this patch with Quadra 800 emulation, and it
+works:
 
- ui/vnc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Tested-by: Laurent Vivier <laurent@vivier.eu>
 
-diff --git a/ui/vnc.c b/ui/vnc.c
-index 2c28a59..6b0672b 100644
---- a/ui/vnc.c
-+++ b/ui/vnc.c
-@@ -1259,7 +1259,7 @@ ssize_t vnc_client_io_error(VncState *vs, ssize_t ret, Error **errp)
-         if (ret == 0) {
-             VNC_DEBUG("Closing down client sock: EOF\n");
-         } else if (ret != QIO_CHANNEL_ERR_BLOCK) {
--            VNC_DEBUG("Closing down client sock: ret %d (%s)\n",
-+            VNC_DEBUG("Closing down client sock: ret %zd (%s)\n",
-                       ret, errp ? error_get_pretty(*errp) : "Unknown");
-         }
- 
--- 
-1.9.1
+Laurent
