@@ -1,32 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44094)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44985)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cQnGp-00042B-7f
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 22:38:49 -0500
+	(envelope-from <mst@redhat.com>) id 1cQnLH-0005lP-Dc
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 22:43:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cQnGm-00029K-1N
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 22:38:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45902)
+	(envelope-from <mst@redhat.com>) id 1cQnLE-0004Ii-94
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 22:43:23 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50866)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cQnGl-00029A-ON
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 22:38:43 -0500
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8127961B86
-	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 03:38:43 +0000 (UTC)
-Date: Tue, 10 Jan 2017 05:38:40 +0200
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cQnLE-0004IZ-0G
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 22:43:20 -0500
+Date: Tue, 10 Jan 2017 05:43:17 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170110053420-mutt-send-email-mst@kernel.org>
-References: <20161214195829.18241-1-dgilbert@redhat.com>
-	<20161216011806-mutt-send-email-mst@kernel.org>
-	<20161216093527.GB2642@work-vm>
+Message-ID: <20170110054258-mutt-send-email-mst@kernel.org>
+References: <20161210153038.9184-1-maxime.coquelin@redhat.com>
+	<20161212100236.GA15611@redhat.com>
+	<cc475d20-6e77-17ab-b41e-56a6d4bf81b2@redhat.com>
+	<20161212103432.GH15611@redhat.com>
+	<9523b995-33a6-80a5-9e6e-e0dc1942578f@redhat.com>
+	<20161213130707.GH28416@redhat.com>
+	<251892a8-54d9-5ef5-15a2-af1d00300754@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20161216093527.GB2642@work-vm>
-Subject: Re: [Qemu-devel] [RFC] PCI/migration merge vmstate_pci_device and
- vmstate_pcie_device
+In-Reply-To: <251892a8-54d9-5ef5-15a2-af1d00300754@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 0/3] virtio-net: Add support to MTU
+ feature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,272 +33,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, marcel@redhat.com, quintela@redhat.com, amit.shah@redhat.com
+To: Maxime Coquelin <maxime.coquelin@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, aconole@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org, jasowang@redhat.com, yuanhan.liu@linux.intel.com, fbl@redhat.com, mlureau@redhat.com, ktraynor@redhat.com
 
-On Fri, Dec 16, 2016 at 09:35:28AM +0000, Dr. David Alan Gilbert wrote:
-> * Michael S. Tsirkin (mst@redhat.com) wrote:
-> > On Wed, Dec 14, 2016 at 07:58:29PM +0000, Dr. David Alan Gilbert (git) wrote:
-> > > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > > 
-> > > The vmstate_pci_device and vmstate_pcie_devices differ
-> > > just in the size of one buffer; combine the two using a _TEST
-> > > macro.
-> > > 
-> > > I think this is safe as long as everywhere which currently
-> > > uses either of these two uses the right type.
-> > > 
-> > > One thing that concerns me is that some places use pci_device_load/save
-> > > which does some irq mangling, but others just use the VMSTATE_PCI_DEVICE
-> > > macro - how are they getting the same irq mangling?
-> > > 
-> > > This passes a smoke test migrate of:
-> > > ./x86_64-softmmu/qemu-system-x86_64 -M pc,accel=kvm -m 1024
-> > > ./littlefed20.img -device e1000e -device virtio-net -device
-> > > e1000 -device virtio-rng -device megasas -device megasas-gen2 -device
-> > > ioh3420 -device nec-usb-xhci
-> > > 
-> > > to an unmodified qemu.
-> > > 
-> > > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > 
-> > Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-> > 
-> > feel free to merge through migration tree.
+On Tue, Dec 13, 2016 at 02:17:11PM +0100, Maxime Coquelin wrote:
 > 
-> Thanks!
-> What about my related question about the difference between pci_device_load/save
-> with respect to the irq mangling it does?
 > 
-> Dave
-
-Do you mean pci_update_irq_status?
-
-All this saving/clearing is for compatibility with
-old code which didn't set/clear it properly.
-I would not be too surprised if that compatibility
-just got broken at some point ...
-
-
-> > > ---
-> > >  hw/net/e1000e.c                    |  2 +-
-> > >  hw/net/vmxnet3.c                   |  2 +-
-> > >  hw/pci-bridge/ioh3420.c            |  2 +-
-> > >  hw/pci-bridge/xio3130_downstream.c |  2 +-
-> > >  hw/pci-bridge/xio3130_upstream.c   |  2 +-
-> > >  hw/pci/pci.c                       | 41 +++++++++++++++++---------------------
-> > >  hw/scsi/megasas.c                  |  2 +-
-> > >  hw/scsi/vmw_pvscsi.c               |  2 +-
-> > >  hw/usb/hcd-xhci.c                  |  2 +-
-> > >  include/hw/pci/pcie.h              | 10 ----------
-> > >  10 files changed, 26 insertions(+), 41 deletions(-)
+> On 12/13/2016 02:07 PM, Daniel P. Berrange wrote:
+> > On Tue, Dec 13, 2016 at 02:04:52PM +0100, Maxime Coquelin wrote:
 > > > 
-> > > diff --git a/hw/net/e1000e.c b/hw/net/e1000e.c
-> > > index 4994e1c..463ac9b 100644
-> > > --- a/hw/net/e1000e.c
-> > > +++ b/hw/net/e1000e.c
-> > > @@ -592,7 +592,7 @@ static const VMStateDescription e1000e_vmstate = {
-> > >      .pre_save = e1000e_pre_save,
-> > >      .post_load = e1000e_post_load,
-> > >      .fields = (VMStateField[]) {
-> > > -        VMSTATE_PCIE_DEVICE(parent_obj, E1000EState),
-> > > +        VMSTATE_PCI_DEVICE(parent_obj, E1000EState),
-> > >          VMSTATE_MSIX(parent_obj, E1000EState),
-> > >  
-> > >          VMSTATE_UINT32(ioaddr, E1000EState),
-> > > diff --git a/hw/net/vmxnet3.c b/hw/net/vmxnet3.c
-> > > index bbb898b..86cded9 100644
-> > > --- a/hw/net/vmxnet3.c
-> > > +++ b/hw/net/vmxnet3.c
-> > > @@ -2538,7 +2538,7 @@ static const VMStateDescription vmstate_vmxnet3_pcie_device = {
-> > >      .minimum_version_id = 1,
-> > >      .needed = vmxnet3_vmstate_need_pcie_device,
-> > >      .fields = (VMStateField[]) {
-> > > -        VMSTATE_PCIE_DEVICE(parent_obj, VMXNET3State),
-> > > +        VMSTATE_PCI_DEVICE(parent_obj, VMXNET3State),
-> > >          VMSTATE_END_OF_LIST()
-> > >      }
-> > >  };
-> > > diff --git a/hw/pci-bridge/ioh3420.c b/hw/pci-bridge/ioh3420.c
-> > > index c8b5ac4..98114e1 100644
-> > > --- a/hw/pci-bridge/ioh3420.c
-> > > +++ b/hw/pci-bridge/ioh3420.c
-> > > @@ -178,7 +178,7 @@ static const VMStateDescription vmstate_ioh3420 = {
-> > >      .minimum_version_id = 1,
-> > >      .post_load = pcie_cap_slot_post_load,
-> > >      .fields = (VMStateField[]) {
-> > > -        VMSTATE_PCIE_DEVICE(parent_obj.parent_obj.parent_obj, PCIESlot),
-> > > +        VMSTATE_PCI_DEVICE(parent_obj.parent_obj.parent_obj, PCIESlot),
-> > >          VMSTATE_STRUCT(parent_obj.parent_obj.parent_obj.exp.aer_log,
-> > >                         PCIESlot, 0, vmstate_pcie_aer_log, PCIEAERLog),
-> > >          VMSTATE_END_OF_LIST()
-> > > diff --git a/hw/pci-bridge/xio3130_downstream.c b/hw/pci-bridge/xio3130_downstream.c
-> > > index cef6e13..4c54301 100644
-> > > --- a/hw/pci-bridge/xio3130_downstream.c
-> > > +++ b/hw/pci-bridge/xio3130_downstream.c
-> > > @@ -164,7 +164,7 @@ static const VMStateDescription vmstate_xio3130_downstream = {
-> > >      .minimum_version_id = 1,
-> > >      .post_load = pcie_cap_slot_post_load,
-> > >      .fields = (VMStateField[]) {
-> > > -        VMSTATE_PCIE_DEVICE(parent_obj.parent_obj.parent_obj, PCIESlot),
-> > > +        VMSTATE_PCI_DEVICE(parent_obj.parent_obj.parent_obj, PCIESlot),
-> > >          VMSTATE_STRUCT(parent_obj.parent_obj.parent_obj.exp.aer_log,
-> > >                         PCIESlot, 0, vmstate_pcie_aer_log, PCIEAERLog),
-> > >          VMSTATE_END_OF_LIST()
-> > > diff --git a/hw/pci-bridge/xio3130_upstream.c b/hw/pci-bridge/xio3130_upstream.c
-> > > index 4ad0440..45dbd1c 100644
-> > > --- a/hw/pci-bridge/xio3130_upstream.c
-> > > +++ b/hw/pci-bridge/xio3130_upstream.c
-> > > @@ -136,7 +136,7 @@ static const VMStateDescription vmstate_xio3130_upstream = {
-> > >      .version_id = 1,
-> > >      .minimum_version_id = 1,
-> > >      .fields = (VMStateField[]) {
-> > > -        VMSTATE_PCIE_DEVICE(parent_obj.parent_obj, PCIEPort),
-> > > +        VMSTATE_PCI_DEVICE(parent_obj.parent_obj, PCIEPort),
-> > >          VMSTATE_STRUCT(parent_obj.parent_obj.exp.aer_log, PCIEPort, 0,
-> > >                         vmstate_pcie_aer_log, PCIEAERLog),
-> > >          VMSTATE_END_OF_LIST()
-> > > diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-> > > index 16df188..8e4226b 100644
-> > > --- a/hw/pci/pci.c
-> > > +++ b/hw/pci/pci.c
-> > > @@ -542,30 +542,29 @@ static VMStateInfo vmstate_info_pci_irq_state = {
-> > >      .put  = put_pci_irq_state,
-> > >  };
-> > >  
-> > > +static bool migrate_is_pcie(void *opaque, int version_id)
-> > > +{
-> > > +    return pci_is_express((PCIDevice *)opaque);
-> > > +}
-> > > +
-> > > +static bool migrate_is_not_pcie(void *opaque, int version_id)
-> > > +{
-> > > +    return !pci_is_express((PCIDevice *)opaque);
-> > > +}
-> > > +
-> > >  const VMStateDescription vmstate_pci_device = {
-> > >      .name = "PCIDevice",
-> > >      .version_id = 2,
-> > >      .minimum_version_id = 1,
-> > >      .fields = (VMStateField[]) {
-> > >          VMSTATE_INT32_POSITIVE_LE(version_id, PCIDevice),
-> > > -        VMSTATE_BUFFER_UNSAFE_INFO(config, PCIDevice, 0,
-> > > -                                   vmstate_info_pci_config,
-> > > +        VMSTATE_BUFFER_UNSAFE_INFO_TEST(config, PCIDevice,
-> > > +                                   migrate_is_not_pcie,
-> > > +                                   0, vmstate_info_pci_config,
-> > >                                     PCI_CONFIG_SPACE_SIZE),
-> > > -        VMSTATE_BUFFER_UNSAFE_INFO(irq_state, PCIDevice, 2,
-> > > -				   vmstate_info_pci_irq_state,
-> > > -				   PCI_NUM_PINS * sizeof(int32_t)),
-> > > -        VMSTATE_END_OF_LIST()
-> > > -    }
-> > > -};
-> > > -
-> > > -const VMStateDescription vmstate_pcie_device = {
-> > > -    .name = "PCIEDevice",
-> > > -    .version_id = 2,
-> > > -    .minimum_version_id = 1,
-> > > -    .fields = (VMStateField[]) {
-> > > -        VMSTATE_INT32_POSITIVE_LE(version_id, PCIDevice),
-> > > -        VMSTATE_BUFFER_UNSAFE_INFO(config, PCIDevice, 0,
-> > > -                                   vmstate_info_pci_config,
-> > > +        VMSTATE_BUFFER_UNSAFE_INFO_TEST(config, PCIDevice,
-> > > +                                   migrate_is_pcie,
-> > > +                                   0, vmstate_info_pci_config,
-> > >                                     PCIE_CONFIG_SPACE_SIZE),
-> > >          VMSTATE_BUFFER_UNSAFE_INFO(irq_state, PCIDevice, 2,
-> > >  				   vmstate_info_pci_irq_state,
-> > > @@ -574,10 +573,6 @@ const VMStateDescription vmstate_pcie_device = {
-> > >      }
-> > >  };
-> > >  
-> > > -static inline const VMStateDescription *pci_get_vmstate(PCIDevice *s)
-> > > -{
-> > > -    return pci_is_express(s) ? &vmstate_pcie_device : &vmstate_pci_device;
-> > > -}
-> > >  
-> > >  void pci_device_save(PCIDevice *s, QEMUFile *f)
-> > >  {
-> > > @@ -586,7 +581,7 @@ void pci_device_save(PCIDevice *s, QEMUFile *f)
-> > >       * This makes us compatible with old devices
-> > >       * which never set or clear this bit. */
-> > >      s->config[PCI_STATUS] &= ~PCI_STATUS_INTERRUPT;
-> > > -    vmstate_save_state(f, pci_get_vmstate(s), s, NULL);
-> > > +    vmstate_save_state(f, &vmstate_pci_device, s, NULL);
-> > >      /* Restore the interrupt status bit. */
-> > >      pci_update_irq_status(s);
-> > >  }
-> > > @@ -594,7 +589,7 @@ void pci_device_save(PCIDevice *s, QEMUFile *f)
-> > >  int pci_device_load(PCIDevice *s, QEMUFile *f)
-> > >  {
-> > >      int ret;
-> > > -    ret = vmstate_load_state(f, pci_get_vmstate(s), s, s->version_id);
-> > > +    ret = vmstate_load_state(f, &vmstate_pci_device, s, s->version_id);
-> > >      /* Restore the interrupt status bit. */
-> > >      pci_update_irq_status(s);
-> > >      return ret;
-> > > diff --git a/hw/scsi/megasas.c b/hw/scsi/megasas.c
-> > > index 67fc1e7..adc0c4b 100644
-> > > --- a/hw/scsi/megasas.c
-> > > +++ b/hw/scsi/megasas.c
-> > > @@ -2288,7 +2288,7 @@ static const VMStateDescription vmstate_megasas_gen2 = {
-> > >      .minimum_version_id = 0,
-> > >      .minimum_version_id_old = 0,
-> > >      .fields      = (VMStateField[]) {
-> > > -        VMSTATE_PCIE_DEVICE(parent_obj, MegasasState),
-> > > +        VMSTATE_PCI_DEVICE(parent_obj, MegasasState),
-> > >          VMSTATE_MSIX(parent_obj, MegasasState),
-> > >  
-> > >          VMSTATE_INT32(fw_state, MegasasState),
-> > > diff --git a/hw/scsi/vmw_pvscsi.c b/hw/scsi/vmw_pvscsi.c
-> > > index a5ce7de..7557546 100644
-> > > --- a/hw/scsi/vmw_pvscsi.c
-> > > +++ b/hw/scsi/vmw_pvscsi.c
-> > > @@ -1207,7 +1207,7 @@ static const VMStateDescription vmstate_pvscsi_pcie_device = {
-> > >      .name = "pvscsi/pcie",
-> > >      .needed = pvscsi_vmstate_need_pcie_device,
-> > >      .fields = (VMStateField[]) {
-> > > -        VMSTATE_PCIE_DEVICE(parent_obj, PVSCSIState),
-> > > +        VMSTATE_PCI_DEVICE(parent_obj, PVSCSIState),
-> > >          VMSTATE_END_OF_LIST()
-> > >      }
-> > >  };
-> > > diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
-> > > index 4acf0c6..e0b5169 100644
-> > > --- a/hw/usb/hcd-xhci.c
-> > > +++ b/hw/usb/hcd-xhci.c
-> > > @@ -3894,7 +3894,7 @@ static const VMStateDescription vmstate_xhci = {
-> > >      .version_id = 1,
-> > >      .post_load = usb_xhci_post_load,
-> > >      .fields = (VMStateField[]) {
-> > > -        VMSTATE_PCIE_DEVICE(parent_obj, XHCIState),
-> > > +        VMSTATE_PCI_DEVICE(parent_obj, XHCIState),
-> > >          VMSTATE_MSIX(parent_obj, XHCIState),
-> > >  
-> > >          VMSTATE_STRUCT_VARRAY_UINT32(ports, XHCIState, numports, 1,
-> > > diff --git a/include/hw/pci/pcie.h b/include/hw/pci/pcie.h
-> > > index 056d25e..894262e 100644
-> > > --- a/include/hw/pci/pcie.h
-> > > +++ b/include/hw/pci/pcie.h
-> > > @@ -121,16 +121,6 @@ void pcie_add_capability(PCIDevice *dev,
-> > >  void pcie_ari_init(PCIDevice *dev, uint16_t offset, uint16_t nextfn);
-> > >  void pcie_dev_ser_num_init(PCIDevice *dev, uint16_t offset, uint64_t ser_num);
-> > >  
-> > > -extern const VMStateDescription vmstate_pcie_device;
-> > > -
-> > > -#define VMSTATE_PCIE_DEVICE(_field, _state) {                        \
-> > > -    .name       = (stringify(_field)),                               \
-> > > -    .size       = sizeof(PCIDevice),                                 \
-> > > -    .vmsd       = &vmstate_pcie_device,                              \
-> > > -    .flags      = VMS_STRUCT,                                        \
-> > > -    .offset     = vmstate_offset_value(_state, _field, PCIDevice),   \
-> > > -}
-> > > -
-> > >  void pcie_cap_slot_hotplug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
-> > >                                Error **errp);
-> > >  void pcie_cap_slot_hot_unplug_request_cb(HotplugHandler *hotplug_dev,
-> > > -- 
-> > > 2.9.3
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> > > 
+> > > On 12/12/2016 11:34 AM, Daniel P. Berrange wrote:
+> > > > On Mon, Dec 12, 2016 at 11:12:56AM +0100, Maxime Coquelin wrote:
+> > > > > Hi Daniel,
+> > > > > 
+> > > > > On 12/12/2016 11:02 AM, Daniel P. Berrange wrote:
+> > > > > > On Sat, Dec 10, 2016 at 04:30:35PM +0100, Maxime Coquelin wrote:
+> > > > > > > Thanks for the reviews,
+> > > > > > > 
+> > > > > > > This series implements Virtio spec update from Aaron Conole which
+> > > > > > > defines a way for the host to expose its max MTU to the guest.
+> > > > > > > 
+> > > > > > > "host_mtu" parameter is added to provide QEMU with the MTU value,
+> > > > > > > and the backend, if supported, gets notified of the MTU value when the
+> > > > > > > MTU feature neogotiation succeeds.
+> > > > > > > 
+> > > > > > > Only user backend currently supports MTU notification. A new protocol
+> > > > > > > feature has been implemented for sending MTU value to the backend.
+> > > > > > > 
+> > > > > > > For kernel backend, it is expected the management tool also configures
+> > > > > > > the tap/macvtap interface with same MTU value.
+> > > > > > > Daniel, I would be interrested about your feedback on this implementation
+> > > > > > > from management tool point of view.
+> > > > > > 
+> > > > > > I can't give real feedback yet, as I'm not seeing clear information on
+> > > > > > what problem this series is designed to solve....
+> > > > > 
+> > > > > Right, I agree it is missing a bit of context here, I'll add more about
+> > > > > the background in next revision.
+> > > > > 
+> > > > > The goal of this series is to address two things:
+> > > > > 1. Providing a way for the guests to use the same MTU as the host,
+> > > > >    in order to have a consistent MTU value across the infrastructure.
+> > > > 
+> > > > Ok, currently libvirt sets the MTU of the tap device based on the MTU
+> > > > of the device it will be attached to. This change means we need to pass
+> > > > that MTU value into QEMU via the -netdev command line so it can inform
+> > > > the guest what the MTU is.
+> > > Nice, do you have a pointer on where this is done in QEMU?
+> > 
+> > Its in libvirt code via virNetDevSetMTUFromDevice()
+> 
+> Thanks.
+> For QEMU part, this series adds host_mtu parameter to virtio-net device,
+> not to vhost netdev. Should it be reworked?
+> 
+> Maxime
+
+I applied as is for now, we can rework as necessary but people want to
+be able to test this.
