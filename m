@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40831)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42161)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cQyMM-00063B-Tn
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 10:29:15 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cQyV2-0000KW-CB
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 10:38:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cQyMJ-0003pD-RJ
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 10:29:14 -0500
-Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:36100)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cQyUx-0006fg-OF
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 10:38:12 -0500
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:35592)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cQyMJ-0003p9-Jm
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 10:29:11 -0500
-Received: by mail-wm0-x236.google.com with SMTP id c85so131275486wmi.1
-	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 07:29:11 -0800 (PST)
-References: <20161124161033.11456-1-alex.bennee@linaro.org>
-	<20161124161033.11456-5-alex.bennee@linaro.org>
-	<87r34b2b3a.fsf@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <87r34b2b3a.fsf@linaro.org>
-Date: Tue, 10 Jan 2017 15:29:08 +0000
-Message-ID: <87pojv2at7.fsf@linaro.org>
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1cQyUx-0006fV-IV
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 10:38:07 -0500
+Received: by mail-wm0-x242.google.com with SMTP id l2so30676695wml.2
+	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 07:38:07 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <1479108340-3453-1-git-send-email-caoj.fnst@cn.fujitsu.com>
+	<20170109234446-mutt-send-email-mst@kernel.org>
+	<87bmvftejz.fsf@dusky.pond.sub.org>
+	<20170110162151-mutt-send-email-mst@kernel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <117edb31-5328-18fb-00d8-604e0e9f2757@redhat.com>
+Date: Tue, 10 Jan 2017 16:38:05 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [kvm-unit-tests PATCH v7 04/11] libcflat: add
- PRI(dux)32 format types
+In-Reply-To: <20170110162151-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v7 00/10] Convert msix_init() to error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,67 +33,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com
-Cc: qemu-devel@nongnu.org, mttcg@listserver.greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serge.fdrv@gmail.com, rth@twiddle.net, peter.maydell@linaro.org, claudio.fontana@huawei.com
+To: "Michael S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: Jiri Pirko <jiri@resnulli.us>, Jason Wang <jasowang@redhat.com>, Cao jin <caoj.fnst@cn.fujitsu.com>, qemu-devel@nongnu.org, Dmitry Fleytman <dmitry@daynix.com>, Alex Williamson <alex.williamson@redhat.com>, Hannes Reinecke <hare@suse.de>, Marcel Apfelbaum <marcel@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
 
-Alex Bennée <alex.bennee@linaro.org> writes:
 
-> Alex Bennée <alex.bennee@linaro.org> writes:
->
->> So we can have portable formatting of uint32_t types.
+On 10/01/2017 15:38, Michael S. Tsirkin wrote:
+> On Tue, Jan 10, 2017 at 11:06:08AM +0100, Markus Armbruster wrote:
+>> "Michael S. Tsirkin" <mst@redhat.com> writes:
 >>
->> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
->> ---
->>  lib/libcflat.h | 5 +++++
->>  1 file changed, 5 insertions(+)
+>>> On Mon, Nov 14, 2016 at 03:25:30PM +0800, Cao jin wrote:
+>>>> v7 changelog:
+>>>> 1. fix the segfaut bug in patch 2. So drop the all the R-b of it,
+>>>>    please take a look, there is detailed description in the patch.
+>>>> 2. add the R-b from Hannes Reinecke
+>>>>
+>>>> Test:
+>>>> 1. make check: pass
+>>>> 2. After applied all the patch, command line test for all the
+>>>>    affected devices, just make sure device realize process is ok,
+>>>>    no crash, but no further use of device.
+>>>
+>>> Consider the megasas device for example, don't you
+>>> need to test that the change actually does what
+>>> it's intended to do?
 >>
->> diff --git a/lib/libcflat.h b/lib/libcflat.h
->> index bdcc561..6dab5be 100644
->> --- a/lib/libcflat.h
->> +++ b/lib/libcflat.h
->> @@ -55,12 +55,17 @@ typedef _Bool		bool;
->>  #define true  1
+>> For better or worse, that's a higher bar than we commonly require for
+>> refactorings.
 >>
->>  #if __SIZEOF_LONG__ == 8
->> +#  define __PRI32_PREFIX
->>  #  define __PRI64_PREFIX	"l"
->>  #  define __PRIPTR_PREFIX	"l"
->>  #else
->> +#  define __PRI32_PREFIX        "l"
->
-> OK this is bogus, but the failure is because of where we get uint32_t
-> from (hint using arm32 compiler on a arm64 system) so I got:
->
->   lib/pci.c:71:9: error: format '%x' expects argument of type 'unsigned int', but argument 3 has type 'uint32_t {aka long unsigned int}' [-Werro\
-> r=format=]
->
-> Which makes me think we should be more careful about including system
-> headers in kvm-unit-tests (done in 75e777a0).
+>> [...]
+> 
+> Well the patch says that it's addressing a TODO. If no one can
+> be bothered to test the functionality, maybe we shouldn't bother
+> with the change.
+> 
+> Generally this patchset is at v7.  It brings a very limited benefit to
+> the project.  It better be perfect otherwise I don't see why bother.
 
-Hmm it turns out my compiler is d.r.t as far as it is concerned:
+I agree.  The changes to the device model are non-trivial and you should
+make a decent effort at coverage of non-trivial changes.
 
-  # 34 "/usr/lib/gcc/arm-none-eabi/5.4.1/include/stdint-gcc.h" 3 4
-  typedef signed char int8_t;
-
-
-  typedef short int int16_t;
-
-
-  typedef long int int32_t;
-
-
-  typedef long long int int64_t;
-
-
-  typedef unsigned char uint8_t;
-
-
-  typedef short unsigned int uint16_t;
-
-
-  typedef long unsigned int uint32_t;
-
-
---
-Alex Bennée
+Paolo
