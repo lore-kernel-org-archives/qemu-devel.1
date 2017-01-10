@@ -1,35 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55369)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55385)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <joserz@linux.vnet.ibm.com>) id 1cQltc-0001sL-Qt
+	(envelope-from <joserz@linux.vnet.ibm.com>) id 1cQlte-0001uC-Vp
 	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 21:10:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <joserz@linux.vnet.ibm.com>) id 1cQltZ-0008RZ-Lr
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 21:10:44 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35310
+	(envelope-from <joserz@linux.vnet.ibm.com>) id 1cQltb-0008SK-QI
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 21:10:46 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49110
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <joserz@linux.vnet.ibm.com>)
-	id 1cQltZ-0008RO-8o
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 21:10:41 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	id 1cQltb-0008S1-Id
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 21:10:43 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
 	by mx0b-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	v0A28v5S084867
-	for <qemu-devel@nongnu.org>; Mon, 9 Jan 2017 21:10:40 -0500
-Received: from e24smtp03.br.ibm.com (e24smtp03.br.ibm.com [32.104.18.24])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 27vmewv6v0-1
+	v0A28u0L126381
+	for <qemu-devel@nongnu.org>; Mon, 9 Jan 2017 21:10:43 -0500
+Received: from e24smtp04.br.ibm.com (e24smtp04.br.ibm.com [32.104.18.25])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 27vmy4u483-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 09 Jan 2017 21:10:40 -0500
+	for <qemu-devel@nongnu.org>; Mon, 09 Jan 2017 21:10:42 -0500
 Received: from localhost
-	by e24smtp03.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e24smtp04.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <joserz@linux.vnet.ibm.com>;
-	Tue, 10 Jan 2017 00:10:38 -0200
+	Tue, 10 Jan 2017 00:10:40 -0200
 From: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
-Date: Tue, 10 Jan 2017 00:10:10 -0200
+Date: Tue, 10 Jan 2017 00:10:11 -0200
 In-Reply-To: <1484014214-32533-1-git-send-email-joserz@linux.vnet.ibm.com>
 References: <1484014214-32533-1-git-send-email-joserz@linux.vnet.ibm.com>
-Message-Id: <1484014214-32533-4-git-send-email-joserz@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v5 3/7] ppc: Implement bcds. instruction
+Message-Id: <1484014214-32533-5-git-send-email-joserz@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v5 4/7] ppc: Implement bcdus. instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,67 +41,68 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-ppc@nongnu.org
 Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au, nikunj@linux.vnet.ibm.com, bharata@linux.vnet.ibm.com, eblake@redhat.com
 
-bcds.: Decimal shift. Given two registers vra and vrb, this instruction
-shift the vrb value by vra bits into the result register.
+bcdus.: Decimal unsigned shift. This instruction works like bcds. but
+considers only unsigned BCDs (no sign in least meaning 4 bits).
 
 Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
 ---
  target/ppc/helper.h                 |  1 +
- target/ppc/int_helper.c             | 40 +++++++++++++++++++++++++++++++++++++
+ target/ppc/int_helper.c             | 41 +++++++++++++++++++++++++++++++++++++
  target/ppc/translate/vmx-impl.inc.c |  3 +++
- target/ppc/translate/vmx-ops.inc.c  |  3 ++-
+ target/ppc/translate/vmx-ops.inc.c  |  2 +-
  4 files changed, 46 insertions(+), 1 deletion(-)
 
 diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-index f28bf62..36e9b82 100644
+index 36e9b82..065eb66 100644
 --- a/target/ppc/helper.h
 +++ b/target/ppc/helper.h
-@@ -398,6 +398,7 @@ DEF_HELPER_3(bcdcfsq, i32, avr, avr, i32)
- DEF_HELPER_3(bcdctsq, i32, avr, avr, i32)
+@@ -399,6 +399,7 @@ DEF_HELPER_3(bcdctsq, i32, avr, avr, i32)
  DEF_HELPER_4(bcdcpsgn, i32, avr, avr, avr, i32)
  DEF_HELPER_3(bcdsetsgn, i32, avr, avr, i32)
-+DEF_HELPER_4(bcds, i32, avr, avr, avr, i32)
+ DEF_HELPER_4(bcds, i32, avr, avr, avr, i32)
++DEF_HELPER_4(bcdus, i32, avr, avr, avr, i32)
  
  DEF_HELPER_2(xsadddp, void, env, i32)
  DEF_HELPER_2(xsaddqp, void, env, i32)
 diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
-index 24e5964..26774a6 100644
+index 26774a6..91ae89f 100644
 --- a/target/ppc/int_helper.c
 +++ b/target/ppc/int_helper.c
-@@ -3094,6 +3094,46 @@ uint32_t helper_bcdsetsgn(ppc_avr_t *r, ppc_avr_t *b, uint32_t ps)
-     return bcd_cmp_zero(r);
+@@ -3134,6 +3134,47 @@ uint32_t helper_bcds(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b, uint32_t ps)
+     return cr;
  }
  
-+uint32_t helper_bcds(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b, uint32_t ps)
++uint32_t helper_bcdus(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b, uint32_t ps)
 +{
 +    int cr;
-+#if defined(HOST_WORDS_BIGENDIAN)
-+    int i = a->s8[7];
-+#else
-+    int i = a->s8[8];
-+#endif
++    int i;
++    int invalid = 0;
 +    bool ox_flag = false;
-+    int sgnb = bcd_get_sgn(b);
 +    ppc_avr_t ret = *b;
-+    ret.u64[LO_IDX] &= ~0xf;
 +
-+    if (bcd_is_valid(b) == false) {
-+        return CRF_SO;
++    for (i = 0; i < 32; i++) {
++        bcd_get_digit(b, i, &invalid);
++
++        if (unlikely(invalid)) {
++            return CRF_SO;
++        }
 +    }
 +
-+    if (unlikely(i > 31)) {
-+        i = 31;
-+    } else if (unlikely(i < -31)) {
-+        i = -31;
-+    }
-+
-+    if (i > 0) {
++#if defined(HOST_WORDS_BIGENDIAN)
++    i = a->s8[7];
++#else
++    i = a->s8[8];
++#endif
++    if (i >= 32) {
++        ox_flag = true;
++        ret.u64[LO_IDX] = ret.u64[HI_IDX] = 0;
++    } else if (i <= -32) {
++        ret.u64[LO_IDX] = ret.u64[HI_IDX] = 0;
++    } else if (i > 0) {
 +        ulshift(&ret.u64[LO_IDX], &ret.u64[HI_IDX], i * 4, &ox_flag);
 +    } else {
 +        urshift(&ret.u64[LO_IDX], &ret.u64[HI_IDX], -i * 4);
 +    }
-+    bcd_put_digit(&ret, bcd_preferred_sgn(sgnb, ps), 0);
-+
 +    *r = ret;
 +
 +    cr = bcd_cmp_zero(r);
@@ -116,39 +117,38 @@ index 24e5964..26774a6 100644
  {
      int i;
 diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/vmx-impl.inc.c
-index e8e527f..84ebb7e 100644
+index 84ebb7e..fc54881 100644
 --- a/target/ppc/translate/vmx-impl.inc.c
 +++ b/target/ppc/translate/vmx-impl.inc.c
-@@ -1016,6 +1016,7 @@ GEN_BCD2(bcdcfsq)
- GEN_BCD2(bcdctsq)
+@@ -1017,6 +1017,7 @@ GEN_BCD2(bcdctsq)
  GEN_BCD2(bcdsetsgn)
  GEN_BCD(bcdcpsgn);
-+GEN_BCD(bcds);
+ GEN_BCD(bcds);
++GEN_BCD(bcdus);
  
  static void gen_xpnd04_1(DisasContext *ctx)
  {
-@@ -1090,6 +1091,8 @@ GEN_VXFORM_DUAL(vsubuhs, PPC_ALTIVEC, PPC_NONE, \
-                 bcdsub, PPC_NONE, PPC2_ALTIVEC_207)
- GEN_VXFORM_DUAL(vaddshs, PPC_ALTIVEC, PPC_NONE, \
+@@ -1093,6 +1094,8 @@ GEN_VXFORM_DUAL(vaddshs, PPC_ALTIVEC, PPC_NONE, \
                  bcdcpsgn, PPC_NONE, PPC2_ISA300)
-+GEN_VXFORM_DUAL(vsubudm, PPC2_ALTIVEC_207, PPC_NONE, \
-+                bcds, PPC_NONE, PPC2_ISA300)
+ GEN_VXFORM_DUAL(vsubudm, PPC2_ALTIVEC_207, PPC_NONE, \
+                 bcds, PPC_NONE, PPC2_ISA300)
++GEN_VXFORM_DUAL(vsubuwm, PPC_ALTIVEC, PPC_NONE, \
++                bcdus, PPC_NONE, PPC2_ISA300)
  
  static void gen_vsbox(DisasContext *ctx)
  {
 diff --git a/target/ppc/translate/vmx-ops.inc.c b/target/ppc/translate/vmx-ops.inc.c
-index 57dce6e..7b4b009 100644
+index 7b4b009..cdd3abe 100644
 --- a/target/ppc/translate/vmx-ops.inc.c
 +++ b/target/ppc/translate/vmx-ops.inc.c
-@@ -62,7 +62,8 @@ GEN_VXFORM_207(vaddudm, 0, 3),
+@@ -61,7 +61,7 @@ GEN_VXFORM(vadduwm, 0, 2),
+ GEN_VXFORM_207(vaddudm, 0, 3),
  GEN_VXFORM_DUAL(vsububm, bcdadd, 0, 16, PPC_ALTIVEC, PPC_NONE),
  GEN_VXFORM_DUAL(vsubuhm, bcdsub, 0, 17, PPC_ALTIVEC, PPC_NONE),
- GEN_VXFORM(vsubuwm, 0, 18),
--GEN_VXFORM_207(vsubudm, 0, 19),
-+GEN_VXFORM_DUAL(vsubudm, bcds, 0, 19, PPC2_ALTIVEC_207, PPC2_ISA300),
-+GEN_VXFORM_300(bcds, 0, 27),
+-GEN_VXFORM(vsubuwm, 0, 18),
++GEN_VXFORM_DUAL(vsubuwm, bcdus, 0, 18, PPC_ALTIVEC, PPC2_ISA300),
+ GEN_VXFORM_DUAL(vsubudm, bcds, 0, 19, PPC2_ALTIVEC_207, PPC2_ISA300),
+ GEN_VXFORM_300(bcds, 0, 27),
  GEN_VXFORM(vmaxub, 1, 0),
- GEN_VXFORM(vmaxuh, 1, 1),
- GEN_VXFORM(vmaxuw, 1, 2),
 -- 
 2.7.4
