@@ -1,37 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53568)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54075)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cQxU1-0000cW-BB
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 09:33:10 -0500
+	(envelope-from <eblake@redhat.com>) id 1cQxVU-0001ls-KU
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 09:34:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cQxTx-0002WS-DU
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 09:33:05 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40146)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cQxTx-0002W1-2p
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 09:33:01 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	v0AESnkS124413
-	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 09:33:00 -0500
-Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 27w18ngptf-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 09:32:59 -0500
-Received: from localhost
-	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <groug@kaod.org>;
-	Tue, 10 Jan 2017 07:32:58 -0700
-From: Greg Kurz <groug@kaod.org>
-Date: Tue, 10 Jan 2017 15:32:53 +0100
-In-Reply-To: <148405872846.9522.17126828396099315346.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-References: <148405872846.9522.17126828396099315346.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+	(envelope-from <eblake@redhat.com>) id 1cQxVQ-0003LS-Ja
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 09:34:36 -0500
+References: <1484014214-32533-1-git-send-email-joserz@linux.vnet.ibm.com>
+	<1484014214-32533-3-git-send-email-joserz@linux.vnet.ibm.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <6ed8225a-65ed-67a0-ee35-a238b7c6408c@redhat.com>
+Date: Tue, 10 Jan 2017 08:34:29 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <148405877363.9522.2658048290773626523.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-Subject: [Qemu-devel] [PATCH 7/7] tests: virtio-9p: TLCREATE should fail if
- pathname exists
+In-Reply-To: <1484014214-32533-3-git-send-email-joserz@linux.vnet.ibm.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="rxPDW6KRiFmQvoVuLOkjwRJsl4eJ7QEoK"
+Subject: Re: [Qemu-devel] [PATCH v5 2/7] host-utils: Implement unsigned
+ quadword left/right shift and unit tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,65 +25,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>
+To: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>, qemu-ppc@nongnu.org
+Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au, nikunj@linux.vnet.ibm.com, bharata@linux.vnet.ibm.com
 
-As specified in the http://man.cat-v.org/plan_9/5/open :
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--rxPDW6KRiFmQvoVuLOkjwRJsl4eJ7QEoK
+From: Eric Blake <eblake@redhat.com>
+To: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>, qemu-ppc@nongnu.org
+Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au,
+ nikunj@linux.vnet.ibm.com, bharata@linux.vnet.ibm.com
+Message-ID: <6ed8225a-65ed-67a0-ee35-a238b7c6408c@redhat.com>
+Subject: Re: [PATCH v5 2/7] host-utils: Implement unsigned quadword left/right
+ shift and unit tests
+References: <1484014214-32533-1-git-send-email-joserz@linux.vnet.ibm.com>
+ <1484014214-32533-3-git-send-email-joserz@linux.vnet.ibm.com>
+In-Reply-To: <1484014214-32533-3-git-send-email-joserz@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-"An attempt to create a file in a directory where the given
-name already exists will be rejected"
+On 01/09/2017 08:10 PM, Jose Ricardo Ziviani wrote:
+> Implements 128-bit left shift and right shift as well as their
+> testcases. By design, shift silently mods by 128, so the caller is
+> responsible to assert the shift range if necessary.
+>=20
+> Left shift sets the overflow flag if any non-zero digit is shifted out.=
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- tests/virtio-9p-test.c |   31 +++++++++++++++++++++++++++++++
- 1 file changed, 31 insertions(+)
+>=20
+> Examples:
+>  ulshift(&low, &high, 250, &overflow);
+>  equivalent: n << 122
+>=20
+>  urshift(&low, &high, -2);
+>  equivalent: n << 126
+>=20
+> Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
+> ---
 
-diff --git a/tests/virtio-9p-test.c b/tests/virtio-9p-test.c
-index 7f2ee41ca0f0..2ba321b990d3 100644
---- a/tests/virtio-9p-test.c
-+++ b/tests/virtio-9p-test.c
-@@ -621,6 +621,35 @@ static void fs_lcreate(QVirtIO9P *v9p)
-     g_free(wnames[0]);
- }
- 
-+static void fs_lcreate_exclusive(QVirtIO9P *v9p)
-+{
-+    char *const wnames[] = { g_strdup(__func__) };
-+    char *path = g_strdup_printf("%s/%s", v9p->test_share, wnames[0]);
-+    int fd;
-+    uint32_t err;
-+    P9Req *req;
-+
-+    fd = creat(path, 0600);
-+    g_assert(fd >= 0);
-+    close(fd);
-+
-+    fs_attach(v9p);
-+    /* Clone the root directory fid and open it */
-+    req = v9fs_twalk(v9p, 0, 1, 0, NULL);
-+    v9fs_rwalk(req, NULL, NULL);
-+    req = v9fs_tlopen(v9p, 1, O_RDWR);
-+    v9fs_rlopen(req, NULL, NULL);
-+
-+    req = v9fs_tlcreate(v9p, 1, wnames[0], O_RDONLY, 0600, getgid());
-+    v9fs_rlerror(req, &err);
-+
-+    g_assert_cmpint(err, ==, EEXIST);
-+
-+    unlink(path);
-+    g_free(path);
-+    g_free(wnames[0]);
-+}
-+
- typedef void (*v9fs_test_fn)(QVirtIO9P *v9p);
- 
- static void v9fs_run_pci_test(gconstpointer data)
-@@ -654,6 +683,8 @@ int main(int argc, char **argv)
-     v9fs_qtest_pci_add("/virtio/9p/pci/fs/lopen/fifo_not_allowed",
-                        fs_lopen_fifo_not_allowed);
-     v9fs_qtest_pci_add("/virtio/9p/pci/fs/lcreate/basic", fs_lcreate);
-+    v9fs_qtest_pci_add("/virtio/9p/pci/fs/lcreate/exclusive",
-+                       fs_lcreate_exclusive);
- 
-     return g_test_run();
- }
+> +typedef struct {
+> +    uint64_t low;
+> +    uint64_t high;
+> +    uint64_t rlow;
+> +    uint64_t rhigh;
+> +    int32_t shift;
+> +    bool overflow;
+> +} test_data;
+> +
+> +static const test_data test_ltable[] =3D {
+> +    { 0x4C7ULL, 0x0ULL, 0x00000000000004C7ULL,
+> +      0x0000000000000000ULL,   0, false },
+
+I might have laid it out as:
+
+{ 0x00000000000004c7ULL, 0x0000000000000000ULL,
+  0x00000000000004c7ULL, 0x0000000000000000ULL,
+  0, false }
+
+to make the pre- and post-shift values line up better.  It's not fatal
+to the patch, so it's up to the maintainer if they want a v6 to improve
+the alignment.
+
+> +    { 0x8888888888888888ULL, 0x9999999999999999ULL,
+> +      0x8000000000000000ULL, 0x9888888888888888ULL, 60, true },
+> +    { 0x8888888888888888ULL, 0x9999999999999999ULL,
+> +      0x0000000000000000ULL, 0x8888888888888888ULL, 64, true },
+
+These two are the most legible.
+
+> +};
+> +
+> +static const test_data test_rtable[] =3D {
+
+> +++ b/util/host-utils.c
+> @@ -161,3 +161,67 @@ int divs128(int64_t *plow, int64_t *phigh, int64_t=
+ divisor)
+>  }
+>  #endif
+> =20
+> +/**
+> + * urshift - 128-bit Unsigned Right Shift.
+> + * @plow: in/out - lower 64-bit integer.
+> + * @phigh: in/out - higher 64-bit integer.
+> + * @shift: in - bytes to shift, between 0 and 127.
+> + *
+> + * Result is zero-extended and stored in plow/phigh, which are
+> + * input/output variables. Shift values outside the range will
+> + * be mod to 128. In other words, the caller is responsible to
+> + * verify/assert both the shift range and plow/phigh pointers.
+> + */
+
+Duplicating docs in the .h and .c doesn't hurt, but risks one getting
+out of date; we have other spots that put the docs in the .h (where
+callers will look up what's available) or the .c (where the
+implementation is there to check against the docs). I don't have any
+strong preference on how to do it, though, so I don't mind leaving it as =
+is.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--rxPDW6KRiFmQvoVuLOkjwRJsl4eJ7QEoK
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYdPD1AAoJEKeha0olJ0Nq0RkH/iGaVwDqgxivedt+V5sE0/oL
+58X2qx4v5EAMHtJWK371cJ4VgykH3TipldtwZjDuyDyPUwFVTF3UaS+VuovH56KS
+o+UiTvN7LgHyMRG0m5OXY25z+f4mORiqPg/voOseA/E4BxNbZCC4ij2AUouOryGc
+wvInySJNJNLbH/5Iqk+bUtoAB7tU0RKcgiG6NpYGQp0gjdfoQCsA9t4KYGsXLLys
+Dia1oGIqakBtQz+qZJkZpbmXHHQWpI6Sr9bngXIDGb7PygyAy53L4EPE6szOEC8w
+bBFXqy6xS73fXdh6HXO+e0aVVMPP0BokHa+LF3LzEtSLFCUZG53Pq7sRmpAbtSI=
+=oXoI
+-----END PGP SIGNATURE-----
+
+--rxPDW6KRiFmQvoVuLOkjwRJsl4eJ7QEoK--
