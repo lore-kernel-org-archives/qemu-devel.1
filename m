@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40278)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40277)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cQmyH-0002Sf-Qe
+	(envelope-from <dgibson@ozlabs.org>) id 1cQmyH-0002Se-Pi
 	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 22:19:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cQmyE-0004Nc-Tc
+	(envelope-from <dgibson@ozlabs.org>) id 1cQmyE-0004Nk-Uk
 	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 22:19:37 -0500
-Received: from ozlabs.org ([2401:3900:2:1::2]:45177)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1cQmyE-0004Kv-Eb
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 22:19:34 -0500
-Date: Tue, 10 Jan 2017 11:28:15 +1100
+Date: Tue, 10 Jan 2017 11:39:24 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170110002815.GJ12515@umbus.fritz.box>
-References: <20170109112338.5629-1-rka@sysgo.com>
+Message-ID: <20170110003924.GL12515@umbus.fritz.box>
+References: <1483966644-14049-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="j+MD90OnwjQyWNYt"
+	protocol="application/pgp-signature"; boundary="f54savKjS/tSNRaU"
 Content-Disposition: inline
-In-Reply-To: <20170109112338.5629-1-rka@sysgo.com>
-Subject: Re: [Qemu-devel] [PATCH] ppc: Prevent inifnite loop in decrementer
- auto-reload.
+In-Reply-To: <1483966644-14049-1-git-send-email-thuth@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] hw/ppc/spapr: Allow POWER9 as
+ hot-pluggable CPU for pseries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,57 +24,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Roman Kapl <rka@sysgo.com>
-Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>, Bharata B Rao <bharata@linux.vnet.ibm.com>
 
 
---j+MD90OnwjQyWNYt
+--f54savKjS/tSNRaU
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jan 09, 2017 at 12:23:38PM +0100, Roman Kapl wrote:
-> If the DECAR register is set to 0, QEMU tries to reload the decrementer w=
-ith
-> zero in an inifinite loop. According to PPC documentation, the decremente=
-r is
-> triggered on 1->0 transition, so avoid reloading the decrementer if if is
-> already zero.
+On Mon, Jan 09, 2017 at 01:57:24PM +0100, Thomas Huth wrote:
+> Running "qemu-system-ppc64 -M pseries -cpu POWER9" currently does not work
+> yet and results in this error message:
 >=20
-> The problem does not manifest under Linux, but it is valid to set DECAR t=
-o zero
-> (and may make sense as part of decrementer initialization when interrupts=
- are
-> disabled).
+>  qemu-system-ppc64: Unable to find sPAPR CPU Core definition
 >=20
-> Signed-off-by: Roman Kapl <rka@sysgo.com>
+> Since we want to support the pseries machine with POWER9 in the future,
+> allow using POWER9 as hot-pluggable CPU there, too.
+>=20
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
-Applied, fixing the coding style nit (no space after if) in the
-process.  Please remember to run checkpatch.pl in future.
+I'm not sure it makes sense to apply this until we have at least the
+basics of the POWER9 PAPR pieces implemented in qemu.
 
 > ---
->  hw/ppc/ppc_booke.c | 8 ++++++--
->  1 file changed, 6 insertions(+), 2 deletions(-)
+>  hw/ppc/spapr_cpu_core.c | 3 +++
+>  1 file changed, 3 insertions(+)
 >=20
-> diff --git a/hw/ppc/ppc_booke.c b/hw/ppc/ppc_booke.c
-> index ab8d026..f8d5c28 100644
-> --- a/hw/ppc/ppc_booke.c
-> +++ b/hw/ppc/ppc_booke.c
-> @@ -198,8 +198,12 @@ static void booke_decr_cb(void *opaque)
->      booke_update_irq(cpu);
+> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+> index 9dddaeb..71253f9 100644
+> --- a/hw/ppc/spapr_cpu_core.c
+> +++ b/hw/ppc/spapr_cpu_core.c
+> @@ -360,6 +360,9 @@ static const char *spapr_core_models[] =3D {
 > =20
->      if (env->spr[SPR_BOOKE_TCR] & TCR_ARE) {
-> -        /* Auto Reload */
-> -        cpu_ppc_store_decr(env, env->spr[SPR_BOOKE_DECAR]);
-> +        /* Do not reload 0, it is already there. It would just trigger
-> +         * the timer again and lead to infinite loop */
-> +        if(env->spr[SPR_BOOKE_DECAR] !=3D 0) {
-> +            /* Auto Reload */
-> +            cpu_ppc_store_decr(env, env->spr[SPR_BOOKE_DECAR]);
-> +        }
->      }
->  }
+>      /* POWER8NVL */
+>      "POWER8NVL_v1.0",
+> +
+> +    /* POWER9 */
+> +    "POWER9_v1.0",
+>  };
 > =20
+>  void spapr_cpu_core_class_init(ObjectClass *oc, void *data)
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -86,25 +72,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---j+MD90OnwjQyWNYt
+--f54savKjS/tSNRaU
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJYdCqfAAoJEGw4ysog2bOShvoP/iQY7j5iKlxB/MqSV8mRha8U
-u2LCRKadnmzXDDV8jgSy5Vp+Vj/r5jRqz94/aNWjXXVamCvkcGCDwNDiow3k4f8v
-GlfgzSD/ccHW+aj87bZCi8JHrOOxo79HggH/59OY6IPTJzBRKS8G9KFrmLyoHhbx
-nNV5fM4y6QQcARMcbiZ6CrZ+uzRkZArA9Ca7DLpPP09vU3WLihuFW88axHuC2hDA
-uBndhPpoUmO/zsI9V/tPXQyooCnxwd/Zabxl9ACNm2F0ZF3TTCyzy7mEb/LYJq5P
-HuB8OsSkhh7/1qEoKbtqnGXBzQ0EITBdhTx6xQQqFrnxEy2/dFXBztZi+oelnl7I
-1oeYugRHobWPo3lqsPFXLPqVI/j7ZFWSZQQoAtPH+AwnuEdbOs/banU0Z7BjGH1u
-vOTSIx1ZM7SoXbmmxj2SPuLJWLvN2fKD9OZHUpZDhlQjFFoGDDLCuZDTW5i/eitj
-sUEslgVAZymsoYr1qDQALVnAq+Gy3jkGrE2y+DezEakmqI2LVdj0g7OeXRUZfjfE
-7hIslRizAmGpAKCgB3rH78aVqeV+1zzQXQTqCw/bNYhifWnlbKkcOtqU24tJd0VA
-GSi1VfmfPwYllXmBncnZlIjvtgJqm+u5oyexGGAEuU7RxQNe4x9qwTbCcf6/Wg2S
-okcCGsYw6Zy4mLbZ6iLF
-=l0KH
+iQIcBAEBCAAGBQJYdC05AAoJEGw4ysog2bOSYwIQANRga2yD+Haa1UCvAbzr/L8w
+TvfvKSB4qklNINcFbPbGn9+7adgz2Zu1vinHezC4hKmwKmkNsfhbad+mu9FICiqn
+4+L8pSWhThq97gLrcAJ+F/YzxcqXLPrd8xsPFR1vYPtgIvYKTR7m4bBnKCeDkLBZ
+FUnBuZ46TzMHoBbwMtD0swU3Vy2AlVH4I0+J1QiyxsGeQMN6BSftf+u4BUJ1IUSV
+INjVJAr8Mz3cldcG7rw2HV7oALOnNpc09MuKchWw2cTD2igaE7p8rXkEMhVfdYa1
+JfnwtG3Sef81hnCZP7LS755TdNkzyNVPbj+WZewZXrwgOzT5tSqZb72FNU/T+oVu
+K4BKTySkHD036SPVpYvxJFQfVhKj/KlkCYoq4gzS7w3ftiscMyxjOsUl7WUj/nm6
+RgFakfKQDMpKSyIgTF9pR60MJII5tlBGLaBAl+C7jhw0iLnxobkqr9gLaR45JER9
+UwKFK2OtUxl93FFWPsyQxdgLwGAcMbgAz0kdhOqTzkxVnFdDs3S7aJF0txX84B7a
+0tAop1I1dzFlc39+a+IXwQHn1KhzXzJn2Vfj9tUVbiDJCBIqMNhueSZeFRQxyvPQ
+Uw/hz/lWBLHI+NAqbTcX7qkyloilRUZ3w9brreKdq9BVXzipQCWBga8WFzvYOZLw
+eZOYQ0MojhjPDZ1ypaBT
+=4j9B
 -----END PGP SIGNATURE-----
 
---j+MD90OnwjQyWNYt--
+--f54savKjS/tSNRaU--
