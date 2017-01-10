@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39259)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41688)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cQuWz-0000Zo-Px
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 06:23:58 -0500
+	(envelope-from <vpalatin@google.com>) id 1cQui6-00045N-AY
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 06:35:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cQuWu-0003wc-Rz
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 06:23:57 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55874)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cQuWu-0003wS-JQ
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 06:23:52 -0500
-Date: Tue, 10 Jan 2017 11:23:46 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170110112346.GE2423@work-vm>
-References: <1483981368-9965-1-git-send-email-ashijeetacharya@gmail.com>
-	<1483981368-9965-3-git-send-email-ashijeetacharya@gmail.com>
+	(envelope-from <vpalatin@google.com>) id 1cQui5-0008R9-Dt
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 06:35:26 -0500
+Received: from mail-it0-x229.google.com ([2607:f8b0:4001:c0b::229]:36177)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <vpalatin@google.com>) id 1cQui5-0008QW-76
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 06:35:25 -0500
+Received: by mail-it0-x229.google.com with SMTP id c7so39310308itd.1
+	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 03:35:25 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1483981368-9965-3-git-send-email-ashijeetacharya@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v4 2/4] migration: Allow "device add"
- options to only add migratable devices
+Sender: vpalatin@google.com
+In-Reply-To: <148404721690.208.4742704020877143303@790289a7ca88>
+References: <cover.1484045952.git.vpalatin@chromium.org>
+	<148404721690.208.4742704020877143303@790289a7ca88>
+From: Vincent Palatin <vpalatin@chromium.org>
+Date: Tue, 10 Jan 2017 12:35:03 +0100
+Message-ID: <CAP_ceTz3=9twm47Yw8h4Wv5KoXWO5Rfz5YvBtUTNjTeRvFaNaA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v6 0/4] Add HAX support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,100 +29,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ashijeet Acharya <ashijeetacharya@gmail.com>
-Cc: jsnow@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, kwolf@redhat.com, armbru@redhat.com, quintela@redhat.com, mst@redhat.com, marcandre.lureau@redhat.com, groug@kaod.org, aneesh.kumar@linux.vnet.ibm.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
+To: qemu-devel <qemu-devel@nongnu.org>
+Cc: famz@redhat.com, Yu Ning <yu.ning@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Stefan Weil <sw@weilnetz.de>, Marcelo Tosatti <mtosatti@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-* Ashijeet Acharya (ashijeetacharya@gmail.com) wrote:
-> Introduce checks for the unmigratable flag in the VMStateDescription
-> structs of respective devices when user attempts to add them. If the
-> "--only-migratable" was specified, all unmigratable devices will
-> rightly fail to add. This feature is made compatible for both "-device"
-> and "-usbdevice" command line options and covers their hmp and qmp
-> counterparts as well.
-> 
-> Signed-off-by: Ashijeet Acharya <ashijeetacharya@gmail.com>
-> ---
->  hw/usb/bus.c   | 18 ++++++++++++++++++
->  qdev-monitor.c |  9 +++++++++
->  2 files changed, 27 insertions(+)
-> 
-> diff --git a/hw/usb/bus.c b/hw/usb/bus.c
-> index 25913ad..3d26103 100644
-> --- a/hw/usb/bus.c
-> +++ b/hw/usb/bus.c
-> @@ -8,6 +8,7 @@
->  #include "monitor/monitor.h"
->  #include "trace.h"
->  #include "qemu/cutils.h"
-> +#include "migration/migration.h"
->  
->  static void usb_bus_dev_print(Monitor *mon, DeviceState *qdev, int indent);
->  
-> @@ -686,6 +687,8 @@ USBDevice *usbdevice_create(const char *cmdline)
->      const char *params;
->      int len;
->      USBDevice *dev;
-> +    ObjectClass *klass;
-> +    DeviceClass *dc;
->  
->      params = strchr(cmdline,':');
->      if (params) {
-> @@ -720,6 +723,21 @@ USBDevice *usbdevice_create(const char *cmdline)
->          return NULL;
->      }
->  
-> +    klass = object_class_by_name(f->name);
-> +    if (klass == NULL) {
-> +        return NULL;
+On Tue, Jan 10, 2017 at 12:20 PM,  <no-reply@patchew.org> wrote:
+> Hi,
+>
+> Your series failed automatic build test. Please find the testing commands and
+> their output below. If you have docker installed, you can probably reproduce it
+> locally.
+[...]
+> /tmp/qemu-test/src/target/i386/hax-mem.c:268:33: error: unknown type name 'RAMBlockNotifier'
+>  static void hax_ram_block_added(RAMBlockNotifier *n, void *host, size_t size)
+>                                  ^~~~~~~~~~~~~~~~
+> /tmp/qemu-test/src/target/i386/hax-mem.c:281:15: error: variable 'hax_ram_notifier' has initializer but incomplete type
+>  static struct RAMBlockNotifier hax_ram_notifier = {
+>                ^~~~~~~~~~~~~~~~
+> /tmp/qemu-test/src/target/i386/hax-mem.c:282:5: error: unknown field 'ram_block_added' specified in initializer
+>      .ram_block_added = hax_ram_block_added,
+>      ^
+> /tmp/qemu-test/src/target/i386/hax-mem.c:282:24: error: 'hax_ram_block_added' undeclared here (not in a function)
+>      .ram_block_added = hax_ram_block_added,
+>                         ^~~~~~~~~~~~~~~~~~~
+> /tmp/qemu-test/src/target/i386/hax-mem.c:282:24: error: excess elements in struct initializer [-Werror]
+> /tmp/qemu-test/src/target/i386/hax-mem.c:282:24: note: (near initialization for 'hax_ram_notifier')
+> /tmp/qemu-test/src/target/i386/hax-mem.c: In function 'hax_memory_init':
+> /tmp/qemu-test/src/target/i386/hax-mem.c:287:5: error: implicit declaration of function 'ram_block_notifier_add' [-Werror=implicit-function-declaration]
+>      ram_block_notifier_add(&hax_ram_notifier);
+>      ^~~~~~~~~~~~~~~~~~~~~~
+> /tmp/qemu-test/src/target/i386/hax-mem.c:287:5: error: nested extern declaration of 'ram_block_notifier_add' [-Werror=nested-externs]
+> /tmp/qemu-test/src/target/i386/hax-mem.c: At top level:
+> /tmp/qemu-test/src/target/i386/hax-mem.c:281:32: error: storage size of 'hax_ram_notifier' isn't known
+>  static struct RAMBlockNotifier hax_ram_notifier = {
+>                                 ^~~~~~~~~~~~~~~~
+> cc1: all warnings being treated as errors
+> /tmp/qemu-test/src/rules.mak:64: recipe for target 'target/i386/hax-mem.o' failed
 
-All error paths should print something, even if it shouldn't happen.
+it failed on the dependency to the unsubmitted Paolo's ramblock-notifier patch.
 
-Dave
-
-> +    }
-> +
-> +    dc = DEVICE_CLASS(klass);
-> +
-> +    if (only_migratable) {
-> +        if (dc->vmsd->unmigratable) {
-> +            error_report("Device %s is not migratable, but --only-migratable "
-> +                         "was specified", f->name);
-> +            return NULL;
-> +        }
-> +    }
-> +
->      if (f->usbdevice_init) {
->          dev = f->usbdevice_init(bus, params);
->      } else {
-> diff --git a/qdev-monitor.c b/qdev-monitor.c
-> index c73410c..81d01df 100644
-> --- a/qdev-monitor.c
-> +++ b/qdev-monitor.c
-> @@ -29,6 +29,7 @@
->  #include "qemu/error-report.h"
->  #include "qemu/help_option.h"
->  #include "sysemu/block-backend.h"
-> +#include "migration/migration.h"
->  
->  /*
->   * Aliases were a bad idea from the start.  Let's keep them
-> @@ -577,6 +578,14 @@ DeviceState *qdev_device_add(QemuOpts *opts, Error **errp)
->          return NULL;
->      }
->  
-> +    if (only_migratable) {
-> +        if (dc->vmsd->unmigratable) {
-> +            error_setg(errp, "Device %s is not migratable, but "
-> +                       "--only-migratable was specified", driver);
-> +            return NULL;
-> +        }
-> +    }
-> +
->      /* find bus */
->      path = qemu_opt_get(opts, "bus");
->      if (path != NULL) {
-> -- 
-> 2.6.2
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+-- 
+Vincent
