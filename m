@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47209)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47963)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cQtHk-0002M9-Ts
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 05:04:14 -0500
+	(envelope-from <armbru@redhat.com>) id 1cQtJu-0003S7-1U
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 05:06:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cQtHe-0006sA-Vb
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 05:04:08 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35464)
+	(envelope-from <armbru@redhat.com>) id 1cQtJp-0007pv-3M
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 05:06:22 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42354)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cQtHe-0006rv-Pw
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 05:04:02 -0500
-Date: Tue, 10 Jan 2017 10:03:55 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170110100355.GD27720@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <58733617.3050503@huawei.com>
-	<20170109134310.GE30228@stefanha-x1.localdomain>
-	<20170109162504.GH29989@redhat.com>
-	<33183CC9F5247A488A2544077AF19020DA182982@DGGEMA505-MBX.china.huawei.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cQtJo-0007pB-TS
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 05:06:17 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <1479108340-3453-1-git-send-email-caoj.fnst@cn.fujitsu.com>
+	<20170109234446-mutt-send-email-mst@kernel.org>
+Date: Tue, 10 Jan 2017 11:06:08 +0100
+In-Reply-To: <20170109234446-mutt-send-email-mst@kernel.org> (Michael
+	S. Tsirkin's message of "Mon, 9 Jan 2017 23:45:27 +0200")
+Message-ID: <87bmvftejz.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <33183CC9F5247A488A2544077AF19020DA182982@DGGEMA505-MBX.china.huawei.com>
-Subject: Re: [Qemu-devel] Question about add AF_ALG backend for virtio-crypto
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v7 00/10] Convert msix_init() to error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,45 +27,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, longpeng <longpeng2@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, QEMU-DEV <qemu-devel@nongnu.org>, "Wubin (H)" <wu.wubin@huawei.com>, "Zhoujian (jay, Euler)" <jianjay.zhou@huawei.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Cao jin <caoj.fnst@cn.fujitsu.com>, Jiri Pirko <jiri@resnulli.us>, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Hannes Reinecke <hare@suse.de>, Dmitry Fleytman <dmitry@daynix.com>, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-On Tue, Jan 10, 2017 at 09:03:45AM +0000, Gonglei (Arei) wrote:
-> Hi,
-> 
-> > 
-> > On Mon, Jan 09, 2017 at 01:43:10PM +0000, Stefan Hajnoczi wrote:
-> > > On Mon, Jan 09, 2017 at 03:04:55PM +0800, Longpeng (Mike) wrote:
-> > > > I'm one of Gonglei's virtio-crypto project members, and we plan to add a
-> > AF_ALG
-> > > > backend for virtio-crypto(there's only builtin-backend currently).
-> > > >
-> > > > I found that Catalin, Paolo and Stefan had discussed about this in 2015
-> > > > (http://www.spinics.net/lists/kvm/msg115457.html), but it seems that
-> > Catalin
-> > > > didn't do it, so I'm confuse about wether it is need to add a AF_ALG
-> > backend.
-> > > >
-> > > > Do you have any suggestion? Thanks :)
-> > >
-> > > I have no objections to an AF_ALG backend in QEMU.
-> > 
-> > Rather than do another backend for virtio-crypto, IMHO, we should have
-> > an AF_ALG impl of the crypto/ APIs. That way any potential performance
-> > benefits will enhance our LUKS encryption code too.
-> > 
-> According to the currently schemas of crypto/ APIs, we can't choose the
-> specific backend dynamically. This is a limitation for virtio-crypto
-> device I think.
+"Michael S. Tsirkin" <mst@redhat.com> writes:
 
-Do we really need to be able to choose the backend explicitly. If the AF_ALG
-backend is faster, why would you simply not use that automatically if it is
-available. I'm not seeing an obvious need for dynamically choosing between
-backends.
+> On Mon, Nov 14, 2016 at 03:25:30PM +0800, Cao jin wrote:
+>> v7 changelog:
+>> 1. fix the segfaut bug in patch 2. So drop the all the R-b of it,
+>>    please take a look, there is detailed description in the patch.
+>> 2. add the R-b from Hannes Reinecke
+>> 
+>> Test:
+>> 1. make check: pass
+>> 2. After applied all the patch, command line test for all the
+>>    affected devices, just make sure device realize process is ok,
+>>    no crash, but no further use of device.
+>
+> Consider the megasas device for example, don't you
+> need to test that the change actually does what
+> it's intended to do?
 
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+For better or worse, that's a higher bar than we commonly require for
+refactorings.
+
+[...]
