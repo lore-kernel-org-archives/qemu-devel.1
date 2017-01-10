@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32854)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32912)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vpalatin@google.com>) id 1cQuA8-0005I8-P9
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 06:00:22 -0500
+	(envelope-from <vpalatin@google.com>) id 1cQuAJ-0005ND-Ki
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 06:00:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vpalatin@google.com>) id 1cQuA7-0003pK-16
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 06:00:20 -0500
-Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:38161)
+	(envelope-from <vpalatin@google.com>) id 1cQuAD-0003qW-07
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 06:00:31 -0500
+Received: from mail-wj0-x234.google.com ([2a00:1450:400c:c01::234]:35357)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <vpalatin@google.com>) id 1cQuA6-0003p4-O9
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 06:00:18 -0500
-Received: by mail-wm0-x22a.google.com with SMTP id k184so155998833wme.1
-	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 03:00:18 -0800 (PST)
+	(Exim 4.71) (envelope-from <vpalatin@google.com>) id 1cQuAC-0003qI-MH
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 06:00:24 -0500
+Received: by mail-wj0-x234.google.com with SMTP id i20so80179266wjn.2
+	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 03:00:24 -0800 (PST)
 Sender: Vincent Palatin <vpalatin@google.com>
 From: Vincent Palatin <vpalatin@chromium.org>
-Date: Tue, 10 Jan 2017 11:59:55 +0100
-Message-Id: <f5c3cffe8d520011df1c2e5437bb814989b48332.1484045952.git.vpalatin@chromium.org>
+Date: Tue, 10 Jan 2017 11:59:57 +0100
+Message-Id: <7b9cae28a0c379ab459c7a8545c9a39762bd394f.1484045952.git.vpalatin@chromium.org>
 In-Reply-To: <cover.1484045952.git.vpalatin@chromium.org>
 References: <cover.1484045952.git.vpalatin@chromium.org>
 In-Reply-To: <cover.1484045952.git.vpalatin@chromium.org>
 References: <cover.1484045952.git.vpalatin@chromium.org>
-Subject: [Qemu-devel] [PATCH v6 1/4] kvm: move cpu synchronization code
+Subject: [Qemu-devel] [PATCH v6 3/4] Plumb the HAXM-based hardware
+ acceleration support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,351 +32,413 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel <qemu-devel@nongnu.org>
 Cc: Yu Ning <yu.ning@linux.intel.com>, Stefan Weil <sw@weilnetz.de>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Vincent Palatin <vpalatin@chromium.org>
 
-Move the generic cpu_synchronize_ functions to the common hw_accel.h header,
-in order to prepare for the addition of a second hardware accelerator.
+Use the Intel HAX is kernel-based hardware acceleration module for
+Windows (similar to KVM on Linux).
 
-Signed-off-by: Stefan Weil <sw@weilnetz.de>
+Based on the "target/i386: Add Intel HAX to android emulator" patch
+from David Chou <david.j.chou@intel.com>
+
 Signed-off-by: Vincent Palatin <vpalatin@chromium.org>
 ---
- cpus.c                      |  1 +
- gdbstub.c                   |  1 +
- hw/i386/kvm/apic.c          |  1 +
- hw/i386/kvmvapic.c          |  1 +
- hw/misc/vmport.c            |  2 +-
- hw/ppc/pnv_xscom.c          |  2 +-
- hw/ppc/ppce500_spin.c       |  4 ++--
- hw/ppc/spapr.c              |  2 +-
- hw/ppc/spapr_hcall.c        |  2 +-
- hw/s390x/s390-pci-inst.c    |  1 +
- include/sysemu/hw_accel.h   | 39 +++++++++++++++++++++++++++++++++++++++
- include/sysemu/kvm.h        | 23 -----------------------
- monitor.c                   |  2 +-
- qom/cpu.c                   |  2 +-
- target/arm/cpu.c            |  2 +-
- target/i386/helper.c        |  1 +
- target/i386/kvm.c           |  1 +
- target/ppc/mmu-hash64.c     |  2 +-
- target/ppc/translate_init.c |  2 +-
- target/s390x/gdbstub.c      |  1 +
- 20 files changed, 58 insertions(+), 34 deletions(-)
- create mode 100644 include/sysemu/hw_accel.h
+ Makefile.target           |  1 +
+ configure                 | 18 +++++++++++
+ cpus.c                    | 78 ++++++++++++++++++++++++++++++++++++++++++++++-
+ hw/intc/apic_common.c     |  3 +-
+ include/qom/cpu.h         |  5 +++
+ include/sysemu/hw_accel.h |  9 ++++++
+ qemu-options.hx           | 11 +++++++
+ target/i386/Makefile.objs |  4 +++
+ util/qemu-thread-win32.c  |  4 +--
+ vl.c                      | 15 +++++++--
+ 10 files changed, 141 insertions(+), 7 deletions(-)
 
+diff --git a/Makefile.target b/Makefile.target
+index 8ae82cb311..c62e2acee3 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -97,6 +97,7 @@ obj-y += target/$(TARGET_BASE_ARCH)/
+ obj-y += disas.o
+ obj-y += tcg-runtime.o
+ obj-$(call notempty,$(TARGET_XML_FILES)) += gdbstub-xml.o
++obj-$(call lnot,$(CONFIG_HAX)) += hax-stub.o
+ obj-$(call lnot,$(CONFIG_KVM)) += kvm-stub.o
+ 
+ obj-$(CONFIG_LIBDECNUMBER) += libdecnumber/decContext.o
+diff --git a/configure b/configure
+index 86f5214dd0..249faa164d 100755
+--- a/configure
++++ b/configure
+@@ -228,6 +228,7 @@ vhost_net="no"
+ vhost_scsi="no"
+ vhost_vsock="no"
+ kvm="no"
++hax="no"
+ colo="yes"
+ rdma=""
+ gprof="no"
+@@ -562,6 +563,7 @@ CYGWIN*)
+ ;;
+ MINGW32*)
+   mingw32="yes"
++  hax="yes"
+   audio_possible_drivers="dsound sdl"
+   if check_include dsound.h; then
+     audio_drv_list="dsound"
+@@ -611,6 +613,7 @@ OpenBSD)
+ Darwin)
+   bsd="yes"
+   darwin="yes"
++  hax="yes"
+   LDFLAGS_SHARED="-bundle -undefined dynamic_lookup"
+   if [ "$cpu" = "x86_64" ] ; then
+     QEMU_CFLAGS="-arch x86_64 $QEMU_CFLAGS"
+@@ -920,6 +923,10 @@ for opt do
+   ;;
+   --enable-kvm) kvm="yes"
+   ;;
++  --disable-hax) hax="no"
++  ;;
++  --enable-hax) hax="yes"
++  ;;
+   --disable-colo) colo="no"
+   ;;
+   --enable-colo) colo="yes"
+@@ -1372,6 +1379,7 @@ disabled with --disable-FEATURE, default is enabled if available:
+   fdt             fdt device tree
+   bluez           bluez stack connectivity
+   kvm             KVM acceleration support
++  hax             HAX acceleration support
+   colo            COarse-grain LOck-stepping VM for Non-stop Service
+   rdma            RDMA-based migration support
+   vde             support for vde network
+@@ -5063,6 +5071,7 @@ echo "ATTR/XATTR support $attr"
+ echo "Install blobs     $blobs"
+ echo "KVM support       $kvm"
+ echo "COLO support      $colo"
++echo "HAX support       $hax"
+ echo "RDMA support      $rdma"
+ echo "TCG interpreter   $tcg_interpreter"
+ echo "fdt support       $fdt"
+@@ -6050,6 +6059,15 @@ case "$target_name" in
+       fi
+     fi
+ esac
++if test "$hax" = "yes" ; then
++  if test "$target_softmmu" = "yes" ; then
++    case "$target_name" in
++    i386|x86_64)
++      echo "CONFIG_HAX=y" >> $config_target_mak
++    ;;
++    esac
++  fi
++fi
+ if test "$target_bigendian" = "yes" ; then
+   echo "TARGET_WORDS_BIGENDIAN=y" >> $config_target_mak
+ fi
 diff --git a/cpus.c b/cpus.c
-index 5213351c6d..fc78502ce5 100644
+index fc78502ce5..71a82e5004 100644
 --- a/cpus.c
 +++ b/cpus.c
-@@ -33,6 +33,7 @@
- #include "sysemu/block-backend.h"
- #include "exec/gdbstub.h"
+@@ -35,6 +35,7 @@
  #include "sysemu/dma.h"
-+#include "sysemu/hw_accel.h"
+ #include "sysemu/hw_accel.h"
  #include "sysemu/kvm.h"
++#include "sysemu/hax.h"
  #include "qmp-commands.h"
  #include "exec/exec-all.h"
-diff --git a/gdbstub.c b/gdbstub.c
-index de62d26096..de9b62b8f8 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -32,6 +32,7 @@
- #define MAX_PACKET_LENGTH 4096
  
- #include "qemu/sockets.h"
-+#include "sysemu/hw_accel.h"
- #include "sysemu/kvm.h"
- #include "exec/semihost.h"
- #include "exec/exec-all.h"
-diff --git a/hw/i386/kvm/apic.c b/hw/i386/kvm/apic.c
-index df5180b1e0..1df6d26816 100644
---- a/hw/i386/kvm/apic.c
-+++ b/hw/i386/kvm/apic.c
-@@ -14,6 +14,7 @@
- #include "cpu.h"
- #include "hw/i386/apic_internal.h"
- #include "hw/pci/msi.h"
-+#include "sysemu/hw_accel.h"
- #include "sysemu/kvm.h"
- #include "target/i386/kvm_i386.h"
+@@ -1221,6 +1222,46 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
+     return NULL;
+ }
  
-diff --git a/hw/i386/kvmvapic.c b/hw/i386/kvmvapic.c
-index b30d1b90c6..2f767b620e 100644
---- a/hw/i386/kvmvapic.c
-+++ b/hw/i386/kvmvapic.c
-@@ -14,6 +14,7 @@
- #include "exec/exec-all.h"
- #include "sysemu/sysemu.h"
- #include "sysemu/cpus.h"
-+#include "sysemu/hw_accel.h"
- #include "sysemu/kvm.h"
- #include "hw/i386/apic_internal.h"
- #include "hw/sysbus.h"
-diff --git a/hw/misc/vmport.c b/hw/misc/vmport.c
-index c763811a9f..be40930b8b 100644
---- a/hw/misc/vmport.c
-+++ b/hw/misc/vmport.c
-@@ -25,7 +25,7 @@
- #include "hw/hw.h"
- #include "hw/isa/isa.h"
- #include "hw/i386/pc.h"
--#include "sysemu/kvm.h"
-+#include "sysemu/hw_accel.h"
- #include "hw/qdev.h"
- 
- //#define VMPORT_DEBUG
-diff --git a/hw/ppc/pnv_xscom.c b/hw/ppc/pnv_xscom.c
-index b82af4f086..38bc85f117 100644
---- a/hw/ppc/pnv_xscom.c
-+++ b/hw/ppc/pnv_xscom.c
-@@ -20,7 +20,7 @@
- #include "qapi/error.h"
- #include "hw/hw.h"
- #include "qemu/log.h"
--#include "sysemu/kvm.h"
-+#include "sysemu/hw_accel.h"
- #include "target/ppc/cpu.h"
- #include "hw/sysbus.h"
- 
-diff --git a/hw/ppc/ppce500_spin.c b/hw/ppc/ppce500_spin.c
-index cf958a9e00..eb219abdff 100644
---- a/hw/ppc/ppce500_spin.c
-+++ b/hw/ppc/ppce500_spin.c
-@@ -29,9 +29,9 @@
- 
- #include "qemu/osdep.h"
- #include "hw/hw.h"
--#include "sysemu/sysemu.h"
- #include "hw/sysbus.h"
--#include "sysemu/kvm.h"
-+#include "sysemu/hw_accel.h"
-+#include "sysemu/sysemu.h"
- #include "e500.h"
- 
- #define MAX_CPUS 32
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 208ef7b110..a642e663d4 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -36,7 +36,7 @@
- #include "sysemu/device_tree.h"
- #include "sysemu/block-backend.h"
- #include "sysemu/cpus.h"
--#include "sysemu/kvm.h"
-+#include "sysemu/hw_accel.h"
- #include "kvm_ppc.h"
- #include "migration/migration.h"
- #include "mmu-hash64.h"
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index 9a9bedf1bd..b2a8e48569 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -1,5 +1,6 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
-+#include "sysemu/hw_accel.h"
- #include "sysemu/sysemu.h"
- #include "qemu/log.h"
- #include "cpu.h"
-@@ -9,7 +10,6 @@
- #include "mmu-hash64.h"
- #include "cpu-models.h"
- #include "trace.h"
--#include "sysemu/kvm.h"
- #include "kvm_ppc.h"
- #include "hw/ppc/spapr_ovec.h"
- 
-diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
-index 0864d9be12..4d0775c83f 100644
---- a/hw/s390x/s390-pci-inst.c
-+++ b/hw/s390x/s390-pci-inst.c
-@@ -18,6 +18,7 @@
- #include "s390-pci-bus.h"
- #include "exec/memory-internal.h"
- #include "qemu/error-report.h"
-+#include "sysemu/hw_accel.h"
- 
- /* #define DEBUG_S390PCI_INST */
- #ifdef DEBUG_S390PCI_INST
-diff --git a/include/sysemu/hw_accel.h b/include/sysemu/hw_accel.h
-new file mode 100644
-index 0000000000..03812cfeb3
---- /dev/null
-+++ b/include/sysemu/hw_accel.h
-@@ -0,0 +1,39 @@
-+/*
-+ * QEMU Hardware accelertors support
-+ *
-+ * Copyright 2016 Google, Inc.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#ifndef QEMU_HW_ACCEL_H
-+#define QEMU_HW_ACCEL_H
-+
-+#include "qom/cpu.h"
-+#include "sysemu/hax.h"
-+#include "sysemu/kvm.h"
-+
-+static inline void cpu_synchronize_state(CPUState *cpu)
++static void *qemu_hax_cpu_thread_fn(void *arg)
 +{
-+    if (kvm_enabled()) {
-+        kvm_cpu_synchronize_state(cpu);
++    CPUState *cpu = arg;
++    int r;
++    qemu_thread_get_self(cpu->thread);
++    qemu_mutex_lock(&qemu_global_mutex);
++
++    cpu->thread_id = qemu_get_thread_id();
++    cpu->created = true;
++    cpu->halted = 0;
++    current_cpu = cpu;
++
++    hax_init_vcpu(cpu);
++    qemu_cond_signal(&qemu_cpu_cond);
++
++    while (1) {
++        if (cpu_can_run(cpu)) {
++            r = hax_smp_cpu_exec(cpu);
++            if (r == EXCP_DEBUG) {
++                cpu_handle_guest_debug(cpu);
++            }
++        }
++
++        while (cpu_thread_is_idle(cpu)) {
++            qemu_cond_wait(cpu->halt_cond, &qemu_global_mutex);
++        }
++#ifdef _WIN32
++        SleepEx(0, TRUE);
++#endif
++        qemu_wait_io_event_common(cpu);
 +    }
++    return NULL;
 +}
 +
-+static inline void cpu_synchronize_post_reset(CPUState *cpu)
++#ifdef _WIN32
++static void CALLBACK dummy_apc_func(ULONG_PTR unused)
 +{
-+    if (kvm_enabled()) {
-+        kvm_cpu_synchronize_post_reset(cpu);
-+    }
 +}
++#endif
 +
-+static inline void cpu_synchronize_post_init(CPUState *cpu)
-+{
-+    if (kvm_enabled()) {
-+        kvm_cpu_synchronize_post_init(cpu);
-+    }
-+}
-+
-+#endif /* QEMU_HW_ACCEL_H */
-diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-index df67cc0672..3045ee7678 100644
---- a/include/sysemu/kvm.h
-+++ b/include/sysemu/kvm.h
-@@ -461,29 +461,6 @@ void kvm_cpu_synchronize_state(CPUState *cpu);
- void kvm_cpu_synchronize_post_reset(CPUState *cpu);
- void kvm_cpu_synchronize_post_init(CPUState *cpu);
- 
--/* generic hooks - to be moved/refactored once there are more users */
--
--static inline void cpu_synchronize_state(CPUState *cpu)
--{
--    if (kvm_enabled()) {
--        kvm_cpu_synchronize_state(cpu);
--    }
--}
--
--static inline void cpu_synchronize_post_reset(CPUState *cpu)
--{
--    if (kvm_enabled()) {
--        kvm_cpu_synchronize_post_reset(cpu);
--    }
--}
--
--static inline void cpu_synchronize_post_init(CPUState *cpu)
--{
--    if (kvm_enabled()) {
--        kvm_cpu_synchronize_post_init(cpu);
--    }
--}
--
- /**
-  * kvm_irqchip_add_msi_route - Add MSI route for specific vector
-  * @s:      KVM state
-diff --git a/monitor.c b/monitor.c
-index 0841d436b0..d38956fd83 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -50,7 +50,7 @@
- #include "sysemu/balloon.h"
- #include "qemu/timer.h"
- #include "migration/migration.h"
--#include "sysemu/kvm.h"
-+#include "sysemu/hw_accel.h"
- #include "qemu/acl.h"
- #include "sysemu/tpm.h"
- #include "qapi/qmp/qerror.h"
-diff --git a/qom/cpu.c b/qom/cpu.c
-index 03d9190f8c..2c5274f0f6 100644
---- a/qom/cpu.c
-+++ b/qom/cpu.c
-@@ -22,7 +22,7 @@
- #include "qapi/error.h"
- #include "qemu-common.h"
- #include "qom/cpu.h"
--#include "sysemu/kvm.h"
-+#include "sysemu/hw_accel.h"
- #include "qemu/notify.h"
- #include "qemu/log.h"
- #include "exec/log.h"
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index f5cb30af6c..f7f20d33d0 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -31,7 +31,7 @@
- #endif
- #include "hw/arm/arm.h"
- #include "sysemu/sysemu.h"
--#include "sysemu/kvm.h"
-+#include "sysemu/hw_accel.h"
- #include "kvm_arm.h"
- 
- static void arm_cpu_set_pc(CPUState *cs, vaddr value)
-diff --git a/target/i386/helper.c b/target/i386/helper.c
-index 43e87ddba0..19b2656995 100644
---- a/target/i386/helper.c
-+++ b/target/i386/helper.c
-@@ -24,6 +24,7 @@
- #include "kvm_i386.h"
- #ifndef CONFIG_USER_ONLY
- #include "sysemu/sysemu.h"
-+#include "sysemu/hw_accel.h"
- #include "monitor/monitor.h"
- #include "hw/i386/apic_internal.h"
- #endif
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 10a9cd8f7f..e6c4f754ab 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -23,6 +23,7 @@
- #include "qemu-common.h"
- #include "cpu.h"
- #include "sysemu/sysemu.h"
-+#include "sysemu/hw_accel.h"
- #include "sysemu/kvm_int.h"
- #include "kvm_i386.h"
- #include "hyperv.h"
-diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-index fdb7a787bf..0efc8c63fa 100644
---- a/target/ppc/mmu-hash64.c
-+++ b/target/ppc/mmu-hash64.c
-@@ -23,7 +23,7 @@
- #include "exec/exec-all.h"
- #include "exec/helper-proto.h"
- #include "qemu/error-report.h"
--#include "sysemu/kvm.h"
-+#include "sysemu/hw_accel.h"
- #include "kvm_ppc.h"
- #include "mmu-hash64.h"
- #include "exec/log.h"
-diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-index 626e03186c..98b8760394 100644
---- a/target/ppc/translate_init.c
-+++ b/target/ppc/translate_init.c
-@@ -21,10 +21,10 @@
- #include "qemu/osdep.h"
- #include "disas/bfd.h"
- #include "exec/gdbstub.h"
--#include "sysemu/kvm.h"
- #include "kvm_ppc.h"
- #include "sysemu/arch_init.h"
- #include "sysemu/cpus.h"
-+#include "sysemu/hw_accel.h"
- #include "cpu-models.h"
- #include "mmu-hash32.h"
- #include "mmu-hash64.h"
-diff --git a/target/s390x/gdbstub.c b/target/s390x/gdbstub.c
-index 3d223dec97..3c652fba62 100644
---- a/target/s390x/gdbstub.c
-+++ b/target/s390x/gdbstub.c
-@@ -23,6 +23,7 @@
- #include "exec/exec-all.h"
- #include "exec/gdbstub.h"
- #include "qemu/bitops.h"
-+#include "sysemu/hw_accel.h"
- 
- int s390_cpu_gdb_read_register(CPUState *cs, uint8_t *mem_buf, int n)
+ static void qemu_cpu_kick_thread(CPUState *cpu)
  {
+ #ifndef _WIN32
+@@ -1236,7 +1277,13 @@ static void qemu_cpu_kick_thread(CPUState *cpu)
+         exit(1);
+     }
+ #else /* _WIN32 */
+-    abort();
++    if (!qemu_cpu_is_self(cpu)) {
++        if (!QueueUserAPC(dummy_apc_func, cpu->hThread, 0)) {
++            fprintf(stderr, "%s: QueueUserAPC failed with error %lu\n",
++                    __func__, GetLastError());
++            exit(1);
++        }
++    }
+ #endif
+ }
+ 
+@@ -1259,6 +1306,13 @@ void qemu_cpu_kick(CPUState *cpu)
+     if (tcg_enabled()) {
+         qemu_cpu_kick_no_halt();
+     } else {
++        if (hax_enabled()) {
++            /*
++             * FIXME: race condition with the exit_request check in
++             * hax_vcpu_hax_exec
++             */
++            cpu->exit_request = 1;
++        }
+         qemu_cpu_kick_thread(cpu);
+     }
+ }
+@@ -1419,6 +1473,26 @@ static void qemu_tcg_init_vcpu(CPUState *cpu)
+     }
+ }
+ 
++static void qemu_hax_start_vcpu(CPUState *cpu)
++{
++    char thread_name[VCPU_THREAD_NAME_SIZE];
++
++    cpu->thread = g_malloc0(sizeof(QemuThread));
++    cpu->halt_cond = g_malloc0(sizeof(QemuCond));
++    qemu_cond_init(cpu->halt_cond);
++
++    snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/HAX",
++             cpu->cpu_index);
++    qemu_thread_create(cpu->thread, thread_name, qemu_hax_cpu_thread_fn,
++                       cpu, QEMU_THREAD_JOINABLE);
++#ifdef _WIN32
++    cpu->hThread = qemu_thread_get_handle(cpu->thread);
++#endif
++    while (!cpu->created) {
++        qemu_cond_wait(&qemu_cpu_cond, &qemu_global_mutex);
++    }
++}
++
+ static void qemu_kvm_start_vcpu(CPUState *cpu)
+ {
+     char thread_name[VCPU_THREAD_NAME_SIZE];
+@@ -1469,6 +1543,8 @@ void qemu_init_vcpu(CPUState *cpu)
+ 
+     if (kvm_enabled()) {
+         qemu_kvm_start_vcpu(cpu);
++    } else if (hax_enabled()) {
++        qemu_hax_start_vcpu(cpu);
+     } else if (tcg_enabled()) {
+         qemu_tcg_init_vcpu(cpu);
+     } else {
+diff --git a/hw/intc/apic_common.c b/hw/intc/apic_common.c
+index d78c885509..3945dfd7b9 100644
+--- a/hw/intc/apic_common.c
++++ b/hw/intc/apic_common.c
+@@ -26,6 +26,7 @@
+ #include "hw/i386/apic.h"
+ #include "hw/i386/apic_internal.h"
+ #include "trace.h"
++#include "sysemu/hax.h"
+ #include "sysemu/kvm.h"
+ #include "hw/qdev.h"
+ #include "hw/sysbus.h"
+@@ -316,7 +317,7 @@ static void apic_common_realize(DeviceState *dev, Error **errp)
+ 
+     /* Note: We need at least 1M to map the VAPIC option ROM */
+     if (!vapic && s->vapic_control & VAPIC_ENABLE_MASK &&
+-        ram_size >= 1024 * 1024) {
++        !hax_enabled() && ram_size >= 1024 * 1024) {
+         vapic = sysbus_create_simple("kvmvapic", -1, NULL);
+     }
+     s->vapic = vapic;
+diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+index 3f79a8e955..ca4d0fb1b4 100644
+--- a/include/qom/cpu.h
++++ b/include/qom/cpu.h
+@@ -227,6 +227,8 @@ struct CPUWatchpoint {
+ struct KVMState;
+ struct kvm_run;
+ 
++struct hax_vcpu_state;
++
+ #define TB_JMP_CACHE_BITS 12
+ #define TB_JMP_CACHE_SIZE (1 << TB_JMP_CACHE_BITS)
+ 
+@@ -392,6 +394,9 @@ struct CPUState {
+        (absolute value) offset as small as possible.  This reduces code
+        size, especially for hosts without large memory offsets.  */
+     uint32_t tcg_exit_req;
++
++    bool hax_vcpu_dirty;
++    struct hax_vcpu_state *hax_vcpu;
+ };
+ 
+ QTAILQ_HEAD(CPUTailQ, CPUState);
+diff --git a/include/sysemu/hw_accel.h b/include/sysemu/hw_accel.h
+index 03812cfeb3..c9b3105bc7 100644
+--- a/include/sysemu/hw_accel.h
++++ b/include/sysemu/hw_accel.h
+@@ -20,6 +20,9 @@ static inline void cpu_synchronize_state(CPUState *cpu)
+     if (kvm_enabled()) {
+         kvm_cpu_synchronize_state(cpu);
+     }
++    if (hax_enabled()) {
++        hax_cpu_synchronize_state(cpu);
++    }
+ }
+ 
+ static inline void cpu_synchronize_post_reset(CPUState *cpu)
+@@ -27,6 +30,9 @@ static inline void cpu_synchronize_post_reset(CPUState *cpu)
+     if (kvm_enabled()) {
+         kvm_cpu_synchronize_post_reset(cpu);
+     }
++    if (hax_enabled()) {
++        hax_cpu_synchronize_post_reset(cpu);
++    }
+ }
+ 
+ static inline void cpu_synchronize_post_init(CPUState *cpu)
+@@ -34,6 +40,9 @@ static inline void cpu_synchronize_post_init(CPUState *cpu)
+     if (kvm_enabled()) {
+         kvm_cpu_synchronize_post_init(cpu);
+     }
++    if (hax_enabled()) {
++        hax_cpu_synchronize_post_init(cpu);
++    }
+ }
+ 
+ #endif /* QEMU_HW_ACCEL_H */
+diff --git a/qemu-options.hx b/qemu-options.hx
+index c534a2f7f9..7fc2807206 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -3280,6 +3280,17 @@ Enable KVM full virtualization support. This option is only available
+ if KVM support is enabled when compiling.
+ ETEXI
+ 
++DEF("enable-hax", 0, QEMU_OPTION_enable_hax, \
++    "-enable-hax     enable HAX virtualization support\n", QEMU_ARCH_I386)
++STEXI
++@item -enable-hax
++@findex -enable-hax
++Enable HAX (Hardware-based Acceleration eXecution) support. This option
++is only available if HAX support is enabled when compiling. HAX is only
++applicable to MAC and Windows platform, and thus does not conflict with
++KVM.
++ETEXI
++
+ DEF("xen-domid", HAS_ARG, QEMU_OPTION_xen_domid,
+     "-xen-domid id   specify xen guest domain id\n", QEMU_ARCH_ALL)
+ DEF("xen-create", 0, QEMU_OPTION_xen_create,
+diff --git a/target/i386/Makefile.objs b/target/i386/Makefile.objs
+index b223d7932b..acbe7b0752 100644
+--- a/target/i386/Makefile.objs
++++ b/target/i386/Makefile.objs
+@@ -5,3 +5,7 @@ obj-y += gdbstub.o
+ obj-$(CONFIG_SOFTMMU) += machine.o arch_memory_mapping.o arch_dump.o monitor.o
+ obj-$(CONFIG_KVM) += kvm.o hyperv.o
+ obj-$(call lnot,$(CONFIG_KVM)) += kvm-stub.o
++# HAX support
++ifdef CONFIG_WIN32
++obj-$(CONFIG_HAX) += hax-all.o hax-mem.o hax-windows.o
++endif
+diff --git a/util/qemu-thread-win32.c b/util/qemu-thread-win32.c
+index 728e76b5b2..95d4ba4f60 100644
+--- a/util/qemu-thread-win32.c
++++ b/util/qemu-thread-win32.c
+@@ -497,8 +497,8 @@ HANDLE qemu_thread_get_handle(QemuThread *thread)
+ 
+     EnterCriticalSection(&data->cs);
+     if (!data->exited) {
+-        handle = OpenThread(SYNCHRONIZE | THREAD_SUSPEND_RESUME, FALSE,
+-                            thread->tid);
++        handle = OpenThread(SYNCHRONIZE | THREAD_SUSPEND_RESUME |
++                            THREAD_SET_CONTEXT, FALSE, thread->tid);
+     } else {
+         handle = NULL;
+     }
+diff --git a/vl.c b/vl.c
+index a23de18fa9..b617ab4016 100644
+--- a/vl.c
++++ b/vl.c
+@@ -92,6 +92,7 @@ int main(int argc, char **argv)
+ #include "sysemu/cpus.h"
+ #include "migration/colo.h"
+ #include "sysemu/kvm.h"
++#include "sysemu/hax.h"
+ #include "qapi/qmp/qjson.h"
+ #include "qemu/option.h"
+ #include "qemu/config-file.h"
+@@ -1959,7 +1960,7 @@ static void main_loop(void)
+     int64_t ti;
+ #endif
+     do {
+-        nonblocking = !kvm_enabled() && !xen_enabled() && last_io > 0;
++        nonblocking = tcg_enabled() && last_io > 0;
+ #ifdef CONFIG_PROFILER
+         ti = profile_getclock();
+ #endif
+@@ -3725,6 +3726,10 @@ int main(int argc, char **argv, char **envp)
+                 olist = qemu_find_opts("machine");
+                 qemu_opts_parse_noisily(olist, "accel=kvm", false);
+                 break;
++            case QEMU_OPTION_enable_hax:
++                olist = qemu_find_opts("machine");
++                qemu_opts_parse_noisily(olist, "accel=hax", false);
++                break;
+             case QEMU_OPTION_M:
+             case QEMU_OPTION_machine:
+                 olist = qemu_find_opts("machine");
+@@ -4419,8 +4424,8 @@ int main(int argc, char **argv, char **envp)
+ 
+     cpu_ticks_init();
+     if (icount_opts) {
+-        if (kvm_enabled() || xen_enabled()) {
+-            error_report("-icount is not allowed with kvm or xen");
++        if (!tcg_enabled()) {
++            error_report("-icount is not allowed with hardware virtualization");
+             exit(1);
+         }
+         configure_icount(icount_opts, &error_abort);
+@@ -4556,6 +4561,10 @@ int main(int argc, char **argv, char **envp)
+ 
+     numa_post_machine_init();
+ 
++    if (hax_enabled()) {
++        hax_sync_vcpus();
++    }
++
+     if (qemu_opts_foreach(qemu_find_opts("fw_cfg"),
+                           parse_fw_cfg, fw_cfg_find(), NULL) != 0) {
+         exit(1);
 -- 
 2.11.0.390.gc69c2f50cf-goog
