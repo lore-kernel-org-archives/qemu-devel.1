@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33901)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33914)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <SRS0=AJsY=YY=redhat.com=mst@kernel.org>)
-	id 1cQpAp-0008Dl-DJ
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 00:40:44 -0500
+	id 1cQpAq-0008Ed-Aj
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 00:40:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <SRS0=AJsY=YY=redhat.com=mst@kernel.org>)
-	id 1cQpAm-0005w5-6Q
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 00:40:43 -0500
-Received: from mail.kernel.org ([198.145.29.136]:48422)
+	id 1cQpAo-0005x2-Ti
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 00:40:44 -0500
+Received: from mail.kernel.org ([198.145.29.136]:48448)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <SRS0=AJsY=YY=redhat.com=mst@kernel.org>)
-	id 1cQpAl-0005vU-VR
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 00:40:40 -0500
-Date: Tue, 10 Jan 2017 07:40:35 +0200
+	id 1cQpAo-0005wk-Jc
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 00:40:42 -0500
+Date: Tue, 10 Jan 2017 07:40:38 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1484026704-28027-31-git-send-email-mst@redhat.com>
+Message-ID: <1484026704-28027-32-git-send-email-mst@redhat.com>
 References: <1484026704-28027-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1484026704-28027-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 30/41] vhost-net: Notify the backend about the
- host MTU
+Subject: [Qemu-devel] [PULL 31/41] virtio-net: Add MTU feature support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,77 +34,98 @@ Cc: Peter Maydell <peter.maydell@linaro.org>, Maxime Coquelin <maxime.coquelin@r
 
 From: Maxime Coquelin <maxime.coquelin@redhat.com>
 
-This patch provides a way for virtio-net to notify the
-backend about the host MTU set by the user.
+This patch allows advising guest with host MTU's by setting
+host_mtu parameter.
+
+If VIRTIO_NET_F_MTU has been successfully negotiated, MTU
+value is passed to the backend.
 
 Cc: Michael S. Tsirkin <mst@redhat.com>
-Cc: Aaron Conole <aconole@redhat.com>
+Cc: Aaron Conole <aconole@redhat.com
 Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- include/net/vhost_net.h |  2 ++
- hw/net/vhost_net.c      | 18 ++++++++++++++++++
+ include/hw/virtio/virtio-net.h |  1 +
+ hw/net/virtio-net.c            | 19 +++++++++++++++++++
  2 files changed, 20 insertions(+)
 
-diff --git a/include/net/vhost_net.h b/include/net/vhost_net.h
-index 5a08eff..afc1499 100644
---- a/include/net/vhost_net.h
-+++ b/include/net/vhost_net.h
-@@ -35,4 +35,6 @@ int vhost_set_vring_enable(NetClientState * nc, int enable);
+diff --git a/include/hw/virtio/virtio-net.h b/include/hw/virtio/virtio-net.h
+index 0ced975..8ea56a8 100644
+--- a/include/hw/virtio/virtio-net.h
++++ b/include/hw/virtio/virtio-net.h
+@@ -36,6 +36,7 @@ typedef struct virtio_net_conf
+     int32_t txburst;
+     char *tx;
+     uint16_t rx_queue_size;
++    uint16_t mtu;
+ } virtio_net_conf;
  
- uint64_t vhost_net_get_acked_features(VHostNetState *net);
- 
-+int vhost_net_set_mtu(struct vhost_net *net, uint16_t mtu);
-+
- #endif
-diff --git a/hw/net/vhost_net.c b/hw/net/vhost_net.c
-index f2d49ad..6280422 100644
---- a/hw/net/vhost_net.c
-+++ b/hw/net/vhost_net.c
-@@ -51,6 +51,7 @@ static const int kernel_feature_bits[] = {
-     VIRTIO_RING_F_EVENT_IDX,
-     VIRTIO_NET_F_MRG_RXBUF,
-     VIRTIO_F_VERSION_1,
-+    VIRTIO_NET_F_MTU,
-     VHOST_INVALID_FEATURE_BIT
+ /* Maximum packet size we can receive from tap device: header + 64k */
+diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+index 6f98eab..7b3ad4a 100644
+--- a/hw/net/virtio-net.c
++++ b/hw/net/virtio-net.c
+@@ -55,6 +55,8 @@ static VirtIOFeature feature_sizes[] = {
+      .end = endof(struct virtio_net_config, status)},
+     {.flags = 1 << VIRTIO_NET_F_MQ,
+      .end = endof(struct virtio_net_config, max_virtqueue_pairs)},
++    {.flags = 1 << VIRTIO_NET_F_MTU,
++     .end = endof(struct virtio_net_config, mtu)},
+     {}
  };
  
-@@ -74,6 +75,7 @@ static const int user_feature_bits[] = {
-     VIRTIO_NET_F_HOST_ECN,
-     VIRTIO_NET_F_HOST_UFO,
-     VIRTIO_NET_F_MRG_RXBUF,
-+    VIRTIO_NET_F_MTU,
+@@ -81,6 +83,7 @@ static void virtio_net_get_config(VirtIODevice *vdev, uint8_t *config)
  
-     /* This bit implies RARP isn't sent by QEMU out of band */
-     VIRTIO_NET_F_GUEST_ANNOUNCE,
-@@ -435,6 +437,17 @@ int vhost_set_vring_enable(NetClientState *nc, int enable)
-     return 0;
+     virtio_stw_p(vdev, &netcfg.status, n->status);
+     virtio_stw_p(vdev, &netcfg.max_virtqueue_pairs, n->max_queues);
++    virtio_stw_p(vdev, &netcfg.mtu, n->net_conf.mtu);
+     memcpy(netcfg.mac, n->mac, ETH_ALEN);
+     memcpy(config, &netcfg, n->config_size);
  }
+@@ -152,6 +155,16 @@ static void virtio_net_vhost_status(VirtIONet *n, uint8_t status)
+             qemu_net_queue_purge(qnc->incoming_queue, qnc->peer);
+         }
  
-+int vhost_net_set_mtu(struct vhost_net *net, uint16_t mtu)
-+{
-+    const VhostOps *vhost_ops = net->dev.vhost_ops;
++        if (virtio_has_feature(vdev->guest_features, VIRTIO_NET_F_MTU)) {
++            r = vhost_net_set_mtu(get_vhost_net(nc->peer), n->net_conf.mtu);
++            if (r < 0) {
++                error_report("%uBytes MTU not supported by the backend",
++                             n->net_conf.mtu);
 +
-+    if (!vhost_ops->vhost_net_set_mtu) {
-+        return 0;
++                return;
++            }
++        }
++
+         n->vhost_started = 1;
+         r = vhost_net_start(vdev, n->nic->ncs, queues);
+         if (r < 0) {
+@@ -1721,6 +1734,7 @@ static void virtio_net_set_config_size(VirtIONet *n, uint64_t host_features)
+ {
+     int i, config_size = 0;
+     virtio_add_feature(&host_features, VIRTIO_NET_F_MAC);
++
+     for (i = 0; feature_sizes[i].flags != 0; i++) {
+         if (host_features & feature_sizes[i].flags) {
+             config_size = MAX(feature_sizes[i].end, config_size);
+@@ -1750,6 +1764,10 @@ static void virtio_net_device_realize(DeviceState *dev, Error **errp)
+     NetClientState *nc;
+     int i;
+ 
++    if (n->net_conf.mtu) {
++        n->host_features |= (0x1 << VIRTIO_NET_F_MTU);
 +    }
 +
-+    return vhost_ops->vhost_net_set_mtu(&net->dev, mtu);
-+}
-+
- #else
- uint64_t vhost_net_get_max_queues(VHostNetState *net)
- {
-@@ -501,4 +514,9 @@ int vhost_set_vring_enable(NetClientState *nc, int enable)
- {
-     return 0;
- }
-+
-+int vhost_net_set_mtu(struct vhost_net *net, uint16_t mtu)
-+{
-+    return 0;
-+}
- #endif
+     virtio_net_set_config_size(n, n->host_features);
+     virtio_init(vdev, "virtio-net", VIRTIO_ID_NET, n->config_size);
+ 
+@@ -1948,6 +1966,7 @@ static Property virtio_net_properties[] = {
+     DEFINE_PROP_STRING("tx", VirtIONet, net_conf.tx),
+     DEFINE_PROP_UINT16("rx_queue_size", VirtIONet, net_conf.rx_queue_size,
+                        VIRTIO_NET_RX_QUEUE_DEFAULT_SIZE),
++    DEFINE_PROP_UINT16("host_mtu", VirtIONet, net_conf.mtu, 0),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
 -- 
 MST
