@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47278)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47303)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cR0XA-0005Ac-65
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 12:48:33 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cR0XC-0005Ce-3F
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 12:48:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cR0X9-0007oC-7n
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 12:48:32 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56684)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cR0XA-0007oy-SK
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 12:48:34 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57960)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1cR0X8-0007nm-Vg
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 12:48:31 -0500
+	id 1cR0XA-0007oZ-Jm
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 12:48:32 -0500
 Received: from int-mx14.intmail.prod.int.phx2.redhat.com
 	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 203A880F93
-	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 17:48:31 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id B658831B305
+	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 17:48:32 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue, 10 Jan 2017 18:47:59 +0100
-Message-Id: <20170110174810.17748-10-marcandre.lureau@redhat.com>
+Date: Tue, 10 Jan 2017 18:48:00 +0100
+Message-Id: <20170110174810.17748-11-marcandre.lureau@redhat.com>
 In-Reply-To: <20170110174810.17748-1-marcandre.lureau@redhat.com>
 References: <20170110174810.17748-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 09/20] char: introduce generic
- qemu_chr_get_kind()
+Subject: [Qemu-devel] [PATCH v2 10/20] char: use a feature bit for replay
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,163 +36,179 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, eblake@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-This allows to remove the "is_mux" field from CharDriverState.
+Use a feature flag rather than a structure field for "replay".
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- include/sysemu/char.h | 15 +++++++++++++--
- monitor.c             |  2 +-
- qemu-char.c           | 21 ++++++++++-----------
- 3 files changed, 24 insertions(+), 14 deletions(-)
+ include/sysemu/char.h |  3 ++-
+ qemu-char.c           | 33 ++++++++++++++++++++-------------
+ 2 files changed, 22 insertions(+), 14 deletions(-)
 
 diff --git a/include/sysemu/char.h b/include/sysemu/char.h
-index 2dd05642fb..7d841ad879 100644
+index 7d841ad879..b0b4231d4c 100644
 --- a/include/sysemu/char.h
 +++ b/include/sysemu/char.h
-@@ -96,7 +96,6 @@ struct CharDriverState {
-     char *filename;
+@@ -69,6 +69,8 @@ typedef enum {
+     /* Whether it is possible to send/recv file descriptors
+      * over the data channel */
+     QEMU_CHAR_FEATURE_FD_PASS,
++    /* Whether replay or record mode is enabled */
++    QEMU_CHAR_FEATURE_REPLAY,
+=20
+     QEMU_CHAR_FEATURE_LAST,
+ } CharDriverFeature;
+@@ -97,7 +99,6 @@ struct CharDriverState {
      int logfd;
      int be_open;
--    int is_mux;
      guint fd_in_tag;
-     bool replay;
+-    bool replay;
      DECLARE_BITMAP(features, QEMU_CHAR_FEATURE_LAST);
-@@ -455,7 +454,19 @@ void qemu_chr_be_generic_open(CharDriverState *s);
- void qemu_chr_fe_accept_input(CharBackend *be);
- int qemu_chr_add_client(CharDriverState *s, int fd);
- CharDriverState *qemu_chr_find(const char *name);
--bool chr_is_ringbuf(const CharDriverState *chr);
-+
-+/**
-+ * @qemu_chr_get_kind:
-+ *
-+ * Returns the kind of char backend, or -1 if unspecified.
-+ */
-+ChardevBackendKind qemu_chr_get_kind(const CharDriverState *chr);
-+
-+static inline bool qemu_chr_is_ringbuf(const CharDriverState *chr)
-+{
-+    return qemu_chr_get_kind(chr) =3D=3D CHARDEV_BACKEND_KIND_RINGBUF ||
-+        qemu_chr_get_kind(chr) =3D=3D CHARDEV_BACKEND_KIND_MEMORY;
-+}
-=20
- bool qemu_chr_has_feature(CharDriverState *chr,
-                           CharDriverFeature feature);
-diff --git a/monitor.c b/monitor.c
-index 0841d436b0..17948f5289 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -3194,7 +3194,7 @@ static void ringbuf_completion(ReadLineState *rs, c=
-onst char *str)
-=20
-         if (!strncmp(chr_info->label, str, len)) {
-             CharDriverState *chr =3D qemu_chr_find(chr_info->label);
--            if (chr && chr_is_ringbuf(chr)) {
-+            if (chr && qemu_chr_is_ringbuf(chr)) {
-                 readline_add_completion(rs, chr_info->label);
-             }
-         }
+     QTAILQ_ENTRY(CharDriverState) next;
+ };
 diff --git a/qemu-char.c b/qemu-char.c
-index 305f410c73..a9ef28c370 100644
+index a9ef28c370..0976d94c1f 100644
 --- a/qemu-char.c
 +++ b/qemu-char.c
-@@ -781,7 +781,7 @@ static void muxes_realize_done(Notifier *notifier, vo=
-id *unused)
-     CharDriverState *chr;
+@@ -277,6 +277,11 @@ static int qemu_chr_fe_write_buffer(CharDriverState =
+*s, const uint8_t *buf, int
+     return res;
+ }
 =20
-     QTAILQ_FOREACH(chr, &chardevs, next) {
--        if (chr->is_mux) {
-+        if (qemu_chr_get_kind(chr) =3D=3D CHARDEV_BACKEND_KIND_MUX) {
-             MuxDriver *d =3D chr->opaque;
-             int i;
-=20
-@@ -888,7 +888,6 @@ static CharDriverState *qemu_chr_open_mux(const CharD=
-river *driver,
-      * set of muxes
-      */
-     *be_opened =3D muxes_realized;
--    chr->is_mux =3D 1;
-     if (!qemu_chr_fe_init(&d->chr, drv, errp)) {
-         qemu_chr_free(chr);
-         return NULL;
-@@ -906,7 +905,7 @@ bool qemu_chr_fe_init(CharBackend *b, CharDriverState=
- *s, Error **errp)
++static bool qemu_chr_replay(CharDriverState *chr)
++{
++    return qemu_chr_has_feature(chr, QEMU_CHAR_FEATURE_REPLAY);
++}
++
+ int qemu_chr_fe_write(CharBackend *be, const uint8_t *buf, int len)
  {
-     int tag =3D 0;
+     CharDriverState *s =3D be->chr;
+@@ -286,7 +291,7 @@ int qemu_chr_fe_write(CharBackend *be, const uint8_t =
+*buf, int len)
+         return 0;
+     }
 =20
--    if (s->is_mux) {
-+    if (qemu_chr_get_kind(s) =3D=3D CHARDEV_BACKEND_KIND_MUX) {
-         MuxDriver *d =3D s->opaque;
+-    if (s->replay && replay_mode =3D=3D REPLAY_MODE_PLAY) {
++    if (qemu_chr_replay(s) && replay_mode =3D=3D REPLAY_MODE_PLAY) {
+         int offset;
+         replay_char_write_event_load(&ret, &offset);
+         assert(offset <=3D len);
+@@ -303,7 +308,7 @@ int qemu_chr_fe_write(CharBackend *be, const uint8_t =
+*buf, int len)
 =20
-         if (d->mux_cnt >=3D MAX_MUX) {
-@@ -933,7 +932,7 @@ unavailable:
+     qemu_mutex_unlock(&s->chr_write_lock);
+    =20
+-    if (s->replay && replay_mode =3D=3D REPLAY_MODE_RECORD) {
++    if (qemu_chr_replay(s) && replay_mode =3D=3D REPLAY_MODE_RECORD) {
+         replay_char_write_event_save(ret, ret < 0 ? 0 : ret);
+     }
+    =20
+@@ -315,7 +320,7 @@ static int qemu_chr_write_all(CharDriverState *s, con=
+st uint8_t *buf, int len)
+     int offset;
+     int res;
 =20
- static bool qemu_chr_is_busy(CharDriverState *s)
- {
--    if (s->is_mux) {
-+    if (qemu_chr_get_kind(s) =3D=3D CHARDEV_BACKEND_KIND_MUX) {
-         MuxDriver *d =3D s->opaque;
-         return d->mux_cnt >=3D 0;
+-    if (s->replay && replay_mode =3D=3D REPLAY_MODE_PLAY) {
++    if (qemu_chr_replay(s) && replay_mode =3D=3D REPLAY_MODE_PLAY) {
+         replay_char_write_event_load(&res, &offset);
+         assert(offset <=3D len);
+         qemu_chr_fe_write_buffer(s, buf, offset, &offset);
+@@ -324,7 +329,7 @@ static int qemu_chr_write_all(CharDriverState *s, con=
+st uint8_t *buf, int len)
+=20
+     res =3D qemu_chr_fe_write_buffer(s, buf, len, &offset);
+=20
+-    if (s->replay && replay_mode =3D=3D REPLAY_MODE_RECORD) {
++    if (qemu_chr_replay(s) && replay_mode =3D=3D REPLAY_MODE_RECORD) {
+         replay_char_write_event_save(res, offset);
+     }
+=20
+@@ -355,7 +360,7 @@ int qemu_chr_fe_read_all(CharBackend *be, uint8_t *bu=
+f, int len)
+         return 0;
+     }
+=20
+-    if (s->replay && replay_mode =3D=3D REPLAY_MODE_PLAY) {
++    if (qemu_chr_replay(s) && replay_mode =3D=3D REPLAY_MODE_PLAY) {
+         return replay_char_read_all_load(buf);
+     }
+=20
+@@ -372,7 +377,7 @@ int qemu_chr_fe_read_all(CharBackend *be, uint8_t *bu=
+f, int len)
+         }
+=20
+         if (res < 0) {
+-            if (s->replay && replay_mode =3D=3D REPLAY_MODE_RECORD) {
++            if (qemu_chr_replay(s) && replay_mode =3D=3D REPLAY_MODE_REC=
+ORD) {
+                 replay_char_read_all_save_error(res);
+             }
+             return res;
+@@ -385,7 +390,7 @@ int qemu_chr_fe_read_all(CharBackend *be, uint8_t *bu=
+f, int len)
+         }
+     }
+=20
+-    if (s->replay && replay_mode =3D=3D REPLAY_MODE_RECORD) {
++    if (qemu_chr_replay(s) && replay_mode =3D=3D REPLAY_MODE_RECORD) {
+         replay_char_read_all_save_buf(buf, offset);
+     }
+     return offset;
+@@ -396,7 +401,7 @@ int qemu_chr_fe_ioctl(CharBackend *be, int cmd, void =
+*arg)
+     CharDriverState *s =3D be->chr;
+     int res;
+=20
+-    if (!s || !s->driver->chr_ioctl || s->replay) {
++    if (!s || !s->driver->chr_ioctl || qemu_chr_replay(s)) {
+         res =3D -ENOTSUP;
      } else {
-@@ -950,7 +949,7 @@ void qemu_chr_fe_deinit(CharBackend *b)
-         if (b->chr->be =3D=3D b) {
-             b->chr->be =3D NULL;
-         }
--        if (b->chr->is_mux) {
-+        if (qemu_chr_get_kind(b->chr) =3D=3D CHARDEV_BACKEND_KIND_MUX) {
-             MuxDriver *d =3D b->chr->opaque;
-             d->backends[b->tag] =3D NULL;
-         }
-@@ -1001,7 +1000,7 @@ void qemu_chr_fe_set_handlers(CharBackend *b,
-         }
-     }
+         res =3D s->driver->chr_ioctl(s, cmd, arg);
+@@ -427,7 +432,7 @@ void qemu_chr_be_write_impl(CharDriverState *s, uint8=
+_t *buf, int len)
 =20
--    if (s->is_mux) {
-+    if (qemu_chr_get_kind(s) =3D=3D CHARDEV_BACKEND_KIND_MUX) {
-         mux_chr_set_handlers(s, context);
-     }
- }
-@@ -1012,7 +1011,7 @@ void qemu_chr_fe_take_focus(CharBackend *b)
-         return;
-     }
-=20
--    if (b->chr->is_mux) {
-+    if (qemu_chr_get_kind(b->chr) =3D=3D CHARDEV_BACKEND_KIND_MUX) {
-         mux_set_focus(b->chr, b->tag);
-     }
- }
-@@ -3557,9 +3556,9 @@ fail:
-     return NULL;
- }
-=20
--bool chr_is_ringbuf(const CharDriverState *chr)
-+ChardevBackendKind qemu_chr_get_kind(const CharDriverState *chr)
+ void qemu_chr_be_write(CharDriverState *s, uint8_t *buf, int len)
  {
--    return chr->driver->chr_write =3D=3D ringbuf_chr_write;
-+    return chr->driver->kind;
- }
-=20
- void qmp_ringbuf_write(const char *device, const char *data,
-@@ -3577,7 +3576,7 @@ void qmp_ringbuf_write(const char *device, const ch=
-ar *data,
+-    if (s->replay) {
++    if (qemu_chr_replay(s)) {
+         if (replay_mode =3D=3D REPLAY_MODE_PLAY) {
+             return;
+         }
+@@ -442,7 +447,7 @@ int qemu_chr_fe_get_msgfd(CharBackend *be)
+     CharDriverState *s =3D be->chr;
+     int fd;
+     int res =3D (qemu_chr_fe_get_msgfds(be, &fd, 1) =3D=3D 1) ? fd : -1;
+-    if (s && s->replay) {
++    if (s && qemu_chr_replay(s)) {
+         fprintf(stderr,
+                 "Replay: get msgfd is not supported for serial devices y=
+et\n");
+         exit(1);
+@@ -4247,8 +4252,10 @@ CharDriverState *qemu_chr_new(const char *label, c=
+onst char *filename)
+     CharDriverState *chr;
+     chr =3D qemu_chr_new_noreplay(label, filename);
+     if (chr) {
+-        chr->replay =3D replay_mode !=3D REPLAY_MODE_NONE;
+-        if (chr->replay && chr->driver->chr_ioctl) {
++        if (replay_mode !=3D REPLAY_MODE_NONE) {
++            qemu_chr_set_feature(chr, QEMU_CHAR_FEATURE_REPLAY);
++        }
++        if (qemu_chr_replay(chr) && chr->driver->chr_ioctl) {
+             fprintf(stderr,
+                     "Replay: ioctl is not supported for serial devices y=
+et\n");
+         }
+@@ -4995,7 +5002,7 @@ void qmp_chardev_remove(const char *id, Error **err=
+p)
+         error_setg(errp, "Chardev '%s' is busy", id);
          return;
      }
-=20
--    if (!chr_is_ringbuf(chr)) {
-+    if (!qemu_chr_is_ringbuf(chr)) {
-         error_setg(errp,"%s is not a ringbuf device", device);
+-    if (chr->replay) {
++    if (qemu_chr_replay(chr)) {
+         error_setg(errp,
+             "Chardev '%s' cannot be unplugged in record/replay mode", id=
+);
          return;
-     }
-@@ -3621,7 +3620,7 @@ char *qmp_ringbuf_read(const char *device, int64_t =
-size,
-         return NULL;
-     }
-=20
--    if (!chr_is_ringbuf(chr)) {
-+    if (!qemu_chr_is_ringbuf(chr)) {
-         error_setg(errp,"%s is not a ringbuf device", device);
-         return NULL;
-     }
 --=20
 2.11.0
