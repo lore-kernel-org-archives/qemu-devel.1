@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45868)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46784)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cQrkW-0000AQ-G7
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 03:25:45 -0500
+	(envelope-from <dovgaluk@ispras.ru>) id 1cQrpt-0001nU-Hc
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 03:31:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1cQrkR-00075k-G0
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 03:25:44 -0500
-Received: from 9.mo69.mail-out.ovh.net ([46.105.56.78]:51591)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1cQrkR-00075Y-8v
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 03:25:39 -0500
-Received: from player696.ha.ovh.net (b7.ovh.net [213.186.33.57])
-	by mo69.mail-out.ovh.net (Postfix) with ESMTP id 436EDFDFA
-	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 09:25:36 +0100 (CET)
-Date: Tue, 10 Jan 2017 09:25:22 +0100
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170110092522.36354170@bahia.lan>
-In-Reply-To: <1483981368-9965-4-git-send-email-ashijeetacharya@gmail.com>
-References: <1483981368-9965-1-git-send-email-ashijeetacharya@gmail.com>
-	<1483981368-9965-4-git-send-email-ashijeetacharya@gmail.com>
+	(envelope-from <dovgaluk@ispras.ru>) id 1cQrpo-00007t-Lz
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 03:31:17 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:60984)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1cQrpo-000071-Er
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 03:31:12 -0500
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <CAMo8BfLRP8qUgJAkU3fSwE_H6EmqYmPKO_MhMn7B6WpwGWUudw@mail.gmail.com>
+In-Reply-To: <CAMo8BfLRP8qUgJAkU3fSwE_H6EmqYmPKO_MhMn7B6WpwGWUudw@mail.gmail.com>
+Date: Tue, 10 Jan 2017 11:31:10 +0300
+Message-ID: <001201d26b1b$e5a8ce20$b0fa6a60$@ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain;
+	charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 3/4] migration: disallow
- migrate_add_blocker during migration
+Content-Language: ru
+Subject: Re: [Qemu-devel] implementing architectural timers using QEMU timers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,52 +28,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ashijeet Acharya <ashijeetacharya@gmail.com>
-Cc: dgilbert@redhat.com, jsnow@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, kwolf@redhat.com, armbru@redhat.com, quintela@redhat.com, mst@redhat.com, marcandre.lureau@redhat.com, aneesh.kumar@linux.vnet.ibm.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
+To: 'Max Filippov' <jcmvbkbc@gmail.com>, 'qemu-devel' <qemu-devel@nongnu.org>
+Cc: 'Richard Henderson' <rth@twiddle.net>, 'Alex Bligh' <alex@alex.org.uk>, 'Pavel Dovgaluk' <Pavel.Dovgaluk@ispras.ru>
 
-On Mon,  9 Jan 2017 22:32:47 +0530
-Ashijeet Acharya <ashijeetacharya@gmail.com> wrote:
-> [...]
-> diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-> index faebd91..c823a44 100644
-> --- a/hw/9pfs/9p.c
-> +++ b/hw/9pfs/9p.c
-> @@ -1013,20 +1013,28 @@ static void coroutine_fn v9fs_attach(void *opaque)
->          goto out;
->      }
->      err += offset;
-> -    memcpy(&s->root_qid, &qid, sizeof(qid));
-> -    trace_v9fs_attach_return(pdu->tag, pdu->id,
-> -                             qid.type, qid.version, qid.path);
-> +
->      /*
->       * disable migration if we haven't done already.
->       * attach could get called multiple times for the same export.
->       */
->      if (!s->migration_blocker) {
-> -        s->root_fid = fid;
->          error_setg(&s->migration_blocker,
->                     "Migration is disabled when VirtFS export path '%s' is mounted in the guest using mount_tag '%s'",
->                     s->ctx.fs_root ? s->ctx.fs_root : "NULL", s->tag);
-> -        migrate_add_blocker(s->migration_blocker);
-> +        err = migrate_add_blocker(s->migration_blocker, NULL);
-> +        if (err < 0) {
-> +            error_free(s->migration_blocker);
-> +            s->migration_blocker = NULL;
-> +            clunk_fid(s, fid);
-> +            goto out;
-> +        }
-> +        s->root_fid = fid;
->      }
+> From: Max Filippov [mailto:jcmvbkbc@gmail.com]
 
-Hmm... my suggestion was to deal with the migration blocker before the call
-to pdu_marshal() since there's no point in copying the qid if we're about
-to return an error back to the guest.
+> I'm trying to reimplement xtensa CCOUNT (cycle counter) and
+> CCOMPARE (CCOUNT-based timer interrupts) using QEMU
+> timers. That is CCOUNT value is derived from the
+> QEMU_CLOCK_VIRTUAL clock and CCOMPARE interrupts are
+> generated from the QEMU_CLOCK_VIRTUAL timer callbacks.
+> The code is here:
+>   https://github.com/OSLL/qemu-xtensa/commits/xtensa-ccount
+> 
+> I've got the following issues doing that:
+> 
+> - I thought that could be improved in -icount mode, so I tried that.
+>   It is better with -icount, but it's still not 100% accurate. That is
+>   I was able to observe guest reading QEMU clock value that is
+>   past QEMU timer deadline before that timer callback was
+>   invoked.
 
-> +
-> +    memcpy(&s->root_qid, &qid, sizeof(qid));
-> +    trace_v9fs_attach_return(pdu->tag, pdu->id,
-> +                             qid.type, qid.version, qid.path);
->  out:
->      put_fid(pdu, fidp);
->  out_nofid:
+icount is meant to be 100% accurate.
+tcg_get_icount_limit function calculates the deadline before the soonest
+virtual timer and executes number of instructions that will fit this
+timeout.
+
+Maybe you need the accuracy that is higher than the precision of the virtual clock?
+Every executed instruction in icount mode takes fixed period of virtual time.
+
+Pavel Dovgalyuk
