@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49937)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50122)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cQz8k-0002Ik-It
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 11:19:15 -0500
+	(envelope-from <lersek@redhat.com>) id 1cQz9A-0002V9-RW
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 11:19:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cQz8i-0000WB-1z
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 11:19:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46712)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cQz8h-0000Vl-T7
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 11:19:11 -0500
-From: Markus Armbruster <armbru@redhat.com>
-References: <1479108340-3453-1-git-send-email-caoj.fnst@cn.fujitsu.com>
-	<20170109234446-mutt-send-email-mst@kernel.org>
-	<87bmvftejz.fsf@dusky.pond.sub.org>
-	<20170110162151-mutt-send-email-mst@kernel.org>
-Date: Tue, 10 Jan 2017 17:19:07 +0100
-In-Reply-To: <20170110162151-mutt-send-email-mst@kernel.org> (Michael
-	S. Tsirkin's message of "Tue, 10 Jan 2017 16:38:00 +0200")
-Message-ID: <87pojuc2h0.fsf@dusky.pond.sub.org>
+	(envelope-from <lersek@redhat.com>) id 1cQz99-0000jF-Fl
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 11:19:40 -0500
+References: <20161201170624.26496-1-lersek@redhat.com>
+	<20170110170453-mutt-send-email-mst@kernel.org>
+	<26322db9-c82b-405f-b2a8-f2d16b0d69b0@redhat.com>
+	<20170110180439-mutt-send-email-mst@kernel.org>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <d0fe82cd-ad71-f125-14d7-0d10e2308869@redhat.com>
+Date: Tue, 10 Jan 2017 17:19:31 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v7 00/10] Convert msix_init() to error
+In-Reply-To: <20170110180439-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 0/7] q35: add negotiable broadcast SMI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,50 +26,125 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Jiri Pirko <jiri@resnulli.us>, Jason Wang <jasowang@redhat.com>, Cao jin <caoj.fnst@cn.fujitsu.com>, qemu-devel@nongnu.org, Dmitry Fleytman <dmitry@daynix.com>, Alex Williamson <alex.williamson@redhat.com>, Hannes Reinecke <hare@suse.de>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu devel list <qemu-devel@nongnu.org>, "Gabriel L. Somlo" <somlo@cmu.edu>, Eduardo Habkost <ehabkost@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Michael Walle <michael@walle.cc>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org
 
-"Michael S. Tsirkin" <mst@redhat.com> writes:
+On 01/10/17 17:05, Michael S. Tsirkin wrote:
+> On Tue, Jan 10, 2017 at 04:23:41PM +0100, Laszlo Ersek wrote:
+>> On 01/10/17 16:06, Michael S. Tsirkin wrote:
+>>> On Thu, Dec 01, 2016 at 06:06:17PM +0100, Laszlo Ersek wrote:
+>>>> * This is version 4 of the series; the last version was at
+>>>>   <http://lists.nongnu.org/archive/html/qemu-devel/2016-11/msg03582.html>.
+>>>>
+>>>>   This version is practically a rewrite from scratch, seeking to address
+>>>>   the v3 feedback. Here's what the individual patches do:
+>>>>
+>>>>   - Patch #1 rebases and extends Michael's "writeable fw_cfg blobs"
+>>>>     patch from Feb/March 2016. The changes relative to the original
+>>>>     patch are documented in the commit message (the code changes are
+>>>>     minimal).
+>>>>
+>>>>   - Patches #2 and #3 turn the FW_CFG_FILE_SLOTS constant into a device
+>>>>     property, and expose the desired number of fw_cfg file slots to
+>>>>     board code. This is meant to address a concern raised by Paolo in
+>>>>     the v2 review
+>>>>     <http://lists.nongnu.org/archive/html/qemu-devel/2016-11/msg03125.html>,
+>>>>     namely that we're about to run out of FW_CFG_FILE_SLOTS.
+>>>>
+>>>>   - Patch #4 introduces the "pc-q35-2.9" and "pc-i440fx-2.9" machine
+>>>>     types, which are allowed to take advantage of the new default for
+>>>>     fw_cfg file slots (0x20 rather than 0x10).
+>>>>
+>>>>   - Patch #5 introduces SMI feature negotiation via fw_cfg, with the
+>>>>     following new files:
+>>>>
+>>>>     - etc/smi/host-features
+>>>>     - etc/smi/guest-features
+>>>>     - etc/smi/features-ok
+>>>>
+>>>>     This is supposed to follow Michael's recommendation re: imitating
+>>>>     virtio
+>>>>     <http://lists.nongnu.org/archive/html/qemu-devel/2016-11/msg03218.html>.
+>>>>
+>>>>     The guest-features file is freely writeable by the guest (no write
+>>>>     callbacks in fw_cfg), and the feature validation & lockdown occurs
+>>>>     when the guest selects the features-ok file (for reading).
+>>>>
+>>>>     Board code is allowed to choose the host feature bitmap to
+>>>>     advertise.
+>>>>
+>>>>     This patch doesn't add any specific SMI features yet.
+>>>>
+>>>>   - Patch #6 adds the ICH9_LPC_SMI_F_BROADCAST feature.
+>>>>
+>>>>   - Patch #7 introduces the PCMachineClass.get_smi_host_features method,
+>>>>     and implements it for "pc-q35-2.9" and later. The idea is to tie the
+>>>>     SMI host features to machine types, and let the machine types
+>>>>     calculate their host features with code (i.e., not just a constant).
+>>>>
+>>>>     In this patch, the "pc-q35-2.9" machine type exposes the
+>>>>     ICH9_LPC_SMI_F_BROADCAST feature iff (smp_cpus == max_cpus), that
+>>>>     is, when VCPU hotplug is not possible. (Also from Paolo's v3
+>>>>     feedback, in
+>>>>     <http://lists.nongnu.org/archive/html/qemu-devel/2016-11/msg04919.html>.)
+>>>>
+>>>> * I've written the OVMF side patches too and tested them together
+>>>>   (including gdb / debug messages for "white box" testing).
+>>>>
+>>>> * Note that this version depends on the following PULL req from Michael:
+>>>>
+>>>>   [Qemu-devel] [PULL 0/5] virtio, vhost, pc: fixes
+>>>>   http://lists.nongnu.org/archive/html/qemu-devel/2016-11/msg05503.html
+>>>>
+>>>>   In particular on the following patch:
+>>>>   "loader: fix handling of custom address spaces when adding ROM blobs"
+>>>>
+>>>> Cc: "Gabriel L. Somlo" <somlo@cmu.edu>
+>>>> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+>>>> Cc: Eduardo Habkost <ehabkost@redhat.com>
+>>>> Cc: Gerd Hoffmann <kraxel@redhat.com>
+>>>> Cc: Igor Mammedov <imammedo@redhat.com>
+>>>> Cc: Michael Walle <michael@walle.cc>
+>>>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>>>> Cc: Peter Maydell <peter.maydell@linaro.org>
+>>>> Cc: Shannon Zhao <zhaoshenglong@huawei.com>
+>>>> Cc: qemu-arm@nongnu.org
+>>>>
+>>>> Thanks
+>>>> Laszlo
+>>>
+>>> So I reviewed fw cfg stuff, looks good to me.
+>>
+>> Thank you.
+>>
+>> I should note that Igor suggested / requested changes for patches #2 and
+>> #3; the sub-threads start at
+>>
+>> http://lists.nongnu.org/archive/html/qemu-devel/2016-12/msg00695.html
+>> msg-id: <20161206115038.4495a217@nial.brq.redhat.com>
+>>
+>> http://lists.nongnu.org/archive/html/qemu-devel/2016-12/msg00706.html
+>> msg-id: <20161206124906.76a41896@nial.brq.redhat.com>
+>>
+>> I was about to rework the patches based on his feedback. Should we
+>> resume those discussions?
+> 
+> If you both agree, pls go ahead and make these changes.
 
-> On Tue, Jan 10, 2017 at 11:06:08AM +0100, Markus Armbruster wrote:
->> "Michael S. Tsirkin" <mst@redhat.com> writes:
->> 
->> > On Mon, Nov 14, 2016 at 03:25:30PM +0800, Cao jin wrote:
->> >> v7 changelog:
->> >> 1. fix the segfaut bug in patch 2. So drop the all the R-b of it,
->> >>    please take a look, there is detailed description in the patch.
->> >> 2. add the R-b from Hannes Reinecke
->> >> 
->> >> Test:
->> >> 1. make check: pass
->> >> 2. After applied all the patch, command line test for all the
->> >>    affected devices, just make sure device realize process is ok,
->> >>    no crash, but no further use of device.
->> >
->> > Consider the megasas device for example, don't you
->> > need to test that the change actually does what
->> > it's intended to do?
->> 
->> For better or worse, that's a higher bar than we commonly require for
->> refactorings.
->> 
->> [...]
->
-> Well the patch says that it's addressing a TODO. If no one can
-> be bothered to test the functionality, maybe we shouldn't bother
-> with the change.
->
-> Generally this patchset is at v7.  It brings a very limited benefit to
-> the project.  It better be perfect otherwise I don't see why bother.
+Okay, will do.
 
-We obviously disagree on the benefit.  Before this series, error
-reporting is *broken* for QMP.  Fixing that is definitely not "why
-bother" material.
+> 
+>>> I'd prefer Paolo to review
+>>> and merge broadcast SMI stuff as appropriate.  Paolo, makes sense?
+>>
+>> If it helps, I can split the series into two "waves", and deal only with
+>> fw_cfg first.
+>>
+>> Thanks!
+>> Laszlo
+> 
+> I don't mind either way.
 
-I certainly don't object to tightening our testing habits.  I was merely
-pointing out that you're doing that.
+I'll see then how I feel about splitting v5 when I'm ready to post it. :)
 
-Testing patches that modernize interfaces often isn't easy for the
-person doing the work.  Fortunately, megasas has a maintainer: Hannes.
-Who gave his R-by.  For me, that would suffice, but you may see things
-differently.  Would a Tested-by from him satisfy you?  If not, what
-would satisfy you?
+Thanks!
+Laszlo
