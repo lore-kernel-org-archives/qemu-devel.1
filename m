@@ -1,39 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53600)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54430)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1cQvWK-0001nd-Fm
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 07:27:21 -0500
+	(envelope-from <imammedo@redhat.com>) id 1cQvYO-0003s8-0Z
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 07:29:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1cQvWF-0002br-Hc
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 07:27:20 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37518
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1cQvWF-0002bT-B9
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 07:27:15 -0500
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	v0ACOROV119016
-	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 07:27:14 -0500
-Received: from e37.co.us.ibm.com (e37.co.us.ibm.com [32.97.110.158])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 27vwk9n05y-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 07:27:13 -0500
-Received: from localhost
-	by e37.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Tue, 10 Jan 2017 05:27:13 -0700
-References: <1481767396-187748-1-git-send-email-arei.gonglei@huawei.com>
-	<1481767396-187748-2-git-send-email-arei.gonglei@huawei.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Tue, 10 Jan 2017 13:27:04 +0100
+	(envelope-from <imammedo@redhat.com>) id 1cQvYJ-0003Gy-8M
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 07:29:28 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36830)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cQvYI-0003Ez-WF
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 07:29:23 -0500
+Received: from int-mx14.intmail.prod.int.phx2.redhat.com
+	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 063BEC0567A3
+	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 12:29:23 +0000 (UTC)
+Date: Tue, 10 Jan 2017 13:29:19 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170110132919.1dcfc5e1@nial.brq.redhat.com>
+In-Reply-To: <20170110070752-mutt-send-email-mst@kernel.org>
+References: <1480980749-182204-1-git-send-email-imammedo@redhat.com>
+	<20170109152201.311fdebb@nial.brq.redhat.com>
+	<20170110070752-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <1481767396-187748-2-git-send-email-arei.gonglei@huawei.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 8bit
-Message-Id: <e235caf4-f51c-dccf-4eb7-548d3fa71644@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v8 1/1] crypto: add virtio-crypto driver
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.9 00/10] pc: acpi: memory hotplug
+ cleanup/consolidation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,27 +35,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gonglei <arei.gonglei@huawei.com>, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, virtualization@lists.linux-foundation.org, linux-crypto@vger.kernel.org
-Cc: weidong.huang@huawei.com, claudio.fontana@huawei.com, mst@redhat.com, luonengjun@huawei.com, hanweidong@huawei.com, xuquan8@huawei.com, wanzongshun@huawei.com, stefanha@redhat.com, jianjay.zhou@huawei.com, longpeng2@huawei.com, arei.gonglei@hotmail.com, davem@davemloft.net, wu.wubin@huawei.com, herbert@gondor.apana.org.au
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On 12/15/2016 03:03 AM, Gonglei wrote:
-[...]
-> +
-> +static struct crypto_alg virtio_crypto_algs[] = { {
-> +	.cra_name = "cbc(aes)",
-> +	.cra_driver_name = "virtio_crypto_aes_cbc",
-> +	.cra_priority = 501,
+On Tue, 10 Jan 2017 07:08:57 +0200
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
+> On Mon, Jan 09, 2017 at 03:22:01PM +0100, Igor Mammedov wrote:
+> > On Tue,  6 Dec 2016 00:32:19 +0100
+> > Igor Mammedov <imammedo@redhat.com> wrote:
+> >   
+> > > Series cleanups and consolidates scattered memory hotplug
+> > > code so it could be easily reused by ARM target later.
+> > > 
+> > > As result:
+> > >  * added memory hotplug variant to bios tables test
+> > >  * all ACPI related parts of memory hotplug are consolidated
+> > >    within memory_hotplug.c
+> > >  * DSDT table size is reduced ~900 bytes when memory hotplug
+> > >    is not enabled (by not generating not used AML)
+> > >  * DSDT table size is reduced on 12 bytes per slot
+> > >    (i.e. up to ~3000 bytes savings for 256 DIMMs) with memory hotplug
+> > >    enabled due AML reorganization that makes calls to common functions
+> > >    smaller as devices and common functions are now within the same scope.
+> > > 
+> > > Tested with following guests:
+> > >   - RHEL7.3, WS2008DC, WS2008R2DC, WS2012R2DC, WS2016TP5 - no regressions found
+> > >   - XP3 and WS2003 - boots fine even if memhotplug is enabled (but otherwise
+> > >     it never worked as memhp is not supported there)  
+> > 
+> > Michael,
+> > 
+> > Marcel's already reviewed this series a while ago could you
+> > pull it in your tree if there aren't any questions?  
+> 
+> I merged this and updated expected files accordingly.
+> 
+> Could you please check expected files in my tree
+> to make sure it looks good?
+Merge looks good to me.
+I've gave your pci branch a quick memhp testing,
+hot-add/remove works as expected with RHEL7/WS2012r2.
 
-This is still higher than the hardware-accelerators (like intel aesni or the
-s390 cpacf functions or the arm hw). aesni and s390/cpacf are supported by the
-hardware virtualization and available to the guests. I do not see a way how virtio
-crypto can be faster than that (in the end it might be cpacf/aesni + overhead)
-instead it will very likely be slower.
-So we should use a number that is higher than software implementations but
-lower than the hw ones.
+Thanks!
 
-Just grepping around, the software ones seem be be around 100 and the hardware 
-ones around 200-400. So why was 150 not enough?
-
-Christian
+> 
+> Thanks!
+> 
+> >   
+> > > Git tree for testing:
+> > >   https://github.com/imammedo/qemu.git memhp_consolidate_v1
+> > > viewing:
+> > >   https://github.com/imammedo/qemu/commits/memhp_consolidate_v1
+> > > 
+> > > Note to maintaner:
+> > >   * blobs patch 2/10 should be merged to patch 1/10
+> > >   * ACPI tables should be regenarated and applied after series is merged
+> > >     as DSDT will cange for all tests cases due removal of inactive
+> > >     memory hotplug code.
+> > > 
+> > > CC: "Michael S. Tsirkin" <mst@redhat.com>
+> > > CC: Eduardo Habkost <ehabkost@redhat.com>
+> > > CC: Marcel Apfelbaum <marcel@redhat.com>
+> > > 
+> > > 
+> > > Igor Mammedov (10):
+> > >   tests: pc: add memory hotplug acpi tables tests
+> > >   tests: pc: acpi: add SRAT and DSDT blobs for memory hotplug variant
+> > >   memhp: move build_memory_hotplug_aml() into memory_hotplug.c
+> > >   memhp: move build_memory_devices() into memory_hotplug.c
+> > >   memhp: consolidate scattered MHPD device declaration
+> > >   memhp: merge build_memory_devices() into build_memory_hotplug_aml()
+> > >   memhp: move GPE handler_E03 into build_memory_hotplug_aml()
+> > >   memhp: move memory hotplug only defines to memory_hotplug.c
+> > >   memhp: don't generate memory hotplug AML if it's not enabled/supported
+> > >   memhp: move DIMM devices into dedicated scope with related common
+> > >     methods
+> > > 
+> > >  include/hw/acpi/memory_hotplug.h    |  12 +-
+> > >  include/hw/acpi/pc-hotplug.h        |  23 --
+> > >  hw/acpi/Makefile.objs               |   2 +-
+> > >  hw/acpi/ich9.c                      |   3 +-
+> > >  hw/acpi/memory_hotplug.c            | 420 +++++++++++++++++++++++++++++++++++-
+> > >  hw/acpi/memory_hotplug_acpi_table.c | 262 ----------------------
+> > >  hw/acpi/piix4.c                     |   3 +-
+> > >  hw/i386/acpi-build.c                | 197 +++--------------
+> > >  tests/acpi-test-data/pc/DSDT.memhp  | Bin 0 -> 6613 bytes
+> > >  tests/acpi-test-data/pc/SRAT.memhp  | Bin 0 -> 224 bytes
+> > >  tests/acpi-test-data/q35/DSDT.memhp | Bin 0 -> 9375 bytes
+> > >  tests/acpi-test-data/q35/SRAT.memhp | Bin 0 -> 224 bytes
+> > >  tests/bios-tables-test.c            |  24 +++
+> > >  13 files changed, 479 insertions(+), 467 deletions(-)
+> > >  delete mode 100644 hw/acpi/memory_hotplug_acpi_table.c
+> > >  create mode 100644 tests/acpi-test-data/pc/DSDT.memhp
+> > >  create mode 100644 tests/acpi-test-data/pc/SRAT.memhp
+> > >  create mode 100644 tests/acpi-test-data/q35/DSDT.memhp
+> > >  create mode 100644 tests/acpi-test-data/q35/SRAT.memhp
+> > >   
+> 
