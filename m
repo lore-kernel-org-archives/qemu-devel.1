@@ -1,18 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38455)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39429)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cQyCv-0000aG-Kp
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 10:19:31 -0500
+	(envelope-from <jcmvbkbc@gmail.com>) id 1cQyG8-0002Ad-Dw
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 10:22:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cQyCq-0001Mc-JA
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 10:19:29 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42904)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cQyCq-0001Ll-9M
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 10:19:24 -0500
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue, 10 Jan 2017 16:18:14 +0100
-Message-Id: <1484061494-428-1-git-send-email-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] Add wctablet device
+	(envelope-from <jcmvbkbc@gmail.com>) id 1cQyG7-0002fH-0S
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 10:22:48 -0500
+Received: from mail-io0-x235.google.com ([2607:f8b0:4001:c06::235]:36626)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1cQyG6-0002ey-SP
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 10:22:46 -0500
+Received: by mail-io0-x235.google.com with SMTP id j13so52393544iod.3
+	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 07:22:46 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <C5E4DA8A-2E1B-4514-8F51-8FE8A0DD52C7@alex.org.uk>
+References: <CAMo8BfLRP8qUgJAkU3fSwE_H6EmqYmPKO_MhMn7B6WpwGWUudw@mail.gmail.com>
+	<C5E4DA8A-2E1B-4514-8F51-8FE8A0DD52C7@alex.org.uk>
+From: Max Filippov <jcmvbkbc@gmail.com>
+Date: Tue, 10 Jan 2017 07:22:44 -0800
+Message-ID: <CAMo8BfLz2i5hJO=3FXjQrWZg84-uktjPe9bLpObnvw4wCjDXEQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] implementing architectural timers using QEMU timers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,489 +28,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Anatoli Huseu1 <avg.tolik@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Alex Bligh <alex@alex.org.uk>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Pavel Dovgaluk <Pavel.Dovgaluk@ispras.ru>, "rth@twiddle.net" <rth@twiddle.net>
 
-From: Anatoli Huseu1 <avg.tolik@gmail.com>
+On Mon, Jan 9, 2017 at 7:41 AM, Alex Bligh <alex@alex.org.uk> wrote:
+>> On 9 Jan 2017, at 15:18, Max Filippov <jcmvbkbc@gmail.com> wrote:
+>> I'm trying to reimplement xtensa CCOUNT (cycle counter) and
+>> CCOMPARE (CCOUNT-based timer interrupts) using QEMU
+>> timers. That is CCOUNT value is derived from the
+>> QEMU_CLOCK_VIRTUAL clock and CCOMPARE interrupts are
+>> generated from the QEMU_CLOCK_VIRTUAL timer callbacks.
+>> The code is here:
+>>  https://github.com/OSLL/qemu-xtensa/commits/xtensa-ccount
+>>
+>> I've got the following issues doing that:
+>>
+>> - in non-icount mode I can often read CCOUNT and get a value
+>>  that is greater than programmed CCOMPARE value, which
+>>  means that QEMU timer must have been fired at that point, but
+>>  no sign of timer callback being called. That is timer callback
+>>  invocation lags behind due time.
+>>
+>>  Is my understanding correct that there's no hard expectations
+>>  that firing of QEMU timers will be correctly sequenced with
+>>  readings of QEMU clock?
+>
+> My understanding is that the intent of the API contract is that
+>
+> * The timer will not fire earlier than the time requested (but
+>   can fire later)
+>
+> * Timers on the same clock and context will fire in the order
+>   of their expiry time (with the ordering being undefined in
+>   the event the expiry times are equal).
+>
+> Whether in practice any users make use of the second guarantee
+> above I don't know.
 
-Add QEMU Wacom Penpartner serial tablet emulation.
-GSoC 2016 project.
+Ok.
 
-Signed-off-by: Anatoli Huseu1 <avg.tolik@gmail.com>
+>> - I thought that could be improved in -icount mode, so I tried that.
+>>  It is better with -icount, but it's still not 100% accurate. That is
+>>  I was able to observe guest reading QEMU clock value that is
+>>  past QEMU timer deadline before that timer callback was
+>>  invoked.
+>>
+>>  That sounds like a bug to me, is it?
+>
+> Hmm... that would be a bug if it were guaranteed that the
+> guest reads are always perfectly in sync with the timer
+> itself. I don't know whether that is the case.
 
-Various cleanups.
-Add line speed tracking.
-Implement ST and SP commands.
+I guess that's my intuitive expectation of the determinism
+offered by the -icount. Because if QEMU_CLOCK_VIRTUAL
+timers are allowed to lag they cannot be used for deterministic
+events, right? If that's intentional, then the question is what
+can be used to generate an event at specific virtual time?
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- Makefile.objs            |   1 +
- backends/Makefile.objs   |   2 +-
- backends/trace-events    |  10 ++
- backends/wctablet.c      | 364 +++++++++++++++++++++++++++++++++++++++++++++++
- docs/qdev-device-use.txt |   2 +-
- qapi-schema.json         |   3 +-
- qemu-char.c              |   1 +
- 7 files changed, 380 insertions(+), 3 deletions(-)
- create mode 100644 backends/trace-events
- create mode 100644 backends/wctablet.c
+> Even though I authored a large timer patch, I found the icount
+> stuff confusing.
+>
+>> - when guest sets a timer and halts itself waiting for timer
+>>  interrupt with waiti opcode QEMU behaviour is very strange with
+>>  -icount: regardless of the programmed timeout QEMU waits for
+>>  about a second before it delivers interrupt, and, AFAICT,
+>>  interrupt delivery it is not caused by the corresponding CCOUNT
+>>  timer. I was able to track this issue down to the
+>>  qemu_clock_use_for_deadline function, i.e. always returning true
+>>  'fixes' that unwanted delay, but looking around the timer code
+>>  I've got the impression that that's not the correct fix.
+>>
+>>  Any suggestions on how to fix that?
+>
+> This could be someone using timerlistgroup_deadline_ns rather than
+> qemu_clock_deadline_ns_all.
 
-diff --git a/Makefile.objs b/Makefile.objs
-index 51c36a4..df7d0cb 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -124,6 +124,7 @@ trace-events-y += crypto/trace-events
- trace-events-y += io/trace-events
- trace-events-y += migration/trace-events
- trace-events-y += block/trace-events
-+trace-events-y += backends/trace-events
- trace-events-y += hw/block/trace-events
- trace-events-y += hw/char/trace-events
- trace-events-y += hw/intc/trace-events
-diff --git a/backends/Makefile.objs b/backends/Makefile.objs
-index 1846998..0e0f156 100644
---- a/backends/Makefile.objs
-+++ b/backends/Makefile.objs
-@@ -1,7 +1,7 @@
- common-obj-y += rng.o rng-egd.o
- common-obj-$(CONFIG_POSIX) += rng-random.o
- 
--common-obj-y += msmouse.o testdev.o
-+common-obj-y += msmouse.o wctablet.o testdev.o
- common-obj-$(CONFIG_BRLAPI) += baum.o
- baum.o-cflags := $(SDL_CFLAGS)
- 
-diff --git a/backends/trace-events b/backends/trace-events
-new file mode 100644
-index 0000000..8c3289a
---- /dev/null
-+++ b/backends/trace-events
-@@ -0,0 +1,10 @@
-+# See docs/tracing.txt for syntax documentation.
-+
-+# backends/wctablet.c
-+wct_init(void) ""
-+wct_cmd_re(void) ""
-+wct_cmd_st(void) ""
-+wct_cmd_sp(void) ""
-+wct_cmd_ts(int input) "0x%02x"
-+wct_cmd_other(const char *cmd) "%s"
-+wct_speed(int speed) "%d"
-diff --git a/backends/wctablet.c b/backends/wctablet.c
-new file mode 100644
-index 0000000..390edec
---- /dev/null
-+++ b/backends/wctablet.c
-@@ -0,0 +1,364 @@
-+/*
-+ * QEMU Wacom Penpartner serial tablet emulation
-+ *
-+ * some protocol details:
-+ *   http://linuxwacom.sourceforge.net/wiki/index.php/Serial_Protocol_IV
-+ *
-+ * Copyright (c) 2016 Anatoli Huseu1
-+ * Copyright (c) 2016,17 Gerd Hoffmann
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to
-+ * deal in the Software without restriction, including without limitation
-+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
-+ * and/or sell copies of the Software, and to permit persons to whom the
-+ * Software is furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+#include <stdlib.h>
-+#include <string.h>
-+#include <sys/time.h>
-+#include <time.h>
-+
-+#include "qemu/osdep.h"
-+#include "qemu-common.h"
-+#include "sysemu/char.h"
-+#include "ui/console.h"
-+#include "ui/input.h"
-+#include "trace.h"
-+
-+
-+#define WC_OUTPUT_BUF_MAX_LEN 512
-+#define WC_COMMAND_MAX_LEN 60
-+
-+#define WC_L7(n) ((n) & 127)
-+#define WC_M7(n) (((n) >> 7) & 127)
-+#define WC_H2(n) ((n) >> 14)
-+
-+#define WC_L4(n) ((n) & 15)
-+#define WC_H4(n) (((n) >> 4) & 15)
-+
-+/* Model string and config string */
-+#define WC_MODEL_STRING_LENGTH 18
-+uint8_t WC_MODEL_STRING[WC_MODEL_STRING_LENGTH + 1] = "~#CT-0045R,V1.3-5,";
-+
-+#define WC_CONFIG_STRING_LENGTH 8
-+uint8_t WC_CONFIG_STRING[WC_CONFIG_STRING_LENGTH + 1] = "96,N,8,0";
-+
-+#define WC_FULL_CONFIG_STRING_LENGTH 61
-+uint8_t WC_FULL_CONFIG_STRING[WC_FULL_CONFIG_STRING_LENGTH + 1] = {
-+    0x5c, 0x39, 0x36, 0x2c, 0x4e, 0x2c, 0x38, 0x2c,
-+    0x31, 0x28, 0x01, 0x24, 0x57, 0x41, 0x43, 0x30,
-+    0x30, 0x34, 0x35, 0x5c, 0x5c, 0x50, 0x45, 0x4e, 0x5c,
-+    0x57, 0x41, 0x43, 0x30, 0x30, 0x30, 0x30, 0x5c,
-+    0x54, 0x61, 0x62, 0x6c, 0x65, 0x74, 0x0d, 0x0a,
-+    0x43, 0x54, 0x2d, 0x30, 0x30, 0x34, 0x35, 0x52,
-+    0x2c, 0x56, 0x31, 0x2e, 0x33, 0x2d, 0x35, 0x0d,
-+    0x0a, 0x45, 0x37, 0x29
-+};
-+
-+/* This structure is used to save private info for Wacom Tablet. */
-+typedef struct {
-+    CharDriverState *chr;
-+    QemuInputHandlerState *hs;
-+
-+    /* Query string from serial */
-+    uint8_t query[100];
-+    int query_index;
-+
-+    /* Command to be sent to serial port */
-+    uint8_t outbuf[WC_OUTPUT_BUF_MAX_LEN];
-+    int outlen;
-+
-+    int line_speed;
-+    bool send_events;
-+    int axis[INPUT_AXIS__MAX];
-+    bool btns[INPUT_BUTTON__MAX];
-+
-+} TabletState;
-+
-+static void wctablet_chr_accept_input(CharDriverState *chr);
-+
-+static void wctablet_shift_input(TabletState *tablet, int count)
-+{
-+    tablet->query_index -= count;
-+    memmove(tablet->query, tablet->query + count, tablet->query_index);
-+    tablet->query[tablet->query_index] = 0;
-+}
-+
-+static void wctablet_queue_output(TabletState *tablet, uint8_t *buf, int count)
-+{
-+    if (tablet->outlen + count > sizeof(tablet->outbuf)) {
-+        return;
-+    }
-+
-+    memcpy(tablet->outbuf + tablet->outlen, buf, count);
-+    tablet->outlen += count;
-+    wctablet_chr_accept_input(tablet->chr);
-+}
-+
-+static void wctablet_reset(TabletState *tablet)
-+{
-+    /* clear buffers */
-+    tablet->query_index = 0;
-+    tablet->outlen = 0;
-+    /* reset state */
-+    tablet->send_events = false;
-+}
-+
-+static void wctablet_queue_event(TabletState *tablet)
-+{
-+    uint8_t codes[8] = { 0xe0, 0, 0, 0, 0, 0, 0 };
-+
-+    if (tablet->line_speed != 9600) {
-+        return;
-+    }
-+
-+    int newX = tablet->axis[INPUT_AXIS_X] * 0.1537;
-+    int nexY = tablet->axis[INPUT_AXIS_Y] * 0.1152;
-+
-+    codes[0] = codes[0] | WC_H2(newX);
-+    codes[1] = codes[1] | WC_M7(newX);
-+    codes[2] = codes[2] | WC_L7(newX);
-+
-+    codes[3] = codes[3] | WC_H2(nexY);
-+    codes[4] = codes[4] | WC_M7(nexY);
-+    codes[5] = codes[5] | WC_L7(nexY);
-+
-+    if (tablet->btns[INPUT_BUTTON_LEFT]) {
-+        codes[0] = 0xa0;
-+    }
-+
-+    wctablet_queue_output(tablet, codes, 7);
-+}
-+
-+static void wctablet_input_event(DeviceState *dev, QemuConsole *src,
-+                                InputEvent *evt)
-+{
-+    TabletState *tablet = (TabletState *)dev;
-+    InputMoveEvent *move;
-+    InputBtnEvent *btn;
-+
-+    switch (evt->type) {
-+    case INPUT_EVENT_KIND_ABS:
-+        move = evt->u.abs.data;
-+        tablet->axis[move->axis] = move->value;
-+        break;
-+
-+    case INPUT_EVENT_KIND_BTN:
-+        btn = evt->u.btn.data;
-+        tablet->btns[btn->button] = btn->down;
-+        break;
-+
-+    default:
-+        /* keep gcc happy */
-+        break;
-+    }
-+}
-+
-+static void wctablet_input_sync(DeviceState *dev)
-+{
-+    TabletState *tablet = (TabletState *)dev;
-+
-+    if (tablet->send_events) {
-+        wctablet_queue_event(tablet);
-+    }
-+}
-+
-+static QemuInputHandler wctablet_handler = {
-+    .name  = "QEMU Wacome Pen Tablet",
-+    .mask  = INPUT_EVENT_MASK_BTN | INPUT_EVENT_MASK_ABS,
-+    .event = wctablet_input_event,
-+    .sync  = wctablet_input_sync,
-+};
-+
-+static void wctablet_chr_accept_input(CharDriverState *chr)
-+{
-+    TabletState *tablet = (TabletState *) chr->opaque;
-+    int len, canWrite;
-+
-+    canWrite = qemu_chr_be_can_write(chr);
-+    len = canWrite;
-+    if (len > tablet->outlen) {
-+        len = tablet->outlen;
-+    }
-+
-+    if (len) {
-+        qemu_chr_be_write(chr, tablet->outbuf, len);
-+        tablet->outlen -= len;
-+        if (tablet->outlen) {
-+            memmove(tablet->outbuf, tablet->outbuf + len, tablet->outlen);
-+        }
-+    }
-+}
-+
-+static int wctablet_chr_write(struct CharDriverState *s,
-+                              const uint8_t *buf, int len)
-+{
-+    TabletState *tablet = (TabletState *) s->opaque;
-+    unsigned int i, clen;
-+    char *pos;
-+
-+    if (tablet->line_speed != 9600) {
-+        return len;
-+    }
-+    for (i = 0; i < len && tablet->query_index < sizeof(tablet->query) - 1; i++) {
-+        tablet->query[tablet->query_index++] = buf[i];
-+    }
-+    tablet->query[tablet->query_index] = 0;
-+
-+    while (tablet->query_index > 0 && (tablet->query[0] == '@'  ||
-+                                       tablet->query[0] == '\r' ||
-+                                       tablet->query[0] == '\n')) {
-+        wctablet_shift_input(tablet, 1);
-+    }
-+    if (!tablet->query_index) {
-+        return len;
-+    }
-+
-+    if (strncmp((char *)tablet->query, "~#", 2) == 0) {
-+        /* init / detect sequence */
-+        trace_wct_init();
-+        wctablet_shift_input(tablet, 2);
-+        wctablet_queue_output(tablet, WC_MODEL_STRING,
-+                              WC_MODEL_STRING_LENGTH);
-+        return len;
-+    }
-+
-+    /* detect line */
-+    pos = strchr((char *)tablet->query, '\r');
-+    if (!pos) {
-+        pos = strchr((char *)tablet->query, '\n');
-+    }
-+    if (!pos) {
-+        return len;
-+    }
-+    clen = pos - (char *)tablet->query;
-+
-+    /* process commands */
-+    if (strncmp((char *)tablet->query, "RE", 2) == 0 &&
-+        clen == 2) {
-+        trace_wct_cmd_re();
-+        wctablet_shift_input(tablet, 3);
-+        wctablet_queue_output(tablet, WC_CONFIG_STRING,
-+                              WC_CONFIG_STRING_LENGTH);
-+
-+    } else if (strncmp((char *)tablet->query, "ST", 2) == 0 &&
-+               clen == 2) {
-+        trace_wct_cmd_st();
-+        wctablet_shift_input(tablet, 3);
-+        tablet->send_events = true;
-+        wctablet_queue_event(tablet);
-+
-+    } else if (strncmp((char *)tablet->query, "SP", 2) == 0 &&
-+               clen == 2) {
-+        trace_wct_cmd_sp();
-+        wctablet_shift_input(tablet, 3);
-+        tablet->send_events = false;
-+
-+    } else if (strncmp((char *)tablet->query, "TS", 2) == 0 &&
-+               clen == 3) {
-+        unsigned int input = tablet->query[2];
-+        uint8_t codes[7] = {
-+            0xa3,
-+            ((input & 0x80) == 0) ? 0x7e : 0x7f,
-+            (((WC_H4(input) & 0x7) ^ 0x5) << 4) | (WC_L4(input) ^ 0x7),
-+            0x03,
-+            0x7f,
-+            0x7f,
-+            0x00,
-+        };
-+        trace_wct_cmd_ts(input);
-+        wctablet_shift_input(tablet, 4);
-+        wctablet_queue_output(tablet, codes, 7);
-+
-+    } else {
-+        tablet->query[clen] = 0; /* terminate line for printing */
-+        trace_wct_cmd_other((char *)tablet->query);
-+        wctablet_shift_input(tablet, clen + 1);
-+
-+    }
-+
-+    return len;
-+}
-+
-+static int wctablet_chr_ioctl(CharDriverState *s, int cmd, void *arg)
-+{
-+    TabletState *tablet = (TabletState *) s->opaque;
-+    QEMUSerialSetParams *ssp;
-+
-+    switch (cmd) {
-+    case CHR_IOCTL_SERIAL_SET_PARAMS:
-+        ssp = arg;
-+        if (tablet->line_speed != ssp->speed) {
-+            trace_wct_speed(ssp->speed);
-+            wctablet_reset(tablet);
-+            tablet->line_speed = ssp->speed;
-+        }
-+        break;
-+    default:
-+        return -ENOTSUP;
-+    }
-+    return 0;
-+}
-+
-+static void wctablet_chr_free(struct CharDriverState *chr)
-+{
-+    TabletState *tablet = (TabletState *) chr->opaque;
-+
-+    qemu_input_handler_unregister(tablet->hs);
-+    g_free(chr->opaque);
-+    g_free(chr);
-+}
-+
-+static CharDriverState *qemu_chr_open_wctablet(const char *id,
-+                                              ChardevBackend *backend,
-+                                              ChardevReturn *ret,
-+                                              bool *be_opened,
-+                                              Error **errp)
-+{
-+    ChardevCommon *common = backend->u.wctablet.data;
-+    CharDriverState *chr;
-+    TabletState *tablet;
-+
-+    chr = qemu_chr_alloc(common, errp);
-+    tablet = g_malloc0(sizeof(TabletState));
-+    if (!chr) {
-+        return NULL;
-+    }
-+    chr->chr_write = wctablet_chr_write;
-+    chr->chr_ioctl = wctablet_chr_ioctl;
-+    chr->chr_free = wctablet_chr_free;
-+    chr->chr_accept_input = wctablet_chr_accept_input;
-+    *be_opened = true;
-+
-+    /* init state machine */
-+    memcpy(tablet->outbuf, WC_FULL_CONFIG_STRING, WC_FULL_CONFIG_STRING_LENGTH);
-+    tablet->outlen = WC_FULL_CONFIG_STRING_LENGTH;
-+    tablet->query_index = 0;
-+
-+    chr->opaque = tablet;
-+    tablet->chr = chr;
-+
-+    tablet->hs = qemu_input_handler_register((DeviceState *)tablet,
-+                                             &wctablet_handler);
-+    return chr;
-+}
-+
-+static void register_types(void)
-+{
-+    register_char_driver("wctablet", CHARDEV_BACKEND_KIND_WCTABLET, NULL,
-+                         qemu_chr_open_wctablet);
-+}
-+
-+type_init(register_types);
-diff --git a/docs/qdev-device-use.txt b/docs/qdev-device-use.txt
-index 136d271..b059405 100644
---- a/docs/qdev-device-use.txt
-+++ b/docs/qdev-device-use.txt
-@@ -200,7 +200,7 @@ LEGACY-CHARDEV translates to -chardev HOST-OPTS... as follows:
- 
- * null becomes -chardev null
- 
--* pty, msmouse, braille, stdio likewise
-+* pty, msmouse, wctablet, braille, stdio likewise
- 
- * vc:WIDTHxHEIGHT becomes -chardev vc,width=WIDTH,height=HEIGHT
- 
-diff --git a/qapi-schema.json b/qapi-schema.json
-index a0d3b5d..cf828a5 100644
---- a/qapi-schema.json
-+++ b/qapi-schema.json
-@@ -3867,7 +3867,7 @@
- #
- # Configuration info for the new chardev backend.
- #
--# Since: 1.4 (testdev since 2.2)
-+# Since: 1.4 (testdev since 2.2, wctablet since 2.9)
- ##
- { 'union': 'ChardevBackend', 'data': { 'file'   : 'ChardevFile',
-                                        'serial' : 'ChardevHostdev',
-@@ -3879,6 +3879,7 @@
-                                        'null'   : 'ChardevCommon',
-                                        'mux'    : 'ChardevMux',
-                                        'msmouse': 'ChardevCommon',
-+                                       'wctablet' : 'ChardevCommon',
-                                        'braille': 'ChardevCommon',
-                                        'testdev': 'ChardevCommon',
-                                        'stdio'  : 'ChardevStdio',
-diff --git a/qemu-char.c b/qemu-char.c
-index 2c9940c..162df2f 100644
---- a/qemu-char.c
-+++ b/qemu-char.c
-@@ -3734,6 +3734,7 @@ QemuOpts *qemu_chr_parse_compat(const char *label, const char *filename)
-     if (strcmp(filename, "null")    == 0 ||
-         strcmp(filename, "pty")     == 0 ||
-         strcmp(filename, "msmouse") == 0 ||
-+        strcmp(filename, "wctablet") == 0 ||
-         strcmp(filename, "braille") == 0 ||
-         strcmp(filename, "testdev") == 0 ||
-         strcmp(filename, "stdio")   == 0) {
+Well, main_loop_wait uses timerlistgroup_deadline_ns. If I only
+change this place to take all timers into account it works without
+the unwanted timeout. But still the following comment above the
+qemu_clock_use_for_deadline makes me wonder if such change
+is legitimate:
+
+ * Determine whether a clock should be used for deadline
+ * calculations. Some clocks, for instance vm_clock with
+ * use_icount set, do not count in nanoseconds. Such clocks
+ * are not used for deadline calculations, and are presumed
+ * to interrupt any poll using qemu_notify/aio_notify
+ * etc.
+
+> The comment at the top of qemu_clock_deadline_ns_all says:
+>
+> /* Calculate the soonest deadline across all timerlists attached
+>  * to the clock. This is used for the icount timeout so we
+>  * ignore whether or not the clock should be used in deadline
+>  * calculations.
+>  */
+>
+> I'm wondering whether there is something up with that logic.
+
 -- 
-1.8.3.1
+Thanks.
+-- Max
