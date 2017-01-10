@@ -1,29 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43992)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47760)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1cQkcH-0001c0-TC
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 19:48:46 -0500
+	(envelope-from <bounces@canonical.com>) id 1cQl7V-0007FY-Jj
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 20:21:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1cQkcE-0001ym-Pk
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 19:48:45 -0500
-Received: from [45.249.212.187] (port=2525 helo=dggrg01-dlp.huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1cQkcC-0001xX-An
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 19:48:42 -0500
-From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Date: Tue, 10 Jan 2017 00:40:30 +0000
-Message-ID: <33183CC9F5247A488A2544077AF19020DA18227F@DGGEMA505-MBX.china.huawei.com>
-References: <1478856187-284644-1-git-send-email-arei.gonglei@huawei.com>
-	<33183CC9F5247A488A2544077AF19020DA16E01B@DGGEMA505-MBX.china.huawei.com>
-	<20170103150003.GD14707@stefanha-x1.localdomain>
-	<33183CC9F5247A488A2544077AF19020DA174682@DGGEMA505-MBX.china.huawei.com>
-	<20170109234006-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20170109234006-mutt-send-email-mst@kernel.org>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <bounces@canonical.com>) id 1cQl7Q-00021T-6d
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 20:21:01 -0500
+Received: from indium.canonical.com ([91.189.90.7]:51208)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cQl7P-00020S-UD
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 20:20:56 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cQl7M-0001rv-6m
+	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 01:20:52 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 5C9552E80D6
+	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 01:20:51 +0000 (UTC)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v14 0/2] virtio-crypto:
- virtio crypto device specification
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 10 Jan 2017 01:10:54 -0000
+From: Hansni Bu <1653063@bugs.launchpad.net>
+Reply-To: Bug 1653063 <1653063@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20161229080217.16446.50840.malonedeb@wampee.canonical.com>
+Message-Id: <20170110011054.14666.40576.launchpad@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1653063] Re: qemu-system-arm hangs with -icount
+ and -nodefaults
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,86 +37,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "Huangweidong (C)" <weidong.huang@huawei.com>, "john.griffin@intel.com" <john.griffin@intel.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "Zhoujian (jay, Euler)" <jianjay.zhou@huawei.com>, "Varun.Sethi@freescale.com" <Varun.Sethi@freescale.com>, "denglingli@chinamobile.com" <denglingli@chinamobile.com>, "arei.gonglei@hotmail.com" <arei.gonglei@hotmail.com>, "Hanweidong (Randy)" <hanweidong@huawei.com>, "agraf@suse.de" <agraf@suse.de>, "nmorey@kalray.eu" <nmorey@kalray.eu>, longpeng <longpeng2@huawei.com>, "vincent.jardin@6wind.com" <vincent.jardin@6wind.com>, "Ola.Liljedahl@arm.com" <Ola.Liljedahl@arm.com>, Luonengjun <luonengjun@huawei.com>, "xin.zeng@intel.com" <xin.zeng@intel.com>, "liang.j.ma@intel.com" <liang.j.ma@intel.com>, "stefanha@redhat.com" <stefanha@redhat.com>, Shiqing Fan <Shiqing.Fan@huawei.com>, Jani Kokkonen <Jani.Kokkonen@huawei.com>, "pasic@linux.vnet.ibm.com" <pasic@linux.vnet.ibm.com>, "brian.a.keating@intel.com" <brian.a.keating@intel.com>, Claudio Fontana <Claudio.Fontana@huawei.com>, "mike.caraman@nxp.com" <mike.caraman@nxp.com>, "Wubin (H)" <wu.wubin@huawei.com>
+To: qemu-devel@nongnu.org
 
-Hi Michael,
+** Description changed:
 
->
-> Subject: [virtio-dev] Re: [Qemu-devel] [PATCH v14 0/2] virtio-crypto: vir=
-tio
-> crypto device specification
->=20
-> On Wed, Jan 04, 2017 at 01:03:21AM +0000, Gonglei (Arei) wrote:
-> > Hi Stefan,
-> >
-> > >
-> > > Subject: Re: [Qemu-devel] [PATCH v14 0/2] virtio-crypto: virtio crypt=
-o device
-> > > specification
-> > >
-> > > On Mon, Dec 26, 2016 at 02:38:29AM +0000, Gonglei (Arei) wrote:
-> > > > Both Alex and Stefan mentioned that the process of create/close a
-> session
-> > > > makes we have a least one full round-trip cost from guest to host t=
-o guest
-> > > > to be able to send any data for symmetric algorithms. It gets ourse=
-lf into
-> > > > synchronization troubles in some scenarios like a web server handli=
-ng lots
-> > > > of small requests whose algorithms and keys are different.
-> > > >
-> > > > Because the virtio crypto specification has not been voted yet and =
-v15 is
-> on
-> > > the way.
-> > > > I'd like to make some changes in order to support those scenarios b=
-etter.
-> > > That means
-> > > > we will support one-blob request (no sessions) as well for symmetri=
-c
-> > > > algorithms, including HASH, MAC services. The benefit is obvious fo=
-r
-> > > > HASH service because it's usually a one-blob operation.
-> > > >
-> > > > The main changes will be:
-> > > >  1) using the flag property of struct virtio_crypto_op_header to id=
-entify
-> the
-> > > >     type of crypto request. Aka Is it a session-based or non-sessio=
-n
-> > > request?
-> > > >     The flag is not used currently, so we can make use of it.
-> > > >
-> > > >  2) extending virtio_crypto_*_para structures, for example, add the
-> content
-> > > of
-> > > >     struct virtio_crypto_cipher_session_para into struct
-> > > virtio_crypto_cipher_para.
-> > > >     It's true that will increase the size of each crypto request af=
-ter this
-> > > change.
-> > > >
-> > > > Does it make sense? Thanks!
-> > >
-> > > That sounds good.  Hopefully many crypto API users only use a single
-> > > operation and can therefore benefit from this optimization.
-> > >
-> > Thanks for your feedback. I'll start this work.
-> >
-> > Regards,
-> > -Gonglei
->=20
-> I worry what's going to happen with the virtio driver
-> I merged upstream though. Do you plan to make changes
-> compatible with it?
->=20
-Yes, I do. We can support both session based and non-session based
-crypto operations then. I use some feature bits to negotiate them between
-the device and the driver. Please see the spec of v15:
+- I tested with the latest git repo, (commit:
++ I tested with release 2.8.0 and the latest git repo, (commit:
+  dbe2b65566e76d3c3a0c3358285c0336ac61e757).
+  =
 
-[PATCH v15 0/2] virtio-crypto: virtio crypto device specification
+  My configure options when building QEMU:
+  '../configure' '--prefix=3D$HOME/local/qemu.git' '--target-list=3Daarch64=
+-softmmu,arm-softmmu' '--cpu=3Dx86_64' '--cc=3Dgcc' '--disable-user' '--dis=
+able-sdl' '--disable-stack-protector' '--disable-attr' '--disable-pie' '--d=
+isable-linux-aio' '--disable-tpm' '--without-system-pixman' '--disable-docs=
+' '--disable-guest-agent' '--disable-guest-agent-msi' '--disable-modules' '=
+--disable-sparse' '--disable-gnutls' '--disable-nettle' '--disable-gcrypt' =
+'--disable-gtk' '--disable-vte' '--disable-curses' '--disable-vnc' '--disab=
+le-cocoa' '--disable-virtfs' '--disable-xen' '--disable-brlapi' '--disable-=
+curl' '--disable-bluez' '--disable-rdma' '--disable-uuid' '--disable-vde' '=
+--disable-netmap' '--disable-cap-ng' '--disable-attr' '--disable-vhost-net'=
+ '--disable-spice' '--disable-rbd' '--disable-libiscsi' '--disable-libnfs' =
+'--disable-smartcard' '--disable-libusb' '--disable-usb-redir' '--disable-l=
+zo' '--disable-snappy' '--disable-bzip2' '--disable-seccomp' '--disable-glu=
+sterfs' '--disable-archipelago' '--disable-libssh2' '--disable-vhdx' '--dis=
+able-numa' '--disable-werror' '--disable-blobs' '--disable-vhost-scsi' '--e=
+nable-debug' '--disable-strip' '--enable-debug-tcg' '--enable-debug-info' '=
+--extra-cflags=3D-fPIC'
+  =
 
+  My host OS is Redhat RHEL-6.5. uname command gives:
+  Linux rslpc1 2.6.32-431.el6.x86_64 #1 SMP Sun Nov 10 22:19:54 EST 2013 x8=
+6_64 x86_64 x86_64 GNU/Linux
+  =
 
-Regards,
--Gonglei
+  The test image is downloaded from http://wiki.qemu.org/download/arm-
+  test-0.2.tar.gz
+  =
+
+  The command to re-produce the problem:
+  qemu-system-arm -M integratorcp -kernel arm-test/zImage.integrator -initr=
+d arm-test/arm_root.img -nographic -icount 1 -nodefaults -chardev stdio,mux=
+=3Don,id=3Dchar0 -serial chardev:char0 --append "console=3DttyAMA0"
+  =
+
+  After console prints the message below:
+  "Uncompressing Linux.....................................................=
+..................... done, booting the kernel."
+  there's no further action noticed.
+  =
+
+  If "-icount" is not set, namely run as:
+  qemu-system-arm -M integratorcp -kernel arm-test/zImage.integrator -initr=
+d arm-test/arm_root.img -nographic -nodefaults -chardev stdio,mux=3Don,id=
+=3Dchar0 -serial chardev:char0 --append "console=3DttyAMA0"
+  =
+
+  or if "-nodefaults" is not set, namely run as:
+  qemu-system-arm -M integratorcp -kernel arm-test/zImage.integrator -initr=
+d arm-test/arm_root.img -nographic -icount 1 --append "console=3DttyAMA0"
+  =
+
+  The Linux boot procedure can finish successfully.
+  =
+
+  Thanks.
+  Hansni
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1653063
+
+Title:
+  qemu-system-arm hangs with -icount and -nodefaults
+
+Status in QEMU:
+  New
+
+Bug description:
+  I tested with release 2.8.0 and the latest git repo, (commit:
+  dbe2b65566e76d3c3a0c3358285c0336ac61e757).
+
+  My configure options when building QEMU:
+  '../configure' '--prefix=3D$HOME/local/qemu.git' '--target-list=3Daarch64=
+-softmmu,arm-softmmu' '--cpu=3Dx86_64' '--cc=3Dgcc' '--disable-user' '--dis=
+able-sdl' '--disable-stack-protector' '--disable-attr' '--disable-pie' '--d=
+isable-linux-aio' '--disable-tpm' '--without-system-pixman' '--disable-docs=
+' '--disable-guest-agent' '--disable-guest-agent-msi' '--disable-modules' '=
+--disable-sparse' '--disable-gnutls' '--disable-nettle' '--disable-gcrypt' =
+'--disable-gtk' '--disable-vte' '--disable-curses' '--disable-vnc' '--disab=
+le-cocoa' '--disable-virtfs' '--disable-xen' '--disable-brlapi' '--disable-=
+curl' '--disable-bluez' '--disable-rdma' '--disable-uuid' '--disable-vde' '=
+--disable-netmap' '--disable-cap-ng' '--disable-attr' '--disable-vhost-net'=
+ '--disable-spice' '--disable-rbd' '--disable-libiscsi' '--disable-libnfs' =
+'--disable-smartcard' '--disable-libusb' '--disable-usb-redir' '--disable-l=
+zo' '--disable-snappy' '--disable-bzip2' '--disable-seccomp' '--disable-glu=
+sterfs' '--disable-archipelago' '--disable-libssh2' '--disable-vhdx' '--dis=
+able-numa' '--disable-werror' '--disable-blobs' '--disable-vhost-scsi' '--e=
+nable-debug' '--disable-strip' '--enable-debug-tcg' '--enable-debug-info' '=
+--extra-cflags=3D-fPIC'
+
+  My host OS is Redhat RHEL-6.5. uname command gives:
+  Linux rslpc1 2.6.32-431.el6.x86_64 #1 SMP Sun Nov 10 22:19:54 EST 2013 x8=
+6_64 x86_64 x86_64 GNU/Linux
+
+  The test image is downloaded from http://wiki.qemu.org/download/arm-
+  test-0.2.tar.gz
+
+  The command to re-produce the problem:
+  qemu-system-arm -M integratorcp -kernel arm-test/zImage.integrator -initr=
+d arm-test/arm_root.img -nographic -icount 1 -nodefaults -chardev stdio,mux=
+=3Don,id=3Dchar0 -serial chardev:char0 --append "console=3DttyAMA0"
+
+  After console prints the message below:
+  "Uncompressing Linux.....................................................=
+..................... done, booting the kernel."
+  there's no further action noticed.
+
+  If "-icount" is not set, namely run as:
+  qemu-system-arm -M integratorcp -kernel arm-test/zImage.integrator -initr=
+d arm-test/arm_root.img -nographic -nodefaults -chardev stdio,mux=3Don,id=
+=3Dchar0 -serial chardev:char0 --append "console=3DttyAMA0"
+
+  or if "-nodefaults" is not set, namely run as:
+  qemu-system-arm -M integratorcp -kernel arm-test/zImage.integrator -initr=
+d arm-test/arm_root.img -nographic -icount 1 --append "console=3DttyAMA0"
+
+  The Linux boot procedure can finish successfully.
+
+  Thanks.
+  Hansni
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1653063/+subscriptions
