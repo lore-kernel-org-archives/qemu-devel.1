@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57315)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33237)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cQogB-0001N1-4Q
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 00:09:04 -0500
+	(envelope-from <SRS0=AJsY=YY=redhat.com=mst@kernel.org>)
+	id 1cQp9a-00074K-Es
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 00:39:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cQog7-000671-Tb
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 00:09:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38706)
+	(envelope-from <SRS0=AJsY=YY=redhat.com=mst@kernel.org>)
+	id 1cQp9X-0005KN-L5
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 00:39:26 -0500
+Received: from mail.kernel.org ([198.145.29.136]:47478)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cQog7-00066v-L5
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 00:08:59 -0500
-Received: from int-mx13.intmail.prod.int.phx2.redhat.com
-	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7D6394E4C7
-	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 05:08:59 +0000 (UTC)
-Date: Tue, 10 Jan 2017 07:08:57 +0200
+	(Exim 4.71) (envelope-from <SRS0=AJsY=YY=redhat.com=mst@kernel.org>)
+	id 1cQp9X-0005Jo-Aw
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 00:39:23 -0500
+Date: Tue, 10 Jan 2017 07:39:18 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170110070752-mutt-send-email-mst@kernel.org>
-References: <1480980749-182204-1-git-send-email-imammedo@redhat.com>
-	<20170109152201.311fdebb@nial.brq.redhat.com>
+Message-ID: <1484026704-28027-2-git-send-email-mst@redhat.com>
+References: <1484026704-28027-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170109152201.311fdebb@nial.brq.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.9 00/10] pc: acpi: memory hotplug
- cleanup/consolidation
+In-Reply-To: <1484026704-28027-1-git-send-email-mst@redhat.com>
+Subject: [Qemu-devel] [PULL 01/41] migration: allow to prioritize save state
+ entries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,91 +30,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Peter Xu <peterx@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>, Amit Shah <amit.shah@redhat.com>
 
-On Mon, Jan 09, 2017 at 03:22:01PM +0100, Igor Mammedov wrote:
-> On Tue,  6 Dec 2016 00:32:19 +0100
-> Igor Mammedov <imammedo@redhat.com> wrote:
-> 
-> > Series cleanups and consolidates scattered memory hotplug
-> > code so it could be easily reused by ARM target later.
-> > 
-> > As result:
-> >  * added memory hotplug variant to bios tables test
-> >  * all ACPI related parts of memory hotplug are consolidated
-> >    within memory_hotplug.c
-> >  * DSDT table size is reduced ~900 bytes when memory hotplug
-> >    is not enabled (by not generating not used AML)
-> >  * DSDT table size is reduced on 12 bytes per slot
-> >    (i.e. up to ~3000 bytes savings for 256 DIMMs) with memory hotplug
-> >    enabled due AML reorganization that makes calls to common functions
-> >    smaller as devices and common functions are now within the same scope.
-> > 
-> > Tested with following guests:
-> >   - RHEL7.3, WS2008DC, WS2008R2DC, WS2012R2DC, WS2016TP5 - no regressions found
-> >   - XP3 and WS2003 - boots fine even if memhotplug is enabled (but otherwise
-> >     it never worked as memhp is not supported there)
-> 
-> Michael,
-> 
-> Marcel's already reviewed this series a while ago could you
-> pull it in your tree if there aren't any questions?
+From: Peter Xu <peterx@redhat.com>
 
-I merged this and updated expected files accordingly.
+During migration, save state entries are saved/loaded without a specific
+order - we just traverse the savevm_state.handlers list and do it one by
+one. This might not be enough.
 
-Could you please check expected files in my tree
-to make sure it looks good?
+There are requirements that we need to load specific device's vmstate
+first before others. For example, VT-d IOMMU contains DMA address
+remapping information, which is required by all the PCI devices to do
+address translations. We need to make sure IOMMU's device state is
+loaded before the rest of the PCI devices, so that DMA address
+translation can work properly.
 
-Thanks!
+This patch provide a VMStateDescription.priority value to allow specify
+the priority of the saved states. The loadvm operation will be done with
+those devices with higher vmsd priority.
 
-> 
-> > Git tree for testing:
-> >   https://github.com/imammedo/qemu.git memhp_consolidate_v1
-> > viewing:
-> >   https://github.com/imammedo/qemu/commits/memhp_consolidate_v1
-> > 
-> > Note to maintaner:
-> >   * blobs patch 2/10 should be merged to patch 1/10
-> >   * ACPI tables should be regenarated and applied after series is merged
-> >     as DSDT will cange for all tests cases due removal of inactive
-> >     memory hotplug code.
-> > 
-> > CC: "Michael S. Tsirkin" <mst@redhat.com>
-> > CC: Eduardo Habkost <ehabkost@redhat.com>
-> > CC: Marcel Apfelbaum <marcel@redhat.com>
-> > 
-> > 
-> > Igor Mammedov (10):
-> >   tests: pc: add memory hotplug acpi tables tests
-> >   tests: pc: acpi: add SRAT and DSDT blobs for memory hotplug variant
-> >   memhp: move build_memory_hotplug_aml() into memory_hotplug.c
-> >   memhp: move build_memory_devices() into memory_hotplug.c
-> >   memhp: consolidate scattered MHPD device declaration
-> >   memhp: merge build_memory_devices() into build_memory_hotplug_aml()
-> >   memhp: move GPE handler_E03 into build_memory_hotplug_aml()
-> >   memhp: move memory hotplug only defines to memory_hotplug.c
-> >   memhp: don't generate memory hotplug AML if it's not enabled/supported
-> >   memhp: move DIMM devices into dedicated scope with related common
-> >     methods
-> > 
-> >  include/hw/acpi/memory_hotplug.h    |  12 +-
-> >  include/hw/acpi/pc-hotplug.h        |  23 --
-> >  hw/acpi/Makefile.objs               |   2 +-
-> >  hw/acpi/ich9.c                      |   3 +-
-> >  hw/acpi/memory_hotplug.c            | 420 +++++++++++++++++++++++++++++++++++-
-> >  hw/acpi/memory_hotplug_acpi_table.c | 262 ----------------------
-> >  hw/acpi/piix4.c                     |   3 +-
-> >  hw/i386/acpi-build.c                | 197 +++--------------
-> >  tests/acpi-test-data/pc/DSDT.memhp  | Bin 0 -> 6613 bytes
-> >  tests/acpi-test-data/pc/SRAT.memhp  | Bin 0 -> 224 bytes
-> >  tests/acpi-test-data/q35/DSDT.memhp | Bin 0 -> 9375 bytes
-> >  tests/acpi-test-data/q35/SRAT.memhp | Bin 0 -> 224 bytes
-> >  tests/bios-tables-test.c            |  24 +++
-> >  13 files changed, 479 insertions(+), 467 deletions(-)
-> >  delete mode 100644 hw/acpi/memory_hotplug_acpi_table.c
-> >  create mode 100644 tests/acpi-test-data/pc/DSDT.memhp
-> >  create mode 100644 tests/acpi-test-data/pc/SRAT.memhp
-> >  create mode 100644 tests/acpi-test-data/q35/DSDT.memhp
-> >  create mode 100644 tests/acpi-test-data/q35/SRAT.memhp
-> > 
+Before this patch, we are possibly achieving the ordering requirement by
+an assumption that the ordering will be the same with the ordering that
+objects are created. A better way is to mark it out explicitly in the
+VMStateDescription table, like what this patch does.
+
+Current ordering logic is still naive and slow, but after all that's not
+a critical path so IMO it's a workable solution for now.
+
+Signed-off-by: Peter Xu <peterx@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ include/migration/vmstate.h |  6 ++++++
+ migration/savevm.c          | 34 ++++++++++++++++++++++++++++++----
+ 2 files changed, 36 insertions(+), 4 deletions(-)
+
+diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
+index 1638ee5..1a22887 100644
+--- a/include/migration/vmstate.h
++++ b/include/migration/vmstate.h
+@@ -186,6 +186,11 @@ enum VMStateFlags {
+     VMS_MULTIPLY_ELEMENTS = 0x4000,
+ };
+ 
++typedef enum {
++    MIG_PRI_DEFAULT = 0,
++    MIG_PRI_MAX,
++} MigrationPriority;
++
+ typedef struct {
+     const char *name;
+     size_t offset;
+@@ -207,6 +212,7 @@ struct VMStateDescription {
+     int version_id;
+     int minimum_version_id;
+     int minimum_version_id_old;
++    MigrationPriority priority;
+     LoadStateHandler *load_state_old;
+     int (*pre_load)(void *opaque);
+     int (*post_load)(void *opaque, int version_id);
+diff --git a/migration/savevm.c b/migration/savevm.c
+index 0363372..f9c06e9 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -532,6 +532,34 @@ static int calculate_compat_instance_id(const char *idstr)
+     return instance_id;
+ }
+ 
++static inline MigrationPriority save_state_priority(SaveStateEntry *se)
++{
++    if (se->vmsd) {
++        return se->vmsd->priority;
++    }
++    return MIG_PRI_DEFAULT;
++}
++
++static void savevm_state_handler_insert(SaveStateEntry *nse)
++{
++    MigrationPriority priority = save_state_priority(nse);
++    SaveStateEntry *se;
++
++    assert(priority <= MIG_PRI_MAX);
++
++    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
++        if (save_state_priority(se) < priority) {
++            break;
++        }
++    }
++
++    if (se) {
++        QTAILQ_INSERT_BEFORE(se, nse, entry);
++    } else {
++        QTAILQ_INSERT_TAIL(&savevm_state.handlers, nse, entry);
++    }
++}
++
+ /* TODO: Individual devices generally have very little idea about the rest
+    of the system, so instance_id should be removed/replaced.
+    Meanwhile pass -1 as instance_id if you do not already have a clearly
+@@ -578,8 +606,7 @@ int register_savevm_live(DeviceState *dev,
+         se->instance_id = instance_id;
+     }
+     assert(!se->compat || se->instance_id == 0);
+-    /* add at the end of list */
+-    QTAILQ_INSERT_TAIL(&savevm_state.handlers, se, entry);
++    savevm_state_handler_insert(se);
+     return 0;
+ }
+ 
+@@ -662,8 +689,7 @@ int vmstate_register_with_alias_id(DeviceState *dev, int instance_id,
+         se->instance_id = instance_id;
+     }
+     assert(!se->compat || se->instance_id == 0);
+-    /* add at the end of list */
+-    QTAILQ_INSERT_TAIL(&savevm_state.handlers, se, entry);
++    savevm_state_handler_insert(se);
+     return 0;
+ }
+ 
+-- 
+MST
