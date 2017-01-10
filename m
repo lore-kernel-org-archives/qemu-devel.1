@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50448)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51462)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cQzAh-0003Tz-2S
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 11:21:16 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cQzFV-0006wh-5U
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 11:26:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1cQzAf-0001Dy-Jh
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 11:21:15 -0500
-Date: Tue, 10 Jan 2017 17:21:12 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170110172112.550e4e4b@Igors-MacBook-Pro.local>
-In-Reply-To: <26322db9-c82b-405f-b2a8-f2d16b0d69b0@redhat.com>
-References: <20161201170624.26496-1-lersek@redhat.com>
-	<20170110170453-mutt-send-email-mst@kernel.org>
-	<26322db9-c82b-405f-b2a8-f2d16b0d69b0@redhat.com>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cQzFT-0003es-SN
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 11:26:13 -0500
+Received: from mail-yw0-x22d.google.com ([2607:f8b0:4002:c05::22d]:32983)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1cQzFT-0003em-Lg
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 11:26:11 -0500
+Received: by mail-yw0-x22d.google.com with SMTP id l75so39225300ywb.0
+	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 08:26:11 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 0/7] q35: add negotiable broadcast SMI
+References: <20170109143437.30554-1-marcandre.lureau@redhat.com>
+	<20170109143437.30554-13-marcandre.lureau@redhat.com>
+	<87wpe3qf2a.fsf@dusky.pond.sub.org>
+	<724269411.621337.1484052915061.JavaMail.zimbra@redhat.com>
+	<87d1fuoqa3.fsf@dusky.pond.sub.org>
+In-Reply-To: <87d1fuoqa3.fsf@dusky.pond.sub.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 10 Jan 2017 16:25:59 +0000
+Message-ID: <CAJ+F1CJAmaC_TzkYrdcwQocpop0nZShakDVydXS7Q3Jxe_r_jg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v7 12/21] qapi.py: fix line break before
+ binary operator pep8
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,155 +34,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, "Gabriel
-	L. Somlo" <somlo@cmu.edu>, Shannon Zhao <zhaoshenglong@huawei.com>, qemu devel list <qemu-devel@nongnu.org>, Michael Walle <michael@walle.cc>, qemu-arm@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On Tue, 10 Jan 2017 16:23:41 +0100
-Laszlo Ersek <lersek@redhat.com> wrote:
+Hi
 
-> On 01/10/17 16:06, Michael S. Tsirkin wrote:
-> > On Thu, Dec 01, 2016 at 06:06:17PM +0100, Laszlo Ersek wrote:
-> >> * This is version 4 of the series; the last version was at
-> >>   <http://lists.nongnu.org/archive/html/qemu-devel/2016-11/msg03582.html>.
-> >>
-> >>   This version is practically a rewrite from scratch, seeking to address
-> >>   the v3 feedback. Here's what the individual patches do:
-> >>
-> >>   - Patch #1 rebases and extends Michael's "writeable fw_cfg blobs"
-> >>     patch from Feb/March 2016. The changes relative to the original
-> >>     patch are documented in the commit message (the code changes are
-> >>     minimal).
-> >>
-> >>   - Patches #2 and #3 turn the FW_CFG_FILE_SLOTS constant into a device
-> >>     property, and expose the desired number of fw_cfg file slots to
-> >>     board code. This is meant to address a concern raised by Paolo in
-> >>     the v2 review
-> >>     <http://lists.nongnu.org/archive/html/qemu-devel/2016-11/msg03125.html>,
-> >>     namely that we're about to run out of FW_CFG_FILE_SLOTS.
-> >>
-> >>   - Patch #4 introduces the "pc-q35-2.9" and "pc-i440fx-2.9" machine
-> >>     types, which are allowed to take advantage of the new default for
-> >>     fw_cfg file slots (0x20 rather than 0x10).
-> >>
-> >>   - Patch #5 introduces SMI feature negotiation via fw_cfg, with the
-> >>     following new files:
-> >>
-> >>     - etc/smi/host-features
-> >>     - etc/smi/guest-features
-> >>     - etc/smi/features-ok
-> >>
-> >>     This is supposed to follow Michael's recommendation re: imitating
-> >>     virtio
-> >>     <http://lists.nongnu.org/archive/html/qemu-devel/2016-11/msg03218.html>.
-> >>
-> >>     The guest-features file is freely writeable by the guest (no write
-> >>     callbacks in fw_cfg), and the feature validation & lockdown occurs
-> >>     when the guest selects the features-ok file (for reading).
-> >>
-> >>     Board code is allowed to choose the host feature bitmap to
-> >>     advertise.
-> >>
-> >>     This patch doesn't add any specific SMI features yet.
-> >>
-> >>   - Patch #6 adds the ICH9_LPC_SMI_F_BROADCAST feature.
-> >>
-> >>   - Patch #7 introduces the PCMachineClass.get_smi_host_features method,
-> >>     and implements it for "pc-q35-2.9" and later. The idea is to tie the
-> >>     SMI host features to machine types, and let the machine types
-> >>     calculate their host features with code (i.e., not just a constant).
-> >>
-> >>     In this patch, the "pc-q35-2.9" machine type exposes the
-> >>     ICH9_LPC_SMI_F_BROADCAST feature iff (smp_cpus == max_cpus), that
-> >>     is, when VCPU hotplug is not possible. (Also from Paolo's v3
-> >>     feedback, in
-> >>     <http://lists.nongnu.org/archive/html/qemu-devel/2016-11/msg04919.html>.)
-> >>
-> >> * I've written the OVMF side patches too and tested them together
-> >>   (including gdb / debug messages for "white box" testing).
-> >>
-> >> * Note that this version depends on the following PULL req from Michael:
-> >>
-> >>   [Qemu-devel] [PULL 0/5] virtio, vhost, pc: fixes
-> >>   http://lists.nongnu.org/archive/html/qemu-devel/2016-11/msg05503.html
-> >>
-> >>   In particular on the following patch:
-> >>   "loader: fix handling of custom address spaces when adding ROM blobs"
-> >>
-> >> Cc: "Gabriel L. Somlo" <somlo@cmu.edu>
-> >> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> >> Cc: Eduardo Habkost <ehabkost@redhat.com>
-> >> Cc: Gerd Hoffmann <kraxel@redhat.com>
-> >> Cc: Igor Mammedov <imammedo@redhat.com>
-> >> Cc: Michael Walle <michael@walle.cc>
-> >> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> >> Cc: Peter Maydell <peter.maydell@linaro.org>
-> >> Cc: Shannon Zhao <zhaoshenglong@huawei.com>
-> >> Cc: qemu-arm@nongnu.org
-> >>
-> >> Thanks
-> >> Laszlo
-> > 
-> > So I reviewed fw cfg stuff, looks good to me.
-> 
-> Thank you.
-> 
-> I should note that Igor suggested / requested changes for patches #2 and
-> #3; the sub-threads start at
-> 
-> http://lists.nongnu.org/archive/html/qemu-devel/2016-12/msg00695.html
-> msg-id: <20161206115038.4495a217@nial.brq.redhat.com>
-> 
-> http://lists.nongnu.org/archive/html/qemu-devel/2016-12/msg00706.html
-> msg-id: <20161206124906.76a41896@nial.brq.redhat.com>
-> 
-> I was about to rework the patches based on his feedback. Should we
-> resume those discussions?
-> 
-> > I'd prefer Paolo to review
-> > and merge broadcast SMI stuff as appropriate.  Paolo, makes sense?
-> 
-> If it helps, I can split the series into two "waves", and deal only with
-> fw_cfg first.
-2 waves looks better as vmgeneration stuff would depend on fw_cfg patches
-so it would be good to first. And SMI could be follow up.
+On Tue, Jan 10, 2017 at 5:04 PM Markus Armbruster <armbru@redhat.com> wrote=
+:
 
-> 
-> Thanks!
-> Laszlo
-> 
-> > 
-> > 
-> >> Laszlo Ersek (6):
-> >>   fw-cfg: turn FW_CFG_FILE_SLOTS into a device property
-> >>   fw-cfg: expose "file_slots" parameter in fw_cfg_init_io_dma()
-> >>   hw/i386/pc: introduce 2.9 machine types with 0x20 fw_cfg file slots
-> >>   hw/isa/lpc_ich9: add SMI feature negotiation via fw_cfg
-> >>   hw/isa/lpc_ich9: add broadcast SMI feature
-> >>   hw/i386/pc_q35: advertise broadcast SMI if VCPU hotplug is turned off
+> Marc-Andr=C3=A9 Lureau <mlureau@redhat.com> writes:
+>
+> > Hi
+> >
+> > ----- Original Message -----
+> >> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 > >>
-> >> Michael S. Tsirkin (1):
-> >>   fw-cfg: support writeable blobs
+> >> > Python code style accepts both form, but pep8 complains. Better to
+> clean
+> >> > up the single warning for now, so new errors stand out more easily.
+> >> >
+> >> > Fix scripts/qapi.py:1539:21: W503 line break before binary operator
 > >>
-> >>  docs/specs/fw_cfg.txt          |  36 +++++++++---
-> >>  hw/lm32/lm32_hwsetup.h         |   2 +-
-> >>  include/hw/compat.h            |  11 ++++
-> >>  include/hw/i386/ich9.h         |  15 ++++-
-> >>  include/hw/i386/pc.h           |   4 ++
-> >>  include/hw/loader.h            |   7 ++-
-> >>  include/hw/nvram/fw_cfg.h      |   5 +-
-> >>  include/hw/nvram/fw_cfg_keys.h |   7 ++-
-> >>  hw/arm/virt-acpi-build.c       |   2 +-
-> >>  hw/core/loader.c               |  18 +++---
-> >>  hw/i386/acpi-build.c           |   4 +-
-> >>  hw/i386/pc.c                   |   3 +-
-> >>  hw/i386/pc_piix.c              |  16 +++++-
-> >>  hw/i386/pc_q35.c               |  37 ++++++++++++-
-> >>  hw/isa/lpc_ich9.c              |  92 +++++++++++++++++++++++++++++-
-> >>  hw/nvram/fw_cfg.c              | 123 +++++++++++++++++++++++++++++++++++------
-> >>  16 files changed, 326 insertions(+), 56 deletions(-)
-> >>
-> >> -- 
-> >> 2.9.2
-> 
-> 
+> >> PEP 8 permits both, but prefers line break before binary operator.
+> >> Thus, this warning is clearly bogus.  What version of pep8 do you use?
+> >> Mine doesn't warn.
+> >
+> > I tried both 1.6.2 and 1.7.0
+>
+> I tried again, and I can now see the warning.  No idea what I did wrong
+> the first time.
+>
+> Turns out PEP8 used to demand line break after the operator, but no
+> more[1].  The pep8 program hasn't caught up, but it will[2]: its current
+> git HEAD already suppresses W503.  There's work in progress[3] on a new
+> W504 to warn on line break after binary operator.
+>
+> We will have to live with a mix of old and new pep8 / pycodestyle
+> versions.  Changing code to make new versions instead of old versions
+> complain instead is not a good idea.  We should simply ignore the
+> obsolete warning from old versions.
+>
+>
+ok, feel free to drop this patch then
+
+thanks
+
+
+> pep8 lets you do that with --ignore=3DW503.  Sadly, --ignore overwrites
+> the default, so you have to --ignore=3DE121,E123,E126,E226,E24,E704,W503.
+> Or have a file tox.ini with
+>
+>     [pep8]
+>     ignore=3DE121,E123,E126,E226,E24,E704,W503
+>
+>
+> [1] https://hg.python.org/peps/rev/3857909d7956
+> [2] https://github.com/PyCQA/pycodestyle/issues/498
+> [3] https://github.com/PyCQA/pycodestyle/pull/502
+>
+> --
+Marc-Andr=C3=A9 Lureau
