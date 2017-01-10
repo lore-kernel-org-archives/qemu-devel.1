@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37262)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39703)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cQwJZ-0002sa-Cw
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 08:18:14 -0500
+	(envelope-from <berrange@redhat.com>) id 1cQwVS-0005qZ-En
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 08:30:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cQwJU-00033k-67
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 08:18:13 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34190)
+	(envelope-from <berrange@redhat.com>) id 1cQwVP-0006dX-Ac
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 08:30:30 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40682)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cQwJU-00033K-06
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 08:18:08 -0500
-Received: from int-mx11.intmail.prod.int.phx2.redhat.com
-	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 088E961BA4
-	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 13:18:07 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue, 10 Jan 2017 14:18:01 +0100
-Message-Id: <1484054281-26139-1-git-send-email-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH] es1370: wire up reset via DeviceClass
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cQwVP-0006dO-0u
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 08:30:27 -0500
+Date: Tue, 10 Jan 2017 13:30:19 +0000
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170110133019.GJ27720@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <58733617.3050503@huawei.com>
+	<20170109134310.GE30228@stefanha-x1.localdomain>
+	<20170109162504.GH29989@redhat.com>
+	<33183CC9F5247A488A2544077AF19020DA182982@DGGEMA505-MBX.china.huawei.com>
+	<20170110100355.GD27720@redhat.com>
+	<33183CC9F5247A488A2544077AF19020DA182ADA@DGGEMA505-MBX.china.huawei.com>
+	<20170110120354.GH27720@redhat.com>
+	<33183CC9F5247A488A2544077AF19020DA182B4A@DGGEMA505-MBX.china.huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <33183CC9F5247A488A2544077AF19020DA182B4A@DGGEMA505-MBX.china.huawei.com>
+Subject: Re: [Qemu-devel] Question about add AF_ALG backend for virtio-crypto
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,48 +34,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+To: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, longpeng <longpeng2@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, QEMU-DEV <qemu-devel@nongnu.org>, "Wubin (H)" <wu.wubin@huawei.com>, "Zhoujian (jay, Euler)" <jianjay.zhou@huawei.com>
 
-Instead of using qemu_register_reset().
-That way we get proper cleanup for free.
+On Tue, Jan 10, 2017 at 12:17:48PM +0000, Gonglei (Arei) wrote:
+> >
+> > > >
+> > > > >
+> > > > > >
+> > > > > > On Mon, Jan 09, 2017 at 01:43:10PM +0000, Stefan Hajnoczi wrote:
+> > > > > > > On Mon, Jan 09, 2017 at 03:04:55PM +0800, Longpeng (Mike) wrote:
+> > > > > > > > I'm one of Gonglei's virtio-crypto project members, and we plan to
+> > add a
+> > > > > > AF_ALG
+> > > > > > > > backend for virtio-crypto(there's only builtin-backend currently).
+> > > > > > > >
+> > > > > > > > I found that Catalin, Paolo and Stefan had discussed about this in
+> > 2015
+> > > > > > > > (http://www.spinics.net/lists/kvm/msg115457.html), but it seems
+> > that
+> > > > > > Catalin
+> > > > > > > > didn't do it, so I'm confuse about wether it is need to add a AF_ALG
+> > > > > > backend.
+> > > > > > > >
+> > > > > > > > Do you have any suggestion? Thanks :)
+> > > > > > >
+> > > > > > > I have no objections to an AF_ALG backend in QEMU.
+> > > > > >
+> > > > > > Rather than do another backend for virtio-crypto, IMHO, we should have
+> > > > > > an AF_ALG impl of the crypto/ APIs. That way any potential performance
+> > > > > > benefits will enhance our LUKS encryption code too.
+> > > > > >
+> > > > > According to the currently schemas of crypto/ APIs, we can't choose the
+> > > > > specific backend dynamically. This is a limitation for virtio-crypto
+> > > > > device I think.
+> > > >
+> > > > Do we really need to be able to choose the backend explicitly. If the AF_ALG
+> > > > backend is faster, why would you simply not use that automatically if it is
+> > > > available.
+> > >
+> > > Can we realize the purpose based on the crypto/ APIs? IIUC the crypto
+> > > subsystem chooses a backend during the building according to the specific
+> > priority,
+> > > nettle > gcrypt > cipher-builtin.
+> > >
+> > > If we add an AF_ALG implementation for crypto subsystem, shall we set it
+> > > as the highest priority? If so, other backends won't be used since AF_ALG
+> > > is always available. If not, how can we use AF_ALG backend for crypto/ API?
+> > >
+> > > Please correct me if I'm missing something.
+> > 
+> > While AF_ALG has been available for a while, not all features have. For
+> > example AEAD support was only added in kernel 4.1
+> > 
+> OK.
+> 
+> > So if we had AF_ALG in QEMU, we would have to have a stacked impl, where
+> > we try AF_ALG and then fallback to the current code when QEMU runs on a
+> > kernel lacking the feature needed.
+> > 
+> It makes sense though the implementation will be more complicate
+> since the code should identify the different error codes are returned
+> by AF_ALG APIs.
+> 
+> > We could potentially also have a global arg to switch backends e.g.
+> > 
+> >  -crypto-backend [afalg|builtin]
+> > 
+> So the backend here is not the cryptodev backend?
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- hw/audio/es1370.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+No, it would apply to the crypto/ APIs, so it affects all users of those
+APIs not just cryptodev
 
-diff --git a/hw/audio/es1370.c b/hw/audio/es1370.c
-index 883ec69..fe64c1a 100644
---- a/hw/audio/es1370.c
-+++ b/hw/audio/es1370.c
-@@ -1010,9 +1010,9 @@ static const VMStateDescription vmstate_es1370 = {
-     }
- };
- 
--static void es1370_on_reset (void *opaque)
-+static void es1370_on_reset(DeviceState *dev)
- {
--    ES1370State *s = opaque;
-+    ES1370State *s = container_of(dev, ES1370State, dev.qdev);
-     es1370_reset (s);
- }
- 
-@@ -1035,7 +1035,6 @@ static void es1370_realize(PCIDevice *dev, Error **errp)
- 
-     memory_region_init_io (&s->io, OBJECT(s), &es1370_io_ops, s, "es1370", 256);
-     pci_register_bar (&s->dev, 0, PCI_BASE_ADDRESS_SPACE_IO, &s->io);
--    qemu_register_reset (es1370_on_reset, s);
- 
-     AUD_register_card ("es1370", &s->card);
-     es1370_reset (s);
-@@ -1075,6 +1074,7 @@ static void es1370_class_init (ObjectClass *klass, void *data)
-     set_bit(DEVICE_CATEGORY_SOUND, dc->categories);
-     dc->desc = "ENSONIQ AudioPCI ES1370";
-     dc->vmsd = &vmstate_es1370;
-+    dc->reset = es1370_on_reset;
- }
- 
- static const TypeInfo es1370_info = {
+
+Regards,
+Daniel
 -- 
-1.8.3.1
+|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
+|: http://libvirt.org              -o-             http://virt-manager.org :|
+|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
