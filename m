@@ -1,20 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53072)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55079)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cQrz5-0005WE-7U
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 03:40:48 -0500
+	(envelope-from <armbru@redhat.com>) id 1cQs7q-0008Ez-Ib
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 03:49:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cQrz2-0005TE-6T
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 03:40:47 -0500
-References: <1482459390-14386-1-git-send-email-caoj.fnst@cn.fujitsu.com>
-	<20170110003733-mutt-send-email-mst@kernel.org>
-From: Cao jin <caoj.fnst@cn.fujitsu.com>
-Message-ID: <58749F4C.9080902@cn.fujitsu.com>
-Date: Tue, 10 Jan 2017 16:46:04 +0800
+	(envelope-from <armbru@redhat.com>) id 1cQs7n-0000FT-JM
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 03:49:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33256)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cQs7n-0000FB-DW
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 03:49:47 -0500
+Received: from int-mx14.intmail.prod.int.phx2.redhat.com
+	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 42CF261BA9
+	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 08:49:47 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170109143437.30554-1-marcandre.lureau@redhat.com>
+	<20170109143437.30554-2-marcandre.lureau@redhat.com>
+Date: Tue, 10 Jan 2017 09:49:44 +0100
+In-Reply-To: <20170109143437.30554-2-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
+	Lureau"'s message of "Mon, 9 Jan 2017 15:34:17 +0100")
+Message-ID: <8737grwb87.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20170110003733-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] pcie: remove duplicate assertion
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v7 01/21] qapi: replace 'o' for list items
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,54 +35,13 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, marcel@redhat.com, qemu-trivial@nongnu.org
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org
 
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
+> Replace with '*', the common form for list items.
+>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-On 01/10/2017 06:37 AM, Michael S. Tsirkin wrote:
-> On Fri, Dec 23, 2016 at 10:16:30AM +0800, Cao jin wrote:
->> "size >= 8" connote "size > 0"
->>
->> Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
-> 
-> Isn't the point to check for overflows?
-> 
-
-Make sense. If it is intended to check overflows, the following sequence
-would make more sense:
-
-    assert(offset >= PCI_CONFIG_SPACE_SIZE);
-    assert(size >= 8);
-    assert(offset < offset + size);
-    assert(offset + size <= PCIE_CONFIG_SPACE_SIZE);
-
-or else, size 0 will pass the assert(offset < offset + size) first and
-hit assert(size >= 8)
--- 
-Sincerely,
-Cao jin
-
->> ---
->>  hw/pci/pcie.c | 1 -
->>  1 file changed, 1 deletion(-)
->>
->> diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
->> index 39b10b852d91..f864c5cd5458 100644
->> --- a/hw/pci/pcie.c
->> +++ b/hw/pci/pcie.c
->> @@ -668,7 +668,6 @@ void pcie_add_capability(PCIDevice *dev,
->>      uint16_t next;
->>  
->>      assert(offset >= PCI_CONFIG_SPACE_SIZE);
->> -    assert(offset < offset + size);
->>      assert(offset + size <= PCIE_CONFIG_SPACE_SIZE);
->>      assert(size >= 8);
->>      assert(pci_is_express(dev));
->> -- 
->> 2.1.0
->>
->>
-> 
-> 
-> 
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
