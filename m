@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57682)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57935)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cQxjy-0006f5-4d
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 09:49:35 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cQxlG-0007d9-CY
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 09:50:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cQxjv-0007qN-1v
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 09:49:34 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60668)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cQxju-0007p3-PV
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 09:49:30 -0500
-References: <1484052795-158195-1-git-send-email-imammedo@redhat.com>
-	<1484052795-158195-4-git-send-email-imammedo@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <6fa24bf8-ea8f-65be-4a06-8721fbca7d27@redhat.com>
-Date: Tue, 10 Jan 2017 08:49:27 -0600
+	(envelope-from <marcandre.lureau@gmail.com>) id 1cQxlE-0008D9-5V
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 09:50:54 -0500
+Received: from mail-yb0-x243.google.com ([2607:f8b0:4002:c09::243]:36443)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1cQxlD-0008CJ-UI
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 09:50:52 -0500
+Received: by mail-yb0-x243.google.com with SMTP id l23so2338176ybj.3
+	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 06:50:51 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1484052795-158195-4-git-send-email-imammedo@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="caTlhq2X8SGUlMo8HingxL99BDOKI6QAe"
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] fix qmp/hmp query-memdev not
- reporting IDs of memory backends
+References: <20170110110621.15287-1-marcandre.lureau@redhat.com>
+	<bf314a15-d2aa-f0bb-8a59-5589e623d650@redhat.com>
+In-Reply-To: <bf314a15-d2aa-f0bb-8a59-5589e623d650@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 10 Jan 2017 14:50:38 +0000
+Message-ID: <CAJ+F1CKOZwHaOUYU0ZXg1b51A=scmpXq3+7hnrEWvfq-UHKriw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] char: fix ctrl-a b not working
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,68 +30,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-Cc: ehabkost@redhat.com, armbru@redhat.com, dgilbert@redhat.com, afaerber@suse.de, pbonzini@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: 1654137@bugs.launchpad.net, gson@gson.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---caTlhq2X8SGUlMo8HingxL99BDOKI6QAe
-From: Eric Blake <eblake@redhat.com>
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-Cc: ehabkost@redhat.com, armbru@redhat.com, dgilbert@redhat.com,
- afaerber@suse.de, pbonzini@redhat.com
-Message-ID: <6fa24bf8-ea8f-65be-4a06-8721fbca7d27@redhat.com>
-Subject: Re: [PATCH v2 3/3] fix qmp/hmp query-memdev not reporting IDs of
- memory backends
-References: <1484052795-158195-1-git-send-email-imammedo@redhat.com>
- <1484052795-158195-4-git-send-email-imammedo@redhat.com>
-In-Reply-To: <1484052795-158195-4-git-send-email-imammedo@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Tue, Jan 10, 2017 at 12:23 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
 
-On 01/10/2017 06:53 AM, Igor Mammedov wrote:
-> Considering 'id' is mandatory for user_creatable objects/backends
-> and user_creatable_add_type() always has it as an argument
-> regardless of where from it is called CLI/monitor or QMP,
-> Fix issue by adding 'id' property to hostmem backends and
-> set it in user_creatable_add_type() for every object that
-> implements 'id' property. Then later at query-memdev time
-> get 'id' from object directly.
->=20
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> ---
->  include/sysemu/hostmem.h |  1 +
->  backends/hostmem.c       | 26 ++++++++++++++++++++++++++
->  docs/qmp-commands.txt    |  1 +
->  hmp.c                    |  5 +----
->  numa.c                   |  3 +++
->  qapi-schema.json         |  3 +++
->  qom/object_interfaces.c  |  6 ++++++
->  7 files changed, 41 insertions(+), 4 deletions(-)
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
 
+On 10/01/2017 12:06, Marc-Andr=C3=A9 Lureau wrote:
+> CharDriverState.be should be updated to point to the current
+> associated backend.
+>
+> Fix the regression introduced in the "mux" chardev from commit
+> a4afa548fc6dd9842ed86639b4d37d4d1c4ad480.
+>
+> https://bugs.launchpad.net/bugs/1654137
+
+Queued.
+
+However, can you also simplify mux_chr_accept_input, mux_chr_can_read
+and mux_chr_read to use d->be directly, with this change?
+
+
+Yes, not a big improvement though. I'll consider it in the reactoring
+series (https://github.com/elmarco/qemu/commits/chrfe)
 --=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---caTlhq2X8SGUlMo8HingxL99BDOKI6QAe
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYdPR3AAoJEKeha0olJ0Nq+JgH/jduZGdMNI29Lss5oMVBzx85
-GEynkU+vuzbeznT4P0QMWcp9VAvRABrjhV/+zJDtQG3PGRwijrr1bu8vjYb2FAnj
-QY4mYGLnkUr65ZFdDKdLgfwO9Z0JNqW2FUL8dZMx7F/V4T0okEeq6dTR1eQfzFup
-LJ3lLevv5OArPTiFj0EM5YgIUznXByhjnDleIp1PKg+JMXAbJHQkjfMNpZ5XY1Ur
-z+nmgc3nq+yvBUcmmgaX9vfep2WF7aBawzMeRCwCnfKMt5RaDS2wHZ9FPW44IZHk
-Z8aoJCeY61MAtTqNYxCrpi/z2qG30b5+EePU6ggic1Gxb3CvcEKyj+PhrR51xn4=
-=S+f4
------END PGP SIGNATURE-----
-
---caTlhq2X8SGUlMo8HingxL99BDOKI6QAe--
+Marc-Andr=C3=A9 Lureau
