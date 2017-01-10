@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40285)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40353)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cQmyI-0002Si-Gx
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 22:19:40 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cQmyK-0002Sx-Ez
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 22:19:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cQmyF-0004O9-6a
-	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 22:19:38 -0500
-Date: Tue, 10 Jan 2017 11:28:37 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1cQmyE-0004Ni-UN
+	for qemu-devel@nongnu.org; Mon, 09 Jan 2017 22:19:40 -0500
+Date: Tue, 10 Jan 2017 11:26:37 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170110002837.GK12515@umbus.fritz.box>
-References: <1483802623-5507-1-git-send-email-hpoussin@reactos.org>
-	<317d34e8-a3fa-2748-1245-3f8555d0738b@tuxfamily.org>
+Message-ID: <20170110002637.GI12515@umbus.fritz.box>
+References: <1483971975-5612-1-git-send-email-nikunj@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="T4Djgzn3z2HSNnx0"
+	protocol="application/pgp-signature"; boundary="JIpyCmsTxyPLrmrM"
 Content-Disposition: inline
-In-Reply-To: <317d34e8-a3fa-2748-1245-3f8555d0738b@tuxfamily.org>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v3 0/4] ppc: add a IBM 40p
- machine (RS/6000, PReP)
+In-Reply-To: <1483971975-5612-1-git-send-email-nikunj@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] POWER9 TCG enablements - part10
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,75 +23,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <huth@tuxfamily.org>
-Cc: =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>, qemu-devel@nongnu.org, Giancarlo Teodori <gteodori@gmail.com>, qemu-ppc@nongnu.org
+To: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com
 
 
---T4Djgzn3z2HSNnx0
-Content-Type: text/plain; charset=iso-8859-1
+--JIpyCmsTxyPLrmrM
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jan 09, 2017 at 08:43:47AM +0100, Thomas Huth wrote:
-> On 07.01.2017 16:23, Herv=E9 Poussineau wrote:
-> > Hi,
-> >=20
-> > This patchset adds the emulation of the IBM RS/6000 7020 (40p). The rea=
-l machine is
-> > able to run AIX (up to 4.3.3), Windows NT (up to 4.0 SP1), the beta of =
-OS/2 PowerPC,
-> > Solaris, Linux, NetBSD/PReP ...
-> >=20
-> > I've tested current emulation with Open Hack'Ware, OpenBIOS and officia=
-l firmware.
-> >=20
-> > Linux kernel starts, and freezes during boot (seems like a problem with=
- the SCSI adapter).
-> > Windows NT starts up to the point where it wants to change endianness.
-> > Other OSes have not been tested.
-> >=20
-> > This machine is a superset of the 'prep' one, because we know exactly w=
-hat is/should
-> > emulated, and that operating system list running on it is quite wide.
-> > I hope that 'prep' machine can be deprecated soon and then later remove=
-d.
-> >=20
-> > Patch 1 is a cleanup, and can probably be committed first.
-> > Patches 2 to 4  are the real implementation of the IBM 40p.
-> >=20
-> > Changes since v2:
-> > - patch 2: fix mismatch between read and write functions for port 92
-> > - patch 4: use error_report instead of fprintf/hw_error
-> >=20
-> > Changes since v1:
-> > - removed patches related to display adapter:
-> >   Let's wait for an emulation of the real display adapter (an S3 Trio),=
- as current
-> >   VGA adapter already mostly works with Open Hack'Ware and OpenBIOS
-> > - various changes due to David Gibson's remarks
-> >=20
-> > Herv=E9 Poussineau (4):
-> >   prep: do not use global variable to access nvram
-> >   prep: add PReP System I/O
-> >   prep: add IBM RS/6000 7020 (40p) memory controller
-> >   prep: add IBM RS/6000 7020 (40p) machine emulation
-> >=20
-> >  default-configs/ppc-softmmu.mak |   2 +
-> >  hw/ppc/Makefile.objs            |   2 +
-> >  hw/ppc/prep.c                   | 233 +++++++++++++++++++++++++++++-
-> >  hw/ppc/prep_systemio.c          | 303 ++++++++++++++++++++++++++++++++=
-++++++++
-> >  hw/ppc/rs6000_mc.c              | 232 ++++++++++++++++++++++++++++++
-> >  hw/ppc/trace-events             |  11 ++
-> >  6 files changed, 781 insertions(+), 2 deletions(-)
-> >  create mode 100644 hw/ppc/prep_systemio.c
-> >  create mode 100644 hw/ppc/rs6000_mc.c
+On Mon, Jan 09, 2017 at 07:56:12PM +0530, Nikunj A Dadhania wrote:
+> This series contains 11 new instructions for POWER9 ISA3.0
+>      VSX Scalar Convert
+>      VSX Scalar Add QP
 >=20
-> By the way, the PReP machine currently does not have a proper maintainer
-> according to the MAINTAINERS file ... would you maybe volunteer to do
-> that job? If so, could you please send a patch for the MAINTAINERS file?
+> Changelog:
+> v1:=20
+> * xsaddqp, xscv[dpqp, qpdp] instructions use register numbering 0-31, thi=
+s needs
+>   to be handled in the decoding. ISA 3.0 documents to use them as VSR[VRA=
+ + 32],=20
+>   and likewise for other registers.=20
+>=20
+> v0:
+>    Rebase and update reviewed-by
 
-Yes, that would be much appreciated.
+Applied to ppc-for-2.9, replacing the earlier versions.
+
+>=20
+>=20
+> Bharata B Rao (3):
+>   target-ppc: Add xsaddqp instructions
+>   target-ppc: Add xscvdpqp instruction
+>   target-ppc: Add xscvqpdp instruction
+>=20
+>  target/ppc/fpu_helper.c             | 109 ++++++++++++++++++++++++++++++=
+++++++
+>  target/ppc/helper.h                 |   3 +
+>  target/ppc/internal.h               |   1 +
+>  target/ppc/translate/vsx-impl.inc.c |   3 +
+>  target/ppc/translate/vsx-ops.inc.c  |   3 +
+>  5 files changed, 119 insertions(+)
+>=20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -101,25 +72,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---T4Djgzn3z2HSNnx0
+--JIpyCmsTxyPLrmrM
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJYdCq1AAoJEGw4ysog2bOS4LYP/1Lfos7rSIi23kjy0aQQz48c
-ev30rAmSBymTrXZVlKWu0yMX1gC/1W9diikicS+f6p0zK1ev8DzZXHmX3oYYPIxM
-lyBdd+NUHq4AtVKj+Q6t1xtDeDg00ZARcSfTK15Kp/6inDZIYZrly43lOm82ezzp
-crCYyA/AQmvOO2yIo38PPpPthMdpGPNNSeOYIYklbJLeroAcYezG2YZkNn8FhGyP
-Dl5n/prwVe9QH9VQmRZwKjdu9PQqM2aV0wHUk180yisEfHjHjzrZ380asv6+Xoo9
-asNi6e2h/sC+mkFs1Ta42hylkzWwxAfZzvvxiVPFQZwFHrEBZCoYzUG196Y5vfQF
-eACMFACG2I70tKz6lQn6ykSd0+0HZFdRxEFncHxuVUs99XYtvm6+keRO4AyiQdyu
-pULc7WdD+0stdOskU1jGwgtYPaZpovPfL9D7ldNzITXHB/OJQ5ogg2SD6k6dNWHR
-NE1j1BOxxfPYoQYfi2bJho6oD4uKV3tRGTjHB9xMDdhRL0BMLvf5MMb4yocLavew
-7QkEBq+9ueR2kz46dvuMlHymxWF5W24mDa19UJT0Ou1Upv1TxXQzFZeE9VtaUajA
-iuDrCtA+/yImEAgKTWpWv3QY8SZPyX3O31KVmrADTjDi+aMsjaAxYGgnEttVVwM9
-0cYxcQ37fJ5UU+r0ka1P
-=v1sR
+iQIcBAEBCAAGBQJYdCo7AAoJEGw4ysog2bOSjtkQAK65/32u67fUIqdsQlSAlCyM
+6dFRzoMWuUosNTOxXMCI9ELRdNNo4OTaFMnvQtuxRQwcuV5eX7w4ci0nzKmgDwuH
+daRnWvCZ+8VYX9xadUjk8hAZIYCjseyEj7w1F4EDGOHgzjdw+1mYF78jk9Zwv/B1
+OUjFY8j3sayXvinLB7PRdX8aQylF5w8/BSeR9ca7skUWYvDZhTs7vK4BqHZy3RdW
+ruJHN8yuBkj1VMBs7Fln6Bjcdam82ybgL8JI0xO/INASdM0o526Y8RonOnlDFS4c
+7PGlbisMW8uRxXoBrhAdPW2hh0KapMInMUL5jZVHIWTYDjb7xDy9l2dgfg3C7s60
+0pSnfs86AhVRE0YnrCWNpuP5XtFeycly7bQWPyx5yzvhXE4VCQ0/HQikme4LqjVJ
+MxSS49REN/59C4ROaEB5aPrVgkEkzh8C76IxZxhrSbK2K8F6GZkrfJEL6DqxUrPo
+0qwiVHnFa0uWf8lS9Fgv1B+H9hQRiMCImnzg53jH88SXULekG0qTJTysEu10kVZ/
+REr6QBLLdEjJ+NS3n8SgcghwXyNmA3+bhAWuS5v+PwCgqQgVuVeESr4t6dcnwYLJ
+7k54AHe9FGt+6XGmQH3wfoS6k678vPPgUD5erUY0KW9ng5ZTikxmrHA7ScB15S8G
+7ZqKG/qOiQPhi9jyrFcZ
+=/TvW
 -----END PGP SIGNATURE-----
 
---T4Djgzn3z2HSNnx0--
+--JIpyCmsTxyPLrmrM--
