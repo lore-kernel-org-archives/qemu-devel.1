@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39429)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39629)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1cQyG8-0002Ad-Dw
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 10:22:49 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cQyGX-0002Me-QK
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 10:23:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1cQyG7-0002fH-0S
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 10:22:48 -0500
-Received: from mail-io0-x235.google.com ([2607:f8b0:4001:c06::235]:36626)
+	(envelope-from <alex.bennee@linaro.org>) id 1cQyGS-0002lG-U0
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 10:23:13 -0500
+Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:36520)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1cQyG6-0002ey-SP
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 10:22:46 -0500
-Received: by mail-io0-x235.google.com with SMTP id j13so52393544iod.3
-	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 07:22:46 -0800 (PST)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cQyGS-0002kz-Ja
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 10:23:08 -0500
+Received: by mail-wm0-x229.google.com with SMTP id c85so131103377wmi.1
+	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 07:23:08 -0800 (PST)
+References: <20161124161033.11456-1-alex.bennee@linaro.org>
+	<20161124161033.11456-5-alex.bennee@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20161124161033.11456-5-alex.bennee@linaro.org>
+Date: Tue, 10 Jan 2017 15:23:05 +0000
+Message-ID: <87r34b2b3a.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <C5E4DA8A-2E1B-4514-8F51-8FE8A0DD52C7@alex.org.uk>
-References: <CAMo8BfLRP8qUgJAkU3fSwE_H6EmqYmPKO_MhMn7B6WpwGWUudw@mail.gmail.com>
-	<C5E4DA8A-2E1B-4514-8F51-8FE8A0DD52C7@alex.org.uk>
-From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Tue, 10 Jan 2017 07:22:44 -0800
-Message-ID: <CAMo8BfLz2i5hJO=3FXjQrWZg84-uktjPe9bLpObnvw4wCjDXEQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] implementing architectural timers using QEMU timers
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [kvm-unit-tests PATCH v7 04/11] libcflat: add
+ PRI(dux)32 format types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,104 +31,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Bligh <alex@alex.org.uk>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Pavel Dovgaluk <Pavel.Dovgaluk@ispras.ru>, "rth@twiddle.net" <rth@twiddle.net>
+To: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com
+Cc: qemu-devel@nongnu.org, mttcg@listserver.greensocs.com, fred.konrad@greensocs.com, a.rigo@virtualopensystems.com, cota@braap.org, bobby.prani@gmail.com, nikunj@linux.vnet.ibm.com, mark.burton@greensocs.com, pbonzini@redhat.com, jan.kiszka@siemens.com, serge.fdrv@gmail.com, rth@twiddle.net, peter.maydell@linaro.org, claudio.fontana@huawei.com
 
-On Mon, Jan 9, 2017 at 7:41 AM, Alex Bligh <alex@alex.org.uk> wrote:
->> On 9 Jan 2017, at 15:18, Max Filippov <jcmvbkbc@gmail.com> wrote:
->> I'm trying to reimplement xtensa CCOUNT (cycle counter) and
->> CCOMPARE (CCOUNT-based timer interrupts) using QEMU
->> timers. That is CCOUNT value is derived from the
->> QEMU_CLOCK_VIRTUAL clock and CCOMPARE interrupts are
->> generated from the QEMU_CLOCK_VIRTUAL timer callbacks.
->> The code is here:
->>  https://github.com/OSLL/qemu-xtensa/commits/xtensa-ccount
->>
->> I've got the following issues doing that:
->>
->> - in non-icount mode I can often read CCOUNT and get a value
->>  that is greater than programmed CCOMPARE value, which
->>  means that QEMU timer must have been fired at that point, but
->>  no sign of timer callback being called. That is timer callback
->>  invocation lags behind due time.
->>
->>  Is my understanding correct that there's no hard expectations
->>  that firing of QEMU timers will be correctly sequenced with
->>  readings of QEMU clock?
->
-> My understanding is that the intent of the API contract is that
->
-> * The timer will not fire earlier than the time requested (but
->   can fire later)
->
-> * Timers on the same clock and context will fire in the order
->   of their expiry time (with the ordering being undefined in
->   the event the expiry times are equal).
->
-> Whether in practice any users make use of the second guarantee
-> above I don't know.
 
-Ok.
+Alex Bennée <alex.bennee@linaro.org> writes:
 
->> - I thought that could be improved in -icount mode, so I tried that.
->>  It is better with -icount, but it's still not 100% accurate. That is
->>  I was able to observe guest reading QEMU clock value that is
->>  past QEMU timer deadline before that timer callback was
->>  invoked.
->>
->>  That sounds like a bug to me, is it?
+> So we can have portable formatting of uint32_t types.
 >
-> Hmm... that would be a bug if it were guaranteed that the
-> guest reads are always perfectly in sync with the timer
-> itself. I don't know whether that is the case.
-
-I guess that's my intuitive expectation of the determinism
-offered by the -icount. Because if QEMU_CLOCK_VIRTUAL
-timers are allowed to lag they cannot be used for deterministic
-events, right? If that's intentional, then the question is what
-can be used to generate an event at specific virtual time?
-
-> Even though I authored a large timer patch, I found the icount
-> stuff confusing.
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> ---
+>  lib/libcflat.h | 5 +++++
+>  1 file changed, 5 insertions(+)
 >
->> - when guest sets a timer and halts itself waiting for timer
->>  interrupt with waiti opcode QEMU behaviour is very strange with
->>  -icount: regardless of the programmed timeout QEMU waits for
->>  about a second before it delivers interrupt, and, AFAICT,
->>  interrupt delivery it is not caused by the corresponding CCOUNT
->>  timer. I was able to track this issue down to the
->>  qemu_clock_use_for_deadline function, i.e. always returning true
->>  'fixes' that unwanted delay, but looking around the timer code
->>  I've got the impression that that's not the correct fix.
->>
->>  Any suggestions on how to fix that?
+> diff --git a/lib/libcflat.h b/lib/libcflat.h
+> index bdcc561..6dab5be 100644
+> --- a/lib/libcflat.h
+> +++ b/lib/libcflat.h
+> @@ -55,12 +55,17 @@ typedef _Bool		bool;
+>  #define true  1
 >
-> This could be someone using timerlistgroup_deadline_ns rather than
-> qemu_clock_deadline_ns_all.
+>  #if __SIZEOF_LONG__ == 8
+> +#  define __PRI32_PREFIX
+>  #  define __PRI64_PREFIX	"l"
+>  #  define __PRIPTR_PREFIX	"l"
+>  #else
+> +#  define __PRI32_PREFIX        "l"
 
-Well, main_loop_wait uses timerlistgroup_deadline_ns. If I only
-change this place to take all timers into account it works without
-the unwanted timeout. But still the following comment above the
-qemu_clock_use_for_deadline makes me wonder if such change
-is legitimate:
+OK this is bogus, but the failure is because of where we get uint32_t
+from (hint using arm32 compiler on a arm64 system) so I got:
 
- * Determine whether a clock should be used for deadline
- * calculations. Some clocks, for instance vm_clock with
- * use_icount set, do not count in nanoseconds. Such clocks
- * are not used for deadline calculations, and are presumed
- * to interrupt any poll using qemu_notify/aio_notify
- * etc.
+  lib/pci.c:71:9: error: format '%x' expects argument of type 'unsigned int', but argument 3 has type 'uint32_t {aka long unsigned int}' [-Werro\
+r=format=]
 
-> The comment at the top of qemu_clock_deadline_ns_all says:
->
-> /* Calculate the soonest deadline across all timerlists attached
->  * to the clock. This is used for the icount timeout so we
->  * ignore whether or not the clock should be used in deadline
->  * calculations.
->  */
->
-> I'm wondering whether there is something up with that logic.
+Which makes me think we should be more careful about including system
+headers in kvm-unit-tests (done in 75e777a0).
 
--- 
-Thanks.
--- Max
+--
+Alex Bennée
