@@ -1,30 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42161)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46651)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cQyV2-0000KW-CB
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 10:38:13 -0500
+	(envelope-from <armbru@redhat.com>) id 1cQyuC-00065Q-JI
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 11:04:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cQyUx-0006fg-OF
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 10:38:12 -0500
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:35592)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1cQyUx-0006fV-IV
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 10:38:07 -0500
-Received: by mail-wm0-x242.google.com with SMTP id l2so30676695wml.2
-	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 07:38:07 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <1479108340-3453-1-git-send-email-caoj.fnst@cn.fujitsu.com>
-	<20170109234446-mutt-send-email-mst@kernel.org>
-	<87bmvftejz.fsf@dusky.pond.sub.org>
-	<20170110162151-mutt-send-email-mst@kernel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <117edb31-5328-18fb-00d8-604e0e9f2757@redhat.com>
-Date: Tue, 10 Jan 2017 16:38:05 +0100
+	(envelope-from <armbru@redhat.com>) id 1cQyu7-0005Ht-BV
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 11:04:12 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51268)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cQyu7-0005Hl-60
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 11:04:07 -0500
+Received: from int-mx09.intmail.prod.int.phx2.redhat.com
+	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 39C0112B27
+	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 16:04:07 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170109143437.30554-1-marcandre.lureau@redhat.com>
+	<20170109143437.30554-13-marcandre.lureau@redhat.com>
+	<87wpe3qf2a.fsf@dusky.pond.sub.org>
+	<724269411.621337.1484052915061.JavaMail.zimbra@redhat.com>
+Date: Tue, 10 Jan 2017 17:04:04 +0100
+In-Reply-To: <724269411.621337.1484052915061.JavaMail.zimbra@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Tue, 10 Jan 2017
+	07:55:15 -0500 (EST)")
+Message-ID: <87d1fuoqa3.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20170110162151-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v7 00/10] Convert msix_init() to error
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v7 12/21] qapi.py: fix line break before
+ binary operator pep8
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,44 +38,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: Jiri Pirko <jiri@resnulli.us>, Jason Wang <jasowang@redhat.com>, Cao jin <caoj.fnst@cn.fujitsu.com>, qemu-devel@nongnu.org, Dmitry Fleytman <dmitry@daynix.com>, Alex Williamson <alex.williamson@redhat.com>, Hannes Reinecke <hare@suse.de>, Marcel Apfelbaum <marcel@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <mlureau@redhat.com>
+Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+
+Marc-Andr=C3=A9 Lureau <mlureau@redhat.com> writes:
+
+> Hi
+>
+> ----- Original Message -----
+>> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+>>=20
+>> > Python code style accepts both form, but pep8 complains. Better to cle=
+an
+>> > up the single warning for now, so new errors stand out more easily.
+>> >
+>> > Fix scripts/qapi.py:1539:21: W503 line break before binary operator
+>>=20
+>> PEP 8 permits both, but prefers line break before binary operator.
+>> Thus, this warning is clearly bogus.  What version of pep8 do you use?
+>> Mine doesn't warn.
+>
+> I tried both 1.6.2 and 1.7.0
+
+I tried again, and I can now see the warning.  No idea what I did wrong
+the first time.
+
+Turns out PEP8 used to demand line break after the operator, but no
+more[1].  The pep8 program hasn't caught up, but it will[2]: its current
+git HEAD already suppresses W503.  There's work in progress[3] on a new
+W504 to warn on line break after binary operator.
+
+We will have to live with a mix of old and new pep8 / pycodestyle
+versions.  Changing code to make new versions instead of old versions
+complain instead is not a good idea.  We should simply ignore the
+obsolete warning from old versions.
+
+pep8 lets you do that with --ignore=3DW503.  Sadly, --ignore overwrites
+the default, so you have to --ignore=3DE121,E123,E126,E226,E24,E704,W503.
+Or have a file tox.ini with
+
+    [pep8]
+    ignore=3DE121,E123,E126,E226,E24,E704,W503
 
 
-
-On 10/01/2017 15:38, Michael S. Tsirkin wrote:
-> On Tue, Jan 10, 2017 at 11:06:08AM +0100, Markus Armbruster wrote:
->> "Michael S. Tsirkin" <mst@redhat.com> writes:
->>
->>> On Mon, Nov 14, 2016 at 03:25:30PM +0800, Cao jin wrote:
->>>> v7 changelog:
->>>> 1. fix the segfaut bug in patch 2. So drop the all the R-b of it,
->>>>    please take a look, there is detailed description in the patch.
->>>> 2. add the R-b from Hannes Reinecke
->>>>
->>>> Test:
->>>> 1. make check: pass
->>>> 2. After applied all the patch, command line test for all the
->>>>    affected devices, just make sure device realize process is ok,
->>>>    no crash, but no further use of device.
->>>
->>> Consider the megasas device for example, don't you
->>> need to test that the change actually does what
->>> it's intended to do?
->>
->> For better or worse, that's a higher bar than we commonly require for
->> refactorings.
->>
->> [...]
-> 
-> Well the patch says that it's addressing a TODO. If no one can
-> be bothered to test the functionality, maybe we shouldn't bother
-> with the change.
-> 
-> Generally this patchset is at v7.  It brings a very limited benefit to
-> the project.  It better be perfect otherwise I don't see why bother.
-
-I agree.  The changes to the device model are non-trivial and you should
-make a decent effort at coverage of non-trivial changes.
-
-Paolo
+[1] https://hg.python.org/peps/rev/3857909d7956
+[2] https://github.com/PyCQA/pycodestyle/issues/498
+[3] https://github.com/PyCQA/pycodestyle/pull/502
