@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60092)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60110)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cQsS2-00086n-3O
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 04:10:43 -0500
+	(envelope-from <imammedo@redhat.com>) id 1cQsS4-00088K-Jg
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 04:10:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cQsRx-0001HJ-W3
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 04:10:42 -0500
-Received: from greensocs.com ([193.104.36.180]:50687)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <fred.konrad@greensocs.com>) id 1cQsRx-0001Gt-Ai
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 04:10:37 -0500
-References: <CAMo8BfLRP8qUgJAkU3fSwE_H6EmqYmPKO_MhMn7B6WpwGWUudw@mail.gmail.com>
-From: Frederic Konrad <fred.konrad@greensocs.com>
-Message-ID: <cd817ab9-fd77-f52c-5ee7-7502b68959cb@greensocs.com>
-Date: Tue, 10 Jan 2017 10:10:30 +0100
+	(envelope-from <imammedo@redhat.com>) id 1cQsS0-0001Hw-OW
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 04:10:44 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53738)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cQsS0-0001Hg-Bq
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 04:10:40 -0500
+Date: Tue, 10 Jan 2017 10:10:37 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170110101037.75bdb727@nial.brq.redhat.com>
+In-Reply-To: <CAMxP3BRbr2huckaL_J+qEmAHHrwFKSsfYfp1ou1p=UVOqXgtvw@mail.gmail.com>
+References: <CAMxP3BTmayVS5VHYm6iXgZFetiv8YAPnyd_1-6p_q33gDLTrEQ@mail.gmail.com>
+	<20170105101246.GC3292@redhat.com>
+	<CAMxP3BRbr2huckaL_J+qEmAHHrwFKSsfYfp1ou1p=UVOqXgtvw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAMo8BfLRP8qUgJAkU3fSwE_H6EmqYmPKO_MhMn7B6WpwGWUudw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] implementing architectural timers using QEMU timers
+Subject: Re: [Qemu-devel] Live migration + cpu/mem hotplug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,57 +28,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Filippov <jcmvbkbc@gmail.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Pavel Dovgaluk <Pavel.Dovgaluk@ispras.ru>, Alex Bligh <alex@alex.org.uk>, Richard Henderson <rth@twiddle.net>
+To: Bob Chen <a175818323@gmail.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
 
-On 01/09/2017 04:18 PM, Max Filippov wrote:
-> Hello,
-> 
-> I'm trying to reimplement xtensa CCOUNT (cycle counter) and
-> CCOMPARE (CCOUNT-based timer interrupts) using QEMU
-> timers. That is CCOUNT value is derived from the
-> QEMU_CLOCK_VIRTUAL clock and CCOMPARE interrupts are
-> generated from the QEMU_CLOCK_VIRTUAL timer callbacks.
-> The code is here:
->   https://github.com/OSLL/qemu-xtensa/commits/xtensa-ccount
-> 
-> I've got the following issues doing that:
-> 
-> - in non-icount mode I can often read CCOUNT and get a value
->   that is greater than programmed CCOMPARE value, which
->   means that QEMU timer must have been fired at that point, but
->   no sign of timer callback being called. That is timer callback
->   invocation lags behind due time.
-> 
->   Is my understanding correct that there's no hard expectations
->   that firing of QEMU timers will be correctly sequenced with
->   readings of QEMU clock?
-> 
-> - I thought that could be improved in -icount mode, so I tried that.
->   It is better with -icount, but it's still not 100% accurate. That is
->   I was able to observe guest reading QEMU clock value that is
->   past QEMU timer deadline before that timer callback was
->   invoked.
-> 
->   That sounds like a bug to me, is it?
+On Tue, 10 Jan 2017 14:28:19 +0800
+Bob Chen <a175818323@gmail.com> wrote:
 
-Did you try "sleep" icount option?
-
-eg:
--icount 1,sleep=off
-
-Fred
+> Answer my own question:
+> 
+> The corresponding cmd-line parameter for memory hot-add by QEMU monitor is,
+> -object memory-backend-ram,id=mem0,size=1024M -device
+> pc-dimm,id=dimm0,memdev=mem0
+pc-dimm should have additional property
+  -device pc-dimm,id=dimm0,memdev=mem0,hotplugged=on
 
 > 
-> - when guest sets a timer and halts itself waiting for timer
->   interrupt with waiti opcode QEMU behaviour is very strange with
->   -icount: regardless of the programmed timeout QEMU waits for
->   about a second before it delivers interrupt, and, AFAICT,
->   interrupt delivery it is not caused by the corresponding CCOUNT
->   timer. I was able to track this issue down to the
->   qemu_clock_use_for_deadline function, i.e. always returning true
->   'fixes' that unwanted delay, but looking around the timer code
->   I've got the impression that that's not the correct fix.
+> 2017-01-05 18:12 GMT+08:00 Daniel P. Berrange <berrange@redhat.com>:
 > 
->   Any suggestions on how to fix that?
-> 
+> > On Thu, Jan 05, 2017 at 04:27:26PM +0800, Bob Chen wrote:  
+> > > Hi,
+> > >
+> > > According to the docs, the destination Qemu must have the exactly same
+> > > parameters as the source one. So if the source has just finished cpu or
+> > > memory hotplug, what would the dest's parameters be like?
+> > >
+> > > Does DIMM device, or logically QOM object, have to be reflected on the  
+> > new  
+> > > command-line parameters?  
+> >
+> > Yes, if you have hotplugged any type of device since the VM was started,
+> > the QEMU command line args on the target host must include all the original
+> > args from the source QEMU, and also any args reflect to reflect the
+> > hotplugged devices too.
+> >
+> > A further complication is that on the target, you must also make sure you
+> > fully specify *all* device address information (PCI slots, SCSI luns, etc
+> > etc), because the addresses QEMU assigns to a device after hotplug may
+> > not be the same as the addresses QEMU assigns to a device whne coldplug.
+> >
+> > eg if you boot a guest with 1 NIC + 1 disk, and then hotplug a 2nd NIC
+> > you might get
+> >
+> >    1st NIC  == PCI slot 2
+> >    1st disk == PCI slot 3
+> >    2nd NIC  == PCI slot 4
+> >
+> > if however, you started QEMU with 2 NICs and 1 disk straight away QEMU
+> > might assign addresses in the order
+> >
+> >    1st NIC  == PCI slot 2
+> >    2nd NIC  == PCI slot 3
+> >    1st disk == PCI slot 4
+> >
+> > this would totally kill a guest OS during live migration as the slots
+> > for devices its using would change.
+> >
+> > So as a general rule when launching QEMU on a target host for migrating,
+> > you must be explicit about all device addresses and not rely on QEMU to
+> > auto-assign addresses. This is quite alot of work to get right, but if
+> > you're using libvirt it'll do pretty much all this automatically for
+> > you.
+> >
+> > Regards,
+> > Daniel
+> > --
+> > |: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/
+> > :|
+> > |: http://libvirt.org              -o-             http://virt-manager.org
+> > :|
+> > |: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/
+> > :|
+> >  
