@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56934)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59056)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cQze5-0001zE-9Y
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 11:51:38 -0500
+	(envelope-from <bounces@canonical.com>) id 1cQznR-0007Bj-Qo
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 12:01:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cQze0-0002Pz-Ez
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 11:51:37 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51966)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cQze0-0002Pq-5h
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 11:51:32 -0500
-Received: from int-mx10.intmail.prod.int.phx2.redhat.com
-	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 45E521556C
-	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 16:51:32 +0000 (UTC)
-References: <20170106155543.12827-1-berrange@redhat.com>
-	<20170106155543.12827-3-berrange@redhat.com>
-	<20170110163713.GA19869@stefanha-x1.localdomain>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <eabc1ecd-439c-69cc-facb-281699a4d26e@redhat.com>
-Date: Tue, 10 Jan 2017 10:51:29 -0600
+	(envelope-from <bounces@canonical.com>) id 1cQznO-00058R-OV
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 12:01:17 -0500
+Received: from indium.canonical.com ([91.189.90.7]:50031)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cQznO-000589-GR
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 12:01:14 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cQznM-0004uo-0n
+	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 17:01:12 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 014F12E80AE
+	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 17:01:12 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20170110163713.GA19869@stefanha-x1.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="PoRdvb9ktiE0AC1GIQq7GGNLDXAtUXKop"
-Subject: Re: [Qemu-devel] [PATCH v2 02/47] trace: switch io/ directory to
- modular trace.h file
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 10 Jan 2017 16:52:45 -0000
+From: Fabian Lesniak <fabian@lesniak-it.de>
+Reply-To: Bug 1653384 <1653384@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20161231213844.1229.87554.malonedeb@soybean.canonical.com>
+Message-Id: <20170110165245.14666.75821.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1653384] Re: Assertion failed with USB pass
+ through with XHCI controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,75 +37,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---PoRdvb9ktiE0AC1GIQq7GGNLDXAtUXKop
-From: Eric Blake <eblake@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>,
- "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org
-Message-ID: <eabc1ecd-439c-69cc-facb-281699a4d26e@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 02/47] trace: switch io/ directory to
- modular trace.h file
-References: <20170106155543.12827-1-berrange@redhat.com>
- <20170106155543.12827-3-berrange@redhat.com>
- <20170110163713.GA19869@stefanha-x1.localdomain>
-In-Reply-To: <20170110163713.GA19869@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+This behaviour was introduced by commit:
 
-On 01/10/2017 10:37 AM, Stefan Hajnoczi wrote:
-> On Fri, Jan 06, 2017 at 03:54:58PM +0000, Daniel P. Berrange wrote:
->> diff --git a/io/channel-buffer.c b/io/channel-buffer.c
->> index 43d7959..b4e50d6 100644
->> --- a/io/channel-buffer.c
->> +++ b/io/channel-buffer.c
->> @@ -22,7 +22,7 @@
->>  #include "io/channel-buffer.h"
->>  #include "io/channel-watch.h"
->>  #include "qemu/sockets.h"
->> -#include "trace.h"
->> +#include "io/trace.h"
->=20
-> Is this change necessary?
+94b037f2a451b3dc855f9f2c346e5049a361bd55
+xhci: use linked list for transfers
 
-Yes - now that there are more than one trace.h files spread across
-multiple directories, you need a prefix to ensure the correct one gets
-included.  In this particular case, it also matches consistency in
-including "io/channel-buffer.h" rather than just "channel-buffer.h".
+However, QEMU does not crash yet, but linux' xhci_hcd reports errors
+like "ERROR Transfer event TRB DMA...". The following commit
 
->=20
-> I think the per-subdir trace.h file should be generated in
-> $BUILD_DIR/<sub-dir>/trace.h and gcc -I. can locate that file.
+5612564ea9cf5b9636438a1b58ae9a2ab6ca16ae
+xhci: drop XHCITransfer->xhci
 
-It can indeed locate it, but now you are depending on -I ordering to
-make sure it locates the right one before any other wrong one, which
-feels too fragile to me.
+finally makes QEMU crash on the assertion check.
 
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+I tried to dig into the code, but I'm not an expert in usb stuff so I
+don't understand it. usb_packet_is_inflight checks if USBPacket.state is
+USB_PACKET_QUEUED or USB_PACKET_ASYNC. I suppose that somewhere in the
+code changed by 94b037f2 finished usb transfers do not have the packet
+state changed.
 
+-- =
 
---PoRdvb9ktiE0AC1GIQq7GGNLDXAtUXKop
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1653384
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+Title:
+  Assertion failed with USB pass through with XHCI controller
 
-iQEcBAEBCAAGBQJYdRERAAoJEKeha0olJ0NqxEMH/1AiPh2h4esGwqCtmjLGHDTN
-I95q11NFKjSpuqC08Y9V9S5mEYLstnoPz1H0nnby8lR8KFCCjycrbQlbud2N2zkL
-k+JbzVnT5Wt9qTL5yjzA5L78YgDsXO0V53pUrXEuq8YSeKSNnlqweET5LKB1VdOj
-3fhKuyqWRtHiI0XqEaTtJ/NxaaWoLZVmKVZVdCswvKIKjdA4sbfQLcN1owlX0s5B
-Vpo6UytEWm80fJBWPZXNtacXJ7r/ZUMz+kW1pPHfwmuLsQz0aIuAF5qUWI6ITVpL
-+9wVlywK1KhjKGqY99howozMFhygP6MKts0Dur6LhM4eZ6qa1GKLK62ldstj2FI=
-=oAkI
------END PGP SIGNATURE-----
+Status in QEMU:
+  New
 
---PoRdvb9ktiE0AC1GIQq7GGNLDXAtUXKop--
+Bug description:
+  Starting qemu 2.8.0 with XHCI controller and host device passed
+  through results in an assertion failure:
+
+  qemu-system-x86_64: hw/usb/core.c:623: usb_packet_cleanup: Assertion
+  `!usb_packet_is_inflight(p)' failed.
+
+  Can be reproduced with the following command (passing through a Lenovo
+  keyboard):
+
+  qemu-system-x86_64 -usb  -device nec-usb-xhci,id=3Dusb -device usb-
+  host,vendorid=3D0x04b3,productid=3D0x3025,id=3Dhostdev0,bus=3Dusb.0,port=
+=3D1
+
+  If nec-usb-xhci is changed to usb-ehci, qemu tries to boot without
+  assertion failures.
+
+  =
+
+  Can be reproduced with the latest master (commit dbe2b65) and v2.8.0.
+
+  Bisected the issue to following commit:
+  first bad commit: [94b037f2a451b3dc855f9f2c346e5049a361bd55] xhci: use li=
+nked list for transfers
+
+  =
+
+  Backtrace from commit dbe2b65:
+
+  #0  0x00007f2eb4657227 in __GI_raise (sig=3Dsig@entry=3D6) at ../sysdeps/=
+unix/sysv/linux/raise.c:55
+          resultvar =3D 0
+          pid =3D 3453
+          selftid =3D 3453
+  #1  0x00007f2eb465867a in __GI_abort () at abort.c:89
+          save_stage =3D 2
+          act =3D {__sigaction_handler =3D {sa_handler =3D 0x4, sa_sigactio=
+n =3D 0x4}, sa_mask =3D {__val =3D {140734740550528, 93876690035339, =
+
+                140734740550624, 48833659808, 0, 0, 0, 21474836480, 1407347=
+40550792, 139838573009553, 140734740550560, 139838573043008, =
+
+                139838573024160, 93876666665872, 139838702616576, 139838573=
+024160}}, sa_flags =3D 1528954938, =
+
+            sa_restorer =3D 0x55615b2202c0 <__PRETTY_FUNCTION__.38612>}
+          sigs =3D {__val =3D {32, 0 <repeats 15 times>}}
+  #2  0x00007f2eb46502cd in __assert_fail_base (fmt=3D0x7f2eb47893a0 "%s%s%=
+s:%u: %s%sAssertion `%s' failed.\n%n", =
+
+      assertion=3Dassertion@entry=3D0x55615b22003a "!usb_packet_is_inflight=
+(p)", file=3Dfile@entry=3D0x55615b21fdf0 "hw/usb/core.c", line=3Dline@entry=
+=3D619, =
+
+      function=3Dfunction@entry=3D0x55615b2202c0 <__PRETTY_FUNCTION__.38612=
+> "usb_packet_cleanup") at assert.c:92
+          str =3D 0x55615cfdf510 ""
+          total =3D 4096
+  #3  0x00007f2eb4650382 in __GI___assert_fail (assertion=3D0x55615b22003a =
+"!usb_packet_is_inflight(p)", file=3D0x55615b21fdf0 "hw/usb/core.c", =
+
+      line=3D619, function=3D0x55615b2202c0 <__PRETTY_FUNCTION__.38612> "us=
+b_packet_cleanup") at assert.c:101
+  No locals.
+  #4  0x000055615afc385e in usb_packet_cleanup ()
+  No symbol table info available.
+  #5  0x000055615afda555 in xhci_ep_free_xfer ()
+  No symbol table info available.
+  #6  0x000055615afdc156 in xhci_kick_epctx ()
+  No symbol table info available.
+  #7  0x000055615afda099 in xhci_ep_kick_timer ()
+  No symbol table info available.
+  #8  0x000055615b08ceee in timerlist_run_timers ()
+  No symbol table info available.
+  #9  0x000055615b08cf36 in qemu_clock_run_timers ()
+  No symbol table info available.
+  #10 0x000055615b08d2df in qemu_clock_run_all_timers ()
+  No symbol table info available.
+  #11 0x000055615b08be40 in main_loop_wait ()
+  No symbol table info available.
+  #12 0x000055615ae3870f in main_loop ()
+  No symbol table info available.
+  #13 0x000055615ae4027b in main ()
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1653384/+subscriptions
