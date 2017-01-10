@@ -1,26 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58468)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60079)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cQvqJ-0004mX-Bb
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 07:48:00 -0500
+	(envelope-from <imammedo@redhat.com>) id 1cQvvX-0007cw-2l
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 07:53:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cQvqF-00028o-Ec
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 07:47:59 -0500
-Resent-Message-Id: <E1cQvqF-00028o-Ec@eggs.gnu.org>
-Received: from sender163-mail.zoho.com ([74.201.84.163]:21431)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1cQvqF-00028f-6Q
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 07:47:55 -0500
-In-Reply-To: <1484052273-23815-1-git-send-email-gerg@uclinux.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <148405246416.208.15774370249510916631@790289a7ca88>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 10 Jan 2017 04:47:45 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH] hw/net: implement MIB counters in mcf_fec
- driver
+	(envelope-from <imammedo@redhat.com>) id 1cQvvT-0003tY-80
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 07:53:23 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:55324)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1cQvvT-0003tS-1Z
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 07:53:19 -0500
+From: Igor Mammedov <imammedo@redhat.com>
+Date: Tue, 10 Jan 2017 13:53:12 +0100
+Message-Id: <1484052795-158195-1-git-send-email-imammedo@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 0/3] fix query-memdev not repporting IDs of
+ memory backends
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,94 +22,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: gerg@uclinux.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com, armbru@redhat.com, dgilbert@redhat.com, eblake@redhat.com, afaerber@suse.de, pbonzini@redhat.com
 
-SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDE0ODQwNTIyNzMtMjM4MTUtMS1naXQtc2VuZC1lbWFpbC1nZXJnQHVjbGludXgu
-b3JnClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0hdIGh3L25ldDogaW1wbGVtZW50IE1JQiBj
-b3VudGVycyBpbiBtY2ZfZmVjIGRyaXZlcgoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9i
-aW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4g
-fCB3YyAtbCkKZmFpbGVkPTAKCiMgVXNlZnVsIGdpdCBvcHRpb25zCmdpdCBjb25maWcgLS1sb2Nh
-bCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVl
-Cgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3Ig
-YyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChn
-aXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZv
-cm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgog
-ICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoK
-ZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMy
-MWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3Bh
-dGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMTQ4NDA1MjI3
-My0yMzgxNS0xLWdpdC1zZW5kLWVtYWlsLWdlcmdAdWNsaW51eC5vcmcgLT4gcGF0Y2hldy8xNDg0
-MDUyMjczLTIzODE1LTEtZ2l0LXNlbmQtZW1haWwtZ2VyZ0B1Y2xpbnV4Lm9yZwpTd2l0Y2hlZCB0
-byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjhiNTk0YzEgaHcvbmV0OiBpbXBsZW1lbnQgTUlCIGNvdW50
-ZXJzIGluIG1jZl9mZWMgZHJpdmVyCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRD
-SCAxLzE6IGh3L25ldDogaW1wbGVtZW50IE1JQiBjb3VudGVycyBpbiBtY2ZfZmVjIGRyaXZlci4u
-LgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3Rh
-dGVtZW50CiMxMjA6IEZJTEU6IGh3L25ldC9tY2ZfZmVjLmM6MjExOgorICAgIGlmIChzaXplIDwg
-NjQpClsuLi5dCisgICAgZWxzZSBpZiAoc2l6ZSA9PSA2NCkKWy4uLl0KKyAgICBlbHNlIGlmIChz
-aXplIDwgMTI4KQpbLi4uXQorICAgIGVsc2UgaWYgKHNpemUgPCAyNTYpClsuLi5dCisgICAgZWxz
-ZSBpZiAoc2l6ZSA8IDUxMikKWy4uLl0KKyAgICBlbHNlIGlmIChzaXplIDwgMTAyNCkKWy4uLl0K
-KyAgICBlbHNlIGlmIChzaXplIDwgMjA0OCkKWy4uLl0KKyAgICBlbHNlClsuLi5dCgpFUlJPUjog
-YnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiMx
-MjI6IEZJTEU6IGh3L25ldC9tY2ZfZmVjLmM6MjEzOgorICAgIGVsc2UgaWYgKHNpemUgPT0gNjQp
-ClsuLi5dCisgICAgZWxzZSBpZiAoc2l6ZSA8IDEyOCkKWy4uLl0KKyAgICBlbHNlIGlmIChzaXpl
-IDwgMjU2KQpbLi4uXQorICAgIGVsc2UgaWYgKHNpemUgPCA1MTIpClsuLi5dCisgICAgZWxzZSBp
-ZiAoc2l6ZSA8IDEwMjQpClsuLi5dCisgICAgZWxzZSBpZiAoc2l6ZSA8IDIwNDgpClsuLi5dCisg
-ICAgZWxzZQpbLi4uXQoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJt
-cyBvZiB0aGlzIHN0YXRlbWVudAojMTI0OiBGSUxFOiBody9uZXQvbWNmX2ZlYy5jOjIxNToKKyAg
-ICBlbHNlIGlmIChzaXplIDwgMTI4KQpbLi4uXQorICAgIGVsc2UgaWYgKHNpemUgPCAyNTYpClsu
-Li5dCisgICAgZWxzZSBpZiAoc2l6ZSA8IDUxMikKWy4uLl0KKyAgICBlbHNlIGlmIChzaXplIDwg
-MTAyNCkKWy4uLl0KKyAgICBlbHNlIGlmIChzaXplIDwgMjA0OCkKWy4uLl0KKyAgICBlbHNlClsu
-Li5dCgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMg
-c3RhdGVtZW50CiMxMjY6IEZJTEU6IGh3L25ldC9tY2ZfZmVjLmM6MjE3OgorICAgIGVsc2UgaWYg
-KHNpemUgPCAyNTYpClsuLi5dCisgICAgZWxzZSBpZiAoc2l6ZSA8IDUxMikKWy4uLl0KKyAgICBl
-bHNlIGlmIChzaXplIDwgMTAyNCkKWy4uLl0KKyAgICBlbHNlIGlmIChzaXplIDwgMjA0OCkKWy4u
-Ll0KKyAgICBlbHNlClsuLi5dCgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFs
-bCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiMxMjg6IEZJTEU6IGh3L25ldC9tY2ZfZmVjLmM6MjE5
-OgorICAgIGVsc2UgaWYgKHNpemUgPCA1MTIpClsuLi5dCisgICAgZWxzZSBpZiAoc2l6ZSA8IDEw
-MjQpClsuLi5dCisgICAgZWxzZSBpZiAoc2l6ZSA8IDIwNDgpClsuLi5dCisgICAgZWxzZQpbLi4u
-XQoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0
-YXRlbWVudAojMTMwOiBGSUxFOiBody9uZXQvbWNmX2ZlYy5jOjIyMToKKyAgICBlbHNlIGlmIChz
-aXplIDwgMTAyNCkKWy4uLl0KKyAgICBlbHNlIGlmIChzaXplIDwgMjA0OCkKWy4uLl0KKyAgICBl
-bHNlClsuLi5dCgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9m
-IHRoaXMgc3RhdGVtZW50CiMxMzI6IEZJTEU6IGh3L25ldC9tY2ZfZmVjLmM6MjIzOgorICAgIGVs
-c2UgaWYgKHNpemUgPCAyMDQ4KQpbLi4uXQorICAgIGVsc2UKWy4uLl0KCkVSUk9SOiBicmFjZXMg
-e30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzE3NjogRklM
-RTogaHcvbmV0L21jZl9mZWMuYzo0OTY6CisgICAgaWYgKHNpemUgPCA2NCkKWy4uLl0KKyAgICBl
-bHNlIGlmIChzaXplID09IDY0KQpbLi4uXQorICAgIGVsc2UgaWYgKHNpemUgPCAxMjgpClsuLi5d
-CisgICAgZWxzZSBpZiAoc2l6ZSA8IDI1NikKWy4uLl0KKyAgICBlbHNlIGlmIChzaXplIDwgNTEy
-KQpbLi4uXQorICAgIGVsc2UgaWYgKHNpemUgPCAxMDI0KQpbLi4uXQorICAgIGVsc2UgaWYgKHNp
-emUgPCAyMDQ4KQpbLi4uXQorICAgIGVsc2UKWy4uLl0KCkVSUk9SOiBicmFjZXMge30gYXJlIG5l
-Y2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzE3ODogRklMRTogaHcvbmV0
-L21jZl9mZWMuYzo0OTg6CisgICAgZWxzZSBpZiAoc2l6ZSA9PSA2NCkKWy4uLl0KKyAgICBlbHNl
-IGlmIChzaXplIDwgMTI4KQpbLi4uXQorICAgIGVsc2UgaWYgKHNpemUgPCAyNTYpClsuLi5dCisg
-ICAgZWxzZSBpZiAoc2l6ZSA8IDUxMikKWy4uLl0KKyAgICBlbHNlIGlmIChzaXplIDwgMTAyNCkK
-Wy4uLl0KKyAgICBlbHNlIGlmIChzaXplIDwgMjA0OCkKWy4uLl0KKyAgICBlbHNlClsuLi5dCgpF
-UlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVt
-ZW50CiMxODA6IEZJTEU6IGh3L25ldC9tY2ZfZmVjLmM6NTAwOgorICAgIGVsc2UgaWYgKHNpemUg
-PCAxMjgpClsuLi5dCisgICAgZWxzZSBpZiAoc2l6ZSA8IDI1NikKWy4uLl0KKyAgICBlbHNlIGlm
-IChzaXplIDwgNTEyKQpbLi4uXQorICAgIGVsc2UgaWYgKHNpemUgPCAxMDI0KQpbLi4uXQorICAg
-IGVsc2UgaWYgKHNpemUgPCAyMDQ4KQpbLi4uXQorICAgIGVsc2UKWy4uLl0KCkVSUk9SOiBicmFj
-ZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzE4Mjog
-RklMRTogaHcvbmV0L21jZl9mZWMuYzo1MDI6CisgICAgZWxzZSBpZiAoc2l6ZSA8IDI1NikKWy4u
-Ll0KKyAgICBlbHNlIGlmIChzaXplIDwgNTEyKQpbLi4uXQorICAgIGVsc2UgaWYgKHNpemUgPCAx
-MDI0KQpbLi4uXQorICAgIGVsc2UgaWYgKHNpemUgPCAyMDQ4KQpbLi4uXQorICAgIGVsc2UKWy4u
-Ll0KCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBz
-dGF0ZW1lbnQKIzE4NDogRklMRTogaHcvbmV0L21jZl9mZWMuYzo1MDQ6CisgICAgZWxzZSBpZiAo
-c2l6ZSA8IDUxMikKWy4uLl0KKyAgICBlbHNlIGlmIChzaXplIDwgMTAyNCkKWy4uLl0KKyAgICBl
-bHNlIGlmIChzaXplIDwgMjA0OCkKWy4uLl0KKyAgICBlbHNlClsuLi5dCgpFUlJPUjogYnJhY2Vz
-IHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiMxODY6IEZJ
-TEU6IGh3L25ldC9tY2ZfZmVjLmM6NTA2OgorICAgIGVsc2UgaWYgKHNpemUgPCAxMDI0KQpbLi4u
-XQorICAgIGVsc2UgaWYgKHNpemUgPCAyMDQ4KQpbLi4uXQorICAgIGVsc2UKWy4uLl0KCkVSUk9S
-OiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQK
-IzE4ODogRklMRTogaHcvbmV0L21jZl9mZWMuYzo1MDg6CisgICAgZWxzZSBpZiAoc2l6ZSA8IDIw
-NDgpClsuLi5dCisgICAgZWxzZQpbLi4uXQoKRVJST1I6IE1pc3NpbmcgU2lnbmVkLW9mZi1ieTog
-bGluZShzKQoKdG90YWw6IDE1IGVycm9ycywgMCB3YXJuaW5ncywgMTY3IGxpbmVzIGNoZWNrZWQK
-CllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9m
-IHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWlu
-dGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09
-PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVk
-IGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBz
-ZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+
+Changelog:
+    since v1:
+        * fix mistakes in commit messages/change them as suggested
+        * extend 3/3 commit message to explain why it's ok to use 'id'
+        * 3/3 set 'id' property directly instead of injecting it back
+          into qdict.
+
+
+Series is a couple of preparratory cleanups which simplify fix
+and a fix itself.
+
+Before fix HMP 'info memdevs' for CLI:
+qemu-system-x86_64 -object memory-backend-ram,id=mem0,size=1G
+outputs:
+
+  memory backend: 0
+    size:  1073741824
+    merge: true
+    dump: true
+    prealloc: false
+    policy: default
+    host nodes: 128
+
+after fix:
+
+  memory backend: mem0
+    size:  1073741824
+    merge: true
+    dump: true
+    prealloc: false
+    policy: default
+    host nodes: 128
+
+it should help to avoid remembering hotplugged IDs as they
+could be queried back via HMP/QMP interface.
+
+CC: ehabkost@redhat.com
+CC: armbru@redhat.com
+CC: dgilbert@redhat.com
+CC: eblake@redhat.com
+CC: afaerber@suse.de
+CC: pbonzini@redhat.com
+
+Igor Mammedov (3):
+  qom: remove unused header
+  reuse user_creatable_add_opts() instead of user_creatable_add() in
+    monitor
+  fix qmp/hmp query-memdev not reporting IDs of memory backends
+
+ include/qom/object_interfaces.h | 17 ---------
+ include/sysemu/hostmem.h        |  1 +
+ backends/hostmem.c              | 26 ++++++++++++++
+ docs/qmp-commands.txt           |  1 +
+ hmp.c                           | 10 ++----
+ numa.c                          |  3 ++
+ qapi-schema.json                |  3 ++
+ qom/object_interfaces.c         | 78 ++++++++++++-----------------------------
+ 8 files changed, 59 insertions(+), 80 deletions(-)
+
+-- 
+2.7.4
