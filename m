@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46784)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53072)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1cQrpt-0001nU-Hc
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 03:31:18 -0500
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cQrz5-0005WE-7U
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 03:40:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1cQrpo-00007t-Lz
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 03:31:17 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:60984)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1cQrpo-000071-Er
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 03:31:12 -0500
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <CAMo8BfLRP8qUgJAkU3fSwE_H6EmqYmPKO_MhMn7B6WpwGWUudw@mail.gmail.com>
-In-Reply-To: <CAMo8BfLRP8qUgJAkU3fSwE_H6EmqYmPKO_MhMn7B6WpwGWUudw@mail.gmail.com>
-Date: Tue, 10 Jan 2017 11:31:10 +0300
-Message-ID: <001201d26b1b$e5a8ce20$b0fa6a60$@ru>
+	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cQrz2-0005TE-6T
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 03:40:47 -0500
+References: <1482459390-14386-1-git-send-email-caoj.fnst@cn.fujitsu.com>
+	<20170110003733-mutt-send-email-mst@kernel.org>
+From: Cao jin <caoj.fnst@cn.fujitsu.com>
+Message-ID: <58749F4C.9080902@cn.fujitsu.com>
+Date: Tue, 10 Jan 2017 16:46:04 +0800
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="UTF-8"
+In-Reply-To: <20170110003733-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset="windows-1252"
 Content-Transfer-Encoding: 7bit
-Content-Language: ru
-Subject: Re: [Qemu-devel] implementing architectural timers using QEMU timers
+Subject: Re: [Qemu-devel] [PATCH] pcie: remove duplicate assertion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,33 +23,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Max Filippov' <jcmvbkbc@gmail.com>, 'qemu-devel' <qemu-devel@nongnu.org>
-Cc: 'Richard Henderson' <rth@twiddle.net>, 'Alex Bligh' <alex@alex.org.uk>, 'Pavel Dovgaluk' <Pavel.Dovgaluk@ispras.ru>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, marcel@redhat.com, qemu-trivial@nongnu.org
 
-> From: Max Filippov [mailto:jcmvbkbc@gmail.com]
 
-> I'm trying to reimplement xtensa CCOUNT (cycle counter) and
-> CCOMPARE (CCOUNT-based timer interrupts) using QEMU
-> timers. That is CCOUNT value is derived from the
-> QEMU_CLOCK_VIRTUAL clock and CCOMPARE interrupts are
-> generated from the QEMU_CLOCK_VIRTUAL timer callbacks.
-> The code is here:
->   https://github.com/OSLL/qemu-xtensa/commits/xtensa-ccount
+
+On 01/10/2017 06:37 AM, Michael S. Tsirkin wrote:
+> On Fri, Dec 23, 2016 at 10:16:30AM +0800, Cao jin wrote:
+>> "size >= 8" connote "size > 0"
+>>
+>> Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
 > 
-> I've got the following issues doing that:
+> Isn't the point to check for overflows?
 > 
-> - I thought that could be improved in -icount mode, so I tried that.
->   It is better with -icount, but it's still not 100% accurate. That is
->   I was able to observe guest reading QEMU clock value that is
->   past QEMU timer deadline before that timer callback was
->   invoked.
 
-icount is meant to be 100% accurate.
-tcg_get_icount_limit function calculates the deadline before the soonest
-virtual timer and executes number of instructions that will fit this
-timeout.
+Make sense. If it is intended to check overflows, the following sequence
+would make more sense:
 
-Maybe you need the accuracy that is higher than the precision of the virtual clock?
-Every executed instruction in icount mode takes fixed period of virtual time.
+    assert(offset >= PCI_CONFIG_SPACE_SIZE);
+    assert(size >= 8);
+    assert(offset < offset + size);
+    assert(offset + size <= PCIE_CONFIG_SPACE_SIZE);
 
-Pavel Dovgalyuk
+or else, size 0 will pass the assert(offset < offset + size) first and
+hit assert(size >= 8)
+-- 
+Sincerely,
+Cao jin
+
+>> ---
+>>  hw/pci/pcie.c | 1 -
+>>  1 file changed, 1 deletion(-)
+>>
+>> diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
+>> index 39b10b852d91..f864c5cd5458 100644
+>> --- a/hw/pci/pcie.c
+>> +++ b/hw/pci/pcie.c
+>> @@ -668,7 +668,6 @@ void pcie_add_capability(PCIDevice *dev,
+>>      uint16_t next;
+>>  
+>>      assert(offset >= PCI_CONFIG_SPACE_SIZE);
+>> -    assert(offset < offset + size);
+>>      assert(offset + size <= PCIE_CONFIG_SPACE_SIZE);
+>>      assert(size >= 8);
+>>      assert(pci_is_express(dev));
+>> -- 
+>> 2.1.0
+>>
+>>
+> 
+> 
+> 
