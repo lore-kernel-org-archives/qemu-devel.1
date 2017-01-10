@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32819)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32854)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vpalatin@google.com>) id 1cQuA2-0005GW-I5
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 06:00:20 -0500
+	(envelope-from <vpalatin@google.com>) id 1cQuA8-0005I8-P9
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 06:00:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vpalatin@google.com>) id 1cQuA1-0003nv-8x
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 06:00:14 -0500
-Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:36781)
+	(envelope-from <vpalatin@google.com>) id 1cQuA7-0003pK-16
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 06:00:20 -0500
+Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:38161)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <vpalatin@google.com>) id 1cQuA0-0003nX-UT
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 06:00:13 -0500
-Received: by mail-wm0-x236.google.com with SMTP id c85so124264165wmi.1
-	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 03:00:12 -0800 (PST)
+	(Exim 4.71) (envelope-from <vpalatin@google.com>) id 1cQuA6-0003p4-O9
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 06:00:18 -0500
+Received: by mail-wm0-x22a.google.com with SMTP id k184so155998833wme.1
+	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 03:00:18 -0800 (PST)
 Sender: Vincent Palatin <vpalatin@google.com>
 From: Vincent Palatin <vpalatin@chromium.org>
-Date: Tue, 10 Jan 2017 11:59:54 +0100
-Message-Id: <cover.1484045952.git.vpalatin@chromium.org>
-Subject: [Qemu-devel] [PATCH v6 0/4] Add HAX support
+Date: Tue, 10 Jan 2017 11:59:55 +0100
+Message-Id: <f5c3cffe8d520011df1c2e5437bb814989b48332.1484045952.git.vpalatin@chromium.org>
+In-Reply-To: <cover.1484045952.git.vpalatin@chromium.org>
+References: <cover.1484045952.git.vpalatin@chromium.org>
+In-Reply-To: <cover.1484045952.git.vpalatin@chromium.org>
+References: <cover.1484045952.git.vpalatin@chromium.org>
+Subject: [Qemu-devel] [PATCH v6 1/4] kvm: move cpu synchronization code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,138 +31,351 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel <qemu-devel@nongnu.org>
 Cc: Yu Ning <yu.ning@linux.intel.com>, Stefan Weil <sw@weilnetz.de>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Vincent Palatin <vpalatin@chromium.org>
 
-I took a stab at trying to rebase/upstream the support for Intel HAXM.
-(Hardware Accelerated Execution Manager).
-Intel HAX is kernel-based hardware acceleration module for Windows and MacOSX.
+Move the generic cpu_synchronize_ functions to the common hw_accel.h header,
+in order to prepare for the addition of a second hardware accelerator.
 
-Another copy of this patchset is available at:
-I have made another public copy there:
-git://github.com/vpalatin/qemu.git tags/hax-v6-pull-request
-
-https://github.com/vpalatin/qemu/tree/hax-v6-pull-request
-
-I have based my work on the last version of the source code I found:
-the emu-2.2-release branch in the external/qemu-android repository as used by
-the Android emulator.
-In patch 2/4, I have forward-ported the core HAX code from there.
-It has been modified to build and run along with the current code base.
-It has been simplifying by removing non-UG hardware support / Darwin support /
-Android-specific leftovers.
-
-This code depends on the new unmapping mechanism and fixes in Intel HAX kernel
-module. They will publish soon a new version 6.1.0 of the HAX kernel module
-including the fixes once their QA cycle is completed.
-Thanks Yu Ning for making this happen.
-
-In patch 3/4, I have put the plumbing into the QEMU code base, I did some clean
-up there and it is reasonably intrusive: i.e.
- Makefile.target           |  1 +
- configure                 | 18 ++++++++++++
- cpus.c                    | 74 ++++++++++++++++++++++++++++++++++++++++++++++-
- hw/intc/apic_common.c     |  3 +-
- include/qom/cpu.h         |  5 ++++
- include/sysemu/hw_accel.h |  9 ++++++
- qemu-options.hx           | 11 +++++++
- target/i386/Makefile.objs |  4 +++
- util/qemu-thread-win32.c  |  4 +--
- vl.c                      | 15 ++++++++--
- 10 files changed, 137 insertions(+), 7 deletions(-)
-
-The patch 1/4 just extracts from KVM specific header the cpu_synchronize_
-functions that HAX is also using.
-
-The patch 4/4 is the Darwin support. This part is only lightly tested for now,
-so it can be considered as 'experimental'.
-
-I have tested the end result on a Windows 10 Pro machine (with UG support)
-with the Intel HAXM module dev version and a large ChromiumOS x86_64 image to
-exercise various code paths. It looks stable.
-I also did a quick regression testing of the integration by running a Linux
-build with KVM enabled.
-
-Changes from v5 to v6:
-- rebase against new upstream target directories changes
-- rebase on top of Paolo's ramblock-notifier patch and use the new API.
-- adjust qemu_cpu_kick according to Paolo's suggestions / use QueueUserApc.
-
-Changes from v4 to v5:
-- update HAX fastmmio API with the new MMIO to MMIO transfer.
-
-Changes from v3 to v4:
-- add RAM unmapping in the MemoryListener thanks to new API in HAX module 6.1.0
-  and re-wrote the memory mappings management to deal with this.
-- marked no longer used MMIO emulation as unsupported.
-- clean-up a few left-overs from removed code.
-- re-add an experimental version of the Darwin support.
-
-Changes from v2 to v3:
-- fix saving/restoring FPU registers as suggested by Paolo.
-- fix Windows build on all targets as contributed by Stefan Weil.
-- clean-up IO / MMIO emulation.
-- more clean-up of emulation leftovers.
-
-Changes from v1 to v2:
-- fix all style issues in the original code to get it through checkpatch.pl.
-- remove Darwin support, it was barely tested and not fully functional.
-- remove the support for CPU without UG mode.
-- fix most review comments
-
-Vincent Palatin (4):
-  kvm: move cpu synchronization code
-  target/i386: Add Intel HAX files
-  Plumb the HAXM-based hardware acceleration support
-  hax: add Darwin support
-
- Makefile.target             |    1 +
- configure                   |   18 +
- cpus.c                      |   79 ++-
- gdbstub.c                   |    1 +
- hax-stub.c                  |   39 ++
- hw/i386/kvm/apic.c          |    1 +
- hw/i386/kvmvapic.c          |    1 +
- hw/intc/apic_common.c       |    3 +-
- hw/misc/vmport.c            |    2 +-
- hw/ppc/pnv_xscom.c          |    2 +-
- hw/ppc/ppce500_spin.c       |    4 +-
- hw/ppc/spapr.c              |    2 +-
- hw/ppc/spapr_hcall.c        |    2 +-
- hw/s390x/s390-pci-inst.c    |    1 +
- include/qom/cpu.h           |    5 +
- include/sysemu/hax.h        |   56 +++
- include/sysemu/hw_accel.h   |   48 ++
- include/sysemu/kvm.h        |   23 -
- monitor.c                   |    2 +-
- qemu-options.hx             |   11 +
- qom/cpu.c                   |    2 +-
- target/arm/cpu.c            |    2 +-
- target/i386/Makefile.objs   |    7 +
- target/i386/hax-all.c       | 1155 +++++++++++++++++++++++++++++++++++++++++++
- target/i386/hax-darwin.c    |  316 ++++++++++++
- target/i386/hax-darwin.h    |   63 +++
- target/i386/hax-i386.h      |   94 ++++
- target/i386/hax-interface.h |  361 ++++++++++++++
- target/i386/hax-mem.c       |  289 +++++++++++
- target/i386/hax-windows.c   |  479 ++++++++++++++++++
- target/i386/hax-windows.h   |   89 ++++
- target/i386/helper.c        |    1 +
- target/i386/kvm.c           |    1 +
- target/ppc/mmu-hash64.c     |    2 +-
- target/ppc/translate_init.c |    2 +-
- target/s390x/gdbstub.c      |    1 +
- util/qemu-thread-win32.c    |    4 +-
- vl.c                        |   15 +-
- 38 files changed, 3143 insertions(+), 41 deletions(-)
- create mode 100644 hax-stub.c
- create mode 100644 include/sysemu/hax.h
+Signed-off-by: Stefan Weil <sw@weilnetz.de>
+Signed-off-by: Vincent Palatin <vpalatin@chromium.org>
+---
+ cpus.c                      |  1 +
+ gdbstub.c                   |  1 +
+ hw/i386/kvm/apic.c          |  1 +
+ hw/i386/kvmvapic.c          |  1 +
+ hw/misc/vmport.c            |  2 +-
+ hw/ppc/pnv_xscom.c          |  2 +-
+ hw/ppc/ppce500_spin.c       |  4 ++--
+ hw/ppc/spapr.c              |  2 +-
+ hw/ppc/spapr_hcall.c        |  2 +-
+ hw/s390x/s390-pci-inst.c    |  1 +
+ include/sysemu/hw_accel.h   | 39 +++++++++++++++++++++++++++++++++++++++
+ include/sysemu/kvm.h        | 23 -----------------------
+ monitor.c                   |  2 +-
+ qom/cpu.c                   |  2 +-
+ target/arm/cpu.c            |  2 +-
+ target/i386/helper.c        |  1 +
+ target/i386/kvm.c           |  1 +
+ target/ppc/mmu-hash64.c     |  2 +-
+ target/ppc/translate_init.c |  2 +-
+ target/s390x/gdbstub.c      |  1 +
+ 20 files changed, 58 insertions(+), 34 deletions(-)
  create mode 100644 include/sysemu/hw_accel.h
- create mode 100644 target/i386/hax-all.c
- create mode 100644 target/i386/hax-darwin.c
- create mode 100644 target/i386/hax-darwin.h
- create mode 100644 target/i386/hax-i386.h
- create mode 100644 target/i386/hax-interface.h
- create mode 100644 target/i386/hax-mem.c
- create mode 100644 target/i386/hax-windows.c
- create mode 100644 target/i386/hax-windows.h
 
+diff --git a/cpus.c b/cpus.c
+index 5213351c6d..fc78502ce5 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -33,6 +33,7 @@
+ #include "sysemu/block-backend.h"
+ #include "exec/gdbstub.h"
+ #include "sysemu/dma.h"
++#include "sysemu/hw_accel.h"
+ #include "sysemu/kvm.h"
+ #include "qmp-commands.h"
+ #include "exec/exec-all.h"
+diff --git a/gdbstub.c b/gdbstub.c
+index de62d26096..de9b62b8f8 100644
+--- a/gdbstub.c
++++ b/gdbstub.c
+@@ -32,6 +32,7 @@
+ #define MAX_PACKET_LENGTH 4096
+ 
+ #include "qemu/sockets.h"
++#include "sysemu/hw_accel.h"
+ #include "sysemu/kvm.h"
+ #include "exec/semihost.h"
+ #include "exec/exec-all.h"
+diff --git a/hw/i386/kvm/apic.c b/hw/i386/kvm/apic.c
+index df5180b1e0..1df6d26816 100644
+--- a/hw/i386/kvm/apic.c
++++ b/hw/i386/kvm/apic.c
+@@ -14,6 +14,7 @@
+ #include "cpu.h"
+ #include "hw/i386/apic_internal.h"
+ #include "hw/pci/msi.h"
++#include "sysemu/hw_accel.h"
+ #include "sysemu/kvm.h"
+ #include "target/i386/kvm_i386.h"
+ 
+diff --git a/hw/i386/kvmvapic.c b/hw/i386/kvmvapic.c
+index b30d1b90c6..2f767b620e 100644
+--- a/hw/i386/kvmvapic.c
++++ b/hw/i386/kvmvapic.c
+@@ -14,6 +14,7 @@
+ #include "exec/exec-all.h"
+ #include "sysemu/sysemu.h"
+ #include "sysemu/cpus.h"
++#include "sysemu/hw_accel.h"
+ #include "sysemu/kvm.h"
+ #include "hw/i386/apic_internal.h"
+ #include "hw/sysbus.h"
+diff --git a/hw/misc/vmport.c b/hw/misc/vmport.c
+index c763811a9f..be40930b8b 100644
+--- a/hw/misc/vmport.c
++++ b/hw/misc/vmport.c
+@@ -25,7 +25,7 @@
+ #include "hw/hw.h"
+ #include "hw/isa/isa.h"
+ #include "hw/i386/pc.h"
+-#include "sysemu/kvm.h"
++#include "sysemu/hw_accel.h"
+ #include "hw/qdev.h"
+ 
+ //#define VMPORT_DEBUG
+diff --git a/hw/ppc/pnv_xscom.c b/hw/ppc/pnv_xscom.c
+index b82af4f086..38bc85f117 100644
+--- a/hw/ppc/pnv_xscom.c
++++ b/hw/ppc/pnv_xscom.c
+@@ -20,7 +20,7 @@
+ #include "qapi/error.h"
+ #include "hw/hw.h"
+ #include "qemu/log.h"
+-#include "sysemu/kvm.h"
++#include "sysemu/hw_accel.h"
+ #include "target/ppc/cpu.h"
+ #include "hw/sysbus.h"
+ 
+diff --git a/hw/ppc/ppce500_spin.c b/hw/ppc/ppce500_spin.c
+index cf958a9e00..eb219abdff 100644
+--- a/hw/ppc/ppce500_spin.c
++++ b/hw/ppc/ppce500_spin.c
+@@ -29,9 +29,9 @@
+ 
+ #include "qemu/osdep.h"
+ #include "hw/hw.h"
+-#include "sysemu/sysemu.h"
+ #include "hw/sysbus.h"
+-#include "sysemu/kvm.h"
++#include "sysemu/hw_accel.h"
++#include "sysemu/sysemu.h"
+ #include "e500.h"
+ 
+ #define MAX_CPUS 32
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 208ef7b110..a642e663d4 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -36,7 +36,7 @@
+ #include "sysemu/device_tree.h"
+ #include "sysemu/block-backend.h"
+ #include "sysemu/cpus.h"
+-#include "sysemu/kvm.h"
++#include "sysemu/hw_accel.h"
+ #include "kvm_ppc.h"
+ #include "migration/migration.h"
+ #include "mmu-hash64.h"
+diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+index 9a9bedf1bd..b2a8e48569 100644
+--- a/hw/ppc/spapr_hcall.c
++++ b/hw/ppc/spapr_hcall.c
+@@ -1,5 +1,6 @@
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
++#include "sysemu/hw_accel.h"
+ #include "sysemu/sysemu.h"
+ #include "qemu/log.h"
+ #include "cpu.h"
+@@ -9,7 +10,6 @@
+ #include "mmu-hash64.h"
+ #include "cpu-models.h"
+ #include "trace.h"
+-#include "sysemu/kvm.h"
+ #include "kvm_ppc.h"
+ #include "hw/ppc/spapr_ovec.h"
+ 
+diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
+index 0864d9be12..4d0775c83f 100644
+--- a/hw/s390x/s390-pci-inst.c
++++ b/hw/s390x/s390-pci-inst.c
+@@ -18,6 +18,7 @@
+ #include "s390-pci-bus.h"
+ #include "exec/memory-internal.h"
+ #include "qemu/error-report.h"
++#include "sysemu/hw_accel.h"
+ 
+ /* #define DEBUG_S390PCI_INST */
+ #ifdef DEBUG_S390PCI_INST
+diff --git a/include/sysemu/hw_accel.h b/include/sysemu/hw_accel.h
+new file mode 100644
+index 0000000000..03812cfeb3
+--- /dev/null
++++ b/include/sysemu/hw_accel.h
+@@ -0,0 +1,39 @@
++/*
++ * QEMU Hardware accelertors support
++ *
++ * Copyright 2016 Google, Inc.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ *
++ */
++
++#ifndef QEMU_HW_ACCEL_H
++#define QEMU_HW_ACCEL_H
++
++#include "qom/cpu.h"
++#include "sysemu/hax.h"
++#include "sysemu/kvm.h"
++
++static inline void cpu_synchronize_state(CPUState *cpu)
++{
++    if (kvm_enabled()) {
++        kvm_cpu_synchronize_state(cpu);
++    }
++}
++
++static inline void cpu_synchronize_post_reset(CPUState *cpu)
++{
++    if (kvm_enabled()) {
++        kvm_cpu_synchronize_post_reset(cpu);
++    }
++}
++
++static inline void cpu_synchronize_post_init(CPUState *cpu)
++{
++    if (kvm_enabled()) {
++        kvm_cpu_synchronize_post_init(cpu);
++    }
++}
++
++#endif /* QEMU_HW_ACCEL_H */
+diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+index df67cc0672..3045ee7678 100644
+--- a/include/sysemu/kvm.h
++++ b/include/sysemu/kvm.h
+@@ -461,29 +461,6 @@ void kvm_cpu_synchronize_state(CPUState *cpu);
+ void kvm_cpu_synchronize_post_reset(CPUState *cpu);
+ void kvm_cpu_synchronize_post_init(CPUState *cpu);
+ 
+-/* generic hooks - to be moved/refactored once there are more users */
+-
+-static inline void cpu_synchronize_state(CPUState *cpu)
+-{
+-    if (kvm_enabled()) {
+-        kvm_cpu_synchronize_state(cpu);
+-    }
+-}
+-
+-static inline void cpu_synchronize_post_reset(CPUState *cpu)
+-{
+-    if (kvm_enabled()) {
+-        kvm_cpu_synchronize_post_reset(cpu);
+-    }
+-}
+-
+-static inline void cpu_synchronize_post_init(CPUState *cpu)
+-{
+-    if (kvm_enabled()) {
+-        kvm_cpu_synchronize_post_init(cpu);
+-    }
+-}
+-
+ /**
+  * kvm_irqchip_add_msi_route - Add MSI route for specific vector
+  * @s:      KVM state
+diff --git a/monitor.c b/monitor.c
+index 0841d436b0..d38956fd83 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -50,7 +50,7 @@
+ #include "sysemu/balloon.h"
+ #include "qemu/timer.h"
+ #include "migration/migration.h"
+-#include "sysemu/kvm.h"
++#include "sysemu/hw_accel.h"
+ #include "qemu/acl.h"
+ #include "sysemu/tpm.h"
+ #include "qapi/qmp/qerror.h"
+diff --git a/qom/cpu.c b/qom/cpu.c
+index 03d9190f8c..2c5274f0f6 100644
+--- a/qom/cpu.c
++++ b/qom/cpu.c
+@@ -22,7 +22,7 @@
+ #include "qapi/error.h"
+ #include "qemu-common.h"
+ #include "qom/cpu.h"
+-#include "sysemu/kvm.h"
++#include "sysemu/hw_accel.h"
+ #include "qemu/notify.h"
+ #include "qemu/log.h"
+ #include "exec/log.h"
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index f5cb30af6c..f7f20d33d0 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -31,7 +31,7 @@
+ #endif
+ #include "hw/arm/arm.h"
+ #include "sysemu/sysemu.h"
+-#include "sysemu/kvm.h"
++#include "sysemu/hw_accel.h"
+ #include "kvm_arm.h"
+ 
+ static void arm_cpu_set_pc(CPUState *cs, vaddr value)
+diff --git a/target/i386/helper.c b/target/i386/helper.c
+index 43e87ddba0..19b2656995 100644
+--- a/target/i386/helper.c
++++ b/target/i386/helper.c
+@@ -24,6 +24,7 @@
+ #include "kvm_i386.h"
+ #ifndef CONFIG_USER_ONLY
+ #include "sysemu/sysemu.h"
++#include "sysemu/hw_accel.h"
+ #include "monitor/monitor.h"
+ #include "hw/i386/apic_internal.h"
+ #endif
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 10a9cd8f7f..e6c4f754ab 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -23,6 +23,7 @@
+ #include "qemu-common.h"
+ #include "cpu.h"
+ #include "sysemu/sysemu.h"
++#include "sysemu/hw_accel.h"
+ #include "sysemu/kvm_int.h"
+ #include "kvm_i386.h"
+ #include "hyperv.h"
+diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
+index fdb7a787bf..0efc8c63fa 100644
+--- a/target/ppc/mmu-hash64.c
++++ b/target/ppc/mmu-hash64.c
+@@ -23,7 +23,7 @@
+ #include "exec/exec-all.h"
+ #include "exec/helper-proto.h"
+ #include "qemu/error-report.h"
+-#include "sysemu/kvm.h"
++#include "sysemu/hw_accel.h"
+ #include "kvm_ppc.h"
+ #include "mmu-hash64.h"
+ #include "exec/log.h"
+diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+index 626e03186c..98b8760394 100644
+--- a/target/ppc/translate_init.c
++++ b/target/ppc/translate_init.c
+@@ -21,10 +21,10 @@
+ #include "qemu/osdep.h"
+ #include "disas/bfd.h"
+ #include "exec/gdbstub.h"
+-#include "sysemu/kvm.h"
+ #include "kvm_ppc.h"
+ #include "sysemu/arch_init.h"
+ #include "sysemu/cpus.h"
++#include "sysemu/hw_accel.h"
+ #include "cpu-models.h"
+ #include "mmu-hash32.h"
+ #include "mmu-hash64.h"
+diff --git a/target/s390x/gdbstub.c b/target/s390x/gdbstub.c
+index 3d223dec97..3c652fba62 100644
+--- a/target/s390x/gdbstub.c
++++ b/target/s390x/gdbstub.c
+@@ -23,6 +23,7 @@
+ #include "exec/exec-all.h"
+ #include "exec/gdbstub.h"
+ #include "qemu/bitops.h"
++#include "sysemu/hw_accel.h"
+ 
+ int s390_cpu_gdb_read_register(CPUState *cs, uint8_t *mem_buf, int n)
+ {
 -- 
 2.11.0.390.gc69c2f50cf-goog
