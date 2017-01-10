@@ -1,17 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43829)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43869)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cR1PB-0005oW-3C
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 13:44:21 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cR1PD-0005r2-Lq
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 13:44:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cR1PA-0002L8-3T
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 13:44:21 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cR1PC-0002Md-Ok
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 13:44:23 -0500
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 10 Jan 2017 18:44:09 +0000
-Message-Id: <1484073849-32666-4-git-send-email-peter.maydell@linaro.org>
-In-Reply-To: <1484073849-32666-1-git-send-email-peter.maydell@linaro.org>
-References: <1484073849-32666-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 3/3] target/arm: Implement DBGVCR32_EL2 system
- register
+Date: Tue, 10 Jan 2017 18:44:06 +0000
+Message-Id: <1484073849-32666-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH 0/3] target/arm: Support EL1 AArch32 guest
+ under AArch64 EL2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,34 +21,30 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 
-The DBGVCR_EL2 system register is needed to run a 32-bit
-EL1 guest under a Linux EL2 64-bit hypervisor. Its only
-purpose is to provide AArch64 with access to the state of
-the DBGVCR AArch32 register. Since we only have a dummy
-DBGVCR, implement a corresponding dummy DBGVCR32_EL2.
+The GICv3 virt patchset is sufficient to run a 64-bit guest under
+a 64-bit host kernel. To run 32-bit guests under the 64-bit host
+you need a few more things:
+ * data aborts from AArch32 need to provide instruction syndrome info
+   to the hypervisor
+ * the AArch32 interrupt code needs to handle VIRQ and VFIQ
+ * we need a DBGVCR32_EL2 register, because Linux's EL2 code uses
+   it to context-switch AArch32 DBGVCR between guests
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- target/arm/helper.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+This patchset sits on top of the gicv3-virt patchset and is
+sufficient to run a Linux 32-bit guest under 64-bit Linux host.
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index dc90986..bda562d 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -4066,6 +4066,13 @@ static const ARMCPRegInfo debug_cp_reginfo[] = {
-       .cp = 14, .opc1 = 0, .crn = 0, .crm = 7, .opc2 = 0,
-       .access = PL1_RW, .accessfn = access_tda,
-       .type = ARM_CP_NOP },
-+    /* Dummy DBGVCR32_EL2 (which is only for a 64-bit hypervisor
-+     * to save and restore a 32-bit guest's DBGVCR)
-+     */
-+    { .name = "DBGVCR32_EL2", .state = ARM_CP_STATE_AA64,
-+      .opc0 = 2, .opc1 = 4, .crn = 0, .crm = 7, .opc2 = 0,
-+      .access = PL2_RW, .accessfn = access_tda,
-+      .type = ARM_CP_NOP },
-     /* Dummy MDCCINT_EL1, since we don't implement the Debug Communications
-      * Channel but Linux may try to access this register. The 32-bit
-      * alias is DBGDCCINT.
+Git branch with the whole lot:
+ https://git.linaro.org/people/peter.maydell/qemu-arm.git aarch32-guest
+
+
+Peter Maydell (3):
+  target/arm: A32, T32: Create Instruction Syndromes for Data Aborts
+  target/arm: Handle VIRQ and VFIQ in arm_cpu_do_interrupt_aarch32()
+  target/arm: Implement DBGVCR32_EL2 system register
+
+ target/arm/helper.c    |  21 +++++
+ target/arm/translate.c | 213 ++++++++++++++++++++++++++++++++++++-------------
+ 2 files changed, 178 insertions(+), 56 deletions(-)
+
 -- 
 2.7.4
