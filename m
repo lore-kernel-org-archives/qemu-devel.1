@@ -1,32 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49911)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50334)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cQvEa-000285-GS
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 07:09:01 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cQvGK-0003nz-2J
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 07:10:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1cQvEX-0003kZ-Bk
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 07:09:00 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:59930)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1cQvEX-0003kM-5z
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 07:08:57 -0500
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
-	(int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6728D31B31F
-	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 12:08:57 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170109143437.30554-1-marcandre.lureau@redhat.com>
-	<20170109143437.30554-9-marcandre.lureau@redhat.com>
-Date: Tue, 10 Jan 2017 13:08:54 +0100
-In-Reply-To: <20170109143437.30554-9-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
-	Lureau"'s message of "Mon, 9 Jan 2017 15:34:24 +0100")
-Message-ID: <871swbruax.fsf@dusky.pond.sub.org>
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cQvGF-0004m0-Lj
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 07:10:48 -0500
+Received: from mail-wj0-x242.google.com ([2a00:1450:400c:c01::242]:33917)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1cQvGF-0004k9-CN
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 07:10:43 -0500
+Received: by mail-wj0-x242.google.com with SMTP id qs7so49756100wjc.1
+	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 04:10:42 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <cover.1484045952.git.vpalatin@chromium.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <14a7e2c0-cee4-5948-eb46-c745eae25a1f@redhat.com>
+Date: Tue, 10 Jan 2017 13:10:38 +0100
 MIME-Version: 1.0
+In-Reply-To: <cover.1484045952.git.vpalatin@chromium.org>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v7 08/21] qapi: move experimental note down
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6 0/4] Add HAX support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,21 +30,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Vincent Palatin <vpalatin@chromium.org>, qemu-devel <qemu-devel@nongnu.org>
+Cc: Yu Ning <yu.ning@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Stefan Weil <sw@weilnetz.de>, Marcelo Tosatti <mtosatti@redhat.com>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+On 10/01/2017 11:59, Vincent Palatin wrote:
+> I took a stab at trying to rebase/upstream the support for Intel HAXM.
+> (Hardware Accelerated Execution Manager).
+> Intel HAX is kernel-based hardware acceleration module for Windows and MacOSX.
+> 
+> Another copy of this patchset is available at:
+> I have made another public copy there:
+> git://github.com/vpalatin/qemu.git tags/hax-v6-pull-request
+> 
+> https://github.com/vpalatin/qemu/tree/hax-v6-pull-request
+> 
+> I have based my work on the last version of the source code I found:
+> the emu-2.2-release branch in the external/qemu-android repository as used by
+> the Android emulator.
+> In patch 2/4, I have forward-ported the core HAX code from there.
+> It has been modified to build and run along with the current code base.
+> It has been simplifying by removing non-UG hardware support / Darwin support /
+> Android-specific leftovers.
+> 
+> This code depends on the new unmapping mechanism and fixes in Intel HAX kernel
+> module. They will publish soon a new version 6.1.0 of the HAX kernel module
+> including the fixes once their QA cycle is completed.
+> Thanks Yu Ning for making this happen.
 
-> Use a better 'Note:' section, move it below parameters following
-> guidelines.
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Queued for 2.9, thanks!  Please keep an eye on the release notes at
+http://wiki.qemu-project.org/ChangeLog/2.9 (nothing there yet).
 
-Again, I don't mind moving stuff around if it helps getting this series
-wrapped, and doesn't make things less readable.  My only nit is the
-commit message's claim about the guidelines.  Let's sidestep it:
+Paolo
 
-    Move these notes down and prefix with "Note:", to please the doc
-    generator we're going to add.
-
-Okay?
+> In patch 3/4, I have put the plumbing into the QEMU code base, I did some clean
+> up there and it is reasonably intrusive: i.e.
+>  Makefile.target           |  1 +
+>  configure                 | 18 ++++++++++++
+>  cpus.c                    | 74 ++++++++++++++++++++++++++++++++++++++++++++++-
+>  hw/intc/apic_common.c     |  3 +-
+>  include/qom/cpu.h         |  5 ++++
+>  include/sysemu/hw_accel.h |  9 ++++++
+>  qemu-options.hx           | 11 +++++++
+>  target/i386/Makefile.objs |  4 +++
+>  util/qemu-thread-win32.c  |  4 +--
+>  vl.c                      | 15 ++++++++--
+>  10 files changed, 137 insertions(+), 7 deletions(-)
+> 
+> The patch 1/4 just extracts from KVM specific header the cpu_synchronize_
+> functions that HAX is also using.
+> 
+> The patch 4/4 is the Darwin support. This part is only lightly tested for now,
+> so it can be considered as 'experimental'.
+> 
+> I have tested the end result on a Windows 10 Pro machine (with UG support)
+> with the Intel HAXM module dev version and a large ChromiumOS x86_64 image to
+> exercise various code paths. It looks stable.
+> I also did a quick regression testing of the integration by running a Linux
+> build with KVM enabled.
+> 
+> Changes from v5 to v6:
+> - rebase against new upstream target directories changes
+> - rebase on top of Paolo's ramblock-notifier patch and use the new API.
+> - adjust qemu_cpu_kick according to Paolo's suggestions / use QueueUserApc.
+> 
+> Changes from v4 to v5:
+> - update HAX fastmmio API with the new MMIO to MMIO transfer.
+> 
+> Changes from v3 to v4:
+> - add RAM unmapping in the MemoryListener thanks to new API in HAX module 6.1.0
+>   and re-wrote the memory mappings management to deal with this.
+> - marked no longer used MMIO emulation as unsupported.
+> - clean-up a few left-overs from removed code.
+> - re-add an experimental version of the Darwin support.
+> 
+> Changes from v2 to v3:
+> - fix saving/restoring FPU registers as suggested by Paolo.
+> - fix Windows build on all targets as contributed by Stefan Weil.
+> - clean-up IO / MMIO emulation.
+> - more clean-up of emulation leftovers.
+> 
+> Changes from v1 to v2:
+> - fix all style issues in the original code to get it through checkpatch.pl.
+> - remove Darwin support, it was barely tested and not fully functional.
+> - remove the support for CPU without UG mode.
+> - fix most review comments
+> 
+> Vincent Palatin (4):
+>   kvm: move cpu synchronization code
+>   target/i386: Add Intel HAX files
+>   Plumb the HAXM-based hardware acceleration support
+>   hax: add Darwin support
+> 
+>  Makefile.target             |    1 +
+>  configure                   |   18 +
+>  cpus.c                      |   79 ++-
+>  gdbstub.c                   |    1 +
+>  hax-stub.c                  |   39 ++
+>  hw/i386/kvm/apic.c          |    1 +
+>  hw/i386/kvmvapic.c          |    1 +
+>  hw/intc/apic_common.c       |    3 +-
+>  hw/misc/vmport.c            |    2 +-
+>  hw/ppc/pnv_xscom.c          |    2 +-
+>  hw/ppc/ppce500_spin.c       |    4 +-
+>  hw/ppc/spapr.c              |    2 +-
+>  hw/ppc/spapr_hcall.c        |    2 +-
+>  hw/s390x/s390-pci-inst.c    |    1 +
+>  include/qom/cpu.h           |    5 +
+>  include/sysemu/hax.h        |   56 +++
+>  include/sysemu/hw_accel.h   |   48 ++
+>  include/sysemu/kvm.h        |   23 -
+>  monitor.c                   |    2 +-
+>  qemu-options.hx             |   11 +
+>  qom/cpu.c                   |    2 +-
+>  target/arm/cpu.c            |    2 +-
+>  target/i386/Makefile.objs   |    7 +
+>  target/i386/hax-all.c       | 1155 +++++++++++++++++++++++++++++++++++++++++++
+>  target/i386/hax-darwin.c    |  316 ++++++++++++
+>  target/i386/hax-darwin.h    |   63 +++
+>  target/i386/hax-i386.h      |   94 ++++
+>  target/i386/hax-interface.h |  361 ++++++++++++++
+>  target/i386/hax-mem.c       |  289 +++++++++++
+>  target/i386/hax-windows.c   |  479 ++++++++++++++++++
+>  target/i386/hax-windows.h   |   89 ++++
+>  target/i386/helper.c        |    1 +
+>  target/i386/kvm.c           |    1 +
+>  target/ppc/mmu-hash64.c     |    2 +-
+>  target/ppc/translate_init.c |    2 +-
+>  target/s390x/gdbstub.c      |    1 +
+>  util/qemu-thread-win32.c    |    4 +-
+>  vl.c                        |   15 +-
+>  38 files changed, 3143 insertions(+), 41 deletions(-)
+>  create mode 100644 hax-stub.c
+>  create mode 100644 include/sysemu/hax.h
+>  create mode 100644 include/sysemu/hw_accel.h
+>  create mode 100644 target/i386/hax-all.c
+>  create mode 100644 target/i386/hax-darwin.c
+>  create mode 100644 target/i386/hax-darwin.h
+>  create mode 100644 target/i386/hax-i386.h
+>  create mode 100644 target/i386/hax-interface.h
+>  create mode 100644 target/i386/hax-mem.c
+>  create mode 100644 target/i386/hax-windows.c
+>  create mode 100644 target/i386/hax-windows.h
+> 
