@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52150)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52447)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cQxOC-0004L0-In
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 09:27:08 -0500
+	(envelope-from <bounces@canonical.com>) id 1cQxPE-00056G-GA
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 09:28:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cQxO8-0000wp-KK
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 09:27:04 -0500
-References: <1484014214-32533-1-git-send-email-joserz@linux.vnet.ibm.com>
-	<1484014214-32533-2-git-send-email-joserz@linux.vnet.ibm.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <06e76bc5-d233-ff2b-1f62-ef23c3f20066@redhat.com>
-Date: Tue, 10 Jan 2017 08:26:57 -0600
+	(envelope-from <bounces@canonical.com>) id 1cQxPA-00018w-Ft
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 09:28:08 -0500
+Received: from indium.canonical.com ([91.189.90.7]:49339)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cQxPA-00018p-8o
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 09:28:04 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cQxP8-0003H6-H8
+	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 14:28:02 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 732532EA028
+	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 14:27:58 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <1484014214-32533-2-git-send-email-joserz@linux.vnet.ibm.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="VuTohf5acbm6CSotoO6rIw9fORATS6t10"
-Subject: Re: [Qemu-devel] [PATCH v5 1/7] host-utils: Move 128-bit guard
- macro to .c file
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 10 Jan 2017 14:10:21 -0000
+From: Paolo Bonzini <bonzini@gnu.org>
+Reply-To: Bug 601946 <601946@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20100705154408.6052.2473.malonedeb@potassium.ubuntu.com>
+Message-Id: <20170110141021.27094.64344.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 601946] Re: [Feature request] qemu-img
+ multi-threaded compressed image conversion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,63 +37,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>, qemu-ppc@nongnu.org
-Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au, nikunj@linux.vnet.ibm.com, bharata@linux.vnet.ibm.com
+To: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---VuTohf5acbm6CSotoO6rIw9fORATS6t10
-From: Eric Blake <eblake@redhat.com>
-To: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>, qemu-ppc@nongnu.org
-Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au,
- nikunj@linux.vnet.ibm.com, bharata@linux.vnet.ibm.com
-Message-ID: <06e76bc5-d233-ff2b-1f62-ef23c3f20066@redhat.com>
-Subject: Re: [PATCH v5 1/7] host-utils: Move 128-bit guard macro to .c file
-References: <1484014214-32533-1-git-send-email-joserz@linux.vnet.ibm.com>
- <1484014214-32533-2-git-send-email-joserz@linux.vnet.ibm.com>
-In-Reply-To: <1484014214-32533-2-git-send-email-joserz@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+The fact that it's now a coroutine_fn doesn't change much, if anything
+it makes it simpler to handle multiple writes in parallel.
 
-On 01/09/2017 08:10 PM, Jose Ricardo Ziviani wrote:
-> It is not possible to implement functions in host-utils.c for
-> architectures with quadwords because the guard is implemented in the
-> Makefile. This patch move the guard out of the Makefile to the
+-- =
 
-s/move/moves/
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/601946
 
-> implementation file.
->=20
-> Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
-> ---
->  util/Makefile.objs | 2 +-
->  util/host-utils.c  | 2 ++
->  2 files changed, 3 insertions(+), 1 deletion(-)
->=20
+Title:
+  [Feature request] qemu-img multi-threaded compressed image conversion
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Status in QEMU:
+  New
 
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
+Bug description:
+  Feature request:
+  qemu-img multi-threaded compressed image conversion
 
+  Suppose I want to convert raw image to compressed qcow2. Multi-
+  threaded conversion will be much faster, because bottleneck is
+  compressing data.
 
---VuTohf5acbm6CSotoO6rIw9fORATS6t10
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYdO8xAAoJEKeha0olJ0Nq9TsH/3M4uIZz0qw0EqKZu2ZR/nIU
-gJHT7sTD8R/ZTzhYLMmJf0C1mPGrDht0+YgnPDeB/XZYuoqynq0S1q/bidvKhntl
-LAPLQswm5FjwxpQcWtfTD934uK0BH8ATN0lWKQzMQNxez+NpQ3H9ww6QHng5ABh2
-sXJ1EFQ24Z+FQIRA7YO/2o/2I120+EZBSLS6GjWxHejp3Asc/jaaoNOzaHsO0Msf
-1lDiZqh+QBRq8ilnAOe5XdBVe49all5VOg8ZdmbHEqZlgqiVtGNos0KvvJ5heYUM
-AyJMB0kMbq+VQbIJIBjhDS3DixQ+tRrylrUIvZZfPwkOmUOAc6d4wMKxGnn/tA0=
-=/DSn
------END PGP SIGNATURE-----
-
---VuTohf5acbm6CSotoO6rIw9fORATS6t10--
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/601946/+subscriptions
