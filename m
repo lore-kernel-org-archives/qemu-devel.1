@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59056)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59070)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cQznR-0007Bj-Qo
+	(envelope-from <pbonzini@redhat.com>) id 1cQznS-0007CU-Lz
 	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 12:01:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cQznO-00058R-OV
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 12:01:17 -0500
-Received: from indium.canonical.com ([91.189.90.7]:50031)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cQznO-000589-GR
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 12:01:14 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cQznM-0004uo-0n
-	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 17:01:12 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 014F12E80AE
-	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 17:01:12 +0000 (UTC)
+	(envelope-from <pbonzini@redhat.com>) id 1cQznP-00058h-LJ
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 12:01:18 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57342)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cQznP-00058O-Cx
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 12:01:15 -0500
+References: <1479991949-11311-1-git-send-email-peterx@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <14810c5b-1cac-b6d0-c5e0-f8be848e8db3@redhat.com>
+Date: Tue, 10 Jan 2017 18:01:11 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 10 Jan 2017 16:52:45 -0000
-From: Fabian Lesniak <fabian@lesniak-it.de>
-Reply-To: Bug 1653384 <1653384@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20161231213844.1229.87554.malonedeb@soybean.canonical.com>
-Message-Id: <20170110165245.14666.75821.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1653384] Re: Assertion failed with USB pass
- through with XHCI controller
+In-Reply-To: <1479991949-11311-1-git-send-email-peterx@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] memory: add section range info for
+ IOMMU notifier
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,122 +27,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+Cc: alex.williamson@redhat.com, david@gibson.dropbear.id.au
 
-This behaviour was introduced by commit:
 
-94b037f2a451b3dc855f9f2c346e5049a361bd55
-xhci: use linked list for transfers
 
-However, QEMU does not crash yet, but linux' xhci_hcd reports errors
-like "ERROR Transfer event TRB DMA...". The following commit
+On 24/11/2016 13:52, Peter Xu wrote:
+> In this patch, IOMMUNotifier.{start|end} are introduced to store section
+> information for a specific notifier. When notification occurs, we not
+> only check the notification type (MAP|UNMAP), but also check whether the
+> notified iova is in the range of specific IOMMU notifier, and skip those
+> notifiers if not in the listened range.
+> 
+> When removing an region, we need to make sure we removed the correct
+> VFIOGuestIOMMU by checking the IOMMUNotifier.start address as well.
+> 
+> Suggested-by: David Gibson <david@gibson.dropbear.id.au>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 
-5612564ea9cf5b9636438a1b58ae9a2ab6ca16ae
-xhci: drop XHCITransfer->xhci
+Seems to be a VFIO bugfix, so
 
-finally makes QEMU crash on the assertion check.
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 
-I tried to dig into the code, but I'm not an expert in usb stuff so I
-don't understand it. usb_packet_is_inflight checks if USBPacket.state is
-USB_PACKET_QUEUED or USB_PACKET_ASYNC. I suppose that somewhere in the
-code changed by 94b037f2 finished usb transfers do not have the packet
-state changed.
+Paolo
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1653384
-
-Title:
-  Assertion failed with USB pass through with XHCI controller
-
-Status in QEMU:
-  New
-
-Bug description:
-  Starting qemu 2.8.0 with XHCI controller and host device passed
-  through results in an assertion failure:
-
-  qemu-system-x86_64: hw/usb/core.c:623: usb_packet_cleanup: Assertion
-  `!usb_packet_is_inflight(p)' failed.
-
-  Can be reproduced with the following command (passing through a Lenovo
-  keyboard):
-
-  qemu-system-x86_64 -usb  -device nec-usb-xhci,id=3Dusb -device usb-
-  host,vendorid=3D0x04b3,productid=3D0x3025,id=3Dhostdev0,bus=3Dusb.0,port=
-=3D1
-
-  If nec-usb-xhci is changed to usb-ehci, qemu tries to boot without
-  assertion failures.
-
-  =
-
-  Can be reproduced with the latest master (commit dbe2b65) and v2.8.0.
-
-  Bisected the issue to following commit:
-  first bad commit: [94b037f2a451b3dc855f9f2c346e5049a361bd55] xhci: use li=
-nked list for transfers
-
-  =
-
-  Backtrace from commit dbe2b65:
-
-  #0  0x00007f2eb4657227 in __GI_raise (sig=3Dsig@entry=3D6) at ../sysdeps/=
-unix/sysv/linux/raise.c:55
-          resultvar =3D 0
-          pid =3D 3453
-          selftid =3D 3453
-  #1  0x00007f2eb465867a in __GI_abort () at abort.c:89
-          save_stage =3D 2
-          act =3D {__sigaction_handler =3D {sa_handler =3D 0x4, sa_sigactio=
-n =3D 0x4}, sa_mask =3D {__val =3D {140734740550528, 93876690035339, =
-
-                140734740550624, 48833659808, 0, 0, 0, 21474836480, 1407347=
-40550792, 139838573009553, 140734740550560, 139838573043008, =
-
-                139838573024160, 93876666665872, 139838702616576, 139838573=
-024160}}, sa_flags =3D 1528954938, =
-
-            sa_restorer =3D 0x55615b2202c0 <__PRETTY_FUNCTION__.38612>}
-          sigs =3D {__val =3D {32, 0 <repeats 15 times>}}
-  #2  0x00007f2eb46502cd in __assert_fail_base (fmt=3D0x7f2eb47893a0 "%s%s%=
-s:%u: %s%sAssertion `%s' failed.\n%n", =
-
-      assertion=3Dassertion@entry=3D0x55615b22003a "!usb_packet_is_inflight=
-(p)", file=3Dfile@entry=3D0x55615b21fdf0 "hw/usb/core.c", line=3Dline@entry=
-=3D619, =
-
-      function=3Dfunction@entry=3D0x55615b2202c0 <__PRETTY_FUNCTION__.38612=
-> "usb_packet_cleanup") at assert.c:92
-          str =3D 0x55615cfdf510 ""
-          total =3D 4096
-  #3  0x00007f2eb4650382 in __GI___assert_fail (assertion=3D0x55615b22003a =
-"!usb_packet_is_inflight(p)", file=3D0x55615b21fdf0 "hw/usb/core.c", =
-
-      line=3D619, function=3D0x55615b2202c0 <__PRETTY_FUNCTION__.38612> "us=
-b_packet_cleanup") at assert.c:101
-  No locals.
-  #4  0x000055615afc385e in usb_packet_cleanup ()
-  No symbol table info available.
-  #5  0x000055615afda555 in xhci_ep_free_xfer ()
-  No symbol table info available.
-  #6  0x000055615afdc156 in xhci_kick_epctx ()
-  No symbol table info available.
-  #7  0x000055615afda099 in xhci_ep_kick_timer ()
-  No symbol table info available.
-  #8  0x000055615b08ceee in timerlist_run_timers ()
-  No symbol table info available.
-  #9  0x000055615b08cf36 in qemu_clock_run_timers ()
-  No symbol table info available.
-  #10 0x000055615b08d2df in qemu_clock_run_all_timers ()
-  No symbol table info available.
-  #11 0x000055615b08be40 in main_loop_wait ()
-  No symbol table info available.
-  #12 0x000055615ae3870f in main_loop ()
-  No symbol table info available.
-  #13 0x000055615ae4027b in main ()
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1653384/+subscriptions
+> ---
+> v2:
+> - replace offset_within_address_space with offset_within_region since
+>   IOTLB iova is relative to region [David]
+> ---
+>  hw/vfio/common.c      | 7 ++++++-
+>  include/exec/memory.h | 3 +++
+>  memory.c              | 4 +++-
+>  3 files changed, 12 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> index 801578b..6f648da 100644
+> --- a/hw/vfio/common.c
+> +++ b/hw/vfio/common.c
+> @@ -455,6 +455,10 @@ static void vfio_listener_region_add(MemoryListener *listener,
+>          giommu->container = container;
+>          giommu->n.notify = vfio_iommu_map_notify;
+>          giommu->n.notifier_flags = IOMMU_NOTIFIER_ALL;
+> +        giommu->n.start = section->offset_within_region;
+> +        llend = int128_add(int128_make64(giommu->n.start), section->size);
+> +        llend = int128_sub(llend, int128_one());
+> +        giommu->n.end = int128_get64(llend);
+>          QLIST_INSERT_HEAD(&container->giommu_list, giommu, giommu_next);
+>  
+>          memory_region_register_iommu_notifier(giommu->iommu, &giommu->n);
+> @@ -525,7 +529,8 @@ static void vfio_listener_region_del(MemoryListener *listener,
+>          VFIOGuestIOMMU *giommu;
+>  
+>          QLIST_FOREACH(giommu, &container->giommu_list, giommu_next) {
+> -            if (giommu->iommu == section->mr) {
+> +            if (giommu->iommu == section->mr &&
+> +                giommu->n.start == section->offset_within_region) {
+>                  memory_region_unregister_iommu_notifier(giommu->iommu,
+>                                                          &giommu->n);
+>                  QLIST_REMOVE(giommu, giommu_next);
+> diff --git a/include/exec/memory.h b/include/exec/memory.h
+> index 9728a2f..87357ea 100644
+> --- a/include/exec/memory.h
+> +++ b/include/exec/memory.h
+> @@ -84,6 +84,9 @@ typedef enum {
+>  struct IOMMUNotifier {
+>      void (*notify)(struct IOMMUNotifier *notifier, IOMMUTLBEntry *data);
+>      IOMMUNotifierFlag notifier_flags;
+> +    /* Notify for address space range start <= addr <= end */
+> +    hwaddr start;
+> +    hwaddr end;
+>      QLIST_ENTRY(IOMMUNotifier) node;
+>  };
+>  typedef struct IOMMUNotifier IOMMUNotifier;
+> diff --git a/memory.c b/memory.c
+> index 33110e9..f89d047 100644
+> --- a/memory.c
+> +++ b/memory.c
+> @@ -1662,7 +1662,9 @@ void memory_region_notify_iommu(MemoryRegion *mr,
+>      }
+>  
+>      QLIST_FOREACH(iommu_notifier, &mr->iommu_notify, node) {
+> -        if (iommu_notifier->notifier_flags & request_flags) {
+> +        if (iommu_notifier->notifier_flags & request_flags &&
+> +            iommu_notifier->start <= entry.iova &&
+> +            iommu_notifier->end >= entry.iova) {
+>              iommu_notifier->notify(iommu_notifier, &entry);
+>          }
+>      }
+> 
