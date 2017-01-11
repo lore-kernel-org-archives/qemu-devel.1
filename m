@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53118)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60617)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mar.krzeminski@gmail.com>) id 1cRNW6-0001YS-8k
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 13:21:02 -0500
+	(envelope-from <jcd@tribudubois.net>) id 1cRNvo-0003PT-1B
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 13:47:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mar.krzeminski@gmail.com>) id 1cRNW3-0002xn-3O
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 13:20:58 -0500
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:34462)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mar.krzeminski@gmail.com>)
-	id 1cRNW2-0002wj-QS
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 13:20:55 -0500
-Received: by mail-wm0-x244.google.com with SMTP id c85so38050191wmi.1
-	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 10:20:54 -0800 (PST)
-References: <1483979087-32663-1-git-send-email-clg@kaod.org>
-	<1483979087-32663-12-git-send-email-clg@kaod.org>
-From: "mar.krzeminski" <mar.krzeminski@gmail.com>
-Message-ID: <b5660d74-0c16-871b-bec0-31a5a6e19f04@gmail.com>
-Date: Wed, 11 Jan 2017 19:20:51 +0100
+	(envelope-from <jcd@tribudubois.net>) id 1cRNvk-0006cR-Tb
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 13:47:32 -0500
+Received: from relay5-d.mail.gandi.net ([217.70.183.197]:55498)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jcd@tribudubois.net>) id 1cRNvk-0006bX-KN
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 13:47:28 -0500
+References: <20170104220624.26557-1-jcd@tribudubois.net>
+	<CAFEAcA8dwhoSZTWS9JJ6-vSUs1Asw8ymktmD+oOqx0DNpCV2XQ@mail.gmail.com>
+	<1be7123c-acee-7d16-8a10-c8965d5805ff@gmail.com>
+	<CAFEAcA9cUEGL=rSrq2cstParBYHMWdkDy_acu7mTW754+G_Y6Q@mail.gmail.com>
+	<fb9b6b0a-62b5-2421-2826-d3f853b5d5b3@tribudubois.net>
+	<f6ddf63f-78b8-935b-9075-838a0ca0aa7d@tribudubois.net>
+	<CAFEAcA_3saBFbSX+e7P9X9n1wXV2=FjCMXML31MDq2xf+HdJmQ@mail.gmail.com>
+	<f3c873b5-1ccb-0cd4-e9fd-2f41fbdf0cca@tribudubois.net>
+	<CAFEAcA-v8RJNLSjT4ALoBNUhZQSxHPupd5rg6t44ui5h4h8BuA@mail.gmail.com>
+	<1d0d2afc-8b59-17a7-be5d-7f9113d9d57f@tribudubois.net>
+	<5ef5d8cd-169f-a54d-69b4-caa572892ef5@gmail.com>
+From: Jean-Christophe DUBOIS <jcd@tribudubois.net>
+Message-ID: <cbd3fee7-31fd-f5b2-a64b-84e7d3b6e00f@tribudubois.net>
+Date: Wed, 11 Jan 2017 19:47:24 +0100
 MIME-Version: 1.0
-In-Reply-To: <1483979087-32663-12-git-send-email-clg@kaod.org>
+In-Reply-To: <5ef5d8cd-169f-a54d-69b4-caa572892ef5@gmail.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 11/11] aspeed/smc: handle dummy bytes
- when doing fast reads in command mode
+Subject: Re: [Qemu-devel] [PATCH v4] [i.MX] fix CS handling during SPI
+ access.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,88 +37,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+To: "mar.krzeminski" <mar.krzeminski@gmail.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-W dniu 09.01.2017 o 17:24, Cédric Le Goater pisze:
-> When doing fast read, a certain amount of dummy bytes should be sent
-> before the read. This number is configurable in the controler CE0
-> Control Register and needs to be modeled using fake transfers the
-> flash module.
->
-> Signed-off-by: Cédric Le Goater <clg@kaod.org>
-> Reviewed-by: Andrew Jeffery <andrew@aj.id.au>
-> ---
->   hw/ssi/aspeed_smc.c | 21 +++++++++++++++++++++
->   1 file changed, 21 insertions(+)
->
->   Changes since v1:
->
->   - splitted user mode from command mode support.
->
-> diff --git a/hw/ssi/aspeed_smc.c b/hw/ssi/aspeed_smc.c
-> index 28d563a5800f..7a76d3344df2 100644
-> --- a/hw/ssi/aspeed_smc.c
-> +++ b/hw/ssi/aspeed_smc.c
-> @@ -69,7 +69,9 @@
->   #define R_CTRL0           (0x10 / 4)
->   #define   CTRL_CMD_SHIFT           16
->   #define   CTRL_CMD_MASK            0xff
-> +#define   CTRL_DUMMY_HIGH_SHIFT    14
->   #define   CTRL_AST2400_SPI_4BYTE   (1 << 13)
-> +#define   CTRL_DUMMY_LOW_SHIFT     6 /* 2 bits [7:6] */
->   #define   CTRL_CE_STOP_ACTIVE      (1 << 2)
->   #define   CTRL_CMD_MODE_MASK       0x3
->   #define     CTRL_READMODE          0x0
-> @@ -141,6 +143,7 @@
->   
->   /* Flash opcodes. */
->   #define SPI_OP_READ       0x03    /* Read data bytes (low frequency) */
-> +#define SPI_OP_READ_FAST  0x0b    /* Read data bytes (high frequency) */
->   
->   /*
->    * Default segments mapping addresses and size for each slave per
-> @@ -490,10 +493,21 @@ static uint32_t aspeed_smc_check_segment_addr(const AspeedSMCFlash *fl,
->       return addr;
->   }
->   
-> +static int aspeed_smc_flash_dummies(const AspeedSMCFlash *fl)
-> +{
-> +    const AspeedSMCState *s = fl->controller;
-> +    uint32_t r_ctrl0 = s->regs[s->r_ctrl0 + fl->id];
-> +    uint32_t dummy_high = (r_ctrl0 >> CTRL_DUMMY_HIGH_SHIFT) & 0x1;
-> +    uint32_t dummy_low = (r_ctrl0 >> CTRL_DUMMY_LOW_SHIFT) & 0x3;
-> +
-> +    return ((dummy_high << 2) | dummy_low) * 8;
-> +}
-> +
->   static void aspeed_smc_flash_send_addr(AspeedSMCFlash *fl, uint32_t addr)
->   {
->       const AspeedSMCState *s = fl->controller;
->       uint8_t cmd = aspeed_smc_flash_cmd(fl);
-> +    int i;
->   
->       /* Flash access can not exceed CS segment */
->       addr = aspeed_smc_check_segment_addr(fl, addr);
-> @@ -506,6 +520,13 @@ static void aspeed_smc_flash_send_addr(AspeedSMCFlash *fl, uint32_t addr)
->       ssi_transfer(s->spi, (addr >> 16) & 0xff);
->       ssi_transfer(s->spi, (addr >> 8) & 0xff);
->       ssi_transfer(s->spi, (addr & 0xff));
-> +
-> +    /* Handle dummies in case of fast read */
-> +    if (cmd == SPI_OP_READ_FAST) {
-I feel this is wrong. It indicates that the controller knows FAST_READ 
-op code.
-I believe controller always try to send dummy cycles, and do not do this 
-when
-their count is set to 0 (so you do not need above if).
+Le 11/01/2017 à 19:08, mar.krzeminski a écrit :
+> W dniu 11.01.2017 o 17:12, Jean-Christophe DUBOIS pisze:
+>> Le 10/01/2017 à 00:02, Peter Maydell a écrit :
+>>> On 9 January 2017 at 22:27, Jean-Christophe DUBOIS 
+>>> <jcd@tribudubois.net> wrote:
+>>>> I might be wrong but I think they are coming out of reset with
+>>>> their CS line set to low (so they are selected by default)
+>>>> because this is the default level at reset.
+>>> If that's true then you're in difficulties, because
+>>> there's no guarantee about device reset order. So
+>>> even if your SPI controller calls qemu_set_irq in
+>>> its reset function, if the devices on the other
+>>> end happen to have their reset called after the
+>>> controller then they'll still reset into selected...
+> I think the simplest solution in this case is to go back what you had 
+> before:
+> set each CS line state at the beginning of each new transfer - then at 
+> first transfer
+> you will properly set all CS line before transfer begin. After 
+> transfer end just negate
+> active CS line.
 
-Thanks,
-Marcin
-> +        for (i = 0; i < aspeed_smc_flash_dummies(fl); i++) {
-> +            ssi_transfer(fl->controller->spi, 0xFF);
-> +        }
-> +    }
->   }
->   
->   static uint64_t aspeed_smc_flash_read(void *opaque, hwaddr addr, unsigned size)
+OK, let's do this then ...
+
+JC
+
+>
+>> How does it work for platforms that would have pull-up resistors on 
+>> some signals? Is it something we cannot model in QEMU?
+>>
+>> On a related note, it seems quite a few SPI controller emulator are 
+>> actually calling qemu_set_irq() in their reset handler.
+> I also have the same problem.
+>
+> Thanks,
+> Marcin
+>>
+>> JC
+>>
+>>>
+>>> thanks
+>>> -- PMM
+>>>
+>>
+>>
+>
