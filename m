@@ -1,37 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49386)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50067)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cRNGh-0002yE-Mv
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 13:05:04 -0500
+	(envelope-from <mar.krzeminski@gmail.com>) id 1cRNJs-0006Xh-GS
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 13:08:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1cRNGg-0005vN-QN
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 13:05:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37276)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1cRNGg-0005ty-JF
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 13:05:02 -0500
-Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
-	[10.5.11.28])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9E00D129216
-	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 18:05:02 +0000 (UTC)
-References: <20170106155543.12827-1-berrange@redhat.com>
-	<20170106155543.12827-3-berrange@redhat.com>
-	<20170110163713.GA19869@stefanha-x1.localdomain>
-	<eabc1ecd-439c-69cc-facb-281699a4d26e@redhat.com>
-	<20170111171202.GG9269@stefanha-x1.localdomain>
-	<20170111171646.GR12072@redhat.com>
-	<6d64c194-bb64-9ac2-3281-9a9329f6a52b@redhat.com>
-	<20170111174045.GT12072@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <6ff77c17-5516-e967-27ec-6fb3bf2160d4@redhat.com>
-Date: Wed, 11 Jan 2017 19:05:00 +0100
+	(envelope-from <mar.krzeminski@gmail.com>) id 1cRNJo-0006dv-HQ
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 13:08:20 -0500
+Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:35636)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mar.krzeminski@gmail.com>)
+	id 1cRNJo-0006dn-9W
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 13:08:16 -0500
+Received: by mail-wm0-x22f.google.com with SMTP id r126so19326572wmr.0
+	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 10:08:16 -0800 (PST)
+References: <20170104220624.26557-1-jcd@tribudubois.net>
+	<CAFEAcA8dwhoSZTWS9JJ6-vSUs1Asw8ymktmD+oOqx0DNpCV2XQ@mail.gmail.com>
+	<1be7123c-acee-7d16-8a10-c8965d5805ff@gmail.com>
+	<CAFEAcA9cUEGL=rSrq2cstParBYHMWdkDy_acu7mTW754+G_Y6Q@mail.gmail.com>
+	<fb9b6b0a-62b5-2421-2826-d3f853b5d5b3@tribudubois.net>
+	<f6ddf63f-78b8-935b-9075-838a0ca0aa7d@tribudubois.net>
+	<CAFEAcA_3saBFbSX+e7P9X9n1wXV2=FjCMXML31MDq2xf+HdJmQ@mail.gmail.com>
+	<f3c873b5-1ccb-0cd4-e9fd-2f41fbdf0cca@tribudubois.net>
+	<CAFEAcA-v8RJNLSjT4ALoBNUhZQSxHPupd5rg6t44ui5h4h8BuA@mail.gmail.com>
+	<1d0d2afc-8b59-17a7-be5d-7f9113d9d57f@tribudubois.net>
+From: "mar.krzeminski" <mar.krzeminski@gmail.com>
+Message-ID: <5ef5d8cd-169f-a54d-69b4-caa572892ef5@gmail.com>
+Date: Wed, 11 Jan 2017 19:08:13 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170111174045.GT12072@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 02/47] trace: switch io/ directory to
- modular trace.h file
+In-Reply-To: <1d0d2afc-8b59-17a7-be5d-7f9113d9d57f@tribudubois.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v4] [i.MX] fix CS handling during SPI
+ access.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,73 +39,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+To: Jean-Christophe DUBOIS <jcd@tribudubois.net>, Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
+W dniu 11.01.2017 o 17:12, Jean-Christophe DUBOIS pisze:
+> Le 10/01/2017 à 00:02, Peter Maydell a écrit :
+>> On 9 January 2017 at 22:27, Jean-Christophe DUBOIS 
+>> <jcd@tribudubois.net> wrote:
+>>> I might be wrong but I think they are coming out of reset with
+>>> their CS line set to low (so they are selected by default)
+>>> because this is the default level at reset.
+>> If that's true then you're in difficulties, because
+>> there's no guarantee about device reset order. So
+>> even if your SPI controller calls qemu_set_irq in
+>> its reset function, if the devices on the other
+>> end happen to have their reset called after the
+>> controller then they'll still reset into selected...
+I think the simplest solution in this case is to go back what you had 
+before:
+set each CS line state at the beginning of each new transfer - then at 
+first transfer
+you will properly set all CS line before transfer begin. After transfer 
+end just negate
+active CS line.
 
+> How does it work for platforms that would have pull-up resistors on 
+> some signals? Is it something we cannot model in QEMU?
+>
+> On a related note, it seems quite a few SPI controller emulator are 
+> actually calling qemu_set_irq() in their reset handler.
+I also have the same problem.
 
-On 11/01/2017 18:40, Daniel P. Berrange wrote:
-> On Wed, Jan 11, 2017 at 06:34:40PM +0100, Paolo Bonzini wrote:
+Thanks,
+Marcin
+>
+> JC
+>
 >>
+>> thanks
+>> -- PMM
 >>
->> On 11/01/2017 18:16, Daniel P. Berrange wrote:
->>> I've been trying to get such relative includes to work most of today
->>> and not having much luck. The problem is that while it works in 95%
->>> of the time, there are some source files and header files which need
->>> to include trace.h files not in their local directory
->>
->> Which are they?  I wouldn't have expected that to happen.
->=20
-> It is indirect - particularly Xen - include/hw/xen/xen_common.h hsa
-> some trace points and that is included from many different source
-> files. Likewise with include/exec/cpu_ldst_template.h
-
-I see.  Yeah, this gets tricky for template-style headers.  (In the case
-of include/hw/xen/xen_common.h I would just move the functions to a .c
-file, but that's a separate thing and the template-style headers are a
-real problem).
-
->>> and we can't
->>> use relative includes for that, since the relative include gets
->>> resolved wrt the source file doing the #include, but the trace.h
->>> file is in $BUILD_DIR.
->>
->> Why would #include "../foo/trace.h" be resolved against the source
->> file's path only, and not against all -I directories?
->=20
-> If we have a plain "../trace.h", then it can end up hitting the
-> wrong file, because there are many -I dirs listed and most of
-> them contain a trace.h file, so if it matches on the 2nd -I
-> dir and you need the one from the 3rd -I dir it gets "fun".
-
-Hmm, I would have expected only the .o directory to have a ../trace.h.
-But again it doesn't help for template-style headers where ../trace.h is
-resolved according to the including file, not the included file.
-
-A weird idea: what about doing
-
-    -DGENERATED_TRACERS_H=3D\"hw/scsi/generated-tracers.h\"
-
-and then having
-
-     #ifdef GENERATED_TRACE_H
-     #include GENERATED_TRACE_H
-     #endif
-
-in include/trace.h?
-
-Then you can use full include path for special cases such as
-include/hw/xen/xen_common.h, but the common case is handled directly
-with just
-
-     #include "trace.h"
-
-which refers to $(srcdir)/include/trace.h? (Take the above with a grain
-of salt because I haven't reviewed the patches closely).
-
-Paolo
-
-> Having all the trace.h files included with path from the root
-> is alot simpler to understand IMHO than just plain "trace.h"
-> and hoping the -I order is going to ensure the right one is
-> found
+>
+>
