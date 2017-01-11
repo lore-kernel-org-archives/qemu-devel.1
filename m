@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35273)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35251)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cR8Uw-0006Gr-2T
+	(envelope-from <rth7680@gmail.com>) id 1cR8Uv-0006GS-Hz
 	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:18:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cR8Uv-0003HT-0t
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:18:46 -0500
-Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:33404)
+	(envelope-from <rth7680@gmail.com>) id 1cR8Uu-0003HA-7W
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:18:45 -0500
+Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:33402)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cR8Uu-0003HI-RL
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cR8Uu-0003Gh-2a
 	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:18:44 -0500
-Received: by mail-pf0-x241.google.com with SMTP id 127so31457994pfg.0
+Received: by mail-pf0-x244.google.com with SMTP id 127so31457948pfg.0
 	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 18:18:44 -0800 (PST)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Tue, 10 Jan 2017 18:17:41 -0800
-Message-Id: <20170111021820.24416-27-rth@twiddle.net>
+Date: Tue, 10 Jan 2017 18:17:40 -0800
+Message-Id: <20170111021820.24416-26-rth@twiddle.net>
 In-Reply-To: <20170111021820.24416-1-rth@twiddle.net>
 References: <20170111021820.24416-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PULL 26/65] disas/ppc: Handle popcnt and cnttz
+Subject: [Qemu-devel] [PULL 25/65] disas/i386.c: Handle tzcnt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,36 +31,52 @@ Cc: peter.maydell@linaro.org
 
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- disas/ppc.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ disas/i386.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/disas/ppc.c b/disas/ppc.c
-index bd05623..ed7e0d0 100644
---- a/disas/ppc.c
-+++ b/disas/ppc.c
-@@ -1955,6 +1955,9 @@ extract_tbr (unsigned long insn,
- #define POWER4	PPC_OPCODE_POWER4
- #define POWER5	PPC_OPCODE_POWER5
- #define POWER6	PPC_OPCODE_POWER6
-+/* Documentation purposes only; we don't actually check the isa for disas.  */
-+#define POWER7  PPC_OPCODE_POWER6
-+#define POWER9  PPC_OPCODE_POWER6
- #define CELL	PPC_OPCODE_CELL
- #define PPC32   PPC_OPCODE_32 | PPC_OPCODE_PPC
- #define PPC64   PPC_OPCODE_64 | PPC_OPCODE_PPC
-@@ -3589,6 +3592,13 @@ const struct powerpc_opcode powerpc_opcodes[] = {
- { "lbzux",   X(31,119),	X_MASK,		COM,		{ RT, RAL, RB } },
+diff --git a/disas/i386.c b/disas/i386.c
+index 57145d0..07f871f 100644
+--- a/disas/i386.c
++++ b/disas/i386.c
+@@ -682,6 +682,7 @@ fetch_data(struct disassemble_info *info, bfd_byte *addr)
+ #define PREGRP104 NULL, { { NULL, USE_PREFIX_USER_TABLE }, { NULL, 104 } }
+ #define PREGRP105 NULL, { { NULL, USE_PREFIX_USER_TABLE }, { NULL, 105 } }
+ #define PREGRP106 NULL, { { NULL, USE_PREFIX_USER_TABLE }, { NULL, 106 } }
++#define PREGRP107 NULL, { { NULL, USE_PREFIX_USER_TABLE }, { NULL, 107 } }
  
- { "popcntb", X(31,122), XRB_MASK,	POWER5,		{ RA, RS } },
-+{ "popcntw", X(31,378), XRB_MASK,       POWER7,         { RA, RS } },
-+{ "popcntd", X(31,506), XRB_MASK,       POWER7,         { RA, RS } },
-+
-+{ "cnttzw",  XRC(31,538,0), XRB_MASK,   POWER9,         { RA, RS } },
-+{ "cnttzw.", XRC(31,538,1), XRB_MASK,   POWER9,         { RA, RS } },
-+{ "cnttzd",  XRC(31,570,0), XRB_MASK,   POWER9,         { RA, RS } },
-+{ "cnttzd.", XRC(31,570,1), XRB_MASK,   POWER9,         { RA, RS } },
+ #define X86_64_0  NULL, { { NULL, X86_64_SPECIAL }, { NULL, 0 } }
+ #define X86_64_1  NULL, { { NULL, X86_64_SPECIAL }, { NULL, 1 } }
+@@ -1247,7 +1248,7 @@ static const struct dis386 dis386_twobyte[] = {
+   { "ud2b",		{ XX } },
+   { GRP8 },
+   { "btcS",		{ Ev, Gv } },
+-  { "bsfS",		{ Gv, Ev } },
++  { PREGRP107 },
+   { PREGRP36 },
+   { "movs{bR|x|bR|x}",	{ Gv, Eb } },
+   { "movs{wR|x|wR|x}",	{ Gv, Ew } }, /* yes, there really is movsww ! */
+@@ -1431,7 +1432,7 @@ static const unsigned char twobyte_uses_REPZ_prefix[256] = {
+   /* 80 */ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, /* 8f */
+   /* 90 */ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, /* 9f */
+   /* a0 */ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, /* af */
+-  /* b0 */ 0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0, /* bf */
++  /* b0 */ 0,0,0,0,0,0,0,0,1,0,0,0,1,1,0,0, /* bf */
+   /* c0 */ 0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0, /* cf */
+   /* d0 */ 0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0, /* df */
+   /* e0 */ 0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0, /* ef */
+@@ -2800,6 +2801,13 @@ static const struct dis386 prefix_user_table[][4] = {
+     { "shrxS",	{ Gv, Ev, Bv } },
+   },
  
- { "not",     XRC(31,124,0), X_MASK,	COM,		{ RA, RS, RBS } },
- { "nor",     XRC(31,124,0), X_MASK,	COM,		{ RA, RS, RB } },
++  /* PREGRP107 */
++  {
++    { "bsfS",	{ Gv, Ev } },
++    { "tzcntS",	{ Gv, Ev } },
++    { "bsfS",	{ Gv, Ev } },
++    { "(bad)",	{ XX } },
++  },
+ };
+ 
+ static const struct dis386 x86_64_table[][2] = {
 -- 
 2.9.3
