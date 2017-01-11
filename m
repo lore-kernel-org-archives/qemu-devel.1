@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45498)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45549)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cROgl-0003Ss-9n
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:36:04 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cROgn-0003V1-Me
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:36:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cROgi-0003SX-5q
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:36:03 -0500
-Received: from mail-wj0-x241.google.com ([2a00:1450:400c:c01::241]:36387)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1cROgh-0003SI-VD
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:36:00 -0500
-Received: by mail-wj0-x241.google.com with SMTP id dh1so11694223wjb.3
-	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 11:35:59 -0800 (PST)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cROgm-0003VA-JA
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:36:05 -0500
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 11 Jan 2017 20:35:18 +0100
-Message-Id: <1484163327-111841-25-git-send-email-pbonzini@redhat.com>
+Date: Wed, 11 Jan 2017 20:35:21 +0100
+Message-Id: <1484163327-111841-28-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1484163327-111841-1-git-send-email-pbonzini@redhat.com>
 References: <1484163327-111841-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 24/33] x86: ioapic: dump version for "info
- ioapic"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 27/33] char: fix ctrl-a b not working
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,30 +24,87 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Xu <peterx@redhat.com>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, qemu-stable@nongnu.org
 
-From: Peter Xu <peterx@redhat.com>
+From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
-Message-Id: <1483952153-7221-3-git-send-email-peterx@redhat.com>
+CharDriverState.be should be updated to point to the current
+associated backend.
+
+Fix the regression introduced in the "mux" chardev from commit
+a4afa548fc6dd9842ed86639b4d37d4d1c4ad480.
+
+https://bugs.launchpad.net/bugs/1654137
+
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Message-Id: <20170110110621.15287-1-marcandre.lureau@redhat.com>
+Cc: qemu-stable@nongnu.org
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/intc/ioapic_common.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ qemu-char.c | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
 
-diff --git a/hw/intc/ioapic_common.c b/hw/intc/ioapic_common.c
-index 1b7ec5e..97c4f9c 100644
---- a/hw/intc/ioapic_common.c
-+++ b/hw/intc/ioapic_common.c
-@@ -58,7 +58,8 @@ void ioapic_print_redtbl(Monitor *mon, IOAPICCommonState *s)
-     uint32_t remote_irr = 0;
-     int i;
+diff --git a/qemu-char.c b/qemu-char.c
+index 2c9940c..676944a 100644
+--- a/qemu-char.c
++++ b/qemu-char.c
+@@ -499,7 +499,7 @@ void qemu_chr_fe_printf(CharBackend *be, const char *fmt, ...)
  
--    monitor_printf(mon, "ioapic id=0x%02x sel=0x%02x", s->id, s->ioregsel);
-+    monitor_printf(mon, "ioapic ver=0x%x id=0x%02x sel=0x%02x",
-+                   s->version, s->id, s->ioregsel);
-     if (s->ioregsel) {
-         monitor_printf(mon, " (redir[%u])\n",
-                        (s->ioregsel - IOAPIC_REG_REDTBL_BASE) >> 1);
+ static void remove_fd_in_watch(CharDriverState *chr);
+ static void mux_chr_set_handlers(CharDriverState *chr, GMainContext *context);
+-static void mux_set_focus(MuxDriver *d, int focus);
++static void mux_set_focus(CharDriverState *chr, int focus);
+ 
+ static int null_chr_write(CharDriverState *chr, const uint8_t *buf, int len)
+ {
+@@ -666,7 +666,7 @@ static int mux_proc_byte(CharDriverState *chr, MuxDriver *d, int ch)
+         case 'c':
+             assert(d->mux_cnt > 0); /* handler registered with first fe */
+             /* Switch to the next registered device */
+-            mux_set_focus(d, (d->focus + 1) % d->mux_cnt);
++            mux_set_focus(chr, (d->focus + 1) % d->mux_cnt);
+             break;
+         case 't':
+             d->timestamps = !d->timestamps;
+@@ -826,8 +826,10 @@ static void mux_chr_set_handlers(CharDriverState *chr, GMainContext *context)
+                              context, true);
+ }
+ 
+-static void mux_set_focus(MuxDriver *d, int focus)
++static void mux_set_focus(CharDriverState *chr, int focus)
+ {
++    MuxDriver *d = chr->opaque;
++
+     assert(focus >= 0);
+     assert(focus < d->mux_cnt);
+ 
+@@ -836,6 +838,7 @@ static void mux_set_focus(MuxDriver *d, int focus)
+     }
+ 
+     d->focus = focus;
++    chr->be = d->backends[focus];
+     mux_chr_send_event(d, d->focus, CHR_EVENT_MUX_IN);
+ }
+ 
+@@ -935,7 +938,9 @@ void qemu_chr_fe_deinit(CharBackend *b)
+ 
+     if (b->chr) {
+         qemu_chr_fe_set_handlers(b, NULL, NULL, NULL, NULL, NULL, true);
+-        b->chr->be = NULL;
++        if (b->chr->be == b) {
++            b->chr->be = NULL;
++        }
+         if (b->chr->is_mux) {
+             MuxDriver *d = b->chr->opaque;
+             d->backends[b->tag] = NULL;
+@@ -999,7 +1004,7 @@ void qemu_chr_fe_take_focus(CharBackend *b)
+     }
+ 
+     if (b->chr->is_mux) {
+-        mux_set_focus(b->chr->opaque, b->tag);
++        mux_set_focus(b->chr, b->tag);
+     }
+ }
+ 
 -- 
 1.8.3.1
