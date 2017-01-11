@@ -1,31 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33840)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34324)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1cRD3n-0001s8-VF
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 02:11:04 -0500
+	(envelope-from <bounces@canonical.com>) id 1cRD8V-0003kQ-Ni
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 02:15:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1cRD3k-00031f-Pm
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 02:11:03 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:45566)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1cRD3k-000306-IR
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 02:11:00 -0500
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <000301d259dc$f9d097c0$ed71c740$@ru>
-	<000601d25a95$12b1b9f0$38152dd0$@ru>
-	<20161220102126.GE5602@stefanha-x1.localdomain>
-	<002501d25ab1$af024b00$0d06e100$@ru>
-	<CAJSP0QXm9ssLC5C+gV_agkEW_fdUY=NWBMvHqMh55UhYTR276g@mail.gmail.com>
-	<000301d25b4f$20018440$60048cc0$@ru>
-	<CAJSP0QW1pOcthcEt16Pp5xQu3miUh2Leq3kn3yvQqWqhi1P=QQ@mail.gmail.com>
-In-Reply-To: <CAJSP0QW1pOcthcEt16Pp5xQu3miUh2Leq3kn3yvQqWqhi1P=QQ@mail.gmail.com>
-Date: Wed, 11 Jan 2017 10:10:59 +0300
-Message-ID: <000801d26bd9$dca56db0$95f04910$@ru>
+	(envelope-from <bounces@canonical.com>) id 1cRD8R-0004VD-04
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 02:15:55 -0500
+Received: from indium.canonical.com ([91.189.90.7]:58922)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cRD8Q-0004UR-QX
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 02:15:50 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cRD8P-0008AB-GA
+	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 07:15:49 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 5CBF12E80C9
+	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 07:15:49 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Content-Language: ru
-Subject: Re: [Qemu-devel] qemu-2.8-rc4 is broken
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 11 Jan 2017 07:01:55 -0000
+From: Thomas Huth <1624726@bugs.launchpad.net>
+Reply-To: Bug 1624726 <1624726@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20160917203131.11876.45030.malonedeb@gac.canonical.com>
+Message-Id: <20170111070155.27560.65937.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1624726] Re: Integrator/CP regression after
+ QOM'ification of integratorcp.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,38 +37,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Stefan Hajnoczi' <stefanha@gmail.com>
-Cc: 'qemu-devel' <qemu-devel@nongnu.org>, 'Paolo Bonzini' <pbonzini@redhat.com>, 'Pavel Dovgalyuk' <pavel.dovgaluk@ispras.ru>, 'Peter Maydell' <peter.maydell@linaro.org>, =?UTF-8?Q?'Alex_Benn=C3=A9e'?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
 
-> From: Stefan Hajnoczi [mailto:stefanha@gmail.com]
-> On Wed, Dec 21, 2016 at 5:57 AM, Pavel Dovgalyuk <dovgaluk@ispras.ru> wrote:
-> >> -----Original Message-----
-> >> From: Stefan Hajnoczi [mailto:stefanha@gmail.com]
-> >> On Tue, Dec 20, 2016 at 11:10 AM, Pavel Dovgalyuk <dovgaluk@ispras.ru> wrote:
-> >> >> From: Stefan Hajnoczi [mailto:stefanha@gmail.com]
-> >> >> On Tue, Dec 20, 2016 at 10:45:44AM +0300, Pavel Dovgalyuk wrote:
-> >> >> > It also fails much earlier when I enable logs with "-d int -D log".
-> >> >> >
-> >> >> Looks like a heap corruption bug since free() is failing.
-> >> >
-> >> > Seems to be a race condition.
-> >> > When I add logs into invalidate_page_bitmap, the bug disappears.
-> >> > It seems that someone tries to free the same page bitmap twice and simultaneously.
-> >>
-> >> Does the following workaround prevent the crashes?
-> >>
-> >> -global apic-common.vapic=off
-> >
-> > Yes, this option helps.
-> > Thank you.
-> 
-> Good news.  This can be fixed in 2.8.1 once someone finds a solution.
+Patch has been included here:
+http://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3De9d9ee234f852026d58
+... and been released with QEMU version 2.8
 
-It seems that something still goes wrong.
-I'm using this workaround, but there is a kind of deadlock in translation.
-call_rcu_thread hangs at some moment in qemu_event_wait.
+** Changed in: qemu
+       Status: New =3D> Fix Released
 
-As far as I understand, it is used by QHT in translate-all.c.
-I can't get more information yet, because logging makes everything too slow.
+-- =
 
-Pavel Dovgalyuk
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1624726
+
+Title:
+  Integrator/CP regression after QOM'ification of integratorcp.c
+
+Status in HelenOS branches:
+  New
+Status in QEMU:
+  Fix Released
+
+Bug description:
+  The following command line no longer works (i.e. the guest does not
+  boot) with QEMU 2.7.0:
+
+      qemu-system-arm -M integratorcp -m 128M -kernel
+  HelenOS-0.6.0-arm32-integratorcp.boot
+
+  The HelenOS image can be downloaded here:
+
+  http://www.helenos.org/releases/HelenOS-0.6.0-arm32-integratorcp.boot
+
+  I did git bisect and came to this revision:
+
+  a1f42e0c9abc1028a8bb8686dbb3749fcd2d18e8 is the first bad commit
+  commit a1f42e0c9abc1028a8bb8686dbb3749fcd2d18e8
+  Author: xiaoqiang.zhao <zxq_yx_007@163.com>
+  Date:   Mon Mar 7 15:05:44 2016 +0800
+
+      hw/arm: QOM'ify integratorcp.c
+      =
+
+      * Drop the use of old SysBus init function and use instance_init
+      * Remove the empty 'icp_pic_class_init' from Typeinfo
+      =
+
+      Signed-off-by: xiaoqiang zhao <zxq_yx_007@163.com>
+      Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+      Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+
+  :040000 040000 b73418ea3fb69ed72438776e78786456fe4c414c
+  b483e8579037fdae7d136b2f4ada3147bdde92f1 M      hw
+
+  Upon closer inspection, I discovered that for some reason s->memsz in
+  integratorcm_init() is zero. In the last good revision, this value was
+  128. As a temporary workaround, hardcoding it to this expected value
+  fixes the problem.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/helenos/+bug/1624726/+subscriptions
