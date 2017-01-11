@@ -1,35 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50733)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52338)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cRP4y-0003uQ-9R
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 15:01:08 -0500
+	(envelope-from <alex@alex.org.uk>) id 1cRPEB-0004Jt-Re
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 15:10:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cRP4t-0000II-Dm
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 15:01:04 -0500
-Received: from indium.canonical.com ([91.189.90.7]:55650)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cRP4t-0000HI-87
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 15:00:59 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cRP4r-0003NS-Jc
-	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 20:00:57 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 922FA2E80C2
-	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 20:00:57 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+	(envelope-from <alex@alex.org.uk>) id 1cRPE7-0004q7-BG
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 15:10:35 -0500
+Received: from mail.avalus.com ([89.16.176.221]:52889)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <alex@alex.org.uk>) id 1cRPE7-0004pJ-3d
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 15:10:31 -0500
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+From: Alex Bligh <alex@alex.org.uk>
+In-Reply-To: <e3c30f7c-8d5b-5cfc-1cc0-5e673a30cd8a@virtuozzo.com>
+Date: Wed, 11 Jan 2017 19:00:00 +0000
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 11 Jan 2017 19:49:22 -0000
-From: Gerd Hoffmann <1653384@bugs.launchpad.net>
-Reply-To: Bug 1653384 <1653384@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20161231213844.1229.87554.malonedeb@soybean.canonical.com>
-	<20170111144020.21116.19598.malone@gac.canonical.com>
-Message-Id: <1484164162.26755.1.camel@redhat.com>
-Errors-To: bounces@canonical.com
-Subject: Re: [Qemu-devel] [Bug 1653384] Re: Assertion failed with USB pass
- through with XHCI controller
+Message-Id: <6986E12E-AE0A-4502-BB43-77C4E83C9DC4@alex.org.uk>
+References: <20161214150840.10899-1-alex@alex.org.uk>
+	<e3c30f7c-8d5b-5cfc-1cc0-5e673a30cd8a@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH] Further tidy-up on block status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,113 +27,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: Alex Bligh <alex@alex.org.uk>, Wouter Verhelst <w@uter.be>, "nbd-general@lists.sourceforge.net" <nbd-general@lists.sourceforge.net>, Kevin Wolf <kwolf@redhat.com>, "Stefan stefanha@redhat. com" <stefanha@redhat.com>, John Snow <jsnow@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Pavel Borzenkov <pborzenkov@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, Markus Pargmann <mpa@pengutronix.de>, "Denis V . Lunev" <den@openvz.org>
 
-Hi,
 
-> #6  0x0000555555aaa9a8 in xhci_kick_epctx (epctx=3D0x7fff5c0205d0,
-streamid=3D0) at hw/usb/hcd-xhci.c:2201
+> On 11 Jan 2017, at 15:31, Vladimir Sementsov-Ogievskiy =
+<vsementsov@virtuozzo.com> wrote:
+>=20
+> >>> If an error occurs, the server SHOULD set the appropriate error =
+code in the error field of an error chunk. However, if the error does =
+not involve invalid usage (such as a request beyond the bounds of the =
+file), a server MAY reply with a single block status descriptor with =
+length matching the requested length, and status of 0 rather than =
+reporting the error.
+> - single block status descriptor for each context? Isn't it =
+implementation defined? Or we finally decided to force 0 status to be =
+safe default for all contexts? If it is so, it would be better to =
+describe this separately. However, personally, I'd prefer to not define =
+contexts internal semantics at all.
 
-Ok, suspected already it will be there.
+I think this is Wouter's wording, but I think 'a status appropriate to =
+the context' would be better. Each context then needs to define what =
+that is. Either that or 'the context's default status' and that should =
+be in the definition of the context.
 
-thanks,
-  Gerd
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1653384
-
-Title:
-  Assertion failed with USB pass through with XHCI controller
-
-Status in QEMU:
-  New
-
-Bug description:
-  Starting qemu 2.8.0 with XHCI controller and host device passed
-  through results in an assertion failure:
-
-  qemu-system-x86_64: hw/usb/core.c:623: usb_packet_cleanup: Assertion
-  `!usb_packet_is_inflight(p)' failed.
-
-  Can be reproduced with the following command (passing through a Lenovo
-  keyboard):
-
-  qemu-system-x86_64 -usb  -device nec-usb-xhci,id=3Dusb -device usb-
-  host,vendorid=3D0x04b3,productid=3D0x3025,id=3Dhostdev0,bus=3Dusb.0,port=
-=3D1
-
-  If nec-usb-xhci is changed to usb-ehci, qemu tries to boot without
-  assertion failures.
-
-  =
-
-  Can be reproduced with the latest master (commit dbe2b65) and v2.8.0.
-
-  Bisected the issue to following commit:
-  first bad commit: [94b037f2a451b3dc855f9f2c346e5049a361bd55] xhci: use li=
-nked list for transfers
-
-  =
-
-  Backtrace from commit dbe2b65:
-
-  #0  0x00007f2eb4657227 in __GI_raise (sig=3Dsig@entry=3D6) at ../sysdeps/=
-unix/sysv/linux/raise.c:55
-          resultvar =3D 0
-          pid =3D 3453
-          selftid =3D 3453
-  #1  0x00007f2eb465867a in __GI_abort () at abort.c:89
-          save_stage =3D 2
-          act =3D {__sigaction_handler =3D {sa_handler =3D 0x4, sa_sigactio=
-n =3D 0x4}, sa_mask =3D {__val =3D {140734740550528, 93876690035339, =
-
-                140734740550624, 48833659808, 0, 0, 0, 21474836480, 1407347=
-40550792, 139838573009553, 140734740550560, 139838573043008, =
-
-                139838573024160, 93876666665872, 139838702616576, 139838573=
-024160}}, sa_flags =3D 1528954938, =
-
-            sa_restorer =3D 0x55615b2202c0 <__PRETTY_FUNCTION__.38612>}
-          sigs =3D {__val =3D {32, 0 <repeats 15 times>}}
-  #2  0x00007f2eb46502cd in __assert_fail_base (fmt=3D0x7f2eb47893a0 "%s%s%=
-s:%u: %s%sAssertion `%s' failed.\n%n", =
-
-      assertion=3Dassertion@entry=3D0x55615b22003a "!usb_packet_is_inflight=
-(p)", file=3Dfile@entry=3D0x55615b21fdf0 "hw/usb/core.c", line=3Dline@entry=
-=3D619, =
-
-      function=3Dfunction@entry=3D0x55615b2202c0 <__PRETTY_FUNCTION__.38612=
-> "usb_packet_cleanup") at assert.c:92
-          str =3D 0x55615cfdf510 ""
-          total =3D 4096
-  #3  0x00007f2eb4650382 in __GI___assert_fail (assertion=3D0x55615b22003a =
-"!usb_packet_is_inflight(p)", file=3D0x55615b21fdf0 "hw/usb/core.c", =
-
-      line=3D619, function=3D0x55615b2202c0 <__PRETTY_FUNCTION__.38612> "us=
-b_packet_cleanup") at assert.c:101
-  No locals.
-  #4  0x000055615afc385e in usb_packet_cleanup ()
-  No symbol table info available.
-  #5  0x000055615afda555 in xhci_ep_free_xfer ()
-  No symbol table info available.
-  #6  0x000055615afdc156 in xhci_kick_epctx ()
-  No symbol table info available.
-  #7  0x000055615afda099 in xhci_ep_kick_timer ()
-  No symbol table info available.
-  #8  0x000055615b08ceee in timerlist_run_timers ()
-  No symbol table info available.
-  #9  0x000055615b08cf36 in qemu_clock_run_timers ()
-  No symbol table info available.
-  #10 0x000055615b08d2df in qemu_clock_run_all_timers ()
-  No symbol table info available.
-  #11 0x000055615b08be40 in main_loop_wait ()
-  No symbol table info available.
-  #12 0x000055615ae3870f in main_loop ()
-  No symbol table info available.
-  #13 0x000055615ae4027b in main ()
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1653384/+subscriptions
+--=20
+Alex Bligh
