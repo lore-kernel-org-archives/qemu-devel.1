@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35338)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35354)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cR8Uz-0006KO-6Z
+	(envelope-from <rth7680@gmail.com>) id 1cR8Uz-0006LJ-Tk
 	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:18:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cR8Uy-0003Jv-7P
+	(envelope-from <rth7680@gmail.com>) id 1cR8Uz-0003KO-4k
 	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:18:49 -0500
-Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:35055)
+Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:35057)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cR8Uy-0003JW-1j
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:18:48 -0500
-Received: by mail-pf0-x241.google.com with SMTP id f144so12525396pfa.2
-	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 18:18:47 -0800 (PST)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cR8Uy-0003K6-V8
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:18:49 -0500
+Received: by mail-pf0-x243.google.com with SMTP id f144so12525434pfa.2
+	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 18:18:48 -0800 (PST)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Tue, 10 Jan 2017 18:17:45 -0800
-Message-Id: <20170111021820.24416-31-rth@twiddle.net>
+Date: Tue, 10 Jan 2017 18:17:46 -0800
+Message-Id: <20170111021820.24416-32-rth@twiddle.net>
 In-Reply-To: <20170111021820.24416-1-rth@twiddle.net>
 References: <20170111021820.24416-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PULL 30/65] target-mips: Use clz opcode
+Subject: [Qemu-devel] [PULL 31/65] target-openrisc: Use clz and ctz opcodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,111 +31,73 @@ Cc: peter.maydell@linaro.org
 
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- target/mips/helper.h    |  7 -------
- target/mips/op_helper.c | 22 ----------------------
- target/mips/translate.c | 23 ++++++++++++++++-------
- 3 files changed, 16 insertions(+), 36 deletions(-)
+ target/openrisc/helper.h     |  2 --
+ target/openrisc/int_helper.c | 19 -------------------
+ target/openrisc/translate.c  |  6 ++++--
+ 3 files changed, 4 insertions(+), 23 deletions(-)
 
-diff --git a/target/mips/helper.h b/target/mips/helper.h
-index 666936c..60efa01 100644
---- a/target/mips/helper.h
-+++ b/target/mips/helper.h
-@@ -20,13 +20,6 @@ DEF_HELPER_4(scd, tl, env, tl, tl, int)
- #endif
- #endif
+diff --git a/target/openrisc/helper.h b/target/openrisc/helper.h
+index f53fa21..bcc7245 100644
+--- a/target/openrisc/helper.h
++++ b/target/openrisc/helper.h
+@@ -54,8 +54,6 @@ FOP_CMP(ge)
+ #undef FOP_CMP
  
--DEF_HELPER_FLAGS_1(clo, TCG_CALL_NO_RWG_SE, tl, tl)
--DEF_HELPER_FLAGS_1(clz, TCG_CALL_NO_RWG_SE, tl, tl)
--#ifdef TARGET_MIPS64
--DEF_HELPER_FLAGS_1(dclo, TCG_CALL_NO_RWG_SE, tl, tl)
--DEF_HELPER_FLAGS_1(dclz, TCG_CALL_NO_RWG_SE, tl, tl)
--#endif
--
- DEF_HELPER_3(muls, tl, env, tl, tl)
- DEF_HELPER_3(mulsu, tl, env, tl, tl)
- DEF_HELPER_3(macc, tl, env, tl, tl)
-diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
-index 7af4c2f..11d781f 100644
---- a/target/mips/op_helper.c
-+++ b/target/mips/op_helper.c
-@@ -103,28 +103,6 @@ HELPER_ST(sd, stq, uint64_t)
- #endif
- #undef HELPER_ST
+ /* int */
+-DEF_HELPER_FLAGS_1(ff1, 0, tl, tl)
+-DEF_HELPER_FLAGS_1(fl1, 0, tl, tl)
+ DEF_HELPER_FLAGS_3(mul32, 0, i32, env, i32, i32)
  
--target_ulong helper_clo (target_ulong arg1)
+ /* interrupt */
+diff --git a/target/openrisc/int_helper.c b/target/openrisc/int_helper.c
+index 4d1f958..ba0fd27 100644
+--- a/target/openrisc/int_helper.c
++++ b/target/openrisc/int_helper.c
+@@ -24,25 +24,6 @@
+ #include "exception.h"
+ #include "qemu/host-utils.h"
+ 
+-target_ulong HELPER(ff1)(target_ulong x)
 -{
--    return clo32(arg1);
+-/*#ifdef TARGET_OPENRISC64
+-    return x ? ctz64(x) + 1 : 0;
+-#else*/
+-    return x ? ctz32(x) + 1 : 0;
+-/*#endif*/
 -}
 -
--target_ulong helper_clz (target_ulong arg1)
+-target_ulong HELPER(fl1)(target_ulong x)
 -{
--    return clz32(arg1);
+-/* not used yet, open it when we need or64.  */
+-/*#ifdef TARGET_OPENRISC64
+-    return 64 - clz64(x);
+-#else*/
+-    return 32 - clz32(x);
+-/*#endif*/
 -}
 -
--#if defined(TARGET_MIPS64)
--target_ulong helper_dclo (target_ulong arg1)
--{
--    return clo64(arg1);
--}
--
--target_ulong helper_dclz (target_ulong arg1)
--{
--    return clz64(arg1);
--}
--#endif /* TARGET_MIPS64 */
--
- /* 64 bits arithmetic for 32 bits hosts */
- static inline uint64_t get_HILO(CPUMIPSState *env)
+ uint32_t HELPER(mul32)(CPUOpenRISCState *env,
+                        uint32_t ra, uint32_t rb)
  {
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 8deffa1..7f8ecf4 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -3626,29 +3626,38 @@ static void gen_cl (DisasContext *ctx, uint32_t opc,
-         /* Treat as NOP. */
-         return;
-     }
--    t0 = tcg_temp_new();
-+    t0 = cpu_gpr[rd];
-     gen_load_gpr(t0, rs);
-+
-     switch (opc) {
-     case OPC_CLO:
-     case R6_OPC_CLO:
--        gen_helper_clo(cpu_gpr[rd], t0);
-+#if defined(TARGET_MIPS64)
-+    case OPC_DCLO:
-+    case R6_OPC_DCLO:
-+#endif
-+        tcg_gen_not_tl(t0, t0);
-         break;
-+    }
-+
-+    switch (opc) {
-+    case OPC_CLO:
-+    case R6_OPC_CLO:
-     case OPC_CLZ:
-     case R6_OPC_CLZ:
--        gen_helper_clz(cpu_gpr[rd], t0);
-+        tcg_gen_ext32u_tl(t0, t0);
-+        tcg_gen_clzi_tl(t0, t0, TARGET_LONG_BITS);
-+        tcg_gen_subi_tl(t0, t0, TARGET_LONG_BITS - 32);
-         break;
- #if defined(TARGET_MIPS64)
-     case OPC_DCLO:
-     case R6_OPC_DCLO:
--        gen_helper_dclo(cpu_gpr[rd], t0);
--        break;
-     case OPC_DCLZ:
-     case R6_OPC_DCLZ:
--        gen_helper_dclz(cpu_gpr[rd], t0);
-+        tcg_gen_clzi_i64(t0, t0, 64);
-         break;
- #endif
-     }
--    tcg_temp_free(t0);
- }
+diff --git a/target/openrisc/translate.c b/target/openrisc/translate.c
+index 229361a..03fa7db 100644
+--- a/target/openrisc/translate.c
++++ b/target/openrisc/translate.c
+@@ -602,11 +602,13 @@ static void dec_calc(DisasContext *dc, uint32_t insn)
+         switch (op1) {
+         case 0x00:    /* l.ff1 */
+             LOG_DIS("l.ff1 r%d, r%d, r%d\n", rd, ra, rb);
+-            gen_helper_ff1(cpu_R[rd], cpu_R[ra]);
++            tcg_gen_ctzi_tl(cpu_R[rd], cpu_R[ra], -1);
++            tcg_gen_addi_tl(cpu_R[rd], cpu_R[rd], 1);
+             break;
+         case 0x01:    /* l.fl1 */
+             LOG_DIS("l.fl1 r%d, r%d, r%d\n", rd, ra, rb);
+-            gen_helper_fl1(cpu_R[rd], cpu_R[ra]);
++            tcg_gen_clzi_tl(cpu_R[rd], cpu_R[ra], TARGET_LONG_BITS);
++            tcg_gen_subfi_tl(cpu_R[rd], TARGET_LONG_BITS, cpu_R[rd]);
+             break;
  
- /* Godson integer instructions */
+         default:
 -- 
 2.9.3
