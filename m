@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50746)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50733)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cRP4z-0003uT-6V
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 15:01:06 -0500
+	(envelope-from <bounces@canonical.com>) id 1cRP4y-0003uQ-9R
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 15:01:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cRP4t-0000Ib-HW
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 15:01:05 -0500
-Received: from indium.canonical.com ([91.189.90.7]:55660)
+	(envelope-from <bounces@canonical.com>) id 1cRP4t-0000II-Dm
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 15:01:04 -0500
+Received: from indium.canonical.com ([91.189.90.7]:55650)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cRP4t-0000HQ-C4
+	id 1cRP4t-0000HI-87
 	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 15:00:59 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cRP4s-0003Nz-5a
-	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 20:00:58 +0000
+	id 1cRP4r-0003NS-Jc
+	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 20:00:57 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 27C512E80C3
-	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 20:00:58 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 922FA2E80C2
+	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 20:00:57 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 11 Jan 2017 19:50:49 -0000
+Date: Wed, 11 Jan 2017 19:49:22 -0000
 From: Gerd Hoffmann <1653384@bugs.launchpad.net>
 Reply-To: Bug 1653384 <1653384@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20161231213844.1229.87554.malonedeb@soybean.canonical.com>
-	<20170111163547.14276.11781.malone@soybean.canonical.com>
-Message-Id: <1484164249.26755.3.camel@redhat.com>
+	<20170111144020.21116.19598.malone@gac.canonical.com>
+Message-Id: <1484164162.26755.1.camel@redhat.com>
 Errors-To: bounces@canonical.com
 Subject: Re: [Qemu-devel] [Bug 1653384] Re: Assertion failed with USB pass
  through with XHCI controller
@@ -40,20 +40,15 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-On Mi, 2017-01-11 at 16:35 +0000, Fabian Lesniak wrote:
-> I examined xhci_kick_epctx (frame 6) and looked into xfer and
-> xfer->packet, maybe this helps:
+Hi,
 
-> (gdb) print *xfer
-> $2 =3D {epctx =3D 0x7fff5c745290, packet =3D {pid =3D 105, id =3D 1028964=
-352, ep
-> =3D 0x555558342660, stream =3D 0, iov =3D {iov =3D 0x7fff5c138960, niov =
-=3D 1,
-> nalloc =3D 1, size =3D 5}, parameter =3D 0, short_not_ok =3D false, int_r=
-eq =3D
-> true, status =3D -6, actual_length =3D 0, state =3D USB_PACKET_ASYNC,
-                                        ^^^^^^^^^^^^^^^^^^^^^^^^
-Yep, packed still being processed at that point.
+> #6  0x0000555555aaa9a8 in xhci_kick_epctx (epctx=3D0x7fff5c0205d0,
+streamid=3D0) at hw/usb/hcd-xhci.c:2201
+
+Ok, suspected already it will be there.
+
+thanks,
+  Gerd
 
 -- =
 
