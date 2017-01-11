@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35354)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35401)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cR8Uz-0006LJ-Tk
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:18:50 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cR8V2-0006Or-C5
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:18:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cR8Uz-0003KO-4k
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:18:49 -0500
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:35057)
+	(envelope-from <rth7680@gmail.com>) id 1cR8V1-0003M4-C0
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:18:52 -0500
+Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:33421)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cR8Uy-0003K6-V8
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:18:49 -0500
-Received: by mail-pf0-x243.google.com with SMTP id f144so12525434pfa.2
-	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 18:18:48 -0800 (PST)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cR8V1-0003Lf-6z
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:18:51 -0500
+Received: by mail-pf0-x244.google.com with SMTP id 127so31458493pfg.0
+	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 18:18:51 -0800 (PST)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Tue, 10 Jan 2017 18:17:46 -0800
-Message-Id: <20170111021820.24416-32-rth@twiddle.net>
+Date: Tue, 10 Jan 2017 18:17:49 -0800
+Message-Id: <20170111021820.24416-35-rth@twiddle.net>
 In-Reply-To: <20170111021820.24416-1-rth@twiddle.net>
 References: <20170111021820.24416-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PULL 31/65] target-openrisc: Use clz and ctz opcodes
+Subject: [Qemu-devel] [PULL 34/65] target-tilegx: Use clz and ctz opcodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,73 +31,62 @@ Cc: peter.maydell@linaro.org
 
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- target/openrisc/helper.h     |  2 --
- target/openrisc/int_helper.c | 19 -------------------
- target/openrisc/translate.c  |  6 ++++--
- 3 files changed, 4 insertions(+), 23 deletions(-)
+ target/tilegx/helper.c    | 10 ----------
+ target/tilegx/helper.h    |  2 --
+ target/tilegx/translate.c |  4 ++--
+ 3 files changed, 2 insertions(+), 14 deletions(-)
 
-diff --git a/target/openrisc/helper.h b/target/openrisc/helper.h
-index f53fa21..bcc7245 100644
---- a/target/openrisc/helper.h
-+++ b/target/openrisc/helper.h
-@@ -54,8 +54,6 @@ FOP_CMP(ge)
- #undef FOP_CMP
+diff --git a/target/tilegx/helper.c b/target/tilegx/helper.c
+index b4fba9c..b6f5e29 100644
+--- a/target/tilegx/helper.c
++++ b/target/tilegx/helper.c
+@@ -55,16 +55,6 @@ void helper_ext01_ics(CPUTLGState *env)
+     }
+ }
  
- /* int */
--DEF_HELPER_FLAGS_1(ff1, 0, tl, tl)
--DEF_HELPER_FLAGS_1(fl1, 0, tl, tl)
- DEF_HELPER_FLAGS_3(mul32, 0, i32, env, i32, i32)
- 
- /* interrupt */
-diff --git a/target/openrisc/int_helper.c b/target/openrisc/int_helper.c
-index 4d1f958..ba0fd27 100644
---- a/target/openrisc/int_helper.c
-+++ b/target/openrisc/int_helper.c
-@@ -24,25 +24,6 @@
- #include "exception.h"
- #include "qemu/host-utils.h"
- 
--target_ulong HELPER(ff1)(target_ulong x)
+-uint64_t helper_cntlz(uint64_t arg)
 -{
--/*#ifdef TARGET_OPENRISC64
--    return x ? ctz64(x) + 1 : 0;
--#else*/
--    return x ? ctz32(x) + 1 : 0;
--/*#endif*/
+-    return clz64(arg);
 -}
 -
--target_ulong HELPER(fl1)(target_ulong x)
+-uint64_t helper_cnttz(uint64_t arg)
 -{
--/* not used yet, open it when we need or64.  */
--/*#ifdef TARGET_OPENRISC64
--    return 64 - clz64(x);
--#else*/
--    return 32 - clz32(x);
--/*#endif*/
+-    return ctz64(arg);
 -}
 -
- uint32_t HELPER(mul32)(CPUOpenRISCState *env,
-                        uint32_t ra, uint32_t rb)
+ uint64_t helper_pcnt(uint64_t arg)
  {
-diff --git a/target/openrisc/translate.c b/target/openrisc/translate.c
-index 229361a..03fa7db 100644
---- a/target/openrisc/translate.c
-+++ b/target/openrisc/translate.c
-@@ -602,11 +602,13 @@ static void dec_calc(DisasContext *dc, uint32_t insn)
-         switch (op1) {
-         case 0x00:    /* l.ff1 */
-             LOG_DIS("l.ff1 r%d, r%d, r%d\n", rd, ra, rb);
--            gen_helper_ff1(cpu_R[rd], cpu_R[ra]);
-+            tcg_gen_ctzi_tl(cpu_R[rd], cpu_R[ra], -1);
-+            tcg_gen_addi_tl(cpu_R[rd], cpu_R[rd], 1);
-             break;
-         case 0x01:    /* l.fl1 */
-             LOG_DIS("l.fl1 r%d, r%d, r%d\n", rd, ra, rb);
--            gen_helper_fl1(cpu_R[rd], cpu_R[ra]);
-+            tcg_gen_clzi_tl(cpu_R[rd], cpu_R[ra], TARGET_LONG_BITS);
-+            tcg_gen_subfi_tl(cpu_R[rd], TARGET_LONG_BITS, cpu_R[rd]);
-             break;
- 
-         default:
+     return ctpop64(arg);
+diff --git a/target/tilegx/helper.h b/target/tilegx/helper.h
+index 9281d0f..bab303a 100644
+--- a/target/tilegx/helper.h
++++ b/target/tilegx/helper.h
+@@ -1,7 +1,5 @@
+ DEF_HELPER_2(exception, noreturn, env, i32)
+ DEF_HELPER_1(ext01_ics, void, env)
+-DEF_HELPER_FLAGS_1(cntlz, TCG_CALL_NO_RWG_SE, i64, i64)
+-DEF_HELPER_FLAGS_1(cnttz, TCG_CALL_NO_RWG_SE, i64, i64)
+ DEF_HELPER_FLAGS_1(pcnt, TCG_CALL_NO_RWG_SE, i64, i64)
+ DEF_HELPER_FLAGS_1(revbits, TCG_CALL_NO_RWG_SE, i64, i64)
+ DEF_HELPER_FLAGS_3(shufflebytes, TCG_CALL_NO_RWG_SE, i64, i64, i64, i64)
+diff --git a/target/tilegx/translate.c b/target/tilegx/translate.c
+index 9c734ee..8a2df1b 100644
+--- a/target/tilegx/translate.c
++++ b/target/tilegx/translate.c
+@@ -608,12 +608,12 @@ static TileExcp gen_rr_opcode(DisasContext *dc, unsigned opext,
+     switch (opext) {
+     case OE_RR_X0(CNTLZ):
+     case OE_RR_Y0(CNTLZ):
+-        gen_helper_cntlz(tdest, tsrca);
++        tcg_gen_clzi_tl(tdest, tsrca, TARGET_LONG_BITS);
+         mnemonic = "cntlz";
+         break;
+     case OE_RR_X0(CNTTZ):
+     case OE_RR_Y0(CNTTZ):
+-        gen_helper_cnttz(tdest, tsrca);
++        tcg_gen_ctzi_tl(tdest, tsrca, TARGET_LONG_BITS);
+         mnemonic = "cnttz";
+         break;
+     case OE_RR_X0(FSINGLE_PACK1):
 -- 
 2.9.3
