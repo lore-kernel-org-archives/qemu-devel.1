@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57841)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57992)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cRPZz-0003fx-RI
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 15:33:09 -0500
+	(envelope-from <atar4qemu@gmail.com>) id 1cRPbA-0004bh-Ob
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 15:34:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cRPZw-0006ef-KS
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 15:33:07 -0500
-Resent-Message-Id: <E1cRPZw-0006ef-KS@eggs.gnu.org>
-Received: from sender163-mail.zoho.com ([74.201.84.163]:21312)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1cRPZw-0006eS-Bg
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 15:33:04 -0500
-In-Reply-To: <1484163327-111841-1-git-send-email-pbonzini@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <148416677833.208.17681251874403443052@790289a7ca88>
+	(envelope-from <atar4qemu@gmail.com>) id 1cRPb9-0006qS-NZ
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 15:34:20 -0500
+Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:33810)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>) id 1cRPb9-0006qB-Gz
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 15:34:19 -0500
+Received: by mail-lf0-x241.google.com with SMTP id q89so12473150lfi.1
+	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 12:34:19 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 11 Jan 2017 12:32:59 -0800 (PST)
-Subject: Re: [Qemu-devel] [PULL 00/33] Misc patches for 2017-01-11
+In-Reply-To: <5b41ce5e-6b22-bda8-ae46-9f99e78a6e3f@ilande.co.uk>
+References: <cover.1478291230.git.atar4qemu@gmail.com>
+	<CACXAS8Cz_NaOA9YgFAnKrYryWR=mEb2Ep6aUKP6j85PRJKiq0g@mail.gmail.com>
+	<e2e9b38a-ad45-d205-f139-cdefd3212f2b@ilande.co.uk>
+	<da86f614-5ba1-5cf9-3083-25dcc8c96956@twiddle.net>
+	<5b41ce5e-6b22-bda8-ae46-9f99e78a6e3f@ilande.co.uk>
+From: Artyom Tarasenko <atar4qemu@gmail.com>
+Date: Wed, 11 Jan 2017 21:33:57 +0100
+Message-ID: <CACXAS8CNa9nv4iAQTmRAKa74iJfxZrBfOMr=9B2R1DZ654K4aA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH v1 00/30] target-sparc: add niagara
+ OpenSPARC T1 sun4v emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,112 +32,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: Richard Henderson <rth@twiddle.net>, qemu-devel <qemu-devel@nongnu.org>
 
-SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDE0ODQxNjMzMjctMTExODQxLTEtZ2l0LXNlbmQtZW1haWwtcGJvbnppbmlAcmVk
-aGF0LmNvbQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BVTEwgMDAvMzNdIE1pc2MgcGF0Y2hlcyBm
-b3IgMjAxNy0wMS0xMQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFT
-RT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFp
-bGVkPTAKCiMgVXNlZnVsIGdpdCBvcHRpb25zCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFt
-ZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIk
-KGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0
-czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEg
-LS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8
-IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxl
-ZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVk
-Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQx
-ZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVj
-dC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMTQ4NDE2MzMyNy0xMTE4NDEtMS1n
-aXQtc2VuZC1lbWFpbC1wYm9uemluaUByZWRoYXQuY29tIC0+IHBhdGNoZXcvMTQ4NDE2MzMyNy0x
-MTE4NDEtMS1naXQtc2VuZC1lbWFpbC1wYm9uemluaUByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEg
-bmV3IGJyYW5jaCAndGVzdCcKY2YwNTc2ZSBSZXZlcnQgIndpbjMyOiBkb24ndCBydW4gc3VicHJv
-Y2VzcyB0ZXN0cyBvbiBNaW5ndzMyIHBsYXRmb3JtIgpjODVmYmZlIGhheDogYWRkIERhcndpbiBz
-dXBwb3J0CjIxODMyYTAgUGx1bWIgdGhlIEhBWE0tYmFzZWQgaGFyZHdhcmUgYWNjZWxlcmF0aW9u
-IHN1cHBvcnQKMzMwYWZjZSB0YXJnZXQvaTM4NjogQWRkIEludGVsIEhBWCBmaWxlcwpiYWYxYTIy
-IGt2bTogbW92ZSBjcHUgc3luY2hyb25pemF0aW9uIGNvZGUKZjU2NDEyZCByYW1ibG9jay1ub3Rp
-ZmllcjogbmV3CmI1ZGQyN2IgY2hhcjogZml4IGN0cmwtYSBiIG5vdCB3b3JraW5nCmJkMDE3NzMg
-ZXhlYzogQWRkIG1pc3NpbmcgcmN1X3JlYWRfdW5sb2NrCjYwODQ5MjcgeDg2OiBpb2FwaWM6IGZp
-eCBmYWlsIG1pZ3JhdGlvbiB3aGVuIGlycWNoaXA9c3BsaXQKZDA3ODVhZSB4ODY6IGlvYXBpYzog
-ZHVtcCB2ZXJzaW9uIGZvciAiaW5mbyBpb2FwaWMiCmI3ZWQyZWUgeDg2OiBpb2FwaWM6IGFkZCB0
-cmFjZXMgZm9yIGlvYXBpYwpkNDA2OGEzIGh4dG9vbDogZW1pdCBUZXhpbmZvIGhlYWRpbmdzIGFz
-IEBzdWJzZWN0aW9uCjUyOTgwNWYgcWVtdS10aHJlYWQ6IGZpeCBxZW11X3RocmVhZF9zZXRfbmFt
-ZSgpIHJhY2UgaW4gcWVtdV90aHJlYWRfY3JlYXRlKCkKNzg0MmEwNCBzZXJpYWw6IGZpeCBtZW1v
-cnkgbGVhayBpbiBzZXJpYWwgZXhpdAozYmYzYjEwIHNjc2ktYmxvY2s6IGZpeCBkaXJlY3Rpb24g
-b2YgQllUQ0hLIHRlc3QgZm9yIFZFUklGWSBjb21tYW5kcwo2MDQyNmRiIHBjOiBmaXggY3Jhc2gg
-aW4gcnRjX3NldF9tZW1vcnkoKSBpZiBpbml0aWFsIGNwdSBpcyBtYXJrZWQgYXMgaG90cGx1Z2dl
-ZAo5NWY5NmYzIHRhcmdldC1pMzg2OiBDb3JyZWN0bHkgYXBwbHkgcGF0Y2ggZm9yIHN5c2NhbGwg
-ZWZsYWdzLlRGIGhhbmRsaW5nCjQ2MzgwMjEgYWNwaTogZmlsdGVyIGJhc2VkIG9uIENPTkZJR19B
-Q1BJX1g4NiByYXRoZXIgdGhhbiBUQVJHRVQKOTlkZWE1MSBzdHViczogcmVtb3ZlIHN0dWJzL2t2
-bS5jCjI5OTA3NzQgYnVpbGQ6IHJlbW92ZSAtLWVuYWJsZS1jb2xvLy0tZGlzYWJsZS1jb2xvCmZm
-MzkzZGYgZXZlbnRfbm90aWZpZXI6IGNsZWFudXBzIGFyb3VuZCBldmVudF9ub3RpZmllcl9zZXRf
-aGFuZGxlcgo3YWRkMGZmIHN0dWJzOiBtb3ZlIHZob3N0IHN0dWJzIHRvIHN0dWJzL3Zob3N0Lm8K
-ZWNlODhhNSBzdHViczogZ3JvdXAgYWxsIG1vbml0b3JfZmRzZXRfKiBmdW5jdGlvbnMgaW4gYSBz
-aW5nbGUgZmlsZQo1ODY3NDIwIHN0dWJzOiBncm91cCBzdHVicyBmb3IgdXNlci1tb2RlIGVtdWxh
-dGlvbgpkODZiMWViIGh3OiBtb3ZlIHJlc2V0IGhhbmRsZXJzIGZyb20gdmwuYyB0byBody9jb3Jl
-CmIwNmEwYzEgc3R1YnM6IHJlbW92ZSB1bnVzZWQgc3R1YiBmb3Igc2VyaWFsX2hkCjE0MWQzOTAg
-c3R1YnM6IG1vdmUgYWNwaSBzdHVicyB0byBody9hY3BpCmZhYTZlZTAgc3R1YnM6IG1vdmUgc21i
-aW9zIHN0dWJzIHRvIGh3L3NtYmlvcwplMjhmMzM3IHN0dWJzOiBtZXJnZSBhbGwgbW9uaXRvciBz
-dHVicyBpbiBvbmUgZmlsZSwgcmVtb3ZlIG1vbml0b3JfY3VyX2lzX3FtcCBzdHViCmJhOTU0OTcg
-c21iaW9zOiBmaWx0ZXIgYmFzZWQgb24gQ09ORklHX1NNQklPUyByYXRoZXIgdGhhbiBUQVJHRVQK
-YTRmZWJhNyBxb206IE1ha2UgYWxsIGludGVyZmFjZSB0eXBlcyBhYnN0cmFjdAphNjVlMDQ5IG1l
-Z2FzYXM6IGZpeCBndWVzdC10cmlnZ2VyZWQgbWVtb3J5IGxlYWsKMzhhMjkxZiBidWdmaXg6IHZt
-IGhhbHQgd2hlbiBpbiByZXNldCBsb29waW5nCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2lu
-ZyBQQVRDSCAxLzMzOiBidWdmaXg6IHZtIGhhbHQgd2hlbiBpbiByZXNldCBsb29waW5nLi4uCkNo
-ZWNraW5nIFBBVENIIDIvMzM6IG1lZ2FzYXM6IGZpeCBndWVzdC10cmlnZ2VyZWQgbWVtb3J5IGxl
-YWsuLi4KQ2hlY2tpbmcgUEFUQ0ggMy8zMzogcW9tOiBNYWtlIGFsbCBpbnRlcmZhY2UgdHlwZXMg
-YWJzdHJhY3QuLi4KV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzEzMjogRklMRTog
-dGVzdHMvZGV2aWNlLWludHJvc3BlY3QtdGVzdC5jOjE3NDoKKyAgICBxdGVzdF9hZGRfZnVuYygi
-ZGV2aWNlL2ludHJvc3BlY3QvYWJzdHJhY3QtaW50ZXJmYWNlcyIsIHRlc3RfYWJzdHJhY3RfaW50
-ZXJmYWNlcyk7Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDEwNSBsaW5lcyBjaGVja2Vk
-CgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBv
-ZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFp
-bnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCkNoZWNraW5nIFBBVENIIDQv
-MzM6IHNtYmlvczogZmlsdGVyIGJhc2VkIG9uIENPTkZJR19TTUJJT1MgcmF0aGVyIHRoYW4gVEFS
-R0VULi4uCkNoZWNraW5nIFBBVENIIDUvMzM6IHN0dWJzOiBtZXJnZSBhbGwgbW9uaXRvciBzdHVi
-cyBpbiBvbmUgZmlsZSwgcmVtb3ZlIG1vbml0b3JfY3VyX2lzX3FtcCBzdHViLi4uCkVSUk9SOiBk
-byBub3QgaW5pdGlhbGlzZSBnbG9iYWxzIHRvIDAgb3IgTlVMTAojNzY6IEZJTEU6IHN0dWJzL21v
-bml0b3IuYzo2OgorTW9uaXRvciAqY3VyX21vbiA9IE5VTEw7Cgp0b3RhbDogMSBlcnJvcnMsIDAg
-d2FybmluZ3MsIDMwIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1z
-LCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRp
-dmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlO
-VEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDYvMzM6IHN0dWJzOiBtb3ZlIHNtYmlvcyBzdHVicyB0
-byBody9zbWJpb3MuLi4KQ2hlY2tpbmcgUEFUQ0ggNy8zMzogc3R1YnM6IG1vdmUgYWNwaSBzdHVi
-cyB0byBody9hY3BpLi4uCkNoZWNraW5nIFBBVENIIDgvMzM6IHN0dWJzOiByZW1vdmUgdW51c2Vk
-IHN0dWIgZm9yIHNlcmlhbF9oZC4uLgpDaGVja2luZyBQQVRDSCA5LzMzOiBodzogbW92ZSByZXNl
-dCBoYW5kbGVycyBmcm9tIHZsLmMgdG8gaHcvY29yZS4uLgpDaGVja2luZyBQQVRDSCAxMC8zMzog
-c3R1YnM6IGdyb3VwIHN0dWJzIGZvciB1c2VyLW1vZGUgZW11bGF0aW9uLi4uCkNoZWNraW5nIFBB
-VENIIDExLzMzOiBzdHViczogZ3JvdXAgYWxsIG1vbml0b3JfZmRzZXRfKiBmdW5jdGlvbnMgaW4g
-YSBzaW5nbGUgZmlsZS4uLgpDaGVja2luZyBQQVRDSCAxMi8zMzogc3R1YnM6IG1vdmUgdmhvc3Qg
-c3R1YnMgdG8gc3R1YnMvdmhvc3Quby4uLgpDaGVja2luZyBQQVRDSCAxMy8zMzogZXZlbnRfbm90
-aWZpZXI6IGNsZWFudXBzIGFyb3VuZCBldmVudF9ub3RpZmllcl9zZXRfaGFuZGxlci4uLgpDaGVj
-a2luZyBQQVRDSCAxNC8zMzogYnVpbGQ6IHJlbW92ZSAtLWVuYWJsZS1jb2xvLy0tZGlzYWJsZS1j
-b2xvLi4uCkNoZWNraW5nIFBBVENIIDE1LzMzOiBzdHViczogcmVtb3ZlIHN0dWJzL2t2bS5jLi4u
-CkNoZWNraW5nIFBBVENIIDE2LzMzOiBhY3BpOiBmaWx0ZXIgYmFzZWQgb24gQ09ORklHX0FDUElf
-WDg2IHJhdGhlciB0aGFuIFRBUkdFVC4uLgpDaGVja2luZyBQQVRDSCAxNy8zMzogdGFyZ2V0LWkz
-ODY6IENvcnJlY3RseSBhcHBseSBwYXRjaCBmb3Igc3lzY2FsbCBlZmxhZ3MuVEYgaGFuZGxpbmcu
-Li4KQ2hlY2tpbmcgUEFUQ0ggMTgvMzM6IHBjOiBmaXggY3Jhc2ggaW4gcnRjX3NldF9tZW1vcnko
-KSBpZiBpbml0aWFsIGNwdSBpcyBtYXJrZWQgYXMgaG90cGx1Z2dlZC4uLgpDaGVja2luZyBQQVRD
-SCAxOS8zMzogc2NzaS1ibG9jazogZml4IGRpcmVjdGlvbiBvZiBCWVRDSEsgdGVzdCBmb3IgVkVS
-SUZZIGNvbW1hbmRzLi4uCkNoZWNraW5nIFBBVENIIDIwLzMzOiBzZXJpYWw6IGZpeCBtZW1vcnkg
-bGVhayBpbiBzZXJpYWwgZXhpdC4uLgpDaGVja2luZyBQQVRDSCAyMS8zMzogcWVtdS10aHJlYWQ6
-IGZpeCBxZW11X3RocmVhZF9zZXRfbmFtZSgpIHJhY2UgaW4gcWVtdV90aHJlYWRfY3JlYXRlKCku
-Li4KQ2hlY2tpbmcgUEFUQ0ggMjIvMzM6IGh4dG9vbDogZW1pdCBUZXhpbmZvIGhlYWRpbmdzIGFz
-IEBzdWJzZWN0aW9uLi4uCkNoZWNraW5nIFBBVENIIDIzLzMzOiB4ODY6IGlvYXBpYzogYWRkIHRy
-YWNlcyBmb3IgaW9hcGljLi4uCkNoZWNraW5nIFBBVENIIDI0LzMzOiB4ODY6IGlvYXBpYzogZHVt
-cCB2ZXJzaW9uIGZvciAiaW5mbyBpb2FwaWMiLi4uCkNoZWNraW5nIFBBVENIIDI1LzMzOiB4ODY6
-IGlvYXBpYzogZml4IGZhaWwgbWlncmF0aW9uIHdoZW4gaXJxY2hpcD1zcGxpdC4uLgpDaGVja2lu
-ZyBQQVRDSCAyNi8zMzogZXhlYzogQWRkIG1pc3NpbmcgcmN1X3JlYWRfdW5sb2NrLi4uCkNoZWNr
-aW5nIFBBVENIIDI3LzMzOiBjaGFyOiBmaXggY3RybC1hIGIgbm90IHdvcmtpbmcuLi4KQ2hlY2tp
-bmcgUEFUQ0ggMjgvMzM6IHJhbWJsb2NrLW5vdGlmaWVyOiBuZXcuLi4KQ2hlY2tpbmcgUEFUQ0gg
-MjkvMzM6IGt2bTogbW92ZSBjcHUgc3luY2hyb25pemF0aW9uIGNvZGUuLi4KQ2hlY2tpbmcgUEFU
-Q0ggMzAvMzM6IHRhcmdldC9pMzg2OiBBZGQgSW50ZWwgSEFYIGZpbGVzLi4uCkNoZWNraW5nIFBB
-VENIIDMxLzMzOiBQbHVtYiB0aGUgSEFYTS1iYXNlZCBoYXJkd2FyZSBhY2NlbGVyYXRpb24gc3Vw
-cG9ydC4uLgpDaGVja2luZyBQQVRDSCAzMi8zMzogaGF4OiBhZGQgRGFyd2luIHN1cHBvcnQuLi4K
-Q2hlY2tpbmcgUEFUQ0ggMzMvMzM6IFJldmVydCAid2luMzI6IGRvbid0IHJ1biBzdWJwcm9jZXNz
-IHRlc3RzIG9uIE1pbmd3MzIgcGxhdGZvcm0iLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBj
-b21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRp
-Y2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIg
-ZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+On Wed, Jan 11, 2017 at 6:13 PM, Mark Cave-Ayland
+<mark.cave-ayland@ilande.co.uk> wrote:
+> On 11/01/17 16:56, Richard Henderson wrote:
+>
+>> On 12/30/2016 09:35 AM, Mark Cave-Ayland wrote:
+>>> On 15/12/16 17:04, Artyom Tarasenko wrote:
+>>>
+>>>> Ping?
+>>>> Richard & Mark, can you please review the patches
+>>>> 04, 05, 08, 10, 11,12, 14, 15, 16, 18-23 and 25-28?
+>>>>
+>>>> Hope I haven't missed anything from the v0 review.
+>>>>
+>>>> It would be nice to get it into the 2.9 release.
+>>>
+>>> No objections from me on the v1, although I would like to see the
+>>> official documentation updated in qemu-doc.texi perhaps with an example
+>>> command line as per the cover letter (maybe a link as to where to
+>>> download the PROM?) and the corrected case for Niagara.
+>>>
+>>> I also suspect that as you've been digging in this area a lot more than
+>>> me that you're definitely going to be more of the expert here.
+>>>
+>>> Can you rebase your branch onto master at github so I can give it a spin
+>>> and make sure there aren't any regressions? Other than that I'd like to
+>>> see this merged fairly quickly if Richard is happy since my connectivity
+>>> will be fairly intermittent after the next couple of weeks.
+>>
+>> I am fairly happy with the patch set.  The addition of MMU_PHYS_IDX in
+>> the meantime makes the rebase non-trivial.  Your assistance in getting
+>> the patch set updated would be most appreciated.
+>
+> Thanks Richard. Artyom, are you able to proceed with the rebase?
+
+Yes. Have just sent the v2, also available here:
+
+https://github.com/artyom-tarasenko/qemu/tree/sun4v-v2
+
+Artyom
+
+
+-- 
+Regards,
+Artyom Tarasenko
+
+SPARC and PPC PReP under qemu blog: http://tyom.blogspot.com/search/label/qemu
