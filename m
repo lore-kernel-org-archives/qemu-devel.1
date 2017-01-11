@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60397)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34815)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cRPkK-00069r-ME
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 15:43:49 -0500
+	(envelope-from <eblake@redhat.com>) id 1cRPzc-0005HU-Jy
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 15:59:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1cRPkH-0001pb-FX
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 15:43:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42036)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cRPkH-0001ox-Ak
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 15:43:45 -0500
-Message-ID: <1484167421.26755.10.camel@redhat.com>
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Wed, 11 Jan 2017 21:43:41 +0100
-In-Reply-To: <20170111145934.nogaszs5gvmn5bad@perseus.local>
-References: <1476776717-24807-1-git-send-email-ppandit@redhat.com>
-	<CAJ+F1CKnyE1d8nT_dj2D5St=2e9+W5Zx0zvXGxPDsOsg1NW66w@mail.gmail.com>
-	<alpine.LFD.2.20.1611281003090.19776@wniryva>
-	<20170111145934.nogaszs5gvmn5bad@perseus.local>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] display: cirrus: check vga bits per
- pixel(bpp) value
+	(envelope-from <eblake@redhat.com>) id 1cRPzZ-0000so-Hy
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 15:59:36 -0500
+References: <1484160658-15419-1-git-send-email-joserz@linux.vnet.ibm.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <6122a696-b85c-4fc8-b0be-a3b80fbb761f@redhat.com>
+Date: Wed, 11 Jan 2017 14:59:29 -0600
+MIME-Version: 1.0
+In-Reply-To: <1484160658-15419-1-git-send-email-joserz@linux.vnet.ibm.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="8GeIfBBip9hdFl9aWGF2tVfS4MsOuV0hI"
+Subject: Re: [Qemu-devel] [PATCH] ppc: Fix a warning in bcdcfz code and
+ improve BCD_DIG_BYTE macro
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,40 +24,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: P J P <ppandit@redhat.com>, =?ISO-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>, Qemu Developers <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Huawei PSIRT <psirt@huawei.com>
+To: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>, qemu-ppc@nongnu.org
+Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au, nikunj@linux.vnet.ibm.com, 655708@bugs.launchpad.net, thuth@redhat.com
 
-On Mi, 2017-01-11 at 16:59 +0200, Alberto Garcia wrote:
-> On Mon, Nov 28, 2016 at 11:52:08AM +0530, P J P wrote:
-> > | > --- a/hw/display/cirrus_vga.c
-> > | > +++ b/hw/display/cirrus_vga.c
-> > | > @@ -272,6 +272,9 @@ static void cirrus_update_memory_access(CirrusV=
-GAState
-> > | > *s);
-> > | >  static bool blit_region_is_unsafe(struct CirrusVGAState *s,
-> > | >                                    int32_t pitch, int32_t addr)
-> > | >  {
-> > | > +    if (!pitch) {
-> > | > +        return true;
-> > | > +    }
-> > | >
-> > |=20
-> > | That doesn't look directly related to 'cirrus_get_bpp', care to expla=
-in?
-> >=20
-> >   'blit_region_is_unsafe' is called from 'blit_is_unsafe' to check if b=
-lit=20
-> > parameters (cirrus_blt_srcpitch/cirrus_blt_dstpitch)  are safe for=20
-> > 'cirrus_do_copy'. These too could lead to div by zero in cirrus_do_copy
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--8GeIfBBip9hdFl9aWGF2tVfS4MsOuV0hI
+From: Eric Blake <eblake@redhat.com>
+To: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>, qemu-ppc@nongnu.org
+Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au,
+ nikunj@linux.vnet.ibm.com, 655708@bugs.launchpad.net, thuth@redhat.com
+Message-ID: <6122a696-b85c-4fc8-b0be-a3b80fbb761f@redhat.com>
+Subject: Re: [PATCH] ppc: Fix a warning in bcdcfz code and improve
+ BCD_DIG_BYTE macro
+References: <1484160658-15419-1-git-send-email-joserz@linux.vnet.ibm.com>
+In-Reply-To: <1484160658-15419-1-git-send-email-joserz@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 01/11/2017 12:50 PM, Jose Ricardo Ziviani wrote:
+> This commit fixes a warning in the code "(i * 2) ? .. : ..", which
+> should be better as "(i) ? .. : ..", and improves the BCD_DIG_BYTE
+
+Could remove the () around i here.
+
+> macro by placing parentheses around its argument to avoid possible
+> expansion issues like: BCD_DIG_BYTE(i + j).
 >=20
-> This change is causing display artifacts in QEMU 2.8.
+> Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
+> ---
+>  target/ppc/int_helper.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 >=20
-> What seems to happen is that blit_is_unsafe() is also called for
-> CIRRUS_BLTMODE_PATTERNCOPY, but in this case cirrus_blt_srcpitch is
-> not used. However, because of this new check if its value is 0 then
-> cirrus_bitblt_common_patterncopy() returns early and becomes a no-op.
+> diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
+> index 24e5964..d889084 100644
+> --- a/target/ppc/int_helper.c
+> +++ b/target/ppc/int_helper.c
+> @@ -2583,9 +2583,9 @@ void helper_vsubecuq(ppc_avr_t *r, ppc_avr_t *a, =
+ppc_avr_t *b, ppc_avr_t *c)
+>  #define NATIONAL_NEG    0x2D
+> =20
+>  #if defined(HOST_WORDS_BIGENDIAN)
+> -#define BCD_DIG_BYTE(n) (15 - (n/2))
+> +#define BCD_DIG_BYTE(n) (15 - ((n) / 2))
+>  #else
+> -#define BCD_DIG_BYTE(n) (n/2)
+> +#define BCD_DIG_BYTE(n) ((n) / 2)
+>  #endif
+> =20
+>  static int bcd_get_sgn(ppc_avr_t *bcd)
+> @@ -2908,7 +2908,7 @@ uint32_t helper_bcdcfz(ppc_avr_t *r, ppc_avr_t *b=
+, uint32_t ps)
+>      }
+> =20
+>      for (i =3D 0; i < 16; i++) {
+> -        zone_digit =3D (i * 2) ? b->u8[BCD_DIG_BYTE(i * 2)] >> 4 : zon=
+e_lead;
+> +        zone_digit =3D (i) ? b->u8[BCD_DIG_BYTE(i * 2)] >> 4 : zone_le=
+ad;
 
-inflight vga queue pull request has a fix for that.
+Extra (); I'd go with zone_digit =3D i ? ...
 
-cheers,
-  Gerd
+With that tweak,
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--8GeIfBBip9hdFl9aWGF2tVfS4MsOuV0hI
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYdpyxAAoJEKeha0olJ0NqiVYIAJr8s43R/rMNNc2RAp5Ig3Xc
+6rIcOGqAzpCarkegGNncz05u29rvFf4rhmuRJHU8L6XvVb7XoqR6WShR4d9VcgJW
+g+G+5QZ3zNBWg1FF215aUdeU8JSwJvUh804CP+PqKwU3dza0NSIF0q5NrJPESjB/
+w5Ld/eMKWowaAWMuGAIv216bxM5v2iLEko84VM8pp6a2s8GktMWpfwr+5fxUdJ04
+uahCmz/PB4ZLGhrKA025LWLTwJxPJHihp7PrbDk+A82KAQLD4+N3KgY7ib1X3x0t
+YuEklZN6ZiHkOL891XR6xHq4WGpagZNQMmcmTOb+3npmYQaqqL08t80Gari8Rrc=
+=aTSO
+-----END PGP SIGNATURE-----
+
+--8GeIfBBip9hdFl9aWGF2tVfS4MsOuV0hI--
