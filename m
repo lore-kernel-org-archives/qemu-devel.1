@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38378)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38499)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <joserz@linux.vnet.ibm.com>) id 1cRQBP-0001KH-JS
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 16:11:48 -0500
+	(envelope-from <bounces@canonical.com>) id 1cRQBg-0001gW-0z
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 16:12:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <joserz@linux.vnet.ibm.com>) id 1cRQBK-00061h-KA
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 16:11:47 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49224)
+	(envelope-from <bounces@canonical.com>) id 1cRQBb-00066D-3I
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 16:12:03 -0500
+Received: from indium.canonical.com ([91.189.90.7]:43433)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <joserz@linux.vnet.ibm.com>)
-	id 1cRQBK-00061N-AZ
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 16:11:42 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	v0BL9T6O048335
-	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 16:11:41 -0500
-Received: from e24smtp01.br.ibm.com (e24smtp01.br.ibm.com [32.104.18.85])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 27wq12ya93-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 16:11:40 -0500
-Received: from localhost
-	by e24smtp01.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <joserz@linux.vnet.ibm.com>;
-	Wed, 11 Jan 2017 19:11:38 -0200
-From: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
-Date: Wed, 11 Jan 2017 19:11:25 -0200
-Message-Id: <1484169085-2962-1-git-send-email-joserz@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCHi v2] ppc: Fix a warning in bcdcfz code and
- improve BCD_DIG_BYTE macro
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cRQBa-00065q-Tn
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 16:11:59 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cRQBZ-0000Om-1K
+	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 21:11:57 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 29BCC2E80CB
+	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 21:11:56 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 11 Jan 2017 20:55:13 -0000
+From: Thomas Huth <1256826@bugs.launchpad.net>
+Reply-To: Bug 1256826 <1256826@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20131202092045.6379.27394.malonedeb@soybean.canonical.com>
+Message-Id: <20170111205513.26927.69056.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1256826] Re: INT instruction bug in WindowsXP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,44 +36,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-ppc@nongnu.org
-Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au, nikunj@linux.vnet.ibm.com, eblake@redhat.com, 655708@bugs.launchpad.net, thuth@redhat.com
+To: qemu-devel@nongnu.org
 
-This commit fixes a warning in the code "(i * 2) ? .. : ..", which
-should be better as "i ? .. : ..", and improves the BCD_DIG_BYTE
-macro by placing parentheses around its argument to avoid possible
-expansion issues like: BCD_DIG_BYTE(i + j).
+Which QEMU version did you use here? Can you still reproduce this
+problem with the latest version of QEMU (currently 2.8)?
 
-Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
----
- target/ppc/int_helper.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
-diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
-index 24e5964..bd8282c 100644
---- a/target/ppc/int_helper.c
-+++ b/target/ppc/int_helper.c
-@@ -2583,9 +2583,9 @@ void helper_vsubecuq(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b, ppc_avr_t *c)
- #define NATIONAL_NEG    0x2D
- 
- #if defined(HOST_WORDS_BIGENDIAN)
--#define BCD_DIG_BYTE(n) (15 - (n/2))
-+#define BCD_DIG_BYTE(n) (15 - ((n) / 2))
- #else
--#define BCD_DIG_BYTE(n) (n/2)
-+#define BCD_DIG_BYTE(n) ((n) / 2)
- #endif
- 
- static int bcd_get_sgn(ppc_avr_t *bcd)
-@@ -2908,7 +2908,7 @@ uint32_t helper_bcdcfz(ppc_avr_t *r, ppc_avr_t *b, uint32_t ps)
-     }
- 
-     for (i = 0; i < 16; i++) {
--        zone_digit = (i * 2) ? b->u8[BCD_DIG_BYTE(i * 2)] >> 4 : zone_lead;
-+        zone_digit = i ? b->u8[BCD_DIG_BYTE(i * 2)] >> 4 : zone_lead;
-         digit = b->u8[BCD_DIG_BYTE(i * 2)] & 0xF;
-         if (unlikely(zone_digit != zone_lead || digit > 0x9)) {
-             invalid = 1;
--- 
-2.7.4
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1256826
+
+Title:
+  INT instruction bug in WindowsXP
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  This bug is in -no-kvm mode.
+
+  In windowsXP at IDT entry 2&8 is Task gate
+
+  when application use INT 2 or INT 8 it will cause blue screen in XP.
+
+  I found it should cause #GP but not generate hw interrupt.
+
+  also I check this bug with -enable-kvm & my PC and works correctly.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1256826/+subscriptions
