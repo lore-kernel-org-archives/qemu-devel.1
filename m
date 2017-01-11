@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54164)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54173)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cRTC2-0004V1-W2
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 19:24:40 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cRTC4-0004V7-UP
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 19:24:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cRTC1-0005Cb-Qq
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 19:24:38 -0500
-Date: Thu, 12 Jan 2017 10:18:49 +1100
+	(envelope-from <dgibson@ozlabs.org>) id 1cRTC1-0005CW-QI
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 19:24:40 -0500
+Date: Thu, 12 Jan 2017 10:22:07 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170111231849.GB14026@umbus.fritz.box>
-References: <1483049536-21548-1-git-send-email-hpoussin@reactos.org>
-	<CACXAS8AGTGJ-3yEzf9gzOmfRfppL2REmTyB2SAkb3Nd8eyVYig@mail.gmail.com>
+Message-ID: <20170111232207.GC14026@umbus.fritz.box>
+References: <1484169085-2962-1-git-send-email-joserz@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="f2QGlHpHGjS2mn6Y"
+	protocol="application/pgp-signature"; boundary="32u276st3Jlj2kUU"
 Content-Disposition: inline
-In-Reply-To: <CACXAS8AGTGJ-3yEzf9gzOmfRfppL2REmTyB2SAkb3Nd8eyVYig@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH 0/6] ppc: add a IBM 40p machine (RS/6000,
- PReP)
+In-Reply-To: <1484169085-2962-1-git-send-email-joserz@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCHi v2] ppc: Fix a warning in bcdcfz code and
+ improve BCD_DIG_BYTE macro
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,95 +24,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Artyom Tarasenko <atar4qemu@gmail.com>
-Cc: =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>, qemu-devel <qemu-devel@nongnu.org>, Giancarlo Teodori <gteodori@gmail.com>, Thomas Huth <thuth@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org
+To: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, nikunj@linux.vnet.ibm.com, eblake@redhat.com, 655708@bugs.launchpad.net, thuth@redhat.com
 
 
---f2QGlHpHGjS2mn6Y
-Content-Type: text/plain; charset=iso-8859-1
+--32u276st3Jlj2kUU
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 11, 2017 at 05:58:40PM +0100, Artyom Tarasenko wrote:
-> Hi Herv=E9,
+On Wed, Jan 11, 2017 at 07:11:25PM -0200, Jose Ricardo Ziviani wrote:
+> This commit fixes a warning in the code "(i * 2) ? .. : ..", which
+> should be better as "i ? .. : ..", and improves the BCD_DIG_BYTE
+> macro by placing parentheses around its argument to avoid possible
+> expansion issues like: BCD_DIG_BYTE(i + j).
 >=20
-> nice work!
->=20
-> On Thu, Dec 29, 2016 at 11:12 PM, Herv=E9 Poussineau <hpoussin@reactos.or=
-g> wrote:
-> > Hi,
-> >
-> > This patchset adds the emulation of the IBM RS/6000 7020 (40p). The rea=
-l machine is
-> > able to run AIX (up to 4.3.3), Windows NT (up to 4.0 SP1), the beta of =
-OS/2 PowerPC,
-> > Solaris, Linux, NetBSD/PReP ...
-> >
-> > I've tested current emulation with Open Hack'Ware, OpenBIOS and officia=
-l firmware.
-> >
-> > Linux kernel starts, and freezes during boot (like with 'prep' machine).
->=20
-> If prep can't do it anymore, it looks like a regression. I definitely
-> remember seen a sitting penguin and a login prompt ~ 2 years ago. At
-> least with OFW.
->=20
-> > Windows NT starts up to the point where it wants to change endianness.
->=20
-> I hit that with Solaris/PPC a few years back as you published your
-> previous attempt. Do you know what is missing? I guess CPU endianness
-> switch emulation is working because it is used in the newer POWER
-> CPUs. Is it just the systemIO which has to be improved, or is it more?
+> Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 
-It could be the system peripherals.  On the other hand, I think the
-endian switch mechanism is a bit different on those older CPUs
-compared to the new ones which PAPR uses, so it's possible that's not
-properly implemented.
+Applied to ppc-for-2.9.
 
-> > Other OSes have not been tested.
-> >
-> > This machine is a superset of the 'prep' one, because we know exactly w=
-hat is/should
-> > emulated, and that operating system list running on it is quite wide.
-> > I hope that 'prep' machine can be deprecated soon and then later remove=
-d.
+> ---
+>  target/ppc/int_helper.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 >=20
-> Would be nice to keep 'prep' until the 40p can boot Linux and NetBSD
-> 6.1.3 (this version used to work with -M prep last time I checked).
->=20
-> Artyom
->=20
-> > Patches 1 to 3 are cleanups, and can probably be committed first.
-> > Patches 4 to 6 are the real implementation of the IBM 40p.
-> >
-> > Herv=E9 Poussineau (6):
-> >   pci: add pci_vga_type(), giving the device name of the chosen VGA
-> >     device
-> >   vga: increase priority of 0xa0000 memory region
-> >   prep: do not use global variable to access nvram
-> >   prep: QOM'ify System I/O
-> >   prep: add IBM RS/6000 7020 (40p) memory controller
-> >   prep: add IBM RS/6000 7020 (40p) machine emulation
-> >
-> >  default-configs/ppc-softmmu.mak |   2 +
-> >  hw/display/vga.c                |   2 +-
-> >  hw/pci/pci.c                    |  22 ++-
-> >  hw/ppc/Makefile.objs            |   2 +
-> >  hw/ppc/prep.c                   | 235 ++++++++++++++++++++++++++++++-
-> >  hw/ppc/prep_systemio.c          | 302 ++++++++++++++++++++++++++++++++=
-++++++++
-> >  hw/ppc/rs6000_mc.c              | 232 ++++++++++++++++++++++++++++++
-> >  hw/ppc/trace-events             |  11 ++
-> >  include/hw/pci/pci.h            |   1 +
-> >  9 files changed, 800 insertions(+), 9 deletions(-)
-> >  create mode 100644 hw/ppc/prep_systemio.c
-> >  create mode 100644 hw/ppc/rs6000_mc.c
-> >
-> >
-> >
->=20
->=20
->=20
+> diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
+> index 24e5964..bd8282c 100644
+> --- a/target/ppc/int_helper.c
+> +++ b/target/ppc/int_helper.c
+> @@ -2583,9 +2583,9 @@ void helper_vsubecuq(ppc_avr_t *r, ppc_avr_t *a, pp=
+c_avr_t *b, ppc_avr_t *c)
+>  #define NATIONAL_NEG    0x2D
+> =20
+>  #if defined(HOST_WORDS_BIGENDIAN)
+> -#define BCD_DIG_BYTE(n) (15 - (n/2))
+> +#define BCD_DIG_BYTE(n) (15 - ((n) / 2))
+>  #else
+> -#define BCD_DIG_BYTE(n) (n/2)
+> +#define BCD_DIG_BYTE(n) ((n) / 2)
+>  #endif
+> =20
+>  static int bcd_get_sgn(ppc_avr_t *bcd)
+> @@ -2908,7 +2908,7 @@ uint32_t helper_bcdcfz(ppc_avr_t *r, ppc_avr_t *b, =
+uint32_t ps)
+>      }
+> =20
+>      for (i =3D 0; i < 16; i++) {
+> -        zone_digit =3D (i * 2) ? b->u8[BCD_DIG_BYTE(i * 2)] >> 4 : zone_=
+lead;
+> +        zone_digit =3D i ? b->u8[BCD_DIG_BYTE(i * 2)] >> 4 : zone_lead;
+>          digit =3D b->u8[BCD_DIG_BYTE(i * 2)] & 0xF;
+>          if (unlikely(zone_digit !=3D zone_lead || digit > 0x9)) {
+>              invalid =3D 1;
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -121,25 +83,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---f2QGlHpHGjS2mn6Y
+--32u276st3Jlj2kUU
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJYdr1XAAoJEGw4ysog2bOSEVEP/1lEsdl2fPpTZ8nVz66X7VvB
-cECvO7DPCCHbrPUCE6msXaMBe3S9riwgu3Ee/BMZUr+F5v7C/DnDAj077NY7Ce9+
-8soiXe9Us4n5wAfOjFN8gFgrFQ5vziwNpJMpyWtNpUI6q46yuyNsWV4mu1wOQ60m
-DkzN1fvm0S8oRHdWvcEnSTwbc2vRcdOJszIzzTHkUO9fH2TUVm2Uym0fICc+t1So
-JoQ89NENA5hJ4dMs4kUCdxR5xbcT3nl/kf+dt8qKaD/8M6UmsuACC7sMQ70nylBx
-C3+jYQ4j7o5OPB0ASCr1extze5QLs7kRbBl7QWIcA/liWo2jZZibhRkRTsf6dkb0
-0of30mBhTmPGSrTNwOVDeR9YQS+IcNHJnfgbPKNprxq7KbFslsQHjwf/lo7aDuuc
-vV/5/NdR9I1UFSIfBf377qk2u5TwAGg8u9Rm2GkP6XoHtrLH5htbKm9oayA2o47G
-0umSS9QGqugiaxk7hfnPgVeXTclz1/jU6HZGVhxE/1G/jgAgVMN5aMHmNecVNb1h
-UnRT3RCGFeQBZwworafymYRbFffmUxnGmxK+RlmrBwrYhCHYHV2243AUqVdUEa2W
-9GPB7txFgJ4/pMNyRKR6JfAVewZe+G1Do3KEDhjnLw54wThZfjIY1R05+qZS9qua
-M1ANZTAcTJhTdG5AUbfb
-=CDAe
+iQIcBAEBCAAGBQJYdr4eAAoJEGw4ysog2bOS/FIP/0f06YsSu0+LfRFdtqQzsaqA
+5MpfFr18lP+PBExuvQ0en+YqC+l+K9PTepTr8sdjQS4imvybD0iMxW5f6ByMu4LL
+VRg1jUxAumZDyWtjXtgZmzSIMTGNzU4qS2HnCSkJisOWk+wQLy+9mL8FGIJ/bE97
+zGKY29piBoW1dI2I1kTt/yN1PVaAuq7bPvae3H6rLRSmUEaLoNKf3lNbRzDAR9m0
+bNaW3/0eOx4MGEz3MJAkJ0QNSUGuxRoJ7GU4kZ0MaLoiFKdaS5Rhj2tEBPEvgZ2u
+GOkNn9My9QxZBP06FUR+h3uW6u/XdjipVLdShdeiOPvcLtGsIauzUpW7/6rpPH3k
+Q8ChRlSIoNCo9jAdcASuN5RHIGq3BLV46q3SPLBzqKfziMNgwPdCk+ezgt33Qj3I
+B6ThvwqCM3zTGJNBxT0kanz1+DiGCkrCBgB3lTsPSsUTwVEYDWUsBG7zkZ2lPN/W
+0Bd3gDEjJyzUKUnDTvuVZmB3QbqN/bTiuRDDEvsa9x33OA2eELIyvtI4ZNvRDy2k
+eOyE53sC9gSHPANsCCun8xhTKar0BQf/prE4SEwuflYcuArm4vca5kdn9fISOT5Q
+BFe6w3IiPeOaSH67Xxa9kAs56kMCs0tkP1JYnYy2c4hHYLpiSt6bpJrxKtFi2Q4R
+OP77lD4wttbKPiEiik9Q
+=JCUL
 -----END PGP SIGNATURE-----
 
---f2QGlHpHGjS2mn6Y--
+--32u276st3Jlj2kUU--
