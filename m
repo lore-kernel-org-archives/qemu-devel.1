@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40984)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40957)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cRMjW-0001J8-VX
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 12:30:48 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cRMjV-0001Hm-IH
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 12:30:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cRMjV-0006ZF-Dh
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 12:30:47 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48568)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cRMjU-0006Yi-80
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 12:30:45 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50172)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1cRMjV-0006Yn-6C
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 12:30:45 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+	id 1cRMjT-0006YY-VM
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 12:30:44 -0500
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com
+	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5D6D74ACCD
-	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 17:30:45 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 284F35277D
+	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 17:30:44 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed, 11 Jan 2017 18:29:50 +0100
-Message-Id: <20170111172956.11255-35-marcandre.lureau@redhat.com>
+Date: Wed, 11 Jan 2017 18:29:49 +0100
+Message-Id: <20170111172956.11255-34-marcandre.lureau@redhat.com>
 In-Reply-To: <20170111172956.11255-1-marcandre.lureau@redhat.com>
 References: <20170111172956.11255-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 34/40] char: move stdio in its own file
+Subject: [Qemu-devel] [PATCH 33/40] char: move file chardev in its own file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,330 +38,298 @@ Cc: pbonzini@redhat.com, eblake@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?=
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- chardev/char-stdio.c  | 141 ++++++++++++++++++++++++++++++++++++++++++++=
+ chardev/char-file.c   | 116 ++++++++++++++++++++++++++++++++++++++++++++=
 ++++++
- chardev/char.c        | 120 ------------------------------------------
+ chardev/char.c        | 106 --------------------------------------------=
+-
  chardev/Makefile.objs |   1 +
- 3 files changed, 142 insertions(+), 120 deletions(-)
- create mode 100644 chardev/char-stdio.c
+ 3 files changed, 117 insertions(+), 106 deletions(-)
+ create mode 100644 chardev/char-file.c
 
-diff --git a/chardev/char-stdio.c b/chardev/char-stdio.c
+diff --git a/chardev/char-file.c b/chardev/char-file.c
 new file mode 100644
-index 0000000000..610fc65b0f
+index 0000000000..8be564c7df
 --- /dev/null
-+++ b/chardev/char-stdio.c
-@@ -0,0 +1,141 @@
++++ b/chardev/char-file.c
+@@ -0,0 +1,116 @@
 +#include "qemu/osdep.h"
-+#include "qemu/sockets.h"
 +#include "qapi/error.h"
 +#include "qemu-common.h"
 +#include "sysemu/char.h"
 +
 +#ifdef _WIN32
 +#include "char-win.h"
-+#include "char-win-stdio.h"
 +#else
-+#include <termios.h>
 +#include "char-fd.h"
 +#endif
 +
-+#ifndef _WIN32
-+/* init terminal so that we can grab keys */
-+static struct termios oldtty;
-+static int old_fd0_flags;
-+static bool stdio_in_use;
-+static bool stdio_allow_signal;
-+static bool stdio_echo_state;
-+
-+static void term_exit(void)
++static void qmp_chardev_open_file(Chardev *chr,
++                                  ChardevBackend *backend,
++                                  bool *be_opened,
++                                  Error **errp)
 +{
-+    tcsetattr(0, TCSANOW, &oldtty);
-+    fcntl(0, F_SETFL, old_fd0_flags);
-+}
++    ChardevFile *file =3D backend->u.file.data;
++#ifdef _WIN32
++    HANDLE out;
++    DWORD accessmode;
++    DWORD flags;
 +
-+static void qemu_chr_set_echo_stdio(Chardev *chr, bool echo)
-+{
-+    struct termios tty;
-+
-+    stdio_echo_state =3D echo;
-+    tty =3D oldtty;
-+    if (!echo) {
-+        tty.c_iflag &=3D ~(IGNBRK | BRKINT | PARMRK | ISTRIP
-+                         | INLCR | IGNCR | ICRNL | IXON);
-+        tty.c_oflag |=3D OPOST;
-+        tty.c_lflag &=3D ~(ECHO | ECHONL | ICANON | IEXTEN);
-+        tty.c_cflag &=3D ~(CSIZE | PARENB);
-+        tty.c_cflag |=3D CS8;
-+        tty.c_cc[VMIN] =3D 1;
-+        tty.c_cc[VTIME] =3D 0;
-+    }
-+    if (!stdio_allow_signal) {
-+        tty.c_lflag &=3D ~ISIG;
-+    }
-+
-+    tcsetattr(0, TCSANOW, &tty);
-+}
-+
-+static void term_stdio_handler(int sig)
-+{
-+    /* restore echo after resume from suspend. */
-+    qemu_chr_set_echo_stdio(NULL, stdio_echo_state);
-+}
-+
-+static void qemu_chr_open_stdio(Chardev *chr,
-+                                ChardevBackend *backend,
-+                                bool *be_opened,
-+                                Error **errp)
-+{
-+    ChardevStdio *opts =3D backend->u.stdio.data;
-+    struct sigaction act;
-+
-+    if (is_daemonized()) {
-+        error_setg(errp, "cannot use stdio with -daemonize");
++    if (file->has_in) {
++        error_setg(errp, "input file not supported");
 +        return;
 +    }
 +
-+    if (stdio_in_use) {
-+        error_setg(errp, "cannot use stdio by multiple character devices=
-");
++    if (file->has_append && file->append) {
++        /* Append to file if it already exists. */
++        accessmode =3D FILE_GENERIC_WRITE & ~FILE_WRITE_DATA;
++        flags =3D OPEN_ALWAYS;
++    } else {
++        /* Truncate file if it already exists. */
++        accessmode =3D GENERIC_WRITE;
++        flags =3D CREATE_ALWAYS;
++    }
++
++    out =3D CreateFile(file->out, accessmode, FILE_SHARE_READ, NULL, fla=
+gs,
++                     FILE_ATTRIBUTE_NORMAL, NULL);
++    if (out =3D=3D INVALID_HANDLE_VALUE) {
++        error_setg(errp, "open %s failed", file->out);
 +        return;
 +    }
 +
-+    stdio_in_use =3D true;
-+    old_fd0_flags =3D fcntl(0, F_GETFL);
-+    tcgetattr(0, &oldtty);
-+    qemu_set_nonblock(0);
-+    atexit(term_exit);
++    qemu_chr_open_win_file(chr, out);
++#else
++    int flags, in =3D -1, out;
 +
-+    memset(&act, 0, sizeof(act));
-+    act.sa_handler =3D term_stdio_handler;
-+    sigaction(SIGCONT, &act, NULL);
-+
-+    qemu_chr_open_fd(chr, 0, 1);
-+
-+    if (opts->has_signal) {
-+        stdio_allow_signal =3D opts->signal;
++    flags =3D O_WRONLY | O_CREAT | O_BINARY;
++    if (file->has_append && file->append) {
++        flags |=3D O_APPEND;
++    } else {
++        flags |=3D O_TRUNC;
 +    }
-+    qemu_chr_set_echo_stdio(chr, false);
-+}
++
++    out =3D qmp_chardev_open_file_source(file->out, flags, errp);
++    if (out < 0) {
++        return;
++    }
++
++    if (file->has_in) {
++        flags =3D O_RDONLY;
++        in =3D qmp_chardev_open_file_source(file->in, flags, errp);
++        if (in < 0) {
++            qemu_close(out);
++            return;
++        }
++    }
++
++    qemu_chr_open_fd(chr, in, out);
 +#endif
-+
-+static void qemu_chr_parse_stdio(QemuOpts *opts, ChardevBackend *backend=
-,
-+                                 Error **errp)
-+{
-+    ChardevStdio *stdio;
-+
-+    backend->type =3D CHARDEV_BACKEND_KIND_STDIO;
-+    stdio =3D backend->u.stdio.data =3D g_new0(ChardevStdio, 1);
-+    qemu_chr_parse_common(opts, qapi_ChardevStdio_base(stdio));
-+    stdio->has_signal =3D true;
-+    stdio->signal =3D qemu_opt_get_bool(opts, "signal", true);
 +}
 +
-+static void char_stdio_class_init(ObjectClass *oc, void *data)
++static void qemu_chr_parse_file_out(QemuOpts *opts, ChardevBackend *back=
+end,
++                                    Error **errp)
++{
++    const char *path =3D qemu_opt_get(opts, "path");
++    ChardevFile *file;
++
++    backend->type =3D CHARDEV_BACKEND_KIND_FILE;
++    if (path =3D=3D NULL) {
++        error_setg(errp, "chardev: file: no filename given");
++        return;
++    }
++    file =3D backend->u.file.data =3D g_new0(ChardevFile, 1);
++    qemu_chr_parse_common(opts, qapi_ChardevFile_base(file));
++    file->out =3D g_strdup(path);
++
++    file->has_append =3D true;
++    file->append =3D qemu_opt_get_bool(opts, "append", false);
++}
++
++static void char_file_class_init(ObjectClass *oc, void *data)
 +{
 +    ChardevClass *cc =3D CHARDEV_CLASS(oc);
 +
-+    cc->parse =3D qemu_chr_parse_stdio;
-+#ifndef _WIN32
-+    cc->open =3D qemu_chr_open_stdio;
-+    cc->chr_set_echo =3D qemu_chr_set_echo_stdio;
-+#endif
++    cc->parse =3D qemu_chr_parse_file_out;
++    cc->open =3D qmp_chardev_open_file;
 +}
 +
-+static void char_stdio_finalize(Object *obj)
-+{
-+#ifndef _WIN32
-+    term_exit();
-+#endif
-+}
-+
-+static const TypeInfo char_stdio_type_info =3D {
-+    .name =3D TYPE_CHARDEV_STDIO,
++static const TypeInfo char_file_type_info =3D {
++    .name =3D TYPE_CHARDEV_FILE,
 +#ifdef _WIN32
-+    .parent =3D TYPE_CHARDEV_WIN_STDIO,
++    .parent =3D TYPE_CHARDEV_WIN,
 +#else
 +    .parent =3D TYPE_CHARDEV_FD,
 +#endif
-+    .instance_finalize =3D char_stdio_finalize,
-+    .class_init =3D char_stdio_class_init,
++    .class_init =3D char_file_class_init,
 +};
 +
 +static void register_types(void)
 +{
-+    type_register_static(&char_stdio_type_info);
++    type_register_static(&char_file_type_info);
 +}
 +
 +type_init(register_types);
 diff --git a/chardev/char.c b/chardev/char.c
-index abf6ad820c..bd91826f8c 100644
+index 2eb148714c..abf6ad820c 100644
 --- a/chardev/char.c
 +++ b/chardev/char.c
-@@ -90,7 +90,6 @@
- #include "char-io.h"
- #ifdef _WIN32
- #include "char-win.h"
--#include "char-win-stdio.h"
- #endif
-=20
- /***********************************************************/
-@@ -687,90 +686,6 @@ static void qemu_chr_open_pipe(Chardev *chr,
-     qemu_chr_open_fd(chr, fd_in, fd_out);
- }
-=20
--/* init terminal so that we can grab keys */
--static struct termios oldtty;
--static int old_fd0_flags;
--static bool stdio_in_use;
--static bool stdio_allow_signal;
--static bool stdio_echo_state;
--
--static void qemu_chr_set_echo_stdio(Chardev *chr, bool echo);
--
--static void term_exit(void)
--{
--    tcsetattr (0, TCSANOW, &oldtty);
--    fcntl(0, F_SETFL, old_fd0_flags);
--}
--
--static void term_stdio_handler(int sig)
--{
--    /* restore echo after resume from suspend. */
--    qemu_chr_set_echo_stdio(NULL, stdio_echo_state);
--}
--
--static void qemu_chr_set_echo_stdio(Chardev *chr, bool echo)
--{
--    struct termios tty;
--
--    stdio_echo_state =3D echo;
--    tty =3D oldtty;
--    if (!echo) {
--        tty.c_iflag &=3D ~(IGNBRK|BRKINT|PARMRK|ISTRIP
--                          |INLCR|IGNCR|ICRNL|IXON);
--        tty.c_oflag |=3D OPOST;
--        tty.c_lflag &=3D ~(ECHO|ECHONL|ICANON|IEXTEN);
--        tty.c_cflag &=3D ~(CSIZE|PARENB);
--        tty.c_cflag |=3D CS8;
--        tty.c_cc[VMIN] =3D 1;
--        tty.c_cc[VTIME] =3D 0;
--    }
--    if (!stdio_allow_signal)
--        tty.c_lflag &=3D ~ISIG;
--
--    tcsetattr (0, TCSANOW, &tty);
--}
--
--static void char_stdio_finalize(Object *obj)
--{
--    term_exit();
--}
--
--static void qemu_chr_open_stdio(Chardev *chr,
--                                ChardevBackend *backend,
--                                bool *be_opened,
--                                Error **errp)
--{
--    ChardevStdio *opts =3D backend->u.stdio.data;
--    struct sigaction act;
--
--    if (is_daemonized()) {
--        error_setg(errp, "cannot use stdio with -daemonize");
--        return;
--    }
--
--    if (stdio_in_use) {
--        error_setg(errp, "cannot use stdio by multiple character devices=
-");
--        return;
--    }
--
--    stdio_in_use =3D true;
--    old_fd0_flags =3D fcntl(0, F_GETFL);
--    tcgetattr(0, &oldtty);
--    qemu_set_nonblock(0);
--    atexit(term_exit);
--
--    memset(&act, 0, sizeof(act));
--    act.sa_handler =3D term_stdio_handler;
--    sigaction(SIGCONT, &act, NULL);
--
--    qemu_chr_open_fd(chr, 0, 1);
--
--    if (opts->has_signal) {
--        stdio_allow_signal =3D opts->signal;
--    }
--    qemu_chr_set_echo_stdio(chr, false);
--}
--
- #if defined(__linux__) || defined(__sun__) || defined(__FreeBSD__) \
-     || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFl=
-y__) \
-     || defined(__GLIBC__)
-@@ -1687,40 +1602,6 @@ void qemu_chr_parse_common(QemuOpts *opts, Chardev=
+@@ -1687,26 +1687,6 @@ void qemu_chr_parse_common(QemuOpts *opts, Chardev=
 Common *backend)
      backend->logappend =3D qemu_opt_get_bool(opts, "logappend", false);
  }
 =20
--static void qemu_chr_parse_stdio(QemuOpts *opts, ChardevBackend *backend=
-,
--                                 Error **errp)
--{
--    ChardevStdio *stdio;
 -
--    backend->type =3D CHARDEV_BACKEND_KIND_STDIO;
--    stdio =3D backend->u.stdio.data =3D g_new0(ChardevStdio, 1);
--    qemu_chr_parse_common(opts, qapi_ChardevStdio_base(stdio));
--    stdio->has_signal =3D true;
--    stdio->signal =3D qemu_opt_get_bool(opts, "signal", true);
+-static void qemu_chr_parse_file_out(QemuOpts *opts, ChardevBackend *back=
+end,
+-                                    Error **errp)
+-{
+-    const char *path =3D qemu_opt_get(opts, "path");
+-    ChardevFile *file;
+-
+-    backend->type =3D CHARDEV_BACKEND_KIND_FILE;
+-    if (path =3D=3D NULL) {
+-        error_setg(errp, "chardev: file: no filename given");
+-        return;
+-    }
+-    file =3D backend->u.file.data =3D g_new0(ChardevFile, 1);
+-    qemu_chr_parse_common(opts, qapi_ChardevFile_base(file));
+-    file->out =3D g_strdup(path);
+-
+-    file->has_append =3D true;
+-    file->append =3D qemu_opt_get_bool(opts, "append", false);
 -}
 -
--static void char_stdio_class_init(ObjectClass *oc, void *data)
+ static void qemu_chr_parse_stdio(QemuOpts *opts, ChardevBackend *backend=
+,
+                                  Error **errp)
+ {
+@@ -2238,41 +2218,6 @@ QemuOptsList qemu_chardev_opts =3D {
+=20
+ #ifdef _WIN32
+=20
+-static void qmp_chardev_open_file(Chardev *chr,
+-                                  ChardevBackend *backend,
+-                                  bool *be_opened,
+-                                  Error **errp)
+-{
+-    ChardevFile *file =3D backend->u.file.data;
+-    HANDLE out;
+-    DWORD accessmode;
+-    DWORD flags;
+-
+-    if (file->has_in) {
+-        error_setg(errp, "input file not supported");
+-        return;
+-    }
+-
+-    if (file->has_append && file->append) {
+-        /* Append to file if it already exists. */
+-        accessmode =3D FILE_GENERIC_WRITE & ~FILE_WRITE_DATA;
+-        flags =3D OPEN_ALWAYS;
+-    } else {
+-        /* Truncate file if it already exists. */
+-        accessmode =3D GENERIC_WRITE;
+-        flags =3D CREATE_ALWAYS;
+-    }
+-
+-    out =3D CreateFile(file->out, accessmode, FILE_SHARE_READ, NULL, fla=
+gs,
+-                     FILE_ATTRIBUTE_NORMAL, NULL);
+-    if (out =3D=3D INVALID_HANDLE_VALUE) {
+-        error_setg(errp, "open %s failed", file->out);
+-        return;
+-    }
+-
+-    qemu_chr_open_win_file(chr, out);
+-}
+-
+ static void qmp_chardev_open_serial(Chardev *chr,
+                                     ChardevBackend *backend,
+                                     bool *be_opened,
+@@ -2285,38 +2230,6 @@ static void qmp_chardev_open_serial(Chardev *chr,
+=20
+ #else /* WIN32 */
+=20
+-static void qmp_chardev_open_file(Chardev *chr,
+-                                  ChardevBackend *backend,
+-                                  bool *be_opened,
+-                                  Error **errp)
+-{
+-    ChardevFile *file =3D backend->u.file.data;
+-    int flags, in =3D -1, out;
+-
+-    flags =3D O_WRONLY | O_CREAT | O_BINARY;
+-    if (file->has_append && file->append) {
+-        flags |=3D O_APPEND;
+-    } else {
+-        flags |=3D O_TRUNC;
+-    }
+-
+-    out =3D qmp_chardev_open_file_source(file->out, flags, errp);
+-    if (out < 0) {
+-        return;
+-    }
+-
+-    if (file->has_in) {
+-        flags =3D O_RDONLY;
+-        in =3D qmp_chardev_open_file_source(file->in, flags, errp);
+-        if (in < 0) {
+-            qemu_close(out);
+-            return;
+-        }
+-    }
+-
+-    qemu_chr_open_fd(chr, in, out);
+-}
+-
+ #ifdef HAVE_CHARDEV_SERIAL
+ static void qmp_chardev_open_serial(Chardev *chr,
+                                     ChardevBackend *backend,
+@@ -2393,24 +2306,6 @@ static const TypeInfo char_parallel_type_info =3D =
+{
+=20
+ #endif /* WIN32 */
+=20
+-static void char_file_class_init(ObjectClass *oc, void *data)
 -{
 -    ChardevClass *cc =3D CHARDEV_CLASS(oc);
 -
--    cc->parse =3D qemu_chr_parse_stdio;
--#ifndef _WIN32
--    cc->open =3D qemu_chr_open_stdio;
--    cc->chr_set_echo =3D qemu_chr_set_echo_stdio;
--#endif
+-    cc->parse =3D qemu_chr_parse_file_out;
+-    cc->open =3D qmp_chardev_open_file;
 -}
 -
--static const TypeInfo char_stdio_type_info =3D {
--    .name =3D TYPE_CHARDEV_STDIO,
+-static const TypeInfo char_file_type_info =3D {
+-    .name =3D TYPE_CHARDEV_FILE,
 -#ifdef _WIN32
--    .parent =3D TYPE_CHARDEV_WIN_STDIO,
+-    .parent =3D TYPE_CHARDEV_WIN,
 -#else
 -    .parent =3D TYPE_CHARDEV_FD,
--    .instance_finalize =3D char_stdio_finalize,
 -#endif
--    .class_init =3D char_stdio_class_init,
+-    .class_init =3D char_file_class_init,
 -};
 -
  #ifdef HAVE_CHARDEV_SERIAL
- static void qemu_chr_parse_serial(QemuOpts *opts, ChardevBackend *backen=
-d,
-                                   Error **errp)
-@@ -2431,7 +2312,6 @@ void qemu_chr_cleanup(void)
+=20
+ static void char_serial_class_init(ObjectClass *oc, void *data)
+@@ -2536,7 +2431,6 @@ void qemu_chr_cleanup(void)
  static void register_types(void)
  {
      type_register_static(&char_type_info);
--    type_register_static(&char_stdio_type_info);
+-    type_register_static(&char_file_type_info);
+     type_register_static(&char_stdio_type_info);
  #ifdef HAVE_CHARDEV_SERIAL
      type_register_static(&char_serial_type_info);
- #endif
 diff --git a/chardev/Makefile.objs b/chardev/Makefile.objs
-index 0051a7a819..ee40e8a1d7 100644
+index dddef029e7..0051a7a819 100644
 --- a/chardev/Makefile.objs
 +++ b/chardev/Makefile.objs
-@@ -6,6 +6,7 @@ chardev-obj-y +=3D char-mux.o
+@@ -1,5 +1,6 @@
+ chardev-obj-y +=3D char.o
+ chardev-obj-$(CONFIG_POSIX) +=3D char-fd.o
++chardev-obj-y +=3D char-file.o
+ chardev-obj-y +=3D char-io.o
+ chardev-obj-y +=3D char-mux.o
  chardev-obj-y +=3D char-null.o
- chardev-obj-y +=3D char-ringbuf.o
- chardev-obj-y +=3D char-socket.o
-+chardev-obj-y +=3D char-stdio.o
- chardev-obj-y +=3D char-udp.o
- chardev-obj-$(CONFIG_WIN32) +=3D char-win.o
- chardev-obj-$(CONFIG_WIN32) +=3D char-win-stdio.o
 --=20
 2.11.0
