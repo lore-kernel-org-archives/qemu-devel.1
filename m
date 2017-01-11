@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35507)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35494)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cR8V8-0006VM-Lk
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:19:00 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cR8V7-0006US-R0
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:18:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cR8V7-0003Pq-KI
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:18:58 -0500
-Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:35075)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cR8V7-0003PO-EY
+	(envelope-from <rth7680@gmail.com>) id 1cR8V6-0003PD-Mv
 	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:18:57 -0500
-Received: by mail-pf0-x242.google.com with SMTP id f144so12525977pfa.2
-	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 18:18:57 -0800 (PST)
+Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:33433)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cR8V6-0003Ox-Fq
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:18:56 -0500
+Received: by mail-pf0-x242.google.com with SMTP id 127so31458840pfg.0
+	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 18:18:56 -0800 (PST)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Tue, 10 Jan 2017 18:17:56 -0800
-Message-Id: <20170111021820.24416-42-rth@twiddle.net>
+Date: Tue, 10 Jan 2017 18:17:55 -0800
+Message-Id: <20170111021820.24416-41-rth@twiddle.net>
 In-Reply-To: <20170111021820.24416-1-rth@twiddle.net>
 References: <20170111021820.24416-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PULL 41/65] tcg/aarch64: Handle ctz and clz opcodes
+Subject: [Qemu-devel] [PULL 40/65] tcg/ppc: Handle ctz and clz opcodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,122 +31,186 @@ Cc: peter.maydell@linaro.org
 
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- tcg/aarch64/tcg-target.h     |  8 ++++----
- tcg/aarch64/tcg-target.inc.c | 48 ++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 52 insertions(+), 4 deletions(-)
+ tcg/ppc/tcg-target.h     | 10 +++++---
+ tcg/ppc/tcg-target.inc.c | 67 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 73 insertions(+), 4 deletions(-)
 
-diff --git a/tcg/aarch64/tcg-target.h b/tcg/aarch64/tcg-target.h
-index 976f493..9d6b00f 100644
---- a/tcg/aarch64/tcg-target.h
-+++ b/tcg/aarch64/tcg-target.h
-@@ -62,8 +62,8 @@ typedef enum {
+diff --git a/tcg/ppc/tcg-target.h b/tcg/ppc/tcg-target.h
+index 698a599..c798c9c 100644
+--- a/tcg/ppc/tcg-target.h
++++ b/tcg/ppc/tcg-target.h
+@@ -49,6 +49,8 @@ typedef enum {
+     TCG_AREG0 = TCG_REG_R27
+ } TCGReg;
+ 
++extern bool have_isa_3_00;
++
+ /* optional instructions automatically implemented */
+ #define TCG_TARGET_HAS_ext8u_i32        0 /* andi */
+ #define TCG_TARGET_HAS_ext16u_i32       0
+@@ -68,8 +70,8 @@ typedef enum {
  #define TCG_TARGET_HAS_eqv_i32          1
- #define TCG_TARGET_HAS_nand_i32         0
- #define TCG_TARGET_HAS_nor_i32          0
+ #define TCG_TARGET_HAS_nand_i32         1
+ #define TCG_TARGET_HAS_nor_i32          1
 -#define TCG_TARGET_HAS_clz_i32          0
 -#define TCG_TARGET_HAS_ctz_i32          0
 +#define TCG_TARGET_HAS_clz_i32          1
-+#define TCG_TARGET_HAS_ctz_i32          1
++#define TCG_TARGET_HAS_ctz_i32          have_isa_3_00
  #define TCG_TARGET_HAS_deposit_i32      1
  #define TCG_TARGET_HAS_extract_i32      1
- #define TCG_TARGET_HAS_sextract_i32     1
-@@ -96,8 +96,8 @@ typedef enum {
+ #define TCG_TARGET_HAS_sextract_i32     0
+@@ -103,8 +105,8 @@ typedef enum {
  #define TCG_TARGET_HAS_eqv_i64          1
- #define TCG_TARGET_HAS_nand_i64         0
- #define TCG_TARGET_HAS_nor_i64          0
+ #define TCG_TARGET_HAS_nand_i64         1
+ #define TCG_TARGET_HAS_nor_i64          1
 -#define TCG_TARGET_HAS_clz_i64          0
 -#define TCG_TARGET_HAS_ctz_i64          0
 +#define TCG_TARGET_HAS_clz_i64          1
-+#define TCG_TARGET_HAS_ctz_i64          1
++#define TCG_TARGET_HAS_ctz_i64          have_isa_3_00
  #define TCG_TARGET_HAS_deposit_i64      1
  #define TCG_TARGET_HAS_extract_i64      1
- #define TCG_TARGET_HAS_sextract_i64     1
-diff --git a/tcg/aarch64/tcg-target.inc.c b/tcg/aarch64/tcg-target.inc.c
-index 17c0b20..585b0d6 100644
---- a/tcg/aarch64/tcg-target.inc.c
-+++ b/tcg/aarch64/tcg-target.inc.c
-@@ -339,8 +339,12 @@ typedef enum {
-     /* Conditional select instructions.  */
-     I3506_CSEL      = 0x1a800000,
-     I3506_CSINC     = 0x1a800400,
-+    I3506_CSINV     = 0x5a800000,
-+    I3506_CSNEG     = 0x5a800400,
+ #define TCG_TARGET_HAS_sextract_i64     0
+diff --git a/tcg/ppc/tcg-target.inc.c b/tcg/ppc/tcg-target.inc.c
+index bf17161..766bc1a 100644
+--- a/tcg/ppc/tcg-target.inc.c
++++ b/tcg/ppc/tcg-target.inc.c
+@@ -77,11 +77,15 @@
+ #define TCG_CT_CONST_U32  0x800
+ #define TCG_CT_CONST_ZERO 0x1000
+ #define TCG_CT_CONST_MONE 0x2000
++#define TCG_CT_CONST_WSZ  0x4000
  
-     /* Data-processing (1 source) instructions.  */
-+    I3507_CLZ       = 0x5ac01000,
-+    I3507_RBIT      = 0x5ac00000,
-     I3507_REV16     = 0x5ac00400,
-     I3507_REV32     = 0x5ac00800,
-     I3507_REV64     = 0x5ac00c00,
-@@ -993,6 +997,37 @@ static inline void tcg_out_mb(TCGContext *s, TCGArg a0)
-     tcg_out32(s, sync[a0 & TCG_MO_ALL]);
+ static tcg_insn_unit *tb_ret_addr;
+ 
+ #include "elf.h"
++
+ static bool have_isa_2_06;
++bool have_isa_3_00;
++
+ #define HAVE_ISA_2_06  have_isa_2_06
+ #define HAVE_ISEL      have_isa_2_06
+ 
+@@ -305,6 +309,9 @@ static const char *target_parse_constraint(TCGArgConstraint *ct,
+     case 'U':
+         ct->ct |= TCG_CT_CONST_U32;
+         break;
++    case 'W':
++        ct->ct |= TCG_CT_CONST_WSZ;
++        break;
+     case 'Z':
+         ct->ct |= TCG_CT_CONST_ZERO;
+         break;
+@@ -341,6 +348,9 @@ static int tcg_target_const_match(tcg_target_long val, TCGType type,
+         return 1;
+     } else if ((ct & TCG_CT_CONST_MONE) && val == -1) {
+         return 1;
++    } else if ((ct & TCG_CT_CONST_WSZ)
++               && val == (type == TCG_TYPE_I32 ? 32 : 64)) {
++        return 1;
+     }
+     return 0;
+ }
+@@ -445,6 +455,8 @@ static int tcg_target_const_match(tcg_target_long val, TCGType type,
+ #define NOR    XO31(124)
+ #define CNTLZW XO31( 26)
+ #define CNTLZD XO31( 58)
++#define CNTTZW XO31(538)
++#define CNTTZD XO31(570)
+ #define ANDC   XO31( 60)
+ #define ORC    XO31(412)
+ #define EQV    XO31(284)
+@@ -1166,6 +1178,32 @@ static void tcg_out_movcond(TCGContext *s, TCGType type, TCGCond cond,
+     }
  }
  
-+static void tcg_out_cltz(TCGContext *s, TCGType ext, TCGReg d,
-+                         TCGReg a0, TCGArg b, bool const_b, bool is_ctz)
++static void tcg_out_cntxz(TCGContext *s, TCGType type, uint32_t opc,
++                          TCGArg a0, TCGArg a1, TCGArg a2, bool const_a2)
 +{
-+    TCGReg a1 = a0;
-+    if (is_ctz) {
-+        a1 = TCG_REG_TMP;
-+        tcg_out_insn(s, 3507, RBIT, ext, a1, a0);
-+    }
-+    if (const_b && b == (ext ? 64 : 32)) {
-+        tcg_out_insn(s, 3507, CLZ, ext, d, a1);
++    if (const_a2 && a2 == (type == TCG_TYPE_I32 ? 32 : 64)) {
++        tcg_out32(s, opc | RA(a0) | RS(a1));
 +    } else {
-+        AArch64Insn sel = I3506_CSEL;
-+
-+        tcg_out_cmp(s, ext, a0, 0, 1);
-+        tcg_out_insn(s, 3507, CLZ, ext, TCG_REG_TMP, a1);
-+
-+        if (const_b) {
-+            if (b == -1) {
-+                b = TCG_REG_XZR;
-+                sel = I3506_CSINV;
-+            } else if (b == 0) {
-+                b = TCG_REG_XZR;
++        tcg_out_cmp(s, TCG_COND_EQ, a1, 0, 1, 7, type);
++        /* Note that the only other valid constant for a2 is 0.  */
++        if (HAVE_ISEL) {
++            tcg_out32(s, opc | RA(TCG_REG_R0) | RS(a1));
++            tcg_out32(s, tcg_to_isel[TCG_COND_EQ] | TAB(a0, a2, TCG_REG_R0));
++        } else if (!const_a2 && a0 == a2) {
++            tcg_out32(s, tcg_to_bc[TCG_COND_EQ] | 8);
++            tcg_out32(s, opc | RA(a0) | RS(a1));
++        } else {
++            tcg_out32(s, opc | RA(a0) | RS(a1));
++            tcg_out32(s, tcg_to_bc[TCG_COND_NE] | 8);
++            if (const_a2) {
++                tcg_out_movi(s, type, a0, 0);
 +            } else {
-+                tcg_out_movi(s, ext, d, b);
-+                b = d;
++                tcg_out_mov(s, type, a0, a2);
 +            }
 +        }
-+        tcg_out_insn_3506(s, sel, ext, d, TCG_REG_TMP, b, TCG_COND_NE);
 +    }
 +}
 +
- #ifdef CONFIG_SOFTMMU
- /* helper signature: helper_ret_ld_mmu(CPUState *env, target_ulong addr,
-  *                                     TCGMemOpIdx oi, uintptr_t ra)
-@@ -1559,6 +1594,15 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc,
-         }
+ static void tcg_out_cmp2(TCGContext *s, const TCGArg *args,
+                          const int *const_args)
+ {
+@@ -2103,6 +2141,24 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc, const TCGArg *args,
+         tcg_out32(s, NOR | SAB(args[1], args[0], args[2]));
          break;
  
-+    case INDEX_op_clz_i64:
 +    case INDEX_op_clz_i32:
-+        tcg_out_cltz(s, ext, a0, a1, a2, c2, false);
++        tcg_out_cntxz(s, TCG_TYPE_I32, CNTLZW, args[0], args[1],
++                      args[2], const_args[2]);
 +        break;
-+    case INDEX_op_ctz_i64:
 +    case INDEX_op_ctz_i32:
-+        tcg_out_cltz(s, ext, a0, a1, a2, c2, true);
++        tcg_out_cntxz(s, TCG_TYPE_I32, CNTTZW, args[0], args[1],
++                      args[2], const_args[2]);
 +        break;
 +
-     case INDEX_op_brcond_i32:
-         a1 = (int32_t)a1;
-         /* FALLTHRU */
-@@ -1750,11 +1794,15 @@ static const TCGTargetOpDef aarch64_op_defs[] = {
-     { INDEX_op_sar_i32, { "r", "r", "ri" } },
-     { INDEX_op_rotl_i32, { "r", "r", "ri" } },
-     { INDEX_op_rotr_i32, { "r", "r", "ri" } },
-+    { INDEX_op_clz_i32, { "r", "r", "rAL" } },
-+    { INDEX_op_ctz_i32, { "r", "r", "rAL" } },
++    case INDEX_op_clz_i64:
++        tcg_out_cntxz(s, TCG_TYPE_I64, CNTLZD, args[0], args[1],
++                      args[2], const_args[2]);
++        break;
++    case INDEX_op_ctz_i64:
++        tcg_out_cntxz(s, TCG_TYPE_I64, CNTTZD, args[0], args[1],
++                      args[2], const_args[2]);
++        break;
++
+     case INDEX_op_mul_i32:
+         a0 = args[0], a1 = args[1], a2 = args[2];
+         if (const_args[2]) {
+@@ -2515,6 +2571,8 @@ static const TCGTargetOpDef ppc_op_defs[] = {
+     { INDEX_op_eqv_i32, { "r", "r", "ri" } },
+     { INDEX_op_nand_i32, { "r", "r", "r" } },
+     { INDEX_op_nor_i32, { "r", "r", "r" } },
++    { INDEX_op_clz_i32, { "r", "r", "rZW" } },
++    { INDEX_op_ctz_i32, { "r", "r", "rZW" } },
+ 
+     { INDEX_op_shl_i32, { "r", "r", "ri" } },
+     { INDEX_op_shr_i32, { "r", "r", "ri" } },
+@@ -2563,6 +2621,8 @@ static const TCGTargetOpDef ppc_op_defs[] = {
+     { INDEX_op_eqv_i64, { "r", "r", "r" } },
+     { INDEX_op_nand_i64, { "r", "r", "r" } },
+     { INDEX_op_nor_i64, { "r", "r", "r" } },
++    { INDEX_op_clz_i64, { "r", "r", "rZW" } },
++    { INDEX_op_ctz_i64, { "r", "r", "rZW" } },
+ 
      { INDEX_op_shl_i64, { "r", "r", "ri" } },
      { INDEX_op_shr_i64, { "r", "r", "ri" } },
-     { INDEX_op_sar_i64, { "r", "r", "ri" } },
-     { INDEX_op_rotl_i64, { "r", "r", "ri" } },
-     { INDEX_op_rotr_i64, { "r", "r", "ri" } },
-+    { INDEX_op_clz_i64, { "r", "r", "rAL" } },
-+    { INDEX_op_ctz_i64, { "r", "r", "rAL" } },
+@@ -2645,9 +2705,16 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
+ static void tcg_target_init(TCGContext *s)
+ {
+     unsigned long hwcap = qemu_getauxval(AT_HWCAP);
++    unsigned long hwcap2 = qemu_getauxval(AT_HWCAP2);
++
+     if (hwcap & PPC_FEATURE_ARCH_2_06) {
+         have_isa_2_06 = true;
+     }
++#ifdef PPC_FEATURE2_ARCH_3_00
++    if (hwcap2 & PPC_FEATURE2_ARCH_3_00) {
++        have_isa_3_00 = true;
++    }
++#endif
  
-     { INDEX_op_brcond_i32, { "r", "rA" } },
-     { INDEX_op_brcond_i64, { "r", "rA" } },
+     tcg_regset_set32(tcg_target_available_regs[TCG_TYPE_I32], 0, 0xffffffff);
+     tcg_regset_set32(tcg_target_available_regs[TCG_TYPE_I64], 0, 0xffffffff);
 -- 
 2.9.3
