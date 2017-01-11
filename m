@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38631)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39596)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cRO8q-0006Jl-9N
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:01:01 -0500
+	(envelope-from <mreitz@redhat.com>) id 1cROE4-0003gr-8i
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:06:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cRO8l-0005A5-GM
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:01:00 -0500
-Received: from indium.canonical.com ([91.189.90.7]:42869)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cRO8l-00059n-A6
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:00:55 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cRO8k-0000Vp-0E
-	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 19:00:54 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 001552E80C2
-	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 19:00:53 +0000 (UTC)
+	(envelope-from <mreitz@redhat.com>) id 1cROE3-0007zs-Fl
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:06:24 -0500
+References: <20161130011851.24696-1-mreitz@redhat.com>
+	<20161130011851.24696-4-mreitz@redhat.com>
+	<600b2a2e-d127-f8a0-e850-80e77594c375@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <36ab608e-93a2-949e-e9c8-ad78ff6d3a8b@redhat.com>
+Date: Wed, 11 Jan 2017 20:06:12 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 11 Jan 2017 18:53:58 -0000
-From: "Jose R. Ziviani" <1655708@bugs.launchpad.net>
-Reply-To: Bug 1655708 <1655708@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170111164105.27164.30697.malonedeb@chaenomeles.canonical.com>
-Message-Id: <20170111185359.14534.77740.launchpad@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1655708] Re: target/ppc/int_helper.c:2806:
- strange expression ?
+In-Reply-To: <600b2a2e-d127-f8a0-e850-80e77594c375@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="TBhka1LwQQbpxfXJVO3EkXUItxBBfVXF0"
+Subject: Re: [Qemu-devel] [PATCH v3 03/25] block: Add BDS.backing_overridden
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,41 +25,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>
 
-** Changed in: qemu
-     Assignee: (unassigned) =3D> Jose R. Ziviani (jrziviani)
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--TBhka1LwQQbpxfXJVO3EkXUItxBBfVXF0
+From: Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Alberto Garcia <berto@igalia.com>
+Message-ID: <36ab608e-93a2-949e-e9c8-ad78ff6d3a8b@redhat.com>
+Subject: Re: [PATCH v3 03/25] block: Add BDS.backing_overridden
+References: <20161130011851.24696-1-mreitz@redhat.com>
+ <20161130011851.24696-4-mreitz@redhat.com>
+ <600b2a2e-d127-f8a0-e850-80e77594c375@redhat.com>
+In-Reply-To: <600b2a2e-d127-f8a0-e850-80e77594c375@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
--- =
+On 11.01.2017 20:00, Eric Blake wrote:
+> On 11/29/2016 07:18 PM, Max Reitz wrote:
+>> If the backing file is overridden, this most probably does change the
+>> guest-visible data of a BDS. Therefore, we will need to consider this =
+in
+>> bdrv_refresh_filename().
+>>
+>> Adding a new field to the BDS is not nice, but it is very simple and
+>> exactly keeps track of whether the backing file has been overridden.
+>>
+>> This commit adds a FIXME which will be remedied by a follow-up commit.=
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1655708
+>> Until then, the respective piece of code will not result in any behavi=
+or
+>> that is worse than what we currently have.
+>>
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> ---
+>=20
+>> +++ b/include/block/block_int.h
+>> @@ -461,6 +461,7 @@ struct BlockDriverState {
+>>      char backing_file[PATH_MAX]; /* if non zero, the image is a diff =
+of
+>>                                      this file image */
+>>      char backing_format[16]; /* if non-zero and backing_file exists *=
+/
+>> +    bool backing_overridden; /* backing file has been specified by th=
+e user */
+>=20
+> Should we group all of the bool in this struct so as to reduce its size=
 
-Title:
-  target/ppc/int_helper.c:2806: strange expression ?
+> and improve cache locality?  But it's already clunky, so that may be
+> appropriate as a separate patch.
+>=20
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Status in QEMU:
-  New
+Yep, makes sense, but we should do that in a separate patch.
 
-Bug description:
-  target/ppc/int_helper.c:2806:25: warning: =E2=80=98*=E2=80=99 in boolean =
-context,
-  suggest =E2=80=98&&=E2=80=99 instead [-Wint-in-bool-context]
+(Or maybe we should fix the compiler to automatically do that
+reordering? O:-))
 
-  Source code is
+Max
 
-         zone_digit =3D (i * 2) ? b->u8[BCD_DIG_BYTE(i * 2)] >> 4 :
-  zone_lead;
 
-  Which I read as
+--TBhka1LwQQbpxfXJVO3EkXUItxBBfVXF0
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-         zone_digit =3D (i * 2) ? (b->u8[BCD_DIG_BYTE(i * 2)] >> 4) :
-  zone_lead;
+-----BEGIN PGP SIGNATURE-----
 
-  so I think the compiler warning is for the i * 2 lhs of the ?.
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlh2giUSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9Al68IAIABBEhQNQ8qEqvh0AQPM7L/tXDOSSdx
+3I8clI5Ji4adZm3Ee1kcBz2VgtHslIHJQFr4AAG2O7MMj6Wk8mwuOoH7XP5FPd9y
+sav90RMx/ffg8QKtikndNDYUEONGo4Cf5cQYQOyQwoUhgD3oSJejO9rDDd10J8gT
+gNdfsWIpJqKO49VD7s4u5UQb6LiCPnszOdaMGCtWUZNm6nXQS834icB+Mk3+n1os
+mjodbjJdHRK8QCmQ7zlL783gID3QpfaUdzRXdPhx7LBZYZepXeqZBimkcje9Sa57
+u5vryf+6a+KsEkNqgaLtKtL9X8Z4Uz3auWcwtYcDSN49gDMdEXDMTto=
+=K9Ux
+-----END PGP SIGNATURE-----
 
-  I am not sure what to suggest as a bugfix.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1655708/+subscriptions
+--TBhka1LwQQbpxfXJVO3EkXUItxBBfVXF0--
