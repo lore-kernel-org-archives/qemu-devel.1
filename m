@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35842)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35907)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cR8VO-0006ma-NP
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:19:15 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cR8VS-0006qM-2o
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:19:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cR8VN-0003dL-Nm
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:19:14 -0500
-Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:36550)
+	(envelope-from <rth7680@gmail.com>) id 1cR8VQ-0003fE-Sy
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:19:18 -0500
+Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:33479)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cR8VN-0003d2-Ho
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:19:13 -0500
-Received: by mail-pf0-x242.google.com with SMTP id b22so15073843pfd.3
-	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 18:19:13 -0800 (PST)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cR8VQ-0003et-Ms
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:19:16 -0500
+Received: by mail-pf0-x242.google.com with SMTP id 127so31460061pfg.0
+	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 18:19:16 -0800 (PST)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Tue, 10 Jan 2017 18:18:16 -0800
-Message-Id: <20170111021820.24416-62-rth@twiddle.net>
+Date: Tue, 10 Jan 2017 18:18:20 -0800
+Message-Id: <20170111021820.24416-66-rth@twiddle.net>
 In-Reply-To: <20170111021820.24416-1-rth@twiddle.net>
 References: <20170111021820.24416-1-rth@twiddle.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 61/65] qemu/host-utils.h: Reduce the operation
- count in the fallback ctpop
+Subject: [Qemu-devel] [PULL 65/65] tcg/i386: Handle ctpop opcode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,68 +29,94 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- include/qemu/host-utils.h | 25 +++++++++++--------------
- 1 file changed, 11 insertions(+), 14 deletions(-)
+ tcg/i386/tcg-target.h     |  5 +++--
+ tcg/i386/tcg-target.inc.c | 12 +++++++++++-
+ 2 files changed, 14 insertions(+), 3 deletions(-)
 
-diff --git a/include/qemu/host-utils.h b/include/qemu/host-utils.h
-index 46187bb..96288d0 100644
---- a/include/qemu/host-utils.h
-+++ b/include/qemu/host-utils.h
-@@ -327,7 +327,7 @@ static inline int ctpop8(uint8_t val)
- #else
-     val = (val & 0x55) + ((val >> 1) & 0x55);
-     val = (val & 0x33) + ((val >> 2) & 0x33);
--    val = (val & 0x0f) + ((val >> 4) & 0x0f);
-+    val = (val + (val >> 4)) & 0x0f;
- 
-     return val;
+diff --git a/tcg/i386/tcg-target.h b/tcg/i386/tcg-target.h
+index b8f73f5..21d96ec 100644
+--- a/tcg/i386/tcg-target.h
++++ b/tcg/i386/tcg-target.h
+@@ -76,6 +76,7 @@ typedef enum {
  #endif
-@@ -344,8 +344,8 @@ static inline int ctpop16(uint16_t val)
- #else
-     val = (val & 0x5555) + ((val >> 1) & 0x5555);
-     val = (val & 0x3333) + ((val >> 2) & 0x3333);
--    val = (val & 0x0f0f) + ((val >> 4) & 0x0f0f);
--    val = (val & 0x00ff) + ((val >> 8) & 0x00ff);
-+    val = (val + (val >> 4)) & 0x0f0f;
-+    val = (val + (val >> 8)) & 0x00ff;
  
-     return val;
- #endif
-@@ -360,11 +360,10 @@ static inline int ctpop32(uint32_t val)
- #if QEMU_GNUC_PREREQ(3, 4)
-     return __builtin_popcount(val);
- #else
--    val = (val & 0x55555555) + ((val >>  1) & 0x55555555);
--    val = (val & 0x33333333) + ((val >>  2) & 0x33333333);
--    val = (val & 0x0f0f0f0f) + ((val >>  4) & 0x0f0f0f0f);
--    val = (val & 0x00ff00ff) + ((val >>  8) & 0x00ff00ff);
--    val = (val & 0x0000ffff) + ((val >> 16) & 0x0000ffff);
-+    val = (val & 0x55555555) + ((val >> 1) & 0x55555555);
-+    val = (val & 0x33333333) + ((val >> 2) & 0x33333333);
-+    val = (val + (val >> 4)) & 0x0f0f0f0f;
-+    val = (val * 0x01010101) >> 24;
+ extern bool have_bmi1;
++extern bool have_popcnt;
  
-     return val;
+ /* optional instructions */
+ #define TCG_TARGET_HAS_div2_i32         1
+@@ -95,7 +96,7 @@ extern bool have_bmi1;
+ #define TCG_TARGET_HAS_nor_i32          0
+ #define TCG_TARGET_HAS_clz_i32          1
+ #define TCG_TARGET_HAS_ctz_i32          1
+-#define TCG_TARGET_HAS_ctpop_i32        0
++#define TCG_TARGET_HAS_ctpop_i32        have_popcnt
+ #define TCG_TARGET_HAS_deposit_i32      1
+ #define TCG_TARGET_HAS_extract_i32      1
+ #define TCG_TARGET_HAS_sextract_i32     1
+@@ -130,7 +131,7 @@ extern bool have_bmi1;
+ #define TCG_TARGET_HAS_nor_i64          0
+ #define TCG_TARGET_HAS_clz_i64          1
+ #define TCG_TARGET_HAS_ctz_i64          1
+-#define TCG_TARGET_HAS_ctpop_i64        0
++#define TCG_TARGET_HAS_ctpop_i64        have_popcnt
+ #define TCG_TARGET_HAS_deposit_i64      1
+ #define TCG_TARGET_HAS_extract_i64      1
+ #define TCG_TARGET_HAS_sextract_i64     0
+diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
+index 3650340..01177a9 100644
+--- a/tcg/i386/tcg-target.inc.c
++++ b/tcg/i386/tcg-target.inc.c
+@@ -130,9 +130,10 @@ static bool have_movbe;
+ # define have_movbe 0
  #endif
-@@ -379,12 +378,10 @@ static inline int ctpop64(uint64_t val)
- #if QEMU_GNUC_PREREQ(3, 4)
-     return __builtin_popcountll(val);
- #else
--    val = (val & 0x5555555555555555ULL) + ((val >>  1) & 0x5555555555555555ULL);
--    val = (val & 0x3333333333333333ULL) + ((val >>  2) & 0x3333333333333333ULL);
--    val = (val & 0x0f0f0f0f0f0f0f0fULL) + ((val >>  4) & 0x0f0f0f0f0f0f0f0fULL);
--    val = (val & 0x00ff00ff00ff00ffULL) + ((val >>  8) & 0x00ff00ff00ff00ffULL);
--    val = (val & 0x0000ffff0000ffffULL) + ((val >> 16) & 0x0000ffff0000ffffULL);
--    val = (val & 0x00000000ffffffffULL) + ((val >> 32) & 0x00000000ffffffffULL);
-+    val = (val & 0x5555555555555555ULL) + ((val >> 1) & 0x5555555555555555ULL);
-+    val = (val & 0x3333333333333333ULL) + ((val >> 2) & 0x3333333333333333ULL);
-+    val = (val + (val >> 4)) & 0x0f0f0f0f0f0f0f0fULL;
-+    val = (val * 0x0101010101010101ULL) >> 56;
  
-     return val;
+-/* We need this symbol in tcg-target.h, and we can't properly conditionalize
++/* We need these symbols in tcg-target.h, and we can't properly conditionalize
+    it there.  Therefore we always define the variable.  */
+ bool have_bmi1;
++bool have_popcnt;
+ 
+ #if defined(CONFIG_CPUID_H) && defined(bit_BMI2)
+ static bool have_bmi2;
+@@ -337,6 +338,7 @@ static inline int tcg_target_const_match(tcg_target_long val, TCGType type,
+ #define OPC_MOVZBL	(0xb6 | P_EXT)
+ #define OPC_MOVZWL	(0xb7 | P_EXT)
+ #define OPC_POP_r32	(0x58)
++#define OPC_POPCNT      (0xb8 | P_EXT | P_SIMDF3)
+ #define OPC_PUSH_r32	(0x50)
+ #define OPC_PUSH_Iv	(0x68)
+ #define OPC_PUSH_Ib	(0x6a)
+@@ -2083,6 +2085,9 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
+     OP_32_64(clz):
+         tcg_out_clz(s, rexw, args[0], args[1], args[2], const_args[2]);
+         break;
++    OP_32_64(ctpop):
++        tcg_out_modrm(s, OPC_POPCNT + rexw, a0, a1);
++        break;
+ 
+     case INDEX_op_brcond_i32:
+         tcg_out_brcond32(s, a2, a0, a1, const_args[1], arg_label(args[3]), 0);
+@@ -2398,6 +2403,8 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
+     case INDEX_op_extract_i32:
+     case INDEX_op_extract_i64:
+     case INDEX_op_sextract_i32:
++    case INDEX_op_ctpop_i32:
++    case INDEX_op_ctpop_i64:
+         return &r_r;
+ 
+     case INDEX_op_deposit_i32:
+@@ -2602,6 +2609,9 @@ static void tcg_target_init(TCGContext *s)
+            need to probe for it.  */
+         have_movbe = (c & bit_MOVBE) != 0;
  #endif
++#ifdef bit_POPCNT
++        have_popcnt = (c & bit_POPCNT) != 0;
++#endif
+     }
+ 
+     if (max >= 7) {
 -- 
 2.9.3
