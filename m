@@ -1,26 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37384)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37617)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cRBSK-00027i-8r
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 00:28:17 -0500
+	(envelope-from <peterx@redhat.com>) id 1cRBTv-0002vw-48
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 00:29:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cRBSF-0003Zc-JM
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 00:28:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34346)
+	(envelope-from <peterx@redhat.com>) id 1cRBTr-0003xP-Vo
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 00:29:55 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42214)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cRBSF-0003Z3-BD
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 00:28:11 -0500
-Date: Wed, 11 Jan 2017 13:28:03 +0800
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cRBTr-0003xK-Py
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 00:29:51 -0500
 From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170111052803.GB4450@pxdev.xzpeter.org>
-References: <1483934694-32425-1-git-send-email-peterx@redhat.com>
-	<1483934694-32425-3-git-send-email-peterx@redhat.com>
-	<20170110173959.ckfhipadyv3bsijs@kamzik.brq.redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170110173959.ckfhipadyv3bsijs@kamzik.brq.redhat.com>
-Subject: Re: [Qemu-devel] [kvm-unit-tests PATCH v4 2/2] run_tests: allow run
- tests in parallel
+Date: Wed, 11 Jan 2017 13:29:33 +0800
+Message-Id: <1484112575-13194-1-git-send-email-peterx@redhat.com>
+Subject: [Qemu-devel] [kvm-unit-tests PATCH v5 0/2] run_tests: support
+ concurrent test execution
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,124 +22,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jones <drjones@redhat.com>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
+To: qemu-devel@nongnu.org, kvm@vger.kernel.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Andrew Jones <drjones@redhat.com>, peterx@redhat.com, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
 
-On Tue, Jan 10, 2017 at 06:39:59PM +0100, Andrew Jones wrote:
-> On Mon, Jan 09, 2017 at 12:04:54PM +0800, Peter Xu wrote:
-> > run_task.sh is getting slow. This patch is trying to make it faster by
-> > running the tests concurrently.
-> > 
-> > We provide a new parameter "-j" for the run_tests.sh, which can be used
-> > to specify how many run queues we want for the tests. Default queue
-> > length is 1, which is the old behavior.
-> > 
-> > Quick test on my laptop (4 cores, 2 threads each) shows 3x speed boost:
-> > 
-> >    |-----------------+-----------|
-> >    | command         | time used |
-> >    |-----------------+-----------|
-> >    | run_test.sh     | 75s       |
-> >    | run_test.sh -j8 | 27s       |
-> >    |-----------------+-----------|
-> > 
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >  run_tests.sh        | 12 ++++++++++--
-> >  scripts/common.bash | 16 +++++++++++++++-
-> >  2 files changed, 25 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/run_tests.sh b/run_tests.sh
-> > index 1e36d66..795cf73 100755
-> > --- a/run_tests.sh
-> > +++ b/run_tests.sh
-> > @@ -13,10 +13,11 @@ function usage()
-> >  {
-> >  cat <<EOF
-> >  
-> > -Usage: $0 [-g group] [-h] [-v]
-> > +Usage: $0 [-g group] [-h] [-v] [-j num_run_queues]
-> >  
-> >      -g: Only execute tests in the given group
-> >      -h: Output this help text
-> > +    -j: Execute tests in parallel
-> >      -v: Enables verbose mode
-> >  
-> >  Set the environment variable QEMU=/path/to/qemu-system-ARCH to
-> > @@ -28,7 +29,7 @@ EOF
-> >  RUNTIME_arch_run="./$TEST_DIR/run"
-> >  source scripts/runtime.bash
-> >  
-> > -while getopts "g:hv" opt; do
-> > +while getopts "g:hj:v" opt; do
-> >      case $opt in
-> >          g)
-> >              only_group=$OPTARG
-> > @@ -37,6 +38,13 @@ while getopts "g:hv" opt; do
-> >              usage
-> >              exit
-> >              ;;
-> > +        j)
-> > +            unittest_run_queues=$OPTARG
-> > +            if ! (( "$unittest_run_queues" > 0 )); then
-> 
-> The equivalent expression without '!' is (( $var <= 0 )), and
-> no need for the "'s around the var.
-> 
-> > +                echo "Invalid -j option: $unittest_run_queues"
-> > +                exit 1
-> > +            fi
-> > +            ;;
-> >          v)
-> >              verbose="yes"
-> >              ;;
-> > diff --git a/scripts/common.bash b/scripts/common.bash
-> > index 2dd7360..83aebf8 100644
-> > --- a/scripts/common.bash
-> > +++ b/scripts/common.bash
-> > @@ -1,11 +1,19 @@
-> >  : ${unittest_log_dir:=logs}
-> > +: ${unittest_run_queues:=1}
-> >  
-> >  function run_task()
-> >  {
-> >  	local testname="$2"
-> >  
-> > +	while (( "$(jobs | wc -l)" == $unittest_run_queues )); do
-> 
-> Why the "'s? The result must resolve to an int, otherwise we don't
-> want ((...))
-> 
-> > +		# wait for any background test to finish
-> > +		wait -n
-> > +	done
-> > +
-> >  	RUNTIME_log_file="${unittest_log_dir}/${testname}.log"
-> > -	"$@"
-> > +
-> > +	# start the testcase in the background
-> > +	"$@" &
-> >  }
-> >  
-> >  function for_each_unittest()
-> > @@ -22,6 +30,8 @@ function for_each_unittest()
-> >  	local accel
-> >  	local timeout
-> >  
-> > +	trap "wait; exit 130" SIGINT
-> > +
-> >  	exec {fd}<"$unittests"
-> >  
-> >  	while read -u $fd line; do
-> > @@ -55,5 +65,9 @@ function for_each_unittest()
-> >  		fi
-> >  	done
-> >  	run_task "$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
-> > +
-> > +	# wait all task finish
-> 
-> wait until all tasks finish
+v5:
+- add "/" at start/end of line where proper [Drew]
+- remove useless newline in Makefile [Drew]
+- don't check "mv" since it won't fail [Drew]
+- avoid using '"s in (( )) [Drew]
+- comment fix [Drew]
 
-Fixing all three places, thanks!
+v4:
+- add .gitignore for logs/ [Drew]
+- instead of create globals.bash, renaming function.bash into
+  common.bash, put globals inside [Drew]
+- instead of removing logs/ directly when start run_tests, move it
+  into logs.old so we at least have the last time result cached [Drew]
+- s/ut_/unittest_/ through the whole series [Drew]
+- remove unittest_log_summary var [Drew]
+- remove radim's s-b in patch 2 since it does not suite [Drew]
+- tiny fix on the usage lines [Drew]
+- use bash arithmetic where proper [Drew]
+- remove ut_in_parallel since not used [Drew]
 
--- peterx
+v3:
+- better handling for ctrl-c during run_tests.sh [Radim]
+
+v2:
+- patch 1: do per-test logging in all cases
+- patch 2: throw away task.bash, instead, take Radim's suggestion to
+  use jobs
+
+run_tests.sh is getting slower. Maybe it's time to let it run faster.
+An obvious issue is that, we were running the tests sequentially in
+the past.
+
+This series provides another new "-j" parameter. "-j 8" means we run
+the tests on 8 task queues. That'll fasten the script a lot. A very
+quick test of mine shows 3x speed boost with 8 task queues.
+
+Please review, thanks.
+
+Peter Xu (2):
+  run_tests: put logs into per-test file
+  run_tests: allow run tests in parallel
+
+ .gitignore                              |  3 ++-
+ Makefile                                |  5 ++---
+ run_tests.sh                            | 30 +++++++++++++++++++++---------
+ scripts/{functions.bash => common.bash} | 27 +++++++++++++++++++++++++--
+ scripts/mkstandalone.sh                 |  2 +-
+ 5 files changed, 51 insertions(+), 16 deletions(-)
+ rename scripts/{functions.bash => common.bash} (63%)
+
+-- 
+2.7.4
