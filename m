@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35187)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35212)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cR8Ur-0006Bp-DC
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:18:42 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cR8Ut-0006EA-Eg
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:18:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cR8Uq-0003DX-9z
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:18:41 -0500
-Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:35035)
+	(envelope-from <rth7680@gmail.com>) id 1cR8Ur-0003ED-Ai
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:18:43 -0500
+Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:36480)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cR8Uq-0003DE-2D
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:18:40 -0500
-Received: by mail-pf0-x242.google.com with SMTP id f144so12524907pfa.2
-	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 18:18:40 -0800 (PST)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cR8Ur-0003Dn-2e
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:18:41 -0500
+Received: by mail-pf0-x242.google.com with SMTP id b22so15071825pfd.3
+	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 18:18:41 -0800 (PST)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Tue, 10 Jan 2017 18:17:35 -0800
-Message-Id: <20170111021820.24416-21-rth@twiddle.net>
+Date: Tue, 10 Jan 2017 18:17:36 -0800
+Message-Id: <20170111021820.24416-22-rth@twiddle.net>
 In-Reply-To: <20170111021820.24416-1-rth@twiddle.net>
 References: <20170111021820.24416-1-rth@twiddle.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 20/65] tcg: Add markup for output requires new
- register
+Subject: [Qemu-devel] [PULL 21/65] tcg: Transition flat op_defs array to a
+ target callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,150 +33,460 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-This is the same concept as, and same markup as, the
-early clobber markup in gcc.
+This will allow the target to tailor the constraints to the
+auto-detected ISA extensions.
 
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- tcg/tcg.c | 34 ++++++++++++++++++++++------------
- tcg/tcg.h |  1 +
- 2 files changed, 23 insertions(+), 12 deletions(-)
+ tcg/aarch64/tcg-target.inc.c | 14 ++++++--
+ tcg/arm/tcg-target.inc.c     | 14 ++++++--
+ tcg/i386/tcg-target.inc.c    | 14 ++++++--
+ tcg/ia64/tcg-target.inc.c    | 14 ++++++--
+ tcg/mips/tcg-target.inc.c    | 14 ++++++--
+ tcg/ppc/tcg-target.inc.c     | 14 ++++++--
+ tcg/s390/tcg-target.inc.c    | 14 ++++++--
+ tcg/sparc/tcg-target.inc.c   | 14 ++++++--
+ tcg/tcg.c                    | 86 +++++++++++++++-----------------------------
+ tcg/tcg.h                    |  2 --
+ tcg/tci/tcg-target.inc.c     | 13 ++++++-
+ 11 files changed, 136 insertions(+), 77 deletions(-)
 
+diff --git a/tcg/aarch64/tcg-target.inc.c b/tcg/aarch64/tcg-target.inc.c
+index c0e9890..416db45 100644
+--- a/tcg/aarch64/tcg-target.inc.c
++++ b/tcg/aarch64/tcg-target.inc.c
+@@ -1812,6 +1812,18 @@ static const TCGTargetOpDef aarch64_op_defs[] = {
+     { -1 },
+ };
+ 
++static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
++{
++    int i, n = ARRAY_SIZE(aarch64_op_defs);
++
++    for (i = 0; i < n; ++i) {
++        if (aarch64_op_defs[i].op == op) {
++            return &aarch64_op_defs[i];
++        }
++    }
++    return NULL;
++}
++
+ static void tcg_target_init(TCGContext *s)
+ {
+     tcg_regset_set32(tcg_target_available_regs[TCG_TYPE_I32], 0, 0xffffffff);
+@@ -1834,8 +1846,6 @@ static void tcg_target_init(TCGContext *s)
+     tcg_regset_set_reg(s->reserved_regs, TCG_REG_FP);
+     tcg_regset_set_reg(s->reserved_regs, TCG_REG_TMP);
+     tcg_regset_set_reg(s->reserved_regs, TCG_REG_X18); /* platform register */
+-
+-    tcg_add_target_add_op_defs(aarch64_op_defs);
+ }
+ 
+ /* Saving pairs: (X19, X20) .. (X27, X28), (X29(fp), X30(lr)).  */
+diff --git a/tcg/arm/tcg-target.inc.c b/tcg/arm/tcg-target.inc.c
+index 2d5af0f..eeabcf8 100644
+--- a/tcg/arm/tcg-target.inc.c
++++ b/tcg/arm/tcg-target.inc.c
+@@ -2008,6 +2008,18 @@ static const TCGTargetOpDef arm_op_defs[] = {
+     { -1 },
+ };
+ 
++static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
++{
++    int i, n = ARRAY_SIZE(arm_op_defs);
++
++    for (i = 0; i < n; ++i) {
++        if (arm_op_defs[i].op == op) {
++            return &arm_op_defs[i];
++        }
++    }
++    return NULL;
++}
++
+ static void tcg_target_init(TCGContext *s)
+ {
+     /* Only probe for the platform and capabilities if we havn't already
+@@ -2038,8 +2050,6 @@ static void tcg_target_init(TCGContext *s)
+     tcg_regset_set_reg(s->reserved_regs, TCG_REG_CALL_STACK);
+     tcg_regset_set_reg(s->reserved_regs, TCG_REG_TMP);
+     tcg_regset_set_reg(s->reserved_regs, TCG_REG_PC);
+-
+-    tcg_add_target_add_op_defs(arm_op_defs);
+ }
+ 
+ static inline void tcg_out_ld(TCGContext *s, TCGType type, TCGReg arg,
+diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
+index 39f62bd..595c399 100644
+--- a/tcg/i386/tcg-target.inc.c
++++ b/tcg/i386/tcg-target.inc.c
+@@ -2330,6 +2330,18 @@ static const TCGTargetOpDef x86_op_defs[] = {
+     { -1 },
+ };
+ 
++static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
++{
++    int i, n = ARRAY_SIZE(x86_op_defs);
++
++    for (i = 0; i < n; ++i) {
++        if (x86_op_defs[i].op == op) {
++            return &x86_op_defs[i];
++        }
++    }
++    return NULL;
++}
++
+ static int tcg_target_callee_save_regs[] = {
+ #if TCG_TARGET_REG_BITS == 64
+     TCG_REG_RBP,
+@@ -2471,8 +2483,6 @@ static void tcg_target_init(TCGContext *s)
+ 
+     tcg_regset_clear(s->reserved_regs);
+     tcg_regset_set_reg(s->reserved_regs, TCG_REG_CALL_STACK);
+-
+-    tcg_add_target_add_op_defs(x86_op_defs);
+ }
+ 
+ typedef struct {
+diff --git a/tcg/ia64/tcg-target.inc.c b/tcg/ia64/tcg-target.inc.c
+index b04d716..e4d419d 100644
+--- a/tcg/ia64/tcg-target.inc.c
++++ b/tcg/ia64/tcg-target.inc.c
+@@ -2352,6 +2352,18 @@ static const TCGTargetOpDef ia64_op_defs[] = {
+     { -1 },
+ };
+ 
++static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
++{
++    int i, n = ARRAY_SIZE(ia64_op_defs);
++
++    for (i = 0; i < n; ++i) {
++        if (ia64_op_defs[i].op == op) {
++            return &ia64_op_defs[i];
++        }
++    }
++    return NULL;
++}
++
+ /* Generate global QEMU prologue and epilogue code */
+ static void tcg_target_qemu_prologue(TCGContext *s)
+ {
+@@ -2471,6 +2483,4 @@ static void tcg_target_init(TCGContext *s)
+     tcg_regset_set_reg(s->reserved_regs, TCG_REG_R5);
+     tcg_regset_set_reg(s->reserved_regs, TCG_REG_R6);
+     tcg_regset_set_reg(s->reserved_regs, TCG_REG_R7);
+-
+-    tcg_add_target_add_op_defs(ia64_op_defs);
+ }
+diff --git a/tcg/mips/tcg-target.inc.c b/tcg/mips/tcg-target.inc.c
+index 24c4949..a8f031a 100644
+--- a/tcg/mips/tcg-target.inc.c
++++ b/tcg/mips/tcg-target.inc.c
+@@ -2262,6 +2262,18 @@ static const TCGTargetOpDef mips_op_defs[] = {
+     { -1 },
+ };
+ 
++static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
++{
++    int i, n = ARRAY_SIZE(mips_op_defs);
++
++    for (i = 0; i < n; ++i) {
++        if (mips_op_defs[i].op == op) {
++            return &mips_op_defs[i];
++        }
++    }
++    return NULL;
++}
++
+ static int tcg_target_callee_save_regs[] = {
+     TCG_REG_S0,       /* used for the global env (TCG_AREG0) */
+     TCG_REG_S1,
+@@ -2563,8 +2575,6 @@ static void tcg_target_init(TCGContext *s)
+     tcg_regset_set_reg(s->reserved_regs, TCG_REG_RA);   /* return address */
+     tcg_regset_set_reg(s->reserved_regs, TCG_REG_SP);   /* stack pointer */
+     tcg_regset_set_reg(s->reserved_regs, TCG_REG_GP);   /* global pointer */
+-
+-    tcg_add_target_add_op_defs(mips_op_defs);
+ }
+ 
+ void tb_set_jmp_target1(uintptr_t jmp_addr, uintptr_t addr)
+diff --git a/tcg/ppc/tcg-target.inc.c b/tcg/ppc/tcg-target.inc.c
+index 7ec54a2..a1b7412 100644
+--- a/tcg/ppc/tcg-target.inc.c
++++ b/tcg/ppc/tcg-target.inc.c
+@@ -2634,6 +2634,18 @@ static const TCGTargetOpDef ppc_op_defs[] = {
+     { -1 },
+ };
+ 
++static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
++{
++    int i, n = ARRAY_SIZE(ppc_op_defs);
++
++    for (i = 0; i < n; ++i) {
++        if (ppc_op_defs[i].op == op) {
++            return &ppc_op_defs[i];
++        }
++    }
++    return NULL;
++}
++
+ static void tcg_target_init(TCGContext *s)
+ {
+     unsigned long hwcap = qemu_getauxval(AT_HWCAP);
+@@ -2670,8 +2682,6 @@ static void tcg_target_init(TCGContext *s)
+     if (USE_REG_RA) {
+         tcg_regset_set_reg(s->reserved_regs, TCG_REG_RA);  /* return addr */
+     }
+-
+-    tcg_add_target_add_op_defs(ppc_op_defs);
+ }
+ 
+ #ifdef __ELF__
+diff --git a/tcg/s390/tcg-target.inc.c b/tcg/s390/tcg-target.inc.c
+index 22e121a..b686f3a 100644
+--- a/tcg/s390/tcg-target.inc.c
++++ b/tcg/s390/tcg-target.inc.c
+@@ -2326,6 +2326,18 @@ static const TCGTargetOpDef s390_op_defs[] = {
+     { -1 },
+ };
+ 
++static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
++{
++    int i, n = ARRAY_SIZE(s390_op_defs);
++
++    for (i = 0; i < n; ++i) {
++        if (s390_op_defs[i].op == op) {
++            return &s390_op_defs[i];
++        }
++    }
++    return NULL;
++}
++
+ static void query_s390_facilities(void)
+ {
+     unsigned long hwcap = qemu_getauxval(AT_HWCAP);
+@@ -2368,8 +2380,6 @@ static void tcg_target_init(TCGContext *s)
+     /* XXX many insns can't be used with R0, so we better avoid it for now */
+     tcg_regset_set_reg(s->reserved_regs, TCG_REG_R0);
+     tcg_regset_set_reg(s->reserved_regs, TCG_REG_CALL_STACK);
+-
+-    tcg_add_target_add_op_defs(s390_op_defs);
+ }
+ 
+ #define FRAME_SIZE  ((int)(TCG_TARGET_CALL_STACK_OFFSET          \
+diff --git a/tcg/sparc/tcg-target.inc.c b/tcg/sparc/tcg-target.inc.c
+index 700c434..f2cbf50 100644
+--- a/tcg/sparc/tcg-target.inc.c
++++ b/tcg/sparc/tcg-target.inc.c
+@@ -1583,6 +1583,18 @@ static const TCGTargetOpDef sparc_op_defs[] = {
+     { -1 },
+ };
+ 
++static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
++{
++    int i, n = ARRAY_SIZE(sparc_op_defs);
++
++    for (i = 0; i < n; ++i) {
++        if (sparc_op_defs[i].op == op) {
++            return &sparc_op_defs[i];
++        }
++    }
++    return NULL;
++}
++
+ static void tcg_target_init(TCGContext *s)
+ {
+     /* Only probe for the platform and capabilities if we havn't already
+@@ -1622,8 +1634,6 @@ static void tcg_target_init(TCGContext *s)
+     tcg_regset_set_reg(s->reserved_regs, TCG_REG_O6); /* stack pointer */
+     tcg_regset_set_reg(s->reserved_regs, TCG_REG_T1); /* for internal use */
+     tcg_regset_set_reg(s->reserved_regs, TCG_REG_T2); /* for internal use */
+-
+-    tcg_add_target_add_op_defs(sparc_op_defs);
+ }
+ 
+ #if SPARC64
 diff --git a/tcg/tcg.c b/tcg/tcg.c
-index aabf94f..27913f0 100644
+index 27913f0..5792c1e 100644
 --- a/tcg/tcg.c
 +++ b/tcg/tcg.c
-@@ -1263,6 +1263,10 @@ void tcg_add_target_add_op_defs(const TCGTargetOpDef *tdefs)
-                     if (*ct_str == '\0')
-                         break;
-                     switch(*ct_str) {
-+                    case '&':
-+                        def->args_ct[i].ct |= TCG_CT_NEWREG;
-+                        ct_str++;
-+                        break;
-                     case 'i':
-                         def->args_ct[i].ct |= TCG_CT_CONST;
-                         ct_str++;
-@@ -2208,7 +2212,8 @@ static void tcg_reg_alloc_op(TCGContext *s,
-                              const TCGOpDef *def, TCGOpcode opc,
-                              const TCGArg *args, TCGLifeData arg_life)
+@@ -62,6 +62,7 @@
+ /* Forward declarations for functions declared in tcg-target.inc.c and
+    used here. */
+ static void tcg_target_init(TCGContext *s);
++static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode);
+ static void tcg_target_qemu_prologue(TCGContext *s);
+ static void patch_reloc(tcg_insn_unit *code_ptr, int type,
+                         intptr_t value, intptr_t addend);
+@@ -319,6 +320,7 @@ static const TCGHelperInfo all_helpers[] = {
+ };
+ 
+ static int indirect_reg_alloc_order[ARRAY_SIZE(tcg_target_reg_alloc_order)];
++static void process_op_defs(TCGContext *s);
+ 
+ void tcg_context_init(TCGContext *s)
  {
--    TCGRegSet allocated_regs;
-+    TCGRegSet i_allocated_regs;
-+    TCGRegSet o_allocated_regs;
-     int i, k, nb_iargs, nb_oargs;
-     TCGReg reg;
-     TCGArg arg;
-@@ -2225,8 +2230,10 @@ static void tcg_reg_alloc_op(TCGContext *s,
-            args + nb_oargs + nb_iargs, 
-            sizeof(TCGArg) * def->nb_cargs);
+@@ -362,6 +364,7 @@ void tcg_context_init(TCGContext *s)
+     }
  
-+    tcg_regset_set(i_allocated_regs, s->reserved_regs);
-+    tcg_regset_set(o_allocated_regs, s->reserved_regs);
+     tcg_target_init(s);
++    process_op_defs(s);
+ 
+     /* Reverse the order of the saved registers, assuming they're all at
+        the start of tcg_target_reg_alloc_order.  */
+@@ -1221,29 +1224,33 @@ static void sort_constraints(TCGOpDef *def, int start, int n)
+     }
+ }
+ 
+-void tcg_add_target_add_op_defs(const TCGTargetOpDef *tdefs)
++static void process_op_defs(TCGContext *s)
+ {
+     TCGOpcode op;
+-    TCGOpDef *def;
+-    const char *ct_str;
+-    int i, nb_args;
+ 
+-    for(;;) {
+-        if (tdefs->op == (TCGOpcode)-1)
+-            break;
+-        op = tdefs->op;
+-        tcg_debug_assert((unsigned)op < NB_OPS);
+-        def = &tcg_op_defs[op];
+-#if defined(CONFIG_DEBUG_TCG)
+-        /* Duplicate entry in op definitions? */
+-        tcg_debug_assert(!def->used);
+-        def->used = 1;
+-#endif
++    for (op = 0; op < NB_OPS; op++) {
++        TCGOpDef *def = &tcg_op_defs[op];
++        const TCGTargetOpDef *tdefs;
++        int i, nb_args, ok;
 +
-     /* satisfy input constraints */ 
--    tcg_regset_set(allocated_regs, s->reserved_regs);
-     for(k = 0; k < nb_iargs; k++) {
-         i = def->sorted_args[nb_oargs + k];
-         arg = args[i];
-@@ -2241,7 +2248,7 @@ static void tcg_reg_alloc_op(TCGContext *s,
-             goto iarg_end;
-         }
- 
--        temp_load(s, ts, arg_ct->u.regs, allocated_regs);
-+        temp_load(s, ts, arg_ct->u.regs, i_allocated_regs);
- 
-         if (arg_ct->ct & TCG_CT_IALIAS) {
-             if (ts->fixed_reg) {
-@@ -2275,13 +2282,13 @@ static void tcg_reg_alloc_op(TCGContext *s,
-         allocate_in_reg:
-             /* allocate a new register matching the constraint 
-                and move the temporary register into it */
--            reg = tcg_reg_alloc(s, arg_ct->u.regs, allocated_regs,
-+            reg = tcg_reg_alloc(s, arg_ct->u.regs, i_allocated_regs,
-                                 ts->indirect_base);
-             tcg_out_mov(s, ts->type, reg, ts->reg);
-         }
-         new_args[i] = reg;
-         const_args[i] = 0;
--        tcg_regset_set_reg(allocated_regs, reg);
-+        tcg_regset_set_reg(i_allocated_regs, reg);
-     iarg_end: ;
-     }
-     
-@@ -2293,24 +2300,23 @@ static void tcg_reg_alloc_op(TCGContext *s,
-     }
- 
-     if (def->flags & TCG_OPF_BB_END) {
--        tcg_reg_alloc_bb_end(s, allocated_regs);
-+        tcg_reg_alloc_bb_end(s, i_allocated_regs);
-     } else {
-         if (def->flags & TCG_OPF_CALL_CLOBBER) {
-             /* XXX: permit generic clobber register list ? */ 
-             for (i = 0; i < TCG_TARGET_NB_REGS; i++) {
-                 if (tcg_regset_test_reg(tcg_target_call_clobber_regs, i)) {
--                    tcg_reg_free(s, i, allocated_regs);
-+                    tcg_reg_free(s, i, i_allocated_regs);
++        if (def->flags & TCG_OPF_NOT_PRESENT) {
++            continue;
++        }
++
+         nb_args = def->nb_iargs + def->nb_oargs;
+-        for(i = 0; i < nb_args; i++) {
+-            ct_str = tdefs->args_ct_str[i];
+-            /* Incomplete TCGTargetOpDef entry? */
++        if (nb_args == 0) {
++            continue;
++        }
++
++        tdefs = tcg_target_op_def(op);
++        /* Missing TCGTargetOpDef entry. */
++        tcg_debug_assert(tdefs != NULL);
++
++        for (i = 0; i < nb_args; i++) {
++            const char *ct_str = tdefs->args_ct_str[i];
++            /* Incomplete TCGTargetOpDef entry. */
+             tcg_debug_assert(ct_str != NULL);
++
+             tcg_regset_clear(def->args_ct[i].u.regs);
+             def->args_ct[i].ct = 0;
+             if (ct_str[0] >= '0' && ct_str[0] <= '9') {
+@@ -1272,11 +1279,9 @@ void tcg_add_target_add_op_defs(const TCGTargetOpDef *tdefs)
+                         ct_str++;
+                         break;
+                     default:
+-                        if (target_parse_constraint(&def->args_ct[i], &ct_str) < 0) {
+-                            fprintf(stderr, "Invalid constraint '%s' for arg %d of operation '%s'\n",
+-                                    ct_str, i, def->name);
+-                            exit(1);
+-                        }
++                        ok = target_parse_constraint(&def->args_ct[i], &ct_str);
++                        /* Typo in TCGTargetOpDef constraint. */
++                        tcg_debug_assert(ok == 0);
+                     }
                  }
              }
-         }
-         if (def->flags & TCG_OPF_SIDE_EFFECTS) {
-             /* sync globals if the op has side effects and might trigger
-                an exception. */
--            sync_globals(s, allocated_regs);
-+            sync_globals(s, i_allocated_regs);
-         }
-         
-         /* satisfy the output constraints */
--        tcg_regset_set(allocated_regs, s->reserved_regs);
-         for(k = 0; k < nb_oargs; k++) {
-             i = def->sorted_args[k];
-             arg = args[i];
-@@ -2318,6 +2324,10 @@ static void tcg_reg_alloc_op(TCGContext *s,
-             ts = &s->temps[arg];
-             if (arg_ct->ct & TCG_CT_ALIAS) {
-                 reg = new_args[arg_ct->alias_index];
-+            } else if (arg_ct->ct & TCG_CT_NEWREG) {
-+                reg = tcg_reg_alloc(s, arg_ct->u.regs,
-+                                    i_allocated_regs | o_allocated_regs,
-+                                    ts->indirect_base);
-             } else {
-                 /* if fixed register, we try to use it */
-                 reg = ts->reg;
-@@ -2325,10 +2335,10 @@ static void tcg_reg_alloc_op(TCGContext *s,
-                     tcg_regset_test_reg(arg_ct->u.regs, reg)) {
-                     goto oarg_end;
-                 }
--                reg = tcg_reg_alloc(s, arg_ct->u.regs, allocated_regs,
-+                reg = tcg_reg_alloc(s, arg_ct->u.regs, o_allocated_regs,
-                                     ts->indirect_base);
-             }
--            tcg_regset_set_reg(allocated_regs, reg);
-+            tcg_regset_set_reg(o_allocated_regs, reg);
-             /* if a fixed register is used, then a move will be done afterwards */
-             if (!ts->fixed_reg) {
-                 if (ts->val_type == TEMP_VAL_REG) {
-@@ -2357,7 +2367,7 @@ static void tcg_reg_alloc_op(TCGContext *s,
-             tcg_out_mov(s, ts->type, ts->reg, reg);
-         }
-         if (NEED_SYNC_ARG(i)) {
--            temp_sync(s, ts, allocated_regs, IS_DEAD_ARG(i));
-+            temp_sync(s, ts, o_allocated_regs, IS_DEAD_ARG(i));
-         } else if (IS_DEAD_ARG(i)) {
-             temp_dead(s, ts);
-         }
+@@ -1288,42 +1293,7 @@ void tcg_add_target_add_op_defs(const TCGTargetOpDef *tdefs)
+         /* sort the constraints (XXX: this is just an heuristic) */
+         sort_constraints(def, 0, def->nb_oargs);
+         sort_constraints(def, def->nb_oargs, def->nb_iargs);
+-
+-#if 0
+-        {
+-            int i;
+-
+-            printf("%s: sorted=", def->name);
+-            for(i = 0; i < def->nb_oargs + def->nb_iargs; i++)
+-                printf(" %d", def->sorted_args[i]);
+-            printf("\n");
+-        }
+-#endif
+-        tdefs++;
+-    }
+-
+-#if defined(CONFIG_DEBUG_TCG)
+-    i = 0;
+-    for (op = 0; op < tcg_op_defs_max; op++) {
+-        const TCGOpDef *def = &tcg_op_defs[op];
+-        if (def->flags & TCG_OPF_NOT_PRESENT) {
+-            /* Wrong entry in op definitions? */
+-            if (def->used) {
+-                fprintf(stderr, "Invalid op definition for %s\n", def->name);
+-                i = 1;
+-            }
+-        } else {
+-            /* Missing entry in op definitions? */
+-            if (!def->used) {
+-                fprintf(stderr, "Missing op definition for %s\n", def->name);
+-                i = 1;
+-            }
+-        }
+-    }
+-    if (i == 1) {
+-        tcg_abort();
+     }
+-#endif
+ }
+ 
+ void tcg_op_remove(TCGContext *s, TCGOp *op)
 diff --git a/tcg/tcg.h b/tcg/tcg.h
-index 5fd3733..ebfcefd 100644
+index ebfcefd..144bdab 100644
 --- a/tcg/tcg.h
 +++ b/tcg/tcg.h
-@@ -851,6 +851,7 @@ void tcg_dump_op_count(FILE *f, fprintf_function cpu_fprintf);
+@@ -906,8 +906,6 @@ do {\
+     abort();\
+ } while (0)
  
- #define TCG_CT_ALIAS  0x80
- #define TCG_CT_IALIAS 0x40
-+#define TCG_CT_NEWREG 0x20 /* output requires a new register */
- #define TCG_CT_REG    0x01
- #define TCG_CT_CONST  0x02 /* any constant of register size */
+-void tcg_add_target_add_op_defs(const TCGTargetOpDef *tdefs);
+-
+ #if UINTPTR_MAX == UINT32_MAX
+ #define TCGV_NAT_TO_PTR(n) MAKE_TCGV_PTR(GET_TCGV_I32(n))
+ #define TCGV_PTR_TO_NAT(n) MAKE_TCGV_I32(GET_TCGV_PTR(n))
+diff --git a/tcg/tci/tcg-target.inc.c b/tcg/tci/tcg-target.inc.c
+index 9dbf4d5..42d4bd6 100644
+--- a/tcg/tci/tcg-target.inc.c
++++ b/tcg/tci/tcg-target.inc.c
+@@ -259,6 +259,18 @@ static const TCGTargetOpDef tcg_target_op_defs[] = {
+     { -1 },
+ };
  
++static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
++{
++    int i, n = ARRAY_SIZE(tcg_target_op_defs);
++
++    for (i = 0; i < n; ++i) {
++        if (tcg_target_op_defs[i].op == op) {
++            return &tcg_target_op_defs[i];
++        }
++    }
++    return NULL;
++}
++
+ static const int tcg_target_reg_alloc_order[] = {
+     TCG_REG_R0,
+     TCG_REG_R1,
+@@ -875,7 +887,6 @@ static void tcg_target_init(TCGContext *s)
+ 
+     tcg_regset_clear(s->reserved_regs);
+     tcg_regset_set_reg(s->reserved_regs, TCG_REG_CALL_STACK);
+-    tcg_add_target_add_op_defs(tcg_target_op_defs);
+ 
+     /* We use negative offsets from "sp" so that we can distinguish
+        stores that might pretend to be call arguments.  */
 -- 
 2.9.3
