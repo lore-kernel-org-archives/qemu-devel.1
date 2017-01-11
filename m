@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45304)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45355)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cROgT-00039E-7u
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:35:46 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cROgX-0003EF-QE
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:35:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cROgS-0003LR-5M
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:35:45 -0500
-Received: from mail-wj0-x244.google.com ([2a00:1450:400c:c01::244]:33869)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cROgW-0003Mm-TM
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:35:49 -0500
+Received: from mail-wj0-x244.google.com ([2a00:1450:400c:c01::244]:35484)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1cROgR-0003LH-V5
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:35:44 -0500
-Received: by mail-wj0-x244.google.com with SMTP id qs7so54428104wjc.1
-	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 11:35:43 -0800 (PST)
+	id 1cROgW-0003Mc-LN
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:35:48 -0500
+Received: by mail-wj0-x244.google.com with SMTP id ey1so12923576wjd.2
+	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 11:35:48 -0800 (PST)
 Received: from 640k.lan (94-39-158-71.adsl-ull.clienti.tiscali.it.
 	[94.39.158.71]) by smtp.gmail.com with ESMTPSA id
-	k11sm10463101wmb.18.2017.01.11.11.35.41 for <qemu-devel@nongnu.org>
+	k11sm10463101wmb.18.2017.01.11.11.35.46 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Wed, 11 Jan 2017 11:35:42 -0800 (PST)
+	Wed, 11 Jan 2017 11:35:46 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 11 Jan 2017 20:35:05 +0100
-Message-Id: <1484163327-111841-12-git-send-email-pbonzini@redhat.com>
+Date: Wed, 11 Jan 2017 20:35:09 +0100
+Message-Id: <1484163327-111841-16-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1484163327-111841-1-git-send-email-pbonzini@redhat.com>
 References: <1484163327-111841-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 11/33] stubs: group all monitor_fdset_*
- functions in a single file
+Subject: [Qemu-devel] [PULL 15/33] stubs: remove stubs/kvm.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,122 +34,91 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-It makes little sense to implement only one of them, so avoid
-proliferation of stubs files.
+This has a single function, just move it to the other target/*/kvm.c files.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- stubs/Makefile.objs     |  5 +----
- stubs/fdset-add-fd.c    |  8 --------
- stubs/fdset-find-fd.c   |  8 --------
- stubs/fdset-get-fd.c    |  8 --------
- stubs/fdset-remove-fd.c |  7 -------
- stubs/fdset.c           | 22 ++++++++++++++++++++++
- 6 files changed, 23 insertions(+), 35 deletions(-)
- delete mode 100644 stubs/fdset-add-fd.c
- delete mode 100644 stubs/fdset-find-fd.c
- delete mode 100644 stubs/fdset-get-fd.c
- delete mode 100644 stubs/fdset-remove-fd.c
- create mode 100644 stubs/fdset.c
+ stubs/Makefile.objs | 1 -
+ stubs/kvm.c         | 8 --------
+ target/mips/kvm.c   | 5 +++++
+ target/ppc/kvm.c    | 5 +++++
+ target/s390x/kvm.c  | 5 +++++
+ 5 files changed, 15 insertions(+), 9 deletions(-)
+ delete mode 100644 stubs/kvm.c
 
 diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-index 1eec1fb..40b4e15 100644
+index a7d3b72..a187295 100644
 --- a/stubs/Makefile.objs
 +++ b/stubs/Makefile.objs
-@@ -10,10 +10,7 @@ stub-obj-y += cpu-get-clock.o
- stub-obj-y += cpu-get-icount.o
- stub-obj-y += dump.o
- stub-obj-y += error-printf.o
--stub-obj-y += fdset-add-fd.o
--stub-obj-y += fdset-find-fd.o
--stub-obj-y += fdset-get-fd.o
--stub-obj-y += fdset-remove-fd.o
-+stub-obj-y += fdset.o
- stub-obj-y += gdbstub.o
- stub-obj-y += get-vm-name.o
- stub-obj-y += iothread.o
-diff --git a/stubs/fdset-add-fd.c b/stubs/fdset-add-fd.c
+@@ -31,7 +31,6 @@ stub-obj-y += uuid.o
+ stub-obj-y += vm-stop.o
+ stub-obj-y += vmstate.o
+ stub-obj-$(CONFIG_WIN32) += fd-register.o
+-stub-obj-y += kvm.o
+ stub-obj-y += qmp_pc_dimm_device_list.o
+ stub-obj-y += target-monitor-defs.o
+ stub-obj-y += target-get-monitor-def.o
+diff --git a/stubs/kvm.c b/stubs/kvm.c
 deleted file mode 100644
-index bf9e60a..0000000
---- a/stubs/fdset-add-fd.c
+index ddd6204..0000000
+--- a/stubs/kvm.c
 +++ /dev/null
 @@ -1,8 +0,0 @@
 -#include "qemu/osdep.h"
 -#include "qemu-common.h"
--#include "monitor/monitor.h"
+-#include "sysemu/kvm.h"
 -
--int monitor_fdset_dup_fd_add(int64_t fdset_id, int dup_fd)
+-int kvm_arch_irqchip_create(MachineState *ms, KVMState *s)
 -{
--    return -1;
+-    return 0;
 -}
-diff --git a/stubs/fdset-find-fd.c b/stubs/fdset-find-fd.c
-deleted file mode 100644
-index 1d9caf3..0000000
---- a/stubs/fdset-find-fd.c
-+++ /dev/null
-@@ -1,8 +0,0 @@
--#include "qemu/osdep.h"
--#include "qemu-common.h"
--#include "monitor/monitor.h"
--
--int monitor_fdset_dup_fd_find(int dup_fd)
--{
--    return -1;
--}
-diff --git a/stubs/fdset-get-fd.c b/stubs/fdset-get-fd.c
-deleted file mode 100644
-index 5325044..0000000
---- a/stubs/fdset-get-fd.c
-+++ /dev/null
-@@ -1,8 +0,0 @@
--#include "qemu/osdep.h"
--#include "qemu-common.h"
--#include "monitor/monitor.h"
--
--int monitor_fdset_get_fd(int64_t fdset_id, int flags)
--{
--    return -1;
--}
-diff --git a/stubs/fdset-remove-fd.c b/stubs/fdset-remove-fd.c
-deleted file mode 100644
-index 47ea297..0000000
---- a/stubs/fdset-remove-fd.c
-+++ /dev/null
-@@ -1,7 +0,0 @@
--#include "qemu/osdep.h"
--#include "qemu-common.h"
--#include "monitor/monitor.h"
--
--void monitor_fdset_dup_fd_remove(int dupfd)
--{
--}
-diff --git a/stubs/fdset.c b/stubs/fdset.c
-new file mode 100644
-index 0000000..6020cf2
---- /dev/null
-+++ b/stubs/fdset.c
-@@ -0,0 +1,22 @@
-+#include "qemu/osdep.h"
-+#include "qemu-common.h"
-+#include "monitor/monitor.h"
-+
-+int monitor_fdset_dup_fd_add(int64_t fdset_id, int dup_fd)
+diff --git a/target/mips/kvm.c b/target/mips/kvm.c
+index dcf5fbb..998c341 100644
+--- a/target/mips/kvm.c
++++ b/target/mips/kvm.c
+@@ -55,6 +55,11 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+     return 0;
+ }
+ 
++int kvm_arch_irqchip_create(MachineState *ms, KVMState *s)
 +{
-+    return -1;
++    return 0;
 +}
 +
-+int monitor_fdset_dup_fd_find(int dup_fd)
+ int kvm_arch_init_vcpu(CPUState *cs)
+ {
+     MIPSCPU *cpu = MIPS_CPU(cs);
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 9c4834c..6c53a6d 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -145,6 +145,11 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+     return 0;
+ }
+ 
++int kvm_arch_irqchip_create(MachineState *ms, KVMState *s)
 +{
-+    return -1;
++    return 0;
 +}
 +
-+int monitor_fdset_get_fd(int64_t fdset_id, int flags)
+ static int kvm_arch_sync_sregs(PowerPCCPU *cpu)
+ {
+     CPUPPCState *cenv = &cpu->env;
+diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+index 97afe02..e938954 100644
+--- a/target/s390x/kvm.c
++++ b/target/s390x/kvm.c
+@@ -294,6 +294,11 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+     return 0;
+ }
+ 
++int kvm_arch_irqchip_create(MachineState *ms, KVMState *s)
 +{
-+    return -1;
++    return 0;
 +}
 +
-+void monitor_fdset_dup_fd_remove(int dupfd)
-+{
-+}
+ unsigned long kvm_arch_vcpu_id(CPUState *cpu)
+ {
+     return cpu->cpu_index;
 -- 
 1.8.3.1
