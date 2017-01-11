@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35130)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35141)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cR8Uo-000694-GA
+	(envelope-from <rth7680@gmail.com>) id 1cR8Up-00069c-41
 	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:18:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cR8Un-0003AW-J1
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:18:38 -0500
-Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:35029)
+	(envelope-from <rth7680@gmail.com>) id 1cR8Uo-0003BF-BE
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:18:39 -0500
+Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:36473)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cR8Un-0003AC-Db
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:18:37 -0500
-Received: by mail-pf0-x244.google.com with SMTP id f144so12524759pfa.2
-	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 18:18:37 -0800 (PST)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cR8Uo-0003Ac-5q
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:18:38 -0500
+Received: by mail-pf0-x244.google.com with SMTP id b22so15071663pfd.3
+	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 18:18:38 -0800 (PST)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Tue, 10 Jan 2017 18:17:32 -0800
-Message-Id: <20170111021820.24416-18-rth@twiddle.net>
+Date: Tue, 10 Jan 2017 18:17:33 -0800
+Message-Id: <20170111021820.24416-19-rth@twiddle.net>
 In-Reply-To: <20170111021820.24416-1-rth@twiddle.net>
 References: <20170111021820.24416-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PULL 17/65] target-ppc: Use the new deposit and
+Subject: [Qemu-devel] [PULL 18/65] target-s390x: Use the new deposit and
  extract ops
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -30,74 +30,67 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-Use the new primitives for RDWINM and RLDICL.
+Use the new primitives for RISBG.
 
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- target/ppc/translate.c | 35 +++++++++++++++++++----------------
- 1 file changed, 19 insertions(+), 16 deletions(-)
+ target/s390x/translate.c | 34 ++++++++++++++++++++++------------
+ 1 file changed, 22 insertions(+), 12 deletions(-)
 
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index 59e9552..435c6f0 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -1975,16 +1975,16 @@ static void gen_rlwinm(DisasContext *ctx)
- {
-     TCGv t_ra = cpu_gpr[rA(ctx->opcode)];
-     TCGv t_rs = cpu_gpr[rS(ctx->opcode)];
--    uint32_t sh = SH(ctx->opcode);
--    uint32_t mb = MB(ctx->opcode);
--    uint32_t me = ME(ctx->opcode);
--
--    if (mb == 0 && me == (31 - sh)) {
--        tcg_gen_shli_tl(t_ra, t_rs, sh);
--        tcg_gen_ext32u_tl(t_ra, t_ra);
--    } else if (sh != 0 && me == 31 && sh == (32 - mb)) {
--        tcg_gen_ext32u_tl(t_ra, t_rs);
--        tcg_gen_shri_tl(t_ra, t_ra, mb);
-+    int sh = SH(ctx->opcode);
-+    int mb = MB(ctx->opcode);
-+    int me = ME(ctx->opcode);
-+    int len = me - mb + 1;
-+    int rsh = (32 - sh) & 31;
-+
-+    if (sh != 0 && len > 0 && me == (31 - sh)) {
-+        tcg_gen_deposit_z_tl(t_ra, t_rs, sh, len);
-+    } else if (me == 31 && rsh + len <= 32) {
-+        tcg_gen_extract_tl(t_ra, t_rs, rsh, len);
-     } else {
-         target_ulong mask;
- #if defined(TARGET_PPC64)
-@@ -1992,8 +1992,9 @@ static void gen_rlwinm(DisasContext *ctx)
-         me += 32;
- #endif
-         mask = MASK(mb, me);
--
--        if (mask <= 0xffffffffu) {
-+        if (sh == 0) {
-+            tcg_gen_andi_tl(t_ra, t_rs, mask);
-+        } else if (mask <= 0xffffffffu) {
-             TCGv_i32 t0 = tcg_temp_new_i32();
-             tcg_gen_trunc_tl_i32(t0, t_rs);
-             tcg_gen_rotli_i32(t0, t0, sh);
-@@ -2096,11 +2097,13 @@ static void gen_rldinm(DisasContext *ctx, int mb, int me, int sh)
- {
-     TCGv t_ra = cpu_gpr[rA(ctx->opcode)];
-     TCGv t_rs = cpu_gpr[rS(ctx->opcode)];
-+    int len = me - mb + 1;
-+    int rsh = (64 - sh) & 63;
+diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+index 02bc705..6cebb7e 100644
+--- a/target/s390x/translate.c
++++ b/target/s390x/translate.c
+@@ -3134,20 +3134,26 @@ static ExitStatus op_risbg(DisasContext *s, DisasOps *o)
+         }
+     }
  
--    if (sh != 0 && mb == 0 && me == (63 - sh)) {
--        tcg_gen_shli_tl(t_ra, t_rs, sh);
--    } else if (sh != 0 && me == 63 && sh == (64 - mb)) {
--        tcg_gen_shri_tl(t_ra, t_rs, mb);
-+    if (sh != 0 && len > 0 && me == (63 - sh)) {
-+        tcg_gen_deposit_z_tl(t_ra, t_rs, sh, len);
-+    } else if (me == 63 && rsh + len <= 64) {
-+        tcg_gen_extract_tl(t_ra, t_rs, rsh, len);
+-    /* In some cases we can implement this with deposit, which can be more
+-       efficient on some hosts.  */
+-    if (~mask == imask && i3 <= i4) {
+-        if (s->fields->op2 == 0x5d) {
+-            i3 += 32, i4 += 32;
+-        }
++    len = i4 - i3 + 1;
++    pos = 63 - i4;
++    rot = i5 & 63;
++    if (s->fields->op2 == 0x5d) {
++        pos += 32;
++    }
++
++    /* In some cases we can implement this with extract.  */
++    if (imask == 0 && pos == 0 && len > 0 && rot + len <= 64) {
++        tcg_gen_extract_i64(o->out, o->in2, rot, len);
++        return NO_EXIT;
++    }
++
++    /* In some cases we can implement this with deposit.  */
++    if (len > 0 && (imask == 0 || ~mask == imask)) {
+         /* Note that we rotate the bits to be inserted to the lsb, not to
+            the position as described in the PoO.  */
+-        len = i4 - i3 + 1;
+-        pos = 63 - i4;
+-        rot = (i5 - pos) & 63;
++        rot = (rot - pos) & 63;
      } else {
-         tcg_gen_rotli_tl(t_ra, t_rs, sh);
-         tcg_gen_andi_tl(t_ra, t_ra, MASK(mb, me));
+-        pos = len = -1;
+-        rot = i5 & 63;
++        pos = -1;
+     }
+ 
+     /* Rotate the input as necessary.  */
+@@ -3155,7 +3161,11 @@ static ExitStatus op_risbg(DisasContext *s, DisasOps *o)
+ 
+     /* Insert the selected bits into the output.  */
+     if (pos >= 0) {
+-        tcg_gen_deposit_i64(o->out, o->out, o->in2, pos, len);
++        if (imask == 0) {
++            tcg_gen_deposit_z_i64(o->out, o->in2, pos, len);
++        } else {
++            tcg_gen_deposit_i64(o->out, o->out, o->in2, pos, len);
++        }
+     } else if (imask == 0) {
+         tcg_gen_andi_i64(o->out, o->in2, mask);
+     } else {
 -- 
 2.9.3
