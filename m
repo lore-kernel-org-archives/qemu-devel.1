@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48187)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48311)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cRQn6-000457-9x
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 16:50:45 -0500
+	(envelope-from <eblake@redhat.com>) id 1cRQnZ-0004OO-S7
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 16:51:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cRQn1-0004VZ-9h
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 16:50:44 -0500
-Received: from indium.canonical.com ([91.189.90.7]:49432)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cRQn1-0004V9-48
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 16:50:39 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cRQmz-0003sS-VE
-	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 21:50:37 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id E9BF72E8029
-	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 21:50:37 +0000 (UTC)
+	(envelope-from <eblake@redhat.com>) id 1cRQnV-0004an-06
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 16:51:13 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45492)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cRQnU-0004aA-N3
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 16:51:08 -0500
+References: <20170111182455.15160-1-nirsof@gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <750c2d41-dac2-61f7-29c3-82d8d13a0de6@redhat.com>
+Date: Wed, 11 Jan 2017 15:51:05 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 11 Jan 2017 21:42:19 -0000
-From: Jignasha <jignasha.vithalani@triliodata.com>
-Reply-To: Bug 1655764 <1655764@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20170111212721.20360.4397.malonedeb@wampee.canonical.com>
-Message-Id: <20170111214219.27340.10641.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1655764] Re: qemu-img convert -c compression
- can't decompress
+In-Reply-To: <20170111182455.15160-1-nirsof@gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="TIGg5iml2InmqFkbxonn3xDivhisQVxFH"
+Subject: Re: [Qemu-devel] [PATCH] qemu-io: Return non-zero exit code on
+ failure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,27 +28,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Nir Soffer <nirsof@gmail.com>, qemu-devel@nongnu.org
+Cc: Nir Soffer <nsoffer@redhat.com>
 
-Used openssl zlib -d < compressedfile but that also not working
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--TIGg5iml2InmqFkbxonn3xDivhisQVxFH
+From: Eric Blake <eblake@redhat.com>
+To: Nir Soffer <nirsof@gmail.com>, qemu-devel@nongnu.org
+Cc: Nir Soffer <nsoffer@redhat.com>
+Message-ID: <750c2d41-dac2-61f7-29c3-82d8d13a0de6@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] qemu-io: Return non-zero exit code on
+ failure
+References: <20170111182455.15160-1-nirsof@gmail.com>
+In-Reply-To: <20170111182455.15160-1-nirsof@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
--- =
+On 01/11/2017 12:24 PM, Nir Soffer wrote:
+> From: Nir Soffer <nsoffer@redhat.com>
+>=20
+> The result of openfile was not checked, leading to failure deep in the
+> actual command with confusing error message, and exiting with exit code=
+ 0.
+>=20
+> Here is one example - trying to read a pattern from an invalid chain:
+>=20
+>     $ qemu-io -c 'read -P 1 0 1024' top.qcow2; echo $?
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1655764
+As written, you have to guess some context about how top.qcow2 was
+created.  The example can be made a bit more reproducible with:
 
-Title:
-  qemu-img convert -c compression can't decompress
+$ : > file
+$ qemu-io -f qcow2 -c ... file
 
-Status in QEMU:
-  New
+>     can't open device top.qcow2: Could not open backing file: Image is =
+not in qcow2 format
+>     no file open, try 'help open'
+>     0
+>=20
+> With this patch, we fail earlier with exit code 1:
+>=20
+>     $ ./qemu-io -c 'read -P 1 0 1024' top.qcow2; echo $?
+>     can't open device top.qcow2: Could not open backing file: Image is =
+not
+>     in qcow2 format
+>     1
+>=20
+> Signed-off-by: Nir Soffer <nirsof@gmail.com>
+> ---
+>  qemu-io.c | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
 
-Bug description:
-  Used -c compression option of qemu-img convert to compress qcow2,
-  then libvirt mount for compressed image don't work as well as decompressi=
-on also
-  not working, tried glib-deflate to decompress
+Whether or not the commit message is improved,
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1655764/+subscriptions
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--TIGg5iml2InmqFkbxonn3xDivhisQVxFH
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYdqjJAAoJEKeha0olJ0NqJekIAKZN1MpB7WKA9bHUE9d1w5XA
+UNflUtlxVZYxm2ZNN/gXVJPmmKI4TkmtXpLBUilmeB8DUXQm4eUCi2zf1KBZes7p
+6h1j9pCnJNYotMglgdV8uzqPjKrKs8cGQwxlZ9jZt/9uzR5mG3S0w6bQO4s6bXmU
+KfOEUGcXAC4Pl2RY+Kyq+Ws2R94AMEpYk3lVR9UhyJsupvm8rvqtn5+P2keeTIBX
+H+m/Qj3Dcaonfp0NXyIhD+YFozb45oDKOzBloYfNsaKXbhUWbJoDkAszjYibKj1Z
+sYyMDjXF33TFWNjBI7i+DO644W6H8nBKwItLvKNZIRJOE6GVHexEKrE5bHCpB5I=
+=nYHM
+-----END PGP SIGNATURE-----
+
+--TIGg5iml2InmqFkbxonn3xDivhisQVxFH--
