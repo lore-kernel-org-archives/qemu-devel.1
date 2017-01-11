@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45302)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45303)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cROgT-00039C-7d
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cROgT-00039D-7g
 	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:35:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cROgQ-0003L3-UV
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cROgR-0003LC-9p
 	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:35:45 -0500
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:34569)
+Received: from mail-wj0-x244.google.com ([2a00:1450:400c:c01::244]:33868)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1cROgQ-0003Ke-2s
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:35:42 -0500
-Received: by mail-wm0-x241.google.com with SMTP id c85so334795wmi.1
-	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 11:35:41 -0800 (PST)
+	id 1cROgR-0003Kw-0V
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:35:43 -0500
+Received: by mail-wj0-x244.google.com with SMTP id qs7so54428078wjc.1
+	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 11:35:42 -0800 (PST)
 Received: from 640k.lan (94-39-158-71.adsl-ull.clienti.tiscali.it.
 	[94.39.158.71]) by smtp.gmail.com with ESMTPSA id
-	k11sm10463101wmb.18.2017.01.11.11.35.39 for <qemu-devel@nongnu.org>
+	k11sm10463101wmb.18.2017.01.11.11.35.40 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Wed, 11 Jan 2017 11:35:40 -0800 (PST)
+	Wed, 11 Jan 2017 11:35:41 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 11 Jan 2017 20:35:03 +0100
-Message-Id: <1484163327-111841-10-git-send-email-pbonzini@redhat.com>
+Date: Wed, 11 Jan 2017 20:35:04 +0100
+Message-Id: <1484163327-111841-11-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1484163327-111841-1-git-send-email-pbonzini@redhat.com>
 References: <1484163327-111841-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 09/33] hw: move reset handlers from vl.c to
- hw/core
+Subject: [Qemu-devel] [PULL 10/33] stubs: group stubs for user-mode emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,263 +34,171 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-They are small, it is not worth stubbing them.  Just include them
-in user-mode emulators and unit tests as well.
+Some stubs are used for user-mode emulation only; they are not
+needed by tools.  Move them out of stubs/.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/core/Makefile.objs   |  2 +-
- hw/core/reset.c         | 72 +++++++++++++++++++++++++++++++++++++++++++++++++
- include/hw/hw.h         |  6 +----
- include/sysemu/reset.h  | 10 +++++++
- include/sysemu/sysemu.h |  1 -
- stubs/Makefile.objs     |  1 -
- stubs/reset.c           | 14 ----------
- tests/Makefile.include  |  1 +
- vl.c                    | 42 -----------------------------
- 9 files changed, 85 insertions(+), 64 deletions(-)
- create mode 100644 hw/core/reset.c
- create mode 100644 include/sysemu/reset.h
- delete mode 100644 stubs/reset.c
+ MAINTAINERS         |  1 +
+ Makefile.target     |  4 ++--
+ stubs/Makefile.objs |  2 --
+ stubs/cpus.c        | 11 -----------
+ stubs/replay-user.c | 33 ---------------------------------
+ user-exec-stub.c    | 34 ++++++++++++++++++++++++++++++++++
+ 6 files changed, 37 insertions(+), 48 deletions(-)
+ delete mode 100644 stubs/cpus.c
+ delete mode 100644 stubs/replay-user.c
+ create mode 100644 user-exec-stub.c
 
-diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
-index a4c94e5..833fd46 100644
---- a/hw/core/Makefile.objs
-+++ b/hw/core/Makefile.objs
-@@ -1,6 +1,6 @@
- # core qdev-related obj files, also used by *-user:
- common-obj-y += qdev.o qdev-properties.o
--common-obj-y += bus.o
-+common-obj-y += bus.o reset.o
- common-obj-y += fw-path-provider.o
- # irq.o needed for qdev GPIO handling:
- common-obj-y += irq.o
-diff --git a/hw/core/reset.c b/hw/core/reset.c
-new file mode 100644
-index 0000000..84c8869
---- /dev/null
-+++ b/hw/core/reset.c
-@@ -0,0 +1,72 @@
-+/*
-+ *  Reset handlers.
-+ *
-+ * Copyright (c) 2003-2008 Fabrice Bellard
-+ * Copyright (c) 2016 Red Hat, Inc.
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/queue.h"
-+#include "sysemu/reset.h"
-+
-+/* reset/shutdown handler */
-+
-+typedef struct QEMUResetEntry {
-+    QTAILQ_ENTRY(QEMUResetEntry) entry;
-+    QEMUResetHandler *func;
-+    void *opaque;
-+} QEMUResetEntry;
-+
-+static QTAILQ_HEAD(reset_handlers, QEMUResetEntry) reset_handlers =
-+    QTAILQ_HEAD_INITIALIZER(reset_handlers);
-+
-+void qemu_register_reset(QEMUResetHandler *func, void *opaque)
-+{
-+    QEMUResetEntry *re = g_malloc0(sizeof(QEMUResetEntry));
-+
-+    re->func = func;
-+    re->opaque = opaque;
-+    QTAILQ_INSERT_TAIL(&reset_handlers, re, entry);
-+}
-+
-+void qemu_unregister_reset(QEMUResetHandler *func, void *opaque)
-+{
-+    QEMUResetEntry *re;
-+
-+    QTAILQ_FOREACH(re, &reset_handlers, entry) {
-+        if (re->func == func && re->opaque == opaque) {
-+            QTAILQ_REMOVE(&reset_handlers, re, entry);
-+            g_free(re);
-+            return;
-+        }
-+    }
-+}
-+
-+void qemu_devices_reset(void)
-+{
-+    QEMUResetEntry *re, *nre;
-+
-+    /* reset all devices */
-+    QTAILQ_FOREACH_SAFE(re, &reset_handlers, entry, nre) {
-+        re->func(re->opaque);
-+    }
-+}
-+
-diff --git a/include/hw/hw.h b/include/hw/hw.h
-index 3669ebd..e22d4ce 100644
---- a/include/hw/hw.h
-+++ b/include/hw/hw.h
-@@ -12,11 +12,7 @@
- #include "hw/irq.h"
- #include "migration/vmstate.h"
- #include "qemu/module.h"
--
--typedef void QEMUResetHandler(void *opaque);
--
--void qemu_register_reset(QEMUResetHandler *func, void *opaque);
--void qemu_unregister_reset(QEMUResetHandler *func, void *opaque);
-+#include "sysemu/reset.h"
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 1444b26..39e8230 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1494,6 +1494,7 @@ M: Riku Voipio <riku.voipio@iki.fi>
+ S: Maintained
+ F: thunk.c
+ F: user-exec.c
++F: user-exec-stub.c
  
- void QEMU_NORETURN hw_error(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
+ BSD user
+ S: Orphan
+diff --git a/Makefile.target b/Makefile.target
+index 8ae82cb..9e8edd9 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -115,7 +115,7 @@ QEMU_CFLAGS+=-I$(SRC_PATH)/linux-user/$(TARGET_ABI_DIR) \
+              -I$(SRC_PATH)/linux-user
  
-diff --git a/include/sysemu/reset.h b/include/sysemu/reset.h
-new file mode 100644
-index 0000000..0b0d6d7
---- /dev/null
-+++ b/include/sysemu/reset.h
-@@ -0,0 +1,10 @@
-+#ifndef QEMU_SYSEMU_RESET_H
-+#define QEMU_SYSEMU_RESET_H
-+
-+typedef void QEMUResetHandler(void *opaque);
-+
-+void qemu_register_reset(QEMUResetHandler *func, void *opaque);
-+void qemu_unregister_reset(QEMUResetHandler *func, void *opaque);
-+void qemu_devices_reset(void);
-+
-+#endif
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index 66c6f15..a194411 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -63,7 +63,6 @@ void qemu_system_vmstop_request_prepare(void);
- int qemu_shutdown_requested_get(void);
- int qemu_reset_requested_get(void);
- void qemu_system_killed(int signal, pid_t pid);
--void qemu_devices_reset(void);
- void qemu_system_reset(bool report);
- void qemu_system_guest_panicked(void);
- size_t qemu_target_page_bits(void);
+ obj-y += linux-user/
+-obj-y += gdbstub.o thunk.o user-exec.o
++obj-y += gdbstub.o thunk.o user-exec.o user-exec-stub.o
+ 
+ endif #CONFIG_LINUX_USER
+ 
+@@ -128,7 +128,7 @@ QEMU_CFLAGS+=-I$(SRC_PATH)/bsd-user -I$(SRC_PATH)/bsd-user/$(TARGET_ABI_DIR) \
+ 			 -I$(SRC_PATH)/bsd-user/$(HOST_VARIANT_DIR)
+ 
+ obj-y += bsd-user/
+-obj-y += gdbstub.o user-exec.o
++obj-y += gdbstub.o user-exec.o user-exec-stub.o
+ 
+ endif #CONFIG_BSD_USER
+ 
 diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-index 5b3e7c6..c89a9da 100644
+index c89a9da..1eec1fb 100644
 --- a/stubs/Makefile.objs
 +++ b/stubs/Makefile.objs
-@@ -26,7 +26,6 @@ stub-obj-y += notify-event.o
+@@ -25,7 +25,6 @@ stub-obj-y += monitor.o
+ stub-obj-y += notify-event.o
  stub-obj-y += qtest.o
  stub-obj-y += replay.o
- stub-obj-y += replay-user.o
--stub-obj-y += reset.o
+-stub-obj-y += replay-user.o
  stub-obj-y += runstate-check.o
  stub-obj-y += set-fd-handler.o
  stub-obj-y += slirp.o
-diff --git a/stubs/reset.c b/stubs/reset.c
+@@ -35,7 +34,6 @@ stub-obj-y += uuid.o
+ stub-obj-y += vm-stop.o
+ stub-obj-y += vmstate.o
+ stub-obj-$(CONFIG_WIN32) += fd-register.o
+-stub-obj-y += cpus.o
+ stub-obj-y += kvm.o
+ stub-obj-y += qmp_pc_dimm_device_list.o
+ stub-obj-y += target-monitor-defs.o
+diff --git a/stubs/cpus.c b/stubs/cpus.c
 deleted file mode 100644
-index 5d47711..0000000
---- a/stubs/reset.c
+index e192722..0000000
+--- a/stubs/cpus.c
 +++ /dev/null
-@@ -1,14 +0,0 @@
+@@ -1,11 +0,0 @@
 -#include "qemu/osdep.h"
--#include "hw/hw.h"
+-#include "qemu-common.h"
+-#include "qom/cpu.h"
 -
--/* Stub functions for binaries that never call qemu_devices_reset(),
-- * and don't need to keep track of the reset handler list.
+-void cpu_resume(CPUState *cpu)
+-{
+-}
+-
+-void qemu_init_vcpu(CPUState *cpu)
+-{
+-}
+diff --git a/stubs/replay-user.c b/stubs/replay-user.c
+deleted file mode 100644
+index b29e7eb..0000000
+--- a/stubs/replay-user.c
++++ /dev/null
+@@ -1,33 +0,0 @@
+-/*
+- * replay.c
+- *
+- * Copyright (c) 2010-2015 Institute for System Programming
+- *                         of the Russian Academy of Sciences.
+- *
+- * This work is licensed under the terms of the GNU GPL, version 2 or later.
+- * See the COPYING file in the top-level directory.
+- *
 - */
 -
--void qemu_register_reset(QEMUResetHandler *func, void *opaque)
+-#include "qemu/osdep.h"
+-#include "sysemu/replay.h"
+-
+-bool replay_exception(void)
 -{
+-    return true;
 -}
 -
--void qemu_unregister_reset(QEMUResetHandler *func, void *opaque)
+-bool replay_has_exception(void)
 -{
--}
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index f776404..cd62f7b 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -516,6 +516,7 @@ tests/test-qdev-global-props$(EXESUF): tests/test-qdev-global-props.o \
- 	hw/core/bus.o \
- 	hw/core/irq.o \
- 	hw/core/fw-path-provider.o \
-+	hw/core/reset.o \
- 	$(test-qapi-obj-y)
- tests/test-vmstate$(EXESUF): tests/test-vmstate.o \
- 	migration/vmstate.o migration/qemu-file.o \
-diff --git a/vl.c b/vl.c
-index 1b81340..1a3ca96 100644
---- a/vl.c
-+++ b/vl.c
-@@ -1635,16 +1635,6 @@ void vm_state_notify(int running, RunState state)
-     }
- }
- 
--/* reset/shutdown handler */
--
--typedef struct QEMUResetEntry {
--    QTAILQ_ENTRY(QEMUResetEntry) entry;
--    QEMUResetHandler *func;
--    void *opaque;
--} QEMUResetEntry;
--
--static QTAILQ_HEAD(reset_handlers, QEMUResetEntry) reset_handlers =
--    QTAILQ_HEAD_INITIALIZER(reset_handlers);
- static int reset_requested;
- static int shutdown_requested, shutdown_signal = -1;
- static pid_t shutdown_pid;
-@@ -1734,38 +1724,6 @@ static int qemu_debug_requested(void)
-     return r;
- }
- 
--void qemu_register_reset(QEMUResetHandler *func, void *opaque)
--{
--    QEMUResetEntry *re = g_malloc0(sizeof(QEMUResetEntry));
--
--    re->func = func;
--    re->opaque = opaque;
--    QTAILQ_INSERT_TAIL(&reset_handlers, re, entry);
+-    return false;
 -}
 -
--void qemu_unregister_reset(QEMUResetHandler *func, void *opaque)
+-bool replay_interrupt(void)
 -{
--    QEMUResetEntry *re;
--
--    QTAILQ_FOREACH(re, &reset_handlers, entry) {
--        if (re->func == func && re->opaque == opaque) {
--            QTAILQ_REMOVE(&reset_handlers, re, entry);
--            g_free(re);
--            return;
--        }
--    }
+-    return true;
 -}
 -
--void qemu_devices_reset(void)
+-bool replay_has_interrupt(void)
 -{
--    QEMUResetEntry *re, *nre;
--
--    /* reset all devices */
--    QTAILQ_FOREACH_SAFE(re, &reset_handlers, entry, nre) {
--        re->func(re->opaque);
--    }
+-    return false;
 -}
--
- void qemu_system_reset(bool report)
- {
-     MachineClass *mc;
+diff --git a/user-exec-stub.c b/user-exec-stub.c
+new file mode 100644
+index 0000000..dbcf1ad
+--- /dev/null
++++ b/user-exec-stub.c
+@@ -0,0 +1,34 @@
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++#include "qom/cpu.h"
++#include "sysemu/replay.h"
++
++void cpu_resume(CPUState *cpu)
++{
++}
++
++void qemu_init_vcpu(CPUState *cpu)
++{
++}
++
++/* User mode emulation does not support record/replay yet.  */
++
++bool replay_exception(void)
++{
++    return true;
++}
++
++bool replay_has_exception(void)
++{
++    return false;
++}
++
++bool replay_interrupt(void)
++{
++    return true;
++}
++
++bool replay_has_interrupt(void)
++{
++    return false;
++}
 -- 
 1.8.3.1
