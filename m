@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50394)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50409)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cRFYw-0004pH-Ng
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 04:51:23 -0500
+	(envelope-from <stefanha@redhat.com>) id 1cRFZ0-0004s4-Bx
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 04:51:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cRFYw-0001hx-3V
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 04:51:22 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41294)
+	(envelope-from <stefanha@redhat.com>) id 1cRFYz-0001kQ-KT
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 04:51:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33912)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cRFYv-0001hk-UN
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 04:51:22 -0500
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cRFYz-0001jT-EH
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 04:51:25 -0500
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Wed, 11 Jan 2017 09:36:30 +0000
-Message-Id: <20170111093630.2088-1-stefanha@redhat.com>
+Date: Wed, 11 Jan 2017 09:44:43 +0000
+Message-Id: <20170111094443.2790-1-stefanha@redhat.com>
 Subject: [Qemu-devel] [PATCH] nvdimm acpi: fix g_array_free() with NULL
  pointer
 List-Id: <qemu-devel.nongnu.org>
