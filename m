@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45390)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45369)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cROgc-0003JO-9B
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:35:55 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cROgZ-0003NM-2b
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cROgZ-0003Fl-6Y
 	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:35:54 -0500
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:34847)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cROgY-0003NA-2o
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:35:51 -0500
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:34846)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1cROgY-0003NE-T9
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:35:51 -0500
-Received: by mail-wm0-x244.google.com with SMTP id l2so325408wml.2
-	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 11:35:50 -0800 (PST)
+	id 1cROgX-0003Mx-Ss
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:35:50 -0500
+Received: by mail-wm0-x243.google.com with SMTP id l2so325319wml.2
+	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 11:35:49 -0800 (PST)
 Received: from 640k.lan (94-39-158-71.adsl-ull.clienti.tiscali.it.
 	[94.39.158.71]) by smtp.gmail.com with ESMTPSA id
-	k11sm10463101wmb.18.2017.01.11.11.35.48 for <qemu-devel@nongnu.org>
+	k11sm10463101wmb.18.2017.01.11.11.35.47 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Wed, 11 Jan 2017 11:35:49 -0800 (PST)
+	Wed, 11 Jan 2017 11:35:48 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 11 Jan 2017 20:35:11 +0100
-Message-Id: <1484163327-111841-18-git-send-email-pbonzini@redhat.com>
+Date: Wed, 11 Jan 2017 20:35:10 +0100
+Message-Id: <1484163327-111841-17-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1484163327-111841-1-git-send-email-pbonzini@redhat.com>
 References: <1484163327-111841-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 17/33] target-i386: Correctly apply patch for
- syscall eflags.TF handling
+Subject: [Qemu-devel] [PULL 16/33] acpi: filter based on CONFIG_ACPI_X86
+ rather than TARGET
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,40 +35,147 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-The change to the "syscall" insn got applied to the "iret" instruction instead.
+Copy the mechanism of hw/smbios/smbios-stub.c to implement an ACPI-stub
+instead, so that -acpitable can be later extended to ARM.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- target/i386/translate.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ arch_init.c                | 13 -------------
+ hw/Makefile.objs           |  2 +-
+ hw/acpi/Makefile.objs      |  7 ++++++-
+ hw/acpi/acpi-stub.c        | 29 +++++++++++++++++++++++++++++
+ include/sysemu/arch_init.h |  1 -
+ vl.c                       |  3 ++-
+ 6 files changed, 38 insertions(+), 17 deletions(-)
+ create mode 100644 hw/acpi/acpi-stub.c
 
-diff --git a/target/i386/translate.c b/target/i386/translate.c
-index 59e11fc..7e9d073 100644
---- a/target/i386/translate.c
-+++ b/target/i386/translate.c
-@@ -6435,10 +6435,7 @@ static target_ulong disas_insn(CPUX86State *env, DisasContext *s,
-                                       tcg_const_i32(s->pc - s->cs_base));
-             set_cc_op(s, CC_OP_EFLAGS);
-         }
--        /* TF handling for the syscall insn is different. The TF bit is checked
--           after the syscall insn completes. This allows #DB to not be
--           generated after one has entered CPL0 if TF is set in FMASK.  */
--        gen_eob_worker(s, false, true);
-+        gen_eob(s);
-         break;
-     case 0xe8: /* call im */
-         {
-@@ -7119,7 +7116,10 @@ static target_ulong disas_insn(CPUX86State *env, DisasContext *s,
-         gen_update_cc_op(s);
-         gen_jmp_im(pc_start - s->cs_base);
-         gen_helper_syscall(cpu_env, tcg_const_i32(s->pc - pc_start));
--        gen_eob(s);
-+        /* TF handling for the syscall insn is different. The TF bit is checked
-+           after the syscall insn completes. This allows #DB to not be
-+           generated after one has entered CPL0 if TF is set in FMASK.  */
-+        gen_eob_worker(s, false, true);
-         break;
-     case 0x107: /* sysret */
-         if (!s->pe) {
+diff --git a/arch_init.c b/arch_init.c
+index 34e7694..6c4e287 100644
+--- a/arch_init.c
++++ b/arch_init.c
+@@ -234,19 +234,6 @@ void audio_init(void)
+     }
+ }
+ 
+-void do_acpitable_option(const QemuOpts *opts)
+-{
+-#ifdef TARGET_I386
+-    Error *err = NULL;
+-
+-    acpi_table_add(opts, &err);
+-    if (err) {
+-        error_reportf_err(err, "Wrong acpi table provided: ");
+-        exit(1);
+-    }
+-#endif
+-}
+-
+ int kvm_available(void)
+ {
+ #ifdef CONFIG_KVM
+diff --git a/hw/Makefile.objs b/hw/Makefile.objs
+index 7be399e..a2c61f6 100644
+--- a/hw/Makefile.objs
++++ b/hw/Makefile.objs
+@@ -1,5 +1,5 @@
+ devices-dirs-$(call land, $(CONFIG_VIRTIO),$(call land,$(CONFIG_VIRTFS),$(CONFIG_PCI))) += 9pfs/
+-devices-dirs-$(CONFIG_ACPI) += acpi/
++devices-dirs-$(CONFIG_SOFTMMU) += acpi/
+ devices-dirs-$(CONFIG_SOFTMMU) += adc/
+ devices-dirs-$(CONFIG_SOFTMMU) += audio/
+ devices-dirs-$(CONFIG_SOFTMMU) += block/
+diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
+index dfc8229..6acf798 100644
+--- a/hw/acpi/Makefile.objs
++++ b/hw/acpi/Makefile.objs
+@@ -1,9 +1,11 @@
++ifeq ($(CONFIG_ACPI),y)
+ common-obj-$(CONFIG_ACPI_X86) += core.o piix4.o pcihp.o
+ common-obj-$(CONFIG_ACPI_X86_ICH) += ich9.o tco.o
+ common-obj-$(CONFIG_ACPI_CPU_HOTPLUG) += cpu_hotplug.o
+ common-obj-$(CONFIG_ACPI_MEMORY_HOTPLUG) += memory_hotplug.o
+ common-obj-$(CONFIG_ACPI_CPU_HOTPLUG) += cpu.o
+ common-obj-$(CONFIG_ACPI_NVDIMM) += nvdimm.o
++common-obj-$(call lnot,$(CONFIG_ACPI_X86)) += acpi-stub.o
+ 
+ common-obj-y += acpi_interface.o
+ common-obj-y += bios-linker-loader.o
+@@ -11,4 +13,7 @@ common-obj-y += aml-build.o
+ 
+ common-obj-$(CONFIG_IPMI) += ipmi.o
+ common-obj-$(call lnot,$(CONFIG_IPMI)) += ipmi-stub.o
+-common-obj-$(CONFIG_ALL) += ipmi-stub.o
++else
++common-obj-y += acpi-stub.o
++endif
++common-obj-$(CONFIG_ALL) += acpi-stub.o ipmi-stub.o
+diff --git a/hw/acpi/acpi-stub.c b/hw/acpi/acpi-stub.c
+new file mode 100644
+index 0000000..26bd22f
+--- /dev/null
++++ b/hw/acpi/acpi-stub.c
+@@ -0,0 +1,29 @@
++/*
++ * ACPI stubs for platforms that don't support ACPI.
++ *
++ * Copyright (c) 2006 Fabrice Bellard
++ * Copyright (c) 2016 Red Hat, Inc.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License along
++ * with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "qapi/qmp/qerror.h"
++#include "qmp-commands.h"
++#include "hw/acpi/acpi.h"
++
++void acpi_table_add(const QemuOpts *opts, Error **errp)
++{
++    error_setg(errp, QERR_UNSUPPORTED);
++}
+diff --git a/include/sysemu/arch_init.h b/include/sysemu/arch_init.h
+index 88dcf77..20b01e3 100644
+--- a/include/sysemu/arch_init.h
++++ b/include/sysemu/arch_init.h
+@@ -28,7 +28,6 @@ enum {
+ extern const uint32_t arch_type;
+ 
+ void select_soundhw(const char *optarg);
+-void do_acpitable_option(const QemuOpts *opts);
+ void audio_init(void);
+ int kvm_available(void);
+ int xen_available(void);
+diff --git a/vl.c b/vl.c
+index 1a3ca96..99f6e7f 100644
+--- a/vl.c
++++ b/vl.c
+@@ -65,6 +65,7 @@ int main(int argc, char **argv)
+ #include "hw/bt.h"
+ #include "sysemu/watchdog.h"
+ #include "hw/smbios/smbios.h"
++#include "hw/acpi/acpi.h"
+ #include "hw/xen/xen.h"
+ #include "hw/qdev.h"
+ #include "hw/loader.h"
+@@ -3662,7 +3663,7 @@ int main(int argc, char **argv, char **envp)
+                 if (!opts) {
+                     exit(1);
+                 }
+-                do_acpitable_option(opts);
++                acpi_table_add(opts, &error_fatal);
+                 break;
+             case QEMU_OPTION_smbios:
+                 opts = qemu_opts_parse_noisily(qemu_find_opts("smbios"),
 -- 
 1.8.3.1
