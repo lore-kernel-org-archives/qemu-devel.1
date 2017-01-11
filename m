@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54828)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54811)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1cRPNs-0006Ke-VM
+	(envelope-from <atar4qemu@gmail.com>) id 1cRPNr-0006Js-V9
 	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 15:20:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1cRPNr-0000vU-Un
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 15:20:36 -0500
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:35262)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>) id 1cRPNr-0000vC-I4
+	(envelope-from <atar4qemu@gmail.com>) id 1cRPNq-0000v5-FC
 	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 15:20:35 -0500
-Received: by mail-wm0-x241.google.com with SMTP id l2so566593wml.2
-	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 12:20:35 -0800 (PST)
+Received: from mail-wj0-x244.google.com ([2a00:1450:400c:c01::244]:36489)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>) id 1cRPNp-0000ul-Vm
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 15:20:34 -0500
+Received: by mail-wj0-x244.google.com with SMTP id dh1so11795484wjb.3
+	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 12:20:33 -0800 (PST)
 From: Artyom Tarasenko <atar4qemu@gmail.com>
-Date: Wed, 11 Jan 2017 21:19:33 +0100
-Message-Id: <f03daff3e16d6ab6a9a0610f1006de7b506a5f58.1484165352.git.atar4qemu@gmail.com>
+Date: Wed, 11 Jan 2017 21:19:32 +0100
+Message-Id: <af031d3c4c1a12eabded2a677ad3ac50937bf6bf.1484165352.git.atar4qemu@gmail.com>
 In-Reply-To: <cover.1484165352.git.atar4qemu@gmail.com>
 References: <cover.1484165352.git.atar4qemu@gmail.com>
 In-Reply-To: <cover.1484165352.git.atar4qemu@gmail.com>
 References: <cover.1484165352.git.atar4qemu@gmail.com>
-Subject: [Qemu-devel] [PATCH v2 02/30] target-sparc: store cpu super- and
- hypervisor flags in TB
+Subject: [Qemu-devel] [PATCH v2 01/30] target-sparc: ignore MMU-faults if
+ MMU is disabled in hypervisor mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,109 +31,60 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Richard Henderson <rth@twiddle.net>, Artyom Tarasenko <atar4qemu@gmail.com>
 
-Suggested-by: Richard Henderson <rth@twiddle.net>
+while IMMU/DMMU is disabled
+- ignore MMU-faults in hypervisorv mode or if CPU doesn't have hypervisor
+- signal TT_INSN_REAL_TRANSLATION_MISS/TT_DATA_REAL_TRANSLATION_MISS otherwise
+
 Signed-off-by: Artyom Tarasenko <atar4qemu@gmail.com>
 ---
- target/sparc/cpu.h       | 17 +++++++++++++++++
- target/sparc/translate.c | 24 +++++++++++++++++++-----
- 2 files changed, 36 insertions(+), 5 deletions(-)
+ target/sparc/cpu.h         |  2 ++
+ target/sparc/ldst_helper.c | 15 +++++++++++++--
+ 2 files changed, 15 insertions(+), 2 deletions(-)
 
 diff --git a/target/sparc/cpu.h b/target/sparc/cpu.h
-index e0b2806..68e39bc 100644
+index 5fb0ed1..e0b2806 100644
 --- a/target/sparc/cpu.h
 +++ b/target/sparc/cpu.h
-@@ -667,6 +667,11 @@ static inline int cpu_supervisor_mode(CPUSPARCState *env1)
+@@ -68,6 +68,8 @@
+ #define TT_DATA_ACCESS 0x32
+ #define TT_UNALIGNED 0x34
+ #define TT_PRIV_ACT 0x37
++#define TT_INSN_REAL_TRANSLATION_MISS 0x3e
++#define TT_DATA_REAL_TRANSLATION_MISS 0x3f
+ #define TT_EXTINT   0x40
+ #define TT_IVEC     0x60
+ #define TT_TMISS    0x64
+diff --git a/target/sparc/ldst_helper.c b/target/sparc/ldst_helper.c
+index de7d53a..fdca87f 100644
+--- a/target/sparc/ldst_helper.c
++++ b/target/sparc/ldst_helper.c
+@@ -1664,14 +1664,25 @@ void sparc_cpu_unassigned_access(CPUState *cs, hwaddr addr,
  {
-     return env1->pstate & PS_PRIV;
+     SPARCCPU *cpu = SPARC_CPU(cs);
+     CPUSPARCState *env = &cpu->env;
+-    int tt = is_exec ? TT_CODE_ACCESS : TT_DATA_ACCESS;
+ 
+ #ifdef DEBUG_UNASSIGNED
+     printf("Unassigned mem access to " TARGET_FMT_plx " from " TARGET_FMT_lx
+            "\n", addr, env->pc);
+ #endif
+ 
+-    cpu_raise_exception_ra(env, tt, GETPC());
++    if (is_exec) { /* XXX has_hypervisor */
++        if (env->lsu & (IMMU_E)) {
++            cpu_raise_exception_ra(env, TT_CODE_ACCESS, GETPC());
++        } else if (cpu_has_hypervisor(env) && !(env->hpstate & HS_PRIV)) {
++            cpu_raise_exception_ra(env, TT_INSN_REAL_TRANSLATION_MISS, GETPC());
++        }
++    } else {
++        if (env->lsu & (DMMU_E)) {
++            cpu_raise_exception_ra(env, TT_DATA_ACCESS, GETPC());
++        } else if (cpu_has_hypervisor(env) && !(env->hpstate & HS_PRIV)) {
++            cpu_raise_exception_ra(env, TT_DATA_REAL_TRANSLATION_MISS, GETPC());
++        }
++    }
  }
-+#else
-+static inline int cpu_supervisor_mode(CPUSPARCState *env1)
-+{
-+    return env1->psrs;
-+}
- #endif
- 
- static inline int cpu_mmu_index(CPUSPARCState *env, bool ifetch)
-@@ -733,6 +738,8 @@ trap_state* cpu_tsptr(CPUSPARCState* env);
- #define TB_FLAG_MMU_MASK     7
- #define TB_FLAG_FPU_ENABLED  (1 << 4)
- #define TB_FLAG_AM_ENABLED   (1 << 5)
-+#define TB_FLAG_SUPER        (1 << 6)
-+#define TB_FLAG_HYPER        (1 << 7)
- #define TB_FLAG_ASI_SHIFT    24
- 
- static inline void cpu_get_tb_cpu_state(CPUSPARCState *env, target_ulong *pc,
-@@ -742,7 +749,17 @@ static inline void cpu_get_tb_cpu_state(CPUSPARCState *env, target_ulong *pc,
-     *pc = env->pc;
-     *cs_base = env->npc;
-     flags = cpu_mmu_index(env, false);
-+#ifndef CONFIG_USER_ONLY
-+    if (cpu_supervisor_mode(env)) {
-+        flags |= TB_FLAG_SUPER;
-+    }
-+#endif
- #ifdef TARGET_SPARC64
-+#ifndef CONFIG_USER_ONLY
-+    if (cpu_hypervisor_mode(env)) {
-+        flags |= TB_FLAG_HYPER;
-+    }
-+#endif
-     if (env->pstate & PS_AM) {
-         flags |= TB_FLAG_AM_ENABLED;
-     }
-diff --git a/target/sparc/translate.c b/target/sparc/translate.c
-index 2205f89..0b0cde1 100644
---- a/target/sparc/translate.c
-+++ b/target/sparc/translate.c
-@@ -72,9 +72,16 @@ typedef struct DisasContext {
-     target_ulong jump_pc[2]; /* used when JUMP_PC pc value is used */
-     int is_br;
-     int mem_idx;
--    int fpu_enabled;
--    int address_mask_32bit;
--    int singlestep;
-+    bool fpu_enabled;
-+    bool address_mask_32bit;
-+    bool singlestep;
-+#ifndef CONFIG_USER_ONLY
-+    bool supervisor;
-+#ifdef TARGET_SPARC64
-+    bool hypervisor;
-+#endif
-+#endif
-+
-     uint32_t cc_op;  /* current CC operation */
-     struct TranslationBlock *tb;
-     sparc_def_t *def;
-@@ -283,10 +290,11 @@ static void gen_move_Q(DisasContext *dc, unsigned int rd, unsigned int rs)
- #define hypervisor(dc) 0
- #endif
- #else
--#define supervisor(dc) (dc->mem_idx >= MMU_KERNEL_IDX)
- #ifdef TARGET_SPARC64
--#define hypervisor(dc) (dc->mem_idx == MMU_HYPV_IDX)
-+#define hypervisor(dc) (dc->hypervisor)
-+#define supervisor(dc) (dc->supervisor | dc->hypervisor)
- #else
-+#define supervisor(dc) (dc->supervisor)
  #endif
  #endif
- 
-@@ -5710,9 +5718,15 @@ void gen_intermediate_code(CPUSPARCState * env, TranslationBlock * tb)
-     dc->fpu_enabled = tb_fpu_enabled(tb->flags);
-     dc->address_mask_32bit = tb_am_enabled(tb->flags);
-     dc->singlestep = (cs->singlestep_enabled || singlestep);
-+#ifndef CONFIG_USER_ONLY
-+    dc->supervisor = (tb->flags & TB_FLAG_SUPER) != 0;
-+#endif
- #ifdef TARGET_SPARC64
-     dc->fprs_dirty = 0;
-     dc->asi = (tb->flags >> TB_FLAG_ASI_SHIFT) & 0xff;
-+#ifndef CONFIG_USER_ONLY
-+    dc->hypervisor = (tb->flags & TB_FLAG_HYPER) != 0;
-+#endif
- #endif
- 
-     num_insns = 0;
 -- 
 1.8.3.1
