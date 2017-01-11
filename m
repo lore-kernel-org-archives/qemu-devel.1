@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40862)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40876)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cRMjN-00019q-B0
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 12:30:39 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cRMjO-0001As-Hj
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 12:30:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cRMjL-0006Ua-P7
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 12:30:37 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35538)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cRMjM-0006V7-T6
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 12:30:38 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50074)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1cRMjL-0006UT-7V
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 12:30:35 -0500
-Received: from int-mx11.intmail.prod.int.phx2.redhat.com
-	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
+	id 1cRMjM-0006Uf-Kz
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 12:30:36 -0500
+Received: from int-mx13.intmail.prod.int.phx2.redhat.com
+	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6798381236
-	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 17:30:35 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id C81BD5277D
+	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 17:30:36 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed, 11 Jan 2017 18:29:43 +0100
-Message-Id: <20170111172956.11255-28-marcandre.lureau@redhat.com>
+Date: Wed, 11 Jan 2017 18:29:44 +0100
+Message-Id: <20170111172956.11255-29-marcandre.lureau@redhat.com>
 In-Reply-To: <20170111172956.11255-1-marcandre.lureau@redhat.com>
 References: <20170111172956.11255-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 27/40] char: move QIOChannel-related in
- char-io.h
+Subject: [Qemu-devel] [PATCH 28/40] char: move fd chardev in its own file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,434 +38,386 @@ Cc: pbonzini@redhat.com, eblake@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?=
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- chardev/char-io.h     |  24 +++++++
- chardev/char-io.c     | 168 ++++++++++++++++++++++++++++++++++++++++++++=
-++++
- chardev/char.c        | 174 +-------------------------------------------=
+ chardev/char-fd.h     |  21 ++++++++
+ chardev/char-fd.c     | 147 ++++++++++++++++++++++++++++++++++++++++++++=
+++++++
+ chardev/char.c        | 147 +-------------------------------------------=
 ------
  chardev/Makefile.objs |   1 +
- 4 files changed, 194 insertions(+), 173 deletions(-)
- create mode 100644 chardev/char-io.h
- create mode 100644 chardev/char-io.c
+ 4 files changed, 171 insertions(+), 145 deletions(-)
+ create mode 100644 chardev/char-fd.h
+ create mode 100644 chardev/char-fd.c
 
-diff --git a/chardev/char-io.h b/chardev/char-io.h
+diff --git a/chardev/char-fd.h b/chardev/char-fd.h
 new file mode 100644
-index 0000000000..ea559fd124
+index 0000000000..beef7c111a
 --- /dev/null
-+++ b/chardev/char-io.h
-@@ -0,0 +1,24 @@
-+#ifndef CHAR_IO_H
-+#define CHAR_IO_H
++++ b/chardev/char-fd.h
+@@ -0,0 +1,21 @@
++#ifndef CHAR_FD_H
++#define CHAR_FD_H
 +
-+#include "qemu/osdep.h"
-+#include "qemu-common.h"
 +#include "io/channel.h"
 +#include "sysemu/char.h"
 +
-+/* Can only be used for read */
-+guint io_add_watch_poll(Chardev *chr,
-+                        QIOChannel *ioc,
-+                        IOCanReadHandler *fd_can_read,
-+                        QIOChannelFunc fd_read,
-+                        gpointer user_data,
-+                        GMainContext *context);
++typedef struct FDChardev {
++    Chardev parent;
++    Chardev *chr;
++    QIOChannel *ioc_in, *ioc_out;
++    int max_size;
++} FDChardev;
 +
-+void remove_fd_in_watch(Chardev *chr);
++#define TYPE_CHARDEV_FD "chardev-fd"
 +
-+int io_channel_send(QIOChannel *ioc, const void *buf, size_t len);
++#define FD_CHARDEV(obj) OBJECT_CHECK(FDChardev, (obj), TYPE_CHARDEV_FD)
 +
-+int io_channel_send_full(QIOChannel *ioc, const void *buf, size_t len,
-+                         int *fds, size_t nfds);
++void qemu_chr_open_fd(Chardev *chr, int fd_in, int fd_out);
++int qmp_chardev_open_file_source(char *src, int flags, Error **errp);
 +
-+#endif /* CHAR_IO_H */
-diff --git a/chardev/char-io.c b/chardev/char-io.c
++#endif /* CHAR_FD_H */
+diff --git a/chardev/char-fd.c b/chardev/char-fd.c
 new file mode 100644
-index 0000000000..82bc721d1a
+index 0000000000..0328c9335c
 --- /dev/null
-+++ b/chardev/char-io.c
-@@ -0,0 +1,168 @@
++++ b/chardev/char-fd.c
+@@ -0,0 +1,147 @@
++#include "qemu/osdep.h"
++#include "qemu/sockets.h"
++#include "qapi/error.h"
++#include "qemu-common.h"
++#include "sysemu/char.h"
++#include "io/channel-file.h"
++
++#include "char-fd.h"
 +#include "char-io.h"
 +
-+typedef struct IOWatchPoll {
-+    GSource parent;
-+
-+    QIOChannel *ioc;
-+    GSource *src;
-+
-+    IOCanReadHandler *fd_can_read;
-+    GSourceFunc fd_read;
-+    void *opaque;
-+    GMainContext *context;
-+} IOWatchPoll;
-+
-+static IOWatchPoll *io_watch_poll_from_source(GSource *source)
++/* Called with chr_write_lock held.  */
++static int fd_chr_write(Chardev *chr, const uint8_t *buf, int len)
 +{
-+    return container_of(source, IOWatchPoll, parent);
++    FDChardev *s =3D FD_CHARDEV(chr);
++
++    return io_channel_send(s->ioc_out, buf, len);
 +}
 +
-+static gboolean io_watch_poll_prepare(GSource *source,
-+                                      gint *timeout_)
++static gboolean fd_chr_read(QIOChannel *chan, GIOCondition cond, void *o=
+paque)
 +{
-+    IOWatchPoll *iwp =3D io_watch_poll_from_source(source);
-+    bool now_active =3D iwp->fd_can_read(iwp->opaque) > 0;
-+    bool was_active =3D iwp->src !=3D NULL;
-+    if (was_active =3D=3D now_active) {
++    Chardev *chr =3D CHARDEV(opaque);
++    FDChardev *s =3D FD_CHARDEV(opaque);
++    int len;
++    uint8_t buf[CHR_READ_BUF_LEN];
++    ssize_t ret;
++
++    len =3D sizeof(buf);
++    if (len > s->max_size) {
++        len =3D s->max_size;
++    }
++    if (len =3D=3D 0) {
++        return TRUE;
++    }
++
++    ret =3D qio_channel_read(
++        chan, (gchar *)buf, len, NULL);
++    if (ret =3D=3D 0) {
++        remove_fd_in_watch(chr);
++        qemu_chr_be_event(chr, CHR_EVENT_CLOSED);
 +        return FALSE;
 +    }
-+
-+    if (now_active) {
-+        iwp->src =3D qio_channel_create_watch(
-+            iwp->ioc, G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL);
-+        g_source_set_callback(iwp->src, iwp->fd_read, iwp->opaque, NULL)=
-;
-+        g_source_attach(iwp->src, iwp->context);
-+    } else {
-+        g_source_destroy(iwp->src);
-+        g_source_unref(iwp->src);
-+        iwp->src =3D NULL;
++    if (ret > 0) {
++        qemu_chr_be_write(chr, buf, ret);
 +    }
-+    return FALSE;
++
++    return TRUE;
 +}
 +
-+static gboolean io_watch_poll_check(GSource *source)
++static int fd_chr_read_poll(void *opaque)
 +{
-+    return FALSE;
++    Chardev *chr =3D CHARDEV(opaque);
++    FDChardev *s =3D FD_CHARDEV(opaque);
++
++    s->max_size =3D qemu_chr_be_can_write(chr);
++    return s->max_size;
 +}
 +
-+static gboolean io_watch_poll_dispatch(GSource *source, GSourceFunc call=
-back,
-+                                       gpointer user_data)
++static GSource *fd_chr_add_watch(Chardev *chr, GIOCondition cond)
 +{
-+    abort();
++    FDChardev *s =3D FD_CHARDEV(chr);
++    return qio_channel_create_watch(s->ioc_out, cond);
 +}
 +
-+static void io_watch_poll_finalize(GSource *source)
++static void fd_chr_update_read_handler(Chardev *chr,
++                                       GMainContext *context)
 +{
-+    /* Due to a glib bug, removing the last reference to a source
-+     * inside a finalize callback causes recursive locking (and a
-+     * deadlock).  This is not a problem inside other callbacks,
-+     * including dispatch callbacks, so we call io_remove_watch_poll
-+     * to remove this source.  At this point, iwp->src must
-+     * be NULL, or we would leak it.
-+     *
-+     * This would be solved much more elegantly by child sources,
-+     * but we support older glib versions that do not have them.
-+     */
-+    IOWatchPoll *iwp =3D io_watch_poll_from_source(source);
-+    assert(iwp->src =3D=3D NULL);
++    FDChardev *s =3D FD_CHARDEV(chr);
++
++    remove_fd_in_watch(chr);
++    if (s->ioc_in) {
++        chr->fd_in_tag =3D io_add_watch_poll(chr, s->ioc_in,
++                                           fd_chr_read_poll,
++                                           fd_chr_read, chr,
++                                           context);
++    }
 +}
 +
-+static GSourceFuncs io_watch_poll_funcs =3D {
-+    .prepare =3D io_watch_poll_prepare,
-+    .check =3D io_watch_poll_check,
-+    .dispatch =3D io_watch_poll_dispatch,
-+    .finalize =3D io_watch_poll_finalize,
-+};
-+
-+guint io_add_watch_poll(Chardev *chr,
-+                        QIOChannel *ioc,
-+                        IOCanReadHandler *fd_can_read,
-+                        QIOChannelFunc fd_read,
-+                        gpointer user_data,
-+                        GMainContext *context)
++static void char_fd_finalize(Object *obj)
 +{
-+    IOWatchPoll *iwp;
-+    int tag;
++    Chardev *chr =3D CHARDEV(obj);
++    FDChardev *s =3D FD_CHARDEV(obj);
++
++    remove_fd_in_watch(chr);
++    if (s->ioc_in) {
++        object_unref(OBJECT(s->ioc_in));
++    }
++    if (s->ioc_out) {
++        object_unref(OBJECT(s->ioc_out));
++    }
++
++    qemu_chr_be_event(chr, CHR_EVENT_CLOSED);
++}
++
++int qmp_chardev_open_file_source(char *src, int flags, Error **errp)
++{
++    int fd =3D -1;
++
++    TFR(fd =3D qemu_open(src, flags, 0666));
++    if (fd =3D=3D -1) {
++        error_setg_file_open(errp, errno, src);
++    }
++    return fd;
++}
++
++/* open a character device to a unix fd */
++void qemu_chr_open_fd(Chardev *chr,
++                      int fd_in, int fd_out)
++{
++    FDChardev *s =3D FD_CHARDEV(chr);
 +    char *name;
 +
-+    iwp =3D (IOWatchPoll *) g_source_new(&io_watch_poll_funcs,
-+                                       sizeof(IOWatchPoll));
-+    iwp->fd_can_read =3D fd_can_read;
-+    iwp->opaque =3D user_data;
-+    iwp->ioc =3D ioc;
-+    iwp->fd_read =3D (GSourceFunc) fd_read;
-+    iwp->src =3D NULL;
-+    iwp->context =3D context;
-+
-+    name =3D g_strdup_printf("chardev-iowatch-%s", chr->label);
-+    g_source_set_name((GSource *)iwp, name);
++    s->ioc_in =3D QIO_CHANNEL(qio_channel_file_new_fd(fd_in));
++    name =3D g_strdup_printf("chardev-file-in-%s", chr->label);
++    qio_channel_set_name(QIO_CHANNEL(s->ioc_in), name);
 +    g_free(name);
-+
-+    tag =3D g_source_attach(&iwp->parent, context);
-+    g_source_unref(&iwp->parent);
-+    return tag;
++    s->ioc_out =3D QIO_CHANNEL(qio_channel_file_new_fd(fd_out));
++    name =3D g_strdup_printf("chardev-file-out-%s", chr->label);
++    qio_channel_set_name(QIO_CHANNEL(s->ioc_out), name);
++    g_free(name);
++    qemu_set_nonblock(fd_out);
++    s->chr =3D chr;
 +}
 +
-+static void io_remove_watch_poll(guint tag)
++static void char_fd_class_init(ObjectClass *oc, void *data)
 +{
-+    GSource *source;
-+    IOWatchPoll *iwp;
++    ChardevClass *cc =3D CHARDEV_CLASS(oc);
 +
-+    g_return_if_fail(tag > 0);
-+
-+    source =3D g_main_context_find_source_by_id(NULL, tag);
-+    g_return_if_fail(source !=3D NULL);
-+
-+    iwp =3D io_watch_poll_from_source(source);
-+    if (iwp->src) {
-+        g_source_destroy(iwp->src);
-+        g_source_unref(iwp->src);
-+        iwp->src =3D NULL;
-+    }
-+    g_source_destroy(&iwp->parent);
++    cc->chr_add_watch =3D fd_chr_add_watch;
++    cc->chr_write =3D fd_chr_write;
++    cc->chr_update_read_handler =3D fd_chr_update_read_handler;
 +}
 +
-+void remove_fd_in_watch(Chardev *chr)
++static const TypeInfo char_fd_type_info =3D {
++    .name =3D TYPE_CHARDEV_FD,
++    .parent =3D TYPE_CHARDEV,
++    .instance_size =3D sizeof(FDChardev),
++    .instance_finalize =3D char_fd_finalize,
++    .class_init =3D char_fd_class_init,
++    .abstract =3D true,
++};
++
++static void register_types(void)
 +{
-+    if (chr->fd_in_tag) {
-+        io_remove_watch_poll(chr->fd_in_tag);
-+        chr->fd_in_tag =3D 0;
-+    }
++    type_register_static(&char_fd_type_info);
 +}
 +
-+int io_channel_send_full(QIOChannel *ioc,
-+                         const void *buf, size_t len,
-+                         int *fds, size_t nfds)
-+{
-+    size_t offset =3D 0;
-+
-+    while (offset < len) {
-+        ssize_t ret =3D 0;
-+        struct iovec iov =3D { .iov_base =3D (char *)buf + offset,
-+                             .iov_len =3D len - offset };
-+
-+        ret =3D qio_channel_writev_full(
-+            ioc, &iov, 1,
-+            fds, nfds, NULL);
-+        if (ret =3D=3D QIO_CHANNEL_ERR_BLOCK) {
-+            if (offset) {
-+                return offset;
-+            }
-+
-+            errno =3D EAGAIN;
-+            return -1;
-+        } else if (ret < 0) {
-+            errno =3D EINVAL;
-+            return -1;
-+        }
-+
-+        offset +=3D ret;
-+    }
-+
-+    return offset;
-+}
-+
-+int io_channel_send(QIOChannel *ioc, const void *buf, size_t len)
-+{
-+    return io_channel_send_full(ioc, buf, len, NULL, 0);
-+}
++type_init(register_types);
 diff --git a/chardev/char.c b/chardev/char.c
-index ea8903c0d7..c8448cf489 100644
+index c8448cf489..5391667f09 100644
 --- a/chardev/char.c
 +++ b/chardev/char.c
 @@ -86,6 +86,7 @@
  #include "ui/qemu-spice.h"
 =20
  #include "char-mux.h"
-+#include "char-io.h"
++#include "char-fd.h"
+ #include "char-io.h"
 =20
  #define TCP_MAX_FDS 16
-=20
-@@ -479,8 +480,6 @@ void qemu_chr_fe_printf(CharBackend *be, const char *=
-fmt, ...)
-     va_end(ap);
+@@ -716,136 +717,6 @@ void qemu_chr_fe_take_focus(CharBackend *b)
  }
 =20
--static void remove_fd_in_watch(Chardev *chr);
+ #ifndef _WIN32
+-typedef struct FDChardev {
+-    Chardev parent;
+-    Chardev *chr;
+-    QIOChannel *ioc_in, *ioc_out;
+-    int max_size;
+-} FDChardev;
 -
- static void qemu_char_open(Chardev *chr, ChardevBackend *backend,
-                            bool *be_opened, Error **errp)
- {
-@@ -716,178 +715,7 @@ void qemu_chr_fe_take_focus(CharBackend *b)
-     }
- }
-=20
--typedef struct IOWatchPoll
+-#define TYPE_CHARDEV_FD "chardev-fd"
+-#define FD_CHARDEV(obj) OBJECT_CHECK(FDChardev, (obj), TYPE_CHARDEV_FD)
+-
+-/* Called with chr_write_lock held.  */
+-static int fd_chr_write(Chardev *chr, const uint8_t *buf, int len)
 -{
--    GSource parent;
+-    FDChardev *s =3D FD_CHARDEV(chr);
 -
--    QIOChannel *ioc;
--    GSource *src;
--
--    IOCanReadHandler *fd_can_read;
--    GSourceFunc fd_read;
--    void *opaque;
--    GMainContext *context;
--} IOWatchPoll;
--
--static IOWatchPoll *io_watch_poll_from_source(GSource *source)
--{
--    return container_of(source, IOWatchPoll, parent);
+-    return io_channel_send(s->ioc_out, buf, len);
 -}
 -
--static gboolean io_watch_poll_prepare(GSource *source,
--                                      gint *timeout_)
+-static gboolean fd_chr_read(QIOChannel *chan, GIOCondition cond, void *o=
+paque)
 -{
--    IOWatchPoll *iwp =3D io_watch_poll_from_source(source);
--    bool now_active =3D iwp->fd_can_read(iwp->opaque) > 0;
--    bool was_active =3D iwp->src !=3D NULL;
--    if (was_active =3D=3D now_active) {
+-    Chardev *chr =3D CHARDEV(opaque);
+-    FDChardev *s =3D FD_CHARDEV(opaque);
+-    int len;
+-    uint8_t buf[CHR_READ_BUF_LEN];
+-    ssize_t ret;
+-
+-    len =3D sizeof(buf);
+-    if (len > s->max_size) {
+-        len =3D s->max_size;
+-    }
+-    if (len =3D=3D 0) {
+-        return TRUE;
+-    }
+-
+-    ret =3D qio_channel_read(
+-        chan, (gchar *)buf, len, NULL);
+-    if (ret =3D=3D 0) {
+-        remove_fd_in_watch(chr);
+-        qemu_chr_be_event(chr, CHR_EVENT_CLOSED);
 -        return FALSE;
 -    }
--
--    if (now_active) {
--        iwp->src =3D qio_channel_create_watch(
--            iwp->ioc, G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL);
--        g_source_set_callback(iwp->src, iwp->fd_read, iwp->opaque, NULL)=
-;
--        g_source_attach(iwp->src, iwp->context);
--    } else {
--        g_source_destroy(iwp->src);
--        g_source_unref(iwp->src);
--        iwp->src =3D NULL;
+-    if (ret > 0) {
+-        qemu_chr_be_write(chr, buf, ret);
 -    }
--    return FALSE;
+-
+-    return TRUE;
 -}
 -
--static gboolean io_watch_poll_check(GSource *source)
+-static int fd_chr_read_poll(void *opaque)
 -{
--    return FALSE;
+-    Chardev *chr =3D CHARDEV(opaque);
+-    FDChardev *s =3D FD_CHARDEV(opaque);
+-
+-    s->max_size =3D qemu_chr_be_can_write(chr);
+-    return s->max_size;
 -}
 -
--static gboolean io_watch_poll_dispatch(GSource *source, GSourceFunc call=
-back,
--                                       gpointer user_data)
+-static GSource *fd_chr_add_watch(Chardev *chr, GIOCondition cond)
 -{
--    abort();
+-    FDChardev *s =3D FD_CHARDEV(chr);
+-    return qio_channel_create_watch(s->ioc_out, cond);
 -}
 -
--static void io_watch_poll_finalize(GSource *source)
+-static void fd_chr_update_read_handler(Chardev *chr,
+-                                       GMainContext *context)
 -{
--    /* Due to a glib bug, removing the last reference to a source
--     * inside a finalize callback causes recursive locking (and a
--     * deadlock).  This is not a problem inside other callbacks,
--     * including dispatch callbacks, so we call io_remove_watch_poll
--     * to remove this source.  At this point, iwp->src must
--     * be NULL, or we would leak it.
--     *
--     * This would be solved much more elegantly by child sources,
--     * but we support older glib versions that do not have them.
--     */
--    IOWatchPoll *iwp =3D io_watch_poll_from_source(source);
--    assert(iwp->src =3D=3D NULL);
+-    FDChardev *s =3D FD_CHARDEV(chr);
+-
+-    remove_fd_in_watch(chr);
+-    if (s->ioc_in) {
+-        chr->fd_in_tag =3D io_add_watch_poll(chr, s->ioc_in,
+-                                           fd_chr_read_poll,
+-                                           fd_chr_read, chr,
+-                                           context);
+-    }
 -}
 -
--static GSourceFuncs io_watch_poll_funcs =3D {
--    .prepare =3D io_watch_poll_prepare,
--    .check =3D io_watch_poll_check,
--    .dispatch =3D io_watch_poll_dispatch,
--    .finalize =3D io_watch_poll_finalize,
--};
--
--/* Can only be used for read */
--static guint io_add_watch_poll(Chardev *chr,
--                               QIOChannel *ioc,
--                               IOCanReadHandler *fd_can_read,
--                               QIOChannelFunc fd_read,
--                               gpointer user_data,
--                               GMainContext *context)
+-static void char_fd_finalize(Object *obj)
 -{
--    IOWatchPoll *iwp;
--    int tag;
+-    Chardev *chr =3D CHARDEV(obj);
+-    FDChardev *s =3D FD_CHARDEV(obj);
+-
+-    remove_fd_in_watch(chr);
+-    if (s->ioc_in) {
+-        object_unref(OBJECT(s->ioc_in));
+-    }
+-    if (s->ioc_out) {
+-        object_unref(OBJECT(s->ioc_out));
+-    }
+-
+-    qemu_chr_be_event(chr, CHR_EVENT_CLOSED);
+-}
+-
+-/* open a character device to a unix fd */
+-static void qemu_chr_open_fd(Chardev *chr,
+-                             int fd_in, int fd_out)
+-{
+-    FDChardev *s =3D FD_CHARDEV(chr);
 -    char *name;
 -
--    iwp =3D (IOWatchPoll *) g_source_new(&io_watch_poll_funcs,
--                                       sizeof(IOWatchPoll));
--    iwp->fd_can_read =3D fd_can_read;
--    iwp->opaque =3D user_data;
--    iwp->ioc =3D ioc;
--    iwp->fd_read =3D (GSourceFunc) fd_read;
--    iwp->src =3D NULL;
--    iwp->context =3D context;
--
--    name =3D g_strdup_printf("chardev-iowatch-%s", chr->label);
--    g_source_set_name((GSource *)iwp, name);
+-    s->ioc_in =3D QIO_CHANNEL(qio_channel_file_new_fd(fd_in));
+-    name =3D g_strdup_printf("chardev-file-in-%s", chr->label);
+-    qio_channel_set_name(QIO_CHANNEL(s->ioc_in), name);
 -    g_free(name);
--
--    tag =3D g_source_attach(&iwp->parent, context);
--    g_source_unref(&iwp->parent);
--    return tag;
+-    s->ioc_out =3D QIO_CHANNEL(qio_channel_file_new_fd(fd_out));
+-    name =3D g_strdup_printf("chardev-file-out-%s", chr->label);
+-    qio_channel_set_name(QIO_CHANNEL(s->ioc_out), name);
+-    g_free(name);
+-    qemu_set_nonblock(fd_out);
+-    s->chr =3D chr;
 -}
 -
--static void io_remove_watch_poll(guint tag)
+-static void char_fd_class_init(ObjectClass *oc, void *data)
 -{
--    GSource *source;
--    IOWatchPoll *iwp;
+-    ChardevClass *cc =3D CHARDEV_CLASS(oc);
 -
--    g_return_if_fail (tag > 0);
+-    cc->chr_add_watch =3D fd_chr_add_watch;
+-    cc->chr_write =3D fd_chr_write;
+-    cc->chr_update_read_handler =3D fd_chr_update_read_handler;
+-}
 -
--    source =3D g_main_context_find_source_by_id(NULL, tag);
--    g_return_if_fail (source !=3D NULL);
+-static const TypeInfo char_fd_type_info =3D {
+-    .name =3D TYPE_CHARDEV_FD,
+-    .parent =3D TYPE_CHARDEV,
+-    .instance_size =3D sizeof(FDChardev),
+-    .instance_finalize =3D char_fd_finalize,
+-    .class_init =3D char_fd_class_init,
+-    .abstract =3D true,
+-};
 -
--    iwp =3D io_watch_poll_from_source(source);
--    if (iwp->src) {
--        g_source_destroy(iwp->src);
--        g_source_unref(iwp->src);
--        iwp->src =3D NULL;
+ static void qemu_chr_open_pipe(Chardev *chr,
+                                ChardevBackend *backend,
+                                bool *be_opened,
+@@ -3852,18 +3723,6 @@ static void qmp_chardev_open_serial(Chardev *chr,
+=20
+ #else /* WIN32 */
+=20
+-static int qmp_chardev_open_file_source(char *src, int flags,
+-                                        Error **errp)
+-{
+-    int fd =3D -1;
+-
+-    TFR(fd =3D qemu_open(src, flags, 0666));
+-    if (fd =3D=3D -1) {
+-        error_setg_file_open(errp, errno, src);
 -    }
--    g_source_destroy(&iwp->parent);
+-    return fd;
 -}
 -
--static void remove_fd_in_watch(Chardev *chr)
--{
--    if (chr->fd_in_tag) {
--        io_remove_watch_poll(chr->fd_in_tag);
--        chr->fd_in_tag =3D 0;
--    }
--}
--
--
--static int io_channel_send_full(QIOChannel *ioc,
--                                const void *buf, size_t len,
--                                int *fds, size_t nfds)
--{
--    size_t offset =3D 0;
--
--    while (offset < len) {
--        ssize_t ret =3D 0;
--        struct iovec iov =3D { .iov_base =3D (char *)buf + offset,
--                             .iov_len =3D len - offset };
--
--        ret =3D qio_channel_writev_full(
--            ioc, &iov, 1,
--            fds, nfds, NULL);
--        if (ret =3D=3D QIO_CHANNEL_ERR_BLOCK) {
--            if (offset) {
--                return offset;
--            }
--
--            errno =3D EAGAIN;
--            return -1;
--        } else if (ret < 0) {
--            errno =3D EINVAL;
--            return -1;
--        }
--
--        offset +=3D ret;
--    }
--
--    return offset;
--}
--
--
- #ifndef _WIN32
--static int io_channel_send(QIOChannel *ioc, const void *buf, size_t len)
--{
--    return io_channel_send_full(ioc, buf, len, NULL, 0);
--}
--
- typedef struct FDChardev {
-     Chardev parent;
-     Chardev *chr;
+ static void qmp_chardev_open_file(Chardev *chr,
+                                   ChardevBackend *backend,
+                                   bool *be_opened,
+@@ -4319,9 +4178,7 @@ void qemu_chr_cleanup(void)
+ static void register_types(void)
+ {
+     type_register_static(&char_type_info);
+-#ifndef _WIN32
+-    type_register_static(&char_fd_type_info);
+-#else
++#ifdef _WIN32
+     type_register_static(&char_win_type_info);
+     type_register_static(&char_win_stdio_type_info);
+ #endif
 diff --git a/chardev/Makefile.objs b/chardev/Makefile.objs
-index d4ffb8d70e..5f5d3716ac 100644
+index 5f5d3716ac..d2f03dc5df 100644
 --- a/chardev/Makefile.objs
 +++ b/chardev/Makefile.objs
 @@ -1,4 +1,5 @@
  chardev-obj-y +=3D char.o
-+chardev-obj-y +=3D char-io.o
++chardev-obj-$(CONFIG_POSIX) +=3D char-fd.o
+ chardev-obj-y +=3D char-io.o
  chardev-obj-y +=3D char-mux.o
  chardev-obj-y +=3D char-null.o
- chardev-obj-y +=3D char-ringbuf.o
 --=20
 2.11.0
