@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45619)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45680)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cROgq-0003YU-TN
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:36:12 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cROgw-0003ee-UO
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:36:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cROgp-0003Yt-7b
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:36:08 -0500
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:34870)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cROgw-0003jv-5m
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:36:14 -0500
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:34626)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1cROgo-0003Xq-VQ
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:36:07 -0500
-Received: by mail-wm0-x244.google.com with SMTP id l2so326720wml.2
-	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 11:36:06 -0800 (PST)
+	id 1cROgw-0003jJ-0a
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:36:14 -0500
+Received: by mail-wm0-x241.google.com with SMTP id c85so337243wmi.1
+	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 11:36:13 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 11 Jan 2017 20:35:23 +0100
-Message-Id: <1484163327-111841-30-git-send-email-pbonzini@redhat.com>
+Date: Wed, 11 Jan 2017 20:35:27 +0100
+Message-Id: <1484163327-111841-34-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1484163327-111841-1-git-send-email-pbonzini@redhat.com>
 References: <1484163327-111841-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 29/33] kvm: move cpu synchronization code
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 33/33] Revert "win32: don't run subprocess tests
+ on Mingw32 platform"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,357 +32,34 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Vincent Palatin <vpalatin@chromium.org>, Stefan Weil <sw@weilnetz.de>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-From: Vincent Palatin <vpalatin@chromium.org>
+From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-Move the generic cpu_synchronize_ functions to the common hw_accel.h header,
-in order to prepare for the addition of a second hardware accelerator.
+This reverts commit 7ad9339e372fcd12d584684d7f52ac259604a4f4.
 
-Signed-off-by: Stefan Weil <sw@weilnetz.de>
-Signed-off-by: Vincent Palatin <vpalatin@chromium.org>
-Message-Id: <f5c3cffe8d520011df1c2e5437bb814989b48332.1484045952.git.vpalatin@chromium.org>
+The error "Failed to execute helper program (No such file or directory)"
+is due to broken glib installation, missing windows gspawn helpers.
+
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Message-Id: <20170104205722.26492-1-marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- cpus.c                      |  1 +
- gdbstub.c                   |  1 +
- hw/i386/kvm/apic.c          |  1 +
- hw/i386/kvmvapic.c          |  1 +
- hw/misc/vmport.c            |  2 +-
- hw/ppc/pnv_xscom.c          |  2 +-
- hw/ppc/ppce500_spin.c       |  4 ++--
- hw/ppc/spapr.c              |  2 +-
- hw/ppc/spapr_hcall.c        |  2 +-
- hw/s390x/s390-pci-inst.c    |  1 +
- include/sysemu/hw_accel.h   | 39 +++++++++++++++++++++++++++++++++++++++
- include/sysemu/kvm.h        | 23 -----------------------
- monitor.c                   |  2 +-
- qom/cpu.c                   |  2 +-
- target/arm/cpu.c            |  2 +-
- target/i386/helper.c        |  1 +
- target/i386/kvm.c           |  1 +
- target/ppc/mmu-hash64.c     |  2 +-
- target/ppc/translate_init.c |  2 +-
- target/s390x/gdbstub.c      |  1 +
- 20 files changed, 58 insertions(+), 34 deletions(-)
- create mode 100644 include/sysemu/hw_accel.h
+ configure | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/cpus.c b/cpus.c
-index 5213351..fc78502 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -33,6 +33,7 @@
- #include "sysemu/block-backend.h"
- #include "exec/gdbstub.h"
- #include "sysemu/dma.h"
-+#include "sysemu/hw_accel.h"
- #include "sysemu/kvm.h"
- #include "qmp-commands.h"
- #include "exec/exec-all.h"
-diff --git a/gdbstub.c b/gdbstub.c
-index de62d26..de9b62b 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -32,6 +32,7 @@
- #define MAX_PACKET_LENGTH 4096
+diff --git a/configure b/configure
+index 091ae05..1f2ee71 100755
+--- a/configure
++++ b/configure
+@@ -3079,7 +3079,7 @@ fi
  
- #include "qemu/sockets.h"
-+#include "sysemu/hw_accel.h"
- #include "sysemu/kvm.h"
- #include "exec/semihost.h"
- #include "exec/exec-all.h"
-diff --git a/hw/i386/kvm/apic.c b/hw/i386/kvm/apic.c
-index df5180b..1df6d26 100644
---- a/hw/i386/kvm/apic.c
-+++ b/hw/i386/kvm/apic.c
-@@ -14,6 +14,7 @@
- #include "cpu.h"
- #include "hw/i386/apic_internal.h"
- #include "hw/pci/msi.h"
-+#include "sysemu/hw_accel.h"
- #include "sysemu/kvm.h"
- #include "target/i386/kvm_i386.h"
+ # g_test_trap_subprocess added in 2.38. Used by some tests.
+ glib_subprocess=yes
+-if test "$mingw32" = "yes" || ! $pkg_config --atleast-version=2.38 glib-2.0; then
++if ! $pkg_config --atleast-version=2.38 glib-2.0; then
+     glib_subprocess=no
+ fi
  
-diff --git a/hw/i386/kvmvapic.c b/hw/i386/kvmvapic.c
-index b30d1b9..2f767b6 100644
---- a/hw/i386/kvmvapic.c
-+++ b/hw/i386/kvmvapic.c
-@@ -14,6 +14,7 @@
- #include "exec/exec-all.h"
- #include "sysemu/sysemu.h"
- #include "sysemu/cpus.h"
-+#include "sysemu/hw_accel.h"
- #include "sysemu/kvm.h"
- #include "hw/i386/apic_internal.h"
- #include "hw/sysbus.h"
-diff --git a/hw/misc/vmport.c b/hw/misc/vmport.c
-index c763811..be40930 100644
---- a/hw/misc/vmport.c
-+++ b/hw/misc/vmport.c
-@@ -25,7 +25,7 @@
- #include "hw/hw.h"
- #include "hw/isa/isa.h"
- #include "hw/i386/pc.h"
--#include "sysemu/kvm.h"
-+#include "sysemu/hw_accel.h"
- #include "hw/qdev.h"
- 
- //#define VMPORT_DEBUG
-diff --git a/hw/ppc/pnv_xscom.c b/hw/ppc/pnv_xscom.c
-index b82af4f..38bc85f 100644
---- a/hw/ppc/pnv_xscom.c
-+++ b/hw/ppc/pnv_xscom.c
-@@ -20,7 +20,7 @@
- #include "qapi/error.h"
- #include "hw/hw.h"
- #include "qemu/log.h"
--#include "sysemu/kvm.h"
-+#include "sysemu/hw_accel.h"
- #include "target/ppc/cpu.h"
- #include "hw/sysbus.h"
- 
-diff --git a/hw/ppc/ppce500_spin.c b/hw/ppc/ppce500_spin.c
-index cf958a9..eb219ab 100644
---- a/hw/ppc/ppce500_spin.c
-+++ b/hw/ppc/ppce500_spin.c
-@@ -29,9 +29,9 @@
- 
- #include "qemu/osdep.h"
- #include "hw/hw.h"
--#include "sysemu/sysemu.h"
- #include "hw/sysbus.h"
--#include "sysemu/kvm.h"
-+#include "sysemu/hw_accel.h"
-+#include "sysemu/sysemu.h"
- #include "e500.h"
- 
- #define MAX_CPUS 32
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 208ef7b..a642e66 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -36,7 +36,7 @@
- #include "sysemu/device_tree.h"
- #include "sysemu/block-backend.h"
- #include "sysemu/cpus.h"
--#include "sysemu/kvm.h"
-+#include "sysemu/hw_accel.h"
- #include "kvm_ppc.h"
- #include "migration/migration.h"
- #include "mmu-hash64.h"
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index 9a9bedf..b2a8e48 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -1,5 +1,6 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
-+#include "sysemu/hw_accel.h"
- #include "sysemu/sysemu.h"
- #include "qemu/log.h"
- #include "cpu.h"
-@@ -9,7 +10,6 @@
- #include "mmu-hash64.h"
- #include "cpu-models.h"
- #include "trace.h"
--#include "sysemu/kvm.h"
- #include "kvm_ppc.h"
- #include "hw/ppc/spapr_ovec.h"
- 
-diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
-index 0864d9b..4d0775c 100644
---- a/hw/s390x/s390-pci-inst.c
-+++ b/hw/s390x/s390-pci-inst.c
-@@ -18,6 +18,7 @@
- #include "s390-pci-bus.h"
- #include "exec/memory-internal.h"
- #include "qemu/error-report.h"
-+#include "sysemu/hw_accel.h"
- 
- /* #define DEBUG_S390PCI_INST */
- #ifdef DEBUG_S390PCI_INST
-diff --git a/include/sysemu/hw_accel.h b/include/sysemu/hw_accel.h
-new file mode 100644
-index 0000000..03812cf
---- /dev/null
-+++ b/include/sysemu/hw_accel.h
-@@ -0,0 +1,39 @@
-+/*
-+ * QEMU Hardware accelertors support
-+ *
-+ * Copyright 2016 Google, Inc.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#ifndef QEMU_HW_ACCEL_H
-+#define QEMU_HW_ACCEL_H
-+
-+#include "qom/cpu.h"
-+#include "sysemu/hax.h"
-+#include "sysemu/kvm.h"
-+
-+static inline void cpu_synchronize_state(CPUState *cpu)
-+{
-+    if (kvm_enabled()) {
-+        kvm_cpu_synchronize_state(cpu);
-+    }
-+}
-+
-+static inline void cpu_synchronize_post_reset(CPUState *cpu)
-+{
-+    if (kvm_enabled()) {
-+        kvm_cpu_synchronize_post_reset(cpu);
-+    }
-+}
-+
-+static inline void cpu_synchronize_post_init(CPUState *cpu)
-+{
-+    if (kvm_enabled()) {
-+        kvm_cpu_synchronize_post_init(cpu);
-+    }
-+}
-+
-+#endif /* QEMU_HW_ACCEL_H */
-diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-index df67cc0..3045ee7 100644
---- a/include/sysemu/kvm.h
-+++ b/include/sysemu/kvm.h
-@@ -461,29 +461,6 @@ void kvm_cpu_synchronize_state(CPUState *cpu);
- void kvm_cpu_synchronize_post_reset(CPUState *cpu);
- void kvm_cpu_synchronize_post_init(CPUState *cpu);
- 
--/* generic hooks - to be moved/refactored once there are more users */
--
--static inline void cpu_synchronize_state(CPUState *cpu)
--{
--    if (kvm_enabled()) {
--        kvm_cpu_synchronize_state(cpu);
--    }
--}
--
--static inline void cpu_synchronize_post_reset(CPUState *cpu)
--{
--    if (kvm_enabled()) {
--        kvm_cpu_synchronize_post_reset(cpu);
--    }
--}
--
--static inline void cpu_synchronize_post_init(CPUState *cpu)
--{
--    if (kvm_enabled()) {
--        kvm_cpu_synchronize_post_init(cpu);
--    }
--}
--
- /**
-  * kvm_irqchip_add_msi_route - Add MSI route for specific vector
-  * @s:      KVM state
-diff --git a/monitor.c b/monitor.c
-index 0841d43..d38956f 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -50,7 +50,7 @@
- #include "sysemu/balloon.h"
- #include "qemu/timer.h"
- #include "migration/migration.h"
--#include "sysemu/kvm.h"
-+#include "sysemu/hw_accel.h"
- #include "qemu/acl.h"
- #include "sysemu/tpm.h"
- #include "qapi/qmp/qerror.h"
-diff --git a/qom/cpu.c b/qom/cpu.c
-index 03d9190..2c5274f 100644
---- a/qom/cpu.c
-+++ b/qom/cpu.c
-@@ -22,7 +22,7 @@
- #include "qapi/error.h"
- #include "qemu-common.h"
- #include "qom/cpu.h"
--#include "sysemu/kvm.h"
-+#include "sysemu/hw_accel.h"
- #include "qemu/notify.h"
- #include "qemu/log.h"
- #include "exec/log.h"
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index f5cb30a..f7f20d3 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -31,7 +31,7 @@
- #endif
- #include "hw/arm/arm.h"
- #include "sysemu/sysemu.h"
--#include "sysemu/kvm.h"
-+#include "sysemu/hw_accel.h"
- #include "kvm_arm.h"
- 
- static void arm_cpu_set_pc(CPUState *cs, vaddr value)
-diff --git a/target/i386/helper.c b/target/i386/helper.c
-index 43e87dd..19b2656 100644
---- a/target/i386/helper.c
-+++ b/target/i386/helper.c
-@@ -24,6 +24,7 @@
- #include "kvm_i386.h"
- #ifndef CONFIG_USER_ONLY
- #include "sysemu/sysemu.h"
-+#include "sysemu/hw_accel.h"
- #include "monitor/monitor.h"
- #include "hw/i386/apic_internal.h"
- #endif
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 10a9cd8..e6c4f75 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -23,6 +23,7 @@
- #include "qemu-common.h"
- #include "cpu.h"
- #include "sysemu/sysemu.h"
-+#include "sysemu/hw_accel.h"
- #include "sysemu/kvm_int.h"
- #include "kvm_i386.h"
- #include "hyperv.h"
-diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
-index fdb7a78..0efc8c6 100644
---- a/target/ppc/mmu-hash64.c
-+++ b/target/ppc/mmu-hash64.c
-@@ -23,7 +23,7 @@
- #include "exec/exec-all.h"
- #include "exec/helper-proto.h"
- #include "qemu/error-report.h"
--#include "sysemu/kvm.h"
-+#include "sysemu/hw_accel.h"
- #include "kvm_ppc.h"
- #include "mmu-hash64.h"
- #include "exec/log.h"
-diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-index 626e031..98b8760 100644
---- a/target/ppc/translate_init.c
-+++ b/target/ppc/translate_init.c
-@@ -21,10 +21,10 @@
- #include "qemu/osdep.h"
- #include "disas/bfd.h"
- #include "exec/gdbstub.h"
--#include "sysemu/kvm.h"
- #include "kvm_ppc.h"
- #include "sysemu/arch_init.h"
- #include "sysemu/cpus.h"
-+#include "sysemu/hw_accel.h"
- #include "cpu-models.h"
- #include "mmu-hash32.h"
- #include "mmu-hash64.h"
-diff --git a/target/s390x/gdbstub.c b/target/s390x/gdbstub.c
-index 3d223de..3c652fb 100644
---- a/target/s390x/gdbstub.c
-+++ b/target/s390x/gdbstub.c
-@@ -23,6 +23,7 @@
- #include "exec/exec-all.h"
- #include "exec/gdbstub.h"
- #include "qemu/bitops.h"
-+#include "sysemu/hw_accel.h"
- 
- int s390_cpu_gdb_read_register(CPUState *cs, uint8_t *mem_buf, int n)
- {
 -- 
 1.8.3.1
