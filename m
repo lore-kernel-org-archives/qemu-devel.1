@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42507)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42505)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cRMnq-0005ED-Bc
+	(envelope-from <lersek@redhat.com>) id 1cRMnq-0005Dw-3T
 	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 12:35:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cRMnp-0007pr-8d
+	(envelope-from <lersek@redhat.com>) id 1cRMnn-0007nf-Uv
 	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 12:35:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53602)
+Received: from mx1.redhat.com ([209.132.183.28]:52690)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cRMnp-0007oD-0s
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 12:35:13 -0500
-Received: from int-mx13.intmail.prod.int.phx2.redhat.com
-	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3A10261BA8
-	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 17:35:13 +0000 (UTC)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cRMnn-0007n6-MJ
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 12:35:11 -0500
 From: Laszlo Ersek <lersek@redhat.com>
-Date: Wed, 11 Jan 2017 18:34:56 +0100
-Message-Id: <20170111173457.30455-4-lersek@redhat.com>
+Date: Wed, 11 Jan 2017 18:34:55 +0100
+Message-Id: <20170111173457.30455-3-lersek@redhat.com>
 In-Reply-To: <20170111173457.30455-1-lersek@redhat.com>
 References: <20170111173457.30455-1-lersek@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 wave 1 3/4] pc: Add 2.9 machine-types
+Subject: [Qemu-devel] [PATCH v5 wave 1 2/4] fw-cfg: turn FW_CFG_FILE_SLOTS
+ into a device property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,117 +25,270 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu devel list <qemu-devel@nongnu.org>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+Cc: "Gabriel L. Somlo" <somlo@cmu.edu>, "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-From: Eduardo Habkost <ehabkost@redhat.com>
+We'd like to raise the value of FW_CFG_FILE_SLOTS. Doing it naively could
+lead to problems with backward migration: a more recent QEMU (running an
+older machine type) would allow the guest, in fw_cfg_select(), to select a
+high key value that is unavailable in the same machine type implemented by
+the older (target) QEMU. On the target host, fw_cfg_data_read() for
+example could dereference nonexistent entries.
 
+As first step, size the FWCfgState.entries[*] and FWCfgState.entry_order
+arrays dynamically. All three array sizes will be influenced by the new
+field (and device property) FWCfgState.file_slots.
+
+Make the following changes:
+
+- Replace the FW_CFG_FILE_SLOTS macro with FW_CFG_FILE_SLOTS_MIN (minimum
+  count of fw_cfg file slots) in the header file. The value remains 0x10.
+
+- Replace all uses of FW_CFG_FILE_SLOTS with a helper function called
+  fw_cfg_file_slots(), returning the new property.
+
+- Eliminate the macro FW_CFG_MAX_ENTRY, and replace all its uses with a
+  helper function called fw_cfg_max_entry().
+
+- In the MMIO- and IO-mapped realize functions both, allocate all three
+  arrays dynamically, based on the new property.
+
+- The new property defaults to FW_CFG_FILE_SLOTS_MIN. This is going to be
+  customized in the following patches.
+
+Cc: "Gabriel L. Somlo" <somlo@cmu.edu>
 Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Laszlo Ersek <lersek@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 Cc: Igor Mammedov <imammedo@redhat.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Laszlo Ersek <lersek@redhat.com>
 ---
 
 Notes:
     v5:
-    - Include this patch from
-      <http://lists.nongnu.org/archive/html/qemu-devel/2017-01/msg01020.html>
-      verbatim, as a dependency, with the R-b tags already posted, replacing
-      v4's "hw/i386/pc: introduce 2.9 machine types with 0x20 fw_cfg file
-      slots".
+    - change the type of "FWCfgState.file_slots" to "uint16_t" [Igor]
+    
+    - same for the retval of the trivial wrapper function
+      fw_cfg_file_slots(), and for the corresponding "file_slots" device
+      properties
+    
+    - preserve the fw_cfg_file_slots() wrapper func (Igor was okay with it
+      in the end)
+    
+    - rename FW_CFG_FILE_SLOTS_TRAD to FW_CFG_FILE_SLOTS_MIN
+    
+    - Remove explicit qdev_prop_set_uint32() calls from fw_cfg_init_io_dma()
+      and fw_cfg_init_mem_wide(), but set the property default to
+      FW_CFG_FILE_SLOTS_MIN (0x10). This is the main change relative to v4;
+      the idea is that per-board opt-in shouldn't be necessary for an
+      increased file_slots count *in addition to* selecting a 2.9 machine
+      type. [Igor]
+    
+    - delay the now-unused FW_CFG_FILE_SLOTS_DFLT macro to a later patch
+    
+    v4:
+    - I know that upstream doesn't care about backward migration, but some
+      downstreams might.
 
- include/hw/i386/pc.h |  2 ++
- hw/i386/pc_piix.c    | 15 ++++++++++++---
- hw/i386/pc_q35.c     | 13 +++++++++++--
- 3 files changed, 25 insertions(+), 5 deletions(-)
+ docs/specs/fw_cfg.txt          |  2 +-
+ include/hw/nvram/fw_cfg_keys.h |  3 +-
+ hw/nvram/fw_cfg.c              | 71 +++++++++++++++++++++++++++++++++++++-----
+ 3 files changed, 65 insertions(+), 11 deletions(-)
 
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index b22e699c46cd..230e9e70c504 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -375,6 +375,8 @@ int e820_get_num_entries(void);
- bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
+diff --git a/docs/specs/fw_cfg.txt b/docs/specs/fw_cfg.txt
+index a19e2adbe1c6..9373bbc64743 100644
+--- a/docs/specs/fw_cfg.txt
++++ b/docs/specs/fw_cfg.txt
+@@ -156,7 +156,7 @@ Selector Reg.    Range Usage
+ 0xc000 - 0xffff  Arch. Specific (0x0000 - 0x3fff, RW, ignored in v2.4+)
  
- #define PC_COMPAT_2_8 \
-+    HW_COMPAT_2_8 \
-+
+ In practice, the number of allowed firmware configuration items is given
+-by the value of FW_CFG_MAX_ENTRY (see fw_cfg.h).
++by the value (FW_CFG_FILE_FIRST + FW_CFG_FILE_SLOTS_MIN) (see fw_cfg.h).
  
- #define PC_COMPAT_2_7 \
-     HW_COMPAT_2_7 \
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 5e1adbe53c94..9f102aa38875 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -437,13 +437,24 @@ static void pc_i440fx_machine_options(MachineClass *m)
-     m->default_display = "std";
+ = Guest-side DMA Interface =
+ 
+diff --git a/include/hw/nvram/fw_cfg_keys.h b/include/hw/nvram/fw_cfg_keys.h
+index 0f3e871884c0..b6919451f5bd 100644
+--- a/include/hw/nvram/fw_cfg_keys.h
++++ b/include/hw/nvram/fw_cfg_keys.h
+@@ -29,8 +29,7 @@
+ #define FW_CFG_FILE_DIR         0x19
+ 
+ #define FW_CFG_FILE_FIRST       0x20
+-#define FW_CFG_FILE_SLOTS       0x10
+-#define FW_CFG_MAX_ENTRY        (FW_CFG_FILE_FIRST + FW_CFG_FILE_SLOTS)
++#define FW_CFG_FILE_SLOTS_MIN   0x10
+ 
+ #define FW_CFG_WRITE_CHANNEL    0x4000
+ #define FW_CFG_ARCH_LOCAL       0x8000
+diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+index e0145c11a19b..313d943ebd27 100644
+--- a/hw/nvram/fw_cfg.c
++++ b/hw/nvram/fw_cfg.c
+@@ -33,6 +33,7 @@
+ #include "qemu/error-report.h"
+ #include "qemu/config-file.h"
+ #include "qemu/cutils.h"
++#include "qapi/error.h"
+ 
+ #define FW_CFG_NAME "fw_cfg"
+ #define FW_CFG_PATH "/machine/" FW_CFG_NAME
+@@ -71,8 +72,9 @@ struct FWCfgState {
+     SysBusDevice parent_obj;
+     /*< public >*/
+ 
+-    FWCfgEntry entries[2][FW_CFG_MAX_ENTRY];
+-    int entry_order[FW_CFG_MAX_ENTRY];
++    uint16_t file_slots;
++    FWCfgEntry *entries[2];
++    int *entry_order;
+     FWCfgFiles *files;
+     uint16_t cur_entry;
+     uint32_t cur_offset;
+@@ -257,13 +259,24 @@ static void fw_cfg_write(FWCfgState *s, uint8_t value)
+     /* nothing, write support removed in QEMU v2.4+ */
  }
  
--static void pc_i440fx_2_8_machine_options(MachineClass *m)
-+static void pc_i440fx_2_9_machine_options(MachineClass *m)
- {
-     pc_i440fx_machine_options(m);
-     m->alias = "pc";
-     m->is_default = 1;
- }
- 
-+DEFINE_I440FX_MACHINE(v2_9, "pc-i440fx-2.9", NULL,
-+                      pc_i440fx_2_9_machine_options);
-+
-+static void pc_i440fx_2_8_machine_options(MachineClass *m)
++static inline uint16_t fw_cfg_file_slots(const FWCfgState *s)
 +{
-+    pc_i440fx_2_9_machine_options(m);
-+    m->is_default = 0;
-+    m->alias = NULL;
-+    SET_MACHINE_COMPAT(m, PC_COMPAT_2_8);
++    return s->file_slots;
 +}
 +
- DEFINE_I440FX_MACHINE(v2_8, "pc-i440fx-2.8", NULL,
-                       pc_i440fx_2_8_machine_options);
- 
-@@ -451,8 +462,6 @@ DEFINE_I440FX_MACHINE(v2_8, "pc-i440fx-2.8", NULL,
- static void pc_i440fx_2_7_machine_options(MachineClass *m)
- {
-     pc_i440fx_2_8_machine_options(m);
--    m->is_default = 0;
--    m->alias = NULL;
-     SET_MACHINE_COMPAT(m, PC_COMPAT_2_7);
- }
- 
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index d042fe0843c6..dd792a8547b3 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -301,19 +301,28 @@ static void pc_q35_machine_options(MachineClass *m)
-     m->max_cpus = 288;
- }
- 
--static void pc_q35_2_8_machine_options(MachineClass *m)
-+static void pc_q35_2_9_machine_options(MachineClass *m)
- {
-     pc_q35_machine_options(m);
-     m->alias = "q35";
- }
- 
-+DEFINE_Q35_MACHINE(v2_9, "pc-q35-2.9", NULL,
-+                   pc_q35_2_9_machine_options);
-+
-+static void pc_q35_2_8_machine_options(MachineClass *m)
++/* Note: this function returns an exclusive limit. */
++static inline uint32_t fw_cfg_max_entry(const FWCfgState *s)
 +{
-+    pc_q35_2_9_machine_options(m);
-+    m->alias = NULL;
-+    SET_MACHINE_COMPAT(m, PC_COMPAT_2_8);
++    return FW_CFG_FILE_FIRST + fw_cfg_file_slots(s);
 +}
 +
- DEFINE_Q35_MACHINE(v2_8, "pc-q35-2.8", NULL,
-                    pc_q35_2_8_machine_options);
- 
- static void pc_q35_2_7_machine_options(MachineClass *m)
+ static int fw_cfg_select(FWCfgState *s, uint16_t key)
  {
-     pc_q35_2_8_machine_options(m);
--    m->alias = NULL;
-     m->max_cpus = 255;
-     SET_MACHINE_COMPAT(m, PC_COMPAT_2_7);
- }
+     int arch, ret;
+     FWCfgEntry *e;
+ 
+     s->cur_offset = 0;
+-    if ((key & FW_CFG_ENTRY_MASK) >= FW_CFG_MAX_ENTRY) {
++    if ((key & FW_CFG_ENTRY_MASK) >= fw_cfg_max_entry(s)) {
+         s->cur_entry = FW_CFG_INVALID;
+         ret = 0;
+     } else {
+@@ -610,7 +623,7 @@ static void fw_cfg_add_bytes_read_callback(FWCfgState *s, uint16_t key,
+ 
+     key &= FW_CFG_ENTRY_MASK;
+ 
+-    assert(key < FW_CFG_MAX_ENTRY && len < UINT32_MAX);
++    assert(key < fw_cfg_max_entry(s) && len < UINT32_MAX);
+     assert(s->entries[arch][key].data == NULL); /* avoid key conflict */
+ 
+     s->entries[arch][key].data = data;
+@@ -628,7 +641,7 @@ static void *fw_cfg_modify_bytes_read(FWCfgState *s, uint16_t key,
+ 
+     key &= FW_CFG_ENTRY_MASK;
+ 
+-    assert(key < FW_CFG_MAX_ENTRY && len < UINT32_MAX);
++    assert(key < fw_cfg_max_entry(s) && len < UINT32_MAX);
+ 
+     /* return the old data to the function caller, avoid memory leak */
+     ptr = s->entries[arch][key].data;
+@@ -777,13 +790,13 @@ void fw_cfg_add_file_callback(FWCfgState *s,  const char *filename,
+     int order = 0;
+ 
+     if (!s->files) {
+-        dsize = sizeof(uint32_t) + sizeof(FWCfgFile) * FW_CFG_FILE_SLOTS;
++        dsize = sizeof(uint32_t) + sizeof(FWCfgFile) * fw_cfg_file_slots(s);
+         s->files = g_malloc0(dsize);
+         fw_cfg_add_bytes(s, FW_CFG_FILE_DIR, s->files, dsize);
+     }
+ 
+     count = be32_to_cpu(s->files->count);
+-    assert(count < FW_CFG_FILE_SLOTS);
++    assert(count < fw_cfg_file_slots(s));
+ 
+     /* Find the insertion point. */
+     if (mc->legacy_fw_cfg_order) {
+@@ -857,7 +870,7 @@ void *fw_cfg_modify_file(FWCfgState *s, const char *filename,
+     assert(s->files);
+ 
+     index = be32_to_cpu(s->files->count);
+-    assert(index < FW_CFG_FILE_SLOTS);
++    assert(index < fw_cfg_file_slots(s));
+ 
+     for (i = 0; i < index; i++) {
+         if (strcmp(filename, s->files->f[i].name) == 0) {
+@@ -1014,12 +1027,38 @@ static const TypeInfo fw_cfg_info = {
+     .class_init    = fw_cfg_class_init,
+ };
+ 
++static void fw_cfg_file_slots_allocate(FWCfgState *s, Error **errp)
++{
++    uint16_t file_slots_max;
++
++    if (fw_cfg_file_slots(s) < FW_CFG_FILE_SLOTS_MIN) {
++        error_setg(errp, "\"file_slots\" must be at least 0x%x",
++                   FW_CFG_FILE_SLOTS_MIN);
++        return;
++    }
++
++    /* (UINT16_MAX & FW_CFG_ENTRY_MASK) is the highest inclusive selector value
++     * that we permit. The actual (exclusive) value coming from the
++     * configuration is (FW_CFG_FILE_FIRST + fw_cfg_file_slots(s)). */
++    file_slots_max = (UINT16_MAX & FW_CFG_ENTRY_MASK) - FW_CFG_FILE_FIRST + 1;
++    if (fw_cfg_file_slots(s) > file_slots_max) {
++        error_setg(errp, "\"file_slots\" must not exceed 0x%" PRIx16,
++                   file_slots_max);
++        return;
++    }
++
++    s->entries[0] = g_new0(FWCfgEntry, fw_cfg_max_entry(s));
++    s->entries[1] = g_new0(FWCfgEntry, fw_cfg_max_entry(s));
++    s->entry_order = g_new0(int, fw_cfg_max_entry(s));
++}
+ 
+ static Property fw_cfg_io_properties[] = {
+     DEFINE_PROP_UINT32("iobase", FWCfgIoState, iobase, -1),
+     DEFINE_PROP_UINT32("dma_iobase", FWCfgIoState, dma_iobase, -1),
+     DEFINE_PROP_BOOL("dma_enabled", FWCfgIoState, parent_obj.dma_enabled,
+                      true),
++    DEFINE_PROP_UINT16("file_slots", FWCfgIoState, parent_obj.file_slots,
++                       FW_CFG_FILE_SLOTS_MIN),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
+@@ -1027,6 +1066,13 @@ static void fw_cfg_io_realize(DeviceState *dev, Error **errp)
+ {
+     FWCfgIoState *s = FW_CFG_IO(dev);
+     SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
++    Error *local_err = NULL;
++
++    fw_cfg_file_slots_allocate(FW_CFG(s), &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
++    }
+ 
+     /* when using port i/o, the 8-bit data register ALWAYS overlaps
+      * with half of the 16-bit control register. Hence, the total size
+@@ -1063,6 +1109,8 @@ static Property fw_cfg_mem_properties[] = {
+     DEFINE_PROP_UINT32("data_width", FWCfgMemState, data_width, -1),
+     DEFINE_PROP_BOOL("dma_enabled", FWCfgMemState, parent_obj.dma_enabled,
+                      true),
++    DEFINE_PROP_UINT16("file_slots", FWCfgMemState, parent_obj.file_slots,
++                       FW_CFG_FILE_SLOTS_MIN),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
+@@ -1071,6 +1119,13 @@ static void fw_cfg_mem_realize(DeviceState *dev, Error **errp)
+     FWCfgMemState *s = FW_CFG_MEM(dev);
+     SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
+     const MemoryRegionOps *data_ops = &fw_cfg_data_mem_ops;
++    Error *local_err = NULL;
++
++    fw_cfg_file_slots_allocate(FW_CFG(s), &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
++    }
+ 
+     memory_region_init_io(&s->ctl_iomem, OBJECT(s), &fw_cfg_ctl_mem_ops,
+                           FW_CFG(s), "fwcfg.ctl", FW_CFG_CTL_SIZE);
 -- 
 2.9.3
