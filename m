@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35690)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35730)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cR8VH-0006fw-L1
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:19:08 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cR8VJ-0006ht-Kv
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:19:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cR8VG-0003X4-OZ
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:19:07 -0500
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:36535)
+	(envelope-from <rth7680@gmail.com>) id 1cR8VI-0003ZQ-TN
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:19:09 -0500
+Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:33460)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cR8VG-0003Wj-JS
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:19:06 -0500
-Received: by mail-pf0-x243.google.com with SMTP id b22so15073378pfd.3
-	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 18:19:06 -0800 (PST)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cR8VI-0003Yx-Nz
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:19:08 -0500
+Received: by mail-pf0-x242.google.com with SMTP id 127so31459592pfg.0
+	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 18:19:08 -0800 (PST)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Tue, 10 Jan 2017 18:18:07 -0800
-Message-Id: <20170111021820.24416-53-rth@twiddle.net>
+Date: Tue, 10 Jan 2017 18:18:10 -0800
+Message-Id: <20170111021820.24416-56-rth@twiddle.net>
 In-Reply-To: <20170111021820.24416-1-rth@twiddle.net>
 References: <20170111021820.24416-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PULL 52/65] target-tricore: Use clrsb helper
+Subject: [Qemu-devel] [PULL 55/65] target-alpha: Use ctpop helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,55 +29,54 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-Tested-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Reviewed-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- target/tricore/helper.h    | 1 -
- target/tricore/op_helper.c | 5 -----
- target/tricore/translate.c | 2 +-
- 3 files changed, 1 insertion(+), 7 deletions(-)
+ target/alpha/helper.h     | 2 --
+ target/alpha/int_helper.c | 5 -----
+ target/alpha/translate.c  | 2 +-
+ 3 files changed, 1 insertion(+), 8 deletions(-)
 
-diff --git a/target/tricore/helper.h b/target/tricore/helper.h
-index 2cf04e1..d215349 100644
---- a/target/tricore/helper.h
-+++ b/target/tricore/helper.h
-@@ -89,7 +89,6 @@ DEF_HELPER_FLAGS_2(ixmin_u, TCG_CALL_NO_RWG_SE, i64, i64, i32)
- /* count leading ... */
- DEF_HELPER_FLAGS_1(clo_h, TCG_CALL_NO_RWG_SE, i32, i32)
- DEF_HELPER_FLAGS_1(clz_h, TCG_CALL_NO_RWG_SE, i32, i32)
--DEF_HELPER_FLAGS_1(cls, TCG_CALL_NO_RWG_SE, i32, i32)
- DEF_HELPER_FLAGS_1(cls_h, TCG_CALL_NO_RWG_SE, i32, i32)
- /* sh */
- DEF_HELPER_FLAGS_2(sh, TCG_CALL_NO_RWG_SE, i32, i32, i32)
-diff --git a/target/tricore/op_helper.c b/target/tricore/op_helper.c
-index 3731d5e..7af202c 100644
---- a/target/tricore/op_helper.c
-+++ b/target/tricore/op_helper.c
-@@ -1769,11 +1769,6 @@ uint32_t helper_clz_h(target_ulong r1)
-     return ret_hw0 | (ret_hw1 << 16);
- }
+diff --git a/target/alpha/helper.h b/target/alpha/helper.h
+index eed3906..d60f208 100644
+--- a/target/alpha/helper.h
++++ b/target/alpha/helper.h
+@@ -3,8 +3,6 @@ DEF_HELPER_FLAGS_1(load_pcc, TCG_CALL_NO_RWG_SE, i64, env)
  
--uint32_t helper_cls(target_ulong r1)
+ DEF_HELPER_FLAGS_3(check_overflow, TCG_CALL_NO_WG, void, env, i64, i64)
+ 
+-DEF_HELPER_FLAGS_1(ctpop, TCG_CALL_NO_RWG_SE, i64, i64)
+-
+ DEF_HELPER_FLAGS_2(zap, TCG_CALL_NO_RWG_SE, i64, i64, i64)
+ DEF_HELPER_FLAGS_2(zapnot, TCG_CALL_NO_RWG_SE, i64, i64, i64)
+ 
+diff --git a/target/alpha/int_helper.c b/target/alpha/int_helper.c
+index 3c303bd..e43b50a 100644
+--- a/target/alpha/int_helper.c
++++ b/target/alpha/int_helper.c
+@@ -24,11 +24,6 @@
+ #include "qemu/host-utils.h"
+ 
+ 
+-uint64_t helper_ctpop(uint64_t arg)
 -{
--    return clrsb32(r1);
+-    return ctpop64(arg);
 -}
 -
- uint32_t helper_cls_h(target_ulong r1)
+ uint64_t helper_zapnot(uint64_t val, uint64_t mskb)
  {
-     uint32_t ret_hw0 = extract32(r1, 0, 16);
-diff --git a/target/tricore/translate.c b/target/tricore/translate.c
-index 69cdfb9..41b1d27 100644
---- a/target/tricore/translate.c
-+++ b/target/tricore/translate.c
-@@ -6374,7 +6374,7 @@ static void decode_rr_logical_shift(CPUTriCoreState *env, DisasContext *ctx)
-         gen_helper_clo_h(cpu_gpr_d[r3], cpu_gpr_d[r1]);
-         break;
-     case OPC2_32_RR_CLS:
--        gen_helper_cls(cpu_gpr_d[r3], cpu_gpr_d[r1]);
-+        tcg_gen_clrsb_tl(cpu_gpr_d[r3], cpu_gpr_d[r1]);
-         break;
-     case OPC2_32_RR_CLS_H:
-         gen_helper_cls_h(cpu_gpr_d[r3], cpu_gpr_d[r1]);
+     uint64_t mask;
+diff --git a/target/alpha/translate.c b/target/alpha/translate.c
+index 6e2e563..055286a 100644
+--- a/target/alpha/translate.c
++++ b/target/alpha/translate.c
+@@ -2541,7 +2541,7 @@ static ExitStatus translate_one(DisasContext *ctx, uint32_t insn)
+             REQUIRE_TB_FLAG(TB_FLAGS_AMASK_CIX);
+             REQUIRE_REG_31(ra);
+             REQUIRE_NO_LIT;
+-            gen_helper_ctpop(vc, vb);
++            tcg_gen_ctpop_i64(vc, vb);
+             break;
+         case 0x31:
+             /* PERR */
 -- 
 2.9.3
