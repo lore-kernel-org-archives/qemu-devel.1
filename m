@@ -1,30 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45369)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45391)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cROgZ-0003Fl-6Y
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:35:54 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cROgc-0003JP-9M
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:35:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cROgY-0003NA-2o
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:35:51 -0500
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:34846)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1cROgX-0003Mx-Ss
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:35:50 -0500
-Received: by mail-wm0-x243.google.com with SMTP id l2so325319wml.2
-	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 11:35:49 -0800 (PST)
-Received: from 640k.lan (94-39-158-71.adsl-ull.clienti.tiscali.it.
-	[94.39.158.71]) by smtp.gmail.com with ESMTPSA id
-	k11sm10463101wmb.18.2017.01.11.11.35.47 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Wed, 11 Jan 2017 11:35:48 -0800 (PST)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cROga-0003Nk-8t
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:35:54 -0500
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 11 Jan 2017 20:35:10 +0100
-Message-Id: <1484163327-111841-17-git-send-email-pbonzini@redhat.com>
+Date: Wed, 11 Jan 2017 20:35:12 +0100
+Message-Id: <1484163327-111841-19-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1484163327-111841-1-git-send-email-pbonzini@redhat.com>
 References: <1484163327-111841-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 16/33] acpi: filter based on CONFIG_ACPI_X86
- rather than TARGET
+Subject: [Qemu-devel] [PULL 18/33] pc: fix crash in rtc_set_memory() if
+ initial cpu is marked as hotplugged
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,148 +22,52 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Igor Mammedov <imammedo@redhat.com>, qemu-stable@nongnu.org
 
-Copy the mechanism of hw/smbios/smbios-stub.c to implement an ACPI-stub
-instead, so that -acpitable can be later extended to ARM.
+From: Igor Mammedov <imammedo@redhat.com>
 
+'hotplugged' propperty is meant to be used on migration side when migrating
+source with hotplugged devices.
+However though it not exacly correct usage of 'hotplugged' property
+it's possible to set generic hotplugged property for CPU using
+ -cpu foo,hotplugged=on
+or
+ -global foo.hotplugged=on
+
+in this case qemu crashes with following backtrace:
+
+...
+
+because pc_cpu_plug() assumes that hotplugged CPU could appear only after
+rtc/fw_cfg are initialized.
+Fix crash by replacing assumption with explicit checks of rtc/fw_cfg
+and updating them only if they were initialized.
+
+Cc: qemu-stable@nongnu.org
+Reported-by: Eduardo Habkost <ehabkost@redhat.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Message-Id: <1483108391-199542-1-git-send-email-imammedo@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch_init.c                | 13 -------------
- hw/Makefile.objs           |  2 +-
- hw/acpi/Makefile.objs      |  7 ++++++-
- hw/acpi/acpi-stub.c        | 29 +++++++++++++++++++++++++++++
- include/sysemu/arch_init.h |  1 -
- vl.c                       |  3 ++-
- 6 files changed, 38 insertions(+), 17 deletions(-)
- create mode 100644 hw/acpi/acpi-stub.c
+ hw/i386/pc.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/arch_init.c b/arch_init.c
-index 34e7694..6c4e287 100644
---- a/arch_init.c
-+++ b/arch_init.c
-@@ -234,19 +234,6 @@ void audio_init(void)
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 25e8586..f721fde 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1820,8 +1820,10 @@ static void pc_cpu_plug(HotplugHandler *hotplug_dev,
+ 
+     /* increment the number of CPUs */
+     pcms->boot_cpus++;
+-    if (dev->hotplugged) {
++    if (pcms->rtc) {
+         rtc_set_cpus_count(pcms->rtc, pcms->boot_cpus);
++    }
++    if (pcms->fw_cfg) {
+         fw_cfg_modify_i16(pcms->fw_cfg, FW_CFG_NB_CPUS, pcms->boot_cpus);
      }
- }
  
--void do_acpitable_option(const QemuOpts *opts)
--{
--#ifdef TARGET_I386
--    Error *err = NULL;
--
--    acpi_table_add(opts, &err);
--    if (err) {
--        error_reportf_err(err, "Wrong acpi table provided: ");
--        exit(1);
--    }
--#endif
--}
--
- int kvm_available(void)
- {
- #ifdef CONFIG_KVM
-diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-index 7be399e..a2c61f6 100644
---- a/hw/Makefile.objs
-+++ b/hw/Makefile.objs
-@@ -1,5 +1,5 @@
- devices-dirs-$(call land, $(CONFIG_VIRTIO),$(call land,$(CONFIG_VIRTFS),$(CONFIG_PCI))) += 9pfs/
--devices-dirs-$(CONFIG_ACPI) += acpi/
-+devices-dirs-$(CONFIG_SOFTMMU) += acpi/
- devices-dirs-$(CONFIG_SOFTMMU) += adc/
- devices-dirs-$(CONFIG_SOFTMMU) += audio/
- devices-dirs-$(CONFIG_SOFTMMU) += block/
-diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
-index dfc8229..6acf798 100644
---- a/hw/acpi/Makefile.objs
-+++ b/hw/acpi/Makefile.objs
-@@ -1,9 +1,11 @@
-+ifeq ($(CONFIG_ACPI),y)
- common-obj-$(CONFIG_ACPI_X86) += core.o piix4.o pcihp.o
- common-obj-$(CONFIG_ACPI_X86_ICH) += ich9.o tco.o
- common-obj-$(CONFIG_ACPI_CPU_HOTPLUG) += cpu_hotplug.o
- common-obj-$(CONFIG_ACPI_MEMORY_HOTPLUG) += memory_hotplug.o
- common-obj-$(CONFIG_ACPI_CPU_HOTPLUG) += cpu.o
- common-obj-$(CONFIG_ACPI_NVDIMM) += nvdimm.o
-+common-obj-$(call lnot,$(CONFIG_ACPI_X86)) += acpi-stub.o
- 
- common-obj-y += acpi_interface.o
- common-obj-y += bios-linker-loader.o
-@@ -11,4 +13,7 @@ common-obj-y += aml-build.o
- 
- common-obj-$(CONFIG_IPMI) += ipmi.o
- common-obj-$(call lnot,$(CONFIG_IPMI)) += ipmi-stub.o
--common-obj-$(CONFIG_ALL) += ipmi-stub.o
-+else
-+common-obj-y += acpi-stub.o
-+endif
-+common-obj-$(CONFIG_ALL) += acpi-stub.o ipmi-stub.o
-diff --git a/hw/acpi/acpi-stub.c b/hw/acpi/acpi-stub.c
-new file mode 100644
-index 0000000..26bd22f
---- /dev/null
-+++ b/hw/acpi/acpi-stub.c
-@@ -0,0 +1,29 @@
-+/*
-+ * ACPI stubs for platforms that don't support ACPI.
-+ *
-+ * Copyright (c) 2006 Fabrice Bellard
-+ * Copyright (c) 2016 Red Hat, Inc.
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along
-+ * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qapi/qmp/qerror.h"
-+#include "qmp-commands.h"
-+#include "hw/acpi/acpi.h"
-+
-+void acpi_table_add(const QemuOpts *opts, Error **errp)
-+{
-+    error_setg(errp, QERR_UNSUPPORTED);
-+}
-diff --git a/include/sysemu/arch_init.h b/include/sysemu/arch_init.h
-index 88dcf77..20b01e3 100644
---- a/include/sysemu/arch_init.h
-+++ b/include/sysemu/arch_init.h
-@@ -28,7 +28,6 @@ enum {
- extern const uint32_t arch_type;
- 
- void select_soundhw(const char *optarg);
--void do_acpitable_option(const QemuOpts *opts);
- void audio_init(void);
- int kvm_available(void);
- int xen_available(void);
-diff --git a/vl.c b/vl.c
-index 1a3ca96..99f6e7f 100644
---- a/vl.c
-+++ b/vl.c
-@@ -65,6 +65,7 @@ int main(int argc, char **argv)
- #include "hw/bt.h"
- #include "sysemu/watchdog.h"
- #include "hw/smbios/smbios.h"
-+#include "hw/acpi/acpi.h"
- #include "hw/xen/xen.h"
- #include "hw/qdev.h"
- #include "hw/loader.h"
-@@ -3662,7 +3663,7 @@ int main(int argc, char **argv, char **envp)
-                 if (!opts) {
-                     exit(1);
-                 }
--                do_acpitable_option(opts);
-+                acpi_table_add(opts, &error_fatal);
-                 break;
-             case QEMU_OPTION_smbios:
-                 opts = qemu_opts_parse_noisily(qemu_find_opts("smbios"),
 -- 
 1.8.3.1
