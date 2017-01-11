@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34887)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34919)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cR8Ub-0005iL-RK
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:18:26 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cR8Ud-0005mU-Hi
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:18:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cR8Ua-00031n-Sn
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:18:25 -0500
-Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:35001)
+	(envelope-from <rth7680@gmail.com>) id 1cR8Uc-00032q-Fj
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:18:27 -0500
+Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:34553)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cR8Ua-00031M-Nt
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:18:24 -0500
-Received: by mail-pf0-x244.google.com with SMTP id f144so12524019pfa.2
-	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 18:18:24 -0800 (PST)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cR8Uc-00032U-9m
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:18:26 -0500
+Received: by mail-pf0-x243.google.com with SMTP id y143so10360066pfb.1
+	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 18:18:26 -0800 (PST)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Tue, 10 Jan 2017 18:17:17 -0800
-Message-Id: <20170111021820.24416-3-rth@twiddle.net>
+Date: Tue, 10 Jan 2017 18:17:19 -0800
+Message-Id: <20170111021820.24416-5-rth@twiddle.net>
 In-Reply-To: <20170111021820.24416-1-rth@twiddle.net>
 References: <20170111021820.24416-1-rth@twiddle.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 02/65] tcg: Minor adjustments to deposit
- expanders
+Subject: [Qemu-devel] [PULL 04/65] tcg/aarch64: Implement field extraction
+ opcodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,46 +33,70 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-Assert that len is not 0.
-
-Since we have asserted that ofs + len <= N, a later
-check for len == N implies that ofs == 0.
-
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- tcg/tcg-op.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ tcg/aarch64/tcg-target.h     |  8 ++++----
+ tcg/aarch64/tcg-target.inc.c | 14 ++++++++++++++
+ 2 files changed, 18 insertions(+), 4 deletions(-)
 
-diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
-index c185b9c..b17f03f 100644
---- a/tcg/tcg-op.c
-+++ b/tcg/tcg-op.c
-@@ -533,10 +533,11 @@ void tcg_gen_deposit_i32(TCGv_i32 ret, TCGv_i32 arg1, TCGv_i32 arg2,
-     TCGv_i32 t1;
+diff --git a/tcg/aarch64/tcg-target.h b/tcg/aarch64/tcg-target.h
+index 410c31b..4a74bd8 100644
+--- a/tcg/aarch64/tcg-target.h
++++ b/tcg/aarch64/tcg-target.h
+@@ -63,8 +63,8 @@ typedef enum {
+ #define TCG_TARGET_HAS_nand_i32         0
+ #define TCG_TARGET_HAS_nor_i32          0
+ #define TCG_TARGET_HAS_deposit_i32      1
+-#define TCG_TARGET_HAS_extract_i32      0
+-#define TCG_TARGET_HAS_sextract_i32     0
++#define TCG_TARGET_HAS_extract_i32      1
++#define TCG_TARGET_HAS_sextract_i32     1
+ #define TCG_TARGET_HAS_movcond_i32      1
+ #define TCG_TARGET_HAS_add2_i32         1
+ #define TCG_TARGET_HAS_sub2_i32         1
+@@ -95,8 +95,8 @@ typedef enum {
+ #define TCG_TARGET_HAS_nand_i64         0
+ #define TCG_TARGET_HAS_nor_i64          0
+ #define TCG_TARGET_HAS_deposit_i64      1
+-#define TCG_TARGET_HAS_extract_i64      0
+-#define TCG_TARGET_HAS_sextract_i64     0
++#define TCG_TARGET_HAS_extract_i64      1
++#define TCG_TARGET_HAS_sextract_i64     1
+ #define TCG_TARGET_HAS_movcond_i64      1
+ #define TCG_TARGET_HAS_add2_i64         1
+ #define TCG_TARGET_HAS_sub2_i64         1
+diff --git a/tcg/aarch64/tcg-target.inc.c b/tcg/aarch64/tcg-target.inc.c
+index 1939d35..c0e9890 100644
+--- a/tcg/aarch64/tcg-target.inc.c
++++ b/tcg/aarch64/tcg-target.inc.c
+@@ -1640,6 +1640,16 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc,
+         tcg_out_dep(s, ext, a0, REG0(2), args[3], args[4]);
+         break;
  
-     tcg_debug_assert(ofs < 32);
-+    tcg_debug_assert(len > 0);
-     tcg_debug_assert(len <= 32);
-     tcg_debug_assert(ofs + len <= 32);
++    case INDEX_op_extract_i64:
++    case INDEX_op_extract_i32:
++        tcg_out_ubfm(s, ext, a0, a1, a2, a2 + args[3] - 1);
++        break;
++
++    case INDEX_op_sextract_i64:
++    case INDEX_op_sextract_i32:
++        tcg_out_sbfm(s, ext, a0, a1, a2, a2 + args[3] - 1);
++        break;
++
+     case INDEX_op_add2_i32:
+         tcg_out_addsub2(s, TCG_TYPE_I32, a0, a1, REG0(2), REG0(3),
+                         (int32_t)args[4], args[5], const_args[4],
+@@ -1785,6 +1795,10 @@ static const TCGTargetOpDef aarch64_op_defs[] = {
  
--    if (ofs == 0 && len == 32) {
-+    if (len == 32) {
-         tcg_gen_mov_i32(ret, arg2);
-         return;
-     }
-@@ -1718,10 +1719,11 @@ void tcg_gen_deposit_i64(TCGv_i64 ret, TCGv_i64 arg1, TCGv_i64 arg2,
-     TCGv_i64 t1;
+     { INDEX_op_deposit_i32, { "r", "0", "rZ" } },
+     { INDEX_op_deposit_i64, { "r", "0", "rZ" } },
++    { INDEX_op_extract_i32, { "r", "r" } },
++    { INDEX_op_extract_i64, { "r", "r" } },
++    { INDEX_op_sextract_i32, { "r", "r" } },
++    { INDEX_op_sextract_i64, { "r", "r" } },
  
-     tcg_debug_assert(ofs < 64);
-+    tcg_debug_assert(len > 0);
-     tcg_debug_assert(len <= 64);
-     tcg_debug_assert(ofs + len <= 64);
- 
--    if (ofs == 0 && len == 64) {
-+    if (len == 64) {
-         tcg_gen_mov_i64(ret, arg2);
-         return;
-     }
+     { INDEX_op_add2_i32, { "r", "r", "rZ", "rZ", "rA", "rMZ" } },
+     { INDEX_op_add2_i64, { "r", "r", "rZ", "rZ", "rA", "rMZ" } },
 -- 
 2.9.3
