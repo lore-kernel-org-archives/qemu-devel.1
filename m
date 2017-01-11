@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45188)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45202)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cROgK-00032f-NW
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cROgL-000331-AK
 	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:35:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cROgH-0003Gh-FI
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:35:36 -0500
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:36136)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cROgK-0003Ib-3j
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:35:37 -0500
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:36140)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1cROgH-0003Ff-5W
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:35:33 -0500
-Received: by mail-wm0-x242.google.com with SMTP id r126so311285wmr.3
-	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 11:35:33 -0800 (PST)
-Received: from 640k.lan (94-39-158-71.adsl-ull.clienti.tiscali.it.
-	[94.39.158.71]) by smtp.gmail.com with ESMTPSA id
-	k11sm10463101wmb.18.2017.01.11.11.35.29 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Wed, 11 Jan 2017 11:35:30 -0800 (PST)
+	id 1cROgJ-0003HX-SU
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:35:36 -0500
+Received: by mail-wm0-x242.google.com with SMTP id r126so311495wmr.3
+	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 11:35:35 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 11 Jan 2017 20:34:54 +0100
-Message-Id: <1484163327-111841-1-git-send-email-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 00/33] Misc patches for 2017-01-11
+Date: Wed, 11 Jan 2017 20:34:57 +0100
+Message-Id: <1484163327-111841-4-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1484163327-111841-1-git-send-email-pbonzini@redhat.com>
+References: <1484163327-111841-1-git-send-email-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PULL 03/33] qom: Make all interface types abstract
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,229 +28,142 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>
 
-The following changes since commit 41a0e54756a9ae6b60be34bb33302a7e085fdb07:
+From: Eduardo Habkost <ehabkost@redhat.com>
 
-  Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into staging (2017-01-10 10:46:21 +0000)
+"qom-list-types abstract=false" currently returns all interface
+types, as if they were not abstract. Fix this by making sure all
+interface types are abstract.
 
-are available in the git repository at:
+All interface types have instance_size == 0, so we can use
+it to set abstract=true on type_initialize().
 
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+Message-Id: <1481567461-2341-1-git-send-email-ehabkost@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ qom/object.c                   |  6 +++++
+ tests/device-introspect-test.c | 60 +++++++++++++++++++++++++++++++++++++++---
+ 2 files changed, 63 insertions(+), 3 deletions(-)
 
-  git://github.com/bonzini/qemu.git tags/for-upstream
-
-for you to fetch changes up to af89d1b204f03e10ade3b61365c7e5c06805caee:
-
-  Revert "win32: don't run subprocess tests on Mingw32 platform" (2017-01-11 20:13:12 +0100)
-
-----------------------------------------------------------------
-* QOM interface fix (Eduardo)
-* RTC fixes (Gaohuai, Igor)
-* Memory leak fixes (Li Qiang, me)
-* Ctrl-a b regression (Marc-André)
-* Stubs cleanups and fixes (Leif, me)
-* hxtool tweak (me)
-* HAX support (Vincent)
-* QemuThread, exec.c, target-i386 and SCSI fixes (Roman, Xinhua, me)
-
-----------------------------------------------------------------
-Caoxinhua (1):
-      qemu-thread: fix qemu_thread_set_name() race in qemu_thread_create()
-
-Eduardo Habkost (1):
-      qom: Make all interface types abstract
-
-Igor Mammedov (1):
-      pc: fix crash in rtc_set_memory() if initial cpu is marked as hotplugged
-
-Leif Lindholm (1):
-      smbios: filter based on CONFIG_SMBIOS rather than TARGET
-
-Li Qiang (1):
-      serial: fix memory leak in serial exit
-
-Marc-André Lureau (2):
-      char: fix ctrl-a b not working
-      Revert "win32: don't run subprocess tests on Mingw32 platform"
-
-Paolo Bonzini (17):
-      megasas: fix guest-triggered memory leak
-      stubs: merge all monitor stubs in one file, remove monitor_cur_is_qmp stub
-      stubs: move smbios stubs to hw/smbios
-      stubs: move acpi stubs to hw/acpi
-      stubs: remove unused stub for serial_hd
-      hw: move reset handlers from vl.c to hw/core
-      stubs: group stubs for user-mode emulation
-      stubs: group all monitor_fdset_* functions in a single file
-      stubs: move vhost stubs to stubs/vhost.o
-      event_notifier: cleanups around event_notifier_set_handler
-      build: remove --enable-colo/--disable-colo
-      stubs: remove stubs/kvm.c
-      acpi: filter based on CONFIG_ACPI_X86 rather than TARGET
-      target-i386: Correctly apply patch for syscall eflags.TF handling
-      scsi-block: fix direction of BYTCHK test for VERIFY commands
-      hxtool: emit Texinfo headings as @subsection
-      ramblock-notifier: new
-
-Peter Xu (3):
-      x86: ioapic: add traces for ioapic
-      x86: ioapic: dump version for "info ioapic"
-      x86: ioapic: fix fail migration when irqchip=split
-
-Roman Kapl (1):
-      exec: Add missing rcu_read_unlock
-
-Vincent Palatin (4):
-      kvm: move cpu synchronization code
-      target/i386: Add Intel HAX files
-      Plumb the HAXM-based hardware acceleration support
-      hax: add Darwin support
-
-hangaohuai (1):
-      bugfix: vm halt when in reset looping
-
- MAINTAINERS                                        |    1 +
- Makefile.target                                    |    5 +-
- arch_init.c                                        |   21 -
- configure                                          |   27 +-
- cpus.c                                             |   79 +-
- exec.c                                             |    6 +
- gdbstub.c                                          |    1 +
- hax-stub.c                                         |   34 +
- hw/Makefile.objs                                   |    6 +-
- hw/acpi/Makefile.objs                              |   17 +-
- hw/acpi/acpi-stub.c                                |   29 +
- stubs/ipmi.c => hw/acpi/ipmi-stub.c                |    0
- hw/char/serial.c                                   |   10 +
- hw/core/Makefile.objs                              |    2 +-
- hw/core/reset.c                                    |   72 ++
- hw/i386/kvm/apic.c                                 |    1 +
- hw/i386/kvmvapic.c                                 |    1 +
- hw/i386/pc.c                                       |    4 +-
- hw/intc/apic_common.c                              |    3 +-
- hw/intc/ioapic.c                                   |   22 +-
- hw/intc/ioapic_common.c                            |    3 +-
- hw/intc/trace-events                               |    7 +
- hw/misc/vmport.c                                   |    2 +-
- hw/ppc/pnv_xscom.c                                 |    2 +-
- hw/ppc/ppce500_spin.c                              |    4 +-
- hw/ppc/spapr.c                                     |    2 +-
- hw/ppc/spapr_hcall.c                               |    2 +-
- hw/s390x/s390-pci-inst.c                           |    1 +
- hw/scsi/megasas.c                                  |   11 +-
- hw/scsi/scsi-disk.c                                |    2 +-
- hw/smbios/Makefile.objs                            |   12 +-
- hw/smbios/smbios-stub.c                            |   31 +
- hw/smbios/smbios.c                                 |    2 +-
- .../smbios/smbios_type_38-stub.c                   |    0
- hw/timer/mc146818rtc.c                             |   12 +
- hw/usb/ccid-card-emulated.c                        |    2 +-
- hw/virtio/Makefile.objs                            |    6 +-
- stubs/vhost.c => hw/virtio/vhost-stub.c            |    0
- hw/virtio/virtio.c                                 |   10 +-
- include/exec/memory.h                              |    6 +-
- include/exec/ram_addr.h                            |   46 +-
- include/exec/ramlist.h                             |   72 ++
- include/hw/hw.h                                    |    6 +-
- include/hw/smbios/smbios.h                         |    2 +-
- include/qemu/event_notifier.h                      |    3 -
- include/qemu/main-loop.h                           |   15 +
- include/qom/cpu.h                                  |    5 +
- include/sysemu/arch_init.h                         |    2 -
- include/sysemu/hax.h                               |   56 +
- include/sysemu/hw_accel.h                          |   48 +
- include/sysemu/kvm.h                               |   23 -
- include/sysemu/reset.h                             |   10 +
- include/sysemu/sysemu.h                            |    1 -
- iohandler.c                                        |    8 +
- migration/Makefile.objs                            |    3 +-
- monitor.c                                          |    2 +-
- numa.c                                             |   29 +
- qemu-char.c                                        |   15 +-
- qemu-options-wrapper.h                             |    2 +-
- qemu-options.hx                                    |   42 +-
- qom/cpu.c                                          |    2 +-
- qom/object.c                                       |    6 +
- scripts/hxtool                                     |   11 +-
- stubs/Makefile.objs                                |   19 +-
- stubs/cpus.c                                       |   11 -
- stubs/fdset-add-fd.c                               |    8 -
- stubs/fdset-find-fd.c                              |    8 -
- stubs/fdset-get-fd.c                               |    8 -
- stubs/fdset-remove-fd.c                            |    7 -
- stubs/fdset.c                                      |   22 +
- stubs/get-next-serial.c                            |    4 -
- stubs/iohandler.c                                  |    8 -
- stubs/kvm.c                                        |    8 -
- stubs/migration-colo.c                             |   46 -
- stubs/mon-is-qmp.c                                 |   10 -
- stubs/monitor-init.c                               |    7 -
- stubs/{get-fd.c => monitor.c}                      |    6 +
- stubs/replay-user.c                                |   33 -
- stubs/reset.c                                      |   14 -
- target/arm/cpu.c                                   |    2 +-
- target/i386/Makefile.objs                          |    7 +
- target/i386/hax-all.c                              | 1155 ++++++++++++++++++++
- target/i386/hax-darwin.c                           |  316 ++++++
- target/i386/hax-darwin.h                           |   63 ++
- target/i386/hax-i386.h                             |   94 ++
- target/i386/hax-interface.h                        |  361 ++++++
- target/i386/hax-mem.c                              |  289 +++++
- target/i386/hax-windows.c                          |  479 ++++++++
- target/i386/hax-windows.h                          |   89 ++
- target/i386/helper.c                               |    1 +
- target/i386/hyperv.c                               |    7 +-
- target/i386/kvm.c                                  |    1 +
- target/i386/translate.c                            |   10 +-
- target/mips/kvm.c                                  |    5 +
- target/ppc/kvm.c                                   |    5 +
- target/ppc/mmu-hash64.c                            |    2 +-
- target/ppc/translate_init.c                        |    2 +-
- target/s390x/gdbstub.c                             |    1 +
- target/s390x/kvm.c                                 |    5 +
- tests/Makefile.include                             |    1 +
- tests/device-introspect-test.c                     |   60 +-
- user-exec-stub.c                                   |   34 +
- util/event_notifier-posix.c                        |    9 -
- util/event_notifier-win32.c                        |   12 -
- util/qemu-thread-posix.c                           |   12 +-
- util/qemu-thread-win32.c                           |    4 +-
- vl.c                                               |   62 +-
- xen-mapcache.c                                     |    3 +
- 108 files changed, 3721 insertions(+), 456 deletions(-)
- create mode 100644 hax-stub.c
- create mode 100644 hw/acpi/acpi-stub.c
- rename stubs/ipmi.c => hw/acpi/ipmi-stub.c (100%)
- create mode 100644 hw/core/reset.c
- create mode 100644 hw/smbios/smbios-stub.c
- rename stubs/smbios_type_38.c => hw/smbios/smbios_type_38-stub.c (100%)
- rename stubs/vhost.c => hw/virtio/vhost-stub.c (100%)
- create mode 100644 include/exec/ramlist.h
- create mode 100644 include/sysemu/hax.h
- create mode 100644 include/sysemu/hw_accel.h
- create mode 100644 include/sysemu/reset.h
- delete mode 100644 stubs/cpus.c
- delete mode 100644 stubs/fdset-add-fd.c
- delete mode 100644 stubs/fdset-find-fd.c
- delete mode 100644 stubs/fdset-get-fd.c
- delete mode 100644 stubs/fdset-remove-fd.c
- create mode 100644 stubs/fdset.c
- delete mode 100644 stubs/get-next-serial.c
- delete mode 100644 stubs/iohandler.c
- delete mode 100644 stubs/kvm.c
- delete mode 100644 stubs/migration-colo.c
- delete mode 100644 stubs/mon-is-qmp.c
- delete mode 100644 stubs/monitor-init.c
- rename stubs/{get-fd.c => monitor.c} (75%)
- delete mode 100644 stubs/replay-user.c
- delete mode 100644 stubs/reset.c
- create mode 100644 target/i386/hax-all.c
- create mode 100644 target/i386/hax-darwin.c
- create mode 100644 target/i386/hax-darwin.h
- create mode 100644 target/i386/hax-i386.h
- create mode 100644 target/i386/hax-interface.h
- create mode 100644 target/i386/hax-mem.c
- create mode 100644 target/i386/hax-windows.c
- create mode 100644 target/i386/hax-windows.h
- create mode 100644 user-exec-stub.c
+diff --git a/qom/object.c b/qom/object.c
+index 7a05e35..760fafb 100644
+--- a/qom/object.c
++++ b/qom/object.c
+@@ -272,6 +272,12 @@ static void type_initialize(TypeImpl *ti)
+ 
+     ti->class_size = type_class_get_size(ti);
+     ti->instance_size = type_object_get_size(ti);
++    /* Any type with zero instance_size is implicitly abstract.
++     * This means interface types are all abstract.
++     */
++    if (ti->instance_size == 0) {
++        ti->abstract = true;
++    }
+ 
+     ti->class = g_malloc0(ti->class_size);
+ 
+diff --git a/tests/device-introspect-test.c b/tests/device-introspect-test.c
+index 37debc1..c5637cc 100644
+--- a/tests/device-introspect-test.c
++++ b/tests/device-introspect-test.c
+@@ -20,18 +20,24 @@
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
+ #include "qapi/qmp/qstring.h"
++#include "qapi/qmp/qbool.h"
++#include "qapi/qmp/qdict.h"
+ #include "libqtest.h"
+ 
+ const char common_args[] = "-nodefaults -machine none";
+ 
+-static QList *device_type_list(bool abstract)
++static QList *qom_list_types(const char *implements, bool abstract)
+ {
+     QDict *resp;
+     QList *ret;
++    QDict *args = qdict_new();
+ 
++    qdict_put(args, "abstract", qbool_from_bool(abstract));
++    if (implements) {
++        qdict_put(args, "implements", qstring_from_str(implements));
++    }
+     resp = qmp("{'execute': 'qom-list-types',"
+-               " 'arguments': {'implements': 'device', 'abstract': %i}}",
+-               abstract);
++               " 'arguments': %p }", args);
+     g_assert(qdict_haskey(resp, "return"));
+     ret = qdict_get_qlist(resp, "return");
+     QINCREF(ret);
+@@ -39,6 +45,11 @@ static QList *device_type_list(bool abstract)
+     return ret;
+ }
+ 
++static QList *device_type_list(bool abstract)
++{
++    return qom_list_types("device", abstract);
++}
++
+ static void test_one_device(const char *type)
+ {
+     QDict *resp;
+@@ -110,6 +121,48 @@ static void test_device_intro_concrete(void)
+     qtest_end();
+ }
+ 
++static void test_abstract_interfaces(void)
++{
++    QList *all_types;
++    QList *obj_types;
++    QListEntry *ae;
++
++    qtest_start(common_args);
++    /* qom-list-types implements=interface would return any type
++     * that implements _any_ interface (not just interface types),
++     * so use a trick to find the interface type names:
++     * - list all object types
++     * - list all types, and look for items that are not
++     *   on the first list
++     */
++    all_types = qom_list_types(NULL, false);
++    obj_types = qom_list_types("object", false);
++
++    QLIST_FOREACH_ENTRY(all_types, ae) {
++        QDict *at = qobject_to_qdict(qlist_entry_obj(ae));
++        const char *aname = qdict_get_str(at, "name");
++        QListEntry *oe;
++        const char *found = NULL;
++
++        QLIST_FOREACH_ENTRY(obj_types, oe) {
++            QDict *ot = qobject_to_qdict(qlist_entry_obj(oe));
++            const char *oname = qdict_get_str(ot, "name");
++            if (!strcmp(aname, oname)) {
++                found = oname;
++                break;
++            }
++        }
++
++        /* Using g_assert_cmpstr() will give more useful failure
++         * messages than g_assert(found) */
++        g_assert_cmpstr(aname, ==, found);
++    }
++
++    QDECREF(all_types);
++    QDECREF(obj_types);
++    qtest_end();
++}
++
+ int main(int argc, char **argv)
+ {
+     g_test_init(&argc, &argv, NULL);
+@@ -118,6 +171,7 @@ int main(int argc, char **argv)
+     qtest_add_func("device/introspect/none", test_device_intro_none);
+     qtest_add_func("device/introspect/abstract", test_device_intro_abstract);
+     qtest_add_func("device/introspect/concrete", test_device_intro_concrete);
++    qtest_add_func("device/introspect/abstract-interfaces", test_abstract_interfaces);
+ 
+     return g_test_run();
+ }
 -- 
 1.8.3.1
