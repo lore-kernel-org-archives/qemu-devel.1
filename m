@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54801)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54828)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cRPNr-0006JF-8G
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 15:20:36 -0500
+	(envelope-from <atar4qemu@gmail.com>) id 1cRPNs-0006Ke-VM
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 15:20:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cRPNn-0000th-6N
+	(envelope-from <atar4qemu@gmail.com>) id 1cRPNr-0000vU-Un
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 15:20:36 -0500
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:35262)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>) id 1cRPNr-0000vC-I4
 	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 15:20:35 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:60056)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cRPNm-0000tW-Rg
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 15:20:31 -0500
-Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
-	[10.5.11.28])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 00571C057FA6
-	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 20:20:31 +0000 (UTC)
-References: <20170111172956.11255-1-marcandre.lureau@redhat.com>
-	<20170111172956.11255-12-marcandre.lureau@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <635bf9a5-0899-de95-ea53-3810ea7f2c01@redhat.com>
-Date: Wed, 11 Jan 2017 14:20:27 -0600
-MIME-Version: 1.0
-In-Reply-To: <20170111172956.11255-12-marcandre.lureau@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="v0WK7Cdf6KdEVjoAI0JWCbUDcLvPdBSpp"
-Subject: Re: [Qemu-devel] [PATCH 11/40] char-win-stdio: convert to finalize
+Received: by mail-wm0-x241.google.com with SMTP id l2so566593wml.2
+	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 12:20:35 -0800 (PST)
+From: Artyom Tarasenko <atar4qemu@gmail.com>
+Date: Wed, 11 Jan 2017 21:19:33 +0100
+Message-Id: <f03daff3e16d6ab6a9a0610f1006de7b506a5f58.1484165352.git.atar4qemu@gmail.com>
+In-Reply-To: <cover.1484165352.git.atar4qemu@gmail.com>
+References: <cover.1484165352.git.atar4qemu@gmail.com>
+In-Reply-To: <cover.1484165352.git.atar4qemu@gmail.com>
+References: <cover.1484165352.git.atar4qemu@gmail.com>
+Subject: [Qemu-devel] [PATCH v2 02/30] target-sparc: store cpu super- and
+ hypervisor flags in TB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,53 +28,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Richard Henderson <rth@twiddle.net>, Artyom Tarasenko <atar4qemu@gmail.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---v0WK7Cdf6KdEVjoAI0JWCbUDcLvPdBSpp
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com
-Message-ID: <635bf9a5-0899-de95-ea53-3810ea7f2c01@redhat.com>
-Subject: Re: [PATCH 11/40] char-win-stdio: convert to finalize
-References: <20170111172956.11255-1-marcandre.lureau@redhat.com>
- <20170111172956.11255-12-marcandre.lureau@redhat.com>
-In-Reply-To: <20170111172956.11255-12-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Suggested-by: Richard Henderson <rth@twiddle.net>
+Signed-off-by: Artyom Tarasenko <atar4qemu@gmail.com>
+---
+ target/sparc/cpu.h       | 17 +++++++++++++++++
+ target/sparc/translate.c | 24 +++++++++++++++++++-----
+ 2 files changed, 36 insertions(+), 5 deletions(-)
 
-On 01/11/2017 11:29 AM, Marc-Andr=C3=A9 Lureau wrote:
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  qemu-char.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
-
-Patches 3-11: Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake   eblake redhat com    +1-919-301-3266
-Libvirt virtualization library http://libvirt.org
-
-
---v0WK7Cdf6KdEVjoAI0JWCbUDcLvPdBSpp
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEcBAEBCAAGBQJYdpOLAAoJEKeha0olJ0NqTCMH/3ymuXoKvolwrimVtW2/4jk6
-a0bbOe8R21+MfxWbLDVibpXmGNI/AIlPECevBO45U+Ltmc43xs0BlNgBCkuMFkBi
-pAMSGCMDQAahQZRSRUM83khMpdOjSldNsZQbChygdXpiBitnwQkvgZNXNzp4qVRo
-9nWJe3/jj60UHgN6KT7sWoZQJwf3THFyxaZjzwPa7YrtWQH2SfoSzvhIPAyPhFBg
-STSGzAhUH3dN59sRPTcmk/UFvL57njOyFqh23QxRild6IhorYSVOZ23wO2Ws6OZT
-Wa8kAz+U+pmswx/Hha++AtjZwVvzBHYB9+2Jj5cGMqxIPeXl3P53CfE0C5Z+hT4=
-=p+pD
------END PGP SIGNATURE-----
-
---v0WK7Cdf6KdEVjoAI0JWCbUDcLvPdBSpp--
+diff --git a/target/sparc/cpu.h b/target/sparc/cpu.h
+index e0b2806..68e39bc 100644
+--- a/target/sparc/cpu.h
++++ b/target/sparc/cpu.h
+@@ -667,6 +667,11 @@ static inline int cpu_supervisor_mode(CPUSPARCState *env1)
+ {
+     return env1->pstate & PS_PRIV;
+ }
++#else
++static inline int cpu_supervisor_mode(CPUSPARCState *env1)
++{
++    return env1->psrs;
++}
+ #endif
+ 
+ static inline int cpu_mmu_index(CPUSPARCState *env, bool ifetch)
+@@ -733,6 +738,8 @@ trap_state* cpu_tsptr(CPUSPARCState* env);
+ #define TB_FLAG_MMU_MASK     7
+ #define TB_FLAG_FPU_ENABLED  (1 << 4)
+ #define TB_FLAG_AM_ENABLED   (1 << 5)
++#define TB_FLAG_SUPER        (1 << 6)
++#define TB_FLAG_HYPER        (1 << 7)
+ #define TB_FLAG_ASI_SHIFT    24
+ 
+ static inline void cpu_get_tb_cpu_state(CPUSPARCState *env, target_ulong *pc,
+@@ -742,7 +749,17 @@ static inline void cpu_get_tb_cpu_state(CPUSPARCState *env, target_ulong *pc,
+     *pc = env->pc;
+     *cs_base = env->npc;
+     flags = cpu_mmu_index(env, false);
++#ifndef CONFIG_USER_ONLY
++    if (cpu_supervisor_mode(env)) {
++        flags |= TB_FLAG_SUPER;
++    }
++#endif
+ #ifdef TARGET_SPARC64
++#ifndef CONFIG_USER_ONLY
++    if (cpu_hypervisor_mode(env)) {
++        flags |= TB_FLAG_HYPER;
++    }
++#endif
+     if (env->pstate & PS_AM) {
+         flags |= TB_FLAG_AM_ENABLED;
+     }
+diff --git a/target/sparc/translate.c b/target/sparc/translate.c
+index 2205f89..0b0cde1 100644
+--- a/target/sparc/translate.c
++++ b/target/sparc/translate.c
+@@ -72,9 +72,16 @@ typedef struct DisasContext {
+     target_ulong jump_pc[2]; /* used when JUMP_PC pc value is used */
+     int is_br;
+     int mem_idx;
+-    int fpu_enabled;
+-    int address_mask_32bit;
+-    int singlestep;
++    bool fpu_enabled;
++    bool address_mask_32bit;
++    bool singlestep;
++#ifndef CONFIG_USER_ONLY
++    bool supervisor;
++#ifdef TARGET_SPARC64
++    bool hypervisor;
++#endif
++#endif
++
+     uint32_t cc_op;  /* current CC operation */
+     struct TranslationBlock *tb;
+     sparc_def_t *def;
+@@ -283,10 +290,11 @@ static void gen_move_Q(DisasContext *dc, unsigned int rd, unsigned int rs)
+ #define hypervisor(dc) 0
+ #endif
+ #else
+-#define supervisor(dc) (dc->mem_idx >= MMU_KERNEL_IDX)
+ #ifdef TARGET_SPARC64
+-#define hypervisor(dc) (dc->mem_idx == MMU_HYPV_IDX)
++#define hypervisor(dc) (dc->hypervisor)
++#define supervisor(dc) (dc->supervisor | dc->hypervisor)
+ #else
++#define supervisor(dc) (dc->supervisor)
+ #endif
+ #endif
+ 
+@@ -5710,9 +5718,15 @@ void gen_intermediate_code(CPUSPARCState * env, TranslationBlock * tb)
+     dc->fpu_enabled = tb_fpu_enabled(tb->flags);
+     dc->address_mask_32bit = tb_am_enabled(tb->flags);
+     dc->singlestep = (cs->singlestep_enabled || singlestep);
++#ifndef CONFIG_USER_ONLY
++    dc->supervisor = (tb->flags & TB_FLAG_SUPER) != 0;
++#endif
+ #ifdef TARGET_SPARC64
+     dc->fprs_dirty = 0;
+     dc->asi = (tb->flags >> TB_FLAG_ASI_SHIFT) & 0xff;
++#ifndef CONFIG_USER_ONLY
++    dc->hypervisor = (tb->flags & TB_FLAG_HYPER) != 0;
++#endif
+ #endif
+ 
+     num_insns = 0;
+-- 
+1.8.3.1
