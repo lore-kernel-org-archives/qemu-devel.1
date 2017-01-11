@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35553)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35594)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cR8VB-0006Yu-7I
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:19:02 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cR8VD-0006bO-J8
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:19:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cR8VA-0003RV-5Q
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:19:01 -0500
-Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:34629)
+	(envelope-from <rth7680@gmail.com>) id 1cR8VC-0003UH-Iy
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:19:03 -0500
+Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:35085)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cR8VA-0003Qw-0E
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:19:00 -0500
-Received: by mail-pf0-x241.google.com with SMTP id y143so10362251pfb.1
-	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 18:18:59 -0800 (PST)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cR8VC-0003Tj-CO
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:19:02 -0500
+Received: by mail-pf0-x244.google.com with SMTP id f144so12526249pfa.2
+	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 18:19:02 -0800 (PST)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Tue, 10 Jan 2017 18:17:59 -0800
-Message-Id: <20170111021820.24416-45-rth@twiddle.net>
+Date: Tue, 10 Jan 2017 18:18:02 -0800
+Message-Id: <20170111021820.24416-48-rth@twiddle.net>
 In-Reply-To: <20170111021820.24416-1-rth@twiddle.net>
 References: <20170111021820.24416-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PULL 44/65] tcg/s390: Handle clz opcode
+Subject: [Qemu-devel] [PULL 47/65] tcg/i386: Allow bmi2 shiftx to have
+ non-matching operands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,99 +30,104 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
+Previously we could not have different constraints for different ISA levels,
+which prevented us from eliding the matching constraint for shifts.
+
+We do now have to make sure that the operands match for constant shifts.
+We can also handle some small left shifts via lea.
+
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- tcg/s390/tcg-target.h     |  2 +-
- tcg/s390/tcg-target.inc.c | 36 +++++++++++++++++++++++++++++++++++-
- 2 files changed, 36 insertions(+), 2 deletions(-)
+ tcg/i386/tcg-target.inc.c | 33 +++++++++++++++++++--------------
+ 1 file changed, 19 insertions(+), 14 deletions(-)
 
-diff --git a/tcg/s390/tcg-target.h b/tcg/s390/tcg-target.h
-index 3ac2dc9..22500ba 100644
---- a/tcg/s390/tcg-target.h
-+++ b/tcg/s390/tcg-target.h
-@@ -110,7 +110,7 @@ extern uint64_t s390_facilities;
- #define TCG_TARGET_HAS_eqv_i64        0
- #define TCG_TARGET_HAS_nand_i64       0
- #define TCG_TARGET_HAS_nor_i64        0
--#define TCG_TARGET_HAS_clz_i64        0
-+#define TCG_TARGET_HAS_clz_i64        (s390_facilities & FACILITY_EXT_IMM)
- #define TCG_TARGET_HAS_ctz_i64        0
- #define TCG_TARGET_HAS_deposit_i64    (s390_facilities & FACILITY_GEN_INST_EXT)
- #define TCG_TARGET_HAS_extract_i64    (s390_facilities & FACILITY_GEN_INST_EXT)
-diff --git a/tcg/s390/tcg-target.inc.c b/tcg/s390/tcg-target.inc.c
-index c36a9ff..0682d01 100644
---- a/tcg/s390/tcg-target.inc.c
-+++ b/tcg/s390/tcg-target.inc.c
-@@ -50,7 +50,7 @@
- #define TCG_REG_NONE    0
+diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
+index 83572ac..651d96c 100644
+--- a/tcg/i386/tcg-target.inc.c
++++ b/tcg/i386/tcg-target.inc.c
+@@ -179,7 +179,6 @@ static const char *target_parse_constraint(TCGArgConstraint *ct,
+         tcg_regset_set_reg(ct->u.regs, TCG_REG_EBX);
+         break;
+     case 'c':
+-    case_c:
+         ct->ct |= TCG_CT_REG;
+         tcg_regset_set_reg(ct->u.regs, TCG_REG_ECX);
+         break;
+@@ -208,7 +207,6 @@ static const char *target_parse_constraint(TCGArgConstraint *ct,
+         tcg_regset_set32(ct->u.regs, 0, 0xf);
+         break;
+     case 'r':
+-    case_r:
+         ct->ct |= TCG_CT_REG;
+         if (TCG_TARGET_REG_BITS == 64) {
+             tcg_regset_set32(ct->u.regs, 0, 0xffff);
+@@ -216,13 +214,6 @@ static const char *target_parse_constraint(TCGArgConstraint *ct,
+             tcg_regset_set32(ct->u.regs, 0, 0xff);
+         }
+         break;
+-    case 'C':
+-        /* With SHRX et al, we need not use ECX as shift count register.  */
+-        if (have_bmi2) {
+-            goto case_r;
+-        } else {
+-            goto case_c;
+-        }
  
- /* A scratch register that may be be used throughout the backend.  */
--#define TCG_TMP0        TCG_REG_R14
-+#define TCG_TMP0        TCG_REG_R1
- 
- #ifndef CONFIG_SOFTMMU
- #define TCG_GUEST_BASE_REG TCG_REG_R13
-@@ -133,6 +133,7 @@ typedef enum S390Opcode {
-     RRE_DLR     = 0xb997,
-     RRE_DSGFR   = 0xb91d,
-     RRE_DSGR    = 0xb90d,
-+    RRE_FLOGR   = 0xb983,
-     RRE_LGBR    = 0xb906,
-     RRE_LCGR    = 0xb903,
-     RRE_LGFR    = 0xb914,
-@@ -1246,6 +1247,33 @@ static void tgen_movcond(TCGContext *s, TCGType type, TCGCond c, TCGReg dest,
-     }
- }
- 
-+static void tgen_clz(TCGContext *s, TCGReg dest, TCGReg a1,
-+                     TCGArg a2, int a2const)
-+{
-+    /* Since this sets both R and R+1, we have no choice but to store the
-+       result into R0, allowing R1 == TCG_TMP0 to be clobbered as well.  */
-+    QEMU_BUILD_BUG_ON(TCG_TMP0 != TCG_REG_R1);
-+    tcg_out_insn(s, RRE, FLOGR, TCG_REG_R0, a1);
-+
-+    if (a2const && a2 == 64) {
-+        tcg_out_mov(s, TCG_TYPE_I64, dest, TCG_REG_R0);
-+    } else {
-+        if (a2const) {
-+            tcg_out_movi(s, TCG_TYPE_I64, dest, a2);
-+        } else {
-+            tcg_out_mov(s, TCG_TYPE_I64, dest, a2);
-+        }
-+        if (s390_facilities & FACILITY_LOAD_ON_COND) {
-+            /* Emit: if (one bit found) dest = r0.  */
-+            tcg_out_insn(s, RRF, LOCGR, dest, TCG_REG_R0, 2);
-+        } else {
-+            /* Emit: if (no one bit found) goto over; dest = r0; over:  */
-+            tcg_out_insn(s, RI, BRC, 8, (4 + 4) >> 1);
-+            tcg_out_insn(s, RRE, LGR, dest, TCG_REG_R0);
-+        }
-+    }
-+}
-+
- static void tgen_deposit(TCGContext *s, TCGReg dest, TCGReg src,
-                          int ofs, int len, int z)
- {
-@@ -2186,6 +2214,10 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
-         tgen_extract(s, args[0], args[1], args[2], args[3]);
+         /* qemu_ld/st address constraint */
+     case 'L':
+@@ -1959,6 +1950,17 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
          break;
  
-+    case INDEX_op_clz_i64:
-+        tgen_clz(s, args[0], args[1], args[2], const_args[2]);
-+        break;
-+
-     case INDEX_op_mb:
-         /* The host memory model is quite strong, we simply need to
-            serialize the instruction stream.  */
-@@ -2309,6 +2341,8 @@ static const TCGTargetOpDef s390_op_defs[] = {
-     { INDEX_op_bswap32_i64, { "r", "r" } },
-     { INDEX_op_bswap64_i64, { "r", "r" } },
- 
-+    { INDEX_op_clz_i64, { "r", "r", "ri" } },
-+
-     { INDEX_op_add2_i64, { "r", "r", "0", "1", "rA", "r" } },
-     { INDEX_op_sub2_i64, { "r", "r", "0", "1", "rA", "r" } },
- 
+     OP_32_64(shl):
++        /* For small constant 3-operand shift, use LEA.  */
++        if (const_a2 && a0 != a1 && (a2 - 1) < 3) {
++            if (a2 - 1 == 0) {
++                /* shl $1,a1,a0 -> lea (a1,a1),a0 */
++                tcg_out_modrm_sib_offset(s, OPC_LEA + rexw, a0, a1, a1, 0, 0);
++            } else {
++                /* shl $n,a1,a0 -> lea 0(,a1,n),a0 */
++                tcg_out_modrm_sib_offset(s, OPC_LEA + rexw, a0, -1, a1, a2, 0);
++            }
++            break;
++        }
+         c = SHIFT_SHL;
+         vexop = OPC_SHLX;
+         goto gen_shift_maybe_vex;
+@@ -1977,9 +1979,12 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
+         c = SHIFT_ROR;
+         goto gen_shift;
+     gen_shift_maybe_vex:
+-        if (have_bmi2 && !const_a2) {
+-            tcg_out_vex_modrm(s, vexop + rexw, a0, a2, a1);
+-            break;
++        if (have_bmi2) {
++            if (!const_a2) {
++                tcg_out_vex_modrm(s, vexop + rexw, a0, a2, a1);
++                break;
++            }
++            tcg_out_mov(s, rexw ? TCG_TYPE_I64 : TCG_TYPE_I32, a0, a1);
+         }
+         /* FALLTHRU */
+     gen_shift:
+@@ -2190,9 +2195,9 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
+     static const TCGTargetOpDef r_q = { .args_ct_str = { "r", "q" } };
+     static const TCGTargetOpDef r_re = { .args_ct_str = { "r", "re" } };
+     static const TCGTargetOpDef r_0 = { .args_ct_str = { "r", "0" } };
++    static const TCGTargetOpDef r_r_ri = { .args_ct_str = { "r", "r", "ri" } };
+     static const TCGTargetOpDef r_r_re = { .args_ct_str = { "r", "r", "re" } };
+     static const TCGTargetOpDef r_0_re = { .args_ct_str = { "r", "0", "re" } };
+-    static const TCGTargetOpDef r_0_Ci = { .args_ct_str = { "r", "0", "Ci" } };
+     static const TCGTargetOpDef r_0_ci = { .args_ct_str = { "r", "0", "ci" } };
+     static const TCGTargetOpDef r_L = { .args_ct_str = { "r", "L" } };
+     static const TCGTargetOpDef L_L = { .args_ct_str = { "L", "L" } };
+@@ -2266,7 +2271,7 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
+     case INDEX_op_shr_i64:
+     case INDEX_op_sar_i32:
+     case INDEX_op_sar_i64:
+-        return &r_0_Ci;
++        return have_bmi2 ? &r_r_ri : &r_0_ci;
+     case INDEX_op_rotl_i32:
+     case INDEX_op_rotl_i64:
+     case INDEX_op_rotr_i32:
 -- 
 2.9.3
