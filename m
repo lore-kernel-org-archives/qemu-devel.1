@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50337)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53319)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1cRIet-0004Y5-QV
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 08:09:45 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1cRIvb-0001el-Jy
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 08:27:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1cRIep-0006qX-1d
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 08:09:43 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42966)
+	(envelope-from <ehabkost@redhat.com>) id 1cRIvY-0006GE-Er
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 08:26:59 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43050)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <drjones@redhat.com>) id 1cRIeo-0006qN-PC
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 08:09:38 -0500
-Date: Wed, 11 Jan 2017 14:09:34 +0100
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20170111130934.q4rgy6g2ysjwvcay@kamzik.brq.redhat.com>
-References: <1484112575-13194-1-git-send-email-peterx@redhat.com>
-	<1484112575-13194-3-git-send-email-peterx@redhat.com>
-	<20170111110023.hg25ouwqf3mtrxr6@kamzik.brq.redhat.com>
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cRIvY-0006G5-9S
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 08:26:56 -0500
+Date: Wed, 11 Jan 2017 11:26:53 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170111132653.GB3315@thinpad.lan.raisama.net>
+References: <20170104115656.GB14961@amt.cnet>
+	<20170104133916.GG3315@thinpad.lan.raisama.net>
+	<20170104195917.GM3315@thinpad.lan.raisama.net>
+	<20170104222623.GA21789@amt.cnet>
+	<20170105013631.GO3315@thinpad.lan.raisama.net>
+	<20170105104830.GB6299@amt.cnet>
+	<20170105121950.GP3315@thinpad.lan.raisama.net>
+	<20170106103126.GA1575@amt.cnet>
+	<20170108202851.GZ3315@thinpad.lan.raisama.net>
+	<d9ff1970-7d2d-6a49-b93e-27fe2817f412@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170111110023.hg25ouwqf3mtrxr6@kamzik.brq.redhat.com>
-Subject: Re: [Qemu-devel] [kvm-unit-tests PATCH v5 2/2] run_tests: allow run
- tests in parallel
+In-Reply-To: <d9ff1970-7d2d-6a49-b93e-27fe2817f412@redhat.com>
+Subject: Re: [Qemu-devel] Exporting kvm_max_guest_tsc_khz to userspace (was
+ Re: [PATCH 4/4] kvm: Allow migration with invtsc)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,148 +36,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org, Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org, Haozhong Zhang <haozhong.zhang@intel.com>, libvir-list@redhat.com
 
-On Wed, Jan 11, 2017 at 12:00:23PM +0100, Andrew Jones wrote:
-> On Wed, Jan 11, 2017 at 01:29:35PM +0800, Peter Xu wrote:
-> > run_task.sh is getting slow. This patch is trying to make it faster by
-> > running the tests concurrently.
-> > 
-> > We provide a new parameter "-j" for the run_tests.sh, which can be used
-> > to specify how many run queues we want for the tests. Default queue
-> > length is 1, which is the old behavior.
-> > 
-> > Quick test on my laptop (4 cores, 2 threads each) shows 3x speed boost:
-> > 
-> >    |-----------------+-----------|
-> >    | command         | time used |
-> >    |-----------------+-----------|
-> >    | run_test.sh     | 75s       |
-> >    | run_test.sh -j8 | 27s       |
-> >    |-----------------+-----------|
-> > 
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >  run_tests.sh        | 12 ++++++++++--
-> >  scripts/common.bash | 16 +++++++++++++++-
-> >  2 files changed, 25 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/run_tests.sh b/run_tests.sh
-> > index b6a1059..477d4fb 100755
-> > --- a/run_tests.sh
-> > +++ b/run_tests.sh
-> > @@ -13,10 +13,11 @@ function usage()
-> >  {
-> >  cat <<EOF
-> >  
-> > -Usage: $0 [-g group] [-h] [-v]
-> > +Usage: $0 [-g group] [-h] [-v] [-j num_run_queues]
-> >  
-> >      -g: Only execute tests in the given group
-> >      -h: Output this help text
-> > +    -j: Execute tests in parallel
-> >      -v: Enables verbose mode
-> >  
-> >  Set the environment variable QEMU=/path/to/qemu-system-ARCH to
-> > @@ -28,7 +29,7 @@ EOF
-> >  RUNTIME_arch_run="./$TEST_DIR/run"
-> >  source scripts/runtime.bash
-> >  
-> > -while getopts "g:hv" opt; do
-> > +while getopts "g:hj:v" opt; do
-> >      case $opt in
-> >          g)
-> >              only_group=$OPTARG
-> > @@ -37,6 +38,13 @@ while getopts "g:hv" opt; do
-> >              usage
-> >              exit
-> >              ;;
-> > +        j)
-> > +            unittest_run_queues=$OPTARG
-> > +            if (( $unittest_run_queues <= 0 )); then
-> > +                echo "Invalid -j option: $unittest_run_queues"
-> > +                exit 1
+On Mon, Jan 09, 2017 at 03:58:11PM +0100, Paolo Bonzini wrote:
 > 
-> We should probably use 'exit 2' here, and below in the *) case.
 > 
-> > +            fi
-> > +            ;;
-> >          v)
-> >              verbose="yes"
-> >              ;;
-> > diff --git a/scripts/common.bash b/scripts/common.bash
-> > index 2dd7360..ef103ee 100644
-> > --- a/scripts/common.bash
-> > +++ b/scripts/common.bash
-> > @@ -1,11 +1,19 @@
-> >  : ${unittest_log_dir:=logs}
-> > +: ${unittest_run_queues:=1}
-> >  
-> >  function run_task()
-> >  {
-> >  	local testname="$2"
-> >  
-> > +	while (( $(jobs | wc -l) == $unittest_run_queues )); do
-> > +		# wait for any background test to finish
-> > +		wait -n
-> > +	done
-> > +
-> >  	RUNTIME_log_file="${unittest_log_dir}/${testname}.log"
-> > -	"$@"
-> > +
-> > +	# start the testcase in the background
-> > +	"$@" &
+> On 08/01/2017 21:28, Eduardo Habkost wrote:
+> >> Well just export KVM_GET_TSC_KHZ in a QMP command right? Its pretty
+> >> easy.
+> >>
+> >> Let me know if you need any help coding or testing.
+> > I just found out that KVM doesn't provide something that QEMU and
+> > libvirt need: the value of kvm_max_guest_tsc_khz. Without it, we
+> > have no way to know if a given VM is really migratable to a host.
+> > 
+> > Could we add a KVM_CAP_MAX_TSC_KHZ capability for that?
 > 
-> If you check the logs before and after applying this patch series you'll
-> see a bunch of "stty: 'standard input': Inappropriate ioctl for device"
-> are now present. These messages come from the stty calls in run_qemu,
-> which we need to avoid the loss of terminal echo when QEMU aborts. We
-> can get rid of these new "inappropriate ioctl" messages by changing the
-> above line to
-> 
->  "$@" <$(tty) &
+> The ratio is really quite high, 256x the host frequency for AMD and
+> 65536x for Intel.  Anything below 2^32 Hz (above that, there would
+> probably be other failures) is safe.
 
-Actually I just came up with a better solution for this. Since we don't
-need input to our unit tests, i.e. we never attempt to read from the
-serial port within them, then we can just use /dev/null for stdin. That
-allows us to leave your code above alone, and also remove the stty stuff
-in run_qemu. I'll send a patch.
+2^32 Hz (~4.3 GHz) sounds like a limit likely to be hit by future
+CPUs. Which kind of failures do you think we could see?
 
-drew
-
-> 
-> 
-> >  }
-> >  
-> >  function for_each_unittest()
-> > @@ -22,6 +30,8 @@ function for_each_unittest()
-> >  	local accel
-> >  	local timeout
-> >  
-> > +	trap "wait; exit 130" SIGINT
-> > +
-> >  	exec {fd}<"$unittests"
-> >  
-> >  	while read -u $fd line; do
-> > @@ -55,5 +65,9 @@ function for_each_unittest()
-> >  		fi
-> >  	done
-> >  	run_task "$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
-> > +
-> > +	# wait until all task finish
-> 
-> Still not quite right :-)  s/task/tasks/
-> 
-> > +	wait
-> > +
-> >  	exec {fd}<&-
-> >  }
-> > -- 
-> > 2.7.4
-> > 
-> > 
-> 
-> Thanks,
-> drew
-> 
+-- 
+Eduardo
