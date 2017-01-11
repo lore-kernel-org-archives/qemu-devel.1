@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45231)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45247)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cROgN-00034U-Ee
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:35:40 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cROgO-000354-94
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:35:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cROgM-0003JW-9I
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:35:39 -0500
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:34559)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cROgN-0003Ju-GM
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:35:40 -0500
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:34564)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1cROgM-0003JE-2p
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:35:38 -0500
-Received: by mail-wm0-x242.google.com with SMTP id c85so334384wmi.1
-	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 11:35:37 -0800 (PST)
+	id 1cROgN-0003Jc-3M
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:35:39 -0500
+Received: by mail-wm0-x244.google.com with SMTP id c85so334537wmi.1
+	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 11:35:38 -0800 (PST)
 Received: from 640k.lan (94-39-158-71.adsl-ull.clienti.tiscali.it.
 	[94.39.158.71]) by smtp.gmail.com with ESMTPSA id
-	k11sm10463101wmb.18.2017.01.11.11.35.35 for <qemu-devel@nongnu.org>
+	k11sm10463101wmb.18.2017.01.11.11.35.36 for <qemu-devel@nongnu.org>
 	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Wed, 11 Jan 2017 11:35:36 -0800 (PST)
+	Wed, 11 Jan 2017 11:35:37 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 11 Jan 2017 20:34:59 +0100
-Message-Id: <1484163327-111841-6-git-send-email-pbonzini@redhat.com>
+Date: Wed, 11 Jan 2017 20:35:00 +0100
+Message-Id: <1484163327-111841-7-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1484163327-111841-1-git-send-email-pbonzini@redhat.com>
 References: <1484163327-111841-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 05/33] stubs: merge all monitor stubs in one
- file, remove monitor_cur_is_qmp stub
+Subject: [Qemu-devel] [PULL 06/33] stubs: move smbios stubs to hw/smbios
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,93 +34,50 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-monitor_cur_is_qmp was previously used by other stubs, but it's not
-since 397d30e ("qemu-error: remove dependency of stubs on monitor",
-2016-11-01).
+No need to include them in libqemustub.a, since only system emulators
+need them.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- stubs/Makefile.objs           |  4 +---
- stubs/mon-is-qmp.c            | 10 ----------
- stubs/monitor-init.c          |  7 -------
- stubs/{get-fd.c => monitor.c} |  6 ++++++
- 4 files changed, 7 insertions(+), 20 deletions(-)
- delete mode 100644 stubs/mon-is-qmp.c
- delete mode 100644 stubs/monitor-init.c
- rename stubs/{get-fd.c => monitor.c} (75%)
+ hw/smbios/Makefile.objs                                   | 11 ++++++++---
+ stubs/smbios_type_38.c => hw/smbios/smbios_type_38-stub.c |  0
+ stubs/Makefile.objs                                       |  1 -
+ 3 files changed, 8 insertions(+), 4 deletions(-)
+ rename stubs/smbios_type_38.c => hw/smbios/smbios_type_38-stub.c (100%)
 
+diff --git a/hw/smbios/Makefile.objs b/hw/smbios/Makefile.objs
+index ee0712b..23bb2ba 100644
+--- a/hw/smbios/Makefile.objs
++++ b/hw/smbios/Makefile.objs
+@@ -1,5 +1,10 @@
+-common-obj-$(CONFIG_SMBIOS) += smbios.o
+-common-obj-$(call land,$(CONFIG_SMBIOS),$(CONFIG_IPMI)) += smbios_type_38.o
++ifeq ($(CONFIG_SMBIOS),y)
++common-obj-y += smbios.o
++common-obj-$(CONFIG_IPMI) += smbios_type_38.o
++common-obj-$(call lnot,$(CONFIG_IPMI)) += smbios_type_38-stub.o
++else
++common-obj-y += smbios-stub.o
++endif
+ 
+-common-obj-$(call lnot,$(CONFIG_SMBIOS)) += smbios-stub.o
+ common-obj-$(CONFIG_ALL) += smbios-stub.o
++common-obj-$(CONFIG_ALL) += smbios_type_38-stub.o
+diff --git a/stubs/smbios_type_38.c b/hw/smbios/smbios_type_38-stub.c
+similarity index 100%
+rename from stubs/smbios_type_38.c
+rename to hw/smbios/smbios_type_38-stub.c
 diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-index 2b5bb74..9fc373e 100644
+index 9fc373e..13c5d45 100644
 --- a/stubs/Makefile.objs
 +++ b/stubs/Makefile.objs
-@@ -15,7 +15,6 @@ stub-obj-y += fdset-find-fd.o
- stub-obj-y += fdset-get-fd.o
- stub-obj-y += fdset-remove-fd.o
- stub-obj-y += gdbstub.o
--stub-obj-y += get-fd.o
- stub-obj-y += get-next-serial.o
- stub-obj-y += get-vm-name.o
- stub-obj-y += iothread.o
-@@ -23,8 +22,7 @@ stub-obj-y += iothread-lock.o
- stub-obj-y += is-daemonized.o
- stub-obj-y += machine-init-done.o
- stub-obj-y += migr-blocker.o
--stub-obj-y += mon-is-qmp.o
--stub-obj-y += monitor-init.o
-+stub-obj-y += monitor.o
- stub-obj-y += notify-event.o
- stub-obj-y += qtest.o
- stub-obj-y += replay.o
-diff --git a/stubs/mon-is-qmp.c b/stubs/mon-is-qmp.c
-deleted file mode 100644
-index a8344ce..0000000
---- a/stubs/mon-is-qmp.c
-+++ /dev/null
-@@ -1,10 +0,0 @@
--#include "qemu/osdep.h"
--#include "qemu-common.h"
--#include "monitor/monitor.h"
--
--Monitor *cur_mon;
--
--bool monitor_cur_is_qmp(void)
--{
--    return false;
--}
-diff --git a/stubs/monitor-init.c b/stubs/monitor-init.c
-deleted file mode 100644
-index de1bc7c..0000000
---- a/stubs/monitor-init.c
-+++ /dev/null
-@@ -1,7 +0,0 @@
--#include "qemu/osdep.h"
--#include "qemu-common.h"
--#include "monitor/monitor.h"
--
--void monitor_init(CharDriverState *chr, int flags)
--{
--}
-diff --git a/stubs/get-fd.c b/stubs/monitor.c
-similarity index 75%
-rename from stubs/get-fd.c
-rename to stubs/monitor.c
-index 7dfdfb5..1d574b1 100644
---- a/stubs/get-fd.c
-+++ b/stubs/monitor.c
-@@ -3,8 +3,14 @@
- #include "qemu-common.h"
- #include "monitor/monitor.h"
- 
-+Monitor *cur_mon = NULL;
-+
- int monitor_get_fd(Monitor *mon, const char *name, Error **errp)
- {
-     error_setg(errp, "only QEMU supports file descriptor passing");
-     return -1;
- }
-+
-+void monitor_init(CharDriverState *chr, int flags)
-+{
-+}
+@@ -44,7 +44,6 @@ stub-obj-y += target-monitor-defs.o
+ stub-obj-y += target-get-monitor-def.o
+ stub-obj-y += vhost.o
+ stub-obj-y += iohandler.o
+-stub-obj-y += smbios_type_38.o
+ stub-obj-y += ipmi.o
+ stub-obj-y += pc_madt_cpu_entry.o
+ stub-obj-y += migration-colo.o
 -- 
 1.8.3.1
