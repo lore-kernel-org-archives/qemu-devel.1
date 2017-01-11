@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35876)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35887)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cR8VQ-0006oI-Go
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:19:17 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cR8VR-0006pG-5g
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:19:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cR8VP-0003eP-ER
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:19:16 -0500
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:33475)
+	(envelope-from <rth7680@gmail.com>) id 1cR8VQ-0003ei-4k
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:19:17 -0500
+Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:33477)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cR8VP-0003dz-74
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:19:15 -0500
-Received: by mail-pf0-x243.google.com with SMTP id 127so31459979pfg.0
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cR8VP-0003eT-Vd
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:19:16 -0500
+Received: by mail-pf0-x242.google.com with SMTP id 127so31460019pfg.0
 	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 18:19:15 -0800 (PST)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Tue, 10 Jan 2017 18:18:18 -0800
-Message-Id: <20170111021820.24416-64-rth@twiddle.net>
+Date: Tue, 10 Jan 2017 18:18:19 -0800
+Message-Id: <20170111021820.24416-65-rth@twiddle.net>
 In-Reply-To: <20170111021820.24416-1-rth@twiddle.net>
 References: <20170111021820.24416-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PULL 63/65] tcg: Use ctpop to generate ctz if needed
+Subject: [Qemu-devel] [PULL 64/65] tcg/ppc: Handle ctpop opcode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,145 +29,99 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-Particularly when andc is also available, this is two insns
-shorter than using clz to compute ctz.
-
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- tcg/tcg-op.c | 100 +++++++++++++++++++++++++++++++++++------------------------
- 1 file changed, 60 insertions(+), 40 deletions(-)
+ tcg/ppc/tcg-target.h     |  5 +++--
+ tcg/ppc/tcg-target.inc.c | 12 +++++++++++-
+ 2 files changed, 14 insertions(+), 3 deletions(-)
 
-diff --git a/tcg/tcg-op.c b/tcg/tcg-op.c
-index 6f4b1b6..95a39b7 100644
---- a/tcg/tcg-op.c
-+++ b/tcg/tcg-op.c
-@@ -497,33 +497,27 @@ void tcg_gen_ctz_i32(TCGv_i32 ret, TCGv_i32 arg1, TCGv_i32 arg2)
-         tcg_gen_extrl_i64_i32(ret, t1);
-         tcg_temp_free_i64(t1);
-         tcg_temp_free_i64(t2);
--    } else if (TCG_TARGET_HAS_clz_i32) {
--        TCGv_i32 t1 = tcg_temp_new_i32();
--        TCGv_i32 t2 = tcg_temp_new_i32();
--        tcg_gen_neg_i32(t1, arg1);
--        tcg_gen_xori_i32(t2, arg2, 31);
--        tcg_gen_and_i32(t1, t1, arg1);
--        tcg_gen_clz_i32(ret, t1, t2);
--        tcg_temp_free_i32(t1);
--        tcg_temp_free_i32(t2);
--        tcg_gen_xori_i32(ret, ret, 31);
--    } else if (TCG_TARGET_HAS_clz_i64) {
--        TCGv_i32 t1 = tcg_temp_new_i32();
--        TCGv_i32 t2 = tcg_temp_new_i32();
--        TCGv_i64 x1 = tcg_temp_new_i64();
--        TCGv_i64 x2 = tcg_temp_new_i64();
--        tcg_gen_neg_i32(t1, arg1);
--        tcg_gen_xori_i32(t2, arg2, 63);
--        tcg_gen_and_i32(t1, t1, arg1);
--        tcg_gen_extu_i32_i64(x1, t1);
--        tcg_gen_extu_i32_i64(x2, t2);
--        tcg_temp_free_i32(t1);
--        tcg_temp_free_i32(t2);
--        tcg_gen_clz_i64(x1, x1, x2);
--        tcg_gen_extrl_i64_i32(ret, x1);
--        tcg_temp_free_i64(x1);
--        tcg_temp_free_i64(x2);
--        tcg_gen_xori_i32(ret, ret, 63);
-+    } else if (TCG_TARGET_HAS_ctpop_i32
-+               || TCG_TARGET_HAS_ctpop_i64
-+               || TCG_TARGET_HAS_clz_i32
-+               || TCG_TARGET_HAS_clz_i64) {
-+        TCGv_i32 z, t = tcg_temp_new_i32();
-+
-+        if (TCG_TARGET_HAS_ctpop_i32 || TCG_TARGET_HAS_ctpop_i64) {
-+            tcg_gen_subi_i32(t, arg1, 1);
-+            tcg_gen_andc_i32(t, t, arg1);
-+            tcg_gen_ctpop_i32(t, t);
-+        } else {
-+            /* Since all non-x86 hosts have clz(0) == 32, don't fight it.  */
-+            tcg_gen_neg_i32(t, arg1);
-+            tcg_gen_and_i32(t, t, arg1);
-+            tcg_gen_clzi_i32(t, t, 32);
-+            tcg_gen_xori_i32(t, t, 31);
-+        }
-+        z = tcg_const_i32(0);
-+        tcg_gen_movcond_i32(TCG_COND_EQ, ret, arg1, z, arg2, t);
-+        tcg_temp_free_i32(t);
-+        tcg_temp_free_i32(z);
-     } else {
-         gen_helper_ctz_i32(ret, arg1, arg2);
-     }
-@@ -531,9 +525,18 @@ void tcg_gen_ctz_i32(TCGv_i32 ret, TCGv_i32 arg1, TCGv_i32 arg2)
+diff --git a/tcg/ppc/tcg-target.h b/tcg/ppc/tcg-target.h
+index 57e66cf..abd8b3d 100644
+--- a/tcg/ppc/tcg-target.h
++++ b/tcg/ppc/tcg-target.h
+@@ -49,6 +49,7 @@ typedef enum {
+     TCG_AREG0 = TCG_REG_R27
+ } TCGReg;
  
- void tcg_gen_ctzi_i32(TCGv_i32 ret, TCGv_i32 arg1, uint32_t arg2)
- {
--    TCGv_i32 t = tcg_const_i32(arg2);
--    tcg_gen_ctz_i32(ret, arg1, t);
--    tcg_temp_free_i32(t);
-+    if (!TCG_TARGET_HAS_ctz_i32 && TCG_TARGET_HAS_ctpop_i32 && arg2 == 32) {
-+        /* This equivalence has the advantage of not requiring a fixup.  */
-+        TCGv_i32 t = tcg_temp_new_i32();
-+        tcg_gen_subi_i32(t, arg1, 1);
-+        tcg_gen_andc_i32(t, t, arg1);
-+        tcg_gen_ctpop_i32(ret, t);
-+        tcg_temp_free_i32(t);
-+    } else {
-+        TCGv_i32 t = tcg_const_i32(arg2);
-+        tcg_gen_ctz_i32(ret, arg1, t);
-+        tcg_temp_free_i32(t);
-+    }
- }
++extern bool have_isa_2_06;
+ extern bool have_isa_3_00;
  
- void tcg_gen_clrsb_i32(TCGv_i32 ret, TCGv_i32 arg)
-@@ -1842,16 +1845,24 @@ void tcg_gen_ctz_i64(TCGv_i64 ret, TCGv_i64 arg1, TCGv_i64 arg2)
- {
-     if (TCG_TARGET_HAS_ctz_i64) {
-         tcg_gen_op3_i64(INDEX_op_ctz_i64, ret, arg1, arg2);
--    } else if (TCG_TARGET_HAS_clz_i64) {
--        TCGv_i64 t1 = tcg_temp_new_i64();
--        TCGv_i64 t2 = tcg_temp_new_i64();
--        tcg_gen_neg_i64(t1, arg1);
--        tcg_gen_xori_i64(t2, arg2, 63);
--        tcg_gen_and_i64(t1, t1, arg1);
--        tcg_gen_clz_i64(ret, t1, t2);
--        tcg_temp_free_i64(t1);
--        tcg_temp_free_i64(t2);
--        tcg_gen_xori_i64(ret, ret, 63);
-+    } else if (TCG_TARGET_HAS_ctpop_i64 || TCG_TARGET_HAS_clz_i64) {
-+        TCGv_i64 z, t = tcg_temp_new_i64();
-+
-+        if (TCG_TARGET_HAS_ctpop_i64) {
-+            tcg_gen_subi_i64(t, arg1, 1);
-+            tcg_gen_andc_i64(t, t, arg1);
-+            tcg_gen_ctpop_i64(t, t);
-+        } else {
-+            /* Since all non-x86 hosts have clz(0) == 64, don't fight it.  */
-+            tcg_gen_neg_i64(t, arg1);
-+            tcg_gen_and_i64(t, t, arg1);
-+            tcg_gen_clzi_i64(t, t, 64);
-+            tcg_gen_xori_i64(t, t, 63);
-+        }
-+        z = tcg_const_i64(0);
-+        tcg_gen_movcond_i64(TCG_COND_EQ, ret, arg1, z, arg2, t);
-+        tcg_temp_free_i64(t);
-+        tcg_temp_free_i64(z);
-     } else {
-         gen_helper_ctz_i64(ret, arg1, arg2);
-     }
-@@ -1868,6 +1879,15 @@ void tcg_gen_ctzi_i64(TCGv_i64 ret, TCGv_i64 arg1, uint64_t arg2)
-         tcg_gen_ctz_i32(TCGV_LOW(ret), TCGV_LOW(arg1), t32);
-         tcg_gen_movi_i32(TCGV_HIGH(ret), 0);
-         tcg_temp_free_i32(t32);
-+    } else if (!TCG_TARGET_HAS_ctz_i64
-+               && TCG_TARGET_HAS_ctpop_i64
-+               && arg2 == 64) {
-+        /* This equivalence has the advantage of not requiring a fixup.  */
-+        TCGv_i64 t = tcg_temp_new_i64();
-+        tcg_gen_subi_i64(t, arg1, 1);
-+        tcg_gen_andc_i64(t, t, arg1);
-+        tcg_gen_ctpop_i64(ret, t);
-+        tcg_temp_free_i64(t);
-     } else {
-         TCGv_i64 t64 = tcg_const_i64(arg2);
-         tcg_gen_ctz_i64(ret, arg1, t64);
+ /* optional instructions automatically implemented */
+@@ -72,7 +73,7 @@ extern bool have_isa_3_00;
+ #define TCG_TARGET_HAS_nor_i32          1
+ #define TCG_TARGET_HAS_clz_i32          1
+ #define TCG_TARGET_HAS_ctz_i32          have_isa_3_00
+-#define TCG_TARGET_HAS_ctpop_i32        0
++#define TCG_TARGET_HAS_ctpop_i32        have_isa_2_06
+ #define TCG_TARGET_HAS_deposit_i32      1
+ #define TCG_TARGET_HAS_extract_i32      1
+ #define TCG_TARGET_HAS_sextract_i32     0
+@@ -108,7 +109,7 @@ extern bool have_isa_3_00;
+ #define TCG_TARGET_HAS_nor_i64          1
+ #define TCG_TARGET_HAS_clz_i64          1
+ #define TCG_TARGET_HAS_ctz_i64          have_isa_3_00
+-#define TCG_TARGET_HAS_ctpop_i64        0
++#define TCG_TARGET_HAS_ctpop_i64        have_isa_2_06
+ #define TCG_TARGET_HAS_deposit_i64      1
+ #define TCG_TARGET_HAS_extract_i64      1
+ #define TCG_TARGET_HAS_sextract_i64     0
+diff --git a/tcg/ppc/tcg-target.inc.c b/tcg/ppc/tcg-target.inc.c
+index 766bc1a..64f67d2 100644
+--- a/tcg/ppc/tcg-target.inc.c
++++ b/tcg/ppc/tcg-target.inc.c
+@@ -83,7 +83,7 @@ static tcg_insn_unit *tb_ret_addr;
+ 
+ #include "elf.h"
+ 
+-static bool have_isa_2_06;
++bool have_isa_2_06;
+ bool have_isa_3_00;
+ 
+ #define HAVE_ISA_2_06  have_isa_2_06
+@@ -457,6 +457,8 @@ static int tcg_target_const_match(tcg_target_long val, TCGType type,
+ #define CNTLZD XO31( 58)
+ #define CNTTZW XO31(538)
+ #define CNTTZD XO31(570)
++#define CNTPOPW XO31(378)
++#define CNTPOPD XO31(506)
+ #define ANDC   XO31( 60)
+ #define ORC    XO31(412)
+ #define EQV    XO31(284)
+@@ -2149,6 +2151,9 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc, const TCGArg *args,
+         tcg_out_cntxz(s, TCG_TYPE_I32, CNTTZW, args[0], args[1],
+                       args[2], const_args[2]);
+         break;
++    case INDEX_op_ctpop_i32:
++        tcg_out32(s, CNTPOPW | SAB(args[1], args[0], 0));
++        break;
+ 
+     case INDEX_op_clz_i64:
+         tcg_out_cntxz(s, TCG_TYPE_I64, CNTLZD, args[0], args[1],
+@@ -2158,6 +2163,9 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc, const TCGArg *args,
+         tcg_out_cntxz(s, TCG_TYPE_I64, CNTTZD, args[0], args[1],
+                       args[2], const_args[2]);
+         break;
++    case INDEX_op_ctpop_i64:
++        tcg_out32(s, CNTPOPD | SAB(args[1], args[0], 0));
++        break;
+ 
+     case INDEX_op_mul_i32:
+         a0 = args[0], a1 = args[1], a2 = args[2];
+@@ -2573,6 +2581,7 @@ static const TCGTargetOpDef ppc_op_defs[] = {
+     { INDEX_op_nor_i32, { "r", "r", "r" } },
+     { INDEX_op_clz_i32, { "r", "r", "rZW" } },
+     { INDEX_op_ctz_i32, { "r", "r", "rZW" } },
++    { INDEX_op_ctpop_i32, { "r", "r" } },
+ 
+     { INDEX_op_shl_i32, { "r", "r", "ri" } },
+     { INDEX_op_shr_i32, { "r", "r", "ri" } },
+@@ -2623,6 +2632,7 @@ static const TCGTargetOpDef ppc_op_defs[] = {
+     { INDEX_op_nor_i64, { "r", "r", "r" } },
+     { INDEX_op_clz_i64, { "r", "r", "rZW" } },
+     { INDEX_op_ctz_i64, { "r", "r", "rZW" } },
++    { INDEX_op_ctpop_i64, { "r", "r" } },
+ 
+     { INDEX_op_shl_i64, { "r", "r", "ri" } },
+     { INDEX_op_shr_i64, { "r", "r", "ri" } },
 -- 
 2.9.3
