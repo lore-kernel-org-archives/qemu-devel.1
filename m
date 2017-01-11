@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40552)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40575)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cRMj1-0000oe-IP
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 12:30:19 -0500
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cRMj3-0000qW-U8
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 12:30:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1cRMix-0006KF-QW
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 12:30:15 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50096)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1cRMj2-0006M2-VJ
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 12:30:17 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57572)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1cRMix-0006K7-LO
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 12:30:11 -0500
-Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
-	[10.5.11.28])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	id 1cRMj2-0006Lu-PW
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 12:30:16 -0500
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com
+	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D1F1F2172E
-	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 17:30:11 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id EFC498F037
+	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 17:30:16 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed, 11 Jan 2017 18:29:25 +0100
-Message-Id: <20170111172956.11255-10-marcandre.lureau@redhat.com>
+Date: Wed, 11 Jan 2017 18:29:29 +0100
+Message-Id: <20170111172956.11255-14-marcandre.lureau@redhat.com>
 In-Reply-To: <20170111172956.11255-1-marcandre.lureau@redhat.com>
 References: <20170111172956.11255-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 09/40] char-parallel: convert parallel to
- finalize
+Subject: [Qemu-devel] [PATCH 13/40] char-win: convert to finalize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,70 +38,73 @@ Cc: pbonzini@redhat.com, eblake@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?=
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- qemu-char.c | 30 +++++++++++++++++-------------
- 1 file changed, 17 insertions(+), 13 deletions(-)
+ qemu-char.c | 10 +++-------
+ 1 file changed, 3 insertions(+), 7 deletions(-)
 
 diff --git a/qemu-char.c b/qemu-char.c
-index 98d4a17990..2579b0be31 100644
+index 1954dec9b8..4cbcc29bd5 100644
 --- a/qemu-char.c
 +++ b/qemu-char.c
-@@ -2025,17 +2025,6 @@ static int pp_ioctl(Chardev *chr, int cmd, void *a=
-rg)
-     return 0;
- }
+@@ -2150,8 +2150,9 @@ typedef struct {
+ static int win_chr_poll(void *opaque);
+ static int win_chr_pipe_poll(void *opaque);
 =20
--static void pp_free(Chardev *chr)
--{
--    ParallelChardev *drv =3D PARALLEL_CHARDEV(chr);
--    int fd =3D drv->fd;
--
--    pp_hw_mode(drv, IEEE1284_MODE_COMPAT);
--    ioctl(fd, PPRELEASE);
--    close(fd);
--    qemu_chr_be_event(chr, CHR_EVENT_CLOSED);
--}
--
- static void qemu_chr_open_pp_fd(Chardev *chr,
-                                 int fd,
-                                 bool *be_opened,
-@@ -4697,18 +4686,33 @@ static void char_parallel_class_init(ObjectClass =
-*oc, void *data)
- #if defined(__linux__)
-     cc->chr_write =3D null_chr_write;
-     cc->chr_ioctl =3D pp_ioctl;
--    cc->chr_free =3D pp_free;
- #elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__D=
-ragonFly__)
--    /* FIXME: no chr_free */
-     cc->chr_write =3D null_chr_write;
-     cc->chr_ioctl =3D pp_ioctl;
- #endif
- }
-=20
-+static void char_parallel_finalize(Object *obj)
-+{
-+#if defined(__linux__)
+-static void win_chr_free(Chardev *chr)
++static void char_win_finalize(Object *obj)
+ {
 +    Chardev *chr =3D CHARDEV(obj);
-+    ParallelChardev *drv =3D PARALLEL_CHARDEV(chr);
-+    int fd =3D drv->fd;
-+
-+    pp_hw_mode(drv, IEEE1284_MODE_COMPAT);
-+    ioctl(fd, PPRELEASE);
-+    close(fd);
-+    qemu_chr_be_event(chr, CHR_EVENT_CLOSED);
-+#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__D=
-ragonFly__)
-+    /* FIXME: close fd? */
-+#endif
-+}
-+
- static const TypeInfo char_parallel_type_info =3D {
-     .name =3D TYPE_CHARDEV_PARALLEL,
+     WinChardev *s =3D WIN_CHARDEV(chr);
+=20
+     if (s->skip_free) {
+@@ -2160,15 +2161,12 @@ static void win_chr_free(Chardev *chr)
+=20
+     if (s->hsend) {
+         CloseHandle(s->hsend);
+-        s->hsend =3D NULL;
+     }
+     if (s->hrecv) {
+         CloseHandle(s->hrecv);
+-        s->hrecv =3D NULL;
+     }
+     if (s->hcom) {
+         CloseHandle(s->hcom);
+-        s->hcom =3D NULL;
+     }
+     if (s->fpipe)
+         qemu_del_polling_cb(win_chr_pipe_poll, chr);
+@@ -2241,7 +2239,6 @@ static int win_chr_init(Chardev *chr, const char *f=
+ilename, Error **errp)
+     return 0;
+=20
+  fail:
+-    win_chr_free(chr);
+     return -1;
+ }
+=20
+@@ -2416,7 +2413,6 @@ static int win_chr_pipe_init(Chardev *chr, const ch=
+ar *filename,
+     return 0;
+=20
+  fail:
+-    win_chr_free(chr);
+     return -1;
+ }
+=20
+@@ -2447,13 +2443,13 @@ static void char_win_class_init(ObjectClass *oc, =
+void *data)
+     ChardevClass *cc =3D CHARDEV_CLASS(oc);
+=20
+     cc->chr_write =3D win_chr_write;
+-    cc->chr_free =3D win_chr_free;
+ }
+=20
+ static const TypeInfo char_win_type_info =3D {
+     .name =3D TYPE_CHARDEV_WIN,
      .parent =3D TYPE_CHARDEV,
-     .instance_size =3D sizeof(ParallelChardev),
-+    .instance_finalize =3D char_parallel_finalize,
-     .class_init =3D char_parallel_class_init,
+     .instance_size =3D sizeof(WinChardev),
++    .instance_finalize =3D char_win_finalize,
+     .class_init =3D char_win_class_init,
+     .abstract =3D true,
  };
- #endif
 --=20
 2.11.0
