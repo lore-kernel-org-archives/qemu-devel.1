@@ -1,28 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38289)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38965)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cRLZy-000530-PI
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 11:16:51 -0500
+	(envelope-from <bounces@canonical.com>) id 1cRLdl-00071z-F4
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 11:20:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1cRLZu-0005kf-QA
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 11:16:50 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56862)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1cRLZu-0005kB-Jy
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 11:16:46 -0500
-Date: Wed, 11 Jan 2017 16:16:40 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170111161640.GA9269@stefanha-x1.localdomain>
-References: <148295045448.19871.9819696634619157347.stgit@fimbulvetr.bsc.es>
-	<148295047061.19871.11792107348459066542.stgit@fimbulvetr.bsc.es>
-	<20170109170156.GL30228@stefanha-x1.localdomain>
-	<34ec95ff-7283-4e6f-fc07-7678424d0e13@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1cRLdh-0007B4-Gg
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 11:20:45 -0500
+Received: from indium.canonical.com ([91.189.90.7]:59397)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1cRLdh-0007Ap-6r
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 11:20:41 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1cRLdg-0007v2-3V
+	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 16:20:40 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id F259F2E80C8
+	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 16:20:39 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="2oS5YaxWCcQjTEyO"
-Content-Disposition: inline
-In-Reply-To: <34ec95ff-7283-4e6f-fc07-7678424d0e13@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v6 3/7] trace: [tcg] Delay changes to
- dynamic state when translating
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 11 Jan 2017 16:06:31 -0000
+From: dcb <1655700@bugs.launchpad.net>
+Reply-To: Bug 1655700 <1655700@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <20170111160632.21721.91751.malonedeb@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1655700] [NEW] disas/libvixl/vixl/invalset.h:
+ possible dodgy code in binary search ?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,69 +36,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: =?iso-8859-1?Q?Llu=EDs?= Vilanova <vilanova@ac.upc.edu>, qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+
+Public bug reported:
 
 
---2oS5YaxWCcQjTEyO
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+[qemu/disas/libvixl/vixl/invalset.h:442]: (style) Array index 'low' is used=
+ before limits check.
 
-On Tue, Jan 10, 2017 at 05:31:37PM +0100, Paolo Bonzini wrote:
-> On 09/01/2017 18:01, Stefan Hajnoczi wrote:
-> > Or use a simpler scheme:
-> >=20
-> > struct CPUState {
-> >     ...
-> >     uint32_t dstate_update_count;
-> > };
-> >=20
-> > In trace_event_set_vcpu_state_dynamic():
-> >=20
-> >     if (state) {
-> >         trace_events_enabled_count++;
-> >         set_bit(vcpu_id, vcpu->trace_dstate_delayed);
-> > 	atomic_inc(&vcpu->dstate_update_count, 1);
-> >         (*ev->dstate)++;
-> >     } ...
-> >=20
-> > In cpu_exec() and friends:
-> >=20
-> >     last_dstate_update_count =3D atomic_read(&vcpu->dstate_update_count=
-);
-> >=20
-> >     tb =3D tb_find(cpu, last_tb, tb_exit);
-> >     cpu_loop_exec_tb(cpu, tb, &last_tb, &tb_exit, &sc);
-> >=20
-> >     /* apply and disable delayed dstate changes */
-> >     if (unlikely(atomic_read(&cpu->dstate_update_count) !=3D last_dstat=
-e_update_count)) {
-> >         bitmap_copy(cpu->trace_dstate, cpu->trace_dstate_delayed,
-> >         trace_get_vcpu_event_count());
-> >     }
-> >=20
-> > (You'll need to adjust the details but the update counter approach
-> > should be workable.)
->=20
-> Would it work to use async_run_on_cpu?
+Source code is
 
-I think so.
+    while (!IsValid(elements[low]) && (low < high)) ++low;
 
-Stefan
+Also:
 
---2oS5YaxWCcQjTEyO
-Content-Type: application/pgp-signature; name="signature.asc"
+qemu/disas/libvixl/vixl/invalset.h:450]: (style) Array index 'middle' is
+used before limits check.
 
------BEGIN PGP SIGNATURE-----
+The source code is
 
-iQEcBAEBAgAGBQJYdlpoAAoJEJykq7OBq3PIX34IAIe9ItpqiFG1y8b3qB++V5wY
-PEkadQ0HDlvJzEVSaFpL+6cgKBnYUGfCV6Hmf32T+1dKZkzsetYBlwgFQoH/9vg/
-7tRM3XeoBRGmpt1WxMl9NRdLM9t1q8YGJNUzqQdFcKqR+YhyKDQfkGiZx8ZAErvL
-Pgi7LGQix1wPQR1IQ03ERtF34bVxS4/qs3bHWw2vJZ6PhYp5YT8FbRARmXxzOyHc
-cJ/YUMzL9Q1iGRJRgXmTHdR3DhkNeg5vwm+hWujslcQYh5IyjAP4Jo/D1x+Ad6AB
-bTX+2yrCf5P+ADdf9MR3VEJWipz6276u+QC4Aiogs05OplVjJiY3il+GrJ4clkc=
-=oyTs
------END PGP SIGNATURE-----
+   while (!IsValid(elements[high]) && (low < high)) --high;
 
---2oS5YaxWCcQjTEyO--
+Mind you, these lines of code look similar but didn't get reported:
+
+    while (!IsValid(elements[middle]) && (middle < high - 1)) ++middle;
+    while (!IsValid(elements[middle]) && (low + 1 < middle)) --middle;
+
+Given that binary search is notoriously tricky to get correct and a standar=
+d C library routine
+I am puzzled as to why the standard library routine didn't get used, with o=
+f course a custom
+comparison function.
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1655700
+
+Title:
+  disas/libvixl/vixl/invalset.h: possible dodgy code in binary search ?
+
+Status in QEMU:
+  New
+
+Bug description:
+  =
+
+  [qemu/disas/libvixl/vixl/invalset.h:442]: (style) Array index 'low' is us=
+ed before limits check.
+
+  Source code is
+
+      while (!IsValid(elements[low]) && (low < high)) ++low;
+
+  Also:
+
+  qemu/disas/libvixl/vixl/invalset.h:450]: (style) Array index 'middle'
+  is used before limits check.
+
+  The source code is
+
+     while (!IsValid(elements[high]) && (low < high)) --high;
+
+  Mind you, these lines of code look similar but didn't get reported:
+
+      while (!IsValid(elements[middle]) && (middle < high - 1)) ++middle;
+      while (!IsValid(elements[middle]) && (low + 1 < middle)) --middle;
+
+  Given that binary search is notoriously tricky to get correct and a stand=
+ard C library routine
+  I am puzzled as to why the standard library routine didn't get used, with=
+ of course a custom
+  comparison function.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1655700/+subscriptions
