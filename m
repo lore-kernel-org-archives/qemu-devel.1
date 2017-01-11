@@ -1,15 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59484)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60397)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cRPhY-0002ZO-VJ
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 15:40:58 -0500
+	(envelope-from <kraxel@redhat.com>) id 1cRPkK-00069r-ME
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 15:43:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1cRPhV-0008PS-S7
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 15:40:57 -0500
-From: Thomas Huth <thuth@redhat.com>
-Date: Wed, 11 Jan 2017 21:40:50 +0100
-Message-Id: <1484167250-16089-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] monitor: Fix crashes when using HMP commands
- without CPU
+	(envelope-from <kraxel@redhat.com>) id 1cRPkH-0001pb-FX
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 15:43:48 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42036)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1cRPkH-0001ox-Ak
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 15:43:45 -0500
+Message-ID: <1484167421.26755.10.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Wed, 11 Jan 2017 21:43:41 +0100
+In-Reply-To: <20170111145934.nogaszs5gvmn5bad@perseus.local>
+References: <1476776717-24807-1-git-send-email-ppandit@redhat.com>
+	<CAJ+F1CKnyE1d8nT_dj2D5St=2e9+W5Zx0zvXGxPDsOsg1NW66w@mail.gmail.com>
+	<alpine.LFD.2.20.1611281003090.19776@wniryva>
+	<20170111145934.nogaszs5gvmn5bad@perseus.local>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH] display: cirrus: check vga bits per
+ pixel(bpp) value
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,95 +30,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-trivial@nongnu.org, Markus Armbruster <armbru@redhat.com>
+To: Alberto Garcia <berto@igalia.com>
+Cc: P J P <ppandit@redhat.com>, =?ISO-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>, Qemu Developers <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Huawei PSIRT <psirt@huawei.com>
 
-When running certain HMP commands ("info registers", "info cpustats"
-or dumping virtual memory) with the "none" machine, QEMU crashes
-with a segmentation fault. This happens because the "none" machine does
-not have any CPUs by default, but these HMP commands did not check for
-a valid CPU pointer yet. Add such a check now and print a message
-about the missing CPU instead.
+On Mi, 2017-01-11 at 16:59 +0200, Alberto Garcia wrote:
+> On Mon, Nov 28, 2016 at 11:52:08AM +0530, P J P wrote:
+> > | > --- a/hw/display/cirrus_vga.c
+> > | > +++ b/hw/display/cirrus_vga.c
+> > | > @@ -272,6 +272,9 @@ static void cirrus_update_memory_access(CirrusV=
+GAState
+> > | > *s);
+> > | >  static bool blit_region_is_unsafe(struct CirrusVGAState *s,
+> > | >                                    int32_t pitch, int32_t addr)
+> > | >  {
+> > | > +    if (!pitch) {
+> > | > +        return true;
+> > | > +    }
+> > | >
+> > |=20
+> > | That doesn't look directly related to 'cirrus_get_bpp', care to expla=
+in?
+> >=20
+> >   'blit_region_is_unsafe' is called from 'blit_is_unsafe' to check if b=
+lit=20
+> > parameters (cirrus_blt_srcpitch/cirrus_blt_dstpitch)  are safe for=20
+> > 'cirrus_do_copy'. These too could lead to div by zero in cirrus_do_copy
+>=20
+> This change is causing display artifacts in QEMU 2.8.
+>=20
+> What seems to happen is that blit_is_unsafe() is also called for
+> CIRRUS_BLTMODE_PATTERNCOPY, but in this case cirrus_blt_srcpitch is
+> not used. However, because of this new check if its value is 0 then
+> cirrus_bitblt_common_patterncopy() returns early and becomes a no-op.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- monitor.c | 29 +++++++++++++++++++++++++----
- 1 file changed, 25 insertions(+), 4 deletions(-)
+inflight vga queue pull request has a fix for that.
 
-diff --git a/monitor.c b/monitor.c
-index 0841d43..0103979 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -1025,6 +1025,9 @@ int monitor_set_cpu(int cpu_index)
- CPUState *mon_get_cpu(void)
- {
-     if (!cur_mon->mon_cpu) {
-+        if (!first_cpu) {
-+            return NULL;
-+        }
-         monitor_set_cpu(first_cpu->cpu_index);
-     }
-     cpu_synchronize_state(cur_mon->mon_cpu);
-@@ -1043,7 +1046,13 @@ int monitor_get_cpu_index(void)
- 
- static void hmp_info_registers(Monitor *mon, const QDict *qdict)
- {
--    cpu_dump_state(mon_get_cpu(), (FILE *)mon, monitor_fprintf, CPU_DUMP_FPU);
-+    CPUState *cs = mon_get_cpu();
-+
-+    if (!cs) {
-+        monitor_printf(mon, "No CPU available\n");
-+        return;
-+    }
-+    cpu_dump_state(cs, (FILE *)mon, monitor_fprintf, CPU_DUMP_FPU);
- }
- 
- static void hmp_info_jit(Monitor *mon, const QDict *qdict)
-@@ -1076,7 +1085,13 @@ static void hmp_info_history(Monitor *mon, const QDict *qdict)
- 
- static void hmp_info_cpustats(Monitor *mon, const QDict *qdict)
- {
--    cpu_dump_statistics(mon_get_cpu(), (FILE *)mon, &monitor_fprintf, 0);
-+    CPUState *cs = mon_get_cpu();
-+
-+    if (!cs) {
-+        monitor_printf(mon, "No CPU available\n");
-+        return;
-+    }
-+    cpu_dump_statistics(cs, (FILE *)mon, &monitor_fprintf, 0);
- }
- 
- static void hmp_info_trace_events(Monitor *mon, const QDict *qdict)
-@@ -1235,6 +1250,12 @@ static void memory_dump(Monitor *mon, int count, int format, int wsize,
-     int l, line_size, i, max_digits, len;
-     uint8_t buf[16];
-     uint64_t v;
-+    CPUState *cs = mon_get_cpu();
-+
-+    if (!cs && (format == 'i' || !is_physical)) {
-+        monitor_printf(mon, "Can not dump without CPU\n");
-+        return;
-+    }
- 
-     if (format == 'i') {
-         int flags = 0;
-@@ -1264,7 +1285,7 @@ static void memory_dump(Monitor *mon, int count, int format, int wsize,
-         flags = msr_le << 16;
-         flags |= env->bfd_mach;
- #endif
--        monitor_disas(mon, mon_get_cpu(), addr, count, is_physical, flags);
-+        monitor_disas(mon, cs, addr, count, is_physical, flags);
-         return;
-     }
- 
-@@ -1303,7 +1324,7 @@ static void memory_dump(Monitor *mon, int count, int format, int wsize,
-         if (is_physical) {
-             cpu_physical_memory_read(addr, buf, l);
-         } else {
--            if (cpu_memory_rw_debug(mon_get_cpu(), addr, buf, l, 0) < 0) {
-+            if (cpu_memory_rw_debug(cs, addr, buf, l, 0) < 0) {
-                 monitor_printf(mon, " Cannot access memory\n");
-                 break;
-             }
--- 
-1.8.3.1
+cheers,
+  Gerd
