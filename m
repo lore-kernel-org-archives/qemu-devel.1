@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39183)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42201)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1cR6Nu-0006Kc-Ns
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 19:03:23 -0500
+	(envelope-from <cardoe@cardoe.com>) id 1cR7cb-00012l-AQ
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 20:22:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1cR6Nt-0001FV-LC
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 19:03:22 -0500
+	(envelope-from <cardoe@cardoe.com>) id 1cR7cY-0002nj-5h
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 20:22:37 -0500
+Received: from mail-it0-x243.google.com ([2607:f8b0:4001:c0b::243]:36026)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <cardoe@cardoe.com>) id 1cR7cX-0002nH-U6
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 20:22:34 -0500
+Received: by mail-it0-x243.google.com with SMTP id o138so1228834ito.3
+	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 17:22:33 -0800 (PST)
+References: <38337537-d2f4-6933-f4fe-2092247a199d@cardoe.com>
+	<20170109130852.GE2541@work-vm>
+	<20170110160154.GD17540@stefanha-x1.localdomain>
+From: Doug Goldstein <cardoe@cardoe.com>
+Message-ID: <eb09b932-772f-edcc-abca-a90c2e2d98af@cardoe.com>
+Date: Tue, 10 Jan 2017 19:22:24 -0600
 MIME-Version: 1.0
-Sender: alistair23@gmail.com
-In-Reply-To: <CAFEAcA8FFHuHTWZ6xteWN+s34g62=W7ukqhCotBKi9shuYt0nQ@mail.gmail.com>
-References: <cover.1482265908.git.alistair.francis@xilinx.com>
-	<b985247bfcb7375de984e801c4145fde931360bb.1482265908.git.alistair.francis@xilinx.com>
-	<CAFEAcA88=_J3==CJ3fy+jurM9APvRErYFhopuz-bJeML5mPSvw@mail.gmail.com>
-	<CAKmqyKM74PWeQZZcM_TKwdCfvOz+RAWa3Y2V7favwCiPT0U4rw@mail.gmail.com>
-	<CAFEAcA8FFHuHTWZ6xteWN+s34g62=W7ukqhCotBKi9shuYt0nQ@mail.gmail.com>
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Tue, 10 Jan 2017 16:02:47 -0800
-Message-ID: <CAKmqyKNbeHY8v8i4wAKYwwEzoLvSniCyNT-sZrWz2Dyi3hcEGA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] [PATCH v3 1/3] arm_generic_timer: Add the ARM
- Generic Timer
+In-Reply-To: <20170110160154.GD17540@stefanha-x1.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature";
+	boundary="rEm0qabDGvBbvCcJcjq8iQlxPc0pitB3O"
+Subject: Re: [Qemu-devel] assert hit on master with q35 machine type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,114 +31,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?S09OUkFEIEZyw6lkw6lyaWM=?= <fred.konrad@greensocs.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On Tue, Jan 10, 2017 at 1:42 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 10 January 2017 at 01:41, Alistair Francis
-> <alistair.francis@xilinx.com> wrote:
->> On Fri, Jan 6, 2017 at 3:57 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
->>> On 20 December 2016 at 22:42, Alistair Francis
->>> <alistair.francis@xilinx.com> wrote:
->
->>>> +    },{ .name = "CNTCV_LOWER",
->>>> +        .addr = A_CNTCV_LOWER,
->>>> +        .post_read = counter_low_value_postr,
->>>> +    },{ .name = "CNTCV_UPPER",
->>>> +        .addr = A_CNTCV_UPPER,
->>>> +        .post_read = counter_high_value_postr,
->>>
->>> Spec says that you should also be able to access the whole
->>> 64-bit counter value with a 64-bit access -- is this reginfo
->>> sufficient to make that work?
->>
->> How do you know, all I see if that it is a 64-bit register. All the
->> documentation about accesses specifies only 32-bit accesses.
->
-> v8 ARM ARM DDI0487A.k, I3.5.3 (CNTCV register description):
-> "In an implementation that supports 64-bit atomic memory accesses,
-> this register must be accessible using a 64-bit atomic access."
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--rEm0qabDGvBbvCcJcjq8iQlxPc0pitB3O
+From: Doug Goldstein <cardoe@cardoe.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org
+Message-ID: <eb09b932-772f-edcc-abca-a90c2e2d98af@cardoe.com>
+Subject: Re: [Qemu-devel] assert hit on master with q35 machine type
+References: <38337537-d2f4-6933-f4fe-2092247a199d@cardoe.com>
+ <20170109130852.GE2541@work-vm>
+ <20170110160154.GD17540@stefanha-x1.localdomain>
+In-Reply-To: <20170110160154.GD17540@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Ok, I don't even have that section. I'm going to try to find an updated ARM ARM.
+On 1/10/17 10:01 AM, Stefan Hajnoczi wrote:
+> On Mon, Jan 09, 2017 at 01:08:53PM +0000, Dr. David Alan Gilbert wrote:=
 
->
->
->>> This means you can't use this device in a system which
->>> doesn't implement TrustZone. I think this would be better
->>> handled by just having the board map the memory region
->>> in to only the Secure address space if it is a TZ-aware board.
->>
->> How can I map something into the secure address space? Is there an
->> example of this? The only think I can find is in the arm/virt.c
->> machine with the secure_sysmem MemoryRegion.
->
-> Yeah, virt.c is the place to look -- for instance we put one
-> of the UARTs in the secure address space only.
-> Basically to support separate address spaces:
->  * create a MemoryRegion to be the secure view of the world
->  * add the NS MemoryRegion to it as a subregion with low
->    priority (so S sees all the NS devices -- this isn't
->    required but that's usually how h/w is set up)
->  * use object_property_set_link() to connect the S memory
->    region to each CPU's secure-memory property
->  * add any S-only devices to the S MemoryRegion
+>> copying in Stefan since it's his commit.
+>=20
+> I can't reproduce the assertion failure.
+>=20
+> Are you able to provide a backtrace (e.g. launch QEMU under gdb and the=
+n
+> use the 'bt' command after the assertion failure is raised)?
+>=20
+> Thanks,
+> Stefan
+>=20
 
-Ok, sounds easy enough.
+#0  __GI_raise (sig=3Dsig@entry=3D6) at ../sysdeps/unix/sysv/linux/raise.=
+c:58
+#1  0x00007ffff44db3ea in __GI_abort () at abort.c:89
+#2  0x00007ffff44d1bb7 in __assert_fail_base (fmt=3D<optimized out>,
+    assertion=3Dassertion@entry=3D0x555555ae8e8a "vq->notification_disabl=
+ed
+> 0",
+    file=3Dfile@entry=3D0x555555ae89c0
+"/home/doug/work/qemu/hw/virtio/virtio.c",
+    line=3Dline@entry=3D215,
+    function=3Dfunction@entry=3D0x555555ae9630 <__PRETTY_FUNCTION__.43707=
+>
+"virtio_queue_set_notification") at assert.c:92
+#3  0x00007ffff44d1c62 in __GI___assert_fail (
+    assertion=3Dassertion@entry=3D0x555555ae8e8a "vq->notification_disabl=
+ed
+> 0",
+    file=3Dfile@entry=3D0x555555ae89c0
+"/home/doug/work/qemu/hw/virtio/virtio.c",
+    line=3Dline@entry=3D215,
+    function=3Dfunction@entry=3D0x555555ae9630 <__PRETTY_FUNCTION__.43707=
+>
+"virtio_queue_set_notification") at assert.c:101
+#4  0x00005555557f25d6 in virtio_queue_set_notification (vq=3D0x55555666a=
+a90,
+    enable=3Denable@entry=3D1) at /home/doug/work/qemu/hw/virtio/virtio.c=
+:215
+#5  0x00005555557dc311 in virtio_net_has_buffers (q=3D<optimized out>,
+    q=3D<optimized out>, bufsize=3D102)
+    at /home/doug/work/qemu/hw/net/virtio-net.c:1008
+#6  virtio_net_receive (nc=3D<optimized out>, buf=3D0x555557386b88 "", si=
+ze=3D102)
+    at /home/doug/work/qemu/hw/net/virtio-net.c:1148
+#7  0x00005555559cad33 in nc_sendv_compat (flags=3D<optimized out>, iovcn=
+t=3D1,
+    iov=3D0x7fffead746d0, nc=3D0x55555788b340) at net/net.c:705
+#8  qemu_deliver_packet_iov (sender=3D<optimized out>, flags=3D<optimized=
+ out>,
+    iov=3D0x7fffead746d0, iovcnt=3D1, opaque=3D0x55555788b340) at net/net=
+=2Ec:732
+#9  0x00005555559cd929 in qemu_net_queue_deliver (size=3D<optimized out>,=
 
->
->>>> +REG32(CNTCR, 0x00)
->>>> +    FIELD(CNTCR, EN, 0, 1)
->>>> +    FIELD(CNTCR, HDBG, 1, 1)
->>>> +REG32(CNTSR, 0x04)
->>>> +    FIELD(CNTSR, DBGH, 1, 1)
->>>> +REG32(CNTCV_LOWER, 0x08)
->>>> +REG32(CNTCV_UPPER, 0x0C)
->>>> +REG32(CNTFID0, 0x20)
->>>> +/* We don't model CNTFIDn */
->>>> +/* We don't model the CounterID registers either */
->>>
->>> Does the Xilinx h/w not implement them at all?
->>> (ie do we need a property for "device has the ID regs" if we add them
->>> later?)
->>
->> There is nothing in the register spec describing registers being here.
->>
->> The last register I see is called: (IOU_SCNTRS)
->> base_frequency_ID_register at address 0xFF260020.
->
-> I suspect there's an implicit reads-as-zero after that.
-> (The frequency table has to have at least one real entry
-> plus the zero terminator -- see I3.5.5 (CNTFID0).)
->
-> QEMU's implementation will only support one frequency so
-> we only need one table entry too (for the moment, anyway).
->
->>> The spec says it's mandatory to have at least the entry for
->>> the counter base frequency plus end-of-table marker.
->>> I would expect EL3 firmware to want to read this table in order
->>> to write the correct values to CNTFRQ_EL0 for each CPU.
->>
->> I don't see anything like that in section I3.5.21 in the ARM ARM,
->> where are you looking?
->
-> There's no I3.5.21 in my copy of the spec (rev A.k), I suspect
-> you have an older rev. I think the generic timer docs got
-> revamped at some point, so you might want to grab the latest rev.
->
-> Anyway, it looks like you have got CNTFIDn (that's CNTFID0)
-> and an implicit undocumented zero-terminator.
->
-> The spec says CounterIDn are IMPDEF, which I guess is why
-> your implementation doesn't bother to implement them.
+    data=3D<optimized out>, flags=3D<optimized out>, sender=3D<optimized =
+out>,
+    queue=3D0x55555788b550) at net/queue.c:164
+#10 qemu_net_queue_flush (queue=3D0x55555788b550) at net/queue.c:261
+#11 0x00005555559cab0c in qemu_flush_or_purge_queued_packets (
+    nc=3D0x55555788b340, purge=3D<optimized out>) at net/net.c:611
+#12 0x00005555557f1eff in virtio_queue_notify_vq (vq=3D0x55555666aa90)
+    at /home/doug/work/qemu/hw/virtio/virtio.c:1318
+#13 0x00005555557adec8 in memory_region_write_accessor (mr=3D0x555557756d=
+30,
+    addr=3D0, value=3D<optimized out>, size=3D2, shift=3D<optimized out>,=
 
-I do have an out of date version. I'll find a newer one and update the
-registers to follow that.
+    mask=3D<optimized out>, attrs=3D...) at /home/doug/work/qemu/memory.c=
+:526
+#14 0x00005555557ab25d in access_with_adjusted_size (addr=3Daddr@entry=3D=
+0,
+    value=3Dvalue@entry=3D0x7fffead74888, size=3Dsize@entry=3D2,
+    access_size_min=3D<optimized out>, access_size_max=3D<optimized out>,=
 
-Thanks,
+    access=3D0x5555557ade50 <memory_region_write_accessor>, mr=3D0x555557=
+756d30,
+    attrs=3D...) at /home/doug/work/qemu/memory.c:592
+#15 0x00005555557af28c in memory_region_dispatch_write (
+    mr=3Dmr@entry=3D0x555557756d30, addr=3D0, data=3D<optimized out>,
+    size=3Dsize@entry=3D2, attrs=3Dattrs@entry=3D...)
+    at /home/doug/work/qemu/memory.c:1336
+#16 0x0000555555764d8a in address_space_write_continue (mr=3D0x555557756d=
+30,
+    l=3D<optimized out>, addr1=3D<optimized out>, len=3D2, buf=3D0x7ffff7=
+fed028 "",
+    attrs=3D..., addr=3D34359750656, as=3D0x5555560aa6a0 <address_space_m=
+emory>)
+    at /home/doug/work/qemu/exec.c:2635
+#17 address_space_write (as=3D0x5555560aa6a0 <address_space_memory>,
+    addr=3D<optimized out>, attrs=3D..., buf=3D<optimized out>, len=3D<op=
+timized
+out>)
+    at /home/doug/work/qemu/exec.c:2686
+#18 0x000055555576532d in address_space_rw (as=3D<optimized out>,
+    addr=3D<optimized out>, attrs=3D..., attrs@entry=3D...,
+    buf=3Dbuf@entry=3D0x7ffff7fed028 "", len=3D<optimized out>,
+    is_write=3D<optimized out>) at /home/doug/work/qemu/exec.c:2788
+#19 0x00005555557aa2a8 in kvm_cpu_exec (cpu=3Dcpu@entry=3D0x5555565bc7f0)=
 
-Alistair
+    at /home/doug/work/qemu/kvm-all.c:1968
+#20 0x0000555555797d48 in qemu_kvm_cpu_thread_fn (arg=3D0x5555565bc7f0)
+    at /home/doug/work/qemu/cpus.c:998
+#21 0x00007ffff48726ca in start_thread (arg=3D0x7fffead75700)
+    at pthread_create.c:333
+#22 0x00007ffff45ac0af in clone ()
+    at ../sysdeps/unix/sysv/linux/x86_64/clone.S:105
 
->
-> thanks
-> -- PMM
->
+--=20
+Doug Goldstein
+
+
+--rEm0qabDGvBbvCcJcjq8iQlxPc0pitB3O
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG/MacGPG2 v2.0
+
+iQJ7BAEBCgBmBQJYdYjWXxSAAAAAAC4AKGlzc3Vlci1mcHJAbm90YXRpb25zLm9w
+ZW5wZ3AuZmlmdGhob3JzZW1hbi5uZXRBNTM5MEQ2RTNFMTkyNzlCNzVDMzIwOTVB
+MkJDMDNEQzg3RUQxQkQ0AAoJEKK8A9yH7RvUO+sP+MSzRIoSLkVNWDZLO0noNtZh
+40284MiEhplom0/rv1XEZ4i4los+L+e5tml6tEklqZZCUu1brvk19mHQz++iFMlR
+twNNEg8sPIWKFOCynroFVDOmwVpY/VlwEbRdF2sFsZrzYjEu3WCXftceLINkoqaJ
+90atSMg6ywdkovbJ6YYiw5FipwvK3LBhmcv4xCuRmTE76ns6GZGqH3RfP6MF+rWP
+s2e73W4b67LKkc3Ec7KaXSYCa2SlI1xqDSi+cJr6OQ9vSECcKL2Y0zFfjMNH5SAz
++pPY83k4e4F3rBvHnw7EZay3S2h/MVozlaTG2uua0NoCYVoSluKiJHPLjCia1Ycw
+SNzytPSYu8AYsCF6DrawmaR4A8ArQMRzJYWO+58p7mho8l2A5W4JNJk7zkJWwmTS
+r4Zd7acBxt3bQuMLpBn8/j69pIq4uyGbsDMZj/Opdq4eKVaHaBmUDWJerbu+yqU7
+a9r3BiiwGrqkPcDRHnYJwqqRWcCnJqiEnVOrwR4sWeqaYg1QTCZD+IBX1SCJEchG
+R0aps4s8bhtESO8PC/k8nrroS5jCLBdJjT4bIr6BUjFyobIanWOJ8rVe7MXL42C2
+st6E9qFI0cmth6XZPvrS5izD9Kr1mXnDHd3SACbkebbzhiMV1ztGWpWUWZ0TqK38
+LwGH7eYzzvnuKonUlq4=
+=S5i/
+-----END PGP SIGNATURE-----
+
+--rEm0qabDGvBbvCcJcjq8iQlxPc0pitB3O--
