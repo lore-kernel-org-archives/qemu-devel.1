@@ -1,34 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60830)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33840)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cRCz0-0006al-1f
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 02:06:09 -0500
+	(envelope-from <dovgaluk@ispras.ru>) id 1cRD3n-0001s8-VF
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 02:11:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cRCyz-0000IA-6s
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 02:06:05 -0500
-Received: from indium.canonical.com ([91.189.90.7]:57286)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cRCyz-0000Ht-0U
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 02:06:05 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cRCyy-0006cR-1X
-	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 07:06:04 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 0870B2E80AE
-	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 07:06:04 +0000 (UTC)
+	(envelope-from <dovgaluk@ispras.ru>) id 1cRD3k-00031f-Pm
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 02:11:03 -0500
+Received: from mail.ispras.ru ([83.149.199.45]:45566)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1cRD3k-000306-IR
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 02:11:00 -0500
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <000301d259dc$f9d097c0$ed71c740$@ru>
+	<000601d25a95$12b1b9f0$38152dd0$@ru>
+	<20161220102126.GE5602@stefanha-x1.localdomain>
+	<002501d25ab1$af024b00$0d06e100$@ru>
+	<CAJSP0QXm9ssLC5C+gV_agkEW_fdUY=NWBMvHqMh55UhYTR276g@mail.gmail.com>
+	<000301d25b4f$20018440$60048cc0$@ru>
+	<CAJSP0QW1pOcthcEt16Pp5xQu3miUh2Leq3kn3yvQqWqhi1P=QQ@mail.gmail.com>
+In-Reply-To: <CAJSP0QW1pOcthcEt16Pp5xQu3miUh2Leq3kn3yvQqWqhi1P=QQ@mail.gmail.com>
+Date: Wed, 11 Jan 2017 10:10:59 +0300
+Message-ID: <000801d26bd9$dca56db0$95f04910$@ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 11 Jan 2017 06:45:56 -0000
-From: Thomas Huth <1414293@bugs.launchpad.net>
-Reply-To: Bug 1414293 <1414293@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20150124131201.12909.9258.malonedeb@soybean.canonical.com>
-Message-Id: <20170111064556.27527.68855.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1414293] Re: target-lm32/translate.c:336: bad ? :
- operator
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Content-Language: ru
+Subject: Re: [Qemu-devel] qemu-2.8-rc4 is broken
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,30 +34,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: 'Stefan Hajnoczi' <stefanha@gmail.com>
+Cc: 'qemu-devel' <qemu-devel@nongnu.org>, 'Paolo Bonzini' <pbonzini@redhat.com>, 'Pavel Dovgalyuk' <pavel.dovgaluk@ispras.ru>, 'Peter Maydell' <peter.maydell@linaro.org>, =?UTF-8?Q?'Alex_Benn=C3=A9e'?= <alex.bennee@linaro.org>
 
-Released with version 2.8
+> From: Stefan Hajnoczi [mailto:stefanha@gmail.com]
+> On Wed, Dec 21, 2016 at 5:57 AM, Pavel Dovgalyuk <dovgaluk@ispras.ru> wrote:
+> >> -----Original Message-----
+> >> From: Stefan Hajnoczi [mailto:stefanha@gmail.com]
+> >> On Tue, Dec 20, 2016 at 11:10 AM, Pavel Dovgalyuk <dovgaluk@ispras.ru> wrote:
+> >> >> From: Stefan Hajnoczi [mailto:stefanha@gmail.com]
+> >> >> On Tue, Dec 20, 2016 at 10:45:44AM +0300, Pavel Dovgalyuk wrote:
+> >> >> > It also fails much earlier when I enable logs with "-d int -D log".
+> >> >> >
+> >> >> Looks like a heap corruption bug since free() is failing.
+> >> >
+> >> > Seems to be a race condition.
+> >> > When I add logs into invalidate_page_bitmap, the bug disappears.
+> >> > It seems that someone tries to free the same page bitmap twice and simultaneously.
+> >>
+> >> Does the following workaround prevent the crashes?
+> >>
+> >> -global apic-common.vapic=off
+> >
+> > Yes, this option helps.
+> > Thank you.
+> 
+> Good news.  This can be fixed in 2.8.1 once someone finds a solution.
 
-** Changed in: qemu
-       Status: Fix Committed =3D> Fix Released
+It seems that something still goes wrong.
+I'm using this workaround, but there is a kind of deadlock in translation.
+call_rcu_thread hangs at some moment in qemu_event_wait.
 
--- =
+As far as I understand, it is used by QHT in translate-all.c.
+I can't get more information yet, because logging makes everything too slow.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1414293
-
-Title:
-  target-lm32/translate.c:336: bad ? : operator
-
-Status in QEMU:
-  Fix Released
-
-Bug description:
-  [qemu/target-lm32/translate.c:336]: (style) Same expression in both
-  branches of ternary operator.
-
-     int rY =3D (dc->format =3D=3D OP_FMT_RR) ? dc->r0 : dc->r0;
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1414293/+subscriptions
+Pavel Dovgalyuk
