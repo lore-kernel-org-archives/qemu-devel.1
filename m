@@ -1,37 +1,52 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44178)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48632)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cRMtL-00045R-4M
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 12:40:56 -0500
+	(envelope-from <joserz@linux.vnet.ibm.com>) id 1cRNDh-0007nb-H4
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 13:01:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cRMtI-00018P-1A
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 12:40:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:30271)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cRMtH-00017w-Qy
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 12:40:51 -0500
-Received: from int-mx10.intmail.prod.int.phx2.redhat.com
-	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D01A8C0467D1
-	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 17:40:51 +0000 (UTC)
-Date: Wed, 11 Jan 2017 17:40:45 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170111174045.GT12072@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170106155543.12827-1-berrange@redhat.com>
-	<20170106155543.12827-3-berrange@redhat.com>
-	<20170110163713.GA19869@stefanha-x1.localdomain>
-	<eabc1ecd-439c-69cc-facb-281699a4d26e@redhat.com>
-	<20170111171202.GG9269@stefanha-x1.localdomain>
-	<20170111171646.GR12072@redhat.com>
-	<6d64c194-bb64-9ac2-3281-9a9329f6a52b@redhat.com>
+	(envelope-from <joserz@linux.vnet.ibm.com>) id 1cRNDd-0004ea-K4
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 13:01:57 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46302
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <joserz@linux.vnet.ibm.com>)
+	id 1cRNDd-0004eT-Dv
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 13:01:53 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
+	v0BHxEQ4065715
+	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 13:01:52 -0500
+Received: from e24smtp01.br.ibm.com (e24smtp01.br.ibm.com [32.104.18.85])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 27wmx5e3d2-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 13:01:52 -0500
+Received: from localhost
+	by e24smtp01.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <joserz@linux.vnet.ibm.com>;
+	Wed, 11 Jan 2017 16:01:49 -0200
+Received: from d24relay03.br.ibm.com (d24relay03.br.ibm.com [9.18.232.225])
+	by d24dlp01.br.ibm.com (Postfix) with ESMTP id 31C8F352005F
+	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 13:01:16 -0500 (EST)
+Received: from d24av05.br.ibm.com (d24av05.br.ibm.com [9.18.232.44])
+	by d24relay03.br.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+	v0BI1kPV34078878
+	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 16:01:46 -0200
+Received: from d24av05.br.ibm.com (localhost [127.0.0.1])
+	by d24av05.br.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id
+	v0BE1kUS012399
+	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 12:01:46 -0200
+Date: Wed, 11 Jan 2017 16:01:42 -0200
+From: joserz@linux.vnet.ibm.com
+References: <20170111164105.27164.30697.malonedeb@chaenomeles.canonical.com>
+	<4fc41772-1607-7e55-ffa1-80e3579b964d@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <6d64c194-bb64-9ac2-3281-9a9329f6a52b@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 02/47] trace: switch io/ directory to
- modular trace.h file
+In-Reply-To: <4fc41772-1607-7e55-ffa1-80e3579b964d@redhat.com>
+Message-Id: <20170111180142.GA8281@pacoca>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Bug 1655708] [NEW] target/ppc/int_helper.c:2806:
+ strange expression ?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,46 +55,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+To: Eric Blake <1655708@bugs.launchpad.net>
+Cc: qemu-devel@nongnu.org
 
-On Wed, Jan 11, 2017 at 06:34:40PM +0100, Paolo Bonzini wrote:
-> 
-> 
-> On 11/01/2017 18:16, Daniel P. Berrange wrote:
-> > I've been trying to get such relative includes to work most of today
-> > and not having much luck. The problem is that while it works in 95%
-> > of the time, there are some source files and header files which need
-> > to include trace.h files not in their local directory
-> 
-> Which are they?  I wouldn't have expected that to happen.
+On Wed, Jan 11, 2017 at 05:12:38PM -0000, Eric Blake wrote:
+> On 01/11/2017 10:41 AM, dcb wrote:
+> > Public bug reported:
+> >=20
+> > target/ppc/int_helper.c:2806:25: warning: =E2=80=98*=E2=80=99 in bool=
+ean context,
+> > suggest =E2=80=98&&=E2=80=99 instead [-Wint-in-bool-context]
+> >=20
+> > Source code is
+> >=20
+> >        zone_digit =3D (i * 2) ? b->u8[BCD_DIG_BYTE(i * 2)] >> 4 :
+> > zone_lead;
+>=20
+> Also, looking at BCD_DIG_BYTE():
+>=20
+> #if defined(HOST_WORDS_BIGENDIAN)
+> #define BCD_DIG_BYTE(n) (15 - (n/2))
+> #else
+> #define BCD_DIG_BYTE(n) (n/2)
+> #endif
+>=20
+> Oops. n is under-parenthesized, and will cause invalid expansions for
+> some expressions.  Let's fix that as well.
+>=20
+Hello guys!!
 
-It is indirect - particularly Xen - include/hw/xen/xen_common.h hsa
-some trace points and that is included from many different source
-files. Likewise with include/exec/cpu_ldst_template.h
+Do you mean something like:
 
+BCD_DIG_BYTE(n) (15 - ((n)/2)) and BCD_DIG_BYTE(n) ((n)/2) ?
 
-> > and we can't
-> > use relative includes for that, since the relative include gets
-> > resolved wrt the source file doing the #include, but the trace.h
-> > file is in $BUILD_DIR.
-> 
-> Why would #include "../foo/trace.h" be resolved against the source
-> file's path only, and not against all -I directories?
+to avoid issues like BCD_DIG_BYTE(i + 3) that will expand to (i + 3/2)
+instead of ((i + 3)/2), right?
 
-If we have a plain "../trace.h", then it can end up hitting the
-wrong file, because there are many -I dirs listed and most of
-them contain a trace.h file, so if it matches on the 2nd -I
-dir and you need the one from the 3rd -I dir it gets "fun".
+>=20
+> > so I think the compiler warning is for the i * 2 lhs of the ?.
+>=20
+> Yes - the compiler is complaining that 'i * 2' can only be non-zero if
+> 'i' was non-zero (given that the code occurs in a loop for i between 0
+> and 16), so it is just as easy to write 'i ? ...' instead of the weirde=
+r
+> '(i * 2) ? ...'.
+>=20
 
-Having all the trace.h files included with path from the root
-is alot simpler to understand IMHO than just plain "trace.h"
-and hoping the -I order is going to ensure the right one is
-found
+Yes, Eric is correct it's meant to be "(i) ? .. : .." because the sign
+is located at position 0. I'm improving it. I'll send a patch for them
+today.
 
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+Thanks!
