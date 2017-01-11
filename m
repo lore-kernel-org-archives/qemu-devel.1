@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35011)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35053)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cR8Ui-00061T-8M
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:18:33 -0500
+	(envelope-from <rth7680@gmail.com>) id 1cR8Uk-00064C-Bh
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:18:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cR8Ug-00036V-To
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:18:32 -0500
-Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:35015)
+	(envelope-from <rth7680@gmail.com>) id 1cR8Uj-000380-F3
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:18:34 -0500
+Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:35022)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cR8Ug-000363-OI
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:18:30 -0500
-Received: by mail-pf0-x241.google.com with SMTP id f144so12524392pfa.2
-	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 18:18:30 -0800 (PST)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cR8Uj-00037Z-9F
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:18:33 -0500
+Received: by mail-pf0-x243.google.com with SMTP id f144so12524550pfa.2
+	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 18:18:33 -0800 (PST)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Tue, 10 Jan 2017 18:17:24 -0800
-Message-Id: <20170111021820.24416-10-rth@twiddle.net>
+Date: Tue, 10 Jan 2017 18:17:27 -0800
+Message-Id: <20170111021820.24416-13-rth@twiddle.net>
 In-Reply-To: <20170111021820.24416-1-rth@twiddle.net>
 References: <20170111021820.24416-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PULL 09/65] tcg/ppc: Implement field extraction
- opcodes
+Subject: [Qemu-devel] [PULL 12/65] tcg/s390: Support deposit into zero
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,69 +29,93 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Since we can no longer use matching constraints, this does
+mean we must handle that data movement by hand.
+
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- tcg/ppc/tcg-target.h     |  4 ++--
- tcg/ppc/tcg-target.inc.c | 10 ++++++++++
- 2 files changed, 12 insertions(+), 2 deletions(-)
+ tcg/s390/tcg-target.inc.c | 30 ++++++++++++++++++++++++++----
+ 1 file changed, 26 insertions(+), 4 deletions(-)
 
-diff --git a/tcg/ppc/tcg-target.h b/tcg/ppc/tcg-target.h
-index c765d3e..b42c57a 100644
---- a/tcg/ppc/tcg-target.h
-+++ b/tcg/ppc/tcg-target.h
-@@ -69,7 +69,7 @@ typedef enum {
- #define TCG_TARGET_HAS_nand_i32         1
- #define TCG_TARGET_HAS_nor_i32          1
- #define TCG_TARGET_HAS_deposit_i32      1
--#define TCG_TARGET_HAS_extract_i32      0
-+#define TCG_TARGET_HAS_extract_i32      1
- #define TCG_TARGET_HAS_sextract_i32     0
- #define TCG_TARGET_HAS_movcond_i32      1
- #define TCG_TARGET_HAS_mulu2_i32        0
-@@ -102,7 +102,7 @@ typedef enum {
- #define TCG_TARGET_HAS_nand_i64         1
- #define TCG_TARGET_HAS_nor_i64          1
- #define TCG_TARGET_HAS_deposit_i64      1
--#define TCG_TARGET_HAS_extract_i64      0
-+#define TCG_TARGET_HAS_extract_i64      1
- #define TCG_TARGET_HAS_sextract_i64     0
- #define TCG_TARGET_HAS_movcond_i64      1
- #define TCG_TARGET_HAS_add2_i64         1
-diff --git a/tcg/ppc/tcg-target.inc.c b/tcg/ppc/tcg-target.inc.c
-index a3262cf..7ec54a2 100644
---- a/tcg/ppc/tcg-target.inc.c
-+++ b/tcg/ppc/tcg-target.inc.c
-@@ -2396,6 +2396,14 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc, const TCGArg *args,
-         }
+diff --git a/tcg/s390/tcg-target.inc.c b/tcg/s390/tcg-target.inc.c
+index 2faa761..22e121a 100644
+--- a/tcg/s390/tcg-target.inc.c
++++ b/tcg/s390/tcg-target.inc.c
+@@ -43,6 +43,7 @@
+ #define TCG_CT_CONST_XORI  0x400
+ #define TCG_CT_CONST_CMPI  0x800
+ #define TCG_CT_CONST_ADLI  0x1000
++#define TCG_CT_CONST_ZERO  0x2000
+ 
+ /* Several places within the instruction set 0 means "no register"
+    rather than TCG_REG_R0.  */
+@@ -399,6 +400,9 @@ static int target_parse_constraint(TCGArgConstraint *ct, const char **pct_str)
+     case 'C':
+         ct->ct |= TCG_CT_CONST_CMPI;
+         break;
++    case 'Z':
++        ct->ct |= TCG_CT_CONST_ZERO;
++        break;
+     default:
+         return -1;
+     }
+@@ -538,6 +542,8 @@ static int tcg_target_const_match(tcg_target_long val, TCGType type,
+         return tcg_match_xori(type, val);
+     } else if (ct & TCG_CT_CONST_CMPI) {
+         return tcg_match_cmpi(type, val);
++    } else if (ct & TCG_CT_CONST_ZERO) {
++        return val == 0;
+     }
+ 
+     return 0;
+@@ -1245,11 +1251,11 @@ static void tgen_movcond(TCGContext *s, TCGType type, TCGCond c, TCGReg dest,
+ }
+ 
+ static void tgen_deposit(TCGContext *s, TCGReg dest, TCGReg src,
+-                         int ofs, int len)
++                         int ofs, int len, int z)
+ {
+     int lsb = (63 - ofs);
+     int msb = lsb - (len - 1);
+-    tcg_out_risbg(s, dest, src, msb, lsb, ofs, 0);
++    tcg_out_risbg(s, dest, src, msb, lsb, ofs, z);
+ }
+ 
+ static void tgen_extract(TCGContext *s, TCGReg dest, TCGReg src,
+@@ -2162,8 +2168,24 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
          break;
  
-+    case INDEX_op_extract_i32:
-+        tcg_out_rlw(s, RLWINM, args[0], args[1],
-+                    32 - args[2], 32 - args[3], 31);
-+        break;
-+    case INDEX_op_extract_i64:
-+        tcg_out_rld(s, RLDICL, args[0], args[1], 64 - args[2], 64 - args[3]);
-+        break;
+     OP_32_64(deposit):
+-        tgen_deposit(s, args[0], args[2], args[3], args[4]);
++        a0 = args[0], a1 = args[1], a2 = args[2];
++        if (const_args[1]) {
++            tgen_deposit(s, a0, a2, args[3], args[4], 1);
++        } else {
++            /* Since we can't support "0Z" as a constraint, we allow a1 in
++               any register.  Fix things up as if a matching constraint.  */
++            if (a0 != a1) {
++                TCGType type = (opc == INDEX_op_deposit_i64);
++                if (a0 == a2) {
++                    tcg_out_mov(s, type, TCG_TMP0, a2);
++                    a2 = TCG_TMP0;
++                }
++                tcg_out_mov(s, type, a0, a1);
++            }
++            tgen_deposit(s, a0, a2, args[3], args[4], 0);
++        }
+         break;
 +
-     case INDEX_op_movcond_i32:
-         tcg_out_movcond(s, TCG_TYPE_I32, args[5], args[0], args[1], args[2],
-                         args[3], args[4], const_args[2]);
-@@ -2530,6 +2538,7 @@ static const TCGTargetOpDef ppc_op_defs[] = {
-     { INDEX_op_movcond_i32, { "r", "r", "ri", "rZ", "rZ" } },
+     OP_32_64(extract):
+         tgen_extract(s, args[0], args[1], args[2], args[3]);
+         break;
+@@ -2235,7 +2257,7 @@ static const TCGTargetOpDef s390_op_defs[] = {
+     { INDEX_op_brcond_i32, { "r", "rC" } },
+     { INDEX_op_setcond_i32, { "r", "r", "rC" } },
+     { INDEX_op_movcond_i32, { "r", "r", "rC", "r", "0" } },
+-    { INDEX_op_deposit_i32, { "r", "0", "r" } },
++    { INDEX_op_deposit_i32, { "r", "rZ", "r" } },
+     { INDEX_op_extract_i32, { "r", "r" } },
  
-     { INDEX_op_deposit_i32, { "r", "0", "rZ" } },
-+    { INDEX_op_extract_i32, { "r", "r" } },
- 
-     { INDEX_op_muluh_i32, { "r", "r", "r" } },
-     { INDEX_op_mulsh_i32, { "r", "r", "r" } },
-@@ -2585,6 +2594,7 @@ static const TCGTargetOpDef ppc_op_defs[] = {
-     { INDEX_op_movcond_i64, { "r", "r", "ri", "rZ", "rZ" } },
- 
-     { INDEX_op_deposit_i64, { "r", "0", "rZ" } },
-+    { INDEX_op_extract_i64, { "r", "r" } },
- 
-     { INDEX_op_mulsh_i64, { "r", "r", "r" } },
-     { INDEX_op_muluh_i64, { "r", "r", "r" } },
+     { INDEX_op_qemu_ld_i32, { "r", "L" } },
 -- 
 2.9.3
