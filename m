@@ -1,38 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35051)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37817)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cRGF2-00079E-2p
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 05:34:53 -0500
+	(envelope-from <drjones@redhat.com>) id 1cRGQY-0004Ke-5W
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 05:46:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cRGEy-0005TJ-BW
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 05:34:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37972)
+	(envelope-from <drjones@redhat.com>) id 1cRGQV-0002IN-21
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 05:46:46 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41764)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cRGEy-0005T8-52
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 05:34:48 -0500
-Received: from int-mx13.intmail.prod.int.phx2.redhat.com
-	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4CF5231B32C
-	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 10:34:48 +0000 (UTC)
-Date: Wed, 11 Jan 2017 10:34:42 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170111103442.GH12072@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170106155543.12827-1-berrange@redhat.com>
-	<20170106155543.12827-3-berrange@redhat.com>
-	<20170110163713.GA19869@stefanha-x1.localdomain>
-	<20170110165105.GR27720@redhat.com>
-	<80b19297-00c4-f109-dd4f-9d2b41ee618c@redhat.com>
-	<20170110183630.GA6628@redhat.com>
-	<d0ff9866-2001-a028-09ae-98ba0ad3693b@redhat.com>
-	<20170111102832.GG12072@redhat.com>
+	(Exim 4.71) (envelope-from <drjones@redhat.com>) id 1cRGQU-0002Hm-PR
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 05:46:42 -0500
+Date: Wed, 11 Jan 2017 11:46:38 +0100
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20170111104638.die63k7v72uhgufx@kamzik.brq.redhat.com>
+References: <1484112575-13194-1-git-send-email-peterx@redhat.com>
+	<1484112575-13194-2-git-send-email-peterx@redhat.com>
+	<20170111090607.crlxskbvhx6seyvl@kamzik.brq.redhat.com>
+	<20170111095112.opwd5sy6et4qdcrl@kamzik.brq.redhat.com>
+	<20170111101244.GG4450@pxdev.xzpeter.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170111102832.GG12072@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 02/47] trace: switch io/ directory to
- modular trace.h file
+In-Reply-To: <20170111101244.GG4450@pxdev.xzpeter.org>
+Subject: Re: [Qemu-devel] [kvm-unit-tests PATCH v5 1/2] run_tests: put logs
+ into per-test file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,49 +31,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org, Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
 
-On Wed, Jan 11, 2017 at 10:28:32AM +0000, Daniel P. Berrange wrote:
-> On Tue, Jan 10, 2017 at 10:01:12PM +0100, Paolo Bonzini wrote:
-> > 
-> > 
-> > On 10/01/2017 19:36, Daniel P. Berrange wrote:
+On Wed, Jan 11, 2017 at 06:12:44PM +0800, Peter Xu wrote:
+> On Wed, Jan 11, 2017 at 10:51:12AM +0100, Andrew Jones wrote:
+> > On Wed, Jan 11, 2017 at 10:06:07AM +0100, Andrew Jones wrote:
+> > > On Wed, Jan 11, 2017 at 01:29:34PM +0800, Peter Xu wrote:
+> > > > We were using test.log before to keep all the test logs. This patch
+> > > > creates one log file per test case under logs/ directory with name
+> > > > "TESTNAME.log". Meanwhile, we will keep the last time log into
+> > > > logs.old/.
+> > > > 
+> > > > Renaming scripts/functions.bash into scripts/common.bash to store some
+> > > > more global variables.
+> > > > 
+> > > > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > > > ---
+> > > >  .gitignore                              |  3 ++-
+> > > >  Makefile                                |  5 ++---
+> > > >  run_tests.sh                            | 18 +++++++++++-------
+> > > >  scripts/{functions.bash => common.bash} | 13 +++++++++++--
+> > > >  scripts/mkstandalone.sh                 |  2 +-
+> > > >  5 files changed, 27 insertions(+), 14 deletions(-)
+> > > >  rename scripts/{functions.bash => common.bash} (75%)
+> > > > 
+> > > > diff --git a/.gitignore b/.gitignore
+> > > > index 3155418..2213b9b 100644
+> > > > --- a/.gitignore
+> > > > +++ b/.gitignore
+> > > > @@ -12,7 +12,8 @@ cscope.*
+> > > >  /lib/asm
+> > > >  /config.mak
+> > > >  /*-run
+> > > > -/test.log
+> > > >  /msr.out
+> > > >  /tests
+> > > >  /build-head
+> > > > +/logs/
+> > > > +/logs.old/
 > > > 
-> > > It seems you're saying we should also trim the top level dirs, so
-> > > we in fact get:
+> > > We should send a cleanup patch fixing the other dirs too someday,
+> > > patches, /lib/asm, and /tests
 > > > 
-> > > 
-> > > -I/home/berrange/src/virt/qemu/hw/scsi
-> > > -Ihw/scsi
-> > > -I/home/berrange/src/virt/qemu/tcg
-> > > -I/home/berrange/src/virt/qemu/tcg/i386
-> > > -I/home/berrange/src/virt/qemu/linux-headers
-> > > -I/home/berrange/src/virt/qemu-build/linux-headers
-> > > -I/home/berrange/src/virt/qemu/include
+> > > > diff --git a/Makefile b/Makefile
+> > > > index a32333b..844bacc 100644
+> > > > --- a/Makefile
+> > > > +++ b/Makefile
+> > > > @@ -94,9 +94,8 @@ libfdt_clean:
+> > > >  	$(LIBFDT_objdir)/.*.d
+> > > >  
+> > > >  distclean: clean libfdt_clean
+> > > > -	$(RM) lib/asm config.mak $(TEST_DIR)-run test.log msr.out cscope.* \
+> > > > -	      build-head
+> > > > -	$(RM) -r tests
+> > > > +	$(RM) lib/asm config.mak $(TEST_DIR)-run msr.out cscope.* build-head
+> > > > +	$(RM) -r tests logs logs.old
+> > > >  
+> > > >  cscope: cscope_dirs = lib lib/libfdt lib/linux $(TEST_DIR) $(ARCH_LIBDIRS) lib/asm-generic
+> > > >  cscope:
+> > > > diff --git a/run_tests.sh b/run_tests.sh
+> > > > index 254129d..b6a1059 100755
+> > > > --- a/run_tests.sh
+> > > > +++ b/run_tests.sh
+> > > > @@ -7,7 +7,7 @@ if [ ! -f config.mak ]; then
+> > > >      exit 1
+> > > >  fi
+> > > >  source config.mak
+> > > > -source scripts/functions.bash
+> > > > +source scripts/common.bash
+> > > >  
+> > > >  function usage()
+> > > >  {
+> > > > @@ -46,17 +46,21 @@ while getopts "g:hv" opt; do
+> > > >      esac
+> > > >  done
+> > > >  
+> > > > -RUNTIME_log_stderr () { cat >> test.log; }
+> > > > +# RUNTIME_log_file will be configured later
+> > > > +RUNTIME_log_stderr () { cat >> $RUNTIME_log_file; }
+> > > >  RUNTIME_log_stdout () {
+> > > >      if [ "$PRETTY_PRINT_STACKS" = "yes" ]; then
+> > > > -        ./scripts/pretty_print_stacks.py $1 >> test.log
+> > > > +        ./scripts/pretty_print_stacks.py $1 >> $RUNTIME_log_file
+> > > >      else
+> > > > -        cat >> test.log
+> > > > +        cat >> $RUNTIME_log_file
+> > > >      fi
+> > > >  }
+> > > >  
+> > > > -
+> > > >  config=$TEST_DIR/unittests.cfg
+> > > > -rm -f test.log
+> > > > -printf "BUILD_HEAD=$(cat build-head)\n\n" > test.log
+> > > > +
+> > > > +rm -rf $unittest_log_dir.old
+> > > > +mv $unittest_log_dir $unittest_log_dir.old
 > > 
-> > Yes, and ultimately tcg too.
+> > Actually this mv can fail, but we definitely wouldn't want to error-out
+> > like v4 did, we want to ignore it. The error is that /logs doesn't exist,
+> > as it won't the first time run_tests.sh is run. So, we need to redirect
+> > stderr to /dev/null on this mv to avoid the message
+> > "mv: cannot stat 'logs': No such file or directory"
+> > on that first run.
 > 
-> So the problem with dropping BUILD_DIR from the include path is that
-> config-host.h is generated in that location. We'll have to move that
-> into BIULD_DIR/include and add -I$(BUILDDIR)/include to search path
-> instead.
+> Hmm, yes.
+> 
+> After a second thought, I think the mv can still fail even if this is
+> not the first time we run the script - e.g. if the directory belongs
+> to user1 but user2 runs run_tests.sh under it (while user2 don't have
+> write permission on this directory). So I think we still need some way
+> to stop the script if we detected that we might encounter issue.
 
-Sigh and much more needs moving too...
+I'm not really concerned about the user1/user2 scenario. The general use
+of kvm-unit-tests is to build and run, meaning the user must have write
+access to the dir in order to compile. But, ignoring the errors, as I
+suggested, probably isn't a great idea either...
 
-	module_block.h
-	qapi-event.h
-	qapi-types.h
-	qapi-visit.h
-	qemu-doc.html
-	qemu-version.h
-	qemu-version.h.tmp
-	qmp-commands.h
-	qmp-introspect.h
+> 
+> We can do explicit check before the mv, making sure that the directory
+> is there.
+> 
+> So, how about this:
+> 
+>     rm -rf $unittest_log_dir.old || err "Failed remove old logs"
+>     if [[ -d $unittest_log_dir ]]; then
 
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+Only [ ... ] for tests like these
+
+>         mv $unittest_log_dir $unittest_log_dir.old ||
+>             err "Failed backup logs"
+>     fi
+>     mkdir $unittest_log_dir || err "Failed to create log dir"
+> 
+> And define err() in common.bash:
+> 
+>     function err()
+>     {
+>         echo "$@"
+>         exit 1
+>     }
+
+The above is mostly just translating rm/mv/mkdir stderr messages to
+new messages. We can do it much more simply like
+
+ rm -rf logs.old
+ [ -d logs ] && mv logs logs.old
+ mkdir logs || exit 2
+
+Thanks,
+drew
