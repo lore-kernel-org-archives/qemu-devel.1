@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35093)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35840)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cRMWm-0006n6-Bl
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 12:17:37 -0500
+	(envelope-from <thuth@redhat.com>) id 1cRMYH-00084W-Jm
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 12:19:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1cRMWj-0001JO-3h
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 12:17:36 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56178)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1cRMWi-0001JB-Tx
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 12:17:33 -0500
-Received: from int-mx13.intmail.prod.int.phx2.redhat.com
-	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 215A88123A
-	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 17:17:33 +0000 (UTC)
-Date: Wed, 11 Jan 2017 17:17:27 +0000
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170111171727.GS12072@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170106155543.12827-1-berrange@redhat.com>
-	<20170106155543.12827-3-berrange@redhat.com>
-	<20170110163858.GB19869@stefanha-x1.localdomain>
+	(envelope-from <thuth@redhat.com>) id 1cRMYG-0001yv-Em
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 12:19:09 -0500
+References: <20170111164105.27164.30697.malonedeb@chaenomeles.canonical.com>
+	<4fc41772-1607-7e55-ffa1-80e3579b964d@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <b53ded52-f5ca-43f8-321e-1a2617471510@redhat.com>
+Date: Wed, 11 Jan 2017 18:19:00 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170110163858.GB19869@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [PATCH v2 02/47] trace: switch io/ directory to
- modular trace.h file
+In-Reply-To: <4fc41772-1607-7e55-ffa1-80e3579b964d@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature";
+	boundary="ivb4ho1DMkABKInvX91KVWdiSGVTOnC6R"
+Subject: Re: [Qemu-devel] [Bug 1655708] [NEW] target/ppc/int_helper.c:2806:
+ strange expression ?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,31 +25,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, Bug 1655708 <1655708@bugs.launchpad.net>, qemu-devel@nongnu.org, Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
+Cc: qemu-ppc@nongnu.org
 
-On Tue, Jan 10, 2017 at 04:38:58PM +0000, Stefan Hajnoczi wrote:
-> On Fri, Jan 06, 2017 at 03:54:58PM +0000, Daniel P. Berrange wrote:
-> > diff --git a/io/Makefile.objs b/io/Makefile.objs
-> > index 9d8337d..94cb74e 100644
-> > --- a/io/Makefile.objs
-> > +++ b/io/Makefile.objs
-> > @@ -8,3 +8,5 @@ io-obj-y += channel-watch.o
-> >  io-obj-y += channel-websock.o
-> >  io-obj-y += channel-util.o
-> >  io-obj-y += task.o
-> > +trace-obj-y += trace.o
-> > +trace-obj-$(CONFIG_TRACE_DTRACE) += trace-dtrace.o
-> 
-> Is there a way to eliminate this boilerplate?  If the directory has a
-> trace-events file then it requires trace.o/trace-dtrace.o.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ivb4ho1DMkABKInvX91KVWdiSGVTOnC6R
+From: Thomas Huth <thuth@redhat.com>
+To: Eric Blake <eblake@redhat.com>, Bug 1655708 <1655708@bugs.launchpad.net>,
+ qemu-devel@nongnu.org, Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
+Cc: qemu-ppc@nongnu.org
+Message-ID: <b53ded52-f5ca-43f8-321e-1a2617471510@redhat.com>
+Subject: Re: [Qemu-devel] [Bug 1655708] [NEW] target/ppc/int_helper.c:2806:
+ strange expression ?
+References: <20170111164105.27164.30697.malonedeb@chaenomeles.canonical.com>
+ <4fc41772-1607-7e55-ffa1-80e3579b964d@redhat.com>
+In-Reply-To: <4fc41772-1607-7e55-ffa1-80e3579b964d@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Yes in fact. I figured out a rule in the top level Makefile.objs that can
-do this for all sub-dirs
+On 11.01.2017 18:12, Eric Blake wrote:
+> On 01/11/2017 10:41 AM, dcb wrote:
+>> so I think the compiler warning is for the i * 2 lhs of the ?.
+>=20
+> Yes - the compiler is complaining that 'i * 2' can only be non-zero if
+> 'i' was non-zero (given that the code occurs in a loop for i between 0
+> and 16), so it is just as easy to write 'i ? ...' instead of the weirde=
+r
+> '(i * 2) ? ...'.
 
-Regards,
-Daniel
--- 
-|: http://berrange.com      -o-    http://www.flickr.com/photos/dberrange/ :|
-|: http://libvirt.org              -o-             http://virt-manager.org :|
-|: http://entangle-photo.org       -o-    http://search.cpan.org/~danberr/ :|
+=2E.. unless something like (i & 2) was meant instead?
+Maybe Jose (who wrote that code) could comment on this?
+
+ Thomas
+
+
+
+
+--ivb4ho1DMkABKInvX91KVWdiSGVTOnC6R
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.22 (GNU/Linux)
+
+iQIcBAEBAgAGBQJYdmkJAAoJEC7Z13T+cC21l+kP/1RxQnb8oL+dsrRO4B3xejFS
+SPu6moVDx9y32bBFsfVNWgNDOMI6/zFLlTv4k+JPcgSeG7nAg5QILkJFvUpvirC1
+sCZ13r3bIu5zpiC/uGwQhtdI6eXikRKAWtNp1J2WoOyu3EzTlTbMaEG/hNqOZ68d
+lov2TV48Xf3RyPuWjmU940N0gV6IiuVADO27nxxQ6Hkewq3oeUyHth5rLjdNQ+OR
+Wg098eA7jFetXC+VJ/38hlPeDeeeoiNvkjh4/e86JcQabJtrQnY0gR6qz9Y3poLE
+SFm8tgaUcGkXFuL9jig5wNXzfl5LKYX7uKFJ6eaoIeWyhwnGK2ccTY3+WxE/4ush
+ONffWpQRctK2vyDF2m7XEnXmJ2lRT6NAT7G60zAxGWe1S8j4zVNcdTIpMwSgT/lF
+V/KoVqLS/gzInG/wnDcEk6rALIo4hNKpsNHd+huoULb6vNLNy5Bcypj2jaeq3/b9
+PHQCSVInwRjxpNvDVz+iNHwdSoaJfcgN1OGaHruJcersvGT9PWTLb3DgJ5E6xWPz
+wy/CLv/u6M1ompIvhzxsVDRRvrAZTRzbiL3UBAPz/e1zKZaiPOXvGIY5haeeLMHR
+CqAPAOnZMtiflZt2sXzomlx0BsN7IwmjFqh+sGb8SWHaQjzCbH1+ZJZ6NB9HjTmB
+dTthQ860aTUVUvuxdcIx
+=E/aI
+-----END PGP SIGNATURE-----
+
+--ivb4ho1DMkABKInvX91KVWdiSGVTOnC6R--
