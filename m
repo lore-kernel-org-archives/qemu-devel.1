@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34326)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37270)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cRD8W-0003kR-0C
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 02:15:56 -0500
+	(envelope-from <bounces@canonical.com>) id 1cRDHC-0007ql-O4
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 02:24:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cRD8R-0004VL-8Z
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 02:15:55 -0500
-Received: from indium.canonical.com ([91.189.90.7]:58940)
+	(envelope-from <bounces@canonical.com>) id 1cRDH7-00081q-Pm
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 02:24:54 -0500
+Received: from indium.canonical.com ([91.189.90.7]:60347)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cRD8R-0004Uz-2w
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 02:15:51 -0500
+	id 1cRDH7-00080o-KK
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 02:24:49 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cRD8Q-0008A8-5A
-	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 07:15:50 +0000
+	id 1cRDH5-0001Mm-V4
+	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 07:24:48 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 0B2152E80C9
-	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 07:15:50 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id E0C902E80C9
+	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 07:24:47 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 11 Jan 2017 06:58:49 -0000
-From: Thomas Huth <1619438@bugs.launchpad.net>
-Reply-To: Bug 1619438 <1619438@bugs.launchpad.net>
+Date: Wed, 11 Jan 2017 07:11:22 -0000
+From: Thomas Huth <622367@bugs.launchpad.net>
+Reply-To: Bug 622367 <622367@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20160901192413.4567.75484.malonedeb@wampee.canonical.com>
-Message-Id: <20170111065849.27406.91924.malone@chaenomeles.canonical.com>
+References: <20100822180158.18591.82477.malonedeb@palladium.canonical.com>
+Message-Id: <20170111071122.20423.64907.malone@wampee.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1619438] Re: GTK+ UI,
- delete key deletes to the left in the monitor
+Subject: [Qemu-devel] [Bug 622367] Re: No BIOS MPFP structure with smp=92
+ and more
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,26 +39,35 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Released with version 2.8
+QEMU 0.12 is quite outdated nowadays ... can you still reproduce this
+issue with the latest version of QEMU (currently version 2.8)?
 
 ** Changed in: qemu
-       Status: Fix Committed =3D> Fix Released
+       Status: New =3D> Incomplete
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1619438
+https://bugs.launchpad.net/bugs/622367
 
 Title:
-  GTK+ UI, delete key deletes to the left in the monitor
+  No BIOS MPFP structure with smp=3D92 and more
 
 Status in QEMU:
-  Fix Released
+  Incomplete
 
 Bug description:
-  it must delete characters to the right, otherwise it is like having
-  two backspaces
+  qemu 0.12.2, SeaBios 0.5.1, running qemu-system-x86_64.exe with option -s=
+mp.
+  If smp>=3D92 then no MP floating point structure present in 1 Mb. This ma=
+y be verified by pmemsave 0 0x100000 in debugger and search for _MP_ signat=
+ure in file.
+
+  qemu 0.10.5 (bios build 05/08/09) can smp=3D128 (and even 255 if not
+  hangs :).
+
+  Host win 7 x64 RTM 7600.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1619438/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/622367/+subscriptions
