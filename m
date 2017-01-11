@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54907)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54893)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1cRPO2-0006SK-Hx
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 15:20:47 -0500
+	(envelope-from <atar4qemu@gmail.com>) id 1cRPO2-0006Rl-0p
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 15:20:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1cRPO1-0000y4-PW
+	(envelope-from <atar4qemu@gmail.com>) id 1cRPNy-0000xN-3s
 	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 15:20:46 -0500
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:34031)
+Received: from mail-wj0-x244.google.com ([2a00:1450:400c:c01::244]:35683)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>) id 1cRPO1-0000xv-J6
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 15:20:45 -0500
-Received: by mail-wm0-x241.google.com with SMTP id c85so574879wmi.1
-	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 12:20:45 -0800 (PST)
+	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>) id 1cRPNx-0000xF-Oy
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 15:20:42 -0500
+Received: by mail-wj0-x244.google.com with SMTP id ey1so13025975wjd.2
+	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 12:20:41 -0800 (PST)
 From: Artyom Tarasenko <atar4qemu@gmail.com>
-Date: Wed, 11 Jan 2017 21:19:38 +0100
-Message-Id: <65e7ea6ea1cd0ebf291b1ed76d5cb1cccff2d49e.1484165352.git.atar4qemu@gmail.com>
+Date: Wed, 11 Jan 2017 21:19:36 +0100
+Message-Id: <be9f2489b4857b637e7d4aaeb058dda11a55374e.1484165352.git.atar4qemu@gmail.com>
 In-Reply-To: <cover.1484165352.git.atar4qemu@gmail.com>
 References: <cover.1484165352.git.atar4qemu@gmail.com>
 In-Reply-To: <cover.1484165352.git.atar4qemu@gmail.com>
 References: <cover.1484165352.git.atar4qemu@gmail.com>
-Subject: [Qemu-devel] [PATCH v2 07/30] target-sparc: simplify
- replace_tlb_entry by using TTE_PGSIZE
+Subject: [Qemu-devel] [PATCH v2 05/30] target-sparc: add UltraSPARC T1 TLB
+ #defines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,26 +32,24 @@ To: qemu-devel@nongnu.org
 Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Richard Henderson <rth@twiddle.net>, Artyom Tarasenko <atar4qemu@gmail.com>
 
 Signed-off-by: Artyom Tarasenko <atar4qemu@gmail.com>
-Reviewed-by: Richard Henderson <rth@twiddle.net>
 ---
- target/sparc/ldst_helper.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ target/sparc/cpu.h | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/target/sparc/ldst_helper.c b/target/sparc/ldst_helper.c
-index 043cbf8..68eca86 100644
---- a/target/sparc/ldst_helper.c
-+++ b/target/sparc/ldst_helper.c
-@@ -127,9 +127,8 @@ static void replace_tlb_entry(SparcTLBEntry *tlb,
-     if (TTE_IS_VALID(tlb->tte)) {
-         CPUState *cs = CPU(sparc_env_get_cpu(env1));
+diff --git a/target/sparc/cpu.h b/target/sparc/cpu.h
+index b41f5c5..f2e923d 100644
+--- a/target/sparc/cpu.h
++++ b/target/sparc/cpu.h
+@@ -336,6 +336,10 @@ enum {
+ #define TTE_PGSIZE_UA2005(tte)     ((tte) & 7ULL)
+ #define TTE_PA(tte)         ((tte) & 0x1ffffffe000ULL)
  
--        mask = 0xffffffffffffe000ULL;
--        mask <<= 3 * ((tlb->tte >> 61) & 3);
--        size = ~mask + 1;
-+        size = 8192ULL << 3 * TTE_PGSIZE(tlb->tte);
-+        mask = 1ULL + ~size;
- 
-         va = tlb->tag & mask;
- 
++/* UltraSPARC T1 specific */
++#define TLB_UST1_IS_REAL_BIT   (1ULL << 9)  /* Real translation entry */
++#define TLB_UST1_IS_SUN4V_BIT  (1ULL << 10) /* sun4u/sun4v TTE format switch */
++
+ #define SFSR_NF_BIT         (1ULL << 24)   /* JPS1 NoFault */
+ #define SFSR_TM_BIT         (1ULL << 15)   /* JPS1 TLB Miss */
+ #define SFSR_FT_VA_IMMU_BIT (1ULL << 13)   /* USIIi VA out of range (IMMU) */
 -- 
 1.8.3.1
