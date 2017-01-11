@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54811)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54810)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1cRPNr-0006Js-V9
+	(envelope-from <atar4qemu@gmail.com>) id 1cRPNr-0006Jp-Uh
 	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 15:20:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1cRPNq-0000v5-FC
+	(envelope-from <atar4qemu@gmail.com>) id 1cRPNn-0000u2-Vd
 	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 15:20:35 -0500
-Received: from mail-wj0-x244.google.com ([2a00:1450:400c:c01::244]:36489)
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:34014)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>) id 1cRPNp-0000ul-Vm
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 15:20:34 -0500
-Received: by mail-wj0-x244.google.com with SMTP id dh1so11795484wjb.3
-	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 12:20:33 -0800 (PST)
+	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>) id 1cRPNn-0000tb-Lo
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 15:20:31 -0500
+Received: by mail-wm0-x241.google.com with SMTP id c85so573736wmi.1
+	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 12:20:31 -0800 (PST)
 From: Artyom Tarasenko <atar4qemu@gmail.com>
-Date: Wed, 11 Jan 2017 21:19:32 +0100
-Message-Id: <af031d3c4c1a12eabded2a677ad3ac50937bf6bf.1484165352.git.atar4qemu@gmail.com>
-In-Reply-To: <cover.1484165352.git.atar4qemu@gmail.com>
-References: <cover.1484165352.git.atar4qemu@gmail.com>
-In-Reply-To: <cover.1484165352.git.atar4qemu@gmail.com>
-References: <cover.1484165352.git.atar4qemu@gmail.com>
-Subject: [Qemu-devel] [PATCH v2 01/30] target-sparc: ignore MMU-faults if
- MMU is disabled in hypervisor mode
+Date: Wed, 11 Jan 2017 21:19:31 +0100
+Message-Id: <cover.1484165352.git.atar4qemu@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v2 00/30] target-sparc: add niagara OpenSPARC
+ T1 sun4v emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,60 +30,94 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Richard Henderson <rth@twiddle.net>, Artyom Tarasenko <atar4qemu@gmail.com>
 
-while IMMU/DMMU is disabled
-- ignore MMU-faults in hypervisorv mode or if CPU doesn't have hypervisor
-- signal TT_INSN_REAL_TRANSLATION_MISS/TT_DATA_REAL_TRANSLATION_MISS otherwise
+This patch series adds a Niagara OpenSPARC T1 sun4v machine.
+The most important new feature: it can boot Solaris 10 / sparc64.
+The machine uses a firmware released by Sun as a part of the OpenSPARC project.
 
-Signed-off-by: Artyom Tarasenko <atar4qemu@gmail.com>
----
- target/sparc/cpu.h         |  2 ++
- target/sparc/ldst_helper.c | 15 +++++++++++++--
- 2 files changed, 15 insertions(+), 2 deletions(-)
+The series are available under:
+https://github.com/artyom-tarasenko/qemu/tree/sun4v-v2
 
-diff --git a/target/sparc/cpu.h b/target/sparc/cpu.h
-index 5fb0ed1..e0b2806 100644
---- a/target/sparc/cpu.h
-+++ b/target/sparc/cpu.h
-@@ -68,6 +68,8 @@
- #define TT_DATA_ACCESS 0x32
- #define TT_UNALIGNED 0x34
- #define TT_PRIV_ACT 0x37
-+#define TT_INSN_REAL_TRANSLATION_MISS 0x3e
-+#define TT_DATA_REAL_TRANSLATION_MISS 0x3f
- #define TT_EXTINT   0x40
- #define TT_IVEC     0x60
- #define TT_TMISS    0x64
-diff --git a/target/sparc/ldst_helper.c b/target/sparc/ldst_helper.c
-index de7d53a..fdca87f 100644
---- a/target/sparc/ldst_helper.c
-+++ b/target/sparc/ldst_helper.c
-@@ -1664,14 +1664,25 @@ void sparc_cpu_unassigned_access(CPUState *cs, hwaddr addr,
- {
-     SPARCCPU *cpu = SPARC_CPU(cs);
-     CPUSPARCState *env = &cpu->env;
--    int tt = is_exec ? TT_CODE_ACCESS : TT_DATA_ACCESS;
- 
- #ifdef DEBUG_UNASSIGNED
-     printf("Unassigned mem access to " TARGET_FMT_plx " from " TARGET_FMT_lx
-            "\n", addr, env->pc);
- #endif
- 
--    cpu_raise_exception_ra(env, tt, GETPC());
-+    if (is_exec) { /* XXX has_hypervisor */
-+        if (env->lsu & (IMMU_E)) {
-+            cpu_raise_exception_ra(env, TT_CODE_ACCESS, GETPC());
-+        } else if (cpu_has_hypervisor(env) && !(env->hpstate & HS_PRIV)) {
-+            cpu_raise_exception_ra(env, TT_INSN_REAL_TRANSLATION_MISS, GETPC());
-+        }
-+    } else {
-+        if (env->lsu & (DMMU_E)) {
-+            cpu_raise_exception_ra(env, TT_DATA_ACCESS, GETPC());
-+        } else if (cpu_has_hypervisor(env) && !(env->hpstate & HS_PRIV)) {
-+            cpu_raise_exception_ra(env, TT_DATA_REAL_TRANSLATION_MISS, GETPC());
-+        }
-+    }
- }
- #endif
- #endif
+The command line for booting Solaris 10 / sparc:
+
+sparc64-softmmu/qemu-system-sparc64 -M niagara -L /path/to/S10image/ -nographic -m 256 -drive if=pflash,readonly=on,file=/path/to/S10image/disk.s10hw2
+
+More info under
+http://tyom.blogspot.de/2016/10/qemu-sun4vniagara-target-went-public.html
+
+v1 -> v2:
+Rebased on top of current master
+Update Niagara target in qemu-doc.texi
+
+v0 -> v1:
+Rebased on top of current master
+Use lowercase machine name (Mark)
+Fixed build on i686
+Fixed user-mode build (Richard)
+Fixed per review comments from Richard
+Added Reviewed-by to the unmodified patches reviewed in the previous round
+
+
+Artyom Tarasenko (30):
+  target-sparc: ignore MMU-faults if MMU is disabled in hypervisor mode
+  target-sparc: store cpu super- and hypervisor flags in TB
+  target-sparc: use explicit mmu register pointers
+  target-sparc: add UA2005 TTE bit #defines
+  target-sparc: add UltraSPARC T1 TLB #defines
+  target-sparc: on UA2005 don't deliver Interrupt_level_n IRQs in
+    hypervisor mode
+  target-sparc: simplify replace_tlb_entry by using TTE_PGSIZE
+  target-sparc: implement UA2005 scratchpad registers
+  target-sparc: implement UltraSPARC-T1 Strand status ASR
+  target-sparc: hypervisor mode takes over nucleus mode
+  target-sparc: implement UA2005 hypervisor traps
+  target-sparc: implement UA2005 GL register
+  target-sparc: implement UA2005 rdhpstate and wrhpstate instructions
+  target-sparc: fix immediate UA2005 traps
+  target-sparc: use direct address translation in hyperprivileged mode
+  target-sparc: allow priveleged ASIs in hyperprivileged mode
+  target-sparc: ignore writes to UA2005 CPU mondo queue register
+  target-sparc: replace the last tlb entry when no free entries left
+  target-sparc: use SparcV9MMU type for sparc64 I/D-MMUs
+  target-sparc: implement UA2005 TSB Pointers
+  target-sparc: simplify ultrasparc_tsb_pointer
+  target-sparc: allow 256M sized pages
+  target-sparc: implement auto-demapping for UA2005 CPUs
+  target-sparc: add more registers to dump_mmu
+  target-sparc: implement UA2005 ASI_MMU (0x21)
+  target-sparc: store the UA2005 entries in sun4u format
+  target-sparc: add ST_BLKINIT_ ASIs for UA2005+ CPUs
+  target-sparc: implement sun4v RTC
+  target-sparc: move common cpu initialisation routines to sparc64.c
+  target-sparc: fix up niagara machine
+
+ MAINTAINERS                         |   7 +
+ default-configs/sparc64-softmmu.mak |   2 +
+ hw/sparc64/Makefile.objs            |   2 +
+ hw/sparc64/niagara.c                | 177 +++++++++++++++++
+ hw/sparc64/sparc64.c                | 378 +++++++++++++++++++++++++++++++++++
+ hw/sparc64/sun4u.c                  | 379 +----------------------------------
+ hw/timer/Makefile.objs              |   2 +
+ hw/timer/sun4v-rtc.c                | 102 ++++++++++
+ include/hw/sparc/sparc64.h          |   5 +
+ include/hw/timer/sun4v-rtc.h        |   1 +
+ linux-user/main.c                   |   2 +-
+ qemu-doc.texi                       |  14 +-
+ target/sparc/asi.h                  |   1 +
+ target/sparc/cpu.c                  |  13 +-
+ target/sparc/cpu.h                  | 105 +++++++---
+ target/sparc/helper.h               |   1 +
+ target/sparc/int64_helper.c         |  43 +++-
+ target/sparc/ldst_helper.c          | 385 ++++++++++++++++++++++++++++--------
+ target/sparc/machine.c              |   4 +-
+ target/sparc/mmu_helper.c           |  20 +-
+ target/sparc/translate.c            |  64 ++++--
+ target/sparc/win_helper.c           |  46 ++++-
+ 22 files changed, 1225 insertions(+), 528 deletions(-)
+ create mode 100644 hw/sparc64/niagara.c
+ create mode 100644 hw/sparc64/sparc64.c
+ create mode 100644 hw/timer/sun4v-rtc.c
+ create mode 100644 include/hw/sparc/sparc64.h
+ create mode 100644 include/hw/timer/sun4v-rtc.h
+
 -- 
 1.8.3.1
