@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54331)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55159)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cRCfW-00044y-Jk
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 01:45:59 -0500
+	(envelope-from <bounces@canonical.com>) id 1cRCje-0007j1-UA
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 01:50:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cRCfV-0008Um-JF
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 01:45:58 -0500
-Received: from indium.canonical.com ([91.189.90.7]:52037)
+	(envelope-from <bounces@canonical.com>) id 1cRCjb-0002Qk-TL
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 01:50:15 -0500
+Received: from indium.canonical.com ([91.189.90.7]:52250)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cRCfV-0008UE-Ci
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 01:45:57 -0500
+	id 1cRCjb-0002Q5-NW
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 01:50:11 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cRCfU-0006Zm-CG
-	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 06:45:56 +0000
+	id 1cRCja-0007Vy-Fe
+	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 06:50:10 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 577FC2E8019
-	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 06:45:56 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id D19BB2E80DA
+	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 06:50:07 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 11 Jan 2017 06:38:18 -0000
-From: Thomas Huth <1631625@bugs.launchpad.net>
-Reply-To: Bug 1631625 <1631625@bugs.launchpad.net>
+Date: Wed, 11 Jan 2017 06:39:20 -0000
+From: Thomas Huth <1611979@bugs.launchpad.net>
+Reply-To: Bug 1611979 <1611979@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20161008161931.5791.70475.malonedeb@chaenomeles.canonical.com>
-Message-Id: <20170111063818.20907.98080.malone@gac.canonical.com>
+References: <20160810223630.29693.49469.malonedeb@gac.canonical.com>
+Message-Id: <20170111063920.27094.79995.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1631625] Re: target-mips/dsp_helper.c: two
- possible bad shifts
+Subject: [Qemu-devel] [Bug 1611979] Re: GTK+ interface,
+ backspace is broken in the monitor console
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,32 +48,16 @@ Released with version 2.8
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1631625
+https://bugs.launchpad.net/bugs/1611979
 
 Title:
-  target-mips/dsp_helper.c: two possible bad shifts
+  GTK+ interface, backspace is broken in the monitor console
 
 Status in QEMU:
   Fix Released
 
 Bug description:
-  target-mips/dsp_helper.c:3480:1: error: V629 Consider inspecting the
-  '0x01 << (size + 1)' expression. Bit shifting of the 32-bit value with
-  a subsequent expansion to the 64-bit type.
-
-  Source code is
-
-          temp =3D temp & ((0x01 << (size + 1)) - 1);
-
-  If size >=3D 32, then better code might be
-
-          temp =3D temp & ((0x01UL << (size + 1)) - 1);
-
-  target-mips/dsp_helper.c:3509:1: error: V629 Consider inspecting the
-  '0x01 << (size + 1)' expression. Bit shifting of the 32-bit value with
-  a subsequent expansion to the 64-bit type.
-
-  Duplicate
+  this has been broken for over 2 years
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1631625/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1611979/+subscriptions
