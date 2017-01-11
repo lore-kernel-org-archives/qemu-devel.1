@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45202)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45228)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cROgL-000331-AK
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:35:38 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cROgM-00033x-Ss
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:35:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cROgK-0003Ib-3j
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:35:37 -0500
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:36140)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cROgL-0003JK-Gu
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:35:38 -0500
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:34558)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1cROgJ-0003HX-SU
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:35:36 -0500
-Received: by mail-wm0-x242.google.com with SMTP id r126so311495wmr.3
-	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 11:35:35 -0800 (PST)
+	id 1cROgL-0003Ij-80
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:35:37 -0500
+Received: by mail-wm0-x244.google.com with SMTP id c85so334353wmi.1
+	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 11:35:37 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 11 Jan 2017 20:34:57 +0100
-Message-Id: <1484163327-111841-4-git-send-email-pbonzini@redhat.com>
+Date: Wed, 11 Jan 2017 20:34:58 +0100
+Message-Id: <1484163327-111841-5-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1484163327-111841-1-git-send-email-pbonzini@redhat.com>
 References: <1484163327-111841-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 03/33] qom: Make all interface types abstract
+Subject: [Qemu-devel] [PULL 04/33] smbios: filter based on CONFIG_SMBIOS
+ rather than TARGET
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,142 +29,167 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Leif Lindholm <leif.lindholm@linaro.org>
 
-From: Eduardo Habkost <ehabkost@redhat.com>
+From: Leif Lindholm <leif.lindholm@linaro.org>
 
-"qom-list-types abstract=false" currently returns all interface
-types, as if they were not abstract. Fix this by making sure all
-interface types are abstract.
+-smbios command line options were accepted but silently ignored on
+TARGET_ARM, due to a test for TARGET_I386 in arch_init.c.
 
-All interface types have instance_size == 0, so we can use
-it to set abstract=true on type_initialize().
+Copy the mechanism of hw/pci/pci-stub.c to implement an smbios-stub
+instead, enabled for all targets without CONFIG_SMBIOS.
 
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Message-Id: <1481567461-2341-1-git-send-email-ehabkost@redhat.com>
+Signed-off-by: Leif Lindholm <leif.lindholm@linaro.org>
+Message-Id: <20161222151828.28292-1-leif.lindholm@linaro.org>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- qom/object.c                   |  6 +++++
- tests/device-introspect-test.c | 60 +++++++++++++++++++++++++++++++++++++++---
- 2 files changed, 63 insertions(+), 3 deletions(-)
+ arch_init.c                |  8 --------
+ hw/Makefile.objs           |  2 +-
+ hw/smbios/Makefile.objs    |  3 +++
+ hw/smbios/smbios-stub.c    | 31 +++++++++++++++++++++++++++++++
+ hw/smbios/smbios.c         |  2 +-
+ include/hw/smbios/smbios.h |  2 +-
+ include/sysemu/arch_init.h |  1 -
+ vl.c                       |  2 +-
+ 8 files changed, 38 insertions(+), 13 deletions(-)
+ create mode 100644 hw/smbios/smbios-stub.c
 
-diff --git a/qom/object.c b/qom/object.c
-index 7a05e35..760fafb 100644
---- a/qom/object.c
-+++ b/qom/object.c
-@@ -272,6 +272,12 @@ static void type_initialize(TypeImpl *ti)
- 
-     ti->class_size = type_class_get_size(ti);
-     ti->instance_size = type_object_get_size(ti);
-+    /* Any type with zero instance_size is implicitly abstract.
-+     * This means interface types are all abstract.
-+     */
-+    if (ti->instance_size == 0) {
-+        ti->abstract = true;
-+    }
- 
-     ti->class = g_malloc0(ti->class_size);
- 
-diff --git a/tests/device-introspect-test.c b/tests/device-introspect-test.c
-index 37debc1..c5637cc 100644
---- a/tests/device-introspect-test.c
-+++ b/tests/device-introspect-test.c
-@@ -20,18 +20,24 @@
- #include "qemu/osdep.h"
- #include "qemu-common.h"
- #include "qapi/qmp/qstring.h"
-+#include "qapi/qmp/qbool.h"
-+#include "qapi/qmp/qdict.h"
- #include "libqtest.h"
- 
- const char common_args[] = "-nodefaults -machine none";
- 
--static QList *device_type_list(bool abstract)
-+static QList *qom_list_types(const char *implements, bool abstract)
- {
-     QDict *resp;
-     QList *ret;
-+    QDict *args = qdict_new();
- 
-+    qdict_put(args, "abstract", qbool_from_bool(abstract));
-+    if (implements) {
-+        qdict_put(args, "implements", qstring_from_str(implements));
-+    }
-     resp = qmp("{'execute': 'qom-list-types',"
--               " 'arguments': {'implements': 'device', 'abstract': %i}}",
--               abstract);
-+               " 'arguments': %p }", args);
-     g_assert(qdict_haskey(resp, "return"));
-     ret = qdict_get_qlist(resp, "return");
-     QINCREF(ret);
-@@ -39,6 +45,11 @@ static QList *device_type_list(bool abstract)
-     return ret;
+diff --git a/arch_init.c b/arch_init.c
+index 5cc58b2..34e7694 100644
+--- a/arch_init.c
++++ b/arch_init.c
+@@ -28,7 +28,6 @@
+ #include "sysemu/arch_init.h"
+ #include "hw/pci/pci.h"
+ #include "hw/audio/audio.h"
+-#include "hw/smbios/smbios.h"
+ #include "qemu/config-file.h"
+ #include "qemu/error-report.h"
+ #include "qmp-commands.h"
+@@ -248,13 +247,6 @@ void do_acpitable_option(const QemuOpts *opts)
+ #endif
  }
  
-+static QList *device_type_list(bool abstract)
+-void do_smbios_option(QemuOpts *opts)
+-{
+-#ifdef TARGET_I386
+-    smbios_entry_add(opts);
+-#endif
+-}
+-
+ int kvm_available(void)
+ {
+ #ifdef CONFIG_KVM
+diff --git a/hw/Makefile.objs b/hw/Makefile.objs
+index 0ffd281..2a73ae5 100644
+--- a/hw/Makefile.objs
++++ b/hw/Makefile.objs
+@@ -33,7 +33,7 @@ devices-dirs-$(CONFIG_VIRTIO) += virtio/
+ devices-dirs-$(CONFIG_SOFTMMU) += watchdog/
+ devices-dirs-$(CONFIG_SOFTMMU) += xen/
+ devices-dirs-$(CONFIG_MEM_HOTPLUG) += mem/
+-devices-dirs-$(CONFIG_SMBIOS) += smbios/
++devices-dirs-$(CONFIG_SOFTMMU) += smbios/
+ devices-dirs-y += core/
+ common-obj-y += $(devices-dirs-y)
+ obj-y += $(devices-dirs-y)
+diff --git a/hw/smbios/Makefile.objs b/hw/smbios/Makefile.objs
+index c3d3753..ee0712b 100644
+--- a/hw/smbios/Makefile.objs
++++ b/hw/smbios/Makefile.objs
+@@ -1,2 +1,5 @@
+ common-obj-$(CONFIG_SMBIOS) += smbios.o
+ common-obj-$(call land,$(CONFIG_SMBIOS),$(CONFIG_IPMI)) += smbios_type_38.o
++
++common-obj-$(call lnot,$(CONFIG_SMBIOS)) += smbios-stub.o
++common-obj-$(CONFIG_ALL) += smbios-stub.o
+diff --git a/hw/smbios/smbios-stub.c b/hw/smbios/smbios-stub.c
+new file mode 100644
+index 0000000..3087394
+--- /dev/null
++++ b/hw/smbios/smbios-stub.c
+@@ -0,0 +1,31 @@
++/*
++ * SMBIOS stubs for platforms that don't support SMBIOS.
++ *
++ * Copyright (c) 2010 Isaku Yamahata <yamahata at valinux co jp>
++ *                    VA Linux Systems Japan K.K.
++ * Copyright (c) 2016 Leif Lindholm <leif.lindholm@linaro.org>
++ *                    Linaro Ltd.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License along
++ * with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "qapi/qmp/qerror.h"
++#include "qmp-commands.h"
++#include "hw/smbios/smbios.h"
++
++void smbios_entry_add(QemuOpts *opts, Error **errp)
 +{
-+    return qom_list_types("device", abstract);
++    error_setg(errp, QERR_UNSUPPORTED);
 +}
-+
- static void test_one_device(const char *type)
- {
-     QDict *resp;
-@@ -110,6 +121,48 @@ static void test_device_intro_concrete(void)
-     qtest_end();
+diff --git a/hw/smbios/smbios.c b/hw/smbios/smbios.c
+index 3a96ced..1a5437a 100644
+--- a/hw/smbios/smbios.c
++++ b/hw/smbios/smbios.c
+@@ -882,7 +882,7 @@ static void save_opt(const char **dest, QemuOpts *opts, const char *name)
+     }
  }
  
-+static void test_abstract_interfaces(void)
-+{
-+    QList *all_types;
-+    QList *obj_types;
-+    QListEntry *ae;
-+
-+    qtest_start(common_args);
-+    /* qom-list-types implements=interface would return any type
-+     * that implements _any_ interface (not just interface types),
-+     * so use a trick to find the interface type names:
-+     * - list all object types
-+     * - list all types, and look for items that are not
-+     *   on the first list
-+     */
-+    all_types = qom_list_types(NULL, false);
-+    obj_types = qom_list_types("object", false);
-+
-+    QLIST_FOREACH_ENTRY(all_types, ae) {
-+        QDict *at = qobject_to_qdict(qlist_entry_obj(ae));
-+        const char *aname = qdict_get_str(at, "name");
-+        QListEntry *oe;
-+        const char *found = NULL;
-+
-+        QLIST_FOREACH_ENTRY(obj_types, oe) {
-+            QDict *ot = qobject_to_qdict(qlist_entry_obj(oe));
-+            const char *oname = qdict_get_str(ot, "name");
-+            if (!strcmp(aname, oname)) {
-+                found = oname;
-+                break;
-+            }
-+        }
-+
-+        /* Using g_assert_cmpstr() will give more useful failure
-+         * messages than g_assert(found) */
-+        g_assert_cmpstr(aname, ==, found);
-+    }
-+
-+    QDECREF(all_types);
-+    QDECREF(obj_types);
-+    qtest_end();
-+}
-+
- int main(int argc, char **argv)
+-void smbios_entry_add(QemuOpts *opts)
++void smbios_entry_add(QemuOpts *opts, Error **errp)
  {
-     g_test_init(&argc, &argv, NULL);
-@@ -118,6 +171,7 @@ int main(int argc, char **argv)
-     qtest_add_func("device/introspect/none", test_device_intro_none);
-     qtest_add_func("device/introspect/abstract", test_device_intro_abstract);
-     qtest_add_func("device/introspect/concrete", test_device_intro_concrete);
-+    qtest_add_func("device/introspect/abstract-interfaces", test_abstract_interfaces);
+     const char *val;
  
-     return g_test_run();
- }
+diff --git a/include/hw/smbios/smbios.h b/include/hw/smbios/smbios.h
+index 1cd53cc..31e8d5f 100644
+--- a/include/hw/smbios/smbios.h
++++ b/include/hw/smbios/smbios.h
+@@ -257,7 +257,7 @@ struct smbios_type_127 {
+     struct smbios_structure_header header;
+ } QEMU_PACKED;
+ 
+-void smbios_entry_add(QemuOpts *opts);
++void smbios_entry_add(QemuOpts *opts, Error **errp);
+ void smbios_set_cpuid(uint32_t version, uint32_t features);
+ void smbios_set_defaults(const char *manufacturer, const char *product,
+                          const char *version, bool legacy_mode,
+diff --git a/include/sysemu/arch_init.h b/include/sysemu/arch_init.h
+index 1c9dad1..88dcf77 100644
+--- a/include/sysemu/arch_init.h
++++ b/include/sysemu/arch_init.h
+@@ -29,7 +29,6 @@ extern const uint32_t arch_type;
+ 
+ void select_soundhw(const char *optarg);
+ void do_acpitable_option(const QemuOpts *opts);
+-void do_smbios_option(QemuOpts *opts);
+ void audio_init(void);
+ int kvm_available(void);
+ int xen_available(void);
+diff --git a/vl.c b/vl.c
+index a23de18..1b81340 100644
+--- a/vl.c
++++ b/vl.c
+@@ -3712,7 +3712,7 @@ int main(int argc, char **argv, char **envp)
+                 if (!opts) {
+                     exit(1);
+                 }
+-                do_smbios_option(opts);
++                smbios_entry_add(opts, &error_fatal);
+                 break;
+             case QEMU_OPTION_fwcfg:
+                 opts = qemu_opts_parse_noisily(qemu_find_opts("fw_cfg"),
 -- 
 1.8.3.1
