@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49200)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49907)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cROwu-0004eQ-87
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:52:45 -0500
+	(envelope-from <eblake@redhat.com>) id 1cROzt-000747-Jk
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:55:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1cROwr-0003um-4i
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:52:44 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47596)
+	(envelope-from <eblake@redhat.com>) id 1cROzq-0005Eg-HR
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:55:49 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45014)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cROwq-0003tt-VO
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:52:41 -0500
-Received: from int-mx11.intmail.prod.int.phx2.redhat.com
-	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cROzq-0005EV-AX
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 14:55:46 -0500
+Received: from int-mx10.intmail.prod.int.phx2.redhat.com
+	(int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 13D9C369C3
-	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 19:52:41 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6833781247
+	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 19:55:46 +0000 (UTC)
 References: <20170111172956.11255-1-marcandre.lureau@redhat.com>
-	<20170111172956.11255-2-marcandre.lureau@redhat.com>
+	<20170111172956.11255-3-marcandre.lureau@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <c25401a0-cae6-e351-5875-b3345f15e61a@redhat.com>
-Date: Wed, 11 Jan 2017 13:52:38 -0600
+Message-ID: <2b469f75-87d6-3177-73db-6a6b1eaa7f38@redhat.com>
+Date: Wed, 11 Jan 2017 13:55:44 -0600
 MIME-Version: 1.0
-In-Reply-To: <20170111172956.11255-2-marcandre.lureau@redhat.com>
+In-Reply-To: <20170111172956.11255-3-marcandre.lureau@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="JkOKcfjIXCGAMkqncFP65dsDI2odXtUAh"
-Subject: Re: [Qemu-devel] [PATCH 01/40] spice-qemu-char: convert to finalize
+	boundary="MUVxSMvq9FScwqlR2rcafM4XIC5fDwMbM"
+Subject: Re: [Qemu-devel] [PATCH 02/40] baum: convert to finalize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,34 +38,38 @@ To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel
 Cc: pbonzini@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---JkOKcfjIXCGAMkqncFP65dsDI2odXtUAh
+--MUVxSMvq9FScwqlR2rcafM4XIC5fDwMbM
 From: Eric Blake <eblake@redhat.com>
 To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
  qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com
-Message-ID: <c25401a0-cae6-e351-5875-b3345f15e61a@redhat.com>
-Subject: Re: [PATCH 01/40] spice-qemu-char: convert to finalize
+Message-ID: <2b469f75-87d6-3177-73db-6a6b1eaa7f38@redhat.com>
+Subject: Re: [PATCH 02/40] baum: convert to finalize
 References: <20170111172956.11255-1-marcandre.lureau@redhat.com>
- <20170111172956.11255-2-marcandre.lureau@redhat.com>
-In-Reply-To: <20170111172956.11255-2-marcandre.lureau@redhat.com>
+ <20170111172956.11255-3-marcandre.lureau@redhat.com>
+In-Reply-To: <20170111172956.11255-3-marcandre.lureau@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 01/11/2017 11:29 AM, Marc-Andr=C3=A9 Lureau wrote:
 > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 > ---
->  spice-qemu-char.c | 6 +++---
+>  backends/baum.c | 6 +++---
 >  1 file changed, 3 insertions(+), 3 deletions(-)
 >=20
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
+
+I might have squashed multiple conversions to finalize in one patch, but
+since you've already done the work of separating them, I don't mind them
+that way.
 
 --=20
 Eric Blake   eblake redhat com    +1-919-301-3266
 Libvirt virtualization library http://libvirt.org
 
 
---JkOKcfjIXCGAMkqncFP65dsDI2odXtUAh
+--MUVxSMvq9FScwqlR2rcafM4XIC5fDwMbM
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -75,13 +79,13 @@ Version: GnuPG v2
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBCAAGBQJYdo0GAAoJEKeha0olJ0Nqc7IIAIgsTUf3C6BWV49ND5WkAQ6h
-V0MCGmx5E+aW4GtExMND6qQUGJo2u4g3cmRSwUOgKvgxf3gtU1KNEouBOwhacKPV
-k8I13pELIfyQjHSgjV5p655/Vi24EphKmito2j89FF59G84mJOLGfZHVnG/gjAqZ
-yEzSK+vDNHc5S5u4gCpCFNAM+QXRxTGO9Z/TjQ3GsH420noRkfVn8RUOL6IknhtP
-rW4mb72LGiwyK1n/jpO9bAgoDG91RHsdM4C43NvbGanXti3IGjlEGf9G6NR10eqm
-lbLfGGT/h79yRn0p6FeO2HIguA4cvAf7ro5H6l+2vAx1cVFZo/DQbRTJGlmUEaA=
-=24Tq
+iQEcBAEBCAAGBQJYdo3AAAoJEKeha0olJ0Nq46IH/jdLKnpwg8G+GRHhA4zCXDMz
+wMNzHZSAIa7X2+YPyC5RkBTC4ME8+aEmAk0PTZS6JHoIC9PMLsCEFJivUjFhuR3z
+Fc5lp+w9Euis9dtHw0nRfIE0EYMmugcZbehID4BsME07b7OTgxJRCjCfxU6CK4tr
+BP7Jw9P0wq6BdzD+ejjX5D3M6clVS5OGXupoY7ZHtF51nxzLwf/p4gu1UfeWsacQ
+pVs0e9aowdE6BoY1GHNHaXW1Y3LY1RkcwhV+A1JEZnuHPyL2AhoHkha9V6b+jj5t
+FN/2ZupqJM8XSbm5RHKLy/JpM15QSPmBMuiUNdjKyfvMasYQ2C7jPwhWjajdsh4=
+=q7n7
 -----END PGP SIGNATURE-----
 
---JkOKcfjIXCGAMkqncFP65dsDI2odXtUAh--
+--MUVxSMvq9FScwqlR2rcafM4XIC5fDwMbM--
