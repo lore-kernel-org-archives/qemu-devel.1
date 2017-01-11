@@ -1,33 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42330)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42501)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cRMnO-0004pP-HX
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 12:34:47 -0500
+	(envelope-from <lersek@redhat.com>) id 1cRMnp-0005Dl-VX
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 12:35:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cRMnL-0007cA-Fw
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 12:34:46 -0500
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:34637)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1cRMnL-0007bY-9j
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 12:34:43 -0500
-Received: by mail-wm0-x243.google.com with SMTP id c85so37787455wmi.1
-	for <qemu-devel@nongnu.org>; Wed, 11 Jan 2017 09:34:43 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <20170106155543.12827-1-berrange@redhat.com>
-	<20170106155543.12827-3-berrange@redhat.com>
-	<20170110163713.GA19869@stefanha-x1.localdomain>
-	<eabc1ecd-439c-69cc-facb-281699a4d26e@redhat.com>
-	<20170111171202.GG9269@stefanha-x1.localdomain>
-	<20170111171646.GR12072@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <6d64c194-bb64-9ac2-3281-9a9329f6a52b@redhat.com>
-Date: Wed, 11 Jan 2017 18:34:40 +0100
-MIME-Version: 1.0
-In-Reply-To: <20170111171646.GR12072@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 02/47] trace: switch io/ directory to
- modular trace.h file
+	(envelope-from <lersek@redhat.com>) id 1cRMno-0007oy-QT
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 12:35:13 -0500
+From: Laszlo Ersek <lersek@redhat.com>
+Date: Wed, 11 Jan 2017 18:34:53 +0100
+Message-Id: <20170111173457.30455-1-lersek@redhat.com>
+Subject: [Qemu-devel] [PATCH v5 wave 1 0/4] fw-cfg: support writeable blobs
+ and more files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,25 +18,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: qemu devel list <qemu-devel@nongnu.org>
+Cc: "Gabriel L. Somlo" <somlo@cmu.edu>, "Michael S. Tsirkin" <mst@redhat.com>, Alexander Graf <agraf@suse.de>, Anthony Perard <anthony.perard@citrix.com>, Artyom Tarasenko <atar4qemu@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Eduardo Habkost <ehabkost@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Michael Walle <michael@walle.cc>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Shannon Zhao <zhaoshenglong@huawei.com>, Stefano Stabellini <sstabellini@kernel.org>, qemu-arm@nongnu.org
+
+This is the first (fw_cfg) half of the v5 iteration of the series posted
+here:
+<http://lists.nongnu.org/archive/html/qemu-devel/2016-12/msg00129.html>.
+
+In this version, the fw_cfg patches have been separated into a
+standalone "wave", for helping review / maintenance, and also for
+enabling independent features on top of writeable blobs. More
+importantly, I've addressed Igor's v4 feedback. See the individual
+patches for the details.
+
+Patch #3 is included verbatim from Eduardo's pending series (see the
+patch notes for the archive URL), as a dependency for patch #4. If
+Eduardo's series is merged first, patch #3 can be dropped (in fact
+git-rebase should do it automatically).
+
+Please excuse the surprisingly long list of CC's, it's due to the fact
+that fw_cfg is quite widely used (see patch #4).
+
+Cc: "Gabriel L. Somlo" <somlo@cmu.edu>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Alexander Graf <agraf@suse.de>
+Cc: Anthony Perard <anthony.perard@citrix.com>
+Cc: Artyom Tarasenko <atar4qemu@gmail.com>
+Cc: David Gibson <david@gibson.dropbear.id.au>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>
+Cc: Laszlo Ersek <lersek@redhat.com>
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: Michael Walle <michael@walle.cc>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Shannon Zhao <zhaoshenglong@huawei.com>
+Cc: Stefano Stabellini <sstabellini@kernel.org>
+Cc: qemu-arm@nongnu.org
+
+Thanks
+Laszlo
 
 
+Eduardo Habkost (1):
+  pc: Add 2.9 machine-types
 
-On 11/01/2017 18:16, Daniel P. Berrange wrote:
-> I've been trying to get such relative includes to work most of today
-> and not having much luck. The problem is that while it works in 95%
-> of the time, there are some source files and header files which need
-> to include trace.h files not in their local directory
+Laszlo Ersek (2):
+  fw-cfg: turn FW_CFG_FILE_SLOTS into a device property
+  fw-cfg: bump "file_slots" to 0x20 for 2.9+ machine types
 
-Which are they?  I wouldn't have expected that to happen.
+Michael S. Tsirkin (1):
+  fw-cfg: support writeable blobs
 
-> and we can't
-> use relative includes for that, since the relative include gets
-> resolved wrt the source file doing the #include, but the trace.h
-> file is in $BUILD_DIR.
+ docs/specs/fw_cfg.txt          |  36 ++++++++++----
+ hw/lm32/lm32_hwsetup.h         |   2 +-
+ include/hw/compat.h            |  10 +++-
+ include/hw/i386/pc.h           |   2 +
+ include/hw/loader.h            |   7 +--
+ include/hw/nvram/fw_cfg.h      |   3 +-
+ include/hw/nvram/fw_cfg_keys.h |   3 +-
+ hw/arm/virt-acpi-build.c       |   2 +-
+ hw/core/loader.c               |  18 ++++---
+ hw/i386/acpi-build.c           |   4 +-
+ hw/i386/pc_piix.c              |  15 ++++--
+ hw/i386/pc_q35.c               |  13 ++++-
+ hw/nvram/fw_cfg.c              | 110 +++++++++++++++++++++++++++++++++++------
+ 13 files changed, 177 insertions(+), 48 deletions(-)
 
-Why would #include "../foo/trace.h" be resolved against the source
-file's path only, and not against all -I directories?
-
-Paolo
+-- 
+2.9.3
