@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35769)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35752)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cR8VL-0006iv-Ap
-	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:19:12 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1cR8VK-0003bJ-GM
+	(envelope-from <rth7680@gmail.com>) id 1cR8VK-0006iV-Fq
 	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:19:11 -0500
-Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:34655)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cR8VK-0003au-Ai
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <rth7680@gmail.com>) id 1cR8VJ-0003ad-J5
 	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:19:10 -0500
-Received: by mail-pf0-x244.google.com with SMTP id y143so10362957pfb.1
-	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 18:19:10 -0800 (PST)
+Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:35100)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1cR8VJ-0003ZV-Dy
+	for qemu-devel@nongnu.org; Tue, 10 Jan 2017 21:19:09 -0500
+Received: by mail-pf0-x244.google.com with SMTP id f144so12526663pfa.2
+	for <qemu-devel@nongnu.org>; Tue, 10 Jan 2017 18:19:09 -0800 (PST)
 Sender: Richard Henderson <rth7680@gmail.com>
 From: Richard Henderson <rth@twiddle.net>
-Date: Tue, 10 Jan 2017 18:18:12 -0800
-Message-Id: <20170111021820.24416-58-rth@twiddle.net>
+Date: Tue, 10 Jan 2017 18:18:11 -0800
+Message-Id: <20170111021820.24416-57-rth@twiddle.net>
 In-Reply-To: <20170111021820.24416-1-rth@twiddle.net>
 References: <20170111021820.24416-1-rth@twiddle.net>
-Subject: [Qemu-devel] [PULL 57/65] target-s390x: Avoid a loop for popcnt
+Subject: [Qemu-devel] [PULL 56/65] target-ppc: Use ctpop helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,33 +31,103 @@ Cc: peter.maydell@linaro.org
 
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- target/s390x/int_helper.c | 15 ++++++---------
- 1 file changed, 6 insertions(+), 9 deletions(-)
+ target/ppc/helper.h     |  3 +--
+ target/ppc/int_helper.c | 18 +++---------------
+ target/ppc/translate.c  |  6 +++++-
+ 3 files changed, 9 insertions(+), 18 deletions(-)
 
-diff --git a/target/s390x/int_helper.c b/target/s390x/int_helper.c
-index 5bc470b..f26f36a 100644
---- a/target/s390x/int_helper.c
-+++ b/target/s390x/int_helper.c
-@@ -137,14 +137,11 @@ uint64_t HELPER(cvd)(int32_t reg)
-     return dec;
+diff --git a/target/ppc/helper.h b/target/ppc/helper.h
+index 1ed1d2c..0a8fbba 100644
+--- a/target/ppc/helper.h
++++ b/target/ppc/helper.h
+@@ -39,12 +39,11 @@ DEF_HELPER_4(divweu, tl, env, tl, tl, i32)
+ DEF_HELPER_4(divwe, tl, env, tl, tl, i32)
+ 
+ DEF_HELPER_FLAGS_1(popcntb, TCG_CALL_NO_RWG_SE, tl, tl)
+-DEF_HELPER_FLAGS_1(popcntw, TCG_CALL_NO_RWG_SE, tl, tl)
+ DEF_HELPER_FLAGS_2(cmpb, TCG_CALL_NO_RWG_SE, tl, tl, tl)
+ DEF_HELPER_3(sraw, tl, env, tl, tl)
+ #if defined(TARGET_PPC64)
+ DEF_HELPER_FLAGS_2(cmpeqb, TCG_CALL_NO_RWG_SE, i32, tl, tl)
+-DEF_HELPER_FLAGS_1(popcntd, TCG_CALL_NO_RWG_SE, tl, tl)
++DEF_HELPER_FLAGS_1(popcntw, TCG_CALL_NO_RWG_SE, tl, tl)
+ DEF_HELPER_FLAGS_2(bpermd, TCG_CALL_NO_RWG_SE, i64, i64, i64)
+ DEF_HELPER_3(srad, tl, env, tl, tl)
+ DEF_HELPER_0(darn32, tl)
+diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
+index e1bb695..1871792 100644
+--- a/target/ppc/int_helper.c
++++ b/target/ppc/int_helper.c
+@@ -272,6 +272,7 @@ target_ulong helper_srad(CPUPPCState *env, target_ulong value,
+ #if defined(TARGET_PPC64)
+ target_ulong helper_popcntb(target_ulong val)
+ {
++    /* Note that we don't fold past bytes */
+     val = (val & 0x5555555555555555ULL) + ((val >>  1) &
+                                            0x5555555555555555ULL);
+     val = (val & 0x3333333333333333ULL) + ((val >>  2) &
+@@ -283,6 +284,7 @@ target_ulong helper_popcntb(target_ulong val)
+ 
+ target_ulong helper_popcntw(target_ulong val)
+ {
++    /* Note that we don't fold past words.  */
+     val = (val & 0x5555555555555555ULL) + ((val >>  1) &
+                                            0x5555555555555555ULL);
+     val = (val & 0x3333333333333333ULL) + ((val >>  2) &
+@@ -295,29 +297,15 @@ target_ulong helper_popcntw(target_ulong val)
+                                            0x0000ffff0000ffffULL);
+     return val;
+ }
+-
+-target_ulong helper_popcntd(target_ulong val)
+-{
+-    return ctpop64(val);
+-}
+ #else
+ target_ulong helper_popcntb(target_ulong val)
+ {
++    /* Note that we don't fold past bytes */
+     val = (val & 0x55555555) + ((val >>  1) & 0x55555555);
+     val = (val & 0x33333333) + ((val >>  2) & 0x33333333);
+     val = (val & 0x0f0f0f0f) + ((val >>  4) & 0x0f0f0f0f);
+     return val;
+ }
+-
+-target_ulong helper_popcntw(target_ulong val)
+-{
+-    val = (val & 0x55555555) + ((val >>  1) & 0x55555555);
+-    val = (val & 0x33333333) + ((val >>  2) & 0x33333333);
+-    val = (val & 0x0f0f0f0f) + ((val >>  4) & 0x0f0f0f0f);
+-    val = (val & 0x00ff00ff) + ((val >>  8) & 0x00ff00ff);
+-    val = (val & 0x0000ffff) + ((val >> 16) & 0x0000ffff);
+-    return val;
+-}
+ #endif
+ 
+ /*****************************************************************************/
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index 1224f56..1212180 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -1844,14 +1844,18 @@ static void gen_popcntb(DisasContext *ctx)
+ 
+ static void gen_popcntw(DisasContext *ctx)
+ {
++#if defined(TARGET_PPC64)
+     gen_helper_popcntw(cpu_gpr[rA(ctx->opcode)], cpu_gpr[rS(ctx->opcode)]);
++#else
++    tcg_gen_ctpop_i32(cpu_gpr[rA(ctx->opcode)], cpu_gpr[rS(ctx->opcode)]);
++#endif
  }
  
--uint64_t HELPER(popcnt)(uint64_t r2)
-+uint64_t HELPER(popcnt)(uint64_t val)
+ #if defined(TARGET_PPC64)
+ /* popcntd: PowerPC 2.06 specification */
+ static void gen_popcntd(DisasContext *ctx)
  {
--    uint64_t ret = 0;
--    int i;
--
--    for (i = 0; i < 64; i += 8) {
--        uint64_t t = ctpop32((r2 >> i) & 0xff);
--        ret |= t << i;
--    }
--    return ret;
-+    /* Note that we don't fold past bytes. */
-+    val = (val & 0x5555555555555555ULL) + ((val >> 1) & 0x5555555555555555ULL);
-+    val = (val & 0x3333333333333333ULL) + ((val >> 2) & 0x3333333333333333ULL);
-+    val = (val + (val >> 4)) & 0x0f0f0f0f0f0f0f0fULL;
-+    return val;
+-    gen_helper_popcntd(cpu_gpr[rA(ctx->opcode)], cpu_gpr[rS(ctx->opcode)]);
++    tcg_gen_ctpop_i64(cpu_gpr[rA(ctx->opcode)], cpu_gpr[rS(ctx->opcode)]);
  }
+ #endif
+ 
 -- 
 2.9.3
