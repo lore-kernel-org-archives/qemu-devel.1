@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33691)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33912)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cRMT5-0003Gy-BY
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 12:13:48 -0500
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1cRMTh-00045q-Vw
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 12:14:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1cRMT1-0007xA-Ae
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 12:13:47 -0500
-References: <20161130011851.24696-1-mreitz@redhat.com>
-	<20161130011851.24696-23-mreitz@redhat.com>
-	<75808f28-d7c0-122d-9046-d5bbed2b4ce2@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <06c71464-f451-e26f-03a9-d84d45547353@redhat.com>
-Date: Wed, 11 Jan 2017 18:13:33 +0100
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1cRMTd-0008Dq-W7
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 12:14:25 -0500
+Received: from chuckie.co.uk ([82.165.15.123]:35086
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1cRMTd-0008Bd-PO
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 12:14:21 -0500
+References: <cover.1478291230.git.atar4qemu@gmail.com>
+	<CACXAS8Cz_NaOA9YgFAnKrYryWR=mEb2Ep6aUKP6j85PRJKiq0g@mail.gmail.com>
+	<e2e9b38a-ad45-d205-f139-cdefd3212f2b@ilande.co.uk>
+	<da86f614-5ba1-5cf9-3083-25dcc8c96956@twiddle.net>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <5b41ce5e-6b22-bda8-ae46-9f99e78a6e3f@ilande.co.uk>
+Date: Wed, 11 Jan 2017 17:13:58 +0000
 MIME-Version: 1.0
-In-Reply-To: <75808f28-d7c0-122d-9046-d5bbed2b4ce2@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="FbAb5PGHsixLMRElurru436L2GLtbgcXX"
-Subject: Re: [Qemu-devel] [PATCH v3 22/25] block: Do not copy exact_filename
- from format file
+In-Reply-To: <da86f614-5ba1-5cf9-3083-25dcc8c96956@twiddle.net>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 00/30] target-sparc: add niagara
+ OpenSPARC T1 sun4v emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,104 +32,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, Eric Blake <eblake@redhat.com>
+To: Richard Henderson <rth@twiddle.net>, Artyom Tarasenko <atar4qemu@gmail.com>, qemu-devel <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---FbAb5PGHsixLMRElurru436L2GLtbgcXX
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- Alberto Garcia <berto@igalia.com>, Eric Blake <eblake@redhat.com>
-Message-ID: <06c71464-f451-e26f-03a9-d84d45547353@redhat.com>
-Subject: Re: [PATCH v3 22/25] block: Do not copy exact_filename from format
- file
-References: <20161130011851.24696-1-mreitz@redhat.com>
- <20161130011851.24696-23-mreitz@redhat.com>
- <75808f28-d7c0-122d-9046-d5bbed2b4ce2@redhat.com>
-In-Reply-To: <75808f28-d7c0-122d-9046-d5bbed2b4ce2@redhat.com>
-Content-Type: text/plain; charset=iso-8859-15
-Content-Transfer-Encoding: quoted-printable
+On 11/01/17 16:56, Richard Henderson wrote:
 
-On 11.01.2017 17:29, Max Reitz wrote:
-> On 30.11.2016 02:18, Max Reitz wrote:
->> If the a format BDS's file BDS is in turn a format BDS, we cannot simp=
-ly
->> use the same filename, because when opening a BDS tree based on a
->> filename alone, qemu will create only one format node on top of one
->> protocol node (disregarding a potential backing file).
+> On 12/30/2016 09:35 AM, Mark Cave-Ayland wrote:
+>> On 15/12/16 17:04, Artyom Tarasenko wrote:
 >>
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->>  block.c | 17 ++++++++++++++---
->>  1 file changed, 14 insertions(+), 3 deletions(-)
+>>> Ping?
+>>> Richard & Mark, can you please review the patches
+>>> 04, 05, 08, 10, 11,12, 14, 15, 16, 18-23 and 25-28?
+>>>
+>>> Hope I haven't missed anything from the v0 review.
+>>>
+>>> It would be nice to get it into the 2.9 release.
 >>
->> diff --git a/block.c b/block.c
->> index ec25cbf..71c14f4 100644
->> --- a/block.c
->> +++ b/block.c
->> @@ -4095,9 +4095,20 @@ void bdrv_refresh_filename(BlockDriverState *bs=
-)
->> =20
->>          bs->exact_filename[0] =3D '\0';
->> =20
->> -        /* If no specific options have been given for this BDS, the f=
-ilename of
->> -         * the underlying file should suffice for this one as well */=
+>> No objections from me on the v1, although I would like to see the
+>> official documentation updated in qemu-doc.texi perhaps with an example
+>> command line as per the cover letter (maybe a link as to where to
+>> download the PROM?) and the corrected case for Niagara.
+>>
+>> I also suspect that as you've been digging in this area a lot more than
+>> me that you're definitely going to be more of the expert here.
+>>
+>> Can you rebase your branch onto master at github so I can give it a spin
+>> and make sure there aren't any regressions? Other than that I'd like to
+>> see this merged fairly quickly if Richard is happy since my connectivity
+>> will be fairly intermittent after the next couple of weeks.
+> 
+> I am fairly happy with the patch set.  The addition of MMU_PHYS_IDX in
+> the meantime makes the rebase non-trivial.  Your assistance in getting
+> the patch set updated would be most appreciated.
 
->> -        if (bs->file->bs->exact_filename[0] && !generate_json_filenam=
-e) {
->> +        /* We can use the underlying file's filename if:
->> +         * - it has a filename,
->> +         * - the file is a protocol BDS, and
->> +         * - opening that file (as this BDS's format) will automatica=
-lly create
->> +         *   the BDS tree we have right now, that is:
->> +         *   - the user did not significantly change this BDS's behav=
-ior with
->> +         *     some explicit options
->> +         *   - no non-file child of this BDS has been overridden by t=
-he user
->> +         *   Both of these conditions are represented by generate_jso=
-n_filename.
->> +         */
->> +        if (bs->file->bs->exact_filename[0] &&
->> +            (bs->file->bs->open_flags & BDRV_O_PROTOCOL) &&
->=20
-> This was a nice try, but as it turns out, this flag does not have to
-> always set for protocol BDSs. A more reliable test is:
->=20
-> !bs->file->bs->file
->=20
-> This test may also be a bit more intuitive: We can copy exact_filename
-> in one layer from bs->file, but not through two layers.
-
-And now it turns out that it's again more complicated...
-
-blkdebug is a protocol block driver that has a bs->file. So when using
-blkdebug, bs->file->bs->file is set on the format layer.
-
-So I guess I'll have to resort to testing
-bs->file->bs->drv->bdrv_file_open...
-
-Max
+Thanks Richard. Artyom, are you able to proceed with the rebase?
 
 
---FbAb5PGHsixLMRElurru436L2GLtbgcXX
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+ATB,
 
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlh2Z70SHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9ApeYIAJ91WGOsKo5903GuPv+Ttrsdj0JqvExd
-vjo5oXt33tqZwm3MA4FsCwb3IYhKSc+dJXr7CdzY5H+QEKTyrPZzfevOA/5bsZil
-ykDr4kEm+mJWElo4KyLvK6aorN6REsSMEecu9eA57JMk+9Nc1LsFiHix8wM8NjOt
-od/EXcRYWt6b3UWRJbSDU2Sur8/qx0/c0YmmIsKvqwe8vwaRChbPqUt+lFHZyYEB
-LQx9ZRoeZKU6LP5ffcxOcjMuKs4RyvygeE5SWFmjKv4PNGpdfWHU1qxiL6bpkf9e
-K0u8nmiGBBDtGM2okpRKXDWszxkYu9SJkr9CIRZngzHp05ozF3UWL7Y=
-=PGlb
------END PGP SIGNATURE-----
-
---FbAb5PGHsixLMRElurru436L2GLtbgcXX--
+Mark.
