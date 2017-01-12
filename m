@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36415)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41644)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cRe5C-0007oj-Uc
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 07:02:23 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cReHY-0003hM-Ps
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 07:15:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1cRe58-00057l-Aj
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 07:02:19 -0500
-Received: from mail-vk0-x22d.google.com ([2607:f8b0:400c:c05::22d]:32957)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cReHU-00023I-5j
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 07:15:04 -0500
+Received: from mail-wj0-x242.google.com ([2a00:1450:400c:c01::242]:33518)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1cRe58-00057V-5f
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 07:02:14 -0500
-Received: by mail-vk0-x22d.google.com with SMTP id 137so10937063vkl.0
-	for <qemu-devel@nongnu.org>; Thu, 12 Jan 2017 04:02:14 -0800 (PST)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1cReHT-00022W-Vf
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 07:15:00 -0500
+Received: by mail-wj0-x242.google.com with SMTP id kp2so1679114wjc.0
+	for <qemu-devel@nongnu.org>; Thu, 12 Jan 2017 04:14:59 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <1483088160-6714-1-git-send-email-peterx@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <6f6d7a51-8f43-1465-8a8c-594a24f46034@redhat.com>
+Date: Thu, 12 Jan 2017 13:14:57 +0100
 MIME-Version: 1.0
-In-Reply-To: <001201d26cc6$f023ad00$d06b0700$@ru>
-References: <CAMo8BfLRP8qUgJAkU3fSwE_H6EmqYmPKO_MhMn7B6WpwGWUudw@mail.gmail.com>
-	<001201d26b1b$e5a8ce20$b0fa6a60$@ru>
-	<CAMo8BfJKXOhiPQz8GT6hXNNBXKsz-67iKx9ct9tEwukVLWR3QA@mail.gmail.com>
-	<001201d26cc6$f023ad00$d06b0700$@ru>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 12 Jan 2017 12:01:52 +0000
-Message-ID: <CAFEAcA-AMJ33g9hO2k9oGJfDr-Fatk7TY+Sbs_wRC-OfCjWhmQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] implementing architectural timers using QEMU timers
+In-Reply-To: <1483088160-6714-1-git-send-email-peterx@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [kvm-unit-tests PATCH 0/8] VT-d ioapic irq test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,28 +30,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
-Cc: Max Filippov <jcmvbkbc@gmail.com>, Pavel Dovgaluk <Pavel.Dovgaluk@ispras.ru>, qemu-devel <qemu-devel@nongnu.org>, Alex Bligh <alex@alex.org.uk>, Richard Henderson <rth@twiddle.net>
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org
+Cc: Jan Kiszka <jan.kiszka@web.de>, agordeev@redhat.com, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, Andrew Jones <drjones@redhat.com>
 
-On 12 January 2017 at 11:28, Pavel Dovgalyuk <dovgaluk@ispras.ru> wrote:
->> From: Max Filippov [mailto:jcmvbkbc@gmail.com]
->> Ok, looks like what happens in my case is that instruction that
->> sets CCOMPARE and thus changes remaining icount does not
->> cause exit from the cpu_exec. So merely ending TB on
->> QEMU_CLOCK_VIRTUAL timer update is not enough, I need to
->> throw an exception of some kind? Or does the timer code need
->> to take care of that?
->
-> Yes, it seems that you should end the block with an exception,
-> to allow icount loop recalculate the timeouts.
 
-Really? The ARM translate.c doesn't generate an exception.
-It just does
- gen_io_end();
- gen_lookup_tb();
 
-(so we force a lookup of the next TB, but don't throw an
-exception of any kind).
+On 30/12/2016 09:55, Peter Xu wrote:
+> The previous vt-d unittest series only contains the very basic tests.
+> Let's enlarge it step by step.
+> 
+> This series expanded it with IOAPIC irq test.
+> 
+> Peter Xu (8):
+>   pci: introduce pci_intx_line()
+>   pci: introduce pci_msi_set_enable()
+>   lib/asm-generic: add atomic.h
+>   x86: ioapic: generalize trigger mode
+>   intel-iommu: add report prefixes
+>   intel-iommu: use atomic ops for irte index alloc
+>   intel-iommu: allow setup trigger mode for irte
+>   intel-iommu: add ioapic irq test
+> 
+>  lib/asm-generic/atomic.h | 21 ++++++++++++++++++
+>  lib/pci.c                | 24 ++++++++++++++++++--
+>  lib/pci.h                |  2 ++
+>  lib/x86/apic.h           |  6 +++++
+>  lib/x86/atomic.h         |  2 ++
+>  lib/x86/intel-iommu.c    | 58 +++++++++++++++++++++++++++++++++++++++++++-----
+>  lib/x86/intel-iommu.h    |  3 +++
+>  x86/intel-iommu.c        | 50 ++++++++++++++++++++++++++++++++++++-----
+>  x86/ioapic.c             | 34 +++++++++++++---------------
+>  9 files changed, 169 insertions(+), 31 deletions(-)
+>  create mode 100644 lib/asm-generic/atomic.h
+> 
 
-thanks
--- PMM
+Queued, thanks.
+
+Paolo
