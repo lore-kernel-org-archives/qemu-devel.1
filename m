@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46014)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46053)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cRUju-0002pv-M1
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 21:03:43 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cRUjv-0002qk-CY
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 21:03:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cRUjs-0006O9-TQ
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 21:03:42 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cRUjs-0006OE-UM
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 21:03:43 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu, 12 Jan 2017 13:02:26 +1100
-Message-Id: <20170112020327.24882-7-david@gibson.dropbear.id.au>
+Date: Thu, 12 Jan 2017 13:02:29 +1100
+Message-Id: <20170112020327.24882-10-david@gibson.dropbear.id.au>
 In-Reply-To: <20170112020327.24882-1-david@gibson.dropbear.id.au>
 References: <20170112020327.24882-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 06/67] target-ppc: Add xscmpoqp and xscmpuqp
- instructions
+Subject: [Qemu-devel] [PULL 09/67] target-ppc: implement lxv/lxvx and
+ stxv/stxvx
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,126 +21,183 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com, lvivier@redhat.com, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com, Bharata B Rao <bharata@linux.vnet.ibm.com>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com, lvivier@redhat.com, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Bharata B Rao <bharata@linux.vnet.ibm.com>
+From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 
-xscmpoqp - VSX Scalar Compare Ordered Quad-Precision
-xscmpuqp - VSX Scalar Compare Unordered Quad-Precision
+lxv:  Load VSX Vector
+lxvx: Load VSX Vector Indexed
 
-Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
+    Little/Big-endian Storage
+    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    |F0|F1|F2|F3|F4|F5|F6|F7|E0|E1|E2|E3|E4|E5|E6|E7|
+    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+
+    Vector load results:
+    BE:
+    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    |F0|F1|F2|F3|F4|F5|F6|F7|E0|E1|E2|E3|E4|E5|E6|E7|
+    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+
+    LE:
+    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    |E7|E6|E5|E4|E3|E2|E1|E0|F7|F6|F5|F4|F3|F2|F1|F0|
+    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+
+stxv: Store VSX Vector
+stxvx: Store VSX Vector Indexed
+
+    Vector (8-bit elements) in BE:
+    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    |F0|F1|F2|F3|F4|F5|F6|F7|E0|E1|E2|E3|E4|E5|E6|E7|
+    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+
+    Vector (8-bit elements) in LE:
+    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    |E7|E6|E5|E4|E3|E2|E1|E0|F7|F6|F5|F4|F3|F2|F1|F0|
+    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+
+    Store results in following:
+    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    |F0|F1|F2|F3|F4|F5|F6|F7|E0|E1|E2|E3|E4|E5|E6|E7|
+    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+
 Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/fpu_helper.c             | 54 +++++++++++++++++++++++++++++++++++++
- target/ppc/helper.h                 |  2 ++
- target/ppc/translate/vsx-impl.inc.c |  2 ++
+ target/ppc/internal.h               |  1 +
+ target/ppc/translate.c              | 10 ++++++--
+ target/ppc/translate/vsx-impl.inc.c | 50 +++++++++++++++++++++++++++++++++++++
  target/ppc/translate/vsx-ops.inc.c  |  2 ++
- 4 files changed, 60 insertions(+)
+ 4 files changed, 61 insertions(+), 2 deletions(-)
 
-diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
-index 8bffafb..696f537 100644
---- a/target/ppc/fpu_helper.c
-+++ b/target/ppc/fpu_helper.c
-@@ -2519,6 +2519,60 @@ void helper_##op(CPUPPCState *env, uint32_t opcode)                      \
- VSX_SCALAR_CMP(xscmpodp, 1)
- VSX_SCALAR_CMP(xscmpudp, 0)
+diff --git a/target/ppc/internal.h b/target/ppc/internal.h
+index 9a4a74a..e83ea45 100644
+--- a/target/ppc/internal.h
++++ b/target/ppc/internal.h
+@@ -187,6 +187,7 @@ EXTRACT_HELPER(DCM, 10, 6)
+ /* DFP Z23-form */
+ EXTRACT_HELPER(RMC, 9, 2)
  
-+#define VSX_SCALAR_CMPQ(op, ordered)                                    \
-+void helper_##op(CPUPPCState *env, uint32_t opcode)                     \
-+{                                                                       \
-+    ppc_vsr_t xa, xb;                                                   \
-+    uint32_t cc = 0;                                                    \
-+    bool vxsnan_flag = false, vxvc_flag = false;                        \
-+    float128 a, b;                                                      \
-+                                                                        \
-+    helper_reset_fpstatus(env);                                         \
-+    getVSR(rA(opcode) + 32, &xa, env);                                  \
-+    getVSR(rB(opcode) + 32, &xb, env);                                  \
-+                                                                        \
-+    a = make_float128(xa.VsrD(0), xa.VsrD(1));                          \
-+    b = make_float128(xb.VsrD(0), xb.VsrD(1));                          \
-+                                                                        \
-+    if (float128_is_signaling_nan(a, &env->fp_status) ||                \
-+        float128_is_signaling_nan(b, &env->fp_status)) {                \
-+        vxsnan_flag = true;                                             \
-+        cc = CRF_SO;                                                    \
-+        if (fpscr_ve == 0 && ordered) {                                 \
-+            vxvc_flag = true;                                           \
-+        }                                                               \
-+    } else if (float128_is_quiet_nan(a, &env->fp_status) ||             \
-+               float128_is_quiet_nan(b, &env->fp_status)) {             \
-+        cc = CRF_SO;                                                    \
-+        if (ordered) {                                                  \
-+            vxvc_flag = true;                                           \
-+        }                                                               \
-+    }                                                                   \
-+    if (vxsnan_flag) {                                                  \
-+        float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 0);          \
-+    }                                                                   \
-+    if (vxvc_flag) {                                                    \
-+        float_invalid_op_excp(env, POWERPC_EXCP_FP_VXVC, 0);            \
-+    }                                                                   \
-+                                                                        \
-+    if (float128_lt(a, b, &env->fp_status)) {                           \
-+        cc |= CRF_LT;                                                   \
-+    } else if (!float128_le(a, b, &env->fp_status)) {                   \
-+        cc |= CRF_GT;                                                   \
-+    } else {                                                            \
-+        cc |= CRF_EQ;                                                   \
-+    }                                                                   \
-+                                                                        \
-+    env->fpscr &= ~(0x0F << FPSCR_FPRF);                                \
-+    env->fpscr |= cc << FPSCR_FPRF;                                     \
-+    env->crf[BF(opcode)] = cc;                                          \
-+                                                                        \
-+    float_check_status(env);                                            \
-+}
-+
-+VSX_SCALAR_CMPQ(xscmpoqp, 1)
-+VSX_SCALAR_CMPQ(xscmpuqp, 0)
-+
- /* VSX_MAX_MIN - VSX floating point maximum/minimum
-  *   name  - instruction mnemonic
-  *   op    - operation (max or min)
-diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-index ba42015..3b26678 100644
---- a/target/ppc/helper.h
-+++ b/target/ppc/helper.h
-@@ -408,6 +408,8 @@ DEF_HELPER_2(xscmpexpdp, void, env, i32)
- DEF_HELPER_2(xscmpexpqp, void, env, i32)
- DEF_HELPER_2(xscmpodp, void, env, i32)
- DEF_HELPER_2(xscmpudp, void, env, i32)
-+DEF_HELPER_2(xscmpoqp, void, env, i32)
-+DEF_HELPER_2(xscmpuqp, void, env, i32)
- DEF_HELPER_2(xsmaxdp, void, env, i32)
- DEF_HELPER_2(xsmindp, void, env, i32)
- DEF_HELPER_2(xscvdpsp, void, env, i32)
++EXTRACT_HELPER_SPLIT(DQxT, 3, 1, 21, 5);
+ EXTRACT_HELPER_SPLIT(xT, 0, 1, 21, 5);
+ EXTRACT_HELPER_SPLIT(xS, 0, 1, 21, 5);
+ EXTRACT_HELPER_SPLIT(xA, 2, 1, 16, 5);
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index a1bf74c..f68f427 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -6076,14 +6076,20 @@ static void gen_dform39(DisasContext *ctx)
+     return gen_invalid(ctx);
+ }
+ 
+-/* handles stfdp, stxsd, stxssp */
++/* handles stfdp, lxv, stxsd, stxssp lxvx */
+ static void gen_dform3D(DisasContext *ctx)
+ {
+     if ((ctx->opcode & 3) == 1) { /* DQ-FORM */
+         switch (ctx->opcode & 0x7) {
+         case 1: /* lxv */
++            if (ctx->insns_flags2 & PPC2_ISA300) {
++                return gen_lxv(ctx);
++            }
+             break;
+         case 5: /* stxv */
++            if (ctx->insns_flags2 & PPC2_ISA300) {
++                return gen_stxv(ctx);
++            }
+             break;
+         }
+     } else { /* DS-FORM */
+@@ -6182,7 +6188,7 @@ GEN_HANDLER(std, 0x3E, 0xFF, 0xFF, 0x00000000, PPC_64B),
+ #endif
+ /* handles lfdp, lxsd, lxssp */
+ GEN_HANDLER_E(dform39, 0x39, 0xFF, 0xFF, 0x00000000, PPC_NONE, PPC2_ISA205),
+-/* handles stfdp, stxsd, stxssp */
++/* handles stfdp, lxv, stxsd, stxssp, stxv */
+ GEN_HANDLER_E(dform3D, 0x3D, 0xFF, 0xFF, 0x00000000, PPC_NONE, PPC2_ISA205),
+ GEN_HANDLER(lmw, 0x2E, 0xFF, 0xFF, 0x00000000, PPC_INTEGER),
+ GEN_HANDLER(stmw, 0x2F, 0xFF, 0xFF, 0x00000000, PPC_INTEGER),
 diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/vsx-impl.inc.c
-index 5206258..ed9588e 100644
+index 8ee44cf..2fbdbd2 100644
 --- a/target/ppc/translate/vsx-impl.inc.c
 +++ b/target/ppc/translate/vsx-impl.inc.c
-@@ -628,6 +628,8 @@ GEN_VSX_HELPER_2(xscmpexpdp, 0x0C, 0x07, 0, PPC2_ISA300)
- GEN_VSX_HELPER_2(xscmpexpqp, 0x04, 0x05, 0, PPC2_ISA300)
- GEN_VSX_HELPER_2(xscmpodp, 0x0C, 0x05, 0, PPC2_VSX)
- GEN_VSX_HELPER_2(xscmpudp, 0x0C, 0x04, 0, PPC2_VSX)
-+GEN_VSX_HELPER_2(xscmpoqp, 0x04, 0x04, 0, PPC2_VSX)
-+GEN_VSX_HELPER_2(xscmpuqp, 0x04, 0x14, 0, PPC2_VSX)
- GEN_VSX_HELPER_2(xsmaxdp, 0x00, 0x14, 0, PPC2_VSX)
- GEN_VSX_HELPER_2(xsmindp, 0x00, 0x15, 0, PPC2_VSX)
- GEN_VSX_HELPER_2(xscvdpsp, 0x12, 0x10, 0, PPC2_VSX)
+@@ -190,6 +190,56 @@ static void gen_lxvb16x(DisasContext *ctx)
+     tcg_temp_free(EA);
+ }
+ 
++#define VSX_VECTOR_LOAD_STORE(name, op, indexed)            \
++static void gen_##name(DisasContext *ctx)                   \
++{                                                           \
++    int xt;                                                 \
++    TCGv EA;                                                \
++    TCGv_i64 xth, xtl;                                      \
++                                                            \
++    if (indexed) {                                          \
++        xt = xT(ctx->opcode);                               \
++    } else {                                                \
++        xt = DQxT(ctx->opcode);                             \
++    }                                                       \
++    xth = cpu_vsrh(xt);                                     \
++    xtl = cpu_vsrl(xt);                                     \
++                                                            \
++    if (xt < 32) {                                          \
++        if (unlikely(!ctx->vsx_enabled)) {                  \
++            gen_exception(ctx, POWERPC_EXCP_VSXU);          \
++            return;                                         \
++        }                                                   \
++    } else {                                                \
++        if (unlikely(!ctx->altivec_enabled)) {              \
++            gen_exception(ctx, POWERPC_EXCP_VPU);           \
++            return;                                         \
++        }                                                   \
++    }                                                       \
++    gen_set_access_type(ctx, ACCESS_INT);                   \
++    EA = tcg_temp_new();                                    \
++    if (indexed) {                                          \
++        gen_addr_reg_index(ctx, EA);                        \
++    } else {                                                \
++        gen_addr_imm_index(ctx, EA, 0x0F);                  \
++    }                                                       \
++    if (ctx->le_mode) {                                     \
++        tcg_gen_qemu_##op(xtl, EA, ctx->mem_idx, MO_LEQ);   \
++        tcg_gen_addi_tl(EA, EA, 8);                         \
++        tcg_gen_qemu_##op(xth, EA, ctx->mem_idx, MO_LEQ);   \
++    } else {                                                \
++        tcg_gen_qemu_##op(xth, EA, ctx->mem_idx, MO_BEQ);   \
++        tcg_gen_addi_tl(EA, EA, 8);                         \
++        tcg_gen_qemu_##op(xtl, EA, ctx->mem_idx, MO_BEQ);   \
++    }                                                       \
++    tcg_temp_free(EA);                                      \
++}
++
++VSX_VECTOR_LOAD_STORE(lxv, ld_i64, 0)
++VSX_VECTOR_LOAD_STORE(stxv, st_i64, 0)
++VSX_VECTOR_LOAD_STORE(lxvx, ld_i64, 1)
++VSX_VECTOR_LOAD_STORE(stxvx, st_i64, 1)
++
+ #define VSX_LOAD_SCALAR_DS(name, operation)                       \
+ static void gen_##name(DisasContext *ctx)                         \
+ {                                                                 \
 diff --git a/target/ppc/translate/vsx-ops.inc.c b/target/ppc/translate/vsx-ops.inc.c
-index 2468ee9..7f09527 100644
+index 7f09527..8a1cbe0 100644
 --- a/target/ppc/translate/vsx-ops.inc.c
 +++ b/target/ppc/translate/vsx-ops.inc.c
-@@ -126,6 +126,8 @@ GEN_XX3FORM(xscmpexpdp, 0x0C, 0x07, PPC2_ISA300),
- GEN_VSX_XFORM_300(xscmpexpqp, 0x04, 0x05, 0x00600001),
- GEN_XX2IFORM(xscmpodp,  0x0C, 0x05, PPC2_VSX),
- GEN_XX2IFORM(xscmpudp,  0x0C, 0x04, PPC2_VSX),
-+GEN_VSX_XFORM_300(xscmpoqp, 0x04, 0x04, 0x00600001),
-+GEN_VSX_XFORM_300(xscmpuqp, 0x04, 0x14, 0x00600001),
- GEN_XX3FORM(xsmaxdp, 0x00, 0x14, PPC2_VSX),
- GEN_XX3FORM(xsmindp, 0x00, 0x15, PPC2_VSX),
- GEN_XX2FORM(xscvdpsp, 0x12, 0x10, PPC2_VSX),
+@@ -9,6 +9,7 @@ GEN_HANDLER_E(lxvdsx, 0x1F, 0x0C, 0x0A, 0, PPC_NONE, PPC2_VSX),
+ GEN_HANDLER_E(lxvw4x, 0x1F, 0x0C, 0x18, 0, PPC_NONE, PPC2_VSX),
+ GEN_HANDLER_E(lxvh8x, 0x1F, 0x0C, 0x19, 0, PPC_NONE,  PPC2_ISA300),
+ GEN_HANDLER_E(lxvb16x, 0x1F, 0x0C, 0x1B, 0, PPC_NONE, PPC2_ISA300),
++GEN_HANDLER_E(lxvx, 0x1F, 0x0C, 0x08, 0x00000040, PPC_NONE, PPC2_ISA300),
+ 
+ GEN_HANDLER_E(stxsdx, 0x1F, 0xC, 0x16, 0, PPC_NONE, PPC2_VSX),
+ GEN_HANDLER_E(stxsibx, 0x1F, 0xD, 0x1C, 0, PPC_NONE, PPC2_ISA300),
+@@ -19,6 +20,7 @@ GEN_HANDLER_E(stxvd2x, 0x1F, 0xC, 0x1E, 0, PPC_NONE, PPC2_VSX),
+ GEN_HANDLER_E(stxvw4x, 0x1F, 0xC, 0x1C, 0, PPC_NONE, PPC2_VSX),
+ GEN_HANDLER_E(stxvh8x, 0x1F, 0x0C, 0x1D, 0, PPC_NONE,  PPC2_ISA300),
+ GEN_HANDLER_E(stxvb16x, 0x1F, 0x0C, 0x1F, 0, PPC_NONE, PPC2_ISA300),
++GEN_HANDLER_E(stxvx, 0x1F, 0x0C, 0x0C, 0, PPC_NONE, PPC2_ISA300),
+ 
+ GEN_HANDLER_E(mfvsrwz, 0x1F, 0x13, 0x03, 0x0000F800, PPC_NONE, PPC2_VSX207),
+ GEN_HANDLER_E(mtvsrwa, 0x1F, 0x13, 0x06, 0x0000F800, PPC_NONE, PPC2_VSX207),
 -- 
 2.9.3
