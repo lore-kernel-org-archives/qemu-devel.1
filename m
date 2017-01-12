@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41378)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42566)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cRgCx-0006m0-Cz
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 09:18:32 -0500
+	(envelope-from <mst@redhat.com>) id 1cRgHj-0003il-G6
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 09:23:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cRgCs-0002FB-Qs
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 09:18:27 -0500
-Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:37445)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cRgCs-0002Eq-Kk
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 09:18:22 -0500
-Received: by mail-wm0-x22a.google.com with SMTP id c206so22037420wme.0
-	for <qemu-devel@nongnu.org>; Thu, 12 Jan 2017 06:18:22 -0800 (PST)
-Date: Thu, 12 Jan 2017 14:18:13 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170112141813.GC14042@stefanha-x1.localdomain>
-References: <20170111212721.20360.4397.malonedeb@wampee.canonical.com>
-	<20170111215835.26958.78968.malone@chaenomeles.canonical.com>
+	(envelope-from <mst@redhat.com>) id 1cRgHe-00041N-Qt
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 09:23:23 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:17977)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cRgHe-00040y-LD
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 09:23:18 -0500
+Date: Thu, 12 Jan 2017 16:23:16 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170112161729-mutt-send-email-mst@kernel.org>
+References: <1481767396-187748-1-git-send-email-arei.gonglei@huawei.com>
+	<1481767396-187748-2-git-send-email-arei.gonglei@huawei.com>
+	<e235caf4-f51c-dccf-4eb7-548d3fa71644@de.ibm.com>
+	<33183CC9F5247A488A2544077AF19020DA182B83@DGGEMA505-MBX.china.huawei.com>
+	<c4282723-2afb-1764-2431-ef41f7126371@de.ibm.com>
+	<a8384ff8-ff65-c578-c338-e6d8ebf498c4@de.ibm.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="xo44VMWPx7vlQ2+2"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170111215835.26958.78968.malone@chaenomeles.canonical.com>
-Subject: Re: [Qemu-devel] [Bug 1655764] Re: qemu-img convert -c compression
- can't decompress
+In-Reply-To: <a8384ff8-ff65-c578-c338-e6d8ebf498c4@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v8 1/1] crypto: add virtio-crypto driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,39 +31,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bug 1655764 <1655764@bugs.launchpad.net>
-Cc: qemu-devel@nongnu.org
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: "Gonglei (Arei)" <arei.gonglei@huawei.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>, "davem@davemloft.net" <davem@davemloft.net>, "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>, "Huangweidong (C)" <weidong.huang@huawei.com>, Claudio Fontana <Claudio.Fontana@huawei.com>, Luonengjun <luonengjun@huawei.com>, "Hanweidong (Randy)" <hanweidong@huawei.com>, "Xuquan (Quan Xu)" <xuquan8@huawei.com>, "Wanzongshun (Vincent)" <wanzongshun@huawei.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "Zhoujian (jay, Euler)" <jianjay.zhou@huawei.com>, longpeng <longpeng2@huawei.com>, "arei.gonglei@hotmail.com" <arei.gonglei@hotmail.com>, "Wubin (H)" <wu.wubin@huawei.com>
 
+On Thu, Jan 12, 2017 at 03:10:25PM +0100, Christian Borntraeger wrote:
+> On 01/10/2017 01:56 PM, Christian Borntraeger wrote:
+> > On 01/10/2017 01:36 PM, Gonglei (Arei) wrote:
+> >> Hi,
+> >>
+> >>>
+> >>> On 12/15/2016 03:03 AM, Gonglei wrote:
+> >>> [...]
+> >>>> +
+> >>>> +static struct crypto_alg virtio_crypto_algs[] = { {
+> >>>> +	.cra_name = "cbc(aes)",
+> >>>> +	.cra_driver_name = "virtio_crypto_aes_cbc",
+> >>>> +	.cra_priority = 501,
+> >>>
+> >>>
+> >>> This is still higher than the hardware-accelerators (like intel aesni or the
+> >>> s390 cpacf functions or the arm hw). aesni and s390/cpacf are supported by the
+> >>> hardware virtualization and available to the guests. I do not see a way how
+> >>> virtio
+> >>> crypto can be faster than that (in the end it might be cpacf/aesni + overhead)
+> >>> instead it will very likely be slower.
+> >>> So we should use a number that is higher than software implementations but
+> >>> lower than the hw ones.
+> >>>
+> >>> Just grepping around, the software ones seem be be around 100 and the
+> >>> hardware
+> >>> ones around 200-400. So why was 150 not enough?
+> >>>
+> >> I didn't find a documentation about how we use the priority, and I assumed
+> >> people use virtio-crypto will configure hardware accelerators in the
+> >> host. So I choosed the number which bigger than aesni's priority.
+> > 
+> > Yes, but the aesni driver will only bind if there is HW support in the guest.
+> > And if aesni is available in the guest (or the s390 aes function from cpacf)
+> > it will always be faster than the same in the host via virtio.So your priority
+> > should be smaller.
+> 
+> 
+> any opinion on this? 
 
---xo44VMWPx7vlQ2+2
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Going forward, we might add an emulated aesni device and that might
+become slower than virtio. OTOH if or when this happens, we can solve it
+by adding a priority or a feature flag to virtio to raise its priority.
 
-On Wed, Jan 11, 2017 at 09:58:35PM -0000, Jignasha wrote:
-> When tried zlib-flate -uncompress < cirros-0.3.4-x86_64-disk.img,
-> getting below error
->=20
-> data: incorrect header check
+So I think I agree with Christian here, let's lower the priority.
+Gonglei, could you send a patch like this?
 
-QEMU image compression uses the compression feature available in some
-disk image formats (like qcow2).  This is not the same as compressing a
-file with gzip, bzip2, or similar tools.
-
-Therefore this error is expected and not a bug.
-
---xo44VMWPx7vlQ2+2
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJYd5AlAAoJEJykq7OBq3PIfWcH/3EOX79fwj/5o2ZtxJb4duK5
-UU9rmWP46JVDPTfXM9ONN8+7wOcr0/Ksc9tP1xUoa0dq8mH9CF68ai2qJTR0WlQN
-JCVFKNTFyYH6v4Hou+fKWd3DmVwv+31XKxPLXWkmXHIpqFzaZAGYw10KeQdE6j51
-sQWfxwUpBcFEjAm3bCI+3Oy0lopsdQRyQt6Zk3sP9xDQNbQkUFM49sjBC1aoRV8p
-qgNfPkrBEH0qFPQt3z9llibOrcsntSsDrmKh1g+MGV6cXig7LndYVi2/Jw49p6gd
-IUnSgUSuUwOCVEDq1Wzgb4OlxG+UDfndNj2wOD2hVslUt8pl6anRs3zfPNjhDMg=
-=kDdQ
------END PGP SIGNATURE-----
-
---xo44VMWPx7vlQ2+2--
+-- 
+MST
