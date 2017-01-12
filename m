@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58593)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59711)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cRVtZ-0006Le-Pu
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 22:17:46 -0500
+	(envelope-from <peterx@redhat.com>) id 1cRW1v-00066J-33
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 22:26:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cRVtY-0005Z5-Mx
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 22:17:45 -0500
-Date: Thu, 12 Jan 2017 14:17:34 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170112031734.GI14026@umbus.fritz.box>
-References: <1484014214-32533-1-git-send-email-joserz@linux.vnet.ibm.com>
+	(envelope-from <peterx@redhat.com>) id 1cRW1q-0000mB-EK
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 22:26:23 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46088)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cRW1q-0000lI-57
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 22:26:18 -0500
+Date: Thu, 12 Jan 2017 11:26:10 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170112032610.GI4450@pxdev.xzpeter.org>
+References: <1484112575-13194-1-git-send-email-peterx@redhat.com>
+	<1484112575-13194-3-git-send-email-peterx@redhat.com>
+	<20170111110023.hg25ouwqf3mtrxr6@kamzik.brq.redhat.com>
+	<20170111130934.q4rgy6g2ysjwvcay@kamzik.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="16qp2B0xu0fRvRD7"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1484014214-32533-1-git-send-email-joserz@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v5 0/7] POWER9 TCG enablements - BCD
- functions - final part
+In-Reply-To: <20170111130934.q4rgy6g2ysjwvcay@kamzik.brq.redhat.com>
+Subject: Re: [Qemu-devel] [kvm-unit-tests PATCH v5 2/2] run_tests: allow run
+ tests in parallel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,102 +30,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, nikunj@linux.vnet.ibm.com, bharata@linux.vnet.ibm.com, eblake@redhat.com
+To: Andrew Jones <drjones@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org, Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
 
+On Wed, Jan 11, 2017 at 02:09:34PM +0100, Andrew Jones wrote:
+> On Wed, Jan 11, 2017 at 12:00:23PM +0100, Andrew Jones wrote:
+> > On Wed, Jan 11, 2017 at 01:29:35PM +0800, Peter Xu wrote:
+> > > run_task.sh is getting slow. This patch is trying to make it faster by
+> > > running the tests concurrently.
+> > > 
+> > > We provide a new parameter "-j" for the run_tests.sh, which can be used
+> > > to specify how many run queues we want for the tests. Default queue
+> > > length is 1, which is the old behavior.
+> > > 
+> > > Quick test on my laptop (4 cores, 2 threads each) shows 3x speed boost:
+> > > 
+> > >    |-----------------+-----------|
+> > >    | command         | time used |
+> > >    |-----------------+-----------|
+> > >    | run_test.sh     | 75s       |
+> > >    | run_test.sh -j8 | 27s       |
+> > >    |-----------------+-----------|
+> > > 
+> > > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > > ---
+> > >  run_tests.sh        | 12 ++++++++++--
+> > >  scripts/common.bash | 16 +++++++++++++++-
+> > >  2 files changed, 25 insertions(+), 3 deletions(-)
+> > > 
+> > > diff --git a/run_tests.sh b/run_tests.sh
+> > > index b6a1059..477d4fb 100755
+> > > --- a/run_tests.sh
+> > > +++ b/run_tests.sh
+> > > @@ -13,10 +13,11 @@ function usage()
+> > >  {
+> > >  cat <<EOF
+> > >  
+> > > -Usage: $0 [-g group] [-h] [-v]
+> > > +Usage: $0 [-g group] [-h] [-v] [-j num_run_queues]
+> > >  
+> > >      -g: Only execute tests in the given group
+> > >      -h: Output this help text
+> > > +    -j: Execute tests in parallel
+> > >      -v: Enables verbose mode
+> > >  
+> > >  Set the environment variable QEMU=/path/to/qemu-system-ARCH to
+> > > @@ -28,7 +29,7 @@ EOF
+> > >  RUNTIME_arch_run="./$TEST_DIR/run"
+> > >  source scripts/runtime.bash
+> > >  
+> > > -while getopts "g:hv" opt; do
+> > > +while getopts "g:hj:v" opt; do
+> > >      case $opt in
+> > >          g)
+> > >              only_group=$OPTARG
+> > > @@ -37,6 +38,13 @@ while getopts "g:hv" opt; do
+> > >              usage
+> > >              exit
+> > >              ;;
+> > > +        j)
+> > > +            unittest_run_queues=$OPTARG
+> > > +            if (( $unittest_run_queues <= 0 )); then
+> > > +                echo "Invalid -j option: $unittest_run_queues"
+> > > +                exit 1
+> > 
+> > We should probably use 'exit 2' here, and below in the *) case.
 
---16qp2B0xu0fRvRD7
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Will fix this one first, with another one line patch for the below one
+(we can either take that new one, or squash it into this patch).
 
-On Tue, Jan 10, 2017 at 12:10:07AM -0200, Jose Ricardo Ziviani wrote:
-> v5:
->  - removes 'unlikely' gcc branch pred. hints from not unlikely places
->  - adds comments in host-utils functions
->  - adds more test cases for shift functions
->  - handles "shift backwards" with signed shifts
->  - rebases branch
->=20
-> v4:
->  - improves functions to behave exactly like the target
->=20
-> v3:
->  - moves shift functions to host-utils.c and added config_int128 guard
->  - changes Makefile to always compile host-utils.c
->  - redesigns bcd[u]trunc to use bitwise operations
->  - removes "target-ppc: Implement bcd_is_valid function" (merged)
->=20
-> v2:
->  - bcd[s,sr,us] uses 1 byte for shifting instead of 4 bytes
->  - left/right functions in host-utils are out of CONFIG_INT128
->  - fixes overflowing issue in left shift and added a testcase
->=20
-> This serie contains 5 new instructions for POWER9 ISA3.0, left/right shif=
-ts for=20
-> unsigned quadwords and a small improvement to check whether a bcd value i=
-s=20
-> valid or not.
+> > 
+> > > +            fi
+> > > +            ;;
+> > >          v)
+> > >              verbose="yes"
+> > >              ;;
+> > > diff --git a/scripts/common.bash b/scripts/common.bash
+> > > index 2dd7360..ef103ee 100644
+> > > --- a/scripts/common.bash
+> > > +++ b/scripts/common.bash
+> > > @@ -1,11 +1,19 @@
+> > >  : ${unittest_log_dir:=logs}
+> > > +: ${unittest_run_queues:=1}
+> > >  
+> > >  function run_task()
+> > >  {
+> > >  	local testname="$2"
+> > >  
+> > > +	while (( $(jobs | wc -l) == $unittest_run_queues )); do
+> > > +		# wait for any background test to finish
+> > > +		wait -n
+> > > +	done
+> > > +
+> > >  	RUNTIME_log_file="${unittest_log_dir}/${testname}.log"
+> > > -	"$@"
+> > > +
+> > > +	# start the testcase in the background
+> > > +	"$@" &
+> > 
+> > If you check the logs before and after applying this patch series you'll
+> > see a bunch of "stty: 'standard input': Inappropriate ioctl for device"
+> > are now present. These messages come from the stty calls in run_qemu,
+> > which we need to avoid the loss of terminal echo when QEMU aborts. We
+> > can get rid of these new "inappropriate ioctl" messages by changing the
+> > above line to
+> > 
+> >  "$@" <$(tty) &
+> 
+> Actually I just came up with a better solution for this. Since we don't
+> need input to our unit tests, i.e. we never attempt to read from the
+> serial port within them, then we can just use /dev/null for stdin. That
+> allows us to leave your code above alone, and also remove the stty stuff
+> in run_qemu. I'll send a patch.
 
-Patches 1-5 applied to ppc-for-2.9, remainder left with a suggestion
-for improvement.
+Thanks, then I'll keep it as it is.
 
->=20
-> bcds.: Decimal signed shift
-> bcdus.: Decimal unsigned shift
-> bcdsr.: Decimal shift and round
-> bcdtrunc.: Decimal signed trucate
-> bcdutrunc.: Decimal unsigned truncate
->=20
-> Jose Ricardo Ziviani (7):
->   host-utils: Move 128-bit guard macro to .c file
->   host-utils: Implement unsigned quadword left/right shift and unit
->     tests
->   ppc: Implement bcds. instruction
->   ppc: Implement bcdus. instruction
->   ppc: Implement bcdsr. instruction
->   ppc: Implement bcdtrunc. instruction
->   ppc: Implement bcdutrunc. instruction
->=20
->  include/qemu/host-utils.h           |  27 +++++
->  target/ppc/helper.h                 |   5 +
->  target/ppc/int_helper.c             | 217 ++++++++++++++++++++++++++++++=
-++++++
->  target/ppc/translate/vmx-impl.inc.c |  16 +++
->  target/ppc/translate/vmx-ops.inc.c  |  13 ++-
->  tests/Makefile.include              |   5 +-
->  tests/test-shift128.c               | 139 +++++++++++++++++++++++
->  util/Makefile.objs                  |   2 +-
->  util/host-utils.c                   |  66 +++++++++++
->  9 files changed, 483 insertions(+), 7 deletions(-)
->  create mode 100644 tests/test-shift128.c
->=20
+> 
+> drew
+> 
+> > 
+> > 
+> > >  }
+> > >  
+> > >  function for_each_unittest()
+> > > @@ -22,6 +30,8 @@ function for_each_unittest()
+> > >  	local accel
+> > >  	local timeout
+> > >  
+> > > +	trap "wait; exit 130" SIGINT
+> > > +
+> > >  	exec {fd}<"$unittests"
+> > >  
+> > >  	while read -u $fd line; do
+> > > @@ -55,5 +65,9 @@ function for_each_unittest()
+> > >  		fi
+> > >  	done
+> > >  	run_task "$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
+> > > +
+> > > +	# wait until all task finish
+> > 
+> > Still not quite right :-)  s/task/tasks/
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Sorry! Fixing up.
 
---16qp2B0xu0fRvRD7
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJYdvVOAAoJEGw4ysog2bOSZqMQAJxvdAXwIg9PmexjTpnvMafO
-0hd2XU4w5ezMrN8tHtS4/YPQ5pPQusFOrV2Jqs6WQHij5OYCXVAAuTq/WBfsLRhg
-WRvR0cBNaWcjGyFyqrrruUu2u6MOym02QA9eUaza04fIpC+KQXXz6iXyZwReI1MS
-5BHD3RV3TpgMZAL7E95JMmYvJHyUzZKTgeHQYkTcZS5/evrALSDzKBS9TR+KB1gT
-XYioiNlAv8XcLkZhVEuYZlA0EFqThg2tgzd8xNIU5tBwf9GeJUh9+QcsUERRxIan
-8hdV71htdIxwrZN5r4eJvajiLeCbzaFvhaYOhNyozpcgPCveEMdTY3uTj/jXGda/
-7NZtbtlHbS6mRjO+LxJCRJrNG8Cx3awUofImV+oH7FwfW703NWMoJxCQR7y+REZ3
-Uzf4Jzf0Yae41PQDTKTPuDb7KlEwjM/U7obSMs/+0I1kNaTiL2LFTNYKWrMMv3Vi
-HCWi224V45PderyLofWrknUYnMp8HTBNoBSsPTWEuN//0s02nKy78OPJlkZxoHvr
-J63uBbIyEQjBs8okQh23Kq7CA/s1U3iv8/ojFPcxQL4QUSKsjWn/EzKTsEvVjXVg
-80T9UDTXbMAgze6jOj5WgJRJ0OLCAJOtuJWYZuVZ2BN6/0/i68fPY5FHKwdchmHJ
-REjoYexLk0ZEkdd9LJ7g
-=oMGp
------END PGP SIGNATURE-----
-
---16qp2B0xu0fRvRD7--
+-- peterx
