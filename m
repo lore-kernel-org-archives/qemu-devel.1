@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45989)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46043)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cRUju-0002pV-7g
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 21:03:43 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cRUjv-0002qd-5Z
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 21:03:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cRUjs-0006O3-Sw
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 21:03:42 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cRUjt-0006PN-If
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 21:03:43 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu, 12 Jan 2017 13:02:28 +1100
-Message-Id: <20170112020327.24882-9-david@gibson.dropbear.id.au>
+Date: Thu, 12 Jan 2017 13:02:33 +1100
+Message-Id: <20170112020327.24882-14-david@gibson.dropbear.id.au>
 In-Reply-To: <20170112020327.24882-1-david@gibson.dropbear.id.au>
 References: <20170112020327.24882-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 08/67] target-ppc: implement stxsd and stxssp
+Subject: [Qemu-devel] [PULL 13/67] target-ppc: Implement bcdsetsgn.
+ instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,121 +21,103 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com, lvivier@redhat.com, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com, lvivier@redhat.com, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com, Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+From: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
 
-stxsd:  Store VSX Scalar Dword
-stxssp: Store VSX Scalar SP
+bcdsetsgn.: Decimal set sign. This instruction copies the register
+value to the result register but adjust the signal according to
+the preferred sign value.
 
-Moreover, DQ-Form/DS-FORM instructions shares the same primary
-opcode(0x3D). For DQ-FORM bits 29:31 are used, for DS-FORM bits 30:31
-are used. Common routine to decode primary opcode(0x3D) -
-ds-form/dq-form instructions is required.
-
-Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+Signed-off-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/translate.c              | 34 ++++++++++++++++++++++++++++++++++
- target/ppc/translate/fp-ops.inc.c   |  1 -
- target/ppc/translate/vsx-impl.inc.c | 21 +++++++++++++++++++++
- 3 files changed, 55 insertions(+), 1 deletion(-)
+ target/ppc/helper.h                 |  1 +
+ target/ppc/int_helper.c             | 19 +++++++++++++++++++
+ target/ppc/translate/vmx-impl.inc.c |  8 ++++++++
+ 3 files changed, 28 insertions(+)
 
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index 9114f85..a1bf74c 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -6076,6 +6076,38 @@ static void gen_dform39(DisasContext *ctx)
-     return gen_invalid(ctx);
+diff --git a/target/ppc/helper.h b/target/ppc/helper.h
+index 2974101..ac8901f 100644
+--- a/target/ppc/helper.h
++++ b/target/ppc/helper.h
+@@ -385,6 +385,7 @@ DEF_HELPER_3(bcdctz, i32, avr, avr, i32)
+ DEF_HELPER_3(bcdcfsq, i32, avr, avr, i32)
+ DEF_HELPER_3(bcdctsq, i32, avr, avr, i32)
+ DEF_HELPER_4(bcdcpsgn, i32, avr, avr, avr, i32)
++DEF_HELPER_3(bcdsetsgn, i32, avr, avr, i32)
+ 
+ DEF_HELPER_2(xsadddp, void, env, i32)
+ DEF_HELPER_2(xssubdp, void, env, i32)
+diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
+index 8021c48..4259876 100644
+--- a/target/ppc/int_helper.c
++++ b/target/ppc/int_helper.c
+@@ -2975,6 +2975,25 @@ uint32_t helper_bcdcpsgn(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b, uint32_t ps)
+     return bcd_cmp_zero(r);
  }
  
-+/* handles stfdp, stxsd, stxssp */
-+static void gen_dform3D(DisasContext *ctx)
++uint32_t helper_bcdsetsgn(ppc_avr_t *r, ppc_avr_t *b, uint32_t ps)
 +{
-+    if ((ctx->opcode & 3) == 1) { /* DQ-FORM */
-+        switch (ctx->opcode & 0x7) {
-+        case 1: /* lxv */
-+            break;
-+        case 5: /* stxv */
-+            break;
-+        }
-+    } else { /* DS-FORM */
-+        switch (ctx->opcode & 0x3) {
-+        case 0: /* stfdp */
-+            if (ctx->insns_flags2 & PPC2_ISA205) {
-+                return gen_stfdp(ctx);
-+            }
-+            break;
-+        case 2: /* stxsd */
-+            if (ctx->insns_flags2 & PPC2_ISA300) {
-+                return gen_stxsd(ctx);
-+            }
-+            break;
-+        case 3: /* stxssp */
-+            if (ctx->insns_flags2 & PPC2_ISA300) {
-+                return gen_stxssp(ctx);
-+            }
-+            break;
++    int i;
++    int invalid = 0;
++    int sgnb = bcd_get_sgn(b);
++
++    *r = *b;
++    bcd_put_digit(r, bcd_preferred_sgn(sgnb, ps), 0);
++
++    for (i = 1; i < 32; i++) {
++        bcd_get_digit(b, i, &invalid);
++        if (unlikely(invalid)) {
++            return CRF_SO;
 +        }
 +    }
-+    return gen_invalid(ctx);
++
++    return bcd_cmp_zero(r);
 +}
 +
- static opcode_t opcodes[] = {
- GEN_HANDLER(invalid, 0x00, 0x00, 0x00, 0xFFFFFFFF, PPC_NONE),
- GEN_HANDLER(cmp, 0x1F, 0x00, 0x00, 0x00400000, PPC_INTEGER),
-@@ -6150,6 +6182,8 @@ GEN_HANDLER(std, 0x3E, 0xFF, 0xFF, 0x00000000, PPC_64B),
- #endif
- /* handles lfdp, lxsd, lxssp */
- GEN_HANDLER_E(dform39, 0x39, 0xFF, 0xFF, 0x00000000, PPC_NONE, PPC2_ISA205),
-+/* handles stfdp, stxsd, stxssp */
-+GEN_HANDLER_E(dform3D, 0x3D, 0xFF, 0xFF, 0x00000000, PPC_NONE, PPC2_ISA205),
- GEN_HANDLER(lmw, 0x2E, 0xFF, 0xFF, 0x00000000, PPC_INTEGER),
- GEN_HANDLER(stmw, 0x2F, 0xFF, 0xFF, 0x00000000, PPC_INTEGER),
- GEN_HANDLER(lswi, 0x1F, 0x15, 0x12, 0x00000001, PPC_STRING),
-diff --git a/target/ppc/translate/fp-ops.inc.c b/target/ppc/translate/fp-ops.inc.c
-index 3127fa0..3c6d05a 100644
---- a/target/ppc/translate/fp-ops.inc.c
-+++ b/target/ppc/translate/fp-ops.inc.c
-@@ -87,7 +87,6 @@ GEN_STXF(name, stop, 0x17, op | 0x00, type)
- GEN_STFS(stfd, st64_i64, 0x16, PPC_FLOAT)
- GEN_STFS(stfs, st32fs, 0x14, PPC_FLOAT)
- GEN_STXF(stfiw, st32fiw, 0x17, 0x1E, PPC_FLOAT_STFIWX)
--GEN_HANDLER_E(stfdp, 0x3D, 0xFF, 0xFF, 0x00200003, PPC_NONE, PPC2_ISA205),
- GEN_HANDLER_E(stfdpx, 0x1F, 0x17, 0x1C, 0x00200001, PPC_NONE, PPC2_ISA205),
+ void helper_vsbox(ppc_avr_t *r, ppc_avr_t *a)
+ {
+     int i;
+diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/vmx-impl.inc.c
+index c14b666..b188e60 100644
+--- a/target/ppc/translate/vmx-impl.inc.c
++++ b/target/ppc/translate/vmx-impl.inc.c
+@@ -991,6 +991,7 @@ GEN_BCD2(bcdcfz)
+ GEN_BCD2(bcdctz)
+ GEN_BCD2(bcdcfsq)
+ GEN_BCD2(bcdctsq)
++GEN_BCD2(bcdsetsgn)
+ GEN_BCD(bcdcpsgn);
  
- GEN_HANDLER(frsqrtes, 0x3B, 0x1A, 0xFF, 0x001F07C0, PPC_FLOAT_FRSQRTES),
-diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/vsx-impl.inc.c
-index 1d7cd23..8ee44cf 100644
---- a/target/ppc/translate/vsx-impl.inc.c
-+++ b/target/ppc/translate/vsx-impl.inc.c
-@@ -332,6 +332,27 @@ static void gen_stxvb16x(DisasContext *ctx)
-     tcg_temp_free(EA);
+ static void gen_xpnd04_1(DisasContext *ctx)
+@@ -1014,6 +1015,9 @@ static void gen_xpnd04_1(DisasContext *ctx)
+     case 7:
+         gen_bcdcfn(ctx);
+         break;
++    case 31:
++        gen_bcdsetsgn(ctx);
++        break;
+     default:
+         gen_invalid(ctx);
+         break;
+@@ -1038,12 +1042,16 @@ static void gen_xpnd04_2(DisasContext *ctx)
+     case 7:
+         gen_bcdcfn(ctx);
+         break;
++    case 31:
++        gen_bcdsetsgn(ctx);
++        break;
+     default:
+         gen_invalid(ctx);
+         break;
+     }
  }
  
-+#define VSX_STORE_SCALAR_DS(name, operation)                      \
-+static void gen_##name(DisasContext *ctx)                         \
-+{                                                                 \
-+    TCGv EA;                                                      \
-+    TCGv_i64 xth = cpu_vsrh(rD(ctx->opcode) + 32);                \
-+                                                                  \
-+    if (unlikely(!ctx->altivec_enabled)) {                        \
-+        gen_exception(ctx, POWERPC_EXCP_VPU);                     \
-+        return;                                                   \
-+    }                                                             \
-+    gen_set_access_type(ctx, ACCESS_INT);                         \
-+    EA = tcg_temp_new();                                          \
-+    gen_addr_imm_index(ctx, EA, 0x03);                            \
-+    gen_qemu_##operation(ctx, xth, EA);                           \
-+    /* NOTE: cpu_vsrl is undefined */                             \
-+    tcg_temp_free(EA);                                            \
-+}
 +
-+VSX_LOAD_SCALAR_DS(stxsd, st64_i64)
-+VSX_LOAD_SCALAR_DS(stxssp, st32fs)
-+
- #define MV_VSRW(name, tcgop1, tcgop2, target, source)           \
- static void gen_##name(DisasContext *ctx)                       \
- {                                                               \
+ GEN_VXFORM_DUAL(vsubcuw, PPC_ALTIVEC, PPC_NONE, \
+                 xpnd04_1, PPC_NONE, PPC2_ISA300)
+ GEN_VXFORM_DUAL(vsubsws, PPC_ALTIVEC, PPC_NONE, \
 -- 
 2.9.3
