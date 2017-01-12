@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46675)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49249)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cRlpG-0003xm-Ll
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 15:18:25 -0500
+	(envelope-from <nirsof@gmail.com>) id 1cRm1X-0007Fz-Kk
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 15:31:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1cRlpD-0004v3-DX
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 15:18:22 -0500
-Received: from mout.kundenserver.de ([217.72.192.75]:55168)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1cRlpD-0004tu-1j
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 15:18:19 -0500
-From: Laurent Vivier <laurent@vivier.eu>
-Date: Thu, 12 Jan 2017 21:18:01 +0100
-Message-Id: <1484252284-29291-3-git-send-email-laurent@vivier.eu>
-In-Reply-To: <1484252284-29291-1-git-send-email-laurent@vivier.eu>
-References: <1484252284-29291-1-git-send-email-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH 2/5] target-m68k: fix gen_flush_flags()
+	(envelope-from <nirsof@gmail.com>) id 1cRm1W-000210-OB
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 15:31:03 -0500
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:33009)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <nirsof@gmail.com>) id 1cRm1W-00020u-Jd
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 15:31:02 -0500
+Received: by mail-oi0-x241.google.com with SMTP id j15so4464486oih.0
+	for <qemu-devel@nongnu.org>; Thu, 12 Jan 2017 12:31:02 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <20170112030148.GC26504@lemon>
+References: <20170111182455.15160-1-nirsof@gmail.com>
+	<750c2d41-dac2-61f7-29c3-82d8d13a0de6@redhat.com>
+	<20170112030148.GC26504@lemon>
+From: Nir Soffer <nirsof@gmail.com>
+Date: Thu, 12 Jan 2017 22:04:11 +0200
+Message-ID: <CAMr-obsOnLgMn+XQHzHSTiHVdQj4wAfJHtbN1zmom_ox7R-G0A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH] qemu-io: Return non-zero exit code on
+ failure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,47 +30,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: rth@twiddle.net, Laurent Vivier <laurent@vivier.eu>
+To: Fam Zheng <famz@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, Nir Soffer <nsoffer@redhat.com>, qemu-devel@nongnu.org
 
-gen_flush_flags() is setting unconditionally cc_op_synced to 1
-and s->cc_op to CC_OP_FLAGS, whereas env->cc_op can be set
-to something else by a previous tcg fragment.
+On Thu, Jan 12, 2017 at 5:01 AM, Fam Zheng <famz@redhat.com> wrote:
+> On Wed, 01/11 15:51, Eric Blake wrote:
+>> On 01/11/2017 12:24 PM, Nir Soffer wrote:
+>> > From: Nir Soffer <nsoffer@redhat.com>
+>> >
+>> > The result of openfile was not checked, leading to failure deep in the
+>> > actual command with confusing error message, and exiting with exit code 0.
+>> >
+>> > Here is one example - trying to read a pattern from an invalid chain:
+>> >
+>> >     $ qemu-io -c 'read -P 1 0 1024' top.qcow2; echo $?
+>>
+>> As written, you have to guess some context about how top.qcow2 was
+>> created.  The example can be made a bit more reproducible with:
+>>
+>> $ : > file
+>> $ qemu-io -f qcow2 -c ... file
+>
+> Nir, thank you for the fix. Could you also add a regression test in
+> tests/qemu-iotests?
 
-We fix that by not setting cc_op_synced to 1
-(except for gen_helper_flush_flags() that updates env->cc_op)
+Sure, will look into it.
 
-FIX: https://github.com/vivier/qemu-m68k/issues/19
-
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- target/m68k/translate.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/target/m68k/translate.c b/target/m68k/translate.c
-index 410f56a..0e97900 100644
---- a/target/m68k/translate.c
-+++ b/target/m68k/translate.c
-@@ -595,18 +595,19 @@ static void gen_flush_flags(DisasContext *s)
- 
-     case CC_OP_DYNAMIC:
-         gen_helper_flush_flags(cpu_env, QREG_CC_OP);
-+        s->cc_op_synced = 1;
-         break;
- 
-     default:
-         t0 = tcg_const_i32(s->cc_op);
-         gen_helper_flush_flags(cpu_env, t0);
-         tcg_temp_free(t0);
-+        s->cc_op_synced = 1;
-         break;
-     }
- 
-     /* Note that flush_flags also assigned to env->cc_op.  */
-     s->cc_op = CC_OP_FLAGS;
--    s->cc_op_synced = 1;
- }
- 
- static inline TCGv gen_extend(TCGv val, int opsize, int sign)
--- 
-2.7.4
+>
+> Reviewed-by: Fam Zheng <famz@redhat.com>
+>
+>>
+>> >     can't open device top.qcow2: Could not open backing file: Image is not in qcow2 format
+>> >     no file open, try 'help open'
+>> >     0
+>> >
+>> > With this patch, we fail earlier with exit code 1:
+>> >
+>> >     $ ./qemu-io -c 'read -P 1 0 1024' top.qcow2; echo $?
+>> >     can't open device top.qcow2: Could not open backing file: Image is not
+>> >     in qcow2 format
+>> >     1
+>> >
+>> > Signed-off-by: Nir Soffer <nirsof@gmail.com>
+>> > ---
+>> >  qemu-io.c | 8 ++++++--
+>> >  1 file changed, 6 insertions(+), 2 deletions(-)
+>>
+>> Whether or not the commit message is improved,
+>> Reviewed-by: Eric Blake <eblake@redhat.com>
