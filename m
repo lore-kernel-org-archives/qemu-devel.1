@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40178)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40235)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cRhsI-0004TR-46
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 11:05:21 -0500
+	(envelope-from <no-reply@patchew.org>) id 1cRhsU-0004bU-1f
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 11:05:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1cRhs8-0007Mm-SU
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 11:05:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57256)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1cRhs8-0007MB-NV
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 11:05:04 -0500
-References: <20170112105132.10394-1-pbonzini@redhat.com>
-	<20170112141145.GA14042@stefanha-x1.localdomain>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <e458f658-bcb8-8864-e6cf-96df9c69578d@redhat.com>
-Date: Thu, 12 Jan 2017 11:05:03 -0500
+	(envelope-from <no-reply@patchew.org>) id 1cRhsQ-0007au-HE
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 11:05:26 -0500
+Resent-Message-Id: <E1cRhsQ-0007au-HE@eggs.gnu.org>
+Received: from sender163-mail.zoho.com ([74.201.84.163]:21421)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1cRhsQ-0007Zi-7e
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 11:05:22 -0500
+In-Reply-To: <1484236354-9640-1-git-send-email-ashijeetacharya@gmail.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <148423711100.208.1040747017863835360@790289a7ca88>
 MIME-Version: 1.0
-In-Reply-To: <20170112141145.GA14042@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] ide: avoid unbounded recursion
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 12 Jan 2017 08:05:12 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH v5 0/4] Introduce a new --only-migratable
+ option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,68 +29,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Lieven <pl@kamp.de>
+To: ashijeetacharya@gmail.com
+Cc: famz@redhat.com, dgilbert@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org, quintela@redhat.com, qemu-devel@nongnu.org, mst@redhat.com, armbru@redhat.com, groug@kaod.org, aneesh.kumar@linux.vnet.ibm.com, marcandre.lureau@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, jsnow@redhat.com
 
-
-
-On 01/12/2017 09:11 AM, Stefan Hajnoczi wrote:
-> On Thu, Jan 12, 2017 at 11:51:32AM +0100, Paolo Bonzini wrote:
->> The end_transfer_func can call ide_transfer_start immediately, before
->> returning, and unbounded recursion can happen at least for
->> ide_atapi_cmd_reply_end.  Use a bottom half to defer the call and
->> limit stack usage.
->>
->> Cc: Peter Lieven <pl@kamp.de>
->> Cc: John Snow <jsnow@redhat.com>
->> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->> ---
->>  hw/ide/core.c | 14 +++++++++++++-
->>  1 file changed, 13 insertions(+), 1 deletion(-)
->>
->> diff --git a/hw/ide/core.c b/hw/ide/core.c
->> index 43709e5..7b9831f 100644
->> --- a/hw/ide/core.c
->> +++ b/hw/ide/core.c
->> @@ -482,6 +482,13 @@ static void ide_clear_retry(IDEState *s)
->>      s->bus->retry_nsector = 0;
->>  }
->>  
->> +static void ide_start_transfer_bh_cb(void *opaque)
->> +{
->> +    IDEDMA *dma = opaque;
->> +
->> +    dma->ops->start_transfer(dma);
->> +}
->> +
->>  /* prepare data transfer and tell what to do after */
->>  void ide_transfer_start(IDEState *s, uint8_t *buf, int size,
->>                          EndTransferFunc *end_transfer_func)
->> @@ -494,7 +501,12 @@ void ide_transfer_start(IDEState *s, uint8_t *buf, int size,
->>          s->status |= DRQ_STAT;
->>      }
->>      if (s->bus->dma->ops->start_transfer) {
->> -        s->bus->dma->ops->start_transfer(s->bus->dma);
->> +        /* There can be unbounded recursion between ops->start_transfer
->> +         * and end_transfer_func, so defer to a bottom half.
->> +         */
->> +        aio_bh_schedule_oneshot(qemu_get_aio_context(),
->> +                                ide_start_transfer_bh_cb,
->> +                                s->bus->dma);
-> 
-> Are you sure this is safe?
-> 
-> I wonder if there are races with device reset, vmsave, or vcpu hw
-> register accesses.
-> 
-> Stefan
-> 
-
-Oh, right, reset -- we're guarded against normal accesses because the
-ATA device will be busy, but we're always allowed to reset.
-
-Can we just amend the ide reset functionality to delete the BH if it
-hasn't triggered yet?
-
-Also, I suppose drain doesn't clear out any scheduled bottom halves
-associated with the device, does it?
+SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
+ZGV2ZWxdIFtQQVRDSCB2NSAwLzRdIEludHJvZHVjZSBhIG5ldyAtLW9ubHktbWlncmF0YWJsZSBv
+cHRpb24KTWVzc2FnZS1pZDogMTQ4NDIzNjM1NC05NjQwLTEtZ2l0LXNlbmQtZW1haWwtYXNoaWpl
+ZXRhY2hhcnlhQGdtYWlsLmNvbQpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9
+PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAk
+QkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgojIFVzZWZ1bCBnaXQgb3B0aW9ucwpnaXQgY29uZmln
+IC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFt
+ZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4u
+KSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90
+YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cg
+JGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07
+IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkp
+CmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4
+Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHVi
+LmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzE0
+ODQyMzYzNTQtOTY0MC0xLWdpdC1zZW5kLWVtYWlsLWFzaGlqZWV0YWNoYXJ5YUBnbWFpbC5jb20g
+LT4gcGF0Y2hldy8xNDg0MjM2MzU0LTk2NDAtMS1naXQtc2VuZC1lbWFpbC1hc2hpamVldGFjaGFy
+eWFAZ21haWwuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKOWIzOTYyNSBtaWdy
+YXRpb246IEZhaWwgbWlncmF0aW9uIGJsb2NrZXIgZm9yIC0tb25seS1taWdyYXRhYmxlCjgwMmI2
+MzkgbWlncmF0aW9uOiBkaXNhbGxvdyBtaWdyYXRlX2FkZF9ibG9ja2VyIGR1cmluZyBtaWdyYXRp
+b24KOTc0MzQxMSBtaWdyYXRpb246IEFsbG93ICJkZXZpY2UgYWRkIiBvcHRpb25zIHRvIG9ubHkg
+YWRkIG1pZ3JhdGFibGUgZGV2aWNlcwpjMWE0ZTUwIG1pZ3JhdGlvbjogQWRkIGEgbmV3IG9wdGlv
+biB0byBlbmFibGUgb25seS1taWdyYXRhYmxlCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2lu
+ZyBQQVRDSCAxLzQ6IG1pZ3JhdGlvbjogQWRkIGEgbmV3IG9wdGlvbiB0byBlbmFibGUgb25seS1t
+aWdyYXRhYmxlLi4uCkNoZWNraW5nIFBBVENIIDIvNDogbWlncmF0aW9uOiBBbGxvdyAiZGV2aWNl
+IGFkZCIgb3B0aW9ucyB0byBvbmx5IGFkZCBtaWdyYXRhYmxlIGRldmljZXMuLi4KQ2hlY2tpbmcg
+UEFUQ0ggMy80OiBtaWdyYXRpb246IGRpc2FsbG93IG1pZ3JhdGVfYWRkX2Jsb2NrZXIgZHVyaW5n
+IG1pZ3JhdGlvbi4uLgpFUlJPUjogZG8gbm90IHVzZSBDOTkgLy8gY29tbWVudHMKIzE4MzogRklM
+RTogYmxvY2svdnZmYXQuYzoxMjA1OgorICAgIC8vICAgIGFzc2VydChpc19jb25zaXN0ZW50KHMp
+KTsKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgNTUzIGxpbmVzIGNoZWNrZWQKCllvdXIg
+cGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
+IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
+LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDQvNDogbWln
+cmF0aW9uOiBGYWlsIG1pZ3JhdGlvbiBibG9ja2VyIGZvciAtLW9ubHktbWlncmF0YWJsZS4uLgo9
+PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0t
+CkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3
+Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxp
+c3RzLm9yZw==
