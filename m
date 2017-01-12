@@ -1,20 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42869)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43232)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1cRcUt-00038K-Nk
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 05:20:45 -0500
+	(envelope-from <a175818323@gmail.com>) id 1cRcXB-0004V4-AR
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 05:23:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1cRcUq-00069n-FZ
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 05:20:43 -0500
-References: <20161101170302.23737-1-sw@weilnetz.de>
-From: Michael Tokarev <mjt@tls.msk.ru>
-Message-ID: <dd8da5eb-3627-5cf8-8ef3-7042c144c5c8@msgid.tls.msk.ru>
-Date: Thu, 12 Jan 2017 13:20:28 +0300
+	(envelope-from <a175818323@gmail.com>) id 1cRcX9-0006uw-4o
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 05:23:05 -0500
 MIME-Version: 1.0
-In-Reply-To: <20161101170302.23737-1-sw@weilnetz.de>
-Content-Type: text/plain; charset=windows-1251
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw/block/m25p80: Fix typo in local macro
- name
+From: Bob Chen <a175818323@gmail.com>
+Date: Thu, 12 Jan 2017 18:22:59 +0800
+Message-ID: <CAMxP3BT7ncDLePmP7QfXMtbodJ81+9Frc01aCkipya3-BNL6AA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: [Qemu-devel] How to online resize qemu disk with nbd protocol?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,16 +19,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Weil <sw@weilnetz.de>, QEMU Developer <qemu-devel@nongnu.org>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-01.11.2016 20:03, Stefan Weil wrote:
-> Signed-off-by: Stefan Weil <sw@weilnetz.de>
-> ---
->  hw/block/m25p80.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+Hi,
 
-Applied to -trivial, quite a bit too late but better be late
-than never :)  Thanks!
 
-/mjt
+My qemu runs on a 3rd party distributed block storage, and the disk backend
+protocol is nbd.
+
+I notices that there are differences between default qcow2 local disk and
+my nbd disk, in terms of resizing the disk on the fly.
+
+Local qcow2 disk could work no matter using qemu-img resize or qemu monitor
+'block_resize', but the nbd disk seemed to fail to detect the backend size
+change(had resized the disk on EBS at first). It said "this feature or
+command is not currently supported".
+
+Is that possible to hack qemu nbd code, making it the same way as resizing
+local qcow2 disk? I have the interface to resize EBS disk at backend.
+
+
+Regards,
+Bob
