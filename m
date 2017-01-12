@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47196)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47219)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cRUkI-0003Ii-QE
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 21:04:09 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cRUkJ-0003Ji-C1
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 21:04:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cRUkE-0006q5-Pb
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 21:04:06 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cRUkF-0006r0-TW
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 21:04:07 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu, 12 Jan 2017 13:03:14 +1100
-Message-Id: <20170112020327.24882-55-david@gibson.dropbear.id.au>
+Date: Thu, 12 Jan 2017 13:03:21 +1100
+Message-Id: <20170112020327.24882-62-david@gibson.dropbear.id.au>
 In-Reply-To: <20170112020327.24882-1-david@gibson.dropbear.id.au>
 References: <20170112020327.24882-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 54/67] target-ppc: Add xscvdphp, xscvhpdp
+Subject: [Qemu-devel] [PULL 61/67] pseries: Rewrite CAS PVR compatibility
+ logic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,183 +21,183 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com, lvivier@redhat.com, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com, Bharata B Rao <bharata@linux.vnet.ibm.com>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com, lvivier@redhat.com, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com, David Gibson <david@gibson.dropbear.id.au>
 
-From: Bharata B Rao <bharata@linux.vnet.ibm.com>
+During boot, PAPR guests negotiate CPU model support with the
+ibm,client-architecture-support mechanism.  The logic to implement this in
+qemu is very convoluted.  This cleans it up to be cleaner, using the new
+ppc_check_compat() call.
 
-xscvdphp: VSX Scalar round & Convert Double-Precision format to
-          Half-Precision format
-xscvhpdp: VSX Scalar Convert Half-Precision format to
-          Double-Precision format
+The new logic for choosing a compatibility mode is:
+    1. Usually, use the most recent compatibility mode that is
+            a) supported by the guest
+            b) supported by the CPU
+        and c) no later than the maximum allowed (if specified)
+    2. If no suitable compatibility mode was found, the guest *does*
+       support this CPU explicitly, and no maximum compatibility mode is
+       specified, then use "raw" mode for the current CPU
+    3. Otherwise, fail the boot.
 
-Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
-Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+This differs from the results of the old code: the old code preferred using
+"raw" mode to a compatibility mode, whereas the new code prefers a
+compatibility mode if available.  Using compatibility mode preferentially
+means that we're more likely to be able to migrate the guest to a similar
+but not identical host.
+
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- include/fpu/softfloat.h             | 20 ++++++++++++++++++++
- target/ppc/fpu_helper.c             | 33 +++++++++++++++++++++++++++++++++
- target/ppc/helper.h                 |  2 ++
- target/ppc/internal.h               |  3 +++
- target/ppc/translate/vsx-impl.inc.c |  2 ++
- target/ppc/translate/vsx-ops.inc.c  |  2 ++
- 6 files changed, 62 insertions(+)
+ hw/ppc/spapr_hcall.c | 104 ++++++++++++++++-----------------------------------
+ hw/ppc/trace-events  |   2 +-
+ 2 files changed, 34 insertions(+), 72 deletions(-)
 
-diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
-index 14f8383..842ec6b 100644
---- a/include/fpu/softfloat.h
-+++ b/include/fpu/softfloat.h
-@@ -356,6 +356,26 @@ static inline int float16_is_any_nan(float16 a)
-     return ((float16_val(a) & ~0x8000) > 0x7c00);
+diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+index fd9f1d4..43a1fef 100644
+--- a/hw/ppc/spapr_hcall.c
++++ b/hw/ppc/spapr_hcall.c
+@@ -935,98 +935,60 @@ static void do_set_compat(CPUState *cs, run_on_cpu_data arg)
+     ppc_set_compat(cpu, s->compat_pvr, &s->err);
  }
  
-+static inline int float16_is_neg(float16 a)
-+{
-+    return float16_val(a) >> 15;
-+}
-+
-+static inline int float16_is_infinity(float16 a)
-+{
-+    return (float16_val(a) & 0x7fff) == 0x7c00;
-+}
-+
-+static inline int float16_is_zero(float16 a)
-+{
-+    return (float16_val(a) & 0x7fff) == 0;
-+}
-+
-+static inline int float16_is_zero_or_denormal(float16 a)
-+{
-+    return (float16_val(a) & 0x7c00) == 0;
-+}
-+
- /*----------------------------------------------------------------------------
- | The pattern for a default generated half-precision NaN.
- *----------------------------------------------------------------------------*/
-diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
-index 913d54e..f4103f5 100644
---- a/target/ppc/fpu_helper.c
-+++ b/target/ppc/fpu_helper.c
-@@ -24,6 +24,7 @@
- 
- #define float64_snan_to_qnan(x) ((x) | 0x0008000000000000ULL)
- #define float32_snan_to_qnan(x) ((x) | 0x00400000)
-+#define float16_snan_to_qnan(x) ((x) | 0x0200)
- 
- /*****************************************************************************/
- /* Floating point operations helpers */
-@@ -107,6 +108,7 @@ void helper_compute_fprf_##tp(CPUPPCState *env, tp arg)        \
-     env->fpscr |= fprf << FPSCR_FPRF;                          \
- }
- 
-+COMPUTE_FPRF(float16)
- COMPUTE_FPRF(float64)
- 
- /* Floating-point invalid operations exception */
-@@ -2664,6 +2666,37 @@ VSX_CVT_FP_TO_FP(xscvspdp, 1, float32, float64, VsrW(0), VsrD(0), 1)
- VSX_CVT_FP_TO_FP(xvcvdpsp, 2, float64, float32, VsrD(i), VsrW(2*i), 0)
- VSX_CVT_FP_TO_FP(xvcvspdp, 2, float32, float64, VsrW(2*i), VsrD(i), 0)
- 
-+/* VSX_CVT_FP_TO_FP_HP - VSX floating point/floating point conversion
-+ *                       involving one half precision value
-+ *   op    - instruction mnemonic
-+ *   stp   - source type
-+ *   ttp   - target type
-+ *   sfld  - source vsr_t field
-+ *   tfld  - target vsr_t field
-+ */
-+#define VSX_CVT_FP_TO_FP_HP(op, stp, ttp, sfld, tfld)              \
-+void helper_##op(CPUPPCState *env, uint32_t opcode)                \
-+{                                                                  \
-+    ppc_vsr_t xt, xb;                                              \
-+                                                                   \
-+    getVSR(xB(opcode), &xb, env);                                  \
-+    memset(&xt, 0, sizeof(xt));                                    \
-+                                                                   \
-+    xt.tfld = stp##_to_##ttp(xb.sfld, 1, &env->fp_status);         \
-+    if (unlikely(stp##_is_signaling_nan(xb.sfld,                   \
-+                                        &env->fp_status))) {       \
-+        float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 0);     \
-+        xt.tfld = ttp##_snan_to_qnan(xt.tfld);                     \
-+    }                                                              \
-+    helper_compute_fprf_##ttp(env, xt.tfld);                       \
-+                                                                   \
-+    putVSR(xT(opcode), &xt, env);                                  \
-+    float_check_status(env);                                       \
-+}
-+
-+VSX_CVT_FP_TO_FP_HP(xscvdphp, float64, float16, VsrD(0), VsrH(3))
-+VSX_CVT_FP_TO_FP_HP(xscvhpdp, float16, float64, VsrH(3), VsrD(0))
-+
- uint64_t helper_xscvdpspn(CPUPPCState *env, uint64_t xb)
+-#define get_compat_level(cpuver) ( \
+-    ((cpuver) == CPU_POWERPC_LOGICAL_2_05) ? 2050 : \
+-    ((cpuver) == CPU_POWERPC_LOGICAL_2_06) ? 2060 : \
+-    ((cpuver) == CPU_POWERPC_LOGICAL_2_06_PLUS) ? 2061 : \
+-    ((cpuver) == CPU_POWERPC_LOGICAL_2_07) ? 2070 : 0)
+-
+-static void cas_handle_compat_cpu(PowerPCCPUClass *pcc, uint32_t pvr,
+-                                  unsigned max_lvl, unsigned *compat_lvl,
+-                                  unsigned *compat_pvr)
+-{
+-    unsigned lvl = get_compat_level(pvr);
+-    bool is205, is206, is207;
+-
+-    if (!lvl) {
+-        return;
+-    }
+-
+-    /* If it is a logical PVR, try to determine the highest level */
+-    is205 = (pcc->pcr_supported & PCR_COMPAT_2_05) &&
+-            (lvl == get_compat_level(CPU_POWERPC_LOGICAL_2_05));
+-    is206 = (pcc->pcr_supported & PCR_COMPAT_2_06) &&
+-            ((lvl == get_compat_level(CPU_POWERPC_LOGICAL_2_06)) ||
+-             (lvl == get_compat_level(CPU_POWERPC_LOGICAL_2_06_PLUS)));
+-    is207 = (pcc->pcr_supported & PCR_COMPAT_2_07) &&
+-            (lvl == get_compat_level(CPU_POWERPC_LOGICAL_2_07));
+-
+-    if (is205 || is206 || is207) {
+-        if (!max_lvl) {
+-            /* User did not set the level, choose the highest */
+-            if (*compat_lvl <= lvl) {
+-                *compat_lvl = lvl;
+-                *compat_pvr = pvr;
+-            }
+-        } else if (max_lvl >= lvl) {
+-            /* User chose the level, don't set higher than this */
+-            *compat_lvl = lvl;
+-            *compat_pvr = pvr;
+-        }
+-    }
+-}
+-
+-static target_ulong h_client_architecture_support(PowerPCCPU *cpu_,
++static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
+                                                   sPAPRMachineState *spapr,
+                                                   target_ulong opcode,
+                                                   target_ulong *args)
  {
-     float_status tstat = env->fp_status;
-diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-index 04e688d..5f290c6 100644
---- a/target/ppc/helper.h
-+++ b/target/ppc/helper.h
-@@ -428,8 +428,10 @@ DEF_HELPER_2(xscmpoqp, void, env, i32)
- DEF_HELPER_2(xscmpuqp, void, env, i32)
- DEF_HELPER_2(xsmaxdp, void, env, i32)
- DEF_HELPER_2(xsmindp, void, env, i32)
-+DEF_HELPER_2(xscvdphp, void, env, i32)
- DEF_HELPER_2(xscvdpsp, void, env, i32)
- DEF_HELPER_2(xscvdpspn, i64, env, i64)
-+DEF_HELPER_2(xscvhpdp, void, env, i32)
- DEF_HELPER_2(xscvspdp, void, env, i32)
- DEF_HELPER_2(xscvspdpn, i64, env, i64)
- DEF_HELPER_2(xscvdpsxds, void, env, i32)
-diff --git a/target/ppc/internal.h b/target/ppc/internal.h
-index 66cde46..1e27209 100644
---- a/target/ppc/internal.h
-+++ b/target/ppc/internal.h
-@@ -211,10 +211,12 @@ typedef union _ppc_vsr_t {
+     target_ulong list = ppc64_phys_to_real(args[0]);
+     target_ulong ov_table;
+-    PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu_);
+     CPUState *cs;
+-    bool cpu_match = false;
+-    unsigned old_compat_pvr = cpu_->compat_pvr;
+-    unsigned compat_lvl = 0, compat_pvr = 0;
+-    unsigned max_lvl = get_compat_level(cpu_->max_compat);
+-    int counter;
++    bool explicit_match = false; /* Matched the CPU's real PVR */
++    uint32_t max_compat = cpu->max_compat;
++    uint32_t best_compat = 0;
++    int i;
+     sPAPROptionVector *ov5_guest, *ov5_cas_old, *ov5_updates;
  
- #if defined(HOST_WORDS_BIGENDIAN)
- #define VsrB(i) u8[i]
-+#define VsrH(i) u16[i]
- #define VsrW(i) u32[i]
- #define VsrD(i) u64[i]
- #else
- #define VsrB(i) u8[15 - (i)]
-+#define VsrH(i) u16[7 - (i)]
- #define VsrW(i) u32[3 - (i)]
- #define VsrD(i) u64[1 - (i)]
- #endif
-@@ -241,4 +243,5 @@ static inline void putVSR(int n, ppc_vsr_t *vsr, CPUPPCState *env)
+-    /* Parse PVR list */
+-    for (counter = 0; counter < 512; ++counter) {
++    /*
++     * We scan the supplied table of PVRs looking for two things
++     *   1. Is our real CPU PVR in the list?
++     *   2. What's the "best" listed logical PVR
++     */
++    for (i = 0; i < 512; ++i) {
+         uint32_t pvr, pvr_mask;
+ 
+         pvr_mask = ldl_be_phys(&address_space_memory, list);
+-        list += 4;
+-        pvr = ldl_be_phys(&address_space_memory, list);
+-        list += 4;
+-
+-        trace_spapr_cas_pvr_try(pvr);
+-        if (!max_lvl &&
+-            ((cpu_->env.spr[SPR_PVR] & pvr_mask) == (pvr & pvr_mask))) {
+-            cpu_match = true;
+-            compat_pvr = 0;
+-        } else if (pvr == cpu_->compat_pvr) {
+-            cpu_match = true;
+-            compat_pvr = cpu_->compat_pvr;
+-        } else if (!cpu_match) {
+-            cas_handle_compat_cpu(pcc, pvr, max_lvl, &compat_lvl, &compat_pvr);
+-        }
+-        /* Terminator record */
++        pvr = ldl_be_phys(&address_space_memory, list + 4);
++        list += 8;
++
+         if (~pvr_mask & pvr) {
+-            break;
++            break; /* Terminator record */
+         }
++
++        if ((cpu->env.spr[SPR_PVR] & pvr_mask) == (pvr & pvr_mask)) {
++            explicit_match = true;
++        } else {
++            if (ppc_check_compat(cpu, pvr, best_compat, max_compat)) {
++                best_compat = pvr;
++            }
++        }
++    }
++
++    if ((best_compat == 0) && (!explicit_match || max_compat)) {
++        /* We couldn't find a suitable compatibility mode, and either
++         * the guest doesn't support "raw" mode for this CPU, or raw
++         * mode is disabled because a maximum compat mode is set */
++        return H_HARDWARE;
      }
- }
  
-+void helper_compute_fprf_float16(CPUPPCState *env, float16 arg);
- #endif /* PPC_INTERNAL_H */
-diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/vsx-impl.inc.c
-index c9ba0f5..2a409a3 100644
---- a/target/ppc/translate/vsx-impl.inc.c
-+++ b/target/ppc/translate/vsx-impl.inc.c
-@@ -805,8 +805,10 @@ GEN_VSX_HELPER_2(xscmpoqp, 0x04, 0x04, 0, PPC2_VSX)
- GEN_VSX_HELPER_2(xscmpuqp, 0x04, 0x14, 0, PPC2_VSX)
- GEN_VSX_HELPER_2(xsmaxdp, 0x00, 0x14, 0, PPC2_VSX)
- GEN_VSX_HELPER_2(xsmindp, 0x00, 0x15, 0, PPC2_VSX)
-+GEN_VSX_HELPER_2(xscvdphp, 0x16, 0x15, 0x11, PPC2_ISA300)
- GEN_VSX_HELPER_2(xscvdpsp, 0x12, 0x10, 0, PPC2_VSX)
- GEN_VSX_HELPER_XT_XB_ENV(xscvdpspn, 0x16, 0x10, 0, PPC2_VSX207)
-+GEN_VSX_HELPER_2(xscvhpdp, 0x16, 0x15, 0x10, PPC2_ISA300)
- GEN_VSX_HELPER_2(xscvspdp, 0x12, 0x14, 0, PPC2_VSX)
- GEN_VSX_HELPER_XT_XB_ENV(xscvspdpn, 0x16, 0x14, 0, PPC2_VSX207)
- GEN_VSX_HELPER_2(xscvdpsxds, 0x10, 0x15, 0, PPC2_VSX)
-diff --git a/target/ppc/translate/vsx-ops.inc.c b/target/ppc/translate/vsx-ops.inc.c
-index 096d358..5c01aed 100644
---- a/target/ppc/translate/vsx-ops.inc.c
-+++ b/target/ppc/translate/vsx-ops.inc.c
-@@ -151,8 +151,10 @@ GEN_VSX_XFORM_300(xscmpoqp, 0x04, 0x04, 0x00600001),
- GEN_VSX_XFORM_300(xscmpuqp, 0x04, 0x14, 0x00600001),
- GEN_XX3FORM(xsmaxdp, 0x00, 0x14, PPC2_VSX),
- GEN_XX3FORM(xsmindp, 0x00, 0x15, PPC2_VSX),
-+GEN_XX2FORM_EO(xscvdphp, 0x16, 0x15, 0x11, PPC2_ISA300),
- GEN_XX2FORM(xscvdpsp, 0x12, 0x10, PPC2_VSX),
- GEN_XX2FORM(xscvdpspn, 0x16, 0x10, PPC2_VSX207),
-+GEN_XX2FORM_EO(xscvhpdp, 0x16, 0x15, 0x10, PPC2_ISA300),
- GEN_XX2FORM(xscvspdp, 0x12, 0x14, PPC2_VSX),
- GEN_XX2FORM(xscvspdpn, 0x16, 0x14, PPC2_VSX207),
- GEN_XX2FORM(xscvdpsxds, 0x10, 0x15, PPC2_VSX),
+     /* Parsing finished */
+-    trace_spapr_cas_pvr(cpu_->compat_pvr, cpu_match,
+-                        compat_pvr, pcc->pcr_mask);
++    trace_spapr_cas_pvr(cpu->compat_pvr, explicit_match, best_compat);
+ 
+     /* Update CPUs */
+-    if (old_compat_pvr != compat_pvr) {
++    if (cpu->compat_pvr != best_compat) {
+         CPU_FOREACH(cs) {
+             SetCompatState s = {
+-                .compat_pvr = compat_pvr,
++                .compat_pvr = best_compat,
+                 .err = NULL,
+             };
+ 
+diff --git a/hw/ppc/trace-events b/hw/ppc/trace-events
+index 42b8ec0..f46995c 100644
+--- a/hw/ppc/trace-events
++++ b/hw/ppc/trace-events
+@@ -15,7 +15,7 @@ spapr_cas_continue(unsigned long n) "Copy changes to the guest: %ld bytes"
+ 
+ # hw/ppc/spapr_hcall.c
+ spapr_cas_pvr_try(uint32_t pvr) "%x"
+-spapr_cas_pvr(uint32_t cur_pvr, bool cpu_match, uint32_t new_pvr, uint64_t pcr) "current=%x, cpu_match=%u, new=%x, compat flags=%"PRIx64
++spapr_cas_pvr(uint32_t cur_pvr, bool explicit_match, uint32_t new_pvr) "current=%x, explicit_match=%u, new=%x"
+ 
+ # hw/ppc/spapr_iommu.c
+ spapr_iommu_put(uint64_t liobn, uint64_t ioba, uint64_t tce, uint64_t ret) "liobn=%"PRIx64" ioba=0x%"PRIx64" tce=0x%"PRIx64" ret=%"PRId64
 -- 
 2.9.3
