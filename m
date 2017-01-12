@@ -1,27 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35072)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36402)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cRhbS-0005Ky-Ku
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 10:47:56 -0500
+	(envelope-from <marcel@redhat.com>) id 1cRhei-0007rM-0s
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 10:51:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1cRhbO-0007AF-Iw
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 10:47:50 -0500
-Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:37617)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1cRhbO-00079U-9p
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 10:47:46 -0500
-Received: by mail-wm0-x22f.google.com with SMTP id c206so26481088wme.0
-	for <qemu-devel@nongnu.org>; Thu, 12 Jan 2017 07:47:46 -0800 (PST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu, 12 Jan 2017 15:47:29 +0000
-Message-Id: <20170112154731.1028-2-alex.bennee@linaro.org>
-In-Reply-To: <20170112154731.1028-1-alex.bennee@linaro.org>
-References: <20170112154731.1028-1-alex.bennee@linaro.org>
+	(envelope-from <marcel@redhat.com>) id 1cRhee-0000VW-1C
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 10:51:12 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52458)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1cRhed-0000Uh-Nx
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 10:51:07 -0500
+Received: from int-mx13.intmail.prod.int.phx2.redhat.com
+	(int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 45F8B61B96
+	for <qemu-devel@nongnu.org>; Thu, 12 Jan 2017 15:51:07 +0000 (UTC)
+References: <1484137136-8021-1-git-send-email-marcel@redhat.com>
+	<1484137136-8021-2-git-send-email-marcel@redhat.com>
+	<20170112173106-mutt-send-email-mst@kernel.org>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <bb4f7fc1-4c2c-8f29-d523-e762cb3b4376@redhat.com>
+Date: Thu, 12 Jan 2017 17:51:01 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 1/3] qom/cpu: move tlb_flush to
- cpu_common_reset
+In-Reply-To: <20170112173106-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH V2 1/3] hw/pcie: Introduce a base class for
+ PCI Express Root Ports
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,551 +35,352 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: rth@twiddle.net
-Cc: ehabkost@redhat.com, qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Michael Walle <michael@walle.cc>, Laurent Vivier <laurent@vivier.eu>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>, Anthony Green <green@moxielogic.com>, Jia Liu <proljc@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, "open list:ARM" <qemu-arm@nongnu.org>, "open list:PowerPC" <qemu-ppc@nongnu.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-It is a common thing amongst the various cpu reset functions want to
-flush the SoftMMU's TLB entries. This is done either by calling
-tlb_flush directly or by way of a general memset of the CPU
-structure (sometimes both).
+On 01/12/2017 05:36 PM, Michael S. Tsirkin wrote:
+> On Wed, Jan 11, 2017 at 02:18:54PM +0200, Marcel Apfelbaum wrote:
+>> The 'base' PCI Express Root Port includes
+>> the common code to be re-used for all
+>> Root Ports implementations. Most of the code
+>> was taken from the current implementation
+>> of Intel's IOH 3420 Root Port.
+>>
+>> Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
+>> ---
+>>  default-configs/arm-softmmu.mak    |   1 +
+>>  default-configs/i386-softmmu.mak   |   1 +
+>>  default-configs/x86_64-softmmu.mak |   1 +
+>>  hw/pci-bridge/Makefile.objs        |   1 +
+>>  hw/pci-bridge/pcie_root_port.c     | 194 +++++++++++++++++++++++++++++++++++++
+>>  include/hw/pci/pcie_port.h         |  18 ++++
+>>  6 files changed, 216 insertions(+)
+>>  create mode 100644 hw/pci-bridge/pcie_root_port.c
+>>
+>> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+>> index 6de3e16..6f2a180 100644
+>> --- a/default-configs/arm-softmmu.mak
+>> +++ b/default-configs/arm-softmmu.mak
+>> @@ -108,6 +108,7 @@ CONFIG_FSL_IMX25=y
+>>
+>>  CONFIG_IMX_I2C=y
+>>
+>> +CONFIG_PCIE_PORT=y
+>>  CONFIG_XIO3130=y
+>>  CONFIG_IOH3420=y
+>>  CONFIG_I82801B11=y
+>> diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
+>> index 0b51360..9288838 100644
+>> --- a/default-configs/i386-softmmu.mak
+>> +++ b/default-configs/i386-softmmu.mak
+>> @@ -51,6 +51,7 @@ CONFIG_PVPANIC=y
+>>  CONFIG_MEM_HOTPLUG=y
+>>  CONFIG_NVDIMM=y
+>>  CONFIG_ACPI_NVDIMM=y
+>> +CONFIG_PCIE_PORT=y
+>>  CONFIG_XIO3130=y
+>>  CONFIG_IOH3420=y
+>>  CONFIG_I82801B11=y
+>> diff --git a/default-configs/x86_64-softmmu.mak b/default-configs/x86_64-softmmu.mak
+>> index 7f89503..7d2c2d4 100644
+>> --- a/default-configs/x86_64-softmmu.mak
+>> +++ b/default-configs/x86_64-softmmu.mak
+>> @@ -51,6 +51,7 @@ CONFIG_PVPANIC=y
+>>  CONFIG_MEM_HOTPLUG=y
+>>  CONFIG_NVDIMM=y
+>>  CONFIG_ACPI_NVDIMM=y
+>> +CONFIG_PCIE_PORT=y
+>>  CONFIG_XIO3130=y
+>>  CONFIG_IOH3420=y
+>>  CONFIG_I82801B11=y
+>> diff --git a/hw/pci-bridge/Makefile.objs b/hw/pci-bridge/Makefile.objs
+>> index f2adfe3..4f2039f 100644
+>> --- a/hw/pci-bridge/Makefile.objs
+>> +++ b/hw/pci-bridge/Makefile.objs
+>> @@ -1,5 +1,6 @@
+>>  common-obj-y += pci_bridge_dev.o
+>>  common-obj-y += pci_expander_bridge.o
+>> +common-obj-$(CONFIG_PCIE_PORT) += pcie_root_port.o
+>>  common-obj-$(CONFIG_XIO3130) += xio3130_upstream.o xio3130_downstream.o
+>>  common-obj-$(CONFIG_IOH3420) += ioh3420.o
+>>  common-obj-$(CONFIG_I82801B11) += i82801b11.o
+>> diff --git a/hw/pci-bridge/pcie_root_port.c b/hw/pci-bridge/pcie_root_port.c
+>> new file mode 100644
+>> index 0000000..e84ae14
+>> --- /dev/null
+>> +++ b/hw/pci-bridge/pcie_root_port.c
+>> @@ -0,0 +1,194 @@
+>> +/*
+>> + * Generic PCI Express Root Port emulation
+>> + *
+>> + * Copyright (C) 2016 Red Hat Inc
+>> + *
+>> + * Authors:
+>> + *   Marcel Apfelbaum <marcel@redhat.com>
+>> + *
+>> + * Most of the code was migrated from hw/pci-bridge/ioh3420.
+>> + *
+>> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+>> + * See the COPYING file in the top-level directory.
+>> + */
+>> +
+>> +#include "qemu/osdep.h"
+>> +#include "qapi/error.h"
+>> +#include "hw/pci/pcie_port.h"
+>> +#include "hw/pci/msi.h"
+>> +
+>> +#define PCIE_ROOT_PORT_MSI_VECTORS              2
+>> +#define PCIE_ROOT_PORT_MSI_SUPPORTED_FLAGS      PCI_MSI_FLAGS_MASKBIT
+>> +#define PCIE_ROOT_PORT_AER_OFFSET               0x100
+>
 
-This moves the tlb_flush call to the common reset function and
-additionally ensures it is only done for the CONFIG_SOFTMMU case and
-when tcg is enabled.
+Hi Michael
 
-In some target cases we add an empty end_of_reset_fields structure to the
-target vCPU structure so have a clear end point for any memset which
-is resetting value in the structure before CPU_COMMON (where the TLB
-structures are).
+> This isn't generic either.
+>
 
-While this is a nice clean-up in general it is also a precursor for
-changes coming to cputlb for MTTCG where the clearing of entries
-can't be done arbitrarily across vCPUs. Currently the cpu_reset
-function is usually called from the context of another vCPU as the
-architectural power up sequence is run. By using the cputlb API
-functions we can ensure the right behaviour in the future.
+It is used by the generic port which happens to be in the same file (patch 3).
+I'll move the define to patch 3.
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Richard Henderson <rth@twiddle.net>
+>> +
+>> +/*
+>> + * If two MSI vector
+>
+>
+> MSI vectors
+>
 
----
-v3:
-  - split tcg_enabled() into a separate patch
----
- qom/cpu.c                   | 4 ++++
- target/arm/cpu.c            | 5 ++---
- target/arm/cpu.h            | 5 ++++-
- target/cris/cpu.c           | 3 +--
- target/cris/cpu.h           | 9 ++++++---
- target/i386/cpu.c           | 2 --
- target/i386/cpu.h           | 6 ++++--
- target/lm32/cpu.c           | 3 +--
- target/lm32/cpu.h           | 3 +++
- target/m68k/cpu.c           | 3 +--
- target/m68k/cpu.h           | 3 +++
- target/microblaze/cpu.c     | 3 +--
- target/microblaze/cpu.h     | 3 +++
- target/mips/cpu.c           | 3 +--
- target/mips/cpu.h           | 3 +++
- target/moxie/cpu.c          | 4 +---
- target/moxie/cpu.h          | 3 +++
- target/openrisc/cpu.c       | 9 +--------
- target/openrisc/cpu.h       | 3 +++
- target/ppc/translate_init.c | 3 ---
- target/s390x/cpu.c          | 7 ++-----
- target/s390x/cpu.h          | 5 +++--
- target/sh4/cpu.c            | 3 +--
- target/sh4/cpu.h            | 3 +++
- target/sparc/cpu.c          | 3 +--
- target/sparc/cpu.h          | 3 +++
- target/tilegx/cpu.c         | 3 +--
- target/tilegx/cpu.h         | 3 +++
- target/tricore/cpu.c        | 2 --
- 29 files changed, 62 insertions(+), 50 deletions(-)
+OK
 
-diff --git a/qom/cpu.c b/qom/cpu.c
-index 03d9190f8c..cc51de2a8c 100644
---- a/qom/cpu.c
-+++ b/qom/cpu.c
-@@ -273,6 +273,10 @@ static void cpu_common_reset(CPUState *cpu)
-     for (i = 0; i < TB_JMP_CACHE_SIZE; ++i) {
-         atomic_set(&cpu->tb_jmp_cache[i], NULL);
-     }
-+
-+#ifdef CONFIG_SOFTMMU
-+    tlb_flush(cpu, 0);
-+#endif
- }
- 
- static bool cpu_common_has_work(CPUState *cs)
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index f5cb30af6c..91046111d9 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -122,7 +122,8 @@ static void arm_cpu_reset(CPUState *s)
- 
-     acc->parent_reset(s);
- 
--    memset(env, 0, offsetof(CPUARMState, features));
-+    memset(env, 0, offsetof(CPUARMState, end_reset_fields));
-+
-     g_hash_table_foreach(cpu->cp_regs, cp_reg_reset, cpu);
-     g_hash_table_foreach(cpu->cp_regs, cp_reg_check_reset, cpu);
- 
-@@ -226,8 +227,6 @@ static void arm_cpu_reset(CPUState *s)
-                               &env->vfp.fp_status);
-     set_float_detect_tininess(float_tininess_before_rounding,
-                               &env->vfp.standard_fp_status);
--    tlb_flush(s, 1);
--
- #ifndef CONFIG_USER_ONLY
-     if (kvm_enabled()) {
-         kvm_arm_reset_vcpu(cpu);
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index ab119e62ab..7bd16eec18 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -491,9 +491,12 @@ typedef struct CPUARMState {
-     struct CPUBreakpoint *cpu_breakpoint[16];
-     struct CPUWatchpoint *cpu_watchpoint[16];
- 
-+    /* Fields up to this point are cleared by a CPU reset */
-+    struct {} end_reset_fields;
-+
-     CPU_COMMON
- 
--    /* These fields after the common ones so they are preserved on reset.  */
-+    /* Fields after CPU_COMMON are preserved across CPU reset. */
- 
-     /* Internal CPU feature flags.  */
-     uint64_t features;
-diff --git a/target/cris/cpu.c b/target/cris/cpu.c
-index 2e9ab9700e..5f766f09d6 100644
---- a/target/cris/cpu.c
-+++ b/target/cris/cpu.c
-@@ -52,9 +52,8 @@ static void cris_cpu_reset(CPUState *s)
-     ccc->parent_reset(s);
- 
-     vr = env->pregs[PR_VR];
--    memset(env, 0, offsetof(CPUCRISState, load_info));
-+    memset(env, 0, offsetof(CPUCRISState, end_reset_fields));
-     env->pregs[PR_VR] = vr;
--    tlb_flush(s, 1);
- 
- #if defined(CONFIG_USER_ONLY)
-     /* start in user mode with interrupts enabled.  */
-diff --git a/target/cris/cpu.h b/target/cris/cpu.h
-index 43d5f9d1da..920e1c33ba 100644
---- a/target/cris/cpu.h
-+++ b/target/cris/cpu.h
-@@ -167,10 +167,13 @@ typedef struct CPUCRISState {
- 	 */
-         TLBSet tlbsets[2][4][16];
- 
--	CPU_COMMON
-+        /* Fields up to this point are cleared by a CPU reset */
-+        struct {} end_reset_fields;
- 
--    /* Members from load_info on are preserved across resets.  */
--    void *load_info;
-+        CPU_COMMON
-+
-+        /* Members from load_info on are preserved across resets.  */
-+        void *load_info;
- } CPUCRISState;
- 
- /**
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index b0640f1e38..b76e1d8cb9 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -2819,8 +2819,6 @@ static void x86_cpu_reset(CPUState *s)
- 
-     memset(env, 0, offsetof(CPUX86State, end_reset_fields));
- 
--    tlb_flush(s, 1);
--
-     env->old_exception = -1;
- 
-     /* init to reset state */
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index a7f2f6099d..8587efa8b0 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1122,10 +1122,12 @@ typedef struct CPUX86State {
-     uint8_t nmi_injected;
-     uint8_t nmi_pending;
- 
-+    /* Fields up to this point are cleared by a CPU reset */
-+    struct {} end_reset_fields;
-+
-     CPU_COMMON
- 
--    /* Fields from here on are preserved across CPU reset. */
--    struct {} end_reset_fields;
-+    /* Fields after CPU_COMMON are preserved across CPU reset. */
- 
-     /* processor features (e.g. for CPUID insn) */
-     /* Minimum level/xlevel/xlevel2, based on CPU model + features */
-diff --git a/target/lm32/cpu.c b/target/lm32/cpu.c
-index 8d939a7779..2b8c36b6d0 100644
---- a/target/lm32/cpu.c
-+++ b/target/lm32/cpu.c
-@@ -128,10 +128,9 @@ static void lm32_cpu_reset(CPUState *s)
-     lcc->parent_reset(s);
- 
-     /* reset cpu state */
--    memset(env, 0, offsetof(CPULM32State, eba));
-+    memset(env, 0, offsetof(CPULM32State, end_reset_fields));
- 
-     lm32_cpu_init_cfg_reg(cpu);
--    tlb_flush(s, 1);
- }
- 
- static void lm32_cpu_disas_set_info(CPUState *cpu, disassemble_info *info)
-diff --git a/target/lm32/cpu.h b/target/lm32/cpu.h
-index d8a3515244..1d972cb26b 100644
---- a/target/lm32/cpu.h
-+++ b/target/lm32/cpu.h
-@@ -165,6 +165,9 @@ struct CPULM32State {
-     struct CPUBreakpoint *cpu_breakpoint[4];
-     struct CPUWatchpoint *cpu_watchpoint[4];
- 
-+    /* Fields up to this point are cleared by a CPU reset */
-+    struct {} end_reset_fields;
-+
-     CPU_COMMON
- 
-     /* Fields from here on are preserved across CPU reset. */
-diff --git a/target/m68k/cpu.c b/target/m68k/cpu.c
-index ba17480098..fa10b6e4cd 100644
---- a/target/m68k/cpu.c
-+++ b/target/m68k/cpu.c
-@@ -52,7 +52,7 @@ static void m68k_cpu_reset(CPUState *s)
- 
-     mcc->parent_reset(s);
- 
--    memset(env, 0, offsetof(CPUM68KState, features));
-+    memset(env, 0, offsetof(CPUM68KState, end_reset_fields));
- #if !defined(CONFIG_USER_ONLY)
-     env->sr = 0x2700;
- #endif
-@@ -61,7 +61,6 @@ static void m68k_cpu_reset(CPUState *s)
-     cpu_m68k_set_ccr(env, 0);
-     /* TODO: We should set PC from the interrupt vector.  */
-     env->pc = 0;
--    tlb_flush(s, 1);
- }
- 
- static void m68k_cpu_disas_set_info(CPUState *s, disassemble_info *info)
-diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
-index 0b4ed7b8a6..aeac95daa3 100644
---- a/target/m68k/cpu.h
-+++ b/target/m68k/cpu.h
-@@ -111,6 +111,9 @@ typedef struct CPUM68KState {
- 
-     uint32_t qregs[MAX_QREGS];
- 
-+    /* Fields up to this point are cleared by a CPU reset */
-+    struct {} end_reset_fields;
-+
-     CPU_COMMON
- 
-     /* Fields from here on are preserved across CPU reset. */
-diff --git a/target/microblaze/cpu.c b/target/microblaze/cpu.c
-index 389c7b691e..3d58869716 100644
---- a/target/microblaze/cpu.c
-+++ b/target/microblaze/cpu.c
-@@ -103,9 +103,8 @@ static void mb_cpu_reset(CPUState *s)
- 
-     mcc->parent_reset(s);
- 
--    memset(env, 0, offsetof(CPUMBState, pvr));
-+    memset(env, 0, offsetof(CPUMBState, end_reset_fields));
-     env->res_addr = RES_ADDR_NONE;
--    tlb_flush(s, 1);
- 
-     /* Disable stack protector.  */
-     env->shr = ~0;
-diff --git a/target/microblaze/cpu.h b/target/microblaze/cpu.h
-index beb75ffd26..bf6963bcb7 100644
---- a/target/microblaze/cpu.h
-+++ b/target/microblaze/cpu.h
-@@ -267,6 +267,9 @@ struct CPUMBState {
-     struct microblaze_mmu mmu;
- #endif
- 
-+    /* Fields up to this point are cleared by a CPU reset */
-+    struct {} end_reset_fields;
-+
-     CPU_COMMON
- 
-     /* These fields are preserved on reset.  */
-diff --git a/target/mips/cpu.c b/target/mips/cpu.c
-index 65ca607f88..1bb66b7a5a 100644
---- a/target/mips/cpu.c
-+++ b/target/mips/cpu.c
-@@ -100,8 +100,7 @@ static void mips_cpu_reset(CPUState *s)
- 
-     mcc->parent_reset(s);
- 
--    memset(env, 0, offsetof(CPUMIPSState, mvp));
--    tlb_flush(s, 1);
-+    memset(env, 0, offsetof(CPUMIPSState, end_reset_fields));
- 
-     cpu_state_reset(env);
- 
-diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-index 5182dc74ff..3146a6017d 100644
---- a/target/mips/cpu.h
-+++ b/target/mips/cpu.h
-@@ -607,6 +607,9 @@ struct CPUMIPSState {
-     uint32_t CP0_TCStatus_rw_bitmask; /* Read/write bits in CP0_TCStatus */
-     int insn_flags; /* Supported instruction set */
- 
-+    /* Fields up to this point are cleared by a CPU reset */
-+    struct {} end_reset_fields;
-+
-     CPU_COMMON
- 
-     /* Fields from here on are preserved across CPU reset. */
-diff --git a/target/moxie/cpu.c b/target/moxie/cpu.c
-index b0be4a7551..927b1a1e44 100644
---- a/target/moxie/cpu.c
-+++ b/target/moxie/cpu.c
-@@ -45,10 +45,8 @@ static void moxie_cpu_reset(CPUState *s)
- 
-     mcc->parent_reset(s);
- 
--    memset(env, 0, sizeof(CPUMoxieState));
-+    memset(env, 0, offsetof(CPUMoxieState, end_reset_fields));
-     env->pc = 0x1000;
--
--    tlb_flush(s, 1);
- }
- 
- static void moxie_cpu_disas_set_info(CPUState *cpu, disassemble_info *info)
-diff --git a/target/moxie/cpu.h b/target/moxie/cpu.h
-index 3e880facf4..8991aaef9a 100644
---- a/target/moxie/cpu.h
-+++ b/target/moxie/cpu.h
-@@ -56,6 +56,9 @@ typedef struct CPUMoxieState {
- 
-     void *irq[8];
- 
-+    /* Fields up to this point are cleared by a CPU reset */
-+    struct {} end_reset_fields;
-+
-     CPU_COMMON
- 
- } CPUMoxieState;
-diff --git a/target/openrisc/cpu.c b/target/openrisc/cpu.c
-index 698e87bb25..422139d29f 100644
---- a/target/openrisc/cpu.c
-+++ b/target/openrisc/cpu.c
-@@ -44,14 +44,7 @@ static void openrisc_cpu_reset(CPUState *s)
- 
-     occ->parent_reset(s);
- 
--#ifndef CONFIG_USER_ONLY
--    memset(&cpu->env, 0, offsetof(CPUOpenRISCState, tlb));
--#else
--    memset(&cpu->env, 0, offsetof(CPUOpenRISCState, irq));
--#endif
--
--    tlb_flush(s, 1);
--    /*tb_flush(&cpu->env);    FIXME: Do we need it?  */
-+    memset(&cpu->env, 0, offsetof(CPUOpenRISCState, end_reset_fields));
- 
-     cpu->env.pc = 0x100;
-     cpu->env.sr = SR_FO | SR_SM;
-diff --git a/target/openrisc/cpu.h b/target/openrisc/cpu.h
-index aaf153579a..508ef568b4 100644
---- a/target/openrisc/cpu.h
-+++ b/target/openrisc/cpu.h
-@@ -300,6 +300,9 @@ typedef struct CPUOpenRISCState {
-                                  in solt so far.  */
-     uint32_t btaken;          /* the SR_F bit */
- 
-+    /* Fields up to this point are cleared by a CPU reset */
-+    struct {} end_reset_fields;
-+
-     CPU_COMMON
- 
-     /* Fields from here on are preserved across CPU reset. */
-diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-index 626e03186c..4ff987226e 100644
---- a/target/ppc/translate_init.c
-+++ b/target/ppc/translate_init.c
-@@ -10415,9 +10415,6 @@ static void ppc_cpu_reset(CPUState *s)
-         }
-         env->spr[i] = spr->default_value;
-     }
--
--    /* Flush all TLBs */
--    tlb_flush(s, 1);
- }
- 
- #ifndef CONFIG_USER_ONLY
-diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-index 0a39d31237..066dcd17df 100644
---- a/target/s390x/cpu.c
-+++ b/target/s390x/cpu.c
-@@ -82,7 +82,6 @@ static void s390_cpu_reset(CPUState *s)
-     scc->parent_reset(s);
-     cpu->env.sigp_order = 0;
-     s390_cpu_set_state(CPU_STATE_STOPPED, cpu);
--    tlb_flush(s, 1);
- }
- 
- /* S390CPUClass::initial_reset() */
-@@ -94,7 +93,7 @@ static void s390_cpu_initial_reset(CPUState *s)
- 
-     s390_cpu_reset(s);
-     /* initial reset does not touch regs,fregs and aregs */
--    memset(&env->fpc, 0, offsetof(CPUS390XState, cpu_num) -
-+    memset(&env->fpc, 0, offsetof(CPUS390XState, end_reset_fields) -
-                          offsetof(CPUS390XState, fpc));
- 
-     /* architectured initial values for CR 0 and 14 */
-@@ -118,7 +117,6 @@ static void s390_cpu_initial_reset(CPUState *s)
-     if (kvm_enabled()) {
-         kvm_s390_reset_vcpu(cpu);
-     }
--    tlb_flush(s, 1);
- }
- 
- /* CPUClass:reset() */
-@@ -133,7 +131,7 @@ static void s390_cpu_full_reset(CPUState *s)
-     cpu->env.sigp_order = 0;
-     s390_cpu_set_state(CPU_STATE_STOPPED, cpu);
- 
--    memset(env, 0, offsetof(CPUS390XState, cpu_num));
-+    memset(env, 0, offsetof(CPUS390XState, end_reset_fields));
- 
-     /* architectured initial values for CR 0 and 14 */
-     env->cregs[0] = CR0_RESET;
-@@ -156,7 +154,6 @@ static void s390_cpu_full_reset(CPUState *s)
-     if (kvm_enabled()) {
-         kvm_s390_reset_vcpu(cpu);
-     }
--    tlb_flush(s, 1);
- }
- 
- #if !defined(CONFIG_USER_ONLY)
-diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-index fd36a25cf5..058ddad83a 100644
---- a/target/s390x/cpu.h
-+++ b/target/s390x/cpu.h
-@@ -139,9 +139,10 @@ typedef struct CPUS390XState {
- 
-     uint8_t riccb[64];
- 
--    CPU_COMMON
-+    /* Fields up to this point are cleared by a CPU reset */
-+    struct {} end_reset_fields;
- 
--    /* reset does memset(0) up to here */
-+    CPU_COMMON
- 
-     uint32_t cpu_num;
-     uint32_t machine_type;
-diff --git a/target/sh4/cpu.c b/target/sh4/cpu.c
-index a38f6a6ded..9a481c35dc 100644
---- a/target/sh4/cpu.c
-+++ b/target/sh4/cpu.c
-@@ -56,8 +56,7 @@ static void superh_cpu_reset(CPUState *s)
- 
-     scc->parent_reset(s);
- 
--    memset(env, 0, offsetof(CPUSH4State, id));
--    tlb_flush(s, 1);
-+    memset(env, 0, offsetof(CPUSH4State, end_reset_fields));
- 
-     env->pc = 0xA0000000;
- #if defined(CONFIG_USER_ONLY)
-diff --git a/target/sh4/cpu.h b/target/sh4/cpu.h
-index 478ab55868..cad8989f7e 100644
---- a/target/sh4/cpu.h
-+++ b/target/sh4/cpu.h
-@@ -175,6 +175,9 @@ typedef struct CPUSH4State {
- 
-     uint32_t ldst;
- 
-+    /* Fields up to this point are cleared by a CPU reset */
-+    struct {} end_reset_fields;
-+
-     CPU_COMMON
- 
-     /* Fields from here on are preserved over CPU reset. */
-diff --git a/target/sparc/cpu.c b/target/sparc/cpu.c
-index 4e07b92fbd..d6583f1c2a 100644
---- a/target/sparc/cpu.c
-+++ b/target/sparc/cpu.c
-@@ -36,8 +36,7 @@ static void sparc_cpu_reset(CPUState *s)
- 
-     scc->parent_reset(s);
- 
--    memset(env, 0, offsetof(CPUSPARCState, version));
--    tlb_flush(s, 1);
-+    memset(env, 0, offsetof(CPUSPARCState, end_reset_fields));
-     env->cwp = 0;
- #ifndef TARGET_SPARC64
-     env->wim = 1;
-diff --git a/target/sparc/cpu.h b/target/sparc/cpu.h
-index 5fb0ed1aad..601c018a05 100644
---- a/target/sparc/cpu.h
-+++ b/target/sparc/cpu.h
-@@ -419,6 +419,9 @@ struct CPUSPARCState {
-     /* NOTE: we allow 8 more registers to handle wrapping */
-     target_ulong regbase[MAX_NWINDOWS * 16 + 8];
- 
-+    /* Fields up to this point are cleared by a CPU reset */
-+    struct {} end_reset_fields;
-+
-     CPU_COMMON
- 
-     /* Fields from here on are preserved across CPU reset. */
-diff --git a/target/tilegx/cpu.c b/target/tilegx/cpu.c
-index 454793f94a..d90e38e88c 100644
---- a/target/tilegx/cpu.c
-+++ b/target/tilegx/cpu.c
-@@ -84,8 +84,7 @@ static void tilegx_cpu_reset(CPUState *s)
- 
-     tcc->parent_reset(s);
- 
--    memset(env, 0, sizeof(CPUTLGState));
--    tlb_flush(s, 1);
-+    memset(env, 0, offsetof(CPUTLGState, end_reset_fields));
- }
- 
- static void tilegx_cpu_realizefn(DeviceState *dev, Error **errp)
-diff --git a/target/tilegx/cpu.h b/target/tilegx/cpu.h
-index 1735427233..f32be49f65 100644
---- a/target/tilegx/cpu.h
-+++ b/target/tilegx/cpu.h
-@@ -97,6 +97,9 @@ typedef struct CPUTLGState {
-     uint32_t sigcode;                  /* Signal code */
- #endif
- 
-+    /* Fields up to this point are cleared by a CPU reset */
-+    struct {} end_reset_fields;
-+
-     CPU_COMMON
- } CPUTLGState;
- 
-diff --git a/target/tricore/cpu.c b/target/tricore/cpu.c
-index 785b76bd3a..08f50e2ba7 100644
---- a/target/tricore/cpu.c
-+++ b/target/tricore/cpu.c
-@@ -53,8 +53,6 @@ static void tricore_cpu_reset(CPUState *s)
- 
-     tcc->parent_reset(s);
- 
--    tlb_flush(s, 1);
--
-     cpu_state_reset(env);
- }
- 
--- 
-2.11.0
+>> are allocated, Advanced Error Interrupt Message Number
+>> + * is 1. otherwise 0.
+>> + * 17.12.5.10 RPERRSTS,  32:27 bit Advanced Error Interrupt Message Number.
+>
+> Hmm I see it in
+> 7.10.10. Root Error Status Register (Offset 30h)
+>
+> which spec is this number from?
+>
+
+No idea, the description is from the Intel Port code, I'll update.
+
+>
+>> + */
+>> +static uint8_t rp_aer_vector(const PCIDevice *d)
+>> +{
+>> +    switch (msi_nr_vectors_allocated(d)) {
+>> +    case 1:
+>> +        return 0;
+>> +    case 2:
+>> +        return 1;
+>> +    case 4:
+>> +    case 8:
+>> +    case 16:
+>> +    case 32:
+>
+> what are these doing here?
+>
+
+Will remove.
+
+>> +    default:
+>> +        break;
+>> +    }
+>> +    abort();
+>> +    return 0;
+>> +}
+>
+> I don't believe it's a generic thing. This is just how
+> intel did it, isn't it?
+>
+
+Yes, but since we have only 2 implementations
+and both are working the same I think they can share it
+until the functionality will split.
+
+An alternative is to add a function to the base class and
+an implementation for each derived class, but since the code
+ultimately will look the same I preferred to keep it simple.
+
+Thanks for the review,
+Marcel
+
+>
+>> +
+>> +static void rp_aer_vector_update(PCIDevice *d)
+>> +{
+>> +    pcie_aer_root_set_vector(d, rp_aer_vector(d));
+>> +}
+>> +
+>> +static void rp_write_config(PCIDevice *d, uint32_t address,
+>> +                            uint32_t val, int len)
+>> +{
+>> +    uint32_t root_cmd =
+>> +        pci_get_long(d->config + d->exp.aer_cap + PCI_ERR_ROOT_COMMAND);
+>> +
+>> +    pci_bridge_write_config(d, address, val, len);
+>> +    rp_aer_vector_update(d);
+>> +    pcie_cap_slot_write_config(d, address, val, len);
+>> +    pcie_aer_write_config(d, address, val, len);
+>> +    pcie_aer_root_write_config(d, address, val, len, root_cmd);
+>> +}
+>> +
+>> +static void rp_reset(DeviceState *qdev)
+>> +{
+>> +    PCIDevice *d = PCI_DEVICE(qdev);
+>> +
+>> +    rp_aer_vector_update(d);
+>> +    pcie_cap_root_reset(d);
+>> +    pcie_cap_deverr_reset(d);
+>> +    pcie_cap_slot_reset(d);
+>> +    pcie_cap_arifwd_reset(d);
+>> +    pcie_aer_root_reset(d);
+>> +    pci_bridge_reset(qdev);
+>> +    pci_bridge_disable_base_limit(d);
+>> +}
+>> +
+>> +static void rp_realize(PCIDevice *d, Error **errp)
+>> +{
+>> +    PCIEPort *p = PCIE_PORT(d);
+>> +    PCIESlot *s = PCIE_SLOT(d);
+>> +    PCIDeviceClass *dc = PCI_DEVICE_GET_CLASS(d);
+>> +    PCIERootPortClass *rpc = PCIE_ROOT_PORT_GET_CLASS(d);
+>> +    int rc;
+>> +    Error *local_err = NULL;
+>> +
+>> +    pci_config_set_interrupt_pin(d->config, 1);
+>> +    pci_bridge_initfn(d, TYPE_PCIE_BUS);
+>> +    pcie_port_init_reg(d);
+>> +
+>> +    rc = pci_bridge_ssvid_init(d, rpc->ssvid_offset, dc->vendor_id, rpc->ssid);
+>> +    if (rc < 0) {
+>> +        error_setg(errp, "Can't init SSV ID, error %d", rc);
+>> +        goto err_bridge;
+>> +    }
+>> +
+>> +    rc = msi_init(d, rpc->msi_offset, PCIE_ROOT_PORT_MSI_VECTORS,
+>> +                  PCIE_ROOT_PORT_MSI_SUPPORTED_FLAGS & PCI_MSI_FLAGS_64BIT,
+>> +                  PCIE_ROOT_PORT_MSI_SUPPORTED_FLAGS & PCI_MSI_FLAGS_MASKBIT,
+>> +                  &local_err);
+>> +    if (rc < 0) {
+>> +        assert(rc == -ENOTSUP);
+>> +        error_propagate(errp, local_err);
+>> +        goto err_bridge;
+>> +    }
+>> +
+>> +    rc = pcie_cap_init(d, rpc->exp_offset, PCI_EXP_TYPE_ROOT_PORT, p->port);
+>> +    if (rc < 0) {
+>> +        error_setg(errp, "Can't add Root Port capability, error %d", rc);
+>> +        goto err_msi;
+>> +    }
+>> +
+>> +    pcie_cap_arifwd_init(d);
+>> +    pcie_cap_deverr_init(d);
+>> +    pcie_cap_slot_init(d, s->slot);
+>> +    pcie_cap_root_init(d);
+>> +
+>> +    pcie_chassis_create(s->chassis);
+>> +    rc = pcie_chassis_add_slot(s);
+>> +    if (rc < 0) {
+>> +        error_setg(errp, "Can't add chassis slot, error %d", rc);
+>> +        goto err_pcie_cap;
+>> +    }
+>> +
+>> +    rc = pcie_aer_init(d, PCI_ERR_VER, rpc->aer_offset,
+>> +                       PCI_ERR_SIZEOF, &local_err);
+>> +    if (rc < 0) {
+>> +        error_propagate(errp, local_err);
+>> +        goto err;
+>> +    }
+>> +    pcie_aer_root_init(d);
+>> +    rp_aer_vector_update(d);
+>> +
+>> +    return;
+>> +
+>> +err:
+>> +    pcie_chassis_del_slot(s);
+>> +err_pcie_cap:
+>> +    pcie_cap_exit(d);
+>> +err_msi:
+>> +    msi_uninit(d);
+>> +err_bridge:
+>> +    pci_bridge_exitfn(d);
+>> +}
+>> +
+>> +static void rp_exit(PCIDevice *d)
+>> +{
+>> +    PCIESlot *s = PCIE_SLOT(d);
+>> +
+>> +    pcie_aer_exit(d);
+>> +    pcie_chassis_del_slot(s);
+>> +    pcie_cap_exit(d);
+>> +    msi_uninit(d);
+>> +    pci_bridge_exitfn(d);
+>> +}
+>> +
+>> +static Property rp_props[] = {
+>> +    DEFINE_PROP_BIT(COMPAT_PROP_PCP, PCIDevice, cap_present,
+>> +                    QEMU_PCIE_SLTCAP_PCP_BITNR, true),
+>> +    DEFINE_PROP_END_OF_LIST()
+>> +};
+>> +
+>> +static void rp_class_init(ObjectClass *klass, void *data)
+>> +{
+>> +    DeviceClass *dc = DEVICE_CLASS(klass);
+>> +    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+>> +    PCIERootPortClass *rpc = PCIE_ROOT_PORT_CLASS(klass);
+>> +
+>> +    k->is_express = 1;
+>> +    k->is_bridge = 1;
+>> +    k->config_write = rp_write_config;
+>> +    k->realize = rp_realize;
+>> +    k->exit = rp_exit;
+>> +    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+>> +    dc->reset = rp_reset;
+>> +    dc->props = rp_props;
+>> +    rpc->aer_offset = PCIE_ROOT_PORT_AER_OFFSET;
+>> +}
+>> +
+>> +static const TypeInfo rp_info = {
+>> +    .name          = TYPE_PCIE_ROOT_PORT,
+>> +    .parent        = TYPE_PCIE_SLOT,
+>> +    .class_init    = rp_class_init,
+>> +    .abstract      = true,
+>> +    .class_size = sizeof(PCIERootPortClass),
+>> +};
+>> +
+>> +static void rp_register_types(void)
+>> +{
+>> +    type_register_static(&rp_info);
+>> +}
+>> +
+>> +type_init(rp_register_types)
+>> diff --git a/include/hw/pci/pcie_port.h b/include/hw/pci/pcie_port.h
+>> index f7b64db..a8eee56 100644
+>> --- a/include/hw/pci/pcie_port.h
+>> +++ b/include/hw/pci/pcie_port.h
+>> @@ -57,4 +57,22 @@ PCIESlot *pcie_chassis_find_slot(uint8_t chassis, uint16_t slot);
+>>  int pcie_chassis_add_slot(struct PCIESlot *slot);
+>>  void pcie_chassis_del_slot(PCIESlot *s);
+>>
+>> +#define TYPE_PCIE_ROOT_PORT         "pcie-root-port-base"
+>> +#define PCIE_ROOT_PORT_CLASS(klass) \
+>> +     OBJECT_CLASS_CHECK(PCIERootPortClass, (klass), TYPE_PCIE_ROOT_PORT)
+>> +#define PCIE_ROOT_PORT_CLASS(klass) \
+>> +     OBJECT_CLASS_CHECK(PCIERootPortClass, (klass), TYPE_PCIE_ROOT_PORT)
+>> +#define PCIE_ROOT_PORT_GET_CLASS(obj) \
+>> +     OBJECT_GET_CLASS(PCIERootPortClass, (obj), TYPE_PCIE_ROOT_PORT)
+>> +
+>> +typedef struct PCIERootPortClass {
+>> +    PCIDeviceClass parent_class;
+>> +
+>> +    int msi_offset;
+>> +    int exp_offset;
+>> +    int aer_offset;
+>> +    int ssvid_offset;
+>> +    int ssid;
+>> +} PCIERootPortClass;
+>> +
+>>  #endif /* QEMU_PCIE_PORT_H */
+>> --
+>> 2.5.5
