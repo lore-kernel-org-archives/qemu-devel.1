@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52011)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53310)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cRkJq-000168-D2
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 13:41:51 -0500
+	(envelope-from <eblake@redhat.com>) id 1cRkNw-0004oT-U0
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 13:46:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1cRkJn-0001HL-8r
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 13:41:50 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45512)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cRkJn-0001H5-2T
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 13:41:47 -0500
-Date: Thu, 12 Jan 2017 16:41:43 -0200
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170112184143.GS3565@thinpad.lan.raisama.net>
-References: <20170112182417.9548-1-lersek@redhat.com>
-	<20170112182417.9548-5-lersek@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1cRkNv-0003Ya-UG
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 13:46:04 -0500
+References: <CAMxP3BT7ncDLePmP7QfXMtbodJ81+9Frc01aCkipya3-BNL6AA@mail.gmail.com>
+	<e6e26ad1-3fdf-85ac-0dc4-f4027123af6b@redhat.com>
+	<2EAE3C4F-58AF-4594-A284-A69D8BC3EA8F@alex.org.uk>
+	<CAJSP0QWXF2tS5q-BpmxR9ti0osjzZCFiRxdRDho4pDBLkD3UUQ@mail.gmail.com>
+	<CAMxP3BQeUWwFLmb42=-XExRzdLe0egCaEUEF4kXLQ9khH9neWg@mail.gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <90b32a89-6dd8-1f83-4f6f-01bb5479252e@redhat.com>
+Date: Thu, 12 Jan 2017 12:45:56 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170112182417.9548-5-lersek@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v6 wave 1 4/4] fw-cfg: bump "x-file-slots"
- to 0x20 for 2.9+ machine types
+In-Reply-To: <CAMxP3BQeUWwFLmb42=-XExRzdLe0egCaEUEF4kXLQ9khH9neWg@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="eSowBQ1KlggqRFQ9RweRGk6jAagGAtHnt"
+Subject: Re: [Qemu-devel] [Qemu-block] [Nbd] How to online resize qemu disk
+ with nbd protocol?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,57 +28,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: qemu devel list <qemu-devel@nongnu.org>, "Gabriel L. Somlo" <somlo@cmu.edu>, "Michael S. Tsirkin" <mst@redhat.com>, Alexander Graf <agraf@suse.de>, Anthony Perard <anthony.perard@citrix.com>, Artyom Tarasenko <atar4qemu@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Stefano Stabellini <sstabellini@kernel.org>
+To: Bob Chen <a175818323@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>
+Cc: "nbd-general@lists.sourceforge.net" <nbd-general@lists.sourceforge.net>, qemu block <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Alex Bligh <alex@alex.org.uk>
 
-On Thu, Jan 12, 2017 at 07:24:17PM +0100, Laszlo Ersek wrote:
-> More precisely, the "x-file-slots" count is bumped for all machine types
-> that:
-> (a) use fw_cfg, and
-> (b) are not versioned (hence migration is not expected to work for them
->     across QEMU releases anyway), or have version 2.9.
-> 
-> This affects machine types implemented in the following source files:
-> 
-> - "hw/arm/virt.c". The "virt-*" machine type is versioned, and the <= 2.8
->   versions already depend on HW_COMPAT_2_8 (see commit e353aac51b944).
->   Therefore adding the "x-file-slots" compat values to HW_COMPAT_2_8
->   suffices.
-> 
-> - "hw/i386/pc.c". The "pc-i440fx-*" (including "pc-*") and "pc-q35-*"
->   machine types are versioned. Modifying HW_COMPAT_2_8 is sufficient here
->   too (see commit "pc: Add 2.9 machine-types"). The "isapc" machtype is
->   not versioned. The "xenfv" machine type, which uses fw_cfg for direct
->   kernel booting, is also not versioned.
-> 
-> - "hw/ppc/mac_newworld.c". The "mac99" machine type is not versioned.
-> 
-> - "hw/ppc/mac_oldworld.c". The "g3beige" machine type is not versioned.
-> 
-> - "hw/sparc/sun4m.c". None of the 9 machine types defined in this file
->   appear versioned.
-> 
-> - "hw/sparc64/sun4u.c". None of the 3 machine types defined in this file
->   appear versioned.
-> 
-> Cc: "Gabriel L. Somlo" <somlo@cmu.edu>
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Alexander Graf <agraf@suse.de>
-> Cc: Anthony Perard <anthony.perard@citrix.com>
-> Cc: Artyom Tarasenko <atar4qemu@gmail.com>
-> Cc: David Gibson <david@gibson.dropbear.id.au>
-> Cc: Eduardo Habkost <ehabkost@redhat.com>
-> Cc: Gerd Hoffmann <kraxel@redhat.com>
-> Cc: Igor Mammedov <imammedo@redhat.com>
-> Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Cc: Stefano Stabellini <sstabellini@kernel.org>
-> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
-> Acked-by: Gabriel Somlo <somlo@cmu.edu>
-> Tested-by: Gabriel Somlo <somlo@cmu.edu>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--eSowBQ1KlggqRFQ9RweRGk6jAagGAtHnt
+From: Eric Blake <eblake@redhat.com>
+To: Bob Chen <a175818323@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>
+Cc: "nbd-general@lists.sourceforge.net" <nbd-general@lists.sourceforge.net>,
+ qemu block <qemu-block@nongnu.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Alex Bligh <alex@alex.org.uk>
+Message-ID: <90b32a89-6dd8-1f83-4f6f-01bb5479252e@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [Nbd] How to online resize qemu disk
+ with nbd protocol?
+References: <CAMxP3BT7ncDLePmP7QfXMtbodJ81+9Frc01aCkipya3-BNL6AA@mail.gmail.com>
+ <e6e26ad1-3fdf-85ac-0dc4-f4027123af6b@redhat.com>
+ <2EAE3C4F-58AF-4594-A284-A69D8BC3EA8F@alex.org.uk>
+ <CAJSP0QWXF2tS5q-BpmxR9ti0osjzZCFiRxdRDho4pDBLkD3UUQ@mail.gmail.com>
+ <CAMxP3BQeUWwFLmb42=-XExRzdLe0egCaEUEF4kXLQ9khH9neWg@mail.gmail.com>
+In-Reply-To: <CAMxP3BQeUWwFLmb42=-XExRzdLe0egCaEUEF4kXLQ9khH9neWg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+On 01/12/2017 11:57 AM, Bob Chen wrote:
+> There might be a time window between the NBD server's resize and the
+> client's `re-read size` request. Is it safe?
 
--- 
-Eduardo
+For resize larger, it seems that it would be safe for the server to just
+remember the last size it has advertised to the client.  As long as the
+client doesn't request read/write to any offset beyond the
+last-advertised size (either the size the server gave at handshake, or
+the size that the server reported when the client last used the new
+'re-read size' command), there's no difference in behavior (and
+well-behaved clients fall in this group); if the client DOES try to
+access out-of-bounds with respect to the last known size, the server
+SHOULD reject the access, but MAY serve it instead.  A client that is
+unaware of the 're-read size' command will never learn that the server
+is now offering a larger image.
+
+For resize smaller, things are a lot trickier - how do you block access
+to a portion of a file that the client still thinks exist, but which the
+server has truncated away?  Maybe the easy way out is to state that the
+server MUST NOT resize smaller.
+
+>=20
+> What about an active `resize` request from the client? Considering some=
+ NBD
+> servers might have the capability to do instant resizing, not applying =
+to
+> LVM or host block device, of course...
+
+And perhaps the 're-read size' command can serve a dual purpose.  Since
+all NBD commands already include space for size and offset parameters,
+we could define that if the client passes 0/0 for size and offset, it
+wants to read the server's current size; if it passes 0/non-zero, it is
+asking the server to resize to the new non-zero size (and the server's
+success or error response tells whether the resize happened).
+
+Should I spend time turning this idea into a more formal spec, along the
+lines of other NBD extension proposals?
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--eSowBQ1KlggqRFQ9RweRGk6jAagGAtHnt
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYd87kAAoJEKeha0olJ0Nq494H/iflclx2SAn5UV0ckc7SFDTd
+V4qGZ/KoUAj8mYWhZjj9TOmuEegV0ocSFvKYbjDhqp7JH8O0yE6HicGOUQSH5QNY
+SVEl3DkIGbiVwvm2t+wf7TsjlxxhSnjGqjOzZz0IplL4vN5iLNz9eXJDq0S31XT4
+ceL3qd9s9gd3nUvOg8vfYfYu09WiRell6dS8D0EsboK+UZhu6zVK0ZgX9iHUXWmx
+AUaLRve5BuSmgfNIhWfntNyqzC9za8seFOawUKKzKR57FMu3a/jJ7z6k4eL3WOjt
+9M6PrCP/53B6HZ0iQaluTycbd9gDzQt6iCy1PgugoTMeWwER6okSjIg5utoH+T0=
+=2LzR
+-----END PGP SIGNATURE-----
+
+--eSowBQ1KlggqRFQ9RweRGk6jAagGAtHnt--
