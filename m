@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38534)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38890)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cRlHP-0006Ld-0j
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 14:43:23 -0500
+	(envelope-from <mst@redhat.com>) id 1cRlJf-0007Mm-Oj
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 14:45:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cRlHK-0000A0-5m
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 14:43:23 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58720)
+	(envelope-from <mst@redhat.com>) id 1cRlJa-0001Ae-Od
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 14:45:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50574)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cRlHJ-00009J-Vt
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 14:43:18 -0500
-Date: Thu, 12 Jan 2017 21:43:15 +0200
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cRlJa-0001AU-AU
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 14:45:38 -0500
+Date: Thu, 12 Jan 2017 21:45:33 +0200
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170112185719-mutt-send-email-mst@kernel.org>
-References: <1482303148-22059-1-git-send-email-liang.z.li@intel.com>
-	<1482303148-22059-3-git-send-email-liang.z.li@intel.com>
+Message-ID: <20170112214414-mutt-send-email-mst@kernel.org>
+References: <1483524185-9036-1-git-send-email-arei.gonglei@huawei.com>
+	<33183CC9F5247A488A2544077AF19020DA174989@DGGEMA505-MBX.china.huawei.com>
+	<63cd3678-4044-365d-d396-1040f5755e2c@linux.vnet.ibm.com>
+	<33183CC9F5247A488A2544077AF19020DA18DE85@DGGEMA505-MBX.china.huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1482303148-22059-3-git-send-email-liang.z.li@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v6 kernel 2/5] virtio-balloon: define new
- feature bit and head struct
+In-Reply-To: <33183CC9F5247A488A2544077AF19020DA18DE85@DGGEMA505-MBX.china.huawei.com>
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v15 0/2] virtio-crypto:
+ virtio crypto device specification
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,64 +30,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Liang Li <liang.z.li@intel.com>
-Cc: kvm@vger.kernel.org, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, amit.shah@redhat.com, dave.hansen@intel.com, cornelia.huck@de.ibm.com, pbonzini@redhat.com, david@redhat.com, aarcange@redhat.com, dgilbert@redhat.com, quintela@redhat.com
+To: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Cc: Halil Pasic <pasic@linux.vnet.ibm.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>, "Huangweidong (C)" <weidong.huang@huawei.com>, "john.griffin@intel.com" <john.griffin@intel.com>, "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>, "Zhoujian (jay, Euler)" <jianjay.zhou@huawei.com>, "Varun.Sethi@freescale.com" <Varun.Sethi@freescale.com>, "denglingli@chinamobile.com" <denglingli@chinamobile.com>, "arei.gonglei@hotmail.com" <arei.gonglei@hotmail.com>, "agraf@suse.de" <agraf@suse.de>, "nmorey@kalray.eu" <nmorey@kalray.eu>, "vincent.jardin@6wind.com" <vincent.jardin@6wind.com>, "Ola.Liljedahl@arm.com" <Ola.Liljedahl@arm.com>, Luonengjun <luonengjun@huawei.com>, "xin.zeng@intel.com" <xin.zeng@intel.com>, "liang.j.ma@intel.com" <liang.j.ma@intel.com>, "stefanha@redhat.com" <stefanha@redhat.com>, Shiqing Fan <Shiqing.Fan@huawei.com>, Jani Kokkonen <Jani.Kokkonen@huawei.com>, "brian.a.keating@intel.com" <brian.a.keating@intel.com>, Claudio Fontana <Claudio.Fontana@huawei.com>, "mike.caraman@nxp.com" <mike.caraman@nxp.com>, "Wubin (H)" <wu.wubin@huawei.com>
 
-On Wed, Dec 21, 2016 at 02:52:25PM +0800, Liang Li wrote:
-> Add a new feature which supports sending the page information
-> with range array. The current implementation uses PFNs array,
-> which is not very efficient. Using ranges can improve the
-> performance of inflating/deflating significantly.
+On Thu, Jan 12, 2017 at 12:26:24PM +0000, Gonglei (Arei) wrote:
+> Hi,
 > 
-> Signed-off-by: Liang Li <liang.z.li@intel.com>
-> Cc: Michael S. Tsirkin <mst@redhat.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Cornelia Huck <cornelia.huck@de.ibm.com>
-> Cc: Amit Shah <amit.shah@redhat.com>
-> Cc: Dave Hansen <dave.hansen@intel.com>
-> Cc: Andrea Arcangeli <aarcange@redhat.com>
-> Cc: David Hildenbrand <david@redhat.com>
-> ---
->  include/uapi/linux/virtio_balloon.h | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
 > 
-> diff --git a/include/uapi/linux/virtio_balloon.h b/include/uapi/linux/virtio_balloon.h
-> index 343d7dd..2f850bf 100644
-> --- a/include/uapi/linux/virtio_balloon.h
-> +++ b/include/uapi/linux/virtio_balloon.h
-> @@ -34,10 +34,14 @@
->  #define VIRTIO_BALLOON_F_MUST_TELL_HOST	0 /* Tell before reclaiming pages */
->  #define VIRTIO_BALLOON_F_STATS_VQ	1 /* Memory Stats virtqueue */
->  #define VIRTIO_BALLOON_F_DEFLATE_ON_OOM	2 /* Deflate balloon on OOM */
-> +#define VIRTIO_BALLOON_F_PAGE_RANGE	3 /* Send page info with ranges */
->  
->  /* Size of a PFN in the balloon interface. */
->  #define VIRTIO_BALLOON_PFN_SHIFT 12
->  
-> +/* Bits width for the length of the pfn range */
+> > 
+> > On 01/04/2017 11:10 AM, Gonglei (Arei) wrote:
+> > > Hi all,
+> > >
+> > > I attach the diff files between v14 and v15 for better review.
+> > >
+> > Hi,
+> > 
+> > only had a quick look. Will try to come back to this later.
+> > 
+> That's cool.
+> 
+> > > diff --git a/virtio-crypto.tex b/virtio-crypto.tex
+> > > index 9f7faf0..884ee95 100644
+> > > --- a/virtio-crypto.tex
+> > > +++ b/virtio-crypto.tex
+> > > @@ -2,8 +2,8 @@
+> > >
+> > >  The virtio crypto device is a virtual cryptography device as well as a kind of
+> > >  virtual hardware accelerator for virtual machines. The encryption and
+> > > -decryption requests are placed in the data queue and are ultimately handled
+> > by the
+> > > -backend crypto accelerators. The second queue is the control queue used to
+> > create
+> > > +decryption requests are placed in any of the data active queues and are
+> > ultimately handled by the
+> > s/data active/active data/
+> > > +backend crypto accelerators. The second kind of queue is the control queue
+> > used to create
+> > >  or destroy sessions for symmetric algorithms and will control some
+> > advanced
+> > >  features in the future. The virtio crypto device provides the following crypto
+> > >  services: CIPHER, MAC, HASH, and AEAD.
+> > 
+> > [..]
+> > 
+> > > ===============The below diff shows the changes of add non-session mode
+> > support:
+> > >
+> > > diff --git a/virtio-crypto.tex b/virtio-crypto.tex
+> > > index 884ee95..44819f9 100644
+> > > --- a/virtio-crypto.tex
+> > > +++ b/virtio-crypto.tex
+> > > @@ -26,7 +26,10 @@ N is set by \field{max_dataqueues}.
+> > >
+> > >  \subsection{Feature bits}\label{sec:Device Types / Crypto Device / Feature
+> > bits}
+> > >
+> > > -None currently defined.
+> > > +VIRTIO_CRYPTO_F_CIPHER_SESSION_MODE (1) Session mode is available
+> > for CIPHER service.
+> > > +VIRTIO_CRYPTO_F_HASH_SESSION_MODE (2) Session mode is available for
+> > HASH service.
+> > > +VIRTIO_CRYPTO_F_MAC_SESSION_MODE (3) Session mode is available for
+> > MAC service.
+> > > +VIRTIO_CRYPTO_F_AEAD_SESSION_MODE (4) Session mode is available for
+> > AEAD service.
+> > >
+> > >  \subsection{Device configuration layout}\label{sec:Device Types / Crypto
+> > Device / Device configuration layout}
+> > >
+> > > @@ -208,6 +211,9 @@ Operation parameters are algorithm-specific
+> > parameters, output data is the
+> > >  data that should be utilized in operations, and input data is equal to
+> > >  "operation result + result data".
+> > >
+> > > +The device can support both session mode (See \ref{sec:Device Types /
+> > Crypto Device / Device Operation / Control Virtqueue / Session operation}) and
+> > non-session mode, for example,
+> > > +As VIRTIO_CRYPTO_F_CIPHER_SESSION feature bit is negotiated, the driver
+> > can use session mode for CIPHER service, otherwise it can only use non-session
+> > mode.
+> > > +
+> > 
+> > As far as I understand you are adding non-session mode to the mix but
+> > providing feature bits for session mode. Would this render the the current
+> > implementation non-compliant?
+> > 
+> You are right, shall we use feature bits for non-session mode for compliancy?
+> Or because the spec is on the fly, and some structures in the virtio_crypto.h need to
+> be modified, can we keep the compliancy completely?
+> 
+> Thanks,
+> -Gonglei
 
-What does this mean? Couldn't figure it out.
+Since there's a linux driver upstream you must at least
+keep compatibility with that.
 
-> +#define VIRTIO_BALLOON_NR_PFN_BITS 12
-> +
->  struct virtio_balloon_config {
->  	/* Number of pages host wants Guest to give up. */
->  	__u32 num_pages;
-> @@ -82,4 +86,12 @@ struct virtio_balloon_stat {
->  	__virtio64 val;
->  } __attribute__((packed));
->  
-> +/* Response header structure */
-> +struct virtio_balloon_resp_hdr {
-> +	__le64 cmd : 8; /* Distinguish different requests type */
-> +	__le64 flag: 8; /* Mark status for a specific request type */
-> +	__le64 id : 16; /* Distinguish requests of a specific type */
-> +	__le64 data_len: 32; /* Length of the following data, in bytes */
-
-This use of __le64 makes no sense.  Just use u8/le16/le32 pls.
-
-> +};
-> +
->  #endif /* _LINUX_VIRTIO_BALLOON_H */
-> -- 
-> 1.9.1
+-- 
+MST
