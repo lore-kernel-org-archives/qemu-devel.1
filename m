@@ -1,32 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43772)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44658)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1cRaPs-0006dc-HQ
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 03:07:25 -0500
+	(envelope-from <armbru@redhat.com>) id 1cRaSr-0007il-CM
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 03:10:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1cRaPn-00041A-JW
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 03:07:24 -0500
-Received: from mail.ispras.ru ([83.149.199.45]:54454)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1cRaPn-0003za-BB
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 03:07:19 -0500
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <000301d259dc$f9d097c0$ed71c740$@ru>
-	<000601d25a95$12b1b9f0$38152dd0$@ru>
-	<20161220102126.GE5602@stefanha-x1.localdomain>
-	<002501d25ab1$af024b00$0d06e100$@ru>
-	<CAJSP0QXm9ssLC5C+gV_agkEW_fdUY=NWBMvHqMh55UhYTR276g@mail.gmail.com>
-	<000301d25b4f$20018440$60048cc0$@ru>
-	<CAJSP0QW1pOcthcEt16Pp5xQu3miUh2Leq3kn3yvQqWqhi1P=QQ@mail.gmail.com>
-	<000801d26bd9$dca56db0$95f04910$@ru> <87o9zd3jta.fsf@linaro.org>
-In-Reply-To: <87o9zd3jta.fsf@linaro.org>
-Date: Thu, 12 Jan 2017 11:07:09 +0300
-Message-ID: <000e01d26caa$dfdb3150$9f9193f0$@ru>
+	(envelope-from <armbru@redhat.com>) id 1cRaSm-0005u4-DL
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 03:10:29 -0500
+From: Markus Armbruster <armbru@redhat.com>
+References: <1484167250-16089-1-git-send-email-thuth@redhat.com>
+Date: Thu, 12 Jan 2017 09:10:21 +0100
+In-Reply-To: <1484167250-16089-1-git-send-email-thuth@redhat.com> (Thomas
+	Huth's message of "Wed, 11 Jan 2017 21:40:50 +0100")
+Message-ID: <87tw94em1e.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Content-Language: ru
-Subject: Re: [Qemu-devel] qemu-2.8-rc4 is broken
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] monitor: Fix crashes when using HMP
+ commands without CPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,56 +23,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?'Alex_Benn=C3=A9e'?= <alex.bennee@linaro.org>
-Cc: 'Stefan Hajnoczi' <stefanha@gmail.com>, 'qemu-devel' <qemu-devel@nongnu.org>, 'Paolo Bonzini' <pbonzini@redhat.com>, 'Pavel Dovgalyuk' <pavel.dovgaluk@ispras.ru>, 'Peter Maydell' <peter.maydell@linaro.org>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-trivial@nongnu.org
 
-> From: Alex Benn=C3=A9e [mailto:alex.bennee@linaro.org]
-> >> From: Stefan Hajnoczi [mailto:stefanha@gmail.com]
-> >> >
-> >> > Yes, this option helps.
-> >> > Thank you.
-> >>
-> >> Good news.  This can be fixed in 2.8.1 once someone finds a =
-solution.
-> >
-> > It seems that something still goes wrong.
-> > I'm using this workaround, but there is a kind of deadlock in =
-translation.
-> > call_rcu_thread hangs at some moment in qemu_event_wait.
-> >
-> > As far as I understand, it is used by QHT in translate-all.c.
-> > I can't get more information yet, because logging makes everything =
-too slow.
->=20
-> There are a number of users of RCU bit for QHT I think it only gets
-> activated when it needs to re-size its hash table on insertion of new
-> TranslationBlocks.
->=20
-> Can you get a backtrace of all threads when it deadlocks?
+Thomas Huth <thuth@redhat.com> writes:
 
-Sorry, this is another problem which occurs only in icount replay mode:
-1. cpu_handle_exception tries to force exception when is cannot occur =
-due to
-   running out all the planned instructions:
-    } else if (replay_has_exception()
-               && cpu->icount_decr.u16.low + cpu->icount_extra =3D=3D 0) =
-{
-        /* try to cause an exception pending in the log */
-        cpu_exec_nocache(cpu, 1, tb_find(cpu, NULL, 0), true);
-        *ret =3D -1;
-        return true;
+> When running certain HMP commands ("info registers", "info cpustats"
+> or dumping virtual memory) with the "none" machine, QEMU crashes
+> with a segmentation fault. This happens because the "none" machine does
+> not have any CPUs by default,
 
-2. tb_find calls tb_gen_code, which cannot allocate new translation =
-block=20
-   and calls tb_flush (which only queues the flushing) and cpu_loop_exit
-3. cpu_loop_exit returns to infinite loop of cpu_exec and the condition
-            if (cpu_handle_exception(cpu, &ret)) {
-                break;
-            }
-   is checked again causing an infinite loop.
+"Sachen gibt's!"
 
-TB cache is not flushed because we never execute that break and real =
-work of tb_flush
-is made outside this loop.
+>                               but these HMP commands did not check for
+> a valid CPU pointer yet. Add such a check now and print a message
+> about the missing CPU instead.
 
-Pavel Dovgalyuk
+Have you checked uses of first_cpu elsewhere?  Out of scope for this
+patch, of course.
+
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  monitor.c | 29 +++++++++++++++++++++++++----
+>  1 file changed, 25 insertions(+), 4 deletions(-)
+>
+> diff --git a/monitor.c b/monitor.c
+> index 0841d43..0103979 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -1025,6 +1025,9 @@ int monitor_set_cpu(int cpu_index)
+>  CPUState *mon_get_cpu(void)
+>  {
+>      if (!cur_mon->mon_cpu) {
+> +        if (!first_cpu) {
+> +            return NULL;
+> +        }
+>          monitor_set_cpu(first_cpu->cpu_index);
+>      }
+>      cpu_synchronize_state(cur_mon->mon_cpu);
+
+Why are the following dereferences safe?
+
+   CPUArchState *mon_get_cpu_env(void)
+   {
+       return mon_get_cpu()->env_ptr;
+   }
+
+   int monitor_get_cpu_index(void)
+   {
+       return mon_get_cpu()->cpu_index;
+   }
+
+> @@ -1043,7 +1046,13 @@ int monitor_get_cpu_index(void)
+>  
+>  static void hmp_info_registers(Monitor *mon, const QDict *qdict)
+>  {
+> -    cpu_dump_state(mon_get_cpu(), (FILE *)mon, monitor_fprintf, CPU_DUMP_FPU);
+> +    CPUState *cs = mon_get_cpu();
+> +
+> +    if (!cs) {
+> +        monitor_printf(mon, "No CPU available\n");
+> +        return;
+> +    }
+> +    cpu_dump_state(cs, (FILE *)mon, monitor_fprintf, CPU_DUMP_FPU);
+>  }
+>  
+>  static void hmp_info_jit(Monitor *mon, const QDict *qdict)
+> @@ -1076,7 +1085,13 @@ static void hmp_info_history(Monitor *mon, const QDict *qdict)
+>  
+>  static void hmp_info_cpustats(Monitor *mon, const QDict *qdict)
+>  {
+> -    cpu_dump_statistics(mon_get_cpu(), (FILE *)mon, &monitor_fprintf, 0);
+> +    CPUState *cs = mon_get_cpu();
+> +
+> +    if (!cs) {
+> +        monitor_printf(mon, "No CPU available\n");
+> +        return;
+> +    }
+> +    cpu_dump_statistics(cs, (FILE *)mon, &monitor_fprintf, 0);
+>  }
+>  
+>  static void hmp_info_trace_events(Monitor *mon, const QDict *qdict)
+> @@ -1235,6 +1250,12 @@ static void memory_dump(Monitor *mon, int count, int format, int wsize,
+>      int l, line_size, i, max_digits, len;
+>      uint8_t buf[16];
+>      uint64_t v;
+> +    CPUState *cs = mon_get_cpu();
+> +
+> +    if (!cs && (format == 'i' || !is_physical)) {
+> +        monitor_printf(mon, "Can not dump without CPU\n");
+> +        return;
+> +    }
+>  
+>      if (format == 'i') {
+>          int flags = 0;
+> @@ -1264,7 +1285,7 @@ static void memory_dump(Monitor *mon, int count, int format, int wsize,
+>          flags = msr_le << 16;
+>          flags |= env->bfd_mach;
+>  #endif
+> -        monitor_disas(mon, mon_get_cpu(), addr, count, is_physical, flags);
+> +        monitor_disas(mon, cs, addr, count, is_physical, flags);
+>          return;
+>      }
+>  
+> @@ -1303,7 +1324,7 @@ static void memory_dump(Monitor *mon, int count, int format, int wsize,
+>          if (is_physical) {
+>              cpu_physical_memory_read(addr, buf, l);
+>          } else {
+> -            if (cpu_memory_rw_debug(mon_get_cpu(), addr, buf, l, 0) < 0) {
+> +            if (cpu_memory_rw_debug(cs, addr, buf, l, 0) < 0) {
+>                  monitor_printf(mon, " Cannot access memory\n");
+>                  break;
+>              }
