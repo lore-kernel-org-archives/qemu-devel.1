@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46369)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46418)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cRcjm-0007mg-9s
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 05:36:07 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1cRcjz-0007uq-Ey
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 05:36:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1cRcjk-0004Ep-26
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 05:36:06 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49988)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cRcjj-0004EQ-SL
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 05:36:03 -0500
-Date: Thu, 12 Jan 2017 18:35:57 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170112103557.GP4450@pxdev.xzpeter.org>
-References: <1484192182-13760-1-git-send-email-peterx@redhat.com>
-	<1484192182-13760-3-git-send-email-peterx@redhat.com>
-	<20170112100405.tyroqjvxpxdxocuc@hawk.localdomain>
+	(envelope-from <peter.maydell@linaro.org>) id 1cRcjx-0004L2-0W
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 05:36:19 -0500
+Received: from mail-ua0-x230.google.com ([2607:f8b0:400c:c08::230]:33597)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1cRcjw-0004Kt-Qq
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 05:36:16 -0500
+Received: by mail-ua0-x230.google.com with SMTP id i68so11133094uad.0
+	for <qemu-devel@nongnu.org>; Thu, 12 Jan 2017 02:36:16 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170112100405.tyroqjvxpxdxocuc@hawk.localdomain>
-Subject: Re: [Qemu-devel] [kvm-unit-tests PATCH v6 2/3] run_tests: put logs
- into per-test file
+In-Reply-To: <20170112040534.15179-1-rth@twiddle.net>
+References: <20170112040534.15179-1-rth@twiddle.net>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 12 Jan 2017 10:35:55 +0000
+Message-ID: <CAFEAcA_zdUzt1E307v2W1e4C+YksEEN9aAot5GAacSSrt-R1Jw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Qemu-devel] [PATCH] linux-user: Use *at functions instead of
+ caching interp_prefix contents
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,43 +29,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jones <drjones@redhat.com>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
+To: Richard Henderson <rth@twiddle.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Riku Voipio <riku.voipio@iki.fi>
 
-On Thu, Jan 12, 2017 at 11:04:05AM +0100, Andrew Jones wrote:
+On 12 January 2017 at 04:05, Richard Henderson <rth@twiddle.net> wrote:
+> If the interp_prefix is a complete chroot, it may have a *lot* of files.
+> Setting up the cache for this is quite expensive.  Instead, use the *at
+> versions of various syscalls to attempt the operation in the prefix.
+>
 
-[...]
+Presumably this also fixes the completely broken handling of
+symlinks in the interp_prefix tree?
 
-> >  config=$TEST_DIR/unittests.cfg
-> > -rm -f test.log
-> > -printf "BUILD_HEAD=$(cat build-head)\n\n" > test.log
-> > +
-> > +rm -rf $unittest_log_dir.old
-> > +[ -d $unittest_log_dir ] && mv $unittest_log_dir $unittest_log_dir.old
-> > +mkdir $unittest_log_dir || exit 2
-> > +
-> > +echo "BUILD_HEAD=$(cat build-head)" > $unittest_log_dir/SUMMARY
-> > +
-> 
-> nit: to be 100% correct all the references to the log dir should have
-> "'s around them in order to handle spaces, or other shell ambiguous
-> characters, in the name. For example, mkdir $log_dir, where $log_dir
-> is "my tests" would create two directories, "my" and "tests" without
-> the quotes. Anyway, I'm not too worried about someone choosing a
-> weird log dir name, nor even changing it from the default.
-> 
-> Isn't bash fun :-)
+Unfortunately patch will break bsd-user as it stands,
+because bsd-user also calls init_paths. There's also a
+usage in tests/tcg/.
 
-It is, as long as it won't break my system... (Once I accidentally did
-a "rm -rf /lib" in Bash when I was still using FreeBSD... Bash became
-less funny since then ;-).
+Awkward problem: I suspect you'll find this breaks a few
+guest programs which don't like the fact that there's now
+an open fd which doesn't belong to the guest. (For instance
+IIRC some LTP test programs do "check that the rlimit on
+number of open files hits after opening exactly N files".)
 
-I'll add them if I'm going to have another spin.
+Incidentally it's a shame C doesn't make it easier to
+abstract out the repeated pattern
 
-[...]
+        switch (PATHNAME[0]) {
+        case '/':
+            ret = SOMEFN(interp_dirfd, PATHNAME + 1, STUFF);
+            if (ret == 0 || errno != ENOENT) {
+                break;
+            }
+            /* fallthru */
+        default:
+            ret = SOMEFN(FD, PATHNAME, STUFF);
+            break;
+        }
 
-> Reviewed-by: Andrew Jones <drjones@redhat.com>
+(and the variant which uses a 2nd function).
 
-Thanks for reviewing!
+A macro would get awkwardly heavily parameterised, I think.
 
--- peterx
+thanks
+-- PMM
