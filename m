@@ -1,16 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38828)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42613)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cRZyu-0006yI-3p
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 02:39:32 -0500
+	(envelope-from <no-reply@patchew.org>) id 1cRaJn-0001E2-K9
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 03:01:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <caoj.fnst@cn.fujitsu.com>) id 1cRZyq-0002Tb-W7
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 02:39:32 -0500
-From: Cao jin <caoj.fnst@cn.fujitsu.com>
-Date: Thu, 12 Jan 2017 15:44:55 +0800
-Message-ID: <1484207095-16224-1-git-send-email-caoj.fnst@cn.fujitsu.com>
+	(envelope-from <no-reply@patchew.org>) id 1cRaJk-0001Wl-Co
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 03:01:07 -0500
+Resent-Message-Id: <E1cRaJk-0001Wl-Co@eggs.gnu.org>
+Received: from sender163-mail.zoho.com ([74.201.84.163]:21444)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1cRaJk-0001WQ-5J
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 03:01:04 -0500
+In-Reply-To: <20170112072513.98411-1-bjsdjshi@linux.vnet.ibm.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <148420805350.208.7373464568560171452@790289a7ca88>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH] doc/usb2: fix typo
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 12 Jan 2017 00:00:55 -0800 (PST)
+Subject: Re: [Qemu-devel] [PATCH RFC v2 00/12] basic channel IO passthrough
+ infrastructure based on vfio
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,26 +29,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kraxel@redhat.com, qemu-trivial@nongnu.org
+To: bjsdjshi@linux.vnet.ibm.com
+Cc: famz@redhat.com, kvm@vger.kernel.org, linux-s390@vger.kernel.org, qemu-devel@nongnu.org, pasic@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, borntraeger@de.ibm.com, alex.williamson@redhat.com, renxiaof@linux.vnet.ibm.com, wkywang@linux.vnet.ibm.com, cornelia.huck@de.ibm.com, agraf@suse.com
 
-Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
----
- docs/usb2.txt | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/docs/usb2.txt b/docs/usb2.txt
-index c7a445afcd55..b9e75480737c 100644
---- a/docs/usb2.txt
-+++ b/docs/usb2.txt
-@@ -19,7 +19,7 @@ the controller so the USB 2.0 bus gets a individual name, for example
- '-device usb-ehci,id=ehci".  This will give you a USB 2.0 bus named
- "ehci.0".
- 
--I strongly recomment to also use -device to attach usb devices because
-+I strongly recommend to also use -device to attach usb devices because
- you can specify the bus they should be attached to this way.  Here is
- a complete example:
- 
--- 
-2.1.0
+SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTcwMTEyMDcyNTEzLjk4NDExLTEtYmpzZGpzaGlAbGludXgudm5ldC5pYm0u
+Y29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggUkZDIHYyIDAwLzEyXSBiYXNpYyBjaGFu
+bmVsIElPIHBhc3N0aHJvdWdoIGluZnJhc3RydWN0dXJlIGJhc2VkIG9uIHZmaW8KCj09PSBURVNU
+IFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQg
+bG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgojIFVzZWZ1bCBnaXQgb3B0
+aW9ucwpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1s
+b2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0t
+cmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2lu
+ZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAg
+IGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5w
+bCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZp
+CiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09
+PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9t
+IGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAg
+ICAgICBwYXRjaGV3LzIwMTcwMTEyMDcyNTEzLjk4NDExLTEtYmpzZGpzaGlAbGludXgudm5ldC5p
+Ym0uY29tIC0+IHBhdGNoZXcvMjAxNzAxMTIwNzI1MTMuOTg0MTEtMS1ianNkanNoaUBsaW51eC52
+bmV0LmlibS5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo2OTRiMGVlIHZmaW8v
+Y2N3OiB1cGRhdGUgc2Vuc2UgZGF0YSBpZiBhIHVuaXQgY2hlY2sgaXMgcGVuZGluZwo0YWZjZmIy
+IHMzOTB4L2NzczogY2N3cyB0cmFuc2xhdGlvbiBpbmZyYXN0cnVjdHVyZQpjYmE5MDk1IHMzOTB4
+L2NzczogaW50cm9kdWNlIGFuZCByZWFsaXplIGNjdy1yZXF1ZXN0IGNhbGxiYWNrCjRmOGQ2NGEg
+dmZpby9jY3c6IGdldCBpcnFzIGluZm8gYW5kIHNldCB0aGUgZXZlbnRmZCBmZAo5NmJjMWI1IHZm
+aW8vY2N3OiBnZXQgaW8gcmVnaW9uIGluZm8KOTA2OTFlYyB2ZmlvL2NjdzogdmZpbyBiYXNlZCBz
+dWJjaGFubmVsIHBhc3N0aHJvdWdoIGRyaXZlcgpiNDBhNTY3IHMzOTB4L2NzczogZGV2aWNlIHN1
+cHBvcnQgZm9yIHMzOTAtY2N3IHBhc3N0aHJvdWdoCjBkNjhmMjEgczM5MHgvY3NzOiByZWFsaXpl
+IGNzc19jcmVhdGVfc2NoCjAxMTc5ZTUgczM5MHgvY3NzOiByZWFsaXplIGNzc19zY2hfYnVpbGRf
+c2NoaWIKMTU2NGY4OCBzMzkweC9jc3M6IGFkZCBzMzkwLW1hcC1jc3MgbWFjaGluZSBvcHRpb24K
+NzliNWU4MSB2ZmlvOiBsaW51eC1oZWFkZXJzIHVwZGF0ZSBmb3IgdmZpby1jY3cKNTJiNTJhZCB1
+cGRhdGUtbGludXgtaGVhZGVyczogYWRkIGFzbS1zMzkwL3ZmaW9fY2N3LmgKCj09PSBPVVRQVVQg
+QkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTI6IHVwZGF0ZS1saW51eC1oZWFkZXJzOiBhZGQg
+YXNtLXMzOTAvdmZpb19jY3cuaC4uLgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzE5
+OiBGSUxFOiBzY3JpcHRzL3VwZGF0ZS1saW51eC1oZWFkZXJzLnNoOjk0OgorICAgICAgICBjcF9w
+b3J0YWJsZSAiJHRtcGRpci9pbmNsdWRlL2FzbS92ZmlvX2Njdy5oIiAiJG91dHB1dC9pbmNsdWRl
+L3N0YW5kYXJkLWhlYWRlcnMvYXNtLXMzOTAvIgoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdz
+LCA3IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
+cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
+dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
+CkNoZWNraW5nIFBBVENIIDIvMTI6IHZmaW86IGxpbnV4LWhlYWRlcnMgdXBkYXRlIGZvciB2Zmlv
+LWNjdy4uLgpDaGVja2luZyBQQVRDSCAzLzEyOiBzMzkweC9jc3M6IGFkZCBzMzkwLW1hcC1jc3Mg
+bWFjaGluZSBvcHRpb24uLi4KQ2hlY2tpbmcgUEFUQ0ggNC8xMjogczM5MHgvY3NzOiByZWFsaXpl
+IGNzc19zY2hfYnVpbGRfc2NoaWIuLi4KV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMK
+IzEyOTogRklMRTogaHcvczM5MHgvY3NzLmM6MTk4MDoKK3N0YXRpYyBpbnQgY3NzX3NjaF9nZXRf
+Y2hwaWRfdHlwZSh1aW50OF90IGNocGlkLCB1aW50MzJfdCAqdHlwZSwgQ3NzRGV2SWQgKmRldl9p
+ZCkKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMjMzIGxpbmVzIGNoZWNrZWQKCllvdXIg
+cGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
+IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
+LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggNS8xMjogczM5
+MHgvY3NzOiByZWFsaXplIGNzc19jcmVhdGVfc2NoLi4uCkNoZWNraW5nIFBBVENIIDYvMTI6IHMz
+OTB4L2NzczogZGV2aWNlIHN1cHBvcnQgZm9yIHMzOTAtY2N3IHBhc3N0aHJvdWdoLi4uCkNoZWNr
+aW5nIFBBVENIIDcvMTI6IHZmaW8vY2N3OiB2ZmlvIGJhc2VkIHN1YmNoYW5uZWwgcGFzc3Rocm91
+Z2ggZHJpdmVyLi4uCkNoZWNraW5nIFBBVENIIDgvMTI6IHZmaW8vY2N3OiBnZXQgaW8gcmVnaW9u
+IGluZm8uLi4KQ2hlY2tpbmcgUEFUQ0ggOS8xMjogdmZpby9jY3c6IGdldCBpcnFzIGluZm8gYW5k
+IHNldCB0aGUgZXZlbnRmZCBmZC4uLgpDaGVja2luZyBQQVRDSCAxMC8xMjogczM5MHgvY3NzOiBp
+bnRyb2R1Y2UgYW5kIHJlYWxpemUgY2N3LXJlcXVlc3QgY2FsbGJhY2suLi4KRVJST1I6IHNwYWNl
+IHJlcXVpcmVkIGFmdGVyIHRoYXQgJywnIChjdHg6VnhWKQojODE6IEZJTEU6IGh3L3ZmaW8vY2N3
+LmM6NzM6CisgICAgICAgIGVycm9yX3JlcG9ydCgidmZpby1jY3c6IHdpcnRlIEkvTyByZWdpb24g
+ZmFpbGVkIHdpdGggZXJybm89JWQiLGVycm5vKTsKICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgp0b3RhbDogMSBl
+cnJvcnMsIDAgd2FybmluZ3MsIDEyNiBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHls
+ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZh
+bHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFU
+Q0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAxMS8xMjogczM5MHgvY3NzOiBjY3dz
+IHRyYW5zbGF0aW9uIGluZnJhc3RydWN0dXJlLi4uCkNoZWNraW5nIFBBVENIIDEyLzEyOiB2Zmlv
+L2NjdzogdXBkYXRlIHNlbnNlIGRhdGEgaWYgYSB1bml0IGNoZWNrIGlzIHBlbmRpbmcuLi4KPT09
+IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpF
+bWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5v
+cmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0
+cy5vcmc=
