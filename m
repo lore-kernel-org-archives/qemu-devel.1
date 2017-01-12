@@ -1,21 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45147)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45747)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1cRcfZ-0004Jn-KY
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 05:31:47 -0500
+	(envelope-from <mjt@tls.msk.ru>) id 1cRchl-0006Md-Mg
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 05:34:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <abologna@redhat.com>) id 1cRcfW-0002DN-Iw
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 05:31:45 -0500
-Message-ID: <1484217095.7948.1.camel@redhat.com>
-From: Andrea Bolognani <abologna@redhat.com>
-Date: Thu, 12 Jan 2017 11:31:35 +0100
-In-Reply-To: <20170108234621.GB12515@umbus.fritz.box>
-References: <20170105054618.GA12106@umbus.fritz.box>
-	<1483724069.4199.80.camel@redhat.com>
-	<20170108234621.GB12515@umbus.fritz.box>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Proposal PCI/PCIe device placement on PAPR guests
+	(envelope-from <mjt@tls.msk.ru>) id 1cRchf-0003RW-NA
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 05:34:01 -0500
+References: <20161119192926.19632-1-sw@weilnetz.de>
+From: Michael Tokarev <mjt@tls.msk.ru>
+Message-ID: <1ab2c552-7ff6-f129-69e6-6bb4c142ca9f@msgid.tls.msk.ru>
+Date: Thu, 12 Jan 2017 13:33:54 +0300
+MIME-Version: 1.0
+In-Reply-To: <20161119192926.19632-1-sw@weilnetz.de>
+Content-Type: text/plain; charset=windows-1251
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH for-2.8] hw: Fix typos found by codespell
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,41 +22,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: thuth@redhat.com, lvivier@redhat.com, benh@kernel.crashing.org, marcel@redhat.com, aik@ozlabs.ru, groug@kaod.org, ehabkost@redhat.com, mdroth@linux.vnet.ibm.com, libvir-list@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, laine@redhat.com
+To: Stefan Weil <sw@weilnetz.de>, QEMU Developer <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, Gerd Hoffmann <kraxel@redhat.com>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Mon, 2017-01-09 at 10:46 +1100, David Gibson wrote:
-> > >=C2=A0=C2=A0=C2=A0=C2=A0* To allow for hotplugged devices, libvirt s=
-hould also add a number
-> > >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0of additional, empty vPHBs (the =
-PAPR spec allows for hotplug of
-> > >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0PHBs, but this is not yet implem=
-ented in qemu).
-> >=C2=A0
-> > "A number" here will have to mean "one", same number of
-> > empty PCIe Root Ports libvirt will add to a newly-defined
-> > q35 guest.
->=C2=A0
-> Umm.. why?
+19.11.2016 22:29, Stefan Weil wrote:
+...
 
-Because some applications using libvirt would inevitably
-start relying on the fact that such spare PHBs are
-available, locking us into providing at least the same
-number forever. In other words, increasing the amount at
-a later time is always possible, but decreasing it isn't.
-We did the same when we started automatically adding PCIe
-Root Ports to q35 machines.
+Applied to -trivial, except of the hw/block/m25p80.c
+hunk which were applied earlier.
 
-The rationale is that having a single spare hotpluggable
-slot is extremely convenient for basic usage, eg. a simple
-guest created by someone who's not necessarily very
-familiar with virtualization; on the other hand, if you
-are actually deploying in production you ought to conduct
-proper capacity planning and figure out in advance how
-many devices you're likely to need to hotplug throughout
-the guest's life.
+Thank you!
 
-Of course this all will be moot once we can hotplug PHBs :)
-
---=C2=A0
-Andrea Bolognani / Red Hat / Virtualization
+/mjt
