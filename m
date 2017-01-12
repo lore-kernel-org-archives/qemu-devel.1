@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58510)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36025)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cRbdc-00041y-Lw
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 04:25:41 -0500
+	(envelope-from <peterx@redhat.com>) id 1cRbxW-00062y-46
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 04:46:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1cRbdY-0008Ub-F5
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 04:25:40 -0500
-Received: from indium.canonical.com ([91.189.90.7]:46434)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1cRbdY-0008UW-9P
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 04:25:36 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1cRbdW-0000a9-Ud
-	for <qemu-devel@nongnu.org>; Thu, 12 Jan 2017 09:25:35 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 044402E80E4
-	for <qemu-devel@nongnu.org>; Thu, 12 Jan 2017 09:25:34 +0000 (UTC)
+	(envelope-from <peterx@redhat.com>) id 1cRbxU-00088E-Im
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 04:46:14 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58911)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1cRbxU-00087y-AR
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 04:46:12 -0500
+Date: Thu, 12 Jan 2017 17:46:06 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170112094606.GO4450@pxdev.xzpeter.org>
+References: <1482307137-5106-1-git-send-email-peterx@redhat.com>
+	<1482307137-5106-2-git-send-email-peterx@redhat.com>
+	<f6e71117-81ce-db81-d469-d0b48b7cc794@redhat.com>
+	<20170112055027.GK4450@pxdev.xzpeter.org>
+	<37865480-14d1-3a13-c083-013e834de1fc@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 12 Jan 2017 09:07:47 -0000
-From: Vic3Dexe <622367@bugs.launchpad.net>
-Reply-To: Bug 622367 <622367@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20100822180158.18591.82477.malonedeb@palladium.canonical.com>
-Message-Id: <20170112090747.12526.29144.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 622367] Re: No BIOS MPFP structure with smp=92
- and more
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <37865480-14d1-3a13-c083-013e834de1fc@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] memory: provide common macros for
+ mtree_print_mr()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,37 +31,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: marcandre.lureau@gmail.com, qemu-devel@nongnu.org
 
-Man, really? xD
-6 years have passed...
-Close the ticket please, I don't have this code anymore.
-...
-still laughing... sorry
+On Thu, Jan 12, 2017 at 09:54:24AM +0100, Paolo Bonzini wrote:
+> 
+> 
+> On 12/01/2017 06:50, Peter Xu wrote:
+> > On Wed, Jan 11, 2017 at 06:21:46PM +0100, Paolo Bonzini wrote:
+> >>
+> >>
+> >> On 21/12/2016 08:58, Peter Xu wrote:
+> >>> -                   mr->romd_mode ? 'R' : '-',
+> >>> -                   !mr->readonly && !(mr->rom_device && mr->romd_mode) ? 'W'
+> >>> -                                                                       : '-',
+> >>> +                   MR_CHAR_RD(mr),
+> >>> +                   MR_CHAR_WR(mr),
+> >>
+> >> An alternative definition could be
+> >>
+> >> 	memory_access_is_direct(mr, false) ? 'R' : '-'
+> >> 	memory_access_is_direct(mr, true) ? 'W' : '-'
+> >>
+> >> for MR_CHAR_RD and MR_CHAR_WR.  With this change, I think the small code
+> >> duplication in the "? :" operator is tolerable and the code is clearer.
+> > 
+> > memory_access_is_direct() will check against whether mr is RAM, is
+> > that what we want here? In that case we'll get most of the regions as
+> > "--" as long as they are not RAM, while in fact IMHO we should want to
+> > know the rw permission for all cases.
+> 
+> Indeed.  My idea was that the RW permission is not well defined for
+> non-RAM memory regions, and ROMD regions in MMIO mode shows as "--"
+> while MMIO regions show as "RW".  But perhaps it's confusing.
+> 
+> What about writing one of "ram", "rom", "ramd", "romd", "i/o" (with I/O
+> also covering rom_device && !romd_mode)?
+> 
+> If you disagree, the below patch looks good.
 
--- =
+Yes, above suggestion makes sense to me, since after all the RW
+permissions are derived from the type of memory regions, and the type
+itself tells more things than the RW bits. So I totally agree we can
+replace the "RW" chars with its type directly (if no one else
+disagree, of course).
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/622367
+While for below patch, do you want me to include it as well as a
+standalone patch, for the purpose of refactoring
+memory_access_is_direct()? Since IMHO it's tiny clearer and more
+readable than before.
 
-Title:
-  No BIOS MPFP structure with smp=3D92 and more
+Thanks!
 
-Status in QEMU:
-  Incomplete
+> 
+> Paolo
+> 
+> > --------8<--------
+> > diff --git a/include/exec/memory.h b/include/exec/memory.h
+> > index bec9756..50974c8 100644
+> > --- a/include/exec/memory.h
+> > +++ b/include/exec/memory.h
+> > @@ -1619,14 +1619,27 @@ MemTxResult address_space_read_full(AddressSpace *as, hwaddr addr,
+> >                                      MemTxAttrs attrs, uint8_t *buf, int len);
+> >  void *qemu_map_ram_ptr(RAMBlock *ram_block, ram_addr_t addr);
+> > 
+> > +static inline bool memory_region_is_readable(MemoryRegion *mr)
+> > +{
+> > +    return mr->rom_device ? mr->romd_mode : true;
+> > +}
+> > +
+> > +static inline bool memory_region_is_writable(MemoryRegion *mr)
+> > +{
+> > +    return !mr->rom_device && !mr->readonly;
+> > +}
+> > +
+> > +static inline bool memory_region_is_direct(MemoryRegion *mr)
+> > +{
+> > +    return memory_region_is_ram(mr) && !memory_region_is_ram_device(mr);
+> > +}
+> > +
+> >  static inline bool memory_access_is_direct(MemoryRegion *mr, bool is_write)
+> >  {
+> >      if (is_write) {
+> > -        return memory_region_is_ram(mr) &&
+> > -               !mr->readonly && !memory_region_is_ram_device(mr);
+> > +        return memory_region_is_direct(mr) && memory_region_is_writable(mr);
+> >      } else {
+> > -        return (memory_region_is_ram(mr) && !memory_region_is_ram_device(mr)) ||
+> > -               memory_region_is_romd(mr);
+> > +        return memory_region_is_direct(mr) && memory_region_is_readable(mr);
+> >      }
+> >  }
+> > -------->8--------
+> > 
+> > Then, I can throw away MR_CHAR_* macros and use:
+> > 
+> >     memory_access_is_readable(mr, false) ? 'R' : '-'
+> >     memory_access_is_writable(mr, true) ? 'W' : '-'
+> > 
+> > Do you like this approach?
+> > 
+> > -- peterx
+> > 
+> > 
 
-Bug description:
-  qemu 0.12.2, SeaBios 0.5.1, running qemu-system-x86_64.exe with option -s=
-mp.
-  If smp>=3D92 then no MP floating point structure present in 1 Mb. This ma=
-y be verified by pmemsave 0 0x100000 in debugger and search for _MP_ signat=
-ure in file.
-
-  qemu 0.10.5 (bios build 05/08/09) can smp=3D128 (and even 255 if not
-  hangs :).
-
-  Host win 7 x64 RTM 7600.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/622367/+subscriptions
+-- peterx
