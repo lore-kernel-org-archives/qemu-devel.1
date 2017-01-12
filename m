@@ -1,32 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47955)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48034)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cRedv-0006n8-9J
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 07:38:19 -0500
+	(envelope-from <thuth@redhat.com>) id 1cReei-0007IH-8S
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 07:39:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1cRedq-0002aM-Cl
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 07:38:11 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52372)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1cRedq-0002Yn-4A
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 07:38:06 -0500
-Received: from int-mx11.intmail.prod.int.phx2.redhat.com
-	(int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4605081240
-	for <qemu-devel@nongnu.org>; Thu, 12 Jan 2017 12:38:06 +0000 (UTC)
-Date: Thu, 12 Jan 2017 12:38:00 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170112123800.GC2513@work-vm>
-References: <20170108194041.10908-1-ehabkost@redhat.com>
-	<20170109113553.GC2541@work-vm>
-	<20170112123308.GH3565@thinpad.lan.raisama.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170112123308.GH3565@thinpad.lan.raisama.net>
-Subject: Re: [Qemu-devel] [PATCH 0/5] Use non-blacklisted
- family/model/stepping for Haswell CPU model
+	(envelope-from <thuth@redhat.com>) id 1cReed-0002qA-7Z
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 07:39:00 -0500
+From: Thomas Huth <thuth@redhat.com>
+Date: Thu, 12 Jan 2017 13:38:52 +0100
+Message-Id: <1484224732-1345-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH v3] monitor: Fix crashes when using HMP
+ commands without CPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,96 +18,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, libvir-list@redhat.com, fweimer@redhat.com, carlos@redhat.com, triegel@redhat.com, berrange@redhat.com, jdenemar@redhat.com, pbonzini@redhat.com
+To: qemu-trivial@nongnu.org
+Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-* Eduardo Habkost (ehabkost@redhat.com) wrote:
-> On Mon, Jan 09, 2017 at 11:35:54AM +0000, Dr. David Alan Gilbert wrote:
-> > * Eduardo Habkost (ehabkost@redhat.com) wrote:
-> > > A recent glibc commit[1] added a blacklist to ensure it won't use
-> > > TSX on hosts that are known to have a broken TSX implementation.
-> > > 
-> > > Our existing Haswell CPU model has a blacklisted
-> > > family/model/stepping combination, so it has to be updated to
-> > > make sure guests will really use TSX. This is done by patch 5/5.
-> > > 
-> > > However, to do this safely we need to ensure the host CPU is not
-> > > a blacklisted one, so we won't mislead guests by exposing
-> > > known-to-be-good FMS values on a known-to-be-broken host. This is
-> > > done by patch 3/5.
-> > 
-> > I'd just like to mke sure I understand the way this will fail in a migration;
-> > lets say we have a guest that doesn't have the new libc and hosts
-> > with a blacklisted CPU, and -cpu Haswell.
-> > 
-> > If I understand correctly then:
-> >   a) With 'enforce' the destination qemu will fail to start
-> >      printing an error about the host lack of tsx feature.
-> 
-> Yes.
-> 
-> >   b) Without 'enforce' the destination will start but print 
-> >      the same error as a warning, but the guest will probably
-> >      break as soon as it tries to use a tsx feature?
-> 
-> Yes. The general rule is: without "enforce", live migration can
-> break in unpredictable ways.
-> 
-> Without "enforce", QEMU will print a warning, and the VCPU will
-> run _without_ the TSX features on CPUID. If we're live-migrating,
-> it may break the guest if it tries to use a TSX feature, or break
-> migration if a TSX-related bit is already set on a MSR.
+When running certain HMP commands ("info registers", "info cpustats",
+"nmi", "memsave" or dumping virtual memory) with the "none" machine,
+QEMU crashes with a segmentation fault. This happens because the "none"
+machine does not have any CPUs by default, but these HMP commands did
+not check for a valid CPU pointer yet. Add such checks now, so we get
+an error message about the missing CPU instead.
 
-OK, but you've been telling people to use "enforce" long enough that
-they should have listened.
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ v3:
+ - Use UNASSIGNED_CPU_INDEX instead of hard-coded -1
+ v2:
+ - Added more checks to cover "nmi" and "memsave", too
 
-Are there any other cases we have to worry about;  lets say a VM with the
-new libc being migrated from an older QEMU, it suddenly changes
-CPU ID to one that's supported; what happens?
-I'm hoping the guest CPU ID is preserved with the TSX disabled until
-a reboot?
+ hmp.c     |  8 +++++++-
+ monitor.c | 37 +++++++++++++++++++++++++++++++------
+ 2 files changed, 38 insertions(+), 7 deletions(-)
 
-Dave
-
-> 
-> > 
-> > Any other combination?
-> > 
-> > Dave
-> > 
-> > > [1] https://sourceware.org/git/?p=glibc.git;a=commit;h=2702856bf45c82cf8e69f2064f5aa15c0ceb6359
-> > > 
-> > > ---
-> > > Cc: dgilbert@redhat.com
-> > > Cc: fweimer@redhat.com
-> > > Cc: carlos@redhat.com
-> > > Cc: triegel@redhat.com
-> > > Cc: berrange@redhat.com
-> > > Cc: jdenemar@redhat.com
-> > > Cc: pbonzini@redhat.com
-> > > 
-> > > Eduardo Habkost (5):
-> > >   i386: Add explicit array size to x86_cpu_vendor_words2str()
-> > >   i386: host_vendor_fms() helper function
-> > >   i386/kvm: Blacklist TSX on known broken hosts
-> > >   pc: Add 2.9 machine-types
-> > >   i386: Change stepping of Haswell to non-blacklisted value
-> > > 
-> > >  include/hw/i386/pc.h |  6 ++++++
-> > >  target/i386/cpu.h    |  1 +
-> > >  hw/i386/pc_piix.c    | 15 ++++++++++++---
-> > >  hw/i386/pc_q35.c     | 13 +++++++++++--
-> > >  target/i386/cpu.c    | 32 ++++++++++++++++++++++----------
-> > >  target/i386/kvm.c    | 17 +++++++++++++++++
-> > >  6 files changed, 69 insertions(+), 15 deletions(-)
-> > > 
-> > > -- 
-> > > 2.11.0.259.g40922b1
-> > > 
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> 
-> -- 
-> Eduardo
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+diff --git a/hmp.c b/hmp.c
+index b869617..b1c503a 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -1013,8 +1013,14 @@ void hmp_memsave(Monitor *mon, const QDict *qdict)
+     const char *filename = qdict_get_str(qdict, "filename");
+     uint64_t addr = qdict_get_int(qdict, "val");
+     Error *err = NULL;
++    int cpu_index = monitor_get_cpu_index();
+ 
+-    qmp_memsave(addr, size, filename, true, monitor_get_cpu_index(), &err);
++    if (cpu_index < 0) {
++        monitor_printf(mon, "No CPU available\n");
++        return;
++    }
++
++    qmp_memsave(addr, size, filename, true, cpu_index, &err);
+     hmp_handle_error(mon, &err);
+ }
+ 
+diff --git a/monitor.c b/monitor.c
+index 0841d43..17121ff 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -1025,6 +1025,9 @@ int monitor_set_cpu(int cpu_index)
+ CPUState *mon_get_cpu(void)
+ {
+     if (!cur_mon->mon_cpu) {
++        if (!first_cpu) {
++            return NULL;
++        }
+         monitor_set_cpu(first_cpu->cpu_index);
+     }
+     cpu_synchronize_state(cur_mon->mon_cpu);
+@@ -1033,17 +1036,27 @@ CPUState *mon_get_cpu(void)
+ 
+ CPUArchState *mon_get_cpu_env(void)
+ {
+-    return mon_get_cpu()->env_ptr;
++    CPUState *cs = mon_get_cpu();
++
++    return cs ? cs->env_ptr : NULL;
+ }
+ 
+ int monitor_get_cpu_index(void)
+ {
+-    return mon_get_cpu()->cpu_index;
++    CPUState *cs = mon_get_cpu();
++
++    return cs ? cs->cpu_index : UNASSIGNED_CPU_INDEX;
+ }
+ 
+ static void hmp_info_registers(Monitor *mon, const QDict *qdict)
+ {
+-    cpu_dump_state(mon_get_cpu(), (FILE *)mon, monitor_fprintf, CPU_DUMP_FPU);
++    CPUState *cs = mon_get_cpu();
++
++    if (!cs) {
++        monitor_printf(mon, "No CPU available\n");
++        return;
++    }
++    cpu_dump_state(cs, (FILE *)mon, monitor_fprintf, CPU_DUMP_FPU);
+ }
+ 
+ static void hmp_info_jit(Monitor *mon, const QDict *qdict)
+@@ -1076,7 +1089,13 @@ static void hmp_info_history(Monitor *mon, const QDict *qdict)
+ 
+ static void hmp_info_cpustats(Monitor *mon, const QDict *qdict)
+ {
+-    cpu_dump_statistics(mon_get_cpu(), (FILE *)mon, &monitor_fprintf, 0);
++    CPUState *cs = mon_get_cpu();
++
++    if (!cs) {
++        monitor_printf(mon, "No CPU available\n");
++        return;
++    }
++    cpu_dump_statistics(cs, (FILE *)mon, &monitor_fprintf, 0);
+ }
+ 
+ static void hmp_info_trace_events(Monitor *mon, const QDict *qdict)
+@@ -1235,6 +1254,12 @@ static void memory_dump(Monitor *mon, int count, int format, int wsize,
+     int l, line_size, i, max_digits, len;
+     uint8_t buf[16];
+     uint64_t v;
++    CPUState *cs = mon_get_cpu();
++
++    if (!cs && (format == 'i' || !is_physical)) {
++        monitor_printf(mon, "Can not dump without CPU\n");
++        return;
++    }
+ 
+     if (format == 'i') {
+         int flags = 0;
+@@ -1264,7 +1289,7 @@ static void memory_dump(Monitor *mon, int count, int format, int wsize,
+         flags = msr_le << 16;
+         flags |= env->bfd_mach;
+ #endif
+-        monitor_disas(mon, mon_get_cpu(), addr, count, is_physical, flags);
++        monitor_disas(mon, cs, addr, count, is_physical, flags);
+         return;
+     }
+ 
+@@ -1303,7 +1328,7 @@ static void memory_dump(Monitor *mon, int count, int format, int wsize,
+         if (is_physical) {
+             cpu_physical_memory_read(addr, buf, l);
+         } else {
+-            if (cpu_memory_rw_debug(mon_get_cpu(), addr, buf, l, 0) < 0) {
++            if (cpu_memory_rw_debug(cs, addr, buf, l, 0) < 0) {
+                 monitor_printf(mon, " Cannot access memory\n");
+                 break;
+             }
+-- 
+1.8.3.1
