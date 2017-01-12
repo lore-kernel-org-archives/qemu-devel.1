@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53528)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53609)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cRiet-0001rb-HP
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 11:55:29 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cRif2-0001yp-Qw
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 11:55:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cRier-0007jc-P3
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 11:55:27 -0500
-Received: from mail-it0-x234.google.com ([2607:f8b0:4001:c0b::234]:38891)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cRiez-0007oN-De
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 11:55:36 -0500
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:33586)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1cRier-0007jK-KC
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 11:55:25 -0500
-Received: by mail-it0-x234.google.com with SMTP id x2so17718901itf.1
-	for <qemu-devel@nongnu.org>; Thu, 12 Jan 2017 08:55:25 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <CAJSP0QWu33aWRHnodcGy+OVQbMUoy4YG2gzNe4AaeCVns4NdMw@mail.gmail.com>
-References: <CAJSP0QWu33aWRHnodcGy+OVQbMUoy4YG2gzNe4AaeCVns4NdMw@mail.gmail.com>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Thu, 12 Jan 2017 16:55:24 +0000
-Message-ID: <CAJSP0QXnfm8m96vrOf0toS-zcvzydMTWpEp2cH7JkmHMp71nbQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Subject: Re: [Qemu-devel] Volunteers for dmg block driver task?
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1cRiez-0007nC-7h
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 11:55:33 -0500
+Received: by mail-wm0-x242.google.com with SMTP id r144so5006984wme.0
+	for <qemu-devel@nongnu.org>; Thu, 12 Jan 2017 08:55:33 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Thu, 12 Jan 2017 17:55:21 +0100
+Message-Id: <20170112165531.11882-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 00/10] aio_context_acquire/release pushdown,
+ part 1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,11 +26,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com, stefanha@redhat.com
 
-On Thu, Jan 12, 2017 at 4:53 PM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
-> I've added a task to the block todo list.  If anyone is interested in
-> tackling it please reply to this email.
+This is the first step of pushing down the AioContext lock.  Bottom halves
+are already protected by their own lock, use it also for walking_bh
+and for the handlers list (including walking_handlers).  The (lock,
+walking_foo) pair is wrapped into the QemuLockCnt primitive.
 
-I forgot to mention this task is on the wiki:
-http://qemu-project.org/ToDo/Block/DmgChunkSizeIndependence
+The only difference from v3 is a smattering of tiny nice improvements
+to QemuLockCnt.
+
+Paolo
+
+v3->v4:
+        Avoid useless atomic_mb_read in non-futex lockcnt [Stefan]
+        Use atomic_read in qemu_lockcnt_count [Stefan]
+        Tweak comment for qemu_lockcnt_cmpxchg_or_wait [Fam]
+        Use if/else in qemu_lockcnt_dec_and_lock [Fam]
+        Comment QEMU_LOCKCNT_STATE_* definitions [Fam]
+
+v2->v3:
+        fix missing unlock
+
+v1->v2:
+        rebased on top of polling patches
+        moved documentation to include/
+        new patch "aio-posix: split aio_dispatch_handlers out of aio_dispatch"
+        replaced atomic_read with atomic_mb_read in qemu_lockcnt_inc
+        replaced futex* function and macro names with qemu_futex*
+        removed atomic access to node->pfd.revents (because there is no
+          concurrent aio_poll anymore after the BDRV_POLL_WHILE series)
+        left "aio: push aio_context_acquire/release down to dispatching"
+          to a later series
+
+Paolo Bonzini (10):
+  aio: rename bh_lock to list_lock
+  qemu-thread: introduce QemuLockCnt
+  aio: make ctx->list_lock a QemuLockCnt, subsuming ctx->walking_bh
+  qemu-thread: optimize QemuLockCnt with futexes on Linux
+  aio-posix: split aio_dispatch_handlers out of aio_dispatch
+  aio: tweak walking in dispatch phase
+  aio-posix: remove walking_handlers, protecting AioHandler list with
+    list_lock
+  aio-win32: remove walking_handlers, protecting AioHandler list with
+    list_lock
+  aio: document locking
+  async: optimize aio_bh_poll
+
+ aio-posix.c                 | 116 +++++++------
+ aio-win32.c                 |  83 +++++----
+ async.c                     |  45 ++---
+ docs/lockcnt.txt            | 277 +++++++++++++++++++++++++++++++
+ docs/multiple-iothreads.txt |  13 +-
+ include/block/aio.h         |  38 ++---
+ include/qemu/futex.h        |  36 ++++
+ include/qemu/thread.h       | 112 +++++++++++++
+ util/Makefile.objs          |   1 +
+ util/lockcnt.c              | 397 ++++++++++++++++++++++++++++++++++++++++++++
+ util/qemu-thread-posix.c    |  35 +---
+ util/qemu-thread-win32.c    |   2 +-
+ util/trace-events           |  10 ++
+ 13 files changed, 1006 insertions(+), 159 deletions(-)
+ create mode 100644 docs/lockcnt.txt
+ create mode 100644 include/qemu/futex.h
+ create mode 100644 util/lockcnt.c
+
+-- 
+2.9.3
