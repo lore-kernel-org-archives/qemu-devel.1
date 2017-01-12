@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50404)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50461)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cRkCs-0002Go-PM
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 13:34:40 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1cRkDP-0002if-JS
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 13:35:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cRkCo-00073U-Qc
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 13:34:38 -0500
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:34393)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1cRkCo-000732-L2
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 13:34:34 -0500
-Received: by mail-wm0-x244.google.com with SMTP id c85so5625691wmi.1
-	for <qemu-devel@nongnu.org>; Thu, 12 Jan 2017 10:34:34 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 12 Jan 2017 19:07:51 +0100
-Message-Id: <20170112180800.21085-2-pbonzini@redhat.com>
-In-Reply-To: <20170112180800.21085-1-pbonzini@redhat.com>
-References: <20170112180800.21085-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 01/10] aio: rename bh_lock to list_lock
+	(envelope-from <ehabkost@redhat.com>) id 1cRkDM-0007G5-Gc
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 13:35:11 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:41692)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cRkDM-0007F8-B4
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 13:35:08 -0500
+Date: Thu, 12 Jan 2017 16:35:05 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170112183505.GR3565@thinpad.lan.raisama.net>
+References: <1484032051-11619-1-git-send-email-he.chen@linux.intel.com>
+	<20170112171029.GD27893@thinpad.lan.raisama.net>
+	<f08d7b7b-6fdb-73bf-b569-4c8b77b2345a@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f08d7b7b-6fdb-73bf-b569-4c8b77b2345a@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] x86: add AVX512_VPOPCNTDQ features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,118 +28,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: famz@redhat.com, stefanha@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: He Chen <he.chen@linux.intel.com>, qemu-devel@nongnu.org, He Chen <he.chen@intel.com>, Richard Henderson <rth@twiddle.net>
 
-This will be used for AioHandlers too.  There is going to be little
-or no contention, so it is better to reuse the same lock.
+On Thu, Jan 12, 2017 at 07:18:20PM +0100, Paolo Bonzini wrote:
+> On 12/01/2017 18:10, Eduardo Habkost wrote:
+> > On Tue, Jan 10, 2017 at 03:07:31PM +0800, He Chen wrote:
+> >> AVX512_VPOPCNTDQ: Vector POPCNT instructions for word and qwords.
+> >> variable precision.
+> >>
+> >> Signed-off-by: He Chen <he.chen@linux.intel.com>
+> >> ---
+> >>  target/i386/cpu.c | 2 +-
+> >>  target/i386/cpu.h | 1 +
+> >>  2 files changed, 2 insertions(+), 1 deletion(-)
+> >>
+> >> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> >> index b0640f1..ae900b5 100644
+> >> --- a/target/i386/cpu.c
+> >> +++ b/target/i386/cpu.c
+> >> @@ -435,7 +435,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+> >>              NULL, "avx512vbmi", "umip", "pku",
+> >>              "ospke", NULL, NULL, NULL,
+> >>              NULL, NULL, NULL, NULL,
+> >> -            NULL, NULL, NULL, NULL,
+> >> +            NULL, NULL, "vpopcntdq", NULL,
+> > 
+> > The patches I see on linux-kernel use the "avx512_vpopcntdq"
+> > name. Why not use "avx512-vpopcntdq" in QEMU to avoid confusion?
+> 
+> Or without the dash too, for consistency with avx512vbmi.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- async.c             | 20 ++++++++++----------
- include/block/aio.h |  2 +-
- 2 files changed, 11 insertions(+), 11 deletions(-)
+I would agree if Linux was consistent and used "avx512vpopcntdq"
+instead of "avx512_vpopcntdq". But if Linux choose to use
+"avx512_vpopcntdq", I would like to use a compatible name in
+QEMU.
 
-diff --git a/async.c b/async.c
-index 2960171..69292fa 100644
---- a/async.c
-+++ b/async.c
-@@ -53,14 +53,14 @@ void aio_bh_schedule_oneshot(AioContext *ctx, QEMUBHFunc *cb, void *opaque)
-         .cb = cb,
-         .opaque = opaque,
-     };
--    qemu_mutex_lock(&ctx->bh_lock);
-+    qemu_mutex_lock(&ctx->list_lock);
-     bh->next = ctx->first_bh;
-     bh->scheduled = 1;
-     bh->deleted = 1;
-     /* Make sure that the members are ready before putting bh into list */
-     smp_wmb();
-     ctx->first_bh = bh;
--    qemu_mutex_unlock(&ctx->bh_lock);
-+    qemu_mutex_unlock(&ctx->list_lock);
-     aio_notify(ctx);
- }
- 
-@@ -73,12 +73,12 @@ QEMUBH *aio_bh_new(AioContext *ctx, QEMUBHFunc *cb, void *opaque)
-         .cb = cb,
-         .opaque = opaque,
-     };
--    qemu_mutex_lock(&ctx->bh_lock);
-+    qemu_mutex_lock(&ctx->list_lock);
-     bh->next = ctx->first_bh;
-     /* Make sure that the members are ready before putting bh into list */
-     smp_wmb();
-     ctx->first_bh = bh;
--    qemu_mutex_unlock(&ctx->bh_lock);
-+    qemu_mutex_unlock(&ctx->list_lock);
-     return bh;
- }
- 
-@@ -120,7 +120,7 @@ int aio_bh_poll(AioContext *ctx)
- 
-     /* remove deleted bhs */
-     if (!ctx->walking_bh) {
--        qemu_mutex_lock(&ctx->bh_lock);
-+        qemu_mutex_lock(&ctx->list_lock);
-         bhp = &ctx->first_bh;
-         while (*bhp) {
-             bh = *bhp;
-@@ -131,7 +131,7 @@ int aio_bh_poll(AioContext *ctx)
-                 bhp = &bh->next;
-             }
-         }
--        qemu_mutex_unlock(&ctx->bh_lock);
-+        qemu_mutex_unlock(&ctx->list_lock);
-     }
- 
-     return ret;
-@@ -270,7 +270,7 @@ aio_ctx_finalize(GSource     *source)
-     }
- #endif
- 
--    qemu_mutex_lock(&ctx->bh_lock);
-+    qemu_mutex_lock(&ctx->list_lock);
-     while (ctx->first_bh) {
-         QEMUBH *next = ctx->first_bh->next;
- 
-@@ -280,12 +280,12 @@ aio_ctx_finalize(GSource     *source)
-         g_free(ctx->first_bh);
-         ctx->first_bh = next;
-     }
--    qemu_mutex_unlock(&ctx->bh_lock);
-+    qemu_mutex_unlock(&ctx->list_lock);
- 
-     aio_set_event_notifier(ctx, &ctx->notifier, false, NULL, NULL);
-     event_notifier_cleanup(&ctx->notifier);
-     qemu_rec_mutex_destroy(&ctx->lock);
--    qemu_mutex_destroy(&ctx->bh_lock);
-+    qemu_mutex_destroy(&ctx->list_lock);
-     timerlistgroup_deinit(&ctx->tlg);
- }
- 
-@@ -381,7 +381,7 @@ AioContext *aio_context_new(Error **errp)
-     ctx->linux_aio = NULL;
- #endif
-     ctx->thread_pool = NULL;
--    qemu_mutex_init(&ctx->bh_lock);
-+    qemu_mutex_init(&ctx->list_lock);
-     qemu_rec_mutex_init(&ctx->lock);
-     timerlistgroup_init(&ctx->tlg, aio_timerlist_notify, ctx);
- 
-diff --git a/include/block/aio.h b/include/block/aio.h
-index 4dca54d..013d400 100644
---- a/include/block/aio.h
-+++ b/include/block/aio.h
-@@ -91,7 +91,7 @@ struct AioContext {
-     uint32_t notify_me;
- 
-     /* lock to protect between bh's adders and deleter */
--    QemuMutex bh_lock;
-+    QemuMutex list_lock;
- 
-     /* Anchor of the list of Bottom Halves belonging to the context */
-     struct QEMUBH *first_bh;
+Other software components are likely to use the same flag names
+as Linux. If we use a different name, they will need to manually
+translate the Linux names to QEMU names.
+
 -- 
-2.9.3
+Eduardo
