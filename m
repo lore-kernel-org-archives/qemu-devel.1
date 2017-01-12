@@ -1,21 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50667)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53009)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hpoussin@reactos.org>) id 1cRewk-0000Je-99
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 07:57:40 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1cRf37-0003Ze-Il
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 08:04:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hpoussin@reactos.org>) id 1cRewg-00026R-8x
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 07:57:38 -0500
-References: <1483049536-21548-1-git-send-email-hpoussin@reactos.org>
-	<CACXAS8AGTGJ-3yEzf9gzOmfRfppL2REmTyB2SAkb3Nd8eyVYig@mail.gmail.com>
-From: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
-Message-ID: <733cba29-58b7-e43f-0d50-3774ee8bf3b2@reactos.org>
-Date: Thu, 12 Jan 2017 13:57:11 +0100
+	(envelope-from <ehabkost@redhat.com>) id 1cRf32-0005zN-HI
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 08:04:13 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57782)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cRf32-0005z6-90
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 08:04:08 -0500
+Received: from int-mx09.intmail.prod.int.phx2.redhat.com
+	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4B24461B96
+	for <qemu-devel@nongnu.org>; Thu, 12 Jan 2017 13:04:08 +0000 (UTC)
+Date: Thu, 12 Jan 2017 11:04:05 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170112130405.GK3565@thinpad.lan.raisama.net>
+References: <20170108194041.10908-1-ehabkost@redhat.com>
+	<20170109113553.GC2541@work-vm>
+	<20170112123308.GH3565@thinpad.lan.raisama.net>
+	<20170112123800.GC2513@work-vm>
 MIME-Version: 1.0
-In-Reply-To: <CACXAS8AGTGJ-3yEzf9gzOmfRfppL2REmTyB2SAkb3Nd8eyVYig@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 0/6] ppc: add a IBM 40p machine (RS/6000,
- PReP)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170112123800.GC2513@work-vm>
+Subject: Re: [Qemu-devel] [PATCH 0/5] Use non-blacklisted
+ family/model/stepping for Haswell CPU model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,173 +36,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Artyom Tarasenko <atar4qemu@gmail.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Giancarlo Teodori <gteodori@gmail.com>, Thomas Huth <thuth@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, libvir-list@redhat.com, fweimer@redhat.com, carlos@redhat.com, triegel@redhat.com, berrange@redhat.com, jdenemar@redhat.com, pbonzini@redhat.com
 
-Le 11/01/2017 =C3=A0 17:58, Artyom Tarasenko a =C3=A9crit :
-> Hi Herv=C3=A9,
->
-> nice work!
->
-> On Thu, Dec 29, 2016 at 11:12 PM, Herv=C3=A9 Poussineau <hpoussin@react=
-os.org> wrote:
->> Hi,
->>
->> This patchset adds the emulation of the IBM RS/6000 7020 (40p). The re=
-al machine is
->> able to run AIX (up to 4.3.3), Windows NT (up to 4.0 SP1), the beta of=
- OS/2 PowerPC,
->> Solaris, Linux, NetBSD/PReP ...
->>
->> I've tested current emulation with Open Hack'Ware, OpenBIOS and offici=
-al firmware.
->>
->> Linux kernel starts, and freezes during boot (like with 'prep' machine=
-).
+On Thu, Jan 12, 2017 at 12:38:00PM +0000, Dr. David Alan Gilbert wrote:
+> * Eduardo Habkost (ehabkost@redhat.com) wrote:
+> > On Mon, Jan 09, 2017 at 11:35:54AM +0000, Dr. David Alan Gilbert wrote:
+> > > * Eduardo Habkost (ehabkost@redhat.com) wrote:
+> > > > A recent glibc commit[1] added a blacklist to ensure it won't use
+> > > > TSX on hosts that are known to have a broken TSX implementation.
+> > > > 
+> > > > Our existing Haswell CPU model has a blacklisted
+> > > > family/model/stepping combination, so it has to be updated to
+> > > > make sure guests will really use TSX. This is done by patch 5/5.
+> > > > 
+> > > > However, to do this safely we need to ensure the host CPU is not
+> > > > a blacklisted one, so we won't mislead guests by exposing
+> > > > known-to-be-good FMS values on a known-to-be-broken host. This is
+> > > > done by patch 3/5.
+> > > 
+> > > I'd just like to mke sure I understand the way this will fail in a migration;
+> > > lets say we have a guest that doesn't have the new libc and hosts
+> > > with a blacklisted CPU, and -cpu Haswell.
+> > > 
+> > > If I understand correctly then:
+> > >   a) With 'enforce' the destination qemu will fail to start
+> > >      printing an error about the host lack of tsx feature.
+> > 
+> > Yes.
+> > 
+> > >   b) Without 'enforce' the destination will start but print 
+> > >      the same error as a warning, but the guest will probably
+> > >      break as soon as it tries to use a tsx feature?
+> > 
+> > Yes. The general rule is: without "enforce", live migration can
+> > break in unpredictable ways.
+> > 
+> > Without "enforce", QEMU will print a warning, and the VCPU will
+> > run _without_ the TSX features on CPUID. If we're live-migrating,
+> > it may break the guest if it tries to use a TSX feature, or break
+> > migration if a TSX-related bit is already set on a MSR.
+> 
+> OK, but you've been telling people to use "enforce" long enough that
+> they should have listened.
+> 
+> Are there any other cases we have to worry about;  lets say a VM with the
+> new libc being migrated from an older QEMU, it suddenly changes
+> CPU ID to one that's supported; what happens?
 
-I already saw a regression during 2.7.0 cycle with 603 CPU. However, I wa=
-s unable to provide kernel source, so Benjamin was unable to find the pro=
-blem.
-http://lists.gnu.org/archive/html/qemu-devel/2016-08/msg03760.html
+I assume you are talking about the stepping change, when
+migrating from an old QEMU to a host that is _not_ on the
+blacklist. In this case, the guest won't see any changes: CPUID
+family/model/stepping will be kept the same for the whole life of
+the VM (even if it is shut down), thanks to the machine-type
+compatibility code.
 
->
-> If prep can't do it anymore, it looks like a regression. I definitely
-> remember seen a sitting penguin and a login prompt ~ 2 years ago. At
-> least with OFW.
->
->> Windows NT starts up to the point where it wants to change endianness.
->
-> I hit that with Solaris/PPC a few years back as you published your
-> previous attempt. Do you know what is missing? I guess CPU endianness
-> switch emulation is working because it is used in the newer POWER
-> CPUs. Is it just the systemIO which has to be improved, or is it more?
+> I'm hoping the guest CPU ID is preserved with the TSX disabled until
+> a reboot?
 
-Yes, PReP System I/O has LE flag which is not implemented.
-You may be interested by ftp://ftp.software.ibm.com/rs6000/technology/spe=
-c/endian.ps
-which deals about endianness switching, with some code from Windows NT/PP=
-C
+CPUID changes are effective immediately on migration. But guests
+often notice the change only on the next reboot.
 
->
->> Other OSes have not been tested.
->>
->> This machine is a superset of the 'prep' one, because we know exactly =
-what is/should
->> emulated, and that operating system list running on it is quite wide.
->> I hope that 'prep' machine can be deprecated soon and then later remov=
-ed.
->
-> Would be nice to keep 'prep' until the 40p can boot Linux and NetBSD
-> 6.1.3 (this version used to work with -M prep last time I checked).
+We could do something to make these problems less likely:
+including CPUID data on the migration stream. I have considered
+it on the past, but never implemented it. Maybe I should
+reconsider that.
 
-Some Linux kernels seem to work, some other ones seem to not work (hang w=
-hile booting)
-I've not searched why.
+(This is another case where it would be interesting to have a
+mechanism to let the destination host abort migration early: we
+could make QEMU work in "enforce" mode when live-migrating, but
+using the migrated CPUID data. This way CPUID changes would never
+happen.)
 
-I tried NetBSD 6.1.3/PReP.
-cdroms/harddisks don't boot anymore with Open Hack'Ware since some change=
-s in IDE core
-Kernel boots better with 40p than with prep
+> 
+> Dave
+> 
+> > 
+> > > 
+> > > Any other combination?
+> > > 
+> > > Dave
+> > > 
+> > > > [1] https://sourceware.org/git/?p=glibc.git;a=commit;h=2702856bf45c82cf8e69f2064f5aa15c0ceb6359
+> > > > 
+> > > > ---
+> > > > Cc: dgilbert@redhat.com
+> > > > Cc: fweimer@redhat.com
+> > > > Cc: carlos@redhat.com
+> > > > Cc: triegel@redhat.com
+> > > > Cc: berrange@redhat.com
+> > > > Cc: jdenemar@redhat.com
+> > > > Cc: pbonzini@redhat.com
+> > > > 
+> > > > Eduardo Habkost (5):
+> > > >   i386: Add explicit array size to x86_cpu_vendor_words2str()
+> > > >   i386: host_vendor_fms() helper function
+> > > >   i386/kvm: Blacklist TSX on known broken hosts
+> > > >   pc: Add 2.9 machine-types
+> > > >   i386: Change stepping of Haswell to non-blacklisted value
+> > > > 
+> > > >  include/hw/i386/pc.h |  6 ++++++
+> > > >  target/i386/cpu.h    |  1 +
+> > > >  hw/i386/pc_piix.c    | 15 ++++++++++++---
+> > > >  hw/i386/pc_q35.c     | 13 +++++++++++--
+> > > >  target/i386/cpu.c    | 32 ++++++++++++++++++++++----------
+> > > >  target/i386/kvm.c    | 17 +++++++++++++++++
+> > > >  6 files changed, 69 insertions(+), 15 deletions(-)
+> > > > 
+> > > > -- 
+> > > > 2.11.0.259.g40922b1
+> > > > 
+> > > --
+> > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> > 
+> > -- 
+> > Eduardo
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D
-prep:
-
-Copyright (c) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-     2006, 2007, 2008, 2009, 2010, 2011, 2012
-     The NetBSD Foundation, Inc.  All rights reserved.
-Copyright (c) 1982, 1986, 1989, 1991, 1993
-     The Regents of the University of California.  All rights reserved.
-
-NetBSD 6.1.3 (INSTALL)
-Model: Qemu
-total memory =3D 128 MB
-avail memory =3D 119 MB
-panic: call to null-ptr from 0x0
-
-The operating system has halted.
-Please press any key to reboot.
-
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D
-40p/Open Hack'Ware:
-
-Copyright (c) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-     2006, 2007, 2008, 2009, 2010, 2011, 2012
-     The NetBSD Foundation, Inc.  All rights reserved.
-Copyright (c) 1982, 1986, 1989, 1991, 1993
-     The Regents of the University of California.  All rights reserved.
-
-NetBSD 6.1.3 (INSTALL)
-Model: Qemu
-total memory =3D 128 MB
-avail memory =3D 119 MB
-mainbus0 (root)
-cpu0 at mainbus0: 604 (Revision 1.3), ID 0 (primary)
-cpu0: HID0 0xc084<ICE,DCE,SGE,BHT>, powersave: 1
-cpu0: 0.00 MHz
-Couldn't find PNP data for bus 0 devfunc 0x0
-pnpbus0 at mainbus0
-pci0 at mainbus0 bus 0: indirect configuration space access
-pchb0 at pci0 dev 0 function 0
-pchb0: vendor 0x1057 product 0x4801 (rev. 0x00)
-siop0 at pci0 dev 1 function 0: Symbios Logic 53c810 (fast scsi)
-siop0: couldn't map interrupt
-vga0 at pci0 dev 2 function 0: vendor 0x1234 product 0x1111 (rev. 0x02)
-wsdisplay0 at vga0 (kbdmux ignored)
-drm at vga0 not configured
-pcn0 at pci0 dev 3 function 0: AMD PCnet-PCI Ethernet
-pcn0: Am79c970A PCnet-PCI II rev 0, Ethernet address 52:54:00:12:34:56
-pcn0: unable to map interrupt
-pcib0 at pci0 dev 11 function 0: vendor 0x8086 product 0x0484 (rev. 0x03)
-isa0 at pcib0
-com0 at isa0 port 0x3f8-0x3ff irq 4: ns16550a, working fifo
-com0: console
-com1 at isa0 port 0x2f8-0x2ff irq 3: ns16550a, working fifo
-pckbc0 at isa0 port 0x60-0x64
-pckbd0 at pckbc0 (kbd slot)
-pckbc0: using irq 1 for kbd slot
-wskbd0 at pckbd0 (mux ignored)
-vmmask 10000000 schedmask 10000000 highmask 70000000
-boot device: mainbus0
-root on md0a dumps on md0b
-root file system type: ffs
-WARNING: no TOD clock present
-WARNING: using filesystem time
-WARNING: CHECK AND RESET THE DATE!
-erase ^H, werase ^W, kill ^U, intr ^C, status ^T
-Terminal type? [vt100]
-
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D
-40p/official firmware with cdrom boot:
-
-Copyright (c) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-     2006, 2007, 2008, 2009, 2010, 2011, 2012
-     The NetBSD Foundation, Inc.  All rights reserved.
-Copyright (c) 1982, 1986, 1989, 1991, 1993
-     The Regents of the University of California.  All rights reserved.
-
-NetBSD 6.1.3 (INSTALL)
-Model: IBM PPS Model 6015
-total memory =3D 128 MB
-avail memory =3D 119 MB
-trap: kernel read DSI trap @ 0x481b4cae by 0x2a4f50 (DSISR 0x40000000, er=
-r=3D14), lr 0x140e84
-panic: trap
-
-The operating system has halted.
-Please press any key to reboot.
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D
-
-OpenBIOS doesn't support PReP boot partitions (type 0x41) nor PReP kernel=
-s so this is a no-go yet.
-
-Regards,
-
-Herv=C3=A9
+-- 
+Eduardo
