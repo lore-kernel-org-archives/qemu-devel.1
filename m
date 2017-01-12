@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46953)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47035)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cRUkE-0003F3-60
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 21:04:05 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cRUkF-0003FC-P9
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 21:04:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cRUkB-0006mG-35
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 21:04:02 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cRUkC-0006o5-4z
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 21:04:03 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu, 12 Jan 2017 13:03:25 +1100
-Message-Id: <20170112020327.24882-66-david@gibson.dropbear.id.au>
+Date: Thu, 12 Jan 2017 13:03:12 +1100
+Message-Id: <20170112020327.24882-53-david@gibson.dropbear.id.au>
 In-Reply-To: <20170112020327.24882-1-david@gibson.dropbear.id.au>
 References: <20170112020327.24882-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 65/67] target-ppc: Add xscvqpdp instruction
+Subject: [Qemu-devel] [PULL 52/67] target-ppc: Replace isden by
+ float64_is_zero_or_denormal
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,93 +25,45 @@ Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com,
 
 From: Bharata B Rao <bharata@linux.vnet.ibm.com>
 
-xscvqpdp:  VSX Scalar round & Convert Quad-Precision format to
-           Double-Precision format
+Replace isden() by float64_is_zero_or_denormal() so that code in
+helper_compute_fprf() can be reused to work with float128 argument.
 
 Signed-off-by: Bharata B Rao <bharata@linux.vnet.ibm.com>
 Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/fpu_helper.c             | 28 ++++++++++++++++++++++++++++
- target/ppc/helper.h                 |  1 +
- target/ppc/translate/vsx-impl.inc.c |  1 +
- target/ppc/translate/vsx-ops.inc.c  |  1 +
- 4 files changed, 31 insertions(+)
+ target/ppc/fpu_helper.c | 11 +----------
+ 1 file changed, 1 insertion(+), 10 deletions(-)
 
 diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
-index 16397ef..8c8e3c5 100644
+index 4da991a..5a7aa75 100644
 --- a/target/ppc/fpu_helper.c
 +++ b/target/ppc/fpu_helper.c
-@@ -2778,6 +2778,34 @@ void helper_##op(CPUPPCState *env, uint32_t opcode)                \
- VSX_CVT_FP_TO_FP_HP(xscvdphp, float64, float16, VsrD(0), VsrH(3))
- VSX_CVT_FP_TO_FP_HP(xscvhpdp, float16, float64, VsrH(3), VsrD(0))
+@@ -47,15 +47,6 @@ uint32_t helper_float64_to_float32(CPUPPCState *env, uint64_t arg)
+     return f.l;
+ }
  
-+/*
-+ * xscvqpdp isn't using VSX_CVT_FP_TO_FP() because xscvqpdpo will be
-+ * added to this later.
-+ */
-+void helper_xscvqpdp(CPUPPCState *env, uint32_t opcode)
-+{
-+    ppc_vsr_t xt, xb;
-+
-+    getVSR(rB(opcode) + 32, &xb, env);
-+    getVSR(rD(opcode) + 32, &xt, env);
-+
-+    if (unlikely(Rc(opcode) != 0)) {
-+        /* TODO: Support xscvqpdpo after round-to-odd is implemented */
-+        abort();
-+    }
-+
-+    xt.VsrD(0) = float128_to_float64(xb.f128, &env->fp_status);
-+    if (unlikely(float128_is_signaling_nan(xb.f128,
-+                                           &env->fp_status))) {
-+        float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 0);
-+        xt.VsrD(0) = float64_snan_to_qnan(xt.VsrD(0));
-+    }
-+    helper_compute_fprf_float64(env, xt.VsrD(0));
-+
-+    putVSR(rD(opcode) + 32, &xt, env);
-+    float_check_status(env);
-+}
-+
- uint64_t helper_xscvdpspn(CPUPPCState *env, uint64_t xb)
+-static inline int isden(float64 d)
+-{
+-    CPU_DoubleU u;
+-
+-    u.d = d;
+-
+-    return ((u.ll >> 52) & 0x7FF) == 0;
+-}
+-
+ static inline int ppc_float32_get_unbiased_exp(float32 f)
  {
-     float_status tstat = env->fp_status;
-diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-index 3b5d0ad..f28bf62 100644
---- a/target/ppc/helper.h
-+++ b/target/ppc/helper.h
-@@ -433,6 +433,7 @@ DEF_HELPER_2(xscvdphp, void, env, i32)
- DEF_HELPER_2(xscvdpqp, void, env, i32)
- DEF_HELPER_2(xscvdpsp, void, env, i32)
- DEF_HELPER_2(xscvdpspn, i64, env, i64)
-+DEF_HELPER_2(xscvqpdp, void, env, i32)
- DEF_HELPER_2(xscvhpdp, void, env, i32)
- DEF_HELPER_2(xscvspdp, void, env, i32)
- DEF_HELPER_2(xscvspdpn, i64, env, i64)
-diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/vsx-impl.inc.c
-index 01b5621..2d9fe50 100644
---- a/target/ppc/translate/vsx-impl.inc.c
-+++ b/target/ppc/translate/vsx-impl.inc.c
-@@ -810,6 +810,7 @@ GEN_VSX_HELPER_2(xscvdphp, 0x16, 0x15, 0x11, PPC2_ISA300)
- GEN_VSX_HELPER_2(xscvdpsp, 0x12, 0x10, 0, PPC2_VSX)
- GEN_VSX_HELPER_2(xscvdpqp, 0x04, 0x1A, 0x16, PPC2_ISA300)
- GEN_VSX_HELPER_XT_XB_ENV(xscvdpspn, 0x16, 0x10, 0, PPC2_VSX207)
-+GEN_VSX_HELPER_2(xscvqpdp, 0x04, 0x1A, 0x14, PPC2_ISA300)
- GEN_VSX_HELPER_2(xscvhpdp, 0x16, 0x15, 0x10, PPC2_ISA300)
- GEN_VSX_HELPER_2(xscvspdp, 0x12, 0x14, 0, PPC2_VSX)
- GEN_VSX_HELPER_XT_XB_ENV(xscvspdpn, 0x16, 0x14, 0, PPC2_VSX207)
-diff --git a/target/ppc/translate/vsx-ops.inc.c b/target/ppc/translate/vsx-ops.inc.c
-index e75ecd1..aeeaff2 100644
---- a/target/ppc/translate/vsx-ops.inc.c
-+++ b/target/ppc/translate/vsx-ops.inc.c
-@@ -113,6 +113,7 @@ GEN_VSX_XFORM_300_EO(xsnabsqp, 0x04, 0x19, 0x08, 0x00000001),
- GEN_VSX_XFORM_300_EO(xsnegqp, 0x04, 0x19, 0x10, 0x00000001),
- GEN_VSX_XFORM_300(xscpsgnqp, 0x04, 0x03, 0x00000001),
- GEN_VSX_XFORM_300_EO(xscvdpqp, 0x04, 0x1A, 0x16, 0x00000001),
-+GEN_VSX_XFORM_300_EO(xscvqpdp, 0x04, 0x1A, 0x14, 0x0),
- 
- #ifdef TARGET_PPC64
- GEN_XX2FORM_EO(xsxexpdp, 0x16, 0x15, 0x00, PPC2_ISA300),
+     return ((f >> 23) & 0xFF) - 127;
+@@ -96,7 +87,7 @@ void helper_compute_fprf(CPUPPCState *env, float64 arg)
+                 fprf = 0x02;
+             }
+         } else {
+-            if (isden(arg)) {
++            if (float64_is_zero_or_denormal(arg)) {
+                 /* Denormalized numbers */
+                 fprf = 0x10;
+             } else {
 -- 
 2.9.3
