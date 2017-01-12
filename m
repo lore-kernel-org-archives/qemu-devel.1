@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33874)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34154)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1cRfiB-0002FG-Fm
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 08:46:44 -0500
+	(envelope-from <vpalatin@google.com>) id 1cRfjY-00038q-Np
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 08:48:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1cRfi6-0000vr-30
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 08:46:39 -0500
+	(envelope-from <vpalatin@google.com>) id 1cRfjT-0001vO-VD
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 08:48:04 -0500
+Received: from mail-io0-x22f.google.com ([2607:f8b0:4001:c06::22f]:33786)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <vpalatin@google.com>) id 1cRfjT-0001ug-Nb
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 08:47:59 -0500
+Received: by mail-io0-x22f.google.com with SMTP id v96so18527295ioi.0
+	for <qemu-devel@nongnu.org>; Thu, 12 Jan 2017 05:47:59 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <733cba29-58b7-e43f-0d50-3774ee8bf3b2@reactos.org>
-References: <1483049536-21548-1-git-send-email-hpoussin@reactos.org>
-	<CACXAS8AGTGJ-3yEzf9gzOmfRfppL2REmTyB2SAkb3Nd8eyVYig@mail.gmail.com>
-	<733cba29-58b7-e43f-0d50-3774ee8bf3b2@reactos.org>
-From: Artyom Tarasenko <atar4qemu@gmail.com>
-Date: Thu, 12 Jan 2017 14:46:11 +0100
-Message-ID: <CACXAS8Ase7rdvAu2tPq3GijuiQwdQ6-EojN5VCYV3pQRfFKs+w@mail.gmail.com>
+Sender: vpalatin@google.com
+In-Reply-To: <20170112132558.GL3565@thinpad.lan.raisama.net>
+References: <20170104205722.26492-1-marcandre.lureau@redhat.com>
+	<20170112132558.GL3565@thinpad.lan.raisama.net>
+From: Vincent Palatin <vpalatin@chromium.org>
+Date: Thu, 12 Jan 2017 14:47:37 +0100
+Message-ID: <CAP_ceTy5QZZ=by5vzfT51KyHm0M2-4_LyR-LFQk1-fQfDOVtXw@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 0/6] ppc: add a IBM 40p machine (RS/6000,
- PReP)
+Subject: Re: [Qemu-devel] [PATCH] Revert "win32: don't run subprocess tests
+ on Mingw32 platform"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,199 +31,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Giancarlo Teodori <gteodori@gmail.com>, Thomas Huth <thuth@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
 
-On Thu, Jan 12, 2017 at 1:57 PM, Herv=C3=A9 Poussineau <hpoussin@reactos.or=
-g> wrote:
-> Le 11/01/2017 =C3=A0 17:58, Artyom Tarasenko a =C3=A9crit :
+On Thu, Jan 12, 2017 at 2:25 PM, Eduardo Habkost <ehabkost@redhat.com> wrot=
+e:
+> On Wed, Jan 04, 2017 at 09:57:22PM +0100, Marc-Andr=C3=A9 Lureau wrote:
+>> This reverts commit 7ad9339e372fcd12d584684d7f52ac259604a4f4.
 >>
->> Hi Herv=C3=A9,
+>> The error "Failed to execute helper program (No such file or directory)"
+>> is due to broken glib installation, missing windows gspawn helpers.
 >>
->> nice work!
->>
->> On Thu, Dec 29, 2016 at 11:12 PM, Herv=C3=A9 Poussineau <hpoussin@reacto=
-s.org>
->> wrote:
->>>
->>> Hi,
->>>
->>> This patchset adds the emulation of the IBM RS/6000 7020 (40p). The rea=
-l
->>> machine is
->>> able to run AIX (up to 4.3.3), Windows NT (up to 4.0 SP1), the beta of
->>> OS/2 PowerPC,
->>> Solaris, Linux, NetBSD/PReP ...
->>>
->>> I've tested current emulation with Open Hack'Ware, OpenBIOS and officia=
-l
->>> firmware.
->>>
->>> Linux kernel starts, and freezes during boot (like with 'prep' machine)=
-.
+>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 >
+> Daniel, are you still unable to run subprocess tests on Migw32?
 >
-> I already saw a regression during 2.7.0 cycle with 603 CPU. However, I wa=
-s
-> unable to provide kernel source, so Benjamin was unable to find the probl=
-em.
-> http://lists.gnu.org/archive/html/qemu-devel/2016-08/msg03760.html
->
->>
->> If prep can't do it anymore, it looks like a regression. I definitely
->> remember seen a sitting penguin and a login prompt ~ 2 years ago. At
->> least with OFW.
->>
->>> Windows NT starts up to the point where it wants to change endianness.
->>
->>
->> I hit that with Solaris/PPC a few years back as you published your
->> previous attempt. Do you know what is missing? I guess CPU endianness
->> switch emulation is working because it is used in the newer POWER
->> CPUs. Is it just the systemIO which has to be improved, or is it more?
->
->
-> Yes, PReP System I/O has LE flag which is not implemented.
-> You may be interested by
-> ftp://ftp.software.ibm.com/rs6000/technology/spec/endian.ps
-> which deals about endianness switching, with some code from Windows NT/PP=
-C
->
->>
->>> Other OSes have not been tested.
->>>
->>> This machine is a superset of the 'prep' one, because we know exactly
->>> what is/should
->>> emulated, and that operating system list running on it is quite wide.
->>> I hope that 'prep' machine can be deprecated soon and then later remove=
-d.
->>
->>
->> Would be nice to keep 'prep' until the 40p can boot Linux and NetBSD
->> 6.1.3 (this version used to work with -M prep last time I checked).
->
->
-> Some Linux kernels seem to work, some other ones seem to not work (hang
-> while booting)
-> I've not searched why.
+> Anybody else able to test this and send a Tested-by line?
 
-I should have somewhere the Debian Woody Image I used. Will test it tonight=
-.
+Works on my setup (mingw32-w64 build on Windows 10, with glib-2.46.2)
 
-> I tried NetBSD 6.1.3/PReP.
-> cdroms/harddisks don't boot anymore with Open Hack'Ware since some change=
-s
-> in IDE core
-> Kernel boots better with 40p than with prep
->
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D
-> prep:
->
-> Copyright (c) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
->     2006, 2007, 2008, 2009, 2010, 2011, 2012
->     The NetBSD Foundation, Inc.  All rights reserved.
-> Copyright (c) 1982, 1986, 1989, 1991, 1993
->     The Regents of the University of California.  All rights reserved.
->
-> NetBSD 6.1.3 (INSTALL)
-> Model: Qemu
-> total memory =3D 128 MB
-> avail memory =3D 119 MB
-> panic: call to null-ptr from 0x0
->
-> The operating system has halted.
-> Please press any key to reboot.
->
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D
-> 40p/Open Hack'Ware:
->
-> Copyright (c) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
->     2006, 2007, 2008, 2009, 2010, 2011, 2012
->     The NetBSD Foundation, Inc.  All rights reserved.
-> Copyright (c) 1982, 1986, 1989, 1991, 1993
->     The Regents of the University of California.  All rights reserved.
->
-> NetBSD 6.1.3 (INSTALL)
-> Model: Qemu
-> total memory =3D 128 MB
-> avail memory =3D 119 MB
-> mainbus0 (root)
-> cpu0 at mainbus0: 604 (Revision 1.3), ID 0 (primary)
-> cpu0: HID0 0xc084<ICE,DCE,SGE,BHT>, powersave: 1
-> cpu0: 0.00 MHz
-> Couldn't find PNP data for bus 0 devfunc 0x0
-> pnpbus0 at mainbus0
-> pci0 at mainbus0 bus 0: indirect configuration space access
-> pchb0 at pci0 dev 0 function 0
-> pchb0: vendor 0x1057 product 0x4801 (rev. 0x00)
-> siop0 at pci0 dev 1 function 0: Symbios Logic 53c810 (fast scsi)
-> siop0: couldn't map interrupt
-> vga0 at pci0 dev 2 function 0: vendor 0x1234 product 0x1111 (rev. 0x02)
-> wsdisplay0 at vga0 (kbdmux ignored)
-> drm at vga0 not configured
-> pcn0 at pci0 dev 3 function 0: AMD PCnet-PCI Ethernet
-> pcn0: Am79c970A PCnet-PCI II rev 0, Ethernet address 52:54:00:12:34:56
-> pcn0: unable to map interrupt
-> pcib0 at pci0 dev 11 function 0: vendor 0x8086 product 0x0484 (rev. 0x03)
-> isa0 at pcib0
-> com0 at isa0 port 0x3f8-0x3ff irq 4: ns16550a, working fifo
-> com0: console
-> com1 at isa0 port 0x2f8-0x2ff irq 3: ns16550a, working fifo
-> pckbc0 at isa0 port 0x60-0x64
-> pckbd0 at pckbc0 (kbd slot)
-> pckbc0: using irq 1 for kbd slot
-> wskbd0 at pckbd0 (mux ignored)
-> vmmask 10000000 schedmask 10000000 highmask 70000000
-> boot device: mainbus0
-> root on md0a dumps on md0b
-> root file system type: ffs
-> WARNING: no TOD clock present
-> WARNING: using filesystem time
-> WARNING: CHECK AND RESET THE DATE!
-> erase ^H, werase ^W, kill ^U, intr ^C, status ^T
-> Terminal type? [vt100]
->
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D
-> 40p/official firmware with cdrom boot:
->
-> Copyright (c) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
->     2006, 2007, 2008, 2009, 2010, 2011, 2012
->     The NetBSD Foundation, Inc.  All rights reserved.
-> Copyright (c) 1982, 1986, 1989, 1991, 1993
->     The Regents of the University of California.  All rights reserved.
->
-> NetBSD 6.1.3 (INSTALL)
-> Model: IBM PPS Model 6015
-> total memory =3D 128 MB
-> avail memory =3D 119 MB
-> trap: kernel read DSI trap @ 0x481b4cae by 0x2a4f50 (DSISR 0x40000000,
-> err=3D14), lr 0x140e84
-> panic: trap
->
-> The operating system has halted.
-> Please press any key to reboot.
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D
->
-> OpenBIOS doesn't support PReP boot partitions (type 0x41) nor PReP kernel=
-s
-> so this is a no-go yet.
+Tested-by: Vincent Palatin <vpalatin@chromium.org>
 
-OpenBIOS doesn't, but OFW does. It has just occurred to me that I
-haven't build a LSI Version for you.
-It should be easy, because OFW seems to have the LSI driver. Will try
-building it this weekend.
-
---=20
-Regards,
-Artyom Tarasenko
-
-SPARC and PPC PReP under qemu blog: http://tyom.blogspot.com/search/label/q=
-emu
+>
+>
+>> ---
+>>  configure | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/configure b/configure
+>> index 218df87d21..54a222d5e7 100755
+>> --- a/configure
+>> +++ b/configure
+>> @@ -3077,7 +3077,7 @@ fi
+>>
+>>  # g_test_trap_subprocess added in 2.38. Used by some tests.
+>>  glib_subprocess=3Dyes
+>> -if test "$mingw32" =3D "yes" || ! $pkg_config --atleast-version=3D2.38 =
+glib-2.0; then
+>> +if ! $pkg_config --atleast-version=3D2.38 glib-2.0; then
+>>      glib_subprocess=3Dno
+>>  fi
+>>
+>> --
+>> 2.11.0
+>>
+>
+> --
+> Eduardo
+>
