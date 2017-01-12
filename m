@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42696)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43218)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1cRi1o-0004z7-FR
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 11:15:09 -0500
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cRi4m-0007Wy-P6
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 11:18:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1cRi1j-0002KZ-7d
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 11:15:04 -0500
-Received: from mx3-phx2.redhat.com ([209.132.183.24]:44887)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1cRi1i-0002Jt-SR
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 11:14:59 -0500
-Date: Thu, 12 Jan 2017 11:14:58 -0500 (EST)
-From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <mlureau@redhat.com>
-Message-ID: <1367963129.1944696.1484237698262.JavaMail.zimbra@redhat.com>
-In-Reply-To: <994f02f5-8272-b420-1912-5cb8f55a40ca@redhat.com>
-References: <20170111172956.11255-1-marcandre.lureau@redhat.com>
-	<20170111172956.11255-17-marcandre.lureau@redhat.com>
-	<994f02f5-8272-b420-1912-5cb8f55a40ca@redhat.com>
+	(envelope-from <paolo.bonzini@gmail.com>) id 1cRi4j-00038H-Iq
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 11:18:08 -0500
+Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:33933)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1cRi4j-000384-Am
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 11:18:05 -0500
+Received: by mail-lf0-x244.google.com with SMTP id q89so2548843lfi.1
+	for <qemu-devel@nongnu.org>; Thu, 12 Jan 2017 08:18:05 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <20170112105132.10394-1-pbonzini@redhat.com>
+	<20170112141145.GA14042@stefanha-x1.localdomain>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <8af61f9a-ea8d-1bff-cbe2-f2c1993e54b2@redhat.com>
+Date: Thu, 12 Jan 2017 17:18:03 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 16/40] char: get rid of CharDriver
+In-Reply-To: <20170112141145.GA14042@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] ide: avoid unbounded recursion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,248 +31,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, pbonzini@redhat.com
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Peter Lieven <pl@kamp.de>, John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
 
-Hi
 
------ Original Message -----
-> On 01/11/2017 11:29 AM, Marc-Andr=C3=A9 Lureau wrote:
-> > qemu_chr_new_from_opts() is modified to not need CharDriver backend[]
-> > array, but uses instead objectified qmp_query_chardev_backends() and
-> > char_get_class(). The alias field is moved outside in a ChardevAlias[],
-> > similar to QDevAlias for devices.
-> >=20
-> > "kind" and "parse" are moved to ChardevClass ("kind" is to be removed
-> > next)
-> >=20
-> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > ---
->=20
->=20
-> >  Chardev *qemu_chr_new_from_opts(QemuOpts *opts,
-> >                                  Error **errp)
-> >  {
-> >      Error *local_err =3D NULL;
-> > -    const CharDriver *cd =3D NULL;
-> > +    const ChardevClass *cc;
-> >      Chardev *chr;
-> >      int i;
-> >      ChardevReturn *ret =3D NULL;
-> > @@ -4180,16 +4196,13 @@ Chardev *qemu_chr_new_from_opts(QemuOpts *opts,
-> > =20
-> >      if (is_help_option(name)) {
-> >          GString *str =3D g_string_new("");
-> > -        for (i =3D 0; i < ARRAY_SIZE(backends); i++) {
-> > -            cd =3D backends[i];
-> > -            if (cd) {
-> > -                g_string_append_printf(str, "\n%s",
-> > ChardevBackendKind_lookup[cd->kind]);
-> > -                if (cd->alias) {
-> > -                    g_string_append_printf(str, "\n%s", cd->alias);
-> > -                }
-> > -            }
-> > +        ChardevBackendInfoList *l, *il =3D qmp_query_chardev_backends(=
-NULL);
-> > +
-> > +        for (l =3D il; l !=3D NULL; l =3D l->next) {
-> > +            g_string_append_printf(str, "\n%s", l->value->name);
-> >          }
-> > =20
-> > +        qapi_free_ChardevBackendInfoList(l);
->=20
-> Is this really the most efficient way to do it?  I guess it works, but
-> consider what qmp_query_chardev_backends() is doing: it is iterating
-> through a list of chardevs, and for each one (or its alias), calling a
-> callback qmp_prepend_backend().  Would a better factorization be to have
-> a common function that takes care of the iteration and takes a function
-> pointer for what to do on each element of the iteration, and then
-> qmp_query_chardev_backend calls helper(qmp_prepend_backup) while this
-> code calls helper(append_name), so that you aren't wasting the creation
-> of an entire ChardevBackendInfoList item just for the action of
-> appending the name?
->=20
 
-I don't think speed matters here, but ok
+On 12/01/2017 15:11, Stefan Hajnoczi wrote:
+> On Thu, Jan 12, 2017 at 11:51:32AM +0100, Paolo Bonzini wrote:
+>> The end_transfer_func can call ide_transfer_start immediately, before
+>> returning, and unbounded recursion can happen at least for
+>> ide_atapi_cmd_reply_end.  Use a bottom half to defer the call and
+>> limit stack usage.
+>>
+>> Cc: Peter Lieven <pl@kamp.de>
+>> Cc: John Snow <jsnow@redhat.com>
+>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>> ---
+>>  hw/ide/core.c | 14 +++++++++++++-
+>>  1 file changed, 13 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/hw/ide/core.c b/hw/ide/core.c
+>> index 43709e5..7b9831f 100644
+>> --- a/hw/ide/core.c
+>> +++ b/hw/ide/core.c
+>> @@ -482,6 +482,13 @@ static void ide_clear_retry(IDEState *s)
+>>      s->bus->retry_nsector = 0;
+>>  }
+>>  
+>> +static void ide_start_transfer_bh_cb(void *opaque)
+>> +{
+>> +    IDEDMA *dma = opaque;
+>> +
+>> +    dma->ops->start_transfer(dma);
+>> +}
+>> +
+>>  /* prepare data transfer and tell what to do after */
+>>  void ide_transfer_start(IDEState *s, uint8_t *buf, int size,
+>>                          EndTransferFunc *end_transfer_func)
+>> @@ -494,7 +501,12 @@ void ide_transfer_start(IDEState *s, uint8_t *buf, int size,
+>>          s->status |= DRQ_STAT;
+>>      }
+>>      if (s->bus->dma->ops->start_transfer) {
+>> -        s->bus->dma->ops->start_transfer(s->bus->dma);
+>> +        /* There can be unbounded recursion between ops->start_transfer
+>> +         * and end_transfer_func, so defer to a bottom half.
+>> +         */
+>> +        aio_bh_schedule_oneshot(qemu_get_aio_context(),
+>> +                                ide_start_transfer_bh_cb,
+>> +                                s->bus->dma);
+> 
+> Are you sure this is safe?
+> 
+> I wonder if there are races with device reset, vmsave, or vcpu hw
+> register accesses.
 
-> > @@ -4407,21 +4417,23 @@ qmp_prepend_backend(ChardevBackendInfoList *lis=
-t,
-> > const char *name)
-> >  ChardevBackendInfoList *qmp_query_chardev_backends(Error **errp)
-> >  {
-> >      ChardevBackendInfoList *backend_list =3D NULL;
-> > -    const CharDriver *c;
-> > +    GSList *l, *list =3D object_class_get_list(TYPE_CHARDEV, false);
-> >      int i;
-> > =20
-> > -    for (i =3D 0; i < ARRAY_SIZE(backends); i++) {
-> > -        c =3D backends[i];
-> > -        if (!c) {
-> > +    for (l =3D list; l; l =3D l->next) {
-> > +        ObjectClass *klass =3D l->data;
-> > +        assert(g_str_has_prefix(object_class_get_name(klass),
-> > "chardev-"));
-> > +        if (CHARDEV_CLASS(klass)->internal) {
-> >              continue;
-> >          }
-> > -
-> >          backend_list =3D qmp_prepend_backend(backend_list,
-> > -
-> > ChardevBackendKind_lookup[c->kind]);
-> > -        if (c->alias) {
-> > -            backend_list =3D qmp_prepend_backend(backend_list, c->alia=
-s);
-> > -        }
-> > +                                           object_class_get_name(klass=
-) +
-> > 8);
-> > +    }
-> > +    for (i =3D 0; i < ARRAY_SIZE(chardev_alias_table); i++) {
-> > +        backend_list =3D qmp_prepend_backend(backend_list,
-> > +                                           chardev_alias_table[i].alia=
-s);
->=20
-> This changes the order of the list which is output to the user
-> (shouldn't matter in practice, but may be worth mentioning in the commit
-> message as intentionally safe).
+Register accesses are okay.  For device reset and vmsave I had actually
+thought about that, but I had thought about it wrong.  
 
-ok
+Device reset and vmsave drain the BlockBackend, but there's nothing to 
+drain for most PIO commands.  Device reset could just cancel a
+(non-oneshot) bottom half, but I'm not sure of how to handle vmsave.
+Maybe do only part of start_transfer in the bottom half so that the
+destination has some condition to check (s->data_ptr < s->data_end?)
+and can reschedule the bottom half on the destination side depending
+on that condition?
 
->=20
-> Again, I think that a little more refactoring to have the iteration over
-> object_class_get_list() and chardev_alias_table[], coupled with a
-> callback passed in by the client (with clients qemu_chr_new_from_opts
-> and qmp_query_chardev_backends), will separate the iteration from the
-> action, so that you don't always have to create a ChardevBackendInfoList
-> that will just be thrown away.
-
-not a trivial refactoring (various callbacks, passed to callback etc) but o=
-k
-
->=20
-> >      }
-> > +    g_slist_free(l);
->=20
-> Shouldn't this be g_slist_free(list)?
-
-Yes my bad, same error with qapi_free_ChardevBackendInfoList()!
-
->=20
-> > @@ -4983,35 +4978,6 @@ void qemu_chr_set_feature(Chardev *chr,
-> >      return set_bit(feature, chr->features);
-> >  }
-> > =20
-> > -static const ChardevClass *char_get_class(const char *driver, Error
-> > **errp)
-> > -{
->=20
-> This function is just moved earlier, which gets a little messy with the
-> rest of the patch. Can you split the code motion into a separate patch
-> for ease of review?  In fact, since it was just barely added in "[PATCH
-> v2 20/20] chardev: qom-ify]" and that patch hasn't landed yet, can't you
-> just amend that patch to hoist it early enough in the first place,
-> rather than churning it?
-
-It depends if I get to resend it or not. Paolo, you may drop it from the fi=
-rst series, so I resend it with this one?
-
->=20
->=20
-> > @@ -5107,45 +5073,34 @@ void qemu_chr_cleanup(void)
-> > =20
-> >  static void register_types(void)
-> >  {
-> > -    static const struct {
-> > -        const CharDriver *driver;
-> > -        const TypeInfo *type;
-> > -    } chardevs[] =3D {
-> > -        { &null_driver, &char_null_type_info },
-> > -        { &socket_driver, &char_socket_type_info },
-> > -        { &udp_driver, &char_udp_type_info },
-> > -        { &ringbuf_driver, &char_ringbuf_type_info },
-> > -        { &file_driver, &char_file_type_info },
-> > -        { &stdio_driver, &char_stdio_type_info },
-> > +    type_register_static(&char_type_info);
-> > +#ifndef _WIN32
-> > +    type_register_static(&char_fd_type_info);
-> > +#else
-> > +    type_register_static(&char_win_type_info);
-> > +    type_register_static(&char_win_stdio_type_info);
-> > +#endif
->=20
-> It's a bit weird that these are registered first,...
->=20
-> > +    type_register_static(&char_null_type_info);
-> > +    type_register_static(&char_socket_type_info);
-> > +    type_register_static(&char_udp_type_info);
-> > +    type_register_static(&char_ringbuf_type_info);
-> > +    type_register_static(&char_file_type_info);
-> > +    type_register_static(&char_stdio_type_info);
-> >  #ifdef HAVE_CHARDEV_SERIAL
-> > -        { &serial_driver, &char_serial_type_info },
-> > +    type_register_static(&char_serial_type_info);
-> >  #endif
-> >  #ifdef HAVE_CHARDEV_PARPORT
-> > -        { &parallel_driver, &char_parallel_type_info },
-> > +    type_register_static(&char_parallel_type_info);
-> >  #endif
-> >  #ifdef HAVE_CHARDEV_PTY
-> > -        { &pty_driver, &char_pty_type_info },
-> > +    type_register_static(&char_pty_type_info);
-> >  #endif
-> >  #ifdef _WIN32
-> > -        { &console_driver, &char_console_type_info },
-> > +    type_register_static(&char_console_type_info);
->=20
-> Any reason we can't consolidate the _WIN32 ifdefs into one place?
-
-we could, but this is going away later in this series
-
->=20
-> >  #endif
-> > -        { &pipe_driver, &char_pipe_type_info },
-> > -        { &mux_driver, &char_mux_type_info },
-> > -        { &memory_driver, &char_memory_type_info }
-> > -    };
-> > -    int i;
-> > -
-> > -    type_register_static(&char_type_info);
-> > -#ifndef _WIN32
-> > -    type_register_static(&char_fd_type_info);
-> > -#else
-> > -    type_register_static(&char_win_type_info);
-> > -    type_register_static(&char_win_stdio_type_info);
-> > -#endif
->=20
-> ...when they used to be last; but I don't think it hurts.
-
-It doesn't, and it is spread later in the series, I wouldn't bother.
-
->=20
-> > -    for (i =3D 0; i < ARRAY_SIZE(chardevs); i++) {
-> > -        type_register_static(chardevs[i].type);
-> > -        register_char_driver(chardevs[i].driver);
-> > -    }
-> > +    type_register_static(&char_pipe_type_info);
-> > +    type_register_static(&char_mux_type_info);
-> > +    type_register_static(&char_memory_type_info);
-> > =20
-> >      /* this must be done after machine init, since we register FEs wit=
-h
-> >      muxes
-> >       * as part of realize functions like serial_isa_realizefn when
-> >       -nographic
-> > diff --git a/spice-qemu-char.c b/spice-qemu-char.c
->=20
-> Enough bugs that I'll want to see a v2, but it's headed in the right
-> direction.
-
-thanks, I'll wait for Paolo to take the first series before sending v2. Fee=
-l free to continue review of v1 for the remaining patches.
-
->=20
-> --
-> Eric Blake   eblake redhat com    +1-919-301-3266
-> Libvirt virtualization library http://libvirt.org
->=20
->=20
+Paolo
