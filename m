@@ -1,17 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34061)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34040)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei@redhat.com>) id 1cRZQz-0001Vn-Js
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 02:04:32 -0500
+	(envelope-from <wei@redhat.com>) id 1cRZQy-0001Un-LV
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 02:04:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei@redhat.com>) id 1cRZQy-00065c-Pi
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 02:04:29 -0500
+	(envelope-from <wei@redhat.com>) id 1cRZQx-00063k-T7
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 02:04:28 -0500
 From: Wei Huang <wei@redhat.com>
-Date: Thu, 12 Jan 2017 02:04:15 -0500
-Message-Id: <1484204658-28058-2-git-send-email-wei@redhat.com>
-In-Reply-To: <1484204658-28058-1-git-send-email-wei@redhat.com>
-References: <1484204658-28058-1-git-send-email-wei@redhat.com>
-Subject: [Qemu-devel] [PATCH V1 1/4] target-arm: Add support for PMU
- register PMSELR_EL0
+Date: Thu, 12 Jan 2017 02:04:14 -0500
+Message-Id: <1484204658-28058-1-git-send-email-wei@redhat.com>
+Subject: [Qemu-devel] [PATCH V1 0/4] Add vPMU vPMU support under TCG mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,69 +20,45 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-arm@nongnu.org, peter.maydell@linaro.org
 
-This patch adds support for AArch64 register PMSELR_EL0. The existing
-PMSELR definition is revised accordingly.
+QEMU has implemented cycle count support for guest VM under TCG mode.
+But this feature is not complete. In fact using perf inside a
+64-bit Linux guest VM (under TCG) can cause the following kernel panic
+because some PMU registers are not implemented.
 
-Signed-off-by: Wei Huang <wei@redhat.com>
----
+[  329.445970] [<fffffe000009e600>] armv8pmu_enable_event+0x58/0x8c
+[  329.446713] [<fffffe0000621e74>] armpmu_start+0x4c/0x74
+
+This patchset solves the problem by adding support for missing vPMU
+registers. Basic perf test can work now under TCG by applying this
+patchset.
+
+[root@localhost ~]# perf stat ls
+ Performance counter stats for 'ls':
+
+        226.740256      task-clock (msec)         #    0.312 CPUs utilized    
+                76      context-switches          #    0.335 K/sec
+                 0      cpu-migrations            #    0.000 K/sec
+                64      page-faults               #    0.282 K/sec
+       186,031,410      cycles                    #    0.820 GHz      (36.40%)
+   <not supported>      stalled-cycles-frontend
+   <not supported>      stalled-cycles-backend
+     <not counted>      instructions               (0.00%)
+   <not supported>      branches
+     <not counted>      branch-misses              (0.00%)
+
+Thanks,
+-Wei
+
+Wei Huang (4):
+  target-arm: Add support for PMU register PMSELR_EL0
+  target-arm: Add support for AArch64 PMU register PMXEVTYPER_EL0
+  target-arm: Add support for PMU register PMINTENSET_EL1
+  target-arm: Hook up TCG vPMU with CPU pmu option
+
+ target/arm/cpu.c    |  2 +-
  target/arm/cpu.h    |  1 +
- target/arm/helper.c | 24 +++++++++++++++++++-----
- 2 files changed, 20 insertions(+), 5 deletions(-)
+ target/arm/helper.c | 41 +++++++++++++++++++++++++++++++++++------
+ 3 files changed, 37 insertions(+), 7 deletions(-)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index ab119e6..bd80658 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -307,6 +307,7 @@ typedef struct CPUARMState {
-         uint32_t c9_pmovsr; /* perf monitor overflow status */
-         uint32_t c9_pmxevtyper; /* perf monitor event type */
-         uint32_t c9_pmuserenr; /* perf monitor user enable */
-+        uint32_t c9_pmselr; /* perf monitor counter selection register */
-         uint32_t c9_pminten; /* perf monitor interrupt enables */
-         union { /* Memory attribute redirection */
-             struct {
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 8dcabbf..71adb0f 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -975,6 +975,15 @@ static uint64_t pmccntr_read(CPUARMState *env, const ARMCPRegInfo *ri)
-     return total_ticks - env->cp15.c15_ccnt;
- }
- 
-+static void pmselr_write(CPUARMState *env, const ARMCPRegInfo *ri,
-+                         uint64_t value)
-+{
-+    /* only cycle counter selection is supported */
-+    if (value == 0x1f) {
-+        env->cp15.c9_pmselr = value;
-+    }
-+}
-+
- static void pmccntr_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                         uint64_t value)
- {
-@@ -1194,12 +1203,17 @@ static const ARMCPRegInfo v7_cp_reginfo[] = {
-     /* Unimplemented so WI. */
-     { .name = "PMSWINC", .cp = 15, .crn = 9, .crm = 12, .opc1 = 0, .opc2 = 4,
-       .access = PL0_W, .accessfn = pmreg_access, .type = ARM_CP_NOP },
--    /* Since we don't implement any events, writing to PMSELR is UNPREDICTABLE.
--     * We choose to RAZ/WI.
--     */
-     { .name = "PMSELR", .cp = 15, .crn = 9, .crm = 12, .opc1 = 0, .opc2 = 5,
--      .access = PL0_RW, .type = ARM_CP_CONST, .resetvalue = 0,
--      .accessfn = pmreg_access },
-+      .access = PL0_RW, .type = ARM_CP_ALIAS,
-+      .fieldoffset = offsetof(CPUARMState, cp15.c9_pmselr),
-+      .accessfn = pmreg_access, .writefn = pmselr_write,
-+      .raw_writefn = raw_write},
-+    { .name = "PMSELR_EL0", .state = ARM_CP_STATE_AA64,
-+      .opc0 = 3, .opc1 = 3, .crn = 9, .crm = 12, .opc2 = 5,
-+      .access = PL0_RW, .accessfn = pmreg_access,
-+      .type = ARM_CP_IO,
-+      .fieldoffset = offsetof(CPUARMState, cp15.c9_pmselr),
-+      .writefn = pmselr_write, .raw_writefn = raw_write, },
- #ifndef CONFIG_USER_ONLY
-     { .name = "PMCCNTR", .cp = 15, .crn = 9, .crm = 13, .opc1 = 0, .opc2 = 0,
-       .access = PL0_RW, .resetvalue = 0, .type = ARM_CP_IO,
 -- 
 1.8.3.1
