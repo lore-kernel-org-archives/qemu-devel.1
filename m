@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45429)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47635)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cRgPA-0002OB-PV
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 09:31:09 -0500
+	(envelope-from <stefanha@gmail.com>) id 1cRgYD-0000qV-PW
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 09:40:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1cRgP5-0000m5-TQ
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 09:31:04 -0500
-Date: Thu, 12 Jan 2017 16:30:47 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170112163009-mutt-send-email-mst@kernel.org>
-References: <20170111173457.30455-1-lersek@redhat.com>
+	(envelope-from <stefanha@gmail.com>) id 1cRgYC-0005ZI-1Z
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 09:40:25 -0500
+Date: Thu, 12 Jan 2017 14:40:06 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170112144006.GE14042@stefanha-x1.localdomain>
+References: <586CB62C.6080504@huawei.com>
+	<c7c4fd91-1374-7371-1ff9-533a8e916f2a@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="/2994txjAzEdQwm5"
 Content-Disposition: inline
-In-Reply-To: <20170111173457.30455-1-lersek@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 wave 1 0/4] fw-cfg: support writeable
- blobs and more files
+In-Reply-To: <c7c4fd91-1374-7371-1ff9-533a8e916f2a@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] NBD handshake may block qemu main
+ thread when socket delays or has packet loss
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,78 +25,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: qemu devel list <qemu-devel@nongnu.org>, "Gabriel L. Somlo" <somlo@cmu.edu>, Alexander Graf <agraf@suse.de>, Anthony Perard <anthony.perard@citrix.com>, Artyom Tarasenko <atar4qemu@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Eduardo Habkost <ehabkost@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Michael Walle <michael@walle.cc>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Shannon Zhao <zhaoshenglong@huawei.com>, Stefano Stabellini <sstabellini@kernel.org>, qemu-arm@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: "Fangyi (C)" <eric.fangyi@huawei.com>, kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, lina.lulina@huawei.com, qemu-block@nongnu.org, subo7@huawei.com, qemu-devel@nongnu.org, wu.wubin@huawei.com, "jiangxiaoqing (C)" <sochin.jiang@huawei.com>
 
-On Wed, Jan 11, 2017 at 06:34:53PM +0100, Laszlo Ersek wrote:
-> This is the first (fw_cfg) half of the v5 iteration of the series posted
-> here:
-> <http://lists.nongnu.org/archive/html/qemu-devel/2016-12/msg00129.html>.
-> 
-> In this version, the fw_cfg patches have been separated into a
-> standalone "wave", for helping review / maintenance, and also for
-> enabling independent features on top of writeable blobs. More
-> importantly, I've addressed Igor's v4 feedback. See the individual
-> patches for the details.
-> 
-> Patch #3 is included verbatim from Eduardo's pending series (see the
-> patch notes for the archive URL), as a dependency for patch #4. If
-> Eduardo's series is merged first, patch #3 can be dropped (in fact
-> git-rebase should do it automatically).
-> 
-> Please excuse the surprisingly long list of CC's, it's due to the fact
-> that fw_cfg is quite widely used (see patch #4).
 
-Looks good. So what's the plan for merging this?
-I think I'll merge part 1 and then Paolo merges part 2 -
-is that what you had in mind?
+--/2994txjAzEdQwm5
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> Cc: "Gabriel L. Somlo" <somlo@cmu.edu>
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Alexander Graf <agraf@suse.de>
-> Cc: Anthony Perard <anthony.perard@citrix.com>
-> Cc: Artyom Tarasenko <atar4qemu@gmail.com>
-> Cc: David Gibson <david@gibson.dropbear.id.au>
-> Cc: Eduardo Habkost <ehabkost@redhat.com>
-> Cc: Gerd Hoffmann <kraxel@redhat.com>
-> Cc: Igor Mammedov <imammedo@redhat.com>
-> Cc: Laszlo Ersek <lersek@redhat.com>
-> Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> Cc: Michael Walle <michael@walle.cc>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Cc: Shannon Zhao <zhaoshenglong@huawei.com>
-> Cc: Stefano Stabellini <sstabellini@kernel.org>
-> Cc: qemu-arm@nongnu.org
-> 
-> Thanks
-> Laszlo
-> 
-> 
-> Eduardo Habkost (1):
->   pc: Add 2.9 machine-types
-> 
-> Laszlo Ersek (2):
->   fw-cfg: turn FW_CFG_FILE_SLOTS into a device property
->   fw-cfg: bump "file_slots" to 0x20 for 2.9+ machine types
-> 
-> Michael S. Tsirkin (1):
->   fw-cfg: support writeable blobs
-> 
->  docs/specs/fw_cfg.txt          |  36 ++++++++++----
->  hw/lm32/lm32_hwsetup.h         |   2 +-
->  include/hw/compat.h            |  10 +++-
->  include/hw/i386/pc.h           |   2 +
->  include/hw/loader.h            |   7 +--
->  include/hw/nvram/fw_cfg.h      |   3 +-
->  include/hw/nvram/fw_cfg_keys.h |   3 +-
->  hw/arm/virt-acpi-build.c       |   2 +-
->  hw/core/loader.c               |  18 ++++---
->  hw/i386/acpi-build.c           |   4 +-
->  hw/i386/pc_piix.c              |  15 ++++--
->  hw/i386/pc_q35.c               |  13 ++++-
->  hw/nvram/fw_cfg.c              | 110 +++++++++++++++++++++++++++++++++++------
->  13 files changed, 177 insertions(+), 48 deletions(-)
-> 
-> -- 
-> 2.9.3
+On Wed, Jan 04, 2017 at 02:44:53PM -0600, Eric Blake wrote:
+> On 01/04/2017 02:45 AM, Fangyi (C) wrote:
+> >     As we all know, socket is in blocking mode when nbd is negotiating
+> > with the other end. If the network is poor because of delay or packet
+> > loss, socket read or write will return very slowly. The mainloop events
+> > won't be handled in time util nbd handshake ends.
+>=20
+> I wonder if Paolo's work to improve NBD coroutine usage after handshakes
+> can be leveraged here?
+>=20
+> https://lists.gnu.org/archive/html/qemu-devel/2016-12/msg03224.html
+>=20
+> >=20
+> >     Any advices to solve the problem?
+>=20
+> At any rate, it sounds like someone will have to patch NBD code to use
+> coroutines instead of blocking for the handshake portion (and that's
+> true in general - ANY operation that can block should probably be
+> refactored into aio or coroutines so that the main loop can remain
+> responsive).
+
+This is a general issue with network block drivers.  They tend to do
+blocking DNS resolution, blocking connection, and blocking protocol
+handshake/negotiation in .bdrv_open().
+
+We cannot expose a block device to the guest before it has been opened
+because the disk's capacity is unknown plus the guest would experience
+I/O timeouts or errors.
+
+I think we need to agree on how to handle this for all different types
+of network protocols, not just nbd, before code can be written.
+
+One starting point is:
+
+Should we make .drv_open() a coroutine and introduce a async concept to
+blockdev_add, reopen, etc?
+
+The BlockDriverState would be in a special OPENING or OFFLINE state
+where its name is reserved but it cannot be used for I/O or emulated
+devices yet.
+
+QMP clients would have watch out for an event that tells them that it's
+now okay to device-add the emulated storage device using the drive.
+
+Any ideas for a nicer solution?
+
+Stefan
+
+--/2994txjAzEdQwm5
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJYd5VGAAoJEJykq7OBq3PI2sUH/1OnCgZmmvWTUVjD688++GGM
+cSl+vgvwhmbf7yMqHvUiyT+agLdPU6DC7VX2U8bKX/oDtQRromL4tT5iltj+MECA
+vrAO5NWXcUzn5/80Dw8Q761IBqNEuRI1QPCharZiwXhBclBqAuFPn3TdtbrW5kfy
+xE/A0XBjz4v1OM4kR5KYSHClDJ0e7PZgCIota7+TYDLL4MMHcP4BD1FEfupz6jGI
+b0ktHuH0DXE/FBfxX+YpWQZ53ezaH61adc+TJbZ+417vv3+WoWUkLFgXGFrvNDg2
+k5AG5ORZX9+UPL7mmkL7UBBZ6+KtKGkIPQwxVXE5F0spVO7dGCYtuNLo9pWtqMI=
+=pXHG
+-----END PGP SIGNATURE-----
+
+--/2994txjAzEdQwm5--
