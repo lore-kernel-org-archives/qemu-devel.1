@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57611)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57999)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cRkf5-0000o3-SB
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 14:03:49 -0500
+	(envelope-from <eblake@redhat.com>) id 1cRkhO-0002WQ-7o
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 14:06:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cRkf4-00017u-PN
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 14:03:47 -0500
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48152)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1cRkf4-00013b-Hd
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 14:03:46 -0500
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 12 Jan 2017 19:03:34 +0000
-Message-Id: <1484247815-15279-3-git-send-email-peter.maydell@linaro.org>
-In-Reply-To: <1484247815-15279-1-git-send-email-peter.maydell@linaro.org>
-References: <1484247815-15279-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 2/3] hw/misc: New "unimplemented" sysbus device
+	(envelope-from <eblake@redhat.com>) id 1cRkhL-0001nY-2q
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 14:06:10 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34654)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1cRkhK-0001nS-QI
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 14:06:07 -0500
+Received: from smtp.corp.redhat.com (int-mx16.intmail.prod.int.phx2.redhat.com
+	[10.5.11.28])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C8F5361B91
+	for <qemu-devel@nongnu.org>; Thu, 12 Jan 2017 19:06:06 +0000 (UTC)
+References: <20170111172956.11255-1-marcandre.lureau@redhat.com>
+	<20170111172956.11255-20-marcandre.lureau@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <e805da6b-ad8d-8cdb-f947-20e0d0096465@redhat.com>
+Date: Thu, 12 Jan 2017 13:06:04 -0600
+MIME-Version: 1.0
+In-Reply-To: <20170111172956.11255-20-marcandre.lureau@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="j3icLXq5vvPgOHHSe32XfKBv2JfRMP5Ak"
+Subject: Re: [Qemu-devel] [PATCH 19/40] char: move to chardev/
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,195 +34,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: patches@linaro.org
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com
 
-Create a new "unimplemented" sysbus device, which simply accepts
-all read and write accesses, and implements them as read-as-zero,
-write-ignored, with logging of the access as LOG_UNIMP.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--j3icLXq5vvPgOHHSe32XfKBv2JfRMP5Ak
+From: Eric Blake <eblake@redhat.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com
+Message-ID: <e805da6b-ad8d-8cdb-f947-20e0d0096465@redhat.com>
+Subject: Re: [PATCH 19/40] char: move to chardev/
+References: <20170111172956.11255-1-marcandre.lureau@redhat.com>
+ <20170111172956.11255-20-marcandre.lureau@redhat.com>
+In-Reply-To: <20170111172956.11255-20-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-This is useful for stubbing out bits of an SoC or board model
-which haven't been written yet.
+On 01/11/2017 11:29 AM, Marc-Andr=C3=A9 Lureau wrote:
+> The following commits will split char.c in several files. Let's put the=
+m
+> in a subdirectory.
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  qemu-char.c =3D> chardev/char.c | 0
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- hw/misc/Makefile.objs   |   2 +
- include/hw/misc/unimp.h |  39 ++++++++++++++++++
- hw/misc/unimp.c         | 107 ++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 148 insertions(+)
- create mode 100644 include/hw/misc/unimp.h
- create mode 100644 hw/misc/unimp.c
+Yay - one less file in the top level :)
 
-diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index 1a89615..898e4cc 100644
---- a/hw/misc/Makefile.objs
-+++ b/hw/misc/Makefile.objs
-@@ -6,6 +6,8 @@ common-obj-$(CONFIG_SGA) += sga.o
- common-obj-$(CONFIG_ISA_TESTDEV) += pc-testdev.o
- common-obj-$(CONFIG_PCI_TESTDEV) += pci-testdev.o
- 
-+common-obj-y += unimp.o
-+
- obj-$(CONFIG_VMPORT) += vmport.o
- 
- # ARM devices
-diff --git a/include/hw/misc/unimp.h b/include/hw/misc/unimp.h
-new file mode 100644
-index 0000000..3462d85
---- /dev/null
-+++ b/include/hw/misc/unimp.h
-@@ -0,0 +1,39 @@
-+/*
-+ * "Unimplemented" device
-+ *
-+ * Copyright Linaro Limited, 2017
-+ * Written by Peter Maydell
-+ */
-+
-+#ifndef HW_MISC_UNIMP_H
-+#define HW_MISC_UNIMP_H
-+
-+#define TYPE_UNIMPLEMENTED_DEVICE "unimplemented-device"
-+
-+/**
-+ * create_unimplemented_device: create and map a dummy device
-+ * @name: name of the device for debug logging
-+ * @base: base address of the device's MMIO region
-+ * @size: size of the device's MMIO region
-+ *
-+ * This utility function creates and maps an instance of unimplemented-device,
-+ * which is a dummy device which simply logs all guest accesses to
-+ * it via the qemu_log LOG_UNIMP debug log.
-+ * The device is mapped at priority -1000, which means that you can
-+ * use it to cover a large region and then map other devices on top of it
-+ * if necessary.
-+ */
-+static inline void create_unimplemented_device(const char *name,
-+                                               hwaddr base,
-+                                               hwaddr size)
-+{
-+    DeviceState *dev = qdev_create(NULL, TYPE_UNIMPLEMENTED_DEVICE);
-+
-+    qdev_prop_set_string(dev, "name", name);
-+    qdev_prop_set_uint64(dev, "size", size);
-+    qdev_init_nofail(dev);
-+
-+    sysbus_mmio_map_overlap(SYS_BUS_DEVICE(dev), 0, base, -1000);
-+}
-+
-+#endif
-diff --git a/hw/misc/unimp.c b/hw/misc/unimp.c
-new file mode 100644
-index 0000000..bcbb585
---- /dev/null
-+++ b/hw/misc/unimp.c
-@@ -0,0 +1,107 @@
-+/* "Unimplemented" device
-+ *
-+ * This is a dummy device which accepts and logs all accesses.
-+ * It's useful for stubbing out regions of an SoC or board
-+ * map which correspond to devices that have not yet been
-+ * implemented. This is often sufficient to placate initial
-+ * guest device driver probing such that the system will
-+ * come up.
-+ *
-+ * Copyright Linaro Limited, 2017
-+ * Written by Peter Maydell
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "hw/hw.h"
-+#include "hw/sysbus.h"
-+#include "hw/misc/unimp.h"
-+#include "qemu/log.h"
-+#include "qapi/error.h"
-+
-+#define UNIMPLEMENTED_DEVICE(obj) \
-+    OBJECT_CHECK(UnimplementedDeviceState, (obj), TYPE_UNIMPLEMENTED_DEVICE)
-+
-+typedef struct {
-+    SysBusDevice parent_obj;
-+    MemoryRegion iomem;
-+    char *name;
-+    uint64_t size;
-+} UnimplementedDeviceState;
-+
-+static uint64_t unimp_read(void *opaque, hwaddr offset, unsigned size)
-+{
-+    UnimplementedDeviceState *s = UNIMPLEMENTED_DEVICE(opaque);
-+
-+    qemu_log_mask(LOG_UNIMP, "%s: unimplemented device read "
-+                  "(size %d, offset 0x%" HWADDR_PRIx ")\n",
-+                  s->name, size, offset);
-+    return 0;
-+}
-+
-+static void unimp_write(void *opaque, hwaddr offset,
-+                        uint64_t value, unsigned size)
-+{
-+    UnimplementedDeviceState *s = UNIMPLEMENTED_DEVICE(opaque);
-+
-+    qemu_log_mask(LOG_UNIMP, "%s: unimplemented device write "
-+                  "(size %d, value 0x%" PRIx64
-+                  ", offset 0x%" HWADDR_PRIx ")\n",
-+                  s->name, size, value, offset);
-+}
-+
-+static const MemoryRegionOps unimp_ops = {
-+    .read = unimp_read,
-+    .write = unimp_write,
-+    .impl.min_access_size = 1,
-+    .impl.max_access_size = 8,
-+    .valid.min_access_size = 1,
-+    .valid.max_access_size = 8,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+};
-+
-+static void unimp_realize(DeviceState *dev, Error **errp)
-+{
-+    UnimplementedDeviceState *s = UNIMPLEMENTED_DEVICE(dev);
-+
-+    if (s->size == 0) {
-+        error_setg(errp, "property 'size' not specified or zero");
-+        return;
-+    }
-+
-+    if (s->name == NULL) {
-+        error_setg(errp, "property 'name' not specified");
-+        return;
-+    }
-+
-+    memory_region_init_io(&s->iomem, OBJECT(s), &unimp_ops, s,
-+                          s->name, s->size);
-+    sysbus_init_mmio(SYS_BUS_DEVICE(s), &s->iomem);
-+}
-+
-+static Property unimp_properties[] = {
-+    DEFINE_PROP_UINT64("size", UnimplementedDeviceState, size, 0),
-+    DEFINE_PROP_STRING("name", UnimplementedDeviceState, name),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void unimp_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->realize = unimp_realize;
-+    dc->props = unimp_properties;
-+}
-+
-+static const TypeInfo unimp_info = {
-+    .name = TYPE_UNIMPLEMENTED_DEVICE,
-+    .parent = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(UnimplementedDeviceState),
-+    .class_init = unimp_class_init,
-+};
-+
-+static void unimp_register_types(void)
-+{
-+    type_register_static(&unimp_info);
-+}
-+
-+type_init(unimp_register_types)
--- 
-2.7.4
+>  MAINTAINERS                   | 2 +-
+>  Makefile.objs                 | 2 +-
+>  chardev/Makefile.objs         | 1 +
+>  tests/Makefile.include        | 6 +++---
+>  5 files changed, 6 insertions(+), 5 deletions(-)
+>  rename qemu-char.c =3D> chardev/char.c (100%)
+>  create mode 100644 chardev/Makefile.objs
+>=20
+
+> +++ b/tests/Makefile.include
+> @@ -9,7 +9,7 @@ SYSEMU_TARGET_LIST :=3D $(subst -softmmu.mak,,$(notdir =
+\
+>  check-unit-y =3D tests/check-qdict$(EXESUF)
+>  gcov-files-check-qdict-y =3D qobject/qdict.c
+>  check-unit-y +=3D tests/test-char$(EXESUF)
+> -gcov-files-check-qdict-y =3D qemu-char.c
+> +gcov-files-check-qdict-y =3D chardev/char.c
+>  check-unit-y +=3D tests/check-qfloat$(EXESUF)
+>  gcov-files-check-qfloat-y =3D qobject/qfloat.c
+>  check-unit-y +=3D tests/check-qint$(EXESUF)
+> @@ -489,7 +489,7 @@ tests/check-qjson$(EXESUF): tests/check-qjson.o $(t=
+est-util-obj-y)
+>  tests/check-qom-interface$(EXESUF): tests/check-qom-interface.o $(test=
+-qom-obj-y)
+>  tests/check-qom-proplist$(EXESUF): tests/check-qom-proplist.o $(test-q=
+om-obj-y)
+> =20
+> -tests/test-char$(EXESUF): tests/test-char.o qemu-char.o qemu-timer.o $=
+(test-util-obj-y) $(qtest-obj-y) $(test-block-obj-y)
+> +tests/test-char$(EXESUF): tests/test-char.o chardev/char.o qemu-timer.=
+o $(test-util-obj-y) $(qtest-obj-y) $(test-block-obj-y)
+
+Pre-existing so you just kept it, but maybe we should use \ line
+wrapping to avoid long lines.
+
+With or without wrapping,
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
+
+
+--j3icLXq5vvPgOHHSe32XfKBv2JfRMP5Ak
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEcBAEBCAAGBQJYd9OcAAoJEKeha0olJ0Nq5uQH/1tFCPtc/zJFGSY1w8GJ3uff
+RWcrxfXzQCx+y8lLx24SVgoVFNF9BQcifE02b2fl4L8GwahPqWks/jyEMHn887VW
+kf0UzGck+T0cUk+HqfV+lTnCNqMqJqq1sReyPw8q+otGrHxE+9YzeuJI26ftJ14M
+bRqLNIFs5I3L4wPprHotFFz8xG4AGgSJZan3YJUWQ/fSWZ8XjRyCqA8MeH37py+B
+3n5/sl5W1/ZppEaIc0j+8Zr7SxML2jqTAUk5iB8ZFc/forX8pOfTrmEIFZBVWP7T
+U8QLK/8zC2NkBKYt2StBP1nCPiKr/vLeVSzuL5hZnkLEN6ikOccVt+sy82Birw4=
+=lAGS
+-----END PGP SIGNATURE-----
+
+--j3icLXq5vvPgOHHSe32XfKBv2JfRMP5Ak--
