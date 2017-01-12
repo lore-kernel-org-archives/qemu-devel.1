@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57615)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57611)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cRkf6-0000o7-8x
+	(envelope-from <pm215@archaic.org.uk>) id 1cRkf5-0000o3-SB
 	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 14:03:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1cRkf5-00018F-II
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 14:03:48 -0500
+	(envelope-from <pm215@archaic.org.uk>) id 1cRkf4-00017u-PN
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 14:03:47 -0500
 Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:48152)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1cRkf5-00013b-Bq
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 14:03:47 -0500
+	id 1cRkf4-00013b-Hd
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 14:03:46 -0500
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 12 Jan 2017 19:03:33 +0000
-Message-Id: <1484247815-15279-2-git-send-email-peter.maydell@linaro.org>
+Date: Thu, 12 Jan 2017 19:03:34 +0000
+Message-Id: <1484247815-15279-3-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1484247815-15279-1-git-send-email-peter.maydell@linaro.org>
 References: <1484247815-15279-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 1/3] stellaris: Document memory map and which
- SoC devices are unimplemented
+Subject: [Qemu-devel] [PATCH 2/3] hw/misc: New "unimplemented" sysbus device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,55 +27,192 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: patches@linaro.org
 
-Add a comment documenting the memory map of the SoC devices and which
-are not implemented.
+Create a new "unimplemented" sysbus device, which simply accepts
+all read and write accesses, and implements them as read-as-zero,
+write-ignored, with logging of the access as LOG_UNIMP.
+
+This is useful for stubbing out bits of an SoC or board model
+which haven't been written yet.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/arm/stellaris.c | 31 +++++++++++++++++++++++++++++++
- 1 file changed, 31 insertions(+)
+ hw/misc/Makefile.objs   |   2 +
+ include/hw/misc/unimp.h |  39 ++++++++++++++++++
+ hw/misc/unimp.c         | 107 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 148 insertions(+)
+ create mode 100644 include/hw/misc/unimp.h
+ create mode 100644 hw/misc/unimp.c
 
-diff --git a/hw/arm/stellaris.c b/hw/arm/stellaris.c
-index 794a3ad..204502a 100644
---- a/hw/arm/stellaris.c
-+++ b/hw/arm/stellaris.c
-@@ -1220,6 +1220,37 @@ static void stellaris_init(const char *kernel_filename, const char *cpu_model,
-         0x40024000, 0x40025000, 0x40026000};
-     static const int gpio_irq[7] = {0, 1, 2, 3, 4, 30, 31};
+diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
+index 1a89615..898e4cc 100644
+--- a/hw/misc/Makefile.objs
++++ b/hw/misc/Makefile.objs
+@@ -6,6 +6,8 @@ common-obj-$(CONFIG_SGA) += sga.o
+ common-obj-$(CONFIG_ISA_TESTDEV) += pc-testdev.o
+ common-obj-$(CONFIG_PCI_TESTDEV) += pci-testdev.o
  
-+    /* Memory map of SoC devices:
-+     * 40000000 wdtimer (unimplemented)
-+     * 40002000 i2c (unimplemented)
-+     * 40004000 GPIO
-+     * 40005000 GPIO
-+     * 40006000 GPIO
-+     * 40007000 GPIO
-+     * 40008000 SSI
-+     * 4000c000 UART
-+     * 4000d000 UART
-+     * 4000e000 UART
-+     * 40020000 i2c
-+     * 40021000 i2c (unimplemented)
-+     * 40024000 GPIO
-+     * 40025000 GPIO
-+     * 40026000 GPIO
-+     * 40028000 PWM (unimplemented)
-+     * 4002c000 QEI (unimplemented)
-+     * 4002d000 QEI (unimplemented)
-+     * 40030000 gptimer
-+     * 40031000 gptimer
-+     * 40032000 gptimer
-+     * 40033000 gptimer
-+     * 40038000 ADC
-+     * 4003c000 analogue comparator (unimplemented)
-+     * 40048000 ethernet
-+     * 400fc000 hibernation module (unimplemented)
-+     * 400fd000 flash memory control (unimplemented)
-+     * 400fe000 system control
-+     */
++common-obj-y += unimp.o
 +
-     DeviceState *gpio_dev[7], *nvic;
-     qemu_irq gpio_in[7][8];
-     qemu_irq gpio_out[7][8];
+ obj-$(CONFIG_VMPORT) += vmport.o
+ 
+ # ARM devices
+diff --git a/include/hw/misc/unimp.h b/include/hw/misc/unimp.h
+new file mode 100644
+index 0000000..3462d85
+--- /dev/null
++++ b/include/hw/misc/unimp.h
+@@ -0,0 +1,39 @@
++/*
++ * "Unimplemented" device
++ *
++ * Copyright Linaro Limited, 2017
++ * Written by Peter Maydell
++ */
++
++#ifndef HW_MISC_UNIMP_H
++#define HW_MISC_UNIMP_H
++
++#define TYPE_UNIMPLEMENTED_DEVICE "unimplemented-device"
++
++/**
++ * create_unimplemented_device: create and map a dummy device
++ * @name: name of the device for debug logging
++ * @base: base address of the device's MMIO region
++ * @size: size of the device's MMIO region
++ *
++ * This utility function creates and maps an instance of unimplemented-device,
++ * which is a dummy device which simply logs all guest accesses to
++ * it via the qemu_log LOG_UNIMP debug log.
++ * The device is mapped at priority -1000, which means that you can
++ * use it to cover a large region and then map other devices on top of it
++ * if necessary.
++ */
++static inline void create_unimplemented_device(const char *name,
++                                               hwaddr base,
++                                               hwaddr size)
++{
++    DeviceState *dev = qdev_create(NULL, TYPE_UNIMPLEMENTED_DEVICE);
++
++    qdev_prop_set_string(dev, "name", name);
++    qdev_prop_set_uint64(dev, "size", size);
++    qdev_init_nofail(dev);
++
++    sysbus_mmio_map_overlap(SYS_BUS_DEVICE(dev), 0, base, -1000);
++}
++
++#endif
+diff --git a/hw/misc/unimp.c b/hw/misc/unimp.c
+new file mode 100644
+index 0000000..bcbb585
+--- /dev/null
++++ b/hw/misc/unimp.c
+@@ -0,0 +1,107 @@
++/* "Unimplemented" device
++ *
++ * This is a dummy device which accepts and logs all accesses.
++ * It's useful for stubbing out regions of an SoC or board
++ * map which correspond to devices that have not yet been
++ * implemented. This is often sufficient to placate initial
++ * guest device driver probing such that the system will
++ * come up.
++ *
++ * Copyright Linaro Limited, 2017
++ * Written by Peter Maydell
++ */
++
++#include "qemu/osdep.h"
++#include "hw/hw.h"
++#include "hw/sysbus.h"
++#include "hw/misc/unimp.h"
++#include "qemu/log.h"
++#include "qapi/error.h"
++
++#define UNIMPLEMENTED_DEVICE(obj) \
++    OBJECT_CHECK(UnimplementedDeviceState, (obj), TYPE_UNIMPLEMENTED_DEVICE)
++
++typedef struct {
++    SysBusDevice parent_obj;
++    MemoryRegion iomem;
++    char *name;
++    uint64_t size;
++} UnimplementedDeviceState;
++
++static uint64_t unimp_read(void *opaque, hwaddr offset, unsigned size)
++{
++    UnimplementedDeviceState *s = UNIMPLEMENTED_DEVICE(opaque);
++
++    qemu_log_mask(LOG_UNIMP, "%s: unimplemented device read "
++                  "(size %d, offset 0x%" HWADDR_PRIx ")\n",
++                  s->name, size, offset);
++    return 0;
++}
++
++static void unimp_write(void *opaque, hwaddr offset,
++                        uint64_t value, unsigned size)
++{
++    UnimplementedDeviceState *s = UNIMPLEMENTED_DEVICE(opaque);
++
++    qemu_log_mask(LOG_UNIMP, "%s: unimplemented device write "
++                  "(size %d, value 0x%" PRIx64
++                  ", offset 0x%" HWADDR_PRIx ")\n",
++                  s->name, size, value, offset);
++}
++
++static const MemoryRegionOps unimp_ops = {
++    .read = unimp_read,
++    .write = unimp_write,
++    .impl.min_access_size = 1,
++    .impl.max_access_size = 8,
++    .valid.min_access_size = 1,
++    .valid.max_access_size = 8,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++};
++
++static void unimp_realize(DeviceState *dev, Error **errp)
++{
++    UnimplementedDeviceState *s = UNIMPLEMENTED_DEVICE(dev);
++
++    if (s->size == 0) {
++        error_setg(errp, "property 'size' not specified or zero");
++        return;
++    }
++
++    if (s->name == NULL) {
++        error_setg(errp, "property 'name' not specified");
++        return;
++    }
++
++    memory_region_init_io(&s->iomem, OBJECT(s), &unimp_ops, s,
++                          s->name, s->size);
++    sysbus_init_mmio(SYS_BUS_DEVICE(s), &s->iomem);
++}
++
++static Property unimp_properties[] = {
++    DEFINE_PROP_UINT64("size", UnimplementedDeviceState, size, 0),
++    DEFINE_PROP_STRING("name", UnimplementedDeviceState, name),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void unimp_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->realize = unimp_realize;
++    dc->props = unimp_properties;
++}
++
++static const TypeInfo unimp_info = {
++    .name = TYPE_UNIMPLEMENTED_DEVICE,
++    .parent = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(UnimplementedDeviceState),
++    .class_init = unimp_class_init,
++};
++
++static void unimp_register_types(void)
++{
++    type_register_static(&unimp_info);
++}
++
++type_init(unimp_register_types)
 -- 
 2.7.4
