@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50348)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50667)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cRev3-0007qA-DR
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 07:55:55 -0500
+	(envelope-from <hpoussin@reactos.org>) id 1cRewk-0000Je-99
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 07:57:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1cRev0-00016R-CD
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 07:55:53 -0500
-Received: from mail-wj0-x244.google.com ([2a00:1450:400c:c01::244]:35039)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1cRev0-00015n-3e
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 07:55:50 -0500
-Received: by mail-wj0-x244.google.com with SMTP id ey1so1774680wjd.2
-	for <qemu-devel@nongnu.org>; Thu, 12 Jan 2017 04:55:49 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <1484192182-13760-1-git-send-email-peterx@redhat.com>
-	<1484192182-13760-3-git-send-email-peterx@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <5269cdb1-ae12-31af-0e7d-7c8d2b9c6848@redhat.com>
-Date: Thu, 12 Jan 2017 13:55:48 +0100
+	(envelope-from <hpoussin@reactos.org>) id 1cRewg-00026R-8x
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 07:57:38 -0500
+References: <1483049536-21548-1-git-send-email-hpoussin@reactos.org>
+	<CACXAS8AGTGJ-3yEzf9gzOmfRfppL2REmTyB2SAkb3Nd8eyVYig@mail.gmail.com>
+From: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
+Message-ID: <733cba29-58b7-e43f-0d50-3774ee8bf3b2@reactos.org>
+Date: Thu, 12 Jan 2017 13:57:11 +0100
 MIME-Version: 1.0
-In-Reply-To: <1484192182-13760-3-git-send-email-peterx@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [kvm-unit-tests PATCH v6 2/3] run_tests: put logs
- into per-test file
+In-Reply-To: <CACXAS8AGTGJ-3yEzf9gzOmfRfppL2REmTyB2SAkb3Nd8eyVYig@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 0/6] ppc: add a IBM 40p machine (RS/6000,
+ PReP)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,156 +24,173 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org
-Cc: Andrew Jones <drjones@redhat.com>, =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>
+To: Artyom Tarasenko <atar4qemu@gmail.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Giancarlo Teodori <gteodori@gmail.com>, Thomas Huth <thuth@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
+Le 11/01/2017 =C3=A0 17:58, Artyom Tarasenko a =C3=A9crit :
+> Hi Herv=C3=A9,
+>
+> nice work!
+>
+> On Thu, Dec 29, 2016 at 11:12 PM, Herv=C3=A9 Poussineau <hpoussin@react=
+os.org> wrote:
+>> Hi,
+>>
+>> This patchset adds the emulation of the IBM RS/6000 7020 (40p). The re=
+al machine is
+>> able to run AIX (up to 4.3.3), Windows NT (up to 4.0 SP1), the beta of=
+ OS/2 PowerPC,
+>> Solaris, Linux, NetBSD/PReP ...
+>>
+>> I've tested current emulation with Open Hack'Ware, OpenBIOS and offici=
+al firmware.
+>>
+>> Linux kernel starts, and freezes during boot (like with 'prep' machine=
+).
 
+I already saw a regression during 2.7.0 cycle with 603 CPU. However, I wa=
+s unable to provide kernel source, so Benjamin was unable to find the pro=
+blem.
+http://lists.gnu.org/archive/html/qemu-devel/2016-08/msg03760.html
 
-On 12/01/2017 04:36, Peter Xu wrote:
-> We were using test.log before to keep all the test logs. This patch
-> creates one log file per test case under logs/ directory with name
-> "TESTNAME.log". Meanwhile, we will keep the last time log into
-> logs.old/.
-> 
-> Renaming scripts/functions.bash into scripts/common.bash to store some
-> more global variables.
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  .gitignore                              |  3 ++-
->  Makefile                                |  5 ++---
->  run_tests.sh                            | 19 ++++++++++++-------
->  scripts/{functions.bash => common.bash} | 13 +++++++++++--
->  scripts/mkstandalone.sh                 |  2 +-
->  5 files changed, 28 insertions(+), 14 deletions(-)
->  rename scripts/{functions.bash => common.bash} (75%)
-> 
-> diff --git a/.gitignore b/.gitignore
-> index 3155418..2213b9b 100644
-> --- a/.gitignore
-> +++ b/.gitignore
-> @@ -12,7 +12,8 @@ cscope.*
->  /lib/asm
->  /config.mak
->  /*-run
-> -/test.log
->  /msr.out
->  /tests
->  /build-head
-> +/logs/
-> +/logs.old/
-> diff --git a/Makefile b/Makefile
-> index a32333b..844bacc 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -94,9 +94,8 @@ libfdt_clean:
->  	$(LIBFDT_objdir)/.*.d
->  
->  distclean: clean libfdt_clean
-> -	$(RM) lib/asm config.mak $(TEST_DIR)-run test.log msr.out cscope.* \
-> -	      build-head
-> -	$(RM) -r tests
-> +	$(RM) lib/asm config.mak $(TEST_DIR)-run msr.out cscope.* build-head
-> +	$(RM) -r tests logs logs.old
->  
->  cscope: cscope_dirs = lib lib/libfdt lib/linux $(TEST_DIR) $(ARCH_LIBDIRS) lib/asm-generic
->  cscope:
-> diff --git a/run_tests.sh b/run_tests.sh
-> index 2cfa365..afd3d95 100755
-> --- a/run_tests.sh
-> +++ b/run_tests.sh
-> @@ -7,7 +7,7 @@ if [ ! -f config.mak ]; then
->      exit 1
->  fi
->  source config.mak
-> -source scripts/functions.bash
-> +source scripts/common.bash
->  
->  function usage()
->  {
-> @@ -46,17 +46,22 @@ while getopts "g:hv" opt; do
->      esac
->  done
->  
-> -RUNTIME_log_stderr () { cat >> test.log; }
-> +# RUNTIME_log_file will be configured later
-> +RUNTIME_log_stderr () { cat >> $RUNTIME_log_file; }
->  RUNTIME_log_stdout () {
->      if [ "$PRETTY_PRINT_STACKS" = "yes" ]; then
-> -        ./scripts/pretty_print_stacks.py $1 >> test.log
-> +        ./scripts/pretty_print_stacks.py $1 >> $RUNTIME_log_file
->      else
-> -        cat >> test.log
-> +        cat >> $RUNTIME_log_file
->      fi
->  }
->  
-> -
->  config=$TEST_DIR/unittests.cfg
-> -rm -f test.log
-> -printf "BUILD_HEAD=$(cat build-head)\n\n" > test.log
-> +
-> +rm -rf $unittest_log_dir.old
-> +[ -d $unittest_log_dir ] && mv $unittest_log_dir $unittest_log_dir.old
-> +mkdir $unittest_log_dir || exit 2
-> +
-> +echo "BUILD_HEAD=$(cat build-head)" > $unittest_log_dir/SUMMARY
-> +
->  for_each_unittest $config run
-> diff --git a/scripts/functions.bash b/scripts/common.bash
-> similarity index 75%
-> rename from scripts/functions.bash
-> rename to scripts/common.bash
-> index ee9143c..2dd7360 100644
-> --- a/scripts/functions.bash
-> +++ b/scripts/common.bash
-> @@ -1,3 +1,12 @@
-> +: ${unittest_log_dir:=logs}
-> +
-> +function run_task()
-> +{
-> +	local testname="$2"
-> +
-> +	RUNTIME_log_file="${unittest_log_dir}/${testname}.log"
-> +	"$@"
-> +}
+>
+> If prep can't do it anymore, it looks like a regression. I definitely
+> remember seen a sitting penguin and a login prompt ~ 2 years ago. At
+> least with OFW.
+>
+>> Windows NT starts up to the point where it wants to change endianness.
+>
+> I hit that with Solaris/PPC a few years back as you published your
+> previous attempt. Do you know what is missing? I guess CPU endianness
+> switch emulation is working because it is used in the newer POWER
+> CPUs. Is it just the systemIO which has to be improved, or is it more?
 
-This should go in run_tests.sh since that's the only place that uses
-unittest_log_dir.  (The last line then becomes 'run "$@"' and the
-for_each_unittest call must be adjusted).  Done and queued.
+Yes, PReP System I/O has LE flag which is not implemented.
+You may be interested by ftp://ftp.software.ibm.com/rs6000/technology/spe=
+c/endian.ps
+which deals about endianness switching, with some code from Windows NT/PP=
+C
 
-Paolo
+>
+>> Other OSes have not been tested.
+>>
+>> This machine is a superset of the 'prep' one, because we know exactly =
+what is/should
+>> emulated, and that operating system list running on it is quite wide.
+>> I hope that 'prep' machine can be deprecated soon and then later remov=
+ed.
+>
+> Would be nice to keep 'prep' until the 40p can boot Linux and NetBSD
+> 6.1.3 (this version used to work with -M prep last time I checked).
 
->  function for_each_unittest()
->  {
-> @@ -17,7 +26,7 @@ function for_each_unittest()
->  
->  	while read -u $fd line; do
->  		if [[ "$line" =~ ^\[(.*)\]$ ]]; then
-> -			"$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
-> +			run_task "$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
->  			testname=${BASH_REMATCH[1]}
->  			smp=1
->  			kernel=""
-> @@ -45,6 +54,6 @@ function for_each_unittest()
->  			timeout=${BASH_REMATCH[1]}
->  		fi
->  	done
-> -	"$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
-> +	run_task "$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
->  	exec {fd}<&-
->  }
-> diff --git a/scripts/mkstandalone.sh b/scripts/mkstandalone.sh
-> index d2bae19..3c1938e 100755
-> --- a/scripts/mkstandalone.sh
-> +++ b/scripts/mkstandalone.sh
-> @@ -5,7 +5,7 @@ if [ ! -f config.mak ]; then
->  	exit 1
->  fi
->  source config.mak
-> -source scripts/functions.bash
-> +source scripts/common.bash
->  
->  escape ()
->  {
-> 
+Some Linux kernels seem to work, some other ones seem to not work (hang w=
+hile booting)
+I've not searched why.
+
+I tried NetBSD 6.1.3/PReP.
+cdroms/harddisks don't boot anymore with Open Hack'Ware since some change=
+s in IDE core
+Kernel boots better with 40p than with prep
+
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D
+prep:
+
+Copyright (c) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
+     2006, 2007, 2008, 2009, 2010, 2011, 2012
+     The NetBSD Foundation, Inc.  All rights reserved.
+Copyright (c) 1982, 1986, 1989, 1991, 1993
+     The Regents of the University of California.  All rights reserved.
+
+NetBSD 6.1.3 (INSTALL)
+Model: Qemu
+total memory =3D 128 MB
+avail memory =3D 119 MB
+panic: call to null-ptr from 0x0
+
+The operating system has halted.
+Please press any key to reboot.
+
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D
+40p/Open Hack'Ware:
+
+Copyright (c) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
+     2006, 2007, 2008, 2009, 2010, 2011, 2012
+     The NetBSD Foundation, Inc.  All rights reserved.
+Copyright (c) 1982, 1986, 1989, 1991, 1993
+     The Regents of the University of California.  All rights reserved.
+
+NetBSD 6.1.3 (INSTALL)
+Model: Qemu
+total memory =3D 128 MB
+avail memory =3D 119 MB
+mainbus0 (root)
+cpu0 at mainbus0: 604 (Revision 1.3), ID 0 (primary)
+cpu0: HID0 0xc084<ICE,DCE,SGE,BHT>, powersave: 1
+cpu0: 0.00 MHz
+Couldn't find PNP data for bus 0 devfunc 0x0
+pnpbus0 at mainbus0
+pci0 at mainbus0 bus 0: indirect configuration space access
+pchb0 at pci0 dev 0 function 0
+pchb0: vendor 0x1057 product 0x4801 (rev. 0x00)
+siop0 at pci0 dev 1 function 0: Symbios Logic 53c810 (fast scsi)
+siop0: couldn't map interrupt
+vga0 at pci0 dev 2 function 0: vendor 0x1234 product 0x1111 (rev. 0x02)
+wsdisplay0 at vga0 (kbdmux ignored)
+drm at vga0 not configured
+pcn0 at pci0 dev 3 function 0: AMD PCnet-PCI Ethernet
+pcn0: Am79c970A PCnet-PCI II rev 0, Ethernet address 52:54:00:12:34:56
+pcn0: unable to map interrupt
+pcib0 at pci0 dev 11 function 0: vendor 0x8086 product 0x0484 (rev. 0x03)
+isa0 at pcib0
+com0 at isa0 port 0x3f8-0x3ff irq 4: ns16550a, working fifo
+com0: console
+com1 at isa0 port 0x2f8-0x2ff irq 3: ns16550a, working fifo
+pckbc0 at isa0 port 0x60-0x64
+pckbd0 at pckbc0 (kbd slot)
+pckbc0: using irq 1 for kbd slot
+wskbd0 at pckbd0 (mux ignored)
+vmmask 10000000 schedmask 10000000 highmask 70000000
+boot device: mainbus0
+root on md0a dumps on md0b
+root file system type: ffs
+WARNING: no TOD clock present
+WARNING: using filesystem time
+WARNING: CHECK AND RESET THE DATE!
+erase ^H, werase ^W, kill ^U, intr ^C, status ^T
+Terminal type? [vt100]
+
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D
+40p/official firmware with cdrom boot:
+
+Copyright (c) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
+     2006, 2007, 2008, 2009, 2010, 2011, 2012
+     The NetBSD Foundation, Inc.  All rights reserved.
+Copyright (c) 1982, 1986, 1989, 1991, 1993
+     The Regents of the University of California.  All rights reserved.
+
+NetBSD 6.1.3 (INSTALL)
+Model: IBM PPS Model 6015
+total memory =3D 128 MB
+avail memory =3D 119 MB
+trap: kernel read DSI trap @ 0x481b4cae by 0x2a4f50 (DSISR 0x40000000, er=
+r=3D14), lr 0x140e84
+panic: trap
+
+The operating system has halted.
+Please press any key to reboot.
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D
+
+OpenBIOS doesn't support PReP boot partitions (type 0x41) nor PReP kernel=
+s so this is a no-go yet.
+
+Regards,
+
+Herv=C3=A9
