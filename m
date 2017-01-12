@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36452)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38534)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1cRlCF-0003KU-FJ
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 14:38:04 -0500
+	(envelope-from <mst@redhat.com>) id 1cRlHP-0006Ld-0j
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 14:43:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1cRlCA-0004zA-In
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 14:38:03 -0500
-Received: from roura.ac.upc.es ([147.83.33.10]:39101)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1cRlCA-0004yk-5K
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 14:37:58 -0500
-From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
-References: <148295045448.19871.9819696634619157347.stgit@fimbulvetr.bsc.es>
-	<148295047061.19871.11792107348459066542.stgit@fimbulvetr.bsc.es>
-	<20170109170156.GL30228@stefanha-x1.localdomain>
-	<34ec95ff-7283-4e6f-fc07-7678424d0e13@redhat.com>
-	<20170111161640.GA9269@stefanha-x1.localdomain>
-Date: Thu, 12 Jan 2017 20:37:52 +0100
-In-Reply-To: <20170111161640.GA9269@stefanha-x1.localdomain> (Stefan
-	Hajnoczi's message of "Wed, 11 Jan 2017 16:16:40 +0000")
-Message-ID: <8760lkt6gf.fsf@ac.upc.edu>
+	(envelope-from <mst@redhat.com>) id 1cRlHK-0000A0-5m
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 14:43:23 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58720)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1cRlHJ-00009J-Vt
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 14:43:18 -0500
+Date: Thu, 12 Jan 2017 21:43:15 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170112185719-mutt-send-email-mst@kernel.org>
+References: <1482303148-22059-1-git-send-email-liang.z.li@intel.com>
+	<1482303148-22059-3-git-send-email-liang.z.li@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v6 3/7] trace: [tcg] Delay changes to
- dynamic state when translating
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1482303148-22059-3-git-send-email-liang.z.li@intel.com>
+Subject: Re: [Qemu-devel] [PATCH v6 kernel 2/5] virtio-balloon: define new
+ feature bit and head struct
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,60 +28,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
+To: Liang Li <liang.z.li@intel.com>
+Cc: kvm@vger.kernel.org, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, amit.shah@redhat.com, dave.hansen@intel.com, cornelia.huck@de.ibm.com, pbonzini@redhat.com, david@redhat.com, aarcange@redhat.com, dgilbert@redhat.com, quintela@redhat.com
 
-Stefan Hajnoczi writes:
+On Wed, Dec 21, 2016 at 02:52:25PM +0800, Liang Li wrote:
+> Add a new feature which supports sending the page information
+> with range array. The current implementation uses PFNs array,
+> which is not very efficient. Using ranges can improve the
+> performance of inflating/deflating significantly.
+> 
+> Signed-off-by: Liang Li <liang.z.li@intel.com>
+> Cc: Michael S. Tsirkin <mst@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Cornelia Huck <cornelia.huck@de.ibm.com>
+> Cc: Amit Shah <amit.shah@redhat.com>
+> Cc: Dave Hansen <dave.hansen@intel.com>
+> Cc: Andrea Arcangeli <aarcange@redhat.com>
+> Cc: David Hildenbrand <david@redhat.com>
+> ---
+>  include/uapi/linux/virtio_balloon.h | 12 ++++++++++++
+>  1 file changed, 12 insertions(+)
+> 
+> diff --git a/include/uapi/linux/virtio_balloon.h b/include/uapi/linux/virtio_balloon.h
+> index 343d7dd..2f850bf 100644
+> --- a/include/uapi/linux/virtio_balloon.h
+> +++ b/include/uapi/linux/virtio_balloon.h
+> @@ -34,10 +34,14 @@
+>  #define VIRTIO_BALLOON_F_MUST_TELL_HOST	0 /* Tell before reclaiming pages */
+>  #define VIRTIO_BALLOON_F_STATS_VQ	1 /* Memory Stats virtqueue */
+>  #define VIRTIO_BALLOON_F_DEFLATE_ON_OOM	2 /* Deflate balloon on OOM */
+> +#define VIRTIO_BALLOON_F_PAGE_RANGE	3 /* Send page info with ranges */
+>  
+>  /* Size of a PFN in the balloon interface. */
+>  #define VIRTIO_BALLOON_PFN_SHIFT 12
+>  
+> +/* Bits width for the length of the pfn range */
 
-> On Tue, Jan 10, 2017 at 05:31:37PM +0100, Paolo Bonzini wrote:
->> On 09/01/2017 18:01, Stefan Hajnoczi wrote:
->> > Or use a simpler scheme:
->> > 
->> > struct CPUState {
->> >     ...
->> >     uint32_t dstate_update_count;
->> > };
->> > 
->> > In trace_event_set_vcpu_state_dynamic():
->> > 
->> >     if (state) {
->> >         trace_events_enabled_count++;
->> >         set_bit(vcpu_id, vcpu->trace_dstate_delayed);
->> > 	atomic_inc(&vcpu->dstate_update_count, 1);
->> >         (*ev->dstate)++;
->> >     } ...
->> > 
->> > In cpu_exec() and friends:
->> > 
->> >     last_dstate_update_count = atomic_read(&vcpu->dstate_update_count);
->> > 
->> >     tb = tb_find(cpu, last_tb, tb_exit);
->> >     cpu_loop_exec_tb(cpu, tb, &last_tb, &tb_exit, &sc);
->> > 
->> >     /* apply and disable delayed dstate changes */
->> >     if (unlikely(atomic_read(&cpu->dstate_update_count) != last_dstate_update_count)) {
->> >         bitmap_copy(cpu->trace_dstate, cpu->trace_dstate_delayed,
->> >         trace_get_vcpu_event_count());
->> >     }
->> > 
->> > (You'll need to adjust the details but the update counter approach
->> > should be workable.)
->> 
->> Would it work to use async_run_on_cpu?
+What does this mean? Couldn't figure it out.
 
-> I think so.
+> +#define VIRTIO_BALLOON_NR_PFN_BITS 12
+> +
+>  struct virtio_balloon_config {
+>  	/* Number of pages host wants Guest to give up. */
+>  	__u32 num_pages;
+> @@ -82,4 +86,12 @@ struct virtio_balloon_stat {
+>  	__virtio64 val;
+>  } __attribute__((packed));
+>  
+> +/* Response header structure */
+> +struct virtio_balloon_resp_hdr {
+> +	__le64 cmd : 8; /* Distinguish different requests type */
+> +	__le64 flag: 8; /* Mark status for a specific request type */
+> +	__le64 id : 16; /* Distinguish requests of a specific type */
+> +	__le64 data_len: 32; /* Length of the following data, in bytes */
 
-AFAIU we cannot use async_run_on_cpu(), since we need to reset the local
-variable "last_tb" to avoid chaining TBs with different dstates, and we cannot
-use cpu_loop_exit() inside the callback.
+This use of __le64 makes no sense.  Just use u8/le16/le32 pls.
 
-To make it work, we'd need to add some new boolean flag on the vCPU to control
-when to reset "last_tb", and then we're just as good as implementing the async
-work "protocol" manually for this specific case.
-
-What I'll do is fix the race condition by simplifying that code (haven't looked
-at the problem yet).
-
-
-Thanks,
-  Lluis
+> +};
+> +
+>  #endif /* _LINUX_VIRTIO_BALLOON_H */
+> -- 
+> 1.9.1
