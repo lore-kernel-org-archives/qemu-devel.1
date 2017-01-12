@@ -1,37 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51276)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51318)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imbrenda@linux.vnet.ibm.com>) id 1cRiV0-0000Zb-CR
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 11:45:15 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1cRiV6-0000eZ-Bz
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 11:45:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imbrenda@linux.vnet.ibm.com>) id 1cRiUw-00016S-1e
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 11:45:14 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39829)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imbrenda@linux.vnet.ibm.com>)
-	id 1cRiUv-00014G-O4
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 11:45:09 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id
-	v0CGdK11108434
-	for <qemu-devel@nongnu.org>; Thu, 12 Jan 2017 11:45:07 -0500
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 27xbeb647m-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 12 Jan 2017 11:45:07 -0500
-Received: from localhost
-	by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <imbrenda@linux.vnet.ibm.com>;
-	Thu, 12 Jan 2017 16:45:05 -0000
-References: <1477674916-6795-1-git-send-email-imbrenda@linux.vnet.ibm.com>
-From: Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>
-Date: Thu, 12 Jan 2017 17:45:01 +0100
+	(envelope-from <ehabkost@redhat.com>) id 1cRiV1-0001D1-ND
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 11:45:20 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52158)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1cRiV1-0001C4-EN
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 11:45:15 -0500
+Date: Thu, 12 Jan 2017 14:45:12 -0200
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170112164512.GO3565@thinpad.lan.raisama.net>
+References: <20170111173457.30455-1-lersek@redhat.com>
+	<20170111173457.30455-3-lersek@redhat.com>
+	<20170112131053.GA27893@thinpad.lan.raisama.net>
+	<899dc23a-b6c0-e9c8-c31a-03e4cc8e7b7e@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1477674916-6795-1-git-send-email-imbrenda@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Message-Id: <08201dc9-c077-feee-14e1-a8f0f225b9d7@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v3 0/2] Qemu: gdbstub: fix vCont
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <899dc23a-b6c0-e9c8-c31a-03e4cc8e7b7e@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5 wave 1 2/4] fw-cfg: turn
+ FW_CFG_FILE_SLOTS into a device property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,11 +30,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, palves@redhat.com, borntraeger@de.ibm.com
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: qemu devel list <qemu-devel@nongnu.org>, Igor Mammedov <imammedo@redhat.com>, "Gabriel L. Somlo" <somlo@cmu.edu>, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-Hello,
+On Thu, Jan 12, 2017 at 05:30:42PM +0100, Laszlo Ersek wrote:
+> On 01/12/17 14:10, Eduardo Habkost wrote:
+> > On Wed, Jan 11, 2017 at 06:34:55PM +0100, Laszlo Ersek wrote:
+> > [...]
+> >>  static Property fw_cfg_io_properties[] = {
+> >>      DEFINE_PROP_UINT32("iobase", FWCfgIoState, iobase, -1),
+> >>      DEFINE_PROP_UINT32("dma_iobase", FWCfgIoState, dma_iobase, -1),
+> >>      DEFINE_PROP_BOOL("dma_enabled", FWCfgIoState, parent_obj.dma_enabled,
+> >>                       true),
+> >> +    DEFINE_PROP_UINT16("file_slots", FWCfgIoState, parent_obj.file_slots,
+> >> +                       FW_CFG_FILE_SLOTS_MIN),
+> >>      DEFINE_PROP_END_OF_LIST(),
+> >>  };
+> >>  
+> >> @@ -1027,6 +1066,13 @@ static void fw_cfg_io_realize(DeviceState *dev, Error **errp)
+> > 
+> > I'm not sure what is more important here: following the QOM
+> > property name convention using "-" instead of "_", or being
+> > consistent with the other existing properties.
+> 
+> Right, when working with the compat settings, I saw both schemes. I
+> couldn't decide. I figured I'd stick with the underscore seen with
+> "dma_enabled".
+> 
+> > 
+> > In either case, we could add a "x-" prefix to indicate it is not
+> > supposed to be configured directly by the user.
+> 
+> I thought "x-" meant "experimental"; i.e., the property could be changed
+> or could go away at any moment. That's a slightly different meaning than
+> "not meant for users".
 
-just a respectful poke to remind about this patchset :)
+That's true: it means the property could be changed or go away.
+And that's the only mechanism we have to indicate that users
+shouldn't rely on the property being always available on the
+command-line in future versions.
 
-Claudio
+(Yes, this should be better documented. We found out very
+recently that people have very different expectations about what
+QOM properties should be used for, so we are still figuring out
+what should be the best practices and didn't write everything
+down yet.)
+
+> 
+> BTW I think the same (== not meant for the user) applies to a number of
+> other properties (dma_enabled is one of them, but other devices have
+> this kind too); do we consistently call them x-*?
+
+We don't, but that's because we haven't been paying attention to
+that until recently. Renaming existing properties is possible,
+but risks breaking existing software and scripts.
+
+> 
+> > 
+> > [...]
+> >> @@ -1063,6 +1109,8 @@ static Property fw_cfg_mem_properties[] = {
+> >>      DEFINE_PROP_UINT32("data_width", FWCfgMemState, data_width, -1),
+> >>      DEFINE_PROP_BOOL("dma_enabled", FWCfgMemState, parent_obj.dma_enabled,
+> >>                       true),
+> >> +    DEFINE_PROP_UINT16("file_slots", FWCfgMemState, parent_obj.file_slots,
+> >> +                       FW_CFG_FILE_SLOTS_MIN),
+> > 
+> > It looks like you can add the property to the TYPE_FW_CFG parent
+> > class instead of duplicating it on the subclasses. The existing
+> > "dma_enabled" property could be moved there as well.
+> 
+> I would prefer if someone could pick up that task, separately.
+> 
+> The idea crossed my mind when I was working on the common base class,
+> originally, wrt. dma_enabled. I vaguely remember that there was some
+> problem with moving up the property. Ultimately the reviewers didn't
+> expect me, or suggest, to move it up, hence the current status.
+> 
+> I think it's out of scope for this series. If you (or someone else) can
+> do it, I agree it would be an improvement, but I'd rather learn the
+> method from someone else's patch than experiment with it myself.
+
+Agreed.
+
+> 
+> 
+> If there's a consensus on the x- prefix and/or the underscore/hyphen
+> question, I'm happy to send a v6 with those changes.
+
+I don't mind about the underscore, but IMO the "x-" prefix is
+important.
+
+-- 
+Eduardo
