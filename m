@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40244)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42696)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1cRhsW-0004eQ-By
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 11:05:29 -0500
+	(envelope-from <mlureau@redhat.com>) id 1cRi1o-0004z7-FR
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 11:15:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1cRhsR-0007bI-Eg
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 11:05:28 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57882)
+	(envelope-from <mlureau@redhat.com>) id 1cRi1j-0002KZ-7d
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 11:15:04 -0500
+Received: from mx3-phx2.redhat.com ([209.132.183.24]:44887)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1cRhsR-0007ay-6S
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 11:05:23 -0500
-Received: from int-mx09.intmail.prod.int.phx2.redhat.com
-	(int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 61D3E31B336
-	for <qemu-devel@nongnu.org>; Thu, 12 Jan 2017 16:05:23 +0000 (UTC)
-References: <1484137136-8021-1-git-send-email-marcel@redhat.com>
-	<20170112173724-mutt-send-email-mst@kernel.org>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <4e1faa9c-c586-cd85-5642-a337b43d8c25@redhat.com>
-Date: Thu, 12 Jan 2017 18:05:20 +0200
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1cRi1i-0002Jt-SR
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 11:14:59 -0500
+Date: Thu, 12 Jan 2017 11:14:58 -0500 (EST)
+From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <mlureau@redhat.com>
+Message-ID: <1367963129.1944696.1484237698262.JavaMail.zimbra@redhat.com>
+In-Reply-To: <994f02f5-8272-b420-1912-5cb8f55a40ca@redhat.com>
+References: <20170111172956.11255-1-marcandre.lureau@redhat.com>
+	<20170111172956.11255-17-marcandre.lureau@redhat.com>
+	<994f02f5-8272-b420-1912-5cb8f55a40ca@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170112173724-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V2 0/3] hw/pcie: Introduce Generic PCI
- Express Root Port
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 16/40] char: get rid of CharDriver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,92 +28,248 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, pbonzini@redhat.com
 
-On 01/12/2017 05:56 PM, Michael S. Tsirkin wrote:
-> On Wed, Jan 11, 2017 at 02:18:53PM +0200, Marcel Apfelbaum wrote:
->> v1 -> v2:
->>  - Rebased on master.
->>
->> The Generic Root Port behaves the same as the
->> Intel's IOH device with id 3420, without having
->> Intel specific attributes.
->>
->> The device has two purposes:
->>  (1) Can be used on both X86 and ARM machines.
->>  (2) It will allow us to tweak the behaviour
->>     (e.g add vendor-specific PCI capabilities)
->>      - something that obviously cannot be done
->>        on a known device.
->>
->> Patch 1/3: Introduce a base class for Root Ports - most of the code
->>            is migrated from IOH3420 implementation.
->> Patch 2/3: Derives the IOH3420 from the new base class
->> Patch 3/3: Introduces the generic Root Port.
->>
->> Tested with Linux and Windows guests only on x86 hosts.
->
+Hi
 
-Hi Michael,
+----- Original Message -----
+> On 01/11/2017 11:29 AM, Marc-Andr=C3=A9 Lureau wrote:
+> > qemu_chr_new_from_opts() is modified to not need CharDriver backend[]
+> > array, but uses instead objectified qmp_query_chardev_backends() and
+> > char_get_class(). The alias field is moved outside in a ChardevAlias[],
+> > similar to QDevAlias for devices.
+> >=20
+> > "kind" and "parse" are moved to ChardevClass ("kind" is to be removed
+> > next)
+> >=20
+> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> > ---
+>=20
+>=20
+> >  Chardev *qemu_chr_new_from_opts(QemuOpts *opts,
+> >                                  Error **errp)
+> >  {
+> >      Error *local_err =3D NULL;
+> > -    const CharDriver *cd =3D NULL;
+> > +    const ChardevClass *cc;
+> >      Chardev *chr;
+> >      int i;
+> >      ChardevReturn *ret =3D NULL;
+> > @@ -4180,16 +4196,13 @@ Chardev *qemu_chr_new_from_opts(QemuOpts *opts,
+> > =20
+> >      if (is_help_option(name)) {
+> >          GString *str =3D g_string_new("");
+> > -        for (i =3D 0; i < ARRAY_SIZE(backends); i++) {
+> > -            cd =3D backends[i];
+> > -            if (cd) {
+> > -                g_string_append_printf(str, "\n%s",
+> > ChardevBackendKind_lookup[cd->kind]);
+> > -                if (cd->alias) {
+> > -                    g_string_append_printf(str, "\n%s", cd->alias);
+> > -                }
+> > -            }
+> > +        ChardevBackendInfoList *l, *il =3D qmp_query_chardev_backends(=
+NULL);
+> > +
+> > +        for (l =3D il; l !=3D NULL; l =3D l->next) {
+> > +            g_string_append_printf(str, "\n%s", l->value->name);
+> >          }
+> > =20
+> > +        qapi_free_ChardevBackendInfoList(l);
+>=20
+> Is this really the most efficient way to do it?  I guess it works, but
+> consider what qmp_query_chardev_backends() is doing: it is iterating
+> through a list of chardevs, and for each one (or its alias), calling a
+> callback qmp_prepend_backend().  Would a better factorization be to have
+> a common function that takes care of the iteration and takes a function
+> pointer for what to do on each element of the iteration, and then
+> qmp_query_chardev_backend calls helper(qmp_prepend_backup) while this
+> code calls helper(append_name), so that you aren't wasting the creation
+> of an entire ChardevBackendInfoList item just for the action of
+> appending the name?
+>=20
 
-> So I understand how it's helpful to share code
-> with an existing bridge, but I worries me that
-> you picked up some arbitrary values from the intel chip
-> and promote them as a standard pcie thing.
->
+I don't think speed matters here, but ok
 
-I suppose you are referring to the macros, I can duplicate
-them, of course.
+> > @@ -4407,21 +4417,23 @@ qmp_prepend_backend(ChardevBackendInfoList *lis=
+t,
+> > const char *name)
+> >  ChardevBackendInfoList *qmp_query_chardev_backends(Error **errp)
+> >  {
+> >      ChardevBackendInfoList *backend_list =3D NULL;
+> > -    const CharDriver *c;
+> > +    GSList *l, *list =3D object_class_get_list(TYPE_CHARDEV, false);
+> >      int i;
+> > =20
+> > -    for (i =3D 0; i < ARRAY_SIZE(backends); i++) {
+> > -        c =3D backends[i];
+> > -        if (!c) {
+> > +    for (l =3D list; l; l =3D l->next) {
+> > +        ObjectClass *klass =3D l->data;
+> > +        assert(g_str_has_prefix(object_class_get_name(klass),
+> > "chardev-"));
+> > +        if (CHARDEV_CLASS(klass)->internal) {
+> >              continue;
+> >          }
+> > -
+> >          backend_list =3D qmp_prepend_backend(backend_list,
+> > -
+> > ChardevBackendKind_lookup[c->kind]);
+> > -        if (c->alias) {
+> > -            backend_list =3D qmp_prepend_backend(backend_list, c->alia=
+s);
+> > -        }
+> > +                                           object_class_get_name(klass=
+) +
+> > 8);
+> > +    }
+> > +    for (i =3D 0; i < ARRAY_SIZE(chardev_alias_table); i++) {
+> > +        backend_list =3D qmp_prepend_backend(backend_list,
+> > +                                           chardev_alias_table[i].alia=
+s);
+>=20
+> This changes the order of the list which is output to the user
+> (shouldn't matter in practice, but may be worth mentioning in the commit
+> message as intentionally safe).
 
-> You want to have e.g. base-pcie-root-port and
-> inherit that. Only put really common stuff in there.
-> Similar to how we do it in hw/pci/pci_bridge.c
->
+ok
 
-So you prefer a different code file for the generic device.
-I currently put them both in the same file, I'll split.
+>=20
+> Again, I think that a little more refactoring to have the iteration over
+> object_class_get_list() and chardev_alias_table[], coupled with a
+> callback passed in by the client (with clients qemu_chr_new_from_opts
+> and qmp_query_chardev_backends), will separate the iteration from the
+> action, so that you don't always have to create a ChardevBackendInfoList
+> that will just be thrown away.
 
->
-> Now we do not want to over-engineer, so I understand
-> how you might want to say hey I use this option
-> and intel does the same so we do not need a flag
-> for that now. And that's fine but please add a comment
-> to that end.
->
+not a trivial refactoring (various callbacks, passed to callback etc) but o=
+k
 
-Indeed, I wanted to keep things simple. I'll add a comment
-on the functions that are not generic but are the same on
-both implementations 'by chance'.
+>=20
+> >      }
+> > +    g_slist_free(l);
+>=20
+> Shouldn't this be g_slist_free(list)?
 
-> And when you do you will discover there's some stuff you
-> might be able to simplify, e.g. I don't yet see why
-> you would want AER support there.
->
+Yes my bad, same error with qapi_free_ChardevBackendInfoList()!
 
-I am not sure *why not*. I am 'afraid' people will not use the new port
-because of missing features and they can see the AER as one of them.
+>=20
+> > @@ -4983,35 +4978,6 @@ void qemu_chr_set_feature(Chardev *chr,
+> >      return set_bit(feature, chr->features);
+> >  }
+> > =20
+> > -static const ChardevClass *char_get_class(const char *driver, Error
+> > **errp)
+> > -{
+>=20
+> This function is just moved earlier, which gets a little messy with the
+> rest of the patch. Can you split the code motion into a separate patch
+> for ease of review?  In fact, since it was just barely added in "[PATCH
+> v2 20/20] chardev: qom-ify]" and that patch hasn't landed yet, can't you
+> just amend that patch to hoist it early enough in the first place,
+> rather than churning it?
 
-Do you see a special issue in imitating Intel's behavior on AER?
+It depends if I get to resend it or not. Paolo, you may drop it from the fi=
+rst series, so I resend it with this one?
 
-Thanks,
-Marcel
+>=20
+>=20
+> > @@ -5107,45 +5073,34 @@ void qemu_chr_cleanup(void)
+> > =20
+> >  static void register_types(void)
+> >  {
+> > -    static const struct {
+> > -        const CharDriver *driver;
+> > -        const TypeInfo *type;
+> > -    } chardevs[] =3D {
+> > -        { &null_driver, &char_null_type_info },
+> > -        { &socket_driver, &char_socket_type_info },
+> > -        { &udp_driver, &char_udp_type_info },
+> > -        { &ringbuf_driver, &char_ringbuf_type_info },
+> > -        { &file_driver, &char_file_type_info },
+> > -        { &stdio_driver, &char_stdio_type_info },
+> > +    type_register_static(&char_type_info);
+> > +#ifndef _WIN32
+> > +    type_register_static(&char_fd_type_info);
+> > +#else
+> > +    type_register_static(&char_win_type_info);
+> > +    type_register_static(&char_win_stdio_type_info);
+> > +#endif
+>=20
+> It's a bit weird that these are registered first,...
+>=20
+> > +    type_register_static(&char_null_type_info);
+> > +    type_register_static(&char_socket_type_info);
+> > +    type_register_static(&char_udp_type_info);
+> > +    type_register_static(&char_ringbuf_type_info);
+> > +    type_register_static(&char_file_type_info);
+> > +    type_register_static(&char_stdio_type_info);
+> >  #ifdef HAVE_CHARDEV_SERIAL
+> > -        { &serial_driver, &char_serial_type_info },
+> > +    type_register_static(&char_serial_type_info);
+> >  #endif
+> >  #ifdef HAVE_CHARDEV_PARPORT
+> > -        { &parallel_driver, &char_parallel_type_info },
+> > +    type_register_static(&char_parallel_type_info);
+> >  #endif
+> >  #ifdef HAVE_CHARDEV_PTY
+> > -        { &pty_driver, &char_pty_type_info },
+> > +    type_register_static(&char_pty_type_info);
+> >  #endif
+> >  #ifdef _WIN32
+> > -        { &console_driver, &char_console_type_info },
+> > +    type_register_static(&char_console_type_info);
+>=20
+> Any reason we can't consolidate the _WIN32 ifdefs into one place?
 
->> Marcel Apfelbaum (3):
->>   hw/pcie: Introduce a base class for PCI Express Root Ports
->>   hw/ioh3420: derive from PCI Express Root Port base class
->>   hw/pcie: Introduce Generic PCI Express Root Port
->>
->>  default-configs/arm-softmmu.mak    |   1 +
->>  default-configs/i386-softmmu.mak   |   1 +
->>  default-configs/x86_64-softmmu.mak |   1 +
->>  hw/pci-bridge/Makefile.objs        |   1 +
->>  hw/pci-bridge/ioh3420.c            | 152 ++-----------------------
->>  hw/pci-bridge/pcie_root_port.c     | 228 +++++++++++++++++++++++++++++++++++++
->>  include/hw/pci/pci.h               |   1 +
->>  include/hw/pci/pcie_port.h         |  18 +++
->>  8 files changed, 258 insertions(+), 145 deletions(-)
->>  create mode 100644 hw/pci-bridge/pcie_root_port.c
->>
->> --
->> 2.5.5
+we could, but this is going away later in this series
+
+>=20
+> >  #endif
+> > -        { &pipe_driver, &char_pipe_type_info },
+> > -        { &mux_driver, &char_mux_type_info },
+> > -        { &memory_driver, &char_memory_type_info }
+> > -    };
+> > -    int i;
+> > -
+> > -    type_register_static(&char_type_info);
+> > -#ifndef _WIN32
+> > -    type_register_static(&char_fd_type_info);
+> > -#else
+> > -    type_register_static(&char_win_type_info);
+> > -    type_register_static(&char_win_stdio_type_info);
+> > -#endif
+>=20
+> ...when they used to be last; but I don't think it hurts.
+
+It doesn't, and it is spread later in the series, I wouldn't bother.
+
+>=20
+> > -    for (i =3D 0; i < ARRAY_SIZE(chardevs); i++) {
+> > -        type_register_static(chardevs[i].type);
+> > -        register_char_driver(chardevs[i].driver);
+> > -    }
+> > +    type_register_static(&char_pipe_type_info);
+> > +    type_register_static(&char_mux_type_info);
+> > +    type_register_static(&char_memory_type_info);
+> > =20
+> >      /* this must be done after machine init, since we register FEs wit=
+h
+> >      muxes
+> >       * as part of realize functions like serial_isa_realizefn when
+> >       -nographic
+> > diff --git a/spice-qemu-char.c b/spice-qemu-char.c
+>=20
+> Enough bugs that I'll want to see a v2, but it's headed in the right
+> direction.
+
+thanks, I'll wait for Paolo to take the first series before sending v2. Fee=
+l free to continue review of v1 for the remaining patches.
+
+>=20
+> --
+> Eric Blake   eblake redhat com    +1-919-301-3266
+> Libvirt virtualization library http://libvirt.org
+>=20
+>=20
