@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46183)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46200)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cRUjy-0002u8-In
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 21:03:48 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cRUjy-0002uR-UT
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 21:03:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cRUjw-0006TR-PI
+	(envelope-from <dgibson@ozlabs.org>) id 1cRUjw-0006TD-IT
 	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 21:03:46 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu, 12 Jan 2017 13:02:45 +1100
-Message-Id: <20170112020327.24882-26-david@gibson.dropbear.id.au>
+Date: Thu, 12 Jan 2017 13:02:36 +1100
+Message-Id: <20170112020327.24882-17-david@gibson.dropbear.id.au>
 In-Reply-To: <20170112020327.24882-1-david@gibson.dropbear.id.au>
 References: <20170112020327.24882-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 25/67] target-ppc: implement xscpsgnqp
- instruction
+Subject: [Qemu-devel] [PULL 16/67] pseries: Make cpu_update during CAS
+ unconditional
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,70 +21,94 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com, lvivier@redhat.com, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com, lvivier@redhat.com, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com, David Gibson <david@gibson.dropbear.id.au>
 
-From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+spapr_h_cas_compose_response() includes a cpu_update parameter which
+controls whether it includes updated information on the CPUs in the device
+tree fragment returned from the ibm,client-architecture-support (CAS) call.
 
-xscpsgnqp: VSX Scalar Copy Sign Quad-Precision
+Providing the updated information is essential when CAS has negotiated
+compatibility options which require different cpu information to be
+presented to the guest.  However, it should be safe to provide in other
+cases (it will just override the existing data in the device tree with
+identical data).  This simplifies the code by removing the parameter and
+always providing the cpu update information.
 
-Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-Reviewed-by: Richard Henderson <rth@twiddle.net>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 ---
- target/ppc/translate/vsx-impl.inc.c | 12 +++++++++++-
- target/ppc/translate/vsx-ops.inc.c  |  1 +
- 2 files changed, 12 insertions(+), 1 deletion(-)
+ hw/ppc/spapr.c         | 5 +----
+ hw/ppc/spapr_hcall.c   | 8 ++------
+ include/hw/ppc/spapr.h | 1 -
+ 3 files changed, 3 insertions(+), 11 deletions(-)
 
-diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/vsx-impl.inc.c
-index e74e16e..90d26a2 100644
---- a/target/ppc/translate/vsx-impl.inc.c
-+++ b/target/ppc/translate/vsx-impl.inc.c
-@@ -612,9 +612,10 @@ VSX_SCALAR_MOVE(xscpsgndp, OP_CPSGN, SGN_MASK_DP)
- #define VSX_SCALAR_MOVE_QP(name, op, sgn_mask)                    \
- static void glue(gen_, name)(DisasContext *ctx)                   \
- {                                                                 \
-+    int xa;                                                       \
-     int xt = rD(ctx->opcode) + 32;                                \
-     int xb = rB(ctx->opcode) + 32;                                \
--    TCGv_i64 xbh, xbl, sgm;                                       \
-+    TCGv_i64 xah, xbh, xbl, sgm;                                  \
-                                                                   \
-     if (unlikely(!ctx->vsx_enabled)) {                            \
-         gen_exception(ctx, POWERPC_EXCP_VSXU);                    \
-@@ -636,6 +637,14 @@ static void glue(gen_, name)(DisasContext *ctx)                   \
-     case OP_NEG:                                                  \
-         tcg_gen_xor_i64(xbh, xbh, sgm);                           \
-         break;                                                    \
-+    case OP_CPSGN:                                                \
-+        xah = tcg_temp_new_i64();                                 \
-+        xa = rA(ctx->opcode) + 32;                                \
-+        tcg_gen_and_i64(xah, cpu_vsrh(xa), sgm);                  \
-+        tcg_gen_andc_i64(xbh, xbh, sgm);                          \
-+        tcg_gen_or_i64(xbh, xbh, xah);                            \
-+        tcg_temp_free_i64(xah);                                   \
-+        break;                                                    \
-     }                                                             \
-     tcg_gen_mov_i64(cpu_vsrh(xt), xbh);                           \
-     tcg_gen_mov_i64(cpu_vsrl(xt), xbl);                           \
-@@ -647,6 +656,7 @@ static void glue(gen_, name)(DisasContext *ctx)                   \
- VSX_SCALAR_MOVE_QP(xsabsqp, OP_ABS, SGN_MASK_DP)
- VSX_SCALAR_MOVE_QP(xsnabsqp, OP_NABS, SGN_MASK_DP)
- VSX_SCALAR_MOVE_QP(xsnegqp, OP_NEG, SGN_MASK_DP)
-+VSX_SCALAR_MOVE_QP(xscpsgnqp, OP_CPSGN, SGN_MASK_DP)
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 4869fce..52970db 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -685,7 +685,6 @@ out:
  
- #define VSX_VECTOR_MOVE(name, op, sgn_mask)                      \
- static void glue(gen_, name)(DisasContext * ctx)                 \
-diff --git a/target/ppc/translate/vsx-ops.inc.c b/target/ppc/translate/vsx-ops.inc.c
-index f7132b4..68fa171 100644
---- a/target/ppc/translate/vsx-ops.inc.c
-+++ b/target/ppc/translate/vsx-ops.inc.c
-@@ -99,6 +99,7 @@ GEN_XX3FORM(xscpsgndp, 0x00, 0x16, PPC2_VSX),
- GEN_VSX_XFORM_300_EO(xsabsqp, 0x04, 0x19, 0x00, 0x00000001),
- GEN_VSX_XFORM_300_EO(xsnabsqp, 0x04, 0x19, 0x08, 0x00000001),
- GEN_VSX_XFORM_300_EO(xsnegqp, 0x04, 0x19, 0x10, 0x00000001),
-+GEN_VSX_XFORM_300(xscpsgnqp, 0x04, 0x03, 0x00000001),
+ int spapr_h_cas_compose_response(sPAPRMachineState *spapr,
+                                  target_ulong addr, target_ulong size,
+-                                 bool cpu_update,
+                                  sPAPROptionVector *ov5_updates)
+ {
+     void *fdt, *fdt_skel;
+@@ -704,9 +703,7 @@ int spapr_h_cas_compose_response(sPAPRMachineState *spapr,
+     g_free(fdt_skel);
  
- GEN_XX2FORM(xvabsdp, 0x12, 0x1D, PPC2_VSX),
- GEN_XX2FORM(xvnabsdp, 0x12, 0x1E, PPC2_VSX),
+     /* Fixup cpu nodes */
+-    if (cpu_update) {
+-        _FDT((spapr_fixup_cpu_dt(fdt, spapr)));
+-    }
++    _FDT((spapr_fixup_cpu_dt(fdt, spapr)));
+ 
+     if (spapr_dt_cas_updates(spapr, fdt, ov5_updates)) {
+         return -1;
+diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+index 9a9bedf..3f08b8a 100644
+--- a/hw/ppc/spapr_hcall.c
++++ b/hw/ppc/spapr_hcall.c
+@@ -945,7 +945,7 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu_,
+     target_ulong ov_table;
+     PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu_);
+     CPUState *cs;
+-    bool cpu_match = false, cpu_update = true;
++    bool cpu_match = false;
+     unsigned old_cpu_version = cpu_->cpu_version;
+     unsigned compat_lvl = 0, cpu_version = 0;
+     unsigned max_lvl = get_compat_level(cpu_->max_compat);
+@@ -999,10 +999,6 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu_,
+         }
+     }
+ 
+-    if (!cpu_version) {
+-        cpu_update = false;
+-    }
+-
+     /* For the future use: here @ov_table points to the first option vector */
+     ov_table = list;
+ 
+@@ -1028,7 +1024,7 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu_,
+ 
+     if (!spapr->cas_reboot) {
+         spapr->cas_reboot =
+-            (spapr_h_cas_compose_response(spapr, args[1], args[2], cpu_update,
++            (spapr_h_cas_compose_response(spapr, args[1], args[2],
+                                           ov5_updates) != 0);
+     }
+     spapr_ovec_cleanup(ov5_updates);
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index f8d444d..04d2821 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -589,7 +589,6 @@ void spapr_events_init(sPAPRMachineState *sm);
+ void spapr_dt_events(sPAPRMachineState *sm, void *fdt);
+ int spapr_h_cas_compose_response(sPAPRMachineState *sm,
+                                  target_ulong addr, target_ulong size,
+-                                 bool cpu_update,
+                                  sPAPROptionVector *ov5_updates);
+ sPAPRTCETable *spapr_tce_new_table(DeviceState *owner, uint32_t liobn);
+ void spapr_tce_table_enable(sPAPRTCETable *tcet,
 -- 
 2.9.3
