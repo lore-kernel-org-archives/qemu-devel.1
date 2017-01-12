@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46651)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46383)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cRUk8-00037C-0I
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 21:03:58 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cRUk2-0002z1-J9
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 21:03:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cRUk5-0006fW-Jc
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 21:03:56 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cRUjz-0006WD-8h
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 21:03:50 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu, 12 Jan 2017 13:02:58 +1100
-Message-Id: <20170112020327.24882-39-david@gibson.dropbear.id.au>
+Date: Thu, 12 Jan 2017 13:02:40 +1100
+Message-Id: <20170112020327.24882-21-david@gibson.dropbear.id.au>
 In-Reply-To: <20170112020327.24882-1-david@gibson.dropbear.id.au>
 References: <20170112020327.24882-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 38/67] qtest: add display-vga-test to ppc64
+Subject: [Qemu-devel] [PULL 20/67] target-ppc: move ppc_vsr_t to common
+ header
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,55 +21,120 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com, lvivier@redhat.com, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com, lvivier@redhat.com, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Laurent Vivier <lvivier@redhat.com>
+From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 
-Only enable for ppc64 in the Makefile, but added
-code in the file to check cirrus card only on architectures
-supporting it (alpha, mips, i386, x86_64).
+The structure and corresponding defines and functions need to be used
+outside of fpu_helper.c as well.
 
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Greg Kurz <groug@kaod.org>
-Tested-by: Greg Kurz <groug@kaod.org>
+Add u8, u16, u32 and Int128 to the structure.
+
+Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- tests/Makefile.include   | 1 +
- tests/display-vga-test.c | 7 ++++++-
- 2 files changed, 7 insertions(+), 1 deletion(-)
+ target/ppc/fpu_helper.c | 37 -------------------------------------
+ target/ppc/internal.h   | 42 ++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 42 insertions(+), 37 deletions(-)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 08ddf59..6ed78b8 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -287,6 +287,7 @@ check-qtest-ppc64-y += $(check-qtest-virtio-y)
- check-qtest-ppc64-y += tests/test-netfilter$(EXESUF)
- check-qtest-ppc64-y += tests/test-filter-mirror$(EXESUF)
- check-qtest-ppc64-y += tests/test-filter-redirector$(EXESUF)
-+check-qtest-ppc64-y += tests/display-vga-test$(EXESUF)
+diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
+index 696f537..3b867cf 100644
+--- a/target/ppc/fpu_helper.c
++++ b/target/ppc/fpu_helper.c
+@@ -1777,43 +1777,6 @@ uint32_t helper_efdcmpeq(CPUPPCState *env, uint64_t op1, uint64_t op2)
+     return helper_efdtsteq(env, op1, op2);
+ }
  
- check-qtest-sh4-y = tests/endianness-test$(EXESUF)
+-typedef union _ppc_vsr_t {
+-    uint64_t u64[2];
+-    uint32_t u32[4];
+-    float32 f32[4];
+-    float64 f64[2];
+-} ppc_vsr_t;
+-
+-#if defined(HOST_WORDS_BIGENDIAN)
+-#define VsrW(i) u32[i]
+-#define VsrD(i) u64[i]
+-#else
+-#define VsrW(i) u32[3-(i)]
+-#define VsrD(i) u64[1-(i)]
+-#endif
+-
+-static void getVSR(int n, ppc_vsr_t *vsr, CPUPPCState *env)
+-{
+-    if (n < 32) {
+-        vsr->VsrD(0) = env->fpr[n];
+-        vsr->VsrD(1) = env->vsr[n];
+-    } else {
+-        vsr->u64[0] = env->avr[n-32].u64[0];
+-        vsr->u64[1] = env->avr[n-32].u64[1];
+-    }
+-}
+-
+-static void putVSR(int n, ppc_vsr_t *vsr, CPUPPCState *env)
+-{
+-    if (n < 32) {
+-        env->fpr[n] = vsr->VsrD(0);
+-        env->vsr[n] = vsr->VsrD(1);
+-    } else {
+-        env->avr[n-32].u64[0] = vsr->u64[0];
+-        env->avr[n-32].u64[1] = vsr->u64[1];
+-    }
+-}
+-
+ #define float64_to_float64(x, env) x
  
-diff --git a/tests/display-vga-test.c b/tests/display-vga-test.c
-index 9146021..2d7d24e 100644
---- a/tests/display-vga-test.c
-+++ b/tests/display-vga-test.c
-@@ -50,9 +50,14 @@ static void pci_virtio_vga(void)
  
- int main(int argc, char **argv)
- {
-+    const char *arch = qtest_get_arch();
+diff --git a/target/ppc/internal.h b/target/ppc/internal.h
+index e83ea45..66cde46 100644
+--- a/target/ppc/internal.h
++++ b/target/ppc/internal.h
+@@ -199,4 +199,46 @@ EXTRACT_HELPER(SHW, 8, 2);
+ EXTRACT_HELPER(SP, 19, 2);
+ EXTRACT_HELPER(IMM8, 11, 8);
+ 
++typedef union _ppc_vsr_t {
++    uint8_t u8[16];
++    uint16_t u16[8];
++    uint32_t u32[4];
++    uint64_t u64[2];
++    float32 f32[4];
++    float64 f64[2];
++    Int128  s128;
++} ppc_vsr_t;
 +
-     g_test_init(&argc, &argv, NULL);
- 
--    qtest_add_func("/display/pci/cirrus", pci_cirrus);
-+    if (strcmp(arch, "alpha") == 0 || strcmp(arch, "i386") == 0 ||
-+        strcmp(arch, "mips") == 0 || strcmp(arch, "x86_64") == 0) {
-+        qtest_add_func("/display/pci/cirrus", pci_cirrus);
++#if defined(HOST_WORDS_BIGENDIAN)
++#define VsrB(i) u8[i]
++#define VsrW(i) u32[i]
++#define VsrD(i) u64[i]
++#else
++#define VsrB(i) u8[15 - (i)]
++#define VsrW(i) u32[3 - (i)]
++#define VsrD(i) u64[1 - (i)]
++#endif
++
++static inline void getVSR(int n, ppc_vsr_t *vsr, CPUPPCState *env)
++{
++    if (n < 32) {
++        vsr->VsrD(0) = env->fpr[n];
++        vsr->VsrD(1) = env->vsr[n];
++    } else {
++        vsr->u64[0] = env->avr[n - 32].u64[0];
++        vsr->u64[1] = env->avr[n - 32].u64[1];
 +    }
-     qtest_add_func("/display/pci/stdvga", pci_stdvga);
-     qtest_add_func("/display/pci/secondary", pci_secondary);
-     qtest_add_func("/display/pci/multihead", pci_multihead);
++}
++
++static inline void putVSR(int n, ppc_vsr_t *vsr, CPUPPCState *env)
++{
++    if (n < 32) {
++        env->fpr[n] = vsr->VsrD(0);
++        env->vsr[n] = vsr->VsrD(1);
++    } else {
++        env->avr[n - 32].u64[0] = vsr->u64[0];
++        env->avr[n - 32].u64[1] = vsr->u64[1];
++    }
++}
++
+ #endif /* PPC_INTERNAL_H */
 -- 
 2.9.3
