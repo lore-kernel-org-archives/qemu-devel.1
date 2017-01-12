@@ -1,19 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58369)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59636)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1cRdZw-0003Qh-Ql
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 06:30:02 -0500
+	(envelope-from <drjones@redhat.com>) id 1cRdgE-0008SB-Gy
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 06:36:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1cRdZs-00009G-Sm
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 06:30:00 -0500
-References: <20161215110459.27985-1-ncopa@alpinelinux.org>
-From: Michael Tokarev <mjt@tls.msk.ru>
-Message-ID: <ef305d55-5579-661b-e895-f91bd800dc55@msgid.tls.msk.ru>
-Date: Thu, 12 Jan 2017 14:29:54 +0300
+	(envelope-from <drjones@redhat.com>) id 1cRdgD-0002ZI-FC
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 06:36:30 -0500
+Date: Thu, 12 Jan 2017 12:36:19 +0100
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20170112113619.zuc5tuhmhzvawnmz@hawk.localdomain>
+References: <98b1ad64-fe10-4ede-3493-f6d4b49ee1d9@sysgo.com>
+	<CAFEAcA8asry6LGTuv+SLVyemNVFk9Q7WhU74Cc2YA_yud8qPMg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20161215110459.27985-1-ncopa@alpinelinux.org>
-Content-Type: text/plain; charset=windows-1251
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] linux-user: fix build with musl on aarch64
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA8asry6LGTuv+SLVyemNVFk9Q7WhU74Cc2YA_yud8qPMg@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH] pflash_cfi01: fix per device sector length
+ in CFI table
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,46 +24,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Natanael Copa <ncopa@alpinelinux.org>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, Riku Voipio <riku.voipio@iki.fi>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: David Engraf <david.engraf@sysgo.com>, Kevin Wolf <kwolf@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>, dgilbert@redhat.com
 
-15.12.2016 14:04, Natanael Copa wrote:
-> Use the standard uint64_t instead of internal __u64.
+On Thu, Jan 12, 2017 at 10:42:41AM +0000, Peter Maydell wrote:
+> On 12 January 2017 at 10:35, David Engraf <david.engraf@sysgo.com> wrote:
+> > The CFI entry for sector length must be set to sector length per device.
+> > This is important for boards using multiple devices like the ARM Vexpress
+> > board (width = 4, device-width = 2).
+> >
+> > Linux and u-boots calculate the size ratio by dividing both values:
+> >
+> > size_ratio = info->portwidth / info->chipwidth;
+> >
+> > After that the sector length will be multiplied by the size_ratio, thus the
+> > CFI entry for sector length is doubled. When Linux or u-boot send a sector
+> > erase, they expect to erase the doubled sector length, but QEMU only erases
+> > the board specified sector length.
+> >
+> > This patch fixes the sector length in the CFI table to match the length per
+> > device, equal to blocks_per_device.
 > 
-> This fixes compiler error with musl libc on aarch64:
-> .../qemu-2.7.0/linux-user/host/aarch64/hostdep.h:28:5:
-> error: unknown type name '__u64'
->      __u64 *pcreg = &uc->uc_mcontext.pc;
->      ^~~~~
+> Thanks for the patch. I haven't checked against the pflash spec yet,
+> but this looks like it's probably the right thing.
 > 
-> Signed-off-by: Natanael Copa <ncopa@alpinelinux.org>
-> ---
->  linux-user/host/aarch64/hostdep.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> The only two machines which use a setup with multiple devices (ie
+> which specify device_width to the pflash_cfi01) are vexpress and virt.
+> For all other machines this patch leaves the behaviour unchanged.
 > 
-> diff --git a/linux-user/host/aarch64/hostdep.h b/linux-user/host/aarch64/hostdep.h
-> index 64f75cef49..6fd6e36b2a 100644
-> --- a/linux-user/host/aarch64/hostdep.h
-> +++ b/linux-user/host/aarch64/hostdep.h
-> @@ -25,7 +25,7 @@ extern char safe_syscall_end[];
->  static inline void rewind_if_in_safe_syscall(void *puc)
->  {
->      struct ucontext *uc = puc;
-> -    __u64 *pcreg = &uc->uc_mcontext.pc;
-> +    uint64_t *pcreg = &uc->uc_mcontext.pc;
+> Q: do we need to have some kind of nasty hack so that pre-2.9 virt
+> still gets the old broken values in the CFI table, for version and
+> migration compatibility? Ccing Drew for an opinion...
+>
 
-Is this type available in all places where this header is
-being included (apparently these are linux-user/qemu.h and
-linux-user/safe-syscall.S, with the latter not being
-interesting. But in linux-user/qemu.h, this is the first
-file which is included..
+I'm pretty sure we need the nasty hack, but I'm also Ccing David for
+his opinion.
 
-Why do we have a mix of __u64 and uint64_t ? :)
-
-Hmm.
-
-/mjt
-
->      if (*pcreg > (uintptr_t)safe_syscall_start
->          && *pcreg < (uintptr_t)safe_syscall_end) {
-> 
+Thanks,
+drew
