@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46596)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46689)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cRUk7-00035e-5C
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 21:03:58 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cRUk8-00038F-L3
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 21:03:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cRUk3-0006d1-50
-	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 21:03:55 -0500
+	(envelope-from <dgibson@ozlabs.org>) id 1cRUk5-0006fI-GS
+	for qemu-devel@nongnu.org; Wed, 11 Jan 2017 21:03:56 -0500
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu, 12 Jan 2017 13:02:54 +1100
-Message-Id: <20170112020327.24882-35-david@gibson.dropbear.id.au>
+Date: Thu, 12 Jan 2017 13:03:07 +1100
+Message-Id: <20170112020327.24882-48-david@gibson.dropbear.id.au>
 In-Reply-To: <20170112020327.24882-1-david@gibson.dropbear.id.au>
 References: <20170112020327.24882-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 34/67] ppc: Rewrite ppc_set_compat()
+Subject: [Qemu-devel] [PULL 47/67] target-ppc: Add xxinsertw instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,223 +20,103 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com, lvivier@redhat.com, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, thuth@redhat.com, lvivier@redhat.com, aik@ozlabs.ru, mdroth@linux.vnet.ibm.com, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
 
-This rewrites the ppc_set_compat() function so that instead of open coding
-the various compatibility modes, it reads the relevant data from a table.
-This is a first step in consolidating the information on compatibility
-modes scattered across the code into a single place.
+From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 
-It also makes one change to the logic.  The old code masked the bits
-to be set in the PCR (Processor Compatibility Register) by which bits
-are valid on the host CPU.  This made no sense, since it was done
-regardless of whether our guest CPU was the same as the host CPU or
-not.  Furthermore, the actual PCR bits are only relevant for TCG[1] -
-KVM instead uses the compatibility mode we tell it in
-kvmppc_set_compat().  When using TCG host cpu information usually
-isn't even present.
+xxinsertw: VSX Vector Insert Word
 
-While we're at it, we put the new implementation in a new file to make the
-enormous translate_init.c a little smaller.
-
-[1] Actually it doesn't even do anything in TCG, but it will if / when we
-    get to implementing compatibility mode logic at that level.
-
+Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 ---
- target/ppc/Makefile.objs    |  2 +-
- target/ppc/compat.c         | 91 +++++++++++++++++++++++++++++++++++++++++++++
- target/ppc/cpu.h            |  6 ++-
- target/ppc/translate_init.c | 41 --------------------
- 4 files changed, 97 insertions(+), 43 deletions(-)
- create mode 100644 target/ppc/compat.c
+ target/ppc/helper.h                 |  1 +
+ target/ppc/int_helper.c             | 25 +++++++++++++++++++++++++
+ target/ppc/translate/vsx-impl.inc.c |  5 +++--
+ target/ppc/translate/vsx-ops.inc.c  |  1 +
+ 4 files changed, 30 insertions(+), 2 deletions(-)
 
-diff --git a/target/ppc/Makefile.objs b/target/ppc/Makefile.objs
-index e667e69..a8c7a30 100644
---- a/target/ppc/Makefile.objs
-+++ b/target/ppc/Makefile.objs
-@@ -2,7 +2,7 @@ obj-y += cpu-models.o
- obj-y += translate.o
- ifeq ($(CONFIG_SOFTMMU),y)
- obj-y += machine.o mmu_helper.o mmu-hash32.o monitor.o
--obj-$(TARGET_PPC64) += mmu-hash64.o arch_dump.o
-+obj-$(TARGET_PPC64) += mmu-hash64.o arch_dump.o compat.o
- endif
- obj-$(CONFIG_KVM) += kvm.o
- obj-$(call lnot,$(CONFIG_KVM)) += kvm-stub.o
-diff --git a/target/ppc/compat.c b/target/ppc/compat.c
-new file mode 100644
-index 0000000..f3fd9c6
---- /dev/null
-+++ b/target/ppc/compat.c
-@@ -0,0 +1,91 @@
-+/*
-+ *  PowerPC CPU initialization for qemu.
-+ *
-+ *  Copyright 2016, David Gibson, Red Hat Inc. <dgibson@redhat.com>
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "sysemu/kvm.h"
-+#include "kvm_ppc.h"
-+#include "sysemu/cpus.h"
-+#include "qemu/error-report.h"
-+#include "qapi/error.h"
-+#include "cpu-models.h"
-+
-+typedef struct {
-+    uint32_t pvr;
-+    uint64_t pcr;
-+} CompatInfo;
-+
-+static const CompatInfo compat_table[] = {
-+    { /* POWER6, ISA2.05 */
-+        .pvr = CPU_POWERPC_LOGICAL_2_05,
-+        .pcr = PCR_COMPAT_2_07 | PCR_COMPAT_2_06 | PCR_COMPAT_2_05
-+               | PCR_TM_DIS | PCR_VSX_DIS,
-+    },
-+    { /* POWER7, ISA2.06 */
-+        .pvr = CPU_POWERPC_LOGICAL_2_06,
-+        .pcr = PCR_COMPAT_2_07 | PCR_COMPAT_2_06 | PCR_TM_DIS,
-+    },
-+    {
-+        .pvr = CPU_POWERPC_LOGICAL_2_06_PLUS,
-+        .pcr = PCR_COMPAT_2_07 | PCR_COMPAT_2_06 | PCR_TM_DIS,
-+    },
-+    { /* POWER8, ISA2.07 */
-+        .pvr = CPU_POWERPC_LOGICAL_2_07,
-+        .pcr = PCR_COMPAT_2_07,
-+    },
-+};
-+
-+static const CompatInfo *compat_by_pvr(uint32_t pvr)
-+{
-+    int i;
-+
-+    for (i = 0; i < ARRAY_SIZE(compat_table); i++) {
-+        if (compat_table[i].pvr == pvr) {
-+            return &compat_table[i];
-+        }
-+    }
-+    return NULL;
-+}
-+
-+void ppc_set_compat(PowerPCCPU *cpu, uint32_t compat_pvr, Error **errp)
-+{
-+    const CompatInfo *compat = compat_by_pvr(compat_pvr);
-+    CPUPPCState *env = &cpu->env;
-+    PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
-+    uint64_t pcr;
-+
-+    if (!compat_pvr) {
-+        pcr = 0;
-+    } else if (!compat) {
-+        error_setg(errp, "Unknown compatibility PVR 0x%08"PRIx32, compat_pvr);
-+        return;
-+    } else {
-+        pcr = compat->pcr;
-+    }
-+
-+    cpu->compat_pvr = compat_pvr;
-+    env->spr[SPR_PCR] = pcr & pcc->pcr_mask;
-+
-+    if (kvm_enabled()) {
-+        int ret = kvmppc_set_compat(cpu, cpu->compat_pvr);
-+        if (ret < 0) {
-+            error_setg_errno(errp, -ret,
-+                             "Unable to set CPU compatibility mode in KVM");
-+        }
-+    }
-+}
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index b62f775..c859547 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -1252,7 +1252,6 @@ void ppc_store_msr (CPUPPCState *env, target_ulong value);
- void ppc_cpu_list (FILE *f, fprintf_function cpu_fprintf);
- int ppc_get_compat_smt_threads(PowerPCCPU *cpu);
- #if defined(TARGET_PPC64)
--void ppc_set_compat(PowerPCCPU *cpu, uint32_t compat_pvr, Error **errp);
- #endif
+diff --git a/target/ppc/helper.h b/target/ppc/helper.h
+index 8b30420..6c5b194 100644
+--- a/target/ppc/helper.h
++++ b/target/ppc/helper.h
+@@ -541,6 +541,7 @@ DEF_HELPER_2(xvrspiz, void, env, i32)
+ DEF_HELPER_2(xxperm, void, env, i32)
+ DEF_HELPER_2(xxpermr, void, env, i32)
+ DEF_HELPER_4(xxextractuw, void, env, tl, tl, i32)
++DEF_HELPER_4(xxinsertw, void, env, tl, tl, i32)
  
- /* Time-base and decrementer management */
-@@ -1323,6 +1322,11 @@ static inline int cpu_mmu_index (CPUPPCState *env, bool ifetch)
-     return ifetch ? env->immu_idx : env->dmmu_idx;
+ DEF_HELPER_2(efscfsi, i32, env, i32)
+ DEF_HELPER_2(efscfui, i32, env, i32)
+diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
+index 63ba0e3..24e5964 100644
+--- a/target/ppc/int_helper.c
++++ b/target/ppc/int_helper.c
+@@ -2059,6 +2059,31 @@ void helper_xxextractuw(CPUPPCState *env, target_ulong xtn,
+     putVSR(xtn, &xt, env);
  }
  
-+/* Compatibility modes */
-+#if defined(TARGET_PPC64)
-+void ppc_set_compat(PowerPCCPU *cpu, uint32_t compat_pvr, Error **errp);
-+#endif /* defined(TARGET_PPC64) */
++void helper_xxinsertw(CPUPPCState *env, target_ulong xtn,
++                      target_ulong xbn, uint32_t index)
++{
++    ppc_vsr_t xt, xb;
++    size_t es = sizeof(uint32_t);
++    int ins_index, i = 0;
 +
- #include "exec/cpu-all.h"
- 
- /*****************************************************************************/
-diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-index 60552c1..abdb842 100644
---- a/target/ppc/translate_init.c
-+++ b/target/ppc/translate_init.c
-@@ -9972,47 +9972,6 @@ int ppc_get_compat_smt_threads(PowerPCCPU *cpu)
-     return ret;
++    getVSR(xbn, &xb, env);
++    getVSR(xtn, &xt, env);
++
++#if defined(HOST_WORDS_BIGENDIAN)
++    ins_index = index;
++    for (i = 0; i < es && ins_index < 16; i++, ins_index++) {
++        xt.u8[ins_index] = xb.u8[8 - es + i];
++    }
++#else
++    ins_index = 15 - index;
++    for (i = es - 1; i >= 0 && ins_index >= 0; i--, ins_index--) {
++        xt.u8[ins_index] = xb.u8[8 + i];
++    }
++#endif
++
++    putVSR(xtn, &xt, env);
++}
++
+ #define VEXT_SIGNED(name, element, mask, cast, recast)              \
+ void helper_##name(ppc_avr_t *r, ppc_avr_t *b)                      \
+ {                                                                   \
+diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/vsx-impl.inc.c
+index 7977f24..c9ba0f5 100644
+--- a/target/ppc/translate/vsx-impl.inc.c
++++ b/target/ppc/translate/vsx-impl.inc.c
+@@ -1180,7 +1180,7 @@ static void gen_xxsldwi(DisasContext *ctx)
+     tcg_temp_free_i64(xtl);
  }
  
--#ifdef TARGET_PPC64
--void ppc_set_compat(PowerPCCPU *cpu, uint32_t compat_pvr, Error **errp)
--{
--    int ret = 0;
--    CPUPPCState *env = &cpu->env;
--    PowerPCCPUClass *host_pcc;
--
--    cpu->compat_pvr = compat_pvr;
--
--    switch (compat_pvr) {
--    case CPU_POWERPC_LOGICAL_2_05:
--        env->spr[SPR_PCR] = PCR_TM_DIS | PCR_VSX_DIS | PCR_COMPAT_2_07 |
--                            PCR_COMPAT_2_06 | PCR_COMPAT_2_05;
--        break;
--    case CPU_POWERPC_LOGICAL_2_06:
--    case CPU_POWERPC_LOGICAL_2_06_PLUS:
--        env->spr[SPR_PCR] = PCR_TM_DIS | PCR_COMPAT_2_07 | PCR_COMPAT_2_06;
--        break;
--    case CPU_POWERPC_LOGICAL_2_07:
--        env->spr[SPR_PCR] = PCR_COMPAT_2_07;
--        break;
--    default:
--        env->spr[SPR_PCR] = 0;
--        break;
--    }
--
--    host_pcc = kvm_ppc_get_host_cpu_class();
--    if (host_pcc) {
--        env->spr[SPR_PCR] &= host_pcc->pcr_mask;
--    }
--
--    if (kvm_enabled()) {
--        ret = kvmppc_set_compat(cpu, cpu->compat_pvr);
--        if (ret < 0) {
--            error_setg_errno(errp, -ret,
--                             "Unable to set CPU compatibility mode in KVM");
--        }
--    }
--}
--#endif
--
- static gint ppc_cpu_compare_class_pvr(gconstpointer a, gconstpointer b)
- {
-     ObjectClass *oc = (ObjectClass *)a;
+-#define VSX_EXTRACT(name)                                       \
++#define VSX_EXTRACT_INSERT(name)                                \
+ static void gen_##name(DisasContext *ctx)                       \
+ {                                                               \
+     TCGv xt, xb;                                                \
+@@ -1208,7 +1208,8 @@ static void gen_##name(DisasContext *ctx)                       \
+     tcg_temp_free_i32(t0);                                      \
+ }
+ 
+-VSX_EXTRACT(xxextractuw)
++VSX_EXTRACT_INSERT(xxextractuw)
++VSX_EXTRACT_INSERT(xxinsertw)
+ 
+ #undef GEN_XX2FORM
+ #undef GEN_XX3FORM
+diff --git a/target/ppc/translate/vsx-ops.inc.c b/target/ppc/translate/vsx-ops.inc.c
+index 473d925..096d358 100644
+--- a/target/ppc/translate/vsx-ops.inc.c
++++ b/target/ppc/translate/vsx-ops.inc.c
+@@ -285,6 +285,7 @@ GEN_XX2FORM(xxspltw, 0x08, 0x0A, PPC2_VSX),
+ GEN_XX1FORM(xxspltib, 0x08, 0x0B, PPC2_ISA300),
+ GEN_XX3FORM_DM(xxsldwi, 0x08, 0x00),
+ GEN_XX2FORM_EXT(xxextractuw, 0x0A, 0x0A, PPC2_ISA300),
++GEN_XX2FORM_EXT(xxinsertw, 0x0A, 0x0B, PPC2_ISA300),
+ 
+ #define GEN_XXSEL_ROW(opc3) \
+ GEN_HANDLER2_E(xxsel, "xxsel", 0x3C, 0x18, opc3, 0, PPC_NONE, PPC2_VSX), \
 -- 
 2.9.3
