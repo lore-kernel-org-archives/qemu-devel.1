@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48376)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48377)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cRXux-0003da-Bj
+	(envelope-from <dgibson@ozlabs.org>) id 1cRXux-0003dZ-Bj
 	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 00:27:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1cRXuu-0008Iy-7w
+	(envelope-from <dgibson@ozlabs.org>) id 1cRXuu-0008J0-86
 	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 00:27:19 -0500
-Date: Thu, 12 Jan 2017 16:09:20 +1100
+Date: Thu, 12 Jan 2017 16:11:51 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170112050920.GO14026@umbus.fritz.box>
-References: <20161222052212.49006-1-aik@ozlabs.ru>
-	<20161222052212.49006-3-aik@ozlabs.ru>
-	<20170102234128.GI12761@umbus.fritz.box>
-	<61109e6f-434a-303e-f0fc-bf1dab1ed63f@ozlabs.ru>
+Message-ID: <20170112051151.GP14026@umbus.fritz.box>
+References: <1484038243-30314-1-git-send-email-nikunj@linux.vnet.ibm.com>
+	<1484038243-30314-4-git-send-email-nikunj@linux.vnet.ibm.com>
+	<20170112024743.GD14026@umbus.fritz.box>
+	<8760lkvpz1.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="7pXD3OQNRL3RjWCz"
+	protocol="application/pgp-signature"; boundary="ZVOC9e0LfXEId8h2"
 Content-Disposition: inline
-In-Reply-To: <61109e6f-434a-303e-f0fc-bf1dab1ed63f@ozlabs.ru>
-Subject: Re: [Qemu-devel] [PATCH qemu 2/2] spapr_pci: Advertise 16M IOMMU
- pages when available
+In-Reply-To: <8760lkvpz1.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+Subject: Re: [Qemu-devel] [PATCH 03/11] target-ppc: Add xsiexpdp instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,84 +26,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+Cc: qemu-ppc@nongnu.org, rth@twiddle.net, qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com
 
 
---7pXD3OQNRL3RjWCz
+--ZVOC9e0LfXEId8h2
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jan 09, 2017 at 01:06:03PM +1100, Alexey Kardashevskiy wrote:
-> On 03/01/17 10:41, David Gibson wrote:
-> > On Thu, Dec 22, 2016 at 04:22:12PM +1100, Alexey Kardashevskiy wrote:
-> >> On sPAPR, IOMMU page size varies and if QEMU is running with RAM
-> >> backed with hugepages, we can advertise this to the guest so does
-> >> this patch.
-> >>
-> >> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+On Thu, Jan 12, 2017 at 10:23:22AM +0530, Nikunj A Dadhania wrote:
+> David Gibson <david@gibson.dropbear.id.au> writes:
+>=20
+> > [ Unknown signature status ]
+> > On Tue, Jan 10, 2017 at 02:20:35PM +0530, Nikunj A Dadhania wrote:
+> >> xsiexpdp: VSX Scalar Insert Exponent Double Precision
+> >>=20
+> >> Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 > >> ---
-> >>  hw/ppc/spapr_pci.c | 3 +++
-> >>  1 file changed, 3 insertions(+)
-> >>
-> >> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-> >> index fd6fc1d953..09244056fc 100644
-> >> --- a/hw/ppc/spapr_pci.c
-> >> +++ b/hw/ppc/spapr_pci.c
-> >> @@ -1505,6 +1505,9 @@ static void spapr_phb_realize(DeviceState *dev, =
-Error **errp)
-> >>      }
+> >>  target/ppc/translate/vsx-impl.inc.c | 20 ++++++++++++++++++++
+> >>  target/ppc/translate/vsx-ops.inc.c  |  1 +
+> >>  2 files changed, 21 insertions(+)
+> >>=20
+> >> diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translat=
+e/vsx-impl.inc.c
+> >> index 2d9fe50..2d09225 100644
+> >> --- a/target/ppc/translate/vsx-impl.inc.c
+> >> +++ b/target/ppc/translate/vsx-impl.inc.c
+> >> @@ -1243,6 +1243,26 @@ static void gen_xsxexpqp(DisasContext *ctx)
+> >>      tcg_gen_movi_i64(xtl, 0);
+> >>  }
 > >> =20
-> >>      /* DMA setup */
-> >> +    /* This allows huge pages for IOMMU when guest is backed with hug=
-e pages */
-> >> +    sphb->page_size_mask |=3D qemu_getrampagesize();
-> >=20
-> > This doesn't look right - you're unconditionally enabling the host ram
-> > page size, regardless of anything else.  Instead the backing page size
-> > should be used to filter out those sizes which are possible from the
-> > list of those supported by the guest hardware.  This patch will give
-> > particularly odd results if you ran it on x86 with hugepages for
-> > example: it would advertise a 2M IOMMU page size, which could never
-> > exist on native POWER.
+> >> +static void gen_xsiexpdp(DisasContext *ctx)
+> >> +{
+> >> +    TCGv_i64 xth =3D cpu_vsrh(xT(ctx->opcode));
+> >> +    TCGv ra =3D cpu_gpr[rA(ctx->opcode)];
+> >> +    TCGv rb =3D cpu_gpr[rB(ctx->opcode)];
+> >> +    TCGv_i64 t0;
+> >> +
+> >> +    if (unlikely(!ctx->vsx_enabled)) {
+> >> +        gen_exception(ctx, POWERPC_EXCP_VSXU);
+> >> +        return;
+> >> +    }
+> >> +    t0 =3D tcg_temp_new_i64();
+> >> +    tcg_gen_andi_i64(xth, ra, 0x800FFFFFFFFFFFFF);
+> >> +    tcg_gen_andi_i64(t0, rb, 0x7FF);
+> >> +    tcg_gen_shli_i64(t0, t0, 52);
+> >> +    tcg_gen_or_i64(xth, xth, t0);
+> >> +    /* dword[1] is undefined */
+> >
+> > According to the ISA doc I have, dword[1] is set to 0 rather than
+> > being undefined.
 >=20
-> Ok, I'll filter 16M out if passed to PHB and not supported by the host.
+> Referring to xsiexpdp on page 570:
 >=20
+> "The contents of doubleword element 1 of VSR[XT] are
+> undefined."
 >=20
-> > Except... come to think of it, why is the backing RAM page size
-> > relevant at all?=20
->=20
-> Because this is just an optimization/acceleration and I'd think the user
-> wants to know if it is actually accelerated or not. If I always allow 16M
-> pages, and QEMU is not backed with hugepages, then all H_PUT_TCE will go
-> via slow path and consume as much memory for TCE as without hugepages, and
-> it will only be visible to the user if TCE-tracepoints are enabled.
+> The revision that I have is dated November 30, 2015
 
-Hm, ok, fair enough.
-
-> > Or rather.. I think VFIO should be able to cope with
-> > any guest IOMMU page size which is larger than the host ram page size
->=20
-> It could, I just do not see much benefit in it. pseries guest can negotia=
-te
-> 4k, 64k, 16m pages and this seems to cover everything we want, why would =
-we
-> want to emulate IOMMU page size?
-
-Just for testing or debugging, I suppose.
-
->=20
-> > (although if it's much larger it could get expensive in the host
-> > tables).  This case would already be routine for ppc64 on x86, where
-> > the guest IOMMU page size is 64kiB, but the host page size is 4 kiB.
->=20
->=20
->=20
->=20
-
-
-
+Ah, sorry.  I think I just misread all those "U"s in the pseudo-code
+as "0"s.  I'll blame the fact I'm using the little laptop screen,
+since I've left my home office to escape the heat.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -112,25 +95,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---7pXD3OQNRL3RjWCz
+--ZVOC9e0LfXEId8h2
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iQIcBAEBCAAGBQJYdw+AAAoJEGw4ysog2bOS3lEQAKZ38Sd+MZ1mBe1IDkfQJOjj
-3+O20ph/hEL02oRnXtB+TX8Av6EAtk94gCEP1boKLv/sec1tipKxggjBSm4/gLhD
-SxE3Lfs51DNkFWgfYnHRMA59DKaE/VE3Gzpi2t3lSzDe2U3eofmjUSB92KKrAHp6
-vnxU/argqmtSx5/lZgtFb1YN7fRMWHfZ+UjnbYa8+tnXuGpFaKhtd7J2L6wQLjDX
-Ox0dl19UdPt7nEc/kpSddtaVRbIkPQEvESGrI07Y+nhMAQEtM2xC1yIzAELh/z57
-bwJv8JE7LxG5cys3iUH8P9ATnRHfSHG6bRj9u9yC8OTFI+ekRmon7qLhmX55SGFQ
-Z/sTL8PxxSoEtqXCsQUVtrXeQGPU+bSAi6+EdCz7sxDBqJuXbi+S3q+E2P0Q7FaM
-iBKt5pzR75SHFa4EQYxn39UOJvWaTFsnsqK6vhTG4NvELKzF9GW1Cgq2tHbzNH5m
-t9qCLdX6vMZYAktywwwbJ/4NMj9lqqysK1tHBSMNKEeTpgcxg1E10k4k77Pgscgx
-bXltj59E6XtRngomRPMuW+XxcvVNqwUGiGn1TUvsynoHXHd9IXf2Z6jRHXEIQHY1
-xJpurlARJqCkyD/LBuuAB0EWRUBAa80yIfaZ0ZIRu6xs0OJc8TGL8wfbXTEPvMS2
-ViN3RTG3t+fwDxLArafA
-=YJP2
+iQIcBAEBCAAGBQJYdxAWAAoJEGw4ysog2bOSmsEP/ikYEEcJFlDDlPLNNXR1JnSP
+877TsxI6JgMIGWFSQpYA2Hg1VxY0kUal351o23vYsYVZCs2UJMQRi8VtGDQSWzzx
+oVJytoN5v6VLFpqWtcL2RbYD7eaY8unfP6nhyMU2OKorf6jQ4Esx9H6yHMVYxrsp
+VKHRWGfwo0QDACTMfxp8WNoF6iQ+um6j+AYqcUHmroeuJ5FGL4CgvRdLktKmtVs/
+oJEXtFIoCq2ekpW7ul8SdLPq6NVnEtqgHK/swwWYmfLyWh5i11uK8fp3uIO26yaw
+rs77+IFZnre/bETeEVgqYfheZMrjGJhxO1QuPeNuSVnRtFCCI5dVN5uuOIhb/Jv1
+MJcRkxlX/Wx1nT6wrixOfgce3A5P5P3cZcYd6SboYUyTEOp3DbU5Oi/HBq2pgnYf
+2YqzKMLL/WI3iwnjjoc5/SOiHyRmzqH2lgxEHRF+HEpZLWHPbEG7qaVp69/qaLl/
+9Ko3F1mdR5Dd0tHAEkhLLxrGR8oqjr59YfhZqYOxBDa9SuudmStdTeTX+HIIPWUR
+pYSDxZeHoiXBy6TSnKraihJgGqFe6Yvmu+zGBVuAX/Q+EbLAwI5v10Dvla9lr2MA
+xvH4N1nK0kSn4cqTy11pb4AGrNvAyFIXM/5HQkmJ+E0kK/8uK7WvoCgSJkRNRXi8
+iq0m84QqlEVrxc2BpS+/
+=/Sic
 -----END PGP SIGNATURE-----
 
---7pXD3OQNRL3RjWCz--
+--ZVOC9e0LfXEId8h2--
