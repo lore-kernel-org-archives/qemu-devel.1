@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33886)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35159)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cRjDC-0003wx-RL
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 12:30:56 -0500
+	(envelope-from <thuth@redhat.com>) id 1cRjH3-0007V9-9x
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 12:34:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1cRjD8-0006JI-QQ
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 12:30:54 -0500
-Resent-Message-Id: <E1cRjD8-0006JI-QQ@eggs.gnu.org>
-Received: from sender163-mail.zoho.com ([74.201.84.163]:21385)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1cRjD8-0006IH-G2
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 12:30:50 -0500
-In-Reply-To: <20170112165531.11882-1-pbonzini@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <148424224454.208.9602007291912291632@790289a7ca88>
+	(envelope-from <thuth@redhat.com>) id 1cRjGy-0008G5-Go
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 12:34:53 -0500
+References: <1484224732-1345-1-git-send-email-thuth@redhat.com>
+	<877f609rkd.fsf@dusky.pond.sub.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <03307c8a-b802-861a-fa8c-0af78df41c8a@redhat.com>
+Date: Thu, 12 Jan 2017 18:34:45 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 12 Jan 2017 09:30:45 -0800 (PST)
-Subject: Re: [Qemu-devel] [PATCH v4 00/10] aio_context_acquire/release
- pushdown, part 1
+In-Reply-To: <877f609rkd.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3] monitor: Fix crashes when using HMP
+ commands without CPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,78 +24,179 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.orgfamz@redhat.com, stefanha@redhat.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-SGksCgpZb3VyIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKTWVzc2FnZS1pZDogMjAx
-NzAxMTIxNjU1MzEuMTE4ODItMS1wYm9uemluaUByZWRoYXQuY29tClN1YmplY3Q6IFtRZW11LWRl
-dmVsXSBbUEFUQ0ggdjQgMDAvMTBdIGFpb19jb250ZXh0X2FjcXVpcmUvcmVsZWFzZSBwdXNoZG93
-biwgcGFydCAxClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4v
-YmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3
-YyAtbCkKZmFpbGVkPTAKCiMgVXNlZnVsIGdpdCBvcHRpb25zCmdpdCBjb25maWcgLS1sb2NhbCBk
-aWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpj
-b21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBp
-biAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQg
-bG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1h
-dD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAg
-ICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhp
-dCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZm
-ODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNo
-ZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMjAxNzAxMTIxNjU1
-MzEuMTE4ODItMS1wYm9uemluaUByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxNzAxMTIxNjU1MzEu
-MTE4ODItMS1wYm9uemluaUByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVz
-dCcKYzNiNmZmMyBhc3luYzogb3B0aW1pemUgYWlvX2JoX3BvbGwKMTBkYWVhNCBhaW86IGRvY3Vt
-ZW50IGxvY2tpbmcKYzg3ZGQ4MCBhaW8td2luMzI6IHJlbW92ZSB3YWxraW5nX2hhbmRsZXJzLCBw
-cm90ZWN0aW5nIEFpb0hhbmRsZXIgbGlzdCB3aXRoIGxpc3RfbG9jawplYmI3ZmM4IGFpby1wb3Np
-eDogcmVtb3ZlIHdhbGtpbmdfaGFuZGxlcnMsIHByb3RlY3RpbmcgQWlvSGFuZGxlciBsaXN0IHdp
-dGggbGlzdF9sb2NrCmE1N2M1YjkgYWlvOiB0d2VhayB3YWxraW5nIGluIGRpc3BhdGNoIHBoYXNl
-CmVjODA5MTIgYWlvLXBvc2l4OiBzcGxpdCBhaW9fZGlzcGF0Y2hfaGFuZGxlcnMgb3V0IG9mIGFp
-b19kaXNwYXRjaAozNDc3ZmVlIHFlbXUtdGhyZWFkOiBvcHRpbWl6ZSBRZW11TG9ja0NudCB3aXRo
-IGZ1dGV4ZXMgb24gTGludXgKNWU5MTEwYyBhaW86IG1ha2UgY3R4LT5saXN0X2xvY2sgYSBRZW11
-TG9ja0NudCwgc3Vic3VtaW5nIGN0eC0+d2Fsa2luZ19iaAo4YmFiZjY0IHFlbXUtdGhyZWFkOiBp
-bnRyb2R1Y2UgUWVtdUxvY2tDbnQKMjZhOTJlZiBhaW86IHJlbmFtZSBiaF9sb2NrIHRvIGxpc3Rf
-bG9jawoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xMDogYWlvOiByZW5h
-bWUgYmhfbG9jayB0byBsaXN0X2xvY2suLi4KQ2hlY2tpbmcgUEFUQ0ggMi8xMDogcWVtdS10aHJl
-YWQ6IGludHJvZHVjZSBRZW11TG9ja0NudC4uLgpDaGVja2luZyBQQVRDSCAzLzEwOiBhaW86IG1h
-a2UgY3R4LT5saXN0X2xvY2sgYSBRZW11TG9ja0NudCwgc3Vic3VtaW5nIGN0eC0+d2Fsa2luZ19i
-aC4uLgpDaGVja2luZyBQQVRDSCA0LzEwOiBxZW11LXRocmVhZDogb3B0aW1pemUgUWVtdUxvY2tD
-bnQgd2l0aCBmdXRleGVzIG9uIExpbnV4Li4uCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2
-ZXIgdXNlIHRhYnMKIzEwODogRklMRTogdXRpbC9sb2NrY250LmM6MjQ6CisjZGVmaW5lIFFFTVVf
-TE9DS0NOVF9TVEFURV9GUkVFICAgIDBeSS8qIGZyZWUsIHVuY29udGVuZGVkICovJAoKRVJST1I6
-IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTA5OiBGSUxFOiB1dGlsL2xvY2tj
-bnQuYzoyNToKKyNkZWZpbmUgUUVNVV9MT0NLQ05UX1NUQVRFX0xPQ0tFRCAgMV5JLyogbG9ja2Vk
-LCB1bmNvbnRlbmRlZCAqLyQKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxNjU6
-IEZJTEU6IHV0aWwvbG9ja2NudC5jOjgxOgorICAgICAgICAgICAgaW50IG5ldyA9IGV4cGVjdGVk
-IC0gUUVNVV9MT0NLQ05UX1NUQVRFX0xPQ0tFRCArIFFFTVVfTE9DS0NOVF9TVEFURV9XQUlUSU5H
-OwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzIwMzogRklMRTogdXRpbC9sb2Nr
-Y250LmM6MTE5OgorICAgICAgICAgICAgdmFsID0gYXRvbWljX2NtcHhjaGcoJmxvY2tjbnQtPmNv
-dW50LCB2YWwsIHZhbCArIFFFTVVfTE9DS0NOVF9DT1VOVF9TVEVQKTsKCldBUk5JTkc6IGxpbmUg
-b3ZlciA4MCBjaGFyYWN0ZXJzCiMyMDk6IEZJTEU6IHV0aWwvbG9ja2NudC5jOjEyNToKKyAgICAg
-ICAgICAgIGlmIChxZW11X2xvY2tjbnRfY21weGNoZ19vcl93YWl0KGxvY2tjbnQsICZ2YWwsIFFF
-TVVfTE9DS0NOVF9DT1VOVF9TVEVQLAoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMK
-IzI0NTogRklMRTogdXRpbC9sb2NrY250LmM6MTYxOgorICAgICAgICAgICAgdmFsID0gYXRvbWlj
-X2NtcHhjaGcoJmxvY2tjbnQtPmNvdW50LCB2YWwsIHZhbCAtIFFFTVVfTE9DS0NOVF9DT1VOVF9T
-VEVQKTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMyNTM6IEZJTEU6IHV0aWwv
-bG9ja2NudC5jOjE2OToKKyAgICAgICAgICAgIGlmIChxZW11X2xvY2tjbnRfY21weGNoZ19vcl93
-YWl0KGxvY2tjbnQsICZ2YWwsIGxvY2tlZF9zdGF0ZSwgJndhaXRlZCkpIHsKCldBUk5JTkc6IGxp
-bmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMyNTg6IEZJTEU6IHV0aWwvbG9ja2NudC5jOjE3NDoKKyAg
-ICAgICAgICAgICAgICAvKiBBdCB0aGlzIHBvaW50IHdlIGRvIG5vdCBrbm93IGlmIHRoZXJlIGFy
-ZSBtb3JlIHdhaXRlcnMuICBBc3N1bWUKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJz
-CiMyOTQ6IEZJTEU6IHV0aWwvbG9ja2NudC5jOjIxMDoKKyAgICAgICAgaWYgKHFlbXVfbG9ja2Nu
-dF9jbXB4Y2hnX29yX3dhaXQobG9ja2NudCwgJnZhbCwgbG9ja2VkX3N0YXRlLCAmd2FpdGVkKSkg
-ewoKdG90YWw6IDIgZXJyb3JzLCA3IHdhcm5pbmdzLCA0NDcgbGluZXMgY2hlY2tlZAoKWW91ciBw
-YXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2Ug
-ZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIs
-IHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggNS8xMDogYWlv
-LXBvc2l4OiBzcGxpdCBhaW9fZGlzcGF0Y2hfaGFuZGxlcnMgb3V0IG9mIGFpb19kaXNwYXRjaC4u
-LgpDaGVja2luZyBQQVRDSCA2LzEwOiBhaW86IHR3ZWFrIHdhbGtpbmcgaW4gZGlzcGF0Y2ggcGhh
-c2UuLi4KQ2hlY2tpbmcgUEFUQ0ggNy8xMDogYWlvLXBvc2l4OiByZW1vdmUgd2Fsa2luZ19oYW5k
-bGVycywgcHJvdGVjdGluZyBBaW9IYW5kbGVyIGxpc3Qgd2l0aCBsaXN0X2xvY2suLi4KQ2hlY2tp
-bmcgUEFUQ0ggOC8xMDogYWlvLXdpbjMyOiByZW1vdmUgd2Fsa2luZ19oYW5kbGVycywgcHJvdGVj
-dGluZyBBaW9IYW5kbGVyIGxpc3Qgd2l0aCBsaXN0X2xvY2suLi4KQ2hlY2tpbmcgUEFUQ0ggOS8x
-MDogYWlvOiBkb2N1bWVudCBsb2NraW5nLi4uCkNoZWNraW5nIFBBVENIIDEwLzEwOiBhc3luYzog
-b3B0aW1pemUgYWlvX2JoX3BvbGwuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQg
-ZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBi
-eSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFj
-ayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
+On 12.01.2017 17:22, Markus Armbruster wrote:
+> Thomas Huth <thuth@redhat.com> writes:
+>=20
+>> When running certain HMP commands ("info registers", "info cpustats",
+>> "nmi", "memsave" or dumping virtual memory) with the "none" machine,
+>> QEMU crashes with a segmentation fault. This happens because the "none=
+"
+>> machine does not have any CPUs by default, but these HMP commands did
+>> not check for a valid CPU pointer yet. Add such checks now, so we get
+>> an error message about the missing CPU instead.
+>>
+>> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>  v3:
+>>  - Use UNASSIGNED_CPU_INDEX instead of hard-coded -1
+>>  v2:
+>>  - Added more checks to cover "nmi" and "memsave", too
+>>
+>>  hmp.c     |  8 +++++++-
+>>  monitor.c | 37 +++++++++++++++++++++++++++++++------
+>>  2 files changed, 38 insertions(+), 7 deletions(-)
+>>
+>> diff --git a/hmp.c b/hmp.c
+>> index b869617..b1c503a 100644
+>> --- a/hmp.c
+>> +++ b/hmp.c
+>> @@ -1013,8 +1013,14 @@ void hmp_memsave(Monitor *mon, const QDict *qdi=
+ct)
+>>      const char *filename =3D qdict_get_str(qdict, "filename");
+>>      uint64_t addr =3D qdict_get_int(qdict, "val");
+>>      Error *err =3D NULL;
+>> +    int cpu_index =3D monitor_get_cpu_index();
+>> =20
+>> -    qmp_memsave(addr, size, filename, true, monitor_get_cpu_index(), =
+&err);
+>> +    if (cpu_index < 0) {
+>> +        monitor_printf(mon, "No CPU available\n");
+>> +        return;
+>> +    }
+>> +
+>> +    qmp_memsave(addr, size, filename, true, cpu_index, &err);
+>>      hmp_handle_error(mon, &err);
+>>  }
+>> =20
+>> diff --git a/monitor.c b/monitor.c
+>> index 0841d43..17121ff 100644
+>> --- a/monitor.c
+>> +++ b/monitor.c
+>> @@ -1025,6 +1025,9 @@ int monitor_set_cpu(int cpu_index)
+>>  CPUState *mon_get_cpu(void)
+>>  {
+>>      if (!cur_mon->mon_cpu) {
+>> +        if (!first_cpu) {
+>> +            return NULL;
+>> +        }
+>>          monitor_set_cpu(first_cpu->cpu_index);
+>>      }
+>>      cpu_synchronize_state(cur_mon->mon_cpu);
+>> @@ -1033,17 +1036,27 @@ CPUState *mon_get_cpu(void)
+>> =20
+>>  CPUArchState *mon_get_cpu_env(void)
+>>  {
+>> -    return mon_get_cpu()->env_ptr;
+>> +    CPUState *cs =3D mon_get_cpu();
+>> +
+>> +    return cs ? cs->env_ptr : NULL;
+>>  }
+>> =20
+>>  int monitor_get_cpu_index(void)
+>>  {
+>> -    return mon_get_cpu()->cpu_index;
+>> +    CPUState *cs =3D mon_get_cpu();
+>> +
+>> +    return cs ? cs->cpu_index : UNASSIGNED_CPU_INDEX;
+>>  }
+>> =20
+>>  static void hmp_info_registers(Monitor *mon, const QDict *qdict)
+>>  {
+>> -    cpu_dump_state(mon_get_cpu(), (FILE *)mon, monitor_fprintf, CPU_D=
+UMP_FPU);
+>> +    CPUState *cs =3D mon_get_cpu();
+>> +
+>> +    if (!cs) {
+>> +        monitor_printf(mon, "No CPU available\n");
+>> +        return;
+>> +    }
+>> +    cpu_dump_state(cs, (FILE *)mon, monitor_fprintf, CPU_DUMP_FPU);
+>>  }
+>> =20
+>>  static void hmp_info_jit(Monitor *mon, const QDict *qdict)
+>> @@ -1076,7 +1089,13 @@ static void hmp_info_history(Monitor *mon, cons=
+t QDict *qdict)
+>> =20
+>>  static void hmp_info_cpustats(Monitor *mon, const QDict *qdict)
+>>  {
+>> -    cpu_dump_statistics(mon_get_cpu(), (FILE *)mon, &monitor_fprintf,=
+ 0);
+>> +    CPUState *cs =3D mon_get_cpu();
+>> +
+>> +    if (!cs) {
+>> +        monitor_printf(mon, "No CPU available\n");
+>> +        return;
+>> +    }
+>> +    cpu_dump_statistics(cs, (FILE *)mon, &monitor_fprintf, 0);
+>>  }
+>> =20
+>>  static void hmp_info_trace_events(Monitor *mon, const QDict *qdict)
+>> @@ -1235,6 +1254,12 @@ static void memory_dump(Monitor *mon, int count=
+, int format, int wsize,
+>>      int l, line_size, i, max_digits, len;
+>>      uint8_t buf[16];
+>>      uint64_t v;
+>> +    CPUState *cs =3D mon_get_cpu();
+>> +
+>> +    if (!cs && (format =3D=3D 'i' || !is_physical)) {
+>> +        monitor_printf(mon, "Can not dump without CPU\n");
+>> +        return;
+>> +    }
+>=20
+> This is basically "if (we're going to dereference cs)".  Not so nice, i=
+n
+> particular since the dereferences are hidden inside mon_get_cpu_env()
+> calls.  I guess it'll do.
+>=20
+>> =20
+>>      if (format =3D=3D 'i') {
+>>          int flags =3D 0;
+>> @@ -1264,7 +1289,7 @@ static void memory_dump(Monitor *mon, int count,=
+ int format, int wsize,
+>>          flags =3D msr_le << 16;
+>>          flags |=3D env->bfd_mach;
+>>  #endif
+>> -        monitor_disas(mon, mon_get_cpu(), addr, count, is_physical, f=
+lags);
+>> +        monitor_disas(mon, cs, addr, count, is_physical, flags);
+>>          return;
+>>      }
+>> =20
+>> @@ -1303,7 +1328,7 @@ static void memory_dump(Monitor *mon, int count,=
+ int format, int wsize,
+>>          if (is_physical) {
+>>              cpu_physical_memory_read(addr, buf, l);
+>>          } else {
+>> -            if (cpu_memory_rw_debug(mon_get_cpu(), addr, buf, l, 0) <=
+ 0) {
+>> +            if (cpu_memory_rw_debug(cs, addr, buf, l, 0) < 0) {
+>>                  monitor_printf(mon, " Cannot access memory\n");
+>>                  break;
+>>              }
+>=20
+> What about get_monitor_def()?
+>=20
+>     $ qemu-system-x86_64 --nodefaults -S -display none -M none -monitor=
+ stdio
+>     QEMU 2.8.50 monitor - type 'help' for more information
+>     (qemu) p $pc
+>     Segmentation fault (core dumped)
+
+Oh, I saw that get_monitor_def() uses mon_get_cpu_env(), but I only
+checked with qemu-system-m68k where "p $pc" simply prints "unknown
+register" when you run it with the "none" machine ... that's why I
+assumed that no fixes would be needed here.
+
+> Likewise, info tlb, info mem, ...=20
+
+These seem to be target specific, too, so I think they could go into a
+separate patch instead. If it's OK for you, I'd like to keep my current
+patch as it is, and add these items to
+http://qemu-project.org/BiteSizedTasks instead - since these are all
+non-urgent problems that should be easy to fix for newcomers, too.
+
+ Thomas
