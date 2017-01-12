@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46757)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47511)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cRiH5-0002d4-US
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 11:30:54 -0500
+	(envelope-from <mdavidsaver@gmail.com>) id 1cRiKM-0005mj-0U
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 11:34:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1cRiH0-0003Q1-VN
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 11:30:51 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58116)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1cRiH0-0003PP-MV
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 11:30:46 -0500
-References: <20170111173457.30455-1-lersek@redhat.com>
-	<20170111173457.30455-3-lersek@redhat.com>
-	<20170112131053.GA27893@thinpad.lan.raisama.net>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <899dc23a-b6c0-e9c8-c31a-03e4cc8e7b7e@redhat.com>
-Date: Thu, 12 Jan 2017 17:30:42 +0100
+	(envelope-from <mdavidsaver@gmail.com>) id 1cRiKH-0004xL-Jd
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 11:34:14 -0500
+References: <1449101933-24928-1-git-send-email-mdavidsaver@gmail.com>
+	<1449101933-24928-2-git-send-email-mdavidsaver@gmail.com>
+	<CAFEAcA_53j-DGqW7WMzWaofUK9zFmeORUSFNAdHUPFKTZyqZ+Q@mail.gmail.com>
+	<CAFEAcA9u2MPh7tKoaMwfeMf04VOWnR-ScJhBvnpBNO-7-kkywg@mail.gmail.com>
+From: Michael Davidsaver <mdavidsaver@gmail.com>
+Message-ID: <b0a0b17b-fff1-cac8-b6e8-b1b7dd6904ec@gmail.com>
+Date: Thu, 12 Jan 2017 11:33:37 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170112131053.GA27893@thinpad.lan.raisama.net>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 wave 1 2/4] fw-cfg: turn
- FW_CFG_FILE_SLOTS into a device property
+In-Reply-To: <CAFEAcA9u2MPh7tKoaMwfeMf04VOWnR-ScJhBvnpBNO-7-kkywg@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="qJBoPSopOsRNk5Uw5WuMqL5jpOb62lTB6"
+Subject: Re: [Qemu-devel] [PATCH v2 01/26] armv7m: MRS/MSR handle
+ unprivileged access
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,71 +27,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu devel list <qemu-devel@nongnu.org>, Igor Mammedov <imammedo@redhat.com>, "Gabriel L. Somlo" <somlo@cmu.edu>, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Peter Crosthwaite <crosthwaitepeter@gmail.com>, qemu-arm <qemu-arm@nongnu.org>
 
-On 01/12/17 14:10, Eduardo Habkost wrote:
-> On Wed, Jan 11, 2017 at 06:34:55PM +0100, Laszlo Ersek wrote:
-> [...]
->>  static Property fw_cfg_io_properties[] = {
->>      DEFINE_PROP_UINT32("iobase", FWCfgIoState, iobase, -1),
->>      DEFINE_PROP_UINT32("dma_iobase", FWCfgIoState, dma_iobase, -1),
->>      DEFINE_PROP_BOOL("dma_enabled", FWCfgIoState, parent_obj.dma_enabled,
->>                       true),
->> +    DEFINE_PROP_UINT16("file_slots", FWCfgIoState, parent_obj.file_slots,
->> +                       FW_CFG_FILE_SLOTS_MIN),
->>      DEFINE_PROP_END_OF_LIST(),
->>  };
->>  
->> @@ -1027,6 +1066,13 @@ static void fw_cfg_io_realize(DeviceState *dev, Error **errp)
-> 
-> I'm not sure what is more important here: following the QOM
-> property name convention using "-" instead of "_", or being
-> consistent with the other existing properties.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--qJBoPSopOsRNk5Uw5WuMqL5jpOb62lTB6
+From: Michael Davidsaver <mdavidsaver@gmail.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>,
+ Peter Crosthwaite <crosthwaitepeter@gmail.com>,
+ qemu-arm <qemu-arm@nongnu.org>
+Message-ID: <b0a0b17b-fff1-cac8-b6e8-b1b7dd6904ec@gmail.com>
+Subject: Re: [PATCH v2 01/26] armv7m: MRS/MSR handle unprivileged access
+References: <1449101933-24928-1-git-send-email-mdavidsaver@gmail.com>
+ <1449101933-24928-2-git-send-email-mdavidsaver@gmail.com>
+ <CAFEAcA_53j-DGqW7WMzWaofUK9zFmeORUSFNAdHUPFKTZyqZ+Q@mail.gmail.com>
+ <CAFEAcA9u2MPh7tKoaMwfeMf04VOWnR-ScJhBvnpBNO-7-kkywg@mail.gmail.com>
+In-Reply-To: <CAFEAcA9u2MPh7tKoaMwfeMf04VOWnR-ScJhBvnpBNO-7-kkywg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Right, when working with the compat settings, I saw both schemes. I
-couldn't decide. I figured I'd stick with the underscore seen with
-"dma_enabled".
+On 01/12/2017 09:14 AM, Peter Maydell wrote:
+> ...
+> Michael has confirmed to me that this was just an oversight.
 
-> 
-> In either case, we could add a "x-" prefix to indicate it is not
-> supposed to be configured directly by the user.
-
-I thought "x-" meant "experimental"; i.e., the property could be changed
-or could go away at any moment. That's a slightly different meaning than
-"not meant for users".
-
-BTW I think the same (== not meant for the user) applies to a number of
-other properties (dma_enabled is one of them, but other devices have
-this kind too); do we consistently call them x-*?
-
-> 
-> [...]
->> @@ -1063,6 +1109,8 @@ static Property fw_cfg_mem_properties[] = {
->>      DEFINE_PROP_UINT32("data_width", FWCfgMemState, data_width, -1),
->>      DEFINE_PROP_BOOL("dma_enabled", FWCfgMemState, parent_obj.dma_enabled,
->>                       true),
->> +    DEFINE_PROP_UINT16("file_slots", FWCfgMemState, parent_obj.file_slots,
->> +                       FW_CFG_FILE_SLOTS_MIN),
-> 
-> It looks like you can add the property to the TYPE_FW_CFG parent
-> class instead of duplicating it on the subclasses. The existing
-> "dma_enabled" property could be moved there as well.
-
-I would prefer if someone could pick up that task, separately.
-
-The idea crossed my mind when I was working on the common base class,
-originally, wrt. dma_enabled. I vaguely remember that there was some
-problem with moving up the property. Ultimately the reviewers didn't
-expect me, or suggest, to move it up, hence the current status.
-
-I think it's out of scope for this series. If you (or someone else) can
-do it, I agree it would be an improvement, but I'd rather learn the
-method from someone else's patch than experiment with it myself.
+This was me not knowing the process.  (just to confirm this publicly)
 
 
-If there's a consensus on the x- prefix and/or the underscore/hyphen
-question, I'm happy to send a v6 with those changes.
 
-Thanks,
-Laszlo
+--qJBoPSopOsRNk5Uw5WuMqL5jpOb62lTB6
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJYd6/lAAoJEJQB5ss9fxjqwz8QAJobiOzExMvHV7PQ86i0uPNx
+hFmaeQzIee1J2fq5ma20qgjLFWqhgEOivnn/gm/nJzBVKB2HLHFIS66RtB4r12Dd
+iaLknvPS+ZVhKWjQy+/wVg7zzyJodo3GQ71mdmGf0Zbr51BL17MHu9gt79uvfgL8
+kD3H/bZEXDVb48GjNktkBPjvLFdJIGEPh86gieEncGi3jwQpK/8SnHj7hQLMk4Yj
+USfgImHiaZgjLBGgGSrvKqO0EvU7GcPU1n/OkqFxdxwxCgASwXyYj6o2TPWc6H/T
+cSWTWE0AVvTbLagKhzCokB0TXZr/dwvXsqzaaMHocjpuJeB7nA1xy5nupmmYFgT0
+bTiZj0+0M3ETCqbGvgoMhQIgyt9mhKd3IloTQqbu9rJoE+DMgdSxp+oc1ucdDcsz
+k6JaiHqZ58C4mQLgdywnbMfzlP0N1y3rPJCnbY7zEYL1VS8XRbFhWBYNacUgHHNh
+q9HXSxJ0ezqBKBZQdboc4omPyD8/FRz2dVzEW49TKvfrWyCyUECZn/BA4VHslhYh
+5M1phmtLNTPoVB280u1XnyTcTnvnjUPxD3B6XqXz3JtK7bPOhRGTA/LLDhyw48Sh
+0jL05MWC3O21z+tm2tunsuiC12mNTf72dWeADEjnn0f+ING/Xz60azhfEzSKh2xQ
+XhKlTbaMzeBtD9coh4qn
+=19nq
+-----END PGP SIGNATURE-----
+
+--qJBoPSopOsRNk5Uw5WuMqL5jpOb62lTB6--
