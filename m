@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47635)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48241)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cRgYD-0000qV-PW
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 09:40:30 -0500
+	(envelope-from <eblake@redhat.com>) id 1cRgbL-0002Hp-1z
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 09:43:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1cRgYC-0005ZI-1Z
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 09:40:25 -0500
-Date: Thu, 12 Jan 2017 14:40:06 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170112144006.GE14042@stefanha-x1.localdomain>
-References: <586CB62C.6080504@huawei.com>
-	<c7c4fd91-1374-7371-1ff9-533a8e916f2a@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1cRgbH-0006QZ-Tl
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 09:43:39 -0500
+References: <CAMxP3BT7ncDLePmP7QfXMtbodJ81+9Frc01aCkipya3-BNL6AA@mail.gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <e6e26ad1-3fdf-85ac-0dc4-f4027123af6b@redhat.com>
+Date: Thu, 12 Jan 2017 08:43:26 -0600
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="/2994txjAzEdQwm5"
-Content-Disposition: inline
-In-Reply-To: <c7c4fd91-1374-7371-1ff9-533a8e916f2a@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] NBD handshake may block qemu main
- thread when socket delays or has packet loss
+In-Reply-To: <CAMxP3BT7ncDLePmP7QfXMtbodJ81+9Frc01aCkipya3-BNL6AA@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="VInmtTetNvFLL0mJoPkFUjN2Vlict4E5k"
+Subject: Re: [Qemu-devel] How to online resize qemu disk with nbd protocol?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,75 +23,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: "Fangyi (C)" <eric.fangyi@huawei.com>, kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, lina.lulina@huawei.com, qemu-block@nongnu.org, subo7@huawei.com, qemu-devel@nongnu.org, wu.wubin@huawei.com, "jiangxiaoqing (C)" <sochin.jiang@huawei.com>
+To: Bob Chen <a175818323@gmail.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, "nbd-general@lists.sourceforge.net" <nbd-general@lists.sourceforge.net>
 
-
---/2994txjAzEdQwm5
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--VInmtTetNvFLL0mJoPkFUjN2Vlict4E5k
+From: Eric Blake <eblake@redhat.com>
+To: Bob Chen <a175818323@gmail.com>, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org,
+ "nbd-general@lists.sourceforge.net" <nbd-general@lists.sourceforge.net>
+Message-ID: <e6e26ad1-3fdf-85ac-0dc4-f4027123af6b@redhat.com>
+Subject: Re: [Qemu-devel] How to online resize qemu disk with nbd protocol?
+References: <CAMxP3BT7ncDLePmP7QfXMtbodJ81+9Frc01aCkipya3-BNL6AA@mail.gmail.com>
+In-Reply-To: <CAMxP3BT7ncDLePmP7QfXMtbodJ81+9Frc01aCkipya3-BNL6AA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 04, 2017 at 02:44:53PM -0600, Eric Blake wrote:
-> On 01/04/2017 02:45 AM, Fangyi (C) wrote:
-> >     As we all know, socket is in blocking mode when nbd is negotiating
-> > with the other end. If the network is poor because of delay or packet
-> > loss, socket read or write will return very slowly. The mainloop events
-> > won't be handled in time util nbd handshake ends.
+On 01/12/2017 04:22 AM, Bob Chen wrote:
+> Hi,
 >=20
-> I wonder if Paolo's work to improve NBD coroutine usage after handshakes
-> can be leveraged here?
 >=20
-> https://lists.gnu.org/archive/html/qemu-devel/2016-12/msg03224.html
+> My qemu runs on a 3rd party distributed block storage, and the disk bac=
+kend
+> protocol is nbd.
 >=20
-> >=20
-> >     Any advices to solve the problem?
+> I notices that there are differences between default qcow2 local disk a=
+nd
+> my nbd disk, in terms of resizing the disk on the fly.
 >=20
-> At any rate, it sounds like someone will have to patch NBD code to use
-> coroutines instead of blocking for the handshake portion (and that's
-> true in general - ANY operation that can block should probably be
-> refactored into aio or coroutines so that the main loop can remain
-> responsive).
+> Local qcow2 disk could work no matter using qemu-img resize=20
 
-This is a general issue with network block drivers.  They tend to do
-blocking DNS resolution, blocking connection, and blocking protocol
-handshake/negotiation in .bdrv_open().
+No. Don't EVER use 'qemu-img resize' while a qemu process is actively
+serving a VM guest.  Two concurrent modifiers to a qcow2 file is
+unsupported, and is highly likely to corrupt your guest's view of the
+disk, if not the entire qcow2 file.
 
-We cannot expose a block device to the guest before it has been opened
-because the disk's capacity is unknown plus the guest would experience
-I/O timeouts or errors.
+> or qemu monitor
+> 'block_resize',
 
-I think we need to agree on how to handle this for all different types
-of network protocols, not just nbd, before code can be written.
+Yes, that is the only supported way to do an online resize.
 
-One starting point is:
+> but the nbd disk seemed to fail to detect the backend size
+> change(had resized the disk on EBS at first). It said "this feature or
+> command is not currently supported".
 
-Should we make .drv_open() a coroutine and introduce a async concept to
-blockdev_add, reopen, etc?
+That's because the NBD protocol lacks a resize command.  You'd have to
+first get that proposed as an NBD extension before qemu could support it.=
 
-The BlockDriverState would be in a special OPENING or OFFLINE state
-where its name is reserved but it cannot be used for I/O or emulated
-devices yet.
 
-QMP clients would have watch out for an event that tells them that it's
-now okay to device-add the emulated storage device using the drive.
+>=20
+> Is that possible to hack qemu nbd code, making it the same way as resiz=
+ing
+> local qcow2 disk? I have the interface to resize EBS disk at backend.
 
-Any ideas for a nicer solution?
+Anything is possible in open source with enough time and patches, but
+the place to tackle this is to first propose an extension to the NBD
+protocol (I've added the NBD list in cc).
 
-Stefan
+--=20
+Eric Blake   eblake redhat com    +1-919-301-3266
+Libvirt virtualization library http://libvirt.org
 
---/2994txjAzEdQwm5
+
+--VInmtTetNvFLL0mJoPkFUjN2Vlict4E5k
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEcBAEBAgAGBQJYd5VGAAoJEJykq7OBq3PI2sUH/1OnCgZmmvWTUVjD688++GGM
-cSl+vgvwhmbf7yMqHvUiyT+agLdPU6DC7VX2U8bKX/oDtQRromL4tT5iltj+MECA
-vrAO5NWXcUzn5/80Dw8Q761IBqNEuRI1QPCharZiwXhBclBqAuFPn3TdtbrW5kfy
-xE/A0XBjz4v1OM4kR5KYSHClDJ0e7PZgCIota7+TYDLL4MMHcP4BD1FEfupz6jGI
-b0ktHuH0DXE/FBfxX+YpWQZ53ezaH61adc+TJbZ+417vv3+WoWUkLFgXGFrvNDg2
-k5AG5ORZX9+UPL7mmkL7UBBZ6+KtKGkIPQwxVXE5F0spVO7dGCYtuNLo9pWtqMI=
-=pXHG
+iQEcBAEBCAAGBQJYd5YOAAoJEKeha0olJ0NqlkQH/Rml9MpvU7GgOd4QJZPyad4c
+n4V/9eTl+2rnuaxA3vvdXemLyDtLDzD5AGkTJPiGHyIaGPdTJU8j+CY24LkURTkN
+hTzmUaGc9Eye6j5HzB+4/TY+yKnap/P9eJ3mIeZ+AMv8s4xY7jkoYaNSk9jGph4R
+PpByMEDucHGXiPLDvUe54BOEZx7Uj5wyozAUM22fPxz2wKEGHhPZK5fTaERcT1fE
+MHKkXkdua7h44JFt9R1GEIscad6FXUcjKoGkiYs72jgioZX64SXeGD5qRHifHfjs
+WMt4cVCse/FGQPfXFR5wmrjbvi5iB/tgxXo0/cN7O5KjwLBrFiGp45Gkeaa7lsc=
+=zEuV
 -----END PGP SIGNATURE-----
 
---/2994txjAzEdQwm5--
+--VInmtTetNvFLL0mJoPkFUjN2Vlict4E5k--
