@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34187)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35058)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex@alex.org.uk>) id 1cRhYJ-0002o0-5T
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 10:44:36 -0500
+	(envelope-from <alex.bennee@linaro.org>) id 1cRhbR-0005KE-RK
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 10:47:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex@alex.org.uk>) id 1cRhYE-0005tp-N2
-	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 10:44:35 -0500
-Content-Type: multipart/signed;
-	boundary="Apple-Mail=_65EC4AA3-C441-4C24-AC3A-B37303B275D1";
-	protocol="application/pgp-signature"; micalg=pgp-sha512
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-From: Alex Bligh <alex@alex.org.uk>
-In-Reply-To: <e6e26ad1-3fdf-85ac-0dc4-f4027123af6b@redhat.com>
-Date: Thu, 12 Jan 2017 15:44:23 +0000
-Message-Id: <2EAE3C4F-58AF-4594-A284-A69D8BC3EA8F@alex.org.uk>
-References: <CAMxP3BT7ncDLePmP7QfXMtbodJ81+9Frc01aCkipya3-BNL6AA@mail.gmail.com>
-	<e6e26ad1-3fdf-85ac-0dc4-f4027123af6b@redhat.com>
-Subject: Re: [Qemu-devel] [Nbd] How to online resize qemu disk with nbd
- protocol?
+	(envelope-from <alex.bennee@linaro.org>) id 1cRhbN-00079H-3o
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 10:47:49 -0500
+Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:34888)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1cRhbM-00078m-Ss
+	for qemu-devel@nongnu.org; Thu, 12 Jan 2017 10:47:45 -0500
+Received: by mail-wm0-x22c.google.com with SMTP id r126so25171278wmr.0
+	for <qemu-devel@nongnu.org>; Thu, 12 Jan 2017 07:47:44 -0800 (PST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Thu, 12 Jan 2017 15:47:30 +0000
+Message-Id: <20170112154731.1028-3-alex.bennee@linaro.org>
+In-Reply-To: <20170112154731.1028-1-alex.bennee@linaro.org>
+References: <20170112154731.1028-1-alex.bennee@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v3 2/3] cpu_common_reset: wrap TCG specific
+ code in tcg_enabled()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,58 +30,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Alex Bligh <alex@alex.org.uk>, Bob Chen <a175818323@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>, "nbd-general@lists.sourceforge.net" <nbd-general@lists.sourceforge.net>
+To: rth@twiddle.net
+Cc: ehabkost@redhat.com, qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
+Both the cpu->tb_jmp_cache and SoftMMU TLB structures are only used
+when running TCG code so we might as well skip them for anything else.
 
---Apple-Mail=_65EC4AA3-C441-4C24-AC3A-B37303B275D1
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain;
-	charset=us-ascii
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ qom/cpu.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-
-> On 12 Jan 2017, at 14:43, Eric Blake <eblake@redhat.com> wrote:
-> 
-> That's because the NBD protocol lacks a resize command.  You'd have to
-> first get that proposed as an NBD extension before qemu could support it.
-
-Actually the NBD protocol lacks a 'make a disk with size X' command,
-let alone a resize command. The size of an NBD disk is (currently)
-entirely in the hands of the server. What I think we'd really need
-would be a 'reread size' command, and have the server capable of
-supporting resizing. That would then work for readonly images too.
-
---
-Alex Bligh
-
-
-
-
-
---Apple-Mail=_65EC4AA3-C441-4C24-AC3A-B37303B275D1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename=signature.asc
-Content-Type: application/pgp-signature;
-	name=signature.asc
-Content-Description: Message signed with OpenPGP using GPGMail
-
------BEGIN PGP SIGNATURE-----
-Comment: GPGTools - https://gpgtools.org
-
-iQIcBAEBCgAGBQJYd6RXAAoJEBPm5K7i9iOR06EP/jMGao6briPN3V0xJ7o92pWG
-LOB8m3RasGNc44bdkisCqK4kuJHhRRxcTu+diUuId18bY4KZq05uuOF9eZKIhdzv
-KpIi5gFvviNSaEPYBksAoHMWxeh2Hc1Lysmdf16KzW84OFiuND59ZbpiqBbSHOSl
-kkmoZp7a0IUEw24NiPjNpMK0DIGnKOXhVB/0xdMe+t/MeBrW7cQmraSjqDuCeDoV
-bURoktVJgl/n5lZdt/tYEBkOBHrQs3Nxb3RA/AXcK+RqzJWxJCF1qbxeHG1D4fj/
-vY7KG/8Ehy1bXdXoldDdL+q0z32m0sxpjJuLVRUAmZILTqWn66zS5OPjJkl3EW2A
-rz4RHPfHYq2A2IAqS9pRPUr5aRLlnWjC8cYOULH8xTLOsV8dsgR++QCLo5f9oLI5
-B26XanfaMJILGK57jhB/9Pt/tKfTw9qH+l8Zi9OoqxLGnjVhAGQk+E3IMQEYRZ/g
-xjwwSAwMnOOXJaQZqKXt18RE+2TDs0MOWOwg48teTDn3XkKTY14rASZJS5bw0pcH
-9IUkk37Z4BsFrGxWcwP7bncSsCZx3EdNrwnyodft4iVC17QGdk8ihXVeJ2guzebQ
-1VoDJWd/MyeBAscCxRn6LCFaLdBM3QyC8YMGqZjrFH1Yf3JnjiEoWx8/Uu3uqSde
-r/onQ11QipqDwCyP53HH
-=Rk+t
------END PGP SIGNATURE-----
-
---Apple-Mail=_65EC4AA3-C441-4C24-AC3A-B37303B275D1--
+diff --git a/qom/cpu.c b/qom/cpu.c
+index cc51de2a8c..61ee0cb88c 100644
+--- a/qom/cpu.c
++++ b/qom/cpu.c
+@@ -270,13 +270,15 @@ static void cpu_common_reset(CPUState *cpu)
+     cpu->exception_index = -1;
+     cpu->crash_occurred = false;
+ 
+-    for (i = 0; i < TB_JMP_CACHE_SIZE; ++i) {
+-        atomic_set(&cpu->tb_jmp_cache[i], NULL);
+-    }
++    if (tcg_enabled()) {
++        for (i = 0; i < TB_JMP_CACHE_SIZE; ++i) {
++            atomic_set(&cpu->tb_jmp_cache[i], NULL);
++        }
+ 
+ #ifdef CONFIG_SOFTMMU
+-    tlb_flush(cpu, 0);
++        tlb_flush(cpu, 0);
+ #endif
++    }
+ }
+ 
+ static bool cpu_common_has_work(CPUState *cs)
+-- 
+2.11.0
